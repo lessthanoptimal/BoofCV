@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -199,8 +199,8 @@ public class VisualizeHogDescriptorApp<T extends ImageBase<T>> extends Demonstra
 		g2.fillRect(tl_x, tl_y, gridWidth, gridHeight);
 
 		double maxValue = 0;
-		for (int i = 0; i < desc.value.length; i++) {
-			maxValue = Math.max(maxValue, desc.value[i]);
+		for (int i = 0; i < desc.data.length; i++) {
+			maxValue = Math.max(maxValue, desc.data[i]);
 		}
 
 		float foo = config.pixelsPerCell/2.0f;
@@ -213,7 +213,7 @@ public class VisualizeHogDescriptorApp<T extends ImageBase<T>> extends Demonstra
 				int c_y = tl_y + (int)((cellY + 0.5)*config.pixelsPerCell);
 
 				for (int i = 0; i < config.orientationBins; i++) {
-					int a = (int)(255.0f*desc.value[index++]/maxValue);
+					int a = (int)(255.0f*desc.data[index++]/maxValue);
 					g2.setColor(colors[a]);
 
 					float x0 = c_x - foo*cos[i];

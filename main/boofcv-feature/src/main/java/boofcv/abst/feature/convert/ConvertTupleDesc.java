@@ -16,7 +16,7 @@
  * limitations under the License.
  */
 
-package boofcv.abst.feature.describe;
+package boofcv.abst.feature.convert;
 
 import boofcv.struct.feature.TupleDesc;
 

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -42,7 +42,7 @@ class TestScoreAssociateEuclideanSq extends BoofStandardJUnit {
 		public TupleDesc_F32 createDescription() {
 			var a = new TupleDesc_F32(5);
 			for (int i = 0; i < a.size(); i++)
-				a.value[i] = rand.nextFloat() * 2;
+				a.data[i] = rand.nextFloat() * 2;
 
 			return a;
 		}
@@ -54,8 +54,8 @@ class TestScoreAssociateEuclideanSq extends BoofStandardJUnit {
 			var a = new TupleDesc_F32(5);
 			var b = new TupleDesc_F32(5);
 
-			a.value = new float[]{1, 2, 3, 4, 5};
-			b.value = new float[]{2, -1, 7, -8, 10};
+			a.data = new float[]{1, 2, 3, 4, 5};
+			b.data = new float[]{2, -1, 7, -8, 10};
 
 			assertEquals(195, score.score(a, b), 1e-4);
 		}
@@ -72,7 +72,7 @@ class TestScoreAssociateEuclideanSq extends BoofStandardJUnit {
 		public TupleDesc_F64 createDescription() {
 			var a = new TupleDesc_F64(5);
 			for (int i = 0; i < a.size(); i++)
-				a.value[i] = rand.nextDouble() * 2;
+				a.data[i] = rand.nextDouble() * 2;
 
 			return a;
 		}
@@ -84,8 +84,8 @@ class TestScoreAssociateEuclideanSq extends BoofStandardJUnit {
 			var a = new TupleDesc_F64(5);
 			var b = new TupleDesc_F64(5);
 
-			a.value=new double[]{1,2,3,4,5};
-			b.value=new double[]{2,-1,7,-8,10};
+			a.data =new double[]{1,2,3,4,5};
+			b.data =new double[]{2,-1,7,-8,10};
 
 			assertEquals(195,score.score(a,b),1e-4);
 		}

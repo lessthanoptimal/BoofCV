@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -57,7 +57,7 @@ public class TestImplDescribePointPixelRegion_U8 extends BoofStandardJUnit {
 		int x0 = c_x-w/2;
 		for( int y = y0; y < y0+h; y++ ) {
 			for( int x = x0; x < x0+w; x++ , index++ ) {
-				assertEquals(image.get(x,y),desc.value[index],1e-4);
+				assertEquals(image.get(x,y),desc.data[index],1e-4);
 			}
 		}
 	}
@@ -82,9 +82,9 @@ public class TestImplDescribePointPixelRegion_U8 extends BoofStandardJUnit {
 		for( int y = y0; y < y0+h; y++ ) {
 			for( int x = x0; x < x0+w; x++ , index++ ) {
 				if(image.isInBounds(x,y))
-					assertEquals(image.get(x,y),desc.value[index],1e-4);
+					assertEquals(image.get(x,y),desc.data[index],1e-4);
 				else
-					assertEquals(0,desc.value[index],1e-4);
+					assertEquals(0,desc.data[index],1e-4);
 			}
 		}
 	}

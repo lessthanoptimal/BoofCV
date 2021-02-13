@@ -62,7 +62,7 @@ public class ClusterVisualWords {
 	 * @param feature image feature. Reference to inner array is saved.
 	 */
 	public void addReference( TupleDesc_F64 feature ) {
-		tuples.add(feature.getValue());
+		tuples.add(feature.getData());
 	}
 
 	/**

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -68,7 +68,7 @@ public class TldTemplatePanel extends JPanel {
 			if (gray) {
 				for (int y = 0; y < featureWidth; y++) {
 					for (int x = 0; x < featureWidth; x++) {
-						int v = (int)(f.value[index++] + f.mean);
+						int v = (int)(f.data[index++] + f.mean);
 						rgb = v << 16 | v << 8 | v;
 
 						img.setRGB(x, y, rgb);
@@ -76,8 +76,8 @@ public class TldTemplatePanel extends JPanel {
 				}
 			} else {
 				double maxAbs = 0;
-				for (int i = 0; i < f.value.length; i++) {
-					double v = Math.abs(f.value[i]);
+				for (int i = 0; i < f.data.length; i++) {
+					double v = Math.abs(f.data[i]);
 					if (v > maxAbs)
 						maxAbs = v;
 				}
@@ -85,7 +85,7 @@ public class TldTemplatePanel extends JPanel {
 					continue;
 				for (int y = 0; y < featureWidth; y++) {
 					for (int x = 0; x < featureWidth; x++) {
-						int v = (int)(255.0*f.value[index++]/maxAbs);
+						int v = (int)(255.0*f.data[index++]/maxAbs);
 						if (v < 0)
 							rgb = -v;
 						else

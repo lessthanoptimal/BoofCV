@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -99,7 +99,7 @@ public class DescribePointSurfPlanar<II extends ImageGray<II>>
 		for(int band = 0; band < colorII.getNumBands(); band++ ) {
 			describe.setImage(colorII.getBand(band));
 			describe.describe(x,y, angle, scale, false, bandDesc);
-			System.arraycopy(bandDesc.value,0,desc.value,featureIndex,bandDesc.size());
+			System.arraycopy(bandDesc.data,0,desc.data,featureIndex,bandDesc.size());
 			featureIndex += bandDesc.size();
 		}
 

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -103,7 +103,7 @@ public class BenchmarkAssociationSpeedRandom {
 		for (int i = 0; i < NUM_FEATURES; i++) {
 			TupleDesc_F64 t = ret.grow();
 			for (int j = 0; j < DOF; j++) {
-				t.value[j] = (rand.nextDouble() - 0.5)*20;
+				t.data[j] = (rand.nextDouble() - 0.5)*20;
 			}
 		}
 		return ret;

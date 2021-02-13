@@ -68,7 +68,7 @@ public class Histogram_F64 extends TupleDesc_F64 {
 		}
 		strides[strides.length-1] = 1;
 
-		value = new double[N];
+		data = new double[N];
 
 		valueMin = new double[ lengths.length ];
 		valueMax = new double[ lengths.length ];
@@ -232,7 +232,7 @@ public class Histogram_F64 extends TupleDesc_F64 {
 	 * @return histogram value
 	 */
 	public double get( int i , int j ) {
-		return  value[getIndex(i,j)];
+		return  data[getIndex(i,j)];
 	}
 
 	/**
@@ -243,7 +243,7 @@ public class Histogram_F64 extends TupleDesc_F64 {
 	 * @return histogram value
 	 */
 	public double get( int i , int j , int k ) {
-		return  value[getIndex(i,j, k)];
+		return  data[getIndex(i,j, k)];
 	}
 
 	/**
@@ -252,7 +252,7 @@ public class Histogram_F64 extends TupleDesc_F64 {
 	 * @return histogram value
 	 */
 	public double get( int[] coordinate ) {
-		return  value[getIndex(coordinate)];
+		return  data[getIndex(coordinate)];
 	}
 
 	/**
@@ -261,7 +261,7 @@ public class Histogram_F64 extends TupleDesc_F64 {
 	@Override public Histogram_F64 copy() {
 		Histogram_F64 out = newInstance();
 
-		System.arraycopy(value,0,out.value,0,length.length);
+		System.arraycopy(data,0,out.data,0,length.length);
 
 		return out;
 	}

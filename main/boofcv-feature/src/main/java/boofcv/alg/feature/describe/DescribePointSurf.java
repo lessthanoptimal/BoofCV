@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -160,7 +160,7 @@ public class DescribePointSurf<II extends ImageGray<II>> {
 	 */
 	public void describe(double x, double y, double angle, double scale, boolean normalize, TupleDesc_F64 ret)
 	{
-		if( ret.value.length != featureDOF )
+		if( ret.data.length != featureDOF )
 			throw new IllegalArgumentException("Provided feature must have "+featureDOF+" elements");
 
 		double c = Math.cos(angle),s=Math.sin(angle);
@@ -176,7 +176,7 @@ public class DescribePointSurf<II extends ImageGray<II>> {
 		SparseImageGradient<II,?> gradient = isInBounds ? this.gradient : this.gradientSafe;
 
 		// extract descriptor
-		features(x, y, c, s, scale, gradient , ret.value);
+		features(x, y, c, s, scale, gradient , ret.data);
 
 		// normalize feature vector to have an Euclidean length of 1 which adds light invariance
 		if( normalize )

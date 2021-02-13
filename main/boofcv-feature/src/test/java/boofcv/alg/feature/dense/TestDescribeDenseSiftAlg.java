@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -87,7 +87,7 @@ public class TestDescribeDenseSiftAlg extends BoofStandardJUnit {
 				alg.computeDescriptor(x,y,expected);
 
 				for (int j = 0; j < 128; j++) {
-					assertEquals(expected.value[j],found.value[j],1e-8);
+					assertEquals(expected.data[j],found.data[j],1e-8);
 				}
 			}
 		}
@@ -150,7 +150,7 @@ public class TestDescribeDenseSiftAlg extends BoofStandardJUnit {
 			algTest.process(p.x,p.y,1,0,expected);
 
 			for (int i = 0; i < 128; i++) {
-				assertEquals(expected.value[i],found.value[i],1e-8);
+				assertEquals(expected.data[i],found.data[i],1e-8);
 			}
 		}
 

@@ -16,36 +16,36 @@
  * limitations under the License.
  */
 
-package boofcv.alg.descriptor;
+package boofcv.abst.feature.convert;
 
-import boofcv.struct.feature.TupleDesc_F64;
-import org.ddogleg.nn.alg.KdTreeDistance;
+import boofcv.misc.BoofLambdas;
+import boofcv.struct.feature.TupleDesc;
 
 /**
- * Distance using {@link TupleDesc_F64} for a {@link org.ddogleg.nn.alg.KdTree}.
+ * Does not modify the tuple and simply copies it
  *
  * @author Peter Abeles
  */
-public class KdTreeTuple_F64 implements KdTreeDistance<TupleDesc_F64> {
+public class ConvertTupleDoNothing <TD extends TupleDesc<TD>>
+	implements ConvertTupleDesc<TD, TD>
+{
+	BoofLambdas.Factory<TD> factory;
+	Class<TD> type;
 
-	int N;
-
-	public KdTreeTuple_F64(int n) {
-		N = n;
+	public ConvertTupleDoNothing( BoofLambdas.Factory<TD> factory ) {
+		this.factory = factory;
+		type = (Class)factory.newInstance().getClass();
 	}
 
-	@Override
-	public double distance(TupleDesc_F64 a, TupleDesc_F64 b) {
-		return DescriptorDistance.euclideanSq(a,b);
+	@Override public TD createOutput() {
+		return factory.newInstance();
 	}
 
-	@Override
-	public double valueAt(TupleDesc_F64 point, int index) {
-		return point.data[index];
+	@Override public void convert( TD input, TD output ) {
+		output.setTo(input);
 	}
 
-	@Override
-	public int length() {
-		return N;
+	@Override public Class<TD> getOutputType() {
+		return type;
 	}
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -58,15 +58,15 @@ class TestObjectSerialization {
 	@Test
 	void testTupleDesc_F64() {
 		TupleDesc_F64 orig = new TupleDesc_F64(20);
-		for( int i = 0; i < orig.value.length; i++ ) {
-			orig.value[i] = i;
+		for(int i = 0; i < orig.data.length; i++ ) {
+			orig.data[i] = i;
 		}
 
 		TupleDesc_F64 found = serializeDeSerialize(orig);
 		assertNotNull(found);
 
-		for( int i = 0; i < orig.value.length; i++ ) {
-			assertEquals(orig.value[i],found.value[i],1e-8);
+		for(int i = 0; i < orig.data.length; i++ ) {
+			assertEquals(orig.data[i],found.data[i],1e-8);
 		}
 	}
 
@@ -75,8 +75,8 @@ class TestObjectSerialization {
 		NccFeature orig = new NccFeature(20);
 		orig.mean = 1.2;
 		orig.sigma = 3.4;
-		for( int i = 0; i < orig.value.length; i++ ) {
-			orig.value[i] = i;
+		for(int i = 0; i < orig.data.length; i++ ) {
+			orig.data[i] = i;
 		}
 
 		NccFeature found = serializeDeSerialize(orig);
@@ -84,8 +84,8 @@ class TestObjectSerialization {
 		assertNotNull(found);
 		assertEquals(orig.mean,found.mean,1e-8);
 		assertEquals(orig.sigma,found.sigma,1e-8);
-		for( int i = 0; i < orig.value.length; i++ ) {
-			assertEquals(orig.value[i],found.value[i],1e-8);
+		for(int i = 0; i < orig.data.length; i++ ) {
+			assertEquals(orig.data[i],found.data[i],1e-8);
 		}
 	}
 

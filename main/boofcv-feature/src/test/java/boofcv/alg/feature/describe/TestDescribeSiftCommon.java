@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -33,9 +33,9 @@ public class TestDescribeSiftCommon extends BoofStandardJUnit {
 	@Test
 	public void normalizeDescriptor() {
 		TupleDesc_F64 descriptor = new TupleDesc_F64(128);
-		descriptor.value[5] = 100;
-		descriptor.value[20] = 120;
-		descriptor.value[60] = 20;
+		descriptor.data[5] = 100;
+		descriptor.data[20] = 120;
+		descriptor.data[60] = 20;
 
 		DescribeSiftCommon alg = new DescribeSiftCommon(4,4,8,0.5,0.2);
 		alg.normalizeDescriptor(descriptor,alg.maxDescriptorElementValue);
@@ -43,12 +43,12 @@ public class TestDescribeSiftCommon extends BoofStandardJUnit {
 		assertEquals(1,normL2(descriptor),1e-8);
 
 		// cropping should make 5 and 20 the same
-		assertEquals(descriptor.value[5],descriptor.value[20],1e-8);
+		assertEquals(descriptor.data[5],descriptor.data[20],1e-8);
 	}
 
 	private double normL2( TupleDesc_F64 desc ) {
 		double total = 0;
-		for( double d : desc.value) {
+		for( double d : desc.data) {
 			total += d*d;
 		}
 		return Math.sqrt(total);
@@ -71,8 +71,8 @@ public class TestDescribeSiftCommon extends BoofStandardJUnit {
 		double sum = 0;
 		int count = 0;
 		for (int i = 0; i < descriptor.size(); i++) {
-			sum += descriptor.value[i];
-			if( descriptor.value[i] != 0 )
+			sum += descriptor.data[i];
+			if( descriptor.data[i] != 0 )
 				count++;
 		}
 		assertEquals(2.0,sum,1e-6);
@@ -83,7 +83,7 @@ public class TestDescribeSiftCommon extends BoofStandardJUnit {
 		descriptor.fill(0);
 		alg.trilinearInterpolation(2.0f,3.25f,3.25f,0.5,descriptor);
 		for (int i = 0; i < descriptor.size(); i++) {
-			sum += descriptor.value[i];
+			sum += descriptor.data[i];
 		}
 		assertEquals( 2.0*0.75*0.75*1.0, sum, 1e-8 );
 
@@ -92,7 +92,7 @@ public class TestDescribeSiftCommon extends BoofStandardJUnit {
 		alg.trilinearInterpolation(2.0f,3f,3f,2*Math.PI/8,descriptor);
 		count = 0;
 		for (int i = 0; i < descriptor.size(); i++) {
-			double weight = descriptor.value[i];
+			double weight = descriptor.data[i];
 			if( weight > 0 ) {
 				assertEquals(2.0,weight,1e-8);
 				count++;

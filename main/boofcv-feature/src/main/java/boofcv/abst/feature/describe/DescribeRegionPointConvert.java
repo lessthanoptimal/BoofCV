@@ -18,6 +18,7 @@
 
 package boofcv.abst.feature.describe;
 
+import boofcv.abst.feature.convert.ConvertTupleDesc;
 import boofcv.struct.feature.TupleDesc;
 import boofcv.struct.image.ImageGray;
 import boofcv.struct.image.ImageType;

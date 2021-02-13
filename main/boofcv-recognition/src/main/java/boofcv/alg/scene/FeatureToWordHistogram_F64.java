@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -80,9 +80,9 @@ public class FeatureToWordHistogram_F64
 	@Override
 	public void addFeature( TupleDesc_F64 feature ) {
 		if( hardAssignment ) {
-			histogram[assignment.assign(feature.getValue())] += 1;
+			histogram[assignment.assign(feature.getData())] += 1;
 		} else {
-			assignment.assign(feature.getValue(),temp);
+			assignment.assign(feature.getData(),temp);
 			for (int i = 0; i < histogram.length; i++) {
 				histogram[i] += temp[i];
 			}

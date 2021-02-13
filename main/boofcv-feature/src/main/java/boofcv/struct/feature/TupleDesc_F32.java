@@ -29,39 +29,39 @@ import java.util.Arrays;
  * @author Peter Abeles
  */
 public class TupleDesc_F32 implements TupleDesc<TupleDesc_F32> {
-	public @Getter @Setter float[] value;
+	public @Getter @Setter float[] data;
 
 	public TupleDesc_F32( int numFeatures ) {
-		this.value = new float[numFeatures];
+		this.data = new float[numFeatures];
 	}
 
 	public TupleDesc_F32( float ...src ) {
-		this.value = src.clone();
+		this.data = src.clone();
 	}
 
 	protected TupleDesc_F32() {}
 
 	public void setTo( float... value ) {
-		System.arraycopy(value, 0, this.value, 0, this.value.length);
+		System.arraycopy(value, 0, this.data, 0, this.data.length);
 	}
 
 	public void fill( float value ) {
-		Arrays.fill(this.value, value);
+		Arrays.fill(this.data, value);
 	}
 
 	@Override public void setTo( TupleDesc_F32 source ) {
-		System.arraycopy(source.value, 0, value, 0, value.length);
+		System.arraycopy(source.data, 0, data, 0, data.length);
 	}
 
 	@Override public double getDouble( int index ) {
-		return value[index];
+		return data[index];
 	}
 
 	@Override public int size() {
-		return value.length;
+		return data.length;
 	}
 
 	@Override public TupleDesc_F32 newInstance() {
-		return new TupleDesc_F32(value.length);
+		return new TupleDesc_F32(data.length);
 	}
 }

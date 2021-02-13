@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -39,12 +39,12 @@ public class ImplDescribePointPixelRegionNCC_F32 extends DescribePointPixelRegio
 		double mean = 0;
 		int centerIndex = image.startIndex + c_y*image.stride + c_x;
 		for( int i = 0; i < offset.length; i++ ) {
-			mean += desc.value[i] = image.data[centerIndex + offset[i]];
+			mean += desc.data[i] = image.data[centerIndex + offset[i]];
 		}
 		mean /= offset.length;
 		double variance = 0;
-		for( int i = 0; i < desc.value.length; i++ ) {
-			double d = desc.value[i] -= mean;
+		for(int i = 0; i < desc.data.length; i++ ) {
+			double d = desc.data[i] -= mean;
 			variance += d*d;
 		}
 		variance /= offset.length;

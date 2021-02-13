@@ -56,21 +56,21 @@ public class PackedTupleArray_F64 implements PackedArray<TupleDesc_F64> {
 	}
 
 	@Override public void addCopy( TupleDesc_F64 element ) {
-		array.addAll(element.value, 0, dof);
+		array.addAll(element.data, 0, dof);
 		numElements++;
 	}
 
 	@Override public TupleDesc_F64 getTemp( int index ) {
-		System.arraycopy(array.data, index*dof, temp.value, 0, dof);
+		System.arraycopy(array.data, index*dof, temp.data, 0, dof);
 		return temp;
 	}
 
 	@Override public void getCopy( int index, TupleDesc_F64 dst ) {
-		System.arraycopy(array.data, index*dof, dst.value, 0, dof);
+		System.arraycopy(array.data, index*dof, dst.data, 0, dof);
 	}
 
 	@Override public void copy( TupleDesc_F64 src, TupleDesc_F64 dst ) {
-		System.arraycopy(src.value, 0, dst.value, 0, dof);
+		System.arraycopy(src.data, 0, dst.data, 0, dof);
 	}
 
 	@Override public int size() {

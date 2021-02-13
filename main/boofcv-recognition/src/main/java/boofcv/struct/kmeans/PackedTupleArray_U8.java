@@ -56,21 +56,21 @@ public class PackedTupleArray_U8 implements PackedArray<TupleDesc_U8> {
 	}
 
 	@Override public void addCopy( TupleDesc_U8 element ) {
-		array.addAll(element.value, 0, dof);
+		array.addAll(element.data, 0, dof);
 		numElements++;
 	}
 
 	@Override public TupleDesc_U8 getTemp( int index ) {
-		System.arraycopy(array.data, index*dof, temp.value, 0, dof);
+		System.arraycopy(array.data, index*dof, temp.data, 0, dof);
 		return temp;
 	}
 
 	@Override public void getCopy( int index, TupleDesc_U8 dst ) {
-		System.arraycopy(array.data, index*dof, dst.value, 0, dof);
+		System.arraycopy(array.data, index*dof, dst.data, 0, dof);
 	}
 
 	@Override public void copy( TupleDesc_U8 src, TupleDesc_U8 dst ) {
-		System.arraycopy(src.value, 0, dst.value, 0, dof);
+		System.arraycopy(src.data, 0, dst.data, 0, dof);
 	}
 
 	@Override public int size() {

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -136,7 +136,7 @@ public class TldTemplateMatching<T extends ImageGray<T>> {
 		for (int y = 0; y < 15; y++) {
 			float sampleY = y0 + y*heightStep;
 			for (int x = 0; x < 15; x++) {
-				mean += f.value[index++] = interpolate.get_fast(x0 + x*widthStep, sampleY);
+				mean += f.data[index++] = interpolate.get_fast(x0 + x*widthStep, sampleY);
 			}
 		}
 		mean /= 15*15;
@@ -146,7 +146,7 @@ public class TldTemplateMatching<T extends ImageGray<T>> {
 		index = 0;
 		for (int y = 0; y < 15; y++) {
 			for (int x = 0; x < 15; x++) {
-				double v = f.value[index++] -= mean;
+				double v = f.data[index++] -= mean;
 				variance += v*v;
 			}
 		}

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -95,7 +95,7 @@ public class ExampleColorHistogramLookup {
 
 			UtilFeature.normalizeL2(histogram); // normalize so that image size doesn't matter
 
-			points.add(histogram.value);
+			points.add(histogram.data);
 		}
 
 		return points;
@@ -136,7 +136,7 @@ public class ExampleColorHistogramLookup {
 
 			UtilFeature.normalizeL2(imageHist); // normalize so that image size doesn't matter
 
-			points.add(imageHist.value);
+			points.add(imageHist.data);
 		}
 
 		return points;
@@ -168,7 +168,7 @@ public class ExampleColorHistogramLookup {
 
 			UtilFeature.normalizeL2(histogram); // normalize so that image size doesn't matter
 
-			points.add(histogram.value);
+			points.add(histogram.data);
 		}
 
 		return points;
@@ -194,7 +194,7 @@ public class ExampleColorHistogramLookup {
 
 			UtilFeature.normalizeL2(imageHist); // normalize so that image size doesn't matter
 
-			points.add(imageHist.value);
+			points.add(imageHist.data);
 		}
 
 		return points;

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -36,7 +36,7 @@ public class TestNccFeature extends BoofStandardJUnit {
 		a.sigma = 1.5;
 
 		for( int i = 0; i < 4; i++ )
-			a.value[i] = i+0.1;
+			a.data[i] = i+0.1;
 
 		NccFeature b = new NccFeature(4);
 
@@ -52,7 +52,7 @@ public class TestNccFeature extends BoofStandardJUnit {
 		a.sigma = 1.5;
 
 		for( int i = 0; i < 4; i++ )
-			a.value[i] = i+0.1;
+			a.data[i] = i+0.1;
 
 		NccFeature b = a.copy();
 
@@ -64,6 +64,6 @@ public class TestNccFeature extends BoofStandardJUnit {
 		assertEquals(a.sigma,b.sigma,1e-8);
 
 		for( int i = 0; i < 4; i++ )
-			assertTrue(a.value[i] == b.value[i]);
+			assertTrue(a.data[i] == b.data[i]);
 	}
 }

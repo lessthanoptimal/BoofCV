@@ -47,7 +47,7 @@ public class TestComputeMeanTuple_MT_F64 extends BoofStandardJUnit {
 			assignments.add(rand.nextInt(numClusters));
 			var t = new TupleDesc_F64(DOF);
 			for (int j = 0; j < DOF; j++) {
-				t.value[j] = rand.nextDouble();
+				t.data[j] = rand.nextDouble();
 			}
 			list.add(t);
 		}
@@ -66,7 +66,7 @@ public class TestComputeMeanTuple_MT_F64 extends BoofStandardJUnit {
 
 		assertEquals(clustersSingle.size, clustersMulti.size);
 		for (int i = 0; i < numClusters; i++) {
-			assertArrayEquals(clustersSingle.get(i).value, clustersMulti.get(i).value, UtilEjml.TEST_F64);
+			assertArrayEquals(clustersSingle.get(i).data, clustersMulti.get(i).data, UtilEjml.TEST_F64);
 		}
 	}
 }

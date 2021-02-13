@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -118,10 +118,10 @@ public class TestDescribeDenseHogFastAlg extends BoofStandardJUnit {
 		// manually build a simple histogram for input and manually construct the expected resulting descriptor
 		TupleDesc_F64 expected = new TupleDesc_F64(40);
 
-		setHistogram(helper.cells[2].histogram,2,3 , expected.value,0);
-		setHistogram(helper.cells[3].histogram,2,3 , expected.value,10);
-		setHistogram(helper.cells[stride + 2].histogram,5,0 , expected.value,20);
-		setHistogram(helper.cells[stride + 3].histogram,7,8 , expected.value,30);
+		setHistogram(helper.cells[2].histogram,2,3 , expected.data,0);
+		setHistogram(helper.cells[3].histogram,2,3 , expected.data,10);
+		setHistogram(helper.cells[stride + 2].histogram,5,0 , expected.data,20);
+		setHistogram(helper.cells[stride + 3].histogram,7,8 , expected.data,30);
 
 		DescribeSiftCommon.normalizeDescriptor(expected,0.2);
 

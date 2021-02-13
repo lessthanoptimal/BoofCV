@@ -16,36 +16,11 @@
  * limitations under the License.
  */
 
-package boofcv.alg.descriptor;
+package boofcv.factory.feature.describe;
 
-import boofcv.struct.feature.TupleDesc_F64;
-import org.ddogleg.nn.alg.KdTreeDistance;
+import boofcv.struct.StandardConfigurationChecks;
 
 /**
- * Distance using {@link TupleDesc_F64} for a {@link org.ddogleg.nn.alg.KdTree}.
- *
  * @author Peter Abeles
  */
-public class KdTreeTuple_F64 implements KdTreeDistance<TupleDesc_F64> {
-
-	int N;
-
-	public KdTreeTuple_F64(int n) {
-		N = n;
-	}
-
-	@Override
-	public double distance(TupleDesc_F64 a, TupleDesc_F64 b) {
-		return DescriptorDistance.euclideanSq(a,b);
-	}
-
-	@Override
-	public double valueAt(TupleDesc_F64 point, int index) {
-		return point.data[index];
-	}
-
-	@Override
-	public int length() {
-		return N;
-	}
-}
+class TestConfigConvertTupleDesc extends StandardConfigurationChecks {}

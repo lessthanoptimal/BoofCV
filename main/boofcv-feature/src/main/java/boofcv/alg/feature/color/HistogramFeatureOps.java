@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -63,7 +63,7 @@ public class HistogramFeatureOps {
 				int value = image.data[index] & 0xFF;
 				int bin = numBins*value/divisor;
 
-				histogram.value[bin]++;
+				histogram.data[bin]++;
 			}
 		}
 	}
@@ -89,7 +89,7 @@ public class HistogramFeatureOps {
 				int value = image.data[index] & 0xFFFF;
 				int bin = numBins*value/divisor;
 
-				histogram.value[bin]++;
+				histogram.data[bin]++;
 			}
 		}
 	}
@@ -115,9 +115,9 @@ public class HistogramFeatureOps {
 			for( int x = 0; x < image.width; x++ , index++ ) {
 				int bin = (int)(numBins*(image.data[index]-minPixelValue)/divisor);
 				if( bin == numBins )
-					histogram.value[bin-1]++;
+					histogram.data[bin-1]++;
 				else
-					histogram.value[bin]++;
+					histogram.data[bin]++;
 			}
 		}
 	}
@@ -148,7 +148,7 @@ public class HistogramFeatureOps {
 					coordinate[i] = histogram.getDimensionIndex(i,image.getBand(i).data[imageIndex]);
 				}
 				int index = histogram.getIndex(coordinate);
-				histogram.value[index] += 1;
+				histogram.data[index] += 1;
 			}
 		}
 	}
@@ -179,7 +179,7 @@ public class HistogramFeatureOps {
 					coordinate[i] = histogram.getDimensionIndex(i,image.getBand(i).data[imageIndex]&0xFF);
 				}
 				int index = histogram.getIndex(coordinate);
-				histogram.value[index] += 1;
+				histogram.data[index] += 1;
 			}
 		}
 	}

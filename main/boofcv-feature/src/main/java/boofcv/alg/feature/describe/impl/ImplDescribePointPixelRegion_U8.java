@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -42,11 +42,11 @@ public class ImplDescribePointPixelRegion_U8 extends DescribePointPixelRegion<Gr
 		if(BoofMiscOps.isInside(image,c_x,c_y,radiusWidth,radiusHeight)) {
 			int centerIndex = image.startIndex + c_y*image.stride + c_x;
 			for( int i = 0; i < offset.length; i++ ) {
-				desc.value[i] = image.data[centerIndex + offset[i]];
+				desc.data[i] = image.data[centerIndex + offset[i]];
 			}
 		} else {
 			// all pixels outside the image will be zero
-			Arrays.fill(desc.value,(byte)0);
+			Arrays.fill(desc.data,(byte)0);
 
 			// only read pixels inside the image
 			int x0 = c_x-radiusWidth;
@@ -63,7 +63,7 @@ public class ImplDescribePointPixelRegion_U8 extends DescribePointPixelRegion<Gr
 				int indexImage = image.startIndex + y*image.stride + x0;
 				int indexDesc = (y - (c_y-radiusHeight))*regionWidth + (x0-(c_x-radiusWidth));
 				for( int x = x0; x <= x1; x++ ) {
-					desc.value[indexDesc++] = image.data[indexImage++];
+					desc.data[indexDesc++] = image.data[indexImage++];
 				}
 			}
 		}

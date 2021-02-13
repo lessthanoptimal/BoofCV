@@ -29,27 +29,27 @@ import java.util.Arrays;
  * @author Peter Abeles
  */
 public abstract class TupleDesc_I8<TD extends TupleDesc_I8> implements TupleDesc<TD> {
-	public @Getter @Setter byte[] value;
+	public @Getter @Setter byte[] data;
 
 	protected TupleDesc_I8( int numFeatures ) {
-		this.value = new byte[numFeatures];
+		this.data = new byte[numFeatures];
 	}
 
 	public void setTo( byte... value ) {
-		System.arraycopy(value, 0, this.value, 0, this.value.length);
+		System.arraycopy(value, 0, this.data, 0, this.data.length);
 	}
 
 	public void fill( byte value ) {
-		Arrays.fill(this.value, value);
+		Arrays.fill(this.data, value);
 	}
 
 	@Override
 	public void setTo( TD source ) {
-		System.arraycopy(source.value, 0, value, 0, value.length);
+		System.arraycopy(source.data, 0, data, 0, data.length);
 	}
 
 	@Override
 	public int size() {
-		return value.length;
+		return data.length;
 	}
 }

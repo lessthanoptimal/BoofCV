@@ -46,7 +46,7 @@ public class ImplDescribeBinaryCompare_U8 extends DescribePointBinaryCompare<Gra
 	@Override
 	public void processInside( int c_x , int c_y , TupleDesc_B feature )
 	{
-		Arrays.fill(feature.value, 0);
+		Arrays.fill(feature.data, 0);
 
 		int index = image.startIndex + image.stride*c_y + c_x;
 
@@ -66,13 +66,13 @@ public class ImplDescribeBinaryCompare_U8 extends DescribePointBinaryCompare<Gra
 				}
 			}
 
-			feature.value[ i/32 ] = desc;
+			feature.data[ i/32 ] = desc;
 		}
 	}
 
 	@Override
 	public void processBorder( int c_x , int c_y , TupleDesc_B feature ) {
-		Arrays.fill(feature.value, 0);
+		Arrays.fill(feature.data, 0);
 
 		int index = image.startIndex + image.stride*c_y + c_x;
 
@@ -96,7 +96,7 @@ public class ImplDescribeBinaryCompare_U8 extends DescribePointBinaryCompare<Gra
 					}
 				}
 			}
-			feature.value[ i/32 ] = desc;
+			feature.data[ i/32 ] = desc;
 		}
 	}
 

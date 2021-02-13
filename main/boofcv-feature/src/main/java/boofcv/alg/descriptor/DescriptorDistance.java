@@ -35,10 +35,10 @@ public class DescriptorDistance {
 	 * @return Euclidean distance
 	 */
 	public static double euclidean( TupleDesc_F64 a, TupleDesc_F64 b ) {
-		final int N = a.value.length;
+		final int N = a.data.length;
 		double total = 0;
 		for (int i = 0; i < N; i++) {
-			double d = a.value[i] - b.value[i];
+			double d = a.data[i] - b.data[i];
 			total += d*d;
 		}
 
@@ -53,10 +53,10 @@ public class DescriptorDistance {
 	 * @return Euclidean distance squared
 	 */
 	public static double euclideanSq( TupleDesc_F64 a, TupleDesc_F64 b ) {
-		final int N = a.value.length;
+		final int N = a.data.length;
 		double total = 0;
 		for (int i = 0; i < N; i++) {
-			double d = a.value[i] - b.value[i];
+			double d = a.data[i] - b.data[i];
 			total += d*d;
 		}
 
@@ -71,10 +71,10 @@ public class DescriptorDistance {
 	 * @return Euclidean distance squared
 	 */
 	public static double euclideanSq( TupleDesc_U8 a, TupleDesc_U8 b ) {
-		final int N = a.value.length;
+		final int N = a.data.length;
 		double total = 0;
 		for (int i = 0; i < N; i++) {
-			double d = (a.value[i] & 0xFF) - (b.value[i] & 0xFF);
+			double d = (a.data[i] & 0xFF) - (b.data[i] & 0xFF);
 			total += d*d;
 		}
 
@@ -89,10 +89,10 @@ public class DescriptorDistance {
 	 * @return Euclidean distance squared
 	 */
 	public static double euclideanSq( TupleDesc_F32 a, TupleDesc_F32 b ) {
-		final int N = a.value.length;
+		final int N = a.data.length;
 		float total = 0;
 		for (int i = 0; i < N; i++) {
-			float d = a.value[i] - b.value[i];
+			float d = a.data[i] - b.data[i];
 			total += d*d;
 		}
 
@@ -107,10 +107,10 @@ public class DescriptorDistance {
 	 * @return Correlation score
 	 */
 	public static double correlation( TupleDesc_F64 a, TupleDesc_F64 b ) {
-		final int N = a.value.length;
+		final int N = a.data.length;
 		double total = 0;
 		for (int i = 0; i < N; i++) {
-			total += a.value[i]*b.value[i];
+			total += a.data[i]*b.data[i];
 		}
 
 		return total;
@@ -132,9 +132,9 @@ public class DescriptorDistance {
 	public static double ncc( NccFeature a, NccFeature b ) {
 		double top = 0;
 
-		final int N = a.value.length;
+		final int N = a.data.length;
 		for (int i = 0; i < N; i++) {
-			top += a.value[i]*b.value[i];
+			top += a.data[i]*b.data[i];
 		}
 
 		return top/(N*a.sigma*b.sigma);
@@ -150,8 +150,8 @@ public class DescriptorDistance {
 	public static int sad( TupleDesc_U8 a, TupleDesc_U8 b ) {
 
 		int total = 0;
-		for (int i = 0; i < a.value.length; i++) {
-			total += Math.abs((a.value[i] & 0xFF) - (b.value[i] & 0xFF));
+		for (int i = 0; i < a.data.length; i++) {
+			total += Math.abs((a.data[i] & 0xFF) - (b.data[i] & 0xFF));
 		}
 		return total;
 	}
@@ -166,8 +166,8 @@ public class DescriptorDistance {
 	public static int sad( TupleDesc_S8 a, TupleDesc_S8 b ) {
 
 		int total = 0;
-		for (int i = 0; i < a.value.length; i++) {
-			total += Math.abs(a.value[i] - b.value[i]);
+		for (int i = 0; i < a.data.length; i++) {
+			total += Math.abs(a.data[i] - b.data[i]);
 		}
 		return total;
 	}
@@ -182,8 +182,8 @@ public class DescriptorDistance {
 	public static float sad( TupleDesc_F32 a, TupleDesc_F32 b ) {
 
 		float total = 0;
-		for (int i = 0; i < a.value.length; i++) {
-			total += Math.abs(a.value[i] - b.value[i]);
+		for (int i = 0; i < a.data.length; i++) {
+			total += Math.abs(a.data[i] - b.data[i]);
 		}
 		return total;
 	}
@@ -198,8 +198,8 @@ public class DescriptorDistance {
 	public static double sad( TupleDesc_F64 a, TupleDesc_F64 b ) {
 
 		double total = 0;
-		for (int i = 0; i < a.value.length; i++) {
-			total += Math.abs(a.value[i] - b.value[i]);
+		for (int i = 0; i < a.data.length; i++) {
+			total += Math.abs(a.data[i] - b.data[i]);
 		}
 		return total;
 	}
@@ -213,9 +213,9 @@ public class DescriptorDistance {
 	 */
 	public static int hamming( TupleDesc_B a, TupleDesc_B b ) {
 		int score = 0;
-		final int N = a.value.length;
+		final int N = a.data.length;
 		for (int i = 0; i < N; i++) {
-			score += hamming(a.value[i] ^ b.value[i]);
+			score += hamming(a.data[i] ^ b.data[i]);
 		}
 		return score;
 	}

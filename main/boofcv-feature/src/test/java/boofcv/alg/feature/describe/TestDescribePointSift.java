@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -100,10 +100,10 @@ public class TestDescribePointSift extends BoofStandardJUnit {
 		int numHit = 0;
 		for (int j = 0; j < 128; j++) {
 			if (j % 8 == 0) {
-				if( descriptor.value[j] > 0)
+				if( descriptor.data[j] > 0)
 					numHit++;
 			} else {
-				assertEquals(0, descriptor.value[j], 1e-4);
+				assertEquals(0, descriptor.data[j], 1e-4);
 			}
 		}
 		return numHit;
@@ -132,9 +132,9 @@ public class TestDescribePointSift extends BoofStandardJUnit {
 			int bin = (int) (UtilAngle.domain2PI(-angle) * 8 / (2 * Math.PI));
 			for (int j = 0; j < 128; j++) {
 				if (j % 8 == bin) {
-					assertTrue(descriptor.value[j] > 0);
+					assertTrue(descriptor.data[j] > 0);
 				} else {
-					assertEquals(0, descriptor.value[j], 1e-4);
+					assertEquals(0, descriptor.data[j], 1e-4);
 				}
 			}
 		}

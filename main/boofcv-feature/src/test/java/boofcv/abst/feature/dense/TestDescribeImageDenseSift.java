@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -76,7 +76,7 @@ public class TestDescribeImageDenseSift extends BoofStandardJUnit {
 				TupleDesc_F64 found = (TupleDesc_F64)alg.getDescriptions().get(i);
 
 				for (int j = 0; j < expected.size(); j++) {
-					assertEquals(expected.value[j], found.value[j], 1e-8);
+					assertEquals(expected.data[j], found.data[j], 1e-8);
 				}
 			}
 		}

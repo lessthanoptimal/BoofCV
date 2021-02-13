@@ -16,36 +16,35 @@
  * limitations under the License.
  */
 
-package boofcv.alg.descriptor;
+package boofcv.abst.feature.convert;
 
+import boofcv.struct.feature.TupleDesc_F32;
 import boofcv.struct.feature.TupleDesc_F64;
-import org.ddogleg.nn.alg.KdTreeDistance;
 
 /**
- * Distance using {@link TupleDesc_F64} for a {@link org.ddogleg.nn.alg.KdTree}.
+ * Convert a {@link boofcv.struct.feature.TupleDesc} from double to float.
  *
  * @author Peter Abeles
- */
-public class KdTreeTuple_F64 implements KdTreeDistance<TupleDesc_F64> {
+ **/
+public class ConvertTupleDesc_F64_F32 implements ConvertTupleDesc<TupleDesc_F64, TupleDesc_F32> {
+	int numElements;
 
-	int N;
-
-	public KdTreeTuple_F64(int n) {
-		N = n;
+	public ConvertTupleDesc_F64_F32( int numElements ) {
+		this.numElements = numElements;
 	}
 
-	@Override
-	public double distance(TupleDesc_F64 a, TupleDesc_F64 b) {
-		return DescriptorDistance.euclideanSq(a,b);
+	@Override public TupleDesc_F32 createOutput() {
+		return new TupleDesc_F32(numElements);
 	}
 
-	@Override
-	public double valueAt(TupleDesc_F64 point, int index) {
-		return point.data[index];
+	@Override public void convert( TupleDesc_F64 input, TupleDesc_F32 output ) {
+		final int size = input.size();
+		for (int i = 0; i < size; i++) {
+			output.data[i] = (float)input.data[i];
+		}
 	}
 
-	@Override
-	public int length() {
-		return N;
+	@Override public Class<TupleDesc_F32> getOutputType() {
+		return TupleDesc_F32.class;
 	}
 }

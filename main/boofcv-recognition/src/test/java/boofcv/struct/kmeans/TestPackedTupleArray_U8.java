@@ -32,19 +32,19 @@ class TestPackedTupleArray_U8 extends GenericPackedArrayChecks<TupleDesc_U8> {
 
 	@Override protected TupleDesc_U8 createRandomPoint() {
 		var point = new TupleDesc_U8(DOF);
-		point.value[0] = (byte) rand.nextInt(256);
+		point.data[0] = (byte) rand.nextInt(256);
 		return point;
 	}
 
 	@Override protected void checkEquals( TupleDesc_U8 a, TupleDesc_U8 b ) {
 		for (int i = 0; i < DOF; i++) {
-			assertEquals(a.value[i], b.value[i]);
+			assertEquals(a.data[i], b.data[i]);
 		}
 	}
 
 	@Override protected void checkNotEquals( TupleDesc_U8 a, TupleDesc_U8 b ) {
 		for (int i = 0; i < DOF; i++) {
-			if (a.value[i] != b.value[i])
+			if (a.data[i] != b.data[i])
 				return;
 		}
 		fail("The tuples are identical");

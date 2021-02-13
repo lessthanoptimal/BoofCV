@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -157,7 +157,7 @@ public class DescribeDenseHogFastAlg<Input extends ImageBase<Input>> extends Bas
 				Cell c = cells[(row + i)*cellCols + (col + j)];
 
 				for (int k = 0; k < c.histogram.length; k++) {
-					d.value[indexDesc++] = c.histogram[k];
+					d.data[indexDesc++] = c.histogram[k];
 				}
 			}
 		}

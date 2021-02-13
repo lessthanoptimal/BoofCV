@@ -45,7 +45,7 @@ public class PackedTupleArray_B implements PackedArray<TupleDesc_B> {
 	public PackedTupleArray_B( int dof ) {
 		this.dof = dof;
 		this.temp = new TupleDesc_B(dof);
-		this.numInts = temp.value.length;
+		this.numInts = temp.data.length;
 		array = new DogArray_I32(dof);
 		array.resize(0);
 	}
@@ -60,21 +60,21 @@ public class PackedTupleArray_B implements PackedArray<TupleDesc_B> {
 	}
 
 	@Override public void addCopy( TupleDesc_B element ) {
-		array.addAll(element.value, 0, numInts);
+		array.addAll(element.data, 0, numInts);
 		numElements++;
 	}
 
 	@Override public TupleDesc_B getTemp( int index ) {
-		System.arraycopy(array.data, index*numInts, temp.value, 0, numInts);
+		System.arraycopy(array.data, index*numInts, temp.data, 0, numInts);
 		return temp;
 	}
 
 	@Override public void getCopy( int index, TupleDesc_B dst ) {
-		System.arraycopy(array.data, index*numInts, dst.value, 0, numInts);
+		System.arraycopy(array.data, index*numInts, dst.data, 0, numInts);
 	}
 
 	@Override public void copy( TupleDesc_B src, TupleDesc_B dst ) {
-		System.arraycopy(src.value, 0, dst.value, 0, numInts);
+		System.arraycopy(src.data, 0, dst.data, 0, numInts);
 	}
 
 	@Override public int size() {

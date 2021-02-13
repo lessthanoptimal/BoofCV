@@ -90,7 +90,7 @@ public class DescribePointBriefSO<T extends ImageGray<T>> {
 		float c = (float)Math.cos(orientation);
 		float s = (float)Math.sin(orientation);
 
-		Arrays.fill(feature.value, 0);
+		Arrays.fill(feature.data, 0);
 
 		if( isInside ) {
 			for( int i = 0; i < definition.samplePoints.length; i++ ) {
@@ -120,7 +120,7 @@ public class DescribePointBriefSO<T extends ImageGray<T>> {
 			Point2D_I32 comp = definition.compare[i];
 
 			if( values[comp.x] < values[comp.y] ) {
-				feature.value[ i/32 ] |= 1 << (i % 32);
+				feature.data[ i/32 ] |= 1 << (i % 32);
 			}
 		}
 	}

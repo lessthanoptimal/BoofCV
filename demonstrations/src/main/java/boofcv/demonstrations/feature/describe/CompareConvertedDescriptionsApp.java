@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -20,7 +20,7 @@ package boofcv.demonstrations.feature.describe;
 
 import boofcv.abst.feature.associate.AssociateDescription;
 import boofcv.abst.feature.associate.ScoreAssociation;
-import boofcv.abst.feature.describe.ConvertTupleDesc;
+import boofcv.abst.feature.convert.ConvertTupleDesc;
 import boofcv.abst.feature.describe.DescribeRegionPoint;
 import boofcv.abst.feature.describe.DescribeRegionPointConvert;
 import boofcv.abst.feature.detect.interest.ConfigFastHessian;

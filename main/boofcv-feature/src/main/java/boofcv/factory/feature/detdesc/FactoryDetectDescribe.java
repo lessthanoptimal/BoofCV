@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -18,6 +18,7 @@
 
 package boofcv.factory.feature.detdesc;
 
+import boofcv.abst.feature.convert.ConvertTupleDesc;
 import boofcv.abst.feature.describe.ConfigSurfDescribe;
 import boofcv.abst.feature.describe.DescribeRegionPoint;
 import boofcv.abst.feature.detdesc.*;
@@ -37,9 +38,7 @@ import boofcv.alg.feature.detect.interest.FastHessianFeatureDetector;
 import boofcv.alg.feature.detect.interest.GeneralFeatureDetector;
 import boofcv.alg.transform.ii.GIntegralImageOps;
 import boofcv.concurrency.BoofConcurrency;
-import boofcv.factory.feature.describe.ConfigDescribeRegionPoint;
-import boofcv.factory.feature.describe.FactoryDescribePointAlgs;
-import boofcv.factory.feature.describe.FactoryDescribeRegionPoint;
+import boofcv.factory.feature.describe.*;
 import boofcv.factory.feature.detect.interest.ConfigDetectInterestPoint;
 import boofcv.factory.feature.detect.interest.FactoryDetectPoint;
 import boofcv.factory.feature.detect.interest.FactoryInterestPoint;
@@ -64,19 +63,18 @@ public class FactoryDetectDescribe {
 	/**
 	 * Generic factory for all detector / descriptors
 	 */
-	public static <T extends ImageGray<T>>
-	DetectDescribePoint<T,TupleDesc_F64> generic( ConfigDetectDescribe config , Class<T> imageType )
-	{
+	public static <Image extends ImageGray<Image>, Desc extends TupleDesc<Desc>>
+	DetectDescribePoint<Image, Desc> generic( ConfigDetectDescribe config, Class<Image> imageType ) {
 		DetectDescribePoint detDesc = null;
 
-		if( config.typeDetector == ConfigDetectInterestPoint.DetectorType.FAST_HESSIAN ) {
+		if (config.typeDetector == ConfigDetectInterestPoint.DetectorType.FAST_HESSIAN) {
 			switch (config.typeDescribe) {
 				case SURF_FAST -> detDesc = FactoryDetectDescribe.surfFast(
 						config.detectFastHessian, config.describeSurfFast, config.orientation.averageIntegral, imageType);
 				case SURF_STABLE -> detDesc = FactoryDetectDescribe.surfStable(
 						config.detectFastHessian, config.describeSurfStability, config.orientation.slidingIntegral, imageType);
 			}
-		} else if( config.typeDescribe == ConfigDescribeRegionPoint.DescriptorType.SIFT ) {
+		} else if (config.typeDescribe == ConfigDescribeRegionPoint.DescriptorType.SIFT) {
 			var configSift = new ConfigCompleteSift();
 			configSift.scaleSpace = config.scaleSpaceSift;
 			configSift.detector = config.detectSift;
@@ -84,8 +82,8 @@ public class FactoryDetectDescribe {
 			detDesc = FactoryDetectDescribe.sift(configSift, imageType);
 		}
 
-		if( detDesc != null )
-			return detDesc;
+		if (detDesc != null)
+			return convertDesc(config.convertDescriptor, detDesc);
 
 		InterestPointDetector detector;
 		switch (config.typeDetector) {
@@ -110,37 +108,49 @@ public class FactoryDetectDescribe {
 		OrientationImage orientation = null;
 
 		// only compute orientation if the descriptor will use it
-		if( descriptor.isOriented() ) {
+		if (descriptor.isOriented()) {
 //			if( descriptor.isScalable() ) {
-				Class integralType = GIntegralImageOps.getIntegralType(imageType);
-				OrientationIntegral orientationII =
-				switch( config.orientation.type ) {
-					case AVERAGE-> FactoryOrientationAlgs.average_ii(config.orientation.averageIntegral, integralType);
-					case SLIDING -> FactoryOrientationAlgs.sliding_ii(config.orientation.slidingIntegral, integralType);
-					default -> throw new RuntimeException("Unsupported orientation type for scalable.");
-				};
-				orientation = FactoryOrientation.convertImage(orientationII, imageType);
+			Class integralType = GIntegralImageOps.getIntegralType(imageType);
+			OrientationIntegral orientationII =
+					switch (config.orientation.type) {
+						case AVERAGE -> FactoryOrientationAlgs.average_ii(config.orientation.averageIntegral, integralType);
+						case SLIDING -> FactoryOrientationAlgs.sliding_ii(config.orientation.slidingIntegral, integralType);
+						default -> throw new RuntimeException("Unsupported orientation type for scalable.");
+					};
+			orientation = FactoryOrientation.convertImage(orientationII, imageType);
 //			}
 			// TODO add fixed scale orientations
 			// TODO move into FactoryOrientation
 		}
 
-		return FactoryDetectDescribe.fuseTogether(detector,orientation,descriptor);
+		return convertDesc(config.convertDescriptor, FactoryDetectDescribe.fuseTogether(detector, orientation, descriptor));
+	}
+
+	/**
+	 * If configured to do so, it will convert the descriptor into a different format
+	 */
+	private static <T extends ImageGray<T>, In extends TupleDesc<In>, Out extends TupleDesc<Out>>
+	DetectDescribePoint<T, Out> convertDesc( ConfigConvertTupleDesc config,
+											 DetectDescribePoint<T, In> original ) {
+		if (config.outputData == ConfigConvertTupleDesc.DataType.NATIVE)
+			return (DetectDescribePoint)original;
+
+		int dof = original.createDescription().size();
+		ConvertTupleDesc<In, Out> converter = FactoryConvertTupleDesc.generic(config, dof, original.getDescriptionType());
+		return new DetectDescribeConvert<>(original, converter);
 	}
 
 	/**
 	 * Creates a new SIFT feature detector and describer.
 	 *
-	 * @see CompleteSift
-	 *
 	 * @param config Configuration for the SIFT detector and descriptor.
 	 * @return SIFT
+	 * @see CompleteSift
 	 */
 	public static <T extends ImageGray<T>>
-	DetectDescribePoint<T,TupleDesc_F64> sift( @Nullable ConfigCompleteSift config, Class<T> imageType)
-	{
+	DetectDescribePoint<T, TupleDesc_F64> sift( @Nullable ConfigCompleteSift config, Class<T> imageType ) {
 		CompleteSift dds = FactoryDetectDescribeAlgs.sift(config);
-		return new DetectDescribe_CompleteSift<>(dds,imageType);
+		return new DetectDescribe_CompleteSift<>(dds, imageType);
 	}
 
 	/**
@@ -154,20 +164,19 @@ public class FactoryDetectDescribe {
 	 * [1] Add tech report when its finished.  See SURF performance web page for now.
 	 * </p>
 	 *
+	 * @param configDetector Configuration for SURF detector
+	 * @param configDesc Configuration for SURF descriptor
+	 * @param configOrientation Configuration for orientation
+	 * @return SURF detector and descriptor
 	 * @see FastHessianFeatureDetector
 	 * @see DescribePointSurf
 	 * @see DescribePointSurfPlanar
-	 *
-	 * @param configDetector		Configuration for SURF detector
-	 * @param configDesc			Configuration for SURF descriptor
-	 * @param configOrientation		Configuration for orientation
-	 * @return SURF detector and descriptor
 	 */
 	public static <T extends ImageGray<T>, II extends ImageGray<II>>
-	DetectDescribePoint<T,TupleDesc_F64> surfFast( @Nullable ConfigFastHessian configDetector ,
-												   @Nullable ConfigSurfDescribe.Fast configDesc,
-												   @Nullable ConfigAverageIntegral configOrientation,
-												   Class<T> imageType) {
+	DetectDescribePoint<T, TupleDesc_F64> surfFast( @Nullable ConfigFastHessian configDetector,
+													@Nullable ConfigSurfDescribe.Fast configDesc,
+													@Nullable ConfigAverageIntegral configOrientation,
+													Class<T> imageType ) {
 
 		Class<II> integralType = GIntegralImageOps.getIntegralType(imageType);
 
@@ -175,7 +184,7 @@ public class FactoryDetectDescribe {
 		DescribePointSurf<II> describe = FactoryDescribePointAlgs.surfSpeed(configDesc, integralType);
 		OrientationIntegral<II> orientation = FactoryOrientationAlgs.average_ii(configOrientation, integralType);
 
-		if(BoofConcurrency.USE_CONCURRENT) {
+		if (BoofConcurrency.USE_CONCURRENT) {
 			return new WrapDetectDescribeSurf_MT<>(detector, orientation, describe, imageType);
 		} else {
 			return new WrapDetectDescribeSurf<>(detector, orientation, describe, imageType);
@@ -189,20 +198,19 @@ public class FactoryDetectDescribe {
 	 * {@link DetectDescribeSurfPlanar} for details.
 	 * </p>
 	 *
+	 * @param configDetector Configuration for SURF detector
+	 * @param configDesc Configuration for SURF descriptor
+	 * @param configOrientation Configuration for orientation
+	 * @return SURF detector and descriptor
 	 * @see FastHessianFeatureDetector
 	 * @see DescribePointSurf
 	 * @see DescribePointSurfPlanar
-	 *
-	 * @param configDetector		Configuration for SURF detector
-	 * @param configDesc			Configuration for SURF descriptor
-	 * @param configOrientation		Configuration for orientation
-	 * @return SURF detector and descriptor
 	 */
 	public static <T extends ImageGray<T>, II extends ImageGray<II>>
-	DetectDescribePoint<T,TupleDesc_F64> surfColorFast( @Nullable ConfigFastHessian configDetector ,
-														@Nullable ConfigSurfDescribe.Fast configDesc,
-														@Nullable ConfigAverageIntegral configOrientation,
-														ImageType<T> imageType) {
+	DetectDescribePoint<T, TupleDesc_F64> surfColorFast( @Nullable ConfigFastHessian configDetector,
+														 @Nullable ConfigSurfDescribe.Fast configDesc,
+														 @Nullable ConfigAverageIntegral configOrientation,
+														 ImageType<T> imageType ) {
 
 		Class bandType = imageType.getImageClass();
 		Class<II> integralType = GIntegralImageOps.getIntegralType(bandType);
@@ -211,23 +219,23 @@ public class FactoryDetectDescribe {
 		DescribePointSurf<II> describe = FactoryDescribePointAlgs.surfSpeed(configDesc, integralType);
 		OrientationIntegral<II> orientation = FactoryOrientationAlgs.average_ii(configOrientation, integralType);
 
-		if( imageType.getFamily() == ImageType.Family.PLANAR) {
+		if (imageType.getFamily() == ImageType.Family.PLANAR) {
 			DescribePointSurfPlanar<II> describeMulti =
 					new DescribePointSurfPlanar<>(describe, imageType.getNumBands());
 
 			DetectDescribeSurfPlanar<II> detectDesc = createDescribeSurfPlanar(detector, orientation, describeMulti);
 
-			return new SurfPlanar_to_DetectDescribePoint( detectDesc,bandType,integralType );
+			return new SurfPlanar_to_DetectDescribePoint(detectDesc, bandType, integralType);
 		} else {
 			throw new IllegalArgumentException("Image type not supported");
 		}
 	}
 
 	protected static <II extends ImageGray<II>> DetectDescribeSurfPlanar<II>
-	createDescribeSurfPlanar(FastHessianFeatureDetector<II> detector, OrientationIntegral<II> orientation,
-							 DescribePointSurfPlanar<II> describeMulti) {
+	createDescribeSurfPlanar( FastHessianFeatureDetector<II> detector, OrientationIntegral<II> orientation,
+							  DescribePointSurfPlanar<II> describeMulti ) {
 		DetectDescribeSurfPlanar<II> detectDesc;
-		if( BoofConcurrency.USE_CONCURRENT ) {
+		if (BoofConcurrency.USE_CONCURRENT) {
 			detectDesc = new DetectDescribeSurfPlanar_MT<>(detector, orientation, describeMulti);
 		} else {
 			detectDesc = new DetectDescribeSurfPlanar<>(detector, orientation, describeMulti);
@@ -246,21 +254,20 @@ public class FactoryDetectDescribe {
 	 * [1] Add tech report when its finished.  See SURF performance web page for now.
 	 * </p>
 	 *
-	 * @see DescribePointSurfPlanar
-	 * @see FastHessianFeatureDetector
-	 * @see boofcv.alg.feature.describe.DescribePointSurfMod
-	 *
 	 * @param configDetector Configuration for SURF detector.  Null for default.
 	 * @param configDescribe Configuration for SURF descriptor.  Null for default.
 	 * @param configOrientation Configuration for region orientation.  Null for default.
 	 * @param imageType Specify type of input image.
 	 * @return SURF detector and descriptor
+	 * @see DescribePointSurfPlanar
+	 * @see FastHessianFeatureDetector
+	 * @see boofcv.alg.feature.describe.DescribePointSurfMod
 	 */
 	public static <T extends ImageGray<T>, II extends ImageGray<II>>
-	DetectDescribePoint<T,TupleDesc_F64> surfStable( @Nullable ConfigFastHessian configDetector,
-													 @Nullable ConfigSurfDescribe.Stability configDescribe,
-													 @Nullable ConfigSlidingIntegral configOrientation,
-													 Class<T> imageType ) {
+	DetectDescribePoint<T, TupleDesc_F64> surfStable( @Nullable ConfigFastHessian configDetector,
+													  @Nullable ConfigSurfDescribe.Stability configDescribe,
+													  @Nullable ConfigSlidingIntegral configOrientation,
+													  Class<T> imageType ) {
 
 		Class<II> integralType = GIntegralImageOps.getIntegralType(imageType);
 
@@ -268,7 +275,7 @@ public class FactoryDetectDescribe {
 		DescribePointSurfMod<II> describe = FactoryDescribePointAlgs.surfStability(configDescribe, integralType);
 		OrientationIntegral<II> orientation = FactoryOrientationAlgs.sliding_ii(configOrientation, integralType);
 
-		if(BoofConcurrency.USE_CONCURRENT) {
+		if (BoofConcurrency.USE_CONCURRENT) {
 			return new WrapDetectDescribeSurf_MT<>(detector, orientation, describe, imageType);
 		} else {
 			return new WrapDetectDescribeSurf<>(detector, orientation, describe, imageType);
@@ -282,21 +289,20 @@ public class FactoryDetectDescribe {
 	 * {@link DetectDescribeSurfPlanar} for details.
 	 * </p>
 	 *
-	 * @see DescribePointSurfPlanar
-	 * @see FastHessianFeatureDetector
-	 * @see boofcv.alg.feature.describe.DescribePointSurfMod
-	 *
 	 * @param configDetector Configuration for SURF detector.  Null for default.
 	 * @param configDescribe Configuration for SURF descriptor.  Null for default.
 	 * @param configOrientation Configuration for region orientation.  Null for default.
 	 * @param imageType Specify type of color input image.
 	 * @return SURF detector and descriptor
+	 * @see DescribePointSurfPlanar
+	 * @see FastHessianFeatureDetector
+	 * @see boofcv.alg.feature.describe.DescribePointSurfMod
 	 */
 	public static <T extends ImageMultiBand<T>, II extends ImageGray<II>>
-	DetectDescribePoint<T,TupleDesc_F64> surfColorStable( @Nullable ConfigFastHessian configDetector,
-														  @Nullable ConfigSurfDescribe.Stability configDescribe,
-														  @Nullable ConfigSlidingIntegral configOrientation,
-														  ImageType<T> imageType ) {
+	DetectDescribePoint<T, TupleDesc_F64> surfColorStable( @Nullable ConfigFastHessian configDetector,
+														   @Nullable ConfigSurfDescribe.Stability configDescribe,
+														   @Nullable ConfigSlidingIntegral configOrientation,
+														   ImageType<T> imageType ) {
 
 		Class bandType = imageType.getImageClass();
 		Class<II> integralType = GIntegralImageOps.getIntegralType(bandType);
@@ -305,13 +311,13 @@ public class FactoryDetectDescribe {
 		DescribePointSurfMod<II> describe = FactoryDescribePointAlgs.surfStability(configDescribe, integralType);
 		OrientationIntegral<II> orientation = FactoryOrientationAlgs.sliding_ii(configOrientation, integralType);
 
-		if( imageType.getFamily() == ImageType.Family.PLANAR) {
+		if (imageType.getFamily() == ImageType.Family.PLANAR) {
 			DescribePointSurfPlanar<II> describeMulti =
 					new DescribePointSurfPlanar<>(describe, imageType.getNumBands());
 
 			DetectDescribeSurfPlanar<II> detectDesc = createDescribeSurfPlanar(detector, orientation, describeMulti);
 
-			return new SurfPlanar_to_DetectDescribePoint( detectDesc,bandType,integralType );
+			return new SurfPlanar_to_DetectDescribePoint(detectDesc, bandType, integralType);
 		} else {
 			throw new IllegalArgumentException("Image type not supported");
 		}
@@ -327,10 +333,9 @@ public class FactoryDetectDescribe {
 	 * @return {@link DetectDescribePoint}.
 	 */
 	public static <T extends ImageGray<T>, D extends TupleDesc>
-	DetectDescribePoint<T,D> fuseTogether( InterestPointDetector<T> detector,
-										   @Nullable OrientationImage<T> orientation,
-										   DescribeRegionPoint<T, D> describe) {
+	DetectDescribePoint<T, D> fuseTogether( InterestPointDetector<T> detector,
+											@Nullable OrientationImage<T> orientation,
+											DescribeRegionPoint<T, D> describe ) {
 		return new DetectDescribeFusion<>(detector, orientation, describe);
 	}
-
 }
