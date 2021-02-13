@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -43,7 +43,7 @@ public class TestScoreAssociateCorrelation extends StandardScoreAssociationCheck
 	public TupleDesc_F64 createDescription() {
 		TupleDesc_F64 a = new TupleDesc_F64(5);
 		for( int i = 0; i < a.size(); i++ )
-			a.value[i] = rand.nextGaussian()*2;
+			a.data[i] = rand.nextGaussian()*2;
 
 		return a;
 	}
@@ -55,8 +55,8 @@ public class TestScoreAssociateCorrelation extends StandardScoreAssociationCheck
 		TupleDesc_F64 a = new TupleDesc_F64(5);
 		TupleDesc_F64 b = new TupleDesc_F64(5);
 
-		a.value=new double[]{1,2,3,4,5};
-		b.value=new double[]{2,-1,7,-8,10};
+		a.data =new double[]{1,2,3,4,5};
+		b.data =new double[]{2,-1,7,-8,10};
 
 		assertEquals(-39,score.score(a,b),1e-2);
 	}

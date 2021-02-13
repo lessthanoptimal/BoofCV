@@ -33,22 +33,22 @@ public class TupleDesc_U8 extends TupleDesc_I8<TupleDesc_U8> {
 
 	public TupleDesc_U8( byte... values ) {
 		super(values.length);
-		System.arraycopy(values, 0, this.value, 0, values.length);
+		System.arraycopy(values, 0, this.data, 0, values.length);
 	}
 
 	@Override public void setTo( byte... value ) {
-		System.arraycopy(value, 0, this.value, 0, this.value.length);
+		System.arraycopy(value, 0, this.data, 0, this.data.length);
 	}
 
 	public void fill( int value ) {
-		Arrays.fill(this.value, (byte)value);
+		Arrays.fill(this.data, (byte)value);
 	}
 
 	@Override public double getDouble( int index ) {
-		return value[index] & 0xFF;
+		return data[index] & 0xFF;
 	}
 
 	@Override public TupleDesc_U8 newInstance() {
-		return new TupleDesc_U8(value.length);
+		return new TupleDesc_U8(data.length);
 	}
 }

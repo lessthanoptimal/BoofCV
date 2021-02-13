@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -68,7 +68,7 @@ public class ExampleFeatureSurf {
 		surf.detect(image);
 
 		System.out.println("Found Features: "+surf.getNumberOfFeatures());
-		System.out.println("First descriptor's first value: "+surf.getDescription(0).value[0]);
+		System.out.println("First descriptor's first value: "+surf.getDescription(0).data[0]);
 	}
 
 	/**
@@ -122,7 +122,7 @@ public class ExampleFeatureSurf {
 		}
 		
 		System.out.println("Found Features: "+points.size());
-		System.out.println("First descriptor's first value: "+descriptions.get(0).value[0]);
+		System.out.println("First descriptor's first value: "+descriptions.get(0).data[0]);
 	}
 
 	public static void main( String[] args ) {

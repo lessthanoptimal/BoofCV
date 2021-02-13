@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -41,7 +41,7 @@ public class TestScoreAssociateSad extends BoofStandardJUnit {
 		public TupleDesc_F32 createDescription() {
 			var a = new TupleDesc_F32(5);
 			for (int i = 0; i < a.size(); i++)
-				a.value[i] = rand.nextFloat() * 2;
+				a.data[i] = rand.nextFloat() * 2;
 
 			return a;
 		}
@@ -53,8 +53,8 @@ public class TestScoreAssociateSad extends BoofStandardJUnit {
 			var a = new TupleDesc_F32(5);
 			var b = new TupleDesc_F32(5);
 
-			a.value = new float[]{1.1f, 2, 3, 4.5f, 5};
-			b.value = new float[]{-1, 2, 6.1f, 3, 6};
+			a.data = new float[]{1.1f, 2, 3, 4.5f, 5};
+			b.data = new float[]{-1, 2, 6.1f, 3, 6};
 
 			assertEquals(7.7, scorer.score(a, b), 1e-2);
 		}
@@ -71,7 +71,7 @@ public class TestScoreAssociateSad extends BoofStandardJUnit {
 		public TupleDesc_F64 createDescription() {
 			var a = new TupleDesc_F64(5);
 			for( int i = 0; i < a.size(); i++ )
-				a.value[i] = rand.nextDouble()*2;
+				a.data[i] = rand.nextDouble()*2;
 
 			return a;
 		}
@@ -83,8 +83,8 @@ public class TestScoreAssociateSad extends BoofStandardJUnit {
 			var a = new TupleDesc_F64(5);
 			var b = new TupleDesc_F64(5);
 
-			a.value=new double[]{1.1,2,3,4.5,5};
-			b.value=new double[]{-1,2,6.1,3,6};
+			a.data =new double[]{1.1,2,3,4.5,5};
+			b.data =new double[]{-1,2,6.1,3,6};
 
 			assertEquals(7.7,scorer.score(a,b),1e-2);
 		}
@@ -101,7 +101,7 @@ public class TestScoreAssociateSad extends BoofStandardJUnit {
 		public TupleDesc_U8 createDescription() {
 			TupleDesc_U8 a = new TupleDesc_U8(5);
 			for( int i = 0; i < a.size(); i++ )
-				a.value[i] = (byte)rand.nextInt(200);
+				a.data[i] = (byte)rand.nextInt(200);
 
 			return a;
 		}
@@ -113,8 +113,8 @@ public class TestScoreAssociateSad extends BoofStandardJUnit {
 			var a = new TupleDesc_U8(5);
 			var b = new TupleDesc_U8(5);
 
-			a.value=new byte[]{1,2,3,4,(byte)200};
-			b.value=new byte[]{(byte)245,2,6,3,6};
+			a.data =new byte[]{1,2,3,4,(byte)200};
+			b.data =new byte[]{(byte)245,2,6,3,6};
 
 			assertEquals(442,scorer.score(a,b),1e-2);
 		}
@@ -131,7 +131,7 @@ public class TestScoreAssociateSad extends BoofStandardJUnit {
 		public TupleDesc_S8 createDescription() {
 			var a = new TupleDesc_S8(5);
 			for( int i = 0; i < a.size(); i++ )
-				a.value[i] = (byte)(rand.nextInt(200)-100);
+				a.data[i] = (byte)(rand.nextInt(200)-100);
 
 			return a;
 		}
@@ -143,8 +143,8 @@ public class TestScoreAssociateSad extends BoofStandardJUnit {
 			var a = new TupleDesc_U8(5);
 			var b = new TupleDesc_U8(5);
 
-			a.value=new byte[]{1,2,3,4,(byte)200};
-			b.value=new byte[]{(byte)245,2,6,3,6};
+			a.data =new byte[]{1,2,3,4,(byte)200};
+			b.data =new byte[]{(byte)245,2,6,3,6};
 
 			assertEquals(442,scorer.score(a,b),1e-2);
 		}

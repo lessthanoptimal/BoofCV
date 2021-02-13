@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -16,39 +16,39 @@
  * limitations under the License.
  */
 
-package boofcv.abst.feature.describe;
+package boofcv.abst.feature.convert;
 
 import boofcv.alg.descriptor.ConvertDescriptors;
 import boofcv.struct.feature.TupleDesc_F64;
-import boofcv.struct.feature.TupleDesc_U8;
+import boofcv.struct.feature.TupleDesc_S8;
 
 /**
  * Converts two types of region descriptors.
  *
- * @see ConvertDescriptors#positive(boofcv.struct.feature.TupleDesc_F64, boofcv.struct.feature.TupleDesc_U8)
+ * @see ConvertDescriptors#signed(boofcv.struct.feature.TupleDesc_F64, boofcv.struct.feature.TupleDesc_S8)
  *
  * @author Peter Abeles
  */
-public class ConvertPositive_F64_U8 implements ConvertTupleDesc<TupleDesc_F64, TupleDesc_U8> {
+public class ConvertTupleDescSigned_F64_S8 implements ConvertTupleDesc<TupleDesc_F64, TupleDesc_S8> {
 
 	int numElements;
 
-	public ConvertPositive_F64_U8(int numElements) {
+	public ConvertTupleDescSigned_F64_S8( int numElements) {
 		this.numElements = numElements;
 	}
 
 	@Override
-	public TupleDesc_U8 createOutput() {
-		return new TupleDesc_U8(numElements);
+	public TupleDesc_S8 createOutput() {
+		return new TupleDesc_S8(numElements);
 	}
 
 	@Override
-	public void convert(TupleDesc_F64 input, TupleDesc_U8 output) {
-		ConvertDescriptors.positive(input, output);
+	public void convert(TupleDesc_F64 input, TupleDesc_S8 output) {
+		ConvertDescriptors.signed(input, output);
 	}
 
 	@Override
-	public Class<TupleDesc_U8> getOutputType() {
-		return TupleDesc_U8.class;
+	public Class<TupleDesc_S8> getOutputType() {
+		return TupleDesc_S8.class;
 	}
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -227,8 +227,8 @@ public class VisualizeTldDetectionApp<T extends ImageGray<T>,D extends ImageGray
 
 	private void printDescription(NccFeature f) {
 		System.out.println("  sigma "+f.sigma);
-		for( int j = 0; j < f.value.length; j++ ) {
-			System.out.printf("%6.1f ",f.value[j]);
+		for(int j = 0; j < f.data.length; j++ ) {
+			System.out.printf("%6.1f ",f.data[j]);
 		}
 		System.out.println();
 	}

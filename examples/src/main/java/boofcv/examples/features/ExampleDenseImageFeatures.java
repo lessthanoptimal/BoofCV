@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -65,7 +65,7 @@ public class ExampleDenseImageFeatures {
 			Point2D_I32 p = describer.getLocations().get(i);
 			TupleDesc_F64 d = describer.getDescriptions().get(i);
 
-			System.out.printf("%3d %3d = [ %f %f %f %f\n",p.x,p.y,d.value[0],d.value[1],d.value[2],d.value[3]);
+			System.out.printf("%3d %3d = [ %f %f %f %f\n",p.x,p.y,d.data[0],d.data[1],d.data[2],d.data[3]);
 
 			// You would process the feature descriptor here
 		}

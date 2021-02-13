@@ -33,19 +33,19 @@ class TestPackedTupleArray_F64 extends GenericPackedArrayChecks<TupleDesc_F64> {
 
 	@Override protected TupleDesc_F64 createRandomPoint() {
 		var point = new TupleDesc_F64(DOF);
-		point.value[0] = (double) rand.nextGaussian();
+		point.data[0] = (double) rand.nextGaussian();
 		return point;
 	}
 
 	@Override protected void checkEquals( TupleDesc_F64 a, TupleDesc_F64 b ) {
 		for (int i = 0; i < DOF; i++) {
-			assertEquals(a.value[i], b.value[i], UtilEjml.TEST_F64);
+			assertEquals(a.data[i], b.data[i], UtilEjml.TEST_F64);
 		}
 	}
 
 	@Override protected void checkNotEquals( TupleDesc_F64 a, TupleDesc_F64 b ) {
 		for (int i = 0; i < DOF; i++) {
-			if (a.value[i] != b.value[i])
+			if (a.data[i] != b.data[i])
 				return;
 		}
 		fail("The tuples are identical");

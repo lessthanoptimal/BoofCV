@@ -33,9 +33,9 @@ public class ExperimentalDescriptorDistance {
 	 */
 	public static int hamming(TupleDesc_B a, TupleDesc_B b ) {
 		int score = 0;
-		final int N = a.value.length;
+		final int N = a.data.length;
 		for( int i = 0; i < N; i++ ) {
-			score += hamming(a.value[i] ^ b.value[i]);
+			score += hamming(a.data[i] ^ b.data[i]);
 		}
 		return score;
 	}

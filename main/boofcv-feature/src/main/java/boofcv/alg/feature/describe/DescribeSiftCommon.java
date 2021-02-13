@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -87,9 +87,9 @@ public class DescribeSiftCommon {
 
 		// clip the values
 		for (int i = 0; i < descriptor.size(); i++) {
-			double value = descriptor.value[i];
+			double value = descriptor.data[i];
 			if( value > maxDescriptorElementValue ) {
-				descriptor.value[i] = maxDescriptorElementValue;
+				descriptor.data[i] = maxDescriptorElementValue;
 			}
 		}
 
@@ -124,7 +124,7 @@ public class DescribeSiftCommon {
 					if( weightHistogram <= 0 ) continue;
 
 					int descriptorIndex = (i*widthGrid + j)*numHistogramBins + k;
-					descriptor.value[descriptorIndex] += weight*weightGridX*weightGridY*weightHistogram;
+					descriptor.data[descriptorIndex] += weight*weightGridX*weightGridY*weightHistogram;
 				}
 			}
 		}

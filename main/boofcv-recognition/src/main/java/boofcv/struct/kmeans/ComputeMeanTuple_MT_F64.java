@@ -76,11 +76,11 @@ public class ComputeMeanTuple_MT_F64 extends ComputeMeanTuple_F64 {
 
 			for (int pointIdx = idx0; pointIdx < idx1; pointIdx++) {
 				points.getCopy(pointIdx, tuple);
-				final double[] point = tuple.value;
+				final double[] point = tuple.data;
 
 				int clusterIdx = assignments.get(pointIdx);
 				counts.data[clusterIdx]++;
-				double[] cluster = sums.get(clusterIdx).value;
+				double[] cluster = sums.get(clusterIdx).data;
 				for (int i = 0; i < point.length; i++) {
 					cluster[i] += point[i];
 				}
@@ -99,7 +99,7 @@ public class ComputeMeanTuple_MT_F64 extends ComputeMeanTuple_F64 {
 				TupleDesc_F64 b = clusters.get(clusterIdx);
 
 				for (int i = 0; i < b.size(); i++) {
-					b.value[i] += a.value[i];
+					b.data[i] += a.data[i];
 				}
 				counts.data[clusterIdx] += data.counts.data[clusterIdx];
 			}
@@ -107,7 +107,7 @@ public class ComputeMeanTuple_MT_F64 extends ComputeMeanTuple_F64 {
 
 		// Divide to get the average value in each cluster
 		for (int clusterIdx = 0; clusterIdx < clusters.size; clusterIdx++) {
-			double[] cluster = clusters.get(clusterIdx).value;
+			double[] cluster = clusters.get(clusterIdx).data;
 			double divisor = counts.get(clusterIdx);
 			for (int i = 0; i < cluster.length; i++) {
 				cluster[i] /= divisor;

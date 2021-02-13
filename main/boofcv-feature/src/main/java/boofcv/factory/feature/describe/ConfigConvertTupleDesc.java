@@ -16,36 +16,40 @@
  * limitations under the License.
  */
 
-package boofcv.alg.descriptor;
+package boofcv.factory.feature.describe;
 
-import boofcv.struct.feature.TupleDesc_F64;
-import org.ddogleg.nn.alg.KdTreeDistance;
+import boofcv.struct.Configuration;
 
 /**
- * Distance using {@link TupleDesc_F64} for a {@link org.ddogleg.nn.alg.KdTree}.
+ * Configuration that specifies how a {@link boofcv.struct.feature.TupleDesc} should be converted into one of
+ * a different data structure
  *
  * @author Peter Abeles
- */
-public class KdTreeTuple_F64 implements KdTreeDistance<TupleDesc_F64> {
+ **/
+public class ConfigConvertTupleDesc implements Configuration {
+	/**
+	 * Data structure of the output descriptor.
+	 */
+	public DataType outputData = DataType.NATIVE;
 
-	int N;
-
-	public KdTreeTuple_F64(int n) {
-		N = n;
+	public void setTo( ConfigConvertTupleDesc src ) {
+		this.outputData = src.outputData;
 	}
 
-	@Override
-	public double distance(TupleDesc_F64 a, TupleDesc_F64 b) {
-		return DescriptorDistance.euclideanSq(a,b);
+	@Override public void checkValidity() {
+
 	}
 
-	@Override
-	public double valueAt(TupleDesc_F64 point, int index) {
-		return point.data[index];
-	}
-
-	@Override
-	public int length() {
-		return N;
+	/** Array data type for output tuple */
+	public enum DataType {
+		/**
+		 * Use the native format of the descriptor. I.e. do nothing.
+		 */
+		NATIVE,
+		BINARY,
+		U8,
+		S8,
+		F32,
+		F64
 	}
 }

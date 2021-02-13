@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -76,7 +76,7 @@ public class TestImplDescribePointPixelRegionNCC_F32  extends BoofStandardJUnit 
 		int index = 0;
 		for( int y = y0; y < y0+h; y++ ) {
 			for( int x = x0; x < x0+w; x++ , index++ ) {
-				assertEquals(image.get(x,y)-mean,desc.value[index],1e-4);
+				assertEquals(image.get(x,y)-mean,desc.data[index],1e-4);
 			}
 		}
 	}

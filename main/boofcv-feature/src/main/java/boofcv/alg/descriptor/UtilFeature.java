@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -75,8 +75,8 @@ public class UtilFeature {
 
 		int start = 0;
 		for (int i = 0; i < inputs.size(); i++) {
-			double v[] = inputs.get(i).value;
-			System.arraycopy(v,0,combined.value,start,v.length);
+			double v[] = inputs.get(i).data;
+			System.arraycopy(v,0,combined.data,start,v.length);
 			start += v.length;
 		}
 
@@ -98,7 +98,7 @@ public class UtilFeature {
 	public static void normalizeL2( TupleDesc_F64 desc ) {
 		double norm = 0;
 		for (int i = 0; i < desc.size(); i++) {
-			double v = desc.value[i];
+			double v = desc.data[i];
 			norm += v*v;
 		}
 		if( norm == 0 )
@@ -106,7 +106,7 @@ public class UtilFeature {
 
 		norm = Math.sqrt(norm);
 		for (int i = 0; i < desc.size(); i++) {
-			desc.value[i] /= norm;
+			desc.data[i] /= norm;
 		}
 	}
 
@@ -124,14 +124,14 @@ public class UtilFeature {
 	public static void normalizeSumOne( TupleDesc_F64 desc ) {
 		double sum = 0;
 		for (int i = 0; i < desc.size(); i++) {
-			double v = desc.value[i];
+			double v = desc.data[i];
 			sum += v;
 		}
 		if( sum == 0 )
 			return;
 
 		for (int i = 0; i < desc.size(); i++) {
-			desc.value[i] /= sum;
+			desc.data[i] /= sum;
 		}
 	}
 

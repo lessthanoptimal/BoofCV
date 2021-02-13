@@ -27,7 +27,7 @@ import lombok.Setter;
  * @author Peter Abeles
  */
 public class TupleDesc_B implements TupleDesc<TupleDesc_B> {
-	public @Getter @Setter int[] value;
+	public @Getter @Setter int[] data;
 	public int numBits;
 
 	public TupleDesc_B( int numBits ) {
@@ -37,26 +37,26 @@ public class TupleDesc_B implements TupleDesc<TupleDesc_B> {
 		}
 
 		this.numBits = numBits;
-		value = new int[numInts];
+		data = new int[numInts];
 	}
 
 	public TupleDesc_B( int numBits, int numInts ) {
 		this.numBits = numBits;
-		value = new int[numInts];
+		data = new int[numInts];
 	}
 
 	public boolean isBitTrue( int bit ) {
 		int index = bit/32;
-		return ((value[index] >> (bit%32)) & 0x01) == 1;
+		return ((data[index] >> (bit%32)) & 0x01) == 1;
 	}
 
 	@Override
 	public void setTo( TupleDesc_B source ) {
-		if (value.length < source.value.length)
+		if (data.length < source.data.length)
 			throw new IllegalArgumentException("Data array is too small to store the source array.");
 
 		this.numBits = source.numBits;
-		System.arraycopy(source.value, 0, value, 0, source.value.length);
+		System.arraycopy(source.data, 0, data, 0, source.data.length);
 	}
 
 	@Override
@@ -73,6 +73,6 @@ public class TupleDesc_B implements TupleDesc<TupleDesc_B> {
 	}
 
 	@Override public TupleDesc_B newInstance() {
-		return new TupleDesc_B(numBits, value.length);
+		return new TupleDesc_B(numBits, data.length);
 	}
 }

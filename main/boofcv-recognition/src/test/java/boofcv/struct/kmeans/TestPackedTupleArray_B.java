@@ -32,19 +32,19 @@ class TestPackedTupleArray_B extends GenericPackedArrayChecks<TupleDesc_B> {
 
 	@Override protected TupleDesc_B createRandomPoint() {
 		var point = new TupleDesc_B(DOF);
-		point.value[0] = rand.nextInt();
+		point.data[0] = rand.nextInt();
 		return point;
 	}
 
 	@Override protected void checkEquals( TupleDesc_B a, TupleDesc_B b ) {
-		for (int i = 0; i < a.value.length; i++) {
-			assertEquals(a.value[i], b.value[i]);
+		for (int i = 0; i < a.data.length; i++) {
+			assertEquals(a.data[i], b.data[i]);
 		}
 	}
 
 	@Override protected void checkNotEquals( TupleDesc_B a, TupleDesc_B b ) {
-		for (int i = 0; i < a.value.length; i++) {
-			if (a.value[i] != b.value[i])
+		for (int i = 0; i < a.data.length; i++) {
+			if (a.data[i] != b.data[i])
 				return;
 		}
 		fail("The tuples are identical");

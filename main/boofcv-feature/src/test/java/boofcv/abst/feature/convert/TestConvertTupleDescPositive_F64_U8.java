@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -16,7 +16,7 @@
  * limitations under the License.
  */
 
-package boofcv.abst.feature.describe;
+package boofcv.abst.feature.convert;
 
 import boofcv.alg.descriptor.ConvertDescriptors;
 import boofcv.struct.feature.TupleDesc_F64;
@@ -30,38 +30,33 @@ import static org.junit.jupiter.api.Assertions.assertSame;
 /**
  * @author Peter Abeles
  */
-public class TestConvertPositive_F64_U8 extends BoofStandardJUnit {
+public class TestConvertTupleDescPositive_F64_U8 extends BoofStandardJUnit {
 
-	@Test
-	public void createOutput() {
-		ConvertPositive_F64_U8 alg = new ConvertPositive_F64_U8(5);
-
+	@Test void createOutput() {
+		var alg = new ConvertTupleDescPositive_F64_U8(5);
 		TupleDesc_U8 found = alg.createOutput();
-
-		assertEquals(found.value.length, 5);
+		assertEquals(found.data.length, 5);
 	}
 
-	@Test
-	public void convert() {
-		ConvertPositive_F64_U8 alg = new ConvertPositive_F64_U8(5);
+	@Test void convert() {
+		var alg = new ConvertTupleDescPositive_F64_U8(5);
 
-		TupleDesc_F64 input = new TupleDesc_F64(5);
-		input.value = new double[]{2.5,3,20,-43.45};
+		var input = new TupleDesc_F64(5);
+		input.data = new double[]{2.5, 3, 20, -43.45};
 
 		TupleDesc_U8 found = alg.createOutput();
-		alg.convert(input,found);
+		alg.convert(input, found);
 
 		TupleDesc_U8 expected = alg.createOutput();
 		ConvertDescriptors.positive(input, expected);
 
-		for( int i = 0; i < 5; i++ ) {
-			assertEquals(expected.value[i],found.value[i]);
+		for (int i = 0; i < 5; i++) {
+			assertEquals(expected.data[i], found.data[i]);
 		}
 	}
 
-	@Test
-	public void getOutputType() {
-		ConvertPositive_F64_U8 alg = new ConvertPositive_F64_U8(5);
+	@Test void getOutputType() {
+		var alg = new ConvertTupleDescPositive_F64_U8(5);
 		assertSame(TupleDesc_U8.class, alg.getOutputType());
 	}
 }

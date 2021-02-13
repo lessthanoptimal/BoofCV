@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -44,8 +44,8 @@ class TestUtilFeature extends BoofStandardJUnit {
 		TupleDesc_F64 feature0 = new TupleDesc_F64(64);
 		TupleDesc_F64 feature1 = new TupleDesc_F64(32);
 
-		feature0.value[5] = 10;
-		feature1.value[3] = 13;
+		feature0.data[5] = 10;
+		feature1.data[3] = 13;
 
 		List<TupleDesc_F64> list = new ArrayList<>();
 		list.add(feature0);
@@ -60,11 +60,11 @@ class TestUtilFeature extends BoofStandardJUnit {
 	@Test
 	void normalizeL2_F64() {
 		TupleDesc_F64 feature = new TupleDesc_F64(64);
-		feature.value[5] = 2;
-		feature.value[10] = 4;
+		feature.data[5] = 2;
+		feature.data[10] = 4;
 		UtilFeature.normalizeL2(feature);
-		assertEquals(0.44721, feature.value[5], 1e-3);
-		assertEquals(0.89443, feature.value[10], 1e-3);
+		assertEquals(0.44721, feature.data[5], 1e-3);
+		assertEquals(0.89443, feature.data[10], 1e-3);
 	}
 
 	/**
@@ -74,15 +74,15 @@ class TestUtilFeature extends BoofStandardJUnit {
 	void normalizeL2_zeros_F64() {
 		TupleDesc_F64 feature = new TupleDesc_F64(64);
 		UtilFeature.normalizeL2(feature);
-		for (int i = 0; i < feature.value.length; i++)
-			assertEquals(0, feature.value[i], 1e-4);
+		for (int i = 0; i < feature.data.length; i++)
+			assertEquals(0, feature.data[i], 1e-4);
 	}
 
 	@Test
 	void normalizeSumOne_F64() {
 		TupleDesc_F64 feature = new TupleDesc_F64(64);
-		feature.value[5] = 2;
-		feature.value[10] = 4;
+		feature.data[5] = 2;
+		feature.data[10] = 4;
 		UtilFeature.normalizeSumOne(feature);
 
 		double total = 0;
@@ -99,8 +99,8 @@ class TestUtilFeature extends BoofStandardJUnit {
 	void normalizeSumOne_zeros_F64() {
 		TupleDesc_F64 feature = new TupleDesc_F64(64);
 		UtilFeature.normalizeSumOne(feature);
-		for (int i = 0; i < feature.value.length; i++)
-			assertEquals(0, feature.value[i], 1e-4);
+		for (int i = 0; i < feature.data.length; i++)
+			assertEquals(0, feature.data[i], 1e-4);
 	}
 
 	/**

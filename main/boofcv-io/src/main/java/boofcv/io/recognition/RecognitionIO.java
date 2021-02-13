@@ -233,20 +233,20 @@ public class RecognitionIO {
 		if (tuple instanceof TupleDesc_F64) {
 			var desc = (TupleDesc_F64)tuple;
 			for (int i = 0; i < desc.size(); i++) {
-				dout.writeDouble(desc.value[i]);
+				dout.writeDouble(desc.data[i]);
 			}
 		} else if (tuple instanceof TupleDesc_F32) {
 			var desc = (TupleDesc_F32)tuple;
 			for (int i = 0; i < desc.size(); i++) {
-				dout.writeFloat(desc.value[i]);
+				dout.writeFloat(desc.data[i]);
 			}
 		} else if (tuple instanceof TupleDesc_I8) {
 			var desc = (TupleDesc_I8)tuple;
-			dout.write(desc.value, 0, desc.size());
+			dout.write(desc.data, 0, desc.size());
 		} else if (tuple instanceof TupleDesc_B) {
 			var desc = (TupleDesc_B)tuple;
-			for (int i = 0; i < desc.value.length; i++) {
-				dout.writeInt(desc.value[i]);
+			for (int i = 0; i < desc.data.length; i++) {
+				dout.writeInt(desc.data[i]);
 			}
 		} else {
 			throw new IllegalArgumentException("Unknown type " + tuple.getClass().getSimpleName());
@@ -256,18 +256,18 @@ public class RecognitionIO {
 	public static <TD extends TupleDesc<TD>> void readBin( TD tuple, DataInputStream in ) throws IOException {
 		if (tuple instanceof TupleDesc_F64) {
 			var desc = (TupleDesc_F64)tuple;
-			for (int i = 0; i < desc.value.length; i++) {
-				desc.value[i] = in.readDouble();
+			for (int i = 0; i < desc.data.length; i++) {
+				desc.data[i] = in.readDouble();
 			}
 		} else if (tuple instanceof TupleDesc_F32) {
 			var desc = (TupleDesc_F32)tuple;
-			for (int i = 0; i < desc.value.length; i++) {
-				desc.value[i] = in.readFloat();
+			for (int i = 0; i < desc.data.length; i++) {
+				desc.data[i] = in.readFloat();
 			}
 		} else if (tuple instanceof TupleDesc_B) {
 			var desc = (TupleDesc_B)tuple;
-			for (int i = 0; i < desc.value.length; i++) {
-				desc.value[i] = in.readInt();
+			for (int i = 0; i < desc.data.length; i++) {
+				desc.data[i] = in.readInt();
 			}
 		} else {
 			throw new IllegalArgumentException("Unknown type " + tuple.getClass().getSimpleName());

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -88,7 +88,7 @@ class TestWrapDetectDescribeSurf_MT extends GenericTestsDetectDescribePoint<Gray
 
 				matched = true;
 				for (int k = 0; k < a.size(); k++) {
-					if( Math.abs(a.value[k]-b.value[k]) > UtilEjml.TEST_F64) {
+					if( Math.abs(a.data[k]-b.data[k]) > UtilEjml.TEST_F64) {
 						matched = false;
 						break;
 					}

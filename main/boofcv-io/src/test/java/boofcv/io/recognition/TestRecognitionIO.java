@@ -80,7 +80,7 @@ public class TestRecognitionIO extends BoofStandardJUnit {
 
 			assertEquals(e.size(), f.size());
 			for (int j = 0; j < e.size(); j++) {
-				assertEquals(e.value[j], f.value[j]);
+				assertEquals(e.data[j], f.data[j]);
 			}
 		}
 	}
@@ -102,7 +102,7 @@ public class TestRecognitionIO extends BoofStandardJUnit {
 
 			var desc = new TupleDesc_F64(DOF);
 			for (int j = 0; j < DOF; j++) {
-				desc.value[j] = rand.nextDouble();
+				desc.data[j] = rand.nextDouble();
 			}
 			n.descIdx = tree.descriptions.size();
 			tree.descriptions.addCopy(desc);

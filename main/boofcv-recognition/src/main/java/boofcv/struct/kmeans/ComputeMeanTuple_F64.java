@@ -47,11 +47,11 @@ public class ComputeMeanTuple_F64 implements ComputeMeanClusters<TupleDesc_F64> 
 
 		// Compute the sum of all points in each cluster
 		for (int pointIdx = 0; pointIdx < points.size(); pointIdx++) {
-			double[] point = points.getTemp(pointIdx).value;
+			double[] point = points.getTemp(pointIdx).data;
 
 			int clusterIdx = assignments.get(pointIdx);
 			counts.data[clusterIdx]++;
-			double[] cluster = clusters.get(clusterIdx).value;
+			double[] cluster = clusters.get(clusterIdx).data;
 			for (int i = 0; i < point.length; i++) {
 				cluster[i] += point[i];
 			}
@@ -59,7 +59,7 @@ public class ComputeMeanTuple_F64 implements ComputeMeanClusters<TupleDesc_F64> 
 
 		// Divide to get the average value in each cluster
 		for (int clusterIdx = 0; clusterIdx < clusters.size; clusterIdx++) {
-			double[] cluster = clusters.get(clusterIdx).value;
+			double[] cluster = clusters.get(clusterIdx).data;
 			double divisor = counts.get(clusterIdx);
 			for (int i = 0; i < cluster.length; i++) {
 				cluster[i] /= divisor;

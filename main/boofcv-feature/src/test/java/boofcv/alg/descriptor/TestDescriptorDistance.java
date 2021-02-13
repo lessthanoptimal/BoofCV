@@ -32,8 +32,8 @@ public class TestDescriptorDistance extends BoofStandardJUnit {
 		var a = new TupleDesc_F64(5);
 		var b = new TupleDesc_F64(5);
 
-		a.value=new double[]{1,2,3,4,5};
-		b.value=new double[]{2,-1,7,-8,10};
+		a.data =new double[]{1,2,3,4,5};
+		b.data =new double[]{2,-1,7,-8,10};
 
 		assertEquals(13.964, DescriptorDistance.euclidean(a, b), 1e-2);
 	}
@@ -42,8 +42,8 @@ public class TestDescriptorDistance extends BoofStandardJUnit {
 		var a = new TupleDesc_F64(5);
 		var b = new TupleDesc_F64(5);
 
-		a.value=new double[]{1,2,3,4,5};
-		b.value=new double[]{2,-1,7,-8,10};
+		a.data =new double[]{1,2,3,4,5};
+		b.data =new double[]{2,-1,7,-8,10};
 
 		assertEquals(195, DescriptorDistance.euclideanSq(a, b), 1e-4);
 	}
@@ -52,8 +52,8 @@ public class TestDescriptorDistance extends BoofStandardJUnit {
 		var a = new TupleDesc_F32(5);
 		var b = new TupleDesc_F32(5);
 
-		a.value=new float[]{1,2,3,4,5};
-		b.value=new float[]{2,-1,7,-8,10};
+		a.data =new float[]{1,2,3,4,5};
+		b.data =new float[]{2,-1,7,-8,10};
 
 		assertEquals(195, DescriptorDistance.euclideanSq(a, b), 1e-4);
 	}
@@ -62,8 +62,8 @@ public class TestDescriptorDistance extends BoofStandardJUnit {
 		var a = new TupleDesc_U8(5);
 		var b = new TupleDesc_U8(5);
 
-		a.value=new byte[]{1,120,3,4,5};
-		b.value=new byte[]{2,(byte)200,7,9,10};
+		a.data =new byte[]{1,120,3,4,5};
+		b.data =new byte[]{2,(byte)200,7,9,10};
 
 		assertEquals(6467, DescriptorDistance.euclideanSq(a, b), 1e-4);
 	}
@@ -73,8 +73,8 @@ public class TestDescriptorDistance extends BoofStandardJUnit {
 		var a = new TupleDesc_F64(5);
 		var b = new TupleDesc_F64(5);
 
-		a.value=new double[]{1,2,3,4,5};
-		b.value=new double[]{2,-1,7,-8,10};
+		a.data =new double[]{1,2,3,4,5};
+		b.data =new double[]{2,-1,7,-8,10};
 
 		assertEquals(39, DescriptorDistance.correlation(a, b), 1e-2);
 	}
@@ -85,8 +85,8 @@ public class TestDescriptorDistance extends BoofStandardJUnit {
 
 		a.sigma = 12;
 		b.sigma = 7;
-		a.value=new double[]{1,2,3,4,5};
-		b.value=new double[]{2,-1,7,-8,10};
+		a.data =new double[]{1,2,3,4,5};
+		b.data =new double[]{2,-1,7,-8,10};
 
 		assertEquals(0.46429/5.0,DescriptorDistance.ncc(a, b),1e-2);
 	}
@@ -96,17 +96,17 @@ public class TestDescriptorDistance extends BoofStandardJUnit {
 	 */
 	@Test void ncc_self_distance() {
 		var a = new NccFeature(5);
-		for( int i = 0; i < a.value.length; i++ )
-			a.value[i] = i*i;
+		for(int i = 0; i < a.data.length; i++ )
+			a.data[i] = i*i;
 
 		double mean = 0;
-		for( int i = 0; i < a.value.length; i++ )
-			mean += a.value[i];
+		for(int i = 0; i < a.data.length; i++ )
+			mean += a.data[i];
 		mean /= a.size();
 
 		double sigma = 0;
-		for( int i = 0; i < a.value.length; i++ ) {
-			double d = a.value[i] -= mean;
+		for(int i = 0; i < a.data.length; i++ ) {
+			double d = a.data[i] -= mean;
 			sigma += d*d;
 		}
 		sigma /= a.size();
@@ -121,8 +121,8 @@ public class TestDescriptorDistance extends BoofStandardJUnit {
 		var a = new TupleDesc_U8(5);
 		var b = new TupleDesc_U8(5);
 
-		a.value=new byte[]{1,2,3,4,(byte)200};
-		b.value=new byte[]{(byte)245,2,6,3,6};
+		a.data =new byte[]{1,2,3,4,(byte)200};
+		b.data =new byte[]{(byte)245,2,6,3,6};
 
 		assertEquals(442, DescriptorDistance.sad(a, b), 1e-2);
 	}
@@ -131,8 +131,8 @@ public class TestDescriptorDistance extends BoofStandardJUnit {
 		var a = new TupleDesc_S8(5);
 		var b = new TupleDesc_S8(5);
 
-		a.value=new byte[]{1,2,3,4,5};
-		b.value=new byte[]{-2,2,-3,3,6};
+		a.data =new byte[]{1,2,3,4,5};
+		b.data =new byte[]{-2,2,-3,3,6};
 
 		assertEquals(11, DescriptorDistance.sad(a, b), 1e-2);
 	}
@@ -141,8 +141,8 @@ public class TestDescriptorDistance extends BoofStandardJUnit {
 		var a = new TupleDesc_F32(5);
 		var b = new TupleDesc_F32(5);
 
-		a.value=new float[]{ 0.1f ,2     ,3 ,-4.9f ,5};
-		b.value=new float[]{-1    ,45.5f ,6 ,3     ,6.01f};
+		a.data =new float[]{ 0.1f ,2     ,3 ,-4.9f ,5};
+		b.data =new float[]{-1    ,45.5f ,6 ,3     ,6.01f};
 
 		assertEquals(56.51,DescriptorDistance.sad(a, b),1e-2);
 	}
@@ -151,8 +151,8 @@ public class TestDescriptorDistance extends BoofStandardJUnit {
 		var a = new TupleDesc_F64(5);
 		var b = new TupleDesc_F64(5);
 
-		a.value=new double[]{ 0.1 ,2    ,3 ,-4.9 ,5};
-		b.value=new double[]{-1   ,45.5 ,6 ,3   ,6.01};
+		a.data =new double[]{ 0.1 ,2    ,3 ,-4.9 ,5};
+		b.data =new double[]{-1   ,45.5 ,6 ,3   ,6.01};
 
 		assertEquals(56.51,DescriptorDistance.sad(a, b),1e-2);
 	}
@@ -162,9 +162,9 @@ public class TestDescriptorDistance extends BoofStandardJUnit {
 		var b = new TupleDesc_B(512);
 
 		for( int numTries = 0; numTries < 20; numTries++ ) {
-			for(int i = 0; i < a.value.length; i++ ) {
-				a.value[i] = rand.nextInt();
-				b.value[i] = rand.nextInt();
+			for(int i = 0; i < a.data.length; i++ ) {
+				a.data[i] = rand.nextInt();
+				b.data[i] = rand.nextInt();
 			}
 
 			assertEquals(hamming(a,b),DescriptorDistance.hamming(a, b),1e-4);
@@ -182,8 +182,8 @@ public class TestDescriptorDistance extends BoofStandardJUnit {
 
 	private int hamming( TupleDesc_B a, TupleDesc_B b) {
 		int ret = 0;
-		for(int i = 0; i < a.value.length; i++ ) {
-			ret += hamming(a.value[i],b.value[i]);
+		for(int i = 0; i < a.data.length; i++ ) {
+			ret += hamming(a.data[i],b.data[i]);
 		}
 		return ret;
 	}

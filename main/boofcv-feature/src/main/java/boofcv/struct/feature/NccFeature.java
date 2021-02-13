@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -42,7 +42,7 @@ public class NccFeature extends TupleDesc_F64 {
 
 	@Override
 	public NccFeature copy() {
-		NccFeature ret = new NccFeature( value.length );
+		NccFeature ret = new NccFeature( data.length );
 		ret.setTo(this);
 		return ret;
 	}

@@ -43,14 +43,14 @@ public class TestTuplePointDistanceEuclideanSq extends BoofStandardJUnit {
 		@Override protected TupleDesc_F64 createRandomPoint() {
 			var desc = new TupleDesc_F64(DOF);
 			for (int i = 0; i < DOF; i++) {
-				desc.value[i] = rand.nextGaussian();
+				desc.data[i] = rand.nextGaussian();
 			}
 			return desc;
 		}
 
 		@Override protected TupleDesc_F64 addToPoint( TupleDesc_F64 src, double magnitude ) {
 			TupleDesc_F64 ret = src.copy();
-			ret.value[0] += magnitude;
+			ret.data[0] += magnitude;
 			return ret;
 		}
 
@@ -73,14 +73,14 @@ public class TestTuplePointDistanceEuclideanSq extends BoofStandardJUnit {
 		@Override protected TupleDesc_F32 createRandomPoint() {
 			var desc = new TupleDesc_F32(DOF);
 			for (int i = 0; i < DOF; i++) {
-				desc.value[i] = (float)rand.nextGaussian();
+				desc.data[i] = (float)rand.nextGaussian();
 			}
 			return desc;
 		}
 
 		@Override protected TupleDesc_F32 addToPoint( TupleDesc_F32 src, double magnitude ) {
 			TupleDesc_F32 ret = src.copy();
-			ret.value[0] += (float)magnitude;
+			ret.data[0] += (float)magnitude;
 			return ret;
 		}
 
@@ -103,7 +103,7 @@ public class TestTuplePointDistanceEuclideanSq extends BoofStandardJUnit {
 		@Override protected TupleDesc_U8 createRandomPoint() {
 			var desc = new TupleDesc_U8(DOF);
 			for (int i = 0; i < DOF; i++) {
-				desc.value[i] = (byte)rand.nextInt(256);
+				desc.data[i] = (byte)rand.nextInt(256);
 			}
 			return desc;
 		}
@@ -111,7 +111,7 @@ public class TestTuplePointDistanceEuclideanSq extends BoofStandardJUnit {
 		@Override protected TupleDesc_U8 addToPoint( TupleDesc_U8 src, double magnitude ) {
 			TupleDesc_U8 ret = src.copy();
 			for (int i = 0; i < DOF; i++) {
-				ret.value[i] = (byte)((ret.value[i]&0xFF) + (int)magnitude);
+				ret.data[i] = (byte)((ret.data[i]&0xFF) + (int)magnitude);
 			}
 			return ret;
 		}

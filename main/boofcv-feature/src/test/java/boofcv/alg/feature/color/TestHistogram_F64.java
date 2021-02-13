@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -31,7 +31,7 @@ public class TestHistogram_F64 extends BoofStandardJUnit {
 	public void constructor() {
 		Histogram_F64 hist = new Histogram_F64(2,3,4);
 
-		assertEquals(2*3*4,hist.value.length);
+		assertEquals(2*3*4,hist.data.length);
 		assertEquals(2,hist.getLength(0));
 		assertEquals(3,hist.getLength(1));
 		assertEquals(4,hist.getLength(2));
@@ -144,7 +144,7 @@ public class TestHistogram_F64 extends BoofStandardJUnit {
 	public void get_two() {
 		Histogram_F64 hist = new Histogram_F64(2,6);
 
-		hist.value[hist.getIndex(1,2)] = 2;
+		hist.data[hist.getIndex(1,2)] = 2;
 		assertEquals(2,hist.get(1,2),1e-8);
 	}
 
@@ -152,7 +152,7 @@ public class TestHistogram_F64 extends BoofStandardJUnit {
 	public void get_three() {
 		Histogram_F64 hist = new Histogram_F64(2,6,4);
 
-		hist.value[hist.getIndex(1,2,1)] = 2;
+		hist.data[hist.getIndex(1,2,1)] = 2;
 		assertEquals(2, hist.get(1, 2,1), 1e-8);
 	}
 
@@ -160,7 +160,7 @@ public class TestHistogram_F64 extends BoofStandardJUnit {
 	public void get_N() {
 		Histogram_F64 hist = new Histogram_F64(2,6,4);
 
-		hist.value[hist.getIndex(1,2,1)] = 2;
+		hist.data[hist.getIndex(1,2,1)] = 2;
 		assertEquals(2, hist.get(new int[]{1, 2, 1}), 1e-8);
 	}
 }

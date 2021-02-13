@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -18,13 +18,9 @@
 
 package boofcv.factory.feature.describe;
 
-import boofcv.abst.feature.describe.ConvertPositive_F64_U8;
-import boofcv.abst.feature.describe.ConvertReal_F64_S8;
-import boofcv.abst.feature.describe.ConvertTupleDesc;
+import boofcv.abst.feature.convert.*;
 import boofcv.alg.descriptor.ConvertDescriptors;
-import boofcv.struct.feature.TupleDesc_F64;
-import boofcv.struct.feature.TupleDesc_S8;
-import boofcv.struct.feature.TupleDesc_U8;
+import boofcv.struct.feature.*;
 
 /**
  * Factory for creating different types of {@link ConvertTupleDesc}, which are used for converting image region
@@ -35,6 +31,35 @@ import boofcv.struct.feature.TupleDesc_U8;
 public class FactoryConvertTupleDesc {
 
 	/**
+	 * Type agnostic way to create {@link ConvertTupleDesc}.
+	 */
+	@SuppressWarnings({"unchecked", "rawtypes"})
+	public static <A extends TupleDesc<A>, B extends TupleDesc<B>>
+	ConvertTupleDesc<A,B> generic( ConfigConvertTupleDesc config, int numElements, Class<A> srcType) {
+		if (config.outputData == ConfigConvertTupleDesc.DataType.NATIVE) {
+			if (srcType == TupleDesc_F64.class) {
+				return (ConvertTupleDesc)new ConvertTupleDoNothing<>(() -> new TupleDesc_F64(numElements));
+			} else if (srcType == TupleDesc_F32.class) {
+				return (ConvertTupleDesc)new ConvertTupleDoNothing<>(() -> new TupleDesc_F32(numElements));
+			} else if (srcType == TupleDesc_B.class) {
+				return (ConvertTupleDesc)new ConvertTupleDoNothing<>(() -> new TupleDesc_B(numElements));
+			} else {
+				throw new IllegalArgumentException("Add support for "+srcType.getName());
+			}
+		}
+		if (srcType == TupleDesc_F64.class) {
+			return (ConvertTupleDesc)switch (config.outputData) {
+				case F32 -> new ConvertTupleDesc_F64_F32(numElements);
+				case U8 -> new ConvertTupleDescPositive_F64_U8(numElements);
+				case S8 -> new ConvertTupleDescSigned_F64_S8(numElements);
+				default -> throw new IllegalArgumentException("Unsupported conversion");
+			};
+		}
+
+		throw new IllegalArgumentException("Add support for this new conversion");
+	}
+
+	/**
 	 * Converts two {@link boofcv.struct.feature.TupleDesc} as describe by
 	 * {@link ConvertDescriptors#positive(TupleDesc_F64, TupleDesc_U8)}.
 	 *
@@ -42,18 +67,18 @@ public class FactoryConvertTupleDesc {
 	 * @return The converter.
 	 */
 	public static ConvertTupleDesc<TupleDesc_F64,TupleDesc_U8> positive_F64_U8( final int numElements ) {
-		return new ConvertPositive_F64_U8(numElements);
+		return new ConvertTupleDescPositive_F64_U8(numElements);
 	}
 
 	/**
 	 * Converts two {@link boofcv.struct.feature.TupleDesc} as describe by
-	 * {@link ConvertDescriptors#real(TupleDesc_F64, TupleDesc_S8)}.
+	 * {@link ConvertDescriptors#signed(TupleDesc_F64, TupleDesc_S8)}.
 	 *
 	 * @param numElements Number of elements in the descriptor
 	 * @return The converter.
 	 */
 	public static ConvertTupleDesc<TupleDesc_F64,TupleDesc_S8> real_F64_S8( final int numElements ) {
-		return new ConvertReal_F64_S8(numElements);
+		return new ConvertTupleDescSigned_F64_S8(numElements);
 	}
 
 }

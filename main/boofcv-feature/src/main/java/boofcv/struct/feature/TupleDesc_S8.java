@@ -30,10 +30,10 @@ public class TupleDesc_S8 extends TupleDesc_I8<TupleDesc_S8> {
 	}
 
 	@Override public double getDouble( int index ) {
-		return value[index];
+		return data[index];
 	}
 
 	@Override public TupleDesc_S8 newInstance() {
-		return new TupleDesc_S8(value.length);
+		return new TupleDesc_S8(data.length);
 	}
 }

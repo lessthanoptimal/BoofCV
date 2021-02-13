@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -16,7 +16,7 @@
  * limitations under the License.
  */
 
-package boofcv.abst.feature.describe;
+package boofcv.abst.feature.convert;
 
 import boofcv.alg.descriptor.ConvertDescriptors;
 import boofcv.struct.feature.TupleDesc_F64;
@@ -25,43 +25,39 @@ import boofcv.testing.BoofStandardJUnit;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertSame;
 
 /**
  * @author Peter Abeles
  */
-public class TestTestConvertReal_F64_S8 extends BoofStandardJUnit {
+public class TestConvertTupleDescSigned_F64_S8 extends BoofStandardJUnit {
 
-	@Test
-	public void createOutput() {
-		ConvertReal_F64_S8 alg = new ConvertReal_F64_S8(5);
+	@Test void createOutput() {
+		var alg = new ConvertTupleDescSigned_F64_S8(5);
+		var found = alg.createOutput();
 
-		TupleDesc_S8 found = alg.createOutput();
-
-		assertTrue(5 == found.value.length);
+		assertEquals(found.data.length, 5);
 	}
 
-	@Test
-	public void convert() {
-		ConvertReal_F64_S8 alg = new ConvertReal_F64_S8(5);
+	@Test void convert() {
+		var alg = new ConvertTupleDescSigned_F64_S8(5);
 
-		TupleDesc_F64 input = new TupleDesc_F64(5);
-		input.value = new double[]{-2.5,3,20,-243.45};
+		var input = new TupleDesc_F64(5);
+		input.data = new double[]{-2.5, 3, 20, -243.45};
 
 		TupleDesc_S8 found = alg.createOutput();
-		alg.convert(input,found);
+		alg.convert(input, found);
 
 		TupleDesc_S8 expected = alg.createOutput();
-		ConvertDescriptors.real(input, expected);
+		ConvertDescriptors.signed(input, expected);
 
-		for( int i = 0; i < 5; i++ ) {
-			assertEquals(expected.value[i],found.value[i]);
+		for (int i = 0; i < 5; i++) {
+			assertEquals(expected.data[i], found.data[i]);
 		}
 	}
 
-	@Test
-	public void getOutputType() {
-		ConvertReal_F64_S8 alg = new ConvertReal_F64_S8(5);
-		assertTrue(TupleDesc_S8.class == alg.getOutputType());
+	@Test void getOutputType() {
+		ConvertTupleDescSigned_F64_S8 alg = new ConvertTupleDescSigned_F64_S8(5);
+		assertSame(TupleDesc_S8.class, alg.getOutputType());
 	}
 }

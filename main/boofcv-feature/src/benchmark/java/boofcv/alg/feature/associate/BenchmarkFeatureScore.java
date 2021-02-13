@@ -102,7 +102,7 @@ public class BenchmarkFeatureScore {
 		for (int i = 0; i < NUM_FEATURES; i++) {
 			TupleDesc_F64 t = ret.grow();
 			for (int j = 0; j < DOF_TUPLE; j++) {
-				t.value[j] = (rand.nextDouble() - 0.5)*20;
+				t.data[j] = (rand.nextDouble() - 0.5)*20;
 			}
 		}
 		return ret;
@@ -113,8 +113,8 @@ public class BenchmarkFeatureScore {
 
 		for (int i = 0; i < NUM_FEATURES; i++) {
 			TupleDesc_B t = ret.grow();
-			for (int j = 0; j < t.value.length; j++) {
-				t.value[j] = rand.nextInt();
+			for (int j = 0; j < t.data.length; j++) {
+				t.data[j] = rand.nextInt();
 			}
 		}
 		return ret;
@@ -125,8 +125,8 @@ public class BenchmarkFeatureScore {
 
 		for (int i = 0; i < NUM_FEATURES; i++) {
 			NccFeature t = ret.grow();
-			for (int j = 0; j < t.value.length; j++) {
-				t.value[j] = (rand.nextDouble() - 0.5)*20;
+			for (int j = 0; j < t.data.length; j++) {
+				t.data[j] = (rand.nextDouble() - 0.5)*20;
 			}
 			t.mean = (rand.nextDouble() - 0.5)*20;
 			t.sigma = (rand.nextDouble() - 0.5)*20;

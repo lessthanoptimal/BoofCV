@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -40,6 +40,9 @@ public class ConfigDescribeRegionPoint implements Configuration {
 	public ConfigBrief brief = new ConfigBrief(false);
 	public ConfigTemplateDescribe template = new ConfigTemplateDescribe();
 
+	/** Convert the descriptor into a different format */
+	public ConfigConvertTupleDesc convert = new ConfigConvertTupleDesc();
+
 	@Override
 	public void checkValidity() {
 		surfFast.checkValidity();
@@ -47,6 +50,7 @@ public class ConfigDescribeRegionPoint implements Configuration {
 		sift.checkValidity();
 		brief.checkValidity();
 		template.checkValidity();
+		convert.checkValidity();
 	}
 
 	public void setTo( ConfigDescribeRegionPoint src ) {
@@ -57,6 +61,7 @@ public class ConfigDescribeRegionPoint implements Configuration {
 		this.sift.setTo(src.sift);
 		this.brief.setTo(src.brief);
 		this.template.setTo(src.template);
+		this.convert.setTo(src.convert);
 	}
 
 	public enum DescriptorType {

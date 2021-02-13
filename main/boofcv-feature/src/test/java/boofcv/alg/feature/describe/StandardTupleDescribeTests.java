@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -61,7 +61,7 @@ public abstract class StandardTupleDescribeTests extends BoofStandardJUnit {
 		GrayF32 sub = BoofTesting.createSubImageOf(image);
 		TupleDesc_F64 found = describe(c_x,c_y,0,sub);
 
-		BoofTesting.assertEquals(expected.value,found.value,1e-8);
+		BoofTesting.assertEquals(expected.data,found.data,1e-8);
 	}
 
 	/**
@@ -73,8 +73,8 @@ public abstract class StandardTupleDescribeTests extends BoofStandardJUnit {
 		TupleDesc_F64 b = describe(c_x,c_y,1,image);
 
 		boolean equals = true;
-		for( int i = 0; i < a.value.length; i++ ) {
-			double diff = Math.abs(a.value[i]-b.value[i]);
+		for(int i = 0; i < a.data.length; i++ ) {
+			double diff = Math.abs(a.data[i]-b.data[i]);
 			if( diff > 1e-8 ) {
 				equals = false;
 				break;

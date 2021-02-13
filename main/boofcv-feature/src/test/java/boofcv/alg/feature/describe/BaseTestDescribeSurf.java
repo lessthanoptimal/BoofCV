@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -105,7 +105,7 @@ public abstract class BaseTestDescribeSurf<I extends ImageGray<I>,II extends Ima
 
 	private boolean isSimilar(TupleDesc_F64 a, TupleDesc_F64 b ) {
 		for( int i = 0; i < 64; i++ ) {
-			double diff = Math.abs(a.value[i] - b.value[i]);
+			double diff = Math.abs(a.data[i] - b.data[i]);
 
 			if( diff > 1e-4 )
 				return false;
@@ -142,7 +142,7 @@ public abstract class BaseTestDescribeSurf<I extends ImageGray<I>,II extends Ima
 		TupleDesc_F64 feat = alg.createDescription();
 		alg.describe(20,20, 0.75, 1, true, feat);
 
-		for( double f : feat.value )
+		for( double f : feat.data)
 			assertEquals(0,f,1e-4);
 	}
 
@@ -164,20 +164,20 @@ public abstract class BaseTestDescribeSurf<I extends ImageGray<I>,II extends Ima
 		alg.describe(15,15, 0, 1, true, feat);
 
 		for( int i = 0; i < 64; i+= 4) {
-			assertEquals(feat.value[i],feat.value[i+1],1e-4);
-			assertTrue(feat.value[i] > 0);
-			assertEquals(0,feat.value[i+2],1e-4);
-			assertEquals(0,feat.value[i+3],1e-4);
+			assertEquals(feat.data[i],feat.data[i+1],1e-4);
+			assertTrue(feat.data[i] > 0);
+			assertEquals(0,feat.data[i+2],1e-4);
+			assertEquals(0,feat.data[i+3],1e-4);
 		}
 
 		// now orient the feature along the y-axis
 		alg.describe(15,15, Math.PI / 2.0, 1, true, feat);
 
 		for( int i = 0; i < 64; i+= 4) {
-			assertEquals(-feat.value[i+2],feat.value[i+3],1e-4);
-			assertTrue(feat.value[i+2] < 0);
-			assertEquals(0,feat.value[i],1e-4);
-			assertEquals(0,feat.value[i+1],1e-4);
+			assertEquals(-feat.data[i+2],feat.data[i+3],1e-4);
+			assertTrue(feat.data[i+2] < 0);
+			assertEquals(0,feat.data[i],1e-4);
+			assertEquals(0,feat.data[i+1],1e-4);
 		}
 	}
 
@@ -197,10 +197,10 @@ public abstract class BaseTestDescribeSurf<I extends ImageGray<I>,II extends Ima
 		alg.describe(25,25, 0, 1.5, true, feat);
 
 		for( int i = 0; i < 64; i+= 4) {
-			assertEquals(feat.value[i],feat.value[i+1],1e-4);
-			assertTrue(feat.value[i] > 0);
-			assertEquals(0,feat.value[i+2],1e-4);
-			assertEquals(0,feat.value[i+3],1e-4);
+			assertEquals(feat.data[i],feat.data[i+1],1e-4);
+			assertTrue(feat.data[i] > 0);
+			assertEquals(0,feat.data[i+2],1e-4);
+			assertEquals(0,feat.data[i+3],1e-4);
 		}
 	}
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -54,7 +54,7 @@ public class TestAssociateNearestNeighbor_ST extends StandardAssociateDescriptio
 	@Override
 	protected TupleDesc_F64 c(double value) {
 		TupleDesc_F64 s = new TupleDesc_F64(1);
-		s.value[0] = value;
+		s.data[0] = value;
 		return s;
 	}
 

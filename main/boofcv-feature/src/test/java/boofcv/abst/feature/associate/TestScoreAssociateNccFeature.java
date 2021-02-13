@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -44,7 +44,7 @@ public class TestScoreAssociateNccFeature extends StandardScoreAssociationChecks
 		a.mean = 10;
 		a.sigma = 5;
 		for( int i = 0; i < a.size(); i++ )
-			a.value[i] = rand.nextGaussian()*2;
+			a.data[i] = rand.nextGaussian()*2;
 
 		return a;
 	}
@@ -58,8 +58,8 @@ public class TestScoreAssociateNccFeature extends StandardScoreAssociationChecks
 
 		a.sigma =12;
 		b.sigma =7;
-		a.value=new double[]{1,2,3,4,5};
-		b.value=new double[]{2,-1,7,-8,10};
+		a.data =new double[]{1,2,3,4,5};
+		b.data =new double[]{2,-1,7,-8,10};
 
 		assertEquals(-0.46429/5.0,scorer.score(a,b),1e-2);
 	}

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -209,8 +209,8 @@ public class DescribeDenseHogAlg<Input extends ImageBase<Input>> extends BaseDen
 		for (int y = 0; y < maxY; y += stepBlockPixelsY) {
 			for (int x = 0; x < maxX; x += stepBlockPixelsX) {
 				TupleDesc_F64 d = descriptions.grow();
-				Arrays.fill(d.value, 0);
-				histogram = d.value;
+				Arrays.fill(d.data, 0);
+				histogram = d.data;
 
 				for (int cellRow = 0; cellRow < cellsPerBlockY; cellRow++) {
 					int blockPixelRow = cellRow*pixelsPerCell;

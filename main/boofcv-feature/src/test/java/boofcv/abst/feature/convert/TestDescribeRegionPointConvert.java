@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -16,8 +16,10 @@
  * limitations under the License.
  */
 
-package boofcv.abst.feature.describe;
+package boofcv.abst.feature.convert;
 
+import boofcv.abst.feature.describe.DescribeRegionPoint;
+import boofcv.abst.feature.describe.DescribeRegionPointConvert;
 import boofcv.struct.feature.TupleDesc_F64;
 import boofcv.struct.feature.TupleDesc_S8;
 import boofcv.struct.image.GrayF32;
@@ -31,9 +33,7 @@ import static org.junit.jupiter.api.Assertions.*;
  * @author Peter Abeles
  */
 public class TestDescribeRegionPointConvert extends BoofStandardJUnit {
-
-	@Test
-	public void basic() {
+	@Test public void basic() {
 		DummyConvert convert = new DummyConvert();
 		DummyDescribe original = new DummyDescribe();
 
@@ -41,7 +41,7 @@ public class TestDescribeRegionPointConvert extends BoofStandardJUnit {
 				new DescribeRegionPointConvert<>(original, convert);
 
 		TupleDesc_S8 found = alg.createDescription();
-		assertTrue(found.value.length==5);
+		assertEquals(found.data.length, 5);
 
 		assertFalse(original.calledImageSet);
 		alg.setImage(null);
@@ -49,11 +49,11 @@ public class TestDescribeRegionPointConvert extends BoofStandardJUnit {
 
 
 		alg.process(1,2,2,2,found);
-		assertEquals(5,found.value[0]);
+		assertEquals(5,found.data[0]);
 
-		assertTrue(alg.isOriented()==original.isOriented());
-		assertTrue(alg.isScalable()==original.isScalable());
-		assertTrue(alg.getDescriptionType()==TupleDesc_S8.class);
+		assertEquals(original.isOriented(), alg.isOriented());
+		assertEquals(original.isScalable(), alg.isScalable());
+		assertSame(alg.getDescriptionType(), TupleDesc_S8.class);
 
 	}
 
@@ -66,8 +66,8 @@ public class TestDescribeRegionPointConvert extends BoofStandardJUnit {
 
 		@Override
 		public void convert(TupleDesc_F64 input, TupleDesc_S8 output) {
-			assertTrue(input.value[0] == 1);
-			output.value[0] = 5;
+			assertEquals(input.data[0], 1);
+			output.data[0] = 5;
 		}
 
 		@Override
@@ -92,7 +92,7 @@ public class TestDescribeRegionPointConvert extends BoofStandardJUnit {
 
 		@Override
 		public boolean process(double x, double y, double orientation, double radius, TupleDesc_F64 ret) {
-			ret.value[0] = 1;
+			ret.data[0] = 1;
 			return true;
 		}
 

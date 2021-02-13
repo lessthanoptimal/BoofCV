@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -237,14 +237,14 @@ public class TestHistogramFeatureOps extends BoofStandardJUnit {
 	}
 
 	private void checkEquals(TupleDesc_F64 histogram, double[] expected) {
-		for (int i = 0; i < histogram.value.length; i++) {
-			assertEquals(expected[i],histogram.value[i],1e-8);
+		for (int i = 0; i < histogram.data.length; i++) {
+			assertEquals(expected[i],histogram.data[i],1e-8);
 		}
 	}
 
 	private void randomFill( TupleDesc_F64 histogram) {
-		for (int i = 0; i < histogram.value.length; i++) {
-			histogram.value[i] = rand.nextDouble()*100-50;
+		for (int i = 0; i < histogram.data.length; i++) {
+			histogram.data[i] = rand.nextDouble()*100-50;
 		}
 	}
 }
