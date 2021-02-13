@@ -16,7 +16,7 @@
  * limitations under the License.
  */
 
-package boofcv.struct.kmeans;
+package boofcv.struct;
 
 import org.ddogleg.struct.LArrayAccessor;
 

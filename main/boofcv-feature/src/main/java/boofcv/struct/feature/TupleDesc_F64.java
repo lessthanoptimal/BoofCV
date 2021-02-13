@@ -35,12 +35,14 @@ public class TupleDesc_F64 implements TupleDesc<TupleDesc_F64> {
 		this.data = new double[numFeatures];
 	}
 
-	public TupleDesc_F64( double[] values ) {
+	public TupleDesc_F64( double... values ) {
 		this.data = new double[values.length];
 		System.arraycopy(values, 0, this.data, 0, values.length);
 	}
 
 	protected TupleDesc_F64() {}
+
+	public double get(int index) {return data[index];}
 
 	public void setTo( double... value ) {
 		System.arraycopy(value, 0, this.data, 0, this.data.length);
@@ -54,7 +56,7 @@ public class TupleDesc_F64 implements TupleDesc<TupleDesc_F64> {
 		System.arraycopy(source.data, 0, data, 0, data.length);
 	}
 
-	@Override public double getDouble( int index ) {
+	@Override public /**/double /**/getDouble( int index ) {
 		return data[index];
 	}
 

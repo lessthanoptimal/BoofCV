@@ -18,16 +18,31 @@
 
 package boofcv.abst.feature.convert;
 
+import boofcv.struct.feature.TupleDesc_F64;
 import boofcv.testing.BoofStandardJUnit;
 import org.junit.jupiter.api.Test;
 
-import static org.junit.jupiter.api.Assertions.fail;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertSame;
 
 /**
  * @author Peter Abeles
  **/
 public class TestConvertTupleDoNothing extends BoofStandardJUnit {
-	@Test void implement() {
-		fail("Implement");
+	@Test void basic() {
+		var alg = new ConvertTupleDoNothing<>(() -> new TupleDesc_F64(5));
+
+		// Check to see if the output type and create both work
+		assertSame(TupleDesc_F64.class, alg.getOutputType());
+		assertEquals(5 , alg.createOutput().size());
+
+		// See if convert works and just copies
+		var expected = new TupleDesc_F64(1,2,3,4,5);
+		TupleDesc_F64 found = alg.createOutput();
+		alg.convert(expected, found);
+
+		for (int i = 0; i < expected.size(); i++) {
+			assertEquals(expected.get(i), found.get(i));
+		}
 	}
 }

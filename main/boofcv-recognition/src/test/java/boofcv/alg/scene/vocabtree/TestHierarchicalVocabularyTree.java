@@ -19,7 +19,7 @@
 package boofcv.alg.scene.vocabtree;
 
 import boofcv.alg.scene.vocabtree.HierarchicalVocabularyTree.Node;
-import boofcv.struct.kmeans.PackedArray;
+import boofcv.struct.PackedArray;
 import boofcv.testing.BoofStandardJUnit;
 import georegression.struct.point.Point2D_F64;
 import org.ddogleg.clustering.PointDistance;

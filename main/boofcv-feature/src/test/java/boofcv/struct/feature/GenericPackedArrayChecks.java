@@ -16,8 +16,9 @@
  * limitations under the License.
  */
 
-package boofcv.struct.kmeans;
+package boofcv.struct.feature;
 
+import boofcv.struct.PackedArray;
 import boofcv.testing.BoofStandardJUnit;
 import org.junit.jupiter.api.Test;
 

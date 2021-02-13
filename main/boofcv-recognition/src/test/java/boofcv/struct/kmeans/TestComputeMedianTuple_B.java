@@ -18,44 +18,42 @@
 
 package boofcv.struct.kmeans;
 
-//CUSTOM ignore org.ddogleg.struct.DogArray_F64;
-
 import boofcv.struct.PackedArray;
-import boofcv.struct.feature.PackedTupleArray_F64;
-import boofcv.struct.feature.TupleDesc_F64;
+import boofcv.struct.feature.PackedTupleArray_B;
+import boofcv.struct.feature.TupleDesc_B;
 import org.ddogleg.clustering.ComputeMeanClusters;
 import org.ddogleg.struct.DogArray_F64;
-import org.ejml.UtilEjml;
 
 /**
  * @author Peter Abeles
- */
-class TestComputeMeanTuple_F64 extends GenericComputeMeanClustersChecks<TupleDesc_F64> {
+ **/
+public class TestComputeMedianTuple_B extends GenericComputeMeanClustersChecks<TupleDesc_B> {
+	final static int DOF = 44;
 
-	public TestComputeMeanTuple_F64() {
-		tol = UtilEjml.TEST_F64;
+	public TestComputeMedianTuple_B() {
+		this.tol = 0.5; // in this case the mean/median should be within 0.5 of each other
 	}
 
-	@Override public ComputeMeanClusters<TupleDesc_F64> createAlg() {
-		return new ComputeMeanTuple_F64();
+	@Override public ComputeMeanClusters<TupleDesc_B> createAlg() {
+		return new ComputeMedianTuple_B(DOF);
 	}
 
-	@Override public PackedArray<TupleDesc_F64> createArray() {
-		return new PackedTupleArray_F64(DOF);
+	@Override public PackedArray<TupleDesc_B> createArray() {
+		return new PackedTupleArray_B(DOF);
 	}
 
-	@Override public void pointToCommonArray( TupleDesc_F64 src, /**/DogArray_F64 dst ) {
-		dst.resize(DOF);
-		for (int i = 0; i < DOF; i++) {
-			dst.set(i, src.get(i));
+	@Override public void pointToCommonArray( TupleDesc_B src, DogArray_F64 dst ) {
+		dst.resize(DOF,0.0);
+		for (int i = 0; i < src.size(); i++) {
+			dst.set(i, src.isBitTrue(i) ? 1.0 : 0.0);
 		}
 	}
 
-	@Override public TupleDesc_F64 randomPoint() {
-		var tuple = new TupleDesc_F64(DOF);
+	@Override public TupleDesc_B randomPoint() {
+		var point = new TupleDesc_B(DOF);
 		for (int i = 0; i < DOF; i++) {
-			tuple.data[i] = rand.nextDouble();
+			point.setBit(i, rand.nextBoolean());
 		}
-		return tuple;
+		return point;
 	}
 }

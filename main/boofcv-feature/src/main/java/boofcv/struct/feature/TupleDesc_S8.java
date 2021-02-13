@@ -29,6 +29,8 @@ public class TupleDesc_S8 extends TupleDesc_I8<TupleDesc_S8> {
 		super(numFeatures);
 	}
 
+	public int get( int index ) {return this.data[index];}
+
 	@Override public double getDouble( int index ) {
 		return data[index];
 	}

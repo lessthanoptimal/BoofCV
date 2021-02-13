@@ -43,6 +43,7 @@ public class Autocode64to32App extends RecursiveConvert {
 				"main/boofcv-io/src/main/java/boofcv/io/points/impl",
 				"main/boofcv-ip/src/main/java/boofcv/alg/distort",
 				"main/boofcv-types/src/main/java/boofcv/struct",
+				"main/boofcv-feature/src/main/java/boofcv/struct/feature",
 				"main/boofcv-recognition/src/main/java/boofcv/struct/kmeans",
 		};
 

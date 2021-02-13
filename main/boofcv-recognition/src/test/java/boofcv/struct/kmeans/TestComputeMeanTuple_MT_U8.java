@@ -18,12 +18,11 @@
 
 package boofcv.struct.kmeans;
 
-import boofcv.struct.feature.TupleDesc_F64;
+import boofcv.struct.feature.TupleDesc_U8;
 import boofcv.testing.BoofStandardJUnit;
 import org.ddogleg.clustering.misc.ListAccessor;
 import org.ddogleg.struct.DogArray;
 import org.ddogleg.struct.DogArray_I32;
-import org.ejml.UtilEjml;
 import org.junit.jupiter.api.Test;
 
 import java.util.ArrayList;
@@ -35,38 +34,38 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 /**
  * @author Peter Abeles
  **/
-public class TestComputeMeanTuple_MT_F64 extends BoofStandardJUnit {
+public class TestComputeMeanTuple_MT_U8 extends BoofStandardJUnit {
 	@Test void compare() {
 		int DOF = 31;
 		int numClusters = 4;
 
 		// Create a list of random points
-		List<TupleDesc_F64> list = new ArrayList<>();
+		List<TupleDesc_U8> list = new ArrayList<>();
 		var assignments = new DogArray_I32(1000);
 		for (int i = 0; i < 1000; i++) {
 			assignments.add(rand.nextInt(numClusters));
-			var t = new TupleDesc_F64(DOF);
+			var t = new TupleDesc_U8(DOF);
 			for (int j = 0; j < DOF; j++) {
-				t.data[j] = rand.nextDouble();
+				t.data[j] = (byte)rand.nextInt();
 			}
 			list.add(t);
 		}
-		var points = new ListAccessor<>(list, (src,dst)->dst.setTo(src), TupleDesc_F64.class);
+		var points = new ListAccessor<>(list, (src,dst)->dst.setTo(src), TupleDesc_U8.class);
 
-		var clustersSingle = new DogArray<>(()->new TupleDesc_F64(DOF));
-		var clustersMulti = new DogArray<>(()->new TupleDesc_F64(DOF));
+		var clustersSingle = new DogArray<>(()->new TupleDesc_U8(DOF));
+		var clustersMulti = new DogArray<>(()->new TupleDesc_U8(DOF));
 		clustersSingle.resize(numClusters);
 		clustersMulti.resize(numClusters);
 
-		var single = new ComputeMeanTuple_F64();
-		var multi = new ComputeMeanTuple_MT_F64(DOF);
+		var single = new ComputeMeanTuple_U8(DOF);
+		var multi = new ComputeMeanTuple_MT_U8(DOF);
 
 		single.process(points, assignments, clustersSingle);
 		multi.process(points, assignments, clustersMulti);
 
 		assertEquals(clustersSingle.size, clustersMulti.size);
 		for (int i = 0; i < numClusters; i++) {
-			assertArrayEquals(clustersSingle.get(i).data, clustersMulti.get(i).data, UtilEjml.TEST_F64);
+			assertArrayEquals(clustersSingle.get(i).data, clustersMulti.get(i).data);
 		}
 	}
 }

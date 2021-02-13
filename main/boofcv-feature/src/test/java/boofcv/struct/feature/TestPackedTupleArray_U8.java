@@ -16,34 +16,33 @@
  * limitations under the License.
  */
 
-package boofcv.struct.kmeans;
+package boofcv.struct.feature;
 
-import boofcv.struct.feature.TupleDesc_F64;
-import org.ejml.UtilEjml;
+import boofcv.struct.PackedArray;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.fail;
 
-class TestPackedTupleArray_F64 extends GenericPackedArrayChecks<TupleDesc_F64> {
+class TestPackedTupleArray_U8 extends GenericPackedArrayChecks<TupleDesc_U8> {
 	int DOF = 1;
 
-	@Override protected PackedArray<TupleDesc_F64> createAlg() {
-		return new PackedTupleArray_F64(DOF);
+	@Override protected PackedArray<TupleDesc_U8> createAlg() {
+		return new PackedTupleArray_U8(DOF);
 	}
 
-	@Override protected TupleDesc_F64 createRandomPoint() {
-		var point = new TupleDesc_F64(DOF);
-		point.data[0] = (double) rand.nextGaussian();
+	@Override protected TupleDesc_U8 createRandomPoint() {
+		var point = new TupleDesc_U8(DOF);
+		point.data[0] = (byte) rand.nextInt(256);
 		return point;
 	}
 
-	@Override protected void checkEquals( TupleDesc_F64 a, TupleDesc_F64 b ) {
+	@Override protected void checkEquals( TupleDesc_U8 a, TupleDesc_U8 b ) {
 		for (int i = 0; i < DOF; i++) {
-			assertEquals(a.data[i], b.data[i], UtilEjml.TEST_F64);
+			assertEquals(a.data[i], b.data[i]);
 		}
 	}
 
-	@Override protected void checkNotEquals( TupleDesc_F64 a, TupleDesc_F64 b ) {
+	@Override protected void checkNotEquals( TupleDesc_U8 a, TupleDesc_U8 b ) {
 		for (int i = 0; i < DOF; i++) {
 			if (a.data[i] != b.data[i])
 				return;

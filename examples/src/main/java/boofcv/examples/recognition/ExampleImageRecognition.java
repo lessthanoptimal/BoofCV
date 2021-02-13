@@ -22,6 +22,7 @@ import boofcv.abst.scene.ImageRecognition;
 import boofcv.abst.scene.nister2006.ConfigImageRecognitionNister2006;
 import boofcv.abst.scene.nister2006.ImageRecognitionNister2006;
 import boofcv.alg.filter.misc.AverageDownSampleOps;
+import boofcv.factory.feature.describe.ConfigConvertTupleDesc;
 import boofcv.gui.ListDisplayPanel;
 import boofcv.gui.image.ScaleOptions;
 import boofcv.gui.image.ShowImages;
@@ -57,6 +58,8 @@ public class ExampleImageRecognition {
 //		config.tree.maximumLevel = 4;
 		config.features.detectFastHessian.extract.radius = 3;
 //		config.features.detectFastHessian.extract.threshold = 0.0f;
+		config.features.convertDescriptor.outputData = ConfigConvertTupleDesc.DataType.F32;
+
 		ImageRecognition<GrayU8> recognizer = new ImageRecognitionNister2006<>(config, ImageType.SB_U8);
 		recognizer.setVerbose(System.out, null);
 
