@@ -18,6 +18,7 @@
 
 package boofcv.struct.kmeans;
 
+import boofcv.struct.PackedArray;
 import boofcv.testing.BoofStandardJUnit;
 import org.ddogleg.clustering.ComputeMeanClusters;
 import org.ddogleg.struct.DogArray;
@@ -37,6 +38,11 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
  * @author Peter Abeles
  **/
 public abstract class GenericComputeMeanClustersChecks<T> extends BoofStandardJUnit {
+
+	// If a tuple descriptor this is the number of elements
+	protected int DOF = 4;
+
+	protected double tol;
 
 	// Number of clusters/labels
 	int numLabels = 3;
@@ -85,7 +91,7 @@ public abstract class GenericComputeMeanClustersChecks<T> extends BoofStandardJU
 			pointToCommonArray(clusters.get(label), tmp);
 
 			for (int i = 0; i < DOF; i++) {
-				assertEquals(e[i], tmp.get(i), UtilEjml.TEST_F32); // F32 since input could be float
+				assertEquals(e[i], tmp.get(i), tol);
 			}
 		}
 	}

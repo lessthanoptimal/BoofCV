@@ -19,7 +19,7 @@
 package boofcv.struct.kmeans;
 
 import boofcv.concurrency.BoofConcurrency;
-import boofcv.struct.feature.TupleDesc_F64;
+import boofcv.struct.feature.TupleDesc_U8;
 import lombok.Getter;
 import lombok.Setter;
 import org.ddogleg.clustering.ComputeMeanClusters;
@@ -29,12 +29,14 @@ import org.ddogleg.struct.FastAccess;
 import org.ddogleg.struct.LArrayAccessor;
 import pabeles.concurrency.GrowArray;
 
+import java.util.Arrays;
+
 /**
  * Concurrent implementation of {@link ComputeMeanTuple_F64}
  *
  * @author Peter Abeles
  */
-public class ComputeMeanTuple_MT_F64 extends ComputeMeanTuple_F64 {
+public class ComputeMeanTuple_MT_U8 extends ComputeMeanTuple_U8 {
 
 	/**
 	 * Minimum list size for it to use concurrent code. If a list is small it will run slower than the single
@@ -46,14 +48,15 @@ public class ComputeMeanTuple_MT_F64 extends ComputeMeanTuple_F64 {
 
 	GrowArray<ThreadData> threadData;
 
-	public ComputeMeanTuple_MT_F64( int numElements) {
+	public ComputeMeanTuple_MT_U8( int numElements ) {
+		super(numElements);
 		tupleDof = numElements;
 		threadData = new GrowArray<>(ThreadData::new);
 	}
 
-	@Override public void process( LArrayAccessor<TupleDesc_F64> points,
+	@Override public void process( LArrayAccessor<TupleDesc_U8> points,
 								   DogArray_I32 assignments,
-								   FastAccess<TupleDesc_F64> clusters) {
+								   FastAccess<TupleDesc_U8> clusters ) {
 		// see if it should run the single thread version instead
 		if (points.size() < minimumForConcurrent) {
 			super.process(points, assignments, clusters);
@@ -64,42 +67,43 @@ public class ComputeMeanTuple_MT_F64 extends ComputeMeanTuple_F64 {
 			throw new IllegalArgumentException("Points and assignments need to be the same size");
 
 		// Compute the sum of all points in each cluster
-		BoofConcurrency.loopBlocks(0, points.size(), threadData, (data,idx0,idx1)->{
-			final TupleDesc_F64 tuple = data.point;
-			final DogArray<TupleDesc_F64> sums = data.clusterSums;
+		BoofConcurrency.loopBlocks(0, points.size(), threadData, ( data, idx0, idx1 ) -> {
+			final TupleDesc_U8 tuple = data.point;
+			final DogArray<int[]> sums = data.clusterSums;
 			sums.resize(clusters.size);
 			for (int i = 0; i < sums.size; i++) {
-				sums.get(i).fill(0.0);
+				Arrays.fill(sums.data[i], 0);
 			}
 			final DogArray_I32 counts = data.counts;
 			counts.resize(sums.size, 0);
 
 			for (int pointIdx = idx0; pointIdx < idx1; pointIdx++) {
 				points.getCopy(pointIdx, tuple);
-				final double[] point = tuple.data;
+				final byte[] point = tuple.data;
 
 				int clusterIdx = assignments.get(pointIdx);
 				counts.data[clusterIdx]++;
-				double[] cluster = sums.get(clusterIdx).data;
+				int[] sum = sums.get(clusterIdx);
 				for (int i = 0; i < point.length; i++) {
-					cluster[i] += point[i];
+					sum[i] += point[i] & 0xFF;
 				}
 			}
 		});
 
 		// Stitch results from threads back together
 		counts.resize(clusters.size, 0);
+		means.resize(clusters.size);
 		for (int i = 0; i < clusters.size; i++) {
-			clusters.get(i).fill(0.0);
+			Arrays.fill(means.data[i], 0);
 		}
 		for (int threadIdx = 0; threadIdx < threadData.size(); threadIdx++) {
 			ThreadData data = threadData.get(threadIdx);
 			for (int clusterIdx = 0; clusterIdx < clusters.size; clusterIdx++) {
-				TupleDesc_F64 a = data.clusterSums.get(clusterIdx);
-				TupleDesc_F64 b = clusters.get(clusterIdx);
+				int[] a = data.clusterSums.get(clusterIdx);
+				int[] b = means.get(clusterIdx);
 
-				for (int i = 0; i < b.size(); i++) {
-					b.data[i] += a.data[i];
+				for (int i = 0; i < b.length; i++) {
+					b[i] += a[i];
 				}
 				counts.data[clusterIdx] += data.counts.data[clusterIdx];
 			}
@@ -107,21 +111,22 @@ public class ComputeMeanTuple_MT_F64 extends ComputeMeanTuple_F64 {
 
 		// Divide to get the average value in each cluster
 		for (int clusterIdx = 0; clusterIdx < clusters.size; clusterIdx++) {
-			double[] cluster = clusters.get(clusterIdx).data;
+			int[] sum = means.get(clusterIdx);
+			byte[] cluster = clusters.get(clusterIdx).data;
 			double divisor = counts.get(clusterIdx);
 			for (int i = 0; i < cluster.length; i++) {
-				cluster[i] /= divisor;
+				cluster[i] = (byte)(sum[i]/divisor);
 			}
 		}
 	}
 
-	@Override public ComputeMeanClusters<TupleDesc_F64> newInstanceThread() {
-		return new ComputeMeanTuple_MT_F64(tupleDof);
+	@Override public ComputeMeanClusters<TupleDesc_U8> newInstanceThread() {
+		return new ComputeMeanTuple_MT_U8(tupleDof);
 	}
 
 	class ThreadData {
-		TupleDesc_F64 point = new TupleDesc_F64(tupleDof);
+		TupleDesc_U8 point = new TupleDesc_U8(tupleDof);
 		DogArray_I32 counts = new DogArray_I32();
-		DogArray<TupleDesc_F64> clusterSums = new DogArray<>(()->new TupleDesc_F64(tupleDof));
+		DogArray<int[]> clusterSums = new DogArray<>(() -> new int[tupleDof]);
 	}
 }

@@ -16,9 +16,9 @@
  * limitations under the License.
  */
 
-package boofcv.struct.kmeans;
+package boofcv.struct.feature;
 
-import boofcv.struct.feature.TupleDesc_F64;
+import boofcv.struct.PackedArray;
 import org.ddogleg.struct.DogArray_F64;
 
 /**

@@ -50,6 +50,14 @@ public class TupleDesc_B implements TupleDesc<TupleDesc_B> {
 		return ((data[index] >> (bit%32)) & 0x01) == 1;
 	}
 
+	public void setBit( int bit , boolean value ) {
+		int index = bit/32;
+		if (value)
+			data[index] |= 1 << (bit%32);
+		else
+			data[index] &= ~(1 << (bit%32));
+	}
+
 	@Override
 	public void setTo( TupleDesc_B source ) {
 		if (data.length < source.data.length)

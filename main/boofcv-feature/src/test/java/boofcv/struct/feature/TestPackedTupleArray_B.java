@@ -16,9 +16,9 @@
  * limitations under the License.
  */
 
-package boofcv.struct.kmeans;
+package boofcv.struct.feature;
 
-import boofcv.struct.feature.TupleDesc_B;
+import boofcv.struct.PackedArray;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.fail;

@@ -24,10 +24,8 @@ import boofcv.alg.scene.nister2006.RecognitionVocabularyTreeNister2006.ImageInfo
 import boofcv.alg.scene.nister2006.RecognitionVocabularyTreeNister2006.LeafData;
 import boofcv.alg.scene.vocabtree.HierarchicalVocabularyTree;
 import boofcv.io.UtilIO;
+import boofcv.struct.PackedArray;
 import boofcv.struct.feature.*;
-import boofcv.struct.kmeans.PackedArray;
-import boofcv.struct.kmeans.PackedTupleArray_F32;
-import boofcv.struct.kmeans.PackedTupleArray_F64;
 import boofcv.struct.kmeans.TuplePointDistanceEuclideanSq;
 import gnu.trove.map.TIntIntMap;
 import gnu.trove.map.hash.TIntIntHashMap;

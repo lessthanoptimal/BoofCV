@@ -18,16 +18,42 @@
 
 package boofcv.abst.feature.convert;
 
+import boofcv.struct.feature.TupleDesc_F32;
+import boofcv.struct.feature.TupleDesc_F64;
 import boofcv.testing.BoofStandardJUnit;
+import org.ejml.UtilEjml;
 import org.junit.jupiter.api.Test;
 
-import static org.junit.jupiter.api.Assertions.fail;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertSame;
 
 /**
  * @author Peter Abeles
  **/
 public class TestConvertTupleDesc_F64_F32 extends BoofStandardJUnit {
-	@Test void implement() {
-		fail("Implement");
+	@Test void createOutput() {
+		var alg = new ConvertTupleDesc_F64_F32(5);
+		TupleDesc_F32 found = alg.createOutput();
+		assertEquals(found.data.length, 5);
+	}
+
+	@Test void convert() {
+		var alg = new ConvertTupleDesc_F64_F32(5);
+
+		var input = new TupleDesc_F64(5);
+		input.data = new double[]{2.5, 3, 20, -43.45, 2.123};
+
+		TupleDesc_F32 found = alg.createOutput();
+		alg.convert(input, found);
+
+
+		for (int i = 0; i < 5; i++) {
+			assertEquals(input.data[i], found.data[i], UtilEjml.TEST_F32);
+		}
+	}
+
+	@Test void getOutputType() {
+		var alg = new ConvertTupleDesc_F64_F32(5);
+		assertSame(TupleDesc_F32.class, alg.getOutputType());
 	}
 }

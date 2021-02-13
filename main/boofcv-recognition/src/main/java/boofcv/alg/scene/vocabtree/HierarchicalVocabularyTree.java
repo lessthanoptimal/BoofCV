@@ -20,7 +20,7 @@ package boofcv.alg.scene.vocabtree;
 
 import boofcv.misc.BoofLambdas;
 import boofcv.misc.BoofMiscOps;
-import boofcv.struct.kmeans.PackedArray;
+import boofcv.struct.PackedArray;
 import org.ddogleg.clustering.PointDistance;
 import org.ddogleg.struct.DogArray;
 import org.ddogleg.struct.DogArray_I32;

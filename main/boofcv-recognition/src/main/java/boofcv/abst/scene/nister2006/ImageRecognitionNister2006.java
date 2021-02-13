@@ -25,18 +25,16 @@ import boofcv.alg.scene.nister2006.RecognitionVocabularyTreeNister2006;
 import boofcv.alg.scene.nister2006.RecognitionVocabularyTreeNister2006.LeafData;
 import boofcv.alg.scene.vocabtree.HierarchicalVocabularyTree;
 import boofcv.alg.scene.vocabtree.LearnHierarchicalTree;
-import boofcv.concurrency.BoofConcurrency;
 import boofcv.factory.feature.detdesc.FactoryDetectDescribe;
+import boofcv.factory.struct.FactoryTupleDesc;
 import boofcv.misc.BoofLambdas;
+import boofcv.struct.PackedArray;
 import boofcv.struct.feature.TupleDesc;
-import boofcv.struct.feature.TupleDesc_F64;
 import boofcv.struct.image.ImageBase;
 import boofcv.struct.image.ImageType;
-import boofcv.struct.kmeans.*;
+import boofcv.struct.kmeans.FactoryTupleCluster;
 import lombok.Getter;
 import lombok.Setter;
-import org.ddogleg.clustering.FactoryClustering;
-import org.ddogleg.clustering.PointDistance;
 import org.ddogleg.clustering.kmeans.StandardKMeans;
 import org.ddogleg.struct.DogArray;
 import org.ddogleg.struct.DogArray_I32;
@@ -96,7 +94,8 @@ public class ImageRecognitionNister2006<Image extends ImageBase<Image>, TD exten
 	@SuppressWarnings({"unchecked", "rawtypes"})
 	@Override public void learnDescription( Iterator<Image> images ) {
 		int DOF = detector.createDescription().size();
-		PackedArray<TD> packedFeatures = (PackedArray)new PackedTupleArray_F64(DOF);
+		Class<TD> tupleType = detector.getDescriptionType();
+		PackedArray<TD> packedFeatures = FactoryTupleDesc.createPacked(DOF, tupleType);
 
 		// Keep track of where features from one image begins/ends
 		DogArray_I32 startIndex = new DogArray_I32();
@@ -119,8 +118,9 @@ public class ImageRecognitionNister2006<Image extends ImageBase<Image>, TD exten
 		long time1 = System.currentTimeMillis();
 
 		// Create the tree data structure
-		PointDistance distance = new TuplePointDistanceEuclideanSq.F64();
-		tree = new HierarchicalVocabularyTree<>(distance, new PackedTupleArray_F64(DOF),
+		PackedArray<TD> packedArray = FactoryTupleDesc.createPacked(DOF, tupleType);
+
+		tree = new HierarchicalVocabularyTree<>(FactoryTupleCluster.createDistance(tupleType), packedArray,
 				RecognitionVocabularyTreeNister2006.LeafData.class);
 		tree.branchFactor = config.tree.branchFactor;
 		tree.maximumLevel = config.tree.maximumLevel;
@@ -128,19 +128,13 @@ public class ImageRecognitionNister2006<Image extends ImageBase<Image>, TD exten
 		// Learn the tree's structure
 		if (verbose != null) verbose.println("learning the tree");
 
-		BoofLambdas.Factory<StandardKMeans<TD>> factoryKMeans = BoofConcurrency.isUseConcurrent() ?
-				() -> {
-					int minimumForThreads = 500;
-					var computeMean = new ComputeMeanTuple_MT_F64(() -> new TupleDesc_F64(DOF));
-					computeMean.setMinimumForConcurrent(minimumForThreads);
-					return FactoryClustering.kMeans_MT(config.kmeans,minimumForThreads,
-							computeMean, distance, () -> new TupleDesc_F64(DOF));
-				} :
-				() -> FactoryClustering.kMeans(config.kmeans,
-						new ComputeMeanTuple_F64(), distance, () -> new TupleDesc_F64(DOF));
+		// TODO generalized PackedTuple
+
+		BoofLambdas.Factory<StandardKMeans<TD>> factoryKMeans = ()->
+				FactoryTupleCluster.kmeans(config.kmeans,500,DOF, tupleType);
 
 		LearnHierarchicalTree<TD> learnTree = new LearnHierarchicalTree<>(
-				() -> (PackedArray)new PackedTupleArray_F64(DOF), factoryKMeans, config.randSeed);
+				() -> FactoryTupleDesc.createPacked(DOF, tupleType), factoryKMeans, config.randSeed);
 		learnTree.setVerbose(verbose, null);
 		learnTree.process(packedFeatures, tree);
 		long time2 = System.currentTimeMillis();

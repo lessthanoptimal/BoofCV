@@ -22,61 +22,78 @@ import boofcv.testing.BoofStandardJUnit;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 
 /**
  * @author Peter Abeles
  */
 public class TestTupleDesc_B extends BoofStandardJUnit {
-
-	@Test
-	public void isBitTrue() {
+	@Test public void isBitTrue() {
 		int N = 40;
 		TupleDesc_B desc = new TupleDesc_B(N);
 
-		boolean expected[] = new boolean[N];
-		for( int i = 0; i < N; i++ ) {
+		boolean[] expected = new boolean[N];
+		for (int i = 0; i < N; i++) {
 			expected[i] = rand.nextBoolean();
 
 			int index = i/32;
 			desc.data[index] |= expected[i] ? 1 << (i%32) : 0;
 		}
 
-		for( int i = 0; i < N; i++ ) {
-			assertEquals(desc.isBitTrue(i),expected[i]);
+		for (int i = 0; i < N; i++) {
+			assertEquals(desc.isBitTrue(i), expected[i]);
 		}
 	}
 
-	@Test
-	public void setTo() {
+	@Test public void setBit() {
+		int N = 40;
+		var desc = new TupleDesc_B(N);
+		for (int bitIdx = 0; bitIdx < N; bitIdx++) {
+			desc.setBit(bitIdx, bitIdx%2 == 0);
+			assertEquals(bitIdx%2 == 0, desc.isBitTrue(bitIdx));
+
+			// Make sure it didn't modify other elements after this point
+			for (int falseIdx = bitIdx + 1; falseIdx < N; falseIdx++) {
+				assertFalse(desc.isBitTrue(falseIdx));
+			}
+		}
+
+		// one more pass which should invert
+		for (int bitIdx = 0; bitIdx < N; bitIdx++) {
+			desc.setBit(bitIdx, bitIdx%2 == 1);
+			assertEquals(bitIdx%2 == 1, desc.isBitTrue(bitIdx));
+		}
+	}
+
+	@Test public void setTo() {
 		int N = 40;
 		TupleDesc_B a = new TupleDesc_B(N);
 
-		for(int i = 0; i < a.data.length; i++ ) {
+		for (int i = 0; i < a.data.length; i++) {
 			a.data[i] = rand.nextInt();
 		}
 
 		TupleDesc_B b = new TupleDesc_B(80);
 		b.setTo(a);
 
-		for(int i = 0; i < a.data.length; i++ ) {
-			assertEquals(a.data[i],b.data[i]);
+		for (int i = 0; i < a.data.length; i++) {
+			assertEquals(a.data[i], b.data[i]);
 		}
-		assertEquals(a.numBits,b.numBits);
+		assertEquals(a.numBits, b.numBits);
 	}
 
-	@Test
-	public void copy() {
+	@Test public void copy() {
 		TupleDesc_B a = new TupleDesc_B(512);
-		for(int i = 0; i < a.data.length; i++ ) {
-			a.data[i] = 100+i;
+		for (int i = 0; i < a.data.length; i++) {
+			a.data[i] = 100 + i;
 		}
 
 		TupleDesc_B b = a.copy();
-		assertEquals(a.numBits,b.numBits);
-		for(int i = 0; i < a.data.length; i++ ) {
-			assertEquals(100+i,a.data[i]);
+		assertEquals(a.numBits, b.numBits);
+		for (int i = 0; i < a.data.length; i++) {
+			assertEquals(100 + i, a.data[i]);
 		}
 
-		assertEquals(a.numBits,b.numBits);
+		assertEquals(a.numBits, b.numBits);
 	}
 }
