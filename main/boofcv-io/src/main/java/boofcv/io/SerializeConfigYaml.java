@@ -40,7 +40,7 @@ import static boofcv.io.calibration.CalibrationIO.createYmlObject;
  */
 public class SerializeConfigYaml {
 	public static void serialize( Configuration config, Writer writer ) {
-		Map<String,Object> state = new HashMap<>();
+		Map<String, Object> state = new HashMap<>();
 
 		// Add some version info to make debugging in the future easier
 		state.put("BoofCV.Version", BoofVersion.VERSION);
@@ -49,7 +49,7 @@ public class SerializeConfigYaml {
 
 		// Print what this is at the top of the file
 		try {
-			writer.write("# Serialized "+config.getClass().getName()+"\n");
+			writer.write("# Serialized " + config.getClass().getName() + "\n");
 		} catch (IOException e) {
 			throw new UncheckedIOException(e);
 		}
@@ -57,8 +57,8 @@ public class SerializeConfigYaml {
 		yaml.dump(state, writer);
 	}
 
-	private static Map<String,Object> serialize( Object config ) {
-		Map<String,Object> state = new HashMap<>();
+	private static Map<String, Object> serialize( Object config ) {
+		Map<String, Object> state = new HashMap<>();
 		Class type = config.getClass();
 		try {
 			Field[] fields = type.getFields();
@@ -83,15 +83,15 @@ public class SerializeConfigYaml {
 		}
 	}
 
-	public static <T extends Configuration>T deserialize( Reader reader ) {
+	public static <T extends Configuration> T deserialize( Reader reader ) {
 		Yaml yaml = createYmlObject();
-		Map<String,Object> state = yaml.load(reader);
+		Map<String, Object> state = yaml.load(reader);
 		try {
-			for( String key : state.keySet() ) {
+			for (String key : state.keySet()) {
 				if (key.startsWith("BoofCV"))
 					continue;
 				T config = (T)Class.forName(key).getConstructor().newInstance();
-				deserialize(config, (Map<String,Object>)state.get(key));
+				deserialize(config, (Map<String, Object>)state.get(key));
 				return config;
 			}
 		} catch (InstantiationException | IllegalAccessException |
@@ -101,17 +101,19 @@ public class SerializeConfigYaml {
 		throw new RuntimeException("Couldn't find object to deserialize");
 	}
 
-	private static void deserialize( Object parent, Map<String,Object> state ) {
+	private static void deserialize( Object parent, Map<String, Object> state ) {
 		Class type = parent.getClass();
 		try {
-			for( String key : state.keySet() ) {
+			for (String key : state.keySet()) {
 				Field f = type.getField(key);
 				Class ftype = f.getType();
 				if (ftype.isEnum()) {
 					f.set(parent, state.get(key));
-				} else if (ftype.isPrimitive() ) {
+				} else if (ftype.isPrimitive()) {
 					Object value = state.get(key);
-					if (ftype == byte.class)
+					if (ftype == boolean.class)
+						f.set(parent, ((Boolean)value).booleanValue());
+					else if (ftype == byte.class)
 						f.set(parent, ((Number)value).byteValue());
 					else if (ftype == char.class)
 						f.set(parent, ((Character)value).charValue());
@@ -126,14 +128,14 @@ public class SerializeConfigYaml {
 					else if (ftype == double.class)
 						f.set(parent, ((Number)value).doubleValue());
 					else
-						throw new RuntimeException("Unknown primitive "+ftype);
+						throw new RuntimeException("Unknown primitive " + ftype);
 				} else if (ftype.getName().equals("java.lang.String")) {
 					f.set(parent, state.get(key));
 				} else {
 					Object child = ftype.getConstructor().newInstance();
-					deserialize(child, (Map<String,Object>)state.get(key));
+					deserialize(child, (Map<String, Object>)state.get(key));
 					Class c = child.getClass();
-					c.getMethod("setTo",c).invoke(f.get(parent), child);
+					c.getMethod("setTo", c).invoke(f.get(parent), child);
 				}
 			}
 		} catch (NoSuchFieldException | IllegalAccessException | NoSuchMethodException | InstantiationException | InvocationTargetException e) {

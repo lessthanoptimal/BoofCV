@@ -100,7 +100,13 @@ public class LearnNodeWeights<Point> {
 		for (int i = 0; i < tree.nodes.size; i++) {
 			Node n = tree.nodes.get(i);
 			int totalImagesFoundInsideOf = numberOfImagesWithNode.get(n.id);
-			n.weight = Math.log(totalImages/(double)totalImagesFoundInsideOf);
+
+			// NOTE: Why is this happening when the same images used to create the tree are used to compute the
+			//       weights? Shouldn't every node in the tree have at least one image?
+			if (totalImagesFoundInsideOf==0)
+				n.weight = 0.0;
+			else
+				n.weight = Math.log(totalImages/(double)totalImagesFoundInsideOf);
 		}
 	}
 }

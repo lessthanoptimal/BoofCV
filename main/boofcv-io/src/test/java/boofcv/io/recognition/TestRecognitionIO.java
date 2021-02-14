@@ -18,18 +18,25 @@
 
 package boofcv.io.recognition;
 
+import boofcv.abst.scene.nister2006.ConfigImageRecognitionNister2006;
+import boofcv.abst.scene.nister2006.ImageRecognitionNister2006;
 import boofcv.alg.scene.nister2006.RecognitionVocabularyTreeNister2006;
 import boofcv.alg.scene.nister2006.RecognitionVocabularyTreeNister2006.ImageInfo;
 import boofcv.alg.scene.nister2006.RecognitionVocabularyTreeNister2006.LeafData;
 import boofcv.alg.scene.vocabtree.HierarchicalVocabularyTree;
+import boofcv.io.UtilIO;
 import boofcv.struct.feature.PackedTupleArray_F64;
 import boofcv.struct.feature.TupleDesc_F64;
+import boofcv.struct.image.GrayU8;
+import boofcv.struct.image.ImageType;
 import boofcv.struct.kmeans.TuplePointDistanceEuclideanSq;
 import boofcv.testing.BoofStandardJUnit;
+import org.jetbrains.annotations.NotNull;
 import org.junit.jupiter.api.Test;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
+import java.io.File;
 import java.io.InputStream;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -38,6 +45,32 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
  * @author Peter Abeles
  **/
 public class TestRecognitionIO extends BoofStandardJUnit {
+
+	/**
+	 * Very basic test. Mostly just checks to see if things blow up or not
+	 */
+	@Test void save_load_nister2006() {
+		File dir = new File(System.getProperty("java.io.tmpdir"),"nister2006");
+		try {
+			var config = new ConfigImageRecognitionNister2006();
+			ImageType<GrayU8> imageType = ImageType.SB_U8;
+
+			var original = new ImageRecognitionNister2006<GrayU8,TupleDesc_F64>(config, imageType);
+			original.setDatabase(createDefaultNister2006());
+
+			RecognitionIO.saveNister2006(original, dir);
+			ImageRecognitionNister2006<GrayU8,TupleDesc_F64> found = RecognitionIO.loadNister2006(dir, imageType);
+
+			// Check a some things to make sure it actually loaded
+			assertEquals(11, found.getDatabaseN().getImagesDB().size());
+			assertEquals(5, found.getTree().nodes.size());
+		} finally {
+			// clean up
+			if (dir.exists())
+				UtilIO.deleteRecursive(dir);
+		}
+	}
+
 	@Test void hierarchicalVocabularyTree_stream() {
 		// Create a dummy tree that's to be saved and reconstructed
 		int DOF = 6;
@@ -100,6 +133,10 @@ public class TestRecognitionIO extends BoofStandardJUnit {
 			n.weight = 0.1 + i;
 			n.dataIdx = i*2;
 
+			// make sure the number of descriptions doesn't match the number of nodes. this was a bug once.
+			if (i==0)
+				continue;
+
 			var desc = new TupleDesc_F64(DOF);
 			for (int j = 0; j < DOF; j++) {
 				desc.data[j] = rand.nextDouble();
@@ -112,24 +149,7 @@ public class TestRecognitionIO extends BoofStandardJUnit {
 
 	@Test void recognitionVocabularyTreeNister2006_stream() {
 		// Create the data structure and fill it in with non default values
-		var db = new RecognitionVocabularyTreeNister2006<TupleDesc_F64>();
-		db.tree = createTree(6, LeafData.class);
-
-		db.getImagesDB().resize(11);
-		for (int i = 0; i < 11; i++) {
-			ImageInfo info = db.getImagesDB().get(i);
-			info.imageId = i + 2;
-			info.descTermFreq.put(1, 1.5f);
-			info.descTermFreq.put(6, i + 1.5f);
-			// cookie can be ignored and isn't saved
-		}
-
-		db.tree.listData.resize(9);
-		for (int i = 0; i < db.tree.listData.size; i++) {
-			var ld = new LeafData();
-			ld.images.put(i + 2, db.getImagesDB().get(i));
-			db.tree.listData.set(i,ld);
-		}
+		RecognitionVocabularyTreeNister2006<TupleDesc_F64> db = createDefaultNister2006();
 
 		// Encode then decode
 		ByteArrayOutputStream stream = new ByteArrayOutputStream();
@@ -168,5 +188,28 @@ public class TestRecognitionIO extends BoofStandardJUnit {
 				assertEquals(indexE, indexF);
 			}
 		}
+	}
+
+	@NotNull
+	private RecognitionVocabularyTreeNister2006<TupleDesc_F64> createDefaultNister2006() {
+		var db = new RecognitionVocabularyTreeNister2006<TupleDesc_F64>();
+		db.tree = createTree(6, LeafData.class);
+
+		db.getImagesDB().resize(11);
+		for (int i = 0; i < 11; i++) {
+			ImageInfo info = db.getImagesDB().get(i);
+			info.imageId = i + 2;
+			info.descTermFreq.put(1, 1.5f);
+			info.descTermFreq.put(6, i + 1.5f);
+			// cookie can be ignored and isn't saved
+		}
+
+		db.tree.listData.resize(9);
+		for (int i = 0; i < db.tree.listData.size; i++) {
+			var ld = new LeafData();
+			ld.images.put(i + 2, db.getImagesDB().get(i));
+			db.tree.listData.set(i,ld);
+		}
+		return db;
 	}
 }

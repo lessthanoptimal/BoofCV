@@ -43,7 +43,7 @@ public class ConfigImageRecognitionNister2006 implements Configuration {
 	public ConfigDetectDescribe features = new ConfigDetectDescribe();
 
 	/** Specifies which norm to use. L1 should yield better results but is slower than L2 to compute. */
-	public DistanceTypes distanceNorm = DistanceTypes.L1;
+	public DistanceTypes distanceNorm = DistanceTypes.L2;
 
 	// TODO make entropy weighting configurable
 

@@ -167,7 +167,7 @@ public class LearnHierarchicalTree<Point> implements VerbosePrint {
 				// todo batch copy?
 			}
 
-			// If there are two few points to be significant, abort the search here
+			// If there are too few points to be significant, abort the search here
 			if (pointsInBranch.size() <= minimumPointsInNode || pointsInBranch.size() <= tree.branchFactor)
 				continue;
 

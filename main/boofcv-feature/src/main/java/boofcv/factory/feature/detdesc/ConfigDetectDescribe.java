@@ -105,6 +105,8 @@ public class ConfigDetectDescribe implements Configuration {
 		detectPoint.checkValidity();
 		detectFastHessian.checkValidity();
 		detectSift.checkValidity();
+
+		convertDescriptor.checkValidity();
 	}
 
 	public void setTo( ConfigDetectDescribe src ) {
@@ -119,6 +121,7 @@ public class ConfigDetectDescribe implements Configuration {
 		this.detectPoint.setTo(src.detectPoint);
 		this.detectFastHessian.setTo(src.detectFastHessian);
 		this.detectSift.setTo(src.detectSift);
+		this.convertDescriptor.setTo(src.convertDescriptor);
 	}
 
 	public ConfigDetectDescribe copy() {

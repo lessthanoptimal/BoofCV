@@ -194,9 +194,9 @@ public class HierarchicalVocabularyTree<Point, Data> {
 		listData.reset();
 		descriptions.reset();
 		nodes.reset();
+
 		// create root node, which will contain the set of all points
-		Node root = nodes.grow();
-		root.id = 0;
+		nodes.grow().id = 0;
 	}
 
 	/**
