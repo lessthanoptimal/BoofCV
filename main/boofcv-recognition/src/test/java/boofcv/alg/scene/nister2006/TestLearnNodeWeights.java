@@ -79,7 +79,8 @@ class TestLearnNodeWeights extends BoofStandardJUnit {
 		alg.fixate();
 
 		for (int i = 0; i < N; i++) {
-			double expected = Math.log(120.0/alg.numberOfImagesWithNode.get(i));
+			int numUsed = alg.numberOfImagesWithNode.get(i);
+			double expected = numUsed == 0 ? 0.0 : Math.log(120.0/numUsed);
 			assertEquals(expected, tree.nodes.get(i).weight);
 		}
 	}
