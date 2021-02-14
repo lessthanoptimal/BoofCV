@@ -44,7 +44,7 @@ public interface ImageRecognition<T extends ImageBase<T>> extends VerbosePrint {
 	 * Using the returned object is likely to require knowledge about its type, which might require some reverse
 	 * engineering.
 	 */
-	DataBase getDataBase();
+	Description getDescription();
 
 	/**
 	 * Finds the best matches in the database to the query image.
@@ -66,5 +66,5 @@ public interface ImageRecognition<T extends ImageBase<T>> extends VerbosePrint {
 	}
 
 	/** Interface for model and database that defines an image recognition system */
-	interface DataBase {}
+	interface Description {}
 }

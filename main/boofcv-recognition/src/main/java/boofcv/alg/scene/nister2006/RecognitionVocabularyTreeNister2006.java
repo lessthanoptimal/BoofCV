@@ -53,8 +53,6 @@ import java.util.List;
  */
 public class RecognitionVocabularyTreeNister2006<Point> {
 
-	// TODO Support using L1-Norm
-
 	/** Vocabulary Tree */
 	public @Getter HierarchicalVocabularyTree<Point, LeafData> tree;
 

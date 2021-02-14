@@ -64,11 +64,15 @@ public class ImageRecognitionNister2006<Image extends ImageBase<Image>, TD exten
 
 	/** Detects image features */
 	@Getter @Setter DetectDescribePoint<Image, TD> detector;
+
 	/** Stores features found in one image */
 	@Getter @Setter DogArray<TD> imageFeatures;
 
 	/** List of all the images in the dataset */
 	@Getter List<String> imageIds = new ArrayList<>();
+
+	/** Performance tuning. If less than this number of features a single thread algorithm will be used */
+	@Getter @Setter public int minimumForThread = 500;
 
 	// Type of input image
 	ImageType<Image> imageType;
@@ -128,10 +132,8 @@ public class ImageRecognitionNister2006<Image extends ImageBase<Image>, TD exten
 		// Learn the tree's structure
 		if (verbose != null) verbose.println("learning the tree");
 
-		// TODO generalized PackedTuple
-
 		BoofLambdas.Factory<StandardKMeans<TD>> factoryKMeans = ()->
-				FactoryTupleCluster.kmeans(config.kmeans,500,DOF, tupleType);
+				FactoryTupleCluster.kmeans(config.kmeans,minimumForThread,DOF, tupleType);
 
 		LearnHierarchicalTree<TD> learnTree = new LearnHierarchicalTree<>(
 				() -> FactoryTupleDesc.createPacked(DOF, tupleType), factoryKMeans, config.randSeed);
@@ -191,8 +193,12 @@ public class ImageRecognitionNister2006<Image extends ImageBase<Image>, TD exten
 		databaseN.addImage(imageIndex, imageFeatures.toList(), null);
 	}
 
-	@Override public ImageRecognition.DataBase getDataBase() {
-		return null;
+	@Override public ImageRecognition.Description getDescription() {
+		var desc = new Description<TD>();
+		desc.config = config;
+		desc.databaseN = databaseN;
+		desc.tree = tree;
+		return desc;
 	}
 
 	@Override public boolean findBestMatch( Image queryImage, DogArray<Match> matches ) {
@@ -227,5 +233,14 @@ public class ImageRecognitionNister2006<Image extends ImageBase<Image>, TD exten
 
 	@Override public void setVerbose( @Nullable PrintStream out, @Nullable Set<String> set ) {
 		this.verbose = out;
+	}
+
+	/**
+	 * Contains references to objects which fully describe this descriptor
+	 */
+	public static class Description<TD extends TupleDesc<TD>> implements ImageRecognition.Description {
+		public ConfigImageRecognitionNister2006 config;
+		public HierarchicalVocabularyTree<TD, LeafData> tree;
+		public RecognitionVocabularyTreeNister2006<TD> databaseN;
 	}
 }

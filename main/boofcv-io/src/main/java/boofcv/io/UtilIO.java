@@ -20,6 +20,7 @@ package boofcv.io;
 
 import boofcv.BoofVersion;
 import boofcv.io.calibration.CalibrationIO;
+import boofcv.struct.Configuration;
 import boofcv.struct.calib.CameraPinholeBrown;
 import org.apache.commons.io.FilenameUtils;
 
@@ -42,6 +43,33 @@ import static java.nio.charset.StandardCharsets.UTF_8;
 @SuppressWarnings({"JdkObsolete"})
 public class UtilIO {
 	public static final String UTF8 = "UTF-8";
+
+	/**
+	 * Saves a BoofCV {@link Configuration} in a YAML format to disk
+	 */
+	public static void saveConfig( Configuration config, File file) {
+		try {
+			var output = new FileOutputStream(file);
+			SerializeConfigYaml.serialize(config, new OutputStreamWriter(output, UTF_8));
+			output.close();
+		} catch (IOException e) {
+			throw new UncheckedIOException(e);
+		}
+	}
+
+	/**
+	 * Loads a BoofCV {@link Configuration} in a YAML format from the disk
+	 */
+	public static <T extends Configuration> T loadConfig( File file) {
+		try {
+			var output = new FileInputStream(file);
+			Configuration config = SerializeConfigYaml.deserialize(new InputStreamReader(output, UTF_8));
+			output.close();
+			return (T)config;
+		} catch (IOException e) {
+			throw new UncheckedIOException(e);
+		}
+	}
 
 	/**
 	 * Returns an absolute path to the file that is relative to the example directory
