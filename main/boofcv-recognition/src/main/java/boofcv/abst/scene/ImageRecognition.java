@@ -40,13 +40,6 @@ public interface ImageRecognition<T extends ImageBase<T>> extends VerbosePrint {
 	void addImage( String id, T image );
 
 	/**
-	 * Returns a reference to the internal database. This can be used to save and load previously constructed models.
-	 * Using the returned object is likely to require knowledge about its type, which might require some reverse
-	 * engineering.
-	 */
-	Description getDescription();
-
-	/**
 	 * Finds the best matches in the database to the query image.
 	 *
 	 * @param queryImage (Input) image being processed
@@ -66,5 +59,5 @@ public interface ImageRecognition<T extends ImageBase<T>> extends VerbosePrint {
 	}
 
 	/** Interface for model and database that defines an image recognition system */
-	interface Description {}
+	interface Definition {}
 }

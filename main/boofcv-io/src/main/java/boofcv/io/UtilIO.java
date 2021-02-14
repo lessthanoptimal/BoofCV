@@ -23,6 +23,7 @@ import boofcv.io.calibration.CalibrationIO;
 import boofcv.struct.Configuration;
 import boofcv.struct.calib.CameraPinholeBrown;
 import org.apache.commons.io.FilenameUtils;
+import org.yaml.snakeyaml.Yaml;
 
 import javax.swing.*;
 import java.io.*;
@@ -35,6 +36,7 @@ import java.util.jar.JarFile;
 import java.util.regex.Pattern;
 import java.util.zip.ZipEntry;
 
+import static boofcv.io.calibration.CalibrationIO.createYmlObject;
 import static java.nio.charset.StandardCharsets.UTF_8;
 
 /**
@@ -45,11 +47,38 @@ public class UtilIO {
 	public static final String UTF8 = "UTF-8";
 
 	/**
+	 * Saves a list of strings as a YAML file
+	 */
+	public static void saveListStringYaml( List<String> list, File file ) {
+		try {
+			var output = new BufferedOutputStream(new FileOutputStream(file));
+			Yaml yaml = createYmlObject();
+			yaml.dump(list, new OutputStreamWriter(output, UTF_8));
+			output.close();
+		} catch (IOException e) {
+			throw new UncheckedIOException(e);
+		}
+	}
+
+	/**
+	 * Saves a list of strings from a YAML file
+	 */
+	public static List<String> loadListStringYaml( File file ) {
+		try {
+			Yaml yaml = createYmlObject();
+			var reader = new BufferedInputStream(new FileInputStream(file));
+			return yaml.load(reader);
+		} catch (IOException e) {
+			throw new UncheckedIOException(e);
+		}
+	}
+
+	/**
 	 * Saves a BoofCV {@link Configuration} in a YAML format to disk
 	 */
 	public static void saveConfig( Configuration config, File file) {
 		try {
-			var output = new FileOutputStream(file);
+			var output = new BufferedOutputStream(new FileOutputStream(file));
 			SerializeConfigYaml.serialize(config, new OutputStreamWriter(output, UTF_8));
 			output.close();
 		} catch (IOException e) {
@@ -62,7 +91,7 @@ public class UtilIO {
 	 */
 	public static <T extends Configuration> T loadConfig( File file) {
 		try {
-			var output = new FileInputStream(file);
+			var output = new BufferedInputStream(new FileInputStream(file));
 			Configuration config = SerializeConfigYaml.deserialize(new InputStreamReader(output, UTF_8));
 			output.close();
 			return (T)config;

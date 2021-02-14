@@ -95,6 +95,11 @@ public class ImageRecognitionNister2006<Image extends ImageBase<Image>, TD exten
 		databaseN.setDistanceType(config.distanceNorm);
 	}
 
+	public void setDatabase(RecognitionVocabularyTreeNister2006<TD> db) {
+		databaseN = db;
+		tree = db.getTree();
+	}
+
 	@SuppressWarnings({"unchecked", "rawtypes"})
 	@Override public void learnDescription( Iterator<Image> images ) {
 		int DOF = detector.createDescription().size();
@@ -132,8 +137,8 @@ public class ImageRecognitionNister2006<Image extends ImageBase<Image>, TD exten
 		// Learn the tree's structure
 		if (verbose != null) verbose.println("learning the tree");
 
-		BoofLambdas.Factory<StandardKMeans<TD>> factoryKMeans = ()->
-				FactoryTupleCluster.kmeans(config.kmeans,minimumForThread,DOF, tupleType);
+		BoofLambdas.Factory<StandardKMeans<TD>> factoryKMeans = () ->
+				FactoryTupleCluster.kmeans(config.kmeans, minimumForThread, DOF, tupleType);
 
 		LearnHierarchicalTree<TD> learnTree = new LearnHierarchicalTree<>(
 				() -> FactoryTupleDesc.createPacked(DOF, tupleType), factoryKMeans, config.randSeed);
@@ -166,11 +171,11 @@ public class ImageRecognitionNister2006<Image extends ImageBase<Image>, TD exten
 		databaseN.initializeTree(tree);
 
 		// Compute internal profiling
-		timeLearnDescribeMS = time1-time0;
-		timeLearnClusterMS = time2-time1;
-		timeLearnWeightsMS = time3-time2;
+		timeLearnDescribeMS = time1 - time0;
+		timeLearnClusterMS = time2 - time1;
+		timeLearnWeightsMS = time3 - time2;
 
-		if (verbose!=null)
+		if (verbose != null)
 			verbose.printf("Time (s): describe=%.1f cluster=%.1f weights=%.1f\n",
 					timeLearnDescribeMS*1e-3, timeLearnClusterMS*1e-3, timeLearnWeightsMS*1e-3);
 	}
@@ -187,18 +192,11 @@ public class ImageRecognitionNister2006<Image extends ImageBase<Image>, TD exten
 		int imageIndex = imageIds.size();
 		imageIds.add(id);
 
-		if (verbose!=null) verbose.println("detected["+imageIndex+"].size="+detector.getNumberOfFeatures()+" id="+id);
+		if (verbose != null)
+			verbose.println("detected[" + imageIndex + "].size=" + detector.getNumberOfFeatures() + " id=" + id);
 
 		// Add the image
 		databaseN.addImage(imageIndex, imageFeatures.toList(), null);
-	}
-
-	@Override public ImageRecognition.Description getDescription() {
-		var desc = new Description<TD>();
-		desc.config = config;
-		desc.databaseN = databaseN;
-		desc.tree = tree;
-		return desc;
 	}
 
 	@Override public boolean findBestMatch( Image queryImage, DogArray<Match> matches ) {
@@ -217,7 +215,7 @@ public class ImageRecognitionNister2006<Image extends ImageBase<Image>, TD exten
 		matches.resize(found.size);
 
 		// Copy results into output format
-		int count = config.maxMatches <= 0 ? found.size :  Math.min(config.maxMatches, found.size);
+		int count = config.maxMatches <= 0 ? found.size : Math.min(config.maxMatches, found.size);
 		for (int i = 0; i < count; i++) {
 			RecognitionVocabularyTreeNister2006.Match f = found.get(i);
 			matches.get(i).id = imageIds.get(f.image.imageId);
@@ -233,14 +231,5 @@ public class ImageRecognitionNister2006<Image extends ImageBase<Image>, TD exten
 
 	@Override public void setVerbose( @Nullable PrintStream out, @Nullable Set<String> set ) {
 		this.verbose = out;
-	}
-
-	/**
-	 * Contains references to objects which fully describe this descriptor
-	 */
-	public static class Description<TD extends TupleDesc<TD>> implements ImageRecognition.Description {
-		public ConfigImageRecognitionNister2006 config;
-		public HierarchicalVocabularyTree<TD, LeafData> tree;
-		public RecognitionVocabularyTreeNister2006<TD> databaseN;
 	}
 }
