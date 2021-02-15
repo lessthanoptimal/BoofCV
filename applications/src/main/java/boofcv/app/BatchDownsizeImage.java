@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -43,29 +43,31 @@ import java.util.List;
 public class BatchDownsizeImage {
 
 	@Option(name = "-i", aliases = {"--Input"},
-			usage="Path to input directory")
+			usage = "Path to input directory")
 	String pathInput;
-	@Option(name = "-o", aliases = {"--Output"}, usage="Path to output directory")
+	@Option(name = "-o", aliases = {"--Output"}, usage = "Path to output directory")
 	String pathOutput;
-	@Option(name = "-r", aliases = {"--Regex"}, usage="Regex. Example: .*\\.jpg")
+	@Option(name = "-r", aliases = {"--Regex"}, usage = "Regex. Example: .*\\.jpg")
 	String regex;
-	@Option(name = "--Rename", usage="Rename files")
+	@Option(name = "--Rename", usage = "Rename files")
 	boolean rename;
-	@Option(name = "--Recursive", usage="Should input directory be recursively searched")
+	@Option(name = "--Recursive", usage = "Should input directory be recursively searched")
 	boolean recursive;
-	@Option(name="--GUI", usage="Ignore all other command line arguments and switch to GUI mode")
+	@Option(name = "--GUI", usage = "Ignore all other command line arguments and switch to GUI mode")
 	private boolean guiMode = false;
-	@Option(name = "-w", aliases = {"--Width"}, usage="Sets output width. If zero then aspect is matched with height")
-	int width=0;
-	@Option(name = "-h", aliases = {"--Height"}, usage="Sets output height. If zero then aspect is matched with width")
-	int height=0;
-	@Option(name = "--MaxLength", usage="Indicates that if only one dimension is set then that's the size of the largest side")
-	boolean maxLength=false;
+	@Option(name = "-w", aliases = {"--Width"}, usage = "Sets output width. If zero then aspect is matched with height")
+	int width = 0;
+	@Option(name = "-h", aliases = {"--Height"}, usage = "Sets output height. If zero then aspect is matched with width")
+	int height = 0;
+	@Option(name = "--MaxLength", usage = "Indicates that if only one dimension is set then that's the size of the largest side")
+	boolean maxLength = false;
+	@Option(name = "--PixelCount", usage = "Indicates it will attempt to match the number of pixels in both images")
+	boolean pixelCount = false;
 
 	Listener listener;
 	boolean cancel;
 
-	public static void printHelpExit(CmdLineParser parser ) {
+	public static void printHelpExit( CmdLineParser parser ) {
 		parser.getProperties().withUsageWidth(120);
 		parser.printUsage(System.out);
 
@@ -77,114 +79,127 @@ public class BatchDownsizeImage {
 
 	public void process() {
 		cancel = false;
-		if( width == 0 && height == 0 ) {
+		if (width == 0 && height == 0) {
 			throw new RuntimeException("Need to specify at least a width or height");
 		}
 
-		System.out.println("width          = "+ width);
-		System.out.println("height         = "+ height);
-		System.out.println("max length     = "+ maxLength);
-		System.out.println("rename         = "+ rename);
-		System.out.println("input path     = "+ pathInput);
-		System.out.println("name regex     = "+ regex);
-		System.out.println("output dir     = "+ pathOutput);
+		System.out.println("width          = " + width);
+		System.out.println("height         = " + height);
+		System.out.println("max length     = " + maxLength);
+		System.out.println("pixel count    = " + pixelCount);
+		System.out.println("rename         = " + rename);
+		System.out.println("input path     = " + pathInput);
+		System.out.println("name regex     = " + regex);
+		System.out.println("output dir     = " + pathOutput);
 
-		List<File> files = Arrays.asList(UtilIO.findMatches(new File(pathInput),regex));
+		List<File> files = Arrays.asList(UtilIO.findMatches(new File(pathInput), regex));
 		Collections.sort(files);
 
 		// Create the output directory if it doesn't exist
-		if( !new File(pathOutput).exists() ) {
-			new File(pathOutput).mkdirs();
+		if (!new File(pathOutput).exists()) {
+			BoofMiscOps.checkTrue(new File(pathOutput).mkdirs());
 		}
 
-		Planar<GrayU8> planar = new Planar<>(GrayU8.class,1,1,1);
-		Planar<GrayU8> small = new Planar<>(GrayU8.class,1,1,1);
-		int numDigits = BoofMiscOps.numDigits(files.size()-1);
-		String format = "%0"+numDigits+"d";
-		for( int i = 0; i < files.size(); i++ ) {
+		Planar<GrayU8> planar = new Planar<>(GrayU8.class, 1, 1, 1);
+		Planar<GrayU8> small = new Planar<>(GrayU8.class, 1, 1, 1);
+		int numDigits = BoofMiscOps.numDigits(files.size() - 1);
+		String format = "%0" + numDigits + "d";
+		for (int i = 0; i < files.size(); i++) {
 			File file = files.get(i);
 			System.out.print("processing " + file.getName());
 			BufferedImage orig = UtilImageIO.loadImage(file.getAbsolutePath());
-			if( orig == null ) {
-				throw new RuntimeException("Can't load file: "+file.getAbsolutePath());
+			if (orig == null) {
+				throw new RuntimeException("Can't load file: " + file.getAbsolutePath());
 			}
 
-			int smallWidth,smallHeight;
+			int smallWidth, smallHeight;
 
-			if( maxLength && (width == 0 || height == 0)) {
-				int largestSide = Math.max(orig.getWidth(),orig.getHeight());
-				int desired = Math.max(width,height);
+			if (pixelCount) {
+				int desired = width*height;
+				if (desired <= 0)
+					desired = Math.max(width, height);
 
-				smallWidth = orig.getWidth() * desired / largestSide;
-				smallHeight = orig.getHeight() * desired / largestSide;
+				double scale = Math.sqrt(desired)/Math.sqrt(orig.getWidth()*orig.getHeight());
+
+				// make sure it won't enlarge the image
+				scale = Math.min(1.0, scale);
+
+				smallWidth = (int)Math.round(scale*orig.getWidth());
+				smallHeight = (int)Math.round(scale*orig.getHeight());
+			} else if (maxLength && (width == 0 || height == 0)) {
+				int largestSide = Math.max(orig.getWidth(), orig.getHeight());
+				int desired = Math.max(width, height);
+
+				smallWidth = orig.getWidth()*desired/largestSide;
+				smallHeight = orig.getHeight()*desired/largestSide;
 			} else {
 				if (width == 0) {
-					smallWidth = orig.getWidth() * height / orig.getHeight();
+					smallWidth = orig.getWidth()*height/orig.getHeight();
 				} else {
 					smallWidth = width;
 				}
 				if (height == 0) {
-					smallHeight = orig.getHeight() * width / orig.getWidth();
+					smallHeight = orig.getHeight()*width/orig.getWidth();
 				} else {
 					smallHeight = height;
 				}
 			}
-			System.out.println("   "+smallWidth+" x "+smallHeight);
+			System.out.println("   " + smallWidth + " x " + smallHeight);
 
-			if( smallWidth > orig.getWidth() || smallHeight > orig.getHeight() ) {
-				System.out.println("Skipping "+file.getName()+" because it is too small");
+			if (smallWidth > orig.getWidth() || smallHeight > orig.getHeight()) {
+				System.out.println("Skipping " + file.getName() + " because it is too small");
 			}
 
-			if( listener != null )
-				listener.loadedImage(orig,file.getName());
+			if (listener != null)
+				listener.loadedImage(orig, file.getName());
 
 			String nameOut;
-			if( rename ) {
-				nameOut = String.format("image"+format+".png",i);
+			if (rename) {
+				nameOut = String.format("image" + format + ".png", i);
 			} else {
-				nameOut = file.getName().split("\\.")[0]+"_small.png";
+				nameOut = file.getName().split("\\.")[0] + "_small.png";
 			}
 
-			planar.reshape(orig.getWidth(),orig.getHeight());
+			planar.reshape(orig.getWidth(), orig.getHeight());
 			ConvertBufferedImage.convertFrom(orig, planar, true);
 
-			small.reshape(smallWidth,smallHeight,planar.getNumBands());
+			small.reshape(smallWidth, smallHeight, planar.getNumBands());
 
-			if( small.width < planar.width && small.height < planar.height ) {
+			if (small.width < planar.width && small.height < planar.height) {
 				AverageDownSampleOps.down(planar, small);
 			} else {
 				small.setTo(planar);
 			}
 
-			BufferedImage output = ConvertBufferedImage.convertTo(small,null,true);
+			BufferedImage output = ConvertBufferedImage.convertTo(small, null, true);
 
-			UtilImageIO.saveImage(output,new File(pathOutput,nameOut).getAbsolutePath());
+			UtilImageIO.saveImage(output, new File(pathOutput, nameOut).getAbsolutePath());
 
-			if( cancel ) {
+			if (cancel) {
 				break;
 			}
 		}
-		if( listener != null )
+		if (listener != null)
 			listener.finishedConverting();
 	}
 
 	public interface Listener {
-		void loadedImage( BufferedImage image , String name );
+		void loadedImage( BufferedImage image, String name );
 
 		void finishedConverting();
 	}
 
-	public static void main(String[] args) {
+	public static void main( String[] args ) {
 		BatchDownsizeImage generator = new BatchDownsizeImage();
 		CmdLineParser parser = new CmdLineParser(generator);
 
-		if( args.length == 0 ) {
+		if (args.length == 0) {
 			printHelpExit(parser);
 		}
 
 		try {
 			parser.parseArgument(args);
-			if( generator.guiMode ) {
+			if (generator.guiMode) {
 				new BatchDownsizeImageGui();
 			} else {
 				generator.process();

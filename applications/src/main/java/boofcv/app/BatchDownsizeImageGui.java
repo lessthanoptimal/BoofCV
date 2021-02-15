@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -19,12 +19,12 @@
 package boofcv.app;
 
 import boofcv.app.batch.BatchConvertControlPanel;
+import boofcv.gui.BoofSwingUtil;
 import boofcv.gui.image.ImagePanel;
 import boofcv.gui.image.ScaleOptions;
 import boofcv.gui.image.ShowImages;
 
 import javax.swing.*;
-import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 import java.awt.*;
 import java.awt.image.BufferedImage;
@@ -38,7 +38,7 @@ import java.util.regex.PatternSyntaxException;
 public class BatchDownsizeImageGui extends JPanel implements BatchDownsizeImage.Listener {
 	public static final String KEY_WIDTH = "width";
 	public static final String KEY_HEIGHT = "height";
-	public static final String KEY_MAX_LENGTH = "max_length";
+	public static final String KEY_FORMULA = "size_formula";
 
 	Preferences prefs = Preferences.userRoot().node(BatchDownsizeImageGui.class.getSimpleName());
 
@@ -53,60 +53,66 @@ public class BatchDownsizeImageGui extends JPanel implements BatchDownsizeImage.
 
 		downsizer.listener = this;
 
-		imagePanel.setPreferredSize(new Dimension(400,400));
+		imagePanel.setPreferredSize(new Dimension(400, 400));
 		imagePanel.setScaling(ScaleOptions.DOWN);
 
-		add(control,BorderLayout.WEST);
-		add(imagePanel,BorderLayout.CENTER);
+		add(control, BorderLayout.WEST);
+		add(imagePanel, BorderLayout.CENTER);
 
-		ShowImages.showWindow(this,"Batch Downsize Images", true);
+		ShowImages.showWindow(this, "Batch Downsize Images", true);
 	}
 
 	@Override
-	public void loadedImage(BufferedImage image, String name) {
+	public void loadedImage( BufferedImage image, String name ) {
 		imagePanel.setImageRepaint(image);
 	}
 
 	@Override
 	public void finishedConverting() {
-		SwingUtilities.invokeLater(()->{
+		SwingUtilities.invokeLater(() -> {
 			control.bAction.setText("Start");
 			processing = false;
 		});
 	}
 
 	private class ControlPanel extends BatchConvertControlPanel implements ChangeListener {
+		JComboBox<String> comboMethod = combo(0, "shape", "length", "pixels");
 		JSpinner spinnerWidth;
 		JSpinner spinnerHeight;
-		JCheckBox checkMaxLength = new JCheckBox("Max Length");
 
 		public ControlPanel() {
-			int width = Integer.parseInt(prefs.get(KEY_WIDTH,"640"));
-			int height = Integer.parseInt(prefs.get(KEY_HEIGHT,"480"));
-			boolean maxLength = Boolean.parseBoolean(prefs.get(KEY_MAX_LENGTH,"false"));
+			int width = Integer.parseInt(prefs.get(KEY_WIDTH, "640"));
+			int height = Integer.parseInt(prefs.get(KEY_HEIGHT, "480"));
+			int method = Integer.parseInt(prefs.get(KEY_FORMULA, "0"));
 
-			if( width < 0 ) width = 640;
-			if( height < 0 ) height = 480;
+			if (width < 0) width = 640;
+			if (height < 0) height = 480;
+			if (method < 0 || method >= 3) method = 0;
 
-			spinnerWidth = spinner(width,0,10000,20);
-			spinnerHeight = spinner(height,0,10000,20);
-			checkMaxLength.setSelected(maxLength);
+			spinnerWidth = spinner(width, 0, 10000, 20);
+			spinnerHeight = spinner(height, 0, 10000, 20);
+			comboMethod = combo(method, "shape", "length", "pixels");
 
-			addLabeled(spinnerWidth,"Width");
-			addLabeled(spinnerHeight,"Height");
-			addAlignLeft(checkMaxLength);
+			addAlignLeft(comboMethod);
+			addLabeled(spinnerWidth, "Width");
+			addLabeled(spinnerHeight, "Height");
 
 			addStandardControls(prefs);
 		}
 
 		@Override
+		public void controlChanged( Object source ) {}
+
+		@Override
 		protected void handleStart() {
-			if( processing ) {
+			BoofSwingUtil.checkGuiThread();
+			if (processing) {
 				downsizer.cancel = true;
 			} else {
 				downsizer.width = ((Number)spinnerWidth.getValue()).intValue();
 				downsizer.height = ((Number)spinnerHeight.getValue()).intValue();
-				downsizer.maxLength = checkMaxLength.isSelected();
+				downsizer.maxLength = comboMethod.getSelectedIndex() == 1;
+				downsizer.pixelCount = comboMethod.getSelectedIndex() == 2;
 				downsizer.pathInput = textInputDirectory.getText();
 				downsizer.pathOutput = textOutputDirectory.getText();
 
@@ -114,7 +120,7 @@ public class BatchDownsizeImageGui extends JPanel implements BatchDownsizeImage.
 				downsizer.rename = checkRename.isSelected();
 				downsizer.recursive = checkRecursive.isSelected();
 
-				if( downsizer.width == 0 && downsizer.height == 0 ) {
+				if (downsizer.width == 0 && downsizer.height == 0) {
 					JOptionPane.showMessageDialog(this, "Width and Height can't be zero");
 					return;
 				}
@@ -126,25 +132,20 @@ public class BatchDownsizeImageGui extends JPanel implements BatchDownsizeImage.
 					return;
 				}
 
-				prefs.put(KEY_INPUT,downsizer.pathInput);
-				prefs.put(KEY_OUTPUT,downsizer.pathOutput);
-				prefs.put(KEY_WIDTH,downsizer.width+"");
-				prefs.put(KEY_HEIGHT,downsizer.height+"");
-				prefs.put(KEY_MAX_LENGTH,downsizer.maxLength+"");
+				prefs.put(KEY_INPUT, downsizer.pathInput);
+				prefs.put(KEY_OUTPUT, downsizer.pathOutput);
+				prefs.put(KEY_WIDTH, downsizer.width + "");
+				prefs.put(KEY_HEIGHT, downsizer.height + "");
+				prefs.put(KEY_FORMULA, comboMethod.getSelectedIndex() + "");
 
 				bAction.setText("Cancel");
 				processing = true;
-				new Thread(()->downsizer.process()).start();
+				new Thread(() -> downsizer.process()).start();
 			}
-		}
-
-		@Override
-		public void stateChanged(ChangeEvent e) {
-
 		}
 	}
 
-	public static void main(String[] args) {
+	public static void main( String[] args ) {
 		new BatchDownsizeImageGui();
 	}
 }
