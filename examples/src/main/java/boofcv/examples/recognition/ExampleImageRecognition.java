@@ -22,6 +22,7 @@ import boofcv.abst.scene.ImageRecognition;
 import boofcv.abst.scene.nister2006.ConfigImageRecognitionNister2006;
 import boofcv.abst.scene.nister2006.ImageRecognitionNister2006;
 import boofcv.alg.filter.misc.AverageDownSampleOps;
+import boofcv.alg.scene.nister2006.RecognitionVocabularyTreeNister2006;
 import boofcv.factory.feature.describe.ConfigConvertTupleDesc;
 import boofcv.gui.ListDisplayPanel;
 import boofcv.gui.image.ScaleOptions;
@@ -81,11 +82,12 @@ public class ExampleImageRecognition {
 			config.features.detectFastHessian.extract.radius = 3;
 //		config.features.detectFastHessian.extract.threshold = 0.0f;
 			config.features.convertDescriptor.outputData = ConfigConvertTupleDesc.DataType.F32;
+			config.distanceNorm = RecognitionVocabularyTreeNister2006.DistanceTypes.L2;
 
 			recognizer = new ImageRecognitionNister2006<>(config, ImageType.SB_U8);
 			recognizer.setVerbose(System.out, null);
 
-			recognizer.learnDescription(imageIterator);
+			recognizer.learnModel(imageIterator);
 
 			// Add images to the data base
 			System.out.println("Adding images to the database");

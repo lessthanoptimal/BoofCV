@@ -30,8 +30,7 @@ import org.junit.jupiter.api.Test;
 import java.util.ArrayList;
 import java.util.List;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 
 /**
  * @author Peter Abeles
@@ -44,6 +43,10 @@ public abstract class GenericImageRecognitionChecks<T extends ImageBase<T>> exte
 	List<T> images = new ArrayList<>();
 	protected ImageType<T> imageType;
 
+	/**
+	 * Creates an instance of the algorithm being tested
+	 *
+	 */
 	protected abstract ImageRecognition<T> createAlg();
 
 	protected GenericImageRecognitionChecks( ImageType<T> imageType ) {
@@ -84,11 +87,13 @@ public abstract class GenericImageRecognitionChecks<T extends ImageBase<T>> exte
 		}
 
 		ImageRecognition<T> alg = createAlg();
-		alg.learnDescription(images.iterator());
+		alg.learnModel(images.iterator());
 	}
 
 	/**
-	 * Give it images to learn, then see if it can look up the originals
+	 * Give it images to learn, then see if it can look up the originals.
+	 *
+	 * Also tests clearDatabase(). We do that here since a model is required.
 	 */
 	@Test void learn_then_select() {
 		createImages();
@@ -96,7 +101,7 @@ public abstract class GenericImageRecognitionChecks<T extends ImageBase<T>> exte
 		ImageRecognition<T> alg = createAlg();
 
 		// Learn a descriptor
-		alg.learnDescription(images.iterator());
+		alg.learnModel(images.iterator());
 
 		// Pass in the images
 		for (int i = 0; i < images.size(); i++) {
@@ -105,6 +110,23 @@ public abstract class GenericImageRecognitionChecks<T extends ImageBase<T>> exte
 
 		// Look up the images and see if the first result is the original
 		DogArray<Match> matches = new DogArray<>(Match::new);
+		for (int i = 0; i < images.size(); i++) {
+			assertTrue(alg.findBestMatch(images.get(i), matches));
+			assertEquals(i, Integer.parseInt(matches.get(0).id));
+		}
+
+		// now clear the database
+		alg.clearDatabase();
+		for (int i = 0; i < images.size(); i++) {
+			assertFalse(alg.findBestMatch(images.get(i), matches));
+		}
+
+		// Add the images
+		for (int i = 0; i < images.size(); i++) {
+			alg.addImage("" + i, images.get(i));
+		}
+
+		// It should be able to find them again
 		for (int i = 0; i < images.size(); i++) {
 			assertTrue(alg.findBestMatch(images.get(i), matches));
 			assertEquals(i, Integer.parseInt(matches.get(0).id));

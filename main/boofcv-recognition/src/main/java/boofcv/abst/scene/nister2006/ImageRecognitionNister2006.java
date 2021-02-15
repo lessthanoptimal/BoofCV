@@ -101,7 +101,7 @@ public class ImageRecognitionNister2006<Image extends ImageBase<Image>, TD exten
 	}
 
 	@SuppressWarnings({"unchecked", "rawtypes"})
-	@Override public void learnDescription( Iterator<Image> images ) {
+	@Override public void learnModel( Iterator<Image> images ) {
 		int DOF = detector.createDescription().size();
 		Class<TD> tupleType = detector.getDescriptionType();
 		PackedArray<TD> packedFeatures = FactoryTupleDesc.createPacked(DOF, tupleType);
@@ -178,6 +178,11 @@ public class ImageRecognitionNister2006<Image extends ImageBase<Image>, TD exten
 		if (verbose != null)
 			verbose.printf("Time (s): describe=%.1f cluster=%.1f weights=%.1f\n",
 					timeLearnDescribeMS*1e-3, timeLearnClusterMS*1e-3, timeLearnWeightsMS*1e-3);
+	}
+
+	@Override public void clearDatabase() {
+		imageIds.clear();
+		databaseN.clearImages();
 	}
 
 	@Override public void addImage( String id, Image image ) {

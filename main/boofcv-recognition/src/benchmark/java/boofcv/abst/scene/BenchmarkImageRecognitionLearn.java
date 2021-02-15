@@ -64,7 +64,7 @@ public class BenchmarkImageRecognitionLearn {
 	}
 
 	@Benchmark public void Nister2006() {
-		nister2006.learnDescription(new ImageFileListIterator<>(images, nister2006.getImageType()));
+		nister2006.learnModel(new ImageFileListIterator<>(images, nister2006.getImageType()));
 	}
 
 	public static void main( String[] args ) throws RunnerException {

@@ -17,6 +17,15 @@ Version : 0.38
   * Fixed image scaling issue when image was smaller than desired
 - Image Features
   * Fast Corners are now concurrent
+- Image Recognition
+  * Added: Nister, Stewenius, "Scalable recognition with a vocabulary tree", CVPR 2006
+      TODO explain why there are nodes with no images when learning weights
+      TODO L1 norm. Get that working
+      TODO Make weight optional
+      TODO get image lookup < 100ms
+  * TODO Support binary image features
+  * TODO Adapt AKNN to this frame work
+  * TODO Create regression tests
 - TODO Loop Closure
 - TODO Generic calibration target for multi cameras
   * QR Code for first version

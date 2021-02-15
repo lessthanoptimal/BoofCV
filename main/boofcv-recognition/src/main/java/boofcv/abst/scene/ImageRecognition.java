@@ -34,9 +34,21 @@ import java.util.Iterator;
  * @author Peter Abeles
  */
 public interface ImageRecognition<T extends ImageBase<T>> extends VerbosePrint {
+	/**
+	 * Learns a model by finding the most distinctive features in the provided set of images. Images are not
+	 * added to the database.
+	 */
+	void learnModel( Iterator<T> images );
 
-	void learnDescription( Iterator<T> images );
+	/** Removes all images from the database. The model is not modified */
+	void clearDatabase();
 
+	/**
+	 * Adds a new image to the database
+	 *
+	 * @param id The unique ID for this image
+	 * @param image The image
+	 */
 	void addImage( String id, T image );
 
 	/**
@@ -48,6 +60,9 @@ public interface ImageRecognition<T extends ImageBase<T>> extends VerbosePrint {
 	 */
 	boolean findBestMatch( T queryImage, DogArray<Match> matches );
 
+	/**
+	 * The image data type which can be processed
+	 */
 	ImageType<T> getImageType();
 
 	/** References a match in the database to the query image */
@@ -57,7 +72,4 @@ public interface ImageRecognition<T extends ImageBase<T>> extends VerbosePrint {
 		/** Error. Larger the value less similar it is to the original. Meaning is implementation dependent. */
 		public double error;
 	}
-
-	/** Interface for model and database that defines an image recognition system */
-	interface Definition {}
 }

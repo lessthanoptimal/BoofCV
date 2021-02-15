@@ -58,6 +58,7 @@ public class RecognitionVocabularyTreeNister2006<Point> {
 
 	/** List of images added to the database */
 	protected @Getter final DogArray<ImageInfo> imagesDB = new DogArray<>(ImageInfo::new, ImageInfo::reset);
+
 	/** Scores for all candidate images which have been sorted */
 	protected @Getter final DogArray<Match> matchScores = new DogArray<>(Match::new, Match::reset);
 
@@ -66,12 +67,18 @@ public class RecognitionVocabularyTreeNister2006<Point> {
 
 	//---------------- Internal Workspace
 
+	// Number of images in DB that pass through this node
+	protected final DogArray_I32 nodeImageCount = new DogArray_I32();
+
 	// The "frequency" that nodes in the tree appear in this image
 	protected final DogArray<Frequency> frequencies = new DogArray<>(Frequency::new, Frequency::reset);
 	protected final TIntObjectMap<Frequency> node_to_frequency = new TIntObjectHashMap<>();
 
 	// Temporary storage for an image's TF description while it's being looked up
 	protected final TIntFloatMap tempDescTermFreq = new TIntFloatHashMap();
+
+	// List of nodes which have already been explored
+	protected final TIntSet exploredSet = new TIntHashSet();
 
 	// Predeclare array for storing keys. Avoids unnecessary array creation
 	protected final DogArray_I32 keysDesc = new DogArray_I32(); // ONLY use in describe()
@@ -81,6 +88,9 @@ public class RecognitionVocabularyTreeNister2006<Point> {
 	// Set to store common non-zero key between two descriptors
 	protected final TIntSet commonKeys = new TIntHashSet();
 
+	// For lookup
+	TIntSet candidates = new TIntHashSet();
+
 	/**
 	 * Configures the tree by adding LeafData to all the leaves in the tree then saves a reference for future use
 	 *
@@ -88,11 +98,26 @@ public class RecognitionVocabularyTreeNister2006<Point> {
 	 */
 	public void initializeTree( HierarchicalVocabularyTree<Point, LeafData> tree ) {
 		this.tree = tree;
+		clearImages();
+	}
+
+	/**
+	 * Removes all images from the database.
+	 */
+	public void clearImages() {
+		imagesDB.reset();
+
+		// Removes the old leaf data and replaces it with empty structures
+		tree.listData.clear();
 		for (int i = 0; i < tree.nodes.size; i++) {
 			if (!tree.nodes.get(i).isLeaf())
 				continue;
+			tree.nodes.get(i).dataIdx = -1;
 			tree.addData(tree.nodes.get(i), new LeafData());
 		}
+
+		// Set image count to zero since there are no images
+		nodeImageCount.resize(tree.nodes.size, 0);
 	}
 
 	/**
@@ -118,6 +143,13 @@ public class RecognitionVocabularyTreeNister2006<Point> {
 				leafData.images.put(info.imageId, info);
 			}
 		});
+
+		// For each node which is in the descriptor, increment its image count
+		keysDesc.resize(info.descTermFreq.size());
+		info.descTermFreq.keys(keysDesc.data);
+		for (int i = 0; i < keysDesc.size; i++) {
+			nodeImageCount.data[keysDesc.get(i)]++;
+		}
 	}
 
 	/**
@@ -128,8 +160,9 @@ public class RecognitionVocabularyTreeNister2006<Point> {
 	 * @return The best matching image with score from the database
 	 */
 	public boolean lookup( List<Point> imageFeatures ) {
-		TIntSet candidates = new TIntHashSet();
+		candidates.clear();
 		matchScores.reset();
+		exploredSet.clear();
 
 		// Can't match to anything if it's empty
 		if (imageFeatures.isEmpty()) {
@@ -138,10 +171,23 @@ public class RecognitionVocabularyTreeNister2006<Point> {
 
 		// Create a description of this image and collect potential matches from leaves
 		describe(imageFeatures, tempDescTermFreq, ( leafNode ) -> {
+			// See if this node has already been observed by this image. If so we don't need to check it's features
+			if (exploredSet.contains(leafNode.id))
+				return;
+			exploredSet.add(leafNode.id);
+			// NOTE: The step above seems to prune 97%, but makes little difference in runtime
+
+
+			// TODO if a node has too many or two few images skip
+
+			// TODO what about parents? traverse up until too many
+
 			// Create a list of images that there's at least one leaf matching
 			LeafData leafData = tree.listData.get(leafNode.dataIdx);
 			keysLookUp.resize(leafData.images.size());
 			leafData.images.keys(keysLookUp.data);
+
+			// Add each image in this leaf, but be careful to only add each image once
 			for (int i = 0; i < keysLookUp.size(); i++) {
 				ImageInfo c = leafData.images.get(keysLookUp.get(i));
 				if (!candidates.add(c.imageId))
@@ -153,9 +199,10 @@ public class RecognitionVocabularyTreeNister2006<Point> {
 		if (matchScores.isEmpty())
 			return false;
 
+		// TODO remove need for this by implement efficient method in the paper
 		for (int i = 0; i < matchScores.size(); i++) {
 			Match m = matchScores.get(i);
-			m.error = distanceL2Norm(tempDescTermFreq, m.image.descTermFreq);
+			m.error = distanceFunction.distance(tempDescTermFreq, m.image.descTermFreq);
 		}
 
 		Collections.sort(matchScores.toList());
@@ -180,6 +227,7 @@ public class RecognitionVocabularyTreeNister2006<Point> {
 		// Sum of the weight of all graph nodes it sees
 		for (int descIdx = 0; descIdx < imageFeatures.size(); descIdx++) {
 			int leafNodeIdx = tree.searchPathToLeaf(imageFeatures.get(descIdx), ( node ) -> {
+				// TODO skip if weight is too low?
 				if (node.weight == 0.0)
 					return;
 				Frequency f = node_to_frequency.get(node.id);
@@ -198,6 +246,9 @@ public class RecognitionVocabularyTreeNister2006<Point> {
 		// No nodes with a non-zero weight that matched was found
 		if (node_to_frequency.isEmpty())
 			return;
+
+		// TODO normalize using the correct norm here. Won't work if you mix the two.
+		//      L1 and L2
 
 		//------ Create the TF-IDF descriptor for this image
 		// Normalize the vector such that the L2-norm is 1.0
