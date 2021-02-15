@@ -19,7 +19,7 @@
 package boofcv.io.image;
 
 import boofcv.misc.BoofLambdas;
-import boofcv.struct.image.ImageGray;
+import boofcv.struct.image.ImageBase;
 import boofcv.struct.image.ImageType;
 import lombok.Getter;
 import lombok.Setter;
@@ -33,7 +33,7 @@ import java.util.List;
  *
  * @author Peter Abeles
  */
-public class ImageFileListIterator<T extends ImageGray<T>> implements Iterator<T> {
+public class ImageFileListIterator<T extends ImageBase<T>> implements Iterator<T> {
 	protected @Getter T image;
 	protected @Getter List<String> paths;
 	protected @Getter int index;

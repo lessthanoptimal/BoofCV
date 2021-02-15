@@ -23,6 +23,7 @@ import boofcv.io.calibration.CalibrationIO;
 import boofcv.struct.Configuration;
 import boofcv.struct.calib.CameraPinholeBrown;
 import org.apache.commons.io.FilenameUtils;
+import org.jetbrains.annotations.Nullable;
 import org.yaml.snakeyaml.Yaml;
 
 import javax.swing.*;
@@ -76,7 +77,7 @@ public class UtilIO {
 	/**
 	 * Saves a BoofCV {@link Configuration} in a YAML format to disk
 	 */
-	public static void saveConfig( Configuration config, File file) {
+	public static void saveConfig( Configuration config, File file ) {
 		try {
 			var output = new BufferedOutputStream(new FileOutputStream(file));
 			SerializeConfigYaml.serialize(config, new OutputStreamWriter(output, UTF_8));
@@ -89,7 +90,7 @@ public class UtilIO {
 	/**
 	 * Loads a BoofCV {@link Configuration} in a YAML format from the disk
 	 */
-	public static <T extends Configuration> T loadConfig( File file) {
+	public static <T extends Configuration> T loadConfig( File file ) {
 		try {
 			var output = new BufferedInputStream(new FileInputStream(file));
 			Configuration config = SerializeConfigYaml.deserialize(new InputStreamReader(output, UTF_8));
@@ -290,13 +291,12 @@ public class UtilIO {
 		return (v0 << 24) | (v1 << 16) | (v2 << 8) | v3;
 	}
 
-	private static int checkEOF(InputStream input) throws IOException {
+	private static int checkEOF( InputStream input ) throws IOException {
 		int value = input.read();
 		if (value == -1)
 			throw new IOException("EOF reached");
 		return value;
 	}
-
 
 	public static void write( OutputStream output, String message ) throws IOException {
 		output.write(message.getBytes(UTF_8));
@@ -481,7 +481,7 @@ public class UtilIO {
 	/**
 	 * Copies all the files and directories in 'src' into 'dst'.
 	 */
-	public static void copyRecursive( File src, File dst) {
+	public static void copyRecursive( File src, File dst ) {
 		try {
 			if (src.isDirectory()) {
 				if (!dst.exists() && !dst.mkdirs()) {
@@ -534,7 +534,7 @@ public class UtilIO {
 	public static String readAsString( InputStream stream ) {
 		StringBuilder code = new StringBuilder();
 		try {
-			BufferedReader reader = new BufferedReader(new InputStreamReader(stream,UTF_8));
+			BufferedReader reader = new BufferedReader(new InputStreamReader(stream, UTF_8));
 			String line;
 			while ((line = reader.readLine()) != null)
 				code.append(line).append(System.lineSeparator());
@@ -676,10 +676,11 @@ public class UtilIO {
 	 * Loads a list of files with the specified prefix.
 	 *
 	 * @param directory Directory it looks inside of
-	 * @param prefix Prefix that the file must have
+	 * @param prefix Prefix that the file must have. Null if no prefix.
+	 * @param suffix Suffix that the file must have. Null if no suffix
 	 * @return List of files that are in the directory and match the prefix.
 	 */
-	public static List<String> listByPrefix( String directory, String prefix, String suffix ) {
+	public static List<String> listByPrefix( String directory, @Nullable String prefix, @Nullable String suffix ) {
 		List<String> ret = new ArrayList<>();
 
 		File d = new File(directory);
@@ -712,6 +713,16 @@ public class UtilIO {
 		}
 
 		return ret;
+	}
+
+	/**
+	 * Lists all images in the directory using a regex and optionally sorts the list
+	 */
+	public static List<String> listImages( String directory, boolean sort ) {
+		List<String> found = listByRegex(directory, "(.*/)*.+\\.(png|jpg|gif|bmp|jpeg|PNG|JPG|GIF|BMP|JPEG)$");
+		if (sort)
+			Collections.sort(found);
+		return found;
 	}
 
 	public static List<String> listByRegex( String directory, String regex ) {
@@ -756,7 +767,7 @@ public class UtilIO {
 			return ret;
 
 		File[] files = directory.listFiles();
-		if (files==null)
+		if (files == null)
 			return ret;
 
 		ret.addAll(Arrays.asList(files));
