@@ -33,8 +33,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static boofcv.alg.scene.vocabtree.TestHierarchicalVocabularyTree.createTree;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 
 class TestRecognitionVocabularyTreeNister2006 extends BoofStandardJUnit {
 	/**
@@ -89,10 +88,14 @@ class TestRecognitionVocabularyTreeNister2006 extends BoofStandardJUnit {
 		}
 
 		var descTermFreq = new TIntFloatHashMap();
+		var leafHistogram = new RecognitionVocabularyTreeNister2006.LeafHistogram();
 
 		var alg = new RecognitionVocabularyTreeNister2006<Point2D_F64>();
 		alg.initializeTree(tree);
-		alg.describe(imageFeatures, descTermFreq, ( n ) -> assertTrue(n.id == 3 || n.id == 5));
+		alg.describe(imageFeatures, descTermFreq, leafHistogram);
+
+		assertTrue(leafHistogram.observed.containsKey(3));
+		assertTrue(leafHistogram.observed.containsKey(5));
 
 		// See if the description is as expected
 		assertEquals(4, descTermFreq.size());
@@ -128,6 +131,10 @@ class TestRecognitionVocabularyTreeNister2006 extends BoofStandardJUnit {
 			tree.nodes.get(i).weight = i*0.1;
 		}
 		return tree;
+	}
+
+	@Test void computeLeafHistogram() {
+		fail("Implement");
 	}
 
 	@Test void distanceL1Norm() {

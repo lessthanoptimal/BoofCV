@@ -9,6 +9,8 @@ Version : 0.38
 - Examples
   * Added an example for computing the Trifocal Tensor
   * TODO Added an example showing how the trifocal tensor can be used
+- Applications
+  * Can batch down sampling now lets you shoot for a fix number of pixels.
 - Functional API
   * Added forEachXY and forEachPixel to images
   * PixelMath.lambda is now PixelMath.operator
@@ -19,6 +21,10 @@ Version : 0.38
   * Fixed reading of second format region. Thanks DCNick3 for finding the issue!
 - Image Features
   * Fast Corners are now concurrent
+- Image Processing
+  * TODO Wolf Binarization https://github.com/lessthanoptimal/BoofCV/issues/124
+- Image Stitching
+  * TODO N-View stitching https://github.com/lessthanoptimal/BoofCV/issues/167
 - Image Recognition
   * Added: Nister, Stewenius, "Scalable recognition with a vocabulary tree", CVPR 2006
       TODO explain why there are nodes with no images when learning weights
@@ -27,7 +33,6 @@ Version : 0.38
       TODO get image lookup < 100ms
   * TODO Support binary image features
   * TODO Adapt AKNN to this frame work
-  * TODO Create regression tests
 - TODO Loop Closure
 - TODO Generic calibration target for multi cameras
   * QR Code for first version
