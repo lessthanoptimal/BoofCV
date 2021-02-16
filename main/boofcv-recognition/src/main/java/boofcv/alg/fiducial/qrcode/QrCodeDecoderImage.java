@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -249,7 +249,7 @@ public class QrCodeDecoderImage<T extends ImageGray<T>> {
 	/**
 	 * Reads the format bits near the corner position pattern
 	 */
-	private boolean readFormatRegion0( QrCode qr ) {
+	final boolean readFormatRegion0( QrCode qr ) {
 		// set the coordinate system to the closest pp to reduce position errors
 		gridReader.setSquare(qr.ppCorner, (float)qr.threshCorner);
 
@@ -273,11 +273,7 @@ public class QrCodeDecoderImage<T extends ImageGray<T>> {
 	/**
 	 * Read the format bits on the right and bottom patterns
 	 */
-	private boolean readFormatRegion1( QrCode qr ) {
-//		if( qr.ppRight.get(0).distance(988.8,268.3) < 30 )
-//			System.out.println("tjere");
-//		System.out.println(qr.ppRight.get(0));
-
+	final boolean readFormatRegion1( QrCode qr ) {
 		// set the coordinate system to the closest pp to reduce position errors
 		gridReader.setSquare(qr.ppRight, (float)qr.threshRight);
 
@@ -289,7 +285,7 @@ public class QrCodeDecoderImage<T extends ImageGray<T>> {
 
 		gridReader.setSquare(qr.ppDown, (float)qr.threshDown);
 
-		for (int i = 0; i < 6; i++) {
+		for (int i = 0; i < 7; i++) {
 			read(i + 8, i, 8);
 		}
 

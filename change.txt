@@ -15,6 +15,8 @@ Version : 0.38
   * ImageBorder no longer uses reflection but uses a functional API instead
 - DownSelectVideoFramesFor3DApp
   * Fixed image scaling issue when image was smaller than desired
+- QR Code
+  * Fixed reading of second format region. Thanks DCNick3 for finding the issue!
 - Image Features
   * Fast Corners are now concurrent
 - Image Recognition

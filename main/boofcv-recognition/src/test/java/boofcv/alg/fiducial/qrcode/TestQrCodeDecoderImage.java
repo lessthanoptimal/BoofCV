@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -22,10 +22,14 @@ import boofcv.alg.fiducial.calib.squares.SquareEdge;
 import boofcv.struct.image.GrayF32;
 import boofcv.struct.image.GrayU8;
 import boofcv.testing.BoofStandardJUnit;
+import georegression.struct.point.Point2D_I32;
 import georegression.struct.shapes.Polygon2D_F64;
 import org.ddogleg.struct.DogArray;
 import org.ejml.UtilEjml;
 import org.junit.jupiter.api.Test;
+
+import java.util.ArrayList;
+import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -34,8 +38,7 @@ import static org.junit.jupiter.api.Assertions.*;
  */
 public class TestQrCodeDecoderImage extends BoofStandardJUnit {
 
-	@Test
-	void withLensDistortion() {
+	@Test void withLensDistortion() {
 		// render a distorted image
 		QrCodeDistortedChecks helper = new QrCodeDistortedChecks();
 
@@ -77,8 +80,7 @@ public class TestQrCodeDecoderImage extends BoofStandardJUnit {
 	/**
 	 * Run the entire algorithm on a rendered image but just care about the message
 	 */
-	@Test
-	void message_numeric() {
+	@Test void message_numeric() {
 		String message = "";
 		for (int i = 0; i < 20; i++) {
 			QrCode expected = new QrCodeEncoder().setVersion(1).
@@ -107,8 +109,7 @@ public class TestQrCodeDecoderImage extends BoofStandardJUnit {
 		}
 	}
 
-	@Test
-	void message_alphanumeric() {
+	@Test void message_alphanumeric() {
 		String[] messages = new String[]{"", "0", "12", "123", "1234", "12345", "01234567ABCD%*+-./:"};
 
 		for (String message : messages) {
@@ -137,8 +138,7 @@ public class TestQrCodeDecoderImage extends BoofStandardJUnit {
 		}
 	}
 
-	@Test
-	void message_byte() {
+	@Test void message_byte() {
 		QrCode expected = new QrCodeEncoder().setVersion(2).
 				setError(QrCode.ErrorLevel.M).
 				setMask(QrCodeMaskPattern.M011).
@@ -163,8 +163,7 @@ public class TestQrCodeDecoderImage extends BoofStandardJUnit {
 		assertEquals("Pp4/", found.message);
 	}
 
-	@Test
-	void message_kanji() {
+	@Test void message_kanji() {
 		QrCode expected = new QrCodeEncoder().setVersion(2).
 				setError(QrCode.ErrorLevel.M).
 				setMask(QrCodeMaskPattern.M011).
@@ -189,8 +188,7 @@ public class TestQrCodeDecoderImage extends BoofStandardJUnit {
 		assertEquals("阿ん鞠ぷへ≦Ｋ", found.message);
 	}
 
-	@Test
-	void message_multiple() {
+	@Test void message_multiple() {
 		QrCode expected = new QrCodeEncoder().setVersion(3).
 				setError(QrCode.ErrorLevel.M).
 				setMask(QrCodeMaskPattern.M011).
@@ -218,8 +216,7 @@ public class TestQrCodeDecoderImage extends BoofStandardJUnit {
 	/**
 	 * Runs through the entire algorithm using a rendered image
 	 */
-	@Test
-	void full_simple() {
+	@Test void full_simple() {
 //		full_simple(7, QrCode.ErrorLevel.M, QrCodeMaskPattern.M010);
 
 		for (QrCode.ErrorLevel error : QrCode.ErrorLevel.values()) {
@@ -302,8 +299,7 @@ public class TestQrCodeDecoderImage extends BoofStandardJUnit {
 		return pps;
 	}
 
-	@Test
-	void setPositionPatterns() {
+	@Test void setPositionPatterns() {
 		Polygon2D_F64 corner = new Polygon2D_F64(0, 0, 2, 0, 2, 2, 0, 2);
 		Polygon2D_F64 right = new Polygon2D_F64(5, 0, 7, 0, 7, 2, 5, 2);
 		Polygon2D_F64 bottom = new Polygon2D_F64(0, 5, 2, 5, 2, 7, 0, 7);
@@ -331,8 +327,7 @@ public class TestQrCodeDecoderImage extends BoofStandardJUnit {
 		a.edges[sideA] = b.edges[sideB] = e;
 	}
 
-	@Test
-	void rotateUntilAt() {
+	@Test void rotateUntilAt() {
 		Polygon2D_F64 square = new Polygon2D_F64(0, 0, 2, 0, 2, 2, 0, 2);
 		assertTrue(square.isCCW());
 		Polygon2D_F64 original = square.copy();
@@ -348,8 +343,7 @@ public class TestQrCodeDecoderImage extends BoofStandardJUnit {
 		assertTrue(square.isIdentical(original, UtilEjml.TEST_F64));
 	}
 
-	@Test
-	void computeBoundingBox() {
+	@Test void computeBoundingBox() {
 		QrCode qr = new QrCode();
 		qr.ppCorner = new Polygon2D_F64(0, 0, 1, 0, 1, 1, 0, 1);
 		qr.ppRight = new Polygon2D_F64(2, 0, 3, 0, 3, 1, 2, 1);
@@ -366,8 +360,7 @@ public class TestQrCodeDecoderImage extends BoofStandardJUnit {
 	/**
 	 * There was a bug where version 0 QR code was returned
 	 */
-	@Test
-	void extractVersionInfo_version0() {
+	@Test void extractVersionInfo_version0() {
 		QrCodeDecoderImage<GrayU8> mock = new QrCodeDecoderImage<>(EciEncoding.UTF8, GrayU8.class) {
 			@Override
 			int estimateVersionBySize( QrCode qr ) {
@@ -384,5 +377,72 @@ public class TestQrCodeDecoderImage extends BoofStandardJUnit {
 		qr.version = 8;
 		assertFalse(mock.extractVersionInfo(qr));
 		assertEquals(-1, qr.version);
+	}
+
+	/**
+	 * Check to see if the correct number of bits are read and that the correct grid coordinates have been selected
+	 */
+	@Test void readFormatRegion0() {
+		var reader = new MockReader();
+		QrCodeDecoderImage<GrayU8> alg = new QrCodeDecoderImage<>(EciEncoding.UTF8, GrayU8.class);
+		alg.gridReader = reader;
+
+		alg.readFormatRegion0(new QrCode());
+		assertEquals(15, reader.bitsRead.size());
+
+		// From QR code specification
+		for (int row = 0; row < 5; row++) {
+			assertTrue(reader.containsPoint(row,8));
+		}
+		for (int row = 7; row < 9; row++) {
+			assertTrue(reader.containsPoint(row,8));
+		}
+		assertTrue(reader.containsPoint(8,7));
+		for (int col = 0; col < 6; col++) {
+			assertTrue(reader.containsPoint(8,col));
+		}
+	}
+
+	/**
+	 * Check to see if the correct number of bits are read and that the correct grid coordinates have been selected
+	 */
+	@Test void readFormatRegion1() {
+		var reader = new MockReader();
+		QrCodeDecoderImage<GrayU8> alg = new QrCodeDecoderImage<>(EciEncoding.UTF8, GrayU8.class);
+		alg.gridReader = reader;
+
+		alg.readFormatRegion1(new QrCode());
+		assertEquals(15, reader.bitsRead.size());
+		for (int col = 0; col < 8; col++) {
+			assertTrue(reader.containsPoint(8,col-1));
+		}
+		for (int row = 0; row < 7; row++) {
+			assertTrue(reader.containsPoint(row,8));
+		}
+	}
+
+	private static class MockReader extends QrCodeBinaryGridReader<GrayU8> {
+		List<Point2D_I32> bitsRead = new ArrayList<>();
+
+		public MockReader() {super(GrayU8.class);}
+
+		/**
+		 * Save which bits were read and always return 1
+		 */
+		@Override public int readBit( int row, int col ) {
+			bitsRead.add(new Point2D_I32(row, col));
+			return 1;
+		}
+
+		// We don't want this to do anything
+		@Override public void setSquare( Polygon2D_F64 square, float threshold ) {}
+
+		boolean containsPoint( int row, int col ) {
+			for( Point2D_I32 p : bitsRead ) {
+				if (p.x == row && p.y == col)
+					return true;
+			}
+			return false;
+		}
 	}
 }
