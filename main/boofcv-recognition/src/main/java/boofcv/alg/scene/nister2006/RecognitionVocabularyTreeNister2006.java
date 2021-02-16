@@ -20,7 +20,6 @@ package boofcv.alg.scene.nister2006;
 
 import boofcv.alg.scene.vocabtree.HierarchicalVocabularyTree;
 import boofcv.alg.scene.vocabtree.HierarchicalVocabularyTree.Node;
-import boofcv.misc.BoofLambdas;
 import boofcv.misc.BoofMiscOps;
 import gnu.trove.impl.Constants;
 import gnu.trove.map.TIntFloatMap;
@@ -77,9 +76,6 @@ public class RecognitionVocabularyTreeNister2006<Point> {
 	// Temporary storage for an image's TF description while it's being looked up
 	protected final TIntFloatMap tempDescTermFreq = new TIntFloatHashMap();
 
-	// List of nodes which have already been explored
-	protected final TIntSet exploredSet = new TIntHashSet();
-
 	// Predeclare array for storing keys. Avoids unnecessary array creation
 	protected final DogArray_I32 keysDesc = new DogArray_I32(); // ONLY use in describe()
 	protected final DogArray_I32 keysDist = new DogArray_I32(); // ONLY use in distance functions.
@@ -90,6 +86,8 @@ public class RecognitionVocabularyTreeNister2006<Point> {
 
 	// For lookup
 	TIntSet candidates = new TIntHashSet();
+
+	LeafHistogram leafHistogram = new LeafHistogram();
 
 	/**
 	 * Configures the tree by adding LeafData to all the leaves in the tree then saves a reference for future use
@@ -136,13 +134,17 @@ public class RecognitionVocabularyTreeNister2006<Point> {
 		info.cookie = cookie;
 
 		// compute a descriptor for this image while adding it to the leaves
-		describe(imageFeatures, info.descTermFreq, ( leafNode ) -> {
-			// Add the image info to the leaf if it hasn't already been added
+		describe(imageFeatures, info.descTermFreq, leafHistogram);
+
+		// Add this image to all the leaves it encountered
+		for (int histIdx = 0; histIdx < leafHistogram.leaves.size; histIdx++) {
+			LeafCounts counts = leafHistogram.leaves.get(histIdx);
+			Node leafNode = tree.nodes.get(counts.nodeIdx);
 			LeafData leafData = tree.listData.get(leafNode.dataIdx);
-			if (!leafData.images.containsKey(info.imageId)) {
-				leafData.images.put(info.imageId, info);
-			}
-		});
+
+			// Each leaf will only appear once in this array, so we can just add it
+			leafData.images.put(info.imageId, info);
+		}
 
 		// For each node which is in the descriptor, increment its image count
 		keysDesc.resize(info.descTermFreq.size());
@@ -162,7 +164,6 @@ public class RecognitionVocabularyTreeNister2006<Point> {
 	public boolean lookup( List<Point> imageFeatures ) {
 		candidates.clear();
 		matchScores.reset();
-		exploredSet.clear();
 
 		// Can't match to anything if it's empty
 		if (imageFeatures.isEmpty()) {
@@ -170,19 +171,13 @@ public class RecognitionVocabularyTreeNister2006<Point> {
 		}
 
 		// Create a description of this image and collect potential matches from leaves
-		describe(imageFeatures, tempDescTermFreq, ( leafNode ) -> {
-			// See if this node has already been observed by this image. If so we don't need to check it's features
-			if (exploredSet.contains(leafNode.id))
-				return;
-			exploredSet.add(leafNode.id);
-			// NOTE: The step above seems to prune 97%, but makes little difference in runtime
+		describe(imageFeatures, tempDescTermFreq, leafHistogram);
 
+		// Create a list of images in the DB that have at least a single feature pass through a node
+		for (int histIdx = 0; histIdx < leafHistogram.leaves.size; histIdx++) {
+			LeafCounts count = leafHistogram.leaves.get(histIdx);
+			HierarchicalVocabularyTree.Node leafNode = tree.nodes.get(count.nodeIdx);
 
-			// TODO if a node has too many or two few images skip
-
-			// TODO what about parents? traverse up until too many
-
-			// Create a list of images that there's at least one leaf matching
 			LeafData leafData = tree.listData.get(leafNode.dataIdx);
 			keysLookUp.resize(leafData.images.size());
 			leafData.images.keys(keysLookUp.data);
@@ -194,7 +189,11 @@ public class RecognitionVocabularyTreeNister2006<Point> {
 					continue;
 				matchScores.grow().image = c;
 			}
-		});
+
+			// TODO traverse up the tree and add in images see in parent nodes
+			// this will require traversing down to their leaves. Each parent needs to keep
+			// track of the number of images it has too so that if there are too many images the search will abort
+		}
 
 		if (matchScores.isEmpty())
 			return false;
@@ -216,31 +215,41 @@ public class RecognitionVocabularyTreeNister2006<Point> {
 	 *
 	 * @param imageFeatures (Input) All image features in the image
 	 * @param descTermFreq (Output) Sparse TF-IDF descriptor for the image
-	 * @param op Each leaf node for each feature is passed into this function
+	 * @param leafHistogram (Output) Which leaves were encountered and how many times
 	 */
-	protected void describe( List<Point> imageFeatures, TIntFloatMap descTermFreq, BoofLambdas.ProcessObject<Node> op ) {
+	protected void describe( List<Point> imageFeatures, TIntFloatMap descTermFreq, LeafHistogram leafHistogram ) {
 		// Reset work variables
 		frequencies.reset();
 		node_to_frequency.clear();
 		descTermFreq.clear();
 
-		// Sum of the weight of all graph nodes it sees
-		for (int descIdx = 0; descIdx < imageFeatures.size(); descIdx++) {
-			int leafNodeIdx = tree.searchPathToLeaf(imageFeatures.get(descIdx), ( node ) -> {
-				// TODO skip if weight is too low?
+		// Find all the leaves and the number of times they were observed
+		computeLeafHistogram(imageFeatures, leafHistogram);
+
+		// From each leaf the parents can be traversed to find the other nodes and the number of times
+		// they were passed though
+		for (int histIdx = 0; histIdx < leafHistogram.leaves.size; histIdx++) {
+			LeafCounts count = leafHistogram.leaves.get(histIdx);
+
+			HierarchicalVocabularyTree.Node node = tree.nodes.get(count.nodeIdx);
+
+			// Traverse up the tree from leaf to root
+			while (true) {
+				// if the weight is zero now, all the parents will have to be zero too
 				if (node.weight == 0.0)
-					return;
+					break;
 				Frequency f = node_to_frequency.get(node.id);
 				if (f == null) {
 					f = frequencies.grow();
 					f.node = node;
 					node_to_frequency.put(node.id, f);
 				}
-				f.sum += node.weight;
-			});
+				f.sum += node.weight*count.count;
 
-			// Process the leaf node in the passed in operation
-			op.process(tree.nodes.get(leafNodeIdx));
+				if (node.parent < 0)
+					break;
+				node = tree.nodes.get(node.parent);
+			}
 		}
 
 		// No nodes with a non-zero weight that matched was found
@@ -265,6 +274,26 @@ public class RecognitionVocabularyTreeNister2006<Point> {
 		for (int i = 0; i < keysDesc.size(); i++) {
 			Frequency f = node_to_frequency.get(keysDesc.get(i));
 			descTermFreq.put(f.node.id, (float)(f.sum/normL2));
+		}
+	}
+
+	/**
+	 * Counts the number of times each leaf node is observed
+	 */
+	protected void computeLeafHistogram( List<Point> imageFeatures, LeafHistogram histogram ) {
+		histogram.reset();
+
+		for (int descIdx = 0; descIdx < imageFeatures.size(); descIdx++) {
+			int leafNodeIdx = tree.searchPathToLeaf(imageFeatures.get(descIdx), ( a ) -> {});
+
+			LeafCounts counts = histogram.observed.get(leafNodeIdx);
+			if (counts == null) {
+				counts = histogram.leaves.grow();
+				counts.nodeIdx = leafNodeIdx;
+				histogram.observed.put(leafNodeIdx, counts);
+			}
+
+			counts.count++;
 		}
 	}
 
@@ -324,7 +353,7 @@ public class RecognitionVocabularyTreeNister2006<Point> {
 			float valueA = Math.max(0.0f, descA.get(key));
 			float valueB = Math.max(0.0f, descB.get(key));
 
-			sum += Math.abs(valueA-valueB);
+			sum += Math.abs(valueA - valueB);
 		}
 
 		return sum;
@@ -374,6 +403,27 @@ public class RecognitionVocabularyTreeNister2006<Point> {
 		}
 	}
 
+	// TODO document
+	protected static class LeafHistogram {
+		public TIntObjectMap<LeafCounts> observed = new TIntObjectHashMap<>();
+		public DogArray<LeafCounts> leaves = new DogArray<>(LeafCounts::new, LeafCounts::reset);
+
+		public void reset() {
+			observed.clear();
+			leaves.reset();
+		}
+	}
+
+	protected static class LeafCounts {
+		public int count;
+		public int nodeIdx;
+
+		public void reset() {
+			count = 0;
+			nodeIdx = -1;
+		}
+	}
+
 	// Used to sum the frequency of words (graph nodes) in the image
 	protected static class Frequency {
 		// sum of weights
@@ -412,7 +462,7 @@ public class RecognitionVocabularyTreeNister2006<Point> {
 	}
 
 	/** Different built in distance norms. */
-	public enum DistanceTypes {L1,L2}
+	public enum DistanceTypes {L1, L2}
 
 	/** Computes the distance between two TF-IDF descriptors */
 	public interface DistanceFunction {
