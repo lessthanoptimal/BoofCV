@@ -34,15 +34,11 @@ import java.util.Set;
 
 /**
  * The graph is constructed using a depth first search. Each level has its own k-means algorithm. Labeling results
- * are used to segment points for each branch before going to the next level. If a branch at a level was
- * fewer than {@link #minimumPointsInNode} then a new node is not created at that location.
+ * are used to segment points for each branch before going to the next level.
  *
  * @author Peter Abeles
  **/
 public class LearnHierarchicalTree<Point> implements VerbosePrint {
-	/** If a branch has this many points or fewer then a new node will not be created there */
-	public int minimumPointsInNode = 0;
-
 	// Stores points for a branch at each level in DFS
 	protected final DogArray<PackedArray<Point>> listPoints;
 	// k-means instance for each level in tree
@@ -115,12 +111,15 @@ public class LearnHierarchicalTree<Point> implements VerbosePrint {
 	private void processLevel( PackedArray<Point> pointsInParent,
 							   HierarchicalVocabularyTree<Point, ?> tree,
 							   int level, int parentNodeIdx ) {
+		// Stop here if we are at the maximum number of levels or it's already down to a single point
+		if (level >= tree.maximumLevel - 1 || pointsInParent.size()<=1)
+			return;
+
 		// Get k-means for this level
 		StandardKMeans<Point> kmeans = listKMeans.get(level);
 
 		// Cluster the input points
-		// Be careful to not try to create more clusters than there are points
-		kmeans.process(pointsInParent, Math.min(pointsInParent.size(), tree.branchFactor));
+		kmeans.process(pointsInParent, tree.branchFactor);
 		DogArray_I32 assignments = kmeans.getAssignments();
 		List<Point> clusterMeans = kmeans.getBestClusters().toList();
 
@@ -132,13 +131,10 @@ public class LearnHierarchicalTree<Point> implements VerbosePrint {
 
 		if (verbose != null) verbose.println("level=" + level + " kmeans.score=" + kmeans.getBestClusterScore());
 
-		// Stop here if we are at the maximum number of levels
-		if (level >= tree.maximumLevel - 1)
-			return;
-
 		// Load the points that are in the child sub region
 		Node parent = tree.nodes.get(parentNodeIdx);
 
+		// Create pyramid nodes from the children
 		PackedArray<Point> pointsInBranch = listPoints.get(level);
 		pointsInBranch.reserve(pointsInParent.size()/(tree.branchFactor - 1));
 		processChildren(tree, level, parent, pointsInParent, clusterMeans, assignments, pointsInBranch);
@@ -164,12 +160,7 @@ public class LearnHierarchicalTree<Point> implements VerbosePrint {
 				if (assignments.get(pointIdx) != label)
 					continue;
 				pointsInBranch.addCopy(pointsInParent.getTemp(pointIdx));
-				// todo batch copy?
 			}
-
-			// If there are too few points to be significant, abort the search here
-			if (pointsInBranch.size() <= minimumPointsInNode || pointsInBranch.size() <= tree.branchFactor)
-				continue;
 
 			if (verbose != null)
 				verbose.println("level=" + level + " branch=" + label + " points.size=" + pointsInBranch.size());

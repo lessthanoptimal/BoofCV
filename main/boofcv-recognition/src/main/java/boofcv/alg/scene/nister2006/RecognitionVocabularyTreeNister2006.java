@@ -48,6 +48,8 @@ import java.util.List;
  * 2006 IEEE Computer Society Conference on Computer Vision and Pattern Recognition (CVPR'06). Vol. 2. Ieee, 2006.
  * </p>
  *
+ * TODO remove concept of Data from tree? Just have a big array here and look up the data based on node id?
+ *
  * @author Peter Abeles
  */
 public class RecognitionVocabularyTreeNister2006<Point> {
@@ -261,18 +263,16 @@ public class RecognitionVocabularyTreeNister2006<Point> {
 
 		//------ Create the TF-IDF descriptor for this image
 		// Normalize the vector such that the L2-norm is 1.0
-		keysDesc.resize(node_to_frequency.size());
-		node_to_frequency.keys(keysDesc.data);
 		double normL2 = 0.0;
-		for (int i = 0; i < keysDesc.size(); i++) {
-			double x = node_to_frequency.get(keysDesc.get(i)).sum;
+		for (int i = 0; i < frequencies.size(); i++) {
+			double x = frequencies.get(i).sum;
 			normL2 += x*x;
 		}
 		normL2 = Math.sqrt(normL2);
 		BoofMiscOps.checkTrue(normL2 != 0.0, "Sum of weights is zero. Something went very wrong");
 
-		for (int i = 0; i < keysDesc.size(); i++) {
-			Frequency f = node_to_frequency.get(keysDesc.get(i));
+		for (int i = 0; i < frequencies.size(); i++) {
+			Frequency f = frequencies.get(i);
 			descTermFreq.put(f.node.id, (float)(f.sum/normL2));
 		}
 	}
