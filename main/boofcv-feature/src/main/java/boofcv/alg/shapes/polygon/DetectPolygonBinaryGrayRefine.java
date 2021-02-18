@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -76,16 +76,16 @@ public class DetectPolygonBinaryGrayRefine<T extends ImageGray<T>> {
 	 * @param minimumRefineEdgeIntensity Threshold for pruning shapes. Must have this edge intensity. Try 6
 	 * @param adjustForThresholdBias Should it adjust contour polygons for the bias caused by thresholding?
 	 */
-	public DetectPolygonBinaryGrayRefine(DetectPolygonFromContour<T> detector,
-										 RefinePolygonToContour refineContour,
-										 RefinePolygonToGray<T> refineGray ,
-										 double minimumRefineEdgeIntensity ,
-										 boolean adjustForThresholdBias ) {
+	public DetectPolygonBinaryGrayRefine( DetectPolygonFromContour<T> detector,
+										  RefinePolygonToContour refineContour,
+										  RefinePolygonToGray<T> refineGray,
+										  double minimumRefineEdgeIntensity,
+										  boolean adjustForThresholdBias ) {
 		this.detector = detector;
 		this.refineContour = refineContour;
 		this.refineGray = refineGray;
 		this.minimumRefineEdgeIntensity = minimumRefineEdgeIntensity;
-		if( adjustForThresholdBias ) {
+		if (adjustForThresholdBias) {
 			this.adjustForBias = new AdjustPolygonForThresholdBias();
 		}
 
@@ -104,7 +104,7 @@ public class DetectPolygonBinaryGrayRefine<T extends ImageGray<T>> {
 	 * Turn on and off verbose output to standard out
 	 */
 	public void setVerbose( boolean verbose ) {
-		detector.setVerbose(verbose);
+		detector.setVerbose(verbose ? System.out : null, null);
 	}
 
 	/**
@@ -116,12 +116,11 @@ public class DetectPolygonBinaryGrayRefine<T extends ImageGray<T>> {
 	 * @param distToUndist Transform from distorted to undistorted image.
 	 * @param undistToDist Transform from undistorted to distorted image.
 	 */
-	public void setLensDistortion(int width , int height ,
-								  @Nullable PixelTransform<Point2D_F32> distToUndist ,
-								  @Nullable PixelTransform<Point2D_F32> undistToDist )
-	{
+	public void setLensDistortion( int width, int height,
+								   @Nullable PixelTransform<Point2D_F32> distToUndist,
+								   @Nullable PixelTransform<Point2D_F32> undistToDist ) {
 		detector.setLensDistortion(width, height, distToUndist, undistToDist);
-		if( refineGray != null )
+		if (refineGray != null)
 			refineGray.setLensDistortion(width, height, distToUndist, undistToDist);
 		edgeIntensity.setTransform(undistToDist);
 	}
@@ -131,7 +130,7 @@ public class DetectPolygonBinaryGrayRefine<T extends ImageGray<T>> {
 	 */
 	public void clearLensDistortion() {
 		detector.clearLensDistortion();
-		if( refineGray != null )
+		if (refineGray != null)
 			refineGray.clearLensDistortion();
 		edgeIntensity.setTransform(null);
 	}
@@ -143,33 +142,34 @@ public class DetectPolygonBinaryGrayRefine<T extends ImageGray<T>> {
 
 	/**
 	 * Detects polygons inside the grayscale image and its thresholded version
+	 *
 	 * @param gray Gray scale image
 	 * @param binary Binary version of grayscale image
 	 */
-	public void process(T gray , GrayU8 binary ) {
-		detector.process(gray,binary);
-		if( refineGray != null )
+	public void process( T gray, GrayU8 binary ) {
+		detector.process(gray, binary);
+		if (refineGray != null)
 			refineGray.setImage(gray);
 		edgeIntensity.setImage(gray);
 
 		long time0 = System.nanoTime();
-		DogArray<DetectPolygonFromContour.Info> detections = detector.getFound();
+		DogArray<DetectPolygonFromContour.Info> detections = detector.getFoundInfo();
 
-		if( adjustForBias != null ) {
+		if (adjustForBias != null) {
 			int minSides = getMinimumSides();
-			for (int i = detections.size()-1; i >= 0; i-- ) {
+			for (int i = detections.size() - 1; i >= 0; i--) {
 				Polygon2D_F64 p = detections.get(i).polygon;
-				adjustForBias.process(p, detector.isOutputClockwise());
+				adjustForBias.process(p, detector.isOutputClockwiseUpY());
 
 				// When the polygon is adjusted for bias a point might need to be removed because it's
 				// almost parallel. This could cause the shape to have too few corners and needs to be removed.
-				if( p.size() < minSides)
+				if (p.size() < minSides)
 					detections.remove(i);
 			}
 		}
 		long time1 = System.nanoTime();
 
-		double milli = (time1-time0)*1e-6;
+		double milli = (time1 - time0)*1e-6;
 
 		milliAdjustBias.update(milli);
 //		System.out.printf(" contour %7.2f shapes %7.2f adjust_bias %7.2f\n",
@@ -178,12 +178,13 @@ public class DetectPolygonBinaryGrayRefine<T extends ImageGray<T>> {
 
 	/**
 	 * Refines the fit to the specified polygon. Only info.polygon is modified
+	 *
 	 * @param info The polygon and related info
 	 * @return true if successful or false if not
 	 */
 	public boolean refine( DetectPolygonFromContour.Info info ) {
-		double before,after;
-		if( edgeIntensity.computeEdge(info.polygon,!detector.isOutputClockwise()) ) {
+		double before, after;
+		if (edgeIntensity.computeEdge(info.polygon, !detector.isOutputClockwiseUpY())) {
 			before = edgeIntensity.getAverageOutside() - edgeIntensity.getAverageInside();
 		} else {
 			return false;
@@ -191,16 +192,16 @@ public class DetectPolygonBinaryGrayRefine<T extends ImageGray<T>> {
 
 		boolean success = false;
 
-		if( refineContour != null ) {
+		if (refineContour != null) {
 			List<Point2D_I32> contour = detector.getContour(info);
-			refineContour.process(contour,info.splits,work);
+			refineContour.process(contour, info.splits, work);
 
-			if( adjustForBias != null )
-				adjustForBias.process(work, detector.isOutputClockwise());
+			if (adjustForBias != null)
+				adjustForBias.process(work, detector.isOutputClockwiseUpY());
 
-			if( edgeIntensity.computeEdge(work,!detector.isOutputClockwise()) ) {
+			if (edgeIntensity.computeEdge(work, !detector.isOutputClockwiseUpY())) {
 				after = edgeIntensity.getAverageOutside() - edgeIntensity.getAverageInside();
-				if( after > before ) {
+				if (after > before) {
 					info.edgeInside = edgeIntensity.getAverageInside();
 					info.edgeOutside = edgeIntensity.getAverageOutside();
 					info.polygon.setTo(work);
@@ -210,19 +211,19 @@ public class DetectPolygonBinaryGrayRefine<T extends ImageGray<T>> {
 			}
 		}
 
-		if( functionAdjust != null ) {
-			functionAdjust.adjust(info, detector.isOutputClockwise());
+		if (functionAdjust != null) {
+			functionAdjust.adjust(info, detector.isOutputClockwiseUpY());
 		}
 
-		if( refineGray != null ) {
+		if (refineGray != null) {
 			work.vertexes.resize(info.polygon.size());
-			if( refineGray.refine(info.polygon,work) ) {
-				if( edgeIntensity.computeEdge(work,!detector.isOutputClockwise()) ) {
+			if (refineGray.refine(info.polygon, work)) {
+				if (edgeIntensity.computeEdge(work, !detector.isOutputClockwiseUpY())) {
 					after = edgeIntensity.getAverageOutside() - edgeIntensity.getAverageInside();
 
 					// basically, unless it diverged stick with this optimization
 					// a near tie
-					if( after*1.5 > before ) {
+					if (after*1.5 > before) {
 						info.edgeInside = edgeIntensity.getAverageInside();
 						info.edgeOutside = edgeIntensity.getAverageOutside();
 						info.polygon.setTo(work);
@@ -240,7 +241,7 @@ public class DetectPolygonBinaryGrayRefine<T extends ImageGray<T>> {
 	 * step are not added.
 	 */
 	public void refineAll() {
-		List<DetectPolygonFromContour.Info> detections = detector.getFound().toList();
+		List<DetectPolygonFromContour.Info> detections = detector.getFoundInfo().toList();
 
 		for (int i = 0; i < detections.size(); i++) {
 			refine(detections.get(i));
@@ -250,27 +251,26 @@ public class DetectPolygonBinaryGrayRefine<T extends ImageGray<T>> {
 	/**
 	 * Returns a list of all polygons with an edge threshold above the minimum
 	 *
-	 *
 	 * @param storageInfo Optional storage for info associated with polygons. Pruning is done so the info list
-	 *                    and the returned polygon list are not in synch with each other
+	 * and the returned polygon list are not in synch with each other
 	 */
-	public List<Polygon2D_F64> getPolygons( @Nullable List<Polygon2D_F64> storage ,
+	public List<Polygon2D_F64> getPolygons( @Nullable List<Polygon2D_F64> storage,
 											@Nullable List<DetectPolygonFromContour.Info> storageInfo ) {
-		if( storage == null )
+		if (storage == null)
 			storage = new ArrayList<>();
 		else
 			storage.clear();
 
-		if( storageInfo != null )
+		if (storageInfo != null)
 			storageInfo.clear();
 
-		List<DetectPolygonFromContour.Info> detections = detector.getFound().toList();
+		List<DetectPolygonFromContour.Info> detections = detector.getFoundInfo().toList();
 		for (int i = 0; i < detections.size(); i++) {
 			DetectPolygonFromContour.Info d = detections.get(i);
 
-			if( d.computeEdgeIntensity() >= minimumRefineEdgeIntensity ) {
+			if (d.computeEdgeIntensity() >= minimumRefineEdgeIntensity) {
 				storage.add(d.polygon);
-				if( storageInfo != null ) {
+				if (storageInfo != null) {
 					storageInfo.add(d);
 				}
 			}
@@ -279,7 +279,7 @@ public class DetectPolygonBinaryGrayRefine<T extends ImageGray<T>> {
 	}
 
 	public List<DetectPolygonFromContour.Info> getPolygonInfo() {
-		return detector.getFound().toList();
+		return detector.getFoundInfo().toList();
 	}
 
 	public Class<T> getInputType() {
@@ -295,7 +295,7 @@ public class DetectPolygonBinaryGrayRefine<T extends ImageGray<T>> {
 	}
 
 	public boolean isOutputClockwise() {
-		return detector.isOutputClockwise();
+		return detector.isOutputClockwiseUpY();
 	}
 
 	public DetectPolygonFromContour<T> getDetector() {
@@ -306,7 +306,7 @@ public class DetectPolygonBinaryGrayRefine<T extends ImageGray<T>> {
 		return detector.getAllContours();
 	}
 
-	public void setFunctionAdjust(AdjustBeforeRefineEdge functionAdjust) {
+	public void setFunctionAdjust( AdjustBeforeRefineEdge functionAdjust ) {
 		this.functionAdjust = functionAdjust;
 	}
 
@@ -315,6 +315,6 @@ public class DetectPolygonBinaryGrayRefine<T extends ImageGray<T>> {
 	}
 
 	public interface AdjustBeforeRefineEdge {
-		void adjust( DetectPolygonFromContour.Info info , boolean clockwise );
+		void adjust( DetectPolygonFromContour.Info info, boolean clockwise );
 	}
 }

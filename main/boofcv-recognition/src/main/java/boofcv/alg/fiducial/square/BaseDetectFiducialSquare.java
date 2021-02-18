@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -138,7 +138,7 @@ public abstract class BaseDetectFiducialSquare<T extends ImageGray<T>> {
 									   int squarePixels,
 									   Class<T> inputType) {
 
-		squareDetector.getDetector().setOutputClockwise(false);
+		squareDetector.getDetector().setOutputClockwiseUpY(false);
 		squareDetector.getDetector().setConvex(true);
 		squareDetector.getDetector().setNumberOfSides(4,4);
 

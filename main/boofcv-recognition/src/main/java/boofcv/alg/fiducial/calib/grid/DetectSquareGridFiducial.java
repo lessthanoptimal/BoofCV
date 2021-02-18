@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -97,7 +97,7 @@ public class DetectSquareGridFiducial<T extends ImageGray<T>> {
 
 		// some unit tests will pass in a null value
 		if (detectorSquare != null) {
-			detectorSquare.getDetector().setOutputClockwise(true);
+			detectorSquare.getDetector().setOutputClockwiseUpY(true);
 			detectorSquare.getDetector().setConvex(true);
 			detectorSquare.getDetector().setNumberOfSides(4, 4);
 		}

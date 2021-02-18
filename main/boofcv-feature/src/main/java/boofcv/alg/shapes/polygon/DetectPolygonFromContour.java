@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -34,15 +34,20 @@ import georegression.struct.point.Point2D_F32;
 import georegression.struct.point.Point2D_F64;
 import georegression.struct.point.Point2D_I32;
 import georegression.struct.shapes.Polygon2D_F64;
+import lombok.Getter;
+import lombok.Setter;
 import org.ddogleg.struct.DogArray;
 import org.ddogleg.struct.DogArray_B;
 import org.ddogleg.struct.DogArray_I32;
+import org.ddogleg.struct.VerbosePrint;
+import org.jetbrains.annotations.Nullable;
 
+import java.io.PrintStream;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 
 /**
- * TODO Update documentation
  * <p>
  * Detects convex polygons with the specified number of sides in an image.  Shapes are assumed to be black shapes
  * against a white background, allowing for thresholding to be used.  Subpixel refinement is done using the
@@ -70,14 +75,14 @@ import java.util.List;
  *
  * @author Peter Abeles
  */
-public class DetectPolygonFromContour<T extends ImageGray<T>> {
+public class DetectPolygonFromContour<T extends ImageGray<T>> implements VerbosePrint {
 
 	// minimum size of a shape's contour as a fraction of the image width
 	private ConfigLength minimumContourConfig;
 	private int minimumContour;
 	private double minimumArea; // computed from minimumContour
 
-	private BinaryContourFinder contourFinder;
+	@Getter private BinaryContourFinder contourFinder;
 	private BinaryContourInterface.Padded contourPadded;
 	int imageWidth, imageHeight; // input image shape
 
@@ -88,8 +93,8 @@ public class DetectPolygonFromContour<T extends ImageGray<T>> {
 	// Used to prune false positives
 	private ContourEdgeIntensity<T> contourEdgeIntensity;
 
-	// extera information for found shapes
-	DogArray<Info> foundInfo = new DogArray<>(Info::new);
+	/** extra information for found shapes */
+	@Getter DogArray<Info> foundInfo = new DogArray<>(Info::new);
 
 	// true if points touching the border are NOT pruned
 	private boolean canTouchBorder;
@@ -98,26 +103,29 @@ public class DetectPolygonFromContour<T extends ImageGray<T>> {
 	private Polygon2D_F64 polygonWork = new Polygon2D_F64(); // undistorted pixel coordinate
 	private Polygon2D_F64 polygonDistorted = new Polygon2D_F64(); // distorted pixel coordinates;
 
-	// should the order of the polygon be on clockwise order on output?
-	private boolean outputClockwise;
+	/**
+	 * <p>Is the polygon sorted in clockwise direction?</p>
+	 * WARNING: This is clockwise with +y up and not the standard
+	 * +y down found in computer vision. This is because a general purpose geometry library is used and it
+	 * caused more errors to swap between the two standards.
+	 */
+	@Getter @Setter private boolean outputClockwiseUpY;
 
-	// transforms which can be used to handle lens distortion
-	protected PixelTransform<Point2D_F32> distToUndist, undistToDist;
+	/** transforms which can be used to handle lens distortion */
+	@Getter protected PixelTransform<Point2D_F32> distToUndist, undistToDist;
 	protected Point2D_F32 distortedPoint = new Point2D_F32();
 
-	private boolean verbose = false;
+	/** How intense the edge along a contour needs to be for it to be processed */
+	@Getter @Setter double contourEdgeThreshold;
 
-	// How intense the edge along a contour needs to be for it to be processed
-	double contourEdgeThreshold;
-
-	// helper used to customize low level behaviors internally
-	private PolygonHelper helper;
+	/** helper used to customize low level behaviors internally */
+	@Setter private PolygonHelper helper;
 
 	// storage space for contour in undistorted pixels
 	private DogArray<Point2D_I32> undistorted = new DogArray<>(Point2D_I32::new);
 
-	// type of input gray scale image it can process
-	private Class<T> inputType;
+	/** type of input gray scale image it can process */
+	@Getter private Class<T> inputType;
 
 	// indicates which corners touch the border
 	private DogArray_B borderCorners = new DogArray_B();
@@ -130,19 +138,22 @@ public class DetectPolygonFromContour<T extends ImageGray<T>> {
 	MovingAverage milliContour = new MovingAverage(0.8);
 	MovingAverage milliShapes = new MovingAverage(0.8);
 
+	// If not null then it will print verbose messages to this stream
+	PrintStream verbose = null;
+
 	/**
 	 * Configures the detector.
 	 *
 	 * @param contourToPolyline Fits a crude polygon to the shape's binary contour
 	 * @param minimumContour Minimum allowed length of a contour.  Copy stored internally. Try 50 pixels.
-	 * @param outputClockwise If true then the order of the output polygons will be in clockwise order
+	 * @param outputClockwiseUpY If true then the order of the output polygons will be in clockwise order
 	 * @param touchBorder if true then shapes which touch the image border are allowed
 	 * @param contourEdgeThreshold Polygons with an edge intensity less than this are discarded.
 	 * @param inputType Type of input image it's processing
 	 */
 	public DetectPolygonFromContour( PointsToPolyline contourToPolyline,
 									 ConfigLength minimumContour,
-									 boolean outputClockwise,
+									 boolean outputClockwiseUpY,
 									 boolean touchBorder,
 									 double contourEdgeThreshold,
 									 double tangentEdgeIntensity,
@@ -151,7 +162,7 @@ public class DetectPolygonFromContour<T extends ImageGray<T>> {
 
 		this.minimumContourConfig = minimumContour.copy(); // local copy so that external can be modified
 		this.contourToPolyline = contourToPolyline;
-		this.outputClockwise = outputClockwise;
+		this.outputClockwiseUpY = outputClockwiseUpY;
 		this.canTouchBorder = touchBorder;
 		this.contourEdgeThreshold = contourEdgeThreshold;
 		this.contourFinder = contourFinder;
@@ -211,7 +222,7 @@ public class DetectPolygonFromContour<T extends ImageGray<T>> {
 	 * @param gray Input image
 	 */
 	public void process( T gray, GrayU8 binary ) {
-		if (verbose) System.out.println("ENTER  DetectPolygonFromContour.process()");
+		if (verbose != null) verbose.println("ENTER  DetectPolygonFromContour.process()");
 
 		if (contourPadded != null && !contourPadded.isCreatePaddedCopy()) {
 			int padding = 2;
@@ -253,7 +264,7 @@ public class DetectPolygonFromContour<T extends ImageGray<T>> {
 		milliContour.update(a);
 		milliShapes.update(b);
 
-		if (verbose) System.out.println("EXIT  DetectPolygonFromContour.process()");
+		if (verbose != null) verbose.println("EXIT  DetectPolygonFromContour.process()");
 	}
 
 	/**
@@ -298,7 +309,7 @@ public class DetectPolygonFromContour<T extends ImageGray<T>> {
 				// ignore shapes which touch the image border
 				boolean touchesBorder = touchesBorder(contourTmp.toList());
 				if (!canTouchBorder && touchesBorder) {
-					if (verbose) System.out.println("rejected polygon, touched border");
+					if (verbose != null) verbose.println("rejected polygon, touched border");
 					continue;
 				}
 
@@ -314,7 +325,7 @@ public class DetectPolygonFromContour<T extends ImageGray<T>> {
 
 					// take the ABS because CCW/CW isn't known yet
 					if (Math.abs(edgeOutside - edgeInside) < contourEdgeThreshold) {
-						if (verbose) System.out.println("rejected polygon. contour edge intensity");
+						if (verbose != null) verbose.println("rejected polygon. contour edge intensity");
 						continue;
 					}
 				}
@@ -337,8 +348,8 @@ public class DetectPolygonFromContour<T extends ImageGray<T>> {
 
 				// Find the initial approximate fit of a polygon to the contour
 				if (!contourToPolyline.process(undistorted, splits)) {
-					if (verbose)
-						System.out.println("rejected polygon initial fit failed. contour size = " + contourTmp.size());
+					if (verbose != null)
+						verbose.println("rejected polygon initial fit failed. contour size = " + contourTmp.size());
 					continue;
 				}
 
@@ -348,6 +359,7 @@ public class DetectPolygonFromContour<T extends ImageGray<T>> {
 					polygonPixel.add(undistorted.get(splits.get(j)));
 				}
 
+				// Note the CCW here uses a standard geometric coordinate system with +y up, not +y down
 				boolean isCCW = UtilPolygons2D_I32.isCCW(polygonPixel);
 
 				// Now that the orientation is known it can check to see if it's actually trying to fit to a
@@ -361,13 +373,13 @@ public class DetectPolygonFromContour<T extends ImageGray<T>> {
 					}
 
 					if (edgeInside > edgeOutside) {
-						if (verbose) System.out.println("White blob. Rejected");
+						if (verbose != null) verbose.println("White blob. Rejected");
 						continue;
 					}
 				}
 
 				// see if it should be flipped so that the polygon has the correct orientation
-				if (outputClockwise == isCCW) {
+				if (outputClockwiseUpY == isCCW) {
 					flip(splits.data, splits.size);
 				}
 
@@ -389,7 +401,7 @@ public class DetectPolygonFromContour<T extends ImageGray<T>> {
 
 				if (helper != null) {
 					if (!helper.filterPixelPolygon(polygonWork, polygonDistorted, borderCorners, touchesBorder)) {
-						if (verbose) System.out.println("rejected by helper.filterPixelPolygon()");
+						if (verbose != null) verbose.println("rejected by helper.filterPixelPolygon()");
 						continue;
 					}
 				}
@@ -398,7 +410,7 @@ public class DetectPolygonFromContour<T extends ImageGray<T>> {
 				double area = Area2D_F64.polygonSimple(polygonWork);
 
 				if (area < minimumArea) {
-					if (verbose) System.out.println("Rejected area");
+					if (verbose != null) verbose.println("Rejected area");
 					continue;
 				}
 
@@ -533,8 +545,8 @@ public class DetectPolygonFromContour<T extends ImageGray<T>> {
 		return false;
 	}
 
-	public void setHelper( PolygonHelper helper ) {
-		this.helper = helper;
+	@Override public void setVerbose( @Nullable PrintStream out, @Nullable Set<String> options ) {
+		this.verbose = out;
 	}
 
 	public boolean isConvex() {
@@ -545,15 +557,7 @@ public class DetectPolygonFromContour<T extends ImageGray<T>> {
 		contourToPolyline.setConvex(convex);
 	}
 
-	public boolean isOutputClockwise() {
-		return outputClockwise;
-	}
-
 	public List<ContourPacked> getAllContours() {return contourFinder.getContours();}
-
-	public Class<T> getInputType() {
-		return inputType;
-	}
 
 	public void setNumberOfSides( int min, int max ) {
 		if (min < 3)
@@ -571,41 +575,6 @@ public class DetectPolygonFromContour<T extends ImageGray<T>> {
 
 	public int getMaximumSides() {
 		return contourToPolyline.getMaximumSides();
-	}
-
-	public void setOutputClockwise( boolean outputClockwise ) {
-		this.outputClockwise = outputClockwise;
-	}
-
-	public void setVerbose( boolean verbose ) {
-		this.verbose = verbose;
-	}
-
-	public double getContourEdgeThreshold() {
-		return contourEdgeThreshold;
-	}
-
-	public void setContourEdgeThreshold( double contourEdgeThreshold ) {
-		this.contourEdgeThreshold = contourEdgeThreshold;
-	}
-
-	public PixelTransform<Point2D_F32> getDistToUndist() {
-		return distToUndist;
-	}
-
-	public PixelTransform<Point2D_F32> getUndistToDist() {
-		return undistToDist;
-	}
-
-	/**
-	 * Returns additional information on the polygon
-	 */
-	public DogArray<Info> getFound() {
-		return foundInfo;
-	}
-
-	public BinaryContourFinder getContourFinder() {
-		return contourFinder;
 	}
 
 	public double getMilliContour() {

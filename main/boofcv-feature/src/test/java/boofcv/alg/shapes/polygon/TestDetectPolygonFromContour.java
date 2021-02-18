@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -43,15 +43,15 @@ import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 import java.util.List;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.*;
 
 /**
  * @author Peter Abeles
  */
+@SuppressWarnings({"rawtypes", "unchecked"})
 public class TestDetectPolygonFromContour extends CommonFitPolygonChecks {
-	
-	GrayU8 binary = new GrayU8(1,1);
+
+	GrayU8 binary = new GrayU8(1, 1);
 
 	InputToBinary<GrayU8> inputToBinary_U8 = FactoryThresholdBinary.globalFixed(100, true, GrayU8.class);
 
@@ -64,270 +64,259 @@ public class TestDetectPolygonFromContour extends CommonFitPolygonChecks {
 	 * is actually the affine transform instead of lens distortion.  It should find the original
 	 * rectangles.
 	 */
-	@Test
-	public void usingSetLensDistortion() {
-		rectangles.add(new Rectangle2D_I32(30,30,60,60));
-		rectangles.add(new Rectangle2D_I32(90,30,120,60));
-		rectangles.add(new Rectangle2D_I32(30,90,60,120));
-		rectangles.add(new Rectangle2D_I32(90,90,120,120));
+	@Test void usingSetLensDistortion() {
+		rectangles.add(new Rectangle2D_I32(30, 30, 60, 60));
+		rectangles.add(new Rectangle2D_I32(90, 30, 120, 60));
+		rectangles.add(new Rectangle2D_I32(30, 90, 60, 120));
+		rectangles.add(new Rectangle2D_I32(90, 90, 120, 120));
 
 		transform.setTo(0.8, 0, 0, 0.8, 1, 2);
 		transform = transform.invert(null);
 
-		for( Class imageType : imageTypes ) {
+		for (Class imageType : imageTypes) {
 			checkDetected_LensDistortion(imageType, 0.5);
 		}
 	}
 
-	private void checkDetected_LensDistortion(Class imageType, double tol) {
-		renderDistortedRectangles(true,imageType);
+	private void checkDetected_LensDistortion( Class imageType, double tol ) {
+		renderDistortedRectangles(true, imageType);
 
 		Affine2D_F32 a = new Affine2D_F32();
-		UtilAffine.convert(transform,a);
+		UtilAffine.convert(transform, a);
 		PixelTransform<Point2D_F32> tranFrom = new PixelTransformAffine_F32(a);
 		PixelTransform<Point2D_F32> tranTo = new PixelTransformAffine_F32(a.invert(null));
 
 		int numberOfSides = 4;
-		DetectPolygonFromContour alg = createDetector(imageType, numberOfSides,numberOfSides);
+		DetectPolygonFromContour alg = createDetector(imageType, numberOfSides, numberOfSides);
 		alg.setLensDistortion(image.width, image.height, tranTo, tranFrom);
 		alg.process(image, binary);
 
-		DogArray<DetectPolygonFromContour.Info> found = alg.getFound();
-
-		assertEquals(rectangles.size(),found.size);
-
-		for (int i = 0; i < found.size; i++) {
-			Polygon2D_F64 p = found.get(i).polygon;
-			assertEquals(1, findMatchesOriginal(p, tol));
-			assertEquals(black,found.get(i).edgeInside,3);
-			assertEquals(white,found.get(i).edgeOutside,white*0.05);
-		}
-	}
-
-	@Test
-	public void easyTestNoDistortion() {
-		rectangles.add(new Rectangle2D_I32(30,30,60,60));
-		rectangles.add(new Rectangle2D_I32(90,30,120,60));
-		rectangles.add(new Rectangle2D_I32(30,90,60,120));
-		rectangles.add(new Rectangle2D_I32(90,90,120,120));
-
-		for( Class imageType : imageTypes ) {
-			checkDetected(imageType,0.01); // the match should be perfect since the size of the
-		}
-	}
-
-	@Test
-	public void someAffineDistortion() {
-		rectangles.add(new Rectangle2D_I32(30,30,60,60));
-		rectangles.add(new Rectangle2D_I32(90,30,120,60));
-		rectangles.add(new Rectangle2D_I32(30,90,60,120));
-		rectangles.add(new Rectangle2D_I32(90,90,120,120));
-
-		transform.setTo(1.1, 0.2, 0.12, 1.3, 10.2, 20.3);
-
-		for( Class imageType : imageTypes ) {
-			checkDetected(imageType,1.0);
-		}
-	}
-
-	private void checkDetected(Class imageType, double tol ) {
-		renderDistortedRectangles(true,imageType);
-
-		int numberOfSides = 4;
-		DetectPolygonFromContour alg = createDetector(imageType, numberOfSides,numberOfSides);
-		alg.process(image, binary);
-
-		DogArray<DetectPolygonFromContour.Info> found = alg.getFound();
+		DogArray<DetectPolygonFromContour.Info> found = alg.getFoundInfo();
 
 		assertEquals(rectangles.size(), found.size);
 
 		for (int i = 0; i < found.size; i++) {
 			Polygon2D_F64 p = found.get(i).polygon;
-			assertEquals(1,findMatches(p,tol));
-
-			assertEquals(black,found.get(i).edgeInside,4);
-			assertEquals(white,found.get(i).edgeOutside,white*0.1);
+			assertEquals(1, findMatchesOriginal(p, tol));
+			assertEquals(black, found.get(i).edgeInside, 3);
+			assertEquals(white, found.get(i).edgeOutside, white*0.05);
 		}
 	}
 
-	@Test
-	public void easyTestMultipleShapes() {
+	@Test void easyTestNoDistortion() {
+		rectangles.add(new Rectangle2D_I32(30, 30, 60, 60));
+		rectangles.add(new Rectangle2D_I32(90, 30, 120, 60));
+		rectangles.add(new Rectangle2D_I32(30, 90, 60, 120));
+		rectangles.add(new Rectangle2D_I32(90, 90, 120, 120));
+
+		for (Class imageType : imageTypes) {
+			checkDetected(imageType, 0.01); // the match should be perfect since the size of the
+		}
+	}
+
+	@Test void someAffineDistortion() {
+		rectangles.add(new Rectangle2D_I32(30, 30, 60, 60));
+		rectangles.add(new Rectangle2D_I32(90, 30, 120, 60));
+		rectangles.add(new Rectangle2D_I32(30, 90, 60, 120));
+		rectangles.add(new Rectangle2D_I32(90, 90, 120, 120));
+
+		transform.setTo(1.1, 0.2, 0.12, 1.3, 10.2, 20.3);
+
+		for (Class imageType : imageTypes) {
+			checkDetected(imageType, 1.0);
+		}
+	}
+
+	private void checkDetected( Class imageType, double tol ) {
+		renderDistortedRectangles(true, imageType);
+
+		int numberOfSides = 4;
+		DetectPolygonFromContour alg = createDetector(imageType, numberOfSides, numberOfSides);
+		alg.process(image, binary);
+
+		DogArray<DetectPolygonFromContour.Info> found = alg.getFoundInfo();
+
+		assertEquals(rectangles.size(), found.size);
+
+		for (int i = 0; i < found.size; i++) {
+			Polygon2D_F64 p = found.get(i).polygon;
+			assertEquals(1, findMatches(p, tol));
+
+			assertEquals(black, found.get(i).edgeInside, 4);
+			assertEquals(white, found.get(i).edgeOutside, white*0.1);
+		}
+	}
+
+	@Test void easyTestMultipleShapes() {
 
 		List<Polygon2D_F64> polygons = new ArrayList<>();
 		polygons.add(new Polygon2D_F64(20, 20, 40, 50, 80, 20));
-		polygons.add(new Polygon2D_F64(20, 60, 20, 90, 40, 90,40, 60));
+		polygons.add(new Polygon2D_F64(20, 60, 20, 90, 40, 90, 40, 60));
 
-		for( Class imageType : imageTypes ) {
-			checkDetectedMulti(imageType, polygons,2.5);
+		for (Class imageType : imageTypes) {
+			checkDetectedMulti(imageType, polygons, 2.5);
 		}
 	}
 
-	private void checkDetectedMulti(Class imageType,List<Polygon2D_F64> polygons,  double tol ) {
-		renderPolygons(polygons,imageType);
+	private void checkDetectedMulti( Class imageType, List<Polygon2D_F64> polygons, double tol ) {
+		renderPolygons(polygons, imageType);
 
-		DetectPolygonFromContour alg = createDetector(imageType, 3,4);
+		DetectPolygonFromContour alg = createDetector(imageType, 3, 4);
 		alg.process(image, binary);
 
-		DogArray<DetectPolygonFromContour.Info> found = alg.getFound();
+		DogArray<DetectPolygonFromContour.Info> found = alg.getFoundInfo();
 
 		assertEquals(polygons.size(), found.size);
 
 		for (int i = 0; i < found.size; i++) {
 			Polygon2D_F64 p = found.get(i).polygon;
-			assertEquals(1,findMatches(p,tol));
+			assertEquals(1, findMatches(p, tol));
 		}
 	}
 
-	private <T extends ImageGray<T>> DetectPolygonFromContour<T> createDetector(Class<T> imageType, int minSides, int maxSides) {
-		ConfigPolygonFromContour config = new ConfigPolygonFromContour(minSides,maxSides);
+	private <T extends ImageGray<T>> DetectPolygonFromContour<T> createDetector( Class<T> imageType, int minSides, int maxSides ) {
+		ConfigPolygonFromContour config = new ConfigPolygonFromContour(minSides, maxSides);
 
-		return FactoryShapeDetector.polygonContour(config,imageType);
+		return FactoryShapeDetector.polygonContour(config, imageType);
 	}
-
 
 	@Override
 	public void renderPolygons( List<Polygon2D_F64> polygons, Class imageType ) {
-		super.renderPolygons(polygons,imageType);
+		super.renderPolygons(polygons, imageType);
 		InputToBinary inputToBinary = FactoryThresholdBinary.globalFixed(100, true, imageType);
 
-		binary.reshape(width,height);
-		inputToBinary.process(image,binary);
+		binary.reshape(width, height);
+		inputToBinary.process(image, binary);
 	}
 
 	@Override
 	public void renderDistortedRectangles( boolean black, Class imageType ) {
-		super.renderDistortedRectangles(black,imageType);
+		super.renderDistortedRectangles(black, imageType);
 		InputToBinary inputToBinary = FactoryThresholdBinary.globalFixed(100, true, imageType);
 
-		binary.reshape(width,height);
+		binary.reshape(width, height);
 
-		inputToBinary.process(image,binary);
+		inputToBinary.process(image, binary);
 	}
 
-	@Test
-	public void rejectShapes_circle() {
-		BufferedImage work = new BufferedImage(200,220,BufferedImage.TYPE_INT_RGB);
+	@Test void rejectShapes_circle() {
+		BufferedImage work = new BufferedImage(200, 220, BufferedImage.TYPE_INT_RGB);
 		Graphics2D g2 = work.createGraphics();
 		g2.setColor(Color.WHITE);
-		g2.fillRect(0,0,200,220);
+		g2.fillRect(0, 0, 200, 220);
 		g2.setColor(Color.BLACK);
 		g2.fillOval(30, 30, 90, 100);
 
-		GrayU8 gray = ConvertBufferedImage.convertFrom(work,(GrayU8)null);
-		binary.reshape(gray.width,gray.height);
-		inputToBinary_U8.process(gray,binary);
+		GrayU8 gray = ConvertBufferedImage.convertFrom(work, (GrayU8)null);
+		binary.reshape(gray.width, gray.height);
+		inputToBinary_U8.process(gray, binary);
 
 		for (int i = 3; i <= 6; i++) {
-			DetectPolygonFromContour alg = createDetector(GrayU8.class, i,i);
+			DetectPolygonFromContour alg = createDetector(GrayU8.class, i, i);
 
-			alg.process(gray,binary);
-			assertEquals(0,alg.getFound().size());
+			alg.process(gray, binary);
+			assertEquals(0, alg.getFoundInfo().size());
 		}
 	}
 
-	@Test
-	public void rejectShapes_triangle() {
-		BufferedImage work = new BufferedImage(200,220,BufferedImage.TYPE_INT_RGB);
+	@Test void rejectShapes_triangle() {
+		BufferedImage work = new BufferedImage(200, 220, BufferedImage.TYPE_INT_RGB);
 		Graphics2D g2 = work.createGraphics();
 		g2.setColor(Color.WHITE);
-		g2.fillRect(0,0,200,220);
+		g2.fillRect(0, 0, 200, 220);
 		g2.setColor(Color.BLACK);
 		g2.fillPolygon(new int[]{10, 50, 30}, new int[]{10, 10, 40}, 3);
 
-		GrayU8 gray = ConvertBufferedImage.convertFrom(work,(GrayU8)null);
-		binary.reshape(gray.width,gray.height);
-		inputToBinary_U8.process(gray,binary);
+		GrayU8 gray = ConvertBufferedImage.convertFrom(work, (GrayU8)null);
+		binary.reshape(gray.width, gray.height);
+		inputToBinary_U8.process(gray, binary);
 
 		for (int i = 3; i <= 6; i++) {
 			DetectPolygonFromContour<GrayU8> alg = createDetector(GrayU8.class, i, i);
 
-			alg.process(gray,binary);
-			if( i == 3 ) {
-				assertEquals(1, alg.getFound().size());
-				Polygon2D_F64 found = alg.getFound().get(0).polygon;
+			alg.process(gray, binary);
+			if (i == 3) {
+				assertEquals(1, alg.getFoundInfo().size());
+				Polygon2D_F64 found = alg.getFoundInfo().get(0).polygon;
 				checkPolygon(new double[]{10, 10, 30, 40, 50, 10}, found);
 			} else
-				assertEquals(0,alg.getFound().size());
+				assertEquals(0, alg.getFoundInfo().size());
 		}
 	}
 
 	/**
 	 * Configure the detector to reject concave shapes
 	 */
-	@Test
-	public void rejectShapes_concave() {
+	@Test void rejectShapes_concave() {
 		List<Polygon2D_F64> polygons = new ArrayList<>();
-		polygons.add(new Polygon2D_F64(20,20, 80,20, 80,80, 40,40, 20,80));
+		polygons.add(new Polygon2D_F64(20, 20, 80, 20, 80, 80, 40, 40, 20, 80));
 
-		for( Class imageType : imageTypes ) {
+		for (Class imageType : imageTypes) {
 			renderPolygons(polygons, imageType);
 
-			DetectPolygonFromContour alg = createDetector(imageType, 5,5);
+			DetectPolygonFromContour alg = createDetector(imageType, 5, 5);
 
-			alg.process(image,binary);
+			alg.process(image, binary);
 
-			assertEquals(0,alg.getFound().size());
+			assertEquals(0, alg.getFoundInfo().size());
 		}
 	}
 
 	/**
 	 * Make sure it rejects shapes with low contract
 	 */
-	@Test
-	public void rejectLowContract() {
-		rectangles.add(new Rectangle2D_I32(30,30,60,60));
-		black = white-2;
+	@Test void rejectLowContract() {
+		rectangles.add(new Rectangle2D_I32(30, 30, 60, 60));
+		black = white - 2;
 
-		for( Class imageType : imageTypes ) {
-			renderDistortedRectangles(true,imageType);
+		for (Class imageType : imageTypes) {
+			renderDistortedRectangles(true, imageType);
 
 			DetectPolygonFromContour alg = createDetector(imageType, 3, 5);
 			alg.process(image, binary);
 
-			assertEquals(0, alg.getFound().size);
+			assertEquals(0, alg.getFoundInfo().size);
 		}
 	}
 
 	/**
 	 * Give it an easy to detect concave shape
 	 */
-	@Test
-	public void detect_concave() {
+	@Test void detect_concave() {
 		List<Polygon2D_F64> polygons = new ArrayList<>();
 		Polygon2D_F64 expected = new Polygon2D_F64(20, 20, 20, 80, 40, 40, 80, 80, 80, 20);
 		polygons.add(expected);
 
-		for( Class imageType : imageTypes ) {
-			renderPolygons(polygons,imageType );
+		for (Class imageType : imageTypes) {
+			renderPolygons(polygons, imageType);
 
-			DetectPolygonFromContour alg = createDetector(imageType, 5,5);
+			DetectPolygonFromContour alg = createDetector(imageType, 5, 5);
 			alg.setConvex(false);
 
 			alg.process(image, binary);
 
-			assertEquals(1, alg.getFound().size());
+			assertEquals(1, alg.getFoundInfo().size());
 
-			Polygon2D_F64 found = ((DetectPolygonFromContour.Info)alg.getFound().get(0)).polygon;
-			assertEquals(1, findMatches(found,3));
+			Polygon2D_F64 found = ((DetectPolygonFromContour.Info)alg.getFoundInfo().get(0)).polygon;
+			assertEquals(1, findMatches(found, 3));
 		}
 	}
 
-	@Test
-	public void touchesBorder_false() {
+	@Test void touchesBorder_false() {
 		List<Point2D_I32> contour = new ArrayList<>();
 
-		DetectPolygonFromContour alg = createDetector(GrayU8.class, 4,4);
+		DetectPolygonFromContour alg = createDetector(GrayU8.class, 4, 4);
 		alg.imageWidth = 20;
 		alg.imageHeight = 30;
 		assertFalse(alg.touchesBorder(contour));
 
-		contour.add(new Point2D_I32(10,1));
+		contour.add(new Point2D_I32(10, 1));
 		assertFalse(alg.touchesBorder(contour));
-		contour.add(new Point2D_I32(10,28));
+		contour.add(new Point2D_I32(10, 28));
 		assertFalse(alg.touchesBorder(contour));
-		contour.add(new Point2D_I32(1,15));
+		contour.add(new Point2D_I32(1, 15));
 		assertFalse(alg.touchesBorder(contour));
-		contour.add(new Point2D_I32(18,15));
+		contour.add(new Point2D_I32(18, 15));
 		assertFalse(alg.touchesBorder(contour));
 	}
 
@@ -335,41 +324,39 @@ public class TestDetectPolygonFromContour extends CommonFitPolygonChecks {
 	 * When an adaptive threshold is used, the area around a bright light gets marked as "dark" then when
 	 * the polygon is fit to it it can snap around the white object
 	 */
-	@Test
-	public void doNotSnapToBrightObject() {
-		GrayU8 gray = new GrayU8(200,200);
-		GrayU8 binary = new GrayU8(200,200);
+	@Test void doNotSnapToBrightObject() {
+		GrayU8 gray = new GrayU8(200, 200);
+		GrayU8 binary = new GrayU8(200, 200);
 
-		ImageMiscOps.fillRectangle(gray,white,40,40,40,40);
-		ImageMiscOps.fillRectangle(binary,1,38,38,44,44);
-		ImageMiscOps.fillRectangle(binary,0,40,40,40,40);
+		ImageMiscOps.fillRectangle(gray, white, 40, 40, 40, 40);
+		ImageMiscOps.fillRectangle(binary, 1, 38, 38, 44, 44);
+		ImageMiscOps.fillRectangle(binary, 0, 40, 40, 40, 40);
 
-		DetectPolygonFromContour<GrayU8> alg = createDetector(GrayU8.class, 4,4);
+		DetectPolygonFromContour<GrayU8> alg = createDetector(GrayU8.class, 4, 4);
 
 		// edge threshold test will only fail now if the sign is reversed
 		alg.contourEdgeThreshold = 0;
 
-		alg.process(gray,binary);
+		alg.process(gray, binary);
 
-		assertEquals(0,alg.getFound().size);
+		assertEquals(0, alg.getFoundInfo().size);
 	}
 
-	@Test
-	public void determineCornersOnBorder() {
-		DetectPolygonFromContour alg = createDetector(GrayU8.class, 4,4);
+	@Test void determineCornersOnBorder() {
+		DetectPolygonFromContour alg = createDetector(GrayU8.class, 4, 4);
 		alg.imageWidth = width;
 		alg.imageHeight = height;
 
-		Polygon2D_F64 poly = new Polygon2D_F64(0,0, 10,0, 10,10, 0,10);
+		Polygon2D_F64 poly = new Polygon2D_F64(0, 0, 10, 0, 10, 10, 0, 10);
 
 		DogArray_B corners = new DogArray_B();
-		alg.determineCornersOnBorder(poly,corners);
+		alg.determineCornersOnBorder(poly, corners);
 
-		assertEquals(4,corners.size());
+		assertEquals(4, corners.size());
 
-		assertEquals(true,corners.get(0));
-		assertEquals(true,corners.get(1));
-		assertEquals(false,corners.get(2));
-		assertEquals(true,corners.get(3));
+		assertTrue(corners.get(0));
+		assertTrue(corners.get(1));
+		assertFalse(corners.get(2));
+		assertTrue(corners.get(3));
 	}
 }

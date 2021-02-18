@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -88,7 +88,7 @@ public class DetectChessboardSquarePoints<T extends ImageGray<T>> {
 		if (detectorSquare != null) { // null in some unit tests for simplicity
 			// configure the detector
 			detectorSquare.setHelper(new ChessboardPolygonHelper<>());
-			detectorSquare.getDetector().setOutputClockwise(true);
+			detectorSquare.getDetector().setOutputClockwiseUpY(true);
 			detectorSquare.getDetector().setConvex(true);
 //			detectorSquare.getDetector().setNumberOfSides(3,8);  <--- this is handled by the helper
 			this.detectorSquare.setFunctionAdjust(( info, clockwise ) ->
