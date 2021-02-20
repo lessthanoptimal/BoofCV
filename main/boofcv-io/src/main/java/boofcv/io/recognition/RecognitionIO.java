@@ -399,7 +399,10 @@ public class RecognitionIO {
 				keys.resize(leaf.images.size());
 				for (int i = 0; i < leaf.images.size; i++) {
 					RecognitionVocabularyTreeNister2006.ImageWord w = leaf.images.get(i);
-					dout.writeFloat(w.weight);
+					dout.writeInt(w.weights.size);
+					for (int weightIdx = 0; weightIdx < w.weights.size; weightIdx++) {
+						dout.writeFloat(w.weights.get(weightIdx));
+					}
 					dout.writeInt(id_to_idx.get(w.image.identification));
 				}
 			}
@@ -464,9 +467,12 @@ public class RecognitionIO {
 				db.tree.invertedFile.add(leaf);
 				int N = input.readInt();
 				for (int i = 0; i < N; i++) {
-					float weight = input.readFloat();
-					int imageIndex = input.readInt();
-					leaf.images.grow().setTo(weight, imagesDB.get(imageIndex));
+					RecognitionVocabularyTreeNister2006.ImageWord word = leaf.images.grow();
+					word.weights.resize(input.readInt());
+					for (int weightIdx = 0; weightIdx < word.weights.size; weightIdx++) {
+						word.weights.set(weightIdx, input.readFloat());
+					}
+					word.image = imagesDB.get(input.readInt());
 				}
 			}
 

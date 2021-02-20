@@ -33,6 +33,7 @@ import gnu.trove.set.hash.TIntHashSet;
 import lombok.Getter;
 import lombok.Setter;
 import org.ddogleg.struct.DogArray;
+import org.ddogleg.struct.DogArray_F32;
 import org.ddogleg.struct.DogArray_I32;
 
 import java.util.Collections;
@@ -89,8 +90,7 @@ public class RecognitionVocabularyTreeNister2006<Point> {
 	protected final TIntSet commonKeys = new TIntHashSet();
 
 	// For lookup
-	TIntSet candidates = new TIntHashSet();
-	TIntIntMap identication_to_match = new TIntIntHashMap();
+	TIntIntMap identification_to_match = new TIntIntHashMap();
 
 	LeafHistogram leafHistogram = new LeafHistogram();
 
@@ -144,13 +144,20 @@ public class RecognitionVocabularyTreeNister2006<Point> {
 		// Add this image to all the leaves it encountered
 		for (int histIdx = 0; histIdx < leafHistogram.leaves.size; histIdx++) {
 			LeafCounts counts = leafHistogram.leaves.get(histIdx);
-			Node leafNode = tree.nodes.get(counts.nodeIdx);
-			LeafData leafData = (LeafData)tree.invertedFile.get(leafNode.invertedIdx);
+			Node node = tree.nodes.get(counts.nodeIdx);
+			LeafData leafData = (LeafData)tree.invertedFile.get(node.invertedIdx);
 
 			// Add to inverted file at this node and note what the descriptor weight was for later rapid retrieval
 			ImageWord word = leafData.images.grow();
 			word.image = info;
-			word.weight = info.descTermFreq.get(counts.nodeIdx);
+			word.weights.reserve(tree.maximumLevel);
+			word.weights.add(info.descTermFreq.get(node.index));
+
+			// Add the weights for all the parents now too. Intentionally don't add the root node with all points.
+			while (node.parent>0) {
+				node = tree.nodes.get(node.parent);
+				word.weights.add(info.descTermFreq.get(node.index));
+			}
 		}
 
 		// For each node which is in the descriptor, increment its image count
@@ -169,8 +176,7 @@ public class RecognitionVocabularyTreeNister2006<Point> {
 	 * @return The best matching image with score from the database
 	 */
 	public boolean lookup( List<Point> imageFeatures ) {
-		candidates.clear();
-		identication_to_match.clear();
+		identification_to_match.clear();
 		matchScores.reset();
 
 		// Can't match to anything if it's empty
@@ -185,35 +191,53 @@ public class RecognitionVocabularyTreeNister2006<Point> {
 		// Create a list of images in the DB that have at least a single feature pass through a node
 		for (int histIdx = 0; histIdx < leafHistogram.leaves.size; histIdx++) {
 			LeafCounts count = leafHistogram.leaves.get(histIdx);
-			HierarchicalVocabularyTree.Node leafNode = tree.nodes.get(count.nodeIdx);
-
-			// Every leaf should have a matching word in the image being looked up
-			float imageWordWeight = targetImageDescTermFreq.get(count.nodeIdx);
+			HierarchicalVocabularyTree.Node node = tree.nodes.get(count.nodeIdx);
 
 			// Find the database images by looking at the inverted file for this particular node/work
-			LeafData leafData = (LeafData)tree.invertedFile.get(leafNode.invertedIdx);
+			LeafData leafData = (LeafData)tree.invertedFile.get(node.invertedIdx);
 
-			// Add each image in this leaf, but be careful to only add each image once
-			for (int i = 0; i < leafData.images.size(); i++) {
-				ImageWord w = leafData.images.get(i);
-				int identification = w.image.identification;
-				Match m;
-				if (!identication_to_match.containsKey(identification)) {
-					identication_to_match.put(identification, matchScores.size);
-					m = matchScores.grow();
-					m.image = w.image;
-				} else {
-					m = matchScores.get(identication_to_match.get(identification));
+			// distance from leaf along the graph
+			int graphDistance = 0;
+
+			while (true) {
+				// if it's at the root stop
+				if (node.index<=0)
+					break;
+
+				// Look up the value of this word in the descriptor for the target
+				float imageWordWeight = targetImageDescTermFreq.get(node.index);
+
+				// Go through each leaf and compute the error for all related nodes
+				for (int i = 0; i < leafData.images.size(); i++) {
+					// Get the list of images in the database which have this particular word using
+					// the inverted file list
+					ImageWord w = leafData.images.get(i);
+
+					// The match stores how well this particular images matches the target as well as book keeping info
+					int identification = w.image.identification;
+					Match m;
+					if (!identification_to_match.containsKey(identification)) {
+						identification_to_match.put(identification, matchScores.size);
+						m = matchScores.grow();
+						m.image = w.image;
+					} else {
+						m = matchScores.get(identification_to_match.get(identification));
+						// If this node has already been examined skip it
+						if (m.traversed.contains(node.index))
+							continue;
+					}
+
+					// Mark this node as being traversed so that it isn't double counted
+					m.traversed.add(node.index);
+
+					// Update the score computation. See BLAH []
+					m.error += imageWordWeight*w.weights.get(graphDistance);
 				}
 
-				// Update the score computation
-				m.error += imageWordWeight*w.weight;
+				// move to the parent node
+				node = tree.nodes.get(node.parent);
+				graphDistance++;
 			}
-
-			// This won't pass unit tests until the part below is done
-			// TODO traverse up the tree and add in images see in parent nodes
-			// this will require traversing down to their leaves. Each parent needs to keep
-			// track of the number of images it has too so that if there are too many images the search will abort
 		}
 
 		if (matchScores.isEmpty())
@@ -468,10 +492,15 @@ public class RecognitionVocabularyTreeNister2006<Point> {
 		public float error;
 		/** Reference to the image in the data base that was matched */
 		public ImageInfo image;
+		/** Nodes in the tree that it has already traversed */
+		public final TIntSet traversed = new TIntHashSet();
+		public final DogArray_I32 foo = new DogArray_I32(0);
 
 		public void reset() {
 			error = 0;
 			image = null;
+			traversed.clear();
+			foo.reset();
 		}
 
 		@Override public int compareTo( Match o ) {
@@ -480,16 +509,18 @@ public class RecognitionVocabularyTreeNister2006<Point> {
 	}
 
 	public static class ImageWord {
-		public float weight;
+		// Contains the weight for the words in the descriptor starting the leaf and going up
+		public DogArray_F32 weights = new DogArray_F32(0);
+		// Which image this word belongs to
 		public ImageInfo image;
 
 		public void reset() {
 			image = null;
-			weight = -1f;
+			weights.reset();
 		}
 
-		public void setTo( float weight, ImageInfo image ) {
-			this.weight = weight;
+		public void setTo( DogArray_F32 weights, ImageInfo image ) {
+			this.weights.setTo(weights);
 			this.image = image;
 		}
 	}
