@@ -91,7 +91,7 @@ public class LearnHierarchicalTree<Point> implements VerbosePrint {
 		}
 
 		// first level is provided by points
-		listPoints.resize(tree.maximumLevel - 1);
+		listPoints.resize(tree.maximumLevel);
 		// each level has it's own k-means instance
 		listKMeans.resize(tree.maximumLevel);
 		listWeights.resize(tree.maximumLevel);
@@ -112,7 +112,7 @@ public class LearnHierarchicalTree<Point> implements VerbosePrint {
 							   HierarchicalVocabularyTree<Point> tree,
 							   int level, int parentNodeIdx ) {
 		// Stop here if we are at the maximum number of levels or it's already down to a single point
-		if (level >= tree.maximumLevel - 1 || pointsInParent.size() <= 1)
+		if (level >= tree.maximumLevel || pointsInParent.size() <= 1)
 			return;
 
 		// Get k-means for this level

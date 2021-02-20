@@ -109,6 +109,18 @@ class TestLearnHierarchicalTree extends BoofStandardJUnit {
 		assertEquals(121, tree.nodes.size);
 		assertEquals(120, tree.descriptions.size());
 		assertEquals(0, tree.invertedFile.size());
+
+		assertEquals( (int)Math.pow(tree.branchFactor, tree.maximumLevel), countLeaves(tree));
+	}
+
+	private static int countLeaves(HierarchicalVocabularyTree<?> tree) {
+		int total = 0;
+		for (int i = 0; i < tree.nodes.size; i++) {
+			HierarchicalVocabularyTree.Node n = tree.nodes.get(i);
+			if (n.isLeaf())
+				total++;
+		}
+		return total;
 	}
 
 	/**
