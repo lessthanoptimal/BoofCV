@@ -181,6 +181,18 @@ public class HierarchicalVocabularyTree<Point> {
 	}
 
 	/**
+	 * Finds the depth for a node. The depth is the number of hops away it is from the root node
+	 */
+	public int depthOfNode( Node n ) {
+		int depth = 0;
+		while (n.parent > 0) {
+			depth++;
+			n = nodes.get(n.parent);
+		}
+		return depth;
+	}
+
+	/**
 	 * Ensures it has a valid configuration
 	 */
 	public void checkConfig() {
@@ -224,7 +236,7 @@ public class HierarchicalVocabularyTree<Point> {
 		public int parent;
 		// Index in the inverted file list. -1 means there's no data there
 		public int invertedIdx;
-		// index of the first mean in the list of descriptions. Means in a set are consecutive.
+		// index of the first mean in the list of descriptions. Means with the same parent are consecutive
 		public int descIdx;
 		// index of the first child in the list of nodes. Children are consecutive.
 		// If at the last level then this will point to an index in leaves

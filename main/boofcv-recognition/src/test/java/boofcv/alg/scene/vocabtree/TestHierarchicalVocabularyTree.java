@@ -30,6 +30,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.fail;
 
 public class TestHierarchicalVocabularyTree extends BoofStandardJUnit {
 	@Test void searchPathToLeaf() {
@@ -86,6 +87,10 @@ public class TestHierarchicalVocabularyTree extends BoofStandardJUnit {
 		assertEquals(0.0, tree.descriptions.getTemp(found.get(3).descIdx).distance( 5,  0), UtilEjml.TEST_F64);
 		assertEquals(0.0, tree.descriptions.getTemp(found.get(4).descIdx).distance( 5, -1), UtilEjml.TEST_F64);
 		assertEquals(0.0, tree.descriptions.getTemp(found.get(5).descIdx).distance( 5,  1), UtilEjml.TEST_F64);
+	}
+
+	@Test void depthOfNode() {
+		fail("IMplement");
 	}
 
 	@Test void addData() {

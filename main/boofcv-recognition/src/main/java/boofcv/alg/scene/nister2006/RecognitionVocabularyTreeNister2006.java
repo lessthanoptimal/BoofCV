@@ -51,14 +51,19 @@ import java.util.List;
  * 2006 IEEE Computer Society Conference on Computer Vision and Pattern Recognition (CVPR'06). Vol. 2. Ieee, 2006.
  * </p>
  *
- * TODO remove concept of Data from tree? Just have a big array here and look up the data based on node id?
- *
  * @author Peter Abeles
  */
 public class RecognitionVocabularyTreeNister2006<Point> {
 
+	// TODO generalize normalization function
+	// TODO block nodes from scoring if inverted file is too long
+	// TODO more standard language. query, retrieve
+
 	/** Vocabulary Tree */
 	public @Getter HierarchicalVocabularyTree<Point> tree;
+
+	/** Nodes only contribute to the descriptor if they are at most this number of hops from a leaf */
+	public int maxDistanceFromLeaf = Integer.MAX_VALUE; // todo make configurable
 
 	/** List of images added to the database */
 	protected @Getter final DogArray<ImageInfo> imagesDB = new DogArray<>(ImageInfo::new, ImageInfo::reset);
@@ -84,7 +89,6 @@ public class RecognitionVocabularyTreeNister2006<Point> {
 	// Predeclare array for storing keys. Avoids unnecessary array creation
 	protected final DogArray_I32 keysDesc = new DogArray_I32(); // ONLY use in describe()
 	protected final DogArray_I32 keysDist = new DogArray_I32(); // ONLY use in distance functions.
-	protected final DogArray_I32 keysLookUp = new DogArray_I32(); // ONLY use in lookUp
 
 	// Set to store common non-zero key between two descriptors
 	protected final TIntSet commonKeys = new TIntHashSet();
@@ -153,9 +157,15 @@ public class RecognitionVocabularyTreeNister2006<Point> {
 			word.weights.reserve(tree.maximumLevel);
 			word.weights.add(info.descTermFreq.get(node.index));
 
-			// Add the weights for all the parents now too. Intentionally don't add the root node with all points.
-			while (node.parent>0) {
+			// distance from leaf along the graph
+			int distanceFromLeaf = 0;
+
+			// Go up the graph until it hits the root or maximum distance away from a leaf
+			while (distanceFromLeaf <= maxDistanceFromLeaf && node.index > 0) {
+				distanceFromLeaf++;
 				node = tree.nodes.get(node.parent);
+				if (node.weight == 0.0)
+					break;
 				word.weights.add(info.descTermFreq.get(node.index));
 			}
 		}
@@ -187,7 +197,6 @@ public class RecognitionVocabularyTreeNister2006<Point> {
 		// Create a description of this image and collect potential matches from leaves
 		describe(imageFeatures, targetImageDescTermFreq, leafHistogram);
 
-		// TODO traverse up the tree from the leaves to compute match score from other nodes
 		// Create a list of images in the DB that have at least a single feature pass through a node
 		for (int histIdx = 0; histIdx < leafHistogram.leaves.size; histIdx++) {
 			LeafCounts count = leafHistogram.leaves.get(histIdx);
@@ -197,11 +206,11 @@ public class RecognitionVocabularyTreeNister2006<Point> {
 			LeafData leafData = (LeafData)tree.invertedFile.get(node.invertedIdx);
 
 			// distance from leaf along the graph
-			int graphDistance = 0;
+			int distanceFromLeaf = 0;
 
-			while (true) {
-				// if it's at the root stop
-				if (node.index<=0)
+			// Go up the graph until it hits the root or maximum distance away from a leaf
+			while (distanceFromLeaf <= maxDistanceFromLeaf && node.index > 0) {
+				if (node.weight == 0.0)
 					break;
 
 				// Look up the value of this word in the descriptor for the target
@@ -231,12 +240,12 @@ public class RecognitionVocabularyTreeNister2006<Point> {
 					m.traversed.add(node.index);
 
 					// Update the score computation. See BLAH []
-					m.error += imageWordWeight*w.weights.get(graphDistance);
+					m.error += imageWordWeight*w.weights.get(distanceFromLeaf);
 				}
 
 				// move to the parent node
 				node = tree.nodes.get(node.parent);
-				graphDistance++;
+				distanceFromLeaf++;
 			}
 		}
 
@@ -279,9 +288,11 @@ public class RecognitionVocabularyTreeNister2006<Point> {
 			LeafCounts count = leafHistogram.leaves.get(histIdx);
 
 			HierarchicalVocabularyTree.Node node = tree.nodes.get(count.nodeIdx);
+			// distance the node is from the leaf node
+			int distanceFromLeaf = 0;
 
 			// Traverse up the tree from leaf to root
-			while (true) {
+			while (distanceFromLeaf <= maxDistanceFromLeaf && node.index > 0) {
 				// if the weight is zero now, all the parents will have to be zero too
 				if (node.weight == 0.0)
 					break;
@@ -293,9 +304,8 @@ public class RecognitionVocabularyTreeNister2006<Point> {
 				}
 				f.sum += node.weight*count.count;
 
-				if (node.parent < 0)
-					break;
 				node = tree.nodes.get(node.parent);
+				distanceFromLeaf++;
 			}
 		}
 
@@ -528,6 +538,8 @@ public class RecognitionVocabularyTreeNister2006<Point> {
 	public static class LeafData {
 		/** Specifies which image is in this leaf and the weight of the word in the descriptor */
 		public DogArray<ImageWord> images = new DogArray<ImageWord>(ImageWord::new, ImageWord::reset);
+		// The depth of the leaf node
+		public int depth;
 	}
 
 	/** Different built in distance norms. */
