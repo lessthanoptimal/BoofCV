@@ -57,7 +57,7 @@ import java.util.List;
 public class RecognitionVocabularyTreeNister2006<Point> {
 
 	/** Vocabulary Tree */
-	public @Getter HierarchicalVocabularyTree<Point, LeafData> tree;
+	public @Getter HierarchicalVocabularyTree<Point> tree;
 
 	/** List of images added to the database */
 	protected @Getter final DogArray<ImageInfo> imagesDB = new DogArray<>(ImageInfo::new, ImageInfo::reset);
@@ -99,7 +99,7 @@ public class RecognitionVocabularyTreeNister2006<Point> {
 	 *
 	 * @param tree Three which is to be used as the database. Saved internally.
 	 */
-	public void initializeTree( HierarchicalVocabularyTree<Point, LeafData> tree ) {
+	public void initializeTree( HierarchicalVocabularyTree<Point> tree ) {
 		this.tree = tree;
 		clearImages();
 	}
@@ -145,7 +145,7 @@ public class RecognitionVocabularyTreeNister2006<Point> {
 		for (int histIdx = 0; histIdx < leafHistogram.leaves.size; histIdx++) {
 			LeafCounts counts = leafHistogram.leaves.get(histIdx);
 			Node leafNode = tree.nodes.get(counts.nodeIdx);
-			LeafData leafData = tree.invertedFile.get(leafNode.invertedIdx);
+			LeafData leafData = (LeafData)tree.invertedFile.get(leafNode.invertedIdx);
 
 			// Add to inverted file at this node and note what the descriptor weight was for later rapid retrieval
 			ImageWord word = leafData.images.grow();
@@ -191,7 +191,7 @@ public class RecognitionVocabularyTreeNister2006<Point> {
 			float imageWordWeight = targetImageDescTermFreq.get(count.nodeIdx);
 
 			// Find the database images by looking at the inverted file for this particular node/work
-			LeafData leafData = tree.invertedFile.get(leafNode.invertedIdx);
+			LeafData leafData = (LeafData)tree.invertedFile.get(leafNode.invertedIdx);
 
 			// Add each image in this leaf, but be careful to only add each image once
 			for (int i = 0; i < leafData.images.size(); i++) {
@@ -224,7 +224,7 @@ public class RecognitionVocabularyTreeNister2006<Point> {
 			Match m = matchScores.get(i);
 
 			// Finalize the score after the accumulation steps above
-			m.error = 2.0f*(1.0f-m.error);
+			m.error = 2.0f*(1.0f - m.error);
 		}
 
 		Collections.sort(matchScores.toList());
@@ -488,7 +488,7 @@ public class RecognitionVocabularyTreeNister2006<Point> {
 			weight = -1f;
 		}
 
-		public void setTo( float weight , ImageInfo image ) {
+		public void setTo( float weight, ImageInfo image ) {
 			this.weight = weight;
 			this.image = image;
 		}
@@ -496,7 +496,7 @@ public class RecognitionVocabularyTreeNister2006<Point> {
 
 	public static class LeafData {
 		/** Specifies which image is in this leaf and the weight of the word in the descriptor */
-		public DogArray<ImageWord> images = new DogArray<ImageWord>(ImageWord::new,ImageWord::reset);
+		public DogArray<ImageWord> images = new DogArray<ImageWord>(ImageWord::new, ImageWord::reset);
 	}
 
 	/** Different built in distance norms. */

@@ -67,7 +67,7 @@ class TestLearnNodeWeights extends BoofStandardJUnit {
 	@Test void fixate() {
 		// Create a minimalist tree for this test
 		int N = 6;
-		var tree = createTree(Object.class);
+		var tree = createTree();
 		tree.nodes.resize(N);
 		tree.nodes.forIdx(( idx, n ) -> n.index = idx);
 

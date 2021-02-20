@@ -46,7 +46,7 @@ import java.util.List;
  */
 public class LearnNodeWeights<Point> {
 	/** Tree which has been learned already but with unspecified weights */
-	protected @Getter HierarchicalVocabularyTree<Point, ?> tree;
+	protected @Getter HierarchicalVocabularyTree<Point> tree;
 
 	//---------------- Internal Workspace
 
@@ -61,7 +61,7 @@ public class LearnNodeWeights<Point> {
 	/**
 	 * Initializes and resets with a new tree. Reference to the passed in tree is saved.
 	 */
-	public void reset( HierarchicalVocabularyTree<Point, ?> tree ) {
+	public void reset( HierarchicalVocabularyTree<Point> tree ) {
 		this.tree = tree;
 		numberOfImagesWithNode.resize(tree.nodes.size, 0);
 		totalImages = 0;
@@ -103,7 +103,7 @@ public class LearnNodeWeights<Point> {
 
 			// NOTE: Why is this happening when the same images used to create the tree are used to compute the
 			//       weights? Shouldn't every node in the tree have at least one image?
-			if (totalImagesFoundInsideOf==0)
+			if (totalImagesFoundInsideOf == 0)
 				n.weight = 0.0;
 			else
 				n.weight = Math.log(totalImages/(double)totalImagesFoundInsideOf);

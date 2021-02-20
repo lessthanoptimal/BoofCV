@@ -26,6 +26,9 @@ import org.ddogleg.struct.DogArray;
 import org.ddogleg.struct.DogArray_I32;
 import org.ddogleg.struct.FastArray;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import static boofcv.misc.BoofMiscOps.checkTrue;
 
 /**
@@ -35,7 +38,7 @@ import static boofcv.misc.BoofMiscOps.checkTrue;
  *
  * @author Peter Abeles
  **/
-public class HierarchicalVocabularyTree<Point, Data> {
+public class HierarchicalVocabularyTree<Point> {
 
 	/** Number of children for each node */
 	public int branchFactor = -1;
@@ -44,7 +47,7 @@ public class HierarchicalVocabularyTree<Point, Data> {
 	public int maximumLevel = -1;
 
 	/** Inverted file used to look up data given the node's index */
-	public final FastArray<Data> invertedFile; // TODO change into a list? Then remove Data from clss
+	public final List<Object> invertedFile = new ArrayList<>();
 
 	/** Computes distance between two points. Together with the 'mean' points, this defines the sub-regions */
 	public PointDistance<Point> distanceFunction;
@@ -56,11 +59,9 @@ public class HierarchicalVocabularyTree<Point, Data> {
 	public final DogArray<Node> nodes = new DogArray<>(Node::new, Node::reset);
 
 	public HierarchicalVocabularyTree( PointDistance<Point> distanceFunction,
-									   PackedArray<Point> descriptions,
-									   Class<Data> leafType ) {
+									   PackedArray<Point> descriptions ) {
 		this.distanceFunction = distanceFunction;
 		this.descriptions = descriptions;
-		invertedFile = new FastArray<>(leafType);
 		reset();
 	}
 
@@ -191,7 +192,7 @@ public class HierarchicalVocabularyTree<Point, Data> {
 	 * Clears references to initial state but keeps allocated memory
 	 */
 	public void reset() {
-		invertedFile.reset();
+		invertedFile.clear();
 		descriptions.reset();
 		nodes.reset();
 
@@ -205,9 +206,9 @@ public class HierarchicalVocabularyTree<Point, Data> {
 	 * @param node Node that data is added to
 	 * @param data The data which is not associated with it
 	 */
-	public void addData( Node node, Data data ) {
+	public void addData( Node node, Object data ) {
 		BoofMiscOps.checkTrue(node.invertedIdx < 0);
-		node.invertedIdx = invertedFile.size;
+		node.invertedIdx = invertedFile.size();
 		invertedFile.add(data);
 	}
 
