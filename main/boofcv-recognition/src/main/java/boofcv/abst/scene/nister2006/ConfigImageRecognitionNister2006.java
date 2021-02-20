@@ -23,6 +23,7 @@ import boofcv.alg.scene.vocabtree.ConfigHierarchicalVocabularyTree;
 import boofcv.factory.feature.describe.ConfigDescribeRegionPoint;
 import boofcv.factory.feature.detdesc.ConfigDetectDescribe;
 import boofcv.factory.feature.detect.interest.ConfigDetectInterestPoint;
+import boofcv.misc.BoofMiscOps;
 import boofcv.struct.Configuration;
 import org.ddogleg.clustering.ConfigKMeans;
 
@@ -44,6 +45,12 @@ public class ConfigImageRecognitionNister2006 implements Configuration {
 
 	/** Specifies which norm to use. L1 should yield better results but is slower than L2 to compute. */
 	public DistanceTypes distanceNorm = DistanceTypes.L2;
+
+	/**
+	 * Nodes more than this distance from a leaf node will not be considered in descriptor. Not considering
+	 * every node speeds up the computations and slightly improves the quality.
+	 */
+	public int maxDistanceFromLeaf = 0;
 
 	// TODO make entropy weighting configurable
 
@@ -71,6 +78,8 @@ public class ConfigImageRecognitionNister2006 implements Configuration {
 	}
 
 	@Override public void checkValidity() {
+		BoofMiscOps.checkTrue(maxDistanceFromLeaf >= 0, "Maximum level must be a non-negative integer");
+
 		kmeans.checkValidity();
 		tree.checkValidity();
 		features.checkValidity();
@@ -81,6 +90,7 @@ public class ConfigImageRecognitionNister2006 implements Configuration {
 		this.tree.setTo(src.tree);
 		this.features.setTo(src.features);
 		this.distanceNorm = src.distanceNorm;
+		this.maxDistanceFromLeaf = src.maxDistanceFromLeaf;
 		this.maxMatches = src.maxMatches;
 		this.randSeed = src.randSeed;
 	}

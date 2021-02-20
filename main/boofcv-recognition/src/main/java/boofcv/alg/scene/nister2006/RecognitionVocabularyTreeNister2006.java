@@ -63,7 +63,7 @@ public class RecognitionVocabularyTreeNister2006<Point> {
 	public @Getter HierarchicalVocabularyTree<Point> tree;
 
 	/** Nodes only contribute to the descriptor if they are at most this number of hops from a leaf */
-	public int maxDistanceFromLeaf = Integer.MAX_VALUE; // todo make configurable
+	public int maxDistanceFromLeaf = Integer.MAX_VALUE;
 
 	/** List of images added to the database */
 	protected @Getter final DogArray<ImageInfo> imagesDB = new DogArray<>(ImageInfo::new, ImageInfo::reset);

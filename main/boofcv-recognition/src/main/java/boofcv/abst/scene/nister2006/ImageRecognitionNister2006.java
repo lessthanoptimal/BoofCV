@@ -93,6 +93,7 @@ public class ImageRecognitionNister2006<Image extends ImageBase<Image>, TD exten
 		this.imageType = imageType;
 
 		databaseN.setDistanceType(config.distanceNorm);
+		databaseN.maxDistanceFromLeaf = config.maxDistanceFromLeaf;
 	}
 
 	public void setDatabase( RecognitionVocabularyTreeNister2006<TD> db ) {

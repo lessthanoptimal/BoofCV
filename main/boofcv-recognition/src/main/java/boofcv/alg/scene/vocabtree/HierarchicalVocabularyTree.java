@@ -104,7 +104,8 @@ public class HierarchicalVocabularyTree<Point> {
 		if (parent.isLeaf())
 			return 0;
 
-		while (level < maximumLevel) {
+		// search until it hits the level limit. This is a sanity check just in case the graph has an infinite loop
+		while (level <= maximumLevel) {
 			int bestNodeIdx = -1;
 			double bestDistance = Double.MAX_VALUE;
 
