@@ -23,8 +23,10 @@ import boofcv.alg.scene.vocabtree.HierarchicalVocabularyTree.Node;
 import boofcv.misc.BoofMiscOps;
 import gnu.trove.impl.Constants;
 import gnu.trove.map.TIntFloatMap;
+import gnu.trove.map.TIntIntMap;
 import gnu.trove.map.TIntObjectMap;
 import gnu.trove.map.hash.TIntFloatHashMap;
+import gnu.trove.map.hash.TIntIntHashMap;
 import gnu.trove.map.hash.TIntObjectHashMap;
 import gnu.trove.set.TIntSet;
 import gnu.trove.set.hash.TIntHashSet;
@@ -76,7 +78,7 @@ public class RecognitionVocabularyTreeNister2006<Point> {
 	protected final TIntObjectMap<Frequency> node_to_frequency = new TIntObjectHashMap<>();
 
 	// Temporary storage for an image's TF description while it's being looked up
-	protected final TIntFloatMap tempDescTermFreq = new TIntFloatHashMap();
+	protected final TIntFloatMap targetImageDescTermFreq = new TIntFloatHashMap();
 
 	// Predeclare array for storing keys. Avoids unnecessary array creation
 	protected final DogArray_I32 keysDesc = new DogArray_I32(); // ONLY use in describe()
@@ -88,6 +90,7 @@ public class RecognitionVocabularyTreeNister2006<Point> {
 
 	// For lookup
 	TIntSet candidates = new TIntHashSet();
+	TIntIntMap identication_to_match = new TIntIntHashMap();
 
 	LeafHistogram leafHistogram = new LeafHistogram();
 
@@ -108,11 +111,11 @@ public class RecognitionVocabularyTreeNister2006<Point> {
 		imagesDB.reset();
 
 		// Removes the old leaf data and replaces it with empty structures
-		tree.listData.clear();
+		tree.invertedFile.clear();
 		for (int i = 0; i < tree.nodes.size; i++) {
 			if (!tree.nodes.get(i).isLeaf())
 				continue;
-			tree.nodes.get(i).dataIdx = -1;
+			tree.nodes.get(i).invertedIdx = -1;
 			tree.addData(tree.nodes.get(i), new LeafData());
 		}
 
@@ -132,7 +135,7 @@ public class RecognitionVocabularyTreeNister2006<Point> {
 			return;
 
 		ImageInfo info = imagesDB.grow();
-		info.imageId = imageID;
+		info.identification = imageID;
 		info.cookie = cookie;
 
 		// compute a descriptor for this image while adding it to the leaves
@@ -142,10 +145,12 @@ public class RecognitionVocabularyTreeNister2006<Point> {
 		for (int histIdx = 0; histIdx < leafHistogram.leaves.size; histIdx++) {
 			LeafCounts counts = leafHistogram.leaves.get(histIdx);
 			Node leafNode = tree.nodes.get(counts.nodeIdx);
-			LeafData leafData = tree.listData.get(leafNode.dataIdx);
+			LeafData leafData = tree.invertedFile.get(leafNode.invertedIdx);
 
-			// Each leaf will only appear once in this array, so we can just add it
-			leafData.images.put(info.imageId, info);
+			// Add to inverted file at this node and note what the descriptor weight was for later rapid retrieval
+			ImageWord word = leafData.images.grow();
+			word.image = info;
+			word.weight = info.descTermFreq.get(counts.nodeIdx);
 		}
 
 		// For each node which is in the descriptor, increment its image count
@@ -165,6 +170,7 @@ public class RecognitionVocabularyTreeNister2006<Point> {
 	 */
 	public boolean lookup( List<Point> imageFeatures ) {
 		candidates.clear();
+		identication_to_match.clear();
 		matchScores.reset();
 
 		// Can't match to anything if it's empty
@@ -173,25 +179,38 @@ public class RecognitionVocabularyTreeNister2006<Point> {
 		}
 
 		// Create a description of this image and collect potential matches from leaves
-		describe(imageFeatures, tempDescTermFreq, leafHistogram);
+		describe(imageFeatures, targetImageDescTermFreq, leafHistogram);
 
+		// TODO traverse up the tree from the leaves to compute match score from other nodes
 		// Create a list of images in the DB that have at least a single feature pass through a node
 		for (int histIdx = 0; histIdx < leafHistogram.leaves.size; histIdx++) {
 			LeafCounts count = leafHistogram.leaves.get(histIdx);
 			HierarchicalVocabularyTree.Node leafNode = tree.nodes.get(count.nodeIdx);
 
-			LeafData leafData = tree.listData.get(leafNode.dataIdx);
-			keysLookUp.resize(leafData.images.size());
-			leafData.images.keys(keysLookUp.data);
+			// Every leaf should have a matching word in the image being looked up
+			float imageWordWeight = targetImageDescTermFreq.get(count.nodeIdx);
+
+			// Find the database images by looking at the inverted file for this particular node/work
+			LeafData leafData = tree.invertedFile.get(leafNode.invertedIdx);
 
 			// Add each image in this leaf, but be careful to only add each image once
-			for (int i = 0; i < keysLookUp.size(); i++) {
-				ImageInfo c = leafData.images.get(keysLookUp.get(i));
-				if (!candidates.add(c.imageId))
-					continue;
-				matchScores.grow().image = c;
+			for (int i = 0; i < leafData.images.size(); i++) {
+				ImageWord w = leafData.images.get(i);
+				int identification = w.image.identification;
+				Match m;
+				if (!identication_to_match.containsKey(identification)) {
+					identication_to_match.put(identification, matchScores.size);
+					m = matchScores.grow();
+					m.image = w.image;
+				} else {
+					m = matchScores.get(identication_to_match.get(identification));
+				}
+
+				// Update the score computation
+				m.error += imageWordWeight*w.weight;
 			}
 
+			// This won't pass unit tests until the part below is done
 			// TODO traverse up the tree and add in images see in parent nodes
 			// this will require traversing down to their leaves. Each parent needs to keep
 			// track of the number of images it has too so that if there are too many images the search will abort
@@ -200,10 +219,12 @@ public class RecognitionVocabularyTreeNister2006<Point> {
 		if (matchScores.isEmpty())
 			return false;
 
-		// TODO remove need for this by implement efficient method in the paper
+		// Compute the final scores
 		for (int i = 0; i < matchScores.size(); i++) {
 			Match m = matchScores.get(i);
-			m.error = distanceFunction.distance(tempDescTermFreq, m.image.descTermFreq);
+
+			// Finalize the score after the accumulation steps above
+			m.error = 2.0f*(1.0f-m.error);
 		}
 
 		Collections.sort(matchScores.toList());
@@ -240,11 +261,11 @@ public class RecognitionVocabularyTreeNister2006<Point> {
 				// if the weight is zero now, all the parents will have to be zero too
 				if (node.weight == 0.0)
 					break;
-				Frequency f = node_to_frequency.get(node.id);
+				Frequency f = node_to_frequency.get(node.index);
 				if (f == null) {
 					f = frequencies.grow();
 					f.node = node;
-					node_to_frequency.put(node.id, f);
+					node_to_frequency.put(node.index, f);
 				}
 				f.sum += node.weight*count.count;
 
@@ -273,7 +294,7 @@ public class RecognitionVocabularyTreeNister2006<Point> {
 
 		for (int i = 0; i < frequencies.size(); i++) {
 			Frequency f = frequencies.get(i);
-			descTermFreq.put(f.node.id, (float)(f.sum/normL2));
+			descTermFreq.put(f.node.index, (float)(f.sum/normL2));
 		}
 	}
 
@@ -390,7 +411,7 @@ public class RecognitionVocabularyTreeNister2006<Point> {
 		/** Use specified data associated with this image */
 		public Object cookie;
 		/** Unique ID for this image */
-		public int imageId;
+		public int identification;
 
 		public <T> T getCookie() {
 			return (T)cookie;
@@ -399,7 +420,7 @@ public class RecognitionVocabularyTreeNister2006<Point> {
 		public void reset() {
 			descTermFreq.clear();
 			cookie = null;
-			imageId = -1;
+			identification = -1;
 		}
 	}
 
@@ -415,7 +436,9 @@ public class RecognitionVocabularyTreeNister2006<Point> {
 	}
 
 	protected static class LeafCounts {
+		// Number of times the leaf was observed
 		public int count;
+		// The node index of the leaf
 		public int nodeIdx;
 
 		public void reset() {
@@ -456,9 +479,24 @@ public class RecognitionVocabularyTreeNister2006<Point> {
 		}
 	}
 
+	public static class ImageWord {
+		public float weight;
+		public ImageInfo image;
+
+		public void reset() {
+			image = null;
+			weight = -1f;
+		}
+
+		public void setTo( float weight , ImageInfo image ) {
+			this.weight = weight;
+			this.image = image;
+		}
+	}
+
 	public static class LeafData {
-		/** images at this leaf. key=imageID value=ImageInfo */
-		public TIntObjectMap<ImageInfo> images = new TIntObjectHashMap<>();
+		/** Specifies which image is in this leaf and the weight of the word in the descriptor */
+		public DogArray<ImageWord> images = new DogArray<ImageWord>(ImageWord::new,ImageWord::reset);
 	}
 
 	/** Different built in distance norms. */

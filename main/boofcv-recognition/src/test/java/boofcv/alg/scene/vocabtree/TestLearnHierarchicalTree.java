@@ -108,7 +108,7 @@ class TestLearnHierarchicalTree extends BoofStandardJUnit {
 
 		assertEquals(121, tree.nodes.size);
 		assertEquals(120, tree.descriptions.size());
-		assertEquals(0, tree.listData.size);
+		assertEquals(0, tree.invertedFile.size);
 	}
 
 	/**
@@ -130,7 +130,7 @@ class TestLearnHierarchicalTree extends BoofStandardJUnit {
 		assertTrue(100 >= tree.nodes.size);
 		// The root node has no description, hence the -1
 		assertEquals(tree.descriptions.size(), tree.nodes.size - 1);
-		assertEquals(0, tree.listData.size);
+		assertEquals(0, tree.invertedFile.size);
 	}
 
 	private boolean findNodeAt( HierarchicalVocabularyTree<Point2D_F64, Object> tree,
