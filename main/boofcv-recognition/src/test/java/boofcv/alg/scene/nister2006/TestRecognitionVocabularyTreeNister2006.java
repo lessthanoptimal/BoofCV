@@ -57,7 +57,7 @@ class TestRecognitionVocabularyTreeNister2006 extends BoofStandardJUnit {
 			Match best = alg.getMatchScores().get(0);
 
 			assertEquals(0.0, best.error, UtilEjml.TEST_F32);
-			assertEquals(best.image.imageId, i);
+			assertEquals(best.image.identification, i);
 			// check to see if the cookie was correctly assigned
 			assertEquals(i, (Integer)best.image.cookie);
 		}

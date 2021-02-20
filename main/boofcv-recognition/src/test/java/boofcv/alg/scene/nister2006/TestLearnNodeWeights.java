@@ -69,7 +69,7 @@ class TestLearnNodeWeights extends BoofStandardJUnit {
 		int N = 6;
 		var tree = createTree(Object.class);
 		tree.nodes.resize(N);
-		tree.nodes.forIdx(( idx, n ) -> n.id = idx);
+		tree.nodes.forIdx(( idx, n ) -> n.index = idx);
 
 		// Initialize data structures then run fixate
 		var alg = new LearnNodeWeights<Point2D_F64>();

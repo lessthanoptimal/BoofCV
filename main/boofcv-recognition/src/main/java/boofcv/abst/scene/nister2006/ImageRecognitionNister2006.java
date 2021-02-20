@@ -228,7 +228,7 @@ public class ImageRecognitionNister2006<Image extends ImageBase<Image>, TD exten
 		int count = config.maxMatches <= 0 ? found.size : Math.min(config.maxMatches, found.size);
 		for (int i = 0; i < count; i++) {
 			RecognitionVocabularyTreeNister2006.Match f = found.get(i);
-			matches.get(i).id = imageIds.get(f.image.imageId);
+			matches.get(i).id = imageIds.get(f.image.identification);
 			matches.get(i).error = f.error;
 		}
 

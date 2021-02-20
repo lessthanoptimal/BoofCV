@@ -43,8 +43,8 @@ public class HierarchicalVocabularyTree<Point, Data> {
 	/** Maximum number of levels in the tree */
 	public int maximumLevel = -1;
 
-	/** Optional data associated with any of the nodes */
-	public final FastArray<Data> listData;
+	/** Inverted file used to look up data given the node's index */
+	public final FastArray<Data> invertedFile; // TODO change into a list? Then remove Data from clss
 
 	/** Computes distance between two points. Together with the 'mean' points, this defines the sub-regions */
 	public PointDistance<Point> distanceFunction;
@@ -60,7 +60,7 @@ public class HierarchicalVocabularyTree<Point, Data> {
 									   Class<Data> leafType ) {
 		this.distanceFunction = distanceFunction;
 		this.descriptions = descriptions;
-		listData = new FastArray<>(leafType);
+		invertedFile = new FastArray<>(leafType);
 		reset();
 	}
 
@@ -76,7 +76,7 @@ public class HierarchicalVocabularyTree<Point, Data> {
 		int index = nodes.size;
 		Node n = nodes.grow();
 		// assign to ID to the index. An alternative would be to use level + branch.
-		n.id = index;
+		n.index = index;
 		n.branch = branch;
 		n.descIdx = descriptions.size();
 		descriptions.addCopy(desc);
@@ -191,12 +191,12 @@ public class HierarchicalVocabularyTree<Point, Data> {
 	 * Clears references to initial state but keeps allocated memory
 	 */
 	public void reset() {
-		listData.reset();
+		invertedFile.reset();
 		descriptions.reset();
 		nodes.reset();
 
 		// create root node, which will contain the set of all points
-		nodes.grow().id = 0;
+		nodes.grow().index = 0;
 	}
 
 	/**
@@ -206,23 +206,23 @@ public class HierarchicalVocabularyTree<Point, Data> {
 	 * @param data The data which is not associated with it
 	 */
 	public void addData( Node node, Data data ) {
-		BoofMiscOps.checkTrue(node.dataIdx < 0);
-		node.dataIdx = listData.size;
-		listData.add(data);
+		BoofMiscOps.checkTrue(node.invertedIdx < 0);
+		node.invertedIdx = invertedFile.size;
+		invertedFile.add(data);
 	}
 
 	/** Node in the Vocabulary tree */
 	public static class Node {
 		// How useful a match to this node is. Higher the weight, more unique it is typically.
 		public double weight;
-		// The unique ID assigned to this node
-		public int id;
+		// The unique ID assigned to this node. Index in the node array
+		public int index;
 		// Which branch/child in the parent it is
 		public int branch;
 		// Index of the parent. The root node will have -1 here
 		public int parent;
-		// Index of data associated with this node
-		public int dataIdx;
+		// Index in the inverted file list. -1 means there's no data there
+		public int invertedIdx;
 		// index of the first mean in the list of descriptions. Means in a set are consecutive.
 		public int descIdx;
 		// index of the first child in the list of nodes. Children are consecutive.
@@ -235,19 +235,19 @@ public class HierarchicalVocabularyTree<Point, Data> {
 
 		public void reset() {
 			weight = -1;
-			id = -1;
+			index = -1;
 			branch = -1;
 			parent = -1;
-			dataIdx = -1;
+			invertedIdx = -1;
 			descIdx = -1;
 			childrenIndexes.reset();
 		}
 
 		public void setTo( Node src ) {
-			id = src.id;
+			index = src.index;
 			branch = src.branch;
 			parent = src.parent;
-			dataIdx = src.dataIdx;
+			invertedIdx = src.invertedIdx;
 			descIdx = src.descIdx;
 			childrenIndexes.setTo(src.childrenIndexes);
 		}

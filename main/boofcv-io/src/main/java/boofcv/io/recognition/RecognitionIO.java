@@ -50,7 +50,7 @@ import java.util.Objects;
  **/
 public class RecognitionIO {
 	/**
-	 * Saves {@link ImageRecognitionNister2006.Definition} to disk inside of the specified directory
+	 * Saves {@link ImageRecognitionNister2006} to disk inside of the specified directory
 	 *
 	 * @param def What is to be saved
 	 * @param dir Direction that it is to be saved
@@ -132,7 +132,7 @@ public class RecognitionIO {
 		header += "maximum_level " + tree.maximumLevel + "\n";
 		header += "nodes.size " + tree.nodes.size + "\n";
 		header += "descriptions.size " + tree.descriptions.size() + "\n";
-		header += "data.size " + tree.listData.size + "\n";
+		header += "data.size " + tree.invertedFile.size + "\n";
 		header += "point_type " + tree.descriptions.getElementType().getSimpleName() + "\n";
 		header += "point_dof " + tree.descriptions.getTemp(0).size() + "\n";
 		header += "distance.name " + tree.distanceFunction.getClass().getName() + "\n";
@@ -143,11 +143,11 @@ public class RecognitionIO {
 			DataOutputStream dout = new DataOutputStream(out);
 			for (int nodeIdx = 0; nodeIdx < tree.nodes.size; nodeIdx++) {
 				HierarchicalVocabularyTree.Node n = tree.nodes.get(nodeIdx);
-				dout.writeInt(n.id);
+				dout.writeInt(n.index);
 				dout.writeInt(n.parent);
 				dout.writeInt(n.branch);
 				dout.writeInt(n.descIdx);
-				dout.writeInt(n.dataIdx);
+				dout.writeInt(n.invertedIdx);
 				dout.writeDouble(n.weight);
 				dout.writeInt(n.childrenIndexes.size);
 				for (int i = 0; i < n.childrenIndexes.size; i++) {
@@ -249,11 +249,11 @@ public class RecognitionIO {
 			DataInputStream input = new DataInputStream(in);
 			for (int nodeIdx = 0; nodeIdx < tree.nodes.size; nodeIdx++) {
 				HierarchicalVocabularyTree.Node n = tree.nodes.get(nodeIdx);
-				n.id = input.readInt();
+				n.index = input.readInt();
 				n.parent = input.readInt();
 				n.branch = input.readInt();
 				n.descIdx = input.readInt();
-				n.dataIdx = input.readInt();
+				n.invertedIdx = input.readInt();
 				n.weight = input.readDouble();
 				n.childrenIndexes.resize(input.readInt());
 				for (int i = 0; i < n.childrenIndexes.size; i++) {
@@ -362,7 +362,7 @@ public class RecognitionIO {
 		header += "boofcv_version " + BoofVersion.VERSION + "\n";
 		header += "git_sha " + BoofVersion.GIT_SHA + "\n";
 		header += "images_db.size " + db.getImagesDB().size + "\n";
-		header += "leaf_data.size " + tree.listData.size + "\n";
+		header += "leaf_data.size " + tree.invertedFile.size + "\n";
 		header += "BEGIN_TREE\n";
 
 		try {
@@ -377,7 +377,7 @@ public class RecognitionIO {
 			DogArray<ImageInfo> imagesDB = db.getImagesDB();
 			for (int dbIdx = 0; dbIdx < imagesDB.size; dbIdx++) {
 				ImageInfo n = imagesDB.get(dbIdx);
-				dout.writeInt(n.imageId);
+				dout.writeInt(n.identification);
 				dout.writeInt(n.descTermFreq.size());
 				keys.resize(n.descTermFreq.size());
 				n.descTermFreq.keys(keys.data);
@@ -393,18 +393,18 @@ public class RecognitionIO {
 			TIntIntMap id_to_idx = new TIntIntHashMap();
 			for (int dbIdx = 0; dbIdx < imagesDB.size; dbIdx++) {
 				ImageInfo n = imagesDB.get(dbIdx);
-				id_to_idx.put(n.imageId, dbIdx);
+				id_to_idx.put(n.identification, dbIdx);
 			}
 
-			for (int infoIdx = 0; infoIdx < tree.listData.size; infoIdx++) {
-				LeafData leaf = tree.listData.get(infoIdx);
+			for (int infoIdx = 0; infoIdx < tree.invertedFile.size; infoIdx++) {
+				LeafData leaf = tree.invertedFile.get(infoIdx);
 				// Save the map as an array. elements are imageID -> dbIdx
 				dout.writeInt(leaf.images.size());
 				keys.resize(leaf.images.size());
-				leaf.images.keys(keys.data);
-				for (int i = 0; i < keys.size(); i++) {
-					dout.writeInt(keys.get(i));
-					dout.writeInt(id_to_idx.get(keys.get(i)));
+				for (int i = 0; i < leaf.images.size; i++) {
+					RecognitionVocabularyTreeNister2006.ImageWord w = leaf.images.get(i);
+					dout.writeFloat(w.weight);
+					dout.writeInt(id_to_idx.get(w.image.identification));
 				}
 			}
 
@@ -446,14 +446,14 @@ public class RecognitionIO {
 			}
 
 			db.tree = loadTreeBin(in, null, RecognitionVocabularyTreeNister2006.LeafData.class);
-			db.tree.listData.resize(listDataSize);
+			db.tree.invertedFile.resize(listDataSize);
 
 			var input = new DataInputStream(in);
 			readCheckUTF(input, "BEGIN_IMAGE_DB");
 
 			for (int dbIdx = 0; dbIdx < imagesDB.size; dbIdx++) {
 				ImageInfo n = imagesDB.get(dbIdx);
-				n.imageId = input.readInt();
+				n.identification = input.readInt();
 				int N = input.readInt();
 				for (int i = 0; i < N; i++) {
 					int key = input.readInt();
@@ -464,14 +464,14 @@ public class RecognitionIO {
 
 			readCheckUTF(input, "BEGIN_LEAF_INFO");
 
-			for (int dataIdx = 0; dataIdx < db.tree.listData.size; dataIdx++) {
+			for (int dataIdx = 0; dataIdx < db.tree.invertedFile.size; dataIdx++) {
 				var leaf = new LeafData();
-				db.tree.listData.set(dataIdx, leaf);
+				db.tree.invertedFile.set(dataIdx, leaf);
 				int N = input.readInt();
 				for (int i = 0; i < N; i++) {
-					int imageId = input.readInt();
-					int dbIdx = input.readInt();
-					leaf.images.put(imageId, imagesDB.get(dbIdx));
+					float weight = input.readFloat();
+					int imageIndex = input.readInt();
+					leaf.images.grow().setTo(weight, imagesDB.get(imageIndex));
 				}
 			}
 

@@ -101,7 +101,7 @@ public class TestRecognitionIO extends BoofStandardJUnit {
 			assertEquals(e.branch, f.branch);
 			assertEquals(e.weight, f.weight);
 			assertEquals(e.descIdx, f.descIdx);
-			assertEquals(e.dataIdx, f.dataIdx);
+			assertEquals(e.invertedIdx, f.invertedIdx);
 			assertEquals(e.childrenIndexes.size, f.childrenIndexes.size);
 			for (int j = 0; j < e.childrenIndexes.size; j++) {
 				assertEquals(e.childrenIndexes.get(j), f.childrenIndexes.get(j));
@@ -131,7 +131,7 @@ public class TestRecognitionIO extends BoofStandardJUnit {
 			n.parent = i - 1;
 			n.branch = i;
 			n.weight = 0.1 + i;
-			n.dataIdx = i*2;
+			n.invertedIdx = i*2;
 
 			// make sure the number of descriptions doesn't match the number of nodes. this was a bug once.
 			if (i==0)
@@ -163,27 +163,27 @@ public class TestRecognitionIO extends BoofStandardJUnit {
 		compareTrees(db.tree, found.tree);
 
 		assertEquals(db.getImagesDB().size, found.getImagesDB().size);
-		assertEquals(db.tree.listData.size, found.tree.listData.size);
+		assertEquals(db.tree.invertedFile.size, found.tree.invertedFile.size);
 
 		for (int i = 0; i < 11; i++) {
 			ImageInfo e = db.getImagesDB().get(i);
 			ImageInfo f = found.getImagesDB().get(i);
 
-			assertEquals(e.imageId, f.imageId);
+			assertEquals(e.identification, f.identification);
 			assertEquals(e.descTermFreq.size(), f.descTermFreq.size());
 			for (int key : e.descTermFreq.keys()) {
 				assertEquals(e.descTermFreq.get(key), f.descTermFreq.get(key));
 			}
 		}
 
-		for (int i = 0; i < db.tree.listData.size; i++) {
-			LeafData e = db.tree.listData.get(i);
-			LeafData f = found.tree.listData.get(i);
+		for (int i = 0; i < db.tree.invertedFile.size; i++) {
+			LeafData e = db.tree.invertedFile.get(i);
+			LeafData f = found.tree.invertedFile.get(i);
 
 			assertEquals(e.images.size(), f.images.size());
-			for (int key : e.images.keys()) {
-				int indexE = db.getImagesDB().indexOf(e.images.get(key));
-				int indexF = found.getImagesDB().indexOf(f.images.get(key));
+			for (int wordIdx = 0; wordIdx < e.images.size; wordIdx++) {
+				int indexE = db.getImagesDB().indexOf(e.images.get(wordIdx).image);
+				int indexF = found.getImagesDB().indexOf(f.images.get(wordIdx).image);
 
 				assertEquals(indexE, indexF);
 			}
@@ -198,17 +198,17 @@ public class TestRecognitionIO extends BoofStandardJUnit {
 		db.getImagesDB().resize(11);
 		for (int i = 0; i < 11; i++) {
 			ImageInfo info = db.getImagesDB().get(i);
-			info.imageId = i + 2;
+			info.identification = i + 2;
 			info.descTermFreq.put(1, 1.5f);
 			info.descTermFreq.put(6, i + 1.5f);
 			// cookie can be ignored and isn't saved
 		}
 
-		db.tree.listData.resize(9);
-		for (int i = 0; i < db.tree.listData.size; i++) {
+		db.tree.invertedFile.resize(9);
+		for (int i = 0; i < db.tree.invertedFile.size; i++) {
 			var ld = new LeafData();
-			ld.images.put(i + 2, db.getImagesDB().get(i));
-			db.tree.listData.set(i,ld);
+			ld.images.grow().setTo(0.5f, db.getImagesDB().get(i));
+			db.tree.invertedFile.set(i,ld);
 		}
 		return db;
 	}

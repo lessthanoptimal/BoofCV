@@ -99,15 +99,15 @@ public class TestHierarchicalVocabularyTree extends BoofStandardJUnit {
 		tree.addNode(1, 0, new Point2D_F64(-5, -1));
 
 		// Verify there is no data at this node
-		assertEquals(-1, tree.nodes.get(2).dataIdx);
+		assertEquals(-1, tree.nodes.get(2).invertedIdx);
 
 		// Assign data to the node
 		tree.addData(tree.nodes.get(2), 1);
 
 		// Check data structures
-		assertEquals(1, tree.listData.size);
-		assertEquals(1, (int)tree.listData.get(0));
-		assertEquals(0, tree.nodes.get(2).dataIdx);
+		assertEquals(1, tree.invertedFile.size);
+		assertEquals(1, (int)tree.invertedFile.get(0));
+		assertEquals(0, tree.nodes.get(2).invertedIdx);
 	}
 
 	@Test void reset() {
@@ -125,7 +125,7 @@ public class TestHierarchicalVocabularyTree extends BoofStandardJUnit {
 		// Verify everything is back to initial state and that settings have not been modified
 		assertEquals(1, tree.nodes.size);
 		assertEquals(0, tree.descriptions.size());
-		assertEquals(0, tree.listData.size());
+		assertEquals(0, tree.invertedFile.size());
 		assertEquals(2, tree.branchFactor);
 		assertEquals(2, tree.maximumLevel);
 	}

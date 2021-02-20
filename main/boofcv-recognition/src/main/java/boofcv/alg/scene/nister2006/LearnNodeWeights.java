@@ -82,7 +82,7 @@ public class LearnNodeWeights<Point> {
 
 		// Mark nodes that descriptors pass through as being a member of this image
 		for (int descIdx = 0; descIdx < descriptors.size(); descIdx++) {
-			tree.searchPathToLeaf(descriptors.get(descIdx), ( node ) -> nodesInImage.add(node.id));
+			tree.searchPathToLeaf(descriptors.get(descIdx), ( node ) -> nodesInImage.add(node.index));
 		}
 
 		// Number of times each leaf node in the graph is seen at least once in an image
@@ -99,7 +99,7 @@ public class LearnNodeWeights<Point> {
 	public void fixate() {
 		for (int i = 0; i < tree.nodes.size; i++) {
 			Node n = tree.nodes.get(i);
-			int totalImagesFoundInsideOf = numberOfImagesWithNode.get(n.id);
+			int totalImagesFoundInsideOf = numberOfImagesWithNode.get(n.index);
 
 			// NOTE: Why is this happening when the same images used to create the tree are used to compute the
 			//       weights? Shouldn't every node in the tree have at least one image?
