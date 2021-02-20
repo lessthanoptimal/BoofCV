@@ -45,7 +45,6 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
  * @author Peter Abeles
  **/
 public class TestRecognitionIO extends BoofStandardJUnit {
-
 	/**
 	 * Very basic test. Mostly just checks to see if things blow up or not
 	 */
@@ -74,21 +73,21 @@ public class TestRecognitionIO extends BoofStandardJUnit {
 	@Test void hierarchicalVocabularyTree_stream() {
 		// Create a dummy tree that's to be saved and reconstructed
 		int DOF = 6;
-		HierarchicalVocabularyTree<TupleDesc_F64, Object> tree = createTree(DOF, Object.class);
+		HierarchicalVocabularyTree<TupleDesc_F64> tree = createTree(DOF);
 
 		// Encode then decode
 		ByteArrayOutputStream stream = new ByteArrayOutputStream();
 		RecognitionIO.saveTreeBin(tree, stream);
 
 		InputStream input = new ByteArrayInputStream(stream.toByteArray());
-		HierarchicalVocabularyTree<TupleDesc_F64, Object> found = RecognitionIO.loadTreeBin(input, null, Object.class);
+		HierarchicalVocabularyTree<TupleDesc_F64> found = RecognitionIO.loadTreeBin(input, null);
 
 		// See if all the important components were copied
 		compareTrees(tree, found);
 	}
 
-	private void compareTrees( HierarchicalVocabularyTree<TupleDesc_F64, ?> tree,
-							   HierarchicalVocabularyTree<TupleDesc_F64, ?> found ) {
+	private void compareTrees( HierarchicalVocabularyTree<TupleDesc_F64> tree,
+							   HierarchicalVocabularyTree<TupleDesc_F64> found ) {
 		assertEquals(tree.maximumLevel, found.maximumLevel);
 		assertEquals(tree.branchFactor, found.branchFactor);
 		assertEquals(tree.nodes.size, found.nodes.size);
@@ -118,9 +117,9 @@ public class TestRecognitionIO extends BoofStandardJUnit {
 		}
 	}
 
-	private <T> HierarchicalVocabularyTree<TupleDesc_F64, T> createTree( int DOF, Class<T> type ) {
+	private <T> HierarchicalVocabularyTree<TupleDesc_F64> createTree( int DOF ) {
 		var tree = new HierarchicalVocabularyTree<>(
-				new TuplePointDistanceEuclideanSq.F64(), new PackedTupleArray_F64(DOF), type);
+				new TuplePointDistanceEuclideanSq.F64(), new PackedTupleArray_F64(DOF));
 
 		tree.maximumLevel = 2;
 		tree.branchFactor = 4;
@@ -163,7 +162,7 @@ public class TestRecognitionIO extends BoofStandardJUnit {
 		compareTrees(db.tree, found.tree);
 
 		assertEquals(db.getImagesDB().size, found.getImagesDB().size);
-		assertEquals(db.tree.invertedFile.size, found.tree.invertedFile.size);
+		assertEquals(db.tree.invertedFile.size(), found.tree.invertedFile.size());
 
 		for (int i = 0; i < 11; i++) {
 			ImageInfo e = db.getImagesDB().get(i);
@@ -176,9 +175,9 @@ public class TestRecognitionIO extends BoofStandardJUnit {
 			}
 		}
 
-		for (int i = 0; i < db.tree.invertedFile.size; i++) {
-			LeafData e = db.tree.invertedFile.get(i);
-			LeafData f = found.tree.invertedFile.get(i);
+		for (int i = 0; i < db.tree.invertedFile.size(); i++) {
+			LeafData e = (LeafData)db.tree.invertedFile.get(i);
+			LeafData f = (LeafData)found.tree.invertedFile.get(i);
 
 			assertEquals(e.images.size(), f.images.size());
 			for (int wordIdx = 0; wordIdx < e.images.size; wordIdx++) {
@@ -193,7 +192,7 @@ public class TestRecognitionIO extends BoofStandardJUnit {
 	@NotNull
 	private RecognitionVocabularyTreeNister2006<TupleDesc_F64> createDefaultNister2006() {
 		var db = new RecognitionVocabularyTreeNister2006<TupleDesc_F64>();
-		db.tree = createTree(6, LeafData.class);
+		db.tree = createTree(6);
 
 		db.getImagesDB().resize(11);
 		for (int i = 0; i < 11; i++) {
@@ -204,11 +203,10 @@ public class TestRecognitionIO extends BoofStandardJUnit {
 			// cookie can be ignored and isn't saved
 		}
 
-		db.tree.invertedFile.resize(9);
-		for (int i = 0; i < db.tree.invertedFile.size; i++) {
+		for (int i = 0; i < 9; i++) {
 			var ld = new LeafData();
 			ld.images.grow().setTo(0.5f, db.getImagesDB().get(i));
-			db.tree.invertedFile.set(i,ld);
+			db.tree.invertedFile.add(ld);
 		}
 		return db;
 	}

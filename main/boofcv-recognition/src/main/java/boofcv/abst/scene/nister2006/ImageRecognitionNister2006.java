@@ -22,7 +22,6 @@ import boofcv.abst.feature.detdesc.DetectDescribePoint;
 import boofcv.abst.scene.ImageRecognition;
 import boofcv.alg.scene.nister2006.LearnNodeWeights;
 import boofcv.alg.scene.nister2006.RecognitionVocabularyTreeNister2006;
-import boofcv.alg.scene.nister2006.RecognitionVocabularyTreeNister2006.LeafData;
 import boofcv.alg.scene.vocabtree.HierarchicalVocabularyTree;
 import boofcv.alg.scene.vocabtree.LearnHierarchicalTree;
 import boofcv.factory.feature.detdesc.FactoryDetectDescribe;
@@ -58,7 +57,7 @@ public class ImageRecognitionNister2006<Image extends ImageBase<Image>, TD exten
 	@Getter ConfigImageRecognitionNister2006 config;
 
 	/** Tree representation of image features */
-	@Getter HierarchicalVocabularyTree<TD, LeafData> tree;
+	@Getter HierarchicalVocabularyTree<TD> tree;
 
 	/** Manages saving and locating images */
 	@Getter RecognitionVocabularyTreeNister2006<TD> databaseN;
@@ -96,7 +95,7 @@ public class ImageRecognitionNister2006<Image extends ImageBase<Image>, TD exten
 		databaseN.setDistanceType(config.distanceNorm);
 	}
 
-	public void setDatabase(RecognitionVocabularyTreeNister2006<TD> db) {
+	public void setDatabase( RecognitionVocabularyTreeNister2006<TD> db ) {
 		databaseN = db;
 		tree = db.getTree();
 	}
@@ -129,8 +128,7 @@ public class ImageRecognitionNister2006<Image extends ImageBase<Image>, TD exten
 		// Create the tree data structure
 		PackedArray<TD> packedArray = FactoryTupleDesc.createPacked(DOF, tupleType);
 
-		tree = new HierarchicalVocabularyTree<>(FactoryTupleCluster.createDistance(tupleType), packedArray,
-				RecognitionVocabularyTreeNister2006.LeafData.class);
+		tree = new HierarchicalVocabularyTree<>(FactoryTupleCluster.createDistance(tupleType), packedArray);
 		tree.branchFactor = config.tree.branchFactor;
 		tree.maximumLevel = config.tree.maximumLevel;
 
@@ -222,7 +220,7 @@ public class ImageRecognitionNister2006<Image extends ImageBase<Image>, TD exten
 		DogArray<RecognitionVocabularyTreeNister2006.Match> found = databaseN.getMatchScores();
 		matches.resize(found.size);
 
-		if (verbose != null) verbose.println("matches.size="+found.size+" best.error="+found.get(0).error);
+		if (verbose != null) verbose.println("matches.size=" + found.size + " best.error=" + found.get(0).error);
 
 		// Copy results into output format
 		int count = config.maxMatches <= 0 ? found.size : Math.min(config.maxMatches, found.size);

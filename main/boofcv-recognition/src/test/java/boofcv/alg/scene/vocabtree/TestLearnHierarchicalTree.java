@@ -46,7 +46,7 @@ class TestLearnHierarchicalTree extends BoofStandardJUnit {
 		addCluster(10, 2, 0, points.list);
 
 		// Very simple graph
-		HierarchicalVocabularyTree<Point2D_F64, Object> tree = createTree(Object.class);
+		HierarchicalVocabularyTree<Point2D_F64> tree = createTree();
 		tree.branchFactor = 2;
 		tree.maximumLevel = 1;
 		LearnHierarchicalTree<Point2D_F64> alg = createAlg();
@@ -70,7 +70,7 @@ class TestLearnHierarchicalTree extends BoofStandardJUnit {
 		addCluster(10, 3, 0, points.list);
 
 		// Very simple graph
-		HierarchicalVocabularyTree<Point2D_F64, Object> tree = createTree(Object.class);
+		HierarchicalVocabularyTree<Point2D_F64> tree = createTree();
 		tree.branchFactor = 2;
 		tree.maximumLevel = 2;
 		LearnHierarchicalTree<Point2D_F64> alg = createAlg();
@@ -100,7 +100,7 @@ class TestLearnHierarchicalTree extends BoofStandardJUnit {
 		}
 
 		// Process the data
-		HierarchicalVocabularyTree<Point2D_F64, Object> tree = createTree(Object.class);
+		HierarchicalVocabularyTree<Point2D_F64> tree = createTree();
 		tree.branchFactor = 3;
 		tree.maximumLevel = 4;
 		LearnHierarchicalTree<Point2D_F64> alg = createAlg();
@@ -108,7 +108,7 @@ class TestLearnHierarchicalTree extends BoofStandardJUnit {
 
 		assertEquals(121, tree.nodes.size);
 		assertEquals(120, tree.descriptions.size());
-		assertEquals(0, tree.invertedFile.size);
+		assertEquals(0, tree.invertedFile.size());
 	}
 
 	/**
@@ -121,7 +121,7 @@ class TestLearnHierarchicalTree extends BoofStandardJUnit {
 		}
 
 		// Process the data
-		HierarchicalVocabularyTree<Point2D_F64, Object> tree = createTree(Object.class);
+		HierarchicalVocabularyTree<Point2D_F64> tree = createTree();
 		tree.branchFactor = 4;
 		tree.maximumLevel = 4;
 		LearnHierarchicalTree<Point2D_F64> alg = createAlg();
@@ -130,10 +130,10 @@ class TestLearnHierarchicalTree extends BoofStandardJUnit {
 		assertTrue(100 >= tree.nodes.size);
 		// The root node has no description, hence the -1
 		assertEquals(tree.descriptions.size(), tree.nodes.size - 1);
-		assertEquals(0, tree.invertedFile.size);
+		assertEquals(0, tree.invertedFile.size());
 	}
 
-	private boolean findNodeAt( HierarchicalVocabularyTree<Point2D_F64, Object> tree,
+	private boolean findNodeAt( HierarchicalVocabularyTree<Point2D_F64> tree,
 								double x, double y, boolean leaf ) {
 		for (int i = 0; i < tree.descriptions.size(); i++) {
 			if (tree.descriptions.getTemp(i).distance(x, y) <= 1e-8) {

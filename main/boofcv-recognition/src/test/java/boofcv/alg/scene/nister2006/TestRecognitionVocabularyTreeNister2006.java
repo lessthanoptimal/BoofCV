@@ -18,7 +18,6 @@
 
 package boofcv.alg.scene.nister2006;
 
-import boofcv.alg.scene.nister2006.RecognitionVocabularyTreeNister2006.LeafData;
 import boofcv.alg.scene.nister2006.RecognitionVocabularyTreeNister2006.Match;
 import boofcv.alg.scene.vocabtree.HierarchicalVocabularyTree;
 import boofcv.testing.BoofStandardJUnit;
@@ -40,7 +39,7 @@ class TestRecognitionVocabularyTreeNister2006 extends BoofStandardJUnit {
 	 * Simple tests with random images to see if they can be found without issue
 	 */
 	@Test void allTogether() {
-		HierarchicalVocabularyTree<Point2D_F64, LeafData> tree = create2x2Tree();
+		HierarchicalVocabularyTree<Point2D_F64> tree = create2x2Tree();
 		var alg = new RecognitionVocabularyTreeNister2006<Point2D_F64>();
 		alg.initializeTree(tree);
 
@@ -78,7 +77,7 @@ class TestRecognitionVocabularyTreeNister2006 extends BoofStandardJUnit {
 	}
 
 	@Test void describe() {
-		HierarchicalVocabularyTree<Point2D_F64, LeafData> tree = create2x2Tree();
+		HierarchicalVocabularyTree<Point2D_F64> tree = create2x2Tree();
 
 		// Add a few features at the leaves
 		List<Point2D_F64> imageFeatures = new ArrayList<>();
@@ -114,8 +113,8 @@ class TestRecognitionVocabularyTreeNister2006 extends BoofStandardJUnit {
 		assertEquals(1.0f, norm, UtilEjml.TEST_F32);
 	}
 
-	public static HierarchicalVocabularyTree<Point2D_F64, LeafData> create2x2Tree() {
-		HierarchicalVocabularyTree<Point2D_F64, LeafData> tree = createTree(LeafData.class);
+	public static HierarchicalVocabularyTree<Point2D_F64> create2x2Tree() {
+		HierarchicalVocabularyTree<Point2D_F64> tree = createTree();
 		tree.branchFactor = 2;
 		tree.maximumLevel = 2;
 

@@ -91,7 +91,7 @@ public class RecognitionIO {
 		return alg;
 	}
 
-	public static <TD extends TupleDesc<TD>> void saveBin( HierarchicalVocabularyTree<TD, ?> tree, File file ) {
+	public static <TD extends TupleDesc<TD>> void saveBin( HierarchicalVocabularyTree<TD> tree, File file ) {
 		try {
 			var out = new FileOutputStream(file);
 			saveTreeBin(tree, out);
@@ -101,13 +101,11 @@ public class RecognitionIO {
 		}
 	}
 
-	public static <TD extends TupleDesc<TD>, Data>
-	HierarchicalVocabularyTree<TD, Data> loadTreeBin( File file,
-													  @Nullable HierarchicalVocabularyTree<TD, Data> tree,
-													  Class<Data> leafType ) {
+	public static <TD extends TupleDesc<TD>>
+	HierarchicalVocabularyTree<TD> loadTreeBin( File file, @Nullable HierarchicalVocabularyTree<TD> tree ) {
 		try {
 			var in = new FileInputStream(file);
-			tree = loadTreeBin(in, tree, leafType);
+			tree = loadTreeBin(in, tree);
 			in.close();
 			return tree;
 		} catch (IOException e) {
@@ -121,7 +119,7 @@ public class RecognitionIO {
 	 * @param tree (Input) Tree that's saved
 	 * @param out (Output) Stream the tree is written to
 	 */
-	public static <TD extends TupleDesc<TD>> void saveTreeBin( HierarchicalVocabularyTree<TD, ?> tree, OutputStream out ) {
+	public static <TD extends TupleDesc<TD>> void saveTreeBin( HierarchicalVocabularyTree<TD> tree, OutputStream out ) {
 		String header = "BOOFCV_HIERARCHICAL_VOCABULARY_TREE\n";
 		header += "# Graph format: id=int,parent=int,branch=int,descIdx=int,dataIdx=int,weight=double,children.size=int,children=int[]\n";
 		header += "# Description format: raw array used internally\n";
@@ -132,7 +130,7 @@ public class RecognitionIO {
 		header += "maximum_level " + tree.maximumLevel + "\n";
 		header += "nodes.size " + tree.nodes.size + "\n";
 		header += "descriptions.size " + tree.descriptions.size() + "\n";
-		header += "data.size " + tree.invertedFile.size + "\n";
+		header += "data.size " + tree.invertedFile.size() + "\n";
 		header += "point_type " + tree.descriptions.getElementType().getSimpleName() + "\n";
 		header += "point_dof " + tree.descriptions.getTemp(0).size() + "\n";
 		header += "distance.name " + tree.distanceFunction.getClass().getName() + "\n";
@@ -166,10 +164,8 @@ public class RecognitionIO {
 		}
 	}
 
-	public static <TD extends TupleDesc<TD>, Data>
-	HierarchicalVocabularyTree<TD, Data> loadTreeBin( InputStream in,
-													  @Nullable HierarchicalVocabularyTree<TD, Data> tree,
-													  Class<Data> leafType ) {
+	public static <TD extends TupleDesc<TD>>
+	HierarchicalVocabularyTree<TD> loadTreeBin( InputStream in, @Nullable HierarchicalVocabularyTree<TD> tree ) {
 		var builder = new StringBuilder();
 		try {
 			String line = UtilIO.readLine(in, builder);
@@ -233,7 +229,7 @@ public class RecognitionIO {
 				}
 
 				if (tree == null)
-					tree = new HierarchicalVocabularyTree<>(distanceFunction, descriptions, leafType);
+					tree = new HierarchicalVocabularyTree<>(distanceFunction, descriptions);
 				else {
 					tree.distanceFunction = distanceFunction;
 				}
@@ -261,7 +257,7 @@ public class RecognitionIO {
 				}
 			}
 
-			readCheckUTF(input,"BEGIN_DESCRIPTIONS");
+			readCheckUTF(input, "BEGIN_DESCRIPTIONS");
 
 			for (int i = 0; i < numDescriptions; i++) {
 				readBin(tuple, input);
@@ -313,7 +309,7 @@ public class RecognitionIO {
 			}
 		} else if (tuple instanceof TupleDesc_I8) {
 			var desc = (TupleDesc_I8)tuple;
-			BoofMiscOps.checkEq(desc.data.length, in.read(desc.data,0,desc.data.length));
+			BoofMiscOps.checkEq(desc.data.length, in.read(desc.data, 0, desc.data.length));
 		} else if (tuple instanceof TupleDesc_B) {
 			var desc = (TupleDesc_B)tuple;
 			for (int i = 0; i < desc.data.length; i++) {
@@ -326,7 +322,7 @@ public class RecognitionIO {
 
 	public static <TD extends TupleDesc<TD>> void saveTreeBin( RecognitionVocabularyTreeNister2006<TD> db, File file ) {
 		try {
-			var out = new BufferedOutputStream(new FileOutputStream(file),1024*1024);
+			var out = new BufferedOutputStream(new FileOutputStream(file), 1024*1024);
 			saveBin(db, out);
 			out.close();
 		} catch (IOException e) {
@@ -352,7 +348,7 @@ public class RecognitionIO {
 	 * @param out Stream it's written to
 	 */
 	public static <TD extends TupleDesc<TD>> void saveBin( RecognitionVocabularyTreeNister2006<TD> db, OutputStream out ) {
-		HierarchicalVocabularyTree<TD, LeafData> tree = db.getTree();
+		HierarchicalVocabularyTree<TD> tree = db.getTree();
 		Objects.requireNonNull(tree, "Tree must be specified before it can be saved");
 
 		String header = "BOOFCV_RECOGNITION_NISTER_2006\n";
@@ -362,7 +358,7 @@ public class RecognitionIO {
 		header += "boofcv_version " + BoofVersion.VERSION + "\n";
 		header += "git_sha " + BoofVersion.GIT_SHA + "\n";
 		header += "images_db.size " + db.getImagesDB().size + "\n";
-		header += "leaf_data.size " + tree.invertedFile.size + "\n";
+		header += "leaf_data.size " + tree.invertedFile.size() + "\n";
 		header += "BEGIN_TREE\n";
 
 		try {
@@ -396,8 +392,8 @@ public class RecognitionIO {
 				id_to_idx.put(n.identification, dbIdx);
 			}
 
-			for (int infoIdx = 0; infoIdx < tree.invertedFile.size; infoIdx++) {
-				LeafData leaf = tree.invertedFile.get(infoIdx);
+			for (int infoIdx = 0; infoIdx < tree.invertedFile.size(); infoIdx++) {
+				LeafData leaf = (LeafData)tree.invertedFile.get(infoIdx);
 				// Save the map as an array. elements are imageID -> dbIdx
 				dout.writeInt(leaf.images.size());
 				keys.resize(leaf.images.size());
@@ -445,8 +441,7 @@ public class RecognitionIO {
 				}
 			}
 
-			db.tree = loadTreeBin(in, null, RecognitionVocabularyTreeNister2006.LeafData.class);
-			db.tree.invertedFile.resize(listDataSize);
+			db.tree = loadTreeBin(in, null);
 
 			var input = new DataInputStream(in);
 			readCheckUTF(input, "BEGIN_IMAGE_DB");
@@ -464,9 +459,9 @@ public class RecognitionIO {
 
 			readCheckUTF(input, "BEGIN_LEAF_INFO");
 
-			for (int dataIdx = 0; dataIdx < db.tree.invertedFile.size; dataIdx++) {
+			for (int dataIdx = 0; dataIdx < listDataSize; dataIdx++) {
 				var leaf = new LeafData();
-				db.tree.invertedFile.set(dataIdx, leaf);
+				db.tree.invertedFile.add(leaf);
 				int N = input.readInt();
 				for (int i = 0; i < N; i++) {
 					float weight = input.readFloat();
@@ -481,9 +476,9 @@ public class RecognitionIO {
 		}
 	}
 
-	private static void readCheckUTF( DataInputStream input, String expected) throws IOException {
+	private static void readCheckUTF( DataInputStream input, String expected ) throws IOException {
 		String line = input.readUTF();
 		if (!line.equals(expected))
-			throw new IOException("Expected '"+expected+"' not '"+line+"'");
+			throw new IOException("Expected '" + expected + "' not '" + line + "'");
 	}
 }

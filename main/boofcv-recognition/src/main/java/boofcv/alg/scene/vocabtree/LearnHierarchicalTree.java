@@ -78,7 +78,7 @@ public class LearnHierarchicalTree<Point> implements VerbosePrint {
 	 * @param points (Input) points which are to be segmented into the hierarchical tree
 	 * @param tree (Output) generated tree
 	 */
-	public void process( PackedArray<Point> points, HierarchicalVocabularyTree<Point, ?> tree ) {
+	public void process( PackedArray<Point> points, HierarchicalVocabularyTree<Point> tree ) {
 		// Initialize data structures
 		tree.checkConfig();
 		tree.reset();
@@ -109,10 +109,10 @@ public class LearnHierarchicalTree<Point> implements VerbosePrint {
 	 * @param parentNodeIdx Array index for the parent node
 	 */
 	private void processLevel( PackedArray<Point> pointsInParent,
-							   HierarchicalVocabularyTree<Point, ?> tree,
+							   HierarchicalVocabularyTree<Point> tree,
 							   int level, int parentNodeIdx ) {
 		// Stop here if we are at the maximum number of levels or it's already down to a single point
-		if (level >= tree.maximumLevel - 1 || pointsInParent.size()<=1)
+		if (level >= tree.maximumLevel - 1 || pointsInParent.size() <= 1)
 			return;
 
 		// Get k-means for this level
@@ -144,7 +144,7 @@ public class LearnHierarchicalTree<Point> implements VerbosePrint {
 	 * Goes through each child/branch one at a time splits the points into a subset for each child's region.
 	 * Then processes the next level in the pyramid for each branch.
 	 */
-	private void processChildren( HierarchicalVocabularyTree<Point, ?> tree,
+	private void processChildren( HierarchicalVocabularyTree<Point> tree,
 								  int level,
 								  Node parent, PackedArray<Point> pointsInParent,
 								  List<Point> clusterMeans, DogArray_I32 assignments,

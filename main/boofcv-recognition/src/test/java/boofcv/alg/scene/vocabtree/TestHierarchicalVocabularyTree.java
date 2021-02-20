@@ -33,7 +33,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class TestHierarchicalVocabularyTree extends BoofStandardJUnit {
 	@Test void searchPathToLeaf() {
-		HierarchicalVocabularyTree<Point2D_F64, Object> tree = createTree(Object.class);
+		HierarchicalVocabularyTree<Point2D_F64> tree = createTree();
 		tree.branchFactor = 2;
 		tree.maximumLevel = 2;
 
@@ -59,7 +59,7 @@ public class TestHierarchicalVocabularyTree extends BoofStandardJUnit {
 	}
 
 	@Test void traverseGraphDepthFirst() {
-		HierarchicalVocabularyTree<Point2D_F64, Object> tree = createTree(Object.class);
+		HierarchicalVocabularyTree<Point2D_F64> tree = createTree();
 		tree.branchFactor = 2;
 		tree.maximumLevel = 2;
 
@@ -90,7 +90,7 @@ public class TestHierarchicalVocabularyTree extends BoofStandardJUnit {
 
 	@Test void addData() {
 		// create a simple graph
-		HierarchicalVocabularyTree<Point2D_F64, Object> tree = createTree(Object.class);
+		HierarchicalVocabularyTree<Point2D_F64> tree = createTree();
 		tree.branchFactor = 2;
 		tree.maximumLevel = 2;
 
@@ -105,13 +105,13 @@ public class TestHierarchicalVocabularyTree extends BoofStandardJUnit {
 		tree.addData(tree.nodes.get(2), 1);
 
 		// Check data structures
-		assertEquals(1, tree.invertedFile.size);
+		assertEquals(1, tree.invertedFile.size());
 		assertEquals(1, (int)tree.invertedFile.get(0));
 		assertEquals(0, tree.nodes.get(2).invertedIdx);
 	}
 
 	@Test void reset() {
-		HierarchicalVocabularyTree<Point2D_F64, Object> tree = createTree(Object.class);
+		HierarchicalVocabularyTree<Point2D_F64> tree = createTree();
 		tree.branchFactor = 2;
 		tree.maximumLevel = 2;
 
@@ -130,8 +130,8 @@ public class TestHierarchicalVocabularyTree extends BoofStandardJUnit {
 		assertEquals(2, tree.maximumLevel);
 	}
 
-	public static <T> HierarchicalVocabularyTree<Point2D_F64, T> createTree(Class<T> type) {
-		return new HierarchicalVocabularyTree<>(new PointDistance2D(), new Packed2D(), type);
+	public static HierarchicalVocabularyTree<Point2D_F64> createTree() {
+		return new HierarchicalVocabularyTree<>(new PointDistance2D(), new Packed2D());
 	}
 
 	// @formatter:off
