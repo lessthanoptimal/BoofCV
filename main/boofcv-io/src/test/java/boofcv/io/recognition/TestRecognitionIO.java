@@ -205,7 +205,11 @@ public class TestRecognitionIO extends BoofStandardJUnit {
 
 		for (int i = 0; i < 9; i++) {
 			var ld = new LeafData();
-			ld.images.grow().setTo(0.5f, db.getImagesDB().get(i));
+			RecognitionVocabularyTreeNister2006.ImageWord word = ld.images.grow();
+			for (int levels = 1; levels < db.tree.maximumLevel; levels++) {
+				word.weights.add(i*0.01f+0.4f);
+			}
+			word.image = db.getImagesDB().get(i);
 			db.tree.invertedFile.add(ld);
 		}
 		return db;
