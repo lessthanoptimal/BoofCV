@@ -136,41 +136,6 @@ class TestRecognitionVocabularyTreeNister2006 extends BoofStandardJUnit {
 		fail("Implement");
 	}
 
-	@Test void distanceL1Norm() {
-		TIntFloatMap va = sparseVector(0, 0, 2, 4, 0, 0, 0, 9, 0, 2, 3);
-		TIntFloatMap vb = sparseVector(1, 0, 0, 1, 4, 0, 2, 6, 1, 3, 0);
-
-		float expected = 0.0f;
-		for (int i = 0; i < 11; i++) {
-			float a = va.containsKey(i) ? va.get(i) : 0.0f;
-			float b = vb.containsKey(i) ? vb.get(i) : 0.0f;
-			expected += Math.abs(a - b);
-		}
-
-		var alg = new RecognitionVocabularyTreeNister2006<>();
-		float found = alg.distanceL1Norm(va, vb);
-
-		assertEquals(expected, found, UtilEjml.TEST_F32);
-	}
-
-	@Test void distanceL2Norm() {
-		TIntFloatMap va = sparseVector(0, 0, 2, 4, 0, 0, 0, 9, 0, 2, 3);
-		TIntFloatMap vb = sparseVector(1, 0, 0, 1, 4, 0, 2, 6, 1, 3, 0);
-
-		float expected = 0.0f;
-		for (int i = 0; i < 11; i++) {
-			float a = va.containsKey(i) ? va.get(i) : 0.0f;
-			float b = vb.containsKey(i) ? vb.get(i) : 0.0f;
-			expected += (a - b)*(a - b);
-		}
-		expected = (float)Math.sqrt(expected);
-
-		var alg = new RecognitionVocabularyTreeNister2006<>();
-		float found = alg.distanceL2Norm(va, vb);
-
-		assertEquals(expected, found, UtilEjml.TEST_F32);
-	}
-
 	private TIntFloatMap sparseVector( float... values ) {
 		float total = 0.0f;
 		for (int i = 0; i < values.length; i++) {

@@ -18,10 +18,9 @@
 
 package boofcv.alg.scene.nister2006;
 
+import boofcv.alg.scene.nister2006.TupleMapDistanceNorm.CommonWords;
 import boofcv.alg.scene.vocabtree.HierarchicalVocabularyTree;
 import boofcv.alg.scene.vocabtree.HierarchicalVocabularyTree.Node;
-import boofcv.misc.BoofMiscOps;
-import gnu.trove.impl.Constants;
 import gnu.trove.map.TIntFloatMap;
 import gnu.trove.map.TIntIntMap;
 import gnu.trove.map.TIntObjectMap;
@@ -55,8 +54,6 @@ import java.util.List;
  */
 public class RecognitionVocabularyTreeNister2006<Point> {
 
-	// TODO generalize normalization function
-	// TODO block nodes from scoring if inverted file is too long <-- when learning weights, not here
 	// TODO more standard language. query, retrieve
 
 	/** Vocabulary Tree */
@@ -72,7 +69,7 @@ public class RecognitionVocabularyTreeNister2006<Point> {
 	protected @Getter final DogArray<Match> matchScores = new DogArray<>(Match::new, Match::reset);
 
 	/** Distance between two TF-IDF descriptors. L1 and L2 norms are provided */
-	protected @Getter @Setter DistanceFunction distanceFunction = this::distanceL1Norm;
+	protected @Getter @Setter TupleMapDistanceNorm distanceFunction = new TupleMapDistanceNorm.L2();
 
 	//---------------- Internal Workspace
 
@@ -244,7 +241,8 @@ public class RecognitionVocabularyTreeNister2006<Point> {
 					m.traversed.add(node.index);
 
 					// Update the score computation. See BLAH []
-					m.error += imageWordWeight*w.weights.get(distanceFromLeaf);
+					m.commonWords.grow().setTo(node.index,
+							imageWordWeight, w.weights.get(distanceFromLeaf));
 				}
 
 				// move to the parent node
@@ -259,9 +257,8 @@ public class RecognitionVocabularyTreeNister2006<Point> {
 		// Compute the final scores
 		for (int i = 0; i < matchScores.size(); i++) {
 			Match m = matchScores.get(i);
-
-			// Finalize the score after the accumulation steps above
-			m.error = 2.0f*(1.0f - m.error);
+			m.error = distanceFunction.distance(
+					queryDescTermFreq, m.image.descTermFreq, m.commonWords.toList());
 		}
 
 		Collections.sort(matchScores.toList());
@@ -318,23 +315,12 @@ public class RecognitionVocabularyTreeNister2006<Point> {
 		if (node_to_frequency.isEmpty())
 			return;
 
-		// TODO normalize using the correct norm here. Won't work if you mix the two.
-		//      L1 and L2
-
-		//------ Create the TF-IDF descriptor for this image
-		// Normalize the vector such that the L2-norm is 1.0
-		double normL2 = 0.0;
-		for (int i = 0; i < frequencies.size(); i++) {
-			double x = frequencies.get(i).sum;
-			normL2 += x*x;
-		}
-		normL2 = Math.sqrt(normL2);
-		BoofMiscOps.checkTrue(normL2 != 0.0, "Sum of weights is zero. Something went very wrong");
-
-		for (int i = 0; i < frequencies.size(); i++) {
+		// Create the descriptor and normalize it
+		for (int i = 0; i < frequencies.size; i++) {
 			Frequency f = frequencies.get(i);
-			descTermFreq.put(f.node.index, (float)(f.sum/normL2));
+			descTermFreq.put(f.node.index, (float)f.sum);
 		}
+		distanceFunction.normalize(descTermFreq);
 	}
 
 	/**
@@ -359,93 +345,17 @@ public class RecognitionVocabularyTreeNister2006<Point> {
 
 	/** Used to change distance function to one of the built in types */
 	public void setDistanceType( DistanceTypes type ) {
-		switch (type) {
-			case L1 -> distanceFunction = this::distanceL1Norm;
-			case L2 -> distanceFunction = this::distanceL2Norm;
-		}
-	}
-
-	/**
-	 * Computes L2-Norm for score between the two descriptions. Searches for common non-zero elements between
-	 * the two then uses the simplified equation from [1].
-	 */
-	public float distanceL2Norm( TIntFloatMap descA, TIntFloatMap descB ) {
-		// Get the key and make sure it doesn't declare new memory
-		keysDist.resize(descA.size());
-		descA.keys(keysDist.data);
-
-		// Compute dot product of common non-zero elements
-		float sum = 0.0f;
-		for (int keyIdx = 0; keyIdx < keysDist.size; keyIdx++) {
-			int key = keysDist.data[keyIdx];
-
-			float valueA = descA.get(key);
-			float valueB = descB.get(key);
-			if (valueB <= 0.0f)
-				continue;
-
-			sum += valueA*valueB;
-		}
-
-		// max to avoid floating point error causing it to go slightly negative
-		return (float)Math.sqrt(Math.max(0.0f, 2.0f - 2.0f*sum)); // TODO should it use L2-norm squared for speed?
-	}
-
-	/**
-	 * Computes the L1-norm distance between the descriptors. This is more complex to compute
-	 * but according to the paper provides better results.
-	 */
-	public float distanceL1Norm( TIntFloatMap descA, TIntFloatMap descB ) {
-		// Find the set of common keys between the two descriptors
-		findCommonKeys(descA, descB, commonKeys, keysDist);
-
-		// Look up the common keys
-		keysDist.resize(commonKeys.size());
-		commonKeys.toArray(keysDist.data);
-
-		// L1-norm is the sum of the difference magnitude of each element
-		float sum = 0.0f;
-		for (int keyIdx = 0; keyIdx < keysDist.size; keyIdx++) {
-			int key = keysDist.data[keyIdx];
-
-			// If a key doesn't exist in the descriptor the default value is -1, but the actual value
-			// is 0.0, hence the max.
-			float valueA = Math.max(0.0f, descA.get(key));
-			float valueB = Math.max(0.0f, descB.get(key));
-
-			sum += Math.abs(valueA - valueB);
-		}
-
-		return sum;
-	}
-
-	/**
-	 * Finds common keys between the two descriptors
-	 */
-	private void findCommonKeys( TIntFloatMap descA, TIntFloatMap descB, TIntSet commonKeys,
-								 DogArray_I32 work ) {
-		commonKeys.clear();
-
-		// Add keys from descA
-		work.resize(descA.size());
-		descA.keys(work.data);
-		for (int i = 0; i < work.size; i++) {
-			commonKeys.add(work.get(i));
-		}
-
-		// Add keys from descB
-		work.resize(descB.size());
-		descB.keys(work.data);
-		for (int i = 0; i < work.size; i++) {
-			commonKeys.add(work.get(i));
-		}
+		distanceFunction = switch (type) {
+			case L1 -> new TupleMapDistanceNorm.L1();
+			case L2 -> new TupleMapDistanceNorm.L2();
+			default -> throw new IllegalArgumentException("Unknown type " + type);
+		};
 	}
 
 	/** Information about an image stored in the database */
 	public static class ImageInfo {
-		/** TF-IDF description of the image. Default -1 for no key and no value. */
-		public TIntFloatMap descTermFreq = new TIntFloatHashMap(
-				Constants.DEFAULT_CAPACITY, Constants.DEFAULT_LOAD_FACTOR, -1, -1);
+		/** TF-IDF description of the image. Default 0 for no key and no value. */
+		public final TIntFloatMap descTermFreq = new TIntFloatHashMap();
 
 		/** Use specified data associated with this image */
 		public Object cookie;
@@ -509,13 +419,14 @@ public class RecognitionVocabularyTreeNister2006<Point> {
 		public ImageInfo image;
 		/** Nodes in the tree that it has already traversed */
 		public final TIntSet traversed = new TIntHashSet();
-		public final DogArray_I32 foo = new DogArray_I32(0);
+
+		public final DogArray<CommonWords> commonWords = new DogArray<>(CommonWords::new);
 
 		public void reset() {
 			error = 0;
 			image = null;
 			traversed.clear();
-			foo.reset();
+			commonWords.reset();
 		}
 
 		@Override public int compareTo( Match o ) {
@@ -549,13 +460,4 @@ public class RecognitionVocabularyTreeNister2006<Point> {
 
 	/** Different built in distance norms. */
 	public enum DistanceTypes {L1, L2}
-
-	/** Computes the distance between two TF-IDF descriptors */
-	public interface DistanceFunction {
-		/**
-		 * Distance between the two descriptors. All empty elements in the maps are assumed to be zero, but
-		 * as a precondition the must return -1.
-		 */
-		float distance( TIntFloatMap descA, TIntFloatMap descB );
-	}
 }
