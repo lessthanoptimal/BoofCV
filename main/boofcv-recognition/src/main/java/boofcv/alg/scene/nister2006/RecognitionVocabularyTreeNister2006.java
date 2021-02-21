@@ -56,7 +56,7 @@ import java.util.List;
 public class RecognitionVocabularyTreeNister2006<Point> {
 
 	// TODO generalize normalization function
-	// TODO block nodes from scoring if inverted file is too long
+	// TODO block nodes from scoring if inverted file is too long <-- when learning weights, not here
 	// TODO more standard language. query, retrieve
 
 	/** Vocabulary Tree */
@@ -84,7 +84,7 @@ public class RecognitionVocabularyTreeNister2006<Point> {
 	protected final TIntObjectMap<Frequency> node_to_frequency = new TIntObjectHashMap<>();
 
 	// Temporary storage for an image's TF description while it's being looked up
-	protected final TIntFloatMap targetImageDescTermFreq = new TIntFloatHashMap();
+	protected final TIntFloatMap queryDescTermFreq = new TIntFloatHashMap();
 
 	// Predeclare array for storing keys. Avoids unnecessary array creation
 	protected final DogArray_I32 keysDesc = new DogArray_I32(); // ONLY use in describe()
@@ -115,12 +115,12 @@ public class RecognitionVocabularyTreeNister2006<Point> {
 		imagesDB.reset();
 
 		// Removes the old leaf data and replaces it with empty structures
-		tree.invertedFile.clear();
+		tree.nodeData.clear();
 		for (int i = 0; i < tree.nodes.size; i++) {
 			if (!tree.nodes.get(i).isLeaf())
 				continue;
-			tree.nodes.get(i).invertedIdx = -1;
-			tree.addData(tree.nodes.get(i), new LeafData());
+			tree.nodes.get(i).dataIdx = -1;
+			tree.addData(tree.nodes.get(i), new InvertedFile());
 		}
 
 		// Set image count to zero since there are no images
@@ -149,10 +149,14 @@ public class RecognitionVocabularyTreeNister2006<Point> {
 		for (int histIdx = 0; histIdx < leafHistogram.leaves.size; histIdx++) {
 			LeafCounts counts = leafHistogram.leaves.get(histIdx);
 			Node node = tree.nodes.get(counts.nodeIdx);
-			LeafData leafData = (LeafData)tree.invertedFile.get(node.invertedIdx);
+
+			if (node.weight <= 0.0f)
+				break;
+
+			InvertedFile invertedFile = (InvertedFile)tree.nodeData.get(node.dataIdx);
 
 			// Add to inverted file at this node and note what the descriptor weight was for later rapid retrieval
-			ImageWord word = leafData.images.grow();
+			ImageWord word = invertedFile.images.grow();
 			word.image = info;
 			word.weights.reserve(tree.maximumLevel);
 			word.weights.add(info.descTermFreq.get(node.index));
@@ -164,7 +168,7 @@ public class RecognitionVocabularyTreeNister2006<Point> {
 			while (distanceFromLeaf <= maxDistanceFromLeaf && node.index > 0) {
 				distanceFromLeaf++;
 				node = tree.nodes.get(node.parent);
-				if (node.weight == 0.0)
+				if (node.weight <= 0.0f)
 					break;
 				word.weights.add(info.descTermFreq.get(node.index));
 			}
@@ -182,20 +186,20 @@ public class RecognitionVocabularyTreeNister2006<Point> {
 	 * Looks up the best match from the data base. The list of all potential matches can be accessed by calling
 	 * {@link #getMatchScores()}.
 	 *
-	 * @param imageFeatures Feature descriptors from an image
+	 * @param query Set of feature descriptors from the query image
 	 * @return The best matching image with score from the database
 	 */
-	public boolean lookup( List<Point> imageFeatures ) {
+	public boolean lookup( List<Point> query ) {
 		identification_to_match.clear();
 		matchScores.reset();
 
 		// Can't match to anything if it's empty
-		if (imageFeatures.isEmpty()) {
+		if (query.isEmpty()) {
 			return false;
 		}
 
 		// Create a description of this image and collect potential matches from leaves
-		describe(imageFeatures, targetImageDescTermFreq, leafHistogram);
+		describe(query, queryDescTermFreq, leafHistogram);
 
 		// Create a list of images in the DB that have at least a single feature pass through a node
 		for (int histIdx = 0; histIdx < leafHistogram.leaves.size; histIdx++) {
@@ -203,24 +207,24 @@ public class RecognitionVocabularyTreeNister2006<Point> {
 			HierarchicalVocabularyTree.Node node = tree.nodes.get(count.nodeIdx);
 
 			// Find the database images by looking at the inverted file for this particular node/work
-			LeafData leafData = (LeafData)tree.invertedFile.get(node.invertedIdx);
+			InvertedFile invertedFile = (InvertedFile)tree.nodeData.get(node.dataIdx);
 
 			// distance from leaf along the graph
 			int distanceFromLeaf = 0;
 
 			// Go up the graph until it hits the root or maximum distance away from a leaf
 			while (distanceFromLeaf <= maxDistanceFromLeaf && node.index > 0) {
-				if (node.weight == 0.0)
+				if (node.weight <= 0.0f)
 					break;
 
-				// Look up the value of this word in the descriptor for the target
-				float imageWordWeight = targetImageDescTermFreq.get(node.index);
+				// Look up the value of this word in the descriptor for the query
+				float imageWordWeight = queryDescTermFreq.get(node.index);
 
 				// Go through each leaf and compute the error for all related nodes
-				for (int i = 0; i < leafData.images.size(); i++) {
+				for (int i = 0; i < invertedFile.images.size(); i++) {
 					// Get the list of images in the database which have this particular word using
 					// the inverted file list
-					ImageWord w = leafData.images.get(i);
+					ImageWord w = invertedFile.images.get(i);
 
 					// The match stores how well this particular images matches the target as well as book keeping info
 					int identification = w.image.identification;
@@ -294,8 +298,9 @@ public class RecognitionVocabularyTreeNister2006<Point> {
 			// Traverse up the tree from leaf to root
 			while (distanceFromLeaf <= maxDistanceFromLeaf && node.index > 0) {
 				// if the weight is zero now, all the parents will have to be zero too
-				if (node.weight == 0.0)
+				if (node.weight <= 0.0f)
 					break;
+
 				Frequency f = node_to_frequency.get(node.index);
 				if (f == null) {
 					f = frequencies.grow();
@@ -535,7 +540,7 @@ public class RecognitionVocabularyTreeNister2006<Point> {
 		}
 	}
 
-	public static class LeafData {
+	public static class InvertedFile {
 		/** Specifies which image is in this leaf and the weight of the word in the descriptor */
 		public DogArray<ImageWord> images = new DogArray<ImageWord>(ImageWord::new, ImageWord::reset);
 		// The depth of the leaf node

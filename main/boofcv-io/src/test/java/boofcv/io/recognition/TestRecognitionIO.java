@@ -22,7 +22,7 @@ import boofcv.abst.scene.nister2006.ConfigImageRecognitionNister2006;
 import boofcv.abst.scene.nister2006.ImageRecognitionNister2006;
 import boofcv.alg.scene.nister2006.RecognitionVocabularyTreeNister2006;
 import boofcv.alg.scene.nister2006.RecognitionVocabularyTreeNister2006.ImageInfo;
-import boofcv.alg.scene.nister2006.RecognitionVocabularyTreeNister2006.LeafData;
+import boofcv.alg.scene.nister2006.RecognitionVocabularyTreeNister2006.InvertedFile;
 import boofcv.alg.scene.vocabtree.HierarchicalVocabularyTree;
 import boofcv.io.UtilIO;
 import boofcv.struct.feature.PackedTupleArray_F64;
@@ -100,7 +100,7 @@ public class TestRecognitionIO extends BoofStandardJUnit {
 			assertEquals(e.branch, f.branch);
 			assertEquals(e.weight, f.weight);
 			assertEquals(e.descIdx, f.descIdx);
-			assertEquals(e.invertedIdx, f.invertedIdx);
+			assertEquals(e.dataIdx, f.dataIdx);
 			assertEquals(e.childrenIndexes.size, f.childrenIndexes.size);
 			for (int j = 0; j < e.childrenIndexes.size; j++) {
 				assertEquals(e.childrenIndexes.get(j), f.childrenIndexes.get(j));
@@ -130,7 +130,7 @@ public class TestRecognitionIO extends BoofStandardJUnit {
 			n.parent = i - 1;
 			n.branch = i;
 			n.weight = 0.1 + i;
-			n.invertedIdx = i*2;
+			n.dataIdx = i*2;
 
 			// make sure the number of descriptions doesn't match the number of nodes. this was a bug once.
 			if (i==0)
@@ -162,7 +162,7 @@ public class TestRecognitionIO extends BoofStandardJUnit {
 		compareTrees(db.tree, found.tree);
 
 		assertEquals(db.getImagesDB().size, found.getImagesDB().size);
-		assertEquals(db.tree.invertedFile.size(), found.tree.invertedFile.size());
+		assertEquals(db.tree.nodeData.size(), found.tree.nodeData.size());
 
 		for (int i = 0; i < 11; i++) {
 			ImageInfo e = db.getImagesDB().get(i);
@@ -175,9 +175,9 @@ public class TestRecognitionIO extends BoofStandardJUnit {
 			}
 		}
 
-		for (int i = 0; i < db.tree.invertedFile.size(); i++) {
-			LeafData e = (LeafData)db.tree.invertedFile.get(i);
-			LeafData f = (LeafData)found.tree.invertedFile.get(i);
+		for (int i = 0; i < db.tree.nodeData.size(); i++) {
+			InvertedFile e = (InvertedFile)db.tree.nodeData.get(i);
+			InvertedFile f = (InvertedFile)found.tree.nodeData.get(i);
 
 			assertEquals(e.images.size(), f.images.size());
 			for (int wordIdx = 0; wordIdx < e.images.size; wordIdx++) {
@@ -204,13 +204,13 @@ public class TestRecognitionIO extends BoofStandardJUnit {
 		}
 
 		for (int i = 0; i < 9; i++) {
-			var ld = new LeafData();
+			var ld = new InvertedFile();
 			RecognitionVocabularyTreeNister2006.ImageWord word = ld.images.grow();
 			for (int levels = 1; levels < db.tree.maximumLevel; levels++) {
 				word.weights.add(i*0.01f+0.4f);
 			}
 			word.image = db.getImagesDB().get(i);
-			db.tree.invertedFile.add(ld);
+			db.tree.nodeData.add(ld);
 		}
 		return db;
 	}
