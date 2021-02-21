@@ -46,8 +46,8 @@ public class HierarchicalVocabularyTree<Point> {
 	/** Maximum number of levels in the tree */
 	public int maximumLevel = -1;
 
-	/** Inverted file used to look up data given the node's index */
-	public final List<Object> invertedFile = new ArrayList<>();
+	/** User data associated with each node */
+	public final List<Object> nodeData = new ArrayList<>();
 
 	/** Computes distance between two points. Together with the 'mean' points, this defines the sub-regions */
 	public PointDistance<Point> distanceFunction;
@@ -98,14 +98,15 @@ public class HierarchicalVocabularyTree<Point> {
 	 * @return index of the leaf node
 	 */
 	public int searchPathToLeaf( Point point, BoofLambdas.ProcessObject<Node> op ) {
-		int level = 0;
 		Node parent = nodes.get(0);
 
-		if (parent.isLeaf())
+		if (parent.isLeaf()) {
+			op.process(parent);
 			return 0;
+		}
 
 		// search until it hits the level limit. This is a sanity check just in case the graph has an infinite loop
-		while (level <= maximumLevel) {
+		for (int level = 0; level <= maximumLevel; level++) {
 			int bestNodeIdx = -1;
 			double bestDistance = Double.MAX_VALUE;
 
@@ -115,7 +116,7 @@ public class HierarchicalVocabularyTree<Point> {
 
 				Point desc = descriptions.getTemp(nodes.get(nodeIdx).descIdx);
 				double distance = distanceFunction.distance(point, desc);
-				if (distance > bestDistance)
+				if (distance >= bestDistance)
 					continue;
 
 				bestNodeIdx = nodeIdx;
@@ -131,8 +132,6 @@ public class HierarchicalVocabularyTree<Point> {
 			if (parent.isLeaf()) {
 				return bestNodeIdx;
 			}
-
-			level++;
 		}
 
 		throw new RuntimeException("Invalid tree. Max depth exceeded searching for leaf");
@@ -205,7 +204,7 @@ public class HierarchicalVocabularyTree<Point> {
 	 * Clears references to initial state but keeps allocated memory
 	 */
 	public void reset() {
-		invertedFile.clear();
+		nodeData.clear();
 		descriptions.reset();
 		nodes.reset();
 
@@ -220,9 +219,9 @@ public class HierarchicalVocabularyTree<Point> {
 	 * @param data The data which is not associated with it
 	 */
 	public void addData( Node node, Object data ) {
-		BoofMiscOps.checkTrue(node.invertedIdx < 0);
-		node.invertedIdx = invertedFile.size();
-		invertedFile.add(data);
+		BoofMiscOps.checkTrue(node.dataIdx < 0);
+		node.dataIdx = nodeData.size();
+		nodeData.add(data);
 	}
 
 	/** Node in the Vocabulary tree */
@@ -236,7 +235,7 @@ public class HierarchicalVocabularyTree<Point> {
 		// Index of the parent. The root node will have -1 here
 		public int parent;
 		// Index in the inverted file list. -1 means there's no data there
-		public int invertedIdx;
+		public int dataIdx;
 		// index of the first mean in the list of descriptions. Means with the same parent are consecutive
 		public int descIdx;
 		// index of the first child in the list of nodes. Children are consecutive.
@@ -252,7 +251,7 @@ public class HierarchicalVocabularyTree<Point> {
 			index = -1;
 			branch = -1;
 			parent = -1;
-			invertedIdx = -1;
+			dataIdx = -1;
 			descIdx = -1;
 			childrenIndexes.reset();
 		}
@@ -261,7 +260,7 @@ public class HierarchicalVocabularyTree<Point> {
 			index = src.index;
 			branch = src.branch;
 			parent = src.parent;
-			invertedIdx = src.invertedIdx;
+			dataIdx = src.dataIdx;
 			descIdx = src.descIdx;
 			childrenIndexes.setTo(src.childrenIndexes);
 		}

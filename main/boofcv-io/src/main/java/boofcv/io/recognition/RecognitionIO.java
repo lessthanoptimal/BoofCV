@@ -23,7 +23,7 @@ import boofcv.abst.scene.nister2006.ConfigImageRecognitionNister2006;
 import boofcv.abst.scene.nister2006.ImageRecognitionNister2006;
 import boofcv.alg.scene.nister2006.RecognitionVocabularyTreeNister2006;
 import boofcv.alg.scene.nister2006.RecognitionVocabularyTreeNister2006.ImageInfo;
-import boofcv.alg.scene.nister2006.RecognitionVocabularyTreeNister2006.LeafData;
+import boofcv.alg.scene.nister2006.RecognitionVocabularyTreeNister2006.InvertedFile;
 import boofcv.alg.scene.vocabtree.HierarchicalVocabularyTree;
 import boofcv.io.UtilIO;
 import boofcv.misc.BoofMiscOps;
@@ -130,7 +130,7 @@ public class RecognitionIO {
 		header += "maximum_level " + tree.maximumLevel + "\n";
 		header += "nodes.size " + tree.nodes.size + "\n";
 		header += "descriptions.size " + tree.descriptions.size() + "\n";
-		header += "data.size " + tree.invertedFile.size() + "\n";
+		header += "data.size " + tree.nodeData.size() + "\n";
 		header += "point_type " + tree.descriptions.getElementType().getSimpleName() + "\n";
 		header += "point_dof " + tree.descriptions.getTemp(0).size() + "\n";
 		header += "distance.name " + tree.distanceFunction.getClass().getName() + "\n";
@@ -145,7 +145,7 @@ public class RecognitionIO {
 				dout.writeInt(n.parent);
 				dout.writeInt(n.branch);
 				dout.writeInt(n.descIdx);
-				dout.writeInt(n.invertedIdx);
+				dout.writeInt(n.dataIdx);
 				dout.writeDouble(n.weight);
 				dout.writeInt(n.childrenIndexes.size);
 				for (int i = 0; i < n.childrenIndexes.size; i++) {
@@ -249,7 +249,7 @@ public class RecognitionIO {
 				n.parent = input.readInt();
 				n.branch = input.readInt();
 				n.descIdx = input.readInt();
-				n.invertedIdx = input.readInt();
+				n.dataIdx = input.readInt();
 				n.weight = input.readDouble();
 				n.childrenIndexes.resize(input.readInt());
 				for (int i = 0; i < n.childrenIndexes.size; i++) {
@@ -358,7 +358,7 @@ public class RecognitionIO {
 		header += "boofcv_version " + BoofVersion.VERSION + "\n";
 		header += "git_sha " + BoofVersion.GIT_SHA + "\n";
 		header += "images_db.size " + db.getImagesDB().size + "\n";
-		header += "leaf_data.size " + tree.invertedFile.size() + "\n";
+		header += "leaf_data.size " + tree.nodeData.size() + "\n";
 		header += "BEGIN_TREE\n";
 
 		try {
@@ -392,8 +392,8 @@ public class RecognitionIO {
 				id_to_idx.put(n.identification, dbIdx);
 			}
 
-			for (int infoIdx = 0; infoIdx < tree.invertedFile.size(); infoIdx++) {
-				LeafData leaf = (LeafData)tree.invertedFile.get(infoIdx);
+			for (int infoIdx = 0; infoIdx < tree.nodeData.size(); infoIdx++) {
+				InvertedFile leaf = (InvertedFile)tree.nodeData.get(infoIdx);
 				// Save the map as an array. elements are imageID -> dbIdx
 				dout.writeInt(leaf.images.size());
 				keys.resize(leaf.images.size());
@@ -463,8 +463,8 @@ public class RecognitionIO {
 			readCheckUTF(input, "BEGIN_LEAF_INFO");
 
 			for (int dataIdx = 0; dataIdx < listDataSize; dataIdx++) {
-				var leaf = new LeafData();
-				db.tree.invertedFile.add(leaf);
+				var leaf = new InvertedFile();
+				db.tree.nodeData.add(leaf);
 				int N = input.readInt();
 				for (int i = 0; i < N; i++) {
 					RecognitionVocabularyTreeNister2006.ImageWord word = leaf.images.grow();

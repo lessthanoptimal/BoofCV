@@ -20,6 +20,7 @@ package boofcv.alg.scene.nister2006;
 
 import boofcv.alg.scene.vocabtree.HierarchicalVocabularyTree;
 import boofcv.alg.scene.vocabtree.HierarchicalVocabularyTree.Node;
+import boofcv.misc.BoofMiscOps;
 import gnu.trove.iterator.TIntIterator;
 import gnu.trove.set.TIntSet;
 import gnu.trove.set.hash.TIntHashSet;
@@ -97,16 +98,15 @@ public class LearnNodeWeights<Point> {
 	 * N[i] is the number of times a specific node/work appears at least once in the images.
 	 */
 	public void fixate() {
-		for (int i = 0; i < tree.nodes.size; i++) {
+		// root is always zero since all images are in it
+		tree.nodes.get(0).weight = 0;
+
+		for (int i = 1; i < tree.nodes.size; i++) {
 			Node n = tree.nodes.get(i);
 			int totalImagesFoundInsideOf = numberOfImagesWithNode.get(n.index);
 
-			// NOTE: Why is this happening when the same images used to create the tree are used to compute the
-			//       weights? Shouldn't every node in the tree have at least one image?
-			if (totalImagesFoundInsideOf == 0)
-				n.weight = 0.0;
-			else
-				n.weight = Math.log(totalImages/(double)totalImagesFoundInsideOf);
+			BoofMiscOps.checkTrue(totalImagesFoundInsideOf != 0, "Every node should have at least 1 image");
+			n.weight = Math.log(totalImages/(double)totalImagesFoundInsideOf);
 		}
 	}
 }
