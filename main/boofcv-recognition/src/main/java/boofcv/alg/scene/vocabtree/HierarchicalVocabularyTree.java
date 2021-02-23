@@ -101,7 +101,6 @@ public class HierarchicalVocabularyTree<Point> {
 		Node parent = nodes.get(0);
 
 		if (parent.isLeaf()) {
-			op.process(parent);
 			return 0;
 		}
 

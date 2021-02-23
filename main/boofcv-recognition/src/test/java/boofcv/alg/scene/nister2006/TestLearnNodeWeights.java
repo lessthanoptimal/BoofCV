@@ -75,10 +75,12 @@ class TestLearnNodeWeights extends BoofStandardJUnit {
 		var alg = new LearnNodeWeights<Point2D_F64>();
 		alg.reset(tree);
 		alg.totalImages = 120;
-		alg.numberOfImagesWithNode.setTo(50, 20, 0, 25, 120, 77);
+		alg.numberOfImagesWithNode.setTo(50, 20, 1, 25, 120, 77);
 		alg.fixate();
 
-		for (int i = 0; i < N; i++) {
+		// root node is skipped
+		assertEquals(0.0, tree.nodes.get(0).weight);
+		for (int i = 1; i < N; i++) {
 			int numUsed = alg.numberOfImagesWithNode.get(i);
 			double expected = numUsed == 0 ? 0.0 : Math.log(120.0/numUsed);
 			assertEquals(expected, tree.nodes.get(i).weight);

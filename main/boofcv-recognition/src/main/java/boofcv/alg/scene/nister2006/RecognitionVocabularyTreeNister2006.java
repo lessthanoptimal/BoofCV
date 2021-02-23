@@ -326,11 +326,11 @@ public class RecognitionVocabularyTreeNister2006<Point> {
 	/**
 	 * Counts the number of times each leaf node is observed
 	 */
-	protected void computeLeafHistogram( List<Point> imageFeatures, LeafHistogram histogram ) {
+	protected void computeLeafHistogram( List<Point> features, LeafHistogram histogram ) {
 		histogram.reset();
 
-		for (int descIdx = 0; descIdx < imageFeatures.size(); descIdx++) {
-			int leafNodeIdx = tree.searchPathToLeaf(imageFeatures.get(descIdx), ( a ) -> {});
+		for (int featsIdx = 0; featsIdx < features.size(); featsIdx++) {
+			int leafNodeIdx = tree.searchPathToLeaf(features.get(featsIdx), ( a ) -> {});
 
 			LeafCounts counts = histogram.observed.get(leafNodeIdx);
 			if (counts == null) {
