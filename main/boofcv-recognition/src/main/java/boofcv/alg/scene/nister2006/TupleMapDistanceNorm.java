@@ -27,8 +27,8 @@ import org.ddogleg.struct.DogArray_I32;
 import java.util.List;
 
 /**
- * Generalized way for normalizing and sequentially computing the distance between two descriptors
- * in a sparse map format.
+ * Generalized way for normalizing and computing the distance between two sparse descriptors in a map
+ * format. Intended for use with {@link RecognitionVocabularyTreeNister2006}.
  *
  * @author Peter Abeles
  */
@@ -56,10 +56,22 @@ public interface TupleMapDistanceNorm {
 	/** Distance functions that are supported */
 	enum Types {L1, L2}
 
+	/**
+	 * Set of works which are common between the two maps
+	 */
 	class CommonWords {
-		int key;
-		float valueA;
-		float valueB;
+		// The key which is common
+		public int key;
+		// value in descriptor A
+		public float valueA;
+		// value in descriptor B
+		public float valueB;
+
+		public CommonWords() {}
+
+		public CommonWords( int key, float valueA, float valueB ) {
+			setTo(key, valueA, valueB);
+		}
 
 		public void setTo( int key, float valueA, float valueB) {
 			this.key = key;
@@ -68,8 +80,13 @@ public interface TupleMapDistanceNorm {
 		}
 	}
 
+	/**
+	 * Base class for norms which need to know which keys are common between the two
+	 */
 	abstract class CommonKeys implements TupleMapDistanceNorm {
+		// Temporary storage for keys in a map
 		final DogArray_I32 keys = new DogArray_I32();
+		// Storage for keys which are common between the two descriptors
 		final TIntSet commonKeys = new TIntHashSet();
 
 		/**
@@ -136,7 +153,7 @@ public interface TupleMapDistanceNorm {
 		}
 
 		@Override public TupleMapDistanceNorm newInstanceThread() {
-			return new L2();
+			return new L1();
 		}
 	}
 

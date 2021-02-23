@@ -32,7 +32,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static boofcv.alg.scene.vocabtree.TestHierarchicalVocabularyTree.createTree;
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class TestRecognitionVocabularyTreeNister2006 extends BoofStandardJUnit {
 	/**
@@ -133,7 +134,30 @@ class TestRecognitionVocabularyTreeNister2006 extends BoofStandardJUnit {
 	}
 
 	@Test void computeLeafHistogram() {
-		fail("Implement");
+		HierarchicalVocabularyTree<Point2D_F64> tree = create2x2Tree();
+		var alg = new RecognitionVocabularyTreeNister2006<Point2D_F64>();
+		alg.initializeTree(tree);
+
+		// Add two points which exactly match a leaf a known number of times
+		// this will define the histogram
+		List<Point2D_F64> features = new ArrayList<>();
+		// Node=3
+		for (int i = 0; i < 3; i++) {
+			features.add(new Point2D_F64(-5, -1));
+		}
+		// Node=6
+		for (int i = 0; i < 9; i++) {
+			features.add(new Point2D_F64(5, 1));
+		}
+
+		var found = new RecognitionVocabularyTreeNister2006.LeafHistogram();
+		alg.computeLeafHistogram(features, found);
+
+		assertEquals(2, found.leaves.size);
+		assertEquals(2, found.observed.size());
+
+		assertEquals(3, found.observed.get(3).count);
+		assertEquals(9, found.observed.get(6).count);
 	}
 
 	private TIntFloatMap sparseVector( float... values ) {

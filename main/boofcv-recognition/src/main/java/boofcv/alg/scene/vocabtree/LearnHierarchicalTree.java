@@ -20,6 +20,7 @@ package boofcv.alg.scene.vocabtree;
 
 import boofcv.alg.scene.vocabtree.HierarchicalVocabularyTree.Node;
 import boofcv.misc.BoofLambdas;
+import boofcv.misc.BoofMiscOps;
 import boofcv.struct.PackedArray;
 import org.ddogleg.clustering.kmeans.StandardKMeans;
 import org.ddogleg.struct.DogArray;
@@ -149,6 +150,9 @@ public class LearnHierarchicalTree<Point> implements VerbosePrint {
 								  Node parent, PackedArray<Point> pointsInParent,
 								  List<Point> clusterMeans, DogArray_I32 assignments,
 								  PackedArray<Point> pointsInBranch ) {
+		// Sanity check to see if the sum of segmented points equals the original list size
+		int sumLabeledPoints = 0;
+
 		// Go through all the (just created) children in the parent
 		for (int label = 0; label < clusterMeans.size(); label++) {
 			// Get the index of the child node
@@ -161,6 +165,7 @@ public class LearnHierarchicalTree<Point> implements VerbosePrint {
 					continue;
 				pointsInBranch.addCopy(pointsInParent.getTemp(pointIdx));
 			}
+			sumLabeledPoints += pointsInBranch.size();
 
 			if (verbose != null)
 				verbose.println("level=" + level + " branch=" + label + " points.size=" + pointsInBranch.size());
@@ -168,6 +173,9 @@ public class LearnHierarchicalTree<Point> implements VerbosePrint {
 			// Next level in depth first search
 			processLevel(pointsInBranch, tree, level + 1, nodeIdx);
 		}
+
+		// This better match or else something is wrong with the labels!
+		BoofMiscOps.checkEq(sumLabeledPoints, pointsInParent.size());
 	}
 
 	@Override public void setVerbose( @Nullable PrintStream out, @Nullable Set<String> set ) {

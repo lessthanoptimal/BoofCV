@@ -30,7 +30,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.fail;
 
 public class TestHierarchicalVocabularyTree extends BoofStandardJUnit {
 	@Test void searchPathToLeaf() {
@@ -90,7 +89,24 @@ public class TestHierarchicalVocabularyTree extends BoofStandardJUnit {
 	}
 
 	@Test void depthOfNode() {
-		fail("IMplement");
+		HierarchicalVocabularyTree<Point2D_F64> tree = createTree();
+		tree.branchFactor = 2;
+		tree.maximumLevel = 3;
+
+		// Create a graph
+		assertEquals(1, tree.addNode(0, 0, new Point2D_F64(-5,  0)));
+		assertEquals(2, tree.addNode(0, 1, new Point2D_F64( 5,  0)));
+		assertEquals(3, tree.addNode(1, 0, new Point2D_F64(-5, -1)));
+		assertEquals(4, tree.addNode(1, 1, new Point2D_F64(-5,  1)));
+		assertEquals(5, tree.addNode(2, 0, new Point2D_F64( 5, -1)));
+		assertEquals(6, tree.addNode(2, 1, new Point2D_F64( 5,  1)));
+		assertEquals(7, tree.addNode(6, 0, new Point2D_F64( 5, 0.9)));
+		assertEquals(8, tree.addNode(6, 1, new Point2D_F64( 5, 1.1)));
+
+		// hand computed cases
+		assertEquals(0, tree.depthOfNode(tree.nodes.get(0)));
+		assertEquals(0, tree.depthOfNode(tree.nodes.get(0)));
+
 	}
 
 	@Test void addData() {

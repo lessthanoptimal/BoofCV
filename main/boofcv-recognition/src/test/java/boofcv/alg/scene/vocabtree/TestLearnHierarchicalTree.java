@@ -106,6 +106,7 @@ class TestLearnHierarchicalTree extends BoofStandardJUnit {
 		LearnHierarchicalTree<Point2D_F64> alg = createAlg();
 		alg.process(points, tree);
 
+		sanityCheckNodes(tree);
 		assertEquals(121, tree.nodes.size);
 		assertEquals(120, tree.descriptions.size());
 		assertEquals(0, tree.nodeData.size());
@@ -135,14 +136,36 @@ class TestLearnHierarchicalTree extends BoofStandardJUnit {
 		// Process the data
 		HierarchicalVocabularyTree<Point2D_F64> tree = createTree();
 		tree.branchFactor = 4;
-		tree.maximumLevel = 4;
+		tree.maximumLevel = 8; // so many levels it has to exhaust all the points
 		LearnHierarchicalTree<Point2D_F64> alg = createAlg();
 		alg.process(points, tree);
 
-		assertTrue(100 >= tree.nodes.size);
+		sanityCheckNodes(tree);
+
+		// Since there are many more leaves potentially than points, these should match
+		assertEquals(points.size(), countLeaves(tree));
+		// There will be more nodes than points because of the intermediate nodes
+		assertTrue(100 < tree.nodes.size);
 		// The root node has no description, hence the -1
 		assertEquals(tree.descriptions.size(), tree.nodes.size - 1);
 		assertEquals(0, tree.nodeData.size());
+	}
+
+	private void sanityCheckNodes( HierarchicalVocabularyTree<Point2D_F64> tree ) {
+		for (int i = 0; i < tree.nodes.size; i++) {
+			HierarchicalVocabularyTree.Node n = tree.nodes.get(i);
+			assertEquals(i,n.index);
+			if (i>0) {
+				assertTrue(n.parent != -1);
+				assertTrue(n.descIdx != -1);
+			}
+			assertTrue(n.parent < n.index);
+
+			if (!n.isLeaf()) {
+				// if it's not a leaf, there should be more than one child
+				assertTrue(n.childrenIndexes.size>1, "node="+i+" children.size="+n.childrenIndexes.size);
+			}
+		}
 	}
 
 	private boolean findNodeAt( HierarchicalVocabularyTree<Point2D_F64> tree,
