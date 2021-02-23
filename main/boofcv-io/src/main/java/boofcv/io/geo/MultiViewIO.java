@@ -81,9 +81,8 @@ public class MultiViewIO {
 
 			Map<String, Object> element = new HashMap<>();
 			motions.add(element);
-			element.put("count_f", pmotion.countF);
-			element.put("count_h", pmotion.countH);
 			element.put("is_3D", pmotion.is3D);
+			element.put("score_3d", pmotion.score3D);
 			element.put("src", pmotion.src.id);
 			element.put("dst", pmotion.dst.id);
 			element.put("F", pmotion.F.data);
@@ -397,8 +396,7 @@ public class MultiViewIO {
 				Map<String, Object> yamlMotion = yamlMotions.get(i);
 				PairwiseImageGraph.Motion m = graph.edges.get(i);
 
-				m.countF = getOrThrow(yamlMotion, "count_f");
-				m.countH = getOrThrow(yamlMotion, "count_h");
+				m.score3D = getOrThrow(yamlMotion, "score_3d");
 				m.is3D = getOrThrow(yamlMotion, "is_3D");
 				m.src = getOrThrow(graph.mapNodes, getOrThrow(yamlMotion, "src"));
 				m.dst = getOrThrow(graph.mapNodes, getOrThrow(yamlMotion, "dst"));

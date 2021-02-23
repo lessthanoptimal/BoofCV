@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -71,9 +71,9 @@ class TestReconstructionFromPairwiseGraph extends BoofStandardJUnit {
 		PairwiseImageGraph.View expected = open.get(4); // make #4 only have a slightly better score, and a valid set of connections
 		PairwiseImageGraph.View expectedConnA = expected.connections.get(0).other(expected);
 		PairwiseImageGraph.View expectedConnB = expected.connections.get(1).other(expected);
-		expected.connections.get(0).countH = 80;
-		expected.connections.get(1).countH = 80;
-		expectedConnA.findMotion(expectedConnB).countH = 80; // it picks the lowest scored connection
+		expected.connections.get(0).score3D = 1.3;
+		expected.connections.get(1).score3D = 1.3;
+		expectedConnA.findMotion(expectedConnB).score3D = 1.3; // it picks the lowest scored connection
 
 		PairwiseImageGraph.View selected = alg.selectNextToProcess(open);
 		assertSame(expected, selected);
@@ -155,7 +155,7 @@ class TestReconstructionFromPairwiseGraph extends BoofStandardJUnit {
 			for (int targetIdx = 1; targetIdx < 4; targetIdx++) {
 				PairwiseImageGraph graph = createLinearGraph(9, 1);
 				PairwiseImageGraph.View target = graph.nodes.get(targetIdx);
-				target.connections.forIdx(( i, o ) -> o.countH = 20);
+				target.connections.forIdx(( i, o ) -> o.score3D = 5.0);
 
 				Map<String, SeedInfo> mapScores = alg.scoreNodesAsSeeds(graph);
 				List<SeedInfo> seeds = alg.selectSeeds(alg.seedScores, mapScores);
@@ -203,8 +203,7 @@ class TestReconstructionFromPairwiseGraph extends BoofStandardJUnit {
 		v.id = "id";
 		for (int count : counts) {
 			PairwiseImageGraph.Motion m = new PairwiseImageGraph.Motion();
-			m.countF = count;
-			m.countH = 100;
+			m.score3D = count/100.0;
 			m.is3D = true;
 			v.connections.add(m);
 		}
@@ -230,8 +229,7 @@ class TestReconstructionFromPairwiseGraph extends BoofStandardJUnit {
 				PairwiseImageGraph.View vb = graph.nodes.get(idx);
 				PairwiseImageGraph.Motion c = graph.connect(va, vb);
 				c.is3D = true;
-				c.countH = 100;
-				c.countF = 120;
+				c.score3D = 120.0/100.0;
 			}
 		}
 

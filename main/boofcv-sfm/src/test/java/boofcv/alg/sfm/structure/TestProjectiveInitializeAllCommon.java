@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -361,8 +361,7 @@ class TestProjectiveInitializeAllCommon extends BoofStandardJUnit {
 			Motion motion = new Motion();
 			motion.src = i%2 == 0 ? seed : view; // sanity check that it handles src/dst correctly
 			motion.dst = i%2 == 0 ? view : seed;
-			motion.countF = 100 + i;
-			motion.countH = 50;
+			motion.score3D = (100 + i)/50.0;
 			seed.connections.add(motion);
 		}
 		// need to make a complete loop
@@ -370,8 +369,7 @@ class TestProjectiveInitializeAllCommon extends BoofStandardJUnit {
 			Motion motion = new Motion();
 			motion.src = seed.connections.get(i - 1).other(seed);
 			motion.dst = seed.connections.get(i).other(seed);
-			motion.countF = 50;
-			motion.countH = 30;
+			motion.score3D = 50.0/30.0;
 			motion.src.connections.add(motion);
 			motion.dst.connections.add(motion);
 		}
@@ -402,11 +400,11 @@ class TestProjectiveInitializeAllCommon extends BoofStandardJUnit {
 		Motion motionAB = new Motion();
 		motionAB.src = seedA;
 		motionAB.dst = viewB;
-		motionAB.countF = 1000; // give it an excellent 3D score
+		motionAB.score3D = 1000; // give it an excellent 3D score
 		Motion motionAC = new Motion();
 		motionAC.src = viewC;
 		motionAC.dst = seedA; // src/dst shouldn't matter. bonus check
-		motionAC.countF = 1000; // give it an excellent 3D score
+		motionAC.score3D = 1000; // give it an excellent 3D score
 
 		seedA.connections.add(motionAB);
 		viewB.connections.add(motionAB);
@@ -431,18 +429,15 @@ class TestProjectiveInitializeAllCommon extends BoofStandardJUnit {
 		Motion motionAB = new Motion();
 		motionAB.src = seedA;
 		motionAB.dst = viewB;
-		motionAB.countF = 10;
-		motionAB.countH = 5;
+		motionAB.score3D = 2.0;
 		Motion motionAC = new Motion();
 		motionAC.src = viewC;
 		motionAC.dst = seedA;
-		motionAC.countF = 12;
-		motionAB.countH = 0;
+		motionAC.score3D = 1000.0;
 		Motion motionBC = new Motion();
 		motionBC.src = viewC;
 		motionBC.dst = viewB;
-		motionBC.countF = 12;
-		motionBC.countH = 1;
+		motionBC.score3D = 20.0;
 
 		seedA.connections.add(motionAB);
 		viewB.connections.add(motionAB);
@@ -454,11 +449,11 @@ class TestProjectiveInitializeAllCommon extends BoofStandardJUnit {
 		double score0 = alg.scoreTripleView(seedA, viewB, viewC);
 
 		// make it have a stronger 3D score and see if this is reflected
-		motionAB.countF = 20;
+		motionAB.score3D *= 2.0;
 		assertTrue(alg.scoreTripleView(seedA, viewB, viewC) > score0);
 
 		// now a worse score
-		motionAB.countF = 5;
+		motionAB.score3D *= 0.1;
 		assertTrue(alg.scoreTripleView(seedA, viewB, viewC) < score0);
 	}
 

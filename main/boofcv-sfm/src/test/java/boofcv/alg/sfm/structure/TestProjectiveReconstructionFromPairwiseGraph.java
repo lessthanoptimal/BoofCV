@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -93,7 +93,7 @@ class TestProjectiveReconstructionFromPairwiseGraph extends BoofStandardJUnit {
 			DMatrixRMaj expected = listB.get(i);
 			double scale = MultiViewOps.findScale(found, expected);
 			CommonOps_DDRM.scale(scale, found);
-			double tol = CommonOps_DDRM.elementMaxAbs(found)*1e-6; // TODO change to 1e-7
+			double tol = CommonOps_DDRM.elementMaxAbs(found)*1e-5; // TODO change to 1e-7
 			assertTrue(MatrixFeatures_DDRM.isIdentical(expected, found, tol));
 		}
 	}

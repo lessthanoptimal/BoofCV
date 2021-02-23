@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -172,8 +172,7 @@ class MockLookupSimilarImagesCircleAround implements LookUpSimilarImages {
 				// mix of the src/dst to exercise more code during testing
 				boolean standardOrder = (viewIdxI + neighborOffset)%2 == 0;
 				PairwiseImageGraph.Motion m = standardOrder ? graph.connect(vi, vj) : graph.connect(vj, vi);
-				m.countH = numFeatures*5/7;
-				m.countF = numFeatures;
+				m.score3D = 5.0/7.0;
 				m.is3D = true;
 
 				int[] tableI = featToView.get(viewIdxI);

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -30,7 +30,6 @@ import org.ddogleg.struct.DogArray_I32;
 import org.ddogleg.util.PrimitiveArrays;
 import org.ejml.UtilEjml;
 import org.ejml.dense.row.MatrixFeatures_DDRM;
-import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 
 import java.util.ArrayList;
@@ -458,29 +457,6 @@ class TestPairwiseGraphUtils extends BoofStandardJUnit {
 					fail("BUG");
 				}
 			}
-		}
-	}
-
-	@Nested
-	class ChecksDefaultScoreMotion {
-		@Test
-		void checkScore() {
-			PairwiseGraphUtils.ScoreMotion scorer = new PairwiseGraphUtils.DefaultScoreMotion();
-			PairwiseImageGraph.Motion m = new PairwiseImageGraph.Motion();
-			m.countF = 100;
-			m.countH = 100;
-			double score0 = scorer.score(m);
-
-			// fewer points found to match homography so it should be more 3D
-			m.countH = 50;
-			double score1 = scorer.score(m);
-			assertTrue(score1 > score0);
-
-			// more points should result in a better score too
-			m.countF *= 2;
-			m.countH *= 2;
-			double score2 = scorer.score(m);
-			assertTrue(score2 > score1);
 		}
 	}
 

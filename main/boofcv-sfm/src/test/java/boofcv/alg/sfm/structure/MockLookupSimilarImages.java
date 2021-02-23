@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -135,8 +135,7 @@ class MockLookupSimilarImages implements LookUpSimilarImages {
 					edge.src = graph.mapNodes.get(nameJ);
 					edge.dst = graph.mapNodes.get(nameI);
 				}
-				edge.countH = 10;
-				edge.countF = numFeatures;
+				edge.score3D = numFeatures/10.0;
 
 				int[] tableI = featToView.get(i);
 				int[] tableJ = featToView.get(j);

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -48,8 +48,7 @@ class TestExpandByOneView extends BoofStandardJUnit {
 			// make sure src/dst is handled correctly
 			Motion mA = i%2 == 0 ? graph.connect(seed, viewI) : graph.connect(viewI, seed);
 			// All have the same score so that the connections between the other two is what decides the winner
-			mA.countF = 100;
-			mA.countH = 80;
+			mA.score3D = 2.0;
 			mA.is3D = true;
 
 			working.addView(viewI);
@@ -63,9 +62,8 @@ class TestExpandByOneView extends BoofStandardJUnit {
 		Motion connBD = graph.connect(viewD, viewB);
 
 		connBD.is3D = connBC.is3D = true;
-		connBC.countH = connBD.countH = 50;
-		connBC.countF = 70;
-		connBD.countF = 75; // this is the more desirable connection
+		connBC.score3D = 1.2;
+		connBD.score3D = 1.3; // this is the more desirable connection
 
 		var alg = new ChildProjectiveExpandByOneView();
 		alg.workGraph = working;
@@ -120,8 +118,7 @@ class TestExpandByOneView extends BoofStandardJUnit {
 
 			// make sure src/dst is handled correctly
 			Motion mA = i%2 == 0 ? graph.connect(viewA, viewI) : graph.connect(viewI, viewA);
-			mA.countF = 100 + i;
-			mA.countH = 80;
+			mA.score3D = 1.0 + i*0.05;
 			mA.is3D = true;
 
 			connectionsA.add(mA);
@@ -130,8 +127,7 @@ class TestExpandByOneView extends BoofStandardJUnit {
 				continue;
 
 			Motion mB = i%2 == 0 ? graph.connect(viewB, viewI) : graph.connect(viewI, viewB);
-			mB.countF = 100 - i*2;
-			mB.countH = 80;
+			mB.score3D = 1.0 - i*0.05;
 			mB.is3D = true;
 		}
 
@@ -158,8 +154,7 @@ class TestExpandByOneView extends BoofStandardJUnit {
 		List<Motion> connectionsA = new ArrayList<>();
 		connectionsA.add(mA);
 
-		mA.countF = mB.countF = 100;
-		mA.countH = mB.countH = 70;
+		mA.score3D = mB.score3D = 1.1;
 		mB.is3D = false;
 
 		// Not 3D so it will fail

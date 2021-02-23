@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -89,8 +89,7 @@ class TestMultiViewIO extends BoofStandardJUnit {
 				assertEquals(ma.is3D, mb.is3D);
 				assertEquals(ma.src.id, mb.src.id);
 				assertEquals(ma.dst.id, mb.dst.id);
-				assertEquals(ma.countF, mb.countF);
-				assertEquals(ma.countH, mb.countH);
+				assertEquals(ma.score3D, mb.score3D);
 				assertTrue(MatrixFeatures_DDRM.isEquals(ma.F, mb.F, UtilEjml.EPS));
 				assertEquals(ma.inliers.size, mb.inliers.size);
 				for (int j = 0; j < ma.inliers.size; j++) {
@@ -121,11 +120,10 @@ class TestMultiViewIO extends BoofStandardJUnit {
 			for (int i = 0; i < Math.min(numConnections, candidates.size); i++) {
 				PairwiseImageGraph.Motion m = ret.edges.grow();
 				m.is3D = rand.nextBoolean();
+				m.score3D = rand.nextDouble();
 				m.src = v;
 				m.dst = ret.nodes.get(candidates.get(i));
 				m.index = ret.edges.size - 1;
-				m.countF = rand.nextInt();
-				m.countH = rand.nextInt();
 				RandomMatrices_DDRM.fillUniform(m.F, rand);
 				m.inliers.resize(rand.nextInt(20));
 				for (int j = 0; j < m.inliers.size; j++) {

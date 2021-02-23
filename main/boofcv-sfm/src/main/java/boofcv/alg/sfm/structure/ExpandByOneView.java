@@ -18,6 +18,7 @@
 
 package boofcv.alg.sfm.structure;
 
+import boofcv.misc.BoofMiscOps;
 import lombok.Getter;
 import lombok.Setter;
 import org.ddogleg.struct.VerbosePrint;
@@ -86,8 +87,7 @@ public abstract class ExpandByOneView implements VerbosePrint {
 			PairwiseImageGraph.Motion connectBtoC = viewB.findMotion(viewC);
 			checkTrue(connectBtoC != null, "BUG");
 
-			double score = Math.min(utils.scoreMotion.score(connectB), utils.scoreMotion.score(connectC));
-			score = Math.min(score, utils.scoreMotion.score(connectBtoC));
+			double score = BoofMiscOps.min(connectB.score3D, connectC.score3D, connectBtoC.score3D);
 
 			if (score > bestScore) {
 				bestScore = score;
@@ -144,7 +144,7 @@ public abstract class ExpandByOneView implements VerbosePrint {
 				continue;
 
 			// Maximize worst case 3D information
-			double score = Math.min(utils.scoreMotion.score(connAC), utils.scoreMotion.score(connBC));
+			double score = Math.min(connAC.score3D, connBC.score3D);
 
 			if (score > bestScore) {
 				bestScore = score;

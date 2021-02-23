@@ -22,6 +22,7 @@ import boofcv.abst.geo.bundle.MetricBundleAdjustmentUtils;
 import boofcv.abst.tracker.PointTracker;
 import boofcv.alg.mvs.MultiViewStereoFromKnownSceneStructure;
 import boofcv.alg.sfm.structure.*;
+import boofcv.alg.sfm.structure.score3d.ScoreRatioFundamentalHomography;
 import boofcv.factory.disparity.FactoryStereoDisparity;
 import boofcv.factory.geo.FactoryMultiViewRobust;
 import boofcv.factory.tracker.FactoryPointTracker;
@@ -68,7 +69,9 @@ public class FactorySceneReconstruction {
 		ModelMatcher<Homography2D_F64, AssociatedPair> ransacH =
 				FactoryMultiViewRobust.homographyRansac(config.homography, config.ransacH);
 
-		return new GeneratePairwiseImageGraph(ransac3D, ransacH);
+		EpipolarScore3D scorer = new ScoreRatioFundamentalHomography(ransac3D, ransacH);
+
+		return new GeneratePairwiseImageGraph(scorer);
 	}
 
 	/**

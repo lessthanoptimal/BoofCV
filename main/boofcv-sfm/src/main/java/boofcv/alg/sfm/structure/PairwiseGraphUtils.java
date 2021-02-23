@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -108,9 +108,6 @@ public class PairwiseGraphUtils {
 	public final DogArray_I32 table_C_to_A = new DogArray_I32();
 	// List indexes in the seed view that are common among all the views
 	public final DogArray_I32 commonIdx = new DogArray_I32();
-
-	/** Score function used to evaluate which motions should be used */
-	public ScoreMotion scoreMotion = new DefaultScoreMotion();
 
 	protected final ImageDimension shape = new ImageDimension();
 
@@ -449,30 +446,6 @@ public class PairwiseGraphUtils {
 		for (int i = 0; i < edge.inliers.size; i++) {
 			AssociatedIndex assoc = edge.inliers.get(i);
 			table_a_to_b.data[src_is_A ? assoc.src : assoc.dst] = src_is_A ? assoc.dst : assoc.src;
-		}
-	}
-
-	/**
-	 * Scores a motion for its ability to capture 3D scene information. Higher relative numbers mean more 3D structure
-	 * can be recovered. The minimum score would be two identical images
-	 */
-	public interface ScoreMotion {
-		double score( PairwiseImageGraph.Motion m );
-	}
-
-	public static class DefaultScoreMotion implements ScoreMotion {
-		@Override
-		public double score( PairwiseImageGraph.Motion m ) {
-			// countF and countF will be <= totalFeatures
-
-			// Prefer a scene more features from a fundamental matrix than a homography.
-			// This can be sign that the scene has a rich 3D structure and is poorly represented by
-			// a plane or rotational motion
-			double score = Math.min(5, m.countF/(double)(m.countH + 1));
-			// Also prefer more features from the original image to be matched
-			score *= m.countF;
-
-			return score;
 		}
 	}
 }

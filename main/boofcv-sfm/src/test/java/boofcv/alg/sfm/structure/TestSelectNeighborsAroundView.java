@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -147,10 +147,8 @@ public class TestSelectNeighborsAroundView extends BoofStandardJUnit {
 		SceneWorkingGraph working = db.createWorkingGraph(pairwise);
 
 		SceneWorkingGraph.View seed = working.viewList.get(4);
-
+		seed.pview.connections.forEach(m->m.score3D+=1000); // make it not want to select immediate neighbors
 		var alg = new SelectNeighborsAroundView();
-		// for simplicity just use the count for the score
-		alg.scoreMotion = m -> m.countF;
 
 		// for the first test we want to prune NOTHING
 		{
@@ -167,7 +165,7 @@ public class TestSelectNeighborsAroundView extends BoofStandardJUnit {
 		{
 			alg.maxViews -= 1;
 			PairwiseImageGraph.Motion m = seed.pview.connections.get(0);
-			m.countF = 1; // make it a prime target to be removed
+			m.score3D = 1.0; // make it a prime target to be removed
 			SceneWorkingGraph.View expected = alg.lookup.get(m.other(seed.pview).id);
 			alg.initialize();
 			alg.addNeighbors2(seed, working);
@@ -178,16 +176,19 @@ public class TestSelectNeighborsAroundView extends BoofStandardJUnit {
 			assertFalse(alg.candidates.contains(expected));
 		}
 
-		// Prune several elements. Just make sure nothing crashed
+		// Prune several elements. It might not hit the target exactly since orphans can be pruned
 		{
+			seed.pview.connections.get(0).score3D = 1003;
 			alg.maxViews = 5;
 			alg.initialize();
 			alg.addNeighbors2(seed, working);
 			alg.pruneViews(seed);
-			assertEquals(alg.maxViews - 1, alg.candidates.size());
+			assertTrue(alg.maxViews - 1 - alg.candidates.size() <= 1);
 		}
 
 		// Prune until the point we hit minNeighbors, meaning only neighbors should remain
+		// NOTE: There are conditions that can arise where this will not be the case. These unit tests
+		// should be made more robust.
 		{
 			alg.maxViews = alg.minNeighbors;
 			alg.initialize();
@@ -203,15 +204,13 @@ public class TestSelectNeighborsAroundView extends BoofStandardJUnit {
 	@Test
 	void scoreForRemoval() {
 		var alg = new SelectNeighborsAroundView();
-		// custom score function which uses countF for simplicity
-		alg.scoreMotion = m -> m.countF;
 		// It will return the score of the second best
 		alg.worstOfTop = 2;
 
 		// First case there will be no motions that can be scored and make sure it ignores the ignore motion
 		var v = new PairwiseImageGraph.View();
 		var m0 = new PairwiseImageGraph.Motion();
-		m0.countF = 999;
+		m0.score3D = 999;
 		v.connections.add(m0);
 		assertEquals(0.0, alg.scoreForRemoval(v, m0));
 
@@ -229,13 +228,13 @@ public class TestSelectNeighborsAroundView extends BoofStandardJUnit {
 		assertEquals(90.0, alg.scoreForRemoval(v, m0));
 	}
 
-	private void addViewForRemoval( String id, PairwiseImageGraph.View src, int motionScore,
+	private void addViewForRemoval( String id, PairwiseImageGraph.View src, double motionScore,
 									SelectNeighborsAroundView alg ) {
 		var workView = new SceneWorkingGraph.View();
 		workView.pview = new PairwiseImageGraph.View();
 		workView.pview.id = id;
 		var m = new PairwiseImageGraph.Motion();
-		m.countF = motionScore;
+		m.score3D = motionScore;
 		m.src = src;
 		m.dst = workView.pview;
 		alg.addCandidateView(workView);

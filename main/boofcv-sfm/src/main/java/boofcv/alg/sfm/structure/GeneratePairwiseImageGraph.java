@@ -20,15 +20,12 @@ package boofcv.alg.sfm.structure;
 
 import boofcv.struct.feature.AssociatedIndex;
 import boofcv.struct.geo.AssociatedPair;
-import georegression.struct.homography.Homography2D_F64;
 import georegression.struct.point.Point2D_F64;
 import lombok.Getter;
-import lombok.Setter;
-import org.ddogleg.fitting.modelset.ModelMatcher;
 import org.ddogleg.struct.DogArray;
+import org.ddogleg.struct.DogArray_I32;
 import org.ddogleg.struct.VerbosePrint;
 import org.ejml.data.DMatrixRMaj;
-import org.ejml.ops.DConvertMatrixStruct;
 import org.jetbrains.annotations.Nullable;
 
 import java.io.PrintStream;
@@ -39,13 +36,7 @@ import java.util.*;
  * images with a geometric relationship are connected to each other. Determine if that relationship has 3D geometry
  * or is composed of a homography.
  *
- * If there is a geometric relationship or not is determined by the number of inliers. The minimum number is specified
- * by {@link #minimumInliers}. A threshold is used for classifying an edge as 3D or not {@link #ratio3D} len(F)/len(H)
- * a value of 1 just requires equality, greater than one means there must be more features from F (fundamental) than
- * H (homography). See [1] for more details on this test.
- *
- * <p>[1] Pollefeys, Marc, et al. "Visual modeling with a hand-held camera." International Journal of Computer
- * Vision 59.3 (2004): 207-232.</p>
+ * If there is a geometric relationship or not is determined using the passed in {@link EpipolarScore3D}.
  *
  * @author Peter Abeles
  */
@@ -53,28 +44,16 @@ public class GeneratePairwiseImageGraph implements VerbosePrint {
 	public final @Getter PairwiseImageGraph graph = new PairwiseImageGraph();
 	private List<String> imageIds;
 
-	// concensus matching algorithms
-	ModelMatcher<DMatrixRMaj, AssociatedPair> ransac3D;
-	ModelMatcher<Homography2D_F64, AssociatedPair> ransacH;
-
-	/**
-	 * The minimum number of inliers for an edge to be accepted
-	 */
-	public @Getter @Setter int minimumInliers = 30;
-	/**
-	 * If number of matches from fundamental divided by homography is more than this then it is considered a 3D scene
-	 */
-	public @Getter @Setter double ratio3D = 1.5;
+	/** Used to score if the two views have a 3D relationship or not */
+	public final @Getter EpipolarScore3D epipolarScore;
 
 	private PrintStream verbose;
 
 	/**
 	 * Specifies consensus matching algorithms
 	 */
-	public GeneratePairwiseImageGraph(ModelMatcher<DMatrixRMaj, AssociatedPair> ransac3D,
-									  ModelMatcher<Homography2D_F64, AssociatedPair> ransacH) {
-		this.ransac3D = ransac3D;
-		this.ransacH = ransacH;
+	public GeneratePairwiseImageGraph(EpipolarScore3D epipolarScore) {
+		this.epipolarScore = epipolarScore;
 	}
 
 	/**
@@ -150,69 +129,31 @@ public class GeneratePairwiseImageGraph implements VerbosePrint {
 	 */
 	protected void createEdge( String src, String dst,
 							   DogArray<AssociatedPair> pairs, DogArray<AssociatedIndex> matches ) {
-		// Fitting Essential/Fundamental works when the scene is not planar and not pure rotation
-		int countF = 0;
-		if (ransac3D.process(pairs.toList())) {
-			countF = ransac3D.getMatchSet().size();
-		}
 
-		// Fitting homography will work when all or part of the scene is planar or motion is pure rotation
-		int countH = 0;
-		if (ransacH.process(pairs.toList())) {
-			countH = ransacH.getMatchSet().size();
-		}
+		DMatrixRMaj fundamental = new DMatrixRMaj(3,3);
+		DogArray_I32 inlierIdx = new DogArray_I32();
 
-		if( verbose != null ) verbose.println("   dst='"+dst+"' ransac F="+countF+" H="+countH+" pairs.size="+pairs.size());
-
-		// fail if not enough features are remaining after RANSAC
-		if (Math.max(countF, countH) < minimumInliers)
+		if (!epipolarScore.process(pairs.toList(), fundamental, inlierIdx)) {
+			// Don't create an edge here
 			return;
-
-		// The idea here is that if the number features for F is greater than H then it's a 3D scene.
-		// If they are similar then it might be a plane
-		boolean is3D = countF > countH * ratio3D;
+		}
 
 		PairwiseImageGraph.Motion edge = graph.edges.grow();
-		edge.is3D = is3D;
-		edge.countF = countF;
-		edge.countH = countH;
+		edge.is3D = epipolarScore.is3D();
+		edge.score3D = epipolarScore.getScore();
 		edge.index = graph.edges.size - 1;
 		edge.src = graph.lookupNode(src);
 		edge.dst = graph.lookupNode(dst);
 		edge.src.connections.add(edge);
 		edge.dst.connections.add(edge);
-
-		if (is3D) {
-			saveInlierMatches(ransac3D, matches, edge);
-			edge.F.setTo(ransac3D.getModelParameters());
-		} else {
-			saveInlierMatches(ransacH, matches, edge);
-			Homography2D_F64 H = ransacH.getModelParameters();
-			DConvertMatrixStruct.convert(H, edge.F);
-		}
-	}
-
-	/**
-	 * Puts the inliers from RANSAC into the edge's list of associated features
-	 *
-	 * @param ransac RANSAC
-	 * @param matches List of matches from feature association
-	 * @param edge The edge that the inliers are to be saved to
-	 */
-	private void saveInlierMatches( ModelMatcher<?, ?> ransac,
-									DogArray<AssociatedIndex> matches, PairwiseImageGraph.Motion edge ) {
-
-		int N = ransac.getMatchSet().size();
-		edge.inliers.reset();
-		edge.inliers.resize(N);
-		for (int i = 0; i < N; i++) {
-			int idx = ransac.getInputIndex(i);
-			edge.inliers.get(i).setTo(matches.get(idx));
+		for (int i = 0; i < inlierIdx.size; i++) {
+			edge.inliers.grow().setTo(matches.get(inlierIdx.get(i)));
 		}
 	}
 
 	@Override
 	public void setVerbose( @Nullable PrintStream out, @Nullable Set<String> configuration ) {
 		this.verbose = out;
+		this.epipolarScore.setVerbose(out, configuration);
 	}
 }
