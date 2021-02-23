@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -123,10 +123,8 @@ public class PairwiseImageGraph {
 		public final DMatrixRMaj F = new DMatrixRMaj(3, 3);
 		/** if this camera motion is known up to a metric transform. otherwise it will be projective */
 		public boolean is3D;
-		/** Number of inliers when an 3D model (Fundamental/Essential) was fit to observations. */
-		public int countF;
-		/** Number of inliers when a homography was fit to observations. */
-		public int countH;
+		/** 3D information score. See {@link EpipolarScore3D} */
+		public double score3D;
 		/** Indexes of features in 'src' and 'dst' views which are inliers to the model {@link #F} */
 		public final DogArray<AssociatedIndex> inliers = new DogArray<>(AssociatedIndex::new);
 

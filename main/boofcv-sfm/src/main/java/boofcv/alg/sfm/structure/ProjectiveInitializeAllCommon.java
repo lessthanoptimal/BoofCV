@@ -300,12 +300,12 @@ public class ProjectiveInitializeAllCommon implements VerbosePrint {
 		Motion motionAC = seedA.findMotion(viewC);
 		Motion motionBC = viewB.findMotion(viewC);
 		if (motionBC == null)
-			return 0;
+			return 0.0;
 
-		double score = 0;
-		score += utils.scoreMotion.score(motionAB);
-		score += utils.scoreMotion.score(motionAC);
-		score += utils.scoreMotion.score(motionBC);
+		double score = 0.0;
+		score += motionAB.score3D;
+		score += motionAC.score3D;
+		score += motionBC.score3D;
 
 		return score;
 	}

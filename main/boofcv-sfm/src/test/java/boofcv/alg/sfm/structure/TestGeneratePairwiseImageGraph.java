@@ -18,21 +18,9 @@
 
 package boofcv.alg.sfm.structure;
 
-import boofcv.alg.geo.PerspectiveOps;
 import boofcv.factory.sfm.FactorySceneReconstruction;
-import boofcv.struct.calib.CameraPinhole;
-import boofcv.struct.feature.AssociatedIndex;
-import boofcv.struct.geo.AssociatedPair;
 import boofcv.testing.BoofStandardJUnit;
-import georegression.geometry.UtilPoint3D_F64;
-import georegression.struct.plane.PlaneNormal3D_F64;
-import georegression.struct.point.Point3D_F64;
-import georegression.struct.se.Se3_F64;
-import georegression.struct.se.SpecialEuclideanOps_F64;
-import org.ddogleg.struct.DogArray;
 import org.junit.jupiter.api.Test;
-
-import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -40,12 +28,10 @@ import static org.junit.jupiter.api.Assertions.*;
  * @author Peter Abeles
  */
 class TestGeneratePairwiseImageGraph extends BoofStandardJUnit {
-
 	/**
 	 * See if it gracefully handles 0 to 1 images
 	 */
-	@Test
-	void process_0_to_1() {
+	@Test void process_0_to_1() {
 		GeneratePairwiseImageGraph alg = FactorySceneReconstruction.generatePairwise(null);
 
 		for (int numViews = 0; numViews < 2; numViews++) {
@@ -61,8 +47,7 @@ class TestGeneratePairwiseImageGraph extends BoofStandardJUnit {
 	/**
 	 * A fully connected scene with 3D structure
 	 */
-	@Test
-	void process_connected() {
+	@Test void process_connected() {
 		GeneratePairwiseImageGraph alg = FactorySceneReconstruction.generatePairwise(null);
 
 		var similar = new MockLookupSimilarImages(4, 123123);
@@ -93,116 +78,5 @@ class TestGeneratePairwiseImageGraph extends BoofStandardJUnit {
 					fail("duplicate2! " + a.src.id + " " + a.dst.id);
 			}
 		}
-	}
-
-	@Test
-	void createEdge_3D() {
-		GeneratePairwiseImageGraph alg = FactorySceneReconstruction.generatePairwise(null);
-		alg.graph.createNode("moo");
-		alg.graph.createNode("foo");
-
-		DogArray<AssociatedPair> associated = createAssociations(100, false, false);
-		DogArray<AssociatedIndex> associtedIdx = new DogArray<>(AssociatedIndex::new);
-		for (int i = 0; i < associated.size; i++) {
-			associtedIdx.grow().setTo(i, i, 1);
-		}
-
-		alg.createEdge("moo", "foo", associated, associtedIdx);
-
-		assertEquals(1, alg.graph.edges.size);
-		PairwiseImageGraph.Motion found = alg.graph.edges.get(0);
-
-		assertTrue(found.is3D);
-		assertTrue(found.inliers.size > 85);
-		assertTrue(found.countF > 85);
-		assertTrue(found.countH < 20);
-		assertEquals("moo", found.src.id);
-		assertEquals("foo", found.dst.id);
-	}
-
-	@Test
-	void createEdge_Rotation() {
-		GeneratePairwiseImageGraph alg = FactorySceneReconstruction.generatePairwise(null);
-		alg.graph.createNode("moo");
-		alg.graph.createNode("foo");
-
-		DogArray<AssociatedPair> associated = createAssociations(100, false, true);
-		DogArray<AssociatedIndex> associtedIdx = new DogArray<>(AssociatedIndex::new);
-		for (int i = 0; i < associated.size; i++) {
-			associtedIdx.grow().setTo(i, i, 1);
-		}
-
-		alg.createEdge("moo", "foo", associated, associtedIdx);
-
-		assertEquals(1, alg.graph.edges.size);
-		PairwiseImageGraph.Motion found = alg.graph.edges.get(0);
-
-		assertFalse(found.is3D);
-		assertTrue(found.inliers.size > 85);
-//		assertTrue(found.countF>85);
-		assertTrue(found.countH > 85);
-		assertEquals("moo", found.src.id);
-		assertEquals("foo", found.dst.id);
-	}
-
-	@Test
-	void createEdge_Planar() {
-		GeneratePairwiseImageGraph alg = FactorySceneReconstruction.generatePairwise(null);
-		alg.graph.createNode("moo");
-		alg.graph.createNode("foo");
-
-		DogArray<AssociatedPair> associated = createAssociations(100, true, false);
-		DogArray<AssociatedIndex> associtedIdx = new DogArray<>(AssociatedIndex::new);
-		for (int i = 0; i < associated.size; i++) {
-			associtedIdx.grow().setTo(i, i, 1);
-		}
-
-		alg.createEdge("moo", "foo", associated, associtedIdx);
-
-		assertEquals(1, alg.graph.edges.size);
-		PairwiseImageGraph.Motion found = alg.graph.edges.get(0);
-
-		assertFalse(found.is3D);
-		assertTrue(found.inliers.size > 85);
-		// both models should match it well
-//		assertTrue(found.countF>85);
-		assertTrue(found.countH > 85);
-		assertEquals("moo", found.src.id);
-		assertEquals("foo", found.dst.id);
-	}
-
-	private DogArray<AssociatedPair> createAssociations( int N, boolean planar, boolean pureRotation ) {
-		var intrinsic = new CameraPinhole(400, 410, 0, 500, 500, 1000, 1000);
-		Se3_F64 view0_to_view1 = SpecialEuclideanOps_F64.eulerXyz(0.3, 0, 0.01, -0.04, -2e-3, 0.4, null);
-
-		if (pureRotation)
-			view0_to_view1.T.setTo(0, 0, 0);
-
-		List<Point3D_F64> feats3D;
-
-		if (planar) {
-			var plane = new PlaneNormal3D_F64(0, 0, 1, 0.001, 0.02, 1);
-			feats3D = UtilPoint3D_F64.random(plane, 0.5, N, rand);
-		} else {
-			feats3D = UtilPoint3D_F64.random(new Point3D_F64(0, 0, 1), -0.5, 0.5, N, rand);
-		}
-
-		var associated = new DogArray<>(AssociatedPair::new);
-
-		for (int i = 0; i < feats3D.size(); i++) {
-			Point3D_F64 X = feats3D.get(i);
-			AssociatedPair a = associated.grow();
-
-			a.p1.setTo(PerspectiveOps.renderPixel(intrinsic, X, null));
-			a.p2.setTo(PerspectiveOps.renderPixel(view0_to_view1, intrinsic, X, null));
-
-			// add a little bit of noise so that it isn't perfect
-			a.p1.x += rand.nextGaussian()*0.5;
-			a.p1.y += rand.nextGaussian()*0.5;
-			a.p2.x += rand.nextGaussian()*0.5;
-			a.p2.y += rand.nextGaussian()*0.5;
-		}
-
-		return associated;
 	}
 }

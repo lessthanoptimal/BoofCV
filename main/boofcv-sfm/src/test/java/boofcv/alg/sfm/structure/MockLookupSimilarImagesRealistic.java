@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -238,8 +238,7 @@ public class MockLookupSimilarImagesRealistic implements LookUpSimilarImages {
 
 				List<AssociatedIndex> shared = v.findShared(b);
 
-				m.countF = shared.size();
-				m.countH = m.countF/3;
+				m.score3D = 3.0;
 
 				Collections.shuffle(shared, rand);
 				int minShared = (int)(0.85*shared.size());

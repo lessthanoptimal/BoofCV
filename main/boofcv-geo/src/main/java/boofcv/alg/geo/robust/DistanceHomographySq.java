@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -20,9 +20,11 @@ package boofcv.alg.geo.robust;
 
 import boofcv.struct.geo.AssociatedPair;
 import georegression.struct.homography.Homography2D_F64;
+import georegression.struct.homography.UtilHomography_F64;
 import georegression.struct.point.Point2D_F64;
 import georegression.transform.homography.HomographyPointOps_F64;
 import org.ddogleg.fitting.modelset.DistanceFromModel;
+import org.ejml.data.DMatrixRMaj;
 
 import java.util.List;
 
@@ -44,6 +46,12 @@ public class DistanceHomographySq implements DistanceFromModel<Homography2D_F64,
 
 	Homography2D_F64 model;
 	Point2D_F64 expected = new Point2D_F64();
+
+	public void setModel( DMatrixRMaj H ) {
+		if (model==null)
+			model = new Homography2D_F64();
+		UtilHomography_F64.convert(H, model);
+	}
 
 	@Override
 	public void setModel( Homography2D_F64 model ) {

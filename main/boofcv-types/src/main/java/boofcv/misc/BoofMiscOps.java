@@ -290,6 +290,18 @@ public class BoofMiscOps {
 			r.y1 = b.height;
 	}
 
+	public static double min( double a, double b, double c) {
+		return Math.min(Math.min(a,b),c);
+	}
+
+	public static float min( float a, float b, float c) {
+		return Math.min(Math.min(a,b),c);
+	}
+
+	public static int min( int a, int b, int c) {
+		return Math.min(Math.min(a,b),c);
+	}
+
 	public static boolean isInside( ImageBase b, ImageRectangle r ) {
 		if (r.x0 < 0)
 			return false;

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -73,9 +73,6 @@ public class SelectNeighborsAroundView implements VerbosePrint {
 
 	/** There should be at least this number of direct neighbors in the final list */
 	public int minNeighbors = 2;
-
-	/** Score function used to evaluate which motions should be used */
-	public PairwiseGraphUtils.ScoreMotion scoreMotion = new PairwiseGraphUtils.DefaultScoreMotion();
 
 	/** Copy of the local scene which can be independently optimized */
 	protected @Getter final SceneWorkingGraph localWorking = new SceneWorkingGraph();
@@ -210,21 +207,28 @@ public class SelectNeighborsAroundView implements VerbosePrint {
 			double lowestScore = Double.MAX_VALUE;
 			for (int i = 0; i < edges.size; i++) {
 				EdgeScore s = edges.get(i);
-				if (s.score >= lowestScore)
+				if (s.m.score3D >= lowestScore)
 					continue;
 				// See if too many neighbors have been removed and that it should keep the remaining
 				if (remainingNeighbors <= minNeighbors && s.m.isConnected(seed.pview))
 					continue;
 				// Check here if removing the node would cause a split. If so don't mark it as the lowest
-				lowestScore = s.score;
+				lowestScore = s.m.score3D;
 				lowestIndex = i;
 			}
 
-			if (lowestIndex < 0)
-				throw new RuntimeException("Highly likely that this is miss configured. No valid candidate has been " +
-						"found for removal. Is 'minNeighbors' >= maxViews-1?");
+			if (lowestIndex < 0) {
+				// it can fail to find a solution if removing any candidate would remove too many neighbors
+				// it's also possible it was miss configured
+				if (minNeighbors < maxViews - 1) {
+					throw new IllegalArgumentException("Miss configured: 'minNeighbors' >= 'maxViews-1'");
+				}
+				return;
+			}
 
-			if (verbose != null) verbose.println("Pruning score=" + lowestScore + " " + edges.get(lowestIndex).m);
+			if (verbose != null)
+				verbose.println("Candidates.size=" + candidates.size() + " Pruning score=" + lowestScore +
+						" " + edges.get(lowestIndex).m);
 
 			Motion m = edges.get(lowestIndex).m;
 
@@ -236,10 +240,20 @@ public class SelectNeighborsAroundView implements VerbosePrint {
 					verbose.println("Connects to target. No need to score. neighbors=" + remainingNeighbors);
 			} else {
 				// be careful to not remove a view which links to the seed if it's below the limit
-				double scoreSrc = (remainingNeighbors <= minNeighbors && m.src.findMotion(seed.pview) != null) ?
-						Double.MAX_VALUE : scoreForRemoval(m.src, m);
-				double scoreDst = (remainingNeighbors <= minNeighbors && m.dst.findMotion(seed.pview) != null) ?
-						Double.MAX_VALUE : scoreForRemoval(m.dst, m);
+				boolean touchSeedSrc = remainingNeighbors <= minNeighbors && m.src.findMotion(seed.pview) != null;
+				boolean touchSeedDst = remainingNeighbors <= minNeighbors && m.dst.findMotion(seed.pview) != null;
+
+				double scoreSrc, scoreDst;
+				if (touchSeedSrc == touchSeedDst) {
+					// they either both touch or neither touch, either way the score should be the tie breaker
+					scoreSrc = scoreForRemoval(m.src, m);
+					scoreDst = scoreForRemoval(m.dst, m);
+				} else {
+					// Prefer to remove the seed which does not touch  the seed
+					scoreSrc = touchSeedSrc ? Double.MAX_VALUE : scoreForRemoval(m.src, m);
+					scoreDst = touchSeedDst ? Double.MAX_VALUE : scoreForRemoval(m.dst, m);
+				}
+
 				if (verbose != null) verbose.println("Scores: src=" + scoreSrc + " dst=" + scoreDst);
 				removeCandidateNode(((scoreSrc < scoreDst) ? m.src : m.dst).id, seed);
 			}
@@ -270,7 +284,7 @@ public class SelectNeighborsAroundView implements VerbosePrint {
 			if (!lookup.containsKey(o)) {
 				continue;
 			}
-			connScores.add(scoreMotion.score(m));
+			connScores.add(m.score3D);
 		}
 		if (connScores.size == 0)
 			return 0.0;
@@ -427,7 +441,6 @@ public class SelectNeighborsAroundView implements VerbosePrint {
 	private void addEdge( Motion m ) {
 		EdgeScore edgeScore = edges.grow();
 		edgeScore.m = m;
-		edgeScore.score = scoreMotion.score(m);
 	}
 
 	@Override
@@ -435,10 +448,9 @@ public class SelectNeighborsAroundView implements VerbosePrint {
 		this.verbose = out;
 	}
 
+	// TODO remove this
 	static class EdgeScore {
 		// The motion this edge references
 		Motion m;
-		// quality of geometric information in this edge. Higher is better
-		double score;
 	}
 }

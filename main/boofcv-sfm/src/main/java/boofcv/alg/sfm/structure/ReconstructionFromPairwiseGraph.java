@@ -19,6 +19,7 @@
 package boofcv.alg.sfm.structure;
 
 import boofcv.alg.sfm.structure.PairwiseImageGraph.View;
+import boofcv.misc.BoofMiscOps;
 import boofcv.struct.ScoreIndex;
 import lombok.Getter;
 import org.ddogleg.struct.DogArray;
@@ -135,8 +136,7 @@ public abstract class ReconstructionFromPairwiseGraph implements VerbosePrint {
 					PairwiseImageGraph.Motion m1 = pview.findMotion(valid.get(idx1));
 					PairwiseImageGraph.Motion m2 = dst.findMotion(valid.get(idx1));
 
-					double s = Math.min(utils.scoreMotion.score(m0), utils.scoreMotion.score(m1));
-					s = Math.min(s, utils.scoreMotion.score(m2));
+					double s = BoofMiscOps.min(m0.score3D, m1.score3D, m2.score3D);
 
 					bestLocalScore = Math.max(s, bestLocalScore);
 				}
@@ -276,7 +276,7 @@ public abstract class ReconstructionFromPairwiseGraph implements VerbosePrint {
 			if (!m.is3D)
 				continue;
 
-			scoresMotions.grow().set(utils.scoreMotion.score(m), i);
+			scoresMotions.grow().set(m.score3D, i);
 		}
 
 		// only score the 3 best. This is to avoid biasing it for
