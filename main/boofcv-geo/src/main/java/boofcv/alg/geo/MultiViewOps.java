@@ -43,7 +43,9 @@ import boofcv.misc.BoofMiscOps;
 import boofcv.struct.calib.CameraPinhole;
 import boofcv.struct.geo.*;
 import georegression.geometry.GeometryMath_F64;
+import georegression.geometry.UtilLine2D_F64;
 import georegression.geometry.UtilPoint3D_F64;
+import georegression.metric.Intersection2D_F64;
 import georegression.struct.GeoTuple3D_F64;
 import georegression.struct.line.LineGeneral2D_F64;
 import georegression.struct.point.Point2D_F64;
@@ -526,6 +528,9 @@ public class MultiViewOps {
 	/**
 	 * Computes the homography induced from a planar surface when viewed from two views using correspondences
 	 * of three points. Observations must be on the planar surface.
+	 *
+	 * <p>WARNING: As implemented, it seems to have stability issues or a bug. See code for comments. Please fix
+	 * and update unit test.</p>
 	 *
 	 * @param F Fundamental matrix
 	 * @param p1 Associated point observation
@@ -1976,5 +1981,53 @@ public class MultiViewOps {
 
 		CommonOps_DDRM.add(tmp0, tmp1, tmp1);
 		return NormOps_DDRM.normF(tmp1);
+	}
+
+	/**
+	 * Given a homography, compute the Fundamental matrix between the two views. This requires at least 2 points
+	 * which are not on the plane to work. Using this function it is possible to compute a fundamental matrix from 6
+	 * points.
+	 *
+	 * <p>
+	 * Page 335 in R. Hartley, and A. Zisserman, "Multiple View Geometry in Computer Vision", 2nd Ed, Cambridge 2003
+	 * </p>
+	 *
+	 * @param H21 (Input) known homography
+	 * @param pairs (Input) two or more point observations which do not lie on the plane
+	 * @param F21 (Output) found homography matrix
+	 * @return true if no errors were encountered
+	 */
+	public static boolean homographyToFundamental( DMatrixRMaj H21, List<AssociatedPair> pairs, DMatrixRMaj F21 ) {
+		List<LineGeneral2D_F64> epipolarLines = new ArrayList<>();
+
+		Point2D_F64 h2 = new Point2D_F64();
+
+		for (int i = 0; i < pairs.size(); i++) {
+			AssociatedPair p = pairs.get(i);
+			GeometryMath_F64.mult(H21, p.p1, h2);
+			epipolarLines.add(UtilLine2D_F64.convert(p.p2, h2, (LineGeneral2D_F64)null));
+		}
+
+		// Epipole in the second view, homogenous coordinates
+		Point3D_F64 epipole = Intersection2D_F64.intersection(epipolarLines, null);
+
+		// F=cross_matrix(e)*H
+		GeometryMath_F64.multCrossA(epipole, H21, F21);
+
+		// In the future an alternative implementation might require error checking, so this is staying
+		return true;
+	}
+
+	/**
+	 * Converts a homography in pixel coordinates (uncalibrated) in to a homography in normalized image coordinates
+	 * (calibrated) given the two intrinsic camera matrices.
+	 *
+	 * @param H21 (Input) Homography in pixel coordinates
+	 * @param K1 (Input) Intrinsic camera matrix 1
+	 * @param K2 (Input) Intrinsic camera matrix 2
+	 * @return The homography in normalized image coordinates
+	 */
+	public static DMatrixRMaj homographyToCalibrated( DMatrixRMaj H21, DMatrixRMaj K1, DMatrixRMaj K2) {
+		return null;
 	}
 }

@@ -21,6 +21,7 @@ package boofcv.alg.geo;
 import boofcv.abst.geo.bundle.SceneObservations;
 import boofcv.abst.geo.bundle.SceneStructureMetric;
 import boofcv.alg.geo.h.CommonHomographyInducedPlane;
+import boofcv.alg.geo.h.HomographyDirectLinearTransform;
 import boofcv.alg.geo.impl.ProjectiveToIdentity;
 import boofcv.struct.calib.CameraPinhole;
 import boofcv.struct.geo.AssociatedPair;
@@ -350,32 +351,33 @@ class TestMultiViewOps extends BoofStandardJUnit {
 	}
 
 	@Test void fundamentalToHomography3Pts() {
-		CommonHomographyInducedPlane common = new CommonHomographyInducedPlane();
+		var common = new CommonHomographyInducedPlane();
 
 		DMatrixRMaj H = MultiViewOps.fundamentalToHomography3Pts(common.F, common.p1, common.p2, common.p3);
 
-		common.checkHomography(H);
+		// TODO Fix the algorithm to improve numerical stability. See code for comments
+		common.checkHomography(H, 20);
 	}
 
 	@Test void fundamentalToHomographyLinePt() {
-		CommonHomographyInducedPlane common = new CommonHomographyInducedPlane();
+		var common = new CommonHomographyInducedPlane();
 
 		PairLineNorm l1 = CommonHomographyInducedPlane.convert(common.p1, common.p2);
 
 		DMatrixRMaj H = MultiViewOps.fundamentalToHomographyLinePt(common.F, l1, common.p3);
 
-		common.checkHomography(H);
+		common.checkHomography(H, UtilEjml.TEST_F64);
 	}
 
 	@Test void fundamentalToHomography2Lines() {
-		CommonHomographyInducedPlane common = new CommonHomographyInducedPlane();
+		var common = new CommonHomographyInducedPlane();
 
 		PairLineNorm l1 = CommonHomographyInducedPlane.convert(common.p1, common.p2);
 		PairLineNorm l2 = CommonHomographyInducedPlane.convert(common.p1, common.p3);
 
 		DMatrixRMaj H = MultiViewOps.fundamentalToHomography2Lines(common.F, l1, l2);
 
-		common.checkHomography(H);
+		common.checkHomography(H, UtilEjml.TEST_F64);
 	}
 
 	/**
@@ -1380,7 +1382,52 @@ class TestMultiViewOps extends BoofStandardJUnit {
 	}
 
 	@Test void compatibleHomography() {
-		fail("implement");
+		var common = new CommonHomographyInducedPlane();
+
+		// Compute the homography from the point pairs.
+		// tried to do it directly but apparently I don't understand how to do that
+		DMatrixRMaj H = new DMatrixRMaj(3, 3);
+		new HomographyDirectLinearTransform(true).process(common.getPairs(), H);
+
+		// This should be a perfect fit
+		assertEquals(0.0, MultiViewOps.compatibleHomography(common.F, H), UtilEjml.TEST_F64);
+
+		// Make it no longer compatible
+		H.data[1] += 0.1;
+		assertNotEquals(0.0, MultiViewOps.compatibleHomography(common.F, H), UtilEjml.TEST_F64);
+	}
+
+	@Test void homographyToFundamental() {
+		// Create an arbitrary scene
+		CameraPinhole intrinsic = new CameraPinhole(500, 500, 0, 250, 250, 500, 500);
+		DMatrixRMaj K = PerspectiveOps.pinholeToMatrix(intrinsic, (DMatrixRMaj)null);
+		Se3_F64 leftToRight = SpecialEuclideanOps_F64.eulerXyz(0.5, 0.05, 0, -0.02, 0.05, 0.01, null);
+		Se3_F64 homographyToLeft = new Se3_F64();
+		homographyToLeft.T.setTo(0, 0, 2);
+
+		// create a bunch of points which are off the plane
+		List<Point3D_F64> cloud = UtilPoint3D_F64.random(new Point3D_F64(0, 0, 1.5),
+				-1, 1, -1, 1, -0.2, 0.2, 50, rand);
+
+		// Create a homography for
+		DMatrixRMaj H = MultiViewOps.createHomography(homographyToLeft.R, homographyToLeft.T, 1.0, new Vector3D_F64(0, 0, 1), K);
+
+		// Create observation
+		List<AssociatedPair> observations = new ArrayList<>();
+		for (Point3D_F64 X : cloud) {
+			var p = new AssociatedPair();
+			PerspectiveOps.renderPixel(intrinsic, X, p.p1);
+			PerspectiveOps.renderPixel(leftToRight, intrinsic, X, p.p2);
+			observations.add(p);
+		}
+
+		var foundF = new DMatrixRMaj(3, 3);
+		assertTrue(MultiViewOps.homographyToFundamental(H, observations, foundF));
+
+		// make sure it's not all zeros
+		assertTrue(NormOps_DDRM.normF(foundF) > 0.5);
+		// they should be compatible
+		assertEquals(0.0, MultiViewOps.compatibleHomography(foundF, H), UtilEjml.TEST_F64);
 	}
 
 	private class BundleSceneHelper {

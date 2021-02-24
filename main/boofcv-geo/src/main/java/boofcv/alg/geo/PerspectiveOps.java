@@ -256,7 +256,7 @@ public class PerspectiveOps {
 	 * @param K Storage for calibration matrix, must be 3x3.  If null then a new matrix is declared
 	 * @return Calibration matrix 3x3
 	 */
-	public static DMatrixRMaj pinholeToMatrix( CameraPinhole param, DMatrixRMaj K ) {
+	public static DMatrixRMaj pinholeToMatrix( CameraPinhole param, @Nullable DMatrixRMaj K ) {
 		return ImplPerspectiveOps_F64.pinholeToMatrix(param, K);
 	}
 
@@ -267,7 +267,7 @@ public class PerspectiveOps {
 	 * @param K Storage for calibration matrix, must be 3x3.  If null then a new matrix is declared
 	 * @return Calibration matrix 3x3
 	 */
-	public static FMatrixRMaj pinholeToMatrix( CameraPinhole param, FMatrixRMaj K ) {
+	public static FMatrixRMaj pinholeToMatrix( CameraPinhole param, @Nullable FMatrixRMaj K ) {
 		return ImplPerspectiveOps_F32.pinholeToMatrix(param, K);
 	}
 
@@ -278,7 +278,7 @@ public class PerspectiveOps {
 	 * @param K Storage for calibration matrix, must be 3x3.  If null then a new matrix is declared
 	 * @return Calibration matrix 3x3
 	 */
-	public static DMatrix3x3 pinholeToMatrix( CameraPinhole param, DMatrix3x3 K ) {
+	public static DMatrix3x3 pinholeToMatrix( CameraPinhole param, @Nullable DMatrix3x3 K ) {
 		return ImplPerspectiveOps_F64.pinholeToMatrix(param, K);
 	}
 

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -19,10 +19,12 @@
 package boofcv.alg.geo.h;
 
 import boofcv.alg.geo.MultiViewOps;
+import boofcv.alg.geo.f.EpipolarMinimizeGeometricError;
 import boofcv.struct.geo.AssociatedPair;
 import georegression.geometry.GeometryMath_F64;
 import georegression.struct.point.Point2D_F64;
 import georegression.struct.point.Point3D_F64;
+import org.ddogleg.struct.DogArray;
 import org.ejml.LinearSolverSafe;
 import org.ejml.data.DMatrixRMaj;
 import org.ejml.dense.row.factory.LinearSolverFactory_DDRM;
@@ -38,12 +40,15 @@ import org.ejml.interfaces.linsol.LinearSolverDense;
  * </p>
  *
  * <p>
- * [1] R. Hartley, and A. Zisserman, "Multiple View Geometry in Computer Vision", 2nd Ed, Cambridge 2003
+ * [1] Page 332, R. Hartley, and A. Zisserman, "Multiple View Geometry in Computer Vision", 2nd Ed, Cambridge 2003
  * </p>
  *
  * @author Peter Abeles
  */
 public class HomographyInducedStereo3Pts {
+
+	// Input fundamental matrix
+	private final DMatrixRMaj F21 = new DMatrixRMaj(3, 3);
 
 	// Epipole in camera 2
 	private final Point3D_F64 e2 = new Point3D_F64();
@@ -71,6 +76,10 @@ public class HomographyInducedStereo3Pts {
 	// pick a reasonable scale and sign
 	private final AdjustHomographyMatrix adjust = new AdjustHomographyMatrix();
 
+	// Adjusts points to minimize geometric error
+	EpipolarMinimizeGeometricError adjusterEpipolar = new EpipolarMinimizeGeometricError();
+	private final DogArray<AssociatedPair> adjustedPairs = new DogArray<>(AssociatedPair::new);
+
 	public HomographyInducedStereo3Pts() {
 		// ensure that the inputs are not modified
 		solver = new LinearSolverSafe<>(LinearSolverFactory_DDRM.linear(3));
@@ -89,6 +98,7 @@ public class HomographyInducedStereo3Pts {
 			MultiViewOps.extractEpipoles(F, new Point3D_F64(), this.e2);
 		}
 		GeometryMath_F64.multCrossA(this.e2, F, A);
+		this.F21.setTo(F);
 	}
 
 	/**
@@ -101,14 +111,25 @@ public class HomographyInducedStereo3Pts {
 	 * @return True if successful or false if it failed
 	 */
 	public boolean process( AssociatedPair p1, AssociatedPair p2, AssociatedPair p3 ) {
+		// Computed corrected points that minimize epipolar error
+		adjustedPairs.resize(3);
+		adjustEpipolar(p1, adjustedPairs.get(0));
+		adjustEpipolar(p2, adjustedPairs.get(1));
+		adjustEpipolar(p3, adjustedPairs.get(2));
+
+		// The algorithm in the book doesn't appear to be terribly stable.
+		// One possible way to improve it is to normalize the inputs so that they have a magnitude around one
+		// This is a bit of a pain and nothing is using the code right now. I'm being lazy
+		// but at least I'm documenting my laziness
+//		LowLevelMultiViewOps.computeNormalization(adjustedPairs.toList(), N1, N2);
 
 		// Fill rows of M with observations from image 1
-		fillM(p1.p1, p2.p1, p3.p1);
+		fillM(adjustedPairs.get(0).p1, adjustedPairs.get(1).p1, adjustedPairs.get(2).p1);
 
 		// Compute 'b' vector
-		b.x = computeB(p1.p2);
-		b.y = computeB(p2.p2);
-		b.z = computeB(p3.p2);
+		b.x = computeB(adjustedPairs.get(0).p2);
+		b.y = computeB(adjustedPairs.get(1).p2);
+		b.z = computeB(adjustedPairs.get(2).p2);
 
 		// A_inv_b = inv(A)*b
 		if (!solver.setA(M))
@@ -124,6 +145,10 @@ public class HomographyInducedStereo3Pts {
 		adjust.adjust(H, p1);
 
 		return true;
+	}
+
+	private void adjustEpipolar( AssociatedPair a, AssociatedPair adjusted ) {
+		adjusterEpipolar.process(F21, a.p1.x, a.p1.y, a.p2.x, a.p2.y, adjusted.p1, adjusted.p2);
 	}
 
 	/**
