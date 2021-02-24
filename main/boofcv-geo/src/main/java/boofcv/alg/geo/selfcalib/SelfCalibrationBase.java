@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -32,7 +32,7 @@ import java.util.List;
 /**
  * view[0] is assumed to the located at coordinate system's origin.
  *
- *<p>
+ * <p>
  * w<sup>*</sup> = P Q<sup>*</sup><sub>&infin;</sub>P<sup>T</sup>
  * </p>
  *
@@ -53,9 +53,9 @@ public class SelfCalibrationBase {
 	int minimumProjectives;
 
 	// workspace
-	DMatrixRMaj _P = new DMatrixRMaj(3,4);
-	DMatrixRMaj _Q = new DMatrixRMaj(4,4);
-	DMatrixRMaj tmp = new DMatrixRMaj(3,4);
+	DMatrixRMaj _P = new DMatrixRMaj(3, 4);
+	DMatrixRMaj _Q = new DMatrixRMaj(4, 4);
+	DMatrixRMaj tmp = new DMatrixRMaj(3, 4);
 
 	/**
 	 * Adds a projective transform which describes the relationship between a 3D point viewed in
@@ -64,20 +64,20 @@ public class SelfCalibrationBase {
 	 * The projective is defined as P[i]=[A[i] | a[i]] where P is 3 by 4 matrix.
 	 *
 	 * @param viewI projective matrix representing the transform from the current camera
-	 *                       to the coordinate system's origin. 3 x 4. A copy is saved internally.
+	 * to the coordinate system's origin. 3 x 4. A copy is saved internally.
 	 */
-	public void addCameraMatrix(DMatrixRMaj viewI ) {
+	public void addCameraMatrix( DMatrixRMaj viewI ) {
 		Projective pr = cameras.grow();
-		PerspectiveOps.projectionSplit(viewI,pr.A,pr.a);
+		PerspectiveOps.projectionSplit(viewI, pr.A, pr.a);
 	}
 
-	public void addCameraMatrix(List<DMatrixRMaj> viewI_to_view0 ) {
+	public void addCameraMatrix( List<DMatrixRMaj> viewI_to_view0 ) {
 		for (int i = 0; i < viewI_to_view0.size(); i++) {
 			addCameraMatrix(viewI_to_view0.get(i));
 		}
 	}
 
-	public static void encodeQ( DMatrix4x4 Q , double param[] ) {
+	public static void encodeQ( DMatrix4x4 Q, double param[] ) {
 		Q.a11 = param[0];
 		Q.a12 = Q.a21 = param[1];
 		Q.a13 = Q.a31 = param[2];
@@ -90,16 +90,16 @@ public class SelfCalibrationBase {
 		Q.a44 = param[9];
 	}
 
-	public void computeW( Projective P , DMatrix4x4 Q , DMatrixRMaj w_i) {
-		DConvertMatrixStruct.convert(Q,_Q);
+	public void computeW( Projective P, DMatrix4x4 Q, DMatrixRMaj w_i ) {
+		DConvertMatrixStruct.convert(Q, _Q);
 
 		convert(P, _P);
-		CommonOps_DDRM.mult(_P,_Q,tmp);
-		CommonOps_DDRM.multTransB(tmp,_P,w_i);
-		CommonOps_DDRM.divide(w_i,w_i.get(2,2));
+		CommonOps_DDRM.mult(_P, _Q, tmp);
+		CommonOps_DDRM.multTransB(tmp, _P, w_i);
+		CommonOps_DDRM.divide(w_i, w_i.get(2, 2));
 	}
 
-	static void convert( Projective P , DMatrixRMaj D ) {
+	static void convert( Projective P, DMatrixRMaj D ) {
 		D.data[0] = P.A.a11;
 		D.data[1] = P.A.a12;
 		D.data[2] = P.A.a13;

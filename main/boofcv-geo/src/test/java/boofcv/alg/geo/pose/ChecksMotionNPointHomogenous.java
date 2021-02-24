@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -39,59 +39,57 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
  */
 public abstract class ChecksMotionNPointHomogenous extends CommonMotionNPointHomogenous {
 
-	public abstract DMatrixRMaj compute( List<AssociatedPair> obs , List<Point4D_F64> locations );
+	public abstract DMatrixRMaj compute( List<AssociatedPair> obs, List<Point4D_F64> locations );
 
 	/**
 	 * Standard test using only the minimum number of observation
 	 */
-	@Test
-	void minimalObservationTest() {
+	@Test void minimalObservationTest() {
 		standardTest(6);
 	}
 
 	/**
 	 * Standard test with an over determined system
 	 */
-	@Test
-	void overdetermined() {
+	@Test void overdetermined() {
 		standardTest(20);
 	}
 
 	/**
 	 * Standard test with an over determined system
 	 */
-	@Test
-	void overdeterminedPlanar() {
+	@Test void overdeterminedPlanar() {
 		planarTest(20);
 	}
 
 	/**
 	 * Standard test with an over determined system
 	 */
-	@Test
-	void checkMotion() {
+	@Test void checkMotion() {
 		testNoMotion(20);
 	}
 
 	/**
 	 * Test a set of random points in general position
+	 *
 	 * @param N number of observed point objects
 	 */
 	public void testNoMotion( int N ) {
-		DMatrixRMaj P = new DMatrixRMaj(3,4);
+		DMatrixRMaj P = new DMatrixRMaj(3, 4);
 		CommonOps_DDRM.setIdentity(P);
 
-		checkMotion(N, P,false);
+		checkMotion(N, P, false);
 	}
 
 	/**
 	 * Test a set of random points in general position
+	 *
 	 * @param N number of observed point objects
 	 */
 	public void standardTest( int N ) {
 		DMatrixRMaj P = createCameraMatrix();
 
-		checkMotion(N, P,false);
+		checkMotion(N, P, false);
 	}
 
 	private DMatrixRMaj createCameraMatrix() {
@@ -104,30 +102,30 @@ public abstract class ChecksMotionNPointHomogenous extends CommonMotionNPointHom
 
 	/**
 	 * Test a set of random points in general position
+	 *
 	 * @param N number of observed point objects
 	 */
 	public void planarTest( int N ) {
 		DMatrixRMaj P = createCameraMatrix();
 
-		checkMotion(N, P,true);
+		checkMotion(N, P, true);
 	}
 
-	private void checkMotion(int N, DMatrixRMaj cameraMatrix, boolean planar ) {
+	private void checkMotion( int N, DMatrixRMaj cameraMatrix, boolean planar ) {
 		generateScene(N, cameraMatrix, planar);
 
 		// extract the motion
-		DMatrixRMaj foundP = compute(assocPairs,worldPts);
+		DMatrixRMaj foundP = compute(assocPairs, worldPts);
 
 		// see if the found motion produces the same output as the original motion
-		for( int i = 0; i < worldPts.size(); i++ ) {
+		for (int i = 0; i < worldPts.size(); i++) {
 			Point4D_F64 X = worldPts.get(i);
 			Point2D_F64 x = assocPairs.get(i).p2;
 
-			Point2D_F64 foundPt = PerspectiveOps.renderPixel(foundP,X,(Point2D_F64)null);
+			Point2D_F64 foundPt = PerspectiveOps.renderPixel(foundP, X, (Point2D_F64)null);
 
-			assertEquals(x.x,foundPt.x,1e-6);
-			assertEquals(x.y,foundPt.y,1e-6);
+			assertEquals(x.x, foundPt.x, 1e-6);
+			assertEquals(x.y, foundPt.y, 1e-6);
 		}
 	}
-
 }

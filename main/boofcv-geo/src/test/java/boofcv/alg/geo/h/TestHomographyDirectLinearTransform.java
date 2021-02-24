@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -49,22 +49,18 @@ import java.util.List;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-
 /**
  * @author Peter Abeles
  */
-class TestHomographyDirectLinearTransform extends CommonHomographyChecks
-{
-	@Test
-	void perfect2D_calibrated() {
+class TestHomographyDirectLinearTransform extends CommonHomographyChecks {
+	@Test void perfect2D_calibrated() {
 		// test the minimum number of points
 		checkHomography(4, false, new HomographyDirectLinearTransform(false));
 		// test with extra points
 		checkHomography(10, false, new HomographyDirectLinearTransform(false));
 	}
 
-	@Test
-	void perfect2D_pixels() {
+	@Test void perfect2D_pixels() {
 		checkHomography(4, true, new HomographyDirectLinearTransform(true));
 		checkHomography(10, true, new HomographyDirectLinearTransform(true));
 	}
@@ -76,23 +72,22 @@ class TestHomographyDirectLinearTransform extends CommonHomographyChecks
 	 * @param isPixels Pixel or calibrated coordinates
 	 * @param alg Algorithm being evaluated
 	 */
-	private void checkHomography(int N, boolean isPixels, HomographyDirectLinearTransform alg) {
-		createScene(N,isPixels);
+	private void checkHomography( int N, boolean isPixels, HomographyDirectLinearTransform alg ) {
+		createScene(N, isPixels);
 
 		// compute essential
-		assertTrue(alg.process(pairs2D,solution));
+		assertTrue(alg.process(pairs2D, solution));
 
 		checkSolution();
 	}
 
-	@Test
-	void perfect_3D() {
+	@Test void perfect_3D() {
 		HomographyDirectLinearTransform alg = new HomographyDirectLinearTransform(false);
-		check3D(4,alg);
-		check3D(10,alg);
+		check3D(4, alg);
+		check3D(10, alg);
 		alg = new HomographyDirectLinearTransform(true);
-		check3D(4,alg);
-		check3D(10,alg);
+		check3D(4, alg);
+		check3D(10, alg);
 	}
 
 	/**
@@ -101,9 +96,9 @@ class TestHomographyDirectLinearTransform extends CommonHomographyChecks
 	 * @param N Number of observed points.
 	 * @param alg Algorithm being evaluated
 	 */
-	private void check3D(int N, HomographyDirectLinearTransform alg) {
-		createScene(N,true);
-		assertTrue(alg.process(null,pairs3D,null,solution));
+	private void check3D( int N, HomographyDirectLinearTransform alg ) {
+		createScene(N, true);
+		assertTrue(alg.process(null, pairs3D, null, solution));
 		checkSolution();
 	}
 
@@ -120,126 +115,123 @@ class TestHomographyDirectLinearTransform extends CommonHomographyChecks
 		}
 	}
 
-	@Test
-	void perfect_Conic() {
+	@Test void perfect_Conic() {
 		HomographyDirectLinearTransform alg = new HomographyDirectLinearTransform(false);
-		checkConics(3,alg);
-		checkConics(10,alg);
+		checkConics(3, alg);
+		checkConics(10, alg);
 		alg = new HomographyDirectLinearTransform(true);
-		checkConics(3,alg);
-		checkConics(10,alg);
+		checkConics(3, alg);
+		checkConics(10, alg);
 	}
 
-	private void checkConics(int N, HomographyDirectLinearTransform alg) {
+	private void checkConics( int N, HomographyDirectLinearTransform alg ) {
 
-		DMatrixRMaj R = ConvertRotation3D_F64.eulerToMatrix(EulerType.XYZ,0.1,-0.2,0.05,null);
-		DMatrixRMaj H = MultiViewOps.createHomography(R,new Vector3D_F64(),1,new Vector3D_F64(0,0,-1),K);
+		DMatrixRMaj R = ConvertRotation3D_F64.eulerToMatrix(EulerType.XYZ, 0.1, -0.2, 0.05, null);
+		DMatrixRMaj H = MultiViewOps.createHomography(R, new Vector3D_F64(), 1, new Vector3D_F64(0, 0, -1), K);
 
 		List<AssociatedPairConic> pairs = createConicPairs(N, H);
 
-		DMatrixRMaj found = new DMatrixRMaj(3,3);
-		alg.process(null,null,pairs,found);
+		DMatrixRMaj found = new DMatrixRMaj(3, 3);
+		alg.process(null, null, pairs, found);
 
 		// remove scale ambuguity
-		CommonOps_DDRM.scale(1.0/NormOps_DDRM.normF(H),H);
-		CommonOps_DDRM.scale(1.0/NormOps_DDRM.normF(found),found);
+		CommonOps_DDRM.scale(1.0/NormOps_DDRM.normF(H), H);
+		CommonOps_DDRM.scale(1.0/NormOps_DDRM.normF(found), found);
 
-		if( Math.signum(H.get(0,0)) != Math.signum(found.get(0,0))) {
-			CommonOps_DDRM.scale(-1,found);
+		if (Math.signum(H.get(0, 0)) != Math.signum(found.get(0, 0))) {
+			CommonOps_DDRM.scale(-1, found);
 		}
 
-		assertTrue(MatrixFeatures_DDRM.isIdentical(H,found, UtilEjml.TEST_F64));
+		assertTrue(MatrixFeatures_DDRM.isIdentical(H, found, UtilEjml.TEST_F64));
 	}
 
-	private List<AssociatedPairConic> createConicPairs(int N, DMatrixRMaj H) {
+	private List<AssociatedPairConic> createConicPairs( int N, DMatrixRMaj H ) {
 		DMatrix3x3 Hinv = new DMatrix3x3();
-		CommonOps_DDF3.invert(DConvertMatrixStruct.convert(H,(DMatrix3x3)null),Hinv);
+		CommonOps_DDF3.invert(DConvertMatrixStruct.convert(H, (DMatrix3x3)null), Hinv);
 		DMatrix3x3 C = new DMatrix3x3();
 
 		List<AssociatedPairConic> pairs = new ArrayList<>();
 		EllipseQuadratic_F64 ellipseQ = new EllipseQuadratic_F64();
 		for (int i = 0; i < N; i++) {
-			EllipseRotated_F64 ellipseR = new EllipseRotated_F64(rand.nextGaussian()*5,rand.nextGaussian()*5,
-					0.5+rand.nextDouble()*2,0.5,rand.nextGaussian()*1.5);
-			UtilEllipse_F64.convert(ellipseR,ellipseQ);
+			EllipseRotated_F64 ellipseR = new EllipseRotated_F64(rand.nextGaussian()*5, rand.nextGaussian()*5,
+					0.5 + rand.nextDouble()*2, 0.5, rand.nextGaussian()*1.5);
+			UtilEllipse_F64.convert(ellipseR, ellipseQ);
 			AssociatedPairConic pair = new AssociatedPairConic();
 			pair.p1.setTo(ellipseQ);
 
 			UtilCurves_F64.convert(pair.p1, C);
-			PerspectiveOps.multTranA(Hinv,C,Hinv,C);
-			UtilCurves_F64.convert(C,pair.p2);
+			PerspectiveOps.multTranA(Hinv, C, Hinv, C);
+			UtilCurves_F64.convert(C, pair.p2);
 
 			pairs.add(pair);
 		}
 		return pairs;
 	}
 
-	@Test
-	void perfect_AllToGether() {
-		perfect_AllToGether(10,new HomographyDirectLinearTransform(false));
-		perfect_AllToGether(10,new HomographyDirectLinearTransform(true));
+	@Test void perfect_AllToGether() {
+		perfect_AllToGether(10, new HomographyDirectLinearTransform(false));
+		perfect_AllToGether(10, new HomographyDirectLinearTransform(true));
 	}
 
-	void perfect_AllToGether(int N, HomographyDirectLinearTransform alg) {
+	void perfect_AllToGether( int N, HomographyDirectLinearTransform alg ) {
 		// pure rotation so that the H computed below acts as expected
-		motion = SpecialEuclideanOps_F64.eulerXyz(0,0,0,0.05, -0.1, 0.08,null);
-		createScene(N,alg.isNormalize());
+		motion = SpecialEuclideanOps_F64.eulerXyz(0, 0, 0, 0.05, -0.1, 0.08, null);
+		createScene(N, alg.isNormalize());
 
 		DMatrixRMaj H = computeH(alg.isNormalize());
-		List<AssociatedPairConic> conics = createConicPairs(N,H);
+		List<AssociatedPairConic> conics = createConicPairs(N, H);
 
-		assertTrue(alg.process(pairs2D,pairs3D,conics,solution));
+		assertTrue(alg.process(pairs2D, pairs3D, conics, solution));
 		checkSolution();
 	}
-
 
 	/**
 	 * Test the constraint added from a pair of conics and seeing of the generating homography results in a null
 	 * vector
 	 */
-	@Test
-	void addConicPairConstraints() {
-		DMatrixRMaj R = ConvertRotation3D_F64.eulerToMatrix(EulerType.XYZ,0.1,-0.2,0.05,null);
-		DMatrixRMaj H = MultiViewOps.createHomography(R,new Vector3D_F64(),1,new Vector3D_F64(0,0,-1),K);
+	@Test void addConicPairConstraints() {
+		DMatrixRMaj R = ConvertRotation3D_F64.eulerToMatrix(EulerType.XYZ, 0.1, -0.2, 0.05, null);
+		DMatrixRMaj H = MultiViewOps.createHomography(R, new Vector3D_F64(), 1, new Vector3D_F64(0, 0, -1), K);
 		DMatrix3x3 H3 = new DMatrix3x3();
 		DMatrix3x3 Hinv = new DMatrix3x3();
 		DMatrix3x3 C = new DMatrix3x3();
 
-		DConvertMatrixStruct.convert(H,H3);
-		CommonOps_DDF3.invert(H3,Hinv);
+		DConvertMatrixStruct.convert(H, H3);
+		CommonOps_DDF3.invert(H3, Hinv);
 
 		AssociatedPairConic pair1 = new AssociatedPairConic();
 		AssociatedPairConic pair2 = new AssociatedPairConic();
 
 
 		// Two arbitrary ellipse conics. Using ellipses since I know they are not degenerate
-		EllipseRotated_F64 ellipseR = new EllipseRotated_F64(2,3,1.5,0.5,0.2);
+		EllipseRotated_F64 ellipseR = new EllipseRotated_F64(2, 3, 1.5, 0.5, 0.2);
 		EllipseQuadratic_F64 ellipseQ = new EllipseQuadratic_F64();
-		UtilEllipse_F64.convert(ellipseR,ellipseQ);
+		UtilEllipse_F64.convert(ellipseR, ellipseQ);
 		pair1.p1 = new ConicGeneral_F64(ellipseQ);
-		ellipseR = new EllipseRotated_F64(20,-2,2.0,0.75,-0.6);
-		UtilEllipse_F64.convert(ellipseR,ellipseQ);
+		ellipseR = new EllipseRotated_F64(20, -2, 2.0, 0.75, -0.6);
+		UtilEllipse_F64.convert(ellipseR, ellipseQ);
 		pair2.p1 = new ConicGeneral_F64(ellipseQ);
 
 		// Find the conic in view 2 by applying C' = inv(H)^T * C * inv(H)
 		UtilCurves_F64.convert(pair1.p1, C);
-		PerspectiveOps.multTranA(Hinv,C,Hinv,C);
-		UtilCurves_F64.convert(C,pair1.p2);
+		PerspectiveOps.multTranA(Hinv, C, Hinv, C);
+		UtilCurves_F64.convert(C, pair1.p2);
 		UtilCurves_F64.convert(pair2.p1, C);
-		PerspectiveOps.multTranA(Hinv,C,Hinv,C);
-		UtilCurves_F64.convert(C,pair2.p2);
+		PerspectiveOps.multTranA(Hinv, C, Hinv, C);
+		UtilCurves_F64.convert(C, pair2.p2);
 
 		HomographyDirectLinearTransform alg = new HomographyDirectLinearTransform(false);
 
 		// construct constraint matrix
-		DMatrixRMaj A = new DMatrixRMaj(9,9);
-		assertEquals(9,alg.addConicPairConstraints(pair1,pair2,A,0));
+		DMatrixRMaj A = new DMatrixRMaj(9, 9);
+		assertEquals(9, alg.addConicPairConstraints(pair1, pair2, A, 0));
 
 		// Test that A*H = 0
-		H.numRows = 9;H.numCols = 1; // convert into a vector
-		DMatrixRMaj b = new DMatrixRMaj(9,1);
-		CommonOps_DDRM.mult(A,H,b);
+		H.numRows = 9;
+		H.numCols = 1; // convert into a vector
+		DMatrixRMaj b = new DMatrixRMaj(9, 1);
+		CommonOps_DDRM.mult(A, H, b);
 
-		assertEquals(0,CommonOps_DDRM.elementSum(b), UtilEjml.TEST_F64);
+		assertEquals(0, CommonOps_DDRM.elementSum(b), UtilEjml.TEST_F64);
 	}
 }

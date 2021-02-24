@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -43,13 +43,12 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 public class TestHomographyTotalLeastSquares extends CommonHomographyChecks {
 	private Random rand = new Random(234);
 
-	@Test
-	public void perfect() {
+	@Test void perfect() {
 		HomographyTotalLeastSquares alg = new HomographyTotalLeastSquares();
 
-		checkHomography(4, alg );
-		checkHomography(10, alg );
-		checkHomography(500, alg );
+		checkHomography(4, alg);
+		checkHomography(10, alg);
+		checkHomography(500, alg);
 	}
 
 	/**
@@ -58,29 +57,28 @@ public class TestHomographyTotalLeastSquares extends CommonHomographyChecks {
 	 * @param N Number of observed points.
 	 * @param alg Algorithm being evaluated
 	 */
-	private void checkHomography(int N, HomographyTotalLeastSquares alg) {
-		createScene(N,true);
+	private void checkHomography( int N, HomographyTotalLeastSquares alg ) {
+		createScene(N, true);
 
 		// compute essential
-		assertTrue(alg.process(pairs2D,solution));
+		assertTrue(alg.process(pairs2D, solution));
 
 		// validate by testing essential properties
 
 		// sanity check, F is not zero
-		assertTrue(NormOps_DDRM.normF(solution) > 0.001 );
+		assertTrue(NormOps_DDRM.normF(solution) > 0.001);
 
 		// see if it follows the epipolar constraint
-		for( AssociatedPair p : pairs2D) {
-			Point2D_F64 a = GeometryMath_F64.mult(solution,p.p1,new Point2D_F64());
+		for (AssociatedPair p : pairs2D) {
+			Point2D_F64 a = GeometryMath_F64.mult(solution, p.p1, new Point2D_F64());
 
 			double diff = a.distance(p.p2);
-			assertEquals(0,diff,1e-8);
+			assertEquals(0, diff, 1e-8);
 		}
 	}
 
-	@Test
-	public void checkAgainstKnownH() {
-		DMatrixRMaj H = new DMatrixRMaj(new double[][]{{1.5,0,0.5},{0.2,2,0.2},{0.05,0,1.5}});
+	@Test void checkAgainstKnownH() {
+		DMatrixRMaj H = new DMatrixRMaj(new double[][]{{1.5, 0, 0.5}, {0.2, 2, 0.2}, {0.05, 0, 1.5}});
 //		DMatrixRMaj H = new DMatrixRMaj(new double[][]{{1,0,0},{0,1,0},{0,0,1}});
 //		DMatrixRMaj H = new DMatrixRMaj(new double[][]{{1,0,0},{0,1,0},{0,0,2.0}});
 
@@ -91,29 +89,28 @@ public class TestHomographyTotalLeastSquares extends CommonHomographyChecks {
 			AssociatedPair p = new AssociatedPair();
 			p.p1.x = rand.nextGaussian();
 			p.p1.y = rand.nextGaussian();
-			GeometryMath_F64.mult(H,p.p1,p.p2);
+			GeometryMath_F64.mult(H, p.p1, p.p2);
 			list.add(p);
 		}
 
-		CommonOps_DDRM.scale(1.0/H.get(2,2),H);
+		CommonOps_DDRM.scale(1.0/H.get(2, 2), H);
 //		H.print();
-		DMatrixRMaj found = new DMatrixRMaj(3,3);
+		DMatrixRMaj found = new DMatrixRMaj(3, 3);
 		HomographyTotalLeastSquares alg = new HomographyTotalLeastSquares();
-		alg.process(list,found);
+		alg.process(list, found);
 
 //		System.out.println("\n\nFound");
 //		found.print();
-		assertTrue(MatrixFeatures_DDRM.isIdentical(found,H,UtilEjml.TEST_F64));
+		assertTrue(MatrixFeatures_DDRM.isIdentical(found, H, UtilEjml.TEST_F64));
 	}
 
-	@Test
-	public void constructA678() {
+	@Test void constructA678() {
 		int N = 10;
-		SimpleMatrix P = SimpleMatrix.random_DDRM(N,2,-1,1,rand);
-		SimpleMatrix X = SimpleMatrix.random_DDRM(N,2,-1,1,rand);
+		SimpleMatrix P = SimpleMatrix.random_DDRM(N, 2, -1, 1, rand);
+		SimpleMatrix X = SimpleMatrix.random_DDRM(N, 2, -1, 1, rand);
 
 		Equation eq = new Equation();
-		eq.alias(P.copy(),"P",X.copy(),"X",N,"N");
+		eq.alias(P.copy(), "P", X.copy(), "X", N, "N");
 		eq.process("X=-X");
 		eq.process("Xd = diag(X(:,0))");
 		eq.process("Yd = diag(X(:,1))");
@@ -128,15 +125,14 @@ public class TestHomographyTotalLeastSquares extends CommonHomographyChecks {
 		alg.X1.setTo(P.getDDRM());
 		alg.X2.setTo(X.getDDRM());
 		alg.constructA678();
-		assertTrue(MatrixFeatures_DDRM.isIdentical(eq.lookupDDRM("A"),alg.A,UtilEjml.TEST_F64));
+		assertTrue(MatrixFeatures_DDRM.isIdentical(eq.lookupDDRM("A"), alg.A, UtilEjml.TEST_F64));
 	}
 
-	@Test
-	public void backsubstitution0134() {
+	@Test void backsubstitution0134() {
 		int N = 10;
-		SimpleMatrix Pp = SimpleMatrix.random_DDRM(2,N,-1,1,rand);
-		SimpleMatrix P = SimpleMatrix.random_DDRM(N,2,-1,1,rand);
-		SimpleMatrix X = SimpleMatrix.random_DDRM(N,2,-1,1,rand);
+		SimpleMatrix Pp = SimpleMatrix.random_DDRM(2, N, -1, 1, rand);
+		SimpleMatrix P = SimpleMatrix.random_DDRM(N, 2, -1, 1, rand);
+		SimpleMatrix X = SimpleMatrix.random_DDRM(N, 2, -1, 1, rand);
 
 		double[] H = new double[9];
 		H[6] = 0.4;
@@ -144,58 +140,54 @@ public class TestHomographyTotalLeastSquares extends CommonHomographyChecks {
 		H[8] = -0.3;
 
 		Equation eq = new Equation();
-		eq.alias(P.copy(),"P",Pp.copy(),"Pp",X.copy(),"X",N,"N");
+		eq.alias(P.copy(), "P", Pp.copy(), "Pp", X.copy(), "X", N, "N");
 
 		eq.process("H=[0.4;0.8;-0.3]");
 		eq.process("Ax = -Pp*diag(-X(:,0))*[P,ones(N,1)]*H");
 		eq.process("Ay = -Pp*diag(-X(:,1))*[P,ones(N,1)]*H");
 
-		HomographyTotalLeastSquares.backsubstitution0134(Pp.getMatrix(),P.getMatrix(),X.getMatrix(),H);
+		HomographyTotalLeastSquares.backsubstitution0134(Pp.getMatrix(), P.getMatrix(), X.getMatrix(), H);
 
 		DMatrixRMaj Ax = eq.lookupDDRM("Ax");
 		DMatrixRMaj Ay = eq.lookupDDRM("Ay");
 
-		assertEquals(Ax.data[0],H[0], UtilEjml.TEST_F64);
-		assertEquals(Ax.data[1],H[1], UtilEjml.TEST_F64);
-		assertEquals(Ay.data[0],H[3], UtilEjml.TEST_F64);
-		assertEquals(Ay.data[1],H[4], UtilEjml.TEST_F64);
-
+		assertEquals(Ax.data[0], H[0], UtilEjml.TEST_F64);
+		assertEquals(Ax.data[1], H[1], UtilEjml.TEST_F64);
+		assertEquals(Ay.data[0], H[3], UtilEjml.TEST_F64);
+		assertEquals(Ay.data[1], H[4], UtilEjml.TEST_F64);
 	}
 
-	@Test
-	public void computeEq20() {
-		SimpleMatrix A = SimpleMatrix.random_DDRM(10,2,-1,1,rand);
-		SimpleMatrix B = SimpleMatrix.random_DDRM(10,2,-1,1,rand);
+	@Test void computeEq20() {
+		SimpleMatrix A = SimpleMatrix.random_DDRM(10, 2, -1, 1, rand);
+		SimpleMatrix B = SimpleMatrix.random_DDRM(10, 2, -1, 1, rand);
 
 		SimpleMatrix expected = A.transpose().mult(B).scale(-1.0/10.0);
 		double[] found = new double[4];
 
-		HomographyTotalLeastSquares.computeEq20(A.getDDRM(),B.getDDRM(),found);
-		assertEquals(expected.get(0,0),found[0],UtilEjml.TEST_F64);
-		assertEquals(expected.get(0,1),found[1],UtilEjml.TEST_F64);
-		assertEquals(expected.get(1,0),found[2],UtilEjml.TEST_F64);
-		assertEquals(expected.get(1,1),found[3],UtilEjml.TEST_F64);
+		HomographyTotalLeastSquares.computeEq20(A.getDDRM(), B.getDDRM(), found);
+		assertEquals(expected.get(0, 0), found[0], UtilEjml.TEST_F64);
+		assertEquals(expected.get(0, 1), found[1], UtilEjml.TEST_F64);
+		assertEquals(expected.get(1, 0), found[2], UtilEjml.TEST_F64);
+		assertEquals(expected.get(1, 1), found[3], UtilEjml.TEST_F64);
 	}
 
-	@Test
-	public void computePseudo() {
-		SimpleMatrix P = SimpleMatrix.random_DDRM(10,2,-1,1,rand);
-		SimpleMatrix found = new SimpleMatrix(1,1);
+	@Test void computePseudo() {
+		SimpleMatrix P = SimpleMatrix.random_DDRM(10, 2, -1, 1, rand);
+		SimpleMatrix found = new SimpleMatrix(1, 1);
 
-		HomographyTotalLeastSquares.computePseudo(P.getDDRM(),found.getDDRM());
+		HomographyTotalLeastSquares.computePseudo(P.getDDRM(), found.getDDRM());
 
 		SimpleMatrix expected = P.transpose().mult(P).invert().mult(P.transpose());
 
 		assertTrue(expected.isIdentical(found, UtilEjml.TEST_F64));
 	}
 
-	@Test
-	public void computePPXP() {
-		SimpleMatrix P = SimpleMatrix.random_DDRM(10,2,-1,1,rand);
-		SimpleMatrix P_plus = SimpleMatrix.random_DDRM(2,10,-1,1,rand);
-		SimpleMatrix X = SimpleMatrix.random_DDRM(10,2,-1,1,rand);
+	@Test void computePPXP() {
+		SimpleMatrix P = SimpleMatrix.random_DDRM(10, 2, -1, 1, rand);
+		SimpleMatrix P_plus = SimpleMatrix.random_DDRM(2, 10, -1, 1, rand);
+		SimpleMatrix X = SimpleMatrix.random_DDRM(10, 2, -1, 1, rand);
 
-		SimpleMatrix found = new SimpleMatrix(1,1);
+		SimpleMatrix found = new SimpleMatrix(1, 1);
 
 		for (int i = 0; i < 2; i++) {
 			HomographyTotalLeastSquares.computePPXP(P.getDDRM(), P_plus.getDDRM(), X.getDDRM(), i, found.getDDRM());
@@ -207,17 +199,16 @@ public class TestHomographyTotalLeastSquares extends CommonHomographyChecks {
 		}
 	}
 
-	@Test
-	public void computePPpX() {
-		SimpleMatrix P = SimpleMatrix.random_DDRM(10,2,-1,1,rand);
-		SimpleMatrix P_plus = SimpleMatrix.random_DDRM(2,10,-1,1,rand);
-		SimpleMatrix X = SimpleMatrix.random_DDRM(10,2,-1,1,rand);
+	@Test void computePPpX() {
+		SimpleMatrix P = SimpleMatrix.random_DDRM(10, 2, -1, 1, rand);
+		SimpleMatrix P_plus = SimpleMatrix.random_DDRM(2, 10, -1, 1, rand);
+		SimpleMatrix X = SimpleMatrix.random_DDRM(10, 2, -1, 1, rand);
 
-		SimpleMatrix found = new SimpleMatrix(1,1);
+		SimpleMatrix found = new SimpleMatrix(1, 1);
 
 		for (int i = 0; i < 2; i++) {
-			HomographyTotalLeastSquares.computePPpX(P.getDDRM(),P_plus.getDDRM(),X.getDDRM(),i,found.getDDRM());
-			SimpleMatrix Xx = X.extractVector(false,i);
+			HomographyTotalLeastSquares.computePPpX(P.getDDRM(), P_plus.getDDRM(), X.getDDRM(), i, found.getDDRM());
+			SimpleMatrix Xx = X.extractVector(false, i);
 			SimpleMatrix expected = P.mult(P_plus).mult(Xx.negative());
 			assertTrue(expected.isIdentical(found, UtilEjml.TEST_F64));
 		}

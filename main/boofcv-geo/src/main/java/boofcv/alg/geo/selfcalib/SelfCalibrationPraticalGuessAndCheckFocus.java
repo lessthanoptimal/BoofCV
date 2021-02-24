@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -151,9 +151,11 @@ public class SelfCalibrationPraticalGuessAndCheckFocus implements VerbosePrint {
 		// center points, remove skew, scale coordinates
 		double d = Math.sqrt(width*width + height*height);
 		V.zero();
+		// @formatter:off
 		V.set(0,0,d/2); V.set(0,1,skew); V.set(0,2,cx);
 		V.set(1,1,d/2); V.set(1,2,cy);
 		V.set(2,2,1);
+		// @formatter:on
 
 		CommonOps_DDRM.invert(V, Vinv);
 	}

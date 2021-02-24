@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -35,27 +35,24 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  */
 public abstract class CommonP3PSideChecks extends BoofStandardJUnit {
 
-	public abstract List<PointDistance3> computeSolutions( Point2D_F64 obs1 , Point2D_F64 obs2, Point2D_F64 obs3,
-														   double length23 , double length13 , double length12,
+	public abstract List<PointDistance3> computeSolutions( Point2D_F64 obs1, Point2D_F64 obs2, Point2D_F64 obs3,
+														   double length23, double length13, double length12,
 														   boolean shouldSucceed );
 
+	@Test void basicTest() {
+		Point3D_F64 P1 = new Point3D_F64(-0.2, 0.4, 2);
+		Point3D_F64 P2 = new Point3D_F64(0.5, 0, 2.6);
+		Point3D_F64 P3 = new Point3D_F64(-0.4, -0.3, 3);
 
-	@Test
-	public void basicTest() {
-
-		Point3D_F64 P1 = new Point3D_F64(-0.2,0.4,2);
-		Point3D_F64 P2 = new Point3D_F64(0.5,0,2.6);
-		Point3D_F64 P3 = new Point3D_F64(-0.4,-0.3,3);
-
-		Point2D_F64 p1 = PerspectiveOps.renderPixel(new Se3_F64(),P1, null);
-		Point2D_F64 p2 = PerspectiveOps.renderPixel(new Se3_F64(),P2, null);
-		Point2D_F64 p3 = PerspectiveOps.renderPixel(new Se3_F64(),P3, null);
+		Point2D_F64 p1 = PerspectiveOps.renderPixel(new Se3_F64(), P1, null);
+		Point2D_F64 p2 = PerspectiveOps.renderPixel(new Se3_F64(), P2, null);
+		Point2D_F64 p3 = PerspectiveOps.renderPixel(new Se3_F64(), P3, null);
 
 		double length12 = P1.distance(P2);
 		double length23 = P2.distance(P3);
 		double length13 = P1.distance(P3);
 
-		List<PointDistance3> solutions = computeSolutions(p1,p2,p3,length23,length13,length12,true);
+		List<PointDistance3> solutions = computeSolutions(p1, p2, p3, length23, length13, length12, true);
 
 		int numCorrect = 0;
 		double tol = 1e-8;
@@ -67,11 +64,11 @@ public abstract class CommonP3PSideChecks extends BoofStandardJUnit {
 //		System.out.println(expected1+" "+expected2+" "+expected3);
 //		System.out.println("--------------");
 
-		for( PointDistance3 s : solutions ) {
+		for (PointDistance3 s : solutions) {
 //			System.out.println(s.dist1+" "+s.dist2+" "+s.dist3);
-			if( Math.abs(s.dist1-expected1) < tol &&
-					Math.abs(s.dist2-expected2) < tol &&
-					Math.abs(s.dist3-expected3) < tol ) {
+			if (Math.abs(s.dist1 - expected1) < tol &&
+					Math.abs(s.dist2 - expected2) < tol &&
+					Math.abs(s.dist3 - expected3) < tol) {
 				numCorrect++;
 			}
 		}
@@ -82,8 +79,7 @@ public abstract class CommonP3PSideChecks extends BoofStandardJUnit {
 	/**
 	 * Check a pathological case where everything is zero
 	 */
-	@Test
-	public void pathological1() {
+	@Test void pathological1() {
 		Point3D_F64 P1 = new Point3D_F64();
 		Point3D_F64 P2 = new Point3D_F64();
 		Point3D_F64 P3 = new Point3D_F64();
@@ -96,8 +92,8 @@ public abstract class CommonP3PSideChecks extends BoofStandardJUnit {
 		double length23 = P2.distance(P3);
 		double length13 = P1.distance(P3);
 
-		List<PointDistance3> solutions = computeSolutions(p1,p2,p3,length23,length13,length12,false);
+		List<PointDistance3> solutions = computeSolutions(p1, p2, p3, length23, length13, length12, false);
 
-		assertEquals(0,solutions.size());
+		assertEquals(0, solutions.size());
 	}
 }

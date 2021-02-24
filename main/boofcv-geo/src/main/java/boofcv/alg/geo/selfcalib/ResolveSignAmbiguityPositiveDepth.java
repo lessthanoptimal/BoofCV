@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -65,9 +65,9 @@ public class ResolveSignAmbiguityPositiveDepth {
 	 * @param observations (input) Observations in pixels
 	 * @param views (input/output) the current solution and modified to have the correct sign on output
 	 */
-	public void process(List<AssociatedTuple> observations, MetricCameras views ) {
-		BoofMiscOps.checkTrue(views.intrinsics.size==views.motion_1_to_k.size+1);
-		BoofMiscOps.checkTrue(observations.size()>0);
+	public void process( List<AssociatedTuple> observations, MetricCameras views ) {
+		BoofMiscOps.checkTrue(views.intrinsics.size == views.motion_1_to_k.size + 1);
+		BoofMiscOps.checkTrue(observations.size() > 0);
 
 		final int numViews = views.intrinsics.size;
 		final int numObs = observations.size();
@@ -80,7 +80,7 @@ public class ResolveSignAmbiguityPositiveDepth {
 			normalizers.get(viewIdx).setK(views.intrinsics.get(viewIdx));
 		}
 		for (int viewIdx = 1; viewIdx < numViews; viewIdx++) {
-			worldToViews.get(viewIdx).setTo(views.motion_1_to_k.get(viewIdx-1));
+			worldToViews.get(viewIdx).setTo(views.motion_1_to_k.get(viewIdx - 1));
 		}
 
 		signChanged = false;
@@ -116,13 +116,13 @@ public class ResolveSignAmbiguityPositiveDepth {
 			}
 
 			// save best
-			if( bestInvalid > foundInvalid ) {
+			if (bestInvalid > foundInvalid) {
 				bestInvalid = foundInvalid;
 				best = trial;
 			}
 		}
 
-		if( best == 1 ) {
+		if (best == 1) {
 			signChanged = true;
 			for (int viewIdx = 0; viewIdx < views.motion_1_to_k.size; viewIdx++) {
 				views.motion_1_to_k.get(viewIdx).T.scale(-1);
@@ -136,7 +136,7 @@ public class ResolveSignAmbiguityPositiveDepth {
 	 * @param observations (input) Observations in pixels
 	 * @param result (input/output) the current solution and modified to have the correct sign on output
 	 */
-	public void process(List<AssociatedTriple> observations, MetricCameraTriple result ) {
+	public void process( List<AssociatedTriple> observations, MetricCameraTriple result ) {
 		signChanged = false;
 		int best = -1;
 		bestInvalid = Integer.MAX_VALUE;
@@ -191,13 +191,13 @@ public class ResolveSignAmbiguityPositiveDepth {
 			}
 
 			// save best
-			if( bestInvalid > foundInvalid ) {
+			if (bestInvalid > foundInvalid) {
 				bestInvalid = foundInvalid;
 				best = trial;
 			}
 		}
 
-		if( best == 1 ) {
+		if (best == 1) {
 			result.view_1_to_2.T.scale(-1);
 			result.view_1_to_3.T.scale(-1);
 		}
