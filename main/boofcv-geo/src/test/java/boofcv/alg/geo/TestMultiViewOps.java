@@ -349,31 +349,31 @@ class TestMultiViewOps extends BoofStandardJUnit {
 		assertEquals(p2.y, found.y, 1e-8);
 	}
 
-	@Test void homographyStereo3Pts() {
+	@Test void fundamentalToHomography3Pts() {
 		CommonHomographyInducedPlane common = new CommonHomographyInducedPlane();
 
-		DMatrixRMaj H = MultiViewOps.homographyStereo3Pts(common.F, common.p1, common.p2, common.p3);
+		DMatrixRMaj H = MultiViewOps.fundamentalToHomography3Pts(common.F, common.p1, common.p2, common.p3);
 
 		common.checkHomography(H);
 	}
 
-	@Test void homographyStereoLinePt() {
+	@Test void fundamentalToHomographyLinePt() {
 		CommonHomographyInducedPlane common = new CommonHomographyInducedPlane();
 
 		PairLineNorm l1 = CommonHomographyInducedPlane.convert(common.p1, common.p2);
 
-		DMatrixRMaj H = MultiViewOps.homographyStereoLinePt(common.F, l1, common.p3);
+		DMatrixRMaj H = MultiViewOps.fundamentalToHomographyLinePt(common.F, l1, common.p3);
 
 		common.checkHomography(H);
 	}
 
-	@Test void homographyStereo2Lines() {
+	@Test void fundamentalToHomography2Lines() {
 		CommonHomographyInducedPlane common = new CommonHomographyInducedPlane();
 
 		PairLineNorm l1 = CommonHomographyInducedPlane.convert(common.p1, common.p2);
 		PairLineNorm l2 = CommonHomographyInducedPlane.convert(common.p1, common.p3);
 
-		DMatrixRMaj H = MultiViewOps.homographyStereo2Lines(common.F, l1, l2);
+		DMatrixRMaj H = MultiViewOps.fundamentalToHomography2Lines(common.F, l1, l2);
 
 		common.checkHomography(H);
 	}
@@ -1377,6 +1377,10 @@ class TestMultiViewOps extends BoofStandardJUnit {
 			});
 			assertEquals(10, helper.counter);
 		}
+	}
+
+	@Test void compatibleHomography() {
+		fail("implement");
 	}
 
 	private class BundleSceneHelper {
