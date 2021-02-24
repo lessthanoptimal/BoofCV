@@ -43,9 +43,9 @@ Version : 0.38
   * TODO Pruning of views when creating pairwise graph. If too similar do not include it. Could be done before pairwise
   * TODO when associating objects split into feature types, e.g. white and black blobs
   * TODO try improving 3-view by estimating lens distortion in projective camera
-- Multi-View Geometry
-  * TODO Fundamental matrix from 6 points on a plane. See p336
-  * TODO intersection of N 2D lines to a homogenous point. linear equation
+- MultiViewOps
+  * compatibleHomography
+  * homographyToFundamental given 2 points
 - Multi-View Stereo
   * TODO Improve point filtering of dense cloud. Way too noisy now
 

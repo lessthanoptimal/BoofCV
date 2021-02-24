@@ -85,7 +85,7 @@ public class ImplPerspectiveOps_F64 {
 		return pinholeToMatrix((double)param.fx, (double)param.fy, (double)param.skew, (double)param.cx, (double)param.cy, K);
 	}
 
-	public static DMatrix3x3 pinholeToMatrix( CameraPinhole param, DMatrix3x3 K ) {
+	public static DMatrix3x3 pinholeToMatrix( CameraPinhole param, @Nullable DMatrix3x3 K ) {
 
 		if (K == null) {
 			K = new DMatrix3x3();

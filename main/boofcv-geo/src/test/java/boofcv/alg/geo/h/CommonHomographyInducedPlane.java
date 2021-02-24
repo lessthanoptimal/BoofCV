@@ -27,7 +27,11 @@ import georegression.geometry.GeometryMath_F64;
 import georegression.struct.point.Point2D_F64;
 import georegression.struct.point.Point3D_F64;
 import georegression.struct.se.Se3_F64;
+import georegression.struct.se.SpecialEuclideanOps_F64;
 import org.ejml.data.DMatrixRMaj;
+
+import java.util.ArrayList;
+import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
@@ -37,7 +41,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 public class CommonHomographyInducedPlane extends BoofStandardJUnit {
 	public DMatrixRMaj K = PerspectiveOps.pinholeToMatrix(500, 520, 0.1, 400, 450);
 
-	public Se3_F64 rightToLeft = new Se3_F64();
+	public Se3_F64 rightToLeft = SpecialEuclideanOps_F64.eulerXyz(10,0.1,-0.05,0.01,0.02,-0.01,null);
 
 	public Point3D_F64 X1 = new Point3D_F64(1, 0, 5);
 	public Point3D_F64 X2 = new Point3D_F64(1, 1, 5);
@@ -52,7 +56,6 @@ public class CommonHomographyInducedPlane extends BoofStandardJUnit {
 	public Point3D_F64 e2 = new Point3D_F64();
 
 	public CommonHomographyInducedPlane() {
-		rightToLeft.getT().setTo(10, 0, 0);
 		Se3_F64 leftToRight = rightToLeft.invert(null);
 
 		p1 = render(leftToRight, K, X1);
@@ -67,11 +70,11 @@ public class CommonHomographyInducedPlane extends BoofStandardJUnit {
 		MultiViewOps.extractEpipoles(F, new Point3D_F64(), e2);
 	}
 
-	public void checkHomography( DMatrixRMaj H ) {
+	public void checkHomography( DMatrixRMaj H, double tol ) {
 		Point2D_F64 found = new Point2D_F64();
 		GeometryMath_F64.mult(H, p4.p1, found);
 
-		assertTrue(found.isIdentical(p4.p2, 1e-8));
+		assertTrue(found.isIdentical(p4.p2, tol));
 	}
 
 	public static AssociatedPair render( Se3_F64 leftToRight, DMatrixRMaj K, Point3D_F64 X1 ) {
@@ -90,5 +93,14 @@ public class CommonHomographyInducedPlane extends BoofStandardJUnit {
 		GeometryMath_F64.cross(x1.p2, x2.p2, ret.l2);
 
 		return ret;
+	}
+
+	public List<AssociatedPair> getPairs() {
+		var list = new ArrayList<AssociatedPair>();
+		list.add(p1);
+		list.add(p2);
+		list.add(p3);
+		list.add(p4);
+		return list;
 	}
 }

@@ -25,11 +25,16 @@ import boofcv.factory.geo.FactoryMultiViewRobust;
 import boofcv.struct.geo.AssociatedPair;
 import org.ddogleg.fitting.modelset.ModelMatcher;
 import org.ejml.data.DMatrixRMaj;
+import org.junit.jupiter.api.Test;
 
 /**
  * @author Peter Abeles
  */
 public class TestScoreFundamentalWithoutTranslation extends CommonEpipolarScore3DChecks {
+
+	// Can't detect translational motion for planar scenes. See code comments
+	@Test @Override void planar() {}
+
 	@Override public EpipolarScore3D createAlg() {
 		ConfigRansac configRansac = new ConfigRansac();
 		configRansac.iterations = 20;

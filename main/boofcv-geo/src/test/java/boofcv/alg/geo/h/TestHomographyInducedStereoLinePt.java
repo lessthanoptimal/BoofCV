@@ -19,6 +19,7 @@
 package boofcv.alg.geo.h;
 
 import boofcv.struct.geo.PairLineNorm;
+import org.ejml.UtilEjml;
 import org.junit.jupiter.api.Test;
 
 public class TestHomographyInducedStereoLinePt extends CommonHomographyInducedPlane {
@@ -29,6 +30,6 @@ public class TestHomographyInducedStereoLinePt extends CommonHomographyInducedPl
 		alg.setFundamental(F,e2);
 		alg.process(l1, p3);
 
-		checkHomography(alg.getHomography());
+		checkHomography(alg.getHomography(), UtilEjml.TEST_F64);
 	}
 }

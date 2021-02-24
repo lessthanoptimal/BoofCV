@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -18,6 +18,7 @@
 
 package boofcv.alg.geo.robust;
 
+import boofcv.alg.geo.MultiViewOps;
 import boofcv.alg.geo.f.EpipolarMinimizeGeometricError;
 import boofcv.struct.geo.AssociatedPair;
 import org.ddogleg.fitting.modelset.DistanceFromModel;
@@ -48,7 +49,9 @@ public class DistanceFundamentalGeometric implements DistanceFromModel<DMatrixRM
 	public double distance( AssociatedPair original ) {
 		if (!adjuster.process(F21, original.p1.x, original.p1.y, original.p2.x, original.p2.y,
 				adjusted.p1, adjusted.p2)) {
-			return Double.MAX_VALUE;
+			// Not the same error, but better than nothing?
+			return 2.0*MultiViewOps.constraint(F21,original.p1, original.p2);
+//			return Double.MAX_VALUE;
 		}
 
 		// Since the adjusted observations will intersect perfectly there's no need to triangulate

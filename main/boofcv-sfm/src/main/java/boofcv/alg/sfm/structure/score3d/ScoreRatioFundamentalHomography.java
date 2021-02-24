@@ -58,7 +58,7 @@ public class ScoreRatioFundamentalHomography implements EpipolarScore3D {
 	 */
 	public @Getter @Setter double ratio3D = 1.5;
 
-	// if true then it decided there was a 3D relationship
+	// if true then it decided there was a 3D relationshipn
 	private boolean is3D;
 
 	/** Number of inliers for fundamental matrix */
