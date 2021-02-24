@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -68,19 +68,18 @@ import static boofcv.misc.BoofMiscOps.checkTrue;
  * <li> P. Abeles, "BoofCV Technical Report: Automatic Camera Calibration" 2020-1 </li>
  * </ol>
  *
- * @see TwoViewToCalibratingHomography
- *
  * @author Peter Abeles
+ * @see TwoViewToCalibratingHomography
  */
 public class SelfCalibrationEssentialGuessAndCheck implements VerbosePrint {
 
 	//---------------------------- Configuration Parameters
-	/** Range of values focal length values will sample. Fraction relative to  {@link #imageLengthPixels}*/
-	public @Getter double sampleFocalRatioMin=0.3, sampleFocalRatioMax=2.5;
+	/** Range of values focal length values will sample. Fraction relative to  {@link #imageLengthPixels} */
+	public @Getter double sampleFocalRatioMin = 0.3, sampleFocalRatioMax = 2.5;
 	/** Number of values it will sample */
-	public @Getter int numberOfSamples=50;
-	/** if true the focus is assumed to be the same for the first two images*/
-	public @Getter boolean fixedFocus =false;
+	public @Getter int numberOfSamples = 50;
+	/** if true the focus is assumed to be the same for the first two images */
+	public @Getter boolean fixedFocus = false;
 
 	//--------------------------- Output Variables
 	/** The selected focal length for the first image */
@@ -88,12 +87,12 @@ public class SelfCalibrationEssentialGuessAndCheck implements VerbosePrint {
 	/** The selected focal length for the second image */
 	public @Getter double focalLengthB;
 	/** The selected rectifying homography */
-	public @Getter final DMatrixRMaj rectifyingHomography = new DMatrixRMaj(4,4);
+	public @Getter final DMatrixRMaj rectifyingHomography = new DMatrixRMaj(4, 4);
 	/** If true that indicates that the selected focal length was at the upper or lower limit. This can indicate a fault */
 	public @Getter boolean isLimit;
 
 	/** The length of the longest side in the image. In pixels. */
-	public int imageLengthPixels=0;
+	public int imageLengthPixels = 0;
 
 	/** Generates and scores a hypothesis given two intrinsic camera matrices */
 	public @Getter final TwoViewToCalibratingHomography calibrator = new TwoViewToCalibratingHomography();
@@ -101,55 +100,57 @@ public class SelfCalibrationEssentialGuessAndCheck implements VerbosePrint {
 	// SVD use to compute fit score. Just need singular values
 	private final SingularValueDecomposition_F64<DMatrixRMaj> svd = DecompositionFactory_DDRM.svd(3, 3, false, false, false);
 	// storage for essential matrix used
-	final DMatrixRMaj E = new DMatrixRMaj(3,3);
+	final DMatrixRMaj E = new DMatrixRMaj(3, 3);
 	// storage for guess intrinsic camera matrices
-	final DMatrixRMaj K1 = new DMatrixRMaj(3,3);
-	final DMatrixRMaj K2 = new DMatrixRMaj(3,3);
+	final DMatrixRMaj K1 = new DMatrixRMaj(3, 3);
+	final DMatrixRMaj K2 = new DMatrixRMaj(3, 3);
 
 	// If not null then verbose information is printed
 	private PrintStream verbose;
 
 	/**
 	 * Specifies the range of focal lengths it will evaluate as ratio of {@link #imageLengthPixels}
+	 *
 	 * @param sampleFocalRatioMin The minimum allowed focal length ratio
 	 * @param sampleFocalRatioMax Tha maximum allowed focal length ratio
 	 */
-	public void configure( double sampleFocalRatioMin , double sampleFocalRatioMax ) {
+	public void configure( double sampleFocalRatioMin, double sampleFocalRatioMax ) {
 		this.sampleFocalRatioMin = sampleFocalRatioMin;
 		this.sampleFocalRatioMax = sampleFocalRatioMax;
 	}
 
 	/**
 	 * Selects the best focal length(s) given the trifocal tensor and observations
+	 *
 	 * @param F21 (Input) Fundamental matrix between view-1 and view-2
 	 * @param P2 (Input) Projective camera matrix for view-1 with inplicit identity matrix view-1
 	 * @param observations (Input) Observation for all three views. Highly recommend that RANSAC or similar is used to
-	 *                     remove false positives first.
+	 * remove false positives first.
 	 * @return true if successful
 	 */
-	public boolean process(DMatrixRMaj F21, DMatrixRMaj P2, List<AssociatedPair> observations ) {
+	public boolean process( DMatrixRMaj F21, DMatrixRMaj P2, List<AssociatedPair> observations ) {
 		// sanity check configurations
-		checkTrue(imageLengthPixels>0,"Must set imageLengthPixels to max(imageWidth,imageHeight)");
-		checkTrue(sampleFocalRatioMin !=0 && sampleFocalRatioMax !=0,"You must call configure");
+		checkTrue(imageLengthPixels > 0, "Must set imageLengthPixels to max(imageWidth,imageHeight)");
+		checkTrue(sampleFocalRatioMin != 0 && sampleFocalRatioMax != 0, "You must call configure");
 		BoofMiscOps.checkTrue(sampleFocalRatioMin < sampleFocalRatioMax && sampleFocalRatioMin > 0);
-		BoofMiscOps.checkTrue(observations.size()>0);
-		BoofMiscOps.checkTrue(numberOfSamples>0);
+		BoofMiscOps.checkTrue(observations.size() > 0);
+		BoofMiscOps.checkTrue(numberOfSamples > 0);
 
 		// Pass in the trifocal tensor so that it can estimate self calibration
-		calibrator.initialize(F21,P2);
+		calibrator.initialize(F21, P2);
 
 		// coeffients for linear to log scale
-		double logCoef = Math.log(sampleFocalRatioMax / sampleFocalRatioMin)/(numberOfSamples-1);
+		double logCoef = Math.log(sampleFocalRatioMax/sampleFocalRatioMin)/(numberOfSamples - 1);
 
 		isLimit = false;
 
-		if(fixedFocus) {
+		if (fixedFocus) {
 			searchFixedFocus(logCoef);
 		} else {
 			searchDynamicFocus(logCoef);
 		}
 		// compute the rectifying homography from the best solution
-		computeHomography(focalLengthA,focalLengthB,observations);
+		computeHomography(focalLengthA, focalLengthB, observations);
 
 		// DESIGN NOTE:
 		// Could fit a 1-D or 2-D quadratic and get additional accuracy. Then compute the H at that value
@@ -164,37 +165,37 @@ public class SelfCalibrationEssentialGuessAndCheck implements VerbosePrint {
 	 *
 	 * @param logCoef coeffient for log scale
 	 */
-	private void searchDynamicFocus(double logCoef) {
-		K1.set(2,2,1);
-		K2.set(2,2,1);
+	private void searchDynamicFocus( double logCoef ) {
+		K1.set(2, 2, 1);
+		K2.set(2, 2, 1);
 
 		double bestError = Double.MAX_VALUE;
 
 		for (int idxA = 0; idxA < numberOfSamples; idxA++) {
-			double focalRatioA = sampleFocalRatioMin * Math.exp(logCoef * idxA);
+			double focalRatioA = sampleFocalRatioMin*Math.exp(logCoef*idxA);
 			double focalPixelsA = focalRatioA*imageLengthPixels;
 			K1.set(0, 0, focalPixelsA);
 			K1.set(1, 1, focalPixelsA);
 
 			for (int idxB = 0; idxB < numberOfSamples; idxB++) {
-				double focalRatioB = sampleFocalRatioMin * Math.exp(logCoef * idxB);
+				double focalRatioB = sampleFocalRatioMin*Math.exp(logCoef*idxB);
 				double focalPixelsB = focalRatioB*imageLengthPixels;
 
 				K2.set(0, 0, focalPixelsB);
 				K2.set(1, 1, focalPixelsB);
 
-				PerspectiveOps.multTranA(K2,calibrator.F21,K1,E);
+				PerspectiveOps.multTranA(K2, calibrator.F21, K1, E);
 
-				if( !svd.decompose(E))
+				if (!svd.decompose(E))
 					continue;
 
 				double error = computeFitError();
 
-				if( verbose != null )
-					verbose.printf("[%3d,%3d] f1=%5.2f f2=%5.2f error=%f\n",idxA,idxB,focalPixelsA,focalPixelsB,error);
-				if( error < bestError ) {
-					isLimit = idxA == 0 || idxA == numberOfSamples-1;
-					isLimit |= idxB == 0 || idxB == numberOfSamples-1;
+				if (verbose != null)
+					verbose.printf("[%3d,%3d] f1=%5.2f f2=%5.2f error=%f\n", idxA, idxB, focalPixelsA, focalPixelsB, error);
+				if (error < bestError) {
+					isLimit = idxA == 0 || idxA == numberOfSamples - 1;
+					isLimit |= idxB == 0 || idxB == numberOfSamples - 1;
 					bestError = error;
 					focalLengthA = focalPixelsA;
 					focalLengthB = focalPixelsB;
@@ -204,8 +205,8 @@ public class SelfCalibrationEssentialGuessAndCheck implements VerbosePrint {
 	}
 
 	private void computeHomography( double F1, double F2, List<AssociatedPair> observations ) {
-		DMatrixRMaj K1 = CommonOps_DDRM.diag(F1,F1,1);
-		DMatrixRMaj K2 = CommonOps_DDRM.diag(F2,F2,1);
+		DMatrixRMaj K1 = CommonOps_DDRM.diag(F1, F1, 1);
+		DMatrixRMaj K2 = CommonOps_DDRM.diag(F2, F2, 1);
 
 		calibrator.process(K1, K2, observations);
 		rectifyingHomography.setTo(calibrator.getCalibrationHomography());
@@ -216,12 +217,12 @@ public class SelfCalibrationEssentialGuessAndCheck implements VerbosePrint {
 	 *
 	 * @param logCoef coeffient for log scale
 	 */
-	private void searchFixedFocus(double logCoef) {
-		K1.set(2,2,1);
+	private void searchFixedFocus( double logCoef ) {
+		K1.set(2, 2, 1);
 		double bestError = Double.MAX_VALUE;
 
 		for (int idxA = 0; idxA < numberOfSamples; idxA++) {
-			double focalRatioA = sampleFocalRatioMin * Math.exp(logCoef * idxA);
+			double focalRatioA = sampleFocalRatioMin*Math.exp(logCoef*idxA);
 			double focalPixelsA = focalRatioA*imageLengthPixels;
 
 //			System.out.println("FOCUS = "+focalA);
@@ -229,18 +230,18 @@ public class SelfCalibrationEssentialGuessAndCheck implements VerbosePrint {
 			K1.set(1, 1, focalPixelsA);
 
 			// Use known calibration to compute essential matrix
-			PerspectiveOps.multTranA(K1,calibrator.F21,K1,E);
+			PerspectiveOps.multTranA(K1, calibrator.F21, K1, E);
 
 			// Use the singular values to evaluate
-			if( !svd.decompose(E))
+			if (!svd.decompose(E))
 				continue;
 
 			double error = computeFitError();
 
-			if( verbose != null ) verbose.printf("[%3d] f=%5.2f svd-error=%f\n", idxA, focalPixelsA, error);
+			if (verbose != null) verbose.printf("[%3d] f=%5.2f svd-error=%f\n", idxA, focalPixelsA, error);
 
-			if( error < bestError ) {
-				isLimit = idxA == 0 || idxA == numberOfSamples-1;
+			if (error < bestError) {
+				isLimit = idxA == 0 || idxA == numberOfSamples - 1;
 				bestError = error;
 				focalLengthA = focalPixelsA;
 			}
@@ -255,24 +256,24 @@ public class SelfCalibrationEssentialGuessAndCheck implements VerbosePrint {
 	private double computeFitError() {
 		double[] sv = svd.getSingularValues();
 		// Find the two largest singular values
-		double v0,v1;
-		if( sv[0] > sv[1] ) {
+		double v0, v1;
+		if (sv[0] > sv[1]) {
 			v0 = sv[0];
 			v1 = sv[1];
 		} else {
 			v0 = sv[1];
 			v1 = sv[0];
 		}
-		if( v1 < sv[2] ) {
+		if (v1 < sv[2]) {
 			v1 = sv[2];
 		}
 		Arrays.sort(sv, 0, 3);
-		double mean = (v0+v1) / 2.0;
+		double mean = (v0 + v1)/2.0;
 		return Math.abs(v0 - mean)/mean;
 	}
 
 	@Override
-	public void setVerbose(@Nullable PrintStream out, @Nullable Set<String> configuration) {
+	public void setVerbose( @Nullable PrintStream out, @Nullable Set<String> configuration ) {
 		this.verbose = out;
 	}
 }

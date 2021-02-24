@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -68,8 +68,8 @@ import java.util.Arrays;
  */
 public class SelfCalibrationLinearDualQuadratic extends SelfCalibrationBase {
 
-	@Getter SingularValueDecomposition_F64<DMatrixRMaj> svd = DecompositionFactory_DDRM.svd(10,10,
-			false,true,true);
+	@Getter SingularValueDecomposition_F64<DMatrixRMaj> svd = DecompositionFactory_DDRM.svd(10, 10,
+			false, true, true);
 
 	// constraints
 	@Getter boolean knownAspect;
@@ -88,19 +88,19 @@ public class SelfCalibrationLinearDualQuadratic extends SelfCalibrationBase {
 	DMatrix4x4 Q = new DMatrix4x4();
 
 	// A singular value is considered zero if it is smaller than this number
-	@Getter @Setter double singularThreshold=1e-3;
+	@Getter @Setter double singularThreshold = 1e-3;
 
 	//---------------- Internal workspace
-	private final DMatrixRMaj L = new DMatrixRMaj(1,1);
-	private final DMatrixRMaj w_i = new DMatrixRMaj(3,3);
+	private final DMatrixRMaj L = new DMatrixRMaj(1, 1);
+	private final DMatrixRMaj w_i = new DMatrixRMaj(3, 3);
 
 	/**
 	 * Constructor for zero-principle point and (optional) zero-skew
 	 *
 	 * @param zeroSkew if true zero is assumed to be zero
 	 */
-	public SelfCalibrationLinearDualQuadratic(boolean zeroSkew ) {
-		this(zeroSkew?3:2);
+	public SelfCalibrationLinearDualQuadratic( boolean zeroSkew ) {
+		this(zeroSkew ? 3 : 2);
 		knownAspect = false;
 		this.zeroSkew = zeroSkew;
 	}
@@ -110,14 +110,14 @@ public class SelfCalibrationLinearDualQuadratic extends SelfCalibrationBase {
 	 *
 	 * @param aspectRatio Specifies the known aspect ratio. fy/fx
 	 */
-	public SelfCalibrationLinearDualQuadratic(double aspectRatio ) {
+	public SelfCalibrationLinearDualQuadratic( double aspectRatio ) {
 		this(4);
 		knownAspect = true;
 		this.zeroSkew = true;
 		this.aspectRatio = aspectRatio;
 	}
 
-	private SelfCalibrationLinearDualQuadratic(int equations ) {
+	private SelfCalibrationLinearDualQuadratic( int equations ) {
 		eqs = equations;
 		minimumProjectives = (int)Math.ceil(10.0/eqs);
 	}
@@ -138,18 +138,18 @@ public class SelfCalibrationLinearDualQuadratic extends SelfCalibrationBase {
 	public GeometricResult solve() {
 		solutions.reset();
 
-		if( cameras.size < minimumProjectives ) {
-			throw new IllegalArgumentException("You need at least "+minimumProjectives+" motions");
+		if (cameras.size < minimumProjectives) {
+			throw new IllegalArgumentException("You need at least " + minimumProjectives + " motions");
 		}
 
 		int N = cameras.size;
-		L.reshape(N*eqs,10);
+		L.reshape(N*eqs, 10);
 
 		// Convert constraints into a (N*eqs) by 10 matrix. Null space is Q
 		constructMatrix(L);
 
 		// Compute the SVD for its null space
-		if( !svd.decompose(L)) {
+		if (!svd.decompose(L)) {
 			return GeometricResult.SOLVE_FAILED;
 		}
 
@@ -160,18 +160,18 @@ public class SelfCalibrationLinearDualQuadratic extends SelfCalibrationBase {
 		// If there isn't a steep drop it either isn't singular or more there is more than 1 singular value
 		double[] sv = svd.getSingularValues();
 		Arrays.sort(sv);
-		if( singularThreshold*sv[1] <= sv[0] )  {
+		if (singularThreshold*sv[1] <= sv[0]) {
 //			System.out.println("ratio = "+(sv[0]/sv[1]));
 			return GeometricResult.GEOMETRY_POOR;
 		}
 
 		// Enforce constraints and solve for each view
-		if( !MultiViewOps.enforceAbsoluteQuadraticConstraints(Q,true,zeroSkew) ) {
+		if (!MultiViewOps.enforceAbsoluteQuadraticConstraints(Q, true, zeroSkew)) {
 			return GeometricResult.SOLVE_FAILED;
 		}
 		computeSolutions(Q);
 
-		if( solutions.size() != N ) {
+		if (solutions.size() != N) {
 			return GeometricResult.SOLUTION_NAN;
 		} else {
 			return GeometricResult.SUCCESS;
@@ -182,29 +182,29 @@ public class SelfCalibrationLinearDualQuadratic extends SelfCalibrationBase {
 	 * Extracts the null space and converts it into the Q matrix
 	 */
 	private void extractSolutionForQ( DMatrix4x4 Q ) {
-		DMatrixRMaj nv = new DMatrixRMaj(10,1);
-		SingularOps_DDRM.nullVector(svd,true,nv);
+		DMatrixRMaj nv = new DMatrixRMaj(10, 1);
+		SingularOps_DDRM.nullVector(svd, true, nv);
 
 		// Convert the solution into a fixed sized matrix because it's easier to read
-		encodeQ(Q,nv.data);
+		encodeQ(Q, nv.data);
 
 		// diagonal elements must be positive because Q = [K*K' .. ; ... ]
 		// If they are a mix of positive and negative that's bad and can't be fixed
 		// All 3 are checked because technically they could be zero. Not a physically useful solution but...
-		if( Q.a11 < 0 || Q.a22 < 0 || Q.a33 < 0 ){
-			CommonOps_DDF4.scale(-1,Q);
+		if (Q.a11 < 0 || Q.a22 < 0 || Q.a33 < 0) {
+			CommonOps_DDF4.scale(-1, Q);
 		}
 	}
 
 	/**
 	 * Computes the calibration for each view..
 	 */
-	private void computeSolutions(DMatrix4x4 Q) {
+	private void computeSolutions( DMatrix4x4 Q ) {
 		for (int i = 0; i < cameras.size; i++) {
-			computeW(cameras.get(i),Q,w_i);
+			computeW(cameras.get(i), Q, w_i);
 			Intrinsic calib = solutions.grow();
-			solveForCalibration(w_i,calib);
-			if( !sanityCheck(calib)) {
+			solveForCalibration(w_i, calib);
+			if (!sanityCheck(calib)) {
 				solutions.removeTail();
 			}
 		}
@@ -213,48 +213,43 @@ public class SelfCalibrationLinearDualQuadratic extends SelfCalibrationBase {
 	/**
 	 * Given the solution for w and the constraints solve for the remaining parameters
 	 */
-	private void solveForCalibration(DMatrixRMaj w, Intrinsic calib) {
-//		CholeskyDecomposition_F64<DMatrixRMaj> chol = DecompositionFactory_DDRM.chol(false);
-//
-//		chol.decompose(w.copy());
-//		DMatrixRMaj R = chol.getT(w);
-//		R.print();
-
-		if( zeroSkew ) {
+	private void solveForCalibration( DMatrixRMaj w, Intrinsic calib ) {
+		if (zeroSkew) {
 			calib.skew = 0;
-			calib.fy = Math.sqrt(w.get(1,1));
+			calib.fy = Math.sqrt(w.get(1, 1));
 
-			if( knownAspect ) {
+			if (knownAspect) {
 				calib.fx = calib.fy/aspectRatio;
 			} else {
-				calib.fx = Math.sqrt(w.get(0,0));
+				calib.fx = Math.sqrt(w.get(0, 0));
 			}
-		} else if( knownAspect ) {
-			calib.fy = Math.sqrt(w.get(1,1));
+		} else if (knownAspect) {
+			calib.fy = Math.sqrt(w.get(1, 1));
 			calib.fx = calib.fy/aspectRatio;
-			calib.skew = w.get(0,1)/calib.fy;
+			calib.skew = w.get(0, 1)/calib.fy;
 		} else {
-			calib.fy = Math.sqrt(w.get(1,1));
-			calib.skew = w.get(0,1)/calib.fy;
-			calib.fx = Math.sqrt(w.get(0,0) - calib.skew*calib.skew);
+			calib.fy = Math.sqrt(w.get(1, 1));
+			calib.skew = w.get(0, 1)/calib.fy;
+			calib.fx = Math.sqrt(w.get(0, 0) - calib.skew*calib.skew);
 		}
 	}
 
 	/**
 	 * Makes sure that the found solution is valid and physically possible
+	 *
 	 * @return true if valid
 	 */
-	boolean sanityCheck(Intrinsic calib ) {
-		if(UtilEjml.isUncountable(calib.fx))
+	boolean sanityCheck( Intrinsic calib ) {
+		if (UtilEjml.isUncountable(calib.fx))
 			return false;
-		if(UtilEjml.isUncountable(calib.fy))
+		if (UtilEjml.isUncountable(calib.fy))
 			return false;
-		if(UtilEjml.isUncountable(calib.skew))
+		if (UtilEjml.isUncountable(calib.skew))
 			return false;
 
-		if( calib.fx < 0 )
+		if (calib.fx < 0)
 			return false;
-		if( calib.fy < 0 )
+		if (calib.fy < 0)
 			return false;
 
 		return true;
@@ -263,11 +258,11 @@ public class SelfCalibrationLinearDualQuadratic extends SelfCalibrationBase {
 	/**
 	 * Constructs the linear system by applying specified constraints
 	 */
-	void constructMatrix(DMatrixRMaj L) {
-		L.reshape(cameras.size*eqs,10);
+	void constructMatrix( DMatrixRMaj L ) {
+		L.reshape(cameras.size*eqs, 10);
 
 		// Known aspect ratio constraint makes more sense as a square
-		double RR = this.aspectRatio *this.aspectRatio;
+		double RR = this.aspectRatio*this.aspectRatio;
 
 		// F = P*Q*P'
 		// F is an arbitrary variable name and not fundamental matrix
@@ -310,7 +305,7 @@ public class SelfCalibrationLinearDualQuadratic extends SelfCalibrationBase {
 			L.data[index++] = (B.a2*A.a33 + A.a23*B.a3);
 			L.data[index++] = B.a2*B.a3;
 
-			if( zeroSkew ) {
+			if (zeroSkew) {
 				// row for F[0,1] == 0
 				L.data[index++] = A.a11*A.a21;
 				L.data[index++] = (A.a12*A.a21 + A.a11*A.a22);
@@ -324,7 +319,7 @@ public class SelfCalibrationLinearDualQuadratic extends SelfCalibrationBase {
 				L.data[index++] = B.a1*B.a2;
 			}
 
-			if( knownAspect ) {
+			if (knownAspect) {
 				// aspect^2*F[0,0]-F[1,1]
 				L.data[index++] = A.a11*A.a11*RR - A.a21*A.a21;
 				L.data[index++] = 2*(A.a11*A.a12*RR - A.a21*A.a22);
@@ -346,6 +341,7 @@ public class SelfCalibrationLinearDualQuadratic extends SelfCalibrationBase {
 
 	/**
 	 * Returns the absolute quadratic
+	 *
 	 * @return 4x4 quadratic
 	 */
 	public DMatrix4x4 getQ() {
@@ -353,10 +349,10 @@ public class SelfCalibrationLinearDualQuadratic extends SelfCalibrationBase {
 	}
 
 	public static class Intrinsic {
-		public double fx,fy,skew;
+		public double fx, fy, skew;
 
 		/** Copies the values into this class in to the more generalized {@link boofcv.struct.calib.CameraPinhole} */
-		public void copyTo(CameraPinhole pinhole ) {
+		public void copyTo( CameraPinhole pinhole ) {
 			pinhole.fx = fx;
 			pinhole.fy = fy;
 			pinhole.skew = skew;

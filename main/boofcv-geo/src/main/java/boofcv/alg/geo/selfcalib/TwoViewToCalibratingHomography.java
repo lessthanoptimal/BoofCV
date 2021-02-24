@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -78,16 +78,16 @@ public class TwoViewToCalibratingHomography {
 	public final DecomposeEssential decomposeEssential = new DecomposeEssential();
 
 	// Input: Camera matric for view-2 with implicit P1=[I|0] for view-1
-	public final DMatrixRMaj P2 = new DMatrixRMaj(3,4);
+	public final DMatrixRMaj P2 = new DMatrixRMaj(3, 4);
 	// Input: Fundamental matrix
-	public final DMatrixRMaj F21 = new DMatrixRMaj(3,3);
+	public final DMatrixRMaj F21 = new DMatrixRMaj(3, 3);
 	// Essential matrix for the first two views
-	public final DMatrixRMaj E21 = new DMatrixRMaj(3,3);
+	public final DMatrixRMaj E21 = new DMatrixRMaj(3, 3);
 
 	//--------------------------------------------------------------------------------
 	// Output Data Structures
 	/** List of all hopotheses for calibrating homography */
-	public final DogArray<DMatrixRMaj> hypothesesH = new DogArray<>(()->new DMatrixRMaj(4,4));
+	public final DogArray<DMatrixRMaj> hypothesesH = new DogArray<>(() -> new DMatrixRMaj(4, 4));
 	/** Which hypothesis was selected as the best. Call {@link #getCalibrationHomography()} as an alternative */
 	public @Getter int bestSolutionIdx;
 	/** The number of invalid observations that appeared behind the camera in the best hypothesis */
@@ -97,10 +97,10 @@ public class TwoViewToCalibratingHomography {
 
 	//------------------------------------------------------------------------------
 	// work space variables
-	private final DMatrixRMaj A = new DMatrixRMaj(3,3);
+	private final DMatrixRMaj A = new DMatrixRMaj(3, 3);
 	private final Vector3D_F64 a = new Vector3D_F64();
-	private final DMatrixRMaj AK1 = new DMatrixRMaj(3,3);
-	private final DMatrixRMaj KiR = new DMatrixRMaj(3,3);
+	private final DMatrixRMaj AK1 = new DMatrixRMaj(3, 3);
+	private final DMatrixRMaj KiR = new DMatrixRMaj(3, 3);
 
 	// Given and estimated intrinsic calibration
 	private final CameraPinhole intrinsic1 = new CameraPinhole();
@@ -110,7 +110,7 @@ public class TwoViewToCalibratingHomography {
 	private final Se3_F64 view_1_to_2 = new Se3_F64();
 
 	// H for elevating projective to metric view
-	private final DMatrixRMaj calibratingH = new DMatrixRMaj(4,4);
+	private final DMatrixRMaj calibratingH = new DMatrixRMaj(4, 4);
 
 	// location of 3D feature in view 1
 	private final Point3D_F64 pointIn1 = new Point3D_F64();
@@ -120,20 +120,20 @@ public class TwoViewToCalibratingHomography {
 	private final AssociatedTriple an = new AssociatedTriple();
 
 	// Linear solver
-	private final LinearSolver<DMatrixRMaj,DMatrixRMaj> linear = LinearSolverFactory_DDRM.leastSquares(9,3);
-	private final DMatrixRMaj matA = new DMatrixRMaj(9,3);
-	private final DMatrixRMaj matX = new DMatrixRMaj(9,1);
-	private final DMatrixRMaj matB = new DMatrixRMaj(9,1);
+	private final LinearSolver<DMatrixRMaj, DMatrixRMaj> linear = LinearSolverFactory_DDRM.leastSquares(9, 3);
+	private final DMatrixRMaj matA = new DMatrixRMaj(9, 3);
+	private final DMatrixRMaj matX = new DMatrixRMaj(9, 1);
+	private final DMatrixRMaj matB = new DMatrixRMaj(9, 1);
 
 	private final DecomposeProjectiveToMetric projectiveToMetric = new DecomposeProjectiveToMetric();
 
 	// Used to normalize data for better stability when used in a linear solver
-	private final DMatrixRMaj K1_inv = new DMatrixRMaj(3,3);
-	private final DMatrixRMaj K2_prime = new DMatrixRMaj(3,3);
-	private final DMatrixRMaj P1_prime = new DMatrixRMaj(3,4);
-	private final DMatrixRMaj P2_prime = new DMatrixRMaj(3,4);
-	private final DMatrixRMaj H_prime = new DMatrixRMaj(4,4);
-	private final DMatrixRMaj P_tmp = new DMatrixRMaj(3,4);
+	private final DMatrixRMaj K1_inv = new DMatrixRMaj(3, 3);
+	private final DMatrixRMaj K2_prime = new DMatrixRMaj(3, 3);
+	private final DMatrixRMaj P1_prime = new DMatrixRMaj(3, 4);
+	private final DMatrixRMaj P2_prime = new DMatrixRMaj(3, 4);
+	private final DMatrixRMaj H_prime = new DMatrixRMaj(4, 4);
+	private final DMatrixRMaj P_tmp = new DMatrixRMaj(3, 4);
 
 	/**
 	 * Specify known geometric relationship between the two views
@@ -141,10 +141,10 @@ public class TwoViewToCalibratingHomography {
 	 * @param F21 (Input) Fundamental matrix between view-1 and view-2
 	 * @param P2 (Input) Projective camera matrix for view-1 with inplicit identity matrix view-1
 	 */
-	public void initialize(DMatrixRMaj F21, DMatrixRMaj P2) {
+	public void initialize( DMatrixRMaj F21, DMatrixRMaj P2 ) {
 		// TODO add image width,height here and use to normalize
-		BoofMiscOps.checkTrue(F21.numRows==3 && F21.numCols==3);
-		BoofMiscOps.checkTrue(P2.numRows==3 && P2.numCols==4);
+		BoofMiscOps.checkTrue(F21.numRows == 3 && F21.numCols == 3);
+		BoofMiscOps.checkTrue(P2.numRows == 3 && P2.numCols == 4);
 		this.F21.setTo(F21);
 		this.P2.setTo(P2);
 	}
@@ -158,14 +158,13 @@ public class TwoViewToCalibratingHomography {
 	 * @param observations (input) observations for the two views. Used to select best solution
 	 * @return true if it could find a solution. Failure is a rare condition which requires noise free data.
 	 */
-	public boolean process(DMatrixRMaj K1 , DMatrixRMaj K2 , List<AssociatedPair> observations )
-	{
+	public boolean process( DMatrixRMaj K1, DMatrixRMaj K2, List<AssociatedPair> observations ) {
 		// TODO try to improve numerics by reducing the scale of K1 and K2 to 0 to 1.0 for diagonal elements
 		//      then undo it
 
 		bestSolutionIdx = -1;
 		// Using the provided calibration matrices, extract potential camera motions
-		MultiViewOps.fundamentalToEssential(F21,K1,K2,E21);
+		MultiViewOps.fundamentalToEssential(F21, K1, K2, E21);
 		decomposeEssential.decompose(E21);
 
 		// Use these camera motions to guess different calibrating homographies
@@ -179,13 +178,13 @@ public class TwoViewToCalibratingHomography {
 		for (int motionIdx = 0; motionIdx < hypothesesH.size; motionIdx++) {
 
 			// computes the reprojection error, valid projections, and fixes sign/scale of H
-			int invalid = checkGeometry(list_view_1_to_2.get(motionIdx),hypothesesH.get(motionIdx),K1,K2,observations);
-			if( invalid == Double.MAX_VALUE )
+			int invalid = checkGeometry(list_view_1_to_2.get(motionIdx), hypothesesH.get(motionIdx), K1, K2, observations);
+			if (invalid == Double.MAX_VALUE)
 				continue;
 
 			// All hypotheses should have the same reprojection error. Only by applying a geometric constraints do you
 			// know which is better
-			if( invalid < bestInvalid ) {
+			if (invalid < bestInvalid) {
 				bestInvalid = invalid;
 				bestSolutionIdx = motionIdx;
 				bestModelError = projectiveToMetric.singularError; // this is the same for every hypothesis
@@ -212,26 +211,26 @@ public class TwoViewToCalibratingHomography {
 	 * is used there. Once the scale factor is known then all the variables can be used resulting in a more stable
 	 * solution.
 	 */
-	void computeHypothesesForH(DMatrixRMaj K1, DMatrixRMaj K2, List<Se3_F64> list_view_1_to_2) {
+	void computeHypothesesForH( DMatrixRMaj K1, DMatrixRMaj K2, List<Se3_F64> list_view_1_to_2 ) {
 		// TODO normalize once using width and height
 
 		// Improve numerics by normalizing based in K1. All values will be close to 0 to 1
-		CommonOps_DDRM.invert(K1,K1_inv);
-		CommonOps_DDRM.mult(K1_inv,K2,K2_prime);
+		CommonOps_DDRM.invert(K1, K1_inv);
+		CommonOps_DDRM.mult(K1_inv, K2, K2_prime);
 
 		// P1' = inv(K1)*P1
-		CommonOps_DDRM.insert(K1_inv,P1_prime,0,0);
+		CommonOps_DDRM.insert(K1_inv, P1_prime, 0, 0);
 		// P2' = inv(k1)*P2
-		CommonOps_DDRM.mult(K1_inv,P2,P2_prime);
+		CommonOps_DDRM.mult(K1_inv, P2, P2_prime);
 
 		// Make view-1 = [I,0] again
-		MultiViewOps.projectiveToIdentityH(P1_prime,H_prime);
-		CommonOps_DDRM.mult(P2_prime,H_prime,P_tmp);
+		MultiViewOps.projectiveToIdentityH(P1_prime, H_prime);
+		CommonOps_DDRM.mult(P2_prime, H_prime, P_tmp);
 		P2_prime.setTo(P_tmp);
 
 		// P2*H ~= [A,a]*H = [A,a]*[K1 0;v',1]
 		// AK ~= A*K1
-		PerspectiveOps.projectionSplit(P2_prime,A,a);
+		PerspectiveOps.projectionSplit(P2_prime, A, a);
 		AK1.setTo(A);
 //		CommonOps_DDRM.mult(A,K1, AK1);
 
@@ -243,12 +242,12 @@ public class TwoViewToCalibratingHomography {
 
 		hypothesesH.reset();
 
-		for( int motionIdx = 0; motionIdx < list_view_1_to_2.size(); motionIdx++ ) {
+		for (int motionIdx = 0; motionIdx < list_view_1_to_2.size(); motionIdx++) {
 			view_1_to_2.setTo(list_view_1_to_2.get(motionIdx));
 
 			// K2*[R,T] = [K2*R, K2*T] = P2*H
 			// KR = K2*R
-			CommonOps_DDRM.mult(K2_prime,view_1_to_2.R, KiR);
+			CommonOps_DDRM.mult(K2_prime, view_1_to_2.R, KiR);
 
 			// Find the scale factor between AK1 and AKiR. Brute force through all possible combinations and select
 			// the one which is least prone to numerical instability due to a small denominator
@@ -257,13 +256,13 @@ public class TwoViewToCalibratingHomography {
 			for (int i = 0; i < 3; i++) {
 				for (int j = 0; j < 3; j++) {
 					for (int k = 0; k < 3; k++) {
-						if( i == k )
+						if (i == k)
 							continue;
-						double top = AK1.get(i,j)*a.getIdx(k) - AK1.get(k,j)*a.getIdx(i);
-						double bottom = a.getIdx(k)*KiR.get(i,j) - a.getIdx(i)*KiR.get(k,j);
+						double top = AK1.get(i, j)*a.getIdx(k) - AK1.get(k, j)*a.getIdx(i);
+						double bottom = a.getIdx(k)*KiR.get(i, j) - a.getIdx(i)*KiR.get(k, j);
 						double scale = top/bottom;
 
-						if( Math.abs(bottom) > bestBottom ) {
+						if (Math.abs(bottom) > bestBottom) {
 							bestBottom = Math.abs(bottom);
 							bestScale = scale;
 						}
@@ -273,17 +272,17 @@ public class TwoViewToCalibratingHomography {
 
 			// Construct a linear system and solve for the 3 unknowns in v. A linear system is used rather than the
 			// commented out algebraic solution de to the possibility of it blowing up if sum of "a" is zero
-			for (int j = 0, row=0; j < 3; j++) {
+			for (int j = 0, row = 0; j < 3; j++) {
 				for (int i = 0; i < 3; i++, row++) {
-					matA.set(row,j, a.getIdx(i));
-					matB.set(row,0, KiR.get(i,j)*bestScale-AK1.get(i,j));
+					matA.set(row, j, a.getIdx(i));
+					matB.set(row, 0, KiR.get(i, j)*bestScale - AK1.get(i, j));
 				}
 			}
 
-			if( !linear.setA(matA) ) {
+			if (!linear.setA(matA)) {
 				continue;
 			}
-			linear.solve(matB,matX);
+			linear.solve(matB, matX);
 			for (int i = 0; i < 3; i++) {
 				calibratingH.set(3, i, matX.get(i));
 			}
@@ -307,7 +306,7 @@ public class TwoViewToCalibratingHomography {
 			// NOTE: At this point the following is not always true K[R|T] ~= P*H
 			//       The sign of H(4,4) needs to be set correctly and this will be done later on since doing so now
 			//       means extra more complex code
-			CommonOps_DDRM.mult(H_prime,calibratingH,hypothesesH.grow());
+			CommonOps_DDRM.mult(H_prime, calibratingH, hypothesesH.grow());
 		}
 	}
 
@@ -321,20 +320,20 @@ public class TwoViewToCalibratingHomography {
 	 *
 	 * @param view_1_to_2e (Input) camera motion returned by essential matrix
 	 * @param H (Input, Output) Calibrating homography. Modifies H(3,3) to set the scale to something reasonable and
-	 *          for direction
+	 * for direction
 	 * @param K1 (Input) Calibration matrix for view 1
 	 * @param K2 (Input) Calibration matrix for view 1
 	 * @param observations (Input) observations from both cameras
 	 * @return Number of times it failed the geometric test
 	 */
-	private int checkGeometry(Se3_F64 view_1_to_2e, DMatrixRMaj H, DMatrixRMaj K1 , DMatrixRMaj K2,
-							  List<AssociatedPair> observations) {
-		PerspectiveOps.matrixToPinhole(K1,0,0,intrinsic1);
-		PerspectiveOps.matrixToPinhole(K2,0,0,intrinsic2);
+	private int checkGeometry( Se3_F64 view_1_to_2e, DMatrixRMaj H, DMatrixRMaj K1, DMatrixRMaj K2,
+							   List<AssociatedPair> observations ) {
+		PerspectiveOps.matrixToPinhole(K1, 0, 0, intrinsic1);
+		PerspectiveOps.matrixToPinhole(K2, 0, 0, intrinsic2);
 
 		// Use of this function forces K2 to be what we said it would be, also provide a mechanism to compute a
 		// model fit error
-		if( !projectiveToMetric.projectiveToMetricKnownK(P2,H,K2,view_1_to_2) )
+		if (!projectiveToMetric.projectiveToMetricKnownK(P2, H, K2, view_1_to_2))
 			return Integer.MAX_VALUE;
 		// NOTE: seems like much of the above calculation only really needs to be done once for all views and this could
 		//       be speed up, but doesn't seem like it's worth the effort right now.
@@ -342,13 +341,13 @@ public class TwoViewToCalibratingHomography {
 		// As mentioned earlier, the sign of H(4,4) will be wrong sometimes. This is where we fix it
 		double scale = view_1_to_2.T.norm();
 		view_1_to_2.T.divide(scale);
-		if( view_1_to_2e.T.distance(view_1_to_2.T) > 1.0 ) {
+		if (view_1_to_2e.T.distance(view_1_to_2.T) > 1.0) {
 			scale *= -1;
 		}
 		view_1_to_2.setTo(view_1_to_2e);
 
 		// Besides fixing the sign, also scale it so that the resulting translation vector has norm(1) for view-2
-		H.set(3,3,1.0/scale);
+		H.set(3, 3, 1.0/scale);
 
 		// count the number of times it appears behind a camera
 		int foundInvalid = 0;
@@ -356,14 +355,14 @@ public class TwoViewToCalibratingHomography {
 		for (int i = 0; i < observations.size(); i++) {
 			AssociatedPair ap = observations.get(i);
 
-			PerspectiveOps.convertPixelToNorm(intrinsic1,ap.p1.x,ap.p1.y,an.p1);
-			PerspectiveOps.convertPixelToNorm(intrinsic2,ap.p2.x,ap.p2.y,an.p2);
+			PerspectiveOps.convertPixelToNorm(intrinsic1, ap.p1.x, ap.p1.y, an.p1);
+			PerspectiveOps.convertPixelToNorm(intrinsic2, ap.p2.x, ap.p2.y, an.p2);
 
-			triangulate.triangulate(an.p1,an.p2,view_1_to_2,pointIn1);
-			if( pointIn1.z < 0)
+			triangulate.triangulate(an.p1, an.p2, view_1_to_2, pointIn1);
+			if (pointIn1.z < 0)
 				foundInvalid++;
-			SePointOps_F64.transform(view_1_to_2,pointIn1,Xcam);
-			if( Xcam.z < 0)
+			SePointOps_F64.transform(view_1_to_2, pointIn1, Xcam);
+			if (Xcam.z < 0)
 				foundInvalid++;
 		}
 

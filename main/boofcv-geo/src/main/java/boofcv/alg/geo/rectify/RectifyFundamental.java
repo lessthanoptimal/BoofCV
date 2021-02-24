@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -54,7 +54,6 @@ import java.util.List;
  * @author Peter Abeles
  */
 public class RectifyFundamental {
-
 	/** Rectification transform for first camera */
 	final @Getter DMatrixRMaj rect1 = new DMatrixRMaj(3, 3);
 	/** Rectification transform for first camera */

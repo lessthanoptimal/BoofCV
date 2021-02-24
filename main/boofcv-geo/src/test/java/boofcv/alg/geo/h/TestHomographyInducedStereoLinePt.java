@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -21,14 +21,8 @@ package boofcv.alg.geo.h;
 import boofcv.struct.geo.PairLineNorm;
 import org.junit.jupiter.api.Test;
 
-/**
- * @author Peter Abeles
- */
 public class TestHomographyInducedStereoLinePt extends CommonHomographyInducedPlane {
-
-	@Test
-	public void perfectData() {
-
+	@Test void perfectData() {
 		PairLineNorm l1 = convert(p1,p2);
 
 		HomographyInducedStereoLinePt alg = new HomographyInducedStereoLinePt();

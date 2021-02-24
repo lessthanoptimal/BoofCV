@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -23,19 +23,13 @@ import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-/**
- * @author Peter Abeles
- */
 public class TestHomographyInducedStereo2Line extends CommonHomographyInducedPlane {
-
-	@Test
-	public void perfectData() {
-
-		PairLineNorm l1 = convert(p1,p2);
-		PairLineNorm l2 = convert(p1,p3);
+	@Test void perfectData() {
+		PairLineNorm l1 = convert(p1, p2);
+		PairLineNorm l2 = convert(p1, p3);
 
 		HomographyInducedStereo2Line alg = new HomographyInducedStereo2Line();
-		alg.setFundamental(F,e2);
+		alg.setFundamental(F, e2);
 		assertTrue(alg.process(l1, l2));
 
 		checkHomography(alg.getHomography());

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -30,22 +30,19 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  * @author Peter Abeles
  */
 public class TestHomographyResidualSampson extends HomographyResidualTests {
-
 	@Override
 	public ModelObservationResidualN createAlg() {
 		return new HomographyResidualSampson();
 	}
 
-	
-	@Test
-	public void checkJacobian() {
+	@Test void checkJacobian() {
 		HomographyResidualSampson alg = new HomographyResidualSampson();
 
-		DMatrixRMaj H = new DMatrixRMaj(3,3,true,1,2,3,4,5,6,7,8,9);
-		Point2D_F64 x1 = new Point2D_F64(10,20);
-		Point2D_F64 x2 = new Point2D_F64(30,40);
+		DMatrixRMaj H = new DMatrixRMaj(3, 3, true, 1, 2, 3, 4, 5, 6, 7, 8, 9);
+		Point2D_F64 x1 = new Point2D_F64(10, 20);
+		Point2D_F64 x2 = new Point2D_F64(30, 40);
 
-		DMatrixRMaj J = new DMatrixRMaj(2,4);
+		DMatrixRMaj J = new DMatrixRMaj(2, 4);
 		alg.H = H;
 
 		// see page 130,  the cost function is multilinear and the jacobian can be computed this way
@@ -53,17 +50,16 @@ public class TestHomographyResidualSampson extends HomographyResidualTests {
 		double top2 = alg.error2(x1.x, x1.y, x2.x, x2.y);
 
 		J.data[0] = alg.error1(x1.x + 1, x1.y, x2.x, x2.y) - top1;
-		J.data[1] = alg.error1(x1.x,x1.y+1,x2.x,x2.y) - top1;
-		J.data[2] = alg.error1(x1.x,x1.y,x2.x+1,x2.y) - top1;
-		J.data[3] = alg.error1(x1.x,x1.y,x2.x,x2.y+1) - top1;
+		J.data[1] = alg.error1(x1.x, x1.y + 1, x2.x, x2.y) - top1;
+		J.data[2] = alg.error1(x1.x, x1.y, x2.x + 1, x2.y) - top1;
+		J.data[3] = alg.error1(x1.x, x1.y, x2.x, x2.y + 1) - top1;
 		J.data[4] = alg.error2(x1.x + 1, x1.y, x2.x, x2.y) - top2;
 		J.data[5] = alg.error2(x1.x, x1.y + 1, x2.x, x2.y) - top2;
 		J.data[6] = alg.error2(x1.x, x1.y, x2.x + 1, x2.y) - top2;
 		J.data[7] = alg.error2(x1.x, x1.y, x2.x, x2.y + 1) - top2;
 
-		alg.computeJacobian(x1,x2);
-		
-		assertTrue(MatrixFeatures_DDRM.isEquals(J, alg.J, 1e-8));
+		alg.computeJacobian(x1, x2);
 
+		assertTrue(MatrixFeatures_DDRM.isEquals(J, alg.J, 1e-8));
 	}
 }

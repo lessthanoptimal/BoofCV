@@ -44,7 +44,6 @@ public class EstimatePlaneAtInfinityGivenK {
 	DMatrix3x3 Q2 = new DMatrix3x3();
 	DMatrix3 q2 = new DMatrix3();
 
-
 	// Known calibration for view 1 and view 2
 	DMatrix3x3 K1 = new DMatrix3x3();
 	DMatrix3x3 K2 = new DMatrix3x3();
@@ -66,16 +65,16 @@ public class EstimatePlaneAtInfinityGivenK {
 	/**
 	 * Specifies known intrinsic parameters for view 1
 	 */
-	public void setCamera1( double fx , double fy , double skew , double cx , double cy ) {
-		PerspectiveOps.pinholeToMatrix(fx,fy,skew,cx,cy,K1);
+	public void setCamera1( double fx, double fy, double skew, double cx, double cy ) {
+		PerspectiveOps.pinholeToMatrix(fx, fy, skew, cx, cy, K1);
 	}
 
 	/**
 	 * Specifies known intrinsic parameters for view 2
 	 */
-	public void setCamera2( double fx , double fy , double skew , double cx , double cy ) {
-		PerspectiveOps.pinholeToMatrix(fx,fy,skew,cx,cy,K2);
-		PerspectiveOps.invertPinhole(K2,K2_inv);
+	public void setCamera2( double fx, double fy, double skew, double cx, double cy ) {
+		PerspectiveOps.pinholeToMatrix(fx, fy, skew, cx, cy, K2);
+		PerspectiveOps.invertPinhole(K2, K2_inv);
 	}
 
 	/**
@@ -85,26 +84,26 @@ public class EstimatePlaneAtInfinityGivenK {
 	 * @param v (Output) plane at infinity
 	 * @return true if successful or false if it failed
 	 */
-	public boolean estimatePlaneAtInfinity( DMatrixRMaj P2 , Vector3D_F64 v ) {
-		PerspectiveOps.projectionSplit(P2,Q2,q2);
+	public boolean estimatePlaneAtInfinity( DMatrixRMaj P2, Vector3D_F64 v ) {
+		PerspectiveOps.projectionSplit(P2, Q2, q2);
 
 		// inv(K2)*(Q2*K1 + q2*v')
-		CommonOps_DDF3.mult(K2_inv,q2,t2);
-		CommonOps_DDF3.mult(K2_inv,Q2,tmpA);
-		CommonOps_DDF3.mult(tmpA,K1,tmpB);
+		CommonOps_DDF3.mult(K2_inv, q2, t2);
+		CommonOps_DDF3.mult(K2_inv, Q2, tmpA);
+		CommonOps_DDF3.mult(tmpA, K1, tmpB);
 
 		// Find the rotation matrix R*t2 = [||t2||,0,0]^T
-		computeRotation(t2,RR);
+		computeRotation(t2, RR);
 
 		// Compute W
-		CommonOps_DDF3.mult(RR,tmpB,W);
+		CommonOps_DDF3.mult(RR, tmpB, W);
 
 		// Compute v, the plane at infinity
 		// v = (w2 cross w3 / ||w3|| - w1 ) / ||t2||
-		w2.setTo(W.a21,W.a22,W.a23);
-		w3.setTo(W.a31,W.a32,W.a33);
+		w2.setTo(W.a21, W.a22, W.a23);
+		w3.setTo(W.a31, W.a32, W.a33);
 		double n3 = w3.norm();
-		v.crossSetTo(w2,w3); // approximation here, w2 and w3 might not be orthogonal
+		v.crossSetTo(w2, w3); // approximation here, w2 and w3 might not be orthogonal
 		v.divideIP(n3);
 		v.x -= W.a11;
 		v.y -= W.a12;
@@ -120,10 +119,10 @@ public class EstimatePlaneAtInfinityGivenK {
 	 *
 	 * @param t Input the vector, Output vector after rotator has been applied
 	 */
-	static void computeRotation(DMatrix3 t , DMatrix3x3 R ) {
+	static void computeRotation( DMatrix3 t, DMatrix3x3 R ) {
 		for (int i = 1; i >= 0; i--) {
-			double a = t.get(i,0);
-			double b = t.get(i+1,0);
+			double a = t.get(i, 0);
+			double b = t.get(i + 1, 0);
 
 			// compute the rotator such that [a,b] = [||X||,0]
 			double r = Math.sqrt(a*a + b*b);
@@ -131,9 +130,10 @@ public class EstimatePlaneAtInfinityGivenK {
 			double q21 = b/r;
 
 			// apply rotator to t and R
-			t.set(i,0,r);
-			t.set(i+1,0,0);
+			t.set(i, 0, r);
+			t.set(i + 1, 0, 0);
 
+			// @formatter:off
 			if( i == 1 ) {
 				R.a11 = 1; R.a12 =  0;   R.a13 =  0;
 				R.a21 = 0; R.a22 =  q11; R.a23 = q21;
@@ -142,7 +142,7 @@ public class EstimatePlaneAtInfinityGivenK {
 				R.a11 = q11;  R.a12 = R.a22*q21; R.a13 = R.a23*q21;
 				R.a21 = -q21; R.a22 = R.a22*q11; R.a23 = R.a23*q11;
 			}
+			// @formatter:on
 		}
 	}
-
 }

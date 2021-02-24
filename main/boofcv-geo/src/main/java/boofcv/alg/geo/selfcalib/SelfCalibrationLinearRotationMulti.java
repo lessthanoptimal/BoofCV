@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -58,7 +58,7 @@ import java.util.List;
 public class SelfCalibrationLinearRotationMulti {
 
 	private SingularValueDecomposition_F64<DMatrixRMaj> svd =
-			DecompositionFactory_DDRM.svd(10,6,false,true,true);
+			DecompositionFactory_DDRM.svd(10, 6, false, true, true);
 
 	// specifies linear constraints
 	boolean zeroSkew;
@@ -70,7 +70,7 @@ public class SelfCalibrationLinearRotationMulti {
 
 	//----------- Working space variables
 	// linear constraint matrix A*x = 0
-	DMatrixRMaj A = new DMatrixRMaj(1,1);
+	DMatrixRMaj A = new DMatrixRMaj(1, 1);
 
 	// W for reference frame
 	Homography2D_F64 W0 = new Homography2D_F64();
@@ -83,7 +83,7 @@ public class SelfCalibrationLinearRotationMulti {
 	DogArray_I32 notZeros = new DogArray_I32();
 
 	// storage for null vector
-	DMatrixRMaj nv = new DMatrixRMaj(1,1);
+	DMatrixRMaj nv = new DMatrixRMaj(1, 1);
 
 	DogArray<Homography2D_F64> listHInv = new DogArray<>(Homography2D_F64::new);
 
@@ -99,12 +99,11 @@ public class SelfCalibrationLinearRotationMulti {
 	 * @param knownAspect that the aspect ratio is known
 	 * @param aspect If aspect is known then this is the aspect. ratio=fy/fx Ignored otherwise.
 	 */
-	public void setConstraints( boolean zeroSkew ,
-								boolean principlePointOrigin ,
+	public void setConstraints( boolean zeroSkew,
+								boolean principlePointOrigin,
 								boolean knownAspect,
-								double aspect )
-	{
-		if( knownAspect && !zeroSkew )
+								double aspect ) {
+		if (knownAspect && !zeroSkew)
 			throw new IllegalArgumentException("If aspect is known then skew must be zero");
 
 		this.zeroSkew = zeroSkew;
@@ -116,40 +115,41 @@ public class SelfCalibrationLinearRotationMulti {
 		for (int i = 0; i < 6; i++) {
 			notZeros.data[i] = i;
 		}
-		if( principlePointOrigin ) {
+		if (principlePointOrigin) {
 			notZeros.remove(4);
 			notZeros.remove(2);
 		}
 
-		if( zeroSkew ) {
+		if (zeroSkew) {
 			notZeros.remove(1);
 		}
 	}
 
 	/**
 	 * Assumes that the camera parameter are constant
+	 *
 	 * @param viewsI_to_view0 (Input) List of observed homographies
 	 * @return true if successful
 	 */
-	public GeometricResult estimate(List<Homography2D_F64> viewsI_to_view0 ) {
+	public GeometricResult estimate( List<Homography2D_F64> viewsI_to_view0 ) {
 		calibration.reset();
 		int N = viewsI_to_view0.size();
 
-		if( !computeInverseH(viewsI_to_view0) )
+		if (!computeInverseH(viewsI_to_view0))
 			return GeometricResult.SOLVE_FAILED;
 
 		fillInConstraintMatrix();
 
 		// Compute the SVD for its null space
-		if( !svd.decompose(A)) {
+		if (!svd.decompose(A)) {
 			return GeometricResult.SOLVE_FAILED;
 		}
 
-		SingularOps_DDRM.nullVector(svd,true,nv);
+		SingularOps_DDRM.nullVector(svd, true, nv);
 		extractReferenceW(nv);
-		convertW(W0,calibration.grow());
+		convertW(W0, calibration.grow());
 		for (int i = 0; i < N; i++) {
-			extractCalibration(listHInv.get(i),calibration.grow());
+			extractCalibration(listHInv.get(i), calibration.grow());
 		}
 
 		return GeometricResult.SUCCESS;
@@ -160,11 +160,11 @@ public class SelfCalibrationLinearRotationMulti {
 	 */
 	public int numberOfConstraints() {
 		int total = 0;
-		if( zeroSkew )
+		if (zeroSkew)
 			total++;
-		if( principlePointOrigin )
+		if (principlePointOrigin)
 			total += 2;
-		if( knownAspectRatio )
+		if (knownAspectRatio)
 			total += 1;
 		return total;
 	}
@@ -180,22 +180,20 @@ public class SelfCalibrationLinearRotationMulti {
 	 *  a=H.transpose()*W*H
 	 *  a[0,1].expand()
 	 * </pre>
-	 *
 	 */
-	void fillInConstraintMatrix( )
-	{
+	void fillInConstraintMatrix() {
 		int N = listHInv.size();
-		A.reshape(N*numberOfConstraints(),6);
+		A.reshape(N*numberOfConstraints(), 6);
 
-		if( A.numRows < notZeros.size ) {
+		if (A.numRows < notZeros.size) {
 			throw new IllegalArgumentException("More unknowns than equations");
 		}
 
 		double b = knownAspectRatio ? aspectRatio*aspectRatio : 1;
-		for (int i = 0,idx=0; i < N; i++) {
+		for (int i = 0, idx = 0; i < N; i++) {
 			Homography2D_F64 H = listHInv.get(i);
 
-			if( zeroSkew ) { // w12
+			if (zeroSkew) { // w12
 				A.data[idx++] = H.a11*H.a12;
 				A.data[idx++] = H.a12*H.a21 + H.a11*H.a22;
 				A.data[idx++] = H.a12*H.a31 + H.a11*H.a32;
@@ -203,7 +201,7 @@ public class SelfCalibrationLinearRotationMulti {
 				A.data[idx++] = H.a22*H.a31 + H.a21*H.a32;
 				A.data[idx++] = H.a31*H.a32;
 			}
-			if( principlePointOrigin ) { // w13 = 0, w23 = 0
+			if (principlePointOrigin) { // w13 = 0, w23 = 0
 				A.data[idx++] = H.a11*H.a13;
 				A.data[idx++] = H.a13*H.a21 + H.a11*H.a23;
 				A.data[idx++] = H.a13*H.a31 + H.a11*H.a33;
@@ -219,10 +217,10 @@ public class SelfCalibrationLinearRotationMulti {
 				A.data[idx++] = H.a32*H.a33;
 			}
 
-			if( knownAspectRatio ) { // w11 - b*w22 = 0
-				A.data[idx++] = H.a11*H.a11 - H.a12*H.a12*b ;
+			if (knownAspectRatio) { // w11 - b*w22 = 0
+				A.data[idx++] = H.a11*H.a11 - H.a12*H.a12*b;
 				A.data[idx++] = 2*H.a11*H.a21 - 2*H.a12*H.a22*b;
-				A.data[idx++] = 2*H.a11*H.a31 - 2*H.a12*H.a32*b ;
+				A.data[idx++] = 2*H.a11*H.a31 - 2*H.a12*H.a32*b;
 				A.data[idx++] = H.a21*H.a21 - H.a22*H.a22*b;
 				A.data[idx++] = 2*H.a21*H.a31 - 2*H.a22*H.a32*b;
 				A.data[idx++] = H.a31*H.a31 - H.a32*H.a32*b;
@@ -233,7 +231,7 @@ public class SelfCalibrationLinearRotationMulti {
 	/**
 	 * Extracts calibration for the reference frame
 	 */
-	void extractReferenceW(DMatrixRMaj nv ) {
+	void extractReferenceW( DMatrixRMaj nv ) {
 		W0.a11 = nv.data[0];
 		W0.a12 = W0.a21 = nv.data[1];
 		W0.a13 = W0.a31 = nv.data[2];
@@ -244,16 +242,14 @@ public class SelfCalibrationLinearRotationMulti {
 
 	/**
 	 * Converts W into a pinhole camera model by finding the cholesky decomposition
-	 *
-	 *
 	 */
-	void convertW( Homography2D_F64 w , CameraPinhole c ) {
+	void convertW( Homography2D_F64 w, CameraPinhole c ) {
 		// inv(w) = K*K'
 		tmp.setTo(w);
-		CommonOps_DDF3.divide(tmp,tmp.a33);
+		CommonOps_DDF3.divide(tmp, tmp.a33);
 		CommonOps_DDF3.cholU(tmp);
-		CommonOps_DDF3.invert(tmp,K);
-		CommonOps_DDF3.divide(K,K.a33);
+		CommonOps_DDF3.invert(tmp, K);
+		CommonOps_DDF3.divide(K, K.a33);
 
 		c.fx = K.a11;
 		c.fy = knownAspectRatio ? (K.a22 + c.fx*aspectRatio)/2.0 : K.a22;
@@ -267,17 +263,17 @@ public class SelfCalibrationLinearRotationMulti {
 	 *
 	 * w = H^-T*w*H^-1
 	 */
-	void extractCalibration( Homography2D_F64 Hinv , CameraPinhole c ) {
-		CommonOps_DDF3.multTransA(Hinv,W0,tmp);
-		CommonOps_DDF3.mult(tmp,Hinv,Wi);
+	void extractCalibration( Homography2D_F64 Hinv, CameraPinhole c ) {
+		CommonOps_DDF3.multTransA(Hinv, W0, tmp);
+		CommonOps_DDF3.mult(tmp, Hinv, Wi);
 
-		convertW(Wi,c);
+		convertW(Wi, c);
 	}
 
 	/**
 	 * Ensures the determinant is one then inverts the homogrpahy
 	 */
-	public boolean computeInverseH(List<Homography2D_F64> homography0toI) {
+	public boolean computeInverseH( List<Homography2D_F64> homography0toI ) {
 		listHInv.reset();
 		int N = homography0toI.size();
 		for (int i = 0; i < N; i++) {
@@ -286,13 +282,13 @@ public class SelfCalibrationLinearRotationMulti {
 
 			// Ensure the determinant is one
 			double d = CommonOps_DDF3.det(H);
-			if( d < 0 )
-				CommonOps_DDF3.divide(H,-Math.pow(-d,1.0/3),Hinv);
+			if (d < 0)
+				CommonOps_DDF3.divide(H, -Math.pow(-d, 1.0/3), Hinv);
 			else
-				CommonOps_DDF3.divide(H,Math.pow(d,1.0/3),Hinv);
+				CommonOps_DDF3.divide(H, Math.pow(d, 1.0/3), Hinv);
 
 			// Now invert the matrix
-			if( !CommonOps_DDF3.invert(Hinv,Hinv) ) {
+			if (!CommonOps_DDF3.invert(Hinv, Hinv)) {
 				return false;
 			}
 		}
