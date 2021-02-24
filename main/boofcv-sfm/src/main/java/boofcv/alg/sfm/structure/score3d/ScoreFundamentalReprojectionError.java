@@ -39,9 +39,14 @@ import java.util.List;
 import java.util.Set;
 
 /**
+ * Runs RANSAC to find the fundamental matrix. Then a homography is fit to the inliers. Errors are compared
+ * between the fundamental matrix and homography. Fundamental matrix will naturally have a lower error since
+ * it's distance from the epipolar line while homography is distance from a point.
+ *
  * @author Peter Abeles
  */
-public class ScoreFundamentalWithoutTranslation implements EpipolarScore3D {
+public class ScoreFundamentalReprojectionError implements EpipolarScore3D {
+	/** Robust model matching algorithm. Inlier set is used but not the error */
 	@Getter ModelMatcher<DMatrixRMaj, AssociatedPair> ransac3D;
 
 	/**
@@ -49,30 +54,52 @@ public class ScoreFundamentalWithoutTranslation implements EpipolarScore3D {
 	 */
 	public @Getter @Setter double ratio3D = 4.0;
 
+	/** Smoothing parameter and avoid divide by zero. This is typically < 1.0 since error is computed in pixels */
+	@Getter @Setter double eps = 0.5;
+
+	// Storage for inliers
 	List<AssociatedPair> inliers = new ArrayList<>();
 
+	// Storage for errors
 	DogArray_F64 errors = new DogArray_F64();
 
+	// Compute the homography
 	GenerateHomographyLinear estimateH = new GenerateHomographyLinear(true);
+	// Error/distance computed using the homography
 	DistanceHomographySq distanceH = new DistanceHomographySq();
+	// Error/distance computed using Fundamental matrix
 	DistanceFundamentalGeometric distanceF = new DistanceFundamentalGeometric();
 
+	// storage for homography
+	DMatrixRMaj H = new DMatrixRMaj(3, 3);
+	Homography2D_F64 H2 = new Homography2D_F64();
+
+	// Output parameters
 	double score;
 	boolean is3D;
-	double eps = 0.5;
 
+	// If not null then verbose output
 	PrintStream verbose;
 
-	public ScoreFundamentalWithoutTranslation( ModelMatcher<DMatrixRMaj, AssociatedPair> ransac3D ) {
+	public ScoreFundamentalReprojectionError( ModelMatcher<DMatrixRMaj, AssociatedPair> ransac3D ) {
 		this.ransac3D = ransac3D;
 	}
 
 	@Override public boolean process( List<AssociatedPair> pairs, DMatrixRMaj fundamental, DogArray_I32 inliersIdx ) {
-		if (!ransac3D.process(pairs))
+		// Not enough points to compute F
+		if (pairs.size() < ransac3D.getMinimumSize())
 			return false;
 
-		fundamental.setTo(ransac3D.getModelParameters());
+		if (!ransac3D.process(pairs)) {
+			// assume it failed because the data was noise free and pure rotation encountered
+			// Even if it failed due to NaN in the input, it's still true there was no geometric info!
+			is3D = false;
+			score = 0.0;
+			return true;
+		}
 
+		// Save the inliers and compute the epipolar geometric error for F
+		fundamental.setTo(ransac3D.getModelParameters());
 		distanceF.setModel(ransac3D.getModelParameters());
 		inliersIdx.resize(ransac3D.getMatchSet().size());
 		inliers.clear();
@@ -83,11 +110,10 @@ public class ScoreFundamentalWithoutTranslation implements EpipolarScore3D {
 			errors.set(i, distanceF.distance(pairs.get(inliersIdx.get(i))));
 		}
 
+		// use 50% error since it's less sensitive to outliers
 		errors.sort();
 		double errorF = errors.getFraction(0.5);
 
-		var H = new DMatrixRMaj(3, 3);
-		var H2 = new Homography2D_F64();
 		estimateH.generate(inliers, H2);
 		UtilHomography_F64.convert(H2, H);
 		distanceH.setModel(H);
@@ -104,7 +130,22 @@ public class ScoreFundamentalWithoutTranslation implements EpipolarScore3D {
 		if (verbose != null)
 			verbose.println("score=" + score + " errorH=" + errorH + " errorF=" + errorF + " 3d=" + is3D);
 
-		// TODO if not 3D identify planar scene case
+		// Figuring out if we are dealing with a translation viewing a plane or pure rotation isn't trivial
+
+		// Failed attempts:
+		// 1) F and H compatibility. only false for non-planar scenes
+		// 2) F -> camera matrix, setting "translation" to (0,0,0). That's not how projective cameras work
+		// 3) Self calibration using pure rotation fails because there aren't enough views
+		// 4) Triangulating projective points, forcing p.w=0, compare reprojection error. Always massive error
+
+		// I think the major issue where is that in both cases points lie on a plane. For pure rotation, the plane is
+		// at infinity but it's still a plane.
+		//
+		// What might work is looking at the apparent motion of the points.  There won't be a vanishing point
+		// if its pure rotation. However rotation along z-axis and pure translation might be difficult to distinguish
+		// from pure translation along x-axis.
+
+		// Thia also can't assume that both cameras have the same intrinsic parameters
 
 		return true;
 	}

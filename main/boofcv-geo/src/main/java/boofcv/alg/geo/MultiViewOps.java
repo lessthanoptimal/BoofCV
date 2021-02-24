@@ -63,6 +63,7 @@ import org.ejml.data.DMatrix4x4;
 import org.ejml.data.DMatrixRMaj;
 import org.ejml.dense.fixed.CommonOps_DDF4;
 import org.ejml.dense.row.CommonOps_DDRM;
+import org.ejml.dense.row.NormOps_DDRM;
 import org.ejml.dense.row.SingularOps_DDRM;
 import org.ejml.dense.row.factory.DecompositionFactory_DDRM;
 import org.ejml.interfaces.decomposition.SingularValueDecomposition_F64;
@@ -533,7 +534,8 @@ public class MultiViewOps {
 	 * @return The homography from view 1 to view 2 or null if it fails
 	 * @see boofcv.alg.geo.h.HomographyInducedStereo3Pts
 	 */
-	public static DMatrixRMaj homographyStereo3Pts( DMatrixRMaj F, AssociatedPair p1, AssociatedPair p2, AssociatedPair p3 ) {
+	public static DMatrixRMaj fundamentalToHomography3Pts( DMatrixRMaj F,
+														   AssociatedPair p1, AssociatedPair p2, AssociatedPair p3 ) {
 		HomographyInducedStereo3Pts alg = new HomographyInducedStereo3Pts();
 
 		alg.setFundamental(F, null);
@@ -552,7 +554,7 @@ public class MultiViewOps {
 	 * @return The homography from view 1 to view 2 or null if it fails
 	 * @see HomographyInducedStereoLinePt
 	 */
-	public static DMatrixRMaj homographyStereoLinePt( DMatrixRMaj F, PairLineNorm line, AssociatedPair point ) {
+	public static DMatrixRMaj fundamentalToHomographyLinePt( DMatrixRMaj F, PairLineNorm line, AssociatedPair point ) {
 		HomographyInducedStereoLinePt alg = new HomographyInducedStereoLinePt();
 
 		alg.setFundamental(F, null);
@@ -570,7 +572,7 @@ public class MultiViewOps {
 	 * @return The homography from view 1 to view 2 or null if it fails
 	 * @see HomographyInducedStereo2Line
 	 */
-	public static DMatrixRMaj homographyStereo2Lines( DMatrixRMaj F, PairLineNorm line0, PairLineNorm line1 ) {
+	public static DMatrixRMaj fundamentalToHomography2Lines( DMatrixRMaj F, PairLineNorm line0, PairLineNorm line1 ) {
 		HomographyInducedStereo2Line alg = new HomographyInducedStereo2Line();
 
 		alg.setFundamental(F, null);
@@ -1951,5 +1953,28 @@ public class MultiViewOps {
 			out.setTo(x, y, z, w);
 			func.process(pointIdx, out);
 		}
+	}
+
+	/**
+	 * IF a homography is compatible with a fundamental matrix then norm(H'*F + F'*H) = 0. A homography
+	 * is compatible with F, if H is generated from a plane.
+	 *
+	 * <p>
+	 * Page 327 in R. Hartley, and A. Zisserman, "Multiple View Geometry in Computer Vision", 2nd Ed, Cambridge 2003
+	 * </p>
+	 *
+	 * @param F (Input) Fundamental matrix
+	 * @param H (Input) Homography
+	 * @return A number close to zero if compatible
+	 */
+	public static double compatibleHomography( DMatrixRMaj F, DMatrixRMaj H ) {
+		DMatrixRMaj tmp0 = new DMatrixRMaj(3, 3);
+		DMatrixRMaj tmp1 = new DMatrixRMaj(3, 3);
+
+		CommonOps_DDRM.multTransA(H, F, tmp0);
+		CommonOps_DDRM.multTransA(F, H, tmp1);
+
+		CommonOps_DDRM.add(tmp0, tmp1, tmp1);
+		return NormOps_DDRM.normF(tmp1);
 	}
 }

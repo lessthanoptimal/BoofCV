@@ -38,6 +38,6 @@ public class TestScoreFundamentalWithoutTranslation extends CommonEpipolarScore3
 		ModelMatcher<DMatrixRMaj, AssociatedPair> ransac3D =
 				FactoryMultiViewRobust.fundamentalRansac(new ConfigFundamental(), configRansac);
 
-		return new ScoreFundamentalWithoutTranslation(ransac3D);
+		return new ScoreFundamentalReprojectionError(ransac3D);
 	}
 }
