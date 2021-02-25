@@ -36,8 +36,13 @@ task unzipJar(type: Copy) {
     exclude "**/Unmodifiable.class"
 }
 
-if( Integer.parseInt(ext.ANDROID_VERSION) >= 29 ) {
-    println("WARNING!!! javadoc will fail with this version of Android")
+try {
+    if( Integer.parseInt(ext.ANDROID_VERSION) >= 29 ) {
+        println("WARNING!!! javadoc will fail with this version of Android")
+    }
+} catch (NumberFormatException e) {
+    // Did Google just switch their versions to letter?? BAD GOOGLE!
+    e.printStackTrace(System.err)
 }
 
 dependencies {
