@@ -58,7 +58,7 @@ public class ScoreFundamentalReprojectionError implements EpipolarScore3D {
 	public @Getter @Setter double ratio3D = 4.0;
 
 	/** Smoothing parameter and avoid divide by zero. This is typically < 1.0 since error is computed in pixels */
-	@Getter @Setter double eps = 0.5;
+	public @Getter @Setter double eps = 0.5;
 
 	// Storage for inliers
 	List<AssociatedPair> inliers = new ArrayList<>();
