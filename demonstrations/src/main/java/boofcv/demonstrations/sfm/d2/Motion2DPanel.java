@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -18,19 +18,20 @@
 
 package boofcv.demonstrations.sfm.d2;
 
-import boofcv.alg.sfm.d2.StitchingFromMotion2D;
 import boofcv.gui.feature.VisualizeFeatures;
 import georegression.struct.homography.Homography2D_F64;
 import georegression.struct.point.Point2D_F64;
+import georegression.struct.shapes.Quadrilateral_F64;
 import georegression.transform.homography.HomographyPointOps_F64;
 import org.ddogleg.struct.DogArray;
+import org.jetbrains.annotations.Nullable;
 
 import javax.swing.*;
 import java.awt.*;
 import java.awt.image.BufferedImage;
 
 /**
- * TODO Comment
+ * Base class for visualizing 2d image stitching video demos
  *
  * @author Peter Abeles
  */
@@ -50,8 +51,13 @@ public abstract class Motion2DPanel extends JPanel
 	DogArray<Point2D_F64> inliers = new DogArray<>(300, Point2D_F64::new);
 	DogArray<Point2D_F64> allTracks = new DogArray<>(300, Point2D_F64::new);
 
-	boolean showImageView;
-	StitchingFromMotion2D.Corners corners;
+	boolean showImageView=true;
+	boolean showAll=false;
+	boolean showInliers=false;
+
+	Quadrilateral_F64 corners = new Quadrilateral_F64();
+
+	BasicStroke boundsStroke = new BasicStroke(5.0f);
 
 	public void setImages(BufferedImage input , BufferedImage stitched)
 	{
@@ -59,28 +65,18 @@ public abstract class Motion2DPanel extends JPanel
 		this.stitched = stitched;
 	}
 
-	public void setCorners(StitchingFromMotion2D.Corners corners) {
-		this.corners = corners;
+	public void setCorners(Quadrilateral_F64 corners) {
+		this.corners.setTo(corners);
 	}
 
-	public synchronized void setInliers(java.util.List<Point2D_F64> list) {
+	public void setInliers(java.util.List<Point2D_F64> list) {
 		inliers.reset();
-
-		if( list != null ) {
-			for( Point2D_F64 p : list ) {
-				inliers.grow().setTo(p);
-			}
-		}
+		inliers.copyAll(list,(s,d)->d.setTo(s));
 	}
 
-	public synchronized void setAllTracks(java.util.List<Point2D_F64> list) {
+	public synchronized void setAllTracks(@Nullable java.util.List<Point2D_F64> list) {
 		allTracks.reset();
-
-		if( list != null ) {
-			for( Point2D_F64 p : list ) {
-				allTracks.grow().setTo(p);
-			}
-		}
+		allTracks.copyAll(list,(s,d)->d.setTo(s));
 	}
 
 	@Override
@@ -91,6 +87,8 @@ public abstract class Motion2DPanel extends JPanel
 			return;
 
 		Graphics2D g2 = (Graphics2D)g;
+		g2.setRenderingHint(RenderingHints.KEY_STROKE_CONTROL, RenderingHints.VALUE_STROKE_PURE);
+		g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
 
 		int w = getWidth();
 		int h = getHeight();
@@ -123,42 +121,43 @@ public abstract class Motion2DPanel extends JPanel
 
 		Point2D_F64 distPt = new Point2D_F64();
 
-		for( int i = 0; i < all.size; i++  ) {
+		if (showAll) {
+			drawPoints(scale, offsetX, offsetY, all, currToGlobal, g2, distPt, Color.RED);
+		}
+
+		if (showInliers) {
+			drawPoints(scale, offsetX, offsetY, inliers, currToGlobal, g2, distPt, Color.BLUE);
+		}
+	}
+
+	private void drawPoints( float scale, int offsetX, int offsetY, DogArray<Point2D_F64> all, Homography2D_F64 currToGlobal, Graphics2D g2, Point2D_F64 distPt, Color red ) {
+		for (int i = 0; i < all.size; i++) {
 			HomographyPointOps_F64.transform(currToGlobal, all.get(i), distPt);
 
 			distPt.x = offsetX + distPt.x*scale;
 			distPt.y = offsetY + distPt.y*scale;
 
-			VisualizeFeatures.drawPoint(g2, (int) distPt.x, (int) distPt.y, Color.RED);
-		}
-
-		for( int i = 0; i < inliers.size; i++  ) {
-			HomographyPointOps_F64.transform(currToGlobal,inliers.get(i),distPt);
-
-			distPt.x = offsetX + distPt.x*scale;
-			distPt.y = offsetY + distPt.y*scale;
-
-			VisualizeFeatures.drawPoint(g2, (int) distPt.x, (int) distPt.y, Color.BLUE);
+			VisualizeFeatures.drawPoint(g2, (int)distPt.x, (int)distPt.y, red);
 		}
 	}
 
 	private void drawImageBounds( Graphics2D g2 , int tx , int ty , double scale ) {
-		StitchingFromMotion2D.Corners c = corners;
-		if( c == null )
-			return;
+		Quadrilateral_F64 c = corners;
 
+		Stroke originalStroke = g2.getStroke();
+		g2.setStroke(boundsStroke);
 		g2.setColor(Color.BLUE);
-		drawLine(g2,tx,ty,scale,c.p0,c.p1);
-		drawLine(g2,tx,ty,scale,c.p1,c.p2);
-		drawLine(g2,tx,ty,scale,c.p2,c.p3);
-		drawLine(g2,tx,ty,scale,c.p3,c.p0);
+		drawLine(g2,tx,ty,scale,c.a,c.b);
+		drawLine(g2,tx,ty,scale,c.b,c.c);
+		drawLine(g2,tx,ty,scale,c.c,c.d);
+		drawLine(g2,tx,ty,scale,c.d,c.a);
+		g2.setStroke(originalStroke);
 	}
 
 	private void drawLine( Graphics2D g2 , int tx , int ty , double scale , Point2D_F64 p0 , Point2D_F64 p1 )
 	{
 		g2.drawLine((int)(p0.x*scale)+tx,(int)(p0.y*scale)+ty,(int)(p1.x*scale)+tx,(int)(p1.y*scale)+ty);
 	}
-
 
 	public void setCurrToWorld(Homography2D_F64 currToWorld) {
 		this.currToWorld.setTo(currToWorld);

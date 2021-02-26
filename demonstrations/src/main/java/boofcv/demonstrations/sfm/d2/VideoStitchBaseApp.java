@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -18,30 +18,24 @@
 
 package boofcv.demonstrations.sfm.d2;
 
-import boofcv.abst.feature.detect.interest.ConfigFastHessian;
-import boofcv.abst.feature.detect.interest.ConfigGeneralDetector;
-import boofcv.abst.feature.detect.interest.ConfigPointDetector;
-import boofcv.abst.feature.detect.interest.PointDetectorTypes;
 import boofcv.abst.sfm.AccessPointTracks;
 import boofcv.abst.sfm.d2.ImageMotion2D;
 import boofcv.abst.sfm.d2.PlToGrayMotion2D;
-import boofcv.abst.tracker.ConfigTrackerHybrid;
 import boofcv.abst.tracker.PointTracker;
-import boofcv.alg.filter.derivative.GImageDerivativeOps;
 import boofcv.alg.sfm.d2.StitchingFromMotion2D;
-import boofcv.alg.tracker.klt.ConfigPKlt;
 import boofcv.factory.sfm.FactoryMotion2D;
-import boofcv.factory.tracker.FactoryPointTracker;
+import boofcv.factory.tracker.ConfigPointTracker;
 import boofcv.gui.DemonstrationBase;
 import boofcv.io.image.ConvertBufferedImage;
 import boofcv.io.image.SimpleImageSequence;
 import boofcv.struct.image.ImageBase;
 import boofcv.struct.image.ImageType;
-import boofcv.struct.pyramid.ConfigDiscreteLevels;
 import georegression.struct.InvertibleTransform;
 import georegression.struct.affine.Affine2D_F64;
 import georegression.struct.homography.Homography2D_F64;
 import georegression.struct.point.Point2D_F64;
+import georegression.struct.shapes.Quadrilateral_F64;
+import org.ddogleg.struct.DogArray;
 
 import javax.swing.*;
 import java.awt.*;
@@ -58,7 +52,7 @@ import java.util.List;
  * @author Peter Abeles
  */
 public abstract class VideoStitchBaseApp<I extends ImageBase<I>, IT extends InvertibleTransform>
-		extends DemonstrationBase implements ImageMotionInfoPanel.Listener
+		extends DemonstrationBase implements ImageMotionInfoPanel.AlgorithmListener
 {
 	// size of the image being stitched into
 	int stitchWidth;
@@ -74,8 +68,8 @@ public abstract class VideoStitchBaseApp<I extends ImageBase<I>, IT extends Inve
 
 	BufferedImage stitchOut;
 
-	StitchingFromMotion2D alg;
-	StitchingFromMotion2D.Corners corners;
+	StitchingFromMotion2D<I,IT> alg;
+	Quadrilateral_F64 corners;
 
 	// number of times stitching has failed and it was reset
 	int totalResets;
@@ -83,7 +77,7 @@ public abstract class VideoStitchBaseApp<I extends ImageBase<I>, IT extends Inve
 	private final static int maxIterations = 100;
 
 	protected Motion2DPanel gui;
-	protected ImageMotionInfoPanel infoPanel = new ImageMotionInfoPanel(this);
+	protected ImageMotionInfoPanel infoPanel = new ImageMotionInfoPanel();
 
 	// stabilization parameters
 	protected int absoluteMinimumTracks;
@@ -95,6 +89,12 @@ public abstract class VideoStitchBaseApp<I extends ImageBase<I>, IT extends Inve
 	private static int maxFeatures = 350;
 
 	private boolean algorithmChanged = false;
+
+	//--------------------- BEGIN LOCK
+	final Object trackLock = new Object();
+	DogArray<Point2D_F64> allTracks = new DogArray<>(Point2D_F64::new);
+	List<Point2D_F64> inliers = new ArrayList<>();
+	//--------------------- END
 
 	// TODO Specify tracker and motion model in info panel
 
@@ -110,9 +110,35 @@ public abstract class VideoStitchBaseApp<I extends ImageBase<I>, IT extends Inve
 			}
 		});
 
-		infoPanel.setMaximumSize(infoPanel.getPreferredSize());
+		ConfigPointTracker config = infoPanel.configTracker;
+		config.typeTracker = ConfigPointTracker.TrackerType.KLT;
+		config.klt.maximumTracks.setFixed(maxFeatures);
+		config.klt.templateRadius = 3;
+		config.klt.pruneClose = true;
+		config.klt.toleranceFB = 4;
+		config.detDesc.detectPoint.general.maxFeatures = maxFeatures;
+		config.detDesc.detectPoint.general.radius = 3;
+		config.detDesc.detectPoint.general.threshold = 1;
+
+		config.detDesc.detectFastHessian.initialSampleStep = 2;
+		config.detDesc.detectFastHessian.maxFeaturesPerScale = 250;
+		config.dda.maxInactiveTracks = 100;
+	}
+
+	protected void initializeGui() {
+		infoPanel.listenerAlg = this;
+		infoPanel.listenerVis = ()->{updateShowFlags();repaint();};
+		infoPanel.initializeGui();
 		add(infoPanel, BorderLayout.WEST);
 		add(gui,BorderLayout.CENTER);
+
+		updateShowFlags();
+	}
+
+	private void updateShowFlags() {
+		gui.showInliers = infoPanel.showInliers;
+		gui.showAll = infoPanel.showAll;
+		gui.showImageView = infoPanel.showView;
 	}
 
 	protected void setStitchImageSize( int width , int height ) {
@@ -134,47 +160,12 @@ public abstract class VideoStitchBaseApp<I extends ImageBase<I>, IT extends Inve
 	}
 
 	protected PointTracker<I> createTracker() {
-		ConfigPKlt configKlt = new ConfigPKlt();
-		configKlt.templateRadius = 3;
-		configKlt.pyramidLevels = ConfigDiscreteLevels.levels(4);
-
-		ConfigFastHessian configFH = new ConfigFastHessian();
-		configFH.initialSampleStep = 2;
-		configFH.maxFeaturesPerScale = 250;
-
-		ConfigTrackerHybrid configHybrid = new ConfigTrackerHybrid();
-
-		ImageType imageType = super.getImageType(0);
-		Class imageClass = imageType.getImageClass();
-		Class derivClass = GImageDerivativeOps.getDerivativeType(imageClass);
-
-		FeatureTrackerTypes type = FeatureTrackerTypes.values()[infoPanel.tracker];
-		switch( type ) {
-			case KLT: {
-				ConfigPointDetector configDetector = new ConfigPointDetector();
-				configDetector.type = PointDetectorTypes.SHI_TOMASI;
-				configDetector.general.maxFeatures = maxFeatures;
-				configDetector.general.radius = 3;
-				configDetector.general.threshold = 1;
-				return FactoryPointTracker.klt(configKlt, configDetector, imageClass, derivClass);
-			}
-			case ST_BRIEF:
-				return FactoryPointTracker. dda_ST_BRIEF(150,
-						new ConfigGeneralDetector(400, 1, 10), imageClass, null);
-			case FH_SURF:
-				return FactoryPointTracker.dda_FH_SURF_Fast(configFH, null, null, imageClass);
-			case ST_SURF_KLT:
-				return FactoryPointTracker.combined_FH_SURF_KLT(
-						configKlt, configHybrid, configFH, null, null, imageClass);
-
-			default:
-				throw new RuntimeException("Unknown tracker: "+type);
-		}
+		return infoPanel.panelTrackers.createTracker(super.getImageType(0));
 	}
 
-	protected StitchingFromMotion2D createAlgorithm( PointTracker<I> tracker ) {
+	protected StitchingFromMotion2D<I,IT> createAlgorithm( PointTracker<I> tracker ) {
 
-		ImageType imageType = super.getImageType(0);
+		ImageType<I> imageType = super.getImageType(0);
 
 		IT fitModel = createFitModelStructure();
 
@@ -184,11 +175,11 @@ public abstract class VideoStitchBaseApp<I extends ImageBase<I>, IT extends Inve
 			ImageMotion2D<I,IT> motion = FactoryMotion2D.createMotion2D(maxIterations,inlierThreshold,2,absoluteMinimumTracks,
 					respawnTrackFraction,respawnCoverageFraction,false,tracker,fitModel);
 
-			ImageMotion2D motion2DColor = new PlToGrayMotion2D(motion,imageClass);
+			ImageMotion2D<I,IT> motion2DColor = new PlToGrayMotion2D(motion,imageClass);
 
 			return FactoryMotion2D.createVideoStitch(maxJumpFraction,motion2DColor, imageType);
 		} else {
-			ImageMotion2D motion = FactoryMotion2D.createMotion2D(maxIterations,inlierThreshold,2,absoluteMinimumTracks,
+			ImageMotion2D<I,IT> motion = FactoryMotion2D.createMotion2D(maxIterations,inlierThreshold,2,absoluteMinimumTracks,
 					respawnTrackFraction,respawnCoverageFraction,false,tracker,fitModel);
 
 			return FactoryMotion2D.createVideoStitch(maxJumpFraction,motion, imageType);
@@ -196,13 +187,11 @@ public abstract class VideoStitchBaseApp<I extends ImageBase<I>, IT extends Inve
 	}
 
 	protected IT createFitModelStructure() {
-		IT fitModel;
-		switch( infoPanel.motionModels ) {
-			case 0: fitModel = (IT)new Affine2D_F64();break;
-			case 1: fitModel = (IT)new Homography2D_F64();break;
-			default:
-				throw new IllegalArgumentException("Unknown motion model");
-		}
+		IT fitModel = switch (infoPanel.motionModels) {
+			case 0 -> (IT)new Affine2D_F64();
+			case 1 -> (IT)new Homography2D_F64();
+			default -> throw new IllegalArgumentException("Unknown motion model");
+		};
 		return fitModel;
 	}
 
@@ -230,7 +219,6 @@ public abstract class VideoStitchBaseApp<I extends ImageBase<I>, IT extends Inve
 	}
 
 	void updateGUI(I frame, BufferedImage imageGUI, final double timeMS) {
-
 		corners = alg.getImageCorners(frame.width,frame.height,null);
 		ConvertBufferedImage.convertTo(alg.getStitchedImage(), stitchOut,true);
 
@@ -241,39 +229,35 @@ public abstract class VideoStitchBaseApp<I extends ImageBase<I>, IT extends Inve
 
 		AccessPointTracks access = (AccessPointTracks)alg.getMotion();
 
-		List<Point2D_F64> tracks = access.getAllTracks(null);
-		List<Point2D_F64> inliers = new ArrayList<>();
-
-		for( int i = 0; i < tracks.size(); i++ ) {
-			if( access.isTrackInlier(i) )
-				inliers.add( tracks.get(i) );
+		synchronized (trackLock) {
+			allTracks.reset();
+			inliers.clear();
+			for (int i = 0; i < access.getTotalTracks(); i++) {
+				access.getTrackPixel(i, allTracks.grow());
+				if (access.isTrackNew(i))
+					continue;
+				if (access.isTrackInlier(i))
+					inliers.add(allTracks.getTail());
+			}
 		}
 
 		final int numInliers = inliers.size();
-		final int numFeatures = tracks.size();
+		final int numFeatures = allTracks.size();
 
-		showImageView = infoPanel.getShowView();
-
-		gui.setImages(imageGUI, stitchOut);
-		gui.setShowImageView(infoPanel.getShowView());
-		gui.setCorners(corners);
-
-		// toggle on and off showing the active tracks
-		if( infoPanel.getShowInliers())
-			gui.setInliers(inliers);
-		else
-			gui.setInliers(null);
-		if( infoPanel.getShowAll())
-			gui.setAllTracks(tracks);
-		else
-			gui.setAllTracks(null);
+		showImageView = infoPanel.isShowView();
 
 		Homography2D_F64 H = alg.getWorldToCurr(null).invert(null);
-		gui.setCurrToWorld(H);
 
 		// update GUI
 		SwingUtilities.invokeLater(() -> {
 			// update GUI
+			gui.setImages(imageGUI, stitchOut);
+			gui.setCorners(corners);
+			gui.setCurrToWorld(H);
+			synchronized (trackLock) {
+				gui.setInliers(inliers);
+				gui.setAllTracks(allTracks.toList());
+			}
 			infoPanel.setPeriodMS(timeMS);
 			infoPanel.setNumInliers(numInliers);
 			infoPanel.setNumTracks(numFeatures);
@@ -294,5 +278,5 @@ public abstract class VideoStitchBaseApp<I extends ImageBase<I>, IT extends Inve
 	/**
 	 * Checks the location of the stitched region and decides if its location should be reset
 	 */
-	protected abstract boolean checkLocation( StitchingFromMotion2D.Corners corners );
+	protected abstract boolean checkLocation( Quadrilateral_F64 corners );
 }

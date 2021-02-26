@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -18,12 +18,12 @@
 
 package boofcv.demonstrations.sfm.d2;
 
-import boofcv.alg.sfm.d2.StitchingFromMotion2D;
 import boofcv.io.PathLabel;
 import boofcv.io.UtilIO;
 import boofcv.struct.image.GrayF32;
 import boofcv.struct.image.ImageGray;
 import georegression.struct.InvertibleTransform;
+import georegression.struct.shapes.Quadrilateral_F64;
 
 import javax.swing.*;
 import java.util.ArrayList;
@@ -53,6 +53,8 @@ public class VideoStabilizeSequentialPointApp<I extends ImageGray<I>, D extends 
 		respawnCoverageFraction = 0.5;
 		maxJumpFraction = 0.3;
 		inlierThreshold = 4;
+
+		initializeGui();
 	}
 
 	@Override
@@ -73,7 +75,7 @@ public class VideoStabilizeSequentialPointApp<I extends ImageGray<I>, D extends 
 	}
 
 	@Override
-	protected boolean checkLocation(StitchingFromMotion2D.Corners corners) {
+	protected boolean checkLocation( Quadrilateral_F64 corners) {
 		return false;
 	}
 
@@ -84,9 +86,7 @@ public class VideoStabilizeSequentialPointApp<I extends ImageGray<I>, D extends 
 		examples.add(new PathLabel("Rotate", UtilIO.pathExample("rotate.mjpeg")));
 
 		SwingUtilities.invokeLater(()->{
-
-			VideoStabilizeSequentialPointApp app = new VideoStabilizeSequentialPointApp(examples,GrayF32.class);
-
+			var app = new VideoStabilizeSequentialPointApp(examples,GrayF32.class);
 			app.openExample(examples.get(0));
 			app.display("Video Image Stabilize");
 		});

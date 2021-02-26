@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -28,8 +28,9 @@ import georegression.metric.Area2D_F64;
 import georegression.struct.InvertibleTransform;
 import georegression.struct.homography.Homography2D_F64;
 import georegression.struct.point.Point2D_F32;
-import georegression.struct.point.Point2D_F64;
+import georegression.struct.shapes.Quadrilateral_F64;
 import georegression.struct.shapes.RectangleLength2D_I32;
+import org.jetbrains.annotations.Nullable;
 
 /**
  * Stitches together sequences of images using {@link ImageMotion2D}, typically used for image stabilization
@@ -69,7 +70,7 @@ public class StitchingFromMotion2D<I extends ImageBase<I>, IT extends Invertible
 	// Largest allowed fractional change in area
 	private final double maxJumpFraction;
 	// image corners are used to detect large motions
-	private final Corners corners = new Corners();
+	private final Quadrilateral_F64 corners = new Quadrilateral_F64();
 	// size of view area in previous update
 	private double previousArea;
 
@@ -168,12 +169,12 @@ public class StitchingFromMotion2D<I extends ImageBase<I>, IT extends Invertible
 	private boolean checkLargeMotion( int width, int height ) {
 		if (first) {
 			getImageCorners(width, height, corners);
-			previousArea = computeArea(corners);
+			previousArea = Area2D_F64.quadrilateral(corners);
 			first = false;
 		} else {
 			getImageCorners(width, height, corners);
 
-			double area = computeArea(corners);
+			double area = Area2D_F64.quadrilateral(corners);
 
 			double change = Math.max(area/previousArea, previousArea/area) - 1;
 			if (change > maxJumpFraction) {
@@ -183,11 +184,6 @@ public class StitchingFromMotion2D<I extends ImageBase<I>, IT extends Invertible
 		}
 
 		return false;
-	}
-
-	private double computeArea( Corners c ) {
-		return Area2D_F64.triangle(c.p0, c.p1, c.p2) +
-				Area2D_F64.triangle(c.p0, c.p2, c.p3);
 	}
 
 	/**
@@ -292,22 +288,22 @@ public class StitchingFromMotion2D<I extends ImageBase<I>, IT extends Invertible
 	 *
 	 * @return image corners
 	 */
-	public Corners getImageCorners( int width, int height, Corners corners ) {
+	public Quadrilateral_F64 getImageCorners( int width, int height, @Nullable Quadrilateral_F64 corners ) {
 
 		if (corners == null)
-			corners = new Corners();
+			corners = new Quadrilateral_F64();
 
 		int w = width;
 		int h = height;
 
 		tranCurrToWorld.compute(0, 0, work);
-		corners.p0.setTo(work.x, work.y);
+		corners.a.setTo(work.x, work.y);
 		tranCurrToWorld.compute(w, 0, work);
-		corners.p1.setTo(work.x, work.y);
+		corners.b.setTo(work.x, work.y);
 		tranCurrToWorld.compute(w, h, work);
-		corners.p2.setTo(work.x, work.y);
+		corners.c.setTo(work.x, work.y);
 		tranCurrToWorld.compute(0, h, work);
-		corners.p3.setTo(work.x, work.y);
+		corners.d.setTo(work.x, work.y);
 
 		return corners;
 	}
@@ -333,10 +329,4 @@ public class StitchingFromMotion2D<I extends ImageBase<I>, IT extends Invertible
 		return motion;
 	}
 
-	public static class Corners {
-		public Point2D_F64 p0 = new Point2D_F64();
-		public Point2D_F64 p1 = new Point2D_F64();
-		public Point2D_F64 p2 = new Point2D_F64();
-		public Point2D_F64 p3 = new Point2D_F64();
-	}
 }
