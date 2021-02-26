@@ -52,8 +52,8 @@ class TestImageSequenceToSparseScene extends BoofStandardJUnit {
 	@Test void perfect() {
 		var config = new ConfigSequenceToSparseScene();
 		// let's make it run faster
-		config.pairwise.ransacF.iterations = 30;
-		config.pairwise.ransacH.iterations = 30;
+		config.pairwise.score.ransacF.iterations = 30;
+		config.pairwise.score.typeInliers.ransacH.iterations = 30;
 		config.projective.ransac.iterations = 30;
 
 		ImageSequenceToSparseScene<GrayF32> alg = FactorySceneReconstruction.

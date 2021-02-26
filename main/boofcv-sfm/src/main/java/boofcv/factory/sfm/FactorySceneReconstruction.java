@@ -22,6 +22,7 @@ import boofcv.abst.geo.bundle.MetricBundleAdjustmentUtils;
 import boofcv.abst.tracker.PointTracker;
 import boofcv.alg.mvs.MultiViewStereoFromKnownSceneStructure;
 import boofcv.alg.sfm.structure.*;
+import boofcv.alg.sfm.structure.score3d.ScoreFundamentalReprojectionError;
 import boofcv.alg.sfm.structure.score3d.ScoreRatioFundamentalHomography;
 import boofcv.factory.disparity.FactoryStereoDisparity;
 import boofcv.factory.geo.FactoryMultiViewRobust;
@@ -65,11 +66,27 @@ public class FactorySceneReconstruction {
 			config = new ConfigGeneratePairwiseImageGraph();
 
 		ModelMatcher<DMatrixRMaj, AssociatedPair> ransac3D =
-				FactoryMultiViewRobust.fundamentalRansac(config.fundamental, config.ransacF);
-		ModelMatcher<Homography2D_F64, AssociatedPair> ransacH =
-				FactoryMultiViewRobust.homographyRansac(config.homography, config.ransacH);
+				FactoryMultiViewRobust.fundamentalRansac(config.score.fundamental, config.score.ransacF);
 
-		EpipolarScore3D scorer = new ScoreRatioFundamentalHomography(ransac3D, ransacH);
+		EpipolarScore3D scorer =
+				switch (config.score.type) {
+					case MODEL_INLIERS -> {
+						ModelMatcher<Homography2D_F64, AssociatedPair> ransacH =
+								FactoryMultiViewRobust.homographyRansac(
+										config.score.typeInliers.homography, config.score.typeInliers.ransacH);
+
+						var alg = new ScoreRatioFundamentalHomography(ransac3D, ransacH);
+						alg.minimumInliers = config.score.typeInliers.minimumInliers;
+						alg.ratio3D = config.score.typeInliers.ratio3D;
+						yield alg;
+					}
+					case FUNDAMENTAL_ERROR -> {
+						var alg = new ScoreFundamentalReprojectionError(ransac3D);
+						alg.eps = config.score.typeErrors.eps;
+						alg.ratio3D = config.score.typeErrors.ratio3D;
+						yield alg;
+					}
+				};
 
 		return new GeneratePairwiseImageGraph(scorer);
 	}
@@ -109,7 +126,7 @@ public class FactorySceneReconstruction {
 	public static <T extends ImageGray<T>>
 	SparseSceneToDenseCloud<T> sparseSceneToDenseCloud( @Nullable ConfigSparseToDenseCloud config,
 														ImageType<T> imageType ) {
-		if (config==null)
+		if (config == null)
 			config = new ConfigSparseToDenseCloud();
 
 		Class<T> grayType = imageType.getImageClass();
@@ -118,7 +135,7 @@ public class FactorySceneReconstruction {
 		MultiViewStereoFromKnownSceneStructure<T> mvs = s2c.getMultiViewStereo();
 
 		mvs.setStereoDisparity(FactoryStereoDisparity.generic(
-				config.disparity,grayType, GrayF32.class));
+				config.disparity, grayType, GrayF32.class));
 		mvs.getComputeFused().setDisparitySmoother(
 				FactoryStereoDisparity.removeSpeckle(config.smoother, GrayF32.class));
 

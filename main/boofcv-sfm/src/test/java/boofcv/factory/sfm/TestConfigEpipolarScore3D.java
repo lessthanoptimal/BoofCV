@@ -18,22 +18,6 @@
 
 package boofcv.factory.sfm;
 
-import boofcv.struct.Configuration;
+import boofcv.struct.StandardConfigurationChecks;
 
-/**
- * Cofiguration for {@link boofcv.alg.sfm.structure.GeneratePairwiseImageGraph}.
- *
- * @author Peter Abeles
- */
-public class ConfigGeneratePairwiseImageGraph implements Configuration {
-	/** Configuration for how quality of 3D information between two views is scored */
-	public final ConfigEpipolarScore3D score = new ConfigEpipolarScore3D();
-
-	@Override public void checkValidity() {
-		score.checkValidity();
-	}
-
-	public void setTo( ConfigGeneratePairwiseImageGraph src ) {
-		this.score.setTo(src.score);
-	}
-}
+class TestConfigEpipolarScore3D extends StandardConfigurationChecks {}
