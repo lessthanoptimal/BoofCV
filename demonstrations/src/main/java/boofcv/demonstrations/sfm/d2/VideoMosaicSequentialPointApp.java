@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -18,7 +18,6 @@
 
 package boofcv.demonstrations.sfm.d2;
 
-import boofcv.alg.sfm.d2.StitchingFromMotion2D;
 import boofcv.io.PathLabel;
 import boofcv.io.UtilIO;
 import boofcv.struct.image.GrayF32;
@@ -27,6 +26,7 @@ import georegression.struct.InvertibleTransform;
 import georegression.struct.affine.Affine2D_F64;
 import georegression.struct.homography.Homography2D_F64;
 import georegression.struct.point.Point2D_F64;
+import georegression.struct.shapes.Quadrilateral_F64;
 
 import javax.swing.*;
 import java.util.ArrayList;
@@ -41,19 +41,20 @@ import java.util.List;
  * @param <I> Input image type
  * @param <D> Image derivative type
  */
-public class VideoMosaicSequentialPointApp<I extends ImageGray<I>, D extends ImageGray<D>,
-		IT extends InvertibleTransform>
+public class VideoMosaicSequentialPointApp
+		<I extends ImageGray<I>, D extends ImageGray<D>, IT extends InvertibleTransform<IT>>
 		extends VideoStitchBaseApp<I,IT>
 {
-
 	public VideoMosaicSequentialPointApp(List<?> exampleInputs , Class<I> imageType) {
 		super(exampleInputs,new Mosaic2DPanel(),true,imageType);
 
 		absoluteMinimumTracks = 40;
-		respawnTrackFraction = 0.3;
+		respawnTrackFraction = 0.7;
 		respawnCoverageFraction = 0.8;
 		maxJumpFraction = 0.3;
 		inlierThreshold = 4;
+
+		initializeGui();
 	}
 
 	private IT createInitialTransform() {
@@ -86,14 +87,14 @@ public class VideoMosaicSequentialPointApp<I extends ImageGray<I>, D extends Ima
 	}
 
 	@Override
-	protected boolean checkLocation(StitchingFromMotion2D.Corners corners) {
-		if( closeToBorder(corners.p0) )
+	protected boolean checkLocation( Quadrilateral_F64 corners) {
+		if( closeToBorder(corners.a) )
 			return true;
-		if( closeToBorder(corners.p1) )
+		if( closeToBorder(corners.b) )
 			return true;
-		if( closeToBorder(corners.p2) )
+		if( closeToBorder(corners.c) )
 			return true;
-		if( closeToBorder(corners.p3) )
+		if( closeToBorder(corners.d) )
 			return true;
 
 		return false;

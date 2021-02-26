@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -18,62 +18,63 @@
 
 package boofcv.demonstrations.sfm.d2;
 
+import boofcv.factory.tracker.ConfigPointTracker;
 import boofcv.gui.StandardAlgConfigPanel;
+import boofcv.gui.controls.ControlPanelPointTrackers;
+import lombok.Getter;
+import org.jetbrains.annotations.Nullable;
 
 import javax.swing.*;
 import javax.swing.border.EtchedBorder;
 import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.awt.event.ItemEvent;
-import java.awt.event.ItemListener;
 
 /**
  * Provides info related to image motion estimation and distortion
  *
  * @author Peter Abeles
  */
-public class ImageMotionInfoPanel extends StandardAlgConfigPanel
-		implements ItemListener, ActionListener {
+public class ImageMotionInfoPanel extends StandardAlgConfigPanel {
+
+	/** User requested that the algorithm's configuration be changed */
+	@Nullable AlgorithmListener listenerAlg;
+
+	/** User requested that the visualization is changed */
+	@Nullable VisualizationListener listenerVis;
+
+	final ConfigPointTracker configTracker = new ConfigPointTracker();
+
+	int motionModels = 0;
+
+	@Getter boolean showView = true;
+	@Getter boolean showInliers = false;
+	@Getter boolean showAll = false;
+	boolean shouldReset = false;
 
 	JButton resetButton;
-	JCheckBox showView;
-	JComboBox<String> spinnerTracker = combo(0,(Object[])FeatureTrackerTypes.getTrackerNames().toArray(new String[0]));
+	JCheckBox checkShowView = checkbox("Show View",showView);
 	JComboBox<String> spinnerModels = combo(0,"Affine","Homography");
-	JCheckBox showInliers;
-	JCheckBox showAll;
+	JCheckBox checkShowInliers = checkbox("Show Inliers",showInliers);
+	JCheckBox checkShowAll = checkbox("Show All",showAll);
 	JTextArea displayPeriodMS;
 	JTextArea displayNumKeyFrames;
 	JTextArea displayNumTracks;
 	JTextArea displayNumInliers;
+	ControlPanelPointTrackers panelTrackers;
 
-	int tracker = 0;
-	int motionModels = 0;
+	public ImageMotionInfoPanel() {}
 
-	boolean setShowView = true;
-	boolean setShowInliers = false;
-	boolean setShowAll = false;
-	boolean shouldReset = false;
+	public void initializeGui() {
+		// Declare the panel here so that the user can do complex modifications to the config first
+		panelTrackers = new ControlPanelPointTrackers(()->{
+			if (listenerAlg!=null)
+				listenerAlg.handleUserChangeAlgorithm();
+		},configTracker);
 
-	ImageMotionInfoPanel.Listener listener;
-
-	public ImageMotionInfoPanel( ImageMotionInfoPanel.Listener listener ) {
-		this.listener = listener;
 		setLayout(new BoxLayout(this,BoxLayout.Y_AXIS));
 		setBorder(BorderFactory.createEtchedBorder(EtchedBorder.RAISED));
 
 		resetButton = new JButton("Reset");
 		resetButton.addActionListener(this);
-
-		showView = new JCheckBox("View");
-		showView.addItemListener(this);
-		showView.setSelected(setShowView);
-		showAll = new JCheckBox("Show All");
-		showAll.addItemListener(this);
-		showAll.setSelected(setShowAll);
-		showInliers = new JCheckBox("Show Inliers");
-		showInliers.addItemListener(this);
-		showInliers.setSelected(setShowInliers);
 
 		displayPeriodMS = createTextInfo();
 		displayNumKeyFrames = createTextInfo();
@@ -81,18 +82,19 @@ public class ImageMotionInfoPanel extends StandardAlgConfigPanel
 		displayNumInliers = createTextInfo();
 
 		addLabeled(displayPeriodMS,"Period (ms)");
-		addAlignLeft(showView);
-		addLabeled(spinnerTracker,"Trackers");
+		addAlignLeft(checkShowView);
 		addLabeled(spinnerModels,"Models");
-		addAlignLeft(showAll);
-		addAlignLeft(showInliers);
+		addAlignLeft(checkShowAll);
+		addAlignLeft(checkShowInliers);
 		addSeparator(200);
 		addLabeled(displayNumKeyFrames,"Resets:");
 		addLabeled(displayNumTracks,"Tracks:");
 		addLabeled(displayNumInliers,"Inliers:");
+		add(panelTrackers);
 		addAlignLeft(resetButton);
 
-		setPreferredSize(new Dimension(200,300));
+		setPreferredSize(new Dimension(200,650));
+		setMaximumSize(getPreferredSize());
 	}
 
 	private JTextArea createTextInfo() {
@@ -102,27 +104,25 @@ public class ImageMotionInfoPanel extends StandardAlgConfigPanel
 		return comp;
 	}
 
-	@Override
-	public void actionPerformed(ActionEvent e) {
-		if( e.getSource() == resetButton ) {
+	@Override public void controlChanged( Object source ) {
+		if( source == resetButton ) {
 			shouldReset = true;
-		} else if( e.getSource() == spinnerTracker ) {
-			tracker = spinnerTracker.getSelectedIndex();
-			listener.handleUserChangeAlgorithm();
-		} else if( e.getSource() == spinnerModels ) {
+		} else if( source == spinnerModels ) {
 			motionModels = spinnerModels.getSelectedIndex();
-			listener.handleUserChangeAlgorithm();
-		}
-	}
-
-	@Override
-	public void itemStateChanged(ItemEvent e) {
-		if( e.getItem() == showInliers) {
-			setShowInliers = e.getStateChange() != ItemEvent.DESELECTED;
-		} else if( e.getItem() == showAll) {
-			setShowAll = e.getStateChange() != ItemEvent.DESELECTED;
-		} else if( e.getItem() == showView ) {
-			setShowView = e.getStateChange() != ItemEvent.DESELECTED;
+			if (listenerAlg!=null)
+				listenerAlg.handleUserChangeAlgorithm();
+		} else if( source == checkShowInliers) {
+			showInliers = checkShowInliers.isSelected();
+			if (listenerVis!=null)
+				listenerVis.handleUserChangeVisualization();
+		} else if( source == checkShowAll) {
+			showAll = checkShowAll.isSelected();
+			if (listenerVis!=null)
+				listenerVis.handleUserChangeVisualization();
+		} else if( source == checkShowView) {
+			showView = checkShowView.isSelected();
+			if (listenerVis!=null)
+				listenerVis.handleUserChangeVisualization();
 		}
 	}
 
@@ -142,18 +142,6 @@ public class ImageMotionInfoPanel extends StandardAlgConfigPanel
 		displayNumInliers.setText(String.format("%5d",totalInliers));
 	}
 
-	public boolean getShowInliers() {
-		return setShowInliers;
-	}
-
-	public boolean getShowAll() {
-		return setShowAll;
-	}
-
-	public boolean getShowView() {
-		return setShowView;
-	}
-
 	public boolean resetRequested() {
 		if( shouldReset ) {
 			shouldReset = false;
@@ -162,7 +150,11 @@ public class ImageMotionInfoPanel extends StandardAlgConfigPanel
 		return false;
 	}
 
-	public interface Listener {
+	public interface AlgorithmListener {
 		void handleUserChangeAlgorithm();
+	}
+
+	public interface VisualizationListener {
+		void handleUserChangeVisualization();
 	}
 }
