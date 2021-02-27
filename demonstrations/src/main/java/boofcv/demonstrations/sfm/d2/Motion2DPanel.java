@@ -54,7 +54,7 @@ public abstract class Motion2DPanel extends ImagePanel {
 
 	BasicStroke boundsStroke = new BasicStroke(5.0f);
 
-	public Motion2DPanel() {
+	protected Motion2DPanel() {
 		setScaling(ScaleOptions.DOWN);
 	}
 
