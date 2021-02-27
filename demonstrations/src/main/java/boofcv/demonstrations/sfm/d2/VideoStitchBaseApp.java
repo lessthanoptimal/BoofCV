@@ -73,6 +73,9 @@ public abstract class VideoStitchBaseApp<I extends ImageBase<I>, IT extends Inve
 	// number of times stitching has failed and it was reset
 	int totalResets;
 
+	// what video frame is being processed
+	long frameID;
+
 	private final static int maxIterations = 100;
 
 	protected Motion2DPanel gui;
@@ -217,6 +220,8 @@ public abstract class VideoStitchBaseApp<I extends ImageBase<I>, IT extends Inve
 		}
 		long time1 = System.nanoTime();
 
+		this.frameID = frameID;
+
 		updateGUI((I)input, buffered, (time1 - time0)*1e-6);
 	}
 
@@ -261,6 +266,7 @@ public abstract class VideoStitchBaseApp<I extends ImageBase<I>, IT extends Inve
 				gui.setAllTracks(allTracks.toList());
 			}
 			infoPanel.setPeriodMS(timeMS);
+			infoPanel.setFrameID(frameID);
 			infoPanel.setNumInliers(numInliers);
 			infoPanel.setNumTracks(numFeatures);
 			infoPanel.setKeyFrames(totalResets);

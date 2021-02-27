@@ -56,6 +56,7 @@ public class ImageMotionInfoPanel extends StandardAlgConfigPanel {
 	JCheckBox checkShowInliers = checkbox("Show Inliers", showInliers);
 	JCheckBox checkShowAll = checkbox("Show All", showAll);
 	JTextArea displayPeriodMS;
+	JTextArea displayFrameID;
 	JTextArea displayNumKeyFrames;
 	JTextArea displayNumTracks;
 	JTextArea displayNumInliers;
@@ -77,11 +78,13 @@ public class ImageMotionInfoPanel extends StandardAlgConfigPanel {
 		resetButton.addActionListener(this);
 
 		displayPeriodMS = createTextInfo();
+		displayFrameID = createTextInfo();
 		displayNumKeyFrames = createTextInfo();
 		displayNumTracks = createTextInfo();
 		displayNumInliers = createTextInfo();
 
 		addLabeled(displayPeriodMS, "Period (ms)");
+		addLabeled(displayFrameID, "Frame");
 		addAlignLeft(checkShowView);
 		addLabeled(spinnerModels, "Models");
 		addAlignLeft(checkShowAll);
@@ -128,6 +131,10 @@ public class ImageMotionInfoPanel extends StandardAlgConfigPanel {
 
 	public void setPeriodMS( double period ) {
 		displayPeriodMS.setText(String.format("%5.1f", period));
+	}
+
+	public void setFrameID( long frame ) {
+		displayFrameID.setText(String.format("%5d", frame));
 	}
 
 	public void setKeyFrames( int totalFaults ) {
