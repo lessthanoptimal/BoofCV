@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -17,8 +17,6 @@
  */
 
 package boofcv.demonstrations.sfm.d2;
-
-import georegression.struct.homography.Homography2D_F64;
 
 import java.awt.*;
 
@@ -38,29 +36,7 @@ public class Stabilize2DPanel extends Motion2DPanel {
 	}
 
 	@Override
-	protected void drawImages( double scale , Graphics2D g2 ) {
-		int scaledInputWidth = (int)(scale*input.getWidth());
-		int scaledInputHeight = (int)(scale*input.getHeight());
-
-		int scaledOutputWidth = (int)(scale* stitched.getWidth());
-		int scaledOutputHeight = (int)(scale* stitched.getHeight());
-
-		distortOffX = scaledInputWidth + outputBorder;
-
-		// draw undistorted on left
-		g2.drawImage(input,0,0,scaledInputWidth,scaledInputHeight,0,0,input.getWidth(),input.getHeight(),null);
-
-		// draw distorted on right
-		g2.drawImage(stitched,scaledInputWidth+outputBorder,0,
-				scaledInputWidth+scaledOutputWidth+outputBorder,scaledOutputHeight,
-				0,0,stitched.getWidth(),stitched.getHeight(),null);
-	}
-
-	@Override
-	protected void drawFeatures( float scale, Graphics2D g2  ) {
-		int scaledInputWidth = (int)(scale*input.getWidth());
-
-		drawFeatures(scale,0,0,allTracks,inliers,new Homography2D_F64(),g2);
-		drawFeatures(scale,scaledInputWidth+outputBorder,0,allTracks,inliers,currToWorld,g2);
+	protected void drawFeatures( Graphics2D g2  ) {
+		drawFeatures(allTracks,inliers,currToWorld,g2);
 	}
 }

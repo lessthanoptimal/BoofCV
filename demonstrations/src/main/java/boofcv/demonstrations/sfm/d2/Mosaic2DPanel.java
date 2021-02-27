@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -24,7 +24,6 @@ import java.awt.*;
  * @author Peter Abeles
  */
 public class Mosaic2DPanel extends Motion2DPanel {
-
 	public void setMosaicSize( int width , int height ) {
 		windowWidth = width;
 		windowHeight = height;
@@ -34,16 +33,7 @@ public class Mosaic2DPanel extends Motion2DPanel {
 	}
 
 	@Override
-	protected void drawImages( double scale , Graphics2D g2 ) {
-		int scaledWidth = (int)(scale* stitched.getWidth());
-		int scaledHeight = (int)(scale* stitched.getHeight());
-
-		// draw stabilized on right
-		g2.drawImage(stitched,0,0,scaledWidth,scaledHeight,0,0, stitched.getWidth(), stitched.getHeight(),null);
-	}
-
-	@Override
-	protected void drawFeatures( float scale, Graphics2D g2  ) {
-		drawFeatures(scale, 0, 0, allTracks, inliers, currToWorld, g2);
+	protected void drawFeatures( Graphics2D g2  ) {
+		drawFeatures(allTracks, inliers, currToWorld, g2);
 	}
 }

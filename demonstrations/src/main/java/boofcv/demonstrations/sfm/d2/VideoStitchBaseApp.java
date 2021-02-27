@@ -258,7 +258,7 @@ public abstract class VideoStitchBaseApp<I extends ImageBase<I>, IT extends Inve
 		// update GUI
 		SwingUtilities.invokeLater(() -> {
 			// update GUI
-			gui.setImages(imageGUI, stitchOut);
+			gui.setImage(stitchOut);
 			gui.setCorners(corners);
 			gui.setCurrToWorld(H);
 			synchronized (trackLock) {
