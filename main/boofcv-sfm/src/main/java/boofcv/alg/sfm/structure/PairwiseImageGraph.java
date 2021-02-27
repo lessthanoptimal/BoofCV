@@ -21,7 +21,6 @@ package boofcv.alg.sfm.structure;
 import boofcv.struct.feature.AssociatedIndex;
 import org.ddogleg.struct.DogArray;
 import org.ddogleg.struct.FastArray;
-import org.ejml.data.DMatrixRMaj;
 
 import java.util.HashMap;
 import java.util.List;
@@ -35,7 +34,7 @@ import java.util.Map;
 public class PairwiseImageGraph {
 
 	public DogArray<View> nodes = new DogArray<>(View::new);
-	public DogArray<Motion> edges = new DogArray<>(Motion::new);
+	public DogArray<Motion> edges = new DogArray<>(Motion::new, Motion::reset);
 
 	public Map<String, View> mapNodes = new HashMap<>();
 
@@ -119,27 +118,24 @@ public class PairwiseImageGraph {
 	}
 
 	public static class Motion {
-		/** 3x3 matrix describing epipolar geometry. Fundamental, Essential, or Homography */
-		public final DMatrixRMaj F = new DMatrixRMaj(3, 3);
 		/** if this camera motion is known up to a metric transform. otherwise it will be projective */
 		public boolean is3D;
 		/** 3D information score. See {@link EpipolarScore3D} */
 		public double score3D;
-		/** Indexes of features in 'src' and 'dst' views which are inliers to the model {@link #F} */
+		/** Indexes of features in 'src' and 'dst' views which are inliers to the model */
 		public final DogArray<AssociatedIndex> inliers = new DogArray<>(AssociatedIndex::new);
-
 		/** Two views that this motion connects */
 		public View src, dst;
-
 		/** Index of motion in {@link #edges} */
 		public int index;
 
-		public void init() {
-			F.zero();
+		public void reset() {
 			is3D = false;
-			index = -1;
+			score3D = 0;
+			inliers.reset();
 			src = null;
 			dst = null;
+			index = -1;
 		}
 
 		public boolean isConnected( View v ) {

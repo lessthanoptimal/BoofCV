@@ -85,7 +85,6 @@ public class MultiViewIO {
 			element.put("score_3d", pmotion.score3D);
 			element.put("src", pmotion.src.id);
 			element.put("dst", pmotion.dst.id);
-			element.put("F", pmotion.F.data);
 			element.put("inliers", encodeInliers(pmotion.inliers));
 		}
 
@@ -401,7 +400,6 @@ public class MultiViewIO {
 				m.src = getOrThrow(graph.mapNodes, getOrThrow(yamlMotion, "src"));
 				m.dst = getOrThrow(graph.mapNodes, getOrThrow(yamlMotion, "dst"));
 				m.index = i;
-				copyIntoMatrix(getOrThrow(yamlMotion, "F"), m.F);
 				decodeInliers(getOrThrow(yamlMotion, "inliers"), m.inliers);
 			}
 		} catch (IOException e) {

@@ -52,7 +52,7 @@ public class GeneratePairwiseImageGraph implements VerbosePrint {
 	/**
 	 * Specifies consensus matching algorithms
 	 */
-	public GeneratePairwiseImageGraph(EpipolarScore3D epipolarScore) {
+	public GeneratePairwiseImageGraph( EpipolarScore3D epipolarScore ) {
 		this.epipolarScore = epipolarScore;
 	}
 
@@ -130,7 +130,7 @@ public class GeneratePairwiseImageGraph implements VerbosePrint {
 	protected void createEdge( String src, String dst,
 							   DogArray<AssociatedPair> pairs, DogArray<AssociatedIndex> matches ) {
 
-		DMatrixRMaj fundamental = new DMatrixRMaj(3,3);
+		DMatrixRMaj fundamental = new DMatrixRMaj(3, 3);
 		DogArray_I32 inlierIdx = new DogArray_I32();
 
 		if (!epipolarScore.process(pairs.toList(), fundamental, inlierIdx)) {
@@ -146,8 +146,11 @@ public class GeneratePairwiseImageGraph implements VerbosePrint {
 		edge.dst = graph.lookupNode(dst);
 		edge.src.connections.add(edge);
 		edge.dst.connections.add(edge);
+
+		// Allocate memory and copy inliers
+		edge.inliers.resize(inlierIdx.size);
 		for (int i = 0; i < inlierIdx.size; i++) {
-			edge.inliers.grow().setTo(matches.get(inlierIdx.get(i)));
+			edge.inliers.get(i).setTo(matches.get(inlierIdx.get(i)));
 		}
 	}
 

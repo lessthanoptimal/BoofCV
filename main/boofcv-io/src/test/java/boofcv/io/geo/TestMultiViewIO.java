@@ -90,7 +90,6 @@ class TestMultiViewIO extends BoofStandardJUnit {
 				assertEquals(ma.src.id, mb.src.id);
 				assertEquals(ma.dst.id, mb.dst.id);
 				assertEquals(ma.score3D, mb.score3D);
-				assertTrue(MatrixFeatures_DDRM.isEquals(ma.F, mb.F, UtilEjml.EPS));
 				assertEquals(ma.inliers.size, mb.inliers.size);
 				for (int j = 0; j < ma.inliers.size; j++) {
 					AssociatedIndex ia = ma.inliers.get(j);
@@ -124,7 +123,6 @@ class TestMultiViewIO extends BoofStandardJUnit {
 				m.src = v;
 				m.dst = ret.nodes.get(candidates.get(i));
 				m.index = ret.edges.size - 1;
-				RandomMatrices_DDRM.fillUniform(m.F, rand);
 				m.inliers.resize(rand.nextInt(20));
 				for (int j = 0; j < m.inliers.size; j++) {
 					AssociatedIndex a = m.inliers.get(j);
