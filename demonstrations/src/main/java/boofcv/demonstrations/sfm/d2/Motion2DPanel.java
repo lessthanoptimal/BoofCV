@@ -29,6 +29,7 @@ import org.ddogleg.struct.DogArray;
 import org.jetbrains.annotations.Nullable;
 
 import java.awt.*;
+import java.awt.image.BufferedImage;
 
 /**
  * Base class for visualizing 2d image stitching video demos
@@ -58,6 +59,10 @@ public abstract class Motion2DPanel extends ImagePanel {
 		setScaling(ScaleOptions.DOWN);
 	}
 
+	public void updateImages( BufferedImage input, BufferedImage stitched ) {
+		setImage(stitched);
+	}
+
 	public void setCorners( Quadrilateral_F64 corners ) {
 		this.corners.setTo(corners);
 	}
@@ -76,7 +81,7 @@ public abstract class Motion2DPanel extends ImagePanel {
 	public void paintComponent( Graphics g ) {
 		super.paintComponent(g);
 
-		if (img==null)
+		if (img == null)
 			return;
 
 		Graphics2D g2 = (Graphics2D)g;
@@ -94,29 +99,30 @@ public abstract class Motion2DPanel extends ImagePanel {
 	/**
 	 * Draw features after applying a homography transformation.
 	 */
-	protected void drawFeatures( DogArray<Point2D_F64> all,
+	protected void drawFeatures( int offsetX,
+								 DogArray<Point2D_F64> all,
 								 DogArray<Point2D_F64> inliers,
 								 Homography2D_F64 currToGlobal, Graphics2D g2 ) {
 
 		Point2D_F64 distPt = new Point2D_F64();
 
 		if (showAll) {
-			drawPoints(all, currToGlobal, g2, distPt, Color.RED);
+			drawPoints(offsetX, all, currToGlobal, g2, distPt, Color.RED);
 		}
 
 		if (showInliers) {
-			drawPoints(inliers, currToGlobal, g2, distPt, Color.BLUE);
+			drawPoints(offsetX, inliers, currToGlobal, g2, distPt, Color.BLUE);
 		}
 	}
 
-	private void drawPoints( DogArray<Point2D_F64> all, Homography2D_F64 currToGlobal, Graphics2D g2, Point2D_F64 distPt, Color red ) {
+	private void drawPoints( int extraOffsetX, DogArray<Point2D_F64> all, Homography2D_F64 currToGlobal, Graphics2D g2, Point2D_F64 distPt, Color red ) {
 		for (int i = 0; i < all.size; i++) {
 			HomographyPointOps_F64.transform(currToGlobal, all.get(i), distPt);
 
-			distPt.x = offsetX + distPt.x*scale;
+			distPt.x = extraOffsetX + offsetX + distPt.x*scale;
 			distPt.y = offsetY + distPt.y*scale;
 
-			VisualizeFeatures.drawPoint(g2, (int)(distPt.x+0.5), (int)(distPt.y+0.5), red);
+			VisualizeFeatures.drawPoint(g2, (int)(distPt.x + 0.5), (int)(distPt.y + 0.5), red);
 		}
 	}
 

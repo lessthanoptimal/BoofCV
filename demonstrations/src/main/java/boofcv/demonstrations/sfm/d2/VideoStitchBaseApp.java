@@ -255,10 +255,13 @@ public abstract class VideoStitchBaseApp<I extends ImageBase<I>, IT extends Inve
 
 		Homography2D_F64 H = alg.getWorldToCurr(null).invert(null);
 
+		// NOTE: imageGUI and stitchOut could be modified while this is being called..
+		//       should double buffer to be safe and avoid artifacts
+		// Doing this outside of UI thread to avoid slowing the UI down, but more chance of artifacts
+		gui.updateImages(imageGUI, stitchOut);
+
 		// update GUI
 		SwingUtilities.invokeLater(() -> {
-			// update GUI
-			gui.setImage(stitchOut);
 			gui.setCorners(corners);
 			gui.setCurrToWorld(H);
 			synchronized (trackLock) {

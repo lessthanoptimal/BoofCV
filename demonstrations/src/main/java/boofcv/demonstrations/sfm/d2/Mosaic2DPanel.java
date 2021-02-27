@@ -24,16 +24,16 @@ import java.awt.*;
  * @author Peter Abeles
  */
 public class Mosaic2DPanel extends Motion2DPanel {
-	public void setMosaicSize( int width , int height ) {
+	public void setMosaicSize( int width, int height ) {
 		windowWidth = width;
 		windowHeight = height;
 
-		setPreferredSize(new Dimension(windowWidth,windowHeight));
+		setPreferredSize(new Dimension(windowWidth, windowHeight));
 		setMinimumSize(getPreferredSize());
 	}
 
 	@Override
-	protected void drawFeatures( Graphics2D g2  ) {
-		drawFeatures(allTracks, inliers, currToWorld, g2);
+	protected void drawFeatures( Graphics2D g2 ) {
+		drawFeatures(0, allTracks, inliers, currToWorld, g2);
 	}
 }

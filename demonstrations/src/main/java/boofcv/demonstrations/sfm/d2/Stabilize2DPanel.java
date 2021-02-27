@@ -18,7 +18,10 @@
 
 package boofcv.demonstrations.sfm.d2;
 
+import georegression.struct.homography.Homography2D_F64;
+
 import java.awt.*;
+import java.awt.image.BufferedImage;
 
 /**
  * @author Peter Abeles
@@ -27,16 +30,32 @@ public class Stabilize2DPanel extends Motion2DPanel {
 
 	private static int outputBorder = 20;
 
-	public void setInputSize( int width , int height ) {
+	private int imageWidth;
+
+	// Buffered image with the combined output
+	BufferedImage combined = new BufferedImage(1, 1, BufferedImage.TYPE_INT_ARGB);
+
+	public void setInputSize( int width, int height ) {
+		imageWidth = width;
 		windowWidth = 2*width + outputBorder;
 		windowHeight = height;
 
-		setPreferredSize(new Dimension(windowWidth,windowHeight));
+		combined = new BufferedImage(windowWidth, windowHeight, BufferedImage.TYPE_INT_ARGB);
+		setPreferredSize(new Dimension(windowWidth, windowHeight));
 		setMinimumSize(getPreferredSize());
 	}
 
 	@Override
-	protected void drawFeatures( Graphics2D g2  ) {
-		drawFeatures(allTracks,inliers,currToWorld,g2);
+	public void updateImages( BufferedImage input, BufferedImage stitched ) {
+		Graphics2D g2 = combined.createGraphics();
+		g2.drawImage(input, 0, 0, null);
+		g2.drawImage(stitched, outputBorder + imageWidth, 0, null);
+		setImage(combined);
+	}
+
+	@Override
+	protected void drawFeatures( Graphics2D g2 ) {
+		drawFeatures(0, allTracks, inliers, currToWorld, g2);
+		drawFeatures(outputBorder + imageWidth, allTracks, inliers, new Homography2D_F64(), g2);
 	}
 }

@@ -48,7 +48,7 @@ public class VideoMosaicSequentialPointApp
 		super(exampleInputs, new Mosaic2DPanel(), true, imageType);
 
 		absoluteMinimumTracks = 40;
-		respawnTrackFraction = 0.7;
+		respawnTrackFraction = 0.4;
 		respawnCoverageFraction = 0.8;
 		maxJumpFraction = 0.3;
 		inlierThreshold = 4;
