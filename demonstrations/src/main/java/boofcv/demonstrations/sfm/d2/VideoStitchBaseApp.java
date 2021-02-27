@@ -52,8 +52,7 @@ import java.util.List;
  * @author Peter Abeles
  */
 public abstract class VideoStitchBaseApp<I extends ImageBase<I>, IT extends InvertibleTransform>
-		extends DemonstrationBase implements ImageMotionInfoPanel.AlgorithmListener
-{
+		extends DemonstrationBase implements ImageMotionInfoPanel.AlgorithmListener {
 	// size of the image being stitched into
 	int stitchWidth;
 	int stitchHeight;
@@ -68,7 +67,7 @@ public abstract class VideoStitchBaseApp<I extends ImageBase<I>, IT extends Inve
 
 	BufferedImage stitchOut;
 
-	StitchingFromMotion2D<I,IT> alg;
+	StitchingFromMotion2D<I, IT> alg;
 	Quadrilateral_F64 corners;
 
 	// number of times stitching has failed and it was reset
@@ -98,14 +97,14 @@ public abstract class VideoStitchBaseApp<I extends ImageBase<I>, IT extends Inve
 
 	// TODO Specify tracker and motion model in info panel
 
-	protected VideoStitchBaseApp(List<?> exampleInputs , Motion2DPanel gui, boolean color , Class imageType ) {
-		super(true,true,exampleInputs,
+	protected VideoStitchBaseApp( List<?> exampleInputs, Motion2DPanel gui, boolean color, Class imageType ) {
+		super(true, true, exampleInputs,
 				color ? ImageType.pl(3, imageType) : ImageType.single(imageType));
 
 		this.gui = gui;
 		gui.addMouseListener(new MouseAdapter() {
 			@Override
-			public void mousePressed(MouseEvent e) {
+			public void mousePressed( MouseEvent e ) {
 				streamPaused = !streamPaused;
 			}
 		});
@@ -127,10 +126,13 @@ public abstract class VideoStitchBaseApp<I extends ImageBase<I>, IT extends Inve
 
 	protected void initializeGui() {
 		infoPanel.listenerAlg = this;
-		infoPanel.listenerVis = ()->{updateShowFlags();repaint();};
+		infoPanel.listenerVis = () -> {
+			updateShowFlags();
+			repaint();
+		};
 		infoPanel.initializeGui();
 		add(infoPanel, BorderLayout.WEST);
-		add(gui,BorderLayout.CENTER);
+		add(gui, BorderLayout.CENTER);
 
 		updateShowFlags();
 	}
@@ -141,15 +143,15 @@ public abstract class VideoStitchBaseApp<I extends ImageBase<I>, IT extends Inve
 		gui.showImageView = infoPanel.showView;
 	}
 
-	protected void setStitchImageSize( int width , int height ) {
+	protected void setStitchImageSize( int width, int height ) {
 		this.stitchWidth = width;
 		this.stitchHeight = height;
 
-		stitchOut = new BufferedImage(stitchWidth, stitchHeight,BufferedImage.TYPE_INT_RGB);
+		stitchOut = new BufferedImage(stitchWidth, stitchHeight, BufferedImage.TYPE_INT_RGB);
 	}
 
 	@Override
-	protected void configureVideo(int which, SimpleImageSequence sequence) {
+	protected void configureVideo( int which, SimpleImageSequence sequence ) {
 		super.configureVideo(which, sequence);
 		sequence.setLoop(true);
 	}
@@ -163,26 +165,26 @@ public abstract class VideoStitchBaseApp<I extends ImageBase<I>, IT extends Inve
 		return infoPanel.panelTrackers.createTracker(super.getImageType(0));
 	}
 
-	protected StitchingFromMotion2D<I,IT> createAlgorithm( PointTracker<I> tracker ) {
+	protected StitchingFromMotion2D<I, IT> createAlgorithm( PointTracker<I> tracker ) {
 
 		ImageType<I> imageType = super.getImageType(0);
 
 		IT fitModel = createFitModelStructure();
 
-		if( imageType.getFamily() == ImageType.Family.PLANAR) {
+		if (imageType.getFamily() == ImageType.Family.PLANAR) {
 			Class imageClass = imageType.getImageClass();
 
-			ImageMotion2D<I,IT> motion = FactoryMotion2D.createMotion2D(maxIterations,inlierThreshold,2,absoluteMinimumTracks,
-					respawnTrackFraction,respawnCoverageFraction,false,tracker,fitModel);
+			ImageMotion2D<I, IT> motion = FactoryMotion2D.createMotion2D(maxIterations, inlierThreshold, 2, absoluteMinimumTracks,
+					respawnTrackFraction, respawnCoverageFraction, false, tracker, fitModel);
 
-			ImageMotion2D<I,IT> motion2DColor = new PlToGrayMotion2D(motion,imageClass);
+			ImageMotion2D<I, IT> motion2DColor = new PlToGrayMotion2D(motion, imageClass);
 
-			return FactoryMotion2D.createVideoStitch(maxJumpFraction,motion2DColor, imageType);
+			return FactoryMotion2D.createVideoStitch(maxJumpFraction, motion2DColor, imageType);
 		} else {
-			ImageMotion2D<I,IT> motion = FactoryMotion2D.createMotion2D(maxIterations,inlierThreshold,2,absoluteMinimumTracks,
-					respawnTrackFraction,respawnCoverageFraction,false,tracker,fitModel);
+			ImageMotion2D<I, IT> motion = FactoryMotion2D.createMotion2D(maxIterations, inlierThreshold, 2, absoluteMinimumTracks,
+					respawnTrackFraction, respawnCoverageFraction, false, tracker, fitModel);
 
-			return FactoryMotion2D.createVideoStitch(maxJumpFraction,motion, imageType);
+			return FactoryMotion2D.createVideoStitch(maxJumpFraction, motion, imageType);
 		}
 	}
 
@@ -196,33 +198,33 @@ public abstract class VideoStitchBaseApp<I extends ImageBase<I>, IT extends Inve
 	}
 
 	@Override
-	public void processImage(int sourceID, long frameID, BufferedImage buffered, ImageBase input) {
-		if( algorithmChanged ) {
+	public void processImage( int sourceID, long frameID, BufferedImage buffered, ImageBase input ) {
+		if (algorithmChanged) {
 			algorithmChanged = false;
 			handleAlgorithmChange();
 		}
 
-		if( alg == null )
+		if (alg == null)
 			return;
 
 		long time0 = System.nanoTime();
-		if( infoPanel.resetRequested() ) {
+		if (infoPanel.resetRequested()) {
 			totalResets = 0;
 			alg.reset();
-		} else if( !alg.process((I)input) ) {
+		} else if (!alg.process((I)input)) {
 			alg.reset();
 			totalResets++;
 		}
 		long time1 = System.nanoTime();
 
-		updateGUI((I)input, buffered, (time1-time0)*1e-6 );
+		updateGUI((I)input, buffered, (time1 - time0)*1e-6);
 	}
 
-	void updateGUI(I frame, BufferedImage imageGUI, final double timeMS) {
-		corners = alg.getImageCorners(frame.width,frame.height,null);
-		ConvertBufferedImage.convertTo(alg.getStitchedImage(), stitchOut,true);
+	void updateGUI( I frame, BufferedImage imageGUI, final double timeMS ) {
+		corners = alg.getImageCorners(frame.width, frame.height, null);
+		ConvertBufferedImage.convertTo(alg.getStitchedImage(), stitchOut, true);
 
-		if( checkLocation(corners) ) {
+		if (checkLocation(corners)) {
 			// the change will only be visible in the next update
 			alg.setOriginToCurrent();
 		}
