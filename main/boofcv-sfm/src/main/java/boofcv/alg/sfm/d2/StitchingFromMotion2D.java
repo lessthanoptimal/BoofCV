@@ -328,5 +328,4 @@ public class StitchingFromMotion2D<I extends ImageBase<I>, IT extends Invertible
 	public ImageMotion2D<I, IT> getMotion() {
 		return motion;
 	}
-
 }

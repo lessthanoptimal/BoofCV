@@ -51,10 +51,10 @@ public class ImageMotionInfoPanel extends StandardAlgConfigPanel {
 	boolean shouldReset = false;
 
 	JButton resetButton;
-	JCheckBox checkShowView = checkbox("Show View",showView);
-	JComboBox<String> spinnerModels = combo(0,"Affine","Homography");
-	JCheckBox checkShowInliers = checkbox("Show Inliers",showInliers);
-	JCheckBox checkShowAll = checkbox("Show All",showAll);
+	JCheckBox checkShowView = checkbox("Show View", showView);
+	JComboBox<String> spinnerModels = combo(0, "Affine", "Homography");
+	JCheckBox checkShowInliers = checkbox("Show Inliers", showInliers);
+	JCheckBox checkShowAll = checkbox("Show All", showAll);
 	JTextArea displayPeriodMS;
 	JTextArea displayNumKeyFrames;
 	JTextArea displayNumTracks;
@@ -65,12 +65,12 @@ public class ImageMotionInfoPanel extends StandardAlgConfigPanel {
 
 	public void initializeGui() {
 		// Declare the panel here so that the user can do complex modifications to the config first
-		panelTrackers = new ControlPanelPointTrackers(()->{
-			if (listenerAlg!=null)
+		panelTrackers = new ControlPanelPointTrackers(() -> {
+			if (listenerAlg != null)
 				listenerAlg.handleUserChangeAlgorithm();
-		},configTracker);
+		}, configTracker);
 
-		setLayout(new BoxLayout(this,BoxLayout.Y_AXIS));
+		setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
 		setBorder(BorderFactory.createEtchedBorder(EtchedBorder.RAISED));
 
 		resetButton = new JButton("Reset");
@@ -81,69 +81,69 @@ public class ImageMotionInfoPanel extends StandardAlgConfigPanel {
 		displayNumTracks = createTextInfo();
 		displayNumInliers = createTextInfo();
 
-		addLabeled(displayPeriodMS,"Period (ms)");
+		addLabeled(displayPeriodMS, "Period (ms)");
 		addAlignLeft(checkShowView);
-		addLabeled(spinnerModels,"Models");
+		addLabeled(spinnerModels, "Models");
 		addAlignLeft(checkShowAll);
 		addAlignLeft(checkShowInliers);
 		addSeparator(200);
-		addLabeled(displayNumKeyFrames,"Resets:");
-		addLabeled(displayNumTracks,"Tracks:");
-		addLabeled(displayNumInliers,"Inliers:");
+		addLabeled(displayNumKeyFrames, "Resets:");
+		addLabeled(displayNumTracks, "Tracks:");
+		addLabeled(displayNumInliers, "Inliers:");
 		add(panelTrackers);
 		addAlignLeft(resetButton);
 
-		setPreferredSize(new Dimension(200,650));
+		setPreferredSize(new Dimension(200, 650));
 		setMaximumSize(getPreferredSize());
 	}
 
 	private JTextArea createTextInfo() {
-		JTextArea comp = new JTextArea(1,6);
+		JTextArea comp = new JTextArea(1, 6);
 		comp.setMaximumSize(comp.getPreferredSize());
 		comp.setEditable(false);
 		return comp;
 	}
 
 	@Override public void controlChanged( Object source ) {
-		if( source == resetButton ) {
+		if (source == resetButton) {
 			shouldReset = true;
-		} else if( source == spinnerModels ) {
+		} else if (source == spinnerModels) {
 			motionModels = spinnerModels.getSelectedIndex();
-			if (listenerAlg!=null)
+			if (listenerAlg != null)
 				listenerAlg.handleUserChangeAlgorithm();
-		} else if( source == checkShowInliers) {
+		} else if (source == checkShowInliers) {
 			showInliers = checkShowInliers.isSelected();
-			if (listenerVis!=null)
+			if (listenerVis != null)
 				listenerVis.handleUserChangeVisualization();
-		} else if( source == checkShowAll) {
+		} else if (source == checkShowAll) {
 			showAll = checkShowAll.isSelected();
-			if (listenerVis!=null)
+			if (listenerVis != null)
 				listenerVis.handleUserChangeVisualization();
-		} else if( source == checkShowView) {
+		} else if (source == checkShowView) {
 			showView = checkShowView.isSelected();
-			if (listenerVis!=null)
+			if (listenerVis != null)
 				listenerVis.handleUserChangeVisualization();
 		}
 	}
 
-	public void setPeriodMS(double period ) {
+	public void setPeriodMS( double period ) {
 		displayPeriodMS.setText(String.format("%5.1f", period));
 	}
 
-	public void setKeyFrames(int totalFaults) {
+	public void setKeyFrames( int totalFaults ) {
 		displayNumKeyFrames.setText(String.format("%5d", totalFaults));
 	}
 
 	public void setNumTracks( int totalTracks ) {
-		displayNumTracks.setText(String.format("%5d",totalTracks));
+		displayNumTracks.setText(String.format("%5d", totalTracks));
 	}
 
-	public void setNumInliers(int totalInliers) {
-		displayNumInliers.setText(String.format("%5d",totalInliers));
+	public void setNumInliers( int totalInliers ) {
+		displayNumInliers.setText(String.format("%5d", totalInliers));
 	}
 
 	public boolean resetRequested() {
-		if( shouldReset ) {
+		if (shouldReset) {
 			shouldReset = false;
 			return true;
 		}

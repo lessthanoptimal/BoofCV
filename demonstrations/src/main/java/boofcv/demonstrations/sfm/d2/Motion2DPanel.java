@@ -35,14 +35,13 @@ import java.awt.image.BufferedImage;
  *
  * @author Peter Abeles
  */
-public abstract class Motion2DPanel extends JPanel
-{
+public abstract class Motion2DPanel extends JPanel {
 	// rendered distorted image
 	BufferedImage stitched;
 	// input image
 	BufferedImage input;
 
-	int windowWidth,windowHeight;
+	int windowWidth, windowHeight;
 	int distortOffX;
 
 	Homography2D_F64 currToWorld = new Homography2D_F64();
@@ -51,39 +50,38 @@ public abstract class Motion2DPanel extends JPanel
 	DogArray<Point2D_F64> inliers = new DogArray<>(300, Point2D_F64::new);
 	DogArray<Point2D_F64> allTracks = new DogArray<>(300, Point2D_F64::new);
 
-	boolean showImageView=true;
-	boolean showAll=false;
-	boolean showInliers=false;
+	boolean showImageView = true;
+	boolean showAll = false;
+	boolean showInliers = false;
 
 	Quadrilateral_F64 corners = new Quadrilateral_F64();
 
 	BasicStroke boundsStroke = new BasicStroke(5.0f);
 
-	public void setImages(BufferedImage input , BufferedImage stitched)
-	{
+	public void setImages( BufferedImage input, BufferedImage stitched ) {
 		this.input = input;
 		this.stitched = stitched;
 	}
 
-	public void setCorners(Quadrilateral_F64 corners) {
+	public void setCorners( Quadrilateral_F64 corners ) {
 		this.corners.setTo(corners);
 	}
 
-	public void setInliers(java.util.List<Point2D_F64> list) {
+	public void setInliers( java.util.List<Point2D_F64> list ) {
 		inliers.reset();
-		inliers.copyAll(list,(s,d)->d.setTo(s));
+		inliers.copyAll(list, ( s, d ) -> d.setTo(s));
 	}
 
-	public synchronized void setAllTracks(@Nullable java.util.List<Point2D_F64> list) {
+	public synchronized void setAllTracks( @Nullable java.util.List<Point2D_F64> list ) {
 		allTracks.reset();
-		allTracks.copyAll(list,(s,d)->d.setTo(s));
+		allTracks.copyAll(list, ( s, d ) -> d.setTo(s));
 	}
 
 	@Override
-	public synchronized void paintComponent(Graphics g) {
+	public synchronized void paintComponent( Graphics g ) {
 		super.paintComponent(g);
 
-		if( stitched == null )
+		if (stitched == null)
 			return;
 
 		Graphics2D g2 = (Graphics2D)g;
@@ -93,28 +91,28 @@ public abstract class Motion2DPanel extends JPanel
 		int w = getWidth();
 		int h = getHeight();
 
-		double scaleX = w/(double) windowWidth;
-		double scaleY = h/(double) windowHeight;
+		double scaleX = w/(double)windowWidth;
+		double scaleY = h/(double)windowHeight;
 
-		double scale = Math.min(scaleX,scaleY);
-		if( scale > 1 ) scale = 1;
+		double scale = Math.min(scaleX, scaleY);
+		if (scale > 1) scale = 1;
 
-		drawImages(scale,g2);
+		drawImages(scale, g2);
 
-		drawFeatures((float)scale,g2);
+		drawFeatures((float)scale, g2);
 //
-		if(showImageView)
-			drawImageBounds(g2,distortOffX,0,scale);
+		if (showImageView)
+			drawImageBounds(g2, distortOffX, 0, scale);
 	}
 
-	protected abstract void drawImages( double scale , Graphics2D g2 );
+	protected abstract void drawImages( double scale, Graphics2D g2 );
 
-	protected abstract void drawFeatures( float scale, Graphics2D g2  );
+	protected abstract void drawFeatures( float scale, Graphics2D g2 );
 
 	/**
 	 * Draw features after applying a homography transformation.
 	 */
-	protected void drawFeatures( float scale , int offsetX , int offsetY ,
+	protected void drawFeatures( float scale, int offsetX, int offsetY,
 								 DogArray<Point2D_F64> all,
 								 DogArray<Point2D_F64> inliers,
 								 Homography2D_F64 currToGlobal, Graphics2D g2 ) {
@@ -141,29 +139,28 @@ public abstract class Motion2DPanel extends JPanel
 		}
 	}
 
-	private void drawImageBounds( Graphics2D g2 , int tx , int ty , double scale ) {
+	private void drawImageBounds( Graphics2D g2, int tx, int ty, double scale ) {
 		Quadrilateral_F64 c = corners;
 
 		Stroke originalStroke = g2.getStroke();
 		g2.setStroke(boundsStroke);
 		g2.setColor(Color.BLUE);
-		drawLine(g2,tx,ty,scale,c.a,c.b);
-		drawLine(g2,tx,ty,scale,c.b,c.c);
-		drawLine(g2,tx,ty,scale,c.c,c.d);
-		drawLine(g2,tx,ty,scale,c.d,c.a);
+		drawLine(g2, tx, ty, scale, c.a, c.b);
+		drawLine(g2, tx, ty, scale, c.b, c.c);
+		drawLine(g2, tx, ty, scale, c.c, c.d);
+		drawLine(g2, tx, ty, scale, c.d, c.a);
 		g2.setStroke(originalStroke);
 	}
 
-	private void drawLine( Graphics2D g2 , int tx , int ty , double scale , Point2D_F64 p0 , Point2D_F64 p1 )
-	{
-		g2.drawLine((int)(p0.x*scale)+tx,(int)(p0.y*scale)+ty,(int)(p1.x*scale)+tx,(int)(p1.y*scale)+ty);
+	private void drawLine( Graphics2D g2, int tx, int ty, double scale, Point2D_F64 p0, Point2D_F64 p1 ) {
+		g2.drawLine((int)(p0.x*scale) + tx, (int)(p0.y*scale) + ty, (int)(p1.x*scale) + tx, (int)(p1.y*scale) + ty);
 	}
 
-	public void setCurrToWorld(Homography2D_F64 currToWorld) {
+	public void setCurrToWorld( Homography2D_F64 currToWorld ) {
 		this.currToWorld.setTo(currToWorld);
 	}
 
-	public void setShowImageView(boolean showImageView) {
+	public void setShowImageView( boolean showImageView ) {
 		this.showImageView = showImageView;
 	}
 }

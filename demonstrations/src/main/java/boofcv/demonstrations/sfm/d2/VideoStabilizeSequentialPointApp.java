@@ -35,18 +35,17 @@ import java.util.List;
  * computer and rendered.  RANSAC is used internally to remove noise.  Different feature descriptors and motion
  * models can be used. Both the unstabilized input and stabilized output are shown in a window.
  *
- * @author Peter Abeles
  * @param <I> Input image type
  * @param <D> Image derivative type
+ * @author Peter Abeles
  */
 public class VideoStabilizeSequentialPointApp<I extends ImageGray<I>, D extends ImageGray<D>,
 		IT extends InvertibleTransform<IT>>
-		extends VideoStitchBaseApp<I, IT>
-{
-	int inputWidth,inputHeight;
+		extends VideoStitchBaseApp<I, IT> {
+	int inputWidth, inputHeight;
 
-	public VideoStabilizeSequentialPointApp(List<?> exampleInputs , Class<I> imageType) {
-		super(exampleInputs,new Stabilize2DPanel(),true,imageType);
+	public VideoStabilizeSequentialPointApp( List<?> exampleInputs, Class<I> imageType ) {
+		super(exampleInputs, new Stabilize2DPanel(), true, imageType);
 
 		absoluteMinimumTracks = 40;
 		respawnTrackFraction = 0.3;
@@ -58,7 +57,7 @@ public class VideoStabilizeSequentialPointApp<I extends ImageGray<I>, D extends 
 	}
 
 	@Override
-	protected void handleInputChange(int source, InputMethod method, int inputWidth, int inputHeight) {
+	protected void handleInputChange( int source, InputMethod method, int inputWidth, int inputHeight ) {
 		this.inputWidth = inputWidth;
 		this.inputHeight = inputHeight;
 		handleAlgorithmChange();
@@ -69,13 +68,13 @@ public class VideoStabilizeSequentialPointApp<I extends ImageGray<I>, D extends 
 		super.handleAlgorithmChange();
 		IT fitModel = createFitModelStructure();
 
-		setStitchImageSize(inputWidth,inputHeight);
-		((Stabilize2DPanel)gui).setInputSize(inputWidth,inputHeight);
-		alg.configure(inputWidth,inputHeight,fitModel);
+		setStitchImageSize(inputWidth, inputHeight);
+		((Stabilize2DPanel)gui).setInputSize(inputWidth, inputHeight);
+		alg.configure(inputWidth, inputHeight, fitModel);
 	}
 
 	@Override
-	protected boolean checkLocation( Quadrilateral_F64 corners) {
+	protected boolean checkLocation( Quadrilateral_F64 corners ) {
 		return false;
 	}
 
@@ -85,8 +84,8 @@ public class VideoStabilizeSequentialPointApp<I extends ImageGray<I>, D extends 
 		examples.add(new PathLabel("Zoom", UtilIO.pathExample("zoom.mjpeg")));
 		examples.add(new PathLabel("Rotate", UtilIO.pathExample("rotate.mjpeg")));
 
-		SwingUtilities.invokeLater(()->{
-			var app = new VideoStabilizeSequentialPointApp(examples,GrayF32.class);
+		SwingUtilities.invokeLater(() -> {
+			var app = new VideoStabilizeSequentialPointApp(examples, GrayF32.class);
 			app.openExample(examples.get(0));
 			app.display("Video Image Stabilize");
 		});

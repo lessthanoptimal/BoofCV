@@ -37,16 +37,15 @@ import java.util.List;
  * moaes toward the mosaic image's boundary it is automatically reset.  When reset the current
  * image is put in the initial position and the mosaic distorted accordingly.
  *
- * @author Peter Abeles
  * @param <I> Input image type
  * @param <D> Image derivative type
+ * @author Peter Abeles
  */
 public class VideoMosaicSequentialPointApp
 		<I extends ImageGray<I>, D extends ImageGray<D>, IT extends InvertibleTransform<IT>>
-		extends VideoStitchBaseApp<I,IT>
-{
-	public VideoMosaicSequentialPointApp(List<?> exampleInputs , Class<I> imageType) {
-		super(exampleInputs,new Mosaic2DPanel(),true,imageType);
+		extends VideoStitchBaseApp<I, IT> {
+	public VideoMosaicSequentialPointApp( List<?> exampleInputs, Class<I> imageType ) {
+		super(exampleInputs, new Mosaic2DPanel(), true, imageType);
 
 		absoluteMinimumTracks = 40;
 		respawnTrackFraction = 0.7;
@@ -62,19 +61,19 @@ public class VideoMosaicSequentialPointApp
 
 		IT fitModel = createFitModelStructure();
 
-		if( fitModel instanceof Affine2D_F64 ) {
-			Affine2D_F64 H = new Affine2D_F64(scale,0,0,scale, stitchWidth /4, stitchHeight /4);
+		if (fitModel instanceof Affine2D_F64) {
+			Affine2D_F64 H = new Affine2D_F64(scale, 0, 0, scale, stitchWidth/4, stitchHeight/4);
 			return (IT)H.invert(null);
-		} else if( fitModel instanceof Homography2D_F64 ) {
-			Homography2D_F64 H = new Homography2D_F64(scale,0,stitchWidth /4,0,scale,stitchHeight /4,0,0,1 );
+		} else if (fitModel instanceof Homography2D_F64) {
+			Homography2D_F64 H = new Homography2D_F64(scale, 0, stitchWidth/4, 0, scale, stitchHeight/4, 0, 0, 1);
 			return (IT)H.invert(null);
 		} else {
-			throw new RuntimeException("Need to support this model type: "+fitModel.getClass().getSimpleName());
+			throw new RuntimeException("Need to support this model type: " + fitModel.getClass().getSimpleName());
 		}
 	}
 
 	@Override
-	protected void handleInputChange(int source, InputMethod method, int width, int height) {
+	protected void handleInputChange( int source, InputMethod method, int width, int height ) {
 		handleAlgorithmChange();
 	}
 
@@ -83,27 +82,27 @@ public class VideoMosaicSequentialPointApp
 		super.handleAlgorithmChange();
 		setStitchImageSize(1000, 600);
 		((Mosaic2DPanel)gui).setMosaicSize(stitchWidth, stitchHeight);
-		alg.configure(stitchWidth, stitchHeight,createInitialTransform());
+		alg.configure(stitchWidth, stitchHeight, createInitialTransform());
 	}
 
 	@Override
-	protected boolean checkLocation( Quadrilateral_F64 corners) {
-		if( closeToBorder(corners.a) )
+	protected boolean checkLocation( Quadrilateral_F64 corners ) {
+		if (closeToBorder(corners.a))
 			return true;
-		if( closeToBorder(corners.b) )
+		if (closeToBorder(corners.b))
 			return true;
-		if( closeToBorder(corners.c) )
+		if (closeToBorder(corners.c))
 			return true;
-		if( closeToBorder(corners.d) )
+		if (closeToBorder(corners.d))
 			return true;
 
 		return false;
 	}
 
 	private boolean closeToBorder( Point2D_F64 pt ) {
-		if( pt.x < borderTolerance || pt.y < borderTolerance)
+		if (pt.x < borderTolerance || pt.y < borderTolerance)
 			return true;
-		return( pt.x >= stitchWidth - borderTolerance || pt.y >= stitchHeight - borderTolerance);
+		return (pt.x >= stitchWidth - borderTolerance || pt.y >= stitchHeight - borderTolerance);
 	}
 
 	public static void main( String[] args ) {
@@ -114,9 +113,9 @@ public class VideoMosaicSequentialPointApp
 		examples.add(new PathLabel("Plane 2", UtilIO.pathExample("mosaic/airplane02.mjpeg")));
 		examples.add(new PathLabel("Shake", UtilIO.pathExample("shake.mjpeg")));
 
-		SwingUtilities.invokeLater(()->{
+		SwingUtilities.invokeLater(() -> {
 
-			VideoMosaicSequentialPointApp app = new VideoMosaicSequentialPointApp(examples,type);
+			VideoMosaicSequentialPointApp app = new VideoMosaicSequentialPointApp(examples, type);
 
 			app.openExample(examples.get(0));
 			app.display("Video Image Mosaic");
