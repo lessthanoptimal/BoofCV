@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -32,6 +32,7 @@ import boofcv.struct.image.GrayU8;
 import boofcv.testing.BoofStandardJUnit;
 import georegression.struct.affine.Affine2D_F64;
 import georegression.struct.point.Point2D_F32;
+import georegression.struct.shapes.Quadrilateral_F64;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -247,16 +248,16 @@ public class TestStitchingFromMotion2D extends BoofStandardJUnit {
 
 		int w = 100, h = 150;
 
-		StitchingFromMotion2D.Corners corners = new StitchingFromMotion2D.Corners();
+		Quadrilateral_F64 corners = new Quadrilateral_F64();
 		alg.getImageCorners(w, h, corners);
-		assertEquals(-1, corners.p0.x, 1e-5);
-		assertEquals(2, corners.p0.y, 1e-5);
-		assertEquals(-1 + w, corners.p1.x, 1e-5);
-		assertEquals(2, corners.p0.y, 1e-5);
-		assertEquals(-1 + w, corners.p2.x, 1e-5);
-		assertEquals(2 + h, corners.p2.y, 1e-5);
-		assertEquals(-1, corners.p3.x, 1e-5);
-		assertEquals(2 + h, corners.p3.y, 1e-5);
+		assertEquals(-1, corners.a.x, 1e-5);
+		assertEquals(2, corners.a.y, 1e-5);
+		assertEquals(-1 + w, corners.b.x, 1e-5);
+		assertEquals(2, corners.b.y, 1e-5);
+		assertEquals(-1 + w, corners.c.x, 1e-5);
+		assertEquals(2 + h, corners.c.y, 1e-5);
+		assertEquals(-1, corners.d.x, 1e-5);
+		assertEquals(2 + h, corners.d.y, 1e-5);
 	}
 
 	/**

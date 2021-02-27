@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -39,6 +39,7 @@ import boofcv.struct.image.ImageType;
 import boofcv.struct.image.Planar;
 import georegression.struct.homography.Homography2D_F64;
 import georegression.struct.point.Point2D_F64;
+import georegression.struct.shapes.Quadrilateral_F64;
 
 import java.awt.*;
 import java.awt.image.BufferedImage;
@@ -112,9 +113,9 @@ public class ExampleVideoMosaic {
 				throw new RuntimeException("You should handle failures");
 
 			// if the current image is close to the image border recenter the mosaic
-			StitchingFromMotion2D.Corners corners = stitch.getImageCorners(frame.width, frame.height, null);
-			if (nearBorder(corners.p0, stitch) || nearBorder(corners.p1, stitch) ||
-					nearBorder(corners.p2, stitch) || nearBorder(corners.p3, stitch)) {
+			Quadrilateral_F64 corners = stitch.getImageCorners(frame.width, frame.height, null);
+			if (nearBorder(corners.a, stitch) || nearBorder(corners.b, stitch) ||
+					nearBorder(corners.c, stitch) || nearBorder(corners.d, stitch)) {
 				stitch.setOriginToCurrent();
 
 				// only enlarge the image once
@@ -144,10 +145,10 @@ public class ExampleVideoMosaic {
 			// draw a red quadrilateral around the current frame in the mosaic
 			Graphics2D g2 = gui.getImage(0, 1).createGraphics();
 			g2.setColor(Color.RED);
-			g2.drawLine((int)corners.p0.x, (int)corners.p0.y, (int)corners.p1.x, (int)corners.p1.y);
-			g2.drawLine((int)corners.p1.x, (int)corners.p1.y, (int)corners.p2.x, (int)corners.p2.y);
-			g2.drawLine((int)corners.p2.x, (int)corners.p2.y, (int)corners.p3.x, (int)corners.p3.y);
-			g2.drawLine((int)corners.p3.x, (int)corners.p3.y, (int)corners.p0.x, (int)corners.p0.y);
+			g2.drawLine((int)corners.a.x, (int)corners.a.y, (int)corners.b.x, (int)corners.b.y);
+			g2.drawLine((int)corners.b.x, (int)corners.b.y, (int)corners.c.x, (int)corners.c.y);
+			g2.drawLine((int)corners.c.x, (int)corners.c.y, (int)corners.d.x, (int)corners.d.y);
+			g2.drawLine((int)corners.d.x, (int)corners.d.y, (int)corners.a.x, (int)corners.a.y);
 
 			gui.repaint();
 
