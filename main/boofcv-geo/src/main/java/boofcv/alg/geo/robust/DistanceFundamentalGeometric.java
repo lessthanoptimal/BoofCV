@@ -50,8 +50,9 @@ public class DistanceFundamentalGeometric implements DistanceFromModel<DMatrixRM
 		if (!adjuster.process(F21, original.p1.x, original.p1.y, original.p2.x, original.p2.y,
 				adjusted.p1, adjusted.p2)) {
 			// Not the same error, but better than nothing?
-			return 2.0*MultiViewOps.constraint(F21,original.p1, original.p2);
-//			return Double.MAX_VALUE;
+			// This is an algebraic error and maybe the correct way to do it is to compute a more stable geometric
+			// error or even better root cause why this is failing.
+			return 2.0*Math.abs(MultiViewOps.constraint(F21,original.p1, original.p2));
 		}
 
 		// Since the adjusted observations will intersect perfectly there's no need to triangulate

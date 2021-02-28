@@ -84,6 +84,7 @@ public class FactorySceneReconstruction {
 						var alg = new ScoreFundamentalReprojectionError(ransac3D);
 						alg.eps = config.score.typeErrors.eps;
 						alg.ratio3D = config.score.typeErrors.ratio3D;
+						alg.maxRatioScore = config.score.typeErrors.maxRatioScore;
 						yield alg;
 					}
 				};

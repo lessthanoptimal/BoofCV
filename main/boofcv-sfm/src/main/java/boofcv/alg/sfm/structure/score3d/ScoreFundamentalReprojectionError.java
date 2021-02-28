@@ -55,10 +55,15 @@ public class ScoreFundamentalReprojectionError implements EpipolarScore3D {
 	/**
 	 * If number of matches from fundamental divided by homography is more than this then it is considered a 3D scene
 	 */
-	public @Getter @Setter double ratio3D = 4.0;
+	public @Getter @Setter double ratio3D = 1.5;
 
 	/** Smoothing parameter and avoid divide by zero. This is typically < 1.0 since error is computed in pixels */
-	public @Getter @Setter double eps = 0.5;
+	public @Getter @Setter double eps = 0.01;
+
+	/**
+	 * The error ratio can get massive and this number prevents large values for being weighted too much in the score
+	 */
+	public @Getter @Setter double maxRatioScore = 5.0;
 
 	// Storage for inliers
 	List<AssociatedPair> inliers = new ArrayList<>();
@@ -82,7 +87,7 @@ public class ScoreFundamentalReprojectionError implements EpipolarScore3D {
 	// Workspace variables
 	Point3D_F64 e1 = new Point3D_F64();
 	Point3D_F64 e2 = new Point3D_F64();
-	DMatrixRMaj F_alt = new DMatrixRMaj(3,3);
+	DMatrixRMaj F_alt = new DMatrixRMaj(3, 3);
 
 	public ScoreFundamentalReprojectionError( ModelMatcher<DMatrixRMaj, AssociatedPair> ransac3D ) {
 		this.ransac3D = ransac3D;
@@ -103,16 +108,13 @@ public class ScoreFundamentalReprojectionError implements EpipolarScore3D {
 
 		// Save the inliers and compute the epipolar geometric error for F
 		fundamental.setTo(ransac3D.getModelParameters());
-		distanceF.setModel(ransac3D.getModelParameters());
 		inliersIdx.resize(ransac3D.getMatchSet().size());
 		inliers.clear();
-		double errorF = 0.0;
 		for (int i = 0; i < inliersIdx.size; i++) {
 			inliersIdx.set(i, ransac3D.getInputIndex(i));
 			inliers.add(pairs.get(inliersIdx.get(i)));
-			errorF += distanceF.distance(pairs.get(inliersIdx.get(i)));
 		}
-		errorF /= inliersIdx.size;
+		double errorF = computeAverageEuclideanError(ransac3D.getModelParameters());
 
 		// Compute a homography to detect degenerate geometry
 		estimateH.generate(inliers, H2);
@@ -125,22 +127,23 @@ public class ScoreFundamentalReprojectionError implements EpipolarScore3D {
 		// F = cross(e2)*H                             see H&Z p335
 		//
 		// This only works if H is compatible with F. That only happens for planar scenes or pure rotation
-		MultiViewOps.extractEpipoles(fundamental,e1,e2);
-		GeometryMath_F64.multCrossA(e2,H,F_alt);
+		MultiViewOps.extractEpipoles(fundamental, e1, e2);
+		GeometryMath_F64.multCrossA(e2, H, F_alt);
+		// TODO experiment with compatibility score? normalize magnitude of variables?
 
 		// Compute errors using the mangled fundamental matrix
-		distanceF.setModel(F_alt);
-		double errorH = 0.0;
-		for (int i = 0; i < inliersIdx.size; i++) {
-			errorH += distanceF.distance(pairs.get(inliersIdx.get(i)));
-		}
-		errorH /= inliersIdx.size;
+		double errorH = computeAverageEuclideanError(F_alt);
 
-		score = (errorH + eps)/(errorF + eps);
-		is3D = score > ratio3D;
+		double ratio = (errorH + eps)/(errorF + eps);
+		is3D = ratio > ratio3D;
+
+		// The final score prefers sets with more inliers and a much better errorF, but caps the benefit from a large
+		// errorF since it can get ridiculously high and there's little benefit after a certain point
+		score = Math.min(maxRatioScore, ratio)*inliers.size();
+		score /= (100.0*maxRatioScore); // purely cosmetic to keep the numbers smaller
 
 		if (verbose != null)
-			verbose.println("score=" + score + " errorH=" + errorH + " errorF=" + errorF + " 3d=" + is3D);
+			verbose.printf("score=%7.2f errorH=%6.2f errorF=%5.2f 3d=%s\n", score, errorH, errorF, is3D);
 
 		if (is3D)
 			return true;
@@ -172,6 +175,23 @@ public class ScoreFundamentalReprojectionError implements EpipolarScore3D {
 		// Also can't assume that both cameras have the same intrinsic parameters
 
 		return true;
+	}
+
+	/**
+	 * The distance function computes the Euclidean distance squared for the feature in the left and right side from
+	 * the closest point on the epipolar line. This function divides that error by 2 (now the average Euclidean
+	 * squared) then takes the square root and sums it. Finally it divides it by the total count.
+	 *
+	 * this should have a linear response to changes in model performance
+	 */
+	private double computeAverageEuclideanError( DMatrixRMaj fundamental ) {
+		distanceF.setModel(fundamental);
+		double error = 0.0;
+		for (int i = 0; i < inliers.size(); i++) {
+			double doubleDistanceSq = distanceF.distance(inliers.get(i));
+			error += Math.sqrt(doubleDistanceSq/2.0);
+		}
+		return error/inliers.size();
 	}
 
 	@Override public double getScore() {

@@ -100,9 +100,16 @@ public class ConfigEpipolarScore3D implements Configuration {
 		 */
 		public double ratio3D = 1.5;
 
+		/**
+		 * Caps how much influence the geometric score can have. The error ratio can sky rocket as the baseline
+		 * increased but the benefit doesn't seem to increase after a point.
+		 */
+		public double maxRatioScore = 5.0;
+
 		@Override public void checkValidity() {
 			BoofMiscOps.checkTrue(minimumInliers >= 0);
 			BoofMiscOps.checkTrue(ratio3D > 0.0);
+			BoofMiscOps.checkTrue(maxRatioScore > 0.0);
 			ransacH.checkValidity();
 			homography.checkValidity();
 		}
@@ -110,6 +117,7 @@ public class ConfigEpipolarScore3D implements Configuration {
 		public void setTo( ModelInliers src ) {
 			this.minimumInliers = src.minimumInliers;
 			this.ratio3D = src.ratio3D;
+			this.maxRatioScore = src.maxRatioScore;
 			this.ransacH.setTo(src.ransacH);
 			this.homography.setTo(src.homography);
 		}
@@ -120,19 +128,27 @@ public class ConfigEpipolarScore3D implements Configuration {
 	 */
 	public static class FundamentalError implements Configuration {
 		/** Higher values indicate more evidence is needed for a scene to be 3D */
-		public double ratio3D = 4.0;
+		public double ratio3D = 2.0;
 
 		/** Smoothing parameter and avoid divide by zero. This is typically < 1.0 since error is computed in pixels */
-		public double eps = 0.5;
+		public double eps = 0.01;
+
+		/**
+		 * Caps how much influence the geometric score can have. The error ratio can sky rocket as the baseline
+		 * increased but the benefit doesn't seem to increase after a point.
+		 */
+		public double maxRatioScore = 5.0;
 
 		@Override public void checkValidity() {
 			BoofMiscOps.checkTrue(eps >= 0);
 			BoofMiscOps.checkTrue(ratio3D > 0.0);
+			BoofMiscOps.checkTrue(maxRatioScore > 0.0);
 		}
 
 		public void setTo( FundamentalError src ) {
 			this.ratio3D = src.ratio3D;
 			this.eps = src.eps;
+			this.maxRatioScore = src.maxRatioScore;
 		}
 	}
 }
