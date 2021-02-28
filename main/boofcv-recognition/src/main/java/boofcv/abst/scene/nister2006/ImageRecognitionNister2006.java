@@ -219,12 +219,12 @@ public class ImageRecognitionNister2006<Image extends ImageBase<Image>, TD exten
 			return false;
 
 		DogArray<RecognitionVocabularyTreeNister2006.Match> found = databaseN.getMatchScores();
-		matches.resize(found.size);
 
 		if (verbose != null) verbose.println("matches.size=" + found.size + " best.error=" + found.get(0).error);
 
 		// Copy results into output format
 		int count = config.maxMatches <= 0 ? found.size : Math.min(config.maxMatches, found.size);
+		matches.resize(count);
 		for (int i = 0; i < count; i++) {
 			RecognitionVocabularyTreeNister2006.Match f = found.get(i);
 			matches.get(i).id = imageIds.get(f.image.identification);

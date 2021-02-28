@@ -47,7 +47,7 @@ public abstract class GenericImageRecognitionChecks<T extends ImageBase<T>> exte
 	 * Creates an instance of the algorithm being tested
 	 *
 	 */
-	protected abstract ImageRecognition<T> createAlg();
+	protected abstract ImageRecognition<T> createAlg(int maxResults);
 
 	protected GenericImageRecognitionChecks( ImageType<T> imageType ) {
 		this.imageType = imageType;
@@ -86,7 +86,7 @@ public abstract class GenericImageRecognitionChecks<T extends ImageBase<T>> exte
 			images.add(imageType.createImage(width, height));
 		}
 
-		ImageRecognition<T> alg = createAlg();
+		ImageRecognition<T> alg = createAlg(20);
 		alg.learnModel(images.iterator());
 	}
 
@@ -98,7 +98,8 @@ public abstract class GenericImageRecognitionChecks<T extends ImageBase<T>> exte
 	@Test void learn_then_select() {
 		createImages();
 
-		ImageRecognition<T> alg = createAlg();
+		int maxMatches = 5; // maximum allowed matches
+		ImageRecognition<T> alg = createAlg(maxMatches);
 
 		// Learn a descriptor
 		alg.learnModel(images.iterator());
@@ -119,6 +120,7 @@ public abstract class GenericImageRecognitionChecks<T extends ImageBase<T>> exte
 		alg.clearDatabase();
 		for (int i = 0; i < images.size(); i++) {
 			assertFalse(alg.findBestMatch(images.get(i), matches));
+			assertEquals(0, matches.size);
 		}
 
 		// Add the images
@@ -130,6 +132,7 @@ public abstract class GenericImageRecognitionChecks<T extends ImageBase<T>> exte
 		for (int i = 0; i < images.size(); i++) {
 			assertTrue(alg.findBestMatch(images.get(i), matches));
 			assertEquals(i, Integer.parseInt(matches.get(0).id));
+			assertTrue(matches.size<=maxMatches);
 		}
 	}
 }
