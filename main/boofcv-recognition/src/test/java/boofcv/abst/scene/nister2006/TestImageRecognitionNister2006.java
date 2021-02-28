@@ -32,11 +32,12 @@ class TestImageRecognitionNister2006 extends GenericImageRecognitionChecks<GrayU
 		super(ImageType.SB_U8);
 	}
 
-	@Override protected ImageRecognition<GrayU8> createAlg() {
+	@Override protected ImageRecognition<GrayU8> createAlg(int maxMatches) {
 		var config = new ConfigImageRecognitionNister2006();
 		config.tree.branchFactor = 3;
 		config.tree.maximumLevel = 3;
 		config.features.detectFastHessian.extract.radius = 6;
+		config.maxMatches = maxMatches;
 		return new ImageRecognitionNister2006<>(config, imageType);
 	}
 }
