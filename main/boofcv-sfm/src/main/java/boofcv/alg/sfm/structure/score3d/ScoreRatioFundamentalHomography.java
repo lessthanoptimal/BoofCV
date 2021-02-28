@@ -53,10 +53,16 @@ public class ScoreRatioFundamentalHomography implements EpipolarScore3D {
 	 * The minimum number of inliers for an edge to be accepted
 	 */
 	public @Getter @Setter int minimumInliers = 30;
+
 	/**
 	 * If number of matches from fundamental divided by homography is more than this then it is considered a 3D scene
 	 */
 	public @Getter @Setter double ratio3D = 1.5;
+
+	/**
+	 * The error ratio can get massive and this number prevents large values for being weighted too much in the score
+	 */
+	public @Getter @Setter double maxRatioScore = 5.0;
 
 	// if true then it decided there was a 3D relationship
 	private boolean is3D;
@@ -70,13 +76,13 @@ public class ScoreRatioFundamentalHomography implements EpipolarScore3D {
 	// If not null then verbose debugging information should be printed here
 	private PrintStream verbose;
 
-	public ScoreRatioFundamentalHomography(ModelMatcher<DMatrixRMaj, AssociatedPair> ransac3D,
-										   ModelMatcher<Homography2D_F64, AssociatedPair> ransacH) {
+	public ScoreRatioFundamentalHomography( ModelMatcher<DMatrixRMaj, AssociatedPair> ransac3D,
+											ModelMatcher<Homography2D_F64, AssociatedPair> ransacH ) {
 		this.ransac3D = ransac3D;
 		this.ransacH = ransacH;
 	}
 
-	protected ScoreRatioFundamentalHomography(){}
+	protected ScoreRatioFundamentalHomography() {}
 
 	@Override public boolean process( List<AssociatedPair> pairs, DMatrixRMaj fundamental, DogArray_I32 inliersIdx ) {
 		// Reset output
@@ -95,15 +101,16 @@ public class ScoreRatioFundamentalHomography implements EpipolarScore3D {
 			countH = ransacH.getMatchSet().size();
 		}
 
-		is3D = countF > countH * ratio3D;
+		is3D = countF > countH*ratio3D;
 
-		if( verbose != null ) verbose.println("ransac F="+countF+" H="+countH+" pairs.size="+pairs.size()+" 3d="+is3D);
+		if (verbose != null)
+			verbose.println("ransac F=" + countF + " H=" + countH + " pairs.size=" + pairs.size() + " 3d=" + is3D);
 
 		// Always use fundamental if it's available
-		if (countF>=minimumInliers) {
+		if (countF >= minimumInliers) {
 			saveInlierMatches(ransac3D, inliersIdx);
 			fundamental.setTo(ransac3D.getModelParameters());
-		} else if (countH>=minimumInliers) {
+		} else if (countH >= minimumInliers) {
 			saveInlierMatches(ransacH, inliersIdx);
 			Homography2D_F64 H = ransacH.getModelParameters();
 			DConvertMatrixStruct.convert(H, fundamental);
@@ -121,7 +128,7 @@ public class ScoreRatioFundamentalHomography implements EpipolarScore3D {
 		// Prefer a scene more features from a fundamental matrix than a homography.
 		// This can be sign that the scene has a rich 3D structure and is poorly represented by
 		// a plane or rotational motion
-		double score = Math.min(5, countF/(double)(countH + 1));
+		double score = Math.min(maxRatioScore, countF/(double)(countH + 1));
 		// Also prefer more features from the original image to be matched
 		score *= countF;
 
@@ -143,7 +150,7 @@ public class ScoreRatioFundamentalHomography implements EpipolarScore3D {
 		int N = ransac.getMatchSet().size();
 		inliers.resize(N);
 		for (int i = 0; i < N; i++) {
-			inliers.set(i,ransac.getInputIndex(i));
+			inliers.set(i, ransac.getInputIndex(i));
 		}
 	}
 }
