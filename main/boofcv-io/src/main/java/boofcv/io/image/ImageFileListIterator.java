@@ -38,9 +38,14 @@ public class ImageFileListIterator<T extends ImageBase<T>> implements Iterator<T
 	protected @Getter List<String> paths;
 	protected @Getter int index;
 
-	protected @Getter @Setter BoofLambdas.Filter<T> filter = (a)->a;
-	/** Called when an image can't be read. Passes in the index. */
-	protected @Getter @Setter BoofLambdas.ProcessI exception = (idx)->{};
+	/** Pre-processing filter that should be applied to the erad in image */
+	protected @Getter @Setter BoofLambdas.Filter<T> filter = ( a ) -> a;
+
+	/** Called when it encounters image can't be read due to an exception. */
+	protected @Getter @Setter HandleException exception = ( idx, path, e ) -> {
+		e.printStackTrace(System.err);
+		System.err.println("Bad Image: " + paths.get(index));
+	};
 
 	public ImageFileListIterator( List<String> paths, ImageType<T> imageType ) {
 		image = imageType.createImage(1, 1);
@@ -53,7 +58,7 @@ public class ImageFileListIterator<T extends ImageBase<T>> implements Iterator<T
 	}
 
 	@Override public boolean hasNext() {
-		return index+1 < paths.size();
+		return index + 1 < paths.size();
 	}
 
 	@Override public T next() {
@@ -64,13 +69,21 @@ public class ImageFileListIterator<T extends ImageBase<T>> implements Iterator<T
 				ConvertBufferedImage.convertFrom(buffered, true, image);
 				break;
 			} catch (RuntimeException e) {
-				exception.process(index);
-				System.err.println("Bad Image: "+paths.get(index));
-				// If there's a bad image, print the stack trace and go on to the next image.
-				e.printStackTrace(System.err);
+				exception.process(index, paths.get(index), e);
 			}
-		} while( index < paths.size());
+		} while (index < paths.size());
 
 		return filter.process(image);
+	}
+
+	public @FunctionalInterface interface HandleException {
+		/**
+		 * Passes in information about the exception and decides how it should be handled
+		 *
+		 * @param index Which image index it blew up on
+		 * @param path Path to the image
+		 * @param e The actual exception
+		 */
+		void process( int index, String path, RuntimeException e );
 	}
 }
