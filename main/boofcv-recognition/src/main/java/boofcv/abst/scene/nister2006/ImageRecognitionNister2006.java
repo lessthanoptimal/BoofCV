@@ -203,7 +203,7 @@ public class ImageRecognitionNister2006<Image extends ImageBase<Image>, TD exten
 		databaseN.addImage(imageIndex, imageFeatures.toList(), null);
 	}
 
-	@Override public boolean findBestMatch( Image queryImage, DogArray<Match> matches ) {
+	@Override public boolean query( Image queryImage, int maxMatches, DogArray<Match> matches ) {
 		// Default is no matches
 		matches.resize(0);
 
@@ -223,7 +223,7 @@ public class ImageRecognitionNister2006<Image extends ImageBase<Image>, TD exten
 		if (verbose != null) verbose.println("matches.size=" + found.size + " best.error=" + found.get(0).error);
 
 		// Copy results into output format
-		int count = config.maxMatches <= 0 ? found.size : Math.min(config.maxMatches, found.size);
+		int count = maxMatches <= 0 ? found.size : Math.min(maxMatches, found.size);
 		matches.resize(count);
 		for (int i = 0; i < count; i++) {
 			RecognitionVocabularyTreeNister2006.Match f = found.get(i);

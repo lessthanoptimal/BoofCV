@@ -47,7 +47,7 @@ public abstract class GenericImageRecognitionChecks<T extends ImageBase<T>> exte
 	 * Creates an instance of the algorithm being tested
 	 *
 	 */
-	protected abstract ImageRecognition<T> createAlg(int maxResults);
+	protected abstract ImageRecognition<T> createAlg();
 
 	protected GenericImageRecognitionChecks( ImageType<T> imageType ) {
 		this.imageType = imageType;
@@ -86,7 +86,7 @@ public abstract class GenericImageRecognitionChecks<T extends ImageBase<T>> exte
 			images.add(imageType.createImage(width, height));
 		}
 
-		ImageRecognition<T> alg = createAlg(20);
+		ImageRecognition<T> alg = createAlg();
 		alg.learnModel(images.iterator());
 	}
 
@@ -99,7 +99,7 @@ public abstract class GenericImageRecognitionChecks<T extends ImageBase<T>> exte
 		createImages();
 
 		int maxMatches = 5; // maximum allowed matches
-		ImageRecognition<T> alg = createAlg(maxMatches);
+		ImageRecognition<T> alg = createAlg();
 
 		// Learn a descriptor
 		alg.learnModel(images.iterator());
@@ -112,14 +112,14 @@ public abstract class GenericImageRecognitionChecks<T extends ImageBase<T>> exte
 		// Look up the images and see if the first result is the original
 		DogArray<Match> matches = new DogArray<>(Match::new);
 		for (int i = 0; i < images.size(); i++) {
-			assertTrue(alg.findBestMatch(images.get(i), matches));
+			assertTrue(alg.query(images.get(i), maxMatches, matches));
 			assertEquals(i, Integer.parseInt(matches.get(0).id));
 		}
 
 		// now clear the database
 		alg.clearDatabase();
 		for (int i = 0; i < images.size(); i++) {
-			assertFalse(alg.findBestMatch(images.get(i), matches));
+			assertFalse(alg.query(images.get(i), maxMatches, matches));
 			assertEquals(0, matches.size);
 		}
 
@@ -130,7 +130,7 @@ public abstract class GenericImageRecognitionChecks<T extends ImageBase<T>> exte
 
 		// It should be able to find them again
 		for (int i = 0; i < images.size(); i++) {
-			assertTrue(alg.findBestMatch(images.get(i), matches));
+			assertTrue(alg.query(images.get(i), maxMatches, matches));
 			assertEquals(i, Integer.parseInt(matches.get(0).id));
 			assertTrue(matches.size<=maxMatches);
 		}

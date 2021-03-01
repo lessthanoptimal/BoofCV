@@ -23,7 +23,6 @@ import boofcv.abst.scene.ImageRecognition;
 import boofcv.struct.image.GrayU8;
 import boofcv.struct.image.ImageType;
 
-
 /**
  * @author Peter Abeles
  */
@@ -32,12 +31,11 @@ class TestImageRecognitionNister2006 extends GenericImageRecognitionChecks<GrayU
 		super(ImageType.SB_U8);
 	}
 
-	@Override protected ImageRecognition<GrayU8> createAlg(int maxMatches) {
+	@Override protected ImageRecognition<GrayU8> createAlg() {
 		var config = new ConfigImageRecognitionNister2006();
 		config.tree.branchFactor = 3;
 		config.tree.maximumLevel = 3;
 		config.features.detectFastHessian.extract.radius = 6;
-		config.maxMatches = maxMatches;
 		return new ImageRecognitionNister2006<>(config, imageType);
 	}
 }
