@@ -32,6 +32,7 @@ Version : 0.38
   * Added: Nister, Stewenius, "Scalable recognition with a vocabulary tree", CVPR 2006
       TODO Make weight optional
       TODO get image lookup < 100ms
+      TODO Optimize ComputeMedianTuple_B by unrolling bit checks
 - TODO Loop Closure
 - TODO Generic calibration target for multi cameras
   * QR Code for first version

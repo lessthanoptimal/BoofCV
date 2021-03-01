@@ -88,6 +88,24 @@ public class DescriptorDistance {
 	 * @param b Second descriptor
 	 * @return Euclidean distance squared
 	 */
+	public static double euclideanSq( TupleDesc_S8 a, TupleDesc_S8 b ) {
+		final int N = a.data.length;
+		double total = 0;
+		for (int i = 0; i < N; i++) {
+			double d = a.data[i] - b.data[i];
+			total += d*d;
+		}
+
+		return total;
+	}
+
+	/**
+	 * Returns the Euclidean distance squared between the two descriptors.
+	 *
+	 * @param a First descriptor
+	 * @param b Second descriptor
+	 * @return Euclidean distance squared
+	 */
 	public static double euclideanSq( TupleDesc_F32 a, TupleDesc_F32 b ) {
 		final int N = a.data.length;
 		float total = 0;
