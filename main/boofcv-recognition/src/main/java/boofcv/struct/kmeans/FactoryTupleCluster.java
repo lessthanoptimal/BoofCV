@@ -20,10 +20,7 @@ package boofcv.struct.kmeans;
 
 import boofcv.concurrency.BoofConcurrency;
 import boofcv.factory.struct.FactoryTupleDesc;
-import boofcv.struct.feature.TupleDesc;
-import boofcv.struct.feature.TupleDesc_F32;
-import boofcv.struct.feature.TupleDesc_F64;
-import boofcv.struct.feature.TupleDesc_U8;
+import boofcv.struct.feature.*;
 import org.ddogleg.clustering.ComputeMeanClusters;
 import org.ddogleg.clustering.ConfigKMeans;
 import org.ddogleg.clustering.FactoryClustering;
@@ -89,6 +86,14 @@ public class FactoryTupleCluster {
 			} else {
 				return (ComputeMeanClusters<TD>)new ComputeMeanTuple_U8(numElements);
 			}
+		} else if (type == TupleDesc_B.class) {
+//			if (BoofConcurrency.isUseConcurrent()) {
+//				var mean = new ComputeMeanTuple_MT_U8(numElements);
+//				mean.setMinimumForConcurrent(minimumForThreads);
+//				return (ComputeMeanClusters<TD>)mean;
+//			} else {
+				return (ComputeMeanClusters<TD>)new ComputeMedianTuple_B(numElements);
+//			}
 		}
 		throw new IllegalArgumentException("Unknown");
 	}
@@ -101,6 +106,8 @@ public class FactoryTupleCluster {
 			return (PointDistance<TD>)new TuplePointDistanceEuclideanSq.F32();
 		else if (tuple == TupleDesc_U8.class)
 			return (PointDistance<TD>)new TuplePointDistanceEuclideanSq.U8();
+		else if (tuple == TupleDesc_B.class)
+			return (PointDistance<TD>)new TuplePointDistanceHamming();
 
 		throw new IllegalArgumentException("Add appropriate distance");
 	}

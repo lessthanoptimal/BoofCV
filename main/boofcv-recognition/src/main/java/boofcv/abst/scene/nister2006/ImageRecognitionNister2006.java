@@ -215,7 +215,7 @@ public class ImageRecognitionNister2006<Image extends ImageBase<Image>, TD exten
 		}
 
 		// Look up the closest matches
-		if (!databaseN.lookup(imageFeatures.toList()))
+		if (!databaseN.query(imageFeatures.toList()))
 			return false;
 
 		DogArray<RecognitionVocabularyTreeNister2006.Match> found = databaseN.getMatchScores();

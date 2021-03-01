@@ -42,7 +42,7 @@ public class PackedTupleArray_F64 implements PackedArray<TupleDesc_F64> {
 	public PackedTupleArray_F64( int dof ) {
 		this.dof = dof;
 		this.temp = new TupleDesc_F64(dof);
-		array = new DogArray_F64(dof*20);
+		array = new DogArray_F64();
 		array.resize(0);
 	}
 

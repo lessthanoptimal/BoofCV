@@ -34,11 +34,11 @@ import java.util.Arrays;
  */
 public class ComputeMedianTuple_B implements ComputeMeanClusters<TupleDesc_B> {
 	// Number of times each label was seen
-	final DogArray_I32 assignmentCounts = new DogArray_I32();
+	protected final DogArray_I32 assignmentCounts = new DogArray_I32();
 	// Number of times each bit was 1
-	final DogArray<int[]> bitCounts;
+	protected final DogArray<int[]> bitCounts;
 	// degree-of-freedom Number of elements in the tuple
-	final int dof;
+	protected final int dof;
 
 	public ComputeMedianTuple_B( int DOF ) {
 		this.bitCounts = new DogArray<>(()->new int[DOF]);
@@ -59,6 +59,12 @@ public class ComputeMedianTuple_B implements ComputeMeanClusters<TupleDesc_B> {
 			Arrays.fill(bitCounts.get(i),0);
 		}
 
+		countBitsInEachCluster(points, assignments);
+
+		countsToBits(clusters);
+	}
+
+	protected void countBitsInEachCluster( LArrayAccessor<TupleDesc_B> points, DogArray_I32 assignments ) {
 		// Compute the sum of all points in each cluster
 		for (int pointIdx = 0; pointIdx < points.size(); pointIdx++) {
 			// See which cluster this point was assigned to and increment its counter
@@ -75,7 +81,9 @@ public class ComputeMedianTuple_B implements ComputeMeanClusters<TupleDesc_B> {
 				bitCount[i]++;
 			}
 		}
+	}
 
+	protected void countsToBits( FastAccess<TupleDesc_B> clusters ) {
 		// If 50% of a bit was observed to be true for a cluster, set that bit to true
 		for (int clusterIdx = 0; clusterIdx < clusters.size; clusterIdx++) {
 			int[] bitCount = bitCounts.get(clusterIdx);
@@ -83,6 +91,8 @@ public class ComputeMedianTuple_B implements ComputeMeanClusters<TupleDesc_B> {
 			int threshold = assignmentCounts.get(clusterIdx)/2;
 
 			TupleDesc_B cluster = clusters.get(clusterIdx);
+			// shouldn't be necessary, but this way we know if there are extra bits in the array they are all zero
+			Arrays.fill(cluster.data,0);
 			for (int i = 0; i < dof; i++) {
 				cluster.setBit(i,bitCount[i]>threshold);
 			}

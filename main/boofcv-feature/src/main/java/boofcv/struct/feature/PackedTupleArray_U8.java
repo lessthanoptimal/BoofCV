@@ -42,7 +42,7 @@ public class PackedTupleArray_U8 implements PackedArray<TupleDesc_U8> {
 	public PackedTupleArray_U8( int dof ) {
 		this.dof = dof;
 		this.temp = new TupleDesc_U8(dof);
-		array = new DogArray_I8(dof*20);
+		array = new DogArray_I8();
 		array.resize(0);
 	}
 
