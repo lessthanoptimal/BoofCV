@@ -53,9 +53,6 @@ import java.util.List;
  * @author Peter Abeles
  */
 public class RecognitionVocabularyTreeNister2006<Point> {
-
-	// TODO more standard language. query, retrieve
-
 	/** Vocabulary Tree */
 	public @Getter HierarchicalVocabularyTree<Point> tree;
 
@@ -86,9 +83,6 @@ public class RecognitionVocabularyTreeNister2006<Point> {
 	// Predeclare array for storing keys. Avoids unnecessary array creation
 	protected final DogArray_I32 keysDesc = new DogArray_I32(); // ONLY use in describe()
 	protected final DogArray_I32 keysDist = new DogArray_I32(); // ONLY use in distance functions.
-
-	// Set to store common non-zero key between two descriptors
-	protected final TIntSet commonKeys = new TIntHashSet();
 
 	// For lookup
 	TIntIntMap identification_to_match = new TIntIntHashMap();
@@ -147,8 +141,9 @@ public class RecognitionVocabularyTreeNister2006<Point> {
 			LeafCounts counts = leafHistogram.leaves.get(histIdx);
 			Node node = tree.nodes.get(counts.nodeIdx);
 
+			// This leaf has been marked as useless for information. In general it means it's too common
 			if (node.weight <= 0.0f)
-				break;
+				continue;
 
 			InvertedFile invertedFile = (InvertedFile)tree.nodeData.get(node.dataIdx);
 
@@ -165,6 +160,7 @@ public class RecognitionVocabularyTreeNister2006<Point> {
 			while (distanceFromLeaf <= maxDistanceFromLeaf && node.index > 0) {
 				distanceFromLeaf++;
 				node = tree.nodes.get(node.parent);
+				// if the current node has a weight of zero then all its parents have to be zero also.
 				if (node.weight <= 0.0f)
 					break;
 				word.weights.add(info.descTermFreq.get(node.index));
@@ -180,23 +176,23 @@ public class RecognitionVocabularyTreeNister2006<Point> {
 	}
 
 	/**
-	 * Looks up the best match from the data base. The list of all potential matches can be accessed by calling
+	 * Looks up the best match from the database. The list of all potential matches can be accessed by calling
 	 * {@link #getMatchScores()}.
 	 *
-	 * @param query Set of feature descriptors from the query image
+	 * @param queryImage Set of feature descriptors from the query image
 	 * @return The best matching image with score from the database
 	 */
-	public boolean lookup( List<Point> query ) {
+	public boolean query( List<Point> queryImage ) {
 		identification_to_match.clear();
 		matchScores.reset();
 
 		// Can't match to anything if it's empty
-		if (query.isEmpty()) {
+		if (queryImage.isEmpty()) {
 			return false;
 		}
 
 		// Create a description of this image and collect potential matches from leaves
-		describe(query, queryDescTermFreq, leafHistogram);
+		describe(queryImage, queryDescTermFreq, leafHistogram);
 
 		// Create a list of images in the DB that have at least a single feature pass through a node
 		for (int histIdx = 0; histIdx < leafHistogram.leaves.size; histIdx++) {
