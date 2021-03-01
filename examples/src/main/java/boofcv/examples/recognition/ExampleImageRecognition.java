@@ -21,7 +21,6 @@ package boofcv.examples.recognition;
 import boofcv.abst.scene.ImageRecognition;
 import boofcv.abst.scene.nister2006.ConfigImageRecognitionNister2006;
 import boofcv.abst.scene.nister2006.ImageRecognitionNister2006;
-import boofcv.alg.filter.misc.AverageDownSampleOps;
 import boofcv.alg.scene.nister2006.RecognitionVocabularyTreeNister2006;
 import boofcv.factory.feature.describe.ConfigConvertTupleDesc;
 import boofcv.gui.ListDisplayPanel;
@@ -32,6 +31,7 @@ import boofcv.io.image.ImageFileListIterator;
 import boofcv.io.image.UtilImageIO;
 import boofcv.io.recognition.RecognitionIO;
 import boofcv.misc.BoofMiscOps;
+import boofcv.misc.FactoryFilterLambdas;
 import boofcv.struct.image.GrayU8;
 import boofcv.struct.image.ImageType;
 import org.apache.commons.io.FilenameUtils;
@@ -53,23 +53,13 @@ public class ExampleImageRecognition {
 		Collections.sort(images);
 
 		int maxResolution = 1024*768;
-		var scaled = new GrayU8(1024, 768);
 
 		ImageRecognitionNister2006<GrayU8,?> recognizer;
 
 		File saveDirectory = new File("nister2006");
 
 		var imageIterator = new ImageFileListIterator<>(images, ImageType.SB_U8);
-		imageIterator.setFilter(( full ) -> {
-			double scale = Math.sqrt(maxResolution)/Math.sqrt(full.width*full.height);
-			if (scale < 1.0) {
-				scaled.reshape((int)(scale*full.width), (int)(scale*full.height));
-				AverageDownSampleOps.down(full, scaled);
-			} else {
-				scaled.setTo(full);
-			}
-			return scaled;
-		});
+		imageIterator.setFilter(FactoryFilterLambdas.createDownSampleFilter(maxResolution,ImageType.SB_U8));
 
 		if (saveDirectory.exists()) {
 			System.out.println("Loading previously generated model");
