@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -49,38 +49,56 @@ public class TestCompleteSift extends BoofStandardJUnit {
 	/**
 	 * Doesn't do much more than see if it blows up and the expected size of objects is returned
 	 */
-	@Test
-	public void basic() {
-		GrayF32 image = new GrayF32(300,290);
-		GImageMiscOps.fillUniform(image,rand,0,200);
+	@Test void basic() {
+		GrayF32 image = new GrayF32(300, 290);
+		GImageMiscOps.fillUniform(image, rand, 0, 200);
 
 		CompleteSift alg = createAlg();
 
 		alg.process(image);
 
-		assertEquals(128,alg.getDescriptorLength());
+		assertEquals(128, alg.getDescriptorLength());
 
 		DogArray_F64 orientations = alg.getOrientations();
 		FastAccess<ScalePoint> locations = alg.getLocations();
 		FastAccess<TupleDesc_F64> descriptions = alg.getDescriptions();
 
-		assertTrue(orientations.size>10);
-		assertEquals(orientations.size,locations.size);
-		assertEquals(orientations.size,descriptions.size);
+		assertTrue(orientations.size > 10);
+		assertEquals(orientations.size, locations.size);
+		assertEquals(orientations.size, descriptions.size);
+	}
+
+	/**
+	 * If a maximum number of features returned is specified make sure this setting is obeyed.
+	 *
+	 * There was a bug where this was ignored
+	 */
+	@Test void respectMaxAll() {
+		int desiredMax = 10;
+
+		GrayF32 image = new GrayF32(300, 290);
+		GImageMiscOps.fillUniform(image, rand, 0, 200);
+
+		CompleteSift alg = createAlg();
+		alg.maxFeaturesAll = desiredMax;
+		alg.process(image);
+
+		assertEquals(desiredMax, alg.getLocations().size);
+		assertEquals(desiredMax, alg.getOrientations().size);
+		assertEquals(desiredMax, alg.getDescriptions().size);
 	}
 
 	private CompleteSift createAlg() {
+		SiftScaleSpace ss = new SiftScaleSpace(-1, 4, 3, 1.6);
 
-		SiftScaleSpace ss = new SiftScaleSpace(-1,4,3,1.6);
-
-		NonMaxSuppression nonmax = FactoryFeatureExtractor.nonmax(new ConfigExtract(1,0,1,true,true,true));
+		NonMaxSuppression nonmax = FactoryFeatureExtractor.nonmax(new ConfigExtract(1, 0, 1, true, true, true));
 		NonMaxLimiter limiter = new NonMaxLimiter(
-				nonmax, FactorySelectLimit.intensity(ConfigSelectLimit.selectBestN()),300);
+				nonmax, FactorySelectLimit.intensity(ConfigSelectLimit.selectBestN()), 300);
 		OrientationHistogramSift<GrayF32> ori =
-				new OrientationHistogramSift<>(36,1.5,GrayF32.class);
+				new OrientationHistogramSift<>(36, 1.5, GrayF32.class);
 		DescribePointSift<GrayF32> describe =
-				new DescribePointSift<>(4,4,8,1.5,0.5,0.2,GrayF32.class);
+				new DescribePointSift<>(4, 4, 8, 1.5, 0.5, 0.2, GrayF32.class);
 
-		return new CompleteSift(ss,FactorySelectLimit.intensity(ConfigSelectLimit.selectBestN()),10,limiter,ori,describe);
+		return new CompleteSift(ss, FactorySelectLimit.intensity(ConfigSelectLimit.selectBestN()), 10, limiter, ori, describe);
 	}
 }

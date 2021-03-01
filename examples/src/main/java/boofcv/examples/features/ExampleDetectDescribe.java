@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -61,9 +61,12 @@ public class ExampleDetectDescribe {
 	 */
 	public static <T extends ImageGray<T>, TD extends TupleDesc>
 	DetectDescribePoint<T, TD> createFromPremade( Class<T> imageType ) {
-		return (DetectDescribePoint)FactoryDetectDescribe.surfStable(
-				new ConfigFastHessian(1, 2, 200, 1, 9, 4, 4), null,null, imageType);
-//		return (DetectDescribePoint)FactoryDetectDescribe.sift(new ConfigCompleteSift(-1,5,300));
+		var config = new ConfigFastHessian();
+		config.maxFeaturesPerScale = 200;
+		return (DetectDescribePoint)FactoryDetectDescribe.surfStable(config, null,null, imageType);
+//		var config = new ConfigCompleteSift();
+//		config.detector.maxFeaturesPerScale = 400;
+//		return (DetectDescribePoint)FactoryDetectDescribe.sift(config, imageType);
 	}
 
 	/**

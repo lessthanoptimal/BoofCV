@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -31,7 +31,7 @@ import boofcv.struct.convolve.Kernel1D_F32;
 import boofcv.struct.image.GrayF32;
 
 /**
- *<p>
+ * <p>
  * Generates the pyramidal scale space as described in the SIFT [1] paper.  This is, for the most part,
  * is intended to be a faithful reproduction of the original work.
  * </p>
@@ -50,16 +50,16 @@ import boofcv.struct.image.GrayF32;
  */
 public class SiftScaleSpace {
 	// all the scale images across an octave
-	GrayF32 octaveImages[];
+	GrayF32[] octaveImages;
 	// images which are the difference between the scales
-	GrayF32 differenceOfGaussian[];
+	GrayF32[] differenceOfGaussian;
 
 	// Blur factor for first image in the scale pyramid
 	// The sigma for the first image in each octave is sigma0*(2**octave)
 	double sigma0;
 	// Indexes of octaves.  It will create a sequence of images between these two numbers, inclusive.
 	// The size of each one is 2*||octave|| for negative numbers and 1/(2*octave) for positive numbers.
-	int firstOctave,lastOctave;
+	int firstOctave, lastOctave;
 	// Number of scales in each octave.
 	// Total octave images = scales + 3
 	// Total DoG images = scales + 2
@@ -72,7 +72,7 @@ public class SiftScaleSpace {
 
 	// precomputed kernels
 	Kernel1D_F32 kernelSigma0;
-	Kernel1D_F32 kernelSigmaToK[];
+	Kernel1D_F32[] kernelSigmaToK;
 
 	// the input image
 	GrayF32 input;
@@ -95,17 +95,16 @@ public class SiftScaleSpace {
 	 * Configures the scale-space
 	 *
 	 * @param firstOctave Initial octave.  Negative numbers means it will scale up.  Recommend 0 or -1.
-	 * @param lastOctave  Last octave, inclusive.  Recommend ????
+	 * @param lastOctave Last octave, inclusive.  Recommend ????
 	 * @param numScales Number of scales in each octave.  Recommend 3.
 	 * @param sigma0 Amount of blur at the first level in the image pyramid.  Recommend 1.6
 	 */
-	public SiftScaleSpace(int firstOctave , int lastOctave ,
-						  int numScales ,
-						  double sigma0  )
-	{
-		if( lastOctave <= firstOctave )
+	public SiftScaleSpace( int firstOctave, int lastOctave,
+						   int numScales,
+						   double sigma0 ) {
+		if (lastOctave <= firstOctave)
 			throw new IllegalArgumentException("Last octave must be more than the first octave");
-		if( numScales < 1 )
+		if (numScales < 1)
 			throw new IllegalArgumentException("Number of scales must be >= 1");
 
 		this.firstOctave = firstOctave;
@@ -116,28 +115,28 @@ public class SiftScaleSpace {
 		octaveImages = new GrayF32[numScales + 3];
 		differenceOfGaussian = new GrayF32[numScales + 2];
 		for (int i = 1; i < octaveImages.length; i++) {
-			octaveImages[i] = new GrayF32(1,1);
-			differenceOfGaussian[i-1] = new GrayF32(1,1);
+			octaveImages[i] = new GrayF32(1, 1);
+			differenceOfGaussian[i - 1] = new GrayF32(1, 1);
 		}
-		tempImage0 = new GrayF32(1,1);
-		tempImage1 = new GrayF32(1,1);
-		tempBlur = new GrayF32(1,1);
+		tempImage0 = new GrayF32(1, 1);
+		tempImage1 = new GrayF32(1, 1);
+		tempBlur = new GrayF32(1, 1);
 
 		// each scale is K has a sigma that is K times larger than the previous
-		levelK = Math.pow(2,1.0/numScales);
+		levelK = Math.pow(2, 1.0/numScales);
 
 		// create all the convolution kernels
 		Class kernelType = FactoryKernel.getKernelType(GrayF32.class, 1);
-		kernelSigma0 = (Kernel1D_F32) FactoryKernelGaussian.gaussian(kernelType, sigma0, -1);
+		kernelSigma0 = (Kernel1D_F32)FactoryKernelGaussian.gaussian(kernelType, sigma0, -1);
 
-		kernelSigmaToK = new Kernel1D_F32[numScales+2];
+		kernelSigmaToK = new Kernel1D_F32[numScales + 2];
 		for (int i = 1; i < numScales + 3; i++) {
 			double before = computeSigmaScale(0, i - 1);
 
 			// compute the sigma that when applied to the previous scale will produce k*scale
 			// k*sigma_{i-1} = conv( sigma_(i-1) , sigma)
-			double sigma = before*Math.sqrt(levelK-1.0);
-			kernelSigmaToK[i-1] = (Kernel1D_F32)FactoryKernelGaussian.gaussian(kernelType, sigma, -1);
+			double sigma = before*Math.sqrt(levelK - 1.0);
+			kernelSigmaToK[i - 1] = (Kernel1D_F32)FactoryKernelGaussian.gaussian(kernelType, sigma, -1);
 		}
 
 //		for (int octave = firstOctave; octave <= lastOctave; octave++) {
@@ -153,32 +152,31 @@ public class SiftScaleSpace {
 	 * Computes the effective amount of blur at the given scale in the current octave.
 	 */
 	public double computeSigmaScale( int scale ) {
-		return computeSigmaScale(currentOctave,scale);
+		return computeSigmaScale(currentOctave, scale);
 	}
 
 	/**
 	 * Returns the blur at the given octave and scale
 	 */
-	public double computeSigmaScale(int octave, int scale) {
-		return sigma0*Math.pow(2,octave+scale/(double)numScales);
+	public double computeSigmaScale( int octave, int scale ) {
+		return sigma0*Math.pow(2, octave + scale/(double)numScales);
 	}
 
 	/**
-	 *
 	 * @param input Input image.  No prior blur should be applied to this image. Not modified.
 	 */
 	public void initialize( GrayF32 input ) {
 		this.input = input;
 		currentOctave = firstOctave;
 
-		if( firstOctave < 0 ) {
-			PyramidOps.scaleImageUp(input,tempImage1,-2*firstOctave,interp);
+		if (firstOctave < 0) {
+			PyramidOps.scaleImageUp(input, tempImage1, -2*firstOctave, interp);
 			tempImage0.reshape(tempImage1.width, tempImage1.height);
 			applyGaussian(tempImage1, tempImage0, kernelSigma0);
 		} else {
 			tempImage0.reshape(input.width, input.height);
 			applyGaussian(input, tempImage0, kernelSigma0);
-			
+
 			for (int i = 0; i < firstOctave; i++) {
 				tempImage1.reshape(tempImage0.width, tempImage0.height);
 				// first image in the next octave will have 2x the blur as the first image in the prior octave
@@ -191,18 +189,18 @@ public class SiftScaleSpace {
 		computeOctaveScales();
 	}
 
-
 	/**
 	 * Computes the next octave.  If the last octave has already been computed false is returned.
+	 *
 	 * @return true if an octave was computed or false if the last one was already reached
 	 */
 	public boolean computeNextOctave() {
 		currentOctave += 1;
-		if( currentOctave > lastOctave ) {
+		if (currentOctave > lastOctave) {
 			return false;
 		}
 
-		if( octaveImages[numScales].width <= 5 || octaveImages[numScales].height <= 5)
+		if (octaveImages[numScales].width <= 5 || octaveImages[numScales].height <= 5)
 			return false;
 
 		// the 2nd image from the top of the stack has 2x the sigma as the first
@@ -216,32 +214,32 @@ public class SiftScaleSpace {
 	 */
 	private void computeOctaveScales() {
 		octaveImages[0] = tempImage0;
-		for (int i = 1; i < numScales+3; i++) {
+		for (int i = 1; i < numScales + 3; i++) {
 			octaveImages[i].reshape(tempImage0.width, tempImage0.height);
-			applyGaussian(octaveImages[i - 1], octaveImages[i], kernelSigmaToK[i-1]);
+			applyGaussian(octaveImages[i - 1], octaveImages[i], kernelSigmaToK[i - 1]);
 		}
 
-		for (int i = 1; i < numScales+3; i++) {
-			differenceOfGaussian[i-1].reshape(tempImage0.width, tempImage0.height);
-			PixelMath.subtract(octaveImages[i],octaveImages[i - 1],differenceOfGaussian[i-1]);
+		for (int i = 1; i < numScales + 3; i++) {
+			differenceOfGaussian[i - 1].reshape(tempImage0.width, tempImage0.height);
+			PixelMath.subtract(octaveImages[i], octaveImages[i - 1], differenceOfGaussian[i - 1]);
 		}
 	}
 
-	public GrayF32 getImageScale(int scaleIndex ) {
+	public GrayF32 getImageScale( int scaleIndex ) {
 		return octaveImages[scaleIndex];
 	}
 
-	public GrayF32 getDifferenceOfGaussian(int dogIndex ) {
+	public GrayF32 getDifferenceOfGaussian( int dogIndex ) {
 		return differenceOfGaussian[dogIndex];
 	}
 
 	/**
 	 * Applies the separable kernel to the input image and stores the results in the output image.
 	 */
-	void applyGaussian(GrayF32 input, GrayF32 output, Kernel1D kernel) {
+	void applyGaussian( GrayF32 input, GrayF32 output, Kernel1D kernel ) {
 		tempBlur.reshape(input.width, input.height);
 		GConvolveImageOps.horizontalNormalized(kernel, input, tempBlur);
-		GConvolveImageOps.verticalNormalized(kernel, tempBlur,output);
+		GConvolveImageOps.verticalNormalized(kernel, tempBlur, output);
 	}
 
 	public int getNumScales() {
@@ -249,7 +247,7 @@ public class SiftScaleSpace {
 	}
 
 	public int getNumScaleImages() {
-		return numScales+3;
+		return numScales + 3;
 	}
 
 	public int getCurrentOctave() {
@@ -257,15 +255,16 @@ public class SiftScaleSpace {
 	}
 
 	public int getTotalOctaves() {
-		return lastOctave-firstOctave+1;
+		return lastOctave - firstOctave + 1;
 	}
 
 	/**
 	 * Returns the size of a pixel in the current octave relative to the size of a pixel
 	 * in the input image
+	 *
 	 * @return pixel size to input image
 	 */
 	public double pixelScaleCurrentToInput() {
-		return Math.pow(2.0,currentOctave);
+		return Math.pow(2.0, currentOctave);
 	}
 }

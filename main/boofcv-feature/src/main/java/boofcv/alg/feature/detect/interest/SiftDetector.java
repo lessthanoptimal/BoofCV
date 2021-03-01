@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -227,8 +227,8 @@ public class SiftDetector {
 		for (int i = 0; i < found.size; i++) {
 			NonMaxLimiter.LocalExtreme e = found.get(i);
 
-			if (isScaleSpaceExtremum(e.location.x, e.location.y, e.getValue(), e.max ? 1f : -1f)) {
-				processFeatureCandidate(e.location.x, e.location.y, e.getValue(), e.max);
+			if (isScaleSpaceExtremum(e.location.x, e.location.y, e.intensity, e.max ? 1f : -1f)) {
+				processFeatureCandidate(e.location.x, e.location.y, e.intensity, e.max);
 			}
 		}
 	}
@@ -238,25 +238,23 @@ public class SiftDetector {
 	 *
 	 * @param c_x x-coordinate of extremum
 	 * @param c_y y-coordinate of extremum
-	 * @param value The maximum value it is checking
+	 * @param positiveIntensity The maximum value it is checking. (positive value)
 	 * @param signAdj Adjust the sign so that it can check for maximums
 	 * @return true if its a local extremum
 	 */
-	boolean isScaleSpaceExtremum( int c_x, int c_y, float value, float signAdj ) {
+	boolean isScaleSpaceExtremum( int c_x, int c_y, float positiveIntensity, float signAdj ) {
 		if (c_x <= 1 || c_y <= 1 || c_x >= dogLower.width - 1 || c_y >= dogLower.height - 1)
 			return false;
 
 		float v;
 
-		value *= signAdj;
-
 		for (int y = -1; y <= 1; y++) {
 			for (int x = -1; x <= 1; x++) {
 				v = dogLower.unsafe_get(c_x + x, c_y + y);
-				if (v*signAdj >= value)
+				if (v*signAdj >= positiveIntensity)
 					return false;
 				v = dogUpper.unsafe_get(c_x + x, c_y + y);
-				if (v*signAdj >= value)
+				if (v*signAdj >= positiveIntensity)
 					return false;
 			}
 		}
@@ -272,10 +270,10 @@ public class SiftDetector {
 	 *
 	 * @param x x-coordinate of extremum
 	 * @param y y-coordinate of extremum
-	 * @param value value of the extremum
+	 * @param positiveIntensity value of the extremum. Positive intensity value.
 	 * @param maximum true if it was a maximum
 	 */
-	protected void processFeatureCandidate( int x, int y, float value, boolean maximum ) {
+	protected void processFeatureCandidate( int x, int y, float positiveIntensity, boolean maximum ) {
 		// suppress response along edges
 		if (isEdge(x, y))
 			return;
@@ -283,8 +281,6 @@ public class SiftDetector {
 		// Estimate the scale and 2D point by fitting 2nd order polynomials
 		// This is different from the original paper
 		float signAdj = maximum ? 1 : -1;
-
-		value *= signAdj;
 
 		float x0 = dogTarget.unsafe_get(x - 1, y)*signAdj;
 		float x2 = dogTarget.unsafe_get(x + 1, y)*signAdj;
@@ -297,11 +293,11 @@ public class SiftDetector {
 		ScalePoint p = detectionsAll.grow();
 
 		// Compute the interpolated coordinate of the point in the original image coordinates
-		p.pixel.x = pixelScaleToInput*(x + polyPeak(x0, value, x2));
-		p.pixel.y = pixelScaleToInput*(y + polyPeak(y0, value, y2));
+		p.pixel.x = pixelScaleToInput*(x + polyPeak(x0, positiveIntensity, x2));
+		p.pixel.y = pixelScaleToInput*(y + polyPeak(y0, positiveIntensity, y2));
 
 		// find the peak then do bilinear interpolate between the two appropriate sigmas
-		double sigmaInterp = polyPeak(s0, value, s2); // scaled from -1 to 1
+		double sigmaInterp = polyPeak(s0, positiveIntensity, s2); // scaled from -1 to 1
 		if (sigmaInterp < 0) {
 			p.scale = sigmaLower*-sigmaInterp + (1 + sigmaInterp)*sigmaTarget;
 		} else {
@@ -312,7 +308,7 @@ public class SiftDetector {
 		p.white = !maximum;
 
 		// Set the intensity to a positive value
-		p.intensity = maximum ? value : -value;
+		p.intensity = positiveIntensity;
 
 		handleDetection(p);
 	}

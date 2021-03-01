@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -41,7 +41,7 @@ public class NonMaxLimiter {
 	@Getter NonMaxSuppression nonmax;
 
 	/** Maximum number of features it can return. If %le; 0 then there will be no limit */
-	@Getter	@Setter	int maxTotalFeatures;
+	@Getter @Setter int maxTotalFeatures;
 
 	// Detected minimums and maximums
 	QueueCorner originalMin = new QueueCorner();
@@ -56,47 +56,53 @@ public class NonMaxLimiter {
 
 	/**
 	 * Configures the limiter
+	 *
 	 * @param nonmax Non-maximum suppression algorithm
 	 * @param maxTotalFeatures The total number of allowed features it can return.  Set to a value &le; 0 to disable.
 	 */
-	public NonMaxLimiter(NonMaxSuppression nonmax,
-						 FeatureSelectLimitIntensity<LocalExtreme> selector,
-						 int maxTotalFeatures) {
+	public NonMaxLimiter( NonMaxSuppression nonmax,
+						  FeatureSelectLimitIntensity<LocalExtreme> selector,
+						  int maxTotalFeatures ) {
 		this.nonmax = nonmax;
 		this.selector = selector;
 		this.maxTotalFeatures = maxTotalFeatures;
 
 		selector.setSampler(new SampleIntensity<>() {
-			@Override public float sample(@Nullable GrayF32 intensity, int index, LocalExtreme p) { return p.intensity;}
-			@Override public int getX(LocalExtreme p) {return p.location.x;}
-			@Override public int getY(LocalExtreme p) {return p.location.y;}
+			@Override
+			public float sample( @Nullable GrayF32 intensity, int index, LocalExtreme p ) { return p.intensity;}
+
+			@Override public int getX( LocalExtreme p ) {return p.location.x;}
+
+			@Override public int getY( LocalExtreme p ) {return p.location.y;}
 		});
 	}
 
 	/**
 	 * Extracts local max and/or min from the intensity image.  If more than the maximum features are found then
 	 * only the most intense ones will be returned
+	 *
 	 * @param intensity Feature image intensity
 	 */
-	public void process(GrayF32 intensity ) {
+	public void process( GrayF32 intensity ) {
 
 		originalMin.reset();
 		originalMax.reset();
-		nonmax.process(intensity,null,null,originalMin,originalMax);
+		nonmax.process(intensity, null, null, originalMin, originalMax);
 
 		foundAll.reset();
 		for (int i = 0; i < originalMin.size; i++) {
 			Point2D_I16 p = originalMin.get(i);
-			float val = intensity.unsafe_get(p.x,p.y);
-			foundAll.grow().set(-val,false,p);
+			float val = intensity.unsafe_get(p.x, p.y);
+			foundAll.grow().set(-val, false, p);
 		}
+
 		for (int i = 0; i < originalMax.size; i++) {
 			Point2D_I16 p = originalMax.get(i);
 			float val = intensity.unsafe_get(p.x, p.y);
-			foundAll.grow().set(val,true,p);
+			foundAll.grow().set(val, true, p);
 		}
 
-		if( maxTotalFeatures > 0 ) {
+		if (maxTotalFeatures > 0) {
 			selector.select(intensity, -1, -1, true, null, foundAll, maxTotalFeatures, foundSelected);
 		} else {
 			foundSelected.clear();
@@ -111,15 +117,16 @@ public class NonMaxLimiter {
 	/**
 	 * Data structure which provides information on a local extremum.
 	 */
-	public static class LocalExtreme implements Comparable<LocalExtreme>{
+	public static class LocalExtreme implements Comparable<LocalExtreme> {
 		/**
 		 * Absolute value of image intensity
 		 */
 		public float intensity;
+		/** true if it was a maximum (positive) or minimum (negative intensity) */
 		public boolean max;
 		public Point2D_I16 location;
 
-		public LocalExtreme set( float intensity , boolean max , Point2D_I16 location ){
+		public LocalExtreme set( float intensity, boolean max, Point2D_I16 location ) {
 			this.intensity = intensity;
 			this.max = max;
 			this.location = location;
@@ -129,18 +136,18 @@ public class NonMaxLimiter {
 		/**
 		 * Returns the value of the feature in the intensity image.  Adds the sign back
 		 */
-		public float getValue() {
-			if( max )
+		public float getIntensitySigned() {
+			if (max)
 				return intensity;
 			else
 				return -intensity;
 		}
 
 		@Override
-		public int compareTo(LocalExtreme o) {
+		public int compareTo( LocalExtreme o ) {
 			if (intensity < o.intensity) {
 				return 1;
-			} else if( intensity > o.intensity ) {
+			} else if (intensity > o.intensity) {
 				return -1;
 			} else {
 				return 0;
