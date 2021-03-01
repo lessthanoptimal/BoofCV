@@ -39,6 +39,8 @@ public class ImageFileListIterator<T extends ImageBase<T>> implements Iterator<T
 	protected @Getter int index;
 
 	protected @Getter @Setter BoofLambdas.Filter<T> filter = (a)->a;
+	/** Called when an image can't be read. Passes in the index. */
+	protected @Getter @Setter BoofLambdas.ProcessI exception = (idx)->{};
 
 	public ImageFileListIterator( List<String> paths, ImageType<T> imageType ) {
 		image = imageType.createImage(1, 1);
@@ -55,9 +57,20 @@ public class ImageFileListIterator<T extends ImageBase<T>> implements Iterator<T
 	}
 
 	@Override public T next() {
-		index++;
-		BufferedImage buffered = UtilImageIO.loadImage(paths.get(index));
-		ConvertBufferedImage.convertFrom(buffered, true, image);
+		do {
+			try {
+				index++;
+				BufferedImage buffered = UtilImageIO.loadImage(paths.get(index));
+				ConvertBufferedImage.convertFrom(buffered, true, image);
+				break;
+			} catch (RuntimeException e) {
+				exception.process(index);
+				System.err.println("Bad Image: "+paths.get(index));
+				// If there's a bad image, print the stack trace and go on to the next image.
+				e.printStackTrace(System.err);
+			}
+		} while( index < paths.size());
+
 		return filter.process(image);
 	}
 }
