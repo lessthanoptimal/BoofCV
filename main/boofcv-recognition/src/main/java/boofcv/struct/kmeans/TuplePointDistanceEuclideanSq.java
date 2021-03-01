@@ -19,10 +19,7 @@
 package boofcv.struct.kmeans;
 
 import boofcv.alg.descriptor.DescriptorDistance;
-import boofcv.struct.feature.TupleDesc;
-import boofcv.struct.feature.TupleDesc_F32;
-import boofcv.struct.feature.TupleDesc_F64;
-import boofcv.struct.feature.TupleDesc_U8;
+import boofcv.struct.feature.*;
 import org.ddogleg.clustering.PointDistance;
 
 /**
@@ -47,6 +44,12 @@ public abstract class TuplePointDistanceEuclideanSq<T extends TupleDesc<T>> impl
 
 	public static class U8 extends TuplePointDistanceEuclideanSq<TupleDesc_U8> {
 		@Override public double distance( TupleDesc_U8 a, TupleDesc_U8 b ) {
+			return DescriptorDistance.euclideanSq(a, b);
+		}
+	}
+
+	public static class S8 extends TuplePointDistanceEuclideanSq<TupleDesc_S8> {
+		@Override public double distance( TupleDesc_S8 a, TupleDesc_S8 b ) {
 			return DescriptorDistance.euclideanSq(a, b);
 		}
 	}

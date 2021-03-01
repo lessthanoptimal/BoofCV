@@ -32,6 +32,7 @@ import boofcv.struct.feature.*;
 import boofcv.struct.image.ImageBase;
 import boofcv.struct.image.ImageType;
 import boofcv.struct.kmeans.TuplePointDistanceEuclideanSq;
+import boofcv.struct.kmeans.TuplePointDistanceHamming;
 import gnu.trove.map.TIntIntMap;
 import gnu.trove.map.hash.TIntIntHashMap;
 import org.ddogleg.clustering.PointDistance;
@@ -224,6 +225,16 @@ public class RecognitionIO {
 						distanceFunction = (PointDistance)new TuplePointDistanceEuclideanSq.U8();
 						descriptions = (PackedArray)new PackedTupleArray_U8(dof);
 						tuple = (TD)new TupleDesc_U8(dof);
+					}
+					case "TupleDesc_S8" -> {
+						distanceFunction = (PointDistance)new TuplePointDistanceEuclideanSq.S8();
+						descriptions = (PackedArray)new PackedTupleArray_S8(dof);
+						tuple = (TD)new TupleDesc_S8(dof);
+					}
+					case "TupleDesc_B" -> {
+						distanceFunction = (PointDistance)new TuplePointDistanceHamming();
+						descriptions = (PackedArray)new PackedTupleArray_B(dof);
+						tuple = (TD)new TupleDesc_B(dof);
 					}
 					default -> throw new IOException("Unknown point type. " + pointType);
 				}

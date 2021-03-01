@@ -20,6 +20,7 @@ package boofcv.struct.kmeans;
 
 import boofcv.struct.feature.TupleDesc_F32;
 import boofcv.struct.feature.TupleDesc_F64;
+import boofcv.struct.feature.TupleDesc_S8;
 import boofcv.struct.feature.TupleDesc_U8;
 import boofcv.testing.BoofStandardJUnit;
 import org.ddogleg.clustering.PointDistance;
@@ -122,6 +123,38 @@ public class TestTuplePointDistanceEuclideanSq extends BoofStandardJUnit {
 			var b = new TupleDesc_U8((byte)4,(byte)1,(byte)200);
 
 			float expected = 3*3 + 1 + 10*10;
+
+			assertEquals(expected, alg.distance(a,b), UtilEjml.TEST_F32);
+		}
+	}
+
+	@Nested class S8 extends GenericPointDistanceChecks<TupleDesc_S8> {
+		@Override protected PointDistance<TupleDesc_S8> createAlg() {
+			return new TuplePointDistanceEuclideanSq.S8();
+		}
+
+		@Override protected TupleDesc_S8 createRandomPoint() {
+			var desc = new TupleDesc_S8(DOF);
+			for (int i = 0; i < DOF; i++) {
+				desc.data[i] = (byte)rand.nextInt(256);
+			}
+			return desc;
+		}
+
+		@Override protected TupleDesc_S8 addToPoint( TupleDesc_S8 src, double magnitude ) {
+			TupleDesc_S8 ret = src.copy();
+			for (int i = 0; i < DOF; i++) {
+				ret.data[i] = (byte)(ret.data[i] + (int)magnitude);
+			}
+			return ret;
+		}
+
+		@Test void knownSolution() {
+			PointDistance<TupleDesc_S8> alg = createAlg();
+			var a = new TupleDesc_S8((byte)1,(byte)2,(byte)-2);
+			var b = new TupleDesc_S8((byte)4,(byte)1,(byte)3);
+
+			float expected = 3*3 + 1 + 5*5;
 
 			assertEquals(expected, alg.distance(a,b), UtilEjml.TEST_F32);
 		}

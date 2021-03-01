@@ -29,6 +29,11 @@ public class TupleDesc_S8 extends TupleDesc_I8<TupleDesc_S8> {
 		super(numFeatures);
 	}
 
+	public TupleDesc_S8( byte... values ) {
+		super(values.length);
+		System.arraycopy(values, 0, this.data, 0, values.length);
+	}
+
 	public int get( int index ) {return this.data[index];}
 
 	@Override public double getDouble( int index ) {

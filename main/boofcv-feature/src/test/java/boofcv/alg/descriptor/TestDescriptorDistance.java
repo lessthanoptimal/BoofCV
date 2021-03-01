@@ -68,6 +68,16 @@ public class TestDescriptorDistance extends BoofStandardJUnit {
 		assertEquals(6467, DescriptorDistance.euclideanSq(a, b), 1e-4);
 	}
 
+	@Test void euclideanSq_S8() {
+		var a = new TupleDesc_S8(5);
+		var b = new TupleDesc_S8(5);
+
+		a.data =new byte[]{1,-5,-45,5,0};
+		b.data =new byte[]{2,100,-93,9,-6};
+
+		assertEquals(13382, DescriptorDistance.euclideanSq(a, b), 1e-4);
+	}
+
 
 	@Test void correlation() {
 		var a = new TupleDesc_F64(5);
