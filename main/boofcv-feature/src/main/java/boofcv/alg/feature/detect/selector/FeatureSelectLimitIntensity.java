@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -52,7 +52,7 @@ public interface FeatureSelectLimitIntensity<Point> {
 	 * @param selected (Output) Selected features. Element count not exceed the limit. Reset on every call.
 	 */
 	void select( @Nullable GrayF32 intensity, int width, int height, boolean positive,
-				 @Nullable FastAccess<Point> prior, FastAccess<Point> detected, int limit, FastArray<Point> selected);
+				 @Nullable FastAccess<Point> prior, FastAccess<Point> detected, int limit, FastArray<Point> selected );
 
 	/**
 	 * Specifies how the intensity will be sampled.

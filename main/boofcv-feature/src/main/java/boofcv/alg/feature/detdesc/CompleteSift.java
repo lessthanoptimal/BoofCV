@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -38,14 +38,12 @@ import org.ddogleg.struct.FastArray;
  * SIFT combined together to simultaneously detect and describe the key points it finds.  Memory is conserved by
  * only having one octave of the scale-space in memory at any given time.
  *
+ * @author Peter Abeles
  * @see OrientationHistogramSift
  * @see DescribePointSift
  * @see SiftDetector
- *
- * @author Peter Abeles
  */
-public class CompleteSift extends SiftDetector
-{
+public class CompleteSift extends SiftDetector {
 	// estimate orientation
 	OrientationHistogramSift<GrayF32> orientation;
 	// describes the keypoints
@@ -57,11 +55,11 @@ public class CompleteSift extends SiftDetector
 	DogArray_F64 orientations = new DogArray_F64();
 
 	// used to compute the image gradient
-	ImageGradient<GrayF32,GrayF32> gradient = FactoryDerivative.three(GrayF32.class,null);
+	ImageGradient<GrayF32, GrayF32> gradient = FactoryDerivative.three(GrayF32.class, null);
 
 	// spacial derivative for the current scale in the octave
-	GrayF32 derivX = new GrayF32(1,1);
-	GrayF32 derivY = new GrayF32(1,1);
+	GrayF32 derivX = new GrayF32(1, 1);
+	GrayF32 derivY = new GrayF32(1, 1);
 
 	/**
 	 * Configures SIFT
@@ -72,22 +70,22 @@ public class CompleteSift extends SiftDetector
 	 * @param orientation Estimates feature orientation(s)
 	 * @param describe Describes a SIFT feature
 	 */
-	public CompleteSift(SiftScaleSpace scaleSpace,
-						FeatureSelectLimitIntensity<ScalePoint> selectFeaturesAll,
-						double edgeR, NonMaxLimiter extractor,
-						OrientationHistogramSift<GrayF32> orientation,
-						DescribePointSift<GrayF32> describe) {
-		super(scaleSpace,selectFeaturesAll, edgeR, extractor);
+	public CompleteSift( SiftScaleSpace scaleSpace,
+						 FeatureSelectLimitIntensity<ScalePoint> selectFeaturesAll,
+						 double edgeR, NonMaxLimiter extractor,
+						 OrientationHistogramSift<GrayF32> orientation,
+						 DescribePointSift<GrayF32> describe ) {
+		super(scaleSpace, selectFeaturesAll, edgeR, extractor);
 
 		this.orientation = orientation;
 		this.describe = describe;
 
 		final int dof = describe.getDescriptorLength();
-		features = new DogArray<>(()->new TupleDesc_F64(dof));
+		features = new DogArray<>(() -> new TupleDesc_F64(dof));
 	}
 
 	@Override
-	public void process(GrayF32 input) {
+	public void process( GrayF32 input ) {
 		features.reset();
 		locations.reset();
 		orientations.reset();
@@ -95,36 +93,35 @@ public class CompleteSift extends SiftDetector
 	}
 
 	@Override
-	protected void detectFeatures(int scaleIndex) {
-
+	protected void detectFeatures( int scaleIndex ) {
 		// compute image derivative for this scale
 		GrayF32 input = scaleSpace.getImageScale(scaleIndex);
-		derivX.reshape(input.width,input.height);
-		derivY.reshape(input.width,input.height);
-		gradient.process(input,derivX,derivY);
+		derivX.reshape(input.width, input.height);
+		derivY.reshape(input.width, input.height);
+		gradient.process(input, derivX, derivY);
 
 		// set up the orientation and description algorithms
-		orientation.setImageGradient(derivX,derivY);
-		describe.setImageGradient(derivX,derivY);
+		orientation.setImageGradient(derivX, derivY);
+		describe.setImageGradient(derivX, derivY);
 
 		super.detectFeatures(scaleIndex);
 	}
 
 	@Override
-	protected void handleDetection(ScalePoint p) {
+	protected void handleDetection( ScalePoint p ) {
 
 		// adjust the image for the down sampling in each octave
-		double localX = p.pixel.x / pixelScaleToInput;
-		double localY = p.pixel.y / pixelScaleToInput;
-		double localSigma = p.scale / pixelScaleToInput;
+		double localX = p.pixel.x/pixelScaleToInput;
+		double localY = p.pixel.y/pixelScaleToInput;
+		double localSigma = p.scale/pixelScaleToInput;
 
 		// find potential orientations first
-		orientation.process(localX,localY,localSigma);
+		orientation.process(localX, localY, localSigma);
 
 		// describe each feature
 		DogArray_F64 angles = orientation.getOrientations();
 		for (int i = 0; i < angles.size; i++) {
-			describe.process(localX,localY,localSigma,angles.get(i),features.grow());
+			describe.process(localX, localY, localSigma, angles.get(i), features.grow());
 
 			orientations.add(angles.get(i));
 			locations.add(p);

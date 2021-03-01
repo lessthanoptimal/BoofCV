@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -54,8 +54,8 @@ public class TestNonMaxLimiter extends BoofStandardJUnit {
 
 		for (int i = 0; i < found.size(); i++) {
 			NonMaxLimiter.LocalExtreme a = found.get(i);
-			assertEquals(a.getValue(),intensity.get(a.location.x,a.location.y));
-			assertEquals( a.getValue() > 0 , a.max);
+			assertEquals(a.getIntensitySigned(),intensity.get(a.location.x,a.location.y));
+			assertEquals( a.getIntensitySigned() > 0 , a.max);
 		}
 	}
 
@@ -83,8 +83,8 @@ public class TestNonMaxLimiter extends BoofStandardJUnit {
 
 		for (int i = 0; i < found.size(); i++) {
 			NonMaxLimiter.LocalExtreme a = found.get(i);
-			assertEquals(a.getValue(),intensity.get(a.location.x,a.location.y));
-			assertEquals( a.getValue() > 0 , a.max);
+			assertEquals(a.getIntensitySigned(),intensity.get(a.location.x,a.location.y));
+			assertEquals( a.getIntensitySigned() > 0 , a.max);
 			assertEquals(25,a.intensity,1e-8);
 
 		}

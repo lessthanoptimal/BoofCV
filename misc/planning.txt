@@ -41,7 +41,6 @@ TODO Videos - hough line detectors
 
 TODO assisted self calibration
 TODO hough circle detector
-TODO concurrent SIFT
 TODO concurrent dense features?
 TODO Estimate focal lengths given disparity image
 TODO Scharr gradient http://www.hlevkin.com/articles/SobelScharrGradients5x5.pdf
