@@ -54,9 +54,6 @@ public class ConfigImageRecognitionNister2006 implements Configuration {
 
 	// TODO make entropy weighting configurable
 
-	/** Maximum number of matches. If &le; 0, then all matches are returned */
-	public int maxMatches = 10;
-
 	/** Seed used in random number generators */
 	public long randSeed = 0xDEADBEEF;
 
@@ -91,7 +88,6 @@ public class ConfigImageRecognitionNister2006 implements Configuration {
 		this.features.setTo(src.features);
 		this.distanceNorm = src.distanceNorm;
 		this.maxDistanceFromLeaf = src.maxDistanceFromLeaf;
-		this.maxMatches = src.maxMatches;
 		this.randSeed = src.randSeed;
 	}
 }

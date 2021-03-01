@@ -54,12 +54,12 @@ public class ExampleImageRecognition {
 
 		int maxResolution = 1024*768;
 
-		ImageRecognitionNister2006<GrayU8,?> recognizer;
+		ImageRecognitionNister2006<GrayU8, ?> recognizer;
 
 		File saveDirectory = new File("nister2006");
 
 		var imageIterator = new ImageFileListIterator<>(images, ImageType.SB_U8);
-		imageIterator.setFilter(FactoryFilterLambdas.createDownSampleFilter(maxResolution,ImageType.SB_U8));
+		imageIterator.setFilter(FactoryFilterLambdas.createDownSampleFilter(maxResolution, ImageType.SB_U8));
 
 		if (saveDirectory.exists()) {
 			System.out.println("Loading previously generated model");
@@ -88,7 +88,7 @@ public class ExampleImageRecognition {
 			}
 
 			System.out.println("Saving tree");
-			BoofMiscOps.profile(()->RecognitionIO.saveNister2006(recognizer, saveDirectory),"");
+			BoofMiscOps.profile(() -> RecognitionIO.saveNister2006(recognizer, saveDirectory), "");
 		}
 
 		ListDisplayPanel gui = new ListDisplayPanel();
@@ -99,16 +99,16 @@ public class ExampleImageRecognition {
 		// Look up images
 		DogArray<ImageRecognition.Match> matches = new DogArray<>(ImageRecognition.Match::new);
 		imageIterator.reset();
-		recognizer.findBestMatch(imageIterator.next(), matches);
-		for (int i = 0; i < Math.min(10, matches.size); i++) {
+		recognizer.query(imageIterator.next(), 10, matches);
+		for (int i = 0; i < matches.size; i++) {
 			String file = matches.get(i).id;
 			double error = matches.get(i).error;
 			BufferedImage image = UtilImageIO.loadImage(file);
 			String name = FilenameUtils.getBaseName(new File(file).getName());
-			gui.addImage(image, String.format("%20s Error %6.3f",name, error), ScaleOptions.ALL);
+			gui.addImage(image, String.format("%20s Error %6.3f", name, error), ScaleOptions.ALL);
 		}
 
-		System.out.println("Total images = "+images.size());
+		System.out.println("Total images = " + images.size());
 		System.out.println(images.get(imageIterator.getIndex()) + " -> " + matches.get(0).id + " matches.size=" + matches.size);
 
 		ShowImages.showWindow(gui, "Similar Images by Features", true);
