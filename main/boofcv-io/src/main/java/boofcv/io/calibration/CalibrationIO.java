@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -18,8 +18,12 @@
 
 package boofcv.io.calibration;
 
+import boofcv.BoofVersion;
+import boofcv.alg.geo.calibration.CalibrationObservation;
 import boofcv.io.UtilIO;
+import boofcv.misc.BoofMiscOps;
 import boofcv.struct.calib.*;
+import boofcv.struct.geo.PointIndex2D_F64;
 import georegression.struct.se.Se3_F64;
 import org.jetbrains.annotations.Nullable;
 import org.yaml.snakeyaml.DumperOptions;
@@ -443,5 +447,83 @@ public class CalibrationIO {
 			throw new UncheckedIOException(e);
 		}
 		return transform;
+	}
+
+	public static void saveLandmarksCsv( String inputFile,
+										 String detector,
+										 CalibrationObservation landmarks,
+										 File outputFile ) {
+		try {
+			var stream = new FileOutputStream(outputFile);
+			saveLandmarksCsv(inputFile, detector, landmarks, stream);
+			stream.close();
+		} catch (IOException e) {
+			throw new UncheckedIOException(e);
+		}
+	}
+
+	/**
+	 * Saves detected landmarks from calibration in a CSV file format
+	 *
+	 * @param inputFile (Input) path to input image
+	 * @param detector (Input) description of the detector
+	 * @param landmarks (Input) detected landmarks
+	 * @param outputWriter (Output) where results are writetn to
+	 */
+	public static void saveLandmarksCsv( String inputFile,
+										 String detector,
+										 CalibrationObservation landmarks, OutputStream outputStream ) {
+		PrintWriter out = new PrintWriter(outputStream);
+
+		out.println("# Landmarks detected on a calibration target");
+		out.println("# " + inputFile);
+		out.println("# Image Shape: " + landmarks.getWidth() + " x " + landmarks.getHeight());
+		out.println("# " + detector);
+		out.println("# BoofCV Version: " + BoofVersion.VERSION);
+		out.println("# BoofCV GITSHA: " + BoofVersion.GIT_SHA);
+		out.println("# (landmark id), pixel-x, pixel-y");
+		for (int i = 0; i < landmarks.size(); i++) {
+			PointIndex2D_F64 p = landmarks.get(i);
+			out.println(p.index + "," + p.p.x + "," + p.p.y);
+		}
+		out.flush();
+	}
+
+	/**
+	 * Reads in a CSV that encodes {@link CalibrationObservation}.
+	 *
+	 * @param input The input stream containing the CSV file
+	 * @return decoded observations
+	 */
+	public static CalibrationObservation loadLandmarksCsv( InputStream input ) {
+		var ret = new CalibrationObservation();
+
+		StringBuilder buffer = new StringBuilder();
+		try {
+			while (true) {
+				String line = UtilIO.readLine(input, buffer);
+				if (line.isEmpty())
+					break;
+				if (line.startsWith("# Image Shape:")) {
+					String[] words = line.split(" ");
+					ret.width = Integer.parseInt(words[3]);
+					ret.height = Integer.parseInt(words[5]);
+					continue;
+				} else if (line.startsWith("#")) {
+					continue;
+				}
+
+				String[] words = line.split(",");
+				BoofMiscOps.checkEq(3, words.length, "Expected 3 words: int, double, double");
+				int which = Integer.parseInt(words[0]);
+				double x = Double.parseDouble(words[1]);
+				double y = Double.parseDouble(words[2]);
+				ret.add(x, y, which);
+			}
+		} catch (IOException e) {
+			throw new UncheckedIOException(e);
+		}
+
+		return ret;
 	}
 }
