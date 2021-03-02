@@ -332,10 +332,10 @@ public class FactoryDetectDescribe {
 	 * @param describe Feature descriptor
 	 * @return {@link DetectDescribePoint}.
 	 */
-	public static <T extends ImageGray<T>, D extends TupleDesc>
-	DetectDescribePoint<T, D> fuseTogether( InterestPointDetector<T> detector,
-											@Nullable OrientationImage<T> orientation,
-											DescribeRegionPoint<T, D> describe ) {
+	public static <T extends ImageGray<T>, TD extends TupleDesc<TD>>
+	DetectDescribePoint<T, TD> fuseTogether( InterestPointDetector<T> detector,
+											 @Nullable OrientationImage<T> orientation,
+											 DescribeRegionPoint<T, TD> describe ) {
 		return new DetectDescribeFusion<>(detector, orientation, describe);
 	}
 }

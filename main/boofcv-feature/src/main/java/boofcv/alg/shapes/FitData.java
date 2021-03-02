@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -33,10 +33,9 @@ public class FitData<Shape> {
 	 */
 	public double error;
 
-	public FitData(Shape shape) {
+	public FitData( Shape shape ) {
 		this.shape = shape;
 	}
 
-	public FitData() {
-	}
+	public FitData() {}
 }

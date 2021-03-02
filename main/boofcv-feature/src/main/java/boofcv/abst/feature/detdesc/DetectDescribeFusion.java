@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -34,29 +34,27 @@ import org.ddogleg.struct.FastArray;
  * them to be used as a single integrated unit. Providing an algorithm for estimating orientation is
  * optional.  If one is provided, any orientation estimate provided by the detector is ignored.
  *
+ * @author Peter Abeles
  * @see InterestPointDetector
  * @see OrientationImage
  * @see DescribeRegionPoint
- *
- * @author Peter Abeles
  */
-public class DetectDescribeFusion<T extends ImageGray<T>, TD extends TupleDesc>
-	implements DetectDescribePoint<T, TD>
-{
+public class DetectDescribeFusion<T extends ImageGray<T>, TD extends TupleDesc<TD>>
+		implements DetectDescribePoint<T, TD> {
 	// detects interest points
-	private InterestPointDetector<T> detector;
+	private final InterestPointDetector<T> detector;
 	// optional override for orientation
-	private OrientationImage<T> orientation;
+	private final OrientationImage<T> orientation;
 	// describes each feature found
-	private DescribeRegionPoint<T, TD> describe;
+	private final DescribeRegionPoint<T, TD> describe;
 
 	// list of extracted feature descriptors
-	private DogArray<TD> descs;
+	private final DogArray<TD> descs;
 
 	// storage for found orientations
-	private DogArray_F64 featureRadiuses = new DogArray_F64(10);
-	private DogArray_F64 featureAngles = new DogArray_F64(10);
-	private FastArray<Point2D_F64> location = new FastArray<>(Point2D_F64.class);
+	private final DogArray_F64 featureRadiuses = new DogArray_F64(10);
+	private final DogArray_F64 featureAngles = new DogArray_F64(10);
+	private final FastArray<Point2D_F64> location = new FastArray<>(Point2D_F64.class);
 
 	/**
 	 * Configures the algorithm.
@@ -65,10 +63,9 @@ public class DetectDescribeFusion<T extends ImageGray<T>, TD extends TupleDesc>
 	 * @param orientation (Optional) orientation estimation algorithm
 	 * @param describe Describes features
 	 */
-	public DetectDescribeFusion(InterestPointDetector<T> detector,
-								OrientationImage<T> orientation,
-								DescribeRegionPoint<T, TD> describe)
-	{
+	public DetectDescribeFusion( InterestPointDetector<T> detector,
+								 OrientationImage<T> orientation,
+								 DescribeRegionPoint<T, TD> describe ) {
 		this.describe = describe;
 		this.orientation = orientation;
 		this.detector = detector;
@@ -82,7 +79,7 @@ public class DetectDescribeFusion<T extends ImageGray<T>, TD extends TupleDesc>
 	}
 
 	@Override
-	public TD getDescription(int index) {
+	public TD getDescription( int index ) {
 		return descs.get(index);
 	}
 
@@ -97,13 +94,13 @@ public class DetectDescribeFusion<T extends ImageGray<T>, TD extends TupleDesc>
 	}
 
 	@Override
-	public void detect(T input) {
+	public void detect( T input ) {
 		descs.reset();
 		featureRadiuses.reset();
 		featureAngles.reset();
 		location.reset();
 
-		if( orientation != null ) {
+		if (orientation != null) {
 			orientation.setImage(input);
 		}
 		describe.setImage(input);
@@ -112,17 +109,17 @@ public class DetectDescribeFusion<T extends ImageGray<T>, TD extends TupleDesc>
 
 		int N = detector.getNumberOfFeatures();
 
-		for( int i = 0; i < N; i++ ) {
+		for (int i = 0; i < N; i++) {
 			Point2D_F64 p = detector.getLocation(i);
 			double radius = detector.getRadius(i);
 			double yaw = detector.getOrientation(i);
 
-			if( orientation != null ) {
+			if (orientation != null) {
 				orientation.setObjectRadius(radius);
-				yaw = orientation.compute(p.x,p.y);
+				yaw = orientation.compute(p.x, p.y);
 			}
 
-			if( describe.process(p.x,p.y,yaw,radius,descs.grow()) ) {
+			if (describe.process(p.x, p.y, yaw, radius, descs.grow())) {
 				featureRadiuses.push(radius);
 				featureAngles.push(yaw);
 				location.add(p);
@@ -138,7 +135,7 @@ public class DetectDescribeFusion<T extends ImageGray<T>, TD extends TupleDesc>
 	}
 
 	@Override
-	public int getSet(int index) {
+	public int getSet( int index ) {
 		return detector.getSet(index);
 	}
 
@@ -148,17 +145,17 @@ public class DetectDescribeFusion<T extends ImageGray<T>, TD extends TupleDesc>
 	}
 
 	@Override
-	public Point2D_F64 getLocation(int featureIndex) {
+	public Point2D_F64 getLocation( int featureIndex ) {
 		return location.get(featureIndex);
 	}
 
 	@Override
-	public double getRadius(int featureIndex) {
+	public double getRadius( int featureIndex ) {
 		return featureRadiuses.get(featureIndex);
 	}
 
 	@Override
-	public double getOrientation(int featureIndex) {
+	public double getOrientation( int featureIndex ) {
 		return featureAngles.get(featureIndex);
 	}
 
@@ -169,7 +166,7 @@ public class DetectDescribeFusion<T extends ImageGray<T>, TD extends TupleDesc>
 
 	@Override
 	public boolean hasOrientation() {
-		if( orientation == null )
+		if (orientation == null)
 			return detector.hasOrientation();
 		return true;
 	}

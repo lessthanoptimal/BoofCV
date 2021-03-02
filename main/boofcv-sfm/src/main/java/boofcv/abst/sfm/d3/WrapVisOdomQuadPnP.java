@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -46,7 +46,7 @@ import java.util.Set;
  *
  * @author Peter Abeles
  */
-public class WrapVisOdomQuadPnP<T extends ImageGray<T>, TD extends TupleDesc>
+public class WrapVisOdomQuadPnP<T extends ImageGray<T>, TD extends TupleDesc<TD>>
 		implements StereoVisualOdometry<T>, AccessPointTracks3D {
 	VisOdomStereoQuadPnP<T, TD> alg;
 	RefinePnPStereo refine;

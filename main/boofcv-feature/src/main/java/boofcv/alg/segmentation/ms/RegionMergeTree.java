@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -48,15 +48,16 @@ public class RegionMergeTree implements Stoppable {
 	// the new ID of the root nodes (segments)
 	protected DogArray_I32 rootID = new DogArray_I32();
 
-	protected boolean stopRequested=false;
+	protected boolean stopRequested = false;
 
 	/**
 	 * Must call before any other functions.
+	 *
 	 * @param numRegions Total number of regions.
 	 */
-	public void initializeMerge(int numRegions) {
+	public void initializeMerge( int numRegions ) {
 		mergeList.resize(numRegions);
-		for( int i = 0; i < numRegions; i++ )
+		for (int i = 0; i < numRegions; i++)
 			mergeList.data[i] = i;
 	}
 
@@ -66,7 +67,7 @@ public class RegionMergeTree implements Stoppable {
 	 * @param pixelToRegion (Input/Output) Image used to convert pixel location in region ID.  Modified.
 	 * @param regionMemberCount (Input/Output) List containing how many pixels belong to each region.  Modified.
 	 */
-	public void performMerge( GrayS32 pixelToRegion ,
+	public void performMerge( GrayS32 pixelToRegion,
 							  DogArray_I32 regionMemberCount ) {
 		// update member counts
 		flowIntoRootNode(regionMemberCount);
@@ -83,15 +84,15 @@ public class RegionMergeTree implements Stoppable {
 	 * its member count and set the index  in mergeList to the root node.  If a node is a root node just note
 	 * what its new ID will be after all the other segments are removed.
 	 */
-	protected void flowIntoRootNode(DogArray_I32 regionMemberCount) {
+	protected void flowIntoRootNode( DogArray_I32 regionMemberCount ) {
 		rootID.resize(regionMemberCount.size);
 		int count = 0;
 
-		for( int i = 0; i < mergeList.size; i++ ) {
+		for (int i = 0; i < mergeList.size; i++) {
 			int p = mergeList.data[i];
 
 			// see if it is a root note
-			if( p == i ) {
+			if (p == i) {
 				// mark the root nodes new ID
 				rootID.data[i] = count++;
 				continue;
@@ -99,7 +100,7 @@ public class RegionMergeTree implements Stoppable {
 
 			// traverse down until it finds the root note
 			int gp = mergeList.data[p];
-			while( gp != p ) {
+			while (gp != p) {
 				p = gp;
 				gp = mergeList.data[p];
 			}
@@ -118,12 +119,12 @@ public class RegionMergeTree implements Stoppable {
 
 		tmpMemberCount.reset();
 
-		for( int i = 0; i < mergeList.size; i++ ) {
+		for (int i = 0; i < mergeList.size; i++) {
 			int p = mergeList.data[i];
 
-			if( p == i ) {
+			if (p == i) {
 				mergeList.data[i] = rootID.data[i];
-				tmpMemberCount.add( regionMemberCount.data[i] );
+				tmpMemberCount.add(regionMemberCount.data[i]);
 			} else {
 				mergeList.data[i] = rootID.data[mergeList.data[i]];
 			}
@@ -143,25 +144,25 @@ public class RegionMergeTree implements Stoppable {
 	 * they are merged.  Either way the path is updated such that the quick check will pass.
 	 * </p>
 	 */
-	protected void markMerge(int regionA, int regionB) {
+	protected void markMerge( int regionA, int regionB ) {
 
 		int dA = mergeList.data[regionA];
 		int dB = mergeList.data[regionB];
 
 		// Quick check to see if they reference the same node
-		if( dA == dB ) {
+		if (dA == dB) {
 			return;
 		}
 
 		// search down to the root node  (set-find)
 		int rootA = regionA;
-		while( dA != rootA ) {
+		while (dA != rootA) {
 			rootA = dA;
 			dA = mergeList.data[rootA];
 		}
 
 		int rootB = regionB;
-		while( dB != rootB ) {
+		while (dB != rootB) {
 			rootB = dB;
 			dB = mergeList.data[rootB];
 		}

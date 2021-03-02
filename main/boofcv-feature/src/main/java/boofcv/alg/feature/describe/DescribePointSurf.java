@@ -83,9 +83,9 @@ public class DescribePointSurf<II extends ImageGray<II>> {
 	protected Kernel2D_F64 weight;
 
 	// computes sparse image gradient around specified points
-	protected SparseScaleGradient<II,?> gradient;
+	protected SparseScaleGradient<II, ?> gradient;
 	// can handle sample requests outside the image border
-	protected SparseImageGradient<II,?> gradientSafe;
+	protected SparseImageGradient<II, ?> gradientSafe;
 
 	// radius of the descriptor at a scale of 1.  Used to determine if it touches the image boundary
 	// does not include sample kernel size
@@ -101,9 +101,9 @@ public class DescribePointSurf<II extends ImageGray<II>> {
 	 * @param useHaar If true the Haar wavelet will be used (what was used in [1]), false means an image gradient
 	 * approximation will be used.  False is recommended.
 	 */
-	public DescribePointSurf(int widthLargeGrid, int widthSubRegion, int widthSample,
-							 double weightSigma , boolean useHaar,
-							 Class<II> inputType ) {
+	public DescribePointSurf( int widthLargeGrid, int widthSubRegion, int widthSample,
+							  double weightSigma, boolean useHaar,
+							  Class<II> inputType ) {
 		this.widthLargeGrid = widthLargeGrid;
 		this.widthSubRegion = widthSubRegion;
 		this.widthSample = widthSample;
@@ -112,12 +112,12 @@ public class DescribePointSurf<II extends ImageGray<II>> {
 		this.inputType = inputType;
 
 		int radius = (widthLargeGrid*widthSubRegion)/2;
-		weight = FactoryKernelGaussian.gaussianWidth(weightSigma, radius * 2);
+		weight = FactoryKernelGaussian.gaussianWidth(weightSigma, radius*2);
 
 		// normalize to reduce numerical issues.
 		// not sure if this makes any difference.
-		double div = weight.get(radius,radius);
-		for( int i = 0; i < weight.data.length; i++ )
+		double div = weight.get(radius, radius);
+		for (int i = 0; i < weight.data.length; i++)
 			weight.data[i] /= div;
 
 		// each sub-region provides 4 features
@@ -133,8 +133,8 @@ public class DescribePointSurf<II extends ImageGray<II>> {
 	/**
 	 * Create a SURF-64 descriptor.  See [1] for details.
 	 */
-	public DescribePointSurf(Class<II> inputType ) {
-		this(4,5,3, 4.5 , false,inputType);
+	public DescribePointSurf( Class<II> inputType ) {
+		this(4, 5, 3, 4.5, false, inputType);
 	}
 
 	public TupleDesc_F64 createDescription() {
@@ -151,6 +151,7 @@ public class DescribePointSurf<II extends ImageGray<II>> {
 	 * Computes the SURF descriptor for the specified interest point.  If the feature
 	 * goes outside of the image border (including convolution kernels) then null is returned.
 	 * </p>
+	 *
 	 * @param x Location of interest point.
 	 * @param y Location of interest point.
 	 * @param angle The angle the feature is pointing at in radians.
@@ -158,28 +159,27 @@ public class DescribePointSurf<II extends ImageGray<II>> {
 	 * @param normalize Apply L2 normalization to the descriptor
 	 * @param ret storage for the feature. Must have 64 values.
 	 */
-	public void describe(double x, double y, double angle, double scale, boolean normalize, TupleDesc_F64 ret)
-	{
-		if( ret.data.length != featureDOF )
-			throw new IllegalArgumentException("Provided feature must have "+featureDOF+" elements");
+	public void describe( double x, double y, double angle, double scale, boolean normalize, TupleDesc_F64 ret ) {
+		if (ret.data.length != featureDOF)
+			throw new IllegalArgumentException("Provided feature must have " + featureDOF + " elements");
 
-		double c = Math.cos(angle),s=Math.sin(angle);
+		double c = Math.cos(angle), s = Math.sin(angle);
 
 		this.gradient.setImage(ii);
 		this.gradient.setWidth(widthSample*scale);
 
 		// By assuming that the entire feature is inside the image faster algorithms can be used
 		// the results are also of dubious value when interacting with the image border.
-		boolean isInBounds = SurfDescribeOps.isInside(ii,x,y, radiusDescriptor,widthSample,scale,c,s);
+		boolean isInBounds = SurfDescribeOps.isInside(ii, x, y, radiusDescriptor, widthSample, scale, c, s);
 
 		// use a safe method if its along the image border
-		SparseImageGradient<II,?> gradient = isInBounds ? this.gradient : this.gradientSafe;
+		SparseImageGradient<II, ?> gradient = isInBounds ? this.gradient : this.gradientSafe;
 
 		// extract descriptor
-		features(x, y, c, s, scale, gradient , ret.data);
+		features(x, y, c, s, scale, gradient, ret.data);
 
 		// normalize feature vector to have an Euclidean length of 1 which adds light invariance
-		if( normalize )
+		if (normalize)
 			UtilFeature.normalizeL2(ret);
 	}
 
@@ -203,18 +203,17 @@ public class DescribePointSurf<II extends ImageGray<II>> {
 	 * @param scale The scale of the wavelets.
 	 * @param features Where the features are written to.  Must be 4*(widthLargeGrid*widthSubRegion)^2 large.
 	 */
-	public void features(double c_x, double c_y,
-						 double c , double s, double scale,
-						 SparseImageGradient gradient ,
-						 double[] features)
-	{
+	public void features( double c_x, double c_y,
+						  double c, double s, double scale,
+						  SparseImageGradient gradient,
+						  double[] features ) {
 		int regionSize = widthLargeGrid*widthSubRegion;
-		if( weight.width != regionSize ) {
+		if (weight.width != regionSize) {
 			throw new IllegalArgumentException("Weighting kernel has an unexpected size");
 		}
 
 		int regionR = regionSize/2;
-		int regionEnd = regionSize-regionR;
+		int regionEnd = regionSize - regionR;
 
 		int regionIndex = 0;
 
@@ -225,15 +224,15 @@ public class DescribePointSurf<II extends ImageGray<II>> {
 		c_y += 0.5;
 
 		// step through the sub-regions
-		for( int rY = -regionR; rY < regionEnd; rY += widthSubRegion ) {
-			for( int rX = -regionR; rX < regionEnd; rX += widthSubRegion ) {
-				double sum_dx = 0, sum_dy=0, sum_adx=0, sum_ady=0;
+		for (int rY = -regionR; rY < regionEnd; rY += widthSubRegion) {
+			for (int rX = -regionR; rX < regionEnd; rX += widthSubRegion) {
+				double sum_dx = 0, sum_dy = 0, sum_adx = 0, sum_ady = 0;
 
 				// compute and sum up the response  inside the sub-region
-				for( int i = 0; i < widthSubRegion; i++ ) {
+				for (int i = 0; i < widthSubRegion; i++) {
 					double regionY = (rY + i)*scale;
-					for( int j = 0; j < widthSubRegion; j++ ) {
-						double w = weight.get(regionR+rX + j, regionR+rY + i);
+					for (int j = 0; j < widthSubRegion; j++) {
+						double w = weight.get(regionR + rX + j, regionR + rY + i);
 
 						double regionX = (rX + j)*scale;
 
@@ -242,13 +241,13 @@ public class DescribePointSurf<II extends ImageGray<II>> {
 						int pixelY = (int)(c_y + s*regionX + c*regionY);
 
 						// compute the wavelet and multiply by the weighting factor
-						GradientValue g = gradient.compute(pixelX,pixelY);
+						GradientValue g = gradient.compute(pixelX, pixelY);
 						double dx = w*g.getX();
 						double dy = w*g.getY();
 
 						// align the gradient along image patch
 						// note the transform is transposed
-						double pdx =  c*dx + s*dy;
+						double pdx = c*dx + s*dy;
 						double pdy = -s*dx + c*dy;
 
 						sum_dx += pdx;
@@ -265,7 +264,6 @@ public class DescribePointSurf<II extends ImageGray<II>> {
 		}
 	}
 
-
 	public int getDescriptionLength() {
 		return featureDOF;
 	}
@@ -276,17 +274,18 @@ public class DescribePointSurf<II extends ImageGray<II>> {
 
 	/**
 	 * Width of sampled region when sampling is aligned with image pixels
+	 *
 	 * @return width of descriptor sample
 	 */
 	public int getCanonicalWidth() {
 		//
-		return widthLargeGrid*widthSubRegion+widthSample-(widthSample%2);
+		return widthLargeGrid*widthSubRegion + widthSample - (widthSample%2);
 	}
 
 	/**
 	 * Creates a new instance with the same configuration
 	 */
 	public DescribePointSurf<II> copy() {
-		return new DescribePointSurf<>(widthLargeGrid,widthSubRegion,widthSample,weightSigma,useHaar,inputType);
+		return new DescribePointSurf<>(widthLargeGrid, widthSubRegion, widthSample, weightSigma, useHaar, inputType);
 	}
 }

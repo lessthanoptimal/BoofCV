@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -41,20 +41,19 @@ public class FactoryFeatureExtractor {
 	 * Creates a generalized feature detector/extractor that adds n-best capability to {@link boofcv.abst.feature.detect.extract.NonMaxSuppression}
 	 * and performs other house keeping tasks. Handles calling {@link GeneralFeatureIntensity} itself.
 	 *
-	 *
-	 * @param intensity   Feature intensity algorithm
-	 * @param extractorMin   Feature extraction algorithm for local minimums
-	 * @param extractorMax   Feature extraction algorithm for local maximums
-	 * @param selector    Selects features when there is more than the maximum allowed
+	 * @param intensity Feature intensity algorithm
+	 * @param extractorMin Feature extraction algorithm for local minimums
+	 * @param extractorMax Feature extraction algorithm for local maximums
+	 * @param selector Selects features when there is more than the maximum allowed
 	 * @param maxFeatures Maximum number of features it should return. -1 to return them all.
 	 * @return General feature detector
 	 */
 	public static <I extends ImageGray<I>, D extends ImageGray<D>>
-	GeneralFeatureDetector<I, D> general(GeneralFeatureIntensity<I, D> intensity,
-										 @Nullable NonMaxSuppression extractorMin,
-										 @Nullable NonMaxSuppression extractorMax,
-										 FeatureSelectLimitIntensity<Point2D_I16> selector,
-										 int maxFeatures ) {
+	GeneralFeatureDetector<I, D> general( GeneralFeatureIntensity<I, D> intensity,
+										  @Nullable NonMaxSuppression extractorMin,
+										  @Nullable NonMaxSuppression extractorMax,
+										  FeatureSelectLimitIntensity<Point2D_I16> selector,
+										  int maxFeatures ) {
 		GeneralFeatureDetector<I, D> det = new GeneralFeatureDetector<>(intensity, extractorMin, extractorMax, selector);
 		det.setFeatureLimit(maxFeatures);
 
@@ -69,26 +68,26 @@ public class FactoryFeatureExtractor {
 	 */
 	public static NonMaxSuppression nonmax( @Nullable ConfigExtract config ) {
 
-		if( config == null )
+		if (config == null)
 			config = new ConfigExtract();
 		config.checkValidity();
 
-		if( BOverrideFactoryFeatureExtractor.nonmax != null ) {
+		if (BOverrideFactoryFeatureExtractor.nonmax != null) {
 			return BOverrideFactoryFeatureExtractor.nonmax.process(config);
 		}
 
 		NonMaxBlock.Search search;
 		if (config.useStrictRule) {
-			if( config.detectMaximums)
-				if( config.detectMinimums )
+			if (config.detectMaximums)
+				if (config.detectMinimums)
 					search = new NonMaxBlockSearchStrict.MinMax();
 				else
 					search = new NonMaxBlockSearchStrict.Max();
 			else
 				search = new NonMaxBlockSearchStrict.Min();
 		} else {
-			if( config.detectMaximums)
-				if( config.detectMinimums )
+			if (config.detectMaximums)
+				if (config.detectMinimums)
 					search = new NonMaxBlockSearchRelaxed.MinMax();
 				else
 					search = new NonMaxBlockSearchRelaxed.Max();
@@ -116,11 +115,11 @@ public class FactoryFeatureExtractor {
 	 */
 	public static NonMaxSuppression nonmaxCandidate( @Nullable ConfigExtract config ) {
 
-		if( config == null )
+		if (config == null)
 			config = new ConfigExtract();
 		config.checkValidity();
 
-		if( BOverrideFactoryFeatureExtractor.nonmaxCandidate != null ) {
+		if (BOverrideFactoryFeatureExtractor.nonmaxCandidate != null) {
 			return BOverrideFactoryFeatureExtractor.nonmaxCandidate.process(config);
 		}
 
@@ -134,10 +133,10 @@ public class FactoryFeatureExtractor {
 		}
 
 		// See if the user wants to use threaded code or not
-		NonMaxCandidate extractor = BoofConcurrency.USE_CONCURRENT?
-				new NonMaxCandidate_MT(search):new NonMaxCandidate(search);
+		NonMaxCandidate extractor = BoofConcurrency.USE_CONCURRENT ?
+				new NonMaxCandidate_MT(search) : new NonMaxCandidate(search);
 
-		WrapperNonMaxCandidate ret = new WrapperNonMaxCandidate(extractor,false,true);
+		WrapperNonMaxCandidate ret = new WrapperNonMaxCandidate(extractor, false, true);
 
 		ret.setSearchRadius(config.radius);
 		ret.setIgnoreBorder(config.ignoreBorder);
@@ -148,14 +147,14 @@ public class FactoryFeatureExtractor {
 
 	/**
 	 * Creates a non-maximum limiter using the specified configuration
+	 *
 	 * @param configExtract non-maxumum settings
 	 * @param maxFeatures maximum allowed features
 	 * @return The NonMaxLimiter
 	 */
-	public static NonMaxLimiter nonmaxLimiter(@Nullable ConfigExtract configExtract , ConfigSelectLimit configSelect, int maxFeatures ) {
+	public static NonMaxLimiter nonmaxLimiter( @Nullable ConfigExtract configExtract, ConfigSelectLimit configSelect, int maxFeatures ) {
 		NonMaxSuppression nonmax = nonmax(configExtract);
 		FeatureSelectLimitIntensity<NonMaxLimiter.LocalExtreme> selector = FactorySelectLimit.intensity(configSelect);
-		return new NonMaxLimiter(nonmax,selector,maxFeatures);
+		return new NonMaxLimiter(nonmax, selector, maxFeatures);
 	}
-
 }

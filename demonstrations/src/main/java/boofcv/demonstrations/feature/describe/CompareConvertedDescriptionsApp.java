@@ -56,7 +56,7 @@ import java.util.List;
  */
 public class CompareConvertedDescriptionsApp {
 
-	public static <TD extends TupleDesc>
+	public static <TD extends TupleDesc<TD>>
 	void visualize( String title,
 					BufferedImage image1, BufferedImage image2,
 					InterestPointDetector<GrayF32> detector,
@@ -87,7 +87,7 @@ public class CompareConvertedDescriptionsApp {
 		ShowImages.showWindow(panel, title);
 	}
 
-	public static <TD extends TupleDesc>
+	public static <TD extends TupleDesc<TD>>
 	FastArray<TD> describeImage( GrayF32 input,
 								 InterestPointDetector<GrayF32> detector,
 								 DescribeRegionPoint<GrayF32, TD> describe,

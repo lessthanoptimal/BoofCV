@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -32,7 +32,7 @@ public class ConfigSelectLimit implements Configuration {
 	public SelectLimitTypes type = SelectLimitTypes.SELECT_N;
 
 	/**
-	 *  Random seed used by RANDOM selector
+	 * Random seed used by RANDOM selector
 	 */
 	public long randomSeed = 0xDEADBEEF;
 
@@ -42,7 +42,7 @@ public class ConfigSelectLimit implements Configuration {
 	public ConfigSelectLimit() {
 	}
 
-	public ConfigSelectLimit(SelectLimitTypes type, long randomSeed) {
+	public ConfigSelectLimit( SelectLimitTypes type, long randomSeed ) {
 		this.type = type;
 		this.randomSeed = randomSeed;
 	}
@@ -53,20 +53,20 @@ public class ConfigSelectLimit implements Configuration {
 	}
 
 	public static ConfigSelectLimit selectBestN() {
-		return new ConfigSelectLimit(SelectLimitTypes.SELECT_N,-1);
+		return new ConfigSelectLimit(SelectLimitTypes.SELECT_N, -1);
 	}
 
-	public static ConfigSelectLimit selectRandom(long seed) {
-		return new ConfigSelectLimit(SelectLimitTypes.RANDOM,seed);
+	public static ConfigSelectLimit selectRandom( long seed ) {
+		return new ConfigSelectLimit(SelectLimitTypes.RANDOM, seed);
 	}
 
-	public static ConfigSelectLimit selectUniform(double inverseRegionScale) {
-		ConfigSelectLimit config = new ConfigSelectLimit(SelectLimitTypes.UNIFORM,-1);
+	public static ConfigSelectLimit selectUniform( double inverseRegionScale ) {
+		ConfigSelectLimit config = new ConfigSelectLimit(SelectLimitTypes.UNIFORM, -1);
 		config.uniform.regionScaleFactor = inverseRegionScale;
 		return config;
 	}
 
-	public void setTo(ConfigSelectLimit src) {
+	public void setTo( ConfigSelectLimit src ) {
 		this.type = src.type;
 		this.randomSeed = src.randomSeed;
 		this.uniform.setTo(uniform);

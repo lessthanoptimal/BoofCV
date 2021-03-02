@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -90,7 +90,7 @@ import static boofcv.misc.BoofMiscOps.checkTrue;
  * @author Peter Abeles
  */
 @SuppressWarnings({"rawtypes", "unchecked"})
-public class DemoThreeViewStereoApp extends DemonstrationBase {
+public class DemoThreeViewStereoApp<TD extends TupleDesc<TD>> extends DemonstrationBase {
 
 	JPanel gui = new JPanel();
 	AssociatedTriplePanel guiMatches = new AssociatedTriplePanel();
@@ -102,16 +102,16 @@ public class DemoThreeViewStereoApp extends DemonstrationBase {
 
 	DemoThreeViewControls controls = new DemoThreeViewControls(this);
 
-	DetectDescribePoint<GrayU8, TupleDesc> detDesc;
-	AssociateDescription<TupleDesc> associate;
+	DetectDescribePoint<GrayU8, TD> detDesc;
+	AssociateDescription<TD> associate;
 
-	AssociateThreeByPairs<TupleDesc> associateThree;
+	AssociateThreeByPairs<TD> associateThree;
 	DogArray<AssociatedTriple> associated = new DogArray<>(AssociatedTriple::new);
 
 	ThreeViewEstimateMetricScene structureEstimator = new ThreeViewEstimateMetricScene();
 
 	DogArray<Point2D_F64>[] locations = new DogArray[3];
-	DogArray<TupleDesc>[] features = new DogArray[3];
+	DogArray<TD>[] features = new DogArray[3];
 	DogArray_I32[] featureSets = new DogArray_I32[3];
 	ImageDimension[] dimensions = new ImageDimension[3];
 
@@ -128,8 +128,6 @@ public class DemoThreeViewStereoApp extends DemonstrationBase {
 
 	// Saved disparity image for saving to disk
 	ImageGray disparity;
-
-	DisparitySmoother<GrayU8,?> smoother;
 
 	// Visualized Disparity
 	BufferedImage visualDisparity = new BufferedImage(1, 1, BufferedImage.TYPE_INT_RGB);

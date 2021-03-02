@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -35,12 +35,12 @@ public class SampleIntensityImage {
 	 */
 	public static class I16 implements SampleIntensity<Point2D_I16> {
 		@Override
-		public float sample(GrayF32 intensity, int index, Point2D_I16 p) {
-			return intensity.unsafe_get(p.x,p.y);
+		public float sample( GrayF32 intensity, int index, Point2D_I16 p ) {
+			return intensity.unsafe_get(p.x, p.y);
 		}
 
-		@Override public int getX(Point2D_I16 p) { return p.x; }
-		@Override public int getY(Point2D_I16 p) { return p.y; }
+		@Override public int getX( Point2D_I16 p ) { return p.x; }
+		@Override public int getY( Point2D_I16 p ) { return p.y; }
 	}
 
 	/**
@@ -48,12 +48,12 @@ public class SampleIntensityImage {
 	 */
 	public static class F32 implements SampleIntensity<Point2D_F32> {
 		@Override
-		public float sample(GrayF32 intensity, int index, Point2D_F32 p) {
-			return intensity.unsafe_get((int)p.x,(int)p.y);
+		public float sample( GrayF32 intensity, int index, Point2D_F32 p ) {
+			return intensity.unsafe_get((int)p.x, (int)p.y);
 		}
 
-		@Override public int getX(Point2D_F32 p) { return (int)p.x; }
-		@Override public int getY(Point2D_F32 p) { return (int)p.y; }
+		@Override public int getX( Point2D_F32 p ) { return (int)p.x; }
+		@Override public int getY( Point2D_F32 p ) { return (int)p.y; }
 	}
 
 	/**
@@ -61,11 +61,11 @@ public class SampleIntensityImage {
 	 */
 	public static class F64 implements SampleIntensity<Point2D_F64> {
 		@Override
-		public float sample(GrayF32 intensity, int index, Point2D_F64 p) {
-			return intensity.unsafe_get((int)p.x,(int)p.y);
+		public float sample( GrayF32 intensity, int index, Point2D_F64 p ) {
+			return intensity.unsafe_get((int)p.x, (int)p.y);
 		}
 
-		@Override public int getX(Point2D_F64 p) { return (int)p.x; }
-		@Override public int getY(Point2D_F64 p) { return (int)p.y; }
+		@Override public int getX( Point2D_F64 p ) { return (int)p.x; }
+		@Override public int getY( Point2D_F64 p ) { return (int)p.y; }
 	}
 }

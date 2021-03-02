@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -337,7 +337,7 @@ public class FactoryVisualOdometry {
 		return stereoDualTrackerPnP(configVO.scene, trackerLeft, trackerRight, configVO, imageType);
 	}
 
-	public static <T extends ImageGray<T>, Desc extends TupleDesc>
+	public static <T extends ImageGray<T>, Desc extends TupleDesc<Desc>>
 	StereoVisualOdometry<T> stereoDualTrackerPnP( ConfigVisOdomTrackPnP configVO,
 												  PointTracker<T> trackerLeft,
 												  PointTracker<T> trackerRight,
@@ -407,7 +407,7 @@ public class FactoryVisualOdometry {
 	 *
 	 * @see VisOdomStereoQuadPnP
 	 */
-	public static <T extends ImageGray<T>, Desc extends TupleDesc>
+	public static <T extends ImageGray<T>, Desc extends TupleDesc<Desc>>
 	StereoVisualOdometry<T> stereoQuadPnP( ConfigStereoQuadPnP config, Class<T> imageType ) {
 		EstimateNofPnP pnp = FactoryMultiView.pnp_N(config.pnp, -1);
 		DistanceFromModelMultiView<Se3_F64, Point2D3D> distanceMono = new PnPDistanceReprojectionSq();
@@ -428,8 +428,7 @@ public class FactoryVisualOdometry {
 			refinePnP = new PnPStereoRefineRodrigues(1e-12, config.refineIterations);
 		}
 
-		DetectDescribePoint<T, Desc> detector = (DetectDescribePoint)
-				FactoryDetectDescribe.generic(config.detectDescribe, imageType);
+		DetectDescribePoint<T, Desc> detector = FactoryDetectDescribe.generic(config.detectDescribe, imageType);
 
 		Class<Desc> descType = detector.getDescriptionType();
 

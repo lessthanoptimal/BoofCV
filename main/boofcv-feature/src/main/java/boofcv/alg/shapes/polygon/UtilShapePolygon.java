@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -34,11 +34,10 @@ public class UtilShapePolygon {
 	 *
 	 * @param lines Assumes lines are ordered
 	 */
-	public static boolean convert( LineGeneral2D_F64[] lines , Polygon2D_F64 poly ) {
-
+	public static boolean convert( LineGeneral2D_F64[] lines, Polygon2D_F64 poly ) {
 		for (int i = 0; i < poly.size(); i++) {
-			int j = (i + 1) % poly.size();
-			if( null == Intersection2D_F64.intersection(lines[i], lines[j], poly.get(j)) )
+			int j = (i + 1)%poly.size();
+			if (null == Intersection2D_F64.intersection(lines[i], lines[j], poly.get(j)))
 				return false;
 		}
 

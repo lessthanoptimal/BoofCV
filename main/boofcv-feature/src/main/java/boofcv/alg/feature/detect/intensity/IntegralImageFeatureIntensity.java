@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -24,7 +24,6 @@ import boofcv.concurrency.BoofConcurrency;
 import boofcv.struct.image.GrayF32;
 import boofcv.struct.image.GrayS32;
 
-
 /**
  * Routines for computing the intensity of the fast hessian features in an image.
  *
@@ -40,13 +39,12 @@ public class IntegralImageFeatureIntensity {
 	 * @param size Hessian kernel's size.
 	 * @param intensity Output intensity image.
 	 */
-	public static void hessian(GrayF32 integral, int skip , int size ,
-							   GrayF32 intensity)
-	{
+	public static void hessian( GrayF32 integral, int skip, int size,
+								GrayF32 intensity ) {
 		// todo check size with skip
 //		InputSanityCheck.checkSameShape(integral,intensity);
 
-		if( BoofConcurrency.USE_CONCURRENT) {
+		if (BoofConcurrency.USE_CONCURRENT) {
 			ImplIntegralImageFeatureIntensity_MT.hessianBorder(integral, skip, size, intensity);
 			ImplIntegralImageFeatureIntensity_MT.hessianInner(integral, skip, size, intensity);
 		} else {
@@ -63,13 +61,12 @@ public class IntegralImageFeatureIntensity {
 	 * @param size Hessian kernel's size.
 	 * @param intensity Output intensity image.
 	 */
-	public static void hessian(GrayS32 integral, int skip , int size ,
-							   GrayF32 intensity)
-	{
+	public static void hessian( GrayS32 integral, int skip, int size,
+								GrayF32 intensity ) {
 		// todo check size with skip
 //		InputSanityCheck.checkSameShape(integral,intensity);
 
-		if( BoofConcurrency.USE_CONCURRENT) {
+		if (BoofConcurrency.USE_CONCURRENT) {
 			ImplIntegralImageFeatureIntensity_MT.hessianBorder(integral, skip, size, intensity);
 			ImplIntegralImageFeatureIntensity_MT.hessianInner(integral, skip, size, intensity);
 		} else {

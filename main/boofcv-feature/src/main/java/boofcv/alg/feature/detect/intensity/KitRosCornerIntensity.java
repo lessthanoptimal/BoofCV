@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -38,23 +38,21 @@ import boofcv.struct.image.GrayS16;
  */
 public class KitRosCornerIntensity {
 
-	public static void process(GrayF32 featureIntensity,
-							   GrayF32 derivX, GrayF32 derivY,
-							   GrayF32 hessianXX, GrayF32 hessianYY , GrayF32 hessianXY )
-	{
-		InputSanityCheck.checkSameShape(derivX,derivY,hessianXX,hessianYY,hessianXY);
-		InputSanityCheck.checkSameShape(derivX,featureIntensity);
+	public static void process( GrayF32 featureIntensity,
+								GrayF32 derivX, GrayF32 derivY,
+								GrayF32 hessianXX, GrayF32 hessianYY, GrayF32 hessianXY ) {
+		InputSanityCheck.checkSameShape(derivX, derivY, hessianXX, hessianYY, hessianXY);
+		InputSanityCheck.checkSameShape(derivX, featureIntensity);
 
-		ImplKitRosCornerIntensity.process(featureIntensity,derivX,derivY,hessianXX,hessianYY,hessianXY);
+		ImplKitRosCornerIntensity.process(featureIntensity, derivX, derivY, hessianXX, hessianYY, hessianXY);
 	}
 
-	public static void process(GrayF32 featureIntensity,
-							   GrayS16 derivX, GrayS16 derivY,
-							   GrayS16 hessianXX, GrayS16 hessianYY , GrayS16 hessianXY )
-	{
-		InputSanityCheck.checkSameShape(derivX,derivY,hessianXX,hessianYY,hessianXY);
-		InputSanityCheck.checkSameShape(derivX,featureIntensity);
+	public static void process( GrayF32 featureIntensity,
+								GrayS16 derivX, GrayS16 derivY,
+								GrayS16 hessianXX, GrayS16 hessianYY, GrayS16 hessianXY ) {
+		InputSanityCheck.checkSameShape(derivX, derivY, hessianXX, hessianYY, hessianXY);
+		InputSanityCheck.checkSameShape(derivX, featureIntensity);
 
-		ImplKitRosCornerIntensity.process(featureIntensity,derivX,derivY,hessianXX,hessianYY,hessianXY);
+		ImplKitRosCornerIntensity.process(featureIntensity, derivX, derivY, hessianXX, hessianYY, hessianXY);
 	}
 }

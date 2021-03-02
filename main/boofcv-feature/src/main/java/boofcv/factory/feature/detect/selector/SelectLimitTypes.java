@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -24,9 +24,8 @@ import boofcv.alg.feature.detect.selector.*;
  * Different types of built in methods for enforcing the maximum allowed number of detected features inside
  * an intensity image.
  *
- * @see FeatureSelectLimitIntensity
- *
  * @author Peter Abeles
+ * @see FeatureSelectLimitIntensity
  */
 public enum SelectLimitTypes {
 	/**

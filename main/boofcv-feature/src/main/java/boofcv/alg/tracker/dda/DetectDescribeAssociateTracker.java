@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -40,7 +40,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
-
 /**
  * <p>
  * Base class for detect-describe-associate type trackers. Tracker works by detecting features in each image,
@@ -49,13 +48,12 @@ import java.util.Random;
  *
  * @author Peter Abeles
  */
-public class DetectDescribeAssociateTracker<I extends ImageGray<I>, TD extends TupleDesc>
-{
+public class DetectDescribeAssociateTracker<I extends ImageGray<I>, TD extends TupleDesc<TD>> {
 	// associates features between two images together
 	protected AssociateDescriptionSets2D<TD> associate;
 
 	// Detects and describes image features
-	protected DetectDescribePoint<I,TD> detector;
+	protected DetectDescribePoint<I, TD> detector;
 
 	// all tracks. active and inactive.
 	protected @Getter DogArray<PointTrack> tracksAll;
@@ -69,7 +67,7 @@ public class DetectDescribeAssociateTracker<I extends ImageGray<I>, TD extends T
 	protected @Getter List<PointTrack> tracksNew = new ArrayList<>();
 
 	// ID of the most recently processed frame
-	protected @Getter long frameID=-1;
+	protected @Getter long frameID = -1;
 
 	// number of features created.  Used to assign unique IDs
 	protected long featureID = 0;
@@ -99,11 +97,11 @@ public class DetectDescribeAssociateTracker<I extends ImageGray<I>, TD extends T
 	 * @param associate Association
 	 * @param config Configures behavior.
 	 */
-	public DetectDescribeAssociateTracker(DetectDescribePoint<I, TD> detector,
-										  final AssociateDescription2D<TD> associate,
-										  ConfigTrackerDda config ) {
+	public DetectDescribeAssociateTracker( DetectDescribePoint<I, TD> detector,
+										   final AssociateDescription2D<TD> associate,
+										   ConfigTrackerDda config ) {
 		this.detector = detector;
-		this.associate = new AssociateDescriptionSets2D<>(associate,detector.getDescriptionType());
+		this.associate = new AssociateDescriptionSets2D<>(associate, detector.getDescriptionType());
 		this.updateDescription = config.updateDescription;
 		this.maxInactiveTracks = config.maxInactiveTracks;
 		this.rand = new Random(config.seed);
@@ -152,8 +150,8 @@ public class DetectDescribeAssociateTracker<I extends ImageGray<I>, TD extends T
 	 * Detect features and associate with existing tracks
 	 */
 	public void process( I input ) {
-		if( frameID == -1 )
-			associate.initialize(input.width,input.height);
+		if (frameID == -1)
+			associate.initialize(input.width, input.height);
 		frameID++;
 		tracksActive.clear();
 		tracksInactive.clear();
@@ -169,13 +167,13 @@ public class DetectDescribeAssociateTracker<I extends ImageGray<I>, TD extends T
 		dstPixels.resize(N);
 
 		// create a list of detected feature descriptions
-		for( int i = 0; i < N; i++ ) {
+		for (int i = 0; i < N; i++) {
 			dstDesc.data[i] = detector.getDescription(i);
 			dstSet.data[i] = detector.getSet(i);
 			dstPixels.data[i] = detector.getLocation(i);
 		}
 
-		if( tracksAll.size == 0 ) {
+		if (tracksAll.size == 0) {
 			return;
 		}
 
@@ -183,7 +181,7 @@ public class DetectDescribeAssociateTracker<I extends ImageGray<I>, TD extends T
 
 		// add unassociated to the list
 		DogArray_I32 unassociatedIdx = associate.getUnassociatedSource();
-		for( int j = 0; j < unassociatedIdx.size(); j++ ) {
+		for (int j = 0; j < unassociatedIdx.size(); j++) {
 			tracksInactive.add(tracksAll.get(unassociatedIdx.get(j)));
 		}
 
@@ -193,12 +191,12 @@ public class DetectDescribeAssociateTracker<I extends ImageGray<I>, TD extends T
 	/**
 	 * If there are too many unassociated tracks, randomly select some of those tracks and drop them
 	 */
-	void dropExcessiveInactiveTracks(DogArray_I32 unassociated) {
-		if( unassociated.size > maxInactiveTracks ) {
+	void dropExcessiveInactiveTracks( DogArray_I32 unassociated ) {
+		if (unassociated.size > maxInactiveTracks) {
 			// make the first N elements the ones which will be dropped
-			int numDrop = unassociated.size-maxInactiveTracks;
+			int numDrop = unassociated.size - maxInactiveTracks;
 			for (int i = 0; i < numDrop; i++) {
-				int selected = rand.nextInt(unassociated.size-i)+i;
+				int selected = rand.nextInt(unassociated.size - i) + i;
 				int a = unassociated.get(i);
 				unassociated.data[i] = unassociated.data[selected];
 				unassociated.data[selected] = a;
@@ -208,8 +206,8 @@ public class DetectDescribeAssociateTracker<I extends ImageGray<I>, TD extends T
 			// the order of later tracks
 			unassociated.size = numDrop;
 			unassociated.sort();
-			for (int i = unassociated.size-1; i >= 0; i--) {
-				tracksDropped.add( dropTrackIndexInAll(unassociated.get(i)) );
+			for (int i = unassociated.size - 1; i >= 0; i--) {
+				tracksDropped.add(dropTrackIndexInAll(unassociated.get(i)));
 			}
 		}
 	}
@@ -232,13 +230,13 @@ public class DetectDescribeAssociateTracker<I extends ImageGray<I>, TD extends T
 		}
 
 		// Associate existing tracks with detections
-		UtilFeature.setSource(srcDesc, srcSet, srcPixels,associate);
-		UtilFeature.setDestination(dstDesc, dstSet, dstPixels,associate);
+		UtilFeature.setSource(srcDesc, srcSet, srcPixels, associate);
+		UtilFeature.setDestination(dstDesc, dstSet, dstPixels, associate);
 		associate.associate();
 
 		FastAccess<AssociatedIndex> matches = associate.getMatches();
 
-		for( int i = 0; i < matches.size; i++ ) {
+		for (int i = 0; i < matches.size; i++) {
 			AssociatedIndex indexes = matches.data[i];
 			PointTrack track = tracksAll.get(indexes.src);
 			Point2D_F64 loc = dstPixels.data[indexes.dst];
@@ -247,7 +245,7 @@ public class DetectDescribeAssociateTracker<I extends ImageGray<I>, TD extends T
 			tracksActive.add(track);
 
 			// update the description
-			if(updateDescription) {
+			if (updateDescription) {
 				((TD)track.getDescription()).setTo(dstDesc.get(indexes.dst));
 			}
 		}
@@ -259,27 +257,27 @@ public class DetectDescribeAssociateTracker<I extends ImageGray<I>, TD extends T
 	public void spawnTracks() {
 		// If there are no tracks then associate is not called. Reset() could have been called at associate is
 		// in an undefined state
-		if( tracksAll.size == 0 ) {
-			for( int i = 0; i < dstDesc.size; i++ ) {
+		if (tracksAll.size == 0) {
+			for (int i = 0; i < dstDesc.size; i++) {
 				Point2D_F64 loc = dstPixels.get(i);
-				addNewTrack(dstSet.get(i), loc.x,loc.y,dstDesc.get(i));
+				addNewTrack(dstSet.get(i), loc.x, loc.y, dstDesc.get(i));
 			}
 			return;
 		}
 
 		// create new tracks from latest unassociated detected features
 		DogArray_I32 unassociated = associate.getUnassociatedDestination();
-		for( int i = 0; i < unassociated.size; i++ ) {
+		for (int i = 0; i < unassociated.size; i++) {
 			int indexDst = unassociated.get(i);
 			Point2D_F64 loc = dstPixels.get(indexDst);
-			addNewTrack(dstSet.get(i), loc.x,loc.y,dstDesc.get(indexDst));
+			addNewTrack(dstSet.get(i), loc.x, loc.y, dstDesc.get(indexDst));
 		}
 	}
 
 	/**
 	 * Adds a new track given its location and description
 	 */
-	protected void addNewTrack( int set,  double x , double y , TD desc ) {
+	protected void addNewTrack( int set, double x, double y, TD desc ) {
 		PointTrack p = tracksAll.grow();
 		p.pixel.setTo(x, y);
 		((TD)p.getDescription()).setTo(desc);
@@ -311,10 +309,10 @@ public class DetectDescribeAssociateTracker<I extends ImageGray<I>, TD extends T
 	 *
 	 * @param track The track which is to be dropped
 	 */
-	public boolean dropTrack(PointTrack track) {
+	public boolean dropTrack( PointTrack track ) {
 
 		int indexInAll = tracksAll.indexOf(track);
-		if( indexInAll < 0 )
+		if (indexInAll < 0)
 			return false; // this is probably a bug...
 		dropTrackIndexInAll(indexInAll);
 
@@ -326,7 +324,7 @@ public class DetectDescribeAssociateTracker<I extends ImageGray<I>, TD extends T
 	/**
 	 * Given the index of the track in the `all` list, drop it from the tracker
 	 */
-	private PointTrack dropTrackIndexInAll(int indexInAll) {
+	private PointTrack dropTrackIndexInAll( int indexInAll ) {
 		PointTrack track = tracksAll.removeSwap(indexInAll);
 
 		// the track may or may not be in the active list
@@ -339,10 +337,10 @@ public class DetectDescribeAssociateTracker<I extends ImageGray<I>, TD extends T
 		return track;
 	}
 
-	public void dropTracks(PointTracker.Dropper dropper) {
-		for (int i = tracksAll.size()-1; i >= 0; i--) {
+	public void dropTracks( PointTracker.Dropper dropper ) {
+		for (int i = tracksAll.size() - 1; i >= 0; i--) {
 			PointTrack track = tracksAll.get(i);
-			if( !dropper.shouldDropTrack(track))
+			if (!dropper.shouldDropTrack(track))
 				continue;
 			dropTrackIndexInAll(i);
 		}

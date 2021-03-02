@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -30,7 +30,7 @@ import boofcv.struct.Configuration;
  *
  * @author Peter Abeles
  */
-public class ConfigCompleteSift implements Configuration{
+public class ConfigCompleteSift implements Configuration {
 
 	public ConfigSiftScaleSpace scaleSpace = new ConfigSiftScaleSpace();
 	public ConfigSiftDetector detector = new ConfigSiftDetector();
@@ -53,7 +53,7 @@ public class ConfigCompleteSift implements Configuration{
 	/**
 	 * Constructor with default parameters for all
 	 */
-	public ConfigCompleteSift(){}
+	public ConfigCompleteSift() {}
 
 	/**
 	 * Constructor which provides access to a few of the more critical parameters which allow you to control
@@ -64,7 +64,7 @@ public class ConfigCompleteSift implements Configuration{
 	 * @param lastOctave The last octave.  Try 5
 	 * @param maxFeaturesPerScale Maximum number of features it will detect per scale.   &le; 0 will mean all features
 	 */
-	public ConfigCompleteSift( int firstOctave , int lastOctave , int maxFeaturesPerScale){
+	public ConfigCompleteSift( int firstOctave, int lastOctave, int maxFeaturesPerScale ) {
 		scaleSpace.firstOctave = firstOctave;
 		scaleSpace.lastOctave = lastOctave;
 		detector.maxFeaturesPerScale = maxFeaturesPerScale;

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -32,22 +32,21 @@ public class HoughTransformBinary_MT extends HoughTransformBinary {
 	 * Specifies parameters of transform.  The minimum number of points specified in the extractor
 	 * is an important tuning parameter.
 	 *
-	 * @param extractor  Extracts local maxima from transform space.
-	 * @param parameters
+	 * @param extractor Extracts local maxima from transform space.
 	 */
-	public HoughTransformBinary_MT(NonMaxSuppression extractor, HoughTransformParameters parameters) {
+	public HoughTransformBinary_MT( NonMaxSuppression extractor, HoughTransformParameters parameters ) {
 		super(extractor, parameters);
 	}
 
 	@Override
-	void computeParameters(GrayU8 binary) {
-		BoofConcurrency.loopFor(0,binary.height,y->{
+	void computeParameters( GrayU8 binary ) {
+		BoofConcurrency.loopFor(0, binary.height, y -> {
 			int start = binary.startIndex + y*binary.stride;
 			int stop = start + binary.width;
 
-			for( int index = start; index < stop; index++ ) {
-				if( binary.data[index] != 0 ) {
-					parameters.parameterize(index-start,y,transform);
+			for (int index = start; index < stop; index++) {
+				if (binary.data[index] != 0) {
+					parameters.parameterize(index - start, y, transform);
 				}
 			}
 		});

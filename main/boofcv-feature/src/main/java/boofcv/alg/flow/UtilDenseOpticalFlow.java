@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -58,34 +58,33 @@ public class UtilDenseOpticalFlow {
 	 * @return The image pyramid.
 	 */
 	public static <T extends ImageGray<T>>
-	PyramidFloat<T> standardPyramid( int width , int height ,
-									 double scale, double sigma ,
-									 int minSize, int maxLayers , Class<T> imageType ) {
-		if( scale > 1.0 || scale < 0 )
+	PyramidFloat<T> standardPyramid( int width, int height,
+									 double scale, double sigma,
+									 int minSize, int maxLayers, Class<T> imageType ) {
+		if (scale > 1.0 || scale < 0)
 			throw new IllegalArgumentException("Scale must be 0 <= scale <= 1");
 
 		int numScales;
 
-		if( scale == 1 || maxLayers == 1 ) {
+		if (scale == 1 || maxLayers == 1) {
 			numScales = 1;
-		} else if ( scale == 0 ) {
+		} else if (scale == 0) {
 			numScales = maxLayers;
 
-			double desiredReduction = minSize/(double)Math.min(width,height);
-			scale = Math.pow(desiredReduction,1.0/(numScales-1));
-
+			double desiredReduction = minSize/(double)Math.min(width, height);
+			scale = Math.pow(desiredReduction, 1.0/(numScales - 1));
 		} else {
 			// this is how much the input image needs to be shrunk
-			double desiredReduction = minSize/(double)Math.min(width,height);
+			double desiredReduction = minSize/(double)Math.min(width, height);
 
 			// number the number of frames needed and round to the nearest integer
 			numScales = (int)(Math.log(desiredReduction)/Math.log(scale) + 0.5);
 
-			if( numScales > maxLayers )
+			if (numScales > maxLayers)
 				numScales = maxLayers;
 
 			// compute a new scale factor using this number of scales
-			scale = Math.pow(desiredReduction,1.0/numScales);
+			scale = Math.pow(desiredReduction, 1.0/numScales);
 
 			// add one since the first scale is going to be the original image
 			numScales++;
@@ -93,26 +92,26 @@ public class UtilDenseOpticalFlow {
 
 		InterpolatePixelS<T> interp = FactoryInterpolation.bilinearPixelS(imageType, BorderType.EXTENDED);
 
-		if( sigma > 0 ) {
-			double layerSigma = sigma*Math.sqrt(Math.pow(scale,-2)-1);
+		if (sigma > 0) {
+			double layerSigma = sigma*Math.sqrt(Math.pow(scale, -2) - 1);
 
-			double scaleFactors[] = new double[ numScales ];
-			double scaleSigmas[] = new double[ numScales ];
+			double[] scaleFactors = new double[numScales];
+			double[] scaleSigmas = new double[numScales];
 
 			scaleFactors[0] = 1;
 			scaleSigmas[0] = layerSigma;
-			for( int i = 1; i < numScales; i++ ) {
-				scaleFactors[i] = scaleFactors[i-1]/scale;
+			for (int i = 1; i < numScales; i++) {
+				scaleFactors[i] = scaleFactors[i - 1]/scale;
 				scaleSigmas[i] = layerSigma;
 			}
 
 			return new PyramidFloatGaussianScale<>(interp, scaleFactors, scaleSigmas, imageType);
 		} else {
-			double scaleFactors[] = new double[ numScales ];
+			double[] scaleFactors = new double[numScales];
 
 			scaleFactors[0] = 1;
-			for( int i = 1; i < numScales; i++ ) {
-				scaleFactors[i] = scaleFactors[i-1]/scale;
+			for (int i = 1; i < numScales; i++) {
+				scaleFactors[i] = scaleFactors[i - 1]/scale;
 			}
 
 			return new PyramidFloatScale<>(interp, scaleFactors, imageType);

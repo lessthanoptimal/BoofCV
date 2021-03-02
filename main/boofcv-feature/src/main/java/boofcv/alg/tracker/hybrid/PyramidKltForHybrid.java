@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -37,15 +37,14 @@ public class PyramidKltForHybrid<I extends ImageGray<I>, D extends ImageGray<D>>
 	public int featureRadius;
 
 	// Number of levels in the image pyramid
-	protected int numLevels=-1;
-
+	protected int numLevels = -1;
 
 	// the tracker
 	protected PyramidKltTracker<I, D> tracker;
 
-	public PyramidKltForHybrid(ConfigKlt config,
-							   int featureRadius,
-							   Class<I> inputType, Class<D> derivType) {
+	public PyramidKltForHybrid( ConfigKlt config,
+								int featureRadius,
+								Class<I> inputType, Class<D> derivType ) {
 		this.config = config;
 		this.featureRadius = featureRadius;
 
@@ -59,17 +58,17 @@ public class PyramidKltForHybrid<I extends ImageGray<I>, D extends ImageGray<D>>
 	protected PyramidKltForHybrid() {
 	}
 
-	public void setDescription( float x , float y , PyramidKltFeature ret ) {
-		ret.setPosition(x,y);
+	public void setDescription( float x, float y, PyramidKltFeature ret ) {
+		ret.setPosition(x, y);
 		tracker.setDescription(ret);
 	}
 
-	public void setInputs( ImagePyramid<I> image , D[] derivX , D[] derivY ) {
-		if( numLevels == -1)
+	public void setInputs( ImagePyramid<I> image, D[] derivX, D[] derivY ) {
+		if (numLevels == -1)
 			this.numLevels = image.getNumLayers();
-		else if( numLevels != image.getNumLayers() )
+		else if (numLevels != image.getNumLayers())
 			throw new IllegalArgumentException("Number of levels pyramid changed!");
-		tracker.setImage(image,derivX,derivY);
+		tracker.setImage(image, derivX, derivY);
 	}
 
 	/**
@@ -79,11 +78,11 @@ public class PyramidKltForHybrid<I extends ImageGray<I>, D extends ImageGray<D>>
 	 * @param feature Feature being updated
 	 * @return true if tracking was successful, false otherwise
 	 */
-	public boolean performTracking(  PyramidKltFeature feature ) {
+	public boolean performTracking( PyramidKltFeature feature ) {
 
 		KltTrackFault result = tracker.track(feature);
 
-		if( result != KltTrackFault.SUCCESS ) {
+		if (result != KltTrackFault.SUCCESS) {
 			return false;
 		} else {
 			tracker.setDescription(feature);

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -36,7 +36,7 @@ import static org.junit.jupiter.api.Assertions.*;
  *
  * @author Peter Abeles
  */
-public abstract class GenericTestsDetectDescribePoint<T extends ImageBase<T>,D extends TupleDesc>
+public abstract class GenericTestsDetectDescribePoint<T extends ImageBase<T>, TD extends TupleDesc<TD>>
 		extends BoofStandardJUnit {
 	int width = 100;
 	int height = 120;
@@ -47,19 +47,19 @@ public abstract class GenericTestsDetectDescribePoint<T extends ImageBase<T>,D e
 
 	T image;
 	protected ImageType<T> imageType;
-	Class<D> descType;
+	Class<TD> descType;
 
 	// how precise the radius needs to be
 	double radiusTol = 0.1;
 
-	protected GenericTestsDetectDescribePoint(boolean hasScale, boolean hasOrientation,
-											  ImageType<T> imageType, Class<D> descType) {
+	protected GenericTestsDetectDescribePoint( boolean hasScale, boolean hasOrientation,
+											   ImageType<T> imageType, Class<TD> descType ) {
 		this.hasScale = hasScale;
 		this.hasOrientation = hasOrientation;
 		this.imageType = imageType;
 		this.descType = descType;
 
-		image = imageType.createImage(width,height);
+		image = imageType.createImage(width, height);
 		GImageMiscOps.fillUniform(image, rand, 0, 100);
 	}
 
@@ -74,17 +74,16 @@ public abstract class GenericTestsDetectDescribePoint<T extends ImageBase<T>,D e
 		sets();
 	}
 
-	public abstract DetectDescribePoint<T,D> createDetDesc();
-
+	public abstract DetectDescribePoint<T, TD> createDetDesc();
 
 	/**
 	 * Detects features inside the image and checks to see if it is in compliance of its reported capabilities
 	 */
 	@Test
 	public void detectFeatures() {
-		DetectDescribePoint<T,D> alg = createDetDesc();
+		DetectDescribePoint<T, TD> alg = createDetDesc();
 
-		for( int imageIndex = 0; imageIndex < 10; imageIndex++ ) {
+		for (int imageIndex = 0; imageIndex < 10; imageIndex++) {
 			int numScaleNotOne = 0;
 			int numOrientationNotZero = 0;
 
@@ -92,35 +91,35 @@ public abstract class GenericTestsDetectDescribePoint<T extends ImageBase<T>,D e
 			alg.detect(image);
 
 			int N = alg.getNumberOfFeatures();
-			assertTrue(N>5);
+			assertTrue(N > 5);
 
-			for( int i = 0; i < N; i++ ) {
+			for (int i = 0; i < N; i++) {
 				Point2D_F64 p = alg.getLocation(i);
 				double radius = alg.getRadius(i);
 				double angle = alg.getOrientation(i);
-				D desc = alg.getDescription(i);
+				TD desc = alg.getDescription(i);
 
-				for( int j = 0; j < desc.size(); j++ ) {
-					assertTrue( !Double.isNaN(desc.getDouble(j)) && !Double.isInfinite(desc.getDouble(j)));
+				for (int j = 0; j < desc.size(); j++) {
+					assertTrue(!Double.isNaN(desc.getDouble(j)) && !Double.isInfinite(desc.getDouble(j)));
 				}
 
 				assertNotNull(desc);
 				assertTrue(p.x != 0 && p.y != 0);
-				assertTrue(p.x >= 0 && p.y >= 0 && p.x < image.width && p.y < image.height );
+				assertTrue(p.x >= 0 && p.y >= 0 && p.x < image.width && p.y < image.height);
 
-				if( radius != 1 )
+				if (radius != 1)
 					numScaleNotOne++;
-				if( angle != 0 )
+				if (angle != 0)
 					numOrientationNotZero++;
 			}
 
-			if( hasScale )
-				assertTrue(numScaleNotOne>0);
+			if (hasScale)
+				assertTrue(numScaleNotOne > 0);
 			else
 				assertEquals(0, numScaleNotOne);
 
-			if( hasOrientation )
-				assertTrue(numOrientationNotZero>0);
+			if (hasOrientation)
+				assertTrue(numOrientationNotZero > 0);
 			else
 				assertEquals(0, numOrientationNotZero);
 		}
@@ -132,8 +131,8 @@ public abstract class GenericTestsDetectDescribePoint<T extends ImageBase<T>,D e
 	 */
 	@Test
 	public void checkSubImage() {
-		DetectDescribePoint<T,D> alg1 = createDetDesc();
-		DetectDescribePoint<T,D> alg2 = createDetDesc();
+		DetectDescribePoint<T, TD> alg1 = createDetDesc();
+		DetectDescribePoint<T, TD> alg2 = createDetDesc();
 
 		T imageSub = BoofTesting.createSubImageOf(image);
 
@@ -149,8 +148,8 @@ public abstract class GenericTestsDetectDescribePoint<T extends ImageBase<T>,D e
 	 */
 	@Test
 	public void checkMultipleCalls() {
-		DetectDescribePoint<T,D> alg1 = createDetDesc();
-		DetectDescribePoint<T,D> alg2 = createDetDesc();
+		DetectDescribePoint<T, TD> alg1 = createDetDesc();
+		DetectDescribePoint<T, TD> alg2 = createDetDesc();
 
 		// call twice
 		alg1.detect(image);
@@ -163,21 +162,21 @@ public abstract class GenericTestsDetectDescribePoint<T extends ImageBase<T>,D e
 
 	@Test
 	public void hasScale() {
-		DetectDescribePoint<T,D> alg = createDetDesc();
+		DetectDescribePoint<T, TD> alg = createDetDesc();
 
 		assertEquals(hasScale, alg.hasScale());
 	}
 
 	@Test
 	public void hasOrientation() {
-		DetectDescribePoint<T,D> alg = createDetDesc();
+		DetectDescribePoint<T, TD> alg = createDetDesc();
 
 		assertEquals(hasOrientation, alg.hasOrientation());
 	}
 
 	@Test
 	public void getDescriptorType() {
-		DetectDescribePoint<T,D> alg = createDetDesc();
+		DetectDescribePoint<T, TD> alg = createDetDesc();
 
 		assertSame(descType, alg.getDescriptionType());
 	}
@@ -187,31 +186,31 @@ public abstract class GenericTestsDetectDescribePoint<T extends ImageBase<T>,D e
 	 */
 	@Test
 	public void sets() {
-		DetectDescribePoint<T,D> alg = createDetDesc();
+		DetectDescribePoint<T, TD> alg = createDetDesc();
 		alg.detect(image);
 
 		// Must have at least one set
-		assertTrue(alg.getNumberOfSets()>=1);
+		assertTrue(alg.getNumberOfSets() >= 1);
 
 		// See if all features are within the allowed range of sets
 		final int N = alg.getNumberOfFeatures();
-		for( int i = 0; i < N; i++ ) {
+		for (int i = 0; i < N; i++) {
 			int set = alg.getSet(i);
 			assertTrue(set >= 0 && set < alg.getNumberOfFeatures());
 		}
 	}
 
-	private void checkIdenticalResponse(DetectDescribePoint<T, D> alg1, DetectDescribePoint<T, D> alg2) {
+	private void checkIdenticalResponse( DetectDescribePoint<T, TD> alg1, DetectDescribePoint<T, TD> alg2 ) {
 		int N = alg1.getNumberOfFeatures();
 		assertTrue(N > 1);
-		assertEquals(N,alg2.getNumberOfFeatures());
+		assertEquals(N, alg2.getNumberOfFeatures());
 
-		for( int i = 0; i < N; i++ ) {
+		for (int i = 0; i < N; i++) {
 			Point2D_F64 p1 = alg1.getLocation(i);
 			int matched = -1;
 
 			for (int j = 0; j < N; j++) {
-				if( p1.isIdentical(alg2.getLocation(j), UtilEjml.EPS) &&
+				if (p1.isIdentical(alg2.getLocation(j), UtilEjml.EPS) &&
 						alg1.getRadius(i) == alg2.getRadius(j) &&
 						alg1.getOrientation(i) == alg2.getOrientation(j)) {
 					matched = j;
@@ -219,13 +218,13 @@ public abstract class GenericTestsDetectDescribePoint<T extends ImageBase<T>,D e
 				}
 			}
 
-			assertTrue(matched != -1 );
+			assertTrue(matched != -1);
 			assertEquals(alg1.getSet(i), alg2.getSet(i));
 
-			D desc1 = alg1.getDescription(i);
-			D desc2 = alg2.getDescription(matched);
+			TD desc1 = alg1.getDescription(i);
+			TD desc2 = alg2.getDescription(matched);
 
-			for( int j = 0; j < desc1.size(); j++ ) {
+			for (int j = 0; j < desc1.size(); j++) {
 				assertEquals(desc1.getDouble(j), desc2.getDouble(j));
 			}
 		}
@@ -236,17 +235,18 @@ public abstract class GenericTestsDetectDescribePoint<T extends ImageBase<T>,D e
 	 */
 	@Test
 	public void failBandMissMatch() {
-		if( !(image instanceof ImageMultiBand) ) {
+		if (!(image instanceof ImageMultiBand)) {
 			return;
 		}
 		ImageMultiBand mb = (ImageMultiBand)image;
 		ImageMultiBand bad = (ImageMultiBand)mb.createSameShape();
-		bad.setNumberOfBands(mb.getNumBands()+1);
+		bad.setNumberOfBands(mb.getNumBands() + 1);
 
-		DetectDescribePoint<T,D> alg = createDetDesc();
+		DetectDescribePoint<T, TD> alg = createDetDesc();
 		try {
-			alg.detect((T) bad);
+			alg.detect((T)bad);
 			fail("Should have thrown an exception");
-		} catch( IllegalArgumentException ignore ){}
+		} catch (IllegalArgumentException ignore) {
+		}
 	}
 }

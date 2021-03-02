@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -32,71 +32,69 @@ import boofcv.struct.image.InterleavedF32;
  * @author Peter Abeles
  */
 public class TemplateCorrelationFFT
-		implements TemplateMatchingIntensity<GrayF32>
-{
-	DiscreteFourierTransform<GrayF32,InterleavedF32> dft =
+		implements TemplateMatchingIntensity<GrayF32> {
+	DiscreteFourierTransform<GrayF32, InterleavedF32> dft =
 			DiscreteFourierTransformOps.createTransformF32();
 
 	// border which should be ignored
-	int borderX0,borderY0,borderX1,borderY1;
+	int borderX0, borderY0, borderX1, borderY1;
 
 	// storage for intermediate states
-	GrayF32 normalizedImage = new GrayF32(1,1);
-	GrayF32 normalizedTemplate = new GrayF32(1,1);
+	GrayF32 normalizedImage = new GrayF32(1, 1);
+	GrayF32 normalizedTemplate = new GrayF32(1, 1);
 
+	GrayF32 enlargedTemplate = new GrayF32(1, 1);
 
-	GrayF32 enlargedTemplate = new GrayF32(1,1);
-
-	InterleavedF32 fftImage = new InterleavedF32(1,1,2);
-	InterleavedF32 fftTemplate = new InterleavedF32(1,1,2);
-	InterleavedF32 fftMult = new InterleavedF32(1,1,2);
+	InterleavedF32 fftImage = new InterleavedF32(1, 1, 2);
+	InterleavedF32 fftTemplate = new InterleavedF32(1, 1, 2);
+	InterleavedF32 fftMult = new InterleavedF32(1, 1, 2);
 
 	// the final correlation/intensity image
-	GrayF32 correlation = new GrayF32(1,1);
+	GrayF32 correlation = new GrayF32(1, 1);
 
 	// image statistics used to normalize images
-	float maxValue,mean;
+	float maxValue, mean;
 
 	@Override
-	public void setInputImage(GrayF32 image) {
-		enlargedTemplate.reshape(image.width,image.height);
-		fftImage.reshape(image.width,image.height);
-		fftTemplate.reshape(image.width,image.height);
-		fftMult.reshape(image.width,image.height);
-		correlation.reshape(image.width,image.height);
+	public void setInputImage( GrayF32 image ) {
+		enlargedTemplate.reshape(image.width, image.height);
+		fftImage.reshape(image.width, image.height);
+		fftTemplate.reshape(image.width, image.height);
+		fftMult.reshape(image.width, image.height);
+		correlation.reshape(image.width, image.height);
 
-		normalizedImage.reshape(image.width,image.height);
+		normalizedImage.reshape(image.width, image.height);
 
-		maxValue = ImageStatistics.max(image)+0.0001f;// avoid divide by zero errors
+		maxValue = ImageStatistics.max(image) + 0.0001f;// avoid divide by zero errors
 		mean = ImageStatistics.mean(image);
 
-		PixelMath.divide(image,maxValue,normalizedImage);
-		PixelMath.minus(normalizedImage,mean/maxValue,normalizedImage);
+		PixelMath.divide(image, maxValue, normalizedImage);
+		PixelMath.minus(normalizedImage, mean/maxValue, normalizedImage);
 
 		dft.forward(normalizedImage, fftImage);
 	}
 
 	@Override
-	public void process(GrayF32 template) {
-		process(template,null);
+	public void process( GrayF32 template ) {
+		process(template, null);
 	}
 
 	@Override
-	public void process(GrayF32 template, GrayF32 mask) {
-		if( template.width > fftImage.width || template.height > fftImage.height )
+	public void process( GrayF32 template, GrayF32 mask ) {
+		if (template.width > fftImage.width || template.height > fftImage.height)
 			throw new IllegalArgumentException("Template must be smaller than or equal to the image");
 
 		// normalize the input image to reduce buffer overflow
-		normalizedTemplate.reshape(template.width,template.height);
+		normalizedTemplate.reshape(template.width, template.height);
 
-		PixelMath.divide(template,maxValue,normalizedTemplate);
-		PixelMath.minus(normalizedTemplate,mean/maxValue,normalizedTemplate);
+		PixelMath.divide(template, maxValue, normalizedTemplate);
+		PixelMath.minus(normalizedTemplate, mean/maxValue, normalizedTemplate);
 
-		if( mask != null ) {
+		if (mask != null) {
 			for (int y = 0; y < mask.height; y++) {
 				for (int x = 0; x < mask.width; x++) {
-					if( mask.unsafe_get(x,y) == 0 ) {
-						normalizedTemplate.unsafe_set(x,y,0);
+					if (mask.unsafe_get(x, y) == 0) {
+						normalizedTemplate.unsafe_set(x, y, 0);
 					}
 				}
 			}
@@ -110,7 +108,7 @@ public class TemplateCorrelationFFT
 
 		// insert the template into the enlarged image
 		// want it to be at (0,0) coordinate.  This requires wrapping it around the corners
-		GImageMiscOps.fill(enlargedTemplate,0);
+		GImageMiscOps.fill(enlargedTemplate, 0);
 //		int x0 = 0;//enlargedTemplate.width-template.width;
 //		int y0 = 0;//enlargedTemplate.height-template.height;
 //		int x1 = x0 + template.width;
@@ -118,22 +116,22 @@ public class TemplateCorrelationFFT
 
 //		enlargedTemplate.subimage(x0,y0,x1,y1).setTo(normalizedTemplate);
 		for (int y = 0; y < template.height; y++) {
-			int yy = y-borderY0+(1-template.height%2);
-			if( yy < 0 )
-				yy = enlargedTemplate.height+yy;
-			for (int x = 0;  x < template.width; x++) {
-				int xx = x-borderX0+(1-template.width%2);
-				if( xx < 0 )
-					xx = enlargedTemplate.width+xx;
-				enlargedTemplate.unsafe_set(xx,yy, normalizedTemplate.unsafe_get(x,y));
+			int yy = y - borderY0 + (1 - template.height%2);
+			if (yy < 0)
+				yy = enlargedTemplate.height + yy;
+			for (int x = 0; x < template.width; x++) {
+				int xx = x - borderX0 + (1 - template.width%2);
+				if (xx < 0)
+					xx = enlargedTemplate.width + xx;
+				enlargedTemplate.unsafe_set(xx, yy, normalizedTemplate.unsafe_get(x, y));
 			}
 		}
 
 		dft.forward(enlargedTemplate, fftTemplate);
 
 		// compute the correlation
-		DiscreteFourierTransformOps.multiplyComplex(fftImage,fftTemplate,fftMult);
-		dft.inverse(fftMult,correlation);
+		DiscreteFourierTransformOps.multiplyComplex(fftImage, fftTemplate, fftMult);
+		dft.inverse(fftMult, correlation);
 	}
 
 	@Override

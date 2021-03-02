@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -43,22 +43,17 @@ public class FactoryBackgroundModel {
 	 * @return new instance of the background model
 	 */
 	public static <T extends ImageBase<T>>
-	BackgroundStationaryBasic<T> stationaryBasic(ConfigBackgroundBasic config , ImageType<T> imageType ) {
+	BackgroundStationaryBasic<T> stationaryBasic( ConfigBackgroundBasic config, ImageType<T> imageType ) {
 
 		config.checkValidity();
 
-		switch( imageType.getFamily() ) {
-			case GRAY:
-				return new BackgroundStationaryBasic_SB(config.learnRate,config.threshold,imageType.getImageClass());
+		return switch (imageType.getFamily()) {
+			case GRAY -> new BackgroundStationaryBasic_SB(config.learnRate, config.threshold, imageType.getImageClass());
+			case PLANAR -> new BackgroundStationaryBasic_PL(config.learnRate, config.threshold, imageType);
+			case INTERLEAVED -> new BackgroundStationaryBasic_IL(config.learnRate, config.threshold, imageType);
+			default -> throw new IllegalArgumentException("Unknown image type");
+		};
 
-			case PLANAR:
-				return new BackgroundStationaryBasic_PL(config.learnRate,config.threshold,imageType);
-
-			case INTERLEAVED:
-				return new BackgroundStationaryBasic_IL(config.learnRate,config.threshold,imageType);
-		}
-
-		throw new IllegalArgumentException("Unknown image type");
 	}
 
 	/**
@@ -69,32 +64,20 @@ public class FactoryBackgroundModel {
 	 * @return new instance of the background model
 	 */
 	public static <T extends ImageBase<T>, Motion extends InvertibleTransform<Motion>>
-	BackgroundMovingBasic<T,Motion> movingBasic(ConfigBackgroundBasic config ,
-												Point2Transform2Model_F32<Motion> transform, ImageType<T> imageType ) {
+	BackgroundMovingBasic<T, Motion> movingBasic( ConfigBackgroundBasic config,
+												  Point2Transform2Model_F32<Motion> transform, ImageType<T> imageType ) {
 
 		config.checkValidity();
 
-		BackgroundMovingBasic<T,Motion> ret;
-
-		switch( imageType.getFamily() ) {
-			case GRAY:
-				ret= new BackgroundMovingBasic_SB(config.learnRate,config.threshold,
-						transform,config.interpolation,imageType.getImageClass());
-				break;
-
-			case PLANAR:
-				ret= new BackgroundMovingBasic_PL(config.learnRate,config.threshold,
-						transform,config.interpolation,imageType);
-				break;
-
-			case INTERLEAVED:
-				ret= new BackgroundMovingBasic_IL(config.learnRate,config.threshold,
-						transform,config.interpolation,imageType);
-				break;
-
-			default:
-				throw new IllegalArgumentException("Unknown image type");
-		}
+		BackgroundMovingBasic<T, Motion> ret = switch (imageType.getFamily()) {
+			case GRAY -> new BackgroundMovingBasic_SB(config.learnRate, config.threshold,
+					transform, config.interpolation, imageType.getImageClass());
+			case PLANAR -> new BackgroundMovingBasic_PL(config.learnRate, config.threshold,
+					transform, config.interpolation, imageType);
+			case INTERLEAVED -> new BackgroundMovingBasic_IL(config.learnRate, config.threshold,
+					transform, config.interpolation, imageType);
+			default -> throw new IllegalArgumentException("Unknown image type");
+		};
 
 		ret.setUnknownValue(config.unknownValue);
 		return ret;
@@ -108,28 +91,16 @@ public class FactoryBackgroundModel {
 	 * @return new instance of the background model
 	 */
 	public static <T extends ImageBase<T>>
-	BackgroundStationaryGaussian<T> stationaryGaussian(ConfigBackgroundGaussian config , ImageType<T> imageType ) {
+	BackgroundStationaryGaussian<T> stationaryGaussian( ConfigBackgroundGaussian config, ImageType<T> imageType ) {
 
 		config.checkValidity();
 
-		BackgroundStationaryGaussian<T> ret;
-
-		switch( imageType.getFamily() ) {
-			case GRAY:
-				ret = new BackgroundStationaryGaussian_SB(config.learnRate,config.threshold,imageType.getImageClass());
-				break;
-
-			case PLANAR:
-				ret =  new BackgroundStationaryGaussian_PL(config.learnRate,config.threshold,imageType);
-				break;
-
-			case INTERLEAVED:
-				ret =  new BackgroundStationaryGaussian_IL(config.learnRate,config.threshold,imageType);
-				break;
-
-			default:
-				throw new IllegalArgumentException("Unknown image type");
-		}
+		BackgroundStationaryGaussian<T> ret = switch (imageType.getFamily()) {
+			case GRAY -> new BackgroundStationaryGaussian_SB(config.learnRate, config.threshold, imageType.getImageClass());
+			case PLANAR -> new BackgroundStationaryGaussian_PL(config.learnRate, config.threshold, imageType);
+			case INTERLEAVED -> new BackgroundStationaryGaussian_IL(config.learnRate, config.threshold, imageType);
+			default -> throw new IllegalArgumentException("Unknown image type");
+		};
 
 		ret.setInitialVariance(config.initialVariance);
 		ret.setMinimumDifference(config.minimumDifference);
@@ -145,34 +116,22 @@ public class FactoryBackgroundModel {
 	 * @param imageType Type of input image
 	 * @return new instance of the background model
 	 */
-	public static <T extends ImageBase<T>,Motion extends InvertibleTransform<Motion>>
-	BackgroundMovingGaussian<T,Motion> movingGaussian( ConfigBackgroundGaussian config ,
-													   Point2Transform2Model_F32<Motion> transform,
-													   ImageType<T> imageType ) {
+	public static <T extends ImageBase<T>, Motion extends InvertibleTransform<Motion>>
+	BackgroundMovingGaussian<T, Motion> movingGaussian( ConfigBackgroundGaussian config,
+														Point2Transform2Model_F32<Motion> transform,
+														ImageType<T> imageType ) {
 
 		config.checkValidity();
 
-		BackgroundMovingGaussian<T,Motion> ret;
-
-		switch( imageType.getFamily() ) {
-			case GRAY:
-				ret = new BackgroundMovingGaussian_SB(config.learnRate,config.threshold,
-						transform,config.interpolation,imageType.getImageClass());
-				break;
-
-			case PLANAR:
-				ret =  new BackgroundMovingGaussian_PL(config.learnRate,config.threshold,
-						transform,config.interpolation,imageType);
-				break;
-
-			case INTERLEAVED:
-				ret =  new BackgroundMovingGaussian_IL(config.learnRate,config.threshold,
-						transform,config.interpolation,imageType);
-				break;
-
-			default:
-				throw new IllegalArgumentException("Unknown image type");
-		}
+		BackgroundMovingGaussian<T, Motion> ret = switch (imageType.getFamily()) {
+			case GRAY -> new BackgroundMovingGaussian_SB(config.learnRate, config.threshold,
+					transform, config.interpolation, imageType.getImageClass());
+			case PLANAR -> new BackgroundMovingGaussian_PL(config.learnRate, config.threshold,
+					transform, config.interpolation, imageType);
+			case INTERLEAVED -> new BackgroundMovingGaussian_IL(config.learnRate, config.threshold,
+					transform, config.interpolation, imageType);
+			default -> throw new IllegalArgumentException("Unknown image type");
+		};
 
 		ret.setInitialVariance(config.initialVariance);
 		ret.setMinimumDifference(config.minimumDifference);
@@ -189,30 +148,20 @@ public class FactoryBackgroundModel {
 	 * @return new instance of the background model
 	 */
 	public static <T extends ImageBase<T>>
-	BackgroundStationaryGmm<T> stationaryGmm(@Nullable ConfigBackgroundGmm config , ImageType<T> imageType ) {
+	BackgroundStationaryGmm<T> stationaryGmm( @Nullable ConfigBackgroundGmm config, ImageType<T> imageType ) {
 
-		if( config == null )
+		if (config == null)
 			config = new ConfigBackgroundGmm();
 		else
 			config.checkValidity();
 
-		BackgroundStationaryGmm<T> ret;
-
-		switch( imageType.getFamily() ) {
-			case GRAY:
-				ret = new BackgroundStationaryGmm_SB(config.learningPeriod,config.decayCoefient,
-						config.numberOfGaussian,imageType);
-				break;
-
-			case PLANAR:
-			case INTERLEAVED:
-				ret =  new BackgroundStationaryGmm_MB(config.learningPeriod,config.decayCoefient,
-						config.numberOfGaussian,imageType);
-				break;
-
-			default:
-				throw new IllegalArgumentException("Unknown image type");
-		}
+		BackgroundStationaryGmm<T> ret = switch (imageType.getFamily()) {
+			case GRAY -> new BackgroundStationaryGmm_SB(config.learningPeriod, config.decayCoefient,
+					config.numberOfGaussian, imageType);
+			case PLANAR, INTERLEAVED -> new BackgroundStationaryGmm_MB(config.learningPeriod, config.decayCoefient,
+					config.numberOfGaussian, imageType);
+			default -> throw new IllegalArgumentException("Unknown image type");
+		};
 
 		ret.setInitialVariance(config.initialVariance);
 		ret.setMaxDistance(config.maxDistance);
@@ -229,33 +178,22 @@ public class FactoryBackgroundModel {
 	 * @param imageType Type of input image
 	 * @return new instance of the background model
 	 */
-	public static <T extends ImageBase<T>,Motion extends InvertibleTransform<Motion>>
-	BackgroundMovingGmm<T,Motion> movingGmm(@Nullable ConfigBackgroundGmm config ,
-											Point2Transform2Model_F32<Motion> transform ,
-											ImageType<T> imageType )
-	{
-		if( config == null )
+	public static <T extends ImageBase<T>, Motion extends InvertibleTransform<Motion>>
+	BackgroundMovingGmm<T, Motion> movingGmm( @Nullable ConfigBackgroundGmm config,
+											  Point2Transform2Model_F32<Motion> transform,
+											  ImageType<T> imageType ) {
+		if (config == null)
 			config = new ConfigBackgroundGmm();
 		else
 			config.checkValidity();
 
-		BackgroundMovingGmm<T,Motion> ret;
-
-		switch( imageType.getFamily() ) {
-			case GRAY:
-				ret = new BackgroundMovingGmm_SB(config.learningPeriod,config.decayCoefient,
-						config.numberOfGaussian,transform,imageType);
-				break;
-
-			case PLANAR:
-			case INTERLEAVED:
-				ret = new BackgroundMovingGmm_MB(config.learningPeriod,config.decayCoefient,
-						config.numberOfGaussian,transform,imageType);
-				break;
-
-			default:
-				throw new IllegalArgumentException("Unknown image type");
-		}
+		BackgroundMovingGmm<T, Motion> ret = switch (imageType.getFamily()) {
+			case GRAY -> new BackgroundMovingGmm_SB(config.learningPeriod, config.decayCoefient,
+					config.numberOfGaussian, transform, imageType);
+			case PLANAR, INTERLEAVED -> new BackgroundMovingGmm_MB(config.learningPeriod, config.decayCoefient,
+					config.numberOfGaussian, transform, imageType);
+			default -> throw new IllegalArgumentException("Unknown image type");
+		};
 
 		ret.setInitialVariance(config.initialVariance);
 		ret.setMaxDistance(config.maxDistance);

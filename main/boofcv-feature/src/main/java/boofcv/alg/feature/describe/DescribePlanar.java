@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -32,56 +32,54 @@ import java.lang.reflect.Array;
  *
  * @author Peter Abeles
  */
-public abstract class DescribePlanar<T extends ImageGray<T>, Desc extends TupleDesc>
-		implements DescribeRegionPoint<Planar<T>,Desc>
-{
+public abstract class DescribePlanar<T extends ImageGray<T>, Desc extends TupleDesc<Desc>>
+		implements DescribeRegionPoint<Planar<T>, Desc> {
 
 	// descriptor for each band in the image
-	DescribeRegionPoint<T,Desc> describers[];
+	DescribeRegionPoint<T, Desc>[] describers;
 
 	// number of elements in the output descriptor
 	int length;
 	Class<Desc> descType;
 
 	// storage for the descriptor in each band
-	Desc descBand[];
+	Desc[] descBand;
 
 	/**
 	 * Configuration
 	 *
 	 * @param describers A descriptor for each band in the image.
 	 */
-	protected DescribePlanar(DescribeRegionPoint<T, Desc> describers[]) {
+	protected DescribePlanar( DescribeRegionPoint<T, Desc>[] describers ) {
 		this.describers = describers;
 
 		descType = describers[0].getDescriptionType();
-		descBand = (Desc[])Array.newInstance(descType,describers.length);
+		descBand = (Desc[])Array.newInstance(descType, describers.length);
 
 		length = 0;
-		for( int i = 0; i < describers.length; i++ ) {
+		for (int i = 0; i < describers.length; i++) {
 			descBand[i] = describers[i].createDescription();
 			length += descBand[i].size();
 		}
-
 	}
 
 	@Override
-	public void setImage(Planar<T> image) {
-		if( image.getNumBands() != describers.length ) {
-			throw new IllegalArgumentException("Unexpected number of bands in input image.  Found "+
-					image.getNumBands()+" expected "+describers.length);
+	public void setImage( Planar<T> image ) {
+		if (image.getNumBands() != describers.length) {
+			throw new IllegalArgumentException("Unexpected number of bands in input image.  Found " +
+					image.getNumBands() + " expected " + describers.length);
 		}
 
-		for( int i = 0; i < describers.length; i++ ) {
+		for (int i = 0; i < describers.length; i++) {
 			describers[i].setImage(image.getBand(i));
 		}
 	}
 
 	@Override
-	public boolean process(double x, double y, double orientation, double radius, Desc description) {
+	public boolean process( double x, double y, double orientation, double radius, Desc description ) {
 		// compute descriptions individually
-		for( int i = 0; i < describers.length; i++ ) {
-			if( !describers[i].process(x,y,orientation, radius,descBand[i]) )
+		for (int i = 0; i < describers.length; i++) {
+			if (!describers[i].process(x, y, orientation, radius, descBand[i]))
 				return false;
 		}
 
@@ -93,8 +91,6 @@ public abstract class DescribePlanar<T extends ImageGray<T>, Desc extends TupleD
 
 	/**
 	 * Given all the descriptors computed independently in each band, combine them together into a single descriptor.
-	 *
-	 * @param description
 	 */
 	protected abstract void combine( Desc description );
 

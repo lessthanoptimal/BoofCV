@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -58,15 +58,14 @@ public class GradientToEdgeFeatures {
 	 * @param derivY Derivative along y-axis. Not modified.
 	 * @param intensity Edge intensity.
 	 */
-	static public void intensityE(GrayF32 derivX , GrayF32 derivY , GrayF32 intensity )
-	{
-		InputSanityCheck.checkSameShape(derivX,derivY);
-		intensity.reshape(derivX.width,derivX.height);
+	static public void intensityE( GrayF32 derivX, GrayF32 derivY, GrayF32 intensity ) {
+		InputSanityCheck.checkSameShape(derivX, derivY);
+		intensity.reshape(derivX.width, derivX.height);
 
-		if(BoofConcurrency.USE_CONCURRENT ) {
-			ImplGradientToEdgeFeatures_MT.intensityE(derivX,derivY,intensity);
+		if (BoofConcurrency.USE_CONCURRENT) {
+			ImplGradientToEdgeFeatures_MT.intensityE(derivX, derivY, intensity);
 		} else {
-			ImplGradientToEdgeFeatures.intensityE(derivX,derivY,intensity);
+			ImplGradientToEdgeFeatures.intensityE(derivX, derivY, intensity);
 		}
 	}
 
@@ -77,15 +76,14 @@ public class GradientToEdgeFeatures {
 	 * @param derivY Derivative along y-axis. Not modified.
 	 * @param intensity Edge intensity.
 	 */
-	static public void intensityAbs(GrayF32 derivX , GrayF32 derivY , GrayF32 intensity )
-	{
-		InputSanityCheck.checkSameShape(derivX,derivY);
-		intensity.reshape(derivX.width,derivX.height);
+	static public void intensityAbs( GrayF32 derivX, GrayF32 derivY, GrayF32 intensity ) {
+		InputSanityCheck.checkSameShape(derivX, derivY);
+		intensity.reshape(derivX.width, derivX.height);
 
-		if(BoofConcurrency.USE_CONCURRENT ) {
-			ImplGradientToEdgeFeatures_MT.intensityAbs(derivX,derivY,intensity);
+		if (BoofConcurrency.USE_CONCURRENT) {
+			ImplGradientToEdgeFeatures_MT.intensityAbs(derivX, derivY, intensity);
 		} else {
-			ImplGradientToEdgeFeatures.intensityAbs(derivX,derivY,intensity);
+			ImplGradientToEdgeFeatures.intensityAbs(derivX, derivY, intensity);
 		}
 	}
 
@@ -96,15 +94,14 @@ public class GradientToEdgeFeatures {
 	 * @param derivY Derivative along y-axis. Not modified.
 	 * @param angle Edge orientation in radians (-pi/2 to pi/2).
 	 */
-	static public void direction(GrayF32 derivX , GrayF32 derivY , GrayF32 angle )
-	{
-		InputSanityCheck.checkSameShape(derivX,derivY);
-		angle.reshape(derivX.width,derivX.height);
+	static public void direction( GrayF32 derivX, GrayF32 derivY, GrayF32 angle ) {
+		InputSanityCheck.checkSameShape(derivX, derivY);
+		angle.reshape(derivX.width, derivX.height);
 
-		if(BoofConcurrency.USE_CONCURRENT ) {
-			ImplGradientToEdgeFeatures_MT.direction(derivX,derivY,angle);
+		if (BoofConcurrency.USE_CONCURRENT) {
+			ImplGradientToEdgeFeatures_MT.direction(derivX, derivY, angle);
 		} else {
-			ImplGradientToEdgeFeatures.direction(derivX,derivY,angle);
+			ImplGradientToEdgeFeatures.direction(derivX, derivY, angle);
 		}
 	}
 
@@ -115,15 +112,14 @@ public class GradientToEdgeFeatures {
 	 * @param derivY Derivative along y-axis. Not modified.
 	 * @param angle Edge orientation in radians (-pi to pi).
 	 */
-	static public void direction2(GrayF32 derivX , GrayF32 derivY , GrayF32 angle )
-	{
-		InputSanityCheck.checkSameShape(derivX,derivY);
-		angle.reshape(derivX.width,derivX.height);
+	static public void direction2( GrayF32 derivX, GrayF32 derivY, GrayF32 angle ) {
+		InputSanityCheck.checkSameShape(derivX, derivY);
+		angle.reshape(derivX.width, derivX.height);
 
-		if(BoofConcurrency.USE_CONCURRENT ) {
-			ImplGradientToEdgeFeatures_MT.direction2(derivX,derivY,angle);
+		if (BoofConcurrency.USE_CONCURRENT) {
+			ImplGradientToEdgeFeatures_MT.direction2(derivX, derivY, angle);
 		} else {
-			ImplGradientToEdgeFeatures.direction2(derivX,derivY,angle);
+			ImplGradientToEdgeFeatures.direction2(derivX, derivY, angle);
 		}
 	}
 
@@ -140,12 +136,11 @@ public class GradientToEdgeFeatures {
 	 * @param output Filtered intensity. If null a new image will be declared and returned. Modified.
 	 * @return Filtered edge intensity.
 	 */
-	static public GrayF32 nonMaxSuppressionCrude4(GrayF32 intensity , GrayF32 derivX , GrayF32 derivY, GrayF32 output )
-	{
-		InputSanityCheck.checkSameShape(intensity,derivX,derivY);
-		output = InputSanityCheck.checkDeclare(intensity,output);
+	static public GrayF32 nonMaxSuppressionCrude4( GrayF32 intensity, GrayF32 derivX, GrayF32 derivY, GrayF32 output ) {
+		InputSanityCheck.checkSameShape(intensity, derivX, derivY);
+		output = InputSanityCheck.checkDeclare(intensity, output);
 
-		if(BoofConcurrency.USE_CONCURRENT ) {
+		if (BoofConcurrency.USE_CONCURRENT) {
 			ImplEdgeNonMaxSuppressionCrude_MT.inner4(intensity, derivX, derivY, output);
 			ImplEdgeNonMaxSuppressionCrude_MT.border4(intensity, derivX, derivY, output);
 		} else {
@@ -163,15 +158,14 @@ public class GradientToEdgeFeatures {
 	 * @param derivY Derivative along y-axis. Not modified.
 	 * @param intensity Edge intensity.
 	 */
-	static public void intensityE(GrayS16 derivX , GrayS16 derivY , GrayF32 intensity )
-	{
-		InputSanityCheck.checkSameShape(derivX,derivY);
-		intensity.reshape(derivX.width,derivX.height);
+	static public void intensityE( GrayS16 derivX, GrayS16 derivY, GrayF32 intensity ) {
+		InputSanityCheck.checkSameShape(derivX, derivY);
+		intensity.reshape(derivX.width, derivX.height);
 
-		if(BoofConcurrency.USE_CONCURRENT ) {
-			ImplGradientToEdgeFeatures_MT.intensityE(derivX,derivY,intensity);
+		if (BoofConcurrency.USE_CONCURRENT) {
+			ImplGradientToEdgeFeatures_MT.intensityE(derivX, derivY, intensity);
 		} else {
-			ImplGradientToEdgeFeatures.intensityE(derivX,derivY,intensity);
+			ImplGradientToEdgeFeatures.intensityE(derivX, derivY, intensity);
 		}
 	}
 
@@ -182,15 +176,14 @@ public class GradientToEdgeFeatures {
 	 * @param derivY Derivative along y-axis. Not modified.
 	 * @param intensity Edge intensity.
 	 */
-	static public void intensityAbs(GrayS16 derivX , GrayS16 derivY , GrayF32 intensity )
-	{
-		InputSanityCheck.checkSameShape(derivX,derivY);
-		intensity.reshape(derivX.width,derivX.height);
+	static public void intensityAbs( GrayS16 derivX, GrayS16 derivY, GrayF32 intensity ) {
+		InputSanityCheck.checkSameShape(derivX, derivY);
+		intensity.reshape(derivX.width, derivX.height);
 
-		if(BoofConcurrency.USE_CONCURRENT ) {
-			ImplGradientToEdgeFeatures_MT.intensityAbs(derivX,derivY,intensity);
+		if (BoofConcurrency.USE_CONCURRENT) {
+			ImplGradientToEdgeFeatures_MT.intensityAbs(derivX, derivY, intensity);
 		} else {
-			ImplGradientToEdgeFeatures.intensityAbs(derivX,derivY,intensity);
+			ImplGradientToEdgeFeatures.intensityAbs(derivX, derivY, intensity);
 		}
 	}
 
@@ -201,15 +194,14 @@ public class GradientToEdgeFeatures {
 	 * @param derivY Derivative along y-axis. Not modified.
 	 * @param angle Edge orientation in radians (-pi/2 to pi/2).
 	 */
-	static public void direction(GrayS16 derivX , GrayS16 derivY , GrayF32 angle )
-	{
-		InputSanityCheck.checkSameShape(derivX,derivY);
-		angle.reshape(derivX.width,derivX.height);
+	static public void direction( GrayS16 derivX, GrayS16 derivY, GrayF32 angle ) {
+		InputSanityCheck.checkSameShape(derivX, derivY);
+		angle.reshape(derivX.width, derivX.height);
 
-		if(BoofConcurrency.USE_CONCURRENT ) {
-			ImplGradientToEdgeFeatures_MT.direction(derivX,derivY,angle);
+		if (BoofConcurrency.USE_CONCURRENT) {
+			ImplGradientToEdgeFeatures_MT.direction(derivX, derivY, angle);
 		} else {
-			ImplGradientToEdgeFeatures.direction(derivX,derivY,angle);
+			ImplGradientToEdgeFeatures.direction(derivX, derivY, angle);
 		}
 	}
 
@@ -220,15 +212,14 @@ public class GradientToEdgeFeatures {
 	 * @param derivY Derivative along y-axis. Not modified.
 	 * @param angle Edge orientation in radians (-pi to pi).
 	 */
-	static public void direction2(GrayS16 derivX , GrayS16 derivY , GrayF32 angle )
-	{
-		InputSanityCheck.checkSameShape(derivX,derivY);
-		angle.reshape(derivX.width,derivX.height);
+	static public void direction2( GrayS16 derivX, GrayS16 derivY, GrayF32 angle ) {
+		InputSanityCheck.checkSameShape(derivX, derivY);
+		angle.reshape(derivX.width, derivX.height);
 
-		if(BoofConcurrency.USE_CONCURRENT ) {
-			ImplGradientToEdgeFeatures_MT.direction2(derivX,derivY,angle);
+		if (BoofConcurrency.USE_CONCURRENT) {
+			ImplGradientToEdgeFeatures_MT.direction2(derivX, derivY, angle);
 		} else {
-			ImplGradientToEdgeFeatures.direction2(derivX,derivY,angle);
+			ImplGradientToEdgeFeatures.direction2(derivX, derivY, angle);
 		}
 	}
 
@@ -245,12 +236,11 @@ public class GradientToEdgeFeatures {
 	 * @param output Filtered intensity. If null a new image will be declared and returned. Modified.
 	 * @return Filtered edge intensity.
 	 */
-	static public GrayF32 nonMaxSuppressionCrude4(GrayF32 intensity , GrayS16 derivX , GrayS16 derivY, GrayF32 output )
-	{
-		InputSanityCheck.checkSameShape(intensity,derivX,derivY);
-		output = InputSanityCheck.checkDeclare(intensity,output);
+	static public GrayF32 nonMaxSuppressionCrude4( GrayF32 intensity, GrayS16 derivX, GrayS16 derivY, GrayF32 output ) {
+		InputSanityCheck.checkSameShape(intensity, derivX, derivY);
+		output = InputSanityCheck.checkDeclare(intensity, output);
 
-		if(BoofConcurrency.USE_CONCURRENT ) {
+		if (BoofConcurrency.USE_CONCURRENT) {
 			ImplEdgeNonMaxSuppressionCrude_MT.inner4(intensity, derivX, derivY, output);
 			ImplEdgeNonMaxSuppressionCrude_MT.border4(intensity, derivX, derivY, output);
 		} else {
@@ -268,15 +258,14 @@ public class GradientToEdgeFeatures {
 	 * @param derivY Derivative along y-axis. Not modified.
 	 * @param intensity Edge intensity.
 	 */
-	static public void intensityE(GrayS32 derivX , GrayS32 derivY , GrayF32 intensity )
-	{
-		InputSanityCheck.checkSameShape(derivX,derivY);
-		intensity.reshape(derivX.width,derivX.height);
+	static public void intensityE( GrayS32 derivX, GrayS32 derivY, GrayF32 intensity ) {
+		InputSanityCheck.checkSameShape(derivX, derivY);
+		intensity.reshape(derivX.width, derivX.height);
 
-		if(BoofConcurrency.USE_CONCURRENT ) {
-			ImplGradientToEdgeFeatures_MT.intensityE(derivX,derivY,intensity);
+		if (BoofConcurrency.USE_CONCURRENT) {
+			ImplGradientToEdgeFeatures_MT.intensityE(derivX, derivY, intensity);
 		} else {
-			ImplGradientToEdgeFeatures.intensityE(derivX,derivY,intensity);
+			ImplGradientToEdgeFeatures.intensityE(derivX, derivY, intensity);
 		}
 	}
 
@@ -287,15 +276,14 @@ public class GradientToEdgeFeatures {
 	 * @param derivY Derivative along y-axis. Not modified.
 	 * @param intensity Edge intensity.
 	 */
-	static public void intensityAbs(GrayS32 derivX , GrayS32 derivY , GrayF32 intensity )
-	{
-		InputSanityCheck.checkSameShape(derivX,derivY);
-		intensity.reshape(derivX.width,derivX.height);
+	static public void intensityAbs( GrayS32 derivX, GrayS32 derivY, GrayF32 intensity ) {
+		InputSanityCheck.checkSameShape(derivX, derivY);
+		intensity.reshape(derivX.width, derivX.height);
 
-		if(BoofConcurrency.USE_CONCURRENT ) {
-			ImplGradientToEdgeFeatures_MT.intensityAbs(derivX,derivY,intensity);
+		if (BoofConcurrency.USE_CONCURRENT) {
+			ImplGradientToEdgeFeatures_MT.intensityAbs(derivX, derivY, intensity);
 		} else {
-			ImplGradientToEdgeFeatures.intensityAbs(derivX,derivY,intensity);
+			ImplGradientToEdgeFeatures.intensityAbs(derivX, derivY, intensity);
 		}
 	}
 
@@ -306,15 +294,14 @@ public class GradientToEdgeFeatures {
 	 * @param derivY Derivative along y-axis. Not modified.
 	 * @param angle Edge orientation in radians (-pi/2 to pi/2).
 	 */
-	static public void direction(GrayS32 derivX , GrayS32 derivY , GrayF32 angle )
-	{
-		InputSanityCheck.checkSameShape(derivX,derivY);
-		angle.reshape(derivX.width,derivX.height);
+	static public void direction( GrayS32 derivX, GrayS32 derivY, GrayF32 angle ) {
+		InputSanityCheck.checkSameShape(derivX, derivY);
+		angle.reshape(derivX.width, derivX.height);
 
-		if(BoofConcurrency.USE_CONCURRENT ) {
-			ImplGradientToEdgeFeatures_MT.direction(derivX,derivY,angle);
+		if (BoofConcurrency.USE_CONCURRENT) {
+			ImplGradientToEdgeFeatures_MT.direction(derivX, derivY, angle);
 		} else {
-			ImplGradientToEdgeFeatures.direction(derivX,derivY,angle);
+			ImplGradientToEdgeFeatures.direction(derivX, derivY, angle);
 		}
 	}
 
@@ -325,15 +312,14 @@ public class GradientToEdgeFeatures {
 	 * @param derivY Derivative along y-axis. Not modified.
 	 * @param angle Edge orientation in radians (-pi to pi).
 	 */
-	static public void direction2(GrayS32 derivX , GrayS32 derivY , GrayF32 angle )
-	{
-		InputSanityCheck.checkSameShape(derivX,derivY);
-		angle.reshape(derivX.width,derivX.height);
+	static public void direction2( GrayS32 derivX, GrayS32 derivY, GrayF32 angle ) {
+		InputSanityCheck.checkSameShape(derivX, derivY);
+		angle.reshape(derivX.width, derivX.height);
 
-		if(BoofConcurrency.USE_CONCURRENT ) {
-			ImplGradientToEdgeFeatures_MT.direction2(derivX,derivY,angle);
+		if (BoofConcurrency.USE_CONCURRENT) {
+			ImplGradientToEdgeFeatures_MT.direction2(derivX, derivY, angle);
 		} else {
-			ImplGradientToEdgeFeatures.direction2(derivX,derivY,angle);
+			ImplGradientToEdgeFeatures.direction2(derivX, derivY, angle);
 		}
 	}
 
@@ -350,12 +336,11 @@ public class GradientToEdgeFeatures {
 	 * @param output Filtered intensity. If null a new image will be declared and returned. Modified.
 	 * @return Filtered edge intensity.
 	 */
-	static public GrayF32 nonMaxSuppressionCrude4(GrayF32 intensity , GrayS32 derivX , GrayS32 derivY, GrayF32 output )
-	{
-		InputSanityCheck.checkSameShape(intensity,derivX,derivY);
-		output = InputSanityCheck.checkDeclare(intensity,output);
+	static public GrayF32 nonMaxSuppressionCrude4( GrayF32 intensity, GrayS32 derivX, GrayS32 derivY, GrayF32 output ) {
+		InputSanityCheck.checkSameShape(intensity, derivX, derivY);
+		output = InputSanityCheck.checkDeclare(intensity, output);
 
-		if(BoofConcurrency.USE_CONCURRENT ) {
+		if (BoofConcurrency.USE_CONCURRENT) {
 			ImplEdgeNonMaxSuppressionCrude_MT.inner4(intensity, derivX, derivY, output);
 			ImplEdgeNonMaxSuppressionCrude_MT.border4(intensity, derivX, derivY, output);
 		} else {
@@ -377,31 +362,30 @@ public class GradientToEdgeFeatures {
 	 *
 	 * @param angle Input image containing edge orientations.  Orientations are assumed to be
 	 * from -pi/2 to pi/2. Not modified.
-	 * @param discrete  Output set of discretized angles.  Values will be from -1 to 2, inclusive. If null a new
+	 * @param discrete Output set of discretized angles.  Values will be from -1 to 2, inclusive. If null a new
 	 * image will be declared and returned. Modified.
 	 * @return Discretized direction.
 	 */
-	static public GrayS8 discretizeDirection4(GrayF32 angle , GrayS8 discrete )
-	{
-		discrete = InputSanityCheck.checkDeclare(angle,discrete,GrayS8.class);
+	static public GrayS8 discretizeDirection4( GrayF32 angle, GrayS8 discrete ) {
+		discrete = InputSanityCheck.checkDeclare(angle, discrete, GrayS8.class);
 
 		final float A = (float)(Math.PI/8.0);
 		final float B = (float)(Math.PI/4.0);
 		final int w = angle.width;
 		final int h = angle.height;
 
-		for( int y = 0; y < h; y++ ) {
+		for (int y = 0; y < h; y++) {
 			int indexSrc = angle.startIndex + y*angle.stride;
 			int indexDst = discrete.startIndex + y*discrete.stride;
 
 			int end = indexSrc + w;
-			for( ; indexSrc < end; indexSrc++ , indexDst++ ) {
+			for (; indexSrc < end; indexSrc++, indexDst++) {
 				float a = angle.data[indexSrc];
 				int val;
-				if( a >= 0 ) {
-					val = (int)((a+A)/B);
+				if (a >= 0) {
+					val = (int)((a + A)/B);
 				} else {
-					val = (int)((a-A)/B);
+					val = (int)((a - A)/B);
 				}
 				discrete.data[indexDst] = (byte)(val == -2 ? 2 : val);
 			}
@@ -421,31 +405,30 @@ public class GradientToEdgeFeatures {
 	 *
 	 * @param angle Input image containing edge orientations.  Orientations are assumed to be
 	 * from -pi to pi. Not modified.
-	 * @param discrete  Output set of discretized angles.  Values will be from -3 to 4, inclusive. If null a new
+	 * @param discrete Output set of discretized angles.  Values will be from -3 to 4, inclusive. If null a new
 	 * image will be declared and returned. Modified.
 	 * @return Discretized direction.
 	 */
-	static public GrayS8 discretizeDirection8(GrayF32 angle , GrayS8 discrete )
-	{
-		discrete = InputSanityCheck.checkDeclare(angle,discrete,GrayS8.class);
+	static public GrayS8 discretizeDirection8( GrayF32 angle, GrayS8 discrete ) {
+		discrete = InputSanityCheck.checkDeclare(angle, discrete, GrayS8.class);
 
 		final float A = (float)(Math.PI/8.0);
 		final float B = (float)(Math.PI/4.0);
 		final int w = angle.width;
 		final int h = angle.height;
 
-		for( int y = 0; y < h; y++ ) {
+		for (int y = 0; y < h; y++) {
 			int indexSrc = angle.startIndex + y*angle.stride;
 			int indexDst = discrete.startIndex + y*discrete.stride;
 
 			int end = indexSrc + w;
-			for( ; indexSrc < end; indexSrc++ , indexDst++ ) {
+			for (; indexSrc < end; indexSrc++, indexDst++) {
 				float a = angle.data[indexSrc];
 				int val;
-				if( a >= 0 ) {
-					val = (int)((a+A)/B);
+				if (a >= 0) {
+					val = (int)((a + A)/B);
 				} else {
-					val = (int)((a-A)/B);
+					val = (int)((a - A)/B);
 				}
 				discrete.data[indexDst] = (byte)(val == -4 ? 4 : val);
 			}
@@ -453,6 +436,7 @@ public class GradientToEdgeFeatures {
 
 		return discrete;
 	}
+
 	/**
 	 * <p>
 	 * Sets edge intensities to zero if the pixel has an intensity which is less than either of
@@ -464,12 +448,11 @@ public class GradientToEdgeFeatures {
 	 * @param output Filtered intensity. If null a new image will be declared and returned. Modified.
 	 * @return Filtered edge intensity.
 	 */
-	static public GrayF32 nonMaxSuppression4(GrayF32 intensity , GrayS8 direction , GrayF32 output )
-	{
-		InputSanityCheck.checkSameShape(intensity,direction);
-		output = InputSanityCheck.checkDeclare(intensity,output);
+	static public GrayF32 nonMaxSuppression4( GrayF32 intensity, GrayS8 direction, GrayF32 output ) {
+		InputSanityCheck.checkSameShape(intensity, direction);
+		output = InputSanityCheck.checkDeclare(intensity, output);
 
-		if( BoofConcurrency.USE_CONCURRENT ) {
+		if (BoofConcurrency.USE_CONCURRENT) {
 			ImplEdgeNonMaxSuppression_MT.inner4(intensity, direction, output);
 			ImplEdgeNonMaxSuppression_MT.border4(intensity, direction, output);
 		} else {
@@ -491,12 +474,11 @@ public class GradientToEdgeFeatures {
 	 * @param output Filtered intensity. If null a new image will be declared and returned. Modified.
 	 * @return Filtered edge intensity.
 	 */
-	static public GrayF32 nonMaxSuppression8(GrayF32 intensity , GrayS8 direction , GrayF32 output )
-	{
-		InputSanityCheck.checkSameShape(intensity,direction);
-		output = InputSanityCheck.checkDeclare(intensity,output);
+	static public GrayF32 nonMaxSuppression8( GrayF32 intensity, GrayS8 direction, GrayF32 output ) {
+		InputSanityCheck.checkSameShape(intensity, direction);
+		output = InputSanityCheck.checkDeclare(intensity, output);
 
-		if( BoofConcurrency.USE_CONCURRENT ) {
+		if (BoofConcurrency.USE_CONCURRENT) {
 			ImplEdgeNonMaxSuppression_MT.inner8(intensity, direction, output);
 			ImplEdgeNonMaxSuppression_MT.border8(intensity, direction, output);
 		} else {
@@ -506,6 +488,4 @@ public class GradientToEdgeFeatures {
 
 		return output;
 	}
-
-
 }

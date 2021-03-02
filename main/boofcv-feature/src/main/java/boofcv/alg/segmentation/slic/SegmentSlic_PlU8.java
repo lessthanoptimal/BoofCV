@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -29,32 +29,32 @@ import boofcv.struct.image.Planar;
  * @author Peter Abeles
  */
 public class SegmentSlic_PlU8 extends SegmentSlic<Planar<GrayU8>> {
-	public SegmentSlic_PlU8(int numberOfRegions, float m, int totalIterations,
-							ConnectRule connectRule , int numBands) {
-		super(numberOfRegions, m , totalIterations, connectRule,ImageType.pl(numBands, GrayU8.class));
+	public SegmentSlic_PlU8( int numberOfRegions, float m, int totalIterations,
+							 ConnectRule connectRule, int numBands ) {
+		super(numberOfRegions, m, totalIterations, connectRule, ImageType.pl(numBands, GrayU8.class));
 	}
 
 	@Override
-	public void setColor(float[] color, int x, int y) {
+	public void setColor( float[] color, int x, int y ) {
 		final int numBands = input.getNumBands();
-		for( int i = 0; i < numBands; i++ ) {
-			color[i] = input.getBand(i).unsafe_get(x,y);
+		for (int i = 0; i < numBands; i++) {
+			color[i] = input.getBand(i).unsafe_get(x, y);
 		}
 	}
 
 	@Override
-	public void addColor(float[] color, int index, float weight) {
+	public void addColor( float[] color, int index, float weight ) {
 		final int numBands = input.getNumBands();
-		for( int i = 0; i < numBands; i++ ) {
+		for (int i = 0; i < numBands; i++) {
 			color[i] += (input.getBand(i).data[index] & 0xFF)*weight;
 		}
 	}
 
 	@Override
-	public float colorDistance(float[] color, int index) {
+	public float colorDistance( float[] color, int index ) {
 		final int numBands = input.getNumBands();
 		float total = 0;
-		for( int i = 0; i < numBands; i++ ) {
+		for (int i = 0; i < numBands; i++) {
 			float diff = (input.getBand(i).data[index] & 0xFF) - color[i];
 			total += diff*diff;
 		}
@@ -63,11 +63,11 @@ public class SegmentSlic_PlU8 extends SegmentSlic<Planar<GrayU8>> {
 	}
 
 	@Override
-	public float getIntensity(int x, int y) {
+	public float getIntensity( int x, int y ) {
 		final int numBands = input.getNumBands();
-		final int index = input.getIndex(x,y);
+		final int index = input.getIndex(x, y);
 		float total = 0;
-		for( int i = 0; i < numBands; i++ ) {
+		for (int i = 0; i < numBands; i++) {
 			total += input.getBand(i).data[index] & 0xFF;
 		}
 

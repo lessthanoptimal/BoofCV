@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -45,11 +45,9 @@ import org.jetbrains.annotations.Nullable;
  *
  * @param <I> Input image type.
  * @param <D> Image derivative type.
- *
  * @author Peter Abeles
  */
-public class GeneralFeatureDetector<I extends ImageGray<I>, D extends ImageGray<D>>
-{
+public class GeneralFeatureDetector<I extends ImageGray<I>, D extends ImageGray<D>> {
 	// list of feature locations found by the extractor
 	protected @Getter QueueCorner maximums = new QueueCorner(10);
 	protected @Getter QueueCorner minimums = new QueueCorner(10);
@@ -84,18 +82,17 @@ public class GeneralFeatureDetector<I extends ImageGray<I>, D extends ImageGray<
 	 * @param intensity Computes how much like the feature the region around each pixel is.
 	 * @param extractorMin Extracts the corners from intensity image
 	 */
-	public GeneralFeatureDetector(GeneralFeatureIntensity<I, D> intensity,
-								  @Nullable NonMaxSuppression extractorMin,
-								  @Nullable NonMaxSuppression extractorMax,
-								  FeatureSelectLimitIntensity<Point2D_I16> selectMax)
-	{
-		if( extractorMin == null && intensity.localMinimums() )
+	public GeneralFeatureDetector( GeneralFeatureIntensity<I, D> intensity,
+								   @Nullable NonMaxSuppression extractorMin,
+								   @Nullable NonMaxSuppression extractorMax,
+								   FeatureSelectLimitIntensity<Point2D_I16> selectMax ) {
+		if (extractorMin == null && intensity.localMinimums())
 			throw new IllegalArgumentException("Must provide a minimum extractor");
-		if( extractorMax == null && intensity.localMaximums() )
+		if (extractorMax == null && intensity.localMaximums())
 			throw new IllegalArgumentException("Must provide a maximum extractor");
-		if( extractorMin != null && !extractorMin.canDetectMinimums() )
+		if (extractorMin != null && !extractorMin.canDetectMinimums())
 			throw new IllegalArgumentException("The minimum extractor doesn't detect minimums");
-		if( extractorMax != null && !extractorMax.canDetectMaximums() )
+		if (extractorMax != null && !extractorMax.canDetectMaximums())
 			throw new IllegalArgumentException("The maximum extractor doesn't detect maximums");
 
 		if (extractorMin != null && extractorMin.getUsesCandidates() && !intensity.hasCandidates())
@@ -110,15 +107,14 @@ public class GeneralFeatureDetector<I extends ImageGray<I>, D extends ImageGray<
 
 		// sanity check ignore borders and increase the size of the extractor's ignore border
 		// if its ignore border is too small then false positive are highly likely
-		if( intensity.localMinimums() ) {
-			if( intensity.getIgnoreBorder() > extractorMin.getIgnoreBorder() )
+		if (intensity.localMinimums()) {
+			if (intensity.getIgnoreBorder() > extractorMin.getIgnoreBorder())
 				extractorMin.setIgnoreBorder(intensity.getIgnoreBorder());
 		}
-		if( intensity.localMaximums() ) {
-			if( intensity.getIgnoreBorder() > extractorMax.getIgnoreBorder() )
+		if (intensity.localMaximums()) {
+			if (intensity.getIgnoreBorder() > extractorMax.getIgnoreBorder())
 				extractorMax.setIgnoreBorder(intensity.getIgnoreBorder());
 		}
-
 	}
 
 	protected GeneralFeatureDetector() {}
@@ -126,14 +122,14 @@ public class GeneralFeatureDetector<I extends ImageGray<I>, D extends ImageGray<
 	/**
 	 * Computes point features from image gradients.
 	 *
-	 * @param image   Original image.
-	 * @param derivX  image derivative in along the x-axis. Only needed if {@link #getRequiresGradient()} is true.
-	 * @param derivY  image derivative in along the y-axis. Only needed if {@link #getRequiresGradient()} is true.
+	 * @param image Original image.
+	 * @param derivX image derivative in along the x-axis. Only needed if {@link #getRequiresGradient()} is true.
+	 * @param derivY image derivative in along the y-axis. Only needed if {@link #getRequiresGradient()} is true.
 	 * @param derivXX Second derivative.  Only needed if {@link #getRequiresHessian()} ()} is true.
 	 * @param derivXY Second derivative.  Only needed if {@link #getRequiresHessian()} ()} is true.
 	 * @param derivYY Second derivative.  Only needed if {@link #getRequiresHessian()} ()} is true.
 	 */
-	public void process(I image, D derivX, D derivY, D derivXX, D derivYY, D derivXY) {
+	public void process( I image, D derivX, D derivY, D derivXX, D derivYY, D derivXY ) {
 		minimums.reset();
 		maximums.reset();
 
@@ -144,9 +140,9 @@ public class GeneralFeatureDetector<I extends ImageGray<I>, D extends ImageGray<
 		int limitPerSetMin = -1;
 		int limitPerSetMax = -1;
 
-		if( featureLimit > 0 ) {
+		if (featureLimit > 0) {
 			if (intensity.localMaximums() && intensity.localMinimums()) {
-				limitPerSetMin = featureLimit / 2;
+				limitPerSetMin = featureLimit/2;
 				limitPerSetMax = featureLimit - limitPerSetMin;
 			} else if (intensity.localMinimums()) {
 				limitPerSetMin = featureLimit;
@@ -156,29 +152,29 @@ public class GeneralFeatureDetector<I extends ImageGray<I>, D extends ImageGray<
 		}
 
 		// Detect local minimums and maximums separately while excluding points in the exclude list
-		if( intensity.localMinimums() ) {
-			markExcludedPixels(intensityImage,-Float.MAX_VALUE);
+		if (intensity.localMinimums()) {
+			markExcludedPixels(intensityImage, -Float.MAX_VALUE);
 			if (intensity.hasCandidates()) {
 				extractorMin.process(intensityImage, intensity.getCandidatesMin(), null, found, null);
 			} else {
 				extractorMin.process(intensityImage, null, null, found, null);
 			}
-			resolveSelectAmbiguity(intensityImage, exclude,found, minimums, limitPerSetMin, false);
+			resolveSelectAmbiguity(intensityImage, exclude, found, minimums, limitPerSetMin, false);
 		}
 
-		if( intensity.localMaximums() ) {
-			markExcludedPixels(intensityImage,Float.MAX_VALUE);
+		if (intensity.localMaximums()) {
+			markExcludedPixels(intensityImage, Float.MAX_VALUE);
 			if (intensity.hasCandidates()) {
 				extractorMax.process(intensityImage, null, intensity.getCandidatesMax(), null, found);
 			} else {
 				extractorMax.process(intensityImage, null, null, null, found);
 			}
-			resolveSelectAmbiguity(intensityImage, exclude,found, maximums, limitPerSetMax, true);
+			resolveSelectAmbiguity(intensityImage, exclude, found, maximums, limitPerSetMax, true);
 		}
 	}
 
-	private void markExcludedPixels(GrayF32 intensityImage, float value) {
-		if (exclude==null)
+	private void markExcludedPixels( GrayF32 intensityImage, float value ) {
+		if (exclude == null)
 			return;
 
 		for (int i = 0; i < exclude.size; i++) {
@@ -190,11 +186,11 @@ public class GeneralFeatureDetector<I extends ImageGray<I>, D extends ImageGray<
 	/**
 	 * More features were detected than requested. Need to select a subset of them
 	 */
-	private void resolveSelectAmbiguity(GrayF32 intensity, QueueCorner excluded, QueueCorner found ,
-										QueueCorner output, int numSelect, boolean positive) {
+	private void resolveSelectAmbiguity( GrayF32 intensity, QueueCorner excluded, QueueCorner found,
+										 QueueCorner output, int numSelect, boolean positive ) {
 		output.reset();
 		if (numSelect > 0) {
-			selectMax.select(intensity, -1, -1, positive,excluded,found,numSelect,selected);
+			selectMax.select(intensity, -1, -1, positive, excluded, found, numSelect, selected);
 			output.appendAll(selected);
 		} else {
 			output.appendAll(found);
@@ -228,10 +224,10 @@ public class GeneralFeatureDetector<I extends ImageGray<I>, D extends ImageGray<
 	 *
 	 * @param threshold The new feature extraction threshold.
 	 */
-	public void setThreshold(float threshold) {
-		if( extractorMin != null )
+	public void setThreshold( float threshold ) {
+		if (extractorMin != null)
 			extractorMin.setThresholdMinimum(-threshold);
-		if( extractorMax != null )
+		if (extractorMax != null)
 			extractorMax.setThresholdMaximum(threshold);
 	}
 
@@ -264,9 +260,9 @@ public class GeneralFeatureDetector<I extends ImageGray<I>, D extends ImageGray<
 	 * @param radius Radius in pixels
 	 */
 	public void setSearchRadius( int radius ) {
-		if( extractorMin != null )
+		if (extractorMin != null)
 			extractorMin.setSearchRadius(radius);
-		if( extractorMax != null )
+		if (extractorMax != null)
 			extractorMax.setSearchRadius(radius);
 	}
 

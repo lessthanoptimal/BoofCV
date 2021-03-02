@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -33,19 +33,18 @@ import boofcv.struct.image.ImageBase;
  * @author Peter Abeles
  */
 public abstract class TemplateSumSquaredError<T extends ImageBase<T>>
-		implements TemplateIntensityImage.EvaluatorMethod<T>
-{
+		implements TemplateIntensityImage.EvaluatorMethod<T> {
 	TemplateIntensityImage<T> o;
 
 	@Override
-	public void initialize( TemplateIntensityImage<T> owner  ) {
+	public void initialize( TemplateIntensityImage<T> owner ) {
 		this.o = owner;
 	}
 	// IF MORE IMAGE TYPES ARE ADDED CREATE A GENERATOR FOR THIS CLASS
 
 	public static class F32 extends TemplateSumSquaredError<GrayF32> {
 		@Override
-		public float evaluate(int tl_x, int tl_y) {
+		public float evaluate( int tl_x, int tl_y ) {
 
 			float total = 0;
 
@@ -53,13 +52,13 @@ public abstract class TemplateSumSquaredError<T extends ImageBase<T>>
 			float div = 255.0f*255.0f;
 
 			for (int y = 0; y < o.template.height; y++) {
-				int imageIndex = o.image.startIndex + (tl_y + y) * o.image.stride + tl_x;
-				int templateIndex = o.template.startIndex + y * o.template.stride;
+				int imageIndex = o.image.startIndex + (tl_y + y)*o.image.stride + tl_x;
+				int templateIndex = o.template.startIndex + y*o.template.stride;
 
-				float rowTotal=0.0f;
+				float rowTotal = 0.0f;
 				for (int x = 0; x < o.template.width; x++) {
 					float error = (o.image.data[imageIndex++] - o.template.data[templateIndex++]);
-					rowTotal += error * error;
+					rowTotal += error*error;
 				}
 				total += rowTotal/div;
 			}
@@ -68,21 +67,21 @@ public abstract class TemplateSumSquaredError<T extends ImageBase<T>>
 		}
 
 		@Override
-		public float evaluateMask(int tl_x, int tl_y) {
+		public float evaluateMask( int tl_x, int tl_y ) {
 			float total = 0;
 
 			// Reduce chance of numerical overflow and delay conversion to float
 			float div = 255.0f*255.0f;
 
 			for (int y = 0; y < o.template.height; y++) {
-				int imageIndex = o.image.startIndex + (tl_y + y) * o.image.stride + tl_x;
-				int templateIndex = o.template.startIndex + y * o.template.stride;
-				int maskIndex = o.mask.startIndex + y * o.mask.stride;
+				int imageIndex = o.image.startIndex + (tl_y + y)*o.image.stride + tl_x;
+				int templateIndex = o.template.startIndex + y*o.template.stride;
+				int maskIndex = o.mask.startIndex + y*o.mask.stride;
 
-				float rowTotal=0.0f;
+				float rowTotal = 0.0f;
 				for (int x = 0; x < o.template.width; x++) {
 					float error = o.image.data[imageIndex++] - o.template.data[templateIndex++];
-					rowTotal += o.mask.data[maskIndex++] * error * error;
+					rowTotal += o.mask.data[maskIndex++]*error*error;
 				}
 				total += rowTotal/div;
 			}
@@ -93,7 +92,7 @@ public abstract class TemplateSumSquaredError<T extends ImageBase<T>>
 
 	public static class U8 extends TemplateSumSquaredError<GrayU8> {
 		@Override
-		public float evaluate(int tl_x, int tl_y) {
+		public float evaluate( int tl_x, int tl_y ) {
 
 			float total = 0;
 
@@ -101,23 +100,23 @@ public abstract class TemplateSumSquaredError<T extends ImageBase<T>>
 			float div = 255.0f*255.0f;
 
 			for (int y = 0; y < o.template.height; y++) {
-				int imageIndex = o.image.startIndex + (tl_y + y) * o.image.stride + tl_x;
-				int templateIndex = o.template.startIndex + y * o.template.stride;
+				int imageIndex = o.image.startIndex + (tl_y + y)*o.image.stride + tl_x;
+				int templateIndex = o.template.startIndex + y*o.template.stride;
 
 				int rowTotal = 0;
 				for (int x = 0; x < o.template.width; x++) {
 					int error = (o.image.data[imageIndex++] & 0xFF) - (o.template.data[templateIndex++] & 0xFF);
-					rowTotal += error * error;
+					rowTotal += error*error;
 				}
 
-				total += rowTotal / div;
+				total += rowTotal/div;
 			}
 
 			return total;
 		}
 
 		@Override
-		public float evaluateMask(int tl_x, int tl_y) {
+		public float evaluateMask( int tl_x, int tl_y ) {
 
 			float total = 0;
 
@@ -125,18 +124,18 @@ public abstract class TemplateSumSquaredError<T extends ImageBase<T>>
 			float div = 255.0f*255.0f;
 
 			for (int y = 0; y < o.template.height; y++) {
-				int imageIndex = o.image.startIndex + (tl_y + y) * o.image.stride + tl_x;
-				int templateIndex = o.template.startIndex + y * o.template.stride;
-				int maskIndex = o.mask.startIndex + y * o.mask.stride;
+				int imageIndex = o.image.startIndex + (tl_y + y)*o.image.stride + tl_x;
+				int templateIndex = o.template.startIndex + y*o.template.stride;
+				int maskIndex = o.mask.startIndex + y*o.mask.stride;
 
 				int rowTotal = 0;
 				for (int x = 0; x < o.template.width; x++) {
 					int m = o.mask.data[maskIndex++] & 0xFF;
 					int error = (o.image.data[imageIndex++] & 0xFF) - (o.template.data[templateIndex++] & 0xFF);
-					rowTotal += m * error * error;
+					rowTotal += m*error*error;
 				}
 
-				total += rowTotal / div;
+				total += rowTotal/div;
 			}
 
 			return total;

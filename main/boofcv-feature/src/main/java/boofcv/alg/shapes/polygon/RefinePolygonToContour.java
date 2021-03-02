@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -39,10 +39,10 @@ import java.util.List;
  */
 public class RefinePolygonToContour {
 
-	private List<Point2D_I32> work = new ArrayList<>();
-	private LinePolar2D_F64 polar = new LinePolar2D_F64();
+	private final List<Point2D_I32> work = new ArrayList<>();
+	private final LinePolar2D_F64 polar = new LinePolar2D_F64();
 
-	private DogArray<LineGeneral2D_F64> lines = new DogArray<>(LineGeneral2D_F64::new);
+	private final DogArray<LineGeneral2D_F64> lines = new DogArray<>(LineGeneral2D_F64::new);
 
 	/**
 	 * Refines the estimate using all the points in the contour
@@ -51,11 +51,11 @@ public class RefinePolygonToContour {
 	 * @param vertexes (Input) List of indexes that are vertexes in the contour
 	 * @param output (Output) Storage for where the found polygon is saved to
 	 */
-	public void process(List<Point2D_I32> contour , DogArray_I32 vertexes , Polygon2D_F64 output ) {
+	public void process( List<Point2D_I32> contour, DogArray_I32 vertexes, Polygon2D_F64 output ) {
 
 		int numDecreasing = 0;
-		for (int i = vertexes.size-1,j=0; j < vertexes.size; i=j,j++) {
-			if( vertexes.get(i) > vertexes.get(j ) )
+		for (int i = vertexes.size - 1, j = 0; j < vertexes.size; i = j, j++) {
+			if (vertexes.get(i) > vertexes.get(j))
 				numDecreasing++;
 		}
 
@@ -65,37 +65,39 @@ public class RefinePolygonToContour {
 		lines.resize(vertexes.size);
 
 		// fit lines to each size
-		for (int i = vertexes.size-1,j=0; j < vertexes.size; i=j,j++) {
+		for (int i = vertexes.size - 1, j = 0; j < vertexes.size; i = j, j++) {
 			int idx0 = vertexes.get(i);
 			int idx1 = vertexes.get(j);
 
-			if( decreasing ) {
-				int tmp = idx0;idx0 = idx1;idx1=tmp;
+			if (decreasing) {
+				int tmp = idx0;
+				idx0 = idx1;
+				idx1 = tmp;
 			}
 
-			if( idx0 > idx1 ) {
+			if (idx0 > idx1) {
 				// handle special case where it wraps around
 				work.clear();
 				for (int k = idx0; k < contour.size(); k++) {
-					work.add( contour.get(k));
+					work.add(contour.get(k));
 				}
 				for (int k = 0; k < idx1; k++) {
-					work.add( contour.get(k));
+					work.add(contour.get(k));
 				}
-				FitLine_I32.polar(work,0,work.size(),polar);
+				FitLine_I32.polar(work, 0, work.size(), polar);
 			} else {
-				FitLine_I32.polar(contour,idx0,idx1-idx0,polar);
+				FitLine_I32.polar(contour, idx0, idx1 - idx0, polar);
 			}
 
-			UtilLine2D_F64.convert(polar,lines.get(i));
+			UtilLine2D_F64.convert(polar, lines.get(i));
 		}
 
 		// find the corners by intersecting the side
-		for (int i = vertexes.size-1,j=0; j < vertexes.size; i=j,j++) {
+		for (int i = vertexes.size - 1, j = 0; j < vertexes.size; i = j, j++) {
 			LineGeneral2D_F64 lineA = lines.get(i);
 			LineGeneral2D_F64 lineB = lines.get(j);
 
-			Intersection2D_F64.intersection(lineA,lineB,output.get(j));
+			Intersection2D_F64.intersection(lineA, lineB, output.get(j));
 		}
 	}
 }

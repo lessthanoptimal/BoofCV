@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -23,6 +23,8 @@ import boofcv.alg.weights.WeightPixel_F32;
 import boofcv.factory.interpolate.FactoryInterpolation;
 import boofcv.struct.border.BorderType;
 import boofcv.struct.image.ImageGray;
+import lombok.Getter;
+import lombok.Setter;
 
 /**
  * Simple implementations of mean-shift intended to finding local peaks inside an intensity image.
@@ -41,36 +43,36 @@ public class MeanShiftPeak<T extends ImageGray<T>> {
 
 	// Input image and interpolation function
 	protected T image;
-	protected InterpolatePixelS<T> interpolate;
+	protected @Getter @Setter InterpolatePixelS<T> interpolate;
 
 	// the maximum number of iterations it will perform
 	protected int maxIterations;
 
 	// size of the kernel
-	protected int radius;
+	protected @Getter int radius;
 	protected int width;
 
 	// if the change in x and y is less than this value stop the search
 	protected float convergenceTol;
 
 	// The peak in x and y
-	protected float peakX,peakY;
+	protected @Getter float peakX, peakY;
 
-	protected boolean odd;
+	protected @Getter boolean odd;
 
 	// used to compute the weight each pixel contributes to the mean
 	protected WeightPixel_F32 weights;
 
 	/**
 	 * Configures search.
-	 *  @param maxIterations  Maximum number of iterations.  Try 10
+	 *
+	 * @param maxIterations Maximum number of iterations.  Try 10
 	 * @param convergenceTol Convergence tolerance.  Try 1e-3
 	 * @param weights Used to compute the weight each pixel contributes to the mean.  Try a uniform distribution.
-	 * @param borderType
 	 */
-	public MeanShiftPeak(int maxIterations, float convergenceTol,
-						 WeightPixel_F32 weights, boolean odd,
-						 Class<T> imageType, BorderType borderType) {
+	public MeanShiftPeak( int maxIterations, float convergenceTol,
+						  WeightPixel_F32 weights, boolean odd,
+						  Class<T> imageType, BorderType borderType ) {
 		this.maxIterations = maxIterations;
 		this.convergenceTol = convergenceTol;
 		this.odd = odd;
@@ -80,18 +82,19 @@ public class MeanShiftPeak<T extends ImageGray<T>> {
 
 	/**
 	 * Specifies the input image
+	 *
 	 * @param image input image
 	 */
-	public void setImage(T image) {
+	public void setImage( T image ) {
 		this.image = image;
 		this.interpolate.setImage(image);
 	}
 
-	public void setRadius(int radius) {
-		this.weights.setRadius( radius, radius, odd );
+	public void setRadius( int radius ) {
+		this.weights.setRadius(radius, radius, odd);
 		this.radius = radius;
-		if( odd ) {
-			this.width = radius*2+1;
+		if (odd) {
+			this.width = radius*2 + 1;
 		} else {
 			this.width = radius*2;
 		}
@@ -100,40 +103,41 @@ public class MeanShiftPeak<T extends ImageGray<T>> {
 	/**
 	 * Performs a mean-shift search center at the specified coordinates
 	 */
-	public void search( float cx , float cy ) {
-		peakX = cx; peakY = cy;
-		if( radius <= 0 ) { // can turn off refinement by setting radius to zero
+	public void search( float cx, float cy ) {
+		peakX = cx;
+		peakY = cy;
+		if (radius <= 0) { // can turn off refinement by setting radius to zero
 			return;
 		}
-		float offset = -radius + (weights.isOdd()?0:0.5f);
+		float offset = -radius + (weights.isOdd() ? 0 : 0.5f);
 
-		for( int i = 0; i < maxIterations; i++ ) {
+		for (int i = 0; i < maxIterations; i++) {
 			float total = 0;
 			float sumX = 0, sumY = 0;
 
 			int kernelIndex = 0;
 
 			// see if it can use fast interpolation otherwise use the safer technique
-			if( interpolate.isInFastBounds(peakX+offset, peakY+offset) &&
-					interpolate.isInFastBounds(peakX-offset, peakY-offset)) {
-				for( int yy = 0; yy < width; yy++ ) {
-					float y = offset+yy;
-					for( int xx = 0; xx < width; xx++ ) {
-						float x = offset+xx;
+			if (interpolate.isInFastBounds(peakX + offset, peakY + offset) &&
+					interpolate.isInFastBounds(peakX - offset, peakY - offset)) {
+				for (int yy = 0; yy < width; yy++) {
+					float y = offset + yy;
+					for (int xx = 0; xx < width; xx++) {
+						float x = offset + xx;
 						float w = weights.weightIndex(kernelIndex++);
-						float weight = w*interpolate.get_fast(peakX+x, peakY+y);
+						float weight = w*interpolate.get_fast(peakX + x, peakY + y);
 						total += weight;
 						sumX += weight*x;
 						sumY += weight*y;
 					}
 				}
 			} else {
-				for( int yy = 0; yy < width; yy++ ) {
-					float y = offset+yy;
-					for( int xx = 0; xx < width; xx++ ) {
-						float x = offset+xx;
+				for (int yy = 0; yy < width; yy++) {
+					float y = offset + yy;
+					for (int xx = 0; xx < width; xx++) {
+						float x = offset + xx;
 						float w = weights.weightIndex(kernelIndex++);
-						float weight = w*interpolate.get(peakX+x, peakY+y);
+						float weight = w*interpolate.get(peakX + x, peakY + y);
 						total += weight;
 						sumX += weight*x;
 						sumY += weight*y;
@@ -142,18 +146,19 @@ public class MeanShiftPeak<T extends ImageGray<T>> {
 			}
 
 			// avoid divided by zero
-			if( total == 0 )
+			if (total == 0)
 				break;
 
 			cx = peakX + sumX/total;
 			cy = peakY + sumY/total;
 
-			float dx = cx-peakX;
-			float dy = cy-peakY;
+			float dx = cx - peakX;
+			float dy = cy - peakY;
 
-			peakX = cx; peakY = cy;
+			peakX = cx;
+			peakY = cy;
 
-			if( Math.abs(dx) < convergenceTol && Math.abs(dy) < convergenceTol ) {
+			if (Math.abs(dx) < convergenceTol && Math.abs(dy) < convergenceTol) {
 				break;
 			}
 		}
@@ -162,90 +167,68 @@ public class MeanShiftPeak<T extends ImageGray<T>> {
 	/**
 	 * Performs a mean-shift search center at the specified coordinates but with negative weights ignored
 	 */
-	public void searchPositive( float cx , float cy ) {
-		peakX = cx; peakY = cy;
-		if( radius <= 0 ) { // can turn off refinement by setting radius to zero
+	public void searchPositive( float cx, float cy ) {
+		peakX = cx;
+		peakY = cy;
+		if (radius <= 0) { // can turn off refinement by setting radius to zero
 			return;
 		}
-		float offset = -radius + (weights.isOdd()?0:0.5f);
+		float offset = -radius + (weights.isOdd() ? 0 : 0.5f);
 
-		for( int i = 0; i < maxIterations; i++ ) {
+		for (int i = 0; i < maxIterations; i++) {
 			float total = 0;
 			float sumX = 0, sumY = 0;
 
 			int kernelIndex = 0;
 
 			// see if it can use fast interpolation otherwise use the safer technique
-			if( interpolate.isInFastBounds(peakX+offset, peakY+offset) &&
-					interpolate.isInFastBounds(peakX-offset, peakY-offset)) {
-				for( int yy = 0; yy < width; yy++ ) {
-					float y = offset+yy;
-					for( int xx = 0; xx < width; xx++ ) {
-						float x = offset+xx;
+			if (interpolate.isInFastBounds(peakX + offset, peakY + offset) &&
+					interpolate.isInFastBounds(peakX - offset, peakY - offset)) {
+				for (int yy = 0; yy < width; yy++) {
+					float y = offset + yy;
+					for (int xx = 0; xx < width; xx++) {
+						float x = offset + xx;
 						float w = weights.weightIndex(kernelIndex++);
-						float weight = w*interpolate.get_fast(peakX+x, peakY+y);
-						if( weight > 0f ) {
+						float weight = w*interpolate.get_fast(peakX + x, peakY + y);
+						if (weight > 0f) {
 							total += weight;
-							sumX += weight * x;
-							sumY += weight * y;
+							sumX += weight*x;
+							sumY += weight*y;
 						}
 					}
 				}
 			} else {
-				for( int yy = 0; yy < width; yy++ ) {
-					float y = offset+yy;
-					for( int xx = 0; xx < width; xx++ ) {
-						float x = offset+xx;
+				for (int yy = 0; yy < width; yy++) {
+					float y = offset + yy;
+					for (int xx = 0; xx < width; xx++) {
+						float x = offset + xx;
 						float w = weights.weightIndex(kernelIndex++);
-						float weight = w*interpolate.get(peakX+x, peakY+y);
-						if( weight > 0f ) {
+						float weight = w*interpolate.get(peakX + x, peakY + y);
+						if (weight > 0f) {
 							total += weight;
-							sumX += weight * x;
-							sumY += weight * y;
+							sumX += weight*x;
+							sumY += weight*y;
 						}
 					}
 				}
 			}
 
 			// avoid divided by zero
-			if( total == 0 )
+			if (total == 0)
 				break;
 
 			cx = peakX + sumX/total;
 			cy = peakY + sumY/total;
 
-			float dx = cx-peakX;
-			float dy = cy-peakY;
+			float dx = cx - peakX;
+			float dy = cy - peakY;
 
-			peakX = cx; peakY = cy;
+			peakX = cx;
+			peakY = cy;
 
-			if( Math.abs(dx) < convergenceTol && Math.abs(dy) < convergenceTol ) {
+			if (Math.abs(dx) < convergenceTol && Math.abs(dy) < convergenceTol) {
 				break;
 			}
 		}
-	}
-
-	public float getPeakX() {
-		return peakX;
-	}
-
-	public float getPeakY() {
-		return peakY;
-	}
-
-	public int getRadius() {
-		return radius;
-	}
-
-	public InterpolatePixelS<T> getInterpolate() {
-		return interpolate;
-	}
-
-	public void setInterpolate(InterpolatePixelS<T> interpolate) {
-		this.interpolate = interpolate;
-	}
-
-	public boolean isOdd() {
-		return odd;
 	}
 }

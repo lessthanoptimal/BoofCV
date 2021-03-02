@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -43,78 +43,78 @@ public class TestDescribePointSurfPlanar extends BoofStandardJUnit {
 	 */
 	@Test
 	public void compareToSingleBand() {
-		Planar<GrayF32> input = new Planar<>(GrayF32.class,width,height,3);
+		Planar<GrayF32> input = new Planar<>(GrayF32.class, width, height, 3);
 
-		GImageMiscOps.addUniform(input,rand,0,200);
+		GImageMiscOps.addUniform(input, rand, 0, 200);
 
 		DescribePointSurf<GrayF32> desc = new DescribePointSurf<>(GrayF32.class);
-		DescribePointSurfPlanar<GrayF32> alg = new DescribePointSurfPlanar<>(desc,3);
+		DescribePointSurfPlanar<GrayF32> alg = new DescribePointSurfPlanar<>(desc, 3);
 
-		GrayF32 gray = ConvertImage.average(input,null);
+		GrayF32 gray = ConvertImage.average(input, null);
 
 		// input isn't an integral image, but I just want to see if it produces the expected results
-		alg.setImage(gray,input);
+		alg.setImage(gray, input);
 
-		for( int i = 0; i < 100; i++ ) {
+		for (int i = 0; i < 100; i++) {
 			double x = rand.nextDouble()*width;
 			double y = rand.nextDouble()*height;
 			double angle = rand.nextDouble()*Math.PI*2;
-			double scale = rand.nextDouble()*10+0.9;
+			double scale = rand.nextDouble()*10 + 0.9;
 
 			TupleDesc_F64 found = alg.createDescription();
-			alg.describe(x,y,angle,scale,found);
+			alg.describe(x, y, angle, scale, found);
 
 			desc.setImage(gray);
 
 			TupleDesc_F64 expected = desc.createDescription();
 
-			for( int b = 0; b < 3; b++ ) {
+			for (int b = 0; b < 3; b++) {
 				desc.setImage(input.getBand(b));
-				desc.describe(x,y,angle,scale, true, expected);
+				desc.describe(x, y, angle, scale, true, expected);
 
 				// should be off by a constant scale factor since it is normalized across all bands not just one
 				double norm = 0;
-				for( int j = 0; j < expected.size(); j++ ) {
-					double v = found.getDouble(j+b*expected.size());
+				for (int j = 0; j < expected.size(); j++) {
+					double v = found.getDouble(j + b*expected.size());
 					norm += v*v;
 				}
 				norm = Math.sqrt(norm);
 
-				for( int j = 0; j < expected.size(); j++ ) {
-					assertEquals(expected.getDouble(j),found.getDouble(j+b*expected.size())/norm,1e-8);
+				for (int j = 0; j < expected.size(); j++) {
+					assertEquals(expected.getDouble(j), found.getDouble(j + b*expected.size())/norm, 1e-8);
 				}
 			}
 		}
 	}
 
 	@Test
-	public void failNumBandMissMatch(){
-		Planar<GrayF32> input = new Planar<>(GrayF32.class,width,height,3);
+	public void failNumBandMissMatch() {
+		Planar<GrayF32> input = new Planar<>(GrayF32.class, width, height, 3);
 
-		GImageMiscOps.addUniform(input,rand,0,200);
+		GImageMiscOps.addUniform(input, rand, 0, 200);
 
 		DescribePointSurf<GrayF32> desc = new DescribePointSurf<>(GrayF32.class);
-		DescribePointSurfPlanar<GrayF32> alg = new DescribePointSurfPlanar<>(desc,2);
+		DescribePointSurfPlanar<GrayF32> alg = new DescribePointSurfPlanar<>(desc, 2);
 
-		GrayF32 gray = ConvertImage.average(input,null);
+		GrayF32 gray = ConvertImage.average(input, null);
 
 		assertThrows(IllegalArgumentException.class,
-				()->alg.setImage(gray,input));
+				() -> alg.setImage(gray, input));
 	}
 
 	@Test
-	public void failShape(){
-		Planar<GrayF32> input = new Planar<>(GrayF32.class,width,height,3);
+	public void failShape() {
+		Planar<GrayF32> input = new Planar<>(GrayF32.class, width, height, 3);
 
-		GImageMiscOps.addUniform(input,rand,0,200);
+		GImageMiscOps.addUniform(input, rand, 0, 200);
 
 		DescribePointSurf<GrayF32> desc = new DescribePointSurf<>(GrayF32.class);
-		DescribePointSurfPlanar<GrayF32> alg = new DescribePointSurfPlanar<>(desc,4);
+		DescribePointSurfPlanar<GrayF32> alg = new DescribePointSurfPlanar<>(desc, 4);
 
-		GrayF32 gray = ConvertImage.average(input,null);
-		gray.reshape(width-1,height);
+		GrayF32 gray = ConvertImage.average(input, null);
+		gray.reshape(width - 1, height);
 
 		assertThrows(IllegalArgumentException.class,
-				()->alg.setImage(gray,input));
+				() -> alg.setImage(gray, input));
 	}
 }

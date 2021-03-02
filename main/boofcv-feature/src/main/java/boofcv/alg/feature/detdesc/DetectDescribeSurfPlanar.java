@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -38,19 +38,15 @@ import java.util.List;
  * and stored in a descriptor which is N*length long.  N = number of bands and length = number of
  * elements in normal descriptor.
  *
- * @see boofcv.alg.feature.describe.DescribePointSurfPlanar
- *
  * @param <II> Type of integral image
- *
  * @author Peter Abeles
+ * @see boofcv.alg.feature.describe.DescribePointSurfPlanar
  */
-public class DetectDescribeSurfPlanar<II extends ImageGray<II>>
-{
+public class DetectDescribeSurfPlanar<II extends ImageGray<II>> {
 	// SURF algorithms
 	protected FastHessianFeatureDetector<II> detector;
 	protected OrientationIntegral<II> orientation;
 	protected DescribePointSurfPlanar<II> describe;
-
 
 	// storage for computed features
 	protected DogArray<TupleDesc_F64> descriptions;
@@ -59,22 +55,21 @@ public class DetectDescribeSurfPlanar<II extends ImageGray<II>>
 	// orientation of features
 	protected DogArray_F64 featureAngles = new DogArray_F64(10);
 
-	public DetectDescribeSurfPlanar(FastHessianFeatureDetector<II> detector,
-									OrientationIntegral<II> orientation,
-									DescribePointSurfPlanar<II> describe )
-	{
+	public DetectDescribeSurfPlanar( FastHessianFeatureDetector<II> detector,
+									 OrientationIntegral<II> orientation,
+									 DescribePointSurfPlanar<II> describe ) {
 		this.detector = detector;
 		this.orientation = orientation;
 		this.describe = describe;
 
-		descriptions = new DogArray<>(()->new TupleDesc_F64(describe.getDescriptorLength()));
+		descriptions = new DogArray<>(() -> new TupleDesc_F64(describe.getDescriptorLength()));
 	}
 
 	public TupleDesc_F64 createDescription() {
 		return describe.createDescription();
 	}
 
-	public TupleDesc_F64 getDescription(int index) {
+	public TupleDesc_F64 getDescription( int index ) {
 		return descriptions.get(index);
 	}
 
@@ -88,7 +83,7 @@ public class DetectDescribeSurfPlanar<II extends ImageGray<II>>
 	 * @param grayII Gray-scale integral image
 	 * @param colorII Color integral image
 	 */
-	public void detect( II grayII , Planar<II> colorII ) {
+	public void detect( II grayII, Planar<II> colorII ) {
 
 		descriptions.reset();
 		featureAngles.reset();
@@ -105,17 +100,17 @@ public class DetectDescribeSurfPlanar<II extends ImageGray<II>>
 		describe(grayII, colorII);
 	}
 
-	protected void describe(II grayII, Planar<II> colorII) {
+	protected void describe( II grayII, Planar<II> colorII ) {
 		orientation.setImage(grayII);
-		describe.setImage(grayII,colorII);
-		for( int i = 0; i < foundPoints.size(); i++ ) {
+		describe.setImage(grayII, colorII);
+		for (int i = 0; i < foundPoints.size(); i++) {
 			ScalePoint p = foundPoints.get(i);
 			orientation.setObjectRadius(p.scale);
-			double angle = orientation.compute(p.pixel.x,p.pixel.y);
+			double angle = orientation.compute(p.pixel.x, p.pixel.y);
 
 			describe.describe(p.pixel.x, p.pixel.y, angle, p.scale, descriptions.get(i));
 
-			featureAngles.set(i,angle);
+			featureAngles.set(i, angle);
 		}
 	}
 
@@ -127,15 +122,15 @@ public class DetectDescribeSurfPlanar<II extends ImageGray<II>>
 		return foundPoints.size();
 	}
 
-	public Point2D_F64 getLocation(int featureIndex) {
+	public Point2D_F64 getLocation( int featureIndex ) {
 		return foundPoints.get(featureIndex).pixel;
 	}
 
-	public double getRadius(int featureIndex) {
+	public double getRadius( int featureIndex ) {
 		return foundPoints.get(featureIndex).scale;
 	}
 
-	public double getOrientation(int featureIndex) {
+	public double getOrientation( int featureIndex ) {
 		return featureAngles.get(featureIndex);
 	}
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -33,7 +33,6 @@ import boofcv.struct.image.GrayU8;
 import boofcv.struct.image.ImageGray;
 import org.jetbrains.annotations.Nullable;
 
-
 /**
  * Creates algorithms for describing point features.
  *
@@ -43,8 +42,8 @@ import org.jetbrains.annotations.Nullable;
 public class FactoryDescribePointAlgs {
 
 	public static <T extends ImageGray<T>>
-	DescribePointSurf<T> surfSpeed(@Nullable ConfigSurfDescribe.Fast config, Class<T> imageType) {
-		if( config == null )
+	DescribePointSurf<T> surfSpeed( @Nullable ConfigSurfDescribe.Fast config, Class<T> imageType ) {
+		if (config == null)
 			config = new ConfigSurfDescribe.Fast();
 		config.checkValidity();
 
@@ -54,8 +53,8 @@ public class FactoryDescribePointAlgs {
 	}
 
 	public static <T extends ImageGray<T>>
-	DescribePointSurfMod<T> surfStability(@Nullable ConfigSurfDescribe.Stability config, Class<T> imageType) {
-		if( config == null )
+	DescribePointSurfMod<T> surfStability( @Nullable ConfigSurfDescribe.Stability config, Class<T> imageType ) {
+		if (config == null)
 			config = new ConfigSurfDescribe.Stability();
 		config.checkValidity();
 
@@ -64,23 +63,23 @@ public class FactoryDescribePointAlgs {
 	}
 
 	public static <T extends ImageGray<T>>
-	DescribePointSurfPlanar<T> surfColor(DescribePointSurf<T> describe , int numBands ) {
+	DescribePointSurfPlanar<T> surfColor( DescribePointSurf<T> describe, int numBands ) {
 
 		return new DescribePointSurfPlanar<>(describe, numBands);
 	}
 
 	public static <T extends ImageGray<T>>
-	DescribePointBrief<T> brief(BinaryCompareDefinition_I32 definition, BlurFilter<T> filterBlur ) {
+	DescribePointBrief<T> brief( BinaryCompareDefinition_I32 definition, BlurFilter<T> filterBlur ) {
 		Class<T> imageType = filterBlur.getInputType().getImageClass();
 
 		DescribePointBinaryCompare<T> compare;
 
-		if( imageType == GrayF32.class ) {
-			compare = (DescribePointBinaryCompare<T> )new ImplDescribeBinaryCompare_F32(definition);
-		} else if( imageType == GrayU8.class ) {
-			compare = (DescribePointBinaryCompare<T> )new ImplDescribeBinaryCompare_U8(definition);
+		if (imageType == GrayF32.class) {
+			compare = (DescribePointBinaryCompare<T>)new ImplDescribeBinaryCompare_F32(definition);
+		} else if (imageType == GrayU8.class) {
+			compare = (DescribePointBinaryCompare<T>)new ImplDescribeBinaryCompare_U8(definition);
 		} else {
-			throw new IllegalArgumentException("Unknown image type: "+imageType.getSimpleName());
+			throw new IllegalArgumentException("Unknown image type: " + imageType.getSimpleName());
 		}
 
 		return new DescribePointBrief<>(compare, filterBlur);
@@ -88,7 +87,7 @@ public class FactoryDescribePointAlgs {
 
 	// todo remove filterBlur for all BRIEF change to radius,sigma,type
 	public static <T extends ImageGray<T>>
-	DescribePointBriefSO<T> briefso(BinaryCompareDefinition_I32 definition, BlurFilter<T> filterBlur) {
+	DescribePointBriefSO<T> briefso( BinaryCompareDefinition_I32 definition, BlurFilter<T> filterBlur ) {
 		Class<T> imageType = filterBlur.getInputType().getImageClass();
 
 		InterpolatePixelS<T> interp = FactoryInterpolation.bilinearPixelS(imageType, BorderType.EXTENDED);
@@ -97,33 +96,31 @@ public class FactoryDescribePointAlgs {
 	}
 
 	public static <T extends ImageGray<T>>
-	DescribePointSift<T> sift(@Nullable ConfigSiftDescribe config , Class<T> derivType ) {
-		if( config == null )
+	DescribePointSift<T> sift( @Nullable ConfigSiftDescribe config, Class<T> derivType ) {
+		if (config == null)
 			config = new ConfigSiftDescribe();
 
-		return new DescribePointSift(config.widthSubregion,config.widthGrid,config.numHistogramBins
-				,config.sigmaToPixels, config.weightingSigmaFraction,config.maxDescriptorElementValue,derivType);
+		return new DescribePointSift(config.widthSubregion, config.widthGrid, config.numHistogramBins
+				, config.sigmaToPixels, config.weightingSigmaFraction, config.maxDescriptorElementValue, derivType);
 	}
 
-	public static <T extends ImageGray<T>, D extends TupleDesc>
-	DescribePointPixelRegion<T,D> pixelRegion( int regionWidth , int regionHeight , Class<T> imageType )
-	{
-		if( imageType == GrayF32.class ) {
-			return (DescribePointPixelRegion<T,D>)new ImplDescribePointPixelRegion_F32(regionWidth,regionHeight);
-		} else if( imageType == GrayU8.class ) {
-			return (DescribePointPixelRegion<T,D>)new ImplDescribePointPixelRegion_U8(regionWidth,regionHeight);
+	public static <T extends ImageGray<T>, TD extends TupleDesc<TD>>
+	DescribePointPixelRegion<T, TD> pixelRegion( int regionWidth, int regionHeight, Class<T> imageType ) {
+		if (imageType == GrayF32.class) {
+			return (DescribePointPixelRegion<T, TD>)new ImplDescribePointPixelRegion_F32(regionWidth, regionHeight);
+		} else if (imageType == GrayU8.class) {
+			return (DescribePointPixelRegion<T, TD>)new ImplDescribePointPixelRegion_U8(regionWidth, regionHeight);
 		} else {
 			throw new IllegalArgumentException("Unsupported image type");
 		}
 	}
 
 	public static <T extends ImageGray<T>>
-	DescribePointPixelRegionNCC<T> pixelRegionNCC( int regionWidth , int regionHeight , Class<T> imageType )
-	{
-		if( imageType == GrayF32.class ) {
-			return (DescribePointPixelRegionNCC<T>)new ImplDescribePointPixelRegionNCC_F32(regionWidth,regionHeight);
-		} else if( imageType == GrayU8.class ) {
-			return (DescribePointPixelRegionNCC<T>)new ImplDescribePointPixelRegionNCC_U8(regionWidth,regionHeight);
+	DescribePointPixelRegionNCC<T> pixelRegionNCC( int regionWidth, int regionHeight, Class<T> imageType ) {
+		if (imageType == GrayF32.class) {
+			return (DescribePointPixelRegionNCC<T>)new ImplDescribePointPixelRegionNCC_F32(regionWidth, regionHeight);
+		} else if (imageType == GrayU8.class) {
+			return (DescribePointPixelRegionNCC<T>)new ImplDescribePointPixelRegionNCC_U8(regionWidth, regionHeight);
 		} else {
 			throw new IllegalArgumentException("Unsupported image type");
 		}

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -27,7 +27,6 @@ import boofcv.struct.Configuration;
  * @author Peter Abeles
  */
 public class ConfigDenseSift implements Configuration {
-
 	/**
 	 * Specifies how the SIFT descriptor is computed.   All parameters are used but
 	 * {@link ConfigSiftDescribe#sigmaToPixels}
@@ -37,9 +36,9 @@ public class ConfigDenseSift implements Configuration {
 	/**
 	 * Specifies the frequency it will sample across the image in pixels.  Default ix period X = 6, period Y = 6.
 	 */
-	public DenseSampling sampling = new DenseSampling(6,6);
+	public DenseSampling sampling = new DenseSampling(6, 6);
 
-	public ConfigDenseSift(DenseSampling sampling) {
+	public ConfigDenseSift( DenseSampling sampling ) {
 		this.sampling = sampling;
 	}
 
@@ -52,7 +51,7 @@ public class ConfigDenseSift implements Configuration {
 
 	@Override
 	public void checkValidity() {
-		if( sampling == null )
+		if (sampling == null)
 			throw new IllegalArgumentException("Most specify sampling");
 	}
 }

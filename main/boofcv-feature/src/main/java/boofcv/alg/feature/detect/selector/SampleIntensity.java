@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -29,12 +29,13 @@ import org.jetbrains.annotations.Nullable;
 public interface SampleIntensity<Point> {
 	/**
 	 * Returns the intensity. If the sampling method does not require the intensity image then it may be null.
+	 *
 	 * @param intensity Image with intensity information. May be null if sampling method does not use it.
 	 * @param index Index of the point in the list
 	 * @param p Coordinate being sampled. Must be inside the image
 	 * @return The intensity at the sample point
 	 */
-	float sample(@Nullable GrayF32 intensity , int index, Point p );
+	float sample( @Nullable GrayF32 intensity, int index, Point p );
 
 	/**
 	 * Pixel coordinate x-axis

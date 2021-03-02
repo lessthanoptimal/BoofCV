@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -59,13 +59,12 @@ import lombok.Getter;
  * </table>
  * </p>
  *
+ * @author Peter Abeles
  * @see FastCornerInterface
  *
  * <p>
  * [1] Edward Rosten, Reid Porter and Tom Drummond. "Faster and better: a machine learning approach to corner detection"
  * </p>
- *
- * @author Peter Abeles
  */
 public class FastCornerDetector<T extends ImageGray<T>> implements FeatureIntensity<T> {
 
@@ -73,7 +72,7 @@ public class FastCornerDetector<T extends ImageGray<T>> implements FeatureIntens
 	protected static final int radius = 3;
 
 	// pixel index offsets for the circle
-	protected int []offsets;
+	protected int[] offsets;
 	// the image's stride.  Used to determine if the offsets need to be recomputed
 	int stride = 0;
 
@@ -92,44 +91,45 @@ public class FastCornerDetector<T extends ImageGray<T>> implements FeatureIntens
 	 *
 	 * @param helper Provide the image type specific helper.
 	 */
-	public FastCornerDetector(FastCornerInterface<T> helper) {
+	public FastCornerDetector( FastCornerInterface<T> helper ) {
 		this.helper = helper;
 	}
 
-	FastCornerDetector(){}
+	FastCornerDetector() {}
 
 	@Override public int getRadius() {return radius;}
+
 	@Override public int getIgnoreBorder() {return radius;}
 
 	/**
 	 * Computes fast corner features and their intensity. The intensity is needed if non-max suppression is
 	 * used
 	 */
-	public void process( T image , GrayF32 intensity ) {
-		candidatesLow.configure(image.width,image.height);
-		candidatesHigh.configure(image.width,image.height);
+	public void process( T image, GrayF32 intensity ) {
+		candidatesLow.configure(image.width, image.height);
+		candidatesHigh.configure(image.width, image.height);
 
 		this.image = image;
 
-		if( stride != image.stride ) {
+		if (stride != image.stride) {
 			stride = image.stride;
 			offsets = DiscretizedCircle.imageOffsets(radius, image.stride);
 		}
-		helper.setImage(image,offsets);
+		helper.setImage(image, offsets);
 
-		for (int y = radius; y < image.height-radius; y++) {
+		for (int y = radius; y < image.height - radius; y++) {
 			int indexIntensity = intensity.startIndex + y*intensity.stride + radius;
 			int index = image.startIndex + y*image.stride + radius;
-			for (int x = radius; x < image.width-radius; x++, index++,indexIntensity++) {
+			for (int x = radius; x < image.width - radius; x++, index++, indexIntensity++) {
 
 				int result = helper.checkPixel(index);
 
-				if( result < 0 ) {
+				if (result < 0) {
 					intensity.data[indexIntensity] = helper.scoreLower(index);
-					candidatesLow.add(x,y);
-				} else if( result > 0) {
+					candidatesLow.add(x, y);
+				} else if (result > 0) {
 					intensity.data[indexIntensity] = helper.scoreUpper(index);
-					candidatesHigh.add(x,y);
+					candidatesHigh.add(x, y);
 				} else {
 					intensity.data[indexIntensity] = 0;
 				}
@@ -141,27 +141,27 @@ public class FastCornerDetector<T extends ImageGray<T>> implements FeatureIntens
 	 * Computes fast corner features
 	 */
 	public void process( T image ) {
-		candidatesLow.configure(image.width,image.height);
-		candidatesHigh.configure(image.width,image.height);
+		candidatesLow.configure(image.width, image.height);
+		candidatesHigh.configure(image.width, image.height);
 
 		this.image = image;
 
-		if( stride != image.stride ) {
+		if (stride != image.stride) {
 			stride = image.stride;
 			offsets = DiscretizedCircle.imageOffsets(radius, image.stride);
 		}
-		helper.setImage(image,offsets);
+		helper.setImage(image, offsets);
 
-		for (int y = radius; y < image.height-radius; y++) {
+		for (int y = radius; y < image.height - radius; y++) {
 			int index = image.startIndex + y*image.stride + radius;
-			for (int x = radius; x < image.width-radius; x++, index++) {
+			for (int x = radius; x < image.width - radius; x++, index++) {
 
 				int result = helper.checkPixel(index);
 
-				if( result < 0 ) {
-					candidatesLow.add(x,y);
-				} else if( result > 0 ) {
-					candidatesHigh.add(x,y);
+				if (result < 0) {
+					candidatesLow.add(x, y);
+				} else if (result > 0) {
+					candidatesHigh.add(x, y);
 				}
 			}
 		}

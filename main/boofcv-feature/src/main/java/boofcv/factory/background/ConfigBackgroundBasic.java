@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -46,11 +46,11 @@ public class ConfigBackgroundBasic extends BaseConfigBackground {
 	 */
 	public InterpolationType interpolation = InterpolationType.BILINEAR;
 
-	public ConfigBackgroundBasic(float threshold) {
+	public ConfigBackgroundBasic( float threshold ) {
 		this.threshold = threshold;
 	}
 
-	public ConfigBackgroundBasic(float threshold, float learnRate) {
+	public ConfigBackgroundBasic( float threshold, float learnRate ) {
 		this.threshold = threshold;
 		this.learnRate = learnRate;
 	}
@@ -66,9 +66,9 @@ public class ConfigBackgroundBasic extends BaseConfigBackground {
 
 	@Override
 	public void checkValidity() {
-		if( learnRate < 0 || learnRate > 1 )
+		if (learnRate < 0 || learnRate > 1)
 			throw new IllegalArgumentException("Learn rate must be 0 <= rate <= 1");
-		if( threshold <= 0 )
+		if (threshold <= 0)
 			throw new IllegalArgumentException("threshold must be > 0");
 	}
 }

@@ -35,7 +35,7 @@ public class FactoryConvertTupleDesc {
 	 */
 	@SuppressWarnings({"unchecked", "rawtypes"})
 	public static <A extends TupleDesc<A>, B extends TupleDesc<B>>
-	ConvertTupleDesc<A,B> generic( ConfigConvertTupleDesc config, int numElements, Class<A> srcType) {
+	ConvertTupleDesc<A, B> generic( ConfigConvertTupleDesc config, int numElements, Class<A> srcType ) {
 		if (config.outputData == ConfigConvertTupleDesc.DataType.NATIVE) {
 			if (srcType == TupleDesc_F64.class) {
 				return (ConvertTupleDesc)new ConvertTupleDoNothing<>(() -> new TupleDesc_F64(numElements));
@@ -44,7 +44,7 @@ public class FactoryConvertTupleDesc {
 			} else if (srcType == TupleDesc_B.class) {
 				return (ConvertTupleDesc)new ConvertTupleDoNothing<>(() -> new TupleDesc_B(numElements));
 			} else {
-				throw new IllegalArgumentException("Add support for "+srcType.getName());
+				throw new IllegalArgumentException("Add support for " + srcType.getName());
 			}
 		}
 		if (srcType == TupleDesc_F64.class) {
@@ -66,7 +66,7 @@ public class FactoryConvertTupleDesc {
 	 * @param numElements Number of elements in the descriptor
 	 * @return The converter.
 	 */
-	public static ConvertTupleDesc<TupleDesc_F64,TupleDesc_U8> positive_F64_U8( final int numElements ) {
+	public static ConvertTupleDesc<TupleDesc_F64, TupleDesc_U8> positive_F64_U8( final int numElements ) {
 		return new ConvertTupleDescPositive_F64_U8(numElements);
 	}
 
@@ -77,8 +77,7 @@ public class FactoryConvertTupleDesc {
 	 * @param numElements Number of elements in the descriptor
 	 * @return The converter.
 	 */
-	public static ConvertTupleDesc<TupleDesc_F64,TupleDesc_S8> real_F64_S8( final int numElements ) {
+	public static ConvertTupleDesc<TupleDesc_F64, TupleDesc_S8> real_F64_S8( final int numElements ) {
 		return new ConvertTupleDescSigned_F64_S8(numElements);
 	}
-
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -25,9 +25,8 @@ import org.jetbrains.annotations.Nullable;
 /**
  * Selects a subset of the features inside the image until it hits the requested number.
  *
- * @see FeatureSelectLimitIntensity
- *
  * @author Peter Abeles
+ * @see FeatureSelectLimitIntensity
  */
 public interface FeatureSelectLimit<Point> {
 	/**
@@ -42,5 +41,5 @@ public interface FeatureSelectLimit<Point> {
 	 */
 	void select( int imageWidth, int imageHeight,
 				 @Nullable FastAccess<Point> prior,
-				 FastAccess<Point> detected, int limit , FastArray<Point> selected );
+				 FastAccess<Point> detected, int limit, FastArray<Point> selected );
 }

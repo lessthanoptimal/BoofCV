@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -54,11 +54,10 @@ public class FactoryTrackerAlg {
 	 * @return Tracker
 	 */
 	public static <I extends ImageGray<I>, D extends ImageGray<D>>
-	KltTracker<I, D> klt(@Nullable ConfigKlt config, Class<I> imageType , Class<D> derivType )
-	{
-		if( config == null )
+	KltTracker<I, D> klt( @Nullable ConfigKlt config, Class<I> imageType, Class<D> derivType ) {
+		if (config == null)
 			config = new ConfigKlt();
-		if( derivType == null )
+		if (derivType == null)
 			derivType = GImageDerivativeOps.getDerivativeType(imageType);
 
 		InterpolateRectangle<I> interpInput = FactoryInterpolation.<I>bilinearRectangle(imageType);
@@ -81,12 +80,11 @@ public class FactoryTrackerAlg {
 	 */
 	public static <I extends ImageGray<I>, D extends ImageGray<D>>
 	PyramidKltTracker<I, D> kltPyramid( @Nullable ConfigKlt config,
-										Class<I> imageType ,
-										Class<D> derivType )
-	{
-		if( config == null )
+										Class<I> imageType,
+										Class<D> derivType ) {
+		if (config == null)
 			config = new ConfigKlt();
-		if( derivType == null )
+		if (derivType == null)
 			derivType = GImageDerivativeOps.getDerivativeType(imageType);
 
 		InterpolateRectangle<I> interpInput = FactoryInterpolation.bilinearRectangle(imageType);
@@ -99,33 +97,31 @@ public class FactoryTrackerAlg {
 	/**
 	 * Creates a tracker that is a hybrid between KLT and Detect-Describe-Associate (DDA) trackers.
 	 *
-	 * @see HybridTrackerScalePoint
-	 *
 	 * @param detector Feature detector and describer.
 	 * @param associate Association algorithm.
 	 * @param kltConfig Configuration for KLT
 	 * @param imageType Input image type.    @return Feature tracker
+	 * @see HybridTrackerScalePoint
 	 */
-	public static <I extends ImageGray<I>, D extends ImageGray<D>, Desc extends TupleDesc>
-	HybridTrackerScalePoint<I,D,Desc> hybrid(DetectDescribePoint<I, Desc> detector,
-											 AssociateDescription2D<Desc> associate,
-											 int tooCloseRadius,
-											 @Nullable ConfigPKlt kltConfig ,
-											 @Nullable ConfigTrackerHybrid configHybrid,
-											 Class<I> imageType,
-											 @Nullable Class<D> derivType)
-	{
-		if( configHybrid == null )
+	public static <I extends ImageGray<I>, D extends ImageGray<D>, Desc extends TupleDesc<Desc>>
+	HybridTrackerScalePoint<I, D, Desc> hybrid( DetectDescribePoint<I, Desc> detector,
+												AssociateDescription2D<Desc> associate,
+												int tooCloseRadius,
+												@Nullable ConfigPKlt kltConfig,
+												@Nullable ConfigTrackerHybrid configHybrid,
+												Class<I> imageType,
+												@Nullable Class<D> derivType ) {
+		if (configHybrid == null)
 			configHybrid = new ConfigTrackerHybrid();
-		if( kltConfig == null)
+		if (kltConfig == null)
 			kltConfig = new ConfigPKlt();
-		if( derivType == null )
+		if (derivType == null)
 			derivType = GImageDerivativeOps.getDerivativeType(imageType);
 
-		PyramidKltForHybrid<I,D> klt = new PyramidKltForHybrid<>(kltConfig.config,
-				kltConfig.templateRadius,imageType, derivType);
+		PyramidKltForHybrid<I, D> klt = new PyramidKltForHybrid<>(kltConfig.config,
+				kltConfig.templateRadius, imageType, derivType);
 
-		var tracker = new HybridTrackerScalePoint<>(klt, detector, associate, tooCloseRadius );
+		var tracker = new HybridTrackerScalePoint<>(klt, detector, associate, tooCloseRadius);
 		tracker.maxInactiveTracks = configHybrid.maxInactiveTracks;
 		return tracker;
 	}

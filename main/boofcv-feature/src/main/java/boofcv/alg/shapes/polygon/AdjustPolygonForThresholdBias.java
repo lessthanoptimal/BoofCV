@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -36,10 +36,10 @@ import org.ddogleg.struct.DogArray;
  */
 public class AdjustPolygonForThresholdBias {
 
-	private DogArray<LineSegment2D_F64> segments = new DogArray<>(LineSegment2D_F64::new);
-	private LineGeneral2D_F64 ga = new LineGeneral2D_F64();
-	private LineGeneral2D_F64 gb = new LineGeneral2D_F64();
-	private Point2D_F64 intersection = new Point2D_F64();
+	private final DogArray<LineSegment2D_F64> segments = new DogArray<>(LineSegment2D_F64::new);
+	private final LineGeneral2D_F64 ga = new LineGeneral2D_F64();
+	private final LineGeneral2D_F64 gb = new LineGeneral2D_F64();
+	private final Point2D_F64 intersection = new Point2D_F64();
 
 	/**
 	 * Processes and adjusts the polygon. If after adjustment a corner needs to be removed because two sides are

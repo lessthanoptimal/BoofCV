@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -33,27 +33,26 @@ import boofcv.struct.image.ImageBase;
  * @author Peter Abeles
  */
 public abstract class TemplateSumAbsoluteDifference<T extends ImageBase<T>>
-		implements TemplateIntensityImage.EvaluatorMethod<T>
-{
+		implements TemplateIntensityImage.EvaluatorMethod<T> {
 	TemplateIntensityImage<T> o;
 
 	@Override
-	public void initialize( TemplateIntensityImage<T> owner  ) {
+	public void initialize( TemplateIntensityImage<T> owner ) {
 		this.o = owner;
 	}
 	// IF MORE IMAGE TYPES ARE ADDED CREATE A GENERATOR FOR THIS CLASS
 
 	public static class F32 extends TemplateSumAbsoluteDifference<GrayF32> {
 		@Override
-		public float evaluate(int tl_x, int tl_y) {
+		public float evaluate( int tl_x, int tl_y ) {
 
 			float total = 0;
 
 			for (int y = 0; y < o.template.height; y++) {
-				int imageIndex = o.image.startIndex + (tl_y + y) * o.image.stride + tl_x;
-				int templateIndex = o.template.startIndex + y * o.template.stride;
+				int imageIndex = o.image.startIndex + (tl_y + y)*o.image.stride + tl_x;
+				int templateIndex = o.template.startIndex + y*o.template.stride;
 
-				float rowTotal=0.0f;
+				float rowTotal = 0.0f;
 				for (int x = 0; x < o.template.width; x++) {
 					rowTotal += Math.abs(o.image.data[imageIndex++] - o.template.data[templateIndex++]);
 				}
@@ -64,17 +63,17 @@ public abstract class TemplateSumAbsoluteDifference<T extends ImageBase<T>>
 		}
 
 		@Override
-		public float evaluateMask(int tl_x, int tl_y) {
+		public float evaluateMask( int tl_x, int tl_y ) {
 			float total = 0;
 
 			for (int y = 0; y < o.template.height; y++) {
-				int imageIndex = o.image.startIndex + (tl_y + y) * o.image.stride + tl_x;
-				int templateIndex = o.template.startIndex + y * o.template.stride;
-				int maskIndex = o.mask.startIndex + y * o.mask.stride;
+				int imageIndex = o.image.startIndex + (tl_y + y)*o.image.stride + tl_x;
+				int templateIndex = o.template.startIndex + y*o.template.stride;
+				int maskIndex = o.mask.startIndex + y*o.mask.stride;
 
-				float rowTotal=0.0f;
+				float rowTotal = 0.0f;
 				for (int x = 0; x < o.template.width; x++) {
-					rowTotal += o.mask.data[maskIndex++] * Math.abs(o.image.data[imageIndex++] - o.template.data[templateIndex++]);
+					rowTotal += o.mask.data[maskIndex++]*Math.abs(o.image.data[imageIndex++] - o.template.data[templateIndex++]);
 				}
 				total += rowTotal;
 			}
@@ -85,13 +84,13 @@ public abstract class TemplateSumAbsoluteDifference<T extends ImageBase<T>>
 
 	public static class U8 extends TemplateSumAbsoluteDifference<GrayU8> {
 		@Override
-		public float evaluate(int tl_x, int tl_y) {
+		public float evaluate( int tl_x, int tl_y ) {
 
 			float total = 0;
 
 			for (int y = 0; y < o.template.height; y++) {
-				int imageIndex = o.image.startIndex + (tl_y + y) * o.image.stride + tl_x;
-				int templateIndex = o.template.startIndex + y * o.template.stride;
+				int imageIndex = o.image.startIndex + (tl_y + y)*o.image.stride + tl_x;
+				int templateIndex = o.template.startIndex + y*o.template.stride;
 
 				int rowTotal = 0;
 				for (int x = 0; x < o.template.width; x++) {
@@ -105,19 +104,19 @@ public abstract class TemplateSumAbsoluteDifference<T extends ImageBase<T>>
 		}
 
 		@Override
-		public float evaluateMask(int tl_x, int tl_y) {
+		public float evaluateMask( int tl_x, int tl_y ) {
 
 			float total = 0;
 
 			for (int y = 0; y < o.template.height; y++) {
-				int imageIndex = o.image.startIndex + (tl_y + y) * o.image.stride + tl_x;
-				int templateIndex = o.template.startIndex + y * o.template.stride;
-				int maskIndex = o.mask.startIndex + y * o.mask.stride;
+				int imageIndex = o.image.startIndex + (tl_y + y)*o.image.stride + tl_x;
+				int templateIndex = o.template.startIndex + y*o.template.stride;
+				int maskIndex = o.mask.startIndex + y*o.mask.stride;
 
 				int rowTotal = 0;
 				for (int x = 0; x < o.template.width; x++) {
 					int m = o.mask.data[maskIndex++] & 0xFF;
-					rowTotal += m * Math.abs((o.image.data[imageIndex++] & 0xFF) - (o.template.data[templateIndex++] & 0xFF));
+					rowTotal += m*Math.abs((o.image.data[imageIndex++] & 0xFF) - (o.template.data[templateIndex++] & 0xFF));
 				}
 
 				total += rowTotal;

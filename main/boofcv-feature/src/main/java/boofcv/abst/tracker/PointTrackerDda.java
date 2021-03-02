@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -31,25 +31,26 @@ import java.util.List;
  *
  * @author Peter Abeles
  */
-public class PointTrackerDda<I extends ImageGray<I>, TD extends TupleDesc>
-	implements PointTracker<I>
-{
-	DetectDescribeAssociateTracker<I,TD> tracker;
+public class PointTrackerDda<I extends ImageGray<I>, TD extends TupleDesc<TD>>
+		implements PointTracker<I> {
+	DetectDescribeAssociateTracker<I, TD> tracker;
 
-	public PointTrackerDda(DetectDescribeAssociateTracker<I, TD> tracker) {
+	public PointTrackerDda( DetectDescribeAssociateTracker<I, TD> tracker ) {
 		this.tracker = tracker;
 	}
 
-	@Override public void process(I image) {tracker.process(image);}
+	// @formatter:off
+	@Override public void process( I image ) {tracker.process(image);}
 	@Override public void reset() {tracker.reset();}
 	@Override public long getFrameID() {return tracker.getFrameID();}
 	@Override public int getTotalActive() {return tracker.getTracksActive().size();}
 	@Override public int getTotalInactive() {return tracker.getTracksInactive().size();}
 	@Override public void dropAllTracks() {tracker.dropAllTracks();}
 	@Override public int getMaxSpawn() { return 0; } // not supported by this tracker
-	@Override public boolean dropTrack(PointTrack track) {return tracker.dropTrack(track);}
-	@Override public void dropTracks(Dropper dropper) {tracker.dropTracks(dropper);}
+	@Override public boolean dropTrack( PointTrack track ) {return tracker.dropTrack(track);}
+	@Override public void dropTracks( Dropper dropper ) {tracker.dropTracks(dropper);}
 	@Override public void spawnTracks() { tracker.spawnTracks(); }
+	// @formatter:on
 
 	@Override
 	public List<PointTrack> getActiveTracks( @Nullable List<PointTrack> list ) {
@@ -72,11 +73,11 @@ public class PointTrackerDda<I extends ImageGray<I>, TD extends TupleDesc>
 	}
 
 	@Override
-	public List<PointTrack> getInactiveTracks(@Nullable List<PointTrack> list) {
+	public List<PointTrack> getInactiveTracks( @Nullable List<PointTrack> list ) {
 		return addAllTracksInList(tracker.getTracksInactive(), list);
 	}
 
-	public static List<PointTrack> addAllTracksInList(List<PointTrack> tracks, @Nullable List<PointTrack> output) {
+	public static List<PointTrack> addAllTracksInList( List<PointTrack> tracks, @Nullable List<PointTrack> output ) {
 		if (output == null)
 			output = new ArrayList<>();
 		else

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -112,10 +112,22 @@ public class HysteresisEdgeTraceMark {
 			while (true) {
 				//----- First check along the direction of the edge.  Only need to check 2 points this way
 				switch (direction.data[indexDir]) {
-					case 0 -> { dx = 0; dy = 1; }
-					case 1 -> { dx = 1; dy = -1; }
-					case 2 -> { dx = 1; dy = 0; }
-					case -1 -> { dx = 1; dy = 1; }
+					case 0 -> {
+						dx = 0;
+						dy = 1;
+					}
+					case 1 -> {
+						dx = 1;
+						dy = -1;
+					}
+					case 2 -> {
+						dx = 1;
+						dy = 0;
+					}
+					case -1 -> {
+						dx = 1;
+						dy = 1;
+					}
 					default -> throw new RuntimeException("Unknown direction: " + direction.data[indexDir]);
 				}
 

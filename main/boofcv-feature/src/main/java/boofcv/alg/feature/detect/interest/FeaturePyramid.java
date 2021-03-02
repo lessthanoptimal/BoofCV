@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -62,10 +62,10 @@ public class FeaturePyramid<T extends ImageGray<T>, D extends ImageGray<D>>
 	private @Getter final GeneralFeatureDetector<T, D> detector;
 	private final float baseThreshold;
 	// feature intensity in the pyramid
-	protected GrayF32 intensities[];
+	protected GrayF32[] intensities;
 	protected int spaceIndex = 0;
 
-	protected List<Point2D_I16> maximums[];
+	protected List<Point2D_I16>[] maximums;
 
 	// List of found feature points
 	protected List<ScalePoint> foundPoints = new ArrayList<>();

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -49,7 +49,7 @@ public class MinimizeEnergyPrune {
 	Point2D_F64 point = new Point2D_F64();
 
 	List<Point2D_I32> contour;
-	double energySegment[] = new double[1];
+	double[] energySegment = new double[1];
 
 	DogArray_I32 bestCorners = new DogArray_I32();
 	DogArray_I32 workCorners1 = new DogArray_I32();

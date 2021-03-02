@@ -57,9 +57,8 @@ public class DescribeSiftCommon {
 	 * @param weightingSigmaFraction Sigma for Gaussian weighting function is set to this value * region width.  Try 0.5
 	 * @param maxDescriptorElementValue Helps with non-affine changes in lighting. See paper.  Try 0.2
 	 */
-	public DescribeSiftCommon(int widthSubregion, int widthGrid,
-							  int numHistogramBins , double weightingSigmaFraction , double maxDescriptorElementValue )
-	{
+	public DescribeSiftCommon( int widthSubregion, int widthGrid,
+							   int numHistogramBins, double weightingSigmaFraction, double maxDescriptorElementValue ) {
 		this.widthSubregion = widthSubregion;
 		this.widthGrid = widthGrid;
 		this.numHistogramBins = numHistogramBins;
@@ -70,7 +69,7 @@ public class DescribeSiftCommon {
 		// number of samples wide the descriptor window is
 		int descriptorWindow = widthSubregion*widthGrid;
 		double weightSigma = descriptorWindow*weightingSigmaFraction;
-		gaussianWeight = createGaussianWeightKernel(weightSigma,descriptorWindow/2);
+		gaussianWeight = createGaussianWeightKernel(weightSigma, descriptorWindow/2);
 	}
 
 	/**
@@ -81,14 +80,14 @@ public class DescribeSiftCommon {
 	 * 2) Clip using max descriptor value
 	 * 3) Apply L2 normalization again
 	 */
-	public static void normalizeDescriptor(TupleDesc_F64 descriptor , double maxDescriptorElementValue ) {
+	public static void normalizeDescriptor( TupleDesc_F64 descriptor, double maxDescriptorElementValue ) {
 		// normalize descriptor to unit length
 		UtilFeature.normalizeL2(descriptor);
 
 		// clip the values
 		for (int i = 0; i < descriptor.size(); i++) {
 			double value = descriptor.data[i];
-			if( value > maxDescriptorElementValue ) {
+			if (value > maxDescriptorElementValue) {
 				descriptor.data[i] = maxDescriptorElementValue;
 			}
 		}
@@ -100,28 +99,27 @@ public class DescribeSiftCommon {
 	/**
 	 * Creates a gaussian weighting kernel with an even number of elements along its width
 	 */
-	protected static float[] createGaussianWeightKernel( double sigma , int radius ) {
-		Kernel2D_F32 ker = FactoryKernelGaussian.gaussian2D_F32(sigma,radius,false,false);
-		float maxValue = KernelMath.maxAbs(ker.data,4*radius*radius);
-		KernelMath.divide(ker,maxValue);
+	protected static float[] createGaussianWeightKernel( double sigma, int radius ) {
+		Kernel2D_F32 ker = FactoryKernelGaussian.gaussian2D_F32(sigma, radius, false, false);
+		float maxValue = KernelMath.maxAbs(ker.data, 4*radius*radius);
+		KernelMath.divide(ker, maxValue);
 		return ker.data;
 	}
 
 	/**
 	 * Applies trilinear interpolation across the descriptor
 	 */
-	protected void trilinearInterpolation( float weight , float sampleX , float sampleY , double angle , TupleDesc_F64 descriptor )
-	{
+	protected void trilinearInterpolation( float weight, float sampleX, float sampleY, double angle, TupleDesc_F64 descriptor ) {
 		for (int i = 0; i < widthGrid; i++) {
-			double weightGridY = 1.0 - Math.abs(sampleY-i);
-			if( weightGridY <= 0) continue;
+			double weightGridY = 1.0 - Math.abs(sampleY - i);
+			if (weightGridY <= 0) continue;
 			for (int j = 0; j < widthGrid; j++) {
-				double weightGridX = 1.0 - Math.abs(sampleX-j);
-				if( weightGridX <= 0 ) continue;
+				double weightGridX = 1.0 - Math.abs(sampleX - j);
+				if (weightGridX <= 0) continue;
 				for (int k = 0; k < numHistogramBins; k++) {
 					double angleBin = k*histogramBinWidth;
-					double weightHistogram = 1.0 - UtilAngle.dist(angle,angleBin)/histogramBinWidth;
-					if( weightHistogram <= 0 ) continue;
+					double weightHistogram = 1.0 - UtilAngle.dist(angle, angleBin)/histogramBinWidth;
+					if (weightHistogram <= 0) continue;
 
 					int descriptorIndex = (i*widthGrid + j)*numHistogramBins + k;
 					descriptor.data[descriptorIndex] += weight*weightGridX*weightGridY*weightHistogram;

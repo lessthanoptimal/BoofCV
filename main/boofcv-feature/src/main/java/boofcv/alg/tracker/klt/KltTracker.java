@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -79,15 +79,15 @@ public class KltTracker<I extends ImageGray<I>, D extends ImageGray<D>> {
 	// length of the feature description
 	protected int lengthFeature;
 	// the feature in the current image
-	protected GrayF32 currDesc = new GrayF32(1,1);
+	protected GrayF32 currDesc = new GrayF32(1, 1);
 
 	// storage for sub-region used when computing interpolation
 	protected GrayF32 subimage = new GrayF32();
 
 	// destination image for current feature data in border case
-	int dstX0,dstY0,dstX1,dstY1;
+	int dstX0, dstY0, dstX1, dstY1;
 	// top-left corner of feature in input image for border case
-	float srcX0 , srcY0;
+	float srcX0, srcY0;
 
 	// allowed feature bounds
 	float allowedLeft;
@@ -104,9 +104,9 @@ public class KltTracker<I extends ImageGray<I>, D extends ImageGray<D>> {
 	// error between template and the current track position in the image
 	float error;
 
-	public KltTracker(InterpolateRectangle<I> interpInput,
-					  InterpolateRectangle<D> interpDeriv,
-					  ConfigKlt config) {
+	public KltTracker( InterpolateRectangle<I> interpInput,
+					   InterpolateRectangle<D> interpDeriv,
+					   ConfigKlt config ) {
 		this.interpInput = interpInput;
 		this.interpDeriv = interpDeriv;
 		this.config = config;
@@ -115,11 +115,11 @@ public class KltTracker<I extends ImageGray<I>, D extends ImageGray<D>> {
 	/**
 	 * Sets the current image it should be tracking with.
 	 *
-	 * @param image  Original input image.
+	 * @param image Original input image.
 	 * @param derivX Image derivative along the x-axis
 	 * @param derivY Image derivative along the y-axis
 	 */
-	public void setImage(I image, D derivX, D derivY) {
+	public void setImage( I image, D derivX, D derivY ) {
 		InputSanityCheck.checkSameShape(image, derivX, derivY);
 
 		this.image = image;
@@ -132,7 +132,7 @@ public class KltTracker<I extends ImageGray<I>, D extends ImageGray<D>> {
 	/**
 	 * Same as {@link #setImage}, but it doesn't check to see if the images are the same size each time
 	 */
-	public void unsafe_setImage(I image, D derivX, D derivY) {
+	public void unsafe_setImage( I image, D derivX, D derivY ) {
 		this.image = image;
 		this.interpInput.setImage(image);
 
@@ -143,15 +143,16 @@ public class KltTracker<I extends ImageGray<I>, D extends ImageGray<D>> {
 	/**
 	 * Sets the features description using the current image and the location of the feature stored in the feature.
 	 * If the feature is an illegal location and cannot be set then false is returned.
+	 *
 	 * @param feature Feature description which is to be set.  Location must be specified.
 	 * @return true if the feature's description was modified.
 	 */
 	@SuppressWarnings({"SuspiciousNameCombination"})
-	public boolean setDescription(KltFeature feature) {
+	public boolean setDescription( KltFeature feature ) {
 		setAllowedBounds(feature);
 
 		if (!isFullyInside(feature.x, feature.y)) {
-			if( isFullyOutside(feature.x,feature.y))
+			if (isFullyOutside(feature.x, feature.y))
 				return false;
 			else
 				return internalSetDescriptionBorder(feature);
@@ -160,9 +161,9 @@ public class KltTracker<I extends ImageGray<I>, D extends ImageGray<D>> {
 		return internalSetDescription(feature);
 	}
 
-	protected boolean internalSetDescription(KltFeature feature) {
-		int regionWidth = feature.radius * 2 + 1;
-		int size = regionWidth * regionWidth;
+	protected boolean internalSetDescription( KltFeature feature ) {
+		int regionWidth = feature.radius*2 + 1;
+		int size = regionWidth*regionWidth;
 
 		float tl_x = feature.x - feature.radius;
 		float tl_y = feature.y - feature.radius;
@@ -179,16 +180,16 @@ public class KltTracker<I extends ImageGray<I>, D extends ImageGray<D>> {
 			float dX = feature.derivX.data[i];
 			float dY = feature.derivY.data[i];
 
-			Gxx += dX * dX;
-			Gyy += dY * dY;
-			Gxy += dX * dY;
+			Gxx += dX*dX;
+			Gyy += dY*dY;
+			Gxy += dX*dY;
 		}
 
 		feature.Gxx = Gxx;
 		feature.Gyy = Gyy;
 		feature.Gxy = Gxy;
 
-		float det = Gxx * Gyy - Gxy * Gxy;
+		float det = Gxx*Gyy - Gxy*Gxy;
 
 		return (det >= config.minDeterminant*lengthFeature);
 	}
@@ -198,7 +199,7 @@ public class KltTracker<I extends ImageGray<I>, D extends ImageGray<D>> {
 	 * is save the pixel value, but derivative information is also computed
 	 * so that it can reject bad features immediately.
 	 */
-	protected boolean internalSetDescriptionBorder(KltFeature feature) {
+	protected boolean internalSetDescriptionBorder( KltFeature feature ) {
 
 		computeSubImageBounds(feature, feature.x, feature.y);
 
@@ -215,11 +216,11 @@ public class KltTracker<I extends ImageGray<I>, D extends ImageGray<D>> {
 		interpDeriv.setImage(derivY);
 		interpDeriv.region(srcX0, srcY0, subimage);
 
-		int total= 0;
+		int total = 0;
 
 		Gxx = Gyy = Gxy = 0;
-		for( int i = 0; i < lengthFeature; i++ ) {
-			if( Float.isNaN(feature.desc.data[i]))
+		for (int i = 0; i < lengthFeature; i++) {
+			if (Float.isNaN(feature.desc.data[i]))
 				continue;
 
 			total++;
@@ -227,9 +228,9 @@ public class KltTracker<I extends ImageGray<I>, D extends ImageGray<D>> {
 			float dX = feature.derivX.data[i];
 			float dY = feature.derivY.data[i];
 
-			Gxx += dX * dX;
-			Gyy += dY * dY;
-			Gxy += dX * dY;
+			Gxx += dX*dX;
+			Gyy += dY*dY;
+			Gxy += dX*dY;
 		}
 
 		// technically don't need to save this...
@@ -237,7 +238,7 @@ public class KltTracker<I extends ImageGray<I>, D extends ImageGray<D>> {
 		feature.Gyy = Gyy;
 		feature.Gxy = Gxy;
 
-		float det = Gxx * Gyy - Gxy * Gxy;
+		float det = Gxx*Gyy - Gxy*Gxy;
 
 		return (det >= config.minDeterminant*total);
 	}
@@ -251,17 +252,17 @@ public class KltTracker<I extends ImageGray<I>, D extends ImageGray<D>> {
 	 * @param feature Feature being tracked.
 	 * @return If the tracking was successful or not.
 	 */
-	public KltTrackFault track(KltFeature feature) {
+	public KltTrackFault track( KltFeature feature ) {
 
 		// precompute bounds and other values
 		setAllowedBounds(feature);
 
 		// sanity check to make sure it is actually inside the image
-		if ( isFullyOutside(feature.x, feature.y))
+		if (isFullyOutside(feature.x, feature.y))
 			return KltTrackFault.OUT_OF_BOUNDS;
 
 		if (currDesc.data.length < lengthFeature) {
-			currDesc.reshape(widthFeature,widthFeature);
+			currDesc.reshape(widthFeature, widthFeature);
 		}
 
 		// save the original location so that a drifting fault can be detected
@@ -273,40 +274,40 @@ public class KltTracker<I extends ImageGray<I>, D extends ImageGray<D>> {
 		float det = 0;
 
 		// make sure its inside this image
-		if ( complete ) {
+		if (complete) {
 			// see if the determinant is too small
 			Gxx = feature.Gxx;
 			Gyy = feature.Gyy;
 			Gxy = feature.Gxy;
-			det = Gxx * Gyy - Gxy * Gxy;
+			det = Gxx*Gyy - Gxy*Gxy;
 			if (det < config.minDeterminant*lengthFeature) {
 				return KltTrackFault.FAILED;
 			}
 		}
 
 		for (int iter = 0; iter < config.maxIterations; iter++) {
-			float dx,dy;
-			if( complete && isFullyInside(feature.x, feature.y) ) {
+			float dx, dy;
+			if (complete && isFullyInside(feature.x, feature.y)) {
 				computeE(feature, feature.x, feature.y);
 			} else {
 				// once it goes outside it must remain outside.  If it starts outside
 				int length = computeGandE_border(feature, feature.x, feature.y);
 
-				det = Gxx * Gyy - Gxy * Gxy;
+				det = Gxx*Gyy - Gxy*Gxy;
 				if (det <= config.minDeterminant*length) {
 					return KltTrackFault.FAILED;
 				}
 			}
 
 			// solve for D
-			dx = (Gyy * Ex - Gxy * Ey) / det;
-			dy = (Gxx * Ey - Gxy * Ex) / det;
+			dx = (Gyy*Ex - Gxy*Ey)/det;
+			dy = (Gxx*Ey - Gxy*Ex)/det;
 
 			feature.x += dx;
 			feature.y += dy;
 
 			// see if it moved outside of the image
-			if ( isFullyOutside(feature.x, feature.y))
+			if (isFullyOutside(feature.x, feature.y))
 				return KltTrackFault.OUT_OF_BOUNDS;
 
 			// see if it has moved more than possible if it is really tracking a target
@@ -320,7 +321,7 @@ public class KltTracker<I extends ImageGray<I>, D extends ImageGray<D>> {
 			}
 		}
 
-		if ( (error=computeError(feature)) > config.maxPerPixelError)
+		if ((error = computeError(feature)) > config.maxPerPixelError)
 			return KltTrackFault.LARGE_ERROR;
 
 		return KltTrackFault.SUCCESS;
@@ -329,40 +330,40 @@ public class KltTracker<I extends ImageGray<I>, D extends ImageGray<D>> {
 	/**
 	 * Precompute image bounds that the feature is allowed inside of
 	 */
-	protected void setAllowedBounds(KltFeature feature) {
+	protected void setAllowedBounds( KltFeature feature ) {
 		// compute the feature's width and temporary storage related to it
-		widthFeature = feature.radius * 2 + 1;
-		lengthFeature = widthFeature * widthFeature;
+		widthFeature = feature.radius*2 + 1;
+		lengthFeature = widthFeature*widthFeature;
 
 		maximumDrift = widthFeature*config.driftFracTol;
 
 		allowedLeft = feature.radius;
 		allowedTop = feature.radius;
-		allowedRight = image.width - feature.radius-1;
-		allowedBottom = image.height - feature.radius-1;
+		allowedRight = image.width - feature.radius - 1;
+		allowedBottom = image.height - feature.radius - 1;
 
 		outsideLeft = -feature.radius;
 		outsideTop = -feature.radius;
-		outsideRight = image.width + feature.radius-1;
-		outsideBottom = image.height + feature.radius-1;
+		outsideRight = image.width + feature.radius - 1;
+		outsideBottom = image.height + feature.radius - 1;
 	}
 
-	private float computeError(KltFeature feature) {
+	private float computeError( KltFeature feature ) {
 		float error = 0;
 		int total = 0;
 		for (int i = 0; i < lengthFeature; i++) {
 
-			if( Float.isNaN(feature.desc.data[i]) || Float.isNaN(currDesc.data[i]))
+			if (Float.isNaN(feature.desc.data[i]) || Float.isNaN(currDesc.data[i]))
 				continue;
 
 			// compute the difference between the previous and the current image
 			error += Math.abs(feature.desc.data[i] - currDesc.data[i]);
 			total++;
 		}
-		return error / total;
+		return error/total;
 	}
 
-	protected void computeE(KltFeature feature, float x, float y) {
+	protected void computeE( KltFeature feature, float x, float y ) {
 		// extract the region in the current image
 		interpInput.region(x - feature.radius, y - feature.radius, currDesc);
 
@@ -372,15 +373,15 @@ public class KltTracker<I extends ImageGray<I>, D extends ImageGray<D>> {
 			// compute the difference between the previous and the current image
 			float d = feature.desc.data[i] - currDesc.data[i];
 
-			Ex += d * feature.derivX.data[i];
-			Ey += d * feature.derivY.data[i];
+			Ex += d*feature.derivX.data[i];
+			Ey += d*feature.derivY.data[i];
 		}
 	}
 
 	/**
 	 * When part of the region is outside the image G and E need to be recomputed
 	 */
-	protected int computeGandE_border(KltFeature feature, float cx, float cy) {
+	protected int computeGandE_border( KltFeature feature, float cx, float cy ) {
 
 		computeSubImageBounds(feature, cx, cy);
 
@@ -391,15 +392,18 @@ public class KltTracker<I extends ImageGray<I>, D extends ImageGray<D>> {
 
 		int total = 0;
 
-		Gxx = 0; Gyy = 0; Gxy = 0;
-		Ex = 0; Ey = 0;
+		Gxx = 0;
+		Gyy = 0;
+		Gxy = 0;
+		Ex = 0;
+		Ey = 0;
 
-		for( int i = 0; i < lengthFeature; i++ ) {
+		for (int i = 0; i < lengthFeature; i++) {
 			float template = feature.desc.data[i];
 			float current = currDesc.data[i];
 
 			// if the description was outside of the image here skip it
-			if( Float.isNaN(template) || Float.isNaN(current))
+			if (Float.isNaN(template) || Float.isNaN(current))
 				continue;
 
 			// count total number of points inbounds
@@ -411,18 +415,18 @@ public class KltTracker<I extends ImageGray<I>, D extends ImageGray<D>> {
 			// compute the difference between the previous and the current image
 			float d = template - current;
 
-			Ex += d * dX;
-			Ey += d * dY;
+			Ex += d*dX;
+			Ey += d*dY;
 
-			Gxx += dX * dX;
-			Gyy += dY * dY;
-			Gxy += dX * dY;
+			Gxx += dX*dX;
+			Gyy += dY*dY;
+			Gxy += dX*dY;
 		}
 
 		return total;
 	}
 
-	private void computeSubImageBounds(KltFeature feature, float cx, float cy) {
+	private void computeSubImageBounds( KltFeature feature, float cx, float cy ) {
 		// initially include the whole destination image
 		dstX0 = 0;
 		dstY0 = 0;
@@ -436,26 +440,26 @@ public class KltTracker<I extends ImageGray<I>, D extends ImageGray<D>> {
 		float srxY1 = srcY0 + widthFeature;
 
 		// take in account the image border
-		if( srcX0 < 0 ) {
+		if (srcX0 < 0) {
 			dstX0 = (int)-Math.floor(srcX0);
 			srcX0 += dstX0;
 		}
-		if( srxX1 > image.width ) {
-			dstX1 -= (int)Math.ceil(srxX1-image.width);
+		if (srxX1 > image.width) {
+			dstX1 -= (int)Math.ceil(srxX1 - image.width);
 			// rounding error
-			dstX1 -= (srcX0 + (dstX1-dstX0) > image.width ? 1 : 0);
+			dstX1 -= (srcX0 + (dstX1 - dstX0) > image.width ? 1 : 0);
 		}
-		if( srcY0 < 0 ) {
+		if (srcY0 < 0) {
 			dstY0 = (int)-Math.floor(srcY0);
 			srcY0 += dstY0;
 		}
-		if( srxY1 > image.height ) {
-			dstY1 -= (int)Math.ceil(srxY1-image.height);
+		if (srxY1 > image.height) {
+			dstY1 -= (int)Math.ceil(srxY1 - image.height);
 			// rounding error
-			dstY1 -= srcY0 + (dstY1-dstY0) > image.height ? 1 : 0;
+			dstY1 -= srcY0 + (dstY1 - dstY0) > image.height ? 1 : 0;
 		}
 
-		if( srcX0 < 0 || srcY0 < 0 || srcX0 + (dstX1-dstX0) > image.width || srcY0 + (dstY1-dstY0) > image.height ) {
+		if (srcX0 < 0 || srcY0 < 0 || srcX0 + (dstX1 - dstX0) > image.width || srcY0 + (dstY1 - dstY0) > image.height) {
 			throw new IllegalArgumentException("Region is outside of the image");
 		}
 	}
@@ -465,8 +469,8 @@ public class KltTracker<I extends ImageGray<I>, D extends ImageGray<D>> {
 	 * outside the image
 	 */
 	public boolean isDescriptionComplete( KltFeature feature ) {
-		for( int i = 0; i < lengthFeature; i++ ) {
-			if( Float.isNaN(feature.desc.data[i]) )
+		for (int i = 0; i < lengthFeature; i++) {
+			if (Float.isNaN(feature.desc.data[i]))
 				return false;
 		}
 		return true;
@@ -475,7 +479,7 @@ public class KltTracker<I extends ImageGray<I>, D extends ImageGray<D>> {
 	/**
 	 * Returns true if the features is entirely enclosed inside of the image.
 	 */
-	public boolean isFullyInside(float x, float y) {
+	public boolean isFullyInside( float x, float y ) {
 		if (x < allowedLeft || x > allowedRight)
 			return false;
 		if (y < allowedTop || y > allowedBottom)
@@ -489,7 +493,7 @@ public class KltTracker<I extends ImageGray<I>, D extends ImageGray<D>> {
 	 * an entire pixel is contained inside the image.  So if only  0.999 of a pixel is inside then the whole
 	 * region is considered to be outside.  Can't interpolate nothing...
 	 */
-	public boolean isFullyOutside(float x, float y) {
+	public boolean isFullyOutside( float x, float y ) {
 		if (x < outsideLeft || x > outsideRight)
 			return true;
 		if (y < outsideTop || y > outsideBottom)
@@ -500,6 +504,7 @@ public class KltTracker<I extends ImageGray<I>, D extends ImageGray<D>> {
 
 	/**
 	 * Average absolute value of the difference between each pixel in the image and the template
+	 *
 	 * @return Average error
 	 */
 	public float getError() {

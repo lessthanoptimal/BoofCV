@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -39,8 +39,8 @@ import org.jetbrains.annotations.Nullable;
  * @author Peter Abeles
  */
 public class FactoryDetectDescribeAlgs {
-	public static CompleteSift sift( @Nullable ConfigCompleteSift config) {
-		if( config == null )
+	public static CompleteSift sift( @Nullable ConfigCompleteSift config ) {
+		if (config == null)
 			config = new ConfigCompleteSift();
 
 		ConfigSiftScaleSpace configSS = config.scaleSpace;
@@ -49,19 +49,19 @@ public class FactoryDetectDescribeAlgs {
 		ConfigSiftDescribe configDesc = config.describe;
 
 		SiftScaleSpace scaleSpace = new SiftScaleSpace(
-				configSS.firstOctave,configSS.lastOctave,configSS.numScales,configSS.sigma0);
+				configSS.firstOctave, configSS.lastOctave, configSS.numScales, configSS.sigma0);
 		OrientationHistogramSift<GrayF32> orientation = new OrientationHistogramSift<>(
-				configOri.histogramSize,configOri.sigmaEnlarge,GrayF32.class);
+				configOri.histogramSize, configOri.sigmaEnlarge, GrayF32.class);
 		DescribePointSift<GrayF32> describe = new DescribePointSift<>(
-				configDesc.widthSubregion,configDesc.widthGrid, configDesc.numHistogramBins,
+				configDesc.widthSubregion, configDesc.widthGrid, configDesc.numHistogramBins,
 				configDesc.sigmaToPixels, configDesc.weightingSigmaFraction,
-				configDesc.maxDescriptorElementValue,GrayF32.class);
+				configDesc.maxDescriptorElementValue, GrayF32.class);
 
 		NonMaxLimiter nonMax = FactoryFeatureExtractor.nonmaxLimiter(
-				configDetector.extract,configDetector.selector,configDetector.maxFeaturesPerScale);
+				configDetector.extract, configDetector.selector, configDetector.maxFeaturesPerScale);
 		FeatureSelectLimitIntensity<ScalePoint> selectorAll = FactorySelectLimit.intensity(configDetector.selector);
-		CompleteSift dds = new CompleteSift(scaleSpace,selectorAll,
-				configDetector.edgeR,nonMax,orientation,describe);
+		CompleteSift dds = new CompleteSift(scaleSpace, selectorAll,
+				configDetector.edgeR, nonMax, orientation, describe);
 		dds.maxFeaturesAll = configDetector.maxFeaturesAll;
 		return dds;
 	}

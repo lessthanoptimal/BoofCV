@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -48,7 +48,7 @@ public class DescribePointBrief<T extends ImageGray<T>> {
 	// computes the binary feature description
 	protected DescribePointBinaryCompare<T> describe;
 
-	public DescribePointBrief(DescribePointBinaryCompare<T> describe, BlurFilter<T> filterBlur) {
+	public DescribePointBrief( DescribePointBinaryCompare<T> describe, BlurFilter<T> filterBlur ) {
 		this.filterBlur = filterBlur;
 		this.describe = describe;
 
@@ -70,9 +70,9 @@ public class DescribePointBrief<T extends ImageGray<T>> {
 	 *
 	 * @param image Image being examined.
 	 */
-	public void setImage(T image) {
-		blur.reshape(image.width,image.height);
-		filterBlur.process(image,blur);
+	public void setImage( T image ) {
+		blur.reshape(image.width, image.height);
+		filterBlur.process(image, blur);
 		describe.setImage(image);
 	}
 
@@ -84,8 +84,8 @@ public class DescribePointBrief<T extends ImageGray<T>> {
 	 * @param c_y Center of region being described.
 	 * @param feature Where the descriptor is written to.
 	 */
-	public void process( double c_x , double c_y , TupleDesc_B feature ) {
-		describe.process((int)c_x,(int)c_y,feature);
+	public void process( double c_x, double c_y, TupleDesc_B feature ) {
+		describe.process((int)c_x, (int)c_y, feature);
 	}
 
 	public BinaryCompareDefinition_I32 getDefinition() {

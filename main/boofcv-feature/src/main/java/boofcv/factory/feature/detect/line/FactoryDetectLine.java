@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -17,7 +17,6 @@
  */
 
 package boofcv.factory.feature.detect.line;
-
 
 import boofcv.abst.feature.detect.line.*;
 import boofcv.abst.filter.binary.InputToBinary;
@@ -42,11 +41,10 @@ public class FactoryDetectLine {
 	/**
 	 * Detects line segments inside an image using the {@link DetectLineSegmentsGridRansac} algorithm.
 	 *
-	 * @see DetectLineSegmentsGridRansac
-	 *
 	 * @param config Configuration for line detector
 	 * @param imageType Type of single band input image.
 	 * @return Line segment detector
+	 * @see DetectLineSegmentsGridRansac
 	 */
 	public static <I extends ImageGray<I>>
 	DetectLineSegment<I> lineRansac( @Nullable ConfigLineRansac config,
@@ -54,27 +52,26 @@ public class FactoryDetectLine {
 
 		Class derivType = GImageDerivativeOps.getDerivativeType(imageType);
 
-		return FactoryDetectLineAlgs.lineRansac(config,imageType,derivType);
+		return FactoryDetectLineAlgs.lineRansac(config, imageType, derivType);
 	}
 
 	/**
 	 * Detects lines using a foot of norm parametrization and sub images to reduce degenerate
 	 * configurations, see {@link DetectLineHoughFootSubimage} for details.
 	 *
-	 * @see DetectLineHoughFootSubimage
-	 *
 	 * @param config Configuration for line detector.  If null then default will be used.
 	 * @param imageType input image type
 	 * @return Line detector.
+	 * @see DetectLineHoughFootSubimage
 	 */
 	public static <T extends ImageGray<T>>
-	DetectLine<T> houghLineFootSub(@Nullable ConfigHoughFootSubimage config , Class<T> imageType ) {
+	DetectLine<T> houghLineFootSub( @Nullable ConfigHoughFootSubimage config, Class<T> imageType ) {
 
 		Class derivType = GImageDerivativeOps.getDerivativeType(imageType);
 
-		DetectEdgeLines alg = FactoryDetectLineAlgs.houghFootSub(config,derivType);
+		DetectEdgeLines alg = FactoryDetectLineAlgs.houghFootSub(config, derivType);
 
-		return new DetectEdgeLinesToLines(alg,imageType,derivType);
+		return new DetectEdgeLinesToLines(alg, imageType, derivType);
 	}
 
 	/**
@@ -88,21 +85,20 @@ public class FactoryDetectLine {
 	 * @return Line detector.
 	 */
 	public static <T extends ImageGray<T>>
-	DetectLine<T> houghLineFoot(@Nullable ConfigHoughGradient configHough ,
-								@Nullable ConfigParamFoot configParam ,
-								Class<T> imageType )
-	{
-		if( configHough == null )
+	DetectLine<T> houghLineFoot( @Nullable ConfigHoughGradient configHough,
+								 @Nullable ConfigParamFoot configParam,
+								 Class<T> imageType ) {
+		if (configHough == null)
 			configHough = new ConfigHoughGradient();
 
-		if( configParam == null )
+		if (configParam == null)
 			configParam = new ConfigParamFoot();
 
-		ImageGradient<T,?> gradient = FactoryDerivative.gradient(
+		ImageGradient<T, ?> gradient = FactoryDerivative.gradient(
 				configHough.edgeThreshold.gradient, ImageType.single(imageType), null);
-		HoughTransformGradient hough = FactoryDetectLineAlgs.houghLineFoot(configHough,configParam,
+		HoughTransformGradient hough = FactoryDetectLineAlgs.houghLineFoot(configHough, configParam,
 				gradient.getDerivativeType().getImageClass());
-		var detector = new HoughGradient_to_DetectLine(hough,gradient,imageType);
+		var detector = new HoughGradient_to_DetectLine(hough, gradient, imageType);
 		detector.nonMaxSuppression = configHough.edgeThreshold.nonMax;
 		detector.thresholdEdge = configHough.edgeThreshold.threshold;
 		return detector;
@@ -119,22 +115,21 @@ public class FactoryDetectLine {
 	 * @return Line detector.
 	 */
 	public static <T extends ImageGray<T>>
-	DetectLine<T> houghLinePolar( @Nullable ConfigHoughGradient configHough ,
-								  @Nullable ConfigParamPolar configParam ,
-								  Class<T> imageType )
-	{
-		if( configHough == null )
+	DetectLine<T> houghLinePolar( @Nullable ConfigHoughGradient configHough,
+								  @Nullable ConfigParamPolar configParam,
+								  Class<T> imageType ) {
+		if (configHough == null)
 			configHough = new ConfigHoughGradient();
 
-		if( configParam == null )
+		if (configParam == null)
 			configParam = new ConfigParamPolar();
 
-		ImageGradient<T,?> gradient = FactoryDerivative.gradient(
+		ImageGradient<T, ?> gradient = FactoryDerivative.gradient(
 				configHough.edgeThreshold.gradient, ImageType.single(imageType), null);
 
-		HoughTransformGradient hough = FactoryDetectLineAlgs.houghLinePolar(configHough,configParam,
+		HoughTransformGradient hough = FactoryDetectLineAlgs.houghLinePolar(configHough, configParam,
 				gradient.getDerivativeType().getImageClass());
-		var detector = new HoughGradient_to_DetectLine(hough,gradient,imageType);
+		var detector = new HoughGradient_to_DetectLine(hough, gradient, imageType);
 		detector.nonMaxSuppression = configHough.edgeThreshold.nonMax;
 		detector.thresholdEdge = configHough.edgeThreshold.threshold;
 		return detector;
@@ -150,27 +145,26 @@ public class FactoryDetectLine {
 	 * @return Line detector.
 	 */
 	public static <T extends ImageGray<T>>
-	DetectLine<T> houghLinePolar(@Nullable ConfigHoughBinary configHough ,
-								 @Nullable ConfigParamPolar configParam ,
-								 Class<T> imageType )
-	{
-		if( configHough == null )
+	DetectLine<T> houghLinePolar( @Nullable ConfigHoughBinary configHough,
+								  @Nullable ConfigParamPolar configParam,
+								  Class<T> imageType ) {
+		if (configHough == null)
 			configHough = new ConfigHoughBinary();
 
-		if( configParam == null )
+		if (configParam == null)
 			configParam = new ConfigParamPolar();
 
-		HoughTransformBinary hough = FactoryDetectLineAlgs.houghLinePolar(configHough,configParam);
+		HoughTransformBinary hough = FactoryDetectLineAlgs.houghLinePolar(configHough, configParam);
 
-		if( configHough.binarization == ConfigHoughBinary.Binarization.EDGE ) {
-			ImageGradient<T,?> gradient = FactoryDerivative.gradient(configHough.thresholdEdge.gradient, ImageType.single(imageType), null);
-			var detector = new HoughBinary_to_DetectLine(hough,gradient);
+		if (configHough.binarization == ConfigHoughBinary.Binarization.EDGE) {
+			ImageGradient<T, ?> gradient = FactoryDerivative.gradient(configHough.thresholdEdge.gradient, ImageType.single(imageType), null);
+			var detector = new HoughBinary_to_DetectLine(hough, gradient);
 			detector.nonMaxSuppression = configHough.thresholdEdge.nonMax;
 			detector.thresholdEdge = configHough.thresholdEdge.threshold;
 			return detector;
 		} else {
-			InputToBinary<T> thresholder = FactoryThresholdBinary.threshold(configHough.thresholdImage,imageType);
-			return new HoughBinary_to_DetectLine<>(hough,thresholder);
+			InputToBinary<T> thresholder = FactoryThresholdBinary.threshold(configHough.thresholdImage, imageType);
+			return new HoughBinary_to_DetectLine<>(hough, thresholder);
 		}
 	}
 }

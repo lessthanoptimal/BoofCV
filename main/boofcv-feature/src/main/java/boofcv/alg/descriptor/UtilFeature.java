@@ -42,7 +42,7 @@ public class UtilFeature {
 	 * {@link DetectDescribePoint}.  The array will have declareInstance set to true, otherwise
 	 * why would you be using this function?
 	 */
-	public static <TD extends TupleDesc>
+	public static <TD extends TupleDesc<TD>>
 	DogArray<TD> createArray( final DescriptorInfo<TD> detDesc , int initialMax ) {
 		DogArray<TD> ret = new DogArray<>(detDesc::createDescription);
 		ret.reserve(initialMax);
@@ -141,7 +141,7 @@ public class UtilFeature {
 	 * @param sets (Input) Set each feature belongs in
 	 * @param association (Output) association algorithm which is having its source configured
 	 */
-	public static <TD extends TupleDesc>
+	public static <TD extends TupleDesc<TD>>
 	void setSource(FastAccess<TD> descriptors , DogArray_I32 sets , AssociateDescriptionSets<TD> association )
 	{
 		assert(descriptors.size==sets.size);
@@ -159,7 +159,7 @@ public class UtilFeature {
 	 * @param sets (Input) Set each feature belongs in
 	 * @param association (Output) association algorithm which is having its destination configured
 	 */
-	public static <TD extends TupleDesc>
+	public static <TD extends TupleDesc<TD>>
 	void setDestination(FastAccess<TD> descriptors , DogArray_I32 sets , AssociateDescriptionSets<TD> association )
 	{
 		assert(descriptors.size==sets.size);
@@ -178,7 +178,7 @@ public class UtilFeature {
 	 * @param locs (Input) Pixel coordinate that each feature was found at
 	 * @param association (Output) association algorithm which is having its source configured
 	 */
-	public static <TD extends TupleDesc>
+	public static <TD extends TupleDesc<TD>>
 	void setSource(FastAccess<TD> descriptors , DogArray_I32 sets , FastAccess<Point2D_F64> locs,
 				   AssociateDescriptionSets2D<TD> association )
 	{
@@ -200,7 +200,7 @@ public class UtilFeature {
 	 * @param locs (Input) Pixel coordinate that each feature was found at
 	 * @param association (Output) association algorithm which is having its destination configured
 	 */
-	public static <TD extends TupleDesc>
+	public static <TD extends TupleDesc<TD>>
 	void setDestination(FastAccess<TD> descriptors , DogArray_I32 sets , FastAccess<Point2D_F64> locs,
 						AssociateDescriptionSets2D<TD> association )
 	{

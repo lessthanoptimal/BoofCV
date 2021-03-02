@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -32,10 +32,9 @@ import boofcv.struct.image.ImageType;
 /**
  * Provides intensity feature intensity algorithms which conform to the {@link GeneralFeatureIntensity} interface.
  *
+ * @author Peter Abeles
  * @see FactoryIntensityPointAlg
  * @see boofcv.factory.feature.detect.extract.FactoryFeatureExtractor
- *
- * @author Peter Abeles
  */
 public class FactoryIntensityPoint {
 
@@ -50,8 +49,8 @@ public class FactoryIntensityPoint {
 	 * @return Fast feature intensity
 	 */
 	public static <I extends ImageGray<I>, D extends ImageGray<D>>
-	GeneralFeatureIntensity<I,D>  fast( int pixelTol, int minCont, Class<I> imageType ) {
-		FastCornerDetector<I> alg =  FactoryIntensityPointAlg.fast(pixelTol, minCont, imageType);
+	GeneralFeatureIntensity<I, D> fast( int pixelTol, int minCont, Class<I> imageType ) {
+		FastCornerDetector<I> alg = FactoryIntensityPointAlg.fast(pixelTol, minCont, imageType);
 		return new WrapperFastCornerIntensity<>(alg);
 	}
 
@@ -67,10 +66,9 @@ public class FactoryIntensityPoint {
 	 * @return Harris feature intensity
 	 */
 	public static <I extends ImageGray<I>, D extends ImageGray<D>>
-	GeneralFeatureIntensity<I,D>  harris(int windowRadius, float kappa,
-										 boolean weighted, Class<D> derivType)
-	{
-		GradientCornerIntensity<D> alg =  FactoryIntensityPointAlg.harris(windowRadius, kappa, weighted, derivType);
+	GeneralFeatureIntensity<I, D> harris( int windowRadius, float kappa,
+										  boolean weighted, Class<D> derivType ) {
+		GradientCornerIntensity<D> alg = FactoryIntensityPointAlg.harris(windowRadius, kappa, weighted, derivType);
 		return new WrapperGradientCornerIntensity<>(alg);
 	}
 
@@ -85,8 +83,8 @@ public class FactoryIntensityPoint {
 	 * @return KLT feature intensity
 	 */
 	public static <I extends ImageGray<I>, D extends ImageGray<D>>
-	GeneralFeatureIntensity<I,D> shiTomasi(int windowRadius, boolean weighted, Class<D> derivType) {
-		GradientCornerIntensity<D> alg =  FactoryIntensityPointAlg.shiTomasi(windowRadius, weighted, derivType);
+	GeneralFeatureIntensity<I, D> shiTomasi( int windowRadius, boolean weighted, Class<D> derivType ) {
+		GradientCornerIntensity<D> alg = FactoryIntensityPointAlg.shiTomasi(windowRadius, weighted, derivType);
 		return new WrapperGradientCornerIntensity<>(alg);
 	}
 
@@ -99,7 +97,7 @@ public class FactoryIntensityPoint {
 	 * @return Kitchen and Rosenfeld feature intensity
 	 */
 	public static <I extends ImageGray<I>, D extends ImageGray<D>>
-	GeneralFeatureIntensity<I,D>  kitros( Class<D> derivType ) {
+	GeneralFeatureIntensity<I, D> kitros( Class<D> derivType ) {
 		return new WrapperKitRosCornerIntensity<>(derivType);
 	}
 
@@ -111,37 +109,35 @@ public class FactoryIntensityPoint {
 	 * @return Median feature intensity
 	 */
 	public static <I extends ImageGray<I>, D extends ImageGray<D>>
-	GeneralFeatureIntensity<I,D>  median( int radius , Class<I> imageType ) {
-		BlurStorageFilter<I> filter = FactoryBlurFilter.median(ImageType.single(imageType),radius);
+	GeneralFeatureIntensity<I, D> median( int radius, Class<I> imageType ) {
+		BlurStorageFilter<I> filter = FactoryBlurFilter.median(ImageType.single(imageType), radius);
 		return new WrapperMedianCornerIntensity<>(filter);
 	}
 
 	/**
 	 * Blob detector which uses the image's second order derivatives directly.
 	 *
-	 * @see HessianBlobIntensity
-	 *
 	 * @param type Type of Hessian
 	 * @param <I> Input image type.
 	 * @param <D> Derivative type.
 	 * @return Hessian based blob intensity
+	 * @see HessianBlobIntensity
 	 */
 	public static <I extends ImageGray<I>, D extends ImageGray<D>>
-	GeneralFeatureIntensity<I,D> hessian(HessianBlobIntensity.Type type, Class<D> derivType) {
+	GeneralFeatureIntensity<I, D> hessian( HessianBlobIntensity.Type type, Class<D> derivType ) {
 		return new WrapperHessianDerivBlobIntensity<>(type, derivType);
 	}
 
 	/**
 	 * Computes the Hessian determinant directly from the input image pixels. Does not use passed in derivatives
 	 *
-	 * @see HessianThreeDeterminant
-
 	 * @param <I> Input image type.
 	 * @param <D> Derivative type.
 	 * @return Hessian based blob intensity
+	 * @see HessianThreeDeterminant
 	 */
 	public static <I extends ImageGray<I>, D extends ImageGray<D>>
-	GeneralFeatureIntensity<I,D> hessianDet( Class<I> imageType ) {
+	GeneralFeatureIntensity<I, D> hessianDet( Class<I> imageType ) {
 		return new WrapperHessianThreeImageDetIntensity<>(imageType);
 	}
 
@@ -150,7 +146,7 @@ public class FactoryIntensityPoint {
 	 * blob.
 	 */
 	public static <I extends ImageGray<I>>
-	GeneralFeatureIntensity<I,?> laplacian(Class<I> imageType) {
+	GeneralFeatureIntensity<I, ?> laplacian( Class<I> imageType ) {
 		return new WrapperLaplacianBlobIntensity<>(imageType);
 	}
 }

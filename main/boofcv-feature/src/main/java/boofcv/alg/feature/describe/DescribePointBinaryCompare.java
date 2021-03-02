@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -47,16 +47,16 @@ public abstract class DescribePointBinaryCompare<T extends ImageGray<T>> {
 
 	// precomputed offsets of sample points inside the image.
 	// splitting it into two arrays avoids an extract array lookup, boosting performance by about 30%
-	private  int offsets[] = new int[0]; // just a temporary place holder
-	protected int offsetsA[] = new int[0];
-	protected int offsetsB[] = new int[0];
+	protected int[] offsets; // just a temporary place holder
+	protected int[] offsetsA;
+	protected int[] offsetsB;
 
-	protected DescribePointBinaryCompare(BinaryCompareDefinition_I32 definition) {
+	protected DescribePointBinaryCompare( BinaryCompareDefinition_I32 definition ) {
 		this.definition = definition;
 
-		offsets = new int[ definition.samplePoints.length ];
-		offsetsA = new int[ definition.compare.length ];
-		offsetsB = new int[ definition.compare.length ];
+		offsets = new int[definition.samplePoints.length];
+		offsetsA = new int[definition.compare.length];
+		offsetsB = new int[definition.compare.length];
 	}
 
 	/**
@@ -64,17 +64,17 @@ public abstract class DescribePointBinaryCompare<T extends ImageGray<T>> {
 	 *
 	 * @param image Image being examined.
 	 */
-	public void setImage(T image) {
+	public void setImage( T image ) {
 		this.image = image;
 
 		// precompute offsets for faster computing later on
-		for( int i = 0; i < definition.samplePoints.length ; i++ ) {
+		for (int i = 0; i < definition.samplePoints.length; i++) {
 			Point2D_I32 a = definition.samplePoints[i];
 
 			offsets[i] = image.stride*a.y + a.x;
 		}
 
-		for( int i = 0; i < definition.compare.length ; i++ ) {
+		for (int i = 0; i < definition.compare.length; i++) {
 			Point2D_I32 p = definition.compare[i];
 			offsetsA[i] = offsets[p.x];
 			offsetsB[i] = offsets[p.y];
@@ -89,23 +89,23 @@ public abstract class DescribePointBinaryCompare<T extends ImageGray<T>> {
 	 * @param c_y Center of region being described.
 	 * @param feature Where the descriptor is written to.
 	 */
-	public void process( int c_x , int c_y , TupleDesc_B feature ) {
-		if( BoofMiscOps.isInside(image,c_x, c_y, definition.radius) ) {
-			processInside(c_x,c_y,feature);
+	public void process( int c_x, int c_y, TupleDesc_B feature ) {
+		if (BoofMiscOps.isInside(image, c_x, c_y, definition.radius)) {
+			processInside(c_x, c_y, feature);
 		} else {
-			processBorder(c_x,c_y,feature);
+			processBorder(c_x, c_y, feature);
 		}
 	}
 
 	/**
 	 * Called if the descriptor region is contained entirely inside the image
 	 */
-	public abstract void processInside( int c_x , int c_y , TupleDesc_B feature );
+	public abstract void processInside( int c_x, int c_y, TupleDesc_B feature );
 
 	/**
 	 * Called if the descriptor region goes outside the image border
 	 */
-	public abstract void processBorder( int c_x , int c_y , TupleDesc_B feature );
+	public abstract void processBorder( int c_x, int c_y, TupleDesc_B feature );
 
 	public BinaryCompareDefinition_I32 getDefinition() {
 		return definition;

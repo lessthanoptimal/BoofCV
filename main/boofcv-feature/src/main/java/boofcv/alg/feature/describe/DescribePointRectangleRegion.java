@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -25,8 +25,7 @@ import boofcv.struct.image.ImageGray;
  *
  * @author Peter Abeles
  */
-public abstract class DescribePointRectangleRegion<T extends ImageGray<T>>
-{
+public abstract class DescribePointRectangleRegion<T extends ImageGray<T>> {
 	// image that descriptors are being extracted from
 	protected T image;
 
@@ -38,24 +37,24 @@ public abstract class DescribePointRectangleRegion<T extends ImageGray<T>>
 	protected int radiusHeight;
 
 	// offset in terms of pixel index from the center pixel
-	protected int offset[];
+	protected int[] offset;
 
-	protected DescribePointRectangleRegion(int regionWidth, int regionHeight) {
+	protected DescribePointRectangleRegion( int regionWidth, int regionHeight ) {
 		this.regionWidth = regionWidth;
 		this.regionHeight = regionHeight;
 
 		this.radiusWidth = regionWidth/2;
 		this.radiusHeight = regionHeight/2;
 
-		offset = new int[ regionHeight*regionWidth ];
+		offset = new int[regionHeight*regionWidth];
 	}
 
 	public void setImage( T image ) {
 		this.image = image;
 
-		for( int i = 0; i < regionHeight; i++ ) {
-			for( int j = 0; j < regionWidth; j++ ) {
-				offset[i*regionWidth+j] = (i-radiusHeight)*image.stride + j-radiusWidth;
+		for (int i = 0; i < regionHeight; i++) {
+			for (int j = 0; j < regionWidth; j++) {
+				offset[i*regionWidth + j] = (i - radiusHeight)*image.stride + j - radiusWidth;
 			}
 		}
 	}

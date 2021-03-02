@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -54,7 +54,7 @@ public class ConfigAssociateNearestNeighbor implements Configuration {
 
 	@Override
 	public void checkValidity() {
-		if( scoreRatioThreshold <= 0 )
+		if (scoreRatioThreshold <= 0)
 			throw new IllegalArgumentException("Ratio must be more than zero");
 	}
 

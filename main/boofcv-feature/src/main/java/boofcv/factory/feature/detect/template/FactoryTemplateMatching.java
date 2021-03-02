@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -37,15 +37,15 @@ public class FactoryTemplateMatching {
 	 * Creates {@link TemplateMatchingIntensity} of the specified type.  Likely
 	 * matches can be extracted using {@link boofcv.abst.feature.detect.extract.NonMaxSuppression}.
 	 *
-	 * @param type      Type of error function
+	 * @param type Type of error function
 	 * @param imageType Image type being processed
 	 * @return {@link TemplateMatchingIntensity} of the specified type.
 	 */
 	public static <T extends ImageGray<T>>
-	TemplateMatchingIntensity<T> createIntensity(TemplateScoreType type, Class<T> imageType) {
-		if( type == TemplateScoreType.CORRELATION) {
+	TemplateMatchingIntensity<T> createIntensity( TemplateScoreType type, Class<T> imageType ) {
+		if (type == TemplateScoreType.CORRELATION) {
 			if (imageType == GrayF32.class) {
-				return (TemplateMatchingIntensity<T>) new TemplateCorrelationFFT();
+				return (TemplateMatchingIntensity<T>)new TemplateCorrelationFFT();
 			} else {
 				throw new IllegalArgumentException("Image type not supported. " + imageType.getSimpleName());
 			}
@@ -88,7 +88,7 @@ public class FactoryTemplateMatching {
 				throw new IllegalArgumentException("Unknown");
 		}
 
-		if(BoofConcurrency.USE_CONCURRENT) {
+		if (BoofConcurrency.USE_CONCURRENT) {
 			return new TemplateIntensityImage_MT<>(method);
 		} else {
 			return new TemplateIntensityImage<>(method);
@@ -98,12 +98,12 @@ public class FactoryTemplateMatching {
 	/**
 	 * Creates an instance of {@link TemplateMatching} for the specified score type.
 	 *
-	 * @param type      Type of error function
+	 * @param type Type of error function
 	 * @param imageType Image type being processed
 	 * @return {@link TemplateMatching} of the specified type.
 	 */
 	public static <T extends ImageGray<T>>
-	TemplateMatching<T> createMatcher(TemplateScoreType type, Class<T> imageType) {
+	TemplateMatching<T> createMatcher( TemplateScoreType type, Class<T> imageType ) {
 		TemplateMatchingIntensity<T> intensity = createIntensity(type, imageType);
 
 		return new TemplateMatching<>(intensity);

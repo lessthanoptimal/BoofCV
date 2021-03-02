@@ -320,8 +320,8 @@ public class DetectPolygonFromContour<T extends ImageGray<T>> implements Verbose
 				// filter out contours which are noise
 				if (contourEdgeIntensity != null) {
 					contourEdgeIntensity.process(contourTmp.toList(), true);
-					edgeInside = contourEdgeIntensity.getInsideAverage();
-					edgeOutside = contourEdgeIntensity.getOutsideAverage();
+					edgeInside = contourEdgeIntensity.getEdgeInsideAverage();
+					edgeOutside = contourEdgeIntensity.getEdgeOutsideAverage();
 
 					// take the ABS because CCW/CW isn't known yet
 					if (Math.abs(edgeOutside - edgeInside) < contourEdgeThreshold) {

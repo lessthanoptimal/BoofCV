@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -36,12 +36,13 @@ public class FactorySearchLocalPeak {
 
 	/**
 	 * Mean-shift based search with a uniform kernel
+	 *
 	 * @param config Configuration for the search
 	 * @param imageType Type of input image
 	 * @return mean-shift search
 	 */
 	public static <T extends ImageGray<T>>
-	SearchLocalPeak<T> meanShiftUniform( ConfigMeanShiftSearch config , Class<T> imageType ) {
+	SearchLocalPeak<T> meanShiftUniform( ConfigMeanShiftSearch config, Class<T> imageType ) {
 		WeightPixel_F32 weights = new WeightPixelUniform_F32();
 		MeanShiftPeak<T> alg = new MeanShiftPeak<>(config.maxIterations, (float)config.convergenceTol,
 				weights, config.odd, imageType, BorderType.EXTENDED);
@@ -50,12 +51,13 @@ public class FactorySearchLocalPeak {
 
 	/**
 	 * Mean-shift based search with a Gaussian kernel
+	 *
 	 * @param config Configuration for the search
 	 * @param imageType Type of input image
 	 * @return mean-shift search
 	 */
 	public static <T extends ImageGray<T>>
-	SearchLocalPeak<T> meanShiftGaussian( ConfigMeanShiftSearch config , Class<T> imageType) {
+	SearchLocalPeak<T> meanShiftGaussian( ConfigMeanShiftSearch config, Class<T> imageType ) {
 		WeightPixel_F32 weights = new WeightPixelGaussian_F32();
 		MeanShiftPeak<T> alg = new MeanShiftPeak<>(config.maxIterations, (float)config.convergenceTol,
 				weights, config.odd, imageType, BorderType.EXTENDED);

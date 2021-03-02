@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -50,7 +50,7 @@ import java.util.List;
  *
  * @author Peter Abeles
  */
-public class ExampleAssociatePoints<T extends ImageGray<T>, TD extends TupleDesc> {
+public class ExampleAssociatePoints<T extends ImageGray<T>, TD extends TupleDesc<TD>> {
 
 	// algorithm used to detect and describe interest points
 	DetectDescribePoint<T, TD> detDesc;

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -61,32 +61,32 @@ public class MergeSmallRegions<T extends ImageBase<T>> extends RegionMergeTree {
 	 * @param minimumSize Minimum number of pixels a region must have for it to not be pruned.
 	 * @param computeColor Computes the color of each region
 	 */
-	public MergeSmallRegions(int minimumSize, ConnectRule rule , ComputeRegionMeanColor<T> computeColor) {
+	public MergeSmallRegions( int minimumSize, ConnectRule rule, ComputeRegionMeanColor<T> computeColor ) {
 		this.minimumSize = minimumSize;
 		this.computeColor = computeColor;
 
-		if( rule == ConnectRule.FOUR ) {
+		if (rule == ConnectRule.FOUR) {
 			connect = new Point2D_I32[4];
-			connect[0] = new Point2D_I32(1,0);
-			connect[1] = new Point2D_I32(0,1);
-			connect[2] = new Point2D_I32(-1,0);
-			connect[3] = new Point2D_I32(0,-1);
-		} else if( rule == ConnectRule.EIGHT ) {
+			connect[0] = new Point2D_I32(1, 0);
+			connect[1] = new Point2D_I32(0, 1);
+			connect[2] = new Point2D_I32(-1, 0);
+			connect[3] = new Point2D_I32(0, -1);
+		} else if (rule == ConnectRule.EIGHT) {
 			connect = new Point2D_I32[8];
-			connect[0] = new Point2D_I32(1,0);
-			connect[1] = new Point2D_I32(0,1);
-			connect[2] = new Point2D_I32(-1,0);
-			connect[3] = new Point2D_I32(0,-1);
-			connect[4] = new Point2D_I32( 1, 1);
+			connect[0] = new Point2D_I32(1, 0);
+			connect[1] = new Point2D_I32(0, 1);
+			connect[2] = new Point2D_I32(-1, 0);
+			connect[3] = new Point2D_I32(0, -1);
+			connect[4] = new Point2D_I32(1, 1);
 			connect[5] = new Point2D_I32(-1, 1);
-			connect[6] = new Point2D_I32(-1,-1);
-			connect[7] = new Point2D_I32( 1,-1);
+			connect[6] = new Point2D_I32(-1, -1);
+			connect[7] = new Point2D_I32(1, -1);
 		} else {
-			throw new IllegalArgumentException("Unknown connect rule "+rule);
+			throw new IllegalArgumentException("Unknown connect rule " + rule);
 		}
 	}
 
-	public void setMinimumSize(int minimumSize) {
+	public void setMinimumSize( int minimumSize ) {
 		this.minimumSize = minimumSize;
 	}
 
@@ -99,13 +99,13 @@ public class MergeSmallRegions<T extends ImageBase<T>> extends RegionMergeTree {
 	 * @param regionColor (Output) Storage for colors of each region. Will contains the color of each region on output.
 	 */
 	public void process( T image,
-						 GrayS32 pixelToRegion ,
+						 GrayS32 pixelToRegion,
 						 DogArray_I32 regionMemberCount,
 						 DogArray<float[]> regionColor ) {
 		stopRequested = false;
 
 		// iterate until no more regions need to be merged together
-		while( !stopRequested ) {
+		while (!stopRequested) {
 
 			// Update the color of each region
 			regionColor.resize(regionMemberCount.size);
@@ -114,19 +114,19 @@ public class MergeSmallRegions<T extends ImageBase<T>> extends RegionMergeTree {
 			initializeMerge(regionMemberCount.size);
 
 			// Create a list of regions which are to be pruned
-			if( !setupPruneList(regionMemberCount) )
+			if (!setupPruneList(regionMemberCount))
 				break;
 
 			// Scan the image and create a list of regions which the pruned regions connect to
 			findAdjacentRegions(pixelToRegion);
 
 			// Select the closest match to merge into
-			for( int i = 0; i < pruneGraph.size; i++ ) {
-				selectMerge(i,regionColor);
+			for (int i = 0; i < pruneGraph.size; i++) {
+				selectMerge(i, regionColor);
 			}
 
 			// Do the usual merge stuff
-			performMerge(pixelToRegion,regionMemberCount);
+			performMerge(pixelToRegion, regionMemberCount);
 		}
 	}
 
@@ -136,12 +136,12 @@ public class MergeSmallRegions<T extends ImageBase<T>> extends RegionMergeTree {
 	 *
 	 * @return true If elements need to be pruned and false if not.
 	 */
-	protected boolean setupPruneList(DogArray_I32 regionMemberCount) {
+	protected boolean setupPruneList( DogArray_I32 regionMemberCount ) {
 		segmentPruneFlag.resize(regionMemberCount.size);
 		pruneGraph.reset();
 		segmentToPruneID.resize(regionMemberCount.size);
-		for( int i = 0; i < regionMemberCount.size; i++ ) {
-			if( regionMemberCount.get(i) < minimumSize ) {
+		for (int i = 0; i < regionMemberCount.size; i++) {
+			if (regionMemberCount.get(i) < minimumSize) {
 				segmentToPruneID.set(i, pruneGraph.size());
 				Node n = pruneGraph.grow();
 				n.init(i);
@@ -159,51 +159,51 @@ public class MergeSmallRegions<T extends ImageBase<T>> extends RegionMergeTree {
 	 * the pixels is in a region that is to be pruned mark them as neighbors. The image is traversed such that
 	 * the number of comparisons is minimized.
 	 */
-	protected void findAdjacentRegions(GrayS32 pixelToRegion) {
+	protected void findAdjacentRegions( GrayS32 pixelToRegion ) {
 		// -------- Do the inner pixels first
-		if( connect.length == 4 )
+		if (connect.length == 4)
 			adjacentInner4(pixelToRegion);
-		else if( connect.length == 8 ) {
+		else if (connect.length == 8) {
 			adjacentInner8(pixelToRegion);
 		}
 
 		adjacentBorder(pixelToRegion);
 	}
 
-	protected void adjacentInner4(GrayS32 pixelToRegion) {
-		for( int y = 0; y < pixelToRegion.height-1; y++ ) {
+	protected void adjacentInner4( GrayS32 pixelToRegion ) {
+		for (int y = 0; y < pixelToRegion.height - 1; y++) {
 			int indexImg = pixelToRegion.startIndex + pixelToRegion.stride*y;
-			for( int x = 0; x < pixelToRegion.width-1; x++ , indexImg++ ) {
+			for (int x = 0; x < pixelToRegion.width - 1; x++, indexImg++) {
 
 				int regionA = pixelToRegion.data[indexImg];
 				// x + 1 , y
-				int regionB = pixelToRegion.data[indexImg+1];
+				int regionB = pixelToRegion.data[indexImg + 1];
 				// x , y + 1
-				int regionC = pixelToRegion.data[indexImg+pixelToRegion.stride];
+				int regionC = pixelToRegion.data[indexImg + pixelToRegion.stride];
 
 				boolean pruneA = segmentPruneFlag.data[regionA];
 
-				if( regionA != regionB ) {
+				if (regionA != regionB) {
 					boolean pruneB = segmentPruneFlag.data[regionB];
 
-					if( pruneA ) {
+					if (pruneA) {
 						Node n = pruneGraph.get(segmentToPruneID.get(regionA));
 						n.connect(regionB);
 					}
-					if( pruneB ) {
+					if (pruneB) {
 						Node n = pruneGraph.get(segmentToPruneID.get(regionB));
 						n.connect(regionA);
 					}
 				}
 
-				if( regionA != regionC ) {
+				if (regionA != regionC) {
 					boolean pruneC = segmentPruneFlag.data[regionC];
 
-					if( pruneA ) {
+					if (pruneA) {
 						Node n = pruneGraph.get(segmentToPruneID.get(regionA));
 						n.connect(regionC);
 					}
-					if( pruneC ) {
+					if (pruneC) {
 						Node n = pruneGraph.get(segmentToPruneID.get(regionC));
 						n.connect(regionA);
 					}
@@ -212,71 +212,71 @@ public class MergeSmallRegions<T extends ImageBase<T>> extends RegionMergeTree {
 		}
 	}
 
-	protected void adjacentInner8(GrayS32 pixelToRegion) {
-		for( int y = 0; y < pixelToRegion.height-1; y++ ) {
-			int indexImg = pixelToRegion.startIndex + pixelToRegion.stride*y+1;
-			for( int x = 1; x < pixelToRegion.width-1; x++ , indexImg++ ) {
+	protected void adjacentInner8( GrayS32 pixelToRegion ) {
+		for (int y = 0; y < pixelToRegion.height - 1; y++) {
+			int indexImg = pixelToRegion.startIndex + pixelToRegion.stride*y + 1;
+			for (int x = 1; x < pixelToRegion.width - 1; x++, indexImg++) {
 
 				int regionA = pixelToRegion.data[indexImg];
 				// x + 1 , y
-				int regionB = pixelToRegion.data[indexImg+1];
+				int regionB = pixelToRegion.data[indexImg + 1];
 				// x , y + 1
-				int regionC = pixelToRegion.data[indexImg+pixelToRegion.stride];
+				int regionC = pixelToRegion.data[indexImg + pixelToRegion.stride];
 
 				// x + 1 , y + 1
-				int regionD = pixelToRegion.data[indexImg+1+pixelToRegion.stride];
+				int regionD = pixelToRegion.data[indexImg + 1 + pixelToRegion.stride];
 				// x - 1 , y + 1
-				int regionE = pixelToRegion.data[indexImg-1+pixelToRegion.stride];
+				int regionE = pixelToRegion.data[indexImg - 1 + pixelToRegion.stride];
 
 				boolean pruneA = segmentPruneFlag.data[regionA];
 
-				if( regionA != regionB ) {
+				if (regionA != regionB) {
 					boolean pruneB = segmentPruneFlag.data[regionB];
 
-					if( pruneA ) {
+					if (pruneA) {
 						Node n = pruneGraph.get(segmentToPruneID.get(regionA));
 						n.connect(regionB);
 					}
-					if( pruneB ) {
+					if (pruneB) {
 						Node n = pruneGraph.get(segmentToPruneID.get(regionB));
 						n.connect(regionA);
 					}
 				}
 
-				if( regionA != regionC ) {
+				if (regionA != regionC) {
 					boolean pruneC = segmentPruneFlag.data[regionC];
 
-					if( pruneA ) {
+					if (pruneA) {
 						Node n = pruneGraph.get(segmentToPruneID.get(regionA));
 						n.connect(regionC);
 					}
-					if( pruneC ) {
+					if (pruneC) {
 						Node n = pruneGraph.get(segmentToPruneID.get(regionC));
 						n.connect(regionA);
 					}
 				}
 
-				if( regionA != regionD ) {
+				if (regionA != regionD) {
 					boolean pruneD = segmentPruneFlag.data[regionD];
 
-					if( pruneA ) {
+					if (pruneA) {
 						Node n = pruneGraph.get(segmentToPruneID.get(regionA));
 						n.connect(regionD);
 					}
-					if( pruneD ) {
+					if (pruneD) {
 						Node n = pruneGraph.get(segmentToPruneID.get(regionD));
 						n.connect(regionA);
 					}
 				}
 
-				if( regionA != regionE ) {
+				if (regionA != regionE) {
 					boolean pruneE = segmentPruneFlag.data[regionE];
 
-					if( pruneA ) {
+					if (pruneA) {
 						Node n = pruneGraph.get(segmentToPruneID.get(regionA));
 						n.connect(regionE);
 					}
-					if( pruneE ) {
+					if (pruneE) {
 						Node n = pruneGraph.get(segmentToPruneID.get(regionE));
 						n.connect(regionA);
 					}
@@ -285,49 +285,49 @@ public class MergeSmallRegions<T extends ImageBase<T>> extends RegionMergeTree {
 		}
 	}
 
-	protected void adjacentBorder(GrayS32 pixelToRegion) {
+	protected void adjacentBorder( GrayS32 pixelToRegion ) {
 
-		for( int y = 0; y < pixelToRegion.height-1; y++ ) {
-			int x = pixelToRegion.width-1;
+		for (int y = 0; y < pixelToRegion.height - 1; y++) {
+			int x = pixelToRegion.width - 1;
 			int indexImg = pixelToRegion.startIndex + pixelToRegion.stride*y + x;
 
-			checkAdjacentAround(x,y,indexImg,pixelToRegion);
+			checkAdjacentAround(x, y, indexImg, pixelToRegion);
 
-			if( connect.length == 8 ) {
+			if (connect.length == 8) {
 				x = 0;
 				indexImg = pixelToRegion.startIndex + pixelToRegion.stride*y + x;
 
-				checkAdjacentAround(x,y,indexImg,pixelToRegion);
+				checkAdjacentAround(x, y, indexImg, pixelToRegion);
 			}
 		}
 
-		for( int x = 0; x < pixelToRegion.width; x++ ) {
-			int y = pixelToRegion.height-1;
+		for (int x = 0; x < pixelToRegion.width; x++) {
+			int y = pixelToRegion.height - 1;
 			int indexImg = pixelToRegion.startIndex + pixelToRegion.stride*y + x;
-			checkAdjacentAround(x,y,indexImg,pixelToRegion);
+			checkAdjacentAround(x, y, indexImg, pixelToRegion);
 		}
 	}
 
-	private void checkAdjacentAround(int x, int y, int indexImg ,GrayS32 pixelToRegion ) {
+	private void checkAdjacentAround( int x, int y, int indexImg, GrayS32 pixelToRegion ) {
 		int regionA = pixelToRegion.data[indexImg];
 
-		for( int i = 0; i < connect.length; i++ ) {
+		for (int i = 0; i < connect.length; i++) {
 			Point2D_I32 p = connect[i];
 
-			if( !pixelToRegion.isInBounds(x+p.x,y+p.y))
+			if (!pixelToRegion.isInBounds(x + p.x, y + p.y))
 				continue;
 
-			int regionB = pixelToRegion.data[indexImg+p.y*pixelToRegion.stride + p.x];
+			int regionB = pixelToRegion.data[indexImg + p.y*pixelToRegion.stride + p.x];
 
-			if( regionA != regionB ) {
+			if (regionA != regionB) {
 				boolean pruneA = segmentPruneFlag.data[regionA];
 				boolean pruneB = segmentPruneFlag.data[regionB];
 
-				if( pruneA ) {
+				if (pruneA) {
 					Node n = pruneGraph.get(segmentToPruneID.get(regionA));
 					n.connect(regionB);
 				}
-				if( pruneB ) {
+				if (pruneB) {
 					Node n = pruneGraph.get(segmentToPruneID.get(regionB));
 					n.connect(regionA);
 				}
@@ -341,7 +341,7 @@ public class MergeSmallRegions<T extends ImageBase<T>> extends RegionMergeTree {
 	 * @param pruneId The prune Id of the segment which is to be merged into another segment
 	 * @param regionColor List of region colors
 	 */
-	protected void selectMerge( int pruneId , FastAccess<float[]> regionColor ) {
+	protected void selectMerge( int pruneId, FastAccess<float[]> regionColor ) {
 		// Grab information on the region which is being pruned
 		Node n = pruneGraph.get(pruneId);
 		float[] targetColor = regionColor.get(n.segment);
@@ -351,18 +351,18 @@ public class MergeSmallRegions<T extends ImageBase<T>> extends RegionMergeTree {
 		float bestDistance = Float.MAX_VALUE;
 
 		// Examine all the segments it is connected to to see which one it is most similar too
-		for( int i = 0; i < n.edges.size; i++ ) {
+		for (int i = 0; i < n.edges.size; i++) {
 			int segment = n.edges.get(i);
 			float[] neighborColor = regionColor.get(segment);
 			float d = SegmentMeanShiftSearch.distanceSq(targetColor, neighborColor);
 
-			if( d < bestDistance ) {
+			if (d < bestDistance) {
 				bestDistance = d;
 				bestId = segment;
 			}
 		}
 
-		if( bestId == -1 )
+		if (bestId == -1)
 			throw new RuntimeException("No neighbors?  Something went really wrong.");
 
 		markMerge(n.segment, bestId);
@@ -371,8 +371,7 @@ public class MergeSmallRegions<T extends ImageBase<T>> extends RegionMergeTree {
 	/**
 	 * Node in a graph.  Specifies which segments are adjacent to a segment which is to be pruned.
 	 */
-	public static class Node
-	{
+	public static class Node {
 		public int segment;
 		// List of segments this segment is connected to
 		public DogArray_I32 edges = new DogArray_I32();
@@ -382,16 +381,16 @@ public class MergeSmallRegions<T extends ImageBase<T>> extends RegionMergeTree {
 			edges.reset();
 		}
 
-		public void connect(int segment) {
-			if( isConnected(segment))
+		public void connect( int segment ) {
+			if (isConnected(segment))
 				return;
 
 			this.edges.add(segment);
 		}
 
 		public boolean isConnected( int segment ) {
-			for( int i = 0; i < edges.size; i++ ) {
-				if( edges.data[i] == segment)
+			for (int i = 0; i < edges.size; i++) {
+				if (edges.data[i] == segment)
 					return true;
 			}
 			return false;

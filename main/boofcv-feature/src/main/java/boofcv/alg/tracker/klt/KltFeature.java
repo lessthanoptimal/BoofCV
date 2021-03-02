@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -56,16 +56,16 @@ public class KltFeature {
 	 */
 	public float Gxx, Gxy, Gyy;
 
-	public KltFeature(int radius) {
+	public KltFeature( int radius ) {
 		this.radius = radius;
-		int sideLength = radius * 2 + 1;
+		int sideLength = radius*2 + 1;
 
-		desc = new GrayF32(sideLength,sideLength);
-		derivX = new GrayF32(sideLength,sideLength);
-		derivY = new GrayF32(sideLength,sideLength);
+		desc = new GrayF32(sideLength, sideLength);
+		derivX = new GrayF32(sideLength, sideLength);
+		derivY = new GrayF32(sideLength, sideLength);
 	}
 
-	public void setPosition(float x, float y) {
+	public void setPosition( float x, float y ) {
 		this.x = x;
 		this.y = y;
 	}

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -33,7 +33,6 @@ import java.util.Arrays;
  */
 public class ImageSegmentationOps {
 
-
 	/**
 	 * Counts the number of instances of 'which' inside the labeled image.
 	 *
@@ -41,12 +40,12 @@ public class ImageSegmentationOps {
 	 * @param which The label being searched for
 	 * @return Number of instances of 'which' in 'labeled'
 	 */
-	public static int countRegionPixels(GrayS32 labeled , int which ) {
+	public static int countRegionPixels( GrayS32 labeled, int which ) {
 		int total = 0;
-		for( int y = 0; y < labeled.height; y++ ) {
+		for (int y = 0; y < labeled.height; y++) {
 			int index = labeled.startIndex + y*labeled.stride;
-			for( int x = 0; x < labeled.width; x++ ) {
-				if( labeled.data[index++] == which ) {
+			for (int x = 0; x < labeled.width; x++) {
+				if (labeled.data[index++] == which) {
 					total++;
 				}
 			}
@@ -61,13 +60,13 @@ public class ImageSegmentationOps {
 	 * @param totalRegions Total number of regions
 	 * @param counts Storage for pixel counts
 	 */
-	public static void countRegionPixels(GrayS32 labeled , int totalRegions , int counts[] ) {
+	public static void countRegionPixels( GrayS32 labeled, int totalRegions, int counts[] ) {
 
-		Arrays.fill(counts,0,totalRegions,0);
+		Arrays.fill(counts, 0, totalRegions, 0);
 
-		for( int y = 0; y < labeled.height; y++ ) {
+		for (int y = 0; y < labeled.height; y++) {
 			int index = labeled.startIndex + y*labeled.stride;
-			for( int x = 0; x < labeled.width; x++ ) {
+			for (int x = 0; x < labeled.width; x++) {
 				counts[labeled.data[index++]]++;
 			}
 		}
@@ -82,25 +81,25 @@ public class ImageSegmentationOps {
 	 * @param segmentId List of segment ID's.  See comment above about what ID's are acceptable.
 	 * @param output The new image after it has been compacted
 	 */
-	public static void regionPixelId_to_Compact(GrayS32 graph, DogArray_I32 segmentId, GrayS32 output) {
+	public static void regionPixelId_to_Compact( GrayS32 graph, DogArray_I32 segmentId, GrayS32 output ) {
 
-		InputSanityCheck.checkSameShape(graph,output);
+		InputSanityCheck.checkSameShape(graph, output);
 
 		// Change the label of root nodes to be the new compacted labels
-		for( int i = 0; i < segmentId.size; i++ ) {
+		for (int i = 0; i < segmentId.size; i++) {
 			graph.data[segmentId.data[i]] = i;
 		}
 
 		// In the second pass assign all the children to the new compacted labels
-		for( int y = 0; y < output.height; y++ ) {
+		for (int y = 0; y < output.height; y++) {
 			int indexGraph = graph.startIndex + y*graph.stride;
 			int indexOut = output.startIndex + y*output.stride;
-			for( int x = 0; x < output.width; x++ , indexGraph++,indexOut++) {
+			for (int x = 0; x < output.width; x++, indexGraph++, indexOut++) {
 				output.data[indexOut] = graph.data[graph.data[indexGraph]];
 			}
 		}
 		// need to do some clean up since the above approach doesn't work for the roots
-		for( int i = 0; i < segmentId.size; i++ ) {
+		for (int i = 0; i < segmentId.size; i++) {
 			int indexGraph = segmentId.data[i] - graph.startIndex;
 
 			int x = indexGraph%graph.stride;
@@ -117,56 +116,56 @@ public class ImageSegmentationOps {
 	 * @param labeled Input segmented image.
 	 * @param output Output binary image.  1 for border pixels.
 	 */
-	public static void markRegionBorders(GrayS32 labeled , GrayU8 output ) {
+	public static void markRegionBorders( GrayS32 labeled, GrayU8 output ) {
 
-		InputSanityCheck.checkSameShape(labeled,output);
+		InputSanityCheck.checkSameShape(labeled, output);
 
-		ImageMiscOps.fill(output,0);
+		ImageMiscOps.fill(output, 0);
 
-		for( int y = 0; y < output.height-1; y++ ) {
+		for (int y = 0; y < output.height - 1; y++) {
 			int indexLabeled = labeled.startIndex + y*labeled.stride;
 			int indexOutput = output.startIndex + y*output.stride;
 
-			for( int x = 0; x < output.width-1; x++ , indexLabeled++ , indexOutput++ ) {
+			for (int x = 0; x < output.width - 1; x++, indexLabeled++, indexOutput++) {
 				int region0 = labeled.data[indexLabeled];
-				int region1 = labeled.data[indexLabeled+1];
-				int region2 = labeled.data[indexLabeled+labeled.stride];
+				int region1 = labeled.data[indexLabeled + 1];
+				int region2 = labeled.data[indexLabeled + labeled.stride];
 
-				if( region0 != region1 ) {
+				if (region0 != region1) {
 					output.data[indexOutput] = 1;
-					output.data[indexOutput+1] = 1;
+					output.data[indexOutput + 1] = 1;
 				}
 
-				if( region0 != region2 ) {
+				if (region0 != region2) {
 					output.data[indexOutput] = 1;
-					output.data[indexOutput+output.stride] = 1;
+					output.data[indexOutput + output.stride] = 1;
 				}
 			}
 		}
 
-		for( int y = 0; y < output.height-1; y++ ) {
-			int indexLabeled = labeled.startIndex + y*labeled.stride + output.width-1;
-			int indexOutput = output.startIndex + y*output.stride + output.width-1;
+		for (int y = 0; y < output.height - 1; y++) {
+			int indexLabeled = labeled.startIndex + y*labeled.stride + output.width - 1;
+			int indexOutput = output.startIndex + y*output.stride + output.width - 1;
 
 			int region0 = labeled.data[indexLabeled];
-			int region2 = labeled.data[indexLabeled+labeled.stride];
+			int region2 = labeled.data[indexLabeled + labeled.stride];
 
-			if( region0 != region2 ) {
+			if (region0 != region2) {
 				output.data[indexOutput] = 1;
-				output.data[indexOutput+output.stride] = 1;
+				output.data[indexOutput + output.stride] = 1;
 			}
 		}
 
-		int y = output.height-1;
+		int y = output.height - 1;
 		int indexLabeled = labeled.startIndex + y*labeled.stride;
 		int indexOutput = output.startIndex + y*output.stride;
-		for( int x = 0; x < output.width-1; x++ , indexLabeled++ , indexOutput++ ) {
+		for (int x = 0; x < output.width - 1; x++, indexLabeled++, indexOutput++) {
 			int region0 = labeled.data[indexLabeled];
-			int region1 = labeled.data[indexLabeled+1];
+			int region1 = labeled.data[indexLabeled + 1];
 
-			if( region0 != region1 ) {
+			if (region0 != region1) {
 				output.data[indexOutput] = 1;
-				output.data[indexOutput+1] = 1;
+				output.data[indexOutput + 1] = 1;
 			}
 		}
 	}

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -17,7 +17,6 @@
  */
 
 package boofcv.factory.feature.detect.line;
-
 
 import boofcv.abst.feature.detect.extract.ConfigExtract;
 import boofcv.abst.feature.detect.extract.NonMaxSuppression;
@@ -48,22 +47,21 @@ public class FactoryDetectLineAlgs {
 	/**
 	 * Detects line segments inside an image using the {@link DetectLineSegmentsGridRansac} algorithm.
 	 *
-	 * @see DetectLineSegmentsGridRansac
-	 *
 	 * @param config Configuration for line detector
 	 * @param imageType Type of single band input image.
 	 * @param derivType Image derivative type.
 	 * @return Line segment detector
+	 * @see DetectLineSegmentsGridRansac
 	 */
 	public static <I extends ImageGray<I>, D extends ImageGray<D>>
-	DetectLineSegmentsGridRansac<I,D> lineRansac( @Nullable ConfigLineRansac config,
-												 Class<I> imageType ,
-												 Class<D> derivType ) {
+	DetectLineSegmentsGridRansac<I, D> lineRansac( @Nullable ConfigLineRansac config,
+												   Class<I> imageType,
+												   Class<D> derivType ) {
 
-		if( config == null )
+		if (config == null)
 			config = new ConfigLineRansac();
 
-		ImageGradient<I,D> gradient = FactoryDerivative.sobel(imageType,derivType);
+		ImageGradient<I, D> gradient = FactoryDerivative.sobel(imageType, derivType);
 
 		ModelManagerLinePolar2D_F32 manager = new ModelManagerLinePolar2D_F32();
 		GridLineModelDistance distance = new GridLineModelDistance((float)config.thresholdAngle);
@@ -73,17 +71,17 @@ public class FactoryDetectLineAlgs {
 				new Ransac<>(123123, manager, fitter, distance, 25, 1);
 
 		GridRansacLineDetector<D> alg;
-		if( derivType == GrayF32.class )  {
-			alg = (GridRansacLineDetector)new ImplGridRansacLineDetector_F32(config.regionSize,10,matcher);
-		} else if( derivType == GrayS16.class ) {
-			alg = (GridRansacLineDetector)new ImplGridRansacLineDetector_S16(config.regionSize,10,matcher);
+		if (derivType == GrayF32.class) {
+			alg = (GridRansacLineDetector)new ImplGridRansacLineDetector_F32(config.regionSize, 10, matcher);
+		} else if (derivType == GrayS16.class) {
+			alg = (GridRansacLineDetector)new ImplGridRansacLineDetector_S16(config.regionSize, 10, matcher);
 		} else {
 			throw new IllegalArgumentException("Unsupported derivative type");
 		}
 
 		ConnectLinesGrid connect = null;
-		if( config.connectLines )
-			connect = new ConnectLinesGrid(Math.PI*0.01,1,8);
+		if (config.connectLines)
+			connect = new ConnectLinesGrid(Math.PI*0.01, 1, 8);
 
 		return new DetectLineSegmentsGridRansac<>(alg, connect, gradient, config.thresholdEdge, imageType, derivType);
 	}
@@ -92,18 +90,17 @@ public class FactoryDetectLineAlgs {
 	 * Detects lines using a foot of norm parametrization and sub images to reduce degenerate
 	 * configurations, see {@link DetectLineHoughFootSubimage} for details.
 	 *
-	 * @see DetectLineHoughFootSubimage
-	 *
 	 * @param config Configuration for line detector.  If null then default will be used.
 	 * @param derivType Image derivative type.
 	 * @param <D> Image derivative type.
 	 * @return Line detector.
+	 * @see DetectLineHoughFootSubimage
 	 */
 	public static <D extends ImageGray<D>>
-	DetectLineHoughFootSubimage<D> houghFootSub(@Nullable ConfigHoughFootSubimage config ,
-												  Class<D> derivType ) {
+	DetectLineHoughFootSubimage<D> houghFootSub( @Nullable ConfigHoughFootSubimage config,
+												 Class<D> derivType ) {
 
-		if( config == null )
+		if (config == null)
 			config = new ConfigHoughFootSubimage();
 
 
@@ -113,15 +110,14 @@ public class FactoryDetectLineAlgs {
 	}
 
 	public static <D extends ImageGray<D>>
-	HoughTransformGradient<D> houghLineFoot(ConfigHoughGradient configHough , ConfigParamFoot configParam ,
-													   Class<D> derivType )
-	{
+	HoughTransformGradient<D> houghLineFoot( ConfigHoughGradient configHough, ConfigParamFoot configParam,
+											 Class<D> derivType ) {
 		HoughParametersFootOfNorm param = new HoughParametersFootOfNorm(configParam.minDistanceFromOrigin);
 		NonMaxSuppression extractor = FactoryFeatureExtractor.nonmax(
 				new ConfigExtract(configHough.localMaxRadius, configHough.minCounts, 0, true));
 
 		HoughTransformGradient<D> hough;
-		if(BoofConcurrency.USE_CONCURRENT ) {
+		if (BoofConcurrency.USE_CONCURRENT) {
 			hough = new HoughTransformGradient_MT<>(extractor, param, derivType);
 		} else {
 			hough = new HoughTransformGradient<>(extractor, param, derivType);
@@ -136,15 +132,14 @@ public class FactoryDetectLineAlgs {
 	}
 
 	public static <D extends ImageGray<D>>
-	HoughTransformGradient<D> houghLinePolar(ConfigHoughGradient configHough , ConfigParamPolar configParam ,
-											 Class<D> derivType )
-	{
-		HoughParametersPolar param = new HoughParametersPolar(configParam.resolutionRange,configParam.numBinsAngle);
+	HoughTransformGradient<D> houghLinePolar( ConfigHoughGradient configHough, ConfigParamPolar configParam,
+											  Class<D> derivType ) {
+		HoughParametersPolar param = new HoughParametersPolar(configParam.resolutionRange, configParam.numBinsAngle);
 		NonMaxSuppression extractor = FactoryFeatureExtractor.nonmax(
 				new ConfigExtract(configHough.localMaxRadius, configHough.minCounts, 0, true));
 
 		HoughTransformGradient<D> hough;
-		if(BoofConcurrency.USE_CONCURRENT ) {
+		if (BoofConcurrency.USE_CONCURRENT) {
 			hough = new HoughTransformGradient_MT<>(extractor, param, derivType);
 		} else {
 			hough = new HoughTransformGradient<>(extractor, param, derivType);
@@ -158,17 +153,16 @@ public class FactoryDetectLineAlgs {
 		return hough;
 	}
 
-	public static HoughTransformBinary houghLinePolar( ConfigHoughBinary configHough , ConfigParamPolar configParam )
-	{
-		HoughParametersPolar param = new HoughParametersPolar(configParam.resolutionRange,configParam.numBinsAngle);
+	public static HoughTransformBinary houghLinePolar( ConfigHoughBinary configHough, ConfigParamPolar configParam ) {
+		HoughParametersPolar param = new HoughParametersPolar(configParam.resolutionRange, configParam.numBinsAngle);
 		NonMaxSuppression extractor = FactoryFeatureExtractor.nonmax(
 				new ConfigExtract(configHough.localMaxRadius, 0, 0, false));
 
 		HoughTransformBinary hough;
-		if(BoofConcurrency.USE_CONCURRENT ) {
-			hough = new HoughTransformBinary_MT(extractor,param);
+		if (BoofConcurrency.USE_CONCURRENT) {
+			hough = new HoughTransformBinary_MT(extractor, param);
 		} else {
-			hough = new HoughTransformBinary(extractor,param);
+			hough = new HoughTransformBinary(extractor, param);
 		}
 
 		hough.setMaxLines(configHough.maxLines);
@@ -178,5 +172,4 @@ public class FactoryDetectLineAlgs {
 
 		return hough;
 	}
-
 }

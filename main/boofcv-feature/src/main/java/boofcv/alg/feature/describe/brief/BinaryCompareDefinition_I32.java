@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -38,19 +38,19 @@ public class BinaryCompareDefinition_I32 {
 	// radius of the region
 	public int radius;
 	// points whose intensity values are sampled
-	public Point2D_I32 samplePoints[];
+	public Point2D_I32[] samplePoints;
 	// indexes of points which are compared
-	public Point2D_I32 compare[];
+	public Point2D_I32[] compare;
 
-	public BinaryCompareDefinition_I32(int radius, int numSamples, int numPairs) {
+	public BinaryCompareDefinition_I32( int radius, int numSamples, int numPairs ) {
 		this.radius = radius;
-		samplePoints = new Point2D_I32[ numSamples ];
-		compare = new Point2D_I32[ numPairs ];
+		samplePoints = new Point2D_I32[numSamples];
+		compare = new Point2D_I32[numPairs];
 
-		for( int i = 0; i < samplePoints.length; i++ ) {
+		for (int i = 0; i < samplePoints.length; i++) {
 			samplePoints[i] = new Point2D_I32();
 		}
-		for( int i = 0; i < compare.length; i++ ) {
+		for (int i = 0; i < compare.length; i++) {
 			compare[i] = new Point2D_I32();
 		}
 	}

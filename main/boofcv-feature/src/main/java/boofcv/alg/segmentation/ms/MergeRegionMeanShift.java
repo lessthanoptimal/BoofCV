@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -28,25 +28,24 @@ import org.ddogleg.struct.DogArray_I32;
  *
  * @author Peter Abeles
  */
-public class MergeRegionMeanShift extends RegionMergeTree
-{
+public class MergeRegionMeanShift extends RegionMergeTree {
 
 	// maximum distance squared in pixels that two nodes can be apart to be merged
-	private int maxSpacialDistanceSq;
+	private final int maxSpacialDistanceSq;
 	// Maximum Euclidean distance squared two colors can be for them to be considered similar
-	private float maxColorDistanceSq;
+	private final float maxColorDistanceSq;
 
 	// Search radius in pixels when looking for regions to merge with
-	private int searchRadius;
+	private final int searchRadius;
 
 	/**
 	 * Configures MergeRegionMeanShift
 	 *
 	 * @param maxSpacialDistance The maximum spacial distance (pixels) at which two modes can be for their
-	 *                           regions to be merged together.
+	 * regions to be merged together.
 	 * @param maxColorDistance The maximum Euclidean distance two colors can be from each other for them to be merged.
 	 */
-	public MergeRegionMeanShift(int maxSpacialDistance, float maxColorDistance ) {
+	public MergeRegionMeanShift( int maxSpacialDistance, float maxColorDistance ) {
 
 		this.searchRadius = maxSpacialDistance;
 		this.maxSpacialDistanceSq = maxSpacialDistance*maxSpacialDistance;
@@ -62,15 +61,15 @@ public class MergeRegionMeanShift extends RegionMergeTree
 	 * @param regionColor (Input/output) Color of each region. Modified.
 	 * @param modeLocation (Input) Location of each region's mode. Not modified.
 	 */
-	public void process( GrayS32 pixelToRegion ,
+	public void process( GrayS32 pixelToRegion,
 						 DogArray_I32 regionMemberCount,
-						 DogArray<float[]> regionColor ,
+						 DogArray<float[]> regionColor,
 						 DogArray<Point2D_I32> modeLocation ) {
 		stopRequested = false;
 		initializeMerge(regionMemberCount.size);
 
-		markMergeRegions(regionColor,modeLocation,pixelToRegion);
-		if( stopRequested )
+		markMergeRegions(regionColor, modeLocation, pixelToRegion);
+		if (stopRequested)
 			return;
 
 		performMerge(pixelToRegion, regionMemberCount);
@@ -81,50 +80,49 @@ public class MergeRegionMeanShift extends RegionMergeTree
 	 * is also within the local area its color is checked to see if it's similar enough.  If the color is similar
 	 * enough then the two regions are marked for merger.
 	 */
-	protected void markMergeRegions(DogArray<float[]> regionColor,
-									DogArray<Point2D_I32> modeLocation,
-									GrayS32 pixelToRegion  ) {
-		for( int targetId = 0; targetId < modeLocation.size &&!stopRequested; targetId++ ) {
+	protected void markMergeRegions( DogArray<float[]> regionColor,
+									 DogArray<Point2D_I32> modeLocation,
+									 GrayS32 pixelToRegion ) {
+		for (int targetId = 0; targetId < modeLocation.size && !stopRequested; targetId++) {
 
 			float[] color = regionColor.get(targetId);
 			Point2D_I32 location = modeLocation.get(targetId);
 
-			int x0 = location.x-searchRadius;
-			int x1 = location.x+searchRadius+1;
-			int y0 = location.y-searchRadius;
-			int y1 = location.y+searchRadius+1;
+			int x0 = location.x - searchRadius;
+			int x1 = location.x + searchRadius + 1;
+			int y0 = location.y - searchRadius;
+			int y1 = location.y + searchRadius + 1;
 
 			// ensure that all pixels it examines are inside the image
-			if( x0 < 0 ) x0 = 0;
-			if( x1 > pixelToRegion.width ) x1 = pixelToRegion.width;
-			if( y0 < 0 ) y0 = 0;
-			if( y1 > pixelToRegion.height ) y1 = pixelToRegion.height;
+			if (x0 < 0) x0 = 0;
+			if (x1 > pixelToRegion.width) x1 = pixelToRegion.width;
+			if (y0 < 0) y0 = 0;
+			if (y1 > pixelToRegion.height) y1 = pixelToRegion.height;
 
 			// look at the local neighborhood
-			for( int y = y0; y < y1; y++ ) {
-				for( int x = x0; x < x1; x++ ) {
-					int candidateId = pixelToRegion.unsafe_get(x,y);
+			for (int y = y0; y < y1; y++) {
+				for (int x = x0; x < x1; x++) {
+					int candidateId = pixelToRegion.unsafe_get(x, y);
 
 					// see if it is the same region
-					if( candidateId == targetId )
+					if (candidateId == targetId)
 						continue;
 
 					// see if the mode is near by
 					Point2D_I32 p = modeLocation.get(candidateId);
-					if( p.distance2(location) <= maxSpacialDistanceSq ) {
+					if (p.distance2(location) <= maxSpacialDistanceSq) {
 
 						// see if the color is similar
 						float[] candidateColor = regionColor.get(candidateId);
-						float colorDistance = SegmentMeanShiftSearch.distanceSq(color,candidateColor);
+						float colorDistance = SegmentMeanShiftSearch.distanceSq(color, candidateColor);
 
-						if( colorDistance <= maxColorDistanceSq ) {
+						if (colorDistance <= maxColorDistanceSq) {
 							// mark the two regions as merged
 							markMerge(targetId, candidateId);
 						}
 					}
 				}
 			}
-
 		}
 	}
 }

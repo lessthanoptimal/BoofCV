@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -29,17 +29,17 @@ import org.jetbrains.annotations.Nullable;
  */
 public class SampleIntensityScalePoint implements SampleIntensity<ScalePoint> {
 	@Override
-	public float sample(@Nullable GrayF32 intensity, int index, ScalePoint p) {
+	public float sample( @Nullable GrayF32 intensity, int index, ScalePoint p ) {
 		return p.intensity;
 	}
 
 	@Override
-	public int getX(ScalePoint p) {
+	public int getX( ScalePoint p ) {
 		return (int)p.pixel.x;
 	}
 
 	@Override
-	public int getY(ScalePoint p) {
+	public int getY( ScalePoint p ) {
 		return (int)p.pixel.y;
 	}
 }
