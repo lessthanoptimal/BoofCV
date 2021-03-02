@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -67,7 +67,6 @@ public class ExampleInterestPoint {
 	void displayResults( BufferedImage image, InterestPointDetector<T> detector ) {
 		Graphics2D g2 = image.createGraphics();
 		FancyInterestPointRender render = new FancyInterestPointRender();
-
 
 		for (int i = 0; i < detector.getNumberOfFeatures(); i++) {
 			Point2D_F64 pt = detector.getLocation(i);

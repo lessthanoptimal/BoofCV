@@ -46,7 +46,7 @@ public class DescribeSiftCommon {
 	protected double maxDescriptorElementValue;
 
 	// weight applied across the entire image
-	protected float gaussianWeight[];
+	protected float[] gaussianWeight;
 
 	/**
 	 * Configures the descriptor.

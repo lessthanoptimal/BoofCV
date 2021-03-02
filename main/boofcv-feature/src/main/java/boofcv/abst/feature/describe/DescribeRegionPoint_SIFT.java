@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -43,7 +43,9 @@ public class DescribeRegionPoint_SIFT <T extends ImageGray<T>>
 	ImageType<T> imageType;
 
 	// precomputes the entire scale-space gradient for faster lookup later
-	UnrollSiftScaleSpaceGradient scaleSpace;
+	UnrollSiftScaleSpaceGradient gradient = new UnrollSiftScaleSpaceGradient();
+
+	SiftScaleSpace scaleSpace;
 
 	// computes the feature description
 	DescribePointSift<GrayF32> describe;
@@ -54,9 +56,8 @@ public class DescribeRegionPoint_SIFT <T extends ImageGray<T>>
 	public DescribeRegionPoint_SIFT(SiftScaleSpace scaleSpace,
 									DescribePointSift<GrayF32> describe,
 									Class<T> imageType ) {
-		this.scaleSpace = new UnrollSiftScaleSpaceGradient(scaleSpace);
+		this.scaleSpace = scaleSpace;
 		this.describe = describe;
-
 		this.imageType = ImageType.single(imageType);
 	}
 
@@ -71,7 +72,8 @@ public class DescribeRegionPoint_SIFT <T extends ImageGray<T>>
 			input = imageFloat;
 		}
 
-		scaleSpace.setImage(input);
+		scaleSpace.process(input);
+		gradient.process(scaleSpace);
 	}
 
 	@Override
@@ -81,7 +83,7 @@ public class DescribeRegionPoint_SIFT <T extends ImageGray<T>>
 		double sigma = radius / BoofDefaults.SIFT_SCALE_TO_RADIUS;
 
 		// find the image which the blur factor closest to this sigma
-		UnrollSiftScaleSpaceGradient.ImageScale image = scaleSpace.lookup(sigma);
+		UnrollSiftScaleSpaceGradient.ImageScale image = gradient.lookup(sigma);
 
 		// compute the descriptor
 		describe.setImageGradient(image.derivX,image.derivY);

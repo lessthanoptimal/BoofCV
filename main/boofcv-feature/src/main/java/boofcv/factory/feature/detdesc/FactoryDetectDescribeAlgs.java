@@ -21,17 +21,14 @@ package boofcv.factory.feature.detdesc;
 import boofcv.abst.feature.describe.ConfigSiftDescribe;
 import boofcv.abst.feature.describe.ConfigSiftScaleSpace;
 import boofcv.abst.feature.detdesc.ConfigCompleteSift;
-import boofcv.abst.feature.detect.extract.NonMaxLimiter;
 import boofcv.abst.feature.detect.interest.ConfigSiftDetector;
 import boofcv.abst.feature.orientation.ConfigSiftOrientation;
 import boofcv.alg.feature.describe.DescribePointSift;
 import boofcv.alg.feature.detdesc.CompleteSift;
+import boofcv.alg.feature.detect.interest.SiftDetector;
 import boofcv.alg.feature.detect.interest.SiftScaleSpace;
-import boofcv.alg.feature.detect.selector.FeatureSelectLimitIntensity;
 import boofcv.alg.feature.orientation.OrientationHistogramSift;
-import boofcv.factory.feature.detect.extract.FactoryFeatureExtractor;
-import boofcv.factory.feature.detect.selector.FactorySelectLimit;
-import boofcv.struct.feature.ScalePoint;
+import boofcv.factory.feature.detect.interest.FactoryInterestPointAlgs;
 import boofcv.struct.image.GrayF32;
 import org.jetbrains.annotations.Nullable;
 
@@ -48,21 +45,18 @@ public class FactoryDetectDescribeAlgs {
 		ConfigSiftOrientation configOri = config.orientation;
 		ConfigSiftDescribe configDesc = config.describe;
 
-		SiftScaleSpace scaleSpace = new SiftScaleSpace(
-				configSS.firstOctave, configSS.lastOctave, configSS.numScales, configSS.sigma0);
 		OrientationHistogramSift<GrayF32> orientation = new OrientationHistogramSift<>(
 				configOri.histogramSize, configOri.sigmaEnlarge, GrayF32.class);
+
 		DescribePointSift<GrayF32> describe = new DescribePointSift<>(
 				configDesc.widthSubregion, configDesc.widthGrid, configDesc.numHistogramBins,
 				configDesc.sigmaToPixels, configDesc.weightingSigmaFraction,
 				configDesc.maxDescriptorElementValue, GrayF32.class);
 
-		NonMaxLimiter nonMax = FactoryFeatureExtractor.nonmaxLimiter(
-				configDetector.extract, configDetector.selector, configDetector.maxFeaturesPerScale);
-		FeatureSelectLimitIntensity<ScalePoint> selectorAll = FactorySelectLimit.intensity(configDetector.selector);
-		CompleteSift dds = new CompleteSift(scaleSpace, selectorAll,
-				configDetector.edgeR, nonMax, orientation, describe);
-		dds.maxFeaturesAll = configDetector.maxFeaturesAll;
-		return dds;
+		var ss = new SiftScaleSpace(configSS.firstOctave,configSS.lastOctave,configSS.numScales,configSS.sigma0);
+		SiftDetector detector = FactoryInterestPointAlgs.sift(configDetector);
+		detector.maxFeaturesAll = configDetector.maxFeaturesAll;
+
+		return new CompleteSift(ss, detector, orientation, describe);
 	}
 }

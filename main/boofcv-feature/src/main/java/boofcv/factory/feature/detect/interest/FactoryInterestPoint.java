@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -186,8 +186,8 @@ public class FactoryInterestPoint {
 	}
 
 	public static <T extends ImageGray<T>>
-	InterestPointDetector<T> sift(ConfigSiftScaleSpace configSS ,
-								  ConfigSiftDetector configDet , Class<T> imageType ) {
+	InterestPointDetector<T> sift(@Nullable ConfigSiftScaleSpace configSS ,
+								  @Nullable ConfigSiftDetector configDet , Class<T> imageType ) {
 
 		if( configSS == null )
 			configSS = new ConfigSiftScaleSpace();
@@ -198,9 +198,9 @@ public class FactoryInterestPoint {
 		NonMaxLimiter nonmax = FactoryFeatureExtractor.nonmaxLimiter(
 				configDet.extract,configDet.selector,configDet.maxFeaturesPerScale);
 		FeatureSelectLimitIntensity<ScalePoint> selectorAll = FactorySelectLimit.intensity(configDet.selector);
-		var detector = new SiftDetector(ss,selectorAll,configDet.edgeR,nonmax);
+		var detector = new SiftDetector(selectorAll,configDet.edgeR,nonmax);
 		detector.maxFeaturesAll = configDet.maxFeaturesAll;
 
-		return new WrapSiftDetector<>(detector, imageType);
+		return new WrapSiftDetector<>(ss, detector, imageType);
 	}
 }

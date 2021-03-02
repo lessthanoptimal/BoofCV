@@ -57,7 +57,7 @@ import java.util.Arrays;
  *
  * @author Peter Abeles
  */
-public class OrientationHistogramSift<Deriv extends ImageGray> {
+public class OrientationHistogramSift<Deriv extends ImageGray<Deriv>> {
 	// How much does it inflate the scale by
 	private final double sigmaEnlarge;
 	// Storage for orientation histogram. Each bin is for angles from i*histAngleBin to (i+1)*histAngleBin

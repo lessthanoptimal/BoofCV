@@ -21,64 +21,52 @@ package boofcv.alg.feature.detect.interest;
 import boofcv.abst.filter.derivative.ImageGradient;
 import boofcv.factory.filter.derivative.FactoryDerivative;
 import boofcv.struct.image.GrayF32;
-
-import java.util.ArrayList;
-import java.util.List;
+import org.ddogleg.struct.DogArray;
 
 /**
- * Precomputes the gradient for all scales in the scale-space and saves them in a list.  Since it saves the entire
+ * Precomputes the gradient for all scales in the scale-space and saves them in a list. Since it saves the entire
  * scale space it can take up a bit of memory, but allows quick random look up of images.
  *
  * @author Peter Abeles
  */
 public class UnrollSiftScaleSpaceGradient {
-
-	// input scale space
-	SiftScaleSpace scaleSpace;
-
-	// scale images that are using
-	List<ImageScale> usedScales = new ArrayList<>();
 	// storage for all possible scales
-	List<ImageScale> allScales = new ArrayList<>();
+	DogArray<ImageScale> scales = new DogArray<>(ImageScale::new);
 
 	// used to compute the image gradient
 	ImageGradient<GrayF32, GrayF32> gradient = FactoryDerivative.three(GrayF32.class, null);
 
-	public UnrollSiftScaleSpaceGradient( SiftScaleSpace scaleSpace ) {
-		this.scaleSpace = scaleSpace;
-
-		// create one image for each scale to minimize memory being created/destroyed
-		int numScales = scaleSpace.getNumScales()*scaleSpace.getTotalOctaves();
-		for (int i = 0; i < numScales; i++) {
-			allScales.add(new ImageScale());
-		}
-	}
+	private int numScales;
 
 	/**
-	 * Sets the input image.  Scale-space is computed and unrolled from this image
+	 * Sets the input image. Scale-space is computed and unrolled from this image
 	 */
-	public void setImage( GrayF32 image ) {
+	public void process( SiftScaleSpace scaleSpace ) {
+		numScales = scaleSpace.getNumScales();
+		int numScales = scaleSpace.getNumScales()*scaleSpace.getTotalOctaves();
+		scales.reserve(numScales);
+		scales.reset();
 
-		scaleSpace.initialize(image);
+		for (int octaveIdx = 0; octaveIdx < scaleSpace.octaves.length; octaveIdx++) {
+			if (scaleSpace.isOctaveTooSmall(octaveIdx))
+				break;
 
-		usedScales.clear();
-		do {
+			int octave = octaveIdx + scaleSpace.firstOctave;
+			SiftScaleSpace.Octave o = scaleSpace.octaves[octaveIdx];
+
 			for (int i = 0; i < scaleSpace.getNumScales(); i++) {
-				GrayF32 scaleImage = scaleSpace.getImageScale(i);
-				double sigma = scaleSpace.computeSigmaScale(i);
-				double pixelCurrentToInput = scaleSpace.pixelScaleCurrentToInput();
+				// See comment in ImageScale for why there's an offset below
+				GrayF32 scaleImage = o.scales[i+1];
+				double sigma = scaleSpace.computeSigmaScale(octave, i);
+				double pixelCurrentToInput = scaleSpace.pixelScaleCurrentToInput(octave);
 
-				ImageScale scale = allScales.get(usedScales.size());
-				scale.derivX.reshape(scaleImage.width, scaleImage.height);
-				scale.derivY.reshape(scaleImage.width, scaleImage.height);
+				ImageScale scale = scales.grow();
 
 				gradient.process(scaleImage, scale.derivX, scale.derivY);
 				scale.imageToInput = pixelCurrentToInput;
 				scale.sigma = sigma;
-
-				usedScales.add(scale);
 			}
-		} while (scaleSpace.computeNextOctave());
+		}
 	}
 
 	/**
@@ -88,8 +76,8 @@ public class UnrollSiftScaleSpaceGradient {
 		ImageScale best = null;
 		double bestValue = Double.MAX_VALUE;
 
-		for (int i = 0; i < usedScales.size(); i++) {
-			ImageScale image = usedScales.get(i);
+		for (int i = 0; i < scales.size(); i++) {
+			ImageScale image = scales.get(i);
 			double difference = Math.abs(sigma - image.sigma);
 			if (difference < bestValue) {
 				bestValue = difference;
@@ -99,6 +87,20 @@ public class UnrollSiftScaleSpaceGradient {
 		return best;
 	}
 
+	public GrayF32 getDerivX( byte octaveIdx, byte scaleIdx ) {
+		return scales.get(octaveIdx*numScales + scaleIdx).derivX;
+	}
+
+	public GrayF32 getDerivY( byte octaveIdx, byte scaleIdx ) {
+		return scales.get(octaveIdx*numScales + scaleIdx).derivY;
+	}
+
+	/**
+	 * The gradient for an image in the scale space.
+	 *
+	 * NOTE: The gradient for index i is computed from scaleIdx=i+1 to reflect the DoG image that the
+	 * feature was detected inside of.
+	 */
 	public static class ImageScale {
 		public GrayF32 derivX = new GrayF32(1, 1);
 		public GrayF32 derivY = new GrayF32(1, 1);

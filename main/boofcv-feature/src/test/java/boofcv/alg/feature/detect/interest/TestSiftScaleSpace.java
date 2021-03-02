@@ -24,16 +24,15 @@ import boofcv.struct.image.GrayF32;
 import boofcv.testing.BoofStandardJUnit;
 import org.junit.jupiter.api.Test;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
-/**
- * @author Peter Abeles
- */
 public class TestSiftScaleSpace extends BoofStandardJUnit {
 	/**
-	 * Checks to see if the first image in each octave has the expected amount of image blur
+	 * In a full resolution image apply the blur that each image in the scale space should
+	 * have applied to it and compare the two images. The full resolution one will be sub-sampled
 	 */
-	@Test void checkOctaveBlur() {
+	@Test void checkBlurAppliedToImages() {
 		GrayF32 original = new GrayF32(300, 340);
 		GImageMiscOps.fillUniform(original, rand, 0, 100);
 
@@ -41,63 +40,39 @@ public class TestSiftScaleSpace extends BoofStandardJUnit {
 
 		float sigma0 = 1.6f;
 
-		int lastOctave = 5;
-		for (int firstOctave = -1; firstOctave < 2; firstOctave++) {
+		int lastOctave = 3;
+		int numScales = 2;
 
-			SiftScaleSpace alg = new SiftScaleSpace(firstOctave, lastOctave, 2, sigma0);
+		// Change the first active in the scale spaces
+		for (int firstOctave = -1; firstOctave <= 1; firstOctave++) {
+			var alg = new SiftScaleSpace(firstOctave, lastOctave, numScales, sigma0);
+			alg.process(original);
+			for (int octaveIdx = 0; octaveIdx < alg.getTotalOctaves(); octaveIdx++) {
+				int octave = octaveIdx + firstOctave;
+				SiftScaleSpace.Octave o = alg.octaves[octaveIdx];
 
-			alg.initialize(original);
+				// Look at the amount of blur in scale image at the first octave
+				for (int scaleIdx = 0; scaleIdx < o.scales.length; scaleIdx++) {
+					float sigma = (float)(sigma0*Math.pow(2.0, octave + scaleIdx/(double)numScales));
 
-			for (int i = firstOctave; i <= lastOctave; i++) {
-				float sigma = (float)(sigma0*Math.pow(2, i));
+					GBlurImageOps.gaussian(original, expected, sigma, -1, null);
 
-				GBlurImageOps.gaussian(original, expected, sigma, -1, null);
+					double averageError = compareImage(expected, o.scales[scaleIdx], octave);
 
-				double averageError = compareImage(expected, alg.getImageScale(0), i);
-
-				assertTrue(averageError < 2, "first " + firstOctave + " oct " + i + " error = " + averageError);
-				assertEquals(alg.computeNextOctave(), i < lastOctave);
+					assertTrue(averageError < 2, "first "+firstOctave+" octave " + octave + " scale " + scaleIdx + " error = " + averageError);
+				}
 			}
-		}
-	}
-
-	/**
-	 * Test the blur factor at each scale between the octaves
-	 */
-	@Test void checkScaleBlur() {
-		GrayF32 original = new GrayF32(300, 340);
-		GImageMiscOps.fillUniform(original, rand, 0, 100);
-
-		GrayF32 expected = new GrayF32(300, 340);
-
-		float sigma0 = 1.6f;
-		SiftScaleSpace alg = new SiftScaleSpace(0, 3, 2, sigma0);
-
-		alg.initialize(original);
-		assertEquals(5, alg.getNumScaleImages());
-
-		for (int i = 0; i < 5; i++) {
-			double sigma = alg.computeSigmaScale(i);
-
-			GBlurImageOps.gaussian(original, expected, sigma, -1, null);
-
-			double averageError = compareImage(expected, alg.getImageScale(i), 0);
-
-			assertTrue(averageError < 2, " scale " + i + " error = " + averageError);
 		}
 	}
 
 	@Test void computeSigmaScale() {
 		SiftScaleSpace alg = new SiftScaleSpace(-1, 4, 3, 1.6);
-		alg.initialize(new GrayF32(60, 50));
+		alg.process(new GrayF32(60, 50));
 
 		double k = Math.pow(2.0, 1.0/3.0);
-		for (int i = 0; i < 5; i++) {
-			assertEquals(0.8*Math.pow(k, i), alg.computeSigmaScale(i), 1e-8);
-		}
-		alg.computeNextOctave();
-		for (int i = 0; i < 5; i++) {
-			assertEquals(1.6*Math.pow(k, i), alg.computeSigmaScale(i), 1e-8);
+		for (int scaleIdx = 0; scaleIdx < 5; scaleIdx++) {
+			assertEquals(0.8*Math.pow(k, scaleIdx), alg.computeSigmaScale(-1, scaleIdx), 1e-8);
+			assertEquals(1.6*Math.pow(k, scaleIdx), alg.computeSigmaScale(0, scaleIdx), 1e-8);
 		}
 	}
 
@@ -117,36 +92,38 @@ public class TestSiftScaleSpace extends BoofStandardJUnit {
 			for (int y = 0; y < expected.height; y++) {
 				for (int x = 0; x < expected.width; x++) {
 					float f = found.get(x*scale, y*scale);
-					float e = expected.get(x, y);
+					float e = expected.unsafe_get(x, y);
 					averageError += Math.abs(e - f);
 				}
 			}
 			averageError /= expected.width*expected.height;
 		} else {
-			int scale = (int)Math.pow(2, octave);
+			double scale = Math.pow(2, octave);
 
+			int total = 0;
 			for (int y = 0; y < found.height; y++) {
+				int yy = (int)(y*scale);
 				for (int x = 0; x < found.width; x++) {
-					float f = found.get(x, y);
-					float e = expected.get(x*scale, y*scale);
+					int xx = (int)(x*scale);
+					if (!expected.isInBounds(xx,yy))
+						continue;
+					float f = found.unsafe_get(x, y);
+					float e = expected.get(xx,yy);
 					averageError += Math.abs(e - f);
+					total++;
 				}
 			}
-			averageError /= found.width*found.height;
+			averageError /= total;
 		}
 		return averageError;
 	}
 
 	/**
-	 * The number of octaves would make the input image too small
+	 * The number of octaves would make the input image too small. See if it blows up.
 	 */
 	@Test void checkImageTooSmallForOctaves() {
 		SiftScaleSpace alg = new SiftScaleSpace(0, 5, 3, 1.6);
 
-		alg.initialize(new GrayF32(20, 20));
-
-		assertTrue(alg.computeNextOctave());
-		assertTrue(alg.computeNextOctave());
-		assertFalse(alg.computeNextOctave());
+		alg.process(new GrayF32(20, 20));
 	}
 }

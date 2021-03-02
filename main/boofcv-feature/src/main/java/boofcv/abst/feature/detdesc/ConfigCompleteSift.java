@@ -28,6 +28,10 @@ import boofcv.struct.Configuration;
 /**
  * Configuration for {@link CompleteSift}.
  *
+ * NOTE: Even if the sift detector is configured to only detect a specified number of features it's possible for
+ * more than that number to be returned since a single detection can have multiple orientations, resulting in
+ * multiple features.
+ *
  * @author Peter Abeles
  */
 public class ConfigCompleteSift implements Configuration {

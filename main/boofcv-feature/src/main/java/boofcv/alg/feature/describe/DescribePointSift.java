@@ -52,7 +52,7 @@ import georegression.metric.UtilAngle;
  *
  * @author Peter Abeles
  */
-public class DescribePointSift<Deriv extends ImageGray> extends DescribeSiftCommon {
+public class DescribePointSift<Deriv extends ImageGray<Deriv>> extends DescribeSiftCommon {
 
 	// spacial derivatives of input image
 	GImageGray imageDerivX, imageDerivY;
