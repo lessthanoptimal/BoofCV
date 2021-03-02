@@ -11,10 +11,13 @@ Version : 0.38
   * TODO Added an example showing how the trifocal tensor can be used
 - Applications
   * Can batch down sampling now lets you shoot for a fix number of pixels.
+  * CameraCalibration can now just save detections
 - Functional API
   * Added forEachXY and forEachPixel to images
   * PixelMath.lambda is now PixelMath.operator
   * ImageBorder no longer uses reflection but uses a functional API instead
+- CalibrationIO
+  * Can save and load calibration landmarks in CSV format
 - DownSelectVideoFramesFor3DApp
   * Fixed image scaling issue when image was smaller than desired
 - QR Code

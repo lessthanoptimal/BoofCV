@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -220,15 +220,15 @@ public class CameraCalibrationGui extends JPanel
 	}
 
 	private void createDetector() {
-		switch( controlsTarget.selected ) {
-			case CHESSBOARD: app.detector = FactoryFiducialCalibration.chessboardX(null,controlsTarget.configChessboard);break;
-			case SQUARE_GRID: app.detector = FactoryFiducialCalibration.squareGrid(null,controlsTarget.configSquare);break;
-			case CIRCLE_GRID: app.detector = FactoryFiducialCalibration.circleRegularGrid(null,controlsTarget.configCircle);break;
-			case CIRCLE_HEX: app.detector = FactoryFiducialCalibration.circleHexagonalGrid(null,controlsTarget.configCircleHex);break;
+		switch (controlsTarget.selected) {
+			case CHESSBOARD -> app.detector = FactoryFiducialCalibration.chessboardX(null, controlsTarget.configChessboard);
+			case SQUARE_GRID -> app.detector = FactoryFiducialCalibration.squareGrid(null, controlsTarget.configSquare);
+			case CIRCLE_GRID -> app.detector = FactoryFiducialCalibration.circleRegularGrid(null, controlsTarget.configCircle);
+			case CIRCLE_HEX -> app.detector = FactoryFiducialCalibration.circleHexagonalGrid(null, controlsTarget.configCircleHex);
 		}
 
 		app.modeType = controlsModel.selected;
-		if( app.modeType == CameraCalibration.ModelType.PINHOLE ) {
+		if( app.modeType == CameraCalibration.ModelType.BROWN) {
 			app.numRadial = controlsModel.pinholeRadial;
 			app.tangential = controlsModel.pinholeTangential;
 			app.zeroSkew = controlsModel.pinholeSkew;

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -39,7 +39,7 @@ public class CalibrationModelPanel extends StandardAlgConfigPanel implements Act
 	JComboBox<ModelType> comboType;
 	JPanel panelTarget = new JPanel();
 
-	public ModelType selected = ModelType.PINHOLE;
+	public ModelType selected = ModelType.BROWN;
 
 	public int pinholeRadial = 2;
 	public boolean pinholeTangential = true;
@@ -85,7 +85,7 @@ public class CalibrationModelPanel extends StandardAlgConfigPanel implements Act
 
 		JPanel p;
 		switch(selected) {
-			case PINHOLE:p=new PinholePanel();break;
+			case BROWN:p=new PinholePanel();break;
 			case UNIVERSAL:p=new UniversalPanel();break;
 			default:throw new RuntimeException("Unknown");
 		}

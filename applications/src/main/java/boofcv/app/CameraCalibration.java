@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -42,6 +42,7 @@ import boofcv.struct.calib.CameraPinholeBrown;
 import boofcv.struct.calib.CameraUniversalOmni;
 import boofcv.struct.image.GrayF32;
 import com.github.sarxos.webcam.Webcam;
+import org.apache.commons.io.FilenameUtils;
 
 import javax.swing.*;
 import java.awt.*;
@@ -67,11 +68,13 @@ public class CameraCalibration extends BaseStandardInputApp {
 	protected boolean zeroSkew = true;
 	protected int numRadial = 2;
 	protected boolean tangential = false;
-	protected ModelType modeType = ModelType.PINHOLE;
+	protected ModelType modeType = ModelType.BROWN;
 	protected FormatType formatType = FormatType.BOOFCV;
 
 	protected boolean GUI = false;
-	protected boolean visualize = true;
+	protected boolean visualize = false;
+	protected boolean saveLandmarks = false;
+	protected boolean justDetect = false;
 
 	public void printHelp() {
 		System.out.println("./application <output file> <Input Options> <Calibration Parameters> <Fiducial Type> <Fiducial Specific Options> ");
@@ -79,13 +82,12 @@ public class CameraCalibration extends BaseStandardInputApp {
 		System.out.println("  --GUI                              Turns on GUI mode and ignores other options.");
 		System.out.println();
 		System.out.println("<output file>                        file name for output");
-		System.out.println("                                     DEFAULT: \"intrinsic.yaml\"");
+		System.out.println("                                     DEFAULT: \""+outputFileName+"\"");
 		System.out.println();
 		System.out.println("Input: File Options:  ");
 		System.out.println();
 		System.out.println("  --Directory=<path>                 Directory containing calibration images");
-		System.out.println("  --Visualize=<true/false>           Should it visualize the results?");
-		System.out.println("                                     DEFAULT: true");
+		System.out.println("  --Visualize                        Turns on visualization in a GUI of final results");
 		System.out.println();
 		System.out.println("Input: Webcam Options:  ");
 		System.out.println();
@@ -97,19 +99,22 @@ public class CameraCalibration extends BaseStandardInputApp {
 		System.out.println();
 		System.out.println("  --Format=<string>                  Format of output calibration file.");
 		System.out.println("                                     ( boofcv , opencv )");
-		System.out.println("                                     DEFAULT: boofcv");
+		System.out.println("                                     DEFAULT: "+formatType);
+		System.out.println("  --SaveLandmarks                    Save detected landmarks on calibration target");
+		System.out.println("                                     in a directory with the same base name as output file");
+		System.out.println("  --JustDetect                       Detect targets and save landmarks");
 		System.out.println();
 		System.out.println("Calibration Parameters:");
 		System.out.println();
 		System.out.println("  --Model=<string>                   Specifies the camera model to use.");
-		System.out.println("                                     ( pinhole, universal )");
-		System.out.println("                                     DEFAULT: pinhole");
+		System.out.println("                                     ( brown, universal )");
+		System.out.println("                                     DEFAULT: "+modeType);
 		System.out.println("  --ZeroSkew=<true/false>            Can it assume zero skew?");
-		System.out.println("                                     DEFAULT: true");
+		System.out.println("                                     DEFAULT: "+zeroSkew);
 		System.out.println("  --NumRadial=<int>                  Number of radial coefficients");
-		System.out.println("                                     DEFAULT: 2");
+		System.out.println("                                     DEFAULT: " +numRadial);
 		System.out.println("  --Tangential=<true/false>          Should it include tangential terms?");
-		System.out.println("                                     DEFAULT: false");
+		System.out.println("                                     DEFAULT: " +tangential);
 		System.out.println();
 		System.out.println("Fiducial Types:");
 		System.out.println("   CHESSBOARD");
@@ -118,7 +123,7 @@ public class CameraCalibration extends BaseStandardInputApp {
 		System.out.println("   CIRCLE_REG");
 		System.out.println();
 		System.out.println("Flags for CHESSBOARD:");
-		System.out.println("  --Grid=<rows>:<columns>            Specifies number of rows and columns");
+		System.out.println("  --Grid=<rows>:<columns>            Specifies number of rows and columns. (squares)");
 		System.out.println();
 		System.out.println("Flags for SQUAREGRID:");
 		System.out.println("  --Grid=<rows>:<columns>            Specifies number of rows and columns");
@@ -135,6 +140,14 @@ public class CameraCalibration extends BaseStandardInputApp {
 		System.out.println("  --CenterDistance=<length>          Specifies how far apart the center of two circles are along an axis");
 		System.out.println("  --Diameter=<length>                Diameter of a circle");
 		System.out.println();
+		System.out.println("Examples:");
+		System.out.println("  java -jar applications.jar CameraCalibration --GUI");
+		System.out.println("          Opens a GUI and let's you do all the configurations there");
+		System.out.println("  java -jar applications.jar CameraCalibration --Directory=path/to/input/ --Model=brown CHESSBOARD --Grid=7:5");
+		System.out.println("          Calibrates using a brown model and a chessboard target with a 7x5 grid.");
+		System.out.println("  java -jar applications.jar CameraCalibration --Visualize --SaveLandmarks --Directory=path/to/input/ CHESSBOARD --Grid=7:5");
+		System.out.println("          The same, but saves the corners and visualizes the results.");
+		System.out.println();
 	}
 
 	public void parse( String[] args ) {
@@ -149,16 +162,21 @@ public class CameraCalibration extends BaseStandardInputApp {
 			if (arg.startsWith("--")) {
 				if (arg.compareToIgnoreCase("--GUI") == 0) {
 					GUI = true;
+				} else if (arg.compareToIgnoreCase("--Visualize") == 0) {
+					visualize = true;
+				} else if (arg.compareToIgnoreCase("--SaveLandmarks") == 0) {
+					saveLandmarks = true;
+				} else if (arg.compareToIgnoreCase("--JustDetect") == 0) {
+					saveLandmarks = true;
+					justDetect = true;
 				} else if (!checkCameraFlag(arg)) {
 					splitFlag(arg);
 					if (flagName.compareToIgnoreCase("Directory") == 0) {
 						inputDirectory = parameters;
 						inputType = InputType.IMAGE;
-					} else if (flagName.compareToIgnoreCase("Visualize") == 0) {
-						visualize = Boolean.parseBoolean(parameters);
 					} else if (flagName.compareToIgnoreCase("Model") == 0) {
 						if (parameters.compareToIgnoreCase("pinhole") == 0) {
-							modeType = ModelType.PINHOLE;
+							modeType = ModelType.BROWN;
 						} else if (parameters.compareToIgnoreCase("universal") == 0) {
 							modeType = ModelType.UNIVERSAL;
 						} else {
@@ -201,7 +219,7 @@ public class CameraCalibration extends BaseStandardInputApp {
 			}
 		}
 
-		if (formatType == FormatType.OPENCV && modeType != ModelType.PINHOLE) {
+		if (formatType == FormatType.OPENCV && modeType != ModelType.BROWN) {
 			throw new RuntimeException("Can only save calibration in OpenCV format if pinhole model");
 		}
 	}
@@ -334,49 +352,51 @@ public class CameraCalibration extends BaseStandardInputApp {
 		}
 
 		switch (inputType) {
-			case VIDEO:
-				throw new RuntimeException("Calibration from video not supported");
-			case IMAGE:
-				handleDirectory();
-				break;
-
-			case WEBCAM:
-				handleWebcam();
-				break;
-
-			default:
+			case VIDEO -> throw new RuntimeException("Calibration from video not supported");
+			case IMAGE -> handleDirectory();
+			case WEBCAM -> handleWebcam();
+			default -> {
 				printHelp();
 				System.out.println();
 				System.err.println("Input method is not specified");
 				System.exit(0);
-				break;
+			}
 		}
 	}
 
+	// TODO break this function up into its own class so that it isn't one massive function?
 	protected void handleDirectory() {
+		File outputDirectory = null;
+		if (saveLandmarks) {
+			String baseName = FilenameUtils.getBaseName(outputFileName);
+			baseName += "_landmarks";
+			String name = baseName;
+			// keep on trying to create the output directory until it succeeds
+			for (int i = 0; i < 10_000; i++) {
+				outputDirectory = new File(new File(outputFileName).getParent(),name);
+				if (outputDirectory.exists()) {
+					name = baseName+i;
+				}
+			}
+			BoofMiscOps.checkTrue(outputDirectory.mkdirs());
+		}
+
 		final CalibrateMonoPlanar calibrationAlg = new CalibrateMonoPlanar(detector.getLayout());
 		final CalibratedPlanarPanel gui;
 		ProcessThread monitor = null;
 
 		switch (modeType) {
-			case PINHOLE:
-				calibrationAlg.configurePinhole(zeroSkew, numRadial, tangential);
-				break;
-
-			case UNIVERSAL:
-				calibrationAlg.configureUniversalOmni(zeroSkew, numRadial, tangential);
-				break;
-
-			default:
-				throw new RuntimeException("Unknown model type: " + modeType);
+			case BROWN -> calibrationAlg.configurePinhole(zeroSkew, numRadial, tangential);
+			case UNIVERSAL -> calibrationAlg.configureUniversalOmni(zeroSkew, numRadial, tangential);
+			default -> throw new RuntimeException("Unknown model type: " + modeType);
 		}
 
 		if (visualize) {
-			switch( modeType ) {
-				case PINHOLE: gui = new MonoPlanarPanel(); break;
-				case UNIVERSAL: gui = new FisheyePlanarPanel(); break;
-				default: throw new RuntimeException("Unknown model type: "+modeType);
-			}
+			gui = switch (modeType) {
+				case BROWN -> new MonoPlanarPanel();
+				case UNIVERSAL -> new FisheyePlanarPanel();
+				default -> throw new RuntimeException("Unknown model type: " + modeType);
+			};
 			monitor = new ProcessThread(gui);
 			monitor.start();
 		} else {
@@ -398,7 +418,7 @@ public class CameraCalibration extends BaseStandardInputApp {
 			System.exit(0);
 		}
 
-		if (visualize) {
+		if (monitor!=null) {
 			monitor.setMessage(0, "Loading images");
 		}
 
@@ -416,7 +436,7 @@ public class CameraCalibration extends BaseStandardInputApp {
 
 			GrayF32 image = ConvertBufferedImage.convertFrom(buffered, (GrayF32)null);
 
-			if (visualize) {
+			if (monitor!=null) {
 				monitor.setMessage(0, f.getName());
 
 				if (first) {
@@ -429,12 +449,7 @@ public class CameraCalibration extends BaseStandardInputApp {
 					gui.showImageProcessed(buffered);
 					ShowImages.showWindow(gui, "Monocular Calibration", true);
 				} else {
-					BoofSwingUtil.invokeNowOrLater(new Runnable() {
-						@Override
-						public void run() {
-							gui.showImageProcessed(buffered);
-						}
-					});
+					BoofSwingUtil.invokeNowOrLater(() -> gui.showImageProcessed(buffered));
 				}
 			}
 
@@ -442,12 +457,24 @@ public class CameraCalibration extends BaseStandardInputApp {
 				imagesFailed.add(f);
 				System.err.println("Failed to detect target in " + f.getName());
 			} else {
+				// if configured to do so, save the landmarks to disk
+				if (outputDirectory!=null) {
+					CalibrationIO.saveLandmarksCsv(f.getPath(),detector.getClass().getSimpleName(),
+							detector.getDetectedPoints(),
+							new File(outputDirectory,FilenameUtils.getBaseName(f.getName())+".csv"));
+				}
 				calibrationAlg.addImage(detector.getDetectedPoints());
 				imagesSuccess.add(f);
 			}
 		}
 
-		if (visualize) {
+		if (justDetect) {
+			System.out.println("Just detecting calibration targets! Exiting now");
+			System.exit(0);
+			return;
+		}
+
+		if (monitor!=null) {
 			monitor.setMessage(1, "Computing intrinsics");
 		}
 
@@ -455,7 +482,7 @@ public class CameraCalibration extends BaseStandardInputApp {
 		try {
 			final CameraModel intrinsic = calibrationAlg.process();
 
-			if (visualize) {
+			if (monitor!=null) {
 				monitor.stopThread();
 
 				if (imagesFailed.size() > 0) {
@@ -479,25 +506,26 @@ public class CameraCalibration extends BaseStandardInputApp {
 			System.out.println();
 
 			switch (modeType) {
-				case PINHOLE: {
+				case BROWN -> {
 					CameraPinholeBrown m = (CameraPinholeBrown)intrinsic;
 					switch (formatType) {
-						case BOOFCV: CalibrationIO.save(m, outputFileName); break;
-						case OPENCV: UtilOpenCV.save(m, outputFileName); break;
-						default: break;
+						case BOOFCV:
+							CalibrationIO.save(m, outputFileName);
+							break;
+						case OPENCV:
+							UtilOpenCV.save(m, outputFileName);
+							break;
+						default:
+							break;
 					}
 					m.print();
 				}
-				break;
-
-				case UNIVERSAL: {
+				case UNIVERSAL -> {
 					CameraUniversalOmni m = (CameraUniversalOmni)intrinsic;
 					CalibrationIO.save(m, outputFileName);
 					m.print();
 				}
-				break;
-
-				default: throw new RuntimeException("Unknown model type. " + modeType);
+				default -> throw new RuntimeException("Unknown model type. " + modeType);
 			}
 			System.out.println();
 			System.out.println("Save file format " + formatType);
@@ -525,9 +553,7 @@ public class CameraCalibration extends BaseStandardInputApp {
 			});
 		}
 
-		@Override
-		public void doRun() {
-		}
+		@Override public void doRun() {}
 	}
 
 	/**
@@ -586,7 +612,7 @@ public class CameraCalibration extends BaseStandardInputApp {
 	}
 
 	public enum ModelType {
-		PINHOLE,
+		BROWN,
 		UNIVERSAL
 	}
 

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -37,7 +37,7 @@ public class CalibrationObservation {
 	/**
 	 * Shape of the image in which observations were created from. Use to configure intrinsics and sanity checks
 	 */
-	int width,height;
+	public int width,height;
 
 	/**
 	 * List of pixel observations and the index of the control point

@@ -38,8 +38,14 @@ git submodule update --init --recursive
 ```
 
 ## Quick Start Examples and Demonstrations
+New to Java? Make sure you have Java 11 or newer installed. In the command line type `java -version` and you should see something like:
+```bash
+java -version
+openjdk version "14" 2020-03-17
+```
+In this case I have Java 14 installed. If you need to install java or upgrade just search for it to find up to date instructions.
 
-Know what you're doing and you just want to see something running?  Then run the commands below!  Each jar will open a window, then to run an application just double click on its name.
+You can now build and run?  Then run the commands below!  Each jar will open a window, then to run an application just double click on its name.
 
 ```bash
 cd boofcv
@@ -51,6 +57,9 @@ java -jar demonstrations/demonstrations.jar
 ```
 
 All the code for what you see is in boofcv/examples and boofcv/demonstrations.  Example code is designed to be easy to understand so look there first.
+
+Click [HERE](applications/readme.md) for instruction on building and running Applications.
+There you can calibrate cameras, create QR codes, batch scan for QR codes, batch downsample images, ... etc.
 
 ## Maven Central Repository
 
