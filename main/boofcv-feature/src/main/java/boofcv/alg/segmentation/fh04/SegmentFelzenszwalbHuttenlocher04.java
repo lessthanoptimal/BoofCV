@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -82,19 +82,19 @@ import org.ddogleg.struct.FastArray;
 public class SegmentFelzenszwalbHuttenlocher04<T extends ImageBase<T>> {
 
 	// tuning parameter.  Determines the number of segments.  Larger number means larger regions
-	private float K;
+	private final float K;
 
 	// the minimum region size.  Regions smaller than this are merged into larger ones
-	private int minimumSize;
+	private final int minimumSize;
 
 	// Storage for the disjoint-set forest.  Same data structure as 'output', but renamed for convenience.
 	// Value stored in each pixel refers to the parent vertex.  A root vertex contains a reference to itself
 	protected GrayS32 graph;
 
 	// Function that computes the weight for each edge
-	private FhEdgeWeights<T> computeWeights;
+	private final FhEdgeWeights<T> computeWeights;
 
-	private QuickSortObj_F32 sorter = new QuickSortObj_F32();
+	private final QuickSortObj_F32 sorter = new QuickSortObj_F32();
 	private ApproximateSort_F32 sorterApprox = null;
 	// storage for edges so that they can be recycled on the next call
 	protected DogArray<Edge> edges = new DogArray<>(Edge::new);
@@ -108,8 +108,8 @@ public class SegmentFelzenszwalbHuttenlocher04<T extends ImageBase<T>> {
 	protected DogArray_F32 threshold = new DogArray_F32();
 
 	// List of region ID's and their size
-	private DogArray_I32 outputRegionId = new DogArray_I32();
-	private DogArray_I32 outputRegionSizes = new DogArray_I32();
+	private final DogArray_I32 outputRegionId = new DogArray_I32();
+	private final DogArray_I32 outputRegionSizes = new DogArray_I32();
 
 	/**
 	 * Specifies tuning parameter

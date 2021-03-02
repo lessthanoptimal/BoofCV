@@ -59,11 +59,11 @@ public class ExampleDetectDescribe {
 	 * For some features, there are pre-made implementations of DetectDescribePoint.  This has only been done
 	 * in situations where there was a performance advantage or that it was a very common combination.
 	 */
-	public static <T extends ImageGray<T>, TD extends TupleDesc>
+	public static <T extends ImageGray<T>, TD extends TupleDesc<TD>>
 	DetectDescribePoint<T, TD> createFromPremade( Class<T> imageType ) {
 		var config = new ConfigFastHessian();
 		config.maxFeaturesPerScale = 200;
-		return (DetectDescribePoint)FactoryDetectDescribe.surfStable(config, null,null, imageType);
+		return (DetectDescribePoint)FactoryDetectDescribe.surfStable(config, null, null, imageType);
 //		var config = new ConfigCompleteSift();
 //		config.detector.maxFeaturesPerScale = 400;
 //		return (DetectDescribePoint)FactoryDetectDescribe.sift(config, imageType);
@@ -74,11 +74,11 @@ public class ExampleDetectDescribe {
 	 * can be combined into DetectDescribePoint.  The syntax is more complex, but the end result is more flexible.
 	 * This should only be done if there isn't a pre-made DetectDescribePoint.
 	 */
-	public static <T extends ImageGray<T>, TD extends TupleDesc>
+	public static <T extends ImageGray<T>, TD extends TupleDesc<TD>>
 	DetectDescribePoint<T, TD> createFromComponents( Class<T> imageType ) {
 		// create a corner detector
 		Class derivType = GImageDerivativeOps.getDerivativeType(imageType);
-		GeneralFeatureDetector corner = FactoryDetectPoint.createShiTomasi(new ConfigGeneralDetector(1000,5,1), null, derivType);
+		GeneralFeatureDetector corner = FactoryDetectPoint.createShiTomasi(new ConfigGeneralDetector(1000, 5, 1), null, derivType);
 		InterestPointDetector detector = FactoryInterestPoint.wrapPoint(corner, 1, imageType, derivType);
 
 		// describe points using BRIEF
@@ -98,14 +98,14 @@ public class ExampleDetectDescribe {
 
 		// Might as well have this example do something useful, like associate two images
 		ScoreAssociation scorer = FactoryAssociation.defaultScore(detDesc.getDescriptionType());
-		AssociateDescription associate = FactoryAssociation.greedy(new ConfigAssociateGreedy(true),scorer);
+		AssociateDescription associate = FactoryAssociation.greedy(new ConfigAssociateGreedy(true), scorer);
 
 		// load and match images
-		ExampleAssociatePoints app = new ExampleAssociatePoints(detDesc,associate,imageType);
+		ExampleAssociatePoints app = new ExampleAssociatePoints(detDesc, associate, imageType);
 
 		BufferedImage imageA = UtilImageIO.loadImage(UtilIO.pathExample("stitch/kayak_01.jpg"));
 		BufferedImage imageB = UtilImageIO.loadImage(UtilIO.pathExample("stitch/kayak_03.jpg"));
 
-		app.associate(imageA,imageB);
+		app.associate(imageA, imageB);
 	}
 }

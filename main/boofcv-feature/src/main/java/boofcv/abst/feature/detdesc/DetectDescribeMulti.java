@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -28,26 +28,25 @@ import boofcv.struct.image.ImageGray;
  * for a set are returned inside of a {@link PointDescSet}.  The order and number of sets remains constant.
  *
  * <TD> Type of feature descriptor
+ *
  * @author Peter Abeles
  */
 @Deprecated
-public interface DetectDescribeMulti<T extends ImageGray<T>, Desc extends TupleDesc>
-	extends DescriptorInfo<Desc>
-{
-
+public interface DetectDescribeMulti<T extends ImageGray<T>, Desc extends TupleDesc<Desc>>
+		extends DescriptorInfo<Desc> {
 	/**
 	 * Detects features inside the image.
 	 *
 	 * @param image Image being processed.
 	 */
-	public void process( T image );
+	void process( T image );
 
 	/**
 	 * The number of feature sets.
 	 *
 	 * @return number of feature sets
 	 */
-	public int getNumberOfSets();
+	int getNumberOfSets();
 
 	/**
 	 * Returns the most recently detected features for a specific set.  Each time
@@ -59,5 +58,5 @@ public interface DetectDescribeMulti<T extends ImageGray<T>, Desc extends TupleD
 	 * @param set Which set of detected features.
 	 * @return Results for a set.
 	 */
-	public PointDescSet<Desc> getFeatureSet(int set);
+	PointDescSet<Desc> getFeatureSet( int set );
 }

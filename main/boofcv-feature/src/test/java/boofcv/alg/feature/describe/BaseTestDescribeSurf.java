@@ -34,7 +34,7 @@ import static org.junit.jupiter.api.Assertions.*;
 /**
  * @author Peter Abeles
  */
-public abstract class BaseTestDescribeSurf<I extends ImageGray<I>,II extends ImageGray<II>>
+public abstract class BaseTestDescribeSurf<I extends ImageGray<I>, II extends ImageGray<II>>
 		extends BoofStandardJUnit {
 	int width = 50;
 	int height = 60;
@@ -43,13 +43,13 @@ public abstract class BaseTestDescribeSurf<I extends ImageGray<I>,II extends Ima
 	int c_y = height/2;
 
 	DescribePointSurf<II> alg = createAlg();
-	protected SparseImageGradient<II,?> sparse;
+	protected SparseImageGradient<II, ?> sparse;
 	II ii;
 	I input;
 
-	protected BaseTestDescribeSurf( Class<I> inputType , Class<II> integralType ) {
-		input = GeneralizedImageOps.createSingleBand(inputType,width,height);
-		ii = GeneralizedImageOps.createSingleBand(integralType,width,height);
+	protected BaseTestDescribeSurf( Class<I> inputType, Class<II> integralType ) {
+		input = GeneralizedImageOps.createSingleBand(inputType, width, height);
+		ii = GeneralizedImageOps.createSingleBand(integralType, width, height);
 	}
 
 	public abstract DescribePointSurf<II> createAlg();
@@ -62,15 +62,15 @@ public abstract class BaseTestDescribeSurf<I extends ImageGray<I>,II extends Ima
 		GImageMiscOps.fillUniform(ii, rand, 0, 100);
 		alg.setImage(ii);
 		TupleDesc_F64 expected = alg.createDescription();
-		alg.describe(c_x,c_y, 0, 1, true, expected);
+		alg.describe(c_x, c_y, 0, 1, true, expected);
 
 		II sub = BoofTesting.createSubImageOf(ii);
 
 		alg.setImage(sub);
 		TupleDesc_F64 found = alg.createDescription();
-		alg.describe(c_x,c_y, 0, 1, true, found);
+		alg.describe(c_x, c_y, 0, 1, true, found);
 
-		assertTrue(isSimilar(expected,found));
+		assertTrue(isSimilar(expected, found));
 	}
 
 	/**
@@ -82,10 +82,10 @@ public abstract class BaseTestDescribeSurf<I extends ImageGray<I>,II extends Ima
 		alg.setImage(ii);
 		TupleDesc_F64 a = alg.createDescription();
 		TupleDesc_F64 b = alg.createDescription();
-		alg.describe(c_x,c_y, 0, 1, true, a);
-		alg.describe(c_x,c_y, 0, 1.5, true, b);
+		alg.describe(c_x, c_y, 0, 1, true, a);
+		alg.describe(c_x, c_y, 0, 1.5, true, b);
 
-		assertFalse(isSimilar(a,b));
+		assertFalse(isSimilar(a, b));
 	}
 
 	/**
@@ -97,17 +97,17 @@ public abstract class BaseTestDescribeSurf<I extends ImageGray<I>,II extends Ima
 		alg.setImage(ii);
 		TupleDesc_F64 a = alg.createDescription();
 		TupleDesc_F64 b = alg.createDescription();
-		alg.describe(c_x,c_y, 0, 1, true, a);
-		alg.describe(c_x,c_y, 1, 1, true, b);
+		alg.describe(c_x, c_y, 0, 1, true, a);
+		alg.describe(c_x, c_y, 1, 1, true, b);
 
-		assertFalse(isSimilar(a,b));
+		assertFalse(isSimilar(a, b));
 	}
 
-	private boolean isSimilar(TupleDesc_F64 a, TupleDesc_F64 b ) {
-		for( int i = 0; i < 64; i++ ) {
+	private boolean isSimilar( TupleDesc_F64 a, TupleDesc_F64 b ) {
+		for (int i = 0; i < 64; i++) {
 			double diff = Math.abs(a.data[i] - b.data[i]);
 
-			if( diff > 1e-4 )
+			if (diff > 1e-4)
 				return false;
 		}
 		return true;
@@ -120,11 +120,11 @@ public abstract class BaseTestDescribeSurf<I extends ImageGray<I>,II extends Ima
 	@Test
 	public void checkBorder() {
 		alg.setImage(ii);
-	
-		for( int i = 0; i < 10; i++ ) {
+
+		for (int i = 0; i < 10; i++) {
 			double angle = (2.0*Math.PI*i)/10;
-			alg.describe(0,0, angle, 1, true, alg.createDescription());
-			alg.describe(ii.width-1,ii.height-1, angle, 1, true, alg.createDescription());
+			alg.describe(0, 0, angle, 1, true, alg.createDescription());
+			alg.describe(ii.width - 1, ii.height - 1, angle, 1, true, alg.createDescription());
 		}
 	}
 
@@ -138,12 +138,12 @@ public abstract class BaseTestDescribeSurf<I extends ImageGray<I>,II extends Ima
 		GIntegralImageOps.transform(input, ii);
 		sparse = TestImplSurfDescribeOps.createGradient(ii, 1);
 		alg.setImage(ii);
-		
-		TupleDesc_F64 feat = alg.createDescription();
-		alg.describe(20,20, 0.75, 1, true, feat);
 
-		for( double f : feat.data)
-			assertEquals(0,f,1e-4);
+		TupleDesc_F64 feat = alg.createDescription();
+		alg.describe(20, 20, 0.75, 1, true, feat);
+
+		for (double f : feat.data)
+			assertEquals(0, f, 1e-4);
 	}
 
 	/**
@@ -154,30 +154,30 @@ public abstract class BaseTestDescribeSurf<I extends ImageGray<I>,II extends Ima
 	@Test
 	public void features_increasing() {
 		// test the gradient along the x-axis only
-		TestImplSurfDescribeOps.createGradient(0,input);
+		TestImplSurfDescribeOps.createGradient(0, input);
 		GIntegralImageOps.transform(input, ii);
 		sparse = TestImplSurfDescribeOps.createGradient(ii, 1);
 
 		// orient the feature along the x-axis
 		alg.setImage(ii);
 		TupleDesc_F64 feat = alg.createDescription();
-		alg.describe(15,15, 0, 1, true, feat);
+		alg.describe(15, 15, 0, 1, true, feat);
 
-		for( int i = 0; i < 64; i+= 4) {
-			assertEquals(feat.data[i],feat.data[i+1],1e-4);
+		for (int i = 0; i < 64; i += 4) {
+			assertEquals(feat.data[i], feat.data[i + 1], 1e-4);
 			assertTrue(feat.data[i] > 0);
-			assertEquals(0,feat.data[i+2],1e-4);
-			assertEquals(0,feat.data[i+3],1e-4);
+			assertEquals(0, feat.data[i + 2], 1e-4);
+			assertEquals(0, feat.data[i + 3], 1e-4);
 		}
 
 		// now orient the feature along the y-axis
-		alg.describe(15,15, Math.PI / 2.0, 1, true, feat);
+		alg.describe(15, 15, Math.PI/2.0, 1, true, feat);
 
-		for( int i = 0; i < 64; i+= 4) {
-			assertEquals(-feat.data[i+2],feat.data[i+3],1e-4);
-			assertTrue(feat.data[i+2] < 0);
-			assertEquals(0,feat.data[i],1e-4);
-			assertEquals(0,feat.data[i+1],1e-4);
+		for (int i = 0; i < 64; i += 4) {
+			assertEquals(-feat.data[i + 2], feat.data[i + 3], 1e-4);
+			assertTrue(feat.data[i + 2] < 0);
+			assertEquals(0, feat.data[i], 1e-4);
+			assertEquals(0, feat.data[i + 1], 1e-4);
 		}
 	}
 
@@ -187,20 +187,20 @@ public abstract class BaseTestDescribeSurf<I extends ImageGray<I>,II extends Ima
 	@Test
 	public void features_fraction() {
 		// test the gradient along the x-axis only
-		TestImplSurfDescribeOps.createGradient( 0,input);
-		GIntegralImageOps.transform(input,ii);
-		sparse = TestImplSurfDescribeOps.createGradient(ii,1.5);
+		TestImplSurfDescribeOps.createGradient(0, input);
+		GIntegralImageOps.transform(input, ii);
+		sparse = TestImplSurfDescribeOps.createGradient(ii, 1.5);
 
 		// orient the feature along the x-axis
 		alg.setImage(ii);
 		TupleDesc_F64 feat = alg.createDescription();
-		alg.describe(25,25, 0, 1.5, true, feat);
+		alg.describe(25, 25, 0, 1.5, true, feat);
 
-		for( int i = 0; i < 64; i+= 4) {
-			assertEquals(feat.data[i],feat.data[i+1],1e-4);
+		for (int i = 0; i < 64; i += 4) {
+			assertEquals(feat.data[i], feat.data[i + 1], 1e-4);
 			assertTrue(feat.data[i] > 0);
-			assertEquals(0,feat.data[i+2],1e-4);
-			assertEquals(0,feat.data[i+3],1e-4);
+			assertEquals(0, feat.data[i + 2], 1e-4);
+			assertEquals(0, feat.data[i + 3], 1e-4);
 		}
 	}
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -38,22 +38,22 @@ public class TemplateIntensityImage<T extends ImageBase<T>>
 	protected T mask;
 
 	// thickness of the border along the lower extents of the image
-	protected int borderX0,borderY0;
-	protected int borderX1,borderY1;
+	protected int borderX0, borderY0;
+	protected int borderX1, borderY1;
 
 	protected EvaluatorMethod<T> method;
 
-	public TemplateIntensityImage(EvaluatorMethod<T> method ) {
+	public TemplateIntensityImage( EvaluatorMethod<T> method ) {
 		this.method = method;
 	}
 
 	@Override
-	public void setInputImage(T image) {
+	public void setInputImage( T image ) {
 		this.image = image;
 	}
 
 	@Override
-	public void process(T template) {
+	public void process( T template ) {
 		this.template = template;
 		this.mask = null;
 		intensity.reshape(image.width, image.height);
@@ -61,13 +61,13 @@ public class TemplateIntensityImage<T extends ImageBase<T>>
 		int w = image.width - template.width + 1;
 		int h = image.height - template.height + 1;
 
-		borderX0 = template.width / 2;
-		borderY0 = template.height / 2;
-		borderX1 = template.width-borderX0;
-		borderY1 = template.height-borderY0;
+		borderX0 = template.width/2;
+		borderY0 = template.height/2;
+		borderX1 = template.width - borderX0;
+		borderY1 = template.height - borderY0;
 
 		// set the outside border to the lowest possible score
-		GImageMiscOps.fillBorder(intensity,0.0f,borderX0,borderY0,borderX1,borderY1);
+		GImageMiscOps.fillBorder(intensity, 0.0f, borderX0, borderY0, borderX1, borderY1);
 
 		method.initialize(this);
 
@@ -78,9 +78,9 @@ public class TemplateIntensityImage<T extends ImageBase<T>>
 		this.mask = null;
 	}
 
-	protected void processInner(int w, int h) {
+	protected void processInner( int w, int h ) {
 		for (int y = 0; y < h; y++) {
-			int index = intensity.startIndex + (y + borderY0) * intensity.stride + borderX0;
+			int index = intensity.startIndex + (y + borderY0)*intensity.stride + borderX0;
 			for (int x = 0; x < w; x++) {
 				intensity.data[index++] = method.evaluate(x, y);
 			}
@@ -88,8 +88,8 @@ public class TemplateIntensityImage<T extends ImageBase<T>>
 	}
 
 	@Override
-	public void process(T template, T mask ) {
-		if( mask == null ) {
+	public void process( T template, T mask ) {
+		if (mask == null) {
 			process(template);
 			return;
 		}
@@ -101,10 +101,10 @@ public class TemplateIntensityImage<T extends ImageBase<T>>
 		int w = image.width - template.width + 1;
 		int h = image.height - template.height + 1;
 
-		borderX0 = template.width / 2;
-		borderY0 = template.height / 2;
-		borderX1 = template.width-borderX0;
-		borderY1 = template.height-borderY0;
+		borderX0 = template.width/2;
+		borderY0 = template.height/2;
+		borderX1 = template.width - borderX0;
+		borderY1 = template.height - borderY0;
 
 		method.initialize(this);
 
@@ -115,9 +115,9 @@ public class TemplateIntensityImage<T extends ImageBase<T>>
 		this.mask = null;
 	}
 
-	protected void processInnerMask(int w, int h) {
+	protected void processInnerMask( int w, int h ) {
 		for (int y = 0; y < h; y++) {
-			int index = intensity.startIndex + (y + borderY0) * intensity.stride + borderX0;
+			int index = intensity.startIndex + (y + borderY0)*intensity.stride + borderX0;
 			for (int x = 0; x < w; x++) {
 				intensity.data[index++] = method.evaluateMask(x, y);
 			}
@@ -160,7 +160,7 @@ public class TemplateIntensityImage<T extends ImageBase<T>>
 	}
 
 	public interface EvaluatorMethod<T extends ImageBase<T>> {
-		void initialize( TemplateIntensityImage<T> owner  );
+		void initialize( TemplateIntensityImage<T> owner );
 
 		/**
 		 * Evaluate the template at the specified location.
@@ -169,7 +169,7 @@ public class TemplateIntensityImage<T extends ImageBase<T>>
 		 * @param tl_y Template's top left corner y-coordinate
 		 * @return match value with better matches having a more positive value
 		 */
-		float evaluate(int tl_x, int tl_y);
+		float evaluate( int tl_x, int tl_y );
 
 		/**
 		 * Evaluate the masked template at the specified location.
@@ -178,7 +178,7 @@ public class TemplateIntensityImage<T extends ImageBase<T>>
 		 * @param tl_y Template's top left corner y-coordinate
 		 * @return match value with better matches having a more positive value
 		 */
-		float evaluateMask(int tl_x, int tl_y);
+		float evaluateMask( int tl_x, int tl_y );
 
 		boolean isMaximize();
 

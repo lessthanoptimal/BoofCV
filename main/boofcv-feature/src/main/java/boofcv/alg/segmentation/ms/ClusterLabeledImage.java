@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -50,11 +50,11 @@ public class ClusterLabeledImage extends RegionMergeTree {
 	protected ConnectRule connectRule;
 
 	// offset in pixel indices for adjacent pixels
-	protected int edgesIn[];
-	protected int edgesOut[];
+	protected int[] edgesIn;
+	protected int[] edgesOut;
 
 	// relative coordinates of adjacent pixels
-	protected Point2D_I32 edges[];
+	protected Point2D_I32[] edges;
 
 	// contains the number of pixels in each output label
 	protected DogArray_I32 regionMemberCount;
@@ -64,55 +64,55 @@ public class ClusterLabeledImage extends RegionMergeTree {
 	 *
 	 * @param connectRule Which connectivity rule to use.  4 or 8
 	 */
-	public ClusterLabeledImage(ConnectRule connectRule) {
+	public ClusterLabeledImage( ConnectRule connectRule ) {
 		this.connectRule = connectRule;
 
-		if( connectRule == ConnectRule.EIGHT ) {
+		if (connectRule == ConnectRule.EIGHT) {
 			edgesIn = new int[4];
 			edgesOut = new int[4];
 			edges = new Point2D_I32[4];
-		} else if( connectRule == ConnectRule.FOUR ) {
+		} else if (connectRule == ConnectRule.FOUR) {
 			edgesIn = new int[2];
 			edgesOut = new int[2];
 			edges = new Point2D_I32[2];
 		} else {
 			throw new IllegalArgumentException("connectRule must be 4 or 8");
 		}
-		for( int i = 0; i < edges.length; i++ )
+		for (int i = 0; i < edges.length; i++)
 			edges[i] = new Point2D_I32();
 	}
 
 	/**
 	 * Declares lookup tables for neighbors
 	 */
-	protected void setUpEdges(GrayS32 input , GrayS32 output  ) {
-		if( connectRule == ConnectRule.EIGHT ) {
-			setUpEdges8(input,edgesIn);
-			setUpEdges8(output,edgesOut);
+	protected void setUpEdges( GrayS32 input, GrayS32 output ) {
+		if (connectRule == ConnectRule.EIGHT) {
+			setUpEdges8(input, edgesIn);
+			setUpEdges8(output, edgesOut);
 
-			edges[0].setTo( 1, 0);
-			edges[1].setTo( 1, 1);
-			edges[2].setTo( 0, 1);
+			edges[0].setTo(1, 0);
+			edges[1].setTo(1, 1);
+			edges[2].setTo(0, 1);
 			edges[3].setTo(-1, 0);
 		} else {
-			setUpEdges4(input,edgesIn);
-			setUpEdges4(output,edgesOut);
+			setUpEdges4(input, edgesIn);
+			setUpEdges4(output, edgesOut);
 
-			edges[0].setTo( 1,0);
-			edges[1].setTo( 0, 1);
+			edges[0].setTo(1, 0);
+			edges[1].setTo(0, 1);
 		}
 	}
 
-	protected void setUpEdges8(GrayS32 image , int edges[] )  {
-		edges[0] =  1;
-		edges[1] =  1 + image.stride;
-		edges[2] =    + image.stride;
+	protected void setUpEdges8( GrayS32 image, int[] edges ) {
+		edges[0] = 1;
+		edges[1] = 1 + image.stride;
+		edges[2] = +image.stride;
 		edges[3] = -1 + image.stride;
 	}
 
-	protected void setUpEdges4(GrayS32 image , int edges[] )  {
-		edges[0] =  1;
-		edges[1] =    + image.stride;
+	protected void setUpEdges4( GrayS32 image, int[] edges ) {
+		edges[0] = 1;
+		edges[1] = +image.stride;
 	}
 
 	/**
@@ -122,13 +122,13 @@ public class ClusterLabeledImage extends RegionMergeTree {
 	 * @param output Labeled output image.
 	 * @param regionMemberCount (Input/Output) Number of pixels which belong to each group.
 	 */
-	public void process(GrayS32 input , GrayS32 output , DogArray_I32 regionMemberCount ) {
+	public void process( GrayS32 input, GrayS32 output, DogArray_I32 regionMemberCount ) {
 		// initialize data structures
 		this.regionMemberCount = regionMemberCount;
 		regionMemberCount.reset();
 
-		setUpEdges(input,output);
-		ImageMiscOps.fill(output,-1);
+		setUpEdges(input, output);
+		ImageMiscOps.fill(output, -1);
 
 		// this is a bit of a hack here.  Normally you call the parent's init function.
 		// since the number of regions is not initially known this will grow
@@ -145,31 +145,31 @@ public class ClusterLabeledImage extends RegionMergeTree {
 	/**
 	 * Examines pixels inside the image without the need for bounds checking
 	 */
-	protected void connectInner(GrayS32 input, GrayS32 output) {
+	protected void connectInner( GrayS32 input, GrayS32 output ) {
 
 		int startX = connectRule == ConnectRule.EIGHT ? 1 : 0;
 
-		for( int y = 0; y < input.height-1; y++ ) {
+		for (int y = 0; y < input.height - 1; y++) {
 			int indexIn = input.startIndex + y*input.stride + startX;
 			int indexOut = output.startIndex + y*output.stride + startX;
 
-			for( int x = startX; x < input.width-1; x++ , indexIn++, indexOut++) {
+			for (int x = startX; x < input.width - 1; x++, indexIn++, indexOut++) {
 				int inputLabel = input.data[indexIn];
 				int outputLabel = output.data[indexOut];
-				if( outputLabel == -1 ) { // see if it needs to create a new output segment
+				if (outputLabel == -1) { // see if it needs to create a new output segment
 					output.data[indexOut] = outputLabel = regionMemberCount.size;
 					regionMemberCount.add(1);
 					mergeList.add(outputLabel);
 				}
 
-				for( int i = 0; i < edgesIn.length; i++ ) {
-					if( inputLabel == input.data[indexIn+edgesIn[i]] ) {
-						int outputAdj = output.data[indexOut+edgesOut[i]];
-						if( outputAdj == -1 ) {  // see if not assigned
+				for (int i = 0; i < edgesIn.length; i++) {
+					if (inputLabel == input.data[indexIn + edgesIn[i]]) {
+						int outputAdj = output.data[indexOut + edgesOut[i]];
+						if (outputAdj == -1) {  // see if not assigned
 							regionMemberCount.data[outputLabel]++;
-							output.data[indexOut+edgesOut[i]] = outputLabel;
-						} else if( outputLabel != outputAdj ) { // see if assigned to different regions
-							markMerge(outputLabel,outputAdj);
+							output.data[indexOut + edgesOut[i]] = outputLabel;
+						} else if (outputLabel != outputAdj) { // see if assigned to different regions
+							markMerge(outputLabel, outputAdj);
 						} // do nothing, same input and output labels
 					}
 				}
@@ -180,42 +180,42 @@ public class ClusterLabeledImage extends RegionMergeTree {
 	/**
 	 * Examines pixels along the left and right border
 	 */
-	protected void connectLeftRight(GrayS32 input, GrayS32 output) {
-		for( int y = 0; y < input.height; y++ ) {
-			int x = input.width-1;
+	protected void connectLeftRight( GrayS32 input, GrayS32 output ) {
+		for (int y = 0; y < input.height; y++) {
+			int x = input.width - 1;
 
 			int inputLabel = input.unsafe_get(x, y);
 			int outputLabel = output.unsafe_get(x, y);
 
-			if( outputLabel == -1 ) { // see if it needs to create a new output segment
+			if (outputLabel == -1) { // see if it needs to create a new output segment
 				outputLabel = regionMemberCount.size;
-				output.unsafe_set(x,y,outputLabel);
+				output.unsafe_set(x, y, outputLabel);
 				regionMemberCount.add(1);
 				mergeList.add(outputLabel);
 			}
 
 			// check right first
-			for( int i = 0; i < edges.length; i++ ) {
+			for (int i = 0; i < edges.length; i++) {
 
 				Point2D_I32 offset = edges[i];
 
 				// make sure it is inside the image
-				if( !input.isInBounds(x+offset.x,y+offset.y))
+				if (!input.isInBounds(x + offset.x, y + offset.y))
 					continue;
 
-				if( inputLabel == input.unsafe_get(x+offset.x,y+offset.y) ) {
-					int outputAdj = output.unsafe_get(x+offset.x,y+offset.y);
-					if( outputAdj == -1 ) {  // see if not assigned
+				if (inputLabel == input.unsafe_get(x + offset.x, y + offset.y)) {
+					int outputAdj = output.unsafe_get(x + offset.x, y + offset.y);
+					if (outputAdj == -1) {  // see if not assigned
 						regionMemberCount.data[outputLabel]++;
-						output.unsafe_set(x+offset.x,y+offset.y, outputLabel);
-					} else if( outputLabel != outputAdj ) { // see if assigned to different regions
-						markMerge(outputLabel,outputAdj);
+						output.unsafe_set(x + offset.x, y + offset.y, outputLabel);
+					} else if (outputLabel != outputAdj) { // see if assigned to different regions
+						markMerge(outputLabel, outputAdj);
 					} // do nothing, same input and output labels
 				}
 			}
 
 			// skip check of left of 4-connect
-			if( connectRule != ConnectRule.EIGHT )
+			if (connectRule != ConnectRule.EIGHT)
 				continue;
 
 			x = 0;
@@ -223,27 +223,27 @@ public class ClusterLabeledImage extends RegionMergeTree {
 			inputLabel = input.unsafe_get(x, y);
 			outputLabel = output.unsafe_get(x, y);
 
-			if( outputLabel == -1 ) { // see if it needs to create a new output segment
+			if (outputLabel == -1) { // see if it needs to create a new output segment
 				outputLabel = regionMemberCount.size;
-				output.unsafe_set(x,y,outputLabel);
+				output.unsafe_set(x, y, outputLabel);
 				regionMemberCount.add(1);
 				mergeList.add(outputLabel);
 			}
 
-			for( int i = 0; i < edges.length; i++ ) {
+			for (int i = 0; i < edges.length; i++) {
 				Point2D_I32 offset = edges[i];
 
 				// make sure it is inside the image
-				if( !input.isInBounds(x+offset.x,y+offset.y))
+				if (!input.isInBounds(x + offset.x, y + offset.y))
 					continue;
 
-				if( inputLabel == input.unsafe_get(x+offset.x,y+offset.y) ) {
-					int outputAdj = output.unsafe_get(x+offset.x,y+offset.y);
-					if( outputAdj == -1 ) {  // see if not assigned
+				if (inputLabel == input.unsafe_get(x + offset.x, y + offset.y)) {
+					int outputAdj = output.unsafe_get(x + offset.x, y + offset.y);
+					if (outputAdj == -1) {  // see if not assigned
 						regionMemberCount.data[outputLabel]++;
-						output.unsafe_set(x+offset.x,y+offset.y, outputLabel);
-					} else if( outputLabel != outputAdj ) { // see if assigned to different regions
-						markMerge(outputLabel,outputAdj);
+						output.unsafe_set(x + offset.x, y + offset.y, outputLabel);
+					} else if (outputLabel != outputAdj) { // see if assigned to different regions
+						markMerge(outputLabel, outputAdj);
 					} // do nothing, same input and output labels
 				}
 			}
@@ -253,28 +253,28 @@ public class ClusterLabeledImage extends RegionMergeTree {
 	/**
 	 * Examines pixels along the bottom border
 	 */
-	protected void connectBottom(GrayS32 input, GrayS32 output) {
-		for( int x = 0; x < input.width-1; x++ ) {
-			int y = input.height-1;
+	protected void connectBottom( GrayS32 input, GrayS32 output ) {
+		for (int x = 0; x < input.width - 1; x++) {
+			int y = input.height - 1;
 
-			int inputLabel = input.unsafe_get(x,y);
-			int outputLabel = output.unsafe_get(x,y);
+			int inputLabel = input.unsafe_get(x, y);
+			int outputLabel = output.unsafe_get(x, y);
 
-			if( outputLabel == -1 ) { // see if it needs to create a new output segment
+			if (outputLabel == -1) { // see if it needs to create a new output segment
 				outputLabel = regionMemberCount.size;
-				output.unsafe_set(x,y,outputLabel);
+				output.unsafe_set(x, y, outputLabel);
 				regionMemberCount.add(1);
 				mergeList.add(outputLabel);
 			}
 
 			// for 4 and 8 connect the check is only +1 x and 0 y
-			if( inputLabel == input.unsafe_get(x+1,y) ) {
-				int outputAdj = output.unsafe_get(x+1,y);
-				if( outputAdj == -1 ) {  // see if not assigned
+			if (inputLabel == input.unsafe_get(x + 1, y)) {
+				int outputAdj = output.unsafe_get(x + 1, y);
+				if (outputAdj == -1) {  // see if not assigned
 					regionMemberCount.data[outputLabel]++;
-					output.unsafe_set(x+1,y, outputLabel);
-				} else if( outputLabel != outputAdj ) { // see if assigned to different regions
-					markMerge(outputLabel,outputAdj);
+					output.unsafe_set(x + 1, y, outputLabel);
+				} else if (outputLabel != outputAdj) { // see if assigned to different regions
+					markMerge(outputLabel, outputAdj);
 				} // do nothing, same input and output labels
 			}
 		}

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -33,13 +33,13 @@ public class FeatureSelectN<Point> implements FeatureSelectLimit<Point> {
 	@Override
 	public void select( int imageWidth, int imageHeight,
 						@Nullable FastAccess<Point> prior,
-						FastAccess<Point> detected, int limit, FastArray<Point> selected) {
-		final int N = Math.min(detected.size,limit);
-		assert(N>0);
+						FastAccess<Point> detected, int limit, FastArray<Point> selected ) {
+		final int N = Math.min(detected.size, limit);
+		assert (N > 0);
 		selected.resize(N);
 		for (int i = 0; i < N; i++) {
 			int selectedIdx = i*detected.size/N;
-			selected.set(i,detected.get(selectedIdx));
+			selected.set(i, detected.get(selectedIdx));
 		}
 	}
 }

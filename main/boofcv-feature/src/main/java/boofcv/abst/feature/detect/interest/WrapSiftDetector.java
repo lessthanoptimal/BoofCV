@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -31,76 +31,52 @@ import georegression.struct.point.Point2D_F64;
  * @author Peter Abeles
  */
 public class WrapSiftDetector<T extends ImageGray<T>>
-		implements InterestPointDetector<T>
-{
+		implements InterestPointDetector<T> {
 	SiftDetector detector;
 
-	GrayF32 imageFloat = new GrayF32(1,1);
+	GrayF32 imageFloat = new GrayF32(1, 1);
 
 	ImageType<T> inputType;
 
-	public WrapSiftDetector(SiftDetector detector, Class<T> inputType ) {
+	public WrapSiftDetector( SiftDetector detector, Class<T> inputType ) {
 		this.detector = detector;
 		this.inputType = ImageType.single(inputType);
 	}
 
-	@Override
-	public void detect(T image) {
-
+	@Override public void detect( T image ) {
 		GrayF32 input;
-		if( !inputType.getDataType().isInteger() ) {
+		if (!inputType.getDataType().isInteger()) {
 			input = (GrayF32)image;
 		} else {
-			imageFloat.reshape(image.width,image.height);
-			GConvertImage.convert(image,imageFloat);
+			imageFloat.reshape(image.width, image.height);
+			GConvertImage.convert(image, imageFloat);
 			input = imageFloat;
 		}
 
 		detector.process(input);
 	}
 
-	@Override
-	public int getNumberOfSets() {
-		return 2;
-	}
+	@Override public int getNumberOfSets() { return 2; }
 
-	@Override
-	public int getSet(int index) {
+	@Override public int getSet( int index ) {
 		return detector.getDetections().get(index).white ? 0 : 1;
 	}
 
-	@Override
-	public int getNumberOfFeatures() {
-		return detector.getDetections().size();
-	}
+	@Override public int getNumberOfFeatures() { return detector.getDetections().size(); }
 
-	@Override
-	public Point2D_F64 getLocation(int featureIndex) {
+	@Override public Point2D_F64 getLocation( int featureIndex ) {
 		return detector.getDetections().get(featureIndex).pixel;
 	}
 
-	@Override
-	public double getRadius(int featureIndex) {
+	@Override public double getRadius( int featureIndex ) {
 		return detector.getDetections().get(featureIndex).scale;
 	}
 
-	@Override
-	public double getOrientation(int featureIndex) {
-		return 0;
-	}
+	@Override public double getOrientation( int featureIndex ) { return 0; }
 
-	@Override
-	public boolean hasScale() {
-		return true;
-	}
+	@Override public boolean hasScale() { return true; }
 
-	@Override
-	public boolean hasOrientation() {
-		return false;
-	}
+	@Override public boolean hasOrientation() { return false; }
 
-	@Override
-	public ImageType<T> getInputType() {
-		return inputType;
-	}
+	@Override public ImageType<T> getInputType() { return inputType; }
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -32,17 +32,17 @@ public class MaximumLineDistance implements SplitSelector {
 	LineParametric2D_F64 line = new LineParametric2D_F64();
 
 	@Override
-	public void selectSplitPoint(List<Point2D_I32> contour, int indexA, int indexB, PolylineSplitMerge.SplitResults results) {
+	public void selectSplitPoint( List<Point2D_I32> contour, int indexA, int indexB, PolylineSplitMerge.SplitResults results ) {
 		PolylineSplitMerge.assignLine(contour, indexA, indexB, line);
 
-		if( indexB >= indexA ) {
+		if (indexB >= indexA) {
 			results.index = indexA;
 			results.score = -1;
-			for (int i = indexA+1; i < indexB; i++) {
+			for (int i = indexA + 1; i < indexB; i++) {
 				Point2D_I32 p = contour.get(i);
-				double distanceSq = Distance2D_F64.distanceSq(line,p.x,p.y);
+				double distanceSq = Distance2D_F64.distanceSq(line, p.x, p.y);
 
-				if( distanceSq > results.score ) {
+				if (distanceSq > results.score) {
 					results.score = distanceSq;
 					results.index = i;
 				}
@@ -50,13 +50,13 @@ public class MaximumLineDistance implements SplitSelector {
 		} else {
 			results.index = indexA;
 			results.score = -1;
-			int distance = contour.size()-indexA + indexB;
+			int distance = contour.size() - indexA + indexB;
 			for (int i = 1; i < distance; i++) {
-				int index = (indexA+i)%contour.size();
+				int index = (indexA + i)%contour.size();
 				Point2D_I32 p = contour.get(index);
-				double distanceSq = Distance2D_F64.distanceSq(line,p.x,p.y);
+				double distanceSq = Distance2D_F64.distanceSq(line, p.x, p.y);
 
-				if( distanceSq > results.score ) {
+				if (distanceSq > results.score) {
 					results.score = distanceSq;
 					results.index = index;
 				}
@@ -68,10 +68,10 @@ public class MaximumLineDistance implements SplitSelector {
 	}
 
 	@Override
-	public int compareScore(double scoreA, double scoreB) {
-		if( scoreA > scoreB )
+	public int compareScore( double scoreA, double scoreB ) {
+		if (scoreA > scoreB)
 			return 1;
-		else if( scoreA < scoreB )
+		else if (scoreA < scoreB)
 			return -1;
 		else
 			return 0;

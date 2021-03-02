@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -33,9 +33,10 @@ import static org.junit.jupiter.api.Assertions.*;
 /**
  * @author Peter Abeles
  */
+@SuppressWarnings({"rawtypes", "unchecked"})
 public class TestDescribePlanar extends BoofStandardJUnit {
 
-	boolean ori,scale;
+	boolean ori, scale;
 
 	/**
 	 * Sanity check to see if input image and number of descriptors is the same
@@ -50,8 +51,7 @@ public class TestDescribePlanar extends BoofStandardJUnit {
 
 		DummyAlg alg = new DummyAlg(descs);
 
-		assertThrows(IllegalArgumentException.class,
-				()->alg.setImage(new Planar(GrayS8.class,1,1,2)));
+		assertThrows(IllegalArgumentException.class, () -> alg.setImage(new Planar(GrayS8.class, 1, 1, 2)));
 	}
 
 	@Test
@@ -82,27 +82,26 @@ public class TestDescribePlanar extends BoofStandardJUnit {
 
 		DummyAlg alg = new DummyAlg(descs);
 
-		alg.setImage(new Planar(GrayS8.class,1,1,3));
+		alg.setImage(new Planar(GrayS8.class, 1, 1, 3));
 		alg.process(0, 1, 2, 3, alg.createDescription());
 
 		assertEquals(30, alg.createDescription().size());
-		assertEquals(1,alg.numCombined);
+		assertEquals(1, alg.numCombined);
 
-		for( int i = 0; i < 3; i++ ) {
-			assertEquals(1,((DummyDesc)descs[i]).numProcess);
+		for (int i = 0; i < 3; i++) {
+			assertEquals(1, ((DummyDesc)descs[i]).numProcess);
 		}
 	}
 
-	private class DummyAlg extends DescribePlanar {
-
+	private static class DummyAlg extends DescribePlanar {
 		int numCombined = 0;
 
-		public DummyAlg(DescribeRegionPoint[] describers) {
+		public DummyAlg( DescribeRegionPoint[] describers ) {
 			super(describers);
 		}
 
 		@Override
-		protected void combine(TupleDesc description) {
+		protected void combine( TupleDesc description ) {
 			numCombined++;
 		}
 
@@ -116,17 +115,16 @@ public class TestDescribePlanar extends BoofStandardJUnit {
 	}
 
 	private class DummyDesc implements DescribeRegionPoint {
-
 		ImageBase image;
 		int numProcess = 0;
 
 		@Override
-		public void setImage(ImageBase image) {
+		public void setImage( ImageBase image ) {
 			this.image = image;
 		}
 
 		@Override
-		public boolean process(double x, double y, double orientation, double radius, TupleDesc description) {
+		public boolean process( double x, double y, double orientation, double radius, TupleDesc description ) {
 			numProcess++;
 			return true;
 		}

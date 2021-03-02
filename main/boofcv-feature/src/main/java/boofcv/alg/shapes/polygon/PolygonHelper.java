@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -38,8 +38,7 @@ public interface PolygonHelper {
 	 * @param width Image width in pixels
 	 * @param height Image height in pixels
 	 */
-	void setImageShape( int width , int height );
-
+	void setImageShape( int width, int height );
 
 	/**
 	 * User defined filter to accept/reject or modify the contour of a shape.  Called at most twice. First
@@ -50,7 +49,7 @@ public interface PolygonHelper {
 	 * @param distorted True if pixels are distorted or false for undistorted pixel coordinates
 	 * @return true to keep the contour for further processing or false to reject it
 	 */
-	boolean filterContour( List<Point2D_I32> contour , boolean touchesBorder , boolean distorted );
+	boolean filterContour( List<Point2D_I32> contour, boolean touchesBorder, boolean distorted );
 
 	/**
 	 * Function which allows a custom filter function to be used on the pixel level precise polygon
@@ -61,10 +60,10 @@ public interface PolygonHelper {
 	 * @param touchesBorder true if the contour touches the image border or false if it doesnt
 	 * @return true to keep the contour for further processing or false to reject it
 	 */
-	boolean filterPixelPolygon(Polygon2D_F64 undistorted , Polygon2D_F64 distorted, DogArray_B touches, boolean touchesBorder);
+	boolean filterPixelPolygon( Polygon2D_F64 undistorted, Polygon2D_F64 distorted, DogArray_B touches, boolean touchesBorder );
 
 	/**
 	 * Provide an oportunity to configure the polyline fit based on what's currently known
 	 */
-	void configureBeforePolyline(PointsToPolyline contourToPolyline, boolean touchesBorder);
+	void configureBeforePolyline( PointsToPolyline contourToPolyline, boolean touchesBorder );
 }

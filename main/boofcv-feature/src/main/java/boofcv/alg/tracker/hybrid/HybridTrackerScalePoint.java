@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -48,7 +48,8 @@ import java.util.Random;
  *
  * @author Peter Abeles
  */
-public class HybridTrackerScalePoint<I extends ImageGray<I>, D extends ImageGray<D>, TD extends TupleDesc> {
+public class HybridTrackerScalePoint
+		<I extends ImageGray<I>, D extends ImageGray<D>, TD extends TupleDesc<TD>> {
 	// The max number of allowed unassociated tracks before it starts to drop them
 	public int maxInactiveTracks = 200;
 	// Used to select tracks to drop

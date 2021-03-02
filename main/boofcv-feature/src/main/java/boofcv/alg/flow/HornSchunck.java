@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -48,7 +48,7 @@ public abstract class HornSchunck<T extends ImageBase<T>, D extends ImageBase<D>
 	protected int numIterations;
 
 	// storage for the average flow
-	protected ImageFlow averageFlow = new ImageFlow(1,1);
+	protected ImageFlow averageFlow = new ImageFlow(1, 1);
 
 	// If the output should be cleared each time a new image is processed or used as an initial estimate
 	protected boolean resetOutput = true;
@@ -64,20 +64,21 @@ public abstract class HornSchunck<T extends ImageBase<T>, D extends ImageBase<D>
 	 * @param alpha Larger values place more importance on flow smoothness consistency over brightness consistency.  Try 20
 	 * @param numIterations Number of iterations.  Try 1000
 	 */
-	protected HornSchunck(float alpha, int numIterations, ImageType<D> derivType) {
+	protected HornSchunck( float alpha, int numIterations, ImageType<D> derivType ) {
 		this.alpha2 = alpha*alpha;
 		this.numIterations = numIterations;
 
-		derivX = derivType.createImage(1,1);
-		derivY = derivType.createImage(1,1);
-		derivT = derivType.createImage(1,1);
+		derivX = derivType.createImage(1, 1);
+		derivY = derivType.createImage(1, 1);
+		derivT = derivType.createImage(1, 1);
 	}
 
 	/**
 	 * changes the maximum number of iterations
+	 *
 	 * @param numIterations maximum number of iterations
 	 */
-	public void setNumIterations(int numIterations) {
+	public void setNumIterations( int numIterations ) {
 		this.numIterations = numIterations;
 	}
 
@@ -89,58 +90,59 @@ public abstract class HornSchunck<T extends ImageBase<T>, D extends ImageBase<D>
 	 * @param image2 Second image
 	 * @param output Found dense optical flow
 	 */
-	public void process( T image1 , T image2 , ImageFlow output) {
+	public void process( T image1, T image2, ImageFlow output ) {
 
-		InputSanityCheck.checkSameShape(image1,image2);
+		InputSanityCheck.checkSameShape(image1, image2);
 
-		derivX.reshape(image1.width,image1.height);
-		derivY.reshape(image1.width,image1.height);
-		derivT.reshape(image1.width,image1.height);
+		derivX.reshape(image1.width, image1.height);
+		derivY.reshape(image1.width, image1.height);
+		derivT.reshape(image1.width, image1.height);
 
-		averageFlow.reshape(output.width,output.height);
+		averageFlow.reshape(output.width, output.height);
 
-		if( resetOutput )
+		if (resetOutput)
 			output.fillZero();
 
-		computeDerivX(image1,image2,derivX);
-		computeDerivY(image1,image2,derivY);
-		computeDerivT(image1,image2,derivT);
+		computeDerivX(image1, image2, derivX);
+		computeDerivY(image1, image2, derivY);
+		computeDerivT(image1, image2, derivT);
 
-		findFlow(derivX,derivY,derivT,output);
+		findFlow(derivX, derivY, derivT, output);
 	}
 
-	protected abstract void computeDerivX( T image1 , T image2 , D derivX );
-	protected abstract void computeDerivY( T image1 , T image2 , D derivY );
-	protected abstract void computeDerivT( T image1 , T image2 , D derivT );
+	protected abstract void computeDerivX( T image1, T image2, D derivX );
+
+	protected abstract void computeDerivY( T image1, T image2, D derivY );
+
+	protected abstract void computeDerivT( T image1, T image2, D derivT );
 
 	/**
 	 * Inner function for computing optical flow
 	 */
-	protected abstract void findFlow( D derivX , D derivY , D derivT , ImageFlow output );
-
+	protected abstract void findFlow( D derivX, D derivY, D derivT, ImageFlow output );
 
 	/**
 	 * Computes average flow using an 8-connect neighborhood for the inner image
 	 */
-	protected static void innerAverageFlow( ImageFlow flow , ImageFlow averageFlow ) {
+	protected static void innerAverageFlow( ImageFlow flow, ImageFlow averageFlow ) {
 
-		int endX = flow.width-1;
-		int endY = flow.height-1;
+		int endX = flow.width - 1;
+		int endY = flow.height - 1;
 
-		for( int y = 1; y < endY; y++ ) {
+		for (int y = 1; y < endY; y++) {
 			int index = flow.width*y + 1;
-			for( int x = 1; x < endX; x++ , index++) {
+			for (int x = 1; x < endX; x++, index++) {
 				ImageFlow.D average = averageFlow.data[index];
 
-				ImageFlow.D f0 = flow.data[index-1];
-				ImageFlow.D f1 = flow.data[index+1];
-				ImageFlow.D f2 = flow.data[index-flow.width];
-				ImageFlow.D f3 = flow.data[index+flow.width];
+				ImageFlow.D f0 = flow.data[index - 1];
+				ImageFlow.D f1 = flow.data[index + 1];
+				ImageFlow.D f2 = flow.data[index - flow.width];
+				ImageFlow.D f3 = flow.data[index + flow.width];
 
-				ImageFlow.D f4 = flow.data[index-1-flow.width];
-				ImageFlow.D f5 = flow.data[index+1-flow.width];
-				ImageFlow.D f6 = flow.data[index-1+flow.width];
-				ImageFlow.D f7 = flow.data[index+1+flow.width];
+				ImageFlow.D f4 = flow.data[index - 1 - flow.width];
+				ImageFlow.D f5 = flow.data[index + 1 - flow.width];
+				ImageFlow.D f6 = flow.data[index - 1 + flow.width];
+				ImageFlow.D f7 = flow.data[index + 1 + flow.width];
 
 				average.x = 0.1666667f*(f0.x + f1.x + f2.x + f3.x) + 0.08333333f*(f4.x + f5.x + f6.x + f7.x);
 				average.y = 0.1666667f*(f0.y + f1.y + f2.y + f3.y) + 0.08333333f*(f4.y + f5.y + f6.y + f7.y);
@@ -151,42 +153,42 @@ public abstract class HornSchunck<T extends ImageBase<T>, D extends ImageBase<D>
 	/**
 	 * Computes average flow using an 8-connect neighborhood for the image border
 	 */
-	protected static void borderAverageFlow( ImageFlow flow , ImageFlow averageFlow) {
+	protected static void borderAverageFlow( ImageFlow flow, ImageFlow averageFlow ) {
 
-		for( int y = 0; y < flow.height; y++ ) {
-			computeBorder(flow,averageFlow, 0, y);
-			computeBorder(flow,averageFlow, flow.width-1, y);
+		for (int y = 0; y < flow.height; y++) {
+			computeBorder(flow, averageFlow, 0, y);
+			computeBorder(flow, averageFlow, flow.width - 1, y);
 		}
 
-		for( int x = 1; x < flow.width-1; x++ ) {
-			computeBorder(flow,averageFlow, x, 0);
-			computeBorder(flow,averageFlow, x, flow.height-1);
+		for (int x = 1; x < flow.width - 1; x++) {
+			computeBorder(flow, averageFlow, x, 0);
+			computeBorder(flow, averageFlow, x, flow.height - 1);
 		}
 	}
 
-	protected static void computeBorder(ImageFlow flow, ImageFlow averageFlow, int x, int y) {
-		ImageFlow.D average = averageFlow.get(x,y);
+	protected static void computeBorder( ImageFlow flow, ImageFlow averageFlow, int x, int y ) {
+		ImageFlow.D average = averageFlow.get(x, y);
 
-		ImageFlow.D f0 = getExtend(flow, x-1,y);
-		ImageFlow.D f1 = getExtend(flow, x+1,y);
-		ImageFlow.D f2 = getExtend(flow, x,y-1);
-		ImageFlow.D f3 = getExtend(flow, x,y+1);
+		ImageFlow.D f0 = getExtend(flow, x - 1, y);
+		ImageFlow.D f1 = getExtend(flow, x + 1, y);
+		ImageFlow.D f2 = getExtend(flow, x, y - 1);
+		ImageFlow.D f3 = getExtend(flow, x, y + 1);
 
-		ImageFlow.D f4 = getExtend(flow, x-1,y-1);
-		ImageFlow.D f5 = getExtend(flow, x+1,y-1);
-		ImageFlow.D f6 = getExtend(flow, x-1,y+1);
-		ImageFlow.D f7 = getExtend(flow, x+1,y+1);
+		ImageFlow.D f4 = getExtend(flow, x - 1, y - 1);
+		ImageFlow.D f5 = getExtend(flow, x + 1, y - 1);
+		ImageFlow.D f6 = getExtend(flow, x - 1, y + 1);
+		ImageFlow.D f7 = getExtend(flow, x + 1, y + 1);
 
 		average.x = 0.1666667f*(f0.x + f1.x + f2.x + f3.x) + 0.08333333f*(f4.x + f5.x + f6.x + f7.x);
 		average.y = 0.1666667f*(f0.y + f1.y + f2.y + f3.y) + 0.08333333f*(f4.y + f5.y + f6.y + f7.y);
 	}
 
-	protected static ImageFlow.D getExtend(ImageFlow flow, int x, int y) {
-		if( x < 0 ) x = 0;
-		else if( x >= flow.width ) x = flow.width-1;
-		if( y < 0 ) y = 0;
-		else if( y >= flow.height ) y = flow.height-1;
+	protected static ImageFlow.D getExtend( ImageFlow flow, int x, int y ) {
+		if (x < 0) x = 0;
+		else if (x >= flow.width) x = flow.width - 1;
+		if (y < 0) y = 0;
+		else if (y >= flow.height) y = flow.height - 1;
 
-		return flow.unsafe_get(x,y);
+		return flow.unsafe_get(x, y);
 	}
 }

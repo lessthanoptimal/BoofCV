@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -46,8 +46,7 @@ public class HessianBlobIntensity {
 	/**
 	 * Different types of Hessian blob detectors
 	 */
-	public static enum Type
-	{
+	public static enum Type {
 		/**
 		 * Compute the determinant.  Maximum are features.
 		 */
@@ -66,11 +65,10 @@ public class HessianBlobIntensity {
 	 * @param hessianYY Second derivative along y-axis. Not modified.
 	 * @param hessianXY Second derivative along x-axis and y-axis. Not modified.
 	 */
-	public static void determinant(GrayF32 featureIntensity , GrayF32 hessianXX, GrayF32 hessianYY , GrayF32 hessianXY )
-	{
-		InputSanityCheck.checkSameShape(featureIntensity,hessianXX,hessianYY,hessianXY);
+	public static void determinant( GrayF32 featureIntensity, GrayF32 hessianXX, GrayF32 hessianYY, GrayF32 hessianXY ) {
+		InputSanityCheck.checkSameShape(featureIntensity, hessianXX, hessianYY, hessianXY);
 
-		ImplHessianBlobIntensity.determinant(featureIntensity,hessianXX,hessianYY,hessianXY);
+		ImplHessianBlobIntensity.determinant(featureIntensity, hessianXX, hessianYY, hessianXY);
 	}
 
 	/**
@@ -80,11 +78,10 @@ public class HessianBlobIntensity {
 	 * @param hessianXX Second derivative along x-axis. Not modified.
 	 * @param hessianYY Second derivative along y-axis. Not modified.
 	 */
-	public static void trace(GrayF32 featureIntensity , GrayF32 hessianXX, GrayF32 hessianYY )
-	{
-		InputSanityCheck.checkSameShape(featureIntensity,hessianXX,hessianYY);
+	public static void trace( GrayF32 featureIntensity, GrayF32 hessianXX, GrayF32 hessianYY ) {
+		InputSanityCheck.checkSameShape(featureIntensity, hessianXX, hessianYY);
 
-		ImplHessianBlobIntensity.trace(featureIntensity,hessianXX,hessianYY);
+		ImplHessianBlobIntensity.trace(featureIntensity, hessianXX, hessianYY);
 	}
 
 	/**
@@ -95,11 +92,10 @@ public class HessianBlobIntensity {
 	 * @param hessianYY Second derivative along y-axis. Not modified.
 	 * @param hessianXY Second derivative along x-axis and y-axis. Not modified.
 	 */
-	public static void determinant(GrayF32 featureIntensity , GrayS16 hessianXX, GrayS16 hessianYY , GrayS16 hessianXY )
-	{
-		InputSanityCheck.checkSameShape(featureIntensity,hessianXX,hessianYY,hessianXY);
+	public static void determinant( GrayF32 featureIntensity, GrayS16 hessianXX, GrayS16 hessianYY, GrayS16 hessianXY ) {
+		InputSanityCheck.checkSameShape(featureIntensity, hessianXX, hessianYY, hessianXY);
 
-		ImplHessianBlobIntensity.determinant(featureIntensity,hessianXX,hessianYY,hessianXY);
+		ImplHessianBlobIntensity.determinant(featureIntensity, hessianXX, hessianYY, hessianXY);
 	}
 
 	/**
@@ -109,10 +105,9 @@ public class HessianBlobIntensity {
 	 * @param hessianXX Second derivative along x-axis. Not modified.
 	 * @param hessianYY Second derivative along y-axis. Not modified.
 	 */
-	public static void trace(GrayF32 featureIntensity , GrayS16 hessianXX, GrayS16 hessianYY )
-	{
-		InputSanityCheck.checkSameShape(featureIntensity,hessianXX,hessianYY);
+	public static void trace( GrayF32 featureIntensity, GrayS16 hessianXX, GrayS16 hessianYY ) {
+		InputSanityCheck.checkSameShape(featureIntensity, hessianXX, hessianYY);
 
-		ImplHessianBlobIntensity.trace(featureIntensity,hessianXX,hessianYY);
+		ImplHessianBlobIntensity.trace(featureIntensity, hessianXX, hessianYY);
 	}
 }

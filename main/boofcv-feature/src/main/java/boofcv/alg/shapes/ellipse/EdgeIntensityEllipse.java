@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -54,31 +54,31 @@ public class EdgeIntensityEllipse<T extends ImageGray<T>> extends BaseIntegralEd
 	 *
 	 * @param tangentDistance Distance along tangent it will integrate
 	 * @param numContourPoints Number of points along the contour it will sample.  If &le; 0
-	 *                         the test will always pass
+	 * the test will always pass
 	 * @param passThreshold Threshold for passing. Value: 0 to (max - min) pixel value.
 	 * @param imageType Type of input image
 	 */
-	public EdgeIntensityEllipse(double tangentDistance,
-								int numContourPoints,
-								double passThreshold,
-								Class<T> imageType) {
+	public EdgeIntensityEllipse( double tangentDistance,
+								 int numContourPoints,
+								 double passThreshold,
+								 Class<T> imageType ) {
 		super(imageType);
 
 		this.tangentDistance = tangentDistance;
 		this.numContourPoints = numContourPoints;
 		this.passThreshold = passThreshold;
-
 	}
 
 	/**
 	 * Processes the edge along the ellipse and determines if the edge intensity is strong enough
 	 * to pass or not
+	 *
 	 * @param ellipse The ellipse in undistorted image coordinates.
 	 * @return true if it passes or false if not
 	 */
-	public boolean process(EllipseRotated_F64 ellipse ) {
+	public boolean process( EllipseRotated_F64 ellipse ) {
 		// see if it's disabled
-		if( numContourPoints <= 0 ) {
+		if (numContourPoints <= 0) {
 			score = 0;
 			return true;
 		}
@@ -115,21 +115,21 @@ public class EdgeIntensityEllipse<T extends ImageGray<T>> extends BaseIntegralEd
 			double dy = edx*sphi + edy*cphi;
 
 			// define the line integral
-			double xin = px-dx*tangentDistance;
-			double yin = py-dy*tangentDistance;
-			double xout = px+dx*tangentDistance;
-			double yout = py+dy*tangentDistance;
+			double xin = px - dx*tangentDistance;
+			double yin = py - dy*tangentDistance;
+			double xout = px + dx*tangentDistance;
+			double yout = py + dy*tangentDistance;
 
-			if( integral.isInside(xin,yin) && integral.isInside(xout,yout)) {
-				averageInside += integral.compute(px,py, xin, yin);
-				averageOutside += integral.compute(px,py, xout, yout);
+			if (integral.isInside(xin, yin) && integral.isInside(xout, yout)) {
+				averageInside += integral.compute(px, py, xin, yin);
+				averageOutside += integral.compute(px, py, xout, yout);
 				total++;
 			}
 		}
 
 		score = 0;
-		if( total > 0 ) {
-			score = Math.abs(averageOutside-averageInside)/(total*tangentDistance);
+		if (total > 0) {
+			score = Math.abs(averageOutside - averageInside)/(total*tangentDistance);
 		}
 
 		return score >= passThreshold;

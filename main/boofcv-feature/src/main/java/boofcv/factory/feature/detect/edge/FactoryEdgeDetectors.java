@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -38,23 +38,21 @@ public class FactoryEdgeDetectors {
 	 * Detects the edge of an object using the canny edge detector. The output can be a binary image and/or a
 	 * graph of connected contour points.
 	 *
-	 * @see CannyEdge
-	 * @see CannyEdgeDynamic
-	 *
 	 * @param blurRadius Size of the kernel used to blur the image. Try 1 or 2
 	 * @param dynamicThreshold If true then the thresholds have a range from 0 to 1 and are relative to the
 	 * maximum edge intensity, if false then they are absolute intensity values.
 	 * @param imageType Type of input image.
 	 * @param derivType Type of image derivative.
 	 * @return Canny edge detector
+	 * @see CannyEdge
+	 * @see CannyEdgeDynamic
 	 */
 	public static <T extends ImageGray<T>, D extends ImageGray<D>>
-	CannyEdge<T,D> canny( int blurRadius , boolean saveTrace , boolean dynamicThreshold, Class<T> imageType , Class<D> derivType )
-	{
+	CannyEdge<T, D> canny( int blurRadius, boolean saveTrace, boolean dynamicThreshold, Class<T> imageType, Class<D> derivType ) {
 		BlurFilter<T> blur = FactoryBlurFilter.gaussian(ImageType.single(imageType), -1, blurRadius);
-		ImageGradient<T,D> gradient = FactoryDerivative.three(imageType, derivType);
+		ImageGradient<T, D> gradient = FactoryDerivative.three(imageType, derivType);
 
-		if( dynamicThreshold )
+		if (dynamicThreshold)
 			return new CannyEdgeDynamic<>(blur, gradient, saveTrace);
 		else
 			return new CannyEdge<>(blur, gradient, saveTrace);

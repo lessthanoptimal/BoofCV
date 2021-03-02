@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -53,11 +53,11 @@ import org.ddogleg.struct.Stoppable;
  * [1] Comaniciu, Dorin, and Peter Meer. "Mean shift analysis and applications." Computer Vision, 1999.
  * The Proceedings of the Seventh IEEE International Conference on. Vol. 2. IEEE, 1999.
  * </p>
+ *
  * @author Peter Abeles
  */
 public class SegmentMeanShift<T extends ImageBase<T>>
-		implements Stoppable
-{
+		implements Stoppable {
 	// finds mean shift modes
 	SegmentMeanShiftSearch<T> search;
 	// Combines similar regions together
@@ -68,7 +68,7 @@ public class SegmentMeanShift<T extends ImageBase<T>>
 	MergeSmallRegions<T> prune;
 
 	// If a request to stop running hsa been requested
-	volatile boolean stopRequested=false;
+	volatile boolean stopRequested = false;
 
 	// contains resegmented image after enforcing all points be connected
 //	GrayS32 pixelToRegion2 = new GrayS32(1,1);
@@ -81,11 +81,10 @@ public class SegmentMeanShift<T extends ImageBase<T>>
 	 * @param prune Prunes small regions and merges them  If null then prune step will be skipped.
 	 * @param connectRule Specify if a 4 or 8 connect rule should be used when segmenting disconnected regions. Try 4
 	 */
-	public SegmentMeanShift(SegmentMeanShiftSearch<T> search,
-							MergeRegionMeanShift merge,
-							MergeSmallRegions<T> prune,
-							ConnectRule connectRule )
-	{
+	public SegmentMeanShift( SegmentMeanShiftSearch<T> search,
+							 MergeRegionMeanShift merge,
+							 MergeSmallRegions<T> prune,
+							 ConnectRule connectRule ) {
 		this.search = search;
 		this.merge = merge;
 		this.prune = prune;
@@ -99,14 +98,14 @@ public class SegmentMeanShift<T extends ImageBase<T>>
 	 * @param image Image
 	 * @param output Storage for output image.  Each pixel is set to the region it belongs to.
 	 */
-	public void process( T image , GrayS32 output ) {
-		InputSanityCheck.checkSameShape(image,output);
+	public void process( T image, GrayS32 output ) {
+		InputSanityCheck.checkSameShape(image, output);
 		stopRequested = false;
 
 //		long time0 = System.currentTimeMillis();
 
 		search.process(image);
-		if( stopRequested ) return;
+		if (stopRequested) return;
 
 //		long time1 = System.currentTimeMillis();
 
@@ -115,18 +114,18 @@ public class SegmentMeanShift<T extends ImageBase<T>>
 		DogArray_I32 regionPixelCount = search.getRegionMemberCount();
 		DogArray<Point2D_I32> modeLocation = search.getModeLocation();
 
-		merge.process(pixelToRegion,regionPixelCount,regionColor,modeLocation);
-		if( stopRequested ) return;
+		merge.process(pixelToRegion, regionPixelCount, regionColor, modeLocation);
+		if (stopRequested) return;
 
 //		long time2 = System.currentTimeMillis();
 
 		segment.process(pixelToRegion, output, regionPixelCount);
-		if( stopRequested ) return;
+		if (stopRequested) return;
 
 //		long time3 = System.currentTimeMillis();
 
-		if( prune != null)
-			prune.process(image,output,regionPixelCount,regionColor);
+		if (prune != null)
+			prune.process(image, output, regionPixelCount, regionColor);
 
 //		long time4 = System.currentTimeMillis();
 
@@ -136,6 +135,7 @@ public class SegmentMeanShift<T extends ImageBase<T>>
 
 	/**
 	 * The number of regions which it found in the image.
+	 *
 	 * @return Total regions
 	 */
 	public int getNumberOfRegions() {

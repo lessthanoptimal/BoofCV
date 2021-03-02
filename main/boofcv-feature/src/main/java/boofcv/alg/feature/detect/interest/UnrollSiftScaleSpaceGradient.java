@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -42,23 +42,22 @@ public class UnrollSiftScaleSpaceGradient {
 	List<ImageScale> allScales = new ArrayList<>();
 
 	// used to compute the image gradient
-	ImageGradient<GrayF32,GrayF32> gradient = FactoryDerivative.three(GrayF32.class,null);
+	ImageGradient<GrayF32, GrayF32> gradient = FactoryDerivative.three(GrayF32.class, null);
 
-	public UnrollSiftScaleSpaceGradient(SiftScaleSpace scaleSpace) {
+	public UnrollSiftScaleSpaceGradient( SiftScaleSpace scaleSpace ) {
 		this.scaleSpace = scaleSpace;
 
 		// create one image for each scale to minimize memory being created/destroyed
 		int numScales = scaleSpace.getNumScales()*scaleSpace.getTotalOctaves();
 		for (int i = 0; i < numScales; i++) {
-			allScales.add( new ImageScale());
+			allScales.add(new ImageScale());
 		}
 	}
 
 	/**
 	 * Sets the input image.  Scale-space is computed and unrolled from this image
-	 * @param image
 	 */
-	public void setImage(GrayF32 image) {
+	public void setImage( GrayF32 image ) {
 
 		scaleSpace.initialize(image);
 
@@ -70,18 +69,17 @@ public class UnrollSiftScaleSpaceGradient {
 				double pixelCurrentToInput = scaleSpace.pixelScaleCurrentToInput();
 
 				ImageScale scale = allScales.get(usedScales.size());
-				scale.derivX.reshape(scaleImage.width,scaleImage.height);
-				scale.derivY.reshape(scaleImage.width,scaleImage.height);
+				scale.derivX.reshape(scaleImage.width, scaleImage.height);
+				scale.derivY.reshape(scaleImage.width, scaleImage.height);
 
-				gradient.process(scaleImage,scale.derivX,scale.derivY);
+				gradient.process(scaleImage, scale.derivX, scale.derivY);
 				scale.imageToInput = pixelCurrentToInput;
 				scale.sigma = sigma;
 
 				usedScales.add(scale);
 			}
-		} while( scaleSpace.computeNextOctave() );
+		} while (scaleSpace.computeNextOctave());
 	}
-
 
 	/**
 	 * Looks up the image which is closest specified sigma
@@ -92,8 +90,8 @@ public class UnrollSiftScaleSpaceGradient {
 
 		for (int i = 0; i < usedScales.size(); i++) {
 			ImageScale image = usedScales.get(i);
-			double difference = Math.abs(sigma-image.sigma);
-			if( difference < bestValue ) {
+			double difference = Math.abs(sigma - image.sigma);
+			if (difference < bestValue) {
 				bestValue = difference;
 				best = image;
 			}
@@ -102,8 +100,8 @@ public class UnrollSiftScaleSpaceGradient {
 	}
 
 	public static class ImageScale {
-		public GrayF32 derivX = new GrayF32(1,1);
-		public GrayF32 derivY = new GrayF32(1,1);
+		public GrayF32 derivX = new GrayF32(1, 1);
+		public GrayF32 derivY = new GrayF32(1, 1);
 		public double imageToInput;
 		public double sigma;
 	}

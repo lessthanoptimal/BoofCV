@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -34,14 +34,13 @@ public interface RefinePolygonToGray<T extends ImageGray<T>> {
 	/**
 	 * Sets the input image
 	 */
-	void setImage(T image);
+	void setImage( T image );
 
 	/**
 	 * Specifies lens distortion
 	 */
-	void setLensDistortion(int width , int height ,
-						   PixelTransform<Point2D_F32> distToUndist , PixelTransform<Point2D_F32> undistToDist );
-
+	void setLensDistortion( int width, int height,
+							PixelTransform<Point2D_F32> distToUndist, PixelTransform<Point2D_F32> undistToDist );
 
 	/**
 	 * Clears the previously set lens distortion
@@ -55,5 +54,5 @@ public interface RefinePolygonToGray<T extends ImageGray<T>> {
 	 * @param output Storage for the refined polygon
 	 * @return true if successful or false if it failed
 	 */
-	boolean refine(Polygon2D_F64 input, Polygon2D_F64 output);
+	boolean refine( Polygon2D_F64 input, Polygon2D_F64 output );
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -57,32 +57,31 @@ import java.util.Arrays;
  *
  * @author Peter Abeles
  */
-public class OrientationHistogramSift<Deriv extends ImageGray>
-{
+public class OrientationHistogramSift<Deriv extends ImageGray> {
 	// How much does it inflate the scale by
-	private double sigmaEnlarge;
+	private final double sigmaEnlarge;
 	// Storage for orientation histogram. Each bin is for angles from i*histAngleBin to (i+1)*histAngleBin
-	double histogramMag[];
+	double[] histogramMag;
 	// histograms containing the sum of each derivative
-	double histogramX[];
-	double histogramY[];
+	double[] histogramX;
+	double[] histogramY;
 	// Number of radians each bin corresponds to.  histAngleBin = 2*PI/histogram.length
-	private double histAngleBin;
+	private final double histAngleBin;
 
 	// peaks in histogram
-	private DogArray_I32 peaks = new DogArray_I32(10);
+	private final DogArray_I32 peaks = new DogArray_I32(10);
 
 	// Found orientations of the feature
-	private DogArray_F64 angles = new DogArray_F64(10);
+	private final DogArray_F64 angles = new DogArray_F64(10);
 	// Angle of the largest peak
 	private double peakAngle;
 
 	// local region from which the orientation is computed
-	private ImageRectangle bound = new ImageRectangle();
-
+	private final ImageRectangle bound = new ImageRectangle();
 
 	// spacial image gradient of closest image in scale-space
-	private GImageGray derivX,derivY;
+	private final GImageGray derivX;
+	private final GImageGray derivY;
 
 	InterpolateArray approximateGauss;
 	double approximateStep = 0.1;
@@ -93,23 +92,22 @@ public class OrientationHistogramSift<Deriv extends ImageGray>
 	 * @param histogramSize Number of elements in the histogram.  Standard is 36
 	 * @param sigmaEnlarge How much the scale is enlarged by.  Standard is 1.5
 	 */
-	public OrientationHistogramSift(int histogramSize ,
-									double sigmaEnlarge ,
-									Class<Deriv> derivType )
-	{
-		this.histogramMag = new double[ histogramSize ];
-		this.histogramX = new double[ histogramSize ];
-		this.histogramY = new double[ histogramSize ];
+	public OrientationHistogramSift( int histogramSize,
+									 double sigmaEnlarge,
+									 Class<Deriv> derivType ) {
+		this.histogramMag = new double[histogramSize];
+		this.histogramX = new double[histogramSize];
+		this.histogramY = new double[histogramSize];
 
 		this.sigmaEnlarge = sigmaEnlarge;
 
 		this.histAngleBin = 2.0*Math.PI/histogramSize;
 
 		// compute an approximation of a Gaussian distribution as a function of the distance squared
-		double samples[] = new double[ (int)(4*4/approximateStep) ];
-		for( int i = 0; i < samples.length; i++ ) {
+		double[] samples = new double[(int)(4*4/approximateStep)];
+		for (int i = 0; i < samples.length; i++) {
 			double dx2 = i*approximateStep;
-			samples[i] = Math.exp(-0.5*dx2 );
+			samples[i] = Math.exp(-0.5*dx2);
 		}
 		approximateGauss = new InterpolateArray(samples);
 
@@ -120,7 +118,7 @@ public class OrientationHistogramSift<Deriv extends ImageGray>
 	/**
 	 * Specify the input image
 	 */
-	public void setImageGradient(Deriv derivX, Deriv derivY ) {
+	public void setImageGradient( Deriv derivX, Deriv derivY ) {
 		this.derivX.wrap(derivX);
 		this.derivY.wrap(derivY);
 	}
@@ -132,14 +130,13 @@ public class OrientationHistogramSift<Deriv extends ImageGray>
 	 * @param c_y Location y-axis
 	 * @param sigma blur standard deviations of detected feature.  Also referred to as scale.
 	 */
-	public void process( double c_x , double c_y , double sigma )
-	{
+	public void process( double c_x, double c_y, double sigma ) {
 		// convert to image coordinates
 		int x = (int)(c_x + 0.5);
 		int y = (int)(c_y + 0.5);
 
 		// Estimate its orientation(s)
-		computeHistogram(x, y, sigma );
+		computeHistogram(x, y, sigma);
 
 		// compute the descriptor
 		findHistogramPeaks();
@@ -152,8 +149,8 @@ public class OrientationHistogramSift<Deriv extends ImageGray>
 	 * @param c_y Center y-axis
 	 * @param sigma Scale of feature, adjusted for local octave
 	 */
-	void computeHistogram(int c_x, int c_y, double sigma) {
-		int r = (int)Math.ceil(sigma * sigmaEnlarge);
+	void computeHistogram( int c_x, int c_y, double sigma ) {
+		int r = (int)Math.ceil(sigma*sigmaEnlarge);
 
 		// specify the area being sampled
 		bound.x0 = c_x - r;
@@ -165,32 +162,32 @@ public class OrientationHistogramSift<Deriv extends ImageGray>
 		ImageGray rawDY = derivY.getImage();
 
 		// make sure it is contained in the image bounds
-		BoofMiscOps.boundRectangleInside(rawDX,bound);
+		BoofMiscOps.boundRectangleInside(rawDX, bound);
 
 		// clear the histogram
-		Arrays.fill(histogramMag,0);
-		Arrays.fill(histogramX,0);
-		Arrays.fill(histogramY,0);
+		Arrays.fill(histogramMag, 0);
+		Arrays.fill(histogramX, 0);
+		Arrays.fill(histogramY, 0);
 
 		// construct the histogram
-		for( int y = bound.y0; y < bound.y1; y++ ) {
+		for (int y = bound.y0; y < bound.y1; y++) {
 			// iterate through the raw array for speed
 			int indexDX = rawDX.startIndex + y*rawDX.stride + bound.x0;
 			int indexDY = rawDY.startIndex + y*rawDY.stride + bound.x0;
 
-			for( int x = bound.x0; x < bound.x1; x++ ) {
+			for (int x = bound.x0; x < bound.x1; x++) {
 				float dx = derivX.getF(indexDX++);
 				float dy = derivY.getF(indexDY++);
 
 				// edge intensity and angle
 				double magnitude = Math.sqrt(dx*dx + dy*dy);
-				double theta = UtilAngle.domain2PI(Math.atan2(dy,dx));
+				double theta = UtilAngle.domain2PI(Math.atan2(dy, dx));
 
 				// weight from gaussian
-				double weight = computeWeight( x-c_x, y-c_y , sigma );
+				double weight = computeWeight(x - c_x, y - c_y, sigma);
 
 				// histogram index
-				int h = (int)(theta / histAngleBin) % histogramMag.length;
+				int h = (int)(theta/histAngleBin)%histogramMag.length;
 
 				// update the histogram
 				histogramMag[h] += magnitude*weight;
@@ -212,15 +209,15 @@ public class OrientationHistogramSift<Deriv extends ImageGray>
 		// identify peaks and find the highest peak
 		double largest = 0;
 		int largestIndex = -1;
-		double before = histogramMag[ histogramMag.length-2 ];
-		double current = histogramMag[ histogramMag.length-1 ];
-		for(int i = 0; i < histogramMag.length; i++ ) {
-			double after = histogramMag[ i ];
+		double before = histogramMag[histogramMag.length - 2];
+		double current = histogramMag[histogramMag.length - 1];
+		for (int i = 0; i < histogramMag.length; i++) {
+			double after = histogramMag[i];
 
-			if( current > before && current > after ) {
-				int currentIndex = CircularIndex.addOffset(i,-1,histogramMag.length);
+			if (current > before && current > after) {
+				int currentIndex = CircularIndex.addOffset(i, -1, histogramMag.length);
 				peaks.push(currentIndex);
-				if( current > largest ) {
+				if (current > largest) {
 					largest = current;
 					largestIndex = currentIndex;
 				}
@@ -229,20 +226,20 @@ public class OrientationHistogramSift<Deriv extends ImageGray>
 			current = after;
 		}
 
-		if( largestIndex < 0 )
+		if (largestIndex < 0)
 			return;
 
 		// see if any of the other peaks are within 80% of the max peak
 		double threshold = largest*0.8;
-		for( int i = 0; i < peaks.size; i++ ) {
+		for (int i = 0; i < peaks.size; i++) {
 			int index = peaks.data[i];
 			current = histogramMag[index];
-			if( current >= threshold) {
+			if (current >= threshold) {
 				double angle = computeAngle(index);
 
-				angles.push( angle );
+				angles.push(angle);
 
-				if( index == largestIndex )
+				if (index == largestIndex)
 					peakAngle = angle;
 			}
 		}
@@ -258,7 +255,7 @@ public class OrientationHistogramSift<Deriv extends ImageGray>
 	 */
 	double computeAngle( int index1 ) {
 
-		int index0 = CircularIndex.addOffset(index1,-1, histogramMag.length);
+		int index0 = CircularIndex.addOffset(index1, -1, histogramMag.length);
 		int index2 = CircularIndex.addOffset(index1, 1, histogramMag.length);
 
 		// compute the peak location using a second order polygon
@@ -266,7 +263,7 @@ public class OrientationHistogramSift<Deriv extends ImageGray>
 		double v1 = histogramMag[index1];
 		double v2 = histogramMag[index2];
 
-		double offset = FastHessianFeatureDetector.polyPeak(v0,v1,v2);
+		double offset = FastHessianFeatureDetector.polyPeak(v0, v1, v2);
 
 		// interpolate using the index offset and angle of its neighbor
 		return interpolateAngle(index0, index1, index2, offset);
@@ -275,19 +272,19 @@ public class OrientationHistogramSift<Deriv extends ImageGray>
 	/**
 	 * Given the interpolated index, compute the angle from the 3 indexes.  The angle for each index
 	 * is computed from the weighted gradients.
+	 *
 	 * @param offset Interpolated index offset relative to index0.  range -1 to 1
 	 * @return Interpolated angle.
 	 */
-	double interpolateAngle(int index0, int index1, int index2, double offset) {
-		double angle1 = Math.atan2(histogramY[index1],histogramX[index1]);
+	double interpolateAngle( int index0, int index1, int index2, double offset ) {
+		double angle1 = Math.atan2(histogramY[index1], histogramX[index1]);
 		double deltaAngle;
-		if( offset < 0 ) {
-			double angle0 = Math.atan2(histogramY[index0],histogramX[index0]);
-			deltaAngle = UtilAngle.dist(angle0,angle1);
-
+		if (offset < 0) {
+			double angle0 = Math.atan2(histogramY[index0], histogramX[index0]);
+			deltaAngle = UtilAngle.dist(angle0, angle1);
 		} else {
 			double angle2 = Math.atan2(histogramY[index2], histogramX[index2]);
-			deltaAngle = UtilAngle.dist(angle2,angle1);
+			deltaAngle = UtilAngle.dist(angle2, angle1);
 		}
 		return UtilAngle.bound(angle1 + deltaAngle*offset);
 	}
@@ -295,14 +292,14 @@ public class OrientationHistogramSift<Deriv extends ImageGray>
 	/**
 	 * Computes the weight based on a centered Gaussian shaped function.  Interpolation is used to speed up the process
 	 */
-	double computeWeight( double deltaX , double deltaY , double sigma ) {
+	double computeWeight( double deltaX, double deltaY, double sigma ) {
 		// the exact equation
 //		return Math.exp(-0.5 * ((deltaX * deltaX + deltaY * deltaY) / (sigma * sigma)));
 
 		// approximation below.  when validating this approach it produced results that were within
 		// floating point tolerance of the exact solution, but much faster
-		double d =  ((deltaX * deltaX + deltaY * deltaY) / (sigma * sigma))/approximateStep;
-		if( approximateGauss.interpolate(d) ) {
+		double d = ((deltaX*deltaX + deltaY*deltaY)/(sigma*sigma))/approximateStep;
+		if (approximateGauss.interpolate(d)) {
 			return approximateGauss.value;
 		} else
 			return 0;

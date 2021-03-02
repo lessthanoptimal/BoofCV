@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -31,22 +31,22 @@ import boofcv.struct.image.ImageType;
  *
  * @author Peter Abeles
  */
-public class WrapDescribePixelRegion<T extends ImageGray<T>, D extends TupleDesc>
-		implements DescribeRegionPoint<T, D> {
-	DescribePointPixelRegion<T, D> alg;
+public class WrapDescribePixelRegion<T extends ImageGray<T>, TD extends TupleDesc<TD>>
+		implements DescribeRegionPoint<T, TD> {
+	DescribePointPixelRegion<T, TD> alg;
 	ImageType<T> imageType;
 
-	public WrapDescribePixelRegion( DescribePointPixelRegion<T, D> alg, Class<T> imageType ) {
+	public WrapDescribePixelRegion( DescribePointPixelRegion<T, TD> alg, Class<T> imageType ) {
 		this.alg = alg;
 		this.imageType = ImageType.single(imageType);
 	}
 
 	@Override
-	public D createDescription() {
+	public TD createDescription() {
 		if (alg.getDescriptorType() == TupleDesc_F32.class) {
-			return (D)new TupleDesc_F32(alg.getDescriptorLength());
+			return (TD)new TupleDesc_F32(alg.getDescriptorLength());
 		} else {
-			return (D)new TupleDesc_U8(alg.getDescriptorLength());
+			return (TD)new TupleDesc_U8(alg.getDescriptorLength());
 		}
 	}
 
@@ -56,7 +56,7 @@ public class WrapDescribePixelRegion<T extends ImageGray<T>, D extends TupleDesc
 	}
 
 	@Override
-	public boolean process( double x, double y, double orientation, double radius, D storage ) {
+	public boolean process( double x, double y, double orientation, double radius, TD storage ) {
 		alg.process((int)x, (int)y, storage);
 
 		return true;
@@ -78,7 +78,7 @@ public class WrapDescribePixelRegion<T extends ImageGray<T>, D extends TupleDesc
 	}
 
 	@Override
-	public Class<D> getDescriptionType() {
+	public Class<TD> getDescriptionType() {
 		return alg.getDescriptorType();
 	}
 

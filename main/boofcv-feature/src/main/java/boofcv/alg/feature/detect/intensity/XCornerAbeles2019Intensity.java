@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -34,16 +34,17 @@ public class XCornerAbeles2019Intensity {
 	/**
 	 * Computes the x-corner intensity. It's assumed the image has already had Gaussian blur applied to it
 	 * with a radius of 1
+	 *
 	 * @param input Blurred input image. Recommended that it's normalized to have values from -1 to 1
 	 * @param intensity x-corner intensity.
 	 */
-	public static void process(GrayF32 input, GrayF32 intensity) {
+	public static void process( GrayF32 input, GrayF32 intensity ) {
 		intensity.reshape(input);
 
-		if( BoofConcurrency.USE_CONCURRENT ) {
+		if (BoofConcurrency.USE_CONCURRENT) {
 			ImplXCornerAbeles2019Intensity_MT.process(input, intensity);
 		} else {
-			ImplXCornerAbeles2019Intensity.process(input,intensity);
+			ImplXCornerAbeles2019Intensity.process(input, intensity);
 		}
 	}
 }

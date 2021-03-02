@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -28,21 +28,19 @@ import boofcv.struct.image.ImageGray;
  * allows the descriptor to be light invariant.  The entire region must be inside the image for a descriptor to be computed
  * because any outside values will change its intensity normalization.
  *
- * @see DescriptorDistance#ncc(boofcv.struct.feature.NccFeature, boofcv.struct.feature.NccFeature)
- *
  * @author Peter Abeles
+ * @see DescriptorDistance#ncc(boofcv.struct.feature.NccFeature, boofcv.struct.feature.NccFeature)
  */
 public abstract class DescribePointPixelRegionNCC<T extends ImageGray<T>>
-		extends DescribePointRectangleRegion<T>
-{
-	protected DescribePointPixelRegionNCC(int regionWidth, int regionHeight) {
+		extends DescribePointRectangleRegion<T> {
+	protected DescribePointPixelRegionNCC( int regionWidth, int regionHeight ) {
 		super(regionWidth, regionHeight);
 	}
 
 	/**
 	 * The entire region must be inside the image because any outside pixels will change the statistics
 	 */
-	public boolean isInBounds( int c_x , int c_y ) {
+	public boolean isInBounds( int c_x, int c_y ) {
 		return BoofMiscOps.isInside(image, c_x, c_y, radiusWidth, radiusHeight);
 	}
 
@@ -53,5 +51,5 @@ public abstract class DescribePointPixelRegionNCC<T extends ImageGray<T>>
 	 * @param c_y Center of the descriptor region.
 	 * @param desc Where the description is written to.
 	 */
-	public abstract void process( int c_x , int c_y , NccFeature desc );
+	public abstract void process( int c_x, int c_y, NccFeature desc );
 }

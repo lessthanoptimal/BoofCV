@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -32,20 +32,19 @@ import boofcv.struct.image.ImageType;
 public class FactoryDescribeImageDenseAlg {
 
 	public static <T extends ImageBase<T>>
-	DescribeDenseHogAlg<T> hog(ConfigDenseHoG config , ImageType<T> imageType ) {
+	DescribeDenseHogAlg<T> hog( ConfigDenseHoG config, ImageType<T> imageType ) {
 		config.checkValidity();
 
 		return new DescribeDenseHogAlg<>(config.orientationBins, config.pixelsPerCell,
 				config.cellsPerBlockX, config.cellsPerBlockY,
 				config.stepBlock, imageType);
-
 	}
 
 	public static <T extends ImageBase<T>>
-	DescribeDenseHogFastAlg<T> hogFast(ConfigDenseHoG config , ImageType<T> imageType ) {
+	DescribeDenseHogFastAlg<T> hogFast( ConfigDenseHoG config, ImageType<T> imageType ) {
 		config.checkValidity();
 
-		return new DescribeDenseHogFastAlg(config.orientationBins,config.pixelsPerCell
-							,config.cellsPerBlockX,config.cellsPerBlockY,config.stepBlock, imageType);
+		return new DescribeDenseHogFastAlg(config.orientationBins, config.pixelsPerCell
+				, config.cellsPerBlockX, config.cellsPerBlockY, config.stepBlock, imageType);
 	}
 }

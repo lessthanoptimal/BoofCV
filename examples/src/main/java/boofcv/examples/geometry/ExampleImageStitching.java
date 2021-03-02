@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -77,16 +77,16 @@ public class ExampleImageStitching {
 	 * Using abstracted code, find a transform which minimizes the difference between corresponding features
 	 * in both images.  This code is completely model independent and is the core algorithms.
 	 */
-	public static <T extends ImageGray<T>, FD extends TupleDesc> Homography2D_F64
+	public static <T extends ImageGray<T>, TD extends TupleDesc<TD>> Homography2D_F64
 	computeTransform( T imageA, T imageB,
-					  DetectDescribePoint<T, FD> detDesc,
-					  AssociateDescription<FD> associate,
+					  DetectDescribePoint<T, TD> detDesc,
+					  AssociateDescription<TD> associate,
 					  ModelMatcher<Homography2D_F64, AssociatedPair> modelMatcher ) {
 		// get the length of the description
 		List<Point2D_F64> pointsA = new ArrayList<>();
-		DogArray<FD> descA = UtilFeature.createArray(detDesc, 100);
+		DogArray<TD> descA = UtilFeature.createArray(detDesc, 100);
 		List<Point2D_F64> pointsB = new ArrayList<>();
-		DogArray<FD> descB = UtilFeature.createArray(detDesc, 100);
+		DogArray<TD> descB = UtilFeature.createArray(detDesc, 100);
 
 		// extract feature locations and descriptions from each image
 		describeImage(imageA, detDesc, pointsA, descA);
@@ -121,11 +121,11 @@ public class ExampleImageStitching {
 	/**
 	 * Detects features inside the two images and computes descriptions at those points.
 	 */
-	private static <T extends ImageGray<T>, FD extends TupleDesc>
+	private static <T extends ImageGray<T>, TD extends TupleDesc<TD>>
 	void describeImage( T image,
-						DetectDescribePoint<T, FD> detDesc,
+						DetectDescribePoint<T, TD> detDesc,
 						List<Point2D_F64> points,
-						DogArray<FD> listDescs ) {
+						DogArray<TD> listDescs ) {
 		detDesc.detect(image);
 
 		listDescs.reset();

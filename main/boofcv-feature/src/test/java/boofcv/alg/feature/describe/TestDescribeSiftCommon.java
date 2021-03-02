@@ -37,18 +37,18 @@ public class TestDescribeSiftCommon extends BoofStandardJUnit {
 		descriptor.data[20] = 120;
 		descriptor.data[60] = 20;
 
-		DescribeSiftCommon alg = new DescribeSiftCommon(4,4,8,0.5,0.2);
-		alg.normalizeDescriptor(descriptor,alg.maxDescriptorElementValue);
+		DescribeSiftCommon alg = new DescribeSiftCommon(4, 4, 8, 0.5, 0.2);
+		alg.normalizeDescriptor(descriptor, alg.maxDescriptorElementValue);
 
-		assertEquals(1,normL2(descriptor),1e-8);
+		assertEquals(1, normL2(descriptor), 1e-8);
 
 		// cropping should make 5 and 20 the same
-		assertEquals(descriptor.data[5],descriptor.data[20],1e-8);
+		assertEquals(descriptor.data[5], descriptor.data[20], 1e-8);
 	}
 
 	private double normL2( TupleDesc_F64 desc ) {
 		double total = 0;
-		for( double d : desc.data) {
+		for (double d : desc.data) {
 			total += d*d;
 		}
 		return Math.sqrt(total);
@@ -60,44 +60,44 @@ public class TestDescribeSiftCommon extends BoofStandardJUnit {
 	 */
 	@Test
 	public void trilinearInterpolation() {
-		DescribeSiftCommon alg = new DescribeSiftCommon(4,4,8,0.5,0.2);
+		DescribeSiftCommon alg = new DescribeSiftCommon(4, 4, 8, 0.5, 0.2);
 
 		TupleDesc_F64 descriptor = new TupleDesc_F64(128);
 
 		// in the middle of the feature, the total amount added to the descriptor should equal the input weight
 		// upper edges will have a value less than the input weight
-		alg.trilinearInterpolation(2.0f,1.25f,2.0f,0.5,descriptor);
+		alg.trilinearInterpolation(2.0f, 1.25f, 2.0f, 0.5, descriptor);
 
 		double sum = 0;
 		int count = 0;
 		for (int i = 0; i < descriptor.size(); i++) {
 			sum += descriptor.data[i];
-			if( descriptor.data[i] != 0 )
+			if (descriptor.data[i] != 0)
 				count++;
 		}
-		assertEquals(2.0,sum,1e-6);
-		assertTrue(count>1);
+		assertEquals(2.0, sum, 1e-6);
+		assertTrue(count > 1);
 
 		// try an edge case
 		sum = 0;
 		descriptor.fill(0);
-		alg.trilinearInterpolation(2.0f,3.25f,3.25f,0.5,descriptor);
+		alg.trilinearInterpolation(2.0f, 3.25f, 3.25f, 0.5, descriptor);
 		for (int i = 0; i < descriptor.size(); i++) {
 			sum += descriptor.data[i];
 		}
-		assertEquals( 2.0*0.75*0.75*1.0, sum, 1e-8 );
+		assertEquals(2.0*0.75*0.75*1.0, sum, 1e-8);
 
 		// now have something exactly at the start of a bin.  all the weight should be in one location
 		descriptor.fill(0);
-		alg.trilinearInterpolation(2.0f,3f,3f,2*Math.PI/8,descriptor);
+		alg.trilinearInterpolation(2.0f, 3f, 3f, 2*Math.PI/8, descriptor);
 		count = 0;
 		for (int i = 0; i < descriptor.size(); i++) {
 			double weight = descriptor.data[i];
-			if( weight > 0 ) {
-				assertEquals(2.0,weight,1e-8);
+			if (weight > 0) {
+				assertEquals(2.0, weight, 1e-8);
 				count++;
 			}
 		}
-		assertEquals(1,count);
+		assertEquals(1, count);
 	}
 }

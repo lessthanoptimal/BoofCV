@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -78,13 +78,13 @@ public class ConfigBackgroundGmm extends BaseConfigBackground {
 
 	@Override
 	public void checkValidity() {
-		if( learningPeriod <= 0 )
+		if (learningPeriod <= 0)
 			throw new IllegalArgumentException("Learning period must be more than zero");
-		if( decayCoefient < 0 )
+		if (decayCoefient < 0)
 			throw new IllegalArgumentException("Decay coeffient must be more than or equal to zero");
-		if( initialVariance == 0 )
+		if (initialVariance == 0)
 			throw new IllegalArgumentException("Don't set initialVariance to zero, set it to Float.MIN_VALUE instead");
-		if( initialVariance <= 0 )
+		if (initialVariance <= 0)
 			throw new IllegalArgumentException("Variance must be set to a value larger than zero");
 	}
 

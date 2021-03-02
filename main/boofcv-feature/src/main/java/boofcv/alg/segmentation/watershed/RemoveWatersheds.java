@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -31,7 +31,7 @@ import org.ddogleg.struct.DogArray_I32;
 public class RemoveWatersheds {
 
 	// relative indexes of connected pixels
-	private int connect[] = new int[4];
+	private final int[] connect = new int[4];
 
 	// list of watershed pixels which have yet to be merged.
 	private DogArray_I32 open = new DogArray_I32();
@@ -49,44 +49,44 @@ public class RemoveWatersheds {
 	 */
 	public void remove( GrayS32 segmented ) {
 		// very quick sanity check
-		if( segmented.get(0,0) >= 0 )
+		if (segmented.get(0, 0) >= 0)
 			throw new IllegalArgumentException("The segmented image must contain a border of -1 valued pixels.  See" +
 					" JavaDoc for important details you didn't bother to read about.");
 
 		open.reset();
 
 		connect[0] = -1;
-		connect[1] =  1;
+		connect[1] = 1;
 		connect[2] = segmented.stride;
 		connect[3] = -segmented.stride;
 
 		// step through the inner pixels and find watershed pixels
-		for( int y = 1; y < segmented.height-1; y++ ) {
+		for (int y = 1; y < segmented.height - 1; y++) {
 			int index = y*segmented.stride + 1;
-			for( int x = 1; x < segmented.width-1; x++ , index++ ) {
-				if( segmented.data[index] == 0 ) {
-					open.add( index );
+			for (int x = 1; x < segmented.width - 1; x++, index++) {
+				if (segmented.data[index] == 0) {
+					open.add(index);
 				}
 			}
 		}
 
 		// assign region values to watersheds until they are all assigned
-		while( open.size != 0 ) {
+		while (open.size != 0) {
 			open2.reset();
-			for( int i = 0; i < open.size; i++ ) {
+			for (int i = 0; i < open.size; i++) {
 				int index = open.get(i);
 				// assign it to the first valid region it finds
-				for( int j = 0; j < 4; j++ ) {
+				for (int j = 0; j < 4; j++) {
 					// the outside border in the enlarged segmented image will have -1 and watersheds are 0
-					int r =  segmented.data[index+connect[j]];
-					if( r > 0 ) {
+					int r = segmented.data[index + connect[j]];
+					if (r > 0) {
 						segmented.data[index] = r;
 						break;
 					}
 				}
 
 				// see if it was not assigned a region
-				if( segmented.data[index] == 0 ) {
+				if (segmented.data[index] == 0) {
 					open2.add(index);
 				}
 			}
@@ -98,9 +98,9 @@ public class RemoveWatersheds {
 		}
 
 		// watershed pixels have a value of 0 and have been removed. So change the region ID numbers by 1
-		for( int y = 1; y < segmented.height-1; y++ ) {
+		for (int y = 1; y < segmented.height - 1; y++) {
 			int index = y*segmented.stride + 1;
-			for( int x = 1; x < segmented.width-1; x++ , index++ ) {
+			for (int x = 1; x < segmented.width - 1; x++, index++) {
 				segmented.data[index]--;
 			}
 		}

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -52,7 +52,7 @@ import org.ddogleg.struct.DogArray_F64;
  * @author Peter Abeles
  */
 // TODO specify weight function.  close to A, close to B, even
-public class SnapToLineEdge<T extends ImageGray<T>>extends BaseIntegralEdge<T> {
+public class SnapToLineEdge<T extends ImageGray<T>> extends BaseIntegralEdge<T> {
 
 	// maximum number of times it will sample along the line
 	protected int lineSamples;
@@ -63,12 +63,11 @@ public class SnapToLineEdge<T extends ImageGray<T>>extends BaseIntegralEdge<T> {
 	protected int radialSamples;
 
 	// storage for computed polar line
-	private LinePolar2D_F64 polar = new LinePolar2D_F64();
+	private final LinePolar2D_F64 polar = new LinePolar2D_F64();
 
 	protected DogArray_F64 weights = new DogArray_F64();// storage for weights in line fitting
 	// storage for where the points that are sampled along the line
 	protected DogArray<Point2D_F64> samplePts = new DogArray<>(Point2D_F64::new);
-
 
 	// storage for the line's center.  used to reduce numerical problems.
 	protected Point2D_F64 center = new Point2D_F64();
@@ -81,10 +80,10 @@ public class SnapToLineEdge<T extends ImageGray<T>>extends BaseIntegralEdge<T> {
 	 * @param tangentialSamples Radius along the tangent of what it will sample.  Must be &ge; 1.  Try 2.
 	 * @param imageType Type of image it's going to process
 	 */
-	public SnapToLineEdge(int lineSamples, int tangentialSamples, Class<T> imageType) {
+	public SnapToLineEdge( int lineSamples, int tangentialSamples, Class<T> imageType ) {
 		super(imageType);
 
-		if( tangentialSamples < 1 )
+		if (tangentialSamples < 1)
 			throw new IllegalArgumentException("Tangential samples must be >= 1 or else it won't work");
 
 		this.lineSamples = lineSamples;
@@ -100,7 +99,7 @@ public class SnapToLineEdge<T extends ImageGray<T>>extends BaseIntegralEdge<T> {
 	 * @param found (output) Fitted line to the edge
 	 * @return true if successful or false if it failed
 	 */
-	public boolean refine(Point2D_F64 a, Point2D_F64 b, LineGeneral2D_F64 found) {
+	public boolean refine( Point2D_F64 a, Point2D_F64 b, LineGeneral2D_F64 found ) {
 
 		// determine the local coordinate system
 		center.x = (a.x + b.x)/2.0;
@@ -121,9 +120,9 @@ public class SnapToLineEdge<T extends ImageGray<T>>extends BaseIntegralEdge<T> {
 		// set up inputs into line fitting
 		computePointsAndWeights(slopeX, slopeY, a.x, a.y, tanX, tanY);
 
-		if( samplePts.size() >= 4 ) {
+		if (samplePts.size() >= 4) {
 			// fit line and convert into generalized format
-			if( null == FitLine_F64.polar(samplePts.toList(), weights.data, polar) ) {
+			if (null == FitLine_F64.polar(samplePts.toList(), weights.data, polar)) {
 				throw new RuntimeException("All weights were zero, bug some place");
 			}
 			UtilLine2D_F64.convert(polar, found);
@@ -140,42 +139,44 @@ public class SnapToLineEdge<T extends ImageGray<T>>extends BaseIntegralEdge<T> {
 	/**
 	 * Computes the location of points along the line and their weights
 	 */
-	protected void computePointsAndWeights(double slopeX, double slopeY, double x0, double y0, double tanX, double tanY) {
+	protected void computePointsAndWeights( double slopeX, double slopeY, double x0, double y0, double tanX, double tanY ) {
 
 		samplePts.reset();
 		weights.reset();
-		int numSamples = radialSamples*2+2;
-		int numPts = numSamples-1;
+		int numSamples = radialSamples*2 + 2;
+		int numPts = numSamples - 1;
 		double widthX = numSamples*tanX;
 		double widthY = numSamples*tanY;
 
-		for (int i = 0; i < lineSamples; i++ ) {
+		for (int i = 0; i < lineSamples; i++) {
 			// find point on line and shift it over to the first sample point
-			double frac = i/(double)(lineSamples -1);
-			double x = x0 + slopeX*frac-widthX/2.0;
-			double y = y0 + slopeY*frac-widthY/2.0;
+			double frac = i/(double)(lineSamples - 1);
+			double x = x0 + slopeX*frac - widthX/2.0;
+			double y = y0 + slopeY*frac - widthY/2.0;
 
 			// Unless all the sample points are inside the image, ignore this point
-			if(!integral.isInside(x, y) || !integral.isInside(x + widthX,y + widthY))
+			if (!integral.isInside(x, y) || !integral.isInside(x + widthX, y + widthY))
 				continue;
 
 			double sample0 = integral.compute(x, y, x + tanX, y + tanY);
-			x += tanX; y += tanY;
+			x += tanX;
+			y += tanY;
 			for (int j = 0; j < numPts; j++) {
 				// still need to check the next point due to round off error. very rare condition
-				if( j==numPts-1&&!integral.isInside(x + tanX, y + tanY))
+				if (j == numPts - 1 && !integral.isInside(x + tanX, y + tanY))
 					break;
 				double sample1 = integral.compute(x, y, x + tanX, y + tanY);
 
 				double w = sample0 - sample1;
-				if( w < 0 ) w = -w;
+				if (w < 0) w = -w;
 
-				if( w > 0 ) {
+				if (w > 0) {
 					weights.add(w);
-					samplePts.grow().setTo((x - center.x) / localScale, (y - center.y) / localScale);
+					samplePts.grow().setTo((x - center.x)/localScale, (y - center.y)/localScale);
 				}
 
-				x += tanX; y += tanY;
+				x += tanX;
+				y += tanY;
 				sample0 = sample1;
 			}
 		}
@@ -192,7 +193,7 @@ public class SnapToLineEdge<T extends ImageGray<T>>extends BaseIntegralEdge<T> {
 		return lineSamples;
 	}
 
-	public void setLineSamples(int lineSamples) {
+	public void setLineSamples( int lineSamples ) {
 		this.lineSamples = lineSamples;
 	}
 
@@ -200,7 +201,7 @@ public class SnapToLineEdge<T extends ImageGray<T>>extends BaseIntegralEdge<T> {
 		return radialSamples;
 	}
 
-	public void setRadialSamples(int radialSamples) {
+	public void setRadialSamples( int radialSamples ) {
 		this.radialSamples = radialSamples;
 	}
 
@@ -208,7 +209,7 @@ public class SnapToLineEdge<T extends ImageGray<T>>extends BaseIntegralEdge<T> {
 		return imageType;
 	}
 
-	public void setImageType(Class<T> imageType) {
+	public void setImageType( Class<T> imageType ) {
 		this.imageType = imageType;
 	}
 }

@@ -43,18 +43,19 @@ import java.util.Random;
  *
  * @author Peter Abeles
  */
+@SuppressWarnings("rawtypes")
 public class FactoryDescribeRegionPoint {
 
 	/**
 	 * Factory function for creating many different types of region descriptors
 	 */
 	@SuppressWarnings("unchecked")
-	public static <T extends ImageBase<T>, Desc extends TupleDesc>
-	DescribeRegionPoint<T, Desc> generic( ConfigDescribeRegionPoint config, ImageType<T> imageType ) {
+	public static <T extends ImageBase<T>, TD extends TupleDesc<TD>>
+	DescribeRegionPoint<T, TD> generic( ConfigDescribeRegionPoint config, ImageType<T> imageType ) {
 
 		Class imageClass = imageType.getImageClass();
 
-		DescribeRegionPoint<T, Desc> ret = switch (config.type) {
+		DescribeRegionPoint<T, TD> ret = switch (config.type) {
 			case SURF_FAST -> (DescribeRegionPoint)FactoryDescribeRegionPoint.surfFast(config.surfFast, imageClass);
 			case SURF_STABLE -> (DescribeRegionPoint)FactoryDescribeRegionPoint.surfStable(config.surfStability, imageClass);
 			case SURF_COLOR_FAST -> (DescribeRegionPoint)FactoryDescribeRegionPoint.surfColorFast(config.surfFast, (ImageType)imageType);
@@ -240,16 +241,13 @@ public class FactoryDescribeRegionPoint {
 		if (config == null)
 			config = new ConfigTemplateDescribe();
 
-		switch (config.type) {
-			case PIXEL:
-				return new WrapDescribePixelRegion(
-						FactoryDescribePointAlgs.pixelRegion(config.width, config.height, imageType), imageType);
-			case NCC:
-				return new WrapDescribePixelRegionNCC(
-						FactoryDescribePointAlgs.pixelRegionNCC(config.width, config.height, imageType), imageType);
-			default:
-				throw new IllegalArgumentException("Unknown template type " + config.type);
-		}
+		return switch (config.type) {
+			case PIXEL -> new WrapDescribePixelRegion(
+					FactoryDescribePointAlgs.pixelRegion(config.width, config.height, imageType), imageType);
+			case NCC -> new WrapDescribePixelRegionNCC(
+					FactoryDescribePointAlgs.pixelRegionNCC(config.width, config.height, imageType), imageType);
+			default -> throw new IllegalArgumentException("Unknown template type " + config.type);
+		};
 	}
 
 	/**

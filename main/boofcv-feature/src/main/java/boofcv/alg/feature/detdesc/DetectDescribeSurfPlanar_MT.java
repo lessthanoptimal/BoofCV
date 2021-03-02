@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -32,16 +32,15 @@ import boofcv.struct.image.Planar;
  * @author Peter Abeles
  */
 public class DetectDescribeSurfPlanar_MT<II extends ImageGray<II>> extends DetectDescribeSurfPlanar<II> {
-	public DetectDescribeSurfPlanar_MT(FastHessianFeatureDetector<II> detector,
-									   OrientationIntegral<II> orientation, DescribePointSurfPlanar<II> describe)
-	{
+	public DetectDescribeSurfPlanar_MT( FastHessianFeatureDetector<II> detector,
+										OrientationIntegral<II> orientation, DescribePointSurfPlanar<II> describe ) {
 		super(detector, orientation, describe);
 	}
 
 	@Override
-	protected void describe(II grayII, Planar<II> colorII) {
-		BoofConcurrency.loopBlocks(0,foundPoints.size(),(i0, i1)-> {
-			OrientationIntegral<II> orientation = (OrientationIntegral) this.orientation.copy();
+	protected void describe( II grayII, Planar<II> colorII ) {
+		BoofConcurrency.loopBlocks(0, foundPoints.size(), ( i0, i1 ) -> {
+			OrientationIntegral<II> orientation = (OrientationIntegral)this.orientation.copy();
 			DescribePointSurfPlanar<II> describe = this.describe.copy();
 
 			orientation.setImage(grayII);
@@ -54,7 +53,7 @@ public class DetectDescribeSurfPlanar_MT<II extends ImageGray<II>> extends Detec
 
 				describe.describe(p.pixel.x, p.pixel.y, angle, p.scale, descriptions.get(i));
 
-				featureAngles.set(i,angle);
+				featureAngles.set(i, angle);
 			}
 		});
 	}

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -28,18 +28,17 @@ import georegression.struct.point.Point2D_F64;
  * @author Peter Abeles
  */
 @Deprecated
-public class DetectDescribeSingleToMulti<T extends ImageGray<T>, TD extends TupleDesc>
-	implements DetectDescribeMulti<T,TD>
-{
-	DetectDescribePoint<T,TD> alg;
+public class DetectDescribeSingleToMulti<T extends ImageGray<T>, TD extends TupleDesc<TD>>
+		implements DetectDescribeMulti<T, TD> {
+	DetectDescribePoint<T, TD> alg;
 	Wrap set = new Wrap();
 
-	public DetectDescribeSingleToMulti(DetectDescribePoint<T, TD> alg) {
+	public DetectDescribeSingleToMulti( DetectDescribePoint<T, TD> alg ) {
 		this.alg = alg;
 	}
 
 	@Override
-	public void process(T image) {
+	public void process( T image ) {
 		alg.detect(image);
 	}
 
@@ -49,8 +48,8 @@ public class DetectDescribeSingleToMulti<T extends ImageGray<T>, TD extends Tupl
 	}
 
 	@Override
-	public PointDescSet<TD> getFeatureSet(int setIndex) {
-		if( setIndex != 0 )
+	public PointDescSet<TD> getFeatureSet( int setIndex ) {
+		if (setIndex != 0)
 			throw new IllegalArgumentException("Only one set");
 		return set;
 	}
@@ -73,12 +72,12 @@ public class DetectDescribeSingleToMulti<T extends ImageGray<T>, TD extends Tupl
 		}
 
 		@Override
-		public Point2D_F64 getLocation(int featureIndex) {
+		public Point2D_F64 getLocation( int featureIndex ) {
 			return alg.getLocation(featureIndex);
 		}
 
 		@Override
-		public TD getDescription(int index) {
+		public TD getDescription( int index ) {
 			return alg.getDescription(index);
 		}
 	}

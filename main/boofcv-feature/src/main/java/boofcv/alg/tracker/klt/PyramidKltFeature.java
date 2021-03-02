@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -27,7 +27,7 @@ public class PyramidKltFeature {
 	/** KLT feature description for each layer in the pyramid */
 	public KltFeature[] desc;
 	/** the feature's location in the original image */
-	public float x,y;
+	public float x, y;
 
 	/** user specified data, not used by the tracker */
 	public Object cookie;
@@ -38,7 +38,7 @@ public class PyramidKltFeature {
 	 * @param numLayers Number of layers inside the image pyramid
 	 * @param radius Radius of the feature description in each layer
 	 */
-	public PyramidKltFeature(int numLayers, int radius) {
+	public PyramidKltFeature( int numLayers, int radius ) {
 		desc = new KltFeature[numLayers];
 		for (int i = 0; i < numLayers; i++) {
 			desc[i] = new KltFeature(radius);
@@ -46,7 +46,7 @@ public class PyramidKltFeature {
 	}
 
 	public void checkUpdateLayers( int numLayers ) {
-		if( desc.length != numLayers ) {
+		if (desc.length != numLayers) {
 			int radius = desc[0].radius;
 			desc = new KltFeature[numLayers];
 			for (int i = 0; i < numLayers; i++) {
@@ -55,12 +55,12 @@ public class PyramidKltFeature {
 		}
 	}
 
-	public void setPosition(float x, float y) {
+	public void setPosition( float x, float y ) {
 		this.x = x;
 		this.y = y;
 	}
 
-	public void setCookie(Object cookie) {
+	public void setCookie( Object cookie ) {
 		this.cookie = cookie;
 	}
 

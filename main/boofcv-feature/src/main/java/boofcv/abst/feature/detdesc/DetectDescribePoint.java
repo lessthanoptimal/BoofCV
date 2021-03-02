@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -29,9 +29,8 @@ import boofcv.struct.image.ImageBase;
  *
  * @author Peter Abeles
  */
-public interface DetectDescribePoint<T extends ImageBase<T>, Desc extends TupleDesc>
-		extends InterestPointDetector<T>, DescriptorInfo<Desc>
-{
+public interface DetectDescribePoint<T extends ImageBase<T>, Desc extends TupleDesc<Desc>>
+		extends InterestPointDetector<T>, DescriptorInfo<Desc> {
 	/**
 	 * <p>Returns the feature descriptor at the specified index.</p>
 	 * <p>
@@ -42,5 +41,5 @@ public interface DetectDescribePoint<T extends ImageBase<T>, Desc extends TupleD
 	 * @param index Which feature
 	 * @return Feature descriptor
 	 */
-	Desc getDescription(int index);
+	Desc getDescription( int index );
 }

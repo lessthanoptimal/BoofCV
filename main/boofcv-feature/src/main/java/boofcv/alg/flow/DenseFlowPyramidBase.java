@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -37,8 +37,8 @@ import boofcv.struct.pyramid.PyramidFloat;
 public abstract class DenseFlowPyramidBase<T extends ImageGray<T>> {
 
 	// storage for normalized image
-	private GrayF32 norm1 = new GrayF32(1,1);
-	private GrayF32 norm2 = new GrayF32(1,1);
+	private GrayF32 norm1 = new GrayF32(1, 1);
+	private GrayF32 norm2 = new GrayF32(1, 1);
 
 	// parameters used to create pyramid
 	private double scale;
@@ -52,8 +52,8 @@ public abstract class DenseFlowPyramidBase<T extends ImageGray<T>> {
 	// Used to interpolate values between pixels
 	protected InterpolatePixelS<GrayF32> interp;// todo remove
 
-	protected DenseFlowPyramidBase(double scale, double sigma, int maxLayers,
-								InterpolatePixelS<GrayF32> interp ) {
+	protected DenseFlowPyramidBase( double scale, double sigma, int maxLayers,
+									InterpolatePixelS<GrayF32> interp ) {
 		this.scale = scale;
 		this.sigma = sigma;
 		this.maxLayers = maxLayers;
@@ -64,15 +64,14 @@ public abstract class DenseFlowPyramidBase<T extends ImageGray<T>> {
 	/**
 	 * Processes the raw input images.  Normalizes them and creates image pyramids from them.
 	 */
-	public void process( T image1 , T image2 )
-	{
+	public void process( T image1, T image2 ) {
 		// declare image data structures
-		if( pyr1 == null || pyr1.getInputWidth() != image1.width || pyr1.getInputHeight() != image1.height ) {
+		if (pyr1 == null || pyr1.getInputWidth() != image1.width || pyr1.getInputHeight() != image1.height) {
 			pyr1 = UtilDenseOpticalFlow.standardPyramid(image1.width, image1.height, scale, sigma, 5, maxLayers, GrayF32.class);
 			pyr2 = UtilDenseOpticalFlow.standardPyramid(image1.width, image1.height, scale, sigma, 5, maxLayers, GrayF32.class);
 
-			pyr1.initialize(image1.width,image1.height);
-			pyr2.initialize(image1.width,image1.height);
+			pyr1.initialize(image1.width, image1.height);
+			pyr2.initialize(image1.width, image1.height);
 		}
 
 		norm1.reshape(image1.width, image1.height);
@@ -93,7 +92,7 @@ public abstract class DenseFlowPyramidBase<T extends ImageGray<T>> {
 	 * Takes the flow from the previous lower resolution layer and uses it to initialize the flow
 	 * in the current layer.  Adjusts for change in image scale.
 	 */
-	protected void interpolateFlowScale(GrayF32 prev, GrayF32 curr) {
+	protected void interpolateFlowScale( GrayF32 prev, GrayF32 curr ) {
 		interp.setImage(prev);
 
 		float scaleX = (float)prev.width/(float)curr.width;
@@ -102,14 +101,14 @@ public abstract class DenseFlowPyramidBase<T extends ImageGray<T>> {
 		float scale = (float)prev.width/(float)curr.width;
 
 		int indexCurr = 0;
-		for( int y = 0; y < curr.height; y++ ) {
+		for (int y = 0; y < curr.height; y++) {
 			float yy = y*scaleY;
-			for( int x = 0; x < curr.width; x++ ) {
+			for (int x = 0; x < curr.width; x++) {
 				float xx = x*scaleX;
-				if( interp.isInFastBounds(xx,yy)) {
-					curr.data[indexCurr++] = interp.get_fast(x * scaleX, y * scaleY) / scale;
+				if (interp.isInFastBounds(xx, yy)) {
+					curr.data[indexCurr++] = interp.get_fast(x*scaleX, y*scaleY)/scale;
 				} else {
-					curr.data[indexCurr++] = interp.get(x * scaleX, y * scaleY) / scale;
+					curr.data[indexCurr++] = interp.get(x*scaleX, y*scaleY)/scale;
 				}
 			}
 		}
@@ -119,13 +118,13 @@ public abstract class DenseFlowPyramidBase<T extends ImageGray<T>> {
 	 * Takes the flow from the previous lower resolution layer and uses it to initialize the flow
 	 * in the current layer.  Adjusts for change in image scale.
 	 */
-	protected void warpImageTaylor(GrayF32 before, GrayF32 flowX , GrayF32 flowY , GrayF32 after) {
+	protected void warpImageTaylor( GrayF32 before, GrayF32 flowX, GrayF32 flowY, GrayF32 after ) {
 		interp.setBorder(FactoryImageBorder.single(BorderType.EXTENDED, before.getImageType().getImageClass()));
 		interp.setImage(before);
 
-		for( int y = 0; y < before.height; y++ ) {
+		for (int y = 0; y < before.height; y++) {
 			int pixelIndex = y*before.width;
-			for (int x = 0; x < before.width; x++, pixelIndex++ ) {
+			for (int x = 0; x < before.width; x++, pixelIndex++) {
 				float u = flowX.data[pixelIndex];
 				float v = flowY.data[pixelIndex];
 
@@ -144,14 +143,13 @@ public abstract class DenseFlowPyramidBase<T extends ImageGray<T>> {
 	 * @param image1 Pyramid of first image
 	 * @param image2 Pyramid of second image
 	 */
-	public abstract void process(ImagePyramid<GrayF32> image1 , ImagePyramid<GrayF32> image2 );
+	public abstract void process( ImagePyramid<GrayF32> image1, ImagePyramid<GrayF32> image2 );
 
 	/**
 	 * Function to normalize the images between 0 and 255.
 	 **/
-	protected static<T extends ImageGray<T>>
-	void imageNormalization(T image1, T image2, GrayF32 normalized1, GrayF32 normalized2 )
-	{
+	protected static <T extends ImageGray<T>>
+	void imageNormalization( T image1, T image2, GrayF32 normalized1, GrayF32 normalized2 ) {
 		// find the max and min of both images
 		float max1 = (float)GImageStatistics.max(image1);
 		float max2 = (float)GImageStatistics.max(image2);
@@ -163,18 +161,18 @@ public abstract class DenseFlowPyramidBase<T extends ImageGray<T>> {
 		float min = min1 < min2 ? min1 : min2;
 		float range = max - min;
 
-		if(range > 0) {
+		if (range > 0) {
 			// normalize both images
 			int indexN = 0;
 			for (int y = 0; y < image1.height; y++) {
-				for (int x = 0; x < image1.width; x++,indexN++) {
+				for (int x = 0; x < image1.width; x++, indexN++) {
 					// this is a slow way to convert the image type into a float, but everything else is much
 					// more expensive
 					float pv1 = (float)GeneralizedImageOps.get(image1, x, y);
-					float pv2 = (float)GeneralizedImageOps.get(image2,x,y);
+					float pv2 = (float)GeneralizedImageOps.get(image2, x, y);
 
-					normalized1.data[indexN] = (pv1 - min) / range;
-					normalized2.data[indexN] = (pv2 - min) / range;
+					normalized1.data[indexN] = (pv1 - min)/range;
+					normalized2.data[indexN] = (pv2 - min)/range;
 				}
 			}
 		} else {

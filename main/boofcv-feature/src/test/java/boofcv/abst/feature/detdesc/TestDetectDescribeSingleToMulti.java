@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -32,8 +32,7 @@ import static org.junit.jupiter.api.Assertions.*;
  */
 public class TestDetectDescribeSingleToMulti extends BoofStandardJUnit {
 
-	@Test
-	public void basic() {
+	@Test void basic() {
 		Helper helper = new Helper();
 
 		DetectDescribeSingleToMulti<GrayF32,TupleDesc_F64> alg =
@@ -43,13 +42,13 @@ public class TestDetectDescribeSingleToMulti extends BoofStandardJUnit {
 		alg.process(null);
 		assertTrue(helper.calledDetect);
 
-		assertTrue(TupleDesc_F64.class == alg.getDescriptionType());
-		assertTrue(null != alg.createDescription());
+		assertSame(TupleDesc_F64.class, alg.getDescriptionType());
+		assertNotNull(alg.createDescription());
 
 		assertEquals(1,alg.getNumberOfSets());
 		assertEquals(16,alg.getFeatureSet(0).getNumberOfFeatures());
-		assertTrue(null != alg.getFeatureSet(0).getLocation(0));
-		assertTrue(null != alg.getFeatureSet(0).getDescription(0));
+		assertNotNull(alg.getFeatureSet(0).getLocation(0));
+		assertNotNull(alg.getFeatureSet(0).getDescription(0));
 	}
 
 	protected static class Helper extends DetectDescribePointAbstract<GrayF32,TupleDesc_F64> {

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -28,7 +28,6 @@ import georegression.struct.point.Point2D_F64;
 
 import java.util.List;
 
-
 /**
  * Wrapper around {@link boofcv.alg.feature.detect.interest.FastHessianFeatureDetector} for {@link InterestPointDetector}.
  *
@@ -42,18 +41,18 @@ public class WrapFHtoInterestPoint<T extends ImageGray<T>, II extends ImageGray<
 	II integral;
 	ImageType<T> inputType;
 
-	public WrapFHtoInterestPoint(FastHessianFeatureDetector<II> detector, Class<T> inputType ) {
+	public WrapFHtoInterestPoint( FastHessianFeatureDetector<II> detector, Class<T> inputType ) {
 		this.detector = detector;
 		this.inputType = ImageType.single(inputType);
 	}
 
 	@Override
-	public void detect(T input) {
-		if( integral != null ) {
-			integral.reshape(input.width,input.height);
+	public void detect( T input ) {
+		if (integral != null) {
+			integral.reshape(input.width, input.height);
 		}
 
-		integral = GIntegralImageOps.transform(input,integral);
+		integral = GIntegralImageOps.transform(input, integral);
 
 		detector.detect(integral);
 
@@ -64,7 +63,7 @@ public class WrapFHtoInterestPoint<T extends ImageGray<T>, II extends ImageGray<
 	public int getNumberOfSets() { return 2; }
 
 	@Override
-	public int getSet(int index) { return location.get(index).white ? 0 : 1; }
+	public int getSet( int index ) { return location.get(index).white ? 0 : 1; }
 
 	@Override
 	public int getNumberOfFeatures() {
@@ -72,17 +71,17 @@ public class WrapFHtoInterestPoint<T extends ImageGray<T>, II extends ImageGray<
 	}
 
 	@Override
-	public Point2D_F64 getLocation(int featureIndex) {
+	public Point2D_F64 getLocation( int featureIndex ) {
 		return location.get(featureIndex).pixel;
 	}
 
 	@Override
-	public double getRadius(int featureIndex) {
+	public double getRadius( int featureIndex ) {
 		return location.get(featureIndex).scale*BoofDefaults.SURF_SCALE_TO_RADIUS;
 	}
 
 	@Override
-	public double getOrientation(int featureIndex) {
+	public double getOrientation( int featureIndex ) {
 		return 0;
 	}
 

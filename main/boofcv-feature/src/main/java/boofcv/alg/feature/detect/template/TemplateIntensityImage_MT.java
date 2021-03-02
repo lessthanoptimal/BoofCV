@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -28,14 +28,14 @@ import boofcv.struct.image.ImageBase;
  */
 public class TemplateIntensityImage_MT<T extends ImageBase<T>>
 		extends TemplateIntensityImage<T> {
-	public TemplateIntensityImage_MT(EvaluatorMethod<T> method) {
+	public TemplateIntensityImage_MT( EvaluatorMethod<T> method ) {
 		super(method);
 	}
 
 	@Override
-	protected void processInner(int w, int h) {
-		BoofConcurrency.loopFor(0,h,y->{
-			int index = intensity.startIndex + (y + borderY0) * intensity.stride + borderX0;
+	protected void processInner( int w, int h ) {
+		BoofConcurrency.loopFor(0, h, y -> {
+			int index = intensity.startIndex + (y + borderY0)*intensity.stride + borderX0;
 			for (int x = 0; x < w; x++) {
 				intensity.data[index++] = method.evaluate(x, y);
 			}
@@ -43,9 +43,9 @@ public class TemplateIntensityImage_MT<T extends ImageBase<T>>
 	}
 
 	@Override
-	protected void processInnerMask(int w, int h) {
-		BoofConcurrency.loopFor(0,h,y->{
-			int index = intensity.startIndex + (y + borderY0) * intensity.stride + borderX0;
+	protected void processInnerMask( int w, int h ) {
+		BoofConcurrency.loopFor(0, h, y -> {
+			int index = intensity.startIndex + (y + borderY0)*intensity.stride + borderX0;
 			for (int x = 0; x < w; x++) {
 				intensity.data[index++] = method.evaluateMask(x, y);
 			}

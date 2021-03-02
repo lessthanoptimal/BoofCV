@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -29,28 +29,29 @@ import org.ddogleg.nn.FactoryNearestNeighbor;
 import org.ddogleg.nn.NearestNeighbor;
 import org.jetbrains.annotations.Nullable;
 
-
 /**
  * Creates algorithms for associating {@link boofcv.struct.feature.TupleDesc_F64} features.
  *
  * @author Peter Abeles
  */
-@SuppressWarnings("unchecked")
+@SuppressWarnings({"unchecked", "rawtypes"})
 public class FactoryAssociation {
 
-	public static <D> AssociateDescription<D> generic( ConfigAssociate config, DescriptorInfo info )
-	{
+	public static <D> AssociateDescription<D> generic( ConfigAssociate config, DescriptorInfo info ) {
 		int DOF = info.createDescription().size();
 
-		switch( config.type ) {
+		switch (config.type) {
 			case GREEDY: {
 				ScoreAssociation<D> scorer = FactoryAssociation.defaultScore(info.getDescriptionType());
-				return FactoryAssociation.greedy(config.greedy,scorer);
+				return FactoryAssociation.greedy(config.greedy, scorer);
 			}
-			case KD_TREE: return (AssociateDescription)FactoryAssociation.kdtree(config.nearestNeighbor,DOF);
-			case RANDOM_FOREST: return (AssociateDescription)FactoryAssociation.kdRandomForest(
-					config.nearestNeighbor,DOF, 10, 5, 1233445565);
-			default: throw new IllegalArgumentException("Unknown association: "+config.type);
+			case KD_TREE:
+				return (AssociateDescription)FactoryAssociation.kdtree(config.nearestNeighbor, DOF);
+			case RANDOM_FOREST:
+				return (AssociateDescription)FactoryAssociation.kdRandomForest(
+						config.nearestNeighbor, DOF, 10, 5, 1233445565);
+			default:
+				throw new IllegalArgumentException("Unknown association: " + config.type);
 		}
 	}
 
@@ -58,10 +59,9 @@ public class FactoryAssociation {
 	 * Creates a generic association algorithm that uses descriptors as well as the 2D location of
 	 * image features.
 	 */
-	public static <D> AssociateDescription2D<D> generic2( ConfigAssociate config, DescriptorInfo info )
-	{
-		if( config.maximumDistancePixels.fraction == 1.0 ) {
-			return new AssociateDescTo2D<>(generic(config,info));
+	public static <D> AssociateDescription2D<D> generic2( ConfigAssociate config, DescriptorInfo info ) {
+		if (config.maximumDistancePixels.fraction == 1.0) {
+			return new AssociateDescTo2D<>(generic(config, info));
 		}
 
 		// only greedy is supported at this time
@@ -72,14 +72,12 @@ public class FactoryAssociation {
 		throw new IllegalArgumentException("Unknown association: " + config.type);
 	}
 
-
 	/**
 	 * Checks and if neccisary wraps the association to ensure that it returns only unique associations
 	 */
-	public static <D> AssociateDescription<D> ensureUnique( AssociateDescription<D> associate )
-	{
-		if( !associate.uniqueDestination() || !associate.uniqueSource() ) {
-			return new EnforceUniqueByScore.Describe<>(associate,true,true);
+	public static <D> AssociateDescription<D> ensureUnique( AssociateDescription<D> associate ) {
+		if (!associate.uniqueDestination() || !associate.uniqueSource()) {
+			return new EnforceUniqueByScore.Describe<>(associate, true, true);
 		} else {
 			return associate;
 		}
@@ -88,10 +86,9 @@ public class FactoryAssociation {
 	/**
 	 * Checks and if neccisary wraps the association to ensure that it returns only unique associations
 	 */
-	public static <D> AssociateDescription2D<D> ensureUnique( AssociateDescription2D<D> associate )
-	{
-		if( !associate.uniqueDestination() || !associate.uniqueSource() ) {
-			return new EnforceUniqueByScore.Describe2D<>(associate,true,true);
+	public static <D> AssociateDescription2D<D> ensureUnique( AssociateDescription2D<D> associate ) {
+		if (!associate.uniqueDestination() || !associate.uniqueSource()) {
+			return new EnforceUniqueByScore.Describe2D<>(associate, true, true);
 		} else {
 			return associate;
 		}
@@ -100,20 +97,19 @@ public class FactoryAssociation {
 	/**
 	 * Returns an algorithm for associating features together which uses a brute force greedy algorithm.
 	 * See {@link AssociateGreedyDesc} for details.
-	 * 
+	 *
 	 * @param score Computes the fit score between two features.
 	 * @param config Configuration
 	 * @param <D> Data structure being associated
 	 * @return AssociateDescription
 	 */
 	public static <D> AssociateDescription<D>
-	greedy( @Nullable ConfigAssociateGreedy config, ScoreAssociation<D> score )
-	{
-		if( config == null )
+	greedy( @Nullable ConfigAssociateGreedy config, ScoreAssociation<D> score ) {
+		if (config == null)
 			config = new ConfigAssociateGreedy();
 		AssociateGreedyDescBase<D> alg;
 
-		if(BoofConcurrency.USE_CONCURRENT ) {
+		if (BoofConcurrency.USE_CONCURRENT) {
 			alg = new AssociateGreedyDesc_MT<>(score);
 		} else {
 			alg = new AssociateGreedyDesc<>(score);
@@ -136,18 +132,17 @@ public class FactoryAssociation {
 	 * @return AssociateDescription
 	 */
 	public static <D> AssociateDescription2D<D>
-	greedy2D(@Nullable ConfigAssociateGreedy config, ConfigLength maxDistance, ScoreAssociation<D> score )
-	{
-		if( config == null )
+	greedy2D( @Nullable ConfigAssociateGreedy config, ConfigLength maxDistance, ScoreAssociation<D> score ) {
+		if (config == null)
 			config = new ConfigAssociateGreedy();
 
 		AssociateImageDistanceFunction distance = new AssociateImageDistanceEuclideanSq();
 
 		AssociateGreedyBase2D<D> alg;
-		if(BoofConcurrency.USE_CONCURRENT ) {
-			alg = new AssociateGreedyBruteForce2D_MT<>(score,distance);
+		if (BoofConcurrency.USE_CONCURRENT) {
+			alg = new AssociateGreedyBruteForce2D_MT<>(score, distance);
 		} else {
-			alg = new AssociateGreedyBruteForce2D<>(score,distance);
+			alg = new AssociateGreedyBruteForce2D<>(score, distance);
 		}
 
 		// square distance since that's what the distance measure returns
@@ -163,59 +158,56 @@ public class FactoryAssociation {
 	 * Approximate association using a K-D tree degree of moderate size (10-15) that uses a best-bin-first search
 	 * order.
 	 *
-	 * @see AssociateNearestNeighbor_ST
-	 * @see org.ddogleg.nn.alg.searches.KdTreeSearch1Bbf
-	 *
 	 * @param dimension Number of elements in the feature vector
 	 * @return Association using approximate nearest neighbor
+	 * @see AssociateNearestNeighbor_ST
+	 * @see org.ddogleg.nn.alg.searches.KdTreeSearch1Bbf
 	 */
 	public static AssociateDescription<TupleDesc_F64> kdtree(
-			@Nullable ConfigAssociateNearestNeighbor configNN , int dimension ) {
-		if( configNN == null )
+			@Nullable ConfigAssociateNearestNeighbor configNN, int dimension ) {
+		if (configNN == null)
 			configNN = new ConfigAssociateNearestNeighbor();
-		NearestNeighbor nn = FactoryNearestNeighbor.kdtree(new KdTreeTuple_F64(dimension),configNN.maxNodesSearched);
+		NearestNeighbor nn = FactoryNearestNeighbor.kdtree(new KdTreeTuple_F64(dimension), configNN.maxNodesSearched);
 
-		return associateNearestNeighbor(configNN,nn);
+		return associateNearestNeighbor(configNN, nn);
 	}
 
 	/**
 	 * Approximate association using multiple random K-D trees (random forest) for descriptors with a high degree of
 	 * freedom, e.g. &gt; 20
 	 *
-	 * @see AssociateNearestNeighbor_ST
-	 * @see org.ddogleg.nn.wrap.KdForestBbfNearestNeighbor
-	 *
 	 * @param dimension Number of elements in the feature vector
 	 * @param numTrees Number of trees that are considered.  Try 10 and tune.
 	 * @param numConsiderSplit Number of nodes that are considered when generating a tree.  Must be less than the
-	 *                         point's dimension.  Try 5
+	 * point's dimension.  Try 5
 	 * @param randomSeed Seed used by random number generator
 	 * @return Association using approximate nearest neighbor
+	 * @see AssociateNearestNeighbor_ST
+	 * @see org.ddogleg.nn.wrap.KdForestBbfNearestNeighbor
 	 */
-	public static AssociateDescription<TupleDesc_F64> kdRandomForest( @Nullable ConfigAssociateNearestNeighbor configNN ,
+	public static AssociateDescription<TupleDesc_F64> kdRandomForest( @Nullable ConfigAssociateNearestNeighbor configNN,
 																	  int dimension,
-																	  int numTrees ,
-																	  int numConsiderSplit ,
-																	  long randomSeed) {
-		if( configNN == null )
+																	  int numTrees,
+																	  int numConsiderSplit,
+																	  long randomSeed ) {
+		if (configNN == null)
 			configNN = new ConfigAssociateNearestNeighbor();
 		NearestNeighbor nn = FactoryNearestNeighbor.kdRandomForest(
 				new KdTreeTuple_F64(dimension),
-				configNN.maxNodesSearched,numTrees,numConsiderSplit,randomSeed);
+				configNN.maxNodesSearched, numTrees, numConsiderSplit, randomSeed);
 
-		return associateNearestNeighbor(configNN,nn);
+		return associateNearestNeighbor(configNN, nn);
 	}
 
 	public static AssociateNearestNeighbor<TupleDesc_F64>
-	associateNearestNeighbor( @Nullable ConfigAssociateNearestNeighbor config ,  NearestNeighbor nn )
-	{
-		if( config == null )
+	associateNearestNeighbor( @Nullable ConfigAssociateNearestNeighbor config, NearestNeighbor nn ) {
+		if (config == null)
 			config = new ConfigAssociateNearestNeighbor();
 
 		config.checkValidity();
 
 		AssociateNearestNeighbor<TupleDesc_F64> assoc;
-		if( BoofConcurrency.USE_CONCURRENT ) {
+		if (BoofConcurrency.USE_CONCURRENT) {
 			assoc = new AssociateNearestNeighbor_MT<>(nn);
 		} else {
 			assoc = new AssociateNearestNeighbor_ST<>(nn);
@@ -234,18 +226,18 @@ public class FactoryAssociation {
 	 */
 	public static <D>
 	ScoreAssociation<D> defaultScore( Class<D> tupleType ) {
-		if( NccFeature.class.isAssignableFrom(tupleType) ) {
+		if (NccFeature.class.isAssignableFrom(tupleType)) {
 			return (ScoreAssociation)new ScoreAssociateNccFeature();
-		} else if( TupleDesc_F64.class.isAssignableFrom(tupleType) ) {
+		} else if (TupleDesc_F64.class.isAssignableFrom(tupleType)) {
 			return (ScoreAssociation)new ScoreAssociateEuclideanSq.F64();
-		} else if( tupleType == TupleDesc_F32.class ) {
+		} else if (tupleType == TupleDesc_F32.class) {
 			return (ScoreAssociation)new ScoreAssociateEuclideanSq.F32();
-		} else if( tupleType == TupleDesc_U8.class ) {
+		} else if (tupleType == TupleDesc_U8.class) {
 			return (ScoreAssociation)new ScoreAssociateSad.U8();
-		} else if( tupleType == TupleDesc_B.class  ) {
+		} else if (tupleType == TupleDesc_B.class) {
 			return (ScoreAssociation)new ScoreAssociateHamming_B();
 		} else {
-			throw new IllegalArgumentException("Unknown tuple type: "+tupleType);
+			throw new IllegalArgumentException("Unknown tuple type: " + tupleType);
 		}
 	}
 
@@ -257,16 +249,16 @@ public class FactoryAssociation {
 	 */
 	public static <D>
 	ScoreAssociation<D> scoreSad( Class<D> tupleType ) {
-		if( TupleDesc_F64.class.isAssignableFrom(tupleType) ) {
+		if (TupleDesc_F64.class.isAssignableFrom(tupleType)) {
 			return (ScoreAssociation)new ScoreAssociateSad.F64();
-		} else if( tupleType == TupleDesc_F32.class ) {
+		} else if (tupleType == TupleDesc_F32.class) {
 			return (ScoreAssociation)new ScoreAssociateSad.F32();
-		} else if( tupleType == TupleDesc_U8.class ) {
+		} else if (tupleType == TupleDesc_U8.class) {
 			return (ScoreAssociation)new ScoreAssociateSad.U8();
-		} else if( tupleType == TupleDesc_S8.class ) {
+		} else if (tupleType == TupleDesc_S8.class) {
 			return (ScoreAssociation)new ScoreAssociateSad.S8();
 		} else {
-			throw new IllegalArgumentException("SAD score not supported for type "+tupleType.getSimpleName());
+			throw new IllegalArgumentException("SAD score not supported for type " + tupleType.getSimpleName());
 		}
 	}
 
@@ -288,18 +280,18 @@ public class FactoryAssociation {
 	 * @return Euclidean distance measure
 	 */
 	public static <D>
-	ScoreAssociation<D> scoreEuclidean( Class<D> tupleType , boolean squared ) {
-		if( TupleDesc_F64.class.isAssignableFrom(tupleType) ) {
-			if( squared )
+	ScoreAssociation<D> scoreEuclidean( Class<D> tupleType, boolean squared ) {
+		if (TupleDesc_F64.class.isAssignableFrom(tupleType)) {
+			if (squared)
 				return (ScoreAssociation)new ScoreAssociateEuclideanSq.F64();
 			else
 				return (ScoreAssociation)new ScoreAssociateEuclidean_F64();
-		} else if( tupleType == TupleDesc_F32.class ) {
-			if( squared )
+		} else if (tupleType == TupleDesc_F32.class) {
+			if (squared)
 				return (ScoreAssociation)new ScoreAssociateEuclideanSq.F32();
 		}
 
-		throw new IllegalArgumentException("Euclidean score not yet supported for type "+tupleType.getSimpleName());
+		throw new IllegalArgumentException("Euclidean score not yet supported for type " + tupleType.getSimpleName());
 	}
 
 	/**
@@ -310,10 +302,10 @@ public class FactoryAssociation {
 	 */
 	public static <D>
 	ScoreAssociation<D> scoreHamming( Class<D> tupleType ) {
-		if( tupleType == TupleDesc_B.class ) {
+		if (tupleType == TupleDesc_B.class) {
 			return (ScoreAssociation)new ScoreAssociateHamming_B();
 		}
 
-		throw new IllegalArgumentException("Hamming distance not yet supported for type "+tupleType.getSimpleName());
+		throw new IllegalArgumentException("Hamming distance not yet supported for type " + tupleType.getSimpleName());
 	}
 }

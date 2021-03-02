@@ -56,32 +56,31 @@ public class DescribePointBriefSO<T extends ImageGray<T>> {
 	protected InterpolatePixelS<T> interp;
 
 	// values at each sample point
-	float values[];
+	float[] values;
 
-	public DescribePointBriefSO(BinaryCompareDefinition_I32 definition,
-								BlurFilter<T> filterBlur,
-								InterpolatePixelS<T> interp) {
+	public DescribePointBriefSO( BinaryCompareDefinition_I32 definition,
+								 BlurFilter<T> filterBlur,
+								 InterpolatePixelS<T> interp ) {
 		this.definition = definition;
 		this.filterBlur = filterBlur;
 		this.interp = interp;
 
 		Class<T> imageType = filterBlur.getInputType().getImageClass();
 		blur = GeneralizedImageOps.createSingleBand(imageType, 1, 1);
-		values = new float[ definition.samplePoints.length ];
+		values = new float[definition.samplePoints.length];
 	}
 
 	public TupleDesc_B createFeature() {
 		return new TupleDesc_B(definition.getLength());
 	}
 
-	public void setImage(T image) {
-		blur.reshape(image.width,image.height);
-		filterBlur.process(image,blur);
+	public void setImage( T image ) {
+		blur.reshape(image.width, image.height);
+		filterBlur.process(image, blur);
 		interp.setImage(blur);
 	}
 
-	public void process( float c_x , float c_y , float orientation , float radius , TupleDesc_B feature )
-	{
+	public void process( float c_x, float c_y, float orientation, float radius, TupleDesc_B feature ) {
 		float scale = (float)(radius/BoofDefaults.BRIEF_SCALE_TO_RADIUS);
 		// NOTE: This doesn't seem to take in account the interpolation border.  Might not work algs
 		// other than bilinear interpolation
@@ -92,8 +91,8 @@ public class DescribePointBriefSO<T extends ImageGray<T>> {
 
 		Arrays.fill(feature.data, 0);
 
-		if( isInside ) {
-			for( int i = 0; i < definition.samplePoints.length; i++ ) {
+		if (isInside) {
+			for (int i = 0; i < definition.samplePoints.length; i++) {
 				Point2D_I32 a = definition.samplePoints[i];
 				// rotate the points
 				float x0 = c_x + (c*a.x - s*a.y)*scale;
@@ -103,24 +102,24 @@ public class DescribePointBriefSO<T extends ImageGray<T>> {
 			}
 		} else {
 			// handle the image border case
-			for( int i = 0; i < definition.samplePoints.length; i++ ) {
+			for (int i = 0; i < definition.samplePoints.length; i++) {
 				Point2D_I32 a = definition.samplePoints[i];
 				// rotate the points
 				float x0 = c_x + (c*a.x - s*a.y)*scale;
 				float y0 = c_y + (s*a.x + c*a.y)*scale;
 
-				if( BoofMiscOps.isInside(blur, x0, y0) ) {
+				if (BoofMiscOps.isInside(blur, x0, y0)) {
 					// it might be inside the image but too close to the border for unsafe
-					values[i] = interp.get(x0,y0);
+					values[i] = interp.get(x0, y0);
 				}
 			}
 		}
 
-		for( int i = 0; i < definition.compare.length; i++ ) {
+		for (int i = 0; i < definition.compare.length; i++) {
 			Point2D_I32 comp = definition.compare[i];
 
-			if( values[comp.x] < values[comp.y] ) {
-				feature.data[ i/32 ] |= 1 << (i % 32);
+			if (values[comp.x] < values[comp.y]) {
+				feature.data[i/32] |= 1 << (i%32);
 			}
 		}
 	}

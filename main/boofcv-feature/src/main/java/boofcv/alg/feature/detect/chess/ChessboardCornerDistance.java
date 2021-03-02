@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -27,17 +27,17 @@ import org.ddogleg.nn.alg.KdTreeDistance;
  */
 public class ChessboardCornerDistance implements KdTreeDistance<ChessboardCorner> {
 	@Override
-	public double distance(ChessboardCorner a, ChessboardCorner b) {
+	public double distance( ChessboardCorner a, ChessboardCorner b ) {
 		return a.distance2(b);
 	}
 
 	@Override
-	public double valueAt(ChessboardCorner point, int index) {
-		switch (index) {
-			case 0: return point.x;
-			case 1: return point.y;
-		}
-		throw new RuntimeException("Out of bounds");
+	public double valueAt( ChessboardCorner point, int index ) {
+		return switch (index) {
+			case 0 -> point.x;
+			case 1 -> point.y;
+			default -> throw new RuntimeException("Out of bounds");
+		};
 	}
 
 	@Override

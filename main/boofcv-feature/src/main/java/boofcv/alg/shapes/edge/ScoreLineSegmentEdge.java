@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -47,8 +47,8 @@ public class ScoreLineSegmentEdge<T extends ImageGray<T>> extends BaseIntegralEd
 	 * @param numSamples Number of points it will sample along an edge
 	 * @param imageType Type of image it will process
 	 */
-	public ScoreLineSegmentEdge(int numSamples,
-								Class<T> imageType) {
+	public ScoreLineSegmentEdge( int numSamples,
+								 Class<T> imageType ) {
 		super(imageType);
 		this.numSamples = numSamples;
 	}
@@ -57,7 +57,7 @@ public class ScoreLineSegmentEdge<T extends ImageGray<T>> extends BaseIntegralEd
 	 * Sets the image which is going to be processed.
 	 */
 	@Override
-	public void setImage(T image) {
+	public void setImage( T image ) {
 		integralImage.wrap(image);
 		integral.setImage(integralImage);
 	}
@@ -73,28 +73,28 @@ public class ScoreLineSegmentEdge<T extends ImageGray<T>> extends BaseIntegralEd
 	 * @param tanY unit tangent y-axis   determines length of line integral
 	 * @return average derivative
 	 */
-	public double computeAverageDerivative(Point2D_F64 a, Point2D_F64 b, double tanX, double tanY) {
+	public double computeAverageDerivative( Point2D_F64 a, Point2D_F64 b, double tanX, double tanY ) {
 		samplesInside = 0;
 		averageUp = averageDown = 0;
 
 		for (int i = 0; i < numSamples; i++) {
-			double x = (b.x-a.x)*i/(numSamples-1) + a.x;
-			double y = (b.y-a.y)*i/(numSamples-1) + a.y;
+			double x = (b.x - a.x)*i/(numSamples - 1) + a.x;
+			double y = (b.y - a.y)*i/(numSamples - 1) + a.y;
 
-			double x0 = x+tanX;
-			double y0 = y+tanY;
-			if(!BoofMiscOps.isInside(integralImage.getWidth(),integralImage.getHeight(),x0,y0))
+			double x0 = x + tanX;
+			double y0 = y + tanY;
+			if (!BoofMiscOps.isInside(integralImage.getWidth(), integralImage.getHeight(), x0, y0))
 				continue;
 
-			double x1 = x-tanX;
-			double y1 = y-tanY;
-			if(!BoofMiscOps.isInside(integralImage.getWidth(),integralImage.getHeight(),x1,y1))
+			double x1 = x - tanX;
+			double y1 = y - tanY;
+			if (!BoofMiscOps.isInside(integralImage.getWidth(), integralImage.getHeight(), x1, y1))
 				continue;
 
 			samplesInside++;
 
-			double up = integral.compute(x,y,x0,y0);
-			double down = integral.compute(x,y,x1,y1);
+			double up = integral.compute(x, y, x0, y0);
+			double down = integral.compute(x, y, x1, y1);
 
 			// don't take the abs here and require that a high score involves it being entirely black or white around
 			// the edge.  Otherwise a random image would score high
@@ -102,12 +102,12 @@ public class ScoreLineSegmentEdge<T extends ImageGray<T>> extends BaseIntegralEd
 			averageDown += down;
 		}
 
-		if( samplesInside == 0 )
+		if (samplesInside == 0)
 			return 0;
 		averageUp /= samplesInside;
 		averageDown /= samplesInside;
 
-		return averageUp-averageDown;
+		return averageUp - averageDown;
 	}
 
 	public int getSamplesInside() {
@@ -118,7 +118,7 @@ public class ScoreLineSegmentEdge<T extends ImageGray<T>> extends BaseIntegralEd
 		return numSamples;
 	}
 
-	public void setNumSamples(int numSamples) {
+	public void setNumSamples( int numSamples ) {
 		this.numSamples = numSamples;
 	}
 

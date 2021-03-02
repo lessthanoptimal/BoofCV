@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -49,8 +49,9 @@ public class ConfigDetectInterestPoint implements Configuration {
 		fastHessian.checkValidity();
 		sift.checkValidity();
 	}
+
 	public enum DetectorType {
-		POINT,FAST_HESSIAN,SIFT,
+		POINT, FAST_HESSIAN, SIFT,
 	}
 
 	public void setTo( ConfigDetectInterestPoint src ) {

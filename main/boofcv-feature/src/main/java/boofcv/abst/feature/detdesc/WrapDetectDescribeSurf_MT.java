@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -32,32 +32,32 @@ import boofcv.struct.image.ImageGray;
  * @author Peter Abeles
  */
 public class WrapDetectDescribeSurf_MT<T extends ImageGray<T>, II extends ImageGray<II>>
-		extends WrapDetectDescribeSurf<T,II> {
+		extends WrapDetectDescribeSurf<T, II> {
 
-	public WrapDetectDescribeSurf_MT(FastHessianFeatureDetector<II> detector,
-									 OrientationIntegral<II> orientation,
-									 DescribePointSurf<II> describe,
-									 Class<T> inputType ) {
-		super(detector, orientation, describe, inputType );
+	public WrapDetectDescribeSurf_MT( FastHessianFeatureDetector<II> detector,
+									  OrientationIntegral<II> orientation,
+									  DescribePointSurf<II> describe,
+									  Class<T> inputType ) {
+		super(detector, orientation, describe, inputType);
 	}
 
 	@Override
 	protected void computeDescriptors() {
-		BoofConcurrency.loopBlocks(0,foundPoints.size(),(i0, i1)->{
+		BoofConcurrency.loopBlocks(0, foundPoints.size(), ( i0, i1 ) -> {
 			OrientationIntegral<II> orientation = (OrientationIntegral)this.orientation.copy();
 			DescribePointSurf<II> describe = this.describe.copy();
 
 			orientation.setImage(ii);
 			describe.setImage(ii);
 
-			for( int i = i0; i < i1; i++ ) {
+			for (int i = i0; i < i1; i++) {
 				ScalePoint p = foundPoints.get(i);
 				double radius = p.scale*BoofDefaults.SURF_SCALE_TO_RADIUS;
 
 				orientation.setObjectRadius(radius);
-				double angle = orientation.compute(p.pixel.x,p.pixel.y);
-				describe.describe(p.pixel.x,p.pixel.y, angle, p.scale, true, features.get(i));
-				featureAngles.set(i,angle);
+				double angle = orientation.compute(p.pixel.x, p.pixel.y);
+				describe.describe(p.pixel.x, p.pixel.y, angle, p.scale, true, features.get(i));
+				featureAngles.set(i, angle);
 			}
 		});
 	}

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -60,7 +60,6 @@ public class DescribePointSift<Deriv extends ImageGray> extends DescribeSiftComm
 	// conversion from scale-space sigma to image pixels
 	double sigmaToPixels;
 
-
 	/**
 	 * Configures the descriptor.
 	 *
@@ -71,10 +70,10 @@ public class DescribePointSift<Deriv extends ImageGray> extends DescribeSiftComm
 	 * @param weightingSigmaFraction Sigma for Gaussian weighting function is set to this value * region width.  Try 0.5
 	 * @param maxDescriptorElementValue Helps with non-affine changes in lighting. See paper.  Try 0.2
 	 */
-	public DescribePointSift(int widthSubregion, int widthGrid, int numHistogramBins,
-							 double sigmaToPixels, double weightingSigmaFraction,
-							 double maxDescriptorElementValue , Class<Deriv> derivType ) {
-		super(widthSubregion,widthGrid,numHistogramBins,weightingSigmaFraction,maxDescriptorElementValue);
+	public DescribePointSift( int widthSubregion, int widthGrid, int numHistogramBins,
+							  double sigmaToPixels, double weightingSigmaFraction,
+							  double maxDescriptorElementValue, Class<Deriv> derivType ) {
+		super(widthSubregion, widthGrid, numHistogramBins, weightingSigmaFraction, maxDescriptorElementValue);
 		this.sigmaToPixels = sigmaToPixels;
 
 		imageDerivX = FactoryGImageGray.create(derivType);
@@ -88,7 +87,7 @@ public class DescribePointSift<Deriv extends ImageGray> extends DescribeSiftComm
 	 * @param derivX x-derivative of input image
 	 * @param derivY y-derivative of input image
 	 */
-	public void setImageGradient(Deriv derivX , Deriv derivY ) {
+	public void setImageGradient( Deriv derivX, Deriv derivY ) {
 		this.imageDerivX.wrap(derivX);
 		this.imageDerivY.wrap(derivY);
 	}
@@ -102,20 +101,19 @@ public class DescribePointSift<Deriv extends ImageGray> extends DescribeSiftComm
 	 * @param orientation Orientation of keypoint in radians
 	 * @param descriptor (output) Storage for computed descriptor.  Make sure it's the appropriate length first
 	 */
-	public void process( double c_x , double c_y , double sigma , double orientation , TupleDesc_F64 descriptor )
-	{
+	public void process( double c_x, double c_y, double sigma, double orientation, TupleDesc_F64 descriptor ) {
 		descriptor.fill(0);
 
 		computeRawDescriptor(c_x, c_y, sigma, orientation, descriptor);
 
-		normalizeDescriptor(descriptor,maxDescriptorElementValue);
+		normalizeDescriptor(descriptor, maxDescriptorElementValue);
 	}
 
 	/**
 	 * Computes the descriptor by sampling the input image.  This is raw because the descriptor hasn't been massaged
 	 * yet.
 	 */
-	void computeRawDescriptor(double c_x, double c_y, double sigma, double orientation, TupleDesc_F64 descriptor) {
+	void computeRawDescriptor( double c_x, double c_y, double sigma, double orientation, TupleDesc_F64 descriptor ) {
 		double c = Math.cos(orientation);
 		double s = Math.sin(orientation);
 
@@ -129,13 +127,13 @@ public class DescribePointSift<Deriv extends ImageGray> extends DescribeSiftComm
 
 		for (int sampleY = 0; sampleY < sampleWidth; sampleY++) {
 			float subY = sampleY/fwidthSubregion;
-			double y = sampleToPixels*(sampleY-sampleRadius);
+			double y = sampleToPixels*(sampleY - sampleRadius);
 
 			for (int sampleX = 0; sampleX < sampleWidth; sampleX++) {
 				// coordinate of samples in terms of sub-region.  Center of sample point, hence + 0.5f
 				float subX = sampleX/fwidthSubregion;
 				// recentered local pixel sample coordinate
-				double x = sampleToPixels*(sampleX-sampleRadius);
+				double x = sampleToPixels*(sampleX - sampleRadius);
 
 				// pixel coordinate in the image that is to be sampled.  Note the rounding
 				// If the pixel coordinate is -1 < x < 0 then it will round to 0 instead of -1, but the rounding
@@ -144,21 +142,21 @@ public class DescribePointSift<Deriv extends ImageGray> extends DescribeSiftComm
 				int pixelY = (int)(x*s + y*c + c_y + 0.5);
 
 				// skip pixels outside of the image
-				if( image.isInBounds(pixelX,pixelY) ) {
+				if (image.isInBounds(pixelX, pixelY)) {
 					// spacial image derivative at this point
 					float spacialDX = imageDerivX.unsafe_getF(pixelX, pixelY);
 					float spacialDY = imageDerivY.unsafe_getF(pixelX, pixelY);
 
-					double adjDX =  c*spacialDX + s*spacialDY;
+					double adjDX = c*spacialDX + s*spacialDY;
 					double adjDY = -s*spacialDX + c*spacialDY;
 
-					double angle = UtilAngle.domain2PI(Math.atan2(adjDY,adjDX));
+					double angle = UtilAngle.domain2PI(Math.atan2(adjDY, adjDX));
 
-					float weightGaussian = gaussianWeight[sampleY*sampleWidth+sampleX];
+					float weightGaussian = gaussianWeight[sampleY*sampleWidth + sampleX];
 					float weightGradient = (float)Math.sqrt(spacialDX*spacialDX + spacialDY*spacialDY);
 
 					// trilinear interpolation intro descriptor
-					trilinearInterpolation(weightGaussian*weightGradient,subX,subY,angle, descriptor);
+					trilinearInterpolation(weightGaussian*weightGradient, subX, subY, angle, descriptor);
 				}
 			}
 		}

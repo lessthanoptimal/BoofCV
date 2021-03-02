@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -28,12 +28,10 @@ import boofcv.struct.image.ImageGray;
  *
  * @author Peter Abeles
  */
-public abstract class DescribePointPixelRegion<T extends ImageGray<T>, D extends TupleDesc>
-		extends DescribePointRectangleRegion<T>
-{
+public abstract class DescribePointPixelRegion<T extends ImageGray<T>, D extends TupleDesc<D>>
+		extends DescribePointRectangleRegion<T> {
 
-
-	protected DescribePointPixelRegion(int regionWidth, int regionHeight) {
+	protected DescribePointPixelRegion( int regionWidth, int regionHeight ) {
 		super(regionWidth, regionHeight);
 	}
 
@@ -44,7 +42,7 @@ public abstract class DescribePointPixelRegion<T extends ImageGray<T>, D extends
 	 * @param c_y Center of region descriptor.
 	 * @param desc Where the descriptor is written to
 	 */
-	public abstract void process( int c_x , int c_y , D desc );
+	public abstract void process( int c_x, int c_y, D desc );
 
 	/**
 	 * The type of region descriptor generated

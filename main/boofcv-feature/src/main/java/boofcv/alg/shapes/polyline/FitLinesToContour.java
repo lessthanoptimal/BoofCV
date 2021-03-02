@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -74,7 +74,7 @@ public class FitLinesToContour {
 
 	boolean verbose = false;
 
-	public void setContour(List<Point2D_I32> contour) {
+	public void setContour( List<Point2D_I32> contour ) {
 		this.contour = contour;
 	}
 
@@ -88,45 +88,44 @@ public class FitLinesToContour {
 	 * @param corners Initial location of the corners
 	 * @param output Optimized location of the corners
 	 */
-	public boolean fitAnchored( int anchor0 , int anchor1 , DogArray_I32 corners , DogArray_I32 output )
-	{
+	public boolean fitAnchored( int anchor0, int anchor1, DogArray_I32 corners, DogArray_I32 output ) {
 		this.anchor0 = anchor0;
 		this.anchor1 = anchor1;
 
-		int numLines = anchor0==anchor1? corners.size() : CircularIndex.distanceP(anchor0,anchor1,corners.size);
-		if( numLines < 2 ) {
+		int numLines = anchor0 == anchor1 ? corners.size() : CircularIndex.distanceP(anchor0, anchor1, corners.size);
+		if (numLines < 2) {
 			throw new RuntimeException("The one line is anchored and can't be optimized");
 		}
 
 		lines.resize(numLines);
 
-		if( verbose ) System.out.println("ENTER FitLinesToContour");
+		if (verbose) System.out.println("ENTER FitLinesToContour");
 
 		// Check pre-condition
 //		checkDuplicateCorner(corners);
 
 		workCorners.setTo(corners);
 
-		for( int iteration = 0; iteration < maxIterations; iteration++ ) {
+		for (int iteration = 0; iteration < maxIterations; iteration++) {
 			// fit the lines to the contour using only lines between each corner for each line
-			if( !fitLinesUsingCorners( numLines,workCorners) ) {
+			if (!fitLinesUsingCorners(numLines, workCorners)) {
 				return false;
 			}
 
 			// intersect each line and find the closest point on the contour as the new corner
-			if( !linesIntoCorners(numLines, workCorners) ) {
+			if (!linesIntoCorners(numLines, workCorners)) {
 				return false;
 			}
 
 			// sanity check to see if corner order is still met
-			if( !sanityCheckCornerOrder(numLines, workCorners) ) {
+			if (!sanityCheckCornerOrder(numLines, workCorners)) {
 				return false; // TODO detect and handle this condition better
 			}
 
 			// TODO check for convergence
 		}
 
-		if( verbose ) System.out.println("EXIT FitLinesToContour. "+corners.size()+"  "+workCorners.size());
+		if (verbose) System.out.println("EXIT FitLinesToContour. " + corners.size() + "  " + workCorners.size());
 		output.setTo(workCorners);
 		return true;
 	}
@@ -171,6 +170,7 @@ public class FitLinesToContour {
 	}
 
 	DogArray_I32 skippedCorners = new DogArray_I32();
+
 	/**
 	 * finds the intersection of a line and update the corner index
 	 */
@@ -191,19 +191,19 @@ public class FitLinesToContour {
 //			System.out.println("  corner index "+cornerIndex);
 
 			if (null == Intersection2D_F64.intersection(line0, line1, intersection)) {
-				if( verbose ) System.out.println("  SKIPPING no intersection");
+				if (verbose) System.out.println("  SKIPPING no intersection");
 				// the two lines are parallel (or a bug earlier inserted NaN), so skip and remove one of them
 				skipped = true;
 			} else {
 
 				int contourIndex = closestPoint(intersection);
-				if( contourIndex != contourIndexPrevious ) {
+				if (contourIndex != contourIndexPrevious) {
 
 					Point2D_I32 a = contour.get(contourIndexPrevious);
 					Point2D_I32 b = contour.get(contourIndex);
 
-					if( a.x == b.x && a.y == b.y ) {
-						if( verbose ) System.out.println("  SKIPPING duplicate coordinate");
+					if (a.x == b.x && a.y == b.y) {
+						if (verbose) System.out.println("  SKIPPING duplicate coordinate");
 //						System.out.println("  duplicate "+a+" "+b);
 						skipped = true;
 					} else {
@@ -212,35 +212,34 @@ public class FitLinesToContour {
 						contourIndexPrevious = contourIndex;
 					}
 				} else {
-					if( verbose ) System.out.println("  SKIPPING duplicate corner index");
+					if (verbose) System.out.println("  SKIPPING duplicate corner index");
 					skipped = true;
 				}
 			}
 
-			if( skipped ) {
-				skippedCorners.add( cornerIndex );
+			if (skipped) {
+				skippedCorners.add(cornerIndex);
 			}
-
 		}
 		// check the last anchor to see if there's a duplicate
 		int cornerIndex = CircularIndex.addOffset(anchor0, numLines, contourCorners.size);
 		Point2D_I32 a = contour.get(contourIndexPrevious);
 		Point2D_I32 b = contour.get(contourCorners.get(cornerIndex));
-		if( a.x == b.x && a.y == b.y ) {
-			skippedCorners.add( cornerIndex );
+		if (a.x == b.x && a.y == b.y) {
+			skippedCorners.add(cornerIndex);
 		}
 
 		// now handle all the skipped corners
-		Arrays.sort(skippedCorners.data,0,skippedCorners.size);
+		Arrays.sort(skippedCorners.data, 0, skippedCorners.size);
 
-		for (int i = skippedCorners.size-1; i >= 0; i--) {
+		for (int i = skippedCorners.size - 1; i >= 0; i--) {
 			int index = skippedCorners.get(i);
 			contourCorners.remove(index);
 
-			if( anchor0 >= index ) {
+			if (anchor0 >= index) {
 				anchor0--;
 			}
-			if( anchor1 >= index ) {
+			if (anchor1 >= index) {
 				anchor1--;
 			}
 		}
@@ -249,17 +248,16 @@ public class FitLinesToContour {
 		numLines -= skippedCorners.size;
 		for (int i = 0; i < numLines; i++) {
 			int c0 = CircularIndex.addOffset(anchor0, i, contourCorners.size);
-			int c1 = CircularIndex.addOffset(anchor0, i+1, contourCorners.size);
+			int c1 = CircularIndex.addOffset(anchor0, i + 1, contourCorners.size);
 			a = contour.get(contourCorners.get(c0));
 			b = contour.get(contourCorners.get(c1));
 
-			if( a.x == b.x && a.y == b.y ) {
+			if (a.x == b.x && a.y == b.y) {
 				throw new RuntimeException("Well I screwed up");
 			}
-
 		}
 
-		return contourCorners.size()>=3;
+		return contourCorners.size() >= 3;
 	}
 
 	/**
@@ -267,20 +265,20 @@ public class FitLinesToContour {
 	 *
 	 * @param numLines number of lines it will fit
 	 */
-	boolean fitLinesUsingCorners( int numLines , DogArray_I32 cornerIndexes) {
+	boolean fitLinesUsingCorners( int numLines, DogArray_I32 cornerIndexes ) {
 		for (int i = 1; i <= numLines; i++) {
 			int index0 = cornerIndexes.get(CircularIndex.addOffset(anchor0, i - 1, cornerIndexes.size));
 			int index1 = cornerIndexes.get(CircularIndex.addOffset(anchor0, i, cornerIndexes.size));
 
-			if( index0 == index1 )
+			if (index0 == index1)
 				return false;
 
 			if (!fitLine(index0, index1, lines.get(i - 1))) {
 				// TODO do something more intelligent here.  Just leave the corners as is?
 				return false;
 			}
-			LineGeneral2D_F64 l = lines.get(i-1);
-			if( Double.isNaN(l.A) || Double.isNaN(l.B) || Double.isNaN(l.C)) {
+			LineGeneral2D_F64 l = lines.get(i - 1);
+			if (Double.isNaN(l.A) || Double.isNaN(l.B) || Double.isNaN(l.C)) {
 				throw new RuntimeException("This should be impossible");
 			}
 		}
@@ -295,38 +293,38 @@ public class FitLinesToContour {
 	 * @param line storage for the found line
 	 * @return true if successful or false if it failed
 	 */
-	boolean fitLine( int contourIndex0 , int contourIndex1 , LineGeneral2D_F64 line ) {
-		int numPixels = CircularIndex.distanceP(contourIndex0,contourIndex1,contour.size());
+	boolean fitLine( int contourIndex0, int contourIndex1, LineGeneral2D_F64 line ) {
+		int numPixels = CircularIndex.distanceP(contourIndex0, contourIndex1, contour.size());
 
 		// if its too small
-		if( numPixels < minimumLineLength )
+		if (numPixels < minimumLineLength)
 			return false;
 
 		Point2D_I32 c0 = contour.get(contourIndex0);
 		Point2D_I32 c1 = contour.get(contourIndex1);
 
 		double scale = c0.distance(c1);
-		double centerX = (c1.x+c0.x)/2.0;
-		double centerY = (c1.y+c0.y)/2.0;
+		double centerX = (c1.x + c0.x)/2.0;
+		double centerY = (c1.y + c0.y)/2.0;
 
-		int numSamples = Math.min(maxSamples,numPixels);
+		int numSamples = Math.min(maxSamples, numPixels);
 
 		pointsFit.reset();
 		for (int i = 0; i < numSamples; i++) {
 
-			int index = i*(numPixels-1)/(numSamples-1);
+			int index = i*(numPixels - 1)/(numSamples - 1);
 
-			Point2D_I32 c = contour.get( CircularIndex.addOffset(contourIndex0,index,contour.size()));
+			Point2D_I32 c = contour.get(CircularIndex.addOffset(contourIndex0, index, contour.size()));
 
 			Point2D_F64 p = pointsFit.grow();
-			p.x = (c.x-centerX)/scale;
-			p.y = (c.y-centerY)/scale;
+			p.x = (c.x - centerX)/scale;
+			p.y = (c.y - centerY)/scale;
 		}
 
-		if( null == FitLine_F64.polar(pointsFit.toList(),linePolar) ) {
+		if (null == FitLine_F64.polar(pointsFit.toList(), linePolar)) {
 			return false;
 		}
-		UtilLine2D_F64.convert(linePolar,line);
+		UtilLine2D_F64.convert(linePolar, line);
 
 		// go from local coordinates into global
 		line.C = scale*line.C - centerX*line.A - centerY*line.B;
@@ -336,6 +334,7 @@ public class FitLinesToContour {
 
 	/**
 	 * Returns the closest point on the contour to the provided point in space
+	 *
 	 * @return index of closest point
 	 */
 	int closestPoint( Point2D_F64 target ) {
@@ -344,8 +343,8 @@ public class FitLinesToContour {
 		for (int i = 0; i < contour.size(); i++) {
 			Point2D_I32 c = contour.get(i);
 
-			double d = UtilPoint2D_F64.distanceSq(target.x,target.y,c.x,c.y);
-			if( d < bestDistance ) {
+			double d = UtilPoint2D_F64.distanceSq(target.x, target.y, c.x, c.y);
+			if (d < bestDistance) {
 				bestDistance = d;
 				bestIndex = i;
 			}

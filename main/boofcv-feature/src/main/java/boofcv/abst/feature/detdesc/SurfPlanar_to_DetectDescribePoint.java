@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -33,12 +33,10 @@ import georegression.struct.point.Point2D_F64;
  *
  * @param <T> Image band type
  * @param <II> Integral image type
- *
  * @author Peter Abeles
  */
 public class SurfPlanar_to_DetectDescribePoint<T extends ImageGray<T>, II extends ImageGray<II>>
-		implements DetectDescribePoint<Planar<T>, TupleDesc_F64>
-{
+		implements DetectDescribePoint<Planar<T>, TupleDesc_F64> {
 	DetectDescribeSurfPlanar<II> alg;
 
 	T gray;
@@ -46,32 +44,31 @@ public class SurfPlanar_to_DetectDescribePoint<T extends ImageGray<T>, II extend
 	Planar<II> bandII;
 	ImageType<Planar<T>> inputType;
 
-	public SurfPlanar_to_DetectDescribePoint(DetectDescribeSurfPlanar<II> alg ,
-											 Class<T> imageType, Class<II> integralType)
-	{
+	public SurfPlanar_to_DetectDescribePoint( DetectDescribeSurfPlanar<II> alg,
+											  Class<T> imageType, Class<II> integralType ) {
 		this.alg = alg;
-		this.inputType = ImageType.pl(alg.getDescribe().getNumBands(),imageType);
+		this.inputType = ImageType.pl(alg.getDescribe().getNumBands(), imageType);
 
 		gray = GeneralizedImageOps.createSingleBand(imageType, 1, 1);
-		grayII = GeneralizedImageOps.createSingleBand(integralType,1,1);
+		grayII = GeneralizedImageOps.createSingleBand(integralType, 1, 1);
 		bandII = new Planar<>(integralType, 1, 1, alg.getDescribe().getNumBands());
 	}
 
 	@Override
-	public void detect(Planar<T> input) {
-		if( input.getNumBands() != bandII.getNumBands() )
-			throw new IllegalArgumentException("Unexpected number of bands. Expected "+
-					bandII.getNumBands()+" found "+input.getNumBands());
-		gray.reshape(input.width,input.height);
-		grayII.reshape(input.width,input.height);
-		bandII.reshape(input.width,input.height);
+	public void detect( Planar<T> input ) {
+		if (input.getNumBands() != bandII.getNumBands())
+			throw new IllegalArgumentException("Unexpected number of bands. Expected " +
+					bandII.getNumBands() + " found " + input.getNumBands());
+		gray.reshape(input.width, input.height);
+		grayII.reshape(input.width, input.height);
+		bandII.reshape(input.width, input.height);
 
-		GConvertImage.average(input,gray);
+		GConvertImage.average(input, gray);
 		GIntegralImageOps.transform(gray, grayII);
-		for( int i = 0; i < input.getNumBands(); i++)
+		for (int i = 0; i < input.getNumBands(); i++)
 			GIntegralImageOps.transform(input.getBand(i), bandII.getBand(i));
 
-		alg.detect(grayII,bandII);
+		alg.detect(grayII, bandII);
 	}
 
 	@Override
@@ -80,7 +77,7 @@ public class SurfPlanar_to_DetectDescribePoint<T extends ImageGray<T>, II extend
 	}
 
 	@Override
-	public int getSet(int index) {
+	public int getSet( int index ) {
 		return alg.isWhite(index) ? 0 : 1;
 	}
 
@@ -95,7 +92,7 @@ public class SurfPlanar_to_DetectDescribePoint<T extends ImageGray<T>, II extend
 	}
 
 	@Override
-	public TupleDesc_F64 getDescription(int index) {
+	public TupleDesc_F64 getDescription( int index ) {
 		return alg.getDescription(index);
 	}
 
@@ -120,17 +117,17 @@ public class SurfPlanar_to_DetectDescribePoint<T extends ImageGray<T>, II extend
 	}
 
 	@Override
-	public Point2D_F64 getLocation(int featureIndex) {
+	public Point2D_F64 getLocation( int featureIndex ) {
 		return alg.getLocation(featureIndex);
 	}
 
 	@Override
-	public double getRadius(int featureIndex) {
+	public double getRadius( int featureIndex ) {
 		return alg.getRadius(featureIndex);
 	}
 
 	@Override
-	public double getOrientation(int featureIndex) {
+	public double getOrientation( int featureIndex ) {
 		return alg.getOrientation(featureIndex);
 	}
 }

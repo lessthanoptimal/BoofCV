@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -44,14 +44,14 @@ import static boofcv.abst.tracker.PointTrackerDda.addAllTracksInList;
  * @author Peter Abeles
  */
 @SuppressWarnings({"unchecked", "rawtypes"})
-public class PointTrackerHybrid<I extends ImageGray<I>, D extends ImageGray<D>, Desc extends TupleDesc>
+public class PointTrackerHybrid<I extends ImageGray<I>, D extends ImageGray<D>, Desc extends TupleDesc<Desc>>
 		implements PointTracker<I> {
 
-	HybridTrackerScalePoint<I,D, Desc> tracker;
+	HybridTrackerScalePoint<I, D, Desc> tracker;
 
 	// Threshold which decides enough tracks have been dropped that it should try to respawn some of the ones it
 	// dropped
-	public final ConfigLength thresholdRespawn = ConfigLength.relative(0.4,50);
+	public final ConfigLength thresholdRespawn = ConfigLength.relative(0.4, 50);
 
 	// Number of active tracks after respawning
 	private int countAfterSpawn;
@@ -62,31 +62,31 @@ public class PointTrackerHybrid<I extends ImageGray<I>, D extends ImageGray<D>, 
 	D[] derivY;
 	ImageType<D> derivType;
 
-	ImageGradient<I,D> gradient;
+	ImageGradient<I, D> gradient;
 
 	// If true that means feature detection has already been called once and new features can be spawned
 	boolean detectCalled;
 
-	public PointTrackerHybrid(HybridTrackerScalePoint<I, D, Desc> tracker,
-							  ConfigDiscreteLevels configLevels,
-							  Class<I> imageType, Class<D> derivType) {
+	public PointTrackerHybrid( HybridTrackerScalePoint<I, D, Desc> tracker,
+							   ConfigDiscreteLevels configLevels,
+							   Class<I> imageType, Class<D> derivType ) {
 		this.tracker = tracker;
 		this.derivType = ImageType.single(derivType);
 
-		pyramid = FactoryPyramid.discreteGaussian(configLevels,-1,2,true, ImageType.single(imageType));
+		pyramid = FactoryPyramid.discreteGaussian(configLevels, -1, 2, true, ImageType.single(imageType));
 		gradient = FactoryDerivative.sobel(imageType, derivType);
 
 		reset();
 	}
 
 	@Override
-	public void process(I image) {
+	public void process( I image ) {
 		this.image = image;
 		detectCalled = false;
 
 		// update the image pyramid
 		pyramid.process(image);
-		if( derivX == null ) {
+		if (derivX == null) {
 			derivX = PyramidOps.declareOutput(pyramid, derivType);
 			derivY = PyramidOps.declareOutput(pyramid, derivType);
 		}
@@ -95,7 +95,7 @@ public class PointTrackerHybrid<I extends ImageGray<I>, D extends ImageGray<D>, 
 		// Perform KLT tracking
 		tracker.updateTracks(pyramid, derivX, derivY);
 		// Perform DDA tracking when the number of pure KLT has dropped significantly from the previous attempt
-		if( tracker.getTracksActive().size < thresholdRespawn.computeI(countAfterSpawn) ) {
+		if (tracker.getTracksActive().size < thresholdRespawn.computeI(countAfterSpawn)) {
 			detectCalled = true;
 			tracker.associateInactiveTracks(image);
 			countAfterSpawn = tracker.getTracksActive().size;
@@ -107,11 +107,11 @@ public class PointTrackerHybrid<I extends ImageGray<I>, D extends ImageGray<D>, 
 	}
 
 	@Override
-	public void dropTracks(Dropper dropper) {
+	public void dropTracks( Dropper dropper ) {
 		DogArray<HybridTrack<Desc>> all = tracker.getTracksAll();
 
-		for (int i = all.size-1; i >= 0; i--) {
-			if( !dropper.shouldDropTrack(all.get(i)) )
+		for (int i = all.size - 1; i >= 0; i--) {
+			if (!dropper.shouldDropTrack(all.get(i)))
 				continue;
 
 			tracker.dropTrackByAllIndex(i);
@@ -120,7 +120,7 @@ public class PointTrackerHybrid<I extends ImageGray<I>, D extends ImageGray<D>, 
 	}
 
 	@Override public void spawnTracks() {
-		if( !detectCalled ) {
+		if (!detectCalled) {
 			tracker.associateInactiveTracks(image);
 		}
 		tracker.spawnNewTracks();
@@ -131,13 +131,19 @@ public class PointTrackerHybrid<I extends ImageGray<I>, D extends ImageGray<D>, 
 		countAfterSpawn = 0;
 		tracker.reset();
 	}
+
 	@Override public long getFrameID() {return tracker.getFrameID();}
+
 	@Override public int getTotalActive() { return tracker.getTracksActive().size();}
+
 	@Override public int getTotalInactive() { return tracker.getTracksInactive().size();}
+
 	@Override public void dropAllTracks() { tracker.dropAllTracks(); }
+
 	@Override public int getMaxSpawn() { return 0; } // returning zero here since there is no good answer.
-	@Override public boolean dropTrack(PointTrack track) {
-		if( tracker.dropTrack((HybridTrack<Desc>) track) ) {
+
+	@Override public boolean dropTrack( PointTrack track ) {
+		if (tracker.dropTrack((HybridTrack<Desc>)track)) {
 			countAfterSpawn--;
 			return true;
 		} else {
@@ -146,27 +152,27 @@ public class PointTrackerHybrid<I extends ImageGray<I>, D extends ImageGray<D>, 
 	}
 
 	@Override
-	public List<PointTrack> getAllTracks(List<PointTrack> list) {
+	public List<PointTrack> getAllTracks( List<PointTrack> list ) {
 		return addAllTracksInList((List)tracker.getTracksAll().toList(), list);
 	}
 
 	@Override
-	public List<PointTrack> getActiveTracks(List<PointTrack> list) {
+	public List<PointTrack> getActiveTracks( List<PointTrack> list ) {
 		return addAllTracksInList((List)tracker.getTracksActive().toList(), list);
 	}
 
 	@Override
-	public List<PointTrack> getInactiveTracks(List<PointTrack> list) {
+	public List<PointTrack> getInactiveTracks( List<PointTrack> list ) {
 		return addAllTracksInList((List)tracker.getTracksInactive().toList(), list);
 	}
 
 	@Override
-	public List<PointTrack> getDroppedTracks(List<PointTrack> list) {
+	public List<PointTrack> getDroppedTracks( List<PointTrack> list ) {
 		return addAllTracksInList((List)tracker.getTracksDropped(), list);
 	}
 
 	@Override
-	public List<PointTrack> getNewTracks(List<PointTrack> list) {
+	public List<PointTrack> getNewTracks( List<PointTrack> list ) {
 		return addAllTracksInList((List)tracker.getTracksSpawned(), list);
 	}
 }

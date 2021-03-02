@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -26,14 +26,13 @@ import georegression.struct.point.Point2D_F64;
  *
  * @author Peter Abeles
  */
-public interface PointDescSet<TD extends TupleDesc> {
-
+public interface PointDescSet<TD extends TupleDesc<TD>> {
 	/**
 	 * Returns the number of detected features
 	 *
 	 * @return Number of interest points.
 	 */
-	public int getNumberOfFeatures();
+	int getNumberOfFeatures();
 
 	/**
 	 * <p>
@@ -46,7 +45,7 @@ public interface PointDescSet<TD extends TupleDesc> {
 	 * @param featureIndex The feature's index.
 	 * @return Location of the feature in image pixels.
 	 */
-	public Point2D_F64 getLocation( int featureIndex );
+	Point2D_F64 getLocation( int featureIndex );
 
 	/**
 	 * <p>Returns the description of the specified feature.</p>
@@ -59,5 +58,5 @@ public interface PointDescSet<TD extends TupleDesc> {
 	 * @param index Which feature
 	 * @return Feature descriptor
 	 */
-	public TD getDescription( int index );
+	TD getDescription( int index );
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -24,7 +24,6 @@ import boofcv.misc.BoofMiscOps;
 import boofcv.struct.ImageRectangle;
 import boofcv.struct.convolve.Kernel2D_F32;
 import boofcv.struct.image.ImageGray;
-
 
 /**
  * <p>
@@ -54,7 +53,7 @@ public abstract class OrientationAverage<D extends ImageGray<D>> implements Orie
 	// optional weights
 	protected Kernel2D_F32 weights;
 
-	protected OrientationAverage(double objectRadiusToScale, boolean weighted) {
+	protected OrientationAverage( double objectRadiusToScale, boolean weighted ) {
 		this.objectToSample = objectRadiusToScale;
 		isWeighted = weighted;
 	}
@@ -63,7 +62,7 @@ public abstract class OrientationAverage<D extends ImageGray<D>> implements Orie
 		return sampleRadius;
 	}
 
-	public void setSampleRadius(int sampleRadius) {
+	public void setSampleRadius( int sampleRadius ) {
 		this.sampleRadius = sampleRadius;
 		setObjectRadius(sampleRadius);
 	}
@@ -73,39 +72,38 @@ public abstract class OrientationAverage<D extends ImageGray<D>> implements Orie
 	}
 
 	@Override
-	public void setObjectRadius(double radius) {
+	public void setObjectRadius( double radius ) {
 		radiusScale = (int)Math.ceil(radius*objectToSample);
-		if( isWeighted ) {
-			weights = FactoryKernelGaussian.gaussian(2,true, 32, -1,radiusScale);
+		if (isWeighted) {
+			weights = FactoryKernelGaussian.gaussian(2, true, 32, -1, radiusScale);
 		}
 	}
 
 	@Override
-	public void setImage(D derivX, D derivY) {
+	public void setImage( D derivX, D derivY ) {
 		this.derivX = derivX;
 		this.derivY = derivY;
 	}
 
 	@Override
-	public double compute(double X, double Y) {
+	public double compute( double X, double Y ) {
 
 		int c_x = (int)X;
 		int c_y = (int)Y;
 
 		// compute the visible region while taking in account
 		// the image borders
-		rect.x0 = c_x-radiusScale;
-		rect.y0 = c_y-radiusScale;
-		rect.x1 = c_x+radiusScale+1;
-		rect.y1 = c_y+radiusScale+1;
+		rect.x0 = c_x - radiusScale;
+		rect.y0 = c_y - radiusScale;
+		rect.x1 = c_x + radiusScale + 1;
+		rect.y1 = c_y + radiusScale + 1;
 
-		BoofMiscOps.boundRectangleInside(derivX,rect);
+		BoofMiscOps.boundRectangleInside(derivX, rect);
 
-		if( weights == null )
+		if (weights == null)
 			return computeUnweightedScore();
 		else
-			return computeWeightedScore(c_x,c_y);
-
+			return computeWeightedScore(c_x, c_y);
 	}
 
 	/**
@@ -116,6 +114,5 @@ public abstract class OrientationAverage<D extends ImageGray<D>> implements Orie
 	/**
 	 * Compute the score using the weighting kernel.
 	 */
-	protected abstract double computeWeightedScore(int c_x , int c_y );
-
+	protected abstract double computeWeightedScore( int c_x, int c_y );
 }

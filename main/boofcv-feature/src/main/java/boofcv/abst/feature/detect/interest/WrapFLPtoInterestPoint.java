@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -27,26 +27,25 @@ import georegression.struct.point.Point2D_F64;
 
 import java.util.List;
 
-
 /**
  * Wrapper around {@link boofcv.alg.feature.detect.interest.FeatureLaplacePyramid} for {@link InterestPointDetector}.
  *
  * @author Peter Abeles
  */
-public class WrapFLPtoInterestPoint<T extends ImageGray<T>, D extends ImageGray<D>> implements InterestPointDetector<T>{
+public class WrapFLPtoInterestPoint<T extends ImageGray<T>, D extends ImageGray<D>> implements InterestPointDetector<T> {
 
-	FeatureLaplacePyramid<T,D> detector;
+	FeatureLaplacePyramid<T, D> detector;
 	List<ScalePoint> location;
 	PyramidFloat<T> ss;
 
-	public WrapFLPtoInterestPoint(FeatureLaplacePyramid<T,D> detector,
-								  PyramidFloat<T> ss ) {
+	public WrapFLPtoInterestPoint( FeatureLaplacePyramid<T, D> detector,
+								   PyramidFloat<T> ss ) {
 		this.detector = detector;
 		this.ss = ss;
 	}
 
 	@Override
-	public void detect(T input) {
+	public void detect( T input ) {
 		ss.process(input);
 
 		detector.detect(ss);
@@ -60,7 +59,7 @@ public class WrapFLPtoInterestPoint<T extends ImageGray<T>, D extends ImageGray<
 	}
 
 	@Override
-	public int getSet(int index) {
+	public int getSet( int index ) {
 		return 0;
 	}
 
@@ -70,17 +69,17 @@ public class WrapFLPtoInterestPoint<T extends ImageGray<T>, D extends ImageGray<
 	}
 
 	@Override
-	public Point2D_F64 getLocation(int featureIndex) {
+	public Point2D_F64 getLocation( int featureIndex ) {
 		return location.get(featureIndex).pixel;
 	}
 
 	@Override
-	public double getRadius(int featureIndex) {
+	public double getRadius( int featureIndex ) {
 		return location.get(featureIndex).scale;
 	}
 
 	@Override
-	public double getOrientation(int featureIndex) {
+	public double getOrientation( int featureIndex ) {
 		return 0;
 	}
 

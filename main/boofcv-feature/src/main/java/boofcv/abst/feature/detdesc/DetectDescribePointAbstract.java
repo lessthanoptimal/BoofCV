@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -28,9 +28,9 @@ import georegression.struct.point.Point2D_F64;
  *
  * @author Peter Abeles
  */
-public abstract class DetectDescribePointAbstract <T extends ImageBase<T>, Desc extends TupleDesc>
-	implements DetectDescribePoint<T,Desc>
-{
+public abstract class DetectDescribePointAbstract<T extends ImageBase<T>, Desc extends TupleDesc<Desc>>
+		implements DetectDescribePoint<T, Desc> {
+	// @formatter:off
 	@Override public Desc getDescription(int index) { return null; }
 	@Override public void detect(T input) { }
 	@Override public boolean hasScale() { return false; }
@@ -44,4 +44,5 @@ public abstract class DetectDescribePointAbstract <T extends ImageBase<T>, Desc 
 	@Override public Point2D_F64 getLocation(int featureIndex) { return null; }
 	@Override public double getRadius(int featureIndex) { return 0; }
 	@Override public double getOrientation(int featureIndex) { return 0; }
+	// @formatter:on
 }

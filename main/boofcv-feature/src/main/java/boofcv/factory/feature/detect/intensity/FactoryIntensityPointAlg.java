@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -34,9 +34,8 @@ import boofcv.struct.image.ImageGray;
  * @author Peter Abeles
  * @see FactoryIntensityPoint
  */
-@SuppressWarnings({"unchecked"})
+@SuppressWarnings({"unchecked", "rawtypes"})
 public class FactoryIntensityPointAlg {
-
 	/**
 	 * Common interface for creating a {@link FastCornerDetector} from different image types.
 	 *

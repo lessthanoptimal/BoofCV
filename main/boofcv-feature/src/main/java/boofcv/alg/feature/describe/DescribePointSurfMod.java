@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -31,7 +31,7 @@ import boofcv.struct.sparse.SparseImageGradient;
  * for sub-regions.  Due to these improvements it will in general produce better results than {@link DescribePointSurf}
  * at the cost of additional computations.
  * </p>
-
+ *
  * <p>
  * [1] M. Agrawal, K. Konolige, and M. Blas, "CenSurE: Center Surround Extremas for Realtime Feature Detection and
  * Matching,"  Computer Vision – ECCV 2008
@@ -42,7 +42,7 @@ import boofcv.struct.sparse.SparseImageGradient;
 public class DescribePointSurfMod<II extends ImageGray<II>> extends DescribePointSurf<II> {
 
 	// how many sample points sub-regions overlap.
-	private int overLap;
+	private final int overLap;
 
 	// easy to save these settings than to copy the kernel due to complex constructor
 	// only used by copy function
@@ -50,12 +50,12 @@ public class DescribePointSurfMod<II extends ImageGray<II>> extends DescribePoin
 	double sigmaSubRegion;
 
 	// used to weigh feature computation
-	private Kernel2D_F64 weightGrid;
-	private Kernel2D_F64 weightSub;
+	private final Kernel2D_F64 weightGrid;
+	private final Kernel2D_F64 weightSub;
 
-	private double samplesX[];
-	private double samplesY[];
-	
+	private final double[] samplesX;
+	private final double[] samplesY;
+
 	/**
 	 * Creates a SURF descriptor of arbitrary dimension by changing how the local region is sampled.
 	 *
@@ -68,41 +68,41 @@ public class DescribePointSurfMod<II extends ImageGray<II>> extends DescribePoin
 	 * @param useHaar If true the Haar wavelet will be used (what was used in [1]), false means an image gradient
 	 * approximation will be used.  True is recommended.
 	 */
-	public DescribePointSurfMod(int widthLargeGrid, int widthSubRegion,
-								int widthSample, int overLap ,
-								double sigmaLargeGrid , double sigmaSubRegion ,
-								boolean useHaar, Class<II> imageType ) {
-		super(widthLargeGrid, widthSubRegion, widthSample, 1, useHaar,imageType);
+	public DescribePointSurfMod( int widthLargeGrid, int widthSubRegion,
+								 int widthSample, int overLap,
+								 double sigmaLargeGrid, double sigmaSubRegion,
+								 boolean useHaar, Class<II> imageType ) {
+		super(widthLargeGrid, widthSubRegion, widthSample, 1, useHaar, imageType);
 
 		this.sigmaLargeGrid = sigmaLargeGrid;
 		this.sigmaSubRegion = sigmaSubRegion;
 		this.overLap = overLap;
 
 		weightGrid = FactoryKernelGaussian.gaussianWidth(sigmaLargeGrid, widthLargeGrid);
-		weightSub = FactoryKernelGaussian.gaussianWidth(sigmaSubRegion, widthSubRegion + 2 * overLap);
+		weightSub = FactoryKernelGaussian.gaussianWidth(sigmaSubRegion, widthSubRegion + 2*overLap);
 
-		double div = weightGrid.get(weightGrid.getRadius(),weightGrid.getRadius());
-		for( int i = 0; i < weightGrid.data.length; i++ )
+		double div = weightGrid.get(weightGrid.getRadius(), weightGrid.getRadius());
+		for (int i = 0; i < weightGrid.data.length; i++)
 			weightGrid.data[i] /= div;
 
-		div = weightSub.get(weightSub.getRadius(),weightSub.getRadius());
-		for( int i = 0; i < weightSub.data.length; i++ )
+		div = weightSub.get(weightSub.getRadius(), weightSub.getRadius());
+		for (int i = 0; i < weightSub.data.length; i++)
 			weightSub.data[i] /= div;
 
 		// how wide the grid is that's being sampled in units of samples
-		int sampleWidth = widthLargeGrid*widthSubRegion+overLap*2;
+		int sampleWidth = widthLargeGrid*widthSubRegion + overLap*2;
 
 		samplesX = new double[sampleWidth*sampleWidth];
 		samplesY = new double[sampleWidth*sampleWidth];
 
-		radiusDescriptor = (widthLargeGrid*widthSubRegion)/2+overLap;
+		radiusDescriptor = (widthLargeGrid*widthSubRegion)/2 + overLap;
 	}
 
 	/**
 	 * Create a SURF-64 descriptor.  See [1] for details.
 	 */
-	public DescribePointSurfMod(Class<II> imageType) {
-		this(4,5,3,2, 2.5 , 2.5 , false ,imageType);
+	public DescribePointSurfMod( Class<II> imageType ) {
+		this(4, 5, 3, 2, 2.5, 2.5, false, imageType);
 	}
 
 	/**
@@ -119,18 +119,17 @@ public class DescribePointSurfMod<II extends ImageGray<II>> extends DescribePoin
 	 * @param features Where the features are written to.  Must be 4*(widthLargeGrid*widthSubRegion)^2 large.
 	 */
 	@Override
-	public void features(double c_x, double c_y,
-						 double c , double s,
-						 double scale,  SparseImageGradient gradient , double[] features)
-	{
+	public void features( double c_x, double c_y,
+						  double c, double s,
+						  double scale, SparseImageGradient gradient, double[] features ) {
 		int regionSize = widthLargeGrid*widthSubRegion;
 
-		int totalSampleWidth = widthSubRegion+overLap*2;
+		int totalSampleWidth = widthSubRegion + overLap*2;
 
 		int regionR = regionSize/2;
-		int regionEnd = regionSize-regionR;
+		int regionEnd = regionSize - regionR;
 
-		int sampleGridWidth = regionSize+2*overLap;
+		int sampleGridWidth = regionSize + 2*overLap;
 		int regionIndex = 0;
 
 		// when computing the pixel coordinates it is more precise to round to the nearest integer
@@ -141,16 +140,16 @@ public class DescribePointSurfMod<II extends ImageGray<II>> extends DescribePoin
 
 		// first sample the whole grid at once to avoid sampling overlapping regions twice
 		int index = 0;
-		for( int rY = -regionR-overLap; rY < regionEnd+overLap; rY++) {
+		for (int rY = -regionR - overLap; rY < regionEnd + overLap; rY++) {
 			double regionY = rY*scale;
-			for( int rX = -regionR-overLap; rX < regionEnd+overLap; rX++,index++ ) {
+			for (int rX = -regionR - overLap; rX < regionEnd + overLap; rX++, index++) {
 				double regionX = rX*scale;
 
 				// rotate the pixel along the feature's direction
 				int pixelX = (int)(c_x + c*regionX - s*regionY);
 				int pixelY = (int)(c_y + s*regionX + c*regionY);
 
-				GradientValue g = gradient.compute(pixelX,pixelY);
+				GradientValue g = gradient.compute(pixelX, pixelY);
 				samplesX[index] = g.getX();
 				samplesY[index] = g.getY();
 			}
@@ -158,22 +157,22 @@ public class DescribePointSurfMod<II extends ImageGray<II>> extends DescribePoin
 
 		// compute descriptor using precomputed samples
 		int indexGridWeight = 0;
-		for( int rY = -regionR; rY < regionEnd; rY += widthSubRegion ) {
-			for( int rX = -regionR; rX < regionEnd; rX += widthSubRegion ) {
-				double sum_dx = 0, sum_dy=0, sum_adx=0, sum_ady=0;
+		for (int rY = -regionR; rY < regionEnd; rY += widthSubRegion) {
+			for (int rX = -regionR; rX < regionEnd; rX += widthSubRegion) {
+				double sum_dx = 0, sum_dy = 0, sum_adx = 0, sum_ady = 0;
 
 				// compute and sum up the response  inside the sub-region
-				for( int i = 0; i < totalSampleWidth; i++ ) {
-					index = (rY+regionR+i)*sampleGridWidth + rX+regionR;
-					for( int j = 0; j < totalSampleWidth; j++ , index++ ) {
-						double w = weightSub.get(j,i);
+				for (int i = 0; i < totalSampleWidth; i++) {
+					index = (rY + regionR + i)*sampleGridWidth + rX + regionR;
+					for (int j = 0; j < totalSampleWidth; j++, index++) {
+						double w = weightSub.get(j, i);
 
 						double dx = w*samplesX[index];
 						double dy = w*samplesY[index];
 
 						// align the gradient along image patch
 						// note the transform is transposed
-						double pdx =  c*dx + s*dy;
+						double pdx = c*dx + s*dy;
 						double pdy = -s*dx + c*dy;
 
 						sum_dx += pdx;
@@ -202,7 +201,7 @@ public class DescribePointSurfMod<II extends ImageGray<II>> extends DescribePoin
 	 */
 	@Override
 	public DescribePointSurf<II> copy() {
-		return new DescribePointSurfMod<>(widthLargeGrid,widthSubRegion,widthSample,
-				overLap,sigmaLargeGrid,sigmaSubRegion,useHaar,inputType);
+		return new DescribePointSurfMod<>(widthLargeGrid, widthSubRegion, widthSample,
+				overLap, sigmaLargeGrid, sigmaSubRegion, useHaar, inputType);
 	}
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -40,24 +40,24 @@ public class FastCornerDetector_MT<T extends ImageGray<T>> extends FastCornerDet
 	 *
 	 * @param helper Provide the image type specific helper.
 	 */
-	public FastCornerDetector_MT(FastCornerInterface<T> helper) {
+	public FastCornerDetector_MT( FastCornerInterface<T> helper ) {
 		this.helper = helper;
-		threadWorkspace = new GrowArray<>(()->new ThreadHelper(helper.newInstance()));
+		threadWorkspace = new GrowArray<>(() -> new ThreadHelper(helper.newInstance()));
 	}
 
 	/**
 	 * Computes fast corner features and their intensity. The intensity is needed if non-max suppression is
 	 * used
 	 */
-	@Override public void process( T image , GrayF32 intensity ) {
+	@Override public void process( T image, GrayF32 intensity ) {
 		this.image = image;
 
-		if( stride != image.stride ) {
+		if (stride != image.stride) {
 			stride = image.stride;
 			offsets = DiscretizedCircle.imageOffsets(radius, image.stride);
 		}
 
-		BoofConcurrency.loopBlocks(radius,image.height-radius, threadWorkspace,(thread, y0, y1)->{
+		BoofConcurrency.loopBlocks(radius, image.height - radius, threadWorkspace, ( thread, y0, y1 ) -> {
 			thread.reset(image.width, image.height);
 			final ListIntPoint2D candidatesLow = thread.candidatesLow;
 			final ListIntPoint2D candidatesHigh = thread.candidatesHigh;
@@ -67,16 +67,16 @@ public class FastCornerDetector_MT<T extends ImageGray<T>> extends FastCornerDet
 			for (int y = y0; y < y1; y++) {
 				int indexIntensity = intensity.startIndex + y*intensity.stride + radius;
 				int index = image.startIndex + y*image.stride + radius;
-				for (int x = radius; x < image.width-radius; x++, index++,indexIntensity++) {
+				for (int x = radius; x < image.width - radius; x++, index++, indexIntensity++) {
 
 					int result = helper.checkPixel(index);
 
-					if( result < 0 ) {
+					if (result < 0) {
 						intensity.data[indexIntensity] = helper.scoreLower(index);
-						candidatesLow.add(x,y);
-					} else if( result > 0) {
+						candidatesLow.add(x, y);
+					} else if (result > 0) {
 						intensity.data[indexIntensity] = helper.scoreUpper(index);
-						candidatesHigh.add(x,y);
+						candidatesHigh.add(x, y);
 					} else {
 						intensity.data[indexIntensity] = 0;
 					}
@@ -84,8 +84,8 @@ public class FastCornerDetector_MT<T extends ImageGray<T>> extends FastCornerDet
 			}
 		});
 
-		candidatesLow.configure(image.width,image.height);
-		candidatesHigh.configure(image.width,image.height);
+		candidatesLow.configure(image.width, image.height);
+		candidatesHigh.configure(image.width, image.height);
 
 		for (int i = 0; i < threadWorkspace.size(); i++) {
 			ThreadHelper thread = threadWorkspace.get(i);
@@ -100,12 +100,12 @@ public class FastCornerDetector_MT<T extends ImageGray<T>> extends FastCornerDet
 	@Override public void process( T image ) {
 		this.image = image;
 
-		if( stride != image.stride ) {
+		if (stride != image.stride) {
 			stride = image.stride;
 			offsets = DiscretizedCircle.imageOffsets(radius, image.stride);
 		}
 
-		BoofConcurrency.loopBlocks(radius,image.height-radius, threadWorkspace,(thread, y0, y1)->{
+		BoofConcurrency.loopBlocks(radius, image.height - radius, threadWorkspace, ( thread, y0, y1 ) -> {
 			thread.reset(image.width, image.height);
 			final ListIntPoint2D candidatesLow = thread.candidatesLow;
 			final ListIntPoint2D candidatesHigh = thread.candidatesHigh;
@@ -114,21 +114,21 @@ public class FastCornerDetector_MT<T extends ImageGray<T>> extends FastCornerDet
 
 			for (int y = y0; y < y1; y++) {
 				int index = image.startIndex + y*image.stride + radius;
-				for (int x = radius; x < image.width-radius; x++, index++) {
+				for (int x = radius; x < image.width - radius; x++, index++) {
 
 					int result = helper.checkPixel(index);
 
-					if( result < 0 ) {
-						candidatesLow.add(x,y);
-					} else if( result > 0 ) {
-						candidatesHigh.add(x,y);
+					if (result < 0) {
+						candidatesLow.add(x, y);
+					} else if (result > 0) {
+						candidatesHigh.add(x, y);
 					}
 				}
 			}
 		});
 
-		candidatesLow.configure(image.width,image.height);
-		candidatesHigh.configure(image.width,image.height);
+		candidatesLow.configure(image.width, image.height);
+		candidatesHigh.configure(image.width, image.height);
 
 		for (int i = 0; i < threadWorkspace.size(); i++) {
 			ThreadHelper thread = threadWorkspace.get(i);
@@ -146,9 +146,9 @@ public class FastCornerDetector_MT<T extends ImageGray<T>> extends FastCornerDet
 			this.helper = helper;
 		}
 
-		public void reset(int width, int height) {
-			candidatesLow.configure(width,height);
-			candidatesHigh.configure(width,height);
+		public void reset( int width, int height ) {
+			candidatesLow.configure(width, height);
+			candidatesHigh.configure(width, height);
 		}
 	}
 }

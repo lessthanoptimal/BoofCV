@@ -42,28 +42,27 @@ public class TestDescribePointSift extends BoofStandardJUnit {
 	 * Tests to see if it blows up and not much more.  Random image.  Compute descriptor along border and image
 	 * center.
 	 */
-	@Test
-	public void process() {
-		GrayF32 derivX = new GrayF32(200,200);
-		GrayF32 derivY = new GrayF32(200,200);
+	@Test void process() {
+		GrayF32 derivX = new GrayF32(200, 200);
+		GrayF32 derivY = new GrayF32(200, 200);
 
-		GImageMiscOps.fillUniform(derivX,rand,-100,100);
-		GImageMiscOps.fillUniform(derivY,rand,-100,100);
+		GImageMiscOps.fillUniform(derivX, rand, -100, 100);
+		GImageMiscOps.fillUniform(derivY, rand, -100, 100);
 
 		DescribePointSift<GrayF32> alg =
-				new DescribePointSift<>(4,4,8,1.5,0.5,0.2,GrayF32.class);
-		alg.setImageGradient(derivX,derivY);
+				new DescribePointSift<>(4, 4, 8, 1.5, 0.5, 0.2, GrayF32.class);
+		alg.setImageGradient(derivX, derivY);
 
 		List<Point2D_I32> testPoints = new ArrayList<>();
-		testPoints.add( new Point2D_I32(100,0));
-		testPoints.add( new Point2D_I32(100,199));
-		testPoints.add( new Point2D_I32(0,100));
-		testPoints.add( new Point2D_I32(199,100));
-		testPoints.add( new Point2D_I32(100,100));
+		testPoints.add(new Point2D_I32(100, 0));
+		testPoints.add(new Point2D_I32(100, 199));
+		testPoints.add(new Point2D_I32(0, 100));
+		testPoints.add(new Point2D_I32(199, 100));
+		testPoints.add(new Point2D_I32(100, 100));
 
 		TupleDesc_F64 desc = new TupleDesc_F64(alg.getDescriptorLength());
-		for( Point2D_I32 where : testPoints ) {
-			alg.process(where.x,where.y,2,0.5,desc);
+		for (Point2D_I32 where : testPoints) {
+			alg.process(where.x, where.y, 2, 0.5, desc);
 		}
 	}
 
@@ -71,36 +70,34 @@ public class TestDescribePointSift extends BoofStandardJUnit {
 	 * Only put gradient inside a small area that fills the descriptor.  Then double the scale and see if
 	 * only a 1/4 of the original image is inside
 	 */
-	@Test
-	public void computeRawDescriptor_scale() {
-		GrayF32 derivX = new GrayF32(200,200);
-		GrayF32 derivY = new GrayF32(200,200);
+	@Test void computeRawDescriptor_scale() {
+		GrayF32 derivX = new GrayF32(200, 200);
+		GrayF32 derivY = new GrayF32(200, 200);
 
 		DescribePointSift<GrayF32> alg =
-				new DescribePointSift<>(4,4,8,1.5,0.5,0.2,GrayF32.class);
+				new DescribePointSift<>(4, 4, 8, 1.5, 0.5, 0.2, GrayF32.class);
 		int r = alg.getCanonicalRadius();
-		ImageMiscOps.fillRectangle(derivX,5.0f,60,60,2*r,2*r);
+		ImageMiscOps.fillRectangle(derivX, 5.0f, 60, 60, 2*r, 2*r);
 
-		alg.setImageGradient(derivX,derivY);
+		alg.setImageGradient(derivX, derivY);
 		TupleDesc_F64 descriptor = new TupleDesc_F64(128);
-		alg.computeRawDescriptor(60+r, 60+r, 1, 0, descriptor);
+		alg.computeRawDescriptor(60 + r, 60 + r, 1, 0, descriptor);
 
 		int numHit = computeInside(descriptor);
-		assertEquals(4*4,numHit);
+		assertEquals(4*4, numHit);
 
 		descriptor = new TupleDesc_F64(128);
-		alg.computeRawDescriptor(60+r, 60+r, 2, 0, descriptor);
+		alg.computeRawDescriptor(60 + r, 60 + r, 2, 0, descriptor);
 		numHit = computeInside(descriptor);
 		// would be 2x2 if there was no interpolation
-		assertEquals(3*3,numHit);
-
+		assertEquals(3*3, numHit);
 	}
 
-	private int computeInside(TupleDesc_F64 descriptor) {
+	private int computeInside( TupleDesc_F64 descriptor ) {
 		int numHit = 0;
 		for (int j = 0; j < 128; j++) {
-			if (j % 8 == 0) {
-				if( descriptor.data[j] > 0)
+			if (j%8 == 0) {
+				if (descriptor.data[j] > 0)
 					numHit++;
 			} else {
 				assertEquals(0, descriptor.data[j], 1e-4);
@@ -113,32 +110,29 @@ public class TestDescribePointSift extends BoofStandardJUnit {
 	 * Have a constant gradient, which has an easy to understand descriptor, then rotate the feature and see
 	 * if the description changes as expected.
 	 */
-	@Test
-	public void computeRawDescriptor_rotation() {
-		GrayF32 derivX = new GrayF32(60,55);
-		GrayF32 derivY = new GrayF32(60,55);
+	@Test void computeRawDescriptor_rotation() {
+		GrayF32 derivX = new GrayF32(60, 55);
+		GrayF32 derivY = new GrayF32(60, 55);
 
-		ImageMiscOps.fill(derivX,5.0f);
-		
+		ImageMiscOps.fill(derivX, 5.0f);
+
 		DescribePointSift<GrayF32> alg =
-				new DescribePointSift<>(4,4,8,1.5,0.5,0.2,GrayF32.class);
-		alg.setImageGradient(derivX,derivY);
+				new DescribePointSift<>(4, 4, 8, 1.5, 0.5, 0.2, GrayF32.class);
+		alg.setImageGradient(derivX, derivY);
 
-		for( int i = 0; i < 8; i++ ) {
+		for (int i = 0; i < 8; i++) {
 			double angle = UtilAngle.bound(i*Math.PI/4);
 			TupleDesc_F64 descriptor = new TupleDesc_F64(128);
 			alg.computeRawDescriptor(20, 21, 1, angle, descriptor);
 
-			int bin = (int) (UtilAngle.domain2PI(-angle) * 8 / (2 * Math.PI));
+			int bin = (int)(UtilAngle.domain2PI(-angle)*8/(2*Math.PI));
 			for (int j = 0; j < 128; j++) {
-				if (j % 8 == bin) {
+				if (j%8 == bin) {
 					assertTrue(descriptor.data[j] > 0);
 				} else {
 					assertEquals(0, descriptor.data[j], 1e-4);
 				}
 			}
 		}
-		
 	}
-
 }

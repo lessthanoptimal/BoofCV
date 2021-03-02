@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -30,36 +30,33 @@ import static org.junit.jupiter.api.Assertions.*;
  * @author Peter Abeles
  */
 public class TestSiftScaleSpace extends BoofStandardJUnit {
-
 	/**
 	 * Checks to see if the first image in each octave has the expected amount of image blur
 	 */
-	@Test
-	public void checkOctaveBlur() {
+	@Test void checkOctaveBlur() {
+		GrayF32 original = new GrayF32(300, 340);
+		GImageMiscOps.fillUniform(original, rand, 0, 100);
 
-		GrayF32 original = new GrayF32(300,340);
-		GImageMiscOps.fillUniform(original,rand,0,100);
-
-		GrayF32 expected = new GrayF32(300,340);
+		GrayF32 expected = new GrayF32(300, 340);
 
 		float sigma0 = 1.6f;
 
 		int lastOctave = 5;
 		for (int firstOctave = -1; firstOctave < 2; firstOctave++) {
 
-			SiftScaleSpace alg = new SiftScaleSpace(firstOctave,lastOctave,2,sigma0);
+			SiftScaleSpace alg = new SiftScaleSpace(firstOctave, lastOctave, 2, sigma0);
 
 			alg.initialize(original);
 
 			for (int i = firstOctave; i <= lastOctave; i++) {
-				float sigma = (float)(sigma0*Math.pow(2,i));
+				float sigma = (float)(sigma0*Math.pow(2, i));
 
 				GBlurImageOps.gaussian(original, expected, sigma, -1, null);
 
 				double averageError = compareImage(expected, alg.getImageScale(0), i);
 
-				assertTrue(averageError<2,"first "+firstOctave+" oct "+i+" error = "+averageError);
-				assertTrue(i < lastOctave == alg.computeNextOctave());
+				assertTrue(averageError < 2, "first " + firstOctave + " oct " + i + " error = " + averageError);
+				assertEquals(alg.computeNextOctave(), i < lastOctave);
 			}
 		}
 	}
@@ -67,18 +64,17 @@ public class TestSiftScaleSpace extends BoofStandardJUnit {
 	/**
 	 * Test the blur factor at each scale between the octaves
 	 */
-	@Test
-	public void checkScaleBlur() {
-		GrayF32 original = new GrayF32(300,340);
-		GImageMiscOps.fillUniform(original,rand,0,100);
+	@Test void checkScaleBlur() {
+		GrayF32 original = new GrayF32(300, 340);
+		GImageMiscOps.fillUniform(original, rand, 0, 100);
 
-		GrayF32 expected = new GrayF32(300,340);
+		GrayF32 expected = new GrayF32(300, 340);
 
 		float sigma0 = 1.6f;
-		SiftScaleSpace alg = new SiftScaleSpace(0,3,2,sigma0);
+		SiftScaleSpace alg = new SiftScaleSpace(0, 3, 2, sigma0);
 
 		alg.initialize(original);
-		assertEquals(5,alg.getNumScaleImages());
+		assertEquals(5, alg.getNumScaleImages());
 
 		for (int i = 0; i < 5; i++) {
 			double sigma = alg.computeSigmaScale(i);
@@ -87,24 +83,22 @@ public class TestSiftScaleSpace extends BoofStandardJUnit {
 
 			double averageError = compareImage(expected, alg.getImageScale(i), 0);
 
-			assertTrue(averageError<2," scale "+i+" error = "+averageError);
+			assertTrue(averageError < 2, " scale " + i + " error = " + averageError);
 		}
 	}
 
-	@Test
-	public void computeSigmaScale() {
-		SiftScaleSpace alg = new SiftScaleSpace(-1,4,3,1.6);
-		alg.initialize(new GrayF32(60,50));
+	@Test void computeSigmaScale() {
+		SiftScaleSpace alg = new SiftScaleSpace(-1, 4, 3, 1.6);
+		alg.initialize(new GrayF32(60, 50));
 
-		double k = Math.pow(2.0,1.0/3.0);
+		double k = Math.pow(2.0, 1.0/3.0);
 		for (int i = 0; i < 5; i++) {
-			assertEquals(0.8*Math.pow(k,i),alg.computeSigmaScale(i),1e-8);
+			assertEquals(0.8*Math.pow(k, i), alg.computeSigmaScale(i), 1e-8);
 		}
 		alg.computeNextOctave();
 		for (int i = 0; i < 5; i++) {
-			assertEquals(1.6*Math.pow(k,i),alg.computeSigmaScale(i),1e-8);
+			assertEquals(1.6*Math.pow(k, i), alg.computeSigmaScale(i), 1e-8);
 		}
-
 	}
 
 	/**
@@ -115,27 +109,27 @@ public class TestSiftScaleSpace extends BoofStandardJUnit {
 	 * @param octave Which octave its at
 	 * @return average error across the smaller image
 	 */
-	private double compareImage(GrayF32 expected, GrayF32 found, int octave) {
+	private double compareImage( GrayF32 expected, GrayF32 found, int octave ) {
 		double averageError = 0;
-		if( found.width > expected.width ) {
-			int scale = (int)Math.pow(2,-octave);
+		if (found.width > expected.width) {
+			int scale = (int)Math.pow(2, -octave);
 
 			for (int y = 0; y < expected.height; y++) {
 				for (int x = 0; x < expected.width; x++) {
-					float f = found.get(x*scale,y*scale);
-					float e = expected.get(x,y);
-					averageError += Math.abs(e-f);
+					float f = found.get(x*scale, y*scale);
+					float e = expected.get(x, y);
+					averageError += Math.abs(e - f);
 				}
 			}
 			averageError /= expected.width*expected.height;
 		} else {
-			int scale = (int)Math.pow(2,octave);
+			int scale = (int)Math.pow(2, octave);
 
 			for (int y = 0; y < found.height; y++) {
 				for (int x = 0; x < found.width; x++) {
-					float f = found.get(x,y);
-					float e = expected.get(x*scale,y*scale);
-					averageError += Math.abs(e-f);
+					float f = found.get(x, y);
+					float e = expected.get(x*scale, y*scale);
+					averageError += Math.abs(e - f);
 				}
 			}
 			averageError /= found.width*found.height;
@@ -146,16 +140,13 @@ public class TestSiftScaleSpace extends BoofStandardJUnit {
 	/**
 	 * The number of octaves would make the input image too small
 	 */
-	@Test
-	public void checkImageTooSmallForOctaves() {
-		SiftScaleSpace alg = new SiftScaleSpace(0,5,3,1.6);
+	@Test void checkImageTooSmallForOctaves() {
+		SiftScaleSpace alg = new SiftScaleSpace(0, 5, 3, 1.6);
 
-		alg.initialize(new GrayF32(20,20));
+		alg.initialize(new GrayF32(20, 20));
 
 		assertTrue(alg.computeNextOctave());
 		assertTrue(alg.computeNextOctave());
 		assertFalse(alg.computeNextOctave());
-
-
 	}
 }

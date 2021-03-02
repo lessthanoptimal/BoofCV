@@ -38,7 +38,6 @@ import static org.junit.jupiter.api.Assertions.*;
  * @author Peter Abeles
  */
 public class TestSiftDetector extends BoofStandardJUnit {
-
 	/**
 	 * Tests the ability to detect a single square feature at multiple scales and color
 	 */

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -38,10 +38,10 @@ public class BOverrideFactoryFeatureExtractor extends BOverrideClass {
 	}
 
 	public interface NonMax {
-		NonMaxSuppression process(ConfigExtract config );
+		NonMaxSuppression process( ConfigExtract config );
 	}
 
 	public interface NonMaxCandidate {
-		NonMaxSuppression process(ConfigExtract config );
+		NonMaxSuppression process( ConfigExtract config );
 	}
 }

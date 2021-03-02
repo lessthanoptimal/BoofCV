@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -61,11 +61,11 @@ public class ConfigBackgroundGaussian extends BaseConfigBackground {
 	 */
 	public InterpolationType interpolation = InterpolationType.BILINEAR;
 
-	public ConfigBackgroundGaussian(float threshold) {
+	public ConfigBackgroundGaussian( float threshold ) {
 		this.threshold = threshold;
 	}
 
-	public ConfigBackgroundGaussian(float threshold, float learnRate) {
+	public ConfigBackgroundGaussian( float threshold, float learnRate ) {
 		this.threshold = threshold;
 		this.learnRate = learnRate;
 	}
@@ -84,15 +84,15 @@ public class ConfigBackgroundGaussian extends BaseConfigBackground {
 
 	@Override
 	public void checkValidity() {
-		if( learnRate < 0 || learnRate > 1 )
+		if (learnRate < 0 || learnRate > 1)
 			throw new IllegalArgumentException("Learn rate must be 0 <= rate <= 1");
-		if( threshold <= 0 )
+		if (threshold <= 0)
 			throw new IllegalArgumentException("threshold must be > 0");
-		if( initialVariance == 0 )
+		if (initialVariance == 0)
 			throw new IllegalArgumentException("Don't set initialVariance to zero, set it to Float.MIN_VALUE instead");
-		if( initialVariance < 0 )
+		if (initialVariance < 0)
 			throw new IllegalArgumentException("Variance must be set to a value larger than zero");
-		if( minimumDifference < 0 )
+		if (minimumDifference < 0)
 			throw new IllegalArgumentException("minimumDifference must be >= 0");
 	}
 }

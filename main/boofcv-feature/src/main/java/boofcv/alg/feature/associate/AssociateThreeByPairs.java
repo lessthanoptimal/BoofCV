@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -37,18 +37,18 @@ import org.ddogleg.struct.FastArray;
  *
  * @author Peter Abeles
  */
-public class AssociateThreeByPairs<Desc extends TupleDesc> implements AssociateThreeDescription<Desc> {
+public class AssociateThreeByPairs<TD extends TupleDesc<TD>> implements AssociateThreeDescription<TD> {
 
 	// image to image association
-	protected AssociateDescriptionSets<Desc> associator;
+	protected AssociateDescriptionSets<TD> associator;
 
 	// Reference to descriptions in each image
-	protected FastAccess<Desc> featuresA,featuresB,featuresC;
-	protected DogArray_I32 setsA,setsB,setsC;
+	protected FastAccess<TD> featuresA, featuresB, featuresC;
+	protected DogArray_I32 setsA, setsB, setsC;
 
 	// work space variables
-	protected FastArray<Desc> tmpB;
-	protected FastArray<Desc> tmpA;
+	protected FastArray<TD> tmpB;
+	protected FastArray<TD> tmpA;
 	protected DogArray_I32 tmpSetsA = new DogArray_I32();
 	protected DogArray_I32 tmpSetsB = new DogArray_I32();
 
@@ -64,34 +64,34 @@ public class AssociateThreeByPairs<Desc extends TupleDesc> implements AssociateT
 	 * @param associator image to image association
 	 * @param type Type of descriptor
 	 */
-	public AssociateThreeByPairs(AssociateDescription<Desc> associator, Class<Desc> type ) {
-		if( !associator.uniqueDestination() || !associator.uniqueSource() )
+	public AssociateThreeByPairs( AssociateDescription<TD> associator, Class<TD> type ) {
+		if (!associator.uniqueDestination() || !associator.uniqueSource())
 			throw new IllegalArgumentException("Both source and destination need to be unique");
-		this.associator = new AssociateDescriptionSets<>(associator,type);
+		this.associator = new AssociateDescriptionSets<>(associator, type);
 
 		tmpB = new FastArray<>(type);
 		tmpA = new FastArray<>(type);
 	}
 
 	@Override
-	public void initialize(int numberOfSets) {
+	public void initialize( int numberOfSets ) {
 		associator.initialize(numberOfSets);
 	}
 
 	@Override
-	public void setFeaturesA(FastAccess<Desc> features, DogArray_I32 sets) {
+	public void setFeaturesA( FastAccess<TD> features, DogArray_I32 sets ) {
 		this.featuresA = features;
 		this.setsA = sets;
 	}
 
 	@Override
-	public void setFeaturesB(FastAccess<Desc> features, DogArray_I32 sets) {
+	public void setFeaturesB( FastAccess<TD> features, DogArray_I32 sets ) {
 		this.featuresB = features;
 		this.setsB = sets;
 	}
 
 	@Override
-	public void setFeaturesC(FastAccess<Desc> features, DogArray_I32 sets) {
+	public void setFeaturesC( FastAccess<TD> features, DogArray_I32 sets ) {
 		this.featuresC = features;
 		this.setsC = sets;
 	}
@@ -102,15 +102,17 @@ public class AssociateThreeByPairs<Desc extends TupleDesc> implements AssociateT
 		matches.reset();
 
 		// Associate view A to view B
-		UtilFeature.setSource(featuresA,setsA,associator);
-		UtilFeature.setDestination(featuresB,setsB,associator);
+		UtilFeature.setSource(featuresA, setsA, associator);
+		UtilFeature.setDestination(featuresB, setsB, associator);
 		associator.associate();
 		FastAccess<AssociatedIndex> pairs = associator.getMatches();
-		tmpA.resize(pairs.size); tmpSetsA.resize(pairs.size);
-		tmpB.resize(pairs.size); tmpSetsB.resize(pairs.size);
+		tmpA.resize(pairs.size);
+		tmpSetsA.resize(pairs.size);
+		tmpB.resize(pairs.size);
+		tmpSetsB.resize(pairs.size);
 		for (int i = 0; i < pairs.size; i++) {
 			AssociatedIndex p = pairs.get(i);
-			matches.grow().setTo(p.src,p.dst,-1);
+			matches.grow().setTo(p.src, p.dst, -1);
 			// indexes of tmp lists will be the same as matches
 			tmpA.data[i] = featuresA.data[p.src];
 			tmpB.data[i] = featuresB.data[p.dst];
@@ -120,13 +122,14 @@ public class AssociateThreeByPairs<Desc extends TupleDesc> implements AssociateT
 		}
 
 		// Associate view B to view C, but only consider previously associated features in B
-		UtilFeature.setSource(tmpB,tmpSetsB,associator);
-		UtilFeature.setDestination(featuresC,setsC,associator);
+		UtilFeature.setSource(tmpB, tmpSetsB, associator);
+		UtilFeature.setDestination(featuresC, setsC, associator);
 		associator.associate();
 		pairs = associator.getMatches();
-		tmpB.resize(pairs.size); tmpSetsB.resize(pairs.size);
+		tmpB.resize(pairs.size);
+		tmpSetsB.resize(pairs.size);
 		srcToC.resize(pairs.size);
-		FastArray<Desc> tmpC = tmpB; // do this to make the code easier to read
+		FastArray<TD> tmpC = tmpB; // do this to make the code easier to read
 		DogArray_I32 tmpSetsC = tmpSetsB;
 		for (int i = 0; i < pairs.size; i++) {
 			AssociatedIndex p = pairs.get(i);
@@ -144,8 +147,8 @@ public class AssociateThreeByPairs<Desc extends TupleDesc> implements AssociateT
 		}
 
 		// Associate view C to view A but only consider features which are currently in the triple
-		UtilFeature.setSource(tmpC,tmpSetsC,associator);
-		UtilFeature.setDestination(tmpA,tmpSetsA,associator);
+		UtilFeature.setSource(tmpC, tmpSetsC, associator);
+		UtilFeature.setDestination(tmpA, tmpSetsA, associator);
 		associator.associate();
 		pairs = associator.getMatches();
 		for (int i = 0; i < pairs.size; i++) {
@@ -153,7 +156,7 @@ public class AssociateThreeByPairs<Desc extends TupleDesc> implements AssociateT
 			AssociatedTripleIndex t = matches.get(p.dst);
 
 			// index of tmpA (destination) matches the index of matches
-			if( matches.get(p.dst).c != srcToC.data[p.src]  ) {
+			if (matches.get(p.dst).c != srcToC.data[p.src]) {
 				t.c = -1;// mark it so that it will be pruned
 			}
 		}
@@ -172,12 +175,12 @@ public class AssociateThreeByPairs<Desc extends TupleDesc> implements AssociateT
 	 * was being made internally.
 	 */
 	private void sanityCheck() {
-		assert(featuresA!=featuresB);
-		assert(featuresA!=featuresC);
-		assert(featuresB!=featuresC);
-		assert(setsA!=setsB);
-		assert(setsA!=setsC);
-		assert(setsB!=setsC);
+		assert (featuresA != featuresB);
+		assert (featuresA != featuresC);
+		assert (featuresB != featuresC);
+		assert (setsA != setsB);
+		assert (setsA != setsC);
+		assert (setsB != setsC);
 	}
 
 	/**
@@ -185,11 +188,11 @@ public class AssociateThreeByPairs<Desc extends TupleDesc> implements AssociateT
 	 */
 	private void pruneMatches() {
 		int index = 0;
-		while( index < matches.size ) {
+		while (index < matches.size) {
 			AssociatedTripleIndex a = matches.get(index);
 			// not matched. Remove it from the list by copying that last element over it
-			if( a.c == -1 ) {
-				a.setTo(matches.get(matches.size-1));
+			if (a.c == -1) {
+				a.setTo(matches.get(matches.size - 1));
 				matches.size--;
 			} else {
 				index++;
@@ -203,7 +206,7 @@ public class AssociateThreeByPairs<Desc extends TupleDesc> implements AssociateT
 	}
 
 	@Override
-	public void setMaxScoreThreshold(double score) {
+	public void setMaxScoreThreshold( double score ) {
 		associator.setMaxScoreThreshold(score);
 	}
 

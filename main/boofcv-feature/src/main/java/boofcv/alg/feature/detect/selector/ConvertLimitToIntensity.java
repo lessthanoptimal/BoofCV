@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -28,22 +28,21 @@ import org.jetbrains.annotations.Nullable;
  *
  * @author Peter Abeles
  */
-public class ConvertLimitToIntensity<Point> implements FeatureSelectLimitIntensity<Point>
-{
+public class ConvertLimitToIntensity<Point> implements FeatureSelectLimitIntensity<Point> {
 	FeatureSelectLimit<Point> alg;
 
-	public ConvertLimitToIntensity(FeatureSelectLimit<Point> alg) {
+	public ConvertLimitToIntensity( FeatureSelectLimit<Point> alg ) {
 		this.alg = alg;
 	}
 
 	@Override
-	public void select(GrayF32 intensity, int width, int height, boolean positive, @Nullable FastAccess<Point> prior,
-					   FastAccess<Point> detected, int limit, FastArray<Point> selected) {
+	public void select( GrayF32 intensity, int width, int height, boolean positive, @Nullable FastAccess<Point> prior,
+						FastAccess<Point> detected, int limit, FastArray<Point> selected ) {
 		width = intensity == null ? width : intensity.width;
 		height = intensity == null ? height : intensity.height;
 
-		alg.select(width,height,prior,detected,limit,selected);
+		alg.select(width, height, prior, detected, limit, selected);
 	}
 
-	@Override public void setSampler(SampleIntensity<Point> sampler) {}
+	@Override public void setSampler( SampleIntensity<Point> sampler ) {}
 }

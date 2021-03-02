@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -18,7 +18,6 @@
 
 package boofcv.alg.feature.detect.line.gridline;
 
-
 import georegression.struct.point.Point2D_F32;
 
 /**
@@ -31,7 +30,7 @@ public class Edgel extends Point2D_F32 {
 	// half circle from -pi to pi
 	public float theta;
 
-	public Edgel(float x, float y, float theta) {
+	public Edgel( float x, float y, float theta ) {
 		super(x, y);
 		this.theta = theta;
 	}

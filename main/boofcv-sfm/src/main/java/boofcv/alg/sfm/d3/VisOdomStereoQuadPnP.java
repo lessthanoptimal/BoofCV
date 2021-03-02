@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -80,7 +80,7 @@ import java.util.Set;
  *
  * @author Peter Abeles
  */
-public class VisOdomStereoQuadPnP<T extends ImageGray<T>, TD extends TupleDesc>
+public class VisOdomStereoQuadPnP<T extends ImageGray<T>, TD extends TupleDesc<TD>>
 		implements VerbosePrint {
 	// used to estimate each feature's 3D location using a stereo pair
 	private final Triangulate2ViewsMetric triangulate;

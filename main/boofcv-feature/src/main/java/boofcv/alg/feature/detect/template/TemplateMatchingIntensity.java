@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -45,7 +45,8 @@ public interface TemplateMatchingIntensity<T extends ImageBase<T>> {
 
 	/**
 	 * Specifies the input image which the template is going ot be matched against
-	 * @param image  Input image. Not modified.
+	 *
+	 * @param image Input image. Not modified.
 	 */
 	void setInputImage( T image );
 
@@ -55,15 +56,15 @@ public interface TemplateMatchingIntensity<T extends ImageBase<T>> {
 	 *
 	 * @param template Template image.  Must be equal to or smaller than the input image. Not modified.
 	 */
-	void process(T template);
+	void process( T template );
 
 	/**
 	 * Matches the template with a mask to the image and computes an intensity image.  Must call
 	 * {@link #setInputImage(ImageBase)} first
 	 *
-	 * @param mask     Mask that identifies how translucent pixels. 0 = 100% transparent and all values above
-	 *                 increase its importance.  Typical values are 0 to 255 for integer images and 0.0 to 1.0 for
-	 *                 floating point.
+	 * @param mask Mask that identifies how translucent pixels. 0 = 100% transparent and all values above
+	 * increase its importance.  Typical values are 0 to 255 for integer images and 0.0 to 1.0 for
+	 * floating point.
 	 * @param template Template image.  Must be equal to or smaller than the input image. Not modified.
 	 */
 	void process( T template, T mask );

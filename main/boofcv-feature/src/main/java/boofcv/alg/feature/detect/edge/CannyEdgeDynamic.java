@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -25,28 +25,26 @@ import boofcv.alg.misc.ImageStatistics;
 import boofcv.struct.image.GrayU8;
 import boofcv.struct.image.ImageGray;
 
-
 /**
  * Canny edge detector where the thresholds are computed dynamically based upon the magnitude of the largest edge
  *
  * @author Peter Abeles
  */
-public class CannyEdgeDynamic<T extends ImageGray<T>, D extends ImageGray<D>> extends CannyEdge<T,D>
-{
+public class CannyEdgeDynamic<T extends ImageGray<T>, D extends ImageGray<D>> extends CannyEdge<T, D> {
 	/**
 	 * Constructor and configures algorithm
 	 *
 	 * @param blur Used during the image blur pre-process step.
 	 * @param gradient Computes image gradient.
 	 */
-	public CannyEdgeDynamic(BlurFilter<T> blur, ImageGradient<T, D> gradient, boolean saveTrace) {
-		super(blur, gradient,saveTrace);
+	public CannyEdgeDynamic( BlurFilter<T> blur, ImageGradient<T, D> gradient, boolean saveTrace ) {
+		super(blur, gradient, saveTrace);
 	}
 
 	@Override
-	protected void performThresholding(float threshLow, float threshHigh, GrayU8 output) {
+	protected void performThresholding( float threshLow, float threshHigh, GrayU8 output ) {
 
-		if( threshLow < 0 || threshLow > 1 || threshHigh < 0 || threshHigh > 1 )
+		if (threshLow < 0 || threshLow > 1 || threshHigh < 0 || threshHigh > 1)
 			throw new IllegalArgumentException("Relative thresholds must be from 0 to 1, inclusive.");
 
 		// find the largest intensity value
@@ -56,13 +54,13 @@ public class CannyEdgeDynamic<T extends ImageGray<T>, D extends ImageGray<D>> ex
 		threshLow = max*threshLow;
 		threshHigh = max*threshHigh;
 
-		if( threshLow <= 0f && threshHigh <= 0f ) {
+		if (threshLow <= 0f && threshHigh <= 0f) {
 			// in this pathological case there is no texture in the image.  It is probably less harmful to return
 			// nothing than a whole image
-			if( hysteresisPts != null )
+			if (hysteresisPts != null)
 				hysteresisPts.getContours().clear();
-			if( output != null )
-				ImageMiscOps.fill(output,0);
+			if (output != null)
+				ImageMiscOps.fill(output, 0);
 		} else {
 			super.performThresholding(threshLow, threshHigh, output);
 		}

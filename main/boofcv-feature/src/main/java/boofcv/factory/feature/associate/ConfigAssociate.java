@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -24,9 +24,8 @@ import boofcv.struct.Configuration;
 /**
  * Configuration for associating using descriptors only
  *
- * @see boofcv.abst.feature.associate.AssociateDescription
- *
  * @author Peter Abeles
+ * @see boofcv.abst.feature.associate.AssociateDescription
  */
 public class ConfigAssociate implements Configuration {
 
@@ -43,7 +42,7 @@ public class ConfigAssociate implements Configuration {
 	 * If an absolute value is specified then it's in units of pixels. If relative then it is a fraction of
 	 * max(imageWidth, imageHeight)
 	 */
-	public ConfigLength maximumDistancePixels = ConfigLength.relative(1.0,0.0);
+	public ConfigLength maximumDistancePixels = ConfigLength.relative(1.0, 0.0);
 
 	@Override
 	public void checkValidity() {

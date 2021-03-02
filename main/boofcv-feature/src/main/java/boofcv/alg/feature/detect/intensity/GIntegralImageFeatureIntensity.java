@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -22,7 +22,6 @@ import boofcv.struct.image.GrayF32;
 import boofcv.struct.image.GrayS32;
 import boofcv.struct.image.ImageGray;
 
-
 /**
  * @author Peter Abeles
  */
@@ -36,13 +35,13 @@ public class GIntegralImageFeatureIntensity {
 	 * @param intensity Output intensity image.
 	 */
 	public static <T extends ImageGray<T>>
-	void hessian( T integral, int skip , int size ,
-				  GrayF32 intensity) {
+	void hessian( T integral, int skip, int size,
+				  GrayF32 intensity ) {
 
-		if( integral instanceof GrayF32) {
-			IntegralImageFeatureIntensity.hessian((GrayF32)integral,skip,size,intensity);
-		} else if( integral instanceof GrayS32) {
-			IntegralImageFeatureIntensity.hessian((GrayS32)integral,skip,size,intensity);
+		if (integral instanceof GrayF32) {
+			IntegralImageFeatureIntensity.hessian((GrayF32)integral, skip, size, intensity);
+		} else if (integral instanceof GrayS32) {
+			IntegralImageFeatureIntensity.hessian((GrayS32)integral, skip, size, intensity);
 		} else {
 			throw new IllegalArgumentException("Unsupported input type");
 		}

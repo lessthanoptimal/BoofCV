@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -68,7 +68,7 @@ public class ChessboardCorner extends Point2D_F64 {
 	public boolean first;
 
 	public void reset() {
-		super.setTo(-1,-1);
+		super.setTo(-1, -1);
 		orientation = Double.NaN;
 		intensity = Double.NaN;
 		edgeIntensity = -1;
@@ -78,7 +78,7 @@ public class ChessboardCorner extends Point2D_F64 {
 		level1 = level2 = levelMax = -1;
 	}
 
-	public void setTo( ChessboardCorner c) {
+	public void setTo( ChessboardCorner c ) {
 		super.setTo(c);
 		this.orientation = c.orientation;
 		this.intensity = c.intensity;
@@ -88,7 +88,7 @@ public class ChessboardCorner extends Point2D_F64 {
 		this.levelMax = c.levelMax;
 	}
 
-	public void setTo( double x, double y, double angle, double intensity) {
+	public void setTo( double x, double y, double angle, double intensity ) {
 		this.x = x;
 		this.y = y;
 		this.orientation = angle;

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -34,22 +34,24 @@ import org.jetbrains.annotations.Nullable;
 public class FactorySelectLimit {
 	/**
 	 * Creates and returns {@link FeatureSelectLimitIntensity} using a {@link ConfigSelectLimit configuration}.
+	 *
 	 * @param config Creates the specified select limit. if null it defaults to {@link ConfigSelectLimit}.
 	 */
-	public static<Point extends GeoTuple<Point>>
-	FeatureSelectLimitIntensity<Point> intensity(@Nullable ConfigSelectLimit config , Class<Point> type ) {
-		FeatureSelectLimitIntensity<Point>  ret = intensity(config);
+	public static <Point extends GeoTuple<Point>>
+	FeatureSelectLimitIntensity<Point> intensity( @Nullable ConfigSelectLimit config, Class<Point> type ) {
+		FeatureSelectLimitIntensity<Point> ret = intensity(config);
 		ret.setSampler(imageSampler(type));
 		return ret;
 	}
 
 	/**
 	 * Creates and returns {@link FeatureSelectLimitIntensity} using a {@link ConfigSelectLimit configuration}.
+	 *
 	 * @param config Creates the specified select limit. if null it defaults to {@link ConfigSelectLimit}.
 	 */
-	public static<Point>
-	FeatureSelectLimitIntensity<Point> intensity(@Nullable ConfigSelectLimit config) {
-		if( config == null )
+	public static <Point>
+	FeatureSelectLimitIntensity<Point> intensity( @Nullable ConfigSelectLimit config ) {
+		if (config == null)
 			config = new ConfigSelectLimit();
 
 		return switch (config.type) {
@@ -62,13 +64,13 @@ public class FactorySelectLimit {
 	/**
 	 * Creates the correct {@link SampleIntensityImage} for the given point type
 	 */
-	public static<Point extends GeoTuple<Point>>
+	public static <Point extends GeoTuple<Point>>
 	SampleIntensity<Point> imageSampler( Class<Point> type ) {
-		if( type == Point2D_I16.class ) {
+		if (type == Point2D_I16.class) {
 			return (SampleIntensity)new SampleIntensityImage.I16();
-		} else if( type == Point2D_F32.class ) {
+		} else if (type == Point2D_F32.class) {
 			return (SampleIntensity)new SampleIntensityImage.F32();
-		} else if( type == Point2D_F64.class ) {
+		} else if (type == Point2D_F64.class) {
 			return (SampleIntensity)new SampleIntensityImage.F64();
 		} else {
 			throw new IllegalArgumentException("Unknown point type " + type.getSimpleName());
@@ -77,11 +79,12 @@ public class FactorySelectLimit {
 
 	/**
 	 * Creates and returns {@link FeatureSelectLimit} using a {@link ConfigSelectLimit configuration}.
+	 *
 	 * @param config Creates the specified select limit. if null it defaults to {@link ConfigSelectLimit}.
 	 */
-	public static<Point extends GeoTuple<Point>>
-	FeatureSelectLimit<Point> spatial(@Nullable ConfigSelectLimit config , Class<Point> type ) {
-		if( config == null )
+	public static <Point extends GeoTuple<Point>>
+	FeatureSelectLimit<Point> spatial( @Nullable ConfigSelectLimit config, Class<Point> type ) {
+		if (config == null)
 			config = new ConfigSelectLimit();
 
 		return switch (config.type) {
@@ -89,11 +92,11 @@ public class FactorySelectLimit {
 			case RANDOM -> new FeatureSelectRandom<>(config.randomSeed);
 			case UNIFORM -> {
 				FeatureSelectLimit ret;
-				if( type == Point2D_I16.class ) {
+				if (type == Point2D_I16.class) {
 					ret = new FeatureSelectUniform.I16();
-				} else if( type == Point2D_F32.class ) {
+				} else if (type == Point2D_F32.class) {
 					ret = new FeatureSelectUniform.F32();
-				} else if( type == Point2D_F64.class ) {
+				} else if (type == Point2D_F64.class) {
 					ret = new FeatureSelectUniform.F64();
 				} else {
 					throw new IllegalArgumentException("Unknown point type " + type.getSimpleName());

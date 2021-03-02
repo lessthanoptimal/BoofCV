@@ -31,10 +31,9 @@ import georegression.struct.point.Point2D_F64;
  **/
 public class DetectDescribeConvert
 		<Image extends ImageBase<Image>, In extends TupleDesc<In>, Out extends TupleDesc<Out>>
-	implements DetectDescribePoint<Image,Out>
-{
-	DetectDescribePoint<Image,In> detector;
-	ConvertTupleDesc<In,Out> converter;
+		implements DetectDescribePoint<Image, Out> {
+	DetectDescribePoint<Image, In> detector;
+	ConvertTupleDesc<In, Out> converter;
 
 	Out out;
 

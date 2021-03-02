@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -59,7 +59,7 @@ public class ConfigKlt implements Configuration {
 
 	@Override
 	public void checkValidity() {
-		if( driftFracTol < 0 )
+		if (driftFracTol < 0)
 			throw new IllegalArgumentException("driftFracTol must be >= 0");
 	}
 

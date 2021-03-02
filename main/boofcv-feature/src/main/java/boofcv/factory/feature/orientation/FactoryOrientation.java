@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -45,14 +45,14 @@ public class FactoryOrientation {
 	 * @return Wrapped version which can process images as its raw input.
 	 */
 	public static <T extends ImageGray<T>>
-	OrientationImage<T> convertImage( RegionOrientation algorithm , Class<T> imageType ) {
-		if( algorithm instanceof OrientationGradient ) {
-			Class derivType = ((OrientationGradient) algorithm).getImageType();
-			ImageGradient gradient = FactoryDerivative.sobel(imageType,derivType);
-			return new OrientationGradientToImage((OrientationGradient)algorithm,gradient,imageType,derivType);
-		} else if( algorithm instanceof OrientationIntegral ) {
+	OrientationImage<T> convertImage( RegionOrientation algorithm, Class<T> imageType ) {
+		if (algorithm instanceof OrientationGradient) {
+			Class derivType = ((OrientationGradient)algorithm).getImageType();
+			ImageGradient gradient = FactoryDerivative.sobel(imageType, derivType);
+			return new OrientationGradientToImage((OrientationGradient)algorithm, gradient, imageType, derivType);
+		} else if (algorithm instanceof OrientationIntegral) {
 			Class integralType = GIntegralImageOps.getIntegralType(imageType);
-			return new OrientationIntegralToImage((OrientationIntegral)algorithm,imageType,integralType);
+			return new OrientationIntegralToImage((OrientationIntegral)algorithm, imageType, integralType);
 		} else {
 			throw new IllegalArgumentException("Unknown orientation algorithm type");
 		}
@@ -62,20 +62,20 @@ public class FactoryOrientation {
 	 * Creates an implementation of the SIFT orientation estimation algorithm
 	 *
 	 * @param configSS Configuration of the scale-space.  null for default
-	 * @param configOri  Orientation configuration. null for default
+	 * @param configOri Orientation configuration. null for default
 	 * @param imageType Type of input image
 	 * @return SIFT orientation image
 	 */
 	public static <T extends ImageGray<T>>
-	OrientationImage<T> sift(ConfigSiftScaleSpace configSS , ConfigSiftOrientation configOri, Class<T> imageType ) {
-		if( configSS == null )
+	OrientationImage<T> sift( ConfigSiftScaleSpace configSS, ConfigSiftOrientation configOri, Class<T> imageType ) {
+		if (configSS == null)
 			configSS = new ConfigSiftScaleSpace();
 		configSS.checkValidity();
 
-		OrientationHistogramSift<GrayF32> ori = FactoryOrientationAlgs.sift(configOri,GrayF32.class);
+		OrientationHistogramSift<GrayF32> ori = FactoryOrientationAlgs.sift(configOri, GrayF32.class);
 
 		SiftScaleSpace ss = new SiftScaleSpace(
-				configSS.firstOctave,configSS.lastOctave,configSS.numScales,configSS.sigma0);
+				configSS.firstOctave, configSS.lastOctave, configSS.numScales, configSS.sigma0);
 		return new OrientationSiftToImage<>(ori, ss, imageType);
 	}
 }

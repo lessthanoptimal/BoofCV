@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -30,7 +30,7 @@ import org.ddogleg.struct.DogArray;
  */
 public interface FhEdgeWeights<T extends ImageBase<T>> {
 
-	public void process( T input , DogArray<SegmentFelzenszwalbHuttenlocher04.Edge> edges );
+	void process( T input, DogArray<SegmentFelzenszwalbHuttenlocher04.Edge> edges );
 
-	public ImageType<T> getInputType();
+	ImageType<T> getInputType();
 }

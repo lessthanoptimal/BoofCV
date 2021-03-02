@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -20,14 +20,13 @@ package boofcv.alg.feature.describe;
 
 import boofcv.struct.image.GrayF32;
 
-
 /**
  * @author Peter Abeles
  */
-public class TestDescribePointSurf extends BaseTestDescribeSurf<GrayF32,GrayF32>{
+public class TestDescribePointSurf extends BaseTestDescribeSurf<GrayF32, GrayF32> {
 
 	public TestDescribePointSurf() {
-		super(GrayF32.class,GrayF32.class);
+		super(GrayF32.class, GrayF32.class);
 	}
 
 	@Override

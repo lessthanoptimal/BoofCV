@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -41,7 +41,7 @@ public class BaseIntegralEdge<T extends ImageGray<T>> {
 	protected ImageLineIntegral integral;
 	protected GImageGray integralImage;
 
-	public BaseIntegralEdge(Class<T> imageType) {
+	public BaseIntegralEdge( Class<T> imageType ) {
 		this.imageType = imageType;
 		this.integral = new ImageLineIntegral();
 		this.integralImage = FactoryGImageGray.create(imageType);
@@ -56,7 +56,7 @@ public class BaseIntegralEdge<T extends ImageGray<T>> {
 	 * @param undistToDist Pixel transformation from undistorted pixels into the actual distorted input image.
 	 */
 	public void setTransform( PixelTransform<Point2D_F32> undistToDist ) {
-		if( undistToDist != null ) {
+		if (undistToDist != null) {
 			InterpolatePixelS<T> interpolate = FactoryInterpolation.bilinearPixelS(imageType, BorderType.EXTENDED);
 			integralImage = new GImageGrayDistorted<>(undistToDist, interpolate);
 		} else {
@@ -67,7 +67,7 @@ public class BaseIntegralEdge<T extends ImageGray<T>> {
 	/**
 	 * Sets the image which is going to be processed. This must be called first.
 	 */
-	public void setImage(T image) {
+	public void setImage( T image ) {
 		integralImage.wrap(image);
 		integral.setImage(integralImage);
 	}

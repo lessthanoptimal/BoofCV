@@ -30,15 +30,12 @@ import boofcv.struct.image.Planar;
  * laplacian sign is computed from a gray-scale image.  The descriptor from each band are not individually
  * normalized.  The whole combined descriptor is normalized.
  *
+ * @param <II> Type of integral image
+ * @author Peter Abeles
  * @see DescribePointSurf
  * @see DescribePointSurfMod
- *
- * @param <II> Type of integral image
- *
- * @author Peter Abeles
  */
-public class DescribePointSurfPlanar<II extends ImageGray<II>>
-{
+public class DescribePointSurfPlanar<II extends ImageGray<II>> {
 	// SURF algorithms
 	private DescribePointSurf<II> describe;
 
@@ -56,9 +53,8 @@ public class DescribePointSurfPlanar<II extends ImageGray<II>>
 	// number of bands in the input image
 	private int numBands;
 
-	public DescribePointSurfPlanar(DescribePointSurf<II> describe,
-								   int numBands )
-	{
+	public DescribePointSurfPlanar( DescribePointSurf<II> describe,
+									int numBands ) {
 		this.describe = describe;
 		this.numBands = numBands;
 
@@ -80,26 +76,26 @@ public class DescribePointSurfPlanar<II extends ImageGray<II>>
 
 	/**
 	 * Specifies input image shapes.
+	 *
 	 * @param grayII integral image of gray scale image
 	 * @param colorII integral image of color image
 	 */
-	public void setImage( II grayII , Planar<II> colorII ) {
-		InputSanityCheck.checkSameShape(grayII,colorII);
-		if( colorII.getNumBands() != numBands )
+	public void setImage( II grayII, Planar<II> colorII ) {
+		InputSanityCheck.checkSameShape(grayII, colorII);
+		if (colorII.getNumBands() != numBands)
 			throw new IllegalArgumentException("Expected planar images to have "
-					+numBands+" not "+colorII.getNumBands());
+					+ numBands + " not " + colorII.getNumBands());
 
 		this.grayII = grayII;
 		this.colorII = colorII;
 	}
 
-	public void describe(double x, double y, double angle, double scale, TupleDesc_F64 desc)
-	{
+	public void describe( double x, double y, double angle, double scale, TupleDesc_F64 desc ) {
 		int featureIndex = 0;
-		for(int band = 0; band < colorII.getNumBands(); band++ ) {
+		for (int band = 0; band < colorII.getNumBands(); band++) {
 			describe.setImage(colorII.getBand(band));
-			describe.describe(x,y, angle, scale, false, bandDesc);
-			System.arraycopy(bandDesc.data,0,desc.data,featureIndex,bandDesc.size());
+			describe.describe(x, y, angle, scale, false, bandDesc);
+			System.arraycopy(bandDesc.data, 0, desc.data, featureIndex, bandDesc.size());
 			featureIndex += bandDesc.size();
 		}
 
@@ -117,6 +113,6 @@ public class DescribePointSurfPlanar<II extends ImageGray<II>>
 	}
 
 	public DescribePointSurfPlanar<II> copy() {
-		return new DescribePointSurfPlanar<>(describe.copy(),numBands);
+		return new DescribePointSurfPlanar<>(describe.copy(), numBands);
 	}
 }

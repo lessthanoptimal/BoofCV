@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -29,15 +29,15 @@ import georegression.struct.point.Point2D_F64;
  * @author Peter Abeles
  */
 public interface HoughTransformParameters {
-	void initialize( int width , int height , GrayF32 transform );
+	void initialize( int width, int height, GrayF32 transform );
 
-	boolean isTransformValid( int x , int y );
+	boolean isTransformValid( int x, int y );
 
-	void lineToCoordinate(LineParametric2D_F32 line , Point2D_F64 coordinate );
+	void lineToCoordinate( LineParametric2D_F32 line, Point2D_F64 coordinate );
 
-	void transformToLine( float x , float y , LineParametric2D_F32 line );
+	void transformToLine( float x, float y, LineParametric2D_F32 line );
 
-	void parameterize( int x , int y , GrayF32 transform );
+	void parameterize( int x, int y, GrayF32 transform );
 
-	void parameterize( int x , int y , float derivX , float derivY , Point2D_F32 parameter );
+	void parameterize( int x, int y, float derivX, float derivY, Point2D_F32 parameter );
 }

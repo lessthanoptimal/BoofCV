@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -49,19 +49,17 @@ public class FactoryDescribeImageDense {
 	 * Different descriptors are produced for gray-scale and color images.
 	 * </p>
 	 *
-	 * @see DescribePointSurf
-	 *
 	 * @param config SURF configuration. Pass in null for default options.
 	 * @param imageType Type of input image.
 	 * @return SURF description extractor
+	 * @see DescribePointSurf
 	 */
 	public static <T extends ImageGray<T>, II extends ImageGray<II>>
-	DescribeImageDense<T,TupleDesc_F64> surfFast(@Nullable ConfigDenseSurfFast config , Class<T> imageType)
-	{
-		if( config == null )
+	DescribeImageDense<T, TupleDesc_F64> surfFast( @Nullable ConfigDenseSurfFast config, Class<T> imageType ) {
+		if (config == null)
 			config = new ConfigDenseSurfFast();
 
-		DescribeRegionPoint<T,TupleDesc_F64> surf =
+		DescribeRegionPoint<T, TupleDesc_F64> surf =
 				(DescribeRegionPoint)FactoryDescribeRegionPoint.surfFast(config.surf, imageType);
 
 		return new GenericDenseDescribeImageDense<>(surf, config.descriptorScale, config.sampling.periodX, config.sampling.periodY);
@@ -74,22 +72,21 @@ public class FactoryDescribeImageDense {
 	 * descriptors are produced for gray-scale and color images.
 	 * </p>
 	 *
-	 * @see DescribePointSurf
-	 *
 	 * @param config SURF configuration. Pass in null for default options.
 	 * @param imageType Type of input image.
 	 * @return SURF description extractor
+	 * @see DescribePointSurf
 	 */
 	public static <T extends ImageGray<T>, II extends ImageGray<II>>
-	DescribeImageDense<T,TupleDesc_F64> surfStable(@Nullable ConfigDenseSurfStable config,
-												   Class<T> imageType) {
+	DescribeImageDense<T, TupleDesc_F64> surfStable( @Nullable ConfigDenseSurfStable config,
+													 Class<T> imageType ) {
 
-		if( config == null )
+		if (config == null)
 			config = new ConfigDenseSurfStable();
 
 		config.checkValidity();
 
-		DescribeRegionPoint<T,TupleDesc_F64> surf =
+		DescribeRegionPoint<T, TupleDesc_F64> surf =
 				(DescribeRegionPoint)FactoryDescribeRegionPoint.surfStable(config.surf, imageType);
 
 		return new GenericDenseDescribeImageDense<>(surf, config.descriptorScale, config.sampling.periodX, config.sampling.periodY);
@@ -98,15 +95,14 @@ public class FactoryDescribeImageDense {
 	/**
 	 * Creates a dense SIFT descriptor.
 	 *
-	 * @see DescribeDenseSiftAlg
-	 *
 	 * @param config Configuration for SIFT descriptor. null for defaults.
 	 * @param imageType Type of input image
 	 * @return Dense SIFT
+	 * @see DescribeDenseSiftAlg
 	 */
 	public static <T extends ImageGray<T>>
-	DescribeImageDense<T,TupleDesc_F64> sift(@Nullable ConfigDenseSift config , Class<T> imageType ) {
-		if( config == null )
+	DescribeImageDense<T, TupleDesc_F64> sift( @Nullable ConfigDenseSift config, Class<T> imageType ) {
+		if (config == null)
 			config = new ConfigDenseSift();
 
 		config.checkValidity();
@@ -115,39 +111,37 @@ public class FactoryDescribeImageDense {
 
 		Class derivType = GImageDerivativeOps.getDerivativeType(imageType);
 
-		DescribeDenseSiftAlg alg = new DescribeDenseSiftAlg(c.widthSubregion,c.widthGrid,
-				c.numHistogramBins,c.weightingSigmaFraction,c.maxDescriptorElementValue,1,1,derivType);
+		DescribeDenseSiftAlg alg = new DescribeDenseSiftAlg(c.widthSubregion, c.widthGrid,
+				c.numHistogramBins, c.weightingSigmaFraction, c.maxDescriptorElementValue, 1, 1, derivType);
 
-		return new DescribeImageDenseSift(alg,config.sampling.periodX,config.sampling.periodY,imageType);
+		return new DescribeImageDenseSift(alg, config.sampling.periodX, config.sampling.periodY, imageType);
 	}
-
 
 	/**
 	 * Creates a dense HOG descriptor.
 	 *
-	 * @see DescribeDenseHogFastAlg
-	 * @see DescribeDenseHogAlg
-	 *
 	 * @param config Configuration for HOG descriptor.  Can't be null.
 	 * @param imageType Type of input image.  Can be single band or planar
 	 * @return Dense HOG extractor
+	 * @see DescribeDenseHogFastAlg
+	 * @see DescribeDenseHogAlg
 	 */
 	public static <T extends ImageBase<T>>
-	DescribeImageDense<T,TupleDesc_F64> hog(@Nullable ConfigDenseHoG config , ImageType<T> imageType ) {
-		if( config == null )
+	DescribeImageDense<T, TupleDesc_F64> hog( @Nullable ConfigDenseHoG config, ImageType<T> imageType ) {
+		if (config == null)
 			config = new ConfigDenseHoG();
 
 		config.checkValidity();
 
 		ImageType actualType;
-		if( imageType.getDataType() != ImageDataType.F32 ) {
-			actualType = new ImageType(imageType.getFamily(),ImageDataType.F32,imageType.getNumBands());
+		if (imageType.getDataType() != ImageDataType.F32) {
+			actualType = new ImageType(imageType.getFamily(), ImageDataType.F32, imageType.getNumBands());
 		} else {
 			actualType = imageType;
 		}
 
 		BaseDenseHog hog;
-		if( config.fastVariant ) {
+		if (config.fastVariant) {
 			hog = FactoryDescribeImageDenseAlg.hogFast(config, actualType);
 		} else {
 			hog = FactoryDescribeImageDenseAlg.hog(config, actualType);
@@ -156,7 +150,7 @@ public class FactoryDescribeImageDense {
 		DescribeImageDenseHoG output = new DescribeImageDenseHoG(hog);
 
 		// If the data type isn't F32 convert it into that data type first
-		if( actualType != imageType ) {
+		if (actualType != imageType) {
 			return new DescribeImageDense_Convert<>(output, imageType);
 		} else {
 			return output;

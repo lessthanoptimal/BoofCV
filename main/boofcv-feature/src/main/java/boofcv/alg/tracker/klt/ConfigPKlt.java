@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -28,8 +28,7 @@ import boofcv.struct.pyramid.ConfigDiscreteLevels;
  *
  * @author Peter Abeles
  */
-public class ConfigPKlt implements Configuration
-{
+public class ConfigPKlt implements Configuration {
 	/** configuration for low level KLT tracker */
 	public ConfigKlt config = new ConfigKlt();
 
@@ -50,7 +49,7 @@ public class ConfigPKlt implements Configuration
 	 * If true it will prune tracks which come too close to each other. The default behavior is to
 	 * prune tracks will higher feature IDs.
 	 */
-	public boolean pruneClose=false;
+	public boolean pruneClose = false;
 
 	/**
 	 * Specifies the maximum number of features it can track. If fixed at 0 then there is no limit. If relative
@@ -59,11 +58,11 @@ public class ConfigPKlt implements Configuration
 	 * <p>NOTE: {@link boofcv.abst.tracker.PointTrackerKltPyramid} will manage the number of detections and will
 	 * override {@link boofcv.abst.feature.detect.interest.ConfigGeneralDetector#maxFeatures}.</p>
 	 */
-	public ConfigLength maximumTracks = ConfigLength.relative(0.002,50);
+	public ConfigLength maximumTracks = ConfigLength.relative(0.002, 50);
 
 	public ConfigPKlt() {}
 
-	public ConfigPKlt(int templateRadius) {
+	public ConfigPKlt( int templateRadius ) {
 		this.templateRadius = templateRadius;
 	}
 
@@ -78,7 +77,7 @@ public class ConfigPKlt implements Configuration
 		config.checkValidity();
 		pyramidLevels.checkValidity();
 		maximumTracks.checkValidity();
-		BoofMiscOps.checkTrue(templateRadius>=0); // 0 = 1 pixel wide. Still technically valid
+		BoofMiscOps.checkTrue(templateRadius >= 0); // 0 = 1 pixel wide. Still technically valid
 		// toleranceFB is valid for all values
 	}
 
@@ -96,5 +95,4 @@ public class ConfigPKlt implements Configuration
 		ret.setTo(this);
 		return ret;
 	}
-
 }

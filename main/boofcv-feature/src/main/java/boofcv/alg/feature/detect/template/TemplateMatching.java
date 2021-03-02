@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -52,8 +52,8 @@ public class TemplateMatching<T extends ImageBase<T>> {
 	// storage for found points
 	private QueueCorner candidates = new QueueCorner(10);
 	// working space for sorting the results
-	private float scores[] = new float[10];
-	private int indexes[] = new int[10];
+	private float[] scores = new float[10];
+	private int[] indexes = new int[10];
 
 	// storage for final points
 	private DogArray<Match> results = new DogArray<>(10, Match::new);

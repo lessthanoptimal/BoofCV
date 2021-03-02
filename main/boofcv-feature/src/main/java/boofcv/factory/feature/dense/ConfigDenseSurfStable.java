@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -26,7 +26,7 @@ import boofcv.struct.Configuration;
  *
  * @author Peter Abeles
  */
-public class ConfigDenseSurfStable implements Configuration{
+public class ConfigDenseSurfStable implements Configuration {
 	/**
 	 * Configuration for Stable SURF descriptor
 	 */
@@ -35,14 +35,14 @@ public class ConfigDenseSurfStable implements Configuration{
 	/**
 	 * Specifies the frequency it will sample across the image in pixels.  Default ix period X = 8, period Y = 8.
 	 */
-	public DenseSampling sampling = new DenseSampling(8,8);
+	public DenseSampling sampling = new DenseSampling(8, 8);
 
 	/**
 	 * Relative size of descriptor
 	 */
 	public double descriptorScale = 1;
 
-	public ConfigDenseSurfStable(DenseSampling sampling) {
+	public ConfigDenseSurfStable( DenseSampling sampling ) {
 		this.sampling = sampling;
 	}
 
@@ -56,7 +56,7 @@ public class ConfigDenseSurfStable implements Configuration{
 
 	@Override
 	public void checkValidity() {
-		if( sampling == null )
+		if (sampling == null)
 			throw new IllegalArgumentException("Most specify sampling");
 	}
 }

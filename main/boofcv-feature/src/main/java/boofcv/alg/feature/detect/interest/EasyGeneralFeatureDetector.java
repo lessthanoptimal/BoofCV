@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -70,12 +70,12 @@ public class EasyGeneralFeatureDetector<T extends ImageGray<T>, D extends ImageG
 		}
 
 		if (derivType == null) {
-			Class<T> im = Objects.requireNonNull(imageType,"Must specify image type since detector doesn't");
+			Class<T> im = Objects.requireNonNull(imageType, "Must specify image type since detector doesn't");
 			derivType = GImageDerivativeOps.getDerivativeType(im);
 		}
 
 		if (detector.getRequiresGradient() || detector.getRequiresHessian()) {
-			Class<T> im = Objects.requireNonNull(imageType,"Must specify image type since detector doesn't");
+			Class<T> im = Objects.requireNonNull(imageType, "Must specify image type since detector doesn't");
 			gradient = FactoryDerivative.sobel(im, derivType);
 		}
 		if (detector.getRequiresHessian()) {

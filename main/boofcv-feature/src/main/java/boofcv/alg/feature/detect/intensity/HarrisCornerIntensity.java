@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -36,7 +36,6 @@ package boofcv.alg.feature.detect.intensity;
  * @author Peter Abeles
  */
 public interface HarrisCornerIntensity {
-
 	/**
 	 * Returns the value of the tuning parameter.
 	 *

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -73,49 +73,49 @@ public class BroxWarpingSpacial<T extends ImageGray<T>> extends DenseFlowPyramid
 	private float convergeTolerance;
 
 	// derivative of first image
-	private GrayF32 deriv1X = new GrayF32(1,1);
-	private GrayF32 deriv1Y = new GrayF32(1,1);
+	private GrayF32 deriv1X = new GrayF32(1, 1);
+	private GrayF32 deriv1Y = new GrayF32(1, 1);
 
 	// derivatives of second image
-	private GrayF32 deriv2X = new GrayF32(1,1);
-	private GrayF32 deriv2Y = new GrayF32(1,1);
-	private GrayF32 deriv2XX = new GrayF32(1,1);
-	private GrayF32 deriv2YY = new GrayF32(1,1);
-	private GrayF32 deriv2XY = new GrayF32(1,1);
+	private GrayF32 deriv2X = new GrayF32(1, 1);
+	private GrayF32 deriv2Y = new GrayF32(1, 1);
+	private GrayF32 deriv2XX = new GrayF32(1, 1);
+	private GrayF32 deriv2YY = new GrayF32(1, 1);
+	private GrayF32 deriv2XY = new GrayF32(1, 1);
 
 	private ImageGradient<GrayF32, GrayF32> gradient = FactoryDerivative.three(GrayF32.class, GrayF32.class);
 	private ImageHessian<GrayF32> hessian = FactoryDerivative.hessianThree(GrayF32.class);
 
 	// flow estimation at the start of the iteration
-	protected GrayF32 flowU = new GrayF32(1,1); // flow along x-axis
-	protected GrayF32 flowV = new GrayF32(1,1); // flow along y-axis
+	protected GrayF32 flowU = new GrayF32(1, 1); // flow along x-axis
+	protected GrayF32 flowV = new GrayF32(1, 1); // flow along y-axis
 
 	// storage for the warped flow
-	protected GrayF32 warpImage2 = new GrayF32(1,1);
-	protected GrayF32 warpDeriv2X = new GrayF32(1,1);
-	protected GrayF32 warpDeriv2Y = new GrayF32(1,1);
-	protected GrayF32 warpDeriv2XX = new GrayF32(1,1);
-	protected GrayF32 warpDeriv2YY = new GrayF32(1,1);
-	protected GrayF32 warpDeriv2XY = new GrayF32(1,1);
+	protected GrayF32 warpImage2 = new GrayF32(1, 1);
+	protected GrayF32 warpDeriv2X = new GrayF32(1, 1);
+	protected GrayF32 warpDeriv2Y = new GrayF32(1, 1);
+	protected GrayF32 warpDeriv2XX = new GrayF32(1, 1);
+	protected GrayF32 warpDeriv2YY = new GrayF32(1, 1);
+	protected GrayF32 warpDeriv2XY = new GrayF32(1, 1);
 
 	// derivative of flow
-	protected GrayF32 derivFlowUX = new GrayF32(1,1);
-	protected GrayF32 derivFlowUY = new GrayF32(1,1);
-	protected GrayF32 derivFlowVX = new GrayF32(1,1);
-	protected GrayF32 derivFlowVY = new GrayF32(1,1);
+	protected GrayF32 derivFlowUX = new GrayF32(1, 1);
+	protected GrayF32 derivFlowUY = new GrayF32(1, 1);
+	protected GrayF32 derivFlowVX = new GrayF32(1, 1);
+	protected GrayF32 derivFlowVY = new GrayF32(1, 1);
 
-	protected GrayF32 psiSmooth = new GrayF32(1,1);
-	protected GrayF32 psiData = new GrayF32(1,1);
-	protected GrayF32 psiGradient = new GrayF32(1,1);
+	protected GrayF32 psiSmooth = new GrayF32(1, 1);
+	protected GrayF32 psiData = new GrayF32(1, 1);
+	protected GrayF32 psiGradient = new GrayF32(1, 1);
 
 	// divergence for u,v,d
-	protected GrayF32 divU = new GrayF32(1,1);
-	protected GrayF32 divV = new GrayF32(1,1);
-	protected GrayF32 divD = new GrayF32(1,1);
+	protected GrayF32 divU = new GrayF32(1, 1);
+	protected GrayF32 divV = new GrayF32(1, 1);
+	protected GrayF32 divD = new GrayF32(1, 1);
 
 	// motion increments for optical flow
-	protected GrayF32 du = new GrayF32(1,1);
-	protected GrayF32 dv = new GrayF32(1,1);
+	protected GrayF32 du = new GrayF32(1, 1);
+	protected GrayF32 dv = new GrayF32(1, 1);
 
 	/**
 	 * Configures flow estimation
@@ -123,9 +123,8 @@ public class BroxWarpingSpacial<T extends ImageGray<T>> extends DenseFlowPyramid
 	 * @param config Configuration parameters
 	 * @param interp Interpolation for image flow between image layers and warping.  Overrides selection in config.
 	 */
-	public BroxWarpingSpacial(ConfigBroxWarping config, InterpolatePixelS<GrayF32> interp)
-	{
-		super(config.pyrScale,config.pyrSigma,config.pyrMaxLayers,interp);
+	public BroxWarpingSpacial( ConfigBroxWarping config, InterpolatePixelS<GrayF32> interp ) {
+		super(config.pyrScale, config.pyrSigma, config.pyrMaxLayers, interp);
 		this.alpha = config.alpha;
 		this.gamma = config.gamma;
 		this.SOR_RELAXATION = config.SOR_RELAXATION;
@@ -143,22 +142,21 @@ public class BroxWarpingSpacial<T extends ImageGray<T>> extends DenseFlowPyramid
 	 * @param image2 Pyramid of second image
 	 */
 	@Override
-	public void process(ImagePyramid<GrayF32> image1 , ImagePyramid<GrayF32> image2 )
-	{
+	public void process( ImagePyramid<GrayF32> image1, ImagePyramid<GrayF32> image2 ) {
 		// Process the pyramid from low resolution to high resolution
 		boolean first = true;
-		for( int i = image1.getNumLayers()-1; i >= 0; i-- ) {
+		for (int i = image1.getNumLayers() - 1; i >= 0; i--) {
 			GrayF32 layer1 = image1.getLayer(i);
 			GrayF32 layer2 = image2.getLayer(i);
 
-			resizeForLayer(layer1.width,layer2.height);
+			resizeForLayer(layer1.width, layer2.height);
 
 			// compute image derivatives
-			gradient.process(layer1,deriv1X,deriv1Y);
-			gradient.process(layer2,deriv2X,deriv2Y);
-			hessian.process(deriv2X,deriv2Y,deriv2XX,deriv2YY,deriv2XY);
+			gradient.process(layer1, deriv1X, deriv1Y);
+			gradient.process(layer2, deriv2X, deriv2Y);
+			hessian.process(deriv2X, deriv2Y, deriv2XX, deriv2YY, deriv2XY);
 
-			if( !first ) {
+			if (!first) {
 				// interpolate initial flow from previous layer
 				interpolateFlowScale(layer1.width, layer1.height);
 			} else {
@@ -168,55 +166,55 @@ public class BroxWarpingSpacial<T extends ImageGray<T>> extends DenseFlowPyramid
 				flowU.reshape(layer1.width, layer1.height);
 				flowV.reshape(layer1.width, layer1.height);
 
-				ImageMiscOps.fill(flowU,0);
-				ImageMiscOps.fill(flowV,0);
+				ImageMiscOps.fill(flowU, 0);
+				ImageMiscOps.fill(flowV, 0);
 			}
 
 			// compute flow for this layer
-			processLayer(layer1,layer2,deriv1X,deriv1Y,deriv2X,deriv2Y,deriv2XX,deriv2YY,deriv2XY);
+			processLayer(layer1, layer2, deriv1X, deriv1Y, deriv2X, deriv2Y, deriv2XX, deriv2YY, deriv2XY);
 		}
 	}
 
 	/**
 	 * Resize images for the current layer being processed
 	 */
-	protected void resizeForLayer( int width , int height ) {
-		deriv1X.reshape(width,height);
-		deriv1Y.reshape(width,height);
-		deriv2X.reshape(width,height);
-		deriv2Y.reshape(width,height);
-		deriv2XX.reshape(width,height);
-		deriv2YY.reshape(width,height);
-		deriv2XY.reshape(width,height);
+	protected void resizeForLayer( int width, int height ) {
+		deriv1X.reshape(width, height);
+		deriv1Y.reshape(width, height);
+		deriv2X.reshape(width, height);
+		deriv2Y.reshape(width, height);
+		deriv2XX.reshape(width, height);
+		deriv2YY.reshape(width, height);
+		deriv2XY.reshape(width, height);
 
-		warpImage2.reshape(width,height);
-		warpDeriv2X.reshape(width,height);
-		warpDeriv2Y.reshape(width,height);
-		warpDeriv2XX.reshape(width,height);
-		warpDeriv2YY.reshape(width,height);
-		warpDeriv2XY.reshape(width,height);
+		warpImage2.reshape(width, height);
+		warpDeriv2X.reshape(width, height);
+		warpDeriv2Y.reshape(width, height);
+		warpDeriv2XX.reshape(width, height);
+		warpDeriv2YY.reshape(width, height);
+		warpDeriv2XY.reshape(width, height);
 
-		derivFlowUX.reshape(width,height);
-		derivFlowUY.reshape(width,height);
-		derivFlowVX.reshape(width,height);
-		derivFlowVY.reshape(width,height);
+		derivFlowUX.reshape(width, height);
+		derivFlowUY.reshape(width, height);
+		derivFlowVX.reshape(width, height);
+		derivFlowVY.reshape(width, height);
 
-		psiData.reshape(width,height);
-		psiGradient.reshape(width,height);
-		psiSmooth.reshape(width,height);
+		psiData.reshape(width, height);
+		psiGradient.reshape(width, height);
+		psiSmooth.reshape(width, height);
 
-		divU.reshape(width,height);
-		divV.reshape(width,height);
-		divD.reshape(width,height);
+		divU.reshape(width, height);
+		divV.reshape(width, height);
+		divD.reshape(width, height);
 
-		du.reshape(width,height);
-		dv.reshape(width,height);
+		du.reshape(width, height);
+		dv.reshape(width, height);
 	}
 
 	/**
 	 * Provides an initial estimate for the flow by interpolating values from the previous layer.
 	 */
-	protected void interpolateFlowScale(int widthNew, int heightNew) {
+	protected void interpolateFlowScale( int widthNew, int heightNew ) {
 		// warping isn't done until later so use those images as temporary storage
 		GrayF32 enlargedU = warpDeriv2X;
 		GrayF32 enlargedV = warpDeriv2Y;
@@ -237,16 +235,16 @@ public class BroxWarpingSpacial<T extends ImageGray<T>> extends DenseFlowPyramid
 	 * Computes the flow for a layer using Taylor series expansion and Successive Over-Relaxation linear solver.
 	 * Flow estimates from previous layers are feed into this by setting initFlow and flow to their values.
 	 */
-	protected void processLayer(GrayF32 image1 , GrayF32 image2 ,
-								GrayF32 deriv1X , GrayF32 deriv1Y,
-								GrayF32 deriv2X , GrayF32 deriv2Y,
-								GrayF32 deriv2XX , GrayF32 deriv2YY, GrayF32 deriv2XY) {
+	protected void processLayer( GrayF32 image1, GrayF32 image2,
+								 GrayF32 deriv1X, GrayF32 deriv1Y,
+								 GrayF32 deriv2X, GrayF32 deriv2Y,
+								 GrayF32 deriv2XX, GrayF32 deriv2YY, GrayF32 deriv2XY ) {
 
 		int N = image1.width*image1.height;
 		int stride = image1.stride;
 
 		// outer Taylor expansion iterations
-		for( int indexOuter = 0; indexOuter < numOuter; indexOuter++ ) {
+		for (int indexOuter = 0; indexOuter < numOuter; indexOuter++) {
 
 			// warp the image and the first + second derivatives
 			warpImageTaylor(image2, flowU, flowV, warpImage2);
@@ -258,18 +256,18 @@ public class BroxWarpingSpacial<T extends ImageGray<T>> extends DenseFlowPyramid
 			warpImageTaylor(deriv2YY, flowU, flowV, warpDeriv2YY);
 			warpImageTaylor(deriv2XY, flowU, flowV, warpDeriv2XY);
 
-			gradient.process(flowU,derivFlowUX,derivFlowUY);
-			gradient.process(flowV,derivFlowVX,derivFlowVY);
+			gradient.process(flowU, derivFlowUX, derivFlowUY);
+			gradient.process(flowV, derivFlowVX, derivFlowVY);
 
-			computePsiSmooth(derivFlowUX,derivFlowUY,derivFlowVX,derivFlowVY,psiSmooth);
+			computePsiSmooth(derivFlowUX, derivFlowUY, derivFlowVX, derivFlowVY, psiSmooth);
 
-			computeDivUVD(flowU, flowV,psiSmooth,divU,divV,divD);
+			computeDivUVD(flowU, flowV, psiSmooth, divU, divV, divD);
 
 			// initialize the motion increments to zero
-			Arrays.fill(du.data,0,N,0);
-			Arrays.fill(dv.data,0,N,0);
+			Arrays.fill(du.data, 0, N, 0);
+			Arrays.fill(dv.data, 0, N, 0);
 
-			for( int indexInner = 0; indexInner < numInner; indexInner++ ) {
+			for (int indexInner = 0; indexInner < numInner; indexInner++) {
 
 				computePsiDataPsiGradient(image1, image2,
 						deriv1X, deriv1Y,
@@ -285,7 +283,7 @@ public class BroxWarpingSpacial<T extends ImageGray<T>> extends DenseFlowPyramid
 
 					// inner portion
 					for (int y = 1; y < image1.height - 1; y++) {
-						int i = y * image1.width + 1;
+						int i = y*image1.width + 1;
 						for (int x = 1; x < image1.width - 1; x++, i++) {
 							error += iterationSor(image1, deriv1X, deriv1Y, i, i + 1, i - 1, i + stride, i - stride);
 						}
@@ -293,8 +291,8 @@ public class BroxWarpingSpacial<T extends ImageGray<T>> extends DenseFlowPyramid
 
 					// border regions require special treatment
 					int y0 = 0;
-					int y1 = image1.height-1;
-					for (int x = 0; x < image1.width; x++ ) {
+					int y1 = image1.height - 1;
+					for (int x = 0; x < image1.width; x++) {
 						error += iterationSor(image1, deriv1X, deriv1Y,
 								s(x, y0), s(x + 1, y0), s(x - 1, y0), s(x, y0 - 1), s(x, y0 + 1));
 
@@ -303,19 +301,19 @@ public class BroxWarpingSpacial<T extends ImageGray<T>> extends DenseFlowPyramid
 					}
 
 					int x0 = 0;
-					int x1 = image1.width-1;
+					int x1 = image1.width - 1;
 					for (int y = 1; y < image1.height - 1; y++) {
 						error += iterationSor(image1, deriv1X, deriv1Y,
 								s(x0, y), s(x0 - 1, y), s(x0 + 1, y), s(x0, y - 1), s(x0, y + 1));
 						error += iterationSor(image1, deriv1X, deriv1Y,
 								s(x1, y), s(x1 - 1, y), s(x1 + 1, y), s(x1, y - 1), s(x1, y + 1));
 					}
-				} while (error > convergeTolerance * image1.width * image1.height && ++iter < maxIterationsSor);
+				} while (error > convergeTolerance*image1.width*image1.height && ++iter < maxIterationsSor);
 			}
 
 			// update the flow with the motion increments
-			PixelMath.add(flowU,du, flowU);
-			PixelMath.add(flowV,dv, flowV);
+			PixelMath.add(flowU, du, flowU);
+			PixelMath.add(flowV, dv, flowV);
 		}
 	}
 
@@ -328,8 +326,8 @@ public class BroxWarpingSpacial<T extends ImageGray<T>> extends DenseFlowPyramid
 	 * @param ipy (x,y+1)
 	 * @param imy (x,y-1)
 	 */
-	private float iterationSor(GrayF32 image1, GrayF32 deriv1X, GrayF32 deriv1Y,
-							   int i, int ipx, int imx, int ipy, int imy) {
+	private float iterationSor( GrayF32 image1, GrayF32 deriv1X, GrayF32 deriv1Y,
+								int i, int ipx, int imx, int ipy, int imy ) {
 		float w = SOR_RELAXATION;
 
 		// these variables could be precomputed once.  See equation 11
@@ -360,26 +358,26 @@ public class BroxWarpingSpacial<T extends ImageGray<T>> extends DenseFlowPyramid
 		float coef2 = 0.5f*(psiSmooth.data[ipy] + psi_index);
 		float coef3 = 0.5f*(psiSmooth.data[imy] + psi_index);
 
-		float div_du = coef0 * du.data[ipx] + coef1 * du.data[imx] + coef2 * du.data[ipy] + coef3 * du.data[imy];
-		float div_dv = coef0 * dv.data[ipx] + coef1 * dv.data[imx] + coef2 * dv.data[ipy] + coef3 * dv.data[imy] ;
+		float div_du = coef0*du.data[ipx] + coef1*du.data[imx] + coef2*du.data[ipy] + coef3*du.data[imy];
+		float div_dv = coef0*dv.data[ipx] + coef1*dv.data[imx] + coef2*dv.data[ipy] + coef3*dv.data[imy];
 
 		final float dui = du.data[i];
 		final float dvi = dv.data[i];
 
-		du.data[i] = (1f-w)*dui + w*(Au - D*dvi + alpha*div_du)/Du;
-		dv.data[i] = (1f-w)*dvi + w*(Av - D*du.data[i] + alpha*div_dv)/Dv;
+		du.data[i] = (1f - w)*dui + w*(Au - D*dvi + alpha*div_du)/Du;
+		dv.data[i] = (1f - w)*dvi + w*(Av - D*du.data[i] + alpha*div_dv)/Dv;
 
-		return (du.data[i] - dui) * (du.data[i] - dui) + (dv.data[i] - dvi) * (dv.data[i] - dvi);
+		return (du.data[i] - dui)*(du.data[i] - dui) + (dv.data[i] - dvi)*(dv.data[i] - dvi);
 	}
 
 	/**
 	 * Equation 5.  Psi_s
 	 */
-	private void computePsiSmooth(GrayF32 ux , GrayF32 uy , GrayF32 vx , GrayF32 vy ,
-								  GrayF32 psiSmooth ) {
-		int N = derivFlowUX.width * derivFlowUX.height;
+	private void computePsiSmooth( GrayF32 ux, GrayF32 uy, GrayF32 vx, GrayF32 vy,
+								   GrayF32 psiSmooth ) {
+		int N = derivFlowUX.width*derivFlowUX.height;
 
-		for( int i = 0; i < N; i++ ) {
+		for (int i = 0; i < N; i++) {
 			float vux = ux.data[i];
 			float vuy = uy.data[i];
 			float vvx = vx.data[i];
@@ -395,15 +393,15 @@ public class BroxWarpingSpacial<T extends ImageGray<T>> extends DenseFlowPyramid
 	/**
 	 * Compute Psi-data using equation 6 and approximation in equation 5
 	 */
-	protected void computePsiDataPsiGradient(GrayF32 image1, GrayF32 image2,
-											 GrayF32 deriv1x, GrayF32 deriv1y,
-											 GrayF32 deriv2x, GrayF32 deriv2y,
-											 GrayF32 deriv2xx, GrayF32 deriv2yy, GrayF32 deriv2xy,
-											 GrayF32 du, GrayF32 dv,
-											 GrayF32 psiData, GrayF32 psiGradient ) {
-		int N = image1.width * image1.height;
+	protected void computePsiDataPsiGradient( GrayF32 image1, GrayF32 image2,
+											  GrayF32 deriv1x, GrayF32 deriv1y,
+											  GrayF32 deriv2x, GrayF32 deriv2y,
+											  GrayF32 deriv2xx, GrayF32 deriv2yy, GrayF32 deriv2xy,
+											  GrayF32 du, GrayF32 dv,
+											  GrayF32 psiData, GrayF32 psiGradient ) {
+		int N = image1.width*image1.height;
 
-		for( int i = 0; i < N; i++ ) {
+		for (int i = 0; i < N; i++) {
 
 			float du_ = du.data[i];
 			float dv_ = dv.data[i];
@@ -417,7 +415,7 @@ public class BroxWarpingSpacial<T extends ImageGray<T>> extends DenseFlowPyramid
 			// compute Psi-gradient
 			float dIx = deriv2x.data[i] + deriv2xx.data[i]*du_ + deriv2xy.data[i]*dv_ - deriv1x.data[i];
 			float dIy = deriv2y.data[i] + deriv2xy.data[i]*du_ + deriv2yy.data[i]*dv_ - deriv1y.data[i];
-			float dI2 = dIx*dIx +  dIy*dIy;
+			float dI2 = dIx*dIx + dIy*dIy;
 
 			psiGradient.data[i] = (float)(1.0/(2.0*Math.sqrt(dI2 + EPSILON*EPSILON)));
 		}
@@ -426,54 +424,54 @@ public class BroxWarpingSpacial<T extends ImageGray<T>> extends DenseFlowPyramid
 	/**
 	 * Computes the divergence for u,v, and d. Equation 8 and Equation 10.
 	 */
-	private void computeDivUVD(GrayF32 u , GrayF32 v , GrayF32 psi ,
-							   GrayF32 divU , GrayF32 divV , GrayF32 divD ) {
+	private void computeDivUVD( GrayF32 u, GrayF32 v, GrayF32 psi,
+								GrayF32 divU, GrayF32 divV, GrayF32 divD ) {
 
 		final int stride = psi.stride;
 
 		// compute the inside pixel
-		for (int y = 1; y < psi.height-1; y++) {
+		for (int y = 1; y < psi.height - 1; y++) {
 
 			// index of the current pixel
 			int index = y*stride + 1;
 
-			for (int x = 1; x < psi.width-1; x++ , index++) {
+			for (int x = 1; x < psi.width - 1; x++, index++) {
 
 				float psi_index = psi.data[index];
 
-				float coef0 = 0.5f*(psi.data[index+1] + psi_index);
-				float coef1 = 0.5f*(psi.data[index-1] + psi_index);
-				float coef2 = 0.5f*(psi.data[index+stride] + psi_index);
-				float coef3 = 0.5f*(psi.data[index-stride] + psi_index);
+				float coef0 = 0.5f*(psi.data[index + 1] + psi_index);
+				float coef1 = 0.5f*(psi.data[index - 1] + psi_index);
+				float coef2 = 0.5f*(psi.data[index + stride] + psi_index);
+				float coef3 = 0.5f*(psi.data[index - stride] + psi_index);
 
 				float u_index = u.data[index];
 
-				divU.data[index] = coef0*(u.data[index+1] - u_index) + coef1*(u.data[index-1] - u_index) +
-								   coef2*(u.data[index+stride] - u_index) + coef3*(u.data[index-stride] - u_index);
+				divU.data[index] = coef0*(u.data[index + 1] - u_index) + coef1*(u.data[index - 1] - u_index) +
+						coef2*(u.data[index + stride] - u_index) + coef3*(u.data[index - stride] - u_index);
 
 				float v_index = v.data[index];
 
-				divV.data[index] = coef0*(v.data[index+1] - v_index) + coef1*(v.data[index-1] - v_index) +
-								   coef2*(v.data[index+stride] - v_index) + coef3*(v.data[index-stride] - v_index);
+				divV.data[index] = coef0*(v.data[index + 1] - v_index) + coef1*(v.data[index - 1] - v_index) +
+						coef2*(v.data[index + stride] - v_index) + coef3*(v.data[index - stride] - v_index);
 
 				divD.data[index] = coef0 + coef1 + coef2 + coef3;
 			}
 		}
 
 		// handle the image borders
-		for( int x = 0; x < psi.width; x++ ) {
-			computeDivUVD_safe(x,0,u,v,psi,divU,divV,divD);
-			computeDivUVD_safe(x,psi.height-1,u,v,psi,divU,divV,divD);
+		for (int x = 0; x < psi.width; x++) {
+			computeDivUVD_safe(x, 0, u, v, psi, divU, divV, divD);
+			computeDivUVD_safe(x, psi.height - 1, u, v, psi, divU, divV, divD);
 		}
-		for( int y = 1; y < psi.height-1; y++ ) {
-			computeDivUVD_safe(0,y,u,v,psi,divU,divV,divD);
-			computeDivUVD_safe(psi.width-1,y,u,v,psi,divU,divV,divD);
+		for (int y = 1; y < psi.height - 1; y++) {
+			computeDivUVD_safe(0, y, u, v, psi, divU, divV, divD);
+			computeDivUVD_safe(psi.width - 1, y, u, v, psi, divU, divV, divD);
 		}
 	}
 
-	protected void computeDivUVD_safe(int x , int y ,
-									  GrayF32 u , GrayF32 v , GrayF32 psi ,
-									  GrayF32 divU , GrayF32 divV , GrayF32 divD ) {
+	protected void computeDivUVD_safe( int x, int y,
+									   GrayF32 u, GrayF32 v, GrayF32 psi,
+									   GrayF32 divU, GrayF32 divV, GrayF32 divD ) {
 
 		int index = u.getIndex(x, y);
 		int index_px = s(x + 1, y);
@@ -501,13 +499,13 @@ public class BroxWarpingSpacial<T extends ImageGray<T>> extends DenseFlowPyramid
 		divD.data[index] = coef0 + coef1 + coef2 + coef3;
 	}
 
-	protected int s( int x , int y ) {
-		if( x < 0 ) x = 0;
-		else if( x >= warpImage2.width ) x = warpImage2.width-1;
-		if( y < 0 ) y = 0;
-		else if( y >= warpImage2.height ) y = warpImage2.height-1;
+	protected int s( int x, int y ) {
+		if (x < 0) x = 0;
+		else if (x >= warpImage2.width) x = warpImage2.width - 1;
+		if (y < 0) y = 0;
+		else if (y >= warpImage2.height) y = warpImage2.height - 1;
 
-		return warpImage2.getIndex(x,y);
+		return warpImage2.getIndex(x, y);
 	}
 
 	public GrayF32 getFlowX() {
