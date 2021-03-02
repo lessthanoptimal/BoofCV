@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -19,6 +19,7 @@
 package boofcv.abst.feature.detect.interest;
 
 import boofcv.alg.feature.detect.interest.SiftDetector;
+import boofcv.alg.feature.detect.interest.SiftScaleSpace;
 import boofcv.factory.feature.detect.interest.FactoryInterestPointAlgs;
 import boofcv.struct.image.GrayF32;
 import boofcv.struct.image.GrayU8;
@@ -30,13 +31,13 @@ import org.junit.jupiter.api.Test;
  */
 public class TestWrapSiftDetector extends BoofStandardJUnit {
 
-	Class types[] = new Class[]{GrayU8.class,GrayF32.class};
+	Class[] types = new Class[]{GrayU8.class,GrayF32.class};
 
-	@Test
-	public void testAllImageTypes() {
+	@Test void allImageTypes() {
 		for( Class type : types ) {
-			SiftDetector detector = FactoryInterestPointAlgs.sift(null,null);
-			WrapSiftDetector alg = new WrapSiftDetector(detector,type);
+			var ss = new SiftScaleSpace(0,2,3,1.6);
+			SiftDetector detector = FactoryInterestPointAlgs.sift(null);
+			WrapSiftDetector alg = new WrapSiftDetector(ss,detector,type);
 
 			new GeneralInterestPointDetectorChecks(alg,false,true,type){}.performAllTests();
 		}

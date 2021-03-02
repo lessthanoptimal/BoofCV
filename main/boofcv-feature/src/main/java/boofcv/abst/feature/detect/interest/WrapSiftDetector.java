@@ -19,6 +19,7 @@
 package boofcv.abst.feature.detect.interest;
 
 import boofcv.alg.feature.detect.interest.SiftDetector;
+import boofcv.alg.feature.detect.interest.SiftScaleSpace;
 import boofcv.core.image.GConvertImage;
 import boofcv.struct.image.GrayF32;
 import boofcv.struct.image.ImageGray;
@@ -32,13 +33,15 @@ import georegression.struct.point.Point2D_F64;
  */
 public class WrapSiftDetector<T extends ImageGray<T>>
 		implements InterestPointDetector<T> {
+	SiftScaleSpace ss;
 	SiftDetector detector;
 
 	GrayF32 imageFloat = new GrayF32(1, 1);
 
 	ImageType<T> inputType;
 
-	public WrapSiftDetector( SiftDetector detector, Class<T> inputType ) {
+	public WrapSiftDetector( SiftScaleSpace ss, SiftDetector detector, Class<T> inputType ) {
+		this.ss = ss;
 		this.detector = detector;
 		this.inputType = ImageType.single(inputType);
 	}
@@ -53,7 +56,8 @@ public class WrapSiftDetector<T extends ImageGray<T>>
 			input = imageFloat;
 		}
 
-		detector.process(input);
+		ss.process(input);
+		detector.process(ss);
 	}
 
 	@Override public int getNumberOfSets() { return 2; }

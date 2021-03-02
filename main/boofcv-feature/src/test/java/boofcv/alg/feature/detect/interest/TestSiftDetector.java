@@ -20,6 +20,7 @@ package boofcv.alg.feature.detect.interest;
 
 import boofcv.abst.feature.detect.extract.ConfigExtract;
 import boofcv.abst.feature.detect.extract.NonMaxLimiter;
+import boofcv.alg.feature.detect.interest.SiftDetector.SiftPoint;
 import boofcv.alg.feature.detect.selector.FeatureSelectLimitIntensity;
 import boofcv.alg.misc.GImageMiscOps;
 import boofcv.factory.feature.detect.extract.FactoryFeatureExtractor;
@@ -38,6 +39,8 @@ import static org.junit.jupiter.api.Assertions.*;
  * @author Peter Abeles
  */
 public class TestSiftDetector extends BoofStandardJUnit {
+	SiftScaleSpace ss = new SiftScaleSpace(-1, 5, 3, 1.6);
+
 	/**
 	 * Tests the ability to detect a single square feature at multiple scales and color
 	 */
@@ -56,9 +59,10 @@ public class TestSiftDetector extends BoofStandardJUnit {
 					GImageMiscOps.fillRectangle(input, 0, c_x - radius, c_y - radius, width, width);
 				}
 
-				alg.process(input);
+				ss.process(input);
+				alg.process(ss);
 
-				List<ScalePoint> detections = alg.getDetections();
+				List<SiftPoint> detections = alg.getDetections();
 				assertTrue(detections.size() > 0);
 
 				boolean found = false;
@@ -66,7 +70,7 @@ public class TestSiftDetector extends BoofStandardJUnit {
 					ScalePoint p = detections.get(i);
 					if (p.pixel.distance(c_x, c_y) <= 0.2) {
 						assertEquals(radius*1.25, p.scale, 0.5);
-						assertTrue(white == p.white);
+						assertEquals(p.white, white);
 						found = true;
 					}
 				}
@@ -119,7 +123,7 @@ public class TestSiftDetector extends BoofStandardJUnit {
 		for (float sign : new float[]{-1, 1}) {
 			alg.detectionsAll.reset();
 			current.set(15, 16, sign*100);
-			alg.processFeatureCandidate(15, 16, 100, sign > 0);
+			alg.createDetection(15, 16, 100, sign > 0);
 
 			ScalePoint p = alg.getDetections().get(0);
 			assertEquals(15*2, p.pixel.x, 1e-8);
@@ -160,7 +164,7 @@ public class TestSiftDetector extends BoofStandardJUnit {
 			upper.set(x, y, sign*80);
 			lower.set(x, y, sign*90);
 
-			alg.processFeatureCandidate(15, 16, 100, sign > 0);
+			alg.createDetection(15, 16, 100, sign > 0);
 
 			ScalePoint p = alg.getDetections().get(0);
 			// make sure it is close
@@ -178,7 +182,7 @@ public class TestSiftDetector extends BoofStandardJUnit {
 			lower.set(x, y, sign*80);
 
 			alg.detectionsAll.reset();
-			alg.processFeatureCandidate(15, 16, 100, sign > 0);
+			alg.createDetection(15, 16, 100, sign > 0);
 			assertTrue(Math.abs(5 - p.scale) < 2);
 			assertTrue(5 < p.scale);
 		}
@@ -204,12 +208,12 @@ public class TestSiftDetector extends BoofStandardJUnit {
 	}
 
 	private SiftDetector createDetector() {
-		SiftScaleSpace ss = new SiftScaleSpace(-1, 5, 3, 1.6);
+
 		NonMaxLimiter nonmax = FactoryFeatureExtractor.nonmaxLimiter(
 				new ConfigExtract(1, 0, 1, true, true, true),
 				ConfigSelectLimit.selectBestN(), 1000);
 		FeatureSelectLimitIntensity<ScalePoint> selectorAll = FactorySelectLimit.intensity(ConfigSelectLimit.selectBestN());
-		return new SiftDetector(ss, selectorAll, 10, nonmax);
+		return new SiftDetector(selectorAll, 10, nonmax);
 	}
 
 	/**
@@ -223,12 +227,14 @@ public class TestSiftDetector extends BoofStandardJUnit {
 		var input = new GrayF32(100, 120);
 		GImageMiscOps.fillUniform(input, rand, 0, 255);
 
-		detector.process(input);
+		ss.process(input);
+		detector.process(ss);
 		int countUnlimited = detector.getDetections().size();
 
 		// hardly limit it
 		detector.getExtractor().setMaxTotalFeatures(5);
-		detector.process(input);
+		ss.process(input);
+		detector.process(ss);
 		int countLimited = detector.getDetections().size();
 		assertTrue(countLimited >= 5);
 		assertTrue(countLimited*2 < countUnlimited);
@@ -244,19 +250,22 @@ public class TestSiftDetector extends BoofStandardJUnit {
 		var input = new GrayF32(100, 120);
 		GImageMiscOps.fillUniform(input, rand, 0, 255);
 
-		detector.process(input);
+		ss.process(input);
+		detector.process(ss);
 		int countUnlimited = detector.getDetections().size();
 		assertTrue(countUnlimited >= 30);
 
 		// force it to be a smaller number
 		detector.maxFeaturesAll = countUnlimited/2;
-		detector.process(input);
+		ss.process(input);
+		detector.process(ss);
 		int countLimited = detector.getDetections().size();
 		assertEquals(countUnlimited/2, countLimited);
 
 		// force it to be a larger number
 		detector.maxFeaturesAll = countUnlimited*2;
-		detector.process(input);
+		ss.process(input);
+		detector.process(ss);
 		countLimited = detector.getDetections().size();
 		assertEquals(countUnlimited, countLimited);
 	}

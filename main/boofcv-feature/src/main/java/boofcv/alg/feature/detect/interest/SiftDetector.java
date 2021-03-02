@@ -60,7 +60,7 @@ import static boofcv.alg.feature.detect.interest.FastHessianFeatureDetector.poly
  * regions in the DoG images above and below it. {@link #isScaleSpaceExtremum}
  * <li>Detect false positive edges using trace and determinant from Hessian of DoG image</li>
  * <li>Interpolate feature's (x,y,sigma) coordinate using the peak of a 2nd order polynomial (quadratic).
- * {@link #processFeatureCandidate}</li>
+ * {@link #createDetection}</li>
  * </ol>
  * <p>Where N is the number of scale parameters.  There are N+3 scale images and N+2 DoG images in an octave.
  *
@@ -89,11 +89,8 @@ import static boofcv.alg.feature.detect.interest.FastHessianFeatureDetector.poly
  */
 public class SiftDetector {
 
-	// image pyramid that it processes
-	protected SiftScaleSpace scaleSpace;
-
 	// conversion factor to go from pixel coordinate in current octave to input image
-	protected double pixelScaleToInput;
+	double pixelScaleToInput;
 
 	// edge detector threshold
 	// In the paper this is (r+1)**2/r
@@ -103,7 +100,7 @@ public class SiftDetector {
 	public int maxFeaturesAll = -1;
 
 	// all the found detections in a single octave
-	protected DogArray<ScalePoint> detectionsAll = new DogArray<>(ScalePoint::new);
+	protected DogArray<SiftPoint> detectionsAll = new DogArray<>(SiftPoint::new);
 
 	// Computes image derivatives. used in edge rejection
 	ImageConvolveSparse<GrayF32, ?> derivXX;
@@ -120,18 +117,16 @@ public class SiftDetector {
 	private @Getter NonMaxLimiter extractor;
 
 	// Used to select features from the combined set when there are too many
-	private FeatureSelectLimitIntensity<ScalePoint> selectFeaturesAll;
-	private FastArray<ScalePoint> selectedAll = new FastArray<>(ScalePoint.class);
+	private FeatureSelectLimitIntensity<SiftPoint> selectFeaturesAll;
+	private FastArray<SiftPoint> selectedAll = new FastArray<>(SiftPoint.class);
 
 	/**
 	 * Configures SIFT detector
 	 *
-	 * @param scaleSpace Provides the scale space
 	 * @param edgeR Threshold used to remove edge responses.  Larger values means its less strict.  Try 10
 	 * @param extractor Spatial feature detector that can be configured to limit the number of detected features in each scale.
 	 */
-	public SiftDetector( SiftScaleSpace scaleSpace,
-						 FeatureSelectLimitIntensity<ScalePoint> selectFeaturesAll,
+	public SiftDetector( FeatureSelectLimitIntensity<ScalePoint> selectFeaturesAll,
 						 double edgeR,
 						 NonMaxLimiter extractor ) {
 		if (!extractor.getNonmax().canDetectMaximums() || !extractor.getNonmax().canDetectMinimums())
@@ -144,11 +139,10 @@ public class SiftDetector {
 			throw new RuntimeException("Non-max should have an ignore border of 1");
 		}
 
-		this.scaleSpace = scaleSpace;
 		this.extractor = extractor;
 
 		this.edgeThreshold = (edgeR + 1)*(edgeR + 1)/edgeR;
-		this.selectFeaturesAll = selectFeaturesAll;
+		this.selectFeaturesAll = (FeatureSelectLimitIntensity)selectFeaturesAll;
 		selectFeaturesAll.setSampler(new SampleIntensityScalePoint());
 
 		createSparseDerivatives();
@@ -177,37 +171,41 @@ public class SiftDetector {
 	/**
 	 * Detects SIFT features inside the input image
 	 *
-	 * @param input Input image.  Not modified.
+	 * @param scaleSpace (Input) Precomputed scale space. Not modified.
 	 */
-	public void process( GrayF32 input ) {
-
-		scaleSpace.initialize(input);
+	public void process( SiftScaleSpace scaleSpace ) {
 		detectionsAll.reset();
+		selectedAll.reset();
 
-		do {
+		for (int octaveIdx = 0; octaveIdx < scaleSpace.octaves.length; octaveIdx++) {
+			if (scaleSpace.isOctaveTooSmall(octaveIdx))
+				break;
+			int octave = octaveIdx + scaleSpace.firstOctave;
+			SiftScaleSpace.Octave o = scaleSpace.octaves[octaveIdx];
+
 			// scale from octave to input image
-			pixelScaleToInput = scaleSpace.pixelScaleCurrentToInput();
+			pixelScaleToInput = scaleSpace.pixelScaleCurrentToInput(octave);
 
 			// detect features in the image
-			for (int j = 1; j < scaleSpace.getNumScales() + 1; j++) {
-
+			for (int scaleIdx = 1; scaleIdx < scaleSpace.getNumScales() + 1; scaleIdx++) {
 				// not really sure how to compute the scale for features found at a particular DoG image
 				// using the average resulted in less visually appealing circles in a test image
-				sigmaLower = scaleSpace.computeSigmaScale(j - 1);
-				sigmaTarget = scaleSpace.computeSigmaScale(j);
-				sigmaUpper = scaleSpace.computeSigmaScale(j + 1);
+				sigmaLower = scaleSpace.computeSigmaScale(octave, scaleIdx - 1);
+				sigmaTarget = scaleSpace.computeSigmaScale(octave, scaleIdx);
+				sigmaUpper = scaleSpace.computeSigmaScale(octave, scaleIdx + 1);
 
 				// grab the local DoG scale space images
-				dogLower = scaleSpace.getDifferenceOfGaussian(j - 1);
-				dogTarget = scaleSpace.getDifferenceOfGaussian(j);
-				dogUpper = scaleSpace.getDifferenceOfGaussian(j + 1);
+				dogLower = o.differenceOfGaussian[scaleIdx - 1];
+				dogTarget = o.differenceOfGaussian[scaleIdx];
+				dogUpper = o.differenceOfGaussian[scaleIdx + 1];
 
-				detectFeatures(j);
+				detectFeatures(octaveIdx, scaleIdx);
 			}
-		} while (scaleSpace.computeNextOctave());
+		}
 
 		if (maxFeaturesAll > 0)
-			selectFeaturesAll.select(null, input.width, input.height, true, null, detectionsAll, maxFeaturesAll, selectedAll);
+			selectFeaturesAll.select(null, scaleSpace.getOriginalWidth(), scaleSpace.getOriginalHeight(),
+					true, null, detectionsAll, maxFeaturesAll, selectedAll);
 	}
 
 	/**
@@ -216,7 +214,7 @@ public class SiftDetector {
 	 * @param scaleIndex Which scale in the octave is it detecting features inside up.
 	 * Primarily provided here for use in child classes.
 	 */
-	protected void detectFeatures( int scaleIndex ) {
+	protected void detectFeatures(int octaveIndex, int scaleIndex) {
 		extractor.process(dogTarget);
 		FastAccess<NonMaxLimiter.LocalExtreme> found = extractor.getFeatures();
 
@@ -228,7 +226,12 @@ public class SiftDetector {
 			NonMaxLimiter.LocalExtreme e = found.get(i);
 
 			if (isScaleSpaceExtremum(e.location.x, e.location.y, e.intensity, e.max ? 1f : -1f)) {
-				processFeatureCandidate(e.location.x, e.location.y, e.intensity, e.max);
+				if (isEdge(e.location.x, e.location.y))
+					continue;
+
+				SiftPoint p = createDetection(e.location.x, e.location.y, e.intensity, e.max);
+				p.octaveIdx = (byte)octaveIndex;
+				p.scaleIdx = (byte)scaleIndex;
 			}
 		}
 	}
@@ -273,11 +276,7 @@ public class SiftDetector {
 	 * @param positiveIntensity value of the extremum. Positive intensity value.
 	 * @param maximum true if it was a maximum
 	 */
-	protected void processFeatureCandidate( int x, int y, float positiveIntensity, boolean maximum ) {
-		// suppress response along edges
-		if (isEdge(x, y))
-			return;
-
+	protected SiftPoint createDetection( int x, int y, float positiveIntensity, boolean maximum ) {
 		// Estimate the scale and 2D point by fitting 2nd order polynomials
 		// This is different from the original paper
 		float signAdj = maximum ? 1 : -1;
@@ -290,7 +289,7 @@ public class SiftDetector {
 		float s0 = dogLower.unsafe_get(x, y)*signAdj;
 		float s2 = dogUpper.unsafe_get(x, y)*signAdj;
 
-		ScalePoint p = detectionsAll.grow();
+		SiftPoint p = detectionsAll.grow();
 
 		// Compute the interpolated coordinate of the point in the original image coordinates
 		p.pixel.x = pixelScaleToInput*(x + polyPeak(x0, positiveIntensity, x2));
@@ -310,16 +309,8 @@ public class SiftDetector {
 		// Set the intensity to a positive value
 		p.intensity = positiveIntensity;
 
-		handleDetection(p);
+		return p;
 	}
-
-	/**
-	 * Function for handling a detected point.  Does nothing here, but can be used by a child class
-	 * to process detections
-	 *
-	 * @param p Detected point in scale-space.
-	 */
-	protected void handleDetection( ScalePoint p ) {}
 
 	/**
 	 * Performs an edge test to remove false positives.  See 4.1 in [1].
@@ -349,7 +340,18 @@ public class SiftDetector {
 	/**
 	 * All the found and selected detections across scale space
 	 */
-	public List<ScalePoint> getDetections() {
+	public List<SiftPoint> getDetections() {
 		return (maxFeaturesAll > 0 ? selectedAll : detectionsAll).toList();
+	}
+
+	/**
+	 * Adds information about the scale space it was detected in for quick reference when
+	 * computing the descriptor
+	 */
+	public static class SiftPoint extends ScalePoint {
+		/** Which octave the point was detected in */
+		public byte octaveIdx;
+		/** The scale the point was detected in */
+		public byte scaleIdx;
 	}
 }

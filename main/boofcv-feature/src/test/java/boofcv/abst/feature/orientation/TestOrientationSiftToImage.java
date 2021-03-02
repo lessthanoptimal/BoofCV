@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -38,9 +38,7 @@ public class TestOrientationSiftToImage extends GenericOrientationImageTests<Gra
 
 		SiftScaleSpace ss = new SiftScaleSpace(-1,5,3,1.6);
 		OrientationHistogramSift<GrayF32> orig = FactoryOrientationAlgs.sift(null,GrayF32.class);
-
-		OrientationSiftToImage<GrayF32> alg =
-				new OrientationSiftToImage<>(orig,ss,GrayF32.class);
+		OrientationSiftToImage<GrayF32> alg = new OrientationSiftToImage<>(orig,ss,GrayF32.class);
 
 		setRegionOrientation(alg);
 	}

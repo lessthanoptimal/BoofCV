@@ -18,7 +18,6 @@
 
 package boofcv.factory.feature.detect.interest;
 
-import boofcv.abst.feature.describe.ConfigSiftScaleSpace;
 import boofcv.abst.feature.detect.extract.ConfigExtract;
 import boofcv.abst.feature.detect.extract.NonMaxLimiter;
 import boofcv.abst.feature.detect.extract.NonMaxSuppression;
@@ -209,20 +208,14 @@ public class FactoryInterestPointAlgs {
 	/**
 	 * Creates a SIFT detector
 	 */
-	public static SiftDetector sift( @Nullable ConfigSiftScaleSpace configSS, @Nullable ConfigSiftDetector configDetector ) {
-
-		if (configSS == null)
-			configSS = new ConfigSiftScaleSpace();
-
+	public static SiftDetector sift( @Nullable ConfigSiftDetector configDetector ) {
 		if (configDetector == null)
 			configDetector = new ConfigSiftDetector();
 
 		NonMaxLimiter nonmax = FactoryFeatureExtractor.nonmaxLimiter(
 				configDetector.extract, configDetector.selector, configDetector.maxFeaturesPerScale);
-		SiftScaleSpace ss = new SiftScaleSpace(configSS.firstOctave, configSS.lastOctave,
-				configSS.numScales, configSS.sigma0);
 		FeatureSelectLimitIntensity<ScalePoint> selectorAll = FactorySelectLimit.intensity(configDetector.selector);
-		final var alg = new SiftDetector(ss, selectorAll, configDetector.edgeR, nonmax);
+		final var alg = new SiftDetector(selectorAll, configDetector.edgeR, nonmax);
 		alg.maxFeaturesAll = configDetector.maxFeaturesAll;
 		return alg;
 	}

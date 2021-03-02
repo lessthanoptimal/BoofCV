@@ -24,10 +24,12 @@ Version : 0.38
   * Fixed reading of second format region. Thanks DCNick3 for finding the issue!
 - Image Features
   * Fast Corners are now concurrent
-  * TODO SIFT fixed bug where it was not respecting maximum features
+  * SIFT fixed bug where it was not respecting maximum features
+  * SIFT scale space is now computed as described in 2004 paper with no (intentional) modifications
   * TODO SIFT fully concurrent implementation is now available
 - Image Processing
   * TODO Wolf Binarization https://github.com/lessthanoptimal/BoofCV/issues/124
+  * TODO make sure everything SIFT touches doesn't go threaded if too small
 - Image Stitching
   * TODO N-View stitching https://github.com/lessthanoptimal/BoofCV/issues/167
 - Image Recognition

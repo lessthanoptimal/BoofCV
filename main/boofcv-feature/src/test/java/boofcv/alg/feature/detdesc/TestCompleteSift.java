@@ -22,6 +22,7 @@ import boofcv.abst.feature.detect.extract.ConfigExtract;
 import boofcv.abst.feature.detect.extract.NonMaxLimiter;
 import boofcv.abst.feature.detect.extract.NonMaxSuppression;
 import boofcv.alg.feature.describe.DescribePointSift;
+import boofcv.alg.feature.detect.interest.SiftDetector;
 import boofcv.alg.feature.detect.interest.SiftScaleSpace;
 import boofcv.alg.feature.orientation.OrientationHistogramSift;
 import boofcv.alg.misc.GImageMiscOps;
@@ -80,12 +81,14 @@ public class TestCompleteSift extends BoofStandardJUnit {
 		GImageMiscOps.fillUniform(image, rand, 0, 200);
 
 		CompleteSift alg = createAlg();
-		alg.maxFeaturesAll = desiredMax;
+		alg.detector.maxFeaturesAll = desiredMax;
 		alg.process(image);
 
-		assertEquals(desiredMax, alg.getLocations().size);
-		assertEquals(desiredMax, alg.getOrientations().size);
-		assertEquals(desiredMax, alg.getDescriptions().size);
+		// Testing max feature is a bit problematic. While the detector respects it, each detection can have more
+		// than one angle resulting in multiple features
+		assertTrue(desiredMax*2 >= alg.getLocations().size);
+		assertEquals( alg.getLocations().size, alg.getOrientations().size);
+		assertEquals( alg.getLocations().size, alg.getDescriptions().size);
 	}
 
 	private CompleteSift createAlg() {
@@ -98,7 +101,9 @@ public class TestCompleteSift extends BoofStandardJUnit {
 				new OrientationHistogramSift<>(36, 1.5, GrayF32.class);
 		DescribePointSift<GrayF32> describe =
 				new DescribePointSift<>(4, 4, 8, 1.5, 0.5, 0.2, GrayF32.class);
+		SiftDetector detector = new SiftDetector(FactorySelectLimit.
+				intensity(ConfigSelectLimit.selectBestN()), 10, limiter);
 
-		return new CompleteSift(ss, FactorySelectLimit.intensity(ConfigSelectLimit.selectBestN()), 10, limiter, ori, describe);
+		return new CompleteSift(ss, detector, ori, describe);
 	}
 }
