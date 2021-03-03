@@ -80,6 +80,9 @@ public class CompleteSift {
 		features = new DogArray<>(() -> new TupleDesc_F64(dof));
 	}
 
+	/**
+	 * Detects features inside the image and computes descriptors
+	 */
 	public void process( GrayF32 input ) {
 		// Clear previous results
 		features.reset();

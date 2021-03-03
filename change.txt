@@ -24,9 +24,9 @@ Version : 0.38
   * Fixed reading of second format region. Thanks DCNick3 for finding the issue!
 - Image Features
   * Fast Corners are now concurrent
-  * SIFT fixed bug where it was not respecting maximum features
-  * SIFT scale space is now computed as described in 2004 paper with no (intentional) modifications
-  * TODO SIFT fully concurrent implementation is now available
+  * SIFT the entire scale space is computed at once. This might result in a net ~10% increase memory.
+  * SIFT fixed bug where it was not respecting maximum feature detections.
+  * SIFT concurrent implementation is running. Single thread is about 3% slower.
 - Image Processing
   * TODO Wolf Binarization https://github.com/lessthanoptimal/BoofCV/issues/124
   * TODO make sure everything SIFT touches doesn't go threaded if too small
