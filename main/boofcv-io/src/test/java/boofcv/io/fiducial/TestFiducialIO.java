@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -45,13 +45,13 @@ class TestFiducialIO extends BoofStandardJUnit {
 		expected.markerHeight = 120;
 
 		for (int i = 0; i < 2; i++) {
-			expected.markers.add(UtilPoint2D_F64.random(-1,1,10+i,rand));
+			expected.markers.add(UtilPoint2D_F64.random(-1, 1, 10 + i, rand));
 		}
 
 		ByteArrayOutputStream stream = new ByteArrayOutputStream();
-		FiducialIO.saveRandomDotYaml(expected,new OutputStreamWriter(stream));
+		FiducialIO.saveRandomDotYaml(expected, new OutputStreamWriter(stream, UTF_8));
 
-		Reader reader = new InputStreamReader(new ByteArrayInputStream(stream.toByteArray()),UTF_8);
+		Reader reader = new InputStreamReader(new ByteArrayInputStream(stream.toByteArray()), UTF_8);
 		RandomDotDefinition found = FiducialIO.loadRandomDotYaml(reader);
 
 		assertEquals(expected.randomSeed, found.randomSeed);
@@ -70,7 +70,7 @@ class TestFiducialIO extends BoofStandardJUnit {
 			assertEquals(a.size(), b.size());
 
 			for (int j = 0; j < a.size(); j++) {
-				assertEquals(0,a.get(j).distance(b.get(j)), UtilEjml.TEST_F64);
+				assertEquals(0, a.get(j).distance(b.get(j)), UtilEjml.TEST_F64);
 			}
 		}
 	}

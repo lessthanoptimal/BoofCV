@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -30,6 +30,8 @@ import org.junit.jupiter.api.Test;
 
 import java.awt.image.BufferedImage;
 import java.io.IOException;
+import java.io.OutputStream;
+import java.io.PrintStream;
 
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
@@ -43,6 +45,8 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 public class TestCreateCalibrationTarget extends CommonFiducialPdfChecks {
 
 	public void createDocument( String args ) {
+		// suppress stdout
+		out.out = new PrintStream(new OutputStream(){@Override public void write( int b ){}});
 		CreateCalibrationTarget.main(args.split("\\s+"));
 		out.used = false; // this will ignore the stdout usage which is unavoidable
 		err.used = false;

@@ -468,12 +468,12 @@ public class CalibrationIO {
 	 * @param inputFile (Input) path to input image
 	 * @param detector (Input) description of the detector
 	 * @param landmarks (Input) detected landmarks
-	 * @param outputWriter (Output) where results are writetn to
+	 * @param outputStream (Output) where results are writetn to
 	 */
 	public static void saveLandmarksCsv( String inputFile,
 										 String detector,
 										 CalibrationObservation landmarks, OutputStream outputStream ) {
-		PrintWriter out = new PrintWriter(outputStream);
+		var out = new PrintWriter(new OutputStreamWriter(outputStream, UTF_8));
 
 		out.println("# Landmarks detected on a calibration target");
 		out.println("# " + inputFile);
@@ -498,7 +498,7 @@ public class CalibrationIO {
 	public static CalibrationObservation loadLandmarksCsv( InputStream input ) {
 		var ret = new CalibrationObservation();
 
-		StringBuilder buffer = new StringBuilder();
+		var buffer = new StringBuilder();
 		try {
 			while (true) {
 				String line = UtilIO.readLine(input, buffer);

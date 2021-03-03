@@ -47,7 +47,7 @@ class TestSerializeConfigYaml extends BoofStandardJUnit {
 		orig.valC = "Test";
 
 		ByteArrayOutputStream stream = new ByteArrayOutputStream();
-		SerializeConfigYaml.serialize(orig, new OutputStreamWriter(stream));
+		SerializeConfigYaml.serialize(orig, new OutputStreamWriter(stream, UTF_8));
 
 		Reader reader = new InputStreamReader(new ByteArrayInputStream(stream.toByteArray()), UTF_8);
 		ConfigBoof found = SerializeConfigYaml.deserialize(reader);

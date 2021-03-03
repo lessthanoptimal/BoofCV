@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -26,6 +26,8 @@ import boofcv.struct.image.GrayF32;
 import org.junit.jupiter.api.Test;
 
 import java.io.IOException;
+import java.io.OutputStream;
+import java.io.PrintStream;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
@@ -37,6 +39,8 @@ public class TestCreateFiducialSquareBinary extends CommonFiducialPdfChecks {
 	private final ConfigThreshold configThreshold = ConfigThreshold.fixed(125);
 
 	public void createDocument( String args ) throws InterruptedException {
+		// suppress stdout
+		out.out = new PrintStream(new OutputStream(){@Override public void write( int b ){}});
 		CreateFiducialSquareBinary.main(args.split("\\s+"));
 		out.used = false; // this will ignore the stdout usage which is unavoidable
 		err.used = false;

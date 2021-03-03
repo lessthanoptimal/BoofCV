@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -18,7 +18,6 @@
 
 package boofcv.alg.sfm;
 
-import boofcv.alg.geo.PerspectiveOps;
 import boofcv.alg.geo.RectifyImageOps;
 import boofcv.alg.misc.ImageStatistics;
 import boofcv.struct.calib.CameraPinholeBrown;
@@ -31,7 +30,6 @@ import georegression.struct.EulerType;
 import georegression.struct.point.Point2D_F64;
 import georegression.struct.point.Point3D_F64;
 import georegression.struct.se.Se3_F64;
-import org.ejml.data.DMatrixRMaj;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -93,8 +91,6 @@ public class TestStereoProcessingBase extends BoofStandardJUnit {
 		Point3D_F64 X = new Point3D_F64(-0.01, 0.1, 3);
 
 		StereoParameters param = createStereoParam(width, height);
-
-		DMatrixRMaj K = PerspectiveOps.pinholeToMatrix(param.left, (DMatrixRMaj)null);
 
 		// compute the view in pixels of the point in the left and right cameras
 		Point2D_F64 lensLeft = new Point2D_F64();
