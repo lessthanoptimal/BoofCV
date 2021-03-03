@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -88,7 +88,6 @@ public class GenerateConvolveNormalizedNaive_IL extends CodeGeneratorBase {
 		String kernelType = input.getKernelType();
 		String inputType = input.getInterleavedName();
 		String outputType = output.getInterleavedName();
-		String kernelData = input.getSumType();
 		String sumType = input.getSumType();
 
 		printVertical2(kernelType, inputType, outputType, sumType);

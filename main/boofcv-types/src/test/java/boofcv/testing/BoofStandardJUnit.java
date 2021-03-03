@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -60,7 +60,7 @@ public class BoofStandardJUnit {
 
 	public static class MirrorStream extends OutputStream {
 
-		PrintStream out;
+		public PrintStream out;
 		public boolean used = false;
 
 		public MirrorStream( PrintStream out ) {

@@ -38,6 +38,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 
+import static java.nio.charset.StandardCharsets.UTF_8;
 import static org.junit.jupiter.api.Assertions.*;
 
 /**
@@ -50,10 +51,10 @@ class TestMultiViewIO extends BoofStandardJUnit {
 			PairwiseImageGraph expected = createPairwise();
 
 			var output = new ByteArrayOutputStream();
-			MultiViewIO.save(expected, new OutputStreamWriter(output));
+			MultiViewIO.save(expected, new OutputStreamWriter(output, UTF_8));
 
 			var input = new ByteArrayInputStream(output.toByteArray());
-			PairwiseImageGraph found = MultiViewIO.load(new InputStreamReader(input), (PairwiseImageGraph)null);
+			PairwiseImageGraph found = MultiViewIO.load(new InputStreamReader(input, UTF_8), (PairwiseImageGraph)null);
 			checkIdentical(expected, found);
 		}
 	}
@@ -143,10 +144,10 @@ class TestMultiViewIO extends BoofStandardJUnit {
 			SceneWorkingGraph expected = createWorkingGraph(pairwise);
 
 			var output = new ByteArrayOutputStream();
-			MultiViewIO.save(expected, new OutputStreamWriter(output));
+			MultiViewIO.save(expected, new OutputStreamWriter(output, UTF_8));
 
 			var input = new ByteArrayInputStream(output.toByteArray());
-			SceneWorkingGraph found = MultiViewIO.load(new InputStreamReader(input), pairwise, null);
+			SceneWorkingGraph found = MultiViewIO.load(new InputStreamReader(input, UTF_8), pairwise, null);
 			checkIdentical(expected, found);
 		}
 	}
@@ -231,10 +232,10 @@ class TestMultiViewIO extends BoofStandardJUnit {
 			SceneStructureMetric expected = createSceneStructureMetric();
 
 			var output = new ByteArrayOutputStream();
-			MultiViewIO.save(expected, new OutputStreamWriter(output));
+			MultiViewIO.save(expected, new OutputStreamWriter(output, UTF_8));
 
 			var input = new ByteArrayInputStream(output.toByteArray());
-			SceneStructureMetric found = MultiViewIO.load(new InputStreamReader(input), (SceneStructureMetric)null);
+			SceneStructureMetric found = MultiViewIO.load(new InputStreamReader(input, UTF_8), (SceneStructureMetric)null);
 			assertTrue(expected.isIdentical(found, UtilEjml.TEST_F64));
 		}
 	}

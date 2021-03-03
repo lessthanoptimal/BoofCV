@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -34,6 +34,8 @@ import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
+import java.io.OutputStream;
+import java.io.PrintStream;
 import java.util.Objects;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -49,6 +51,8 @@ class TestCreateFiducialSquareImage extends CommonFiducialPdfChecks {
 			new String[]{"temp0.jpg", "temp1.jpg"};
 
 	private void createDocument( String args ) throws IOException {
+		// suppress stdout
+		out.out = new PrintStream(new OutputStream(){@Override public void write( int b ){}});
 		CreateFiducialSquareImage.main(args.split("\\s+"));
 		out.used = false; // this will ignore the stdout usage which is unavoidable
 		err.used = false;

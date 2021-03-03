@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -32,6 +32,7 @@ import java.nio.ByteOrder;
 import java.util.ArrayList;
 import java.util.List;
 
+import static java.nio.charset.StandardCharsets.UTF_8;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 /**
@@ -42,19 +43,19 @@ class TestPlyCodec extends BoofStandardJUnit {
 	void encode_decode_3D_ascii() throws IOException {
 		List<Point3D_F64> expected = new ArrayList<>();
 		for (int i = 0; i < 10; i++) {
-			expected.add( new Point3D_F64(i*123.45,i-1.01,i+2.34));
+			expected.add(new Point3D_F64(i*123.45, i - 1.01, i + 2.34));
 		}
 
 		DogArray<Point3D_F64> found = new DogArray<>(Point3D_F64::new);
 
 		Writer output = new StringWriter();
-		PlyCodec.saveAscii(PointCloudReader.wrapF64(expected),false,output);
-		InputStream input = new ByteArrayInputStream(output.toString().getBytes());
+		PlyCodec.saveAscii(PointCloudReader.wrapF64(expected), false, output);
+		InputStream input = new ByteArrayInputStream(output.toString().getBytes(UTF_8));
 		PlyCodec.read(input, PointCloudWriter.wrapF64(found));
 
-		assertEquals(expected.size(),found.size);
+		assertEquals(expected.size(), found.size);
 		for (int i = 0; i < found.size; i++) {
-			assertEquals(0.0,found.get(i).distance(expected.get(i)), UtilEjml.TEST_F64);
+			assertEquals(0.0, found.get(i).distance(expected.get(i)), UtilEjml.TEST_F64);
 		}
 	}
 
@@ -62,25 +63,25 @@ class TestPlyCodec extends BoofStandardJUnit {
 	void encode_decode_3DRGB_ascii() throws IOException {
 		List<Point3dRgbI_F64> expected = new ArrayList<>();
 		for (int i = 0; i < 10; i++) {
-			int r = (10*i)&0xFF;
-			int g = (28*i)&0xFF;
-			int b = (58*i)&0xFF;
+			int r = (10*i) & 0xFF;
+			int g = (28*i) & 0xFF;
+			int b = (58*i) & 0xFF;
 
 			int rgb = r << 16 | g << 16 | b;
 
-			expected.add( new Point3dRgbI_F64(i*123.45,i-1.01,i+2.34,rgb));
+			expected.add(new Point3dRgbI_F64(i*123.45, i - 1.01, i + 2.34, rgb));
 		}
 
 		DogArray<Point3dRgbI_F64> found = new DogArray<>(Point3dRgbI_F64::new);
 
 		Writer output = new StringWriter();
-		PlyCodec.saveAscii(PointCloudReader.wrapF64RGB(expected),true,output);
-		InputStream input = new ByteArrayInputStream(output.toString().getBytes());
-		PlyCodec.read(input,PointCloudWriter.wrapF64RGB(found));
+		PlyCodec.saveAscii(PointCloudReader.wrapF64RGB(expected), true, output);
+		InputStream input = new ByteArrayInputStream(output.toString().getBytes(UTF_8));
+		PlyCodec.read(input, PointCloudWriter.wrapF64RGB(found));
 
-		assertEquals(expected.size(),found.size);
+		assertEquals(expected.size(), found.size);
 		for (int i = 0; i < found.size; i++) {
-			assertEquals(0.0,found.get(i).distance(expected.get(i)), UtilEjml.TEST_F64);
+			assertEquals(0.0, found.get(i).distance(expected.get(i)), UtilEjml.TEST_F64);
 		}
 	}
 
@@ -88,10 +89,10 @@ class TestPlyCodec extends BoofStandardJUnit {
 	void encode_decode_3D_binary() throws IOException {
 		List<Point3D_F64> expected = new ArrayList<>();
 		for (int i = 0; i < 10; i++) {
-			expected.add(new Point3D_F64(i * 123.45, i - 1.01, i + 2.34));
+			expected.add(new Point3D_F64(i*123.45, i - 1.01, i + 2.34));
 		}
 
-		for( boolean asFloat : new boolean[]{true,false}) {
+		for (boolean asFloat : new boolean[]{true, false}) {
 			DogArray<Point3D_F64> found = new DogArray<>(Point3D_F64::new);
 
 			ByteArrayOutputStream output = new ByteArrayOutputStream();
@@ -111,16 +112,16 @@ class TestPlyCodec extends BoofStandardJUnit {
 	void encode_decode_3DRGB_binary() throws IOException {
 		List<Point3dRgbI_F64> expected = new ArrayList<>();
 		for (int i = 0; i < 10; i++) {
-			int r = (10*i)&0xFF;
-			int g = (28*i)&0xFF;
-			int b = (58*i)&0xFF;
+			int r = (10*i) & 0xFF;
+			int g = (28*i) & 0xFF;
+			int b = (58*i) & 0xFF;
 
 			int rgb = r << 16 | g << 16 | b;
 
-			expected.add( new Point3dRgbI_F64(i*123.45,i-1.01,i+2.34,rgb));
+			expected.add(new Point3dRgbI_F64(i*123.45, i - 1.01, i + 2.34, rgb));
 		}
 
-		for( boolean asFloat : new boolean[]{true,false}) {
+		for (boolean asFloat : new boolean[]{true, false}) {
 			DogArray<Point3dRgbI_F64> found = new DogArray<>(Point3dRgbI_F64::new);
 
 			ByteArrayOutputStream output = new ByteArrayOutputStream();
@@ -135,5 +136,4 @@ class TestPlyCodec extends BoofStandardJUnit {
 			}
 		}
 	}
-
 }
