@@ -54,7 +54,7 @@ public class TestUnrollSiftScaleSpaceGradient extends BoofStandardJUnit {
 			int octave = octaveIdx + ss.firstOctave;
 			SiftScaleSpace.Octave o = ss.octaves[octaveIdx];
 			for (int scale = 0; scale < ss.getNumScales(); scale++, total++) {
-				GrayF32 scaleImage = o.scales[scale];
+				GrayF32 scaleImage = o.scales[scale+1];
 
 				derivX.reshape(scaleImage.width, scaleImage.height);
 				derivY.reshape(scaleImage.width, scaleImage.height);

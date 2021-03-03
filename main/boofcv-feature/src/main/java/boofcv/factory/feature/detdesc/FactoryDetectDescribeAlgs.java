@@ -25,9 +25,11 @@ import boofcv.abst.feature.detect.interest.ConfigSiftDetector;
 import boofcv.abst.feature.orientation.ConfigSiftOrientation;
 import boofcv.alg.feature.describe.DescribePointSift;
 import boofcv.alg.feature.detdesc.CompleteSift;
+import boofcv.alg.feature.detdesc.CompleteSift_MT;
 import boofcv.alg.feature.detect.interest.SiftDetector;
 import boofcv.alg.feature.detect.interest.SiftScaleSpace;
 import boofcv.alg.feature.orientation.OrientationHistogramSift;
+import boofcv.concurrency.BoofConcurrency;
 import boofcv.factory.feature.detect.interest.FactoryInterestPointAlgs;
 import boofcv.struct.image.GrayF32;
 import org.jetbrains.annotations.Nullable;
@@ -45,18 +47,29 @@ public class FactoryDetectDescribeAlgs {
 		ConfigSiftOrientation configOri = config.orientation;
 		ConfigSiftDescribe configDesc = config.describe;
 
-		OrientationHistogramSift<GrayF32> orientation = new OrientationHistogramSift<>(
-				configOri.histogramSize, configOri.sigmaEnlarge, GrayF32.class);
-
-		DescribePointSift<GrayF32> describe = new DescribePointSift<>(
-				configDesc.widthSubregion, configDesc.widthGrid, configDesc.numHistogramBins,
-				configDesc.sigmaToPixels, configDesc.weightingSigmaFraction,
-				configDesc.maxDescriptorElementValue, GrayF32.class);
-
-		var ss = new SiftScaleSpace(configSS.firstOctave,configSS.lastOctave,configSS.numScales,configSS.sigma0);
+		var ss = new SiftScaleSpace(configSS.firstOctave, configSS.lastOctave, configSS.numScales, configSS.sigma0);
 		SiftDetector detector = FactoryInterestPointAlgs.sift(configDetector);
 		detector.maxFeaturesAll = configDetector.maxFeaturesAll;
 
-		return new CompleteSift(ss, detector, orientation, describe);
+		// Create the threaded variant if requested
+		if (BoofConcurrency.USE_CONCURRENT) {
+			return new CompleteSift_MT(ss, detector,
+					() -> new OrientationHistogramSift<>(
+							configOri.histogramSize, configOri.sigmaEnlarge, GrayF32.class),
+					() -> new DescribePointSift<>(
+							configDesc.widthSubregion, configDesc.widthGrid, configDesc.numHistogramBins,
+							configDesc.sigmaToPixels, configDesc.weightingSigmaFraction,
+							configDesc.maxDescriptorElementValue, GrayF32.class));
+		} else {
+			OrientationHistogramSift<GrayF32> orientation = new OrientationHistogramSift<>(
+					configOri.histogramSize, configOri.sigmaEnlarge, GrayF32.class);
+
+			DescribePointSift<GrayF32> describe = new DescribePointSift<>(
+					configDesc.widthSubregion, configDesc.widthGrid, configDesc.numHistogramBins,
+					configDesc.sigmaToPixels, configDesc.weightingSigmaFraction,
+					configDesc.maxDescriptorElementValue, GrayF32.class);
+
+			return new CompleteSift(ss, detector, orientation, describe);
+		}
 	}
 }
