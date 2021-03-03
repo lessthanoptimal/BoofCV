@@ -43,7 +43,7 @@ New to Java? Make sure you have Java 14 or newer installed. In the command line 
 java -version
 openjdk version "14" 2020-03-17
 ```
-In this case I do have Java 14 installed. If you need to install/upgrade Java there are many options these days, such as [Zulu](https://www.azul.com/downloads/zulu-community/?package=jdk). A quick search should help if you need a more detailed explanation.
+In this case I do have Java 14 installed. If you need to install/upgrade Java there are many options these days, such as [Zulu](https://www.azul.com/downloads/zulu-community/?package=jdk). A quick search should help if you need a more detailed explanation. You should avoid anything with `-ea` in its name since that's a developmental version.
 
 You can now build and run?  Then run the commands below!  Each jar will open a window, then to run an application just double click on its name.
 
