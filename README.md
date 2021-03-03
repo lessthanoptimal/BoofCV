@@ -1,4 +1,4 @@
-[![Build Status](https://travis-ci.org/lessthanoptimal/BoofCV.svg?branch=master)](https://travis-ci.org/lessthanoptimal/BoofCV)
+[![Build Status](https://github.com/lessthanoptimal/BoofCV/actions/workflows/gradle.yml/badge.svg)](https://github.com/lessthanoptimal/BoofCV/actions/workflows/gradle.yml)
 [![Join the chat at https://gitter.im/lessthanoptimal/BoofCV](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/lessthanoptimal/BoofCV?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 [![Maven Central](https://img.shields.io/maven-central/v/org.boofcv/boofcv-core.svg)](https://maven-badges.herokuapp.com/maven-central/org.boofcv/boofcv-core)
 
@@ -38,12 +38,12 @@ git submodule update --init --recursive
 ```
 
 ## Quick Start Examples and Demonstrations
-New to Java? Make sure you have Java 11 or newer installed. In the command line type `java -version` and you should see something like:
+New to Java? Make sure you have Java 14 or newer installed. In the command line type `java -version` and you should see something like:
 ```bash
 java -version
 openjdk version "14" 2020-03-17
 ```
-In this case I have Java 14 installed. If you need to install java or upgrade just search for it to find up to date instructions.
+In this case I do have Java 14 installed. If you need to install/upgrade Java there are many options these days, such as [Zulu](https://www.azul.com/downloads/zulu-community/?package=jdk). A quick search should help if you need a more detailed explanation.
 
 You can now build and run?  Then run the commands below!  Each jar will open a window, then to run an application just double click on its name.
 
