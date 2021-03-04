@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -38,8 +38,6 @@ import org.kohsuke.args4j.Option;
 
 import java.awt.image.BufferedImage;
 import java.io.File;
-import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
 
 /**
@@ -52,17 +50,15 @@ public class BatchRemoveLensDistortion {
 	@Option(name = "-c", aliases = {"--Camera"},
 			usage="Path to camera intrinsics yaml")
 	String pathIntrinsic;
-	@Option(name = "-i", aliases = {"--Input"},
-			usage="Path to input directory")
-	String pathInput;
+	@Option(name = "-i", aliases = {"--Input"}, usage = "Directory or glob pattern or regex pattern.\n"+
+			"Glob example: 'glob:data/**/left*.jpg'\n" +
+			"Regex example: 'regex:data/\\w+/left\\d+.jpg'\n" +
+			"If not a pattern then it's assumed to be a path. All files with known image extensions in their name as added, e.g. jpg, png")
+	String inputPattern;
 	@Option(name = "-o", aliases = {"--Output"}, usage="Path to output directory")
-	String pathOutput;
-	@Option(name = "-r", aliases = {"--Regex"}, usage="Regex. Example: .*\\.jpg")
-	String regex;
+	String outputPath;
 	@Option(name = "--Rename", usage="Rename files")
 	boolean rename;
-	@Option(name = "--Recursive", usage="Should input directory be recursively searched")
-	boolean recursive;
 	@Option(name = "-a", aliases = {"--Adjustment"}, usage="none, expand, full_view")
 	String adjustmentName;
 	AdjustmentType adjustmentType;
@@ -75,16 +71,13 @@ public class BatchRemoveLensDistortion {
 	public BatchRemoveLensDistortion() {
 	}
 
-	public BatchRemoveLensDistortion(String pathIntrinsic, String pathInput, String pathOutput,
-									 String regex, boolean rename,
-									 boolean recursive, AdjustmentType adjustmentType,
-									 Listener listener ) {
+	public BatchRemoveLensDistortion( String pathIntrinsic, String inputPattern, String outputPath,
+									 boolean rename, AdjustmentType adjustmentType,
+									  Listener listener ) {
 		this.pathIntrinsic = pathIntrinsic;
-		this.pathInput = pathInput;
-		this.pathOutput = pathOutput;
-		this.regex = regex;
+		this.inputPattern = inputPattern;
+		this.outputPath = outputPath;
 		this.rename = rename;
-		this.recursive = recursive;
 		this.adjustmentType = adjustmentType;
 		this.listener = listener;
 	}
@@ -117,12 +110,11 @@ public class BatchRemoveLensDistortion {
 		cancel = false;
 		System.out.println("AdjustmentType = "+ adjustmentType);
 		System.out.println("rename         = "+ rename);
-		System.out.println("input path     = "+ pathInput);
-		System.out.println("name regex     = "+ regex);
-		System.out.println("output dir     = "+ pathOutput);
+		System.out.println("input pattern  = "+ inputPattern);
+		System.out.println("output dir     = "+ outputPath);
 
 
-		File fileOutputDir = new File(pathOutput);
+		File fileOutputDir = new File(outputPath);
 		if( !fileOutputDir.exists() ) {
 			if( !fileOutputDir.mkdirs() ) {
 				throw new RuntimeException("Output directory did not exist and failed to create it");
@@ -134,24 +126,26 @@ public class BatchRemoveLensDistortion {
 		CameraPinholeBrown param = CalibrationIO.load(pathIntrinsic);
 		CameraPinholeBrown paramAdj = new CameraPinholeBrown();
 
-		List<File> files = Arrays.asList(UtilIO.findMatches(new File(pathInput),regex));
-		Collections.sort(files);
+		List<String> paths = UtilIO.listSmartImages(inputPattern,false);
 
-		System.out.println("Found a total of "+files.size()+" matching files");
+		if (paths.isEmpty())
+			System.out.println("No inputs found. Bath path or pattern? "+inputPattern);
+
+		System.out.println("Found a total of "+paths.size()+" matching files");
 
 		Planar<GrayF32> distoredImg = new Planar<>(GrayF32.class,param.width,param.height,3);
 		Planar<GrayF32> undistoredImg = new Planar<>(GrayF32.class,param.width,param.height,3);
 
 		ImageDistort distort = LensDistortionOps.changeCameraModel(adjustmentType, BorderType.ZERO, param,
 				new CameraPinhole(param), paramAdj, (ImageType) distoredImg.getImageType());
-		CalibrationIO.save(paramAdj,new File(pathOutput,"intrinsicUndistorted.yaml").getAbsolutePath());
+		CalibrationIO.save(paramAdj,new File(outputPath,"intrinsicUndistorted.yaml").getAbsolutePath());
 
 		BufferedImage out = new BufferedImage(param.width,param.height,BufferedImage.TYPE_INT_RGB);
 
-		int numDigits = BoofMiscOps.numDigits(files.size()-1);
+		int numDigits = BoofMiscOps.numDigits(paths.size()-1);
 		String format = "%0"+numDigits+"d";
-		for( int i = 0; i < files.size(); i++ ) {
-			File file = files.get(i);
+		for( int i = 0; i < paths.size(); i++ ) {
+			File file = new File(paths.get(i));
 			System.out.println("processing " + file.getName());
 			BufferedImage orig = UtilImageIO.loadImage(file.getAbsolutePath());
 			if( orig == null ) {
@@ -177,7 +171,7 @@ public class BatchRemoveLensDistortion {
 				nameOut = file.getName().split("\\.")[0]+"_undistorted.png";
 			}
 
-			UtilImageIO.saveImage(out,new File(pathOutput,nameOut).getAbsolutePath());
+			UtilImageIO.saveImage(out,new File(outputPath,nameOut).getAbsolutePath());
 
 			if( cancel ) {
 				break;

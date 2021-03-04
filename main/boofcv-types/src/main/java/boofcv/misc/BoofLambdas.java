@@ -46,8 +46,12 @@ public interface BoofLambdas {
 		void process( T object );
 	}
 
-	@FunctionalInterface interface Filter<T> {
+	@FunctionalInterface interface Transform<T> {
 		T process( T object );
+	}
+
+	@FunctionalInterface interface Filter<T> {
+		boolean process( T object );
 	}
 
 	@FunctionalInterface interface ProcessI {

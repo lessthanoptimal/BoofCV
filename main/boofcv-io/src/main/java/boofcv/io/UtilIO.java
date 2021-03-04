@@ -20,6 +20,7 @@ package boofcv.io;
 
 import boofcv.BoofVersion;
 import boofcv.io.calibration.CalibrationIO;
+import boofcv.misc.BoofLambdas;
 import boofcv.struct.Configuration;
 import boofcv.struct.calib.CameraPinholeBrown;
 import org.apache.commons.io.FilenameUtils;
@@ -30,7 +31,8 @@ import javax.swing.*;
 import java.io.*;
 import java.net.*;
 import java.nio.charset.Charset;
-import java.nio.file.Files;
+import java.nio.file.*;
+import java.nio.file.attribute.BasicFileAttributes;
 import java.util.*;
 import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
@@ -713,6 +715,86 @@ public class UtilIO {
 		}
 
 		return ret;
+	}
+
+	/**
+	 * An intelligent image file search. If the passed in string starts with "glob:" or "regex:" then it will use
+	 * a glob or regex pattern to find the files. Otherwise it will see if it's a file or directory. If a file
+	 * then just that file is returned in the list. If a directory then all the files in that directory are returned.
+	 *
+	 * @param pathPattern Either a path to the file/directory or a glob/regex pattern.
+	 * @param sort If the output should be sorted first
+	 * @param filter A filter that provides better flexibility in deciding what's included
+	 * @return List of found files that matched all the patterns
+	 */
+	public static List<String> listSmart( String pathPattern, boolean sort, BoofLambdas.Filter<Path> filter ) {
+		List<String> results = new ArrayList<>();
+
+		if (pathPattern.startsWith("glob:") || pathPattern.startsWith("regex:")) {
+			try {
+				// Reduce the search scope and figure out if it's an absolute or relative path by looking for the
+				// prefix which is a valid path
+				int start = pathPattern.indexOf(':')+1;
+				int end = -1;
+				for (int i = start + 1; i < pathPattern.length(); i++) {
+					if (new File(pathPattern.substring(start, i)).isDirectory()) {
+						end = i;
+					}
+				}
+				// If it was never valid then we will assume that it's a relative pattern. Otherwise you would end
+				// up searching the entire file system a lot
+				String baseDirectory = end != -1 ? pathPattern.substring(start, end) : "";
+				PathMatcher pathMatcher = FileSystems.getDefault().getPathMatcher(pathPattern);
+
+				Files.walkFileTree(Paths.get(baseDirectory), new SimpleFileVisitor<>() {
+					@Override public FileVisitResult visitFile( Path path, BasicFileAttributes attrs ) {
+						if (pathMatcher.matches(path) && filter.process(path)) {
+							results.add(path.toString());
+						}
+						return FileVisitResult.CONTINUE;
+					}
+
+					@Override public FileVisitResult visitFileFailed( Path file, IOException exc ) {
+						return FileVisitResult.CONTINUE;
+					}
+				});
+			} catch (IOException e) {
+				throw new UncheckedIOException(e);
+			}
+		} else {
+			File directory = new File(pathPattern);
+			if (directory.isFile()) {
+				if (filter.process(directory.toPath()))
+					results.add(pathPattern);
+			} else if (directory.isDirectory()) {
+				File[] files = directory.listFiles();
+				if (files != null) {
+					for( File f : files ) {
+						if (!filter.process(f.toPath()))
+							continue;
+						results.add(f.getPath());
+					}
+				}
+			}
+		}
+
+		if (sort)
+			Collections.sort(results);
+
+		return results;
+	}
+
+	/**
+	 * Same as {@link #listSmart(String, boolean, BoofLambdas.Filter)} but adds a filter that looks for images
+	 * based on their extension.
+	 *
+	 * @param pathPattern Either a path to the file/directory or a glob/regex pattern.
+	 * @param sort If the output should be sorted first
+	 * @return List of matching file paths
+	 */
+	public static List<String> listSmartImages( String pathPattern, boolean sort ) {
+		String regex = "(.*/)*.+\\.(png|jpg|gif|bmp|jpeg|PNG|JPG|GIF|BMP|JPEG)$";
+		return listSmart(pathPattern, sort, ( path ) -> path.toString().matches(regex));
 	}
 
 	/**

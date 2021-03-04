@@ -29,8 +29,6 @@ import javax.swing.event.ChangeListener;
 import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.util.prefs.Preferences;
-import java.util.regex.Pattern;
-import java.util.regex.PatternSyntaxException;
 
 /**
  * @author Peter Abeles
@@ -113,27 +111,18 @@ public class BatchDownsizeImageGui extends JPanel implements BatchDownsizeImage.
 				downsizer.height = ((Number)spinnerHeight.getValue()).intValue();
 				downsizer.maxLength = comboMethod.getSelectedIndex() == 1;
 				downsizer.pixelCount = comboMethod.getSelectedIndex() == 2;
-				downsizer.pathInput = textInputDirectory.getText();
-				downsizer.pathOutput = textOutputDirectory.getText();
+				downsizer.inputPattern = textInputSource.getText();
+				downsizer.outputPath = textOutputDirectory.getText();
 
-				downsizer.regex = textRegex.getText();
 				downsizer.rename = checkRename.isSelected();
-				downsizer.recursive = checkRecursive.isSelected();
 
 				if (downsizer.width == 0 && downsizer.height == 0) {
 					JOptionPane.showMessageDialog(this, "Width and Height can't be zero");
 					return;
 				}
 
-				try {
-					Pattern.compile(downsizer.regex);
-				} catch (PatternSyntaxException exception) {
-					JOptionPane.showMessageDialog(this, "Invalid Regex");
-					return;
-				}
-
-				prefs.put(KEY_INPUT, downsizer.pathInput);
-				prefs.put(KEY_OUTPUT, downsizer.pathOutput);
+				prefs.put(KEY_INPUT, downsizer.inputPattern);
+				prefs.put(KEY_OUTPUT, downsizer.outputPath);
 				prefs.put(KEY_WIDTH, downsizer.width + "");
 				prefs.put(KEY_HEIGHT, downsizer.height + "");
 				prefs.put(KEY_FORMULA, comboMethod.getSelectedIndex() + "");

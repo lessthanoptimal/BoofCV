@@ -32,7 +32,7 @@ public class FactoryFilterLambdas {
 	 * Creates a filter which seeks to scale an image down to the specified pixel count. If
 	 * the image is larger then nothing is done. Uses {@link AverageDownSampleOps} to scale the image.
 	 */
-	public static<T extends ImageBase<T>> BoofLambdas.Filter<T>
+	public static<T extends ImageBase<T>> BoofLambdas.Transform<T>
 	createDownSampleFilter(int targetPixelCount, ImageType<T> imageType) {
 		T scaled = imageType.createImage(1,1);
 		return (full)->{
