@@ -42,7 +42,8 @@ try {
     }
 } catch (NumberFormatException e) {
     // Did Google just switch their versions to letter?? BAD GOOGLE!
-    e.printStackTrace(System.err)
+    System.err.println("Bad number format for version: "+ext.ANDROID_VERSION)
+    System.err.println(e.getMessage());
 }
 
 dependencies {
