@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -42,9 +42,9 @@ public class CreateSquareFiducialDocumentPDF extends CreateFiducialDocumentPDF {
 	int gridWidth;
 	java.util.List<GrayU8> imagePatterns;
 
-	String markerType="";
+	String markerType = "";
 
-	public CreateSquareFiducialDocumentPDF(String documentName, PaperSize paper, Unit units) {
+	public CreateSquareFiducialDocumentPDF( String documentName, PaperSize paper, Unit units ) {
 		super(documentName, paper, units);
 	}
 
@@ -53,7 +53,7 @@ public class CreateSquareFiducialDocumentPDF extends CreateFiducialDocumentPDF {
 		return markerType;
 	}
 
-	public void render( java.util.List<String> names , DogArray_I64 patterns , int gridWidth ) throws IOException {
+	public void render( java.util.List<String> names, DogArray_I64 patterns, int gridWidth ) throws IOException {
 		this.names = names;
 		binaryPatterns = patterns;
 		this.gridWidth = gridWidth;
@@ -62,7 +62,7 @@ public class CreateSquareFiducialDocumentPDF extends CreateFiducialDocumentPDF {
 		render();
 	}
 
-	public void render(java.util.List<String> names  , java.util.List<GrayU8> patterns ) throws IOException {
+	public void render( java.util.List<String> names, java.util.List<GrayU8> patterns ) throws IOException {
 		this.names = names;
 		binaryPatterns = null;
 		imagePatterns = patterns;
@@ -71,16 +71,16 @@ public class CreateSquareFiducialDocumentPDF extends CreateFiducialDocumentPDF {
 	}
 
 	@Override
-	protected void configureRenderer(PdfFiducialEngine pdfengine) {
+	protected void configureRenderer( PdfFiducialEngine pdfengine ) {
 		g = new FiducialSquareGenerator(pdfengine);
 		g.setBlackBorder(blackBorderFractionalWidth);
 		g.setMarkerWidth(markerWidth*UNIT_TO_POINTS);
 	}
 
 	@Override
-	protected void render(int index) {
-		if( binaryPatterns != null ) {
-			g.generate(binaryPatterns.get(index),gridWidth);
+	protected void render( int index ) {
+		if (binaryPatterns != null) {
+			g.generate(binaryPatterns.get(index), gridWidth);
 		} else {
 			g.generate(imagePatterns.get(index));
 		}

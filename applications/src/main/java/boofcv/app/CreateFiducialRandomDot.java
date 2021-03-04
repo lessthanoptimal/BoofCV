@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -93,9 +93,9 @@ public class CreateFiducialRandomDot extends BaseFiducialSquare {
 	 * Saves a description of all the markers in a YAML file so that it can be easily read later on
 	 */
 	private void saveMarkersToYaml() throws IOException {
-		String nameYaml = FilenameUtils.getBaseName(fileName)+".yaml";
+		String nameYaml = FilenameUtils.getBaseName(fileName) + ".yaml";
 		var writer = new OutputStreamWriter(
-				new FileOutputStream(new File(new File(fileName).getParentFile(),nameYaml)), UTF_8);
+				new FileOutputStream(new File(new File(fileName).getParentFile(), nameYaml)), UTF_8);
 
 		var def = new RandomDotDefinition();
 		def.randomSeed = randomSeed;

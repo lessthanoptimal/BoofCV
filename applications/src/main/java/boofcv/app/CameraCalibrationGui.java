@@ -50,8 +50,7 @@ import static boofcv.gui.StandardAlgConfigPanel.addLabeled;
 // TODO specify output file name
 // TODO output format
 public class CameraCalibrationGui extends JPanel
-		implements CalibrationTargetPanel.Listener, ActionListener
-{
+		implements CalibrationTargetPanel.Listener, ActionListener {
 
 	CameraCalibration app;
 
@@ -71,24 +70,24 @@ public class CameraCalibrationGui extends JPanel
 		this.app = new CameraCalibration();
 		this.app.visualize = true;
 
-		final File outputFile = new File(FileSystemView.getFileSystemView().getHomeDirectory(),"camera_calibration.yaml");
+		final File outputFile = new File(FileSystemView.getFileSystemView().getHomeDirectory(), "camera_calibration.yaml");
 
 		textOutput = new JTextField();
 		textOutput.setColumns(20);
 		textOutput.setText(outputFile.getAbsolutePath());
-		textOutput.setMaximumSize(new Dimension(textOutput.getPreferredSize().width,30));
+		textOutput.setMaximumSize(new Dimension(textOutput.getPreferredSize().width, 30));
 		JButton bOutput = new JButton(UIManager.getIcon("FileView.fileIcon"));
-		bOutput.setPreferredSize(new Dimension(30,30));
+		bOutput.setPreferredSize(new Dimension(30, 30));
 		bOutput.setMaximumSize(bOutput.getPreferredSize());
-		bOutput.addActionListener(a->{
-			File f = BoofSwingUtil.fileChooser(null,this,false,textOutput.getText(),null);
-			if( f != null ) {
+		bOutput.addActionListener(a -> {
+			File f = BoofSwingUtil.fileChooser(null, this, false, textOutput.getText(), null);
+			if (f != null) {
 				textOutput.setText(f.getAbsolutePath());
 			}
 		});
 
 		JPanel panelOutput = new JPanel();
-		panelOutput.setLayout(new BoxLayout(panelOutput,BoxLayout.X_AXIS));
+		panelOutput.setLayout(new BoxLayout(panelOutput, BoxLayout.X_AXIS));
 		panelOutput.add(textOutput);
 		panelOutput.add(bOutput);
 
@@ -98,28 +97,27 @@ public class CameraCalibrationGui extends JPanel
 		comboOutputFormat.setMaximumSize(comboOutputFormat.getPreferredSize());
 
 		JPanel controlsPanel = new JPanel();
-		controlsPanel.setLayout(new BoxLayout(controlsPanel,BoxLayout.Y_AXIS) );
+		controlsPanel.setLayout(new BoxLayout(controlsPanel, BoxLayout.Y_AXIS));
 		controlsPanel.setBorder(BorderFactory.createEtchedBorder(EtchedBorder.RAISED));
-		addLabeled(panelOutput,"Output", null, controlsPanel);
-		addLabeled(comboOutputFormat,"Format", null, controlsPanel);
-		controlsPanel.add(Box.createRigidArea(new Dimension(5,5)));
+		addLabeled(panelOutput, "Output", null, controlsPanel);
+		addLabeled(comboOutputFormat, "Format", null, controlsPanel);
+		controlsPanel.add(Box.createRigidArea(new Dimension(5, 5)));
 		controlsPanel.add(controlsTarget);
 		controlsPanel.add(controlsModel);
 
 		renderingPanel.setScaling(ScaleOptions.DOWN);
 		renderingPanel.setCentering(true);
-		renderingPanel.setPreferredSize(new Dimension(400,400));
+		renderingPanel.setPreferredSize(new Dimension(400, 400));
 
 		add(BorderLayout.WEST, controlsPanel);
-		add(BorderLayout.CENTER,renderingPanel);
+		add(BorderLayout.CENTER, renderingPanel);
 		createMenuBar();
 
 		// trigger an event which will cause the target to be rendered
 		controlsTarget.updateParameters();
 
-		frame = ShowImages.showWindow(this,"BoofCV Camera Calibration",true);
+		frame = ShowImages.showWindow(this, "BoofCV Camera Calibration", true);
 	}
-
 
 	void createMenuBar() {
 		JMenuBar menuBar = new JMenuBar();
@@ -129,19 +127,19 @@ public class CameraCalibrationGui extends JPanel
 		menuBar.add(menu);
 
 		JMenuItem menuOpenDirectory = new JMenuItem("Input Directory");
-		BoofSwingUtil.setMenuItemKeys(menuOpenDirectory,KeyEvent.VK_D,KeyEvent.VK_D);
+		BoofSwingUtil.setMenuItemKeys(menuOpenDirectory, KeyEvent.VK_D, KeyEvent.VK_D);
 		menuOpenDirectory.addActionListener(new ActionListener() {
 			@Override
-			public void actionPerformed(ActionEvent e) {
+			public void actionPerformed( ActionEvent e ) {
 				processDirectory();
 			}
 		});
 
 		JMenuItem menuWebcam = new JMenuItem("Input Webcam");
-		BoofSwingUtil.setMenuItemKeys(menuWebcam,KeyEvent.VK_W,KeyEvent.VK_W);
+		BoofSwingUtil.setMenuItemKeys(menuWebcam, KeyEvent.VK_W, KeyEvent.VK_W);
 		menuWebcam.addActionListener(new ActionListener() {
 			@Override
-			public void actionPerformed(ActionEvent e) {
+			public void actionPerformed( ActionEvent e ) {
 				openWebcam();
 			}
 		});
@@ -149,16 +147,16 @@ public class CameraCalibrationGui extends JPanel
 		JMenuItem menuHelp = new JMenuItem("Help", KeyEvent.VK_H);
 		menuHelp.addActionListener(new ActionListener() {
 			@Override
-			public void actionPerformed(ActionEvent e) {
+			public void actionPerformed( ActionEvent e ) {
 				showHelp();
 			}
 		});
 
 		JMenuItem menuQuit = new JMenuItem("Quit");
-		BoofSwingUtil.setMenuItemKeys(menuQuit,KeyEvent.VK_Q,KeyEvent.VK_Q);
+		BoofSwingUtil.setMenuItemKeys(menuQuit, KeyEvent.VK_Q, KeyEvent.VK_Q);
 		menuQuit.addActionListener(new ActionListener() {
 			@Override
-			public void actionPerformed(ActionEvent e) {
+			public void actionPerformed( ActionEvent e ) {
 				System.exit(0);
 			}
 		});
@@ -169,17 +167,17 @@ public class CameraCalibrationGui extends JPanel
 		menu.add(menuHelp);
 		menu.add(menuQuit);
 
-		add(BorderLayout.NORTH,menuBar);
+		add(BorderLayout.NORTH, menuBar);
 	}
 
 	private void showHelp() {
-		JOptionPane.showMessageDialog(this,"Many more options and better documentation available through commandline");
+		JOptionPane.showMessageDialog(this, "Many more options and better documentation available through commandline");
 	}
 
 	private void openWebcam() {
 		OpenWebcamDialog.Selection s = OpenWebcamDialog.showDialog(null);
 
-		if(s != null ) {
+		if (s != null) {
 			app.inputType = BaseStandardInputApp.InputType.WEBCAM;
 			app.cameraName = s.camera.getName();
 			app.desiredWidth = s.width;
@@ -194,7 +192,7 @@ public class CameraCalibrationGui extends JPanel
 	private void processDirectory() {
 		Preferences prefs;
 		prefs = Preferences.userRoot().node(this.getClass().getSimpleName());
-		String previousPath=prefs.get(KEY_PREVIOUS_SELECTION, ".");
+		String previousPath = prefs.get(KEY_PREVIOUS_SELECTION, ".");
 
 		JFileChooser chooser = new JFileChooser();
 		chooser.setCurrentDirectory(new File(previousPath));
@@ -212,8 +210,8 @@ public class CameraCalibrationGui extends JPanel
 			new Thread(() -> {
 				try {
 					app.process();
-				} catch( RuntimeException e ) {
-					BoofSwingUtil.warningDialog(frame,e);
+				} catch (RuntimeException e) {
+					BoofSwingUtil.warningDialog(frame, e);
 				}
 			}).start();
 		}
@@ -228,11 +226,11 @@ public class CameraCalibrationGui extends JPanel
 		}
 
 		app.modeType = controlsModel.selected;
-		if( app.modeType == CameraCalibration.ModelType.BROWN) {
+		if (app.modeType == CameraCalibration.ModelType.BROWN) {
 			app.numRadial = controlsModel.pinholeRadial;
 			app.tangential = controlsModel.pinholeTangential;
 			app.zeroSkew = controlsModel.pinholeSkew;
-		} else if( app.modeType == CameraCalibration.ModelType.UNIVERSAL ) {
+		} else if (app.modeType == CameraCalibration.ModelType.UNIVERSAL) {
 			app.numRadial = controlsModel.universalRadial;
 			app.tangential = controlsModel.universalTangential;
 			app.zeroSkew = controlsModel.universalSkew;
@@ -243,27 +241,27 @@ public class CameraCalibrationGui extends JPanel
 	}
 
 	@Override
-	public void calibrationParametersChanged(CalibrationTargetPanel.TargetType type, ConfigGridDimen config) {
-		final RenderCalibrationTargetsGraphics2D renderer = new RenderCalibrationTargetsGraphics2D(20,1);
+	public void calibrationParametersChanged( CalibrationTargetPanel.TargetType type, ConfigGridDimen config ) {
+		final RenderCalibrationTargetsGraphics2D renderer = new RenderCalibrationTargetsGraphics2D(20, 1);
 
-		if( type == CalibrationTargetPanel.TargetType.CHESSBOARD ) {
-			renderer.chessboard(config.numRows,config.numCols,20);
-		} else if( type == CalibrationTargetPanel.TargetType.SQUARE_GRID ) {
+		if (type == CalibrationTargetPanel.TargetType.CHESSBOARD) {
+			renderer.chessboard(config.numRows, config.numCols, 20);
+		} else if (type == CalibrationTargetPanel.TargetType.SQUARE_GRID) {
 			double space = 20*config.shapeDistance/config.shapeSize;
-			renderer.squareGrid(config.numRows,config.numCols,20,space);
-		} else if( type == CalibrationTargetPanel.TargetType.CIRCLE_GRID ) {
+			renderer.squareGrid(config.numRows, config.numCols, 20, space);
+		} else if (type == CalibrationTargetPanel.TargetType.CIRCLE_GRID) {
 			double space = 10*config.shapeDistance/config.shapeSize;
-			renderer.circleRegular(config.numRows,config.numCols,10,space);
-		} else if( type == CalibrationTargetPanel.TargetType.CIRCLE_HEX ) {
+			renderer.circleRegular(config.numRows, config.numCols, 10, space);
+		} else if (type == CalibrationTargetPanel.TargetType.CIRCLE_HEX) {
 			double space = 10*config.shapeDistance/config.shapeSize;
-			renderer.circleHex(config.numRows,config.numCols,10,space);
+			renderer.circleHex(config.numRows, config.numCols, 10, space);
 		}
 		renderingPanel.setImageUI(renderer.getBufferred());
 	}
 
 	@Override
-	public void actionPerformed(ActionEvent e) {
-		if( e.getSource() == comboOutputFormat ) {
+	public void actionPerformed( ActionEvent e ) {
+		if (e.getSource() == comboOutputFormat) {
 			outputFormat = (CameraCalibration.FormatType)comboOutputFormat.getSelectedItem();
 		}
 	}

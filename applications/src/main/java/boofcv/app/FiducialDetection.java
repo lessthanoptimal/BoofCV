@@ -251,7 +251,7 @@ public class FiducialDetection extends BaseStandardInputApp {
 			if (flagName.compareToIgnoreCase("Robust") == 0) {
 				robust = Boolean.parseBoolean(parameters);
 			} else if (flagName.compareToIgnoreCase("Image") == 0) {
-				String words[] = parameters.split(":");
+				String[] words = parameters.split(":");
 				if (words.length != 2) throw new RuntimeException("Expected two for width and image path");
 				sizes.add(Double.parseDouble(words[0]));
 				paths.add(words[1]);
@@ -308,7 +308,7 @@ public class FiducialDetection extends BaseStandardInputApp {
 
 			splitFlag(arg);
 			if (flagName.compareToIgnoreCase("Shape") == 0) {
-				String words[] = parameters.split(":");
+				String[] words = parameters.split(":");
 				if (words.length != 2) throw new RuntimeException("Expected two for rows and columns");
 				rows = Integer.parseInt(words[0]);
 				cols = Integer.parseInt(words[1]);
@@ -341,7 +341,7 @@ public class FiducialDetection extends BaseStandardInputApp {
 
 			splitFlag(arg);
 			if (flagName.compareToIgnoreCase("Shape") == 0) {
-				String words[] = parameters.split(":");
+				String[] words = parameters.split(":");
 				if (words.length != 2) throw new RuntimeException("Expected two for rows and columns");
 				rows = Integer.parseInt(words[0]);
 				cols = Integer.parseInt(words[1]);

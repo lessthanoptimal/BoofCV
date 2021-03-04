@@ -53,74 +53,73 @@ public class BatchRemoveLensDistortionGui extends JPanel implements BatchRemoveL
 	public BatchRemoveLensDistortionGui() {
 		super(new BorderLayout());
 
-		imagePanel.setPreferredSize(new Dimension(400,400));
+		imagePanel.setPreferredSize(new Dimension(400, 400));
 		imagePanel.setScaling(ScaleOptions.DOWN);
 
-		add(control,BorderLayout.WEST);
-		add(imagePanel,BorderLayout.CENTER);
+		add(control, BorderLayout.WEST);
+		add(imagePanel, BorderLayout.CENTER);
 
-		ShowImages.showWindow(this,"Batch Remove Lens Distortion", true);
+		ShowImages.showWindow(this, "Batch Remove Lens Distortion", true);
 	}
 
-	public boolean spawn( String pathIntrinsic , String pathInput , String pathOutput ,
-						  boolean rename, AdjustmentType adjustment )
-	{
-		if( processing )
+	public boolean spawn( String pathIntrinsic, String pathInput, String pathOutput,
+						  boolean rename, AdjustmentType adjustment ) {
+		if (processing)
 			return false;
 
 		System.out.println("point A");
 
 		BoofSwingUtil.checkGuiThread();
 
-		if( !new File(pathIntrinsic).exists() ) {
+		if (!new File(pathIntrinsic).exists()) {
 			JOptionPane.showMessageDialog(this, "Intrinsic path does not exist");
 			return false;
 		}
 
 		try {
 			CalibrationIO.load(pathIntrinsic);
-		} catch( RuntimeException e ) {
+		} catch (RuntimeException e) {
 			e.printStackTrace();
-			BoofSwingUtil.warningDialog(this,e);
+			BoofSwingUtil.warningDialog(this, e);
 			return false;
 		}
 
-		if( !new File(pathInput).exists() ) {
+		if (!new File(pathInput).exists()) {
 			JOptionPane.showMessageDialog(this, "Input does not exist");
 			return false;
 		}
-		if( pathOutput.length() == 0 ) {
+		if (pathOutput.length() == 0) {
 			pathOutput = pathInput;
-		} else if( !new File(pathOutput).exists() ){
+		} else if (!new File(pathOutput).exists()) {
 			JOptionPane.showMessageDialog(this, "Output does not exist");
 			return false;
 		}
 
 
 		Preferences prefs = Preferences.userRoot().node(getClass().getSimpleName());
-		prefs.put(KEY_INTRINSIC,pathIntrinsic);
-		prefs.put(KEY_INPUT,pathInput);
-		prefs.put(KEY_OUTPUT,pathOutput);
+		prefs.put(KEY_INTRINSIC, pathIntrinsic);
+		prefs.put(KEY_INPUT, pathInput);
+		prefs.put(KEY_OUTPUT, pathOutput);
 
 		control.bAction.setText("Cancel");
 		processing = true;
 		System.out.println("point B");
 		String _pathOutput = pathOutput;
-		undistorter = new BatchRemoveLensDistortion(pathIntrinsic,pathInput,_pathOutput,
-				rename,adjustment,this);
-		new Thread(()->{undistorter.process();}).start();
+		undistorter = new BatchRemoveLensDistortion(pathIntrinsic, pathInput, _pathOutput,
+				rename, adjustment, this);
+		new Thread(() -> {undistorter.process();}).start();
 
 		return true;
 	}
 
 	@Override
-	public void loadedImage(BufferedImage image, String name) {
+	public void loadedImage( BufferedImage image, String name ) {
 		imagePanel.setImageRepaint(image);
 	}
 
 	@Override
 	public void finishedConverting() {
-		SwingUtilities.invokeLater(()->{
+		SwingUtilities.invokeLater(() -> {
 			control.bAction.setText("Start");
 			processing = false;
 		});
@@ -128,7 +127,7 @@ public class BatchRemoveLensDistortionGui extends JPanel implements BatchRemoveL
 
 	private class ControlPanel extends BatchConvertControlPanel {
 		JTextField textIntrinsic = new JTextField();
-		JComboBox<String> comboResize = new JComboBox<>(new String[]{"None","Expand","Full View"});
+		JComboBox<String> comboResize = new JComboBox<>(new String[]{"None", "Expand", "Full View"});
 
 		public ControlPanel() {
 			int textWidth = 200;
@@ -136,21 +135,21 @@ public class BatchRemoveLensDistortionGui extends JPanel implements BatchRemoveL
 
 			Preferences prefs = Preferences.userRoot().node(BatchRemoveLensDistortionGui.class.getSimpleName());
 
-			textIntrinsic.setPreferredSize(new Dimension(textWidth,textHeight));
+			textIntrinsic.setPreferredSize(new Dimension(textWidth, textHeight));
 			textIntrinsic.setMaximumSize(textIntrinsic.getPreferredSize());
 			comboResize.setMaximumSize(comboResize.getPreferredSize());
 
-			textIntrinsic.setText(prefs.get(KEY_INTRINSIC,""));
+			textIntrinsic.setText(prefs.get(KEY_INTRINSIC, ""));
 
-			addLabeled(createTextSelect(textIntrinsic,"Intrinsic",false),"Intrinsic");
-			addLabeled(comboResize,"Adjust");
+			addLabeled(createTextSelect(textIntrinsic, "Intrinsic", false), "Intrinsic");
+			addLabeled(comboResize, "Adjust");
 
 			addStandardControls(prefs);
 		}
 
 		@Override
 		protected void handleStart() {
-			if( processing ) {
+			if (processing) {
 				undistorter.cancel = true;
 			} else {
 				System.out.println("Handle Start");
@@ -173,7 +172,7 @@ public class BatchRemoveLensDistortionGui extends JPanel implements BatchRemoveL
 		}
 	}
 
-	public static void main(String[] args) {
+	public static void main( String[] args ) {
 		new BatchRemoveLensDistortionGui();
 	}
 }

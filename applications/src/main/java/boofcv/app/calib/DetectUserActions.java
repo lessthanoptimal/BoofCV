@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -35,33 +35,33 @@ public class DetectUserActions {
 	double stationaryStart;
 	double stationaryTime;
 
-	CalibrationObservation previous = new CalibrationObservation(0,0);
-	CalibrationObservation first = new CalibrationObservation(0,0);
+	CalibrationObservation previous = new CalibrationObservation(0, 0);
+	CalibrationObservation first = new CalibrationObservation(0, 0);
 
 	CalibrationObservation points;
 	int numMissed;
 
-	public void setImageSize( int width , int height ) {
-		int size = Math.min(width,height);
+	public void setImageSize( int width, int height ) {
+		int size = Math.min(width, height);
 
 		thresholdDistance = size*0.005;
 	}
 
-	public void update( boolean detected , CalibrationObservation points ) {
-		if( detected ) {
+	public void update( boolean detected, CalibrationObservation points ) {
+		if (detected) {
 			this.points = points;
 			stationaryTime = checkStationary();
 			numMissed = 0;
 		} else {
-			if( ++numMissed > 5 ) {
+			if (++numMissed > 5) {
 				previous.reset();
 				stationaryStart = System.currentTimeMillis();
 			}
 		}
 	}
 
-	public double checkStationary( ) {
-		if( previous.size() != points.size() ) {
+	public double checkStationary() {
+		if (previous.size() != points.size()) {
 			previous.setTo(points);
 			first.setTo(points);
 			stationaryStart = System.currentTimeMillis();
@@ -71,17 +71,17 @@ public class DetectUserActions {
 			double averageFirst = averageDifference(first);
 
 			previous.setTo(points);
-			if( averagePrev > thresholdDistance || averageFirst > thresholdDistance*10 ) {
+			if (averagePrev > thresholdDistance || averageFirst > thresholdDistance*10) {
 				stationaryStart = System.currentTimeMillis();
 				first.setTo(points);
 			}
-			return (System.currentTimeMillis()-stationaryStart)/1000.0;
+			return (System.currentTimeMillis() - stationaryStart)/1000.0;
 		}
 	}
 
 	private double averageDifference( CalibrationObservation reference ) {
 		double average = 0;
-		for( int i = 0; i < points.size(); i++ ) {
+		for (int i = 0; i < points.size(); i++) {
 			double difference = reference.points.get(i).p.distance(points.points.get(i).p);
 
 			average += difference;
@@ -98,7 +98,7 @@ public class DetectUserActions {
 		return stationaryTime;
 	}
 
-	public boolean isAtLocation( double x , double y ) {
+	public boolean isAtLocation( double x, double y ) {
 		double centerX = 0, centerY = 0;
 
 		for (int i = 0; i < points.size(); i++) {
@@ -111,7 +111,7 @@ public class DetectUserActions {
 		centerX /= points.size();
 		centerY /= points.size();
 
-		double distance = UtilPoint2D_F64.distanceSq(centerX,centerY,x,y);
+		double distance = UtilPoint2D_F64.distanceSq(centerX, centerY, x, y);
 
 		return distance <= thresholdDistance*4;
 	}

@@ -40,7 +40,7 @@ import java.util.List;
  */
 public class BatchDownsizeImage {
 
-	@Option(name = "-i", aliases = {"--Input"}, usage = "Directory or glob pattern or regex pattern.\n"+
+	@Option(name = "-i", aliases = {"--Input"}, usage = "Directory or glob pattern or regex pattern.\n" +
 			"Glob example: 'glob:data/**/left*.jpg'\n" +
 			"Regex example: 'regex:data/\\w+/left\\d+.jpg'\n" +
 			"If not a pattern then it's assumed to be a path. All files with known image extensions in their name as added, e.g. jpg, png")
@@ -87,10 +87,10 @@ public class BatchDownsizeImage {
 		System.out.println("input pattern  = " + inputPattern);
 		System.out.println("output dir     = " + outputPath);
 
-		List<String> paths = UtilIO.listSmartImages(inputPattern,false);
+		List<String> paths = UtilIO.listSmartImages(inputPattern, false);
 
 		if (paths.isEmpty())
-			System.out.println("No inputs found. Bath path or pattern? "+inputPattern);
+			System.out.println("No inputs found. Bath path or pattern? " + inputPattern);
 
 		// Create the output directory if it doesn't exist
 		if (!new File(outputPath).exists()) {

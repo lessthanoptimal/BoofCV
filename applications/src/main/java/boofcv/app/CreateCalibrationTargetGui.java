@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -66,8 +66,8 @@ public class CreateCalibrationTargetGui extends JPanel
 		controlsTarget.configSquare.numCols = 4;
 		controlsTarget.configSquare.shapeSize = 3;
 		controlsTarget.configSquare.shapeDistance = 2;
-		controlsTarget.configCircleHex = new ConfigGridDimen(20,24,1,1.5);
-		controlsTarget.configCircle =new ConfigGridDimen(17,12,1,1.5);
+		controlsTarget.configCircleHex = new ConfigGridDimen(20, 24, 1, 1.5);
+		controlsTarget.configCircle = new ConfigGridDimen(17, 12, 1, 1.5);
 		controlsTarget.changeTargetPanel();
 
 		comboPaper.addActionListener(this);
@@ -79,26 +79,26 @@ public class CreateCalibrationTargetGui extends JPanel
 		comboUnits.setMaximumSize(comboUnits.getPreferredSize());
 
 		JPanel controlsPanel = new JPanel();
-		controlsPanel.setLayout(new BoxLayout(controlsPanel,BoxLayout.Y_AXIS) );
+		controlsPanel.setLayout(new BoxLayout(controlsPanel, BoxLayout.Y_AXIS));
 		controlsPanel.setBorder(BorderFactory.createEtchedBorder(EtchedBorder.RAISED));
-		addLabeled(comboPaper,"Paper", null, controlsPanel);
+		addLabeled(comboPaper, "Paper", null, controlsPanel);
 		controlsPanel.add(controlsTarget);
-		addLabeled(comboUnits,"Target Units", null, controlsPanel);
+		addLabeled(comboUnits, "Target Units", null, controlsPanel);
 		controlsPanel.add(Box.createVerticalGlue());
 
-		renderingPanel.setPreferredSize(new Dimension(400,500));
+		renderingPanel.setPreferredSize(new Dimension(400, 500));
 		renderingPanel.setCentering(true);
 		renderingPanel.setScaling(ScaleOptions.DOWN);
 		renderingPanel.setBackground(Color.GRAY);
 
 		add(BorderLayout.WEST, controlsPanel);
-		add(BorderLayout.CENTER,renderingPanel);
+		add(BorderLayout.CENTER, renderingPanel);
 		createMenuBar();
 
 		// trigger an event which will cause the target to be rendered
 		controlsTarget.updateParameters();
 
-		frame = ShowImages.showWindow(this,"BoofCV Create Calibration Target",true);
+		frame = ShowImages.showWindow(this, "BoofCV Create Calibration Target", true);
 	}
 
 	private void createMenuBar() {
@@ -109,39 +109,19 @@ public class CreateCalibrationTargetGui extends JPanel
 		menuBar.add(menu);
 
 		JMenuItem menuSave = new JMenuItem("Save");
-		BoofSwingUtil.setMenuItemKeys(menuSave,KeyEvent.VK_S,KeyEvent.VK_S);
-		menuSave.addActionListener(new ActionListener() {
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				saveFile(false);
-			}
-		});
+		BoofSwingUtil.setMenuItemKeys(menuSave, KeyEvent.VK_S, KeyEvent.VK_S);
+		menuSave.addActionListener(e -> saveFile(false));
 
 		JMenuItem menuPrint = new JMenuItem("Print...");
-		BoofSwingUtil.setMenuItemKeys(menuPrint,KeyEvent.VK_P,KeyEvent.VK_P);
-		menuPrint.addActionListener(new ActionListener() {
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				saveFile(true);
-			}
-		});
+		BoofSwingUtil.setMenuItemKeys(menuPrint, KeyEvent.VK_P, KeyEvent.VK_P);
+		menuPrint.addActionListener(e -> saveFile(true));
 
 		JMenuItem menuHelp = new JMenuItem("Help", KeyEvent.VK_H);
-		menuHelp.addActionListener(new ActionListener() {
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				showHelp();
-			}
-		});
+		menuHelp.addActionListener(e -> showHelp());
 
 		JMenuItem menuQuit = new JMenuItem("Quit");
-		BoofSwingUtil.setMenuItemKeys(menuQuit,KeyEvent.VK_Q,KeyEvent.VK_Q);
-		menuQuit.addActionListener(new ActionListener() {
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				System.exit(0);
-			}
-		});
+		BoofSwingUtil.setMenuItemKeys(menuQuit, KeyEvent.VK_Q, KeyEvent.VK_Q);
+		menuQuit.addActionListener(e -> System.exit(0));
 
 		menu.addSeparator();
 		menu.add(menuSave);
@@ -149,11 +129,11 @@ public class CreateCalibrationTargetGui extends JPanel
 		menu.add(menuHelp);
 		menu.add(menuQuit);
 
-		add(BorderLayout.NORTH,menuBar);
+		add(BorderLayout.NORTH, menuBar);
 	}
 
 	private void showHelp() {
-		JOptionPane.showMessageDialog(this,"Many more options and better documentation available through commandline");
+		JOptionPane.showMessageDialog(this, "Many more options and better documentation available through commandline");
 	}
 
 	private void saveFile( boolean sendToPrinter ) {
@@ -162,13 +142,13 @@ public class CreateCalibrationTargetGui extends JPanel
 		File f;
 
 		// see where the document is to be sent
-		if( sendToPrinter ) {
+		if (sendToPrinter) {
 			f = new File(""); // dummy to make the code below happy and less complex
 		} else {
 			f = FileSystemView.getFileSystemView().getHomeDirectory();
-			f = new File(f,"calibration_target.pdf");
+			f = new File(f, "calibration_target.pdf");
 
-			f = BoofSwingUtil.fileChooser(null,this,false,f.getPath(),null);
+			f = BoofSwingUtil.fileChooser(null, this, false, f.getPath(), null);
 			if (f == null) {
 				return;
 			}
@@ -183,55 +163,50 @@ public class CreateCalibrationTargetGui extends JPanel
 		// Make sure the file has the correct extension
 		String outputFile = f.getAbsolutePath();
 		String ext = FilenameUtils.getExtension(outputFile);
-		if( ext.compareToIgnoreCase("pdf") != 0 ) {
+		if (ext.compareToIgnoreCase("pdf") != 0) {
 			outputFile = FilenameUtils.removeExtension(outputFile);
 			outputFile += "." + "pdf";
 		}
 
 		try {
 			switch (selectedType) {
-				case CHESSBOARD: {
+				case CHESSBOARD -> {
 					ConfigGridDimen config = selectedCalib;
 					CreateCalibrationTargetGenerator generator = new CreateCalibrationTargetGenerator(outputFile, paper,
 							config.numRows, config.numCols, units);
 					generator.sendToPrinter = sendToPrinter;
-					generator.chessboard((float) config.shapeSize);
-				} break;
-
-				case SQUARE_GRID: {
+					generator.chessboard((float)config.shapeSize);
+				}
+				case SQUARE_GRID -> {
 					ConfigGridDimen config = selectedCalib;
 					CreateCalibrationTargetGenerator generator = new CreateCalibrationTargetGenerator(outputFile, paper,
 							config.numRows, config.numCols, units);
 					generator.sendToPrinter = sendToPrinter;
-					generator.squareGrid((float) config.shapeSize, (float)config.shapeDistance);
-				} break;
-
-				case CIRCLE_GRID: {
+					generator.squareGrid((float)config.shapeSize, (float)config.shapeDistance);
+				}
+				case CIRCLE_GRID -> {
 					ConfigGridDimen config = selectedCalib;
 					CreateCalibrationTargetGenerator generator = new CreateCalibrationTargetGenerator(outputFile, paper,
 							config.numRows, config.numCols, units);
 					generator.sendToPrinter = sendToPrinter;
-					generator.circleGrid((float) config.shapeSize, (float)config.shapeDistance);
-				} break;
-
-				case CIRCLE_HEX: {
+					generator.circleGrid((float)config.shapeSize, (float)config.shapeDistance);
+				}
+				case CIRCLE_HEX -> {
 					ConfigGridDimen config = selectedCalib;
 					CreateCalibrationTargetGenerator generator = new CreateCalibrationTargetGenerator(outputFile, paper,
 							config.numRows, config.numCols, units);
 					generator.sendToPrinter = sendToPrinter;
-					generator.circleHexagonal((float) config.shapeSize, (float)config.shapeDistance);
-				} break;
-
-				default:
-					throw new RuntimeException("Unknown type "+selectedType);
+					generator.circleHexagonal((float)config.shapeSize, (float)config.shapeDistance);
+				}
+				default -> throw new RuntimeException("Unknown type " + selectedType);
 			}
-		} catch( IOException e) {
-			BoofSwingUtil.warningDialog(this,e);
+		} catch (IOException e) {
+			BoofSwingUtil.warningDialog(this, e);
 		}
 	}
 
 	@Override
-	public void calibrationParametersChanged(CalibrationTargetPanel.TargetType type, ConfigGridDimen _config) {
+	public void calibrationParametersChanged( CalibrationTargetPanel.TargetType type, ConfigGridDimen _config ) {
 		this.selectedType = type;
 		this.selectedCalib = _config;
 
@@ -239,34 +214,34 @@ public class CreateCalibrationTargetGui extends JPanel
 	}
 
 	private void updatePreview() {
-		double paperWidth = paper.unit.convert(paper.width,units);
-		double paperHeight = paper.unit.convert(paper.height,units);
+		double paperWidth = paper.unit.convert(paper.width, units);
+		double paperHeight = paper.unit.convert(paper.height, units);
 
-		final RenderCalibrationTargetsGraphics2D renderer = new RenderCalibrationTargetsGraphics2D(-1,400/paperWidth);
-		renderer.setPaperSize(paperWidth,paperHeight);
+		final RenderCalibrationTargetsGraphics2D renderer = new RenderCalibrationTargetsGraphics2D(-1, 400/paperWidth);
+		renderer.setPaperSize(paperWidth, paperHeight);
 
-		if( selectedType == CalibrationTargetPanel.TargetType.CHESSBOARD ) {
+		if (selectedType == CalibrationTargetPanel.TargetType.CHESSBOARD) {
 			ConfigGridDimen config = selectedCalib;
-			renderer.chessboard(config.numRows,config.numCols,config.shapeSize);
-		} else if( selectedType == CalibrationTargetPanel.TargetType.SQUARE_GRID ) {
+			renderer.chessboard(config.numRows, config.numCols, config.shapeSize);
+		} else if (selectedType == CalibrationTargetPanel.TargetType.SQUARE_GRID) {
 			ConfigGridDimen config = selectedCalib;
-			renderer.squareGrid(config.numRows,config.numCols,config.shapeSize,config.shapeDistance);
-		} else if( selectedType == CalibrationTargetPanel.TargetType.CIRCLE_GRID ) {
+			renderer.squareGrid(config.numRows, config.numCols, config.shapeSize, config.shapeDistance);
+		} else if (selectedType == CalibrationTargetPanel.TargetType.CIRCLE_GRID) {
 			ConfigGridDimen config = selectedCalib;
-			renderer.circleRegular(config.numRows,config.numCols,config.shapeSize,config.shapeDistance);
-		} else if( selectedType == CalibrationTargetPanel.TargetType.CIRCLE_HEX ) {
+			renderer.circleRegular(config.numRows, config.numCols, config.shapeSize, config.shapeDistance);
+		} else if (selectedType == CalibrationTargetPanel.TargetType.CIRCLE_HEX) {
 			ConfigGridDimen config = selectedCalib;
-			renderer.circleHex(config.numRows,config.numCols,config.shapeSize,config.shapeDistance);
+			renderer.circleHex(config.numRows, config.numCols, config.shapeSize, config.shapeDistance);
 		}
 
 		renderingPanel.setImageUI(renderer.getBufferred());
 	}
 
 	@Override
-	public void actionPerformed(ActionEvent e) {
-		if( e.getSource() == comboPaper ) {
+	public void actionPerformed( ActionEvent e ) {
+		if (e.getSource() == comboPaper) {
 			paper = (PaperSize)comboPaper.getSelectedItem();
-		} else if( e.getSource() == comboUnits ) {
+		} else if (e.getSource() == comboUnits) {
 			units = Unit.values()[comboUnits.getSelectedIndex()];
 		}
 

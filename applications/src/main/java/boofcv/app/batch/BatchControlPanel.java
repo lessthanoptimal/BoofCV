@@ -37,30 +37,30 @@ public abstract class BatchControlPanel extends StandardAlgConfigPanel {
 	public int textWidth = 200;
 	public int textHeight = 30;
 
-	protected JPanel createTextSelect( final JTextField field , final String message , boolean directory ) {
+	protected JPanel createTextSelect( final JTextField field, final String message, boolean directory ) {
 		JButton bOpen = new JButton(UIManager.getIcon("FileView.fileIcon"));
-		bOpen.setPreferredSize(new Dimension(30,30));
+		bOpen.setPreferredSize(new Dimension(30, 30));
 		bOpen.setMaximumSize(bOpen.getPreferredSize());
-		bOpen.addActionListener(a->{
-			selectPath(field,message,directory);
+		bOpen.addActionListener(a -> {
+			selectPath(field, message, directory);
 		});
 
 		JPanel panel = new JPanel();
-		panel.setLayout(new BoxLayout(panel,BoxLayout.X_AXIS));
+		panel.setLayout(new BoxLayout(panel, BoxLayout.X_AXIS));
 		panel.add(field);
 		panel.add(bOpen);
 		return panel;
 	}
 
-	protected void selectPath(JTextField field , String message , boolean directory) {
+	protected void selectPath( JTextField field, String message, boolean directory ) {
 		File current = new File(field.getText());
-		if( !current.exists() )
+		if (!current.exists())
 			current = new File(".");
 
 		JFileChooser chooser = new JFileChooser();
 		chooser.setCurrentDirectory(current);
 		chooser.setDialogTitle(message);
-		if( directory )
+		if (directory)
 			chooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
 		else
 			chooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
@@ -74,7 +74,7 @@ public abstract class BatchControlPanel extends StandardAlgConfigPanel {
 	protected static JComponent createInputHelp() {
 		var text = new JTextArea("If 'Input Source' is a file or directory then all image files in the directory are added." +
 				" Otherwise 'glob' or 'regex' patterns can be used to search for all matches.\n" +
-				"'glob:path/**/media*' will recursively search for all files starting with media\n"+
+				"'glob:path/**/media*' will recursively search for all files starting with media\n" +
 				"'regex:path/\\w+/media\\w+' will recursively search for all files starting with media");
 		text.setLineWrap(true);
 		return text;
@@ -85,5 +85,4 @@ public abstract class BatchControlPanel extends StandardAlgConfigPanel {
 	public interface Listener {
 		void batchUpdate( String fileName );
 	}
-
 }

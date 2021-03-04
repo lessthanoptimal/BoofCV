@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -34,14 +34,13 @@ import java.awt.image.BufferedImage;
  * @author Peter Abeles
  */
 public class CalibrationInfoPanel extends StandardAlgConfigPanel
-	implements ActionListener
-{
+		implements ActionListener {
 	JProgressBar geometryProgress;
 	JProgressBar fillProgress;
 	JProgressBar focusMeter;
 
-	ImagePanel undistortedTemplate = new ImagePanel(80,80);
-	ImagePanel undistortedView = new ImagePanel(80,80);
+	ImagePanel undistortedTemplate = new ImagePanel(80, 80);
+	ImagePanel undistortedView = new ImagePanel(80, 80);
 	BufferedImage imageView;
 	BufferedImage imageTemplate;
 
@@ -73,7 +72,7 @@ public class CalibrationInfoPanel extends StandardAlgConfigPanel
 		JPanel imageRow = new JPanel();
 		imageRow.setLayout(new BoxLayout(imageRow, BoxLayout.X_AXIS));
 		imageRow.add(undistortedTemplate);
-		imageRow.add(Box.createRigidArea(new Dimension(10,10)));
+		imageRow.add(Box.createRigidArea(new Dimension(10, 10)));
 		imageRow.add(undistortedView);
 		imageRow.setMaximumSize(imageRow.getPreferredSize());
 
@@ -84,7 +83,7 @@ public class CalibrationInfoPanel extends StandardAlgConfigPanel
 
 		addCenterLabel("Geometry", this);
 		addAlignCenter(geometryProgress, this);
-		addCenterLabel("Edge Fill",this);
+		addCenterLabel("Edge Fill", this);
 		addAlignCenter(fillProgress, this);
 		add(Box.createRigidArea(new Dimension(5, 5)));
 		addAlignCenter(imageRow, this);
@@ -96,50 +95,35 @@ public class CalibrationInfoPanel extends StandardAlgConfigPanel
 	}
 
 	public void updateTemplate( GrayF32 image ) {
-		if( imageTemplate == null ) {
-			imageTemplate = new BufferedImage(image.width,image.height,BufferedImage.TYPE_INT_BGR);
+		if (imageTemplate == null) {
+			imageTemplate = new BufferedImage(image.width, image.height, BufferedImage.TYPE_INT_BGR);
 		}
-		ConvertBufferedImage.convertTo(image,imageTemplate);
+		ConvertBufferedImage.convertTo(image, imageTemplate);
 		undistortedTemplate.setImageUI(imageTemplate);
 	}
 
 	public void updateView( GrayF32 image ) {
-		if( imageView == null ) {
-			imageView = new BufferedImage(image.width,image.height,BufferedImage.TYPE_INT_BGR);
+		if (imageView == null) {
+			imageView = new BufferedImage(image.width, image.height, BufferedImage.TYPE_INT_BGR);
 		}
-		ConvertBufferedImage.convertTo(image,imageView);
+		ConvertBufferedImage.convertTo(image, imageView);
 		undistortedView.setImageUI(imageView);
 	}
 
 	public void updateGeometry( final double process ) {
-		SwingUtilities.invokeLater(new Runnable() {
-			@Override
-			public void run() {
-				geometryProgress.setValue((int)(100*process));
-			}
-		});
+		SwingUtilities.invokeLater(() -> geometryProgress.setValue((int)(100*process)));
 	}
 
-	public void updateEdgeFill(final double process) {
-		SwingUtilities.invokeLater(new Runnable() {
-			@Override
-			public void run() {
-				fillProgress.setValue((int)(100*process));
-			}
-		});
+	public void updateEdgeFill( final double process ) {
+		SwingUtilities.invokeLater(() -> fillProgress.setValue((int)(100*process)));
 	}
 
 	public void updateFocusScore( final double score ) {
 
-		this.focusMax = Math.max(focusMax,score);
+		this.focusMax = Math.max(focusMax, score);
 		final double value = score/focusMax;
 
-		SwingUtilities.invokeLater(new Runnable() {
-			@Override
-			public void run() {
-				focusMeter.setValue((int)(100*value));
-			}
-		});
+		SwingUtilities.invokeLater(() -> focusMeter.setValue((int)(100*value)));
 	}
 
 	public boolean isFinished() {
@@ -147,12 +131,7 @@ public class CalibrationInfoPanel extends StandardAlgConfigPanel
 	}
 
 	public void enabledFinishedButton() {
-		SwingUtilities.invokeLater(new Runnable() {
-			@Override
-			public void run() {
-				finishedButton.setEnabled(true);
-			}
-		});
+		SwingUtilities.invokeLater(() -> finishedButton.setEnabled(true));
 	}
 
 	public void resetForceSave() {
@@ -160,10 +139,10 @@ public class CalibrationInfoPanel extends StandardAlgConfigPanel
 	}
 
 	@Override
-	public void actionPerformed(ActionEvent e) {
-		if( e.getSource() == finishedButton) {
+	public void actionPerformed( ActionEvent e ) {
+		if (e.getSource() == finishedButton) {
 			saveRequested = true;
-		} else if( e.getSource() == forceSaveButton ) {
+		} else if (e.getSource() == forceSaveButton) {
 			forceSaveImage = true;
 		}
 	}

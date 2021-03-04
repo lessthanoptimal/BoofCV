@@ -411,7 +411,7 @@ public class CameraCalibration extends BaseStandardInputApp {
 			gui = null;
 		}
 
-		List<String> imagePath = UtilIO.listSmartImages(inputPattern,true);
+		List<String> imagePath = UtilIO.listSmartImages(inputPattern, true);
 
 		if (imagePath.isEmpty()) {
 			System.err.println("No images found. Check path, glob, or regex pattern");
@@ -421,7 +421,7 @@ public class CameraCalibration extends BaseStandardInputApp {
 		}
 
 		if (verbose)
-			System.out.println("Total images found: "+imagePath.size());
+			System.out.println("Total images found: " + imagePath.size());
 
 		// If configured to do so, create directory to store more verbose information
 		if (saveLandmarks) {
@@ -437,13 +437,13 @@ public class CameraCalibration extends BaseStandardInputApp {
 			}
 			BoofMiscOps.checkTrue(outputDirectory.mkdirs());
 			if (verbose)
-				System.out.println("Saving landmarks to "+outputDirectory.getPath());
+				System.out.println("Saving landmarks to " + outputDirectory.getPath());
 
 			try {
 				summaryDetection = new PrintStream(new BufferedOutputStream(new FileOutputStream(new File(outputDirectory, "summary_detection.csv"))));
 				summaryDetection.println("# Summary of success or failure for each image it processed");
 				summaryDetection.println("# (file name),(true = successful, false = failed)");
-			} catch( IOException e ){
+			} catch (IOException e) {
 				throw new UncheckedIOException(e);
 			}
 		}
@@ -463,7 +463,7 @@ public class CameraCalibration extends BaseStandardInputApp {
 
 			final BufferedImage buffered = UtilImageIO.loadImage(path);
 			if (buffered == null) {
-				System.err.println("Failed to open 'image' file: "+path);
+				System.err.println("Failed to open 'image' file: " + path);
 				continue;
 			}
 
@@ -488,8 +488,8 @@ public class CameraCalibration extends BaseStandardInputApp {
 
 			if (detector.process(image)) {
 				imagesSuccess.add(f);
-				if (summaryDetection!=null)
-					summaryDetection.println(f.getPath()+",true");
+				if (summaryDetection != null)
+					summaryDetection.println(f.getPath() + ",true");
 				// if configured to do so, save the landmarks to disk
 				if (outputDirectory != null) {
 					CalibrationIO.saveLandmarksCsv(f.getPath(), detector.getClass().getSimpleName(),
@@ -499,18 +499,17 @@ public class CameraCalibration extends BaseStandardInputApp {
 				calibrationAlg.addImage(detector.getDetectedPoints());
 				if (verbose)
 					System.out.println("  Detection successful " + f.getPath());
-
 			} else {
 				imagesFailed.add(f);
-				if (summaryDetection!=null)
-					summaryDetection.println(f.getPath()+",false");
+				if (summaryDetection != null)
+					summaryDetection.println(f.getPath() + ",false");
 				if (verbose)
 					System.out.println("  Detection FAILED " + f.getPath());
 			}
 		}
 
 		// Done detecting targets so close this file
-		if (summaryDetection!=null)
+		if (summaryDetection != null)
 			summaryDetection.close();
 
 		if (verbose) {
@@ -552,12 +551,12 @@ public class CameraCalibration extends BaseStandardInputApp {
 			}
 
 			// Save calibration statistics to disk
-			if (outputDirectory!=null) {
+			if (outputDirectory != null) {
 				try {
 					PrintStream out = new PrintStream(new File(outputDirectory, "stats.txt"));
 					calibrationAlg.printStatistics(out);
 					out.close();
-				} catch( IOException e) {
+				} catch (IOException e) {
 					throw new UncheckedIOException(e);
 				}
 			}

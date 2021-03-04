@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -65,8 +65,11 @@ public abstract class CreateSquareFiducialControlPanel extends StandardAlgConfig
 	}
 
 	protected void layoutComponents() {
-		configureTextField(fieldBorderFraction,borderFraction,a->{borderFraction=a;listener.controlsUpdates();});
-		configureTextField(fieldMarkerWidth,markerWidth,a->markerWidth=a);
+		configureTextField(fieldBorderFraction, borderFraction, a -> {
+			borderFraction = a;
+			listener.controlsUpdates();
+		});
+		configureTextField(fieldMarkerWidth, markerWidth, a -> markerWidth = a);
 
 		comboOutputFormat.setMaximumSize(comboOutputFormat.getPreferredSize());
 		format = (String)comboOutputFormat.getSelectedItem();
@@ -104,7 +107,8 @@ public abstract class CreateSquareFiducialControlPanel extends StandardAlgConfig
 				try {
 					double value = ((Number)field.getFormatter().stringToValue(field.getText())).doubleValue();
 					action.changed(value);
-				} catch (ParseException ignore) {}
+				} catch (ParseException ignore) {
+				}
 			}
 
 			@Override

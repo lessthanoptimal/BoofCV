@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -29,14 +29,14 @@ import org.kohsuke.args4j.spi.Setter;
  * @author Peter Abeles
  */
 public class LongArrayOptionHandler extends OptionHandler<Long> {
-	public LongArrayOptionHandler(CmdLineParser parser, OptionDef option, Setter<Long> setter) {
+	public LongArrayOptionHandler( CmdLineParser parser, OptionDef option, Setter<Long> setter ) {
 		super(parser, option, setter);
 	}
 
 	/**
 	 * Returns {@code "LONG[]"}.
 	 *
-	 * @return	return "LONG[]";
+	 * @return return "LONG[]";
 	 */
 	@Override
 	public String getDefaultMetaVariable() {
@@ -47,12 +47,12 @@ public class LongArrayOptionHandler extends OptionHandler<Long> {
 	 * Tries to parse {@code Long[]} argument from {@link Parameters}.
 	 */
 	@Override
-	public int parseArguments(Parameters params) throws CmdLineException {
-		int counter=0;
-		for (; counter<params.size(); counter++) {
+	public int parseArguments( Parameters params ) throws CmdLineException {
+		int counter = 0;
+		for (; counter < params.size(); counter++) {
 			String param = params.getParameter(counter);
 
-			if(param.startsWith("-")) {
+			if (param.startsWith("-")) {
 				break;
 			}
 

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -49,14 +49,14 @@ import java.io.IOException;
 public abstract class BaseFiducialSquare {
 
 	@Option(name = "-u", aliases = {"--Units"}, usage = "Name of document units.  default: cm")
-	private String _unit = Unit.CENTIMETER.abbreviation;
+	protected String _unit = Unit.CENTIMETER.abbreviation;
 	public Unit unit;
 
 	@Option(name = "-p", aliases = {"--PaperSize"}, usage = "Size of paper used.  See below for predefined document sizes.  "
 			+ "You can manually specify any size using the following notation. W:H  where W is the width and H is the height.  "
 			+ "Values of W and H is specified with <number><unit abbreviation>, e.g. 6cm or 6, the unit is optional.  If no unit"
 			+ " are specified the default document units are used.")
-	private String _paperSize = PaperSize.LETTER.name;
+	protected String _paperSize = PaperSize.LETTER.name;
 	public PaperSize paperSize;
 
 	@Option(name = "-w", aliases = {"--MarkerWidth"}, usage = "Width of each marker.  In document units.")
@@ -186,7 +186,7 @@ public abstract class BaseFiducialSquare {
 			}
 			paperSize = PaperSize.lookup(_paperSize);
 			if (paperSize == null) {
-				String words[] = _paperSize.split(":");
+				String[] words = _paperSize.split(":");
 				if (words.length != 2) failExit("Expected two value+unit separated by a :");
 				LengthUnit w = new LengthUnit(words[0]);
 				LengthUnit h = new LengthUnit(words[1]);

@@ -33,8 +33,7 @@ import java.awt.event.ActionListener;
  *
  * @author Peter Abeles
  */
-public class CalibrationModelPanel extends StandardAlgConfigPanel implements ActionListener
-{
+public class CalibrationModelPanel extends StandardAlgConfigPanel implements ActionListener {
 
 	JComboBox<ModelType> comboType;
 	JPanel panelTarget = new JPanel();
@@ -49,7 +48,6 @@ public class CalibrationModelPanel extends StandardAlgConfigPanel implements Act
 	public boolean universalTangential = true;
 	public boolean universalSkew = true;
 
-
 	public CalibrationModelPanel() {
 		setBorder(BorderFactory.createEmptyBorder());
 
@@ -58,19 +56,19 @@ public class CalibrationModelPanel extends StandardAlgConfigPanel implements Act
 		comboType.setMaximumSize(comboType.getPreferredSize());
 
 		panelTarget.setLayout(new BorderLayout());
-		panelTarget.setPreferredSize(new Dimension(250,100));
+		panelTarget.setPreferredSize(new Dimension(250, 100));
 		panelTarget.setMaximumSize(panelTarget.getPreferredSize());
 
 		changeTargetPanel();
 
-		addLabeled(comboType,"Model Type");
-		add(Box.createRigidArea(new Dimension(10,10)));
+		addLabeled(comboType, "Model Type");
+		add(Box.createRigidArea(new Dimension(10, 10)));
 		addAlignCenter(panelTarget);
 	}
 
 	@Override
-	public void actionPerformed(ActionEvent e) {
-		if( e.getSource() == comboType ) {
+	public void actionPerformed( ActionEvent e ) {
+		if (e.getSource() == comboType) {
 			selected = (ModelType)comboType.getSelectedItem();
 			changeTargetPanel();
 			updateParameters();
@@ -82,22 +80,20 @@ public class CalibrationModelPanel extends StandardAlgConfigPanel implements Act
 	}
 
 	private void changeTargetPanel() {
-
-		JPanel p;
-		switch(selected) {
-			case BROWN:p=new PinholePanel();break;
-			case UNIVERSAL:p=new UniversalPanel();break;
-			default:throw new RuntimeException("Unknown");
-		}
+		JPanel p = switch (selected) {
+			case BROWN -> new PinholePanel();
+			case UNIVERSAL -> new UniversalPanel();
+			default -> throw new RuntimeException("Unknown");
+		};
 
 		panelTarget.removeAll();
-		panelTarget.add(BorderLayout.CENTER,p);
+		panelTarget.add(BorderLayout.CENTER, p);
 		panelTarget.validate();
 		panelTarget.repaint();
 	}
 
 	private class PinholePanel extends StandardAlgConfigPanel
-			implements ChangeListener , ActionListener {
+			implements ChangeListener, ActionListener {
 
 		JSpinner numRadial;
 		JCheckBox tangential;
@@ -106,28 +102,28 @@ public class CalibrationModelPanel extends StandardAlgConfigPanel implements Act
 		public PinholePanel() {
 			setBorder(BorderFactory.createEmptyBorder());
 
-			numRadial = spinner(pinholeRadial,0,3,1);
-			tangential = checkbox("Tangential",pinholeTangential);
-			skew = checkbox("Zero Skew",pinholeSkew);
+			numRadial = spinner(pinholeRadial, 0, 3, 1);
+			tangential = checkbox("Tangential", pinholeTangential);
+			skew = checkbox("Zero Skew", pinholeSkew);
 
-			addLabeled(numRadial,"Radial");
+			addLabeled(numRadial, "Radial");
 			addAlignLeft(tangential);
 			addAlignLeft(skew);
 		}
 
 		@Override
-		public void stateChanged(ChangeEvent e) {
-			if( e.getSource() == numRadial ) {
+		public void stateChanged( ChangeEvent e ) {
+			if (e.getSource() == numRadial) {
 				pinholeRadial = ((Number)numRadial.getValue()).intValue();
 			}
 			updateParameters();
 		}
 
 		@Override
-		public void actionPerformed(ActionEvent e) {
-			if( e.getSource() == tangential ) {
+		public void actionPerformed( ActionEvent e ) {
+			if (e.getSource() == tangential) {
 				pinholeTangential = tangential.isSelected();
-			} else if( e.getSource() == skew ) {
+			} else if (e.getSource() == skew) {
 				pinholeSkew = skew.isSelected();
 			}
 			updateParameters();
@@ -135,7 +131,7 @@ public class CalibrationModelPanel extends StandardAlgConfigPanel implements Act
 	}
 
 	private class UniversalPanel extends StandardAlgConfigPanel
-			implements ChangeListener , ActionListener {
+			implements ChangeListener, ActionListener {
 
 		JSpinner numRadial;
 		JCheckBox tangential;
@@ -144,28 +140,28 @@ public class CalibrationModelPanel extends StandardAlgConfigPanel implements Act
 		public UniversalPanel() {
 			setBorder(BorderFactory.createEmptyBorder());
 
-			numRadial = spinner(universalRadial,0,3,1);
-			tangential = checkbox("Tangential",universalTangential);
-			skew = checkbox("Zero Skew",universalSkew);
+			numRadial = spinner(universalRadial, 0, 3, 1);
+			tangential = checkbox("Tangential", universalTangential);
+			skew = checkbox("Zero Skew", universalSkew);
 
-			addLabeled(numRadial,"Radial");
+			addLabeled(numRadial, "Radial");
 			addAlignLeft(tangential);
 			addAlignLeft(skew);
 		}
 
 		@Override
-		public void stateChanged(ChangeEvent e) {
-			if( e.getSource() == numRadial ) {
+		public void stateChanged( ChangeEvent e ) {
+			if (e.getSource() == numRadial) {
 				universalRadial = ((Number)numRadial.getValue()).intValue();
 			}
 			updateParameters();
 		}
 
 		@Override
-		public void actionPerformed(ActionEvent e) {
-			if( e.getSource() == tangential ) {
+		public void actionPerformed( ActionEvent e ) {
+			if (e.getSource() == tangential) {
 				universalTangential = tangential.isSelected();
-			} else if( e.getSource() == skew ) {
+			} else if (e.getSource() == skew) {
 				universalSkew = skew.isSelected();
 			}
 			updateParameters();

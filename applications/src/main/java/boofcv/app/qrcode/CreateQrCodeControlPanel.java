@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -38,10 +38,9 @@ import java.text.ParseException;
  *
  * @author Peter Abeles
  */
-public class CreateQrCodeControlPanel extends StandardAlgConfigPanel implements ActionListener
-{
-	JTextArea messageField= new JTextArea();
-	JComboBox<String> comboOutputFormat = new JComboBox<>(new String[]{"pdf","png","bmp","jpg","ppm","pgm"});
+public class CreateQrCodeControlPanel extends StandardAlgConfigPanel implements ActionListener {
+	JTextArea messageField = new JTextArea();
+	JComboBox<String> comboOutputFormat = new JComboBox<>(new String[]{"pdf", "png", "bmp", "jpg", "ppm", "pgm"});
 	JComboBox<String> comboVersion = new JComboBox<>();
 	JComboBox<String> comboError = new JComboBox<>();
 	JComboBox<String> comboPattern = new JComboBox<>();
@@ -52,17 +51,17 @@ public class CreateQrCodeControlPanel extends StandardAlgConfigPanel implements 
 	JComboBox<PaperSize> comboPaper = new JComboBox<>(PaperSize.values().toArray(new PaperSize[0]));
 
 	JComboBox<Unit> comboUnits = new JComboBox<>(Unit.values());
-	JFormattedTextField fieldMarkerWidth = BoofSwingUtil.createTextField(3.0,0.0,Double.NaN);
+	JFormattedTextField fieldMarkerWidth = BoofSwingUtil.createTextField(3.0, 0.0, Double.NaN);
 
-	int version=-1;
+	int version = -1;
 	String message = "Enter Text Here";
 	QrCode.ErrorLevel error = null;
 	QrCodeMaskPattern mask = null;
 	QrCode.Mode mode = null;
 	PaperSize paperSize;
-	boolean fillGrid=false;
-	public boolean drawGrid =false;
-	boolean hideInfo=false;
+	boolean fillGrid = false;
+	public boolean drawGrid = false;
+	boolean hideInfo = false;
 	String format;
 
 	Unit documentUnits = Unit.CENTIMETER;
@@ -70,31 +69,31 @@ public class CreateQrCodeControlPanel extends StandardAlgConfigPanel implements 
 
 	Listener listener;
 
-	public CreateQrCodeControlPanel(final Listener listener ) {
+	public CreateQrCodeControlPanel( final Listener listener ) {
 		this.listener = listener;
 
 		format = (String)comboOutputFormat.getSelectedItem();
 		comboOutputFormat.addActionListener(this);
 
 		messageField.setText(message);
-		messageField.setPreferredSize(new Dimension(200,300));
+		messageField.setPreferredSize(new Dimension(200, 300));
 		messageField.setLineWrap(true);
 		messageField.setWrapStyleWord(true);
 		messageField.getDocument().addDocumentListener(new DocumentListener() {
 			@Override
-			public void insertUpdate(DocumentEvent e) {
+			public void insertUpdate( DocumentEvent e ) {
 				message = messageField.getText();
 				listener.controlsUpdates();
 			}
 
 			@Override
-			public void removeUpdate(DocumentEvent e) {
+			public void removeUpdate( DocumentEvent e ) {
 				message = messageField.getText();
 				listener.controlsUpdates();
 			}
 
 			@Override
-			public void changedUpdate(DocumentEvent e) {
+			public void changedUpdate( DocumentEvent e ) {
 				message = messageField.getText();
 				listener.controlsUpdates();
 			}
@@ -102,13 +101,13 @@ public class CreateQrCodeControlPanel extends StandardAlgConfigPanel implements 
 
 		comboVersion.addItem("AUTOMATIC");
 		for (int i = 1; i <= 40; i++) {
-			comboVersion.addItem(""+i);
+			comboVersion.addItem("" + i);
 		}
 		comboVersion.addActionListener(this);
 		comboVersion.setMaximumSize(comboVersion.getPreferredSize());
 
 		comboError.addItem("AUTOMATIC");
-		for (QrCode.ErrorLevel e : QrCode.ErrorLevel.values() ) {
+		for (QrCode.ErrorLevel e : QrCode.ErrorLevel.values()) {
 			comboError.addItem(e.name());
 		}
 		comboError.setSelectedIndex(0);
@@ -116,8 +115,8 @@ public class CreateQrCodeControlPanel extends StandardAlgConfigPanel implements 
 		comboError.setMaximumSize(comboError.getPreferredSize());
 
 		comboPattern.addItem("AUTOMATIC");
-		for ( QrCodeMaskPattern e : QrCodeMaskPattern.values() ) {
-			comboPattern.addItem(e.toString().substring(1,4));
+		for (QrCodeMaskPattern e : QrCodeMaskPattern.values()) {
+			comboPattern.addItem(e.toString().substring(1, 4));
 		}
 		comboPattern.addActionListener(this);
 		comboPattern.setMaximumSize(comboPattern.getPreferredSize());
@@ -135,25 +134,25 @@ public class CreateQrCodeControlPanel extends StandardAlgConfigPanel implements 
 		comboPaper.setMaximumSize(comboPaper.getPreferredSize());
 		paperSize = comboPaper.getItemAt(comboPaper.getSelectedIndex());
 
-		checkFillGrid = checkbox("Fill Grid",fillGrid);
+		checkFillGrid = checkbox("Fill Grid", fillGrid);
 		checkDrawGrid = checkbox("Draw Grid", drawGrid);
-		checkHideInfo = checkbox("Hide Info",hideInfo);
+		checkHideInfo = checkbox("Hide Info", hideInfo);
 
 		add(new JScrollPane(messageField));
-		addLabeled(comboOutputFormat,"Output Format");
-		addLabeled(comboPaper,"Paper Size");
+		addLabeled(comboOutputFormat, "Output Format");
+		addLabeled(comboPaper, "Paper Size");
 		add(createMarkerWidthPanel());
 		add(createFlagPanel());
 		add(new JSeparator());
-		addLabeled(comboVersion,"Version");
-		addLabeled(comboError,"Error");
-		addLabeled(comboPattern,"Pattern");
-		addLabeled(comboMode,"Mode");
+		addLabeled(comboVersion, "Version");
+		addLabeled(comboError, "Error");
+		addLabeled(comboPattern, "Pattern");
+		addLabeled(comboMode, "Mode");
 	}
 
 	private JPanel createFlagPanel() {
 		JPanel panel = new JPanel();
-		panel.setLayout(new BoxLayout(panel,BoxLayout.X_AXIS));
+		panel.setLayout(new BoxLayout(panel, BoxLayout.X_AXIS));
 		panel.add(checkFillGrid);
 		panel.add(checkDrawGrid);
 		panel.add(checkHideInfo);
@@ -161,7 +160,7 @@ public class CreateQrCodeControlPanel extends StandardAlgConfigPanel implements 
 	}
 
 	private JPanel createMarkerWidthPanel() {
-		fieldMarkerWidth.setPreferredSize(new Dimension(50,20));
+		fieldMarkerWidth.setPreferredSize(new Dimension(50, 20));
 		fieldMarkerWidth.setMaximumSize(fieldMarkerWidth.getPreferredSize());
 		fieldMarkerWidth.setValue(markerWidth);
 //		fieldMarkerWidth.addPropertyChangeListener(new PropertyChangeListener() {
@@ -175,68 +174,69 @@ public class CreateQrCodeControlPanel extends StandardAlgConfigPanel implements 
 		// that the user has typed in even if they didn't hit enter
 		fieldMarkerWidth.getDocument().addDocumentListener(new DocumentListener() {
 			@Override
-			public void insertUpdate(DocumentEvent e) {
+			public void insertUpdate( DocumentEvent e ) {
 				try {
 					markerWidth = ((Number)fieldMarkerWidth.getFormatter().stringToValue(fieldMarkerWidth.getText())).doubleValue();
-				} catch (ParseException ignore) {}
+				} catch (ParseException ignore) {
+				}
 			}
 
 			@Override
-			public void removeUpdate(DocumentEvent e) {insertUpdate(e);}
+			public void removeUpdate( DocumentEvent e ) {insertUpdate(e);}
 
 			@Override
-			public void changedUpdate(DocumentEvent e) {insertUpdate(e);}
+			public void changedUpdate( DocumentEvent e ) {insertUpdate(e);}
 		});
 		comboUnits.setSelectedIndex(documentUnits.ordinal());
 		comboUnits.setMaximumSize(comboUnits.getPreferredSize());
 		comboUnits.addActionListener(this);
 
 		JPanel panel = new JPanel();
-		panel.setLayout(new BoxLayout(panel,BoxLayout.X_AXIS));
+		panel.setLayout(new BoxLayout(panel, BoxLayout.X_AXIS));
 		panel.add(new JLabel("Marker Width"));
-		panel.add(Box.createRigidArea(new Dimension(10,10)));
+		panel.add(Box.createRigidArea(new Dimension(10, 10)));
 		panel.add(fieldMarkerWidth);
 		panel.add(comboUnits);
 		return panel;
 	}
 
 	@Override
-	public void actionPerformed(ActionEvent e) {
-		if( e.getSource() == comboVersion ) {
+	public void actionPerformed( ActionEvent e ) {
+		if (e.getSource() == comboVersion) {
 			version = comboVersion.getSelectedIndex();
 			listener.controlsUpdates();
-		} else if( e.getSource() == comboError ) {
-			if( comboError.getSelectedIndex() == 0 ) {
+		} else if (e.getSource() == comboError) {
+			if (comboError.getSelectedIndex() == 0) {
 				error = null;
 			} else {
 				error = QrCode.ErrorLevel.lookup(comboError.getSelectedIndex() - 1);
 			}
 			listener.controlsUpdates();
-		} else if( e.getSource() == comboPattern ) {
-			if( comboPattern.getSelectedIndex() == 0 ) {
+		} else if (e.getSource() == comboPattern) {
+			if (comboPattern.getSelectedIndex() == 0) {
 				mask = null;
 			} else {
 				mask = QrCodeMaskPattern.lookupMask((String)comboPattern.getSelectedItem());
 			}
 			listener.controlsUpdates();
-		} else if( e.getSource() == comboMode ) {
-			if( comboMode.getSelectedIndex() == 0 ) {
+		} else if (e.getSource() == comboMode) {
+			if (comboMode.getSelectedIndex() == 0) {
 				mode = null;
 			} else {
 				mode = QrCode.Mode.lookup((String)comboPattern.getSelectedItem());
 			}
 			listener.controlsUpdates();
-		} else if( e.getSource() == comboPaper ) {
+		} else if (e.getSource() == comboPaper) {
 			paperSize = (PaperSize)comboPaper.getSelectedItem();
-		} else if( e.getSource() == checkHideInfo ) {
+		} else if (e.getSource() == checkHideInfo) {
 			hideInfo = checkHideInfo.isSelected();
-		} else if( e.getSource() == checkFillGrid ) {
+		} else if (e.getSource() == checkFillGrid) {
 			fillGrid = checkFillGrid.isSelected();
-		} else if( e.getSource() == checkDrawGrid) {
+		} else if (e.getSource() == checkDrawGrid) {
 			drawGrid = checkDrawGrid.isSelected();
-		} else if( e.getSource() == comboUnits ) {
-			documentUnits = (Unit) comboUnits.getSelectedItem();
-		} else if( e.getSource() == comboOutputFormat ) {
+		} else if (e.getSource() == comboUnits) {
+			documentUnits = (Unit)comboUnits.getSelectedItem();
+		} else if (e.getSource() == comboOutputFormat) {
 			format = (String)comboOutputFormat.getSelectedItem();
 			// toggle controls depending on type of output format
 			boolean enable = comboOutputFormat.getSelectedIndex() == 0;
@@ -251,5 +251,4 @@ public class CreateQrCodeControlPanel extends StandardAlgConfigPanel implements 
 	public interface Listener {
 		void controlsUpdates();
 	}
-
 }

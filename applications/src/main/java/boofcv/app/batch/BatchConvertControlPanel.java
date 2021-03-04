@@ -32,19 +32,19 @@ public abstract class BatchConvertControlPanel extends BatchControlPanel {
 	protected JTextField textOutputDirectory = new JTextField();
 	protected JCheckBox checkRename = new JCheckBox("Rename");
 
-	public void addStandardControls(Preferences prefs) {
-		textInputSource.setPreferredSize(new Dimension(textWidth,textHeight));
+	public void addStandardControls( Preferences prefs ) {
+		textInputSource.setPreferredSize(new Dimension(textWidth, textHeight));
 		textInputSource.setMaximumSize(textInputSource.getPreferredSize());
-		textOutputDirectory.setPreferredSize(new Dimension(textWidth,textHeight));
+		textOutputDirectory.setPreferredSize(new Dimension(textWidth, textHeight));
 		textOutputDirectory.setMaximumSize(textOutputDirectory.getPreferredSize());
 
-		textInputSource.setText(prefs.get(KEY_INPUT,""));
-		textOutputDirectory.setText(prefs.get(KEY_OUTPUT,""));
+		textInputSource.setText(prefs.get(KEY_INPUT, ""));
+		textOutputDirectory.setText(prefs.get(KEY_OUTPUT, ""));
 
-		bAction.addActionListener(a-> handleStart());
+		bAction.addActionListener(a -> handleStart());
 
-		addLabeled(createTextSelect(textInputSource,"Input Source",true),"Input");
-		addLabeled(createTextSelect(textOutputDirectory,"Output Directory",true),"Output");
+		addLabeled(createTextSelect(textInputSource, "Input Source", true), "Input");
+		addLabeled(createTextSelect(textOutputDirectory, "Output Directory", true), "Output");
 		addAlignLeft(checkRename);
 		add(createInputHelp());
 

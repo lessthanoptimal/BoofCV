@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -38,7 +38,7 @@ public class CreateSquareFiducialDocumentImage extends CreateFiducialDocumentIma
 
 	double blackBorderFractionalWidth;
 
-	public CreateSquareFiducialDocumentImage(String documentName ) {
+	public CreateSquareFiducialDocumentImage( String documentName ) {
 		super(documentName);
 		this.generator = new FiducialSquareGenerator(render);
 	}
@@ -47,26 +47,26 @@ public class CreateSquareFiducialDocumentImage extends CreateFiducialDocumentIma
 		return generator;
 	}
 
-	public void render( java.util.List<String> names , DogArray_I64 patterns , int gridWidth ) {
-		if( markerHeight > 0 )
+	public void render( java.util.List<String> names, DogArray_I64 patterns, int gridWidth ) {
+		if (markerHeight > 0)
 			throw new IllegalArgumentException("markerHeight must be < 0 since only square is supported");
 		generator.setMarkerWidth(markerWidth);
 		generator.setBlackBorder(blackBorderFractionalWidth);
-		render.configure(whiteBorderPixels,(int)generator.getMarkerWidth());
+		render.configure(whiteBorderPixels, (int)generator.getMarkerWidth());
 		for (int i = 0; i < patterns.size; i++) {
-			generator.generate(patterns.get(i),gridWidth);
-			save(render.getGray(),names.get(i));
+			generator.generate(patterns.get(i), gridWidth);
+			save(render.getGray(), names.get(i));
 		}
 	}
 
-	public void render( java.util.List<String> names , List<GrayU8> patterns ) {
-		if( markerHeight > 0 )
+	public void render( java.util.List<String> names, List<GrayU8> patterns ) {
+		if (markerHeight > 0)
 			throw new IllegalArgumentException("markerHeight must be < 0 since only square is supported");
 		generator.setMarkerWidth(markerWidth);
-		render.configure(whiteBorderPixels,(int)generator.getMarkerWidth());
+		render.configure(whiteBorderPixels, (int)generator.getMarkerWidth());
 		for (int i = 0; i < patterns.size(); i++) {
 			generator.generate(patterns.get(i));
-			save(render.getGray(),names.get(i));
+			save(render.getGray(), names.get(i));
 		}
 	}
 
@@ -74,7 +74,7 @@ public class CreateSquareFiducialDocumentImage extends CreateFiducialDocumentIma
 		whiteBorderPixels = pixels;
 	}
 
-	public void setBlackBorderFractionalWidth(double blackBorderFractionalWidth) {
+	public void setBlackBorderFractionalWidth( double blackBorderFractionalWidth ) {
 		this.blackBorderFractionalWidth = blackBorderFractionalWidth;
 	}
 }
