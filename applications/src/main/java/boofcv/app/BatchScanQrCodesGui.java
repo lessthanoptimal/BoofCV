@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -54,18 +54,15 @@ public class BatchScanQrCodesGui extends BatchProcessControlPanel
 		BoofSwingUtil.checkGuiThread();
 
 		BatchScanQrCodes batch = new BatchScanQrCodes();
-		batch.pathInput = textInputDirectory.getText();
+		batch.inputPattern = textInputSource.getText();
 		batch.pathOutput = textOutputFile.getText();
-		batch.regex = textRegex.getText();
-		batch.recursive = checkRecursive.isSelected();
 		batch.listener = this;
 		count = 0;
 
 		bAction.setEnabled(false);
 
-		prefs.put(KEY_INPUT, batch.pathInput);
+		prefs.put(KEY_INPUT, batch.inputPattern);
 		prefs.put(KEY_OUTPUT, batch.pathOutput);
-		prefs.put(KEY_RECURSIVE, batch.recursive + "");
 
 		new Thread(() -> {
 			try {

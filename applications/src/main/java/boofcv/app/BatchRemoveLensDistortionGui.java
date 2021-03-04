@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -31,8 +31,6 @@ import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.util.prefs.Preferences;
-import java.util.regex.Pattern;
-import java.util.regex.PatternSyntaxException;
 
 import static boofcv.app.batch.BatchConvertControlPanel.KEY_INPUT;
 import static boofcv.app.batch.BatchConvertControlPanel.KEY_OUTPUT;
@@ -45,8 +43,6 @@ import static boofcv.app.batch.BatchConvertControlPanel.KEY_OUTPUT;
 public class BatchRemoveLensDistortionGui extends JPanel implements BatchRemoveLensDistortion.Listener {
 
 	public static final String KEY_INTRINSIC = "intrinsic";
-	public static final String KEY_REGEX = "regex";
-
 
 	ControlPanel control = new ControlPanel();
 	ImagePanel imagePanel = new ImagePanel();
@@ -67,7 +63,7 @@ public class BatchRemoveLensDistortionGui extends JPanel implements BatchRemoveL
 	}
 
 	public boolean spawn( String pathIntrinsic , String pathInput , String pathOutput ,
-						  String regex , boolean rename , boolean recursive , AdjustmentType adjustment )
+						  boolean rename, AdjustmentType adjustment )
 	{
 		if( processing )
 			return false;
@@ -100,25 +96,18 @@ public class BatchRemoveLensDistortionGui extends JPanel implements BatchRemoveL
 			return false;
 		}
 
-		try {
-			Pattern.compile(regex);
-		} catch (PatternSyntaxException exception) {
-			JOptionPane.showMessageDialog(this, "Invalid Regex");
-			return false;
-		}
 
 		Preferences prefs = Preferences.userRoot().node(getClass().getSimpleName());
 		prefs.put(KEY_INTRINSIC,pathIntrinsic);
 		prefs.put(KEY_INPUT,pathInput);
 		prefs.put(KEY_OUTPUT,pathOutput);
-		prefs.put(KEY_REGEX,regex);
 
 		control.bAction.setText("Cancel");
 		processing = true;
 		System.out.println("point B");
 		String _pathOutput = pathOutput;
 		undistorter = new BatchRemoveLensDistortion(pathIntrinsic,pathInput,_pathOutput,
-				regex,rename,recursive,adjustment,this);
+				rename,adjustment,this);
 		new Thread(()->{undistorter.process();}).start();
 
 		return true;
@@ -166,12 +155,10 @@ public class BatchRemoveLensDistortionGui extends JPanel implements BatchRemoveL
 			} else {
 				System.out.println("Handle Start");
 				String pathIntrinsic = textIntrinsic.getText();
-				String pathInput = textInputDirectory.getText();
+				String pathInput = textInputSource.getText();
 				String pathOutput = textOutputDirectory.getText();
 
-				String regex = textRegex.getText();
 				boolean rename = checkRename.isSelected();
-				boolean recursive = checkRecursive.isSelected();
 
 				AdjustmentType adjustment = switch (comboResize.getSelectedIndex()) {
 					case 0 -> AdjustmentType.NONE;
@@ -181,7 +168,7 @@ public class BatchRemoveLensDistortionGui extends JPanel implements BatchRemoveL
 				};
 
 				System.out.println("before spawn");
-				spawn(pathIntrinsic, pathInput, pathOutput, regex, rename, recursive, adjustment);
+				spawn(pathIntrinsic, pathInput, pathOutput, rename, adjustment);
 			}
 		}
 	}

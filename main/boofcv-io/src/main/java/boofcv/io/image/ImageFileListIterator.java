@@ -39,7 +39,7 @@ public class ImageFileListIterator<T extends ImageBase<T>> implements Iterator<T
 	protected @Getter int index;
 
 	/** Pre-processing filter that should be applied to the erad in image */
-	protected @Getter @Setter BoofLambdas.Filter<T> filter = ( a ) -> a;
+	protected @Getter @Setter BoofLambdas.Transform<T> filter = ( a ) -> a;
 
 	/** Called when it encounters image can't be read due to an exception. */
 	protected @Getter @Setter HandleException exception = ( idx, path, e ) -> {

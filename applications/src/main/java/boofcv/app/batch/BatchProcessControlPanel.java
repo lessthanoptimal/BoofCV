@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -32,26 +32,19 @@ public abstract class BatchProcessControlPanel extends BatchControlPanel {
 	protected JTextField textOutputFile = new JTextField();
 
 	public void addStandardControls(Preferences prefs) {
-		boolean recursive = Boolean.parseBoolean(prefs.get(KEY_RECURSIVE,"false"));
-
-		textInputDirectory.setPreferredSize(new Dimension(textWidth,textHeight));
-		textInputDirectory.setMaximumSize(textInputDirectory.getPreferredSize());
+		textInputSource.setPreferredSize(new Dimension(textWidth,textHeight));
+		textInputSource.setMaximumSize(textInputSource.getPreferredSize());
 		textOutputFile.setPreferredSize(new Dimension(textWidth,textHeight));
 		textOutputFile.setMaximumSize(textOutputFile.getPreferredSize());
-		textRegex.setPreferredSize(new Dimension(textWidth+40,textHeight));
-		textRegex.setMaximumSize(textRegex.getPreferredSize());
-		textRegex.setText("([^\\s]+(\\.(?i)(jpg|png|gif|bmp))$)");
-		checkRecursive.setSelected(recursive);
 
-		textInputDirectory.setText(prefs.get(KEY_INPUT,textInputDirectory.getText()));
+		textInputSource.setText(prefs.get(KEY_INPUT, textInputSource.getText()));
 		textOutputFile.setText(prefs.get(KEY_OUTPUT,textOutputFile.getText()));
 
 		bAction.addActionListener(a-> handleStart());
 
-		addLabeled(createTextSelect(textInputDirectory,"Input Directory",true),"Input");
+		addLabeled(createTextSelect(textInputSource,"Input Source",true),"Input");
 		addLabeled(createTextSelect(textOutputFile,"Output File",true),"Output");
-		addAlignLeft(checkRecursive);
-		addLabeled(textRegex,"Regex");
+		add(createInputHelp());
 		addVerticalGlue();
 		addAlignCenter(bAction);
 	}

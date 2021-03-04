@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -22,6 +22,7 @@ import boofcv.abst.fiducial.QrCodeDetector;
 import boofcv.alg.fiducial.qrcode.QrCode;
 import boofcv.app.batch.BatchControlPanel;
 import boofcv.factory.fiducial.FactoryFiducial;
+import boofcv.io.UtilIO;
 import boofcv.io.image.ConvertBufferedImage;
 import boofcv.io.image.UtilImageIO;
 import boofcv.struct.image.GrayU8;
@@ -35,7 +36,7 @@ import java.io.FileNotFoundException;
 import java.io.PrintStream;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
-import java.util.ArrayDeque;
+import java.util.List;
 
 /**
  * Scans all images in a directory for QR codes and outputs the results
@@ -44,17 +45,14 @@ import java.util.ArrayDeque;
  */
 public class BatchScanQrCodes {
 
-	@Option(name = "-i", aliases = {"--Input"}, usage = "Path to input directory or file")
-	String pathInput;
+	@Option(name = "-i", aliases = {"--Input"}, usage = "Directory or glob pattern or regex pattern.\n"+
+			"Glob example: 'glob:data/**/left*.jpg'\n" +
+			"Regex example: 'regex:data/\\w+/left\\d+.jpg'\n" +
+			"If not a pattern then it's assumed to be a path. All files with known image extensions in their name as added, e.g. jpg, png")
+	String inputPattern;
 
 	@Option(name = "-o", aliases = {"--Output"}, usage = "Path to output file.")
 	String pathOutput = "qrcodes.txt";
-
-	@Option(name = "--Regex", usage = "Optional regex to filter files by name")
-	String regex = "";
-
-	@Option(name = "--Recursive", usage = "Should input directory be recursively searched")
-	boolean recursive = false;
 
 	@Option(name = "--GUI", usage = "Ignore all other command line arguments and switch to GUI mode")
 	private boolean guiMode = false;
@@ -76,47 +74,24 @@ public class BatchScanQrCodes {
 		total = 0;
 		output = new PrintStream(pathOutput);
 		output.println("# Found QR Codes inside of images");
-		output.println("# " + new File(pathInput).getPath());
+		output.println("# " + new File(inputPattern).getPath());
 		output.println("# Format:");
 		output.println("# <File Name> <Total Found>");
 		output.println("# message encoded with URLEncoder");
 
-		try {
-			ArrayDeque<File> files = new ArrayDeque<>();
-			files.add(new File(pathInput));
+		List<String> inputs = UtilIO.listSmartImages(inputPattern,false);
 
-			while (!files.isEmpty()) {
-				File f = files.remove();
-				if (!f.exists()) {
-					System.err.println("Does not exist: " + f.getPath());
-				} else {
-					if (f.isFile()) {
-						processFile(f);
-					} else {
-						File[] children = f.listFiles();
-						if (children == null)
-							continue;
-						for (File c : children) {
-							if (c.isFile()) {
-								processFile(c);
-							} else if (recursive) {
-								files.add(c);
-							}
-						}
-					}
-				}
-			}
-		} finally {
-			output.close();
+		if (inputs.isEmpty())
+			System.out.println("No inputs found. Bath path or pattern? "+inputPattern);
+
+		for( String path : inputs ) {
+			processFile(new File(path));
 		}
 		System.out.println("\n\nDone! Images Count = " + total);
 	}
 
 	private void processFile( File f ) throws UnsupportedEncodingException {
-		if (regex.length() > 0 && !f.getName().matches(regex))
-			return;
-
-		BufferedImage buffered = UtilImageIO.loadImage(f.getAbsolutePath());
+				BufferedImage buffered = UtilImageIO.loadImage(f.getAbsolutePath());
 		if (buffered == null) {
 			System.err.println("Can't open " + f.getPath());
 			return;
@@ -147,8 +122,14 @@ public class BatchScanQrCodes {
 		System.out.println();
 		System.out.println("Examples:");
 		System.out.println();
-		System.out.println("--Recursive -i /path/to/directory -o myresults.txt");
-		System.out.println("--Recursive --Regex \"\\w*\\.jpg\" -i /path/to/directory -o myresults.txt");
+		System.out.println("-i /path/to/directory -o myresults.txt");
+		System.out.println("   Finds all images in 'path/to' directory");
+		System.out.println("-i \"regex:path/to/\\w+\\.jpg\" -o myresults.txt");
+		System.out.println("   Finds all files ending with .jpg in 'path/to' directory");
+		System.out.println("-i \"glob:path/to/*.jpg\" -o myresults.txt");
+		System.out.println("   Finds all files ending with .jpg in 'path/to' directory");
+		System.out.println("-i \"glob:path/**/*\" -o myresults.txt");
+		System.out.println("   Recursively search all directories starting at 'path' for images");
 
 		System.exit(1);
 	}

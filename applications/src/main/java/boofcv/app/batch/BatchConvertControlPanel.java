@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -33,25 +33,21 @@ public abstract class BatchConvertControlPanel extends BatchControlPanel {
 	protected JCheckBox checkRename = new JCheckBox("Rename");
 
 	public void addStandardControls(Preferences prefs) {
-		textInputDirectory.setPreferredSize(new Dimension(textWidth,textHeight));
-		textInputDirectory.setMaximumSize(textInputDirectory.getPreferredSize());
+		textInputSource.setPreferredSize(new Dimension(textWidth,textHeight));
+		textInputSource.setMaximumSize(textInputSource.getPreferredSize());
 		textOutputDirectory.setPreferredSize(new Dimension(textWidth,textHeight));
 		textOutputDirectory.setMaximumSize(textOutputDirectory.getPreferredSize());
-		textRegex.setPreferredSize(new Dimension(textWidth+40,textHeight));
-		textRegex.setMaximumSize(textRegex.getPreferredSize());
-		textRegex.setText("([^\\s]+(\\.(?i)(jpg|png|gif|bmp))$)");
-		checkRecursive.setSelected(false);
 
-		textInputDirectory.setText(prefs.get(KEY_INPUT,""));
+		textInputSource.setText(prefs.get(KEY_INPUT,""));
 		textOutputDirectory.setText(prefs.get(KEY_OUTPUT,""));
 
 		bAction.addActionListener(a-> handleStart());
 
-		addLabeled(createTextSelect(textInputDirectory,"Input Directory",true),"Input");
+		addLabeled(createTextSelect(textInputSource,"Input Source",true),"Input");
 		addLabeled(createTextSelect(textOutputDirectory,"Output Directory",true),"Output");
-		addAlignLeft(checkRecursive);
 		addAlignLeft(checkRename);
-		addLabeled(textRegex,"Regex");
+		add(createInputHelp());
+
 		addVerticalGlue();
 		addAlignCenter(bAction);
 	}

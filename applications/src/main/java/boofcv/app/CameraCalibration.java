@@ -62,7 +62,7 @@ import static boofcv.app.calib.AssistedCalibration.OUTPUT_DIRECTORY;
  */
 public class CameraCalibration extends BaseStandardInputApp {
 
-	protected String inputDirectory;
+	protected String inputPattern;
 	protected String outputFileName = "intrinsic.yaml";
 	protected DetectorFiducialCalibration detector;
 	protected boolean zeroSkew = true;
@@ -93,7 +93,13 @@ public class CameraCalibration extends BaseStandardInputApp {
 		System.out.println();
 		System.out.println("Input: File Options:  ");
 		System.out.println();
-		System.out.println("  --Directory=<path>                 Directory containing calibration images");
+		System.out.println("  --Input=<path>                     Directory or glob pattern or regex pattern.");
+		System.out.println("                                     Glob example: 'glob:data/**/left*.jpg'");
+		System.out.println("                                     Regex example: 'regex:data/\\w+/left\\d+.jpg'");
+		System.out.println("                                     If not a pattern then it's assumed to be a path. All files");
+		System.out.println("                                     with known image extensions in their name as added,");
+		System.out.println("                                     e.g. jpg, png");
+		System.out.println();
 		System.out.println("  --Visualize                        Turns on visualization in a GUI of final results");
 		System.out.println();
 		System.out.println("Input: Webcam Options:  ");
@@ -151,10 +157,12 @@ public class CameraCalibration extends BaseStandardInputApp {
 		System.out.println("Examples:");
 		System.out.println("  java -jar applications.jar CameraCalibration --GUI");
 		System.out.println("          Opens a GUI and let's you do all the configurations there");
-		System.out.println("  java -jar applications.jar CameraCalibration --Directory=path/to/input/ --Model=brown CHESSBOARD --Grid=7:5");
+		System.out.println("  java -jar applications.jar CameraCalibration --Input=path/to/input/ --Model=brown CHESSBOARD --Grid=7:5");
 		System.out.println("          Calibrates using a brown model and a chessboard target with a 7x5 grid.");
-		System.out.println("  java -jar applications.jar CameraCalibration --Visualize --SaveLandmarks --Directory=path/to/input/ CHESSBOARD --Grid=7:5");
+		System.out.println("  java -jar applications.jar CameraCalibration --Visualize --SaveLandmarks --Input=path/to/input/ CHESSBOARD --Grid=7:5");
 		System.out.println("          The same, but saves the corners and visualizes the results.");
+		System.out.println("  java -jar applications.jar CameraCalibration \"--Input=glob:stereo_data/left**.jpg\" --Model=brown CHESSBOARD --Grid=7:5");
+		System.out.println("          Uses a glob pattern to find all left images in a directory");
 		System.out.println();
 	}
 
@@ -181,8 +189,8 @@ public class CameraCalibration extends BaseStandardInputApp {
 					justDetect = true;
 				} else if (!checkCameraFlag(arg)) {
 					splitFlag(arg);
-					if (flagName.compareToIgnoreCase("Directory") == 0) {
-						inputDirectory = BoofMiscOps.handlePathTilde(parameters);
+					if (flagName.compareToIgnoreCase("Input") == 0) {
+						inputPattern = BoofMiscOps.handlePathTilde(parameters);
 						inputType = InputType.IMAGE;
 					} else if (flagName.compareToIgnoreCase("Model") == 0) {
 						if (parameters.compareToIgnoreCase("pinhole") == 0) {
@@ -380,29 +388,6 @@ public class CameraCalibration extends BaseStandardInputApp {
 	protected void handleDirectory() {
 		File outputDirectory = null;
 		PrintStream summaryDetection = null;
-		if (saveLandmarks) {
-			String baseName = FilenameUtils.getBaseName(outputFileName);
-			baseName += "_landmarks";
-			String name = baseName;
-			// keep on trying to create the output directory until it succeeds
-			for (int i = 0; i < 10_000; i++) {
-				outputDirectory = new File(new File(outputFileName).getParent(), name);
-				if (outputDirectory.exists()) {
-					name = baseName + i;
-				}
-			}
-			BoofMiscOps.checkTrue(outputDirectory.mkdirs());
-			if (verbose)
-				System.out.println("Saving landmarks to "+outputDirectory.getPath());
-
-			try {
-				summaryDetection = new PrintStream(new BufferedOutputStream(new FileOutputStream(new File(outputDirectory, "summary_detection.csv"))));
-				summaryDetection.println("# Summary of success or failure for each image it processed");
-				summaryDetection.println("# (file name),(true = successful, false = failed)");
-			} catch( IOException e ){
-				throw new UncheckedIOException(e);
-			}
-		}
 
 		final CalibrateMonoPlanar calibrationAlg = new CalibrateMonoPlanar(detector.getLayout());
 		final CalibratedPlanarPanel gui;
@@ -426,21 +411,42 @@ public class CameraCalibration extends BaseStandardInputApp {
 			gui = null;
 		}
 
-		File directory = new File(inputDirectory);
-		if (!directory.exists()) {
-			System.err.println("Input directory doesn't exist!");
-			System.err.println("  " + inputDirectory);
-			System.exit(0);
-		}
-		List<String> imagePath = UtilIO.listImages(directory.getPath(), true);
+		List<String> imagePath = UtilIO.listSmartImages(inputPattern,true);
 
 		if (imagePath.isEmpty()) {
-			System.err.println("No image files found!");
-			System.err.println(inputDirectory);
-			System.exit(0);
+			System.err.println("No images found. Check path, glob, or regex pattern");
+			System.err.println("  " + inputPattern);
+			System.exit(1);
+			return;
 		}
+
 		if (verbose)
 			System.out.println("Total images found: "+imagePath.size());
+
+		// If configured to do so, create directory to store more verbose information
+		if (saveLandmarks) {
+			String baseName = FilenameUtils.getBaseName(outputFileName);
+			baseName += "_landmarks";
+			String name = baseName;
+			// keep on trying to create the output directory until it succeeds
+			for (int i = 0; i < 10_000; i++) {
+				outputDirectory = new File(new File(outputFileName).getParent(), name);
+				if (outputDirectory.exists()) {
+					name = baseName + i;
+				}
+			}
+			BoofMiscOps.checkTrue(outputDirectory.mkdirs());
+			if (verbose)
+				System.out.println("Saving landmarks to "+outputDirectory.getPath());
+
+			try {
+				summaryDetection = new PrintStream(new BufferedOutputStream(new FileOutputStream(new File(outputDirectory, "summary_detection.csv"))));
+				summaryDetection.println("# Summary of success or failure for each image it processed");
+				summaryDetection.println("# (file name),(true = successful, false = failed)");
+			} catch( IOException e ){
+				throw new UncheckedIOException(e);
+			}
+		}
 
 		if (monitor != null) {
 			monitor.setMessage(0, "Loading images");
@@ -483,7 +489,7 @@ public class CameraCalibration extends BaseStandardInputApp {
 			if (detector.process(image)) {
 				imagesSuccess.add(f);
 				if (summaryDetection!=null)
-					summaryDetection.println(f.getName()+",true");
+					summaryDetection.println(f.getPath()+",true");
 				// if configured to do so, save the landmarks to disk
 				if (outputDirectory != null) {
 					CalibrationIO.saveLandmarksCsv(f.getPath(), detector.getClass().getSimpleName(),
@@ -492,14 +498,14 @@ public class CameraCalibration extends BaseStandardInputApp {
 				}
 				calibrationAlg.addImage(detector.getDetectedPoints());
 				if (verbose)
-					System.out.println("  Detection successful " + f.getName());
+					System.out.println("  Detection successful " + f.getPath());
 
 			} else {
 				imagesFailed.add(f);
 				if (summaryDetection!=null)
-					summaryDetection.println(f.getName()+",false");
+					summaryDetection.println(f.getPath()+",false");
 				if (verbose)
-					System.out.println("  Detection FAILED " + f.getName());
+					System.out.println("  Detection FAILED " + f.getPath());
 			}
 		}
 
@@ -657,7 +663,7 @@ public class CameraCalibration extends BaseStandardInputApp {
 		if (assisted.isFinished()) {
 			frame.setVisible(false);
 
-			inputDirectory = new File(OUTPUT_DIRECTORY, IMAGE_DIRECTORY).getPath();
+			inputPattern = new File(OUTPUT_DIRECTORY, IMAGE_DIRECTORY).getPath();
 			outputFileName = new File(OUTPUT_DIRECTORY, "intrinsic.yaml").getPath();
 			handleDirectory();
 		}

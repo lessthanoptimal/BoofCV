@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -30,11 +30,8 @@ import java.io.File;
 public abstract class BatchControlPanel extends StandardAlgConfigPanel {
 	public static final String KEY_INPUT = "input";
 	public static final String KEY_OUTPUT = "output";
-	public static final String KEY_RECURSIVE = "recursive";
 
-	protected JTextField textInputDirectory = new JTextField();
-	protected JTextField textRegex = new JTextField();
-	protected JCheckBox checkRecursive = new JCheckBox("Recursive");
+	protected JTextField textInputSource = new JTextField();
 	public JButton bAction = new JButton("Start");
 
 	public int textWidth = 200;
@@ -72,6 +69,15 @@ public abstract class BatchControlPanel extends StandardAlgConfigPanel {
 		if (chooser.showOpenDialog(this) == JFileChooser.APPROVE_OPTION) {
 			field.setText(chooser.getSelectedFile().getAbsolutePath());
 		}
+	}
+
+	protected static JComponent createInputHelp() {
+		var text = new JTextArea("If 'Input Source' is a file or directory then all image files in the directory are added." +
+				" Otherwise 'glob' or 'regex' patterns can be used to search for all matches.\n" +
+				"'glob:path/**/media*' will recursively search for all files starting with media\n"+
+				"'regex:path/\\w+/media\\w+' will recursively search for all files starting with media");
+		text.setLineWrap(true);
+		return text;
 	}
 
 	protected abstract void handleStart();

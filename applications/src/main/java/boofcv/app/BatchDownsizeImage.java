@@ -31,8 +31,6 @@ import org.kohsuke.args4j.Option;
 
 import java.awt.image.BufferedImage;
 import java.io.File;
-import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
 
 /**
@@ -42,17 +40,15 @@ import java.util.List;
  */
 public class BatchDownsizeImage {
 
-	@Option(name = "-i", aliases = {"--Input"},
-			usage = "Path to input directory")
-	String pathInput;
+	@Option(name = "-i", aliases = {"--Input"}, usage = "Directory or glob pattern or regex pattern.\n"+
+			"Glob example: 'glob:data/**/left*.jpg'\n" +
+			"Regex example: 'regex:data/\\w+/left\\d+.jpg'\n" +
+			"If not a pattern then it's assumed to be a path. All files with known image extensions in their name as added, e.g. jpg, png")
+	String inputPattern;
 	@Option(name = "-o", aliases = {"--Output"}, usage = "Path to output directory")
-	String pathOutput;
-	@Option(name = "-r", aliases = {"--Regex"}, usage = "Regex. Example: .*\\.jpg")
-	String regex;
+	String outputPath;
 	@Option(name = "--Rename", usage = "Rename files")
 	boolean rename;
-	@Option(name = "--Recursive", usage = "Should input directory be recursively searched")
-	boolean recursive;
 	@Option(name = "--GUI", usage = "Ignore all other command line arguments and switch to GUI mode")
 	private boolean guiMode = false;
 	@Option(name = "-w", aliases = {"--Width"}, usage = "Sets output width. If zero then aspect is matched with height")
@@ -88,24 +84,25 @@ public class BatchDownsizeImage {
 		System.out.println("max length     = " + maxLength);
 		System.out.println("pixel count    = " + pixelCount);
 		System.out.println("rename         = " + rename);
-		System.out.println("input path     = " + pathInput);
-		System.out.println("name regex     = " + regex);
-		System.out.println("output dir     = " + pathOutput);
+		System.out.println("input pattern  = " + inputPattern);
+		System.out.println("output dir     = " + outputPath);
 
-		List<File> files = Arrays.asList(UtilIO.findMatches(new File(pathInput), regex));
-		Collections.sort(files);
+		List<String> paths = UtilIO.listSmartImages(inputPattern,false);
+
+		if (paths.isEmpty())
+			System.out.println("No inputs found. Bath path or pattern? "+inputPattern);
 
 		// Create the output directory if it doesn't exist
-		if (!new File(pathOutput).exists()) {
-			BoofMiscOps.checkTrue(new File(pathOutput).mkdirs());
+		if (!new File(outputPath).exists()) {
+			BoofMiscOps.checkTrue(new File(outputPath).mkdirs());
 		}
 
 		Planar<GrayU8> planar = new Planar<>(GrayU8.class, 1, 1, 1);
 		Planar<GrayU8> small = new Planar<>(GrayU8.class, 1, 1, 1);
-		int numDigits = BoofMiscOps.numDigits(files.size() - 1);
+		int numDigits = BoofMiscOps.numDigits(paths.size() - 1);
 		String format = "%0" + numDigits + "d";
-		for (int i = 0; i < files.size(); i++) {
-			File file = files.get(i);
+		for (int i = 0; i < paths.size(); i++) {
+			File file = new File(paths.get(i));
 			System.out.print("processing " + file.getName());
 			BufferedImage orig = UtilImageIO.loadImage(file.getAbsolutePath());
 			if (orig == null) {
@@ -173,7 +170,7 @@ public class BatchDownsizeImage {
 
 			BufferedImage output = ConvertBufferedImage.convertTo(small, null, true);
 
-			UtilImageIO.saveImage(output, new File(pathOutput, nameOut).getAbsolutePath());
+			UtilImageIO.saveImage(output, new File(outputPath, nameOut).getAbsolutePath());
 
 			if (cancel) {
 				break;

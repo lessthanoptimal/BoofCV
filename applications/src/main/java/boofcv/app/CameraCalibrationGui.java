@@ -205,7 +205,7 @@ public class CameraCalibrationGui extends JPanel
 		if (chooser.showOpenDialog(this) == JFileChooser.APPROVE_OPTION) {
 			prefs.put(KEY_PREVIOUS_SELECTION, chooser.getSelectedFile().getAbsolutePath());
 			app.inputType = BaseStandardInputApp.InputType.IMAGE;
-			app.inputDirectory = chooser.getSelectedFile().getAbsolutePath();
+			app.inputPattern = chooser.getSelectedFile().getAbsolutePath();
 			createDetector();
 			frame.setVisible(false);
 
