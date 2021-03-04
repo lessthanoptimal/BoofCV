@@ -45,7 +45,7 @@ import java.util.List;
  */
 public class BatchScanQrCodes {
 
-	@Option(name = "-i", aliases = {"--Input"}, usage = "Directory or glob pattern or regex pattern.\n"+
+	@Option(name = "-i", aliases = {"--Input"}, usage = "Directory or glob pattern or regex pattern.\n" +
 			"Glob example: 'glob:data/**/left*.jpg'\n" +
 			"Regex example: 'regex:data/\\w+/left\\d+.jpg'\n" +
 			"If not a pattern then it's assumed to be a path. All files with known image extensions in their name as added, e.g. jpg, png")
@@ -79,19 +79,19 @@ public class BatchScanQrCodes {
 		output.println("# <File Name> <Total Found>");
 		output.println("# message encoded with URLEncoder");
 
-		List<String> inputs = UtilIO.listSmartImages(inputPattern,false);
+		List<String> inputs = UtilIO.listSmartImages(inputPattern, false);
 
 		if (inputs.isEmpty())
-			System.out.println("No inputs found. Bath path or pattern? "+inputPattern);
+			System.out.println("No inputs found. Bath path or pattern? " + inputPattern);
 
-		for( String path : inputs ) {
+		for (String path : inputs) {
 			processFile(new File(path));
 		}
 		System.out.println("\n\nDone! Images Count = " + total);
 	}
 
 	private void processFile( File f ) throws UnsupportedEncodingException {
-				BufferedImage buffered = UtilImageIO.loadImage(f.getAbsolutePath());
+		BufferedImage buffered = UtilImageIO.loadImage(f.getAbsolutePath());
 		if (buffered == null) {
 			System.err.println("Can't open " + f.getPath());
 			return;

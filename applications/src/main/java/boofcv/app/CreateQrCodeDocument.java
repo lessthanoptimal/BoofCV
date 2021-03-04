@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -50,11 +50,11 @@ public class CreateQrCodeDocument {
 	public List<String> messages;
 
 	@Option(name = "-m", aliases = {"--Mask"}, usage = "Specify which mask to use. Most people shouldn't use this flag. Options: 000, 001, 010, 011, 100, 101, 110, 111")
-	private String _mask = null;
+	protected String _mask = null;
 	public QrCodeMaskPattern mask;
 
 	@Option(name = "-e", aliases = {"--Error"}, usage = "Error correction level. Options: L,M,Q,H. Robustness: 7%, 15%, 25%, 30%, respectively ")
-	private String _error = "M";
+	protected String _error = "M";
 	public QrCode.ErrorLevel error;
 
 	@Option(name = "-v", aliases = {"--Version"}, usage =
@@ -63,18 +63,18 @@ public class CreateQrCodeDocument {
 
 	@Option(name = "-n", aliases = {"--Encoding"}, usage =
 			"Type of data that can be encoded. Default is auto select. Options: NUMERIC, ALPHANUMERIC, BYTE, KANJI")
-	private String _encoding = "AUTO";
+	protected String _encoding = "AUTO";
 	public QrCode.Mode encoding;
 
 	@Option(name = "-u", aliases = {"--Units"}, usage = "Name of document units.  default: cm")
-	private String _unit = Unit.CENTIMETER.abbreviation;
+	protected String _unit = Unit.CENTIMETER.abbreviation;
 	public Unit unit;
 
 	@Option(name = "-p", aliases = {"--PaperSize"}, usage = "Size of paper used.  See below for predefined document sizes.  "
 			+ "You can manually specify any size using the following notation. W:H  where W is the width and H is the height.  "
 			+ "Values of W and H is specified with <number><unit abbreviation>, e.g. 6cm or 6, the unit is optional.  If no unit"
 			+ " are specified the default document units are used.")
-	private String _paperSize = PaperSize.LETTER.name;
+	protected String _paperSize = PaperSize.LETTER.name;
 	public PaperSize paperSize;
 
 	@Option(name = "-w", aliases = {"--MarkerWidth"}, usage = "Width of the QR Code.  In document units.")
@@ -103,7 +103,7 @@ public class CreateQrCodeDocument {
 	public boolean hideInfo = false;
 
 	@Option(name = "--GUI", usage = "Ignore all other command line arguments and switch to GUI mode")
-	private boolean guiMode = false;
+	public boolean guiMode = false;
 
 	// if true it will send a document to the printer instead of saving it
 	public boolean sendToPrinter = false;
@@ -168,7 +168,7 @@ public class CreateQrCodeDocument {
 			}
 			paperSize = PaperSize.lookup(_paperSize);
 			if (paperSize == null) {
-				String words[] = _paperSize.split(":");
+				String[] words = _paperSize.split(":");
 				if (words.length != 2) failExit("Expected two value+unit separated by a :");
 				LengthUnit w = new LengthUnit(words[0]);
 				LengthUnit h = new LengthUnit(words[1]);
@@ -211,20 +211,11 @@ public class CreateQrCodeDocument {
 
 			if (encoding != null) {
 				switch (encoding) {
-					case NUMERIC:
-						encoder.addNumeric(message);
-						break;
-					case ALPHANUMERIC:
-						encoder.addAlphanumeric(message);
-						break;
-					case BYTE:
-						encoder.addBytes(message);
-						break;
-					case KANJI:
-						encoder.addKanji(message);
-						break;
-					default:
-						throw new RuntimeException("Unknown mode");
+					case NUMERIC -> encoder.addNumeric(message);
+					case ALPHANUMERIC -> encoder.addAlphanumeric(message);
+					case BYTE -> encoder.addBytes(message);
+					case KANJI -> encoder.addKanji(message);
+					default -> throw new RuntimeException("Unknown mode");
 				}
 			} else {
 				encoder.addAutomatic(message);
@@ -240,7 +231,7 @@ public class CreateQrCodeDocument {
 		}
 
 		switch (fileType) {
-			case "pdf": {
+			case "pdf" -> {
 				CreateQrCodeDocumentPDF renderer = new CreateQrCodeDocumentPDF(fileName, paperSize, unit);
 				renderer.markerWidth = markerWidth;
 				renderer.spaceBetween = spaceBetween;
@@ -257,16 +248,13 @@ public class CreateQrCodeDocument {
 				} else
 					renderer.saveToDisk();
 			}
-			break;
-
-			default: {
+			default -> {
 				// TODO support the ability to specify how large the QR code is in pixels
 				CreateQrCodeDocumentImage renderer = new CreateQrCodeDocumentImage(fileName, 20);
 //				renderer.setWhiteBorder((int)spaceBetween);
 //				renderer.setMarkerWidth((int)markerWidth);
 				renderer.render(markers);
 			}
-			break;
 		}
 	}
 

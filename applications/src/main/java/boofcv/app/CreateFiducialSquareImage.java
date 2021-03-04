@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -46,19 +46,19 @@ import java.util.List;
 public class CreateFiducialSquareImage extends BaseFiducialSquareBorder {
 
 	// Paths to image files containing fiducial patterns
-	@Option(name = "-i",aliases = {"--Images"},usage = "Path to images", handler = StringArrayOptionHandler.class)
+	@Option(name = "-i", aliases = {"--Images"}, usage = "Path to images", handler = StringArrayOptionHandler.class)
 	List<String> imagePaths = new ArrayList<>();
 
-	@Option(name = "--Threshold",usage = "Threshold used to convert images into binary")
+	@Option(name = "--Threshold", usage = "Threshold used to convert images into binary")
 	int threshold = 128;
 
 	@Override
-	protected void callRenderPdf(CreateFiducialDocumentPDF renderer) throws IOException {
+	protected void callRenderPdf( CreateFiducialDocumentPDF renderer ) throws IOException {
 		((CreateSquareFiducialDocumentPDF)renderer).render(getNames(), loadPatterns());
 	}
 
 	@Override
-	protected void callRenderImage(CreateFiducialDocumentImage renderer) {
+	protected void callRenderImage( CreateFiducialDocumentImage renderer ) {
 		((CreateSquareFiducialDocumentImage)renderer).render(getNames(), loadPatterns());
 	}
 
@@ -79,30 +79,30 @@ public class CreateFiducialSquareImage extends BaseFiducialSquareBorder {
 		return names;
 	}
 
-	protected GrayU8 loadPattern(int patternID) {
+	protected GrayU8 loadPattern( int patternID ) {
 		GrayU8 image = UtilImageIO.loadImage(imagePaths.get(patternID), GrayU8.class);
 
-		if( image == null ) {
-			System.err.println("Can't read image.  Path = "+ imagePaths.get(patternID));
+		if (image == null) {
+			System.err.println("Can't read image.  Path = " + imagePaths.get(patternID));
 			System.exit(1);
 		}
 
 		// If it is larger than 240x240 resize it
-		if( image.width > 240 || image.height > 240 ) {
-			GrayU8 tmp = new GrayU8( Math.min(image.width,240), Math.min(image.height,240));
+		if (image.width > 240 || image.height > 240) {
+			GrayU8 tmp = new GrayU8(Math.min(image.width, 240), Math.min(image.height, 240));
 			new FDistort(image, tmp).scaleExt().apply();
 			image = tmp;
 		}
 
 		// it will threshold again later on, but here we can use the user selected threshold
 		GrayU8 binary = ThresholdImageOps.threshold(image, null, threshold, false);
-		PixelMath.multiply(binary,255,binary);
+		PixelMath.multiply(binary, 255, binary);
 
 		return binary;
 	}
 
 	@Override
-	protected void printHelp(CmdLineParser parser) {
+	protected void printHelp( CmdLineParser parser ) {
 		super.printHelp(parser);
 
 		System.out.println("Creates two images in PNG format 220x220 pixels, 20 pixel white border");
@@ -119,20 +119,20 @@ public class CreateFiducialSquareImage extends BaseFiducialSquareBorder {
 		System.exit(-1);
 	}
 
-	public static void main(String[] args) throws IOException {
+	public static void main( String[] args ) throws IOException {
 		CreateFiducialSquareImage generator = new CreateFiducialSquareImage();
 		CmdLineParser parser = new CmdLineParser(generator);
 
-		if( args.length == 0 ) {
+		if (args.length == 0) {
 			generator.printHelp(parser);
 		}
 
 		try {
 			parser.parseArgument(args);
-			if( generator.guiMode ) {
+			if (generator.guiMode) {
 				BoofSwingUtil.invokeNowOrLater(CreateFiducialSquareImageGui::new);
 			} else {
-				if( generator.imagePaths.isEmpty() ) {
+				if (generator.imagePaths.isEmpty()) {
 					System.err.println("Must specify at least one image");
 					System.exit(1);
 				}

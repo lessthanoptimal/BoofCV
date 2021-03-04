@@ -31,19 +31,19 @@ public abstract class BatchProcessControlPanel extends BatchControlPanel {
 
 	protected JTextField textOutputFile = new JTextField();
 
-	public void addStandardControls(Preferences prefs) {
-		textInputSource.setPreferredSize(new Dimension(textWidth,textHeight));
+	public void addStandardControls( Preferences prefs ) {
+		textInputSource.setPreferredSize(new Dimension(textWidth, textHeight));
 		textInputSource.setMaximumSize(textInputSource.getPreferredSize());
-		textOutputFile.setPreferredSize(new Dimension(textWidth,textHeight));
+		textOutputFile.setPreferredSize(new Dimension(textWidth, textHeight));
 		textOutputFile.setMaximumSize(textOutputFile.getPreferredSize());
 
 		textInputSource.setText(prefs.get(KEY_INPUT, textInputSource.getText()));
-		textOutputFile.setText(prefs.get(KEY_OUTPUT,textOutputFile.getText()));
+		textOutputFile.setText(prefs.get(KEY_OUTPUT, textOutputFile.getText()));
 
-		bAction.addActionListener(a-> handleStart());
+		bAction.addActionListener(a -> handleStart());
 
-		addLabeled(createTextSelect(textInputSource,"Input Source",true),"Input");
-		addLabeled(createTextSelect(textOutputFile,"Output File",true),"Output");
+		addLabeled(createTextSelect(textInputSource, "Input Source", true), "Input");
+		addLabeled(createTextSelect(textOutputFile, "Output File", true), "Output");
 		add(createInputHelp());
 		addVerticalGlue();
 		addAlignCenter(bAction);

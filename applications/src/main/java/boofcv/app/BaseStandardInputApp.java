@@ -117,7 +117,7 @@ public class BaseStandardInputApp {
 			throw new RuntimeException("Expected = inside of flag");
 
 		flagName = word.substring(2, indexEquals);
-		parameters = word.substring(indexEquals + 1, word.length());
+		parameters = word.substring(indexEquals + 1);
 	}
 
 	enum InputType {

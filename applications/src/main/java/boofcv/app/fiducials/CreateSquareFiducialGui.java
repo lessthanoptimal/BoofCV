@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -52,27 +52,27 @@ public abstract class CreateSquareFiducialGui extends JPanel implements CreateSq
 
 	String defaultSaveName;
 
-	protected CreateSquareFiducialGui(String defaultSaveName) {
+	protected CreateSquareFiducialGui( String defaultSaveName ) {
 		super(new BorderLayout());
 		this.defaultSaveName = defaultSaveName;
 	}
 
-	public void setupGui( CreateSquareFiducialControlPanel controls , String title ) {
+	public void setupGui( CreateSquareFiducialControlPanel controls, String title ) {
 		this.controls = controls;
-		render.configure(20,300);
+		render.configure(20, 300);
 		generator.setMarkerWidth(300);
-		buffered = new BufferedImage(render.getGray().width,render.getGray().height,BufferedImage.TYPE_INT_RGB);
+		buffered = new BufferedImage(render.getGray().width, render.getGray().height, BufferedImage.TYPE_INT_RGB);
 
-		imagePanel.setPreferredSize(new Dimension(400,400));
+		imagePanel.setPreferredSize(new Dimension(400, 400));
 		imagePanel.setScaling(ScaleOptions.DOWN);
 		imagePanel.setCentering(true);
 		imagePanel.setBackground(Color.GRAY);
 
-		add(controls,BorderLayout.WEST);
-		add(imagePanel,BorderLayout.CENTER);
+		add(controls, BorderLayout.WEST);
+		add(imagePanel, BorderLayout.CENTER);
 
-		setPreferredSize(new Dimension(700,500));
-		frame = ShowImages.setupWindow(this,title,true);
+		setPreferredSize(new Dimension(700, 500));
+		frame = ShowImages.setupWindow(this, title, true);
 		createMenuBar();
 
 		renderPreview();
@@ -85,15 +85,15 @@ public abstract class CreateSquareFiducialGui extends JPanel implements CreateSq
 		JMenu menuFile = new JMenu("File");
 		menuFile.setMnemonic(KeyEvent.VK_F);
 		JMenuItem menuSave = new JMenuItem("Save");
-		BoofSwingUtil.setMenuItemKeys(menuSave,KeyEvent.VK_S,KeyEvent.VK_S);
+		BoofSwingUtil.setMenuItemKeys(menuSave, KeyEvent.VK_S, KeyEvent.VK_S);
 		menuSave.addActionListener(e -> saveFile(false));
 
 		JMenuItem menuPrint = new JMenuItem("Print...");
-		BoofSwingUtil.setMenuItemKeys(menuPrint,KeyEvent.VK_P,KeyEvent.VK_P);
+		BoofSwingUtil.setMenuItemKeys(menuPrint, KeyEvent.VK_P, KeyEvent.VK_P);
 		menuPrint.addActionListener(e -> saveFile(true));
 
 		JMenuItem menuQuit = new JMenuItem("Quit");
-		BoofSwingUtil.setMenuItemKeys(menuQuit,KeyEvent.VK_Q,KeyEvent.VK_Q);
+		BoofSwingUtil.setMenuItemKeys(menuQuit, KeyEvent.VK_Q, KeyEvent.VK_Q);
 		menuQuit.addActionListener(e -> System.exit(0));
 
 		JMenuItem menuHelp = new JMenuItem("Help", KeyEvent.VK_H);
@@ -109,11 +109,14 @@ public abstract class CreateSquareFiducialGui extends JPanel implements CreateSq
 		JMenu editMenu = new JMenu("Edit");
 		editMenu.setMnemonic(KeyEvent.VK_E);
 		JMenuItem menuCut = new JMenuItem(new DefaultEditorKit.CutAction());
-		menuCut.setText("Cut");BoofSwingUtil.setMenuItemKeys(menuCut,KeyEvent.VK_T,KeyEvent.VK_X);
+		menuCut.setText("Cut");
+		BoofSwingUtil.setMenuItemKeys(menuCut, KeyEvent.VK_T, KeyEvent.VK_X);
 		JMenuItem menuCopy = new JMenuItem(new DefaultEditorKit.CopyAction());
-		menuCopy.setText("Copy");BoofSwingUtil.setMenuItemKeys(menuCopy,KeyEvent.VK_C,KeyEvent.VK_C);
+		menuCopy.setText("Copy");
+		BoofSwingUtil.setMenuItemKeys(menuCopy, KeyEvent.VK_C, KeyEvent.VK_C);
 		JMenuItem menuPaste = new JMenuItem(new DefaultEditorKit.PasteAction());
-		menuPaste.setText("Paste");BoofSwingUtil.setMenuItemKeys(menuPaste,KeyEvent.VK_P,KeyEvent.VK_V);
+		menuPaste.setText("Paste");
+		BoofSwingUtil.setMenuItemKeys(menuPaste, KeyEvent.VK_P, KeyEvent.VK_V);
 
 		editMenu.add(menuCut);
 		editMenu.add(menuCopy);
@@ -123,17 +126,17 @@ public abstract class CreateSquareFiducialGui extends JPanel implements CreateSq
 		frame.setJMenuBar(menuBar);
 	}
 
-	protected void saveFile(boolean sendToPrinter, BaseFiducialSquareBorder c) {
-		if( sendToPrinter ) {
+	protected void saveFile( boolean sendToPrinter, BaseFiducialSquareBorder c ) {
+		if (sendToPrinter) {
 			if (controls.format.compareToIgnoreCase("pdf") != 0) {
 				JOptionPane.showMessageDialog(this, "Must select PDF document type to print");
 				return;
 			}
 		} else {
 			File f = FileSystemView.getFileSystemView().getHomeDirectory();
-			f = new File(f,defaultSaveName+"."+controls.format);
+			f = new File(f, defaultSaveName + "." + controls.format);
 
-			f = BoofSwingUtil.fileChooser(null,this,false,f.getPath(),null);
+			f = BoofSwingUtil.fileChooser(null, this, false, f.getPath(), null);
 			if (f == null) {
 				return;
 			}
@@ -148,10 +151,9 @@ public abstract class CreateSquareFiducialGui extends JPanel implements CreateSq
 		try {
 			c.run();
 		} catch (IOException e) {
-			BoofSwingUtil.warningDialog(this,e);
+			BoofSwingUtil.warningDialog(this, e);
 		}
 	}
-
 
 	protected abstract void saveFile( boolean sendToPrinter );
 

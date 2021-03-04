@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -53,7 +53,6 @@ public class ImageSelectorAndSaver {
 	GrayF32 weights = new GrayF32(LENGTH, LENGTH);
 	double totalWeight;
 
-
 	GrayF32 difference = new GrayF32(LENGTH, LENGTH);
 	GrayF32 tempImage = new GrayF32(LENGTH, LENGTH);
 
@@ -65,12 +64,12 @@ public class ImageSelectorAndSaver {
 	File outputDirectory;
 	int imageNumber = 0;
 
-	public ImageSelectorAndSaver(String outputDirectory) {
+	public ImageSelectorAndSaver( String outputDirectory ) {
 		this.outputDirectory = new File(outputDirectory);
 
-		if( !this.outputDirectory.exists() ) {
-			if( !this.outputDirectory.mkdirs() ) {
-				throw new RuntimeException("Can't create output directory. "+this.outputDirectory.getPath());
+		if (!this.outputDirectory.exists()) {
+			if (!this.outputDirectory.mkdirs()) {
+				throw new RuntimeException("Can't create output directory. " + this.outputDirectory.getPath());
 			}
 		}
 		// TODO see if there are images in the output directory.  Ask if it should delete it
@@ -79,34 +78,34 @@ public class ImageSelectorAndSaver {
 	/**
 	 * Creates a template of the fiducial and this is then used to determine how blurred the image is
 	 */
-	public void setTemplate(GrayF32 image, List<Point2D_F64> sides) {
-		if( sides.size() != 4 )
+	public void setTemplate( GrayF32 image, List<Point2D_F64> sides ) {
+		if (sides.size() != 4)
 			throw new IllegalArgumentException("Expected 4 sidesCollision");
 
-		removePerspective.apply(image,sides.get(0),sides.get(1),sides.get(2),sides.get(3));
+		removePerspective.apply(image, sides.get(0), sides.get(1), sides.get(2), sides.get(3));
 
 		templateOriginal.setTo(removePerspective.getOutput());
 
 		// blur the image a bit so it doesn't have to be a perfect match
-		GrayF32 blurred = new GrayF32(LENGTH,LENGTH);
-		BlurImageOps.gaussian(templateOriginal,blurred,-1,2,null);
+		GrayF32 blurred = new GrayF32(LENGTH, LENGTH);
+		BlurImageOps.gaussian(templateOriginal, blurred, -1, 2, null);
 
 		// place greater importance on pixels which are around edges
 		GrayF32 derivX = new GrayF32(LENGTH, LENGTH);
 		GrayF32 derivY = new GrayF32(LENGTH, LENGTH);
-		GImageDerivativeOps.gradient(DerivativeType.SOBEL,blurred,derivX,derivY, BorderType.EXTENDED);
+		GImageDerivativeOps.gradient(DerivativeType.SOBEL, blurred, derivX, derivY, BorderType.EXTENDED);
 
-		GGradientToEdgeFeatures.intensityE(derivX,derivY,weights);
+		GGradientToEdgeFeatures.intensityE(derivX, derivY, weights);
 
 		float max = ImageStatistics.max(weights);
-		PixelMath.divide(weights,max,weights);
+		PixelMath.divide(weights, max, weights);
 
 		totalWeight = ImageStatistics.sum(weights);
 
 		// compute a normalized template for later use.  Divide by the mean to add some lighting invariance
 		template.setTo(removePerspective.getOutput());
-		float mean = (float)ImageStatistics.mean(template);
-		PixelMath.divide(template,mean,template);
+		float mean = ImageStatistics.mean(template);
+		PixelMath.divide(template, mean, template);
 	}
 
 	/**
@@ -119,36 +118,37 @@ public class ImageSelectorAndSaver {
 
 	/**
 	 * Computes the sharpness score for the current image, if better than the current best image it's then saved.
+	 *
 	 * @param image Gray scale input image for detector
 	 * @param sides Location of 4 corners on fiducial
 	 */
-	public synchronized void process(GrayF32 image, List<Point2D_F64> sides) {
-		if( sides.size() != 4 )
+	public synchronized void process( GrayF32 image, List<Point2D_F64> sides ) {
+		if (sides.size() != 4)
 			throw new IllegalArgumentException("Expected 4 sidesCollision");
 
-		updateScore(image,sides);
+		updateScore(image, sides);
 
-		if( currentScore < bestScore ) {
+		if (currentScore < bestScore) {
 			bestScore = currentScore;
-			if( bestImage == null ) {
-				bestImage = new BufferedImage(image.getWidth(), image.getHeight(),BufferedImage.TYPE_INT_RGB);
+			if (bestImage == null) {
+				bestImage = new BufferedImage(image.getWidth(), image.getHeight(), BufferedImage.TYPE_INT_RGB);
 			}
-			ConvertBufferedImage.convertTo(image,bestImage);
+			ConvertBufferedImage.convertTo(image, bestImage);
 		}
 	}
 
 	/**
 	 * Used when you just want to update the score for visualization purposes but not update the best image.
 	 */
-	public synchronized void updateScore(GrayF32 image, List<Point2D_F64> sides) {
-		removePerspective.apply(image,sides.get(0),sides.get(1),sides.get(2),sides.get(3));
+	public synchronized void updateScore( GrayF32 image, List<Point2D_F64> sides ) {
+		removePerspective.apply(image, sides.get(0), sides.get(1), sides.get(2), sides.get(3));
 
 		GrayF32 current = removePerspective.getOutput();
-		float mean = (float)ImageStatistics.mean(current);
-		PixelMath.divide(current,mean,tempImage);
+		float mean = ImageStatistics.mean(current);
+		PixelMath.divide(current, mean, tempImage);
 
-		PixelMath.diffAbs(tempImage,template,difference);
-		PixelMath.multiply(difference,weights,difference);
+		PixelMath.diffAbs(tempImage, template, difference);
+		PixelMath.multiply(difference, weights, difference);
 
 		// compute score as a weighted average of the difference
 		currentScore = ImageStatistics.sum(difference)/totalWeight;
@@ -158,9 +158,9 @@ public class ImageSelectorAndSaver {
 	 * Saves the image to a file
 	 */
 	public synchronized void save() {
-		if( bestImage != null ) {
-			File path = new File(outputDirectory, String.format("image%04d.png",imageNumber));
-			UtilImageIO.saveImage(bestImage,path.getAbsolutePath());
+		if (bestImage != null) {
+			File path = new File(outputDirectory, String.format("image%04d.png", imageNumber));
+			UtilImageIO.saveImage(bestImage, path.getAbsolutePath());
 			imageNumber++;
 		}
 		clearHistory();

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -43,26 +43,26 @@ public class ComputeGeometryScore {
 
 	double score = 0;
 
-	public ComputeGeometryScore(boolean assumeZeroSkew, List<Point2D_F64> worldPoints) {
+	public ComputeGeometryScore( boolean assumeZeroSkew, List<Point2D_F64> worldPoints ) {
 		computeCalib = new Zhang99CalibrationMatrixFromHomographies(assumeZeroSkew);
 		computeHomography = new Zhang99ComputeTargetHomography(worldPoints);
 	}
 
 	public void addObservations( CalibrationObservation observations ) {
 		computeHomography.computeHomography(observations);
-		homographies.add( computeHomography.getHomography().copy() );
+		homographies.add(computeHomography.getHomography().copy());
 
 		try {
 			computeCalib.process(homographies);
 
-			double values[] = computeCalib.getSolverNull().getSingularValues();
-			Arrays.sort(values,0,3);
+			double[] values = computeCalib.getSolverNull().getSingularValues();
+			Arrays.sort(values, 0, 3);
 
-			System.out.println("raw singularity score = "+(values[1]/values[2]));
+			System.out.println("raw singularity score = " + (values[1]/values[2]));
 
 			// 0.2 was a threshold that was emperically determined
-			score = Math.min(1.0,(values[1]/values[2])/0.2 );
-		} catch( RuntimeException e ) {
+			score = Math.min(1.0, (values[1]/values[2])/0.2);
+		} catch (RuntimeException e) {
 			score = 0;
 		}
 	}

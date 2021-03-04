@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -39,24 +39,24 @@ public class CreateQrCodeDocumentImage {
 
 	String documentName;
 
-	public CreateQrCodeDocumentImage(String documentName , int moduleWidthPixels ) {
+	public CreateQrCodeDocumentImage( String documentName, int moduleWidthPixels ) {
 		this.documentName = documentName;
 		this.moduleWidthPixels = moduleWidthPixels;
 	}
 
-	public void render(java.util.List<QrCode> markers ) {
+	public void render( java.util.List<QrCode> markers ) {
 
-		for( int i = 0; i < markers.size(); i++ ) {
+		for (int i = 0; i < markers.size(); i++) {
 			QrCodeGeneratorImage generator = new QrCodeGeneratorImage(moduleWidthPixels);
 			generator.setBorderModule(2);
 			generator.render(markers.get(i));
 
 			String name;
 			String ext = FilenameUtils.getExtension(documentName);
-			if( ext.length() == 0 ) {
-				name = documentName+i+".png";
+			if (ext.length() == 0) {
+				name = documentName + i + ".png";
 			} else {
-				if( markers.size() > 1 ) {
+				if (markers.size() > 1) {
 					File f = new File(documentName);
 					String n = f.getName();
 					name = new File(f.getParentFile(), n.substring(0, n.length() - ext.length() - 1) + i + "." + ext).getPath();
@@ -66,11 +66,11 @@ public class CreateQrCodeDocumentImage {
 			}
 
 			GrayU8 gray = generator.getGray();
-			BufferedImage output = new BufferedImage(gray.width,gray.height,BufferedImage.TYPE_INT_RGB);
-			ConvertBufferedImage.convertTo(gray,output);
+			BufferedImage output = new BufferedImage(gray.width, gray.height, BufferedImage.TYPE_INT_RGB);
+			ConvertBufferedImage.convertTo(gray, output);
 
-			System.out.println("Saving "+name);
-			UtilImageIO.saveImage(output,name);
+			System.out.println("Saving " + name);
+			UtilImageIO.saveImage(output, name);
 		}
 	}
 }

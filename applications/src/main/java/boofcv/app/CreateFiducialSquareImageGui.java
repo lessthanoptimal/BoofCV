@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -35,16 +35,16 @@ import java.util.ArrayList;
  */
 public class CreateFiducialSquareImageGui extends CreateSquareFiducialGui {
 	ControlPanel controls;
+
 	public CreateFiducialSquareImageGui() {
 		super("square_image");
 		controls = new ControlPanel(this);
-		setupGui(controls,"Square Image Fiducial");
-
+		setupGui(controls, "Square Image Fiducial");
 	}
 
 	@Override
-	protected void saveFile(boolean sendToPrinter) {
-		if( controls.patterns.size() == 0 )
+	protected void saveFile( boolean sendToPrinter ) {
+		if (controls.patterns.size() == 0)
 			return;
 		CreateFiducialSquareImage c = new CreateFiducialSquareImage();
 		c.sendToPrinter = sendToPrinter;
@@ -68,14 +68,14 @@ public class CreateFiducialSquareImageGui extends CreateSquareFiducialGui {
 	@Override
 	protected void renderPreview() {
 		String path = controls.selectedPattern;
-		if( path == null ) {
+		if (path == null) {
 			imagePanel.setImageRepaint(null);
 		} else {
 			BufferedImage buffered = UtilImageIO.loadImage(path);
-			GrayU8 gray = ConvertBufferedImage.convertFrom(buffered,(GrayU8)null);
+			GrayU8 gray = ConvertBufferedImage.convertFrom(buffered, (GrayU8)null);
 			generator.setBlackBorder(controls.borderFraction);
 			generator.generate(gray);
-			buffered = ConvertBufferedImage.convertTo(render.getGray(),null,true);
+			buffered = ConvertBufferedImage.convertTo(render.getGray(), null, true);
 			imagePanel.setImageRepaint(buffered);
 		}
 	}
@@ -88,7 +88,7 @@ public class CreateFiducialSquareImageGui extends CreateSquareFiducialGui {
 
 		String selectedPattern = null;
 
-		public ControlPanel(Listener listener) {
+		public ControlPanel( Listener listener ) {
 			super(listener);
 
 			listPatterns.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
@@ -96,7 +96,7 @@ public class CreateFiducialSquareImageGui extends CreateSquareFiducialGui {
 //			listPatterns.setVisibleRowCount(-1);
 			listPatterns.addListSelectionListener(e -> {
 				int s = listPatterns.getSelectedIndex();
-				if( s >= 0 ) {
+				if (s >= 0) {
 					selectedPattern = patterns.get(s);
 				} else {
 					selectedPattern = null;
@@ -104,31 +104,31 @@ public class CreateFiducialSquareImageGui extends CreateSquareFiducialGui {
 				renderPreview();
 			});
 
-			add( new JScrollPane(listPatterns));
+			add(new JScrollPane(listPatterns));
 			layoutComponents();
 		}
 
 		@Override
 		public void handleAddPattern() {
 			File path = BoofSwingUtil.openFileChooser(this, BoofSwingUtil.FileTypes.IMAGES);
-			if( path == null )
+			if (path == null)
 				return;
 			listModel.add(listModel.size(), path.getName());
 			patterns.add(path.getAbsolutePath());
-			listPatterns.setSelectedIndex(listModel.size()-1);
+			listPatterns.setSelectedIndex(listModel.size() - 1);
 		}
 
 		@Override
 		public void handleRemovePattern() {
 			int selected = listPatterns.getSelectedIndex();
-			if( selected >= 0 ) {
+			if (selected >= 0) {
 				listModel.removeElementAt(selected);
 				patterns.remove(selected);
 			}
 		}
 	}
 
-	public static void main(String[] args) {
+	public static void main( String[] args ) {
 		SwingUtilities.invokeLater(CreateFiducialSquareImageGui::new);
 	}
 }

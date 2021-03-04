@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -48,7 +48,7 @@ public abstract class BaseFiducialSquareBorder extends BaseFiducialSquare {
 	public float blackBorderFractionalWidth = 0.25f;
 
 	@Override
-	protected CreateFiducialDocumentImage createRendererImage(String filename) {
+	protected CreateFiducialDocumentImage createRendererImage( String filename ) {
 		CreateSquareFiducialDocumentImage ret = new CreateSquareFiducialDocumentImage(filename);
 		ret.setBlackBorderFractionalWidth(blackBorderFractionalWidth);
 		ret.setWhiteBorder((int)spaceBetween);
@@ -56,7 +56,7 @@ public abstract class BaseFiducialSquareBorder extends BaseFiducialSquare {
 	}
 
 	@Override
-	protected CreateFiducialDocumentPDF createRendererPdf(String documentName, PaperSize paper, Unit units) {
+	protected CreateFiducialDocumentPDF createRendererPdf( String documentName, PaperSize paper, Unit units ) {
 		CreateSquareFiducialDocumentPDF ret = new CreateSquareFiducialDocumentPDF(documentName, paper, units);
 		ret.blackBorderFractionalWidth = blackBorderFractionalWidth;
 		return ret;

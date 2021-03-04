@@ -56,7 +56,7 @@ public class DownSelectVideoFramesFor3DApp {
 	String pathOutput = "qrcodes.txt";
 
 	@Option(name = "--GUI", usage = "Ignore all other command line arguments and switch to GUI mode")
-	private boolean guiMode = false;
+	boolean guiMode = false;
 
 	@Option(name = "-w", aliases = {"--Width"}, usage = "Sets output width. If zero then aspect is matched with height")
 	int width = 0;
@@ -140,13 +140,13 @@ public class DownSelectVideoFramesFor3DApp {
 			// Impossible for both width and height to be zero
 			double scale = 1.0;
 			if (width == 0) {
-				scale = Math.min(scale,height/(double)sequence.getHeight());
+				scale = Math.min(scale, height/(double)sequence.getHeight());
 			}
 			if (height == 0) {
-				scale = Math.min(scale,width/(double)sequence.getWidth());
+				scale = Math.min(scale, width/(double)sequence.getWidth());
 			}
-			smallWidth = (int)(scale*sequence.getWidth()+0.5);
-			smallHeight = (int)(scale*sequence.getHeight()+0.5);
+			smallWidth = (int)(scale*sequence.getWidth() + 0.5);
+			smallHeight = (int)(scale*sequence.getHeight() + 0.5);
 		}
 
 		config.motionInlierPx = motionPx;

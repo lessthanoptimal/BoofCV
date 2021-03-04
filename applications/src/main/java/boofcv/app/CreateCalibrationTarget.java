@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -33,43 +33,43 @@ import java.io.IOException;
  * @author Peter Abeles
  */
 public class CreateCalibrationTarget {
-	@Option(name="-t",aliases = {"--Type"}, usage="Type of calibration target.")
-	String _type=null;
+	@Option(name = "-t", aliases = {"--Type"}, usage = "Type of calibration target.")
+	String _type = null;
 	CalibrationPatterns type;
 
-	@Option(name="-r",aliases = {"--Rows"}, usage="Number of rows")
-	int rows=-1;
+	@Option(name = "-r", aliases = {"--Rows"}, usage = "Number of rows")
+	int rows = -1;
 
-	@Option(name="-c",aliases = {"--Columns"}, usage="Number of columns")
-	int columns=-1;
+	@Option(name = "-c", aliases = {"--Columns"}, usage = "Number of columns")
+	int columns = -1;
 
-	@Option(name="-u",aliases = {"--Units"}, usage="Name of document units.  default: cm")
+	@Option(name = "-u", aliases = {"--Units"}, usage = "Name of document units.  default: cm")
 	String _unit = Unit.CENTIMETER.abbreviation;
 	Unit unit;
 
-	@Option(name="-p",aliases = {"--PaperSize"}, usage="Size of paper used.  See below for predefined document sizes.  "
-	+"You can manually specify any size using the following notation. W:H  where W is the width and H is the height.  "
-	+"Values of W and H is specified with <number><unit abbreviation>, e.g. 6cm or 6, the unit is optional.  If no unit"
-	+" are specified the default document units are used.")
+	@Option(name = "-p", aliases = {"--PaperSize"}, usage = "Size of paper used.  See below for predefined document sizes.  "
+			+ "You can manually specify any size using the following notation. W:H  where W is the width and H is the height.  "
+			+ "Values of W and H is specified with <number><unit abbreviation>, e.g. 6cm or 6, the unit is optional.  If no unit"
+			+ " are specified the default document units are used.")
 	String _paperSize = PaperSize.LETTER.name;
 	PaperSize paperSize;
 
-	@Option(name="-w",aliases = {"--ShapeWidth"}, usage="Width of the shape or diameter if a circle.  In document units.")
-	float shapeWidth=-1;
+	@Option(name = "-w", aliases = {"--ShapeWidth"}, usage = "Width of the shape or diameter if a circle.  In document units.")
+	float shapeWidth = -1;
 
-	@Option(name="-s",aliases = {"--Space"}, usage="Spacing between the shapes.  In document units.")
-	float shapeSpace=-1;
+	@Option(name = "-s", aliases = {"--Space"}, usage = "Spacing between the shapes.  In document units.")
+	float shapeSpace = -1;
 
-	@Option(name="-d",aliases = {"--CenterDistance"}, usage="Distance between circle centers.  In document units.")
-	float centerDistance=-1;
+	@Option(name = "-d", aliases = {"--CenterDistance"}, usage = "Distance between circle centers.  In document units.")
+	float centerDistance = -1;
 
-	@Option(name="-o",aliases = {"--OutputName"}, usage="Name of output file.  E.g. chessboard for chessboard.pdf")
+	@Option(name = "-o", aliases = {"--OutputName"}, usage = "Name of output file.  E.g. chessboard for chessboard.pdf")
 	String fileName = "target";
 
-	@Option(name="-i",aliases = {"--DisablePrintInfo"}, usage="Disable printing information about the calibration target")
+	@Option(name = "-i", aliases = {"--DisablePrintInfo"}, usage = "Disable printing information about the calibration target")
 	boolean disablePrintInfo = false;
 
-	@Option(name="--GUI", usage="Ignore all other command line arguments and switch to GUI mode")
+	@Option(name = "--GUI", usage = "Ignore all other command line arguments and switch to GUI mode")
 	private boolean guiMode = false;
 
 	private static void printHelpExit( CmdLineParser parser ) {
@@ -77,18 +77,18 @@ public class CreateCalibrationTarget {
 		parser.printUsage(System.out);
 		System.out.println();
 		System.out.println("Target Types");
-		for( CalibrationPatterns p : CalibrationPatterns.values() ) {
-			System.out.println("  "+p);
+		for (CalibrationPatterns p : CalibrationPatterns.values()) {
+			System.out.println("  " + p);
 		}
 		System.out.println();
 		System.out.println("Document Types");
-		for( PaperSize p : PaperSize.values() ) {
-			System.out.printf("  %12s  %5.0f %5.0f %s\n",p.getName(),p.width,p.height,p.unit.abbreviation);
+		for (PaperSize p : PaperSize.values()) {
+			System.out.printf("  %12s  %5.0f %5.0f %s\n", p.getName(), p.width, p.height, p.unit.abbreviation);
 		}
 		System.out.println();
 		System.out.println("Units");
-		for( Unit u : Unit.values() ) {
-			System.out.printf("  %12s  %3s\n",u,u.abbreviation);
+		for (Unit u : Unit.values()) {
+			System.out.printf("  %12s  %3s\n", u, u.abbreviation);
 		}
 
 		System.out.println();
@@ -114,109 +114,106 @@ public class CreateCalibrationTarget {
 		System.exit(1);
 	}
 
-	private void finishParsing(CmdLineParser parser) {
-		if( guiMode ) {
+	private void finishParsing( CmdLineParser parser ) {
+		if (guiMode) {
 			new CreateCalibrationTargetGui();
 			return;
 		}
 
-		if( rows <= 0 || columns <= 0 || _type == null )
+		if (rows <= 0 || columns <= 0 || _type == null)
 			printHelpExit(parser);
-		for( CalibrationPatterns p : CalibrationPatterns.values() ) {
-			if( _type.compareToIgnoreCase(p.name() ) == 0 ) {
+		for (CalibrationPatterns p : CalibrationPatterns.values()) {
+			if (_type.compareToIgnoreCase(p.name()) == 0) {
 				type = p;
 				break;
 			}
 		}
-		if( type == null ) {
-			failExit("Must specify a known document type "+_type);
+		if (type == null) {
+			failExit("Must specify a known document type " + _type);
 		}
 
 		unit = Unit.lookup(_unit);
-		if( unit == null ) {
+		if (unit == null) {
 			System.err.println("Must specify a valid unit or use default");
 			System.exit(1);
 		}
 		paperSize = PaperSize.lookup(_paperSize);
-		if( paperSize == null ) {
+		if (paperSize == null) {
 			String words[] = _paperSize.split(":");
-			if( words.length != 2) failExit("Expected two value+unit separated by a :");
+			if (words.length != 2) failExit("Expected two value+unit separated by a :");
 			LengthUnit w = new LengthUnit(words[0]);
 			LengthUnit h = new LengthUnit(words[1]);
-			if( w.unit != h.unit ) failExit("Same units must be specified for width and height");
-			paperSize = new PaperSize(w.length,h.length,w.unit);
+			if (w.unit != h.unit) failExit("Same units must be specified for width and height");
+			paperSize = new PaperSize(w.length, h.length, w.unit);
 		}
 
-		if( rows <= 0 || columns <= 0)
+		if (rows <= 0 || columns <= 0)
 			failExit("Must the number of rows and columns");
 
-		if( shapeWidth <= 0 )
+		if (shapeWidth <= 0)
 			failExit("Must specify a shape width more than zero");
 
-		switch( type ) {
-			case BINARY_GRID:
-			case SQUARE_GRID:
-				if( centerDistance > 0 )
+		switch (type) {
+			case BINARY_GRID, SQUARE_GRID -> {
+				if (centerDistance > 0)
 					failExit("Don't specify center distance for square type targets, use shape space instead");
-				if( shapeSpace <= 0 )
+				if (shapeSpace <= 0)
 					shapeSpace = shapeWidth;
-				break;
-
-			case CHESSBOARD:
-				if( centerDistance > 0 )
+			}
+			case CHESSBOARD -> {
+				if (centerDistance > 0)
 					failExit("Don't specify center distance for chessboard targets");
-				if( shapeSpace > 0 )
+				if (shapeSpace > 0)
 					failExit("Don't specify center distance for chessboard targets");
-				break;
-
-			case CIRCLE_HEXAGONAL:
-				if( shapeSpace > 0 )
+			}
+			case CIRCLE_HEXAGONAL -> {
+				if (shapeSpace > 0)
 					failExit("Don't specify space for circle type targets, use center distance instead");
-				if( centerDistance <= 0 )
+				if (centerDistance <= 0)
 					centerDistance = shapeWidth*2;
-				break;
-
-			case CIRCLE_GRID:
-				if( shapeSpace > 0 )
+			}
+			case CIRCLE_GRID -> {
+				if (shapeSpace > 0)
 					failExit("Don't specify space for circle type targets, use center distance instead");
-				if( centerDistance <= 0 )
+				if (centerDistance <= 0)
 					centerDistance = shapeWidth*2;
-				break;
+			}
+			default -> throw new RuntimeException("Unknown type "+type);
 		}
 	}
 
 	public void run() throws IOException {
 		String suffix = ".pdf";
-		System.out.println("Saving to "+fileName+suffix);
+		System.out.println("Saving to " + fileName + suffix);
 		CreateCalibrationTargetGenerator generator =
-				new CreateCalibrationTargetGenerator(fileName+suffix,paperSize,rows,columns,unit);
+				new CreateCalibrationTargetGenerator(fileName + suffix, paperSize, rows, columns, unit);
 
 		generator.setShowInfo(!disablePrintInfo);
 
-		System.out.println("   paper     : "+paperSize);
-		System.out.println("   type      : "+type);
-		System.out.println("   rows      : "+rows);
-		System.out.println("   columns   : "+columns);
-		System.out.println("   info      : "+ !disablePrintInfo);
+		System.out.println("   paper     : " + paperSize);
+		System.out.println("   type      : " + type);
+		System.out.println("   rows      : " + rows);
+		System.out.println("   columns   : " + columns);
+		System.out.println("   info      : " + !disablePrintInfo);
 
 
-		switch( type ) {
-			case CHESSBOARD:generator.chessboard(shapeWidth);break;
-			case SQUARE_GRID:generator.squareGrid(shapeWidth,shapeSpace);break;
-			case BINARY_GRID:generator.binaryGrid(shapeWidth,shapeSpace);break;
-			case CIRCLE_HEXAGONAL:generator.circleHexagonal(shapeWidth,centerDistance);break;
-			case CIRCLE_GRID:generator.circleGrid(shapeWidth,centerDistance);break;
-			default: throw new RuntimeException("Unknown target type");
+		switch (type) {
+			case CHESSBOARD -> generator.chessboard(shapeWidth);
+			case SQUARE_GRID -> generator.squareGrid(shapeWidth, shapeSpace);
+			case BINARY_GRID -> generator.binaryGrid(shapeWidth, shapeSpace);
+			case CIRCLE_HEXAGONAL -> generator.circleHexagonal(shapeWidth, centerDistance);
+			case CIRCLE_GRID -> generator.circleGrid(shapeWidth, centerDistance);
+			default -> throw new RuntimeException("Unknown target type");
 		}
-
 	}
-	public static void main(String[] args) {
+
+	public static void main( String[] args ) {
 		CreateCalibrationTarget generator = new CreateCalibrationTarget();
 		CmdLineParser parser = new CmdLineParser(generator);
 		try {
 			parser.parseArgument(args);
 			generator.finishParsing(parser);
-			if( !generator.guiMode )
+			if (!generator.guiMode)
 				generator.run();
 		} catch (CmdLineException e) {
 			// handling of wrong arguments
@@ -226,5 +223,4 @@ public class CreateCalibrationTarget {
 			e.printStackTrace();
 		}
 	}
-
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -63,21 +63,21 @@ public class CreateFiducialRandomDotGui extends JPanel {
 	RandomDotDefinition def = new RandomDotDefinition();
 
 	public CreateFiducialRandomDotGui() {
-		this( new CreateFiducialRandomDot() );
+		this(new CreateFiducialRandomDot());
 	}
 
-	public CreateFiducialRandomDotGui(CreateFiducialRandomDot owner) {
+	public CreateFiducialRandomDotGui( CreateFiducialRandomDot owner ) {
 		setLayout(new BorderLayout());
 		this.owner = owner;
 
 		// If not specified by the command line fill in these values with something reasonable
-		if( owner.markerWidth <= 0 )
+		if (owner.markerWidth <= 0)
 			owner.markerWidth = 10.0f;
-		if( owner.unit == null )
+		if (owner.unit == null)
 			owner.unit = Unit.CENTIMETER;
-		if( owner.paperSize == null )
+		if (owner.paperSize == null)
 			owner.paperSize = PaperSize.LETTER;
-		if( owner.spaceBetween == 0 )
+		if (owner.spaceBetween == 0)
 			owner.spaceBetween = owner.markerWidth/4;
 
 		controls = new ControlPanel();
@@ -89,11 +89,11 @@ public class CreateFiducialRandomDotGui extends JPanel {
 
 		updateMarkers();
 
-		add(controls,BorderLayout.WEST);
-		add(imagePanel,BorderLayout.CENTER);
+		add(controls, BorderLayout.WEST);
+		add(imagePanel, BorderLayout.CENTER);
 
-		setPreferredSize(new Dimension(700,500));
-		frame = ShowImages.setupWindow(this,"Create Random Dot Markers",true);
+		setPreferredSize(new Dimension(700, 500));
+		frame = ShowImages.setupWindow(this, "Create Random Dot Markers", true);
 		createMenuBar();
 		frame.setVisible(true);
 	}
@@ -103,11 +103,11 @@ public class CreateFiducialRandomDotGui extends JPanel {
 
 		JMenu menuFile = new JMenu("File");
 		menuFile.setMnemonic(KeyEvent.VK_F);
-		JMenuItem menuSave = BoofSwingUtil.createMenuItem("Save",KeyEvent.VK_S,KeyEvent.VK_S,
+		JMenuItem menuSave = BoofSwingUtil.createMenuItem("Save", KeyEvent.VK_S, KeyEvent.VK_S,
 				() -> saveFile(false));
-		JMenuItem menuPrint = BoofSwingUtil.createMenuItem("Print...",KeyEvent.VK_P,KeyEvent.VK_P,
+		JMenuItem menuPrint = BoofSwingUtil.createMenuItem("Print...", KeyEvent.VK_P, KeyEvent.VK_P,
 				() -> saveFile(true));
-		JMenuItem menuQuit = BoofSwingUtil.createMenuItem("Quit",KeyEvent.VK_Q,KeyEvent.VK_Q,
+		JMenuItem menuQuit = BoofSwingUtil.createMenuItem("Quit", KeyEvent.VK_Q, KeyEvent.VK_Q,
 				() -> System.exit(0));
 
 		menuFile.addSeparator();
@@ -119,11 +119,14 @@ public class CreateFiducialRandomDotGui extends JPanel {
 		JMenu editMenu = new JMenu("Edit");
 		editMenu.setMnemonic(KeyEvent.VK_E);
 		JMenuItem menuCut = new JMenuItem(new DefaultEditorKit.CutAction());
-		menuCut.setText("Cut");BoofSwingUtil.setMenuItemKeys(menuCut,KeyEvent.VK_T,KeyEvent.VK_X);
+		menuCut.setText("Cut");
+		BoofSwingUtil.setMenuItemKeys(menuCut, KeyEvent.VK_T, KeyEvent.VK_X);
 		JMenuItem menuCopy = new JMenuItem(new DefaultEditorKit.CopyAction());
-		menuCopy.setText("Copy");BoofSwingUtil.setMenuItemKeys(menuCopy,KeyEvent.VK_C,KeyEvent.VK_C);
+		menuCopy.setText("Copy");
+		BoofSwingUtil.setMenuItemKeys(menuCopy, KeyEvent.VK_C, KeyEvent.VK_C);
 		JMenuItem menuPaste = new JMenuItem(new DefaultEditorKit.PasteAction());
-		menuPaste.setText("Paste");BoofSwingUtil.setMenuItemKeys(menuPaste,KeyEvent.VK_P,KeyEvent.VK_V);
+		menuPaste.setText("Paste");
+		BoofSwingUtil.setMenuItemKeys(menuPaste, KeyEvent.VK_P, KeyEvent.VK_V);
 
 		editMenu.add(menuCut);
 		editMenu.add(menuCopy);
@@ -139,7 +142,7 @@ public class CreateFiducialRandomDotGui extends JPanel {
 		File f;
 
 		// see where the document is to be sent
-		if( sendToPrinter ) {
+		if (sendToPrinter) {
 			if (owner.fileType.compareToIgnoreCase("pdf") != 0) {
 				JOptionPane.showMessageDialog(this, "Must select PDF document type to print");
 				return;
@@ -147,12 +150,12 @@ public class CreateFiducialRandomDotGui extends JPanel {
 			f = new File(""); // dummy to make the code below happy and less complex
 		} else {
 			f = FileSystemView.getFileSystemView().getHomeDirectory();
-			f = new File(f,"dotmarker."+owner.fileType);
+			f = new File(f, "dotmarker." + owner.fileType);
 
-			f = BoofSwingUtil.fileChooser(null,this,false,f.getPath(),(s)->{
+			f = BoofSwingUtil.fileChooser(null, this, false, f.getPath(), ( s ) -> {
 				File parent = new File(s).getParentFile();
 				String base = FilenameUtils.getBaseName(s);
-				File ff = new File(parent,base + "." + owner.fileType);
+				File ff = new File(parent, base + "." + owner.fileType);
 				System.out.println(s);
 				System.out.println(ff.getPath());
 				return ff.getPath();
@@ -170,7 +173,7 @@ public class CreateFiducialRandomDotGui extends JPanel {
 		// Make sure the file has the correct extension
 		String outputFile = f.getAbsolutePath();
 		String ext = FilenameUtils.getExtension(outputFile);
-		if( ext.compareToIgnoreCase(owner.fileType) != 0 ) {
+		if (ext.compareToIgnoreCase(owner.fileType) != 0) {
 			outputFile = FilenameUtils.removeExtension(outputFile);
 			outputFile += "." + owner.fileType;
 		}
@@ -182,9 +185,9 @@ public class CreateFiducialRandomDotGui extends JPanel {
 
 		try {
 			owner.run();
-		} catch( IOException | RuntimeException e){
+		} catch (IOException | RuntimeException e) {
 			System.out.println("Exception!!!");
-			BoofSwingUtil.warningDialog(this,e);
+			BoofSwingUtil.warningDialog(this, e);
 		}
 	}
 
@@ -202,14 +205,14 @@ public class CreateFiducialRandomDotGui extends JPanel {
 		owner.markers.clear();
 
 		// Decide how close two dots can be
-		double spacingDiameter = controls.spaceDiameter<=0?def.dotDiameter: controls.spaceDiameter;
+		double spacingDiameter = controls.spaceDiameter <= 0 ? def.dotDiameter : controls.spaceDiameter;
 
 		// Create all the dots
 		Random rand = new Random(def.randomSeed);
-		for(int i = 0; i < controls.totalMarkers; i++ ) {
+		for (int i = 0; i < controls.totalMarkers; i++) {
 			List<Point2D_F64> marker = RandomDotMarkerGenerator.createRandomMarker(rand,
-					def.maxDotsPerMarker, def.markerWidth, def.markerHeight,spacingDiameter);
-			owner.markers.add( marker );
+					def.maxDotsPerMarker, def.markerWidth, def.markerHeight, spacingDiameter);
+			owner.markers.add(marker);
 		}
 
 		updateRendering();
@@ -229,12 +232,12 @@ public class CreateFiducialRandomDotGui extends JPanel {
 		// Generate the preview image
 		var generator = new RandomDotMarkerGeneratorImage();
 		generator.setRadius(dd/2.0);
-		generator.configure(width,height,20);
-		generator.render(owner.markers.get(controls.viewMarkerIndex),def.markerWidth, def.markerHeight);
+		generator.configure(width, height, 20);
+		generator.render(owner.markers.get(controls.viewMarkerIndex), def.markerWidth, def.markerHeight);
 
 		GrayU8 gray = generator.getImage();
 		BufferedImage out = new BufferedImage(gray.width, gray.height, BufferedImage.TYPE_INT_RGB);
-		ConvertBufferedImage.convertTo(gray,out);
+		ConvertBufferedImage.convertTo(gray, out);
 		imagePanel.setImageRepaint(out);
 	}
 
@@ -258,62 +261,62 @@ public class CreateFiducialRandomDotGui extends JPanel {
 		double diameterPdf = owner.dotDiameter;
 		int diameterPixels = 30;
 
-		JComboBox<String> comboOutputFormat = combo(0,"pdf","png","bmp","jpg","ppm","pgm");
-		JComboBox<String> comboPaper = combo(PaperSize.values().indexOf(owner.paperSize),PaperSize.values().toArray());
-		JComboBox<String> comboUnits = combo( owner.unit.ordinal(),(Object[])Unit.values());
-		JFormattedTextField fieldMarkerWidth = BoofSwingUtil.createTextField(owner.markerWidth,0.0,Double.NaN);
-		JSpinner spinnerRatio = spinner(markerRatio,0.0001,1000.0,0.05);
+		JComboBox<String> comboOutputFormat = combo(0, "pdf", "png", "bmp", "jpg", "ppm", "pgm");
+		JComboBox<String> comboPaper = combo(PaperSize.values().indexOf(owner.paperSize), PaperSize.values().toArray());
+		JComboBox<String> comboUnits = combo(owner.unit.ordinal(), (Object[])Unit.values());
+		JFormattedTextField fieldMarkerWidth = BoofSwingUtil.createTextField(owner.markerWidth, 0.0, Double.NaN);
+		JSpinner spinnerRatio = spinner(markerRatio, 0.0001, 1000.0, 0.05);
 		JFormattedTextField fieldRandomSeed = BoofSwingUtil.createHexTextField(owner.randomSeed);
-		JCheckBox checkFillGrid = checkbox("Fill Grid",owner.gridFill,"Fill in all space in the document with markers");
-		JCheckBox checkDrawGrid = checkbox("Draw Grid", owner.drawGrid,"Draw the grid in the document");
-		JCheckBox checkDrawBorder = checkbox("Draw Border", owner.drawLineBorder,"Draw marker borders in the document");
-		JCheckBox checkHideInfo = checkbox("Hide Info",owner.hideInfo,"Hide text info for each marker");
-		JSpinner spinnerMaxDots = spinner(owner.maxDotsPerMarker,1,9999,1);
-		JSpinner spinnerTotalMarkers = spinner(totalMarkers,1,100000,1);
-		JSpinner spinnerDotDiameter = spinner(owner.dotDiameter,0.0,1000.0,1.0);
-		JSpinner spinnerSpace = spinner(spaceDiameter,-1.0,1000.0,1.0);
-		JSpinner spinnerView = spinner(viewMarkerIndex,0,100000,1);
+		JCheckBox checkFillGrid = checkbox("Fill Grid", owner.gridFill, "Fill in all space in the document with markers");
+		JCheckBox checkDrawGrid = checkbox("Draw Grid", owner.drawGrid, "Draw the grid in the document");
+		JCheckBox checkDrawBorder = checkbox("Draw Border", owner.drawLineBorder, "Draw marker borders in the document");
+		JCheckBox checkHideInfo = checkbox("Hide Info", owner.hideInfo, "Hide text info for each marker");
+		JSpinner spinnerMaxDots = spinner(owner.maxDotsPerMarker, 1, 9999, 1);
+		JSpinner spinnerTotalMarkers = spinner(totalMarkers, 1, 100000, 1);
+		JSpinner spinnerDotDiameter = spinner(owner.dotDiameter, 0.0, 1000.0, 1.0);
+		JSpinner spinnerSpace = spinner(spaceDiameter, -1.0, 1000.0, 1.0);
+		JSpinner spinnerView = spinner(viewMarkerIndex, 0, 100000, 1);
 
 		public ControlPanel() {
 			owner.fileType = "pdf";
 
-			fieldMarkerWidth.setPreferredSize(new Dimension(60,24));
+			fieldMarkerWidth.setPreferredSize(new Dimension(60, 24));
 			fieldMarkerWidth.setMaximumSize(fieldMarkerWidth.getPreferredSize());
-			fieldRandomSeed.setPreferredSize(new Dimension(100,24));
+			fieldRandomSeed.setPreferredSize(new Dimension(100, 24));
 			fieldRandomSeed.setMaximumSize(fieldRandomSeed.getPreferredSize());
 			fieldMarkerWidth.addActionListener(this);
 			fieldRandomSeed.addActionListener(this);
 
-			addLabeled(spinnerView,"View Marker ID","Specify which of the markers to view in the preview");
-			addLabeled(spinnerTotalMarkers,"Total Markers","The number of markers it will generate");
-			addLabeled(fieldMarkerWidth,"Marker Width",
+			addLabeled(spinnerView, "View Marker ID", "Specify which of the markers to view in the preview");
+			addLabeled(spinnerTotalMarkers, "Total Markers", "The number of markers it will generate");
+			addLabeled(fieldMarkerWidth, "Marker Width",
 					"Width and Height of the markers. If image then this is pixels. Use command line for rectangular markers.");
-			addLabeled(spinnerRatio,"Height/Width","Ratio of the markers height/width");
-			addLabeled(comboUnits,"Units","Units that the width is specified in");
-			addLabeled(spinnerMaxDots,"Max Dots","Max number of possible dots in a marker");
-			addLabeled(spinnerDotDiameter,"Dot Diameter","How wide a marker is");
-			addLabeled(spinnerSpace,"Dot Space","If > 0 then this species the min spacing between dots. " +
+			addLabeled(spinnerRatio, "Height/Width", "Ratio of the markers height/width");
+			addLabeled(comboUnits, "Units", "Units that the width is specified in");
+			addLabeled(spinnerMaxDots, "Max Dots", "Max number of possible dots in a marker");
+			addLabeled(spinnerDotDiameter, "Dot Diameter", "How wide a marker is");
+			addLabeled(spinnerSpace, "Dot Space", "If > 0 then this species the min spacing between dots. " +
 					"If less than the diameter then two dots can touch. That's bad.");
-			addLabeled(fieldRandomSeed,"Random Seed","Random seed used to generate markers");
+			addLabeled(fieldRandomSeed, "Random Seed", "Random seed used to generate markers");
 
-			addLabeled(comboOutputFormat,"Output Format","Format for output file");
-			addLabeled(comboPaper,"Paper Size","Size of paper for PDF or printing");
-			add(BoofSwingUtil.gridPanel(2,2,2,2,checkFillGrid,checkDrawGrid,checkDrawBorder,checkHideInfo));
+			addLabeled(comboOutputFormat, "Output Format", "Format for output file");
+			addLabeled(comboPaper, "Paper Size", "Size of paper for PDF or printing");
+			add(BoofSwingUtil.gridPanel(2, 2, 2, 2, checkFillGrid, checkDrawGrid, checkDrawBorder, checkHideInfo));
 
 			// set the max size now so that it will have a width large enough for the max possible value
-			((SpinnerNumberModel) spinnerView.getModel()).setMaximum(totalMarkers-1);
+			((SpinnerNumberModel)spinnerView.getModel()).setMaximum(totalMarkers - 1);
 		}
 
 		/**
 		 * Where all the user interactions are handled
 		 */
 		@Override
-		public void controlChanged(final Object source) {
-			if( source == spinnerMaxDots) {
-				owner.maxDotsPerMarker = ((Number) spinnerMaxDots.getValue()).intValue();
+		public void controlChanged( final Object source ) {
+			if (source == spinnerMaxDots) {
+				owner.maxDotsPerMarker = ((Number)spinnerMaxDots.getValue()).intValue();
 				updateMarkers();
-			} else if( source == fieldMarkerWidth ) {
-				if( isPixels() ) {
+			} else if (source == fieldMarkerWidth) {
+				if (isPixels()) {
 					widthPixels = ((Number)fieldMarkerWidth.getValue()).intValue();
 					owner.markerWidth = widthPixels;
 				} else {
@@ -321,11 +324,11 @@ public class CreateFiducialRandomDotGui extends JPanel {
 					owner.markerWidth = (float)widthPdf;
 				}
 				updateMarkers();
-			} else if( source == spinnerRatio ) {
+			} else if (source == spinnerRatio) {
 				markerRatio = ((Number)spinnerRatio.getValue()).doubleValue();
 				updateMarkers();
-			} else if( source == spinnerDotDiameter ) {
-				if( isPixels() ) {
+			} else if (source == spinnerDotDiameter) {
+				if (isPixels()) {
 					diameterPixels = ((Number)spinnerDotDiameter.getValue()).intValue();
 					owner.dotDiameter = diameterPixels;
 				} else {
@@ -333,25 +336,25 @@ public class CreateFiducialRandomDotGui extends JPanel {
 					owner.dotDiameter = (float)diameterPdf;
 				}
 				updateMarkers();
-			} else if( source == fieldRandomSeed ) {
+			} else if (source == fieldRandomSeed) {
 				owner.randomSeed = ((Number)fieldRandomSeed.getValue()).longValue();
 				updateMarkers();
-			} else if( source == spinnerSpace ) {
+			} else if (source == spinnerSpace) {
 				spaceDiameter = ((Number)spinnerSpace.getValue()).doubleValue();
 				updateMarkers();
-			} else if( source == spinnerTotalMarkers) {
-				totalMarkers = ((Number) spinnerTotalMarkers.getValue()).intValue();
+			} else if (source == spinnerTotalMarkers) {
+				totalMarkers = ((Number)spinnerTotalMarkers.getValue()).intValue();
 				// change the max allowed value in the marker being viewed
-				SpinnerNumberModel m = (SpinnerNumberModel) spinnerView.getModel();
-				m.setMaximum(totalMarkers-1);
+				SpinnerNumberModel m = (SpinnerNumberModel)spinnerView.getModel();
+				m.setMaximum(totalMarkers - 1);
 				updateMarkers();
-			} else if( source == spinnerView ) {
+			} else if (source == spinnerView) {
 				int idx = ((Number)spinnerView.getValue()).intValue();
-				if( viewMarkerIndex == idx )
+				if (viewMarkerIndex == idx)
 					return;
 				this.viewMarkerIndex = idx;
 				updateRendering();
-			} else if ( source == comboOutputFormat ) {
+			} else if (source == comboOutputFormat) {
 				owner.fileType = (String)comboOutputFormat.getSelectedItem();
 				// toggle controls depending on type of output format
 				boolean enable = comboOutputFormat.getSelectedIndex() == 0;
@@ -361,7 +364,7 @@ public class CreateFiducialRandomDotGui extends JPanel {
 				checkDrawBorder.setEnabled(enable);
 				checkDrawGrid.setEnabled(enable);
 				comboUnits.setEnabled(enable);
-				if( enable ) {
+				if (enable) {
 					owner.markerWidth = (float)widthPdf;
 					owner.dotDiameter = (float)diameterPdf;
 				} else {
@@ -371,23 +374,22 @@ public class CreateFiducialRandomDotGui extends JPanel {
 				fieldMarkerWidth.setValue(owner.markerWidth);
 				spinnerDotDiameter.setValue(owner.dotDiameter);
 				updateRendering();
-			} else if ( source == comboPaper ) {
+			} else if (source == comboPaper) {
 				owner.paperSize = PaperSize.values().get(comboPaper.getSelectedIndex());
-			} else if ( source == checkFillGrid ) {
+			} else if (source == checkFillGrid) {
 				owner.gridFill = checkFillGrid.isSelected();
-			} else if ( source == checkDrawGrid ) {
+			} else if (source == checkDrawGrid) {
 				owner.drawGrid = checkDrawGrid.isSelected();
-			} else if ( source == checkDrawBorder ) {
+			} else if (source == checkDrawBorder) {
 				owner.drawLineBorder = checkDrawBorder.isSelected();
-			} else if ( source == checkHideInfo ) {
+			} else if (source == checkHideInfo) {
 				owner.hideInfo = checkHideInfo.isSelected();
 			}
 		}
 	}
 
-	public static void main(String[] args) {
+	public static void main( String[] args ) {
 		var owner = new CreateFiducialRandomDot();
-		SwingUtilities.invokeLater(()->new CreateFiducialRandomDotGui(owner));
+		SwingUtilities.invokeLater(() -> new CreateFiducialRandomDotGui(owner));
 	}
-
 }

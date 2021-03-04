@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -39,40 +39,40 @@ import java.util.List;
  */
 public class CreateFiducialSquareBinary extends BaseFiducialSquareBorder {
 
-	@Option(name = "-n",aliases = {"--Numbers"},usage = "Specifies the numbers to encode", handler = LongArrayOptionHandler.class)
+	@Option(name = "-n", aliases = {"--Numbers"}, usage = "Specifies the numbers to encode", handler = LongArrayOptionHandler.class)
 	public Long[] numbers = new Long[0];
 
 	@Option(name = "--PatternGridWidth", usage = "Size of grid in the pattern")
 	public int gridWidth = 4;
 
 	@Override
-	protected void callRenderPdf(CreateFiducialDocumentPDF renderer) throws IOException {
+	protected void callRenderPdf( CreateFiducialDocumentPDF renderer ) throws IOException {
 		List<String> names = new ArrayList<>();
 		DogArray_I64 numbers = new DogArray_I64();
 
 		for (int i = 0; i < this.numbers.length; i++) {
-			names.add( this.numbers[i].toString() );
-			numbers.add( this.numbers[i]);
+			names.add(this.numbers[i].toString());
+			numbers.add(this.numbers[i]);
 		}
 
 		((CreateSquareFiducialDocumentPDF)renderer).render(names, numbers, gridWidth);
 	}
 
 	@Override
-	protected void callRenderImage(CreateFiducialDocumentImage renderer) {
+	protected void callRenderImage( CreateFiducialDocumentImage renderer ) {
 		List<String> names = new ArrayList<>();
 		DogArray_I64 numbers = new DogArray_I64();
 
 		for (int i = 0; i < this.numbers.length; i++) {
-			names.add( this.numbers[i].toString() );
-			numbers.add( this.numbers[i]);
+			names.add(this.numbers[i].toString());
+			numbers.add(this.numbers[i]);
 		}
 
 		((CreateSquareFiducialDocumentImage)renderer).render(names, numbers, gridWidth);
 	}
 
 	@Override
-	protected void printHelp(CmdLineParser parser) {
+	protected void printHelp( CmdLineParser parser ) {
 		super.printHelp(parser);
 
 		System.out.println("Creates three images in PNG format 220x220 pixels, 20 pixel white border");
@@ -88,20 +88,20 @@ public class CreateFiducialSquareBinary extends BaseFiducialSquareBorder {
 		System.exit(-1);
 	}
 
-	public static void main(String[] args) {
+	public static void main( String[] args ) {
 		CreateFiducialSquareBinary generator = new CreateFiducialSquareBinary();
 		CmdLineParser parser = new CmdLineParser(generator);
 
-		if( args.length == 0 ) {
+		if (args.length == 0) {
 			generator.printHelp(parser);
 		}
 
 		try {
 			parser.parseArgument(args);
-			if( generator.guiMode ) {
+			if (generator.guiMode) {
 				BoofSwingUtil.invokeNowOrLater(CreateFiducialSquareBinaryGui::new);
 			} else {
-				if( generator.numbers == null ) {
+				if (generator.numbers == null) {
 					System.err.println("Must specify at least one number");
 					System.exit(1);
 				}

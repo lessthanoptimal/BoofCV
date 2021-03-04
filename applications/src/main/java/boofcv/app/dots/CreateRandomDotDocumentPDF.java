@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -45,7 +45,7 @@ public class CreateRandomDotDocumentPDF extends CreateFiducialDocumentPDF {
 
 	public double dotDiameter;
 
-	public CreateRandomDotDocumentPDF(String documentName, PaperSize paper, Unit units) {
+	public CreateRandomDotDocumentPDF( String documentName, PaperSize paper, Unit units ) {
 		super(documentName, paper, units);
 	}
 
@@ -55,8 +55,8 @@ public class CreateRandomDotDocumentPDF extends CreateFiducialDocumentPDF {
 	}
 
 	@Override
-	protected void configureRenderer(PdfFiducialEngine renderer) {
-		if( markerHeight < 0 )
+	protected void configureRenderer( PdfFiducialEngine renderer ) {
+		if (markerHeight < 0)
 			throw new IllegalArgumentException("Must specify marker height even if square");
 		this.renderer = renderer;
 		g = new RandomDotMarkerGenerator();
@@ -67,21 +67,21 @@ public class CreateRandomDotDocumentPDF extends CreateFiducialDocumentPDF {
 	}
 
 	@Override
-	protected void render(int markerIndex ) {
-		List<Point2D_F64> marker = markers.get( markerIndex%markers.size());
+	protected void render( int markerIndex ) {
+		List<Point2D_F64> marker = markers.get(markerIndex%markers.size());
 
 		//  Convert the marker into document units
 		List<Point2D_F64> scaled = new ArrayList<>();
-		for( var p : marker ) {
+		for (var p : marker) {
 			p = p.copy();
 			p.x *= UNIT_TO_POINTS;
 			p.y *= UNIT_TO_POINTS;
-			scaled.add( p );
+			scaled.add(p);
 		}
-		g.render(scaled,markerWidth*UNIT_TO_POINTS, markerHeight*UNIT_TO_POINTS);
+		g.render(scaled, markerWidth*UNIT_TO_POINTS, markerHeight*UNIT_TO_POINTS);
 
 		// draw optional black box around the marker
-		if( drawLineBorder ) {
+		if (drawLineBorder) {
 			try {
 				drawFiducialBorder();
 			} catch (IOException e) {
@@ -99,21 +99,21 @@ public class CreateRandomDotDocumentPDF extends CreateFiducialDocumentPDF {
 		float xx = (float)renderer.offsetX;
 		float yy = (float)renderer.offsetY;
 
-		pcs.moveTo(xx,yy);
-		pcs.lineTo(xx,yy+w);
-		pcs.lineTo(xx+w,yy+w);
-		pcs.lineTo(xx+w,yy);
-		pcs.lineTo(xx,yy);
+		pcs.moveTo(xx, yy);
+		pcs.lineTo(xx, yy + w);
+		pcs.lineTo(xx + w, yy + w);
+		pcs.lineTo(xx + w, yy);
+		pcs.lineTo(xx, yy);
 		pcs.closeAndStroke();
 	}
 
-	public void render(List<List<Point2D_F64>> markers , int maxDots, long seed ) throws IOException {
+	public void render( List<List<Point2D_F64>> markers, int maxDots, long seed ) throws IOException {
 		this.markers = markers;
 
 		totalMarkers = markers.size();
 		names = new ArrayList<>();
 		for (int i = 0; i < markers.size(); i++) {
-			names.add(String.format("ID: %d N: %d Seed: 0x%4X",i,maxDots,seed));
+			names.add(String.format("ID: %d N: %d Seed: 0x%4X", i, maxDots, seed));
 		}
 
 		render();
@@ -121,7 +121,7 @@ public class CreateRandomDotDocumentPDF extends CreateFiducialDocumentPDF {
 
 	@Override
 	protected String createMarkerSizeString() {
-		return String.format("mw: %4.1f  dd: %4.1f %2s",markerWidth,
-				dotDiameter,units.getAbbreviation());
+		return String.format("mw: %4.1f  dd: %4.1f %2s", markerWidth,
+				dotDiameter, units.getAbbreviation());
 	}
 }

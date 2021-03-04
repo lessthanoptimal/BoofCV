@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -29,20 +29,21 @@ import java.util.List;
  * @author Peter Abeles
  */
 public class PaperSize {
-	public static PaperSize FIT_CONTENT = new PaperSize("CONTENT",0,0,null);
-	public static PaperSize A0 = new PaperSize("A0",841 , 1189, Unit.MILLIMETER);
-	public static PaperSize A1 = new PaperSize("A1",594 , 841, Unit.MILLIMETER);
-	public static PaperSize A2 = new PaperSize("A2",420 , 594, Unit.MILLIMETER);
-	public static PaperSize A3 = new PaperSize("A3",297 , 420, Unit.MILLIMETER);
-	public static PaperSize A4 = new PaperSize("A4",210 , 297, Unit.MILLIMETER);
-	public static PaperSize LEGAL = new PaperSize("LEGAL",8.5 , 14.0, Unit.INCH);
-	public static PaperSize LETTER = new PaperSize("LETTER",8.5 , 11.0, Unit.INCH);
+	public static PaperSize FIT_CONTENT = new PaperSize("CONTENT", 0, 0, null);
+	public static PaperSize A0 = new PaperSize("A0", 841, 1189, Unit.MILLIMETER);
+	public static PaperSize A1 = new PaperSize("A1", 594, 841, Unit.MILLIMETER);
+	public static PaperSize A2 = new PaperSize("A2", 420, 594, Unit.MILLIMETER);
+	public static PaperSize A3 = new PaperSize("A3", 297, 420, Unit.MILLIMETER);
+	public static PaperSize A4 = new PaperSize("A4", 210, 297, Unit.MILLIMETER);
+	public static PaperSize LEGAL = new PaperSize("LEGAL", 8.5, 14.0, Unit.INCH);
+	public static PaperSize LETTER = new PaperSize("LETTER", 8.5, 11.0, Unit.INCH);
 
-	public PaperSize( String name , double width, double height, Unit unit) {
+	public PaperSize( String name, double width, double height, Unit unit ) {
 		this(width, height, unit);
 		this.name = name;
 	}
-	public PaperSize(double width, double height, Unit unit) {
+
+	public PaperSize( double width, double height, Unit unit ) {
 		this.width = width;
 		this.height = height;
 		this.unit = unit;
@@ -56,6 +57,7 @@ public class PaperSize {
 	public static List<PaperSize> values() {
 		return values;
 	}
+
 	private static final List<PaperSize> values = new ArrayList<>();
 
 	static {
@@ -72,8 +74,8 @@ public class PaperSize {
 	 * Sees if the specified work matches any of the units full name or short name.
 	 */
 	public static PaperSize lookup( String word ) {
-		for( PaperSize paper : values ) {
-			if( paper.name.compareToIgnoreCase(word) == 0 ) {
+		for (PaperSize paper : values) {
+			if (paper.name.compareToIgnoreCase(word) == 0) {
 				return paper;
 			}
 		}
@@ -82,11 +84,11 @@ public class PaperSize {
 	}
 
 	public double convertWidth( Unit outputUnit ) {
-		return this.unit.convert(width,outputUnit);
+		return this.unit.convert(width, outputUnit);
 	}
 
 	public double convertHeight( Unit outputUnit ) {
-		return this.unit.convert(height,outputUnit);
+		return this.unit.convert(height, outputUnit);
 	}
 
 	public Unit getUnit() {
@@ -108,11 +110,11 @@ public class PaperSize {
 	@Override
 	public String toString() {
 		String output = "";
-		if( name != null )
-			output += name+" ";
-		output += String.format("%4.1f x %4.1f",width,height);
-		if( unit != null)
-			output += "  "+unit.abbreviation;
+		if (name != null)
+			output += name + " ";
+		output += String.format("%4.1f x %4.1f", width, height);
+		if (unit != null)
+			output += "  " + unit.abbreviation;
 		return output;
 	}
 }

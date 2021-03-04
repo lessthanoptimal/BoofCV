@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -38,7 +38,7 @@ public class CreateQrCodeDocumentPDF extends CreateFiducialDocumentPDF {
 	java.util.List<QrCode> markers;
 	QrCodeGenerator g;
 
-	public CreateQrCodeDocumentPDF(String documentName, PaperSize paper, Unit units) {
+	public CreateQrCodeDocumentPDF( String documentName, PaperSize paper, Unit units ) {
 		super(documentName, paper, units);
 	}
 
@@ -48,18 +48,18 @@ public class CreateQrCodeDocumentPDF extends CreateFiducialDocumentPDF {
 	}
 
 	@Override
-	protected void configureRenderer(PdfFiducialEngine r) {
+	protected void configureRenderer( PdfFiducialEngine r ) {
 		g = new QrCodeGenerator(markerWidth*UNIT_TO_POINTS);
 		g.setRender(r);
 	}
 
 	@Override
-	protected void render(int markerIndex ) {
-		QrCode qr = markers.get( markerIndex%markers.size());
+	protected void render( int markerIndex ) {
+		QrCode qr = markers.get(markerIndex%markers.size());
 		g.render(qr);
 	}
 
-	public void render(java.util.List<QrCode> markers ) throws IOException {
+	public void render( java.util.List<QrCode> markers ) throws IOException {
 		this.markers = markers;
 
 		totalMarkers = markers.size();
@@ -69,7 +69,7 @@ public class CreateQrCodeDocumentPDF extends CreateFiducialDocumentPDF {
 			String message = markers.get(i).message;
 			// get rid of new line
 			message = message.replaceAll("\\r|\\n", "");
-			message = message.substring(0,Math.min(message.length(),30));
+			message = message.substring(0, Math.min(message.length(), 30));
 			// remove non-printable
 			message = message.replaceAll("\\p{C}", "?");
 			names.add(message);

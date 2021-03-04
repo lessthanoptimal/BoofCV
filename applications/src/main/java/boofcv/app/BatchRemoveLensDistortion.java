@@ -48,21 +48,21 @@ import java.util.List;
 public class BatchRemoveLensDistortion {
 
 	@Option(name = "-c", aliases = {"--Camera"},
-			usage="Path to camera intrinsics yaml")
+			usage = "Path to camera intrinsics yaml")
 	String pathIntrinsic;
-	@Option(name = "-i", aliases = {"--Input"}, usage = "Directory or glob pattern or regex pattern.\n"+
+	@Option(name = "-i", aliases = {"--Input"}, usage = "Directory or glob pattern or regex pattern.\n" +
 			"Glob example: 'glob:data/**/left*.jpg'\n" +
 			"Regex example: 'regex:data/\\w+/left\\d+.jpg'\n" +
 			"If not a pattern then it's assumed to be a path. All files with known image extensions in their name as added, e.g. jpg, png")
 	String inputPattern;
-	@Option(name = "-o", aliases = {"--Output"}, usage="Path to output directory")
+	@Option(name = "-o", aliases = {"--Output"}, usage = "Path to output directory")
 	String outputPath;
-	@Option(name = "--Rename", usage="Rename files")
+	@Option(name = "--Rename", usage = "Rename files")
 	boolean rename;
-	@Option(name = "-a", aliases = {"--Adjustment"}, usage="none, expand, full_view")
+	@Option(name = "-a", aliases = {"--Adjustment"}, usage = "none, expand, full_view")
 	String adjustmentName;
 	AdjustmentType adjustmentType;
-	@Option(name="--GUI", usage="Ignore all other command line arguments and switch to GUI mode")
+	@Option(name = "--GUI", usage = "Ignore all other command line arguments and switch to GUI mode")
 	private boolean guiMode = false;
 
 	boolean cancel = false;
@@ -72,7 +72,7 @@ public class BatchRemoveLensDistortion {
 	}
 
 	public BatchRemoveLensDistortion( String pathIntrinsic, String inputPattern, String outputPath,
-									 boolean rename, AdjustmentType adjustmentType,
+									  boolean rename, AdjustmentType adjustmentType,
 									  Listener listener ) {
 		this.pathIntrinsic = pathIntrinsic;
 		this.inputPattern = inputPattern;
@@ -82,7 +82,7 @@ public class BatchRemoveLensDistortion {
 		this.listener = listener;
 	}
 
-	private static void printHelpExit(CmdLineParser parser ) {
+	private static void printHelpExit( CmdLineParser parser ) {
 		parser.getProperties().withUsageWidth(120);
 		parser.printUsage(System.out);
 
@@ -95,28 +95,28 @@ public class BatchRemoveLensDistortion {
 	}
 
 	public void finishParsing() {
-		if( adjustmentName.compareToIgnoreCase("none")==0) {
+		if (adjustmentName.compareToIgnoreCase("none") == 0) {
 			adjustmentType = AdjustmentType.NONE;
-		} else if( adjustmentName.compareToIgnoreCase("expand")==0) {
+		} else if (adjustmentName.compareToIgnoreCase("expand") == 0) {
 			adjustmentType = AdjustmentType.EXPAND;
-		} else if( adjustmentName.compareToIgnoreCase("full_view")==0) {
+		} else if (adjustmentName.compareToIgnoreCase("full_view") == 0) {
 			adjustmentType = AdjustmentType.FULL_VIEW;
 		} else {
-			throw new RuntimeException("Unknown adjustment "+adjustmentName);
+			throw new RuntimeException("Unknown adjustment " + adjustmentName);
 		}
 	}
 
 	public void process() {
 		cancel = false;
-		System.out.println("AdjustmentType = "+ adjustmentType);
-		System.out.println("rename         = "+ rename);
-		System.out.println("input pattern  = "+ inputPattern);
-		System.out.println("output dir     = "+ outputPath);
+		System.out.println("AdjustmentType = " + adjustmentType);
+		System.out.println("rename         = " + rename);
+		System.out.println("input pattern  = " + inputPattern);
+		System.out.println("output dir     = " + outputPath);
 
 
 		File fileOutputDir = new File(outputPath);
-		if( !fileOutputDir.exists() ) {
-			if( !fileOutputDir.mkdirs() ) {
+		if (!fileOutputDir.exists()) {
+			if (!fileOutputDir.mkdirs()) {
 				throw new RuntimeException("Output directory did not exist and failed to create it");
 			} else {
 				System.out.println("  created output directory");
@@ -126,78 +126,78 @@ public class BatchRemoveLensDistortion {
 		CameraPinholeBrown param = CalibrationIO.load(pathIntrinsic);
 		CameraPinholeBrown paramAdj = new CameraPinholeBrown();
 
-		List<String> paths = UtilIO.listSmartImages(inputPattern,false);
+		List<String> paths = UtilIO.listSmartImages(inputPattern, false);
 
 		if (paths.isEmpty())
-			System.out.println("No inputs found. Bath path or pattern? "+inputPattern);
+			System.out.println("No inputs found. Bath path or pattern? " + inputPattern);
 
-		System.out.println("Found a total of "+paths.size()+" matching files");
+		System.out.println("Found a total of " + paths.size() + " matching files");
 
-		Planar<GrayF32> distoredImg = new Planar<>(GrayF32.class,param.width,param.height,3);
-		Planar<GrayF32> undistoredImg = new Planar<>(GrayF32.class,param.width,param.height,3);
+		Planar<GrayF32> distoredImg = new Planar<>(GrayF32.class, param.width, param.height, 3);
+		Planar<GrayF32> undistoredImg = new Planar<>(GrayF32.class, param.width, param.height, 3);
 
 		ImageDistort distort = LensDistortionOps.changeCameraModel(adjustmentType, BorderType.ZERO, param,
-				new CameraPinhole(param), paramAdj, (ImageType) distoredImg.getImageType());
-		CalibrationIO.save(paramAdj,new File(outputPath,"intrinsicUndistorted.yaml").getAbsolutePath());
+				new CameraPinhole(param), paramAdj, (ImageType)distoredImg.getImageType());
+		CalibrationIO.save(paramAdj, new File(outputPath, "intrinsicUndistorted.yaml").getAbsolutePath());
 
-		BufferedImage out = new BufferedImage(param.width,param.height,BufferedImage.TYPE_INT_RGB);
+		BufferedImage out = new BufferedImage(param.width, param.height, BufferedImage.TYPE_INT_RGB);
 
-		int numDigits = BoofMiscOps.numDigits(paths.size()-1);
-		String format = "%0"+numDigits+"d";
-		for( int i = 0; i < paths.size(); i++ ) {
+		int numDigits = BoofMiscOps.numDigits(paths.size() - 1);
+		String format = "%0" + numDigits + "d";
+		for (int i = 0; i < paths.size(); i++) {
 			File file = new File(paths.get(i));
 			System.out.println("processing " + file.getName());
 			BufferedImage orig = UtilImageIO.loadImage(file.getAbsolutePath());
-			if( orig == null ) {
-				throw new RuntimeException("Can't load file: "+file.getAbsolutePath());
+			if (orig == null) {
+				throw new RuntimeException("Can't load file: " + file.getAbsolutePath());
 			}
 
-			if( orig.getWidth() != param.width || orig.getHeight() != param.height ) {
+			if (orig.getWidth() != param.width || orig.getHeight() != param.height) {
 				System.err.println("intrinsic parameters and image size do not match!");
 				System.exit(-1);
 			}
 
-			if( listener != null )
-				listener.loadedImage(orig,file.getName());
+			if (listener != null)
+				listener.loadedImage(orig, file.getName());
 
 			ConvertBufferedImage.convertFromPlanar(orig, distoredImg, true, GrayF32.class);
-			distort.apply(distoredImg,undistoredImg);
-			ConvertBufferedImage.convertTo(undistoredImg,out,true);
+			distort.apply(distoredImg, undistoredImg);
+			ConvertBufferedImage.convertTo(undistoredImg, out, true);
 
 			String nameOut;
-			if( rename ) {
-				nameOut = String.format("image"+format+".png",i);
+			if (rename) {
+				nameOut = String.format("image" + format + ".png", i);
 			} else {
-				nameOut = file.getName().split("\\.")[0]+"_undistorted.png";
+				nameOut = file.getName().split("\\.")[0] + "_undistorted.png";
 			}
 
-			UtilImageIO.saveImage(out,new File(outputPath,nameOut).getAbsolutePath());
+			UtilImageIO.saveImage(out, new File(outputPath, nameOut).getAbsolutePath());
 
-			if( cancel ) {
+			if (cancel) {
 				break;
 			}
 		}
-		if( listener != null )
+		if (listener != null)
 			listener.finishedConverting();
 	}
 
 	public interface Listener {
-		void loadedImage( BufferedImage image , String name );
+		void loadedImage( BufferedImage image, String name );
 
 		void finishedConverting();
 	}
 
-	public static void main(String[] args) {
+	public static void main( String[] args ) {
 		BatchRemoveLensDistortion generator = new BatchRemoveLensDistortion();
 		CmdLineParser parser = new CmdLineParser(generator);
 
-		if( args.length == 0 ) {
+		if (args.length == 0) {
 			printHelpExit(parser);
 		}
 
 		try {
 			parser.parseArgument(args);
-			if( generator.guiMode ) {
+			if (generator.guiMode) {
 				new BatchRemoveLensDistortionGui();
 			} else {
 				generator.finishParsing();
@@ -208,6 +208,5 @@ public class BatchRemoveLensDistortion {
 			System.err.println(e.getMessage());
 			printHelpExit(parser);
 		}
-
 	}
 }

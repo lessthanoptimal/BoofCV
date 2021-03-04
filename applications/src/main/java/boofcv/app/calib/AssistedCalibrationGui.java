@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -36,10 +36,10 @@ public class AssistedCalibrationGui extends JPanel {
 	CalibrationInfoPanel infoPanel;
 
 	public AssistedCalibrationGui( Dimension dimension ) {
-		this(dimension.width,dimension.height);
+		this(dimension.width, dimension.height);
 	}
 
-	public AssistedCalibrationGui( int imageWidth , int imageHeight ) {
+	public AssistedCalibrationGui( int imageWidth, int imageHeight ) {
 //		super(new GridLayout(2,1));
 		super(new BorderLayout());
 
@@ -50,32 +50,29 @@ public class AssistedCalibrationGui extends JPanel {
 		messageLabel.setBorder(new BevelBorder(BevelBorder.LOWERED));
 		messageLabel.setFont(new Font("Serif", Font.BOLD, 22));
 		messageLabel.setText("Initial text string to fill it up");
-		messageLabel.setMinimumSize(new Dimension(imageWidth,30));
+		messageLabel.setMinimumSize(new Dimension(imageWidth, 30));
 		messageLabel.setPreferredSize(new Dimension(imageWidth, 30));
 
 		infoPanel = new CalibrationInfoPanel();
 
-		imagePanel = new ImagePanel(imageWidth,imageHeight);
+		imagePanel = new ImagePanel(imageWidth, imageHeight);
 
-		add(messageLabel,BorderLayout.NORTH);
-		add(imagePanel,BorderLayout.CENTER);
-		add(infoPanel,BorderLayout.EAST);
+		add(messageLabel, BorderLayout.NORTH);
+		add(imagePanel, BorderLayout.CENTER);
+		add(infoPanel, BorderLayout.EAST);
 
 
-		workImage = new BufferedImage(imageWidth,imageHeight,BufferedImage.TYPE_INT_BGR);
+		workImage = new BufferedImage(imageWidth, imageHeight, BufferedImage.TYPE_INT_BGR);
 	}
 
 	public void setMessage( final String message ) {
-		if( message == null )
+		if (message == null)
 			return;
 
-		SwingUtilities.invokeLater(new Runnable() {
-			@Override
-			public void run() {
-				messageLabel.setText(message);
-				messageLabel.repaint();
+		SwingUtilities.invokeLater(() -> {
+			messageLabel.setText(message);
+			messageLabel.repaint();
 //				messageLabel.invalidate();
-			}
 		});
 	}
 
@@ -84,7 +81,7 @@ public class AssistedCalibrationGui extends JPanel {
 	}
 
 	public synchronized void setImage( BufferedImage image ) {
-		workImage.createGraphics().drawImage(image,0,0,image.getWidth(),image.getHeight(),null);
+		workImage.createGraphics().drawImage(image, 0, 0, image.getWidth(), image.getHeight(), null);
 		imagePanel.setImage(workImage);
 	}
 }

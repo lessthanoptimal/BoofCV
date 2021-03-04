@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -54,47 +54,47 @@ public class PointCloudViewerApp {
 	JMenuBar menuBar;
 
 	public PointCloudViewerApp() {
-		viewer.setPreferredSize(new Dimension(800,600));
+		viewer.setPreferredSize(new Dimension(800, 600));
 
 		menuBar = new JMenuBar();
 		JMenu menuFile = new JMenu("File");
-		menuFile.add(BoofSwingUtil.createMenuItem("Open File",KeyEvent.VK_O,KeyEvent.VK_O,this::openFile));
-		menuFile.add(BoofSwingUtil.createMenuItem("Quit",()->System.exit(0)));
+		menuFile.add(BoofSwingUtil.createMenuItem("Open File", KeyEvent.VK_O, KeyEvent.VK_O, this::openFile));
+		menuFile.add(BoofSwingUtil.createMenuItem("Quit", () -> System.exit(0)));
 		menuBar.add(menuFile);
 
-		frame = ShowImages.setupWindow(viewer,"Point Cloud Viewer", true);
+		frame = ShowImages.setupWindow(viewer, "Point Cloud Viewer", true);
 		frame.setJMenuBar(menuBar);
 		frame.setVisible(true);
 	}
 
 	public void openFile() {
-		File selected = BoofSwingUtil.fileChooser("PointCloudViewer",frame,true,
-				".",null, BoofSwingUtil.FileTypes.FILES);
-		if( selected == null )
+		File selected = BoofSwingUtil.fileChooser("PointCloudViewer", frame, true,
+				".", null, BoofSwingUtil.FileTypes.FILES);
+		if (selected == null)
 			return;
 
 		// Make it so open file can't be called twice
-		BoofSwingUtil.recursiveEnable(menuBar,false);
+		BoofSwingUtil.recursiveEnable(menuBar, false);
 
 		// Load it in a thread as to not lock the GUI
-		new Thread(()->{
+		new Thread(() -> {
 			PointCloudWriter.CloudArraysF32 cloud = new PointCloudWriter.CloudArraysF32();
 			try {
 				InputStream input = new FileInputStream(selected);
-				PointCloudIO.load(PointCloudIO.Format.PLY,input,cloud);
+				PointCloudIO.load(PointCloudIO.Format.PLY, input, cloud);
 			} catch (IOException e) {
-				BoofSwingUtil.warningDialog(frame,e);
-				BoofSwingUtil.recursiveEnable(menuBar,true);
+				BoofSwingUtil.warningDialog(frame, e);
+				BoofSwingUtil.recursiveEnable(menuBar, true);
 				return;
 			}
 
 			// Select an initial view location based on the point cloud
 			final int N = cloud.cloudXyz.size/3;
-			float x=0,y=0,z=0;
+			float x = 0, y = 0, z = 0;
 			for (int i = 0; i < N; i++) {
-				x += cloud.cloudXyz.data[i*3  ];
-				y += cloud.cloudXyz.data[i*3+1];
-				z += cloud.cloudXyz.data[i*3+2];
+				x += cloud.cloudXyz.data[i*3];
+				y += cloud.cloudXyz.data[i*3 + 1];
+				z += cloud.cloudXyz.data[i*3 + 2];
 			}
 			x /= N;
 			y /= N;
@@ -103,37 +103,37 @@ public class PointCloudViewerApp {
 			DogArray_F32 distances = new DogArray_F32();
 			distances.resize(N);
 			for (int i = 0; i < N; i++) {
-				float X = cloud.cloudXyz.data[i*3  ];
-				float Y = cloud.cloudXyz.data[i*3+1];
-				float Z = cloud.cloudXyz.data[i*3+2];
+				float X = cloud.cloudXyz.data[i*3];
+				float Y = cloud.cloudXyz.data[i*3 + 1];
+				float Z = cloud.cloudXyz.data[i*3 + 2];
 
-				distances.data[i] = UtilPoint3D_F32.distance(x,y,z,X,Y,Z);
+				distances.data[i] = UtilPoint3D_F32.distance(x, y, z, X, Y, Z);
 			}
 
 			Se3_F64 worldToCamera = new Se3_F64();
-			worldToCamera.T.setTo(x,y,z);
+			worldToCamera.T.setTo(x, y, z);
 
 			// TODO pick a better method for selecting the initial step size
 			distances.sort();
 			double baseline = distances.getFraction(0.001);
-			System.out.println("baseline = "+baseline);
+			System.out.println("baseline = " + baseline);
 
 			viewer.periodBaseline = baseline*10;
 			viewer.translateBaseline = baseline;
 			viewer.getViewer().setCameraHFov(UtilAngle.radian(100));
 
-			SwingUtilities.invokeLater(()->{
+			SwingUtilities.invokeLater(() -> {
 				viewer.handleControlChange();
 				viewer.clearPoints();
-				viewer.getViewer().addCloud(cloud.cloudXyz,cloud.cloudRgb);
+				viewer.getViewer().addCloud(cloud.cloudXyz, cloud.cloudRgb);
 				viewer.getViewer().setCameraToWorld(worldToCamera);
 				viewer.repaint();
-				BoofSwingUtil.recursiveEnable(menuBar,true);
+				BoofSwingUtil.recursiveEnable(menuBar, true);
 			});
 		}).start();
 	}
 
-	public static void main(String[] args) {
+	public static void main( String[] args ) {
 		SwingUtilities.invokeLater(PointCloudViewerApp::new);
 	}
 }
