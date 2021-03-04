@@ -55,7 +55,7 @@ public class BatchScanQrCodes {
 	String pathOutput = "qrcodes.txt";
 
 	@Option(name = "--GUI", usage = "Ignore all other command line arguments and switch to GUI mode")
-	private boolean guiMode = false;
+	boolean guiMode = false;
 
 	QrCodeDetector<GrayU8> scanner = FactoryFiducial.qrcode(null, GrayU8.class);
 	GrayU8 gray = new GrayU8(1, 1);
@@ -66,9 +66,10 @@ public class BatchScanQrCodes {
 
 	int total;
 
-	void finishParsing() {
+	@Option(name = "--Verbose", usage = "Prints out verbose debugging information")
+	boolean verbose = false;
 
-	}
+	void finishParsing() {}
 
 	void process() throws FileNotFoundException, UnsupportedEncodingException {
 		total = 0;
@@ -81,13 +82,16 @@ public class BatchScanQrCodes {
 
 		List<String> inputs = UtilIO.listSmartImages(inputPattern, false);
 
-		if (inputs.isEmpty())
-			System.out.println("No inputs found. Bath path or pattern? " + inputPattern);
+		if (inputs.isEmpty()) {
+			System.err.println("No inputs found. Bath path or pattern? " + inputPattern);
+			return;
+		}
 
 		for (String path : inputs) {
 			processFile(new File(path));
 		}
-		System.out.println("\n\nDone! Images Count = " + total);
+		if (verbose)
+			System.out.println("\n\nDone! Images Count = " + total);
 	}
 
 	private void processFile( File f ) throws UnsupportedEncodingException {
@@ -111,7 +115,8 @@ public class BatchScanQrCodes {
 
 		total++;
 		if (total%50 == 0) {
-			System.out.println("processed " + total);
+			if (verbose)
+				System.out.println("processed " + total);
 		}
 	}
 
