@@ -11,7 +11,7 @@ dependencies {
 }
 
 // Create a jar which contains all the applications
-task examples(type: Jar) {
+task examplesJar(type: Jar) {
 	manifest {
 		attributes 'Implementation-Title': 'BoofCV Examples Jar',
 				'Implementation-Version': version,

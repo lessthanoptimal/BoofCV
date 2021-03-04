@@ -50,9 +50,9 @@ You can now build and run?  Then run the commands below!  Each jar will open a w
 ```bash
 cd boofcv
 ./gradlew autogenerate
-./gradlew examples
+./gradlew examplesJar
 java -jar examples/examples.jar
-./gradlew demonstrations
+./gradlew demonstrationsJar
 java -jar demonstrations/demonstrations.jar
 ```
 
