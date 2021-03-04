@@ -48,6 +48,9 @@ subprojects {
         withSourcesJar()
     }
 
+    // Prevents tons of errors if someone is using ASCII
+    compileJava {options.encoding = "UTF-8"}
+
     // Creates Java 8 byte code
     tasks.withType(JavaCompile).all { options.compilerArgs = ["--release", "8"] }
 
