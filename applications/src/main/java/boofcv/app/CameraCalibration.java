@@ -31,6 +31,7 @@ import boofcv.gui.calibration.FisheyePlanarPanel;
 import boofcv.gui.calibration.MonoPlanarPanel;
 import boofcv.gui.image.ShowImages;
 import boofcv.io.ProgressMonitorThread;
+import boofcv.io.UtilIO;
 import boofcv.io.calibration.CalibrationIO;
 import boofcv.io.image.ConvertBufferedImage;
 import boofcv.io.image.UtilImageIO;
@@ -47,9 +48,8 @@ import org.apache.commons.io.FilenameUtils;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.image.BufferedImage;
-import java.io.File;
+import java.io.*;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 import static boofcv.app.calib.AssistedCalibration.IMAGE_DIRECTORY;
@@ -75,16 +75,18 @@ public class CameraCalibration extends BaseStandardInputApp {
 	protected boolean visualize = false;
 	protected boolean saveLandmarks = false;
 	protected boolean justDetect = false;
+	protected boolean verbose = false;
 
 	public void printHelp() {
 		System.out.println("./application <output file> <Input Options> <Calibration Parameters> <Fiducial Type> <Fiducial Specific Options> ");
 		System.out.println();
-		System.out.println("      Used for calibrating a camera and/or saving detected landmarks on calibration targets to disk.");
-		System.out.println("      When calibrating, a variety of different fiducial/target types are available as well as");
-		System.out.println("      different lens models. The detected landmarks (e.g. pixel coordinates of chessboard corners)");
-		System.out.println("      can be optionally saved.");
+		System.out.println("  Used for calibrating a single camera and/or saving detected landmarks on calibration targets to disk.");
+		System.out.println("  When calibrating, a variety of different fiducial/target types are available as well as");
+		System.out.println("  different lens models. The detected landmarks (e.g. pixel coordinates of chessboard corners)");
+		System.out.println("  can be optionally saved.");
 		System.out.println();
 		System.out.println("  --GUI                              Turns on GUI mode and ignores other options.");
+		System.out.println("  --Verbose                          Verbose print to stdout.");
 		System.out.println();
 		System.out.println("<output file>                        file name for output");
 		System.out.println("                                     DEFAULT: \"" + outputFileName + "\"");
@@ -168,6 +170,8 @@ public class CameraCalibration extends BaseStandardInputApp {
 			if (arg.startsWith("--")) {
 				if (arg.compareToIgnoreCase("--GUI") == 0) {
 					GUI = true;
+				} else if (arg.compareToIgnoreCase("--Verbose") == 0) {
+					verbose = true;
 				} else if (arg.compareToIgnoreCase("--Visualize") == 0) {
 					visualize = true;
 				} else if (arg.compareToIgnoreCase("--SaveLandmarks") == 0) {
@@ -242,7 +246,7 @@ public class CameraCalibration extends BaseStandardInputApp {
 
 			splitFlag(arg);
 			if (flagName.compareToIgnoreCase("Grid") == 0) {
-				String words[] = parameters.split(":");
+				String[] words = parameters.split(":");
 				if (words.length != 2) throw new RuntimeException("Expected two values for rows and columns");
 				numRows = Integer.parseInt(words[0]);
 				numColumns = Integer.parseInt(words[1]);
@@ -255,7 +259,8 @@ public class CameraCalibration extends BaseStandardInputApp {
 			throw new RuntimeException("Rows and columns must be specified and > 0");
 		}
 
-		System.out.println("chessboard: " + numRows + " x " + numColumns);
+		if (verbose)
+			System.out.println("chessboard: " + numRows + " x " + numColumns);
 
 		ConfigGridDimen config = new ConfigGridDimen(numRows, numColumns, 1);
 
@@ -275,12 +280,12 @@ public class CameraCalibration extends BaseStandardInputApp {
 
 			splitFlag(arg);
 			if (flagName.compareToIgnoreCase("Grid") == 0) {
-				String words[] = parameters.split(":");
+				String[] words = parameters.split(":");
 				if (words.length != 2) throw new RuntimeException("Expected two values for rows and columns");
 				numRows = Integer.parseInt(words[0]);
 				numColumns = Integer.parseInt(words[1]);
 			} else if (flagName.compareToIgnoreCase("SquareSpace") == 0) {
-				String words[] = parameters.split(":");
+				String[] words = parameters.split(":");
 				if (words.length != 2) throw new RuntimeException("Expected two values for square and space");
 				square = Double.parseDouble(words[0]);
 				space = Double.parseDouble(words[1]);
@@ -296,7 +301,8 @@ public class CameraCalibration extends BaseStandardInputApp {
 			throw new RuntimeException("square and space width must be specified and > 0");
 		}
 
-		System.out.println("squaregrid: " + numRows + " x " + numColumns + " square/space = " + (square/space));
+		if (verbose)
+			System.out.println("squaregrid: " + numRows + " x " + numColumns + " square/space = " + (square/space));
 
 		ConfigGridDimen config = new ConfigGridDimen(numRows, numColumns, square, space);
 
@@ -316,7 +322,7 @@ public class CameraCalibration extends BaseStandardInputApp {
 
 			splitFlag(arg);
 			if (flagName.compareToIgnoreCase("Grid") == 0) {
-				String words[] = parameters.split(":");
+				String[] words = parameters.split(":");
 				if (words.length != 2) throw new RuntimeException("Expected two values for rows and columns");
 				numRows = Integer.parseInt(words[0]);
 				numColumns = Integer.parseInt(words[1]);
@@ -373,6 +379,7 @@ public class CameraCalibration extends BaseStandardInputApp {
 	// TODO break this function up into its own class so that it isn't one massive function?
 	protected void handleDirectory() {
 		File outputDirectory = null;
+		PrintStream summaryDetection = null;
 		if (saveLandmarks) {
 			String baseName = FilenameUtils.getBaseName(outputFileName);
 			baseName += "_landmarks";
@@ -385,6 +392,16 @@ public class CameraCalibration extends BaseStandardInputApp {
 				}
 			}
 			BoofMiscOps.checkTrue(outputDirectory.mkdirs());
+			if (verbose)
+				System.out.println("Saving landmarks to "+outputDirectory.getPath());
+
+			try {
+				summaryDetection = new PrintStream(new BufferedOutputStream(new FileOutputStream(new File(outputDirectory, "summary_detection.csv"))));
+				summaryDetection.println("# Summary of success or failure for each image it processed");
+				summaryDetection.println("# (file name),(true = successful, false = failed)");
+			} catch( IOException e ){
+				throw new UncheckedIOException(e);
+			}
 		}
 
 		final CalibrateMonoPlanar calibrationAlg = new CalibrateMonoPlanar(detector.getLayout());
@@ -415,14 +432,15 @@ public class CameraCalibration extends BaseStandardInputApp {
 			System.err.println("  " + inputDirectory);
 			System.exit(0);
 		}
-		List<File> files = Arrays.asList(directory.listFiles());
-		BoofMiscOps.sortFilesByName(files);
+		List<String> imagePath = UtilIO.listImages(directory.getPath(), true);
 
-		if (files.isEmpty()) {
+		if (imagePath.isEmpty()) {
 			System.err.println("No image files found!");
 			System.err.println(inputDirectory);
 			System.exit(0);
 		}
+		if (verbose)
+			System.out.println("Total images found: "+imagePath.size());
 
 		if (monitor != null) {
 			monitor.setMessage(0, "Loading images");
@@ -432,13 +450,16 @@ public class CameraCalibration extends BaseStandardInputApp {
 		final List<File> imagesFailed = new ArrayList<>();
 
 		boolean first = true;
-		for (File f : files) {
+		for (String path : imagePath) {
+			File f = new File(path);
 			if (f.isDirectory() || f.isHidden())
 				continue;
 
-			final BufferedImage buffered = UtilImageIO.loadImage(f.getPath());
-			if (buffered == null)
+			final BufferedImage buffered = UtilImageIO.loadImage(path);
+			if (buffered == null) {
+				System.err.println("Failed to open 'image' file: "+path);
 				continue;
+			}
 
 			GrayF32 image = ConvertBufferedImage.convertFrom(buffered, (GrayF32)null);
 
@@ -459,10 +480,10 @@ public class CameraCalibration extends BaseStandardInputApp {
 				}
 			}
 
-			if (!detector.process(image)) {
-				imagesFailed.add(f);
-				System.err.println("Failed to detect target in " + f.getName());
-			} else {
+			if (detector.process(image)) {
+				imagesSuccess.add(f);
+				if (summaryDetection!=null)
+					summaryDetection.println(f.getName()+",true");
 				// if configured to do so, save the landmarks to disk
 				if (outputDirectory != null) {
 					CalibrationIO.saveLandmarksCsv(f.getPath(), detector.getClass().getSimpleName(),
@@ -470,12 +491,30 @@ public class CameraCalibration extends BaseStandardInputApp {
 							new File(outputDirectory, FilenameUtils.getBaseName(f.getName()) + ".csv"));
 				}
 				calibrationAlg.addImage(detector.getDetectedPoints());
-				imagesSuccess.add(f);
+				if (verbose)
+					System.out.println("  Detection successful " + f.getName());
+
+			} else {
+				imagesFailed.add(f);
+				if (summaryDetection!=null)
+					summaryDetection.println(f.getName()+",false");
+				if (verbose)
+					System.out.println("  Detection FAILED " + f.getName());
 			}
 		}
 
+		// Done detecting targets so close this file
+		if (summaryDetection!=null)
+			summaryDetection.close();
+
+		if (verbose) {
+			System.out.println("Detected targets in " + imagesSuccess.size() +
+					" / " + (imagesFailed.size() + imagesSuccess.size()) + " images");
+		}
+
 		if (justDetect) {
-			System.out.println("Just detecting calibration targets! Exiting now");
+			if (verbose)
+				System.out.println("Just detecting calibration targets! Exiting now");
 			System.exit(0);
 			return;
 		}
@@ -506,36 +545,43 @@ public class CameraCalibration extends BaseStandardInputApp {
 				});
 			}
 
-			calibrationAlg.printStatistics();
-			System.out.println();
-			System.out.println("--- " + modeType + " Parameters ---");
-			System.out.println();
-
-			switch (modeType) {
-				case BROWN -> {
-					CameraPinholeBrown m = (CameraPinholeBrown)intrinsic;
-					switch (formatType) {
-						case BOOFCV:
-							CalibrationIO.save(m, outputFileName);
-							break;
-						case OPENCV:
-							UtilOpenCV.save(m, outputFileName);
-							break;
-						default:
-							break;
-					}
-					m.print();
+			// Save calibration statistics to disk
+			if (outputDirectory!=null) {
+				try {
+					PrintStream out = new PrintStream(new File(outputDirectory, "stats.txt"));
+					calibrationAlg.printStatistics(out);
+					out.close();
+				} catch( IOException e) {
+					throw new UncheckedIOException(e);
 				}
-				case UNIVERSAL -> {
-					CameraUniversalOmni m = (CameraUniversalOmni)intrinsic;
-					CalibrationIO.save(m, outputFileName);
-					m.print();
-				}
-				default -> throw new RuntimeException("Unknown model type. " + modeType);
 			}
-			System.out.println();
-			System.out.println("Save file format " + formatType);
-			System.out.println();
+
+			if (verbose) {
+				calibrationAlg.printStatistics(System.out);
+				System.out.println();
+				System.out.println("--- " + modeType + " Parameters ---");
+				System.out.println();
+
+				switch (modeType) {
+					case BROWN -> {
+						CameraPinholeBrown m = (CameraPinholeBrown)intrinsic;
+						switch (formatType) {
+							case BOOFCV -> CalibrationIO.save(m, outputFileName);
+							case OPENCV -> UtilOpenCV.save(m, outputFileName);
+						}
+						m.print();
+					}
+					case UNIVERSAL -> {
+						CameraUniversalOmni m = (CameraUniversalOmni)intrinsic;
+						CalibrationIO.save(m, outputFileName);
+						m.print();
+					}
+					default -> throw new RuntimeException("Unknown model type. " + modeType);
+				}
+				System.out.println();
+				System.out.println("Save file format " + formatType);
+				System.out.println();
+			}
 		} catch (RuntimeException e) {
 			if (visualize)
 				BoofSwingUtil.warningDialog(gui, e);

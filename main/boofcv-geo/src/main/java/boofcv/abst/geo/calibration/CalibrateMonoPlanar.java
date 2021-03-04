@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -141,7 +141,8 @@ public class CalibrateMonoPlanar implements VerbosePrint {
 			this.imageWidth = observation.getWidth();
 			this.imageHeight = observation.getHeight();
 		} else if (observation.getWidth() != this.imageWidth || observation.getHeight() != this.imageHeight) {
-			throw new IllegalArgumentException("Image shape miss match");
+			throw new IllegalArgumentException("Image shape miss match. Are these all from the same camera? "+
+					imageWidth+"x"+imageHeight+" vs "+observation.getWidth()+"x"+observation.getHeight());
 		}
 		observations.add(observation);
 	}
@@ -176,22 +177,22 @@ public class CalibrateMonoPlanar implements VerbosePrint {
 		return (T)foundIntrinsic;
 	}
 
-	public void printStatistics() {
-		printErrors(errors);
+	public void printStatistics(PrintStream out) {
+		printErrors(errors, out);
 	}
 
 	/**
 	 * Prints out error information to standard out
 	 */
-	public static void printErrors( List<ImageResults> results ) {
+	public static void printErrors( List<ImageResults> results, PrintStream out ) {
 		double totalError = 0;
 		for (int i = 0; i < results.size(); i++) {
 			ImageResults r = results.get(i);
 			totalError += r.meanError;
 
-			System.out.printf("image %3d Euclidean ( mean = %7.1e max = %7.1e ) bias ( X = %8.1e Y %8.1e )\n", i, r.meanError, r.maxError, r.biasX, r.biasY);
+			out.printf("image %3d Euclidean ( mean = %7.1e max = %7.1e ) bias ( X = %8.1e Y %8.1e )\n", i, r.meanError, r.maxError, r.biasX, r.biasY);
 		}
-		System.out.println("Average Mean Error = " + (totalError/results.size()));
+		out.println("Average Mean Error = " + (totalError/results.size()));
 	}
 
 	public void setRobust( boolean robust ) {
