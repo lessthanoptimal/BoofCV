@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -18,6 +18,7 @@
 
 package boofcv.app;
 
+import boofcv.misc.BoofMiscOps;
 import com.github.sarxos.webcam.Webcam;
 
 /**
@@ -27,9 +28,9 @@ public class BaseStandardInputApp {
 
 	protected InputType inputType = InputType.WEBCAM;
 
-	protected int cameraId=0;
+	protected int cameraId = 0;
 	protected String cameraName = null;
-	protected int desiredWidth=-1,desiredHeight=-1;
+	protected int desiredWidth = -1, desiredHeight = -1;
 
 	protected String filePath;
 
@@ -56,26 +57,26 @@ public class BaseStandardInputApp {
 
 	protected boolean checkCameraFlag( String argument ) {
 		splitFlag(argument);
-		if( flagName.compareToIgnoreCase("Camera") == 0 ) {
+		if (flagName.compareToIgnoreCase("Camera") == 0) {
 			inputType = InputType.WEBCAM;
 			try {
 				cameraId = Integer.parseInt(parameters);
-			} catch( NumberFormatException e ) {
+			} catch (NumberFormatException e) {
 				cameraId = -1;
 				cameraName = parameters;
 			}
 			return true;
-		} else if( flagName.compareToIgnoreCase("ImageFile") == 0 ) {
+		} else if (flagName.compareToIgnoreCase("ImageFile") == 0) {
 			inputType = InputType.IMAGE;
-			filePath = parameters;
+			filePath = BoofMiscOps.handlePathTilde(parameters);
 			return true;
-		} else if( flagName.compareToIgnoreCase("videoFile") == 0 ) {
+		} else if (flagName.compareToIgnoreCase("videoFile") == 0) {
 			inputType = InputType.VIDEO;
-			filePath = parameters;
+			filePath = BoofMiscOps.handlePathTilde(parameters);
 			return true;
-		} else if( flagName.compareToIgnoreCase("Resolution") == 0 ) {
-			String words[] = parameters.split(":");
-			if( words.length != 2 )throw new RuntimeException("Expected two for width and height");
+		} else if (flagName.compareToIgnoreCase("Resolution") == 0) {
+			String[] words = parameters.split(":");
+			if (words.length != 2) throw new RuntimeException("Expected two for width and height");
 			desiredWidth = Integer.parseInt(words[0]);
 			desiredHeight = Integer.parseInt(words[1]);
 			return true;
@@ -87,11 +88,11 @@ public class BaseStandardInputApp {
 	protected Webcam openSelectedCamera() {
 		Webcam webcam = cameraId >= 0 ? Webcam.getWebcams().get(cameraId) : Webcam.getWebcamByName(cameraName);
 
-		if( webcam == null ) {
-			if( cameraId >= 0 ) {
-				System.err.println("Can't find camera with ID "+cameraId);
+		if (webcam == null) {
+			if (cameraId >= 0) {
+				System.err.println("Can't find camera with ID " + cameraId);
 			} else {
-				System.err.println("Can't find camera with name "+cameraName);
+				System.err.println("Can't find camera with name " + cameraName);
 			}
 			System.exit(-1);
 		}
@@ -99,24 +100,24 @@ public class BaseStandardInputApp {
 	}
 
 	protected String getCameraDeviceString() {
-		if( cameraId >= 0 )
-			return cameraId+"";
+		if (cameraId >= 0)
+			return cameraId + "";
 		else
 			return cameraName;
 	}
 
 	protected void splitFlag( String word ) {
 		int indexEquals = 2;
-		for(; indexEquals < word.length(); indexEquals++ ) {
-			if( word.charAt(indexEquals)=='=') {
+		for (; indexEquals < word.length(); indexEquals++) {
+			if (word.charAt(indexEquals) == '=') {
 				break;
 			}
 		}
-		if(indexEquals == word.length() )
+		if (indexEquals == word.length())
 			throw new RuntimeException("Expected = inside of flag");
 
-		flagName = word.substring(2,indexEquals);
-		parameters = word.substring(indexEquals+1,word.length());
+		flagName = word.substring(2, indexEquals);
+		parameters = word.substring(indexEquals + 1, word.length());
 	}
 
 	enum InputType {

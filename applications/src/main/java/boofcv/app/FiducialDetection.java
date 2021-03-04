@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -37,6 +37,7 @@ import boofcv.io.image.ConvertBufferedImage;
 import boofcv.io.image.SimpleImageSequence;
 import boofcv.io.image.UtilImageIO;
 import boofcv.io.wrapper.DefaultMediaManager;
+import boofcv.misc.BoofMiscOps;
 import boofcv.struct.calib.CameraPinholeBrown;
 import boofcv.struct.image.GrayU8;
 import boofcv.struct.image.ImageType;
@@ -74,7 +75,10 @@ public class FiducialDetection extends BaseStandardInputApp {
 		System.out.println("java -jar BLAH <Input Flags> <Fiducial Type> <Fiducial Flags>");
 		System.out.println();
 		System.out.println("   Detects different types of fiducials inside of webcam streams, video files, or still images.");
-		System.out.println("   Results are visualized in a window and optionally saved to file.");
+		System.out.println("   Results are visualized in a window and optionally the SE3 transforms are saved to file.");
+		System.out.println();
+		System.out.println("   If you wish to detect fiducals for calibration, use the CameraCalibration app instead as ");
+		System.out.println("   this won't save the landmarks.");
 		System.out.println();
 		System.out.println("----------------------------------- Input Flags -----------------------------------------");
 		System.out.println();
@@ -121,7 +125,8 @@ public class FiducialDetection extends BaseStandardInputApp {
 		System.out.println("                                     DEFAULT: 0.25");
 		System.out.println("Flags for CHESSBOARD");
 		System.out.println();
-		System.out.println("  --Shape=<rows int>:<cols int>      Number of rows/columns it expects to see");
+		System.out.println("  --Shape=<rows int>:<cols int>      Number of rows/columns it expects to see. Count squares");
+		System.out.println("                                     not inner corners like in OpenCV.");
 		System.out.println("  --SquareWidth=<float>              The width of each square");
 		System.out.println("                                     Can be called multiple times for several images");
 		System.out.println("                                     DEFAULT: 1");
@@ -147,70 +152,70 @@ public class FiducialDetection extends BaseStandardInputApp {
 		System.out.println();
 	}
 
-	void parse( String []args ) {
-		if( args.length < 1 ) {
+	void parse( String[] args ) {
+		if (args.length < 1) {
 			throw new RuntimeException("Must specify some arguments");
 		}
 
-		for( int i = 0; i < args.length; i++ ) {
+		for (int i = 0; i < args.length; i++) {
 			String arg = args[i];
 
-			if( arg.startsWith("--") ) {
-				if( !checkCameraFlag(arg) ) {
-					if( flagName.compareToIgnoreCase("Intrinsic") == 0 ) {
-						intrinsicPath = parameters;
-					} else if( flagName.compareToIgnoreCase("OutputFile") == 0 ) {
-						outputPath = parameters;
+			if (arg.startsWith("--")) {
+				if (!checkCameraFlag(arg)) {
+					if (flagName.compareToIgnoreCase("Intrinsic") == 0) {
+						intrinsicPath = BoofMiscOps.handlePathTilde(parameters);
+					} else if (flagName.compareToIgnoreCase("OutputFile") == 0) {
+						outputPath = BoofMiscOps.handlePathTilde(parameters);
 					} else {
-						throw new RuntimeException("Unknown camera option "+flagName);
+						throw new RuntimeException("Unknown camera option " + flagName);
 					}
 				}
-			} else if( arg.compareToIgnoreCase("BINARY") == 0 ) {
-				parseBinary(i+1,args);
+			} else if (arg.compareToIgnoreCase("BINARY") == 0) {
+				parseBinary(i + 1, args);
 				break;
-			} else if( arg.compareToIgnoreCase("IMAGE") == 0 ) {
+			} else if (arg.compareToIgnoreCase("IMAGE") == 0) {
 				parseImage(i + 1, args);
 				break;
-			} else if( arg.compareToIgnoreCase("CHESSBOARD") == 0 ) {
-				parseChessboard(i + 1,args);
+			} else if (arg.compareToIgnoreCase("CHESSBOARD") == 0) {
+				parseChessboard(i + 1, args);
 				break;
-			} else if( arg.compareToIgnoreCase("SQUAREGRID") == 0 ) {
-				parseSquareGrid(i + 1,args);
+			} else if (arg.compareToIgnoreCase("SQUAREGRID") == 0) {
+				parseSquareGrid(i + 1, args);
 				break;
 			} else {
-				throw new RuntimeException("Unknown fiducial type "+arg);
+				throw new RuntimeException("Unknown fiducial type " + arg);
 			}
 		}
 	}
 
-	void parseBinary( int index , String []args ) {
-		boolean robust=true;
-		double size=1;
+	void parseBinary( int index, String[] args ) {
+		boolean robust = true;
+		double size = 1;
 		int gridWidth = 4;
 		double borderWidth = 0.25;
 
-		for(; index < args.length; index++ ) {
+		for (; index < args.length; index++) {
 			String arg = args[index];
 
-			if( !arg.startsWith("--") ) {
-				throw new  RuntimeException("Expected flags for binary fiducial");
+			if (!arg.startsWith("--")) {
+				throw new RuntimeException("Expected flags for binary fiducial");
 			}
 
 			splitFlag(arg);
-			if( flagName.compareToIgnoreCase("Robust") == 0 ) {
+			if (flagName.compareToIgnoreCase("Robust") == 0) {
 				robust = Boolean.parseBoolean(parameters);
-			} else if( flagName.compareToIgnoreCase("Size") == 0 ) {
+			} else if (flagName.compareToIgnoreCase("Size") == 0) {
 				size = Double.parseDouble(parameters);
-			} else if( flagName.compareToIgnoreCase("GridWidth") == 0 ) {
+			} else if (flagName.compareToIgnoreCase("GridWidth") == 0) {
 				gridWidth = Integer.parseInt(parameters);
-			} else if( flagName.compareToIgnoreCase("Border") == 0 ) {
+			} else if (flagName.compareToIgnoreCase("Border") == 0) {
 				borderWidth = Double.parseDouble(parameters);
 			} else {
-				throw new RuntimeException("Unknown image option "+flagName);
+				throw new RuntimeException("Unknown image option " + flagName);
 			}
 		}
 
-		System.out.println("binary: robust = "+robust+" size = "+size + " grid width = " + gridWidth+" border = "+borderWidth);
+		System.out.println("binary: robust = " + robust + " size = " + size + " grid width = " + gridWidth + " border = " + borderWidth);
 
 		ConfigFiducialBinary configFid = new ConfigFiducialBinary();
 		configFid.targetWidth = size;
@@ -218,9 +223,9 @@ public class FiducialDetection extends BaseStandardInputApp {
 		configFid.squareDetector.minimumRefineEdgeIntensity = 10;
 		configFid.borderWidthFraction = borderWidth;
 
-		ConfigThreshold configThreshold ;
+		ConfigThreshold configThreshold;
 
-		if( robust )
+		if (robust)
 			configThreshold = ConfigThreshold.local(ThresholdType.LOCAL_MEAN, 21);
 		else
 			configThreshold = ConfigThreshold.fixed(DEFAULT_THRESHOLD);
@@ -228,45 +233,45 @@ public class FiducialDetection extends BaseStandardInputApp {
 		detector = FactoryFiducial.squareBinary(configFid, configThreshold, GrayU8.class);
 	}
 
-	void parseImage( int index , String []args ) {
-		boolean robust=true;
+	void parseImage( int index, String[] args ) {
+		boolean robust = true;
 
 		List<String> paths = new ArrayList<>();
 		DogArray_F64 sizes = new DogArray_F64();
 		double borderWidth = 0.25;
 
-		for(; index < args.length; index++ ) {
+		for (; index < args.length; index++) {
 			String arg = args[index];
 
-			if( !arg.startsWith("--") ) {
-				throw new  RuntimeException("Expected flags for image fiducial");
+			if (!arg.startsWith("--")) {
+				throw new RuntimeException("Expected flags for image fiducial");
 			}
 
 			splitFlag(arg);
-			if( flagName.compareToIgnoreCase("Robust") == 0 ) {
+			if (flagName.compareToIgnoreCase("Robust") == 0) {
 				robust = Boolean.parseBoolean(parameters);
-			} else if( flagName.compareToIgnoreCase("Image") == 0 ) {
+			} else if (flagName.compareToIgnoreCase("Image") == 0) {
 				String words[] = parameters.split(":");
-				if( words.length != 2 )throw new RuntimeException("Expected two for width and image path");
+				if (words.length != 2) throw new RuntimeException("Expected two for width and image path");
 				sizes.add(Double.parseDouble(words[0]));
 				paths.add(words[1]);
-			} else if( flagName.compareToIgnoreCase("Border") == 0 ) {
+			} else if (flagName.compareToIgnoreCase("Border") == 0) {
 				borderWidth = Double.parseDouble(parameters);
 			} else {
-				throw new RuntimeException("Unknown image option "+flagName);
+				throw new RuntimeException("Unknown image option " + flagName);
 			}
 		}
 
-		if( paths.isEmpty() )
+		if (paths.isEmpty())
 			throw new RuntimeException("Need to specify patterns");
 
-		System.out.println("image: robust = "+robust+" total patterns = "+paths.size()+" border = "+borderWidth);
+		System.out.println("image: robust = " + robust + " total patterns = " + paths.size() + " border = " + borderWidth);
 
 		ConfigFiducialImage config = new ConfigFiducialImage();
 		config.borderWidthFraction = borderWidth;
 		ConfigThreshold configThreshold;
 
-		if( robust )
+		if (robust)
 			configThreshold = ConfigThreshold.local(ThresholdType.LOCAL_MEAN, 21);
 		else
 			configThreshold = ConfigThreshold.fixed(DEFAULT_THRESHOLD);
@@ -276,25 +281,25 @@ public class FiducialDetection extends BaseStandardInputApp {
 
 		for (int i = 0; i < paths.size(); i++) {
 			BufferedImage buffered = UtilImageIO.loadImage(paths.get(i));
-			if( buffered == null )
-				throw new RuntimeException("Can't find pattern "+paths.get(i));
+			if (buffered == null)
+				throw new RuntimeException("Can't find pattern " + paths.get(i));
 
-			GrayU8 pattern = new GrayU8(buffered.getWidth(),buffered.getHeight());
+			GrayU8 pattern = new GrayU8(buffered.getWidth(), buffered.getHeight());
 
 			ConvertBufferedImage.convertFrom(buffered, pattern);
 
-			detector.addPatternImage(pattern,125,sizes.get(i));
+			detector.addPatternImage(pattern, 125, sizes.get(i));
 		}
 
 		this.detector = detector;
 	}
 
-	void parseChessboard( int index , String []args ) {
+	void parseChessboard( int index, String[] args ) {
 
-		int rows=-1,cols=-1;
+		int rows = -1, cols = -1;
 		double width = 1;
 
-		for(; index < args.length; index++ ) {
+		for (; index < args.length; index++) {
 			String arg = args[index];
 
 			if (!arg.startsWith("--")) {
@@ -304,29 +309,30 @@ public class FiducialDetection extends BaseStandardInputApp {
 			splitFlag(arg);
 			if (flagName.compareToIgnoreCase("Shape") == 0) {
 				String words[] = parameters.split(":");
-				if( words.length != 2 )throw new RuntimeException("Expected two for rows and columns");
+				if (words.length != 2) throw new RuntimeException("Expected two for rows and columns");
 				rows = Integer.parseInt(words[0]);
 				cols = Integer.parseInt(words[1]);
 			} else if (flagName.compareToIgnoreCase("SquareWidth") == 0) {
 				width = Double.parseDouble(parameters);
 			} else {
-				throw new RuntimeException("Unknown chessboard option "+flagName);
+				throw new RuntimeException("Unknown chessboard option " + flagName);
 			}
 		}
 
-		if( rows < 1 || cols < 1)
+		if (rows < 1 || cols < 1)
 			throw new RuntimeException("Must specify number of rows and columns");
 
-		System.out.println("chessboard: rows = "+rows+" columns = "+cols+"  square width "+width);
+		System.out.println("chessboard: rows = " + rows + " columns = " + cols + "  square width " + width);
 		ConfigGridDimen config = new ConfigGridDimen(rows, cols, width);
 
-		detector = FactoryFiducial.calibChessboardX(null,config, GrayU8.class);
+		detector = FactoryFiducial.calibChessboardX(null, config, GrayU8.class);
 	}
-	void parseSquareGrid( int index , String []args ) {
-		int rows=-1,cols=-1;
+
+	void parseSquareGrid( int index, String[] args ) {
+		int rows = -1, cols = -1;
 		double width = 1, space = -1;
 
-		for(; index < args.length; index++ ) {
+		for (; index < args.length; index++) {
 			String arg = args[index];
 
 			if (!arg.startsWith("--")) {
@@ -336,7 +342,7 @@ public class FiducialDetection extends BaseStandardInputApp {
 			splitFlag(arg);
 			if (flagName.compareToIgnoreCase("Shape") == 0) {
 				String words[] = parameters.split(":");
-				if( words.length != 2 )throw new RuntimeException("Expected two for rows and columns");
+				if (words.length != 2) throw new RuntimeException("Expected two for rows and columns");
 				rows = Integer.parseInt(words[0]);
 				cols = Integer.parseInt(words[1]);
 			} else if (flagName.compareToIgnoreCase("SquareWidth") == 0) {
@@ -344,24 +350,24 @@ public class FiducialDetection extends BaseStandardInputApp {
 			} else if (flagName.compareToIgnoreCase("Space") == 0) {
 				space = Double.parseDouble(parameters);
 			} else {
-				throw new RuntimeException("Unknown square grid option "+flagName);
+				throw new RuntimeException("Unknown square grid option " + flagName);
 			}
 		}
 
-		if( rows < 1 || cols < 1)
+		if (rows < 1 || cols < 1)
 			throw new RuntimeException("Must specify number of rows and columns");
 
-		if( space <= 0 )
+		if (space <= 0)
 			space = width;
 
-		System.out.println("square grid: rows = "+rows+" columns = "+cols+"  square width "+width+"  space "+space);
-		ConfigGridDimen config = new ConfigGridDimen(rows, cols, width,space);
+		System.out.println("square grid: rows = " + rows + " columns = " + cols + "  square width " + width + "  space " + space);
+		ConfigGridDimen config = new ConfigGridDimen(rows, cols, width, space);
 
-		detector = FactoryFiducial.calibSquareGrid(null,config, GrayU8.class);
+		detector = FactoryFiducial.calibSquareGrid(null, config, GrayU8.class);
 	}
 
-	private static CameraPinholeBrown handleIntrinsic(CameraPinholeBrown intrinsic, int width, int height) {
-		if( intrinsic == null ) {
+	private static CameraPinholeBrown handleIntrinsic( CameraPinholeBrown intrinsic, int width, int height ) {
+		if (intrinsic == null) {
 			System.out.println();
 			System.out.println("SERIOUSLY YOU NEED TO CALIBRATE THE CAMERA YOURSELF!");
 			System.out.println("There will be a lot more jitter and inaccurate pose");
@@ -369,7 +375,7 @@ public class FiducialDetection extends BaseStandardInputApp {
 
 			return PerspectiveOps.createIntrinsic(width, height, 35);
 		} else {
-			if( intrinsic.width != width || intrinsic.height != height ) {
+			if (intrinsic.width != width || intrinsic.height != height) {
 				System.out.println();
 				System.out.println("The image resolution in the intrinsics file doesn't match the input.");
 				System.out.println("Massaging the intrinsic for this input.  If the results are poor calibrate");
@@ -379,11 +385,11 @@ public class FiducialDetection extends BaseStandardInputApp {
 				double ratioW = width/(double)intrinsic.width;
 				double ratioH = height/(double)intrinsic.height;
 
-				if( Math.abs(ratioW-ratioH) > 1e-8 ) {
+				if (Math.abs(ratioW - ratioH) > 1e-8) {
 					System.err.println("Can't adjust intrinsic parameters because camera ratios are different");
 					System.exit(1);
 				}
-				PerspectiveOps.scaleIntrinsic(intrinsic,ratioW);
+				PerspectiveOps.scaleIntrinsic(intrinsic, ratioW);
 			}
 			return intrinsic;
 		}
@@ -392,48 +398,51 @@ public class FiducialDetection extends BaseStandardInputApp {
 	/**
 	 * Displays a continuous stream of images
 	 */
-	private void processStream(CameraPinholeBrown intrinsic , SimpleImageSequence<GrayU8> sequence , ImagePanel gui , long pauseMilli) {
+	private void processStream( CameraPinholeBrown intrinsic, SimpleImageSequence<GrayU8> sequence, ImagePanel gui, long pauseMilli ) {
 
 		Font font = new Font("Serif", Font.BOLD, 24);
 
 		Se3_F64 fiducialToCamera = new Se3_F64();
 		int frameNumber = 0;
-		while( sequence.hasNext() ) {
+		while (sequence.hasNext()) {
 			long before = System.currentTimeMillis();
 			GrayU8 input = sequence.next();
 			BufferedImage buffered = sequence.getGuiImage();
 			try {
 				detector.detect(input);
-			} catch( RuntimeException e ) {
+			} catch (RuntimeException e) {
 				System.err.println("BUG!!! saving image to crash_image.png");
-				UtilImageIO.saveImage(buffered,"crash_image.png");
+				UtilImageIO.saveImage(buffered, "crash_image.png");
 				throw e;
 			}
 
 			Graphics2D g2 = buffered.createGraphics();
 
 			for (int i = 0; i < detector.totalFound(); i++) {
-				detector.getFiducialToCamera(i,fiducialToCamera);
+				detector.getFiducialToCamera(i, fiducialToCamera);
 				long id = detector.getId(i);
 				double width = detector.getWidth(i);
 
-				VisualizeFiducial.drawCube(fiducialToCamera,intrinsic,width,3,g2);
-				VisualizeFiducial.drawLabelCenter(fiducialToCamera,intrinsic,""+id,g2);
+				VisualizeFiducial.drawCube(fiducialToCamera, intrinsic, width, 3, g2);
+				VisualizeFiducial.drawLabelCenter(fiducialToCamera, intrinsic, "" + id, g2);
 			}
 			saveResults(frameNumber++);
 
-			if( intrinsicPath == null ) {
+			if (intrinsicPath == null) {
 				g2.setColor(Color.RED);
 				g2.setFont(font);
-				g2.drawString("Uncalibrated",10,20);
+				g2.drawString("Uncalibrated", 10, 20);
 			}
 
 			gui.setImage(buffered);
 
 			long after = System.currentTimeMillis();
-			long time = Math.max(0,pauseMilli-(after-before));
-			if( time > 0 ) {
-				try { Thread.sleep(time); } catch (InterruptedException ignore) {}
+			long time = Math.max(0, pauseMilli - (after - before));
+			if (time > 0) {
+				try {
+					Thread.sleep(time);
+				} catch (InterruptedException ignore) {
+				}
 			}
 		}
 	}
@@ -441,71 +450,71 @@ public class FiducialDetection extends BaseStandardInputApp {
 	/**
 	 * Displays a simple image
 	 */
-	private void processImage(CameraPinholeBrown intrinsic , BufferedImage buffered , ImagePanel gui ) {
+	private void processImage( CameraPinholeBrown intrinsic, BufferedImage buffered, ImagePanel gui ) {
 
 		Font font = new Font("Serif", Font.BOLD, 24);
 
-		GrayU8 gray = new GrayU8(buffered.getWidth(),buffered.getHeight());
-		ConvertBufferedImage.convertFrom(buffered,gray);
+		GrayU8 gray = new GrayU8(buffered.getWidth(), buffered.getHeight());
+		ConvertBufferedImage.convertFrom(buffered, gray);
 
 		Se3_F64 fiducialToCamera = new Se3_F64();
 		try {
 			detector.detect(gray);
-		} catch( RuntimeException e ) {
+		} catch (RuntimeException e) {
 			System.err.println("BUG!!! saving image to crash_image.png");
-			UtilImageIO.saveImage(buffered,"crash_image.png");
+			UtilImageIO.saveImage(buffered, "crash_image.png");
 			throw e;
 		}
 
 		Graphics2D g2 = buffered.createGraphics();
 
 		for (int i = 0; i < detector.totalFound(); i++) {
-			detector.getFiducialToCamera(i,fiducialToCamera);
+			detector.getFiducialToCamera(i, fiducialToCamera);
 			long id = detector.getId(i);
 			double width = detector.getWidth(i);
 
-			VisualizeFiducial.drawCube(fiducialToCamera,intrinsic,width,3,g2);
-			VisualizeFiducial.drawLabelCenter(fiducialToCamera,intrinsic,""+id,g2);
+			VisualizeFiducial.drawCube(fiducialToCamera, intrinsic, width, 3, g2);
+			VisualizeFiducial.drawLabelCenter(fiducialToCamera, intrinsic, "" + id, g2);
 		}
 		saveResults(0);
 
-		if( intrinsicPath == null ) {
+		if (intrinsicPath == null) {
 			g2.setColor(Color.RED);
 			g2.setFont(font);
-			g2.drawString("Uncalibrated",10,20);
+			g2.drawString("Uncalibrated", 10, 20);
 		}
 
-		gui.setImage(buffered);
+		gui.setImageRepaint(buffered);
 	}
 
 	private void saveResults( int frameNumber ) {
-		if( outputFile == null )
+		if (outputFile == null)
 			return;
 
 		Quaternion_F64 quat = new Quaternion_F64();
 		Se3_F64 fiducialToCamera = new Se3_F64();
 
-		outputFile.printf("%d %d",frameNumber,detector.totalFound());
+		outputFile.printf("%d %d", frameNumber, detector.totalFound());
 		for (int i = 0; i < detector.totalFound(); i++) {
 			long id = detector.getId(i);
-			detector.getFiducialToCamera(i,fiducialToCamera);
+			detector.getFiducialToCamera(i, fiducialToCamera);
 
-			ConvertRotation3D_F64.matrixToQuaternion(fiducialToCamera.getR(),quat);
+			ConvertRotation3D_F64.matrixToQuaternion(fiducialToCamera.getR(), quat);
 
-			outputFile.printf(" %d %.10f %.10f %.10f %.10f %.10f %.10f %.10f",id,
-					fiducialToCamera.T.x,fiducialToCamera.T.y,fiducialToCamera.T.z,
-					quat.w,quat.x,quat.y,quat.z);
+			outputFile.printf(" %d %.10f %.10f %.10f %.10f %.10f %.10f %.10f", id,
+					fiducialToCamera.T.x, fiducialToCamera.T.y, fiducialToCamera.T.z,
+					quat.w, quat.x, quat.y, quat.z);
 		}
 		outputFile.println();
 	}
 
 	private void process() {
-		if( detector == null ) {
+		if (detector == null) {
 			System.err.println("Need to specify which fiducial you wish to detect");
 			System.exit(1);
 		}
 
-		if( outputPath != null ) {
+		if (outputPath != null) {
 			try {
 				outputFile = new PrintStream(outputPath);
 				outputFile.println("# Results from fiducial detection ");
@@ -525,50 +534,49 @@ public class FiducialDetection extends BaseStandardInputApp {
 
 		MediaManager media = DefaultMediaManager.INSTANCE;
 
-		CameraPinholeBrown intrinsic = intrinsicPath == null ? null :  (CameraPinholeBrown)CalibrationIO.load(intrinsicPath);
+		CameraPinholeBrown intrinsic = intrinsicPath == null ? null : (CameraPinholeBrown)CalibrationIO.load(intrinsicPath);
 
 		SimpleImageSequence<GrayU8> sequence = null;
 		long pause = 0;
 		BufferedImage buffered = null;
-		if( inputType == InputType.VIDEO || inputType == InputType.WEBCAM ) {
-			if( inputType == InputType.WEBCAM ) {
+		if (inputType == InputType.VIDEO || inputType == InputType.WEBCAM) {
+			if (inputType == InputType.WEBCAM) {
 				String device = getCameraDeviceString();
-				sequence = media.openCamera(device,desiredWidth, desiredHeight,ImageType.single(GrayU8.class));
+				sequence = media.openCamera(device, desiredWidth, desiredHeight, ImageType.single(GrayU8.class));
 			} else {
 				// just assume 30ms is appropriate.  Should let the use specify this number
 				pause = 30;
-				sequence = media.openVideo(filePath,ImageType.single(GrayU8.class));
+				sequence = media.openVideo(filePath, ImageType.single(GrayU8.class));
 				sequence.setLoop(true);
 			}
 			intrinsic = handleIntrinsic(intrinsic, sequence.getWidth(), sequence.getHeight());
 		} else {
 			buffered = UtilImageIO.loadImage(filePath);
-			if( buffered == null ) {
-				System.err.println("Can't find image or it can't be read.  "+filePath);
+			if (buffered == null) {
+				System.err.println("Can't find image or it can't be read.  " + filePath);
 				System.exit(1);
 			}
-			intrinsic = handleIntrinsic(intrinsic, buffered.getWidth(),buffered.getHeight());
+			intrinsic = handleIntrinsic(intrinsic, buffered.getWidth(), buffered.getHeight());
 		}
 
 
-		ImagePanel gui = new ImagePanel();
-		gui.setPreferredSize(new Dimension(intrinsic.width,intrinsic.height));
-		ShowImages.showWindow(gui,"Fiducial Detector",true);
-		detector.setLensDistortion(new LensDistortionBrown(intrinsic),intrinsic.width,intrinsic.height);
+		var gui = new ImagePanel();
+		gui.setPreferredSize(new Dimension(intrinsic.width, intrinsic.height));
+		ShowImages.showWindow(gui, "Fiducial Detector", true);
+		detector.setLensDistortion(new LensDistortionBrown(intrinsic), intrinsic.width, intrinsic.height);
 
-		if( sequence != null ) {
-			processStream(intrinsic,sequence,gui,pause);
+		if (sequence != null) {
+			processStream(intrinsic, sequence, gui, pause);
 		} else {
-			processImage(intrinsic,buffered, gui);
+			processImage(intrinsic, buffered, gui);
 		}
-
 	}
 
-	public static void main(String[] args) {
-		FiducialDetection app = new FiducialDetection();
+	public static void main( String[] args ) {
+		var app = new FiducialDetection();
 		try {
 			app.parse(args);
-		} catch( RuntimeException e ) {
+		} catch (RuntimeException e) {
 			app.printHelp();
 			System.out.println();
 			System.out.println(e.getMessage());
@@ -576,7 +584,7 @@ public class FiducialDetection extends BaseStandardInputApp {
 		}
 		try {
 			app.process();
-		} catch( RuntimeException e ) {
+		} catch (RuntimeException e) {
 			System.out.println();
 			System.out.println(e.getMessage());
 			System.exit(0);

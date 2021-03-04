@@ -12,6 +12,7 @@ Version : 0.38
 - Applications
   * Can batch down sampling now lets you shoot for a fix number of pixels.
   * CameraCalibration can now just save detections
+  * TODO FiducialDetection add new fiducials to this
 - Functional API
   * Added forEachXY and forEachPixel to images
   * PixelMath.lambda is now PixelMath.operator

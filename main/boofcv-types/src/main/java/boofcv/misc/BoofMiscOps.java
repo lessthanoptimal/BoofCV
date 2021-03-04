@@ -73,6 +73,14 @@ public class BoofMiscOps {
 				.replace("T", " ");
 	}
 
+	/**
+	 * Checks to see if the passed in string starts with a ~ and if so it will replace it with the
+	 * users home directory.
+	 */
+	public static String handlePathTilde( String path ) {
+		return path.replaceFirst("^~", System.getProperty("user.home"));
+	}
+
 	public static float bound( float value, float min, float max ) {
 		if (value <= min)
 			return min;

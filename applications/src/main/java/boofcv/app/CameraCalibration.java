@@ -79,10 +79,15 @@ public class CameraCalibration extends BaseStandardInputApp {
 	public void printHelp() {
 		System.out.println("./application <output file> <Input Options> <Calibration Parameters> <Fiducial Type> <Fiducial Specific Options> ");
 		System.out.println();
+		System.out.println("      Used for calibrating a camera and/or saving detected landmarks on calibration targets to disk.");
+		System.out.println("      When calibrating, a variety of different fiducial/target types are available as well as");
+		System.out.println("      different lens models. The detected landmarks (e.g. pixel coordinates of chessboard corners)");
+		System.out.println("      can be optionally saved.");
+		System.out.println();
 		System.out.println("  --GUI                              Turns on GUI mode and ignores other options.");
 		System.out.println();
 		System.out.println("<output file>                        file name for output");
-		System.out.println("                                     DEFAULT: \""+outputFileName+"\"");
+		System.out.println("                                     DEFAULT: \"" + outputFileName + "\"");
 		System.out.println();
 		System.out.println("Input: File Options:  ");
 		System.out.println();
@@ -98,8 +103,8 @@ public class CameraCalibration extends BaseStandardInputApp {
 		System.out.println("Output Options");
 		System.out.println();
 		System.out.println("  --Format=<string>                  Format of output calibration file.");
-		System.out.println("                                     ( boofcv , opencv )");
-		System.out.println("                                     DEFAULT: "+formatType);
+		System.out.println("                                     ( boofcv, opencv )");
+		System.out.println("                                     DEFAULT: " + formatType);
 		System.out.println("  --SaveLandmarks                    Save detected landmarks on calibration target");
 		System.out.println("                                     in a directory with the same base name as output file");
 		System.out.println("  --JustDetect                       Detect targets and save landmarks");
@@ -108,13 +113,13 @@ public class CameraCalibration extends BaseStandardInputApp {
 		System.out.println();
 		System.out.println("  --Model=<string>                   Specifies the camera model to use.");
 		System.out.println("                                     ( brown, universal )");
-		System.out.println("                                     DEFAULT: "+modeType);
+		System.out.println("                                     DEFAULT: " + modeType);
 		System.out.println("  --ZeroSkew=<true/false>            Can it assume zero skew?");
-		System.out.println("                                     DEFAULT: "+zeroSkew);
+		System.out.println("                                     DEFAULT: " + zeroSkew);
 		System.out.println("  --NumRadial=<int>                  Number of radial coefficients");
-		System.out.println("                                     DEFAULT: " +numRadial);
+		System.out.println("                                     DEFAULT: " + numRadial);
 		System.out.println("  --Tangential=<true/false>          Should it include tangential terms?");
-		System.out.println("                                     DEFAULT: " +tangential);
+		System.out.println("                                     DEFAULT: " + tangential);
 		System.out.println();
 		System.out.println("Fiducial Types:");
 		System.out.println("   CHESSBOARD");
@@ -123,7 +128,8 @@ public class CameraCalibration extends BaseStandardInputApp {
 		System.out.println("   CIRCLE_REG");
 		System.out.println();
 		System.out.println("Flags for CHESSBOARD:");
-		System.out.println("  --Grid=<rows>:<columns>            Specifies number of rows and columns. (squares)");
+		System.out.println("  --Grid=<rows>:<columns>            Specifies number of rows and columns.");
+		System.out.println("                                     Unlike OpenCV, count squares not inner corners.");
 		System.out.println();
 		System.out.println("Flags for SQUAREGRID:");
 		System.out.println("  --Grid=<rows>:<columns>            Specifies number of rows and columns");
@@ -172,7 +178,7 @@ public class CameraCalibration extends BaseStandardInputApp {
 				} else if (!checkCameraFlag(arg)) {
 					splitFlag(arg);
 					if (flagName.compareToIgnoreCase("Directory") == 0) {
-						inputDirectory = parameters;
+						inputDirectory = BoofMiscOps.handlePathTilde(parameters);
 						inputType = InputType.IMAGE;
 					} else if (flagName.compareToIgnoreCase("Model") == 0) {
 						if (parameters.compareToIgnoreCase("pinhole") == 0) {
@@ -373,9 +379,9 @@ public class CameraCalibration extends BaseStandardInputApp {
 			String name = baseName;
 			// keep on trying to create the output directory until it succeeds
 			for (int i = 0; i < 10_000; i++) {
-				outputDirectory = new File(new File(outputFileName).getParent(),name);
+				outputDirectory = new File(new File(outputFileName).getParent(), name);
 				if (outputDirectory.exists()) {
-					name = baseName+i;
+					name = baseName + i;
 				}
 			}
 			BoofMiscOps.checkTrue(outputDirectory.mkdirs());
@@ -418,7 +424,7 @@ public class CameraCalibration extends BaseStandardInputApp {
 			System.exit(0);
 		}
 
-		if (monitor!=null) {
+		if (monitor != null) {
 			monitor.setMessage(0, "Loading images");
 		}
 
@@ -436,7 +442,7 @@ public class CameraCalibration extends BaseStandardInputApp {
 
 			GrayF32 image = ConvertBufferedImage.convertFrom(buffered, (GrayF32)null);
 
-			if (monitor!=null) {
+			if (monitor != null) {
 				monitor.setMessage(0, f.getName());
 
 				if (first) {
@@ -458,10 +464,10 @@ public class CameraCalibration extends BaseStandardInputApp {
 				System.err.println("Failed to detect target in " + f.getName());
 			} else {
 				// if configured to do so, save the landmarks to disk
-				if (outputDirectory!=null) {
-					CalibrationIO.saveLandmarksCsv(f.getPath(),detector.getClass().getSimpleName(),
+				if (outputDirectory != null) {
+					CalibrationIO.saveLandmarksCsv(f.getPath(), detector.getClass().getSimpleName(),
 							detector.getDetectedPoints(),
-							new File(outputDirectory,FilenameUtils.getBaseName(f.getName())+".csv"));
+							new File(outputDirectory, FilenameUtils.getBaseName(f.getName()) + ".csv"));
 				}
 				calibrationAlg.addImage(detector.getDetectedPoints());
 				imagesSuccess.add(f);
@@ -474,7 +480,7 @@ public class CameraCalibration extends BaseStandardInputApp {
 			return;
 		}
 
-		if (monitor!=null) {
+		if (monitor != null) {
 			monitor.setMessage(1, "Computing intrinsics");
 		}
 
@@ -482,7 +488,7 @@ public class CameraCalibration extends BaseStandardInputApp {
 		try {
 			final CameraModel intrinsic = calibrationAlg.process();
 
-			if (monitor!=null) {
+			if (monitor != null) {
 				monitor.stopThread();
 
 				if (imagesFailed.size() > 0) {
