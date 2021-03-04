@@ -237,7 +237,7 @@ public class CameraCalibrationGui extends JPanel
 		}
 
 		app.formatType = outputFormat;
-		app.outputFileName = textOutput.getText();
+		app.outputFilePath = textOutput.getText();
 	}
 
 	@Override
