@@ -41,8 +41,9 @@ public interface PackedArray<T> extends LArrayAccessor<T> {
 	void reserve( int numElements );
 
 	/**
-	 * Adds a copy of element to the array
+	 * Appends a copy to the end of the array
+	 *
 	 * @param element (Input) The element which is copied then added
 	 */
-	void addCopy( T element );
+	void append( T element );
 }

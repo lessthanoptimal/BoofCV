@@ -59,7 +59,7 @@ public class PackedTupleArray_B implements PackedArray<TupleDesc_B> {
 		array.reserve(numTuples*numInts);
 	}
 
-	@Override public void addCopy( TupleDesc_B element ) {
+	@Override public void append( TupleDesc_B element ) {
 		array.addAll(element.data, 0, numInts);
 		numElements++;
 	}

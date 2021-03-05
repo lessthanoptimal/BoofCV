@@ -55,7 +55,7 @@ public class PackedTupleArray_U8 implements PackedArray<TupleDesc_U8> {
 		array.reserve(numTuples*dof);
 	}
 
-	@Override public void addCopy( TupleDesc_U8 element ) {
+	@Override public void append( TupleDesc_U8 element ) {
 		array.addAll(element.data, 0, dof);
 		numElements++;
 	}

@@ -180,7 +180,7 @@ public abstract class GenericComputeMeanClustersChecks<T> extends BoofStandardJU
 		for (int i = 0; i < 30; i++) {
 			T point = randomPoint();
 			list.add(point);
-			packed.addCopy(point);
+			packed.append(point);
 			assignments.add(rand.nextInt(numLabels));
 		}
 	}
