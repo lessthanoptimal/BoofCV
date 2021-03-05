@@ -48,6 +48,7 @@ import static java.nio.charset.StandardCharsets.UTF_8;
 @SuppressWarnings({"JdkObsolete"})
 public class UtilIO {
 	public static final String UTF8 = "UTF-8";
+	public static final String IMAGE_REGEX = "(.*/)*.+\\.(png|jpg|gif|bmp|jpeg|PNG|JPG|GIF|BMP|JPEG)$";
 
 	/**
 	 * Saves a list of strings as a YAML file
@@ -830,15 +831,14 @@ public class UtilIO {
 	 * @return List of matching file paths
 	 */
 	public static List<String> listSmartImages( String pathPattern, boolean sort ) {
-		String regex = "(.*/)*.+\\.(png|jpg|gif|bmp|jpeg|PNG|JPG|GIF|BMP|JPEG)$";
-		return listSmart(pathPattern, sort, ( path ) -> path.toString().matches(regex));
+		return listSmart(pathPattern, sort, ( path ) -> path.toString().matches(IMAGE_REGEX));
 	}
 
 	/**
 	 * Lists all images in the directory using a regex and optionally sorts the list
 	 */
 	public static List<String> listImages( String directory, boolean sort ) {
-		List<String> found = listByRegex(directory, "(.*/)*.+\\.(png|jpg|gif|bmp|jpeg|PNG|JPG|GIF|BMP|JPEG)$");
+		List<String> found = listByRegex(directory, IMAGE_REGEX);
 		if (sort)
 			Collections.sort(found);
 		return found;
