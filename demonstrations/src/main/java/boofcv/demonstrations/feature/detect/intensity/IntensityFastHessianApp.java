@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -87,7 +87,7 @@ public class IntensityFastHessianApp<T extends ImageGray<T>>
 				int block = 1 + skip*2*(sizeIndex + 1);
 				int size = 3*block;
 
-				GIntegralImageFeatureIntensity.hessian(integral, 1, size, intensity);
+				GIntegralImageFeatureIntensity.hessian(integral, 1, size, intensity, null, null, null);
 				float maxAbs = ImageStatistics.maxAbs(intensity);
 				BufferedImage b = VisualizeImageData.colorizeSign(intensity, null, maxAbs);
 				labels.add(String.format("Oct = %2d size %3d", octave + 1, size));

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -32,8 +32,9 @@ import java.util.Random;
  */
 class TestImplIntegralImageFeatureIntensity_MT extends CompareIdenticalFunctions {
 
-	private Random rand = new Random(234);
-	private int width = 60,height=70;
+	private final Random rand = new Random(234);
+	private final int width = 60;
+	private final int height = 70;
 
 	TestImplIntegralImageFeatureIntensity_MT() {
 		super(ImplIntegralImageFeatureIntensity_MT.class, ImplIntegralImageFeatureIntensity.class);
@@ -45,19 +46,20 @@ class TestImplIntegralImageFeatureIntensity_MT extends CompareIdenticalFunctions
 	}
 
 	@Override
-	protected Object[][] createInputParam(Method candidate, Method validation) {
+	protected Object[][] createInputParam( Method candidate, Method validation ) {
 		int skip = 2;
 		Class[] inputTypes = candidate.getParameterTypes();
-		ImageGray integral = GeneralizedImageOps.createSingleBand(inputTypes[0],width,height);
-		ImageGray intensity = GeneralizedImageOps.createSingleBand(inputTypes[3],width/skip,height/skip);
+		ImageGray integral = GeneralizedImageOps.createSingleBand(inputTypes[0], width, height);
+		ImageGray intensity = GeneralizedImageOps.createSingleBand(inputTypes[3], width/skip, height/skip);
 
-		GImageMiscOps.fillUniform(integral,rand,0,100);
-		Object[] inputs = new Object[4];
+		GImageMiscOps.fillUniform(integral, rand, 0, 100);
+		Object[] inputs = new Object[candidate.getParameterTypes().length];
 
 		inputs[0] = integral;
 		inputs[1] = skip;
 		inputs[2] = 5;
 		inputs[3] = intensity;
+		// if it has 7 arguments the last 3 can all be null
 
 		return new Object[][]{inputs};
 	}
