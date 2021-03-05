@@ -29,20 +29,20 @@ import boofcv.struct.image.GrayU8;
  */
 public class ImplDescribePointPixelRegionNCC_U8 extends DescribePointPixelRegionNCC<GrayU8> {
 
-	public ImplDescribePointPixelRegionNCC_U8(int regionWidth, int regionHeight) {
+	public ImplDescribePointPixelRegionNCC_U8( int regionWidth, int regionHeight ) {
 		super(regionWidth, regionHeight);
 	}
 
 	@Override
-	public void process(int c_x, int c_y, NccFeature desc) {
+	public void process( int c_x, int c_y, NccFeature desc ) {
 		double mean = 0;
 		int centerIndex = image.startIndex + c_y*image.stride + c_x;
-		for( int i = 0; i < offset.length; i++ ) {
+		for (int i = 0; i < offset.length; i++) {
 			mean += desc.data[i] = image.data[centerIndex + offset[i]] & 0xFF;
 		}
 		mean /= offset.length;
 		double variance = 0;
-		for(int i = 0; i < desc.data.length; i++ ) {
+		for (int i = 0; i < desc.data.length; i++) {
 			double d = desc.data[i] -= mean;
 			variance += d*d;
 		}
