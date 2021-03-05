@@ -18,9 +18,11 @@
 
 package boofcv.alg.feature.detect.intensity;
 
+import boofcv.alg.transform.ii.IntegralKernel;
 import boofcv.struct.image.GrayF32;
 import boofcv.struct.image.GrayS32;
 import boofcv.struct.image.ImageGray;
+import org.jetbrains.annotations.Nullable;
 
 /**
  * @author Peter Abeles
@@ -35,13 +37,16 @@ public class GIntegralImageFeatureIntensity {
 	 * @param intensity Output intensity image.
 	 */
 	public static <T extends ImageGray<T>>
-	void hessian( T integral, int skip, int size,
-				  GrayF32 intensity ) {
-
+	void hessian( T integral, int skip, int size, GrayF32 intensity,
+				  @Nullable IntegralKernel storageKerXX,
+				  @Nullable IntegralKernel storageKerYY,
+				  @Nullable IntegralKernel storageKerXY ) {
 		if (integral instanceof GrayF32) {
-			IntegralImageFeatureIntensity.hessian((GrayF32)integral, skip, size, intensity);
+			IntegralImageFeatureIntensity.hessian((GrayF32)integral, skip, size, intensity,
+					storageKerXX, storageKerYY, storageKerXY);
 		} else if (integral instanceof GrayS32) {
-			IntegralImageFeatureIntensity.hessian((GrayS32)integral, skip, size, intensity);
+			IntegralImageFeatureIntensity.hessian((GrayS32)integral, skip, size, intensity,
+					storageKerXX, storageKerYY, storageKerXY);
 		} else {
 			throw new IllegalArgumentException("Unsupported input type");
 		}

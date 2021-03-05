@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -19,6 +19,8 @@
 package boofcv.alg.transform.ii;
 
 import boofcv.struct.image.GrayF32;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 /**
  * @author Peter Abeles
@@ -31,9 +33,8 @@ public class DerivativeIntegralImage {
 	 * @param r Radius of the box.  width is 2*r+1
 	 * @return Kernel Kernel for derivative.
 	 */
-	public static IntegralKernel kernelDerivX( int r, IntegralKernel ret ) {
-		if (ret == null)
-			ret = new IntegralKernel(2);
+	public static IntegralKernel kernelDerivX( int r, @Nullable IntegralKernel ret ) {
+		ret = checkDeclareKernel(ret, 2);
 
 		ret.blocks[0].setTo(-r - 1, -r - 1, -1, r);
 		ret.blocks[1].setTo(0, -r - 1, r, r);
@@ -43,15 +44,22 @@ public class DerivativeIntegralImage {
 		return ret;
 	}
 
+	@NotNull private static IntegralKernel checkDeclareKernel( @Nullable IntegralKernel ret, int numBlocks ) {
+		if (ret == null)
+			ret = new IntegralKernel(numBlocks);
+		else
+			ret.resizeBlocks(numBlocks);
+		return ret;
+	}
+
 	/**
 	 * Creates a kernel for a symmetric box derivative.
 	 *
 	 * @param r Radius of the box.  width is 2*r+1
 	 * @return Kernel Kernel for derivative.
 	 */
-	public static IntegralKernel kernelDerivY( int r, IntegralKernel ret ) {
-		if (ret == null)
-			ret = new IntegralKernel(2);
+	public static IntegralKernel kernelDerivY( int r, @Nullable IntegralKernel ret ) {
+		ret = checkDeclareKernel(ret, 2);
 
 		ret.blocks[0].setTo(-r - 1, -r - 1, r, -1);
 		ret.blocks[1].setTo(-r - 1, 0, r, r);
@@ -67,9 +75,8 @@ public class DerivativeIntegralImage {
 	 * @param r Radius of the box.  width is 2*r
 	 * @return Kernel for a Haar x-axis wavelet.
 	 */
-	public static IntegralKernel kernelHaarX( int r, IntegralKernel ret ) {
-		if (ret == null)
-			ret = new IntegralKernel(2);
+	public static IntegralKernel kernelHaarX( int r, @Nullable IntegralKernel ret ) {
+		ret = checkDeclareKernel(ret, 2);
 
 		ret.blocks[0].setTo(-r, -r, 0, r);
 		ret.blocks[1].setTo(0, -r, r, r);
@@ -85,9 +92,8 @@ public class DerivativeIntegralImage {
 	 * @param r Radius of the box.  width is 2*r
 	 * @return Kernel for a Haar y-axis wavelet.
 	 */
-	public static IntegralKernel kernelHaarY( int r, IntegralKernel ret ) {
-		if (ret == null)
-			ret = new IntegralKernel(2);
+	public static IntegralKernel kernelHaarY( int r, @Nullable IntegralKernel ret ) {
+		ret = checkDeclareKernel(ret, 2);
 
 		ret.blocks[0].setTo(-r, -r, r, 0);
 		ret.blocks[1].setTo(-r, 0, r, r);
@@ -97,9 +103,8 @@ public class DerivativeIntegralImage {
 		return ret;
 	}
 
-	public static IntegralKernel kernelDerivXX( int size, IntegralKernel ret ) {
-		if (ret == null)
-			ret = new IntegralKernel(2);
+	public static IntegralKernel kernelDerivXX( int size, @Nullable IntegralKernel ret ) {
+		ret = checkDeclareKernel(ret, 2);
 
 		// lobe size
 		int blockW = size/3;
@@ -118,9 +123,8 @@ public class DerivativeIntegralImage {
 		return ret;
 	}
 
-	public static IntegralKernel kernelDerivYY( int size, IntegralKernel ret ) {
-		if (ret == null)
-			ret = new IntegralKernel(2);
+	public static IntegralKernel kernelDerivYY( int size, @Nullable IntegralKernel ret ) {
+		ret = checkDeclareKernel(ret, 2);
 
 		int blockW = size/3;
 		int blockH = size - blockW - 1;
@@ -137,9 +141,8 @@ public class DerivativeIntegralImage {
 		return ret;
 	}
 
-	public static IntegralKernel kernelDerivXY( int size, IntegralKernel ret ) {
-		if (ret == null)
-			ret = new IntegralKernel(4);
+	public static IntegralKernel kernelDerivXY( int size, @Nullable IntegralKernel ret ) {
+		ret = checkDeclareKernel(ret, 4);
 
 		int block = size/3;
 

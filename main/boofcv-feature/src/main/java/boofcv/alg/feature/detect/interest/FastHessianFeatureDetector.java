@@ -133,6 +133,11 @@ public class FastHessianFeatureDetector<II extends ImageGray<II>> {
 	protected IntegralKernel kerXX;
 	protected IntegralKernel kerYY;
 
+	// storage for hessian kernels
+	protected IntegralKernel hessXX = new IntegralKernel(2);
+	protected IntegralKernel hessYY = new IntegralKernel(2);
+	protected IntegralKernel hessXY = new IntegralKernel(2);
+
 	// how often the image is sampled in the first octave
 	// a value of 1 would mean every pixel is sampled
 	private final int initialSampleRate;
@@ -239,7 +244,8 @@ public class FastHessianFeatureDetector<II extends ImageGray<II>> {
 
 		// compute feature intensity in each level
 		for (int i = 0; i < featureSize.length; i++) {
-			GIntegralImageFeatureIntensity.hessian(integral, skip, featureSize[i], intensity[spaceIndex]);
+			GIntegralImageFeatureIntensity.hessian(integral, skip, featureSize[i], intensity[spaceIndex],
+					hessXX, hessYY, hessXY);
 
 			spaceIndex++;
 			if (spaceIndex >= 3)

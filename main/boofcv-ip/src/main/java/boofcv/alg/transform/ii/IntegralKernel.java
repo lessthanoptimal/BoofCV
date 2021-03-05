@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -29,7 +29,7 @@ import boofcv.struct.ImageRectangle;
  */
 public class IntegralKernel {
 	public ImageRectangle[] blocks;
-	public int scales[];
+	public int[] scales;
 
 	public IntegralKernel( int numBlocks ) {
 		this.blocks = new ImageRectangle[numBlocks];
@@ -40,7 +40,17 @@ public class IntegralKernel {
 		}
 	}
 
-	public IntegralKernel() {
+	public IntegralKernel() {}
+
+	public void resizeBlocks(int desired) {
+		if (getNumBlocks() == desired)
+			return;
+		this.blocks = new ImageRectangle[desired];
+		this.scales = new int[ desired ];
+
+		for( int i = 0; i < desired; i++ ) {
+			blocks[i] = new ImageRectangle();
+		}
 	}
 
 	public int getNumBlocks() {
