@@ -26,7 +26,7 @@ import boofcv.alg.feature.detect.selector.SampleIntensityScalePoint;
 import boofcv.alg.transform.ii.DerivativeIntegralImage;
 import boofcv.alg.transform.ii.GIntegralImageOps;
 import boofcv.alg.transform.ii.IntegralKernel;
-import boofcv.core.image.border.FactoryImageBorderAlgs;
+import boofcv.core.image.ImageBorderValue;
 import boofcv.struct.QueueCorner;
 import boofcv.struct.border.ImageBorder_F32;
 import boofcv.struct.feature.ScalePoint;
@@ -137,6 +137,10 @@ public class FastHessianFeatureDetector<II extends ImageGray<II>> {
 	protected IntegralKernel hessXX = new IntegralKernel(2);
 	protected IntegralKernel hessYY = new IntegralKernel(2);
 	protected IntegralKernel hessXY = new IntegralKernel(2);
+
+	// Pre-declare. Used in findLocalScaleSpaceMax
+	protected ImageBorder_F32 inten0 = new ImageBorderValue.Value_F32(0.0f);
+	protected ImageBorder_F32 inten2 = new ImageBorderValue.Value_F32(0.0f);
 
 	// how often the image is sampled in the first octave
 	// a value of 1 would mean every pixel is sampled
@@ -270,9 +274,9 @@ public class FastHessianFeatureDetector<II extends ImageGray<II>> {
 		int index1 = (spaceIndex + 1)%3;
 		int index2 = (spaceIndex + 2)%3;
 
-		ImageBorder_F32 inten0 = FactoryImageBorderAlgs.value(intensity[index0], 0);
+		inten0.setImage(intensity[index0]); // outside of image returns a value of zero
 		GrayF32 inten1 = intensity[index1];
-		ImageBorder_F32 inten2 = FactoryImageBorderAlgs.value(intensity[index2], 0);
+		inten2.setImage(intensity[index2]);
 
 		// find local maximums in image 2D space.  Borders need to be ignored since
 		// false positives are found around them as an artifact of pixels outside being
