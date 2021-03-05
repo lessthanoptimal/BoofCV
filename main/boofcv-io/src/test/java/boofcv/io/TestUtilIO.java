@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -46,12 +46,10 @@ class TestUtilIO extends BoofStandardJUnit {
 	private final String validExamplePackage = "boofcv.examples.enhance";
 	private final String validExampleClass = "ExampleImageEnhancement";
 
-
 	/**
 	 * See if it can get the URL for a resource correctly
 	 */
-	@Test
-	void pathExampleURL_resource() {
+	@Test void pathExampleURL_resource() {
 		URL found = UtilIO.pathExampleURL("boofcv/io/image/wrapper/images/dummy01.png");
 
 		assertNotNull(found);
@@ -61,8 +59,7 @@ class TestUtilIO extends BoofStandardJUnit {
 	/**
 	 * See if it handles the URL after it has been messed up by being passed through File
 	 */
-	@Test
-	void ensureURL_mangled() {
+	@Test void ensureURL_mangled() {
 		String input = "jar:file:/home/person/BoofApplications/demonstrations.jar!/fiducial/image/video/patterns/chicken.png";
 		URL url = UtilIO.ensureURL(new File(input).getPath());
 
@@ -70,8 +67,7 @@ class TestUtilIO extends BoofStandardJUnit {
 		assertEquals(input,url.toString());
 	}
 
-	@Test
-	void simplifyJarPath() throws MalformedURLException {
+	@Test void simplifyJarPath() throws MalformedURLException {
 		String input = "jar:file:/home/person/BoofApplications/demonstrations.jar!/fiducial/image/video/../patterns/chicken.png";
 		String expected = "jar:file:/home/person/BoofApplications/demonstrations.jar!/fiducial/image/patterns/chicken.png";
 
@@ -80,8 +76,7 @@ class TestUtilIO extends BoofStandardJUnit {
 		assertEquals(expected,b.toString());
 	}
 
-	@Test
-	void readAsString() throws IOException {
+	@Test void readAsString() throws IOException {
 		String expected = "This is\na string\n";
 		File tmp = File.createTempFile("readAsString",null);
 
@@ -95,8 +90,7 @@ class TestUtilIO extends BoofStandardJUnit {
 		assertEquals(expected,found);
 	}
 
-	@Test
-	void getSourcePath() {
+	@Test void getSourcePath() {
 		File f1 = new File(UtilIO.getSourcePath(validDemoPackage, validDemoClass));
 		assertTrue(f1.exists(),f1.getPath());
 		assertTrue(f1.isAbsolute());
@@ -118,8 +112,7 @@ class TestUtilIO extends BoofStandardJUnit {
 	}
 
 	@SuppressWarnings("ConstantConditions")
-	@Test
-	void getGithubLink() throws IOException {
+	@Test void getGithubLink() throws IOException {
 		// Don't run If this is a snapshot since it will allways fail
 		if(BoofVersion.VERSION.contains("SNAPSHOT"))
 			return;
@@ -143,8 +136,7 @@ class TestUtilIO extends BoofStandardJUnit {
 		assertEquals(url3, "");
 	}
 
-	@Test
-	void indexOfSourceStart() {
+	@Test void indexOfSourceStart() {
 		String example0 = "// asdfasdf\n\nimport foo;\npublic class stuff{\n/** Yo Dog*/public void class()}";
 
 		assertEquals(25,UtilIO.indexOfSourceStart(example0));
@@ -158,8 +150,7 @@ class TestUtilIO extends BoofStandardJUnit {
 		assertEquals(29,UtilIO.indexOfSourceStart(example2));
 	}
 
-	@Test
-	void findMatches() {
+	@Test void findMatches() {
 		String f = TestUtilIO.class.getResource(".").getFile();
 		String w = "resources";
 		File[] matches = UtilIO.findMatches(new File(f),"\\w*.class");
@@ -174,9 +165,7 @@ class TestUtilIO extends BoofStandardJUnit {
 		assertTrue(matches.length>=3);
 	}
 
-	@SuppressWarnings("ConstantConditions")
-	@Test
-	void delete() throws IOException {
+	@Test void delete() throws IOException {
 		File tmp = Files.createTempDirectory("delete").toFile();
 		assertTrue(new File(tmp,"boo.txt").createNewFile());
 		assertTrue(new File(tmp,"moo.txt").createNewFile());
@@ -186,5 +175,22 @@ class TestUtilIO extends BoofStandardJUnit {
 		UtilIO.delete(tmp,f->f.getName().startsWith("moo"));
 		assertEquals(1,tmp.list().length);
 		FileUtils.deleteDirectory(tmp);
+	}
+	
+	@Test void findBaseDirectoryInPattern() throws IOException {
+		// Create a file path with some pathological issues
+		File base = Files.createTempDirectory("delete").toFile();
+		String bp = base.getPath(); // short variable bame since this will be used a lot
+		String gbp = "glob:"+bp;
+		assertTrue(new File(base,"foo/aaaa/bbb").mkdirs());
+		assertTrue(new File(base,"foo/aa/bbb").mkdirs());
+
+		assertEquals(bp+"/foo/aaaa/",UtilIO.findBaseDirectoryInPattern(gbp+"/foo/aaaa/**"));
+		assertEquals(bp+"/foo/",UtilIO.findBaseDirectoryInPattern(gbp+"/foo/aaaa**/*"));
+		assertEquals(bp+"/foo/",UtilIO.findBaseDirectoryInPattern(gbp+"/foo/aa**/*"));
+		assertEquals(bp+"/foo/aa",UtilIO.findBaseDirectoryInPattern(gbp+"/foo/aa"));
+
+		// clean up
+		FileUtils.deleteDirectory(base);
 	}
 }

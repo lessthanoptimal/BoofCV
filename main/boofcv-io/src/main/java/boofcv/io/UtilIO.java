@@ -732,18 +732,7 @@ public class UtilIO {
 
 		if (pathPattern.startsWith("glob:") || pathPattern.startsWith("regex:")) {
 			try {
-				// Reduce the search scope and figure out if it's an absolute or relative path by looking for the
-				// prefix which is a valid path
-				int start = pathPattern.indexOf(':')+1;
-				int end = -1;
-				for (int i = start + 1; i < pathPattern.length(); i++) {
-					if (new File(pathPattern.substring(start, i)).isDirectory()) {
-						end = i;
-					}
-				}
-				// If it was never valid then we will assume that it's a relative pattern. Otherwise you would end
-				// up searching the entire file system a lot
-				String baseDirectory = end != -1 ? pathPattern.substring(start, end) : "";
+				String baseDirectory = findBaseDirectoryInPattern(pathPattern);
 				PathMatcher pathMatcher = FileSystems.getDefault().getPathMatcher(pathPattern);
 
 				Files.walkFileTree(Paths.get(baseDirectory), new SimpleFileVisitor<>() {
@@ -782,6 +771,54 @@ public class UtilIO {
 			Collections.sort(results);
 
 		return results;
+	}
+
+	/**
+	 * This searches for a subset of the pattern which matches a valid directory. This is intended to reduce
+	 * the number of files that are searched. Which is particularly important when the pattern is in reference
+	 * to the root file system.
+	 *
+	 * It does this by creating a file from a sub string and seeing if it's a directory. Edge cases:
+	 *
+	 * Directory Tree:
+	 * foo/aaaaa/b
+	 * foo/aa/b
+	 *
+	 * Pattern:  foo/aa*  <-- This would only search inside of aa
+	 *           foo/aa/*
+	 *
+	 */
+	static String findBaseDirectoryInPattern( String pathPattern ) {
+		// Reduce the search scope and figure out if it's an absolute or relative path by looking for the
+		// prefix which is a valid path
+		File lastDirectory = new File("/");
+		int start = pathPattern.indexOf(':')+1;
+		int end = -1;
+		boolean previousDirectory = false;
+		for (int i = start + 1; i <= pathPattern.length(); i++) {
+			var f = new File(pathPattern.substring(start, i));
+			// If the previous string was a directory and now the parent directory has changed after
+			// adding another character that means the last directory must be the complete name
+			// it was going for
+			File parent = f.getParentFile();
+			if (parent != null && previousDirectory && parent.getPath().equals(lastDirectory.getPath())) {
+				end = i-1;
+			}
+
+			if (!f.isDirectory()) {
+				previousDirectory = false;
+				continue;
+			}
+
+			previousDirectory = true;
+			lastDirectory = f;
+		}
+		if (previousDirectory) {
+			end = pathPattern.length();
+		}
+		// If it was never valid then we will assume that it's a relative pattern. Otherwise you would end
+		// up searching the entire file system a lot
+		return end != -1 ? pathPattern.substring(start, end) : "";
 	}
 
 	/**
