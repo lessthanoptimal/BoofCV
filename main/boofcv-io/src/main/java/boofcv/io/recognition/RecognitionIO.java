@@ -272,7 +272,7 @@ public class RecognitionIO {
 
 			for (int i = 0; i < numDescriptions; i++) {
 				readBin(tuple, input);
-				tree.descriptions.addCopy(tuple);
+				tree.descriptions.append(tuple);
 			}
 
 			readCheckUTF(input, "END_BOOFCV_HIERARCHICAL_VOCABULARY_TREE");

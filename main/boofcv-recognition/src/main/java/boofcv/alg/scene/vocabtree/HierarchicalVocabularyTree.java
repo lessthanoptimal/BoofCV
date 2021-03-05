@@ -80,7 +80,7 @@ public class HierarchicalVocabularyTree<Point> {
 		n.index = index;
 		n.branch = branch;
 		n.descIdx = descriptions.size();
-		descriptions.addCopy(desc);
+		descriptions.append(desc);
 		Node parent = nodes.get(parentIndex);
 		checkTrue(branch == parent.childrenIndexes.size, "Branch index must map to child index");
 		n.parent = parentIndex;

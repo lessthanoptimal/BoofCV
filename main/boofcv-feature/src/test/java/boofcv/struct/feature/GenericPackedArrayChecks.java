@@ -48,7 +48,7 @@ public abstract class GenericPackedArrayChecks<T> extends BoofStandardJUnit {
 
 		assertEquals(0, alg.size());
 		for (int i = 0; i < 3; i++) {
-			alg.addCopy(createRandomPoint());
+			alg.append(createRandomPoint());
 		}
 		assertEquals(3, alg.size());
 
@@ -62,7 +62,7 @@ public abstract class GenericPackedArrayChecks<T> extends BoofStandardJUnit {
 		assertEquals(0, alg.size());
 
 		for (int i = 0; i < 3; i++) {
-			alg.addCopy(createRandomPoint());
+			alg.append(createRandomPoint());
 		}
 		assertEquals(3, alg.size());
 	}
@@ -76,7 +76,7 @@ public abstract class GenericPackedArrayChecks<T> extends BoofStandardJUnit {
 
 		// Add the first point
 		assertEquals(0, alg.size());
-		alg.addCopy(a);
+		alg.append(a);
 		assertEquals(1, alg.size());
 
 		// Copy the first point into the second
@@ -91,7 +91,7 @@ public abstract class GenericPackedArrayChecks<T> extends BoofStandardJUnit {
 		for (int i = 0; i < 5; i++) {
 			T a = createRandomPoint();
 			expected.add(a);
-			alg.addCopy(a);
+			alg.append(a);
 		}
 
 		assertEquals(5, alg.size());
@@ -108,7 +108,7 @@ public abstract class GenericPackedArrayChecks<T> extends BoofStandardJUnit {
 
 		T a = createRandomPoint();
 
-		alg.addCopy(a);
+		alg.append(a);
 		// The returned item should not be the same instance
 		assertNotSame(a, alg.getTemp(0));
 

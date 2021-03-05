@@ -163,7 +163,7 @@ public class LearnHierarchicalTree<Point> implements VerbosePrint {
 			for (int pointIdx = 0; pointIdx < pointsInParent.size(); pointIdx++) {
 				if (assignments.get(pointIdx) != label)
 					continue;
-				pointsInBranch.addCopy(pointsInParent.getTemp(pointIdx));
+				pointsInBranch.append(pointsInParent.getTemp(pointIdx));
 			}
 			sumLabeledPoints += pointsInBranch.size();
 

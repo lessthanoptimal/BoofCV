@@ -117,7 +117,7 @@ public class ImageRecognitionNister2006<Image extends ImageBase<Image>, TD exten
 			int N = detector.getNumberOfFeatures();
 			packedFeatures.reserve(N);
 			for (int i = 0; i < N; i++) {
-				packedFeatures.addCopy(detector.getDescription(i));
+				packedFeatures.append(detector.getDescription(i));
 			}
 			if (verbose != null)
 				verbose.println("described.size=" + startIndex.size + " packed.size=" + packedFeatures.size());

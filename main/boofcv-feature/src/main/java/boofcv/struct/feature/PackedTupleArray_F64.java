@@ -55,7 +55,7 @@ public class PackedTupleArray_F64 implements PackedArray<TupleDesc_F64> {
 		array.reserve(numTuples*dof);
 	}
 
-	@Override public void addCopy( TupleDesc_F64 element ) {
+	@Override public void append( TupleDesc_F64 element ) {
 		array.addAll(element.data, 0, dof);
 		numElements++;
 	}

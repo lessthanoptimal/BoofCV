@@ -141,7 +141,7 @@ public class TestRecognitionIO extends BoofStandardJUnit {
 				desc.data[j] = rand.nextDouble();
 			}
 			n.descIdx = tree.descriptions.size();
-			tree.descriptions.addCopy(desc);
+			tree.descriptions.append(desc);
 		}
 		return tree;
 	}
