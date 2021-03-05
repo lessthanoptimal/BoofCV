@@ -25,6 +25,7 @@ import boofcv.alg.feature.detect.interest.FastHessianFeatureDetector;
 import boofcv.concurrency.BoofConcurrency;
 import boofcv.struct.feature.ScalePoint;
 import boofcv.struct.image.ImageGray;
+import pabeles.concurrency.GrowArray;
 
 /**
  * Concurrent implementations of {@link WrapDetectDescribeSurf}.
@@ -34,18 +35,23 @@ import boofcv.struct.image.ImageGray;
 public class WrapDetectDescribeSurf_MT<T extends ImageGray<T>, II extends ImageGray<II>>
 		extends WrapDetectDescribeSurf<T, II> {
 
+	// Stores data used as workspace inside each thread
+	GrowArray<ThreadData> threadData;
+
 	public WrapDetectDescribeSurf_MT( FastHessianFeatureDetector<II> detector,
 									  OrientationIntegral<II> orientation,
 									  DescribePointSurf<II> describe,
 									  Class<T> inputType ) {
 		super(detector, orientation, describe, inputType);
+
+		threadData = new GrowArray<>(()->new ThreadData((OrientationIntegral)orientation.copy(), describe.copy()));
 	}
 
 	@Override
 	protected void computeDescriptors() {
-		BoofConcurrency.loopBlocks(0, foundPoints.size(), ( i0, i1 ) -> {
-			OrientationIntegral<II> orientation = (OrientationIntegral)this.orientation.copy();
-			DescribePointSurf<II> describe = this.describe.copy();
+		BoofConcurrency.loopBlocks(0, foundPoints.size(), threadData, ( data, i0, i1 ) -> {
+			final OrientationIntegral<II> orientation = data.orientation;
+			final DescribePointSurf<II> describe = data.describe;
 
 			orientation.setImage(ii);
 			describe.setImage(ii);
@@ -60,5 +66,15 @@ public class WrapDetectDescribeSurf_MT<T extends ImageGray<T>, II extends ImageG
 				featureAngles.set(i, angle);
 			}
 		});
+	}
+
+	private class ThreadData {
+		OrientationIntegral<II> orientation;
+		DescribePointSurf<II> describe;
+
+		public ThreadData( OrientationIntegral<II> orientation, DescribePointSurf<II> describe ) {
+			this.orientation = orientation;
+			this.describe = describe;
+		}
 	}
 }
