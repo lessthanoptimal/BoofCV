@@ -30,18 +30,18 @@ import java.util.Arrays;
  *
  * @author Peter Abeles
  */
-public class ImplDescribePointPixelRegion_F32 extends DescribePointPixelRegion<GrayF32,TupleDesc_F32> {
+public class ImplDescribePointPixelRegion_F32 extends DescribePointPixelRegion<GrayF32, TupleDesc_F32> {
 
-	public ImplDescribePointPixelRegion_F32(int regionWidth, int regionHeight) {
+	public ImplDescribePointPixelRegion_F32( int regionWidth, int regionHeight ) {
 		super(regionWidth, regionHeight);
 	}
 
 	@Override
-	public void process(int c_x, int c_y, TupleDesc_F32 desc) {
+	public void process( int c_x, int c_y, TupleDesc_F32 desc ) {
 		// if it is entirely inside the image then faster code can be run
-		if(BoofMiscOps.isInside(image,c_x,c_y,radiusWidth,radiusHeight)) {
+		if (BoofMiscOps.isInside(image, c_x, c_y, radiusWidth, radiusHeight)) {
 			int centerIndex = image.startIndex + c_y*image.stride + c_x;
-			for( int i = 0; i < offset.length; i++ ) {
+			for (int i = 0; i < offset.length; i++) {
 				desc.data[i] = image.data[centerIndex + offset[i]];
 			}
 		} else {
@@ -49,20 +49,20 @@ public class ImplDescribePointPixelRegion_F32 extends DescribePointPixelRegion<G
 			Arrays.fill(desc.data, 0);
 
 			// only read pixels inside the image
-			int x0 = c_x-radiusWidth;
-			int x1 = c_x+radiusWidth;
-			int y0 = c_y-radiusHeight;
-			int y1 = c_y+radiusHeight;
+			int x0 = c_x - radiusWidth;
+			int x1 = c_x + radiusWidth;
+			int y0 = c_y - radiusHeight;
+			int y1 = c_y + radiusHeight;
 
-			if( x0 < 0 ) x0 = 0;
-			if( y0 < 0 ) y0 = 0;
-			if( x1 >= image.width ) x1 = image.width-1;
-			if( y1 >= image.height ) y1 = image.height-1;
+			if (x0 < 0) x0 = 0;
+			if (y0 < 0) y0 = 0;
+			if (x1 >= image.width) x1 = image.width - 1;
+			if (y1 >= image.height) y1 = image.height - 1;
 
-			for( int y = y0; y <= y1; y++) {
+			for (int y = y0; y <= y1; y++) {
 				int indexImage = image.startIndex + y*image.stride + x0;
-				int indexDesc = (y - (c_y-radiusHeight))*regionWidth + (x0-(c_x-radiusWidth));
-				for( int x = x0; x <= x1; x++ ) {
+				int indexDesc = (y - (c_y - radiusHeight))*regionWidth + (x0 - (c_x - radiusWidth));
+				for (int x = x0; x <= x1; x++) {
 					desc.data[indexDesc++] = image.data[indexImage++];
 				}
 			}
