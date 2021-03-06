@@ -104,7 +104,7 @@ public class ImageRecognitionNister2006<Image extends ImageBase<Image>, TD exten
 	@Override public void learnModel( Iterator<Image> images ) {
 		int DOF = detector.createDescription().size();
 		Class<TD> tupleType = detector.getDescriptionType();
-		PackedArray<TD> packedFeatures = FactoryTupleDesc.createPacked(DOF, tupleType);
+		PackedArray<TD> packedFeatures = FactoryTupleDesc.createPackedBig(DOF, tupleType);
 
 		// Keep track of where features from one image begins/ends
 		DogArray_I32 startIndex = new DogArray_I32();
@@ -127,7 +127,7 @@ public class ImageRecognitionNister2006<Image extends ImageBase<Image>, TD exten
 		long time1 = System.currentTimeMillis();
 
 		// Create the tree data structure
-		PackedArray<TD> packedArray = FactoryTupleDesc.createPacked(DOF, tupleType);
+		PackedArray<TD> packedArray = FactoryTupleDesc.createPackedBig(DOF, tupleType);
 
 		tree = new HierarchicalVocabularyTree<>(FactoryTupleCluster.createDistance(tupleType), packedArray);
 		tree.branchFactor = config.tree.branchFactor;
@@ -140,7 +140,7 @@ public class ImageRecognitionNister2006<Image extends ImageBase<Image>, TD exten
 				FactoryTupleCluster.kmeans(config.kmeans, minimumForThread, DOF, tupleType);
 
 		LearnHierarchicalTree<TD> learnTree = new LearnHierarchicalTree<>(
-				() -> FactoryTupleDesc.createPacked(DOF, tupleType), factoryKMeans, config.randSeed);
+				() -> FactoryTupleDesc.createPackedBig(DOF, tupleType), factoryKMeans, config.randSeed);
 		learnTree.setVerbose(verbose, null);
 		learnTree.process(packedFeatures, tree);
 		long time2 = System.currentTimeMillis();

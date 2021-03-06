@@ -53,4 +53,17 @@ public class FactoryTupleDesc {
 		else
 			throw new IllegalArgumentException("Unknown type "+type);
 	}
+
+	public static <TD extends TupleDesc<TD>> PackedArray<TD> createPackedBig( int numElements, Class<TD> type) {
+		if (type == TupleDesc_F64.class)
+			return (PackedArray<TD>)new PackedTupleBigArray_F64(numElements);
+		else if (type == TupleDesc_F32.class)
+			return (PackedArray<TD>)new PackedTupleBigArray_F32(numElements);
+		else if (type == TupleDesc_U8.class)
+			return (PackedArray<TD>)new PackedTupleBigArray_U8(numElements);
+		else if (type == TupleDesc_B.class) // TODO create big array variant of this!
+			return (PackedArray<TD>)new PackedTupleArray_B(numElements);
+		else
+			throw new IllegalArgumentException("Unknown type "+type);
+	}
 }
