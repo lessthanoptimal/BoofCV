@@ -213,25 +213,25 @@ public class RecognitionIO {
 				switch (pointType) {
 					case "TupleDesc_F64" -> {
 						distanceFunction = (PointDistance)new TuplePointDistanceEuclideanSq.F64();
-						descriptions = (PackedArray)new PackedTupleArray_F64(dof);
+						descriptions = (PackedArray)new PackedTupleBigArray_F64(dof);
 						tuple = (TD)new TupleDesc_F64(dof);
 					}
 					case "TupleDesc_F32" -> {
 						distanceFunction = (PointDistance)new TuplePointDistanceEuclideanSq.F32();
-						descriptions = (PackedArray)new PackedTupleArray_F32(dof);
+						descriptions = (PackedArray)new PackedTupleBigArray_F32(dof);
 						tuple = (TD)new TupleDesc_F32(dof);
 					}
 					case "TupleDesc_U8" -> {
 						distanceFunction = (PointDistance)new TuplePointDistanceEuclideanSq.U8();
-						descriptions = (PackedArray)new PackedTupleArray_U8(dof);
+						descriptions = (PackedArray)new PackedTupleBigArray_U8(dof);
 						tuple = (TD)new TupleDesc_U8(dof);
 					}
 					case "TupleDesc_S8" -> {
 						distanceFunction = (PointDistance)new TuplePointDistanceEuclideanSq.S8();
-						descriptions = (PackedArray)new PackedTupleArray_S8(dof);
+						descriptions = (PackedArray)new PackedTupleBigArray_U8(dof);
 						tuple = (TD)new TupleDesc_S8(dof);
 					}
-					case "TupleDesc_B" -> {
+					case "TupleDesc_B" -> { // TODO update to BigArray
 						distanceFunction = (PointDistance)new TuplePointDistanceHamming();
 						descriptions = (PackedArray)new PackedTupleArray_B(dof);
 						tuple = (TD)new TupleDesc_B(dof);

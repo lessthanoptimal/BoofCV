@@ -25,7 +25,7 @@ import boofcv.alg.scene.nister2006.RecognitionVocabularyTreeNister2006.ImageInfo
 import boofcv.alg.scene.nister2006.RecognitionVocabularyTreeNister2006.InvertedFile;
 import boofcv.alg.scene.vocabtree.HierarchicalVocabularyTree;
 import boofcv.io.UtilIO;
-import boofcv.struct.feature.PackedTupleArray_F64;
+import boofcv.struct.feature.PackedTupleBigArray_F64;
 import boofcv.struct.feature.TupleDesc_F64;
 import boofcv.struct.image.GrayU8;
 import boofcv.struct.image.ImageType;
@@ -119,7 +119,7 @@ public class TestRecognitionIO extends BoofStandardJUnit {
 
 	private <T> HierarchicalVocabularyTree<TupleDesc_F64> createTree( int DOF ) {
 		var tree = new HierarchicalVocabularyTree<>(
-				new TuplePointDistanceEuclideanSq.F64(), new PackedTupleArray_F64(DOF));
+				new TuplePointDistanceEuclideanSq.F64(), new PackedTupleBigArray_F64(DOF));
 
 		tree.maximumLevel = 2;
 		tree.branchFactor = 4;
