@@ -179,10 +179,10 @@ public class TestRecognitionIO extends BoofStandardJUnit {
 			InvertedFile e = (InvertedFile)db.tree.nodeData.get(i);
 			InvertedFile f = (InvertedFile)found.tree.nodeData.get(i);
 
-			assertEquals(e.images.size(), f.images.size());
-			for (int wordIdx = 0; wordIdx < e.images.size; wordIdx++) {
-				int indexE = db.getImagesDB().indexOf(e.images.get(wordIdx).image);
-				int indexF = found.getImagesDB().indexOf(f.images.get(wordIdx).image);
+			assertEquals(e.size(), f.size());
+			for (int imageIdx = 0; imageIdx < e.size; imageIdx++) {
+				int indexE = e.get(imageIdx);
+				int indexF = f.get(imageIdx);
 
 				assertEquals(indexE, indexF);
 			}
@@ -205,11 +205,7 @@ public class TestRecognitionIO extends BoofStandardJUnit {
 
 		for (int i = 0; i < 9; i++) {
 			var ld = new InvertedFile();
-			RecognitionVocabularyTreeNister2006.ImageWord word = ld.images.grow();
-			for (int levels = 1; levels < db.tree.maximumLevel; levels++) {
-				word.weights.add(i*0.01f+0.4f);
-			}
-			word.image = db.getImagesDB().get(i);
+			ld.add(i);
 			db.tree.nodeData.add(ld);
 		}
 		return db;

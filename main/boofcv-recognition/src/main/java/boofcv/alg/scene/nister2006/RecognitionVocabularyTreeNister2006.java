@@ -32,7 +32,6 @@ import gnu.trove.set.hash.TIntHashSet;
 import lombok.Getter;
 import lombok.Setter;
 import org.ddogleg.struct.DogArray;
-import org.ddogleg.struct.DogArray_F32;
 import org.ddogleg.struct.DogArray_I32;
 
 import java.util.Collections;
@@ -69,7 +68,6 @@ public class RecognitionVocabularyTreeNister2006<Point> {
 	protected @Getter @Setter TupleMapDistanceNorm distanceFunction = new TupleMapDistanceNorm.L2();
 
 	//---------------- Internal Workspace
-
 	// Number of images in DB that pass through this node
 	protected final DogArray_I32 nodeImageCount = new DogArray_I32();
 
@@ -82,7 +80,6 @@ public class RecognitionVocabularyTreeNister2006<Point> {
 
 	// Predeclare array for storing keys. Avoids unnecessary array creation
 	protected final DogArray_I32 keysDesc = new DogArray_I32(); // ONLY use in describe()
-	protected final DogArray_I32 keysDist = new DogArray_I32(); // ONLY use in distance functions.
 
 	// For lookup
 	TIntIntMap identification_to_match = new TIntIntHashMap();
@@ -129,6 +126,7 @@ public class RecognitionVocabularyTreeNister2006<Point> {
 		if (imageFeatures.isEmpty())
 			return;
 
+		int imageIdx = imagesDB.size;
 		ImageInfo info = imagesDB.grow();
 		info.identification = imageID;
 		info.cookie = cookie;
@@ -145,26 +143,8 @@ public class RecognitionVocabularyTreeNister2006<Point> {
 			if (node.weight <= 0.0f)
 				continue;
 
-			InvertedFile invertedFile = (InvertedFile)tree.nodeData.get(node.dataIdx);
-
-			// Add to inverted file at this node and note what the descriptor weight was for later rapid retrieval
-			ImageWord word = invertedFile.images.grow();
-			word.image = info;
-			word.weights.reserve(tree.maximumLevel);
-			word.weights.add(info.descTermFreq.get(node.index));
-
-			// distance from leaf along the graph
-			int distanceFromLeaf = 0;
-
-			// Go up the graph until it hits the root or maximum distance away from a leaf
-			while (distanceFromLeaf <= maxDistanceFromLeaf && node.index > 0) {
-				distanceFromLeaf++;
-				node = tree.nodes.get(node.parent);
-				// if the current node has a weight of zero then all its parents have to be zero also.
-				if (node.weight <= 0.0f)
-					break;
-				word.weights.add(info.descTermFreq.get(node.index));
-			}
+			// Add the image to the list of images which observed this leaf
+			((InvertedFile)tree.nodeData.get(node.dataIdx)).add(imageIdx);
 		}
 
 		// For each node which is in the descriptor, increment its image count
@@ -210,22 +190,22 @@ public class RecognitionVocabularyTreeNister2006<Point> {
 				if (node.weight <= 0.0f)
 					break;
 
-				// Look up the value of this word in the descriptor for the query
+				// Look up the value of this word in the image descriptor for the query
 				float imageWordWeight = queryDescTermFreq.get(node.index);
 
 				// Go through each leaf and compute the error for all related nodes
-				for (int i = 0; i < invertedFile.images.size(); i++) {
+				for (int i = 0; i < invertedFile.size(); i++) {
 					// Get the list of images in the database which have this particular word using
 					// the inverted file list
-					ImageWord w = invertedFile.images.get(i);
+					ImageInfo image = imagesDB.get(invertedFile.get(i));
 
 					// The match stores how well this particular images matches the target as well as book keeping info
-					int identification = w.image.identification;
+					int identification = image.identification;
 					Match m;
 					if (!identification_to_match.containsKey(identification)) {
 						identification_to_match.put(identification, matchScores.size);
 						m = matchScores.grow();
-						m.image = w.image;
+						m.image = image;
 					} else {
 						m = matchScores.get(identification_to_match.get(identification));
 						// If this node has already been examined skip it
@@ -237,8 +217,7 @@ public class RecognitionVocabularyTreeNister2006<Point> {
 					m.traversed.add(node.index);
 
 					// Update the score computation. See BLAH []
-					m.commonWords.grow().setTo(node.index,
-							imageWordWeight, w.weights.get(distanceFromLeaf));
+					m.commonWords.grow().setTo(node.index, imageWordWeight, image.descTermFreq.get(node.index));
 				}
 
 				// move to the parent node
@@ -430,28 +409,14 @@ public class RecognitionVocabularyTreeNister2006<Point> {
 		}
 	}
 
-	public static class ImageWord {
-		// Contains the weight for the words in the descriptor starting the leaf and going up
-		public DogArray_F32 weights = new DogArray_F32(0);
-		// Which image this word belongs to
-		public ImageInfo image;
-
-		public void reset() {
-			image = null;
-			weights.reset();
+	/**
+	 * The inverted file is a list of images that were observed in a particular node. Images are
+	 * referenced by array index.
+	 */
+	public static class InvertedFile extends DogArray_I32 {
+		public InvertedFile(){
+			super(1);
 		}
-
-		public void setTo( DogArray_F32 weights, ImageInfo image ) {
-			this.weights.setTo(weights);
-			this.image = image;
-		}
-	}
-
-	public static class InvertedFile {
-		/** Specifies which image is in this leaf and the weight of the word in the descriptor */
-		public DogArray<ImageWord> images = new DogArray<ImageWord>(ImageWord::new, ImageWord::reset);
-		// The depth of the leaf node
-		public int depth;
 	}
 
 	/** Different built in distance norms. */
