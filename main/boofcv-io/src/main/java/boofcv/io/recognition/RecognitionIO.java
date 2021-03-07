@@ -394,6 +394,7 @@ public class RecognitionIO {
 				}
 			}
 
+
 			dout.writeUTF("BEGIN_LEAF_INFO");
 
 			// need to create a look up table from image ID to index
@@ -405,16 +406,9 @@ public class RecognitionIO {
 
 			for (int infoIdx = 0; infoIdx < tree.nodeData.size(); infoIdx++) {
 				InvertedFile leaf = (InvertedFile)tree.nodeData.get(infoIdx);
-				// Save the map as an array. elements are imageID -> dbIdx
-				dout.writeInt(leaf.images.size());
-				keys.resize(leaf.images.size());
-				for (int i = 0; i < leaf.images.size; i++) {
-					RecognitionVocabularyTreeNister2006.ImageWord w = leaf.images.get(i);
-					dout.writeInt(w.weights.size);
-					for (int weightIdx = 0; weightIdx < w.weights.size; weightIdx++) {
-						dout.writeFloat(w.weights.get(weightIdx));
-					}
-					dout.writeInt(id_to_idx.get(w.image.identification));
+				dout.writeInt(leaf.size());
+				for (int i = 0; i < leaf.size; i++) {
+					dout.writeInt(leaf.get(i));
 				}
 			}
 
@@ -477,13 +471,9 @@ public class RecognitionIO {
 				var leaf = new InvertedFile();
 				db.tree.nodeData.add(leaf);
 				int N = input.readInt();
-				for (int i = 0; i < N; i++) {
-					RecognitionVocabularyTreeNister2006.ImageWord word = leaf.images.grow();
-					word.weights.resize(input.readInt());
-					for (int weightIdx = 0; weightIdx < word.weights.size; weightIdx++) {
-						word.weights.set(weightIdx, input.readFloat());
-					}
-					word.image = imagesDB.get(input.readInt());
+				leaf.resize(N);
+				for (int arrayIdx = 0; arrayIdx < N; arrayIdx++) {
+					leaf.set(arrayIdx, input.readInt());
 				}
 			}
 
