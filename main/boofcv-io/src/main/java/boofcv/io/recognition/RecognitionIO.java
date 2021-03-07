@@ -231,9 +231,9 @@ public class RecognitionIO {
 						descriptions = (PackedArray)new PackedTupleBigArray_U8(dof);
 						tuple = (TD)new TupleDesc_S8(dof);
 					}
-					case "TupleDesc_B" -> { // TODO update to BigArray
+					case "TupleDesc_B" -> {
 						distanceFunction = (PointDistance)new TuplePointDistanceHamming();
-						descriptions = (PackedArray)new PackedTupleArray_B(dof);
+						descriptions = (PackedArray)new PackedTupleBigArray_B(dof);
 						tuple = (TD)new TupleDesc_B(dof);
 					}
 					default -> throw new IOException("Unknown point type. " + pointType);

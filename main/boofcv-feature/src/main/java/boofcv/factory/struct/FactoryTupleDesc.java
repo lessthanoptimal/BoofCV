@@ -61,8 +61,8 @@ public class FactoryTupleDesc {
 			return (PackedArray<TD>)new PackedTupleBigArray_F32(numElements);
 		else if (type == TupleDesc_U8.class)
 			return (PackedArray<TD>)new PackedTupleBigArray_U8(numElements);
-		else if (type == TupleDesc_B.class) // TODO create big array variant of this!
-			return (PackedArray<TD>)new PackedTupleArray_B(numElements);
+		else if (type == TupleDesc_B.class)
+			return (PackedArray<TD>)new PackedTupleBigArray_B(numElements);
 		else
 			throw new IllegalArgumentException("Unknown type "+type);
 	}
