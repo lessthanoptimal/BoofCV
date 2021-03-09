@@ -160,9 +160,10 @@ public class RecognitionVocabularyTreeNister2006<Point> {
 	 * {@link #getMatchScores()}.
 	 *
 	 * @param queryImage Set of feature descriptors from the query image
+	 * @oaran limit Maximum number of matches it will return.
 	 * @return The best matching image with score from the database
 	 */
-	public boolean query( List<Point> queryImage ) {
+	public boolean query( List<Point> queryImage, int limit ) {
 		identification_to_match.clear();
 		matchScores.reset();
 
@@ -191,21 +192,21 @@ public class RecognitionVocabularyTreeNister2006<Point> {
 					break;
 
 				// Look up the value of this word in the image descriptor for the query
-				float imageWordWeight = queryDescTermFreq.get(node.index);
+				float queryWordWeight = queryDescTermFreq.get(node.index);
 
 				// Go through each leaf and compute the error for all related nodes
 				for (int i = 0; i < invertedFile.size(); i++) {
 					// Get the list of images in the database which have this particular word using
 					// the inverted file list
-					ImageInfo image = imagesDB.get(invertedFile.get(i));
+					ImageInfo dbImage = imagesDB.get(invertedFile.get(i));
 
 					// The match stores how well this particular images matches the target as well as book keeping info
-					int identification = image.identification;
+					int identification = dbImage.identification;
 					Match m;
 					if (!identification_to_match.containsKey(identification)) {
 						identification_to_match.put(identification, matchScores.size);
 						m = matchScores.grow();
-						m.image = image;
+						m.image = dbImage;
 					} else {
 						m = matchScores.get(identification_to_match.get(identification));
 						// If this node has already been examined skip it
@@ -217,7 +218,7 @@ public class RecognitionVocabularyTreeNister2006<Point> {
 					m.traversed.add(node.index);
 
 					// Update the score computation. See TupleMapDistanceNorm for why this is done
-					m.commonWords.grow().setTo(node.index, imageWordWeight, image.descTermFreq.get(node.index));
+					m.commonWords.grow().setTo(node.index, queryWordWeight, dbImage.descTermFreq.get(node.index));
 				}
 
 				// move to the parent node
@@ -236,7 +237,10 @@ public class RecognitionVocabularyTreeNister2006<Point> {
 					queryDescTermFreq, m.image.descTermFreq, m.commonWords.toList());
 		}
 
+		// NOTE: quick select then Collections.sort on the remaining entries is about 1.3x to 2x faster, but it's not
+		//       a bottle neck. Sort time for 8000 elements is about 2.5 ms
 		Collections.sort(matchScores.toList());
+		matchScores.size = Math.min(matchScores.size,limit);
 
 		return true;
 	}

@@ -203,9 +203,12 @@ public class ImageRecognitionNister2006<Image extends ImageBase<Image>, TD exten
 		databaseN.addImage(imageIndex, imageFeatures.toList(), null);
 	}
 
-	@Override public boolean query( Image queryImage, int maxMatches, DogArray<Match> matches ) {
+	@Override public boolean query( Image queryImage, int limit, DogArray<Match> matches ) {
 		// Default is no matches
 		matches.resize(0);
+
+		// Handle the case where the limit is unlimited
+		limit = limit <= 0 ? Integer.MAX_VALUE : limit;
 
 		// Detect image features then copy features into an array
 		detector.detect(queryImage);
@@ -215,7 +218,7 @@ public class ImageRecognitionNister2006<Image extends ImageBase<Image>, TD exten
 		}
 
 		// Look up the closest matches
-		if (!databaseN.query(imageFeatures.toList()))
+		if (!databaseN.query(imageFeatures.toList(), limit))
 			return false;
 
 		DogArray<RecognitionVocabularyTreeNister2006.Match> found = databaseN.getMatchScores();
@@ -223,9 +226,8 @@ public class ImageRecognitionNister2006<Image extends ImageBase<Image>, TD exten
 		if (verbose != null) verbose.println("matches.size=" + found.size + " best.error=" + found.get(0).error);
 
 		// Copy results into output format
-		int count = maxMatches <= 0 ? found.size : Math.min(maxMatches, found.size);
-		matches.resize(count);
-		for (int i = 0; i < count; i++) {
+		matches.resize(found.size);
+		for (int i = 0; i < matches.size; i++) {
 			RecognitionVocabularyTreeNister2006.Match f = found.get(i);
 			matches.get(i).id = imageIds.get(f.image.identification);
 			matches.get(i).error = f.error;
