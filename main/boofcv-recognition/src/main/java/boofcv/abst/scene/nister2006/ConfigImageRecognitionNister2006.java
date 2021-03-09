@@ -20,6 +20,7 @@ package boofcv.abst.scene.nister2006;
 
 import boofcv.alg.scene.nister2006.RecognitionVocabularyTreeNister2006.DistanceTypes;
 import boofcv.alg.scene.vocabtree.ConfigHierarchicalVocabularyTree;
+import boofcv.factory.feature.describe.ConfigConvertTupleDesc;
 import boofcv.factory.feature.describe.ConfigDescribeRegionPoint;
 import boofcv.factory.feature.detdesc.ConfigDetectDescribe;
 import boofcv.factory.feature.detect.interest.ConfigDetectInterestPoint;
@@ -34,6 +35,14 @@ import org.ddogleg.clustering.ConfigKMeans;
  */
 public class ConfigImageRecognitionNister2006 implements Configuration {
 
+	/**
+	 * Images are rescaled so that they have at most this number of pixels. To turn off set to a value &le; 0.
+	 * Many of feature related tuning parameters have an implicit assumption about image resolution.
+	 * Processing a much higher resolution image could require changing many other parameters for optimal
+	 * performance.
+	 */
+	public int maxImagePixels = 640*480;
+
 	/** Clustering algorithm used when learning the hierarchical tree */
 	public ConfigKMeans kmeans = new ConfigKMeans();
 
@@ -47,10 +56,11 @@ public class ConfigImageRecognitionNister2006 implements Configuration {
 	public DistanceTypes distanceNorm = DistanceTypes.L2;
 
 	/**
-	 * Nodes more than this distance from a leaf node will not be considered in descriptor. Not considering
-	 * every node speeds up the computations and slightly improves the quality.
+	 * Critical tuning parameter for performance. Typically, better retrieval is found when this considers all
+	 * nodes (i.e. Integer.MAX_VALUE). However, in that case a simple query might end up needing to consider
+	 * almost the entire dataset. For the default tree structure the default value is a reasonable compromise.
 	 */
-	public int maxDistanceFromLeaf = 0;
+	public int maxDistanceFromLeaf = 2;
 
 	// TODO make entropy weighting configurable
 
@@ -72,6 +82,14 @@ public class ConfigImageRecognitionNister2006 implements Configuration {
 		// Let's use SURF-FAST by default
 		features.typeDescribe = ConfigDescribeRegionPoint.DescriptorType.SURF_STABLE;
 		features.typeDetector = ConfigDetectInterestPoint.DetectorType.FAST_HESSIAN;
+		// reduces number of features with less sensitivity than hard limits on the number
+		features.detectFastHessian.extract.radius = 6;
+		// Performance can be improved slightly by setting this to zero. This removed an implicit assumption about
+		// the amount of contrast in the image
+		features.detectFastHessian.extract.threshold = 0;
+
+		// Reduce memory usage with very little loss in accuracy
+		features.convertDescriptor.outputData = ConfigConvertTupleDesc.DataType.F32;
 	}
 
 	@Override public void checkValidity() {
@@ -83,6 +101,7 @@ public class ConfigImageRecognitionNister2006 implements Configuration {
 	}
 
 	public void setTo( ConfigImageRecognitionNister2006 src ) {
+		this.maxImagePixels = src.maxImagePixels;
 		this.kmeans.setTo(src.kmeans);
 		this.tree.setTo(src.tree);
 		this.features.setTo(src.features);

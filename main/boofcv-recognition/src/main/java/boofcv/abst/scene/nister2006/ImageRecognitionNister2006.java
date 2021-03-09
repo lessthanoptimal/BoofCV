@@ -27,6 +27,7 @@ import boofcv.alg.scene.vocabtree.LearnHierarchicalTree;
 import boofcv.factory.feature.detdesc.FactoryDetectDescribe;
 import boofcv.factory.struct.FactoryTupleDesc;
 import boofcv.misc.BoofLambdas;
+import boofcv.misc.FactoryFilterLambdas;
 import boofcv.struct.PackedArray;
 import boofcv.struct.feature.TupleDesc;
 import boofcv.struct.image.ImageBase;
@@ -80,6 +81,9 @@ public class ImageRecognitionNister2006<Image extends ImageBase<Image>, TD exten
 	// If not null then print verbose information
 	PrintStream verbose;
 
+	// Used to ensure the image is at the expected scale
+	BoofLambdas.Transform<Image> downSample;
+
 	// Internal Profiling. All times in milliseconds
 	@Getter long timeLearnDescribeMS;
 	@Getter long timeLearnClusterMS;
@@ -94,6 +98,8 @@ public class ImageRecognitionNister2006<Image extends ImageBase<Image>, TD exten
 
 		databaseN.setDistanceType(config.distanceNorm);
 		databaseN.maxDistanceFromLeaf = config.maxDistanceFromLeaf;
+
+		downSample = FactoryFilterLambdas.createDownSampleFilter(config.maxImagePixels, imageType);
 	}
 
 	public void setDatabase( RecognitionVocabularyTreeNister2006<TD> db ) {
@@ -113,14 +119,14 @@ public class ImageRecognitionNister2006<Image extends ImageBase<Image>, TD exten
 		long time0 = System.currentTimeMillis();
 		while (images.hasNext()) {
 			startIndex.add(packedFeatures.size());
-			detector.detect(images.next());
+			detector.detect(downSample.process(images.next()));
 			int N = detector.getNumberOfFeatures();
 			packedFeatures.reserve(N);
 			for (int i = 0; i < N; i++) {
 				packedFeatures.append(detector.getDescription(i));
 			}
 			if (verbose != null)
-				verbose.println("described.size=" + startIndex.size + " features="+N+" packed.size=" + packedFeatures.size());
+				verbose.println("described.size=" + startIndex.size + " features=" + N + " packed.size=" + packedFeatures.size());
 		}
 		startIndex.add(packedFeatures.size());
 		if (verbose != null) verbose.println("packedFeatures.size=" + packedFeatures.size());
@@ -186,7 +192,7 @@ public class ImageRecognitionNister2006<Image extends ImageBase<Image>, TD exten
 
 	@Override public void addImage( String id, Image image ) {
 		// Copy image features into an array
-		detector.detect(image);
+		detector.detect(downSample.process(image));
 		imageFeatures.resize(detector.getNumberOfFeatures());
 		for (int i = 0; i < imageFeatures.size; i++) {
 			imageFeatures.get(i).setTo(detector.getDescription(i));
@@ -211,7 +217,7 @@ public class ImageRecognitionNister2006<Image extends ImageBase<Image>, TD exten
 		limit = limit <= 0 ? Integer.MAX_VALUE : limit;
 
 		// Detect image features then copy features into an array
-		detector.detect(queryImage);
+		detector.detect(downSample.process(queryImage));
 		imageFeatures.resize(detector.getNumberOfFeatures());
 		for (int i = 0; i < imageFeatures.size; i++) {
 			imageFeatures.get(i).setTo(detector.getDescription(i));
