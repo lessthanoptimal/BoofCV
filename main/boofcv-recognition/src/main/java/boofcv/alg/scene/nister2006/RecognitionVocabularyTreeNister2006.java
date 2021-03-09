@@ -216,7 +216,7 @@ public class RecognitionVocabularyTreeNister2006<Point> {
 					// Mark this node as being traversed so that it isn't double counted
 					m.traversed.add(node.index);
 
-					// Update the score computation. See BLAH []
+					// Update the score computation. See TupleMapDistanceNorm for why this is done
 					m.commonWords.grow().setTo(node.index, imageWordWeight, image.descTermFreq.get(node.index));
 				}
 
@@ -279,7 +279,7 @@ public class RecognitionVocabularyTreeNister2006<Point> {
 					f.node = node;
 					node_to_frequency.put(node.index, f);
 				}
-				f.sum += node.weight*count.count;
+				f.totalAppearances += count.count;
 
 				node = tree.nodes.get(node.parent);
 				distanceFromLeaf++;
@@ -291,15 +291,25 @@ public class RecognitionVocabularyTreeNister2006<Point> {
 			return;
 
 		// Create the descriptor and normalize it
+		double totalUniqueWordsSeenByImage = frequencies.size;
+		// NOTE: I'm not 100% sure this is the divisor used in the paper, but doesn't really matter due to the
+		//       descriptor getting normalized.
+
 		for (int i = 0; i < frequencies.size; i++) {
 			Frequency f = frequencies.get(i);
-			descTermFreq.put(f.node.index, (float)f.sum);
+
+			// Term frequency: n[i] = number of times word[i] appears in this image / total words in this image
+			double termFrequency = f.totalAppearances/totalUniqueWordsSeenByImage;
+			// TF-IDF feature: d[i] = n[i] * node_weight[i]
+			double feature = termFrequency*f.node.weight;
+			descTermFreq.put(f.node.index, (float)feature);
 		}
 		distanceFunction.normalize(descTermFreq);
 	}
 
 	/**
-	 * Counts the number of times each leaf node is observed
+	 * Counts the number of times each leaf node is observed and stores the found leaves
+	 * in the sparse histogram.
 	 */
 	protected void computeLeafHistogram( List<Point> features, LeafHistogram histogram ) {
 		histogram.reset();
@@ -307,7 +317,10 @@ public class RecognitionVocabularyTreeNister2006<Point> {
 		for (int featsIdx = 0; featsIdx < features.size(); featsIdx++) {
 			int leafNodeIdx = tree.searchPathToLeaf(features.get(featsIdx), ( a ) -> {});
 
+			// See if this leaf has been observed before
 			LeafCounts counts = histogram.observed.get(leafNodeIdx);
+
+			// If it has not been seed before, add it to the set
 			if (counts == null) {
 				counts = histogram.leaves.grow();
 				counts.nodeIdx = leafNodeIdx;
@@ -348,9 +361,13 @@ public class RecognitionVocabularyTreeNister2006<Point> {
 		}
 	}
 
-	// TODO document
+	/**
+	 * Storage for counting the number of times each leaf is observed by an image
+	 */
 	protected static class LeafHistogram {
+		// leaf node-id to count data structure
 		public TIntObjectMap<LeafCounts> observed = new TIntObjectHashMap<>();
+		// array of all the leaves encountered for fast look up later on and for recycling memory
 		public DogArray<LeafCounts> leaves = new DogArray<>(LeafCounts::new, LeafCounts::reset);
 
 		public void reset() {
@@ -359,6 +376,9 @@ public class RecognitionVocabularyTreeNister2006<Point> {
 		}
 	}
 
+	/**
+	 * Number of times a specific node was observed by an image
+	 */
 	protected static class LeafCounts {
 		// Number of times the leaf was observed
 		public int count;
@@ -371,21 +391,23 @@ public class RecognitionVocabularyTreeNister2006<Point> {
 		}
 	}
 
-	// Used to sum the frequency of words (graph nodes) in the image
+	/**
+	 * Used to sum the frequency of words (graph nodes) in the image
+	 */
 	protected static class Frequency {
-		// sum of weights
-		double sum;
+		// Number of times this word/node appeared in this image
+		int totalAppearances;
 		// The node which is referenced
 		Node node;
 
 		public void reset() {
-			sum = 0;
+			totalAppearances = 0;
 			node = null;
 		}
 	}
 
 	/**
-	 * Match and score information.
+	 * Information on candidate match to a query image
 	 */
 	public static class Match implements Comparable<Match> {
 		/** Fit error. 0.0 = perfect. */
@@ -394,7 +416,7 @@ public class RecognitionVocabularyTreeNister2006<Point> {
 		public ImageInfo image;
 		/** Nodes in the tree that it has already traversed */
 		public final TIntSet traversed = new TIntHashSet();
-
+		/** All words which are common between image in DB and the query image */
 		public final DogArray<CommonWords> commonWords = new DogArray<>(CommonWords::new);
 
 		public void reset() {

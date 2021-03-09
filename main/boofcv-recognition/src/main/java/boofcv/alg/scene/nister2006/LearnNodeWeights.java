@@ -20,7 +20,7 @@ package boofcv.alg.scene.nister2006;
 
 import boofcv.alg.scene.vocabtree.HierarchicalVocabularyTree;
 import boofcv.alg.scene.vocabtree.HierarchicalVocabularyTree.Node;
-import boofcv.misc.BoofMiscOps;
+import boofcv.errors.BoofCheckFailure;
 import gnu.trove.iterator.TIntIterator;
 import gnu.trove.set.TIntSet;
 import gnu.trove.set.hash.TIntHashSet;
@@ -48,6 +48,12 @@ import java.util.List;
 public class LearnNodeWeights<Point> {
 	/** Tree which has been learned already but with unspecified weights */
 	protected @Getter HierarchicalVocabularyTree<Point> tree;
+
+	/**
+	 * Sanity check. If true it will make sure every node is observed by an image. This is true when the training
+	 * set and the set of images passed into this are the same.
+	 */
+	public boolean checkEveryNodeSeenOnce = true;
 
 	//---------------- Internal Workspace
 
@@ -105,8 +111,17 @@ public class LearnNodeWeights<Point> {
 			Node n = tree.nodes.get(i);
 			int totalImagesFoundInsideOf = numberOfImagesWithNode.get(n.index);
 
-			BoofMiscOps.checkTrue(totalImagesFoundInsideOf != 0, "Every node should have at least 1 image");
-			n.weight = Math.log(totalImages/(double)totalImagesFoundInsideOf);
+			if (totalImagesFoundInsideOf==0) {
+				// this can happen if the set of images used to train the graph is different from the images
+				// used to compute the weight. If that case we will set the weight to zero since it's
+				// never observed.
+				if (checkEveryNodeSeenOnce)
+					throw new BoofCheckFailure("Every node should have been seen by at least 1 image if feed the " +
+							"same images the tree was trained from.");
+				n.weight = 0;
+			} else {
+				n.weight = Math.log(totalImages/(double)totalImagesFoundInsideOf);
+			}
 		}
 	}
 }

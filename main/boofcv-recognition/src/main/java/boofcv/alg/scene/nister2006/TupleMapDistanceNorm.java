@@ -57,7 +57,7 @@ public interface TupleMapDistanceNorm {
 	enum Types {L1, L2}
 
 	/**
-	 * Set of works which are common between the two maps
+	 * Set of words which are common between the two maps
 	 */
 	class CommonWords {
 		// The key which is common
