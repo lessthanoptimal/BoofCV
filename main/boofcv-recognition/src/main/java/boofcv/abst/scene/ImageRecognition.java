@@ -55,12 +55,12 @@ public interface ImageRecognition<T extends ImageBase<T>> extends VerbosePrint {
 	 * Finds the best matches in the database to the query image.
 	 *
 	 * @param queryImage (Input) image being processed
-	 * @param maxMatches (Input) The maximum number of results it will return. If &le; 0 then all matches are returned.
+	 * @param limit (Input) The maximum number of results it will return. If &le; 0 then all matches are returned.
 	 * @param matches (Output) Set of matches found in best first order. List is always cleared
 	 * @return true if at least one valid match was found or false if no valid matches could be found. If false
 	 * that means matches is empty. This is strictly a convenience.
 	 */
-	boolean query( T queryImage, int maxMatches, DogArray<Match> matches );
+	boolean query( T queryImage, int limit, DogArray<Match> matches );
 
 	/**
 	 * The image data type which can be processed

@@ -53,7 +53,7 @@ class TestRecognitionVocabularyTreeNister2006 extends BoofStandardJUnit {
 
 		for (int i = 0; i < 5; i++) {
 			// The best match should be the input image since the exact same image is being passed in
-			assertTrue(alg.query(images.get(i)));
+			assertTrue(alg.query(images.get(i), Integer.MAX_VALUE));
 			Match best = alg.getMatchScores().get(0);
 
 			assertEquals(0.0, best.error, UtilEjml.TEST_F32);
