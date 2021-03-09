@@ -120,7 +120,7 @@ public class ImageRecognitionNister2006<Image extends ImageBase<Image>, TD exten
 				packedFeatures.append(detector.getDescription(i));
 			}
 			if (verbose != null)
-				verbose.println("described.size=" + startIndex.size + " packed.size=" + packedFeatures.size());
+				verbose.println("described.size=" + startIndex.size + " features="+N+" packed.size=" + packedFeatures.size());
 		}
 		startIndex.add(packedFeatures.size());
 		if (verbose != null) verbose.println("packedFeatures.size=" + packedFeatures.size());

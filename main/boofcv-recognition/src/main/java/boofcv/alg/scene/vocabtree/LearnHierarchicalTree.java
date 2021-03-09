@@ -85,7 +85,7 @@ public class LearnHierarchicalTree<Point> implements VerbosePrint {
 		tree.reset();
 		this.totalPoints = points.size();
 
-		// Abourt if it can't do anything
+		// Abort if it can't do anything
 		if (points.size() == 0) {
 			if (verbose != null) verbose.println("No points to process!");
 			return;
