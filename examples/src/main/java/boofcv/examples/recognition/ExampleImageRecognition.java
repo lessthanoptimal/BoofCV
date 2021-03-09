@@ -21,8 +21,6 @@ package boofcv.examples.recognition;
 import boofcv.abst.scene.ImageRecognition;
 import boofcv.abst.scene.nister2006.ConfigImageRecognitionNister2006;
 import boofcv.abst.scene.nister2006.ImageRecognitionNister2006;
-import boofcv.alg.scene.nister2006.RecognitionVocabularyTreeNister2006;
-import boofcv.factory.feature.describe.ConfigConvertTupleDesc;
 import boofcv.gui.ListDisplayPanel;
 import boofcv.gui.image.ScaleOptions;
 import boofcv.gui.image.ShowImages;
@@ -31,7 +29,6 @@ import boofcv.io.image.ImageFileListIterator;
 import boofcv.io.image.UtilImageIO;
 import boofcv.io.recognition.RecognitionIO;
 import boofcv.misc.BoofMiscOps;
-import boofcv.misc.FactoryFilterLambdas;
 import boofcv.struct.image.GrayU8;
 import boofcv.struct.image.ImageType;
 import org.apache.commons.io.FilenameUtils;
@@ -52,14 +49,11 @@ public class ExampleImageRecognition {
 		List<String> images = UtilIO.listByPrefix(imagePath, null, ".jpg");
 		Collections.sort(images);
 
-		int maxResolution = 1024*768;
-
 		ImageRecognitionNister2006<GrayU8, ?> recognizer;
 
 		File saveDirectory = new File("nister2006");
 
 		var imageIterator = new ImageFileListIterator<>(images, ImageType.SB_U8);
-		imageIterator.setFilter(FactoryFilterLambdas.createDownSampleFilter(maxResolution, ImageType.SB_U8));
 
 		if (saveDirectory.exists()) {
 			System.out.println("Loading previously generated model");
@@ -67,12 +61,6 @@ public class ExampleImageRecognition {
 		} else {
 			// Learn how to describe images
 			var config = new ConfigImageRecognitionNister2006();
-//		config.tree.branchFactor = 4;
-//		config.tree.maximumLevel = 4;
-			config.features.detectFastHessian.extract.radius = 3;
-//		config.features.detectFastHessian.extract.threshold = 0.0f;
-			config.features.convertDescriptor.outputData = ConfigConvertTupleDesc.DataType.F32;
-			config.distanceNorm = RecognitionVocabularyTreeNister2006.DistanceTypes.L2;
 
 			recognizer = new ImageRecognitionNister2006<>(config, ImageType.SB_U8);
 			recognizer.setVerbose(System.out, null);

@@ -37,8 +37,9 @@ Version : 0.38
 - Image Recognition
   * Added: Nister, Stewenius, "Scalable recognition with a vocabulary tree", CVPR 2006
       TODO Make weight optional
-      TODO get image lookup < 100ms
+      TODO Optimize query. It's much slower than IPOL
       TODO Optimize ComputeMedianTuple_B by unrolling bit checks
+      TODO Find best tuning parameters through a study. Document in a design doc. ukbench and inria
 - TODO Loop Closure
 - TODO Generic calibration target for multi cameras
   * QR Code for first version

@@ -30,20 +30,27 @@ import boofcv.struct.image.ImageType;
 public class FactoryFilterLambdas {
 	/**
 	 * Creates a filter which seeks to scale an image down to the specified pixel count. If
-	 * the image is larger then nothing is done. Uses {@link AverageDownSampleOps} to scale the image.
+	 * the image is larger then the original image is returned. Uses {@link AverageDownSampleOps} to scale the image.
+	 *
+	 * @param maxImagePixels If the image has more pixels than this it will be scaled down. Set to a value &le; 0
+	 * to disable this function;
 	 */
 	public static<T extends ImageBase<T>> BoofLambdas.Transform<T>
-	createDownSampleFilter(int targetPixelCount, ImageType<T> imageType) {
+	createDownSampleFilter(int maxImagePixels, ImageType<T> imageType) {
+		// if disabled return a function that does nothing
+		if (maxImagePixels<=0)
+			return (img)->img;
+
+		// Scale down and use this workspace to scale in
 		T scaled = imageType.createImage(1,1);
 		return (full)->{
-			double scale = Math.sqrt(targetPixelCount)/Math.sqrt(full.width*full.height);
+			double scale = Math.sqrt(maxImagePixels)/Math.sqrt(full.width*full.height);
 			if (scale < 1.0) {
 				scaled.reshape((int)(scale*full.width), (int)(scale*full.height));
 				AverageDownSampleOps.down(full, scaled);
-			} else {
-				scaled.setTo(full);
+				return scaled;
 			}
-			return scaled;
+			return full;
 		};
 	}
 }
