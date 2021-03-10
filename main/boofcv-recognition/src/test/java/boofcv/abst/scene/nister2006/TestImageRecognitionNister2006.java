@@ -20,6 +20,7 @@ package boofcv.abst.scene.nister2006;
 
 import boofcv.abst.scene.GenericImageRecognitionChecks;
 import boofcv.abst.scene.ImageRecognition;
+import boofcv.factory.feature.describe.ConfigConvertTupleDesc;
 import boofcv.factory.feature.describe.ConfigDescribeRegionPoint;
 import boofcv.struct.image.GrayU8;
 import boofcv.struct.image.ImageType;
@@ -58,11 +59,12 @@ class TestImageRecognitionNister2006 extends BoofStandardJUnit {
 
 		@Override protected ImageRecognition<GrayU8> createAlg() {
 			var config = new ConfigImageRecognitionNister2006();
-			config.tree.branchFactor = 3;
+			config.tree.branchFactor = 5;
 			config.tree.maximumLevel = 3;
 			config.features.typeDescribe = ConfigDescribeRegionPoint.DescriptorType.BRIEF;
 			config.features.describeBrief.fixed = false;
-			config.features.detectFastHessian.extract.radius = 6;
+			config.features.detectFastHessian.extract.radius = 12;
+			config.features.convertDescriptor.outputData = ConfigConvertTupleDesc.DataType.NATIVE;
 			return new ImageRecognitionNister2006<>(config, imageType);
 		}
 	}

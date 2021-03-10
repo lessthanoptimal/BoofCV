@@ -19,10 +19,7 @@
 package boofcv.alg.scene.nister2006;
 
 import boofcv.misc.BoofMiscOps;
-import gnu.trove.map.TIntFloatMap;
-import gnu.trove.set.TIntSet;
-import gnu.trove.set.hash.TIntHashSet;
-import org.ddogleg.struct.DogArray_I32;
+import org.ddogleg.struct.DogArray_F32;
 
 import java.util.List;
 
@@ -36,19 +33,12 @@ public interface TupleMapDistanceNorm {
 	/**
 	 * Normalizes the descriptor. Computes the norm then divides each element by the norm.
 	 */
-	void normalize( TIntFloatMap descriptor );
+	void normalize( DogArray_F32 weights );
 
 	/**
-	 * Computes the distance between these two descriptors. Default values for the map must be zero
+	 * TODO update description citing what type of norms this works with only
 	 */
-	float distance( TIntFloatMap descA, TIntFloatMap descB );
-
-	/**
-	 * Computes the distance between these two descriptors given the common keys and values.
-	 * This produces the same output as {@link #distance(TIntFloatMap, TIntFloatMap)}, but can
-	 * potentially be substantially faster since common elements are known.
-	 */
-	float distance( TIntFloatMap descA, TIntFloatMap descB, List<CommonWords> common );
+	float distance( List<CommonWords> common );
 
 	/** Create a new instance that is thread safe, i.e. read only settings can be shared */
 	TupleMapDistanceNorm newInstanceThread();
@@ -73,83 +63,54 @@ public interface TupleMapDistanceNorm {
 			setTo(key, valueA, valueB);
 		}
 
-		public void setTo( int key, float valueA, float valueB) {
+		public void setTo( int key, float valueA, float valueB ) {
 			this.key = key;
 			this.valueA = valueA;
 			this.valueB = valueB;
 		}
 	}
 
-	/**
-	 * Base class for norms which need to know which keys are common between the two
-	 */
-	abstract class CommonKeys implements TupleMapDistanceNorm {
-		// Temporary storage for keys in a map
-		final DogArray_I32 keys = new DogArray_I32();
-		// Storage for keys which are common between the two descriptors
-		final TIntSet commonKeys = new TIntHashSet();
-
-		/**
-		 * Finds common keys between the two descriptors
-		 */
-		protected void findCommonKeys( TIntFloatMap descA, TIntFloatMap descB, TIntSet commonKeys) {
-			commonKeys.clear();
-
-			// Add keys from descA
-			keys.resize(descA.size());
-			descA.keys(keys.data);
-			for (int i = 0; i < keys.size; i++) {
-				commonKeys.add(keys.get(i));
-			}
-
-			// Add keys from descB
-			keys.resize(descB.size());
-			descB.keys(keys.data);
-			for (int i = 0; i < keys.size; i++) {
-				commonKeys.add(keys.get(i));
-			}
-		}
-	}
-
-	class L1 extends CommonKeys {
-		@Override public void normalize( TIntFloatMap descriptor ) {
-			keys.resize(descriptor.size());
-			descriptor.keys(keys.data);
+	class L1 implements TupleMapDistanceNorm {
+		@Override public void normalize( DogArray_F32 weights ) {
 			float norm = 0;
-			for (int i = 0; i < keys.size; i++) {
-				norm += descriptor.get(keys.data[i]);
+			for (int i = 0; i < weights.size; i++) {
+				norm += weights.get(i);
 			}
 			BoofMiscOps.checkTrue(norm != 0.0f, "Norm value is zero. Something went very wrong");
 
-			float _norm = norm;
-			descriptor.transformValues((v)->v/_norm);
+			for (int i = 0; i < weights.size; i++) {
+				weights.data[i] /= norm;
+			}
 		}
 
-		@Override public float distance( TIntFloatMap descA, TIntFloatMap descB ) {
-			// Find the set of common keys between the two descriptors
-			findCommonKeys(descA, descB, commonKeys);
+//		@Override public float distance( TIntFloatMap descA, TIntFloatMap descB ) {
+//			// Look up the common keys
+//			keys.resize(descA.size());
+//			descA.keys(keys.data);
+//
+//			// L1-norm is the sum of the difference magnitude of each element
+//			float sum = 2.0f;
+//			for (int keyIdx = 0; keyIdx < keys.size; keyIdx++) {
+//				int key = keys.data[keyIdx];
+//
+//				// takes advantage of default value being 0.0f
+//				float valueA = descA.get(key);
+//				float valueB = descB.get(key);
+//				sum += Math.abs(valueA - valueB) - valueA - valueB;
+//			}
+//
+//			return sum;
+//		}
 
-			// Look up the common keys
-			keys.resize(commonKeys.size());
-			commonKeys.toArray(keys.data);
+		@Override public float distance( List<CommonWords> common ) {
+			float sum = 2.0f;
 
-			// L1-norm is the sum of the difference magnitude of each element
-			float sum = 0.0f;
-			for (int keyIdx = 0; keyIdx < keys.size; keyIdx++) {
-				int key = keys.data[keyIdx];
-
-				// takes advantage of default value being 0.0f
-				float valueA = descA.get(key);
-				float valueB = descB.get(key);
-				sum += Math.abs(valueA - valueB);
+			for (int i = 0; i < common.size(); i++) {
+				CommonWords c = common.get(i);
+				sum += Math.abs(c.valueA - c.valueB) - c.valueA - c.valueB;
 			}
 
 			return sum;
-		}
-
-		@Override public float distance( TIntFloatMap descA, TIntFloatMap descB, List<CommonWords> common ) {
-			// TODO optimize this
-			return distance(descA, descB);
 		}
 
 		@Override public TupleMapDistanceNorm newInstanceThread() {
@@ -158,40 +119,38 @@ public interface TupleMapDistanceNorm {
 	}
 
 	class L2 implements TupleMapDistanceNorm {
-		final DogArray_I32 keys = new DogArray_I32();
 
-		@Override public void normalize( TIntFloatMap descriptor ) {
-			keys.resize(descriptor.size());
-			descriptor.keys(keys.data);
+		@Override public void normalize( DogArray_F32 weights ) {
 			float norm = 0;
-			for (int i = 0; i < keys.size; i++) {
-				float value = descriptor.get(keys.data[i]);
+			for (int i = 0; i < weights.size; i++) {
+				float value = weights.data[i];
 				norm += value*value;
 			}
 			norm = (float)Math.sqrt(norm);
 			BoofMiscOps.checkTrue(norm != 0.0, "Sum of weights is zero. Something went very wrong");
 
-			float _norm = norm;
-			descriptor.transformValues((v)->v/_norm);
-		}
-
-		@Override public float distance( TIntFloatMap descA, TIntFloatMap descB ) {
-			keys.resize(descA.size());
-			descA.keys(keys.data);
-
-			float sum = 0.0f;
-
-			for (int i = 0; i < keys.size(); i++) {
-				int key = keys.get(i);
-				float valueA = descA.get(key);
-				float valueB = descB.get(key);
-				sum += valueA*valueB;
+			for (int i = 0; i < weights.size; i++) {
+				weights.data[i]/=norm;
 			}
-
-			return 2.0f*(1.0f - sum);
 		}
 
-		@Override public float distance( TIntFloatMap descA, TIntFloatMap descB, List<CommonWords> common ) {
+//		@Override public float distance( TIntFloatMap descA, TIntFloatMap descB ) {
+//			keys.resize(descA.size());
+//			descA.keys(keys.data);
+//
+//			float sum = 0.0f;
+//
+//			for (int i = 0; i < keys.size(); i++) {
+//				int key = keys.get(i);
+//				float valueA = descA.get(key);
+//				float valueB = descB.get(key);
+//				sum += valueA*valueB;
+//			}
+//
+//			return 2.0f*(1.0f - sum);
+//		}
+
+		@Override public float distance( List<CommonWords> common ) {
 			float sum = 0.0f;
 
 			for (int i = 0; i < common.size(); i++) {

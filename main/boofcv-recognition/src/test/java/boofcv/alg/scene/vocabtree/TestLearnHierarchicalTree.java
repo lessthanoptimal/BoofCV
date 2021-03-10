@@ -109,7 +109,6 @@ class TestLearnHierarchicalTree extends BoofStandardJUnit {
 		sanityCheckNodes(tree);
 		assertEquals(121, tree.nodes.size);
 		assertEquals(120, tree.descriptions.size());
-		assertEquals(0, tree.nodeData.size());
 
 		assertEquals( (int)Math.pow(tree.branchFactor, tree.maximumLevel), countLeaves(tree));
 	}
@@ -148,7 +147,6 @@ class TestLearnHierarchicalTree extends BoofStandardJUnit {
 		assertTrue(100 < tree.nodes.size);
 		// The root node has no description, hence the -1
 		assertEquals(tree.descriptions.size(), tree.nodes.size - 1);
-		assertEquals(0, tree.nodeData.size());
 	}
 
 	private void sanityCheckNodes( HierarchicalVocabularyTree<Point2D_F64> tree ) {

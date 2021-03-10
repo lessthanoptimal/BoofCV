@@ -19,7 +19,7 @@
 package boofcv.alg.scene.nister2006;
 
 import boofcv.testing.BoofStandardJUnit;
-import gnu.trove.map.TIntFloatMap;
+import org.ddogleg.struct.DogArray_F32;
 import org.junit.jupiter.api.Nested;
 
 /**
@@ -30,22 +30,13 @@ class TestTupleMapDistanceNorm extends BoofStandardJUnit {
 	/**
 	 * Common function for computing most norms
 	 */
-	public static float computeError( TIntFloatMap descA, TIntFloatMap descB,
+	public static float computeError( DogArray_F32 descA, DogArray_F32 descB,
 									  Operator2 op ) {
 		float sum = 0.0f;
 
-		for (int key : descA.keys()) {
-			float valA = descA.get(key);
-			float valB = descB.containsKey(key) ? descB.get(key) : 0.0f;
-			sum += op.process(valA, valB);
-		}
-
-		for (int key : descB.keys()) {
-			// see if it has already been processed
-			if (descA.containsKey(key))
-				continue;
-			float valA = 0.0f;
-			float valB = descB.get(key);
+		for (int i = 0; i < descA.size; i++) {
+			float valA = descA.get(i);
+			float valB = descB.get(i);
 			sum += op.process(valA, valB);
 		}
 
@@ -55,12 +46,11 @@ class TestTupleMapDistanceNorm extends BoofStandardJUnit {
 	/**
 	 * Common function for computing most norms
 	 */
-	public static float computeNorm( TIntFloatMap descA, Operator1 op, Operator1 post ) {
+	public static float computeNorm( DogArray_F32 descA, Operator1 op, Operator1 post ) {
 		float sum = 0.0f;
 
-		for (int key : descA.keys()) {
-			float valA = descA.get(key);
-			sum += op.process(valA);
+		for (int i = 0; i < descA.size; i++) {
+			sum += op.process(descA.get(i));
 		}
 
 		return post.process(sum);
@@ -72,11 +62,11 @@ class TestTupleMapDistanceNorm extends BoofStandardJUnit {
 			return new TupleMapDistanceNorm.L1();
 		}
 
-		@Override public float computeError( TIntFloatMap descA, TIntFloatMap descB ) {
+		@Override public float computeError( DogArray_F32 descA, DogArray_F32 descB ) {
 			return TestTupleMapDistanceNorm.computeError(descA, descB, ( a, b ) -> Math.abs(a - b));
 		}
 
-		@Override public float computeNorm( TIntFloatMap desc ) {
+		@Override public float computeNorm( DogArray_F32 desc ) {
 			return TestTupleMapDistanceNorm.computeNorm(desc, Math::abs, ( a ) -> a);
 		}
 	}
@@ -87,11 +77,11 @@ class TestTupleMapDistanceNorm extends BoofStandardJUnit {
 			return new TupleMapDistanceNorm.L2();
 		}
 
-		@Override public float computeError( TIntFloatMap descA, TIntFloatMap descB ) {
+		@Override public float computeError( DogArray_F32 descA, DogArray_F32 descB ) {
 			return TestTupleMapDistanceNorm.computeError(descA, descB, ( a, b ) -> (a - b)*(a - b));
 		}
 
-		@Override public float computeNorm( TIntFloatMap desc ) {
+		@Override public float computeNorm( DogArray_F32 desc ) {
 			return TestTupleMapDistanceNorm.computeNorm(desc, ( a ) -> a*a, ( a ) -> (float)Math.sqrt(a));
 		}
 	}

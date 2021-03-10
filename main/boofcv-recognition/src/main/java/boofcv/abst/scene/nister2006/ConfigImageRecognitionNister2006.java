@@ -53,14 +53,17 @@ public class ConfigImageRecognitionNister2006 implements Configuration {
 	public ConfigDetectDescribe features = new ConfigDetectDescribe();
 
 	/** Specifies which norm to use. L1 should yield better results but is slower than L2 to compute. */
-	public DistanceTypes distanceNorm = DistanceTypes.L2;
+	public DistanceTypes distanceNorm = DistanceTypes.L1;
 
 	/**
-	 * Critical tuning parameter for performance. Typically, better retrieval is found when this considers all
-	 * nodes (i.e. Integer.MAX_VALUE). However, in that case a simple query might end up needing to consider
-	 * almost the entire dataset. For the default tree structure the default value is a reasonable compromise.
+	 * Critical tuning parameter for performance. A node can't be a "word" in the descriptor if it's this close
+	 * to the root node. Small values will prune less or no images in the database. As a result more images are
+	 * considered slowing everything down. However, if this is set too high then valid images are pruned and
+	 * recognition goes down.
+	 *
+	 * If set larger than tree.maximumLevel, then there are no valid nodes.
 	 */
-	public int maxDistanceFromLeaf = 2;
+	public int minimumDepthFromRoot = 0;
 
 	// TODO make entropy weighting configurable
 
@@ -82,18 +85,21 @@ public class ConfigImageRecognitionNister2006 implements Configuration {
 		// Let's use SURF-FAST by default
 		features.typeDescribe = ConfigDescribeRegionPoint.DescriptorType.SURF_STABLE;
 		features.typeDetector = ConfigDetectInterestPoint.DetectorType.FAST_HESSIAN;
-		// reduces number of features with less sensitivity than hard limits on the number
-		features.detectFastHessian.extract.radius = 6;
-		// Performance can be improved slightly by setting this to zero. This removed an implicit assumption about
-		// the amount of contrast in the image
 		features.detectFastHessian.extract.threshold = 0;
+		features.detectFastHessian.extract.radius = 2;
+		// You can get better retrieval with more features, but you start running into hard limits.
+		// With this value you can train on about 20,000 images with SURF before you blow past the limits
+		// of an integer length array. This can be fixed in code without much difficulty, but you are
+		// already using 8G of memory.
+		features.detectFastHessian.maxFeaturesAll = 1500;
+		features.detectFastHessian.maxFeaturesPerScale = 600;
 
 		// Reduce memory usage with very little loss in accuracy
 		features.convertDescriptor.outputData = ConfigConvertTupleDesc.DataType.F32;
 	}
 
 	@Override public void checkValidity() {
-		BoofMiscOps.checkTrue(maxDistanceFromLeaf >= 0, "Maximum level must be a non-negative integer");
+		BoofMiscOps.checkTrue(minimumDepthFromRoot >= 0, "Maximum level must be a non-negative integer");
 
 		kmeans.checkValidity();
 		tree.checkValidity();
@@ -106,7 +112,7 @@ public class ConfigImageRecognitionNister2006 implements Configuration {
 		this.tree.setTo(src.tree);
 		this.features.setTo(src.features);
 		this.distanceNorm = src.distanceNorm;
-		this.maxDistanceFromLeaf = src.maxDistanceFromLeaf;
+		this.minimumDepthFromRoot = src.minimumDepthFromRoot;
 		this.randSeed = src.randSeed;
 	}
 }

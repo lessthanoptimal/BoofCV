@@ -20,12 +20,12 @@ package boofcv.alg.scene.nister2006;
 
 import boofcv.alg.scene.nister2006.TupleMapDistanceNorm.CommonWords;
 import boofcv.testing.BoofStandardJUnit;
-import gnu.trove.map.TIntFloatMap;
-import gnu.trove.map.hash.TIntFloatHashMap;
+import org.ddogleg.struct.DogArray_F32;
 import org.ejml.UtilEjml;
 import org.junit.jupiter.api.Test;
 
 import java.util.ArrayList;
+import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
@@ -39,10 +39,10 @@ abstract class GenericTupleMapDistanceNormChecks extends BoofStandardJUnit {
 	public abstract TupleMapDistanceNorm createAlg();
 
 	/** Compute the error using a brute force approach that's easy to visually verify */
-	public abstract float computeError( TIntFloatMap descA, TIntFloatMap descB );
+	public abstract float computeError( DogArray_F32 descA, DogArray_F32 descB );
 
 	/** Compute the norm using a brute force approach that's easy to visually verify */
-	public abstract float computeNorm( TIntFloatMap desc );
+	public abstract float computeNorm( DogArray_F32 desc );
 
 	/**
 	 * Compare the normalization to the same method computed other ways
@@ -51,22 +51,21 @@ abstract class GenericTupleMapDistanceNormChecks extends BoofStandardJUnit {
 		TupleMapDistanceNorm alg = createAlg();
 
 		for (int i = 0; i < 20; i++) {
-			TIntFloatMap desc = new TIntFloatHashMap();
-			TIntFloatMap copy = new TIntFloatHashMap();
+			DogArray_F32 weights = new DogArray_F32();
+			DogArray_F32 copy = new DogArray_F32();
 
 			for (int j = 0; j < 5; j++) {
-				int key = rand.nextInt(10);
 				float value = rand.nextFloat();
-				desc.put(key, value);
-				copy.put(key, value);
+				weights.add(value);
+				copy.add(value);
 			}
 
-			float norm = computeNorm(desc);
+			float norm = computeNorm(weights);
 
-			alg.normalize(desc);
+			alg.normalize(weights);
 
-			for (int keys : desc.keys()) {
-				assertEquals(copy.get(keys)/norm, desc.get(keys), UtilEjml.TEST_F32);
+			for (int weightIdx = 0; weightIdx < weights.size; weightIdx++) {
+				assertEquals(copy.get(weightIdx)/norm, weights.get(weightIdx), UtilEjml.TEST_F32);
 			}
 		}
 	}
@@ -78,89 +77,41 @@ abstract class GenericTupleMapDistanceNormChecks extends BoofStandardJUnit {
 		TupleMapDistanceNorm alg = createAlg();
 
 		for (int i = 0; i < 20; i++) {
-			TIntFloatMap descA = new TIntFloatHashMap();
-			TIntFloatMap descB = new TIntFloatHashMap();
+			DogArray_F32 descA = new DogArray_F32();
+			DogArray_F32 descB = new DogArray_F32();
+			descA.resize(10);
+			descB.resize(10);
 
 			int uniqueA = rand.nextInt(3);
 			int uniqueB = rand.nextInt(3);
 
 			// these might be unique
 			for (int idx = 0; idx < uniqueA; idx++) {
-				descA.put(rand.nextInt(10), rand.nextFloat());
+				descA.set(rand.nextInt(10), rand.nextFloat());
 			}
 			for (int idx = 0; idx < uniqueB; idx++) {
-				descB.put(rand.nextInt(10), rand.nextFloat());
+				descB.set(rand.nextInt(10), rand.nextFloat());
 			}
 
 			// these will be common
 			for (int commonI = 0; commonI < 5; commonI++) {
-				descA.put(rand.nextInt(10), rand.nextFloat());
-				descB.put(rand.nextInt(10), rand.nextFloat());
+				int index = rand.nextInt(10);
+				descA.set(index, rand.nextFloat());
+				descB.set(index, rand.nextFloat());
 			}
 
 			// Need to normalize for distance functions to work correctly
 			alg.normalize(descA);
 			alg.normalize(descB);
 
-			assertEquals(computeError(descA, descB), alg.distance(descA, descB), UtilEjml.TEST_F32);
+			List<CommonWords> commonWords = new ArrayList<>();
+			for (int j = 0; j < 10; j++) {
+				if (descA.get(j) != 0 && descB.get(j) != 0)
+					commonWords.add(new CommonWords(j,descA.get(j),descB.get(j)));
+			}
+
+			assertEquals(computeError(descA, descB), alg.distance(commonWords), UtilEjml.TEST_F32);
 		}
-	}
-
-	/**
-	 * The two descriptors have no non-zero elements in common
-	 */
-	@Test void distance_NoOverLap() {
-		TupleMapDistanceNorm alg = createAlg();
-
-		TIntFloatMap descA = new TIntFloatHashMap();
-		TIntFloatMap descB = new TIntFloatHashMap();
-
-		descA.put(1, 1.0f);
-		descA.put(5, 2.0f);
-		descA.put(10, 1.0f);
-
-		descB.put(0, 1.0f);
-		descB.put(7, 2.0f);
-		descB.put(123, 1.0f);
-
-		// Need to normalize for distance functions to work correctly
-		alg.normalize(descA);
-		alg.normalize(descB);
-
-		assertEquals(computeError(descA, descB), alg.distance(descA, descB), UtilEjml.TEST_F32);
-		assertEquals(computeError(descA, descB), alg.distance(descA, descB, new ArrayList<>()), UtilEjml.TEST_F32);
-	}
-
-	/**
-	 * Makes sure the two distance functions return the same result
-	 */
-	@Test void distance_SameAnswer() {
-		TupleMapDistanceNorm alg = createAlg();
-
-		TIntFloatMap descA = new TIntFloatHashMap();
-		TIntFloatMap descB = new TIntFloatHashMap();
-
-		descA.put(1, 1.0f);
-		descA.put(5, 2.0f);
-		descA.put(10, 1.0f);
-		descA.put(72, 0.9f);
-
-		descB.put(1, 0.5f);
-		descB.put(2, 0.9f);
-		descB.put(5, 0.01f);
-		descB.put(10, 0.9f);
-
-		// Need to normalize for distance functions to work correctly
-		alg.normalize(descA);
-		alg.normalize(descB);
-
-		var common = new ArrayList<CommonWords>();
-		common.add(new CommonWords(1, descA.get(1), descB.get(1)));
-		common.add(new CommonWords(5, descA.get(5), descB.get(5)));
-		common.add(new CommonWords(10, descA.get(10), descB.get(10)));
-
-		assertEquals(alg.distance(descA, descB, common),
-				alg.distance(descA, descB), UtilEjml.TEST_F32);
 	}
 
 	/**
@@ -171,21 +122,21 @@ abstract class GenericTupleMapDistanceNormChecks extends BoofStandardJUnit {
 		TupleMapDistanceNorm alg1 = createAlg();
 		TupleMapDistanceNorm alg2 = alg1.newInstanceThread();
 
-		TIntFloatMap descA = new TIntFloatHashMap();
-		TIntFloatMap descB = new TIntFloatHashMap();
+		DogArray_F32 descA = new DogArray_F32();
+		DogArray_F32 descB = new DogArray_F32();
 
-		descA.put(1, 1.0f);
-		descA.put(5, 2.0f);
-		descA.put(10, 1.0f);
-
-		descB.put(0, 1.0f);
-		descB.put(7, 2.0f);
-		descB.put(123, 1.0f);
+		for (int j = 0; j < 20; j++) {
+			float value = rand.nextFloat();
+			descA.add(value);
+			descB.add(value);
+		}
 
 		// Need to normalize for distance functions to work correctly
 		alg1.normalize(descA);
-		alg1.normalize(descB);
+		alg2.normalize(descB);
 
-		assertEquals(alg1.distance(descA, descB), alg2.distance(descA, descB), UtilEjml.TEST_F32);
+		for (int i = 0; i < descA.size; i++) {
+			assertEquals(descA.get(i), descB.get(i), UtilEjml.TEST_F32);
+		}
 	}
 }

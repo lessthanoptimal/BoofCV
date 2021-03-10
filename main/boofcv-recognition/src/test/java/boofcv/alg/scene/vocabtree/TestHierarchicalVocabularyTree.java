@@ -51,7 +51,7 @@ public class TestHierarchicalVocabularyTree extends BoofStandardJUnit {
 		assertEquals(6, tree.addNode(2, 1, new Point2D_F64( 5,  1)));
 
 		// Compare results to manual
-		assertEquals(5, tree.searchPathToLeaf(new Point2D_F64(5, -0.9), found::add));
+		assertEquals(5, tree.searchPathToLeaf(new Point2D_F64(5, -0.9), (depth,node)->found.add(node)));
 
 		assertEquals(2, found.size());
 		assertEquals(0.0, tree.descriptions.getTemp(found.get(0).descIdx).distance(5,  0), UtilEjml.TEST_F64);
@@ -109,28 +109,6 @@ public class TestHierarchicalVocabularyTree extends BoofStandardJUnit {
 
 	}
 
-	@Test void addData() {
-		// create a simple graph
-		HierarchicalVocabularyTree<Point2D_F64> tree = createTree();
-		tree.branchFactor = 2;
-		tree.maximumLevel = 2;
-
-		tree.addNode(0, 0, new Point2D_F64(-5,  0));
-		tree.addNode(0, 1, new Point2D_F64( 5,  0));
-		tree.addNode(1, 0, new Point2D_F64(-5, -1));
-
-		// Verify there is no data at this node
-		assertEquals(-1, tree.nodes.get(2).dataIdx);
-
-		// Assign data to the node
-		tree.addData(tree.nodes.get(2), 1);
-
-		// Check data structures
-		assertEquals(1, tree.nodeData.size());
-		assertEquals(1, (int)tree.nodeData.get(0));
-		assertEquals(0, tree.nodes.get(2).dataIdx);
-	}
-
 	@Test void reset() {
 		HierarchicalVocabularyTree<Point2D_F64> tree = createTree();
 		tree.branchFactor = 2;
@@ -139,14 +117,12 @@ public class TestHierarchicalVocabularyTree extends BoofStandardJUnit {
 		tree.addNode(0, 0, new Point2D_F64(-5,  0));
 		tree.addNode(0, 1, new Point2D_F64( 5,  0));
 		tree.addNode(1, 0, new Point2D_F64(-5, -1));
-		tree.addData(tree.nodes.get(2), 1);
 
 		tree.reset();
 
 		// Verify everything is back to initial state and that settings have not been modified
 		assertEquals(1, tree.nodes.size);
 		assertEquals(0, tree.descriptions.size());
-		assertEquals(0, tree.nodeData.size());
 		assertEquals(2, tree.branchFactor);
 		assertEquals(2, tree.maximumLevel);
 	}

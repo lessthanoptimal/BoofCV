@@ -22,9 +22,8 @@ import boofcv.alg.scene.nister2006.RecognitionVocabularyTreeNister2006.Match;
 import boofcv.alg.scene.vocabtree.HierarchicalVocabularyTree;
 import boofcv.testing.BoofStandardJUnit;
 import georegression.struct.point.Point2D_F64;
-import gnu.trove.impl.Constants;
-import gnu.trove.map.TIntFloatMap;
-import gnu.trove.map.hash.TIntFloatHashMap;
+import org.ddogleg.struct.DogArray_F32;
+import org.ddogleg.struct.DogArray_I32;
 import org.ejml.UtilEjml;
 import org.junit.jupiter.api.Test;
 
@@ -35,6 +34,7 @@ import static boofcv.alg.scene.vocabtree.TestHierarchicalVocabularyTree.createTr
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+@SuppressWarnings("ConstantConditions")
 class TestRecognitionVocabularyTreeNister2006 extends BoofStandardJUnit {
 	/**
 	 * Simple tests with random images to see if they can be found without issue
@@ -48,7 +48,7 @@ class TestRecognitionVocabularyTreeNister2006 extends BoofStandardJUnit {
 		List<List<Point2D_F64>> images = new ArrayList<>();
 		for (int i = 0; i < 5; i++) {
 			images.add(createRandomImage());
-			alg.addImage(i, images.get(i), i);
+			alg.addImage(i, images.get(i));
 		}
 
 		for (int i = 0; i < 5; i++) {
@@ -57,9 +57,7 @@ class TestRecognitionVocabularyTreeNister2006 extends BoofStandardJUnit {
 			Match best = alg.getMatchScores().get(0);
 
 			assertEquals(0.0, best.error, UtilEjml.TEST_F32);
-			assertEquals(best.image.identification, i);
-			// check to see if the cookie was correctly assigned
-			assertEquals(i, (Integer)best.image.cookie);
+			assertEquals(best.identification, i);
 		}
 	}
 
@@ -67,7 +65,7 @@ class TestRecognitionVocabularyTreeNister2006 extends BoofStandardJUnit {
 	 * Creates a set of random features that are close to the means in the generated tree
 	 */
 	List<Point2D_F64> createRandomImage() {
-		List<Point2D_F64> ret = new ArrayList<>();
+		var ret = new ArrayList<Point2D_F64>();
 		for (int i = 0; i < 10; i++) {
 			Point2D_F64 p = new Point2D_F64();
 			p.x = rand.nextDouble()*12 - 6;
@@ -87,24 +85,23 @@ class TestRecognitionVocabularyTreeNister2006 extends BoofStandardJUnit {
 			imageFeatures.add(new Point2D_F64(5, -1));
 		}
 
-		var descTermFreq = new TIntFloatHashMap();
-		var leafHistogram = new RecognitionVocabularyTreeNister2006.LeafHistogram();
+		// TF-IDF descriptor
+		var descWeights = new DogArray_F32();
+		var descWords = new DogArray_I32();
 
 		var alg = new RecognitionVocabularyTreeNister2006<Point2D_F64>();
 		alg.initializeTree(tree);
-		alg.describe(imageFeatures, descTermFreq, leafHistogram);
-
-		assertTrue(leafHistogram.observed.containsKey(3));
-		assertTrue(leafHistogram.observed.containsKey(5));
+		alg.describe(imageFeatures, descWeights, descWords);
 
 		// See if the description is as expected
-		assertEquals(4, descTermFreq.size());
+		assertEquals(4, descWeights.size());
+		assertEquals(4, descWords.size());
 
 		// All the expected nodes should have values
-		float f1 = descTermFreq.get(1);
-		float f2 = descTermFreq.get(2);
-		float f3 = descTermFreq.get(3);
-		float f5 = descTermFreq.get(5);
+		float f1 = descWeights.get(descWords.indexOf(1));
+		float f2 = descWeights.get(descWords.indexOf(2));
+		float f3 = descWeights.get(descWords.indexOf(3));
+		float f5 = descWeights.get(descWords.indexOf(5));
 		assertTrue(f1 > 0 && f2 > 0 && f3 > 0 && f5 > 0);
 		assertTrue(f1 < f2);
 		assertTrue(f3 < f5);
@@ -131,49 +128,5 @@ class TestRecognitionVocabularyTreeNister2006 extends BoofStandardJUnit {
 			tree.nodes.get(i).weight = i*0.1;
 		}
 		return tree;
-	}
-
-	@Test void computeLeafHistogram() {
-		HierarchicalVocabularyTree<Point2D_F64> tree = create2x2Tree();
-		var alg = new RecognitionVocabularyTreeNister2006<Point2D_F64>();
-		alg.initializeTree(tree);
-
-		// Add two points which exactly match a leaf a known number of times
-		// this will define the histogram
-		List<Point2D_F64> features = new ArrayList<>();
-		// Node=3
-		for (int i = 0; i < 3; i++) {
-			features.add(new Point2D_F64(-5, -1));
-		}
-		// Node=6
-		for (int i = 0; i < 9; i++) {
-			features.add(new Point2D_F64(5, 1));
-		}
-
-		var found = new RecognitionVocabularyTreeNister2006.LeafHistogram();
-		alg.computeLeafHistogram(features, found);
-
-		assertEquals(2, found.leaves.size);
-		assertEquals(2, found.observed.size());
-
-		assertEquals(3, found.observed.get(3).count);
-		assertEquals(9, found.observed.get(6).count);
-	}
-
-	private TIntFloatMap sparseVector( float... values ) {
-		float total = 0.0f;
-		for (int i = 0; i < values.length; i++) {
-			total += values[i]*values[i];
-		}
-		total = (float)Math.sqrt(total);
-
-		var ret = new TIntFloatHashMap(Constants.DEFAULT_CAPACITY, Constants.DEFAULT_LOAD_FACTOR, -1, -1);
-		for (int i = 0; i < values.length; i++) {
-			if (values[i] == 0.0f)
-				continue;
-			ret.put(i, values[i]/total);
-		}
-
-		return ret;
 	}
 }
