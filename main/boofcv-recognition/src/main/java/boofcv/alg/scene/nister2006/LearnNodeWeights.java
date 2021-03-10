@@ -89,7 +89,7 @@ public class LearnNodeWeights<Point> {
 
 		// Mark nodes that descriptors pass through as being a member of this image
 		for (int descIdx = 0; descIdx < descriptors.size(); descIdx++) {
-			tree.searchPathToLeaf(descriptors.get(descIdx), ( node ) -> nodesInImage.add(node.index));
+			tree.searchPathToLeaf(descriptors.get(descIdx), ( depth, node ) -> nodesInImage.add(node.index));
 		}
 
 		// Number of times each leaf node in the graph is seen at least once in an image

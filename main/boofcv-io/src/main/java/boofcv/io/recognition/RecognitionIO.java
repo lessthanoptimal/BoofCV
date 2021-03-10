@@ -22,7 +22,6 @@ import boofcv.BoofVersion;
 import boofcv.abst.scene.nister2006.ConfigImageRecognitionNister2006;
 import boofcv.abst.scene.nister2006.ImageRecognitionNister2006;
 import boofcv.alg.scene.nister2006.RecognitionVocabularyTreeNister2006;
-import boofcv.alg.scene.nister2006.RecognitionVocabularyTreeNister2006.ImageInfo;
 import boofcv.alg.scene.nister2006.RecognitionVocabularyTreeNister2006.InvertedFile;
 import boofcv.alg.scene.vocabtree.HierarchicalVocabularyTree;
 import boofcv.io.UtilIO;
@@ -33,11 +32,8 @@ import boofcv.struct.image.ImageBase;
 import boofcv.struct.image.ImageType;
 import boofcv.struct.kmeans.TuplePointDistanceEuclideanSq;
 import boofcv.struct.kmeans.TuplePointDistanceHamming;
-import gnu.trove.map.TIntIntMap;
-import gnu.trove.map.hash.TIntIntHashMap;
 import org.ddogleg.clustering.PointDistance;
-import org.ddogleg.struct.DogArray;
-import org.ddogleg.struct.DogArray_I32;
+import org.ddogleg.struct.BigDogArray_I32;
 import org.jetbrains.annotations.Nullable;
 
 import java.io.*;
@@ -131,7 +127,6 @@ public class RecognitionIO {
 		header += "maximum_level " + tree.maximumLevel + "\n";
 		header += "nodes.size " + tree.nodes.size + "\n";
 		header += "descriptions.size " + tree.descriptions.size() + "\n";
-		header += "data.size " + tree.nodeData.size() + "\n";
 		header += "point_type " + tree.descriptions.getElementType().getSimpleName() + "\n";
 		header += "point_dof " + tree.descriptions.getTemp(0).size() + "\n";
 		header += "distance.name " + tree.distanceFunction.getClass().getName() + "\n";
@@ -146,7 +141,7 @@ public class RecognitionIO {
 				dout.writeInt(n.parent);
 				dout.writeInt(n.branch);
 				dout.writeInt(n.descIdx);
-				dout.writeInt(n.dataIdx);
+				dout.writeInt(n.userIdx);
 				dout.writeDouble(n.weight);
 				dout.writeInt(n.childrenIndexes.size);
 				for (int i = 0; i < n.childrenIndexes.size; i++) {
@@ -260,7 +255,7 @@ public class RecognitionIO {
 				n.parent = input.readInt();
 				n.branch = input.readInt();
 				n.descIdx = input.readInt();
-				n.dataIdx = input.readInt();
+				n.userIdx = input.readInt();
 				n.weight = input.readDouble();
 				n.childrenIndexes.resize(input.readInt());
 				for (int i = 0; i < n.childrenIndexes.size; i++) {
@@ -369,7 +364,6 @@ public class RecognitionIO {
 		header += "boofcv_version " + BoofVersion.VERSION + "\n";
 		header += "git_sha " + BoofVersion.GIT_SHA + "\n";
 		header += "images_db.size " + db.getImagesDB().size + "\n";
-		header += "leaf_data.size " + tree.nodeData.size() + "\n";
 		header += "BEGIN_TREE\n";
 
 		try {
@@ -380,35 +374,23 @@ public class RecognitionIO {
 
 			var dout = new DataOutputStream(out);
 			dout.writeUTF("BEGIN_IMAGE_DB");
-			var keys = new DogArray_I32();
-			DogArray<ImageInfo> imagesDB = db.getImagesDB();
-			for (int dbIdx = 0; dbIdx < imagesDB.size; dbIdx++) {
-				ImageInfo n = imagesDB.get(dbIdx);
-				dout.writeInt(n.identification);
-				dout.writeInt(n.descTermFreq.size());
-				keys.resize(n.descTermFreq.size());
-				n.descTermFreq.keys(keys.data);
-				for (int keyCnt = 0; keyCnt < keys.size; keyCnt++) {
-					dout.writeInt(keys.data[keyCnt]);
-					dout.writeFloat(n.descTermFreq.get(keys.data[keyCnt]));
+			BigDogArray_I32 imageDB = db.getImagesDB();
+			for (int dbIdx = 0; dbIdx < imageDB.size; dbIdx++) {
+				dout.writeInt(imageDB.get(dbIdx));
+			}
+
+			dout.writeUTF("BEGIN_INVERTED_FILES");
+			BoofMiscOps.checkEq(db.invertedFiles.size(), tree.nodes.size);
+			for (int nodeIdx = 0; nodeIdx < db.invertedFiles.size(); nodeIdx++) {
+				InvertedFile node = db.invertedFiles.get(nodeIdx);
+				BoofMiscOps.checkEq(node.size, node.weights.size);
+
+				dout.writeInt(node.size());
+				for (int i = 0; i < node.size; i++) {
+					dout.writeInt(node.get(i));
 				}
-			}
-
-
-			dout.writeUTF("BEGIN_LEAF_INFO");
-
-			// need to create a look up table from image ID to index
-			TIntIntMap id_to_idx = new TIntIntHashMap();
-			for (int dbIdx = 0; dbIdx < imagesDB.size; dbIdx++) {
-				ImageInfo n = imagesDB.get(dbIdx);
-				id_to_idx.put(n.identification, dbIdx);
-			}
-
-			for (int infoIdx = 0; infoIdx < tree.nodeData.size(); infoIdx++) {
-				InvertedFile leaf = (InvertedFile)tree.nodeData.get(infoIdx);
-				dout.writeInt(leaf.size());
-				for (int i = 0; i < leaf.size; i++) {
-					dout.writeInt(leaf.get(i));
+				for (int i = 0; i < node.weights.size; i++) {
+					dout.writeFloat(node.weights.get(i));
 				}
 			}
 
@@ -433,8 +415,7 @@ public class RecognitionIO {
 			if (!line.equals("BOOFCV_RECOGNITION_NISTER_2006"))
 				throw new IOException("Unexpected first line. line.length=" + line.length());
 
-			int listDataSize = 0;
-			DogArray<ImageInfo> imagesDB = db.getImagesDB();
+			BigDogArray_I32 imagesDB = db.getImagesDB();
 			while (true) {
 				line = UtilIO.readLine(in, builder);
 				if (line.startsWith("BEGIN_TREE"))
@@ -444,8 +425,6 @@ public class RecognitionIO {
 				String[] words = line.split("\\s");
 				if (words[0].equals("images_db.size")) {
 					imagesDB.resize(Integer.parseInt(words[1]));
-				} else if (words[0].equals("leaf_data.size")) {
-					listDataSize = Integer.parseInt(words[1]);
 				}
 			}
 
@@ -453,27 +432,23 @@ public class RecognitionIO {
 
 			var input = new DataInputStream(in);
 			readCheckUTF(input, "BEGIN_IMAGE_DB");
-
-			for (int dbIdx = 0; dbIdx < imagesDB.size; dbIdx++) {
-				ImageInfo n = imagesDB.get(dbIdx);
-				n.identification = input.readInt();
-				int N = input.readInt();
-				for (int i = 0; i < N; i++) {
-					int key = input.readInt();
-					float value = input.readFloat();
-					n.descTermFreq.put(key, value);
-				}
+			for (int i = 0; i < imagesDB.size; i++) {
+				imagesDB.set(i, input.readInt());
 			}
 
-			readCheckUTF(input, "BEGIN_LEAF_INFO");
-
-			for (int dataIdx = 0; dataIdx < listDataSize; dataIdx++) {
-				var leaf = new InvertedFile();
-				db.tree.nodeData.add(leaf);
-				int N = input.readInt();
-				leaf.resize(N);
-				for (int arrayIdx = 0; arrayIdx < N; arrayIdx++) {
-					leaf.set(arrayIdx, input.readInt());
+			readCheckUTF(input, "BEGIN_INVERTED_FILES");
+			db.invertedFiles.reset();
+			db.invertedFiles.resize(db.tree.nodes.size());
+			for (int nodeIdx = 0; nodeIdx < db.invertedFiles.size(); nodeIdx++) {
+				final InvertedFile node = db.invertedFiles.get(nodeIdx);
+				final int N = input.readInt();
+				node.resize(N);
+				node.weights.resize(N);
+				for (int i = 0; i < N; i++) {
+					node.set(i, input.readInt());
+				}
+				for (int i = 0; i < N; i++) {
+					node.weights.set(i, input.readFloat());
 				}
 			}
 

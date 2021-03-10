@@ -26,9 +26,6 @@ import org.ddogleg.struct.DogArray;
 import org.ddogleg.struct.DogArray_I32;
 import org.ddogleg.struct.FastArray;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import static boofcv.misc.BoofMiscOps.checkTrue;
 
 /**
@@ -45,9 +42,6 @@ public class HierarchicalVocabularyTree<Point> {
 
 	/** Maximum number of levels in the tree */
 	public int maximumLevel = -1;
-
-	/** User data associated with each node */
-	public final List<Object> nodeData = new ArrayList<>();
 
 	/** Computes distance between two points. Together with the 'mean' points, this defines the sub-regions */
 	public PointDistance<Point> distanceFunction;
@@ -97,7 +91,7 @@ public class HierarchicalVocabularyTree<Point> {
 	 * @param op Traversed nodes are passed to this function from level 0 to the leaf
 	 * @return index of the leaf node
 	 */
-	public int searchPathToLeaf( Point point, BoofLambdas.ProcessObject<Node> op ) {
+	public int searchPathToLeaf( Point point, BoofLambdas.ProcessIndex<Node> op ) {
 		Node parent = nodes.get(0);
 
 		if (parent.isLeaf()) {
@@ -125,7 +119,7 @@ public class HierarchicalVocabularyTree<Point> {
 			parent = nodes.get(bestNodeIdx);
 
 			// Pass in the node being explored
-			op.process(parent);
+			op.process(level+1,parent);
 
 			// See if it has reached a leaf and the search is finished
 			if (parent.isLeaf()) {
@@ -203,7 +197,6 @@ public class HierarchicalVocabularyTree<Point> {
 	 * Clears references to initial state but keeps allocated memory
 	 */
 	public void reset() {
-		nodeData.clear();
 		descriptions.reset();
 		nodes.reset();
 
@@ -211,17 +204,6 @@ public class HierarchicalVocabularyTree<Point> {
 		nodes.grow().index = 0;
 	}
 
-	/**
-	 * Adds data to the node
-	 *
-	 * @param node Node that data is added to
-	 * @param data The data which is not associated with it
-	 */
-	public void addData( Node node, Object data ) {
-		BoofMiscOps.checkTrue(node.dataIdx < 0);
-		node.dataIdx = nodeData.size();
-		nodeData.add(data);
-	}
 
 	/** Node in the Vocabulary tree */
 	public static class Node {
@@ -233,8 +215,8 @@ public class HierarchicalVocabularyTree<Point> {
 		public int branch;
 		// Index of the parent. The root node will have -1 here
 		public int parent;
-		// Index in the inverted file list. -1 means there's no data there
-		public int dataIdx;
+		// Index to user data. Optional.
+		public int userIdx;
 		// index of the first mean in the list of descriptions. Means with the same parent are consecutive
 		public int descIdx;
 		// index of the first child in the list of nodes. Children are consecutive.
@@ -250,7 +232,7 @@ public class HierarchicalVocabularyTree<Point> {
 			index = -1;
 			branch = -1;
 			parent = -1;
-			dataIdx = -1;
+			userIdx = -1;
 			descIdx = -1;
 			childrenIndexes.reset();
 		}
@@ -259,7 +241,7 @@ public class HierarchicalVocabularyTree<Point> {
 			index = src.index;
 			branch = src.branch;
 			parent = src.parent;
-			dataIdx = src.dataIdx;
+			userIdx = src.userIdx;
 			descIdx = src.descIdx;
 			childrenIndexes.setTo(src.childrenIndexes);
 		}

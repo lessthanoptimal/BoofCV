@@ -56,7 +56,8 @@ public class FactoryConvertTupleDesc {
 			};
 		}
 
-		throw new IllegalArgumentException("Add support for this new conversion");
+		throw new IllegalArgumentException("Add support for this new conversion: "+
+				srcType.getSimpleName()+" -> "+config.outputData);
 	}
 
 	/**

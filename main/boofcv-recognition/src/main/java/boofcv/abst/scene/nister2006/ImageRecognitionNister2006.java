@@ -97,7 +97,7 @@ public class ImageRecognitionNister2006<Image extends ImageBase<Image>, TD exten
 		this.imageType = imageType;
 
 		databaseN.setDistanceType(config.distanceNorm);
-		databaseN.maxDistanceFromLeaf = config.maxDistanceFromLeaf;
+		databaseN.minimumDepthFromRoot = config.minimumDepthFromRoot;
 
 		downSample = FactoryFilterLambdas.createDownSampleFilter(config.maxImagePixels, imageType);
 	}
@@ -206,7 +206,7 @@ public class ImageRecognitionNister2006<Image extends ImageBase<Image>, TD exten
 			verbose.println("detected[" + imageIndex + "].size=" + detector.getNumberOfFeatures() + " id=" + id);
 
 		// Add the image
-		databaseN.addImage(imageIndex, imageFeatures.toList(), null);
+		databaseN.addImage(imageIndex, imageFeatures.toList());
 	}
 
 	@Override public boolean query( Image queryImage, int limit, DogArray<Match> matches ) {
@@ -235,7 +235,7 @@ public class ImageRecognitionNister2006<Image extends ImageBase<Image>, TD exten
 		matches.resize(found.size);
 		for (int i = 0; i < matches.size; i++) {
 			RecognitionVocabularyTreeNister2006.Match f = found.get(i);
-			matches.get(i).id = imageIds.get(f.image.identification);
+			matches.get(i).id = imageIds.get(f.identification);
 			matches.get(i).error = f.error;
 		}
 

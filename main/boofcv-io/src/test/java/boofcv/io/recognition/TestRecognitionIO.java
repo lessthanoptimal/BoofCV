@@ -21,7 +21,6 @@ package boofcv.io.recognition;
 import boofcv.abst.scene.nister2006.ConfigImageRecognitionNister2006;
 import boofcv.abst.scene.nister2006.ImageRecognitionNister2006;
 import boofcv.alg.scene.nister2006.RecognitionVocabularyTreeNister2006;
-import boofcv.alg.scene.nister2006.RecognitionVocabularyTreeNister2006.ImageInfo;
 import boofcv.alg.scene.nister2006.RecognitionVocabularyTreeNister2006.InvertedFile;
 import boofcv.alg.scene.vocabtree.HierarchicalVocabularyTree;
 import boofcv.io.UtilIO;
@@ -61,7 +60,7 @@ public class TestRecognitionIO extends BoofStandardJUnit {
 			ImageRecognitionNister2006<GrayU8,TupleDesc_F64> found = RecognitionIO.loadNister2006(dir, imageType);
 
 			// Check a some things to make sure it actually loaded
-			assertEquals(11, found.getDatabaseN().getImagesDB().size());
+			assertEquals(20, found.getDatabaseN().getImagesDB().size);
 			assertEquals(5, found.getTree().nodes.size());
 		} finally {
 			// clean up
@@ -100,7 +99,7 @@ public class TestRecognitionIO extends BoofStandardJUnit {
 			assertEquals(e.branch, f.branch);
 			assertEquals(e.weight, f.weight);
 			assertEquals(e.descIdx, f.descIdx);
-			assertEquals(e.dataIdx, f.dataIdx);
+			assertEquals(e.userIdx, f.userIdx);
 			assertEquals(e.childrenIndexes.size, f.childrenIndexes.size);
 			for (int j = 0; j < e.childrenIndexes.size; j++) {
 				assertEquals(e.childrenIndexes.get(j), f.childrenIndexes.get(j));
@@ -130,7 +129,7 @@ public class TestRecognitionIO extends BoofStandardJUnit {
 			n.parent = i - 1;
 			n.branch = i;
 			n.weight = 0.1 + i;
-			n.dataIdx = i*2;
+			n.userIdx = i*2;
 
 			// make sure the number of descriptions doesn't match the number of nodes. this was a bug once.
 			if (i==0)
@@ -162,29 +161,25 @@ public class TestRecognitionIO extends BoofStandardJUnit {
 		compareTrees(db.tree, found.tree);
 
 		assertEquals(db.getImagesDB().size, found.getImagesDB().size);
-		assertEquals(db.tree.nodeData.size(), found.tree.nodeData.size());
+		assertEquals(db.invertedFiles.size(), found.invertedFiles.size());
 
-		for (int i = 0; i < 11; i++) {
-			ImageInfo e = db.getImagesDB().get(i);
-			ImageInfo f = found.getImagesDB().get(i);
-
-			assertEquals(e.identification, f.identification);
-			assertEquals(e.descTermFreq.size(), f.descTermFreq.size());
-			for (int key : e.descTermFreq.keys()) {
-				assertEquals(e.descTermFreq.get(key), f.descTermFreq.get(key));
-			}
-		}
-
-		for (int i = 0; i < db.tree.nodeData.size(); i++) {
-			InvertedFile e = (InvertedFile)db.tree.nodeData.get(i);
-			InvertedFile f = (InvertedFile)found.tree.nodeData.get(i);
+		for (int i = 0; i < db.invertedFiles.size(); i++) {
+			InvertedFile e = db.invertedFiles.get(i);
+			InvertedFile f = found.invertedFiles.get(i);
 
 			assertEquals(e.size(), f.size());
+			assertEquals(e.weights.size(), f.weights.size());
+			assertEquals(e.weights.size(), f.size());
 			for (int imageIdx = 0; imageIdx < e.size; imageIdx++) {
 				int indexE = e.get(imageIdx);
 				int indexF = f.get(imageIdx);
 
 				assertEquals(indexE, indexF);
+
+				float weightE = e.weights.get(imageIdx);
+				float weightF = f.weights.get(imageIdx);
+
+				assertEquals(weightE, weightF);
 			}
 		}
 	}
@@ -194,19 +189,15 @@ public class TestRecognitionIO extends BoofStandardJUnit {
 		var db = new RecognitionVocabularyTreeNister2006<TupleDesc_F64>();
 		db.tree = createTree(6);
 
-		db.getImagesDB().resize(11);
-		for (int i = 0; i < 11; i++) {
-			ImageInfo info = db.getImagesDB().get(i);
-			info.identification = i + 2;
-			info.descTermFreq.put(1, 1.5f);
-			info.descTermFreq.put(6, i + 1.5f);
-			// cookie can be ignored and isn't saved
+		db.getImagesDB().resize(20);
+		for (int i = 0; i < 20; i++) {
+			db.getImagesDB().set(i,rand.nextInt());
 		}
 
-		for (int i = 0; i < 9; i++) {
-			var ld = new InvertedFile();
-			ld.add(i);
-			db.tree.nodeData.add(ld);
+		for (int i = 0; i < db.tree.nodes.size; i++) {
+			InvertedFile ld = db.invertedFiles.grow();
+			ld.add(rand.nextInt(20));
+			ld.weights.add(rand.nextFloat());
 		}
 		return db;
 	}

@@ -21,18 +21,10 @@ package boofcv.alg.scene.nister2006;
 import boofcv.alg.scene.nister2006.TupleMapDistanceNorm.CommonWords;
 import boofcv.alg.scene.vocabtree.HierarchicalVocabularyTree;
 import boofcv.alg.scene.vocabtree.HierarchicalVocabularyTree.Node;
-import gnu.trove.map.TIntFloatMap;
-import gnu.trove.map.TIntIntMap;
-import gnu.trove.map.TIntObjectMap;
-import gnu.trove.map.hash.TIntFloatHashMap;
-import gnu.trove.map.hash.TIntIntHashMap;
-import gnu.trove.map.hash.TIntObjectHashMap;
-import gnu.trove.set.TIntSet;
-import gnu.trove.set.hash.TIntHashSet;
 import lombok.Getter;
 import lombok.Setter;
-import org.ddogleg.struct.DogArray;
-import org.ddogleg.struct.DogArray_I32;
+import org.ddogleg.struct.*;
+import pabeles.concurrency.GrowArray;
 
 import java.util.Collections;
 import java.util.List;
@@ -55,11 +47,14 @@ public class RecognitionVocabularyTreeNister2006<Point> {
 	/** Vocabulary Tree */
 	public @Getter HierarchicalVocabularyTree<Point> tree;
 
-	/** Nodes only contribute to the descriptor if they are at most this number of hops from a leaf */
-	public int maxDistanceFromLeaf = Integer.MAX_VALUE;
+	/** A node can be part of the descriptor if it's at least this far from the root node */
+	public int minimumDepthFromRoot = 0;
+
+	/** User data associated with each node */
+	public final GrowArray<InvertedFile> invertedFiles = new GrowArray<>(InvertedFile::new, InvertedFile::reset);
 
 	/** List of images added to the database */
-	protected @Getter final DogArray<ImageInfo> imagesDB = new DogArray<>(ImageInfo::new, ImageInfo::reset);
+	protected @Getter final BigDogArray_I32 imagesDB = new BigDogArray_I32(100, 10000, BigDogArray.Growth.GROW_FIRST);
 
 	/** Scores for all candidate images which have been sorted */
 	protected @Getter final DogArray<Match> matchScores = new DogArray<>(Match::new, Match::reset);
@@ -68,23 +63,16 @@ public class RecognitionVocabularyTreeNister2006<Point> {
 	protected @Getter @Setter TupleMapDistanceNorm distanceFunction = new TupleMapDistanceNorm.L2();
 
 	//---------------- Internal Workspace
-	// Number of images in DB that pass through this node
-	protected final DogArray_I32 nodeImageCount = new DogArray_I32();
-
 	// The "frequency" that nodes in the tree appear in this image
 	protected final DogArray<Frequency> frequencies = new DogArray<>(Frequency::new, Frequency::reset);
-	protected final TIntObjectMap<Frequency> node_to_frequency = new TIntObjectHashMap<>();
 
-	// Temporary storage for an image's TF description while it's being looked up
-	protected final TIntFloatMap queryDescTermFreq = new TIntFloatHashMap();
+	// For lookup. One element for every image in the database
+	DogArray_I32 imageIdx_to_match = new DogArray_I32();
+	DogArray_I32 nodeIdx_to_match = new DogArray_I32();
 
-	// Predeclare array for storing keys. Avoids unnecessary array creation
-	protected final DogArray_I32 keysDesc = new DogArray_I32(); // ONLY use in describe()
-
-	// For lookup
-	TIntIntMap identification_to_match = new TIntIntHashMap();
-
-	LeafHistogram leafHistogram = new LeafHistogram();
+	// temporary storage for an image TF-IDF descriptor
+	DogArray_F32 tmpDescWeights = new DogArray_F32();
+	DogArray_I32 tmpDescWords = new DogArray_I32();
 
 	/**
 	 * Configures the tree by adding LeafData to all the leaves in the tree then saves a reference for future use
@@ -103,16 +91,8 @@ public class RecognitionVocabularyTreeNister2006<Point> {
 		imagesDB.reset();
 
 		// Removes the old leaf data and replaces it with empty structures
-		tree.nodeData.clear();
-		for (int i = 0; i < tree.nodes.size; i++) {
-			if (!tree.nodes.get(i).isLeaf())
-				continue;
-			tree.nodes.get(i).dataIdx = -1;
-			tree.addData(tree.nodes.get(i), new InvertedFile());
-		}
-
-		// Set image count to zero since there are no images
-		nodeImageCount.resize(tree.nodes.size, 0);
+		invertedFiles.reset();
+		invertedFiles.resize(tree.nodes.size);
 	}
 
 	/**
@@ -120,38 +100,22 @@ public class RecognitionVocabularyTreeNister2006<Point> {
 	 *
 	 * @param imageID The image's unique ID for later reference
 	 * @param imageFeatures Feature descriptors from an image
-	 * @param cookie Optional user defined data which will be attached to the image
 	 */
-	public void addImage( int imageID, List<Point> imageFeatures, Object cookie ) {
+	public void addImage( int imageID, List<Point> imageFeatures ) {
 		if (imageFeatures.isEmpty())
 			return;
 
 		int imageIdx = imagesDB.size;
-		ImageInfo info = imagesDB.grow();
-		info.identification = imageID;
-		info.cookie = cookie;
+		imagesDB.append(imageID);
 
 		// compute a descriptor for this image while adding it to the leaves
-		describe(imageFeatures, info.descTermFreq, leafHistogram);
+		describe(imageFeatures, tmpDescWeights, tmpDescWords);
 
-		// Add this image to all the leaves it encountered
-		for (int histIdx = 0; histIdx < leafHistogram.leaves.size; histIdx++) {
-			LeafCounts counts = leafHistogram.leaves.get(histIdx);
-			Node node = tree.nodes.get(counts.nodeIdx);
-
-			// This leaf has been marked as useless for information. In general it means it's too common
-			if (node.weight <= 0.0f)
-				continue;
-
-			// Add the image to the list of images which observed this leaf
-			((InvertedFile)tree.nodeData.get(node.dataIdx)).add(imageIdx);
-		}
-
-		// For each node which is in the descriptor, increment its image count
-		keysDesc.resize(info.descTermFreq.size());
-		info.descTermFreq.keys(keysDesc.data);
-		for (int i = 0; i < keysDesc.size; i++) {
-			nodeImageCount.data[keysDesc.get(i)]++;
+		for (int wordIdx = 0; wordIdx < tmpDescWords.size; wordIdx++) {
+			int nodeIdx = tmpDescWords.get(wordIdx);
+			InvertedFile inv = invertedFiles.get(nodeIdx);
+			inv.weights.add(tmpDescWeights.get(wordIdx));
+			inv.add(imageIdx);
 		}
 	}
 
@@ -160,11 +124,10 @@ public class RecognitionVocabularyTreeNister2006<Point> {
 	 * {@link #getMatchScores()}.
 	 *
 	 * @param queryImage Set of feature descriptors from the query image
-	 * @oaran limit Maximum number of matches it will return.
+	 * @param limit Maximum number of matches it will return.
 	 * @return The best matching image with score from the database
 	 */
 	public boolean query( List<Point> queryImage, int limit ) {
-		identification_to_match.clear();
 		matchScores.reset();
 
 		// Can't match to anything if it's empty
@@ -173,57 +136,33 @@ public class RecognitionVocabularyTreeNister2006<Point> {
 		}
 
 		// Create a description of this image and collect potential matches from leaves
-		describe(queryImage, queryDescTermFreq, leafHistogram);
+		describe(queryImage, tmpDescWeights, tmpDescWords);
 
-		// Create a list of images in the DB that have at least a single feature pass through a node
-		for (int histIdx = 0; histIdx < leafHistogram.leaves.size; histIdx++) {
-			LeafCounts count = leafHistogram.leaves.get(histIdx);
-			HierarchicalVocabularyTree.Node node = tree.nodes.get(count.nodeIdx);
+		// NOTE: It's assumed imageIdx_to_match is full of -1
+		imageIdx_to_match.resize(imagesDB.size, -1);
 
-			// Find the database images by looking at the inverted file for this particular node/work
-			InvertedFile invertedFile = (InvertedFile)tree.nodeData.get(node.dataIdx);
+		for (int wordIdx = 0; wordIdx < tmpDescWords.size; wordIdx++) {
+			float queryWordWeight = tmpDescWeights.get(wordIdx);
+			HierarchicalVocabularyTree.Node node = tree.nodes.get(tmpDescWords.get(wordIdx));
 
-			// distance from leaf along the graph
-			int distanceFromLeaf = 0;
+			InvertedFile invertedFile = invertedFiles.get(node.index);
 
-			// Go up the graph until it hits the root or maximum distance away from a leaf
-			while (distanceFromLeaf <= maxDistanceFromLeaf && node.index > 0) {
-				if (node.weight <= 0.0f)
-					break;
+			for (int i = 0; i < invertedFile.size; i++) {
+				// Get the list of images in the database which have this particular word using
+				// the inverted file list
+				int imageIdx = invertedFile.get(i);
 
-				// Look up the value of this word in the image descriptor for the query
-				float queryWordWeight = queryDescTermFreq.get(node.index);
-
-				// Go through each leaf and compute the error for all related nodes
-				for (int i = 0; i < invertedFile.size(); i++) {
-					// Get the list of images in the database which have this particular word using
-					// the inverted file list
-					ImageInfo dbImage = imagesDB.get(invertedFile.get(i));
-
-					// The match stores how well this particular images matches the target as well as book keeping info
-					int identification = dbImage.identification;
-					Match m;
-					if (!identification_to_match.containsKey(identification)) {
-						identification_to_match.put(identification, matchScores.size);
-						m = matchScores.grow();
-						m.image = dbImage;
-					} else {
-						m = matchScores.get(identification_to_match.get(identification));
-						// If this node has already been examined skip it
-						if (m.traversed.contains(node.index))
-							continue;
-					}
-
-					// Mark this node as being traversed so that it isn't double counted
-					m.traversed.add(node.index);
-
-					// Update the score computation. See TupleMapDistanceNorm for why this is done
-					m.commonWords.grow().setTo(node.index, queryWordWeight, dbImage.descTermFreq.get(node.index));
+				Match m;
+				if (imageIdx_to_match.get(imageIdx) == -1) {
+					imageIdx_to_match.set(imageIdx, matchScores.size);
+					m = matchScores.grow();
+					m.identification = imageIdx; // this will be converted to ID on output
+				} else {
+					m = matchScores.get(imageIdx_to_match.get(imageIdx));
 				}
 
-				// move to the parent node
-				node = tree.nodes.get(node.parent);
-				distanceFromLeaf++;
+				// Update the score computation. See TupleMapDistanceNorm for why this is done
+				m.commonWords.grow().setTo(node.index, queryWordWeight, invertedFile.weights.get(i));
 			}
 		}
 
@@ -233,14 +172,17 @@ public class RecognitionVocabularyTreeNister2006<Point> {
 		// Compute the final scores
 		for (int i = 0; i < matchScores.size(); i++) {
 			Match m = matchScores.get(i);
-			m.error = distanceFunction.distance(
-					queryDescTermFreq, m.image.descTermFreq, m.commonWords.toList());
+			m.error = distanceFunction.distance(m.commonWords.toList());
+			// Undo changes and make sure all elements are -1 again
+			imageIdx_to_match.set(m.identification, -1);
+			// m.identification is overloaded earlier and actualy stores the index
+			m.identification = imagesDB.get(m.identification);
 		}
 
 		// NOTE: quick select then Collections.sort on the remaining entries is about 1.3x to 2x faster, but it's not
 		//       a bottle neck. Sort time for 8000 elements is about 2.5 ms
 		Collections.sort(matchScores.toList());
-		matchScores.size = Math.min(matchScores.size,limit);
+		matchScores.size = Math.min(matchScores.size, limit);
 
 		return true;
 	}
@@ -250,48 +192,43 @@ public class RecognitionVocabularyTreeNister2006<Point> {
 	 * image feature.
 	 *
 	 * @param imageFeatures (Input) All image features in the image
-	 * @param descTermFreq (Output) Sparse TF-IDF descriptor for the image
-	 * @param leafHistogram (Output) Which leaves were encountered and how many times
+	 * @param descWeights (Output) Weights for non-zero word in TD-IDF descriptor for this image
+	 * @param descWords (Output) Word index for non-zero word in TD-IDF descriptor for this image
 	 */
-	protected void describe( List<Point> imageFeatures, TIntFloatMap descTermFreq, LeafHistogram leafHistogram ) {
+	protected void describe( List<Point> imageFeatures, DogArray_F32 descWeights, DogArray_I32 descWords) {
 		// Reset work variables
 		frequencies.reset();
-		node_to_frequency.clear();
-		descTermFreq.clear();
+		descWeights.reset();
+		descWords.reset();
 
-		// Find all the leaves and the number of times they were observed
-		computeLeafHistogram(imageFeatures, leafHistogram);
+		// NOTE: It's assumed nodeIdx_to_match is full of -1
+		nodeIdx_to_match.resize(tree.nodes.size, -1);
 
-		// From each leaf the parents can be traversed to find the other nodes and the number of times
-		// they were passed though
-		for (int histIdx = 0; histIdx < leafHistogram.leaves.size; histIdx++) {
-			LeafCounts count = leafHistogram.leaves.get(histIdx);
+		for (int featureIdx = 0; featureIdx < imageFeatures.size(); featureIdx++) {
+			tree.searchPathToLeaf(imageFeatures.get(featureIdx), (depth,node)->{
+				if (depth<minimumDepthFromRoot || node.weight <= 0.0f)
+					return;
 
-			HierarchicalVocabularyTree.Node node = tree.nodes.get(count.nodeIdx);
-			// distance the node is from the leaf node
-			int distanceFromLeaf = 0;
-
-			// Traverse up the tree from leaf to root
-			while (distanceFromLeaf <= maxDistanceFromLeaf && node.index > 0) {
-				// if the weight is zero now, all the parents will have to be zero too
-				if (node.weight <= 0.0f)
-					break;
-
-				Frequency f = node_to_frequency.get(node.index);
-				if (f == null) {
+				Frequency f;
+				int frequencyIdx = nodeIdx_to_match.get(node.index);
+				if (frequencyIdx == -1) {
+					nodeIdx_to_match.set(node.index, frequencies.size);
 					f = frequencies.grow();
 					f.node = node;
-					node_to_frequency.put(node.index, f);
+				} else {
+					f = frequencies.get(frequencyIdx);
 				}
-				f.totalAppearances += count.count;
+				f.totalAppearances++;
+			});
+		}
 
-				node = tree.nodes.get(node.parent);
-				distanceFromLeaf++;
-			}
+		// undo changes to the lookup table
+		for (int i = 0; i < frequencies.size; i++) {
+			nodeIdx_to_match.set(frequencies.get(i).node.index, -1);
 		}
 
 		// No nodes with a non-zero weight that matched was found
-		if (node_to_frequency.isEmpty())
+		if (frequencies.isEmpty())
 			return;
 
 		// Create the descriptor and normalize it
@@ -299,40 +236,19 @@ public class RecognitionVocabularyTreeNister2006<Point> {
 		// NOTE: I'm not 100% sure this is the divisor used in the paper, but doesn't really matter due to the
 		//       descriptor getting normalized.
 
+		descWeights.reserve(frequencies.size);
+		descWords.reserve(frequencies.size);
+
 		for (int i = 0; i < frequencies.size; i++) {
 			Frequency f = frequencies.get(i);
 
 			// Term frequency: n[i] = number of times word[i] appears in this image / total words in this image
 			double termFrequency = f.totalAppearances/totalUniqueWordsSeenByImage;
 			// TF-IDF feature: d[i] = n[i] * node_weight[i]
-			double feature = termFrequency*f.node.weight;
-			descTermFreq.put(f.node.index, (float)feature);
+			descWeights.add((float)(termFrequency*f.node.weight));
+			descWords.add(f.node.index);
 		}
-		distanceFunction.normalize(descTermFreq);
-	}
-
-	/**
-	 * Counts the number of times each leaf node is observed and stores the found leaves
-	 * in the sparse histogram.
-	 */
-	protected void computeLeafHistogram( List<Point> features, LeafHistogram histogram ) {
-		histogram.reset();
-
-		for (int featsIdx = 0; featsIdx < features.size(); featsIdx++) {
-			int leafNodeIdx = tree.searchPathToLeaf(features.get(featsIdx), ( a ) -> {});
-
-			// See if this leaf has been observed before
-			LeafCounts counts = histogram.observed.get(leafNodeIdx);
-
-			// If it has not been seed before, add it to the set
-			if (counts == null) {
-				counts = histogram.leaves.grow();
-				counts.nodeIdx = leafNodeIdx;
-				histogram.observed.put(leafNodeIdx, counts);
-			}
-
-			counts.count++;
-		}
+		distanceFunction.normalize(descWeights);
 	}
 
 	/** Used to change distance function to one of the built in types */
@@ -342,57 +258,6 @@ public class RecognitionVocabularyTreeNister2006<Point> {
 			case L2 -> new TupleMapDistanceNorm.L2();
 			default -> throw new IllegalArgumentException("Unknown type " + type);
 		};
-	}
-
-	/** Information about an image stored in the database */
-	public static class ImageInfo {
-		/** TF-IDF description of the image. Default 0 for no key and no value. */
-		public final TIntFloatMap descTermFreq = new TIntFloatHashMap();
-
-		/** Use specified data associated with this image */
-		public Object cookie;
-		/** Unique ID for this image */
-		public int identification;
-
-		public <T> T getCookie() {
-			return (T)cookie;
-		}
-
-		public void reset() {
-			descTermFreq.clear();
-			cookie = null;
-			identification = -1;
-		}
-	}
-
-	/**
-	 * Storage for counting the number of times each leaf is observed by an image
-	 */
-	protected static class LeafHistogram {
-		// leaf node-id to count data structure
-		public TIntObjectMap<LeafCounts> observed = new TIntObjectHashMap<>();
-		// array of all the leaves encountered for fast look up later on and for recycling memory
-		public DogArray<LeafCounts> leaves = new DogArray<>(LeafCounts::new, LeafCounts::reset);
-
-		public void reset() {
-			observed.clear();
-			leaves.reset();
-		}
-	}
-
-	/**
-	 * Number of times a specific node was observed by an image
-	 */
-	protected static class LeafCounts {
-		// Number of times the leaf was observed
-		public int count;
-		// The node index of the leaf
-		public int nodeIdx;
-
-		public void reset() {
-			count = 0;
-			nodeIdx = -1;
-		}
 	}
 
 	/**
@@ -417,16 +282,13 @@ public class RecognitionVocabularyTreeNister2006<Point> {
 		/** Fit error. 0.0 = perfect. */
 		public float error;
 		/** Reference to the image in the data base that was matched */
-		public ImageInfo image;
-		/** Nodes in the tree that it has already traversed */
-		public final TIntSet traversed = new TIntHashSet();
+		public int identification;
 		/** All words which are common between image in DB and the query image */
 		public final DogArray<CommonWords> commonWords = new DogArray<>(CommonWords::new);
 
 		public void reset() {
 			error = 0;
-			image = null;
-			traversed.clear();
+			identification = -1;
 			commonWords.reset();
 		}
 
@@ -440,8 +302,16 @@ public class RecognitionVocabularyTreeNister2006<Point> {
 	 * referenced by array index.
 	 */
 	public static class InvertedFile extends DogArray_I32 {
-		public InvertedFile(){
+		public final DogArray_F32 weights = new DogArray_F32();
+
+		public InvertedFile() {
 			super(1);
+		}
+
+		@Override
+		public void reset() {
+			super.reset();
+			weights.reset();
 		}
 	}
 

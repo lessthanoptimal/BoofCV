@@ -47,7 +47,7 @@ public class PackedTupleBigArray_B implements PackedArray<TupleDesc_B> {
 		this.dof = dof;
 		this.temp = new TupleDesc_B(dof);
 		this.numInts = temp.data.length;
-		array = new BigDogArray_I32(dof,dof*65536, BigDogArray.Growth.GROW_FIRST);
+		array = new BigDogArray_I32(dof,(dof/32)*65536, BigDogArray.Growth.GROW_FIRST);
 		array.resize(0);
 	}
 
