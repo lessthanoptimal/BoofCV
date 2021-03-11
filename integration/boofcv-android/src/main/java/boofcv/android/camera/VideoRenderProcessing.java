@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -65,6 +65,7 @@ public abstract class VideoRenderProcessing<T extends ImageBase<T>> extends Thre
 	protected View view;
 	// thread which is processing the video frames
 	Thread thread;
+	protected final Object lockThread = new Object();
 
 	/**
 	 * Lock used ever reading or writing to display related data.  User should use this to ensure
@@ -192,6 +193,7 @@ public abstract class VideoRenderProcessing<T extends ImageBase<T>> extends Thre
 
 	@Override
 	public void stopProcessing() {
+		final Thread thread = this.thread;
 		if (thread == null)
 			return;
 
@@ -205,9 +207,8 @@ public abstract class VideoRenderProcessing<T extends ImageBase<T>> extends Thre
 
 	@Override
 	public void run() {
-		thread = Thread.currentThread();
 		while (!requestStop) {
-			synchronized (thread) {
+			synchronized (lockThread) {
 				try {
 					wait();
 					if (requestStop)
