@@ -55,6 +55,8 @@ Version : 0.38
   * homographyToFundamental given 2 points
 - Multi-View Stereo
   * TODO Improve point filtering of dense cloud. Way too noisy now
+- Misc
+  * Added ConfigGenerator for easily creating a set of Configurations when parameter tuning
 
 ---------------------------------------------
 Date    : 2020/Dec/21
