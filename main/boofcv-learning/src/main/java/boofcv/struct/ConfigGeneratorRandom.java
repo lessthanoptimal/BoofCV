@@ -29,6 +29,13 @@ public class ConfigGeneratorRandom<Config extends Configuration> extends ConfigG
 		this.numTrials = numTrials;
 	}
 
+	/**
+	 * Provides more configuration info over default.
+	 */
+	@Override public String toStringSettings() {
+		return "Random:\n" + super.toStringSettings();
+	}
+
 	@Override public Config next() {
 		trial++;
 		// randomly assign states to all parameters

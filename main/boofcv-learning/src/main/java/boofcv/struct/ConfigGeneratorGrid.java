@@ -50,6 +50,22 @@ public class ConfigGeneratorGrid<Config extends Configuration> extends ConfigGen
 	}
 
 	/**
+	 * Provides more configuration info over default.
+	 */
+	@Override public String toStringSettings() {
+		String ret = "Grid:\n";
+
+		ret += "discretization," + rangeDiscretization + "\n";
+		ret += super.toStringSettings();
+		ret += "rules:\n";
+		for (String key : pathToRule.keySet()) { // lint:forbidden ignore_line
+			ret += key + "," + pathToRule.get(key) + "\n";
+		}
+
+		return ret;
+	}
+
+	/**
 	 * Returns the number of possible states a parameter has
 	 */
 	@Override protected int getNumberOfStates( Parameter p ) {
