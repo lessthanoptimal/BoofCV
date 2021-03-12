@@ -181,7 +181,9 @@ public abstract class ConfigGenerator<Config extends Configuration> {
 	 * Creates a string which summarizes what settings are being configured
 	 */
 	public String toStringSettings() {
-		String ret = "";
+		String ret = "type," + type.getCanonicalName() + "\n";
+		ret += "random_seed," + seed + "\n";
+		ret += "parameters:\n";
 		for (int i = 0; i < parameters.size(); i++) {
 			Parameter p = parameters.get(i);
 			ret += p.getPath() + "," + p.getDescription() + "\n";
@@ -412,7 +414,7 @@ public abstract class ConfigGenerator<Config extends Configuration> {
 		}
 
 		@Override String getDescription() {
-			return "range-integers, " + idx0 + "," + idx1;
+			return "range-integers," + idx0 + "," + idx1;
 		}
 
 		@Override int getStateSize() {return 0;}
