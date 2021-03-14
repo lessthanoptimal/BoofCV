@@ -25,8 +25,13 @@ import java.util.List;
 
 /**
  * Generalized way for normalizing and computing the distance between two sparse descriptors in a map
- * format. Intended for use with {@link RecognitionVocabularyTreeNister2006}.
+ * format. Intended for use with {@link RecognitionVocabularyTreeNister2006}. Uses efficient distance
+ * formula from [1].
  *
+ * <p>
+ * [1] Nister, David, and Henrik Stewenius. "Scalable recognition with a vocabulary tree."
+ * 2006 IEEE Computer Society Conference on Computer Vision and Pattern Recognition (CVPR'06). Vol. 2. Ieee, 2006.
+ * </p>
  * @author Peter Abeles
  */
 public interface TupleMapDistanceNorm {
@@ -36,7 +41,8 @@ public interface TupleMapDistanceNorm {
 	void normalize( DogArray_F32 weights );
 
 	/**
-	 * TODO update description citing what type of norms this works with only
+	 * Computes the distance between two vectors using common elements only. This only works for a subclass of
+	 * normalizations. See [1] for details.
 	 */
 	float distance( List<CommonWords> common );
 
@@ -70,6 +76,9 @@ public interface TupleMapDistanceNorm {
 		}
 	}
 
+	/**
+	 * L1-norm for scoring
+	 */
 	class L1 implements TupleMapDistanceNorm {
 		@Override public void normalize( DogArray_F32 weights ) {
 			float norm = 0;
@@ -82,25 +91,6 @@ public interface TupleMapDistanceNorm {
 				weights.data[i] /= norm;
 			}
 		}
-
-//		@Override public float distance( TIntFloatMap descA, TIntFloatMap descB ) {
-//			// Look up the common keys
-//			keys.resize(descA.size());
-//			descA.keys(keys.data);
-//
-//			// L1-norm is the sum of the difference magnitude of each element
-//			float sum = 2.0f;
-//			for (int keyIdx = 0; keyIdx < keys.size; keyIdx++) {
-//				int key = keys.data[keyIdx];
-//
-//				// takes advantage of default value being 0.0f
-//				float valueA = descA.get(key);
-//				float valueB = descB.get(key);
-//				sum += Math.abs(valueA - valueB) - valueA - valueB;
-//			}
-//
-//			return sum;
-//		}
 
 		@Override public float distance( List<CommonWords> common ) {
 			float sum = 2.0f;
@@ -118,8 +108,10 @@ public interface TupleMapDistanceNorm {
 		}
 	}
 
+	/**
+	 * L2-norm for scoring
+	 */
 	class L2 implements TupleMapDistanceNorm {
-
 		@Override public void normalize( DogArray_F32 weights ) {
 			float norm = 0;
 			for (int i = 0; i < weights.size; i++) {
@@ -133,22 +125,6 @@ public interface TupleMapDistanceNorm {
 				weights.data[i]/=norm;
 			}
 		}
-
-//		@Override public float distance( TIntFloatMap descA, TIntFloatMap descB ) {
-//			keys.resize(descA.size());
-//			descA.keys(keys.data);
-//
-//			float sum = 0.0f;
-//
-//			for (int i = 0; i < keys.size(); i++) {
-//				int key = keys.get(i);
-//				float valueA = descA.get(key);
-//				float valueB = descB.get(key);
-//				sum += valueA*valueB;
-//			}
-//
-//			return 2.0f*(1.0f - sum);
-//		}
 
 		@Override public float distance( List<CommonWords> common ) {
 			float sum = 0.0f;

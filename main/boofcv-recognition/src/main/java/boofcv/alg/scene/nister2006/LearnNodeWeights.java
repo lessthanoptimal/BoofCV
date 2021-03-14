@@ -51,9 +51,10 @@ public class LearnNodeWeights<Point> {
 
 	/**
 	 * Sanity check. If true it will make sure every node is observed by an image. This is true when the training
-	 * set and the set of images passed into this are the same.
+	 * set and the set of images passed into this are the same. This is set to false by default because
+	 * in rare situations floating point noise can cause a false positive.
 	 */
-	public boolean checkEveryNodeSeenOnce = true;
+	public boolean checkEveryNodeSeenOnce = false;
 
 	//---------------- Internal Workspace
 
