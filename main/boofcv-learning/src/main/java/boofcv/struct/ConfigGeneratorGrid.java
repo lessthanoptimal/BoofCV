@@ -78,7 +78,7 @@ public class ConfigGeneratorGrid<Config extends Configuration> extends ConfigGen
 			case INTEGER_VALUES: {
 				double val0 = ((Number)p.selectValue(0.0)).doubleValue();
 				double val1 = ((Number)p.selectValue(1.0)).doubleValue();
-				return (int)(val1 - val0);
+				return (int)(val1 - val0 + 1); // +1 because both extents are inclusive
 			}
 			default:
 				throw new RuntimeException("Unknown rule");

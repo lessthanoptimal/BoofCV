@@ -417,6 +417,8 @@ public abstract class ConfigGenerator<Config extends Configuration> {
 			return "range-integers," + idx0 + "," + idx1;
 		}
 
+		// Even though the number of possible states isn't infinite, 0 indicates that it's a range and should be
+		// handled as special since it could be very very large
 		@Override int getStateSize() {return 0;}
 	}
 

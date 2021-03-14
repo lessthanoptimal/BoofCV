@@ -101,6 +101,24 @@ class TestConfigGeneratorGrid extends BoofStandardJUnit {
 		alg.setDiscretizationRule("next.valueFloat", ConfigGeneratorGrid.Discretization.INTEGER_VALUES);
 		alg.initialize();
 
-		assertEquals(12*7, alg.getNumTrials());
+		assertEquals(13*8, alg.getNumTrials());
+
+		// Sanity check to see if each value appears the expected number of times
+		int[] countInt = new int[13];
+		int[] countFloat = new int[8];
+
+		while (alg.hasNext()) {
+			TestConfigGenerator.ConfigDummyA config = alg.next();
+			countInt[config.valueInt+2]++;
+			countFloat[(int)config.next.valueFloat+2]++;
+		}
+
+		for (int i = 0; i < countInt.length; i++) {
+			assertEquals(8,countInt[i]);
+		}
+
+		for (int i = 0; i < countFloat.length; i++) {
+			assertEquals(13,countFloat[i]);
+		}
 	}
 }
