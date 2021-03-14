@@ -61,7 +61,7 @@ public abstract class ConfigGenerator<Config extends Configuration> {
 	protected List<Parameter> parameters = new ArrayList<>();
 
 	/** Base config that's modified when generating new configures */
-	@Getter protected Config configBase;
+	@Getter protected Config configurationBase;
 	/** The most recently generated configuration */
 	protected Config configCurrent;
 
@@ -78,7 +78,7 @@ public abstract class ConfigGenerator<Config extends Configuration> {
 		trial = 0;
 		rand = new Random(seed);
 		try {
-			configBase = type.getConstructor().newInstance();
+			configurationBase = type.getConstructor().newInstance();
 		} catch (Exception e) {
 			throw new RuntimeException(e);
 		}

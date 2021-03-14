@@ -46,8 +46,10 @@ class TestConfigGeneratorGrid extends BoofStandardJUnit {
 
 		// Generate the configs
 		List<TestConfigGenerator.ConfigDummyA> configs = new ArrayList<>();
+		int trial = 1;
 		while (alg.hasNext()) {
 			configs.add(alg.next());
+			assertEquals(trial++, alg.getTrial());
 			assertSame(configs.get(configs.size() - 1), alg.getConfiguration());
 		}
 

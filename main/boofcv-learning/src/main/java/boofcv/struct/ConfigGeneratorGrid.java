@@ -104,7 +104,7 @@ public class ConfigGeneratorGrid<Config extends Configuration> extends ConfigGen
 			// Initialize all parameters in the base config to their 0.0 state
 			for (int i = 0; i < parameters.size(); i++) {
 				Parameter p = parameters.get(i);
-				assignValue(configBase, p.getPath(), p.selectValue(0.0));
+				assignValue(configurationBase, p.getPath(), p.selectValue(0.0));
 			}
 		} catch (Exception e) {
 			throw new RuntimeException(e);
@@ -118,7 +118,7 @@ public class ConfigGeneratorGrid<Config extends Configuration> extends ConfigGen
 	@Override public Config next() {
 		trial++;
 		// Creates a new config and assigns it to have the same value as configBase
-		configCurrent = createAndAssignConfig(configBase);
+		configCurrent = createAndAssignConfig(configurationBase);
 
 		try {
 			boolean finished = false;
@@ -140,7 +140,7 @@ public class ConfigGeneratorGrid<Config extends Configuration> extends ConfigGen
 
 				// Modify this parameter and increment the state
 				double fraction = numStates == 1 ? 0.0 : state/(double)(numStates - 1);
-				assignValue(configBase, p.getPath(), p.selectValue(fraction));
+				assignValue(configurationBase, p.getPath(), p.selectValue(fraction));
 			}
 		} catch (Exception e) {
 			throw new RuntimeException(e);

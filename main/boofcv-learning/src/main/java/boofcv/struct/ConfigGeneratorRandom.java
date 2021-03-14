@@ -42,14 +42,14 @@ public class ConfigGeneratorRandom<Config extends Configuration> extends ConfigG
 		try {
 			for (int i = 0; i < parameters.size(); i++) {
 				Parameter p = parameters.get(i);
-				assignValue(configBase, p.getPath(), p.selectValue(rand.nextDouble()));
+				assignValue(configurationBase, p.getPath(), p.selectValue(rand.nextDouble()));
 			}
 		} catch (Exception e) {
 			throw new RuntimeException(e);
 		}
 
 		// Creates a new config and assigns it to have the same value as configBase
-		configCurrent = createAndAssignConfig(configBase);
+		configCurrent = createAndAssignConfig(configurationBase);
 		return configCurrent;
 	}
 }
