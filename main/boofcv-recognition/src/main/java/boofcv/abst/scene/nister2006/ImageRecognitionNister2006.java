@@ -227,7 +227,7 @@ public class ImageRecognitionNister2006<Image extends ImageBase<Image>, TD exten
 		if (!databaseN.query(imageFeatures.toList(), limit))
 			return false;
 
-		DogArray<RecognitionVocabularyTreeNister2006.Match> found = databaseN.getMatchScores();
+		DogArray<RecognitionVocabularyTreeNister2006.Match> found = databaseN.getMatches();
 
 		if (verbose != null) verbose.println("matches.size=" + found.size + " best.error=" + found.get(0).error);
 

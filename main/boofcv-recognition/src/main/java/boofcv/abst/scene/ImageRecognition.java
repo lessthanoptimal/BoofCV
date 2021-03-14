@@ -26,10 +26,20 @@ import org.ddogleg.struct.VerbosePrint;
 import java.util.Iterator;
 
 /**
- * High level interface for image recognition. The goal here is to identify and recall images of scenes that have
- * been seen previously from approximately the sam perspective.
+ * Implementations of this interface seek to solve the problem of "have I seen this scene before, but from the
+ * same or different perspective? If so find those images". For example, this should be used if you want to find
+ * images of a mountain taken from a different angle or zoom. Implementations may or may not apply geometric
+ * constraints to ensure that it is the same scene.
  *
- * TODO describe usage of functions
+ * Usage Example:
+ * <ol>
+ *     <li>Learn a model from a set of images by calling {@link #learnModel}</li>
+ *     <li>Add images for later retrieval by calling {@link #addImage}</li>
+ *     <li>Call {@link #query} to find the set of N images which are most similar to the passed in image</li>
+ * </ol>
+ *
+ * You can also save models and your image database by using functions in RecognitionIO.
+ *
  *
  * @author Peter Abeles
  */

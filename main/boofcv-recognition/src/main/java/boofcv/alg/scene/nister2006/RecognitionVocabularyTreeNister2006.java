@@ -36,14 +36,30 @@ import java.util.List;
  * all images in the data base are found that share at least one leaf node. These candidate matches are then
  * compared against each other and scored using L2-Norm.
  *
+ * <p>Implementation Notes:<br>
+ * This implementation is intended to produce output which is faithful to the original work [1] but has
+ * several modifications internally where there has been an attempt to improve runtime performance, often
+ * at the cost of an increase in memory consumption. A non-exhaustive set of deviations is listed below</p>
+ * <ul>
+ *     <li>Taking inspiration from [2], this implementation has an explicit representation of the inverted
+ *     files in non-leaf nodes. This avoid an expensive graph traversal step and replaces it with a very fast
+ *     array look up.</li>
+ *     <li>Histogram weights are stored in inverted files instead of word counts. Allows more efficient error
+ *     computation.</li>
+ * </ul>
+ *
  * <p>
  * [1] Nister, David, and Henrik Stewenius. "Scalable recognition with a vocabulary tree."
- * 2006 IEEE Computer Society Conference on Computer Vision and Pattern Recognition (CVPR'06). Vol. 2. Ieee, 2006.
+ * 2006 IEEE Computer Society Conference on Computer Vision and Pattern Recognition (CVPR'06). Vol. 2. Ieee, 2006.<br>
+ * [2] Esteban Uriza, Francisco Gómez Fernández, and Martín Rais, "Efficient Large-scale Image Search With a Vocabulary
+ * Tree", Image Processing On Line, 8 (2018), pp. 71–98
  * </p>
  *
  * @author Peter Abeles
  */
 public class RecognitionVocabularyTreeNister2006<Point> {
+	// TODO block inverted files which are too large from scoring
+
 	/** Vocabulary Tree */
 	public @Getter HierarchicalVocabularyTree<Point> tree;
 
@@ -57,7 +73,7 @@ public class RecognitionVocabularyTreeNister2006<Point> {
 	protected @Getter final BigDogArray_I32 imagesDB = new BigDogArray_I32(100, 10000, BigDogArray.Growth.GROW_FIRST);
 
 	/** Scores for all candidate images which have been sorted */
-	protected @Getter final DogArray<Match> matchScores = new DogArray<>(Match::new, Match::reset);
+	protected @Getter final DogArray<Match> matches = new DogArray<>(Match::new, Match::reset);
 
 	/** Distance between two TF-IDF descriptors. L1 and L2 norms are provided */
 	protected @Getter @Setter TupleMapDistanceNorm distanceFunction = new TupleMapDistanceNorm.L2();
@@ -121,14 +137,14 @@ public class RecognitionVocabularyTreeNister2006<Point> {
 
 	/**
 	 * Looks up the best match from the database. The list of all potential matches can be accessed by calling
-	 * {@link #getMatchScores()}.
+	 * {@link #getMatches()}.
 	 *
 	 * @param queryImage Set of feature descriptors from the query image
 	 * @param limit Maximum number of matches it will return.
 	 * @return The best matching image with score from the database
 	 */
 	public boolean query( List<Point> queryImage, int limit ) {
-		matchScores.reset();
+		matches.reset();
 
 		// Can't match to anything if it's empty
 		if (queryImage.isEmpty()) {
@@ -154,11 +170,11 @@ public class RecognitionVocabularyTreeNister2006<Point> {
 
 				Match m;
 				if (imageIdx_to_match.get(imageIdx) == -1) {
-					imageIdx_to_match.set(imageIdx, matchScores.size);
-					m = matchScores.grow();
+					imageIdx_to_match.set(imageIdx, matches.size);
+					m = matches.grow();
 					m.identification = imageIdx; // this will be converted to ID on output
 				} else {
-					m = matchScores.get(imageIdx_to_match.get(imageIdx));
+					m = matches.get(imageIdx_to_match.get(imageIdx));
 				}
 
 				// Update the score computation. See TupleMapDistanceNorm for why this is done
@@ -166,12 +182,12 @@ public class RecognitionVocabularyTreeNister2006<Point> {
 			}
 		}
 
-		if (matchScores.isEmpty())
+		if (matches.isEmpty())
 			return false;
 
 		// Compute the final scores
-		for (int i = 0; i < matchScores.size(); i++) {
-			Match m = matchScores.get(i);
+		for (int i = 0; i < matches.size(); i++) {
+			Match m = matches.get(i);
 			m.error = distanceFunction.distance(m.commonWords.toList());
 			// Undo changes and make sure all elements are -1 again
 			imageIdx_to_match.set(m.identification, -1);
@@ -181,8 +197,8 @@ public class RecognitionVocabularyTreeNister2006<Point> {
 
 		// NOTE: quick select then Collections.sort on the remaining entries is about 1.3x to 2x faster, but it's not
 		//       a bottle neck. Sort time for 8000 elements is about 2.5 ms
-		Collections.sort(matchScores.toList());
-		matchScores.size = Math.min(matchScores.size, limit);
+		Collections.sort(matches.toList());
+		matches.size = Math.min(matches.size, limit);
 
 		return true;
 	}
@@ -299,9 +315,13 @@ public class RecognitionVocabularyTreeNister2006<Point> {
 
 	/**
 	 * The inverted file is a list of images that were observed in a particular node. Images are
-	 * referenced by array index.
+	 * referenced by array index. This class extends DogArray_I32 to remove the need to store
+	 * an additional java object. might be pre-mature optimization.
 	 */
 	public static class InvertedFile extends DogArray_I32 {
+		// The word weights. In this paper this is d[i] = m[i]*w[i], where w[i] is the weight
+		// assigned to a node. m[i] is the number of occurrences of this word in this image
+		// In the original paper [1] they store m[i] and not d[i] in the inverted file.
 		public final DogArray_F32 weights = new DogArray_F32();
 
 		public InvertedFile() {
