@@ -25,19 +25,18 @@ import org.junit.jupiter.api.Test;
 import java.util.ArrayList;
 import java.util.List;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotSame;
+import static org.junit.jupiter.api.Assertions.*;
 
 /**
  * @author Peter Abeles
  */
 class TestConfigGeneratorRandom extends BoofStandardJUnit {
 	@Test void generate() {
-		var alg = new ConfigGeneratorRandom<>(100,0xBEEF, ConfigDummyA.class);
+		var alg = new ConfigGeneratorRandom<>(100, 0xBEEF, ConfigDummyA.class);
 
 		// Modify two parameters
-		alg.setOfIntegers("valueInt",-2,1,3,10);
-		alg.rangeOfFloats("next.valueFloat",-2.0,5.0);
+		alg.setOfIntegers("valueInt", -2, 1, 3, 10);
+		alg.rangeOfFloats("next.valueFloat", -2.0, 5.0);
 		alg.initialize();
 
 		assertEquals(100, alg.numTrials);
@@ -46,6 +45,7 @@ class TestConfigGeneratorRandom extends BoofStandardJUnit {
 		List<ConfigDummyA> configs = new ArrayList<>();
 		while (alg.hasNext()) {
 			configs.add(alg.next());
+			assertSame(configs.get(configs.size() - 1), alg.getConfiguration());
 		}
 
 		// Make sure the expected number was created
@@ -55,12 +55,12 @@ class TestConfigGeneratorRandom extends BoofStandardJUnit {
 		int intMin = Integer.MAX_VALUE;
 		int intMax = Integer.MIN_VALUE;
 
-		double floatMin=Double.MAX_VALUE;
-		double floatMax=-Double.MAX_VALUE;
+		double floatMin = Double.MAX_VALUE;
+		double floatMax = -Double.MAX_VALUE;
 
 		for (int i = 1; i < configs.size(); i++) {
 			// make sure they are not the same instance
-			assertNotSame(configs.get(i-1), configs.get(i));
+			assertNotSame(configs.get(i - 1), configs.get(i));
 
 			// Look at the values it sampled
 			ConfigDummyA c = configs.get(i);
@@ -75,5 +75,31 @@ class TestConfigGeneratorRandom extends BoofStandardJUnit {
 		assertEquals(10, intMax);
 		assertEquals(-2, floatMin, 1.0);
 		assertEquals(5.0, floatMax, 1.0);
+	}
+
+	/**
+	 * Makes sure toStringState() contains the actual current state.
+	 */
+	@Test void toStringState() {
+		var alg = new ConfigGeneratorRandom<>(100, 0xBEEF, ConfigDummyA.class);
+		alg.rangeOfIntegers("valueInt", -2, 10);
+		alg.rangeOfFloats("next.valueFloat", -2.0, 5.0);
+
+		alg.initialize();
+		while (alg.hasNext()) {
+			TestConfigGenerator.ConfigDummyA config = alg.next();
+
+			String state = alg.toStringState();
+			String[] lines = state.split("\n");
+			for (String line : lines) {
+				if (line.startsWith("valueInt")) {
+					int value = Integer.parseInt(line.split(",")[1]);
+					assertEquals(config.valueInt, value);
+				} else if (line.startsWith("next.valueFloat")) {
+					float value = Float.parseFloat(line.split(",")[1]);
+					assertEquals(config.next.valueFloat, value);
+				}
+			}
+		}
 	}
 }

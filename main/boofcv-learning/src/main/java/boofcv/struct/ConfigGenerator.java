@@ -62,6 +62,8 @@ public abstract class ConfigGenerator<Config extends Configuration> {
 
 	/** Base config that's modified when generating new configures */
 	@Getter protected Config configBase;
+	/** The most recently generated configuration */
+	protected Config configCurrent;
 
 	protected ConfigGenerator( long seed, Class<Config> type ) {
 		this.seed = seed;
@@ -198,9 +200,16 @@ public abstract class ConfigGenerator<Config extends Configuration> {
 		String ret = "";
 		for (int i = 0; i < parameters.size(); i++) {
 			Parameter p = parameters.get(i);
-			ret += p.getPath() + "," + getValue(configBase, p.path) + "\n";
+			ret += p.getPath() + "," + getValue(configCurrent, p.path) + "\n";
 		}
 		return ret;
+	}
+
+	/**
+	 * Returns the most recently generated configuration. This is the same instance as what {@link #next()} returns.
+	 */
+	public Config getConfiguration() {
+		return configCurrent;
 	}
 
 	/**
@@ -410,7 +419,7 @@ public abstract class ConfigGenerator<Config extends Configuration> {
 		}
 
 		@Override Object selectValue( double fraction ) {
-			if (fraction>=1.0)
+			if (fraction >= 1.0)
 				return idx1;
 			return idx0 + (int)((1 + idx1 - idx0)*fraction);
 		}

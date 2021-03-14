@@ -49,6 +49,7 @@ public class ConfigGeneratorRandom<Config extends Configuration> extends ConfigG
 		}
 
 		// Creates a new config and assigns it to have the same value as configBase
-		return createAndAssignConfig(configBase);
+		configCurrent = createAndAssignConfig(configBase);
+		return configCurrent;
 	}
 }

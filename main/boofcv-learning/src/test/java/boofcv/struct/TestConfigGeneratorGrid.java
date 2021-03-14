@@ -25,8 +25,7 @@ import org.junit.jupiter.api.Test;
 import java.util.ArrayList;
 import java.util.List;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotSame;
+import static org.junit.jupiter.api.Assertions.*;
 
 /**
  * @author Peter Abeles
@@ -49,6 +48,7 @@ class TestConfigGeneratorGrid extends BoofStandardJUnit {
 		List<TestConfigGenerator.ConfigDummyA> configs = new ArrayList<>();
 		while (alg.hasNext()) {
 			configs.add(alg.next());
+			assertSame(configs.get(configs.size() - 1), alg.getConfiguration());
 		}
 
 		// Make sure the expected number was created
@@ -109,16 +109,44 @@ class TestConfigGeneratorGrid extends BoofStandardJUnit {
 
 		while (alg.hasNext()) {
 			TestConfigGenerator.ConfigDummyA config = alg.next();
-			countInt[config.valueInt+2]++;
-			countFloat[(int)config.next.valueFloat+2]++;
+			countInt[config.valueInt + 2]++;
+			countFloat[(int)config.next.valueFloat + 2]++;
 		}
 
 		for (int i = 0; i < countInt.length; i++) {
-			assertEquals(8,countInt[i]);
+			assertEquals(8, countInt[i]);
 		}
 
 		for (int i = 0; i < countFloat.length; i++) {
-			assertEquals(13,countFloat[i]);
+			assertEquals(13, countFloat[i]);
+		}
+	}
+
+	/**
+	 * Makes sure toStringState() contains the actual current state.
+	 */
+	@Test void toStringState() {
+		var alg = new ConfigGeneratorGrid<>(0xBEEF, TestConfigGenerator.ConfigDummyA.class);
+		alg.rangeOfIntegers("valueInt", -2, 10);
+		alg.rangeOfFloats("next.valueFloat", -2.0, 5.0);
+		alg.setDiscretizationRule("valueInt", ConfigGeneratorGrid.Discretization.INTEGER_VALUES);
+		alg.setDiscretizationRule("next.valueFloat", ConfigGeneratorGrid.Discretization.INTEGER_VALUES);
+
+		alg.initialize();
+		while (alg.hasNext()) {
+			TestConfigGenerator.ConfigDummyA config = alg.next();
+
+			String state = alg.toStringState();
+			String[] lines = state.split("\n");
+			for (String line : lines) {
+				if (line.startsWith("valueInt")) {
+					int value = Integer.parseInt(line.split(",")[1]);
+					assertEquals(config.valueInt, value);
+				} else if (line.startsWith("next.valueFloat")) {
+					float value = Float.parseFloat(line.split(",")[1]);
+					assertEquals(config.next.valueFloat, value);
+				}
+			}
 		}
 	}
 }

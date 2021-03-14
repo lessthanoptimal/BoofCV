@@ -118,7 +118,7 @@ public class ConfigGeneratorGrid<Config extends Configuration> extends ConfigGen
 	@Override public Config next() {
 		trial++;
 		// Creates a new config and assigns it to have the same value as configBase
-		Config output = createAndAssignConfig(configBase);
+		configCurrent = createAndAssignConfig(configBase);
 
 		try {
 			boolean finished = false;
@@ -146,7 +146,7 @@ public class ConfigGeneratorGrid<Config extends Configuration> extends ConfigGen
 			throw new RuntimeException(e);
 		}
 
-		return output;
+		return configCurrent;
 	}
 
 	/**
