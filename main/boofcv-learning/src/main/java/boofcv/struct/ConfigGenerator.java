@@ -410,7 +410,9 @@ public abstract class ConfigGenerator<Config extends Configuration> {
 		}
 
 		@Override Object selectValue( double fraction ) {
-			return idx0 + (int)((idx1 - idx0)*fraction + 0.5);
+			if (fraction>=1.0)
+				return idx1;
+			return idx0 + (int)((1 + idx1 - idx0)*fraction);
 		}
 
 		@Override String getDescription() {

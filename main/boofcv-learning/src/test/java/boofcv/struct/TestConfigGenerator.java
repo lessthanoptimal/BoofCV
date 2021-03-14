@@ -67,12 +67,21 @@ class TestConfigGenerator extends BoofStandardJUnit {
 		ConfigGenerator.Parameter p = alg.parameters.get(0);
 		assertEquals("valueInt", p.getPath());
 		assertEquals(0, p.getStateSize());
-		for (int i = 0; i < 20; i++) {
-			int value = (int)p.selectValue(i/19.0);
+
+		int[] count = new int[6];
+		for (int i = 0; i < 36; i++) {
+			int value = (int)p.selectValue(i/35.0);
 			assertTrue(value >= 5 && value <= 10);
+			count[value - 5]++;
 
 			value = (int)p.selectValue(rand);
 			assertTrue(value >= 5 && value <= 10);
+		}
+
+		// make sure each one was selected the same number of times
+		assertTrue(count[0] > 0);
+		for (int i = 1; i < count.length; i++) {
+			assertEquals(count[0], count[i]);
 		}
 	}
 
