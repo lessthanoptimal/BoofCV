@@ -77,9 +77,10 @@ public class ConfigImageRecognitionNister2006 implements Configuration {
 	public long randSeed = 0xDEADBEEF;
 
 	{
-		// Configure to behave like Method-A in the paper
-		tree.branchFactor = 10;
-		tree.maximumLevel = 6;
+		// Deviation from paper. This was determined through empirical tuning. See tech report
+		tree.branchFactor = 23;
+		tree.maximumLevel = 4;
+		minimumDepthFromRoot = 2;
 
 		// In the paper it didn't show a large improvement with lots of training cycles
 		// They maxed out at 50 iterations and saw little improvement past 25.
@@ -91,14 +92,13 @@ public class ConfigImageRecognitionNister2006 implements Configuration {
 		// Let's use SURF-FAST by default
 		features.typeDescribe = ConfigDescribeRegionPoint.DescriptorType.SURF_STABLE;
 		features.typeDetector = ConfigDetectInterestPoint.DetectorType.FAST_HESSIAN;
+		// Settings a threshold degrades overall results, even if in some specific situations makes it better
 		features.detectFastHessian.extract.threshold = 0;
 		features.detectFastHessian.extract.radius = 2;
-		// You can get better retrieval with more features, but you start running into hard limits.
-		// With this value you can train on about 20,000 images with SURF before you blow past the limits
-		// of an integer length array. This can be fixed in code without much difficulty, but you are
-		// already using 8G of memory.
-		features.detectFastHessian.maxFeaturesAll = 1500;
-		features.detectFastHessian.maxFeaturesPerScale = 600;
+		// 500 features is a good trade off for memory and performance. Accuracy can be improved
+		// with more features but becomes prohibitively expensive in larger datasets
+		features.detectFastHessian.maxFeaturesAll = 500;
+		features.detectFastHessian.maxFeaturesPerScale = 0;
 
 		// Reduce memory usage with very little loss in accuracy
 		features.convertDescriptor.outputData = ConfigConvertTupleDesc.DataType.F32;
