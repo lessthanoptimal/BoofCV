@@ -10,8 +10,9 @@ Version : 0.38
   * Added an example for computing the Trifocal Tensor
   * TODO Added an example showing how the trifocal tensor can be used
 - Applications
-  * Can batch down sampling now lets you shoot for a fix number of pixels.
+  * Batch down sample app now lets you scale for a fix number of pixels and keep aspect ratio.
   * CameraCalibration can now just save detections
+  * Several apps now let you specify a path using 'glob:' and 'regex:' greatly improving its versatility
   * TODO FiducialDetection add new fiducials to this
 - Functional API
   * Added forEachXY and forEachPixel to images
@@ -20,6 +21,9 @@ Version : 0.38
 - CalibrationIO
   * Can save and load calibration landmarks in CSV format
   * TODO have BoofCV save yaml in OpenCV format and remove dependency
+- UtilIO
+  * Added saveConfig() to save any BoofCV Configuration in a yaml format
+  * Added listSmart() that can list files inside a directory, blob pattern, or regex pattern
 - DownSelectVideoFramesFor3DApp
   * Fixed image scaling issue when image was smaller than desired
 - QR Code
@@ -35,6 +39,10 @@ Version : 0.38
 - Image Stitching
   * TODO N-View stitching https://github.com/lessthanoptimal/BoofCV/issues/167
 - Image Recognition
+  * Added: Bag-of-Words Nearest Neighbor search with Inverted Files
+      TODO Finish
+  * Added: Galvez-Lopez, Tardos, "Bag of Binary Words for Fast Place Recognition in Image Sequences" 2012
+      TODO Finish
   * Added: Nister, Stewenius, "Scalable recognition with a vocabulary tree", CVPR 2006
       TODO Make weight optional
       TODO Optimize query. It's much slower than IPOL
