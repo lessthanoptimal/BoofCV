@@ -21,6 +21,7 @@ package boofcv.alg.scene.nister2006;
 import boofcv.alg.scene.vocabtree.HierarchicalVocabularyTree;
 import boofcv.alg.scene.vocabtree.HierarchicalVocabularyTree.Node;
 import boofcv.errors.BoofCheckFailure;
+import boofcv.struct.ConfigLength;
 import gnu.trove.iterator.TIntIterator;
 import gnu.trove.set.TIntSet;
 import gnu.trove.set.hash.TIntHashSet;
@@ -48,6 +49,13 @@ import java.util.List;
 public class LearnNodeWeights<Point> {
 	/** Tree which has been learned already but with unspecified weights */
 	protected @Getter HierarchicalVocabularyTree<Point> tree;
+
+	/**
+	 * If a node has more than this number of images passing through it, it's weight is set to 0. The idea
+	 * being that there is little information gained by considering this node, but it adds significantly to the
+	 * cost of searching the tree as many images now need to be considered.
+	 */
+	public ConfigLength maximumNumberImagesInNode = ConfigLength.relative(1.0, 1);
 
 	/**
 	 * Sanity check. If true it will make sure every node is observed by an image. This is true when the training
@@ -108,11 +116,21 @@ public class LearnNodeWeights<Point> {
 		// root is always zero since all images are in it
 		tree.nodes.get(0).weight = 0;
 
+		// Compute the threshold relative to the total number of images
+		int maxImagesInNode = maximumNumberImagesInNode.computeI(totalImages);
+
 		for (int i = 1; i < tree.nodes.size; i++) {
 			Node n = tree.nodes.get(i);
 			int totalImagesFoundInsideOf = numberOfImagesWithNode.get(n.index);
 
-			if (totalImagesFoundInsideOf==0) {
+			// See if it exceeds the total number of images allowed. If so set the weight to zero so that it can't
+			// become part of the image descriptor
+			if (totalImagesFoundInsideOf > maxImagesInNode) {
+				n.weight = 0;
+				continue;
+			}
+
+			if (totalImagesFoundInsideOf == 0) {
 				// this can happen if the set of images used to train the graph is different from the images
 				// used to compute the weight. If that case we will set the weight to zero since it's
 				// never observed.

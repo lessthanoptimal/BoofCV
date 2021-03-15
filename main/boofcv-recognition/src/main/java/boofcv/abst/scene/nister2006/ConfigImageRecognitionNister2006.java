@@ -25,6 +25,7 @@ import boofcv.factory.feature.describe.ConfigDescribeRegionPoint;
 import boofcv.factory.feature.detdesc.ConfigDetectDescribe;
 import boofcv.factory.feature.detect.interest.ConfigDetectInterestPoint;
 import boofcv.misc.BoofMiscOps;
+import boofcv.struct.ConfigLength;
 import boofcv.struct.Configuration;
 import org.ddogleg.clustering.ConfigKMeans;
 
@@ -44,13 +45,13 @@ public class ConfigImageRecognitionNister2006 implements Configuration {
 	public int maxImagePixels = 640*480;
 
 	/** Clustering algorithm used when learning the hierarchical tree */
-	public ConfigKMeans kmeans = new ConfigKMeans();
+	public final ConfigKMeans kmeans = new ConfigKMeans();
 
 	/** Configuration for the tree when it's being learned */
-	public ConfigHierarchicalVocabularyTree tree = new ConfigHierarchicalVocabularyTree();
+	public final ConfigHierarchicalVocabularyTree tree = new ConfigHierarchicalVocabularyTree();
 
 	/** Image feature detector */
-	public ConfigDetectDescribe features = new ConfigDetectDescribe();
+	public final ConfigDetectDescribe features = new ConfigDetectDescribe();
 
 	/** Specifies which norm to use. L1 should yield better results but is slower than L2 to compute. */
 	public DistanceTypes distanceNorm = DistanceTypes.L1;
@@ -65,7 +66,12 @@ public class ConfigImageRecognitionNister2006 implements Configuration {
 	 */
 	public int minimumDepthFromRoot = 0;
 
-	// TODO make entropy weighting configurable
+	/**
+	 * If a node, during training, is viewed by more than this number of images then its weight is set to zero.
+	 * This is useful because it provides a more strategic way to eliminate less informative words from the
+	 * image descriptor than by setting {@link #minimumDepthFromRoot}. Disabled by default.
+	 */
+	public final ConfigLength maximumTrainingImagesInNode = ConfigLength.relative(1.0, 1);
 
 	/** Seed used in random number generators */
 	public long randSeed = 0xDEADBEEF;
@@ -104,6 +110,7 @@ public class ConfigImageRecognitionNister2006 implements Configuration {
 		kmeans.checkValidity();
 		tree.checkValidity();
 		features.checkValidity();
+		maximumTrainingImagesInNode.checkValidity();
 	}
 
 	public void setTo( ConfigImageRecognitionNister2006 src ) {
@@ -114,5 +121,6 @@ public class ConfigImageRecognitionNister2006 implements Configuration {
 		this.distanceNorm = src.distanceNorm;
 		this.minimumDepthFromRoot = src.minimumDepthFromRoot;
 		this.randSeed = src.randSeed;
+		this.maximumTrainingImagesInNode.setTo(src.maximumTrainingImagesInNode);
 	}
 }

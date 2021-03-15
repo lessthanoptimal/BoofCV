@@ -159,7 +159,9 @@ public class ImageRecognitionNister2006<Image extends ImageBase<Image>, TD exten
 		// Learn the weight for each node in the tree
 		if (verbose != null) verbose.println("learning the weights");
 		LearnNodeWeights<TD> learnWeights = new LearnNodeWeights<>();
+		learnWeights.maximumNumberImagesInNode.setTo(config.maximumTrainingImagesInNode);
 		learnWeights.reset(tree);
+
 		for (int imgIdx = 1; imgIdx < startIndex.size; imgIdx++) {
 			imageFeatures.reset();
 			int idx0 = startIndex.get(imgIdx - 1);
