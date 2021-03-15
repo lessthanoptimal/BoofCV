@@ -58,8 +58,6 @@ import java.util.List;
  * @author Peter Abeles
  */
 public class RecognitionVocabularyTreeNister2006<Point> {
-	// TODO block inverted files which are too large from scoring
-
 	/** Vocabulary Tree */
 	public @Getter HierarchicalVocabularyTree<Point> tree;
 
