@@ -22,7 +22,6 @@ println "Android version is $ext.ANDROID_VERSION"
 test.enabled = false
 
 repositories {
-    jcenter()
     maven {
         url 'https://maven.google.com/'
         name 'Google'
@@ -59,6 +58,5 @@ dependencies {
 
     // This imports files as aar which require extra work to import
     // instead I modified the code to not require them
-//    implementation 'com.android.support:appcompat-v7:27.1.1'
-    compileOnly 'com.android.support:support-v4:27.1.1'
+    compileOnly 'com.android.support:support-media-compat:27.1.1'
 }
