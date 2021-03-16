@@ -20,6 +20,7 @@ package boofcv.io;
 
 import boofcv.BoofVersion;
 import boofcv.struct.Configuration;
+import org.jetbrains.annotations.Nullable;
 import org.yaml.snakeyaml.Yaml;
 
 import java.io.IOException;
@@ -39,13 +40,13 @@ import static boofcv.io.calibration.CalibrationIO.createYmlObject;
  * @author Peter Abeles
  */
 public class SerializeConfigYaml {
-	public static void serialize( Configuration config, Writer writer ) {
+	public static void serialize( Configuration config, @Nullable Object canonical, Writer writer ) {
 		Map<String, Object> state = new HashMap<>();
 
 		// Add some version info to make debugging in the future easier
 		state.put("BoofCV.Version", BoofVersion.VERSION);
 		state.put("BoofCV.GIT_SHA", BoofVersion.GIT_SHA);
-		state.put(config.getClass().getName(), serialize(config));
+		state.put(config.getClass().getName(), serialize(config, canonical));
 
 		// Print what this is at the top of the file
 		try {
@@ -57,14 +58,23 @@ public class SerializeConfigYaml {
 		yaml.dump(state, writer);
 	}
 
-	private static Map<String, Object> serialize( Object config ) {
+	/**
+	 * Serializes the specified config. If a 'canonical' reference is provided then only what is not identical
+	 * in value to the canonical is serialized.
+	 *
+	 * @param config Object that is to be serialized
+	 * @param canonical Canonical object.
+	 */
+	static Map<String, Object> serialize( Object config, @Nullable Object canonical ) {
 		Map<String, Object> state = new HashMap<>();
 		Class type = config.getClass();
 		try {
 			Field[] fields = type.getFields();
 			for (Field f : fields) {
 				if (f.getType().isEnum() || f.getType().isPrimitive() || f.getType().getName().equals("java.lang.String")) {
-					state.put(f.getName(), f.get(config));
+					// Only add if they are not identical
+					if (canonical == null || !f.get(config).equals(f.get(canonical)))
+						state.put(f.getName(), f.get(config));
 				} else {
 					try {
 						// All Configuration must have setTo()
@@ -74,7 +84,11 @@ public class SerializeConfigYaml {
 					} catch (NoSuchMethodException e) {
 						throw new RuntimeException("Referenced object which is not enum, primitive, or a valid class");
 					}
-					state.put(f.getName(), serialize(f.get(config)));
+					Map<String, Object> result = canonical != null ?
+							serialize(f.get(config), f.get(canonical)) : serialize(f.get(config), null);
+					// If everything is identical then the returned object will be empty
+					if (!result.isEmpty())
+						state.put(f.getName(), result);
 				}
 			}
 			return state;
@@ -138,7 +152,8 @@ public class SerializeConfigYaml {
 					c.getMethod("setTo", c).invoke(f.get(parent), child);
 				}
 			}
-		} catch (NoSuchFieldException | IllegalAccessException | NoSuchMethodException | InstantiationException | InvocationTargetException e) {
+		} catch (NoSuchFieldException | IllegalAccessException | NoSuchMethodException |
+				InstantiationException | InvocationTargetException e) {
 			e.printStackTrace();
 		}
 	}
