@@ -26,6 +26,7 @@ import org.junit.jupiter.api.Test;
 import java.io.*;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
+import static org.ejml.UtilEjml.assertTrue;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 /**
@@ -47,12 +48,16 @@ class TestSerializeConfigYaml extends BoofStandardJUnit {
 		orig.valC = "Test";
 
 		ByteArrayOutputStream stream = new ByteArrayOutputStream();
-		SerializeConfigYaml.serialize(orig, new OutputStreamWriter(stream, UTF_8));
+		SerializeConfigYaml.serialize(orig, null, new OutputStreamWriter(stream, UTF_8));
 
 		Reader reader = new InputStreamReader(new ByteArrayInputStream(stream.toByteArray()), UTF_8);
 		ConfigBoof found = SerializeConfigYaml.deserialize(reader);
 
 		// See if the serialization/deserialization worked
+		checkIdentical(orig, found);
+	}
+
+	private void checkIdentical( ConfigBoof orig, ConfigBoof found ) {
 		assertEquals(orig.childA.valA, found.childA.valA);
 		assertEquals(orig.childA.valB, found.childA.valB);
 		assertEquals(orig.childA.valC, found.childA.valC);
@@ -64,6 +69,30 @@ class TestSerializeConfigYaml extends BoofStandardJUnit {
 		assertEquals(orig.valA, found.valA);
 		assertEquals(orig.valB, found.valB);
 		assertEquals(orig.valC, found.valC);
+	}
+
+	/** Provide a canonical reference */
+	@Test void encode_decode_canonical() {
+		var orig = new ConfigBoof();
+		orig.childA.valA = 88;
+		orig.childA.valB = -2;
+		orig.childA.external.stuff = "moo";
+		orig.childB.valB = -6;
+		orig.childB.valC = 101.1;
+		orig.childB.external.stuff = "foo";
+		orig.valB = EnumPNP.IPPE;
+
+		// Nothing should be serialized if you provide the object you wish to serialize as the reference
+		assertTrue(SerializeConfigYaml.serialize(orig, orig).isEmpty());
+
+		// Now try serializing using the default values as a reference
+		ByteArrayOutputStream stream = new ByteArrayOutputStream();
+		SerializeConfigYaml.serialize(orig, new ConfigBoof(), new OutputStreamWriter(stream, UTF_8));
+		Reader reader = new InputStreamReader(new ByteArrayInputStream(stream.toByteArray()), UTF_8);
+		ConfigBoof found = SerializeConfigYaml.deserialize(reader);
+
+		// See if the serialization/deserialization worked
+		checkIdentical(orig, found);
 	}
 
 	// Create a chain of configurations, both native BoofCV and External, that will exercise the system

@@ -83,7 +83,27 @@ public class UtilIO {
 	public static void saveConfig( Configuration config, File file ) {
 		try {
 			var output = new BufferedOutputStream(new FileOutputStream(file));
-			SerializeConfigYaml.serialize(config, new OutputStreamWriter(output, UTF_8));
+			SerializeConfigYaml.serialize(config, null, new OutputStreamWriter(output, UTF_8));
+			output.close();
+		} catch (IOException e) {
+			throw new UncheckedIOException(e);
+		}
+	}
+
+	/**
+	 * Saves a BoofCV {@link Configuration} in a YAML format to disk. Only values which are different from
+	 * the 'canonical' reference are saved. This can result in more concise and readable configurations but
+	 * can cause problems in repeatability if the reference is changed in the future.
+	 *
+	 * @param config (Input) The configuration which is to be saved
+	 * @param canonical (Input) A configuration that is compared against. Only what's not identical will be saved.
+	 * @param file (Input) Reference to the file that the configuration will be saved at.
+	 */
+	public static <C extends Configuration>
+	void saveConfig( C config, C canonical, File file ) {
+		try {
+			var output = new BufferedOutputStream(new FileOutputStream(file));
+			SerializeConfigYaml.serialize(config, canonical, new OutputStreamWriter(output, UTF_8));
 			output.close();
 		} catch (IOException e) {
 			throw new UncheckedIOException(e);
@@ -759,7 +779,7 @@ public class UtilIO {
 			} else if (directory.isDirectory()) {
 				File[] files = directory.listFiles();
 				if (files != null) {
-					for( File f : files ) {
+					for (File f : files) {
 						if (!filter.process(f.toPath()))
 							continue;
 						results.add(f.getPath());
@@ -786,14 +806,13 @@ public class UtilIO {
 	 * foo/aa/b
 	 *
 	 * Pattern:  foo/aa*  <-- This would only search inside of aa
-	 *           foo/aa/*
-	 *
+	 * foo/aa/*
 	 */
 	static String findBaseDirectoryInPattern( String pathPattern ) {
 		// Reduce the search scope and figure out if it's an absolute or relative path by looking for the
 		// prefix which is a valid path
 		File lastDirectory = new File("/");
-		int start = pathPattern.indexOf(':')+1;
+		int start = pathPattern.indexOf(':') + 1;
 		int end = -1;
 		boolean previousDirectory = false;
 		for (int i = start + 1; i <= pathPattern.length(); i++) {
@@ -803,7 +822,7 @@ public class UtilIO {
 			// it was going for
 			File parent = f.getParentFile();
 			if (parent != null && previousDirectory && parent.getPath().equals(lastDirectory.getPath())) {
-				end = i-1;
+				end = i - 1;
 			}
 
 			if (!f.isDirectory()) {
