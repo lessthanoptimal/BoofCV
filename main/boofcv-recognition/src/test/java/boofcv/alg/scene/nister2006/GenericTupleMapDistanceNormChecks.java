@@ -18,14 +18,10 @@
 
 package boofcv.alg.scene.nister2006;
 
-import boofcv.alg.scene.nister2006.TupleMapDistanceNorm.CommonWords;
 import boofcv.testing.BoofStandardJUnit;
 import org.ddogleg.struct.DogArray_F32;
 import org.ejml.UtilEjml;
 import org.junit.jupiter.api.Test;
-
-import java.util.ArrayList;
-import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
@@ -73,7 +69,7 @@ abstract class GenericTupleMapDistanceNormChecks extends BoofStandardJUnit {
 	/**
 	 * Compare the normalization to the same method computed other ways
 	 */
-	@Test void distance_CompareToManual() {
+	@Test void distanceUpdate_CompareToManual() {
 		TupleMapDistanceNorm alg = createAlg();
 
 		for (int i = 0; i < 20; i++) {
@@ -104,13 +100,13 @@ abstract class GenericTupleMapDistanceNormChecks extends BoofStandardJUnit {
 			alg.normalize(descA);
 			alg.normalize(descB);
 
-			List<CommonWords> commonWords = new ArrayList<>();
+			float found = 2.0f;
 			for (int j = 0; j < 10; j++) {
 				if (descA.get(j) != 0 && descB.get(j) != 0)
-					commonWords.add(new CommonWords(j,descA.get(j),descB.get(j)));
+					found += alg.distanceUpdate(descA.get(j), descB.get(j));
 			}
 
-			assertEquals(computeError(descA, descB), alg.distance(commonWords), UtilEjml.TEST_F32);
+			assertEquals(computeError(descA, descB), found, UtilEjml.TEST_F32);
 		}
 	}
 

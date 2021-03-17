@@ -69,8 +69,11 @@ public class ConfigImageRecognitionNister2006 implements Configuration {
 	/**
 	 * If a node has an inverted file list greater than this amount then it will be skipped when scoring. This
 	 * should be viewed as a last ditch effort when the query is too slow as it will degrade the quality.
+	 *
+	 * For example, with 1,000,000 images, setting this to be 5000 images reduced query time from 7,000 (ms) to
+	 * 85 (ms).
 	 */
-	public ConfigLength maximumQueryImagesInNode = ConfigLength.relative(1.0, 1);
+	public final ConfigLength maximumQueryImagesInNode = ConfigLength.relative(1.0, 1);
 
 	/**
 	 * If a node, during training, is viewed by more than this number of images then its weight is set to zero.

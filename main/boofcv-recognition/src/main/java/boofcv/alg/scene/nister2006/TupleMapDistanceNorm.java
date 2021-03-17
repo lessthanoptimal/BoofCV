@@ -21,8 +21,6 @@ package boofcv.alg.scene.nister2006;
 import boofcv.misc.BoofMiscOps;
 import org.ddogleg.struct.DogArray_F32;
 
-import java.util.List;
-
 /**
  * Generalized way for normalizing and computing the distance between two sparse descriptors in a map
  * format. Intended for use with {@link RecognitionVocabularyTreeNister2006}. Uses efficient distance
@@ -32,6 +30,7 @@ import java.util.List;
  * [1] Nister, David, and Henrik Stewenius. "Scalable recognition with a vocabulary tree."
  * 2006 IEEE Computer Society Conference on Computer Vision and Pattern Recognition (CVPR'06). Vol. 2. Ieee, 2006.
  * </p>
+ *
  * @author Peter Abeles
  */
 public interface TupleMapDistanceNorm {
@@ -41,40 +40,18 @@ public interface TupleMapDistanceNorm {
 	void normalize( DogArray_F32 weights );
 
 	/**
-	 * Computes the distance between two vectors using common elements only. This only works for a subclass of
-	 * normalizations. See [1] for details.
+	 * Incremental update to the distance. Initially the distance is set to 2.0, then for every word that
+	 * is present in both descriptors add this value to it.
+	 *
+	 * This only works for a subclass of normalizations. See [1] for details.
 	 */
-	float distance( List<CommonWords> common );
+	float distanceUpdate( float valA, float valB );
 
 	/** Create a new instance that is thread safe, i.e. read only settings can be shared */
 	TupleMapDistanceNorm newInstanceThread();
 
 	/** Distance functions that are supported */
 	enum Types {L1, L2}
-
-	/**
-	 * Set of words which are common between the two maps
-	 */
-	class CommonWords {
-		// The key which is common
-		public int key;
-		// value in descriptor A
-		public float valueA;
-		// value in descriptor B
-		public float valueB;
-
-		public CommonWords() {}
-
-		public CommonWords( int key, float valueA, float valueB ) {
-			setTo(key, valueA, valueB);
-		}
-
-		public void setTo( int key, float valueA, float valueB ) {
-			this.key = key;
-			this.valueA = valueA;
-			this.valueB = valueB;
-		}
-	}
 
 	/**
 	 * L1-norm for scoring
@@ -92,15 +69,8 @@ public interface TupleMapDistanceNorm {
 			}
 		}
 
-		@Override public float distance( List<CommonWords> common ) {
-			float sum = 2.0f;
-
-			for (int i = 0; i < common.size(); i++) {
-				CommonWords c = common.get(i);
-				sum += Math.abs(c.valueA - c.valueB) - c.valueA - c.valueB;
-			}
-
-			return sum;
+		@Override public float distanceUpdate( float valA, float valB ) {
+			return Math.abs(valA - valB) - valA - valB;
 		}
 
 		@Override public TupleMapDistanceNorm newInstanceThread() {
@@ -122,19 +92,12 @@ public interface TupleMapDistanceNorm {
 			BoofMiscOps.checkTrue(norm != 0.0, "Sum of weights is zero. Something went very wrong");
 
 			for (int i = 0; i < weights.size; i++) {
-				weights.data[i]/=norm;
+				weights.data[i] /= norm;
 			}
 		}
 
-		@Override public float distance( List<CommonWords> common ) {
-			float sum = 0.0f;
-
-			for (int i = 0; i < common.size(); i++) {
-				CommonWords c = common.get(i);
-				sum += c.valueA*c.valueB;
-			}
-
-			return 2.0f*(1.0f - sum);
+		@Override public float distanceUpdate( float valA, float valB ) {
+			return -2.0f*valA*valB;
 		}
 
 		@Override public TupleMapDistanceNorm newInstanceThread() {

@@ -18,7 +18,6 @@
 
 package boofcv.alg.scene.nister2006;
 
-import boofcv.alg.scene.nister2006.TupleMapDistanceNorm.CommonWords;
 import boofcv.alg.scene.vocabtree.HierarchicalVocabularyTree;
 import boofcv.alg.scene.vocabtree.HierarchicalVocabularyTree.Node;
 import boofcv.struct.ConfigLength;
@@ -164,6 +163,39 @@ public class RecognitionVocabularyTreeNister2006<Point> implements VerbosePrint 
 			return false;
 		}
 
+		findAndScoreMatches(queryImage);
+
+		if (matches.isEmpty())
+			return false;
+
+		if (verbose != null) verbose.println("raw matches.size=" + matches.size);
+
+		// Book keeping
+		for (int i = 0; i < matches.size(); i++) {
+			Match m = matches.get(i);
+			// Undo changes and make sure all elements are -1 again
+			imageIdx_to_match.set(m.identification, -1);
+			// m.identification is overloaded earlier and actually stores the index
+			m.identification = imagesDB.get(m.identification);
+		}
+
+		// When dealing with 1 million images using quick select first makes a significant improvement
+		// Sorting everything was taking 300 to 500 ms before and after it was taking 15 to 45 ms.
+		if (matches.size > limit) {
+			// Quick select ensures that the first N elements have the smallest N values, but they are not ordered
+			QuickSelect.select(matches.data, limit, matches.size);
+			matches.size = limit;
+		}
+		Collections.sort(matches.toList());
+
+		return true;
+	}
+
+	/**
+	 * Uses the inverted file for each word to create a list of potential matches while scoring the matches
+	 * efficiently
+	 */
+	protected void findAndScoreMatches( List<Point> queryImage ) {
 		// Don't use a node if it will degrade the runtime performance too much by considering too many images
 		// This will also degrade the quality of query results
 		int maximumInvertedFileLength = maximumQueryImagesInNode.computeI(imagesDB.size);
@@ -174,6 +206,7 @@ public class RecognitionVocabularyTreeNister2006<Point> implements VerbosePrint 
 		// NOTE: It's assumed imageIdx_to_match is full of -1
 		imageIdx_to_match.resize(imagesDB.size, -1);
 
+		// Find and score all the images that could possible be matched with the query
 		for (int wordIdx = 0; wordIdx < tmpDescWords.size; wordIdx++) {
 			float queryWordWeight = tmpDescWeights.get(wordIdx);
 			HierarchicalVocabularyTree.Node node = tree.nodes.get(tmpDescWords.get(wordIdx));
@@ -198,37 +231,11 @@ public class RecognitionVocabularyTreeNister2006<Point> implements VerbosePrint 
 					m = matches.get(imageIdx_to_match.get(imageIdx));
 				}
 
-				// TODO remove the commonWords list entirely
 				// Update the score computation. See TupleMapDistanceNorm for why this is done
-				m.commonWords.grow().setTo(node.index, queryWordWeight, invertedFile.weights.get(i));
+				m.error += distanceFunction.distanceUpdate(queryWordWeight, invertedFile.weights.get(i));
+				// NOTE: An earlier version created a list of common word weights. That took 5x longer
 			}
 		}
-
-		if (matches.isEmpty())
-			return false;
-
-		if (verbose != null) verbose.println("raw matches.size=" + matches.size);
-
-		// Compute the final scores
-		for (int i = 0; i < matches.size(); i++) {
-			Match m = matches.get(i);
-			m.error = distanceFunction.distance(m.commonWords.toList());
-			// Undo changes and make sure all elements are -1 again
-			imageIdx_to_match.set(m.identification, -1);
-			// m.identification is overloaded earlier and actually stores the index
-			m.identification = imagesDB.get(m.identification);
-		}
-
-		// When dealing with 1 million images using quick select first makes a significant improvement
-		// Sorting everything was taking 300 to 500 ms before and after it was taking 15 to 45 ms.
-		if (matches.size > limit) {
-			// Quick select ensures that the first N elements have the smallest N values, but they are not ordered
-			QuickSelect.select(matches.data, limit, matches.size);
-			matches.size = limit;
-		}
-		Collections.sort(matches.toList());
-
-		return true;
 	}
 
 	/**
@@ -331,13 +338,10 @@ public class RecognitionVocabularyTreeNister2006<Point> implements VerbosePrint 
 		public float error;
 		/** Reference to the image in the data base that was matched */
 		public int identification;
-		/** All words which are common between image in DB and the query image */
-		public final DogArray<CommonWords> commonWords = new DogArray<>(CommonWords::new);
 
 		public void reset() {
-			error = 0;
+			error = 2.0f; // See MapDistanceNorm for why the error initially has to be this value
 			identification = -1;
-			commonWords.reset();
 		}
 
 		@Override public int compareTo( Match o ) {
