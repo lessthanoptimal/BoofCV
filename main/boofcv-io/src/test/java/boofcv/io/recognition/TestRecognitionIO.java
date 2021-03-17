@@ -18,8 +18,8 @@
 
 package boofcv.io.recognition;
 
-import boofcv.abst.scene.nister2006.ConfigImageRecognitionNister2006;
-import boofcv.abst.scene.nister2006.ImageRecognitionNister2006;
+import boofcv.abst.scene.nister2006.ConfigSceneRecognitionNister2006;
+import boofcv.abst.scene.nister2006.SceneRecognitionNister2006;
 import boofcv.alg.scene.nister2006.RecognitionVocabularyTreeNister2006;
 import boofcv.alg.scene.nister2006.RecognitionVocabularyTreeNister2006.InvertedFile;
 import boofcv.alg.scene.vocabtree.HierarchicalVocabularyTree;
@@ -50,14 +50,14 @@ public class TestRecognitionIO extends BoofStandardJUnit {
 	@Test void save_load_nister2006() {
 		File dir = new File(System.getProperty("java.io.tmpdir"),"nister2006");
 		try {
-			var config = new ConfigImageRecognitionNister2006();
+			var config = new ConfigSceneRecognitionNister2006();
 			ImageType<GrayU8> imageType = ImageType.SB_U8;
 
-			var original = new ImageRecognitionNister2006<GrayU8,TupleDesc_F64>(config, imageType);
+			var original = new SceneRecognitionNister2006<GrayU8,TupleDesc_F64>(config, imageType);
 			original.setDatabase(createDefaultNister2006());
 
 			RecognitionIO.saveNister2006(original, dir);
-			ImageRecognitionNister2006<GrayU8,TupleDesc_F64> found = RecognitionIO.loadNister2006(dir, imageType);
+			SceneRecognitionNister2006<GrayU8,TupleDesc_F64> found = RecognitionIO.loadNister2006(dir, imageType);
 
 			// Check a some things to make sure it actually loaded
 			assertEquals(20, found.getDatabaseN().getImagesDB().size);

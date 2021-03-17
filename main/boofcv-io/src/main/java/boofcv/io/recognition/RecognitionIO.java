@@ -19,8 +19,8 @@
 package boofcv.io.recognition;
 
 import boofcv.BoofVersion;
-import boofcv.abst.scene.nister2006.ConfigImageRecognitionNister2006;
-import boofcv.abst.scene.nister2006.ImageRecognitionNister2006;
+import boofcv.abst.scene.nister2006.ConfigSceneRecognitionNister2006;
+import boofcv.abst.scene.nister2006.SceneRecognitionNister2006;
 import boofcv.alg.scene.nister2006.RecognitionVocabularyTreeNister2006;
 import boofcv.alg.scene.nister2006.RecognitionVocabularyTreeNister2006.InvertedFile;
 import boofcv.alg.scene.vocabtree.HierarchicalVocabularyTree;
@@ -47,13 +47,13 @@ import java.util.Objects;
  **/
 public class RecognitionIO {
 	/**
-	 * Saves {@link ImageRecognitionNister2006} to disk inside of the specified directory
+	 * Saves {@link SceneRecognitionNister2006} to disk inside of the specified directory
 	 *
 	 * @param def What is to be saved
 	 * @param dir Direction that it is to be saved
 	 */
 	public static <TD extends TupleDesc<TD>>
-	void saveNister2006( ImageRecognitionNister2006<?, TD> def, File dir ) {
+	void saveNister2006( SceneRecognitionNister2006<?, TD> def, File dir ) {
 		if (dir.exists() && !dir.isDirectory())
 			throw new IllegalArgumentException("Destination must not exist or be a directory");
 		if (!dir.exists())
@@ -65,21 +65,21 @@ public class RecognitionIO {
 	}
 
 	/**
-	 * Loads {@link ImageRecognitionNister2006}
+	 * Loads {@link SceneRecognitionNister2006}
 	 *
 	 * @param dir Where it has been saved
 	 * @param imageType The type of image it will process. This should match what it was trained on
 	 * @return a new instance loaded from disk
 	 */
 	public static <Image extends ImageBase<Image>, TD extends TupleDesc<TD>>
-	ImageRecognitionNister2006<Image, TD> loadNister2006( File dir, ImageType<Image> imageType ) {
+	SceneRecognitionNister2006<Image, TD> loadNister2006( File dir, ImageType<Image> imageType ) {
 		if (!dir.exists())
 			throw new IllegalArgumentException("Directory doesn't exist: " + dir.getPath());
 		if (!dir.isDirectory())
 			throw new IllegalArgumentException("Path is not a directory: " + dir.getPath());
 
-		ConfigImageRecognitionNister2006 config = UtilIO.loadConfig(new File(dir, "config.yaml"));
-		var alg = new ImageRecognitionNister2006<Image, TD>(config, imageType);
+		ConfigSceneRecognitionNister2006 config = UtilIO.loadConfig(new File(dir, "config.yaml"));
+		var alg = new SceneRecognitionNister2006<Image, TD>(config, imageType);
 		loadTreeBin(new File(dir, "database.bin"), alg.getDatabaseN());
 		alg.getImageIds().addAll(UtilIO.loadListStringYaml(new File(dir, "image_ids.yaml")));
 

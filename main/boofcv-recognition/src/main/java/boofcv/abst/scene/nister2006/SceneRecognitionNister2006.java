@@ -19,7 +19,7 @@
 package boofcv.abst.scene.nister2006;
 
 import boofcv.abst.feature.detdesc.DetectDescribePoint;
-import boofcv.abst.scene.ImageRecognition;
+import boofcv.abst.scene.SceneRecognition;
 import boofcv.alg.scene.nister2006.LearnNodeWeights;
 import boofcv.alg.scene.nister2006.RecognitionVocabularyTreeNister2006;
 import boofcv.alg.scene.vocabtree.HierarchicalVocabularyTree;
@@ -47,15 +47,15 @@ import java.util.List;
 import java.util.Set;
 
 /**
- * High level implementation of {@link RecognitionVocabularyTreeNister2006} for {@link ImageRecognition}.
+ * High level implementation of {@link RecognitionVocabularyTreeNister2006} for {@link SceneRecognition}.
  *
  * @author Peter Abeles
  */
-public class ImageRecognitionNister2006<Image extends ImageBase<Image>, TD extends TupleDesc<TD>>
-		implements ImageRecognition<Image> {
+public class SceneRecognitionNister2006<Image extends ImageBase<Image>, TD extends TupleDesc<TD>>
+		implements SceneRecognition<Image> {
 
 	/** Configuration for this class */
-	@Getter ConfigImageRecognitionNister2006 config;
+	@Getter ConfigSceneRecognitionNister2006 config;
 
 	/** Tree representation of image features */
 	@Getter HierarchicalVocabularyTree<TD> tree;
@@ -89,7 +89,7 @@ public class ImageRecognitionNister2006<Image extends ImageBase<Image>, TD exten
 	@Getter long timeLearnClusterMS;
 	@Getter long timeLearnWeightsMS;
 
-	public ImageRecognitionNister2006( ConfigImageRecognitionNister2006 config, ImageType<Image> imageType ) {
+	public SceneRecognitionNister2006( ConfigSceneRecognitionNister2006 config, ImageType<Image> imageType ) {
 		this.config = config;
 		this.detector = FactoryDetectDescribe.generic(config.features, imageType.getImageClass());
 		this.imageFeatures = new DogArray<>(() -> detector.createDescription());

@@ -20,4 +20,4 @@ package boofcv.abst.scene.nister2006;
 
 import boofcv.struct.StandardConfigurationChecks;
 
-class TestConfigImageRecognitionNister2006 extends StandardConfigurationChecks {}
+class TestConfigSceneRecognitionNister2006 extends StandardConfigurationChecks {}

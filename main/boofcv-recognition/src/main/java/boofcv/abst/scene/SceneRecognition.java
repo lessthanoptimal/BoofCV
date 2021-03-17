@@ -43,7 +43,7 @@ import java.util.Iterator;
  *
  * @author Peter Abeles
  */
-public interface ImageRecognition<T extends ImageBase<T>> extends VerbosePrint {
+public interface SceneRecognition<T extends ImageBase<T>> extends VerbosePrint {
 	/**
 	 * Learns a model by finding the most distinctive features in the provided set of images. Images are not
 	 * added to the database.
@@ -72,9 +72,7 @@ public interface ImageRecognition<T extends ImageBase<T>> extends VerbosePrint {
 	 */
 	boolean query( T queryImage, int limit, DogArray<Match> matches );
 
-	/**
-	 * The image data type which can be processed
-	 */
+	/** The image data type which can be processed */
 	ImageType<T> getImageType();
 
 	/** References a match in the database to the query image */

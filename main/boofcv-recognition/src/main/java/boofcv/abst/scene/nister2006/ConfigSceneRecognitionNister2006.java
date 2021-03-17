@@ -30,11 +30,11 @@ import boofcv.struct.Configuration;
 import org.ddogleg.clustering.ConfigKMeans;
 
 /**
- * Configuration for {@link ImageRecognitionNister2006}
+ * Configuration for {@link SceneRecognitionNister2006}
  *
  * @author Peter Abeles
  */
-public class ConfigImageRecognitionNister2006 implements Configuration {
+public class ConfigSceneRecognitionNister2006 implements Configuration {
 
 	/**
 	 * Images are rescaled so that they have at most this number of pixels. To turn off set to a value &le; 0.
@@ -123,7 +123,7 @@ public class ConfigImageRecognitionNister2006 implements Configuration {
 		maximumTrainingImagesInNode.checkValidity();
 	}
 
-	public void setTo( ConfigImageRecognitionNister2006 src ) {
+	public void setTo( ConfigSceneRecognitionNister2006 src ) {
 		this.maxImagePixels = src.maxImagePixels;
 		this.kmeans.setTo(src.kmeans);
 		this.tree.setTo(src.tree);

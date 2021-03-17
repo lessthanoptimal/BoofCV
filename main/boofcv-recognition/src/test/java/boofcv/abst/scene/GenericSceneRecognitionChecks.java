@@ -18,7 +18,7 @@
 
 package boofcv.abst.scene;
 
-import boofcv.abst.scene.ImageRecognition.Match;
+import boofcv.abst.scene.SceneRecognition.Match;
 import boofcv.alg.filter.blur.GBlurImageOps;
 import boofcv.alg.misc.GImageMiscOps;
 import boofcv.struct.image.ImageBase;
@@ -35,7 +35,7 @@ import static org.junit.jupiter.api.Assertions.*;
 /**
  * @author Peter Abeles
  **/
-public abstract class GenericImageRecognitionChecks<T extends ImageBase<T>> extends BoofStandardJUnit {
+public abstract class GenericSceneRecognitionChecks<T extends ImageBase<T>> extends BoofStandardJUnit {
 
 	int width = 640;
 	int height = 480;
@@ -47,9 +47,9 @@ public abstract class GenericImageRecognitionChecks<T extends ImageBase<T>> exte
 	 * Creates an instance of the algorithm being tested
 	 *
 	 */
-	protected abstract ImageRecognition<T> createAlg();
+	protected abstract SceneRecognition<T> createAlg();
 
-	protected GenericImageRecognitionChecks( ImageType<T> imageType ) {
+	protected GenericSceneRecognitionChecks( ImageType<T> imageType ) {
 		this.imageType = imageType;
 	}
 
@@ -86,7 +86,7 @@ public abstract class GenericImageRecognitionChecks<T extends ImageBase<T>> exte
 			images.add(imageType.createImage(width, height));
 		}
 
-		ImageRecognition<T> alg = createAlg();
+		SceneRecognition<T> alg = createAlg();
 		alg.learnModel(images.iterator());
 	}
 
@@ -99,7 +99,7 @@ public abstract class GenericImageRecognitionChecks<T extends ImageBase<T>> exte
 		createImages();
 
 		int maxMatches = 5; // maximum allowed matches
-		ImageRecognition<T> alg = createAlg();
+		SceneRecognition<T> alg = createAlg();
 
 		// Learn a descriptor
 		alg.learnModel(images.iterator());

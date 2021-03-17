@@ -18,9 +18,9 @@
 
 package boofcv.examples.recognition;
 
-import boofcv.abst.scene.ImageRecognition;
-import boofcv.abst.scene.nister2006.ConfigImageRecognitionNister2006;
-import boofcv.abst.scene.nister2006.ImageRecognitionNister2006;
+import boofcv.abst.scene.SceneRecognition;
+import boofcv.abst.scene.nister2006.ConfigSceneRecognitionNister2006;
+import boofcv.abst.scene.nister2006.SceneRecognitionNister2006;
 import boofcv.gui.ListDisplayPanel;
 import boofcv.gui.image.ScaleOptions;
 import boofcv.gui.image.ShowImages;
@@ -40,16 +40,24 @@ import java.util.Collections;
 import java.util.List;
 
 /**
+ * In BoofCV, scene recognition [1] refers to the problem of trying to identify photos of the same scene (not a single
+ * object in the image) from different perspectives. This is of interest if you want to organize your photos, find
+ * images to create a mosaic from, or cluster photos for 3D reconstruction. Solutions to this problem tend to
+ * emphasise fast accurate retrieval from large databases.
+ *
+ * [1] As far as I can tell there is no universal terminology for this specific sub problem. It is sometimes lumped
+ * under Content Based Image Retrieval (CBIR), which is a very generic term.
+ *
  * @author Peter Abeles
- **/
-public class ExampleImageRecognition {
+ */
+public class ExampleSceneRecognition {
 
 	public static void main( String[] args ) {
 		String imagePath = "/home/pja/Downloads/inria/jpg1";//UtilIO.pathExample("recognition/vacation");
 		List<String> images = UtilIO.listByPrefix(imagePath, null, ".jpg");
 		Collections.sort(images);
 
-		ImageRecognitionNister2006<GrayU8, ?> recognizer;
+		SceneRecognitionNister2006<GrayU8, ?> recognizer;
 
 		File saveDirectory = new File("nister2006");
 
@@ -60,9 +68,9 @@ public class ExampleImageRecognition {
 			recognizer = RecognitionIO.loadNister2006(saveDirectory, ImageType.SB_U8);
 		} else {
 			// Learn how to describe images
-			var config = new ConfigImageRecognitionNister2006();
+			var config = new ConfigSceneRecognitionNister2006();
 
-			recognizer = new ImageRecognitionNister2006<>(config, ImageType.SB_U8);
+			recognizer = new SceneRecognitionNister2006<>(config, ImageType.SB_U8);
 			recognizer.setVerbose(System.out, null);
 
 			recognizer.learnModel(imageIterator);
@@ -85,7 +93,7 @@ public class ExampleImageRecognition {
 		gui.addImage(UtilImageIO.loadImage(images.get(0)), "Target", ScaleOptions.ALL);
 
 		// Look up images
-		DogArray<ImageRecognition.Match> matches = new DogArray<>(ImageRecognition.Match::new);
+		DogArray<SceneRecognition.Match> matches = new DogArray<>(SceneRecognition.Match::new);
 		imageIterator.reset();
 		recognizer.query(imageIterator.next(), 10, matches);
 		for (int i = 0; i < matches.size; i++) {

@@ -18,8 +18,8 @@
 
 package boofcv.abst.scene.nister2006;
 
-import boofcv.abst.scene.GenericImageRecognitionChecks;
-import boofcv.abst.scene.ImageRecognition;
+import boofcv.abst.scene.GenericSceneRecognitionChecks;
+import boofcv.abst.scene.SceneRecognition;
 import boofcv.factory.feature.describe.ConfigConvertTupleDesc;
 import boofcv.factory.feature.describe.ConfigDescribeRegionPoint;
 import boofcv.struct.image.GrayU8;
@@ -30,42 +30,42 @@ import org.junit.jupiter.api.Nested;
 /**
  * @author Peter Abeles
  */
-class TestImageRecognitionNister2006 extends BoofStandardJUnit {
+class TestSceneRecognitionNister2006 extends BoofStandardJUnit {
 
 	/**
 	 * Default settings with a few minor tweaks for speed
 	 */
-	@Nested class MostlyDefault extends GenericImageRecognitionChecks<GrayU8> {
+	@Nested class MostlyDefault extends GenericSceneRecognitionChecks<GrayU8> {
 		public MostlyDefault() {
 			super(ImageType.SB_U8);
 		}
 
-		@Override protected ImageRecognition<GrayU8> createAlg() {
-			var config = new ConfigImageRecognitionNister2006();
+		@Override protected SceneRecognition<GrayU8> createAlg() {
+			var config = new ConfigSceneRecognitionNister2006();
 			config.tree.branchFactor = 3;
 			config.tree.maximumLevel = 3;
 			config.features.detectFastHessian.extract.radius = 6;
-			return new ImageRecognitionNister2006<>(config, imageType);
+			return new SceneRecognitionNister2006<>(config, imageType);
 		}
 	}
 
 	/**
 	 * Use binary features and see if it still works
 	 */
-	@Nested class Binary extends GenericImageRecognitionChecks<GrayU8> {
+	@Nested class Binary extends GenericSceneRecognitionChecks<GrayU8> {
 		public Binary() {
 			super(ImageType.SB_U8);
 		}
 
-		@Override protected ImageRecognition<GrayU8> createAlg() {
-			var config = new ConfigImageRecognitionNister2006();
+		@Override protected SceneRecognition<GrayU8> createAlg() {
+			var config = new ConfigSceneRecognitionNister2006();
 			config.tree.branchFactor = 5;
 			config.tree.maximumLevel = 3;
 			config.features.typeDescribe = ConfigDescribeRegionPoint.DescriptorType.BRIEF;
 			config.features.describeBrief.fixed = false;
 			config.features.detectFastHessian.extract.radius = 12;
 			config.features.convertDescriptor.outputData = ConfigConvertTupleDesc.DataType.NATIVE;
-			return new ImageRecognitionNister2006<>(config, imageType);
+			return new SceneRecognitionNister2006<>(config, imageType);
 		}
 	}
 }
