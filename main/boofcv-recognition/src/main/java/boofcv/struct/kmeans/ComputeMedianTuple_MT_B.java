@@ -80,10 +80,49 @@ public class ComputeMedianTuple_MT_B extends ComputeMedianTuple_B {
 
 				// Increment the counter for each "true" bit in the tuple
 				int[] bitCount = bitCounts.get(clusterIdx);
-				for (int i = 0; i < dof; i++) {
-					if (!tuple.isBitTrue(i))
+				int bit = 0;
+				while (bit + 32 < dof) {
+					// Unroll for speed
+					int value = tuple.data[bit/32];
+					if ((value & 0x00000001) != 0) bitCount[bit]++;
+					if ((value & 0x00000002) != 0) bitCount[bit + 1]++;
+					if ((value & 0x00000004) != 0) bitCount[bit + 2]++;
+					if ((value & 0x00000008) != 0) bitCount[bit + 3]++;
+					if ((value & 0x00000010) != 0) bitCount[bit + 4]++;
+					if ((value & 0x00000020) != 0) bitCount[bit + 5]++;
+					if ((value & 0x00000040) != 0) bitCount[bit + 6]++;
+					if ((value & 0x00000080) != 0) bitCount[bit + 7]++;
+					if ((value & 0x00000100) != 0) bitCount[bit + 8]++;
+					if ((value & 0x00000200) != 0) bitCount[bit + 9]++;
+					if ((value & 0x00000400) != 0) bitCount[bit + 10]++;
+					if ((value & 0x00000800) != 0) bitCount[bit + 11]++;
+					if ((value & 0x00001000) != 0) bitCount[bit + 12]++;
+					if ((value & 0x00002000) != 0) bitCount[bit + 13]++;
+					if ((value & 0x00004000) != 0) bitCount[bit + 14]++;
+					if ((value & 0x00008000) != 0) bitCount[bit + 15]++;
+					if ((value & 0x00010000) != 0) bitCount[bit + 16]++;
+					if ((value & 0x00020000) != 0) bitCount[bit + 17]++;
+					if ((value & 0x00040000) != 0) bitCount[bit + 18]++;
+					if ((value & 0x00080000) != 0) bitCount[bit + 19]++;
+					if ((value & 0x00100000) != 0) bitCount[bit + 20]++;
+					if ((value & 0x00200000) != 0) bitCount[bit + 21]++;
+					if ((value & 0x00400000) != 0) bitCount[bit + 22]++;
+					if ((value & 0x00800000) != 0) bitCount[bit + 23]++;
+					if ((value & 0x01000000) != 0) bitCount[bit + 24]++;
+					if ((value & 0x02000000) != 0) bitCount[bit + 25]++;
+					if ((value & 0x04000000) != 0) bitCount[bit + 26]++;
+					if ((value & 0x08000000) != 0) bitCount[bit + 27]++;
+					if ((value & 0x10000000) != 0) bitCount[bit + 28]++;
+					if ((value & 0x20000000) != 0) bitCount[bit + 29]++;
+					if ((value & 0x40000000) != 0) bitCount[bit + 30]++;
+					if ((value & 0x80000000) != 0) bitCount[bit + 31]++;
+					bit += 32;
+				}
+				// handle the remainder if it doesn't align with 32-bit integers
+				for (; bit < dof; bit++) {
+					if (!tuple.isBitTrue(bit))
 						continue;
-					bitCount[i]++;
+					bitCount[bit]++;
 				}
 			}
 		});
@@ -105,7 +144,7 @@ public class ComputeMedianTuple_MT_B extends ComputeMedianTuple_B {
 	}
 
 	class ThreadData {
-		DogArray<int[]> bitCounts = new DogArray<>(()->new int[dof]);
+		DogArray<int[]> bitCounts = new DogArray<>(() -> new int[dof]);
 		TupleDesc_B point = new TupleDesc_B(dof);
 		DogArray_I32 assignmentCounts = new DogArray_I32();
 	}
