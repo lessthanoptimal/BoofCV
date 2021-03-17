@@ -98,6 +98,7 @@ public class ImageRecognitionNister2006<Image extends ImageBase<Image>, TD exten
 
 		databaseN.setDistanceType(config.distanceNorm);
 		databaseN.minimumDepthFromRoot = config.minimumDepthFromRoot;
+		databaseN.maximumQueryImagesInNode.setTo(config.maximumQueryImagesInNode);
 
 		downSample = FactoryFilterLambdas.createDownSampleFilter(config.maxImagePixels, imageType);
 	}

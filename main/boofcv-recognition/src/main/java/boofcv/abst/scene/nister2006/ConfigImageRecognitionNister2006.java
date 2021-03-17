@@ -67,6 +67,12 @@ public class ConfigImageRecognitionNister2006 implements Configuration {
 	public int minimumDepthFromRoot = 0;
 
 	/**
+	 * If a node has an inverted file list greater than this amount then it will be skipped when scoring. This
+	 * should be viewed as a last ditch effort when the query is too slow as it will degrade the quality.
+	 */
+	public ConfigLength maximumQueryImagesInNode = ConfigLength.relative(1.0, 1);
+
+	/**
 	 * If a node, during training, is viewed by more than this number of images then its weight is set to zero.
 	 * This is useful because it provides a more strategic way to eliminate less informative words from the
 	 * image descriptor than by setting {@link #minimumDepthFromRoot}. Disabled by default.
@@ -110,6 +116,7 @@ public class ConfigImageRecognitionNister2006 implements Configuration {
 		kmeans.checkValidity();
 		tree.checkValidity();
 		features.checkValidity();
+		maximumQueryImagesInNode.checkValidity();
 		maximumTrainingImagesInNode.checkValidity();
 	}
 
@@ -121,6 +128,7 @@ public class ConfigImageRecognitionNister2006 implements Configuration {
 		this.distanceNorm = src.distanceNorm;
 		this.minimumDepthFromRoot = src.minimumDepthFromRoot;
 		this.randSeed = src.randSeed;
+		this.maximumQueryImagesInNode.setTo(src.maximumQueryImagesInNode);
 		this.maximumTrainingImagesInNode.setTo(src.maximumTrainingImagesInNode);
 	}
 }

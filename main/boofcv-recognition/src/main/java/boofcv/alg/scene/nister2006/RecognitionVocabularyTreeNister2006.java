@@ -21,8 +21,10 @@ package boofcv.alg.scene.nister2006;
 import boofcv.alg.scene.nister2006.TupleMapDistanceNorm.CommonWords;
 import boofcv.alg.scene.vocabtree.HierarchicalVocabularyTree;
 import boofcv.alg.scene.vocabtree.HierarchicalVocabularyTree.Node;
+import boofcv.struct.ConfigLength;
 import lombok.Getter;
 import lombok.Setter;
+import org.ddogleg.sorting.QuickSelect;
 import org.ddogleg.struct.*;
 import org.jetbrains.annotations.Nullable;
 import pabeles.concurrency.GrowArray;
@@ -66,6 +68,13 @@ public class RecognitionVocabularyTreeNister2006<Point> implements VerbosePrint 
 
 	/** A node can be part of the descriptor if it's at least this far from the root node */
 	public int minimumDepthFromRoot = 0;
+
+	/**
+	 * If a node has an inverted file list greater than this amount then it will be skipped when scoring. This
+	 * should be viewed as a last ditch effort when the query is too slow. If there are a 1,000,000 images in the
+	 * DB, then 20,000 seems to be a reasonable number.
+	 */
+	public ConfigLength maximumQueryImagesInNode = ConfigLength.relative(1.0, 1);
 
 	/** User data associated with each node */
 	public final GrowArray<InvertedFile> invertedFiles = new GrowArray<>(InvertedFile::new, InvertedFile::reset);
@@ -155,6 +164,10 @@ public class RecognitionVocabularyTreeNister2006<Point> implements VerbosePrint 
 			return false;
 		}
 
+		// Don't use a node if it will degrade the runtime performance too much by considering too many images
+		// This will also degrade the quality of query results
+		int maximumInvertedFileLength = maximumQueryImagesInNode.computeI(imagesDB.size);
+
 		// Create a description of this image and collect potential matches from leaves
 		describe(queryImage, tmpDescWeights, tmpDescWords);
 
@@ -166,6 +179,10 @@ public class RecognitionVocabularyTreeNister2006<Point> implements VerbosePrint 
 			HierarchicalVocabularyTree.Node node = tree.nodes.get(tmpDescWords.get(wordIdx));
 
 			InvertedFile invertedFile = invertedFiles.get(node.index);
+
+			// See above
+			if (invertedFile.size > maximumInvertedFileLength)
+				continue;
 
 			for (int i = 0; i < invertedFile.size; i++) {
 				// Get the list of images in the database which have this particular word using
@@ -181,6 +198,7 @@ public class RecognitionVocabularyTreeNister2006<Point> implements VerbosePrint 
 					m = matches.get(imageIdx_to_match.get(imageIdx));
 				}
 
+				// TODO remove the commonWords list entirely
 				// Update the score computation. See TupleMapDistanceNorm for why this is done
 				m.commonWords.grow().setTo(node.index, queryWordWeight, invertedFile.weights.get(i));
 			}
@@ -197,14 +215,18 @@ public class RecognitionVocabularyTreeNister2006<Point> implements VerbosePrint 
 			m.error = distanceFunction.distance(m.commonWords.toList());
 			// Undo changes and make sure all elements are -1 again
 			imageIdx_to_match.set(m.identification, -1);
-			// m.identification is overloaded earlier and actualy stores the index
+			// m.identification is overloaded earlier and actually stores the index
 			m.identification = imagesDB.get(m.identification);
 		}
 
-		// NOTE: quick select then Collections.sort on the remaining entries is about 1.3x to 2x faster, but it's not
-		//       a bottle neck. Sort time for 8000 elements is about 2.5 ms
+		// When dealing with 1 million images using quick select first makes a significant improvement
+		// Sorting everything was taking 300 to 500 ms before and after it was taking 15 to 45 ms.
+		if (matches.size > limit) {
+			// Quick select ensures that the first N elements have the smallest N values, but they are not ordered
+			QuickSelect.select(matches.data, limit, matches.size);
+			matches.size = limit;
+		}
 		Collections.sort(matches.toList());
-		matches.size = Math.min(matches.size, limit);
 
 		return true;
 	}
