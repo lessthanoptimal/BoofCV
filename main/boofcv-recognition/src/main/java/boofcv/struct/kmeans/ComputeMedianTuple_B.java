@@ -41,13 +41,13 @@ public class ComputeMedianTuple_B implements ComputeMeanClusters<TupleDesc_B> {
 	protected final int dof;
 
 	public ComputeMedianTuple_B( int DOF ) {
-		this.bitCounts = new DogArray<>(()->new int[DOF]);
+		this.bitCounts = new DogArray<>(() -> new int[DOF]);
 		this.dof = DOF;
 	}
 
 	@Override public void process( LArrayAccessor<TupleDesc_B> points,
 								   DogArray_I32 assignments,
-								   FastAccess<TupleDesc_B> clusters) {
+								   FastAccess<TupleDesc_B> clusters ) {
 
 		if (assignments.size != points.size())
 			throw new IllegalArgumentException("Points and assignments need to be the same size");
@@ -56,7 +56,7 @@ public class ComputeMedianTuple_B implements ComputeMeanClusters<TupleDesc_B> {
 		assignmentCounts.resize(clusters.size, 0);
 		bitCounts.resize(clusters.size);
 		for (int i = 0; i < bitCounts.size; i++) {
-			Arrays.fill(bitCounts.get(i),0);
+			Arrays.fill(bitCounts.get(i), 0);
 		}
 
 		countBitsInEachCluster(points, assignments);
@@ -64,6 +64,9 @@ public class ComputeMedianTuple_B implements ComputeMeanClusters<TupleDesc_B> {
 		countsToBits(clusters);
 	}
 
+	/**
+	 * Goes through each point and counts the number of bits are true in each cluster its assigned to
+	 */
 	protected void countBitsInEachCluster( LArrayAccessor<TupleDesc_B> points, DogArray_I32 assignments ) {
 		// Compute the sum of all points in each cluster
 		for (int pointIdx = 0; pointIdx < points.size(); pointIdx++) {
@@ -75,10 +78,49 @@ public class ComputeMedianTuple_B implements ComputeMeanClusters<TupleDesc_B> {
 
 			// Increment the counter for each "true" bit in the tuple
 			int[] bitCount = bitCounts.get(clusterIdx);
-			for (int i = 0; i < dof; i++) {
-				if (!tuple.isBitTrue(i))
+			int bit = 0;
+			while (bit + 32 < dof) {
+				// Unroll for speed
+				int value = tuple.data[bit/32];
+				if ((value & 0x00000001) != 0) bitCount[bit]++;
+				if ((value & 0x00000002) != 0) bitCount[bit + 1]++;
+				if ((value & 0x00000004) != 0) bitCount[bit + 2]++;
+				if ((value & 0x00000008) != 0) bitCount[bit + 3]++;
+				if ((value & 0x00000010) != 0) bitCount[bit + 4]++;
+				if ((value & 0x00000020) != 0) bitCount[bit + 5]++;
+				if ((value & 0x00000040) != 0) bitCount[bit + 6]++;
+				if ((value & 0x00000080) != 0) bitCount[bit + 7]++;
+				if ((value & 0x00000100) != 0) bitCount[bit + 8]++;
+				if ((value & 0x00000200) != 0) bitCount[bit + 9]++;
+				if ((value & 0x00000400) != 0) bitCount[bit + 10]++;
+				if ((value & 0x00000800) != 0) bitCount[bit + 11]++;
+				if ((value & 0x00001000) != 0) bitCount[bit + 12]++;
+				if ((value & 0x00002000) != 0) bitCount[bit + 13]++;
+				if ((value & 0x00004000) != 0) bitCount[bit + 14]++;
+				if ((value & 0x00008000) != 0) bitCount[bit + 15]++;
+				if ((value & 0x00010000) != 0) bitCount[bit + 16]++;
+				if ((value & 0x00020000) != 0) bitCount[bit + 17]++;
+				if ((value & 0x00040000) != 0) bitCount[bit + 18]++;
+				if ((value & 0x00080000) != 0) bitCount[bit + 19]++;
+				if ((value & 0x00100000) != 0) bitCount[bit + 20]++;
+				if ((value & 0x00200000) != 0) bitCount[bit + 21]++;
+				if ((value & 0x00400000) != 0) bitCount[bit + 22]++;
+				if ((value & 0x00800000) != 0) bitCount[bit + 23]++;
+				if ((value & 0x01000000) != 0) bitCount[bit + 24]++;
+				if ((value & 0x02000000) != 0) bitCount[bit + 25]++;
+				if ((value & 0x04000000) != 0) bitCount[bit + 26]++;
+				if ((value & 0x08000000) != 0) bitCount[bit + 27]++;
+				if ((value & 0x10000000) != 0) bitCount[bit + 28]++;
+				if ((value & 0x20000000) != 0) bitCount[bit + 29]++;
+				if ((value & 0x40000000) != 0) bitCount[bit + 30]++;
+				if ((value & 0x80000000) != 0) bitCount[bit + 31]++;
+				bit += 32;
+			}
+			// handle the remainder if it doesn't align with 32-bit integers
+			for (; bit < dof; bit++) {
+				if (!tuple.isBitTrue(bit))
 					continue;
-				bitCount[i]++;
+				bitCount[bit]++;
 			}
 		}
 	}
@@ -94,7 +136,7 @@ public class ComputeMedianTuple_B implements ComputeMeanClusters<TupleDesc_B> {
 			// shouldn't be necessary, but this way we know if there are extra bits in the array they are all zero
 			Arrays.fill(cluster.data,0);
 			for (int i = 0; i < dof; i++) {
-				cluster.setBit(i,bitCount[i]>threshold);
+				cluster.setBit(i, bitCount[i] > threshold);
 			}
 		}
 	}
