@@ -24,10 +24,13 @@ import boofcv.alg.scene.vocabtree.HierarchicalVocabularyTree.Node;
 import lombok.Getter;
 import lombok.Setter;
 import org.ddogleg.struct.*;
+import org.jetbrains.annotations.Nullable;
 import pabeles.concurrency.GrowArray;
 
+import java.io.PrintStream;
 import java.util.Collections;
 import java.util.List;
+import java.util.Set;
 
 /**
  * Image recognition based off of [1] using inverted files. A {@link HierarchicalVocabularyTree} is assumed to hav
@@ -57,7 +60,7 @@ import java.util.List;
  *
  * @author Peter Abeles
  */
-public class RecognitionVocabularyTreeNister2006<Point> {
+public class RecognitionVocabularyTreeNister2006<Point> implements VerbosePrint {
 	/** Vocabulary Tree */
 	public @Getter HierarchicalVocabularyTree<Point> tree;
 
@@ -87,6 +90,9 @@ public class RecognitionVocabularyTreeNister2006<Point> {
 	// temporary storage for an image TF-IDF descriptor
 	DogArray_F32 tmpDescWeights = new DogArray_F32();
 	DogArray_I32 tmpDescWords = new DogArray_I32();
+
+	// If not null then print verbose information here
+	PrintStream verbose;
 
 	/**
 	 * Configures the tree by adding LeafData to all the leaves in the tree then saves a reference for future use
@@ -183,6 +189,8 @@ public class RecognitionVocabularyTreeNister2006<Point> {
 		if (matches.isEmpty())
 			return false;
 
+		if (verbose != null) verbose.println("raw matches.size=" + matches.size);
+
 		// Compute the final scores
 		for (int i = 0; i < matches.size(); i++) {
 			Match m = matches.get(i);
@@ -209,7 +217,7 @@ public class RecognitionVocabularyTreeNister2006<Point> {
 	 * @param descWeights (Output) Weights for non-zero word in TD-IDF descriptor for this image
 	 * @param descWords (Output) Word index for non-zero word in TD-IDF descriptor for this image
 	 */
-	protected void describe( List<Point> imageFeatures, DogArray_F32 descWeights, DogArray_I32 descWords) {
+	protected void describe( List<Point> imageFeatures, DogArray_F32 descWeights, DogArray_I32 descWords ) {
 		// Reset work variables
 		frequencies.reset();
 		descWeights.reset();
@@ -219,8 +227,8 @@ public class RecognitionVocabularyTreeNister2006<Point> {
 		nodeIdx_to_match.resize(tree.nodes.size, -1);
 
 		for (int featureIdx = 0; featureIdx < imageFeatures.size(); featureIdx++) {
-			tree.searchPathToLeaf(imageFeatures.get(featureIdx), (depth,node)->{
-				if (depth<minimumDepthFromRoot || node.weight <= 0.0f)
+			tree.searchPathToLeaf(imageFeatures.get(featureIdx), ( depth, node ) -> {
+				if (depth < minimumDepthFromRoot || node.weight <= 0.0f)
 					return;
 
 				Frequency f;
@@ -272,6 +280,10 @@ public class RecognitionVocabularyTreeNister2006<Point> {
 			case L2 -> new TupleMapDistanceNorm.L2();
 			default -> throw new IllegalArgumentException("Unknown type " + type);
 		};
+	}
+
+	@Override public void setVerbose( @Nullable PrintStream out, @Nullable Set<String> settings ) {
+		this.verbose = out;
 	}
 
 	/**
