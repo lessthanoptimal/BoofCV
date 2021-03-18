@@ -19,10 +19,11 @@
 package boofcv.alg.fiducial.qrcode;
 
 import boofcv.testing.BoofStandardJUnit;
+import org.apache.commons.compress.utils.Charsets;
 import org.junit.jupiter.api.Test;
 
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static boofcv.alg.fiducial.qrcode.EciEncoding.UTF8;
+import static org.junit.jupiter.api.Assertions.*;
 
 /**
  * @author Peter Abeles
@@ -32,7 +33,7 @@ public class TestEciEncoding extends BoofStandardJUnit {
 		for (int i = 0; i <= 0xFF; i++) {
 			if (i <= 0xBF)
 				assertTrue(EciEncoding.isValidUTF8(i));
-			else if (i >= 0xC3 && i <= 0xF4)
+			else if (i >= 0xC2 && i <= 0xF4)
 				assertTrue(EciEncoding.isValidUTF8(i));
 			else
 				assertFalse(EciEncoding.isValidUTF8(i));
@@ -59,5 +60,10 @@ public class TestEciEncoding extends BoofStandardJUnit {
 			else
 				assertFalse(EciEncoding.isValidIso8869_1(i));
 		}
+	}
+
+	@Test void guessEncoding_Bug_01() {
+		byte[] message = "§".getBytes(Charsets.UTF_8);
+		assertSame(UTF8, EciEncoding.guessEncoding(message));
 	}
 }

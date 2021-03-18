@@ -31,6 +31,8 @@ Version : 0.38
   * Fixed image scaling issue when image was smaller than desired
 - QR Code
   * Fixed reading of second format region. Thanks DCNick3 for finding the issue!
+  * Fixed UTF8 issued when guessing the encoding. C2 was incorrectly marked as invalid
+    Thanks gerripeach for finding the issue and helping debug it!
 - Image Features
   * Fast Corners are now concurrent
   * SIFT the entire scale space is computed at once. This might result in a net ~10% increase memory.
