@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -27,9 +27,9 @@ public interface PackedBits {
 
 	int get( int which );
 
-	void set( int which , int value );
+	void set( int which, int value );
 
-	void resize(int totalBits );
+	void resize( int totalBits );
 
 	void zero();
 

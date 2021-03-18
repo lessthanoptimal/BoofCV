@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -33,9 +33,8 @@ import java.awt.image.BufferedImage;
 public class TestQrCodeGeneratorImage extends BoofStandardJUnit {
 	boolean showImage = false; // use a boolean to make it easier to turn on and off. Don't need to add import
 
-	@Test
-	public void showImage() {
-		if(!showImage)
+	@Test void showImage() {
+		if (!showImage)
 			return;
 
 		QrCode qr = new QrCodeEncoder().setVersion(1).
@@ -47,16 +46,16 @@ public class TestQrCodeGeneratorImage extends BoofStandardJUnit {
 
 		generator.render(qr);
 
-		BufferedImage output = ConvertBufferedImage.convertTo(generator.getGray(),null,true);
+		BufferedImage output = ConvertBufferedImage.convertTo(generator.getGray(), null, true);
 
 		// add a border so that qr code readers can decode what is shown
-		BufferedImage border = new BufferedImage(output.getWidth()+50,output.getHeight()+50,output.getType());
+		BufferedImage border = new BufferedImage(output.getWidth() + 50, output.getHeight() + 50, output.getType());
 		Graphics2D g2 = border.createGraphics();
 		g2.setColor(Color.WHITE);
-		g2.fillRect(0,0,border.getWidth(),border.getHeight());
-		g2.drawImage(output,25,25,null);
+		g2.fillRect(0, 0, border.getWidth(), border.getHeight());
+		g2.drawImage(output, 25, 25, null);
 
-		ShowImages.showWindow(border,"QR Code", true);
+		ShowImages.showWindow(border, "QR Code", true);
 		BoofMiscOps.sleep(100000);
 	}
 }

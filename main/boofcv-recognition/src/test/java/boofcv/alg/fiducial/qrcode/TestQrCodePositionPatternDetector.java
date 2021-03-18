@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -33,6 +33,7 @@ import georegression.struct.affine.Affine2D_F64;
 import georegression.struct.se.Se2_F64;
 import georegression.struct.shapes.Polygon2D_F64;
 import georegression.transform.se.SePointOps_F64;
+import org.jetbrains.annotations.Nullable;
 import org.junit.jupiter.api.Test;
 
 import java.awt.*;
@@ -46,8 +47,7 @@ import static org.junit.jupiter.api.Assertions.*;
  * @author Peter Abeles
  */
 public class TestQrCodePositionPatternDetector extends BoofStandardJUnit {
-	@Test
-	public void easy() {
+	@Test void easy() {
 		GrayF32 image = render(null,
 				new PP(40, 60, 70), new PP(140, 60, 70), new PP(40, 150, 70));
 
@@ -67,8 +67,7 @@ public class TestQrCodePositionPatternDetector extends BoofStandardJUnit {
 		checkNode(40 + 35, 150 + 35, 1, list);
 	}
 
-	@Test
-	public void withLensDistortion() {
+	@Test void withLensDistortion() {
 		// Render QR Code in a simulated world with lens distortion
 		QrCodeDistortedChecks helper = new QrCodeDistortedChecks();
 
@@ -125,8 +124,7 @@ public class TestQrCodePositionPatternDetector extends BoofStandardJUnit {
 	/**
 	 * Simple positive example
 	 */
-	@Test
-	public void considerConnect_positive() {
+	@Test void considerConnect_positive() {
 		QrCodePositionPatternDetector<GrayF32> alg = createAlg();
 
 		SquareNode n0 = squareNode(40, 60, 70);
@@ -141,8 +139,7 @@ public class TestQrCodePositionPatternDetector extends BoofStandardJUnit {
 	/**
 	 * The two patterns are rotated 45 degrees relative to each other
 	 */
-	@Test
-	public void considerConnect_negative_rotated() {
+	@Test void considerConnect_negative_rotated() {
 		QrCodePositionPatternDetector<GrayF32> alg = createAlg();
 
 		SquareNode n0 = squareNode(40, 60, 70);
@@ -165,8 +162,7 @@ public class TestQrCodePositionPatternDetector extends BoofStandardJUnit {
 		assertEquals(0, n1.getNumberOfConnections());
 	}
 
-	@Test
-	public void checkPositionPatternAppearance() {
+	@Test void checkPositionPatternAppearance() {
 		GrayF32 image = render(null, new PP(40, 60, 70));
 
 		QrCodePositionPatternDetector<GrayF32> alg = createAlg();
@@ -206,15 +202,14 @@ public class TestQrCodePositionPatternDetector extends BoofStandardJUnit {
 		return square;
 	}
 
-	@Test
-	public void positionSquareIntensityCheck() {
+	@Test void positionSquareIntensityCheck() {
 
-		float positive[] = new float[]{10, 200, 10, 10, 10, 200, 10};
+		float[] positive = new float[]{10, 200, 10, 10, 10, 200, 10};
 
 		assertTrue(QrCodePositionPatternDetector.positionSquareIntensityCheck(positive, 100));
 
 		for (int i = 0; i < 7; i++) {
-			float negative[] = positive.clone();
+			float[] negative = positive.clone();
 
 			negative[i] = negative[i] < 100 ? 200 : 10;
 			assertFalse(QrCodePositionPatternDetector.positionSquareIntensityCheck(negative, 100));
@@ -231,7 +226,7 @@ public class TestQrCodePositionPatternDetector extends BoofStandardJUnit {
 		return new QrCodePositionPatternDetector<>(squareDetector, 2);
 	}
 
-	private GrayF32 render( Affine2D_F64 affine, PP... pps ) {
+	private GrayF32 render( @Nullable Affine2D_F64 affine, PP... pps ) {
 
 		BufferedImage image = new BufferedImage(300, 400, BufferedImage.TYPE_INT_RGB);
 

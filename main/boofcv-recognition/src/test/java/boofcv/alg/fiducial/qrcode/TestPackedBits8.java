@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -26,102 +26,101 @@ import static org.junit.jupiter.api.Assertions.*;
 /**
  * @author Peter Abeles
  */
-public class TestPackedBits8  extends BoofStandardJUnit {
-	@Test
-	public void set_get() {
+public class TestPackedBits8 extends BoofStandardJUnit {
+	@Test void set_get() {
 		PackedBits8 values = new PackedBits8(60);
 
-		values.set(2,1); assertEquals(values.get(2), 1);
-		values.set(2,0); assertNotEquals(values.get(2), 1);
+		values.set(2, 1);
+		assertEquals(values.get(2), 1);
+		values.set(2, 0);
+		assertNotEquals(values.get(2), 1);
 		isZeros(values);
 
-		values.set(33,1); assertEquals(values.get(33), 1);
-		values.set(33,0); assertNotEquals(values.get(33), 1);
+		values.set(33, 1);
+		assertEquals(values.get(33), 1);
+		values.set(33, 0);
+		assertNotEquals(values.get(33), 1);
 		isZeros(values);
 	}
 
 	private void isZeros( PackedBits8 values ) {
 		int N = values.arrayLength();
 		for (int i = 0; i < N; i++) {
-			assertEquals(0,values.data[i]);
+			assertEquals(0, values.data[i]);
 		}
 	}
 
-	@Test
-	public void resize() {
+	@Test void resize() {
 		PackedBits8 values = new PackedBits8(60);
-		assertEquals(60,values.size);
-		assertEquals(60/8+1,values.data.length);
+		assertEquals(60, values.size);
+		assertEquals(60/8 + 1, values.data.length);
 		values.resize(20);
-		assertEquals(20,values.size);
-		assertEquals(60/8+1,values.data.length);
+		assertEquals(20, values.size);
+		assertEquals(60/8 + 1, values.data.length);
 		values.resize(100);
-		assertEquals(100,values.size);
-		assertEquals(100/8+1,values.data.length);
+		assertEquals(100, values.size);
+		assertEquals(100/8 + 1, values.data.length);
 	}
 
-	@Test
-	public void growArray() {
+	@Test void growArray() {
 		PackedBits8 values = new PackedBits8(8);
-		assertEquals(8,values.size);
-		assertEquals(1,values.data.length);
+		assertEquals(8, values.size);
+		assertEquals(1, values.data.length);
 
-		values.growArray(2,false);
-		assertTrue(2<=values.data.length);
-		assertEquals(10,values.size);
+		values.growArray(2, false);
+		assertTrue(2 <= values.data.length);
+		assertEquals(10, values.size);
 
-		values.growArray(7,false);
+		values.growArray(7, false);
 		assertTrue(3 <= values.data.length);
-		assertEquals(17,values.size);
+		assertEquals(17, values.size);
 
 		// see if save value works
-		values.set(10,1);
-		values.growArray(1,true);
-		assertEquals(1,values.get(10));
+		values.set(10, 1);
+		values.growArray(1, true);
+		assertEquals(1, values.get(10));
 		assertTrue(3 <= values.data.length);
-		assertEquals(18,values.size);
-		values.growArray(7,true);
-		assertEquals(1,values.get(10));
+		assertEquals(18, values.size);
+		values.growArray(7, true);
+		assertEquals(1, values.get(10));
 		assertTrue(4 <= values.data.length);
-		assertEquals(25,values.size);
+		assertEquals(25, values.size);
 
 		values = new PackedBits8(8);
-		values.set(2,1);
-		assertEquals(1,values.get(2));
-		values.growArray(8,false);
-		assertEquals(0,values.get(2));
+		values.set(2, 1);
+		assertEquals(1, values.get(2));
+		values.growArray(8, false);
+		assertEquals(0, values.get(2));
 	}
 
-	@Test
-	public void append() {
+	@Test void append() {
 		PackedBits8 values = new PackedBits8(0);
 
-		values.append(0b1101,4,true);
-		assertEquals(4,values.size);
-		assertEquals(1,values.get(0));
-		assertEquals(0,values.get(1));
-		assertEquals(1,values.get(2));
-		assertEquals(1,values.get(3));
+		values.append(0b1101, 4, true);
+		assertEquals(4, values.size);
+		assertEquals(1, values.get(0));
+		assertEquals(0, values.get(1));
+		assertEquals(1, values.get(2));
+		assertEquals(1, values.get(3));
 
-		values.append(0b1101,4,false);
-		assertEquals(8,values.size);
-		assertEquals(1,values.get(4));
-		assertEquals(1,values.get(5));
-		assertEquals(0,values.get(6));
-		assertEquals(1,values.get(7));
+		values.append(0b1101, 4, false);
+		assertEquals(8, values.size);
+		assertEquals(1, values.get(4));
+		assertEquals(1, values.get(5));
+		assertEquals(0, values.get(6));
+		assertEquals(1, values.get(7));
 	}
 
-	@Test
-	public void read() {
+	@Test void read() {
 		PackedBits8 values = new PackedBits8(0);
 
-		values.append(0b1101,4,true);
-		values.append(0b00011,5,true);
+		values.append(0b1101, 4, true);
+		values.append(0b00011, 5, true);
 
-		assertEquals(0b1101,values.read(0,4,false));
-		assertEquals(0b00011,values.read(4,5,false));
+		assertEquals(0b1101, values.read(0, 4, false));
+		assertEquals(0b00011, values.read(4, 5, false));
 
-		assertEquals(0b1011,values.read(0,4,true));
-		assertEquals(0b11000,values.read(4,5,true));
+		assertEquals(0b1011, values.read(0, 4, true));
+		assertEquals(0b11000, values.read(4, 5, true));
 	}
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -32,18 +32,17 @@ public class TestGaliosFieldTableOps extends BoofStandardJUnit {
 	int primitive2 = 0b111;
 	int primitive8 = 0b100011101;
 
-	@Test
-	public void constructor() {
-		GaliosFieldTableOps alg = new GaliosFieldTableOps(2,primitive2);
-		assertEquals(4,alg.num_values);
-		assertEquals(3,alg.max_value);
-		assertEquals(0b111,alg.primitive);
+	@Test void constructor() {
+		GaliosFieldTableOps alg = new GaliosFieldTableOps(2, primitive2);
+		assertEquals(4, alg.num_values);
+		assertEquals(3, alg.max_value);
+		assertEquals(0b111, alg.primitive);
 		checkTableSum(alg);
 
-		alg = new GaliosFieldTableOps(8,primitive8);
-		assertEquals(256,alg.num_values);
-		assertEquals(255,alg.max_value);
-		assertEquals(0b100011101,alg.primitive);
+		alg = new GaliosFieldTableOps(8, primitive8);
+		assertEquals(256, alg.num_values);
+		assertEquals(255, alg.max_value);
+		assertEquals(0b100011101, alg.primitive);
 		checkTableSum(alg);
 	}
 
@@ -61,29 +60,28 @@ public class TestGaliosFieldTableOps extends BoofStandardJUnit {
 		for (int i = 0; i < alg.max_value; i++) {
 			sum += alg.exp[i];
 		}
-		assertEquals(expected,sum-alg.max_value);
+		assertEquals(expected, sum - alg.max_value);
 
 		// zero will be in the first two elements, hence up to num_values
 		sum = 0;
 		for (int i = 0; i < alg.num_values; i++) {
 			sum += alg.log[i];
 		}
-		assertEquals(expected,sum);
+		assertEquals(expected, sum);
 	}
 
-	@Test
-	public void multiply() {
+	@Test void multiply() {
 		multiply(2, primitive2);
 		multiply(8, primitive8);
 	}
 
-	public void multiply( int numBits , int primitive ) {
-		GaliosFieldTableOps alg =  new GaliosFieldTableOps(numBits,primitive);
+	public void multiply( int numBits, int primitive ) {
+		GaliosFieldTableOps alg = new GaliosFieldTableOps(numBits, primitive);
 
 		int num_values = alg.num_values;
 
-		assertEquals(0,alg.multiply(0, 5));
-		assertEquals(0,alg.multiply(5, 0));
+		assertEquals(0, alg.multiply(0, 5));
+		assertEquals(0, alg.multiply(5, 0));
 
 		for (int i = 0; i < num_values; i++) {
 			for (int j = 0; j < num_values; j++) {
@@ -100,477 +98,460 @@ public class TestGaliosFieldTableOps extends BoofStandardJUnit {
 		}
 	}
 
-	private int pow( int n , int primitive ,int num_values) {
+	private int pow( int n, int primitive, int num_values ) {
 		int val = 1;
 		for (int i = 0; i < n; i++) {
 			val <<= 1;
-			if( val >= num_values ) {
+			if (val >= num_values) {
 				val ^= primitive;
 			}
 		}
 		return val;
 	}
 
-	@Test
-	public void divide() {
-		GaliosFieldTableOps alg =  new GaliosFieldTableOps(8, primitive8);
+	@Test void divide() {
+		GaliosFieldTableOps alg = new GaliosFieldTableOps(8, primitive8);
 
 		for (int i = 0; i < 256; i++) {
 			for (int j = 1; j < 256; j++) {
-				int multAB = alg.multiply(i,j);
-				int found = alg.divide(multAB,j);
+				int multAB = alg.multiply(i, j);
+				int found = alg.divide(multAB, j);
 
-				assertEquals(i,found);
+				assertEquals(i, found);
 			}
 		}
 	}
 
-	@Test
-	public void power() {
-		GaliosFieldTableOps alg =  new GaliosFieldTableOps(8, primitive8);
+	@Test void power() {
+		GaliosFieldTableOps alg = new GaliosFieldTableOps(8, primitive8);
 
 		for (int i = 0; i < 100; i++) {
 			int a = rand.nextInt(20);
 			int b = rand.nextInt(20);
 
-			int expected = pow(a*b, primitive8,256);
+			int expected = pow(a*b, primitive8, 256);
 
-			int valA = pow(a, primitive8,256);
-			int found = alg.power(valA,b);
+			int valA = pow(a, primitive8, 256);
+			int found = alg.power(valA, b);
 
-			assertEquals(expected,found);
+			assertEquals(expected, found);
 		}
 	}
 
-	@Test
-	public void inverse() {
-		GaliosFieldTableOps alg =  new GaliosFieldTableOps(8, primitive8);
+	@Test void inverse() {
+		GaliosFieldTableOps alg = new GaliosFieldTableOps(8, primitive8);
 
 		for (int i = 0; i < 100; i++) {
-			int a = rand.nextInt(255)+1;
+			int a = rand.nextInt(255) + 1;
 
-			int expected = alg.divide(1,a);
+			int expected = alg.divide(1, a);
 			int found = alg.inverse(a);
 
-			assertEquals(expected,found);
+			assertEquals(expected, found);
 		}
 	}
 
-	@Test
-	public void polyScale() {
+	@Test void polyScale() {
 
-		GaliosFieldTableOps alg =  new GaliosFieldTableOps(8, primitive8);
+		GaliosFieldTableOps alg = new GaliosFieldTableOps(8, primitive8);
 
 		// Create an arbitrary polynomial: 0x12*x^2 + 0x54*x + 0xFF
 		DogArray_I8 input = new DogArray_I8(3);
-		input.set(0,0x12);
-		input.set(1,0x54);
-		input.set(2,0xFF);
+		input.set(0, 0x12);
+		input.set(1, 0x54);
+		input.set(2, 0xFF);
 
 		int scale = 0x45;
 
 		DogArray_I8 output = new DogArray_I8();
 
-		alg.polyScale(input.copy(),scale,output);
+		alg.polyScale(input.copy(), scale, output);
 
-		assertEquals(input.size,output.size);
+		assertEquals(input.size, output.size);
 
 		for (int i = 0; i < input.size; i++) {
-			int expected = alg.multiply(input.data[i]&0xFF, scale);
-			assertEquals(expected,output.data[i]&0xFF);
+			int expected = alg.multiply(input.data[i] & 0xFF, scale);
+			assertEquals(expected, output.data[i] & 0xFF);
 		}
 	}
 
-	@Test
-	public void polyAdd() {
-		GaliosFieldTableOps alg =  new GaliosFieldTableOps(8, primitive8);
+	@Test void polyAdd() {
+		GaliosFieldTableOps alg = new GaliosFieldTableOps(8, primitive8);
 
 		// Create an arbitrary polynomial: 0x12*x^2 + 0x54*x + 0xFF
 		DogArray_I8 inputA = new DogArray_I8(3);
 		inputA.resize(3);
-		inputA.set(0,0x12);
-		inputA.set(1,0x54);
-		inputA.set(2,0xFF);
+		inputA.set(0, 0x12);
+		inputA.set(1, 0x54);
+		inputA.set(2, 0xFF);
 
 		// Create an arbitrary polynomial: 0xA0*x^3 + 0x45
 		DogArray_I8 inputB = new DogArray_I8(4);
 		inputB.resize(4);
-		inputB.set(0,0xA0);
-		inputB.set(3,0x45);
+		inputB.set(0, 0xA0);
+		inputB.set(3, 0x45);
 
 		// make sure the order doesn't matter
 		DogArray_I8 output0 = new DogArray_I8();
-		alg.polyAdd(inputA,inputB,output0);
+		alg.polyAdd(inputA, inputB, output0);
 
 		DogArray_I8 output1 = new DogArray_I8();
-		alg.polyAdd(inputB,inputA,output1);
+		alg.polyAdd(inputB, inputA, output1);
 
-		assertEquals(4,output0.size);
+		assertEquals(4, output0.size);
 		assertEqualsG(output0, output1);
 
 		// compare to hand computed solution
-		assertEquals(0xA0,output0.data[0]&0xFF);
-		assertEquals(0x12,output0.data[1]&0xFF);
-		assertEquals(0x54,output0.data[2]&0xFF);
-		assertEquals(0xFF^0x45,output0.data[3]&0xFF);
+		assertEquals(0xA0, output0.data[0] & 0xFF);
+		assertEquals(0x12, output0.data[1] & 0xFF);
+		assertEquals(0x54, output0.data[2] & 0xFF);
+		assertEquals(0xFF ^ 0x45, output0.data[3] & 0xFF);
 	}
 
-	@Test
-	public void polyAdd_S() {
-		GaliosFieldTableOps alg =  new GaliosFieldTableOps(8, primitive8);
+	@Test void polyAdd_S() {
+		GaliosFieldTableOps alg = new GaliosFieldTableOps(8, primitive8);
 
 		// Create an arbitrary polynomial: 0x12*x^2 + 0x54*x + 0xFF
 		DogArray_I8 inputA = new DogArray_I8(3);
 		inputA.resize(3);
-		inputA.set(2,0x12);
-		inputA.set(1,0x54);
-		inputA.set(0,0xFF);
+		inputA.set(2, 0x12);
+		inputA.set(1, 0x54);
+		inputA.set(0, 0xFF);
 
 		// Create an arbitrary polynomial: 0xA0*x^3 + 0x45
 		DogArray_I8 inputB = new DogArray_I8(4);
 		inputB.resize(4);
-		inputB.set(3,0xA0);
-		inputB.set(0,0x45);
+		inputB.set(3, 0xA0);
+		inputB.set(0, 0x45);
 
 		// make sure the order doesn't matter
 		DogArray_I8 output0 = new DogArray_I8();
-		alg.polyAdd_S(inputA,inputB,output0);
+		alg.polyAdd_S(inputA, inputB, output0);
 
 		DogArray_I8 output1 = new DogArray_I8();
-		alg.polyAdd_S(inputB,inputA,output1);
+		alg.polyAdd_S(inputB, inputA, output1);
 
-		assertEquals(4,output0.size);
+		assertEquals(4, output0.size);
 		assertEqualsG_S(output0, output1);
 
 		// compare to hand computed solution
-		assertEquals(0xA0,output0.data[3]&0xFF);
-		assertEquals(0x12,output0.data[2]&0xFF);
-		assertEquals(0x54,output0.data[1]&0xFF);
-		assertEquals(0xFF^0x45,output0.data[0]&0xFF);
+		assertEquals(0xA0, output0.data[3] & 0xFF);
+		assertEquals(0x12, output0.data[2] & 0xFF);
+		assertEquals(0x54, output0.data[1] & 0xFF);
+		assertEquals(0xFF ^ 0x45, output0.data[0] & 0xFF);
 	}
 
-	@Test
-	public void polyAddScaleB() {
-		GaliosFieldTableOps alg =  new GaliosFieldTableOps(8, primitive8);
+	@Test void polyAddScaleB() {
+		GaliosFieldTableOps alg = new GaliosFieldTableOps(8, primitive8);
 
 		// Create an arbitrary polynomial: 0x12*x^2 + 0x54*x + 0xFF
 		DogArray_I8 inputA = new DogArray_I8(3);
 		inputA.resize(3);
-		inputA.set(0,0x12);
-		inputA.set(1,0x54);
-		inputA.set(2,0xFF);
+		inputA.set(0, 0x12);
+		inputA.set(1, 0x54);
+		inputA.set(2, 0xFF);
 
 		// Create an arbitrary polynomial: 0xA0*x^3 + 0x45
 		DogArray_I8 inputB = new DogArray_I8(4);
 		inputB.resize(4);
-		inputB.set(0,0xA0);
-		inputB.set(3,0x45);
+		inputB.set(0, 0xA0);
+		inputB.set(3, 0x45);
 
 		int scale = 0x62;
 		DogArray_I8 scaleB = new DogArray_I8();
-		alg.polyScale(inputB,scale,scaleB);
+		alg.polyScale(inputB, scale, scaleB);
 		DogArray_I8 expected = new DogArray_I8();
-		alg.polyAdd(inputA,scaleB,expected);
+		alg.polyAdd(inputA, scaleB, expected);
 
 		DogArray_I8 found = new DogArray_I8();
-		alg.polyAddScaleB(inputA,inputB,scale,found);
+		alg.polyAddScaleB(inputA, inputB, scale, found);
 
 		assertEqualsG(expected, found);
 	}
 
-	@Test
-	public void polyMult() {
-		GaliosFieldTableOps alg =  new GaliosFieldTableOps(8, primitive8);
+	@Test void polyMult() {
+		GaliosFieldTableOps alg = new GaliosFieldTableOps(8, primitive8);
 
 		// Create an arbitrary polynomial: 0x12*x^2 + 0x54*x + 0xFF
 		DogArray_I8 inputA = new DogArray_I8();
 		inputA.resize(3);
-		inputA.set(0,0x12);
-		inputA.set(1,0x54);
-		inputA.set(2,0xFF);
+		inputA.set(0, 0x12);
+		inputA.set(1, 0x54);
+		inputA.set(2, 0xFF);
 
 		DogArray_I8 inputB = new DogArray_I8();
 		inputB.resize(2);
-		inputB.set(1,0x03);
+		inputB.set(1, 0x03);
 
 		// make sure the order doesn't matter
 		DogArray_I8 output0 = new DogArray_I8();
-		alg.polyMult(inputA,inputB,output0);
+		alg.polyMult(inputA, inputB, output0);
 
 		DogArray_I8 output1 = new DogArray_I8();
-		alg.polyMult(inputB,inputA,output1);
+		alg.polyMult(inputB, inputA, output1);
 
-		assertEquals(4,output0.size);
+		assertEquals(4, output0.size);
 		assertEqualsG(output0, output1);
 
 		// check the value against a manual solution
 		DogArray_I8 expected = new DogArray_I8();
 		expected.resize(4);
-		expected.set(1,alg.multiply(0x12,0x03));
-		expected.set(2,alg.multiply(0x54,0x03));
-		expected.set(3,alg.multiply(0xFF,0x03));
+		expected.set(1, alg.multiply(0x12, 0x03));
+		expected.set(2, alg.multiply(0x54, 0x03));
+		expected.set(3, alg.multiply(0xFF, 0x03));
 	}
 
-	@Test
-	public void polyMult_flipA() {
-		GaliosFieldTableOps alg =  new GaliosFieldTableOps(8, primitive8);
+	@Test void polyMult_flipA() {
+		GaliosFieldTableOps alg = new GaliosFieldTableOps(8, primitive8);
 
 		// Create an arbitrary polynomial: 0x12*x^2 + 0x54*x + 0xFF
 		DogArray_I8 inputA = new DogArray_I8();
 		inputA.resize(3);
-		inputA.set(2,0x12);
-		inputA.set(1,0x54);
-		inputA.set(0,0xFF);
+		inputA.set(2, 0x12);
+		inputA.set(1, 0x54);
+		inputA.set(0, 0xFF);
 
 		DogArray_I8 inputB = new DogArray_I8();
 		inputB.resize(2);
-		inputB.set(1,0x03);
+		inputB.set(1, 0x03);
 
 		DogArray_I8 output0 = new DogArray_I8();
-		alg.polyMult_flipA(inputA,inputB,output0);
+		alg.polyMult_flipA(inputA, inputB, output0);
 
-		assertEquals(4,output0.size);
+		assertEquals(4, output0.size);
 
 		// check the value against a manual solution
 		DogArray_I8 expected = new DogArray_I8();
 		expected.resize(4);
-		expected.set(1,alg.multiply(0x12,0x03));
-		expected.set(2,alg.multiply(0x54,0x03));
-		expected.set(3,alg.multiply(0xFF,0x03));
+		expected.set(1, alg.multiply(0x12, 0x03));
+		expected.set(2, alg.multiply(0x54, 0x03));
+		expected.set(3, alg.multiply(0xFF, 0x03));
 	}
 
-	@Test
-	public void polyMult_S() {
-		GaliosFieldTableOps alg =  new GaliosFieldTableOps(8, primitive8);
+	@Test void polyMult_S() {
+		GaliosFieldTableOps alg = new GaliosFieldTableOps(8, primitive8);
 
 		// Create an arbitrary polynomial: 0x12*x^2 + 0x54*x + 0xFF
 		DogArray_I8 inputA = new DogArray_I8();
 		inputA.resize(3);
-		inputA.set(2,0x12);
-		inputA.set(1,0x54);
-		inputA.set(0,0xFF);
+		inputA.set(2, 0x12);
+		inputA.set(1, 0x54);
+		inputA.set(0, 0xFF);
 
 		DogArray_I8 inputB = new DogArray_I8();
 		inputB.resize(2);
-		inputB.set(0,0x03);
+		inputB.set(0, 0x03);
 
 		// make sure the order doesn't matter
 		DogArray_I8 output0 = new DogArray_I8();
-		alg.polyMult_S(inputA,inputB,output0);
+		alg.polyMult_S(inputA, inputB, output0);
 
 		DogArray_I8 output1 = new DogArray_I8();
-		alg.polyMult_S(inputB,inputA,output1);
+		alg.polyMult_S(inputB, inputA, output1);
 
-		assertEquals(4,output0.size);
+		assertEquals(4, output0.size);
 		assertEqualsG_S(output0, output1);
 
 		// check the value against a manual solution
 		DogArray_I8 expected = new DogArray_I8();
 		expected.resize(4);
-		expected.set(2,alg.multiply(0x12,0x03));
-		expected.set(1,alg.multiply(0x54,0x03));
-		expected.set(0,alg.multiply(0xFF,0x03));
+		expected.set(2, alg.multiply(0x12, 0x03));
+		expected.set(1, alg.multiply(0x54, 0x03));
+		expected.set(0, alg.multiply(0xFF, 0x03));
 	}
 
-	private void randomPoly(DogArray_I8 inputA, int length) {
+	private void randomPoly( DogArray_I8 inputA, int length ) {
 		inputA.reset();
 		for (int j = 0; j < length; j++) {
-			inputA.add( rand.nextInt(256));
+			inputA.add(rand.nextInt(256));
 		}
 	}
 
-	@Test
-	public void polyEval() {
-		GaliosFieldTableOps alg =  new GaliosFieldTableOps(8, primitive8);
+	@Test void polyEval() {
+		GaliosFieldTableOps alg = new GaliosFieldTableOps(8, primitive8);
 
 		// Create an arbitrary polynomial: 0x12*x^2 + 0x54*x + 0xFF
 		DogArray_I8 inputA = new DogArray_I8();
 		inputA.resize(3);
-		inputA.set(0,0x12);
-		inputA.set(1,0x54);
-		inputA.set(2,0xFF);
+		inputA.set(0, 0x12);
+		inputA.set(1, 0x54);
+		inputA.set(2, 0xFF);
 
 		int input = 0x09;
-		int found = alg.polyEval(inputA,input);
+		int found = alg.polyEval(inputA, input);
 
-		int expected = 0xFF ^ alg.multiply(0x54,input);
-		expected ^= alg.multiply(0x12,alg.multiply(input,input));
+		int expected = 0xFF ^ alg.multiply(0x54, input);
+		expected ^= alg.multiply(0x12, alg.multiply(input, input));
 
-		assertEquals(expected,found);
+		assertEquals(expected, found);
 	}
 
-	@Test
-	public void polyEval_random() {
-		GaliosFieldTableOps alg =  new GaliosFieldTableOps(8, primitive8);
+	@Test void polyEval_random() {
+		GaliosFieldTableOps alg = new GaliosFieldTableOps(8, primitive8);
 		DogArray_I8 inputA = new DogArray_I8();
 
 		for (int i = 0; i < 1000; i++) {
-			randomPoly(inputA,30);
+			randomPoly(inputA, 30);
 
 			int value = rand.nextInt(256);
 
-			int found = alg.polyEval(inputA,value);
+			int found = alg.polyEval(inputA, value);
 			assertTrue(found >= 0 && found < 256);
 		}
 	}
 
-	@Test
-	public void polyEval_S() {
-		GaliosFieldTableOps alg =  new GaliosFieldTableOps(8, primitive8);
+	@Test void polyEval_S() {
+		GaliosFieldTableOps alg = new GaliosFieldTableOps(8, primitive8);
 
 		// Create an arbitrary polynomial: 0x12*x^2 + 0x54*x + 0xFF
 		DogArray_I8 inputA = new DogArray_I8();
 		inputA.resize(3);
-		inputA.set(2,0x12);
-		inputA.set(1,0x54);
-		inputA.set(0,0xFF);
+		inputA.set(2, 0x12);
+		inputA.set(1, 0x54);
+		inputA.set(0, 0xFF);
 
 		int input = 0x09;
-		int found = alg.polyEval_S(inputA,input);
+		int found = alg.polyEval_S(inputA, input);
 
-		int expected = 0xFF ^ alg.multiply(0x54,input);
-		expected ^= alg.multiply(0x12,alg.multiply(input,input));
+		int expected = 0xFF ^ alg.multiply(0x54, input);
+		expected ^= alg.multiply(0x12, alg.multiply(input, input));
 
-		assertEquals(expected,found);
+		assertEquals(expected, found);
 	}
 
-	@Test
-	public void polyEvalContinue() {
-		GaliosFieldTableOps alg =  new GaliosFieldTableOps(8, primitive8);
+	@Test void polyEvalContinue() {
+		GaliosFieldTableOps alg = new GaliosFieldTableOps(8, primitive8);
 
 		DogArray_I8 polyA = new DogArray_I8();
-		randomPoly(polyA,30);
+		randomPoly(polyA, 30);
 
 		int x = 0x09;
-		int expected = alg.polyEval(polyA,x);
+		int expected = alg.polyEval(polyA, x);
 
 		DogArray_I8 polyB = new DogArray_I8(10);
 		polyB.resize(10);
-		System.arraycopy(polyA.data,20,polyB.data,0,10);
+		System.arraycopy(polyA.data, 20, polyB.data, 0, 10);
 		polyA.size = 20;
 
-		int found = alg.polyEval(polyA,x);
-		found = alg.polyEvalContinue(found,polyB,x);
+		int found = alg.polyEval(polyA, x);
+		found = alg.polyEvalContinue(found, polyB, x);
 
-		assertEquals(expected,found);
+		assertEquals(expected, found);
 	}
 
-	@Test
-	public void polyDivide() {
-		GaliosFieldTableOps alg =  new GaliosFieldTableOps(8, primitive8);
+	@Test void polyDivide() {
+		GaliosFieldTableOps alg = new GaliosFieldTableOps(8, primitive8);
 
 		// Create an arbitrary polynomial: 0BB*x^4 + 0x12*x^3 + 0x54*x^2 + 0*x + 0xFF
 		DogArray_I8 inputA = new DogArray_I8();
 		inputA.resize(5);
-		inputA.set(0,0xBB);
-		inputA.set(1,0x12);
-		inputA.set(2,0x54);
-		inputA.set(4,0xFF);
+		inputA.set(0, 0xBB);
+		inputA.set(1, 0x12);
+		inputA.set(2, 0x54);
+		inputA.set(4, 0xFF);
 
 		DogArray_I8 inputB = new DogArray_I8();
 		inputB.resize(2);
-		inputB.set(0,0xF0);
-		inputB.set(1,0x0A);
+		inputB.set(0, 0xF0);
+		inputB.set(1, 0x0A);
 
 		DogArray_I8 quotient = new DogArray_I8();
 		DogArray_I8 remainder = new DogArray_I8();
-		alg.polyDivide(inputA,inputB,quotient,remainder);
-		assertEquals(4,quotient.size);
-		assertEquals(1,remainder.size);
+		alg.polyDivide(inputA, inputB, quotient, remainder);
+		assertEquals(4, quotient.size);
+		assertEquals(1, remainder.size);
 
 		// see if division was done correct and reconstruct the original equation
 		checkDivision(alg, inputA, inputB, quotient, remainder);
 
 		// have the divisor be larger than the dividend
-		alg.polyDivide(inputB,inputA,quotient,remainder);
-		assertEquals(0,quotient.size);
-		assertEquals(2,remainder.size);
+		alg.polyDivide(inputB, inputA, quotient, remainder);
+		assertEquals(0, quotient.size);
+		assertEquals(2, remainder.size);
 
 		checkDivision(alg, inputB, inputA, quotient, remainder);
 	}
 
-	private void checkDivision(GaliosFieldTableOps alg, DogArray_I8 inputA, DogArray_I8 inputB, DogArray_I8 quotent, DogArray_I8 remainder) {
+	private void checkDivision( GaliosFieldTableOps alg, DogArray_I8 inputA, DogArray_I8 inputB, DogArray_I8 quotent, DogArray_I8 remainder ) {
 		DogArray_I8 tmp = new DogArray_I8();
 		DogArray_I8 found = new DogArray_I8();
-		alg.polyMult(inputB,quotent,tmp);
-		alg.polyAdd(tmp,remainder,found);
+		alg.polyMult(inputB, quotent, tmp);
+		alg.polyAdd(tmp, remainder, found);
 		assertEqualsG(inputA, found);
 	}
 
-	@Test
-	public void polyDivide_S() {
-		GaliosFieldTableOps alg =  new GaliosFieldTableOps(8, primitive8);
+	@Test void polyDivide_S() {
+		GaliosFieldTableOps alg = new GaliosFieldTableOps(8, primitive8);
 
 		// Create an arbitrary polynomial: 0BB*x^4 + 0x12*x^3 + 0x54*x^2 + 0*x + 0xFF
 		DogArray_I8 inputA = new DogArray_I8();
 		inputA.resize(5);
-		inputA.set(4,0xBB);
-		inputA.set(3,0x12);
-		inputA.set(2,0x54);
-		inputA.set(0,0xFF);
+		inputA.set(4, 0xBB);
+		inputA.set(3, 0x12);
+		inputA.set(2, 0x54);
+		inputA.set(0, 0xFF);
 
 		DogArray_I8 inputB = new DogArray_I8();
 		inputB.resize(2);
-		inputB.set(1,0xF0);
-		inputB.set(0,0x0A);
+		inputB.set(1, 0xF0);
+		inputB.set(0, 0x0A);
 
 		DogArray_I8 quotient = new DogArray_I8();
 		DogArray_I8 remainder = new DogArray_I8();
-		alg.polyDivide_S(inputA,inputB,quotient,remainder);
-		assertEquals(4,quotient.size);
-		assertEquals(1,remainder.size);
+		alg.polyDivide_S(inputA, inputB, quotient, remainder);
+		assertEquals(4, quotient.size);
+		assertEquals(1, remainder.size);
 
 		// see if division was done correct and reconstruct the original equation
 		checkDivision_S(alg, inputA, inputB, quotient, remainder);
 
 		// have the divisor be larger than the dividend
-		alg.polyDivide_S(inputB,inputA,quotient,remainder);
-		assertEquals(0,quotient.size);
-		assertEquals(2,remainder.size);
+		alg.polyDivide_S(inputB, inputA, quotient, remainder);
+		assertEquals(0, quotient.size);
+		assertEquals(2, remainder.size);
 
 		checkDivision_S(alg, inputB, inputA, quotient, remainder);
 	}
 
-	private void checkDivision_S(GaliosFieldTableOps alg, DogArray_I8 inputA, DogArray_I8 inputB, DogArray_I8 quotent, DogArray_I8 remainder) {
+	private void checkDivision_S( GaliosFieldTableOps alg, DogArray_I8 inputA, DogArray_I8 inputB, DogArray_I8 quotent, DogArray_I8 remainder ) {
 		DogArray_I8 tmp = new DogArray_I8();
 		DogArray_I8 found = new DogArray_I8();
-		alg.polyMult_S(inputB,quotent,tmp);
-		alg.polyAdd_S(tmp,remainder,found);
+		alg.polyMult_S(inputB, quotent, tmp);
+		alg.polyAdd_S(tmp, remainder, found);
 		assertEqualsG_S(inputA, found);
 	}
 
-	private static void assertEqualsG(DogArray_I8 inputA, DogArray_I8 inputB) {
-		int offsetA=0,offsetB=0;
-		if( inputA.size > inputB.size ) {
-			offsetA = inputA.size-inputB.size;
+	private static void assertEqualsG( DogArray_I8 inputA, DogArray_I8 inputB ) {
+		int offsetA = 0, offsetB = 0;
+		if (inputA.size > inputB.size) {
+			offsetA = inputA.size - inputB.size;
 		} else {
-			offsetB = inputB.size-inputA.size;
+			offsetB = inputB.size - inputA.size;
 		}
 		for (int i = 0; i < offsetA; i++) {
-			assertEquals(0,inputA.data[i]);
+			assertEquals(0, inputA.data[i]);
 		}
 		for (int i = 0; i < offsetB; i++) {
-			assertEquals(0,inputB.data[i]);
+			assertEquals(0, inputB.data[i]);
 		}
 
-		int N = Math.min(inputA.size,inputB.size);
+		int N = Math.min(inputA.size, inputB.size);
 		for (int i = 0; i < N; i++) {
-			assertEquals(inputA.get(i+offsetA),inputB.get(i+offsetB));
+			assertEquals(inputA.get(i + offsetA), inputB.get(i + offsetB));
 		}
 	}
 
-	private static void assertEqualsG_S(DogArray_I8 inputA, DogArray_I8 inputB) {
-		int M = Math.min(inputA.size,inputB.size);
+	private static void assertEqualsG_S( DogArray_I8 inputA, DogArray_I8 inputB ) {
+		int M = Math.min(inputA.size, inputB.size);
 
 		for (int i = M; i < inputA.size; i++) {
-			assertEquals(0,inputA.data[i]);
+			assertEquals(0, inputA.data[i]);
 		}
 		for (int i = M; i < inputB.size; i++) {
-			assertEquals(0,inputB.data[i]);
+			assertEquals(0, inputB.data[i]);
 		}
 		for (int i = 0; i < M; i++) {
-			assertEquals(inputA.get(i),inputB.get(i));
+			assertEquals(inputA.get(i), inputB.get(i));
 		}
 	}
-
 }

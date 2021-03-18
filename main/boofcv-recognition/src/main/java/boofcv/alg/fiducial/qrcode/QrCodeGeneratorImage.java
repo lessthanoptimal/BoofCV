@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -35,26 +35,26 @@ public class QrCodeGeneratorImage extends QrCodeGenerator {
 	int pixelsPerModule;
 
 	// number of module wide the border/quite zone is around the qr code
-	int borderModule=2;
+	int borderModule = 2;
 
 	FiducialImageEngine renderer = new FiducialImageEngine();
 
-	public QrCodeGeneratorImage( int pixelsPerModule) {
+	public QrCodeGeneratorImage( int pixelsPerModule ) {
 		this.pixelsPerModule = pixelsPerModule;
 		setRender(renderer);
 	}
 
 	@Override
-	public QrCodeGeneratorImage render(QrCode qr ) {
+	public QrCodeGeneratorImage render( QrCode qr ) {
 		super.render(qr);
 
 		int borderPixels = renderer.getBorderPixels();
 
 		// adjust the location to match what's in the image
-		adjustSize(borderPixels,qr.ppRight);
-		adjustSize(borderPixels,qr.ppCorner);
-		adjustSize(borderPixels,qr.ppDown);
-		adjustSize(borderPixels,qr.bounds);
+		adjustSize(borderPixels, qr.ppRight);
+		adjustSize(borderPixels, qr.ppCorner);
+		adjustSize(borderPixels, qr.ppDown);
+		adjustSize(borderPixels, qr.bounds);
 
 		for (int i = 0; i < qr.alignment.size(); i++) {
 			QrCode.Alignment a = qr.alignment.get(i);
@@ -71,29 +71,32 @@ public class QrCodeGeneratorImage extends QrCodeGenerator {
 	}
 
 	@Override
-	protected void initialize(QrCode qr) {
-		this.markerWidth = pixelsPerModule*QrCode.totalModules(qr.version);;
+	protected void initialize( QrCode qr ) {
+		this.markerWidth = pixelsPerModule*QrCode.totalModules(qr.version);
+		;
 		super.initialize(qr);
-		renderer.configure( borderModule*pixelsPerModule, pixelsPerModule*numModules);
+		renderer.configure(borderModule*pixelsPerModule, pixelsPerModule*numModules);
 		renderer.init();
 	}
 
-	private void adjustSize( int borderPixels , Polygon2D_F64 poly) {
+	private void adjustSize( int borderPixels, Polygon2D_F64 poly ) {
 		for (int i = 0; i < poly.size(); i++) {
 			Point2D_F64 p = poly.get(i);
 			p.x += borderPixels;
 			p.y += borderPixels;
 		}
 	}
+
 	public int getBorderModule() {
 		return borderModule;
 	}
 
 	/**
 	 * Used to change the white border's size.
+	 *
 	 * @param borderModule Border size in units of modules
 	 */
-	public void setBorderModule(int borderModule) {
+	public void setBorderModule( int borderModule ) {
 		this.borderModule = borderModule;
 	}
 

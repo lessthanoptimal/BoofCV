@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -31,8 +31,7 @@ public class TestQrCodeGenerator extends BoofStandardJUnit {
 	/**
 	 * Compare against example from reference
 	 */
-	@Test
-	void formatInformationBits() {
+	@Test void formatInformationBits() {
 		QrCode qr = new QrCode();
 		qr.version = 1;
 		qr.error = QrCode.ErrorLevel.M;
@@ -44,8 +43,7 @@ public class TestQrCodeGenerator extends BoofStandardJUnit {
 		assertEquals(expected, found.data[0]);
 	}
 
-	@Test
-	void alignmentPosition() {
+	@Test void alignmentPosition() {
 		QrCode qr = new QrCodeEncoder().setVersion(2).addNumeric("123345").fixate();
 
 		QrCodeGenerator alg = new QrCodeGenerator(1.0);
@@ -54,7 +52,7 @@ public class TestQrCodeGenerator extends BoofStandardJUnit {
 		alg.render(qr);
 
 		// get the location of alignment patterns in terms of modules
-		int alignment[] = QrCode.VERSION_INFO[qr.version].alignment;
+		int[] alignment = QrCode.VERSION_INFO[qr.version].alignment;
 
 		QrCode.Alignment a = qr.alignment.get(0);
 		int N = qr.getNumberOfModules();
