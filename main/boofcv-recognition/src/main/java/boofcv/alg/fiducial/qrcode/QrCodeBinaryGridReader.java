@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -29,6 +29,7 @@ import boofcv.struct.image.ImageGray;
 import georegression.struct.point.Point2D_F32;
 import georegression.struct.point.Point2D_F64;
 import georegression.struct.shapes.Polygon2D_F64;
+import lombok.Getter;
 
 /**
  * Reads binary values from the qr code's grid. Top left corner of the qr code is it's origin. +x = right and +y = down
@@ -37,12 +38,12 @@ import georegression.struct.shapes.Polygon2D_F64;
  * @author Peter Abeles
  */
 public class QrCodeBinaryGridReader<T extends ImageGray<T>> {
-	QrCodeBinaryGridToPixel transformGrid = new QrCodeBinaryGridToPixel();
+	@Getter QrCodeBinaryGridToPixel transformGrid = new QrCodeBinaryGridToPixel();
 
 	InterpolatePixelS<T> interpolate;
 	Point2D_F32 pixel = new Point2D_F32();
 
-	int imageWidth,imageHeight;
+	int imageWidth, imageHeight;
 
 	float threshold;
 
@@ -54,20 +55,18 @@ public class QrCodeBinaryGridReader<T extends ImageGray<T>> {
 		interpolate.setBorder(FactoryImageBorder.single(BorderType.EXTENDED, imageType));
 	}
 
-	public void setImage(T image ) {
+	public void setImage( T image ) {
 		interpolate.setImage(image);
 		imageWidth = image.width;
 		imageHeight = image.height;
 	}
 
-	public void setLensDistortion(int width , int height ,
-								  LensDistortionNarrowFOV model )
-	{
+	public void setLensDistortion( int width, int height, LensDistortionNarrowFOV model ) {
 		interpolate = FactoryInterpolation.bilinearPixelS(
 				this.interpolate.getImageType().getImageClass(), BorderType.EXTENDED);
-		if( model != null ) {
-			Point2Transform2_F32 u2d = model.distort_F32(true,true);
-			this.interpolate = new InterpolatePixelDistortS<>(interpolate,u2d);
+		if (model != null) {
+			Point2Transform2_F32 u2d = model.distort_F32(true, true);
+			this.interpolate = new InterpolatePixelDistortS<>(interpolate, u2d);
 		}
 	}
 
@@ -76,60 +75,59 @@ public class QrCodeBinaryGridReader<T extends ImageGray<T>> {
 		transformGrid.addAllFeatures(qr);
 		transformGrid.removeOutsideCornerFeatures();
 		transformGrid.computeTransform();
-		threshold = (float)(qr.threshCorner+qr.threshDown+qr.threshRight)/3.0f;
+		threshold = (float)(qr.threshCorner + qr.threshDown + qr.threshRight)/3.0f;
 	}
 
-	public void setSquare(Polygon2D_F64 square , float threshold ) {
+	public void setSquare( Polygon2D_F64 square, float threshold ) {
 		this.qr = null;
 		transformGrid.setTransformFromSquare(square);
 		this.threshold = threshold;
 	}
 
-	public void setMarkerUnknownVersion(QrCode qr , float threshold ) {
+	public void setMarkerUnknownVersion( QrCode qr, float threshold ) {
 		this.qr = null;
 		transformGrid.setTransformFromLinesSquare(qr);
 		this.threshold = threshold;
 	}
 
-	public void imageToGrid( float x , float y , Point2D_F32 grid ) {
+	public void imageToGrid( float x, float y, Point2D_F32 grid ) {
 		transformGrid.imageToGrid(x, y, grid);
 	}
 
-	public void imageToGrid( Point2D_F32 pixel , Point2D_F32 grid ) {
+	public void imageToGrid( Point2D_F32 pixel, Point2D_F32 grid ) {
 		transformGrid.imageToGrid(pixel.x, pixel.y, grid);
 	}
 
 	/**
 	 * Converts a pixel coordinate into a grid coordinate.
 	 */
-	public void imageToGrid( Point2D_F64 pixel , Point2D_F64 grid ) {
+	public void imageToGrid( Point2D_F64 pixel, Point2D_F64 grid ) {
 		transformGrid.imageToGrid(pixel.x, pixel.y, grid);
 	}
 
-
-	public void gridToImage( float row , float col , Point2D_F32 image ) {
+	public void gridToImage( float row, float col, Point2D_F32 image ) {
 		transformGrid.gridToImage(row, col, image);
 	}
 
-	public void gridToImage( double row , double col , Point2D_F64 image ) {
+	public void gridToImage( double row, double col, Point2D_F64 image ) {
 		transformGrid.gridToImage((float)row, (float)col, pixel);
 		image.x = pixel.x;
 		image.y = pixel.y;
 	}
 
-	public float read( float row , float col ) {
+	public float read( float row, float col ) {
 		transformGrid.gridToImage(row, col, pixel);
-		return interpolate.get(pixel.x,pixel.y);
+		return interpolate.get(pixel.x, pixel.y);
 	}
 
 	/**
 	 * Reads a bit from the qr code's data matrix while adjusting for location distortions using known
 	 * feature locations.
+	 *
 	 * @param row grid row
 	 * @param col grid column
-	 * @return
 	 */
-	public int readBit( int row , int col ) {
+	public int readBit( int row, int col ) {
 		// todo use adjustments from near by alignment patterns
 
 		float center = 0.5f;
@@ -137,27 +135,27 @@ public class QrCodeBinaryGridReader<T extends ImageGray<T>> {
 //		if( pixel.x < -0.5 || pixel.y < -0.5 || pixel.x > imageWidth || pixel.y > imageHeight )
 //			return -1;
 
-		transformGrid.gridToImage(row+center-0.2f, col+center, pixel);
-		float pixel01 = interpolate.get(pixel.x,pixel.y);
-		transformGrid.gridToImage(row+center+0.2f, col+center, pixel);
-		float pixel21 = interpolate.get(pixel.x,pixel.y);
-		transformGrid.gridToImage(row+center, col+center-0.2f, pixel);
-		float pixel10 = interpolate.get(pixel.x,pixel.y);
-		transformGrid.gridToImage(row+center, col+center+0.2f, pixel);
-		float pixel12 = interpolate.get(pixel.x,pixel.y);
-		transformGrid.gridToImage(row+center, col+center, pixel);
-		float pixel00 = interpolate.get(pixel.x,pixel.y);
+		transformGrid.gridToImage(row + center - 0.2f, col + center, pixel);
+		float pixel01 = interpolate.get(pixel.x, pixel.y);
+		transformGrid.gridToImage(row + center + 0.2f, col + center, pixel);
+		float pixel21 = interpolate.get(pixel.x, pixel.y);
+		transformGrid.gridToImage(row + center, col + center - 0.2f, pixel);
+		float pixel10 = interpolate.get(pixel.x, pixel.y);
+		transformGrid.gridToImage(row + center, col + center + 0.2f, pixel);
+		float pixel12 = interpolate.get(pixel.x, pixel.y);
+		transformGrid.gridToImage(row + center, col + center, pixel);
+		float pixel00 = interpolate.get(pixel.x, pixel.y);
 
 //		float threshold = this.threshold*1.25f;
 
 		int total = 0;
-		if( pixel01 < threshold ) total++;
-		if( pixel21 < threshold ) total++;
-		if( pixel10 < threshold ) total++;
-		if( pixel12 < threshold ) total++;
-		if( pixel00 < threshold ) total++;
+		if (pixel01 < threshold) total++;
+		if (pixel21 < threshold) total++;
+		if (pixel10 < threshold) total++;
+		if (pixel12 < threshold) total++;
+		if (pixel00 < threshold) total++;
 
-		if( total >= 3 )
+		if (total >= 3)
 			return 1;
 		else
 			return 0;
@@ -188,9 +186,5 @@ public class QrCodeBinaryGridReader<T extends ImageGray<T>> {
 //			return 1;
 //		else
 //			return 0;
-	}
-
-	public QrCodeBinaryGridToPixel getTransformGrid() {
-		return transformGrid;
 	}
 }

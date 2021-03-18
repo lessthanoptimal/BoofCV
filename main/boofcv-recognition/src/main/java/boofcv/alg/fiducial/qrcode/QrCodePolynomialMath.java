@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -40,49 +40,53 @@ public class QrCodePolynomialMath {
 
 	/**
 	 * Encodes the version bits. BCH(18,6)
+	 *
 	 * @param version QR code version. 7 to 40
 	 * @return encoded bit field
 	 */
-	public static int encodeVersionBits(int version) {
+	public static int encodeVersionBits( int version ) {
 		int message = version << 12;
-		return message ^ bitPolyModulus(message, VERSION_GENERATOR,18,6);
+		return message ^ bitPolyModulus(message, VERSION_GENERATOR, 18, 6);
 	}
 
 	/**
 	 * Encodes the version bits. BCH(18,6)
+	 *
 	 * @param bits Read in bits. Should encode 18-bits
 	 * @return encoded bit field
 	 */
-	public static boolean checkVersionBits(int bits) {
-		return bitPolyModulus(bits, VERSION_GENERATOR,18,6) == 0;
+	public static boolean checkVersionBits( int bits ) {
+		return bitPolyModulus(bits, VERSION_GENERATOR, 18, 6) == 0;
 	}
 
 	/**
 	 * Attempts to correct version bit sequence.
+	 *
 	 * @param bits Read in bits after removing the mask
 	 * @return If the message could be corrected, th 5-bit format message. -1 if it couldn't
 	 */
-	public static int correctVersionBits(int bits ) {
-		return correctDCH(64,bits,VERSION_GENERATOR,18,6);
+	public static int correctVersionBits( int bits ) {
+		return correctDCH(64, bits, VERSION_GENERATOR, 18, 6);
 	}
 
 	/**
 	 * Encodes the format bits. BCH(15,5)
+	 *
 	 * @param level Error correction level
 	 * @param mask The type of mask that is applied to the qr code
 	 * @return encoded bit field
 	 */
-	public static int encodeFormatBits(QrCode.ErrorLevel level , int mask ) {
+	public static int encodeFormatBits( QrCode.ErrorLevel level, int mask ) {
 		int message = (level.value << 3) | (mask & 0xFFFFFFF7);
 		message = message << 10;
-		return message ^ bitPolyModulus(message, FORMAT_GENERATOR,15,5);
+		return message ^ bitPolyModulus(message, FORMAT_GENERATOR, 15, 5);
 	}
 
 	/**
 	 * Check the format bits. BCH(15,5) code.
 	 */
-	public static boolean checkFormatBits(int bitsNoMask ) {
-		return bitPolyModulus(bitsNoMask, FORMAT_GENERATOR,15,5) == 0;
+	public static boolean checkFormatBits( int bitsNoMask ) {
+		return bitPolyModulus(bitsNoMask, FORMAT_GENERATOR, 15, 5) == 0;
 	}
 
 	/**
@@ -91,25 +95,27 @@ public class QrCodePolynomialMath {
 	 * @param message format data bits after the mask has been remove and shifted over 10 bits
 	 * @param qr Where the results are written to
 	 */
-	public static void decodeFormatMessage(int message , QrCode qr ) {
+	public static void decodeFormatMessage( int message, QrCode qr ) {
 		int error = message >> 3;
 
 		qr.error = QrCode.ErrorLevel.lookup(error);
-		qr.mask = QrCodeMaskPattern.lookupMask(message&0x07);
+		qr.mask = QrCodeMaskPattern.lookupMask(message & 0x07);
 	}
 
 	/**
 	 * Attempts to correct format bit sequence.
+	 *
 	 * @param bitsNoMask Read in bits after removing the mask
 	 * @return If the message could be corrected, th 5-bit format message. -1 if it couldn't
 	 */
-	public static int correctFormatBits(int bitsNoMask ) {
-		return correctDCH(32,bitsNoMask,FORMAT_GENERATOR,15,5);
+	public static int correctFormatBits( int bitsNoMask ) {
+		return correctDCH(32, bitsNoMask, FORMAT_GENERATOR, 15, 5);
 	}
 
 	/**
 	 * Applies a brute force algorithm to find the message which has the smallest hamming distance. if two
 	 * messages have the same distance -1 is returned.
+	 *
 	 * @param N Number of possible messages. 32 or 64
 	 * @param messageNoMask The observed message with mask removed
 	 * @param generator Generator polynomial
@@ -117,24 +123,24 @@ public class QrCodePolynomialMath {
 	 * @param dataBits Total number of data bits in the message
 	 * @return The error corrected message or -1 if it can't be determined.
 	 */
-	public static int correctDCH( int N , int messageNoMask , int generator , int totalBits, int dataBits) {
+	public static int correctDCH( int N, int messageNoMask, int generator, int totalBits, int dataBits ) {
 		int bestHamming = 255;
 		int bestMessage = -1;
 
-		int errorBits = totalBits-dataBits;
+		int errorBits = totalBits - dataBits;
 
 		// exhaustively check all possibilities
 		for (int i = 0; i < N; i++) {
 			int test = i << errorBits;
-			test = test ^ bitPolyModulus(test,generator,totalBits,dataBits);
+			test = test ^ bitPolyModulus(test, generator, totalBits, dataBits);
 
-			int distance = DescriptorDistance.hamming(test^messageNoMask);
+			int distance = DescriptorDistance.hamming(test ^ messageNoMask);
 
 			// see if it found a better match
-			if( distance < bestHamming ) {
+			if (distance < bestHamming) {
 				bestHamming = distance;
 				bestMessage = i;
-			} else if( distance == bestHamming ) {
+			} else if (distance == bestHamming) {
 				// ambiguous so reject
 				bestMessage = -1;
 			}
@@ -144,16 +150,17 @@ public class QrCodePolynomialMath {
 
 	/**
 	 * Performs division using xcr operators on the encoded polynomials. used in BCH encoding/decoding
+	 *
 	 * @param data Data being checked
 	 * @param generator Generator polynomial
 	 * @param totalBits Total number of bits in data
 	 * @param dataBits Number of data bits. Rest are error correction bits
 	 * @return Remainder after polynomial division
 	 */
-	public static int bitPolyModulus(int data , int generator , int totalBits, int dataBits) {
-		int errorBits = totalBits-dataBits;
-		for (int i = dataBits-1; i >= 0; i--) {
-			if( (data & (1 << (i+errorBits))) != 0 ) {
+	public static int bitPolyModulus( int data, int generator, int totalBits, int dataBits ) {
+		int errorBits = totalBits - dataBits;
+		for (int i = dataBits - 1; i >= 0; i--) {
+			if ((data & (1 << (i + errorBits))) != 0) {
 				data ^= generator << i;
 			}
 		}

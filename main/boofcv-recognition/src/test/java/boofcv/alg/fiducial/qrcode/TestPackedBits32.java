@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -31,32 +31,35 @@ public class TestPackedBits32 extends BoofStandardJUnit {
 	@Test void set_get() {
 		PackedBits32 values = new PackedBits32(60);
 
-		values.set(2,1); assertEquals(values.get(2), 1);
-		values.set(2,0); assertNotEquals(values.get(2), 1);
+		values.set(2, 1);
+		assertEquals(values.get(2), 1);
+		values.set(2, 0);
+		assertNotEquals(values.get(2), 1);
 		isZeros(values);
 
-		values.set(33,1); assertEquals(values.get(33), 1);
-		values.set(33,0); assertNotEquals(values.get(33), 1);
+		values.set(33, 1);
+		assertEquals(values.get(33), 1);
+		values.set(33, 0);
+		assertNotEquals(values.get(33), 1);
 		isZeros(values);
-
 	}
 
 	private void isZeros( PackedBits32 values ) {
 		int N = values.size/32;
 		for (int i = 0; i < N; i++) {
-			assertEquals(0,values.data[i]);
+			assertEquals(0, values.data[i]);
 		}
 	}
 
 	@Test void resize() {
 		PackedBits32 values = new PackedBits32(60);
-		assertEquals(60,values.size);
-		assertEquals(2,values.data.length);
+		assertEquals(60, values.size);
+		assertEquals(2, values.data.length);
 		values.resize(20);
-		assertEquals(20,values.size);
-		assertEquals(2,values.data.length);
+		assertEquals(20, values.size);
+		assertEquals(2, values.data.length);
 		values.resize(100);
-		assertEquals(100,values.size);
-		assertEquals(100/32+1,values.data.length);
+		assertEquals(100, values.size);
+		assertEquals(100/32 + 1, values.data.length);
 	}
 }

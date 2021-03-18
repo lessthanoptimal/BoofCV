@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -28,36 +28,33 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  * @author Peter Abeles
  */
 public class TestEciEncoding extends BoofStandardJUnit {
-	@Test
-	public void isValidUTF8() {
+	@Test void isValidUTF8() {
 		for (int i = 0; i <= 0xFF; i++) {
-			if( i <= 0xBF )
+			if (i <= 0xBF)
 				assertTrue(EciEncoding.isValidUTF8(i));
-			else if( i >= 0xC3 && i <= 0xF4 )
+			else if (i >= 0xC3 && i <= 0xF4)
 				assertTrue(EciEncoding.isValidUTF8(i));
 			else
 				assertFalse(EciEncoding.isValidUTF8(i));
 		}
 	}
 
-	@Test
-	public void isValidJIS() {
+	@Test void isValidJIS() {
 		for (int i = 0; i <= 0xFF; i++) {
-			if( i >= 0x20 && i <= 0x7E )
+			if (i >= 0x20 && i <= 0x7E)
 				assertTrue(EciEncoding.isValidJIS(i));
-			else if( i >= 0xA1 && i <= 0xDF )
+			else if (i >= 0xA1 && i <= 0xDF)
 				assertTrue(EciEncoding.isValidJIS(i));
 			else
 				assertFalse(EciEncoding.isValidJIS(i));
 		}
 	}
 
-	@Test
-	public void isValidIso8869_1() {
+	@Test void isValidIso8869_1() {
 		for (int i = 0; i <= 0xFF; i++) {
-			if( i >= 0x20 && i <= 0x7E )
+			if (i >= 0x20 && i <= 0x7E)
 				assertTrue(EciEncoding.isValidIso8869_1(i));
-			else if( i >= 0xA0 )
+			else if (i >= 0xA0)
 				assertTrue(EciEncoding.isValidIso8869_1(i));
 			else
 				assertFalse(EciEncoding.isValidIso8869_1(i));

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -27,9 +27,7 @@ import static org.junit.jupiter.api.Assertions.*;
  * @author Peter Abeles
  */
 public class TestQrCodeDecoderBits extends BoofStandardJUnit {
-
-	@Test
-	public void applyErrorCorrection() {
+	@Test public void applyErrorCorrection() {
 		QrCode qr = new QrCodeEncoder().addNumeric("923492348985").fixate();
 
 		QrCodeDecoderBits alg = new QrCodeDecoderBits(EciEncoding.UTF8);
@@ -63,8 +61,7 @@ public class TestQrCodeDecoderBits extends BoofStandardJUnit {
 		assertFalse(alg.applyErrorCorrection(qr));
 	}
 
-	@Test
-	public void alignToBytes() {
+	@Test public void alignToBytes() {
 		assertEquals(0, QrCodeDecoderBits.alignToBytes(0));
 		assertEquals(8, QrCodeDecoderBits.alignToBytes(1));
 		assertEquals(8, QrCodeDecoderBits.alignToBytes(7));
@@ -72,8 +69,7 @@ public class TestQrCodeDecoderBits extends BoofStandardJUnit {
 		assertEquals(16, QrCodeDecoderBits.alignToBytes(9));
 	}
 
-	@Test
-	public void checkPaddingBytes() {
+	@Test public void checkPaddingBytes() {
 		QrCode qr = new QrCodeEncoder().addNumeric("923492348985").fixate();
 
 		QrCodeDecoderBits alg = new QrCodeDecoderBits(EciEncoding.UTF8);
@@ -102,8 +98,7 @@ public class TestQrCodeDecoderBits extends BoofStandardJUnit {
 	/**
 	 * Test against example from specification
 	 */
-	@Test
-	public void decodeEci_IsoExample() {
+	@Test public void decodeEci_IsoExample() {
 		PackedBits8 bits = new PackedBits8();
 		// ECI Assignment number
 		bits.append(0b00001001, 8, false);

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -39,8 +39,7 @@ public class TestQrCodeBinaryGridReader extends BoofStandardJUnit {
 	/**
 	 * Create a perfect undistorted image and read from it
 	 */
-	@Test
-	public void simpleChecks() {
+	@Test void simpleChecks() {
 		QrCodeGeneratorImage generator = new QrCodeGeneratorImage(4);
 		int border = generator.borderModule*4;
 		QrCode qr = new QrCodeEncoder().addAlphanumeric("HI1234").fixate();
@@ -54,23 +53,23 @@ public class TestQrCodeBinaryGridReader extends BoofStandardJUnit {
 		Point2D_F32 pixel = new Point2D_F32();
 		Point2D_F32 grid = new Point2D_F32();
 
-		reader.imageToGrid(border+4*6+1,border+4*10+1,grid);
-		assertEquals(10.25,grid.y,0.1);
-		assertEquals(6.25,grid.x,0.1);
+		reader.imageToGrid(border + 4*6 + 1, border + 4*10 + 1, grid);
+		assertEquals(10.25, grid.y, 0.1);
+		assertEquals(6.25, grid.x, 0.1);
 
-		reader.gridToImage(10,6,pixel);
-		assertEquals(border+10*4,pixel.y,0.1);
-		assertEquals(border+6*4,pixel.x,0.1);
+		reader.gridToImage(10, 6, pixel);
+		assertEquals(border + 10*4, pixel.y, 0.1);
+		assertEquals(border + 6*4, pixel.x, 0.1);
 
 		// check reading of bits
 		QrCodeMaskPattern mask = qr.mask;
 		List<Point2D_I32> locations = QrCode.LOCATION_BITS[qr.version];
-		PackedBits8 bits = PackedBits8.wrap(qr.rawbits,qr.rawbits.length*8);
+		PackedBits8 bits = PackedBits8.wrap(qr.rawbits, qr.rawbits.length*8);
 
 		for (int i = 0; i < bits.size; i++) {
 			Point2D_I32 p = locations.get(i);
-			int value = mask.apply(p.y,p.x,reader.readBit(p.y,p.x));
-			assertEquals(value,bits.get(i));
+			int value = mask.apply(p.y, p.x, reader.readBit(p.y, p.x));
+			assertEquals(value, bits.get(i));
 		}
 	}
 
@@ -80,15 +79,14 @@ public class TestQrCodeBinaryGridReader extends BoofStandardJUnit {
 	 *
 	 * This also acts as a less trivial version of the previous unit test
 	 */
-	@Test
-	public void imageToGrid_withLensDistortion() {
+	@Test void imageToGrid_withLensDistortion() {
 		QrCodeDistortedChecks helper = createDistortionCheck();
 		double r = helper.r;
 		int N = helper.qr.getNumberOfModules();
 
 		QrCodeBinaryGridReader<GrayF32> reader = new QrCodeBinaryGridReader<>(GrayF32.class);
 
-		reader.setLensDistortion(helper.image.width,helper.image.height,helper.distortion);
+		reader.setLensDistortion(helper.image.width, helper.image.height, helper.distortion);
 		reader.setImage(helper.image);
 		reader.setMarker(helper.qr);
 
@@ -97,30 +95,29 @@ public class TestQrCodeBinaryGridReader extends BoofStandardJUnit {
 
 		// grid coordinate system has its origin bottom left corner
 		double tol = 0.05; // could be even more precise
-		helper.simulator.computePixel(0,-r,r, pixel);
-		helper.p2p.compute(pixel.x,pixel.y,pixel);
-		reader.imageToGrid((float)pixel.x,(float)pixel.y,found);
-		assertEquals(0,found.x,tol);
-		assertEquals(0,found.y,tol);
+		helper.simulator.computePixel(0, -r, r, pixel);
+		helper.p2p.compute(pixel.x, pixel.y, pixel);
+		reader.imageToGrid((float)pixel.x, (float)pixel.y, found);
+		assertEquals(0, found.x, tol);
+		assertEquals(0, found.y, tol);
 
-		helper.simulator.computePixel(0,-r,-r, pixel);
-		helper.p2p.compute(pixel.x,pixel.y,pixel);
-		reader.imageToGrid((float)pixel.x,(float)pixel.y,found);
-		assertEquals(0,found.x,tol);
-		assertEquals(N,found.y,tol);
+		helper.simulator.computePixel(0, -r, -r, pixel);
+		helper.p2p.compute(pixel.x, pixel.y, pixel);
+		reader.imageToGrid((float)pixel.x, (float)pixel.y, found);
+		assertEquals(0, found.x, tol);
+		assertEquals(N, found.y, tol);
 
-		helper.simulator.computePixel(0,r,r, pixel);
-		helper.p2p.compute(pixel.x,pixel.y,pixel);
-		reader.imageToGrid((float)pixel.x,(float)pixel.y,found);
-		assertEquals(N,found.x,tol);
-		assertEquals(0,found.y,tol);
+		helper.simulator.computePixel(0, r, r, pixel);
+		helper.p2p.compute(pixel.x, pixel.y, pixel);
+		reader.imageToGrid((float)pixel.x, (float)pixel.y, found);
+		assertEquals(N, found.x, tol);
+		assertEquals(0, found.y, tol);
 	}
 
 	/**
 	 * To read a bit lens distortion needs to be removed.
 	 */
-	@Test
-	public void readBit_withLensDistortion() {
+	@Test void readBit_withLensDistortion() {
 		QrCodeDistortedChecks helper = createDistortionCheck();
 		QrCode qr = helper.qr;
 
@@ -132,25 +129,25 @@ public class TestQrCodeBinaryGridReader extends BoofStandardJUnit {
 //		BoofMiscOps.sleep(10_000);
 
 		// Should fail without the distortion model
-		assertTrue(countCorrectRead(qr,reader) < 1.0 );
+		assertTrue(countCorrectRead(qr, reader) < 1.0);
 
 		// should work now
-		reader.setLensDistortion(helper.image.width,helper.image.height,helper.distortion);
+		reader.setLensDistortion(helper.image.width, helper.image.height, helper.distortion);
 		reader.setImage(helper.image);
 		reader.setMarker(helper.qr);
-		assertTrue(countCorrectRead(qr,reader) == 1.0 );
+		assertEquals(countCorrectRead(qr, reader), 1.0);
 	}
 
-	private double countCorrectRead( QrCode qr , QrCodeBinaryGridReader<GrayF32> reader) {
+	private double countCorrectRead( QrCode qr, QrCodeBinaryGridReader<GrayF32> reader ) {
 		QrCodeMaskPattern mask = qr.mask;
 		List<Point2D_I32> locations = QrCode.LOCATION_BITS[qr.version];
-		PackedBits8 bits = PackedBits8.wrap(qr.rawbits,qr.rawbits.length*8);
+		PackedBits8 bits = PackedBits8.wrap(qr.rawbits, qr.rawbits.length*8);
 
 		int success = 0;
 		for (int i = 0; i < bits.size; i++) {
 			Point2D_I32 p = locations.get(i);
-			int value = mask.apply(p.y,p.x,reader.readBit(p.y,p.x));
-			if( value == bits.get(i))
+			int value = mask.apply(p.y, p.x, reader.readBit(p.y, p.x));
+			if (value == bits.get(i))
 				success++;
 		}
 		return success/(double)bits.size;

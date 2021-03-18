@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -32,8 +32,7 @@ public class TestQrCodeEncoder extends BoofStandardJUnit {
 	 * In the qr code specification an example is given. This compares the computed results
 	 * to that example
 	 */
-	@Test
-	void numeric_specification() {
+	@Test void numeric_specification() {
 		QrCode qr = new QrCodeEncoder().setVersion(1).
 				setError(QrCode.ErrorLevel.M).
 				setMask(new QrCodeMaskPattern.NONE(0b011)).
@@ -54,16 +53,14 @@ public class TestQrCodeEncoder extends BoofStandardJUnit {
 		}
 	}
 
-	@Test
-	void checkAlphaNumericLookUpTable() {
+	@Test void checkAlphaNumericLookUpTable() {
 		assertEquals(45, QrCodeEncoder.ALPHANUMERIC.length());
 	}
 
 	/**
 	 * Compare only the data portion against an example from the specification
 	 */
-	@Test
-	void alphanumeric_specification() {
+	@Test void alphanumeric_specification() {
 		QrCodeEncoder encoder = new QrCodeEncoder();
 		encoder.setVersion(1).
 				setError(QrCode.ErrorLevel.H).
@@ -80,16 +77,14 @@ public class TestQrCodeEncoder extends BoofStandardJUnit {
 		}
 	}
 
-	@Test
-	void alphanumericToValues() {
+	@Test void alphanumericToValues() {
 		byte[] found = QrCodeEncoder.alphanumericToValues("14AE%*+-./:");
 		byte[] expected = new byte[]{1, 4, 10, 14, 38, 39, 40, 41, 42, 43, 44};
 
 		assertArrayEquals(expected, found);
 	}
 
-	@Test
-	void valueToAlphanumeric() {
+	@Test void valueToAlphanumeric() {
 		byte[] input = new byte[]{1, 4, 10, 14, 38, 39, 40, 41, 42, 43, 44};
 		String expected = "14AE%*+-./:";
 		for (int i = 0; i < input.length; i++) {
@@ -101,8 +96,7 @@ public class TestQrCodeEncoder extends BoofStandardJUnit {
 	/**
 	 * Test comparing against a data stream that was successfully decoded by another qr-code reader
 	 */
-	@Test
-	void kanji() {
+	@Test void kanji() {
 		QrCodeEncoder encoder = new QrCodeEncoder();
 		encoder.setVersion(2).setError(QrCode.ErrorLevel.M).
 				setMask(QrCodeMaskPattern.M011).
@@ -117,8 +111,7 @@ public class TestQrCodeEncoder extends BoofStandardJUnit {
 		}
 	}
 
-	@Test
-	void automatic() {
+	@Test void automatic() {
 		QrCodeEncoder encoder = new QrCodeEncoder();
 		QrCodeDecoderBits decoder = new QrCodeDecoderBits(EciEncoding.UTF8); // used to validate the message
 		QrCode qr = encoder.addAutomatic("123ASDdf阿ん鞠ぷへ≦Ｋ").fixate();
@@ -150,8 +143,7 @@ public class TestQrCodeEncoder extends BoofStandardJUnit {
 		assertEquals(QrCode.Mode.NUMERIC, qr.mode);
 	}
 
-	@Test
-	void messageTooLong() {
+	@Test void messageTooLong() {
 		assertThrows(IllegalArgumentException.class,
 				() ->
 						new QrCodeEncoder().setVersion(1).
@@ -163,8 +155,7 @@ public class TestQrCodeEncoder extends BoofStandardJUnit {
 	/**
 	 * Encodes and then decodes it for several different lengths
 	 */
-	@Test
-	void encodeThenDecode() {
+	@Test void encodeThenDecode() {
 		for (int length = 1; length < 30; length++) {
 			encodeThenDecode(length);
 		}
@@ -192,8 +183,7 @@ public class TestQrCodeEncoder extends BoofStandardJUnit {
 	/**
 	 * See if it blows up when encoding using multiple encoding methods
 	 */
-	@Test
-	void multipleModes() {
+	@Test void multipleModes() {
 		new QrCodeEncoder()
 				.setVersion(2).setError(QrCode.ErrorLevel.M).
 				setMask(QrCodeMaskPattern.M011).
@@ -201,8 +191,7 @@ public class TestQrCodeEncoder extends BoofStandardJUnit {
 				addKanji("阿ん鞠ぷへ≦Ｋ").fixate();
 	}
 
-	@Test
-	void tooMuchData() {
+	@Test void tooMuchData() {
 		QrCodeEncoder encoder = new QrCodeEncoder()
 				.setVersion(2).setError(QrCode.ErrorLevel.M).
 						setMask(QrCodeMaskPattern.M011).
@@ -211,8 +200,7 @@ public class TestQrCodeEncoder extends BoofStandardJUnit {
 		assertThrows(RuntimeException.class, encoder::fixate);
 	}
 
-	@Test
-	void autoSelectVersion() {
+	@Test void autoSelectVersion() {
 		QrCode qr = new QrCodeEncoder().
 				setError(QrCode.ErrorLevel.M).
 				setMask(QrCodeMaskPattern.M011).
@@ -228,8 +216,7 @@ public class TestQrCodeEncoder extends BoofStandardJUnit {
 		assertEquals(2, qr.version);
 	}
 
-	@Test
-	void autoSelectErrorCorrection() {
+	@Test void autoSelectErrorCorrection() {
 		QrCode qr = new QrCodeEncoder().
 				setVersion(1).
 				setMask(QrCodeMaskPattern.M011).
@@ -245,8 +232,7 @@ public class TestQrCodeEncoder extends BoofStandardJUnit {
 		assertEquals(QrCode.ErrorLevel.L, qr.error);
 	}
 
-	@Test
-	void autoSelectVersionAndError() {
+	@Test void autoSelectVersionAndError() {
 		QrCode qr = new QrCodeEncoder().
 				setMask(QrCodeMaskPattern.M011).
 				addAlphanumeric("123").fixate();
@@ -262,8 +248,7 @@ public class TestQrCodeEncoder extends BoofStandardJUnit {
 		assertEquals(QrCode.ErrorLevel.M, qr.error);
 	}
 
-	@Test
-	void autoSelectMask() {
+	@Test void autoSelectMask() {
 		QrCode qr = new QrCodeEncoder().addAlphanumeric("123").fixate();
 		assertNotNull(qr.mask);
 	}
@@ -271,8 +256,7 @@ public class TestQrCodeEncoder extends BoofStandardJUnit {
 	/**
 	 * Sanity check on qr code with no data encoded.
 	 */
-	@Test
-	void detectAdjacentAndPositionPatterns_test0() {
+	@Test void detectAdjacentAndPositionPatterns_test0() {
 		int version = 1;
 		QrCodeEncoder.FoundFeatures features = new QrCodeEncoder.FoundFeatures();
 		int N = QrCode.totalModules(version);
@@ -294,8 +278,7 @@ public class TestQrCodeEncoder extends BoofStandardJUnit {
 	/**
 	 * Insert a fake position pattern and see if it is found
 	 */
-	@Test
-	void detectAdjacentAndPositionPatterns_test1() {
+	@Test void detectAdjacentAndPositionPatterns_test1() {
 		int version = 1;
 		QrCodeEncoder.FoundFeatures features = new QrCodeEncoder.FoundFeatures();
 		int N = QrCode.totalModules(version);
@@ -328,8 +311,7 @@ public class TestQrCodeEncoder extends BoofStandardJUnit {
 	/**
 	 * Test adjacent counter by making a very specific pattern
 	 */
-	@Test
-	void detectAdjacentAndPositionPatterns_test2() {
+	@Test void detectAdjacentAndPositionPatterns_test2() {
 		int version = 1;
 		QrCodeEncoder.FoundFeatures features = new QrCodeEncoder.FoundFeatures();
 		int N = QrCode.totalModules(version);

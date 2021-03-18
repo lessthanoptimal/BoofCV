@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -37,7 +37,7 @@ import static boofcv.alg.fiducial.qrcode.QrCodeEncoder.valueToAlphanumeric;
 public class QrCodeDecoderBits {
 
 	// used to compute error correction
-	ReidSolomonCodes rscodes = new ReidSolomonCodes(8,0b100011101);
+	ReidSolomonCodes rscodes = new ReidSolomonCodes(8, 0b100011101);
 	// storage for the data message
 	DogArray_I8 message = new DogArray_I8();
 	// storage fot the message's ecc
@@ -53,18 +53,17 @@ public class QrCodeDecoderBits {
 	String forceEncoding;
 
 	/**
-	 *
 	 * @param forceEncoding If null then the default byte encoding is used. If not null then the specified
-	 *                      encoding is used.
+	 * encoding is used.
 	 */
-	public QrCodeDecoderBits(@Nullable String forceEncoding) {
+	public QrCodeDecoderBits( @Nullable String forceEncoding ) {
 		this.forceEncoding = forceEncoding;
 	}
 
 	/**
 	 * Reconstruct the data while applying error correction.
 	 */
-	public boolean applyErrorCorrection( QrCode qr) {
+	public boolean applyErrorCorrection( QrCode qr ) {
 //		System.out.println("decoder ver   "+qr.version);
 //		System.out.println("decoder mask  "+qr.mask);
 //		System.out.println("decoder error "+qr.error);
@@ -74,12 +73,12 @@ public class QrCodeDecoderBits {
 
 		int wordsBlockAllA = block.codewords;
 		int wordsBlockDataA = block.dataCodewords;
-		int wordsEcc = wordsBlockAllA-wordsBlockDataA;
+		int wordsEcc = wordsBlockAllA - wordsBlockDataA;
 		int numBlocksA = block.blocks;
 
 		int wordsBlockAllB = wordsBlockAllA + 1;
 		int wordsBlockDataB = wordsBlockDataA + 1;
-		int numBlocksB = (info.codewords-wordsBlockAllA*numBlocksA)/wordsBlockAllB;
+		int numBlocksB = (info.codewords - wordsBlockAllA*numBlocksA)/wordsBlockAllB;
 
 		int totalBlocks = numBlocksA + numBlocksB;
 		int totalDataBytes = wordsBlockDataA*numBlocksA + wordsBlockDataB*numBlocksB;
@@ -88,45 +87,44 @@ public class QrCodeDecoderBits {
 		ecc.resize(wordsEcc);
 		rscodes.generator(wordsEcc);
 
-		if( !decodeBlocks(qr,wordsBlockDataA,numBlocksA,0,0,totalDataBytes,totalBlocks) )
+		if (!decodeBlocks(qr, wordsBlockDataA, numBlocksA, 0, 0, totalDataBytes, totalBlocks))
 			return false;
 
-		return decodeBlocks(qr,wordsBlockDataB,numBlocksB,numBlocksA*wordsBlockDataA,numBlocksA,totalDataBytes,totalBlocks);
+		return decodeBlocks(qr, wordsBlockDataB, numBlocksB, numBlocksA*wordsBlockDataA, numBlocksA, totalDataBytes, totalBlocks);
 	}
 
 	private boolean decodeBlocks( QrCode qr, int bytesInDataBlock, int numberOfBlocks, int bytesDataRead,
-							  int offsetBlock, int offsetEcc, int stride) {
+								  int offsetBlock, int offsetEcc, int stride ) {
 		message.resize(bytesInDataBlock);
 
 		for (int idxBlock = 0; idxBlock < numberOfBlocks; idxBlock++) {
-			copyFromRawData(qr.rawbits,message,ecc,offsetBlock+idxBlock,stride,offsetEcc);
+			copyFromRawData(qr.rawbits, message, ecc, offsetBlock + idxBlock, stride, offsetEcc);
 
 			QrCodeEncoder.flipBits8(message);
 			QrCodeEncoder.flipBits8(ecc);
 
-			if( !rscodes.correct(message,ecc) ) {
+			if (!rscodes.correct(message, ecc)) {
 				return false;
 			}
 
 			QrCodeEncoder.flipBits8(message);
-			System.arraycopy(message.data,0,qr.corrected,bytesDataRead,message.size);
+			System.arraycopy(message.data, 0, qr.corrected, bytesDataRead, message.size);
 			bytesDataRead += message.size;
 		}
 		return true;
 	}
 
-	private void copyFromRawData( byte[] input , DogArray_I8 message , DogArray_I8 ecc ,
-								  int offsetBlock , int stride , int offsetEcc )
-	{
+	private void copyFromRawData( byte[] input, DogArray_I8 message, DogArray_I8 ecc,
+								  int offsetBlock, int stride, int offsetEcc ) {
 		for (int i = 0; i < message.size; i++) {
-			message.data[i] = input[i*stride+offsetBlock];
+			message.data[i] = input[i*stride + offsetBlock];
 		}
 		for (int i = 0; i < ecc.size; i++) {
-			ecc.data[i] = input[i*stride+offsetBlock+offsetEcc];
+			ecc.data[i] = input[i*stride + offsetBlock + offsetEcc];
 		}
 	}
 
-	public boolean decodeMessage(QrCode qr) {
+	public boolean decodeMessage( QrCode qr ) {
 		encodingEci = null;
 		PackedBits8 bits = new PackedBits8();
 		bits.data = qr.corrected;
@@ -140,19 +138,29 @@ public class QrCodeDecoderBits {
 
 		// if there isn't enough bits left to read the mode it must be done
 		int location = 0;
-		while( location+4 <= bits.size ) {
+		while (location + 4 <= bits.size) {
 			int modeBits = bits.read(location, 4, true);
 			location += 4;
-			if( modeBits == 0) // escape indicator
+			if (modeBits == 0) // escape indicator
 				break;
 			QrCode.Mode mode = QrCode.Mode.lookup(modeBits);
-			qr.mode = updateModeLogic(qr.mode,mode);
+			qr.mode = updateModeLogic(qr.mode, mode);
 			switch (mode) {
-				case NUMERIC: location = decodeNumeric(qr, bits,location); break;
-				case ALPHANUMERIC: location = decodeAlphanumeric(qr, bits,location); break;
-				case BYTE: location = decodeByte(qr, bits,location); break;
-				case KANJI: location = decodeKanji(qr, bits,location); break;
-				case ECI: location = decodeEci(bits,location);break;
+				case NUMERIC:
+					location = decodeNumeric(qr, bits, location);
+					break;
+				case ALPHANUMERIC:
+					location = decodeAlphanumeric(qr, bits, location);
+					break;
+				case BYTE:
+					location = decodeByte(qr, bits, location);
+					break;
+				case KANJI:
+					location = decodeKanji(qr, bits, location);
+					break;
+				case ECI:
+					location = decodeEci(bits, location);
+					break;
 				case FNC1_FIRST:
 				case FNC1_SECOND:
 					// This isn't the proper way to handle this mode, but it
@@ -170,7 +178,7 @@ public class QrCodeDecoderBits {
 		}
 		// ensure the length is byte aligned
 		location = alignToBytes(location);
-		int lengthBytes = location / 8;
+		int lengthBytes = location/8;
 
 		// sanity check padding
 		if (!checkPaddingBytes(qr, lengthBytes)) {
@@ -185,19 +193,18 @@ public class QrCodeDecoderBits {
 	/**
 	 * If only one mode then that mode is used. If more than one mode is used then set to multiple
 	 */
-	private QrCode.Mode updateModeLogic( QrCode.Mode current , QrCode.Mode candidate )
-	{
-		if( current == candidate )
+	private QrCode.Mode updateModeLogic( QrCode.Mode current, QrCode.Mode candidate ) {
+		if (current == candidate)
 			return current;
-		else if( current == QrCode.Mode.UNKNOWN ) {
+		else if (current == QrCode.Mode.UNKNOWN) {
 			return candidate;
 		} else {
 			return QrCode.Mode.MIXED;
 		}
 	}
 
-	public static int alignToBytes(int lengthBits) {
-		return lengthBits + (8-lengthBits%8)%8;
+	public static int alignToBytes( int lengthBits ) {
+		return lengthBits + (8 - lengthBits%8)%8;
 	}
 
 	/**
@@ -205,7 +212,7 @@ public class QrCodeDecoderBits {
 	 *
 	 * @param lengthBytes Number of bytes that data should be been written to and not filled with padding.
 	 */
-	boolean checkPaddingBytes(QrCode qr, int lengthBytes) {
+	boolean checkPaddingBytes( QrCode qr, int lengthBytes ) {
 		boolean a = true;
 
 		for (int i = lengthBytes; i < qr.corrected.length; i++) {
@@ -237,23 +244,23 @@ public class QrCodeDecoderBits {
 	 * @param data encoded data
 	 * @return Location it has read up to in bits
 	 */
-	private int decodeNumeric( QrCode qr , PackedBits8 data, int bitLocation ) {
+	private int decodeNumeric( QrCode qr, PackedBits8 data, int bitLocation ) {
 		int lengthBits = QrCodeEncoder.getLengthBitsNumeric(qr.version);
 
-		int length = data.read(bitLocation,lengthBits,true);
+		int length = data.read(bitLocation, lengthBits, true);
 		bitLocation += lengthBits;
 
-		while( length >= 3 ) {
-			if( data.size < bitLocation+10 ) {
+		while (length >= 3) {
+			if (data.size < bitLocation + 10) {
 				qr.failureCause = QrCode.Failure.MESSAGE_OVERFLOW;
 				return -1;
 			}
-			int chunk = data.read(bitLocation,10,true);
+			int chunk = data.read(bitLocation, 10, true);
 			bitLocation += 10;
 
 			int valA = chunk/100;
-			int valB = (chunk-valA*100)/10;
-			int valC = chunk-valA*100-valB*10;
+			int valB = (chunk - valA*100)/10;
+			int valC = chunk - valA*100 - valB*10;
 
 			workString.append((char)(valA + '0'));
 			workString.append((char)(valB + '0'));
@@ -262,24 +269,24 @@ public class QrCodeDecoderBits {
 			length -= 3;
 		}
 
-		if( length == 2 ) {
-			if( data.size < bitLocation+7 ) {
+		if (length == 2) {
+			if (data.size < bitLocation + 7) {
 				qr.failureCause = QrCode.Failure.MESSAGE_OVERFLOW;
 				return -1;
 			}
-			int chunk = data.read(bitLocation,7,true);
+			int chunk = data.read(bitLocation, 7, true);
 			bitLocation += 7;
 
 			int valA = chunk/10;
-			int valB = chunk-valA*10;
+			int valB = chunk - valA*10;
 			workString.append((char)(valA + '0'));
 			workString.append((char)(valB + '0'));
-		} else if( length == 1 ) {
-			if( data.size < bitLocation+4 ) {
+		} else if (length == 1) {
+			if (data.size < bitLocation + 4) {
 				qr.failureCause = QrCode.Failure.MESSAGE_OVERFLOW;
 				return -1;
 			}
-			int valA = data.read(bitLocation,4,true);
+			int valA = data.read(bitLocation, 4, true);
 			bitLocation += 4;
 			workString.append((char)(valA + '0'));
 		}
@@ -293,34 +300,34 @@ public class QrCodeDecoderBits {
 	 * @param data encoded data
 	 * @return Location it has read up to in bits
 	 */
-	private int decodeAlphanumeric( QrCode qr , PackedBits8 data, int bitLocation ) {
+	private int decodeAlphanumeric( QrCode qr, PackedBits8 data, int bitLocation ) {
 		int lengthBits = QrCodeEncoder.getLengthBitsAlphanumeric(qr.version);
 
-		int length = data.read(bitLocation,lengthBits,true);
+		int length = data.read(bitLocation, lengthBits, true);
 		bitLocation += lengthBits;
 
-		while( length >= 2 ) {
-			if( data.size < bitLocation+11 ) {
+		while (length >= 2) {
+			if (data.size < bitLocation + 11) {
 				qr.failureCause = QrCode.Failure.MESSAGE_OVERFLOW;
 				return -1;
 			}
-			int chunk = data.read(bitLocation,11,true);
+			int chunk = data.read(bitLocation, 11, true);
 			bitLocation += 11;
 
 			int valA = chunk/45;
-			int valB = chunk-valA*45;
+			int valB = chunk - valA*45;
 
 			workString.append(valueToAlphanumeric(valA));
 			workString.append(valueToAlphanumeric(valB));
 			length -= 2;
 		}
 
-		if( length == 1 ) {
-			if( data.size < bitLocation+6 ) {
+		if (length == 1) {
+			if (data.size < bitLocation + 6) {
 				qr.failureCause = QrCode.Failure.MESSAGE_OVERFLOW;
 				return -1;
 			}
-			int valA = data.read(bitLocation,6,true);
+			int valA = data.read(bitLocation, 6, true);
 			bitLocation += 6;
 			workString.append(valueToAlphanumeric(valA));
 		}
@@ -334,31 +341,31 @@ public class QrCodeDecoderBits {
 	 * @param data encoded data
 	 * @return Location it has read up to in bits
 	 */
-	private int decodeByte( QrCode qr , PackedBits8 data, int bitLocation ) {
+	private int decodeByte( QrCode qr, PackedBits8 data, int bitLocation ) {
 		int lengthBits = QrCodeEncoder.getLengthBitsBytes(qr.version);
 
-		int length = data.read(bitLocation,lengthBits,true);
+		int length = data.read(bitLocation, lengthBits, true);
 		bitLocation += lengthBits;
 
-		if( length*8 > data.size-bitLocation ) {
+		if (length*8 > data.size - bitLocation) {
 			qr.failureCause = QrCode.Failure.MESSAGE_OVERFLOW;
 			return -1;
 		}
 
-		byte rawdata[] = new byte[ length ];
+		byte rawdata[] = new byte[length];
 
 		for (int i = 0; i < length; i++) {
-			rawdata[i] = (byte)data.read(bitLocation,8,true);
+			rawdata[i] = (byte)data.read(bitLocation, 8, true);
 			bitLocation += 8;
 		}
 
 		// If ECI encoding is not specified use the default encoding. Unfortunately the specification is ignored
 		// by most people here and UTF-8 is used. If an encoding is specified then that is used.
-		String encoding = encodingEci == null ? (forceEncoding!=null?forceEncoding:guessEncoding(rawdata))
+		String encoding = encodingEci == null ? (forceEncoding != null ? forceEncoding : guessEncoding(rawdata))
 				: encodingEci;
 
 		try {
-			workString.append( new String(rawdata, encoding) );
+			workString.append(new String(rawdata, encoding));
 		} catch (UnsupportedEncodingException ignored) {
 			qr.failureCause = JIS_UNAVAILABLE;
 			return -1;
@@ -373,20 +380,20 @@ public class QrCodeDecoderBits {
 	 * @param data encoded data
 	 * @return Location it has read up to in bits
 	 */
-	private int decodeKanji( QrCode qr , PackedBits8 data, int bitLocation ) {
+	private int decodeKanji( QrCode qr, PackedBits8 data, int bitLocation ) {
 		int lengthBits = QrCodeEncoder.getLengthBitsKanji(qr.version);
 
-		int length = data.read(bitLocation,lengthBits,true);
+		int length = data.read(bitLocation, lengthBits, true);
 		bitLocation += lengthBits;
 
-		byte rawdata[] = new byte[ length*2 ];
+		byte rawdata[] = new byte[length*2];
 
 		for (int i = 0; i < length; i++) {
-			if( data.size < bitLocation+13 ) {
+			if (data.size < bitLocation + 13) {
 				qr.failureCause = QrCode.Failure.MESSAGE_OVERFLOW;
 				return -1;
 			}
-			int letter = data.read(bitLocation,13,true);
+			int letter = data.read(bitLocation, 13, true);
 			bitLocation += 13;
 
 			letter = ((letter/0x0C0) << 8) | (letter%0x0C0);
@@ -398,13 +405,13 @@ public class QrCodeDecoderBits {
 				// In the 0xE040 to 0xEBBF range
 				letter += 0x0C140;
 			}
-			rawdata[i*2] = (byte) (letter >> 8);
-			rawdata[i*2 + 1] = (byte) letter;
+			rawdata[i*2] = (byte)(letter >> 8);
+			rawdata[i*2 + 1] = (byte)letter;
 		}
 
 		// Shift_JIS may not be supported in some environments:
 		try {
-			workString.append( new String(rawdata, "Shift_JIS") );
+			workString.append(new String(rawdata, "Shift_JIS"));
 		} catch (UnsupportedEncodingException ignored) {
 			qr.failureCause = KANJI_UNAVAILABLE;
 			return -1;
@@ -424,24 +431,24 @@ public class QrCodeDecoderBits {
 		//       almost all use UTF-8 by default and that supports a lot of characters
 
 		// number of 1 bits before first 0 define number of additional codewords
-		int firstByte = data.read(bitLocation,8,true);
+		int firstByte = data.read(bitLocation, 8, true);
 		bitLocation += 8;
 
 		int numCodeWords = 1;
-		while( (firstByte&(1 << (7-numCodeWords))) != 0 ) {
+		while ((firstByte & (1 << (7 - numCodeWords))) != 0) {
 			numCodeWords++;
 		}
 		// trip the bits that indicate the number of code words
-		if( numCodeWords > 1) {
-			firstByte <<= numCodeWords-1;
-			firstByte >>= numCodeWords-1;
+		if (numCodeWords > 1) {
+			firstByte <<= numCodeWords - 1;
+			firstByte >>= numCodeWords - 1;
 		}
 
 		// read the 6-digit designator
 		int assignmentValue = firstByte;
 		for (int i = 1; i < numCodeWords; i++) {
 			assignmentValue <<= 8;
-			assignmentValue |= data.read(bitLocation,8,true);
+			assignmentValue |= data.read(bitLocation, 8, true);
 			bitLocation += 8;
 		}
 

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -32,8 +32,7 @@ public class TestReidSolomonCodes extends BoofStandardJUnit {
 
 	int primitive8 = 0b100011101;
 
-	@Test
-	public void computeECC() {
+	@Test void computeECC() {
 		DogArray_I8 message = randomMessage(50);
 		DogArray_I8 ecc = new DogArray_I8();
 
@@ -56,11 +55,10 @@ public class TestReidSolomonCodes extends BoofStandardJUnit {
 	/**
 	 * Compare against results from python tutorial
 	 */
-	@Test
-	public void computeECC_python() {
-		byte a[] = new byte[]{0x40, (byte)0xd2, 0x75, 0x47, 0x76, 0x17, 0x32,
+	@Test void computeECC_python() {
+		byte[] a = new byte[]{0x40, (byte)0xd2, 0x75, 0x47, 0x76, 0x17, 0x32,
 				0x06, 0x27, 0x26, (byte)0x96, (byte)0xc6, (byte)0xc6, (byte)0x96, 0x70, (byte)0xec};
-		byte b[] = new byte[]{(byte)0xbc, 0x2a, (byte)0x90, 0x13, 0x6b,
+		byte[] b = new byte[]{(byte)0xbc, 0x2a, (byte)0x90, 0x13, 0x6b,
 				(byte)0xaf, (byte)0xef, (byte)0xfd, 0x4b, (byte)0xe0};
 
 		DogArray_I8 message = new DogArray_I8();
@@ -78,8 +76,7 @@ public class TestReidSolomonCodes extends BoofStandardJUnit {
 		}
 	}
 
-	@Test
-	public void computeSyndromes() {
+	@Test void computeSyndromes() {
 		DogArray_I8 message = randomMessage(50);
 		DogArray_I8 ecc = new DogArray_I8();
 
@@ -115,8 +112,7 @@ public class TestReidSolomonCodes extends BoofStandardJUnit {
 		return message;
 	}
 
-	@Test
-	public void generator() {
+	@Test void generator() {
 		ReidSolomonCodes alg = new ReidSolomonCodes(8, primitive8);
 		alg.generator(5);
 
@@ -134,8 +130,7 @@ public class TestReidSolomonCodes extends BoofStandardJUnit {
 	/**
 	 * Computed using a reference implementation found at [1].
 	 */
-	@Test
-	public void findErrorLocatorPolynomialBM() {
+	@Test void findErrorLocatorPolynomialBM() {
 		DogArray_I8 message = DogArray_I8.parseHex(
 				"[ 0x40, 0xd2, 0x75, 0x47, 0x76, 0x17, 0x32, 0x06, 0x27, 0x26, 0x96, 0xc6, 0xc6, 0x96, 0x70, 0xec ]");
 		DogArray_I8 ecc = new DogArray_I8();
@@ -167,8 +162,7 @@ public class TestReidSolomonCodes extends BoofStandardJUnit {
 	 * Compares the results from BM against an error locator polynomial computed directly given the known
 	 * error locations
 	 */
-	@Test
-	public void findErrorLocatorPolynomialBM_compareToDirect() {
+	@Test void findErrorLocatorPolynomialBM_compareToDirect() {
 
 		DogArray_I8 found = new DogArray_I8();
 		DogArray_I8 expected = new DogArray_I8();
@@ -205,8 +199,7 @@ public class TestReidSolomonCodes extends BoofStandardJUnit {
 	/**
 	 * Test positive cases
 	 */
-	@Test
-	public void findErrors_BruteForce() {
+	@Test void findErrors_BruteForce() {
 		DogArray_I8 message = randomMessage(50);
 		for (int i = 0; i < 200; i++) {
 			findErrors_BruteForce(message, rand.nextInt(5), false);
@@ -228,7 +221,7 @@ public class TestReidSolomonCodes extends BoofStandardJUnit {
 
 		// corrupt the message and ecc
 		int N = message.size + ecc.size;
-		int corrupted[] = selectN(numErrors, N);
+		int[] corrupted = selectN(numErrors, N);
 		for (int i = 0; i < corrupted.length; i++) {
 			int w = corrupted[i];
 			if (w < message.size)
@@ -269,15 +262,14 @@ public class TestReidSolomonCodes extends BoofStandardJUnit {
 	/**
 	 * Test a case where there are too many errors.
 	 */
-	@Test
-	public void findErrors_BruteForce_TooMany() {
+	@Test void findErrors_BruteForce_TooMany() {
 		DogArray_I8 message = randomMessage(50);
 		findErrors_BruteForce(message, 6, true);
 		findErrors_BruteForce(message, 8, true);
 	}
 
 	public int[] selectN( int setSize, int maxValue ) {
-		int a[] = new int[maxValue];
+		int[] a = new int[maxValue];
 
 		for (int i = 0; i < maxValue; i++) {
 			a[i] = i;
@@ -289,7 +281,7 @@ public class TestReidSolomonCodes extends BoofStandardJUnit {
 			a[i] = tmp;
 		}
 
-		int out[] = new int[setSize];
+		int[] out = new int[setSize];
 		System.arraycopy(a, 0, out, 0, setSize);
 		return out;
 	}
@@ -297,8 +289,7 @@ public class TestReidSolomonCodes extends BoofStandardJUnit {
 	/**
 	 * Compare solution to reference code
 	 */
-	@Test
-	public void findErrorEvaluator() {
+	@Test void findErrorEvaluator() {
 
 		// one error
 		findErrorEvaluator(array(64, 192, 93, 231, 52, 92, 228, 49, 83, 2455),
@@ -332,8 +323,7 @@ public class TestReidSolomonCodes extends BoofStandardJUnit {
 	/**
 	 * Compare against a hand computed scenario
 	 */
-	@Test
-	public void correctErrors_hand() {
+	@Test void correctErrors_hand() {
 		DogArray_I8 message = DogArray_I8.parseHex(
 				"[ 0x40, 0xd2, 0x75, 0x47, 0x76, 0x17, 0x32, 0x06, 0x27, 0x26, 0x96, 0xc6, 0xc6, 0x96, 0x70, 0xec ]");
 		DogArray_I8 ecc = new DogArray_I8();
@@ -369,8 +359,7 @@ public class TestReidSolomonCodes extends BoofStandardJUnit {
 	/**
 	 * Randomly correct the message and ECC. See if the message is correctly reconstructed.
 	 */
-	@Test
-	public void correct_random() {
+	@Test void correct_random() {
 		DogArray_I8 ecc = new DogArray_I8();
 		int nsyn = 10; // should be able to recover from 4 errors
 
@@ -393,7 +382,6 @@ public class TestReidSolomonCodes extends BoofStandardJUnit {
 
 			// corrupt the ecc code
 			if (numErrors < 5 && rand.nextInt(5) < 1) {
-				numErrors++;
 				ecc.data[rand.nextInt(ecc.size)] ^= (byte)0x13;
 			}
 

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -32,8 +32,7 @@ public class PositionPatternNode extends SquareNode {
 	public double grayThreshold;
 
 	@Override
-	public void reset()
-	{
+	public void reset() {
 		super.reset();
 		grayThreshold = -1;
 	}

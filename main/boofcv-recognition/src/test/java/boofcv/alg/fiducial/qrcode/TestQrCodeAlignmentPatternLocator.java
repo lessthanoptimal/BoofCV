@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -37,8 +37,7 @@ public class TestQrCodeAlignmentPatternLocator extends BoofStandardJUnit {
 	/**
 	 * Everything all together on a simple code
 	 */
-	@Test
-	public void simple() {
+	@Test void simple() {
 		QrCode qr = new QrCodeEncoder().setVersion(7).addNumeric("12340324").fixate();
 
 		QrCodeGeneratorImage generator = new QrCodeGeneratorImage(4);
@@ -50,8 +49,7 @@ public class TestQrCodeAlignmentPatternLocator extends BoofStandardJUnit {
 		assertEquals(6, qr.alignment.size);
 	}
 
-	@Test
-	public void withLensDistortion() {
+	@Test void withLensDistortion() {
 		QrCodeDistortedChecks helper = new QrCodeDistortedChecks();
 		helper.qr = new QrCodeEncoder().setVersion(7).addNumeric("12340324").fixate();
 
@@ -95,8 +93,7 @@ public class TestQrCodeAlignmentPatternLocator extends BoofStandardJUnit {
 	/**
 	 * Give it bad guess but all within the white or black dot
 	 */
-	@Test
-	public void centerOnSquare() {
+	@Test void centerOnSquare() {
 		QrCode qr = new QrCodeEncoder().setVersion(2).addNumeric("12340324").fixate();
 
 		centerOnSquare(qr, 4);
@@ -132,8 +129,7 @@ public class TestQrCodeAlignmentPatternLocator extends BoofStandardJUnit {
 		}
 	}
 
-	@Test
-	public void localize() {
+	@Test void localize() {
 		QrCode qr = new QrCodeEncoder().setVersion(2).addNumeric("12340324").fixate();
 		localize(qr, 4);
 	}
@@ -161,28 +157,24 @@ public class TestQrCodeAlignmentPatternLocator extends BoofStandardJUnit {
 	/**
 	 * The smallest possible configuration for a QR code.  See if it still works
 	 */
-	@Test
-	public void localize_OnePixelModules() {
+	@Test void localize_OnePixelModules() {
 		QrCode qr = new QrCodeEncoder().setVersion(2).addNumeric("12340324").fixate();
 
 		localize(qr, 1);
 	}
 
-	@Test
-	public void greatestDown() {
-		float values[] = new float[]{200, 210, 190, 20, 25, 18, 0, 255, 255, 255};
+	@Test void greatestDown() {
+		float[] values = new float[]{200, 210, 190, 20, 25, 18, 0, 255, 255, 255};
 
 		assertEquals(3, QrCodeAlignmentPatternLocator.greatestDown(values));
 	}
 
-	@Test
-	public void greatestUp() {
-		float values[] = new float[]{200, 0, 255, 20, 25, 18, 0, 200, 255, 255};
+	@Test void greatestUp() {
+		float[] values = new float[]{200, 0, 255, 20, 25, 18, 0, 200, 255, 255};
 		assertEquals(6, QrCodeAlignmentPatternLocator.greatestUp(values, 3));
 	}
 
-	@Test
-	public void initializePatterns() {
+	@Test void initializePatterns() {
 		QrCodeAlignmentPatternLocator<GrayU8> alg = new QrCodeAlignmentPatternLocator<>(GrayU8.class);
 
 		QrCode qr = new QrCodeEncoder().setVersion(2).addNumeric("12340324").fixate();

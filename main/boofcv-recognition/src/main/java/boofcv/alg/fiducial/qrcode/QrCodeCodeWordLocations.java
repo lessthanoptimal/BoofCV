@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -35,36 +35,33 @@ public class QrCodeCodeWordLocations extends BMatrixRMaj {
 
 	public List<Point2D_I32> bits = new ArrayList<>();
 
-	public QrCodeCodeWordLocations(int numModules , int alignment[] , boolean hasVersion ) {
-		super(numModules,numModules);
+	public QrCodeCodeWordLocations( int numModules, int[] alignment, boolean hasVersion ) {
+		super(numModules, numModules);
 		computeFeatureMask(numModules, alignment, hasVersion);
 		computeBitLocations();
 	}
 
 	public QrCodeCodeWordLocations( int version ) {
-		this(QrCode.totalModules(version), QrCode.VERSION_INFO[version].alignment,version >= QrCode.VERSION_ENCODED_AT);
+		this(QrCode.totalModules(version), QrCode.VERSION_INFO[version].alignment, version >= QrCode.VERSION_ENCODED_AT);
 	}
 
 	/**
 	 * Blocks out the location of features in the image. Needed for codeworld location extraction
-	 * @param numModules
-	 * @param alignment
-	 * @param hasVersion
 	 */
-	private void computeFeatureMask(int numModules, int[] alignment, boolean hasVersion) {
+	private void computeFeatureMask( int numModules, int[] alignment, boolean hasVersion ) {
 		// mark alignment patterns + format info
-		markSquare(0,0,9);
-		markRectangle(numModules-8,0,9,8);
-		markRectangle(0,numModules-8,8,9);
+		markSquare(0, 0, 9);
+		markRectangle(numModules - 8, 0, 9, 8);
+		markRectangle(0, numModules - 8, 8, 9);
 
 		// timing pattern
-		markRectangle(8,6,1,numModules-8-8);
-		markRectangle(6,8,numModules-8-8,1);
+		markRectangle(8, 6, 1, numModules - 8 - 8);
+		markRectangle(6, 8, numModules - 8 - 8, 1);
 
 		// version info
-		if( hasVersion ) {
-			markRectangle(numModules-11,0,6,3);
-			markRectangle(0,numModules-11,3,6);
+		if (hasVersion) {
+			markRectangle(numModules - 11, 0, 6, 3);
+			markRectangle(0, numModules - 11, 3, 6);
 		}
 
 		// alignment patterns
@@ -72,31 +69,31 @@ public class QrCodeCodeWordLocations extends BMatrixRMaj {
 			int row = alignment[i];
 
 			for (int j = 0; j < alignment.length; j++) {
-				if( i == 0 && j == 0 )
+				if (i == 0 && j == 0)
 					continue;
-				if( i == alignment.length-1 && j == 0)
+				if (i == alignment.length - 1 && j == 0)
 					continue;
-				if( i == 0 && j == alignment.length-1)
+				if (i == 0 && j == alignment.length - 1)
 					continue;
 
 				int col = alignment[j];
-				markSquare(row-2,col-2,5);
+				markSquare(row - 2, col - 2, 5);
 			}
 		}
 	}
 
-	private void markSquare( int row , int col , int width ) {
+	private void markSquare( int row, int col, int width ) {
 		for (int i = 0; i < width; i++) {
 			for (int j = 0; j < width; j++) {
-				set(row+i,col+j,true);
+				set(row + i, col + j, true);
 			}
 		}
 	}
 
-	private void markRectangle( int row , int col , int width , int height ) {
+	private void markRectangle( int row, int col, int width, int height ) {
 		for (int i = 0; i < height; i++) {
 			for (int j = 0; j < width; j++) {
-				set(row+i,col+j,true);
+				set(row + i, col + j, true);
 			}
 		}
 	}
@@ -106,19 +103,19 @@ public class QrCodeCodeWordLocations extends BMatrixRMaj {
 	 */
 	private void computeBitLocations() {
 		int N = numRows;
-		int row = N-1;
-		int col = N-1;
+		int row = N - 1;
+		int col = N - 1;
 		int direction = -1;
 
 		while (col > 0) {
 			if (col == 6)
 				col -= 1;
 
-			if (!get(row,col)) {
-				bits.add( new Point2D_I32(col,row));
+			if (!get(row, col)) {
+				bits.add(new Point2D_I32(col, row));
 			}
-			if (!get(row,col-1)) {
-				bits.add( new Point2D_I32(col-1,row));
+			if (!get(row, col - 1)) {
+				bits.add(new Point2D_I32(col - 1, row));
 			}
 
 			row += direction;

@@ -392,14 +392,14 @@ public class TestQrCodeDecoderImage extends BoofStandardJUnit {
 
 		// From QR code specification
 		for (int row = 0; row < 5; row++) {
-			assertTrue(reader.containsPoint(row,8));
+			assertTrue(reader.containsPoint(row, 8));
 		}
 		for (int row = 7; row < 9; row++) {
-			assertTrue(reader.containsPoint(row,8));
+			assertTrue(reader.containsPoint(row, 8));
 		}
-		assertTrue(reader.containsPoint(8,7));
+		assertTrue(reader.containsPoint(8, 7));
 		for (int col = 0; col < 6; col++) {
-			assertTrue(reader.containsPoint(8,col));
+			assertTrue(reader.containsPoint(8, col));
 		}
 	}
 
@@ -414,10 +414,10 @@ public class TestQrCodeDecoderImage extends BoofStandardJUnit {
 		alg.readFormatRegion1(new QrCode());
 		assertEquals(15, reader.bitsRead.size());
 		for (int col = 0; col < 8; col++) {
-			assertTrue(reader.containsPoint(8,col-1));
+			assertTrue(reader.containsPoint(8, col - 1));
 		}
 		for (int row = 0; row < 7; row++) {
-			assertTrue(reader.containsPoint(row,8));
+			assertTrue(reader.containsPoint(row, 8));
 		}
 	}
 
@@ -438,7 +438,7 @@ public class TestQrCodeDecoderImage extends BoofStandardJUnit {
 		@Override public void setSquare( Polygon2D_F64 square, float threshold ) {}
 
 		boolean containsPoint( int row, int col ) {
-			for( Point2D_I32 p : bitsRead ) {
+			for (Point2D_I32 p : bitsRead) {
 				if (p.x == row && p.y == col)
 					return true;
 			}

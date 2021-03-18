@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -43,7 +43,7 @@ import java.util.List;
  * @author Peter Abeles
  */
 public class QrCodeBinaryGridToPixel {
-	ModelGenerator<Homography2D_F64,AssociatedPair> generator = new GenerateHomographyLinear(true);
+	ModelGenerator<Homography2D_F64, AssociatedPair> generator = new GenerateHomographyLinear(true);
 	HomographyDirectLinearTransform dlt = new HomographyDirectLinearTransform(true);
 
 	DogArray<AssociatedPair> storagePairs2D = new DogArray<>(AssociatedPair::new);
@@ -67,10 +67,10 @@ public class QrCodeBinaryGridToPixel {
 		storagePairs2D.reset();
 		pairs2D.clear();
 
-		set(0, 0, square,0);
-		set(0, 7, square,1);
-		set(7, 7, square,2);
-		set(7, 0, square,3);
+		set(0, 0, square, 0);
+		set(0, 7, square, 1);
+		set(7, 7, square, 2);
+		set(7, 0, square, 3);
 
 		computeTransform();
 	}
@@ -87,19 +87,19 @@ public class QrCodeBinaryGridToPixel {
 
 		// use 3 of the corners to set the coordinate system
 //		set(0, 0, qr.ppCorner,0); <-- prone to damage. Significantly degrades results if used
-		set(0, 7, qr.ppCorner,1);
-		set(7, 7, qr.ppCorner,2);
-		set(7, 0, qr.ppCorner,3);
+		set(0, 7, qr.ppCorner, 1);
+		set(7, 7, qr.ppCorner, 2);
+		set(7, 0, qr.ppCorner, 3);
 
 		// Use 4 lines to make it more robust errors in these corners
 		// We just need to get the direction right for the lines. the exact grid to image doesn't matter
-		setLine(0,7,0,14,qr.ppCorner,1,qr.ppRight,0);
-		setLine(7,7,7,14,qr.ppCorner,2,qr.ppRight,3);
-		setLine(7,7,14,7,qr.ppCorner,2,qr.ppDown,1);
-		setLine(7,0,14,0,qr.ppCorner,3,qr.ppDown,0);
+		setLine(0, 7, 0, 14, qr.ppCorner, 1, qr.ppRight, 0);
+		setLine(7, 7, 7, 14, qr.ppCorner, 2, qr.ppRight, 3);
+		setLine(7, 7, 14, 7, qr.ppCorner, 2, qr.ppDown, 1);
+		setLine(7, 0, 14, 0, qr.ppCorner, 3, qr.ppDown, 0);
 
-		DMatrixRMaj HH = new DMatrixRMaj(3,3);
-		dlt.process(storagePairs2D.toList(),storagePairs3D.toList(),null,HH);
+		DMatrixRMaj HH = new DMatrixRMaj(3, 3);
+		dlt.process(storagePairs2D.toList(), storagePairs3D.toList(), null, HH);
 		H.setTo(HH);
 		H.invert(Hinv);
 		ConvertFloatType.convert(Hinv, Hinv32);
@@ -113,25 +113,25 @@ public class QrCodeBinaryGridToPixel {
 
 		int N = qr.getNumberOfModules();
 
-		set(0, 0, qr.ppCorner,0); // outside corner
-		set(0, 7, qr.ppCorner,1);
-		set(7, 7, qr.ppCorner,2);
-		set(7, 0, qr.ppCorner,3);
+		set(0, 0, qr.ppCorner, 0); // outside corner
+		set(0, 7, qr.ppCorner, 1);
+		set(7, 7, qr.ppCorner, 2);
+		set(7, 0, qr.ppCorner, 3);
 
-		set(0, N-7, qr.ppRight,0);
-		set(0, N, qr.ppRight,1); // outside corner
-		set(7, N, qr.ppRight,2);
-		set(7, N-7, qr.ppRight,3);
+		set(0, N - 7, qr.ppRight, 0);
+		set(0, N, qr.ppRight, 1); // outside corner
+		set(7, N, qr.ppRight, 2);
+		set(7, N - 7, qr.ppRight, 3);
 
-		set(N-7, 0, qr.ppDown,0);
-		set(N-7, 7, qr.ppDown,1);
-		set(N, 7, qr.ppDown,2);
-		set(N, 0, qr.ppDown,3); // outside corner
+		set(N - 7, 0, qr.ppDown, 0);
+		set(N - 7, 7, qr.ppDown, 1);
+		set(N, 7, qr.ppDown, 2);
+		set(N, 0, qr.ppDown, 3); // outside corner
 
 		for (int i = 0; i < qr.alignment.size; i++) {
 			QrCode.Alignment a = qr.alignment.get(i);
 			AssociatedPair p = storagePairs2D.grow();
-			p.setTo(a.pixel.x,a.pixel.y,a.moduleX+0.5f,a.moduleY+0.5f);
+			p.setTo(a.pixel.x, a.pixel.y, a.moduleX + 0.5f, a.moduleY + 0.5f);
 			pairs2D.add(p);
 		}
 	}
@@ -140,7 +140,7 @@ public class QrCodeBinaryGridToPixel {
 	 * Outside corners on position patterns are more likely to be damaged, so remove them
 	 */
 	public void removeOutsideCornerFeatures() {
-		if( pairs2D.size() != storagePairs2D.size )
+		if (pairs2D.size() != storagePairs2D.size)
 			throw new RuntimeException("This can only be called when all the features have been added");
 
 		pairs2D.remove(11);
@@ -154,17 +154,17 @@ public class QrCodeBinaryGridToPixel {
 
 		for (int i = 0; i < pairs2D.size(); i++) {
 			AssociatedPair p = pairs2D.get(i);
-			HomographyPointOps_F64.transform(Hinv,p.p2.x,p.p2.y,tmp64);
+			HomographyPointOps_F64.transform(Hinv, p.p2.x, p.p2.y, tmp64);
 			double dx = tmp64.x - p.p1.x;
 			double dy = tmp64.y - p.p1.y;
 
 			double error = dx*dx + dy*dy;
-			if( error > largestError ) {
+			if (error > largestError) {
 				largestError = error;
 				selected = i;
 			}
 		}
-		if( selected != -1 && largestError > 2*2 ) {
+		if (selected != -1 && largestError > 2*2) {
 			pairs2D.remove(selected);
 			return true;
 		} else {
@@ -173,13 +173,13 @@ public class QrCodeBinaryGridToPixel {
 	}
 
 	public void computeTransform() {
-		generator.generate(pairs2D,H);
+		generator.generate(pairs2D, H);
 		H.invert(Hinv);
 		ConvertFloatType.convert(Hinv, Hinv32);
 		ConvertFloatType.convert(H, H32);
 
 		adjustments.reset();
-		if( adjustWithFeatures ) {
+		if (adjustWithFeatures) {
 			for (int i = 0; i < pairs2D.size(); i++) {
 				AssociatedPair p = pairs2D.get(i);
 				Point2D_F64 a = adjustments.grow();
@@ -191,34 +191,34 @@ public class QrCodeBinaryGridToPixel {
 		}
 	}
 
-	private void set(float row, float col, Polygon2D_F64 polygon, int corner) {
+	private void set( float row, float col, Polygon2D_F64 polygon, int corner ) {
 		AssociatedPair p = storagePairs2D.grow();
 		Point2D_F64 c = polygon.get(corner);
-		p.setTo(c.x,c.y,col,row);
+		p.setTo(c.x, c.y, col, row);
 		pairs2D.add(p);
 	}
 
-	private void setLine(float row0, float col0, float row1, float col1,
-						 Polygon2D_F64 polygon0, int corner0, Polygon2D_F64 polygon1, int corner1) {
+	private void setLine( float row0, float col0, float row1, float col1,
+						  Polygon2D_F64 polygon0, int corner0, Polygon2D_F64 polygon1, int corner1 ) {
 		AssociatedPair3D p = storagePairs3D.grow();
 		Point2D_F64 c0 = polygon0.get(corner0);
 		Point2D_F64 c1 = polygon1.get(corner1);
 
-		p.setTo(c1.x-c0.x,c1.y-c0.y,0,col1-col0,row1-row0,0);
+		p.setTo(c1.x - c0.x, c1.y - c0.y, 0, col1 - col0, row1 - row0, 0);
 		// normalize for numerical reasons. Scale of line parameters doesn't matter
 		p.p1.divideIP(p.p1.norm());
 		p.p2.divideIP(p.p2.norm());
 	}
 
-	public final void imageToGrid(float x, float y, Point2D_F32 grid) {
+	public final void imageToGrid( float x, float y, Point2D_F32 grid ) {
 		HomographyPointOps_F32.transform(H32, x, y, grid);
 	}
 
-	public final void imageToGrid(double x, double y, Point2D_F64 grid) {
+	public final void imageToGrid( double x, double y, Point2D_F64 grid ) {
 		HomographyPointOps_F64.transform(H, x, y, grid);
 	}
 
-	public final void gridToImage(float row, float col, Point2D_F32 pixel) {
+	public final void gridToImage( float row, float col, Point2D_F32 pixel ) {
 		HomographyPointOps_F32.transform(Hinv32, col, row, pixel);
 
 		// Use a second adjustment based on observed features
@@ -241,11 +241,11 @@ public class QrCodeBinaryGridToPixel {
 		}
 	}
 
-	public void setAdjustWithFeatures(boolean adjustWithFeatures) {
+	public void setAdjustWithFeatures( boolean adjustWithFeatures ) {
 		this.adjustWithFeatures = adjustWithFeatures;
 	}
 
-	public void setHomographyInv(Homography2D_F64 Hinv) {
+	public void setHomographyInv( Homography2D_F64 Hinv ) {
 		this.Hinv.setTo(Hinv);
 		ConvertFloatType.convert(Hinv, Hinv32);
 	}

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -28,8 +28,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
  * @author Peter Abeles
  */
 class TestQrCodeBinaryGridToPixel extends BoofStandardJUnit {
-	@Test
-	void simple() {
+	@Test void simple() {
 
 		QrCode qr = new QrCodeEncoder().setVersion(2).addNumeric("12340324").fixate();
 
@@ -41,26 +40,23 @@ class TestQrCodeBinaryGridToPixel extends BoofStandardJUnit {
 		alg.addAllFeatures(qr);
 		alg.computeTransform();
 
-		check(alg,0,0,border,border);
-		check(alg,7,0,border+7*4,border);
-		check(alg,7,7,border+7*4,border+7*4);
-
+		check(alg, 0, 0, border, border);
+		check(alg, 7, 0, border + 7*4, border);
+		check(alg, 7, 7, border + 7*4, border + 7*4);
 	}
 
-	private void check(QrCodeBinaryGridToPixel transformGrid ,
-					   float x , float y ,
-					   float expectedX , float expectedY )
-	{
+	private void check( QrCodeBinaryGridToPixel transformGrid,
+						float x, float y,
+						float expectedX, float expectedY ) {
 		Point2D_F32 found = new Point2D_F32();
 
-		transformGrid.gridToImage(y,x,found);
+		transformGrid.gridToImage(y, x, found);
 
-		assertEquals(expectedX,found.x,1e-4f);
-		assertEquals(expectedY,found.y,1e-4f);
+		assertEquals(expectedX, found.x, 1e-4f);
+		assertEquals(expectedY, found.y, 1e-4f);
 	}
 
-	@Test
-	void setTransformFromLinesSquare() {
+	@Test void setTransformFromLinesSquare() {
 		QrCode qr = new QrCodeEncoder().setVersion(2).addNumeric("12340324").fixate();
 
 		QrCodeGeneratorImage generator = new QrCodeGeneratorImage(4);
@@ -70,8 +66,8 @@ class TestQrCodeBinaryGridToPixel extends BoofStandardJUnit {
 		QrCodeBinaryGridToPixel alg = new QrCodeBinaryGridToPixel();
 		alg.setTransformFromLinesSquare(qr);
 
-		check(alg,0,0,border,border);
-		check(alg,7,0,border+7*4,border);
-		check(alg,7,7,border+7*4,border+7*4);
+		check(alg, 0, 0, border, border);
+		check(alg, 7, 0, border + 7*4, border);
+		check(alg, 7, 7, border + 7*4, border + 7*4);
 	}
 }
