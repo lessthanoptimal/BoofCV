@@ -70,7 +70,8 @@ public class EciEncoding {
 	 * Checks to see if is a valid UTF-8 character. Taken from wikipedia
 	 */
 	public static boolean isValidUTF8( int v ) {
-		return (v >= 0 && v <= 0xBF) || (v >= 0xC3 && v <= 0xF4);
+		// C0, C1, F5 - FF never appear
+		return (v >= 0 && v <= 0xBF) || (v >= 0xC2 && v <= 0xF4);
 	}
 
 	/**
