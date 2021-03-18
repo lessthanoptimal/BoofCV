@@ -42,20 +42,19 @@ subprojects {
     apply plugin: 'com.diffplug.spotless'
 
     java {
-        sourceCompatibility = JavaVersion.VERSION_14
-        targetCompatibility = JavaVersion.VERSION_14
         withJavadocJar()
         withSourcesJar()
+        toolchain { languageVersion = JavaLanguageVersion.of(14) }
     }
 
     // Prevents tons of errors if someone is using ASCII
     compileJava {options.encoding = "UTF-8"}
 
     // Creates Java 8 byte code
-    tasks.withType(JavaCompile).all { options.compilerArgs = ["--release", "8"] }
+    tasks.withType(JavaCompile).configureEach { options.release = 8 }
 
     // To make ErrorProne and Kotlin plugins happy
-    configurations.all {
+    configurations.configureEach {
         resolutionStrategy {
             force 'org.jetbrains:annotations:20.0.0'
             force 'com.google.guava:guava:30.1-jre'
@@ -66,7 +65,7 @@ subprojects {
     }
 
     // Fail on jar conflict
-    configurations.all { resolutionStrategy { failOnVersionConflict() } }
+    configurations.configureEach { resolutionStrategy { failOnVersionConflict() } }
 
     // Enable incremental compile. Should make single file changes faster
     tasks.withType(JavaCompile) { options.incremental = true }
@@ -464,5 +463,5 @@ task testReport(type: TestReport) {
 
 wrapper {
     distributionType = Wrapper.DistributionType.BIN
-    gradleVersion = '6.4.1'
+    gradleVersion = '6.8.3'
 }

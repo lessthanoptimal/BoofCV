@@ -6,6 +6,9 @@ Date Format: year/month/day
 Date    : 2021
 Version : 0.38
 
+- Build
+  * Updated to Gradle 6.8.3
+  * Now uses Toolchains. This should eliminate problems caused by people using an incompatible JDK.
 - Examples
   * Added an example for computing the Trifocal Tensor
   * TODO Added an example showing how the trifocal tensor can be used
