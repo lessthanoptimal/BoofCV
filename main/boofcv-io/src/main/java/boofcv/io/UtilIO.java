@@ -30,7 +30,6 @@ import org.yaml.snakeyaml.Yaml;
 import javax.swing.*;
 import java.io.*;
 import java.net.*;
-import java.nio.charset.Charset;
 import java.nio.file.*;
 import java.nio.file.attribute.BasicFileAttributes;
 import java.util.*;
@@ -45,7 +44,7 @@ import static java.nio.charset.StandardCharsets.UTF_8;
 /**
  * @author Peter Abeles
  */
-@SuppressWarnings({"JdkObsolete"})
+@SuppressWarnings({"JdkObsolete", "unchecked", "ConstantConditions"})
 public class UtilIO {
 	public static final String UTF8 = "UTF-8";
 	public static final String IMAGE_REGEX = "(.*/)*.+\\.(png|jpg|gif|bmp|jpeg|PNG|JPG|GIF|BMP|JPEG)$";
@@ -81,10 +80,9 @@ public class UtilIO {
 	 * Saves a BoofCV {@link Configuration} in a YAML format to disk
 	 */
 	public static void saveConfig( Configuration config, File file ) {
-		try {
-			var output = new BufferedOutputStream(new FileOutputStream(file));
+		try (var stream = new FileOutputStream(file)) {
+			var output = new BufferedOutputStream(stream);
 			SerializeConfigYaml.serialize(config, null, new OutputStreamWriter(output, UTF_8));
-			output.close();
 		} catch (IOException e) {
 			throw new UncheckedIOException(e);
 		}
@@ -101,10 +99,9 @@ public class UtilIO {
 	 */
 	public static <C extends Configuration>
 	void saveConfig( C config, C canonical, File file ) {
-		try {
-			var output = new BufferedOutputStream(new FileOutputStream(file));
+		try (var stream = new FileOutputStream(file)) {
+			var output = new BufferedOutputStream(stream);
 			SerializeConfigYaml.serialize(config, canonical, new OutputStreamWriter(output, UTF_8));
-			output.close();
 		} catch (IOException e) {
 			throw new UncheckedIOException(e);
 		}
@@ -114,10 +111,9 @@ public class UtilIO {
 	 * Loads a BoofCV {@link Configuration} in a YAML format from the disk
 	 */
 	public static <T extends Configuration> T loadConfig( File file ) {
-		try {
-			var output = new BufferedInputStream(new FileInputStream(file));
+		try (var stream = new FileInputStream(file)) {
+			var output = new BufferedInputStream(stream);
 			Configuration config = SerializeConfigYaml.deserialize(new InputStreamReader(output, UTF_8));
-			output.close();
 			return (T)config;
 		} catch (IOException e) {
 			throw new UncheckedIOException(e);
@@ -187,6 +183,13 @@ public class UtilIO {
 				intrinsic = CalibrationIO.load(reader);
 			}
 		}
+		if (reader != null) {
+			try {
+				reader.close();
+			} catch (IOException e) {
+				throw new UncheckedIOException(e);
+			}
+		}
 		return intrinsic;
 	}
 
@@ -194,7 +197,7 @@ public class UtilIO {
 		InputStream stream = UtilIO.openStream(fileName);
 		if (stream == null)
 			throw new FileNotFoundException("Can't open " + fileName);
-		return new BufferedReader(new InputStreamReader(stream, Charset.forName(UTF8)));
+		return new BufferedReader(new InputStreamReader(stream, UTF_8));
 	}
 
 	/**
@@ -465,25 +468,17 @@ public class UtilIO {
 	}
 
 	public static void save( Object o, String fileName ) {
-		try {
-			FileOutputStream fileOut = new FileOutputStream(fileName);
-			ObjectOutputStream out = new ObjectOutputStream(fileOut);
-			out.writeObject(o);
-			out.close();
-			fileOut.close();
+		try (FileOutputStream fileOut = new FileOutputStream(fileName)) {
+			new ObjectOutputStream(fileOut).writeObject(o);
 		} catch (IOException e) {
 			throw new UncheckedIOException(e);
 		}
 	}
 
 	public static <T> T load( String fileName ) {
-		try {
-			FileInputStream fileIn = new FileInputStream(fileName);
+		try (FileInputStream fileIn = new FileInputStream(fileName)) {
 			ObjectInputStream in = new ObjectInputStream(fileIn);
-			T obj = (T)in.readObject();
-			in.close();
-			fileIn.close();
-			return obj;
+			return (T)in.readObject();
 		} catch (IOException | ClassNotFoundException e) {
 			throw new RuntimeException(e);
 		}
@@ -1119,16 +1114,13 @@ public class UtilIO {
 	}
 
 	public static void copyToFile( InputStream in, File file ) {
-		try {
+		try (FileOutputStream out = new FileOutputStream(file)) {
 			if (in == null) throw new RuntimeException("Input is null");
-			FileOutputStream out = new FileOutputStream(file);
 			byte[] buffer = new byte[1024*1024];
 			while (in.available() > 0) {
 				int amount = in.read(buffer, 0, buffer.length);
 				out.write(buffer, 0, amount);
 			}
-			out.close();
-			in.close();
 		} catch (IOException e) {
 			throw new UncheckedIOException(e);
 		}
@@ -1185,6 +1177,7 @@ public class UtilIO {
 					final File tempFile = File.createTempFile("boofcv_jar_hack_", suffix);
 					tempFile.deleteOnExit();
 					copyToFile(in, tempFile);
+					in.close();
 					filename = tempFile.getAbsolutePath();
 				} catch (IOException e) {
 					throw new UncheckedIOException(e);

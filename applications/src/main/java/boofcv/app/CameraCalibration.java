@@ -36,7 +36,6 @@ import boofcv.io.calibration.CalibrationIO;
 import boofcv.io.image.ConvertBufferedImage;
 import boofcv.io.image.UtilImageIO;
 import boofcv.io.webcamcapture.UtilWebcamCapture;
-import boofcv.javacv.UtilOpenCV;
 import boofcv.misc.BoofMiscOps;
 import boofcv.struct.calib.CameraModel;
 import boofcv.struct.calib.CameraPinholeBrown;
@@ -571,7 +570,7 @@ public class CameraCalibration extends BaseStandardInputApp {
 						CameraPinholeBrown m = (CameraPinholeBrown)intrinsic;
 						switch (formatType) {
 							case BOOFCV -> CalibrationIO.save(m, outputFilePath);
-							case OPENCV -> UtilOpenCV.save(m, outputFilePath);
+							case OPENCV -> CalibrationIO.saveOpencv(m, outputFilePath);
 						}
 						m.print();
 					}

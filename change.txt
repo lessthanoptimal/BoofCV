@@ -23,7 +23,7 @@ Version : 0.38
   * ImageBorder no longer uses reflection but uses a functional API instead
 - CalibrationIO
   * Can save and load calibration landmarks in CSV format
-  * TODO have BoofCV save yaml in OpenCV format and remove dependency
+  * Can save and load Brown camera model in OpenCV format
 - UtilIO
   * Added saveConfig() to save any BoofCV Configuration in a yaml format
   * Added listSmart() that can list files inside a directory, blob pattern, or regex pattern
