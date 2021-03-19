@@ -109,7 +109,8 @@ public class LearnHierarchicalTree<Point> implements VerbosePrint {
 
 		// Computes how many points a node needs to create children. It clearly needs at least 1.
 		// The user can configure it to require more
-		pointsRequiredForChildren = Math.max(1, minimumPointsForChildren.computeI(points.size()));
+		// Minus one below because the check below is <= (inclusive) while the parameter is exclusive
+		pointsRequiredForChildren = Math.max(1, minimumPointsForChildren.computeI(points.size())-1);
 
 		// Construct the tree
 		processLevel(points, tree, 0, 0);
@@ -127,7 +128,7 @@ public class LearnHierarchicalTree<Point> implements VerbosePrint {
 							   HierarchicalVocabularyTree<Point> tree,
 							   int level, int parentNodeIdx ) {
 		// Stop here if we are at the maximum number of levels or there are too few points
-		if (level >= tree.maximumLevel || pointsInParent.size() < pointsRequiredForChildren)
+		if (level >= tree.maximumLevel || pointsInParent.size() <= pointsRequiredForChildren)
 			return;
 
 		// Get k-means for this level
