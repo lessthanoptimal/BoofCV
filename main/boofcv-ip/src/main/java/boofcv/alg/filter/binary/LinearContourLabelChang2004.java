@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -71,14 +71,14 @@ public class LinearContourLabelChang2004 {
 	private ContourTracer tracer;
 
 	// binary image with a border of zero.
-	private final GrayU8 border = new GrayU8(1,1);
+	private final GrayU8 border = new GrayU8(1, 1);
 
 	// predeclared/recycled data structures
 	@Getter PackedSetsPoint2D_I32 packedPoints = new PackedSetsPoint2D_I32(2000);
 	private final DogArray<ContourPacked> contours = new DogArray<>(ContourPacked::new);
 
 	// internal book keeping variables
-	private int x,y,indexIn,indexOut;
+	private int x, y, indexIn, indexOut;
 
 	/**
 	 * Configures the algorithm.
@@ -95,57 +95,57 @@ public class LinearContourLabelChang2004 {
 	 * @param binary Input binary image. Not modified.
 	 * @param labeled Output. Labeled image.  Modified.
 	 */
-	public void process(GrayU8 binary , GrayS32 labeled ) {
+	public void process( GrayU8 binary, GrayS32 labeled ) {
 		// initialize data structures
-		labeled.reshape(binary.width,binary.height);
+		labeled.reshape(binary.width, binary.height);
 
 		// ensure that the image border pixels are filled with zero by enlarging the image
-		if( border.width != binary.width+2 || border.height != binary.height+2)  {
+		if (border.width != binary.width + 2 || border.height != binary.height + 2) {
 			border.reshape(binary.width + 2, binary.height + 2);
 			ImageMiscOps.fillBorder(border, 0, 1);
 		}
-		border.subimage(1,1,border.width-1,border.height-1, null).setTo(binary);
+		border.subimage(1, 1, border.width - 1, border.height - 1, null).setTo(binary);
 
 		// labeled image must initially be filled with zeros
-		ImageMiscOps.fill(labeled,0);
+		ImageMiscOps.fill(labeled, 0);
 
 		binary = border;
 		packedPoints.reset();
 		contours.reset();
-		tracer.setInputs(binary,labeled, packedPoints);
+		tracer.setInputs(binary, labeled, packedPoints);
 
 		// Outside border is all zeros so it can be ignored
-		int endY = binary.height-1, enxX = binary.width-1;
-		for( y = 1; y < endY; y++ ) {
-			indexIn = binary.startIndex + y*binary.stride+1;
-			indexOut = labeled.startIndex + (y-1)*labeled.stride;
+		int endY = binary.height - 1, enxX = binary.width - 1;
+		for (y = 1; y < endY; y++) {
+			indexIn = binary.startIndex + y*binary.stride + 1;
+			indexOut = labeled.startIndex + (y - 1)*labeled.stride;
 
 			x = 1;
-			int delta = scanForOne(binary.data,indexIn,indexIn+enxX-x)-indexIn;
+			int delta = scanForOne(binary.data, indexIn, indexIn + enxX - x) - indexIn;
 			x += delta;
 			indexIn += delta;
 			indexOut += delta;
-			while( x < enxX ) {
+			while (x < enxX) {
 				int label = labeled.data[indexOut];
 				boolean handled = false;
-				if( label == 0 && binary.data[indexIn - binary.stride ] != 1 ) {
+				if (label == 0 && binary.data[indexIn - binary.stride] != 1) {
 					handleStep1();
 					handled = true;
 					label = contours.size;
 				}
 				// could be an external and internal contour
-				if( binary.data[indexIn + binary.stride ] == 0 ) {
+				if (binary.data[indexIn + binary.stride] == 0) {
 					handleStep2(labeled, label);
 					handled = true;
 				}
-				if( !handled ) {
+				if (!handled) {
 					// Step 3: Must not be part of the contour but an inner pixel and the pixel to the left must be
 					// labeled
-					if( labeled.data[indexOut] == 0 )
-						labeled.data[indexOut] = labeled.data[indexOut-1];
+					if (labeled.data[indexOut] == 0)
+						labeled.data[indexOut] = labeled.data[indexOut - 1];
 				}
 
-				delta = scanForOne(binary.data,indexIn+1,indexIn+enxX-x)-indexIn;
+				delta = scanForOne(binary.data, indexIn + 1, indexIn + enxX - x) - indexIn;
 				x += delta;
 				indexIn += delta;
 				indexOut += delta;
@@ -156,7 +156,7 @@ public class LinearContourLabelChang2004 {
 	/**
 	 * Faster when there's a specialized function which searches for one pixels
 	 */
-	private int scanForOne(byte[] data , int index , int end ) {
+	private int scanForOne( byte[] data, int index, int end ) {
 		while (index < end && data[index] != 1) {
 			index++;
 		}
@@ -168,8 +168,8 @@ public class LinearContourLabelChang2004 {
 	}
 
 	/**
-	 *  Step 1: If the pixel is unlabeled and the pixel above is not one, then it
-	 *          must be an external contour of a newly encountered blob.
+	 * Step 1: If the pixel is unlabeled and the pixel above is not one, then it
+	 * must be an external contour of a newly encountered blob.
 	 */
 	private void handleStep1() {
 		ContourPacked c = contours.grow();
@@ -180,10 +180,10 @@ public class LinearContourLabelChang2004 {
 		c.externalIndex = packedPoints.size();
 		packedPoints.grow();
 		c.internalIndexes.reset();
-		tracer.trace(contours.size(),x,y,true);
+		tracer.trace(contours.size(), x, y, true);
 
 		// Keep track that this was a contour, but free up all the points used in defining it
-		if( packedPoints.sizeOfTail() >= maxContourSize || packedPoints.sizeOfTail() < minContourSize ) {
+		if (packedPoints.sizeOfTail() >= maxContourSize || packedPoints.sizeOfTail() < minContourSize) {
 			packedPoints.removeTail();
 			packedPoints.grow();
 		}
@@ -191,28 +191,28 @@ public class LinearContourLabelChang2004 {
 
 	/**
 	 * Step 2: If the pixel below is unmarked and white then it must be an internal contour
-	 *         Same behavior it the pixel in question has been labeled or not already
+	 * Same behavior it the pixel in question has been labeled or not already
 	 */
-	private void handleStep2(GrayS32 labeled, int label) {
+	private void handleStep2( GrayS32 labeled, int label ) {
 		// if the blob is not labeled and in this state it cannot be against the left side of the image
-		if( label == 0 )
-			label = labeled.data[indexOut-1];
+		if (label == 0)
+			label = labeled.data[indexOut - 1];
 
-		ContourPacked c = contours.get(label-1);
-		c.internalIndexes.add( packedPoints.size() );
+		ContourPacked c = contours.get(label - 1);
+		c.internalIndexes.add(packedPoints.size());
 		packedPoints.grow();
-		tracer.setMaxContourSize(saveInternalContours?maxContourSize:0);
-		tracer.trace(label,x,y,false);
+		tracer.setMaxContourSize(saveInternalContours ? maxContourSize : 0);
+		tracer.trace(label, x, y, false);
 
 		// See if the inner contour exceeded the maximum  or minimum size. If so free its points
-		if( packedPoints.sizeOfTail() >= maxContourSize || packedPoints.sizeOfTail() < minContourSize ) {
+		if (packedPoints.sizeOfTail() >= maxContourSize || packedPoints.sizeOfTail() < minContourSize) {
 			packedPoints.removeTail();
 			packedPoints.grow();
 		}
 	}
 
 	public void setConnectRule( ConnectRule rule ) {
-		if( rule != tracer.getConnectRule() )
+		if (rule != tracer.getConnectRule())
 			tracer = new ContourTracer(rule);
 	}
 

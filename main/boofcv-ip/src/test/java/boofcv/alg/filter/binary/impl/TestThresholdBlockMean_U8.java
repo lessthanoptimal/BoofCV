@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -32,7 +32,7 @@ public class TestThresholdBlockMean_U8
 	}
 
 	@Override
-	public ThresholdBlock.BlockProcessor<GrayU8, ?> createBlockProcessor(double scale, boolean down) {
-		return new ThresholdBlockMean_U8(scale,down);
+	public ThresholdBlock.BlockProcessor<GrayU8, ?> createBlockProcessor( double scale, boolean down ) {
+		return new ThresholdBlockMean_U8(scale, down);
 	}
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -25,8 +25,7 @@ import boofcv.struct.image.GrayU8;
  * @author Peter Abeles
  */
 public class TestThresholdBlockMinMax_U8
-		extends GenericThresholdBlockMinMaxChecks<GrayU8>
-{
+		extends GenericThresholdBlockMinMaxChecks<GrayU8> {
 
 	public TestThresholdBlockMinMax_U8() {
 		super(GrayU8.class);
@@ -34,7 +33,7 @@ public class TestThresholdBlockMinMax_U8
 
 	@Override
 	public ThresholdBlockMinMax<GrayU8, ?> createProcessor(
-			double textureThreshold, int requestedBlockWidth, double scale, boolean down) {
-		return new ThresholdBlockMinMax_U8((float)textureThreshold, (float)scale,down);
+			double textureThreshold, int requestedBlockWidth, double scale, boolean down ) {
+		return new ThresholdBlockMinMax_U8((float)textureThreshold, (float)scale, down);
 	}
 }

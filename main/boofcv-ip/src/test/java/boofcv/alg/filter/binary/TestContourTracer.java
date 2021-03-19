@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -41,45 +41,39 @@ public class TestContourTracer extends BoofStandardJUnit {
 		queue.reset();
 	}
 
+	@Test void single() {
+		GrayU8 pattern = new GrayU8(1, 1);
+		ImageMiscOps.fill(pattern, 1);
 
-	@Test
-	public void single() {
-		GrayU8 pattern = new GrayU8(1,1);
-		ImageMiscOps.fill(pattern,1);
-
-		shiftContourCheck(pattern,1,ConnectRule.FOUR);
-		shiftContourCheck(pattern,1,ConnectRule.EIGHT);
+		shiftContourCheck(pattern, 1, ConnectRule.FOUR);
+		shiftContourCheck(pattern, 1, ConnectRule.EIGHT);
 	}
 
-	@Test
-	public void two_horizontal() {
-		GrayU8 pattern = new GrayU8(2,1);
-		ImageMiscOps.fill(pattern,1);
+	@Test void two_horizontal() {
+		GrayU8 pattern = new GrayU8(2, 1);
+		ImageMiscOps.fill(pattern, 1);
 
-		shiftContourCheck(pattern,2,ConnectRule.FOUR);
-		shiftContourCheck(pattern,2,ConnectRule.EIGHT);
+		shiftContourCheck(pattern, 2, ConnectRule.FOUR);
+		shiftContourCheck(pattern, 2, ConnectRule.EIGHT);
 	}
 
-	@Test
-	public void two_vertical() {
-		GrayU8 pattern = new GrayU8(1,2);
-		ImageMiscOps.fill(pattern,1);
+	@Test void two_vertical() {
+		GrayU8 pattern = new GrayU8(1, 2);
+		ImageMiscOps.fill(pattern, 1);
 
-		shiftContourCheck(pattern,2,ConnectRule.FOUR);
-		shiftContourCheck(pattern,2,ConnectRule.EIGHT);
+		shiftContourCheck(pattern, 2, ConnectRule.FOUR);
+		shiftContourCheck(pattern, 2, ConnectRule.EIGHT);
 	}
 
-	@Test
-	public void square() {
-		GrayU8 pattern = new GrayU8(2,2);
-		ImageMiscOps.fill(pattern,1);
+	@Test void square() {
+		GrayU8 pattern = new GrayU8(2, 2);
+		ImageMiscOps.fill(pattern, 1);
 
-		shiftContourCheck(pattern,4,ConnectRule.FOUR);
-		shiftContourCheck(pattern,4,ConnectRule.EIGHT);
+		shiftContourCheck(pattern, 4, ConnectRule.FOUR);
+		shiftContourCheck(pattern, 4, ConnectRule.EIGHT);
 	}
 
-	@Test
-	public void funky1() {
+	@Test void funky1() {
 		String s =
 				"10\n"+
 				"01\n"+
@@ -87,11 +81,10 @@ public class TestContourTracer extends BoofStandardJUnit {
 
 		GrayU8 pattern = stringToImage(s);
 
-		shiftContourCheck(pattern,4,ConnectRule.EIGHT);
+		shiftContourCheck(pattern, 4, ConnectRule.EIGHT);
 	}
 
-	@Test
-	public void funky2() {
+	@Test void funky2() {
 		String s =
 				"1000\n"+
 				"0110\n"+
@@ -99,32 +92,30 @@ public class TestContourTracer extends BoofStandardJUnit {
 
 		GrayU8 pattern = stringToImage(s);
 
-		shiftContourCheck(pattern,8,ConnectRule.EIGHT);
+		shiftContourCheck(pattern, 8, ConnectRule.EIGHT);
 	}
 
-	@Test
-	public void funky3() {
+	@Test void funky3() {
 		String s =
 				"0100\n"+
 				"0110\n"+
 				"1101\n";
 
 		GrayU8 input = stringToImage(s);
-		GrayS32 label = new GrayS32(input.width,input.height);
+		GrayS32 label = new GrayS32(input.width, input.height);
 
 		ContourTracer alg = new ContourTracer(ConnectRule.EIGHT);
 
 		// process the image
-		alg.setInputs(addBorder(input),label,queue);
+		alg.setInputs(addBorder(input), label, queue);
 		queue.grow();
-		alg.trace(2,1+1,0+1,true);
+		alg.trace(2, 1 + 1, 0 + 1, true);
 
 		assertEquals(7, queue.totalPoints());
 		assertEquals(7, queue.sizeOfTail());
 	}
 
-	@Test
-	public void funk4() {
+	@Test void funk4() {
 		String s =
 				"101\n"+
 				"111\n"+
@@ -132,45 +123,43 @@ public class TestContourTracer extends BoofStandardJUnit {
 
 		GrayU8 pattern = stringToImage(s);
 
-		shiftContourCheck(pattern,12,ConnectRule.FOUR);
+		shiftContourCheck(pattern, 12, ConnectRule.FOUR);
 	}
 
-	@Test
-	public void interior1() {
+	@Test void interior1() {
 		String s =
 				"01110\n"+
 				"01101\n"+
 				"11110\n";
 
 		GrayU8 input = stringToImage(s);
-		GrayS32 label = new GrayS32(input.width,input.height);
+		GrayS32 label = new GrayS32(input.width, input.height);
 
 		ContourTracer alg = new ContourTracer(ConnectRule.EIGHT);
 
 		// process the image
-		alg.setInputs(addBorder(input),label,queue);
+		alg.setInputs(addBorder(input), label, queue);
 		queue.grow();
-		alg.trace(2,3+1,0+1,false);
+		alg.trace(2, 3 + 1, 0 + 1, false);
 
 		assertEquals(4, queue.sizeOfTail());
 	}
 
-	@Test
-	public void interior2() {
+	@Test void interior2() {
 		String s =
-				"01111\n"+
-				"01101\n"+
-				"11111\n";
+				"01111\n" +
+						"01101\n" +
+						"11111\n";
 
 		GrayU8 input = stringToImage(s);
-		GrayS32 label = new GrayS32(input.width,input.height);
+		GrayS32 label = new GrayS32(input.width, input.height);
 
 		ContourTracer alg = new ContourTracer(ConnectRule.FOUR);
 
 		// process the image
-		alg.setInputs(addBorder(input),label,queue);
+		alg.setInputs(addBorder(input), label, queue);
 		queue.grow();
-		alg.trace(2,3+1,0+1,false);
+		alg.trace(2, 3 + 1, 0 + 1, false);
 
 		assertEquals(8, queue.sizeOfTail());
 	}
@@ -178,8 +167,7 @@ public class TestContourTracer extends BoofStandardJUnit {
 	/**
 	 * Make sure it is marking surrounding white pixels
 	 */
-	@Test
-	public void checkMarkWhite() {
+	@Test void checkMarkWhite() {
 		String b =
 				"000000\n"+
 				"001100\n"+
@@ -193,21 +181,21 @@ public class TestContourTracer extends BoofStandardJUnit {
 
 		GrayU8 before = stringToImage(b);
 		GrayU8 after = stringToImage(a);
-		GrayS32 label = new GrayS32(before.width,before.height);
+		GrayS32 label = new GrayS32(before.width, before.height);
 
 		ContourTracer alg = new ContourTracer(ConnectRule.EIGHT);
 
 		// process the image
-		alg.setInputs(before,label,queue);
+		alg.setInputs(before, label, queue);
 		queue.grow();
-		alg.trace(2,2,1,true);
+		alg.trace(2, 2, 1, true);
 
-		for( int i = 0; i < before.height; i++ ) {
-			for( int j = 0; j < before.width; j++ ) {
-				if( after.get(j,i) == 2 )
-					assertEquals(255,before.get(j,i));
+		for (int i = 0; i < before.height; i++) {
+			for (int j = 0; j < before.width; j++) {
+				if (after.get(j, i) == 2)
+					assertEquals(255, before.get(j, i));
 				else
-					assertEquals(after.get(j,i),before.get(j,i));
+					assertEquals(after.get(j, i), before.get(j, i));
 			}
 		}
 	}
@@ -216,62 +204,63 @@ public class TestContourTracer extends BoofStandardJUnit {
 	 * Given a pattern that is only a contour, it sees if it has the expected results when the pattern
 	 * is shifted to every possible location in the image
 	 */
-	public void shiftContourCheck(GrayU8 pattern , int expectedSize , ConnectRule rule ) {
+	public void shiftContourCheck( GrayU8 pattern, int expectedSize, ConnectRule rule ) {
 		ContourTracer alg = new ContourTracer(rule);
-		GrayU8 input = new GrayU8(4,5);
-		GrayS32 label = new GrayS32(input.width,input.height);
+		GrayU8 input = new GrayU8(4, 5);
+		GrayS32 label = new GrayS32(input.width, input.height);
 
 		// exhaustively try all initial locations
-		for( int y = 0; y < input.height-pattern.height+1; y++ ) {
-			for( int x = 0; x < input.width-pattern.width+1; x++ ) {
+		for (int y = 0; y < input.height - pattern.height + 1; y++) {
+			for (int x = 0; x < input.width - pattern.width + 1; x++) {
 				// paste the pattern in to the larger image
-				ImageMiscOps.fill(input,0);
-				GrayU8 sub = input.subimage(x,y,x+pattern.width,y+pattern.height, null);
+				ImageMiscOps.fill(input, 0);
+				GrayU8 sub = input.subimage(x, y, x + pattern.width, y + pattern.height, null);
 				sub.setTo(pattern);
 
 				// reset other data structures
-				ImageMiscOps.fill(label,0);
-				queue.reset();queue.grow();
+				ImageMiscOps.fill(label, 0);
+				queue.reset();
+				queue.grow();
 
 				// process the image
-				alg.setInputs(addBorder(input),label,queue);
-				alg.trace(2,x+1,y+1,true);
+				alg.setInputs(addBorder(input), label, queue);
+				alg.trace(2, x + 1, y + 1, true);
 
 				// forward then back
-				assertEquals(expectedSize,queue.sizeOfTail());
+				assertEquals(expectedSize, queue.sizeOfTail());
 
 				// see if the image has been correctly labeled
-				for( int yy = 0; yy < input.height; yy++ ) {
-					for( int xx = 0; xx < input.width; xx++ ) {
+				for (int yy = 0; yy < input.height; yy++) {
+					for (int xx = 0; xx < input.width; xx++) {
 						boolean isOne = false;
-						if( pattern.isInBounds(xx-x,yy-y) ) {
-							isOne = pattern.get(xx-x,yy-y) == 1;
+						if (pattern.isInBounds(xx - x, yy - y)) {
+							isOne = pattern.get(xx - x, yy - y) == 1;
 						}
-						if( isOne )
-							assertEquals(2,label.get(xx,yy));
+						if (isOne)
+							assertEquals(2, label.get(xx, yy));
 						else
-							assertEquals(0,label.get(xx,yy));
+							assertEquals(0, label.get(xx, yy));
 					}
 				}
 			}
 		}
 	}
 
-	private GrayU8 addBorder(GrayU8 original ) {
-		GrayU8 border = new GrayU8(original.width+2,original.height+2);
-		border.subimage(1,1,border.width-1,border.height-1, null).setTo(original);
-		ImageMiscOps.fillBorder(border,0,1);
+	private GrayU8 addBorder( GrayU8 original ) {
+		GrayU8 border = new GrayU8(original.width + 2, original.height + 2);
+		border.subimage(1, 1, border.width - 1, border.height - 1, null).setTo(original);
+		ImageMiscOps.fillBorder(border, 0, 1);
 		return border;
 	}
 
-	private GrayU8 stringToImage(String s ) {
+	private GrayU8 stringToImage( String s ) {
 		int numCols = s.indexOf('\n');
-		int numRows = s.length()/(numCols+1);
+		int numRows = s.length()/(numCols + 1);
 
-		GrayU8 out = new GrayU8(numCols,numRows);
-		for( int y = 0; y < numRows; y++ ) {
-			for( int x = 0; x < numCols; x++ ) {
-				out.set(x,y, Integer.parseInt(""+s.charAt(y*(numCols+1)+x)));
+		GrayU8 out = new GrayU8(numCols, numRows);
+		for (int y = 0; y < numRows; y++) {
+			for (int x = 0; x < numCols; x++) {
+				out.set(x, y, Integer.parseInt("" + s.charAt(y*(numCols + 1) + x)));
 			}
 		}
 

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -30,27 +30,27 @@ import boofcv.struct.image.GrayU8;
 @SuppressWarnings("Duplicates")
 public class ThresholdLocalOtsu_MT extends ThresholdLocalOtsu {
 
-	public ThresholdLocalOtsu_MT(boolean otsu2, ConfigLength regionWidthLength,
-								 double tuning, double scale, boolean down) {
+	public ThresholdLocalOtsu_MT( boolean otsu2, ConfigLength regionWidthLength,
+								  double tuning, double scale, boolean down ) {
 		super(otsu2, regionWidthLength, tuning, scale, down);
 	}
 
 	@Override
-	protected void process(GrayU8 input, GrayU8 output, int x0, int y0, int x1, int y1, byte a, byte b) {
+	protected void process( GrayU8 input, GrayU8 output, int x0, int y0, int x1, int y1, byte a, byte b ) {
 
-		BoofConcurrency.loopBlocks(y0,y1,(block0,block1)->{
+		BoofConcurrency.loopBlocks(y0, y1, ( block0, block1 ) -> {
 			// handle the inner portion first
 			ApplyHelper h = helpers.pop();
 			for (int y = block0; y < block1; y++) {
 				int indexInput = input.startIndex + y*input.stride + x0;
 				int indexOutput = output.startIndex + y*output.stride + x0;
 
-				h.computeHistogram(0,y-y0,input);
-				output.data[indexOutput++] = (input.data[indexInput++]&0xFF) <= h.otsu.threshold ? a : b;
+				h.computeHistogram(0, y - y0, input);
+				output.data[indexOutput++] = (input.data[indexInput++] & 0xFF) <= h.otsu.threshold ? a : b;
 
-				for (int x = x0+1; x < x1; x++) {
-					h.updateHistogramX(x-x0,y-y0,input);
-					output.data[indexOutput++] = (input.data[indexInput++]&0xFF) <= h.otsu.threshold ? a : b;
+				for (int x = x0 + 1; x < x1; x++) {
+					h.updateHistogramX(x - x0, y - y0, input);
+					output.data[indexOutput++] = (input.data[indexInput++] & 0xFF) <= h.otsu.threshold ? a : b;
 				}
 			}
 

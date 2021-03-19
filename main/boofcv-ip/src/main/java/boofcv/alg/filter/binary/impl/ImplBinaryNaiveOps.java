@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -28,7 +28,7 @@ import boofcv.struct.image.GrayU8;
  * @see boofcv.alg.filter.binary.BinaryImageOps
  */
 public class ImplBinaryNaiveOps {
-	public static void erode4(GrayU8 input, GrayU8 output) {
+	public static void erode4( GrayU8 input, GrayU8 output ) {
 		for (int y = 0; y < input.height; y++) {
 			for (int x = 0; x < input.width; x++) {
 				if (input.get(x, y) != 0 &&
@@ -41,7 +41,7 @@ public class ImplBinaryNaiveOps {
 		}
 	}
 
-	public static void dilate4(GrayU8 input, GrayU8 output) {
+	public static void dilate4( GrayU8 input, GrayU8 output ) {
 		for (int y = 0; y < input.height; y++) {
 			for (int x = 0; x < input.width; x++) {
 				if (input.get(x, y) != 0 || getF(input, x - 1, y) || getF(input, x + 1, y) ||
@@ -53,12 +53,12 @@ public class ImplBinaryNaiveOps {
 		}
 	}
 
-	public static void edge4(GrayU8 input, GrayU8 output ) {
-		edge4(input,output,false);
+	public static void edge4( GrayU8 input, GrayU8 output ) {
+		edge4(input, output, false);
 	}
 
-	public static void edge4(GrayU8 input, GrayU8 output, boolean outsideZero ) {
-		if( outsideZero ) {
+	public static void edge4( GrayU8 input, GrayU8 output, boolean outsideZero ) {
+		if (outsideZero) {
 			for (int y = 0; y < input.height; y++) {
 				for (int x = 0; x < input.width; x++) {
 					if (getF(input, x - 1, y) && getF(input, x + 1, y) &&
@@ -81,7 +81,7 @@ public class ImplBinaryNaiveOps {
 		}
 	}
 
-	public static void erode8(GrayU8 input, GrayU8 output) {
+	public static void erode8( GrayU8 input, GrayU8 output ) {
 		output = InputSanityCheck.checkDeclare(input, output);
 
 		for (int y = 0; y < input.height; y++) {
@@ -98,7 +98,7 @@ public class ImplBinaryNaiveOps {
 		}
 	}
 
-	public static void dilate8(GrayU8 input, GrayU8 output) {
+	public static void dilate8( GrayU8 input, GrayU8 output ) {
 		for (int y = 0; y < input.height; y++) {
 			for (int x = 0; x < input.width; x++) {
 				if (input.get(x, y) != 0 ||
@@ -113,12 +113,12 @@ public class ImplBinaryNaiveOps {
 		}
 	}
 
-	public static void edge8(GrayU8 input, GrayU8 output ) {
-		edge8(input,output,false);
+	public static void edge8( GrayU8 input, GrayU8 output ) {
+		edge8(input, output, false);
 	}
 
-	public static void edge8(GrayU8 input, GrayU8 output, boolean outsideZero ) {
-		if( outsideZero ) {
+	public static void edge8( GrayU8 input, GrayU8 output, boolean outsideZero ) {
+		if (outsideZero) {
 			for (int y = 0; y < input.height; y++) {
 				for (int x = 0; x < input.width; x++) {
 					if (getF(input, x - 1, y) && getF(input, x + 1, y) &&
@@ -150,10 +150,10 @@ public class ImplBinaryNaiveOps {
 	 * If a pixel is connected to less than 2 neighbors then its value zero.  If connected to more than 6 then
 	 * its value is one.  Otherwise it retains its original value.
 	 *
-	 * @param input  Input image. Not modified.
+	 * @param input Input image. Not modified.
 	 * @param output If not null, the output image.  If null a new image is declared and returned.  Modified.
 	 */
-	public static void removePointNoise(GrayU8 input, GrayU8 output) {
+	public static void removePointNoise( GrayU8 input, GrayU8 output ) {
 		for (int y = 0; y < input.height; y++) {
 			for (int x = 0; x < input.width; x++) {
 				int num = 0;
@@ -179,7 +179,7 @@ public class ImplBinaryNaiveOps {
 	/**
 	 * If a point is inside the image true is returned if its value is not zero, otherwise true is returned.
 	 */
-	public static boolean getT(GrayU8 image, int x, int y) {
+	public static boolean getT( GrayU8 image, int x, int y ) {
 		if (image.isInBounds(x, y)) {
 			return image.get(x, y) != 0;
 		} else {
@@ -190,7 +190,7 @@ public class ImplBinaryNaiveOps {
 	/**
 	 * If a point is inside the image true is returned if its value is not zero, otherwise false is returned.
 	 */
-	public static boolean getF(GrayU8 image, int x, int y) {
+	public static boolean getF( GrayU8 image, int x, int y ) {
 		if (image.isInBounds(x, y)) {
 			return image.get(x, y) != 0;
 		} else {

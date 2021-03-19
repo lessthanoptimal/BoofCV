@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -31,45 +31,42 @@ public class TestComputeOtsu extends BoofStandardJUnit {
 	/**
 	 * Compares to standard Otsu
 	 */
-	@Test
-	public void otsu() {
-		ComputeOtsu computeOtsu = new ComputeOtsu(false,true);
+	@Test void otsu() {
+		ComputeOtsu computeOtsu = new ComputeOtsu(false, true);
 
 		for (int i = 0; i < 100; i++) {
-			int histogram[] = new int[ 256 ];
+			int[] histogram = new int[256];
 			int total = 0;
 			for (int j = 0; j < histogram.length; j++) {
 				total += histogram[j] = rand.nextInt(400);
 			}
 
-			int expected = GThresholdImageOps.computeOtsu(histogram,histogram.length,total);
-			computeOtsu.compute(histogram,histogram.length,total);
+			int expected = GThresholdImageOps.computeOtsu(histogram, histogram.length, total);
+			computeOtsu.compute(histogram, histogram.length, total);
 			int found = (int)computeOtsu.threshold;
 
-			assertEquals(expected,found);
+			assertEquals(expected, found);
 		}
 	}
 
 	/**
 	 * Compares to standard Otsu
 	 */
-	@Test
-	public void otsu2() {
-		ComputeOtsu computeOtsu = new ComputeOtsu(true,true);
+	@Test void otsu2() {
+		ComputeOtsu computeOtsu = new ComputeOtsu(true, true);
 
 		for (int i = 0; i < 100; i++) {
-			int histogram[] = new int[ 256 ];
+			int[] histogram = new int[256];
 			int total = 0;
 			for (int j = 0; j < histogram.length; j++) {
 				total += histogram[j] = rand.nextInt(400);
 			}
 
-			int expected = GThresholdImageOps.computeOtsu2(histogram,histogram.length,total);
-			computeOtsu.compute(histogram,histogram.length,total);
+			int expected = GThresholdImageOps.computeOtsu2(histogram, histogram.length, total);
+			computeOtsu.compute(histogram, histogram.length, total);
 			int found = (int)computeOtsu.threshold;
 
-			assertEquals(expected,found);
+			assertEquals(expected, found);
 		}
 	}
-
 }

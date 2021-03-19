@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -508,7 +508,7 @@ public class GThresholdImageOps {
 	 * @return binary image.
 	 */
 	public static <T extends ImageGray<T>>
-	GrayU8 threshold( T input, GrayU8 output,
+	GrayU8 threshold( T input, @Nullable GrayU8 output,
 					  double threshold, boolean down ) {
 		if (input instanceof GrayF32) {
 			return ThresholdImageOps.threshold((GrayF32)input, output, (float)threshold, down);
@@ -590,9 +590,9 @@ public class GThresholdImageOps {
 	 * @return binary image.
 	 */
 	public static <T extends ImageGray<T>>
-	GrayU8 localGaussian( T input, GrayU8 output,
+	GrayU8 localGaussian( T input, @Nullable GrayU8 output,
 						  ConfigLength width, double scale, boolean down,
-						  T work1, ImageGray work2 ) {
+						  @Nullable T work1, @Nullable ImageGray work2 ) {
 		if (input instanceof GrayF32) {
 			return ThresholdImageOps.localGaussian((GrayF32)input, output, width, (float)scale, down,
 					(GrayF32)work1, (GrayF32)work2);
@@ -611,7 +611,7 @@ public class GThresholdImageOps {
 	 * @see FactoryThresholdBinary#localOtsu(ConfigLength, double, boolean, boolean, double, Class)
 	 */
 	public static <T extends ImageGray<T>>
-	GrayU8 localOtsu( T input, GrayU8 output, boolean otsu2, ConfigLength width, double tuning, double scale, boolean down ) {
+	GrayU8 localOtsu( T input, @Nullable GrayU8 output, boolean otsu2, ConfigLength width, double tuning, double scale, boolean down ) {
 		InputToBinary<T> alg = FactoryThresholdBinary.localOtsu(width, scale, down, otsu2, tuning, input.getImageType().getImageClass());
 
 		if (output == null)
@@ -635,7 +635,7 @@ public class GThresholdImageOps {
 	 * @see ThresholdSauvola
 	 */
 	public static <T extends ImageGray<T>>
-	GrayU8 localSauvola( T input, GrayU8 output, ConfigLength width, float k, boolean down ) {
+	GrayU8 localSauvola( T input, @Nullable GrayU8 output, ConfigLength width, float k, boolean down ) {
 		InputToBinary<GrayF32> alg;
 
 		if (BoofConcurrency.USE_CONCURRENT) {
@@ -671,7 +671,7 @@ public class GThresholdImageOps {
 	 * @see boofcv.alg.filter.binary.ThresholdNick
 	 */
 	public static <T extends ImageGray<T>>
-	GrayU8 localNick( T input, GrayU8 output, ConfigLength width, float k, boolean down ) {
+	GrayU8 localNick( T input, @Nullable GrayU8 output, ConfigLength width, float k, boolean down ) {
 		InputToBinary<GrayF32> alg =
 				BoofConcurrency.USE_CONCURRENT ?
 						new ThresholdNick_MT(width, k, down) : new ThresholdNick(width, k, down);
@@ -703,7 +703,7 @@ public class GThresholdImageOps {
 	 * @return Binary image
 	 */
 	public static <T extends ImageGray<T>>
-	GrayU8 blockMinMax( T input, GrayU8 output, ConfigLength width, double scale, boolean down, double textureThreshold ) {
+	GrayU8 blockMinMax( T input, @Nullable GrayU8 output, ConfigLength width, double scale, boolean down, double textureThreshold ) {
 		InputToBinary<T> alg = FactoryThresholdBinary.blockMinMax(
 				width, scale, down, true, textureThreshold, (Class)input.getClass());
 
@@ -727,7 +727,7 @@ public class GThresholdImageOps {
 	 * @return Binary image
 	 */
 	public static <T extends ImageGray<T>>
-	GrayU8 blockMean( T input, GrayU8 output, ConfigLength width, double scale, boolean down ) {
+	GrayU8 blockMean( T input, @Nullable GrayU8 output, ConfigLength width, double scale, boolean down ) {
 		InputToBinary<T> alg = FactoryThresholdBinary.blockMean(width, scale, down, true,
 				(Class<T>)input.getClass());
 
@@ -751,7 +751,7 @@ public class GThresholdImageOps {
 	 * @return Binary image
 	 */
 	public static <T extends ImageGray<T>>
-	GrayU8 blockOtsu( T input, GrayU8 output, boolean otsu2, ConfigLength width, double tuning, double scale, boolean down ) {
+	GrayU8 blockOtsu( T input, @Nullable GrayU8 output, boolean otsu2, ConfigLength width, double tuning, double scale, boolean down ) {
 		InputToBinary<T> alg = FactoryThresholdBinary.blockOtsu(width, scale, down, true, otsu2, tuning,
 				(Class)input.getClass());
 

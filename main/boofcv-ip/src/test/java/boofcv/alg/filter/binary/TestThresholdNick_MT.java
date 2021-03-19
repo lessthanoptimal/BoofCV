@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -22,12 +22,11 @@ import boofcv.struct.ConfigLength;
 import boofcv.struct.image.GrayF32;
 
 class TestThresholdNick_MT extends GenericInputToBinaryCompare<GrayF32> {
-
 	TestThresholdNick_MT() {
-		ThresholdNick_MT target = new ThresholdNick_MT(ConfigLength.fixed(12), -0.2f,true);
-		ThresholdNick reference = new ThresholdNick(ConfigLength.fixed(12), -0.2f,true);
+		ThresholdNick_MT target = new ThresholdNick_MT(ConfigLength.fixed(12), -0.2f, true);
+		ThresholdNick reference = new ThresholdNick(ConfigLength.fixed(12), -0.2f, true);
 
-		initialize(target,reference);
+		initialize(target, reference);
 	}
 }
 

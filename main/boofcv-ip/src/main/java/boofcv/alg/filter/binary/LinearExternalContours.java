@@ -60,7 +60,7 @@ public class LinearExternalContours {
 	private int minContourLength = 0;
 
 	// adjusts coordinate from binary to output
-	private int adjustX , adjustY;
+	private int adjustX, adjustY;
 
 	private Tracer tracer;
 	private final PackedSetsPoint2D_I32 storagePoints = new PackedSetsPoint2D_I32();
@@ -71,11 +71,12 @@ public class LinearExternalContours {
 
 	/**
 	 * Detects contours inside the binary image.
+	 *
 	 * @param binary Binary image. Will be modified. See class description
 	 * @param adjustX adjustment applied to coordinate in binary image for contour. 0 or 1 is typical
 	 * @param adjustY adjustment applied to coordinate in binary image for contour. 0 or 1 is typical
 	 */
-	public void process( GrayU8 binary , int adjustX , int adjustY ) {
+	public void process( GrayU8 binary, int adjustX, int adjustY ) {
 		// Initialize data structures
 		this.adjustX = adjustX;
 		this.adjustY = adjustY;
@@ -86,13 +87,13 @@ public class LinearExternalContours {
 		final byte[] binaryData = binary.data;
 
 		// Scan through the image one row at a time looking for pixels with 1
-		for (int y = 1; y < binary.height-1; y++) {
+		for (int y = 1; y < binary.height - 1; y++) {
 			int x = 1;
 			int indexBinary = binary.startIndex + y*binary.stride + 1;
 
 			int end = indexBinary + binary.width - 2;
 
-			while( true ) {
+			while (true) {
 				int delta = findNotZero(binaryData, indexBinary, end) - indexBinary;
 				indexBinary += delta;
 				if (indexBinary == end)
@@ -101,10 +102,10 @@ public class LinearExternalContours {
 
 				// If this pixel has NOT already been labeled then trace until it runs into a labeled pixel or it
 				// completes the trace. If a labeled pixel is not encountered then it must be an external contour
-				if( binaryData[indexBinary] == 1 ) {
-					if( tracer.trace(x,y,true) ) {
+				if (binaryData[indexBinary] == 1) {
+					if (tracer.trace(x, y, true)) {
 						int N = storagePoints.sizeOfTail();
-						if( N < minContourLength || N >= maxContourLength)
+						if (N < minContourLength || N >= maxContourLength)
 							storagePoints.removeTail();
 					} else {
 						// it was really an internal contour
@@ -121,24 +122,23 @@ public class LinearExternalContours {
 
 				// If this pixel has NOT already been labeled trace until it completes a loop or it encounters a
 				// labeled pixel. This is always an internal contour
-				if( binaryData[indexBinary-1] == 1 ) {
-					tracer.trace(x-1,y,false);
+				if (binaryData[indexBinary - 1] == 1) {
+					tracer.trace(x - 1, y, false);
 					storagePoints.removeTail();
 				} else {
 					// Can't be sure if it's entering a hole or leaving the blob. This marker will let the
 					// tracer know it just traced an internal contour and not an external contour
-					binaryData[indexBinary-1] = -2;
+					binaryData[indexBinary - 1] = -2;
 				}
 			}
 		}
 	}
 
-
 	/**
 	 * Searches for a value in the array which is not zero.
 	 */
-	static int findNotZero( byte[] data , int index , int end ) {
-		while( index < end && data[index] == 0 ) {
+	static int findNotZero( byte[] data, int index, int end ) {
+		while (index < end && data[index] == 0) {
 			index++;
 		}
 		return index;
@@ -147,8 +147,8 @@ public class LinearExternalContours {
 	/**
 	 * Searches for a value in the array which is zero.
 	 */
-	static int findZero( byte[] data , int index , int end ) {
-		while( index < end && data[index] != 0 ) {
+	static int findZero( byte[] data, int index, int end ) {
+		while (index < end && data[index] != 0) {
 			index++;
 		}
 		return index;
@@ -159,32 +159,30 @@ public class LinearExternalContours {
 
 		public int maxContourLength = Integer.MAX_VALUE;
 
-		public Tracer(ConnectRule rule) {
+		public Tracer( ConnectRule rule ) {
 			super(rule);
 		}
 
-		public boolean trace( int initialX , int initialY , boolean external )
-		{
+		public boolean trace( int initialX, int initialY, boolean external ) {
 			// TODO determine if it's ambigous or not. The number of times this test is
 			// done could be reduced I think.
 			// verify that it's external. If there are ones above it then it can't possibly be external
-			if( external ) {
-				indexBinary = binary.getIndex(initialX,initialY);
-				if( rule == ConnectRule.EIGHT ) {
-					if( binary.data[indexBinary+offsetsBinary[5]] != 0 ||
-							binary.data[indexBinary+offsetsBinary[6]] != 0 ||
-							binary.data[indexBinary+offsetsBinary[7]] != 0 )
-					{
+			if (external) {
+				indexBinary = binary.getIndex(initialX, initialY);
+				if (rule == ConnectRule.EIGHT) {
+					if (binary.data[indexBinary + offsetsBinary[5]] != 0 ||
+							binary.data[indexBinary + offsetsBinary[6]] != 0 ||
+							binary.data[indexBinary + offsetsBinary[7]] != 0) {
 						external = false;
 					}
 				} else {
-					if( binary.data[indexBinary+offsetsBinary[3]] != 0  ) {
+					if (binary.data[indexBinary + offsetsBinary[3]] != 0) {
 						external = false;
 					}
 				}
 			}
 
-			if( external ) {
+			if (external) {
 				this.maxContourLength = LinearExternalContours.this.maxContourLength;
 			} else {
 				this.maxContourLength = -1;
@@ -192,7 +190,7 @@ public class LinearExternalContours {
 
 			// start a contour here
 			storagePoints.grow();
-			if( rule == ConnectRule.EIGHT )
+			if (rule == ConnectRule.EIGHT)
 				dir = external ? 7 : 6;
 			else
 				dir = external ? 0 : 3;
@@ -202,34 +200,34 @@ public class LinearExternalContours {
 
 			// index of pixels in the image array
 			// binary has a 1 pixel border which labeled lacks, hence the -1,-1 for labeled
-			indexBinary = binary.getIndex(x,y);
+			indexBinary = binary.getIndex(x, y);
 			// give the first pixel a special marking
 			storagePoints.addPointToTail(x - adjustX, y - adjustY);
 			binary.data[indexBinary] = -2;
 
 			// find the next one pixel.  handle case where its an isolated point
-			if( !searchNotZero() ) {
+			if (!searchNotZero()) {
 				return true;
 			}
 			int initialDir = dir;
 			moveToNext();
 			dir = nextDirection[dir];
 
-			while( true ) {
+			while (true) {
 				searchNotZero();
 
-				if( binary.data[indexBinary] != -2 ) {
+				if (binary.data[indexBinary] != -2) {
 					binary.data[indexBinary] = -1;
 				} else {
-					if( x != initialX || y != initialY ) {
+					if (x != initialX || y != initialY) {
 						// found an marker that was left when leaving a blob and it was ambiguous if it was external
 						// or internal region of zeros
 						return false;
-					} else if( dir == initialDir ) {
+					} else if (dir == initialDir) {
 						return external;
 					}
 				}
-				if( storagePoints.sizeOfTail() <= maxContourLength )
+				if (storagePoints.sizeOfTail() <= maxContourLength)
 					storagePoints.addPointToTail(x - adjustX, y - adjustY);
 
 				moveToNext();
@@ -242,53 +240,53 @@ public class LinearExternalContours {
 		 */
 		private boolean searchNotZero() {
 			// Unrolling here results in about a 10% speed up
-			if( ruleN == 4 )
+			if (ruleN == 4)
 				return searchNotOne4();
 			else
 				return searchNotOne8();
 		}
 
 		private boolean searchNotOne4() {
-			if( binary.data[indexBinary + offsetsBinary[dir]] != 0)
+			if (binary.data[indexBinary + offsetsBinary[dir]] != 0)
 				return true;
-			dir = (dir+1)%4;
-			if( binary.data[indexBinary + offsetsBinary[dir]] != 0)
+			dir = (dir + 1)%4;
+			if (binary.data[indexBinary + offsetsBinary[dir]] != 0)
 				return true;
-			dir = (dir+1)%4;
-			if( binary.data[indexBinary + offsetsBinary[dir]] != 0)
+			dir = (dir + 1)%4;
+			if (binary.data[indexBinary + offsetsBinary[dir]] != 0)
 				return true;
-			dir = (dir+1)%4;
-			if( binary.data[indexBinary + offsetsBinary[dir]] != 0)
+			dir = (dir + 1)%4;
+			if (binary.data[indexBinary + offsetsBinary[dir]] != 0)
 				return true;
-			dir = (dir+1)%4;
+			dir = (dir + 1)%4;
 			return false;
 		}
 
 		private boolean searchNotOne8() {
-			if( binary.data[indexBinary + offsetsBinary[dir]] != 0)
+			if (binary.data[indexBinary + offsetsBinary[dir]] != 0)
 				return true;
-			dir = (dir+1)%8;
-			if( binary.data[indexBinary + offsetsBinary[dir]] != 0)
+			dir = (dir + 1)%8;
+			if (binary.data[indexBinary + offsetsBinary[dir]] != 0)
 				return true;
-			dir = (dir+1)%8;
-			if( binary.data[indexBinary + offsetsBinary[dir]] != 0)
+			dir = (dir + 1)%8;
+			if (binary.data[indexBinary + offsetsBinary[dir]] != 0)
 				return true;
-			dir = (dir+1)%8;
-			if( binary.data[indexBinary + offsetsBinary[dir]] != 0)
+			dir = (dir + 1)%8;
+			if (binary.data[indexBinary + offsetsBinary[dir]] != 0)
 				return true;
-			dir = (dir+1)%8;
-			if( binary.data[indexBinary + offsetsBinary[dir]] != 0)
+			dir = (dir + 1)%8;
+			if (binary.data[indexBinary + offsetsBinary[dir]] != 0)
 				return true;
-			dir = (dir+1)%8;
-			if( binary.data[indexBinary + offsetsBinary[dir]] != 0)
+			dir = (dir + 1)%8;
+			if (binary.data[indexBinary + offsetsBinary[dir]] != 0)
 				return true;
-			dir = (dir+1)%8;
-			if( binary.data[indexBinary + offsetsBinary[dir]] != 0)
+			dir = (dir + 1)%8;
+			if (binary.data[indexBinary + offsetsBinary[dir]] != 0)
 				return true;
-			dir = (dir+1)%8;
-			if( binary.data[indexBinary + offsetsBinary[dir]] != 0)
+			dir = (dir + 1)%8;
+			if (binary.data[indexBinary + offsetsBinary[dir]] != 0)
 				return true;
-			dir = (dir+1)%8;
+			dir = (dir + 1)%8;
 			return false;
 		}
 
@@ -318,7 +316,7 @@ public class LinearExternalContours {
 		return maxContourLength;
 	}
 
-	public void setMaxContourLength(int maxContourLength) {
+	public void setMaxContourLength( int maxContourLength ) {
 		this.maxContourLength = maxContourLength;
 	}
 
@@ -326,7 +324,7 @@ public class LinearExternalContours {
 		return minContourLength;
 	}
 
-	public void setMinContourLength(int minContourLength) {
+	public void setMinContourLength( int minContourLength ) {
 		this.minContourLength = minContourLength;
 	}
 }

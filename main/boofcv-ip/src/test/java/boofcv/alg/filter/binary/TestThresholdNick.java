@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -30,13 +30,11 @@ public class TestThresholdNick extends GenericThresholdCommon<GrayF32> {
 	public TestThresholdNick() {
 		super(GrayF32.class);
 	}
-
-	@Override
-	public InputToBinary<GrayF32> createAlg(int requestedBlockWidth, double scale, boolean down) {
-		return new ThresholdNick(ConfigLength.fixed(requestedBlockWidth), -0.2f,down);
+	@Override public InputToBinary<GrayF32> createAlg( int requestedBlockWidth, double scale, boolean down ) {
+		return new ThresholdNick(ConfigLength.fixed(requestedBlockWidth), -0.2f, down);
 	}
 
-	public void widthLargerThanImage(){
+	public void widthLargerThanImage() {
 		// perfectly acceptable
 	}
 }

@@ -50,6 +50,7 @@ public class BinaryThinning {
 	//  0 means it is expected to be zero
 	//  1 means it is expected to be one
 
+	// @formatter:off
 	public static byte[] mask0=new byte[]{ 0, 0, 0,
 										  -1, 1,-1,
 										   1, 1, 1};
@@ -74,6 +75,7 @@ public class BinaryThinning {
 	public static byte[] mask7=new byte[]{ 0, 0,-1,
 										   0, 1, 1,
 										  -1, 1,-1};
+	// @formatter:on
 
 	Mask[] masks = new Mask[]{
 			new Mask0(), new Mask1(), new Mask2(), new Mask3(),

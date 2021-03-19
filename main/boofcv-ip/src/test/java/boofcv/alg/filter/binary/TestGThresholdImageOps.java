@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -32,33 +32,31 @@ public class TestGThresholdImageOps extends BoofStandardJUnit {
 	/**
 	 * Compare otsu against a brute force algorithm for computing variance directly.
 	 */
-	@Test
-	public void computeOtsu() {
-
+	@Test void computeOtsu() {
 		for (int i = 0; i < 100; i++) {
-			int histogram[] = new int[ 256 ];
+			int[] histogram = new int[256];
 			int total = 0;
 			for (int j = 0; j < histogram.length; j++) {
 				total += histogram[j] = rand.nextInt(400);
 			}
 
 			int best = bruteForceOtsu(histogram, total);
-			int found = GThresholdImageOps.computeOtsu(histogram,histogram.length,total);
+			int found = GThresholdImageOps.computeOtsu(histogram, histogram.length, total);
 
-			assertEquals(best,found);
+			assertEquals(best, found);
 		}
 	}
-   
-	private int bruteForceOtsu(int[] histogram, int total) {
+
+	private int bruteForceOtsu( int[] histogram, int total ) {
 		int best = -1;
 		double bestScore = Double.MAX_VALUE;
 
-		for (int j = 0; j < histogram.length-1; j++) {
+		for (int j = 0; j < histogram.length - 1; j++) {
 			// the threshold is inclusive. <= upper value
-			double stats0[] = variance(histogram,0,j,total);
-			double stats1[] = variance(histogram,j+1,histogram.length-1, total);
+			double[] stats0 = variance(histogram, 0, j, total);
+			double[] stats1 = variance(histogram, j + 1, histogram.length - 1, total);
 
-			if( stats0 == null || stats1 == null )
+			if (stats0 == null || stats1 == null)
 				continue;
 
 			double var0 = stats0[1];
@@ -69,7 +67,7 @@ public class TestGThresholdImageOps extends BoofStandardJUnit {
 
 			double score = (weight0*var0 + weight1*var1);
 
-			if( score < bestScore ) {
+			if (score < bestScore) {
 				bestScore = score;
 				best = j;
 			}
@@ -77,35 +75,33 @@ public class TestGThresholdImageOps extends BoofStandardJUnit {
 		return best;
 	}
 
-	@Test
-	public void computeOtsu2() {
-
+	@Test void computeOtsu2() {
 		for (int i = 0; i < 100; i++) {
-			int histogram[] = new int[ 256 ];
+			int[] histogram = new int[256];
 			int total = 0;
 			for (int j = 0; j < histogram.length; j++) {
 				total += histogram[j] = rand.nextInt(400);
 			}
 
 			int best = bruteForceOtsu2(histogram, total);
-			int found = GThresholdImageOps.computeOtsu2(histogram,histogram.length,total);
+			int found = GThresholdImageOps.computeOtsu2(histogram, histogram.length, total);
 
-			assertEquals(best,found);
+			assertEquals(best, found);
 		}
 	}
 
-	private int bruteForceOtsu2(int[] histogram, int total) {
+	private int bruteForceOtsu2( int[] histogram, int total ) {
 		double bestScore = 0;
-		double bestMean0=0,bestMean1=0;
+		double bestMean0 = 0, bestMean1 = 0;
 
-		double stats[] = variance(histogram,0,histogram.length-1,total);
+		double[] stats = variance(histogram, 0, histogram.length - 1, total);
 		double varianceAll = stats[1];
-		for (int j = 0; j < histogram.length-1; j++) {
+		for (int j = 0; j < histogram.length - 1; j++) {
 			// the threshold is inclusive. <= upper value
-			double stats0[] = variance(histogram,0,j,total);
-			double stats1[] = variance(histogram,j+1,histogram.length-1, total);
+			double[] stats0 = variance(histogram, 0, j, total);
+			double[] stats1 = variance(histogram, j + 1, histogram.length - 1, total);
 
-			if( stats0 == null || stats1 == null )
+			if (stats0 == null || stats1 == null)
 				continue;
 
 			double mean0 = stats0[0];
@@ -120,7 +116,7 @@ public class TestGThresholdImageOps extends BoofStandardJUnit {
 			double withinClassVariance = (weight0*var0 + weight1*var1);
 			double betweenClassVariance = varianceAll - withinClassVariance;
 
-			if( betweenClassVariance > bestScore ) {
+			if (betweenClassVariance > bestScore) {
 				bestScore = betweenClassVariance;
 				bestMean0 = mean0;
 				bestMean1 = mean1;
@@ -132,10 +128,9 @@ public class TestGThresholdImageOps extends BoofStandardJUnit {
 	/**
 	 * Exercise Li code. Not sure how to check its validity
 	 */
-	@Test
-	public void computeLi() {
+	@Test void computeLi() {
 		for (int i = 0; i < 100; i++) {
-			int histogram[] = new int[256];
+			int[] histogram = new int[256];
 			for (int j = 0; j < histogram.length; j++) {
 				histogram[j] = rand.nextInt(400);
 			}
@@ -145,13 +140,12 @@ public class TestGThresholdImageOps extends BoofStandardJUnit {
 			assertTrue(found >= 0 && found < 256);
 		}
 	}
-	
+
 	/**
-	 * Test Li method on a synthetic sawtooth histogram (similar to the 
-	 * one in Li's publication 
+	 * Test Li method on a synthetic sawtooth histogram (similar to the
+	 * one in Li's publication
 	 */
-	@Test
-	public void computeLi_Sawtooth() {
+	@Test void computeLi_Sawtooth() {
 		// test on a synthetic sawtooth histogram
 		int[] histogram = createSawToothHistogram();
 
@@ -166,17 +160,17 @@ public class TestGThresholdImageOps extends BoofStandardJUnit {
 	@Test
 	void computeLi_zeros() {
 		int[] sawTooth = createSawToothHistogram();
-		int[] histogram = new int[sawTooth.length+50];
+		int[] histogram = new int[sawTooth.length + 50];
 		for (int i = 0; i < sawTooth.length; i++) {
-			histogram[i+30] = sawTooth[i];
+			histogram[i + 30] = sawTooth[i];
 		}
 		int threshold = GThresholdImageOps.computeLi(histogram, histogram.length);
-		final int expected = 30+25; // this is a cheat, since I have no independent method
+		final int expected = 30 + 25; // this is a cheat, since I have no independent method
 		assertEquals(expected, threshold);
 	}
 
 	private int[] createSawToothHistogram() {
-		int histogram[] = new int[56];
+		int[] histogram = new int[56];
 		histogram[0] = 10;
 		for (int i = 1; i < 11; i++) {
 			histogram[i] = histogram[i - 1] + 10;
@@ -196,10 +190,9 @@ public class TestGThresholdImageOps extends BoofStandardJUnit {
 	/**
 	 * Exercise Huang code. Not sure how to check its validity
 	 */
-	@Test
-	public void computeHuang() {
+	@Test void computeHuang() {
 		for (int i = 0; i < 100; i++) {
-			int histogram[] = new int[256];
+			int[] histogram = new int[256];
 			for (int j = 0; j < histogram.length; j++) {
 				histogram[j] = rand.nextInt(400);
 			}
@@ -209,13 +202,12 @@ public class TestGThresholdImageOps extends BoofStandardJUnit {
 			assertTrue(found >= 0 && found < 256);
 		}
 	}
-	
+
 	/**
-	 * Test Huang method on a synthetic sawtooth histogram (similar to the 
-	 * one in Li's publication 
+	 * Test Huang method on a synthetic sawtooth histogram (similar to the
+	 * one in Li's publication
 	 */
-	@Test
-	void computeHuang_Sawtooth() {
+	@Test void computeHuang_Sawtooth() {
 		// test on a synthetic sawtooth histogram
 		int[] histogram = createSawToothHistogram();
 
@@ -227,26 +219,25 @@ public class TestGThresholdImageOps extends BoofStandardJUnit {
 	/**
 	 * Make sure zeros at the beginning and end of the histogram are handled correctly
 	 */
-	@Test
-	void computeHang_zeros() {
+	@Test void computeHang_zeros() {
 		int[] sawTooth = createSawToothHistogram();
-		int[] histogram = new int[sawTooth.length+50];
+		int[] histogram = new int[sawTooth.length + 50];
 		for (int i = 0; i < sawTooth.length; i++) {
-			histogram[i+30] = sawTooth[i];
+			histogram[i + 30] = sawTooth[i];
 		}
 		int threshold = GThresholdImageOps.computeHuang(histogram, histogram.length);
-		final int expected = 30+25; // this is a cheat, since I have no independent method
+		final int expected = 30 + 25; // this is a cheat, since I have no independent method
 		assertEquals(expected, threshold);
 	}
 
-	private static double[] variance( int histogram[] , int start , int stop , int allPixels) {
+	private static double[] variance( int[] histogram, int start, int stop, int allPixels ) {
 		double mean = 0;
 		int total = 0;
 		for (int i = start; i <= stop; i++) {
 			mean += i*histogram[i];
 			total += histogram[i];
 		}
-		if( total == 0 )
+		if (total == 0)
 			return null;
 
 		mean /= total;
@@ -255,63 +246,59 @@ public class TestGThresholdImageOps extends BoofStandardJUnit {
 		for (int i = start; i <= stop; i++) {
 			variance += histogram[i]*(i - mean)*(i - mean);
 		}
-		variance /= total-1;
+		variance /= total - 1;
 
-		return new double[]{ mean , variance, total/(double)allPixels };
+		return new double[]{mean, variance, total/(double)allPixels};
 	}
 
 	/**
 	 * Check to see if it handles zeros and the start and end of the histogram correctly.
 	 */
-	@Test
-	public void computeOtsu_zeros() {
-		int histogram[] = new int[ 256 ];
+	@Test void computeOtsu_zeros() {
+		int[] histogram = new int[256];
 
 		int total = 0;
-		for (int j = 15; j < histogram.length-40; j++) {
+		for (int j = 15; j < histogram.length - 40; j++) {
 			total += histogram[j] = rand.nextInt(400);
 		}
 
 		int best = bruteForceOtsu(histogram, total);
-		int found = GThresholdImageOps.computeOtsu(histogram,histogram.length,total);
+		int found = GThresholdImageOps.computeOtsu(histogram, histogram.length, total);
 
-		assertEquals(best,found);
+		assertEquals(best, found);
 	}
 
-	@Test
-	public void computeOtsu2_zeros() {
-		int histogram[] = new int[ 256 ];
+	@Test void computeOtsu2_zeros() {
+		int[] histogram = new int[256];
 
 		int total = 0;
-		for (int j = 15; j < histogram.length-40; j++) {
+		for (int j = 15; j < histogram.length - 40; j++) {
 			total += histogram[j] = rand.nextInt(400);
 		}
 
 		int best = bruteForceOtsu2(histogram, total);
-		int found = GThresholdImageOps.computeOtsu2(histogram,histogram.length,total);
+		int found = GThresholdImageOps.computeOtsu2(histogram, histogram.length, total);
 
-		assertEquals(best,found);
+		assertEquals(best, found);
 	}
 
 	/**
 	 * The histogram is composed of two values. See if it picks a threshold that can split this sest
 	 */
-	@Test
-	public void computeOtsu2_pathological() {
-		int histogram[] = new int[ 256 ];
+	@Test void computeOtsu2_pathological() {
+		int[] histogram = new int[256];
 
 		histogram[10] = 200;
 		histogram[120] = 500;
 
-		int found = GThresholdImageOps.computeOtsu2(histogram,histogram.length,700);
+		int found = GThresholdImageOps.computeOtsu2(histogram, histogram.length, 700);
 
-		assertEquals(65,found); // 65 maximizes the distance between the two
+		assertEquals(65, found); // 65 maximizes the distance between the two
 	}
 
-	@Test
-	public void computeEntropy() {
+	@Test void computeEntropy() {
 		for (int i = 0; i < 100; i++) {
-			int histogram[] = new int[ 256 ];
+			int[] histogram = new int[256];
 			int total = 0;
 			for (int j = 0; j < histogram.length; j++) {
 				total += histogram[j] = rand.nextInt(400);
@@ -320,31 +307,30 @@ public class TestGThresholdImageOps extends BoofStandardJUnit {
 			int best = directComputeEntropy(histogram, histogram.length, total);
 			int found = GThresholdImageOps.computeEntropy(histogram, histogram.length, total);
 
-			assertEquals(best,found);
+			assertEquals(best, found);
 		}
 	}
 
-	@Test
-	public void computeEntropy_zeros() {
-		int histogram[] = new int[ 256 ];
+	@Test void computeEntropy_zeros() {
+		int[] histogram = new int[256];
 
 		int total = 0;
-		for (int j = 15; j < histogram.length-40; j++) {
+		for (int j = 15; j < histogram.length - 40; j++) {
 			total += histogram[j] = rand.nextInt(400);
 		}
 
 		int best = directComputeEntropy(histogram, histogram.length, total);
 		int found = GThresholdImageOps.computeEntropy(histogram, histogram.length, total);
 
-		assertEquals(best,found);
+		assertEquals(best, found);
 	}
 
 	/**
 	 * Implementation of computeEntropy() which is almost identical to the original equations
 	 */
-	public static int directComputeEntropy( int histogram[] , int length , int totalPixels ) {
+	public static int directComputeEntropy( int[] histogram, int length, int totalPixels ) {
 
-		double p[] = new double[length];
+		double[] p = new double[length];
 		for (int i = 0; i < length; i++) {
 			p[i] = histogram[i]/(double)totalPixels;
 		}
@@ -352,34 +338,34 @@ public class TestGThresholdImageOps extends BoofStandardJUnit {
 		double bestScore = 0;
 		int bestIndex = 0;
 
-		for (int i=0 ; i<length ; i++) {
+		for (int i = 0; i < length; i++) {
 
 			double sumF = 0;
 			for (int j = 0; j <= i; j++) {
 				sumF += p[j];
 			}
 
-			if( sumF == 0 || sumF == 1.0 ) continue;
+			if (sumF == 0 || sumF == 1.0) continue;
 
-			double sumB = 1.0-sumF;
+			double sumB = 1.0 - sumF;
 
 			double HA = 0;
 			for (int j = 0; j <= i; j++) {
-				if( p[j] == 0 ) continue;
+				if (p[j] == 0) continue;
 				HA += p[j]*Math.log(p[j]);
 			}
-			HA/=sumF;
+			HA /= sumF;
 
 			double HB = 0;
-			for (int j = i+1; j < length; j++) {
-				if( p[j] == 0 ) continue;
+			for (int j = i + 1; j < length; j++) {
+				if (p[j] == 0) continue;
 				HB += p[j]*Math.log(p[j]);
 			}
-			HB/=sumB;
+			HB /= sumB;
 
-			double entropy = Math.log(sumF) + Math.log(sumB)  - HA - HB;
+			double entropy = Math.log(sumF) + Math.log(sumB) - HA - HB;
 
-			if( entropy > bestScore ) {
+			if (entropy > bestScore) {
 				bestScore = entropy;
 				bestIndex = i;
 			}

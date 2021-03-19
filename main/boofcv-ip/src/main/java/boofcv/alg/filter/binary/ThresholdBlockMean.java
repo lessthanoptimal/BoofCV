@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -32,23 +32,24 @@ import boofcv.struct.image.ImageGray;
  * @author Peter Abeles
  */
 public abstract class ThresholdBlockMean<T extends ImageGray<T>>
-		implements ThresholdBlock.BlockProcessor<T,T>
-{
-	protected int blockWidth,blockHeight;
+		implements ThresholdBlock.BlockProcessor<T, T> {
+	protected int blockWidth, blockHeight;
 	protected boolean thresholdFromLocalBlocks;
 	// defines 0 or 1 when thresholding
-	protected byte a,b;
+	protected byte a, b;
 
 	protected ThresholdBlockMean( boolean down ) {
-		if( down ) {
-			a = 1; b = 0;
+		if (down) {
+			a = 1;
+			b = 0;
 		} else {
-			a = 0; b = 1;
+			a = 0;
+			b = 1;
 		}
 	}
 
 	@Override
-	public void init(int blockWidth, int blockHeight, boolean thresholdFromLocalBlocks) {
+	public void init( int blockWidth, int blockHeight, boolean thresholdFromLocalBlocks ) {
 		this.blockWidth = blockWidth;
 		this.blockHeight = blockHeight;
 		this.thresholdFromLocalBlocks = thresholdFromLocalBlocks;

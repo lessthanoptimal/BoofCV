@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -30,27 +30,26 @@ import boofcv.struct.image.GrayU8;
  */
 @SuppressWarnings("Duplicates")
 public class ThresholdBlockMean_F32
-	extends ThresholdBlockMean<GrayF32>
-{
+		extends ThresholdBlockMean<GrayF32> {
 	float scale;
 
-	public ThresholdBlockMean_F32(double scale , boolean down) {
+	public ThresholdBlockMean_F32( double scale, boolean down ) {
 		super(down);
 		this.scale = (float)scale;
 	}
 
 	@Override
-	public void thresholdBlock(int blockX0 , int blockY0 , GrayF32 input, GrayF32 stats, GrayU8 output ) {
+	public void thresholdBlock( int blockX0, int blockY0, GrayF32 input, GrayF32 stats, GrayU8 output ) {
 
 		int x0 = blockX0*blockWidth;
 		int y0 = blockY0*blockHeight;
 
-		int x1 = blockX0==stats.width-1 ? input.width : (blockX0+1)*blockWidth;
-		int y1 = blockY0==stats.height-1 ? input.height: (blockY0+1)*blockHeight;
+		int x1 = blockX0 == stats.width - 1 ? input.width : (blockX0 + 1)*blockWidth;
+		int y1 = blockY0 == stats.height - 1 ? input.height : (blockY0 + 1)*blockHeight;
 
 		// define the local 3x3 region in blocks, taking in account the image border
 		int blockX1, blockY1;
-		if(thresholdFromLocalBlocks) {
+		if (thresholdFromLocalBlocks) {
 			blockX1 = Math.min(stats.width - 1, blockX0 + 1);
 			blockY1 = Math.min(stats.height - 1, blockY0 + 1);
 
@@ -66,15 +65,15 @@ public class ThresholdBlockMean_F32
 
 		for (int y = blockY0; y <= blockY1; y++) {
 			for (int x = blockX0; x <= blockX1; x++) {
-				mean += stats.unsafe_get(x,y);
+				mean += stats.unsafe_get(x, y);
 			}
 		}
-		mean /= (blockY1-blockY0+1)*(blockX1-blockX0+1);
+		mean /= (blockY1 - blockY0 + 1)*(blockX1 - blockX0 + 1);
 
 		// apply threshold
 		for (int y = y0; y < y1; y++) {
-			int indexInput = input.startIndex + y * input.stride + x0;
-			int indexOutput = output.startIndex + y * output.stride + x0;
+			int indexInput = input.startIndex + y*input.stride + x0;
+			int indexOutput = output.startIndex + y*output.stride + x0;
 			int end = indexOutput + (x1 - x0);
 			for (; indexOutput < end; indexOutput++, indexInput++) {
 				output.data[indexOutput] = input.data[indexInput] <= mean ? a : b;
@@ -84,22 +83,22 @@ public class ThresholdBlockMean_F32
 
 	@Override
 	public ThresholdBlock.BlockProcessor<GrayF32, GrayF32> copy() {
-		return new ThresholdBlockMean_F32(scale,isDown());
+		return new ThresholdBlockMean_F32(scale, isDown());
 	}
 
 	@Override
 	public GrayF32 createStats() {
-		return new GrayF32(1,1);
+		return new GrayF32(1, 1);
 	}
 
 	@Override
-	public void computeBlockStatistics(int x0, int y0, int width, int height, int indexStats,
-										  GrayF32 input, GrayF32 stats ) {
+	public void computeBlockStatistics( int x0, int y0, int width, int height, int indexStats,
+										GrayF32 input, GrayF32 stats ) {
 
 		float sum = 0;
 
 		for (int y = 0; y < height; y++) {
-			int indexInput = input.startIndex + (y0+y)*input.stride + x0;
+			int indexInput = input.startIndex + (y0 + y)*input.stride + x0;
 			for (int x = 0; x < width; x++) {
 				sum += input.data[indexInput++];
 			}

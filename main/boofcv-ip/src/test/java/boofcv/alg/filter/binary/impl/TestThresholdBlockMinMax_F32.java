@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -33,7 +33,7 @@ public class TestThresholdBlockMinMax_F32
 
 	@Override
 	public ThresholdBlockMinMax<GrayF32, ?> createProcessor(
-			double textureThreshold, int requestedBlockWidth, double scale, boolean down) {
-		return new ThresholdBlockMinMax_F32((float)textureThreshold, (float)scale,down);
+			double textureThreshold, int requestedBlockWidth, double scale, boolean down ) {
+		return new ThresholdBlockMinMax_F32((float)textureThreshold, (float)scale, down);
 	}
 }

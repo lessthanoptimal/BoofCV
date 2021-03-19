@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -31,52 +31,34 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
  * @author Peter Abeles
  */
 public class TestThresholdBlock extends BoofStandardJUnit {
-	@Test
-	public void selectBlockSize() {
-
+	@Test void selectBlockSize() {
 		int width = 30;
 
 		ThresholdBlock alg = new ThresholdBlock(new Dummy(),
-				ConfigLength.fixed(width),true,GrayU8.class);
+				ConfigLength.fixed(width), true, GrayU8.class);
 
-		alg.selectBlockSize(300,330,width);
-		assertEquals(30,alg.blockWidth);
-		assertEquals(30,alg.blockHeight);
+		alg.selectBlockSize(300, 330, width);
+		assertEquals(30, alg.blockWidth);
+		assertEquals(30, alg.blockHeight);
 
-		alg.selectBlockSize(329,301,width);
-		assertEquals(32,alg.blockWidth);
-		assertEquals(30,alg.blockHeight);
+		alg.selectBlockSize(329, 301, width);
+		assertEquals(32, alg.blockWidth);
+		assertEquals(30, alg.blockHeight);
 
-		alg.selectBlockSize(301,329,width);
-		assertEquals(30,alg.blockWidth);
-		assertEquals(32,alg.blockHeight);
+		alg.selectBlockSize(301, 329, width);
+		assertEquals(30, alg.blockWidth);
+		assertEquals(32, alg.blockHeight);
 	}
 
+	// @formatter:off
 	private class Dummy implements ThresholdBlock.BlockProcessor {
-
-		@Override
-		public ImageBase createStats() {
-			return new GrayU8(1,1);
-		}
-
-		@Override
-		public void init(int blockWidth, int blockHeight, boolean thresholdFromLocalBlocks) {
-
-		}
-
-		@Override
-		public void computeBlockStatistics(int x0, int y0, int width, int height, int indexStats, ImageGray input, ImageBase stats) {
-
-		}
-
-		@Override
-		public void thresholdBlock(int blockX0, int blockY0, ImageGray input, ImageBase stats, GrayU8 output) {
-
-		}
-
-		@Override
-		public ThresholdBlock.BlockProcessor copy() {
-			return null;
-		}
+		@Override public ImageBase createStats() {return new GrayU8(1, 1);}
+		@Override public void init( int blockWidth, int blockHeight, boolean thresholdFromLocalBlocks ) {}
+		@Override public void computeBlockStatistics( int x0, int y0, int width, int height,
+													  int indexStats, ImageGray input, ImageBase stats ) {}
+		@Override public void thresholdBlock( int blockX0, int blockY0,
+											  ImageGray input, ImageBase stats, GrayU8 output ) {}
+		@Override public ThresholdBlock.BlockProcessor copy() {return null;}
 	}
+	// @formatter:on
 }

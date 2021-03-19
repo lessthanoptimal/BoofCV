@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -21,6 +21,7 @@ package boofcv.alg;
 import boofcv.core.image.GeneralizedImageOps;
 import boofcv.struct.image.*;
 import boofcv.struct.pyramid.ImagePyramid;
+import org.jetbrains.annotations.Nullable;
 
 /**
  * @author Peter Abeles
@@ -46,7 +47,7 @@ public class InputSanityCheck {
 	 * If the output has not been declared a new instance is declared.  If an instance of the output
 	 * is provided its bounds are checked.
 	 */
-	public static <T extends ImageBase<T>> T checkDeclare( T input, T output ) {
+	public static <T extends ImageBase<T>> T checkDeclare( T input, @Nullable T output ) {
 		if (output == null) {
 			output = (T)input.createNew(input.width, input.height);
 		} else {
@@ -55,7 +56,7 @@ public class InputSanityCheck {
 		return output;
 	}
 
-	public static <T extends ImageGray<T>> T checkDeclare( T image, int width, int height, Class<T> imageType ) {
+	public static <T extends ImageGray<T>> T checkDeclare( @Nullable T image, int width, int height, Class<T> imageType ) {
 		if (image == null)
 			image = GeneralizedImageOps.createSingleBand(imageType, width, height);
 		else
@@ -63,7 +64,7 @@ public class InputSanityCheck {
 		return image;
 	}
 
-	public static <T extends ImageInterleaved<T>> T checkDeclare( T image,
+	public static <T extends ImageInterleaved<T>> T checkDeclare( @Nullable T image,
 																  int width, int height, int numBands,
 																  Class<T> imageType ) {
 		if (image == null)
@@ -73,7 +74,7 @@ public class InputSanityCheck {
 		return image;
 	}
 
-	public static <T extends ImageGray<T>> Planar<T> checkDeclare( Planar<T> image,
+	public static <T extends ImageGray<T>> Planar<T> checkDeclare( @Nullable Planar<T> image,
 																   int width, int height, int numBands,
 																   Class<T> imageType ) {
 		if (image == null)
@@ -88,7 +89,7 @@ public class InputSanityCheck {
 	 * is provided its bounds are checked.
 	 */
 	public static <In extends ImageGray, Out extends ImageGray>
-	Out checkDeclare( In input, Out output, Class<Out> typeOut ) {
+	Out checkDeclare( In input, @Nullable Out output, Class<Out> typeOut ) {
 		if (output == null) {
 			output = (Out)GeneralizedImageOps.createSingleBand(typeOut, input.width, input.height);
 		} else {

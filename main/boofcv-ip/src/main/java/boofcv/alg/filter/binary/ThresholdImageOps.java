@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -50,12 +50,11 @@ public class ThresholdImageOps {
 	 * @param down If true then the inequality <= is used, otherwise if false then &gt; is used.
 	 * @return Output image.
 	 */
-	public static GrayU8 threshold( GrayF32 input , GrayU8 output ,
-										float threshold , boolean down )
-	{
-		output = InputSanityCheck.checkDeclare(input,output,GrayU8.class);
+	public static GrayU8 threshold( GrayF32 input, @Nullable GrayU8 output,
+									float threshold, boolean down ) {
+		output = InputSanityCheck.checkDeclare(input, output, GrayU8.class);
 
-		if(BoofConcurrency.USE_CONCURRENT ) {
+		if (BoofConcurrency.USE_CONCURRENT) {
 			ImplThresholdImageOps_MT.threshold(input, output, threshold, down);
 		} else {
 			ImplThresholdImageOps.threshold(input, output, threshold, down);
@@ -75,12 +74,11 @@ public class ThresholdImageOps {
 	 * @param down If true then the inequality <= is used, otherwise if false then &gt; is used.
 	 * @return Output image.
 	 */
-	public static GrayU8 threshold( GrayF64 input , GrayU8 output ,
-										double threshold , boolean down )
-	{
-		output = InputSanityCheck.checkDeclare(input,output,GrayU8.class);
+	public static GrayU8 threshold( GrayF64 input, @Nullable GrayU8 output,
+									double threshold, boolean down ) {
+		output = InputSanityCheck.checkDeclare(input, output, GrayU8.class);
 
-		if(BoofConcurrency.USE_CONCURRENT ) {
+		if (BoofConcurrency.USE_CONCURRENT) {
 			ImplThresholdImageOps_MT.threshold(input, output, threshold, down);
 		} else {
 			ImplThresholdImageOps.threshold(input, output, threshold, down);
@@ -100,12 +98,11 @@ public class ThresholdImageOps {
 	 * @param down If true then the inequality <= is used, otherwise if false then &gt; is used.
 	 * @return Output image.
 	 */
-	public static GrayU8 threshold( GrayU8 input , GrayU8 output ,
-										int threshold , boolean down )
-	{
-		output = InputSanityCheck.checkDeclare(input,output,GrayU8.class);
+	public static GrayU8 threshold( GrayU8 input, @Nullable GrayU8 output,
+									int threshold, boolean down ) {
+		output = InputSanityCheck.checkDeclare(input, output, GrayU8.class);
 
-		if(BoofConcurrency.USE_CONCURRENT ) {
+		if (BoofConcurrency.USE_CONCURRENT) {
 			ImplThresholdImageOps_MT.threshold(input, output, threshold, down);
 		} else {
 			ImplThresholdImageOps.threshold(input, output, threshold, down);
@@ -125,12 +122,11 @@ public class ThresholdImageOps {
 	 * @param down If true then the inequality <= is used, otherwise if false then &gt; is used.
 	 * @return Output image.
 	 */
-	public static GrayU8 threshold( GrayS16 input , GrayU8 output ,
-										int threshold , boolean down )
-	{
-		output = InputSanityCheck.checkDeclare(input,output,GrayU8.class);
+	public static GrayU8 threshold( GrayS16 input, @Nullable GrayU8 output,
+									int threshold, boolean down ) {
+		output = InputSanityCheck.checkDeclare(input, output, GrayU8.class);
 
-		if(BoofConcurrency.USE_CONCURRENT ) {
+		if (BoofConcurrency.USE_CONCURRENT) {
 			ImplThresholdImageOps_MT.threshold(input, output, threshold, down);
 		} else {
 			ImplThresholdImageOps.threshold(input, output, threshold, down);
@@ -150,12 +146,11 @@ public class ThresholdImageOps {
 	 * @param down If true then the inequality <= is used, otherwise if false then &gt; is used.
 	 * @return Output image.
 	 */
-	public static GrayU8 threshold( GrayU16 input , GrayU8 output ,
-										int threshold , boolean down )
-	{
-		output = InputSanityCheck.checkDeclare(input,output,GrayU8.class);
+	public static GrayU8 threshold( GrayU16 input, @Nullable GrayU8 output,
+									int threshold, boolean down ) {
+		output = InputSanityCheck.checkDeclare(input, output, GrayU8.class);
 
-		if(BoofConcurrency.USE_CONCURRENT ) {
+		if (BoofConcurrency.USE_CONCURRENT) {
 			ImplThresholdImageOps_MT.threshold(input, output, threshold, down);
 		} else {
 			ImplThresholdImageOps.threshold(input, output, threshold, down);
@@ -175,12 +170,11 @@ public class ThresholdImageOps {
 	 * @param down If true then the inequality <= is used, otherwise if false then &gt; is used.
 	 * @return Output image.
 	 */
-	public static GrayU8 threshold( GrayS32 input , GrayU8 output ,
-										int threshold , boolean down )
-	{
-		output = InputSanityCheck.checkDeclare(input,output,GrayU8.class);
+	public static GrayU8 threshold( GrayS32 input, @Nullable GrayU8 output,
+									int threshold, boolean down ) {
+		output = InputSanityCheck.checkDeclare(input, output, GrayU8.class);
 
-		if(BoofConcurrency.USE_CONCURRENT ) {
+		if (BoofConcurrency.USE_CONCURRENT) {
 			ImplThresholdImageOps_MT.threshold(input, output, threshold, down);
 		} else {
 			ImplThresholdImageOps.threshold(input, output, threshold, down);
@@ -204,16 +198,16 @@ public class ThresholdImageOps {
 	 * @param storage2 (Optional) Storage for intermediate step. If null will be declared internally.
 	 * @return Thresholded image.
 	 */
-	public static GrayU8 localMean(GrayU8 input , GrayU8 output ,
-								   ConfigLength width , float scale , boolean down ,
-								   @Nullable GrayU8 storage1 , @Nullable GrayU8 storage2 ,
-								   @Nullable GrowArray<DogArray_I32> storage3 ) {
+	public static GrayU8 localMean( GrayU8 input, @Nullable GrayU8 output,
+									ConfigLength width, float scale, boolean down,
+									@Nullable GrayU8 storage1, @Nullable GrayU8 storage2,
+									@Nullable GrowArray<DogArray_I32> storage3 ) {
 
-		output = InputSanityCheck.checkDeclare(input,output,GrayU8.class);
-		storage1 = InputSanityCheck.checkDeclare(input,storage1,GrayU8.class);
-		storage2 = InputSanityCheck.checkDeclare(input,storage2,GrayU8.class);
+		output = InputSanityCheck.checkDeclare(input, output, GrayU8.class);
+		storage1 = InputSanityCheck.checkDeclare(input, storage1, GrayU8.class);
+		storage2 = InputSanityCheck.checkDeclare(input, storage2, GrayU8.class);
 
-		if(BoofConcurrency.USE_CONCURRENT ) {
+		if (BoofConcurrency.USE_CONCURRENT) {
 			ImplThresholdImageOps_MT.localMean(input, output, width, scale, down, storage1, storage2, storage3);
 		} else {
 			ImplThresholdImageOps.localMean(input, output, width, scale, down, storage1, storage2, storage3);
@@ -237,15 +231,15 @@ public class ThresholdImageOps {
 	 * @param storage2 (Optional) Storage for intermediate step. If null will be declared internally.
 	 * @return Thresholded image.
 	 */
-	public static GrayU8 localGaussian( GrayU8 input , GrayU8 output ,
-										ConfigLength width , float scale , boolean down ,
-										GrayU8 storage1 , GrayU8 storage2 ) {
+	public static GrayU8 localGaussian( GrayU8 input, @Nullable GrayU8 output,
+										ConfigLength width, float scale, boolean down,
+										@Nullable GrayU8 storage1, @Nullable GrayU8 storage2 ) {
 
-		output = InputSanityCheck.checkDeclare(input,output,GrayU8.class);
-		storage1 = InputSanityCheck.checkDeclare(input,storage1,GrayU8.class);
-		storage2 = InputSanityCheck.checkDeclare(input,storage2,GrayU8.class);
+		output = InputSanityCheck.checkDeclare(input, output, GrayU8.class);
+		storage1 = InputSanityCheck.checkDeclare(input, storage1, GrayU8.class);
+		storage2 = InputSanityCheck.checkDeclare(input, storage2, GrayU8.class);
 
-		if(BoofConcurrency.USE_CONCURRENT ) {
+		if (BoofConcurrency.USE_CONCURRENT) {
 			ImplThresholdImageOps_MT.localGaussian(input, output, width, scale, down, storage1, storage2);
 		} else {
 			ImplThresholdImageOps.localGaussian(input, output, width, scale, down, storage1, storage2);
@@ -269,16 +263,16 @@ public class ThresholdImageOps {
 	 * @param storage2 (Optional) Storage for intermediate step. If null will be declared internally.
 	 * @return Thresholded image.
 	 */
-	public static GrayU8 localMean(GrayU16 input , GrayU8 output ,
-								   ConfigLength width , float scale , boolean down ,
-								   @Nullable GrayU16 storage1 , @Nullable GrayU16 storage2 ,
-								   @Nullable GrowArray<DogArray_I32> storage3 ) {
+	public static GrayU8 localMean( GrayU16 input, @Nullable GrayU8 output,
+									ConfigLength width, float scale, boolean down,
+									@Nullable GrayU16 storage1, @Nullable GrayU16 storage2,
+									@Nullable GrowArray<DogArray_I32> storage3 ) {
 
-		output = InputSanityCheck.checkDeclare(input,output,GrayU8.class);
-		storage1 = InputSanityCheck.checkDeclare(input,storage1,GrayU16.class);
-		storage2 = InputSanityCheck.checkDeclare(input,storage2,GrayU16.class);
+		output = InputSanityCheck.checkDeclare(input, output, GrayU8.class);
+		storage1 = InputSanityCheck.checkDeclare(input, storage1, GrayU16.class);
+		storage2 = InputSanityCheck.checkDeclare(input, storage2, GrayU16.class);
 
-		if(BoofConcurrency.USE_CONCURRENT ) {
+		if (BoofConcurrency.USE_CONCURRENT) {
 			ImplThresholdImageOps_MT.localMean(input, output, width, scale, down, storage1, storage2, storage3);
 		} else {
 			ImplThresholdImageOps.localMean(input, output, width, scale, down, storage1, storage2, storage3);
@@ -302,15 +296,15 @@ public class ThresholdImageOps {
 	 * @param storage2 (Optional) Storage for intermediate step. If null will be declared internally.
 	 * @return Thresholded image.
 	 */
-	public static GrayU8 localGaussian( GrayU16 input , GrayU8 output ,
-										ConfigLength width , float scale , boolean down ,
-										GrayU16 storage1 , GrayU16 storage2 ) {
+	public static GrayU8 localGaussian( GrayU16 input, @Nullable GrayU8 output,
+										ConfigLength width, float scale, boolean down,
+										@Nullable GrayU16 storage1, @Nullable GrayU16 storage2 ) {
 
-		output = InputSanityCheck.checkDeclare(input,output,GrayU8.class);
-		storage1 = InputSanityCheck.checkDeclare(input,storage1,GrayU16.class);
-		storage2 = InputSanityCheck.checkDeclare(input,storage2,GrayU16.class);
+		output = InputSanityCheck.checkDeclare(input, output, GrayU8.class);
+		storage1 = InputSanityCheck.checkDeclare(input, storage1, GrayU16.class);
+		storage2 = InputSanityCheck.checkDeclare(input, storage2, GrayU16.class);
 
-		if(BoofConcurrency.USE_CONCURRENT ) {
+		if (BoofConcurrency.USE_CONCURRENT) {
 			ImplThresholdImageOps_MT.localGaussian(input, output, width, scale, down, storage1, storage2);
 		} else {
 			ImplThresholdImageOps.localGaussian(input, output, width, scale, down, storage1, storage2);
@@ -334,16 +328,16 @@ public class ThresholdImageOps {
 	 * @param storage2 (Optional) Storage for intermediate step. If null will be declared internally.
 	 * @return Thresholded image.
 	 */
-	public static GrayU8 localMean(GrayF32 input , GrayU8 output ,
-								   ConfigLength width , float scale , boolean down ,
-								   @Nullable GrayF32 storage1 , @Nullable GrayF32 storage2 ,
-								   @Nullable GrowArray<DogArray_F32> storage3 ) {
+	public static GrayU8 localMean( GrayF32 input, @Nullable GrayU8 output,
+									ConfigLength width, float scale, boolean down,
+									@Nullable GrayF32 storage1, @Nullable GrayF32 storage2,
+									@Nullable GrowArray<DogArray_F32> storage3 ) {
 
-		output = InputSanityCheck.checkDeclare(input,output,GrayU8.class);
-		storage1 = InputSanityCheck.checkDeclare(input,storage1,GrayF32.class);
-		storage2 = InputSanityCheck.checkDeclare(input,storage2,GrayF32.class);
+		output = InputSanityCheck.checkDeclare(input, output, GrayU8.class);
+		storage1 = InputSanityCheck.checkDeclare(input, storage1, GrayF32.class);
+		storage2 = InputSanityCheck.checkDeclare(input, storage2, GrayF32.class);
 
-		if(BoofConcurrency.USE_CONCURRENT ) {
+		if (BoofConcurrency.USE_CONCURRENT) {
 			ImplThresholdImageOps_MT.localMean(input, output, width, scale, down, storage1, storage2, storage3);
 		} else {
 			ImplThresholdImageOps.localMean(input, output, width, scale, down, storage1, storage2, storage3);
@@ -367,15 +361,15 @@ public class ThresholdImageOps {
 	 * @param storage2 (Optional) Storage for intermediate step. If null will be declared internally.
 	 * @return Thresholded image.
 	 */
-	public static GrayU8 localGaussian( GrayF32 input , GrayU8 output ,
-										ConfigLength width , float scale , boolean down ,
-										GrayF32 storage1 , GrayF32 storage2 ) {
+	public static GrayU8 localGaussian( GrayF32 input, @Nullable GrayU8 output,
+										ConfigLength width, float scale, boolean down,
+										@Nullable GrayF32 storage1, @Nullable GrayF32 storage2 ) {
 
-		output = InputSanityCheck.checkDeclare(input,output,GrayU8.class);
-		storage1 = InputSanityCheck.checkDeclare(input,storage1,GrayF32.class);
-		storage2 = InputSanityCheck.checkDeclare(input,storage2,GrayF32.class);
+		output = InputSanityCheck.checkDeclare(input, output, GrayU8.class);
+		storage1 = InputSanityCheck.checkDeclare(input, storage1, GrayF32.class);
+		storage2 = InputSanityCheck.checkDeclare(input, storage2, GrayF32.class);
 
-		if(BoofConcurrency.USE_CONCURRENT ) {
+		if (BoofConcurrency.USE_CONCURRENT) {
 			ImplThresholdImageOps_MT.localGaussian(input, output, width, scale, down, storage1, storage2);
 		} else {
 			ImplThresholdImageOps.localGaussian(input, output, width, scale, down, storage1, storage2);
@@ -383,6 +377,4 @@ public class ThresholdImageOps {
 
 		return output;
 	}
-
-
 }

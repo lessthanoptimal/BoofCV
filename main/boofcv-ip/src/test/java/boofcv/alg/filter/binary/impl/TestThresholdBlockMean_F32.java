@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -32,7 +32,7 @@ public class TestThresholdBlockMean_F32
 	}
 
 	@Override
-	public ThresholdBlock.BlockProcessor<GrayF32, ?> createBlockProcessor(double scale, boolean down) {
-		return new ThresholdBlockMean_F32(scale,down);
+	public ThresholdBlock.BlockProcessor<GrayF32, ?> createBlockProcessor( double scale, boolean down ) {
+		return new ThresholdBlockMean_F32(scale, down);
 	}
 }
