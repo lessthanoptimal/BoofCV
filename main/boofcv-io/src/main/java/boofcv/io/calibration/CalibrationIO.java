@@ -19,21 +19,26 @@
 package boofcv.io.calibration;
 
 import boofcv.BoofVersion;
+import boofcv.alg.geo.PerspectiveOps;
 import boofcv.alg.geo.calibration.CalibrationObservation;
 import boofcv.io.UtilIO;
 import boofcv.misc.BoofMiscOps;
 import boofcv.struct.calib.*;
 import boofcv.struct.geo.PointIndex2D_F64;
 import georegression.struct.se.Se3_F64;
+import org.apache.commons.io.IOUtils;
+import org.ejml.data.DMatrixRMaj;
 import org.jetbrains.annotations.Nullable;
 import org.yaml.snakeyaml.DumperOptions;
 import org.yaml.snakeyaml.Yaml;
+import org.yaml.snakeyaml.constructor.Constructor;
+import org.yaml.snakeyaml.representer.Representer;
 
 import java.io.*;
 import java.net.URL;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.*;
 
 import static boofcv.misc.BoofMiscOps.getOrThrow;
 import static java.nio.charset.StandardCharsets.UTF_8;
@@ -92,13 +97,12 @@ public class CalibrationIO {
 		}
 
 		yaml.dump(data, out);
-
-		out.close();
+		out.flush();
 	}
 
 	public static <T extends CameraPinhole> void save( T parameters, String filePath ) {
-		try {
-			save(parameters, new OutputStreamWriter(new FileOutputStream(filePath), UTF_8));
+		try (var stream = new FileOutputStream(filePath)) {
+			save(parameters, new OutputStreamWriter(stream, UTF_8));
 		} catch (IOException e) {
 			throw new UncheckedIOException(e);
 		}
@@ -121,7 +125,6 @@ public class CalibrationIO {
 	 * @param outputWriter Stream to save the parameters to
 	 */
 	public static void save( StereoParameters parameters, Writer outputWriter ) {
-
 		Map<String, Object> map = new HashMap<>();
 		map.put("model", MODEL_STEREO);
 		map.put(VERSION, 0);
@@ -133,12 +136,12 @@ public class CalibrationIO {
 		out.println("# Intrinsic and extrinsic parameters for a stereo camera pair");
 		Yaml yaml = createYmlObject();
 		yaml.dump(map, out);
-		out.close();
+		out.flush();
 	}
 
 	public static void save( StereoParameters parameters, String outputPath ) {
-		try {
-			save(parameters, new OutputStreamWriter(new FileOutputStream(outputPath), UTF_8));
+		try (var stream = new FileOutputStream(outputPath)) {
+			save(parameters, new OutputStreamWriter(stream, UTF_8));
 		} catch (IOException e) {
 			throw new UncheckedIOException(e);
 		}
@@ -153,8 +156,8 @@ public class CalibrationIO {
 	}
 
 	public static void save( Se3_F64 rigidBody, String outputPath ) {
-		try {
-			save(rigidBody, new OutputStreamWriter(new FileOutputStream(outputPath), UTF_8));
+		try (var stream = new FileOutputStream(outputPath)) {
+			save(rigidBody, new OutputStreamWriter(stream, UTF_8));
 		} catch (IOException e) {
 			throw new UncheckedIOException(e);
 		}
@@ -170,7 +173,7 @@ public class CalibrationIO {
 		out.println("# Rigid Body transformation");
 		Yaml yaml = createYmlObject();
 		yaml.dump(map, out);
-		out.close();
+		out.flush();
 	}
 
 	public static void save( VisualDepthParameters parameters, File filePath ) {
@@ -178,8 +181,8 @@ public class CalibrationIO {
 	}
 
 	public static void save( VisualDepthParameters parameters, String outputPath ) {
-		try {
-			save(parameters, new OutputStreamWriter(new FileOutputStream(outputPath), UTF_8));
+		try (var stream = new FileOutputStream(outputPath)) {
+			save(parameters, new OutputStreamWriter(stream, UTF_8));
 		} catch (IOException e) {
 			throw new UncheckedIOException(e);
 		}
@@ -197,7 +200,7 @@ public class CalibrationIO {
 		out.println("# RGB Depth Camera Calibration");
 		Yaml yaml = createYmlObject();
 		yaml.dump(map, out);
-		out.close();
+		out.flush();
 	}
 
 	public static void save( MonoPlaneParameters parameters, Writer outputWriter ) {
@@ -211,14 +214,14 @@ public class CalibrationIO {
 		out.println("# Monocular Camera with Known Plane Distance");
 		Yaml yaml = createYmlObject();
 		yaml.dump(map, out);
-		out.close();
+		out.flush();
 	}
 
 	public static <T> T load( @Nullable URL path ) {
 		if (path == null)
 			throw new RuntimeException("Null path");
-		try {
-			return load(new InputStreamReader(path.openStream(), UTF_8));
+		try (InputStream stream = path.openStream()) {
+			return load(new InputStreamReader(stream, UTF_8));
 		} catch (IOException e) {
 			throw new UncheckedIOException(e);
 		}
@@ -250,7 +253,6 @@ public class CalibrationIO {
 		Map<String, Object> data = yaml.load(reader);
 
 		try {
-			reader.close();
 			return load(data);
 		} catch (IOException e) {
 			throw new UncheckedIOException(e);
@@ -453,10 +455,8 @@ public class CalibrationIO {
 										 String detector,
 										 CalibrationObservation landmarks,
 										 File outputFile ) {
-		try {
-			var stream = new FileOutputStream(outputFile);
+		try (var stream = new FileOutputStream(outputFile)) {
 			saveLandmarksCsv(inputFile, detector, landmarks, stream);
-			stream.close();
 		} catch (IOException e) {
 			throw new UncheckedIOException(e);
 		}
@@ -525,5 +525,134 @@ public class CalibrationIO {
 		}
 
 		return ret;
+	}
+
+	public static void saveOpencv( CameraPinholeBrown intrinsics, String path ) {
+		try (var stream = new FileOutputStream(path)) {
+			saveOpencv(intrinsics, new OutputStreamWriter(stream, UTF_8));
+		} catch (IOException e) {
+			throw new UncheckedIOException(e);
+		}
+	}
+
+	/**
+	 * Saves the calibration in OpenCV yaml format.
+	 *
+	 * @param intrinsics (Input) Calibration that's to be saved
+	 * @param outputWriter (Output) where to save it to
+	 */
+	public static void saveOpencv( CameraPinholeBrown intrinsics,
+								   Writer outputWriter ) {
+		PrintWriter out = new PrintWriter(outputWriter);
+
+		// Snakeyaml isn't flexible enough. Just dump it manually
+		try {
+			Date date = Calendar.getInstance().getTime();
+			DateFormat dateFormat = new SimpleDateFormat("yyyy-mm-dd hh:mm:ss");
+
+			outputWriter.write("%YAML:1.0\n");
+			outputWriter.write("calibration_time: \"" + dateFormat.format(date) + "\"\n");
+			outputWriter.write("image_width: " + intrinsics.width + "\n");
+			outputWriter.write("image_height: " + intrinsics.height + "\n");
+			outputWriter.write("flags: 0\n");
+			writeOpenCVMatrix(outputWriter, "camera_matrix", 3, 3,
+					intrinsics.fx, intrinsics.skew, intrinsics.cx,
+					0.0, intrinsics.fy, intrinsics.cy,
+					0.0, 0.0, 1.0);
+
+			double[] distortion = new double[5];
+			if (intrinsics.radial != null) {
+				if (intrinsics.radial.length > 0)
+					distortion[0] = intrinsics.radial[0];
+				if (intrinsics.radial.length > 1)
+					distortion[1] = intrinsics.radial[01];
+				if (intrinsics.radial.length > 2)
+					distortion[4] = intrinsics.radial[2];
+			}
+			distortion[2] = intrinsics.t1;
+			distortion[3] = intrinsics.t2;
+
+			writeOpenCVMatrix(outputWriter, "distortion_coefficients", 5, 1, distortion);
+		} catch (IOException e) {
+			throw new UncheckedIOException(e);
+		}
+		out.flush();
+	}
+
+	private static void writeOpenCVMatrix( Writer writer, String name, int rows, int cols, double... data ) throws IOException {
+		writer.write(name + ": !!opencv-matrix\n");
+		writer.write("    rows: " + rows + "\n");
+		writer.write("    cols: " + cols + "\n");
+		writer.write("    dt: d\n");
+		writer.write("    data: [");
+		for (int i = 0; i < data.length; i++) {
+			writer.write(" " + data[i]);
+			if (i + 1 != data.length)
+				writer.write(",");
+		}
+		writer.write(" ]\n");
+	}
+
+	public static CameraPinholeBrown loadOpenCV( String path ) {
+		URL url = UtilIO.ensureURL(path);
+		return loadOpenCV(url);
+	}
+
+	public static CameraPinholeBrown loadOpenCV( URL path ) {
+		try (InputStream stream = path.openStream()) {
+			return loadOpenCV(new InputStreamReader(stream, UTF_8));
+		} catch (IOException e) {
+			throw new UncheckedIOException(e);
+		}
+	}
+
+	/**
+	 * Loads intrinsic parameters in OpenCV format.
+	 */
+	public static CameraPinholeBrown loadOpenCV( Reader reader ) {
+		CameraPinholeBrown out = new CameraPinholeBrown();
+		try {
+			String filtered = IOUtils.toString(reader);
+			// It doesn't like the header or that class def
+			filtered = filtered.replace("%YAML:1.0", "");
+			filtered = filtered.replace("!!opencv-matrix", "");
+
+			Representer representer = new Representer();
+			representer.getPropertyUtils().setSkipMissingProperties(true);
+
+			Yaml yaml = new Yaml(new Constructor(), representer);
+			Map<String, Object> map = yaml.load(filtered);
+
+			int width = getOrThrow(map, "image_width");
+			int height = getOrThrow(map, "image_height");
+
+			DMatrixRMaj K = loadOpenCVMatrix(getOrThrow(map, "camera_matrix"));
+			DMatrixRMaj distortion = loadOpenCVMatrix(getOrThrow(map, "distortion_coefficients"));
+
+			PerspectiveOps.matrixToPinhole(K, width, height, out);
+
+			if (distortion.getNumElements() >= 5)
+				out.setRadial(distortion.get(0), distortion.get(1), distortion.get(4));
+			else if (distortion.getNumElements() >= 2)
+				out.setRadial(distortion.get(0), distortion.get(1));
+			if (distortion.getNumElements() >= 5)
+				out.fsetTangental(distortion.get(2), distortion.get(3));
+		} catch (IOException e) {
+			throw new UncheckedIOException(e);
+		}
+
+		return out;
+	}
+
+	private static DMatrixRMaj loadOpenCVMatrix( Map<String, Object> map ) throws IOException {
+		int rows = getOrThrow(map, "rows");
+		int cols = getOrThrow(map, "cols");
+
+		var mat = new DMatrixRMaj(rows, cols);
+		List<Double> array = getOrThrow(map, "data");
+		for (int i = 0; i < array.size(); i++) {
+			mat.data[i] = array.get(i);
+		}
+		return mat;
 	}
 }

@@ -8,7 +8,6 @@ dependencies {
 	api project(':main:boofcv-recognition')
 	api project(':integration:boofcv-swing')
 	api project(':integration:boofcv-WebcamCapture')
-	api project(':integration:boofcv-javacv')
 	api project(':integration:boofcv-pdf')
 
 	api group: 'args4j', name: 'args4j', version: '2.33'

@@ -19,12 +19,16 @@
 package boofcv.io.calibration;
 
 import boofcv.alg.geo.calibration.CalibrationObservation;
+import boofcv.struct.calib.CameraPinholeBrown;
 import boofcv.struct.geo.PointIndex2D_F64;
 import boofcv.testing.BoofStandardJUnit;
 import org.junit.jupiter.api.Test;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
+import java.io.InputStreamReader;
+import java.io.OutputStreamWriter;
+import java.net.URL;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
@@ -41,7 +45,7 @@ public class TestCalibrationIO extends BoofStandardJUnit {
 		original.add(3.11, -20.1, -23);
 
 		ByteArrayOutputStream stream = new ByteArrayOutputStream();
-		CalibrationIO.saveLandmarksCsv("File","ASDASD",original, stream);
+		CalibrationIO.saveLandmarksCsv("File", "ASDASD", original, stream);
 
 		CalibrationObservation found = CalibrationIO.loadLandmarksCsv(new ByteArrayInputStream(stream.toByteArray()));
 
@@ -56,5 +60,61 @@ public class TestCalibrationIO extends BoofStandardJUnit {
 			assertEquals(o.p.x, f.p.x);
 			assertEquals(o.p.y, f.p.y);
 		}
+	}
+
+	/**
+	 * Read an actual OpenCV generated file
+	 */
+	@Test void saveOpenCV() {
+		CameraPinholeBrown model = new CameraPinholeBrown();
+
+		model.fsetK(1, 2, 3, 4, 0.65, 100, 7);
+		model.fsetRadial(.1, .2, .3);
+		model.fsetTangental(0.5, 0.7);
+
+		ByteArrayOutputStream stream = new ByteArrayOutputStream();
+		CalibrationIO.saveOpencv(model, new OutputStreamWriter(stream));
+
+		CameraPinholeBrown found = CalibrationIO.loadOpenCV(new InputStreamReader(
+				new ByteArrayInputStream(stream.toByteArray())));
+
+		assertEquals(model.width, found.width);
+		assertEquals(model.height, found.height);
+		assertEquals(model.fx, found.fx, 1e-8);
+		assertEquals(model.fy, found.fy, 1e-8);
+		assertEquals(model.skew, found.skew, 1e-8);
+		assertEquals(model.cx, found.cx, 1e-8);
+		assertEquals(model.cy, found.cy, 1e-8);
+
+		for (int i = 0; i < 3; i++) {
+			assertEquals(model.radial[i], found.radial[i], 1e-8);
+		}
+
+		assertEquals(model.t1, found.t1, 1e-8);
+		assertEquals(model.t2, found.t2, 1e-8);
+	}
+
+	/**
+	 * Read an actual OpenCV generated file
+	 */
+	@Test void loadOpenCV() {
+		URL url = TestCalibrationIO.class.getResource("pinhole_distorted.yml");
+		CameraPinholeBrown model = CalibrationIO.loadOpenCV(url);
+		assertEquals(640, model.width);
+		assertEquals(480, model.height);
+
+		assertEquals(5.2626362816407709e+02, model.fx, 1e-8);
+		assertEquals(0, model.skew, 1e-8);
+		assertEquals(5.2830704330313858e+02, model.fy, 1e-8);
+		assertEquals(3.1306715867053975e+02, model.cx, 1e-8);
+		assertEquals(2.4747722332735930e+02, model.cy, 1e-8);
+
+		assertEquals(3, model.radial.length);
+		assertEquals(-3.7077854691489726e-01, model.radial[0], 1e-8);
+		assertEquals(2.4308561956661329e-01, model.radial[1], 1e-8);
+		assertEquals(-1.2351969388838037e-01, model.radial[2], 1e-8);
+
+		assertEquals(4.4148972909019294e-04, model.t1, 1e-8);
+		assertEquals(-6.0304229617877381e-04, model.t2, 1e-8);
 	}
 }
