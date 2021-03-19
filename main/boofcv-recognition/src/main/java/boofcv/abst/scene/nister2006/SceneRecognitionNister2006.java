@@ -98,7 +98,7 @@ public class SceneRecognitionNister2006<Image extends ImageBase<Image>, TD exten
 
 		databaseN.setDistanceType(config.distanceNorm);
 		databaseN.minimumDepthFromRoot = config.minimumDepthFromRoot;
-		databaseN.maximumQueryImagesInNode.setTo(config.maximumQueryImagesInNode);
+		databaseN.maximumQueryImagesInNode.setTo(config.queryMaximumImagesInNode);
 
 		downSample = FactoryFilterLambdas.createDownSampleFilter(config.maxImagePixels, imageType);
 	}
@@ -148,6 +148,7 @@ public class SceneRecognitionNister2006<Image extends ImageBase<Image>, TD exten
 
 		LearnHierarchicalTree<TD> learnTree = new LearnHierarchicalTree<>(
 				() -> FactoryTupleDesc.createPackedBig(DOF, tupleType), factoryKMeans, config.randSeed);
+		learnTree.minimumPointsForChildren.setTo(config.learningMinimumPointsForChildren);
 		learnTree.setVerbose(verbose, null);
 		learnTree.process(packedFeatures, tree);
 		long time2 = System.currentTimeMillis();
@@ -160,7 +161,7 @@ public class SceneRecognitionNister2006<Image extends ImageBase<Image>, TD exten
 		// Learn the weight for each node in the tree
 		if (verbose != null) verbose.println("learning the weights");
 		LearnNodeWeights<TD> learnWeights = new LearnNodeWeights<>();
-		learnWeights.maximumNumberImagesInNode.setTo(config.maximumTrainingImagesInNode);
+		learnWeights.maximumNumberImagesInNode.setTo(config.learningMaximumImagesInNode);
 		learnWeights.reset(tree);
 
 		for (int imgIdx = 1; imgIdx < startIndex.size; imgIdx++) {

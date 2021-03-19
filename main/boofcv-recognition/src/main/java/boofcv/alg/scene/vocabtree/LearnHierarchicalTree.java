@@ -21,6 +21,7 @@ package boofcv.alg.scene.vocabtree;
 import boofcv.alg.scene.vocabtree.HierarchicalVocabularyTree.Node;
 import boofcv.misc.BoofLambdas;
 import boofcv.misc.BoofMiscOps;
+import boofcv.struct.ConfigLength;
 import boofcv.struct.PackedArray;
 import org.ddogleg.clustering.kmeans.StandardKMeans;
 import org.ddogleg.struct.DogArray;
@@ -40,6 +41,12 @@ import java.util.Set;
  * @author Peter Abeles
  **/
 public class LearnHierarchicalTree<Point> implements VerbosePrint {
+	/**
+	 * If a node has less than this number of points it will not spawn children. This is intended to avoid over
+	 * fitting. If relative then it will be relative to the total number of points.
+	 */
+	public ConfigLength minimumPointsForChildren = ConfigLength.fixed(0);
+
 	// Stores points for a branch at each level in DFS
 	protected final DogArray<PackedArray<Point>> listPoints;
 	// k-means instance for each level in tree
@@ -48,6 +55,9 @@ public class LearnHierarchicalTree<Point> implements VerbosePrint {
 	protected final DogArray<DogArray_F64> listWeights = new DogArray<>(DogArray_F64::new);
 
 	//---------- Workspace variables
+
+	// Dynamically computed. The actual threshold for adding children nodes based on the number of points
+	protected int pointsRequiredForChildren;
 
 	// Total points in the input list/dataset
 	protected int totalPoints;
@@ -97,6 +107,10 @@ public class LearnHierarchicalTree<Point> implements VerbosePrint {
 		listKMeans.resize(tree.maximumLevel);
 		listWeights.resize(tree.maximumLevel);
 
+		// Computes how many points a node needs to create children. It clearly needs at least 1.
+		// The user can configure it to require more
+		pointsRequiredForChildren = Math.max(1, minimumPointsForChildren.computeI(points.size()));
+
 		// Construct the tree
 		processLevel(points, tree, 0, 0);
 	}
@@ -112,8 +126,8 @@ public class LearnHierarchicalTree<Point> implements VerbosePrint {
 	private void processLevel( PackedArray<Point> pointsInParent,
 							   HierarchicalVocabularyTree<Point> tree,
 							   int level, int parentNodeIdx ) {
-		// Stop here if we are at the maximum number of levels or it's already down to a single point
-		if (level >= tree.maximumLevel || pointsInParent.size() <= 1)
+		// Stop here if we are at the maximum number of levels or there are too few points
+		if (level >= tree.maximumLevel || pointsInParent.size() < pointsRequiredForChildren)
 			return;
 
 		// Get k-means for this level

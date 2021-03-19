@@ -110,10 +110,10 @@ class TestLearnHierarchicalTree extends BoofStandardJUnit {
 		assertEquals(121, tree.nodes.size);
 		assertEquals(120, tree.descriptions.size());
 
-		assertEquals( (int)Math.pow(tree.branchFactor, tree.maximumLevel), countLeaves(tree));
+		assertEquals((int)Math.pow(tree.branchFactor, tree.maximumLevel), countLeaves(tree));
 	}
 
-	private static int countLeaves(HierarchicalVocabularyTree<?> tree) {
+	private static int countLeaves( HierarchicalVocabularyTree<?> tree ) {
 		int total = 0;
 		for (int i = 0; i < tree.nodes.size; i++) {
 			HierarchicalVocabularyTree.Node n = tree.nodes.get(i);
@@ -121,6 +121,38 @@ class TestLearnHierarchicalTree extends BoofStandardJUnit {
 				total++;
 		}
 		return total;
+	}
+
+	/**
+	 * Makes sure this parameter is obeyed
+	 */
+	@Test void minimumPointsForChildren() {
+		// Random points
+		var points = new Packed2D();
+		for (int i = 0; i < 100; i++) {
+			points.list.add(new Point2D_F64(rand.nextGaussian()*2, rand.nextGaussian()*2));
+		}
+
+		// Create a structure that could go much deeper
+		HierarchicalVocabularyTree<Point2D_F64> tree = createTree();
+		tree.branchFactor = 4;
+		tree.maximumLevel = 5;
+
+		LearnHierarchicalTree<Point2D_F64> alg = createAlg();
+		// 100/4 = 25.  25/4 = 6.25,  This it should not get past the first level
+		alg.minimumPointsForChildren.setFixed(20);
+		alg.process(points, tree);
+
+		// level=1 will have children and non after that
+		assertTrue(tree.nodes.size <= 1 + 4 + 4*4);
+		for (int i = 0; i < tree.nodes.size; i++) {
+			assertTrue(2 >= tree.depthOfNode(tree.nodes.get(i)));
+		}
+
+		// sanity check
+		alg.minimumPointsForChildren.setFixed(0);
+		alg.process(points, tree);
+		assertTrue(tree.nodes.size > 1 + 4 + 4*4);
 	}
 
 	/**
@@ -152,8 +184,8 @@ class TestLearnHierarchicalTree extends BoofStandardJUnit {
 	private void sanityCheckNodes( HierarchicalVocabularyTree<Point2D_F64> tree ) {
 		for (int i = 0; i < tree.nodes.size; i++) {
 			HierarchicalVocabularyTree.Node n = tree.nodes.get(i);
-			assertEquals(i,n.index);
-			if (i>0) {
+			assertEquals(i, n.index);
+			if (i > 0) {
 				assertTrue(n.parent != -1);
 				assertTrue(n.descIdx != -1);
 			}
@@ -161,7 +193,7 @@ class TestLearnHierarchicalTree extends BoofStandardJUnit {
 
 			if (!n.isLeaf()) {
 				// if it's not a leaf, there should be more than one child
-				assertTrue(n.childrenIndexes.size>1, "node="+i+" children.size="+n.childrenIndexes.size);
+				assertTrue(n.childrenIndexes.size > 1, "node=" + i + " children.size=" + n.childrenIndexes.size);
 			}
 		}
 	}
