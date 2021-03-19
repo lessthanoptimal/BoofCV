@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -28,7 +28,7 @@ import java.lang.reflect.Method;
 
 class TestImplBinaryImageOps_MT extends CompareIdenticalFunctions {
 
-	int width = 640,height=480;
+	int width = 640, height = 480;
 
 	protected TestImplBinaryImageOps_MT() {
 		super(ImplBinaryImageOps_MT.class, ImplBinaryImageOps.class);
@@ -40,30 +40,29 @@ class TestImplBinaryImageOps_MT extends CompareIdenticalFunctions {
 	}
 
 	@Override
-	protected Object[][] createInputParam(Method candidate, Method validation) {
+	protected Object[][] createInputParam( Method candidate, Method validation ) {
 		Class[] inputTypes = candidate.getParameterTypes();
 
+		GrayU8 inputA = new GrayU8(width, height);
+		GrayU8 inputB = new GrayU8(width, height);
+		GrayU8 output = new GrayU8(width, height);
 
-		GrayU8 inputA = new GrayU8(width,height);
-		GrayU8 inputB = new GrayU8(width,height);
-		GrayU8 output = new GrayU8(width,height);
+		GImageMiscOps.fillUniform(inputA, rand, 0, 1);
+		GImageMiscOps.fillUniform(inputB, rand, 0, 1);
+		GImageMiscOps.fillUniform(output, rand, 0, 1);
 
-		GImageMiscOps.fillUniform(inputA,rand,0,1);
-		GImageMiscOps.fillUniform(inputB,rand,0,1);
-		GImageMiscOps.fillUniform(output,rand,0,1);
-
-		switch( candidate.getName() ) {
+		switch (candidate.getName()) {
 			case "logicAnd":
 			case "logicOr":
 			case "logicXor":
-				return new Object[][]{{inputA,inputB,output}};
+				return new Object[][]{{inputA, inputB, output}};
 
 			case "invert":
-				return new Object[][]{{inputA,output}};
+				return new Object[][]{{inputA, output}};
 
 			case "relabel": {
-				GrayS32 labeled = new GrayS32(width,height);
-				GImageMiscOps.fillUniform(labeled,rand,0,32);
+				GrayS32 labeled = new GrayS32(width, height);
+				GImageMiscOps.fillUniform(labeled, rand, 0, 32);
 				int[] table = new int[33];
 				for (int i = 0; i < table.length; i++) {
 					table[i] = rand.nextInt(table.length);
@@ -73,8 +72,8 @@ class TestImplBinaryImageOps_MT extends CompareIdenticalFunctions {
 			}
 
 			case "labelToBinary": {
-				GrayS32 labeled = new GrayS32(width,height);
-				GImageMiscOps.fillUniform(labeled,rand,0,32);
+				GrayS32 labeled = new GrayS32(width, height);
+				GImageMiscOps.fillUniform(labeled, rand, 0, 32);
 				boolean[] selected = new boolean[33];
 				for (int i = 0; i < selected.length; i++) {
 					selected[i] = rand.nextBoolean();
@@ -88,7 +87,7 @@ class TestImplBinaryImageOps_MT extends CompareIdenticalFunctions {
 			}
 
 			default:
-				throw new RuntimeException("Unknown function "+candidate.getName());
+				throw new RuntimeException("Unknown function " + candidate.getName());
 		}
 	}
 }

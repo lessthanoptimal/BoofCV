@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -35,16 +35,14 @@ import boofcv.struct.image.GrayU8;
  * @see boofcv.alg.filter.binary.BinaryImageOps
  */
 public class ImplBinaryInnerOps {
-
-	public static void erode4(GrayU8 input, GrayU8 output) {
-
+	public static void erode4( GrayU8 input, GrayU8 output ) {
 		final int h = input.height - 1;
 		final int w = input.width - 2;
 
 		//CONCURRENT_BELOW BoofConcurrency.loopFor(1, h, y -> {
 		for (int y = 1; y < h; y++) {
-			int indexIn = input.startIndex + y * input.stride + 1;
-			int indexOut = output.startIndex + y * output.stride + 1;
+			int indexIn = input.startIndex + y*input.stride + 1;
+			int indexOut = output.startIndex + y*output.stride + 1;
 
 			final int end = indexIn + w;
 
@@ -59,15 +57,14 @@ public class ImplBinaryInnerOps {
 		//CONCURRENT_ABOVE });
 	}
 
-	public static void dilate4(GrayU8 input, GrayU8 output) {
-
+	public static void dilate4( GrayU8 input, GrayU8 output ) {
 		final int h = input.height - 1;
 		final int w = input.width - 2;
 
 		//CONCURRENT_BELOW BoofConcurrency.loopFor(1, h, y -> {
 		for (int y = 1; y < h; y++) {
-			int indexIn = input.startIndex + y * input.stride + 1;
-			int indexOut = output.startIndex + y * output.stride + 1;
+			int indexIn = input.startIndex + y*input.stride + 1;
+			int indexOut = output.startIndex + y*output.stride + 1;
 
 			final int end = indexIn + w;
 
@@ -83,15 +80,14 @@ public class ImplBinaryInnerOps {
 		//CONCURRENT_ABOVE });
 	}
 
-	public static void edge4(GrayU8 input, GrayU8 output) {
-
+	public static void edge4( GrayU8 input, GrayU8 output ) {
 		final int h = input.height - 1;
 		final int w = input.width - 2;
 
 		//CONCURRENT_BELOW BoofConcurrency.loopFor(1, h, y -> {
 		for (int y = 1; y < h; y++) {
-			int indexIn = input.startIndex + y * input.stride + 1;
-			int indexOut = output.startIndex + y * output.stride + 1;
+			int indexIn = input.startIndex + y*input.stride + 1;
+			int indexOut = output.startIndex + y*output.stride + 1;
 
 			final int end = indexIn + w;
 
@@ -106,15 +102,14 @@ public class ImplBinaryInnerOps {
 		//CONCURRENT_ABOVE });
 	}
 
-	public static void erode8(GrayU8 input, GrayU8 output) {
-
+	public static void erode8( GrayU8 input, GrayU8 output ) {
 		final int h = input.height - 1;
 		final int w = input.width - 2;
 
 		//CONCURRENT_BELOW BoofConcurrency.loopFor(1, h, y -> {
 		for (int y = 1; y < h; y++) {
-			int indexIn = input.startIndex + y * input.stride + 1;
-			int indexOut = output.startIndex + y * output.stride + 1;
+			int indexIn = input.startIndex + y*input.stride + 1;
+			int indexOut = output.startIndex + y*output.stride + 1;
 
 			final int end = indexIn + w;
 
@@ -130,15 +125,14 @@ public class ImplBinaryInnerOps {
 		//CONCURRENT_ABOVE });
 	}
 
-	public static void dilate8(GrayU8 input, GrayU8 output) {
-
+	public static void dilate8( GrayU8 input, GrayU8 output ) {
 		final int h = input.height - 1;
 		final int w = input.width - 2;
 
 		//CONCURRENT_BELOW BoofConcurrency.loopFor(1, h, y -> {
 		for (int y = 1; y < h; y++) {
-			int indexIn = input.startIndex + y * input.stride + 1;
-			int indexOut = output.startIndex + y * output.stride + 1;
+			int indexIn = input.startIndex + y*input.stride + 1;
+			int indexOut = output.startIndex + y*output.stride + 1;
 
 			final int end = indexIn + w;
 
@@ -154,15 +148,14 @@ public class ImplBinaryInnerOps {
 		//CONCURRENT_ABOVE });
 	}
 
-	public static void edge8(GrayU8 input, GrayU8 output) {
-
+	public static void edge8( GrayU8 input, GrayU8 output ) {
 		final int h = input.height - 1;
 		final int w = input.width - 2;
 
 		//CONCURRENT_BELOW BoofConcurrency.loopFor(1, h, y -> {
 		for (int y = 1; y < h; y++) {
-			int indexIn = input.startIndex + y * input.stride + 1;
-			int indexOut = output.startIndex + y * output.stride + 1;
+			int indexIn = input.startIndex + y*input.stride + 1;
+			int indexOut = output.startIndex + y*output.stride + 1;
 
 			final int end = indexIn + w;
 
@@ -178,15 +171,14 @@ public class ImplBinaryInnerOps {
 		//CONCURRENT_ABOVE });
 	}
 
-	public static void removePointNoise(GrayU8 input, GrayU8 output) {
-
+	public static void removePointNoise( GrayU8 input, GrayU8 output ) {
 		final int h = input.height - 1;
 		final int w = input.width - 2;
 
 		//CONCURRENT_BELOW BoofConcurrency.loopFor(1, h, y -> {
 		for (int y = 1; y < h; y++) {
-			int indexIn = input.startIndex + y * input.stride + 1;
-			int indexOut = output.startIndex + y * output.stride + 1;
+			int indexIn = input.startIndex + y*input.stride + 1;
+			int indexOut = output.startIndex + y*output.stride + 1;
 
 			final int end = indexIn + w;
 

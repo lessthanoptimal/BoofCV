@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -35,14 +35,14 @@ public class CompareToBinaryNaive extends CompareIdenticalFunctions {
 
 	boolean hasNumTimes;
 
-	public CompareToBinaryNaive( boolean hasNumTimes , Class<?> testClass) {
+	public CompareToBinaryNaive( boolean hasNumTimes, Class<?> testClass ) {
 		super(testClass, ImplBinaryNaiveOps.class);
 		this.hasNumTimes = hasNumTimes;
 	}
 
 	@Override
-	protected Object[] reformatForValidation(Method m, Object[] targetParam) {
-		if( targetParam.length == 3 && !m.getName().startsWith("edge")) {
+	protected Object[] reformatForValidation( Method m, Object[] targetParam ) {
+		if (targetParam.length == 3 && !m.getName().startsWith("edge")) {
 			Object[] ret = new Object[2];
 			ret[0] = targetParam[0];
 			ret[1] = targetParam[2];
@@ -52,30 +52,30 @@ public class CompareToBinaryNaive extends CompareIdenticalFunctions {
 	}
 
 	@Override
-	protected boolean isEquivalent(Method candidate, Method evaluation) {
-		if(isSpecialFunction(candidate)) {
-			if( evaluation.getName().compareTo(candidate.getName()) != 0 )
+	protected boolean isEquivalent( Method candidate, Method evaluation ) {
+		if (isSpecialFunction(candidate)) {
+			if (evaluation.getName().compareTo(candidate.getName()) != 0)
 				return false;
 
 			return candidate.getParameterTypes().length == 2;
 		} else {
-			return super.isEquivalent(candidate,evaluation);
+			return super.isEquivalent(candidate, evaluation);
 		}
 	}
 
 	@Override
-	protected Object[][] createInputParam(Method candidate, Method validation) {
+	protected Object[][] createInputParam( Method candidate, Method validation ) {
 
 		GrayU8 input = new GrayU8(width, height);
 		GrayU8 output = new GrayU8(width, height);
 
 		ImageMiscOps.fillUniform(input, rand, 0, 1);
 
-		if(isSpecialFunction(candidate)) {
-			return new Object[][]{{input,1, output}};
+		if (isSpecialFunction(candidate)) {
+			return new Object[][]{{input, 1, output}};
 		} else {
-			if( candidate.getName().startsWith("edge") && candidate.getParameterTypes().length == 3 ) {
-				return new Object[][]{{input, output, true},{input, output, false}};
+			if (candidate.getName().startsWith("edge") && candidate.getParameterTypes().length == 3) {
+				return new Object[][]{{input, output, true}, {input, output, false}};
 			} else {
 				return new Object[][]{{input, output}};
 			}
@@ -83,19 +83,19 @@ public class CompareToBinaryNaive extends CompareIdenticalFunctions {
 	}
 
 	@Override
-	protected void compareResults(Object targetResult, Object[] targetParam, Object validationResult, Object[] validationParam) {
+	protected void compareResults( Object targetResult, Object[] targetParam, Object validationResult, Object[] validationParam ) {
 
-		if( targetParam.length == 3 &&  !(targetParam[1] instanceof ImageBase) ) {
-			Object []tmp = new Object[2];
+		if (targetParam.length == 3 && !(targetParam[1] instanceof ImageBase)) {
+			Object[] tmp = new Object[2];
 			tmp[0] = targetParam[0];
 			tmp[1] = targetParam[2];
 			targetParam = tmp;
 		}
 
-		super.compareResults(targetResult,targetParam,validationResult,validationParam);
+		super.compareResults(targetResult, targetParam, validationResult, validationParam);
 	}
 
-	private boolean isSpecialFunction(Method candidate) {
+	private boolean isSpecialFunction( Method candidate ) {
 		return hasNumTimes && (candidate.getName().contains("erode") || candidate.getName().contains("dilate"));
 	}
 }

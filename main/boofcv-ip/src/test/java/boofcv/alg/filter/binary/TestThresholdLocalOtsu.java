@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -32,7 +32,7 @@ public class TestThresholdLocalOtsu extends GenericThresholdCommon<GrayU8> {
 	}
 
 	@Override
-	public InputToBinary<GrayU8> createAlg(int requestedBlockWidth, double scale, boolean down) {
-		return new ThresholdLocalOtsu(true,ConfigLength.fixed(requestedBlockWidth), 0, 1.0,down);
+	public InputToBinary<GrayU8> createAlg( int requestedBlockWidth, double scale, boolean down ) {
+		return new ThresholdLocalOtsu(true, ConfigLength.fixed(requestedBlockWidth), 0, 1.0, down);
 	}
 }

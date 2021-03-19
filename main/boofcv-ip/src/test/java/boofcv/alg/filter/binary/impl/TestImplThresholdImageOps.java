@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -39,6 +39,7 @@ import java.lang.reflect.Method;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
+@SuppressWarnings("rawtypes")
 public class TestImplThresholdImageOps extends BoofStandardJUnit {
 	int width = 20;
 	int height = 30;
@@ -49,97 +50,95 @@ public class TestImplThresholdImageOps extends BoofStandardJUnit {
 	void localMean() {
 		int total = 0;
 
-		for( Method m : list ) {
-			if( !m.getName().equals("localMean"))
+		for (Method m : list) {
+			if (!m.getName().equals("localMean"))
 				continue;
 
-			Class param[] = m.getParameterTypes();
+			Class[] param = m.getParameterTypes();
 
 			ImageGray input = GeneralizedImageOps.createSingleBand(param[0], width, height);
-			GrayU8 output = new GrayU8(width,height);
+			GrayU8 output = new GrayU8(width, height);
 
 			GImageMiscOps.fillUniform(input, rand, 0, 200);
 
-			BoofTesting.checkSubImage(this,"performLocalMean",true,m,input,output);
+			BoofTesting.checkSubImage(this, "performLocalMean", true, m, input, output);
 			total++;
 		}
 
 		assertEquals(3, total);
 	}
 
-	public void performLocalMean(Method m , ImageGray input , GrayU8 output )
-			throws InvocationTargetException, IllegalAccessException
-	{
+	public void performLocalMean( Method m, ImageGray input, GrayU8 output )
+			throws InvocationTargetException, IllegalAccessException {
 		ImageGray storage1 = (ImageGray)input.createSameShape();
 		ImageGray storage2 = (ImageGray)input.createSameShape();
 
-		GrayU8 expected = new GrayU8(output.width,output.height);
+		GrayU8 expected = new GrayU8(output.width, output.height);
 
-		for( int radius = 1; radius <= 5; radius++ ) {
-			ConfigLength width = ConfigLength.fixed(radius*2+1);
+		for (int radius = 1; radius <= 5; radius++) {
+			ConfigLength width = ConfigLength.fixed(radius*2 + 1);
 
-			for( int indexScale = 0; indexScale < 4; indexScale++ ) {
-				float scale = (float)(0.8+0.4*(indexScale/3.0));
-				ImageMiscOps.fillUniform(output,rand,0,200);
-				ImageMiscOps.fillUniform(expected,rand,0,200);
-				m.invoke(null,input,output,width,scale,true,storage1,storage2,null);
+			for (int indexScale = 0; indexScale < 4; indexScale++) {
+				float scale = (float)(0.8 + 0.4*(indexScale/3.0));
+				ImageMiscOps.fillUniform(output, rand, 0, 200);
+				ImageMiscOps.fillUniform(expected, rand, 0, 200);
+				m.invoke(null, input, output, width, scale, true, storage1, storage2, null);
 				naiveLocalMean(input, expected, radius, scale, true);
 
-				BoofTesting.assertEquals(expected,output,0);
+				BoofTesting.assertEquals(expected, output, 0);
 
-				ImageMiscOps.fillUniform(output,rand,0,200);
-				ImageMiscOps.fillUniform(expected,rand,0,200);
-				m.invoke(null,input,output,width,scale,false,storage1,storage2,null);
+				ImageMiscOps.fillUniform(output, rand, 0, 200);
+				ImageMiscOps.fillUniform(expected, rand, 0, 200);
+				m.invoke(null, input, output, width, scale, false, storage1, storage2, null);
 				naiveLocalMean(input, expected, radius, scale, false);
 
-				BoofTesting.assertEquals(expected,output,0);
+				BoofTesting.assertEquals(expected, output, 0);
 			}
 		}
 	}
 
-	void naiveLocalMean(ImageGray input, GrayU8 output,
-						int radius, double scale, boolean down) {
-
+	void naiveLocalMean( ImageGray input, GrayU8 output,
+						 int radius, double scale, boolean down ) {
 		ImageGray blur;
 		boolean isInt;
-		if( input instanceof GrayU8) {
+		if (input instanceof GrayU8) {
 			isInt = true;
-			blur = BlurImageOps.mean((GrayU8) input, null, radius, null, null);
-		} else if( input instanceof GrayU16) {
+			blur = BlurImageOps.mean((GrayU8)input, null, radius, null, null);
+		} else if (input instanceof GrayU16) {
 			isInt = true;
-			blur = BlurImageOps.mean((GrayU16)input,null,radius,null, null);
+			blur = BlurImageOps.mean((GrayU16)input, null, radius, null, null);
 		} else {
 			isInt = false;
-			blur = BlurImageOps.mean((GrayF32)input,null,radius,null,null);
+			blur = BlurImageOps.mean((GrayF32)input, null, radius, null, null);
 		}
 
 		float fscale = (float)scale;
 
-		for( int y = 0; y < input.height; y++ ) {
-			for( int x = 0; x < input.width; x++ ) {
+		for (int y = 0; y < input.height; y++) {
+			for (int x = 0; x < input.width; x++) {
 
-				double threshold = GeneralizedImageOps.get(blur,x,y);
-				double v = GeneralizedImageOps.get(input,x,y);
+				double threshold = GeneralizedImageOps.get(blur, x, y);
+				double v = GeneralizedImageOps.get(input, x, y);
 
 				boolean one;
-				if( down ) {
-					if( isInt ) {
+				if (down) {
+					if (isInt) {
 						one = (int)v <= ((int)threshold)*fscale;
 					} else {
 						one = v <= threshold*fscale;
 					}
 				} else {
-					if( isInt ) {
+					if (isInt) {
 						one = ((int)v)*fscale > (int)threshold;
 					} else {
 						one = v*fscale > threshold;
 					}
 				}
 
-				if( one ) {
-					output.set(x,y,1);
+				if (one) {
+					output.set(x, y, 1);
 				} else {
-					output.set(x,y,0);
+					output.set(x, y, 0);
 				}
 			}
 		}
@@ -149,98 +148,96 @@ public class TestImplThresholdImageOps extends BoofStandardJUnit {
 	void localGaussian() {
 		int total = 0;
 
-		for( Method m : list ) {
-			if( !m.getName().equals("localGaussian"))
+		for (Method m : list) {
+			if (!m.getName().equals("localGaussian"))
 				continue;
 
-			Class param[] = m.getParameterTypes();
+			Class[] param = m.getParameterTypes();
 
 			ImageGray input = GeneralizedImageOps.createSingleBand(param[0], width, height);
-			GrayU8 output = new GrayU8(width,height);
+			GrayU8 output = new GrayU8(width, height);
 
 			GImageMiscOps.fillUniform(input, rand, 0, 200);
 
-			BoofTesting.checkSubImage(this,"performLocalGaussian",true,m,input,output);
+			BoofTesting.checkSubImage(this, "performLocalGaussian", true, m, input, output);
 			total++;
 		}
 
 		assertEquals(3, total);
 	}
 
-	public void performLocalGaussian(Method m , ImageGray input , GrayU8 output )
-			throws InvocationTargetException, IllegalAccessException
-	{
+	public void performLocalGaussian( Method m, ImageGray input, GrayU8 output )
+			throws InvocationTargetException, IllegalAccessException {
 		ImageGray storage1 = (ImageGray)input.createSameShape();
 		ImageGray storage2 = (ImageGray)input.createSameShape();
 
-		GrayU8 expected = new GrayU8(output.width,output.height);
+		GrayU8 expected = new GrayU8(output.width, output.height);
 
-		for( int radius = 1; radius <= 5; radius++ ) {
-			for( int indexScale = 0; indexScale < 4; indexScale++ ) {
-				ConfigLength width = ConfigLength.fixed(radius*2+1);
-				float scale = (float)(0.8+0.4*(indexScale/3.0));
-
-				ImageMiscOps.fillUniform(output,rand,0,200);
-				ImageMiscOps.fillUniform(expected,rand,0,200);
-				m.invoke(null,input,output,width,scale,true,storage1,storage2);
-				naiveLocalGaussian(input, expected, radius, scale, true);
-
-				BoofTesting.assertEquals(expected,output,0);
+		for (int radius = 1; radius <= 5; radius++) {
+			for (int indexScale = 0; indexScale < 4; indexScale++) {
+				ConfigLength width = ConfigLength.fixed(radius*2 + 1);
+				float scale = (float)(0.8 + 0.4*(indexScale/3.0));
 
 				ImageMiscOps.fillUniform(output, rand, 0, 200);
-				ImageMiscOps.fillUniform(expected,rand,0,200);
+				ImageMiscOps.fillUniform(expected, rand, 0, 200);
+				m.invoke(null, input, output, width, scale, true, storage1, storage2);
+				naiveLocalGaussian(input, expected, radius, scale, true);
+
+				BoofTesting.assertEquals(expected, output, 0);
+
+				ImageMiscOps.fillUniform(output, rand, 0, 200);
+				ImageMiscOps.fillUniform(expected, rand, 0, 200);
 				m.invoke(null, input, output, width, scale, false, storage1, storage2);
 				naiveLocalGaussian(input, expected, radius, scale, false);
 
-				BoofTesting.assertEquals(expected,output,0);
+				BoofTesting.assertEquals(expected, output, 0);
 			}
 		}
 	}
 
-	void naiveLocalGaussian(ImageGray input , GrayU8 output ,
-								   int radius , double scale , boolean down ) {
+	void naiveLocalGaussian( ImageGray input, GrayU8 output,
+							 int radius, double scale, boolean down ) {
 
 		ImageGray blur;
 		boolean isInt;
-		if( input instanceof GrayU8) {
+		if (input instanceof GrayU8) {
 			isInt = true;
-			blur = BlurImageOps.gaussian((GrayU8) input, null, -1, radius, null);
-		} else if( input instanceof GrayU16) {
+			blur = BlurImageOps.gaussian((GrayU8)input, null, -1, radius, null);
+		} else if (input instanceof GrayU16) {
 			isInt = true;
-			blur = BlurImageOps.gaussian((GrayU16) input, null, -1, radius, null);
+			blur = BlurImageOps.gaussian((GrayU16)input, null, -1, radius, null);
 		} else {
 			isInt = false;
-			blur = BlurImageOps.gaussian((GrayF32) input, null, -1, radius, null);
+			blur = BlurImageOps.gaussian((GrayF32)input, null, -1, radius, null);
 		}
 
 		float fscale = (float)scale;
 
-		for( int y = 0; y < input.height; y++ ) {
-			for( int x = 0; x < input.width; x++ ) {
-				double threshold = GeneralizedImageOps.get(blur,x,y);
-				double v = GeneralizedImageOps.get(input,x,y);
+		for (int y = 0; y < input.height; y++) {
+			for (int x = 0; x < input.width; x++) {
+				double threshold = GeneralizedImageOps.get(blur, x, y);
+				double v = GeneralizedImageOps.get(input, x, y);
 
 				boolean one;
-				if( down ) {
-					if( isInt ) {
+				if (down) {
+					if (isInt) {
 						one = (int)v <= ((int)threshold)*fscale;
 					} else {
 						one = v <= threshold*fscale;
 					}
 				} else {
-					if( isInt ) {
+					if (isInt) {
 						one = ((int)v)*fscale > (int)threshold;
 					} else {
 						one = v*fscale > threshold;
 					}
 				}
 
-				if( one ) {
-					output.set(x,y,1);
+				if (one) {
+					output.set(x, y, 1);
 				} else {
-					output.set(x,y,0);
+					output.set(x, y, 0);
 				}
-
 			}
 		}
 	}
@@ -250,40 +247,39 @@ public class TestImplThresholdImageOps extends BoofStandardJUnit {
 
 		int total = 0;
 
-		for( Method m : list ) {
-			if( !m.getName().equals("threshold"))
+		for (Method m : list) {
+			if (!m.getName().equals("threshold"))
 				continue;
 
-			Class param[] = m.getParameterTypes();
+			Class[] param = m.getParameterTypes();
 
 			ImageGray input = GeneralizedImageOps.createSingleBand(param[0], width, height);
-			GrayU8 output = new GrayU8(width,height);
+			GrayU8 output = new GrayU8(width, height);
 
 			GImageGray a = FactoryGImageGray.wrap(input);
-			for( int y = 0; y < input.height; y++ ) {
-				for( int x = 0; x < input.width; x++ ) {
-					a.set(x,y,x);
+			for (int y = 0; y < input.height; y++) {
+				for (int x = 0; x < input.width; x++) {
+					a.set(x, y, x);
 				}
 			}
 
-			BoofTesting.checkSubImage(this,"performThreshold",true,m,input,output);
+			BoofTesting.checkSubImage(this, "performThreshold", true, m, input, output);
 			total++;
 		}
 
-		assertEquals(6,total);
+		assertEquals(6, total);
 	}
 
-	public void performThreshold(Method m , ImageGray input , GrayU8 output )
-			throws InvocationTargetException, IllegalAccessException
-	{
+	public void performThreshold( Method m, ImageGray input, GrayU8 output )
+			throws InvocationTargetException, IllegalAccessException {
 		int areaBelow = 8*input.height;
 		int areaAbove = input.width*input.height - areaBelow;
 
 
-		m.invoke(null,input,output,7,true);
-		assertEquals(areaBelow, GImageStatistics.sum(output),1e-4);
+		m.invoke(null, input, output, 7, true);
+		assertEquals(areaBelow, GImageStatistics.sum(output), 1e-4);
 
-		m.invoke(null,input,output,7,false);
-		assertEquals(areaAbove, GImageStatistics.sum(output),1e-4);
+		m.invoke(null, input, output, 7, false);
+		assertEquals(areaAbove, GImageStatistics.sum(output), 1e-4);
 	}
 }

@@ -33,7 +33,7 @@ public class ContourTracerBase {
 	protected GrayU8 binary;
 
 	// coordinate of pixel being examined (x,y)
-	protected int x,y;
+	protected int x, y;
 	// label of the object being traced
 	protected int label;
 	// direction it moved in
@@ -54,57 +54,55 @@ public class ContourTracerBase {
 	public ContourTracerBase( ConnectRule rule ) {
 		this.rule = rule;
 
-		if( ConnectRule.EIGHT == rule ) {
+		if (ConnectRule.EIGHT == rule) {
 			// start the next search +2 away from the square it came from
 			// the square it came from is the opposite from the previous 'dir'
 			nextDirection = new int[8];
-			for( int i = 0; i < 8; i++ )
-				nextDirection[i] = ((i+4)%8 + 2)%8;
+			for (int i = 0; i < 8; i++)
+				nextDirection[i] = ((i + 4)%8 + 2)%8;
 			ruleN = 8;
-		} else if( ConnectRule.FOUR == rule ) {
+		} else if (ConnectRule.FOUR == rule) {
 			nextDirection = new int[4];
-			for( int i = 0; i < 4; i++ )
-				nextDirection[i] = ((i+2)%4 + 1)%4;
+			for (int i = 0; i < 4; i++)
+				nextDirection[i] = ((i + 2)%4 + 1)%4;
 			ruleN = 4;
 		} else {
-			throw new IllegalArgumentException("Connectivity rule must be 4 or 8 not "+rule);
+			throw new IllegalArgumentException("Connectivity rule must be 4 or 8 not " + rule);
 		}
 
 		offsetsBinary = new int[ruleN];
 	}
 
 	/**
-	 *
 	 * @param binary Binary image with a border of zeros added to the outside.
 	 */
-	public void setInputs(GrayU8 binary ) {
+	public void setInputs( GrayU8 binary ) {
 		this.binary = binary;
 
-		if( rule == ConnectRule.EIGHT ) {
-			setOffsets8(offsetsBinary,binary.stride);
+		if (rule == ConnectRule.EIGHT) {
+			setOffsets8(offsetsBinary, binary.stride);
 		} else {
-			setOffsets4(offsetsBinary,binary.stride);
+			setOffsets4(offsetsBinary, binary.stride);
 		}
 	}
 
 	private void setOffsets8( int[] offsets, int stride ) {
 		int s = stride;
-		offsets[0] =  1;   // x =  1 y =  0
-		offsets[1] =  1+s; // x =  1 y =  1
-		offsets[2] =    s; // x =  0 y =  1
-		offsets[3] = -1+s; // x = -1 y =  1
-		offsets[4] = -1  ; // x = -1 y =  0
-		offsets[5] = -1-s; // x = -1 y = -1
-		offsets[6] =   -s; // x =  0 y = -1
-		offsets[7] =  1-s; // x =  1 y = -1
+		offsets[0] = 1;   // x =  1 y =  0
+		offsets[1] = 1 + s; // x =  1 y =  1
+		offsets[2] = s; // x =  0 y =  1
+		offsets[3] = -1 + s; // x = -1 y =  1
+		offsets[4] = -1; // x = -1 y =  0
+		offsets[5] = -1 - s; // x = -1 y = -1
+		offsets[6] = -s; // x =  0 y = -1
+		offsets[7] = 1 - s; // x =  1 y = -1
 	}
 
 	private void setOffsets4( int[] offsets, int stride ) {
 		int s = stride;
-		offsets[0] =  1;   // x =  1 y =  0
-		offsets[1] =    s; // x =  0 y =  1
+		offsets[0] = 1;   // x =  1 y =  0
+		offsets[1] = s; // x =  0 y =  1
 		offsets[2] = -1;   // x = -1 y =  0
-		offsets[3] =   -s; // x =  0 y = -1
+		offsets[3] = -s; // x =  0 y = -1
 	}
-
 }

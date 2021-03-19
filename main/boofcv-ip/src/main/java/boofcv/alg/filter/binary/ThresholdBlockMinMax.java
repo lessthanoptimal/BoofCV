@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -49,10 +49,9 @@ import boofcv.struct.image.ImageInterleaved;
  *
  * @author Peter Abeles
  */
-public abstract class ThresholdBlockMinMax <T extends ImageGray<T>, I extends ImageInterleaved<I>>
-		implements ThresholdBlock.BlockProcessor<T,I>
-{
-	protected int blockWidth,blockHeight;
+public abstract class ThresholdBlockMinMax<T extends ImageGray<T>, I extends ImageInterleaved<I>>
+		implements ThresholdBlock.BlockProcessor<T, I> {
+	protected int blockWidth, blockHeight;
 	protected boolean thresholdFromLocalBlocks;
 	// if the min and max value's difference is <= to this value then it is considered
 	// to be textureless and a default value is used
@@ -62,16 +61,17 @@ public abstract class ThresholdBlockMinMax <T extends ImageGray<T>, I extends Im
 
 	/**
 	 * Configures the detector
+	 *
 	 * @param minimumSpread If the difference between min max is less than or equal to this
-	 *                         value then it is considered textureless.  Set to &le; -1 to disable.
+	 * value then it is considered textureless.  Set to &le; -1 to disable.
 	 */
-	protected ThresholdBlockMinMax(double minimumSpread , boolean down ) {
+	protected ThresholdBlockMinMax( double minimumSpread, boolean down ) {
 		this.minimumSpread = minimumSpread;
 		this.down = down;
 	}
 
 	@Override
-	public void init(int blockWidth, int blockHeight, boolean thresholdFromLocalBlocks) {
+	public void init( int blockWidth, int blockHeight, boolean thresholdFromLocalBlocks ) {
 		this.blockWidth = blockWidth;
 		this.blockHeight = blockHeight;
 		this.thresholdFromLocalBlocks = thresholdFromLocalBlocks;

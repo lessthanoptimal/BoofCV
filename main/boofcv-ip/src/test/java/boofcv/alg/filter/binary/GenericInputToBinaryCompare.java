@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -32,7 +32,7 @@ import org.junit.jupiter.api.Test;
  *
  * @author Peter Abeles
  */
-public abstract class GenericInputToBinaryCompare<T extends ImageGray<T>>  extends BoofStandardJUnit {
+public abstract class GenericInputToBinaryCompare<T extends ImageGray<T>> extends BoofStandardJUnit {
 
 	protected int width = 100, height = 110;
 
@@ -41,23 +41,22 @@ public abstract class GenericInputToBinaryCompare<T extends ImageGray<T>>  exten
 	// algorithm which it is being tested against
 	InputToBinary<T> validation;
 
-	public void initialize(InputToBinary<T> test , InputToBinary<T> validation ) {
+	public void initialize( InputToBinary<T> test, InputToBinary<T> validation ) {
 		this.test = test;
 		this.validation = validation;
 	}
 
-	@Test
-	public void compare() {
-		T input = (T)GeneralizedImageOps.createSingleBand(test.getInputType().getImageClass(),width,height);
+	@Test void compare() {
+		T input = (T)GeneralizedImageOps.createSingleBand(test.getInputType().getImageClass(), width, height);
 
-		GImageMiscOps.fillUniform(input,rand,0,100);
+		GImageMiscOps.fillUniform(input, rand, 0, 100);
 
-		GrayU8 expected = new GrayU8(width,height);
-		GrayU8 found = new GrayU8(width,height);
+		GrayU8 expected = new GrayU8(width, height);
+		GrayU8 found = new GrayU8(width, height);
 
-		validation.process(input,expected);
-		test.process(input,found);
+		validation.process(input, expected);
+		test.process(input, found);
 
-		BoofTesting.assertEquals(expected,found,0);
+		BoofTesting.assertEquals(expected, found, 0);
 	}
 }

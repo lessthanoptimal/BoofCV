@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -30,7 +30,7 @@ public class TestThresholdBlockOtsu extends GenericThresholdBlock<GrayU8> {
 	}
 
 	@Override
-	public ThresholdBlock.BlockProcessor<GrayU8, ?> createBlockProcessor(double scale, boolean down) {
-		return new ThresholdBlockOtsu(true,0.0,scale, down);
+	public ThresholdBlock.BlockProcessor<GrayU8, ?> createBlockProcessor( double scale, boolean down ) {
+		return new ThresholdBlockOtsu(true, 0.0, scale, down);
 	}
 }

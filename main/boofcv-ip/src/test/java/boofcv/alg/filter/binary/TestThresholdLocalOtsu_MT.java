@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -27,9 +27,8 @@ import boofcv.struct.image.GrayU8;
 class TestThresholdLocalOtsu_MT extends GenericInputToBinaryCompare<GrayU8> {
 
 	TestThresholdLocalOtsu_MT() {
-		ThresholdLocalOtsu_MT target = new ThresholdLocalOtsu_MT(true,ConfigLength.fixed(12), 0, 1.0,true);
-		ThresholdLocalOtsu reference = new ThresholdLocalOtsu(true,ConfigLength.fixed(12), 0, 1.0,true);
-
-		initialize(target,reference);
+		ThresholdLocalOtsu_MT target = new ThresholdLocalOtsu_MT(true, ConfigLength.fixed(12), 0, 1.0, true);
+		ThresholdLocalOtsu reference = new ThresholdLocalOtsu(true, ConfigLength.fixed(12), 0, 1.0, true);
+		initialize(target, reference);
 	}
 }

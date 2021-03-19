@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -25,26 +25,22 @@ import org.junit.jupiter.api.Test;
 
 import java.lang.reflect.Method;
 
-class TestImplBinaryInnerOps_MT extends CompareIdenticalFunctions
-{
-	int width = 640,height=480;
+class TestImplBinaryInnerOps_MT extends CompareIdenticalFunctions {
+	int width = 640, height = 480;
 
 	protected TestImplBinaryInnerOps_MT() {
 		super(ImplBinaryInnerOps_MT.class, ImplBinaryInnerOps.class);
 	}
 
-	@Test
-	void performTests() {
-		super.performTests(7);
-	}
+	@Test void performTests() {super.performTests(7);}
 
 	@Override
-	protected Object[][] createInputParam(Method candidate, Method validation) {
-		GrayU8 input = new GrayU8(width,height);
-		GrayU8 output = new GrayU8(width,height);
+	protected Object[][] createInputParam( Method candidate, Method validation ) {
+		GrayU8 input = new GrayU8(width, height);
+		GrayU8 output = new GrayU8(width, height);
 
-		GImageMiscOps.fillUniform(input,rand,0,1);
-		GImageMiscOps.fillUniform(output,rand,0,1);
+		GImageMiscOps.fillUniform(input, rand, 0, 1);
+		GImageMiscOps.fillUniform(output, rand, 0, 1);
 
 		return new Object[][]{{input, output}};
 	}

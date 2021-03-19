@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -28,22 +28,20 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
  * @author Peter Abeles
  */
 public class TestBinaryInnerOps extends BoofStandardJUnit {
-	@Test
-	public void test() {
-		CompreToBinaryNaiveInner tests = new CompreToBinaryNaiveInner(ImplBinaryInnerOps.class);
+	@Test void test() {
+		CompareToBinaryNaiveInner tests = new CompareToBinaryNaiveInner(ImplBinaryInnerOps.class);
 		tests.performTests(7);
 	}
 
-	private static class CompreToBinaryNaiveInner extends CompareToBinaryNaive {
-
-		public CompreToBinaryNaiveInner(Class<?> testClass) {
-			super(false,testClass);
+	private static class CompareToBinaryNaiveInner extends CompareToBinaryNaive {
+		public CompareToBinaryNaiveInner( Class<?> testClass ) {
+			super(false, testClass);
 		}
 
 		@Override
-		protected void compareResults(Object targetResult, Object[] targetParam, Object validationResult, Object[] validationParam) {
-			GrayU8 t = (GrayU8) targetParam[1];
-			GrayU8 v = (GrayU8) validationParam[1];
+		protected void compareResults( Object targetResult, Object[] targetParam, Object validationResult, Object[] validationParam ) {
+			GrayU8 t = (GrayU8)targetParam[1];
+			GrayU8 v = (GrayU8)validationParam[1];
 
 			for (int y = 1; y < t.height - 1; y++) {
 				for (int x = 1; x < t.width - 1; x++) {

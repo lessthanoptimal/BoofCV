@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -34,18 +34,16 @@ import java.util.Arrays;
  * <p>NOTE: This produces visually different results from {@link ThresholdBlockOtsu} because the block algorithm
  * combines histograms from its neighboring blocks. That's why it appears to have a wider effective block.</p>
  *
- * @see GThresholdImageOps#computeOtsu(ImageGray, double, double)
- *
  * @author Peter Abeles
+ * @see GThresholdImageOps#computeOtsu(ImageGray, double, double)
  */
 public class ThresholdBlockOtsu
-		implements ThresholdBlock.BlockProcessor<GrayU8,InterleavedS32>
-{
-	int histogram[] = new int[256];
+		implements ThresholdBlock.BlockProcessor<GrayU8, InterleavedS32> {
+	int[] histogram = new int[256];
 
 	ComputeOtsu otsu;
 
-	protected int blockWidth,blockHeight;
+	protected int blockWidth, blockHeight;
 	protected boolean thresholdFromLocalBlocks;
 
 	/**
@@ -53,17 +51,17 @@ public class ThresholdBlockOtsu
 	 *
 	 * @param tuning Tuning parameter. 0 = standard Otsu. Greater than 0 will penalize zero texture.
 	 */
-	public ThresholdBlockOtsu(boolean otsu2, double tuning, double scale, boolean down ) {
-		this.otsu = new ComputeOtsu(otsu2,tuning,down,scale);
+	public ThresholdBlockOtsu( boolean otsu2, double tuning, double scale, boolean down ) {
+		this.otsu = new ComputeOtsu(otsu2, tuning, down, scale);
 	}
 
 	@Override
 	public InterleavedS32 createStats() {
-		return new InterleavedS32(1,1,256);
+		return new InterleavedS32(1, 1, 256);
 	}
 
 	@Override
-	public void init(int blockWidth, int blockHeight, boolean thresholdFromLocalBlocks) {
+	public void init( int blockWidth, int blockHeight, boolean thresholdFromLocalBlocks ) {
 //		Arrays.fill(stats.data,0,stats.width*stats.height*256,0);
 		this.blockWidth = blockWidth;
 		this.blockHeight = blockHeight;
@@ -71,31 +69,31 @@ public class ThresholdBlockOtsu
 	}
 
 	@Override
-	public void computeBlockStatistics(int x0, int y0, int width, int height, int indexStats,
-										  GrayU8 input, InterleavedS32 stats ) {
-		Arrays.fill(stats.data,indexStats,indexStats+256,0);
+	public void computeBlockStatistics( int x0, int y0, int width, int height, int indexStats,
+										GrayU8 input, InterleavedS32 stats ) {
+		Arrays.fill(stats.data, indexStats, indexStats + 256, 0);
 		for (int y = 0; y < height; y++) {
-			int indexInput = input.startIndex + (y0+y)*input.stride + x0;
+			int indexInput = input.startIndex + (y0 + y)*input.stride + x0;
 			int end = indexInput + width;
-			while( indexInput < end ) {
-				stats.data[indexStats+(input.data[indexInput++] & 0xFF)]++;
+			while (indexInput < end) {
+				stats.data[indexStats + (input.data[indexInput++] & 0xFF)]++;
 			}
 		}
 	}
 
 	@Override
-	public void thresholdBlock(int blockX0, int blockY0, GrayU8 input, InterleavedS32 stats,
-								  GrayU8 output) {
+	public void thresholdBlock( int blockX0, int blockY0, GrayU8 input, InterleavedS32 stats,
+								GrayU8 output ) {
 
 		int x0 = blockX0*blockWidth;
 		int y0 = blockY0*blockHeight;
 
-		int x1 = blockX0== stats.width-1 ? input.width : (blockX0+1)*blockWidth;
-		int y1 = blockY0== stats.height-1 ? input.height: (blockY0+1)*blockHeight;
+		int x1 = blockX0 == stats.width - 1 ? input.width : (blockX0 + 1)*blockWidth;
+		int y1 = blockY0 == stats.height - 1 ? input.height : (blockY0 + 1)*blockHeight;
 
 		// define the local 3x3 region in blocks, taking in account the image border
 		int blockX1, blockY1;
-		if(thresholdFromLocalBlocks) {
+		if (thresholdFromLocalBlocks) {
 			blockX1 = Math.min(stats.width - 1, blockX0 + 1);
 			blockY1 = Math.min(stats.height - 1, blockY0 + 1);
 
@@ -107,13 +105,13 @@ public class ThresholdBlockOtsu
 		}
 
 		// sum up histogram in local region
-		Arrays.fill(histogram,0,histogram.length,0);
+		Arrays.fill(histogram, 0, histogram.length, 0);
 
 		for (int y = blockY0; y <= blockY1; y++) {
 			for (int x = blockX0; x <= blockX1; x++) {
-				int indexStats = stats.getIndex(x,y,0);
+				int indexStats = stats.getIndex(x, y, 0);
 				for (int i = 0; i < 256; i++) {
-					histogram[i] += stats.data[indexStats+i];
+					histogram[i] += stats.data[indexStats + i];
 				}
 			}
 		}
@@ -125,18 +123,20 @@ public class ThresholdBlockOtsu
 		}
 
 		// compute threshold
-		otsu.compute(histogram,histogram.length,total);
+		otsu.compute(histogram, histogram.length, total);
 
-		final byte a,b;
-		if( otsu.down ) {
-			a = 1; b = 0;
+		final byte a, b;
+		if (otsu.down) {
+			a = 1;
+			b = 0;
 		} else {
-			a = 0; b = 1;
+			a = 0;
+			b = 1;
 		}
 
 		for (int y = y0; y < y1; y++) {
-			int indexInput = input.startIndex + y * input.stride + x0;
-			int indexOutput = output.startIndex + y * output.stride + x0;
+			int indexInput = input.startIndex + y*input.stride + x0;
+			int indexOutput = output.startIndex + y*output.stride + x0;
 			int end = indexOutput + (x1 - x0);
 			for (; indexOutput < end; indexOutput++, indexInput++) {
 				output.data[indexOutput] = (input.data[indexInput] & 0xFF) <= otsu.threshold ? a : b;
@@ -146,6 +146,6 @@ public class ThresholdBlockOtsu
 
 	@Override
 	public ThresholdBlock.BlockProcessor<GrayU8, InterleavedS32> copy() {
-		return new ThresholdBlockOtsu(otsu.isUseOtsu2(),otsu.getTuning(),otsu.getScale(),otsu.down);
+		return new ThresholdBlockOtsu(otsu.isUseOtsu2(), otsu.getTuning(), otsu.getScale(), otsu.down);
 	}
 }

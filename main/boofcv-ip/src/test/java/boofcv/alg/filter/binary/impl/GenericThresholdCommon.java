@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -49,8 +49,7 @@ public abstract class GenericThresholdCommon<T extends ImageGray<T>> extends Boo
 	 * Make sure it's doing something resembling a proper thresholding of a random image. About 1/2 the pixels should
 	 * be true or false. There was a bug where this wasn't happening and wasn't caught
 	 */
-	@Test
-	void sanityCheckThreshold() {
+	@Test void sanityCheckThreshold() {
 		T input = GeneralizedImageOps.createSingleBand(imageType, 100, 120);
 		GImageMiscOps.fillUniform(input, rand, 0, 255);
 
@@ -65,8 +64,7 @@ public abstract class GenericThresholdCommon<T extends ImageGray<T>> extends Boo
 		assertTrue(ImageStatistics.sum(up) > down.data.length/4);
 	}
 
-	@Test
-	void toggleDown() {
+	@Test void toggleDown() {
 		T input = GeneralizedImageOps.createSingleBand(imageType, 100, 120);
 		GImageMiscOps.fillUniform(input, rand, 0, 255);
 
@@ -79,7 +77,7 @@ public abstract class GenericThresholdCommon<T extends ImageGray<T>> extends Boo
 
 		for (int y = 0; y < down.height; y++) {
 			for (int x = 0; x < down.width; x++) {
-				assertTrue((down.get(x, y) == 0) == !(up.get(x, y) == 0), x + " " + y);
+				assertEquals(!(up.get(x, y) == 0), (down.get(x, y) == 0), x + " " + y);
 			}
 		}
 	}
@@ -87,8 +85,7 @@ public abstract class GenericThresholdCommon<T extends ImageGray<T>> extends Boo
 	/**
 	 * Should process the image just fine. If a local region the block/region is adjusted for the image
 	 */
-	@Test
-	void widthLargerThanImage() {
+	@Test void widthLargerThanImage() {
 		T input = GeneralizedImageOps.createSingleBand(imageType, 10, 12);
 		GImageMiscOps.fillUniform(input, rand, 0, 255);
 		GrayU8 output = new GrayU8(10, 12);
@@ -99,8 +96,7 @@ public abstract class GenericThresholdCommon<T extends ImageGray<T>> extends Boo
 		assertTrue(ImageStatistics.sum(output) > output.data.length/4);
 	}
 
-	@Test
-	void subImage() {
+	@Test void subImage() {
 		T input = GeneralizedImageOps.createSingleBand(imageType, 100, 120);
 		GImageMiscOps.fillUniform(input, rand, 0, 255);
 
@@ -117,8 +113,7 @@ public abstract class GenericThresholdCommon<T extends ImageGray<T>> extends Boo
 		BoofTesting.assertEquals(expected, sub_output, 0);
 	}
 
-	@Test
-	void resize_output() {
+	@Test void resize_output() {
 		T input = GeneralizedImageOps.createSingleBand(imageType, 100, 120);
 		GImageMiscOps.fillUniform(input, rand, 0, 255);
 

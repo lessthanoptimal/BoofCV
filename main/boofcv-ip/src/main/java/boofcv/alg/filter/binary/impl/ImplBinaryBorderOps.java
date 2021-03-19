@@ -28,22 +28,22 @@ import boofcv.struct.image.GrayU8;
  * @author Peter Abeles
  */
 public class ImplBinaryBorderOps {
-	public static void erode4(GrayU8 input, GrayU8 output) {
+	public static void erode4( GrayU8 input, GrayU8 output ) {
 
-		ImageBorder_S32 in = ImageBorderValue.wrap(input,0);
-		
+		ImageBorder_S32 in = ImageBorderValue.wrap(input, 0);
+
 		final int h = input.height - 1;
 		final int w = input.width - 1;
 
 		for (int x = 0; x < input.width; x++) {
 			// check top edge
-			if ((in.get( x, 0) + in.get( x - 1, 0) + in.get( x + 1, 0) + in.get( x, 1)) == 4)
+			if ((in.get(x, 0) + in.get(x - 1, 0) + in.get(x + 1, 0) + in.get(x, 1)) == 4)
 				output.unsafe_set(x, 0, 1);
 			else
 				output.unsafe_set(x, 0, 0);
 
 			// check bottom edge
-			if ((in.get( x, h) + in.get( x - 1, h) + in.get( x + 1, h) + in.get( x, h - 1)) == 4)
+			if ((in.get(x, h) + in.get(x - 1, h) + in.get(x + 1, h) + in.get(x, h - 1)) == 4)
 				output.unsafe_set(x, h, 1);
 			else
 				output.unsafe_set(x, h, 0);
@@ -51,35 +51,35 @@ public class ImplBinaryBorderOps {
 
 		for (int y = 0; y < input.height; y++) {
 			// check left edge
-			if ((in.get( 0, y) + in.get( 1, y) + in.get( 0, y - 1) + in.get( 0, y + 1)) == 4)
+			if ((in.get(0, y) + in.get(1, y) + in.get(0, y - 1) + in.get(0, y + 1)) == 4)
 				output.unsafe_set(0, y, 1);
 			else
 				output.unsafe_set(0, y, 0);
 
 			// check right edge
-			if ((in.get( w, y) + in.get( w - 1, y) + in.get( w, y - 1) + in.get( w, y + 1)) == 4)
+			if ((in.get(w, y) + in.get(w - 1, y) + in.get(w, y - 1) + in.get(w, y + 1)) == 4)
 				output.unsafe_set(w, y, 1);
 			else
 				output.unsafe_set(w, y, 0);
 		}
 	}
 
-	public static void dilate4(GrayU8 input, GrayU8 output) {
+	public static void dilate4( GrayU8 input, GrayU8 output ) {
 
-		ImageBorder_S32 in = ImageBorderValue.wrap(input,0);
+		ImageBorder_S32 in = ImageBorderValue.wrap(input, 0);
 
 		final int h = input.height - 1;
 		final int w = input.width - 1;
 
 		for (int x = 0; x < input.width; x++) {
 			// check top edge
-			if ((in.get( x, 0) + in.get( x - 1, 0) + in.get( x + 1, 0) + in.get( x, 1)) > 0)
+			if ((in.get(x, 0) + in.get(x - 1, 0) + in.get(x + 1, 0) + in.get(x, 1)) > 0)
 				output.unsafe_set(x, 0, 1);
 			else
 				output.unsafe_set(x, 0, 0);
 
 			// check bottom edge
-			if ((in.get( x, h) + in.get( x - 1, h) + in.get( x + 1, h) + in.get( x, h - 1)) > 0)
+			if ((in.get(x, h) + in.get(x - 1, h) + in.get(x + 1, h) + in.get(x, h - 1)) > 0)
 				output.unsafe_set(x, h, 1);
 			else
 				output.unsafe_set(x, h, 0);
@@ -87,37 +87,37 @@ public class ImplBinaryBorderOps {
 
 		for (int y = 0; y < input.height; y++) {
 			// check left edge
-			if ((in.get( 0, y) + in.get( 1, y) + in.get( 0, y - 1) + in.get( 0, y + 1)) > 0)
+			if ((in.get(0, y) + in.get(1, y) + in.get(0, y - 1) + in.get(0, y + 1)) > 0)
 				output.unsafe_set(0, y, 1);
 			else
 				output.unsafe_set(0, y, 0);
 
 			// check right edge
-			if ((in.get( w, y) + in.get( w - 1, y) + in.get( w, y - 1) + in.get( w, y + 1)) > 0)
+			if ((in.get(w, y) + in.get(w - 1, y) + in.get(w, y - 1) + in.get(w, y + 1)) > 0)
 				output.unsafe_set(w, y, 1);
 			else
 				output.unsafe_set(w, y, 0);
 		}
 	}
 
-	public static void erode8(GrayU8 input, GrayU8 output) {
+	public static void erode8( GrayU8 input, GrayU8 output ) {
 
-		ImageBorder_S32 in = ImageBorderValue.wrap(input,1);
-		
+		ImageBorder_S32 in = ImageBorderValue.wrap(input, 1);
+
 		final int h = input.height - 1;
 		final int w = input.width - 1;
 
 		for (int x = 0; x < input.width; x++) {
 			// check top edge
-			if ((in.get( x, 0) + in.get( x - 1, 0) + in.get( x + 1, 0) +
-					in.get( x - 1, 1) + in.get( x, 1) + in.get( x + 1, 1)) == 6)
+			if ((in.get(x, 0) + in.get(x - 1, 0) + in.get(x + 1, 0) +
+					in.get(x - 1, 1) + in.get(x, 1) + in.get(x + 1, 1)) == 6)
 				output.unsafe_set(x, 0, 1);
 			else
 				output.unsafe_set(x, 0, 0);
 
 			// check bottom edge
-			if ((in.get( x, h) + in.get( x - 1, h) + in.get( x + 1, h) +
-					in.get( x - 1, h - 1) + in.get( x, h - 1) + in.get( x + 1, h - 1)) == 6)
+			if ((in.get(x, h) + in.get(x - 1, h) + in.get(x + 1, h) +
+					in.get(x - 1, h - 1) + in.get(x, h - 1) + in.get(x + 1, h - 1)) == 6)
 				output.unsafe_set(x, h, 1);
 			else
 				output.unsafe_set(x, h, 0);
@@ -125,39 +125,39 @@ public class ImplBinaryBorderOps {
 
 		for (int y = 0; y < input.height; y++) {
 			// check left edge
-			if ((in.get( 0, y) + in.get( 1, y) + in.get( 0, y - 1) +
-					in.get( 1, y - 1) + in.get( 0, y + 1) + in.get( 1, y + 1)) == 6)
+			if ((in.get(0, y) + in.get(1, y) + in.get(0, y - 1) +
+					in.get(1, y - 1) + in.get(0, y + 1) + in.get(1, y + 1)) == 6)
 				output.unsafe_set(0, y, 1);
 			else
 				output.unsafe_set(0, y, 0);
 
 			// check right edge
-			if ((in.get( w - 1, y) + in.get( w, y) + in.get( w - 1, y - 1) +
-					in.get( w, y - 1) + in.get( w - 1, y + 1) + in.get( w, y + 1)) == 6)
+			if ((in.get(w - 1, y) + in.get(w, y) + in.get(w - 1, y - 1) +
+					in.get(w, y - 1) + in.get(w - 1, y + 1) + in.get(w, y + 1)) == 6)
 				output.unsafe_set(w, y, 1);
 			else
 				output.unsafe_set(w, y, 0);
 		}
 	}
 
-	public static void dilate8(GrayU8 input, GrayU8 output) {
+	public static void dilate8( GrayU8 input, GrayU8 output ) {
 
-		ImageBorder_S32 in = ImageBorderValue.wrap(input,0);
+		ImageBorder_S32 in = ImageBorderValue.wrap(input, 0);
 
 		final int h = input.height - 1;
 		final int w = input.width - 1;
 
 		for (int x = 0; x < input.width; x++) {
 			// check top edge
-			if ((in.get( x, 0) + in.get( x - 1, 0) + in.get( x + 1, 0) +
-					in.get( x - 1, 1) + in.get( x, 1) + in.get( x + 1, 1)) > 0)
+			if ((in.get(x, 0) + in.get(x - 1, 0) + in.get(x + 1, 0) +
+					in.get(x - 1, 1) + in.get(x, 1) + in.get(x + 1, 1)) > 0)
 				output.unsafe_set(x, 0, 1);
 			else
 				output.unsafe_set(x, 0, 0);
 
 			// check bottom edge
-			if ((in.get( x, h) + in.get( x - 1, h) + in.get( x + 1, h) +
-					in.get( x - 1, h - 1) + in.get( x, h - 1) + in.get( x + 1, h - 1)) > 0)
+			if ((in.get(x, h) + in.get(x - 1, h) + in.get(x + 1, h) +
+					in.get(x - 1, h - 1) + in.get(x, h - 1) + in.get(x + 1, h - 1)) > 0)
 				output.unsafe_set(x, h, 1);
 			else
 				output.unsafe_set(x, h, 0);
@@ -165,22 +165,22 @@ public class ImplBinaryBorderOps {
 
 		for (int y = 0; y < input.height; y++) {
 			// check left edge
-			if ((in.get( 0, y) + in.get( 1, y) + in.get( 0, y - 1) +
-					in.get( 1, y - 1) + in.get( 0, y + 1) + in.get( 1, y + 1)) > 0)
+			if ((in.get(0, y) + in.get(1, y) + in.get(0, y - 1) +
+					in.get(1, y - 1) + in.get(0, y + 1) + in.get(1, y + 1)) > 0)
 				output.unsafe_set(0, y, 1);
 			else
 				output.unsafe_set(0, y, 0);
 
 			// check right edge
-			if ((in.get( w - 1, y) + in.get( w, y) + in.get( w - 1, y - 1) +
-					in.get( w, y - 1) + in.get( w - 1, y + 1) + in.get( w, y + 1)) > 0)
+			if ((in.get(w - 1, y) + in.get(w, y) + in.get(w - 1, y - 1) +
+					in.get(w, y - 1) + in.get(w - 1, y + 1) + in.get(w, y + 1)) > 0)
 				output.unsafe_set(w, y, 1);
 			else
 				output.unsafe_set(w, y, 0);
 		}
 	}
 
-	private static void edge_outside0(GrayU8 input, GrayU8 output) {
+	private static void edge_outside0( GrayU8 input, GrayU8 output ) {
 		// outside of the image is always considered to be zero, so any non zero pixel which touches the edge is 1
 		final int h = input.height - 1;
 		final int w = input.width - 1;
@@ -201,30 +201,30 @@ public class ImplBinaryBorderOps {
 		}
 	}
 
-	public static void edge4(GrayU8 input, GrayU8 output, boolean outsideZero ) {
-		if( outsideZero ) {
-			edge_outside0(input,output);
+	public static void edge4( GrayU8 input, GrayU8 output, boolean outsideZero ) {
+		if (outsideZero) {
+			edge_outside0(input, output);
 		} else {
-			edge4_outside1(input,output);
+			edge4_outside1(input, output);
 		}
 	}
 
-	private static void edge4_outside1(GrayU8 input, GrayU8 output) {
+	private static void edge4_outside1( GrayU8 input, GrayU8 output ) {
 
-		ImageBorder_S32 in = ImageBorderValue.wrap(input,1);
+		ImageBorder_S32 in = ImageBorderValue.wrap(input, 1);
 
 		final int h = input.height - 1;
 		final int w = input.width - 1;
 
 		for (int x = 0; x < input.width; x++) {
 			// check top edge
-			if ((in.get( x - 1, 0) + in.get( x + 1, 0) + in.get( x, 1)) == 3)
+			if ((in.get(x - 1, 0) + in.get(x + 1, 0) + in.get(x, 1)) == 3)
 				output.unsafe_set(x, 0, 0);
 			else
 				output.unsafe_set(x, 0, input.get(x, 0));
 
 			// check bottom edge
-			if ((in.get( x - 1, h) + in.get( x + 1, h) + in.get( x, h - 1)) == 3)
+			if ((in.get(x - 1, h) + in.get(x + 1, h) + in.get(x, h - 1)) == 3)
 				output.unsafe_set(x, h, 0);
 			else
 				output.unsafe_set(x, h, input.get(x, h));
@@ -232,45 +232,45 @@ public class ImplBinaryBorderOps {
 
 		for (int y = 0; y < input.height; y++) {
 			// check left edge
-			if ((in.get( 1, y) + in.get( 0, y - 1) + in.get( 0, y + 1)) == 3)
+			if ((in.get(1, y) + in.get(0, y - 1) + in.get(0, y + 1)) == 3)
 				output.unsafe_set(0, y, 0);
 			else
 				output.unsafe_set(0, y, input.get(0, y));
 
 			// check right edge
-			if ((in.get( w - 1, y) + in.get( w, y - 1) + in.get( w, y + 1)) == 3)
+			if ((in.get(w - 1, y) + in.get(w, y - 1) + in.get(w, y + 1)) == 3)
 				output.unsafe_set(w, y, 0);
 			else
 				output.unsafe_set(w, y, input.get(w, y));
 		}
 	}
 
-	public static void edge8(GrayU8 input, GrayU8 output, boolean outsideZero ) {
-		if( outsideZero ) {
-			edge_outside0(input,output);
+	public static void edge8( GrayU8 input, GrayU8 output, boolean outsideZero ) {
+		if (outsideZero) {
+			edge_outside0(input, output);
 		} else {
-			edge8_outside1(input,output);
+			edge8_outside1(input, output);
 		}
 	}
 
-	private static void edge8_outside1(GrayU8 input, GrayU8 output) {
+	private static void edge8_outside1( GrayU8 input, GrayU8 output ) {
 
-		ImageBorder_S32 in = ImageBorderValue.wrap(input,1);
+		ImageBorder_S32 in = ImageBorderValue.wrap(input, 1);
 
 		final int h = input.height - 1;
 		final int w = input.width - 1;
 
 		for (int x = 0; x < input.width; x++) {
 			// check top edge
-			if ((in.get( x - 1, 0) + in.get( x + 1, 0) +
-					in.get( x - 1, 1) + in.get( x, 1) + in.get( x + 1, 1)) == 5)
+			if ((in.get(x - 1, 0) + in.get(x + 1, 0) +
+					in.get(x - 1, 1) + in.get(x, 1) + in.get(x + 1, 1)) == 5)
 				output.unsafe_set(x, 0, 0);
 			else
 				output.unsafe_set(x, 0, input.get(x, 0));
 
 			// check bottom edge
-			if ((in.get( x - 1, h) + in.get( x + 1, h) +
-					in.get( x - 1, h - 1) + in.get( x, h - 1) + in.get( x + 1, h - 1)) == 5)
+			if ((in.get(x - 1, h) + in.get(x + 1, h) +
+					in.get(x - 1, h - 1) + in.get(x, h - 1) + in.get(x + 1, h - 1)) == 5)
 				output.unsafe_set(x, h, 0);
 			else
 				output.unsafe_set(x, h, input.get(x, h));
@@ -278,41 +278,40 @@ public class ImplBinaryBorderOps {
 
 		for (int y = 0; y < input.height; y++) {
 			// check left edge
-			if ((in.get( 1, y) + in.get( 0, y - 1) +
-					in.get( 1, y - 1) + in.get( 0, y + 1) + in.get( 1, y + 1)) == 5)
+			if ((in.get(1, y) + in.get(0, y - 1) +
+					in.get(1, y - 1) + in.get(0, y + 1) + in.get(1, y + 1)) == 5)
 				output.unsafe_set(0, y, 0);
 			else
 				output.unsafe_set(0, y, input.get(0, y));
 
 			// check right edge
-			if ((in.get( w - 1, y) + in.get( w - 1, y - 1) +
-					in.get( w, y - 1) + in.get( w - 1, y + 1) + in.get( w, y + 1)) == 5)
+			if ((in.get(w - 1, y) + in.get(w - 1, y - 1) +
+					in.get(w, y - 1) + in.get(w - 1, y + 1) + in.get(w, y + 1)) == 5)
 				output.unsafe_set(w, y, 0);
 			else
 				output.unsafe_set(w, y, input.get(w, y));
 		}
 	}
 
+	public static void removePointNoise( GrayU8 input, GrayU8 output ) {
 
-	public static void removePointNoise(GrayU8 input, GrayU8 output) {
-
-		ImageBorder_S32 in = ImageBorderValue.wrap(input,0);
+		ImageBorder_S32 in = ImageBorderValue.wrap(input, 0);
 
 		final int h = input.height - 1;
 		final int w = input.width - 1;
 
 		for (int x = 0; x < input.width; x++) {
 			// check top edge
-			int total = in.get( x - 1, 0) + in.get( x + 1, 0) +
-					in.get( x - 1, 1) + in.get( x, 1) + in.get( x + 1, 1);
+			int total = in.get(x - 1, 0) + in.get(x + 1, 0) +
+					in.get(x - 1, 1) + in.get(x, 1) + in.get(x + 1, 1);
 			if (total < 2)
 				output.unsafe_set(x, 0, 0);
 			else
 				output.unsafe_set(x, 0, input.get(x, 0));
 
 			// check bottom edge
-			total = in.get( x - 1, h) + in.get( x + 1, h) +
-					in.get( x - 1, h - 1) + in.get( x, h - 1) + in.get( x + 1, h - 1);
+			total = in.get(x - 1, h) + in.get(x + 1, h) +
+					in.get(x - 1, h - 1) + in.get(x, h - 1) + in.get(x + 1, h - 1);
 			if (total < 2)
 				output.unsafe_set(x, h, 0);
 			else
@@ -321,16 +320,16 @@ public class ImplBinaryBorderOps {
 
 		for (int y = 0; y < input.height; y++) {
 			// check left edge
-			int total = in.get( 1, y) + in.get( 0, y - 1) +
-					in.get( 1, y - 1) + in.get( 0, y + 1) + in.get( 1, y + 1);
+			int total = in.get(1, y) + in.get(0, y - 1) +
+					in.get(1, y - 1) + in.get(0, y + 1) + in.get(1, y + 1);
 			if (total < 2)
 				output.unsafe_set(0, y, 0);
 			else
 				output.unsafe_set(0, y, input.get(0, y));
 
 			// check right edge
-			total = in.get( w - 1, y) + in.get( w - 1, y - 1) +
-					in.get( w, y - 1) + in.get( w - 1, y + 1) + in.get( w, y + 1);
+			total = in.get(w - 1, y) + in.get(w - 1, y - 1) +
+					in.get(w, y - 1) + in.get(w - 1, y + 1) + in.get(w, y + 1);
 			if (total < 2)
 				output.unsafe_set(w, y, 0);
 			else

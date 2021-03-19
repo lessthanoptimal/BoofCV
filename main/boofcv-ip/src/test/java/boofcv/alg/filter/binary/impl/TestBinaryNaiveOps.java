@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -31,9 +31,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
  * @author Peter Abeles
  */
 public class TestBinaryNaiveOps extends BoofStandardJUnit {
-
-	@Test
-	public void erode4() {
+	@Test void erode4() {
 		GrayU8 input;
 
 		input = createInput(0, 1, 0, 1, 1, 1, 0, 1, 0);
@@ -47,8 +45,7 @@ public class TestBinaryNaiveOps extends BoofStandardJUnit {
 		checkOutput("erode4", input, 0);
 	}
 
-	@Test
-	public void erode4_border() {
+	@Test void erode4_border() {
 		GrayU8 input;
 
 		input = createInput(0, 1, 0, 1, 1, 1, 0, 1, 0);
@@ -57,8 +54,7 @@ public class TestBinaryNaiveOps extends BoofStandardJUnit {
 		checkImage("erode4", input, 1, 1, 1, 1, 1, 1, 1, 1, 1);
 	}
 
-	@Test
-	public void dilate4() {
+	@Test void dilate4() {
 		GrayU8 input;
 
 		input = createInput(0, 1, 0, 1, 1, 1, 0, 1, 0);
@@ -76,8 +72,7 @@ public class TestBinaryNaiveOps extends BoofStandardJUnit {
 		checkOutput("dilate4", input, 0);
 	}
 
-	@Test
-	public void dilate4_border() {
+	@Test void dilate4_border() {
 		GrayU8 input;
 
 		input = createInput(0, 1, 0, 1, 1, 1, 0, 1, 0);
@@ -86,8 +81,7 @@ public class TestBinaryNaiveOps extends BoofStandardJUnit {
 		checkImage("dilate4", input, 0, 1, 0, 1, 1, 1, 0, 1, 0);
 	}
 
-	@Test
-	public void edge4() {
+	@Test void edge4() {
 		GrayU8 input;
 
 		input = createInput(0, 0, 0, 0, 1, 0, 0, 0, 0);
@@ -109,8 +103,7 @@ public class TestBinaryNaiveOps extends BoofStandardJUnit {
 		checkOutput("edge4", input, 0);
 	}
 
-	@Test
-	public void edge4_border() {
+	@Test void edge4_border() {
 		GrayU8 input;
 
 		input = createInput(0, 1, 0, 1, 1, 1, 0, 1, 0);
@@ -119,8 +112,7 @@ public class TestBinaryNaiveOps extends BoofStandardJUnit {
 		checkImage("edge4", input, 0, 0, 0, 0, 0, 0, 0, 0, 0);
 	}
 
-	@Test
-	public void erode8() {
+	@Test void erode8() {
 		GrayU8 input;
 
 		input = createInput(1, 1, 1, 1, 1, 1, 1, 1, 1);
@@ -134,8 +126,7 @@ public class TestBinaryNaiveOps extends BoofStandardJUnit {
 		checkOutput("erode8", input, 0);
 	}
 
-	@Test
-	public void erode8_border() {
+	@Test void erode8_border() {
 		GrayU8 input;
 
 		input = createInput(1, 1, 1, 1, 1, 1, 1, 1, 1);
@@ -144,8 +135,7 @@ public class TestBinaryNaiveOps extends BoofStandardJUnit {
 		checkImage("erode8", input, 0, 0, 0, 0, 0, 0, 0, 0, 0);
 	}
 
-	@Test
-	public void dilate8() {
+	@Test void dilate8() {
 		GrayU8 input;
 
 		input = createInput(1, 1, 1, 1, 1, 1, 1, 1, 1);
@@ -165,8 +155,7 @@ public class TestBinaryNaiveOps extends BoofStandardJUnit {
 		checkOutput("dilate8", input, 0);
 	}
 
-	@Test
-	public void dilate8_border() {
+	@Test void dilate8_border() {
 		GrayU8 input;
 
 		input = createInput(1, 1, 1, 1, 1, 1, 1, 1, 1);
@@ -177,8 +166,7 @@ public class TestBinaryNaiveOps extends BoofStandardJUnit {
 		checkImage("dilate8", input, 1, 1, 1, 1, 1, 1, 1, 1, 1);
 	}
 
-	@Test
-	public void edge8() {
+	@Test void edge8() {
 		GrayU8 input;
 
 		input = createInput(0, 0, 0, 0, 1, 0, 0, 0, 0);
@@ -196,8 +184,7 @@ public class TestBinaryNaiveOps extends BoofStandardJUnit {
 		checkOutput("edge8", input, 0);
 	}
 
-	@Test
-	public void edge8_border() {
+	@Test void edge8_border() {
 		GrayU8 input;
 
 		input = createInput(1, 1, 1, 1, 1, 1, 1, 1, 1);
@@ -208,8 +195,7 @@ public class TestBinaryNaiveOps extends BoofStandardJUnit {
 		checkImage("edge8", input, 0, 1, 0, 1, 1, 1, 0, 1, 0);
 	}
 
-	@Test
-	public void removePointNoise() {
+	@Test void removePointNoise() {
 		GrayU8 input;
 
 		input = createInput(1, 1, 1, 1, 1, 1, 1, 1, 1);
@@ -233,8 +219,7 @@ public class TestBinaryNaiveOps extends BoofStandardJUnit {
 		checkOutput("removePointNoise", input, 0);
 	}
 
-	@Test
-	public void removePointNoise_border() {
+	@Test void removePointNoise_border() {
 		GrayU8 input;
 
 		input = createInput(1, 1, 1, 1, 1, 1, 1, 1, 1);
@@ -245,11 +230,11 @@ public class TestBinaryNaiveOps extends BoofStandardJUnit {
 		checkImage("removePointNoise", input, 0, 1, 0, 1, 1, 1, 0, 1, 0);
 	}
 
-	private void checkOutput(String methodName, GrayU8 input, int expected) {
+	private void checkOutput( String methodName, GrayU8 input, int expected ) {
 		checkOutput(methodName, input, 1, 1, expected);
 	}
 
-	private void checkOutput(String methodName, GrayU8 input, int x, int y, int expected) {
+	private void checkOutput( String methodName, GrayU8 input, int x, int y, int expected ) {
 		GrayU8 output = createOutput(methodName, input);
 
 		assertEquals(expected, output.get(x, y));
@@ -263,12 +248,12 @@ public class TestBinaryNaiveOps extends BoofStandardJUnit {
 		assertEquals(output.get(x, y), expected);
 	}
 
-	private void checkImage(String methodName, GrayU8 input, int... expected) {
+	private void checkImage( String methodName, GrayU8 input, int... expected ) {
 		GrayU8 output = createOutput(methodName, input);
 
 		for (int i = 0; i < 3; i++)
 			for (int j = 0; j < 3; j++)
-				assertEquals(expected[i * 3 + j], output.get(j, i));
+				assertEquals(expected[i*3 + j], output.get(j, i));
 
 		// check it against sub-images
 		GrayU8 temp = new GrayU8(3 + output.width, 4 + output.height);
@@ -278,18 +263,18 @@ public class TestBinaryNaiveOps extends BoofStandardJUnit {
 		output = createOutput(methodName, temp);
 		for (int i = 0; i < 3; i++)
 			for (int j = 0; j < 3; j++)
-				assertEquals(expected[i * 3 + j], output.get(j, i));
+				assertEquals(expected[i*3 + j], output.get(j, i));
 	}
 
-	private GrayU8 createInput(int... image) {
+	private GrayU8 createInput( int... image ) {
 		GrayU8 input = new GrayU8(3, 3);
 		for (int i = 0; i < 9; i++) {
-			input.data[i] = (byte) image[i];
+			input.data[i] = (byte)image[i];
 		}
 		return input;
 	}
 
-	private GrayU8 createOutput(String methodName, GrayU8 input) {
+	private GrayU8 createOutput( String methodName, GrayU8 input ) {
 		try {
 			GrayU8 output = new GrayU8(input.width, input.height);
 			Method m = ImplBinaryNaiveOps.class.getMethod(methodName, GrayU8.class, GrayU8.class);
