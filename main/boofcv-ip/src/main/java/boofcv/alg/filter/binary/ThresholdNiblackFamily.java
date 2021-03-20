@@ -26,35 +26,56 @@ import boofcv.struct.ConfigLength;
 import boofcv.struct.image.GrayF32;
 import boofcv.struct.image.GrayU8;
 import boofcv.struct.image.ImageType;
+import lombok.Getter;
+import lombok.Setter;
 import org.ddogleg.struct.DogArray_F32;
 import pabeles.concurrency.GrowArray;
-//CONCURRENT_INLINE import boofcv.concurrency.BoofConcurrency;
 
 /**
+ * <p>Several related algorithms based off the Niblack's [1] paper which are intended for use in thresholding
+ * images as a preprocessing step for OCR. All algorithms are based on local image statistics.</p>
+ * <ol>
+ *     <li>Niblack: T(x,y) = m(x,y) * [ 1 + k * (s(x,y)/R - 1)]</li>
+ *     <li>Sauvola: T(x,y) = m(x,y) * [ 1 + k * (s(x,y)/R - 1)]</li>
+ *     <li>Wolf-Jolion: T(x,y) = m(x,y) * [ 1 + k * (s(x,y)/R - 1)]</li>
+ * </ol>
  * <p>
- * Intended for use as a preprocessing step in OCR it computes a binary image from an input gray image.  It's
- * an adaptive algorithm and uses the local mean and standard deviation, as is shown in the equation below:<br>
- * T(x,y) = m(x,y) * [ 1 + k * (s(x,y)/R - 1)]<br>
  * where T(x,y) is the pixel's threshold, m(x,y) is the local mean, s(x,y) is the local deviation,
  * R is dynamic range of standard deviation, and k is a user specified threshold.
  * </p>
  *
+ * <p>There are two tuning parameters 'k' a positive number and the the 'radius' of the local region. Recommended
+ * values:</p>
+ * <ul>
+ *     <li>Niblack: k=0.3 and radius=15</li>
+ *     <li>Sauvola: k=0.3 and radius=15</li>
+ *     <li>Wolf-Jolion: k=0.5 and radius=15</li>
+ * </ul>
+ *
  * <p>
- * There are two tuning parameters 'k' a positive number and the the 'radius' of the local region.  Recommended
- * values are k=0.3 and radius=15.  These were found by tuning against a set of text.
+ *  [1] W.Niblack, An Introduction to Digital Image Processing. Prentice Hall, Englewood Cliffs, (1986).<br>
+ *  [2] Sauvola, Jaakko, and Matti Pietikäinen. "Adaptive document image binarization."
+ *  Pattern recognition 33.2 (2000): 225-236.<br>
+ *  [3] C. Wolf, J-M. Jolion, “Extraction and Recognition of Artificial Text in Multimedia Documents”, Pattern Analysis
+ * and Applications, 6(4):309-326, (2003)<br>
  * </p>
  *
  * @author Peter Abeles
  */
 @SuppressWarnings("Duplicates")
-public class ThresholdSauvola implements InputToBinary<GrayF32> {
+public class ThresholdNiblackFamily implements InputToBinary<GrayF32> {
 
-	// user specified threshold
-	float k;
-	// size of local region
-	ConfigLength width;
-	// should it threshold down or up
-	boolean down;
+	/** user specified threshold */
+	@Getter @Setter float k;
+
+	/** size of local region */
+	@Getter @Setter ConfigLength width;
+
+	/** should it threshold down or up */
+	@Getter @Setter boolean down;
+
+	/** Which variant in the family is being applied */
+	@Getter Variant variant;
 
 	// storage for intermediate results
 	GrayF32 inputPow2 = new GrayF32(1, 1); // I^2
@@ -66,6 +87,14 @@ public class ThresholdSauvola implements InputToBinary<GrayF32> {
 	GrayF32 tmp = new GrayF32(1, 1); // work space
 	GrowArray<DogArray_F32> work = new GrowArray<>(DogArray_F32::new);
 
+	// Maximum stdev across entire image
+	float maxStdev;
+	// Minimum pixel intensity value
+	float minItensity;
+
+	// The thresholding operation
+	Threshold op;
+
 	/**
 	 * Configures the algorithm.
 	 *
@@ -73,10 +102,17 @@ public class ThresholdSauvola implements InputToBinary<GrayF32> {
 	 * @param k User specified threshold adjustment factor.  Must be positive. Try 0.3
 	 * @param down Threshold down or up
 	 */
-	public ThresholdSauvola( ConfigLength width, float k, boolean down ) {
+	public ThresholdNiblackFamily( ConfigLength width, float k, boolean down, Variant variant ) {
 		this.k = k;
 		this.width = width;
 		this.down = down;
+		this.variant = variant;
+
+		op = switch (variant) {
+			case SAUVOLA -> new Sauvola();
+			case NIBLACK -> new Niblack();
+			case WOLF_JOLION -> new WolfJolion();
+		};
 	}
 
 	/**
@@ -107,65 +143,76 @@ public class ThresholdSauvola implements InputToBinary<GrayF32> {
 		PixelMath.subtract(inputPow2Mean, inputMeanPow2, stdev);
 		PixelMath.sqrt(stdev, stdev);
 
-		float R = ImageStatistics.max(stdev);
+		if (variant == Variant.SAUVOLA || variant == Variant.WOLF_JOLION)
+			maxStdev = ImageStatistics.max(stdev);
 
+		if (variant == Variant.WOLF_JOLION)
+			minItensity = ImageStatistics.min(input);
+
+		applyThresholding(input, output);
+	}
+
+	protected void applyThresholding( GrayF32 input, GrayU8 output ) {
 		if (down) {
-			//CONCURRENT_BELOW BoofConcurrency.loopFor(0, input.height, y -> {
 			for (int y = 0; y < input.height; y++) {
 				int i = y*stdev.width;
 				int indexIn = input.startIndex + y*input.stride;
 				int indexOut = output.startIndex + y*output.stride;
 
 				for (int x = 0; x < input.width; x++, i++) {
-					// threshold = mean.*(1 + k * ((deviation/R)-1));
-					float threshold = inputMean.data[i]*(1.0f + k*(stdev.data[i]/R - 1.0f));
+					float threshold = op.compute(inputMean.data[i], stdev.data[i]);
 					output.data[indexOut++] = (byte)(input.data[indexIn++] <= threshold ? 1 : 0);
 				}
 			}
-			//CONCURRENT_ABOVE });
 		} else {
-			//CONCURRENT_BELOW BoofConcurrency.loopFor(0, input.height, y -> {
 			for (int y = 0; y < input.height; y++) {
 				int i = y*stdev.width;
 				int indexIn = input.startIndex + y*input.stride;
 				int indexOut = output.startIndex + y*output.stride;
 
 				for (int x = 0; x < input.width; x++, i++) {
-					// threshold = mean.*(1 + k * ((deviation/R)-1));
-					float threshold = inputMean.data[i]*(1.0f + k*(stdev.data[i]/R - 1.0f));
+					float threshold = op.compute(inputMean.data[i], stdev.data[i]);
 					output.data[indexOut++] = (byte)(input.data[indexIn++] >= threshold ? 1 : 0);
 				}
 			}
-			//CONCURRENT_ABOVE });
 		}
 	}
 
-	@Override
-	public ImageType<GrayF32> getInputType() {
+	/**
+	 * Threshold operation. Computes the threshold given the mean and standard deviation
+	 */
+	interface Threshold {
+		float compute( float mean, float stdev );
+	}
+
+	class Niblack implements Threshold {
+		@Override final public float compute( final float mean, final float stdev ) {
+			return mean + k*stdev;
+		}
+	}
+
+	class Sauvola implements Threshold {
+		@Override final public float compute( final float mean, final float stdev ) {
+			// NOTE: R=maxStdev. Some papers which describe Sauvola have R=128. However in the 1999 paper it says
+			// R is equal to the "dynamic range of stdev". Maybe an earlier paper had it as 128?
+			return mean*(1.0f + k*(stdev/maxStdev - 1.0f));
+		}
+	}
+
+	class WolfJolion implements Threshold {
+		@Override final public float compute( final float mean, final float stdev ) {
+			return mean + k*(stdev/maxStdev - 1.0f)*(mean - minItensity);
+		}
+	}
+
+	@Override public ImageType<GrayF32> getInputType() {
 		return ImageType.SB_F32;
 	}
 
-	public float getK() {
-		return k;
-	}
-
-	public void setK( float k ) {
-		this.k = k;
-	}
-
-	public ConfigLength getWidth() {
-		return width;
-	}
-
-	public void setWidth( ConfigLength width ) {
-		this.width = width;
-	}
-
-	public boolean isDown() {
-		return down;
-	}
-
-	public void setDown( boolean down ) {
-		this.down = down;
+	/** Which variant of this family is computed */
+	public enum Variant {
+		NIBLACK,
+		SAUVOLA,
+		WOLF_JOLION
 	}
 }

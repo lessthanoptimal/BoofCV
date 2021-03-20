@@ -39,7 +39,7 @@ Version : 0.38
   * SIFT fixed bug where it was not respecting maximum feature detections.
   * SIFT concurrent implementation is running. Single thread is about 3% slower.
 - Image Processing
-  * TODO Wolf Binarization https://github.com/lessthanoptimal/BoofCV/issues/124
+  * Wolf and Niback Binarization
   * TODO make sure everything SIFT touches doesn't go threaded if too small
 - Image Stitching
   * TODO N-View stitching https://github.com/lessthanoptimal/BoofCV/issues/167

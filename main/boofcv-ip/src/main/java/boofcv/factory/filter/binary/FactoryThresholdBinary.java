@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -57,7 +57,7 @@ public class FactoryThresholdBinary {
 	}
 
 	/**
-	 * @see ThresholdSauvola
+	 * @see ThresholdNiblackFamily
 	 *
 	 * @param width Width of square region.
 	 * @param down Should it threshold up or down.
@@ -68,17 +68,65 @@ public class FactoryThresholdBinary {
 	public static <T extends ImageGray<T>>
 	InputToBinary<T> localSauvola(ConfigLength width, boolean down, float k, Class<T> inputType)
 	{
+		return localNiblackFamily(ThresholdNiblackFamily.Variant.SAUVOLA, width, down, k, inputType);
+	}
+
+	/**
+	 * @see ThresholdNiblackFamily
+	 *
+	 * @param width Width of square region.
+	 * @param down Should it threshold up or down.
+	 * @param k User specified threshold adjustment factor.  Must be positive. Try 0.3
+	 * @param inputType Type of input image
+	 * @return Filter to binary
+	 */
+	public static <T extends ImageGray<T>>
+	InputToBinary<T> localWolf(ConfigLength width, boolean down, float k, Class<T> inputType)
+	{
+		return localNiblackFamily(ThresholdNiblackFamily.Variant.WOLF_JOLION, width, down, k, inputType);
+	}
+
+	/**
+	 * @see ThresholdNiblackFamily
+	 *
+	 * @param width Width of square region.
+	 * @param down Should it threshold up or down.
+	 * @param k User specified threshold adjustment factor.  Must be positive. Try 0.3
+	 * @param inputType Type of input image
+	 * @return Filter to binary
+	 */
+	public static <T extends ImageGray<T>>
+	InputToBinary<T> localNiblack(ConfigLength width, boolean down, float k, Class<T> inputType)
+	{
+		return localNiblackFamily(ThresholdNiblackFamily.Variant.NIBLACK, width, down, k, inputType);
+	}
+
+	/**
+	 * @see ThresholdNiblackFamily
+	 *
+	 * @param variant Which variant in the family
+	 * @param width Width of square region.
+	 * @param down Should it threshold up or down.
+	 * @param k User specified threshold adjustment factor.  Must be positive. Try 0.3
+	 * @param inputType Type of input image
+	 * @return Filter to binary
+	 */
+	protected static <T extends ImageGray<T>>
+	InputToBinary<T> localNiblackFamily(ThresholdNiblackFamily.Variant variant,
+										ConfigLength width, boolean down, float k, Class<T> inputType)
+	{
 		if( BOverrideFactoryThresholdBinary.localSauvola != null )
-			return BOverrideFactoryThresholdBinary.localSauvola.handle(width, k, down, inputType);
+			throw new RuntimeException("Update how overrides are handled for Niblack family");
 
 		InputToBinary<GrayF32> sauvola;
 		if( BoofConcurrency.USE_CONCURRENT ) {
-			sauvola = new ThresholdSauvola_MT(width, k, down);
+			sauvola = new ThresholdNiblackFamily_MT(width, k, down, variant);
 		} else {
-			sauvola = new ThresholdSauvola(width, k, down);
+			sauvola = new ThresholdNiblackFamily(width, k, down, variant);
 		}
 		return new InputToBinarySwitch<>(sauvola,inputType);
 	}
+
 
 	/**
 	 * @see ThresholdNick
@@ -337,8 +385,14 @@ public class FactoryThresholdBinary {
 			case LOCAL_GAUSSIAN:
 				return localGaussian(config.width, config.scale, config.down, inputType);
 
+			case LOCAL_NIBLACK:
+				return localNiblack(config.width, config.down, config.niblackK, inputType);
+
 			case LOCAL_SAVOLA:
-				return localSauvola(config.width, config.down, config.savolaK, inputType);
+				return localSauvola(config.width, config.down, config.niblackK, inputType);
+
+			case LOCAL_WOLF:
+				return localWolf(config.width, config.down, config.niblackK, inputType);
 
 			case LOCAL_NICK:
 				return localNick(config.width, config.down, config.nickK, inputType);

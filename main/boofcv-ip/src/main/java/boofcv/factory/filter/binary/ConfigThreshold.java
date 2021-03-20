@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -59,11 +59,13 @@ public class ConfigThreshold implements Configuration {
 	public ConfigLength width = ConfigLength.fixed(11);
 
 	/**
-	 * Positive parameter used to tune threshold in Savola.  Try 0.3
+	 * Positive parameter used to tune threshold in members of the Niblack family.  Try 0.3 or 0.5
 	 *
+	 * @see ThresholdType#LOCAL_NIBLACK
 	 * @see ThresholdType#LOCAL_SAVOLA
+	 * @see ThresholdType#LOCAL_WOLF
 	 */
-	public float savolaK = 0.3f;
+	public float niblackK = 0.3f;
 
 	/**
 	 * Threshold for NICK. -0.1 to -0.2 is recommended
@@ -141,7 +143,7 @@ public class ConfigThreshold implements Configuration {
 		this.scale = src.scale;
 		this.down = src.down;
 		this.width.setTo(src.width);
-		this.savolaK = src.savolaK;
+		this.niblackK = src.niblackK;
 		this.nickK = src.nickK;
 		this.minPixelValue = src.minPixelValue;
 		this.maxPixelValue = src.maxPixelValue;
@@ -161,7 +163,7 @@ public class ConfigThreshold implements Configuration {
 				", scale=" + scale +
 				", down=" + down +
 				", width=" + width +
-				", savolaK=" + savolaK +
+				", savolaK=" + niblackK +
 				", minPixelValue=" + minPixelValue +
 				", maxPixelValue=" + maxPixelValue +
 				'}';

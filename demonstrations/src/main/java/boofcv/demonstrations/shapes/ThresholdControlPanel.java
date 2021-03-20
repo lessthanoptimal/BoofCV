@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -91,7 +91,7 @@ public class ThresholdControlPanel extends StandardAlgConfigPanel
 		this.scale = configThreshold.scale;
 		this.down = configThreshold.down;
 		this.regionWidth = configThreshold.width.copy();
-		this.savolaK = configThreshold.savolaK;
+		this.savolaK = configThreshold.niblackK;
 		this.nickK = configThreshold.nickK;
 		this.minPixelValue = configThreshold.minPixelValue;
 		this.maxGrayLevels = configThreshold.maxPixelValue;
@@ -414,7 +414,7 @@ public class ThresholdControlPanel extends StandardAlgConfigPanel
 		config.scale = scale;
 		config.down = down;
 		config.width = regionWidth.copy();
-		config.savolaK = savolaK;
+		config.niblackK = savolaK;
 		config.nickK = nickK;
 		config.minPixelValue = minPixelValue;
 		config.maxPixelValue = maxGrayLevels;
