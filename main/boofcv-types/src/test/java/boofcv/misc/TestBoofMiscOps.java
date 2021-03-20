@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -233,5 +233,15 @@ class TestBoofMiscOps extends BoofStandardJUnit {
 		assertFalse(BoofMiscOps.containsDuplicates(list));
 		list.add(2);
 		assertTrue(BoofMiscOps.containsDuplicates(list));
+	}
+
+	@Test void similarity_string() {
+		assertEquals(1.0, BoofMiscOps.similarity("",""));
+		assertEquals(1.0, BoofMiscOps.similarity("foo","foo"));
+		assertEquals(1.0, BoofMiscOps.similarity("FFO","ffo"));
+		assertEquals(1.0, BoofMiscOps.similarity("123A","123a"));
+
+		assertTrue(BoofMiscOps.similarity("foooo","fooo") > BoofMiscOps.similarity("f","fooo"));
+		assertTrue(BoofMiscOps.similarity("asdf","abdf") > BoofMiscOps.similarity("asdfasdf","asdf"));
 	}
 }
