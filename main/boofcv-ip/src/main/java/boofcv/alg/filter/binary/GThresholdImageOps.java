@@ -623,7 +623,7 @@ public class GThresholdImageOps {
 	}
 
 	/**
-	 * Applies {@link ThresholdSauvola Sauvola} thresholding to the input image.
+	 * Applies {@link ThresholdNiblackFamily Niblack} thresholding to the input image.
 	 * Intended for use with text image.
 	 *
 	 * @param input Input image.
@@ -632,16 +632,56 @@ public class GThresholdImageOps {
 	 * @param k Positive parameter used to tune threshold.  Try 0.3
 	 * @param down Should it threshold up or down.
 	 * @return binary image
-	 * @see ThresholdSauvola
+	 * @see ThresholdNiblackFamily
+	 */
+	public static <T extends ImageGray<T>>
+	GrayU8 localNiblack( T input, @Nullable GrayU8 output, ConfigLength width, float k, boolean down ) {
+		return niblackFamily(input, output, width, k, down, ThresholdNiblackFamily.Variant.NIBLACK);
+	}
+
+	/**
+	 * Applies {@link ThresholdNiblackFamily Sauvola} thresholding to the input image.
+	 * Intended for use with text image.
+	 *
+	 * @param input Input image.
+	 * @param output (optional) Output binary image.  If null it will be declared internally.
+	 * @param width Width of square region.
+	 * @param k Positive parameter used to tune threshold.  Try 0.3
+	 * @param down Should it threshold up or down.
+	 * @return binary image
+	 * @see ThresholdNiblackFamily
 	 */
 	public static <T extends ImageGray<T>>
 	GrayU8 localSauvola( T input, @Nullable GrayU8 output, ConfigLength width, float k, boolean down ) {
+		return niblackFamily(input, output, width, k, down, ThresholdNiblackFamily.Variant.SAUVOLA);
+	}
+
+	/**
+	 * Applies {@link ThresholdNiblackFamily Wolf} thresholding to the input image.
+	 * Intended for use with text image.
+	 *
+	 * @param input Input image.
+	 * @param output (optional) Output binary image.  If null it will be declared internally.
+	 * @param width Width of square region.
+	 * @param k Positive parameter used to tune threshold.  Try 0.3
+	 * @param down Should it threshold up or down.
+	 * @return binary image
+	 * @see ThresholdNiblackFamily
+	 */
+	public static <T extends ImageGray<T>>
+	GrayU8 localWolf( T input, @Nullable GrayU8 output, ConfigLength width, float k, boolean down ) {
+		return niblackFamily(input, output, width, k, down, ThresholdNiblackFamily.Variant.WOLF_JOLION);
+	}
+
+	protected static <T extends ImageGray<T>>
+	GrayU8 niblackFamily( T input, @Nullable GrayU8 output, ConfigLength width, float k, boolean down,
+						  ThresholdNiblackFamily.Variant variant) {
 		InputToBinary<GrayF32> alg;
 
 		if (BoofConcurrency.USE_CONCURRENT) {
-			alg = new ThresholdSauvola_MT(width, k, down);
+			alg = new ThresholdNiblackFamily_MT(width, k, down, variant);
 		} else {
-			alg = new ThresholdSauvola(width, k, down);
+			alg = new ThresholdNiblackFamily(width, k, down, variant);
 		}
 
 		if (output == null)

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -95,11 +95,25 @@ public enum ThresholdType {
 	BLOCK_OTSU(true,false),
 
 	/**
+	 * Locally adaptive computed using Niblack's method
+	 *
+	 * @see ThresholdNiblackFamily
+	 */
+	LOCAL_NIBLACK(true,false),
+
+	/**
 	 * Locally adaptive computed using Savola's method
 	 *
-	 * @see ThresholdSauvola
+	 * @see ThresholdNiblackFamily
 	 */
 	LOCAL_SAVOLA(true,false),
+
+	/**
+	 * Locally adaptive computed using Wolf's method
+	 *
+	 * @see ThresholdNiblackFamily
+	 */
+	LOCAL_WOLF(true,false),
 
 	/**
 	 * Locally adaptive computed using NICK method

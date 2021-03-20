@@ -30,12 +30,18 @@ import org.junit.jupiter.api.Test;
 /**
  * @author Peter Abeles
  */
-public class TestThresholdSauvola extends BoofStandardJUnit {
+public class TestThresholdNiblackFamily extends BoofStandardJUnit {
 	/**
 	 * Provide it a simple input image with obvious thresholding.  There will be regions of white space
 	 * which exceed its radius.
 	 */
 	@Test void simple() {
+		// Niblack has issues with this scenario
+		simple(ThresholdNiblackFamily.Variant.SAUVOLA);
+		simple(ThresholdNiblackFamily.Variant.WOLF_JOLION);
+	}
+
+	void simple(ThresholdNiblackFamily.Variant variant) {
 		int width = 11;
 		GrayU8 expected = new GrayU8(30, 35);
 
@@ -55,7 +61,7 @@ public class TestThresholdSauvola extends BoofStandardJUnit {
 		ConfigLength regionWidth = ConfigLength.fixed(width);
 		int radius = regionWidth.computeI(Math.min(input.width, input.height))/2;
 
-		ThresholdSauvola alg = new ThresholdSauvola(regionWidth, 0.5f, true);
+		var alg = new ThresholdNiblackFamily(regionWidth, 0.5f, true, variant);
 
 		alg.process(input, found);
 
@@ -102,7 +108,8 @@ public class TestThresholdSauvola extends BoofStandardJUnit {
 			}
 		}
 
-		ThresholdSauvola alg = new ThresholdSauvola(ConfigLength.fixed(width), k, down);
+		ThresholdNiblackFamily alg = new ThresholdNiblackFamily(ConfigLength.fixed(width), k, down,
+				ThresholdNiblackFamily.Variant.SAUVOLA);
 		alg.process(input, found);
 
 //		expected.printBinary();
