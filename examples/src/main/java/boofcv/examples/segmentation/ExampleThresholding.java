@@ -64,13 +64,7 @@ public class ExampleThresholding {
 
 		// Local method
 		GThresholdImageOps.localMean(input, binary, ConfigLength.fixed(57), 1.0, true, null, null,null);
-		gui.addImage(VisualizeBinaryData.renderBinary(binary, false, null),"Local: Square");
-		GThresholdImageOps.blockMinMax(input, binary, ConfigLength.fixed(21), 1.0, true, 15 );
-		gui.addImage(VisualizeBinaryData.renderBinary(binary, false, null),"Local: Block Min-Max");
-		GThresholdImageOps.blockMean(input, binary, ConfigLength.fixed(21), 1.0, true );
-		gui.addImage(VisualizeBinaryData.renderBinary(binary, false, null),"Local: Block Mean");
-		GThresholdImageOps.blockOtsu(input, binary, false,ConfigLength.fixed(21),0.5, 1.0, true );
-		gui.addImage(VisualizeBinaryData.renderBinary(binary, false, null),"Local: Block Otsu");
+		gui.addImage(VisualizeBinaryData.renderBinary(binary, false, null),"Local: Mean");
 		GThresholdImageOps.localGaussian(input, binary,  ConfigLength.fixed(85), 1.0, true, null, null);
 		gui.addImage(VisualizeBinaryData.renderBinary(binary, false, null),"Local: Gaussian");
 		GThresholdImageOps.localNiblack(input, binary,  ConfigLength.fixed(11), 0.30f, true);
@@ -81,6 +75,12 @@ public class ExampleThresholding {
 		gui.addImage(VisualizeBinaryData.renderBinary(binary, false, null),"Local: Wolf");
 		GThresholdImageOps.localNick(input, binary,  ConfigLength.fixed(11), -0.2f, true);
 		gui.addImage(VisualizeBinaryData.renderBinary(binary, false, null),"Local: NICK");
+		GThresholdImageOps.blockMinMax(input, binary, ConfigLength.fixed(21), 1.0, true, 15 );
+		gui.addImage(VisualizeBinaryData.renderBinary(binary, false, null),"Block: Min-Max");
+		GThresholdImageOps.blockMean(input, binary, ConfigLength.fixed(21), 1.0, true );
+		gui.addImage(VisualizeBinaryData.renderBinary(binary, false, null),"Block: Mean");
+		GThresholdImageOps.blockOtsu(input, binary, false,ConfigLength.fixed(21),0.5, 1.0, true );
+		gui.addImage(VisualizeBinaryData.renderBinary(binary, false, null),"Block: Otsu");
 
 		// Sauvola is tuned for text image.  Change radius to make it run better in others.
 
