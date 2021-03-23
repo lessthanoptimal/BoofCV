@@ -65,15 +65,15 @@ public class GenerateConvolveImageStandard_SB extends CodeGeneratorBase {
 
 	private void printPreamble() {
 		autoSelectName();
-		out.print("import boofcv.alg.misc.ImageMiscOps;\n" +
-				"import pabeles.concurrency.GrowArray;\n" +
+		out.print("import pabeles.concurrency.GrowArray;\n" +
 				"import boofcv.misc.BoofMiscOps;\n" +
 				"import boofcv.struct.convolve.*;\n" +
 				"import boofcv.struct.image.*;\n" +
 				"import org.ddogleg.struct.DogArray_I32;\n" +
 				"import org.jetbrains.annotations.Nullable;\n" +
 				"\n" +
-				"import javax.annotation.Generated;\n");
+				"import javax.annotation.Generated;\n" +
+				"import java.util.Arrays;\n");
 		out.println();
 		out.print("//CONCURRENT_INLINE import boofcv.concurrency.BoofConcurrency;\n");
 
@@ -217,21 +217,19 @@ public class GenerateConvolveImageStandard_SB extends CodeGeneratorBase {
 				"\n" +
 				"\t\tfinal int imgWidth = dest.getWidth();\n" +
 				"\t\tfinal int imgHeight = dest.getHeight();\n" +
-				"\t\tfinal int yEnd = imgHeight - (kernelWidth - offset - 1);\n" +
-				"\n" +
-				"\t\t// JMH isn't showing any slow down by filling instead of having a special case fir the first iteration\n" +
-				"\t\tImageMiscOps.fill(dest, 0);\n");
+				"\t\tfinal int yEnd = imgHeight - (kernelWidth - offset - 1);\n");
 
 		String body = "";
 		body += "\t\t\tfinal int indexDstStart = dest.startIndex + y*dest.stride;\n" +
-				"\t\t\t\n" +
+				"\t\t\tArrays.fill(dataDst, indexDstStart, indexDstStart + imgWidth, (" + outputData + ")0);\n" +
+				"\n" +
 				"\t\t\tfor (int k = 0; k < kernelWidth; k++) {\n" +
 				"\t\t\t\t" + kernelData + " kernelValue = dataKer[k];\n" +
 				"\t\t\t\tint indexDst = indexDstStart;\n" +
-				"\t\t\t\tfinal int iStart = image.startIndex + (y - offset +k)*image.stride;\n" +
+				"\t\t\t\tfinal int iStart = image.startIndex + (y - offset + k)*image.stride;\n" +
 				"\t\t\t\tfinal int iEnd = iStart + imgWidth;\n" +
 				"\t\t\t\tfor (int i = iStart; i < iEnd; i++) {\n" +
-				"\t\t\t\t\tdataDst[indexDst++] += (dataSrc[i]" + bitWise + ")*kernelValue;\n" +
+				"\t\t\t\t\tdataDst[indexDst++] += " + typeCast + "((dataSrc[i]" + bitWise + ")*kernelValue);\n" +
 				"\t\t\t\t}\n" +
 				"\t\t\t}\n";
 

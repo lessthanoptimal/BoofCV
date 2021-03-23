@@ -35,7 +35,7 @@ import java.util.concurrent.TimeUnit;
 @State(Scope.Benchmark)
 @Fork(value = 1)
 @SuppressWarnings({"UnusedDeclaration"})
-public class BenchmarkConvolveImageStandard extends CommonBenchmarkConvolve_SB {
+public class BenchmarkConvolveImageStandard_SB extends CommonBenchmarkConvolve_SB {
 	@Param({"1", "10"})
 	private int radius;
 
@@ -50,7 +50,7 @@ public class BenchmarkConvolveImageStandard extends CommonBenchmarkConvolve_SB {
 	@Benchmark public void horizontal_S16_I16() {ConvolveImageStandard_SB.horizontal(kernelI32, input_S16, out_S16);}
 	@Benchmark public void horizontal_S32_I32() {ConvolveImageStandard_SB.horizontal(kernelI32, input_S32, out_S32);}
 	@Benchmark public void vertical_F32() {ConvolveImageStandard_SB.vertical(kernelF32, input_F32, out_F32);}
-	@Benchmark public void vertical_U8_I8_div() {ConvolveImageStandard_SB.vertical(kernelI32, input_U8, out_U8, 10);}
+	@Benchmark public void vertical_U8_I8_DIV() {ConvolveImageStandard_SB.vertical(kernelI32, input_U8, out_U8, 10);}
 	@Benchmark public void vertical_U8_I16() {ConvolveImageStandard_SB.vertical(kernelI32, input_U8, out_S16);}
 	@Benchmark public void vertical_U8_I32() {ConvolveImageStandard_SB.vertical(kernelI32, input_U8, out_S32);}
 	@Benchmark public void vertical_U16_I16() {ConvolveImageStandard_SB.vertical(kernelI32, input_U16, out_S16);}
@@ -72,7 +72,7 @@ public class BenchmarkConvolveImageStandard extends CommonBenchmarkConvolve_SB {
 
 	public static void main( String[] args ) throws RunnerException {
 		Options opt = new OptionsBuilder()
-				.include(BenchmarkConvolveImageStandard.class.getSimpleName())
+				.include(BenchmarkConvolveImageStandard_SB.class.getSimpleName())
 				.warmupTime(TimeValue.seconds(1))
 				.measurementTime(TimeValue.seconds(1))
 				.build();
