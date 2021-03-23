@@ -78,6 +78,7 @@ public class BenchmarkConvolveImageStandard_SB extends CommonBenchmarkConvolve_S
 	public static void main( String[] args ) throws RunnerException {
 		Options opt = new OptionsBuilder()
 				.include(BenchmarkConvolveImageStandard_SB.class.getSimpleName())
+				.exclude(BenchmarkConvolveImageStandard_SB_MT.class.getSimpleName())
 				.warmupTime(TimeValue.seconds(1))
 				.measurementTime(TimeValue.seconds(1))
 				.build();

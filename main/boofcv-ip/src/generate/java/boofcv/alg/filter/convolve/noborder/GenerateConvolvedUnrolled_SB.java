@@ -102,14 +102,27 @@ public class GenerateConvolvedUnrolled_SB extends CodeGeneratorBase {
 			addHorizontal(3 + i * 2,hasDivisor);
 		}
 		for (int i = 0; i < numUnrolled; i++) {
-			addVertical(3 + i * 2, hasDivisor);
+			// Disabling because it's worth investigating why the Div approach didn't win. It can also be
+			// adapted to Vector easier
+//			if (hasDivisor)
+//				addVerticalDiv(3 +i*2);
+//			else
+			addVertical(3 + i*2, hasDivisor);
 		}
 		for (int i = 0; i < numUnrolled; i++) {
 			if( hasDivisor )
-				addConvolveDiv(3 + i * 2 );
+				addConvolveDiv(3 + i*2 );
 			else
-				addConvolve(3 + i * 2 );
+				addConvolve(3 + i*2 );
 		}
+
+//		if (isInteger) {
+//			out.println("\tprivate static void scaleArray( final " + dataInput + "[] dataSrc, final int kernelVal, final int imgWidth, final int[] totalRow, int indexSrc ) {\n" +
+//					"\t\tfor (int j = 0; j < imgWidth; j++) {\n" +
+//					"\t\t\ttotalRow[j] += (dataSrc[indexSrc++]" + bitWise + ")*kernelVal;\n" +
+//					"\t\t}\n" +
+//					"\t}\n");
+//		}
 
 		out.println("}");
 	}
@@ -125,7 +138,8 @@ public class GenerateConvolvedUnrolled_SB extends CodeGeneratorBase {
 		out.print("import boofcv.struct.image." + typeInput + ";\n"+
 				"import org.ddogleg.struct."+workType+";\n"+
 				"import javax.annotation.Generated;\n" +
-				"import boofcv.concurrency.*;\n");
+				"import boofcv.concurrency.*;\n" +
+				"import java.util.Arrays;\n");
 
 		out.println("\n//CONCURRENT_CLASS_NAME "+nameConcurrent);
 		out.println("//CONCURRENT_INLINE import boofcv.concurrency.BoofConcurrency;");
@@ -238,8 +252,8 @@ public class GenerateConvolvedUnrolled_SB extends CodeGeneratorBase {
 	void addVertical(int num, boolean hasDivisor) {
 		String typeCast = generateTypeCast();
 
-		out.print("\tpublic static void vertical" + num + "( Kernel1D_" + typeKernel + " kernel , "
-				 + typeInput + " image, " + typeOutput + " dest ");
+		out.print("\tpublic static void vertical" + num + "( Kernel1D_" + typeKernel + " kernel, "
+				 + typeInput + " src, " + typeOutput + " dst ");
 		if( hasDivisor && !isInteger)
 			out.print(", int divisor )\n");
 		else if( hasDivisor && isInteger)
@@ -248,8 +262,8 @@ public class GenerateConvolvedUnrolled_SB extends CodeGeneratorBase {
 			out.print(")\n");
 
 		out.print("\t{\n" +
-				"\t\tfinal " + dataInput + "[] dataSrc = image.data;\n" +
-				"\t\tfinal " + dataOutput + "[] dataDst = dest.data;\n" +
+				"\t\tfinal " + dataInput + "[] dataSrc = src.data;\n" +
+				"\t\tfinal " + dataOutput + "[] dataDst = dst.data;\n" +
 				"\n");
 		for (int i = 0; i < num; i++) {
 			out.printf("\t\tfinal " + dataKernel + " k%d = kernel.data[%d];\n", i + 1, i);
@@ -258,22 +272,22 @@ public class GenerateConvolvedUnrolled_SB extends CodeGeneratorBase {
 		out.print("\n" +
 				"\t\tfinal int radius = kernel.getRadius();\n" +
 				"\n" +
-				"\t\tfinal int imgWidth = dest.getWidth();\n" +
-				"\t\tfinal int imgHeight = dest.getHeight();\n" +
+				"\t\tfinal int imgWidth = dst.getWidth();\n" +
+				"\t\tfinal int imgHeight = dst.getHeight();\n" +
 				(hasDivisor ? declareHalf : "") +
 				"\n" +
-				"\t\tfinal int yEnd = imgHeight-radius;\n");
+				"\t\tfinal int yEnd = imgHeight - radius;\n");
 
-		String body = "\t\t\tint indexDst = dest.startIndex+y*dest.stride;\n" +
-				"\t\t\tint i = image.startIndex + (y-radius)*image.stride;\n" +
-				"\t\t\tfinal int iEnd = i+imgWidth;\n" +
+		String body = "\t\t\tint indexDst = dst.startIndex + y*dst.stride;\n" +
+				"\t\t\tint i = src.startIndex + (y - radius)*src.stride;\n" +
+				"\t\t\tfinal int iEnd = i + imgWidth;\n" +
 				"\n" +
-				"\t\t\tfor( ; i < iEnd; i++ ) {\n" +
+				"\t\t\tfor (; i < iEnd; i++) {\n" +
 				"\t\t\t\tint indexSrc = i;\n" +
 				"\n" +
 				"\t\t\t\t" + sumType + " total = (dataSrc[indexSrc]"+bitWise+") * k1;\n";
 		for (int i = 1; i < num; i++) {
-			body += "\t\t\t\tindexSrc += image.stride;\n";
+			body += "\t\t\t\tindexSrc += src.stride;\n";
 			body += String.format("\t\t\t\ttotal += (dataSrc[indexSrc]" + bitWise + ")*k%d;\n", i + 1);
 		}
 		body += "\n";
@@ -284,6 +298,51 @@ public class GenerateConvolvedUnrolled_SB extends CodeGeneratorBase {
 		body += "\t\t\t}\n";
 
 		printParallel("y","radius","yEnd",body);
+
+		out.print("\t}\n\n");
+	}
+
+	/**
+	 * This doesn't seem to be getting optimized as well. For r=1 it's much faster. Cost increases linearly. While
+	 * for the other it has constant runtime independent of kernel length, which is really odd.
+	 */
+	void addVerticalDiv( int num) {
+		out.print("\tpublic static void vertical"+num+"( Kernel1D_"+typeKernel+" kernel, "+typeInput+" src, "+
+				typeOutput+" dst, int divisor, @Nullable GrowArray<DogArray_I32> workspaces ) {\n" +
+				"\t\tworkspaces = BoofMiscOps.checkDeclare(workspaces, DogArray_I32::new);\n" +
+				"\t\tfinal DogArray_I32 work = workspaces.grow(); //CONCURRENT_REMOVE_LINE\n" +
+				"\t\tfinal "+dataInput+"[] dataSrc = src.data;\n" +
+				"\t\tfinal "+dataOutput+"[] dataDst = dst.data;\n" +
+				"\n");
+		for (int i = 0; i < num; i++) {
+			out.printf("\t\tfinal " + dataKernel + " k%d = kernel.data[%d];\n", i + 1, i);
+		}
+		out.print("\n" +
+				"\t\tfinal int offset = kernel.getRadius();\n" +
+				"\n" +
+				"\t\tfinal int imgWidth = dst.getWidth();\n" +
+				"\t\tfinal int imgHeight = dst.getHeight();\n" +
+				"\t\tfinal int halfDivisor = divisor/2;\n" +
+				"\t\tfinal double divisionHack = 1.0/divisor; // WTF integer division is slower than converting to a float??\n" +
+				"\n" +
+				"\t\tfinal int yEnd = imgHeight-offset;\n");
+		String body = "";
+		body += "\t\tint[] totalRow = BoofMiscOps.checkDeclare(work, imgWidth, true);\n" +
+				"\t\tfor (int y = y0; y < y1; y++) {\n" +
+				"\t\t\tint indexSrc = src.startIndex + (y - offset)*src.stride;\n";
+		for (int i = 0; i < num; i++) {
+			body += String.format("\t\t\tscaleArray(dataSrc, k%d, imgWidth, totalRow, indexSrc); indexSrc += src.stride;\n",i+1);
+		}
+
+		body += "\n" +
+				"\t\t\tint indexDst = dst.startIndex + y*dst.stride;\n" +
+				"\t\t\tfor (int j = 0; j < imgWidth; j++) {\n" +
+				"\t\t\t\tdataDst[indexDst++] = ("+dataOutput+")((totalRow[j] + halfDivisor)*divisionHack);\n" +
+				"\t\t\t}\n" +
+				"\t\t\tArrays.fill(totalRow,0,imgWidth,0);\n" +
+				"\t\t}\n";
+
+		printParallelBlock("y0", "y1", "offset", "yEnd", null, body);
 
 		out.print("\t}\n\n");
 	}

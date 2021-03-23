@@ -88,11 +88,14 @@ public abstract class CodeGeneratorBase {
 		out.print("\t\t//CONCURRENT_ABOVE });\n");
 	}
 
-	protected void printParallelBlock( String var0, String var1, String lower, String upper, String minBlock, String body ) {
+	protected void printParallelBlock( String nameY0, String nameY1, String lower, String upper, @Nullable String minBlock, String body ) {
 		out.println();
 
-		out.printf("\t\t//CONCURRENT_BELOW BoofConcurrency.loopBlocks(%s, %s, %s, workspaces, (work, %s, %s)->{\n", lower, upper, minBlock, var0, var1);
-		out.printf("\t\tfinal int %s = %s, %s = %s;\n", var0, lower, var1, upper);
+		if (minBlock!=null)
+			out.printf("\t\t//CONCURRENT_BELOW BoofConcurrency.loopBlocks(%s, %s, %s, workspaces, (work, %s, %s)->{\n", lower, upper, minBlock, nameY0, nameY1);
+		else
+			out.printf("\t\t//CONCURRENT_BELOW BoofConcurrency.loopBlocks(%s, %s, workspaces, (work, %s, %s)->{\n", lower, upper, nameY0, nameY1);
+		out.printf("\t\tfinal int %s = %s, %s = %s;\n", nameY0, lower, nameY1, upper);
 		out.print(body);
 		out.print("\t\t//CONCURRENT_INLINE });\n");
 	}
