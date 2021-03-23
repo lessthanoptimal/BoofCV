@@ -20,10 +20,7 @@ package boofcv.alg.filter.convolve;
 
 import boofcv.alg.misc.ImageMiscOps;
 import boofcv.factory.filter.kernel.FactoryKernelGaussian;
-import boofcv.struct.convolve.Kernel1D_F32;
-import boofcv.struct.convolve.Kernel1D_S32;
-import boofcv.struct.convolve.Kernel2D_F32;
-import boofcv.struct.convolve.Kernel2D_S32;
+import boofcv.struct.convolve.*;
 import boofcv.struct.image.*;
 import org.ddogleg.struct.DogArray_F32;
 import org.ddogleg.struct.DogArray_F64;
@@ -39,7 +36,9 @@ public class CommonBenchmarkConvolve_SB {
 	protected static int width = 800, height = 600;
 
 	protected static Kernel2D_F32 kernel2D_F32;
+	protected static Kernel2D_F64 kernel2D_F64;
 	protected static Kernel1D_F32 kernelF32;
+	protected static Kernel1D_F64 kernelF64;
 	protected static Kernel1D_S32 kernelI32;
 	protected static Kernel2D_S32 kernel2D_I32;
 	protected static GrayF32 input_F32 = new GrayF32(width, height);
@@ -68,8 +67,10 @@ public class CommonBenchmarkConvolve_SB {
 		ImageMiscOps.fillUniform(input_F64, rand, 0, 20);
 		System.arraycopy(input_S16.data,0,input_U16.data,0,input_S16.data.length);
 
+		kernelF64 = FactoryKernelGaussian.gaussian(Kernel1D_F64.class, -1, radius);
 		kernelF32 = FactoryKernelGaussian.gaussian(Kernel1D_F32.class, -1, radius);
 		kernelI32 = FactoryKernelGaussian.gaussian(Kernel1D_S32.class, -1, radius);
+		kernel2D_F64 = FactoryKernelGaussian.gaussian(Kernel2D_F64.class, -1, radius);
 		kernel2D_F32 = FactoryKernelGaussian.gaussian(Kernel2D_F32.class, -1, radius);
 		kernel2D_I32 = FactoryKernelGaussian.gaussian(Kernel2D_S32.class, -1, radius);
 	}
