@@ -64,10 +64,10 @@ public class GenerateConvolveImageStandard_IL extends CodeGeneratorBase {
 
 	private void printPreamble() {
 		autoSelectName();
-		out.print("import boofcv.alg.misc.ImageMiscOps;\n" +
-				"import boofcv.struct.convolve.*;\n" +
+		out.print("import boofcv.struct.convolve.*;\n" +
 				"import boofcv.struct.image.*;\n" +
-				"import javax.annotation.Generated;\n");
+				"import javax.annotation.Generated;\n" +
+				"import java.util.Arrays;\n");
 		out.print("//CONCURRENT_INLINE import boofcv.concurrency.BoofConcurrency;\n");
 
 		out.println();
@@ -221,14 +221,12 @@ public class GenerateConvolveImageStandard_IL extends CodeGeneratorBase {
 				"\t\tfinal int imgHeight = dst.getHeight();\n" +
 				"\n" +
 				"\t\tfinal int yEnd = imgHeight-(kernelWidth-offset-1);\n" +
-				"\t\tfinal int elementsInRow = imgWidth*numBands;\n" +
-				"\n" +
-				"\t\t// JMH isn't showing any slow down by filling instead of having a special case fir the first iteration\n" +
-				"\t\tImageMiscOps.fill(dst, 0);\n");
+				"\t\tfinal int elementsInRow = imgWidth*numBands;\n");
 
 		String body = "";
 		body += "\t\t\tfinal int indexDstStart = dst.startIndex+y*dst.stride;\n" +
 				"\t\t\tint indexSrcStart = src.startIndex + (y - offset)*src.stride;\n" +
+				"\t\t\tArrays.fill(dataDst, indexDstStart, indexDstStart + elementsInRow, (" + outputData + ")0);\n" +
 				"\n" +
 				"\t\t\tfor (int k = 0; k < kernelWidth; k++) {\n" +
 				"\t\t\t\tfinal " + kernelData + " kernelValue = dataKer[k];\n" +
@@ -237,7 +235,7 @@ public class GenerateConvolveImageStandard_IL extends CodeGeneratorBase {
 				"\t\t\t\tint indexSrcEnd = indexSrc + elementsInRow;\n" +
 				"\n" +
 				"\t\t\t\twhile (indexSrc < indexSrcEnd) {\n" +
-				"\t\t\t\t\tdataDst[indexDst++] += (dataSrc[indexSrc++]" + bitWise + ")*kernelValue;\n" +
+				"\t\t\t\t\tdataDst[indexDst++] += " + typeCast + "((dataSrc[indexSrc++]" + bitWise + ")*kernelValue);\n" +
 				"\t\t\t\t}\n" +
 				"\t\t\t\tindexSrcStart += src.stride;\n" +
 				"\t\t\t}\n";

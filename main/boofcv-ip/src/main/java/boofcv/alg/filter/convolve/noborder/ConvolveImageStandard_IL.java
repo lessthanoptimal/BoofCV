@@ -18,11 +18,11 @@
 
 package boofcv.alg.filter.convolve.noborder;
 
-import boofcv.alg.misc.ImageMiscOps;
 import boofcv.struct.convolve.*;
 import boofcv.struct.image.*;
 
 import javax.annotation.Generated;
+import java.util.Arrays;
 //CONCURRENT_INLINE import boofcv.concurrency.BoofConcurrency;
 
 
@@ -87,13 +87,11 @@ public class ConvolveImageStandard_IL {
 		final int yEnd = imgHeight-(kernelWidth-offset-1);
 		final int elementsInRow = imgWidth*numBands;
 
-		// JMH isn't showing any slow down by filling instead of having a special case fir the first iteration
-		ImageMiscOps.fill(dst, 0);
-
 		//CONCURRENT_BELOW BoofConcurrency.loopFor(offset, yEnd, y -> {
 		for (int y = offset; y < yEnd; y++) {
 			final int indexDstStart = dst.startIndex+y*dst.stride;
 			int indexSrcStart = src.startIndex + (y - offset)*src.stride;
+			Arrays.fill(dataDst, indexDstStart, indexDstStart + elementsInRow, (float)0);
 
 			for (int k = 0; k < kernelWidth; k++) {
 				final float kernelValue = dataKer[k];
@@ -102,7 +100,7 @@ public class ConvolveImageStandard_IL {
 				int indexSrcEnd = indexSrc + elementsInRow;
 
 				while (indexSrc < indexSrcEnd) {
-					dataDst[indexDst++] += (dataSrc[indexSrc++])*kernelValue;
+					dataDst[indexDst++] += ((dataSrc[indexSrc++])*kernelValue);
 				}
 				indexSrcStart += src.stride;
 			}
@@ -192,13 +190,11 @@ public class ConvolveImageStandard_IL {
 		final int yEnd = imgHeight-(kernelWidth-offset-1);
 		final int elementsInRow = imgWidth*numBands;
 
-		// JMH isn't showing any slow down by filling instead of having a special case fir the first iteration
-		ImageMiscOps.fill(dst, 0);
-
 		//CONCURRENT_BELOW BoofConcurrency.loopFor(offset, yEnd, y -> {
 		for (int y = offset; y < yEnd; y++) {
 			final int indexDstStart = dst.startIndex+y*dst.stride;
 			int indexSrcStart = src.startIndex + (y - offset)*src.stride;
+			Arrays.fill(dataDst, indexDstStart, indexDstStart + elementsInRow, (double)0);
 
 			for (int k = 0; k < kernelWidth; k++) {
 				final double kernelValue = dataKer[k];
@@ -207,7 +203,7 @@ public class ConvolveImageStandard_IL {
 				int indexSrcEnd = indexSrc + elementsInRow;
 
 				while (indexSrc < indexSrcEnd) {
-					dataDst[indexDst++] += (dataSrc[indexSrc++])*kernelValue;
+					dataDst[indexDst++] += ((dataSrc[indexSrc++])*kernelValue);
 				}
 				indexSrcStart += src.stride;
 			}
@@ -297,13 +293,11 @@ public class ConvolveImageStandard_IL {
 		final int yEnd = imgHeight-(kernelWidth-offset-1);
 		final int elementsInRow = imgWidth*numBands;
 
-		// JMH isn't showing any slow down by filling instead of having a special case fir the first iteration
-		ImageMiscOps.fill(dst, 0);
-
 		//CONCURRENT_BELOW BoofConcurrency.loopFor(offset, yEnd, y -> {
 		for (int y = offset; y < yEnd; y++) {
 			final int indexDstStart = dst.startIndex+y*dst.stride;
 			int indexSrcStart = src.startIndex + (y - offset)*src.stride;
+			Arrays.fill(dataDst, indexDstStart, indexDstStart + elementsInRow, (short)0);
 
 			for (int k = 0; k < kernelWidth; k++) {
 				final int kernelValue = dataKer[k];
@@ -312,7 +306,7 @@ public class ConvolveImageStandard_IL {
 				int indexSrcEnd = indexSrc + elementsInRow;
 
 				while (indexSrc < indexSrcEnd) {
-					dataDst[indexDst++] += (dataSrc[indexSrc++] & 0xFF)*kernelValue;
+					dataDst[indexDst++] += (short)((dataSrc[indexSrc++] & 0xFF)*kernelValue);
 				}
 				indexSrcStart += src.stride;
 			}
@@ -402,13 +396,11 @@ public class ConvolveImageStandard_IL {
 		final int yEnd = imgHeight-(kernelWidth-offset-1);
 		final int elementsInRow = imgWidth*numBands;
 
-		// JMH isn't showing any slow down by filling instead of having a special case fir the first iteration
-		ImageMiscOps.fill(dst, 0);
-
 		//CONCURRENT_BELOW BoofConcurrency.loopFor(offset, yEnd, y -> {
 		for (int y = offset; y < yEnd; y++) {
 			final int indexDstStart = dst.startIndex+y*dst.stride;
 			int indexSrcStart = src.startIndex + (y - offset)*src.stride;
+			Arrays.fill(dataDst, indexDstStart, indexDstStart + elementsInRow, (int)0);
 
 			for (int k = 0; k < kernelWidth; k++) {
 				final int kernelValue = dataKer[k];
@@ -417,7 +409,7 @@ public class ConvolveImageStandard_IL {
 				int indexSrcEnd = indexSrc + elementsInRow;
 
 				while (indexSrc < indexSrcEnd) {
-					dataDst[indexDst++] += (dataSrc[indexSrc++] & 0xFF)*kernelValue;
+					dataDst[indexDst++] += ((dataSrc[indexSrc++] & 0xFF)*kernelValue);
 				}
 				indexSrcStart += src.stride;
 			}
@@ -546,13 +538,11 @@ public class ConvolveImageStandard_IL {
 		final int yEnd = imgHeight-(kernelWidth-offset-1);
 		final int elementsInRow = imgWidth*numBands;
 
-		// JMH isn't showing any slow down by filling instead of having a special case fir the first iteration
-		ImageMiscOps.fill(dst, 0);
-
 		//CONCURRENT_BELOW BoofConcurrency.loopFor(offset, yEnd, y -> {
 		for (int y = offset; y < yEnd; y++) {
 			final int indexDstStart = dst.startIndex+y*dst.stride;
 			int indexSrcStart = src.startIndex + (y - offset)*src.stride;
+			Arrays.fill(dataDst, indexDstStart, indexDstStart + elementsInRow, (short)0);
 
 			for (int k = 0; k < kernelWidth; k++) {
 				final int kernelValue = dataKer[k];
@@ -561,7 +551,7 @@ public class ConvolveImageStandard_IL {
 				int indexSrcEnd = indexSrc + elementsInRow;
 
 				while (indexSrc < indexSrcEnd) {
-					dataDst[indexDst++] += (dataSrc[indexSrc++])*kernelValue;
+					dataDst[indexDst++] += (short)((dataSrc[indexSrc++])*kernelValue);
 				}
 				indexSrcStart += src.stride;
 			}
@@ -865,13 +855,11 @@ public class ConvolveImageStandard_IL {
 		final int yEnd = imgHeight-(kernelWidth-offset-1);
 		final int elementsInRow = imgWidth*numBands;
 
-		// JMH isn't showing any slow down by filling instead of having a special case fir the first iteration
-		ImageMiscOps.fill(dst, 0);
-
 		//CONCURRENT_BELOW BoofConcurrency.loopFor(offset, yEnd, y -> {
 		for (int y = offset; y < yEnd; y++) {
 			final int indexDstStart = dst.startIndex+y*dst.stride;
 			int indexSrcStart = src.startIndex + (y - offset)*src.stride;
+			Arrays.fill(dataDst, indexDstStart, indexDstStart + elementsInRow, (short)0);
 
 			for (int k = 0; k < kernelWidth; k++) {
 				final int kernelValue = dataKer[k];
@@ -880,7 +868,7 @@ public class ConvolveImageStandard_IL {
 				int indexSrcEnd = indexSrc + elementsInRow;
 
 				while (indexSrc < indexSrcEnd) {
-					dataDst[indexDst++] += (dataSrc[indexSrc++] & 0xFFFF)*kernelValue;
+					dataDst[indexDst++] += (short)((dataSrc[indexSrc++] & 0xFFFF)*kernelValue);
 				}
 				indexSrcStart += src.stride;
 			}
@@ -1116,13 +1104,11 @@ public class ConvolveImageStandard_IL {
 		final int yEnd = imgHeight-(kernelWidth-offset-1);
 		final int elementsInRow = imgWidth*numBands;
 
-		// JMH isn't showing any slow down by filling instead of having a special case fir the first iteration
-		ImageMiscOps.fill(dst, 0);
-
 		//CONCURRENT_BELOW BoofConcurrency.loopFor(offset, yEnd, y -> {
 		for (int y = offset; y < yEnd; y++) {
 			final int indexDstStart = dst.startIndex+y*dst.stride;
 			int indexSrcStart = src.startIndex + (y - offset)*src.stride;
+			Arrays.fill(dataDst, indexDstStart, indexDstStart + elementsInRow, (int)0);
 
 			for (int k = 0; k < kernelWidth; k++) {
 				final int kernelValue = dataKer[k];
@@ -1131,7 +1117,7 @@ public class ConvolveImageStandard_IL {
 				int indexSrcEnd = indexSrc + elementsInRow;
 
 				while (indexSrc < indexSrcEnd) {
-					dataDst[indexDst++] += (dataSrc[indexSrc++])*kernelValue;
+					dataDst[indexDst++] += ((dataSrc[indexSrc++])*kernelValue);
 				}
 				indexSrcStart += src.stride;
 			}
