@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -130,7 +130,8 @@ public class GenerateConvolveImageNoBorder extends CodeGeneratorBase {
 		String divideArg = hasDivide ? ", int divisor" : "";
 		String divideSuf = hasDivide ? "_Div" : "";
 		String divideInput = hasDivide ? ", divisor" : "";
-		String workspaceArg = hasDivide && singleBand && name.equals("convolve") ? ", @Nullable GrowArray<DogArray_I32> work" : "";
+		String workspaceArg = hasDivide && singleBand && (name.equals("convolve") || name.equals("vertical"))
+				? ", @Nullable GrowArray<DogArray_I32> work" : "";
 		String workspaceInput = workspaceArg.length()==0 ? "" : ", work";
 
 		// Not all permutations of unrolled are generated

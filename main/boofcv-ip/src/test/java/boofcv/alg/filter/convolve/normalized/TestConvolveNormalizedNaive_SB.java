@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -130,7 +130,7 @@ public class TestConvolveNormalizedNaive_SB extends BoofStandardJUnit {
 		ConvolveNormalizedNaive_SB.vertical(kernelX,kernelY, input, output);
 
 		GrayU8 alt = new GrayU8(15,16);
-		ConvolveImageNoBorder.vertical(kernelY, input, alt, kernelX.computeSum() * kernelY.computeSum());
+		ConvolveImageNoBorder.vertical(kernelY, input, alt, kernelX.computeSum() * kernelY.computeSum(), null);
 
 		for (int y = 0; y < output.height; y++) {
 			for (int x = 0; x < output.width; x++) {

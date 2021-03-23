@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -20,6 +20,8 @@ package boofcv.alg.filter.convolve;
 
 import boofcv.generate.AutoTypeImage;
 import boofcv.generate.CodeGeneratorBase;
+
+import java.io.FileNotFoundException;
 
 /**
  * NOTE: There is a tinny bit of manual work required.  need to comment out a few lines to unroll
@@ -113,7 +115,7 @@ public class GenerateConvolveImageNormalized extends CodeGeneratorBase {
 		String kernelTypeName = "Kernel"+dimen+"_"+kernelType;
 
 		String overrideName = name.equals("convolve") ? "Convolve" : name.equals("horizontal") ? "Horizontal" : "Vertical";
-		String workArray = name.equals("convolve") && singleBand ? ", null" : "";
+		String workArray = (name.equals("convolve")||(name.equals("vertical") && isInteger)) && singleBand ? ", null" : "";
 
 		String borderArgument = border ? ", "+borderType+" bsrc" : "";
 
@@ -181,8 +183,10 @@ public class GenerateConvolveImageNormalized extends CodeGeneratorBase {
 		out.print("\t}\n\n");
 	}
 
-	public static void main(String[] args) {
-		GenerateConvolveImageNormalized gen = new GenerateConvolveImageNormalized();
-		gen.generateCode();
+	public static void main(String[] args) throws FileNotFoundException {
+		var gen = new GenerateConvolveImageNormalized();
+		gen.setModuleName("boofcv-ip");
+		gen.parseArguments(args);
+		gen.generate();
 	}
 }

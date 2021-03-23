@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -48,11 +48,11 @@ public class TestConvolveJustBorder_General_SB extends CompareImageBorder {
 	}
 
 	@Override
-	protected boolean isTestMethod(Method m) {
-		Class<?> e[] = m.getParameterTypes();
+	protected boolean isTestMethod( Method m ) {
+		Class<?>[] e = m.getParameterTypes();
 
-		for( Class<?> c : e ) {
-			if( ImageGray.class.isAssignableFrom(c))
+		for (Class<?> c : e) {
+			if (ImageGray.class.isAssignableFrom(c))
 				return true;
 		}
 		return false;
@@ -68,53 +68,57 @@ public class TestConvolveJustBorder_General_SB extends CompareImageBorder {
 	}
 
 	@Override
-	protected boolean isEquivalent(Method candidate, Method evaluation) {
-		if( evaluation.getName().compareTo(candidate.getName()) != 0 )
+	protected boolean isEquivalent( Method candidate, Method evaluation ) {
+		if (evaluation.getName().compareTo(candidate.getName()) != 0)
 			return false;
 
-		Class<?> e[] = evaluation.getParameterTypes();
-		Class<?> c[] = candidate.getParameterTypes();
+		Class<?>[] e = evaluation.getParameterTypes();
+		Class<?>[] c = candidate.getParameterTypes();
 
-		if( e.length != c.length )
+		if (candidate.getName().equals("vertical") && e.length == 4) {
+			if (c.length != 5)
+				return false;
+		} else if (e.length != c.length)
 			return false;
-		if( e[0] != c[0] )
+		if (e[0] != c[0])
 			return false;
-		if( !e[2].isAssignableFrom(c[2]) )
+		if (!e[2].isAssignableFrom(c[2]))
 			return false;
 
 		return true;
 	}
 
 	@Override
-	protected Object[] reformatForValidation(Method m, Object[] targetParam) {
-		Object[] ret = targetParam.clone();
+	protected Object[] reformatForValidation( Method m, Object[] targetParam ) {
+		Object[] ret = new Object[Math.max(m.getParameterTypes().length, targetParam.length)];
+		System.arraycopy(targetParam, 0, ret, 0, targetParam.length);
 
-		ImageBorder border = (ImageBorder) targetParam[1];
+		ImageBorder border = (ImageBorder)targetParam[1];
 		ImageGray inputImage = (ImageGray)border.getImage();
 
 		KernelBase kernel = (KernelBase)targetParam[0];
 
-		computeBorder(kernel,m.getName());
+		computeBorder(kernel, m.getName());
 
-		int borderWidthX = borderX0+borderX1;
-		int borderWidthY = borderY0+borderY1;
+		int borderWidthX = borderX0 + borderX1;
+		int borderWidthY = borderY0 + borderY1;
 
 		// input image
-		ret[1] = inputImage.createNew(width+ borderWidthX,height+ borderWidthY);
+		ret[1] = inputImage.createNew(width + borderWidthX, height + borderWidthY);
 		// output image
-		ret[2] = ((ImageGray)targetParam[2]).createNew(width+ borderWidthX,height+ borderWidthY);
+		ret[2] = ((ImageGray)targetParam[2]).createNew(width + borderWidthX, height + borderWidthY);
 
-		GImageMiscOps.growBorder(inputImage,border, borderX0, borderY0,borderX1,borderY1,(ImageBase)ret[1]);
+		GImageMiscOps.growBorder(inputImage, border, borderX0, borderY0, borderX1, borderY1, (ImageBase)ret[1]);
 
 		return ret;
 	}
 
 	@Override
-	protected Object[][] createInputParam(Method candidate, Method validation) {
-		Class<?> paramTypes[] = candidate.getParameterTypes();
+	protected Object[][] createInputParam( Method candidate, Method validation ) {
+		Class<?>[] paramTypes = candidate.getParameterTypes();
 
 		// Adjust border size for the different  convolution types
-		int kernelLength=5;
+		int kernelLength = 5;
 
 		KernelBase kernel = createKernel(paramTypes[0], kernelLength, kernelLength/2);
 
@@ -122,7 +126,7 @@ public class TestConvolveJustBorder_General_SB extends CompareImageBorder {
 		GImageMiscOps.fillUniform(src, rand, 0, 5);
 		ImageBase dst = ConvolutionTestHelper.createImage(validation.getParameterTypes()[2], width, height);
 
-		ImageBorder border = FactoryImageBorder.generic(borderType,src.getImageType());
+		ImageBorder border = FactoryImageBorder.generic(borderType, src.getImageType());
 		border.setImage(src);
 
 		Object[][] ret = new Object[2][paramTypes.length];
@@ -130,39 +134,39 @@ public class TestConvolveJustBorder_General_SB extends CompareImageBorder {
 		ret[0][0] = kernel;
 		ret[0][1] = border;
 		ret[0][2] = dst;
-		if( paramTypes.length == 4 )
-			ret[0][3] = BoofTesting.primitive(3,paramTypes[3]);
+		if (paramTypes.length == 4)
+			ret[0][3] = BoofTesting.primitive(3, paramTypes[3]);
 
 		// change the offset
-		kernel = createKernel(paramTypes[0], kernelLength, kernelLength /2-1);
+		kernel = createKernel(paramTypes[0], kernelLength, kernelLength/2 - 1);
 		ret[1][0] = kernel;
 		ret[1][1] = border;
 		ret[1][2] = ConvolutionTestHelper.createImage(validation.getParameterTypes()[2], width, height);
-		if( paramTypes.length == 4 )
-			ret[1][3] = BoofTesting.primitive(3,paramTypes[3]);
+		if (paramTypes.length == 4)
+			ret[1][3] = BoofTesting.primitive(3, paramTypes[3]);
 		return ret;
 	}
 
 	@Override
-	protected void compareResults(Object targetResult, Object[] targetParam, Object validationResult, Object[] validationParam) {
+	protected void compareResults( Object targetResult, Object[] targetParam, Object validationResult, Object[] validationParam ) {
 		ImageGray targetOut = (ImageGray)targetParam[2];
 		ImageGray validationOut = (ImageGray)validationParam[2];
 
 		// remove the border
-		computeBorder((KernelBase)targetParam[0],methodTest.getName());
-		validationOut = (ImageGray)stripBorder(validationOut,borderX0,borderY0,borderX1,borderY1);
+		computeBorder((KernelBase)targetParam[0], methodTest.getName());
+		validationOut = (ImageGray)stripBorder(validationOut, borderX0, borderY0, borderX1, borderY1);
 
 		GImageGray t = FactoryGImageGray.wrap(targetOut);
 		GImageGray v = FactoryGImageGray.wrap(validationOut);
 
-		for( int y = 0; y < targetOut.height; y++ ) {
-			if( y >= borderX0 &&  y < targetOut.height-borderX1 )
+		for (int y = 0; y < targetOut.height; y++) {
+			if (y >= borderX0 && y < targetOut.height - borderX1)
 				continue;
-			for( int x = 0; x < targetOut.width; x++ ) {
-				if( x >= borderX0 &&  x < targetOut.width-borderY1 )
+			for (int x = 0; x < targetOut.width; x++) {
+				if (x >= borderX0 && x < targetOut.width - borderY1)
 					continue;
 
-				assertEquals(v.get(x,y).doubleValue(),t.get(x,y).doubleValue(),1e-4f);
+				assertEquals(v.get(x, y).doubleValue(), t.get(x, y).doubleValue(), 1e-4f);
 			}
 		}
 	}

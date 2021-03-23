@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -60,7 +60,7 @@ public class TestConvolveImageUnrolled_SB_S32_S32_Div extends BoofStandardJUnit 
 
 		for (int i = 0; i < GenerateConvolvedUnrolled_SB.numUnrolled; i++) {
 			Method m = ConvolveImageUnrolled_SB_S32_S32_Div.class.getMethod("vertical",
-					Kernel1D_S32.class, GrayS32.class, GrayS32.class, int.class);
+					Kernel1D_S32.class, GrayS32.class, GrayS32.class, int.class, GrowArray.class);
 
 			compareToStandard.compareMethod(m, "vertical", i + 1);
 		}

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -47,7 +47,6 @@ public class TestConvolveImageUnrolled_SB_U8_I8_Div extends BoofStandardJUnit {
 
 	@Test
 	public void horizontal_divide() throws NoSuchMethodException {
-
 		for (int i = 0; i < GenerateConvolvedUnrolled_SB.numUnrolled; i++) {
 			Method m = ConvolveImageUnrolled_SB_U8_I8_Div.class.getMethod("horizontal",
 					Kernel1D_S32.class, GrayU8.class, GrayI8.class, int.class);
@@ -58,10 +57,9 @@ public class TestConvolveImageUnrolled_SB_U8_I8_Div extends BoofStandardJUnit {
 
 	@Test
 	public void vertical_divide() throws NoSuchMethodException {
-
 		for (int i = 0; i < GenerateConvolvedUnrolled_SB.numUnrolled; i++) {
 			Method m = ConvolveImageUnrolled_SB_U8_I8_Div.class.getMethod("vertical",
-					Kernel1D_S32.class, GrayU8.class, GrayI8.class, int.class);
+					Kernel1D_S32.class, GrayU8.class, GrayI8.class, int.class, GrowArray.class);
 
 			compareToStandard.compareMethod(m, "vertical", i + 1);
 		}

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -75,6 +75,11 @@ public abstract class CompareEquivalentFunctions extends BoofStandardJUnit {
 			}
 			if (foundMatch)
 				numFound++;
+
+//			if (!foundMatch) {
+//				System.out.print("No match: ");
+//				BoofMiscOps.printMethodInfo(m, System.out);
+//			}
 		}
 
 		// update this as needed when new functions are added
@@ -104,7 +109,7 @@ public abstract class CompareEquivalentFunctions extends BoofStandardJUnit {
 		compareMethod(validationClasses[0], target, validationName);
 	}
 
-	private void compareMethods( Method target, Method validation ) {
+	protected void compareMethods( Method target, Method validation ) {
 
 		methodTest = target;
 		methodValidation = validation;
@@ -118,7 +123,7 @@ public abstract class CompareEquivalentFunctions extends BoofStandardJUnit {
 		}
 	}
 
-	private void compareMethods( Method target, Method validation, Object[] targetParam ) {
+	protected void compareMethods( Method target, Method validation, Object[] targetParam ) {
 		Object[] validationParam = reformatForValidation(validation, targetParam);
 
 		Object[] targetParamSub = createSubImageInputs(targetParam);

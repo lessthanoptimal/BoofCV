@@ -52,7 +52,7 @@ public class BenchmarkConvolveUnrolled extends CommonBenchmarkConvolve_SB {
 	}
 
 	@Benchmark public void vertical_U8_I8_div() {
-		if (!ConvolveImageUnrolled_SB_U8_I8_Div.vertical(kernelI32, input_U8, out_U8, 10))
+		if (!ConvolveImageUnrolled_SB_U8_I8_Div.vertical(kernelI32, input_U8, out_U8, 10, null))
 			throw new RuntimeException();
 	}
 

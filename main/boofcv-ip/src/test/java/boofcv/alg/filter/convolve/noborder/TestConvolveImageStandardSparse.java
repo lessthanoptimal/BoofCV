@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -56,15 +56,14 @@ public class TestConvolveImageStandardSparse extends BoofStandardJUnit {
 	/**
 	 * Automatically compares all the box filters against a generalize convolution
 	 */
-	@Test
-	public void compareToGeneral() {
-		Method methods[] = ConvolveImageStandardSparse.class.getMethods();
+	@Test void compareToGeneral() {
+		Method[] methods = ConvolveImageStandardSparse.class.getMethods();
 
 		// sanity check to make sure the functions are being found
 		int numFound = 0;
 		for (Method m : methods) {
 			// search for methods which have equivalent in the other class
-			Class<?> paramTypes[] = m.getParameterTypes();
+			Class<?>[] paramTypes = m.getParameterTypes();
 			if (paramTypes.length < 3)
 				continue;
 
@@ -132,7 +131,7 @@ public class TestConvolveImageStandardSparse extends BoofStandardJUnit {
 			GrayU8 temp2 = new GrayU8(image.width, image.height);
 
 			ConvolveImageNoBorder.horizontal(kernelI32, image, temp, sumKernelI32);
-			ConvolveImageNoBorder.vertical(kernelI32, temp, temp2, sumKernelI32);
+			ConvolveImageNoBorder.vertical(kernelI32, temp, temp2, sumKernelI32, null);
 
 			return temp2.get(targetX, targetY);
 		} else {

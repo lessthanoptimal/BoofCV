@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -118,7 +118,8 @@ public class GenerateConvolvedUnrolled_SB extends CodeGeneratorBase {
 		out.print(
 				"import boofcv.misc.BoofMiscOps;\n" +
 				"import boofcv.struct.convolve.*;\n" +
-				"import org.jetbrains.annotations.Nullable;");
+				"import pabeles.concurrency.GrowArray;\n" +
+				"import org.jetbrains.annotations.Nullable;\n");
 		if (typeInput.compareTo(typeOutput) != 0)
 			out.print("import boofcv.struct.image." + typeOutput + ";\n");
 		out.print("import boofcv.struct.image." + typeInput + ";\n"+
@@ -148,15 +149,15 @@ public class GenerateConvolvedUnrolled_SB extends CodeGeneratorBase {
 	void createMaster(String opName, int kernelDOF , boolean hasDivisor ) {
 		String kernel = "Kernel"+kernelDOF+"D_"+typeKernel;
 
-		String workParam = hasDivisor && opName.equals("convolve") ? ", GrowArray<"+workType+"> work" : "";
-		String workVar = hasDivisor && opName.equals("convolve") ? ",work" : "";
+		String workParam = hasDivisor && (opName.equals("convolve")||opName.equals("vertical")) ? ", GrowArray<"+workType+"> work" : "";
+		String workVar = hasDivisor && (opName.equals("convolve")||opName.equals("vertical")) ? ", work" : "";
 
-		out.print("\tpublic static boolean " + opName + "( " + kernel + " kernel ,\n" +
+		out.print("\tpublic static boolean " + opName + "( " + kernel + " kernel,\n" +
 				"\t\t\t\t\t\t\t\t   " + typeInput + " image, " + typeOutput + " dest");
 
 
 		if( hasDivisor ) {
-			out.print(", int divisor "+workParam+") {\n");
+			out.print(", int divisor"+workParam+" ) {\n");
 		} else {
 			out.print(") {\n");
 		}
@@ -239,8 +240,10 @@ public class GenerateConvolvedUnrolled_SB extends CodeGeneratorBase {
 
 		out.print("\tpublic static void vertical" + num + "( Kernel1D_" + typeKernel + " kernel , "
 				 + typeInput + " image, " + typeOutput + " dest ");
-		if( hasDivisor )
+		if( hasDivisor && !isInteger)
 			out.print(", int divisor )\n");
+		else if( hasDivisor && isInteger)
+			out.print(", int divisor, @Nullable GrowArray<DogArray_I32> workspaces )\n");
 		else
 			out.print(")\n");
 
