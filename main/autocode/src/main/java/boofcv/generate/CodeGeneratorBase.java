@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -82,7 +82,7 @@ public abstract class CodeGeneratorBase {
 	protected void printParallel( String var, String lower, String upper, String body ) {
 		out.println();
 		out.printf("\t\t//CONCURRENT_BELOW BoofConcurrency.loopFor(%s, %s, %s -> {\n", lower, upper, var);
-		out.printf("\t\tfor( int %s = %s; %s < %s; %s++ ) {\n", var, lower, var, upper, var);
+		out.printf("\t\tfor (int %s = %s; %s < %s; %s++) {\n", var, lower, var, upper, var);
 		out.print(body);
 		out.print("\t\t}\n");
 		out.print("\t\t//CONCURRENT_ABOVE });\n");

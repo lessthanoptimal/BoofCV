@@ -33,6 +33,8 @@ Version : 0.38
   * Fixed reading of second format region. Thanks DCNick3 for finding the issue!
   * Fixed UTF8 issued when guessing the encoding. C2 was incorrectly marked as invalid
     Thanks gerripeach for finding the issue and helping debug it!
+- Image Processing
+  * Re-ordered loops to speed up vertical convolution for inner image. Gray only. 20% to 70% faster.
 - Image Features
   * Fast Corners are now concurrent
   * SIFT the entire scale space is computed at once. This might result in a net ~10% increase memory.
