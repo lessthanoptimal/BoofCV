@@ -38,7 +38,7 @@ import java.util.concurrent.TimeUnit;
 @State(Scope.Benchmark)
 @Fork(value = 1)
 @SuppressWarnings({"UnusedDeclaration"})
-public class BenchmarkConvolveUnrolled extends CommonBenchmarkConvolve {
+public class BenchmarkConvolveUnrolled extends CommonBenchmarkConvolve_SB {
 	@Param({"1", "3"})
 	private int radius;
 

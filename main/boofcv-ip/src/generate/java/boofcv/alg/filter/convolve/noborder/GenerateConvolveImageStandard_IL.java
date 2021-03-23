@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -107,10 +107,10 @@ public class GenerateConvolveImageStandard_IL extends CodeGeneratorBase {
 		this.hasDivide = hasDivide;
 
 		if( justVertical ) {
-			printVertical();
+			printVertical_div();
 		} else {
 			printHorizontal();
-			printVertical();
+			printVertical_div();
 			printConvolve2D();
 		}
 	}
@@ -153,7 +153,7 @@ public class GenerateConvolveImageStandard_IL extends CodeGeneratorBase {
 		out.print("\t}\n\n");
 	}
 
-	private void printVertical() {
+	private void printVertical_div() {
 		String paramDiv = hasDivide ? " , int divisor" : "";
 		String totalDiv = hasDivide ? "((total+halfDivisor)/divisor)" : "total";
 
@@ -192,6 +192,50 @@ public class GenerateConvolveImageStandard_IL extends CodeGeneratorBase {
 				"\t\t\t\t}\n" +
 				"\t\t\t\tindexSrcStart += numBands;\n" +
 				"\t\t\t}\n";
+
+		printParallel("y","offset","yEnd",body);
+		out.print("\t}\n\n");
+	}
+
+	private void printVertical_sum() {
+		String paramDiv = hasDivide ? " , int divisor" : "";
+		String totalDiv = hasDivide ? "((total+halfDivisor)/divisor)" : "total";
+
+		out.print("\tpublic static void vertical( Kernel1D_"+kernelType+" kernel,\n" +
+				"\t\t\t\t\t\t\t\t "+inputType+" src, "+outputType+" dst"+paramDiv+" )\n" +
+				"\t{\n" +
+				"\t\tfinal "+inputData+"[] dataSrc = src.data;\n" +
+				"\t\tfinal "+outputData+"[] dataDst = dst.data;\n" +
+				"\t\tfinal "+kernelData+"[] dataKer = kernel.data;\n" +
+				"\n" +
+				"\t\tfinal int offset = kernel.getOffset();\n" +
+				"\t\tfinal int kernelWidth = kernel.getWidth();\n" +
+				"\t\tfinal int numBands = src.getNumBands();\n");
+		if( hasDivide )
+			out.print("\t\tfinal int halfDivisor = divisor/2;\n");
+		out.print("\n" +
+				"\t\tfinal int imgWidth = dst.getWidth();\n" +
+				"\t\tfinal int imgHeight = dst.getHeight();\n" +
+				"\n" +
+				"\t\tfinal int yEnd = imgHeight-(kernelWidth-offset-1);\n");
+
+		String body =
+				"\t\t\tint indexDst = dst.startIndex+y*dst.stride;\n" +
+						"\t\t\tint indexSrcStart = src.startIndex+(y-offset)*src.stride;\n" +
+						"\n" +
+						"\t\t\tfor (int x = 0; x < imgWidth; x++) {\n" +
+						"\t\t\t\tfor (int band = 0; band < numBands; band++) {\n" +
+						"\t\t\t\t\tint indexSrc = indexSrcStart + band;\n" +
+						"\n" +
+						"\t\t\t\t\t"+sumType+" total = 0;\n" +
+						"\t\t\t\t\tfor (int k = 0; k < kernelWidth; k++) {\n" +
+						"\t\t\t\t\t\ttotal += (dataSrc[indexSrc] "+bitWise+")* dataKer[k];\n" +
+						"\t\t\t\t\t\tindexSrc += src.stride;\n" +
+						"\t\t\t\t\t}\n" +
+						"\t\t\t\t\tdataDst[indexDst++] = "+ typeCast + totalDiv +";\n" +
+						"\t\t\t\t}\n" +
+						"\t\t\t\tindexSrcStart += numBands;\n" +
+						"\t\t\t}\n";
 
 		printParallel("y","offset","yEnd",body);
 		out.print("\t}\n\n");
