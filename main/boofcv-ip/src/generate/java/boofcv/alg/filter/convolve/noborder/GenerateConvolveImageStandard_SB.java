@@ -199,7 +199,7 @@ public class GenerateConvolveImageStandard_SB extends CodeGeneratorBase {
 				"\t\t\tArrays.fill(totalRow,0,imgWidth,0);\n" +
 				"\t\t}\n";
 
-		printParallelBlock("y0", "y1", "offset", "yEnd", "kernel.width", body);
+		printParallelBlock("y0", "y1", "offset", "yEnd", null, body);
 
 		out.print("\t}\n\n");
 	}

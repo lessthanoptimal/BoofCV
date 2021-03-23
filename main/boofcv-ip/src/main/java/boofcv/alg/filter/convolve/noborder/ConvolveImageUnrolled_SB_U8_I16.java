@@ -295,10 +295,10 @@ public class ConvolveImageUnrolled_SB_U8_I16 {
 		//CONCURRENT_ABOVE });
 	}
 
-	public static void vertical3( Kernel1D_S32 kernel , GrayU8 image, GrayI16 dest )
+	public static void vertical3( Kernel1D_S32 kernel, GrayU8 src, GrayI16 dst )
 	{
-		final byte[] dataSrc = image.data;
-		final short[] dataDst = dest.data;
+		final byte[] dataSrc = src.data;
+		final short[] dataDst = dst.data;
 
 		final int k1 = kernel.data[0];
 		final int k2 = kernel.data[1];
@@ -306,24 +306,24 @@ public class ConvolveImageUnrolled_SB_U8_I16 {
 
 		final int radius = kernel.getRadius();
 
-		final int imgWidth = dest.getWidth();
-		final int imgHeight = dest.getHeight();
+		final int imgWidth = dst.getWidth();
+		final int imgHeight = dst.getHeight();
 
-		final int yEnd = imgHeight-radius;
+		final int yEnd = imgHeight - radius;
 
 		//CONCURRENT_BELOW BoofConcurrency.loopFor(radius, yEnd, y -> {
 		for (int y = radius; y < yEnd; y++) {
-			int indexDst = dest.startIndex+y*dest.stride;
-			int i = image.startIndex + (y-radius)*image.stride;
-			final int iEnd = i+imgWidth;
+			int indexDst = dst.startIndex + y*dst.stride;
+			int i = src.startIndex + (y - radius)*src.stride;
+			final int iEnd = i + imgWidth;
 
-			for( ; i < iEnd; i++ ) {
+			for (; i < iEnd; i++) {
 				int indexSrc = i;
 
 				int total = (dataSrc[indexSrc]& 0xFF) * k1;
-				indexSrc += image.stride;
+				indexSrc += src.stride;
 				total += (dataSrc[indexSrc]& 0xFF)*k2;
-				indexSrc += image.stride;
+				indexSrc += src.stride;
 				total += (dataSrc[indexSrc]& 0xFF)*k3;
 
 				dataDst[indexDst++] = ( short )total;
@@ -332,10 +332,10 @@ public class ConvolveImageUnrolled_SB_U8_I16 {
 		//CONCURRENT_ABOVE });
 	}
 
-	public static void vertical5( Kernel1D_S32 kernel , GrayU8 image, GrayI16 dest )
+	public static void vertical5( Kernel1D_S32 kernel, GrayU8 src, GrayI16 dst )
 	{
-		final byte[] dataSrc = image.data;
-		final short[] dataDst = dest.data;
+		final byte[] dataSrc = src.data;
+		final short[] dataDst = dst.data;
 
 		final int k1 = kernel.data[0];
 		final int k2 = kernel.data[1];
@@ -345,28 +345,28 @@ public class ConvolveImageUnrolled_SB_U8_I16 {
 
 		final int radius = kernel.getRadius();
 
-		final int imgWidth = dest.getWidth();
-		final int imgHeight = dest.getHeight();
+		final int imgWidth = dst.getWidth();
+		final int imgHeight = dst.getHeight();
 
-		final int yEnd = imgHeight-radius;
+		final int yEnd = imgHeight - radius;
 
 		//CONCURRENT_BELOW BoofConcurrency.loopFor(radius, yEnd, y -> {
 		for (int y = radius; y < yEnd; y++) {
-			int indexDst = dest.startIndex+y*dest.stride;
-			int i = image.startIndex + (y-radius)*image.stride;
-			final int iEnd = i+imgWidth;
+			int indexDst = dst.startIndex + y*dst.stride;
+			int i = src.startIndex + (y - radius)*src.stride;
+			final int iEnd = i + imgWidth;
 
-			for( ; i < iEnd; i++ ) {
+			for (; i < iEnd; i++) {
 				int indexSrc = i;
 
 				int total = (dataSrc[indexSrc]& 0xFF) * k1;
-				indexSrc += image.stride;
+				indexSrc += src.stride;
 				total += (dataSrc[indexSrc]& 0xFF)*k2;
-				indexSrc += image.stride;
+				indexSrc += src.stride;
 				total += (dataSrc[indexSrc]& 0xFF)*k3;
-				indexSrc += image.stride;
+				indexSrc += src.stride;
 				total += (dataSrc[indexSrc]& 0xFF)*k4;
-				indexSrc += image.stride;
+				indexSrc += src.stride;
 				total += (dataSrc[indexSrc]& 0xFF)*k5;
 
 				dataDst[indexDst++] = ( short )total;
@@ -375,10 +375,10 @@ public class ConvolveImageUnrolled_SB_U8_I16 {
 		//CONCURRENT_ABOVE });
 	}
 
-	public static void vertical7( Kernel1D_S32 kernel , GrayU8 image, GrayI16 dest )
+	public static void vertical7( Kernel1D_S32 kernel, GrayU8 src, GrayI16 dst )
 	{
-		final byte[] dataSrc = image.data;
-		final short[] dataDst = dest.data;
+		final byte[] dataSrc = src.data;
+		final short[] dataDst = dst.data;
 
 		final int k1 = kernel.data[0];
 		final int k2 = kernel.data[1];
@@ -390,32 +390,32 @@ public class ConvolveImageUnrolled_SB_U8_I16 {
 
 		final int radius = kernel.getRadius();
 
-		final int imgWidth = dest.getWidth();
-		final int imgHeight = dest.getHeight();
+		final int imgWidth = dst.getWidth();
+		final int imgHeight = dst.getHeight();
 
-		final int yEnd = imgHeight-radius;
+		final int yEnd = imgHeight - radius;
 
 		//CONCURRENT_BELOW BoofConcurrency.loopFor(radius, yEnd, y -> {
 		for (int y = radius; y < yEnd; y++) {
-			int indexDst = dest.startIndex+y*dest.stride;
-			int i = image.startIndex + (y-radius)*image.stride;
-			final int iEnd = i+imgWidth;
+			int indexDst = dst.startIndex + y*dst.stride;
+			int i = src.startIndex + (y - radius)*src.stride;
+			final int iEnd = i + imgWidth;
 
-			for( ; i < iEnd; i++ ) {
+			for (; i < iEnd; i++) {
 				int indexSrc = i;
 
 				int total = (dataSrc[indexSrc]& 0xFF) * k1;
-				indexSrc += image.stride;
+				indexSrc += src.stride;
 				total += (dataSrc[indexSrc]& 0xFF)*k2;
-				indexSrc += image.stride;
+				indexSrc += src.stride;
 				total += (dataSrc[indexSrc]& 0xFF)*k3;
-				indexSrc += image.stride;
+				indexSrc += src.stride;
 				total += (dataSrc[indexSrc]& 0xFF)*k4;
-				indexSrc += image.stride;
+				indexSrc += src.stride;
 				total += (dataSrc[indexSrc]& 0xFF)*k5;
-				indexSrc += image.stride;
+				indexSrc += src.stride;
 				total += (dataSrc[indexSrc]& 0xFF)*k6;
-				indexSrc += image.stride;
+				indexSrc += src.stride;
 				total += (dataSrc[indexSrc]& 0xFF)*k7;
 
 				dataDst[indexDst++] = ( short )total;
@@ -424,10 +424,10 @@ public class ConvolveImageUnrolled_SB_U8_I16 {
 		//CONCURRENT_ABOVE });
 	}
 
-	public static void vertical9( Kernel1D_S32 kernel , GrayU8 image, GrayI16 dest )
+	public static void vertical9( Kernel1D_S32 kernel, GrayU8 src, GrayI16 dst )
 	{
-		final byte[] dataSrc = image.data;
-		final short[] dataDst = dest.data;
+		final byte[] dataSrc = src.data;
+		final short[] dataDst = dst.data;
 
 		final int k1 = kernel.data[0];
 		final int k2 = kernel.data[1];
@@ -441,36 +441,36 @@ public class ConvolveImageUnrolled_SB_U8_I16 {
 
 		final int radius = kernel.getRadius();
 
-		final int imgWidth = dest.getWidth();
-		final int imgHeight = dest.getHeight();
+		final int imgWidth = dst.getWidth();
+		final int imgHeight = dst.getHeight();
 
-		final int yEnd = imgHeight-radius;
+		final int yEnd = imgHeight - radius;
 
 		//CONCURRENT_BELOW BoofConcurrency.loopFor(radius, yEnd, y -> {
 		for (int y = radius; y < yEnd; y++) {
-			int indexDst = dest.startIndex+y*dest.stride;
-			int i = image.startIndex + (y-radius)*image.stride;
-			final int iEnd = i+imgWidth;
+			int indexDst = dst.startIndex + y*dst.stride;
+			int i = src.startIndex + (y - radius)*src.stride;
+			final int iEnd = i + imgWidth;
 
-			for( ; i < iEnd; i++ ) {
+			for (; i < iEnd; i++) {
 				int indexSrc = i;
 
 				int total = (dataSrc[indexSrc]& 0xFF) * k1;
-				indexSrc += image.stride;
+				indexSrc += src.stride;
 				total += (dataSrc[indexSrc]& 0xFF)*k2;
-				indexSrc += image.stride;
+				indexSrc += src.stride;
 				total += (dataSrc[indexSrc]& 0xFF)*k3;
-				indexSrc += image.stride;
+				indexSrc += src.stride;
 				total += (dataSrc[indexSrc]& 0xFF)*k4;
-				indexSrc += image.stride;
+				indexSrc += src.stride;
 				total += (dataSrc[indexSrc]& 0xFF)*k5;
-				indexSrc += image.stride;
+				indexSrc += src.stride;
 				total += (dataSrc[indexSrc]& 0xFF)*k6;
-				indexSrc += image.stride;
+				indexSrc += src.stride;
 				total += (dataSrc[indexSrc]& 0xFF)*k7;
-				indexSrc += image.stride;
+				indexSrc += src.stride;
 				total += (dataSrc[indexSrc]& 0xFF)*k8;
-				indexSrc += image.stride;
+				indexSrc += src.stride;
 				total += (dataSrc[indexSrc]& 0xFF)*k9;
 
 				dataDst[indexDst++] = ( short )total;
@@ -479,10 +479,10 @@ public class ConvolveImageUnrolled_SB_U8_I16 {
 		//CONCURRENT_ABOVE });
 	}
 
-	public static void vertical11( Kernel1D_S32 kernel , GrayU8 image, GrayI16 dest )
+	public static void vertical11( Kernel1D_S32 kernel, GrayU8 src, GrayI16 dst )
 	{
-		final byte[] dataSrc = image.data;
-		final short[] dataDst = dest.data;
+		final byte[] dataSrc = src.data;
+		final short[] dataDst = dst.data;
 
 		final int k1 = kernel.data[0];
 		final int k2 = kernel.data[1];
@@ -498,40 +498,40 @@ public class ConvolveImageUnrolled_SB_U8_I16 {
 
 		final int radius = kernel.getRadius();
 
-		final int imgWidth = dest.getWidth();
-		final int imgHeight = dest.getHeight();
+		final int imgWidth = dst.getWidth();
+		final int imgHeight = dst.getHeight();
 
-		final int yEnd = imgHeight-radius;
+		final int yEnd = imgHeight - radius;
 
 		//CONCURRENT_BELOW BoofConcurrency.loopFor(radius, yEnd, y -> {
 		for (int y = radius; y < yEnd; y++) {
-			int indexDst = dest.startIndex+y*dest.stride;
-			int i = image.startIndex + (y-radius)*image.stride;
-			final int iEnd = i+imgWidth;
+			int indexDst = dst.startIndex + y*dst.stride;
+			int i = src.startIndex + (y - radius)*src.stride;
+			final int iEnd = i + imgWidth;
 
-			for( ; i < iEnd; i++ ) {
+			for (; i < iEnd; i++) {
 				int indexSrc = i;
 
 				int total = (dataSrc[indexSrc]& 0xFF) * k1;
-				indexSrc += image.stride;
+				indexSrc += src.stride;
 				total += (dataSrc[indexSrc]& 0xFF)*k2;
-				indexSrc += image.stride;
+				indexSrc += src.stride;
 				total += (dataSrc[indexSrc]& 0xFF)*k3;
-				indexSrc += image.stride;
+				indexSrc += src.stride;
 				total += (dataSrc[indexSrc]& 0xFF)*k4;
-				indexSrc += image.stride;
+				indexSrc += src.stride;
 				total += (dataSrc[indexSrc]& 0xFF)*k5;
-				indexSrc += image.stride;
+				indexSrc += src.stride;
 				total += (dataSrc[indexSrc]& 0xFF)*k6;
-				indexSrc += image.stride;
+				indexSrc += src.stride;
 				total += (dataSrc[indexSrc]& 0xFF)*k7;
-				indexSrc += image.stride;
+				indexSrc += src.stride;
 				total += (dataSrc[indexSrc]& 0xFF)*k8;
-				indexSrc += image.stride;
+				indexSrc += src.stride;
 				total += (dataSrc[indexSrc]& 0xFF)*k9;
-				indexSrc += image.stride;
+				indexSrc += src.stride;
 				total += (dataSrc[indexSrc]& 0xFF)*k10;
-				indexSrc += image.stride;
+				indexSrc += src.stride;
 				total += (dataSrc[indexSrc]& 0xFF)*k11;
 
 				dataDst[indexDst++] = ( short )total;
