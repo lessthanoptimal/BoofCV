@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -57,30 +57,31 @@ public class CompareToStandardConvolution extends CompareIdenticalFunctions
 
 	@Override
 	protected Object[][] createInputParam(Method candidate, Method validation) {
-		Class<?> paramTypes[] = candidate.getParameterTypes();
+		Class<?>[] candidateTypes = candidate.getParameterTypes();
+		Class<?>[] validationTypes = validation.getParameterTypes();
 
-		ImageBase src = ConvolutionTestHelper.createImage(paramTypes[1], width, height);
+		ImageBase src = ConvolutionTestHelper.createImage(candidateTypes[1], width, height);
 		GImageMiscOps.fillUniform(src, rand, 0, 130);
-		ImageBase dst = ConvolutionTestHelper.createImage(paramTypes[2], width, height);
+		ImageBase dst = ConvolutionTestHelper.createImage(candidateTypes[2], width, height);
 
 		if( candidate.getName().compareTo("convolve") != 0 ) {
-			Object[][] ret = new Object[1][paramTypes.length];
-			ret[0][0] = createKernel(paramTypes[0]);
+			Object[][] ret = new Object[1][candidateTypes.length];
+			ret[0][0] = createKernel(candidateTypes[0]);
 			ret[0][1] = src;
 			ret[0][2] = dst;
-			if( paramTypes.length == 4) {
+			if( candidateTypes.length >= 4) {
 				ret[0][3] = 11;
 			}
 
 			return ret;
 		} else {
-			Object[][] ret = new Object[1][paramTypes.length];
+			Object[][] ret = new Object[1][validationTypes.length];
 
-			ret[0][0] = createKernel(paramTypes[0]);
+			ret[0][0] = createKernel(candidateTypes[0]);
 			ret[0][1] = src;
 			ret[0][2] = dst;
 
-			if( paramTypes.length == 4 || paramTypes.length == 5) {
+			if( candidateTypes.length == 4 || candidateTypes.length == 5) {
 				ret[0][3] = 11;
 			}
 

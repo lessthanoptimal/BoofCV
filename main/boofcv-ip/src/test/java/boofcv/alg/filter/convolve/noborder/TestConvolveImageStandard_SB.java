@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -322,7 +322,7 @@ public class TestConvolveImageStandard_SB extends BoofStandardJUnit {
 		int divisor = kernelWidth;
 
 		GImageMiscOps.fill(dest, 0);
-		invokeMethod("vertical", ker, img, dest, divisor);
+		invokeMethod("vertical", ker, img, dest, divisor, new GrowArray<>(DogArray_I32::new));
 		assertTrue(GImageStatistics.sum(dest) != 0); // making sure it's a good test and not trivial
 		int x = 1;
 

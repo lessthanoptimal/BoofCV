@@ -18,15 +18,16 @@
 
 package boofcv.alg.feature.detect.intensity.impl;
 
+import javax.annotation.Generated;
 import boofcv.alg.transform.ii.DerivativeIntegralImage;
+import boofcv.alg.transform.ii.IntegralImageOps;
 import boofcv.alg.transform.ii.IntegralKernel;
-import boofcv.concurrency.BoofConcurrency;
 import boofcv.struct.image.GrayF32;
 import boofcv.struct.image.GrayS32;
 import org.jetbrains.annotations.Nullable;
 
 import javax.annotation.Generated;
-
+import boofcv.concurrency.BoofConcurrency;
 import static boofcv.alg.feature.detect.intensity.impl.ImplIntegralImageFeatureIntensity.computeHessian;
 
 /**

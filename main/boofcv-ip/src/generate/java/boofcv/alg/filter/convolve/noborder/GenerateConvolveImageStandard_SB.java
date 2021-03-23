@@ -133,9 +133,9 @@ public class GenerateConvolveImageStandard_SB extends CodeGeneratorBase {
 		String totalDiv = hasDivide ? "((total + halfDivisor)/divisor)" : "total";
 
 		out.print("\tpublic static void horizontal( Kernel1D_" + kernelType + " kernel, " +
-				inputType + " image, " + outputType + " dest" + paramDiv + " ) {\n" +
-				"\t\tfinal " + inputData + "[] dataSrc = image.data;\n" +
-				"\t\tfinal " + outputData + "[] dataDst = dest.data;\n" +
+				inputType + " src, " + outputType + " dst" + paramDiv + " ) {\n" +
+				"\t\tfinal " + inputData + "[] dataSrc = src.data;\n" +
+				"\t\tfinal " + outputData + "[] dataDst = dst.data;\n" +
 				"\t\tfinal " + kernelData + "[] dataKer = kernel.data;\n" +
 				"\n" +
 				"\t\tfinal int offset = kernel.getOffset();\n" +
@@ -143,10 +143,10 @@ public class GenerateConvolveImageStandard_SB extends CodeGeneratorBase {
 		if (hasDivide)
 			out.print("\t\tfinal int halfDivisor = divisor/2;\n");
 		out.print("\n" +
-				"\t\tfinal int width = image.getWidth();\n");
+				"\t\tfinal int width = src.getWidth();\n");
 
-		String body = "\t\t\tint indexDst = dest.startIndex + i*dest.stride + offset;\n" +
-				"\t\t\tint j = image.startIndex + i*image.stride;\n" +
+		String body = "\t\t\tint indexDst = dst.startIndex + i*dst.stride + offset;\n" +
+				"\t\t\tint j = src.startIndex + i*src.stride;\n" +
 				"\t\t\tfinal int jEnd = j + width - (kernelWidth - 1);\n" +
 				"\n" +
 				"\t\t\tfor (; j < jEnd; j++) {\n" +
@@ -158,46 +158,48 @@ public class GenerateConvolveImageStandard_SB extends CodeGeneratorBase {
 				"\t\t\t\tdataDst[indexDst++] = " + typeCast + totalDiv + ";\n" +
 				"\t\t\t}\n";
 
-		printParallel("i", "0", "image.height", body);
+		printParallel("i", "0", "src.height", body);
 
 		out.print("\t}\n\n");
 	}
 
 	private void printVertical_div() {
-		String paramDiv = hasDivide ? " , int divisor" : "";
-		String totalDiv = hasDivide ? "((total + halfDivisor)/divisor)" : "total";
-
 		out.print("\tpublic static void vertical( Kernel1D_" + kernelType + " kernel,\n" +
-				"\t\t\t\t\t\t\t\t " + inputType + " image, " + outputType + " dest" + paramDiv + " ) {\n" +
-				"\t\tfinal " + inputData + "[] dataSrc = image.data;\n" +
-				"\t\tfinal " + outputData + "[] dataDst = dest.data;\n" +
+				"\t\t\t\t\t\t\t\t " + inputType + " src, " + outputType + " dst, int divisor, @Nullable GrowArray<DogArray_I32> workspaces ) {\n" +
+				"\t\tworkspaces = BoofMiscOps.checkDeclare(workspaces, DogArray_I32::new);\n" +
+				"\t\tfinal DogArray_I32 work = workspaces.grow(); //CONCURRENT_REMOVE_LINE\n" +
+				"\t\tfinal " + inputData + "[] dataSrc = src.data;\n" +
+				"\t\tfinal " + outputData + "[] dataDst = dst.data;\n" +
 				"\t\tfinal " + kernelData + "[] dataKer = kernel.data;\n" +
 				"\n" +
 				"\t\tfinal int offset = kernel.getOffset();\n" +
-				"\t\tfinal int kernelWidth = kernel.getWidth();\n");
-		if (hasDivide)
-			out.print("\t\tfinal int halfDivisor = divisor/2;\n");
-		out.print("\n" +
-				"\t\tfinal int imgWidth = dest.getWidth();\n" +
-				"\t\tfinal int imgHeight = dest.getHeight();\n" +
+				"\t\tfinal int kernelWidth = kernel.getWidth();\n" +
+				"\t\tfinal int halfDivisor = divisor/2;\n" +
+				"\t\tfinal double divisionHack = 1.0/divisor; // WTF integer division is slower than converting to a float??\n" +
+				"\n" +
+				"\t\tfinal int imgWidth = dst.getWidth();\n" +
+				"\t\tfinal int imgHeight = dst.getHeight();\n" +
 				"\t\tfinal int yEnd = imgHeight - (kernelWidth - offset - 1);\n");
 
 		String body = "";
-		body += "\t\t\tint indexDst = dest.startIndex + y*dest.stride;\n" +
-				"\t\t\tint i = image.startIndex + (y - offset)*image.stride;\n" +
-				"\t\t\tfinal int iEnd = i + imgWidth;\n" +
-				"\n" +
-				"\t\t\tfor (; i < iEnd; i++) {\n" +
-				"\t\t\t\t" + sumType + " total = 0;\n" +
-				"\t\t\t\tint indexSrc = i;\n" +
-				"\t\t\t\tfor (int k = 0; k < kernelWidth; k++) {\n" +
-				"\t\t\t\t\ttotal += (dataSrc[indexSrc]" + bitWise + ")*dataKer[k];\n" +
-				"\t\t\t\t\tindexSrc += image.stride;\n" +
+		body += "\t\t" + sumType + "[] totalRow = BoofMiscOps.checkDeclare(work, imgWidth, true);\n" +
+				"\t\tfor (int y = y0; y < y1; y++) {\n" +
+				"\t\t\tfor (int k = 0; k < kernelWidth; k++) {\n" +
+				"\t\t\t\tfinal int kernelValue = dataKer[k];\n" +
+				"\t\t\t\tint indexSrc = src.startIndex + (y - offset + k)*src.stride;\n" +
+				"\t\t\t\tfor (int i = 0; i < imgWidth; i++) {\n" +
+				"\t\t\t\t\ttotalRow[i] += ((dataSrc[indexSrc++]" + bitWise + ")*kernelValue);\n" +
 				"\t\t\t\t}\n" +
-				"\t\t\t\tdataDst[indexDst++] = " + typeCast + totalDiv + ";\n" +
-				"\t\t\t}\n";
+				"\t\t\t}\n" +
+				"\n" +
+				"\t\t\tint indexDst = dst.startIndex + y*dst.stride;\n" +
+				"\t\t\tfor (int i = 0; i < imgWidth; i++) {\n" +
+				"\t\t\t\tdataDst[indexDst++] = (" + outputData + ")((totalRow[i] + halfDivisor)*divisionHack);\n" +
+				"\t\t\t}\n" +
+				"\t\t\tArrays.fill(totalRow,0,imgWidth,0);\n" +
+				"\t\t}\n";
 
-		printParallel("y", "offset", "yEnd", body);
+		printParallelBlock("y0", "y1", "offset", "yEnd", "kernel.width", body);
 
 		out.print("\t}\n\n");
 	}
@@ -207,27 +209,27 @@ public class GenerateConvolveImageStandard_SB extends CodeGeneratorBase {
 	 * the output image can sum up without overflowing. This would be an issue even if an int is used to sum.
 	 */
 	private void printVertical() {
-		out.print("\tpublic static void vertical( Kernel1D_" + kernelType + " kernel, " + inputType + " image, " + outputType + " dest ) {\n" +
-				"\t\tfinal " + inputData + "[] dataSrc = image.data;\n" +
-				"\t\tfinal " + outputData + "[] dataDst = dest.data;\n" +
+		out.print("\tpublic static void vertical( Kernel1D_" + kernelType + " kernel, " + inputType + " src, " + outputType + " dst ) {\n" +
+				"\t\tfinal " + inputData + "[] dataSrc = src.data;\n" +
+				"\t\tfinal " + outputData + "[] dataDst = dst.data;\n" +
 				"\t\tfinal " + kernelData + "[] dataKer = kernel.data;\n" +
 				"\n" +
 				"\t\tfinal int offset = kernel.getOffset();\n" +
 				"\t\tfinal int kernelWidth = kernel.getWidth();\n" +
 				"\n" +
-				"\t\tfinal int imgWidth = dest.getWidth();\n" +
-				"\t\tfinal int imgHeight = dest.getHeight();\n" +
+				"\t\tfinal int imgWidth = dst.getWidth();\n" +
+				"\t\tfinal int imgHeight = dst.getHeight();\n" +
 				"\t\tfinal int yEnd = imgHeight - (kernelWidth - offset - 1);\n");
 
 		String body = "";
-		body += "\t\t\tfinal int indexDstStart = dest.startIndex + y*dest.stride;\n" +
+		body += "\t\t\tfinal int indexDstStart = dst.startIndex + y*dst.stride;\n" +
 				"\t\t\tArrays.fill(dataDst, indexDstStart, indexDstStart + imgWidth, (" + outputData + ")0);\n" +
 				"\n" +
 				"\t\t\tfor (int k = 0; k < kernelWidth; k++) {\n" +
-				"\t\t\t\t" + kernelData + " kernelValue = dataKer[k];\n" +
-				"\t\t\t\tint indexDst = indexDstStart;\n" +
-				"\t\t\t\tfinal int iStart = image.startIndex + (y - offset + k)*image.stride;\n" +
+				"\t\t\t\tfinal int iStart = src.startIndex + (y - offset + k)*src.stride;\n" +
 				"\t\t\t\tfinal int iEnd = iStart + imgWidth;\n" +
+				"\t\t\t\tint indexDst = indexDstStart;\n" +
+				"\t\t\t\t" + kernelData + " kernelValue = dataKer[k];\n" +
 				"\t\t\t\tfor (int i = iStart; i < iEnd; i++) {\n" +
 				"\t\t\t\t\tdataDst[indexDst++] += " + typeCast + "((dataSrc[i]" + bitWise + ")*kernelValue);\n" +
 				"\t\t\t\t}\n" +
@@ -279,7 +281,6 @@ public class GenerateConvolveImageStandard_SB extends CodeGeneratorBase {
 	}
 
 	private void printConvolve2D_div() {
-
 		out.print("\tpublic static void convolve( Kernel2D_" + kernelType + " kernel, " + inputType + " src, " +
 				outputType + " dest, int divisor, @Nullable GrowArray<" + workType + "> workspaces ) {\n" +
 				"\t\tworkspaces = BoofMiscOps.checkDeclare(workspaces, " + workType + "::new);\n" +

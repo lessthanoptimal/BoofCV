@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -60,7 +60,6 @@ public class TestImplConvolveMean extends CompareEquivalentFunctions {
 
 	@Override
 	protected boolean isEquivalent( Method candidate, Method validation ) {
-
 		Class<?>[] c = candidate.getParameterTypes();
 		Class<?>[] v = validation.getParameterTypes();
 
@@ -68,7 +67,7 @@ public class TestImplConvolveMean extends CompareEquivalentFunctions {
 			return false;
 
 		if (!GeneralizedImageOps.isFloatingPoint(v[0])) {
-			if (c.length != 4)
+			if (c.length != 4 && c.length != 5)
 				return false;
 		} else {
 			if (c.length != 3)
@@ -84,15 +83,15 @@ public class TestImplConvolveMean extends CompareEquivalentFunctions {
 	@Override
 	protected Object[][] createInputParam( Method candidate, Method validation ) {
 
-		Class[] c = candidate.getParameterTypes();
+		Class[] candidateParam = candidate.getParameterTypes();
 
-		ImageGray input = GeneralizedImageOps.createSingleBand(c[0], width, height);
-		ImageGray output = GeneralizedImageOps.createSingleBand(c[1], width, height);
+		ImageGray input = GeneralizedImageOps.createSingleBand(candidateParam[0], width, height);
+		ImageGray output = GeneralizedImageOps.createSingleBand(candidateParam[1], width, height);
 
 		GImageMiscOps.fillUniform(input, rand, 0, 50);
 
 		Object[][] ret = new Object[3][];
-		if (c.length == 4) {
+		if (candidateParam.length == 4) {
 			ret[0] = new Object[]{input, output, kernelOffset, kernelLength};
 			ret[1] = new Object[]{input, output, kernelOffset + 1, kernelLength};
 			ret[2] = new Object[]{input, output, kernelOffset, kernelLength - 1};
@@ -114,7 +113,10 @@ public class TestImplConvolveMean extends CompareEquivalentFunctions {
 		ImageGray output = (ImageGray)((ImageGray)targetParam[1]).clone();
 
 		if (output.getDataType().isInteger())
-			return new Object[]{kernel, targetParam[0], output, targetParam[3]};
+			if (m.getName().equals("vertical"))
+				return new Object[]{kernel, targetParam[0], output, targetParam[3], null};
+			else
+				return new Object[]{kernel, targetParam[0], output, targetParam[3]};
 		else
 			return new Object[]{kernel, targetParam[0], output};
 	}

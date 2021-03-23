@@ -44,20 +44,20 @@ import java.util.Arrays;
 @SuppressWarnings({"ForLoopReplaceableByForEach","Duplicates"})
 public class ConvolveImageStandard_SB {
 
-	public static void horizontal( Kernel1D_F32 kernel, GrayF32 image, GrayF32 dest ) {
-		final float[] dataSrc = image.data;
-		final float[] dataDst = dest.data;
+	public static void horizontal( Kernel1D_F32 kernel, GrayF32 src, GrayF32 dst ) {
+		final float[] dataSrc = src.data;
+		final float[] dataDst = dst.data;
 		final float[] dataKer = kernel.data;
 
 		final int offset = kernel.getOffset();
 		final int kernelWidth = kernel.getWidth();
 
-		final int width = image.getWidth();
+		final int width = src.getWidth();
 
-		//CONCURRENT_BELOW BoofConcurrency.loopFor(0, image.height, i -> {
-		for (int i = 0; i < image.height; i++) {
-			int indexDst = dest.startIndex + i*dest.stride + offset;
-			int j = image.startIndex + i*image.stride;
+		//CONCURRENT_BELOW BoofConcurrency.loopFor(0, src.height, i -> {
+		for (int i = 0; i < src.height; i++) {
+			int indexDst = dst.startIndex + i*dst.stride + offset;
+			int j = src.startIndex + i*src.stride;
 			final int jEnd = j + width - (kernelWidth - 1);
 
 			for (; j < jEnd; j++) {
@@ -72,28 +72,28 @@ public class ConvolveImageStandard_SB {
 		//CONCURRENT_ABOVE });
 	}
 
-	public static void vertical( Kernel1D_F32 kernel, GrayF32 image, GrayF32 dest ) {
-		final float[] dataSrc = image.data;
-		final float[] dataDst = dest.data;
+	public static void vertical( Kernel1D_F32 kernel, GrayF32 src, GrayF32 dst ) {
+		final float[] dataSrc = src.data;
+		final float[] dataDst = dst.data;
 		final float[] dataKer = kernel.data;
 
 		final int offset = kernel.getOffset();
 		final int kernelWidth = kernel.getWidth();
 
-		final int imgWidth = dest.getWidth();
-		final int imgHeight = dest.getHeight();
+		final int imgWidth = dst.getWidth();
+		final int imgHeight = dst.getHeight();
 		final int yEnd = imgHeight - (kernelWidth - offset - 1);
 
 		//CONCURRENT_BELOW BoofConcurrency.loopFor(offset, yEnd, y -> {
 		for (int y = offset; y < yEnd; y++) {
-			final int indexDstStart = dest.startIndex + y*dest.stride;
+			final int indexDstStart = dst.startIndex + y*dst.stride;
 			Arrays.fill(dataDst, indexDstStart, indexDstStart + imgWidth, (float)0);
 
 			for (int k = 0; k < kernelWidth; k++) {
-				float kernelValue = dataKer[k];
-				int indexDst = indexDstStart;
-				final int iStart = image.startIndex + (y - offset + k)*image.stride;
+				final int iStart = src.startIndex + (y - offset + k)*src.stride;
 				final int iEnd = iStart + imgWidth;
+				int indexDst = indexDstStart;
+				float kernelValue = dataKer[k];
 				for (int i = iStart; i < iEnd; i++) {
 					dataDst[indexDst++] += ((dataSrc[i])*kernelValue);
 				}
@@ -131,20 +131,20 @@ public class ConvolveImageStandard_SB {
 		//CONCURRENT_ABOVE });
 	}
 
-	public static void horizontal( Kernel1D_F64 kernel, GrayF64 image, GrayF64 dest ) {
-		final double[] dataSrc = image.data;
-		final double[] dataDst = dest.data;
+	public static void horizontal( Kernel1D_F64 kernel, GrayF64 src, GrayF64 dst ) {
+		final double[] dataSrc = src.data;
+		final double[] dataDst = dst.data;
 		final double[] dataKer = kernel.data;
 
 		final int offset = kernel.getOffset();
 		final int kernelWidth = kernel.getWidth();
 
-		final int width = image.getWidth();
+		final int width = src.getWidth();
 
-		//CONCURRENT_BELOW BoofConcurrency.loopFor(0, image.height, i -> {
-		for (int i = 0; i < image.height; i++) {
-			int indexDst = dest.startIndex + i*dest.stride + offset;
-			int j = image.startIndex + i*image.stride;
+		//CONCURRENT_BELOW BoofConcurrency.loopFor(0, src.height, i -> {
+		for (int i = 0; i < src.height; i++) {
+			int indexDst = dst.startIndex + i*dst.stride + offset;
+			int j = src.startIndex + i*src.stride;
 			final int jEnd = j + width - (kernelWidth - 1);
 
 			for (; j < jEnd; j++) {
@@ -159,28 +159,28 @@ public class ConvolveImageStandard_SB {
 		//CONCURRENT_ABOVE });
 	}
 
-	public static void vertical( Kernel1D_F64 kernel, GrayF64 image, GrayF64 dest ) {
-		final double[] dataSrc = image.data;
-		final double[] dataDst = dest.data;
+	public static void vertical( Kernel1D_F64 kernel, GrayF64 src, GrayF64 dst ) {
+		final double[] dataSrc = src.data;
+		final double[] dataDst = dst.data;
 		final double[] dataKer = kernel.data;
 
 		final int offset = kernel.getOffset();
 		final int kernelWidth = kernel.getWidth();
 
-		final int imgWidth = dest.getWidth();
-		final int imgHeight = dest.getHeight();
+		final int imgWidth = dst.getWidth();
+		final int imgHeight = dst.getHeight();
 		final int yEnd = imgHeight - (kernelWidth - offset - 1);
 
 		//CONCURRENT_BELOW BoofConcurrency.loopFor(offset, yEnd, y -> {
 		for (int y = offset; y < yEnd; y++) {
-			final int indexDstStart = dest.startIndex + y*dest.stride;
+			final int indexDstStart = dst.startIndex + y*dst.stride;
 			Arrays.fill(dataDst, indexDstStart, indexDstStart + imgWidth, (double)0);
 
 			for (int k = 0; k < kernelWidth; k++) {
-				double kernelValue = dataKer[k];
-				int indexDst = indexDstStart;
-				final int iStart = image.startIndex + (y - offset + k)*image.stride;
+				final int iStart = src.startIndex + (y - offset + k)*src.stride;
 				final int iEnd = iStart + imgWidth;
+				int indexDst = indexDstStart;
+				double kernelValue = dataKer[k];
 				for (int i = iStart; i < iEnd; i++) {
 					dataDst[indexDst++] += ((dataSrc[i])*kernelValue);
 				}
@@ -218,20 +218,20 @@ public class ConvolveImageStandard_SB {
 		//CONCURRENT_ABOVE });
 	}
 
-	public static void horizontal( Kernel1D_S32 kernel, GrayU8 image, GrayI16 dest ) {
-		final byte[] dataSrc = image.data;
-		final short[] dataDst = dest.data;
+	public static void horizontal( Kernel1D_S32 kernel, GrayU8 src, GrayI16 dst ) {
+		final byte[] dataSrc = src.data;
+		final short[] dataDst = dst.data;
 		final int[] dataKer = kernel.data;
 
 		final int offset = kernel.getOffset();
 		final int kernelWidth = kernel.getWidth();
 
-		final int width = image.getWidth();
+		final int width = src.getWidth();
 
-		//CONCURRENT_BELOW BoofConcurrency.loopFor(0, image.height, i -> {
-		for (int i = 0; i < image.height; i++) {
-			int indexDst = dest.startIndex + i*dest.stride + offset;
-			int j = image.startIndex + i*image.stride;
+		//CONCURRENT_BELOW BoofConcurrency.loopFor(0, src.height, i -> {
+		for (int i = 0; i < src.height; i++) {
+			int indexDst = dst.startIndex + i*dst.stride + offset;
+			int j = src.startIndex + i*src.stride;
 			final int jEnd = j + width - (kernelWidth - 1);
 
 			for (; j < jEnd; j++) {
@@ -246,28 +246,28 @@ public class ConvolveImageStandard_SB {
 		//CONCURRENT_ABOVE });
 	}
 
-	public static void vertical( Kernel1D_S32 kernel, GrayU8 image, GrayI16 dest ) {
-		final byte[] dataSrc = image.data;
-		final short[] dataDst = dest.data;
+	public static void vertical( Kernel1D_S32 kernel, GrayU8 src, GrayI16 dst ) {
+		final byte[] dataSrc = src.data;
+		final short[] dataDst = dst.data;
 		final int[] dataKer = kernel.data;
 
 		final int offset = kernel.getOffset();
 		final int kernelWidth = kernel.getWidth();
 
-		final int imgWidth = dest.getWidth();
-		final int imgHeight = dest.getHeight();
+		final int imgWidth = dst.getWidth();
+		final int imgHeight = dst.getHeight();
 		final int yEnd = imgHeight - (kernelWidth - offset - 1);
 
 		//CONCURRENT_BELOW BoofConcurrency.loopFor(offset, yEnd, y -> {
 		for (int y = offset; y < yEnd; y++) {
-			final int indexDstStart = dest.startIndex + y*dest.stride;
+			final int indexDstStart = dst.startIndex + y*dst.stride;
 			Arrays.fill(dataDst, indexDstStart, indexDstStart + imgWidth, (short)0);
 
 			for (int k = 0; k < kernelWidth; k++) {
-				int kernelValue = dataKer[k];
-				int indexDst = indexDstStart;
-				final int iStart = image.startIndex + (y - offset + k)*image.stride;
+				final int iStart = src.startIndex + (y - offset + k)*src.stride;
 				final int iEnd = iStart + imgWidth;
+				int indexDst = indexDstStart;
+				int kernelValue = dataKer[k];
 				for (int i = iStart; i < iEnd; i++) {
 					dataDst[indexDst++] += (short)((dataSrc[i] & 0xFF)*kernelValue);
 				}
@@ -305,20 +305,20 @@ public class ConvolveImageStandard_SB {
 		//CONCURRENT_ABOVE });
 	}
 
-	public static void horizontal( Kernel1D_S32 kernel, GrayU8 image, GrayS32 dest ) {
-		final byte[] dataSrc = image.data;
-		final int[] dataDst = dest.data;
+	public static void horizontal( Kernel1D_S32 kernel, GrayU8 src, GrayS32 dst ) {
+		final byte[] dataSrc = src.data;
+		final int[] dataDst = dst.data;
 		final int[] dataKer = kernel.data;
 
 		final int offset = kernel.getOffset();
 		final int kernelWidth = kernel.getWidth();
 
-		final int width = image.getWidth();
+		final int width = src.getWidth();
 
-		//CONCURRENT_BELOW BoofConcurrency.loopFor(0, image.height, i -> {
-		for (int i = 0; i < image.height; i++) {
-			int indexDst = dest.startIndex + i*dest.stride + offset;
-			int j = image.startIndex + i*image.stride;
+		//CONCURRENT_BELOW BoofConcurrency.loopFor(0, src.height, i -> {
+		for (int i = 0; i < src.height; i++) {
+			int indexDst = dst.startIndex + i*dst.stride + offset;
+			int j = src.startIndex + i*src.stride;
 			final int jEnd = j + width - (kernelWidth - 1);
 
 			for (; j < jEnd; j++) {
@@ -333,28 +333,28 @@ public class ConvolveImageStandard_SB {
 		//CONCURRENT_ABOVE });
 	}
 
-	public static void vertical( Kernel1D_S32 kernel, GrayU8 image, GrayS32 dest ) {
-		final byte[] dataSrc = image.data;
-		final int[] dataDst = dest.data;
+	public static void vertical( Kernel1D_S32 kernel, GrayU8 src, GrayS32 dst ) {
+		final byte[] dataSrc = src.data;
+		final int[] dataDst = dst.data;
 		final int[] dataKer = kernel.data;
 
 		final int offset = kernel.getOffset();
 		final int kernelWidth = kernel.getWidth();
 
-		final int imgWidth = dest.getWidth();
-		final int imgHeight = dest.getHeight();
+		final int imgWidth = dst.getWidth();
+		final int imgHeight = dst.getHeight();
 		final int yEnd = imgHeight - (kernelWidth - offset - 1);
 
 		//CONCURRENT_BELOW BoofConcurrency.loopFor(offset, yEnd, y -> {
 		for (int y = offset; y < yEnd; y++) {
-			final int indexDstStart = dest.startIndex + y*dest.stride;
+			final int indexDstStart = dst.startIndex + y*dst.stride;
 			Arrays.fill(dataDst, indexDstStart, indexDstStart + imgWidth, (int)0);
 
 			for (int k = 0; k < kernelWidth; k++) {
-				int kernelValue = dataKer[k];
-				int indexDst = indexDstStart;
-				final int iStart = image.startIndex + (y - offset + k)*image.stride;
+				final int iStart = src.startIndex + (y - offset + k)*src.stride;
 				final int iEnd = iStart + imgWidth;
+				int indexDst = indexDstStart;
+				int kernelValue = dataKer[k];
 				for (int i = iStart; i < iEnd; i++) {
 					dataDst[indexDst++] += ((dataSrc[i] & 0xFF)*kernelValue);
 				}
@@ -393,52 +393,57 @@ public class ConvolveImageStandard_SB {
 	}
 
 	public static void vertical( Kernel1D_S32 kernel,
-								 GrayU16 image, GrayI8 dest , int divisor ) {
-		final short[] dataSrc = image.data;
-		final byte[] dataDst = dest.data;
+								 GrayU16 src, GrayI8 dst, int divisor, @Nullable GrowArray<DogArray_I32> workspaces ) {
+		workspaces = BoofMiscOps.checkDeclare(workspaces, DogArray_I32::new);
+		final DogArray_I32 work = workspaces.grow(); //CONCURRENT_REMOVE_LINE
+		final short[] dataSrc = src.data;
+		final byte[] dataDst = dst.data;
 		final int[] dataKer = kernel.data;
 
 		final int offset = kernel.getOffset();
 		final int kernelWidth = kernel.getWidth();
 		final int halfDivisor = divisor/2;
+		final double divisionHack = 1.0/divisor; // WTF integer division is slower than converting to a float??
 
-		final int imgWidth = dest.getWidth();
-		final int imgHeight = dest.getHeight();
+		final int imgWidth = dst.getWidth();
+		final int imgHeight = dst.getHeight();
 		final int yEnd = imgHeight - (kernelWidth - offset - 1);
 
-		//CONCURRENT_BELOW BoofConcurrency.loopFor(offset, yEnd, y -> {
-		for (int y = offset; y < yEnd; y++) {
-			int indexDst = dest.startIndex + y*dest.stride;
-			int i = image.startIndex + (y - offset)*image.stride;
-			final int iEnd = i + imgWidth;
-
-			for (; i < iEnd; i++) {
-				int total = 0;
-				int indexSrc = i;
-				for (int k = 0; k < kernelWidth; k++) {
-					total += (dataSrc[indexSrc] & 0xFFFF)*dataKer[k];
-					indexSrc += image.stride;
+		//CONCURRENT_BELOW BoofConcurrency.loopBlocks(offset, yEnd, kernel.width, workspaces, (work, y0, y1)->{
+		final int y0 = offset, y1 = yEnd;
+		int[] totalRow = BoofMiscOps.checkDeclare(work, imgWidth, true);
+		for (int y = y0; y < y1; y++) {
+			for (int k = 0; k < kernelWidth; k++) {
+				final int kernelValue = dataKer[k];
+				int indexSrc = src.startIndex + (y - offset + k)*src.stride;
+				for (int i = 0; i < imgWidth; i++) {
+					totalRow[i] += ((dataSrc[indexSrc++] & 0xFFFF)*kernelValue);
 				}
-				dataDst[indexDst++] = (byte)((total + halfDivisor)/divisor);
 			}
+
+			int indexDst = dst.startIndex + y*dst.stride;
+			for (int i = 0; i < imgWidth; i++) {
+				dataDst[indexDst++] = (byte)((totalRow[i] + halfDivisor)*divisionHack);
+			}
+			Arrays.fill(totalRow,0,imgWidth,0);
 		}
-		//CONCURRENT_ABOVE });
+		//CONCURRENT_INLINE });
 	}
 
-	public static void horizontal( Kernel1D_S32 kernel, GrayS16 image, GrayI16 dest ) {
-		final short[] dataSrc = image.data;
-		final short[] dataDst = dest.data;
+	public static void horizontal( Kernel1D_S32 kernel, GrayS16 src, GrayI16 dst ) {
+		final short[] dataSrc = src.data;
+		final short[] dataDst = dst.data;
 		final int[] dataKer = kernel.data;
 
 		final int offset = kernel.getOffset();
 		final int kernelWidth = kernel.getWidth();
 
-		final int width = image.getWidth();
+		final int width = src.getWidth();
 
-		//CONCURRENT_BELOW BoofConcurrency.loopFor(0, image.height, i -> {
-		for (int i = 0; i < image.height; i++) {
-			int indexDst = dest.startIndex + i*dest.stride + offset;
-			int j = image.startIndex + i*image.stride;
+		//CONCURRENT_BELOW BoofConcurrency.loopFor(0, src.height, i -> {
+		for (int i = 0; i < src.height; i++) {
+			int indexDst = dst.startIndex + i*dst.stride + offset;
+			int j = src.startIndex + i*src.stride;
 			final int jEnd = j + width - (kernelWidth - 1);
 
 			for (; j < jEnd; j++) {
@@ -453,28 +458,28 @@ public class ConvolveImageStandard_SB {
 		//CONCURRENT_ABOVE });
 	}
 
-	public static void vertical( Kernel1D_S32 kernel, GrayS16 image, GrayI16 dest ) {
-		final short[] dataSrc = image.data;
-		final short[] dataDst = dest.data;
+	public static void vertical( Kernel1D_S32 kernel, GrayS16 src, GrayI16 dst ) {
+		final short[] dataSrc = src.data;
+		final short[] dataDst = dst.data;
 		final int[] dataKer = kernel.data;
 
 		final int offset = kernel.getOffset();
 		final int kernelWidth = kernel.getWidth();
 
-		final int imgWidth = dest.getWidth();
-		final int imgHeight = dest.getHeight();
+		final int imgWidth = dst.getWidth();
+		final int imgHeight = dst.getHeight();
 		final int yEnd = imgHeight - (kernelWidth - offset - 1);
 
 		//CONCURRENT_BELOW BoofConcurrency.loopFor(offset, yEnd, y -> {
 		for (int y = offset; y < yEnd; y++) {
-			final int indexDstStart = dest.startIndex + y*dest.stride;
+			final int indexDstStart = dst.startIndex + y*dst.stride;
 			Arrays.fill(dataDst, indexDstStart, indexDstStart + imgWidth, (short)0);
 
 			for (int k = 0; k < kernelWidth; k++) {
-				int kernelValue = dataKer[k];
-				int indexDst = indexDstStart;
-				final int iStart = image.startIndex + (y - offset + k)*image.stride;
+				final int iStart = src.startIndex + (y - offset + k)*src.stride;
 				final int iEnd = iStart + imgWidth;
+				int indexDst = indexDstStart;
+				int kernelValue = dataKer[k];
 				for (int i = iStart; i < iEnd; i++) {
 					dataDst[indexDst++] += (short)((dataSrc[i])*kernelValue);
 				}
@@ -512,21 +517,21 @@ public class ConvolveImageStandard_SB {
 		//CONCURRENT_ABOVE });
 	}
 
-	public static void horizontal( Kernel1D_S32 kernel, GrayU8 image, GrayI8 dest , int divisor ) {
-		final byte[] dataSrc = image.data;
-		final byte[] dataDst = dest.data;
+	public static void horizontal( Kernel1D_S32 kernel, GrayU8 src, GrayI8 dst , int divisor ) {
+		final byte[] dataSrc = src.data;
+		final byte[] dataDst = dst.data;
 		final int[] dataKer = kernel.data;
 
 		final int offset = kernel.getOffset();
 		final int kernelWidth = kernel.getWidth();
 		final int halfDivisor = divisor/2;
 
-		final int width = image.getWidth();
+		final int width = src.getWidth();
 
-		//CONCURRENT_BELOW BoofConcurrency.loopFor(0, image.height, i -> {
-		for (int i = 0; i < image.height; i++) {
-			int indexDst = dest.startIndex + i*dest.stride + offset;
-			int j = image.startIndex + i*image.stride;
+		//CONCURRENT_BELOW BoofConcurrency.loopFor(0, src.height, i -> {
+		for (int i = 0; i < src.height; i++) {
+			int indexDst = dst.startIndex + i*dst.stride + offset;
+			int j = src.startIndex + i*src.stride;
 			final int jEnd = j + width - (kernelWidth - 1);
 
 			for (; j < jEnd; j++) {
@@ -542,36 +547,41 @@ public class ConvolveImageStandard_SB {
 	}
 
 	public static void vertical( Kernel1D_S32 kernel,
-								 GrayU8 image, GrayI8 dest , int divisor ) {
-		final byte[] dataSrc = image.data;
-		final byte[] dataDst = dest.data;
+								 GrayU8 src, GrayI8 dst, int divisor, @Nullable GrowArray<DogArray_I32> workspaces ) {
+		workspaces = BoofMiscOps.checkDeclare(workspaces, DogArray_I32::new);
+		final DogArray_I32 work = workspaces.grow(); //CONCURRENT_REMOVE_LINE
+		final byte[] dataSrc = src.data;
+		final byte[] dataDst = dst.data;
 		final int[] dataKer = kernel.data;
 
 		final int offset = kernel.getOffset();
 		final int kernelWidth = kernel.getWidth();
 		final int halfDivisor = divisor/2;
+		final double divisionHack = 1.0/divisor; // WTF integer division is slower than converting to a float??
 
-		final int imgWidth = dest.getWidth();
-		final int imgHeight = dest.getHeight();
+		final int imgWidth = dst.getWidth();
+		final int imgHeight = dst.getHeight();
 		final int yEnd = imgHeight - (kernelWidth - offset - 1);
 
-		//CONCURRENT_BELOW BoofConcurrency.loopFor(offset, yEnd, y -> {
-		for (int y = offset; y < yEnd; y++) {
-			int indexDst = dest.startIndex + y*dest.stride;
-			int i = image.startIndex + (y - offset)*image.stride;
-			final int iEnd = i + imgWidth;
-
-			for (; i < iEnd; i++) {
-				int total = 0;
-				int indexSrc = i;
-				for (int k = 0; k < kernelWidth; k++) {
-					total += (dataSrc[indexSrc] & 0xFF)*dataKer[k];
-					indexSrc += image.stride;
+		//CONCURRENT_BELOW BoofConcurrency.loopBlocks(offset, yEnd, kernel.width, workspaces, (work, y0, y1)->{
+		final int y0 = offset, y1 = yEnd;
+		int[] totalRow = BoofMiscOps.checkDeclare(work, imgWidth, true);
+		for (int y = y0; y < y1; y++) {
+			for (int k = 0; k < kernelWidth; k++) {
+				final int kernelValue = dataKer[k];
+				int indexSrc = src.startIndex + (y - offset + k)*src.stride;
+				for (int i = 0; i < imgWidth; i++) {
+					totalRow[i] += ((dataSrc[indexSrc++] & 0xFF)*kernelValue);
 				}
-				dataDst[indexDst++] = (byte)((total + halfDivisor)/divisor);
 			}
+
+			int indexDst = dst.startIndex + y*dst.stride;
+			for (int i = 0; i < imgWidth; i++) {
+				dataDst[indexDst++] = (byte)((totalRow[i] + halfDivisor)*divisionHack);
+			}
+			Arrays.fill(totalRow,0,imgWidth,0);
 		}
-		//CONCURRENT_ABOVE });
+		//CONCURRENT_INLINE });
 	}
 
 	public static void convolve( Kernel2D_S32 kernel, GrayU8 src, GrayI8 dest, int divisor, @Nullable GrowArray<DogArray_I32> workspaces ) {
@@ -626,21 +636,21 @@ public class ConvolveImageStandard_SB {
 		}
 		//CONCURRENT_INLINE });
 	}
-	public static void horizontal( Kernel1D_S32 kernel, GrayS16 image, GrayI16 dest , int divisor ) {
-		final short[] dataSrc = image.data;
-		final short[] dataDst = dest.data;
+	public static void horizontal( Kernel1D_S32 kernel, GrayS16 src, GrayI16 dst , int divisor ) {
+		final short[] dataSrc = src.data;
+		final short[] dataDst = dst.data;
 		final int[] dataKer = kernel.data;
 
 		final int offset = kernel.getOffset();
 		final int kernelWidth = kernel.getWidth();
 		final int halfDivisor = divisor/2;
 
-		final int width = image.getWidth();
+		final int width = src.getWidth();
 
-		//CONCURRENT_BELOW BoofConcurrency.loopFor(0, image.height, i -> {
-		for (int i = 0; i < image.height; i++) {
-			int indexDst = dest.startIndex + i*dest.stride + offset;
-			int j = image.startIndex + i*image.stride;
+		//CONCURRENT_BELOW BoofConcurrency.loopFor(0, src.height, i -> {
+		for (int i = 0; i < src.height; i++) {
+			int indexDst = dst.startIndex + i*dst.stride + offset;
+			int j = src.startIndex + i*src.stride;
 			final int jEnd = j + width - (kernelWidth - 1);
 
 			for (; j < jEnd; j++) {
@@ -656,36 +666,41 @@ public class ConvolveImageStandard_SB {
 	}
 
 	public static void vertical( Kernel1D_S32 kernel,
-								 GrayS16 image, GrayI16 dest , int divisor ) {
-		final short[] dataSrc = image.data;
-		final short[] dataDst = dest.data;
+								 GrayS16 src, GrayI16 dst, int divisor, @Nullable GrowArray<DogArray_I32> workspaces ) {
+		workspaces = BoofMiscOps.checkDeclare(workspaces, DogArray_I32::new);
+		final DogArray_I32 work = workspaces.grow(); //CONCURRENT_REMOVE_LINE
+		final short[] dataSrc = src.data;
+		final short[] dataDst = dst.data;
 		final int[] dataKer = kernel.data;
 
 		final int offset = kernel.getOffset();
 		final int kernelWidth = kernel.getWidth();
 		final int halfDivisor = divisor/2;
+		final double divisionHack = 1.0/divisor; // WTF integer division is slower than converting to a float??
 
-		final int imgWidth = dest.getWidth();
-		final int imgHeight = dest.getHeight();
+		final int imgWidth = dst.getWidth();
+		final int imgHeight = dst.getHeight();
 		final int yEnd = imgHeight - (kernelWidth - offset - 1);
 
-		//CONCURRENT_BELOW BoofConcurrency.loopFor(offset, yEnd, y -> {
-		for (int y = offset; y < yEnd; y++) {
-			int indexDst = dest.startIndex + y*dest.stride;
-			int i = image.startIndex + (y - offset)*image.stride;
-			final int iEnd = i + imgWidth;
-
-			for (; i < iEnd; i++) {
-				int total = 0;
-				int indexSrc = i;
-				for (int k = 0; k < kernelWidth; k++) {
-					total += (dataSrc[indexSrc])*dataKer[k];
-					indexSrc += image.stride;
+		//CONCURRENT_BELOW BoofConcurrency.loopBlocks(offset, yEnd, kernel.width, workspaces, (work, y0, y1)->{
+		final int y0 = offset, y1 = yEnd;
+		int[] totalRow = BoofMiscOps.checkDeclare(work, imgWidth, true);
+		for (int y = y0; y < y1; y++) {
+			for (int k = 0; k < kernelWidth; k++) {
+				final int kernelValue = dataKer[k];
+				int indexSrc = src.startIndex + (y - offset + k)*src.stride;
+				for (int i = 0; i < imgWidth; i++) {
+					totalRow[i] += ((dataSrc[indexSrc++])*kernelValue);
 				}
-				dataDst[indexDst++] = (short)((total + halfDivisor)/divisor);
 			}
+
+			int indexDst = dst.startIndex + y*dst.stride;
+			for (int i = 0; i < imgWidth; i++) {
+				dataDst[indexDst++] = (short)((totalRow[i] + halfDivisor)*divisionHack);
+			}
+			Arrays.fill(totalRow,0,imgWidth,0);
 		}
-		//CONCURRENT_ABOVE });
+		//CONCURRENT_INLINE });
 	}
 
 	public static void convolve( Kernel2D_S32 kernel, GrayS16 src, GrayI16 dest, int divisor, @Nullable GrowArray<DogArray_I32> workspaces ) {
@@ -740,20 +755,20 @@ public class ConvolveImageStandard_SB {
 		}
 		//CONCURRENT_INLINE });
 	}
-	public static void horizontal( Kernel1D_S32 kernel, GrayU16 image, GrayI16 dest ) {
-		final short[] dataSrc = image.data;
-		final short[] dataDst = dest.data;
+	public static void horizontal( Kernel1D_S32 kernel, GrayU16 src, GrayI16 dst ) {
+		final short[] dataSrc = src.data;
+		final short[] dataDst = dst.data;
 		final int[] dataKer = kernel.data;
 
 		final int offset = kernel.getOffset();
 		final int kernelWidth = kernel.getWidth();
 
-		final int width = image.getWidth();
+		final int width = src.getWidth();
 
-		//CONCURRENT_BELOW BoofConcurrency.loopFor(0, image.height, i -> {
-		for (int i = 0; i < image.height; i++) {
-			int indexDst = dest.startIndex + i*dest.stride + offset;
-			int j = image.startIndex + i*image.stride;
+		//CONCURRENT_BELOW BoofConcurrency.loopFor(0, src.height, i -> {
+		for (int i = 0; i < src.height; i++) {
+			int indexDst = dst.startIndex + i*dst.stride + offset;
+			int j = src.startIndex + i*src.stride;
 			final int jEnd = j + width - (kernelWidth - 1);
 
 			for (; j < jEnd; j++) {
@@ -768,28 +783,28 @@ public class ConvolveImageStandard_SB {
 		//CONCURRENT_ABOVE });
 	}
 
-	public static void vertical( Kernel1D_S32 kernel, GrayU16 image, GrayI16 dest ) {
-		final short[] dataSrc = image.data;
-		final short[] dataDst = dest.data;
+	public static void vertical( Kernel1D_S32 kernel, GrayU16 src, GrayI16 dst ) {
+		final short[] dataSrc = src.data;
+		final short[] dataDst = dst.data;
 		final int[] dataKer = kernel.data;
 
 		final int offset = kernel.getOffset();
 		final int kernelWidth = kernel.getWidth();
 
-		final int imgWidth = dest.getWidth();
-		final int imgHeight = dest.getHeight();
+		final int imgWidth = dst.getWidth();
+		final int imgHeight = dst.getHeight();
 		final int yEnd = imgHeight - (kernelWidth - offset - 1);
 
 		//CONCURRENT_BELOW BoofConcurrency.loopFor(offset, yEnd, y -> {
 		for (int y = offset; y < yEnd; y++) {
-			final int indexDstStart = dest.startIndex + y*dest.stride;
+			final int indexDstStart = dst.startIndex + y*dst.stride;
 			Arrays.fill(dataDst, indexDstStart, indexDstStart + imgWidth, (short)0);
 
 			for (int k = 0; k < kernelWidth; k++) {
-				int kernelValue = dataKer[k];
-				int indexDst = indexDstStart;
-				final int iStart = image.startIndex + (y - offset + k)*image.stride;
+				final int iStart = src.startIndex + (y - offset + k)*src.stride;
 				final int iEnd = iStart + imgWidth;
+				int indexDst = indexDstStart;
+				int kernelValue = dataKer[k];
 				for (int i = iStart; i < iEnd; i++) {
 					dataDst[indexDst++] += (short)((dataSrc[i] & 0xFFFF)*kernelValue);
 				}
@@ -827,21 +842,21 @@ public class ConvolveImageStandard_SB {
 		//CONCURRENT_ABOVE });
 	}
 
-	public static void horizontal( Kernel1D_S32 kernel, GrayU16 image, GrayI16 dest , int divisor ) {
-		final short[] dataSrc = image.data;
-		final short[] dataDst = dest.data;
+	public static void horizontal( Kernel1D_S32 kernel, GrayU16 src, GrayI16 dst , int divisor ) {
+		final short[] dataSrc = src.data;
+		final short[] dataDst = dst.data;
 		final int[] dataKer = kernel.data;
 
 		final int offset = kernel.getOffset();
 		final int kernelWidth = kernel.getWidth();
 		final int halfDivisor = divisor/2;
 
-		final int width = image.getWidth();
+		final int width = src.getWidth();
 
-		//CONCURRENT_BELOW BoofConcurrency.loopFor(0, image.height, i -> {
-		for (int i = 0; i < image.height; i++) {
-			int indexDst = dest.startIndex + i*dest.stride + offset;
-			int j = image.startIndex + i*image.stride;
+		//CONCURRENT_BELOW BoofConcurrency.loopFor(0, src.height, i -> {
+		for (int i = 0; i < src.height; i++) {
+			int indexDst = dst.startIndex + i*dst.stride + offset;
+			int j = src.startIndex + i*src.stride;
 			final int jEnd = j + width - (kernelWidth - 1);
 
 			for (; j < jEnd; j++) {
@@ -857,36 +872,41 @@ public class ConvolveImageStandard_SB {
 	}
 
 	public static void vertical( Kernel1D_S32 kernel,
-								 GrayU16 image, GrayI16 dest , int divisor ) {
-		final short[] dataSrc = image.data;
-		final short[] dataDst = dest.data;
+								 GrayU16 src, GrayI16 dst, int divisor, @Nullable GrowArray<DogArray_I32> workspaces ) {
+		workspaces = BoofMiscOps.checkDeclare(workspaces, DogArray_I32::new);
+		final DogArray_I32 work = workspaces.grow(); //CONCURRENT_REMOVE_LINE
+		final short[] dataSrc = src.data;
+		final short[] dataDst = dst.data;
 		final int[] dataKer = kernel.data;
 
 		final int offset = kernel.getOffset();
 		final int kernelWidth = kernel.getWidth();
 		final int halfDivisor = divisor/2;
+		final double divisionHack = 1.0/divisor; // WTF integer division is slower than converting to a float??
 
-		final int imgWidth = dest.getWidth();
-		final int imgHeight = dest.getHeight();
+		final int imgWidth = dst.getWidth();
+		final int imgHeight = dst.getHeight();
 		final int yEnd = imgHeight - (kernelWidth - offset - 1);
 
-		//CONCURRENT_BELOW BoofConcurrency.loopFor(offset, yEnd, y -> {
-		for (int y = offset; y < yEnd; y++) {
-			int indexDst = dest.startIndex + y*dest.stride;
-			int i = image.startIndex + (y - offset)*image.stride;
-			final int iEnd = i + imgWidth;
-
-			for (; i < iEnd; i++) {
-				int total = 0;
-				int indexSrc = i;
-				for (int k = 0; k < kernelWidth; k++) {
-					total += (dataSrc[indexSrc] & 0xFFFF)*dataKer[k];
-					indexSrc += image.stride;
+		//CONCURRENT_BELOW BoofConcurrency.loopBlocks(offset, yEnd, kernel.width, workspaces, (work, y0, y1)->{
+		final int y0 = offset, y1 = yEnd;
+		int[] totalRow = BoofMiscOps.checkDeclare(work, imgWidth, true);
+		for (int y = y0; y < y1; y++) {
+			for (int k = 0; k < kernelWidth; k++) {
+				final int kernelValue = dataKer[k];
+				int indexSrc = src.startIndex + (y - offset + k)*src.stride;
+				for (int i = 0; i < imgWidth; i++) {
+					totalRow[i] += ((dataSrc[indexSrc++] & 0xFFFF)*kernelValue);
 				}
-				dataDst[indexDst++] = (short)((total + halfDivisor)/divisor);
 			}
+
+			int indexDst = dst.startIndex + y*dst.stride;
+			for (int i = 0; i < imgWidth; i++) {
+				dataDst[indexDst++] = (short)((totalRow[i] + halfDivisor)*divisionHack);
+			}
+			Arrays.fill(totalRow,0,imgWidth,0);
 		}
-		//CONCURRENT_ABOVE });
+		//CONCURRENT_INLINE });
 	}
 
 	public static void convolve( Kernel2D_S32 kernel, GrayU16 src, GrayI16 dest, int divisor, @Nullable GrowArray<DogArray_I32> workspaces ) {
@@ -942,52 +962,57 @@ public class ConvolveImageStandard_SB {
 		//CONCURRENT_INLINE });
 	}
 	public static void vertical( Kernel1D_S32 kernel,
-								 GrayS32 image, GrayI16 dest , int divisor ) {
-		final int[] dataSrc = image.data;
-		final short[] dataDst = dest.data;
+								 GrayS32 src, GrayI16 dst, int divisor, @Nullable GrowArray<DogArray_I32> workspaces ) {
+		workspaces = BoofMiscOps.checkDeclare(workspaces, DogArray_I32::new);
+		final DogArray_I32 work = workspaces.grow(); //CONCURRENT_REMOVE_LINE
+		final int[] dataSrc = src.data;
+		final short[] dataDst = dst.data;
 		final int[] dataKer = kernel.data;
 
 		final int offset = kernel.getOffset();
 		final int kernelWidth = kernel.getWidth();
 		final int halfDivisor = divisor/2;
+		final double divisionHack = 1.0/divisor; // WTF integer division is slower than converting to a float??
 
-		final int imgWidth = dest.getWidth();
-		final int imgHeight = dest.getHeight();
+		final int imgWidth = dst.getWidth();
+		final int imgHeight = dst.getHeight();
 		final int yEnd = imgHeight - (kernelWidth - offset - 1);
 
-		//CONCURRENT_BELOW BoofConcurrency.loopFor(offset, yEnd, y -> {
-		for (int y = offset; y < yEnd; y++) {
-			int indexDst = dest.startIndex + y*dest.stride;
-			int i = image.startIndex + (y - offset)*image.stride;
-			final int iEnd = i + imgWidth;
-
-			for (; i < iEnd; i++) {
-				int total = 0;
-				int indexSrc = i;
-				for (int k = 0; k < kernelWidth; k++) {
-					total += (dataSrc[indexSrc])*dataKer[k];
-					indexSrc += image.stride;
+		//CONCURRENT_BELOW BoofConcurrency.loopBlocks(offset, yEnd, kernel.width, workspaces, (work, y0, y1)->{
+		final int y0 = offset, y1 = yEnd;
+		int[] totalRow = BoofMiscOps.checkDeclare(work, imgWidth, true);
+		for (int y = y0; y < y1; y++) {
+			for (int k = 0; k < kernelWidth; k++) {
+				final int kernelValue = dataKer[k];
+				int indexSrc = src.startIndex + (y - offset + k)*src.stride;
+				for (int i = 0; i < imgWidth; i++) {
+					totalRow[i] += ((dataSrc[indexSrc++])*kernelValue);
 				}
-				dataDst[indexDst++] = (short)((total + halfDivisor)/divisor);
 			}
+
+			int indexDst = dst.startIndex + y*dst.stride;
+			for (int i = 0; i < imgWidth; i++) {
+				dataDst[indexDst++] = (short)((totalRow[i] + halfDivisor)*divisionHack);
+			}
+			Arrays.fill(totalRow,0,imgWidth,0);
 		}
-		//CONCURRENT_ABOVE });
+		//CONCURRENT_INLINE });
 	}
 
-	public static void horizontal( Kernel1D_S32 kernel, GrayS32 image, GrayS32 dest ) {
-		final int[] dataSrc = image.data;
-		final int[] dataDst = dest.data;
+	public static void horizontal( Kernel1D_S32 kernel, GrayS32 src, GrayS32 dst ) {
+		final int[] dataSrc = src.data;
+		final int[] dataDst = dst.data;
 		final int[] dataKer = kernel.data;
 
 		final int offset = kernel.getOffset();
 		final int kernelWidth = kernel.getWidth();
 
-		final int width = image.getWidth();
+		final int width = src.getWidth();
 
-		//CONCURRENT_BELOW BoofConcurrency.loopFor(0, image.height, i -> {
-		for (int i = 0; i < image.height; i++) {
-			int indexDst = dest.startIndex + i*dest.stride + offset;
-			int j = image.startIndex + i*image.stride;
+		//CONCURRENT_BELOW BoofConcurrency.loopFor(0, src.height, i -> {
+		for (int i = 0; i < src.height; i++) {
+			int indexDst = dst.startIndex + i*dst.stride + offset;
+			int j = src.startIndex + i*src.stride;
 			final int jEnd = j + width - (kernelWidth - 1);
 
 			for (; j < jEnd; j++) {
@@ -1002,28 +1027,28 @@ public class ConvolveImageStandard_SB {
 		//CONCURRENT_ABOVE });
 	}
 
-	public static void vertical( Kernel1D_S32 kernel, GrayS32 image, GrayS32 dest ) {
-		final int[] dataSrc = image.data;
-		final int[] dataDst = dest.data;
+	public static void vertical( Kernel1D_S32 kernel, GrayS32 src, GrayS32 dst ) {
+		final int[] dataSrc = src.data;
+		final int[] dataDst = dst.data;
 		final int[] dataKer = kernel.data;
 
 		final int offset = kernel.getOffset();
 		final int kernelWidth = kernel.getWidth();
 
-		final int imgWidth = dest.getWidth();
-		final int imgHeight = dest.getHeight();
+		final int imgWidth = dst.getWidth();
+		final int imgHeight = dst.getHeight();
 		final int yEnd = imgHeight - (kernelWidth - offset - 1);
 
 		//CONCURRENT_BELOW BoofConcurrency.loopFor(offset, yEnd, y -> {
 		for (int y = offset; y < yEnd; y++) {
-			final int indexDstStart = dest.startIndex + y*dest.stride;
+			final int indexDstStart = dst.startIndex + y*dst.stride;
 			Arrays.fill(dataDst, indexDstStart, indexDstStart + imgWidth, (int)0);
 
 			for (int k = 0; k < kernelWidth; k++) {
-				int kernelValue = dataKer[k];
-				int indexDst = indexDstStart;
-				final int iStart = image.startIndex + (y - offset + k)*image.stride;
+				final int iStart = src.startIndex + (y - offset + k)*src.stride;
 				final int iEnd = iStart + imgWidth;
+				int indexDst = indexDstStart;
+				int kernelValue = dataKer[k];
 				for (int i = iStart; i < iEnd; i++) {
 					dataDst[indexDst++] += ((dataSrc[i])*kernelValue);
 				}
@@ -1061,21 +1086,21 @@ public class ConvolveImageStandard_SB {
 		//CONCURRENT_ABOVE });
 	}
 
-	public static void horizontal( Kernel1D_S32 kernel, GrayS32 image, GrayS32 dest , int divisor ) {
-		final int[] dataSrc = image.data;
-		final int[] dataDst = dest.data;
+	public static void horizontal( Kernel1D_S32 kernel, GrayS32 src, GrayS32 dst , int divisor ) {
+		final int[] dataSrc = src.data;
+		final int[] dataDst = dst.data;
 		final int[] dataKer = kernel.data;
 
 		final int offset = kernel.getOffset();
 		final int kernelWidth = kernel.getWidth();
 		final int halfDivisor = divisor/2;
 
-		final int width = image.getWidth();
+		final int width = src.getWidth();
 
-		//CONCURRENT_BELOW BoofConcurrency.loopFor(0, image.height, i -> {
-		for (int i = 0; i < image.height; i++) {
-			int indexDst = dest.startIndex + i*dest.stride + offset;
-			int j = image.startIndex + i*image.stride;
+		//CONCURRENT_BELOW BoofConcurrency.loopFor(0, src.height, i -> {
+		for (int i = 0; i < src.height; i++) {
+			int indexDst = dst.startIndex + i*dst.stride + offset;
+			int j = src.startIndex + i*src.stride;
 			final int jEnd = j + width - (kernelWidth - 1);
 
 			for (; j < jEnd; j++) {
@@ -1091,36 +1116,41 @@ public class ConvolveImageStandard_SB {
 	}
 
 	public static void vertical( Kernel1D_S32 kernel,
-								 GrayS32 image, GrayS32 dest , int divisor ) {
-		final int[] dataSrc = image.data;
-		final int[] dataDst = dest.data;
+								 GrayS32 src, GrayS32 dst, int divisor, @Nullable GrowArray<DogArray_I32> workspaces ) {
+		workspaces = BoofMiscOps.checkDeclare(workspaces, DogArray_I32::new);
+		final DogArray_I32 work = workspaces.grow(); //CONCURRENT_REMOVE_LINE
+		final int[] dataSrc = src.data;
+		final int[] dataDst = dst.data;
 		final int[] dataKer = kernel.data;
 
 		final int offset = kernel.getOffset();
 		final int kernelWidth = kernel.getWidth();
 		final int halfDivisor = divisor/2;
+		final double divisionHack = 1.0/divisor; // WTF integer division is slower than converting to a float??
 
-		final int imgWidth = dest.getWidth();
-		final int imgHeight = dest.getHeight();
+		final int imgWidth = dst.getWidth();
+		final int imgHeight = dst.getHeight();
 		final int yEnd = imgHeight - (kernelWidth - offset - 1);
 
-		//CONCURRENT_BELOW BoofConcurrency.loopFor(offset, yEnd, y -> {
-		for (int y = offset; y < yEnd; y++) {
-			int indexDst = dest.startIndex + y*dest.stride;
-			int i = image.startIndex + (y - offset)*image.stride;
-			final int iEnd = i + imgWidth;
-
-			for (; i < iEnd; i++) {
-				int total = 0;
-				int indexSrc = i;
-				for (int k = 0; k < kernelWidth; k++) {
-					total += (dataSrc[indexSrc])*dataKer[k];
-					indexSrc += image.stride;
+		//CONCURRENT_BELOW BoofConcurrency.loopBlocks(offset, yEnd, kernel.width, workspaces, (work, y0, y1)->{
+		final int y0 = offset, y1 = yEnd;
+		int[] totalRow = BoofMiscOps.checkDeclare(work, imgWidth, true);
+		for (int y = y0; y < y1; y++) {
+			for (int k = 0; k < kernelWidth; k++) {
+				final int kernelValue = dataKer[k];
+				int indexSrc = src.startIndex + (y - offset + k)*src.stride;
+				for (int i = 0; i < imgWidth; i++) {
+					totalRow[i] += ((dataSrc[indexSrc++])*kernelValue);
 				}
-				dataDst[indexDst++] = ((total + halfDivisor)/divisor);
 			}
+
+			int indexDst = dst.startIndex + y*dst.stride;
+			for (int i = 0; i < imgWidth; i++) {
+				dataDst[indexDst++] = (int)((totalRow[i] + halfDivisor)*divisionHack);
+			}
+			Arrays.fill(totalRow,0,imgWidth,0);
 		}
-		//CONCURRENT_ABOVE });
+		//CONCURRENT_INLINE });
 	}
 
 	public static void convolve( Kernel2D_S32 kernel, GrayS32 src, GrayS32 dest, int divisor, @Nullable GrowArray<DogArray_I32> workspaces ) {

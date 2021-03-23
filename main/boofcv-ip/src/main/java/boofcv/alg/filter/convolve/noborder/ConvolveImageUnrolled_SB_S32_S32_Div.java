@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -49,7 +49,7 @@ import javax.annotation.Generated;
 @Generated("boofcv.alg.filter.convolve.noborder.GenerateConvolvedUnrolled_SB")
 @SuppressWarnings({"ForLoopReplaceableByForEach","Duplicates"})
 public class ConvolveImageUnrolled_SB_S32_S32_Div {
-	public static boolean horizontal( Kernel1D_S32 kernel ,
+	public static boolean horizontal( Kernel1D_S32 kernel,
 								   GrayS32 image, GrayS32 dest, int divisor ) {
 
 		// Unrolled functions only exist for symmetric kernels with an odd width
@@ -67,37 +67,37 @@ public class ConvolveImageUnrolled_SB_S32_S32_Div {
 		return true;
 	}
 
-	public static boolean vertical( Kernel1D_S32 kernel ,
-								   GrayS32 image, GrayS32 dest, int divisor ) {
+	public static boolean vertical( Kernel1D_S32 kernel,
+								   GrayS32 image, GrayS32 dest, int divisor, GrowArray<DogArray_I32> work ) {
 
 		// Unrolled functions only exist for symmetric kernels with an odd width
 		if( kernel.offset != kernel.width/2 || kernel.width%2 == 0 )
 			return false;
 
 		switch (kernel.width) {
-			case 3: vertical3(kernel, image, dest, divisor); break;
-			case 5: vertical5(kernel, image, dest, divisor); break;
-			case 7: vertical7(kernel, image, dest, divisor); break;
-			case 9: vertical9(kernel, image, dest, divisor); break;
-			case 11: vertical11(kernel, image, dest, divisor); break;
+			case 3: vertical3(kernel, image, dest, divisor, work); break;
+			case 5: vertical5(kernel, image, dest, divisor, work); break;
+			case 7: vertical7(kernel, image, dest, divisor, work); break;
+			case 9: vertical9(kernel, image, dest, divisor, work); break;
+			case 11: vertical11(kernel, image, dest, divisor, work); break;
 			default: return false;
 		}
 		return true;
 	}
 
-	public static boolean convolve( Kernel2D_S32 kernel ,
-								   GrayS32 image, GrayS32 dest, int divisor , GrowArray<DogArray_I32> work) {
+	public static boolean convolve( Kernel2D_S32 kernel,
+								   GrayS32 image, GrayS32 dest, int divisor, GrowArray<DogArray_I32> work ) {
 
 		// Unrolled functions only exist for symmetric kernels with an odd width
 		if( kernel.offset != kernel.width/2 || kernel.width%2 == 0 )
 			return false;
 
 		switch (kernel.width) {
-			case 3: convolve3(kernel, image, dest, divisor,work); break;
-			case 5: convolve5(kernel, image, dest, divisor,work); break;
-			case 7: convolve7(kernel, image, dest, divisor,work); break;
-			case 9: convolve9(kernel, image, dest, divisor,work); break;
-			case 11: convolve11(kernel, image, dest, divisor,work); break;
+			case 3: convolve3(kernel, image, dest, divisor, work); break;
+			case 5: convolve5(kernel, image, dest, divisor, work); break;
+			case 7: convolve7(kernel, image, dest, divisor, work); break;
+			case 9: convolve9(kernel, image, dest, divisor, work); break;
+			case 11: convolve11(kernel, image, dest, divisor, work); break;
 			default: return false;
 		}
 		return true;
@@ -118,7 +118,7 @@ public class ConvolveImageUnrolled_SB_S32_S32_Div {
 		final int halfDivisor = divisor/2;
 
 		//CONCURRENT_BELOW BoofConcurrency.loopFor(0, image.height, i -> {
-		for( int i = 0; i < image.height; i++ ) {
+		for (int i = 0; i < image.height; i++) {
 			int indexDst = dest.startIndex + i*dest.stride+radius;
 			int j = image.startIndex + i*image.stride - radius;
 			final int jEnd = j+width-radius;
@@ -152,7 +152,7 @@ public class ConvolveImageUnrolled_SB_S32_S32_Div {
 		final int halfDivisor = divisor/2;
 
 		//CONCURRENT_BELOW BoofConcurrency.loopFor(0, image.height, i -> {
-		for( int i = 0; i < image.height; i++ ) {
+		for (int i = 0; i < image.height; i++) {
 			int indexDst = dest.startIndex + i*dest.stride+radius;
 			int j = image.startIndex + i*image.stride - radius;
 			final int jEnd = j+width-radius;
@@ -190,7 +190,7 @@ public class ConvolveImageUnrolled_SB_S32_S32_Div {
 		final int halfDivisor = divisor/2;
 
 		//CONCURRENT_BELOW BoofConcurrency.loopFor(0, image.height, i -> {
-		for( int i = 0; i < image.height; i++ ) {
+		for (int i = 0; i < image.height; i++) {
 			int indexDst = dest.startIndex + i*dest.stride+radius;
 			int j = image.startIndex + i*image.stride - radius;
 			final int jEnd = j+width-radius;
@@ -232,7 +232,7 @@ public class ConvolveImageUnrolled_SB_S32_S32_Div {
 		final int halfDivisor = divisor/2;
 
 		//CONCURRENT_BELOW BoofConcurrency.loopFor(0, image.height, i -> {
-		for( int i = 0; i < image.height; i++ ) {
+		for (int i = 0; i < image.height; i++) {
 			int indexDst = dest.startIndex + i*dest.stride+radius;
 			int j = image.startIndex + i*image.stride - radius;
 			final int jEnd = j+width-radius;
@@ -278,7 +278,7 @@ public class ConvolveImageUnrolled_SB_S32_S32_Div {
 		final int halfDivisor = divisor/2;
 
 		//CONCURRENT_BELOW BoofConcurrency.loopFor(0, image.height, i -> {
-		for( int i = 0; i < image.height; i++ ) {
+		for (int i = 0; i < image.height; i++) {
 			int indexDst = dest.startIndex + i*dest.stride+radius;
 			int j = image.startIndex + i*image.stride - radius;
 			final int jEnd = j+width-radius;
@@ -303,7 +303,7 @@ public class ConvolveImageUnrolled_SB_S32_S32_Div {
 		//CONCURRENT_ABOVE });
 	}
 
-	public static void vertical3( Kernel1D_S32 kernel , GrayS32 image, GrayS32 dest , int divisor )
+	public static void vertical3( Kernel1D_S32 kernel , GrayS32 image, GrayS32 dest , int divisor, @Nullable GrowArray<DogArray_I32> workspaces )
 	{
 		final int[] dataSrc = image.data;
 		final int[] dataDst = dest.data;
@@ -321,7 +321,7 @@ public class ConvolveImageUnrolled_SB_S32_S32_Div {
 		final int yEnd = imgHeight-radius;
 
 		//CONCURRENT_BELOW BoofConcurrency.loopFor(radius, yEnd, y -> {
-		for( int y = radius; y < yEnd; y++ ) {
+		for (int y = radius; y < yEnd; y++) {
 			int indexDst = dest.startIndex+y*dest.stride;
 			int i = image.startIndex + (y-radius)*image.stride;
 			final int iEnd = i+imgWidth;
@@ -341,7 +341,7 @@ public class ConvolveImageUnrolled_SB_S32_S32_Div {
 		//CONCURRENT_ABOVE });
 	}
 
-	public static void vertical5( Kernel1D_S32 kernel , GrayS32 image, GrayS32 dest , int divisor )
+	public static void vertical5( Kernel1D_S32 kernel , GrayS32 image, GrayS32 dest , int divisor, @Nullable GrowArray<DogArray_I32> workspaces )
 	{
 		final int[] dataSrc = image.data;
 		final int[] dataDst = dest.data;
@@ -361,7 +361,7 @@ public class ConvolveImageUnrolled_SB_S32_S32_Div {
 		final int yEnd = imgHeight-radius;
 
 		//CONCURRENT_BELOW BoofConcurrency.loopFor(radius, yEnd, y -> {
-		for( int y = radius; y < yEnd; y++ ) {
+		for (int y = radius; y < yEnd; y++) {
 			int indexDst = dest.startIndex+y*dest.stride;
 			int i = image.startIndex + (y-radius)*image.stride;
 			final int iEnd = i+imgWidth;
@@ -385,7 +385,7 @@ public class ConvolveImageUnrolled_SB_S32_S32_Div {
 		//CONCURRENT_ABOVE });
 	}
 
-	public static void vertical7( Kernel1D_S32 kernel , GrayS32 image, GrayS32 dest , int divisor )
+	public static void vertical7( Kernel1D_S32 kernel , GrayS32 image, GrayS32 dest , int divisor, @Nullable GrowArray<DogArray_I32> workspaces )
 	{
 		final int[] dataSrc = image.data;
 		final int[] dataDst = dest.data;
@@ -407,7 +407,7 @@ public class ConvolveImageUnrolled_SB_S32_S32_Div {
 		final int yEnd = imgHeight-radius;
 
 		//CONCURRENT_BELOW BoofConcurrency.loopFor(radius, yEnd, y -> {
-		for( int y = radius; y < yEnd; y++ ) {
+		for (int y = radius; y < yEnd; y++) {
 			int indexDst = dest.startIndex+y*dest.stride;
 			int i = image.startIndex + (y-radius)*image.stride;
 			final int iEnd = i+imgWidth;
@@ -435,7 +435,7 @@ public class ConvolveImageUnrolled_SB_S32_S32_Div {
 		//CONCURRENT_ABOVE });
 	}
 
-	public static void vertical9( Kernel1D_S32 kernel , GrayS32 image, GrayS32 dest , int divisor )
+	public static void vertical9( Kernel1D_S32 kernel , GrayS32 image, GrayS32 dest , int divisor, @Nullable GrowArray<DogArray_I32> workspaces )
 	{
 		final int[] dataSrc = image.data;
 		final int[] dataDst = dest.data;
@@ -459,7 +459,7 @@ public class ConvolveImageUnrolled_SB_S32_S32_Div {
 		final int yEnd = imgHeight-radius;
 
 		//CONCURRENT_BELOW BoofConcurrency.loopFor(radius, yEnd, y -> {
-		for( int y = radius; y < yEnd; y++ ) {
+		for (int y = radius; y < yEnd; y++) {
 			int indexDst = dest.startIndex+y*dest.stride;
 			int i = image.startIndex + (y-radius)*image.stride;
 			final int iEnd = i+imgWidth;
@@ -491,7 +491,7 @@ public class ConvolveImageUnrolled_SB_S32_S32_Div {
 		//CONCURRENT_ABOVE });
 	}
 
-	public static void vertical11( Kernel1D_S32 kernel , GrayS32 image, GrayS32 dest , int divisor )
+	public static void vertical11( Kernel1D_S32 kernel , GrayS32 image, GrayS32 dest , int divisor, @Nullable GrowArray<DogArray_I32> workspaces )
 	{
 		final int[] dataSrc = image.data;
 		final int[] dataDst = dest.data;
@@ -517,7 +517,7 @@ public class ConvolveImageUnrolled_SB_S32_S32_Div {
 		final int yEnd = imgHeight-radius;
 
 		//CONCURRENT_BELOW BoofConcurrency.loopFor(radius, yEnd, y -> {
-		for( int y = radius; y < yEnd; y++ ) {
+		for (int y = radius; y < yEnd; y++) {
 			int indexDst = dest.startIndex+y*dest.stride;
 			int i = image.startIndex + (y-radius)*image.stride;
 			final int iEnd = i+imgWidth;
@@ -566,7 +566,7 @@ public class ConvolveImageUnrolled_SB_S32_S32_Div {
 		final int kernelRadius = kernel.getRadius();
 		final int kernelWidth = 2*kernelRadius+1;
 
-		//CONCURRENT_BELOW BoofConcurrency.loopBlocks(kernelRadius, height-kernelRadius, kernelWidth, workspaces, (work, y0,y1)->{
+		//CONCURRENT_BELOW BoofConcurrency.loopBlocks(kernelRadius, height-kernelRadius, kernelWidth, workspaces, (work, y0, y1)->{
 		final int y0 = kernelRadius, y1 = height-kernelRadius;
 		int totalRow[] = BoofMiscOps.checkDeclare(work,src.width,false);
 		for( int y = y0; y < y1; y++ ) {
@@ -627,7 +627,7 @@ public class ConvolveImageUnrolled_SB_S32_S32_Div {
 		final int kernelRadius = kernel.getRadius();
 		final int kernelWidth = 2*kernelRadius+1;
 
-		//CONCURRENT_BELOW BoofConcurrency.loopBlocks(kernelRadius, height-kernelRadius, kernelWidth, workspaces, (work, y0,y1)->{
+		//CONCURRENT_BELOW BoofConcurrency.loopBlocks(kernelRadius, height-kernelRadius, kernelWidth, workspaces, (work, y0, y1)->{
 		final int y0 = kernelRadius, y1 = height-kernelRadius;
 		int totalRow[] = BoofMiscOps.checkDeclare(work,src.width,false);
 		for( int y = y0; y < y1; y++ ) {
@@ -696,7 +696,7 @@ public class ConvolveImageUnrolled_SB_S32_S32_Div {
 		final int kernelRadius = kernel.getRadius();
 		final int kernelWidth = 2*kernelRadius+1;
 
-		//CONCURRENT_BELOW BoofConcurrency.loopBlocks(kernelRadius, height-kernelRadius, kernelWidth, workspaces, (work, y0,y1)->{
+		//CONCURRENT_BELOW BoofConcurrency.loopBlocks(kernelRadius, height-kernelRadius, kernelWidth, workspaces, (work, y0, y1)->{
 		final int y0 = kernelRadius, y1 = height-kernelRadius;
 		int totalRow[] = BoofMiscOps.checkDeclare(work,src.width,false);
 		for( int y = y0; y < y1; y++ ) {
@@ -773,7 +773,7 @@ public class ConvolveImageUnrolled_SB_S32_S32_Div {
 		final int kernelRadius = kernel.getRadius();
 		final int kernelWidth = 2*kernelRadius+1;
 
-		//CONCURRENT_BELOW BoofConcurrency.loopBlocks(kernelRadius, height-kernelRadius, kernelWidth, workspaces, (work, y0,y1)->{
+		//CONCURRENT_BELOW BoofConcurrency.loopBlocks(kernelRadius, height-kernelRadius, kernelWidth, workspaces, (work, y0, y1)->{
 		final int y0 = kernelRadius, y1 = height-kernelRadius;
 		int totalRow[] = BoofMiscOps.checkDeclare(work,src.width,false);
 		for( int y = y0; y < y1; y++ ) {
@@ -858,7 +858,7 @@ public class ConvolveImageUnrolled_SB_S32_S32_Div {
 		final int kernelRadius = kernel.getRadius();
 		final int kernelWidth = 2*kernelRadius+1;
 
-		//CONCURRENT_BELOW BoofConcurrency.loopBlocks(kernelRadius, height-kernelRadius, kernelWidth, workspaces, (work, y0,y1)->{
+		//CONCURRENT_BELOW BoofConcurrency.loopBlocks(kernelRadius, height-kernelRadius, kernelWidth, workspaces, (work, y0, y1)->{
 		final int y0 = kernelRadius, y1 = height-kernelRadius;
 		int totalRow[] = BoofMiscOps.checkDeclare(work,src.width,false);
 		for( int y = y0; y < y1; y++ ) {

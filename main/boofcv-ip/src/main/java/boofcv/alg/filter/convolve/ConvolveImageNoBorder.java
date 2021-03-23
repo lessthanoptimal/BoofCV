@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -337,13 +337,13 @@ public class ConvolveImageNoBorder {
 	}
 
 	public static void vertical(Kernel1D_S32 kernel,
-								  GrayU16 input, GrayI8 output, int divisor) {
+								  GrayU16 input, GrayI8 output, int divisor, @Nullable GrowArray<DogArray_I32> work) {
 		InputSanityCheck.checkSameShape(input, output);
 
 		if (BoofConcurrency.USE_CONCURRENT) {
-			ConvolveImageStandard_SB_MT.vertical(kernel, input, output, divisor);
+			ConvolveImageStandard_SB_MT.vertical(kernel, input, output, divisor, work);
 		} else {
-			ConvolveImageStandard_SB.vertical(kernel, input, output, divisor);
+			ConvolveImageStandard_SB.vertical(kernel, input, output, divisor, work);
 		}
 	}
 
@@ -444,15 +444,15 @@ public class ConvolveImageNoBorder {
 	}
 
 	public static void vertical(Kernel1D_S32 kernel,
-								  GrayU8 input, GrayI8 output, int divisor) {
+								  GrayU8 input, GrayI8 output, int divisor, @Nullable GrowArray<DogArray_I32> work) {
 		InputSanityCheck.checkSameShape(input, output);
 
 		if (BoofConcurrency.USE_CONCURRENT) {
-			if (!ConvolveImageUnrolled_SB_MT_U8_I8_Div.vertical(kernel, input, output, divisor))
-				ConvolveImageStandard_SB_MT.vertical(kernel, input, output, divisor);
+			if (!ConvolveImageUnrolled_SB_MT_U8_I8_Div.vertical(kernel, input, output, divisor, work))
+				ConvolveImageStandard_SB_MT.vertical(kernel, input, output, divisor, work);
 		} else {
-			if (!ConvolveImageUnrolled_SB_U8_I8_Div.vertical(kernel, input, output, divisor))
-				ConvolveImageStandard_SB.vertical(kernel, input, output, divisor);
+			if (!ConvolveImageUnrolled_SB_U8_I8_Div.vertical(kernel, input, output, divisor, work))
+				ConvolveImageStandard_SB.vertical(kernel, input, output, divisor, work);
 		}
 	}
 
@@ -516,15 +516,15 @@ public class ConvolveImageNoBorder {
 	}
 
 	public static void vertical(Kernel1D_S32 kernel,
-								  GrayS16 input, GrayI16 output, int divisor) {
+								  GrayS16 input, GrayI16 output, int divisor, @Nullable GrowArray<DogArray_I32> work) {
 		InputSanityCheck.checkSameShape(input, output);
 
 		if (BoofConcurrency.USE_CONCURRENT) {
-			if (!ConvolveImageUnrolled_SB_MT_S16_I16_Div.vertical(kernel, input, output, divisor))
-				ConvolveImageStandard_SB_MT.vertical(kernel, input, output, divisor);
+			if (!ConvolveImageUnrolled_SB_MT_S16_I16_Div.vertical(kernel, input, output, divisor, work))
+				ConvolveImageStandard_SB_MT.vertical(kernel, input, output, divisor, work);
 		} else {
-			if (!ConvolveImageUnrolled_SB_S16_I16_Div.vertical(kernel, input, output, divisor))
-				ConvolveImageStandard_SB.vertical(kernel, input, output, divisor);
+			if (!ConvolveImageUnrolled_SB_S16_I16_Div.vertical(kernel, input, output, divisor, work))
+				ConvolveImageStandard_SB.vertical(kernel, input, output, divisor, work);
 		}
 	}
 
@@ -588,15 +588,15 @@ public class ConvolveImageNoBorder {
 	}
 
 	public static void vertical(Kernel1D_S32 kernel,
-								  GrayU16 input, GrayI16 output, int divisor) {
+								  GrayU16 input, GrayI16 output, int divisor, @Nullable GrowArray<DogArray_I32> work) {
 		InputSanityCheck.checkSameShape(input, output);
 
 		if (BoofConcurrency.USE_CONCURRENT) {
-			if (!ConvolveImageUnrolled_SB_MT_U16_I16_Div.vertical(kernel, input, output, divisor))
-				ConvolveImageStandard_SB_MT.vertical(kernel, input, output, divisor);
+			if (!ConvolveImageUnrolled_SB_MT_U16_I16_Div.vertical(kernel, input, output, divisor, work))
+				ConvolveImageStandard_SB_MT.vertical(kernel, input, output, divisor, work);
 		} else {
-			if (!ConvolveImageUnrolled_SB_U16_I16_Div.vertical(kernel, input, output, divisor))
-				ConvolveImageStandard_SB.vertical(kernel, input, output, divisor);
+			if (!ConvolveImageUnrolled_SB_U16_I16_Div.vertical(kernel, input, output, divisor, work))
+				ConvolveImageStandard_SB.vertical(kernel, input, output, divisor, work);
 		}
 	}
 
@@ -647,13 +647,13 @@ public class ConvolveImageNoBorder {
 	}
 
 	public static void vertical(Kernel1D_S32 kernel,
-								  GrayS32 input, GrayI16 output, int divisor) {
+								  GrayS32 input, GrayI16 output, int divisor, @Nullable GrowArray<DogArray_I32> work) {
 		InputSanityCheck.checkSameShape(input, output);
 
 		if (BoofConcurrency.USE_CONCURRENT) {
-			ConvolveImageStandard_SB_MT.vertical(kernel, input, output, divisor);
+			ConvolveImageStandard_SB_MT.vertical(kernel, input, output, divisor, work);
 		} else {
-			ConvolveImageStandard_SB.vertical(kernel, input, output, divisor);
+			ConvolveImageStandard_SB.vertical(kernel, input, output, divisor, work);
 		}
 	}
 
@@ -754,15 +754,15 @@ public class ConvolveImageNoBorder {
 	}
 
 	public static void vertical(Kernel1D_S32 kernel,
-								  GrayS32 input, GrayS32 output, int divisor) {
+								  GrayS32 input, GrayS32 output, int divisor, @Nullable GrowArray<DogArray_I32> work) {
 		InputSanityCheck.checkSameShape(input, output);
 
 		if (BoofConcurrency.USE_CONCURRENT) {
-			if (!ConvolveImageUnrolled_SB_MT_S32_S32_Div.vertical(kernel, input, output, divisor))
-				ConvolveImageStandard_SB_MT.vertical(kernel, input, output, divisor);
+			if (!ConvolveImageUnrolled_SB_MT_S32_S32_Div.vertical(kernel, input, output, divisor, work))
+				ConvolveImageStandard_SB_MT.vertical(kernel, input, output, divisor, work);
 		} else {
-			if (!ConvolveImageUnrolled_SB_S32_S32_Div.vertical(kernel, input, output, divisor))
-				ConvolveImageStandard_SB.vertical(kernel, input, output, divisor);
+			if (!ConvolveImageUnrolled_SB_S32_S32_Div.vertical(kernel, input, output, divisor, work))
+				ConvolveImageStandard_SB.vertical(kernel, input, output, divisor, work);
 		}
 	}
 
