@@ -35,7 +35,7 @@ import java.util.concurrent.TimeUnit;
 @State(Scope.Benchmark)
 @Fork(value = 1)
 @SuppressWarnings({"UnusedDeclaration"})
-public class BenchmarkConvolveMean extends CommonBenchmarkConvolve {
+public class BenchmarkConvolveMean extends CommonBenchmarkConvolve_SB {
 	@Param({"true", "false"})
 	boolean concurrent;
 

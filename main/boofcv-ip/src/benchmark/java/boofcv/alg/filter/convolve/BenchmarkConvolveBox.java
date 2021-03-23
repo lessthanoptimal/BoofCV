@@ -34,7 +34,7 @@ import java.util.concurrent.TimeUnit;
 @Measurement(iterations = 5)
 @State(Scope.Benchmark)
 @Fork(value = 1)
-public class BenchmarkConvolveBox extends CommonBenchmarkConvolve {
+public class BenchmarkConvolveBox extends CommonBenchmarkConvolve_SB {
 	@Param({"1", "4"})
 	public int radius;
 

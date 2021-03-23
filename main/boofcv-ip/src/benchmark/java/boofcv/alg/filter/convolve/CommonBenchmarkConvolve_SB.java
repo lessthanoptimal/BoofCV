@@ -35,7 +35,7 @@ import java.util.Random;
 /**
  * @author Peter Abeles
  */
-public class CommonBenchmarkConvolve {
+public class CommonBenchmarkConvolve_SB {
 	protected static int width = 800, height = 600;
 
 	protected static Kernel2D_F32 kernel2D_F32;
@@ -49,6 +49,7 @@ public class CommonBenchmarkConvolve {
 	protected static GrayU8 input_U8 = new GrayU8(width, height);
 	protected static GrayS16 input_S16 = new GrayS16(width, height);
 	protected static GrayS16 input_U16 = new GrayS16(width, height);
+	protected static GrayS32 input_S32 = new GrayS32(width, height);
 	protected static GrayU8 out_U8 = new GrayU8(width, height);
 	protected static GrayS16 out_S16 = new GrayS16(width, height);
 	protected static GrayS32 out_S32 = new GrayS32(width, height);
@@ -62,6 +63,7 @@ public class CommonBenchmarkConvolve {
 
 		ImageMiscOps.fillUniform(input_U8, rand, 0, 20);
 		ImageMiscOps.fillUniform(input_S16, rand, 0, 20);
+		ImageMiscOps.fillUniform(input_S32, rand, 0, 20);
 		ImageMiscOps.fillUniform(input_F32, rand, 0, 20);
 		ImageMiscOps.fillUniform(input_F64, rand, 0, 20);
 		System.arraycopy(input_S16.data,0,input_U16.data,0,input_S16.data.length);

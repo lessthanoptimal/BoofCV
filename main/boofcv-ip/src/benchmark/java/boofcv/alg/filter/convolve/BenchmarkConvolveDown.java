@@ -37,7 +37,7 @@ import java.util.concurrent.TimeUnit;
 @Measurement(iterations = 5)
 @State(Scope.Benchmark)
 @Fork(value = 1)
-public class BenchmarkConvolveDown extends CommonBenchmarkConvolve {
+public class BenchmarkConvolveDown extends CommonBenchmarkConvolve_SB {
 	static int skip = 2;
 
 	@Param({"2"})

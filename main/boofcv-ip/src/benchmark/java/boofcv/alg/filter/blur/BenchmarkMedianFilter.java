@@ -21,7 +21,7 @@ package boofcv.alg.filter.blur;
 import boofcv.alg.filter.blur.impl.ImplMedianHistogramInner;
 import boofcv.alg.filter.blur.impl.ImplMedianHistogramInnerNaive;
 import boofcv.alg.filter.blur.impl.ImplMedianSortNaive;
-import boofcv.alg.filter.convolve.CommonBenchmarkConvolve;
+import boofcv.alg.filter.convolve.CommonBenchmarkConvolve_SB;
 import org.openjdk.jmh.annotations.*;
 import org.openjdk.jmh.runner.Runner;
 import org.openjdk.jmh.runner.RunnerException;
@@ -37,7 +37,7 @@ import java.util.concurrent.TimeUnit;
 @Measurement(iterations = 5)
 @State(Scope.Benchmark)
 @Fork(value = 1)
-public class BenchmarkMedianFilter extends CommonBenchmarkConvolve {
+public class BenchmarkMedianFilter extends CommonBenchmarkConvolve_SB {
 	@Param({"1", "4"})
 	public int radius;
 
