@@ -68,14 +68,18 @@ public class ExampleCalibrateMonocular {
 //		images = UtilIO.listByPrefix(UtilIO.pathExample("calibration/stereo/Bumblebee2_Square"),"left", null);
 
 		// Chessboard Example
-		detector = FactoryFiducialCalibration.chessboardX(null,new ConfigGridDimen(7, 5, 30));
+		detector = FactoryFiducialCalibration.chessboardX(null,
+				new ConfigGridDimen(/*numRows*/ 7,/*numCols*/ 5,/*shapeSize*/ 30));
 		images = UtilIO.listByPrefix(UtilIO.pathExample("calibration/stereo/Bumblebee2_Chess"),"left", null);
 
 		// Declare and setup the calibration algorithm
 		CalibrateMonoPlanar calibrationAlg = new CalibrateMonoPlanar(detector.getLayout());
 
-		// tell it type type of target and which parameters to estimate
-		calibrationAlg.configurePinhole( true, 2, false);
+		// tell it type type of target and which intrinsic parameters to estimate
+		calibrationAlg.configurePinhole(
+				/*assumeZeroSkew*/ true,
+				/*numRadialParam*/ 2,
+				/*includeTangential*/ false);
 
 		for( String n : images ) {
 			BufferedImage input = UtilImageIO.loadImage(n);
