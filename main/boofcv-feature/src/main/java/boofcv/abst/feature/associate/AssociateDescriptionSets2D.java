@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -31,8 +31,8 @@ import org.ddogleg.struct.DogArray;
 public class AssociateDescriptionSets2D<Desc> extends BaseAssociateSets<Desc> {
 	AssociateDescription2D<Desc> associator;
 
-	public AssociateDescriptionSets2D(AssociateDescription2D<Desc> associator, Class<Desc> type) {
-		super(associator,type);
+	public AssociateDescriptionSets2D( AssociateDescription2D<Desc> associator, Class<Desc> type ) {
+		super(associator, type);
 		this.associator = associator;
 	}
 
@@ -41,17 +41,15 @@ public class AssociateDescriptionSets2D<Desc> extends BaseAssociateSets<Desc> {
 	 *
 	 * @see AssociateDescription2D#initialize(int, int)
 	 */
-	public void initialize(int imageWidth , int imageHeight ) {
+	public void initialize( int imageWidth, int imageHeight ) {
 		this.associator.initialize(imageWidth, imageHeight);
 	}
 
-	@Override
-	protected SetStruct newSetStruct() {
+	@Override protected SetStruct newSetStruct() {
 		return new SetStruct2D();
 	}
 
-	@Override
-	public void clearSource() {
+	@Override public void clearSource() {
 		super.clearSource();
 		for (int i = 0; i < sets.size; i++) {
 			SetStruct2D set = (SetStruct2D)sets.get(i);
@@ -59,9 +57,7 @@ public class AssociateDescriptionSets2D<Desc> extends BaseAssociateSets<Desc> {
 		}
 	}
 
-
-	@Override
-	public void clearDestination() {
+	@Override public void clearDestination() {
 		super.clearDestination();
 		for (int i = 0; i < sets.size; i++) {
 			SetStruct2D set = (SetStruct2D)sets.get(i);
@@ -69,32 +65,28 @@ public class AssociateDescriptionSets2D<Desc> extends BaseAssociateSets<Desc> {
 		}
 	}
 
-
 	/**
 	 * Adds a new descriptor and its set to the list. The order that descriptors are added is important and saved.
 	 */
-	public void addSource( Desc description, double pixelX, double pixelY, int set )
-	{
+	public void addSource( Desc description, double pixelX, double pixelY, int set ) {
 		final SetStruct2D ss = (SetStruct2D)sets.data[set];
 		ss.src.add(description);
-		ss.pixelsSrc.grow().setTo(pixelX,pixelY);
+		ss.pixelsSrc.grow().setTo(pixelX, pixelY);
 		ss.indexSrc.add(countSrc++);
 	}
 
 	/**
 	 * Adds a new descriptor and its set to the list. The order that descriptors are added is important and saved.
 	 */
-	public void addDestination( Desc description, double pixelX, double pixelY, int set )
-	{
+	public void addDestination( Desc description, double pixelX, double pixelY, int set ) {
 		final SetStruct2D ss = (SetStruct2D)sets.data[set];
 		ss.dst.add(description);
-		ss.pixelsDst.grow().setTo(pixelX,pixelY);
+		ss.pixelsDst.grow().setTo(pixelX, pixelY);
 		ss.indexDst.add(countDst++);
 	}
 
-	@Override
-	public void associate() {
-		if( sets.size <= 0 )
+	@Override public void associate() {
+		if (sets.size <= 0)
 			throw new IllegalArgumentException("You must initialize first with the number of sets");
 
 		// reset data structures
@@ -123,8 +115,7 @@ public class AssociateDescriptionSets2D<Desc> extends BaseAssociateSets<Desc> {
 		DogArray<Point2D_F64> pixelsSrc = new DogArray<>(Point2D_F64::new);
 		DogArray<Point2D_F64> pixelsDst = new DogArray<>(Point2D_F64::new);
 
-		@Override
-		public void reset() {
+		@Override public void reset() {
 			super.reset();
 			pixelsSrc.reset();
 			pixelsDst.reset();

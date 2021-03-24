@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -22,7 +22,6 @@ import boofcv.alg.descriptor.DescriptorDistance;
 import boofcv.struct.feature.MatchScoreType;
 import boofcv.struct.feature.TupleDesc_F64;
 
-
 /**
  * Scores two possible associations using {@link DescriptorDistance#correlation}.
  *
@@ -33,7 +32,7 @@ import boofcv.struct.feature.TupleDesc_F64;
  */
 public class ScoreAssociateCorrelation implements ScoreAssociation<TupleDesc_F64> {
 	@Override
-	public double score(TupleDesc_F64 a, TupleDesc_F64 b) {
+	public double score( TupleDesc_F64 a, TupleDesc_F64 b ) {
 		return -DescriptorDistance.correlation(a, b);
 	}
 

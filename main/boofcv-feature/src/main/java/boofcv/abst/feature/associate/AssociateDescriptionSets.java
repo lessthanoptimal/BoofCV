@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -31,19 +31,19 @@ public class AssociateDescriptionSets<Desc> extends BaseAssociateSets<Desc> {
 
 	/**
 	 * Provides the association algorithm and the descriptor type
+	 *
 	 * @param associator Association algorithm
 	 * @param type Type of descriptor
 	 */
-	public AssociateDescriptionSets(AssociateDescription<Desc> associator, Class<Desc> type) {
-		super(associator,type);
+	public AssociateDescriptionSets( AssociateDescription<Desc> associator, Class<Desc> type ) {
+		super(associator, type);
 		this.associator = associator;
 	}
 
 	/**
 	 * Adds a new descriptor and its set to the list. The order that descriptors are added is important and saved.
 	 */
-	public void addSource( Desc description , int set )
-	{
+	public void addSource( Desc description, int set ) {
 		final SetStruct ss = sets.data[set];
 		ss.src.add(description);
 		ss.indexSrc.add(countSrc++);
@@ -52,8 +52,7 @@ public class AssociateDescriptionSets<Desc> extends BaseAssociateSets<Desc> {
 	/**
 	 * Adds a new descriptor and its set to the list. The order that descriptors are added is important and saved.
 	 */
-	public void addDestination( Desc description , int set )
-	{
+	public void addDestination( Desc description, int set ) {
 		final SetStruct ss = sets.data[set];
 		ss.dst.add(description);
 		ss.indexDst.add(countDst++);
@@ -64,7 +63,7 @@ public class AssociateDescriptionSets<Desc> extends BaseAssociateSets<Desc> {
 	 */
 	@Override
 	public void associate() {
-		if( sets.size <= 0 )
+		if (sets.size <= 0)
 			throw new IllegalArgumentException("You must initialize first with the number of sets");
 
 		// reset data structures

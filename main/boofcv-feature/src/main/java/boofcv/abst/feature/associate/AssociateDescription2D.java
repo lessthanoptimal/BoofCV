@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -27,11 +27,9 @@ import org.ddogleg.struct.FastAccess;
  * is added to the unassociated list.
  *
  * @param <Desc> Feature description type.
- *
  * @author Peter Abeles
  */
 public interface AssociateDescription2D<Desc> extends Associate {
-
 	/**
 	 * Initialize by specifying the image width/height. Used to precompute internal data
 	 * structures and set thresholds. If images are different sizes just use the largest
@@ -40,7 +38,7 @@ public interface AssociateDescription2D<Desc> extends Associate {
 	 * @param imageWidth Input image width
 	 * @param imageHeight Input image height
 	 */
-	void initialize( int imageWidth , int imageHeight );
+	void initialize( int imageWidth, int imageHeight );
 
 	/**
 	 * Provide the location and descriptions for source features.
@@ -48,7 +46,7 @@ public interface AssociateDescription2D<Desc> extends Associate {
 	 * @param location Feature locations.
 	 * @param descriptions Feature descriptions.
 	 */
-	void setSource( FastAccess<Point2D_F64> location , FastAccess<Desc> descriptions );
+	void setSource( FastAccess<Point2D_F64> location, FastAccess<Desc> descriptions );
 
 	/**
 	 * Provide the location and descriptions for destination features.
@@ -56,5 +54,5 @@ public interface AssociateDescription2D<Desc> extends Associate {
 	 * @param location Feature locations.
 	 * @param descriptions Feature descriptions.
 	 */
-	void setDestination( FastAccess<Point2D_F64> location , FastAccess<Desc> descriptions );
+	void setDestination( FastAccess<Point2D_F64> location, FastAccess<Desc> descriptions );
 }

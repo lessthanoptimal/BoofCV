@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -28,11 +28,11 @@ import boofcv.struct.feature.TupleDesc_B;
  *
  * @author Peter Abeles
  */
-public class ScoreAssociateHamming_B implements ScoreAssociation<TupleDesc_B>{
+public class ScoreAssociateHamming_B implements ScoreAssociation<TupleDesc_B> {
 
 	@Override
-	public double score(TupleDesc_B a, TupleDesc_B b) {
-		return DescriptorDistance.hamming(a,b);
+	public double score( TupleDesc_B a, TupleDesc_B b ) {
+		return DescriptorDistance.hamming(a, b);
 	}
 
 	@Override

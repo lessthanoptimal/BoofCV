@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -23,8 +23,9 @@ import boofcv.struct.feature.MatchScoreType;
 import org.ddogleg.struct.DogArray_I32;
 import org.ddogleg.struct.FastAccess;
 
-/** Provides default implementations for all functions. Primiarly for testing. */
+/** Provides default implementations for all functions. Primarily for testing. */
 public class AssociateDescriptionDefault<Desc> implements AssociateDescription<Desc> {
+	// @formatter:off
 	@Override public void associate() {}
 	@Override public FastAccess<AssociatedIndex> getMatches() { return null; }
 	@Override public DogArray_I32 getUnassociatedSource() { return null; }
@@ -35,4 +36,5 @@ public class AssociateDescriptionDefault<Desc> implements AssociateDescription<D
 	@Override public boolean uniqueDestination() { return false; }
 	@Override public void setSource( FastAccess<Desc> listSrc ) {}
 	@Override public void setDestination( FastAccess<Desc> listDst ) {}
+	// @formatter:on
 }

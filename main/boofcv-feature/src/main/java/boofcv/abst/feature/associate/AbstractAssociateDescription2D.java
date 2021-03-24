@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -29,8 +29,8 @@ import org.ddogleg.struct.FastAccess;
  *
  * @author Peter Abeles
  */
-public class AbstractAssociateDescription2D<Desc> implements AssociateDescription2D<Desc>
-{
+public class AbstractAssociateDescription2D<Desc> implements AssociateDescription2D<Desc> {
+	// @formatter:off
 	@Override public void initialize(int imageWidth, int imageHeight) {}
 	@Override public void setSource(FastAccess<Point2D_F64> location, FastAccess<Desc> descriptions) {}
 	@Override public void setDestination(FastAccess<Point2D_F64> location, FastAccess<Desc> descriptions) {}
@@ -42,4 +42,5 @@ public class AbstractAssociateDescription2D<Desc> implements AssociateDescriptio
 	@Override public MatchScoreType getScoreType() {return null;}
 	@Override public boolean uniqueSource() {return false;}
 	@Override public boolean uniqueDestination() {return false;}
+	// @formatter:on
 }

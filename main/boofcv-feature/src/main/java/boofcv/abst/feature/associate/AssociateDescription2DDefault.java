@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -26,6 +26,7 @@ import org.ddogleg.struct.FastAccess;
 
 /** Provides default implementations for all functions. Primiarly for testing. */
 public class AssociateDescription2DDefault<Desc> implements AssociateDescription2D<Desc> {
+	// @formatter:off
 	@Override public void associate() {}
 	@Override public FastAccess<AssociatedIndex> getMatches() { return null; }
 	@Override public DogArray_I32 getUnassociatedSource() { return null; }
@@ -37,4 +38,5 @@ public class AssociateDescription2DDefault<Desc> implements AssociateDescription
 	@Override public void initialize( int imageWidth, int imageHeight ) {}
 	@Override public void setDestination( FastAccess<Point2D_F64> location, FastAccess<Desc> descriptions ) {}
 	@Override public void setSource( FastAccess<Point2D_F64> location, FastAccess<Desc> descriptions ) {}
+	// @formatter:on
 }

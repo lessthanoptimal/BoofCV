@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -37,9 +37,8 @@ import org.ddogleg.struct.FastAccess;
  * the original algorithm for a bit more efficiency.
  * </p>
  *
- * @see AssociateUniqueByScoreAlg
- *
  * @author Peter Abeles
+ * @see AssociateUniqueByScoreAlg
  */
 public class EnforceUniqueByScore<A extends Associate> implements Associate {
 
@@ -63,14 +62,14 @@ public class EnforceUniqueByScore<A extends Associate> implements Associate {
 	 * @param checkSource Should source features be unique
 	 * @param checkDestination Should destination features be unique
 	 */
-	public EnforceUniqueByScore(A association, boolean checkSource, boolean checkDestination) {
+	public EnforceUniqueByScore( A association, boolean checkSource, boolean checkDestination ) {
 		this.association = association;
 
 		// make sure it doesn't perform a redundant check
 		checkSource = checkSource && !association.uniqueSource();
 		checkDestination = checkDestination && !association.uniqueDestination();
 
-		uniqueByScore = new AssociateUniqueByScoreAlg(association.getScoreType(),checkSource,checkDestination);
+		uniqueByScore = new AssociateUniqueByScoreAlg(association.getScoreType(), checkSource, checkDestination);
 	}
 
 	@Override
@@ -82,14 +81,14 @@ public class EnforceUniqueByScore<A extends Associate> implements Associate {
 	public FastAccess<AssociatedIndex> getMatches() {
 		FastAccess<AssociatedIndex> matches = association.getMatches();
 
-		uniqueByScore.process(matches,numSource,numDestination);
+		uniqueByScore.process(matches, numSource, numDestination);
 
 		return uniqueByScore.getMatches();
 	}
 
 	@Override
 	public DogArray_I32 getUnassociatedSource() {
-		return unassociated.checkSource(uniqueByScore.getMatches(),numSource);
+		return unassociated.checkSource(uniqueByScore.getMatches(), numSource);
 	}
 
 	@Override
@@ -98,7 +97,7 @@ public class EnforceUniqueByScore<A extends Associate> implements Associate {
 	}
 
 	@Override
-	public void setMaxScoreThreshold(double score) {
+	public void setMaxScoreThreshold( double score ) {
 		association.setMaxScoreThreshold(score);
 	}
 
@@ -123,20 +122,19 @@ public class EnforceUniqueByScore<A extends Associate> implements Associate {
 	 * @param <Desc> Feature description type
 	 */
 	public static class Describe<Desc> extends EnforceUniqueByScore<AssociateDescription<Desc>>
-			implements AssociateDescription<Desc>
-	{
-		public Describe(AssociateDescription<Desc> alg, boolean checkSource, boolean checkDestination) {
+			implements AssociateDescription<Desc> {
+		public Describe( AssociateDescription<Desc> alg, boolean checkSource, boolean checkDestination ) {
 			super(alg, checkSource, checkDestination);
 		}
 
 		@Override
-		public void setSource(FastAccess<Desc> listSrc) {
+		public void setSource( FastAccess<Desc> listSrc ) {
 			association.setSource(listSrc);
 			numSource = listSrc.size;
 		}
 
 		@Override
-		public void setDestination(FastAccess<Desc> listDst) {
+		public void setDestination( FastAccess<Desc> listDst ) {
 			association.setDestination(listDst);
 			numDestination = listDst.size;
 		}
@@ -148,25 +146,24 @@ public class EnforceUniqueByScore<A extends Associate> implements Associate {
 	 * @param <Desc> Feature description type
 	 */
 	public static class Describe2D<Desc> extends EnforceUniqueByScore<AssociateDescription2D<Desc>>
-			implements AssociateDescription2D<Desc>
-	{
-		public Describe2D(AssociateDescription2D<Desc> alg, boolean checkSource, boolean checkDestination) {
+			implements AssociateDescription2D<Desc> {
+		public Describe2D( AssociateDescription2D<Desc> alg, boolean checkSource, boolean checkDestination ) {
 			super(alg, checkSource, checkDestination);
 		}
 
 		@Override
-		public void initialize(int imageWidth, int imageHeight) {
+		public void initialize( int imageWidth, int imageHeight ) {
 			association.initialize(imageWidth, imageHeight);
 		}
 
 		@Override
-		public void setSource( FastAccess<Point2D_F64> location , FastAccess<Desc> listSrc) {
+		public void setSource( FastAccess<Point2D_F64> location, FastAccess<Desc> listSrc ) {
 			association.setSource(location, listSrc);
 			numSource = listSrc.size;
 		}
 
 		@Override
-		public void setDestination( FastAccess<Point2D_F64> location , FastAccess<Desc> listDst) {
+		public void setDestination( FastAccess<Point2D_F64> location, FastAccess<Desc> listDst ) {
 			association.setDestination(location, listDst);
 			numDestination = listDst.size;
 		}

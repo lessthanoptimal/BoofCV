@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -21,7 +21,6 @@ package boofcv.abst.feature.associate;
 import org.ddogleg.struct.DogArray;
 import org.ddogleg.struct.FastAccess;
 
-
 /**
  * <p>
  * Generalized interface for associating features.   Finds matches for each feature in the source
@@ -37,7 +36,6 @@ import org.ddogleg.struct.FastAccess;
  * </p>
  *
  * @param <Desc> Feature description type.
- *
  * @author Peter Abeles
  */
 public interface AssociateDescription<Desc> extends Associate {

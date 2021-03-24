@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -26,12 +26,12 @@ import boofcv.struct.feature.TupleDesc_F64;
 /**
  * Scores based on Euclidean distance squared
  *
- * @see DescriptorDistance#euclideanSq(TupleDesc_F32, TupleDesc_F32)
- *
  * @author Peter Abeles
+ * @see DescriptorDistance#euclideanSq(TupleDesc_F32, TupleDesc_F32)
  */
 public interface ScoreAssociateEuclideanSq<Desc> extends ScoreAssociation<Desc> {
 
+	// @formatter:off
 	class F32 implements ScoreAssociateEuclideanSq<TupleDesc_F32> {
 		@Override public double score(TupleDesc_F32 a, TupleDesc_F32 b) { return DescriptorDistance.euclideanSq(a, b); }
 		@Override public MatchScoreType getScoreType()                  { return MatchScoreType.NORM_ERROR; }
@@ -41,4 +41,5 @@ public interface ScoreAssociateEuclideanSq<Desc> extends ScoreAssociation<Desc> 
 		@Override public double score(TupleDesc_F64 a, TupleDesc_F64 b) { return DescriptorDistance.euclideanSq(a, b); }
 		@Override public MatchScoreType getScoreType()                  { return MatchScoreType.NORM_ERROR; }
 	}
+	// @formatter:on
 }

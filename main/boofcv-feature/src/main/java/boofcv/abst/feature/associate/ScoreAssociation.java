@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -29,7 +29,6 @@ import boofcv.struct.feature.MatchScoreType;
  * NOTES: To ensure that lower is better, correlation scores undergo a sign flip.
  *
  * @param <Desc> Feature description type.
- *
  * @author Peter Abeles
  */
 public interface ScoreAssociation<Desc> {
@@ -41,7 +40,7 @@ public interface ScoreAssociation<Desc> {
 	 * @param b second feature
 	 * @return Quality of fit score.  Lower is better.
 	 */
-	public double score( Desc a , Desc b );
+	public double score( Desc a, Desc b );
 
 	/**
 	 * Specifies the type of score which is returned.
