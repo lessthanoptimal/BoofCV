@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -28,13 +28,12 @@ import boofcv.struct.feature.NccFeature;
  * NOTE: The score's sign is flipped in order to comply with {@link ScoreAssociation}'s requirements that lower
  * values be preferred.
  *
- * @see DescriptorDistance#ncc
- *
  * @author Peter Abeles
+ * @see DescriptorDistance#ncc
  */
 public class ScoreAssociateNccFeature implements ScoreAssociation<NccFeature> {
 	@Override
-	public double score(NccFeature a, NccFeature b) {
+	public double score( NccFeature a, NccFeature b ) {
 		return -DescriptorDistance.ncc(a, b);
 	}
 

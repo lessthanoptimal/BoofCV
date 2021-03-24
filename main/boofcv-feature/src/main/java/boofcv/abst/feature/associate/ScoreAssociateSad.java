@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -26,29 +26,28 @@ import boofcv.struct.feature.*;
  *
  * @author Peter Abeles
  */
-public interface ScoreAssociateSad<Desc> extends ScoreAssociation<Desc>
-{
-	class F32 implements ScoreAssociateSad<TupleDesc_F32>
-	{
-		@Override public double score(TupleDesc_F32 a, TupleDesc_F32 b) { return DescriptorDistance.sad(a, b); }
+public interface ScoreAssociateSad<Desc> extends ScoreAssociation<Desc> {
+	class F32 implements ScoreAssociateSad<TupleDesc_F32> {
+		@Override public double score( TupleDesc_F32 a, TupleDesc_F32 b ) { return DescriptorDistance.sad(a, b); }
+
 		@Override public MatchScoreType getScoreType() {return MatchScoreType.NORM_ERROR;}
 	}
 
-	class F64 implements ScoreAssociateSad<TupleDesc_F64>
-	{
-		@Override public double score(TupleDesc_F64 a, TupleDesc_F64 b) { return DescriptorDistance.sad(a, b); }
+	class F64 implements ScoreAssociateSad<TupleDesc_F64> {
+		@Override public double score( TupleDesc_F64 a, TupleDesc_F64 b ) { return DescriptorDistance.sad(a, b); }
+
 		@Override public MatchScoreType getScoreType() {return MatchScoreType.NORM_ERROR;}
 	}
 
-	class U8 implements ScoreAssociateSad<TupleDesc_U8>
-	{
-		@Override public double score(TupleDesc_U8 a, TupleDesc_U8 b) { return DescriptorDistance.sad(a, b); }
+	class U8 implements ScoreAssociateSad<TupleDesc_U8> {
+		@Override public double score( TupleDesc_U8 a, TupleDesc_U8 b ) { return DescriptorDistance.sad(a, b); }
+
 		@Override public MatchScoreType getScoreType() {return MatchScoreType.NORM_ERROR;}
 	}
 
-	class S8 implements ScoreAssociateSad<TupleDesc_S8>
-	{
-		@Override public double score(TupleDesc_S8 a, TupleDesc_S8 b) { return DescriptorDistance.sad(a, b); }
+	class S8 implements ScoreAssociateSad<TupleDesc_S8> {
+		@Override public double score( TupleDesc_S8 a, TupleDesc_S8 b ) { return DescriptorDistance.sad(a, b); }
+
 		@Override public MatchScoreType getScoreType() {return MatchScoreType.NORM_ERROR;}
 	}
 }

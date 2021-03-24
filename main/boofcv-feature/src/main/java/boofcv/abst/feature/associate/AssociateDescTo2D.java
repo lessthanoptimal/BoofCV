@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -18,6 +18,7 @@
 
 package boofcv.abst.feature.associate;
 
+import boofcv.misc.BoofMiscOps;
 import boofcv.struct.feature.AssociatedIndex;
 import boofcv.struct.feature.MatchScoreType;
 import georegression.struct.point.Point2D_F64;
@@ -35,63 +36,32 @@ public class AssociateDescTo2D<D> implements AssociateDescription2D<D> {
 	// sanity check to detect bad usage of this interface. Not needed for this implementation
 	boolean calledInitialize = false;
 
-	public AssociateDescTo2D(AssociateDescription<D> alg) {
-		this.alg = alg;
-	}
+	public AssociateDescTo2D( AssociateDescription<D> alg ) {this.alg = alg;}
 
-	@Override
-	public void initialize(int imageWidth, int imageHeight) {
+	@Override public void initialize( int imageWidth, int imageHeight ) {
 		calledInitialize = true;
 	}
 
-	@Override
-	public void setSource(FastAccess<Point2D_F64> location, FastAccess<D> descriptions) {
+	@Override public void setSource( FastAccess<Point2D_F64> location, FastAccess<D> descriptions ) {
 		alg.setSource(descriptions);
 	}
 
-	@Override
-	public void setDestination(FastAccess<Point2D_F64> location, FastAccess<D> descriptions) {
+	@Override public void setDestination( FastAccess<Point2D_F64> location, FastAccess<D> descriptions ) {
 		alg.setDestination(descriptions);
 	}
 
-	@Override
-	public void associate() {
-		assert(calledInitialize);
+	@Override public void associate() {
+		BoofMiscOps.checkTrue(calledInitialize);
 		alg.associate();
 	}
 
-	@Override
-	public FastAccess<AssociatedIndex> getMatches() {
-		return alg.getMatches();
-	}
-
-	@Override
-	public DogArray_I32 getUnassociatedSource() {
-		return alg.getUnassociatedSource();
-	}
-
-	@Override
-	public DogArray_I32 getUnassociatedDestination() {
-		return alg.getUnassociatedDestination();
-	}
-
-	@Override
-	public void setMaxScoreThreshold(double score) {
-		alg.setMaxScoreThreshold(score);
-	}
-
-	@Override
-	public MatchScoreType getScoreType() {
-		return alg.getScoreType();
-	}
-
-	@Override
-	public boolean uniqueSource() {
-		return alg.uniqueSource();
-	}
-
-	@Override
-	public boolean uniqueDestination() {
-		return alg.uniqueDestination();
-	}
+	// @formatter:off
+	@Override public FastAccess<AssociatedIndex> getMatches() {return alg.getMatches();}
+	@Override public DogArray_I32 getUnassociatedSource() {return alg.getUnassociatedSource();}
+	@Override public DogArray_I32 getUnassociatedDestination() {return alg.getUnassociatedDestination();}
+	@Override public void setMaxScoreThreshold( double score ) {alg.setMaxScoreThreshold(score);}
+	@Override public MatchScoreType getScoreType() {return alg.getScoreType();}
+	@Override public boolean uniqueSource() {return alg.uniqueSource();}
+	@Override public boolean uniqueDestination() {return alg.uniqueDestination();}
+	// @formatter:on
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -28,7 +28,6 @@ import org.ddogleg.struct.DogArray_F64;
 import org.ddogleg.struct.DogArray_I32;
 import org.ddogleg.struct.FastAccess;
 
-
 /**
  * Wrapper around of {@link AssociateGreedyBase2D} for {@link AssociateDescription2D}
  *
@@ -50,20 +49,20 @@ public class WrapAssociateGreedy2D<D> implements AssociateDescription2D<D> {
 	// Number of features in the destination list
 	private int sizeDst;
 
-	public WrapAssociateGreedy2D(AssociateGreedyBase2D<D> alg) {this.alg = alg;}
+	public WrapAssociateGreedy2D( AssociateGreedyBase2D<D> alg ) {this.alg = alg;}
 
 	@Override
-	public void initialize(int imageWidth, int imageHeight) {
+	public void initialize( int imageWidth, int imageHeight ) {
 		alg.init(imageWidth, imageHeight);
 	}
 
 	@Override
-	public void setSource(FastAccess<Point2D_F64> location, FastAccess<D> descriptions) {
+	public void setSource( FastAccess<Point2D_F64> location, FastAccess<D> descriptions ) {
 		alg.setSource(location, descriptions);
 	}
 
 	@Override
-	public void setDestination(FastAccess<Point2D_F64> location, FastAccess<D> descriptions) {
+	public void setDestination( FastAccess<Point2D_F64> location, FastAccess<D> descriptions ) {
 		alg.setDestination(location, descriptions);
 		sizeDst = location.size;
 	}
@@ -84,11 +83,13 @@ public class WrapAssociateGreedy2D<D> implements AssociateDescription2D<D> {
 		}
 	}
 
+	// @formatter:off
 	@Override public DogArray<AssociatedIndex> getMatches() {return matches;}
 	@Override public DogArray_I32 getUnassociatedSource() {return unassocSrc;}
-	@Override public DogArray_I32 getUnassociatedDestination() { return unassociated.checkDestination(matches, sizeDst); }
-	@Override public void setMaxScoreThreshold(double score) {alg.setMaxFitError(score);}
+	@Override public DogArray_I32 getUnassociatedDestination() {return unassociated.checkDestination(matches, sizeDst);}
+	@Override public void setMaxScoreThreshold( double score ) {alg.setMaxFitError(score);}
 	@Override public MatchScoreType getScoreType() {return alg.getScore().getScoreType();}
 	@Override public boolean uniqueSource() {return true;}
 	@Override public boolean uniqueDestination() {return alg.isBackwardsValidation();}
+	// @formatter:on
 }

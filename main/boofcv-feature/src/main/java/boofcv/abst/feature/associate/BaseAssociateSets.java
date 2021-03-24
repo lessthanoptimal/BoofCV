@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -39,6 +39,7 @@ public abstract class BaseAssociateSets<Desc> implements Associate {
 
 	// Stores sorted descriptors by sets
 	protected final DogArray<SetStruct> sets;
+
 	// Number of source and destination descriptors added in all sets combined
 	protected int countSrc, countDst;
 

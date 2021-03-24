@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -28,7 +28,6 @@ import org.ddogleg.struct.DogArray_F64;
 import org.ddogleg.struct.DogArray_I32;
 import org.ddogleg.struct.FastAccess;
 
-
 /**
  * Wrapper around algorithms contained inside of {@link AssociateGreedyDesc}.
  *
@@ -51,19 +50,18 @@ public class WrapAssociateGreedy<T> implements AssociateDescription<T> {
 
 	/**
 	 *
-	 * @param alg
 	 */
 	public WrapAssociateGreedy( AssociateGreedyDescBase<T> alg ) {
 		this.alg = alg;
 	}
 
 	@Override
-	public void setSource(FastAccess<T> listSrc) {
+	public void setSource( FastAccess<T> listSrc ) {
 		this.listSrc = listSrc;
 	}
 
 	@Override
-	public void setDestination(FastAccess<T> listDst) {
+	public void setDestination( FastAccess<T> listDst ) {
 		this.listDst = listDst;
 	}
 
@@ -74,22 +72,22 @@ public class WrapAssociateGreedy<T> implements AssociateDescription<T> {
 
 	@Override
 	public void associate() {
-		if( listSrc == null )
+		if (listSrc == null)
 			throw new IllegalArgumentException("source features not specified");
-		if( listDst == null )
+		if (listDst == null)
 			throw new IllegalArgumentException("destination features not specified");
 
 		unassocSrc.reset();
-		alg.associate(listSrc,listDst);
+		alg.associate(listSrc, listDst);
 
 		DogArray_I32 pairs = alg.getPairs();
 		DogArray_F64 score = alg.getFitQuality();
 
 		matches.reset();
-		for( int i = 0; i < listSrc.size; i++ ) {
+		for (int i = 0; i < listSrc.size; i++) {
 			int dst = pairs.data[i];
-			if( dst >= 0 )
-				matches.grow().setTo(i,dst,score.data[i]);
+			if (dst >= 0)
+				matches.grow().setTo(i, dst, score.data[i]);
 			else
 				unassocSrc.add(i);
 		}
@@ -102,11 +100,11 @@ public class WrapAssociateGreedy<T> implements AssociateDescription<T> {
 
 	@Override
 	public DogArray_I32 getUnassociatedDestination() {
-		return unassociated.checkDestination(matches,listDst.size);
+		return unassociated.checkDestination(matches, listDst.size);
 	}
 
 	@Override
-	public void setMaxScoreThreshold(double score) {
+	public void setMaxScoreThreshold( double score ) {
 		alg.setMaxFitError(score);
 	}
 

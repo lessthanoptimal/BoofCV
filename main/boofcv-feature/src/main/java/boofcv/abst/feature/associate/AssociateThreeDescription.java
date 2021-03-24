@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -28,6 +28,7 @@ import org.ddogleg.struct.FastAccess;
  * <p>
  * Common interface for associating features between three images.
  * </p>
+ *
  * @author Peter Abeles
  */
 public interface AssociateThreeDescription<Desc> {
@@ -39,24 +40,27 @@ public interface AssociateThreeDescription<Desc> {
 
 	/**
 	 * Specify descriptors in image A
+	 *
 	 * @param features (Input) feature descriptors. Reference is saved.
 	 * @param sets (Input) Which sets the features belong to. Reference is saved.
 	 */
-	void setFeaturesA(FastAccess<Desc> features , DogArray_I32 sets);
+	void setFeaturesA( FastAccess<Desc> features, DogArray_I32 sets );
 
 	/**
 	 * Specify descriptors in image B
+	 *
 	 * @param features feature descriptors. Reference is saved.
 	 * @param sets (Input) Which sets the features belong to. Reference is saved.
 	 */
-	void setFeaturesC(FastAccess<Desc> features , DogArray_I32 sets );
+	void setFeaturesC( FastAccess<Desc> features, DogArray_I32 sets );
 
 	/**
 	 * Specify descriptors in image C
+	 *
 	 * @param features feature descriptors. Reference is saved.
 	 * @param sets (Input) Which sets the features belong to. Reference is saved.
 	 */
-	void setFeaturesB(FastAccess<Desc> features , DogArray_I32 sets );
+	void setFeaturesB( FastAccess<Desc> features, DogArray_I32 sets );
 
 	/**
 	 * Finds the best match for each item in the source list with an item in the destination list.
@@ -76,7 +80,7 @@ public interface AssociateThreeDescription<Desc> {
 	 *
 	 * @param score The threshold.
 	 */
-	void setMaxScoreThreshold(double score);
+	void setMaxScoreThreshold( double score );
 
 	/**
 	 * Specifies the type of score which is returned.
