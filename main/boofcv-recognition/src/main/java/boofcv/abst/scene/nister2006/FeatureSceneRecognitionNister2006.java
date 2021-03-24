@@ -231,11 +231,11 @@ public class FeatureSceneRecognitionNister2006<TD extends TupleDesc<TD>> impleme
 		return !matches.isEmpty();
 	}
 
-	@Override public int getFeatureWord( int featureIdx ) {
+	@Override public int getQueryWord( int featureIdx ) {
 		return databaseN.getFeatureIdxToLeafID().get(featureIdx);
 	}
 
-	@Override public void getFeatureWords( int featureIdx, DogArray_I32 word ) {
+	@Override public void getQueryWords( int featureIdx, DogArray_I32 word ) {
 		int leafID = databaseN.getFeatureIdxToLeafID().get(featureIdx);
 
 		HierarchicalVocabularyTree.Node node = databaseN.tree.nodes.get(leafID);
@@ -246,6 +246,18 @@ public class FeatureSceneRecognitionNister2006<TD extends TupleDesc<TD>> impleme
 			word.add(node.index);
 			node = databaseN.tree.nodes.get(node.parent);
 		}
+	}
+
+	@Override public int lookupWord( TD description ) {
+		return 0;
+	}
+
+	@Override public void lookupWordsWords( TD description, DogArray_I32 word ) {
+
+	}
+
+	@Override public int getTotalWords() {
+		return databaseN.tree.nodes.size;
 	}
 
 	@Override public Class<TD> getDescriptorType() {

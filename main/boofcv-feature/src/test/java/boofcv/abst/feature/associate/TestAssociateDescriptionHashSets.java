@@ -16,9 +16,9 @@
  * limitations under the License.
  */
 
-package boofcv.abst.scene.nister2006;
+package boofcv.abst.feature.associate;
 
-import boofcv.abst.scene.GenericFeatureSceneRecognitionChecks;
+import boofcv.testing.BoofStandardJUnit;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.fail;
@@ -26,8 +26,8 @@ import static org.junit.jupiter.api.Assertions.fail;
 /**
  * @author Peter Abeles
  */
-class TestFeatureSceneRecognitionNister2006 extends GenericFeatureSceneRecognitionChecks {
-	@Test void implement() {
+public class TestAssociateDescriptionHashSets extends BoofStandardJUnit {
+	@Test void foo() {
 		fail("Implement");
 	}
 }

@@ -98,6 +98,7 @@ public class WrapFeatureToSceneRecognition<Image extends ImageBase<Image>, TD ex
 		recognizer.setVerbose(out, options);
 	}
 
+	// @formatter:off
 	private FeatureSceneRecognition.Features<TD> wrap() {
 		return new FeatureSceneRecognition.Features<>() {
 			@Override public Point2D_F64 getPixel( int index ) {return detector.getLocation(index);}
@@ -105,6 +106,7 @@ public class WrapFeatureToSceneRecognition<Image extends ImageBase<Image>, TD ex
 			@Override public int size() {return detector.getNumberOfFeatures();}
 		};
 	}
+	// @formatter:on
 
 	public <T extends FeatureSceneRecognition<TD>>T getRecognizer() {
 		return (T)recognizer;
