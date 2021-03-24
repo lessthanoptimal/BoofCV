@@ -72,15 +72,25 @@ public interface FeatureSceneRecognition<TD extends TupleDesc<TD>> extends Verbo
 	 * @param featureIdx (Input) Index of the feature in the query.
 	 * @return The word's ID. If no word is associated with this feature then -1 is returned.
 	 */
-	int getFeatureWord( int featureIdx );
+	int getQueryWord( int featureIdx );
 
 	/**
 	 * Used to retrieve all the words a feature is associated with. If the internal implementation is hierarchical
 	 * then words it passes through on the way a leaf could go in the words list.
+	 *
 	 * @param featureIdx (Input) Index of the feature in the query.
 	 * @param word (Output) Storage for all the words the feature is associated with
 	 */
-	void getFeatureWords( int featureIdx, DogArray_I32 word );
+	void getQueryWords( int featureIdx, DogArray_I32 word );
+
+	int lookupWord( TD description );
+
+	void lookupWordsWords( TD description, DogArray_I32 word );
+
+	/**
+	 * Returns the number of unique words. it's assumed that the word ID's will occupy 0 to this value.
+	 */
+	int getTotalWords();
 
 	/** The image data type which can be processed */
 	Class<TD> getDescriptorType();

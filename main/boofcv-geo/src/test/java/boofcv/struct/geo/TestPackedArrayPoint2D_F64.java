@@ -16,8 +16,18 @@
  * limitations under the License.
  */
 
-package boofcv.abst.scene.nister2006;
+package boofcv.struct.geo;
 
-import boofcv.struct.StandardConfigurationChecks;
+import boofcv.testing.BoofStandardJUnit;
+import org.junit.jupiter.api.Test;
 
-class TestConfigSceneRecognitionNister2006 extends StandardConfigurationChecks {}
+import static org.junit.jupiter.api.Assertions.fail;
+
+/**
+ * @author Peter Abeles
+ */
+public class TestPackedArrayPoint2D_F64 extends BoofStandardJUnit {
+	@Test void implement() {
+		fail("Implement");
+	}
+}

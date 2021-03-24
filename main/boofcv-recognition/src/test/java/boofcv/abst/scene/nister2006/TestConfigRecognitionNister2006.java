@@ -18,16 +18,6 @@
 
 package boofcv.abst.scene.nister2006;
 
-import boofcv.abst.scene.GenericFeatureSceneRecognitionChecks;
-import org.junit.jupiter.api.Test;
+import boofcv.struct.StandardConfigurationChecks;
 
-import static org.junit.jupiter.api.Assertions.fail;
-
-/**
- * @author Peter Abeles
- */
-class TestFeatureSceneRecognitionNister2006 extends GenericFeatureSceneRecognitionChecks {
-	@Test void implement() {
-		fail("Implement");
-	}
-}
+class TestConfigRecognitionNister2006 extends StandardConfigurationChecks {}
