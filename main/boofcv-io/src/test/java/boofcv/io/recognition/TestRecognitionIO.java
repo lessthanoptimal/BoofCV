@@ -18,11 +18,14 @@
 
 package boofcv.io.recognition;
 
-import boofcv.abst.scene.nister2006.ConfigSceneRecognitionNister2006;
-import boofcv.abst.scene.nister2006.SceneRecognitionNister2006;
+import boofcv.abst.scene.ConfigFeatureToSceneRecognition;
+import boofcv.abst.scene.WrapFeatureToSceneRecognition;
+import boofcv.abst.scene.nister2006.ConfigRecognitionNister2006;
+import boofcv.abst.scene.nister2006.FeatureSceneRecognitionNister2006;
 import boofcv.alg.scene.nister2006.RecognitionVocabularyTreeNister2006;
 import boofcv.alg.scene.nister2006.RecognitionVocabularyTreeNister2006.InvertedFile;
 import boofcv.alg.scene.vocabtree.HierarchicalVocabularyTree;
+import boofcv.factory.scene.FactorySceneRecognition;
 import boofcv.io.UtilIO;
 import boofcv.struct.feature.PackedTupleBigArray_F64;
 import boofcv.struct.feature.TupleDesc_F64;
@@ -47,17 +50,44 @@ public class TestRecognitionIO extends BoofStandardJUnit {
 	/**
 	 * Very basic test. Mostly just checks to see if things blow up or not
 	 */
+	@Test void save_load_FeatureToScene() {
+		File dir = new File(System.getProperty("java.io.tmpdir"),"feature_to_scene");
+		try {
+			var config = new ConfigFeatureToSceneRecognition();
+			ImageType<GrayU8> imageType = ImageType.SB_U8;
+
+			var original = FactorySceneRecognition.createFeatureToScene(config, imageType);
+			((FeatureSceneRecognitionNister2006<TupleDesc_F64>)original.getRecognizer()).
+					setDatabase(createDefaultNister2006());
+
+			RecognitionIO.saveFeatureToScene(original, dir);
+			WrapFeatureToSceneRecognition<GrayU8,TupleDesc_F64> found = RecognitionIO.loadFeatureToScene(dir, imageType);
+
+			// Check a some things to make sure it actually loaded
+			FeatureSceneRecognitionNister2006<TupleDesc_F64> foundRecognizer = found.getRecognizer();
+			assertEquals(20, foundRecognizer.getDatabaseN().getImagesDB().size);
+			assertEquals(5, foundRecognizer.getTree().nodes.size());
+		} finally {
+			// clean up
+			if (dir.exists())
+				UtilIO.deleteRecursive(dir);
+		}
+	}
+
+	/**
+	 * Very basic test. Mostly just checks to see if things blow up or not
+	 */
 	@Test void save_load_nister2006() {
 		File dir = new File(System.getProperty("java.io.tmpdir"),"nister2006");
 		try {
-			var config = new ConfigSceneRecognitionNister2006();
-			ImageType<GrayU8> imageType = ImageType.SB_U8;
+			var config = new ConfigRecognitionNister2006();
 
-			var original = new SceneRecognitionNister2006<GrayU8,TupleDesc_F64>(config, imageType);
+			var original = new FeatureSceneRecognitionNister2006<>(config,()->new TupleDesc_F64(10));
 			original.setDatabase(createDefaultNister2006());
 
 			RecognitionIO.saveNister2006(original, dir);
-			SceneRecognitionNister2006<GrayU8,TupleDesc_F64> found = RecognitionIO.loadNister2006(dir, imageType);
+			var found = new FeatureSceneRecognitionNister2006<>(config,()->new TupleDesc_F64(10));
+			RecognitionIO.loadNister2006(dir, found);
 
 			// Check a some things to make sure it actually loaded
 			assertEquals(20, found.getDatabaseN().getImagesDB().size);

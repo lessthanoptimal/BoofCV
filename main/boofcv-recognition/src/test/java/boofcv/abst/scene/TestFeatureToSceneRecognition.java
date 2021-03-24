@@ -16,12 +16,11 @@
  * limitations under the License.
  */
 
-package boofcv.abst.scene.nister2006;
+package boofcv.abst.scene;
 
-import boofcv.abst.scene.GenericSceneRecognitionChecks;
-import boofcv.abst.scene.SceneRecognition;
 import boofcv.factory.feature.describe.ConfigConvertTupleDesc;
 import boofcv.factory.feature.describe.ConfigDescribeRegionPoint;
+import boofcv.factory.scene.FactorySceneRecognition;
 import boofcv.struct.image.GrayU8;
 import boofcv.struct.image.ImageType;
 import boofcv.testing.BoofStandardJUnit;
@@ -30,8 +29,7 @@ import org.junit.jupiter.api.Nested;
 /**
  * @author Peter Abeles
  */
-class TestSceneRecognitionNister2006 extends BoofStandardJUnit {
-
+class TestWrapFeatureToSceneRecognition extends BoofStandardJUnit {
 	/**
 	 * Default settings with a few minor tweaks for speed
 	 */
@@ -41,11 +39,11 @@ class TestSceneRecognitionNister2006 extends BoofStandardJUnit {
 		}
 
 		@Override protected SceneRecognition<GrayU8> createAlg() {
-			var config = new ConfigSceneRecognitionNister2006();
-			config.tree.branchFactor = 3;
-			config.tree.maximumLevel = 3;
+			var config = new ConfigFeatureToSceneRecognition();
+			config.recognizeNister2006.tree.branchFactor = 3;
+			config.recognizeNister2006.tree.maximumLevel = 3;
 			config.features.detectFastHessian.extract.radius = 6;
-			return new SceneRecognitionNister2006<>(config, imageType);
+			return FactorySceneRecognition.createFeatureToScene(config, imageType);
 		}
 	}
 
@@ -58,14 +56,14 @@ class TestSceneRecognitionNister2006 extends BoofStandardJUnit {
 		}
 
 		@Override protected SceneRecognition<GrayU8> createAlg() {
-			var config = new ConfigSceneRecognitionNister2006();
-			config.tree.branchFactor = 5;
-			config.tree.maximumLevel = 3;
+			var config = new ConfigFeatureToSceneRecognition();
+			config.recognizeNister2006.tree.branchFactor = 5;
+			config.recognizeNister2006.tree.maximumLevel = 3;
 			config.features.typeDescribe = ConfigDescribeRegionPoint.DescriptorType.BRIEF;
 			config.features.describeBrief.fixed = false;
 			config.features.detectFastHessian.extract.radius = 12;
 			config.features.convertDescriptor.outputData = ConfigConvertTupleDesc.DataType.NATIVE;
-			return new SceneRecognitionNister2006<>(config, imageType);
+			return FactorySceneRecognition.createFeatureToScene(config, imageType);
 		}
 	}
 }
