@@ -18,26 +18,23 @@
 
 package boofcv.abst.scene.nister2006;
 
-import boofcv.abst.feature.detdesc.DetectDescribePoint;
+import boofcv.abst.scene.FeatureSceneRecognition;
 import boofcv.abst.scene.SceneRecognition;
 import boofcv.alg.scene.nister2006.LearnNodeWeights;
 import boofcv.alg.scene.nister2006.RecognitionVocabularyTreeNister2006;
 import boofcv.alg.scene.vocabtree.HierarchicalVocabularyTree;
 import boofcv.alg.scene.vocabtree.LearnHierarchicalTree;
-import boofcv.factory.feature.detdesc.FactoryDetectDescribe;
 import boofcv.factory.struct.FactoryTupleDesc;
 import boofcv.misc.BoofLambdas;
-import boofcv.misc.FactoryFilterLambdas;
 import boofcv.struct.PackedArray;
 import boofcv.struct.feature.TupleDesc;
-import boofcv.struct.image.ImageBase;
-import boofcv.struct.image.ImageType;
 import boofcv.struct.kmeans.FactoryTupleCluster;
 import lombok.Getter;
 import lombok.Setter;
 import org.ddogleg.clustering.kmeans.StandardKMeans;
 import org.ddogleg.struct.DogArray;
 import org.ddogleg.struct.DogArray_I32;
+import org.ddogleg.struct.Factory;
 import org.jetbrains.annotations.Nullable;
 
 import java.io.PrintStream;
@@ -47,24 +44,19 @@ import java.util.List;
 import java.util.Set;
 
 /**
- * High level implementation of {@link RecognitionVocabularyTreeNister2006} for {@link SceneRecognition}.
+ * High level implementation of {@link RecognitionVocabularyTreeNister2006} for {@link FeatureSceneRecognition}.
  *
  * @author Peter Abeles
  */
-public class SceneRecognitionNister2006<Image extends ImageBase<Image>, TD extends TupleDesc<TD>>
-		implements SceneRecognition<Image> {
-
+public class FeatureSceneRecognitionNister2006<TD extends TupleDesc<TD>> implements FeatureSceneRecognition<TD> {
 	/** Configuration for this class */
-	@Getter ConfigSceneRecognitionNister2006 config;
+	@Getter ConfigRecognitionNister2006 config;
 
 	/** Tree representation of image features */
 	@Getter HierarchicalVocabularyTree<TD> tree;
 
 	/** Manages saving and locating images */
 	@Getter RecognitionVocabularyTreeNister2006<TD> databaseN;
-
-	/** Detects image features */
-	@Getter @Setter DetectDescribePoint<Image, TD> detector;
 
 	/** Stores features found in one image */
 	@Getter @Setter DogArray<TD> imageFeatures;
@@ -75,32 +67,29 @@ public class SceneRecognitionNister2006<Image extends ImageBase<Image>, TD exten
 	/** Performance tuning. If less than this number of features a single thread algorithm will be used */
 	@Getter @Setter public int minimumForThread = 500;
 
-	// Type of input image
-	ImageType<Image> imageType;
+	// Describes how to store the feature descriptor
+	Class<TD> tupleType;
+	int tupleDOF;
 
 	// If not null then print verbose information
 	PrintStream verbose;
-
-	// Used to ensure the image is at the expected scale
-	BoofLambdas.Transform<Image> downSample;
 
 	// Internal Profiling. All times in milliseconds
 	@Getter long timeLearnDescribeMS;
 	@Getter long timeLearnClusterMS;
 	@Getter long timeLearnWeightsMS;
 
-	public SceneRecognitionNister2006( ConfigSceneRecognitionNister2006 config, ImageType<Image> imageType ) {
+	public FeatureSceneRecognitionNister2006( ConfigRecognitionNister2006 config, Factory<TD> factory) {
 		this.config = config;
-		this.detector = FactoryDetectDescribe.generic(config.features, imageType.getImageClass());
-		this.imageFeatures = new DogArray<>(() -> detector.createDescription());
+		this.imageFeatures = new DogArray<>(factory);
 		this.databaseN = new RecognitionVocabularyTreeNister2006<>();
-		this.imageType = imageType;
 
 		databaseN.setDistanceType(config.distanceNorm);
 		databaseN.minimumDepthFromRoot = config.minimumDepthFromRoot;
 		databaseN.maximumQueryImagesInNode.setTo(config.queryMaximumImagesInNode);
 
-		downSample = FactoryFilterLambdas.createDownSampleFilter(config.maxImagePixels, imageType);
+		tupleDOF = imageFeatures.grow().size();
+		tupleType = (Class)imageFeatures.get(0).getClass();
 	}
 
 	public void setDatabase( RecognitionVocabularyTreeNister2006<TD> db ) {
@@ -108,10 +97,8 @@ public class SceneRecognitionNister2006<Image extends ImageBase<Image>, TD exten
 		tree = db.getTree();
 	}
 
-	@Override public void learnModel( Iterator<Image> images ) {
-		int DOF = detector.createDescription().size();
-		Class<TD> tupleType = detector.getDescriptionType();
-		PackedArray<TD> packedFeatures = FactoryTupleDesc.createPackedBig(DOF, tupleType);
+	@Override public void learnModel( Iterator<Features<TD>> images ) {
+		PackedArray<TD> packedFeatures = FactoryTupleDesc.createPackedBig(tupleDOF, tupleType);
 
 		// Keep track of where features from one image begins/ends
 		DogArray_I32 startIndex = new DogArray_I32();
@@ -119,12 +106,12 @@ public class SceneRecognitionNister2006<Image extends ImageBase<Image>, TD exten
 		// Detect features in all the images and save into a single array
 		long time0 = System.currentTimeMillis();
 		while (images.hasNext()) {
+			Features<TD> image = images.next();
 			startIndex.add(packedFeatures.size());
-			detector.detect(downSample.process(images.next()));
-			int N = detector.getNumberOfFeatures();
+			int N = image.size();
 			packedFeatures.reserve(N);
 			for (int i = 0; i < N; i++) {
-				packedFeatures.append(detector.getDescription(i));
+				packedFeatures.append(image.getDescription(i));
 			}
 			if (verbose != null)
 				verbose.println("described.size=" + startIndex.size + " features=" + N + " packed.size=" + packedFeatures.size());
@@ -134,7 +121,7 @@ public class SceneRecognitionNister2006<Image extends ImageBase<Image>, TD exten
 		long time1 = System.currentTimeMillis();
 
 		// Create the tree data structure
-		PackedArray<TD> packedArray = FactoryTupleDesc.createPackedBig(DOF, tupleType);
+		PackedArray<TD> packedArray = FactoryTupleDesc.createPackedBig(tupleDOF, tupleType);
 
 		tree = new HierarchicalVocabularyTree<>(FactoryTupleCluster.createDistance(tupleType), packedArray);
 		tree.branchFactor = config.tree.branchFactor;
@@ -144,10 +131,10 @@ public class SceneRecognitionNister2006<Image extends ImageBase<Image>, TD exten
 		if (verbose != null) verbose.println("learning the tree");
 
 		BoofLambdas.Factory<StandardKMeans<TD>> factoryKMeans = () ->
-				FactoryTupleCluster.kmeans(config.kmeans, minimumForThread, DOF, tupleType);
+				FactoryTupleCluster.kmeans(config.kmeans, minimumForThread, tupleDOF, tupleType);
 
 		LearnHierarchicalTree<TD> learnTree = new LearnHierarchicalTree<>(
-				() -> FactoryTupleDesc.createPackedBig(DOF, tupleType), factoryKMeans, config.randSeed);
+				() -> FactoryTupleDesc.createPackedBig(tupleDOF, tupleType), factoryKMeans, config.randSeed);
 		learnTree.minimumPointsForChildren.setTo(config.learningMinimumPointsForChildren);
 		learnTree.setVerbose(verbose, null);
 		learnTree.process(packedFeatures, tree);
@@ -194,12 +181,11 @@ public class SceneRecognitionNister2006<Image extends ImageBase<Image>, TD exten
 		databaseN.clearImages();
 	}
 
-	@Override public void addImage( String id, Image image ) {
+	@Override public void addImage( String id, Features<TD> features ) {
 		// Copy image features into an array
-		detector.detect(downSample.process(image));
-		imageFeatures.resize(detector.getNumberOfFeatures());
+		imageFeatures.resize(features.size());
 		for (int i = 0; i < imageFeatures.size; i++) {
-			imageFeatures.get(i).setTo(detector.getDescription(i));
+			imageFeatures.get(i).setTo(features.getDescription(i));
 		}
 
 		// Save the ID and convert into a format the database understands
@@ -207,13 +193,13 @@ public class SceneRecognitionNister2006<Image extends ImageBase<Image>, TD exten
 		imageIds.add(id);
 
 		if (verbose != null)
-			verbose.println("detected[" + imageIndex + "].size=" + detector.getNumberOfFeatures() + " id=" + id);
+			verbose.println("added[" + imageIndex + "].size=" + features.size() + " id=" + id);
 
 		// Add the image
 		databaseN.addImage(imageIndex, imageFeatures.toList());
 	}
 
-	@Override public boolean query( Image queryImage, int limit, DogArray<Match> matches ) {
+	@Override public boolean query( Features<TD> query, int limit, DogArray<SceneRecognition.Match> matches ) {
 		// Default is no matches
 		matches.resize(0);
 
@@ -221,10 +207,9 @@ public class SceneRecognitionNister2006<Image extends ImageBase<Image>, TD exten
 		limit = limit <= 0 ? Integer.MAX_VALUE : limit;
 
 		// Detect image features then copy features into an array
-		detector.detect(downSample.process(queryImage));
-		imageFeatures.resize(detector.getNumberOfFeatures());
+		imageFeatures.resize(query.size());
 		for (int i = 0; i < imageFeatures.size; i++) {
-			imageFeatures.get(i).setTo(detector.getDescription(i));
+			imageFeatures.get(i).setTo(query.getDescription(i));
 		}
 
 		// Look up the closest matches
@@ -246,8 +231,25 @@ public class SceneRecognitionNister2006<Image extends ImageBase<Image>, TD exten
 		return !matches.isEmpty();
 	}
 
-	@Override public ImageType<Image> getImageType() {
-		return imageType;
+	@Override public int getFeatureWord( int featureIdx ) {
+		return databaseN.getFeatureIdxToLeafID().get(featureIdx);
+	}
+
+	@Override public void getFeatureWords( int featureIdx, DogArray_I32 word ) {
+		int leafID = databaseN.getFeatureIdxToLeafID().get(featureIdx);
+
+		HierarchicalVocabularyTree.Node node = databaseN.tree.nodes.get(leafID);
+		while (node != null) {
+			// the root node has a parent of -1 and we don't want to use that as a word since every feature has it
+			if (node.parent==-1)
+				break;
+			word.add(node.index);
+			node = databaseN.tree.nodes.get(node.parent);
+		}
+	}
+
+	@Override public Class<TD> getDescriptorType() {
+		return tupleType;
 	}
 
 	@Override public void setVerbose( @Nullable PrintStream out, @Nullable Set<String> set ) {

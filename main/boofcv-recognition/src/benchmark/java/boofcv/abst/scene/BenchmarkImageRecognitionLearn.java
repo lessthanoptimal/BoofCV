@@ -18,12 +18,10 @@
 
 package boofcv.abst.scene;
 
-import boofcv.abst.scene.nister2006.ConfigSceneRecognitionNister2006;
-import boofcv.abst.scene.nister2006.SceneRecognitionNister2006;
 import boofcv.concurrency.BoofConcurrency;
+import boofcv.factory.scene.FactorySceneRecognition;
 import boofcv.io.UtilIO;
 import boofcv.io.image.ImageFileListIterator;
-import boofcv.struct.feature.TupleDesc_F64;
 import boofcv.struct.image.GrayU8;
 import boofcv.struct.image.ImageType;
 import org.openjdk.jmh.annotations.*;
@@ -50,21 +48,21 @@ public class BenchmarkImageRecognitionLearn {
 	String imagePath = UtilIO.pathExample("recognition/vacation");
 	List<String> images;
 
-	SceneRecognitionNister2006<GrayU8, TupleDesc_F64> nister2006;
+	SceneRecognition<GrayU8> recognizer;
 
 	@Setup public void setup() {
 		BoofConcurrency.USE_CONCURRENT = concurrent;
 		images = UtilIO.listByPrefix(imagePath, null, ".jpg");
 		Collections.sort(images);
 
-		var config = new ConfigSceneRecognitionNister2006();
-		config.tree.branchFactor = 4;
-		config.tree.maximumLevel = 4;
-		nister2006 = new SceneRecognitionNister2006<>(config, ImageType.SB_U8);
+		var config = new ConfigFeatureToSceneRecognition();
+		config.recognizeNister2006.tree.branchFactor = 4;
+		config.recognizeNister2006.tree.maximumLevel = 4;
+		recognizer = FactorySceneRecognition.createFeatureToScene(config, ImageType.SB_U8);
 	}
 
 	@Benchmark public void Nister2006() {
-		nister2006.learnModel(new ImageFileListIterator<>(images, nister2006.getImageType()));
+		recognizer.learnModel(new ImageFileListIterator<>(images, recognizer.getImageType()));
 	}
 
 	public static void main( String[] args ) throws RunnerException {

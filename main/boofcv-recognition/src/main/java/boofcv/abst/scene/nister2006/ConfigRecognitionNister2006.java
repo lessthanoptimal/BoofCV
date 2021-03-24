@@ -18,40 +18,25 @@
 
 package boofcv.abst.scene.nister2006;
 
+import boofcv.alg.scene.nister2006.RecognitionVocabularyTreeNister2006;
 import boofcv.alg.scene.nister2006.RecognitionVocabularyTreeNister2006.DistanceTypes;
 import boofcv.alg.scene.vocabtree.ConfigHierarchicalVocabularyTree;
-import boofcv.factory.feature.describe.ConfigConvertTupleDesc;
-import boofcv.factory.feature.describe.ConfigDescribeRegionPoint;
-import boofcv.factory.feature.detdesc.ConfigDetectDescribe;
-import boofcv.factory.feature.detect.interest.ConfigDetectInterestPoint;
 import boofcv.misc.BoofMiscOps;
 import boofcv.struct.ConfigLength;
 import boofcv.struct.Configuration;
 import org.ddogleg.clustering.ConfigKMeans;
 
 /**
- * Configuration for {@link SceneRecognitionNister2006}
+ * Configuration for recognition algorithms based on {@link RecognitionVocabularyTreeNister2006}
  *
  * @author Peter Abeles
  */
-public class ConfigSceneRecognitionNister2006 implements Configuration {
-
-	/**
-	 * Images are rescaled so that they have at most this number of pixels. To turn off set to a value &le; 0.
-	 * Many of feature related tuning parameters have an implicit assumption about image resolution.
-	 * Processing a much higher resolution image could require changing many other parameters for optimal
-	 * performance.
-	 */
-	public int maxImagePixels = 640*480;
-
+public class ConfigRecognitionNister2006 implements Configuration {
 	/** Clustering algorithm used when learning the hierarchical tree */
 	public final ConfigKMeans kmeans = new ConfigKMeans();
 
 	/** Configuration for the tree when it's being learned */
 	public final ConfigHierarchicalVocabularyTree tree = new ConfigHierarchicalVocabularyTree();
-
-	/** Image feature detector */
-	public final ConfigDetectDescribe features = new ConfigDetectDescribe();
 
 	/** Specifies which norm to use. L1 should yield better results but is slower than L2 to compute. */
 	public DistanceTypes distanceNorm = DistanceTypes.L1;
@@ -103,20 +88,6 @@ public class ConfigSceneRecognitionNister2006 implements Configuration {
 		kmeans.reseedAfterIterations = 30;
 		kmeans.maxIterations = 30;
 		kmeans.maxReSeed = 0;
-
-		// Let's use SURF-FAST by default
-		features.typeDescribe = ConfigDescribeRegionPoint.DescriptorType.SURF_STABLE;
-		features.typeDetector = ConfigDetectInterestPoint.DetectorType.FAST_HESSIAN;
-		// Settings a threshold degrades overall results, even if in some specific situations makes it better
-		features.detectFastHessian.extract.threshold = 0;
-		features.detectFastHessian.extract.radius = 2;
-		// 500 features is a good trade off for memory and performance. Accuracy can be improved
-		// with more features but becomes prohibitively expensive in larger datasets
-		features.detectFastHessian.maxFeaturesAll = 500;
-		features.detectFastHessian.maxFeaturesPerScale = 0;
-
-		// Reduce memory usage with very little loss in accuracy
-		features.convertDescriptor.outputData = ConfigConvertTupleDesc.DataType.F32;
 	}
 
 	@Override public void checkValidity() {
@@ -124,17 +95,14 @@ public class ConfigSceneRecognitionNister2006 implements Configuration {
 
 		kmeans.checkValidity();
 		tree.checkValidity();
-		features.checkValidity();
 		queryMaximumImagesInNode.checkValidity();
 		learningMaximumImagesInNode.checkValidity();
 		learningMinimumPointsForChildren.checkValidity();
 	}
 
-	public void setTo( ConfigSceneRecognitionNister2006 src ) {
-		this.maxImagePixels = src.maxImagePixels;
+	public void setTo( ConfigRecognitionNister2006 src ) {
 		this.kmeans.setTo(src.kmeans);
 		this.tree.setTo(src.tree);
-		this.features.setTo(src.features);
 		this.distanceNorm = src.distanceNorm;
 		this.minimumDepthFromRoot = src.minimumDepthFromRoot;
 		this.randSeed = src.randSeed;

@@ -87,6 +87,9 @@ public class RecognitionVocabularyTreeNister2006<Point> implements VerbosePrint 
 	/** Distance between two TF-IDF descriptors. L1 and L2 norms are provided */
 	protected @Getter @Setter TupleMapDistanceNorm distanceFunction = new TupleMapDistanceNorm.L2();
 
+	/** Stores a mapping from feature index to leaf ID */
+	protected @Getter final DogArray_I32 featureIdxToLeafID = new DogArray_I32();
+
 	//---------------- Internal Workspace
 	// The "frequency" that nodes in the tree appear in this image
 	protected final DogArray<Frequency> frequencies = new DogArray<>(Frequency::new, Frequency::reset);
@@ -254,9 +257,10 @@ public class RecognitionVocabularyTreeNister2006<Point> implements VerbosePrint 
 
 		// NOTE: It's assumed nodeIdx_to_match is full of -1
 		nodeIdx_to_match.resize(tree.nodes.size, -1);
+		featureIdxToLeafID.resize(imageFeatures.size());
 
 		for (int featureIdx = 0; featureIdx < imageFeatures.size(); featureIdx++) {
-			tree.searchPathToLeaf(imageFeatures.get(featureIdx), ( depth, node ) -> {
+			int leafID = tree.searchPathToLeaf(imageFeatures.get(featureIdx), ( depth, node ) -> {
 				if (depth < minimumDepthFromRoot || node.weight <= 0.0f)
 					return;
 
@@ -271,6 +275,8 @@ public class RecognitionVocabularyTreeNister2006<Point> implements VerbosePrint 
 				}
 				f.totalAppearances++;
 			});
+
+			featureIdxToLeafID.data[featureIdx] = leafID;
 		}
 
 		// undo changes to the lookup table

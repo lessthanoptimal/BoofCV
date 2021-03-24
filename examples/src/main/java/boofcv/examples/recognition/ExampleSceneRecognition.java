@@ -18,9 +18,10 @@
 
 package boofcv.examples.recognition;
 
+import boofcv.abst.scene.ConfigFeatureToSceneRecognition;
 import boofcv.abst.scene.SceneRecognition;
-import boofcv.abst.scene.nister2006.ConfigSceneRecognitionNister2006;
-import boofcv.abst.scene.nister2006.SceneRecognitionNister2006;
+import boofcv.abst.scene.WrapFeatureToSceneRecognition;
+import boofcv.factory.scene.FactorySceneRecognition;
 import boofcv.gui.ListDisplayPanel;
 import boofcv.gui.image.ScaleOptions;
 import boofcv.gui.image.ShowImages;
@@ -57,7 +58,7 @@ public class ExampleSceneRecognition {
 		List<String> images = UtilIO.listByPrefix(imagePath, null, ".jpg");
 		Collections.sort(images);
 
-		SceneRecognitionNister2006<GrayU8, ?> recognizer;
+		SceneRecognition<GrayU8> recognizer;
 
 		File saveDirectory = new File("nister2006");
 
@@ -65,12 +66,12 @@ public class ExampleSceneRecognition {
 
 		if (saveDirectory.exists()) {
 			System.out.println("Loading previously generated model");
-			recognizer = RecognitionIO.loadNister2006(saveDirectory, ImageType.SB_U8);
+			recognizer = RecognitionIO.loadFeatureToScene(saveDirectory, ImageType.SB_U8);
 		} else {
 			// Learn how to describe images
-			var config = new ConfigSceneRecognitionNister2006();
+			var config = new ConfigFeatureToSceneRecognition();
 
-			recognizer = new SceneRecognitionNister2006<>(config, ImageType.SB_U8);
+			recognizer = FactorySceneRecognition.createFeatureToScene(config, ImageType.SB_U8);
 			recognizer.setVerbose(System.out, null);
 
 			recognizer.learnModel(imageIterator);
@@ -84,7 +85,8 @@ public class ExampleSceneRecognition {
 			}
 
 			System.out.println("Saving tree");
-			BoofMiscOps.profile(() -> RecognitionIO.saveNister2006(recognizer, saveDirectory), "");
+			BoofMiscOps.profile(() -> RecognitionIO.saveFeatureToScene(
+					(WrapFeatureToSceneRecognition<GrayU8,?>)recognizer, saveDirectory), "");
 		}
 
 		ListDisplayPanel gui = new ListDisplayPanel();
