@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -48,9 +48,13 @@ public class AssociateNearestNeighbor_ST<D>
 	NnData<D> result = new NnData<>();
 	DogArray<NnData<D>> result2 = new DogArray<>(NnData<D>::new);
 
-	public AssociateNearestNeighbor_ST(NearestNeighbor<D> alg) {
+	// The type of description it can process
+	Class<D> descType;
+
+	public AssociateNearestNeighbor_ST(NearestNeighbor<D> alg, Class<D> descType) {
 		super(alg);
 		this.search = alg.createSearch();
+		this.descType = descType;
 	}
 
 	@Override
@@ -102,5 +106,9 @@ public class AssociateNearestNeighbor_ST<D>
 				}
 			}
 		}
+	}
+
+	@Override public Class<D> getDescriptionType() {
+		return descType;
 	}
 }

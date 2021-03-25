@@ -18,6 +18,7 @@
 
 package boofcv.factory.struct;
 
+import boofcv.abst.feature.describe.DescriptorInfo;
 import boofcv.struct.PackedArray;
 import boofcv.struct.feature.*;
 
@@ -28,42 +29,52 @@ import boofcv.struct.feature.*;
  **/
 @SuppressWarnings({"unchecked"})
 public class FactoryTupleDesc {
-	public static <TD extends TupleDesc<TD>> TD createTuple(int numElements, Class<TD> type) {
+	public static <TD extends TupleDesc<TD>> TD createTuple( int dof, Class<TD> type ) {
 		if (type == TupleDesc_F64.class)
-			return (TD)new TupleDesc_F64(numElements);
+			return (TD)new TupleDesc_F64(dof);
 		else if (type == TupleDesc_F32.class)
-			return (TD)new TupleDesc_F32(numElements);
+			return (TD)new TupleDesc_F32(dof);
 		else if (type == TupleDesc_U8.class)
-			return (TD)new TupleDesc_U8(numElements);
+			return (TD)new TupleDesc_U8(dof);
 		else if (type == TupleDesc_B.class)
-			return (TD)new TupleDesc_B(numElements);
+			return (TD)new TupleDesc_B(dof);
 		else
-			throw new IllegalArgumentException("Unknown type "+type);
+			throw new IllegalArgumentException("Unknown type " + type);
 	}
 
-	public static <TD extends TupleDesc<TD>> PackedArray<TD> createPacked( int numElements, Class<TD> type) {
-		if (type == TupleDesc_F64.class)
-			return (PackedArray<TD>)new PackedTupleArray_F64(numElements);
-		else if (type == TupleDesc_F32.class)
-			return (PackedArray<TD>)new PackedTupleArray_F32(numElements);
-		else if (type == TupleDesc_U8.class)
-			return (PackedArray<TD>)new PackedTupleArray_U8(numElements);
-		else if (type == TupleDesc_B.class)
-			return (PackedArray<TD>)new PackedTupleArray_B(numElements);
-		else
-			throw new IllegalArgumentException("Unknown type "+type);
+	public static <TD extends TupleDesc<TD>> PackedArray<TD> createPacked( DescriptorInfo<TD> info ) {
+		int dof = info.createDescription().size();
+		return createPacked(dof, info.getDescriptionType());
 	}
 
-	public static <TD extends TupleDesc<TD>> PackedArray<TD> createPackedBig( int numElements, Class<TD> type) {
+	public static <TD extends TupleDesc<TD>> PackedArray<TD> createPacked( int dof, Class<TD> type ) {
 		if (type == TupleDesc_F64.class)
-			return (PackedArray<TD>)new PackedTupleBigArray_F64(numElements);
+			return (PackedArray<TD>)new PackedTupleArray_F64(dof);
 		else if (type == TupleDesc_F32.class)
-			return (PackedArray<TD>)new PackedTupleBigArray_F32(numElements);
+			return (PackedArray<TD>)new PackedTupleArray_F32(dof);
 		else if (type == TupleDesc_U8.class)
-			return (PackedArray<TD>)new PackedTupleBigArray_U8(numElements);
+			return (PackedArray<TD>)new PackedTupleArray_U8(dof);
 		else if (type == TupleDesc_B.class)
-			return (PackedArray<TD>)new PackedTupleBigArray_B(numElements);
+			return (PackedArray<TD>)new PackedTupleArray_B(dof);
 		else
-			throw new IllegalArgumentException("Unknown type "+type);
+			throw new IllegalArgumentException("Unknown type " + type);
+	}
+
+	public static <TD extends TupleDesc<TD>> PackedArray<TD> createPackedBig( DescriptorInfo<TD> info ) {
+		int dof = info.createDescription().size();
+		return createPackedBig(dof, info.getDescriptionType());
+	}
+
+	public static <TD extends TupleDesc<TD>> PackedArray<TD> createPackedBig( int dof, Class<TD> type ) {
+		if (type == TupleDesc_F64.class)
+			return (PackedArray<TD>)new PackedTupleBigArray_F64(dof);
+		else if (type == TupleDesc_F32.class)
+			return (PackedArray<TD>)new PackedTupleBigArray_F32(dof);
+		else if (type == TupleDesc_U8.class)
+			return (PackedArray<TD>)new PackedTupleBigArray_U8(dof);
+		else if (type == TupleDesc_B.class)
+			return (PackedArray<TD>)new PackedTupleBigArray_B(dof);
+		else
+			throw new IllegalArgumentException("Unknown type " + type);
 	}
 }

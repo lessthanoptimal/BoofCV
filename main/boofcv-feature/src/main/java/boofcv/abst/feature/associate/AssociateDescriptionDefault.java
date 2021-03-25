@@ -34,6 +34,7 @@ public class AssociateDescriptionDefault<Desc> implements AssociateDescription<D
 	@Override public MatchScoreType getScoreType() { return null; }
 	@Override public boolean uniqueSource() { return false; }
 	@Override public boolean uniqueDestination() { return false; }
+	@Override public Class<Desc> getDescriptionType() { return null; }
 	@Override public void setSource( FastAccess<Desc> listSrc ) {}
 	@Override public void setDestination( FastAccess<Desc> listDst ) {}
 	// @formatter:on

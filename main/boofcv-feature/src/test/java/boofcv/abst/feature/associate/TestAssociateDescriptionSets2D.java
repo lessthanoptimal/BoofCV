@@ -80,7 +80,7 @@ class TestAssociateDescriptionSets2D extends BoofStandardJUnit {
 
 	protected AssociateDescriptionSets2D<TupleDesc_F64> createAlgorithm() {
 		return new AssociateDescriptionSets2D<>(new AssociateDescTo2D<>(FactoryAssociation.greedy(
-				null, new ScoreAssociateEuclideanSq.F64())), TupleDesc_F64.class);
+				null, new ScoreAssociateEuclideanSq.F64())));
 	}
 
 	@Nested

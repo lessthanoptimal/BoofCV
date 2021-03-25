@@ -40,7 +40,7 @@ import org.ddogleg.struct.FastAccess;
  * @author Peter Abeles
  * @see AssociateUniqueByScoreAlg
  */
-public class EnforceUniqueByScore<A extends Associate> implements Associate {
+public class EnforceUniqueByScore<Desc, A extends Associate<Desc>> implements Associate<Desc> {
 
 	// algorithm for removing ambiguity
 	protected AssociateUniqueByScoreAlg uniqueByScore;
@@ -116,12 +116,16 @@ public class EnforceUniqueByScore<A extends Associate> implements Associate {
 		return association.uniqueDestination() || uniqueByScore.checkDestination();
 	}
 
+	@Override public Class<Desc> getDescriptionType() {
+		return association.getDescriptionType();
+	}
+
 	/**
 	 * Implementation of {@link EnforceUniqueByScore} for {@link AssociateDescription}.
 	 *
 	 * @param <Desc> Feature description type
 	 */
-	public static class Describe<Desc> extends EnforceUniqueByScore<AssociateDescription<Desc>>
+	public static class Describe<Desc> extends EnforceUniqueByScore<Desc, AssociateDescription<Desc>>
 			implements AssociateDescription<Desc> {
 		public Describe( AssociateDescription<Desc> alg, boolean checkSource, boolean checkDestination ) {
 			super(alg, checkSource, checkDestination);
@@ -145,7 +149,7 @@ public class EnforceUniqueByScore<A extends Associate> implements Associate {
 	 *
 	 * @param <Desc> Feature description type
 	 */
-	public static class Describe2D<Desc> extends EnforceUniqueByScore<AssociateDescription2D<Desc>>
+	public static class Describe2D<Desc> extends EnforceUniqueByScore<Desc, AssociateDescription2D<Desc>>
 			implements AssociateDescription2D<Desc> {
 		public Describe2D( AssociateDescription2D<Desc> alg, boolean checkSource, boolean checkDestination ) {
 			super(alg, checkSource, checkDestination);

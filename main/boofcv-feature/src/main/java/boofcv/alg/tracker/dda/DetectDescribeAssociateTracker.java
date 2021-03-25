@@ -101,7 +101,7 @@ public class DetectDescribeAssociateTracker<I extends ImageGray<I>, TD extends T
 										   final AssociateDescription2D<TD> associate,
 										   ConfigTrackerDda config ) {
 		this.detector = detector;
-		this.associate = new AssociateDescriptionSets2D<>(associate, detector.getDescriptionType());
+		this.associate = new AssociateDescriptionSets2D<>(associate);
 		this.updateDescription = config.updateDescription;
 		this.maxInactiveTracks = config.maxInactiveTracks;
 		this.rand = new Random(config.seed);

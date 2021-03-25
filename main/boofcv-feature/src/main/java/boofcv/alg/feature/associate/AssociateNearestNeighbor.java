@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -66,7 +66,7 @@ public abstract class AssociateNearestNeighbor<D>
 	protected final DogArray<AssociatedIndex> matchesAll = new DogArray<>(100, AssociatedIndex::new);
 
 	// creates a list of unassociated features from the list of matches
-	private FindUnassociated unassociated = new FindUnassociated();
+	private final FindUnassociated unassociated = new FindUnassociated();
 
 	// maximum distance away two points can be
 	double maxDistance = -1;

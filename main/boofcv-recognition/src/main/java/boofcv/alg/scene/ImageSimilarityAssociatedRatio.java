@@ -38,6 +38,10 @@ public class ImageSimilarityAssociatedRatio implements SceneRecognitionSimilarIm
 	public boolean isSimilar( FastAccess<Point2D_F64> srcPixels,
 							  FastAccess<Point2D_F64> dstPixels,
 							  FastAccess<AssociatedIndex> matches ) {
-		return false;
+		if (matches.size < minimumRatio*srcPixels.size)
+			return false;
+		if (matches.size < minimumRatio*dstPixels.size)
+			return false;
+		return true;
 	}
 }

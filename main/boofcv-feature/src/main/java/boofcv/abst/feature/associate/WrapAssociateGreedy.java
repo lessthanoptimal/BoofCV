@@ -48,9 +48,6 @@ public class WrapAssociateGreedy<T> implements AssociateDescription<T> {
 	// creates a list of unassociated features from the list of matches
 	FindUnassociated unassociated = new FindUnassociated();
 
-	/**
-	 *
-	 */
 	public WrapAssociateGreedy( AssociateGreedyDescBase<T> alg ) {
 		this.alg = alg;
 	}
@@ -121,5 +118,9 @@ public class WrapAssociateGreedy<T> implements AssociateDescription<T> {
 	@Override
 	public boolean uniqueDestination() {
 		return alg.isBackwardsValidation();
+	}
+
+	@Override public Class<T> getDescriptionType() {
+		return alg.getScore().getDescriptorType();
 	}
 }

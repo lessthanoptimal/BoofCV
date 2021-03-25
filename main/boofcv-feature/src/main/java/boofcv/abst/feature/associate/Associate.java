@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -43,7 +43,7 @@ import org.ddogleg.struct.FastAccess;
  *
  * @author Peter Abeles
  */
-public interface Associate {
+public interface Associate<Desc> {
 
 	/**
 	 * Finds the best match for each item in the source list with an item in the destination list.
@@ -105,4 +105,7 @@ public interface Associate {
 	 * @return true for unique destination association
 	 */
 	boolean uniqueDestination();
+
+	/** Returns the type of object it can associate */
+	Class<Desc> getDescriptionType();
 }

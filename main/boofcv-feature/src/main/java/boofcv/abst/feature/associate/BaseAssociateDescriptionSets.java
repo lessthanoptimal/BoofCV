@@ -27,11 +27,9 @@ public abstract class BaseAssociateDescriptionSets<Desc> extends BaseAssociateSe
 
 	/**
 	 * Specifies the type of descriptor
-	 *
-	 * @param type Type of descriptor
 	 */
-	protected BaseAssociateDescriptionSets( Associate associator, Class<Desc> type ) {
-		super(associator, type);
+	protected BaseAssociateDescriptionSets( Associate<Desc> associator ) {
+		super(associator);
 	}
 
 	/**

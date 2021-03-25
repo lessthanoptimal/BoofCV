@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -41,8 +41,10 @@ class TestAssociateNearestNeighbor_MT extends BoofStandardJUnit {
 
 		NearestNeighbor<TupleDesc_F64> exhaustive = FactoryNearestNeighbor.exhaustive(new KdTreeTuple_F64(1));
 
-		AssociateNearestNeighbor<TupleDesc_F64> sequentialAlg = new AssociateNearestNeighbor_ST<>( exhaustive);
-		AssociateNearestNeighbor<TupleDesc_F64> parallelAlg = new AssociateNearestNeighbor_MT<>( exhaustive);
+		AssociateNearestNeighbor<TupleDesc_F64> sequentialAlg =
+				new AssociateNearestNeighbor_ST<>(exhaustive, TupleDesc_F64.class);
+		AssociateNearestNeighbor<TupleDesc_F64> parallelAlg =
+				new AssociateNearestNeighbor_MT<>(exhaustive, TupleDesc_F64.class);
 
 		sequentialAlg.setSource(dataSrc); sequentialAlg.setDestination(dataDst);
 		parallelAlg.setSource(dataSrc); parallelAlg.setDestination(dataDst);

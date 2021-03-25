@@ -39,4 +39,8 @@ public class ScoreAssociateHamming_B implements ScoreAssociation<TupleDesc_B> {
 	public MatchScoreType getScoreType() {
 		return MatchScoreType.NORM_ERROR;
 	}
+
+	@Override public Class<TupleDesc_B> getDescriptorType() {
+		return TupleDesc_B.class;
+	}
 }

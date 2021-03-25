@@ -18,10 +18,7 @@
 
 package boofcv.alg.descriptor;
 
-import boofcv.abst.feature.associate.AssociateDescription;
-import boofcv.abst.feature.associate.AssociateDescription2D;
-import boofcv.abst.feature.associate.AssociateDescriptionArraySets;
-import boofcv.abst.feature.associate.AssociateDescriptionSets2D;
+import boofcv.abst.feature.associate.*;
 import boofcv.struct.feature.TupleDesc_F64;
 import boofcv.testing.BoofStandardJUnit;
 import georegression.struct.point.Point2D_F64;
@@ -39,8 +36,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
  */
 class TestUtilFeature extends BoofStandardJUnit {
 
-	@Test
-	void combine() {
+	@Test void combine() {
 		TupleDesc_F64 feature0 = new TupleDesc_F64(64);
 		TupleDesc_F64 feature1 = new TupleDesc_F64(32);
 
@@ -57,8 +53,7 @@ class TestUtilFeature extends BoofStandardJUnit {
 		assertEquals(13, combined.getDouble(67), 1e-8);
 	}
 
-	@Test
-	void normalizeL2_F64() {
+	@Test void normalizeL2_F64() {
 		TupleDesc_F64 feature = new TupleDesc_F64(64);
 		feature.data[5] = 2;
 		feature.data[10] = 4;
@@ -70,16 +65,14 @@ class TestUtilFeature extends BoofStandardJUnit {
 	/**
 	 * The descriptor is all zeros.  See if it handles this special case.
 	 */
-	@Test
-	void normalizeL2_zeros_F64() {
+	@Test void normalizeL2_zeros_F64() {
 		TupleDesc_F64 feature = new TupleDesc_F64(64);
 		UtilFeature.normalizeL2(feature);
 		for (int i = 0; i < feature.data.length; i++)
 			assertEquals(0, feature.data[i], 1e-4);
 	}
 
-	@Test
-	void normalizeSumOne_F64() {
+	@Test void normalizeSumOne_F64() {
 		TupleDesc_F64 feature = new TupleDesc_F64(64);
 		feature.data[5] = 2;
 		feature.data[10] = 4;
@@ -95,8 +88,7 @@ class TestUtilFeature extends BoofStandardJUnit {
 	/**
 	 * The descriptor is all zeros.  See if it handles this special case.
 	 */
-	@Test
-	void normalizeSumOne_zeros_F64() {
+	@Test void normalizeSumOne_zeros_F64() {
 		TupleDesc_F64 feature = new TupleDesc_F64(64);
 		UtilFeature.normalizeSumOne(feature);
 		for (int i = 0; i < feature.data.length; i++)
@@ -106,9 +98,8 @@ class TestUtilFeature extends BoofStandardJUnit {
 	/**
 	 * Simple test to see if it broke the features up when adding them to the associator
 	 */
-	@Test
-	void setSource() {
-		var associate = new PAssociateDescriptionSets<>(null, TupleDesc_F64.class);
+	@Test void setSource() {
+		var associate = new PAssociateDescriptionSets<>(new MockAssociateDescription());
 
 		var descriptors = new DogArray<>(() -> new TupleDesc_F64(1));
 		var sets = new DogArray_I32();
@@ -133,9 +124,8 @@ class TestUtilFeature extends BoofStandardJUnit {
 		}
 	}
 
-	@Test
-	void setDestination() {
-		var associate = new PAssociateDescriptionSets<>(null, TupleDesc_F64.class);
+	@Test void setDestination() {
+		var associate = new PAssociateDescriptionSets<>(new MockAssociateDescription());
 
 		var descriptors = new DogArray<>(() -> new TupleDesc_F64(1));
 		var sets = new DogArray_I32();
@@ -160,9 +150,8 @@ class TestUtilFeature extends BoofStandardJUnit {
 		}
 	}
 
-	@Test
-	void setSource_2D() {
-		var associate = new PAssociateDescriptionSets2D<>(null, TupleDesc_F64.class);
+	@Test void setSource_2D() {
+		var associate = new PAssociateDescriptionSets2D<>(new MockAssociateDescriptionSets2D());
 
 		var descriptors = new DogArray<>(() -> new TupleDesc_F64(1));
 		var locs = new DogArray<>(Point2D_F64::new);
@@ -189,9 +178,8 @@ class TestUtilFeature extends BoofStandardJUnit {
 		}
 	}
 
-	@Test
-	void setDestination_2D() {
-		var associate = new PAssociateDescriptionSets2D<>(null, TupleDesc_F64.class);
+	@Test void setDestination_2D() {
+		var associate = new PAssociateDescriptionSets2D<>(new MockAssociateDescriptionSets2D());
 
 		var descriptors = new DogArray<>(() -> new TupleDesc_F64(1));
 		var locs = new DogArray<>(Point2D_F64::new);
@@ -219,30 +207,38 @@ class TestUtilFeature extends BoofStandardJUnit {
 	}
 
 	static class PAssociateDescriptionSets<Desc> extends AssociateDescriptionArraySets<Desc> {
-		public PAssociateDescriptionSets(AssociateDescription<Desc> associator, Class<Desc> type) {
-			super(associator, type);
+		public PAssociateDescriptionSets( AssociateDescription<Desc> associator ) {
+			super(associator);
 		}
 
-		public int getCountSrc(int set) {
+		public int getCountSrc( int set ) {
 			return sets.get(set).src.size;
 		}
 
-		public int getCountDst(int set) {
+		public int getCountDst( int set ) {
 			return sets.get(set).dst.size;
 		}
 	}
 
 	static class PAssociateDescriptionSets2D<Desc> extends AssociateDescriptionSets2D<Desc> {
-		public PAssociateDescriptionSets2D(AssociateDescription2D<Desc> associator, Class<Desc> type) {
-			super(associator, type);
+		public PAssociateDescriptionSets2D( AssociateDescription2D<Desc> associator ) {
+			super(associator);
 		}
 
-		public int getCountSrc(int set) {
+		public int getCountSrc( int set ) {
 			return sets.get(set).src.size;
 		}
 
-		public int getCountDst(int set) {
+		public int getCountDst( int set ) {
 			return sets.get(set).dst.size;
 		}
+	}
+
+	static class MockAssociateDescription extends AssociateDescriptionDefault<TupleDesc_F64> {
+		@Override public Class<TupleDesc_F64> getDescriptionType() {return TupleDesc_F64.class;}
+	}
+
+	static class MockAssociateDescriptionSets2D extends AssociateDescription2DDefault<TupleDesc_F64> {
+		@Override public Class<TupleDesc_F64> getDescriptionType() {return TupleDesc_F64.class;}
 	}
 }

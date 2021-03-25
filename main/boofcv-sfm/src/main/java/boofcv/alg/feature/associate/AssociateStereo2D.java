@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -35,7 +35,7 @@ import org.ddogleg.struct.FastAccess;
  *
  * @author Peter Abeles
  */
-public class AssociateStereo2D<Desc extends TupleDesc>
+public class AssociateStereo2D<Desc extends TupleDesc<Desc>>
 		extends StereoConsistencyCheck
 		implements AssociateDescription2D<Desc> {
 	// computes match score between two descriptions
@@ -57,7 +57,7 @@ public class AssociateStereo2D<Desc extends TupleDesc>
 	private FastAccess<Desc> descriptionsLeft;
 	private FastAccess<Desc> descriptionsRight;
 
-	public AssociateStereo2D( ScoreAssociation<Desc> scorer, double locationTolerance, Class<Desc> descType ) {
+	public AssociateStereo2D( ScoreAssociation<Desc> scorer, double locationTolerance) {
 		super(locationTolerance, locationTolerance);
 		this.scorer = scorer;
 	}
@@ -91,6 +91,10 @@ public class AssociateStereo2D<Desc extends TupleDesc>
 			rightImageToRect.compute(orig.x, orig.y, rectified);
 		}
 		this.descriptionsRight = descriptions;
+	}
+
+	@Override public Class<Desc> getDescriptionType() {
+		return scorer.getDescriptorType();
 	}
 
 	@Override

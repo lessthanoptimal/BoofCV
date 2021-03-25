@@ -120,7 +120,7 @@ public class HybridTrackerScalePoint
 		detectedDesc = new FastArray<>(detector.getDescriptionType());
 		knownDesc = new FastArray<>(detector.getDescriptionType());
 
-		this.associate = new AssociateDescriptionSets2D<>(associate, detector.getDescriptionType());
+		this.associate = new AssociateDescriptionSets2D<>(associate);
 		this.associate.initializeSets(detector.getNumberOfSets());
 
 		this.tracksAll = new DogArray<>(this::createNewTrack);

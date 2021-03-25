@@ -41,4 +41,8 @@ public class ScoreAssociateNccFeature implements ScoreAssociation<NccFeature> {
 	public MatchScoreType getScoreType() {
 		return MatchScoreType.CORRELATION;
 	}
+
+	@Override public Class<NccFeature> getDescriptorType() {
+		return NccFeature.class;
+	}
 }

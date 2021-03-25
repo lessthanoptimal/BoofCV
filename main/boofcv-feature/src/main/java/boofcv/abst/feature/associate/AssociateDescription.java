@@ -18,7 +18,6 @@
 
 package boofcv.abst.feature.associate;
 
-import org.ddogleg.struct.DogArray;
 import org.ddogleg.struct.FastAccess;
 
 /**
@@ -30,7 +29,7 @@ import org.ddogleg.struct.FastAccess;
  * </p>
  *
  * <p>
- * DESIGN NOTE: {@link DogArray} is used instead of {@link java.util.List} because in the association
+ * DESIGN NOTE: {@link FastAccess} is used instead of {@link java.util.List} because in the association
  * micro benchmark it produced results that were about 20% faster consistently.  Which is surprising since
  * one would think descriptor comparisons would dominate.
  * </p>
@@ -38,7 +37,7 @@ import org.ddogleg.struct.FastAccess;
  * @param <Desc> Feature description type.
  * @author Peter Abeles
  */
-public interface AssociateDescription<Desc> extends Associate {
+public interface AssociateDescription<Desc> extends Associate<Desc> {
 
 	/**
 	 * Sets the list of source features.

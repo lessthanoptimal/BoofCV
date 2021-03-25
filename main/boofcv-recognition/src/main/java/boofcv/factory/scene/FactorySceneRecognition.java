@@ -18,6 +18,7 @@
 
 package boofcv.factory.scene;
 
+import boofcv.abst.feature.associate.AssociateDescriptionHashSets;
 import boofcv.abst.feature.detdesc.DetectDescribePoint;
 import boofcv.abst.scene.ConfigFeatureToSceneRecognition;
 import boofcv.abst.scene.FeatureSceneRecognition;
@@ -25,7 +26,11 @@ import boofcv.abst.scene.SceneRecognition;
 import boofcv.abst.scene.WrapFeatureToSceneRecognition;
 import boofcv.abst.scene.nister2006.ConfigRecognitionNister2006;
 import boofcv.abst.scene.nister2006.FeatureSceneRecognitionNister2006;
+import boofcv.alg.scene.ConfigSceneRecognitionSimilarImages;
+import boofcv.alg.scene.SceneRecognitionSimilarImages;
+import boofcv.factory.feature.associate.FactoryAssociation;
 import boofcv.factory.feature.detdesc.FactoryDetectDescribe;
+import boofcv.factory.struct.FactoryTupleDesc;
 import boofcv.misc.BoofLambdas;
 import boofcv.misc.FactoryFilterLambdas;
 import boofcv.struct.feature.TupleDesc;
@@ -73,5 +78,26 @@ public class FactorySceneRecognition {
 		}
 
 		return new FeatureSceneRecognitionNister2006<>(config, factory);
+	}
+
+	public static <Image extends ImageBase<Image>, TD extends TupleDesc<TD>>
+	SceneRecognitionSimilarImages<Image, TD> createSimilarImages( @Nullable ConfigSceneRecognitionSimilarImages config,
+																  ImageType<Image> imageType ) {
+		if (config == null)
+			config = new ConfigSceneRecognitionSimilarImages();
+
+		DetectDescribePoint<Image, TD> detector =
+				FactoryDetectDescribe.generic(config.features, imageType.getImageClass());
+
+		FeatureSceneRecognition<TD> recognitizer =
+				createSceneNister2006(config.recognizeNister2006, detector::createDescription);
+
+		AssociateDescriptionHashSets<TD> associator = new AssociateDescriptionHashSets<>(
+				FactoryAssociation.generic(config.associate, detector));
+		;
+		var similar = new SceneRecognitionSimilarImages<Image, TD>(detector,associator,recognitizer,
+				()->FactoryTupleDesc.createPacked(detector));
+
+		return similar;
 	}
 }

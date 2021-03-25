@@ -34,6 +34,7 @@ public class AbstractAssociateDescription2D<Desc> implements AssociateDescriptio
 	@Override public void initialize(int imageWidth, int imageHeight) {}
 	@Override public void setSource(FastAccess<Point2D_F64> location, FastAccess<Desc> descriptions) {}
 	@Override public void setDestination(FastAccess<Point2D_F64> location, FastAccess<Desc> descriptions) {}
+	@Override public Class<Desc> getDescriptionType() {return null;}
 	@Override public void associate() {}
 	@Override public FastAccess<AssociatedIndex> getMatches() {return null;}
 	@Override public DogArray_I32 getUnassociatedSource() {return null;}

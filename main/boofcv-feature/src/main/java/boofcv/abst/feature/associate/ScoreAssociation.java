@@ -40,12 +40,15 @@ public interface ScoreAssociation<Desc> {
 	 * @param b second feature
 	 * @return Quality of fit score.  Lower is better.
 	 */
-	public double score( Desc a, Desc b );
+	double score( Desc a, Desc b );
 
 	/**
 	 * Specifies the type of score which is returned.
 	 *
 	 * @return Type of association score.
 	 */
-	public MatchScoreType getScoreType();
+	MatchScoreType getScoreType();
+
+	/** The type of description it can score */
+	Class<Desc> getDescriptorType();
 }

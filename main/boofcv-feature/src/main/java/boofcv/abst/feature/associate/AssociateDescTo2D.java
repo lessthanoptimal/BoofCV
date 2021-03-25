@@ -63,5 +63,6 @@ public class AssociateDescTo2D<D> implements AssociateDescription2D<D> {
 	@Override public MatchScoreType getScoreType() {return alg.getScoreType();}
 	@Override public boolean uniqueSource() {return alg.uniqueSource();}
 	@Override public boolean uniqueDestination() {return alg.uniqueDestination();}
+	@Override public Class<D> getDescriptionType() {return alg.getDescriptionType();}
 	// @formatter:on
 }

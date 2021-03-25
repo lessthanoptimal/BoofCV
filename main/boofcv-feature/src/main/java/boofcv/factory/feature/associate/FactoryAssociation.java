@@ -208,9 +208,9 @@ public class FactoryAssociation {
 
 		AssociateNearestNeighbor<TupleDesc_F64> assoc;
 		if (BoofConcurrency.USE_CONCURRENT) {
-			assoc = new AssociateNearestNeighbor_MT<>(nn);
+			assoc = new AssociateNearestNeighbor_MT<>(nn, TupleDesc_F64.class);
 		} else {
-			assoc = new AssociateNearestNeighbor_ST<>(nn);
+			assoc = new AssociateNearestNeighbor_ST<>(nn, TupleDesc_F64.class);
 		}
 		assoc.setRatioUsesSqrt(config.distanceIsSquared);
 		assoc.setMaxScoreThreshold(config.maxErrorThreshold);

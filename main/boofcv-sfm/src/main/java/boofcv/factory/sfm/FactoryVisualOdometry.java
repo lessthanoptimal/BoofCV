@@ -378,7 +378,7 @@ public class FactoryVisualOdometry {
 				generic(hack.stereoDescribe, ImageType.single(imageType));
 		Class<Desc> descType = descriptor.getDescriptionType();
 		ScoreAssociation<Desc> scorer = FactoryAssociation.defaultScore(descType);
-		AssociateStereo2D<Desc> associateL2R = new AssociateStereo2D<>(scorer, hack.epipolarTol, descType);
+		AssociateStereo2D<Desc> associateL2R = new AssociateStereo2D<>(scorer, hack.epipolarTol);
 
 		// need to make sure associations are unique
 		AssociateDescription2D<Desc> associateUnique = FactoryAssociation.ensureUnique(associateL2R);
@@ -435,7 +435,7 @@ public class FactoryVisualOdometry {
 
 		// need to make sure associations are unique
 		ScoreAssociation<Desc> scorer = FactoryAssociation.defaultScore(descType);
-		AssociateStereo2D<Desc> associateL2R = new AssociateStereo2D<>(scorer, config.epipolarTol, descType);
+		AssociateStereo2D<Desc> associateL2R = new AssociateStereo2D<>(scorer, config.epipolarTol);
 		associateL2R.setMaxScoreThreshold(config.associateL2R.maxErrorThreshold);
 
 		AssociateDescription2D<Desc> associateF2F = FactoryAssociation.generic2(config.associateF2F, detector);

@@ -35,11 +35,13 @@ public interface ScoreAssociateEuclideanSq<Desc> extends ScoreAssociation<Desc> 
 	class F32 implements ScoreAssociateEuclideanSq<TupleDesc_F32> {
 		@Override public double score(TupleDesc_F32 a, TupleDesc_F32 b) { return DescriptorDistance.euclideanSq(a, b); }
 		@Override public MatchScoreType getScoreType()                  { return MatchScoreType.NORM_ERROR; }
+		@Override public Class<TupleDesc_F32> getDescriptorType()       { return TupleDesc_F32.class; }
 	}
 
 	class F64 implements ScoreAssociateEuclideanSq<TupleDesc_F64> {
 		@Override public double score(TupleDesc_F64 a, TupleDesc_F64 b) { return DescriptorDistance.euclideanSq(a, b); }
 		@Override public MatchScoreType getScoreType()                  { return MatchScoreType.NORM_ERROR; }
+		@Override public Class<TupleDesc_F64> getDescriptorType()       { return TupleDesc_F64.class; }
 	}
 	// @formatter:on
 }

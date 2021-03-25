@@ -31,8 +31,8 @@ import org.ddogleg.struct.DogArray;
 public class AssociateDescriptionSets2D<Desc> extends BaseAssociateSets<Desc> {
 	AssociateDescription2D<Desc> associator;
 
-	public AssociateDescriptionSets2D( AssociateDescription2D<Desc> associator, Class<Desc> type ) {
-		super(associator, type);
+	public AssociateDescriptionSets2D( AssociateDescription2D<Desc> associator ) {
+		super(associator);
 		this.associator = associator;
 	}
 

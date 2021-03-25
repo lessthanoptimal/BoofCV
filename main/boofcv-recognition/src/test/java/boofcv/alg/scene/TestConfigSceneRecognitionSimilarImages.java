@@ -16,17 +16,8 @@
  * limitations under the License.
  */
 
-package boofcv.abst.feature.associate;
+package boofcv.alg.scene;
 
-import boofcv.factory.feature.associate.FactoryAssociation;
-import boofcv.struct.feature.TupleDesc_F64;
+import boofcv.struct.StandardConfigurationChecks;
 
-/**
- * @author Peter Abeles
- */
-class TestAssociateDescriptionSets extends GenericAssociateDescriptionSetsChecks {
-	@Override protected BaseAssociateDescriptionSets<TupleDesc_F64> createAlg() {
-		return new AssociateDescriptionArraySets<>(FactoryAssociation.greedy(
-				null,new ScoreAssociateEuclideanSq.F64()));
-	}
-}
+public class TestConfigSceneRecognitionSimilarImages extends StandardConfigurationChecks {}

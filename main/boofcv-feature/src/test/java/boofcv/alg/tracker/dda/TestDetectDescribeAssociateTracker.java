@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -110,6 +110,7 @@ class TestDetectDescribeAssociateTracker extends BoofStandardJUnit {
 
 		@Override public boolean uniqueSource() {return true;}
 		@Override public boolean uniqueDestination() {return true;}
+		@Override public Class<TupleDesc_F64> getDescriptionType() {return TupleDesc_F64.class;};
 	}
 
 	private static class DummyDetector extends DetectDescribePointAbstract<GrayF32,TupleDesc_F64> {

@@ -30,12 +30,10 @@ import org.ddogleg.struct.FastArray;
  *
  * @author Peter Abeles
  */
-public abstract class BaseAssociateSets<Desc> implements Associate {
+public abstract class BaseAssociateSets<Desc> implements Associate<Desc> {
 
-	Associate _associator;
+	Associate<Desc> _associator;
 
-	// Type of descriptor
-	protected final Class<Desc> type;
 
 	// Stores sorted descriptors by sets
 	protected final DogArray<SetStruct> sets;
@@ -50,12 +48,9 @@ public abstract class BaseAssociateSets<Desc> implements Associate {
 
 	/**
 	 * Specifies the type of descriptor
-	 *
-	 * @param type Type of descriptor
 	 */
-	protected BaseAssociateSets( Associate associator, Class<Desc> type ) {
+	protected BaseAssociateSets( Associate<Desc> associator ) {
 		this._associator = associator;
-		this.type = type;
 
 		// Declare this now since type information is now known
 		this.matches = new DogArray<>(AssociatedIndex::new);
@@ -136,13 +131,15 @@ public abstract class BaseAssociateSets<Desc> implements Associate {
 
 	@Override public boolean uniqueDestination() {return _associator.uniqueDestination();}
 
+	@Override public Class<Desc> getDescriptionType() {return _associator.getDescriptionType();}
+
 	/**
 	 * Stores data specific to a feature set
 	 */
 	protected class SetStruct {
 		// Descriptors inside this set
-		public FastArray<Desc> src = new FastArray<>(type);
-		public FastArray<Desc> dst = new FastArray<>(type);
+		public FastArray<Desc> src = new FastArray<>(_associator.getDescriptionType());
+		public FastArray<Desc> dst = new FastArray<>(_associator.getDescriptionType());
 
 		// index of the descriptors in the input list
 		public DogArray_I32 indexSrc = new DogArray_I32();

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -68,6 +68,7 @@ public abstract class StandardAssociateDescription2DChecks<Desc> extends Standar
 
 		}
 
+		// @formatter:off
 		@Override public void associate() { alg.associate(); }
 		@Override public FastAccess<AssociatedIndex> getMatches() { return alg.getMatches(); }
 		@Override public DogArray_I32 getUnassociatedSource() { return alg.getUnassociatedSource(); }
@@ -76,5 +77,7 @@ public abstract class StandardAssociateDescription2DChecks<Desc> extends Standar
 		@Override public MatchScoreType getScoreType() { return alg.getScoreType(); }
 		@Override public boolean uniqueSource() { return alg.uniqueSource(); }
 		@Override public boolean uniqueDestination() { return alg.uniqueDestination(); }
+		@Override public Class<Desc> getDescriptionType() { return alg.getDescriptionType(); }
+		// @formatter:on
 	}
 }
