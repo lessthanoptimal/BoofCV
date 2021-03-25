@@ -91,7 +91,7 @@ public class AssociateDescriptionHashSets<Desc> extends BaseAssociateDescription
 		final SetStruct ss;
 		int setIndex = setToIndex.get(set);
 		if (setIndex==-1) {
-			setToIndex.put(sets.size, set);
+			setToIndex.put(set, sets.size);
 			ss = sets.grow();
 		} else {
 			ss = sets.get(setIndex);

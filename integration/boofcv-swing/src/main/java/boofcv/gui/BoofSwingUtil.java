@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -295,7 +295,7 @@ public class BoofSwingUtil {
 		// If the previous is a selected directory then show the parent containing that directory
 		// If it's a file then show the file containing the directory
 		File currentDirectory = previousPath.isDirectory() ? previousPath.getParentFile() : previousPath;
-		if (currentDirectory.exists()) {
+		if (currentDirectory != null && currentDirectory.exists()) {
 			chooser.setCurrentDirectory(currentDirectory);
 			chooser.setSelectedFile(previousPath);
 		}
