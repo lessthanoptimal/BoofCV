@@ -16,7 +16,7 @@
  * limitations under the License.
  */
 
-package boofcv.struct.feature;
+package boofcv.struct.packed;
 
 import boofcv.struct.PackedArray;
 import boofcv.testing.BoofStandardJUnit;

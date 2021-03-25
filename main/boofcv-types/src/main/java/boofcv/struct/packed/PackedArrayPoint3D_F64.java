@@ -16,27 +16,27 @@
  * limitations under the License.
  */
 
-package boofcv.struct.geo;
+package boofcv.struct.packed;
 
 import boofcv.struct.PackedArray;
-import georegression.struct.point.Point2D_F64;
+import georegression.struct.point.Point3D_F64;
 import org.ddogleg.struct.DogArray_F64;
 
 /**
- * Packed array of {@link Point2D_F64}. Internally the point is stored in an interleaved format.
+ * Packed array of {@link Point3D_F64}. Internally the point is stored in an interleaved format.
  *
  * @author Peter Abeles
  */
-public class PackedArrayPoint2D_F64 implements PackedArray<Point2D_F64> {
+public class PackedArrayPoint3D_F64 implements PackedArray<Point3D_F64> {
 	// Stores tuple in a single continuous array
 	public final DogArray_F64 array;
 	// tuple that the result is temporarily written to
-	public final Point2D_F64 temp = new Point2D_F64();
+	public final Point3D_F64 temp = new Point3D_F64();
 
 	// Number of tuples stored in the array
 	protected int numElements;
 
-	public PackedArrayPoint2D_F64() {
+	public PackedArrayPoint3D_F64() {
 		array = new DogArray_F64();
 		array.resize(0);
 	}
@@ -50,26 +50,31 @@ public class PackedArrayPoint2D_F64 implements PackedArray<Point2D_F64> {
 		array.reserve(numTuples*2);
 	}
 
-	@Override public void append( Point2D_F64 element ) {
+	@Override public void append( Point3D_F64 element ) {
 		array.add(element.x);
 		array.add(element.y);
+		array.add(element.z);
 
 		numElements++;
 	}
 
-	@Override public Point2D_F64 getTemp( int index ) {
-		temp.x = array.data[index*2];
-		temp.y = array.data[index*2+1];
+	@Override public Point3D_F64 getTemp( int index ) {
+		index *= 3;
+		temp.x = array.data[index];
+		temp.y = array.data[index+1];
+		temp.z = array.data[index+2];
 
 		return temp;
 	}
 
-	@Override public void getCopy( int index, Point2D_F64 dst ) {
-		dst.x = array.data[index*2];
-		dst.y = array.data[index*2+1];
+	@Override public void getCopy( int index, Point3D_F64 dst ) {
+		index *= 3;
+		dst.x = array.data[index];
+		dst.y = array.data[index+1];
+		dst.z = array.data[index+2];
 	}
 
-	@Override public void copy( Point2D_F64 src, Point2D_F64 dst ) {
+	@Override public void copy( Point3D_F64 src, Point3D_F64 dst ) {
 		dst.setTo(src);
 	}
 
@@ -77,7 +82,7 @@ public class PackedArrayPoint2D_F64 implements PackedArray<Point2D_F64> {
 		return numElements;
 	}
 
-	@Override public Class<Point2D_F64> getElementType() {
-		return Point2D_F64.class;
+	@Override public Class<Point3D_F64> getElementType() {
+		return Point3D_F64.class;
 	}
 }
