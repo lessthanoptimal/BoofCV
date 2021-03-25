@@ -12,7 +12,7 @@ dependencies {
 task demonstrationsJar(type: Jar) {
 	manifest {
 		attributes 'Implementation-Title': 'BoofCV Demonstrations Jar',
-				'Implementation-Version': version,
+				'Implementation-Version': project.version,
 				'Main-Class': 'boofcv.DemonstrationLauncherApp'
 	}
 
@@ -26,6 +26,6 @@ task demonstrationsJar(type: Jar) {
 	}
 
 	doLast {
-		archivePath.renameTo(file('demonstrations.jar'))
+		archiveFile.renameTo(file('demonstrations.jar'))
 	}
 }

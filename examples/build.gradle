@@ -14,7 +14,7 @@ dependencies {
 task examplesJar(type: Jar) {
 	manifest {
 		attributes 'Implementation-Title': 'BoofCV Examples Jar',
-				'Implementation-Version': version,
+				'Implementation-Version': project.version,
 				'Main-Class': 'boofcv.examples.ExampleLauncherApp'
 	}
 
@@ -28,6 +28,6 @@ task examplesJar(type: Jar) {
 	}
 
 	doLast {
-		archivePath.renameTo(file('examples.jar'))
+		archiveFile.renameTo(file('examples.jar'))
 	}
 }

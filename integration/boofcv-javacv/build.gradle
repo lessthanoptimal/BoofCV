@@ -18,10 +18,4 @@ dependencies {
 	}
 }
 
-sourceSets {
-	test {
-		java {
-			srcDir 'src/main/examples'
-		}
-	}
-}
+sourceSets { test { java { srcDir 'src/main/examples' } } }

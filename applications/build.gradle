@@ -23,7 +23,7 @@ idea {
 task applicationsJar(type: Jar) {
 	manifest {
 		attributes 'Implementation-Title': 'BoofCV Applications Jar',
-				'Implementation-Version': version,
+				'Implementation-Version': project.version,
 				'Main-Class': 'boofcv.app.Help'
 	}
 
@@ -38,6 +38,6 @@ task applicationsJar(type: Jar) {
 
 
 	doLast {
-		archivePath.renameTo(file('applications.jar'))
+		archiveFile.renameTo(file('applications.jar'))
 	}
 }
