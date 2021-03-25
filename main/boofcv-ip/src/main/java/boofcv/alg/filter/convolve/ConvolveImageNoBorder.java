@@ -54,8 +54,7 @@ import javax.annotation.Generated;
 @SuppressWarnings({"ForLoopReplaceableByForEach", "rawtypes"})
 public class ConvolveImageNoBorder {
 
-	public static void horizontal(Kernel1D_F32 kernel,
-								  GrayF32 input, GrayF32 output) {
+	public static void horizontal( Kernel1D_F32 kernel, GrayF32 input, GrayF32 output ) {
 		InputSanityCheck.checkSameShape(input, output);
 
 		if (BoofConcurrency.USE_CONCURRENT) {
@@ -67,8 +66,7 @@ public class ConvolveImageNoBorder {
 		}
 	}
 
-	public static void vertical(Kernel1D_F32 kernel,
-								  GrayF32 input, GrayF32 output) {
+	public static void vertical( Kernel1D_F32 kernel, GrayF32 input, GrayF32 output ) {
 		InputSanityCheck.checkSameShape(input, output);
 
 		if (BoofConcurrency.USE_CONCURRENT) {
@@ -80,8 +78,7 @@ public class ConvolveImageNoBorder {
 		}
 	}
 
-	public static void convolve(Kernel2D_F32 kernel,
-								  GrayF32 input, GrayF32 output) {
+	public static void convolve( Kernel2D_F32 kernel, GrayF32 input, GrayF32 output ) {
 		InputSanityCheck.checkSameShape(input, output);
 
 		if (BoofConcurrency.USE_CONCURRENT) {
@@ -93,8 +90,7 @@ public class ConvolveImageNoBorder {
 		}
 	}
 
-	public static void horizontal(Kernel1D_F32 kernel,
-								  InterleavedF32 input, InterleavedF32 output) {
+	public static void horizontal( Kernel1D_F32 kernel, InterleavedF32 input, InterleavedF32 output ) {
 		InputSanityCheck.checkSameShape(input, output);
 
 		if (BoofConcurrency.USE_CONCURRENT) {
@@ -104,8 +100,7 @@ public class ConvolveImageNoBorder {
 		}
 	}
 
-	public static void vertical(Kernel1D_F32 kernel,
-								  InterleavedF32 input, InterleavedF32 output) {
+	public static void vertical( Kernel1D_F32 kernel, InterleavedF32 input, InterleavedF32 output ) {
 		InputSanityCheck.checkSameShape(input, output);
 
 		if (BoofConcurrency.USE_CONCURRENT) {
@@ -115,8 +110,7 @@ public class ConvolveImageNoBorder {
 		}
 	}
 
-	public static void convolve(Kernel2D_F32 kernel,
-								  InterleavedF32 input, InterleavedF32 output) {
+	public static void convolve( Kernel2D_F32 kernel, InterleavedF32 input, InterleavedF32 output ) {
 		InputSanityCheck.checkSameShape(input, output);
 
 		if (BoofConcurrency.USE_CONCURRENT) {
@@ -126,8 +120,7 @@ public class ConvolveImageNoBorder {
 		}
 	}
 
-	public static void horizontal(Kernel1D_F64 kernel,
-								  GrayF64 input, GrayF64 output) {
+	public static void horizontal( Kernel1D_F64 kernel, GrayF64 input, GrayF64 output ) {
 		InputSanityCheck.checkSameShape(input, output);
 
 		if (BoofConcurrency.USE_CONCURRENT) {
@@ -139,8 +132,7 @@ public class ConvolveImageNoBorder {
 		}
 	}
 
-	public static void vertical(Kernel1D_F64 kernel,
-								  GrayF64 input, GrayF64 output) {
+	public static void vertical( Kernel1D_F64 kernel, GrayF64 input, GrayF64 output ) {
 		InputSanityCheck.checkSameShape(input, output);
 
 		if (BoofConcurrency.USE_CONCURRENT) {
@@ -152,8 +144,7 @@ public class ConvolveImageNoBorder {
 		}
 	}
 
-	public static void convolve(Kernel2D_F64 kernel,
-								  GrayF64 input, GrayF64 output) {
+	public static void convolve( Kernel2D_F64 kernel, GrayF64 input, GrayF64 output ) {
 		InputSanityCheck.checkSameShape(input, output);
 
 		if (BoofConcurrency.USE_CONCURRENT) {
@@ -165,8 +156,7 @@ public class ConvolveImageNoBorder {
 		}
 	}
 
-	public static void horizontal(Kernel1D_F64 kernel,
-								  InterleavedF64 input, InterleavedF64 output) {
+	public static void horizontal( Kernel1D_F64 kernel, InterleavedF64 input, InterleavedF64 output ) {
 		InputSanityCheck.checkSameShape(input, output);
 
 		if (BoofConcurrency.USE_CONCURRENT) {
@@ -176,8 +166,7 @@ public class ConvolveImageNoBorder {
 		}
 	}
 
-	public static void vertical(Kernel1D_F64 kernel,
-								  InterleavedF64 input, InterleavedF64 output) {
+	public static void vertical( Kernel1D_F64 kernel, InterleavedF64 input, InterleavedF64 output ) {
 		InputSanityCheck.checkSameShape(input, output);
 
 		if (BoofConcurrency.USE_CONCURRENT) {
@@ -187,8 +176,7 @@ public class ConvolveImageNoBorder {
 		}
 	}
 
-	public static void convolve(Kernel2D_F64 kernel,
-								  InterleavedF64 input, InterleavedF64 output) {
+	public static void convolve( Kernel2D_F64 kernel, InterleavedF64 input, InterleavedF64 output ) {
 		InputSanityCheck.checkSameShape(input, output);
 
 		if (BoofConcurrency.USE_CONCURRENT) {
@@ -198,8 +186,7 @@ public class ConvolveImageNoBorder {
 		}
 	}
 
-	public static void horizontal(Kernel1D_S32 kernel,
-								  GrayU8 input, GrayI16 output) {
+	public static void horizontal( Kernel1D_S32 kernel, GrayU8 input, GrayI16 output ) {
 		InputSanityCheck.checkSameShape(input, output);
 
 		if (BoofConcurrency.USE_CONCURRENT) {
@@ -211,8 +198,7 @@ public class ConvolveImageNoBorder {
 		}
 	}
 
-	public static void vertical(Kernel1D_S32 kernel,
-								  GrayU8 input, GrayI16 output) {
+	public static void vertical( Kernel1D_S32 kernel, GrayU8 input, GrayI16 output ) {
 		InputSanityCheck.checkSameShape(input, output);
 
 		if (BoofConcurrency.USE_CONCURRENT) {
@@ -224,8 +210,7 @@ public class ConvolveImageNoBorder {
 		}
 	}
 
-	public static void convolve(Kernel2D_S32 kernel,
-								  GrayU8 input, GrayI16 output) {
+	public static void convolve( Kernel2D_S32 kernel, GrayU8 input, GrayI16 output ) {
 		InputSanityCheck.checkSameShape(input, output);
 
 		if (BoofConcurrency.USE_CONCURRENT) {
@@ -237,8 +222,7 @@ public class ConvolveImageNoBorder {
 		}
 	}
 
-	public static void horizontal(Kernel1D_S32 kernel,
-								  InterleavedU8 input, InterleavedI16 output) {
+	public static void horizontal( Kernel1D_S32 kernel, InterleavedU8 input, InterleavedI16 output ) {
 		InputSanityCheck.checkSameShape(input, output);
 
 		if (BoofConcurrency.USE_CONCURRENT) {
@@ -248,8 +232,7 @@ public class ConvolveImageNoBorder {
 		}
 	}
 
-	public static void vertical(Kernel1D_S32 kernel,
-								  InterleavedU8 input, InterleavedI16 output) {
+	public static void vertical( Kernel1D_S32 kernel, InterleavedU8 input, InterleavedI16 output ) {
 		InputSanityCheck.checkSameShape(input, output);
 
 		if (BoofConcurrency.USE_CONCURRENT) {
@@ -259,8 +242,7 @@ public class ConvolveImageNoBorder {
 		}
 	}
 
-	public static void convolve(Kernel2D_S32 kernel,
-								  InterleavedU8 input, InterleavedI16 output) {
+	public static void convolve( Kernel2D_S32 kernel, InterleavedU8 input, InterleavedI16 output ) {
 		InputSanityCheck.checkSameShape(input, output);
 
 		if (BoofConcurrency.USE_CONCURRENT) {
@@ -270,8 +252,7 @@ public class ConvolveImageNoBorder {
 		}
 	}
 
-	public static void horizontal(Kernel1D_S32 kernel,
-								  GrayU8 input, GrayS32 output) {
+	public static void horizontal( Kernel1D_S32 kernel, GrayU8 input, GrayS32 output ) {
 		InputSanityCheck.checkSameShape(input, output);
 
 		if (BoofConcurrency.USE_CONCURRENT) {
@@ -281,8 +262,7 @@ public class ConvolveImageNoBorder {
 		}
 	}
 
-	public static void vertical(Kernel1D_S32 kernel,
-								  GrayU8 input, GrayS32 output) {
+	public static void vertical( Kernel1D_S32 kernel, GrayU8 input, GrayS32 output ) {
 		InputSanityCheck.checkSameShape(input, output);
 
 		if (BoofConcurrency.USE_CONCURRENT) {
@@ -292,8 +272,7 @@ public class ConvolveImageNoBorder {
 		}
 	}
 
-	public static void convolve(Kernel2D_S32 kernel,
-								  GrayU8 input, GrayS32 output) {
+	public static void convolve( Kernel2D_S32 kernel, GrayU8 input, GrayS32 output ) {
 		InputSanityCheck.checkSameShape(input, output);
 
 		if (BoofConcurrency.USE_CONCURRENT) {
@@ -303,8 +282,7 @@ public class ConvolveImageNoBorder {
 		}
 	}
 
-	public static void horizontal(Kernel1D_S32 kernel,
-								  InterleavedU8 input, InterleavedS32 output) {
+	public static void horizontal( Kernel1D_S32 kernel, InterleavedU8 input, InterleavedS32 output ) {
 		InputSanityCheck.checkSameShape(input, output);
 
 		if (BoofConcurrency.USE_CONCURRENT) {
@@ -314,8 +292,7 @@ public class ConvolveImageNoBorder {
 		}
 	}
 
-	public static void vertical(Kernel1D_S32 kernel,
-								  InterleavedU8 input, InterleavedS32 output) {
+	public static void vertical( Kernel1D_S32 kernel, InterleavedU8 input, InterleavedS32 output ) {
 		InputSanityCheck.checkSameShape(input, output);
 
 		if (BoofConcurrency.USE_CONCURRENT) {
@@ -325,8 +302,7 @@ public class ConvolveImageNoBorder {
 		}
 	}
 
-	public static void convolve(Kernel2D_S32 kernel,
-								  InterleavedU8 input, InterleavedS32 output) {
+	public static void convolve( Kernel2D_S32 kernel, InterleavedU8 input, InterleavedS32 output ) {
 		InputSanityCheck.checkSameShape(input, output);
 
 		if (BoofConcurrency.USE_CONCURRENT) {
@@ -336,8 +312,8 @@ public class ConvolveImageNoBorder {
 		}
 	}
 
-	public static void vertical(Kernel1D_S32 kernel,
-								  GrayU16 input, GrayI8 output, int divisor, @Nullable GrowArray<DogArray_I32> work) {
+	public static void vertical( Kernel1D_S32 kernel, GrayU16 input, GrayI8 output, int divisor, 
+								 @Nullable GrowArray<DogArray_I32> work ) {
 		InputSanityCheck.checkSameShape(input, output);
 
 		if (BoofConcurrency.USE_CONCURRENT) {
@@ -347,8 +323,7 @@ public class ConvolveImageNoBorder {
 		}
 	}
 
-	public static void vertical(Kernel1D_S32 kernel,
-								  InterleavedU16 input, InterleavedI8 output, int divisor) {
+	public static void vertical( Kernel1D_S32 kernel, InterleavedU16 input, InterleavedI8 output, int divisor ) {
 		InputSanityCheck.checkSameShape(input, output);
 
 		if (BoofConcurrency.USE_CONCURRENT) {
@@ -358,8 +333,7 @@ public class ConvolveImageNoBorder {
 		}
 	}
 
-	public static void horizontal(Kernel1D_S32 kernel,
-								  GrayS16 input, GrayI16 output) {
+	public static void horizontal( Kernel1D_S32 kernel, GrayS16 input, GrayI16 output ) {
 		InputSanityCheck.checkSameShape(input, output);
 
 		if (BoofConcurrency.USE_CONCURRENT) {
@@ -371,8 +345,7 @@ public class ConvolveImageNoBorder {
 		}
 	}
 
-	public static void vertical(Kernel1D_S32 kernel,
-								  GrayS16 input, GrayI16 output) {
+	public static void vertical( Kernel1D_S32 kernel, GrayS16 input, GrayI16 output ) {
 		InputSanityCheck.checkSameShape(input, output);
 
 		if (BoofConcurrency.USE_CONCURRENT) {
@@ -384,8 +357,7 @@ public class ConvolveImageNoBorder {
 		}
 	}
 
-	public static void convolve(Kernel2D_S32 kernel,
-								  GrayS16 input, GrayI16 output) {
+	public static void convolve( Kernel2D_S32 kernel, GrayS16 input, GrayI16 output ) {
 		InputSanityCheck.checkSameShape(input, output);
 
 		if (BoofConcurrency.USE_CONCURRENT) {
@@ -397,8 +369,7 @@ public class ConvolveImageNoBorder {
 		}
 	}
 
-	public static void horizontal(Kernel1D_S32 kernel,
-								  InterleavedS16 input, InterleavedI16 output) {
+	public static void horizontal( Kernel1D_S32 kernel, InterleavedS16 input, InterleavedI16 output ) {
 		InputSanityCheck.checkSameShape(input, output);
 
 		if (BoofConcurrency.USE_CONCURRENT) {
@@ -408,8 +379,7 @@ public class ConvolveImageNoBorder {
 		}
 	}
 
-	public static void vertical(Kernel1D_S32 kernel,
-								  InterleavedS16 input, InterleavedI16 output) {
+	public static void vertical( Kernel1D_S32 kernel, InterleavedS16 input, InterleavedI16 output ) {
 		InputSanityCheck.checkSameShape(input, output);
 
 		if (BoofConcurrency.USE_CONCURRENT) {
@@ -419,8 +389,7 @@ public class ConvolveImageNoBorder {
 		}
 	}
 
-	public static void convolve(Kernel2D_S32 kernel,
-								  InterleavedS16 input, InterleavedI16 output) {
+	public static void convolve( Kernel2D_S32 kernel, InterleavedS16 input, InterleavedI16 output ) {
 		InputSanityCheck.checkSameShape(input, output);
 
 		if (BoofConcurrency.USE_CONCURRENT) {
@@ -430,8 +399,7 @@ public class ConvolveImageNoBorder {
 		}
 	}
 
-	public static void horizontal(Kernel1D_S32 kernel,
-								  GrayU8 input, GrayI8 output, int divisor) {
+	public static void horizontal( Kernel1D_S32 kernel, GrayU8 input, GrayI8 output, int divisor ) {
 		InputSanityCheck.checkSameShape(input, output);
 
 		if (BoofConcurrency.USE_CONCURRENT) {
@@ -443,8 +411,8 @@ public class ConvolveImageNoBorder {
 		}
 	}
 
-	public static void vertical(Kernel1D_S32 kernel,
-								  GrayU8 input, GrayI8 output, int divisor, @Nullable GrowArray<DogArray_I32> work) {
+	public static void vertical( Kernel1D_S32 kernel, GrayU8 input, GrayI8 output, int divisor, 
+								 @Nullable GrowArray<DogArray_I32> work ) {
 		InputSanityCheck.checkSameShape(input, output);
 
 		if (BoofConcurrency.USE_CONCURRENT) {
@@ -456,8 +424,8 @@ public class ConvolveImageNoBorder {
 		}
 	}
 
-	public static void convolve(Kernel2D_S32 kernel,
-								  GrayU8 input, GrayI8 output, int divisor, @Nullable GrowArray<DogArray_I32> work) {
+	public static void convolve( Kernel2D_S32 kernel, GrayU8 input, GrayI8 output, int divisor, 
+								 @Nullable GrowArray<DogArray_I32> work ) {
 		InputSanityCheck.checkSameShape(input, output);
 
 		if (BoofConcurrency.USE_CONCURRENT) {
@@ -469,8 +437,7 @@ public class ConvolveImageNoBorder {
 		}
 	}
 
-	public static void horizontal(Kernel1D_S32 kernel,
-								  InterleavedU8 input, InterleavedI8 output, int divisor) {
+	public static void horizontal( Kernel1D_S32 kernel, InterleavedU8 input, InterleavedI8 output, int divisor ) {
 		InputSanityCheck.checkSameShape(input, output);
 
 		if (BoofConcurrency.USE_CONCURRENT) {
@@ -480,8 +447,7 @@ public class ConvolveImageNoBorder {
 		}
 	}
 
-	public static void vertical(Kernel1D_S32 kernel,
-								  InterleavedU8 input, InterleavedI8 output, int divisor) {
+	public static void vertical( Kernel1D_S32 kernel, InterleavedU8 input, InterleavedI8 output, int divisor ) {
 		InputSanityCheck.checkSameShape(input, output);
 
 		if (BoofConcurrency.USE_CONCURRENT) {
@@ -491,8 +457,7 @@ public class ConvolveImageNoBorder {
 		}
 	}
 
-	public static void convolve(Kernel2D_S32 kernel,
-								  InterleavedU8 input, InterleavedI8 output, int divisor) {
+	public static void convolve( Kernel2D_S32 kernel, InterleavedU8 input, InterleavedI8 output, int divisor ) {
 		InputSanityCheck.checkSameShape(input, output);
 
 		if (BoofConcurrency.USE_CONCURRENT) {
@@ -502,8 +467,7 @@ public class ConvolveImageNoBorder {
 		}
 	}
 
-	public static void horizontal(Kernel1D_S32 kernel,
-								  GrayS16 input, GrayI16 output, int divisor) {
+	public static void horizontal( Kernel1D_S32 kernel, GrayS16 input, GrayI16 output, int divisor ) {
 		InputSanityCheck.checkSameShape(input, output);
 
 		if (BoofConcurrency.USE_CONCURRENT) {
@@ -515,8 +479,8 @@ public class ConvolveImageNoBorder {
 		}
 	}
 
-	public static void vertical(Kernel1D_S32 kernel,
-								  GrayS16 input, GrayI16 output, int divisor, @Nullable GrowArray<DogArray_I32> work) {
+	public static void vertical( Kernel1D_S32 kernel, GrayS16 input, GrayI16 output, int divisor, 
+								 @Nullable GrowArray<DogArray_I32> work ) {
 		InputSanityCheck.checkSameShape(input, output);
 
 		if (BoofConcurrency.USE_CONCURRENT) {
@@ -528,8 +492,8 @@ public class ConvolveImageNoBorder {
 		}
 	}
 
-	public static void convolve(Kernel2D_S32 kernel,
-								  GrayS16 input, GrayI16 output, int divisor, @Nullable GrowArray<DogArray_I32> work) {
+	public static void convolve( Kernel2D_S32 kernel, GrayS16 input, GrayI16 output, int divisor, 
+								 @Nullable GrowArray<DogArray_I32> work ) {
 		InputSanityCheck.checkSameShape(input, output);
 
 		if (BoofConcurrency.USE_CONCURRENT) {
@@ -541,8 +505,7 @@ public class ConvolveImageNoBorder {
 		}
 	}
 
-	public static void horizontal(Kernel1D_S32 kernel,
-								  InterleavedS16 input, InterleavedI16 output, int divisor) {
+	public static void horizontal( Kernel1D_S32 kernel, InterleavedS16 input, InterleavedI16 output, int divisor ) {
 		InputSanityCheck.checkSameShape(input, output);
 
 		if (BoofConcurrency.USE_CONCURRENT) {
@@ -552,8 +515,7 @@ public class ConvolveImageNoBorder {
 		}
 	}
 
-	public static void vertical(Kernel1D_S32 kernel,
-								  InterleavedS16 input, InterleavedI16 output, int divisor) {
+	public static void vertical( Kernel1D_S32 kernel, InterleavedS16 input, InterleavedI16 output, int divisor ) {
 		InputSanityCheck.checkSameShape(input, output);
 
 		if (BoofConcurrency.USE_CONCURRENT) {
@@ -563,8 +525,7 @@ public class ConvolveImageNoBorder {
 		}
 	}
 
-	public static void convolve(Kernel2D_S32 kernel,
-								  InterleavedS16 input, InterleavedI16 output, int divisor) {
+	public static void convolve( Kernel2D_S32 kernel, InterleavedS16 input, InterleavedI16 output, int divisor ) {
 		InputSanityCheck.checkSameShape(input, output);
 
 		if (BoofConcurrency.USE_CONCURRENT) {
@@ -574,8 +535,7 @@ public class ConvolveImageNoBorder {
 		}
 	}
 
-	public static void horizontal(Kernel1D_S32 kernel,
-								  GrayU16 input, GrayI16 output, int divisor) {
+	public static void horizontal( Kernel1D_S32 kernel, GrayU16 input, GrayI16 output, int divisor ) {
 		InputSanityCheck.checkSameShape(input, output);
 
 		if (BoofConcurrency.USE_CONCURRENT) {
@@ -587,8 +547,8 @@ public class ConvolveImageNoBorder {
 		}
 	}
 
-	public static void vertical(Kernel1D_S32 kernel,
-								  GrayU16 input, GrayI16 output, int divisor, @Nullable GrowArray<DogArray_I32> work) {
+	public static void vertical( Kernel1D_S32 kernel, GrayU16 input, GrayI16 output, int divisor, 
+								 @Nullable GrowArray<DogArray_I32> work ) {
 		InputSanityCheck.checkSameShape(input, output);
 
 		if (BoofConcurrency.USE_CONCURRENT) {
@@ -600,8 +560,8 @@ public class ConvolveImageNoBorder {
 		}
 	}
 
-	public static void convolve(Kernel2D_S32 kernel,
-								  GrayU16 input, GrayI16 output, int divisor, @Nullable GrowArray<DogArray_I32> work) {
+	public static void convolve( Kernel2D_S32 kernel, GrayU16 input, GrayI16 output, int divisor, 
+								 @Nullable GrowArray<DogArray_I32> work ) {
 		InputSanityCheck.checkSameShape(input, output);
 
 		if (BoofConcurrency.USE_CONCURRENT) {
@@ -613,8 +573,7 @@ public class ConvolveImageNoBorder {
 		}
 	}
 
-	public static void horizontal(Kernel1D_S32 kernel,
-								  InterleavedU16 input, InterleavedI16 output, int divisor) {
+	public static void horizontal( Kernel1D_S32 kernel, InterleavedU16 input, InterleavedI16 output, int divisor ) {
 		InputSanityCheck.checkSameShape(input, output);
 
 		if (BoofConcurrency.USE_CONCURRENT) {
@@ -624,8 +583,7 @@ public class ConvolveImageNoBorder {
 		}
 	}
 
-	public static void vertical(Kernel1D_S32 kernel,
-								  InterleavedU16 input, InterleavedI16 output, int divisor) {
+	public static void vertical( Kernel1D_S32 kernel, InterleavedU16 input, InterleavedI16 output, int divisor ) {
 		InputSanityCheck.checkSameShape(input, output);
 
 		if (BoofConcurrency.USE_CONCURRENT) {
@@ -635,8 +593,7 @@ public class ConvolveImageNoBorder {
 		}
 	}
 
-	public static void convolve(Kernel2D_S32 kernel,
-								  InterleavedU16 input, InterleavedI16 output, int divisor) {
+	public static void convolve( Kernel2D_S32 kernel, InterleavedU16 input, InterleavedI16 output, int divisor ) {
 		InputSanityCheck.checkSameShape(input, output);
 
 		if (BoofConcurrency.USE_CONCURRENT) {
@@ -646,8 +603,8 @@ public class ConvolveImageNoBorder {
 		}
 	}
 
-	public static void vertical(Kernel1D_S32 kernel,
-								  GrayS32 input, GrayI16 output, int divisor, @Nullable GrowArray<DogArray_I32> work) {
+	public static void vertical( Kernel1D_S32 kernel, GrayS32 input, GrayI16 output, int divisor, 
+								 @Nullable GrowArray<DogArray_I32> work ) {
 		InputSanityCheck.checkSameShape(input, output);
 
 		if (BoofConcurrency.USE_CONCURRENT) {
@@ -657,8 +614,7 @@ public class ConvolveImageNoBorder {
 		}
 	}
 
-	public static void vertical(Kernel1D_S32 kernel,
-								  InterleavedS32 input, InterleavedI16 output, int divisor) {
+	public static void vertical( Kernel1D_S32 kernel, InterleavedS32 input, InterleavedI16 output, int divisor ) {
 		InputSanityCheck.checkSameShape(input, output);
 
 		if (BoofConcurrency.USE_CONCURRENT) {
@@ -668,8 +624,7 @@ public class ConvolveImageNoBorder {
 		}
 	}
 
-	public static void horizontal(Kernel1D_S32 kernel,
-								  GrayS32 input, GrayS32 output) {
+	public static void horizontal( Kernel1D_S32 kernel, GrayS32 input, GrayS32 output ) {
 		InputSanityCheck.checkSameShape(input, output);
 
 		if (BoofConcurrency.USE_CONCURRENT) {
@@ -681,8 +636,7 @@ public class ConvolveImageNoBorder {
 		}
 	}
 
-	public static void vertical(Kernel1D_S32 kernel,
-								  GrayS32 input, GrayS32 output) {
+	public static void vertical( Kernel1D_S32 kernel, GrayS32 input, GrayS32 output ) {
 		InputSanityCheck.checkSameShape(input, output);
 
 		if (BoofConcurrency.USE_CONCURRENT) {
@@ -694,8 +648,7 @@ public class ConvolveImageNoBorder {
 		}
 	}
 
-	public static void convolve(Kernel2D_S32 kernel,
-								  GrayS32 input, GrayS32 output) {
+	public static void convolve( Kernel2D_S32 kernel, GrayS32 input, GrayS32 output ) {
 		InputSanityCheck.checkSameShape(input, output);
 
 		if (BoofConcurrency.USE_CONCURRENT) {
@@ -707,8 +660,7 @@ public class ConvolveImageNoBorder {
 		}
 	}
 
-	public static void horizontal(Kernel1D_S32 kernel,
-								  InterleavedS32 input, InterleavedS32 output) {
+	public static void horizontal( Kernel1D_S32 kernel, InterleavedS32 input, InterleavedS32 output ) {
 		InputSanityCheck.checkSameShape(input, output);
 
 		if (BoofConcurrency.USE_CONCURRENT) {
@@ -718,8 +670,7 @@ public class ConvolveImageNoBorder {
 		}
 	}
 
-	public static void vertical(Kernel1D_S32 kernel,
-								  InterleavedS32 input, InterleavedS32 output) {
+	public static void vertical( Kernel1D_S32 kernel, InterleavedS32 input, InterleavedS32 output ) {
 		InputSanityCheck.checkSameShape(input, output);
 
 		if (BoofConcurrency.USE_CONCURRENT) {
@@ -729,8 +680,7 @@ public class ConvolveImageNoBorder {
 		}
 	}
 
-	public static void convolve(Kernel2D_S32 kernel,
-								  InterleavedS32 input, InterleavedS32 output) {
+	public static void convolve( Kernel2D_S32 kernel, InterleavedS32 input, InterleavedS32 output ) {
 		InputSanityCheck.checkSameShape(input, output);
 
 		if (BoofConcurrency.USE_CONCURRENT) {
@@ -740,8 +690,7 @@ public class ConvolveImageNoBorder {
 		}
 	}
 
-	public static void horizontal(Kernel1D_S32 kernel,
-								  GrayS32 input, GrayS32 output, int divisor) {
+	public static void horizontal( Kernel1D_S32 kernel, GrayS32 input, GrayS32 output, int divisor ) {
 		InputSanityCheck.checkSameShape(input, output);
 
 		if (BoofConcurrency.USE_CONCURRENT) {
@@ -753,8 +702,8 @@ public class ConvolveImageNoBorder {
 		}
 	}
 
-	public static void vertical(Kernel1D_S32 kernel,
-								  GrayS32 input, GrayS32 output, int divisor, @Nullable GrowArray<DogArray_I32> work) {
+	public static void vertical( Kernel1D_S32 kernel, GrayS32 input, GrayS32 output, int divisor, 
+								 @Nullable GrowArray<DogArray_I32> work ) {
 		InputSanityCheck.checkSameShape(input, output);
 
 		if (BoofConcurrency.USE_CONCURRENT) {
@@ -766,8 +715,8 @@ public class ConvolveImageNoBorder {
 		}
 	}
 
-	public static void convolve(Kernel2D_S32 kernel,
-								  GrayS32 input, GrayS32 output, int divisor, @Nullable GrowArray<DogArray_I32> work) {
+	public static void convolve( Kernel2D_S32 kernel, GrayS32 input, GrayS32 output, int divisor, 
+								 @Nullable GrowArray<DogArray_I32> work ) {
 		InputSanityCheck.checkSameShape(input, output);
 
 		if (BoofConcurrency.USE_CONCURRENT) {
@@ -779,8 +728,7 @@ public class ConvolveImageNoBorder {
 		}
 	}
 
-	public static void horizontal(Kernel1D_S32 kernel,
-								  InterleavedS32 input, InterleavedS32 output, int divisor) {
+	public static void horizontal( Kernel1D_S32 kernel, InterleavedS32 input, InterleavedS32 output, int divisor ) {
 		InputSanityCheck.checkSameShape(input, output);
 
 		if (BoofConcurrency.USE_CONCURRENT) {
@@ -790,8 +738,7 @@ public class ConvolveImageNoBorder {
 		}
 	}
 
-	public static void vertical(Kernel1D_S32 kernel,
-								  InterleavedS32 input, InterleavedS32 output, int divisor) {
+	public static void vertical( Kernel1D_S32 kernel, InterleavedS32 input, InterleavedS32 output, int divisor ) {
 		InputSanityCheck.checkSameShape(input, output);
 
 		if (BoofConcurrency.USE_CONCURRENT) {
@@ -801,8 +748,7 @@ public class ConvolveImageNoBorder {
 		}
 	}
 
-	public static void convolve(Kernel2D_S32 kernel,
-								  InterleavedS32 input, InterleavedS32 output, int divisor) {
+	public static void convolve( Kernel2D_S32 kernel, InterleavedS32 input, InterleavedS32 output, int divisor ) {
 		InputSanityCheck.checkSameShape(input, output);
 
 		if (BoofConcurrency.USE_CONCURRENT) {
