@@ -18,6 +18,7 @@
 
 package boofcv.demonstrations.recognition;
 
+import boofcv.alg.scene.ConfigSceneRecognitionSimilarImages;
 import boofcv.alg.scene.SceneRecognitionSimilarImages;
 import boofcv.core.image.GeneralizedImageOps;
 import boofcv.factory.scene.FactorySceneRecognition;
@@ -115,6 +116,7 @@ public class DemoSceneRecognitionSimilarImagesApp<Gray extends ImageGray<Gray>, 
 			});
 		}
 
+		// TODO spawn thread so it doesn't block the UI
 		processImageFiles(foundFiles);
 	}
 
@@ -123,8 +125,22 @@ public class DemoSceneRecognitionSimilarImagesApp<Gray extends ImageGray<Gray>, 
 	 */
 	void processImageFiles( List<String> foundFiles ) {
 		System.out.println("Processing images.size="+foundFiles.size());
+
+		var config = new ConfigSceneRecognitionSimilarImages();
+		config.features.detectFastHessian.extract.radius = 5;
+		config.features.detectFastHessian.maxFeaturesAll = 500;
+		config.limitMatchesConsider = 20;
+		config.minimumRatio = 0.3;
+		config.recognizeNister2006.learningMinimumPointsForChildren.setRelative(0.001,100);
+//		config.associate.greedy.scoreRatioThreshold = 0.9;
+		config.recognizeNister2006.minimumDepthFromRoot = 1;
+//		config.recognizeNister2006.featureSingleWordHops = 1;
+//		config.recognizeNister2006.learnNodeWeights = false;
+
 		SceneRecognitionSimilarImages<Gray,TD> alg =
-				FactorySceneRecognition.createSimilarImages(null, ImageType.single(grayType));
+				FactorySceneRecognition.createSimilarImages(config, ImageType.single(grayType));
+
+		alg.setVerbose(System.out, null);
 
 		Gray gray = GeneralizedImageOps.createImage(grayType, 1, 1,0);
 

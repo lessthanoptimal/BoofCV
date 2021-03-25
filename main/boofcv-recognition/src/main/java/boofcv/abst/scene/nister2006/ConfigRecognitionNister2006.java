@@ -24,6 +24,8 @@ import boofcv.alg.scene.vocabtree.ConfigHierarchicalVocabularyTree;
 import boofcv.misc.BoofMiscOps;
 import boofcv.struct.ConfigLength;
 import boofcv.struct.Configuration;
+import lombok.Getter;
+import lombok.Setter;
 import org.ddogleg.clustering.ConfigKMeans;
 
 /**
@@ -73,6 +75,18 @@ public class ConfigRecognitionNister2006 implements Configuration {
 	 */
 	public final ConfigLength learningMinimumPointsForChildren = ConfigLength.fixed(0);
 
+	/**
+	 * If true then it will learn node weights. If false the all nodes but the root node will have a weight of 1.0
+	 */
+	public boolean learnNodeWeights = true;
+
+	/**
+	 * When converting a descriptor into a word it will return the word which is this many hops from the leaf.
+	 * The leaf can be too specific and by "hoping" away from the leaf it gets more generic and will have more
+	 * matches.
+	 */
+	@Getter @Setter public int featureSingleWordHops = 1;
+
 	/** Seed used in random number generators */
 	public long randSeed = 0xDEADBEEF;
 
@@ -92,6 +106,7 @@ public class ConfigRecognitionNister2006 implements Configuration {
 
 	@Override public void checkValidity() {
 		BoofMiscOps.checkTrue(minimumDepthFromRoot >= 0, "Maximum level must be a non-negative integer");
+		BoofMiscOps.checkTrue(featureSingleWordHops >= 0, "Can't hop backwards in the tree");
 
 		kmeans.checkValidity();
 		tree.checkValidity();
@@ -106,6 +121,8 @@ public class ConfigRecognitionNister2006 implements Configuration {
 		this.distanceNorm = src.distanceNorm;
 		this.minimumDepthFromRoot = src.minimumDepthFromRoot;
 		this.randSeed = src.randSeed;
+		this.learnNodeWeights = src.learnNodeWeights;
+		this.featureSingleWordHops = src.featureSingleWordHops;
 		this.queryMaximumImagesInNode.setTo(src.queryMaximumImagesInNode);
 		this.learningMaximumImagesInNode.setTo(src.learningMaximumImagesInNode);
 		this.learningMinimumPointsForChildren.setTo(src.learningMinimumPointsForChildren);

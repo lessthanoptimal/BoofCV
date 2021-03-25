@@ -20,7 +20,10 @@ package boofcv.alg.scene;
 
 import boofcv.abst.scene.nister2006.ConfigRecognitionNister2006;
 import boofcv.factory.feature.associate.ConfigAssociate;
+import boofcv.factory.feature.describe.ConfigConvertTupleDesc;
+import boofcv.factory.feature.describe.ConfigDescribeRegionPoint;
 import boofcv.factory.feature.detdesc.ConfigDetectDescribe;
+import boofcv.factory.feature.detect.interest.ConfigDetectInterestPoint;
 import boofcv.misc.BoofMiscOps;
 import boofcv.struct.Configuration;
 
@@ -45,6 +48,22 @@ public class ConfigSceneRecognitionSimilarImages implements Configuration {
 
 	/** Feature association */
 	public final ConfigAssociate associate = new ConfigAssociate();
+
+	{
+		// Let's use SURF-FAST by default
+		features.typeDescribe = ConfigDescribeRegionPoint.DescriptorType.SURF_STABLE;
+		features.typeDetector = ConfigDetectInterestPoint.DetectorType.FAST_HESSIAN;
+		// Settings a threshold degrades overall results, even if in some specific situations makes it better
+		features.detectFastHessian.extract.threshold = 0;
+		features.detectFastHessian.extract.radius = 2;
+		// 500 features is a good trade off for memory and performance. Accuracy can be improved
+		// with more features but becomes prohibitively expensive in larger datasets
+		features.detectFastHessian.maxFeaturesAll = 500;
+		features.detectFastHessian.maxFeaturesPerScale = 0;
+
+		// Reduce memory usage with very little loss in accuracy
+		features.convertDescriptor.outputData = ConfigConvertTupleDesc.DataType.F32;
+	}
 
 	@Override public void checkValidity() {
 		BoofMiscOps.checkTrue(limitMatchesConsider >= 1, "Must consider at least 1 match");
