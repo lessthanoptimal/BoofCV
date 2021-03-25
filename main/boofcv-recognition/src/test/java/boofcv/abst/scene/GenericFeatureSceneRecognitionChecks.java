@@ -26,7 +26,7 @@ import static org.junit.jupiter.api.Assertions.fail;
 /**
  * @author Peter Abeles
  */
-public class GenericFeatureSceneRecognitionChecks extends BoofStandardJUnit {
+public abstract class GenericFeatureSceneRecognitionChecks extends BoofStandardJUnit {
 	@Test void implement() {
 		fail("Implement");
 	}

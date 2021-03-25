@@ -26,27 +26,8 @@ import static org.junit.jupiter.api.Assertions.fail;
 /**
  * @author Peter Abeles
  */
-public class TestSceneRecognitionSimilarImages extends BoofStandardJUnit {
-	/**
-	 * Simple scenario which exercises everything all at once
-	 */
-	@Test void simpleAllTogether() {
-		fail("Implement");
-	}
-
-	@Test void getImageIDs() {
-		fail("Implement");
-	}
-
-	@Test void addDestFeaturesThenAssociate() {
-		fail("Implement");
-	}
-
-	@Test void saveImagePairInfo() {
-		fail("Implement");
-	}
-
-	@Test void lookupShape() {
+class TestImageSimilarityAssociatedRatio extends BoofStandardJUnit {
+	@Test void implement() {
 		fail("Implement");
 	}
 }
