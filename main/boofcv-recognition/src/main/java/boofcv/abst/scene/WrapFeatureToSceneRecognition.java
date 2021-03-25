@@ -41,13 +41,13 @@ import java.util.Set;
 public class WrapFeatureToSceneRecognition<Image extends ImageBase<Image>, TD extends TupleDesc<TD>>
 		implements SceneRecognition<Image> {
 	/** Detects image features */
-	@Getter @Setter DetectDescribePoint<Image, TD> detector;
+	protected @Getter @Setter DetectDescribePoint<Image, TD> detector;
 
 	// Used to ensure the image is at the expected scale
 	protected BoofLambdas.Transform<Image> downSample;
 
 	/** The {@link FeatureSceneRecognition} */
-	protected FeatureSceneRecognition<TD> recognizer;
+	protected @Getter @Setter FeatureSceneRecognition<TD> recognizer;
 
 	/** Optional reference to a config. Useful when saving to disk */
 	public @Getter @Setter ConfigFeatureToSceneRecognition config;
