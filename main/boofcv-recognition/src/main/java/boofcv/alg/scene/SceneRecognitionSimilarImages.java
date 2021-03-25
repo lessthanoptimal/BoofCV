@@ -38,11 +38,14 @@ import lombok.Setter;
 import org.ddogleg.struct.DogArray;
 import org.ddogleg.struct.DogArray_I32;
 import org.ddogleg.struct.FastAccess;
+import org.ddogleg.struct.VerbosePrint;
 import org.jetbrains.annotations.Nullable;
 
+import java.io.PrintStream;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Set;
 
 /**
  * Identifies similar images using {@link boofcv.abst.scene.FeatureSceneRecognition}. For each image which is added
@@ -61,7 +64,7 @@ import java.util.List;
  * @author Peter Abeles
  */
 public class SceneRecognitionSimilarImages<Image extends ImageBase<Image>, TD extends TupleDesc<TD>>
-		implements LookUpSimilarImages {
+		implements LookUpSimilarImages, VerbosePrint {
 	/** Detects image features */
 	@Getter @Setter DetectDescribePoint<Image, TD> detector;
 
@@ -100,6 +103,14 @@ public class SceneRecognitionSimilarImages<Image extends ImageBase<Image>, TD ex
 	// Stores the location of image features in the packed array. interleaved (first index, number of features)
 	final DogArray_I32 imageFeatureStartIndexes = new DogArray_I32();
 
+	//========================= Internal Profiling
+	/** Time {@link #fixate()} took to learn the model. Milliseconds. */
+	public @Getter double timeFixateLearnMS;
+	/** Time {@link #fixate()} took to add images to the database. Milliseconds. */
+	public @Getter double timeFixateAddMS;
+	/** Time {@link #fixate()} took to find the set of similar images. Milliseconds. */
+	public @Getter double timeFixateSimilarMS;
+
 	//========================= Internal Workspace
 	// Storage for results when looking up matches
 	final DogArray<SceneRecognition.Match> sceneMatches = new DogArray<>(SceneRecognition.Match::new);
@@ -114,6 +125,9 @@ public class SceneRecognitionSimilarImages<Image extends ImageBase<Image>, TD ex
 
 	final DogArray<TD> destinationDescriptions;
 	final DogArray<Point2D_F64> destinationPixels;
+
+	// If not null it will print verbose debugging info
+	PrintStream verbose;
 
 	public SceneRecognitionSimilarImages( DetectDescribePoint<Image, TD> detector,
 										  AssociateDescriptionHashSets<TD> asscociator,
@@ -131,6 +145,10 @@ public class SceneRecognitionSimilarImages<Image extends ImageBase<Image>, TD ex
 
 		sourcePixels = new DogArray<>(Point2D_F64::new);
 		destinationPixels = new DogArray<>(Point2D_F64::new);
+
+		// Source features are added first and there can only be a match if a set in the source exists
+		asscociator.createNewSetsFromSource = true;
+		asscociator.createNewSetsFromDestination = false;
 	}
 
 	/**
@@ -163,12 +181,90 @@ public class SceneRecognitionSimilarImages<Image extends ImageBase<Image>, TD ex
 	 * calling fixate you will need to call it again.
 	 */
 	public void fixate() {
+
+		long time0 = System.nanoTime();
 		if (relearnModel)
 			learnModel();
+		long time1 = System.nanoTime();
+		timeFixateLearnMS = (time1 - time0)*1e-6;
+		if (verbose != null) verbose.printf("fixate learning time: %.1f (ms)\n", timeFixateLearnMS);
 
 		// Add images to the data base
 		for (int imageIndex = 0; imageIndex < imageIDs.size(); imageIndex++) {
 			recognizer.addImage(imageIDs.get(imageIndex), createFeaturesLambda(imageIndex));
+		}
+		long time2 = System.nanoTime();
+		timeFixateAddMS = (time2 - time1)*1e-6;
+		if (verbose != null) verbose.printf("fixate learning add: %.1f (ms)\n", timeFixateAddMS);
+
+		// Determine similarity relationship between all images.
+		findAllSimilarImages();
+		long time3 = System.nanoTime();
+		timeFixateSimilarMS = (time3 - time2)*1e-6;
+		if (verbose != null) verbose.printf("fixate learning similar: %.1f (ms)\n", timeFixateSimilarMS);
+	}
+
+	/**
+	 * Finds the relationship between all images in one batch
+	 */
+	void findAllSimilarImages() {
+		// Initialize data structures
+		imageToPairIndexes.resize(imageIDs.size());
+
+		// Go through each image and find the relationships. Note that the relationships might not be mutual
+		for (int imageIndex = 0; imageIndex < imageIDs.size(); imageIndex++) {
+			// Get the location of this image's features
+			int targetFeatureOffset = imageFeatureStartIndexes.get(imageIndex*2);
+			int targetFeatureSize = imageFeatureStartIndexes.get(imageIndex*2 + 1);
+
+			// Look up similar images
+			recognizer.query(createFeaturesLambda(imageIndex), limitMatchesConsider, sceneMatches);
+
+			if (verbose != null) verbose.printf("image[%d].cbir_matches.size=%d\n", imageIndex, sceneMatches.size);
+
+			// Initialize association
+			asscociator.initialize(recognizer.getTotalWords());
+
+			// Load the target/source image features
+			sourceDescriptions.reset();
+			sourcePixels.reset();
+			for (int i = 0; i < targetFeatureSize; i++) {
+				TD desc = sourceDescriptions.grow();
+				descriptions.getCopy(targetFeatureOffset + i, desc);
+				pixels.getCopy(targetFeatureOffset + i, sourcePixels.grow());
+				asscociator.addSource(desc, recognizer.getQueryWord(i));
+			}
+
+			// inspect all matches that the recognition algortihm found and see if anything of them look good
+			for (int matchIndex = 0; matchIndex < sceneMatches.size; matchIndex++) {
+				SceneRecognition.Match match = sceneMatches.get(matchIndex);
+
+				int imageIndexMatch = imageToIndex.get(match.id);
+				if (imageIndex == imageIndexMatch)
+					continue;
+
+				// See if these two images have been matched already
+				if (null != lookupPairInfo(imageIndex, imageIndexMatch))
+					continue;
+
+				addDestFeaturesThenAssociate(imageIndexMatch);
+
+				if (verbose != null) {
+					verbose.printf("   dst.size=%d associated[%d].size=%d",
+							destinationPixels.size, imageIndexMatch, asscociator.getMatches().size);
+				}
+
+				if (!similarityTest.isSimilar(sourcePixels, destinationPixels, asscociator.getMatches())) {
+					if (verbose!=null) verbose.println();
+					// Idea: Save PairInfo even if not matched to avoid checking again
+					continue;
+				}
+
+				if (verbose!=null) verbose.println("  accepted");
+				saveImagePairInfo(imageIndex, imageIndexMatch);
+			}
+
+			if (verbose != null) verbose.printf("      pair.size=%d\n", imageToPairIndexes.get(imageIndex).size);
 		}
 	}
 
@@ -196,48 +292,13 @@ public class SceneRecognitionSimilarImages<Image extends ImageBase<Image>, TD ex
 	@Override public void findSimilar( String target, List<String> similar ) {
 		int imageIndex = imageToIndex.get(target);
 
-		// Get the location of this image's features
-		int targetFeatureOffset = imageFeatureStartIndexes.get(imageIndex*2);
-		int targetFeatureSize = imageFeatureStartIndexes.get(imageIndex*2+1);
+		DogArray_I32 pairIndexes = imageToPairIndexes.get(imageIndex);
 
-		// Look up similar images
-		recognizer.query(createFeaturesLambda(imageIndex), limitMatchesConsider, sceneMatches);
-
-		// Initialize association
-		asscociator.initialize(recognizer.getTotalWords());
-
-		// Load the target/source image features
-		sourceDescriptions.reset();
-		sourcePixels.reset();
-		for (int i = 0; i < targetFeatureSize; i++) {
-			TD desc = sourceDescriptions.grow();
-			descriptions.getCopy(targetFeatureOffset + i, desc);
-			pixels.getCopy(targetFeatureOffset + i, sourcePixels.grow());
-			asscociator.addSource(desc, recognizer.getQueryWord(i));
-		}
-
-		for (int matchIndex = 0; matchIndex < sceneMatches.size; matchIndex++) {
-			SceneRecognition.Match match = sceneMatches.get(matchIndex);
-
-			int imageIndexMatch = imageToIndex.get(matchIndex);
-			if (imageIndex == imageIndexMatch)
-				continue;
-
-			// See if these two images have been matched already
-			if (null != lookupPairInfo(imageIndex, imageIndexMatch))
-				continue;
-
-			addDestFeaturesThenAssociate(imageIndexMatch);
-
-			if (!similarityTest.isSimilar(sourcePixels, destinationPixels, asscociator.getMatches())) {
-				// Idea: Save PairInfo even if not matched to avoid checking again
-				continue;
-			}
-
-			saveImagePairInfo(imageIndex, imageIndexMatch);
-
-			// Save this result as being similar
-			similar.add(match.id);
+		for (int i = 0; i < pairIndexes.size; i++) {
+			// Get the index of the image it's similiar to
+			int similarIndex = pairedImages.get(pairIndexes.get(i)).other(imageIndex);
+			// Add the ID
+			similar.add(imageIDs.get(similarIndex));
 		}
 	}
 
@@ -246,19 +307,19 @@ public class SceneRecognitionSimilarImages<Image extends ImageBase<Image>, TD ex
 	 */
 	private void addDestFeaturesThenAssociate( int imageIndex ) {
 		int destFeatureOffset = imageFeatureStartIndexes.get(imageIndex*2);
-		int destFeatureSize = imageFeatureStartIndexes.get(imageIndex*2+1);
+		int destFeatureSize = imageFeatureStartIndexes.get(imageIndex*2 + 1);
 
 		// Purge features from previous matches
 		asscociator.clearDestination();
 
 		// Load the match/destination image features
 		sourceDescriptions.reset();
-		sourcePixels.reset();
+		destinationPixels.reset();
 		for (int featureIndex = 0; featureIndex < destFeatureSize; featureIndex++) {
 			TD desc = destinationDescriptions.grow();
 			descriptions.getCopy(destFeatureOffset + featureIndex, desc);
 			pixels.getCopy(destFeatureOffset + featureIndex, destinationPixels.grow());
-			asscociator.addSource(desc, recognizer.lookupWord(desc));
+			asscociator.addDestination(desc, recognizer.lookupWord(desc));
 		}
 
 		// Associate the features together
@@ -277,7 +338,7 @@ public class SceneRecognitionSimilarImages<Image extends ImageBase<Image>, TD ex
 		PairInfo p = pairedImages.grow();
 		p.src = imageIndexSrc;
 		p.dst = imageIndexDst;
-		p.associated.copyAll(asscociator.getMatches().toList(),(s,d)->d.setTo(s));
+		p.associated.copyAll(asscociator.getMatches().toList(), ( s, d ) -> d.setTo(s));
 	}
 
 	@Override public void lookupPixelFeats( String target, DogArray<Point2D_F64> features ) {
@@ -291,7 +352,7 @@ public class SceneRecognitionSimilarImages<Image extends ImageBase<Image>, TD ex
 
 		// Copy the features in the output array
 		for (int i = 0; i < size; i++) {
-			pixels.getCopy(offset+i, features.get(i));
+			pixels.getCopy(offset + i, features.get(i));
 		}
 	}
 
@@ -307,11 +368,11 @@ public class SceneRecognitionSimilarImages<Image extends ImageBase<Image>, TD ex
 		PairInfo info = lookupPairInfo(imageIndexA, imageIndexB);
 
 		// There are no pair so return
-		if (info==null)
+		if (info == null)
 			return false;
 
 		// Copy the list of associated features into the output list
-		pairs.copyAll(info.associated.toList(), (src,dst)->dst.setTo(src));
+		pairs.copyAll(info.associated.toList(), ( src, dst ) -> dst.setTo(src));
 		return true;
 	}
 
@@ -323,7 +384,7 @@ public class SceneRecognitionSimilarImages<Image extends ImageBase<Image>, TD ex
 	/**
 	 * Finds the Pair info for the two images. If they are not paied then null is returned
 	 */
-	protected @Nullable PairInfo lookupPairInfo( int imageIndexA , int imageIndexB ) {
+	protected @Nullable PairInfo lookupPairInfo( int imageIndexA, int imageIndexB ) {
 		DogArray_I32 matches = imageToPairIndexes.get(imageIndexA);
 		for (int i = 0; i < matches.size; i++) {
 			PairInfo pair = pairedImages.get(matches.get(i));
@@ -356,6 +417,10 @@ public class SceneRecognitionSimilarImages<Image extends ImageBase<Image>, TD ex
 		};
 	}
 
+	@Override public void setVerbose( @Nullable PrintStream out, @Nullable Set<String> options ) {
+		this.verbose = out;
+	}
+
 	/**
 	 * Describes the relationship between two images
 	 */
@@ -367,10 +432,18 @@ public class SceneRecognitionSimilarImages<Image extends ImageBase<Image>, TD ex
 		// Image feature index for features which were associated
 		public DogArray<AssociatedIndex> associated = new DogArray<>(AssociatedIndex::new);
 
+		public int other( int target ) {
+			if (src == target)
+				return dst;
+			if (dst == target)
+				return src;
+			throw new RuntimeException("BUG!");
+		}
+
 		public void reset() {
 			src = -1;
 			dst = -1;
-			associated.reset();;
+			associated.reset();
 		}
 	}
 

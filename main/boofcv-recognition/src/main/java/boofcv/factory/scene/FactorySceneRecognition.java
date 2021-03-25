@@ -103,6 +103,7 @@ public class FactorySceneRecognition {
 				() -> FactoryTupleDesc.createPacked(detector));
 
 		similar.setSimilarityTest(new ImageSimilarityAssociatedRatio(config.minimumRatio));
+		similar.setLimitMatchesConsider(config.limitMatchesConsider);
 
 		return similar;
 	}

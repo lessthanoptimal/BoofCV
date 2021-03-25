@@ -67,6 +67,9 @@ public class FeatureSceneRecognitionNister2006<TD extends TupleDesc<TD>> impleme
 	/** Performance tuning. If less than this number of features a single thread algorithm will be used */
 	@Getter @Setter public int minimumForThread = 500;
 
+	/** When converting a descriptor into a word it will return the word which is this many hops from the leaf. */
+	@Getter @Setter public int featureSingleWordHops = 0;
+
 	// Describes how to store the feature descriptor
 	Class<TD> tupleType;
 	int tupleDOF;
@@ -79,7 +82,7 @@ public class FeatureSceneRecognitionNister2006<TD extends TupleDesc<TD>> impleme
 	@Getter long timeLearnClusterMS;
 	@Getter long timeLearnWeightsMS;
 
-	public FeatureSceneRecognitionNister2006( ConfigRecognitionNister2006 config, Factory<TD> factory) {
+	public FeatureSceneRecognitionNister2006( ConfigRecognitionNister2006 config, Factory<TD> factory ) {
 		this.config = config;
 		this.imageFeatures = new DogArray<>(factory);
 		this.databaseN = new RecognitionVocabularyTreeNister2006<>();
@@ -147,20 +150,26 @@ public class FeatureSceneRecognitionNister2006<TD extends TupleDesc<TD>> impleme
 
 		// Learn the weight for each node in the tree
 		if (verbose != null) verbose.println("learning the weights");
-		LearnNodeWeights<TD> learnWeights = new LearnNodeWeights<>();
-		learnWeights.maximumNumberImagesInNode.setTo(config.learningMaximumImagesInNode);
-		learnWeights.reset(tree);
+		if (config.learnNodeWeights) {
+			LearnNodeWeights<TD> learnWeights = new LearnNodeWeights<>();
+			learnWeights.maximumNumberImagesInNode.setTo(config.learningMaximumImagesInNode);
+			learnWeights.reset(tree);
 
-		for (int imgIdx = 1; imgIdx < startIndex.size; imgIdx++) {
-			imageFeatures.reset();
-			int idx0 = startIndex.get(imgIdx - 1);
-			int idx1 = startIndex.get(imgIdx);
-			for (int i = idx0; i < idx1; i++) {
-				imageFeatures.grow().setTo(packedFeatures.getTemp(i));
+			for (int imgIdx = 1; imgIdx < startIndex.size; imgIdx++) {
+				imageFeatures.reset();
+				int idx0 = startIndex.get(imgIdx - 1);
+				int idx1 = startIndex.get(imgIdx);
+				for (int i = idx0; i < idx1; i++) {
+					imageFeatures.grow().setTo(packedFeatures.getTemp(i));
+				}
+				learnWeights.addImage(imageFeatures.toList());
 			}
-			learnWeights.addImage(imageFeatures.toList());
+			learnWeights.fixate();
+		} else {
+			// Set all weights to zero, except for the root which has to contain everything
+			tree.nodes.forEach(n -> n.weight = 1.0);
+			tree.nodes.get(0).weight = 0.0;
 		}
-		learnWeights.fixate();
 		long time3 = System.currentTimeMillis();
 
 		// Initialize the database
@@ -232,28 +241,50 @@ public class FeatureSceneRecognitionNister2006<TD extends TupleDesc<TD>> impleme
 	}
 
 	@Override public int getQueryWord( int featureIdx ) {
-		return databaseN.getFeatureIdxToLeafID().get(featureIdx);
+		return traverseUpGetID(databaseN.getFeatureIdxToLeafID().get(featureIdx), featureSingleWordHops);
 	}
 
 	@Override public void getQueryWords( int featureIdx, DogArray_I32 word ) {
-		int leafID = databaseN.getFeatureIdxToLeafID().get(featureIdx);
+		int leafID = getQueryWord(featureIdx);
+		lookupWordsFromLeafID(leafID, word);
+	}
 
+	@Override public int lookupWord( TD description ) {
+		return traverseUpGetID(databaseN.tree.searchPathToLeaf(description, ( idx, n ) -> {}), featureSingleWordHops);
+	}
+
+	@Override public void lookupWordsWords( TD description, DogArray_I32 word ) {
+		lookupWordsFromLeafID(lookupWord(description), word);
+	}
+
+	/**
+	 * Given the leafID lookup the other words in the tree leading to the leaf
+	 */
+	protected void lookupWordsFromLeafID( int leafID, DogArray_I32 word ) {
 		HierarchicalVocabularyTree.Node node = databaseN.tree.nodes.get(leafID);
 		while (node != null) {
 			// the root node has a parent of -1 and we don't want to use that as a word since every feature has it
-			if (node.parent==-1)
+			if (node.parent == -1)
 				break;
 			word.add(node.index);
 			node = databaseN.tree.nodes.get(node.parent);
 		}
 	}
 
-	@Override public int lookupWord( TD description ) {
-		return 0;
-	}
-
-	@Override public void lookupWordsWords( TD description, DogArray_I32 word ) {
-
+	/**
+	 * Traverses up the tree to find a parent node X hops away
+	 */
+	protected int traverseUpGetID( int id, int maxHops ) {
+		int hops = maxHops;
+		HierarchicalVocabularyTree.Node node = databaseN.tree.nodes.get(id);
+		while (node != null && hops-- > 0) {
+			// the root node has a parent of -1 and we don't want to use that as a word since every feature has it
+			if (node.parent == -1)
+				break;
+			id = node.index;
+			node = databaseN.tree.nodes.get(node.parent);
+		}
+		return id;
 	}
 
 	@Override public int getTotalWords() {

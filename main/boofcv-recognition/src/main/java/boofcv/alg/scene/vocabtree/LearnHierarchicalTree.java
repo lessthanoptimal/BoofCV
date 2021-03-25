@@ -112,6 +112,10 @@ public class LearnHierarchicalTree<Point> implements VerbosePrint {
 		// Minus one below because the check below is <= (inclusive) while the parameter is exclusive
 		pointsRequiredForChildren = Math.max(1, minimumPointsForChildren.computeI(points.size())-1);
 
+		if (verbose!=null)
+			verbose.println("pointsRequiredForChildren="+pointsRequiredForChildren+" points.size="+points.size());
+
+
 		// Construct the tree
 		processLevel(points, tree, 0, 0);
 	}

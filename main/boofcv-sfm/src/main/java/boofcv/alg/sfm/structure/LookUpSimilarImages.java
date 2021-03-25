@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -32,9 +32,14 @@ import java.util.List;
  */
 public interface LookUpSimilarImages {
 
+	/**
+	 * Returns a list of all images by ID that it has in its data base
+	 */
 	List<String> getImageIDs();
 
 	/**
+	 * Given an imageID, it will find list of similar images.
+	 *
 	 * @param target ID of target image
 	 * @param similar Storage for IDs of similar images. Cleared upon each call
 	 */
