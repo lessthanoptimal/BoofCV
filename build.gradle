@@ -204,7 +204,7 @@ subprojects {
         }
 
         // https://github.com/gradle/gradle/issues/11182 Error introduced in JDK 11
-        if (JavaVersion.current().compareTo(JavaVersion.VERSION_1_9) >= 0) {
+        if (JavaVersion.current() >= JavaVersion.VERSION_1_9) {
             options.addStringOption("-release", "8")
         }
 
@@ -403,9 +403,8 @@ task oneJarBin(type: Jar, dependsOn: javadocProjects.collect { it + ":compileJav
     }
 }
 
+// Generates a global javadoc from all the modules
 task alljavadoc(type: Javadoc,  group: "Documentation") {
-    description = 'Generates a global javadoc from all the modules'
-
     // only include source code in src directory to avoid including 3rd party code which some projects do as a hack
     source = javadocProjects.collect { project(it).sourceSets.main.allJava } +
             javadocProjects.collect { project(it).sourceSets.noauto.allJava }
