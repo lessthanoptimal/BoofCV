@@ -34,6 +34,12 @@ public class ImageSimilarityAssociatedRatio implements SceneRecognitionSimilarIm
 	/** Fraction of features in a single image which must be associated for them to be considered similar */
 	public double minimumRatio = 0.5;
 
+	public ImageSimilarityAssociatedRatio( double minimumRatio ) {
+		this.minimumRatio = minimumRatio;
+	}
+
+	public ImageSimilarityAssociatedRatio() {}
+
 	@Override
 	public boolean isSimilar( FastAccess<Point2D_F64> srcPixels,
 							  FastAccess<Point2D_F64> dstPixels,

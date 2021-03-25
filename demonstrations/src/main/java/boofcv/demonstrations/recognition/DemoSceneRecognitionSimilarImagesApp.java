@@ -19,6 +19,8 @@
 package boofcv.demonstrations.recognition;
 
 import boofcv.alg.scene.SceneRecognitionSimilarImages;
+import boofcv.core.image.GeneralizedImageOps;
+import boofcv.factory.scene.FactorySceneRecognition;
 import boofcv.gui.BoofSwingUtil;
 import boofcv.gui.DemonstrationBase;
 import boofcv.gui.StandardAlgConfigPanel;
@@ -49,6 +51,9 @@ public class DemoSceneRecognitionSimilarImagesApp<Gray extends ImageGray<Gray>, 
 	Class<Gray> grayType;
 	ImageType<Planar<Gray>> colorType;
 
+	// List of which images are similar to each other
+	List<List<String>> similarImages = new ArrayList<>();
+
 	protected DemoSceneRecognitionSimilarImagesApp( List<?> exampleInputs, Class<Gray> grayType ) {
 		super(true, false, exampleInputs);
 		this.grayType = grayType;
@@ -62,6 +67,19 @@ public class DemoSceneRecognitionSimilarImagesApp<Gray extends ImageGray<Gray>, 
 
 	// Not used as this has it's own pipeline
 	@Override public void processImage( int sourceID, long frameID, BufferedImage buffered, ImageBase input ) {}
+
+	@Override protected void openFileMenuBar() {
+		List<BoofSwingUtil.FileTypes> types = new ArrayList<>();
+		types.add(BoofSwingUtil.FileTypes.IMAGES);
+		types.add(BoofSwingUtil.FileTypes.VIDEOS);
+		types.add(BoofSwingUtil.FileTypes.DIRECTORIES);
+		BoofSwingUtil.FileTypes[] array = types.toArray(new BoofSwingUtil.FileTypes[0]);
+
+		File file = BoofSwingUtil.openFileChooser(DemoSceneRecognitionSimilarImagesApp.this, array);
+		if (file != null) {
+			openFile(file, true);
+		}
+	}
 
 	/**
 	 * Specialized open file which makes a list of files
@@ -104,7 +122,37 @@ public class DemoSceneRecognitionSimilarImagesApp<Gray extends ImageGray<Gray>, 
 	 *
 	 */
 	void processImageFiles( List<String> foundFiles ) {
-		SceneRecognitionSimilarImages<Gray,TD> alg;
+		System.out.println("Processing images.size="+foundFiles.size());
+		SceneRecognitionSimilarImages<Gray,TD> alg =
+				FactorySceneRecognition.createSimilarImages(null, ImageType.single(grayType));
+
+		Gray gray = GeneralizedImageOps.createImage(grayType, 1, 1,0);
+
+		System.out.print("Adding images: ");
+		long time0 = System.currentTimeMillis();
+		for (String path : foundFiles) {
+			UtilImageIO.loadImage(path, true, gray);
+			// TODO max resolution
+
+			alg.addImage(path, gray);
+		}
+		long time1 = System.currentTimeMillis();
+		System.out.println((time1-time0)+" (ms)");
+
+		System.out.print("Fixating: ");
+		alg.fixate();
+		long time2 = System.currentTimeMillis();
+		System.out.println((time2-time1)+" (ms)");
+
+		System.out.print("Finding Similar: ");
+		similarImages.clear();
+		for (String path : foundFiles) {
+			List<String> similar = new ArrayList<>();
+			alg.findSimilar(path, similar);
+			similarImages.add(similar);
+		}
+		long time3 = System.currentTimeMillis();
+		System.out.println((time3-time2)+" (ms)");
 	}
 
 	class ControlPanel extends StandardAlgConfigPanel {
@@ -129,8 +177,8 @@ public class DemoSceneRecognitionSimilarImagesApp<Gray extends ImageGray<Gray>, 
 
 		SwingUtilities.invokeLater(() -> {
 			var app = new DemoSceneRecognitionSimilarImagesApp<>(examples, GrayU8.class);
-			app.openExample(examples.get(0));
-			app.display("FeatureSceneRecognition Demo");
+//			app.openExample(examples.get(0));
+			app.displayImmediate("FeatureSceneRecognition Demo");
 		});
 	}
 }
