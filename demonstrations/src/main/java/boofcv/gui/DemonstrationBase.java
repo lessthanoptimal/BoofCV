@@ -60,7 +60,7 @@ import static boofcv.io.UtilIO.systemToUnix;
  */
 public abstract class DemonstrationBase extends JPanel {
 	protected JMenuBar menuBar;
-	JMenuItem menuItemFile, menuItemWebcam, menuItenQuit;
+	JMenuItem menuItemFile, menuItemWebcam, menuItemQuit;
 	JMenu menuRecent;
 
 	// Window the application is shown in
@@ -211,13 +211,13 @@ public abstract class DemonstrationBase extends JPanel {
 		JMenuItem menuSettings = new JMenuItem("Settings");
 		menuSettings.addActionListener(e -> new GlobalSettingsControls().showDialog(window, this));
 
-		menuItenQuit = new JMenuItem("Quit", KeyEvent.VK_Q);
-		menuItenQuit.addActionListener(listener);
-		BoofSwingUtil.setMenuItemKeys(menuItenQuit, KeyEvent.VK_Q, KeyEvent.VK_Q);
+		menuItemQuit = new JMenuItem("Quit", KeyEvent.VK_Q);
+		menuItemQuit.addActionListener(listener);
+		BoofSwingUtil.setMenuItemKeys(menuItemQuit, KeyEvent.VK_Q, KeyEvent.VK_Q);
 
 		menuFile.addSeparator();
 		menuFile.add(menuSettings);
-		menuFile.add(menuItenQuit);
+		menuFile.add(menuItemQuit);
 
 		if (exampleInputs != null && exampleInputs.size() > 0) {
 			JMenu menuExamples = new JMenu("Examples");
@@ -856,7 +856,7 @@ public abstract class DemonstrationBase extends JPanel {
 				openFileMenuBar();
 			} else if (menuItemWebcam == e.getSource()) {
 				openWebcam();
-			} else if (menuItenQuit == e.getSource()) {
+			} else if (menuItemQuit == e.getSource()) {
 				System.exit(0);
 			}
 		};
