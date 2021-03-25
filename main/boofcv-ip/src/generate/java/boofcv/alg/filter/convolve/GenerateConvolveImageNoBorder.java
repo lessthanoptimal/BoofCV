@@ -131,7 +131,7 @@ public class GenerateConvolveImageNoBorder extends CodeGeneratorBase {
 		String divideSuf = hasDivide ? "_Div" : "";
 		String divideInput = hasDivide ? ", divisor" : "";
 		String workspaceArg = hasDivide && singleBand && (name.equals("convolve") || name.equals("vertical"))
-				? ", @Nullable GrowArray<DogArray_I32> work" : "";
+				? "@Nullable GrowArray<DogArray_I32> work" : "";
 		String workspaceInput = workspaceArg.length()==0 ? "" : ", work";
 
 		// Not all permutations of unrolled are generated
@@ -151,10 +151,9 @@ public class GenerateConvolveImageNoBorder extends CodeGeneratorBase {
 //		if( hasDivide )
 //			out.print("\t * @param divisor The value that the convolved image is divided by.\n");
 //		out.print("\t */\n" );
-
-		out.print("\tpublic static void "+name+"(Kernel"+dimen+"_"+kernelType+" kernel,\n" +
-				"\t\t\t\t\t\t\t\t  "+inputName+" input, "+outputName+" output"+divideArg+workspaceArg+") {\n" +
-				"\t\tInputSanityCheck.checkSameShape(input, output);\n" +
+		out.print(functionSignature(1,"public static void",name,"Kernel"+dimen+"_"+kernelType+" kernel",
+				inputName+" input", outputName+" output"+divideArg,workspaceArg));
+		out.print("\t\tInputSanityCheck.checkSameShape(input, output);\n" +
 				"\n");
 		out.print("\t\tif (BoofConcurrency.USE_CONCURRENT) {\n");
 		if( singleBand ) {

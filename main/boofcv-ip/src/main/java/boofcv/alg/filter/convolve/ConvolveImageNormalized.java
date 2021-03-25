@@ -49,7 +49,7 @@ public class ConvolveImageNormalized {
 	 * @param dst Where the resulting image is written to. Modified.
 	 * @param kernel The kernel that is being convolved. Not modified.
 	 */
-	public static void horizontal(Kernel1D_F32 kernel, GrayF32 src, GrayF32 dst ) {
+	public static void horizontal( Kernel1D_F32 kernel, GrayF32 src, GrayF32 dst ) {
 		dst.reshape(src.width,src.height);
 
 		if( BOverrideConvolveImageNormalized.invokeNativeHorizontal(kernel,src,dst) )
@@ -75,7 +75,7 @@ public class ConvolveImageNormalized {
 	 * @param dst Where the resulting image is written to. Modified.
 	 * @param kernel The kernel that is being convolved. Not modified.
 	 */
-	public static void vertical(Kernel1D_F32 kernel, GrayF32 src, GrayF32 dst ) {
+	public static void vertical( Kernel1D_F32 kernel, GrayF32 src, GrayF32 dst ) {
 		dst.reshape(src.width,src.height);
 
 		if( BOverrideConvolveImageNormalized.invokeNativeVertical(kernel,src,dst) )
@@ -101,7 +101,7 @@ public class ConvolveImageNormalized {
 	 * @param dst Where the resulting image is written to. Modified.
 	 * @param kernel The kernel that is being convolved. Not modified.
 	 */
-	public static void convolve(Kernel2D_F32 kernel, GrayF32 src, GrayF32 dst ) {
+	public static void convolve( Kernel2D_F32 kernel, GrayF32 src, GrayF32 dst ) {
 		dst.reshape(src.width,src.height);
 
 		if( BOverrideConvolveImageNormalized.invokeNativeConvolve(kernel,src,dst) )
@@ -127,7 +127,7 @@ public class ConvolveImageNormalized {
 	 * @param dst Where the resulting image is written to. Modified.
 	 * @param kernel The kernel that is being convolved. Not modified.
 	 */
-	public static void horizontal(Kernel1D_F32 kernel, GrayF32 src, GrayF32 dst , ImageBorder_F32 bsrc) {
+	public static void horizontal( Kernel1D_F32 kernel, GrayF32 src, GrayF32 dst, ImageBorder_F32 bsrc ) {
 		dst.reshape(src.width,src.height);
 
 		//if( BOverrideConvolveImageNormalized.invokeNativeHorizontal(kernel,src,dst) )
@@ -155,7 +155,7 @@ public class ConvolveImageNormalized {
 	 * @param dst Where the resulting image is written to. Modified.
 	 * @param kernel The kernel that is being convolved. Not modified.
 	 */
-	public static void vertical(Kernel1D_F32 kernel, GrayF32 src, GrayF32 dst , ImageBorder_F32 bsrc) {
+	public static void vertical( Kernel1D_F32 kernel, GrayF32 src, GrayF32 dst, ImageBorder_F32 bsrc ) {
 		dst.reshape(src.width,src.height);
 
 		//if( BOverrideConvolveImageNormalized.invokeNativeVertical(kernel,src,dst) )
@@ -183,7 +183,7 @@ public class ConvolveImageNormalized {
 	 * @param dst Where the resulting image is written to. Modified.
 	 * @param kernel The kernel that is being convolved. Not modified.
 	 */
-	public static void convolve(Kernel2D_F32 kernel, GrayF32 src, GrayF32 dst , ImageBorder_F32 bsrc) {
+	public static void convolve( Kernel2D_F32 kernel, GrayF32 src, GrayF32 dst, ImageBorder_F32 bsrc ) {
 		dst.reshape(src.width,src.height);
 
 		//if( BOverrideConvolveImageNormalized.invokeNativeConvolve(kernel,src,dst) )
@@ -211,7 +211,7 @@ public class ConvolveImageNormalized {
 	 * @param dst Where the resulting image is written to. Modified.
 	 * @param kernel The kernel that is being convolved. Not modified.
 	 */
-	public static void horizontal(Kernel1D_F32 kernel, InterleavedF32 src, InterleavedF32 dst ) {
+	public static void horizontal( Kernel1D_F32 kernel, InterleavedF32 src, InterleavedF32 dst ) {
 		dst.reshape(src.width,src.height);
 
 		if( BOverrideConvolveImageNormalized.invokeNativeHorizontal(kernel,src,dst) )
@@ -237,7 +237,7 @@ public class ConvolveImageNormalized {
 	 * @param dst Where the resulting image is written to. Modified.
 	 * @param kernel The kernel that is being convolved. Not modified.
 	 */
-	public static void vertical(Kernel1D_F32 kernel, InterleavedF32 src, InterleavedF32 dst ) {
+	public static void vertical( Kernel1D_F32 kernel, InterleavedF32 src, InterleavedF32 dst ) {
 		dst.reshape(src.width,src.height);
 
 		if( BOverrideConvolveImageNormalized.invokeNativeVertical(kernel,src,dst) )
@@ -263,7 +263,7 @@ public class ConvolveImageNormalized {
 	 * @param dst Where the resulting image is written to. Modified.
 	 * @param kernel The kernel that is being convolved. Not modified.
 	 */
-	public static void convolve(Kernel2D_F32 kernel, InterleavedF32 src, InterleavedF32 dst ) {
+	public static void convolve( Kernel2D_F32 kernel, InterleavedF32 src, InterleavedF32 dst ) {
 		dst.reshape(src.width,src.height);
 
 		if( BOverrideConvolveImageNormalized.invokeNativeConvolve(kernel,src,dst) )
@@ -289,7 +289,7 @@ public class ConvolveImageNormalized {
 	 * @param dst Where the resulting image is written to. Modified.
 	 * @param kernel The kernel that is being convolved. Not modified.
 	 */
-	public static void horizontal(Kernel1D_F64 kernel, GrayF64 src, GrayF64 dst ) {
+	public static void horizontal( Kernel1D_F64 kernel, GrayF64 src, GrayF64 dst ) {
 		dst.reshape(src.width,src.height);
 
 		if( BOverrideConvolveImageNormalized.invokeNativeHorizontal(kernel,src,dst) )
@@ -315,7 +315,7 @@ public class ConvolveImageNormalized {
 	 * @param dst Where the resulting image is written to. Modified.
 	 * @param kernel The kernel that is being convolved. Not modified.
 	 */
-	public static void vertical(Kernel1D_F64 kernel, GrayF64 src, GrayF64 dst ) {
+	public static void vertical( Kernel1D_F64 kernel, GrayF64 src, GrayF64 dst ) {
 		dst.reshape(src.width,src.height);
 
 		if( BOverrideConvolveImageNormalized.invokeNativeVertical(kernel,src,dst) )
@@ -341,7 +341,7 @@ public class ConvolveImageNormalized {
 	 * @param dst Where the resulting image is written to. Modified.
 	 * @param kernel The kernel that is being convolved. Not modified.
 	 */
-	public static void convolve(Kernel2D_F64 kernel, GrayF64 src, GrayF64 dst ) {
+	public static void convolve( Kernel2D_F64 kernel, GrayF64 src, GrayF64 dst ) {
 		dst.reshape(src.width,src.height);
 
 		if( BOverrideConvolveImageNormalized.invokeNativeConvolve(kernel,src,dst) )
@@ -367,7 +367,7 @@ public class ConvolveImageNormalized {
 	 * @param dst Where the resulting image is written to. Modified.
 	 * @param kernel The kernel that is being convolved. Not modified.
 	 */
-	public static void horizontal(Kernel1D_F64 kernel, GrayF64 src, GrayF64 dst , ImageBorder_F64 bsrc) {
+	public static void horizontal( Kernel1D_F64 kernel, GrayF64 src, GrayF64 dst, ImageBorder_F64 bsrc ) {
 		dst.reshape(src.width,src.height);
 
 		//if( BOverrideConvolveImageNormalized.invokeNativeHorizontal(kernel,src,dst) )
@@ -395,7 +395,7 @@ public class ConvolveImageNormalized {
 	 * @param dst Where the resulting image is written to. Modified.
 	 * @param kernel The kernel that is being convolved. Not modified.
 	 */
-	public static void vertical(Kernel1D_F64 kernel, GrayF64 src, GrayF64 dst , ImageBorder_F64 bsrc) {
+	public static void vertical( Kernel1D_F64 kernel, GrayF64 src, GrayF64 dst, ImageBorder_F64 bsrc ) {
 		dst.reshape(src.width,src.height);
 
 		//if( BOverrideConvolveImageNormalized.invokeNativeVertical(kernel,src,dst) )
@@ -423,7 +423,7 @@ public class ConvolveImageNormalized {
 	 * @param dst Where the resulting image is written to. Modified.
 	 * @param kernel The kernel that is being convolved. Not modified.
 	 */
-	public static void convolve(Kernel2D_F64 kernel, GrayF64 src, GrayF64 dst , ImageBorder_F64 bsrc) {
+	public static void convolve( Kernel2D_F64 kernel, GrayF64 src, GrayF64 dst, ImageBorder_F64 bsrc ) {
 		dst.reshape(src.width,src.height);
 
 		//if( BOverrideConvolveImageNormalized.invokeNativeConvolve(kernel,src,dst) )
@@ -451,7 +451,7 @@ public class ConvolveImageNormalized {
 	 * @param dst Where the resulting image is written to. Modified.
 	 * @param kernel The kernel that is being convolved. Not modified.
 	 */
-	public static void horizontal(Kernel1D_F64 kernel, InterleavedF64 src, InterleavedF64 dst ) {
+	public static void horizontal( Kernel1D_F64 kernel, InterleavedF64 src, InterleavedF64 dst ) {
 		dst.reshape(src.width,src.height);
 
 		if( BOverrideConvolveImageNormalized.invokeNativeHorizontal(kernel,src,dst) )
@@ -477,7 +477,7 @@ public class ConvolveImageNormalized {
 	 * @param dst Where the resulting image is written to. Modified.
 	 * @param kernel The kernel that is being convolved. Not modified.
 	 */
-	public static void vertical(Kernel1D_F64 kernel, InterleavedF64 src, InterleavedF64 dst ) {
+	public static void vertical( Kernel1D_F64 kernel, InterleavedF64 src, InterleavedF64 dst ) {
 		dst.reshape(src.width,src.height);
 
 		if( BOverrideConvolveImageNormalized.invokeNativeVertical(kernel,src,dst) )
@@ -503,7 +503,7 @@ public class ConvolveImageNormalized {
 	 * @param dst Where the resulting image is written to. Modified.
 	 * @param kernel The kernel that is being convolved. Not modified.
 	 */
-	public static void convolve(Kernel2D_F64 kernel, InterleavedF64 src, InterleavedF64 dst ) {
+	public static void convolve( Kernel2D_F64 kernel, InterleavedF64 src, InterleavedF64 dst ) {
 		dst.reshape(src.width,src.height);
 
 		if( BOverrideConvolveImageNormalized.invokeNativeConvolve(kernel,src,dst) )
@@ -529,7 +529,7 @@ public class ConvolveImageNormalized {
 	 * @param dst Where the resulting image is written to. Modified.
 	 * @param kernel The kernel that is being convolved. Not modified.
 	 */
-	public static void horizontal(Kernel1D_S32 kernel, GrayU8 src, GrayI8 dst ) {
+	public static void horizontal( Kernel1D_S32 kernel, GrayU8 src, GrayI8 dst ) {
 		dst.reshape(src.width,src.height);
 
 		if( BOverrideConvolveImageNormalized.invokeNativeHorizontal(kernel,src,dst) )
@@ -550,7 +550,7 @@ public class ConvolveImageNormalized {
 	 * @param dst Where the resulting image is written to. Modified.
 	 * @param kernel The kernel that is being convolved. Not modified.
 	 */
-	public static void vertical(Kernel1D_S32 kernel, GrayU8 src, GrayI8 dst ) {
+	public static void vertical( Kernel1D_S32 kernel, GrayU8 src, GrayI8 dst ) {
 		dst.reshape(src.width,src.height);
 
 		if( BOverrideConvolveImageNormalized.invokeNativeVertical(kernel,src,dst) )
@@ -571,7 +571,7 @@ public class ConvolveImageNormalized {
 	 * @param dst Where the resulting image is written to. Modified.
 	 * @param kernel The kernel that is being convolved. Not modified.
 	 */
-	public static void convolve(Kernel2D_S32 kernel, GrayU8 src, GrayI8 dst ) {
+	public static void convolve( Kernel2D_S32 kernel, GrayU8 src, GrayI8 dst ) {
 		dst.reshape(src.width,src.height);
 
 		if( BOverrideConvolveImageNormalized.invokeNativeConvolve(kernel,src,dst) )
@@ -592,7 +592,7 @@ public class ConvolveImageNormalized {
 	 * @param dst Where the resulting image is written to. Modified.
 	 * @param kernel The kernel that is being convolved. Not modified.
 	 */
-	public static void horizontal(Kernel1D_S32 kernel, GrayU8 src, GrayI8 dst , ImageBorder_S32<GrayU8> bsrc) {
+	public static void horizontal( Kernel1D_S32 kernel, GrayU8 src, GrayI8 dst, ImageBorder_S32<GrayU8> bsrc ) {
 		dst.reshape(src.width,src.height);
 
 		//if( BOverrideConvolveImageNormalized.invokeNativeHorizontal(kernel,src,dst) )
@@ -615,7 +615,7 @@ public class ConvolveImageNormalized {
 	 * @param dst Where the resulting image is written to. Modified.
 	 * @param kernel The kernel that is being convolved. Not modified.
 	 */
-	public static void vertical(Kernel1D_S32 kernel, GrayU8 src, GrayI8 dst , ImageBorder_S32<GrayU8> bsrc) {
+	public static void vertical( Kernel1D_S32 kernel, GrayU8 src, GrayI8 dst, ImageBorder_S32<GrayU8> bsrc ) {
 		dst.reshape(src.width,src.height);
 
 		//if( BOverrideConvolveImageNormalized.invokeNativeVertical(kernel,src,dst) )
@@ -638,7 +638,7 @@ public class ConvolveImageNormalized {
 	 * @param dst Where the resulting image is written to. Modified.
 	 * @param kernel The kernel that is being convolved. Not modified.
 	 */
-	public static void convolve(Kernel2D_S32 kernel, GrayU8 src, GrayI8 dst , ImageBorder_S32<GrayU8> bsrc) {
+	public static void convolve( Kernel2D_S32 kernel, GrayU8 src, GrayI8 dst, ImageBorder_S32<GrayU8> bsrc ) {
 		dst.reshape(src.width,src.height);
 
 		//if( BOverrideConvolveImageNormalized.invokeNativeConvolve(kernel,src,dst) )
@@ -661,7 +661,7 @@ public class ConvolveImageNormalized {
 	 * @param dst Where the resulting image is written to. Modified.
 	 * @param kernel The kernel that is being convolved. Not modified.
 	 */
-	public static void horizontal(Kernel1D_S32 kernel, InterleavedU8 src, InterleavedI8 dst ) {
+	public static void horizontal( Kernel1D_S32 kernel, InterleavedU8 src, InterleavedI8 dst ) {
 		dst.reshape(src.width,src.height);
 
 		if( BOverrideConvolveImageNormalized.invokeNativeHorizontal(kernel,src,dst) )
@@ -682,7 +682,7 @@ public class ConvolveImageNormalized {
 	 * @param dst Where the resulting image is written to. Modified.
 	 * @param kernel The kernel that is being convolved. Not modified.
 	 */
-	public static void vertical(Kernel1D_S32 kernel, InterleavedU8 src, InterleavedI8 dst ) {
+	public static void vertical( Kernel1D_S32 kernel, InterleavedU8 src, InterleavedI8 dst ) {
 		dst.reshape(src.width,src.height);
 
 		if( BOverrideConvolveImageNormalized.invokeNativeVertical(kernel,src,dst) )
@@ -703,7 +703,7 @@ public class ConvolveImageNormalized {
 	 * @param dst Where the resulting image is written to. Modified.
 	 * @param kernel The kernel that is being convolved. Not modified.
 	 */
-	public static void convolve(Kernel2D_S32 kernel, InterleavedU8 src, InterleavedI8 dst ) {
+	public static void convolve( Kernel2D_S32 kernel, InterleavedU8 src, InterleavedI8 dst ) {
 		dst.reshape(src.width,src.height);
 
 		if( BOverrideConvolveImageNormalized.invokeNativeConvolve(kernel,src,dst) )
@@ -724,7 +724,7 @@ public class ConvolveImageNormalized {
 	 * @param dst Where the resulting image is written to. Modified.
 	 * @param kernel The kernel that is being convolved. Not modified.
 	 */
-	public static void horizontal(Kernel1D_S32 kernel, GrayS16 src, GrayI16 dst ) {
+	public static void horizontal( Kernel1D_S32 kernel, GrayS16 src, GrayI16 dst ) {
 		dst.reshape(src.width,src.height);
 
 		if( BOverrideConvolveImageNormalized.invokeNativeHorizontal(kernel,src,dst) )
@@ -745,7 +745,7 @@ public class ConvolveImageNormalized {
 	 * @param dst Where the resulting image is written to. Modified.
 	 * @param kernel The kernel that is being convolved. Not modified.
 	 */
-	public static void vertical(Kernel1D_S32 kernel, GrayS16 src, GrayI16 dst ) {
+	public static void vertical( Kernel1D_S32 kernel, GrayS16 src, GrayI16 dst ) {
 		dst.reshape(src.width,src.height);
 
 		if( BOverrideConvolveImageNormalized.invokeNativeVertical(kernel,src,dst) )
@@ -766,7 +766,7 @@ public class ConvolveImageNormalized {
 	 * @param dst Where the resulting image is written to. Modified.
 	 * @param kernel The kernel that is being convolved. Not modified.
 	 */
-	public static void convolve(Kernel2D_S32 kernel, GrayS16 src, GrayI16 dst ) {
+	public static void convolve( Kernel2D_S32 kernel, GrayS16 src, GrayI16 dst ) {
 		dst.reshape(src.width,src.height);
 
 		if( BOverrideConvolveImageNormalized.invokeNativeConvolve(kernel,src,dst) )
@@ -787,7 +787,7 @@ public class ConvolveImageNormalized {
 	 * @param dst Where the resulting image is written to. Modified.
 	 * @param kernel The kernel that is being convolved. Not modified.
 	 */
-	public static void horizontal(Kernel1D_S32 kernel, GrayS16 src, GrayI16 dst , ImageBorder_S32<GrayS16> bsrc) {
+	public static void horizontal( Kernel1D_S32 kernel, GrayS16 src, GrayI16 dst, ImageBorder_S32<GrayS16> bsrc ) {
 		dst.reshape(src.width,src.height);
 
 		//if( BOverrideConvolveImageNormalized.invokeNativeHorizontal(kernel,src,dst) )
@@ -810,7 +810,7 @@ public class ConvolveImageNormalized {
 	 * @param dst Where the resulting image is written to. Modified.
 	 * @param kernel The kernel that is being convolved. Not modified.
 	 */
-	public static void vertical(Kernel1D_S32 kernel, GrayS16 src, GrayI16 dst , ImageBorder_S32<GrayS16> bsrc) {
+	public static void vertical( Kernel1D_S32 kernel, GrayS16 src, GrayI16 dst, ImageBorder_S32<GrayS16> bsrc ) {
 		dst.reshape(src.width,src.height);
 
 		//if( BOverrideConvolveImageNormalized.invokeNativeVertical(kernel,src,dst) )
@@ -833,7 +833,7 @@ public class ConvolveImageNormalized {
 	 * @param dst Where the resulting image is written to. Modified.
 	 * @param kernel The kernel that is being convolved. Not modified.
 	 */
-	public static void convolve(Kernel2D_S32 kernel, GrayS16 src, GrayI16 dst , ImageBorder_S32<GrayS16> bsrc) {
+	public static void convolve( Kernel2D_S32 kernel, GrayS16 src, GrayI16 dst, ImageBorder_S32<GrayS16> bsrc ) {
 		dst.reshape(src.width,src.height);
 
 		//if( BOverrideConvolveImageNormalized.invokeNativeConvolve(kernel,src,dst) )
@@ -856,7 +856,7 @@ public class ConvolveImageNormalized {
 	 * @param dst Where the resulting image is written to. Modified.
 	 * @param kernel The kernel that is being convolved. Not modified.
 	 */
-	public static void horizontal(Kernel1D_S32 kernel, InterleavedS16 src, InterleavedI16 dst ) {
+	public static void horizontal( Kernel1D_S32 kernel, InterleavedS16 src, InterleavedI16 dst ) {
 		dst.reshape(src.width,src.height);
 
 		if( BOverrideConvolveImageNormalized.invokeNativeHorizontal(kernel,src,dst) )
@@ -877,7 +877,7 @@ public class ConvolveImageNormalized {
 	 * @param dst Where the resulting image is written to. Modified.
 	 * @param kernel The kernel that is being convolved. Not modified.
 	 */
-	public static void vertical(Kernel1D_S32 kernel, InterleavedS16 src, InterleavedI16 dst ) {
+	public static void vertical( Kernel1D_S32 kernel, InterleavedS16 src, InterleavedI16 dst ) {
 		dst.reshape(src.width,src.height);
 
 		if( BOverrideConvolveImageNormalized.invokeNativeVertical(kernel,src,dst) )
@@ -898,7 +898,7 @@ public class ConvolveImageNormalized {
 	 * @param dst Where the resulting image is written to. Modified.
 	 * @param kernel The kernel that is being convolved. Not modified.
 	 */
-	public static void convolve(Kernel2D_S32 kernel, InterleavedS16 src, InterleavedI16 dst ) {
+	public static void convolve( Kernel2D_S32 kernel, InterleavedS16 src, InterleavedI16 dst ) {
 		dst.reshape(src.width,src.height);
 
 		if( BOverrideConvolveImageNormalized.invokeNativeConvolve(kernel,src,dst) )
@@ -919,7 +919,7 @@ public class ConvolveImageNormalized {
 	 * @param dst Where the resulting image is written to. Modified.
 	 * @param kernel The kernel that is being convolved. Not modified.
 	 */
-	public static void horizontal(Kernel1D_S32 kernel, GrayU16 src, GrayI16 dst ) {
+	public static void horizontal( Kernel1D_S32 kernel, GrayU16 src, GrayI16 dst ) {
 		dst.reshape(src.width,src.height);
 
 		if( BOverrideConvolveImageNormalized.invokeNativeHorizontal(kernel,src,dst) )
@@ -940,7 +940,7 @@ public class ConvolveImageNormalized {
 	 * @param dst Where the resulting image is written to. Modified.
 	 * @param kernel The kernel that is being convolved. Not modified.
 	 */
-	public static void vertical(Kernel1D_S32 kernel, GrayU16 src, GrayI16 dst ) {
+	public static void vertical( Kernel1D_S32 kernel, GrayU16 src, GrayI16 dst ) {
 		dst.reshape(src.width,src.height);
 
 		if( BOverrideConvolveImageNormalized.invokeNativeVertical(kernel,src,dst) )
@@ -961,7 +961,7 @@ public class ConvolveImageNormalized {
 	 * @param dst Where the resulting image is written to. Modified.
 	 * @param kernel The kernel that is being convolved. Not modified.
 	 */
-	public static void convolve(Kernel2D_S32 kernel, GrayU16 src, GrayI16 dst ) {
+	public static void convolve( Kernel2D_S32 kernel, GrayU16 src, GrayI16 dst ) {
 		dst.reshape(src.width,src.height);
 
 		if( BOverrideConvolveImageNormalized.invokeNativeConvolve(kernel,src,dst) )
@@ -982,7 +982,7 @@ public class ConvolveImageNormalized {
 	 * @param dst Where the resulting image is written to. Modified.
 	 * @param kernel The kernel that is being convolved. Not modified.
 	 */
-	public static void horizontal(Kernel1D_S32 kernel, GrayU16 src, GrayI16 dst , ImageBorder_S32<GrayU16> bsrc) {
+	public static void horizontal( Kernel1D_S32 kernel, GrayU16 src, GrayI16 dst, ImageBorder_S32<GrayU16> bsrc ) {
 		dst.reshape(src.width,src.height);
 
 		//if( BOverrideConvolveImageNormalized.invokeNativeHorizontal(kernel,src,dst) )
@@ -1005,7 +1005,7 @@ public class ConvolveImageNormalized {
 	 * @param dst Where the resulting image is written to. Modified.
 	 * @param kernel The kernel that is being convolved. Not modified.
 	 */
-	public static void vertical(Kernel1D_S32 kernel, GrayU16 src, GrayI16 dst , ImageBorder_S32<GrayU16> bsrc) {
+	public static void vertical( Kernel1D_S32 kernel, GrayU16 src, GrayI16 dst, ImageBorder_S32<GrayU16> bsrc ) {
 		dst.reshape(src.width,src.height);
 
 		//if( BOverrideConvolveImageNormalized.invokeNativeVertical(kernel,src,dst) )
@@ -1028,7 +1028,7 @@ public class ConvolveImageNormalized {
 	 * @param dst Where the resulting image is written to. Modified.
 	 * @param kernel The kernel that is being convolved. Not modified.
 	 */
-	public static void convolve(Kernel2D_S32 kernel, GrayU16 src, GrayI16 dst , ImageBorder_S32<GrayU16> bsrc) {
+	public static void convolve( Kernel2D_S32 kernel, GrayU16 src, GrayI16 dst, ImageBorder_S32<GrayU16> bsrc ) {
 		dst.reshape(src.width,src.height);
 
 		//if( BOverrideConvolveImageNormalized.invokeNativeConvolve(kernel,src,dst) )
@@ -1051,7 +1051,7 @@ public class ConvolveImageNormalized {
 	 * @param dst Where the resulting image is written to. Modified.
 	 * @param kernel The kernel that is being convolved. Not modified.
 	 */
-	public static void horizontal(Kernel1D_S32 kernel, InterleavedU16 src, InterleavedI16 dst ) {
+	public static void horizontal( Kernel1D_S32 kernel, InterleavedU16 src, InterleavedI16 dst ) {
 		dst.reshape(src.width,src.height);
 
 		if( BOverrideConvolveImageNormalized.invokeNativeHorizontal(kernel,src,dst) )
@@ -1072,7 +1072,7 @@ public class ConvolveImageNormalized {
 	 * @param dst Where the resulting image is written to. Modified.
 	 * @param kernel The kernel that is being convolved. Not modified.
 	 */
-	public static void vertical(Kernel1D_S32 kernel, InterleavedU16 src, InterleavedI16 dst ) {
+	public static void vertical( Kernel1D_S32 kernel, InterleavedU16 src, InterleavedI16 dst ) {
 		dst.reshape(src.width,src.height);
 
 		if( BOverrideConvolveImageNormalized.invokeNativeVertical(kernel,src,dst) )
@@ -1093,7 +1093,7 @@ public class ConvolveImageNormalized {
 	 * @param dst Where the resulting image is written to. Modified.
 	 * @param kernel The kernel that is being convolved. Not modified.
 	 */
-	public static void convolve(Kernel2D_S32 kernel, InterleavedU16 src, InterleavedI16 dst ) {
+	public static void convolve( Kernel2D_S32 kernel, InterleavedU16 src, InterleavedI16 dst ) {
 		dst.reshape(src.width,src.height);
 
 		if( BOverrideConvolveImageNormalized.invokeNativeConvolve(kernel,src,dst) )
@@ -1114,7 +1114,7 @@ public class ConvolveImageNormalized {
 	 * @param dst Where the resulting image is written to. Modified.
 	 * @param kernel The kernel that is being convolved. Not modified.
 	 */
-	public static void horizontal(Kernel1D_S32 kernel, GrayS32 src, GrayS32 dst ) {
+	public static void horizontal( Kernel1D_S32 kernel, GrayS32 src, GrayS32 dst ) {
 		dst.reshape(src.width,src.height);
 
 		if( BOverrideConvolveImageNormalized.invokeNativeHorizontal(kernel,src,dst) )
@@ -1135,7 +1135,7 @@ public class ConvolveImageNormalized {
 	 * @param dst Where the resulting image is written to. Modified.
 	 * @param kernel The kernel that is being convolved. Not modified.
 	 */
-	public static void vertical(Kernel1D_S32 kernel, GrayS32 src, GrayS32 dst ) {
+	public static void vertical( Kernel1D_S32 kernel, GrayS32 src, GrayS32 dst ) {
 		dst.reshape(src.width,src.height);
 
 		if( BOverrideConvolveImageNormalized.invokeNativeVertical(kernel,src,dst) )
@@ -1156,7 +1156,7 @@ public class ConvolveImageNormalized {
 	 * @param dst Where the resulting image is written to. Modified.
 	 * @param kernel The kernel that is being convolved. Not modified.
 	 */
-	public static void convolve(Kernel2D_S32 kernel, GrayS32 src, GrayS32 dst ) {
+	public static void convolve( Kernel2D_S32 kernel, GrayS32 src, GrayS32 dst ) {
 		dst.reshape(src.width,src.height);
 
 		if( BOverrideConvolveImageNormalized.invokeNativeConvolve(kernel,src,dst) )
@@ -1177,7 +1177,7 @@ public class ConvolveImageNormalized {
 	 * @param dst Where the resulting image is written to. Modified.
 	 * @param kernel The kernel that is being convolved. Not modified.
 	 */
-	public static void horizontal(Kernel1D_S32 kernel, GrayS32 src, GrayS32 dst , ImageBorder_S32<GrayS32> bsrc) {
+	public static void horizontal( Kernel1D_S32 kernel, GrayS32 src, GrayS32 dst, ImageBorder_S32<GrayS32> bsrc ) {
 		dst.reshape(src.width,src.height);
 
 		//if( BOverrideConvolveImageNormalized.invokeNativeHorizontal(kernel,src,dst) )
@@ -1200,7 +1200,7 @@ public class ConvolveImageNormalized {
 	 * @param dst Where the resulting image is written to. Modified.
 	 * @param kernel The kernel that is being convolved. Not modified.
 	 */
-	public static void vertical(Kernel1D_S32 kernel, GrayS32 src, GrayS32 dst , ImageBorder_S32<GrayS32> bsrc) {
+	public static void vertical( Kernel1D_S32 kernel, GrayS32 src, GrayS32 dst, ImageBorder_S32<GrayS32> bsrc ) {
 		dst.reshape(src.width,src.height);
 
 		//if( BOverrideConvolveImageNormalized.invokeNativeVertical(kernel,src,dst) )
@@ -1223,7 +1223,7 @@ public class ConvolveImageNormalized {
 	 * @param dst Where the resulting image is written to. Modified.
 	 * @param kernel The kernel that is being convolved. Not modified.
 	 */
-	public static void convolve(Kernel2D_S32 kernel, GrayS32 src, GrayS32 dst , ImageBorder_S32<GrayS32> bsrc) {
+	public static void convolve( Kernel2D_S32 kernel, GrayS32 src, GrayS32 dst, ImageBorder_S32<GrayS32> bsrc ) {
 		dst.reshape(src.width,src.height);
 
 		//if( BOverrideConvolveImageNormalized.invokeNativeConvolve(kernel,src,dst) )
@@ -1246,7 +1246,7 @@ public class ConvolveImageNormalized {
 	 * @param dst Where the resulting image is written to. Modified.
 	 * @param kernel The kernel that is being convolved. Not modified.
 	 */
-	public static void horizontal(Kernel1D_S32 kernel, InterleavedS32 src, InterleavedS32 dst ) {
+	public static void horizontal( Kernel1D_S32 kernel, InterleavedS32 src, InterleavedS32 dst ) {
 		dst.reshape(src.width,src.height);
 
 		if( BOverrideConvolveImageNormalized.invokeNativeHorizontal(kernel,src,dst) )
@@ -1267,7 +1267,7 @@ public class ConvolveImageNormalized {
 	 * @param dst Where the resulting image is written to. Modified.
 	 * @param kernel The kernel that is being convolved. Not modified.
 	 */
-	public static void vertical(Kernel1D_S32 kernel, InterleavedS32 src, InterleavedS32 dst ) {
+	public static void vertical( Kernel1D_S32 kernel, InterleavedS32 src, InterleavedS32 dst ) {
 		dst.reshape(src.width,src.height);
 
 		if( BOverrideConvolveImageNormalized.invokeNativeVertical(kernel,src,dst) )
@@ -1288,7 +1288,7 @@ public class ConvolveImageNormalized {
 	 * @param dst Where the resulting image is written to. Modified.
 	 * @param kernel The kernel that is being convolved. Not modified.
 	 */
-	public static void convolve(Kernel2D_S32 kernel, InterleavedS32 src, InterleavedS32 dst ) {
+	public static void convolve( Kernel2D_S32 kernel, InterleavedS32 src, InterleavedS32 dst ) {
 		dst.reshape(src.width,src.height);
 
 		if( BOverrideConvolveImageNormalized.invokeNativeConvolve(kernel,src,dst) )

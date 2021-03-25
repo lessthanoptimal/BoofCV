@@ -117,7 +117,7 @@ public class GenerateConvolveImageNormalized extends CodeGeneratorBase {
 		String overrideName = name.equals("convolve") ? "Convolve" : name.equals("horizontal") ? "Horizontal" : "Vertical";
 		String workArray = (name.equals("convolve")||(name.equals("vertical") && isInteger)) && singleBand ? ", null" : "";
 
-		String borderArgument = border ? ", "+borderType+" bsrc" : "";
+		String borderArgument = border ? borderType+" bsrc" : "";
 
 		String commentsOverride = border ? "//" : "";
 
@@ -141,8 +141,8 @@ public class GenerateConvolveImageNormalized extends CodeGeneratorBase {
 				"\t * @param kernel The kernel that is being convolved. Not modified.\n" +
 				"\t */\n" );
 
-		out.print("\tpublic static void "+name+"("+kernelTypeName+" kernel, "+inputName+" src, "+outputName+" dst "+borderArgument+") {\n" +
-				"\t\tdst.reshape(src.width,src.height);\n" +
+		out.print(functionSignature(1,"public static void",name,kernelTypeName+" kernel",inputName+" src",outputName+" dst", borderArgument));
+		out.print("\t\tdst.reshape(src.width,src.height);\n" +
 				"\n" +
 				"\t\t"+commentsOverride+"if( BOverrideConvolveImageNormalized.invokeNative"+overrideName+"(kernel,src,dst) )\n"+
 				"\t\t"+commentsOverride+"\treturn;\n\n");

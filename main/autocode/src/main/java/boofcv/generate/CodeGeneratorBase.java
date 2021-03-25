@@ -27,6 +27,8 @@ import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.util.ArrayList;
+import java.util.List;
 
 import static boofcv.AutocodeMasterApp.findPathToProjectRoot;
 
@@ -37,6 +39,9 @@ import static boofcv.AutocodeMasterApp.findPathToProjectRoot;
  */
 public abstract class CodeGeneratorBase {
 	public static String copyright = "/** Copyright Peter Abeles. Failed to load copyright.txt. */";
+
+	public static final int MAX_LINE_LENGTH = 120;
+	public static final int SPACE_PER_TAB = 4;
 
 	protected PrintStream out;
 	protected @Nullable String className;
@@ -172,6 +177,50 @@ public abstract class CodeGeneratorBase {
 				"@Generated(\"" + getClass().getCanonicalName() + "\")\n";
 
 		return ret;
+	}
+
+	/**
+	 * Creates a function signal and automatically formats text so that it fits within the maximum length
+	 */
+	public String functionSignature( int tabs, String typeReturn, String name, String... arguments ) {
+		// Remove empty arguments. It can be easier to add empty strings than to filter them in advance
+		List<String> realArguments = new ArrayList<>();
+		for (String argument: arguments) {
+			if (argument.isEmpty())
+				continue;
+			realArguments.add(argument);
+		}
+
+		String text = "";
+		for (int i = 0; i < tabs; i++) {
+			text += "\t";
+		}
+		int startCharacters = tabs*SPACE_PER_TAB;
+		text += typeReturn+" "+name+"(" + (arguments.length==0?"":" ");
+		startCharacters += text.length()-tabs;
+
+		int lineLength = startCharacters;
+		for ( int argIdx = 0; argIdx < realArguments.size(); argIdx++ ) {
+			String argument = realArguments.get(argIdx);
+			if (lineLength + argument.length() > MAX_LINE_LENGTH ) {
+				text += "\n";
+				for (int i = 0; i < startCharacters/4; i++) {
+					text += "\t";
+				}
+				for (int i = 0; i < startCharacters%4; i++) {
+					text += " ";
+				}
+				lineLength = startCharacters;
+			}
+			int lengthBefore = text.length();
+			text += argument;
+			if (argIdx+1 != realArguments.size()) {
+				text += ", ";
+			}
+			lineLength += text.length()-lengthBefore;
+		}
+		text += " ) {\n";
+		return text;
 	}
 
 //	public String generatedAnnotation() {
