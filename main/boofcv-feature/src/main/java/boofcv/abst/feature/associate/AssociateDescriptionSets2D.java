@@ -41,8 +41,22 @@ public class AssociateDescriptionSets2D<Desc> extends BaseAssociateSets<Desc> {
 	 *
 	 * @see AssociateDescription2D#initialize(int, int)
 	 */
-	public void initialize( int imageWidth, int imageHeight ) {
+	public void initializeAssociator( int imageWidth, int imageHeight ) {
 		this.associator.initialize(imageWidth, imageHeight);
+	}
+
+	/**
+	 * Override the default behavior which assumes there's a one-to-one match between index and set ID
+	 */
+	public void initializeSets( int numberOfSets ) {
+		assert (numberOfSets > 0);
+
+		countSrc = 0;
+		countDst = 0;
+		unassociatedDst.reset();
+		unassociatedDst.reset();
+		sets.reset();
+		sets.resize(numberOfSets);
 	}
 
 	@Override protected SetStruct newSetStruct() {

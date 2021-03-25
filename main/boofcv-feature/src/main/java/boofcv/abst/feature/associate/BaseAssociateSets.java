@@ -67,21 +67,6 @@ public abstract class BaseAssociateSets<Desc> implements Associate {
 	}
 
 	/**
-	 * Specifies the number of sets and resets all internal data structures. This must be called before any other
-	 * function.
-	 */
-	public void initialize( int numberOfSets ) {
-		assert (numberOfSets > 0);
-
-		countSrc = 0;
-		countDst = 0;
-		unassociatedDst.reset();
-		unassociatedDst.reset();
-		sets.reset();
-		sets.resize(numberOfSets);
-	}
-
-	/**
 	 * Removes all data for the source descriptors.
 	 */
 	public void clearSource() {

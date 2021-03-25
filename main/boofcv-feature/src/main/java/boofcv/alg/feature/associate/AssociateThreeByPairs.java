@@ -19,7 +19,7 @@
 package boofcv.alg.feature.associate;
 
 import boofcv.abst.feature.associate.AssociateDescription;
-import boofcv.abst.feature.associate.AssociateDescriptionSets;
+import boofcv.abst.feature.associate.AssociateDescriptionArraySets;
 import boofcv.abst.feature.associate.AssociateThreeDescription;
 import boofcv.alg.descriptor.UtilFeature;
 import boofcv.struct.feature.AssociatedIndex;
@@ -40,7 +40,7 @@ import org.ddogleg.struct.FastArray;
 public class AssociateThreeByPairs<TD extends TupleDesc<TD>> implements AssociateThreeDescription<TD> {
 
 	// image to image association
-	protected AssociateDescriptionSets<TD> associator;
+	protected AssociateDescriptionArraySets<TD> associator;
 
 	// Reference to descriptions in each image
 	protected FastAccess<TD> featuresA, featuresB, featuresC;
@@ -67,7 +67,7 @@ public class AssociateThreeByPairs<TD extends TupleDesc<TD>> implements Associat
 	public AssociateThreeByPairs( AssociateDescription<TD> associator, Class<TD> type ) {
 		if (!associator.uniqueDestination() || !associator.uniqueSource())
 			throw new IllegalArgumentException("Both source and destination need to be unique");
-		this.associator = new AssociateDescriptionSets<>(associator, type);
+		this.associator = new AssociateDescriptionArraySets<>(associator, type);
 
 		tmpB = new FastArray<>(type);
 		tmpA = new FastArray<>(type);

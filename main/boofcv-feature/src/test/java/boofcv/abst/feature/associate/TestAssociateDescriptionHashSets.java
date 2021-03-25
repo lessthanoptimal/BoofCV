@@ -18,16 +18,15 @@
 
 package boofcv.abst.feature.associate;
 
-import boofcv.testing.BoofStandardJUnit;
-import org.junit.jupiter.api.Test;
-
-import static org.junit.jupiter.api.Assertions.fail;
+import boofcv.factory.feature.associate.FactoryAssociation;
+import boofcv.struct.feature.TupleDesc_F64;
 
 /**
  * @author Peter Abeles
  */
-public class TestAssociateDescriptionHashSets extends BoofStandardJUnit {
-	@Test void foo() {
-		fail("Implement");
+public class TestAssociateDescriptionHashSets extends GenericAssociateDescriptionSetsChecks {
+	@Override protected BaseAssociateDescriptionSets<TupleDesc_F64> createAlg() {
+		return new AssociateDescriptionHashSets<>(FactoryAssociation.greedy(
+				null,new ScoreAssociateEuclideanSq.F64()),TupleDesc_F64.class);
 	}
 }

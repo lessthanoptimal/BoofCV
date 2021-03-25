@@ -181,7 +181,7 @@ public class VisOdomStereoQuadPnP<T extends ImageGray<T>, TD extends TupleDesc<T
 		featsRight1 = new ImageInfo();
 
 		this.triangulateN = FactoryMultiView.triangulateNViewMetric(ConfigTriangulation.GEOMETRIC());
-		this.assocF2F.initialize(detector.getNumberOfSets());
+		this.assocF2F.initializeSets(detector.getNumberOfSets());
 
 		listNorm.resize(4);
 		listWorldToView.resize(4);
@@ -223,7 +223,7 @@ public class VisOdomStereoQuadPnP<T extends ImageGray<T>, TD extends TupleDesc<T
 	 */
 	public boolean process( T left, T right ) {
 		if (frameID == -1) {
-			assocF2F.initialize(left.width, left.height);
+			assocF2F.initializeAssociator(left.width, left.height);
 		}
 		frameID++;
 		long time0 = System.nanoTime();

@@ -18,7 +18,7 @@
 
 package boofcv.alg.descriptor;
 
-import boofcv.abst.feature.associate.AssociateDescriptionSets;
+import boofcv.abst.feature.associate.AssociateDescriptionArraySets;
 import boofcv.abst.feature.associate.AssociateDescriptionSets2D;
 import boofcv.abst.feature.describe.DescriptorInfo;
 import boofcv.abst.feature.detdesc.DetectDescribePoint;
@@ -142,7 +142,7 @@ public class UtilFeature {
 	 * @param association (Output) association algorithm which is having its source configured
 	 */
 	public static <TD extends TupleDesc<TD>>
-	void setSource(FastAccess<TD> descriptors , DogArray_I32 sets , AssociateDescriptionSets<TD> association )
+	void setSource(FastAccess<TD> descriptors , DogArray_I32 sets , AssociateDescriptionArraySets<TD> association )
 	{
 		assert(descriptors.size==sets.size);
 
@@ -160,7 +160,7 @@ public class UtilFeature {
 	 * @param association (Output) association algorithm which is having its destination configured
 	 */
 	public static <TD extends TupleDesc<TD>>
-	void setDestination(FastAccess<TD> descriptors , DogArray_I32 sets , AssociateDescriptionSets<TD> association )
+	void setDestination(FastAccess<TD> descriptors , DogArray_I32 sets , AssociateDescriptionArraySets<TD> association )
 	{
 		assert(descriptors.size==sets.size);
 

@@ -20,7 +20,7 @@ package boofcv.alg.descriptor;
 
 import boofcv.abst.feature.associate.AssociateDescription;
 import boofcv.abst.feature.associate.AssociateDescription2D;
-import boofcv.abst.feature.associate.AssociateDescriptionSets;
+import boofcv.abst.feature.associate.AssociateDescriptionArraySets;
 import boofcv.abst.feature.associate.AssociateDescriptionSets2D;
 import boofcv.struct.feature.TupleDesc_F64;
 import boofcv.testing.BoofStandardJUnit;
@@ -178,7 +178,7 @@ class TestUtilFeature extends BoofStandardJUnit {
 		sets.add(2);
 		sets.add(0);
 
-		associate.initialize(3);
+		associate.initializeSets(3);
 		UtilFeature.setSource(descriptors, sets, locs, associate);
 
 		assertEquals(3, associate.getCountSrc(0));
@@ -207,7 +207,7 @@ class TestUtilFeature extends BoofStandardJUnit {
 		sets.add(2);
 		sets.add(0);
 
-		associate.initialize(3);
+		associate.initializeSets(3);
 		UtilFeature.setDestination(descriptors, sets, locs, associate);
 
 		assertEquals(3, associate.getCountDst(0));
@@ -218,7 +218,7 @@ class TestUtilFeature extends BoofStandardJUnit {
 		}
 	}
 
-	static class PAssociateDescriptionSets<Desc> extends AssociateDescriptionSets<Desc> {
+	static class PAssociateDescriptionSets<Desc> extends AssociateDescriptionArraySets<Desc> {
 		public PAssociateDescriptionSets(AssociateDescription<Desc> associator, Class<Desc> type) {
 			super(associator, type);
 		}
