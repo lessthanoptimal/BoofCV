@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -118,8 +118,7 @@ public class TestEnforceUniqueByScore extends BoofStandardJUnit {
 		}
 	}
 
-	private static class DummyAssociate implements Associate {
-
+	private static class DummyAssociate implements Associate<Object> {
 		boolean calledAssociate = false;
 
 		boolean uniqueSource;
@@ -167,6 +166,10 @@ public class TestEnforceUniqueByScore extends BoofStandardJUnit {
 		@Override
 		public boolean uniqueDestination() {
 			return uniqueDestination;
+		}
+
+		@Override public Class<Object> getDescriptionType() {
+			return Object.class;
 		}
 	}
 }

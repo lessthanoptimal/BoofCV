@@ -38,4 +38,8 @@ public class ScoreAssociateEuclidean_F64 implements ScoreAssociation<TupleDesc_F
 	public MatchScoreType getScoreType() {
 		return MatchScoreType.NORM_ERROR;
 	}
+
+	@Override public Class<TupleDesc_F64> getDescriptorType() {
+		return TupleDesc_F64.class;
+	}
 }

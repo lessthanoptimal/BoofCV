@@ -33,10 +33,9 @@ public class AssociateDescriptionArraySets<Desc> extends BaseAssociateDescriptio
 	 * Provides the association algorithm and the descriptor type
 	 *
 	 * @param associator Association algorithm
-	 * @param type Type of descriptor
 	 */
-	public AssociateDescriptionArraySets( AssociateDescription<Desc> associator, Class<Desc> type ) {
-		super(associator, type);
+	public AssociateDescriptionArraySets( AssociateDescription<Desc> associator ) {
+		super(associator);
 		this.associator = associator;
 	}
 

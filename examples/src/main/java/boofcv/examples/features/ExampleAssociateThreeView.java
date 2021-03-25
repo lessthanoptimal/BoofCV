@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -115,7 +115,7 @@ public class ExampleAssociateThreeView {
 		AssociateDescription<TupleDesc_F64> associate =
 				FactoryAssociation.greedy(new ConfigAssociateGreedy(true, 0.1), scorer);
 
-		var associateThree = new AssociateThreeByPairs<>(associate, TupleDesc_F64.class);
+		var associateThree = new AssociateThreeByPairs<>(associate);
 
 		associateThree.initialize(detDesc.getNumberOfSets());
 		associateThree.setFeaturesA(features01, featureSet01);

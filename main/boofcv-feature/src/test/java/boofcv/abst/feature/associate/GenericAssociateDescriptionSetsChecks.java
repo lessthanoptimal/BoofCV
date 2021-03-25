@@ -87,7 +87,7 @@ public abstract class GenericAssociateDescriptionSetsChecks extends BoofStandard
 		@Override
 		public AssociateDescription<TupleDesc_F64> createAssociate() {
 			return new ConvertAssociateSets<>(FactoryAssociation.greedy(
-					null,new ScoreAssociateEuclideanSq.F64()),TupleDesc_F64.class);
+					null,new ScoreAssociateEuclideanSq.F64()));
 		}
 
 		@Override
@@ -96,10 +96,11 @@ public abstract class GenericAssociateDescriptionSetsChecks extends BoofStandard
 		}
 	}
 
-	private static class ConvertAssociateSets<Desc> extends AssociateDescriptionArraySets<Desc> implements AssociateDescription<Desc>
+	private static class ConvertAssociateSets<Desc> extends AssociateDescriptionArraySets<Desc>
+			implements AssociateDescription<Desc>
 	{
-		public ConvertAssociateSets(AssociateDescription<Desc> associator, Class<Desc> type) {
-			super(associator, type);
+		public ConvertAssociateSets(AssociateDescription<Desc> associator) {
+			super(associator);
 			initialize(1);
 		}
 

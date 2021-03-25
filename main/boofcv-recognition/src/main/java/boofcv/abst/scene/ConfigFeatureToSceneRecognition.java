@@ -43,6 +43,7 @@ public class ConfigFeatureToSceneRecognition implements Configuration {
 	/** Image feature detector */
 	public final ConfigDetectDescribe features = new ConfigDetectDescribe();
 
+	/** Configuration for {@link boofcv.alg.scene.nister2006.RecognitionVocabularyTreeNister2006} */
 	public final ConfigRecognitionNister2006 recognizeNister2006 = new ConfigRecognitionNister2006();
 
 	{

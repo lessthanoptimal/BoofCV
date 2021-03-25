@@ -29,7 +29,7 @@ import org.ddogleg.struct.FastAccess;
  * @param <Desc> Feature description type.
  * @author Peter Abeles
  */
-public interface AssociateDescription2D<Desc> extends Associate {
+public interface AssociateDescription2D<Desc> extends Associate<Desc> {
 	/**
 	 * Initialize by specifying the image width/height. Used to precompute internal data
 	 * structures and set thresholds. If images are different sizes just use the largest
@@ -55,4 +55,7 @@ public interface AssociateDescription2D<Desc> extends Associate {
 	 * @param descriptions Feature descriptions.
 	 */
 	void setDestination( FastAccess<Point2D_F64> location, FastAccess<Desc> descriptions );
+
+	/** Returns the type of object it can associate */
+	Class<Desc> getDescriptionType();
 }

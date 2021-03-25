@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -35,23 +35,25 @@ import java.util.List;
  * @author Peter Abeles
  */
 public class AssociateNearestNeighbor_MT<D>
-		extends AssociateNearestNeighbor<D>
-{
+		extends AssociateNearestNeighbor<D> {
 	// Nearest Neighbor algorithm and storage for the results
 	private final List<Helper> available = new ArrayList<>();
 
-	public AssociateNearestNeighbor_MT(NearestNeighbor<D> alg) {
+	private Class<D> descType;
+
+	public AssociateNearestNeighbor_MT( NearestNeighbor<D> alg, Class<D> descType ) {
 		super(alg);
+		this.descType = descType;
 	}
 
 	@Override
-	public void setSource(FastAccess<D> listSrc) {
+	public void setSource( FastAccess<D> listSrc ) {
 		this.sizeSrc = listSrc.size;
-		alg.setPoints((List)listSrc.toList(),true);
+		alg.setPoints((List)listSrc.toList(), true);
 	}
 
 	@Override
-	public void setDestination(FastAccess<D> listDst) {
+	public void setDestination( FastAccess<D> listDst ) {
 		this.listDst = listDst;
 	}
 
@@ -59,10 +61,10 @@ public class AssociateNearestNeighbor_MT<D>
 	public void associate() {
 		matchesAll.resize(listDst.size);
 		matchesAll.reset();
-		if( scoreRatioThreshold >= 1.0 ) {
-			BoofConcurrency.loopBlocks(0,listDst.size,new InnerConsumer() {
+		if (scoreRatioThreshold >= 1.0) {
+			BoofConcurrency.loopBlocks(0, listDst.size, new InnerConsumer() {
 				@Override
-				public void innerAccept(Helper h, int index0, int index1) {
+				public void innerAccept( Helper h, int index0, int index1 ) {
 					for (int i = index0; i < index1; i++) {
 						if (!h.search.findNearest(listDst.data[i], maxDistance, h.result))
 							continue;
@@ -71,9 +73,9 @@ public class AssociateNearestNeighbor_MT<D>
 				}
 			});
 		} else {
-			BoofConcurrency.loopBlocks(0,listDst.size,new InnerConsumer() {
+			BoofConcurrency.loopBlocks(0, listDst.size, new InnerConsumer() {
 				@Override
-				public void innerAccept(Helper h, int index0, int index1) {
+				public void innerAccept( Helper h, int index0, int index1 ) {
 					for (int i = index0; i < index1; i++) {
 						h.search.findNearest(listDst.data[i], maxDistance, 2, h.result2);
 
@@ -91,7 +93,7 @@ public class AssociateNearestNeighbor_MT<D>
 								r1 = tmp;
 							}
 
-							double foundRatio = ratioUsesSqrt ? Math.sqrt(r0.distance) / Math.sqrt(r1.distance) : r0.distance / r1.distance;
+							double foundRatio = ratioUsesSqrt ? Math.sqrt(r0.distance)/Math.sqrt(r1.distance) : r0.distance/r1.distance;
 							if (foundRatio <= scoreRatioThreshold) {
 								h.matches.grow().setTo(r0.index, i, r0.distance);
 							}
@@ -104,31 +106,34 @@ public class AssociateNearestNeighbor_MT<D>
 		}
 	}
 
+	@Override public Class<D> getDescriptionType() {
+		return descType;
+	}
+
 	/**
 	 * Consumes a block of matches
 	 */
 	private abstract class InnerConsumer implements IntRangeConsumer {
 
 		@Override
-		public void accept(int index0, int index1) {
+		public void accept( int index0, int index1 ) {
 			// Recycle a helper if possible
 			Helper h;
 			synchronized (available) {
-				if( available.isEmpty() ) {
+				if (available.isEmpty()) {
 					h = new Helper();
 				} else {
-					h = available.remove(available.size()-1);
+					h = available.remove(available.size() - 1);
 					h.initialize();
 				}
 			}
 
 			// do the for loop inside of this and pass in the helper for this block
-			innerAccept(h,index0,index1);
+			innerAccept(h, index0, index1);
 
 			// synchronize the data again
 			synchronized (matchesAll) {
-				for (int i = 0; i < h.matches.size; i++)
-				{
+				for (int i = 0; i < h.matches.size; i++) {
 					AssociatedIndex a = h.matches.get(i);
 					matchesAll.grow().setTo(a);
 				}
@@ -140,7 +145,7 @@ public class AssociateNearestNeighbor_MT<D>
 			}
 		}
 
-		public abstract void innerAccept(Helper h, int index0, int index1);
+		public abstract void innerAccept( Helper h, int index0, int index1 );
 	}
 
 	/**

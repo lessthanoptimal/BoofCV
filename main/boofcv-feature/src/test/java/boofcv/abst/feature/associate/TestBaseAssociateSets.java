@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -51,10 +51,10 @@ class TestBaseAssociateSets extends BoofStandardJUnit {
 		assertFalse(alg.uniqueDestination());
 		associate.uniqueDst = true;
 		assertTrue(alg.uniqueDestination());
-		assertEquals(MatchScoreType.NORM_ERROR,alg.getScoreType());
+		assertEquals(MatchScoreType.NORM_ERROR, alg.getScoreType());
 	}
 
-	private static class MockAssociate implements Associate {
+	private static class MockAssociate implements Associate<TupleDesc_F64> {
 
 		public int calledAssociate;
 		public double maxScore;
@@ -64,6 +64,7 @@ class TestBaseAssociateSets extends BoofStandardJUnit {
 		public DogArray_I32 unassociatedSrc = new DogArray_I32();
 		public DogArray_I32 unassociatedDst = new DogArray_I32();
 
+		// @formatter:off
 		@Override public void associate() {calledAssociate++;}
 		@Override public FastAccess<AssociatedIndex> getMatches() {return matches;}
 		@Override public DogArray_I32 getUnassociatedSource() {return unassociatedSrc;}
@@ -72,13 +73,15 @@ class TestBaseAssociateSets extends BoofStandardJUnit {
 		@Override public MatchScoreType getScoreType() {return MatchScoreType.NORM_ERROR;}
 		@Override public boolean uniqueSource() {return uniqueSrc;}
 		@Override public boolean uniqueDestination() { return uniqueDst; }
+		@Override public Class<TupleDesc_F64> getDescriptionType() {return TupleDesc_F64.class;}
+		// @formatter:on
 	}
 
-	private static class MockAssociateSets extends BaseAssociateSets<TupleDesc_F64>
-	{
-		public MockAssociateSets(Associate associator) {
-			super(associator, TupleDesc_F64.class);
+	private static class MockAssociateSets extends BaseAssociateSets<TupleDesc_F64> {
+		public MockAssociateSets( Associate<TupleDesc_F64> associator ) {
+			super(associator);
 		}
+
 		@Override public void associate() {}
 	}
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -86,7 +86,7 @@ public class TestAssociateStereo2D extends BoofStandardJUnit {
 		descLeft.grow();
 		descRight.grow();
 
-		AssociateStereo2D<TupleDesc_F64> alg = new AssociateStereo2D<>(scorer, 0.5, TupleDesc_F64.class);
+		AssociateStereo2D<TupleDesc_F64> alg = new AssociateStereo2D<>(scorer, 0.5);
 
 		alg.setCalibration(param);
 
@@ -120,7 +120,7 @@ public class TestAssociateStereo2D extends BoofStandardJUnit {
 		descLeft.grow();
 		descRight.grow();
 
-		AssociateStereo2D<TupleDesc_F64> alg = new AssociateStereo2D<>(scorer, 0.5, TupleDesc_F64.class);
+		AssociateStereo2D<TupleDesc_F64> alg = new AssociateStereo2D<>(scorer, 0.5);
 
 		alg.setCalibration(param);
 
@@ -133,7 +133,7 @@ public class TestAssociateStereo2D extends BoofStandardJUnit {
 		assertEquals(1, alg.getMatches().size);
 
 		// make the tolerance tighter
-		alg = new AssociateStereo2D<>(scorer, 0.01, TupleDesc_F64.class);
+		alg = new AssociateStereo2D<>(scorer, 0.01);
 		alg.setCalibration(param);
 		alg.setSource(pointsLeft, descLeft);
 		alg.setDestination(pointsRight, descRight);
@@ -160,7 +160,7 @@ public class TestAssociateStereo2D extends BoofStandardJUnit {
 		descLeft.grow();
 		descRight.grow();
 
-		AssociateStereo2D<TupleDesc_F64> alg = new AssociateStereo2D<>(scorer, 0.5, TupleDesc_F64.class);
+		AssociateStereo2D<TupleDesc_F64> alg = new AssociateStereo2D<>(scorer, 0.5);
 
 		alg.setCalibration(param);
 
@@ -173,7 +173,7 @@ public class TestAssociateStereo2D extends BoofStandardJUnit {
 		assertEquals(1, alg.getMatches().size);
 
 		// make the tolerance tighter
-		alg = new AssociateStereo2D<>(scorer, 0.01, TupleDesc_F64.class);
+		alg = new AssociateStereo2D<>(scorer, 0.01);
 		alg.setCalibration(param);
 		alg.setSource(pointsLeft, descLeft);
 		alg.setDestination(pointsRight, descRight);

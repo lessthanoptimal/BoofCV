@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -58,8 +58,7 @@ public class TestAssociateDescTo2D extends BoofStandardJUnit {
 		assertSame(MatchScoreType.CORRELATION, alg.getScoreType());
 	}
 
-	private static class Dummy implements AssociateDescription<TupleDesc_F64> {
-
+	private static class Dummy extends AssociateDescriptionDefault<TupleDesc_F64> {
 		public FastAccess<TupleDesc_F64> listSrc;
 		public FastAccess<TupleDesc_F64> listDst;
 		public boolean calledAssociate = false;
@@ -106,16 +105,6 @@ public class TestAssociateDescTo2D extends BoofStandardJUnit {
 		@Override
 		public MatchScoreType getScoreType() {
 			return MatchScoreType.CORRELATION;
-		}
-
-		@Override
-		public boolean uniqueSource() {
-			return false;
-		}
-
-		@Override
-		public boolean uniqueDestination() {
-			return false;
 		}
 	}
 

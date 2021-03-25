@@ -31,23 +31,31 @@ public interface ScoreAssociateSad<Desc> extends ScoreAssociation<Desc> {
 		@Override public double score( TupleDesc_F32 a, TupleDesc_F32 b ) { return DescriptorDistance.sad(a, b); }
 
 		@Override public MatchScoreType getScoreType() {return MatchScoreType.NORM_ERROR;}
+
+		@Override public Class<TupleDesc_F32> getDescriptorType() {return TupleDesc_F32.class;}
 	}
 
 	class F64 implements ScoreAssociateSad<TupleDesc_F64> {
 		@Override public double score( TupleDesc_F64 a, TupleDesc_F64 b ) { return DescriptorDistance.sad(a, b); }
 
 		@Override public MatchScoreType getScoreType() {return MatchScoreType.NORM_ERROR;}
+
+		@Override public Class<TupleDesc_F64> getDescriptorType() {return TupleDesc_F64.class;}
 	}
 
 	class U8 implements ScoreAssociateSad<TupleDesc_U8> {
 		@Override public double score( TupleDesc_U8 a, TupleDesc_U8 b ) { return DescriptorDistance.sad(a, b); }
 
 		@Override public MatchScoreType getScoreType() {return MatchScoreType.NORM_ERROR;}
+
+		@Override public Class<TupleDesc_U8> getDescriptorType() {return TupleDesc_U8.class;}
 	}
 
 	class S8 implements ScoreAssociateSad<TupleDesc_S8> {
 		@Override public double score( TupleDesc_S8 a, TupleDesc_S8 b ) { return DescriptorDistance.sad(a, b); }
 
 		@Override public MatchScoreType getScoreType() {return MatchScoreType.NORM_ERROR;}
+
+		@Override public Class<TupleDesc_S8> getDescriptorType() {return TupleDesc_S8.class;}
 	}
 }

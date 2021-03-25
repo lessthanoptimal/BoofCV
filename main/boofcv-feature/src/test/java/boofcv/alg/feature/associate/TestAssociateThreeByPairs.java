@@ -66,7 +66,7 @@ class TestAssociateThreeByPairs extends BoofStandardJUnit {
 		ScoreAssociation<TupleDesc_F64> score = FactoryAssociation.defaultScore(TupleDesc_F64.class);
 		AssociateDescription<TupleDesc_F64> associate = FactoryAssociation.greedy(new ConfigAssociateGreedy(true,1e-8),score);
 
-		AssociateThreeByPairs<TupleDesc_F64> alg = new AssociateThreeByPairs<>(associate,TupleDesc_F64.class);
+		AssociateThreeByPairs<TupleDesc_F64> alg = new AssociateThreeByPairs<>(associate);
 
 		alg.initialize(1);
 		alg.setFeaturesA(featuresA, featuresSetA);
@@ -121,7 +121,7 @@ class TestAssociateThreeByPairs extends BoofStandardJUnit {
 		ScoreAssociation<TupleDesc_F64> score = FactoryAssociation.defaultScore(TupleDesc_F64.class);
 		AssociateDescription<TupleDesc_F64> associate = FactoryAssociation.greedy(new ConfigAssociateGreedy(true,maxError),score);
 
-		AssociateThreeByPairs<TupleDesc_F64> alg = new AssociateThreeByPairs<>(associate,TupleDesc_F64.class);
+		AssociateThreeByPairs<TupleDesc_F64> alg = new AssociateThreeByPairs<>(associate);
 		alg.initialize(1);
 
 		alg.setFeaturesA(featuresA, featuresSetA);
@@ -170,7 +170,7 @@ class TestAssociateThreeByPairs extends BoofStandardJUnit {
 		ScoreAssociation<TupleDesc_F64> score = FactoryAssociation.defaultScore(TupleDesc_F64.class);
 		AssociateDescription<TupleDesc_F64> associate = FactoryAssociation.greedy(new ConfigAssociateGreedy(true,maxError),score);
 
-		AssociateThreeByPairs<TupleDesc_F64> alg = new AssociateThreeByPairs<>(associate,TupleDesc_F64.class);
+		AssociateThreeByPairs<TupleDesc_F64> alg = new AssociateThreeByPairs<>(associate);
 		alg.initialize(1);
 
 		alg.setFeaturesA(featuresA, featuresSetA);
@@ -218,7 +218,7 @@ class TestAssociateThreeByPairs extends BoofStandardJUnit {
 		ScoreAssociation<TupleDesc_F64> score = FactoryAssociation.defaultScore(TupleDesc_F64.class);
 		AssociateDescription<TupleDesc_F64> associate = FactoryAssociation.greedy(new ConfigAssociateGreedy(true,maxError),score);
 
-		AssociateThreeByPairs<TupleDesc_F64> alg = new AssociateThreeByPairs<>(associate,TupleDesc_F64.class);
+		AssociateThreeByPairs<TupleDesc_F64> alg = new AssociateThreeByPairs<>(associate);
 		alg.initialize(1);
 
 		alg.setFeaturesA(featuresA, featuresSetA);

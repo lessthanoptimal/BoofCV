@@ -34,7 +34,6 @@ import org.ddogleg.struct.FastAccess;
  * @author Peter Abeles
  */
 public class WrapAssociateGreedy2D<D> implements AssociateDescription2D<D> {
-
 	// The algorithm being wrapped
 	AssociateGreedyBase2D<D> alg;
 
@@ -91,5 +90,6 @@ public class WrapAssociateGreedy2D<D> implements AssociateDescription2D<D> {
 	@Override public MatchScoreType getScoreType() {return alg.getScore().getScoreType();}
 	@Override public boolean uniqueSource() {return true;}
 	@Override public boolean uniqueDestination() {return alg.isBackwardsValidation();}
+	@Override public Class<D> getDescriptionType() {return alg.getScore().getDescriptorType();}
 	// @formatter:on
 }

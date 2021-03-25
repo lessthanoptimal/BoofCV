@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -52,8 +52,7 @@ class TestHybridTrackerScalePoint extends BoofStandardJUnit {
 		return new HybridTrackerScalePoint(trackerKlt,detector,associate,10);
 	}
 
-	@Test
-	void reset() {
+	@Test void reset() {
 		HybridTrackerScalePoint alg = createAlgorithm();
 
 		addTracks(alg.tracksAll, 1);
@@ -75,8 +74,7 @@ class TestHybridTrackerScalePoint extends BoofStandardJUnit {
 		assertEquals(0,alg.totalTracks);
 	}
 
-	@Test
-	void dropAllTracks() {
+	@Test void dropAllTracks() {
 		HybridTrackerScalePoint alg = createAlgorithm();
 
 		addTracks(alg.tracksAll, 1);
@@ -94,8 +92,7 @@ class TestHybridTrackerScalePoint extends BoofStandardJUnit {
 		assertEquals(0,alg.tracksDropped.size());
 	}
 
-	@Test
-	void dropTrackByAllIndex() {
+	@Test void dropTrackByAllIndex() {
 		HybridTrackerScalePoint alg = createAlgorithm();
 
 		alg.trackerKlt = new DummyKlt();
@@ -113,8 +110,7 @@ class TestHybridTrackerScalePoint extends BoofStandardJUnit {
 		assertFalse(alg.tracksAll.contains(track));
 	}
 
-	@Test
-	void updateTracks() {
+	@Test void updateTracks() {
 		HybridTrackerScalePoint alg = createAlgorithm();
 
 		alg.trackerKlt = new DummyKlt();
@@ -135,8 +131,7 @@ class TestHybridTrackerScalePoint extends BoofStandardJUnit {
 		assertEquals(0, alg.tracksSpawned.size());
 	}
 
-	@Test
-	void dropExcessiveInactiveTracks() {
+	@Test void dropExcessiveInactiveTracks() {
 		var alg = createAlgorithm();
 		alg.maxInactiveTracks = 20;
 		addTracks(alg.tracksAll,50);
@@ -149,8 +144,7 @@ class TestHybridTrackerScalePoint extends BoofStandardJUnit {
 		assertEquals(20,alg.tracksInactive.size);
 	}
 
-	@Test
-	void pruneActiveTracksWhichAreTooClose() {
+	@Test void pruneActiveTracksWhichAreTooClose() {
 		var alg = createAlgorithm();
 		alg.imageWidth = width;
 		alg.imageHeight = height;
@@ -209,6 +203,7 @@ class TestHybridTrackerScalePoint extends BoofStandardJUnit {
 
 		@Override public boolean uniqueSource() {return true;}
 		@Override public boolean uniqueDestination() {return true;}
+		@Override public Class<TupleDesc_F64> getDescriptionType() {return TupleDesc_F64.class;};
 	}
 
 	private static class DummyDetector extends DetectDescribePointAbstract<GrayF32,TupleDesc_F64> {
@@ -223,7 +218,6 @@ class TestHybridTrackerScalePoint extends BoofStandardJUnit {
 	}
 
 	private class DummyPyramid extends PyramidDiscrete<GrayF32> {
-
 		public DummyPyramid() {
 			super(ImageType.SB_F32, true,ConfigDiscreteLevels.levels(2));
 			initialize(width,height);

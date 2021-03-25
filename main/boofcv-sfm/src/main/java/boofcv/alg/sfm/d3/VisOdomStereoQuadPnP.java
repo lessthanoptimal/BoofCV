@@ -169,7 +169,7 @@ public class VisOdomStereoQuadPnP<T extends ImageGray<T>, TD extends TupleDesc<T
 								 ModelMatcher<Se3_F64, Stereo2D3D> matcher,
 								 ModelFitter<Se3_F64, Stereo2D3D> modelRefiner ) {
 		this.detector = detector;
-		this.assocF2F = new AssociateDescriptionSets2D<>(assocF2F, detector.getDescriptionType());
+		this.assocF2F = new AssociateDescriptionSets2D<>(assocF2F);
 		this.assocL2R = assocL2R;
 		this.triangulate = triangulate;
 		this.matcher = matcher;

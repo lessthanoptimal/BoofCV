@@ -27,6 +27,6 @@ import boofcv.struct.feature.TupleDesc_F64;
 public class TestAssociateDescriptionHashSets extends GenericAssociateDescriptionSetsChecks {
 	@Override protected BaseAssociateDescriptionSets<TupleDesc_F64> createAlg() {
 		return new AssociateDescriptionHashSets<>(FactoryAssociation.greedy(
-				null,new ScoreAssociateEuclideanSq.F64()),TupleDesc_F64.class);
+				null,new ScoreAssociateEuclideanSq.F64()));
 	}
 }

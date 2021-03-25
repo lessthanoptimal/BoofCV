@@ -37,6 +37,7 @@ public class AssociateDescription2DDefault<Desc> implements AssociateDescription
 	@Override public boolean uniqueDestination() { return false; }
 	@Override public void initialize( int imageWidth, int imageHeight ) {}
 	@Override public void setDestination( FastAccess<Point2D_F64> location, FastAccess<Desc> descriptions ) {}
+	@Override public Class<Desc> getDescriptionType() {return null;}
 	@Override public void setSource( FastAccess<Point2D_F64> location, FastAccess<Desc> descriptions ) {}
 	// @formatter:on
 }

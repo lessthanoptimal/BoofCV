@@ -48,7 +48,7 @@ public class TestAssociateNearestNeighbor_ST extends StandardAssociateDescriptio
 	public AssociateDescription<TupleDesc_F64> createAssociate() {
 		// exhaustive algorithm will produce perfect results
 		NearestNeighbor<TupleDesc_F64> exhaustive = FactoryNearestNeighbor.exhaustive(new KdTreeTuple_F64(1));
-		return new AssociateNearestNeighbor_ST<>(exhaustive);
+		return new AssociateNearestNeighbor_ST<>(exhaustive, TupleDesc_F64.class);
 	}
 
 	@Override
@@ -68,7 +68,7 @@ public class TestAssociateNearestNeighbor_ST extends StandardAssociateDescriptio
 		nn.assoc = new int[]{2,0,1,-1,4,-1,-1,2,2,1};
 		nn.distanceScale = 2.0;
 
-		AssociateNearestNeighbor_ST<TupleDesc_F64> alg = new AssociateNearestNeighbor_ST<>(nn);
+		AssociateNearestNeighbor_ST<TupleDesc_F64> alg = new AssociateNearestNeighbor_ST<>(nn, TupleDesc_F64.class);
 
 		FastArray<TupleDesc_F64> src = new FastArray<>(TupleDesc_F64.class);
 		FastArray<TupleDesc_F64> dst = new FastArray<>(TupleDesc_F64.class);
@@ -114,7 +114,7 @@ public class TestAssociateNearestNeighbor_ST extends StandardAssociateDescriptio
 		// src = assoc[i] where src is the index of the source feature and i is the index of the dst feature
 		nn.assoc = new int[]{2,0,1,-1,4,-1,-1,2,2,1};
 
-		AssociateNearestNeighbor_ST<TupleDesc_F64> alg = new AssociateNearestNeighbor_ST<>(nn);
+		AssociateNearestNeighbor_ST<TupleDesc_F64> alg = new AssociateNearestNeighbor_ST<>(nn, TupleDesc_F64.class);
 
 		FastArray<TupleDesc_F64> src = new FastArray<>( TupleDesc_F64.class);
 		FastArray<TupleDesc_F64> dst = new FastArray<>( TupleDesc_F64.class);

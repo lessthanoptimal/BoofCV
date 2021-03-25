@@ -42,10 +42,9 @@ public class AssociateDescriptionHashSets<Desc> extends BaseAssociateDescription
 	 * Provides the association algorithm and the descriptor type
 	 *
 	 * @param associator Association algorithm
-	 * @param type Type of descriptor
 	 */
-	public AssociateDescriptionHashSets( AssociateDescription<Desc> associator, Class<Desc> type ) {
-		super(associator, type);
+	public AssociateDescriptionHashSets( AssociateDescription<Desc> associator ) {
+		super(associator);
 		this.associator = associator;
 	}
 

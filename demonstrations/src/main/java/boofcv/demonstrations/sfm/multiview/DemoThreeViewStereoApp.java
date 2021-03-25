@@ -445,7 +445,7 @@ public class DemoThreeViewStereoApp<TD extends TupleDesc<TD>> extends Demonstrat
 		detDesc = (DetectDescribePoint)controls.controlsDetDescAssoc.createDetectDescribe(GrayU8.class);
 		associate = controls.controlsDetDescAssoc.createAssociate(detDesc);
 		associate = FactoryAssociation.ensureUnique(associate);
-		associateThree = new AssociateThreeByPairs<>(associate, detDesc.getDescriptionType());
+		associateThree = new AssociateThreeByPairs<>(associate);
 		for (int i = 0; i < 3; i++) {
 			features[i] = UtilFeature.createArray(detDesc, 100);
 		}

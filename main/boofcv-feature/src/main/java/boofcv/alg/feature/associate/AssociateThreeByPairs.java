@@ -62,15 +62,14 @@ public class AssociateThreeByPairs<TD extends TupleDesc<TD>> implements Associat
 	 * Specifies which algorithms to use internally
 	 *
 	 * @param associator image to image association
-	 * @param type Type of descriptor
 	 */
-	public AssociateThreeByPairs( AssociateDescription<TD> associator, Class<TD> type ) {
+	public AssociateThreeByPairs( AssociateDescription<TD> associator ) {
 		if (!associator.uniqueDestination() || !associator.uniqueSource())
 			throw new IllegalArgumentException("Both source and destination need to be unique");
-		this.associator = new AssociateDescriptionArraySets<>(associator, type);
+		this.associator = new AssociateDescriptionArraySets<>(associator);
 
-		tmpB = new FastArray<>(type);
-		tmpA = new FastArray<>(type);
+		tmpB = new FastArray<>(associator.getDescriptionType());
+		tmpA = new FastArray<>(associator.getDescriptionType());
 	}
 
 	@Override

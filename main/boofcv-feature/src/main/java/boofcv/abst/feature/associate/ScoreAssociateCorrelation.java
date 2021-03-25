@@ -40,4 +40,8 @@ public class ScoreAssociateCorrelation implements ScoreAssociation<TupleDesc_F64
 	public MatchScoreType getScoreType() {
 		return MatchScoreType.CORRELATION;
 	}
+
+	@Override public Class<TupleDesc_F64> getDescriptorType() {
+		return TupleDesc_F64.class;
+	}
 }
