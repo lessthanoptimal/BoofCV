@@ -78,7 +78,7 @@ public class SceneRecognitionSimilarImages<Image extends ImageBase<Image>, TD ex
 	@Getter @Setter int limitMatchesConsider = 30;
 
 	/** Logic used to decide if two images are similar to each other */
-	@Getter @Setter SimilarityTest similarityTest;
+	@Getter @Setter SimilarityTest similarityTest = new ImageSimilarityAssociatedRatio();
 
 	//========================== Image Information and Relationships
 	// List of ID strings for each image
