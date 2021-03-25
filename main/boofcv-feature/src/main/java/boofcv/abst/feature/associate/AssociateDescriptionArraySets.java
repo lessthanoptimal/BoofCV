@@ -24,7 +24,7 @@ package boofcv.abst.feature.associate;
  *
  * @author Peter Abeles
  */
-public class AssociateDescriptionSets<Desc> extends BaseAssociateSets<Desc> {
+public class AssociateDescriptionArraySets<Desc> extends BaseAssociateDescriptionSets<Desc> {
 
 	// Regular association algorithm
 	final AssociateDescription<Desc> associator;
@@ -35,15 +35,29 @@ public class AssociateDescriptionSets<Desc> extends BaseAssociateSets<Desc> {
 	 * @param associator Association algorithm
 	 * @param type Type of descriptor
 	 */
-	public AssociateDescriptionSets( AssociateDescription<Desc> associator, Class<Desc> type ) {
+	public AssociateDescriptionArraySets( AssociateDescription<Desc> associator, Class<Desc> type ) {
 		super(associator, type);
 		this.associator = associator;
 	}
 
 	/**
+	 * Override the default behavior which assumes there's a one-to-one match between index and set ID
+	 */
+	@Override public void initialize( int numberOfSets ) {
+		assert (numberOfSets > 0);
+
+		countSrc = 0;
+		countDst = 0;
+		unassociatedDst.reset();
+		unassociatedDst.reset();
+		sets.reset();
+		sets.resize(numberOfSets);
+	}
+
+	/**
 	 * Adds a new descriptor and its set to the list. The order that descriptors are added is important and saved.
 	 */
-	public void addSource( Desc description, int set ) {
+	@Override public void addSource( Desc description, int set ) {
 		final SetStruct ss = sets.data[set];
 		ss.src.add(description);
 		ss.indexSrc.add(countSrc++);
@@ -52,7 +66,7 @@ public class AssociateDescriptionSets<Desc> extends BaseAssociateSets<Desc> {
 	/**
 	 * Adds a new descriptor and its set to the list. The order that descriptors are added is important and saved.
 	 */
-	public void addDestination( Desc description, int set ) {
+	@Override public void addDestination( Desc description, int set ) {
 		final SetStruct ss = sets.data[set];
 		ss.dst.add(description);
 		ss.indexDst.add(countDst++);
@@ -61,8 +75,7 @@ public class AssociateDescriptionSets<Desc> extends BaseAssociateSets<Desc> {
 	/**
 	 * Associates each set of features independently then puts them back into a single list for output
 	 */
-	@Override
-	public void associate() {
+	@Override public void associate() {
 		if (sets.size <= 0)
 			throw new IllegalArgumentException("You must initialize first with the number of sets");
 

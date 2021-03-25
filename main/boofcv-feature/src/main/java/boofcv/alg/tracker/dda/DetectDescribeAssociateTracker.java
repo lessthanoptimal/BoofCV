@@ -111,11 +111,10 @@ public class DetectDescribeAssociateTracker<I extends ImageGray<I>, TD extends T
 
 		this.tracksAll = new DogArray<>(this::createNewTrack, this::resetTrack);
 
-		this.associate.initialize(detector.getNumberOfSets());
+		this.associate.initializeSets(detector.getNumberOfSets());
 	}
 
-	protected DetectDescribeAssociateTracker() {
-	}
+	protected DetectDescribeAssociateTracker() {}
 
 	/**
 	 * Creates a new track and sets the descriptor
@@ -151,7 +150,7 @@ public class DetectDescribeAssociateTracker<I extends ImageGray<I>, TD extends T
 	 */
 	public void process( I input ) {
 		if (frameID == -1)
-			associate.initialize(input.width, input.height);
+			associate.initializeAssociator(input.width, input.height);
 		frameID++;
 		tracksActive.clear();
 		tracksInactive.clear();

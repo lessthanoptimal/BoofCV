@@ -36,7 +36,7 @@ class TestAssociateDescriptionSets2D extends BoofStandardJUnit {
 	@Test
 	void matchedOnlyWithinSets() {
 		AssociateDescriptionSets2D<TupleDesc_F64> alg = createAlgorithm();
-		alg.initialize(2);
+		alg.initializeSets(2);
 		// all points are the same coordinate. Zero distance from each other so that only desc matters
 		alg.addSource(c(5.0), 5, 5, 0);
 		alg.addSource(c(6.0), 5, 5, 1);
@@ -51,7 +51,7 @@ class TestAssociateDescriptionSets2D extends BoofStandardJUnit {
 		alg.addDestination(c(7.9), 5, 5, 0);
 		alg.addDestination(c(9.9), 5, 5, 0);
 
-		alg.initialize(100, 100);
+		alg.initializeAssociator(100, 100);
 		alg.associate();
 
 		assertEquals(5, alg.getMatches().size);

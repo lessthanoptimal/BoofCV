@@ -30,7 +30,7 @@ import gnu.trove.map.hash.TIntIntHashMap;
  *
  * @author Peter Abeles
  */
-public class AssociateDescriptionHashSets<Desc> extends BaseAssociateSets<Desc> {
+public class AssociateDescriptionHashSets<Desc> extends BaseAssociateDescriptionSets<Desc> {
 
 	// Regular association algorithm
 	final AssociateDescription<Desc> associator;
@@ -69,7 +69,7 @@ public class AssociateDescriptionHashSets<Desc> extends BaseAssociateSets<Desc> 
 	 * @param description The feature's description. This reference is saved internally.
 	 * @param set The set the feature belongs to.
 	 */
-	public void addSource( Desc description, int set ) {
+	@Override public void addSource( Desc description, int set ) {
 		final SetStruct ss = lookupSetByID(set);
 
 		ss.src.add(description);
@@ -82,7 +82,7 @@ public class AssociateDescriptionHashSets<Desc> extends BaseAssociateSets<Desc> 
 	 * @param description The feature's description. This reference is saved internally.
 	 * @param set The set the feature belongs to.
 	 */
-	public void addDestination( Desc description, int set ) {
+	@Override public void addDestination( Desc description, int set ) {
 		final SetStruct ss = lookupSetByID(set);
 		ss.dst.add(description);
 		ss.indexDst.add(countDst++);

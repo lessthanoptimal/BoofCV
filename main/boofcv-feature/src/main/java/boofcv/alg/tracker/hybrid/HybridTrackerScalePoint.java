@@ -121,7 +121,7 @@ public class HybridTrackerScalePoint
 		knownDesc = new FastArray<>(detector.getDescriptionType());
 
 		this.associate = new AssociateDescriptionSets2D<>(associate, detector.getDescriptionType());
-		this.associate.initialize(detector.getNumberOfSets());
+		this.associate.initializeSets(detector.getNumberOfSets());
 
 		this.tracksAll = new DogArray<>(this::createNewTrack);
 		if (tooCloseRadius > 0) {
@@ -168,7 +168,7 @@ public class HybridTrackerScalePoint
 		this.tracksDropped.clear();
 		this.tracksSpawned.clear();
 		if (frameID == -1)
-			associate.initialize(imageWidth, imageHeight);
+			associate.initializeAssociator(imageWidth, imageHeight);
 
 		frameID++;
 //		System.out.println("frame: "+frameID+" active "+tracksActive.size+" all "+tracksAll.size);
