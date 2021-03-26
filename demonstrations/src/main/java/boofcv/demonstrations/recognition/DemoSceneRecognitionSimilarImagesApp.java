@@ -36,6 +36,8 @@ import boofcv.struct.feature.AssociatedIndex;
 import boofcv.struct.feature.TupleDesc;
 import boofcv.struct.image.*;
 import georegression.struct.point.Point2D_F64;
+import gnu.trove.map.TIntIntMap;
+import gnu.trove.map.hash.TIntIntHashMap;
 import org.ddogleg.struct.DogArray;
 import org.ddogleg.struct.DogArray_I32;
 
@@ -184,7 +186,7 @@ public class DemoSceneRecognitionSimilarImagesApp<Gray extends ImageGray<Gray>, 
 		config.recognizeNister2006.learningMinimumPointsForChildren.setRelative(0.001, 100);
 //		config.associate.greedy.scoreRatioThreshold = 0.9;
 		config.recognizeNister2006.minimumDepthFromRoot = 1;
-		config.recognizeNister2006.featureSingleWordHops = 2;
+		config.recognizeNister2006.featureSingleWordHops = 5;
 //		config.recognizeNister2006.learnNodeWeights = false;
 
 		sceneSimilar = FactorySceneRecognition.createSimilarImages(config, ImageType.single(grayType));
@@ -243,8 +245,36 @@ public class DemoSceneRecognitionSimilarImagesApp<Gray extends ImageGray<Gray>, 
 		SwingUtilities.invokeLater(()-> viewControlPanel.setProcessingTimeS((time3-time0)*1e-3));
 	}
 
+	/**
+	 * Computes statistics about the selected image
+	 */
+	private String createInfoText( int imageIndex ) {
+		if (!computingFinished)
+			return "";
+
+		// Find any features appear in each word
+		TIntIntMap wordHistogram = new TIntIntHashMap();
+		DogArray_I32 words = imagesWords.get(imageIndex);
+		words.forEach(word->wordHistogram.put(word, wordHistogram.get(word)+1));
+
+		// Find number of features in the most common word
+		int mostFeaturesInAWord = 0;
+		for( int key : wordHistogram.keys()) {
+			mostFeaturesInAWord = Math.max(wordHistogram.get(key), mostFeaturesInAWord);
+		}
+
+		String text = "";
+		text += String.format("Similar Images: %d\n", imagesSimilar.get(imageIndex).size);
+		text += String.format("Total Features: %d\n", words.size());
+		text += String.format("Total Words: %d\n", wordHistogram.size());
+		text += String.format("Mean Feats/Word: %.1f\n", words.size()/(double)wordHistogram.size());
+		text += String.format("Max Feats/Word: %d\n", mostFeaturesInAWord);
+
+		return text;
+	}
+
 	class ViewControlPanel extends StandardAlgConfigPanel implements ListSelectionListener {
-		public boolean drawFeatures = true;
+		public boolean drawFeatures = false;
 		public ColorFeatures colorization = ColorFeatures.ASSOCIATION;
 
 		protected JLabel processingTimeLabel = new JLabel();
@@ -253,7 +283,6 @@ public class DemoSceneRecognitionSimilarImagesApp<Gray extends ImageGray<Gray>, 
 		JList<String> listImages;
 
 		JCheckBox checkFeatures = checkbox("Features", drawFeatures);
-		JComboBox<String> comboShow = combo(0, "All", "Associated");
 		JComboBox<String> comboColor = combo(colorization.ordinal(), (Object[])ColorFeatures.values());
 
 		public ViewControlPanel() {
@@ -267,7 +296,6 @@ public class DemoSceneRecognitionSimilarImagesApp<Gray extends ImageGray<Gray>, 
 			addLabeled(processingTimeLabel, "Time (s)");
 			addLabeled(imageSizeLabel, "Image Size");
 			addAlignLeft(checkFeatures);
-			addLabeled(comboShow, "Show");
 			addLabeled(comboColor, "Color");
 			addAlignCenter(new JScrollPane(listImages));
 			setPreferredSize(new Dimension(250, 500));
@@ -326,9 +354,11 @@ public class DemoSceneRecognitionSimilarImagesApp<Gray extends ImageGray<Gray>, 
 	}
 
 	class VisualizePanel extends JPanel {
-		VisualizeImage mainImage = new VisualizeImage(-1);
+		final VisualizeImage mainImage = new VisualizeImage(-1);
 
-		JPanel gridPanel = new JPanel(new GridLayout(0, 4, 10, 10));
+		final JTextArea textArea = new JTextArea();
+
+		final JPanel gridPanel = new JPanel(new GridLayout(0, 4, 10, 10));
 
 		// Selected index of a feature in the "source" image
 		int selectedSrcID = -1;
@@ -374,19 +404,26 @@ public class DemoSceneRecognitionSimilarImagesApp<Gray extends ImageGray<Gray>, 
 			});
 			mainImage.requestFocus();
 
-			JSplitPane splitPane = new JSplitPane(JSplitPane.VERTICAL_SPLIT, mainImage, gridPanel);
-			splitPane.setDividerLocation(250);
-			splitPane.setPreferredSize(new Dimension(200, 0));
+			textArea.setEditable(false);
+			textArea.setWrapStyleWord(true);
+			textArea.setLineWrap(true);
+			textArea.setMinimumSize( new Dimension(0, 0));
 
-			add(splitPane, BorderLayout.CENTER);
+			JSplitPane mainPanelSplit = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, textArea, mainImage);
+			mainPanelSplit.setDividerLocation(200);
+
+			JSplitPane verticalSplit = new JSplitPane(JSplitPane.VERTICAL_SPLIT, mainPanelSplit, gridPanel);
+			verticalSplit.setDividerLocation(300);
+			verticalSplit.setPreferredSize(new Dimension(200, 0));
+
+			add(verticalSplit, BorderLayout.CENTER);
 		}
 
 		public void handleSelectedChanged() {
 			BoofSwingUtil.checkGuiThread();
 
-			// Invalidate previous feature selections
+			// Invalidate previous feature selection, but keep the word so we can watch it
 			selectedSrcID = -1;
-			selectedWord = -1;
 
 			int selectedIndex = viewControlPanel.listImages.getSelectedIndex();
 			mainImage.changeImage(selectedIndex);
@@ -409,6 +446,8 @@ public class DemoSceneRecognitionSimilarImagesApp<Gray extends ImageGray<Gray>, 
 				gridPanel.validate();
 				return;
 			}
+
+			textArea.setText(createInfoText(selectedIndex));
 
 			DogArray_I32 similar = imagesSimilar.get(selectedIndex);
 			gridPanel.removeAll();
@@ -515,7 +554,7 @@ public class DemoSceneRecognitionSimilarImagesApp<Gray extends ImageGray<Gray>, 
 				Color color = switch (viewControlPanel.colorization) {
 					case ALL -> Color.RED;
 					case ASSOCIATION -> new Color(VisualizeFeatures.trackIdToRgb(mainFeatureIdx.get(i)));
-					case WORD -> new Color(VisualizeFeatures.trackIdToRgb(word*123L));
+					case WORD -> new Color(VisualizeFeatures.trackIdToRgb(word*100L+ (word%100)));
 				};
 
 				VisualizeFeatures.drawPoint(g2,
