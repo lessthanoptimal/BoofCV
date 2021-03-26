@@ -25,6 +25,7 @@ import boofcv.factory.scene.FactorySceneRecognition;
 import boofcv.gui.BoofSwingUtil;
 import boofcv.gui.DemonstrationBase;
 import boofcv.gui.StandardAlgConfigPanel;
+import boofcv.gui.feature.VisualizeFeatures;
 import boofcv.gui.image.ImagePanel;
 import boofcv.gui.image.ScaleOptions;
 import boofcv.io.UtilIO;
@@ -33,6 +34,7 @@ import boofcv.io.image.UtilImageIO;
 import boofcv.misc.BoofMiscOps;
 import boofcv.struct.feature.TupleDesc;
 import boofcv.struct.image.*;
+import georegression.struct.point.Point2D_F64;
 import org.ddogleg.struct.DogArray;
 import org.ddogleg.struct.DogArray_I32;
 
@@ -41,6 +43,7 @@ import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 import java.awt.*;
 import java.awt.geom.AffineTransform;
+import java.awt.geom.Ellipse2D;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.util.ArrayList;
@@ -54,6 +57,9 @@ import static boofcv.io.UtilIO.systemToUnix;
 public class DemoSceneRecognitionSimilarImagesApp<Gray extends ImageGray<Gray>, TD extends TupleDesc<TD>>
 		extends DemonstrationBase {
 
+	// TODO Colorize features by group
+	// TODO Colorize by association
+
 	public static final int PREVIEW_PIXELS = 400*300;
 
 	VisualizePanel gui = new VisualizePanel();
@@ -61,6 +67,8 @@ public class DemoSceneRecognitionSimilarImagesApp<Gray extends ImageGray<Gray>, 
 
 	Class<Gray> grayType;
 	ImageType<Planar<Gray>> colorType;
+
+	SceneRecognitionSimilarImages<Gray, TD> sceneSimilar;
 
 	// List of which images are similar to each other
 	final Object imageLock = new Object();
@@ -170,10 +178,8 @@ public class DemoSceneRecognitionSimilarImagesApp<Gray extends ImageGray<Gray>, 
 //		config.recognizeNister2006.featureSingleWordHops = 1;
 //		config.recognizeNister2006.learnNodeWeights = false;
 
-		SceneRecognitionSimilarImages<Gray, TD> alg =
-				FactorySceneRecognition.createSimilarImages(config, ImageType.single(grayType));
-
-		alg.setVerbose(System.out, null);
+		sceneSimilar = FactorySceneRecognition.createSimilarImages(config, ImageType.single(grayType));
+		sceneSimilar.setVerbose(System.out, null);
 
 		Gray gray = GeneralizedImageOps.createImage(grayType, 1, 1, 0);
 
@@ -196,13 +202,13 @@ public class DemoSceneRecognitionSimilarImagesApp<Gray extends ImageGray<Gray>, 
 
 			// Convert to gray for image processing
 			ConvertBufferedImage.convertFrom(buffered, gray, true);
-			alg.addImage(path, gray);
+			sceneSimilar.addImage(path, gray);
 		}
 		long time1 = System.currentTimeMillis();
 		System.out.println((time1 - time0) + " (ms)");
 
 		System.out.print("Fixating: ");
-		alg.fixate();
+		sceneSimilar.fixate();
 		long time2 = System.currentTimeMillis();
 		System.out.println((time2 - time1) + " (ms)");
 
@@ -210,7 +216,7 @@ public class DemoSceneRecognitionSimilarImagesApp<Gray extends ImageGray<Gray>, 
 		imagesSimilar.resize(0);
 		for (String path : foundFiles) {
 			List<String> foundIDs = new ArrayList<>();
-			alg.findSimilar(path, foundIDs);
+			sceneSimilar.findSimilar(path, foundIDs);
 
 			DogArray_I32 similar = imagesSimilar.grow();
 			for (String s : foundIDs) {
@@ -222,10 +228,16 @@ public class DemoSceneRecognitionSimilarImagesApp<Gray extends ImageGray<Gray>, 
 	}
 
 	class ControlPanel extends StandardAlgConfigPanel implements ListSelectionListener {
+		public boolean drawFeatures = true;
+
 		protected JLabel processingTimeLabel = new JLabel();
 		protected JLabel imageSizeLabel = new JLabel();
 
 		JList<String> listImages;
+
+		JCheckBox checkFeatures = checkbox("Features", drawFeatures);
+		JComboBox<String> comboShow = combo(0,"All","Associated");
+		JComboBox<String> comboColor = combo(0,"Feature","Word");
 
 		public ControlPanel() {
 			listImages = new JList<>();
@@ -237,6 +249,9 @@ public class DemoSceneRecognitionSimilarImagesApp<Gray extends ImageGray<Gray>, 
 
 			addLabeled(processingTimeLabel, "Time");
 			addLabeled(imageSizeLabel, "Size");
+			addAlignLeft(checkFeatures);
+			addLabeled(comboShow,"Show");
+			addLabeled(comboColor,"Color");
 			addAlignCenter(new JScrollPane(listImages));
 			setPreferredSize(new Dimension(250, 500));
 		}
@@ -281,18 +296,24 @@ public class DemoSceneRecognitionSimilarImagesApp<Gray extends ImageGray<Gray>, 
 				gui.handleSelectedChanged();
 			}
 		}
+
+		@Override public void controlChanged( Object source ) {
+			if (source == checkFeatures) {
+				drawFeatures = checkFeatures.isSelected();
+				gui.repaint();
+			}
+		}
 	}
 
 	class VisualizePanel extends JPanel {
-		ImagePanel mainImage = new ImagePanel();
+		VisualizeImage mainImage = new VisualizeImage(-1);
 
 		JPanel gridPanel = new JPanel(new GridLayout(0, 4, 10, 10));
 
 		public VisualizePanel() {
 			setLayout(new BorderLayout());
-			mainImage.setScaling(ScaleOptions.DOWN);
 
-			JSplitPane splitPane = new JSplitPane(JSplitPane.VERTICAL_SPLIT,mainImage, gridPanel);
+			JSplitPane splitPane = new JSplitPane(JSplitPane.VERTICAL_SPLIT, mainImage, gridPanel);
 			splitPane.setDividerLocation(150);
 			splitPane.setPreferredSize(new Dimension(200, 0));
 
@@ -302,23 +323,16 @@ public class DemoSceneRecognitionSimilarImagesApp<Gray extends ImageGray<Gray>, 
 		public void handleSelectedChanged() {
 			BoofSwingUtil.checkGuiThread();
 
-			int selected = controlPanel.listImages.getSelectedIndex();
-			BufferedImage preview = null;
-			synchronized (imageLock) {
-				if (selected >= 0 && selected < imagePreviews.size()) {
-					preview = imagePreviews.get(selected);
-				}
-			}
+			int selectedIndex = controlPanel.listImages.getSelectedIndex();
+			mainImage.changeImage(selectedIndex);
 
 			// Nothing is selected so remove any images being displayed
-			if (preview == null) {
+			if (selectedIndex<0) {
 				mainImage.setImageRepaint(null);
 				gridPanel.removeAll();
 				gridPanel.validate();
 				return;
 			}
-
-			mainImage.setImageRepaint(preview);
 
 			// Wait until it has finished before trying to visualize the results
 			if (!computingFinished) {
@@ -327,13 +341,77 @@ public class DemoSceneRecognitionSimilarImagesApp<Gray extends ImageGray<Gray>, 
 				return;
 			}
 
-			DogArray_I32 similar = imagesSimilar.get(selected);
+			DogArray_I32 similar = imagesSimilar.get(selectedIndex);
 			gridPanel.removeAll();
 			similar.forEach(imageIndex -> {
-				gridPanel.add(new ImagePanel(imagePreviews.get(imageIndex), ScaleOptions.DOWN));
+				gridPanel.add(new ImageLabeledPanel(imageIndex));
 			});
 			gridPanel.validate();
 			gridPanel.repaint();
+		}
+	}
+
+	/**
+	 * Draws the image and the image's name below it.
+	 */
+	class ImageLabeledPanel extends JPanel {
+		public ImageLabeledPanel(int imageIndex) {
+			super(new BorderLayout());
+			var image = new VisualizeImage(imageIndex);
+			var label = new JLabel(new File(image.imageID).getName());
+
+			add(image,BorderLayout.CENTER);
+			add(label,BorderLayout.SOUTH);
+		}
+	}
+
+	class VisualizeImage extends ImagePanel {
+		ImageDimension shape = new ImageDimension();
+		DogArray<Point2D_F64> features = new DogArray<>(Point2D_F64::new);
+		Ellipse2D.Double ellipse = new Ellipse2D.Double();
+		String imageID;
+
+		public VisualizeImage( int imageIndex ) {
+			super(300, 300);
+			setScaling(ScaleOptions.DOWN);
+			if (imageIndex>=0)
+				changeImage(imageIndex);
+		}
+
+		public void changeImage( int imageIndex ) {
+			BoofSwingUtil.checkGuiThread();
+			features.reset();
+			synchronized (imageLock) {
+				if (imageIndex < 0 || imageIndex >= imagePreviews.size()) {
+					imageID = null;
+					setImageRepaint(null);
+					return;
+				}
+				setImageRepaint(imagePreviews.get(imageIndex));
+				imageID = imagePaths.get(imageIndex);
+			}
+		}
+
+		@Override public void paintComponent( Graphics g ) {
+			super.paintComponent(g);
+
+			if (imageID == null || !computingFinished || !controlPanel.drawFeatures || img == null)
+				return;
+
+			if (features.isEmpty()) {
+				sceneSimilar.lookupPixelFeats(imageID, features);
+				sceneSimilar.lookupShape(imageID, shape);
+			}
+
+			double previewScale = img.getWidth() / (double)shape.width;
+			double imageScale = previewScale*scale;
+
+			Graphics2D g2 = (Graphics2D)g;
+			for (int i = 0; i < features.size; i++) {
+				Point2D_F64 p = features.get(i);
+				VisualizeFeatures.drawPoint(g2,
+						offsetX + p.x*imageScale, offsetY + p.y*imageScale, 5.0, Color.RED, true, ellipse);
+			}
 		}
 	}
 
