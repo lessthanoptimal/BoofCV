@@ -32,6 +32,7 @@ import boofcv.io.UtilIO;
 import boofcv.io.image.ConvertBufferedImage;
 import boofcv.io.image.UtilImageIO;
 import boofcv.misc.BoofMiscOps;
+import boofcv.struct.feature.AssociatedIndex;
 import boofcv.struct.feature.TupleDesc;
 import boofcv.struct.image.*;
 import georegression.struct.point.Point2D_F64;
@@ -437,6 +438,7 @@ public class DemoSceneRecognitionSimilarImagesApp<Gray extends ImageGray<Gray>, 
 		ImageDimension shape = new ImageDimension();
 		DogArray<Point2D_F64> features = new DogArray<>(Point2D_F64::new);
 		DogArray_I32 words = new DogArray_I32();
+		DogArray_I32 mainFeatureIdx = new DogArray_I32();
 
 		Ellipse2D.Double ellipse = new Ellipse2D.Double();
 		String imageID;
@@ -478,6 +480,12 @@ public class DemoSceneRecognitionSimilarImagesApp<Gray extends ImageGray<Gray>, 
 				sceneSimilar.lookupShape(imageID, shape);
 				int imageIndex = imagePaths.indexOf(imageID);
 				words.setTo(imagesWords.get(imageIndex));
+
+				// look up corresponding features in the mainImage
+				mainFeatureIdx.resize(words.size,-1);
+				DogArray<AssociatedIndex> pairs = new DogArray<>(AssociatedIndex::new);
+				sceneSimilar.lookupMatches(gui.mainImage.imageID, imageID, pairs);
+				pairs.forEach(p->mainFeatureIdx.set(p.dst, p.src));
 			}
 
 			double imageScale = getImageScale();
@@ -487,11 +495,17 @@ public class DemoSceneRecognitionSimilarImagesApp<Gray extends ImageGray<Gray>, 
 			// Filter by words if a word has been selected and it's colorizing by words
 			boolean filterWords = viewControlPanel.colorization == ColorFeatures.WORD && gui.selectedWord!=-1;
 
+			// Filter by feature if showing all features and a feature in the source has been selected
+			boolean filterFeature = viewControlPanel.colorization == ColorFeatures.ALL && gui.selectedSrcID!=-1;
+
 			for (int i = 0; i < features.size; i++) {
 				int word = words.get(i);
 				Point2D_F64 p = features.get(i);
 
 				if (filterWords && gui.selectedWord != word)
+					continue;
+
+				if (filterFeature && gui.selectedSrcID != mainFeatureIdx.get(i))
 					continue;
 
 				Color color = switch (viewControlPanel.colorization) {
