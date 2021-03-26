@@ -42,6 +42,8 @@ import javax.swing.*;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 import java.awt.*;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 import java.awt.geom.AffineTransform;
 import java.awt.geom.Ellipse2D;
 import java.awt.image.BufferedImage;
@@ -52,18 +54,22 @@ import java.util.List;
 import static boofcv.io.UtilIO.systemToUnix;
 
 /**
+ * Visualizes similar images using scene recognition. Shows images features, words, and allows interaction.
+ *
  * @author Peter Abeles
  */
 public class DemoSceneRecognitionSimilarImagesApp<Gray extends ImageGray<Gray>, TD extends TupleDesc<TD>>
 		extends DemonstrationBase {
 
-	// TODO Colorize features by group
 	// TODO Colorize by association
+	// TODO Info panel next to image with useful statistics
+	// TODO Add a tuning panel
+	// TODO Load full resolution image for the selected target
 
 	public static final int PREVIEW_PIXELS = 400*300;
 
 	VisualizePanel gui = new VisualizePanel();
-	ControlPanel controlPanel = new ControlPanel();
+	ViewControlPanel viewControlPanel = new ViewControlPanel();
 
 	Class<Gray> grayType;
 	ImageType<Planar<Gray>> colorType;
@@ -87,7 +93,7 @@ public class DemoSceneRecognitionSimilarImagesApp<Gray extends ImageGray<Gray>, 
 
 		gui.setPreferredSize(new Dimension(800, 800));
 
-		add(BorderLayout.WEST, controlPanel);
+		add(BorderLayout.WEST, viewControlPanel);
 		add(BorderLayout.CENTER, gui);
 	}
 
@@ -167,7 +173,7 @@ public class DemoSceneRecognitionSimilarImagesApp<Gray extends ImageGray<Gray>, 
 			imagesSimilar.reset();
 			imagesWords.reset();
 		}
-		SwingUtilities.invokeLater(() -> controlPanel.updateImagePaths());
+		SwingUtilities.invokeLater(() -> viewControlPanel.updateImagePaths());
 
 		var config = new ConfigSceneRecognitionSimilarImages();
 		config.features.detectFastHessian.extract.radius = 5;
@@ -200,7 +206,7 @@ public class DemoSceneRecognitionSimilarImagesApp<Gray extends ImageGray<Gray>, 
 				imagePaths.add(path);
 				imagePreviews.add(preview);
 			}
-			SwingUtilities.invokeLater(() -> controlPanel.updateImagePaths());
+			SwingUtilities.invokeLater(() -> viewControlPanel.updateImagePaths());
 
 			// Convert to gray for image processing
 			ConvertBufferedImage.convertFrom(buffered, gray, true);
@@ -232,10 +238,13 @@ public class DemoSceneRecognitionSimilarImagesApp<Gray extends ImageGray<Gray>, 
 		}
 		long time3 = System.currentTimeMillis();
 		System.out.println((time3 - time2) + " (ms)");
+
+		SwingUtilities.invokeLater(()-> viewControlPanel.setProcessingTimeS((time3-time0)*1e-3));
 	}
 
-	class ControlPanel extends StandardAlgConfigPanel implements ListSelectionListener {
+	class ViewControlPanel extends StandardAlgConfigPanel implements ListSelectionListener {
 		public boolean drawFeatures = true;
+		public ColorFeatures colorization = ColorFeatures.ALL;
 
 		protected JLabel processingTimeLabel = new JLabel();
 		protected JLabel imageSizeLabel = new JLabel();
@@ -243,10 +252,10 @@ public class DemoSceneRecognitionSimilarImagesApp<Gray extends ImageGray<Gray>, 
 		JList<String> listImages;
 
 		JCheckBox checkFeatures = checkbox("Features", drawFeatures);
-		JComboBox<String> comboShow = combo(0,"All","Associated");
-		JComboBox<String> comboColor = combo(0,"Feature","Word");
+		JComboBox<String> comboShow = combo(0, "All", "Associated");
+		JComboBox<String> comboColor = combo(colorization.ordinal(), "Feature", "Word");
 
-		public ControlPanel() {
+		public ViewControlPanel() {
 			listImages = new JList<>();
 			listImages.setModel(new DefaultListModel<>());
 			listImages.setSelectionMode(ListSelectionModel.SINGLE_INTERVAL_SELECTION);
@@ -257,8 +266,8 @@ public class DemoSceneRecognitionSimilarImagesApp<Gray extends ImageGray<Gray>, 
 			addLabeled(processingTimeLabel, "Time");
 			addLabeled(imageSizeLabel, "Size");
 			addAlignLeft(checkFeatures);
-			addLabeled(comboShow,"Show");
-			addLabeled(comboColor,"Color");
+			addLabeled(comboShow, "Show");
+			addLabeled(comboColor, "Color");
 			addAlignCenter(new JScrollPane(listImages));
 			setPreferredSize(new Dimension(250, 500));
 		}
@@ -308,6 +317,9 @@ public class DemoSceneRecognitionSimilarImagesApp<Gray extends ImageGray<Gray>, 
 			if (source == checkFeatures) {
 				drawFeatures = checkFeatures.isSelected();
 				gui.repaint();
+			} else if (source == comboColor) {
+				colorization = ColorFeatures.values()[comboColor.getSelectedIndex()];
+				gui.repaint();
 			}
 		}
 	}
@@ -317,11 +329,52 @@ public class DemoSceneRecognitionSimilarImagesApp<Gray extends ImageGray<Gray>, 
 
 		JPanel gridPanel = new JPanel(new GridLayout(0, 4, 10, 10));
 
+		// Selected index of a feature in the "source" image
+		int selectedSrcID = -1;
+		// The word of the feature in the selected feature
+		int selectedWord = -1;
+
 		public VisualizePanel() {
 			setLayout(new BorderLayout());
 
+			mainImage.addMouseListener(new MouseAdapter() {
+				@Override public void mousePressed( MouseEvent e) {
+					if (mainImage.features.isEmpty())
+						return;
+					double scale = mainImage.getImageScale();
+					double x = e.getX()/scale;
+					double y = e.getY()/scale;
+
+					int best = -1;
+					double bestDistance = Math.pow(15.0/scale, 2.0);
+					for (int i = 0; i < mainImage.features.size; i++) {
+						Point2D_F64 pixel = mainImage.features.get(i);
+						double d = pixel.distance2(x,y);
+						if ( d < bestDistance) {
+							bestDistance = d;
+							best = i;
+						}
+					}
+
+					if (best == -1) {
+						// Only redraw if it deselected
+						if (selectedSrcID != best) {
+							selectedSrcID = -1;
+							selectedWord = -1;
+							gui.repaint();
+						}
+						return;
+					}
+					selectedSrcID = best;
+					selectedWord = mainImage.words.get(best);
+
+					gui.repaint();
+				}
+			});
+			mainImage.requestFocus();
+
 			JSplitPane splitPane = new JSplitPane(JSplitPane.VERTICAL_SPLIT, mainImage, gridPanel);
-			splitPane.setDividerLocation(150);
+			splitPane.setDividerLocation(250);
 			splitPane.setPreferredSize(new Dimension(200, 0));
 
 			add(splitPane, BorderLayout.CENTER);
@@ -330,16 +383,24 @@ public class DemoSceneRecognitionSimilarImagesApp<Gray extends ImageGray<Gray>, 
 		public void handleSelectedChanged() {
 			BoofSwingUtil.checkGuiThread();
 
-			int selectedIndex = controlPanel.listImages.getSelectedIndex();
+			// Invalidate previous feature selections
+			selectedSrcID = -1;
+			selectedWord = -1;
+
+			int selectedIndex = viewControlPanel.listImages.getSelectedIndex();
 			mainImage.changeImage(selectedIndex);
 
 			// Nothing is selected so remove any images being displayed
-			if (selectedIndex<0) {
+			if (selectedIndex < 0) {
 				mainImage.setImageRepaint(null);
 				gridPanel.removeAll();
 				gridPanel.validate();
 				return;
 			}
+
+			// Update the image shape
+			ImageDimension shape = mainImage.shape;
+			viewControlPanel.setImageSize(shape.width, shape.height);
 
 			// Wait until it has finished before trying to visualize the results
 			if (!computingFinished) {
@@ -362,13 +423,13 @@ public class DemoSceneRecognitionSimilarImagesApp<Gray extends ImageGray<Gray>, 
 	 * Draws the image and the image's name below it.
 	 */
 	class ImageLabeledPanel extends JPanel {
-		public ImageLabeledPanel(int imageIndex) {
+		public ImageLabeledPanel( int imageIndex ) {
 			super(new BorderLayout());
 			var image = new VisualizeImage(imageIndex);
 			var label = new JLabel(new File(image.imageID).getName());
 
-			add(image,BorderLayout.CENTER);
-			add(label,BorderLayout.SOUTH);
+			add(image, BorderLayout.CENTER);
+			add(label, BorderLayout.SOUTH);
 		}
 	}
 
@@ -383,7 +444,7 @@ public class DemoSceneRecognitionSimilarImagesApp<Gray extends ImageGray<Gray>, 
 		public VisualizeImage( int imageIndex ) {
 			super(300, 300);
 			setScaling(ScaleOptions.DOWN);
-			if (imageIndex>=0)
+			if (imageIndex >= 0)
 				changeImage(imageIndex);
 		}
 
@@ -398,34 +459,54 @@ public class DemoSceneRecognitionSimilarImagesApp<Gray extends ImageGray<Gray>, 
 				}
 				setImageRepaint(imagePreviews.get(imageIndex));
 				imageID = imagePaths.get(imageIndex);
-
-				words.setTo(imagesWords.get(imageIndex));
 			}
+		}
+
+		public double getImageScale() {
+			double previewScale = img.getWidth()/(double)shape.width;
+			return previewScale*scale;
 		}
 
 		@Override public void paintComponent( Graphics g ) {
 			super.paintComponent(g);
 
-			if (imageID == null || !computingFinished || !controlPanel.drawFeatures || img == null)
+			if (imageID == null || !computingFinished || !viewControlPanel.drawFeatures || img == null)
 				return;
 
 			if (features.isEmpty()) {
 				sceneSimilar.lookupPixelFeats(imageID, features);
 				sceneSimilar.lookupShape(imageID, shape);
+				int imageIndex = imagePaths.indexOf(imageID);
+				words.setTo(imagesWords.get(imageIndex));
 			}
 
-			double previewScale = img.getWidth() / (double)shape.width;
-			double imageScale = previewScale*scale;
+			double imageScale = getImageScale();
 
 			Graphics2D g2 = BoofSwingUtil.antialiasing(g);
 
-			for (int i = 0; i < features.size; i++) {
-				Point2D_F64 p = features.get(i);
-				VisualizeFeatures.drawPoint(g2,
-						offsetX + p.x*imageScale, offsetY + p.y*imageScale, 5.0, Color.RED, true, ellipse);
+			// Filter by words if a word has been selected and it's colorizing by words
+			boolean filterWords = viewControlPanel.colorization == ColorFeatures.WORD && gui.selectedWord!=-1;
 
+			for (int i = 0; i < features.size; i++) {
+				int word = words.get(i);
+				Point2D_F64 p = features.get(i);
+
+				if (filterWords && gui.selectedWord != word)
+					continue;
+
+				Color color = switch (viewControlPanel.colorization) {
+					case ALL, ASSOCIATION -> Color.RED;
+					case WORD -> new Color(VisualizeFeatures.trackIdToRgb(word));
+				};
+
+				VisualizeFeatures.drawPoint(g2,
+						offsetX + p.x*imageScale, offsetY + p.y*imageScale, 5.0, color, true, ellipse);
 			}
 		}
+	}
+
+	enum ColorFeatures {
+		ALL, WORD, ASSOCIATION
 	}
 
 	public static void main( String[] args ) {

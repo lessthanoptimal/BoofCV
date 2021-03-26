@@ -45,7 +45,6 @@ import java.awt.event.KeyEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.geom.Ellipse2D;
-import java.awt.geom.Line2D;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.util.ArrayList;
@@ -59,8 +58,7 @@ import java.util.Map;
  * @author Peter Abeles
  */
 public class VideoTrackerPointFeaturesApp<I extends ImageGray<I>>
-		extends DemonstrationBase implements TrackerPointControlPanel.Listener
-{
+		extends DemonstrationBase implements TrackerPointControlPanel.Listener {
 	PointTracker<I> tracker;
 
 	VisualizePanel gui = new VisualizePanel();
@@ -77,27 +75,27 @@ public class VideoTrackerPointFeaturesApp<I extends ImageGray<I>>
 	MovingAverage processingTime = new MovingAverage();
 
 	// track duration 50% and 95%
-	volatile double duration50,duration95;
+	volatile double duration50, duration95;
 	// track duration work space
 	DogArray_F64 storageDuration = new DogArray_F64();
 
-	public VideoTrackerPointFeaturesApp(List<PathLabel> examples,
-										Class<I> imageType ) {
+	public VideoTrackerPointFeaturesApp( List<PathLabel> examples,
+										 Class<I> imageType ) {
 		super(examples, ImageType.single(imageType));
 		this.imageType = imageType;
 		this.allowImages = false;
 
-		gui.setPreferredSize(new Dimension(400,400));
+		gui.setPreferredSize(new Dimension(400, 400));
 
 		add(BorderLayout.WEST, controlPanel);
 		add(BorderLayout.CENTER, gui);
 
 		gui.addMouseListener(new MouseAdapter() {
 			@Override
-			public void mousePressed(MouseEvent e) {
+			public void mousePressed( MouseEvent e ) {
 				double x = gui.offsetX + e.getX()/gui.scale;
 				double y = gui.offsetY + e.getY()/gui.scale;
-				handleMouseClick(x,y);
+				handleMouseClick(x, y);
 				gui.requestFocus();
 			}
 		});
@@ -105,8 +103,8 @@ public class VideoTrackerPointFeaturesApp<I extends ImageGray<I>>
 		// Step video when space is pressed
 		gui.addKeyListener(new KeyAdapter() {
 			@Override
-			public void keyPressed(KeyEvent e) {
-				if(e.getKeyCode()==KeyEvent.VK_SPACE){
+			public void keyPressed( KeyEvent e ) {
+				if (e.getKeyCode() == KeyEvent.VK_SPACE) {
 					controlPanel.buttonStep.doClick();
 				}
 			}
@@ -116,7 +114,7 @@ public class VideoTrackerPointFeaturesApp<I extends ImageGray<I>>
 	}
 
 	@Override
-	public void openExample(Object o) {
+	public void openExample( Object o ) {
 		int period = 33;
 		if (o instanceof PathLabel) {
 			// These examples were made before mp4 capability was added and were kept small by reducing the frame rate
@@ -131,22 +129,22 @@ public class VideoTrackerPointFeaturesApp<I extends ImageGray<I>>
 	}
 
 	@Override
-	protected void configureVideo(int which, SimpleImageSequence sequence) {
+	protected void configureVideo( int which, SimpleImageSequence sequence ) {
 		super.configureVideo(which, sequence);
 		sequence.setLoop(true);
 		tracker.reset();
-		BoofSwingUtil.invokeNowOrLater(()-> {
+		BoofSwingUtil.invokeNowOrLater(() -> {
 			controlPanel.setPauseState(false);
 			streamPaused = false;
 		});
 	}
 
 	@Override
-	protected void handleInputChange(int source, InputMethod method, int width, int height) {
+	protected void handleInputChange( int source, InputMethod method, int width, int height ) {
 		super.handleInputChange(source, method, width, height);
 		this.streamPeriod = controlPanel.videoPeriod;
-		gui.setPreferredSize(new Dimension(width,height));
-		BoofSwingUtil.invokeNowOrLater(()-> controlPanel.setImageSize(width,height));
+		gui.setPreferredSize(new Dimension(width, height));
+		BoofSwingUtil.invokeNowOrLater(() -> controlPanel.setImageSize(width, height));
 	}
 
 	@Override
@@ -163,29 +161,29 @@ public class VideoTrackerPointFeaturesApp<I extends ImageGray<I>>
 	}
 
 	@Override
-	public void handlePause(boolean paused) {
+	public void handlePause( boolean paused ) {
 		super.streamPaused = paused;
 	}
 
 	/**
 	 * Show info on the selected feature and
 	 */
-	public void handleMouseClick( double x , double y ) {
-		String text = String.format("Clicked %4.1f %4.1f\n",x,y);
+	public void handleMouseClick( double x, double y ) {
+		String text = String.format("Clicked %4.1f %4.1f\n", x, y);
 		double tol = 10*10;
 		selectedTrackID = -1;
 		synchronized (tracksGui) {
 			double bestDistance = tol;
 			PointTrack best = null;
 			for (PointTrack p : tracksGui.toList()) {
-				double d = p.pixel.distance2(x,y);
-				if( d <= bestDistance ) {
+				double d = p.pixel.distance2(x, y);
+				if (d <= bestDistance) {
 					best = p;
 					bestDistance = d;
 				}
 			}
 
-			if( best != null ) {
+			if (best != null) {
 				selectedTrackID = best.featureId;
 				text += stringPointInfo(best);
 			} else {
@@ -197,51 +195,49 @@ public class VideoTrackerPointFeaturesApp<I extends ImageGray<I>>
 		controlPanel.textArea.setText(text);
 	}
 
-	private String stringPointInfo(PointTrack best) {
-		String text = "Track ID "+best.featureId+"\n";
-		text += "Set      "+best.detectorSetId +"\n";
-		text += "Duration "+(frameIdGui-best.spawnFrameID)+"\n";
-		text += String.format("Location %7.2f %7.2f",best.pixel.x,best.pixel.y);
+	private String stringPointInfo( PointTrack best ) {
+		String text = "Track ID " + best.featureId + "\n";
+		text += "Set      " + best.detectorSetId + "\n";
+		text += "Duration " + (frameIdGui - best.spawnFrameID) + "\n";
+		text += String.format("Location %7.2f %7.2f", best.pixel.x, best.pixel.y);
 		return text;
 	}
 
 	public class VisualizePanel extends ImagePanel {
 		Ellipse2D.Double ellipse = new Ellipse2D.Double();
-		Line2D.Double line = new Line2D.Double();
-
 		VisualizeOpticalFlow visualizeFlow = new VisualizeOpticalFlow();
 
 		@Override
-		public void paintComponent(Graphics g) {
+		public void paintComponent( Graphics g ) {
 			super.paintComponent(g);
 			BoofSwingUtil.antialiasing(g);
-			Graphics2D g2 = (Graphics2D) g;
+			Graphics2D g2 = (Graphics2D)g;
 
 			final TrackerPointControlPanel.Colorization colorization = controlPanel.colorization;
 			final Marker markerType = controlPanel.markerType;
 			final int minDuration = controlPanel.minDuration;
 
 			boolean computeMaxFlow = colorization != TrackerPointControlPanel.Colorization.TRACK_ID ||
-								  markerType == Marker.Line;
+					markerType == Marker.Line;
 
 			synchronized (tracksGui) {
 				// Find max velocity of features which are drawn
-				if( computeMaxFlow )
-				{
+				if (computeMaxFlow) {
 					computeMaxFlowVelocity(minDuration);
 				}
 
-				for (PointTrack p : tracksGui.toList() ) {
-					long duration = frameIdGui-p.spawnFrameID;
+				for (PointTrack p : tracksGui.toList()) {
+					long duration = frameIdGui - p.spawnFrameID;
 
-					if( duration < minDuration )
+					if (duration < minDuration)
 						continue;
 
 					switch (colorization) {
 						case TRACK_ID -> {
-							visualizeFlow.red = (int)(2.5*(p.featureId%100));
-							visualizeFlow.green = (int)((255.0/150.0)*(p.featureId%150));
-							visualizeFlow.blue = (int)(p.featureId%255);
+							int rgb = VisualizeFeatures.trackIdToRgb(p.featureId);
+							visualizeFlow.red = (rgb >> 16) & 0xFF;
+							visualizeFlow.green = (rgb >> 8) & 0xFF;
+							visualizeFlow.blue = rgb & 0xFF;
 						}
 						case FLOW -> {
 							visualizeFlow.computeColor(p.pixel, tracksPrev.get(p.featureId), false);
@@ -256,8 +252,8 @@ public class VideoTrackerPointFeaturesApp<I extends ImageGray<I>>
 					double y = offsetY + scale*p.pixel.y;
 
 					Stroke strokeBefore = g2.getStroke();
-					if( duration == 0 ) {
-						VisualizeFeatures.drawPoint(g2, x,y, 5, Color.GREEN,true,ellipse );
+					if (duration == 0) {
+						VisualizeFeatures.drawPoint(g2, x, y, 5, Color.GREEN, true, ellipse);
 					} else {
 						switch (markerType) {
 							case Dot -> VisualizeFeatures.drawPoint(g2, x, y, 5, visualizeFlow.createColor(), true, ellipse);
@@ -278,11 +274,11 @@ public class VideoTrackerPointFeaturesApp<I extends ImageGray<I>>
 					}
 					g2.setStroke(strokeBefore);
 					// Visually indicates that the user has clicked on this feature
-					if( p.featureId == selectedTrackID ) {
+					if (p.featureId == selectedTrackID) {
 						controlPanel.textArea.setText(stringPointInfo(p));
 						g2.setColor(Color.CYAN);
 						for (int i = 0; i < 3; i++) {
-							VisualizeFeatures.drawCircle(g2, x, y, 7+i*2, ellipse);
+							VisualizeFeatures.drawCircle(g2, x, y, 7 + i*2, ellipse);
 						}
 					}
 				}
@@ -291,14 +287,14 @@ public class VideoTrackerPointFeaturesApp<I extends ImageGray<I>>
 
 		private void computeMaxFlowVelocity( int minDuration ) {
 			double maxVelocity = 0;
-			for (PointTrack p : tracksGui.toList() ) {
-				long duration = frameIdGui-p.spawnFrameID;
+			for (PointTrack p : tracksGui.toList()) {
+				long duration = frameIdGui - p.spawnFrameID;
 
-				if( duration < minDuration )
+				if (duration < minDuration)
 					continue;
 
 				Point2D_F64 prev = tracksPrev.get(p.featureId);
-				if( prev != null ) {
+				if (prev != null) {
 					// velocity Sq is much faster to compute than Euclidean distance
 					maxVelocity = Math.max(maxVelocity, prev.distance2(p.pixel));
 				}
@@ -308,7 +304,7 @@ public class VideoTrackerPointFeaturesApp<I extends ImageGray<I>>
 	}
 
 	@Override
-	public void processImage(int sourceID, long frameID, BufferedImage buffered, ImageBase input) {
+	public void processImage( int sourceID, long frameID, BufferedImage buffered, ImageBase input ) {
 		PointTracker<I> tracker;
 		synchronized (this) {
 			tracker = this.tracker;
@@ -321,7 +317,7 @@ public class VideoTrackerPointFeaturesApp<I extends ImageGray<I>>
 			tracker.spawnTracks();
 		}
 		long time1 = System.nanoTime();
-		processingTime.update((time1-time0)*1e-6);
+		processingTime.update((time1 - time0)*1e-6);
 
 		List<PointTrack> active = tracker.getActiveTracks(null);
 
@@ -329,7 +325,7 @@ public class VideoTrackerPointFeaturesApp<I extends ImageGray<I>>
 		long trackerFrameID = tracker.getFrameID();
 		storageDuration.resize(active.size());
 		for (int i = 0; i < active.size(); i++) {
-			storageDuration.data[i] = trackerFrameID-active.get(i).spawnFrameID;
+			storageDuration.data[i] = trackerFrameID - active.get(i).spawnFrameID;
 		}
 		storageDuration.sort();
 		this.duration50 = storageDuration.getFraction(0.5);
@@ -337,18 +333,18 @@ public class VideoTrackerPointFeaturesApp<I extends ImageGray<I>>
 
 		int count = active.size();
 
-		SwingUtilities.invokeLater(()->{
+		SwingUtilities.invokeLater(() -> {
 			controlPanel.setFrame((int)tracker.getFrameID());
 			controlPanel.setTime(processingTime.getAverage());
 			controlPanel.setTrackCount(count);
-			controlPanel.setDuration(duration50,duration95);
+			controlPanel.setDuration(duration50, duration95);
 		});
 
 		synchronized (tracksGui) {
 			tracksPrev.clear();
 			for (int i = 0; i < tracksGui.size(); i++) {
 				PointTrack t = tracksGui.get(i);
-				tracksPrev.put(t.featureId,t.pixel.copy());
+				tracksPrev.put(t.featureId, t.pixel.copy());
 			}
 
 			tracksGui.reset();
@@ -361,14 +357,14 @@ public class VideoTrackerPointFeaturesApp<I extends ImageGray<I>>
 
 		gui.setImageRepaint(buffered);
 
-		if( controlPanel.step ) {
+		if (controlPanel.step) {
 			controlPanel.step = false;
 			this.streamPaused = true;
-			SwingUtilities.invokeLater(()-> this.controlPanel.setPauseState(true));
+			SwingUtilities.invokeLater(() -> this.controlPanel.setPauseState(true));
 		}
 	}
 
-	public static void main(String[] args) {
+	public static void main( String[] args ) {
 		//		Class type = GrayF32.class;
 		Class type = GrayU8.class;
 
@@ -382,10 +378,10 @@ public class VideoTrackerPointFeaturesApp<I extends ImageGray<I>>
 		examples.add(new PathLabel("Driving Snow", UtilIO.pathExample("tracking/snow_follow_car.mjpeg")));
 		examples.add(new PathLabel("Driving Night", UtilIO.pathExample("tracking/night_follow_car.mjpeg")));
 
-		SwingUtilities.invokeLater(()->{
-			var app = new VideoTrackerPointFeaturesApp(examples,type);
+		SwingUtilities.invokeLater(() -> {
+			var app = new VideoTrackerPointFeaturesApp(examples, type);
 			app.openFile(new File(examples.get(0).getPath()));
-			app.display( "Feature Tracker");
+			app.display("Feature Tracker");
 		});
 	}
 }
