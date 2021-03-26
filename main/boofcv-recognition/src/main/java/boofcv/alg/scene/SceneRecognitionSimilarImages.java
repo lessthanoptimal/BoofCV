@@ -160,6 +160,9 @@ public class SceneRecognitionSimilarImages<Image extends ImageBase<Image>, TD ex
 	public void addImage( String id, Image image ) {
 		imageToIndex.put(id, imageIDs.size());
 		imageIDs.add(id);
+		imageShapes.grow().setTo(image.width, image.height);
+
+		// Detect the point features
 		detector.detect(image);
 
 		int N = detector.getNumberOfFeatures();
@@ -182,6 +185,7 @@ public class SceneRecognitionSimilarImages<Image extends ImageBase<Image>, TD ex
 	 */
 	public void fixate() {
 
+		// Learn the model
 		long time0 = System.nanoTime();
 		if (relearnModel)
 			learnModel();
@@ -295,7 +299,7 @@ public class SceneRecognitionSimilarImages<Image extends ImageBase<Image>, TD ex
 		DogArray_I32 pairIndexes = imageToPairIndexes.get(imageIndex);
 
 		for (int i = 0; i < pairIndexes.size; i++) {
-			// Get the index of the image it's similiar to
+			// Get the index of the image it's similar to
 			int similarIndex = pairedImages.get(pairIndexes.get(i)).other(imageIndex);
 			// Add the ID
 			similar.add(imageIDs.get(similarIndex));
