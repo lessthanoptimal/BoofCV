@@ -245,7 +245,7 @@ public class DemoSceneRecognitionSimilarImagesApp<Gray extends ImageGray<Gray>, 
 
 	class ViewControlPanel extends StandardAlgConfigPanel implements ListSelectionListener {
 		public boolean drawFeatures = true;
-		public ColorFeatures colorization = ColorFeatures.ALL;
+		public ColorFeatures colorization = ColorFeatures.ASSOCIATION;
 
 		protected JLabel processingTimeLabel = new JLabel();
 		protected JLabel imageSizeLabel = new JLabel();
@@ -254,7 +254,7 @@ public class DemoSceneRecognitionSimilarImagesApp<Gray extends ImageGray<Gray>, 
 
 		JCheckBox checkFeatures = checkbox("Features", drawFeatures);
 		JComboBox<String> comboShow = combo(0, "All", "Associated");
-		JComboBox<String> comboColor = combo(colorization.ordinal(), "Feature", "Word");
+		JComboBox<String> comboColor = combo(colorization.ordinal(), (Object[])ColorFeatures.values());
 
 		public ViewControlPanel() {
 			listImages = new JList<>();
@@ -496,7 +496,7 @@ public class DemoSceneRecognitionSimilarImagesApp<Gray extends ImageGray<Gray>, 
 			boolean filterWords = viewControlPanel.colorization == ColorFeatures.WORD && gui.selectedWord!=-1;
 
 			// Filter by feature if showing all features and a feature in the source has been selected
-			boolean filterFeature = viewControlPanel.colorization == ColorFeatures.ALL && gui.selectedSrcID!=-1;
+			boolean filterFeature = viewControlPanel.colorization == ColorFeatures.ASSOCIATION && gui.selectedSrcID!=-1;
 
 			for (int i = 0; i < features.size; i++) {
 				int word = words.get(i);
@@ -508,8 +508,13 @@ public class DemoSceneRecognitionSimilarImagesApp<Gray extends ImageGray<Gray>, 
 				if (filterFeature && gui.selectedSrcID != mainFeatureIdx.get(i))
 					continue;
 
+				// Skip over features which are not associated
+				if (viewControlPanel.colorization == ColorFeatures.ASSOCIATION && mainFeatureIdx.get(i) < 0)
+					continue;
+
 				Color color = switch (viewControlPanel.colorization) {
-					case ALL, ASSOCIATION -> Color.RED;
+					case ALL -> Color.RED;
+					case ASSOCIATION -> new Color(VisualizeFeatures.trackIdToRgb(mainFeatureIdx.get(i)));
 					case WORD -> new Color(VisualizeFeatures.trackIdToRgb(word*123L));
 				};
 
@@ -520,7 +525,7 @@ public class DemoSceneRecognitionSimilarImagesApp<Gray extends ImageGray<Gray>, 
 	}
 
 	enum ColorFeatures {
-		ALL, WORD, ASSOCIATION
+		ASSOCIATION, WORD, ALL
 	}
 
 	public static void main( String[] args ) {
