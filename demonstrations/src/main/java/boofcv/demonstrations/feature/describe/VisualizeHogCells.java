@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -19,6 +19,7 @@
 package boofcv.demonstrations.feature.describe;
 
 import boofcv.alg.feature.dense.DescribeDenseHogFastAlg;
+import boofcv.gui.BoofSwingUtil;
 
 import java.awt.*;
 import java.awt.geom.Line2D;
@@ -70,9 +71,7 @@ public class VisualizeHogCells {
 	}
 
 	public synchronized void render( Graphics2D g2 ) {
-
-		g2.setRenderingHint(RenderingHints.KEY_STROKE_CONTROL, RenderingHints.VALUE_STROKE_PURE);
-		g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_OFF);
+		BoofSwingUtil.antialiasing(g2);
 
 		if (showGrid) {
 			int cell = hog.getPixelsPerCell();

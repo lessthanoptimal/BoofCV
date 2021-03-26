@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -413,8 +413,7 @@ public class DetectUchiyaMarkerApp<T extends ImageGray<T>>
 		@Override
 		protected void paintOverPanel( Graphics2D g2 ) {
 			if (addingMarkers) {
-				g2.setRenderingHint(RenderingHints.KEY_STROKE_CONTROL, RenderingHints.VALUE_STROKE_PURE);
-				g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+				BoofSwingUtil.antialiasing(g2);
 
 				float x = (float)(getWidth()/8.0 - transX);
 				float y = (float)(getHeight()/2.0 - transY);
@@ -426,8 +425,7 @@ public class DetectUchiyaMarkerApp<T extends ImageGray<T>>
 
 		@Override
 		protected void paintInPanel( AffineTransform tran, Graphics2D g2 ) {
-			g2.setRenderingHint(RenderingHints.KEY_STROKE_CONTROL, RenderingHints.VALUE_STROKE_PURE);
-			g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+			BoofSwingUtil.antialiasing(g2);
 
 			final Uchiya_to_FiducialDetector<T> tracker = DetectUchiyaMarkerApp.this.tracker;
 			if (tracker == null) return;

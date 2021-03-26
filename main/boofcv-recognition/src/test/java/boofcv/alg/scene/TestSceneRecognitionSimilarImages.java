@@ -49,4 +49,8 @@ public class TestSceneRecognitionSimilarImages extends BoofStandardJUnit {
 	@Test void lookupShape() {
 		fail("Implement");
 	}
+
+	@Test void lookupImageWords() {
+		fail("Implement");
+	}
 }

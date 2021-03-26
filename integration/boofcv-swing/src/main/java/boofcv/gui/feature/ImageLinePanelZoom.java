@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -19,6 +19,7 @@
 package boofcv.gui.feature;
 
 import boofcv.alg.feature.detect.line.LineImageOps;
+import boofcv.gui.BoofSwingUtil;
 import boofcv.gui.image.ImageZoomPanel;
 import georegression.metric.Distance2D_F32;
 import georegression.struct.line.LineParametric2D_F32;
@@ -86,8 +87,7 @@ public class ImageLinePanelZoom extends ImageZoomPanel {
 
 	@Override
 	protected synchronized void paintInPanel( AffineTransform tran, Graphics2D g2 ) {
-		g2.setRenderingHint(RenderingHints.KEY_STROKE_CONTROL, RenderingHints.VALUE_STROKE_PURE);
-		g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+		BoofSwingUtil.antialiasing(g2);
 		g2.setStroke(new BasicStroke(3));
 
 		for (int i = 0; i < lines.size(); i++) {

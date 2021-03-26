@@ -386,6 +386,21 @@ public class SceneRecognitionSimilarImages<Image extends ImageBase<Image>, TD ex
 	}
 
 	/**
+	 * Looks up the word each feature belongs in for an image
+	 */
+	public void lookupImageWords( String imageID, DogArray_I32 words ) {
+		words.reset();
+
+		int imageIndex = imageToIndex.get(imageID);
+		int offset = imageFeatureStartIndexes.get(imageIndex*2);
+		int numFeatures = imageFeatureStartIndexes.get(imageIndex*2 + 1);
+
+		for (int i = 0; i < numFeatures; i++) {
+			words.add( recognizer.lookupWord(descriptions.getTemp(offset+i)) );
+		}
+	}
+
+	/**
 	 * Finds the Pair info for the two images. If they are not paied then null is returned
 	 */
 	protected @Nullable PairInfo lookupPairInfo( int imageIndexA, int imageIndexB ) {

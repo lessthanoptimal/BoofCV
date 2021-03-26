@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -288,9 +288,7 @@ public class DetectQrCodeApp<T extends ImageGray<T>>
 		protected void paintInPanel( AffineTransform tran, Graphics2D g2 ) {
 
 			DetectQrCodeControlPanel controls = (DetectQrCodeControlPanel)DetectQrCodeApp.this.controls;
-
-			g2.setRenderingHint(RenderingHints.KEY_STROKE_CONTROL, RenderingHints.VALUE_STROKE_PURE);
-			g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+			BoofSwingUtil.antialiasing(g2);
 
 			synchronized (DetectQrCodeApp.this) {
 

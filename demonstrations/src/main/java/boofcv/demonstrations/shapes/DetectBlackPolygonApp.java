@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -114,8 +114,7 @@ public class DetectBlackPolygonApp<T extends ImageGray<T>>
 
 			DetectBlackPolygonAppControlPanel controls = (DetectBlackPolygonAppControlPanel)DetectBlackPolygonApp.this.controls;
 
-			g2.setRenderingHint(RenderingHints.KEY_STROKE_CONTROL, RenderingHints.VALUE_STROKE_PURE);
-			g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+			BoofSwingUtil.antialiasing(g2);
 
 			synchronized ( DetectBlackPolygonApp.this ) {
 

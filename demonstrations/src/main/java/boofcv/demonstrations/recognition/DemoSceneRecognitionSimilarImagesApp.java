@@ -73,6 +73,7 @@ public class DemoSceneRecognitionSimilarImagesApp<Gray extends ImageGray<Gray>, 
 	// List of which images are similar to each other
 	final Object imageLock = new Object();
 	DogArray<DogArray_I32> imagesSimilar = new DogArray<>(DogArray_I32::new, DogArray_I32::reset);
+	DogArray<DogArray_I32> imagesWords = new DogArray<>(DogArray_I32::new, DogArray_I32::reset);
 	List<String> imagePaths = new ArrayList<>();
 	List<BufferedImage> imagePreviews = new ArrayList<>();
 
@@ -164,6 +165,7 @@ public class DemoSceneRecognitionSimilarImagesApp<Gray extends ImageGray<Gray>, 
 			imagePaths.clear();
 			imagePreviews.clear();
 			imagesSimilar.reset();
+			imagesWords.reset();
 		}
 		SwingUtilities.invokeLater(() -> controlPanel.updateImagePaths());
 
@@ -213,15 +215,20 @@ public class DemoSceneRecognitionSimilarImagesApp<Gray extends ImageGray<Gray>, 
 		System.out.println((time2 - time1) + " (ms)");
 
 		System.out.print("Finding Similar: ");
-		imagesSimilar.resize(0);
+		imagesSimilar.reset();
+		imagesWords.reset();
 		for (String path : foundFiles) {
 			List<String> foundIDs = new ArrayList<>();
 			sceneSimilar.findSimilar(path, foundIDs);
 
+			// Save indexes of similar images
 			DogArray_I32 similar = imagesSimilar.grow();
 			for (String s : foundIDs) {
 				similar.add(foundFiles.indexOf(s));
 			}
+
+			// Save which words appeared in the images
+			sceneSimilar.lookupImageWords(path, imagesWords.grow());
 		}
 		long time3 = System.currentTimeMillis();
 		System.out.println((time3 - time2) + " (ms)");
@@ -368,6 +375,8 @@ public class DemoSceneRecognitionSimilarImagesApp<Gray extends ImageGray<Gray>, 
 	class VisualizeImage extends ImagePanel {
 		ImageDimension shape = new ImageDimension();
 		DogArray<Point2D_F64> features = new DogArray<>(Point2D_F64::new);
+		DogArray_I32 words = new DogArray_I32();
+
 		Ellipse2D.Double ellipse = new Ellipse2D.Double();
 		String imageID;
 
@@ -389,6 +398,8 @@ public class DemoSceneRecognitionSimilarImagesApp<Gray extends ImageGray<Gray>, 
 				}
 				setImageRepaint(imagePreviews.get(imageIndex));
 				imageID = imagePaths.get(imageIndex);
+
+				words.setTo(imagesWords.get(imageIndex));
 			}
 		}
 
@@ -406,11 +417,13 @@ public class DemoSceneRecognitionSimilarImagesApp<Gray extends ImageGray<Gray>, 
 			double previewScale = img.getWidth() / (double)shape.width;
 			double imageScale = previewScale*scale;
 
-			Graphics2D g2 = (Graphics2D)g;
+			Graphics2D g2 = BoofSwingUtil.antialiasing(g);
+
 			for (int i = 0; i < features.size; i++) {
 				Point2D_F64 p = features.get(i);
 				VisualizeFeatures.drawPoint(g2,
 						offsetX + p.x*imageScale, offsetY + p.y*imageScale, 5.0, Color.RED, true, ellipse);
+
 			}
 		}
 	}

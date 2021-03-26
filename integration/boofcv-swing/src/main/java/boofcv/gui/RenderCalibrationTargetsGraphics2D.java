@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -76,8 +76,7 @@ public class RenderCalibrationTargetsGraphics2D extends RenderCalibrationTargets
 		g2.setColor(Color.WHITE);
 		g2.fillRect(0,0,bufferred.getWidth(),bufferred.getHeight());
 		g2.setColor(Color.BLACK);
-		g2.setRenderingHint(RenderingHints.KEY_STROKE_CONTROL, RenderingHints.VALUE_STROKE_PURE);
-		g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+		BoofSwingUtil.antialiasing(g2);
 	}
 
 	@Override

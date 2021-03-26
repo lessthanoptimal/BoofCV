@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -18,6 +18,7 @@
 
 package boofcv.gui.feature;
 
+import boofcv.gui.BoofSwingUtil;
 import georegression.struct.curve.EllipseRotated_F64;
 import georegression.struct.point.Point2D_F64;
 import georegression.struct.point.Point2D_I32;
@@ -188,8 +189,7 @@ public class VisualizeShapes {
 	}
 
 	public static<T extends Point2D_I32> void drawPolygon( List<T> vertexes, boolean loop,double scale,  Graphics2D g2 ) {
-		g2.setRenderingHint(RenderingHints.KEY_STROKE_CONTROL, RenderingHints.VALUE_STROKE_PURE);
-		g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+		BoofSwingUtil.antialiasing(g2);
 
 		Line2D.Double l = new Line2D.Double();
 
@@ -227,8 +227,7 @@ public class VisualizeShapes {
 
 	public static void drawPolygon( Polygon2D_F64 polygon, boolean loop, Graphics2D g2 , boolean interpolate ) {
 		if( interpolate ) {
-			g2.setRenderingHint(RenderingHints.KEY_STROKE_CONTROL, RenderingHints.VALUE_STROKE_PURE);
-			g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+			BoofSwingUtil.antialiasing(g2);
 
 			Path2D path = new Path2D.Double();
 
@@ -252,8 +251,7 @@ public class VisualizeShapes {
 	}
 
 	public static void drawPolygon( Polygon2D_F64 polygon, boolean loop,double scale,  Graphics2D g2 ) {
-		g2.setRenderingHint(RenderingHints.KEY_STROKE_CONTROL, RenderingHints.VALUE_STROKE_PURE);
-		g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+		BoofSwingUtil.antialiasing(g2);
 
 		Path2D path = new Path2D.Double();
 
@@ -272,8 +270,7 @@ public class VisualizeShapes {
 	}
 
 	public static void drawPolygon( Polygon2D_F64 polygon, boolean loop,double scale, Color color0, Color colorOthers,  Graphics2D g2 ) {
-		g2.setRenderingHint(RenderingHints.KEY_STROKE_CONTROL, RenderingHints.VALUE_STROKE_PURE);
-		g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+		BoofSwingUtil.antialiasing(g2);
 
 		Path2D path = new Path2D.Double();
 
@@ -303,8 +300,7 @@ public class VisualizeShapes {
 	}
 
 	public static void fillPolygon( Polygon2D_F64 polygon, double scale,  Graphics2D g2 ) {
-		g2.setRenderingHint(RenderingHints.KEY_STROKE_CONTROL, RenderingHints.VALUE_STROKE_PURE);
-		g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+		BoofSwingUtil.antialiasing(g2);
 
 		Path2D path = new Path2D.Double();
 
@@ -320,8 +316,7 @@ public class VisualizeShapes {
 
 	public static void drawPolygonCorners( Polygon2D_F64 polygon, int radius , Graphics2D g2 , boolean interpolate ) {
 		if( interpolate ) {
-			g2.setRenderingHint(RenderingHints.KEY_STROKE_CONTROL, RenderingHints.VALUE_STROKE_PURE);
-			g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+			BoofSwingUtil.antialiasing(g2);
 
 			for( int i = 0; i < polygon.size(); i++ ) {
 				Point2D_F64 p = polygon.get(i);
@@ -382,8 +377,7 @@ public class VisualizeShapes {
 	}
 
 	public static void drawRectangle( double x0, double y0, double x1, double y1, Line2D.Double line , Graphics2D g2 ) {
-		g2.setRenderingHint(RenderingHints.KEY_STROKE_CONTROL, RenderingHints.VALUE_STROKE_PURE);
-		g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+		BoofSwingUtil.antialiasing(g2);
 
 		line.setLine(x0,y0,x1,y0);g2.draw(line);
 		line.setLine(x1,y0,x1,y1);g2.draw(line);

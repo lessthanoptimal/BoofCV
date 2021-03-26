@@ -622,11 +622,14 @@ public class BoofSwingUtil {
 	}
 
 	/**
-	 * Sets rendering hints that will enable antialiasing and make sub pixel rendering look good
+	 * Convenience function which sets rendering hints that the improve rendering quality of 2D graphics and will
+	 * return the type casted Graphics2D. Potentially converting 3 lines of code into 1 line of code.
 	 */
-	public static void antialiasing( Graphics2D g2 ) {
+	public static Graphics2D antialiasing( Graphics g ) {
+		Graphics2D g2 = (Graphics2D)g;
 		g2.setRenderingHint(RenderingHints.KEY_STROKE_CONTROL, RenderingHints.VALUE_STROKE_PURE);
 		g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+		return g2;
 	}
 
 	public static JButton createButtonIconGUI( String path, int width, int height ) {

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -124,9 +124,7 @@ public class AssociatedTriplePanel extends JPanel {
 			image3 = this.image3;
 		}
 
-		Graphics2D g2 = (Graphics2D)g;
-		g2.setRenderingHint(RenderingHints.KEY_STROKE_CONTROL, RenderingHints.VALUE_STROKE_PURE);
-		g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+		Graphics2D g2 = BoofSwingUtil.antialiasing(g);
 
 		int sep = 10;
 		int w = image2.getWidth() + sep + image3.getWidth();
@@ -227,8 +225,7 @@ public class AssociatedTriplePanel extends JPanel {
 	}
 
 	private void drawPoints( Graphics2D g2 ) {
-		g2.setRenderingHint(RenderingHints.KEY_STROKE_CONTROL, RenderingHints.VALUE_STROKE_PURE);
-		g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+		BoofSwingUtil.antialiasing(g2);
 
 		g2.setStroke(new BasicStroke(3));
 		Ellipse2D.Double circle = new Ellipse2D.Double();
