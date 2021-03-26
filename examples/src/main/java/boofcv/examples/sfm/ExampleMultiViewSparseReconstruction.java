@@ -122,7 +122,7 @@ public class ExampleMultiViewSparseReconstruction {
 			int frame = 0;
 			while (sequence.hasNext() && frame < maxFrames) {
 				InterleavedU8 image = sequence.next();
-				File imageFile = new File(imageDirectory, String.format("frame%d.png", frame++));
+				File imageFile = new File(imageDirectory, String.format("frame%04d.png", frame++));
 				imageFiles.add(imageFile.getPath());
 				// This is commented out for what appears to be a JRE bug.
 				// V  [libjvm.so+0xdc4059]  SWPointer::SWPointer(MemNode*, SuperWord*, Node_Stack*, bool)
