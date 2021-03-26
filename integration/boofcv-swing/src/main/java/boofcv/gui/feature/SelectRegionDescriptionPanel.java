@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -18,6 +18,7 @@
 
 package boofcv.gui.feature;
 
+import boofcv.gui.BoofSwingUtil;
 import georegression.geometry.UtilPoint2D_I32;
 import georegression.struct.point.Point2D_I32;
 
@@ -104,7 +105,7 @@ public class SelectRegionDescriptionPanel extends JPanel implements MouseListene
 
 		computeScale();
 
-		Graphics2D g2 = (Graphics2D)g;
+		Graphics2D g2 = BoofSwingUtil.antialiasing(g);
 
 		int dstWidth = (int)(imageScale*background.getWidth());
 		int dstHeight = (int)(imageScale*background.getHeight());
@@ -112,9 +113,6 @@ public class SelectRegionDescriptionPanel extends JPanel implements MouseListene
 		g2.drawImage(background,0,0,dstWidth,dstHeight,0,0,background.getWidth(),background.getHeight(),null);
 
 		if( target != null ) {
-			g2.setRenderingHint(RenderingHints.KEY_STROKE_CONTROL, RenderingHints.VALUE_STROKE_PURE);
-			g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-
 			int x1 = (int)(imageScale*target.x);
 			int y1 = (int)(imageScale*target.y);
 			int x2 = (int)(imageScale*current.x);

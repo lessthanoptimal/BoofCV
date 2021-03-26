@@ -18,6 +18,7 @@
 
 package boofcv.demonstrations.sfm.d2;
 
+import boofcv.gui.BoofSwingUtil;
 import boofcv.gui.feature.VisualizeFeatures;
 import boofcv.gui.image.ImagePanel;
 import boofcv.gui.image.ScaleOptions;
@@ -84,9 +85,7 @@ public abstract class Motion2DPanel extends ImagePanel {
 		if (img == null)
 			return;
 
-		Graphics2D g2 = (Graphics2D)g;
-		g2.setRenderingHint(RenderingHints.KEY_STROKE_CONTROL, RenderingHints.VALUE_STROKE_PURE);
-		g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+		Graphics2D g2 = BoofSwingUtil.antialiasing(g);
 
 		drawFeatures(g2);
 //

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -21,6 +21,7 @@ package boofcv.gui.binary;
 import boofcv.alg.feature.detect.edge.EdgeContour;
 import boofcv.alg.feature.detect.edge.EdgeSegment;
 import boofcv.alg.filter.binary.Contour;
+import boofcv.gui.BoofSwingUtil;
 import boofcv.struct.image.GrayS32;
 import boofcv.struct.image.GrayU8;
 import georegression.struct.point.Point2D_I32;
@@ -181,9 +182,9 @@ public class VisualizeBinaryData {
 		return out;
 	}
 
-	public static void render( List<List<Point2D_I32>> contours, boolean loops, Color color, double stroke, double scale, Graphics2D g2 ) {
-		g2.setRenderingHint(RenderingHints.KEY_STROKE_CONTROL, RenderingHints.VALUE_STROKE_PURE);
-		g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+	public static void render( List<List<Point2D_I32>> contours, boolean loops,
+							   Color color, double stroke, double scale, Graphics2D g2 ) {
+		BoofSwingUtil.antialiasing(g2);
 
 		Line2D.Double l = new Line2D.Double();
 

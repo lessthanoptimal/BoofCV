@@ -24,6 +24,7 @@ import boofcv.abst.fiducial.calib.CalibrationDetectorCircleRegularGrid;
 import boofcv.abst.fiducial.calib.CalibrationDetectorSquareGrid;
 import boofcv.abst.geo.calibration.DetectorFiducialCalibration;
 import boofcv.alg.geo.calibration.CalibrationObservation;
+import boofcv.gui.BoofSwingUtil;
 import boofcv.io.UtilIO;
 import boofcv.io.image.UtilImageIO;
 import boofcv.struct.geo.PointIndex2D_F64;
@@ -189,8 +190,7 @@ public class AssistedCalibration {
 		imageSize = Math.min(gray.width, gray.height);
 
 		g2 = image.createGraphics();
-		g2.setRenderingHint(RenderingHints.KEY_STROKE_CONTROL, RenderingHints.VALUE_STROKE_PURE);
-		g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+		BoofSwingUtil.antialiasing(g2);
 
 		boolean success = detector.process(gray);
 

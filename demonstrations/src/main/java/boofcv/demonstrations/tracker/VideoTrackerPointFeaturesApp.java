@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -214,9 +214,8 @@ public class VideoTrackerPointFeaturesApp<I extends ImageGray<I>>
 		@Override
 		public void paintComponent(Graphics g) {
 			super.paintComponent(g);
+			BoofSwingUtil.antialiasing(g);
 			Graphics2D g2 = (Graphics2D) g;
-			g2.setRenderingHint(RenderingHints.KEY_STROKE_CONTROL, RenderingHints.VALUE_STROKE_PURE);
-			g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
 
 			final TrackerPointControlPanel.Colorization colorization = controlPanel.colorization;
 			final Marker markerType = controlPanel.markerType;

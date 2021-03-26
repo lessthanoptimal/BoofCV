@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -20,6 +20,7 @@ package boofcv.gui.fiducial;
 
 import boofcv.alg.geo.PerspectiveOps;
 import boofcv.alg.geo.WorldToCameraToPixel;
+import boofcv.gui.BoofSwingUtil;
 import boofcv.struct.calib.CameraPinholeBrown;
 import georegression.struct.point.Point2D_F64;
 import georegression.struct.point.Point3D_F64;
@@ -97,8 +98,7 @@ public class VisualizeFiducial {
 	 */
 	public static void drawCube( Se3_F64 targetToCamera, CameraPinholeBrown intrinsic, double width,
 								 double heightScale, int lineThickness, Graphics2D g2, double scale ) {
-		g2.setRenderingHint(RenderingHints.KEY_STROKE_CONTROL, RenderingHints.VALUE_STROKE_PURE);
-		g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+		BoofSwingUtil.antialiasing(g2);
 
 		double r = width/2.0;
 		double h = width*heightScale;

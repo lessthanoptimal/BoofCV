@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -528,8 +528,7 @@ public class VisualizeStereoDisparity<T extends ImageGray<T>, D extends ImageGra
 		protected void paintInPanel( AffineTransform tran, Graphics2D g2 ) {
 			if (state == 0)
 				return;
-			g2.setRenderingHint(RenderingHints.KEY_STROKE_CONTROL, RenderingHints.VALUE_STROKE_PURE);
-			g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+			BoofSwingUtil.antialiasing(g2);
 
 			g2.setStroke(new BasicStroke(4));
 			g2.setColor(Color.RED);

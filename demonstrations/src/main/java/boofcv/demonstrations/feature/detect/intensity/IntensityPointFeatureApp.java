@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -203,13 +203,12 @@ public class IntensityPointFeatureApp<T extends ImageGray<T>, D extends ImageGra
 		@Override
 		protected void paintInPanel( AffineTransform tran, Graphics2D g2 ) {
 			super.paintInPanel(tran, g2);
-			g2.setRenderingHint(RenderingHints.KEY_STROKE_CONTROL, RenderingHints.VALUE_STROKE_PURE);
-			g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+			BoofSwingUtil.antialiasing(g2);
 
 			if (controlPanel.view == 2) {
 				// this requires some explaining
 				// for some reason it was decided that the transform would apply a translation, but not a scale
-				// so this scale will be concatted on top of the translation in the g2
+				// so this scale will be concatenated on top of the translation in the g2
 				tran.setTransform(scale, 0, 0, scale, 0, 0);
 				Composite beforeAC = g2.getComposite();
 				AlphaComposite ac = AlphaComposite.getInstance(AlphaComposite.SRC_OVER, 0.25f);
