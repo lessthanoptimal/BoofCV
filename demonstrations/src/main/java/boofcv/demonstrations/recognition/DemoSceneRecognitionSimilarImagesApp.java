@@ -178,12 +178,12 @@ public class DemoSceneRecognitionSimilarImagesApp<Gray extends ImageGray<Gray>, 
 		var config = new ConfigSceneRecognitionSimilarImages();
 		config.features.detectFastHessian.extract.radius = 5;
 		config.features.detectFastHessian.maxFeaturesAll = 500;
-		config.limitMatchesConsider = 20;
-		config.minimumRatio = 0.3;
+		config.limitMatchesConsider = 15;
+		config.minimumRatioSimilar = 0.3;
 		config.recognizeNister2006.learningMinimumPointsForChildren.setRelative(0.001, 100);
 //		config.associate.greedy.scoreRatioThreshold = 0.9;
 		config.recognizeNister2006.minimumDepthFromRoot = 1;
-//		config.recognizeNister2006.featureSingleWordHops = 1;
+		config.recognizeNister2006.featureSingleWordHops = 2;
 //		config.recognizeNister2006.learnNodeWeights = false;
 
 		sceneSimilar = FactorySceneRecognition.createSimilarImages(config, ImageType.single(grayType));
@@ -263,8 +263,8 @@ public class DemoSceneRecognitionSimilarImagesApp<Gray extends ImageGray<Gray>, 
 			listImages.setVisibleRowCount(-1);
 			listImages.addListSelectionListener(this);
 
-			addLabeled(processingTimeLabel, "Time");
-			addLabeled(imageSizeLabel, "Size");
+			addLabeled(processingTimeLabel, "Time (s)");
+			addLabeled(imageSizeLabel, "Image Size");
 			addAlignLeft(checkFeatures);
 			addLabeled(comboShow, "Show");
 			addLabeled(comboColor, "Color");
@@ -496,7 +496,7 @@ public class DemoSceneRecognitionSimilarImagesApp<Gray extends ImageGray<Gray>, 
 
 				Color color = switch (viewControlPanel.colorization) {
 					case ALL, ASSOCIATION -> Color.RED;
-					case WORD -> new Color(VisualizeFeatures.trackIdToRgb(word));
+					case WORD -> new Color(VisualizeFeatures.trackIdToRgb(word*123L));
 				};
 
 				VisualizeFeatures.drawPoint(g2,

@@ -65,10 +65,7 @@ public class FeatureSceneRecognitionNister2006<TD extends TupleDesc<TD>> impleme
 	@Getter List<String> imageIds = new ArrayList<>();
 
 	/** Performance tuning. If less than this number of features a single thread algorithm will be used */
-	@Getter @Setter public int minimumForThread = 500;
-
-	/** When converting a descriptor into a word it will return the word which is this many hops from the leaf. */
-	@Getter @Setter public int featureSingleWordHops = 0;
+	@Getter @Setter public int minimumForThread = 500; // This value has not been proven to be optimal
 
 	// Describes how to store the feature descriptor
 	Class<TD> tupleType;
@@ -241,7 +238,8 @@ public class FeatureSceneRecognitionNister2006<TD extends TupleDesc<TD>> impleme
 	}
 
 	@Override public int getQueryWord( int featureIdx ) {
-		return traverseUpGetID(databaseN.getFeatureIdxToLeafID().get(featureIdx), featureSingleWordHops);
+		return traverseUpGetID(databaseN.getFeatureIdxToLeafID().get(featureIdx),
+				config.featureSingleWordHops);
 	}
 
 	@Override public void getQueryWords( int featureIdx, DogArray_I32 word ) {
@@ -250,7 +248,8 @@ public class FeatureSceneRecognitionNister2006<TD extends TupleDesc<TD>> impleme
 	}
 
 	@Override public int lookupWord( TD description ) {
-		return traverseUpGetID(databaseN.tree.searchPathToLeaf(description, ( idx, n ) -> {}), featureSingleWordHops);
+		return traverseUpGetID(databaseN.tree.searchPathToLeaf(description, ( idx, n ) -> {}),
+				config.featureSingleWordHops);
 	}
 
 	@Override public void lookupWordsWords( TD description, DogArray_I32 word ) {
