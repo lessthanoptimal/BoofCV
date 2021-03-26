@@ -38,7 +38,7 @@ public class ConfigSceneRecognitionSimilarImages implements Configuration {
 	public int limitMatchesConsider = 30;
 
 	/** Fraction of features in a single image which must be associated for them to be considered similar */
-	public double minimumRatio = 0.5;
+	public double minimumRatioSimilar = 0.5;
 
 	/** Image feature detector */
 	public final ConfigDetectDescribe features = new ConfigDetectDescribe();
@@ -67,7 +67,7 @@ public class ConfigSceneRecognitionSimilarImages implements Configuration {
 
 	@Override public void checkValidity() {
 		BoofMiscOps.checkTrue(limitMatchesConsider >= 1, "Must consider at least 1 match");
-		BoofMiscOps.checkTrue(minimumRatio >= 0.0, "Negative ratios make no sense");
+		BoofMiscOps.checkTrue(minimumRatioSimilar >= 0.0, "Negative ratios make no sense");
 
 		features.checkValidity();
 		recognizeNister2006.checkValidity();
@@ -76,6 +76,6 @@ public class ConfigSceneRecognitionSimilarImages implements Configuration {
 
 	public void setTo( ConfigSceneRecognitionSimilarImages src ) {
 		this.limitMatchesConsider = src.limitMatchesConsider;
-		this.minimumRatio = src.minimumRatio;
+		this.minimumRatioSimilar = src.minimumRatioSimilar;
 	}
 }

@@ -102,7 +102,7 @@ public class FactorySceneRecognition {
 		var similar = new SceneRecognitionSimilarImages<>(detector, associator, recognitizer,
 				() -> FactoryTupleDesc.createPacked(detector));
 
-		similar.setSimilarityTest(new ImageSimilarityAssociatedRatio(config.minimumRatio));
+		similar.setSimilarityTest(new ImageSimilarityAssociatedRatio(config.minimumRatioSimilar));
 		similar.setLimitMatchesConsider(config.limitMatchesConsider);
 
 		return similar;
