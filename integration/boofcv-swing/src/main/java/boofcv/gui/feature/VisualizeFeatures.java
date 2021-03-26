@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -25,44 +25,55 @@ import java.awt.*;
 import java.awt.geom.Ellipse2D;
 import java.awt.geom.Line2D;
 
-
 /**
  * @author Peter Abeles
  */
 public class VisualizeFeatures {
 
-	public static void drawPoints( Graphics2D g2 ,
-								   Color color ,
-								   java.util.List<Point2D_I32> points ,
-								   int radius) {
+	/**
+	 * Converts a track ID into a RGB color. THis is designed so that tracks with similar IDs will be visually
+	 * distinctive
+	 */
+	public static int trackIdToRgb( long featureId ) {
+		int red = (int)(2.5*((50+featureId)%100));
+		int green = (int)((255.0/150.0)*((100+featureId)%150));
+		int blue = (int)(featureId%255);
+
+		return (0xFF << 24) | ((red & 0xFF) << 16) | ((green & 0xFF) << 8) | (blue & 0xFF);
+	}
+
+	public static void drawPoints( Graphics2D g2,
+								   Color color,
+								   java.util.List<Point2D_I32> points,
+								   int radius ) {
 
 		g2.setStroke(new BasicStroke(2));
 
-		int ro = radius+1;
-		int wo = ro*2+1;
-		int w = radius*2+1;
-		for( Point2D_I32 p : points ) {
+		int ro = radius + 1;
+		int wo = ro*2 + 1;
+		int w = radius*2 + 1;
+		for (Point2D_I32 p : points) {
 			g2.setColor(color);
-			g2.fillOval(p.x-radius,p.y-radius,w,w);
+			g2.fillOval(p.x - radius, p.y - radius, w, w);
 			g2.setColor(Color.BLACK);
-			g2.drawOval(p.x-ro,p.y-ro,wo,wo);
+			g2.drawOval(p.x - ro, p.y - ro, wo, wo);
 		}
 	}
 
-	public static void drawPoint( Graphics2D g2 , int x , int y , Color color ) {
+	public static void drawPoint( Graphics2D g2, int x, int y, Color color ) {
 		drawPoint(g2, x, y, 5, color);
 	}
 
-	public static void drawPoint( Graphics2D g2 , int x , int y ,int r,  Color color ) {
+	public static void drawPoint( Graphics2D g2, int x, int y, int r, Color color ) {
 		drawPoint(g2, x, y, r, color, true);
 	}
 
-	public static void drawPoint( Graphics2D g2 , int x , int y ,int r,  Color color , boolean hasBorder) {
-		int w = r*2+1;
+	public static void drawPoint( Graphics2D g2, int x, int y, int r, Color color, boolean hasBorder ) {
+		int w = r*2 + 1;
 
-		if( hasBorder ) {
-			int r2 = r+2;
-			int w2 = r2*2+1;
+		if (hasBorder) {
+			int r2 = r + 2;
+			int w2 = r2*2 + 1;
 
 			g2.setColor(Color.BLACK);
 			g2.fillOval(x - r2, y - r2, w2, w2);
@@ -72,24 +83,22 @@ public class VisualizeFeatures {
 		g2.fillOval(x - r, y - r, w, w);
 	}
 
-	public static void drawPoint( Graphics2D g2 , double x , double y ,double r,
-								  Color color , boolean hasBorder) {
-		drawPoint(g2, x, y, r, color, hasBorder,new Ellipse2D.Double());
+	public static void drawPoint( Graphics2D g2, double x, double y, double r,
+								  Color color, boolean hasBorder ) {
+		drawPoint(g2, x, y, r, color, hasBorder, new Ellipse2D.Double());
 	}
 
-	public static void drawPoint( Graphics2D g2 , double x , double y ,double r,
-								  Color colorInside ,  Color colorBorder ) {
-		drawPoint(g2, x, y, r, colorInside, colorBorder,new Ellipse2D.Double());
+	public static void drawPoint( Graphics2D g2, double x, double y, double r,
+								  Color colorInside, Color colorBorder ) {
+		drawPoint(g2, x, y, r, colorInside, colorBorder, new Ellipse2D.Double());
 	}
 
-
-	public static void drawPoint( Graphics2D g2 , double x , double y ,double r,
-								  Color color , boolean hasBorder, Ellipse2D.Double c )
-	{
+	public static void drawPoint( Graphics2D g2, double x, double y, double r,
+								  Color color, boolean hasBorder, Ellipse2D.Double c ) {
 		double w = r*2;
 
-		if( hasBorder ) {
-			double r2 = r+2;
+		if (hasBorder) {
+			double r2 = r + 2;
 			double w2 = r2*2;
 
 			g2.setColor(Color.BLACK);
@@ -102,12 +111,11 @@ public class VisualizeFeatures {
 		g2.fill(c);
 	}
 
-	public static void drawPoint( Graphics2D g2 , double x , double y ,double r,
-								  Color colorInside ,  Color colorBorder, Ellipse2D.Double c )
-	{
+	public static void drawPoint( Graphics2D g2, double x, double y, double r,
+								  Color colorInside, Color colorBorder, Ellipse2D.Double c ) {
 		double w = r*2;
 
-		double r2 = r+2;
+		double r2 = r + 2;
 		double w2 = r2*2;
 
 		g2.setColor(colorBorder);
@@ -119,44 +127,44 @@ public class VisualizeFeatures {
 		g2.fill(c);
 	}
 
-	public static void drawCross( Graphics2D g2 , int x , int y ,int r ) {
+	public static void drawCross( Graphics2D g2, int x, int y, int r ) {
 		g2.drawLine(x - r, y, x + r, y);
 		g2.drawLine(x, y - r, x, y + r);
 	}
 
-	public static void drawCross( Graphics2D g2 , double x , double y ,double r ) {
+	public static void drawCross( Graphics2D g2, double x, double y, double r ) {
 		Line2D.Double l = new Line2D.Double();
-		l.setLine(x-r,y,x+r,y);
+		l.setLine(x - r, y, x + r, y);
 		g2.draw(l);
 		l.setLine(x, y - r, x, y + r);
 		g2.draw(l);
 	}
 
-	public static void drawScalePoints( Graphics2D g2 , java.util.List<ScalePoint> points ,
+	public static void drawScalePoints( Graphics2D g2, java.util.List<ScalePoint> points,
 										double scaleToRadius ) {
 
 		g2.setStroke(new BasicStroke(3));
 
-		for( ScalePoint p : points ) {
-			if( p.white ) {
+		for (ScalePoint p : points) {
+			if (p.white) {
 				g2.setColor(Color.BLUE);
 			} else {
 				g2.setColor(Color.RED);
 			}
-			int r = (int)(p.scale*scaleToRadius +0.5);
-			int w = r*2+1;
-			g2.drawOval((int)p.pixel.x-r,(int)p.pixel.y-r,w,w);
+			int r = (int)(p.scale*scaleToRadius + 0.5);
+			int w = r*2 + 1;
+			g2.drawOval((int)p.pixel.x - r, (int)p.pixel.y - r, w, w);
 		}
 	}
 
-	public static void drawCircle( Graphics2D g2 , double x , double y ,double r ) {
+	public static void drawCircle( Graphics2D g2, double x, double y, double r ) {
 		Ellipse2D.Double c = new Ellipse2D.Double();
-		c.setFrame(x - r, y - r, 2 * r, 2 * r);
+		c.setFrame(x - r, y - r, 2*r, 2*r);
 		g2.draw(c);
 	}
 
-	public static void drawCircle( Graphics2D g2 , double x , double y ,double r , Ellipse2D.Double c ) {
-		c.setFrame(x - r, y - r, 2 * r, 2 * r);
+	public static void drawCircle( Graphics2D g2, double x, double y, double r, Ellipse2D.Double c ) {
+		c.setFrame(x - r, y - r, 2*r, 2*r);
 		g2.draw(c);
 	}
 }
