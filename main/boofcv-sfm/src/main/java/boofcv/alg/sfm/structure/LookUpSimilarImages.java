@@ -31,7 +31,6 @@ import java.util.List;
  * @author Peter Abeles
  */
 public interface LookUpSimilarImages {
-
 	/**
 	 * Returns a list of all images by ID that it has in its data base
 	 */
@@ -54,14 +53,14 @@ public interface LookUpSimilarImages {
 	void lookupPixelFeats( String target, DogArray<Point2D_F64> features );
 
 	/**
-	 * Looks up associated features between the two views. Which view
+	 * Returns associated features between the two views.
 	 *
-	 * @param viewA name of view A
-	 * @param viewB name of view B
+	 * @param viewSrc name of view which will be the src
+	 * @param viewDst name of view which will be the dst
 	 * @param pairs Storage for associated features. Cleared upon each call
 	 * @return true if views are similar and have known associations. False if not and results should be ignored
 	 */
-	boolean lookupMatches( String viewA, String viewB, DogArray<AssociatedIndex> pairs );
+	boolean lookupMatches( String viewSrc, String viewDst, DogArray<AssociatedIndex> pairs );
 
 	/**
 	 * Looks up the original images width and height

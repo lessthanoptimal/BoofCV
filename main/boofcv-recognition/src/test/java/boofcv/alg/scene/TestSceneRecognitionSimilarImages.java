@@ -53,4 +53,10 @@ public class TestSceneRecognitionSimilarImages extends BoofStandardJUnit {
 	@Test void lookupImageWords() {
 		fail("Implement");
 	}
+
+	@Test void lookupMatches() {
+		// TODO make sure the order is correct
+		// TODO check case where a match to the same image is requested
+		fail("Implement");
+	}
 }

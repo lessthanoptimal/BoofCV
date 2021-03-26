@@ -259,12 +259,12 @@ public class SceneRecognitionSimilarImages<Image extends ImageBase<Image>, TD ex
 				}
 
 				if (!similarityTest.isSimilar(sourcePixels, destinationPixels, asscociator.getMatches())) {
-					if (verbose!=null) verbose.println();
+					if (verbose != null) verbose.println();
 					// Idea: Save PairInfo even if not matched to avoid checking again
 					continue;
 				}
 
-				if (verbose!=null) verbose.println("  accepted");
+				if (verbose != null) verbose.println("  accepted");
 				saveImagePairInfo(imageIndex, imageIndexMatch);
 			}
 
@@ -342,7 +342,7 @@ public class SceneRecognitionSimilarImages<Image extends ImageBase<Image>, TD ex
 		PairInfo p = pairedImages.grow();
 		p.src = imageIndexSrc;
 		p.dst = imageIndexDst;
-		p.associated.copyAll(asscociator.getMatches().toList(), ( s, d ) -> d.setTo(s));
+		p.associated.copyAll(asscociator.getMatches().toList(), ( orig, copy ) -> copy.setTo(orig));
 	}
 
 	@Override public void lookupPixelFeats( String target, DogArray<Point2D_F64> features ) {
@@ -360,23 +360,40 @@ public class SceneRecognitionSimilarImages<Image extends ImageBase<Image>, TD ex
 		}
 	}
 
-	@Override public boolean lookupMatches( String viewA, String viewB, DogArray<AssociatedIndex> pairs ) {
+	@Override public boolean lookupMatches( String viewSrc, String viewDst, DogArray<AssociatedIndex> pairs ) {
 		// clear the list so that nothing is returned if there is no match
 		pairs.reset();
 
 		// Figure out which images we are dealing with
-		int imageIndexA = imageToIndex.get(viewA);
-		int imageIndexB = imageToIndex.get(viewB);
+		int imageIndexSrc = imageToIndex.get(viewSrc);
+		int imageIndexDst = imageToIndex.get(viewDst);
+
+		// Handle the special case where pairs to same image was requested
+		if (imageIndexSrc==imageIndexDst) {
+			// Every feature is a match to itself
+			int size = imageFeatureStartIndexes.get(imageIndexSrc*2 + 1);
+			pairs.resize(size);
+			for (int i = 0; i < size; i++) {
+				pairs.get(i).setTo(i,i);
+			}
+			return true;
+		}
 
 		// Look up the pair
-		PairInfo info = lookupPairInfo(imageIndexA, imageIndexB);
+		PairInfo info = lookupPairInfo(imageIndexSrc, imageIndexDst);
 
 		// There are no pair so return
 		if (info == null)
 			return false;
 
+		// Copy associations while ensuring the the src and dst matches the function's arguments
+		if (info.src == imageIndexSrc) {
+			pairs.copyAll(info.associated.toList(), ( original, copy ) -> copy.setTo(original));
+		} else {
+			pairs.copyAll(info.associated.toList(), ( original, copy ) -> copy.setTo(original.dst, original.src));
+		}
+
 		// Copy the list of associated features into the output list
-		pairs.copyAll(info.associated.toList(), ( src, dst ) -> dst.setTo(src));
 		return true;
 	}
 
@@ -396,7 +413,7 @@ public class SceneRecognitionSimilarImages<Image extends ImageBase<Image>, TD ex
 		int numFeatures = imageFeatureStartIndexes.get(imageIndex*2 + 1);
 
 		for (int i = 0; i < numFeatures; i++) {
-			words.add( recognizer.lookupWord(descriptions.getTemp(offset+i)) );
+			words.add(recognizer.lookupWord(descriptions.getTemp(offset + i)));
 		}
 	}
 
