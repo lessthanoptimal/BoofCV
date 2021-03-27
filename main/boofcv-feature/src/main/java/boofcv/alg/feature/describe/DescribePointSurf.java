@@ -67,7 +67,7 @@ public class DescribePointSurf<II extends ImageGray<II>> {
 	// Number of sample points wide a sub-region is
 	protected int widthSubRegion;
 	// Size of a sample point
-	protected int widthSample;
+	protected double widthSample;
 
 	protected double weightSigma;
 	protected boolean useHaar;
@@ -101,7 +101,7 @@ public class DescribePointSurf<II extends ImageGray<II>> {
 	 * @param useHaar If true the Haar wavelet will be used (what was used in [1]), false means an image gradient
 	 * approximation will be used.  False is recommended.
 	 */
-	public DescribePointSurf( int widthLargeGrid, int widthSubRegion, int widthSample,
+	public DescribePointSurf( int widthLargeGrid, int widthSubRegion, double widthSample,
 							  double weightSigma, boolean useHaar,
 							  Class<II> inputType ) {
 		this.widthLargeGrid = widthLargeGrid;
@@ -155,7 +155,7 @@ public class DescribePointSurf<II extends ImageGray<II>> {
 	 * @param x Location of interest point.
 	 * @param y Location of interest point.
 	 * @param angle The angle the feature is pointing at in radians.
-	 * @param scale Scale of the interest point. Null is returned if the feature goes outside the image border.
+	 * @param scale Scale of the interest point.
 	 * @param normalize Apply L2 normalization to the descriptor
 	 * @param ret storage for the feature. Must have 64 values.
 	 */
@@ -278,8 +278,9 @@ public class DescribePointSurf<II extends ImageGray<II>> {
 	 * @return width of descriptor sample
 	 */
 	public int getCanonicalWidth() {
-		//
-		return widthLargeGrid*widthSubRegion + widthSample - (widthSample%2);
+		// Rounds to closest int. Always positive so this rounding method works
+		int widthSampleInt = (int)(widthSample+0.5);
+		return widthLargeGrid*widthSubRegion + widthSampleInt - (widthSampleInt%2);
 	}
 
 	/**

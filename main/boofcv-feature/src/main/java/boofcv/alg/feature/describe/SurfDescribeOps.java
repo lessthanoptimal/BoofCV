@@ -109,13 +109,13 @@ public class SurfDescribeOps {
 	 * @param s Sine of the orientation
 	 */
 	public static <T extends ImageGray<T>>
-	boolean isInside( T ii, double X, double Y, int radiusRegions, int kernelSize,
+	boolean isInside( T ii, double X, double Y, int radiusRegions, double kernelSize,
 					  double scale, double c, double s ) {
 		int c_x = (int)Math.round(X);
 		int c_y = (int)Math.round(Y);
 
-		kernelSize = (int)Math.ceil(kernelSize*scale);
-		int kernelRadius = kernelSize/2 + (kernelSize%2);
+		int kernelSizeInt = (int)Math.ceil(kernelSize*scale);
+		int kernelRadius = kernelSizeInt/2 + (kernelSizeInt%2);
 
 		// find the radius of the whole area being sampled
 		int radius = (int)Math.ceil(radiusRegions*scale);

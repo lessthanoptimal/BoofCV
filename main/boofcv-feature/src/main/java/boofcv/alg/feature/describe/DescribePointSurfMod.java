@@ -69,7 +69,7 @@ public class DescribePointSurfMod<II extends ImageGray<II>> extends DescribePoin
 	 * approximation will be used.  True is recommended.
 	 */
 	public DescribePointSurfMod( int widthLargeGrid, int widthSubRegion,
-								 int widthSample, int overLap,
+								 double widthSample, int overLap,
 								 double sigmaLargeGrid, double sigmaSubRegion,
 								 boolean useHaar, Class<II> imageType ) {
 		super(widthLargeGrid, widthSubRegion, widthSample, 1, useHaar, imageType);
