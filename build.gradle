@@ -341,6 +341,7 @@ def mainProjects = [
         ':main:boofcv-types',
         ':main:boofcv-ip',
         ':main:boofcv-ip-multiview',
+        ':main:boofcv-learning',
         ':main:boofcv-io',
         ':main:boofcv-feature',
         ':main:boofcv-geo',
