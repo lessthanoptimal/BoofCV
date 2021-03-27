@@ -31,6 +31,7 @@ import boofcv.struct.image.ImageBase;
 import boofcv.struct.image.ImageDimension;
 import boofcv.struct.packed.PackedArrayPoint2D_F64;
 import georegression.struct.point.Point2D_F64;
+import gnu.trove.impl.Constants;
 import gnu.trove.map.TObjectIntMap;
 import gnu.trove.map.hash.TObjectIntHashMap;
 import lombok.Getter;
@@ -86,8 +87,8 @@ public class SceneRecognitionSimilarImages<Image extends ImageBase<Image>, TD ex
 	//========================== Image Information and Relationships
 	// List of ID strings for each image
 	final List<String> imageIDs = new ArrayList<>();
-	// Mapping from image ID to image array index
-	final TObjectIntMap<String> imageToIndex = new TObjectIntHashMap<>();
+	// Mapping from image ID to image array index. -1 means no mapping
+	final TObjectIntMap<String> imageToIndex = new TObjectIntHashMap<>(Constants.DEFAULT_CAPACITY, Constants.DEFAULT_LOAD_FACTOR, -1);
 	// Dimension of each image
 	final DogArray<ImageDimension> imageShapes = new DogArray<>(ImageDimension::new);
 	// Mapping from image to list of image indexes its matched/paired with
@@ -294,6 +295,7 @@ public class SceneRecognitionSimilarImages<Image extends ImageBase<Image>, TD ex
 	}
 
 	@Override public void findSimilar( String target, List<String> similar ) {
+		similar.clear();
 		int imageIndex = imageToIndex.get(target);
 
 		DogArray_I32 pairIndexes = imageToPairIndexes.get(imageIndex);
@@ -333,7 +335,7 @@ public class SceneRecognitionSimilarImages<Image extends ImageBase<Image>, TD ex
 	/**
 	 * Saves association information for these two images
 	 */
-	private void saveImagePairInfo( int imageIndexSrc, int imageIndexDst ) {
+	void saveImagePairInfo( int imageIndexSrc, int imageIndexDst ) {
 		// Save the reference from image index to PairInfo index
 		imageToPairIndexes.get(imageIndexSrc).add(pairedImages.size);
 		imageToPairIndexes.get(imageIndexDst).add(pairedImages.size);
@@ -348,6 +350,8 @@ public class SceneRecognitionSimilarImages<Image extends ImageBase<Image>, TD ex
 	@Override public void lookupPixelFeats( String target, DogArray<Point2D_F64> features ) {
 		// Look up which image is being requested
 		int imageIndex = imageToIndex.get(target);
+		if (imageIndex == -1)
+			throw new IllegalArgumentException("Unknown view=" + target);
 
 		// Look up where these features are stored
 		int offset = imageFeatureStartIndexes.get(imageIndex*2);
@@ -368,13 +372,17 @@ public class SceneRecognitionSimilarImages<Image extends ImageBase<Image>, TD ex
 		int imageIndexSrc = imageToIndex.get(viewSrc);
 		int imageIndexDst = imageToIndex.get(viewDst);
 
+		// If either view doesn't exist there can't be any pairs
+		if (imageIndexSrc == -1 || imageIndexDst == -1)
+			throw new IllegalArgumentException("Unknown view: src=" + viewSrc + " dst=" + viewDst);
+
 		// Handle the special case where pairs to same image was requested
-		if (imageIndexSrc==imageIndexDst) {
+		if (imageIndexSrc == imageIndexDst) {
 			// Every feature is a match to itself
 			int size = imageFeatureStartIndexes.get(imageIndexSrc*2 + 1);
 			pairs.resize(size);
 			for (int i = 0; i < size; i++) {
-				pairs.get(i).setTo(i,i);
+				pairs.get(i).setTo(i, i);
 			}
 			return true;
 		}
@@ -435,6 +443,9 @@ public class SceneRecognitionSimilarImages<Image extends ImageBase<Image>, TD ex
 		return null;
 	}
 
+	/**
+	 * Accesses feature information directly from internal data structures.
+	 */
 	private FeatureSceneRecognition.Features<TD> createFeaturesLambda( int imageIndex ) {
 		int offset = imageFeatureStartIndexes.get(imageIndex*2);
 		int size = imageFeatureStartIndexes.get(imageIndex*2 + 1);

@@ -25,7 +25,6 @@ import boofcv.alg.sfm.structure.PointTrackerToSimilarImages.Matches;
 import boofcv.struct.feature.AssociatedIndex;
 import boofcv.struct.image.GrayU8;
 import boofcv.struct.image.ImageDimension;
-import boofcv.testing.BoofStandardJUnit;
 import georegression.struct.point.Point2D_F64;
 import org.ddogleg.struct.DogArray;
 import org.ddogleg.util.PrimitiveArrays;
@@ -41,7 +40,43 @@ import static org.junit.jupiter.api.Assertions.*;
 /**
  * @author Peter Abeles
  */
-class TestPointTrackerToSimilarImages extends BoofStandardJUnit {
+class TestPointTrackerToSimilarImages extends GenericLookUpSimilarImagesChecks {
+
+	/**
+	 * Fill in the algorithm with dummy values to test the contracts
+	 */
+	@Override public LookUpSimilarImages createFullyLoaded() {
+		int numFeatures = 11;
+		var alg = new PointTrackerToSimilarImages();
+
+		alg.initialize(200,210);
+
+		alg.frames.resize(5);
+		for (int i = 0; i < alg.frames.size; i++) {
+			PointTrackerToSimilarImages.Frame f = alg.frames.get(i);
+			f.frameID = ""+i;
+			alg.frameMap.put(f.frameID, f);
+			f.initActive(numFeatures);
+			for (int j = 0; j < i; j++) {
+				Matches m = alg.matches.grow();
+				m.init(numFeatures);
+				PointTrackerToSimilarImages.Frame r = alg.frames.get(j);
+				f.related.add(r);
+				r.related.add(f);
+				f.matches.add(m);
+				r.matches.add(m);
+				m.frameSrc = f;
+				m.frameDst = r;
+				for (int k = 0; k < m.size(); k++) {
+					// Randomize the values make it obvious if the feature src/dst order is respected
+					m.src[k] = rand.nextInt();
+					m.dst[k] = rand.nextInt();
+				}
+			}
+		}
+
+		return alg;
+	}
 
 	@Test
 	void processFrame() {
@@ -212,21 +247,6 @@ class TestPointTrackerToSimilarImages extends BoofStandardJUnit {
 		for (int i = 0; i < 5; i++) {
 			assertEquals(""+i,found.get(i));
 		}
-	}
-
-	/**
-	 * Make sure a few failure cases are handled gracefully
-	 */
-	@Test
-	void lookupMatches() {
-		var alg = new PointTrackerToSimilarImages();
-		DogArray<AssociatedIndex> associated = new DogArray<>(AssociatedIndex::new);
-
-		// both don't match
-		assertFalse(alg.lookupMatches("asdf","asdf",associated));
-		// first matches second doesn't
-		alg.frameMap.put("a", alg.frames.grow());
-		assertFalse(alg.lookupMatches("a","asdf",associated));
 	}
 
 	@Test
