@@ -85,7 +85,7 @@ public interface FeatureSceneRecognition<TD extends TupleDesc<TD>> extends Verbo
 
 	int lookupWord( TD description );
 
-	void lookupWordsWords( TD description, DogArray_I32 word );
+	void lookupWords( TD description, DogArray_I32 word );
 
 	/**
 	 * Returns the number of unique words. it's assumed that the word ID's will occupy 0 to this value.

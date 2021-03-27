@@ -252,14 +252,15 @@ public class FeatureSceneRecognitionNister2006<TD extends TupleDesc<TD>> impleme
 				config.featureSingleWordHops);
 	}
 
-	@Override public void lookupWordsWords( TD description, DogArray_I32 word ) {
+	@Override public void lookupWords( TD description, DogArray_I32 word ) {
 		lookupWordsFromLeafID(lookupWord(description), word);
 	}
 
 	/**
-	 * Given the leafID lookup the other words in the tree leading to the leaf
+	 * Given the leafID lookup the other words in the tree leading to the leaf. Words is reset on each call
 	 */
 	protected void lookupWordsFromLeafID( int leafID, DogArray_I32 word ) {
+		word.reset();
 		HierarchicalVocabularyTree.Node node = databaseN.tree.nodes.get(leafID);
 		while (node != null) {
 			// the root node has a parent of -1 and we don't want to use that as a word since every feature has it
@@ -276,12 +277,12 @@ public class FeatureSceneRecognitionNister2006<TD extends TupleDesc<TD>> impleme
 	protected int traverseUpGetID( int id, int maxHops ) {
 		int hops = maxHops;
 		HierarchicalVocabularyTree.Node node = databaseN.tree.nodes.get(id);
-		while (node != null && hops-- > 0) {
+		while (hops-- > 0) {
+			node = databaseN.tree.nodes.get(node.parent);
 			// the root node has a parent of -1 and we don't want to use that as a word since every feature has it
 			if (node.parent == -1)
 				break;
 			id = node.index;
-			node = databaseN.tree.nodes.get(node.parent);
 		}
 		return id;
 	}

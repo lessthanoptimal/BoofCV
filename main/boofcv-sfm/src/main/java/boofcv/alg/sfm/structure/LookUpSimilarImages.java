@@ -37,10 +37,13 @@ public interface LookUpSimilarImages {
 	List<String> getImageIDs();
 
 	/**
-	 * Given an imageID, it will find list of similar images.
+	 * Given an imageID, it will find list of similar images. Similarity is defined from
+	 * the perspective of the 'target', so viewA might think viewB is similar to it, but viewB might think
+	 * viewA is not similar to it.
 	 *
 	 * @param target ID of target image
 	 * @param similar Storage for IDs of similar images. Cleared upon each call
+	 * @throws IllegalArgumentException If the target is not known
 	 */
 	void findSimilar( String target, List<String> similar );
 
@@ -49,16 +52,19 @@ public interface LookUpSimilarImages {
 	 *
 	 * @param target ID of target image
 	 * @param features Storage for pixel observations. Cleared upon each call
+	 * @throws IllegalArgumentException If the target is not known
 	 */
 	void lookupPixelFeats( String target, DogArray<Point2D_F64> features );
 
 	/**
-	 * Returns associated features between the two views.
+	 * Returns associated features between the two views. The set of common features will not be dependent
+	 * which view is src or dst, but the the returned values in pairs will be.
 	 *
 	 * @param viewSrc name of view which will be the src
 	 * @param viewDst name of view which will be the dst
 	 * @param pairs Storage for associated features. Cleared upon each call
 	 * @return true if views are similar and have known associations. False if not and results should be ignored
+	 * @throws IllegalArgumentException If the one of the views is not known
 	 */
 	boolean lookupMatches( String viewSrc, String viewDst, DogArray<AssociatedIndex> pairs );
 
@@ -67,6 +73,7 @@ public interface LookUpSimilarImages {
 	 *
 	 * @param target (Input) the image to retrieve from
 	 * @param shape (Output) storage for width and height
+	 * @throws IllegalArgumentException If the target is not known
 	 */
 	void lookupShape( String target, ImageDimension shape );
 }

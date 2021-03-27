@@ -18,4 +18,5 @@ dependencies {
 	testImplementation project(':main:boofcv-io')
 	testImplementation project(':main:boofcv-simulation')
 	testImplementation project(':integration:boofcv-swing')
+	testImplementation project(':main:boofcv-sfm').sourceSets.test.output
 }
