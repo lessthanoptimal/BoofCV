@@ -55,7 +55,4 @@ public interface AssociateDescription2D<Desc> extends Associate<Desc> {
 	 * @param descriptions Feature descriptions.
 	 */
 	void setDestination( FastAccess<Point2D_F64> location, FastAccess<Desc> descriptions );
-
-	/** Returns the type of object it can associate */
-	Class<Desc> getDescriptionType();
 }

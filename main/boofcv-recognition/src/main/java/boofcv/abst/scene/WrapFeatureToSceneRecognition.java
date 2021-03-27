@@ -47,7 +47,7 @@ public class WrapFeatureToSceneRecognition<Image extends ImageBase<Image>, TD ex
 	protected BoofLambdas.Transform<Image> downSample;
 
 	/** The {@link FeatureSceneRecognition} */
-	protected @Getter @Setter FeatureSceneRecognition<TD> recognizer;
+	protected @Setter FeatureSceneRecognition<TD> recognizer;
 
 	/** Optional reference to a config. Useful when saving to disk */
 	public @Getter @Setter ConfigFeatureToSceneRecognition config;

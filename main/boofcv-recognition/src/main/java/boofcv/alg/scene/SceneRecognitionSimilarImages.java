@@ -390,7 +390,8 @@ public class SceneRecognitionSimilarImages<Image extends ImageBase<Image>, TD ex
 		if (info.src == imageIndexSrc) {
 			pairs.copyAll(info.associated.toList(), ( original, copy ) -> copy.setTo(original));
 		} else {
-			pairs.copyAll(info.associated.toList(), ( original, copy ) -> copy.setTo(original.dst, original.src));
+			pairs.copyAll(info.associated.toList(), ( original, copy ) ->
+					copy.setTo(/* dst= */original.dst, /* src= */original.src));
 		}
 
 		// Copy the list of associated features into the output list
