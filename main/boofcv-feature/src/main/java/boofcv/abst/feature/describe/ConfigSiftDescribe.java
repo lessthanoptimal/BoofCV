@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -37,7 +37,7 @@ public class ConfigSiftDescribe implements Configuration {
 	/** Number of histogram bins.*/
 	public int numHistogramBins=8;
 
-	/** Conversion of sigma to pixels.  Used to scale the descriptor region. */
+	/** Conversion of sigma to pixels. Used to scale the descriptor sample region's width.*/
 	public double sigmaToPixels=1.0;
 
 	/** Sigma for Gaussian weighting function is set to this value * region width.*/

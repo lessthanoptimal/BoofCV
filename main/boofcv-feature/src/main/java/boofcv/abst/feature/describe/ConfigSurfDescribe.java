@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -37,9 +37,9 @@ public abstract class ConfigSurfDescribe implements Configuration {
 	 */
 	public int widthSubRegion = 5;
 	/**
-	 * The width of a sample point. Typically 3
+	 * The width of a sample point in pixels. Used to scale the descriptor sample region's width. Typically 3
 	 */
-	public int widthSample = 3;
+	public double widthSample = 3;
 	/**
 	 * If true the Haar wavelet will be used.  If false means image gradient.
 	 */
