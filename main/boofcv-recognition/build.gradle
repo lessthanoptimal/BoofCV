@@ -4,7 +4,7 @@ dependencies {
 	api project(':main:boofcv-geo')
 
 	['main','models'].each {String a ->
-		compile( group: 'org.deepboof', name: a, version: project.deepboof_version) {
+		api( group: 'org.deepboof', name: a, version: project.deepboof_version) {
 			exclude group: 'com.thoughtworks.xstream'
 			exclude group: 'org.ddogleg'
 			exclude group: 'org.georegression'

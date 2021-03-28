@@ -9,6 +9,7 @@ dependencies {
 	testImplementation project(':main:boofcv-ip-multiview').sourceSets.test.output
 	testImplementation project(':main:boofcv-learning').sourceSets.test.output
 	testImplementation project(':main:boofcv-recognition').sourceSets.test.output
+	testImplementation project(':main:boofcv-reconstruction').sourceSets.test.output
 	testImplementation project(':main:boofcv-sfm').sourceSets.test.output
 	testImplementation project(':main:boofcv-simulation').sourceSets.test.output
 	testImplementation project(':main:boofcv-types').sourceSets.test.output
