@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -76,7 +76,7 @@ public class PruneStructureFromSceneMetric {
 				// Get feature location in world
 				f.get(X);
 				// Get observation in image pixels
-				v.get(pointIndex, observation);
+				v.getPixel(pointIndex, observation);
 
 				// Find the point in this view
 				world_to_view.transform(X, X);
@@ -120,7 +120,7 @@ public class PruneStructureFromSceneMetric {
 				int pointID = v.getPointId(pointIndex);
 				SceneStructureCommon.Point f = structure.points.data[pointID];
 //				System.out.println("   pointIndex="+pointIndex+" pointID="+pointID+" hash="+f.hashCode());
-				v.get(pointIndex, observation);
+				v.getPixel(pointIndex, observation);
 
 				if (!Double.isNaN(observation.x))
 					continue;

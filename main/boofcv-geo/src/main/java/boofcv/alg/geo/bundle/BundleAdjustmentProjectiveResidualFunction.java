@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -113,7 +113,7 @@ public class BundleAdjustmentProjectiveResidualFunction
 			SceneStructureCommon.Camera camera = structure.cameras.get(view.camera);
 
 			for (int i = 0; i < obsView.size(); i++) {
-				obsView.get(i, observedPixel);
+				obsView.getPixel(i, observedPixel);
 				SceneStructureCommon.Point worldPt = structure.points.data[observedPixel.index];
 				worldPt.get(p3);
 
@@ -143,7 +143,7 @@ public class BundleAdjustmentProjectiveResidualFunction
 			SceneStructureCommon.Camera camera = structure.cameras.get(view.camera);
 
 			for (int i = 0; i < obsView.size(); i++) {
-				obsView.get(i, observedPixel);
+				obsView.getPixel(i, observedPixel);
 				SceneStructureCommon.Point worldPt = structure.points.data[observedPixel.index];
 				worldPt.get(p4);
 

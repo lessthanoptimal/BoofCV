@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -224,7 +224,7 @@ class TestPruneStructureFromSceneProjective extends BoofStandardJUnit {
 				int pointIdx = vo.point.get(i);
 				structure.points.data[pointIdx].get(X);
 				GeometryMath_F64.mult(P, X, x);
-				vo.get(i, y);
+				vo.getPixel(i, y);
 				assertEquals(0, x.x - y.x, UtilEjml.TEST_F64_SQ);
 				assertEquals(0, x.y - y.y, UtilEjml.TEST_F64_SQ);
 			}

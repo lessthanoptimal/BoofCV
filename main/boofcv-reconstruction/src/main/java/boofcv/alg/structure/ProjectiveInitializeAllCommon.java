@@ -490,7 +490,7 @@ public class ProjectiveInitializeAllCommon implements VerbosePrint {
 			BoofMiscOps.checkTrue(oview.size() == observations.size);
 
 			for (int obsIdx = 0; obsIdx < observations.size; obsIdx++) {
-				oview.get(obsIdx, observations.get(obsIdx).get(viewIdx));
+				oview.getPixel(obsIdx, observations.get(obsIdx).get(viewIdx));
 			}
 		}
 	}

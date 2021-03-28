@@ -1689,7 +1689,7 @@ public class MultiViewOps {
 				// get the observation in pixels
 				Point2D_F64 n = normObs.grow();
 				int pointidx = observations.views.get(viewIdx).point.indexOf(i);
-				observations.views.get(viewIdx).get(pointidx, n);
+				observations.views.get(viewIdx).getPixel(pointidx, n);
 				// convert to normalized image coordinates
 				list_p_to_n.get(v.camera).compute(n.x, n.y, n);
 			}

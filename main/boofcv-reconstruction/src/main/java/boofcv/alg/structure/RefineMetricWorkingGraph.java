@@ -258,7 +258,8 @@ public class RefineMetricWorkingGraph implements VerbosePrint {
 	}
 
 	/**
-	 * Assigns world 3D features that were already matched to others in the inlier set to the unmatches observations.
+	 * Assigns world 3D features that were already matched to others in the inlier view set to the
+	 * unassigned observations.
 	 *
 	 * Part of the idea behind only associating an observation with a 3D feature if the preprojection error is less
 	 * than some value is that tracks can drift from one object to another, but it's useful to save both.
@@ -276,7 +277,7 @@ public class RefineMetricWorkingGraph implements VerbosePrint {
 			int whichViewID = viewIntIds.get(whichViewInliers);
 			// Lookup the pixel observation in the view
 			int viewObsIdx = inliers.observations.get(whichViewInliers).get(inlierIdx);
-			observations.getView(whichViewID).get(viewObsIdx, pixelObserved);
+			observations.getView(whichViewID).getPixel(viewObsIdx, pixelObserved);
 
 			// look up scene information for this view
 			SceneWorkingGraph.View wview = graph.viewList.get(whichViewID);
@@ -287,6 +288,9 @@ public class RefineMetricWorkingGraph implements VerbosePrint {
 			int bestId = -1;
 			for (int knownIdx = 0; knownIdx < featureIdx3D.size; knownIdx++) {
 				int featureId = featureIdx3D.get(knownIdx);
+				// If this feature has already been assigned to this view skip over it
+				if (structure.points.get(featureId).views.contains(whichViewID))
+					continue;
 				structure.getPoints().get(featureId).get(world3D);
 				double error = computeReprojectionError(wview.world_to_view, normToPixels, pixelObserved, world3D);
 				if (error <= bestScore) {
@@ -300,7 +304,7 @@ public class RefineMetricWorkingGraph implements VerbosePrint {
 			}
 
 			// assign this feature to this observation
-			observations.getView(whichViewID).point.set(viewObsIdx, bestId);
+			observations.getView(whichViewID).safeAssignToFeature(viewObsIdx, bestId);
 			structure.connectPointToView(bestId, whichViewID);
 			// Remove it since it has been assigned. This is also why we iterate in reverse
 			unassigned.remove(unassignedIdx);
@@ -367,7 +371,7 @@ public class RefineMetricWorkingGraph implements VerbosePrint {
 		for (int inlierViewIdx = 0; inlierViewIdx < viewIntIds.size; inlierViewIdx++) {
 			int viewID = viewIntIds.get(inlierViewIdx);
 			int obsIdx = inliers.observations.get(inlierViewIdx).get(inlierIdx);
-			observations.getView(viewID).get(obsIdx, pixelObserved);
+			observations.getView(viewID).getPixel(obsIdx, pixelObserved);
 			listPixelToNorm.get(viewID).compute(pixelObserved.x, pixelObserved.y, pixelNormalized.get(inlierViewIdx));
 		}
 

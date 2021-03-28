@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -143,7 +143,7 @@ public class CodecBundleAdjustmentInTheLarge {
 			SceneObservations.View view = observations.views.data[viewIdx];
 
 			for (int obsIdx = 0; obsIdx < view.size(); obsIdx++) {
-				view.get(obsIdx, o);
+				view.getPixel(obsIdx, o);
 				writer.printf("%d %d %.8f %.8f\n", viewIdx, o.index, o.p.x, o.p.y);
 			}
 		}

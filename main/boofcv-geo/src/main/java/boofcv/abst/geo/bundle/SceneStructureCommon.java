@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -115,10 +115,9 @@ public abstract class SceneStructureCommon implements SceneStructure {
 	public void connectPointToView( int pointIndex, int viewIndex ) {
 		Point p = points.data[pointIndex];
 
-		for (int i = 0; i < p.views.size; i++) {
-			if (p.views.data[i] == viewIndex)
-				throw new IllegalArgumentException("Tried to add the same view twice. viewIndex=" + viewIndex);
-		}
+		if (p.views.contains(viewIndex))
+			throw new IllegalArgumentException("Tried to add the same view twice. viewIndex=" + viewIndex);
+
 		p.views.add(viewIndex);
 	}
 
