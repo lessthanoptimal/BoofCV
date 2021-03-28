@@ -25,6 +25,7 @@ import boofcv.factory.feature.describe.ConfigDescribeRegionPoint;
 import boofcv.factory.feature.detdesc.ConfigDetectDescribe;
 import boofcv.factory.feature.detect.interest.ConfigDetectInterestPoint;
 import boofcv.misc.BoofMiscOps;
+import boofcv.struct.ConfigLength;
 import boofcv.struct.Configuration;
 
 /**
@@ -37,8 +38,13 @@ public class ConfigSimilarImagesSceneRecognition implements Configuration {
 	/** Number of images which will be considered as matches when using the recognizer */
 	public int limitMatchesConsider = 30;
 
-	/** Fraction of features in a single image which must be associated for them to be considered similar */
-	public double minimumRatioSimilar = 0.5;
+	/**
+	 * Specifies how many features need to be matched for an image to be considered similar. Absolute
+	 * is the number of matches. Fraction is relative to the number of images in each image.
+	 *
+	 * The default minimum number of matches is probably set too low.
+	 */
+	public final ConfigLength minimumSimilar = ConfigLength.relative(0.4, 50);
 
 	/** Image feature detector */
 	public final ConfigDetectDescribe features = new ConfigDetectDescribe();
@@ -54,20 +60,53 @@ public class ConfigSimilarImagesSceneRecognition implements Configuration {
 		features.typeDescribe = ConfigDescribeRegionPoint.DescriptorType.SURF_STABLE;
 		features.typeDetector = ConfigDetectInterestPoint.DetectorType.FAST_HESSIAN;
 		// Settings a threshold degrades overall results, even if in some specific situations makes it better
-		features.detectFastHessian.extract.threshold = 0;
-		features.detectFastHessian.extract.radius = 2;
+		features.detectFastHessian.extract.threshold = 0.5f;
+		features.detectFastHessian.extract.radius = 6;
+		features.detectFastHessian.numberOfOctaves = 7;
 		// 500 features is a good trade off for memory and performance. Accuracy can be improved
 		// with more features but becomes prohibitively expensive in larger datasets
 		features.detectFastHessian.maxFeaturesAll = 500;
 		features.detectFastHessian.maxFeaturesPerScale = 0;
 
+		// Also give SIFT reasonable parameters
+		features.describeSift.sigmaToPixels = 2.0f;
+		features.detectSift.extract.threshold = 0.5f;
+		features.detectSift.extract.radius = 6;
+		features.detectSift.maxFeaturesAll = 500;
+		features.detectSift.maxFeaturesPerScale = 0;
+
 		// Reduce memory usage with very little loss in accuracy
 		features.convertDescriptor.outputData = ConfigConvertTupleDesc.DataType.F32;
 	}
 
+	/**
+	 * The default makes implicit assumptions about the input image. This relaxes those but will perform worse
+	 * in most situations. Only use this if the default completely fails.
+	 */
+	public static ConfigSimilarImagesSceneRecognition createFailSafe() {
+		var config = new ConfigSimilarImagesSceneRecognition();
+
+		// Feature threshold makes assumptions about how bright the image is
+		// Feature radius might be too large for very small images
+		config.features.detectFastHessian.extract.threshold = 0.0f;
+		config.features.detectFastHessian.extract.radius = 2;
+		config.features.detectFastHessian.numberOfOctaves = 4;
+		config.features.detectSift.extract.threshold = 0.0f;
+		config.features.detectSift.extract.radius = 2;
+		config.features.describeSift.sigmaToPixels = 1.0f;
+
+		// If you have extremely small dataset the default value could cause problems
+		config.recognizeNister2006.learningMinimumPointsForChildren.setFixed(0);
+		config.recognizeNister2006.minimumDepthFromRoot = 0;
+
+		// If you have next to no image features to work with the default might be too small
+		config.minimumSimilar.setFraction(0.4);
+
+		return config;
+	}
+
 	@Override public void checkValidity() {
 		BoofMiscOps.checkTrue(limitMatchesConsider >= 1, "Must consider at least 1 match");
-		BoofMiscOps.checkTrue(minimumRatioSimilar >= 0.0, "Negative ratios make no sense");
 
 		features.checkValidity();
 		recognizeNister2006.checkValidity();
@@ -76,6 +115,9 @@ public class ConfigSimilarImagesSceneRecognition implements Configuration {
 
 	public void setTo( ConfigSimilarImagesSceneRecognition src ) {
 		this.limitMatchesConsider = src.limitMatchesConsider;
-		this.minimumRatioSimilar = src.minimumRatioSimilar;
+		this.minimumSimilar.setTo(src.minimumSimilar);
+		this.features.setTo(src.features);
+		this.recognizeNister2006.setTo(src.recognizeNister2006);
+		this.associate.setTo(src.associate);
 	}
 }

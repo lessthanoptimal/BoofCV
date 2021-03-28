@@ -182,7 +182,7 @@ public class DemoSceneRecognitionSimilarImagesApp<Gray extends ImageGray<Gray>, 
 		config.features.detectFastHessian.extract.radius = 5;
 		config.features.detectFastHessian.maxFeaturesAll = 500;
 		config.limitMatchesConsider = 15;
-		config.minimumRatioSimilar = 0.3;
+		config.minimumSimilar.setRelative(0.3, 100);
 		config.recognizeNister2006.learningMinimumPointsForChildren.setRelative(0.001, 100);
 //		config.associate.greedy.scoreRatioThreshold = 0.9;
 		config.recognizeNister2006.minimumDepthFromRoot = 1;
@@ -242,7 +242,7 @@ public class DemoSceneRecognitionSimilarImagesApp<Gray extends ImageGray<Gray>, 
 		long time3 = System.currentTimeMillis();
 		System.out.println((time3 - time2) + " (ms)");
 
-		SwingUtilities.invokeLater(()-> viewControlPanel.setProcessingTimeS((time3-time0)*1e-3));
+		SwingUtilities.invokeLater(() -> viewControlPanel.setProcessingTimeS((time3 - time0)*1e-3));
 	}
 
 	/**
@@ -255,11 +255,11 @@ public class DemoSceneRecognitionSimilarImagesApp<Gray extends ImageGray<Gray>, 
 		// Find any features appear in each word
 		TIntIntMap wordHistogram = new TIntIntHashMap();
 		DogArray_I32 words = imagesWords.get(imageIndex);
-		words.forEach(word->wordHistogram.put(word, wordHistogram.get(word)+1));
+		words.forEach(word -> wordHistogram.put(word, wordHistogram.get(word) + 1));
 
 		// Find number of features in the most common word
 		int mostFeaturesInAWord = 0;
-		for( int key : wordHistogram.keys()) {
+		for (int key : wordHistogram.keys()) {
 			mostFeaturesInAWord = Math.max(wordHistogram.get(key), mostFeaturesInAWord);
 		}
 
@@ -369,7 +369,7 @@ public class DemoSceneRecognitionSimilarImagesApp<Gray extends ImageGray<Gray>, 
 			setLayout(new BorderLayout());
 
 			mainImage.addMouseListener(new MouseAdapter() {
-				@Override public void mousePressed( MouseEvent e) {
+				@Override public void mousePressed( MouseEvent e ) {
 					if (mainImage.features.isEmpty())
 						return;
 					double scale = mainImage.getImageScale();
@@ -380,8 +380,8 @@ public class DemoSceneRecognitionSimilarImagesApp<Gray extends ImageGray<Gray>, 
 					double bestDistance = Math.pow(15.0/scale, 2.0);
 					for (int i = 0; i < mainImage.features.size; i++) {
 						Point2D_F64 pixel = mainImage.features.get(i);
-						double d = pixel.distance2(x,y);
-						if ( d < bestDistance) {
+						double d = pixel.distance2(x, y);
+						if (d < bestDistance) {
 							bestDistance = d;
 							best = i;
 						}
@@ -407,7 +407,7 @@ public class DemoSceneRecognitionSimilarImagesApp<Gray extends ImageGray<Gray>, 
 			textArea.setEditable(false);
 			textArea.setWrapStyleWord(true);
 			textArea.setLineWrap(true);
-			textArea.setMinimumSize( new Dimension(0, 0));
+			textArea.setMinimumSize(new Dimension(0, 0));
 
 			JSplitPane mainPanelSplit = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, textArea, mainImage);
 			mainPanelSplit.setDividerLocation(200);
@@ -521,10 +521,10 @@ public class DemoSceneRecognitionSimilarImagesApp<Gray extends ImageGray<Gray>, 
 				words.setTo(imagesWords.get(imageIndex));
 
 				// look up corresponding features in the mainImage
-				mainFeatureIdx.resize(words.size,-1);
+				mainFeatureIdx.resize(words.size, -1);
 				DogArray<AssociatedIndex> pairs = new DogArray<>(AssociatedIndex::new);
 				sceneSimilar.lookupMatches(gui.mainImage.imageID, imageID, pairs);
-				pairs.forEach(p->mainFeatureIdx.set(p.dst, p.src));
+				pairs.forEach(p -> mainFeatureIdx.set(p.dst, p.src));
 			}
 
 			double imageScale = getImageScale();
@@ -532,10 +532,10 @@ public class DemoSceneRecognitionSimilarImagesApp<Gray extends ImageGray<Gray>, 
 			Graphics2D g2 = BoofSwingUtil.antialiasing(g);
 
 			// Filter by words if a word has been selected and it's colorizing by words
-			boolean filterWords = viewControlPanel.colorization == ColorFeatures.WORD && gui.selectedWord!=-1;
+			boolean filterWords = viewControlPanel.colorization == ColorFeatures.WORD && gui.selectedWord != -1;
 
 			// Filter by feature if showing all features and a feature in the source has been selected
-			boolean filterFeature = viewControlPanel.colorization == ColorFeatures.ASSOCIATION && gui.selectedSrcID!=-1;
+			boolean filterFeature = viewControlPanel.colorization == ColorFeatures.ASSOCIATION && gui.selectedSrcID != -1;
 
 			for (int i = 0; i < features.size; i++) {
 				int word = words.get(i);
@@ -554,7 +554,7 @@ public class DemoSceneRecognitionSimilarImagesApp<Gray extends ImageGray<Gray>, 
 				Color color = switch (viewControlPanel.colorization) {
 					case ALL -> Color.RED;
 					case ASSOCIATION -> new Color(VisualizeFeatures.trackIdToRgb(mainFeatureIdx.get(i)));
-					case WORD -> new Color(VisualizeFeatures.trackIdToRgb(word*100L+ (word%100)));
+					case WORD -> new Color(VisualizeFeatures.trackIdToRgb(word*100L + (word%100)));
 				};
 
 				VisualizeFeatures.drawPoint(g2,

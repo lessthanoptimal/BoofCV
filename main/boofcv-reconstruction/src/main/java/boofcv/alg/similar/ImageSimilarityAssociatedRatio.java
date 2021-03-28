@@ -18,6 +18,7 @@
 
 package boofcv.alg.similar;
 
+import boofcv.struct.ConfigLength;
 import boofcv.struct.feature.AssociatedIndex;
 import georegression.struct.point.Point2D_F64;
 import org.ddogleg.struct.FastAccess;
@@ -32,10 +33,10 @@ import org.ddogleg.struct.FastAccess;
 public class ImageSimilarityAssociatedRatio implements SimilarImagesSceneRecognition.SimilarityTest {
 
 	/** Fraction of features in a single image which must be associated for them to be considered similar */
-	public double minimumRatio = 0.5;
+	public final ConfigLength minimum = ConfigLength.relative(0.4, 0);
 
-	public ImageSimilarityAssociatedRatio( double minimumRatio ) {
-		this.minimumRatio = minimumRatio;
+	public ImageSimilarityAssociatedRatio( ConfigLength minimumRatio ) {
+		this.minimum.setTo(minimumRatio);
 	}
 
 	public ImageSimilarityAssociatedRatio() {}
@@ -44,9 +45,13 @@ public class ImageSimilarityAssociatedRatio implements SimilarImagesSceneRecogni
 	public boolean isSimilar( FastAccess<Point2D_F64> srcPixels,
 							  FastAccess<Point2D_F64> dstPixels,
 							  FastAccess<AssociatedIndex> matches ) {
-		if (matches.size < minimumRatio*srcPixels.size)
+		if (minimum.length > 0 && matches.size < minimum.length)
 			return false;
-		if (matches.size < minimumRatio*dstPixels.size)
+		if (minimum.fraction < 0.0)
+			return true;
+		if (matches.size < minimum.fraction*srcPixels.size)
+			return false;
+		if (matches.size < minimum.fraction*dstPixels.size)
 			return false;
 		return true;
 	}
