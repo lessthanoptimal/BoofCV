@@ -6,9 +6,9 @@ dependencies {
 
 	api group: 'com.github.sarxos', name: 'webcam-capture', version: '0.3.12'
 
-	testCompile project(':main:boofcv-geo')
-	testCompile project(':main:boofcv-feature')
-	testCompile project(':main:boofcv-recognition')
+	testImplementation project(':main:boofcv-geo')
+	testImplementation project(':main:boofcv-feature')
+	testImplementation project(':main:boofcv-recognition')
 }
 
 sourceSets {

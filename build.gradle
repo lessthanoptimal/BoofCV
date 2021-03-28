@@ -115,7 +115,7 @@ subprojects {
         api(group: 'org.georegression', name: 'georegression', version: '0.24-SNAPSHOT')
         api(group: 'org.ddogleg', name: 'ddogleg', version: '0.20-SNAPSHOT')
 
-        compile group: 'net.sf.trove4j', name: 'trove4j', version: '3.0.3'
+        api group: 'net.sf.trove4j', name: 'trove4j', version: '3.0.3'
 
         compileOnly "org.projectlombok:lombok:${project.lombok_version}"
         compileOnly 'org.jetbrains:annotations:20.0.0' // @Nullable
@@ -141,7 +141,7 @@ subprojects {
         benchmarkImplementation project.sourceSets.main.compileClasspath
 
         ['1.27'].each { String a ->
-            benchmarkCompile('org.openjdk.jmh:jmh-core:' + a)
+            benchmarkImplementation('org.openjdk.jmh:jmh-core:' + a)
             benchmarkAnnotationProcessor 'org.openjdk.jmh:jmh-generator-annprocess:' + a
         }
 
@@ -331,7 +331,7 @@ subprojects {
 
     project.dependencies {
         // needed for testing Config*
-        compile project(':main:boofcv-types').sourceSets.noauto.output
+        implementation project(':main:boofcv-types').sourceSets.noauto.output
         testImplementation project(':main:boofcv-types').sourceSets.test.output
     }
 }

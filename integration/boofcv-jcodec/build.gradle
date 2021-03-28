@@ -4,8 +4,8 @@ dependencies {
 	api project(':main:boofcv-io')
 	api project(':integration:boofcv-swing')
 
-	compile 'org.jcodec:jcodec:0.2.3'
-	compile 'org.jcodec:jcodec-javase:0.2.3'
+	implementation 'org.jcodec:jcodec:0.2.3'
+	implementation 'org.jcodec:jcodec-javase:0.2.3'
 }
 
 sourceSets {
