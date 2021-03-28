@@ -36,7 +36,7 @@ import boofcv.alg.geo.RectifyImageOps;
 import boofcv.alg.geo.bundle.BundleAdjustmentOps;
 import boofcv.alg.geo.bundle.cameras.BundlePinholeSimplified;
 import boofcv.alg.geo.rectify.RectifyCalibrated;
-import boofcv.alg.sfm.structure.ThreeViewEstimateMetricScene;
+import boofcv.alg.structure.ThreeViewEstimateMetricScene;
 import boofcv.core.image.ConvertImage;
 import boofcv.factory.feature.associate.FactoryAssociation;
 import boofcv.gui.BoofSwingUtil;

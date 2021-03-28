@@ -2,7 +2,7 @@ include 'examples','demonstrations','applications',
 
         'main:boofcv-core',
         'main:boofcv-ip','main:boofcv-io','main:boofcv-feature','main:boofcv-geo',
-        'main:boofcv-sfm','main:boofcv-recognition','main:boofcv-simulation',
+        'main:boofcv-sfm','main:boofcv-reconstruction','main:boofcv-recognition','main:boofcv-simulation',
         'main:checks','main:autocode','main:boofcv-learning',
         'main:boofcv-ip-multiview','main:boofcv-types',
 

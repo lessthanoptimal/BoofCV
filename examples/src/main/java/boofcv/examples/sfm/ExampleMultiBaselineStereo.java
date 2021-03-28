@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -24,7 +24,7 @@ import boofcv.alg.geo.bundle.BundleAdjustmentOps;
 import boofcv.alg.mvs.DisparityParameters;
 import boofcv.alg.mvs.MultiBaselineStereoIndependent;
 import boofcv.alg.mvs.MultiViewStereoOps;
-import boofcv.alg.sfm.structure.SceneWorkingGraph;
+import boofcv.alg.structure.SceneWorkingGraph;
 import boofcv.factory.disparity.ConfigDisparityBMBest5;
 import boofcv.factory.disparity.FactoryStereoDisparity;
 import boofcv.gui.ListDisplayPanel;

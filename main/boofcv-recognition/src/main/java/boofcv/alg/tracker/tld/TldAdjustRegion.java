@@ -18,11 +18,11 @@
 
 package boofcv.alg.tracker.tld;
 
-import boofcv.alg.sfm.robust.DistanceScaleTranslate2DSq;
-import boofcv.alg.sfm.robust.GenerateScaleTranslate2D;
-import boofcv.alg.sfm.robust.ModelManagerScaleTranslate2D;
+import boofcv.alg.geo.robust.DistanceScaleTranslate2DSq;
+import boofcv.alg.geo.robust.GenerateScaleTranslate2D;
+import boofcv.alg.geo.robust.ModelManagerScaleTranslate2D;
 import boofcv.struct.geo.AssociatedPair;
-import boofcv.struct.sfm.ScaleTranslate2D;
+import boofcv.struct.geo.ScaleTranslate2D;
 import georegression.struct.shapes.Rectangle2D_F64;
 import org.ddogleg.fitting.modelset.ModelManager;
 import org.ddogleg.fitting.modelset.lmeds.LeastMedianOfSquares;
