@@ -2,7 +2,6 @@ dependencies {
 	api project(':main:boofcv-ip')
 	api project(':main:boofcv-feature')
 	api project(':main:boofcv-geo')
-	api project(':main:boofcv-sfm')
 
 	['main','models'].each {String a ->
 		compile( group: 'org.deepboof', name: a, version: project.deepboof_version) {
@@ -18,5 +17,4 @@ dependencies {
 	testImplementation project(':main:boofcv-io')
 	testImplementation project(':main:boofcv-simulation')
 	testImplementation project(':integration:boofcv-swing')
-	testImplementation project(':main:boofcv-sfm').sourceSets.test.output
 }

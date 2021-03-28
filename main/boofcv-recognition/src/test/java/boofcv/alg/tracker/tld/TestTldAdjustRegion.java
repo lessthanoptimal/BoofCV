@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -19,7 +19,7 @@
 package boofcv.alg.tracker.tld;
 
 import boofcv.struct.geo.AssociatedPair;
-import boofcv.struct.sfm.ScaleTranslate2D;
+import boofcv.struct.geo.ScaleTranslate2D;
 import boofcv.testing.BoofStandardJUnit;
 import georegression.struct.shapes.Rectangle2D_F64;
 import org.ddogleg.struct.DogArray;

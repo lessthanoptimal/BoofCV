@@ -22,11 +22,12 @@ import boofcv.abst.feature.detect.interest.PointDetectorTypes;
 import boofcv.abst.geo.bundle.SceneStructureMetric;
 import boofcv.abst.tracker.PointTracker;
 import boofcv.alg.mvs.ColorizeMultiViewStereoResults;
-import boofcv.alg.sfm.structure.*;
+import boofcv.alg.similar.SimilarImagesPointTracker;
+import boofcv.alg.structure.*;
 import boofcv.core.image.LookUpColorRgbFormats;
 import boofcv.factory.feature.detect.interest.ConfigDetectInterestPoint;
 import boofcv.factory.feature.detect.selector.ConfigSelectLimit;
-import boofcv.factory.sfm.FactorySceneReconstruction;
+import boofcv.factory.structure.FactorySceneReconstruction;
 import boofcv.factory.tracker.ConfigPointTracker;
 import boofcv.factory.tracker.FactoryPointTracker;
 import boofcv.gui.BoofSwingUtil;
@@ -180,7 +181,7 @@ public class ExampleMultiViewSparseReconstruction {
 
 		PointTracker<GrayU8> tracker = FactoryPointTracker.tracker(configTracker, GrayU8.class, null);
 
-		var trackerSimilar = new PointTrackerToSimilarImages();
+		var trackerSimilar = new SimilarImagesPointTracker();
 
 		// Track features across the entire sequence and save the results
 		BoofMiscOps.profile(() -> {

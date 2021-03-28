@@ -7,6 +7,7 @@ dependencies {
 	api project(':main:boofcv-ip-multiview')
 	api project(':main:boofcv-learning')
 	api project(':main:boofcv-recognition')
+	api project(':main:boofcv-reconstruction')
 	api project(':main:boofcv-sfm')
 	api project(':main:boofcv-types')
 }

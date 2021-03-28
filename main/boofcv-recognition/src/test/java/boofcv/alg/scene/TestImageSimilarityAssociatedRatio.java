@@ -18,6 +18,7 @@
 
 package boofcv.alg.scene;
 
+import boofcv.alg.similar.ImageSimilarityAssociatedRatio;
 import boofcv.struct.feature.AssociatedIndex;
 import boofcv.testing.BoofStandardJUnit;
 import georegression.struct.point.Point2D_F64;

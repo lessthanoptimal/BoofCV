@@ -19,9 +19,9 @@
 package boofcv.alg.tracker.sfot;
 
 import boofcv.abst.filter.derivative.ImageGradient;
-import boofcv.alg.sfm.robust.DistanceScaleTranslateRotate2DSq;
-import boofcv.alg.sfm.robust.GenerateScaleTranslateRotate2D;
-import boofcv.alg.sfm.robust.ModelManagerScaleTranslateRotate2D;
+import boofcv.alg.geo.robust.DistanceScaleTranslateRotate2DSq;
+import boofcv.alg.geo.robust.GenerateScaleTranslateRotate2D;
+import boofcv.alg.geo.robust.ModelManagerScaleTranslateRotate2D;
 import boofcv.alg.tracker.klt.KltTrackFault;
 import boofcv.alg.tracker.klt.PyramidKltFeature;
 import boofcv.alg.tracker.klt.PyramidKltTracker;
@@ -30,11 +30,11 @@ import boofcv.factory.tracker.FactoryTrackerAlg;
 import boofcv.factory.transform.pyramid.FactoryPyramid;
 import boofcv.struct.RectangleRotate_F64;
 import boofcv.struct.geo.AssociatedPair;
+import boofcv.struct.geo.ScaleTranslateRotate2D;
 import boofcv.struct.image.ImageGray;
 import boofcv.struct.image.ImageType;
 import boofcv.struct.pyramid.ConfigDiscreteLevels;
 import boofcv.struct.pyramid.ImagePyramid;
-import boofcv.struct.sfm.ScaleTranslateRotate2D;
 import georegression.geometry.UtilPoint2D_F32;
 import org.ddogleg.fitting.modelset.lmeds.LeastMedianOfSquares;
 import org.ddogleg.struct.DogArray;

@@ -18,10 +18,10 @@
 
 package boofcv.demonstrations.recognition;
 
-import boofcv.alg.scene.ConfigSceneRecognitionSimilarImages;
-import boofcv.alg.scene.SceneRecognitionSimilarImages;
+import boofcv.alg.similar.ConfigSimilarImagesSceneRecognition;
+import boofcv.alg.similar.SimilarImagesSceneRecognition;
 import boofcv.core.image.GeneralizedImageOps;
-import boofcv.factory.scene.FactorySceneRecognition;
+import boofcv.factory.structure.FactorySceneReconstruction;
 import boofcv.gui.BoofSwingUtil;
 import boofcv.gui.DemonstrationBase;
 import boofcv.gui.StandardAlgConfigPanel;
@@ -77,7 +77,7 @@ public class DemoSceneRecognitionSimilarImagesApp<Gray extends ImageGray<Gray>, 
 	Class<Gray> grayType;
 	ImageType<Planar<Gray>> colorType;
 
-	SceneRecognitionSimilarImages<Gray, TD> sceneSimilar;
+	SimilarImagesSceneRecognition<Gray, TD> sceneSimilar;
 
 	// List of which images are similar to each other
 	final Object imageLock = new Object();
@@ -178,7 +178,7 @@ public class DemoSceneRecognitionSimilarImagesApp<Gray extends ImageGray<Gray>, 
 		}
 		SwingUtilities.invokeLater(() -> viewControlPanel.updateImagePaths());
 
-		var config = new ConfigSceneRecognitionSimilarImages();
+		var config = new ConfigSimilarImagesSceneRecognition();
 		config.features.detectFastHessian.extract.radius = 5;
 		config.features.detectFastHessian.maxFeaturesAll = 500;
 		config.limitMatchesConsider = 15;
@@ -189,7 +189,7 @@ public class DemoSceneRecognitionSimilarImagesApp<Gray extends ImageGray<Gray>, 
 		config.recognizeNister2006.featureSingleWordHops = 5;
 //		config.recognizeNister2006.learnNodeWeights = false;
 
-		sceneSimilar = FactorySceneRecognition.createSimilarImages(config, ImageType.single(grayType));
+		sceneSimilar = FactorySceneReconstruction.createSimilarImages(config, ImageType.single(grayType));
 		sceneSimilar.setVerbose(System.out, null);
 
 		Gray gray = GeneralizedImageOps.createImage(grayType, 1, 1, 0);

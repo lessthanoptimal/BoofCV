@@ -347,6 +347,7 @@ def mainProjects = [
         ':main:boofcv-geo',
         ':main:boofcv-sfm',
         ':main:boofcv-recognition',
+        ':main:boofcv-reconstruction',
         ':main:boofcv-learning',
         ':main:boofcv-simulation',
         ':integration:boofcv-swing'
