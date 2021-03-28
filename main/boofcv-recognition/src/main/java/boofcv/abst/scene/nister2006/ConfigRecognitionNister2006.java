@@ -60,7 +60,7 @@ public class ConfigRecognitionNister2006 implements Configuration {
 	 * For example, with 1,000,000 images, setting this to be 5000 images reduced query time from 7,000 (ms) to
 	 * 85 (ms).
 	 */
-	public final ConfigLength queryMaximumImagesInNode = ConfigLength.relative(1.0, 1);
+	public final ConfigLength queryMaximumImagesInNode = ConfigLength.relative(0.002, 5000);
 
 	/**
 	 * When learning, if a node is viewed by more than this number of images then its weight is set to zero.
@@ -73,7 +73,7 @@ public class ConfigRecognitionNister2006 implements Configuration {
 	 * When learning, if a node has less than this number of points it will not spawn children. If
 	 * relative then its relative to the total number of points. This is intended to avoid over fitting.
 	 */
-	public final ConfigLength learningMinimumPointsForChildren = ConfigLength.fixed(0);
+	public final ConfigLength learningMinimumPointsForChildren = ConfigLength.fixed(20);
 
 	/**
 	 * If true then it will learn node weights. If false the all nodes but the root node will have a weight of 1.0
@@ -84,15 +84,18 @@ public class ConfigRecognitionNister2006 implements Configuration {
 	 * When converting a descriptor into a word it will return the word which is this many hops from the leaf.
 	 * The leaf can be too specific and by "hoping" away from the leaf it gets more generic and will have more
 	 * matches.
+	 *
+	 * If words are being used for frame-to-frame matching then this is a critical parameter. Default value will
+	 * force it to the root's children. This won't fail but might not be the most effective choice.
 	 */
-	@Getter @Setter public int featureSingleWordHops = 1;
+	@Getter @Setter public int featureSingleWordHops = Integer.MAX_VALUE;
 
 	/** Seed used in random number generators */
 	public long randSeed = 0xDEADBEEF;
 
 	{
 		// Deviation from paper. This was determined through empirical tuning. See tech report
-		tree.branchFactor = 23;
+		tree.branchFactor = 20;
 		tree.maximumLevel = 4;
 		minimumDepthFromRoot = 2;
 
