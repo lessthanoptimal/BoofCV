@@ -20,14 +20,12 @@ task examplesJar(type: Jar) {
 
 	outputs.upToDateWhen { false }
 
+	archiveFile.set(file('examples.jar'))
+
 	from sourceSets.main.output
 
 	dependsOn configurations.runtimeClasspath
 	from {configurations.runtimeClasspath.findAll { it.name.endsWith('jar') }.collect { zipTree(it) } } {
 		exclude 'META-INF/*.RSA', 'META-INF/*.SF', 'META-INF/*.DSA'
-	}
-
-	doLast {
-		archiveFile.renameTo(file('examples.jar'))
 	}
 }

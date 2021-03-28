@@ -52,8 +52,8 @@ public class DownSelectVideoFramesFor3DApp {
 	@Option(name = "-i", aliases = {"--Input"}, usage = "Path to input directory or file")
 	String pathInput;
 
-	@Option(name = "-o", aliases = {"--Output"}, usage = "Path to output file.")
-	String pathOutput = "qrcodes.txt";
+	@Option(name = "-o", aliases = {"--Output"}, usage = "Path to output directory.")
+	String pathOutput = "output";
 
 	@Option(name = "--GUI", usage = "Ignore all other command line arguments and switch to GUI mode")
 	boolean guiMode = false;
