@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -49,9 +49,9 @@ public class TestSceneObservations extends BoofStandardJUnit {
 		assertEquals(3,v.point.get(2));
 
 		Point2D_F64 p = new Point2D_F64();
-		v.get(0,p);
+		v.getPixel(0,p);
 		assertTrue(p.distance2(1,2) < 1e-7);
-		v.get(2,p);
+		v.getPixel(2,p);
 		assertTrue(p.distance2(4,2) < 1e-7);
 	}
 
@@ -67,7 +67,7 @@ public class TestSceneObservations extends BoofStandardJUnit {
 		v.set(2,4,-1,-2);
 		assertEquals(4,v.point.get(2));
 		Point2D_F64 p = new Point2D_F64();
-		v.get(2,p);
+		v.getPixel(2,p);
 		assertTrue(p.distance2(-1,-2) < 1e-7);
 	}
 
@@ -83,7 +83,7 @@ public class TestSceneObservations extends BoofStandardJUnit {
 		v.setPixel(2,-1,-2);
 		assertEquals(8,v.point.get(2));
 		Point2D_F64 p = new Point2D_F64();
-		v.get(2,p);
+		v.getPixel(2,p);
 		assertTrue(p.distance2(-1,-2) < 1e-7);
 	}
 }

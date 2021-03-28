@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -169,7 +169,7 @@ abstract class GenericBundleAdjustmentProjectiveChecks extends BoofStandardJUnit
 				SceneObservations.View v = observations.views.data[indexView];
 
 				for (int j = 0; j < v.point.size; j++) {
-					v.get(j, o);
+					v.getPixel(j, o);
 					structure.points.data[o.index].get(p4);
 					p3.x = p4.x/p4.w;
 					p3.y = p4.y/p4.w;
@@ -186,7 +186,7 @@ abstract class GenericBundleAdjustmentProjectiveChecks extends BoofStandardJUnit
 				SceneObservations.View v = observations.views.data[indexView];
 
 				for (int j = 0; j < v.point.size; j++) {
-					v.get(j, o);
+					v.getPixel(j, o);
 					structure.points.data[o.index].get(p3);
 					PerspectiveOps.renderPixel(structure.views.data[indexView].worldToView,p3,predicted);
 					double residual = o.p.distance(predicted);

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -69,7 +69,7 @@ public class PruneStructureFromSceneProjective {
 				SceneStructureCommon.Point f = structure.points.data[pointID];
 
 				// Get observation in image pixels
-				v.get(indexInView, observation);
+				v.getPixel(indexInView, observation);
 
 				// Get feature location in world and predict the pixel observation
 				if (structure.homogenous) {
@@ -216,7 +216,7 @@ public class PruneStructureFromSceneProjective {
 				int pointID = v.getPointId(indexInView);
 				SceneStructureCommon.Point f = structure.points.data[pointID];
 //				System.out.println("   pointIndex="+pointIndex+" pointID="+pointID+" hash="+f.hashCode());
-				v.get(indexInView, observation);
+				v.getPixel(indexInView, observation);
 
 				if (!Double.isNaN(observation.x))
 					continue;

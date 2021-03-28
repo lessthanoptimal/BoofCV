@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -143,7 +143,7 @@ public class BundleAdjustmentMetricResidualFunction
 			{
 				SceneObservations.View obsView = observations.views.get(viewIndex);
 				for (int i = 0; i < obsView.size(); i++) {
-					obsView.get(i, observedPixel);
+					obsView.getPixel(i, observedPixel);
 					SceneStructureCommon.Point worldPt = structure.points.data[observedPixel.index];
 					worldPt.get(p3);
 
@@ -162,7 +162,7 @@ public class BundleAdjustmentMetricResidualFunction
 			if (observations.hasRigid()) {
 				SceneObservations.View obsView = observations.viewsRigid.get(viewIndex);
 				for (int i = 0; i < obsView.size(); i++) {
-					obsView.get(i, observedPixel);
+					obsView.getPixel(i, observedPixel);
 
 					// Use lookup table to figure out which rigid object it belongs to
 					int rigidIndex = structure.lookupRigid[observedPixel.index];
@@ -206,7 +206,7 @@ public class BundleAdjustmentMetricResidualFunction
 				SceneObservations.View obsView = observations.views.get(viewIndex);
 
 				for (int i = 0; i < obsView.size(); i++) {
-					obsView.get(i, observedPixel);
+					obsView.getPixel(i, observedPixel);
 					SceneStructureCommon.Point worldPt = structure.points.data[observedPixel.index];
 					worldPt.get(p4);
 
@@ -227,7 +227,7 @@ public class BundleAdjustmentMetricResidualFunction
 				SceneObservations.View obsView = observations.viewsRigid.get(viewIndex);
 
 				for (int i = 0; i < obsView.size(); i++) {
-					obsView.get(i, observedPixel);
+					obsView.getPixel(i, observedPixel);
 
 					// Use lookup table to figure out which rigid object it belongs to
 					int rigidIndex = structure.lookupRigid[observedPixel.index];

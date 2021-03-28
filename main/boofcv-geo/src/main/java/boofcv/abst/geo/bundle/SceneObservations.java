@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -96,9 +96,9 @@ public class SceneObservations {
 	}
 
 	public static class View {
-		// list of Point ID's which this view can see. -1 indicates the point has been removed
+		/** list of Point ID's that are visible in this view. -1 indicates the point has been removed */
 		public DogArray_I32 point = new DogArray_I32();
-		// The observation of the point in the view in an interleaved format (x,y). In image pixels.
+		/** Pixel observations of features in 'point' in an interleaved format (x,y) */
 		public DogArray_F32 observations = new DogArray_F32();
 
 		public int size() {
@@ -112,6 +112,18 @@ public class SceneObservations {
 			point.remove(index);
 			index *= 2;
 			observations.remove(index, index + 1);
+		}
+
+		/**
+		 * Assigns this observation to th specified feature. Does sanity checks to make sure
+		 * everything is consistent.
+		 */
+		public void safeAssignToFeature(int index, int featureIdx) {
+			if (point.contains(featureIdx))
+				throw new IllegalArgumentException("Feature has already been assigned to an observation");
+			if (-1 != point.get(index))
+				throw new IllegalArgumentException("Observation is already assigned a feature");
+			point.set(index, featureIdx);
 		}
 
 		/**
@@ -139,7 +151,7 @@ public class SceneObservations {
 			return point.get(index);
 		}
 
-		public void get( int index, Point2D_F64 p ) {
+		public void getPixel( int index, Point2D_F64 p ) {
 			if (index >= point.size)
 				throw new IndexOutOfBoundsException(index + " >= " + point.size);
 			index *= 2;
@@ -147,7 +159,7 @@ public class SceneObservations {
 			p.y = observations.data[index + 1];
 		}
 
-		public void get( int index, PointIndex2D_F64 observation ) {
+		public void getPixel( int index, PointIndex2D_F64 observation ) {
 			if (index >= point.size)
 				throw new IndexOutOfBoundsException(index + " >= " + point.size);
 			observation.index = point.data[index];

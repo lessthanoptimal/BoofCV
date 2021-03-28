@@ -336,7 +336,7 @@ class TestPairwiseGraphUtils extends BoofStandardJUnit {
 
 			for (int i = 0; i < db.feats3D.size(); i++) {
 				Point2D_F64 expected = db.viewObs.get(views[viewIdx]).get(i);
-				alg.observations.views.get(viewIdx).get(i, found);
+				alg.observations.views.get(viewIdx).getPixel(i, found);
 
 				assertEquals(0.0, expected.distance(found), UtilEjml.TEST_F32);
 			}

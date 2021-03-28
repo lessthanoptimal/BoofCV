@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -501,7 +501,7 @@ class TestPruneStructureFromSceneMetric extends BoofStandardJUnit {
 
 				assertTrue(cameraX.z > 0);
 				camera.project(cameraX.x, cameraX.y, cameraX.z, predicted);
-				observations.views.data[viewIdx].get(obsIdx, found);
+				observations.views.data[viewIdx].getPixel(obsIdx, found);
 				assertTrue(predicted.distance(found) < 1e-4);
 			}
 		}

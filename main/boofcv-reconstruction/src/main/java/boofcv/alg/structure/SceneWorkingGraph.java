@@ -150,11 +150,15 @@ public class SceneWorkingGraph {
 	 * Information on the set of inlier observations used to compute the camera location
 	 */
 	public static class InlierInfo {
-		// List of views from which these inliers were selected from
-		// the first view is always the view which contains this set of info
+		/**
+		 * List of views from which these inliers were selected from
+		 * the first view is always the view which contains this set of info
+		 */
 		public final FastArray<PairwiseImageGraph.View> views = new FastArray<>(PairwiseImageGraph.View.class);
-		// indexes of observations for each view listed in 'views'.  obs[view][idx] will refer to the same feature
-		// for all 'idx'
+		/**
+		 * indexes of observations for each view listed in 'views'.  obs[view][idx] will refer to the same feature
+		 * for all 'idx'
+		 */
 		public final DogArray<DogArray_I32> observations = new DogArray<>(DogArray_I32::new, DogArray_I32::reset);
 
 		public boolean isEmpty() { return observations.size == 0; }
@@ -195,7 +199,7 @@ public class SceneWorkingGraph {
 		public final TIntObjectHashMap<Feature> obs_to_feat = new TIntObjectHashMap<>();
 
 		// Specifies which observations were used to compute the projective transform for this view
-		// If empty that means one set of inliers are used to multiple views and only one view needed this to be saved
+		// If empty that means one set of inliers are used for multiple views and only one view needed this to be saved
 		// this happens for the seed view
 		public final InlierInfo inliers = new InlierInfo();
 
