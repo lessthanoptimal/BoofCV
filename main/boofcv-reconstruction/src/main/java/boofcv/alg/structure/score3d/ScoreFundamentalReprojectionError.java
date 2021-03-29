@@ -22,6 +22,7 @@ import boofcv.alg.geo.MultiViewOps;
 import boofcv.alg.geo.robust.DistanceFundamentalGeometric;
 import boofcv.alg.geo.robust.GenerateHomographyLinear;
 import boofcv.alg.structure.EpipolarScore3D;
+import boofcv.struct.ConfigLength;
 import boofcv.struct.geo.AssociatedPair;
 import georegression.geometry.GeometryMath_F64;
 import georegression.struct.homography.Homography2D_F64;
@@ -65,6 +66,9 @@ public class ScoreFundamentalReprojectionError implements EpipolarScore3D {
 	 */
 	public @Getter @Setter double maxRatioScore = 5.0;
 
+	/** The minimum number of inliers for an edge to be accepted. If relative, then relative to pairs. */
+	public @Getter final ConfigLength minimumInliers = ConfigLength.fixed(30);
+
 	// Storage for inliers
 	List<AssociatedPair> inliers = new ArrayList<>();
 
@@ -105,6 +109,10 @@ public class ScoreFundamentalReprojectionError implements EpipolarScore3D {
 			score = 0.0;
 			return true;
 		}
+
+		// if there are too few matches then it's probably noise
+		if (ransac3D.getMatchSet().size() < minimumInliers.computeI(pairs.size()))
+			return false;
 
 		// Save the inliers and compute the epipolar geometric error for F
 		fundamental.setTo(ransac3D.getModelParameters());

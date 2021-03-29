@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -18,7 +18,6 @@
 
 package boofcv.struct;
 
-
 /**
  * Specifies an axis aligned rectangle inside an image using lower and upper extents.
  *
@@ -26,16 +25,16 @@ package boofcv.struct;
  */
 public class ImageRectangle_F64 {
 	/** Inclusive lower extent (x0,y) and exclusive upper extent (x1,y1) */
-	public double x0,y0,x1,y1;
+	public double x0, y0, x1, y1;
 
-	public ImageRectangle_F64(double x0, double y0, double x1, double y1) {
+	public ImageRectangle_F64( double x0, double y0, double x1, double y1 ) {
 		this.x0 = x0;
 		this.y0 = y0;
 		this.x1 = x1;
 		this.y1 = y1;
 	}
 
-	public ImageRectangle_F64(ImageRectangle_F64 orig) {
+	public ImageRectangle_F64( ImageRectangle_F64 orig ) {
 		this.x0 = orig.x0;
 		this.y0 = orig.y0;
 		this.x1 = orig.x1;
@@ -44,10 +43,24 @@ public class ImageRectangle_F64 {
 
 	public ImageRectangle_F64() {}
 
+	public void setTo( ImageRectangle_F64 orig ) {
+		this.x0 = orig.x0;
+		this.y0 = orig.y0;
+		this.x1 = orig.x1;
+		this.y1 = orig.y1;
+	}
+
+	public void setTo( double x0, double y0, double x1, double y1 ) {
+		this.x0 = x0;
+		this.y0 = y0;
+		this.x1 = x1;
+		this.y1 = y1;
+	}
+
 	/**
 	 * Returns the area of the rectangle
 	 */
 	public double area() {
-		return (y1-y0)*(x1-x0);
+		return (y1 - y0)*(x1 - x0);
 	}
 }

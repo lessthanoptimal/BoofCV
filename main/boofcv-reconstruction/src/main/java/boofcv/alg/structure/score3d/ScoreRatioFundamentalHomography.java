@@ -19,6 +19,7 @@
 package boofcv.alg.structure.score3d;
 
 import boofcv.alg.structure.EpipolarScore3D;
+import boofcv.struct.ConfigLength;
 import boofcv.struct.geo.AssociatedPair;
 import georegression.struct.homography.Homography2D_F64;
 import lombok.Getter;
@@ -49,10 +50,8 @@ public class ScoreRatioFundamentalHomography implements EpipolarScore3D {
 	@Getter ModelMatcher<DMatrixRMaj, AssociatedPair> ransac3D;
 	@Getter ModelMatcher<Homography2D_F64, AssociatedPair> ransacH;
 
-	/**
-	 * The minimum number of inliers for an edge to be accepted
-	 */
-	public @Getter @Setter int minimumInliers = 30;
+	/** The minimum number of inliers for an edge to be accepted. If relative, then relative to pairs. */
+	public @Getter final ConfigLength minimumInliers = ConfigLength.fixed(30);
 
 	/**
 	 * If number of matches from fundamental divided by homography is more than this then it is considered a 3D scene
@@ -107,10 +106,10 @@ public class ScoreRatioFundamentalHomography implements EpipolarScore3D {
 			verbose.println("ransac F=" + countF + " H=" + countH + " pairs.size=" + pairs.size() + " 3d=" + is3D);
 
 		// Always use fundamental if it's available
-		if (countF >= minimumInliers) {
+		if (countF >= minimumInliers.computeI(pairs.size())) {
 			saveInlierMatches(ransac3D, inliersIdx);
 			fundamental.setTo(ransac3D.getModelParameters());
-		} else if (countH >= minimumInliers) {
+		} else if (countH >= minimumInliers.computeI(pairs.size())) {
 			saveInlierMatches(ransacH, inliersIdx);
 			Homography2D_F64 H = ransacH.getModelParameters();
 			DConvertMatrixStruct.convert(H, fundamental);

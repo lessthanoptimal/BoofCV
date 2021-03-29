@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -127,5 +127,57 @@ public interface PointCloudReader {
 
 			@Override public int getRGB( int index ) {return cloud.get(index).rgb;}
 		};
+	}
+
+	static PointCloudReader wrapF32( List<Point3D_F32> cloud, int[] rgb ) {
+		return new PointCloudReader() {
+			@Override public int size() {return cloud.size();}
+
+			@Override public void get( int index, Point3D_F32 point ) {point.setTo(cloud.get(index));}
+
+			@Override public void get( int index, Point3D_F64 point ) {convert(cloud.get(index), point);}
+
+			@Override public int getRGB( int index ) {return rgb[index];}
+		};
+	}
+
+	static PointCloudReader wrapF64( List<Point3D_F64> cloud, int[] rgb ) {
+		return new PointCloudReader() {
+			@Override public int size() {return cloud.size();}
+
+			@Override public void get( int index, Point3D_F32 point ) {convert(cloud.get(index), point);}
+
+			@Override public void get( int index, Point3D_F64 point ) {point.setTo(cloud.get(index));}
+
+			@Override public int getRGB( int index ) {return rgb[index];}
+		};
+	}
+
+	static PointCloudReader wrap( Generic op, int size ) {
+		return new PointCloudReader() {
+			Point3dRgbI_F64 p = new Point3dRgbI_F64();
+			@Override public int size() {return size;}
+
+			@Override public void get( int index, Point3D_F32 point ) {
+				op.get(index,p);
+				point.x=(float)p.x;
+				point.y=(float)p.y;
+				point.z=(float)p.z;
+			}
+
+			@Override public void get( int index, Point3D_F64 point ) {
+				op.get(index,p);
+				point.setTo(p);
+			}
+
+			@Override public int getRGB( int index ) {
+				op.get(index,p);
+				return p.rgb;
+			}
+		};
+	}
+
+	interface Generic {
+		void get( int index, Point3dRgbI_F64 point );
 	}
 }
