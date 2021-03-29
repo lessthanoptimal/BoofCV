@@ -5,6 +5,7 @@ dependencies {
 	api project(':integration:boofcv-swing')
 
 	api group: 'com.github.sarxos', name: 'webcam-capture', version: '0.3.12'
+        implementation group: 'org.freedesktop.gstreamer', name: 'gst1-java-core', version: '1.4.0'
 
 	testCompile project(':main:boofcv-geo')
 	testCompile project(':main:boofcv-feature')
