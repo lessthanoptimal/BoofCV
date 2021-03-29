@@ -90,7 +90,7 @@ public class FactorySceneReconstruction {
 										config.score.typeInliers.homography, config.score.typeInliers.ransacH);
 
 						var alg = new ScoreRatioFundamentalHomography(ransac3D, ransacH);
-						alg.minimumInliers = config.score.typeInliers.minimumInliers;
+						alg.minimumInliers.setTo(config.score.typeInliers.minimumInliers);
 						alg.ratio3D = config.score.typeInliers.ratio3D;
 						yield alg;
 					}
@@ -99,6 +99,7 @@ public class FactorySceneReconstruction {
 						alg.eps = config.score.typeErrors.eps;
 						alg.ratio3D = config.score.typeErrors.ratio3D;
 						alg.maxRatioScore = config.score.typeErrors.maxRatioScore;
+						alg.minimumInliers.setTo(config.score.typeErrors.minimumInliers);
 						yield alg;
 					}
 				};

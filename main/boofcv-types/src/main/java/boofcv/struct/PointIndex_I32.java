@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -37,6 +37,16 @@ public class PointIndex_I32 extends Point2D_I32 {
 
 	public PointIndex_I32( int x, int y, int index ) {
 		super(x, y);
+		this.index = index;
+	}
+
+	public void setTo(Point2D_I32 p, int index) {
+		this.setTo(p);
+		this.index = index;
+	}
+
+	public void setTo(int x, int y, int index) {
+		this.setTo(x,y);
 		this.index = index;
 	}
 

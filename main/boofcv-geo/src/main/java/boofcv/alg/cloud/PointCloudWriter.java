@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -32,10 +32,22 @@ import org.ddogleg.struct.DogArray_I32;
  * @author Peter Abeles
  */
 public interface PointCloudWriter {
+	/**
+	 * Resets and initializes the writer and tells it approximately how many points will be written so it can
+	 * preallocate memory
+	 *
+	 * @param estimatedSize Approximate number of points which will be written.
+	 */
 	void init( int estimatedSize );
 
+	/**
+	 * Adds a 3D point
+	 */
 	void add( double x, double y, double z );
 
+	/**
+	 * Adds a 3D point with color information
+	 */
 	void add( double x, double y, double z, int rgb );
 
 	class CloudArraysF32 implements PointCloudWriter {
@@ -122,7 +134,7 @@ public interface PointCloudWriter {
 
 			@Override
 			public void add( double x, double y, double z, int rgb ) {
-				cloud.grow().set((float)x, (float)y, (float)z, rgb);
+				cloud.grow().setTo((float)x, (float)y, (float)z, rgb);
 			}
 		};
 	}
@@ -142,7 +154,7 @@ public interface PointCloudWriter {
 
 			@Override
 			public void add( double x, double y, double z, int rgb ) {
-				cloud.grow().set(x, y, z, rgb);
+				cloud.grow().setTo(x, y, z, rgb);
 			}
 		};
 	}

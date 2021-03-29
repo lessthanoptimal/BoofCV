@@ -22,6 +22,7 @@ import boofcv.factory.geo.ConfigFundamental;
 import boofcv.factory.geo.ConfigHomography;
 import boofcv.factory.geo.ConfigRansac;
 import boofcv.misc.BoofMiscOps;
+import boofcv.struct.ConfigLength;
 import boofcv.struct.Configuration;
 
 /**
@@ -91,8 +92,8 @@ public class ConfigEpipolarScore3D implements Configuration {
 		/** Configuration for computing Homography matrix */
 		public final ConfigHomography homography = new ConfigHomography();
 
-		/** The minimum number of inliers for an edge to be accepted */
-		public int minimumInliers = 30;
+		/** The minimum number of inliers for an edge to be accepted. If relative, then relative to pairs.  */
+		public final ConfigLength minimumInliers = ConfigLength.fixed(30);
 
 		/**
 		 * If number of matches from fundamental divided by homography is more than this then it is
@@ -107,19 +108,19 @@ public class ConfigEpipolarScore3D implements Configuration {
 		public double maxRatioScore = 5.0;
 
 		@Override public void checkValidity() {
-			BoofMiscOps.checkTrue(minimumInliers >= 0);
 			BoofMiscOps.checkTrue(ratio3D > 0.0);
 			BoofMiscOps.checkTrue(maxRatioScore > 0.0);
 			ransacH.checkValidity();
 			homography.checkValidity();
+			minimumInliers.checkValidity();
 		}
 
 		public void setTo( ModelInliers src ) {
-			this.minimumInliers = src.minimumInliers;
 			this.ratio3D = src.ratio3D;
 			this.maxRatioScore = src.maxRatioScore;
 			this.ransacH.setTo(src.ransacH);
 			this.homography.setTo(src.homography);
+			this.minimumInliers.setTo(src.minimumInliers);
 		}
 	}
 
@@ -139,16 +140,21 @@ public class ConfigEpipolarScore3D implements Configuration {
 		 */
 		public double maxRatioScore = 5.0;
 
+		/** The minimum number of inliers for an edge to be accepted. If relative, then relative to pairs.  */
+		public final ConfigLength minimumInliers = ConfigLength.fixed(30);
+
 		@Override public void checkValidity() {
 			BoofMiscOps.checkTrue(eps >= 0);
 			BoofMiscOps.checkTrue(ratio3D > 0.0);
 			BoofMiscOps.checkTrue(maxRatioScore > 0.0);
+			minimumInliers.checkValidity();
 		}
 
 		public void setTo( FundamentalError src ) {
 			this.ratio3D = src.ratio3D;
 			this.eps = src.eps;
 			this.maxRatioScore = src.maxRatioScore;
+			this.minimumInliers.setTo(src.minimumInliers);
 		}
 	}
 }
