@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -45,19 +45,20 @@ import java.util.List;
  * @author Peter Abeles
  */
 // todo add option to do weighted histogram from NN data
-public class ClassifierKNearestNeighborsBow<T extends ImageBase<T>,Desc extends TupleDesc> {
-
+public class ClassifierKNearestNeighborsBow<T extends ImageBase<T>, TD extends TupleDesc<TD>> {
 	// Used to look up the histograms in memory which are the most similar
-	private NearestNeighbor<HistogramScene> nn;
-	private NearestNeighbor.Search<HistogramScene> search;
+	private final NearestNeighbor<HistogramScene> nn;
+	private final NearestNeighbor.Search<HistogramScene> search;
+
 	// Computes all the features in the image
-	private DescribeImageDense<T,Desc> describe;
+	private final DescribeImageDense<T, TD> describe;
+
 	// Converts the set of image features into visual words into a histogram which describes the frequency
 	// of visual words
-	private FeatureToWordHistogram<Desc> featureToHistogram;
+	private final FeatureToWordHistogram<TD> featureToHistogram;
 
 	// storage for NN results
-	private DogArray<NnData<HistogramScene>> resultsNN = new DogArray(NnData::new);
+	private final DogArray<NnData<HistogramScene>> resultsNN = new DogArray(NnData::new);
 
 	// number of neighbors it will consider
 	private int numNeighbors;
@@ -74,9 +75,9 @@ public class ClassifierKNearestNeighborsBow<T extends ImageBase<T>,Desc extends 
 	 * @param describe Computes the dense image features
 	 * @param featureToHistogram Converts a set of features into a word histogram
 	 */
-	public ClassifierKNearestNeighborsBow(NearestNeighbor<HistogramScene> nn,
-										  final DescribeImageDense<T, Desc> describe,
-										  FeatureToWordHistogram<Desc> featureToHistogram) {
+	public ClassifierKNearestNeighborsBow( NearestNeighbor<HistogramScene> nn,
+										   final DescribeImageDense<T, TD> describe,
+										   FeatureToWordHistogram<TD> featureToHistogram ) {
 		this.nn = nn;
 		this.describe = describe;
 		this.featureToHistogram = featureToHistogram;
@@ -87,28 +88,30 @@ public class ClassifierKNearestNeighborsBow<T extends ImageBase<T>,Desc extends 
 	/**
 	 * Specifies the number of neighbors it should search for when classifying\
 	 */
-	public void setNumNeighbors(int numNeighbors) {
+	public void setNumNeighbors( int numNeighbors ) {
 		this.numNeighbors = numNeighbors;
 	}
 
 	/**
 	 * Provides a set of labeled word histograms to use to classify a new image
+	 *
 	 * @param memory labeled histograms
 	 */
-	public void setClassificationData(List<HistogramScene> memory , int numScenes ) {
+	public void setClassificationData( List<HistogramScene> memory, int numScenes ) {
 
 		nn.setPoints(memory, false);
 
-		scenes = new double[ numScenes ];
+		scenes = new double[numScenes];
 	}
 
 	/**
 	 * Finds the scene which most resembles the provided image
+	 *
 	 * @param image Image that's to be classified
 	 * @return The index of the scene it most resembles
 	 */
-	public int classify(T image) {
-		if( numNeighbors == 0 )
+	public int classify( T image ) {
+		if (numNeighbors == 0)
 			throw new IllegalArgumentException("Must specify number of neighbors!");
 
 		// compute all the features inside the image
@@ -116,9 +119,9 @@ public class ClassifierKNearestNeighborsBow<T extends ImageBase<T>,Desc extends 
 
 		// find which word the feature matches and construct a frequency histogram
 		featureToHistogram.reset();
-		List<Desc> imageFeatures = describe.getDescriptions();
+		List<TD> imageFeatures = describe.getDescriptions();
 		for (int i = 0; i < imageFeatures.size(); i++) {
-			Desc d = imageFeatures.get(i);
+			TD d = imageFeatures.get(i);
 			featureToHistogram.addFeature(d);
 		}
 		featureToHistogram.process();
@@ -126,16 +129,16 @@ public class ClassifierKNearestNeighborsBow<T extends ImageBase<T>,Desc extends 
 
 		// Find the N most similar image histograms
 		resultsNN.reset();
-		search.findNearest(temp,-1,numNeighbors,resultsNN);
+		search.findNearest(temp, -1, numNeighbors, resultsNN);
 
 		// Find the most common scene among those neighbors
-		Arrays.fill(scenes,0);
+		Arrays.fill(scenes, 0);
 		for (int i = 0; i < resultsNN.size; i++) {
 			NnData<HistogramScene> data = resultsNN.get(i);
 			HistogramScene n = data.point;
 
 //			scenes[n.type]++;
-			scenes[n.type] += 1.0/(data.distance+0.005); // todo
+			scenes[n.type] += 1.0/(data.distance + 0.005); // todo
 //			scenes[n.type] += 1.0/(Math.sqrt(data.distance)+0.005); // todo
 		}
 
@@ -144,7 +147,7 @@ public class ClassifierKNearestNeighborsBow<T extends ImageBase<T>,Desc extends 
 		double bestCount = 0;
 
 		for (int i = 0; i < scenes.length; i++) {
-			if( scenes[i] > bestCount ) {
+			if (scenes[i] > bestCount) {
 				bestCount = scenes[i];
 				bestIndex = i;
 			}

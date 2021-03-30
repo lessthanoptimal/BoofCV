@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -31,8 +31,8 @@ import java.util.List;
  *
  * @author Peter Abeles
  */
-public class DescribeImageDense_Convert<T extends ImageBase<T>, Desc extends TupleDesc>
-		implements DescribeImageDense<T,Desc>
+public class DescribeImageDense_Convert<T extends ImageBase<T>, TD extends TupleDesc<TD>>
+		implements DescribeImageDense<T, TD>
 {
 	DescribeImageDense describer;
 	ImageBase workspace;
@@ -55,12 +55,12 @@ public class DescribeImageDense_Convert<T extends ImageBase<T>, Desc extends Tup
 
 
 	@Override
-	public Desc createDescription() {
-		return (Desc)describer.createDescription();
+	public TD createDescription() {
+		return (TD)describer.createDescription();
 	}
 
 	@Override
-	public Class<Desc> getDescriptionType() {
+	public Class<TD> getDescriptionType() {
 		return describer.getDescriptionType();
 	}
 
@@ -72,7 +72,7 @@ public class DescribeImageDense_Convert<T extends ImageBase<T>, Desc extends Tup
 	}
 
 	@Override
-	public List<Desc> getDescriptions() {
+	public List<TD> getDescriptions() {
 		return describer.getDescriptions();
 	}
 

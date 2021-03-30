@@ -26,7 +26,7 @@ import boofcv.struct.image.ImageType;
 /**
  * @author Peter Abeles
  */
-class TestWrapDescribeBriefSo extends GenericDescribeRegionPointChecks<GrayF32> {
+class TestWrapDescribeBriefSo extends GenericDescribeRegionPointChecks<GrayF32, TupleDesc_B> {
 	TestWrapDescribeBriefSo() {
 		super(ImageType.single(GrayF32.class));
 	}
@@ -35,6 +35,6 @@ class TestWrapDescribeBriefSo extends GenericDescribeRegionPointChecks<GrayF32> 
 	protected DescribePointGivenRegion<GrayF32, TupleDesc_B> createAlg() {
 		ConfigBrief config = new ConfigBrief();
 		config.fixed = false;
-		return FactoryDescribeRegionPoint.brief(config,GrayF32.class);
+		return FactoryDescribeRegionPoint.brief(config, GrayF32.class);
 	}
 }

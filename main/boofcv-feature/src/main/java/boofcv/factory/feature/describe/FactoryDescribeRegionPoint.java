@@ -236,8 +236,8 @@ public class FactoryDescribeRegionPoint {
 	 * @return Pixel region descriptor
 	 * @see ConfigTemplateDescribe
 	 */
-	public static <T extends ImageGray<T>, D extends TupleDesc>
-	DescribePointGivenRegion<T, D> template( @Nullable ConfigTemplateDescribe config, Class<T> imageType ) {
+	public static <T extends ImageGray<T>, TD extends TupleDesc<TD>>
+	DescribePointGivenRegion<T, TD> template( @Nullable ConfigTemplateDescribe config, Class<T> imageType ) {
 		if (config == null)
 			config = new ConfigTemplateDescribe();
 
@@ -261,8 +261,8 @@ public class FactoryDescribeRegionPoint {
 	 * @see boofcv.alg.feature.describe.DescribePointPixelRegion
 	 */
 	@SuppressWarnings({"unchecked"})
-	public static <T extends ImageGray<T>, D extends TupleDesc>
-	DescribePointGivenRegion<T, D> pixel( int regionWidth, int regionHeight, Class<T> imageType ) {
+	public static <T extends ImageGray<T>, TD extends TupleDesc<TD>>
+	DescribePointGivenRegion<T, TD> pixel( int regionWidth, int regionHeight, Class<T> imageType ) {
 		return new WrapDescribePixelRegion(
 				FactoryDescribePointAlgs.pixelRegion(regionWidth, regionHeight, imageType), imageType);
 	}

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -36,8 +36,8 @@ import java.util.List;
  *
  * @author Peter Abeles
  */
-public interface DescribeImageDense<T extends ImageBase<T>, Desc extends TupleDesc>
-	extends DescriptorInfo<Desc>
+public interface DescribeImageDense<T extends ImageBase<T>, TD extends TupleDesc<TD>>
+	extends DescriptorInfo<TD>
 {
 	/**
 	 * Processes the image and computes the dense image features.
@@ -54,7 +54,7 @@ public interface DescribeImageDense<T extends ImageBase<T>, Desc extends TupleDe
 	 *
 	 * @return list of descriptions
 	 */
-	List<Desc> getDescriptions();
+	List<TD> getDescriptions();
 
 	/**
 	 * <p>Returns a list of locations that the descriptors are computed at</p>

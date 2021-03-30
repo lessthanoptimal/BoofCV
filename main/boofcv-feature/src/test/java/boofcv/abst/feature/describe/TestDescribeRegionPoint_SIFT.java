@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -33,7 +33,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 /**
  * @author Peter Abeles
  */
-class TestDescribeRegionPoint_SIFT extends GenericDescribeRegionPointChecks<GrayF32> {
+class TestDescribeRegionPoint_SIFT extends GenericDescribeRegionPointChecks<GrayF32, TupleDesc_F64> {
 
 	TestDescribeRegionPoint_SIFT() {
 		super(ImageType.single(GrayF32.class));
@@ -47,16 +47,15 @@ class TestDescribeRegionPoint_SIFT extends GenericDescribeRegionPointChecks<Gray
 		assertTrue(alg.isScalable());
 
 		TupleDesc_F64 desc = alg.createDescription();
-		assertEquals(128,desc.size());
+		assertEquals(128, desc.size());
 
-		assertEquals(2*alg.describe.getCanonicalRadius(),alg.getCanonicalWidth(),1e-8);
+		assertEquals(2*alg.describe.getCanonicalRadius(), alg.getCanonicalWidth(), 1e-8);
 	}
 
 	@Test
 	void process() {
-
-		GrayF32 image = new GrayF32(640,480);
-		GImageMiscOps.fillUniform(image,rand,0,200);
+		GrayF32 image = new GrayF32(640, 480);
+		GImageMiscOps.fillUniform(image, rand, 0, 200);
 
 		DescribeRegionPoint_SIFT<GrayF32> alg = declare();
 		alg.setImage(image);
@@ -66,32 +65,31 @@ class TestDescribeRegionPoint_SIFT extends GenericDescribeRegionPointChecks<Gray
 		TupleDesc_F64 desc2 = alg.createDescription();
 
 		// same location, but different orientations and scales
-		assertTrue(alg.process(100,120,0.5,10,desc0));
-		assertTrue(alg.process(100,50,-1.1,10,desc1));
-		assertTrue(alg.process(100,50,0.5,7,desc2));
+		assertTrue(alg.process(100, 120, 0.5, 10, desc0));
+		assertTrue(alg.process(100, 50, -1.1, 10, desc1));
+		assertTrue(alg.process(100, 50, 0.5, 7, desc2));
 
 		// should be 3 different descriptions
-		assertNotEquals(desc0.getDouble(0),desc1.getDouble(0),1e-6);
-		assertNotEquals(desc0.getDouble(0),desc2.getDouble(0),1e-6);
-		assertNotEquals(desc1.getDouble(0),desc2.getDouble(0),1e-6);
+		assertNotEquals(desc0.getDouble(0), desc1.getDouble(0), 1e-6);
+		assertNotEquals(desc0.getDouble(0), desc2.getDouble(0), 1e-6);
+		assertNotEquals(desc1.getDouble(0), desc2.getDouble(0), 1e-6);
 
 		// see if it blows up along the image border
-		assertTrue(alg.process(0,120,0.5,10,desc0));
-		assertTrue(alg.process(100,0,0.5,10,desc0));
-		assertTrue(alg.process(639,120,0.5,10,desc0));
-		assertTrue(alg.process(100,479,0.5,10,desc0));
+		assertTrue(alg.process(0, 120, 0.5, 10, desc0));
+		assertTrue(alg.process(100, 0, 0.5, 10, desc0));
+		assertTrue(alg.process(639, 120, 0.5, 10, desc0));
+		assertTrue(alg.process(100, 479, 0.5, 10, desc0));
 	}
 
-	static void assertNotEquals( double a , double b , double tol ) {
-		assertTrue(Math.abs(a-b)>tol);
+	static void assertNotEquals( double a, double b, double tol ) {
+		assertTrue(Math.abs(a - b) > tol);
 	}
 
 	private DescribeRegionPoint_SIFT<GrayF32> declare() {
+		SiftScaleSpace ss = new SiftScaleSpace(0, 4, 3, 1.6);
+		DescribePointSift<GrayF32> desc = FactoryDescribePointAlgs.sift(null, GrayF32.class);
 
-		SiftScaleSpace ss = new SiftScaleSpace(0,4,3,1.6);
-		DescribePointSift<GrayF32> desc = FactoryDescribePointAlgs.sift(null,GrayF32.class);
-
-		return new DescribeRegionPoint_SIFT<>(ss,desc,GrayF32.class);
+		return new DescribeRegionPoint_SIFT<>(ss, desc, GrayF32.class);
 	}
 
 	@Override

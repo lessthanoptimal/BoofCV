@@ -27,12 +27,12 @@ import boofcv.struct.image.ImageType;
  *
  * @author Peter Abeles
  */
-public class DescribeRegionPointDefault<T extends ImageBase<T>, Desc extends TupleDesc>
-		implements DescribePointGivenRegion<T,Desc> {
+public class DescribeRegionPointDefault<T extends ImageBase<T>, TD extends TupleDesc<TD>>
+		implements DescribePointGivenRegion<T, TD> {
 
 	@Override public void setImage( T image ) {}
 
-	@Override public boolean process( double x, double y, double orientation, double radius, Desc description ) {
+	@Override public boolean process( double x, double y, double orientation, double radius, TD description ) {
 		return false;
 	}
 
@@ -40,6 +40,6 @@ public class DescribeRegionPointDefault<T extends ImageBase<T>, Desc extends Tup
 	@Override public boolean isOriented() { return false; }
 	@Override public ImageType<T> getImageType() { return null; }
 	@Override public double getCanonicalWidth() { return 0; }
-	@Override public Desc createDescription() { return null; }
-	@Override public Class<Desc> getDescriptionType() { return null; }
+	@Override public TD createDescription() { return null; }
+	@Override public Class<TD> getDescriptionType() { return null; }
 }

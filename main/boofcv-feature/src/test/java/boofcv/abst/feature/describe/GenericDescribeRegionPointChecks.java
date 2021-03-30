@@ -32,11 +32,11 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 /**
  * @author Peter Abeles
  */
-abstract class GenericDescribeRegionPointChecks<T extends ImageBase<T>> extends BoofStandardJUnit {
-
+abstract class GenericDescribeRegionPointChecks<T extends ImageBase<T>, TD extends TupleDesc<TD>>
+		extends BoofStandardJUnit {
 	protected ImageType<T> imageType;
 
-	protected abstract DescribePointGivenRegion<T, ?> createAlg();
+	protected abstract DescribePointGivenRegion<T, TD> createAlg();
 
 	protected GenericDescribeRegionPointChecks( ImageType<T> imageType ) {
 		this.imageType = imageType;
@@ -60,12 +60,12 @@ abstract class GenericDescribeRegionPointChecks<T extends ImageBase<T>> extends 
 		GImageMiscOps.fill(image.subimage(cx - aradius, cy - aradius, cx + aradius + 1, cy + aradius + 1), 50);
 //		image.set(cx,cy,100); // give it some texture so it doesn't amplify noise
 
-		DescribePointGivenRegion<T, TupleDesc> describe = (DescribePointGivenRegion)createAlg();
+		DescribePointGivenRegion<T, TD> describe = createAlg();
 		describe.setImage(image);
 
-		TupleDesc t1 = describe.createDescription();
+		TD t1 = describe.createDescription();
 		describe.process(cx, cy, 0, radius, t1);
-		TupleDesc t2 = describe.createDescription();
+		TD t2 = describe.createDescription();
 
 		// Moving by 1 pixels should make no difference
 		describe.process(cx + 1, cy, 0, radius, t2);

@@ -18,6 +18,11 @@
 
 package boofcv.struct.feature;
 
+import lombok.Getter;
+import lombok.Setter;
+
+import java.util.Arrays;
+
 /**
  * <p>Description for normalized cross correlation (NCC).  The descriptor's value
  * in a NCC feature is the pixel intensity value minus the mean pixel intensity value.
@@ -26,32 +31,54 @@ package boofcv.struct.feature;
  *
  * @author Peter Abeles
  */
-public class NccFeature extends TupleDesc_F64 {
-
-	/** Mean pixel intensity   Can be used to reconstruct the original values of the template.*/
+public class NccFeature implements TupleDesc<NccFeature> {
+	/** Mean pixel intensity   Can be used to reconstruct the original values of the template. */
 	public double mean;
-	/** standard deviation of pixel intensity*/
+
+	/** standard deviation of pixel intensity */
 	public double sigma;
 
-	public NccFeature(int numFeatures) {
-		super(numFeatures);
+	/** Storage for each element in the feature */
+	public @Getter @Setter double[] data;
+
+	public NccFeature( int numFeatures ) {
+		this.data = new double[numFeatures];
 	}
 
-	protected NccFeature() {
-	}
+	protected NccFeature() {}
 
 	@Override
 	public NccFeature copy() {
-		NccFeature ret = new NccFeature( data.length );
+		NccFeature ret = new NccFeature(data.length);
 		ret.setTo(this);
 		return ret;
 	}
 
-	@Override
-	public void setTo(TupleDesc_F64 source) {
-		super.setTo(source);
-		NccFeature ncc = (NccFeature)source;
-		this.mean = ncc.mean;
-		this.sigma = ncc.sigma;
+	public double get( int index ) {return data[index];}
+
+	public void setTo( double... value ) {
+		System.arraycopy(value, 0, this.data, 0, this.data.length);
+	}
+
+	public void fill( double value ) {
+		Arrays.fill(this.data, value);
+	}
+
+	@Override public void setTo( NccFeature src ) {
+		System.arraycopy(src.data, 0, data, 0, data.length);
+		this.mean = src.mean;
+		this.sigma = src.sigma;
+	}
+
+	@Override public /**/double /**/getDouble( int index ) {
+		return data[index];
+	}
+
+	@Override public int size() {
+		return data.length;
+	}
+
+	@Override public NccFeature newInstance() {
+		return new NccFeature(data.length);
 	}
 }

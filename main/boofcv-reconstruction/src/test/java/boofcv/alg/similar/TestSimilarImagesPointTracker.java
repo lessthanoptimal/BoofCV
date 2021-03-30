@@ -23,7 +23,6 @@ import boofcv.abst.tracker.PointTrackerDefault;
 import boofcv.alg.similar.SimilarImagesPointTracker.Frame;
 import boofcv.alg.similar.SimilarImagesPointTracker.Matches;
 import boofcv.alg.structure.GenericLookUpSimilarImagesChecks;
-import boofcv.alg.structure.LookUpSimilarImages;
 import boofcv.struct.feature.AssociatedIndex;
 import boofcv.struct.image.GrayU8;
 import boofcv.struct.image.ImageDimension;
@@ -43,20 +42,19 @@ import static org.junit.jupiter.api.Assertions.*;
  * @author Peter Abeles
  */
 class TestSimilarImagesPointTracker extends GenericLookUpSimilarImagesChecks {
-
 	/**
 	 * Fill in the algorithm with dummy values to test the contracts
 	 */
-	@Override public LookUpSimilarImages createFullyLoaded() {
+	@Override public SimilarImagesPointTracker createFullyLoaded() {
 		int numFeatures = 11;
 		var alg = new SimilarImagesPointTracker();
 
-		alg.initialize(200,210);
+		alg.initialize(200, 210);
 
 		alg.frames.resize(5);
 		for (int i = 0; i < alg.frames.size; i++) {
 			SimilarImagesPointTracker.Frame f = alg.frames.get(i);
-			f.frameID = ""+i;
+			f.frameID = "" + i;
 			alg.frameMap.put(f.frameID, f);
 			f.initActive(numFeatures);
 			for (int j = 0; j < i; j++) {
@@ -80,14 +78,13 @@ class TestSimilarImagesPointTracker extends GenericLookUpSimilarImagesChecks {
 		return alg;
 	}
 
-	@Test
-	void processFrame() {
+	@Test void processFrame() {
 		final int numFrames = 20;
 
 		var tracker = new MockTracker();
 		var alg = new SimilarImagesPointTracker();
 
-		alg.initialize(200,210);
+		alg.initialize(200, 210);
 		for (int i = 0; i < numFrames; i++) {
 			tracker.process(null);
 			alg.processFrame(tracker);
@@ -100,50 +97,48 @@ class TestSimilarImagesPointTracker extends GenericLookUpSimilarImagesChecks {
 		assertEquals(numFrames, imageIds.size());
 		List<String> similarIds = new ArrayList<>();
 		for (int targetIdx = alg.searchRadius; targetIdx < numFrames - alg.searchRadius; targetIdx++) {
-			String targetId = ""+targetIdx;
+			String targetId = "" + targetIdx;
 
-			alg.lookupPixelFeats(targetId,features);
+			alg.lookupPixelFeats(targetId, features);
 			assertEquals(tracker.numTracks, features.size);
 			for (int i = 0; i < features.size(); i++) {
-				assertEquals(i,features.get(i).x, UtilEjml.TEST_F64);
-				assertEquals(i+1,features.get(i).y, UtilEjml.TEST_F64);
+				assertEquals(i, features.get(i).x, UtilEjml.TEST_F64);
+				assertEquals(i + 1, features.get(i).y, UtilEjml.TEST_F64);
 			}
 
-			alg.findSimilar(""+targetIdx, similarIds);
+			alg.findSimilar("" + targetIdx, similarIds);
 			// 6 is expected and not 10 because every time 5 less tracks out of 20 match.
 			assertEquals(6, similarIds.size());
-			for( String similarId : similarIds ) {
+			for (String similarId : similarIds) {
 				int similarIdx = Integer.parseInt(similarId);
 				// the expected number of matches is dependent on how many frames apart they are
-				int expected = 20-5*Math.abs(similarIdx-targetIdx);
-				assertTrue(alg.lookupMatches(targetId,similarId,associated));
+				int expected = 20 - 5*Math.abs(similarIdx - targetIdx);
+				assertTrue(alg.lookupMatches(targetId, similarId, associated));
 				assertEquals(expected, associated.size());
 			}
 		}
 	}
 
-	@Test
-	void initialize() {
+	@Test void initialize() {
 		var alg = new SimilarImagesPointTracker();
 
-		alg.initialize(50,10);
-		assertEquals(50,alg.imageWidth);
-		assertEquals(10,alg.imageHeight);
+		alg.initialize(50, 10);
+		assertEquals(50, alg.imageWidth);
+		assertEquals(10, alg.imageHeight);
 
 		alg.matches.grow();
 		alg.frames.grow();
-		alg.frameMap.put("asdasd",alg.frames.grow());
+		alg.frameMap.put("asdasd", alg.frames.grow());
 
-		alg.initialize(51,12);
-		assertEquals(51,alg.imageWidth);
-		assertEquals(12,alg.imageHeight);
+		alg.initialize(51, 12);
+		assertEquals(51, alg.imageWidth);
+		assertEquals(12, alg.imageHeight);
 		assertEquals(0, alg.matches.size);
 		assertEquals(0, alg.frames.size);
 		assertEquals(0, alg.frameMap.size());
 	}
 
-	@Test
-	void createFrameSaveObservations() {
+	@Test void createFrameSaveObservations() {
 		var tracker = new MockTracker();
 		var alg = new SimilarImagesPointTracker();
 
@@ -155,16 +150,16 @@ class TestSimilarImagesPointTracker extends GenericLookUpSimilarImagesChecks {
 		assertEquals(1, alg.frameMap.size());
 		assertEquals(1, alg.frames.size);
 		Frame frame = alg.frames.get(0);
-		assertEquals("0",frame.frameID);
+		assertEquals("0", frame.frameID);
 		assertSame(frame, alg.frameMap.get(frame.frameID));
-		assertEquals(tracker.numTracks, frame.size());
+		assertEquals(tracker.numTracks, frame.totalObservations());
 
 		var foundPixel = new Point2D_F64();
-		for (int i = 0; i < frame.size(); i++) {
+		for (int i = 0; i < frame.totalObservations(); i++) {
 			assertEquals(i, frame.getID(i));
-			frame.getPixel(i,foundPixel);
-			assertEquals(i,foundPixel.x, UtilEjml.TEST_F64);
-			assertEquals(i+1,foundPixel.y, UtilEjml.TEST_F64);
+			frame.getPixel(i, foundPixel);
+			assertEquals(i, foundPixel.x, UtilEjml.TEST_F64);
+			assertEquals(i + 1, foundPixel.y, UtilEjml.TEST_F64);
 		}
 
 		// see if it can handle adding another frame
@@ -173,16 +168,15 @@ class TestSimilarImagesPointTracker extends GenericLookUpSimilarImagesChecks {
 		assertEquals(2, alg.frameMap.size());
 		assertEquals(2, alg.frames.size);
 		frame = alg.frames.get(1);
-		assertEquals("1",frame.frameID);
+		assertEquals("1", frame.frameID);
 		assertSame(frame, alg.frameMap.get(frame.frameID));
-		assertEquals(tracker.numTracks, frame.size());
+		assertEquals(tracker.numTracks, frame.totalObservations());
 	}
 
 	/**
 	 * No common features so no match should be created.
 	 */
-	@Test
-	void findRelatedPastFrames_no_common() {
+	@Test void findRelatedPastFrames_no_common() {
 		var tracker = new MockTracker();
 		var alg = new SimilarImagesPointTracker();
 
@@ -194,9 +188,9 @@ class TestSimilarImagesPointTracker extends GenericLookUpSimilarImagesChecks {
 		// make the most recent incompatible with the previous
 		Frame current = alg.frames.get(1);
 		current.id_to_index.clear();
-		for (int i = 0; i < current.size(); i++) {
-			current.ids[i] = 100+i;
-			current.id_to_index.put(current.ids[i],i);
+		for (int i = 0; i < current.totalObservations(); i++) {
+			current.ids[i] = 100 + i;
+			current.id_to_index.put(current.ids[i], i);
 		}
 
 		alg.findRelatedPastFrames(current);
@@ -208,8 +202,7 @@ class TestSimilarImagesPointTracker extends GenericLookUpSimilarImagesChecks {
 	/**
 	 * All but one observation match
 	 */
-	@Test
-	void findRelatedPastFrames_matched() {
+	@Test void findRelatedPastFrames_matched() {
 		var tracker = new MockTracker();
 		var alg = new SimilarImagesPointTracker();
 
@@ -222,9 +215,9 @@ class TestSimilarImagesPointTracker extends GenericLookUpSimilarImagesChecks {
 		Frame current = alg.frames.get(1);
 		current.id_to_index.remove(15);
 		current.ids[15] = 115;
-		current.id_to_index.put(115,15);
+		current.id_to_index.put(115, 15);
 		// randomize the ID order to make things more interesting. This will mess up which observation they point to
-		PrimitiveArrays.shuffle(current.ids,0,current.ids.length,rand);
+		PrimitiveArrays.shuffle(current.ids, 0, current.ids.length, rand);
 
 		alg.findRelatedPastFrames(current);
 		for (int i = 0; i < alg.frames.size; i++) {
@@ -233,34 +226,39 @@ class TestSimilarImagesPointTracker extends GenericLookUpSimilarImagesChecks {
 			Matches matches = alg.matches.get(0);
 			assertEquals(19, matches.size());
 			assertNotSame(matches.frameSrc, matches.frameDst);
-			assertTrue(matches.frameSrc==f || matches.frameDst==f);
+			assertTrue(matches.frameSrc == f || matches.frameDst == f);
 			// checks to see if the ids are consistent is done in the system check above
 		}
 	}
 
-	@Test
-	void getImageIDs() {
+	/**
+	 * Nake sure that this configuration is used correctly internally
+	 */
+	@Test void minimumCommonTracks() {
+		fail("implement");
+	}
+
+	@Test void getImageIDs() {
 		var alg = new SimilarImagesPointTracker();
 		for (int i = 0; i < 5; i++) {
-			alg.frames.grow().frameID = ""+i;
+			alg.frames.grow().frameID = "" + i;
 		}
 		List<String> found = alg.getImageIDs();
-		assertEquals(5,found.size());
+		assertEquals(5, found.size());
 		for (int i = 0; i < 5; i++) {
-			assertEquals(""+i,found.get(i));
+			assertEquals("" + i, found.get(i));
 		}
 	}
 
-	@Test
-	void lookupShape() {
+	@Test void lookupShape() {
 		var alg = new SimilarImagesPointTracker();
-		alg.initialize(123,321);
+		alg.initialize(123, 321);
 
 		ImageDimension shape = new ImageDimension();
 		// always returns the same for all images since it's constant
-		alg.lookupShape("sadfsf",shape);
-		assertEquals(123,shape.width);
-		assertEquals(321,shape.height);
+		alg.lookupShape("sadfsf", shape);
+		assertEquals(123, shape.width);
+		assertEquals(321, shape.height);
 	}
 
 	@Nested
@@ -268,14 +266,12 @@ class TestSimilarImagesPointTracker extends GenericLookUpSimilarImagesChecks {
 		/**
 		 * Did some hackery to force the value of no-matches ot be -1
 		 */
-		@Test
-		void valueOfNoMatch() {
+		@Test void valueOfNoMatch() {
 			var frame = new Frame();
-			assertEquals(-1,frame.id_to_index.get(345354));
+			assertEquals(-1, frame.id_to_index.get(345354));
 		}
 
-		@Test
-		void getPixel() {
+		@Test void getPixel() {
 			var frame = new Frame();
 			frame.initActive(5);
 
@@ -284,25 +280,24 @@ class TestSimilarImagesPointTracker extends GenericLookUpSimilarImagesChecks {
 
 			var found = new Point2D_F64();
 
-			frame.getPixel(1,found);
-			assertEquals(3,found.x, UtilEjml.TEST_F64);
-			assertEquals(6,found.y, UtilEjml.TEST_F64);
+			frame.getPixel(1, found);
+			assertEquals(3, found.x, UtilEjml.TEST_F64);
+			assertEquals(6, found.y, UtilEjml.TEST_F64);
 		}
 	}
 
-	private static class MockTracker extends PointTrackerDefault<GrayU8>
-	{
+	private static class MockTracker extends PointTrackerDefault<GrayU8> {
 		long offsetID = 0;
 		int numTracks = 20;
 		DogArray<PointTrack> tracks = new DogArray<>(PointTrack::new);
 
 		@Override
-		public void process(GrayU8 image) {
+		public void process( GrayU8 image ) {
 			tracks.reset();
 			for (int i = 0; i < numTracks; i++) {
 				PointTrack t = tracks.grow();
-				t.featureId = offsetID+i;
-				t.pixel.setTo(i,i+1);
+				t.featureId = offsetID + i;
+				t.pixel.setTo(i, i + 1);
 			}
 
 			super.process(image);
@@ -314,8 +309,8 @@ class TestSimilarImagesPointTracker extends GenericLookUpSimilarImagesChecks {
 		}
 
 		@Override
-		public List<PointTrack> getActiveTracks(List<PointTrack> list) {
-			if( list == null )
+		public List<PointTrack> getActiveTracks( List<PointTrack> list ) {
+			if (list == null)
 				list = new ArrayList<>();
 			else
 				list.clear();

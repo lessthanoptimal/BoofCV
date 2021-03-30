@@ -26,13 +26,13 @@ import boofcv.struct.image.ImageType;
 /**
  * @author Peter Abeles
  */
-class TestWrapDescribeSurf extends GenericDescribeRegionPointChecks<GrayF32> {
+class TestWrapDescribeSurf extends GenericDescribeRegionPointChecks<GrayF32, TupleDesc_F64> {
 	TestWrapDescribeSurf() {
 		super(ImageType.single(GrayF32.class));
 	}
 
 	@Override
 	protected DescribePointGivenRegion<GrayF32, TupleDesc_F64> createAlg() {
-		return (DescribePointGivenRegion)FactoryDescribeRegionPoint.surfStable(null,GrayF32.class);
+		return FactoryDescribeRegionPoint.surfStable(null, GrayF32.class);
 	}
 }
