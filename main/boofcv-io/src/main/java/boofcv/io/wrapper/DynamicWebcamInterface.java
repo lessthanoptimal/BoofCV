@@ -31,12 +31,35 @@ import java.lang.reflect.InvocationTargetException;
 public class DynamicWebcamInterface implements WebcamInterface {
 
 	WebcamInterface webcam;
+        private static String cameraPackage = "boofcv.io.webcamcapture.WebcamCaptureWebcamInterface";
 
 	public DynamicWebcamInterface() {
 		try {
-			webcam = loadManager("boofcv.io.webcamcapture.WebcamCaptureWebcamInterface");
+			webcam = loadManager(cameraPackage);
 		} catch( RuntimeException ignore ) {}
 	}
+        /**
+         * Static Function to change webcam backend to GStreamer
+         */
+        public static void useGStreamer(){
+            setCameraPackage("boofcv.io.gstwebcamcapture.WebcamCaptureWebcamInterface");
+        }
+        
+        /**
+         * Static function to change webcam backend to Sarxos
+         */
+        public static void useSarxos(){
+            setCameraPackage("boofcv.io.webcamcapture.WebcamCaptureWebcamInterface");
+        }
+        
+        /**
+         * Static function to se webcam backend to custom package
+         * @param packageName 
+         */
+        public static void setCameraPackage(String packageName){
+            cameraPackage = packageName;
+        }
+        
 
 	@Override
 	public <T extends ImageBase<T>> SimpleImageSequence<T>
