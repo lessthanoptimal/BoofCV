@@ -6,8 +6,9 @@
 package boofcv.io.gstwebcamcapture;
 
 /**
- *
- * @author techgarage
+ * Interface that can listen to cameraClosed events from a webcam
+ * 
+ * @author Devin Willis
  */
 public interface CameraClosedListenerInterface {
     public void cameraClosed(GStreamerCameraInterface cam);

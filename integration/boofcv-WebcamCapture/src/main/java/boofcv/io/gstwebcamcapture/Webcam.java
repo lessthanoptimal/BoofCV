@@ -23,7 +23,7 @@ import org.freedesktop.gstreamer.device.DeviceMonitor;
 
 /**
  *
- * @author techgarage
+ * @author Devin Willis
  */
 public class Webcam implements GStreamerCameraInterface, ImageListener, ImageProducer {
 
@@ -37,12 +37,20 @@ public class Webcam implements GStreamerCameraInterface, ImageListener, ImagePro
     private Dimension[] supportedResolutions;
     private BufferedImage currentImg;
 
+    /**
+     * Creates new webcam given a webcam name
+     * @param deviceName camera name on computer
+     */
     Webcam(String deviceName) {
         cameraName = deviceName;
         this.addCameraOpenListener(GStreamerManager.getManager());
         this.addCameraCloseListener(GStreamerManager.getManager());
     }
 
+    /**
+     * Gets and instantiates a list of webcams for every video source on the computer
+     * @return 
+     */
     public static List<Webcam> getWebcams() {
         List<Device> devices = GStreamerManager.getManager().getDevices();
         List<Webcam> webcams = new ArrayList<>();
@@ -62,14 +70,26 @@ public class Webcam implements GStreamerCameraInterface, ImageListener, ImagePro
         return webcams;
     }
 
+    /**
+     * Gets all webcams on system and returns the first in the list
+     * @return 
+     */
     public static Webcam getDefault() {
         return getWebcams().get(0);
     }
 
+    /**
+     * Static method to create and return a webcam with the given name
+     * @param deviceName
+     * @return 
+     */
     public static Webcam getCamera(String deviceName) {
         return new Webcam(deviceName);
     }
 
+    /**
+     * Construct GStreamer string given camera parameters
+     */
     private void constructString() {
         if (OSHelper.isWindows()) {
             String C270CameraCaps = "video/x-raw, width=" + resolution.width + ", height=" + resolution.height + ", format=RGBA";
@@ -83,6 +103,10 @@ public class Webcam implements GStreamerCameraInterface, ImageListener, ImagePro
         }
     }
 
+    /**
+     * Opens camera by calling all camera open listeners
+     * @return 
+     */
     @Override
     public boolean open() {
         if (resolution == null) {
@@ -95,13 +119,17 @@ public class Webcam implements GStreamerCameraInterface, ImageListener, ImagePro
         return true;
     }
 
+    /**
+     * Return current pipeline object
+     * @return 
+     */
     @Override
     public Pipeline getPipeline() {
         return cameraPipeline;
     }
 
     /**
-     *
+     * Set current pipeline
      * @param pipeline
      * @return
      */
@@ -111,49 +139,89 @@ public class Webcam implements GStreamerCameraInterface, ImageListener, ImagePro
         return true;
     }
 
+    /**
+     * Add new camera open listener
+     * @param listener
+     * @return 
+     */
     @Override
     public boolean addCameraOpenListener(CameraOpenListenerInterface listener) {
         cameraOpenListeners.add(listener);
         return true;
     }
 
+    /**
+     * Return generated GST Pipeline string
+     * @return 
+     */
     @Override
     public String getPipelineString() {
         return stringPipeline;
     }
 
+    /**
+     * Return name of camera
+     * @return 
+     */
     @Override
     public String getName() {
         return cameraName;
     }
 
+    /**
+     * Return current image pipeline which generates images
+     * @return 
+     */
     @Override
     public GStreamerImagePipeline getImagePipeline() {
         return imagePipeline;
     }
 
+    /**
+     * Set current image pipeline for handling images from pipeline
+     * @param imagePipeline
+     * @return 
+     */
     @Override
     public boolean setImagePipeline(GStreamerImagePipeline imagePipeline) {
         this.imagePipeline = imagePipeline;
         return true;
     }
 
+    /**
+     * Return current resolution of the camera
+     * @return 
+     */
     @Override
     public Dimension getResolution() {
         return resolution;
     }
 
+    /**
+     * Return list of potential resolutions
+     * @return 
+     */
     @Override
     public Dimension[] getCustomViewSizes() {
         return supportedResolutions;
     }
 
+    /**
+     * Set list of potential resolutions
+     * @param dimensionList
+     * @return 
+     */
     @Override
     public boolean setCustomViewSizes(Dimension[] dimensionList) {
         supportedResolutions = dimensionList;
         return true;
     }
 
+    /**
+     * Set current resolution
+     * @param resolution
+     * @return 
+     */
     @Override
     public boolean setViewSize(Dimension resolution) {
         if (supportedResolutions != null) {
@@ -168,6 +236,10 @@ public class Webcam implements GStreamerCameraInterface, ImageListener, ImagePro
         return true;
     }
 
+    /**
+     * Called when a new image has been received by the Image Pipeline
+     * @param image 
+     */
     @Override
     public void newImage(BufferedImage image) {
         currentImg = image;
@@ -178,17 +250,30 @@ public class Webcam implements GStreamerCameraInterface, ImageListener, ImagePro
 
     private ArrayList<ImageListener> imageListeners = new ArrayList<>();
 
+    /**
+     * Adds a new image listener that receives all new images
+     * @param imageListener
+     * @return 
+     */
     @Override
     public ImageProducer addImageListener(ImageListener imageListener) {
         imageListeners.add(imageListener);
         return this;
     }
 
+    /**
+     * Return instance of camera device
+     * @return 
+     */
     @Override
     public GStreamerCameraInterface getDevice() {
         return this;
     }
 
+    /**
+     * Return an image per request
+     * @return 
+     */
     @Override
     public BufferedImage getImage() {
         while(currentImg==null){
@@ -201,6 +286,10 @@ public class Webcam implements GStreamerCameraInterface, ImageListener, ImagePro
         return currentImg;
     }
 
+    /**
+     * Close camera by calling all camera closed interfaces
+     * @return 
+     */
     @Override
     public boolean close() {
         for (CameraClosedListenerInterface listener : cameraCloseListeners) {
@@ -209,12 +298,21 @@ public class Webcam implements GStreamerCameraInterface, ImageListener, ImagePro
         return true;
     }
 
+    /**
+     * Add new camera closed listener
+     * @param manager
+     * @return 
+     */
     @Override
     public boolean addCameraCloseListener(CameraClosedListenerInterface manager) {
         cameraCloseListeners.add(manager);
         return true;
     }
 
+    /**
+     * Get current resolution
+     * @return 
+     */
     @Override
     public Dimension getViewSize() {
         return this.getResolution();

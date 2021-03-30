@@ -20,8 +20,8 @@ import org.freedesktop.gstreamer.PadProbeInfo;
 import org.freedesktop.gstreamer.PadProbeReturn;
 
 /**
- *
- * @author techgarage
+ * Responsible for receiving images from GST and calling all image listeners
+ * @author Devin Willis
  */
 public class GStreamerImagePipeline implements Pad.PROBE, ImageProducer {
 
@@ -30,12 +30,24 @@ public class GStreamerImagePipeline implements Pad.PROBE, ImageProducer {
     private final int[] data;
     private Element identity;
 
+    /**
+     * Creates a new GStreamerImagePipeline
+     * @param width Width of Camera
+     * @param height Height of Camera
+     * @param identity GStreamer Identity Element from Pipeline
+     */
     public GStreamerImagePipeline(int width, int height, Element identity) {
         image = new BufferedImage(width, height, BufferedImage.TYPE_INT_BGR);
         data = ((DataBufferInt) (image.getRaster().getDataBuffer())).getData();
         this.identity = identity;
     }
 
+    /**
+     * Probe callback function that receives and process image buffer from GST
+     * @param pad
+     * @param info
+     * @return 
+     */
     @Override
     public PadProbeReturn probeCallback(Pad pad, PadProbeInfo info) {
 
@@ -67,6 +79,9 @@ public class GStreamerImagePipeline implements Pad.PROBE, ImageProducer {
         return PadProbeReturn.OK;
     }
 
+    /**
+     * processes image and sends to all image listeners
+     */
     private void process() {
         for (ImageListener imageListener : imageListeners) {
             ColorModel cm = image.getColorModel();
@@ -80,6 +95,11 @@ public class GStreamerImagePipeline implements Pad.PROBE, ImageProducer {
 
     ArrayList<ImageListener> imageListeners = new ArrayList<ImageListener>();
 
+    /**
+     * Adds image listener to ImagePipeline class
+     * @param imageListener
+     * @return 
+     */
     @Override
     public ImageProducer addImageListener(ImageListener imageListener) {
         imageListeners.add(imageListener);

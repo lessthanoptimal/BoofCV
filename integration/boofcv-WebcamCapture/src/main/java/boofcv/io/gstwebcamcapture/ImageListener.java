@@ -8,8 +8,8 @@ package boofcv.io.gstwebcamcapture;
 import java.awt.image.BufferedImage;
 
 /**
- *
- * @author willi
+ * Image listener to receive new images from Image Producers
+ * @author Devin Willis
  */
 public interface ImageListener {
     

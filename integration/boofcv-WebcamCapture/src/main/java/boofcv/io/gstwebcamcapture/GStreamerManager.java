@@ -19,8 +19,8 @@ import org.freedesktop.gstreamer.device.Device;
 import org.freedesktop.gstreamer.device.DeviceMonitor;
 
 /**
- *
- * @author techgarage
+ * GStreamer Manager responsible for control of all pipelines and starting and stopping cameras
+ * @author Devin Willis
  */
 public class GStreamerManager implements CameraOpenListenerInterface, CameraClosedListenerInterface, Runnable {
 
@@ -39,10 +39,17 @@ public class GStreamerManager implements CameraOpenListenerInterface, CameraClos
     private boolean startPipeline = false;
     private DeviceMonitor dm;
 
+    /**
+     * Creates new GStreamerManager and initializes a new DeviceMonitor
+     */
     GStreamerManager() {
         dm = new DeviceMonitor();
     }
 
+    /**
+     * Method to get static reference of GStreamerManager
+     * @return GStreamerManager
+     */
     public static GStreamerManager getManager() {
         if (currentManager == null) {
             Gst.init("GSTManager", "");
@@ -53,11 +60,19 @@ public class GStreamerManager implements CameraOpenListenerInterface, CameraClos
         return currentManager;
     }
 
+    /**
+     * Add camera to GStreamerManager
+     * @param cam
+     * @return 
+     */
     public boolean addCamera(GStreamerCameraInterface cam) {
         cameras.add(cam);
         return true;
     }
 
+    /**
+     * Start Pipeline
+     */
     public void pipelineStart() {
         if (pipelinesStarted == false) {
             startPipeline = true;
@@ -68,6 +83,10 @@ public class GStreamerManager implements CameraOpenListenerInterface, CameraClos
         }
     }
 
+    /**
+     * Get list of video/source devices found by GStreamer
+     * @return 
+     */
     public List<Device> getDevices() {
         int filterId = dm.addFilter("Video/Source", null);
         dm.start();
@@ -82,12 +101,19 @@ public class GStreamerManager implements CameraOpenListenerInterface, CameraClos
         return devices;
     }
 
+    /**
+     * Camera opened called event that restarts the pipeline
+     * @param cam 
+     */
     @Override
     public void cameraOpened(GStreamerCameraInterface cam) {
         addCamera(cam);
         pipelineStart();
     }
 
+    /**
+     * Main thread running the GST main loop
+     */
     @Override
     public void run() {
         while (true) {
@@ -128,6 +154,10 @@ public class GStreamerManager implements CameraOpenListenerInterface, CameraClos
         }
     }
 
+    /**
+     * Camera closed called event that removes the camera from the pipeline
+     * @param cam 
+     */
     @Override
     public void cameraClosed(GStreamerCameraInterface cam) {
         Pipeline pipeline = cam.getPipeline();

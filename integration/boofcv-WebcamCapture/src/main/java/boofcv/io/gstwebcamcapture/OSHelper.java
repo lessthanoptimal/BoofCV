@@ -6,8 +6,8 @@
 package boofcv.io.gstwebcamcapture;
 
 /**
- *
- * @author willi
+ * Provides information on current OS
+ * @author Devin Willis
  */
 public class OSHelper {
 
@@ -30,21 +30,41 @@ public class OSHelper {
         }
     }
 
+    /**
+     * Returns True if Windows
+     * @return 
+     */
     public static boolean isWindows() {
         return OS.contains("win");
     }
 
+    /**
+     * Returns True if Max
+     * @return 
+     */
     public static boolean isMac() {
         return OS.contains("mac");
     }
 
+    /**
+     * Returns True if Unix
+     * @return 
+     */
     public static boolean isUnix() {
         return (OS.contains("nix") || OS.contains("nux") || OS.contains("aix"));
     }
-
+    /**
+     * Returns True if Solaris
+     * @return 
+     */
     public static boolean isSolaris() {
         return OS.contains("sunos");
     }
+    
+    /**
+     * Returns OS as a string
+     * @return 
+     */
     public static String getOS(){
         if (isWindows()) {
             return "win";

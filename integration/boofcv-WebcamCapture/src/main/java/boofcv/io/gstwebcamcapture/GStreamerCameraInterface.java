@@ -8,8 +8,9 @@ import java.awt.Dimension;
 import java.awt.image.BufferedImage;
 import org.freedesktop.gstreamer.Pipeline;
 /**
- *
- * @author techgarage
+ * Interface for GstreamerCameras
+ * 
+ * @author Devin Willis
  */
 public interface GStreamerCameraInterface {
     public Pipeline getPipeline();

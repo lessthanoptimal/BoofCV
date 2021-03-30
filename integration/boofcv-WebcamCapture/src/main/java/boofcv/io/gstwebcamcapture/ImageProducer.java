@@ -6,8 +6,8 @@
 package boofcv.io.gstwebcamcapture;
 
 /**
- *
- * @author willi
+ * Interface for classes that produce buffered images
+ * @author Devin Willis
  */
 public interface ImageProducer {
     
