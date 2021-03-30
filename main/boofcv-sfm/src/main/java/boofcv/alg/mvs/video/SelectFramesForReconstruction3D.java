@@ -19,7 +19,7 @@
 package boofcv.alg.mvs.video;
 
 import boofcv.abst.feature.associate.AssociateDescription2D;
-import boofcv.abst.feature.describe.DescribeRegionPoint;
+import boofcv.abst.feature.describe.DescribePointGivenRegion;
 import boofcv.abst.tracker.PointTrack;
 import boofcv.abst.tracker.PointTracker;
 import boofcv.alg.geo.robust.GenerateHomographyLinear;
@@ -91,7 +91,7 @@ public class SelectFramesForReconstruction3D<T extends ImageBase<T>> implements 
 	@Getter @Setter @Nullable PointTracker<T> tracker;
 
 	/** Descriptors of tracks */
-	final @Getter DescribeRegionPoint<T, TupleDesc_F64> descriptor;
+	final @Getter DescribePointGivenRegion<T, TupleDesc_F64> descriptor;
 
 	/** Associates tracks to each other using their descriptors */
 	@Getter @Setter @Nullable AssociateDescription2D<TupleDesc_F64> associate;
@@ -153,7 +153,7 @@ public class SelectFramesForReconstruction3D<T extends ImageBase<T>> implements 
 
 	@Nullable PrintStream verbose = null;
 
-	public SelectFramesForReconstruction3D( DescribeRegionPoint<T, TupleDesc_F64> descriptor ) {
+	public SelectFramesForReconstruction3D( DescribePointGivenRegion<T, TupleDesc_F64> descriptor ) {
 		this.descriptor = descriptor;
 		this.keyFrame = new Frame();
 		this.currentFrame = new Frame();

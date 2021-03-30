@@ -21,7 +21,7 @@ package boofcv.demonstrations.feature.describe;
 import boofcv.abst.feature.associate.AssociateDescription;
 import boofcv.abst.feature.associate.ScoreAssociation;
 import boofcv.abst.feature.convert.ConvertTupleDesc;
-import boofcv.abst.feature.describe.DescribeRegionPoint;
+import boofcv.abst.feature.describe.DescribePointGivenRegion;
 import boofcv.abst.feature.describe.DescribeRegionPointConvert;
 import boofcv.abst.feature.detect.interest.ConfigFastHessian;
 import boofcv.abst.feature.detect.interest.InterestPointDetector;
@@ -60,7 +60,7 @@ public class CompareConvertedDescriptionsApp {
 	void visualize( String title,
 					BufferedImage image1, BufferedImage image2,
 					InterestPointDetector<GrayF32> detector,
-					DescribeRegionPoint<GrayF32, TD> describe,
+					DescribePointGivenRegion<GrayF32, TD> describe,
 					ScoreAssociation<TD> scorer ) {
 
 		AssociateDescription<TD> assoc = FactoryAssociation.greedy(new ConfigAssociateGreedy(false), scorer);
@@ -90,7 +90,7 @@ public class CompareConvertedDescriptionsApp {
 	public static <TD extends TupleDesc<TD>>
 	FastArray<TD> describeImage( GrayF32 input,
 								 InterestPointDetector<GrayF32> detector,
-								 DescribeRegionPoint<GrayF32, TD> describe,
+								 DescribePointGivenRegion<GrayF32, TD> describe,
 								 List<Point2D_F64> location ) {
 		FastArray<TD> list = new FastArray<>(describe.getDescriptionType());
 
@@ -121,13 +121,13 @@ public class CompareConvertedDescriptionsApp {
 		InterestPointDetector<GrayF32> detector =
 				FactoryInterestPoint.fastHessian(new ConfigFastHessian(1, 10, -1, 2, 9, 4, 4), GrayF32.class);
 
-		DescribeRegionPoint<GrayF32, TupleDesc_F64> describeA =
-				(DescribeRegionPoint)FactoryDescribeRegionPoint.surfStable(null, GrayF32.class);
+		DescribePointGivenRegion<GrayF32, TupleDesc_F64> describeA =
+				(DescribePointGivenRegion)FactoryDescribeRegionPoint.surfStable(null, GrayF32.class);
 
 		ConvertTupleDesc<TupleDesc_F64, TupleDesc_S8> converter =
 				FactoryConvertTupleDesc.real_F64_S8(describeA.createDescription().size());
 
-		DescribeRegionPoint<GrayF32, TupleDesc_S8> describeB =
+		DescribePointGivenRegion<GrayF32, TupleDesc_S8> describeB =
 				new DescribeRegionPointConvert<>(describeA, converter);
 
 		ScoreAssociation<TupleDesc_F64> scoreA = FactoryAssociation.scoreSad(TupleDesc_F64.class);

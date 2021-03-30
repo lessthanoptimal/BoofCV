@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -36,7 +36,7 @@ abstract class GenericDescribeRegionPointChecks<T extends ImageBase<T>> extends 
 
 	protected ImageType<T> imageType;
 
-	protected abstract DescribeRegionPoint<T, ?> createAlg();
+	protected abstract DescribePointGivenRegion<T, ?> createAlg();
 
 	protected GenericDescribeRegionPointChecks( ImageType<T> imageType ) {
 		this.imageType = imageType;
@@ -60,7 +60,7 @@ abstract class GenericDescribeRegionPointChecks<T extends ImageBase<T>> extends 
 		GImageMiscOps.fill(image.subimage(cx - aradius, cy - aradius, cx + aradius + 1, cy + aradius + 1), 50);
 //		image.set(cx,cy,100); // give it some texture so it doesn't amplify noise
 
-		DescribeRegionPoint<T, TupleDesc> describe = (DescribeRegionPoint)createAlg();
+		DescribePointGivenRegion<T, TupleDesc> describe = (DescribePointGivenRegion)createAlg();
 		describe.setImage(image);
 
 		TupleDesc t1 = describe.createDescription();

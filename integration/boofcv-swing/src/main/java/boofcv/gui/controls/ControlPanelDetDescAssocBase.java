@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -20,7 +20,7 @@ package boofcv.gui.controls;
 
 import boofcv.abst.feature.associate.AssociateDescription;
 import boofcv.abst.feature.associate.AssociateDescription2D;
-import boofcv.abst.feature.describe.DescribeRegionPoint;
+import boofcv.abst.feature.describe.DescribePointGivenRegion;
 import boofcv.abst.feature.describe.DescriptorInfo;
 import boofcv.abst.feature.detdesc.DetectDescribePoint;
 import boofcv.abst.feature.detect.interest.InterestPointDetector;
@@ -177,7 +177,7 @@ public abstract class ControlPanelDetDescAssocBase extends StandardAlgConfigPane
 	}
 
 	public <T extends ImageGray<T>, D extends ImageGray<D>>
-	DescribeRegionPoint<T, ?> createDescriptor( Class<T> imageType ) {
+	DescribePointGivenRegion<T, ?> createDescriptor( Class<T> imageType ) {
 		ConfigDescribeRegionPoint c = new ConfigDescribeRegionPoint();
 		c.type = configDetDesc.typeDescribe;
 		c.brief = configDetDesc.describeBrief;

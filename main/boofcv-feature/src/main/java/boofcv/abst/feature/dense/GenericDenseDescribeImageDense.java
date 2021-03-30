@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -18,7 +18,7 @@
 
 package boofcv.abst.feature.dense;
 
-import boofcv.abst.feature.describe.DescribeRegionPoint;
+import boofcv.abst.feature.describe.DescribePointGivenRegion;
 import boofcv.struct.feature.TupleDesc;
 import boofcv.struct.image.ImageBase;
 import boofcv.struct.image.ImageType;
@@ -28,14 +28,14 @@ import org.ddogleg.struct.DogArray;
 import java.util.List;
 
 /**
- * Dense feature computation which uses {@link boofcv.abst.feature.describe.DescribeRegionPoint} internally.
+ * Dense feature computation which uses {@link DescribePointGivenRegion} internally.
  *
  * @author Peter Abeles
  */
 public class GenericDenseDescribeImageDense<T extends ImageBase<T>, Desc extends TupleDesc>
 		implements DescribeImageDense<T, Desc> {
 	// Computes the image feature
-	DescribeRegionPoint<T, Desc> alg;
+	DescribePointGivenRegion<T, Desc> alg;
 
 	// Radius of the "detected" feature
 	double radius;
@@ -56,7 +56,7 @@ public class GenericDenseDescribeImageDense<T extends ImageBase<T>, Desc extends
 	 * @param samplePeriodX How frequently the image is sampled in pixels. X-axis
 	 * @param samplePeriodY How frequently the image is sampled in pixels. Y-axis
 	 */
-	public GenericDenseDescribeImageDense( DescribeRegionPoint<T, Desc> alg,
+	public GenericDenseDescribeImageDense( DescribePointGivenRegion<T, Desc> alg,
 										   double descriptorScale,
 										   double samplePeriodX,
 										   double samplePeriodY ) {

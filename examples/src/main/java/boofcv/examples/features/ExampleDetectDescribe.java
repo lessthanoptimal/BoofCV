@@ -21,7 +21,7 @@ package boofcv.examples.features;
 import boofcv.abst.feature.associate.AssociateDescription;
 import boofcv.abst.feature.associate.ScoreAssociation;
 import boofcv.abst.feature.describe.ConfigBrief;
-import boofcv.abst.feature.describe.DescribeRegionPoint;
+import boofcv.abst.feature.describe.DescribePointGivenRegion;
 import boofcv.abst.feature.detdesc.DetectDescribePoint;
 import boofcv.abst.feature.detect.interest.ConfigFastHessian;
 import boofcv.abst.feature.detect.interest.ConfigGeneralDetector;
@@ -82,7 +82,7 @@ public class ExampleDetectDescribe {
 		InterestPointDetector detector = FactoryInterestPoint.wrapPoint(corner, 1, imageType, derivType);
 
 		// describe points using BRIEF
-		DescribeRegionPoint describe = FactoryDescribeRegionPoint.brief(new ConfigBrief(true), imageType);
+		DescribePointGivenRegion describe = FactoryDescribeRegionPoint.brief(new ConfigBrief(true), imageType);
 
 		// Combine together.
 		// NOTE: orientation will not be estimated

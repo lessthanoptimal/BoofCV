@@ -22,7 +22,7 @@ import boofcv.abst.feature.describe.*;
 import boofcv.struct.Configuration;
 
 /**
- * Configuration for creating {@link DescribeRegionPoint}
+ * Configuration for creating {@link DescribePointGivenRegion}
  *
  * @author Peter Abeles
  */

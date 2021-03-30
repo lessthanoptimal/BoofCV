@@ -27,12 +27,12 @@ import boofcv.struct.image.ImageType;
 
 /**
  * Wrapper around {@link boofcv.alg.feature.describe.DescribePointPixelRegion} for
- * {@link DescribeRegionPoint}.
+ * {@link DescribePointGivenRegion}.
  *
  * @author Peter Abeles
  */
 public class WrapDescribePixelRegion<T extends ImageGray<T>, TD extends TupleDesc<TD>>
-		implements DescribeRegionPoint<T, TD> {
+		implements DescribePointGivenRegion<T, TD> {
 	DescribePointPixelRegion<T, TD> alg;
 	ImageType<T> imageType;
 

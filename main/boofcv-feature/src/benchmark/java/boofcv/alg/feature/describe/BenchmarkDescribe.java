@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -18,7 +18,7 @@
 
 package boofcv.alg.feature.describe;
 
-import boofcv.abst.feature.describe.DescribeRegionPoint;
+import boofcv.abst.feature.describe.DescribePointGivenRegion;
 import boofcv.alg.feature.describe.brief.FactoryBriefDefinition;
 import boofcv.alg.filter.derivative.GImageDerivativeOps;
 import boofcv.alg.misc.GImageMiscOps;
@@ -144,7 +144,7 @@ public class BenchmarkDescribe<I extends ImageGray<I>, D extends ImageGray<D>, I
 		process(FactoryDescribeRegionPoint.sift(null, null, imageType));
 	}
 
-	public <PD extends TupleDesc> void process( DescribeRegionPoint alg ) {
+	public <PD extends TupleDesc> void process( DescribePointGivenRegion alg ) {
 		if (alg.getImageType().getFamily() == ImageType.Family.GRAY)
 			alg.setImage(gray);
 		else

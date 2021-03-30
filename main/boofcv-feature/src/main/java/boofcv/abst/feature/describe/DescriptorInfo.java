@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -25,19 +25,19 @@ import boofcv.struct.feature.TupleDesc;
  *
  * @author Peter Abeles
  */
-public interface DescriptorInfo<Desc extends TupleDesc> {
+public interface DescriptorInfo<Desc extends TupleDesc<Desc>> {
 
 	/**
 	 * Creates new description instance which can be processed by this class
 	 *
 	 * @return New descriptor
 	 */
-	public Desc createDescription();
+	Desc createDescription();
 
 	/**
 	 * The type of region descriptor generated
 	 *
 	 * @return Returns the descriptor type.
 	 */
-	public Class<Desc> getDescriptionType();
+	Class<Desc> getDescriptionType();
 }

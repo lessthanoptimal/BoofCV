@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -19,7 +19,7 @@
 package boofcv.demonstrations.feature.associate;
 
 import boofcv.abst.feature.associate.*;
-import boofcv.abst.feature.describe.DescribeRegionPoint;
+import boofcv.abst.feature.describe.DescribePointGivenRegion;
 import boofcv.abst.feature.detect.interest.InterestPointDetector;
 import boofcv.abst.feature.orientation.OrientationImage;
 import boofcv.abst.feature.orientation.OrientationIntegral;
@@ -65,7 +65,7 @@ public class VisualizeAssociationScoreApp<T extends ImageGray<T>, D extends Imag
 		extends DemonstrationBase {
 	// These classes process the input images and compute association score
 	InterestPointDetector<T> detector;
-	DescribeRegionPoint descriptor;
+	DescribePointGivenRegion descriptor;
 	OrientationImage<T> orientation;
 
 	// copies of input image

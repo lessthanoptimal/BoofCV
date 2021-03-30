@@ -24,22 +24,22 @@ import boofcv.struct.image.ImageGray;
 import boofcv.struct.image.ImageType;
 
 /**
- * Converts the region descriptor type from the {@link DescribeRegionPoint} into the desired output using a
+ * Converts the region descriptor type from the {@link DescribePointGivenRegion} into the desired output using a
  * {@link ConvertTupleDesc}.
  *
  * @author Peter Abeles
  */
 public class DescribeRegionPointConvert<T extends ImageGray<T>, In extends TupleDesc<In>, Out extends TupleDesc<Out>>
-		implements DescribeRegionPoint<T, Out> {
+		implements DescribePointGivenRegion<T, Out> {
 	// Computers the description
-	DescribeRegionPoint<T, In> original;
+	DescribePointGivenRegion<T, In> original;
 	// Change the description type
 	ConvertTupleDesc<In, Out> converter;
 
 	// internal storage for the original descriptor
 	In storage;
 
-	public DescribeRegionPointConvert( DescribeRegionPoint<T, In> original,
+	public DescribeRegionPointConvert( DescribePointGivenRegion<T, In> original,
 									   ConvertTupleDesc<In, Out> converter ) {
 		this.original = original;
 		this.converter = converter;

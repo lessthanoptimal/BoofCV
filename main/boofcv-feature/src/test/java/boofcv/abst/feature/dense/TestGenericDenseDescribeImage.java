@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -18,7 +18,7 @@
 
 package boofcv.abst.feature.dense;
 
-import boofcv.abst.feature.describe.DescribeRegionPoint;
+import boofcv.abst.feature.describe.DescribePointGivenRegion;
 import boofcv.struct.feature.TupleDesc;
 import boofcv.struct.feature.TupleDesc_F64;
 import boofcv.struct.image.GrayU8;
@@ -114,7 +114,7 @@ public class TestGenericDenseDescribeImage extends BoofStandardJUnit {
 		assertTrue(found07b > found10);
 	}
 
-	public static class DummyFeature implements DescribeRegionPoint {
+	public static class DummyFeature implements DescribePointGivenRegion {
 
 		ImageType type = ImageType.single(GrayU8.class);
 		double inputRadius;

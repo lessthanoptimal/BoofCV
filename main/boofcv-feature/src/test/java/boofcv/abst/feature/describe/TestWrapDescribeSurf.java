@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -32,7 +32,7 @@ class TestWrapDescribeSurf extends GenericDescribeRegionPointChecks<GrayF32> {
 	}
 
 	@Override
-	protected DescribeRegionPoint<GrayF32, TupleDesc_F64> createAlg() {
-		return (DescribeRegionPoint)FactoryDescribeRegionPoint.surfStable(null,GrayF32.class);
+	protected DescribePointGivenRegion<GrayF32, TupleDesc_F64> createAlg() {
+		return (DescribePointGivenRegion)FactoryDescribeRegionPoint.surfStable(null,GrayF32.class);
 	}
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -19,7 +19,7 @@
 package boofcv.alg.sfm.d3;
 
 import boofcv.abst.feature.associate.AssociateDescription2D;
-import boofcv.abst.feature.describe.DescribeRegionPoint;
+import boofcv.abst.feature.describe.DescribePointGivenRegion;
 import boofcv.abst.geo.Triangulate2ViewsMetric;
 import boofcv.abst.tracker.PointTrack;
 import boofcv.abst.tracker.PointTracker;
@@ -91,7 +91,7 @@ public class VisOdomDualTrackPnP<T extends ImageBase<T>, Desc extends TupleDesc>
 	private final PointTracker<T> trackerLeft;
 	private final PointTracker<T> trackerRight;
 	/** Used to describe tracks so that they can be matches between the two cameras */
-	private final DescribeRegionPoint<T, Desc> describe;
+	private final DescribePointGivenRegion<T, Desc> describe;
 	/** Radius of a descriptor's region */
 	private @Getter @Setter double describeRadius = 11.0;
 
@@ -150,7 +150,7 @@ public class VisOdomDualTrackPnP<T extends ImageBase<T>, Desc extends TupleDesc>
 	 */
 	public VisOdomDualTrackPnP( double epilolarTol,
 								PointTracker<T> trackerLeft, PointTracker<T> trackerRight,
-								DescribeRegionPoint<T, Desc> describe,
+								DescribePointGivenRegion<T, Desc> describe,
 								AssociateDescription2D<Desc> assocL2R,
 								Triangulate2ViewsMetric triangulate2,
 								ModelMatcher<Se3_F64, Stereo2D3D> matcher,

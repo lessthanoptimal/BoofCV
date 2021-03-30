@@ -20,7 +20,7 @@ package boofcv.factory.feature.detdesc;
 
 import boofcv.abst.feature.convert.ConvertTupleDesc;
 import boofcv.abst.feature.describe.ConfigSurfDescribe;
-import boofcv.abst.feature.describe.DescribeRegionPoint;
+import boofcv.abst.feature.describe.DescribePointGivenRegion;
 import boofcv.abst.feature.detdesc.*;
 import boofcv.abst.feature.detect.interest.ConfigFastHessian;
 import boofcv.abst.feature.detect.interest.InterestPointDetector;
@@ -96,7 +96,7 @@ public class FactoryDetectDescribe {
 			}
 			default -> throw new IllegalArgumentException("Unknown detector");
 		}
-		DescribeRegionPoint descriptor = switch (config.typeDescribe) {
+		DescribePointGivenRegion descriptor = switch (config.typeDescribe) {
 			case SURF_FAST -> FactoryDescribeRegionPoint.surfFast(config.describeSurfFast, imageType);
 			case SURF_STABLE -> FactoryDescribeRegionPoint.surfStable(config.describeSurfStability, imageType);
 			case SIFT -> FactoryDescribeRegionPoint.sift(config.scaleSpaceSift, config.describeSift, imageType);
@@ -335,7 +335,7 @@ public class FactoryDetectDescribe {
 	public static <T extends ImageGray<T>, TD extends TupleDesc<TD>>
 	DetectDescribePoint<T, TD> fuseTogether( InterestPointDetector<T> detector,
 											 @Nullable OrientationImage<T> orientation,
-											 DescribeRegionPoint<T, TD> describe ) {
+											 DescribePointGivenRegion<T, TD> describe ) {
 		return new DetectDescribeFusion<>(detector, orientation, describe);
 	}
 }

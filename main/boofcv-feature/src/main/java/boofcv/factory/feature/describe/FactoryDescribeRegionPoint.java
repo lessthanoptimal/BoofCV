@@ -39,7 +39,7 @@ import org.jetbrains.annotations.Nullable;
 import java.util.Random;
 
 /**
- * Factory for creating implementations of {@link DescribeRegionPoint}.
+ * Factory for creating implementations of {@link DescribePointGivenRegion}.
  *
  * @author Peter Abeles
  */
@@ -51,18 +51,18 @@ public class FactoryDescribeRegionPoint {
 	 */
 	@SuppressWarnings("unchecked")
 	public static <T extends ImageBase<T>, TD extends TupleDesc<TD>>
-	DescribeRegionPoint<T, TD> generic( ConfigDescribeRegionPoint config, ImageType<T> imageType ) {
+	DescribePointGivenRegion<T, TD> generic( ConfigDescribeRegionPoint config, ImageType<T> imageType ) {
 
 		Class imageClass = imageType.getImageClass();
 
-		DescribeRegionPoint<T, TD> ret = switch (config.type) {
-			case SURF_FAST -> (DescribeRegionPoint)FactoryDescribeRegionPoint.surfFast(config.surfFast, imageClass);
-			case SURF_STABLE -> (DescribeRegionPoint)FactoryDescribeRegionPoint.surfStable(config.surfStability, imageClass);
-			case SURF_COLOR_FAST -> (DescribeRegionPoint)FactoryDescribeRegionPoint.surfColorFast(config.surfFast, (ImageType)imageType);
-			case SURF_COLOR_STABLE -> (DescribeRegionPoint)FactoryDescribeRegionPoint.surfColorStable(config.surfStability, imageType);
-			case SIFT -> (DescribeRegionPoint)FactoryDescribeRegionPoint.sift(config.scaleSpaceSift, config.sift, imageClass);
-			case BRIEF -> (DescribeRegionPoint)FactoryDescribeRegionPoint.brief(config.brief, imageClass);
-			case TEMPLATE -> (DescribeRegionPoint)FactoryDescribeRegionPoint.template(config.template, imageClass);
+		DescribePointGivenRegion<T, TD> ret = switch (config.type) {
+			case SURF_FAST -> (DescribePointGivenRegion)FactoryDescribeRegionPoint.surfFast(config.surfFast, imageClass);
+			case SURF_STABLE -> (DescribePointGivenRegion)FactoryDescribeRegionPoint.surfStable(config.surfStability, imageClass);
+			case SURF_COLOR_FAST -> (DescribePointGivenRegion)FactoryDescribeRegionPoint.surfColorFast(config.surfFast, (ImageType)imageType);
+			case SURF_COLOR_STABLE -> (DescribePointGivenRegion)FactoryDescribeRegionPoint.surfColorStable(config.surfStability, imageType);
+			case SIFT -> (DescribePointGivenRegion)FactoryDescribeRegionPoint.sift(config.scaleSpaceSift, config.sift, imageClass);
+			case BRIEF -> (DescribePointGivenRegion)FactoryDescribeRegionPoint.brief(config.brief, imageClass);
+			case TEMPLATE -> (DescribePointGivenRegion)FactoryDescribeRegionPoint.template(config.template, imageClass);
 			default -> throw new IllegalArgumentException("Unknown descriptor");
 		};
 
@@ -89,7 +89,7 @@ public class FactoryDescribeRegionPoint {
 	 * @see DescribePointSurf
 	 */
 	public static <T extends ImageGray<T>, II extends ImageGray<II>>
-	DescribeRegionPoint<T, TupleDesc_F64> surfFast( @Nullable ConfigSurfDescribe.Fast config, Class<T> imageType ) {
+	DescribePointGivenRegion<T, TupleDesc_F64> surfFast( @Nullable ConfigSurfDescribe.Fast config, Class<T> imageType ) {
 
 
 		Class<II> integralType = GIntegralImageOps.getIntegralType(imageType);
@@ -108,7 +108,7 @@ public class FactoryDescribeRegionPoint {
 	 * @see DescribePointSurfPlanar
 	 */
 	public static <T extends ImageMultiBand<T>, II extends ImageGray<II>>
-	DescribeRegionPoint<T, TupleDesc_F64> surfColorFast( @Nullable ConfigSurfDescribe.Fast config, ImageType<T> imageType ) {
+	DescribePointGivenRegion<T, TupleDesc_F64> surfColorFast( @Nullable ConfigSurfDescribe.Fast config, ImageType<T> imageType ) {
 
 		Class bandType = imageType.getImageClass();
 		Class<II> integralType = GIntegralImageOps.getIntegralType(bandType);
@@ -137,7 +137,7 @@ public class FactoryDescribeRegionPoint {
 	 * @see DescribePointSurf
 	 */
 	public static <T extends ImageGray<T>, II extends ImageGray<II>>
-	DescribeRegionPoint<T, TupleDesc_F64> surfStable( @Nullable ConfigSurfDescribe.Stability config, Class<T> imageType ) {
+	DescribePointGivenRegion<T, TupleDesc_F64> surfStable( @Nullable ConfigSurfDescribe.Stability config, Class<T> imageType ) {
 
 		Class<II> integralType = GIntegralImageOps.getIntegralType(imageType);
 
@@ -155,7 +155,7 @@ public class FactoryDescribeRegionPoint {
 	 * @see DescribePointSurfPlanar
 	 */
 	public static <T extends ImageBase<T>, II extends ImageGray<II>>
-	DescribeRegionPoint<T, TupleDesc_F64> surfColorStable( ConfigSurfDescribe.Stability config, ImageType<T> imageType ) {
+	DescribePointGivenRegion<T, TupleDesc_F64> surfColorStable( ConfigSurfDescribe.Stability config, ImageType<T> imageType ) {
 
 		Class bandType = imageType.getImageClass();
 		Class<II> integralType = GIntegralImageOps.getIntegralType(bandType);
@@ -186,8 +186,8 @@ public class FactoryDescribeRegionPoint {
 	 * @return SIFT descriptor
 	 */
 	public static <T extends ImageGray<T>>
-	DescribeRegionPoint<T, TupleDesc_F64> sift( @Nullable ConfigSiftScaleSpace configSS,
-												@Nullable ConfigSiftDescribe configDescribe, Class<T> imageType ) {
+	DescribePointGivenRegion<T, TupleDesc_F64> sift( @Nullable ConfigSiftScaleSpace configSS,
+													 @Nullable ConfigSiftDescribe configDescribe, Class<T> imageType ) {
 		if (configSS == null)
 			configSS = new ConfigSiftScaleSpace();
 		configSS.checkValidity();
@@ -212,7 +212,7 @@ public class FactoryDescribeRegionPoint {
 	 * @see boofcv.alg.feature.describe.DescribePointBriefSO
 	 */
 	public static <T extends ImageGray<T>>
-	DescribeRegionPoint<T, TupleDesc_B> brief( @Nullable ConfigBrief config, Class<T> imageType ) {
+	DescribePointGivenRegion<T, TupleDesc_B> brief( @Nullable ConfigBrief config, Class<T> imageType ) {
 		if (config == null)
 			config = new ConfigBrief();
 		config.checkValidity();
@@ -237,7 +237,7 @@ public class FactoryDescribeRegionPoint {
 	 * @see ConfigTemplateDescribe
 	 */
 	public static <T extends ImageGray<T>, D extends TupleDesc>
-	DescribeRegionPoint<T, D> template( @Nullable ConfigTemplateDescribe config, Class<T> imageType ) {
+	DescribePointGivenRegion<T, D> template( @Nullable ConfigTemplateDescribe config, Class<T> imageType ) {
 		if (config == null)
 			config = new ConfigTemplateDescribe();
 
@@ -262,7 +262,7 @@ public class FactoryDescribeRegionPoint {
 	 */
 	@SuppressWarnings({"unchecked"})
 	public static <T extends ImageGray<T>, D extends TupleDesc>
-	DescribeRegionPoint<T, D> pixel( int regionWidth, int regionHeight, Class<T> imageType ) {
+	DescribePointGivenRegion<T, D> pixel( int regionWidth, int regionHeight, Class<T> imageType ) {
 		return new WrapDescribePixelRegion(
 				FactoryDescribePointAlgs.pixelRegion(regionWidth, regionHeight, imageType), imageType);
 	}
@@ -279,7 +279,7 @@ public class FactoryDescribeRegionPoint {
 	 */
 	@SuppressWarnings({"unchecked"})
 	public static <T extends ImageGray<T>>
-	DescribeRegionPoint<T, NccFeature> pixelNCC( int regionWidth, int regionHeight, Class<T> imageType ) {
+	DescribePointGivenRegion<T, NccFeature> pixelNCC( int regionWidth, int regionHeight, Class<T> imageType ) {
 		return new WrapDescribePixelRegionNCC(
 				FactoryDescribePointAlgs.pixelRegionNCC(regionWidth, regionHeight, imageType), imageType);
 	}

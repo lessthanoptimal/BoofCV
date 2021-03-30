@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -23,12 +23,12 @@ import boofcv.struct.image.ImageBase;
 import boofcv.struct.image.ImageType;
 
 /**
- * Implements {@link DescribeRegionPoint} but does nothing. Primarily used for testing.
+ * Implements {@link DescribePointGivenRegion} but does nothing. Primarily used for testing.
  *
  * @author Peter Abeles
  */
 public class DescribeRegionPointDefault<T extends ImageBase<T>, Desc extends TupleDesc>
-		implements DescribeRegionPoint<T,Desc> {
+		implements DescribePointGivenRegion<T,Desc> {
 
 	@Override public void setImage( T image ) {}
 

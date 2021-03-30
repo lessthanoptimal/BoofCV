@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -25,12 +25,12 @@ import boofcv.struct.image.ImageType;
 
 /**
  * Wrapper around {@link boofcv.alg.feature.describe.DescribePointPixelRegionNCC} for
- * {@link boofcv.abst.feature.describe.DescribeRegionPoint}.
+ * {@link DescribePointGivenRegion}.
  *
  * @author Peter Abeles
  */
 public class WrapDescribePixelRegionNCC<T extends ImageGray<T>>
-		implements DescribeRegionPoint<T,NccFeature>
+		implements DescribePointGivenRegion<T,NccFeature>
 {
 	DescribePointPixelRegionNCC<T> alg;
 	ImageType<T> imageType;

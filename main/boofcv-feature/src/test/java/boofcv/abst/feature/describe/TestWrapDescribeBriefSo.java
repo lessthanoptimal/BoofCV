@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -32,7 +32,7 @@ class TestWrapDescribeBriefSo extends GenericDescribeRegionPointChecks<GrayF32> 
 	}
 
 	@Override
-	protected DescribeRegionPoint<GrayF32, TupleDesc_B> createAlg() {
+	protected DescribePointGivenRegion<GrayF32, TupleDesc_B> createAlg() {
 		ConfigBrief config = new ConfigBrief();
 		config.fixed = false;
 		return FactoryDescribeRegionPoint.brief(config,GrayF32.class);

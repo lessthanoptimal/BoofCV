@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -22,7 +22,6 @@ import boofcv.struct.feature.TupleDesc;
 import boofcv.struct.image.ImageBase;
 import boofcv.struct.image.ImageType;
 
-
 /**
  * Computes a description of the local region around a point at different circular radii and orientations.  The radius
  * specifies the size of the object and it should be assumed to be circular in shape.  Orientation rotates the
@@ -30,9 +29,8 @@ import boofcv.struct.image.ImageType;
  *
  * @author Peter Abeles
  */
-public interface DescribeRegionPoint<T extends ImageBase<T>, Desc extends TupleDesc>
-	extends DescriptorInfo<Desc>
-{
+public interface DescribePointGivenRegion<T extends ImageBase<T>, Desc extends TupleDesc<Desc>>
+		extends DescriptorInfo<Desc> {
 	/**
 	 * Specified the image which is to be processed.
 	 *
@@ -53,7 +51,7 @@ public interface DescribeRegionPoint<T extends ImageBase<T>, Desc extends TupleD
 	 * @param description (output) Storage for extracted feature.  Use {@link #createDescription} to create descriptor.
 	 * @return true if a descriptor can computed or false if not.
 	 */
-	boolean process( double x , double y , double orientation , double radius , Desc description );
+	boolean process( double x, double y, double orientation, double radius, Desc description );
 
 	/**
 	 * If size information is used when computing the descriptor.
@@ -84,10 +82,4 @@ public interface DescribeRegionPoint<T extends ImageBase<T>, Desc extends TupleD
 	 * @return width of descriptor at a scale of one
 	 */
 	double getCanonicalWidth();
-
-	// TODO implement this later for threads
-//	/**
-//	 * Creates a new instance with identical configuration
-//	 */
-//	DescribeRegionPoint<T,Desc> newInstance();
 }

@@ -18,7 +18,7 @@
 
 package boofcv.abst.feature.convert;
 
-import boofcv.abst.feature.describe.DescribeRegionPoint;
+import boofcv.abst.feature.describe.DescribePointGivenRegion;
 import boofcv.abst.feature.describe.DescribeRegionPointConvert;
 import boofcv.struct.feature.TupleDesc_F64;
 import boofcv.struct.feature.TupleDesc_S8;
@@ -76,7 +76,7 @@ public class TestDescribeRegionPointConvert extends BoofStandardJUnit {
 		}
 	}
 
-	private static class DummyDescribe implements DescribeRegionPoint<GrayF32,TupleDesc_F64> {
+	private static class DummyDescribe implements DescribePointGivenRegion<GrayF32,TupleDesc_F64> {
 
 		public boolean calledImageSet = false;
 

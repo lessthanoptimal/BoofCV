@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -18,7 +18,7 @@
 
 package boofcv.factory.mvs;
 
-import boofcv.abst.feature.describe.DescribeRegionPoint;
+import boofcv.abst.feature.describe.DescribePointGivenRegion;
 import boofcv.alg.mvs.video.RelativeBetter;
 import boofcv.alg.mvs.video.SelectFramesForReconstruction3D;
 import boofcv.factory.feature.associate.FactoryAssociation;
@@ -54,7 +54,7 @@ public class FactoryMultiViewStereo {
 		// Image tracker currently only supports gray images
 		Class<T> grayType = imageType.getImageClass();
 
-		DescribeRegionPoint<T, TupleDesc_F64> describe = FactoryDescribeRegionPoint.generic(config.describe, imageType);
+		DescribePointGivenRegion<T, TupleDesc_F64> describe = FactoryDescribeRegionPoint.generic(config.describe, imageType);
 
 		var alg = new SelectFramesForReconstruction3D<T>(describe);
 		alg.config.setTo(config);
