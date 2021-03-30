@@ -22,7 +22,7 @@ import boofcv.abst.disparity.StereoDisparitySparse;
 import boofcv.abst.feature.associate.AssociateDescription2D;
 import boofcv.abst.feature.associate.EnforceUniqueByScore;
 import boofcv.abst.feature.associate.ScoreAssociation;
-import boofcv.abst.feature.describe.DescribeRegionPoint;
+import boofcv.abst.feature.describe.DescribePointGivenRegion;
 import boofcv.abst.feature.detdesc.DetectDescribePoint;
 import boofcv.abst.geo.Estimate1ofPnP;
 import boofcv.abst.geo.EstimateNofPnP;
@@ -387,7 +387,7 @@ public class FactoryVisualOdometry {
 			case TICK_TOCK -> new TickTockKeyFrameManager(configVO.keyframes.tickPeriod);
 		};
 
-		DescribeRegionPoint<T, Desc> descriptor = FactoryDescribeRegionPoint.
+		DescribePointGivenRegion<T, Desc> descriptor = FactoryDescribeRegionPoint.
 				generic(hack.stereoDescribe, ImageType.single(imageType));
 		Class<Desc> descType = descriptor.getDescriptionType();
 		ScoreAssociation<Desc> scorer = FactoryAssociation.defaultScore(descType);

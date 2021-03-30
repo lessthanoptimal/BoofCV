@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -18,7 +18,7 @@
 
 package boofcv.abst.feature.detdesc;
 
-import boofcv.abst.feature.describe.DescribeRegionPoint;
+import boofcv.abst.feature.describe.DescribePointGivenRegion;
 import boofcv.abst.feature.detect.interest.InterestPointDetector;
 import boofcv.abst.feature.orientation.OrientationImage;
 import boofcv.factory.feature.describe.FactoryDescribeRegionPoint;
@@ -48,7 +48,7 @@ public class TestDetectDescribeFusion extends BoofStandardJUnit {
 	public void checkFeatureNotInBounds() {
 
 		InterestPointDetector detector = new DummyDetector();
-		DescribeRegionPoint describe = new DummyRegionPoint();
+		DescribePointGivenRegion describe = new DummyRegionPoint();
 
 		DetectDescribeFusion alg = new DetectDescribeFusion(detector,null,describe);
 
@@ -73,7 +73,7 @@ public class TestDetectDescribeFusion extends BoofStandardJUnit {
 			public DetectDescribePoint createDetDesc() {
 				final InterestPointDetector<GrayF32> detector = FactoryInterestPoint.fastHessian(null,GrayF32.class);
 				final OrientationImage ori = FactoryOrientationAlgs.nogradient(1.0/2.0,5,GrayF32.class);
-				final DescribeRegionPoint<GrayF32,TupleDesc_F64> desc =
+				final DescribePointGivenRegion<GrayF32,TupleDesc_F64> desc =
 						FactoryDescribeRegionPoint.surfStable(null, GrayF32.class);
 				return new DetectDescribeFusion(detector,ori,desc);
 			}
@@ -87,7 +87,7 @@ public class TestDetectDescribeFusion extends BoofStandardJUnit {
 			@Override
 			public DetectDescribePoint createDetDesc() {
 				final InterestPointDetector<GrayF32> detector = FactoryInterestPoint.fastHessian(null,GrayF32.class);
-				final DescribeRegionPoint<GrayF32,TupleDesc_F64> desc =
+				final DescribePointGivenRegion<GrayF32,TupleDesc_F64> desc =
 						FactoryDescribeRegionPoint.surfStable(null, GrayF32.class);
 				return new DetectDescribeFusion(detector,null,desc);
 			}
@@ -127,7 +127,7 @@ public class TestDetectDescribeFusion extends BoofStandardJUnit {
 		}
 	}
 
-	public static class DummyRegionPoint implements DescribeRegionPoint {
+	public static class DummyRegionPoint implements DescribePointGivenRegion {
 
 		int calls = 0;
 

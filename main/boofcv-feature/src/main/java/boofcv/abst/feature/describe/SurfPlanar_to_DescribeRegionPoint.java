@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -28,7 +28,7 @@ import boofcv.struct.image.ImageType;
 import boofcv.struct.image.Planar;
 
 /**
- * Wrapper around {@link DescribePointSurfPlanar} for {@link DescribeRegionPoint}
+ * Wrapper around {@link DescribePointSurfPlanar} for {@link DescribePointGivenRegion}
  *
  * @param <T> Image band type
  * @param <II> Integral image type
@@ -36,7 +36,7 @@ import boofcv.struct.image.Planar;
  * @author Peter Abeles
  */
 public class SurfPlanar_to_DescribeRegionPoint<T extends ImageGray<T>, II extends ImageGray<II>>
-	implements DescribeRegionPoint<Planar<T>, TupleDesc_F64>
+	implements DescribePointGivenRegion<Planar<T>, TupleDesc_F64>
 {
 	DescribePointSurfPlanar<II> alg;
 

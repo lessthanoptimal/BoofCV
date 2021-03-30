@@ -20,7 +20,7 @@ package boofcv.factory.tracker;
 
 import boofcv.abst.feature.associate.*;
 import boofcv.abst.feature.describe.ConfigSurfDescribe;
-import boofcv.abst.feature.describe.DescribeRegionPoint;
+import boofcv.abst.feature.describe.DescribePointGivenRegion;
 import boofcv.abst.feature.describe.WrapDescribeBrief;
 import boofcv.abst.feature.describe.WrapDescribePixelRegionNCC;
 import boofcv.abst.feature.detdesc.DetectDescribeFusion;
@@ -251,7 +251,7 @@ public class FactoryPointTracker {
 		DescribePointBrief<I> brief = FactoryDescribePointAlgs.
 				brief(FactoryBriefDefinition.gaussian2(new Random(123), 16, 512),
 						FactoryBlurFilter.gaussian(ImageType.single(imageType), 0, 4));
-		DescribeRegionPoint describeBrief = new WrapDescribeBrief<>(brief, imageType);
+		DescribePointGivenRegion describeBrief = new WrapDescribeBrief<>(brief, imageType);
 
 		GeneralFeatureDetector<I, D> detectPoint = createShiTomasi(configExtract, derivType);
 
@@ -288,7 +288,7 @@ public class FactoryPointTracker {
 		DescribePointBrief<I> brief = FactoryDescribePointAlgs.
 				brief(FactoryBriefDefinition.gaussian2(new Random(123), 16, 512),
 						FactoryBlurFilter.gaussian(ImageType.single(imageType), 0, 4));
-		DescribeRegionPoint describeBrief = new WrapDescribeBrief<>(brief, imageType);
+		DescribePointGivenRegion describeBrief = new WrapDescribeBrief<>(brief, imageType);
 
 		GeneralFeatureDetector<I, D> corner = FactoryDetectPoint.createFast(configExtract, configFast, imageType);
 
@@ -325,7 +325,7 @@ public class FactoryPointTracker {
 		int w = 2*describeRadius + 1;
 
 		DescribePointPixelRegionNCC<I> ncc = FactoryDescribePointAlgs.pixelRegionNCC(w, w, imageType);
-		DescribeRegionPoint describeNCC = new WrapDescribePixelRegionNCC(ncc, imageType);
+		DescribePointGivenRegion describeNCC = new WrapDescribePixelRegionNCC(ncc, imageType);
 
 		GeneralFeatureDetector<I, D> corner = createShiTomasi(configExtract, derivType);
 
@@ -356,7 +356,7 @@ public class FactoryPointTracker {
 	public static <I extends ImageGray<I>, Desc extends TupleDesc<Desc>>
 	DetectDescribeAssociateTracker<I, Desc> dda( InterestPointDetector<I> detector,
 												 OrientationImage<I> orientation,
-												 DescribeRegionPoint<I, Desc> describe,
+												 DescribePointGivenRegion<I, Desc> describe,
 												 AssociateDescription2D<Desc> associate,
 												 ConfigTrackerDda config ) {
 
@@ -432,7 +432,7 @@ public class FactoryPointTracker {
 		GeneralFeatureDetector<I, D> corner = createShiTomasi(configExtract, derivType);
 		InterestPointDetector<I> detector = FactoryInterestPoint.wrapPoint(corner, 1, imageType, derivType);
 
-		DescribeRegionPoint<I, TupleDesc_F64> regionDesc
+		DescribePointGivenRegion<I, TupleDesc_F64> regionDesc
 				= FactoryDescribeRegionPoint.surfStable(configDescribe, imageType);
 
 		ScoreAssociation<TupleDesc_F64> score = FactoryAssociation.scoreEuclidean(TupleDesc_F64.class, true);
@@ -466,7 +466,7 @@ public class FactoryPointTracker {
 	public static <I extends ImageGray<I>, Desc extends TupleDesc<Desc>>
 	PointTracker<I> hybrid( InterestPointDetector<I> detector,
 							OrientationImage<I> orientation,
-							DescribeRegionPoint<I, Desc> describe,
+							DescribePointGivenRegion<I, Desc> describe,
 							AssociateDescription2D<Desc> associate,
 							int tooCloseRadius,
 							ConfigPKlt kltConfig,
@@ -515,7 +515,7 @@ public class FactoryPointTracker {
 
 	public static <I extends ImageGray<I>, D extends ImageGray<D>, Desc extends TupleDesc<Desc>>
 	PointTracker<I> dda( GeneralFeatureDetector<I, D> detector,
-						 DescribeRegionPoint<I, Desc> describe,
+						 DescribePointGivenRegion<I, Desc> describe,
 						 AssociateDescription2D<Desc> associate,
 						 double scale,
 						 Class<I> imageType ) {

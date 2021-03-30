@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -29,7 +29,7 @@ import boofcv.struct.image.ImageType;
  * @author Peter Abeles
  */
 public class WrapDescribeSurf<T extends ImageGray<T>, II extends ImageGray<II>>
-		implements DescribeRegionPoint<T, TupleDesc_F64> {
+		implements DescribePointGivenRegion<T, TupleDesc_F64> {
 
 	// computes SURF feature descriptor
 	DescribePointSurf<II> surf;

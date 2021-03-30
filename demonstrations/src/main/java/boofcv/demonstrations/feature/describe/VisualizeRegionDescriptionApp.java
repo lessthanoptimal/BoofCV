@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -19,7 +19,7 @@
 package boofcv.demonstrations.feature.describe;
 
 import boofcv.abst.feature.describe.ConfigBrief;
-import boofcv.abst.feature.describe.DescribeRegionPoint;
+import boofcv.abst.feature.describe.DescribePointGivenRegion;
 import boofcv.core.image.GConvertImage;
 import boofcv.core.image.GeneralizedImageOps;
 import boofcv.factory.feature.describe.FactoryDescribeRegionPoint;
@@ -53,7 +53,7 @@ public class VisualizeRegionDescriptionApp<T extends ImageGray<T>>
 	BufferedImage image;
 
 	private final Object lock = new Object();
-	private DescribeRegionPoint describe;
+	private DescribePointGivenRegion describe;
 
 	private SelectRegionDescriptionPanel panel = new SelectRegionDescriptionPanel();
 	private Controls controls = new Controls();

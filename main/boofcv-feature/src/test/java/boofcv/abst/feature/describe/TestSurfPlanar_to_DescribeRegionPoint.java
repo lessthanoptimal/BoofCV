@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -32,7 +32,7 @@ class TestSurfPlanar_to_DescribeRegionPoint extends GenericDescribeRegionPointCh
 		super(ImageType.pl(3,GrayF32.class));
 	}
 	@Override
-	protected DescribeRegionPoint<Planar<GrayF32>, TupleDesc_F64> createAlg() {
-		return (DescribeRegionPoint) FactoryDescribeRegionPoint.surfColorStable(null, imageType);
+	protected DescribePointGivenRegion<Planar<GrayF32>, TupleDesc_F64> createAlg() {
+		return (DescribePointGivenRegion) FactoryDescribeRegionPoint.surfColorStable(null, imageType);
 	}
 }

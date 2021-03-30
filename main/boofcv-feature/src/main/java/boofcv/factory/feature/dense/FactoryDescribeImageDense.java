@@ -20,7 +20,7 @@ package boofcv.factory.feature.dense;
 
 import boofcv.abst.feature.dense.*;
 import boofcv.abst.feature.describe.ConfigSiftDescribe;
-import boofcv.abst.feature.describe.DescribeRegionPoint;
+import boofcv.abst.feature.describe.DescribePointGivenRegion;
 import boofcv.alg.feature.dense.BaseDenseHog;
 import boofcv.alg.feature.dense.DescribeDenseHogAlg;
 import boofcv.alg.feature.dense.DescribeDenseHogFastAlg;
@@ -59,8 +59,8 @@ public class FactoryDescribeImageDense {
 		if (config == null)
 			config = new ConfigDenseSurfFast();
 
-		DescribeRegionPoint<T, TupleDesc_F64> surf =
-				(DescribeRegionPoint)FactoryDescribeRegionPoint.surfFast(config.surf, imageType);
+		DescribePointGivenRegion<T, TupleDesc_F64> surf =
+				(DescribePointGivenRegion)FactoryDescribeRegionPoint.surfFast(config.surf, imageType);
 
 		return new GenericDenseDescribeImageDense<>(surf, config.descriptorScale, config.sampling.periodX, config.sampling.periodY);
 	}
@@ -86,8 +86,8 @@ public class FactoryDescribeImageDense {
 
 		config.checkValidity();
 
-		DescribeRegionPoint<T, TupleDesc_F64> surf =
-				(DescribeRegionPoint)FactoryDescribeRegionPoint.surfStable(config.surf, imageType);
+		DescribePointGivenRegion<T, TupleDesc_F64> surf =
+				(DescribePointGivenRegion)FactoryDescribeRegionPoint.surfStable(config.surf, imageType);
 
 		return new GenericDenseDescribeImageDense<>(surf, config.descriptorScale, config.sampling.periodX, config.sampling.periodY);
 	}
