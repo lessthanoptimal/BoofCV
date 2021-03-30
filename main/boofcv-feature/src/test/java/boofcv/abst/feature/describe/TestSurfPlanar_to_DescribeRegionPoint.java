@@ -27,12 +27,12 @@ import boofcv.struct.image.Planar;
 /**
  * @author Peter Abeles
  */
-class TestSurfPlanar_to_DescribeRegionPoint extends GenericDescribeRegionPointChecks<Planar<GrayF32>> {
+class TestSurfPlanar_to_DescribeRegionPoint extends GenericDescribeRegionPointChecks<Planar<GrayF32>, TupleDesc_F64> {
 	TestSurfPlanar_to_DescribeRegionPoint() {
 		super(ImageType.pl(3,GrayF32.class));
 	}
 	@Override
 	protected DescribePointGivenRegion<Planar<GrayF32>, TupleDesc_F64> createAlg() {
-		return (DescribePointGivenRegion) FactoryDescribeRegionPoint.surfColorStable(null, imageType);
+		return FactoryDescribeRegionPoint.surfColorStable(null, imageType);
 	}
 }

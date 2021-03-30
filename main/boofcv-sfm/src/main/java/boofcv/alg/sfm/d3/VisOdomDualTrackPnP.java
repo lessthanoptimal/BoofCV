@@ -67,7 +67,7 @@ import java.util.List;
  *
  * @author Peter Abeles
  */
-public class VisOdomDualTrackPnP<T extends ImageBase<T>, Desc extends TupleDesc>
+public class VisOdomDualTrackPnP<T extends ImageBase<T>, TD extends TupleDesc<TD>>
 		extends VisOdomBundlePnPBase<VisOdomDualTrackPnP.TrackInfo> {
 
 	// TODO must modify so that tracks can exist in only one camera after the initial spawn. Requiring tracks always
@@ -91,18 +91,18 @@ public class VisOdomDualTrackPnP<T extends ImageBase<T>, Desc extends TupleDesc>
 	private final PointTracker<T> trackerLeft;
 	private final PointTracker<T> trackerRight;
 	/** Used to describe tracks so that they can be matches between the two cameras */
-	private final DescribePointGivenRegion<T, Desc> describe;
+	private final DescribePointGivenRegion<T, TD> describe;
 	/** Radius of a descriptor's region */
 	private @Getter @Setter double describeRadius = 11.0;
 
 	// Data structures used when associating left and right cameras
 	private final FastArray<Point2D_F64> pointsLeft = new FastArray<>(Point2D_F64.class);
 	private final FastArray<Point2D_F64> pointsRight = new FastArray<>(Point2D_F64.class);
-	private final DogArray<Desc> descLeft;
-	private final DogArray<Desc> descRight;
+	private final DogArray<TD> descLeft;
+	private final DogArray<TD> descRight;
 
 	// matches features between left and right images
-	private final AssociateDescription2D<Desc> assocL2R;
+	private final AssociateDescription2D<TD> assocL2R;
 	/** Triangulates points from the two stereo correspondences */
 	private final Triangulate2ViewsMetric triangulate2;
 
@@ -150,8 +150,8 @@ public class VisOdomDualTrackPnP<T extends ImageBase<T>, Desc extends TupleDesc>
 	 */
 	public VisOdomDualTrackPnP( double epilolarTol,
 								PointTracker<T> trackerLeft, PointTracker<T> trackerRight,
-								DescribePointGivenRegion<T, Desc> describe,
-								AssociateDescription2D<Desc> assocL2R,
+								DescribePointGivenRegion<T, TD> describe,
+								AssociateDescription2D<TD> assocL2R,
 								Triangulate2ViewsMetric triangulate2,
 								ModelMatcher<Se3_F64, Stereo2D3D> matcher,
 								ModelFitter<Se3_F64, Stereo2D3D> modelRefiner ) {
@@ -583,7 +583,7 @@ public class VisOdomDualTrackPnP<T extends ImageBase<T>, Desc extends TupleDesc>
 	 * Given list of new visual tracks, describe the region around each track using a descriptor
 	 */
 	private void describeSpawnedTracks( T image, List<PointTrack> tracks,
-										FastArray<Point2D_F64> points, DogArray<Desc> descs ) {
+										FastArray<Point2D_F64> points, DogArray<TD> descs ) {
 		describe.setImage(image);
 		points.reset();
 		descs.reset();
