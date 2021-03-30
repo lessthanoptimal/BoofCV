@@ -73,7 +73,7 @@ public class ConfigRecognitionNister2006 implements Configuration {
 	 * When learning, if a node has less than this number of points it will not spawn children. If
 	 * relative then its relative to the total number of points. This is intended to avoid over fitting.
 	 */
-	public final ConfigLength learningMinimumPointsForChildren = ConfigLength.fixed(20);
+	public final ConfigLength learningMinimumPointsForChildren = ConfigLength.fixed(0);
 
 	/**
 	 * If true then it will learn node weights. If false the all nodes but the root node will have a weight of 1.0
