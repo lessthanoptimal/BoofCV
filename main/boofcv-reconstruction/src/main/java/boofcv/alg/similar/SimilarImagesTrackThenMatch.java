@@ -50,14 +50,14 @@ public class SimilarImagesTrackThenMatch<Image extends ImageBase<Image>, TD exte
 	/**
 	 * Minimum number of frames (by ID) away two frames need to be for loop closure logic to connect them
 	 */
-	public int minimumLinkDistance = 30;
+	public @Getter @Setter int minimumRecognizeDistance = 30;
 
 	/**
 	 * Limit how many images it will consider in the query when looking to find loops. If a search radius
 	 * is specified then 2*radius+1 added to this number as a way to ensure that known sequential
 	 * matches don't prevent loop closure..
 	 */
-	public int limitQuery = 30;
+	public @Getter @Setter int limitQuery = 30;
 
 	/** Describes a point */
 	@Getter @Setter DescribePoint<Image, TD> describer;
@@ -207,7 +207,7 @@ public class SimilarImagesTrackThenMatch<Image extends ImageBase<Image>, TD exte
 					// that means there could have been an event that broke the sequential tracker but might not
 					// break the feature matcher. E.g. abrupt lighting or short term motion blur
 					checkConnection = true;
-				} else if (Math.abs(matchedFrameIdx - frameIdx) >= minimumLinkDistance) {
+				} else if (Math.abs(matchedFrameIdx - frameIdx) >= minimumRecognizeDistance) {
 					// They are far enough apart that it's advantageous to look for loop closures
 					checkConnection = true;
 				}

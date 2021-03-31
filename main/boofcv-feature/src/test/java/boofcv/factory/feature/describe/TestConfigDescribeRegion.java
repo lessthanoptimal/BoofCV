@@ -23,4 +23,4 @@ import boofcv.struct.StandardConfigurationChecks;
 /**
  * @author Peter Abeles
  */
-class TestConfigDescriptors extends StandardConfigurationChecks {}
+class TestConfigDescribeRegion extends StandardConfigurationChecks {}

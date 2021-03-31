@@ -18,6 +18,7 @@
 
 package boofcv.abst.feature.describe;
 
+import boofcv.testing.BoofStandardJUnit;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.fail;
@@ -25,7 +26,7 @@ import static org.junit.jupiter.api.Assertions.fail;
 /**
  * @author Peter Abeles
  */
-public class TestDescribeRadiusAngle_Point {
+public class TestDescribeRadiusAngle_Point extends BoofStandardJUnit {
 	@Test void implement() {
 		fail("Implement");
 	}
