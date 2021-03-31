@@ -19,7 +19,7 @@
 package boofcv.demonstrations.feature.associate;
 
 import boofcv.abst.feature.associate.AssociateDescription;
-import boofcv.abst.feature.describe.DescribePointGivenRegion;
+import boofcv.abst.feature.describe.DescribePointRadiusAngle;
 import boofcv.abst.feature.detect.interest.InterestPointDetector;
 import boofcv.abst.feature.orientation.OrientationImage;
 import boofcv.abst.feature.orientation.OrientationIntegral;
@@ -59,7 +59,7 @@ public class VisualizeAssociationMatchesApp<T extends ImageGray<T>, D extends Im
 
 	// algorithms
 	InterestPointDetector<T> detector;
-	DescribePointGivenRegion descriptor;
+	DescribePointRadiusAngle descriptor;
 	AssociateDescription<TupleDesc> matcher;
 	OrientationImage<T> orientation;
 	boolean algorithmChange = true;

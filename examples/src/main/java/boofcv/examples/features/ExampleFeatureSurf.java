@@ -28,7 +28,7 @@ import boofcv.alg.feature.detect.interest.FastHessianFeatureDetector;
 import boofcv.alg.transform.ii.GIntegralImageOps;
 import boofcv.concurrency.BoofConcurrency;
 import boofcv.core.image.GeneralizedImageOps;
-import boofcv.factory.feature.describe.FactoryDescribePointAlgs;
+import boofcv.factory.feature.describe.FactoryDescribeAlgs;
 import boofcv.factory.feature.detdesc.FactoryDetectDescribe;
 import boofcv.factory.feature.detect.interest.FactoryInterestPointAlgs;
 import boofcv.factory.feature.orientation.FactoryOrientationAlgs;
@@ -92,7 +92,7 @@ public class ExampleFeatureSurf {
 		// estimate orientation
 		OrientationIntegral<II> orientation =  FactoryOrientationAlgs.sliding_ii(null, integralType);
 
-		DescribePointSurf<II> descriptor = FactoryDescribePointAlgs.surfStability(null,integralType);
+		DescribePointSurf<II> descriptor = FactoryDescribeAlgs.surfStability(null,integralType);
 		
 		// compute the integral image of 'image'
 		II integral = GeneralizedImageOps.createSingleBand(integralType,image.width,image.height);

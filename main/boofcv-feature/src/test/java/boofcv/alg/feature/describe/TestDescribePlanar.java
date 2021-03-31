@@ -18,7 +18,7 @@
 
 package boofcv.alg.feature.describe;
 
-import boofcv.abst.feature.describe.DescribePointGivenRegion;
+import boofcv.abst.feature.describe.DescribePointRadiusAngle;
 import boofcv.struct.feature.TupleDesc;
 import boofcv.struct.feature.TupleDesc_F64;
 import boofcv.struct.image.GrayS8;
@@ -44,7 +44,7 @@ public class TestDescribePlanar extends BoofStandardJUnit {
 	@Test
 	public void checkNumBands() {
 
-		DescribePointGivenRegion[] descs = new DummyDesc[3];
+		DescribePointRadiusAngle[] descs = new DummyDesc[3];
 		descs[0] = new DummyDesc();
 		descs[1] = new DummyDesc();
 		descs[2] = new DummyDesc();
@@ -56,7 +56,7 @@ public class TestDescribePlanar extends BoofStandardJUnit {
 
 	@Test
 	public void checkRequires() {
-		DescribePointGivenRegion[] descs = new DummyDesc[3];
+		DescribePointRadiusAngle[] descs = new DummyDesc[3];
 		descs[0] = new DummyDesc();
 		descs[1] = new DummyDesc();
 		descs[2] = new DummyDesc();
@@ -75,7 +75,7 @@ public class TestDescribePlanar extends BoofStandardJUnit {
 
 	@Test
 	public void various() {
-		DescribePointGivenRegion[] descs = new DummyDesc[3];
+		DescribePointRadiusAngle[] descs = new DummyDesc[3];
 		descs[0] = new DummyDesc();
 		descs[1] = new DummyDesc();
 		descs[2] = new DummyDesc();
@@ -96,7 +96,7 @@ public class TestDescribePlanar extends BoofStandardJUnit {
 	private static class DummyAlg extends DescribePlanar {
 		int numCombined = 0;
 
-		public DummyAlg( DescribePointGivenRegion[] describers ) {
+		public DummyAlg( DescribePointRadiusAngle[] describers ) {
 			super(describers);
 		}
 
@@ -114,7 +114,7 @@ public class TestDescribePlanar extends BoofStandardJUnit {
 		public ImageType getImageType() {return null;}
 	}
 
-	private class DummyDesc implements DescribePointGivenRegion {
+	private class DummyDesc implements DescribePointRadiusAngle {
 		ImageBase image;
 		int numProcess = 0;
 

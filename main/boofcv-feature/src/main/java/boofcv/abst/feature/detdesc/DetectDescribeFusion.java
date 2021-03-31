@@ -18,7 +18,7 @@
 
 package boofcv.abst.feature.detdesc;
 
-import boofcv.abst.feature.describe.DescribePointGivenRegion;
+import boofcv.abst.feature.describe.DescribePointRadiusAngle;
 import boofcv.abst.feature.detect.interest.InterestPointDetector;
 import boofcv.abst.feature.orientation.OrientationImage;
 import boofcv.struct.feature.TupleDesc;
@@ -37,7 +37,7 @@ import org.ddogleg.struct.FastArray;
  * @author Peter Abeles
  * @see InterestPointDetector
  * @see OrientationImage
- * @see DescribePointGivenRegion
+ * @see DescribePointRadiusAngle
  */
 public class DetectDescribeFusion<T extends ImageGray<T>, TD extends TupleDesc<TD>>
 		implements DetectDescribePoint<T, TD> {
@@ -46,7 +46,7 @@ public class DetectDescribeFusion<T extends ImageGray<T>, TD extends TupleDesc<T
 	// optional override for orientation
 	private final OrientationImage<T> orientation;
 	// describes each feature found
-	private final DescribePointGivenRegion<T, TD> describe;
+	private final DescribePointRadiusAngle<T, TD> describe;
 
 	// list of extracted feature descriptors
 	private final DogArray<TD> descs;
@@ -65,7 +65,7 @@ public class DetectDescribeFusion<T extends ImageGray<T>, TD extends TupleDesc<T
 	 */
 	public DetectDescribeFusion( InterestPointDetector<T> detector,
 								 OrientationImage<T> orientation,
-								 DescribePointGivenRegion<T, TD> describe ) {
+								 DescribePointRadiusAngle<T, TD> describe ) {
 		this.describe = describe;
 		this.orientation = orientation;
 		this.detector = detector;

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -19,7 +19,7 @@
 package boofcv.factory.sfm;
 
 import boofcv.abst.feature.detect.interest.PointDetectorTypes;
-import boofcv.factory.feature.describe.ConfigDescribeRegionPoint;
+import boofcv.factory.feature.describe.ConfigDescribeRegion;
 import boofcv.factory.feature.detect.interest.ConfigDetectInterestPoint;
 import boofcv.factory.tracker.ConfigPointTracker;
 import boofcv.struct.Configuration;
@@ -38,7 +38,7 @@ public class ConfigStereoDualTrackPnP implements Configuration {
 	public ConfigPointTracker tracker = new ConfigPointTracker();
 
 	/** Feature descriptor for stereo association */
-	public ConfigDescribeRegionPoint stereoDescribe = new ConfigDescribeRegionPoint();
+	public ConfigDescribeRegion stereoDescribe = new ConfigDescribeRegion();
 	// TODO add in fancier sanity checks for stereo association
 
 	/** Radius used when computing feature descriptors for stereo matching */
@@ -53,12 +53,12 @@ public class ConfigStereoDualTrackPnP implements Configuration {
 		tracker.klt.pruneClose = true;
 		tracker.klt.toleranceFB = 3.0;
 		tracker.klt.templateRadius = 4;
-		tracker.detDesc.typeDetector = ConfigDetectInterestPoint.DetectorType.POINT;
+		tracker.detDesc.typeDetector = ConfigDetectInterestPoint.Type.POINT;
 		tracker.detDesc.detectPoint.type = PointDetectorTypes.SHI_TOMASI;
 		tracker.detDesc.detectPoint.shiTomasi.radius = 4;
 		tracker.detDesc.detectPoint.general.radius = 5;
 
-		stereoDescribe.type = ConfigDescribeRegionPoint.DescriptorType.BRIEF;
+		stereoDescribe.type = ConfigDescribeRegion.Type.BRIEF;
 		stereoDescribe.brief.fixed = true;
 	}
 

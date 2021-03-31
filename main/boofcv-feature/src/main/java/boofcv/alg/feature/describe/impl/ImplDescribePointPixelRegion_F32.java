@@ -18,7 +18,7 @@
 
 package boofcv.alg.feature.describe.impl;
 
-import boofcv.alg.feature.describe.DescribePointPixelRegion;
+import boofcv.alg.feature.describe.DescribePointRawPixels;
 import boofcv.misc.BoofMiscOps;
 import boofcv.struct.feature.TupleDesc_F32;
 import boofcv.struct.image.GrayF32;
@@ -26,11 +26,11 @@ import boofcv.struct.image.GrayF32;
 import java.util.Arrays;
 
 /**
- * Implementation of {@link DescribePointPixelRegion}.
+ * Implementation of {@link DescribePointRawPixels}.
  *
  * @author Peter Abeles
  */
-public class ImplDescribePointPixelRegion_F32 extends DescribePointPixelRegion<GrayF32, TupleDesc_F32> {
+public class ImplDescribePointPixelRegion_F32 extends DescribePointRawPixels<GrayF32, TupleDesc_F32> {
 
 	public ImplDescribePointPixelRegion_F32( int regionWidth, int regionHeight ) {
 		super(regionWidth, regionHeight);

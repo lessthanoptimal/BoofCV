@@ -20,7 +20,7 @@ package boofcv.abst.scene;
 
 import boofcv.abst.scene.nister2006.ConfigRecognitionNister2006;
 import boofcv.factory.feature.describe.ConfigConvertTupleDesc;
-import boofcv.factory.feature.describe.ConfigDescribeRegionPoint;
+import boofcv.factory.feature.describe.ConfigDescribeRegion;
 import boofcv.factory.feature.detdesc.ConfigDetectDescribe;
 import boofcv.factory.feature.detect.interest.ConfigDetectInterestPoint;
 import boofcv.struct.Configuration;
@@ -48,8 +48,8 @@ public class ConfigFeatureToSceneRecognition implements Configuration {
 
 	{
 		// Let's use SURF-FAST by default
-		features.typeDescribe = ConfigDescribeRegionPoint.DescriptorType.SURF_STABLE;
-		features.typeDetector = ConfigDetectInterestPoint.DetectorType.FAST_HESSIAN;
+		features.typeDescribe = ConfigDescribeRegion.Type.SURF_STABLE;
+		features.typeDetector = ConfigDetectInterestPoint.Type.FAST_HESSIAN;
 		// Settings a threshold degrades overall results, even if in some specific situations makes it better
 		features.detectFastHessian.extract.threshold = 0;
 		features.detectFastHessian.extract.radius = 2;

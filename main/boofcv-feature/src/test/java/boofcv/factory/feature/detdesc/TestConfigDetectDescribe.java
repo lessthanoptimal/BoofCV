@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -18,7 +18,7 @@
 
 package boofcv.factory.feature.detdesc;
 
-import boofcv.factory.feature.describe.ConfigDescribeRegionPoint;
+import boofcv.factory.feature.describe.ConfigDescribeRegion;
 import boofcv.factory.feature.detect.interest.ConfigDetectInterestPoint;
 import boofcv.struct.Configuration;
 import boofcv.struct.StandardConfigurationChecks;
@@ -36,8 +36,8 @@ class TestConfigDetectDescribe extends StandardConfigurationChecks {
 	@Override
 	public Configuration createNotDefault(Random rand) {
 		ConfigDetectDescribe out = new ConfigDetectDescribe();
-		out.typeDescribe = ConfigDescribeRegionPoint.DescriptorType.SURF_STABLE;
-		out.typeDetector = ConfigDetectInterestPoint.DetectorType.POINT;
+		out.typeDescribe = ConfigDescribeRegion.Type.SURF_STABLE;
+		out.typeDetector = ConfigDetectInterestPoint.Type.POINT;
 		return out;
 	}
 }

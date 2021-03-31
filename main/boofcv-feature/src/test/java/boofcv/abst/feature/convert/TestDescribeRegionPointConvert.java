@@ -18,8 +18,8 @@
 
 package boofcv.abst.feature.convert;
 
-import boofcv.abst.feature.describe.DescribePointGivenRegion;
-import boofcv.abst.feature.describe.DescribeRegionPointConvert;
+import boofcv.abst.feature.describe.DescribePointRadiusAngle;
+import boofcv.abst.feature.describe.DescribePointRadiusAngleConvertTuple;
 import boofcv.struct.feature.TupleDesc_F64;
 import boofcv.struct.feature.TupleDesc_S8;
 import boofcv.struct.image.GrayF32;
@@ -37,8 +37,8 @@ public class TestDescribeRegionPointConvert extends BoofStandardJUnit {
 		DummyConvert convert = new DummyConvert();
 		DummyDescribe original = new DummyDescribe();
 
-		DescribeRegionPointConvert<GrayF32,TupleDesc_F64,TupleDesc_S8> alg =
-				new DescribeRegionPointConvert<>(original, convert);
+		DescribePointRadiusAngleConvertTuple<GrayF32,TupleDesc_F64,TupleDesc_S8> alg =
+				new DescribePointRadiusAngleConvertTuple<>(original, convert);
 
 		TupleDesc_S8 found = alg.createDescription();
 		assertEquals(found.data.length, 5);
@@ -76,7 +76,7 @@ public class TestDescribeRegionPointConvert extends BoofStandardJUnit {
 		}
 	}
 
-	private static class DummyDescribe implements DescribePointGivenRegion<GrayF32,TupleDesc_F64> {
+	private static class DummyDescribe implements DescribePointRadiusAngle<GrayF32,TupleDesc_F64> {
 
 		public boolean calledImageSet = false;
 

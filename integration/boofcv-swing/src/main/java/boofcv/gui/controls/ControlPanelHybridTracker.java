@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -24,7 +24,7 @@ import boofcv.abst.tracker.ConfigTrackerHybrid;
 import boofcv.abst.tracker.PointTracker;
 import boofcv.alg.tracker.klt.ConfigPKlt;
 import boofcv.factory.feature.associate.ConfigAssociate;
-import boofcv.factory.feature.describe.ConfigDescribeRegionPoint;
+import boofcv.factory.feature.describe.ConfigDescribeRegion;
 import boofcv.factory.feature.detdesc.ConfigDetectDescribe;
 import boofcv.factory.feature.detect.interest.ConfigDetectInterestPoint;
 import boofcv.factory.tracker.FactoryPointTracker;
@@ -73,8 +73,8 @@ public class ControlPanelHybridTracker extends ControlPanelDetDescAssocBase {
 		configDetDesc.detectPoint.shiTomasi.radius = 4;
 		configDetDesc.describeTemplate.type = ConfigTemplateDescribe.Type.NCC;
 
-		configDetDesc.typeDetector = ConfigDetectInterestPoint.DetectorType.POINT;
-		configDetDesc.typeDescribe = ConfigDescribeRegionPoint.DescriptorType.TEMPLATE;
+		configDetDesc.typeDetector = ConfigDetectInterestPoint.Type.POINT;
+		configDetDesc.typeDescribe = ConfigDescribeRegion.Type.TEMPLATE;
 	}
 
 	public ControlPanelHybridTracker(Listener listener,
@@ -146,10 +146,10 @@ public class ControlPanelHybridTracker extends ControlPanelDetDescAssocBase {
 	public void controlChanged(final Object source) {
 		if (source == comboDetect) {
 			configDetDesc.typeDetector =
-					ConfigDetectInterestPoint.DetectorType.values()[comboDetect.getSelectedIndex()];
+					ConfigDetectInterestPoint.Type.values()[comboDetect.getSelectedIndex()];
 		} else if (source == comboDescribe) {
 			configDetDesc.typeDescribe =
-					ConfigDescribeRegionPoint.DescriptorType.values()[comboDescribe.getSelectedIndex()];
+					ConfigDescribeRegion.Type.values()[comboDescribe.getSelectedIndex()];
 		} else if (source == comboAssociate) {
 			configAssociate.type = ConfigAssociate.AssociationType.values()[comboAssociate.getSelectedIndex()];
 		}

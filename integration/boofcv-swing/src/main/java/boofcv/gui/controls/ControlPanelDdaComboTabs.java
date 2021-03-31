@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -19,13 +19,13 @@
 package boofcv.gui.controls;
 
 import boofcv.factory.feature.associate.ConfigAssociate;
-import boofcv.factory.feature.describe.ConfigDescribeRegionPoint;
+import boofcv.factory.feature.describe.ConfigDescribeRegion;
 import boofcv.factory.feature.detect.interest.ConfigDetectInterestPoint;
 
 import javax.swing.*;
 import java.awt.*;
 
-import static boofcv.factory.feature.describe.ConfigDescribeRegionPoint.DescriptorType.BRIEF;
+import static boofcv.factory.feature.describe.ConfigDescribeRegion.Type.BRIEF;
 
 /**
  * Provides full control over all of Detect-Describe-Associate using combo boxes that when selected will change
@@ -103,11 +103,11 @@ public class ControlPanelDdaComboTabs extends ControlPanelDetDescAssocBase {
 	public void controlChanged(final Object source) {
 		if( comboDetect == source ) {
 			configDetDesc.typeDetector =
-					ConfigDetectInterestPoint.DetectorType.values()[comboDetect.getSelectedIndex()];
+					ConfigDetectInterestPoint.Type.values()[comboDetect.getSelectedIndex()];
 			handleDetectorChanged();
 		} else if( comboDescribe == source ){
 			configDetDesc.typeDescribe =
-					ConfigDescribeRegionPoint.DescriptorType.values()[comboDescribe.getSelectedIndex()];
+					ConfigDescribeRegion.Type.values()[comboDescribe.getSelectedIndex()];
 			handleDescriptorChanged();
 		} else if( comboAssociate == source ){
 			configAssociate.type = ConfigAssociate.AssociationType.values()[comboAssociate.getSelectedIndex()];

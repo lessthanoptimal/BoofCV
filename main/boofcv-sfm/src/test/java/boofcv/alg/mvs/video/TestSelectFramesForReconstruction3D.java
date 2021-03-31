@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -19,7 +19,7 @@
 package boofcv.alg.mvs.video;
 
 import boofcv.abst.feature.associate.AssociateDescription2DDefault;
-import boofcv.abst.feature.describe.DescribeRegionPointDefault;
+import boofcv.abst.feature.describe.DescribePointRadiusAngleAbstract;
 import boofcv.abst.tracker.PointTrackerDefault;
 import boofcv.misc.ModelGeneratorDefault;
 import boofcv.misc.ModelMatcherDefault;
@@ -265,7 +265,7 @@ class TestSelectFramesForReconstruction3D extends BoofStandardJUnit {
 		}
 	}
 
-	private static class MockDescriptor<T extends ImageBase<T>> extends DescribeRegionPointDefault<T, TupleDesc_F64> {
+	private static class MockDescriptor<T extends ImageBase<T>> extends DescribePointRadiusAngleAbstract<T, TupleDesc_F64> {
 		@Override public TupleDesc_F64 createDescription() {
 			return new TupleDesc_F64(1);
 		}

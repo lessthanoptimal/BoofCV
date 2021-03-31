@@ -18,7 +18,7 @@
 
 package boofcv.abst.feature.dense;
 
-import boofcv.abst.feature.describe.DescribePointGivenRegion;
+import boofcv.abst.feature.describe.DescribePointRadiusAngle;
 import boofcv.struct.feature.TupleDesc;
 import boofcv.struct.feature.TupleDesc_F64;
 import boofcv.struct.image.GrayU8;
@@ -114,7 +114,7 @@ public class TestGenericDenseDescribeImage extends BoofStandardJUnit {
 		assertTrue(found07b > found10);
 	}
 
-	public static class DummyFeature implements DescribePointGivenRegion {
+	public static class DummyFeature implements DescribePointRadiusAngle {
 
 		ImageType type = ImageType.single(GrayU8.class);
 		double inputRadius;

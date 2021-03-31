@@ -21,7 +21,7 @@ package boofcv.examples.features;
 import boofcv.abst.feature.associate.AssociateDescription;
 import boofcv.abst.feature.associate.ScoreAssociation;
 import boofcv.abst.feature.describe.ConfigBrief;
-import boofcv.abst.feature.describe.DescribePointGivenRegion;
+import boofcv.abst.feature.describe.DescribePointRadiusAngle;
 import boofcv.abst.feature.detdesc.DetectDescribePoint;
 import boofcv.abst.feature.detect.interest.ConfigFastHessian;
 import boofcv.abst.feature.detect.interest.ConfigGeneralDetector;
@@ -30,7 +30,7 @@ import boofcv.alg.feature.detect.interest.GeneralFeatureDetector;
 import boofcv.alg.filter.derivative.GImageDerivativeOps;
 import boofcv.factory.feature.associate.ConfigAssociateGreedy;
 import boofcv.factory.feature.associate.FactoryAssociation;
-import boofcv.factory.feature.describe.FactoryDescribeRegionPoint;
+import boofcv.factory.feature.describe.FactoryDescribePointRadiusAngle;
 import boofcv.factory.feature.detdesc.FactoryDetectDescribe;
 import boofcv.factory.feature.detect.interest.FactoryDetectPoint;
 import boofcv.factory.feature.detect.interest.FactoryInterestPoint;
@@ -82,7 +82,7 @@ public class ExampleDetectDescribe {
 		InterestPointDetector detector = FactoryInterestPoint.wrapPoint(corner, 1, imageType, derivType);
 
 		// describe points using BRIEF
-		DescribePointGivenRegion describe = FactoryDescribeRegionPoint.brief(new ConfigBrief(true), imageType);
+		DescribePointRadiusAngle describe = FactoryDescribePointRadiusAngle.brief(new ConfigBrief(true), imageType);
 
 		// Combine together.
 		// NOTE: orientation will not be estimated

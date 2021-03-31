@@ -57,7 +57,7 @@ public class ConfigSequenceToSparseScene implements Configuration {
 		tracker.klt.templateRadius = radius;
 		tracker.klt.maximumTracks.setFixed(800);
 		tracker.klt.config.maxIterations = 30;
-		tracker.detDesc.typeDetector = ConfigDetectInterestPoint.DetectorType.POINT;
+		tracker.detDesc.typeDetector = ConfigDetectInterestPoint.Type.POINT;
 		tracker.detDesc.detectPoint.type = PointDetectorTypes.SHI_TOMASI;
 		tracker.detDesc.detectPoint.shiTomasi.radius = 6;
 		tracker.detDesc.detectPoint.general.radius = 4;

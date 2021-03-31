@@ -19,13 +19,13 @@
 package boofcv.demonstrations.feature.associate;
 
 import boofcv.abst.feature.associate.*;
-import boofcv.abst.feature.describe.DescribePointGivenRegion;
+import boofcv.abst.feature.describe.DescribePointRadiusAngle;
 import boofcv.abst.feature.detect.interest.InterestPointDetector;
 import boofcv.abst.feature.orientation.OrientationImage;
 import boofcv.abst.feature.orientation.OrientationIntegral;
 import boofcv.alg.transform.ii.GIntegralImageOps;
 import boofcv.core.image.GeneralizedImageOps;
-import boofcv.factory.feature.describe.ConfigDescribeRegionPoint;
+import boofcv.factory.feature.describe.ConfigDescribeRegion;
 import boofcv.factory.feature.detect.interest.ConfigDetectInterestPoint;
 import boofcv.factory.feature.orientation.FactoryOrientation;
 import boofcv.factory.feature.orientation.FactoryOrientationAlgs;
@@ -65,7 +65,7 @@ public class VisualizeAssociationScoreApp<T extends ImageGray<T>, D extends Imag
 		extends DemonstrationBase {
 	// These classes process the input images and compute association score
 	InterestPointDetector<T> detector;
-	DescribePointGivenRegion descriptor;
+	DescribePointRadiusAngle descriptor;
 	OrientationImage<T> orientation;
 
 	// copies of input image
@@ -344,11 +344,11 @@ public class VisualizeAssociationScoreApp<T extends ImageGray<T>, D extends Imag
 		public void actionPerformed( ActionEvent e ) {
 			if (comboDetect == e.getSource()) {
 				configDetDesc.typeDetector =
-						ConfigDetectInterestPoint.DetectorType.values()[comboDetect.getSelectedIndex()];
+						ConfigDetectInterestPoint.Type.values()[comboDetect.getSelectedIndex()];
 				handleDetectorChanged();
 			} else if (comboDescribe == e.getSource()) {
 				configDetDesc.typeDescribe =
-						ConfigDescribeRegionPoint.DescriptorType.values()[comboDescribe.getSelectedIndex()];
+						ConfigDescribeRegion.Type.values()[comboDescribe.getSelectedIndex()];
 				handleDescriptorChanged();
 			} else if (scoreTypes == e.getSource()) {
 				ScoreItem item = (ScoreItem)scoreTypes.getSelectedItem();

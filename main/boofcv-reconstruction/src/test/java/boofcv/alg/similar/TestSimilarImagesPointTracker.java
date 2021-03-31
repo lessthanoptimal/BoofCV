@@ -21,7 +21,7 @@ package boofcv.alg.similar;
 import boofcv.abst.tracker.PointTrack;
 import boofcv.abst.tracker.PointTrackerDefault;
 import boofcv.alg.similar.SimilarImagesPointTracker.Frame;
-import boofcv.alg.similar.SimilarImagesPointTracker.Matches;
+import boofcv.alg.similar.SimilarImagesPointTracker.Match;
 import boofcv.alg.structure.GenericLookUpSimilarImagesChecks;
 import boofcv.struct.feature.AssociatedIndex;
 import boofcv.struct.image.GrayU8;
@@ -58,7 +58,7 @@ class TestSimilarImagesPointTracker extends GenericLookUpSimilarImagesChecks {
 			alg.frameMap.put(f.frameID, f);
 			f.initActive(numFeatures);
 			for (int j = 0; j < i; j++) {
-				Matches m = alg.matches.grow();
+				Match m = alg.matches.grow();
 				m.init(numFeatures);
 				SimilarImagesPointTracker.Frame r = alg.frames.get(j);
 				f.related.add(r);
@@ -152,10 +152,10 @@ class TestSimilarImagesPointTracker extends GenericLookUpSimilarImagesChecks {
 		Frame frame = alg.frames.get(0);
 		assertEquals("0", frame.frameID);
 		assertSame(frame, alg.frameMap.get(frame.frameID));
-		assertEquals(tracker.numTracks, frame.totalObservations());
+		assertEquals(tracker.numTracks, frame.featureCount());
 
 		var foundPixel = new Point2D_F64();
-		for (int i = 0; i < frame.totalObservations(); i++) {
+		for (int i = 0; i < frame.featureCount(); i++) {
 			assertEquals(i, frame.getID(i));
 			frame.getPixel(i, foundPixel);
 			assertEquals(i, foundPixel.x, UtilEjml.TEST_F64);
@@ -170,7 +170,7 @@ class TestSimilarImagesPointTracker extends GenericLookUpSimilarImagesChecks {
 		frame = alg.frames.get(1);
 		assertEquals("1", frame.frameID);
 		assertSame(frame, alg.frameMap.get(frame.frameID));
-		assertEquals(tracker.numTracks, frame.totalObservations());
+		assertEquals(tracker.numTracks, frame.featureCount());
 	}
 
 	/**
@@ -188,7 +188,7 @@ class TestSimilarImagesPointTracker extends GenericLookUpSimilarImagesChecks {
 		// make the most recent incompatible with the previous
 		Frame current = alg.frames.get(1);
 		current.id_to_index.clear();
-		for (int i = 0; i < current.totalObservations(); i++) {
+		for (int i = 0; i < current.featureCount(); i++) {
 			current.ids[i] = 100 + i;
 			current.id_to_index.put(current.ids[i], i);
 		}
@@ -223,7 +223,7 @@ class TestSimilarImagesPointTracker extends GenericLookUpSimilarImagesChecks {
 		for (int i = 0; i < alg.frames.size; i++) {
 			Frame f = alg.frames.get(i);
 			assertEquals(1, f.matches.size());
-			Matches matches = alg.matches.get(0);
+			Match matches = alg.matches.get(0);
 			assertEquals(19, matches.size());
 			assertNotSame(matches.frameSrc, matches.frameDst);
 			assertTrue(matches.frameSrc == f || matches.frameDst == f);

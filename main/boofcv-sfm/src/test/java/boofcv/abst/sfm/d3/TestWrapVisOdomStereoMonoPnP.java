@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -24,7 +24,7 @@ import boofcv.abst.tracker.PointTracker;
 import boofcv.alg.tracker.klt.ConfigPKlt;
 import boofcv.factory.disparity.ConfigDisparityBM;
 import boofcv.factory.disparity.FactoryStereoDisparity;
-import boofcv.factory.feature.describe.ConfigDescribeRegionPoint;
+import boofcv.factory.feature.describe.ConfigDescribeRegion;
 import boofcv.factory.feature.detect.interest.ConfigDetectInterestPoint;
 import boofcv.factory.sfm.ConfigVisOdomTrackPnP;
 import boofcv.factory.sfm.FactoryVisualOdometry;
@@ -101,13 +101,13 @@ public class TestWrapVisOdomStereoMonoPnP extends BoofStandardJUnit {
 
 			var configDDA = new ConfigPointTracker();
 			configDDA.typeTracker = ConfigPointTracker.TrackerType.DDA;
-			configDDA.detDesc.typeDetector = ConfigDetectInterestPoint.DetectorType.POINT;
+			configDDA.detDesc.typeDetector = ConfigDetectInterestPoint.Type.POINT;
 			configDDA.detDesc.detectPoint.general.maxFeatures = 300;
 			configDDA.detDesc.detectPoint.scaleRadius = 12;
 			configDDA.detDesc.detectPoint.general.radius = 3;
 			configDDA.detDesc.detectPoint.general.threshold = 0;
 			configDDA.detDesc.detectPoint.shiTomasi.radius = 2;
-			configDDA.detDesc.typeDescribe = ConfigDescribeRegionPoint.DescriptorType.BRIEF;
+			configDDA.detDesc.typeDescribe = ConfigDescribeRegion.Type.BRIEF;
 			configDDA.detDesc.describeBrief.fixed = true;
 
 			StereoDisparitySparse<GrayF32> disparity = FactoryStereoDisparity.sparseRectifiedBM(configBM, GrayF32.class);

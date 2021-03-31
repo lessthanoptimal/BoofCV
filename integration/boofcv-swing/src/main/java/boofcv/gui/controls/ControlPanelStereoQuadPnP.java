@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -19,7 +19,7 @@
 package boofcv.gui.controls;
 
 import boofcv.abst.sfm.d3.StereoVisualOdometry;
-import boofcv.factory.feature.describe.ConfigDescribeRegionPoint;
+import boofcv.factory.feature.describe.ConfigDescribeRegion;
 import boofcv.factory.feature.detect.interest.ConfigDetectInterestPoint;
 import boofcv.factory.geo.EnumPNP;
 import boofcv.factory.sfm.ConfigStereoQuadPnP;
@@ -142,10 +142,10 @@ public class ControlPanelStereoQuadPnP extends JTabbedPane {
 		public void controlChanged(final Object source) {
 			int which = -1;
 			if (source == comboDetect) {
-				configDetDesc.typeDetector = ConfigDetectInterestPoint.DetectorType.values()[comboDetect.getSelectedIndex()];
+				configDetDesc.typeDetector = ConfigDetectInterestPoint.Type.values()[comboDetect.getSelectedIndex()];
 				which = 0;
 			} else if (source == comboDescribe) {
-				configDetDesc.typeDescribe = ConfigDescribeRegionPoint.DescriptorType.values()[comboDescribe.getSelectedIndex()];
+				configDetDesc.typeDescribe = ConfigDescribeRegion.Type.values()[comboDescribe.getSelectedIndex()];
 				which = 1;
 			} else {
 				throw new RuntimeException("BUG!");

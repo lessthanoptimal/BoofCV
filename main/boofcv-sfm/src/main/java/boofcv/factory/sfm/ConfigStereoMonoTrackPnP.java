@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -54,7 +54,7 @@ public class ConfigStereoMonoTrackPnP implements Configuration {
 		config.klt.templateRadius = 4;
 		config.klt.pyramidLevels = ConfigDiscreteLevels.minSize(40);
 
-		config.detDesc.typeDetector = ConfigDetectInterestPoint.DetectorType.POINT;
+		config.detDesc.typeDetector = ConfigDetectInterestPoint.Type.POINT;
 		config.detDesc.detectPoint.type = PointDetectorTypes.SHI_TOMASI;
 		config.detDesc.detectPoint.shiTomasi.radius = 3;
 		config.detDesc.detectPoint.general.threshold = 1.0f;

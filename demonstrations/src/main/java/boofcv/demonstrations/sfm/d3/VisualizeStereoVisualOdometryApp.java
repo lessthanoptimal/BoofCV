@@ -27,7 +27,7 @@ import boofcv.abst.sfm.d3.WrapVisOdomMonoStereoDepthPnP;
 import boofcv.alg.geo.PerspectiveOps;
 import boofcv.alg.sfm.d3.structure.VisOdomBundleAdjustment.BTrack;
 import boofcv.demonstrations.shapes.DetectBlackShapePanel;
-import boofcv.factory.feature.describe.ConfigDescribeRegionPoint;
+import boofcv.factory.feature.describe.ConfigDescribeRegion;
 import boofcv.factory.feature.detect.interest.ConfigDetectInterestPoint;
 import boofcv.factory.feature.detect.selector.SelectLimitTypes;
 import boofcv.factory.sfm.ConfigStereoDualTrackPnP;
@@ -237,7 +237,7 @@ public class VisualizeStereoVisualOdometryApp<T extends ImageGray<T>>
 		config.tracker.klt.templateRadius = 4;
 		config.tracker.klt.pyramidLevels = ConfigDiscreteLevels.minSize(40);
 
-		config.tracker.detDesc.typeDetector = ConfigDetectInterestPoint.DetectorType.POINT;
+		config.tracker.detDesc.typeDetector = ConfigDetectInterestPoint.Type.POINT;
 		config.tracker.detDesc.detectPoint.type = PointDetectorTypes.SHI_TOMASI;
 		config.tracker.detDesc.detectPoint.shiTomasi.radius = 3;
 		config.tracker.detDesc.detectPoint.general.threshold = 1.0f;
@@ -274,7 +274,7 @@ public class VisualizeStereoVisualOdometryApp<T extends ImageGray<T>>
 		config.tracker.klt.templateRadius = 4;
 		config.tracker.klt.pyramidLevels = ConfigDiscreteLevels.minSize(40);
 
-		config.tracker.detDesc.typeDetector = ConfigDetectInterestPoint.DetectorType.POINT;
+		config.tracker.detDesc.typeDetector = ConfigDetectInterestPoint.Type.POINT;
 		config.tracker.detDesc.detectPoint.type = PointDetectorTypes.SHI_TOMASI;
 		config.tracker.detDesc.detectPoint.shiTomasi.radius = 3;
 		config.tracker.detDesc.detectPoint.general.threshold = 1.0f;
@@ -287,7 +287,7 @@ public class VisualizeStereoVisualOdometryApp<T extends ImageGray<T>>
 
 		config.scene.maxKeyFrames = 6;
 		config.scene.ransac.inlierThreshold = 1.5;
-		config.stereoDescribe.type = ConfigDescribeRegionPoint.DescriptorType.BRIEF;
+		config.stereoDescribe.type = ConfigDescribeRegion.Type.BRIEF;
 		config.stereoRadius = 6;
 		config.epipolarTol = 1.0;
 
