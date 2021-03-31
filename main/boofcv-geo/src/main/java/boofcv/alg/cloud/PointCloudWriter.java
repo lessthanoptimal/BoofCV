@@ -33,17 +33,10 @@ import org.ddogleg.struct.DogArray_I32;
  */
 public interface PointCloudWriter {
 	/**
-	 * Resets and initializes the writer and tells it approximately how many points will be written so it can
-	 * preallocate memory
-	 *
-	 * @param estimatedSize Approximate number of points which will be written.
+	 * @param size Estimated size of the point cloud. Passes in a value &le; 0 if it's unknown
+	 * @param hasColor true if the cloud has color information
 	 */
-	void init( int estimatedSize );
-
-	/**
-	 * Adds a 3D point
-	 */
-	void add( double x, double y, double z );
+	void initialize( int size, boolean hasColor );
 
 	/**
 	 * Adds a 3D point with color information
@@ -55,23 +48,14 @@ public interface PointCloudWriter {
 		public DogArray_F32 cloudXyz = new DogArray_F32();
 		public DogArray_I32 cloudRgb = new DogArray_I32();
 
-		@Override
-		public void init( int estimatedSize ) {
+		@Override public void initialize( int size, boolean hasColor ) {
 			cloudRgb.reset();
 			cloudXyz.reset();
-			cloudRgb.reserve(estimatedSize);
-			cloudXyz.reserve(estimatedSize*3);
+			cloudRgb.reserve(size);
+			cloudXyz.reserve(size*3);
 		}
 
-		@Override
-		public void add( double x, double y, double z ) {
-			cloudXyz.add((float)x);
-			cloudXyz.add((float)y);
-			cloudXyz.add((float)z);
-		}
-
-		@Override
-		public void add( double x, double y, double z, int rgb ) {
+		@Override public void add( double x, double y, double z, int rgb ) {
 			cloudXyz.add((float)x);
 			cloudXyz.add((float)y);
 			cloudXyz.add((float)z);
@@ -81,15 +65,9 @@ public interface PointCloudWriter {
 
 	static PointCloudWriter wrapF32( DogArray<Point3D_F32> cloud ) {
 		return new PointCloudWriter() {
-			@Override
-			public void init( int estimatedSize ) {
-				cloud.reserve(estimatedSize);
+			@Override public void initialize( int size, boolean hasColor ) {
+				cloud.reserve(size);
 				cloud.reset();
-			}
-
-			@Override
-			public void add( double x, double y, double z ) {
-				cloud.grow().setTo((float)x, (float)y, (float)z);
 			}
 
 			@Override
@@ -101,15 +79,9 @@ public interface PointCloudWriter {
 
 	static PointCloudWriter wrapF64( DogArray<Point3D_F64> cloud ) {
 		return new PointCloudWriter() {
-			@Override
-			public void init( int estimatedSize ) {
-				cloud.reserve(estimatedSize);
+			@Override public void initialize( int size, boolean hasColor ) {
+				cloud.reserve(size);
 				cloud.reset();
-			}
-
-			@Override
-			public void add( double x, double y, double z ) {
-				cloud.grow().setTo(x, y, z);
 			}
 
 			@Override
@@ -121,15 +93,9 @@ public interface PointCloudWriter {
 
 	static PointCloudWriter wrapF32RGB( DogArray<Point3dRgbI_F32> cloud ) {
 		return new PointCloudWriter() {
-			@Override
-			public void init( int estimatedSize ) {
-				cloud.reserve(estimatedSize);
+			@Override public void initialize( int size, boolean hasColor ) {
+				cloud.reserve(size);
 				cloud.reset();
-			}
-
-			@Override
-			public void add( double x, double y, double z ) {
-				cloud.grow().setTo((float)x, (float)y, (float)z);
 			}
 
 			@Override
@@ -141,15 +107,8 @@ public interface PointCloudWriter {
 
 	static PointCloudWriter wrapF64RGB( DogArray<Point3dRgbI_F64> cloud ) {
 		return new PointCloudWriter() {
-			@Override
-			public void init( int estimatedSize ) {
-				cloud.reserve(estimatedSize);
+			@Override public void initialize( int size, boolean hasColor ) {
 				cloud.reset();
-			}
-
-			@Override
-			public void add( double x, double y, double z ) {
-				cloud.grow().setTo(x, y, z);
 			}
 
 			@Override

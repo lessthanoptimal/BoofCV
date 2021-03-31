@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -76,53 +76,38 @@ public class PointCloudViewerSwing implements PointCloudViewer {
 		BoofSwingUtil.invokeNowOrLater(()->panel.backgroundColor=rgb);
 	}
 
-	@Override
-	public void addCloud(List<Point3D_F64> cloudXyz, int[] colorsRgb) {
-		if( cloudXyz.size() > colorsRgb.length ) {
-			throw new IllegalArgumentException("Number of points do not match");
-		}
+	@Override public void addCloud( IteratePoint iterator, boolean hasColor ) {
+		Point3D_F64 p = new Point3D_F64();
 		if( SwingUtilities.isEventDispatchThread() ) {
-			for (int i = 0; i < cloudXyz.size(); i++) {
-				Point3D_F64 p = cloudXyz.get(i);
-				panel.addPoint((float) p.x, (float) p.y, (float) p.z, colorsRgb[i]);
+			while (iterator.hasNext()) {
+				int rgb = iterator.next(p);
+				panel.addPoint((float) p.x, (float) p.y, (float) p.z, hasColor ? rgb : 0xFF000000);
 			}
 		} else {
 			SwingUtilities.invokeLater(() -> {
-				for (int i = 0; i < cloudXyz.size(); i++) {
-					Point3D_F64 p = cloudXyz.get(i);
-					panel.addPoint((float) p.x, (float) p.y, (float) p.z, colorsRgb[i]);
+				while (iterator.hasNext()) {
+					int rgb = iterator.next(p);
+					panel.addPoint((float) p.x, (float) p.y, (float) p.z, hasColor ? rgb : 0xFF000000);
 				}
 			});
 		}
 	}
 
-	@Override
-	public void addCloud(List<Point3D_F64> cloud) {
+	@Override public void addCloud( AccessPointIndex accessPoint, @Nullable AccessColorIndex accessColor, int size ) {
+		Point3D_F64 p = new Point3D_F64();
 		if( SwingUtilities.isEventDispatchThread() ) {
-			for (int i = 0; i < cloud.size(); i++) {
-				Point3D_F64 p = cloud.get(i);
-				panel.addPoint((float) p.x, (float) p.y, (float) p.z, 0xFF0000);
+			for (int i = 0; i < size; i++) {
+				accessPoint.getPoint(i, p);
+				int rgb = accessColor == null ? 0xFF000000 : accessColor.getRGB(i);
+				panel.addPoint((float) p.x, (float) p.y, (float) p.z, rgb);
 			}
 		} else {
 			SwingUtilities.invokeLater(() -> {
-				for (int i = 0; i < cloud.size(); i++) {
-					Point3D_F64 p = cloud.get(i);
-					panel.addPoint((float) p.x, (float) p.y, (float) p.z, 0xFF0000);
+				for (int i = 0; i < size; i++) {
+					accessPoint.getPoint(i, p);
+					int rgb = accessColor == null ? 0xFF000000 : accessColor.getRGB(i);
+					panel.addPoint((float) p.x, (float) p.y, (float) p.z, rgb);
 				}
-			});
-		}
-	}
-
-	@Override
-	public void addCloud(DogArray_F32 cloudXYZ, DogArray_I32 colorRGB) {
-		if( cloudXYZ.size/3 != colorRGB.size ) {
-			throw new IllegalArgumentException("Number of points do not match");
-		}
-		if( SwingUtilities.isEventDispatchThread() ) {
-			panel.addPoints(cloudXYZ.data, colorRGB.data, cloudXYZ.size / 3);
-		} else {
-			SwingUtilities.invokeLater(() -> {
-				panel.addPoints(cloudXYZ.data, colorRGB.data, cloudXYZ.size / 3);
 			});
 		}
 	}
@@ -148,9 +133,7 @@ public class PointCloudViewerSwing implements PointCloudViewer {
 		if( SwingUtilities.isEventDispatchThread() ) {
 			panel.clearCloud();
 		} else {
-			SwingUtilities.invokeLater(() -> {
-				panel.clearCloud();
-			});
+			SwingUtilities.invokeLater(() -> panel.clearCloud());
 		}
 	}
 
