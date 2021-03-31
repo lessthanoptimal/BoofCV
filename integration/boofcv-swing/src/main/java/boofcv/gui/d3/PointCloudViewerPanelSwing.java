@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -22,10 +22,12 @@ import boofcv.alg.geo.PerspectiveOps;
 import boofcv.alg.misc.ImageMiscOps;
 import boofcv.gui.image.SaveImageOnClick;
 import boofcv.io.image.ConvertBufferedImage;
+import boofcv.misc.BoofLambdas;
 import boofcv.misc.BoofMiscOps;
 import boofcv.struct.calib.CameraPinhole;
 import boofcv.struct.image.GrayF32;
 import boofcv.struct.image.GrayS32;
+import boofcv.struct.packed.PackedBigArrayPoint3D_F32;
 import boofcv.visualize.PointCloudViewer;
 import georegression.geometry.ConvertRotation3D_F32;
 import georegression.metric.UtilAngle;
@@ -38,10 +40,9 @@ import georegression.struct.point.Vector3D_F32;
 import georegression.struct.se.Se3_F32;
 import georegression.transform.se.SePointOps_F32;
 import lombok.Getter;
+import org.ddogleg.struct.BigDogArray_I32;
 import org.ddogleg.struct.DogArray;
 import org.ddogleg.struct.DogArray_B;
-import org.ddogleg.struct.DogArray_F32;
-import org.ddogleg.struct.DogArray_I32;
 import org.jetbrains.annotations.Nullable;
 
 import javax.swing.*;
@@ -73,9 +74,10 @@ public class PointCloudViewerPanelSwing extends JPanel
 	// TODO right click that brings up contextual menu that lets you configure how data is viewed
 
 	// Storage for xyz coordinates of points in the count
-	private @Getter final DogArray_F32 cloudXyz = new DogArray_F32(); // lock for reading/writing cloud data
+	// lock for reading/writing cloud data
+	private @Getter final PackedBigArrayPoint3D_F32 cloudXyz = new PackedBigArrayPoint3D_F32();
 	// Storage for rgb values of points in the cloud
-	private @Getter final DogArray_I32 cloudColor = new DogArray_I32();
+	private @Getter final BigDogArray_I32 cloudColor = new BigDogArray_I32();
 
 	// Wireframes which will be rendered. Also the LOCK
 	private final DogArray<Wireframe> wireframes = new DogArray<>(Wireframe::new);
@@ -230,26 +232,8 @@ public class PointCloudViewerPanelSwing extends JPanel
 
 	public void addPoint( float x, float y, float z, int rgb ) {
 		synchronized (cloudXyz) {
-			cloudXyz.add(x);
-			cloudXyz.add(y);
-			cloudXyz.add(z);
+			cloudXyz.append(x,y,z);
 			cloudColor.add(rgb);
-		}
-	}
-
-	public void addPoints( float[] pointsXYZ, int[] pointsRGB, int length ) {
-		synchronized (cloudXyz) {
-			int idxSrc = cloudXyz.size*3;
-
-			cloudXyz.extend(cloudXyz.size + length*3);
-			cloudColor.extend(cloudColor.size + length);
-
-			for (int i = 0, idx = 0; i < length; i++) {
-				cloudXyz.data[idxSrc++] = pointsXYZ[idx++];
-				cloudXyz.data[idxSrc++] = pointsXYZ[idx++];
-				cloudXyz.data[idxSrc++] = pointsXYZ[idx++];
-				cloudColor.data[i] = pointsRGB[i];
-			}
 		}
 	}
 
@@ -320,7 +304,6 @@ public class PointCloudViewerPanelSwing extends JPanel
 			throw new RuntimeException("Must be locked already");
 
 		final Point2D_F32 pixel = rendering.pixel;
-		final Point3D_F32 worldPt = rendering.worldPt;
 		final Point3D_F32 cameraPt = rendering.cameraPt;
 		final Se3_F32 worldToCamera = rendering.worldToCamera;
 		final GrayF32 imageDepth = rendering.imageDepth;
@@ -331,21 +314,16 @@ public class PointCloudViewerPanelSwing extends JPanel
 		final float cy = (float)intrinsic.cy;
 		// NOTE: To make this concurrent there needs to be a way to write the points and not run into race conditions
 		//       Each thread writing to its own image seems too expensive for large images and combining the results
-		int totalPoints = cloudXyz.size/3;
-		for (int i = 0, pointIdx = 0; i < totalPoints; i++) {
-			worldPt.x = cloudXyz.data[pointIdx++];
-			worldPt.y = cloudXyz.data[pointIdx++];
-			worldPt.z = cloudXyz.data[pointIdx++];
-
+		cloudXyz.forIdx(0, cloudXyz.size(), (BoofLambdas.ProcessIndex<Point3D_F32>)( idx, worldPt)-> {
 			SePointOps_F32.transform(worldToCamera, worldPt, cameraPt);
 
 			// can't render if it's behind the camera
 			if (cameraPt.z < 0)
-				continue;
+				return;
 
 			float r2 = cameraPt.normSq();
 			if (r2 > maxDistanceSq)
-				continue;
+				return;
 
 			pixel.x = fx*cameraPt.x/cameraPt.z + cx;
 			pixel.y = fy*cameraPt.y/cameraPt.z + cy;
@@ -354,20 +332,20 @@ public class PointCloudViewerPanelSwing extends JPanel
 			int y = (int)(pixel.y + 0.5f);
 
 			if (!imageDepth.isInBounds(x, y))
-				continue;
+				return;
 
 			int rgb;
 			if (colorizer == null) {
-				rgb = cloudColor.data[i];
+				rgb = cloudColor.get(idx);
 			} else {
-				rgb = colorizer.color(i, worldPt.x, worldPt.y, worldPt.z);
+				rgb = colorizer.color(idx, worldPt.x, worldPt.y, worldPt.z);
 			}
 
 			if (fog) {
 				rgb = applyFog(rgb, 1.0f - (float)Math.sqrt(r2)/maxRenderDistance);
 			}
 			renderDot(x, y, cameraPt.z, rgb, dotRadius);
-		}
+		});
 	}
 
 	/**

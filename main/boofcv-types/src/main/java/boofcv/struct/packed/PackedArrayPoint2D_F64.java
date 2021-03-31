@@ -18,6 +18,7 @@
 
 package boofcv.struct.packed;
 
+import boofcv.misc.BoofLambdas;
 import boofcv.struct.PackedArray;
 import georegression.struct.point.Point2D_F64;
 import org.ddogleg.struct.DogArray_F64;
@@ -28,6 +29,8 @@ import org.ddogleg.struct.DogArray_F64;
  * @author Peter Abeles
  */
 public class PackedArrayPoint2D_F64 implements PackedArray<Point2D_F64> {
+	private static final int DOF = 2;
+
 	// Stores tuple in a single continuous array
 	public final DogArray_F64 array;
 	// tuple that the result is temporarily written to
@@ -79,5 +82,16 @@ public class PackedArrayPoint2D_F64 implements PackedArray<Point2D_F64> {
 
 	@Override public Class<Point2D_F64> getElementType() {
 		return Point2D_F64.class;
+	}
+
+	@Override public void forIdx( int idx0, int idx1, BoofLambdas.ProcessIndex<Point2D_F64> op ) {
+		int pointIndex = idx0;
+		idx0 *= DOF;
+		idx1 *= DOF;
+		for (int i = idx0; i < idx1; i += DOF) {
+			temp.x = array.data[i];
+			temp.y = array.data[i+1];
+			op.process(pointIndex++, temp);
+		}
 	}
 }

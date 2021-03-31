@@ -18,8 +18,10 @@
 
 package boofcv.struct.packed;
 
+import boofcv.misc.BoofLambdas;
 import boofcv.struct.PackedArray;
 import georegression.struct.point.Point2D_F64;
+import org.ddogleg.struct.BigDogArray;
 import org.ddogleg.struct.BigDogArray_F64;
 
 /**
@@ -27,8 +29,11 @@ import org.ddogleg.struct.BigDogArray_F64;
  *
  * @author Peter Abeles
  */
-public class PackedBigArrayPoint2D_F64 extends BigDogArray_F64 implements PackedArray<Point2D_F64> {
+public class PackedBigArrayPoint2D_F64 implements PackedArray<Point2D_F64> {
 	private static final int DOF = 2;
+
+	// Storage for the raw data in an array
+	private final BigDogArray_F64 dog;
 
 	// tuple that the result is temporarily written to
 	public final Point2D_F64 temp = new Point2D_F64();
@@ -47,7 +52,7 @@ public class PackedBigArrayPoint2D_F64 extends BigDogArray_F64 implements Packed
 	 * Constructor where the initial number of points is specified and everything else is default
 	 */
 	public PackedBigArrayPoint2D_F64( int reservedPoints ) {
-		this(reservedPoints, 50_000, Growth.GROW_FIRST);
+		this(reservedPoints, 50_000, BigDogArray.Growth.GROW_FIRST);
 	}
 
 	/**
@@ -57,43 +62,49 @@ public class PackedBigArrayPoint2D_F64 extends BigDogArray_F64 implements Packed
 	 * @param blockSize A single block will be able to store this number of points
 	 * @param growth Growth strategy to use
 	 */
-	public PackedBigArrayPoint2D_F64( int reservedPoints, int blockSize, Growth growth ) {
-		// Ensure that blocks
-		super(reservedPoints*DOF, blockSize*DOF, growth);
+	public PackedBigArrayPoint2D_F64( int reservedPoints, int blockSize, BigDogArray.Growth growth ) {
+		dog = new BigDogArray_F64(reservedPoints*DOF, blockSize*DOF, growth);
 	}
 
 	@Override public void reset() {
-		super.reset();
+		dog.reset();
 		numPoints = 0;
 	}
 
 	@Override public void reserve( int numPoints ) {
-		super.reserve(numPoints*DOF);
+		dog.reserve(numPoints*DOF);
+	}
+
+	public void append( double x, double y ) {
+		dog.add(x);
+		dog.add(y);
+
+		numPoints++;
 	}
 
 	@Override public void append( Point2D_F64 element ) {
-		super.add(element.x);
-		super.add(element.y);
+		dog.add(element.x);
+		dog.add(element.y);
 
 		numPoints++;
 	}
 
 	@Override public Point2D_F64 getTemp( int index ) {
 		index *= DOF;
-		double[] block = super.blocks.get(index/blockSize);
-		int element = index%blockSize;
+		double[] block = dog.getBlocks().get(index/dog.getBlockSize());
+		int element = index%dog.getBlockSize();
 		temp.x = block[element];
-		temp.y = block[element+1];
+		temp.y = block[element + 1];
 
 		return temp;
 	}
 
 	@Override public void getCopy( int index, Point2D_F64 dst ) {
 		index *= DOF;
-		double[] block = super.blocks.get(index/blockSize);
-		int element = index%blockSize;
+		double[] block = dog.getBlocks().get(index/dog.getBlockSize());
+		int element = index%dog.getBlockSize();
 		dst.x = block[element];
-		dst.y = block[element+1];
+		dst.y = block[element + 1];
 	}
 
 	@Override public void copy( Point2D_F64 src, Point2D_F64 dst ) {
@@ -106,5 +117,16 @@ public class PackedBigArrayPoint2D_F64 extends BigDogArray_F64 implements Packed
 
 	@Override public Class<Point2D_F64> getElementType() {
 		return Point2D_F64.class;
+	}
+
+	@Override public void forIdx( int idx0, int idx1, BoofLambdas.ProcessIndex<Point2D_F64> op ) {
+		dog.processByBlock(idx0*DOF, idx1*DOF, (array, arrayIdx0, arrayIdx1, offset )-> {
+			int pointIndex = idx0 + offset/DOF;
+			for (int i = arrayIdx0; i < arrayIdx1; i += DOF) {
+				temp.x = array[i];
+				temp.y = array[i+1];
+				op.process(pointIndex++, temp);
+			}
+		});
 	}
 }

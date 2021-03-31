@@ -18,6 +18,7 @@
 
 package boofcv.struct;
 
+import boofcv.misc.BoofLambdas;
 import org.ddogleg.struct.LArrayAccessor;
 
 /**
@@ -46,4 +47,13 @@ public interface PackedArray<T> extends LArrayAccessor<T> {
 	 * @param element (Input) The element which is copied then added
 	 */
 	void append( T element );
+
+	/**
+	 * For each with index
+	 *
+	 * @param idx0 Initial index. Inclusive
+	 * @param idx1 Last index, Exclusive
+	 * @param op The operation to process each element
+	 */
+	void forIdx( int idx0, int idx1, BoofLambdas.ProcessIndex<T> op );
 }

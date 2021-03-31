@@ -19,6 +19,7 @@
 package boofcv.alg.scene.vocabtree;
 
 import boofcv.alg.scene.vocabtree.HierarchicalVocabularyTree.Node;
+import boofcv.misc.BoofLambdas;
 import boofcv.struct.PackedArray;
 import boofcv.testing.BoofStandardJUnit;
 import georegression.struct.point.Point2D_F64;
@@ -142,6 +143,7 @@ public class TestHierarchicalVocabularyTree extends BoofStandardJUnit {
 		@Override public void reset() {list.clear();}
 		@Override public void reserve( int numElements ) {}
 		@Override public void append( Point2D_F64 element ) {list.add(element.copy());}
+		@Override public void forIdx( int idx0, int idx1, BoofLambdas.ProcessIndex<Point2D_F64> op ) {}
 		@Override public Point2D_F64 getTemp( int index ) {return list.get(index);}
 		@Override public void getCopy( int index, Point2D_F64 dst ) {dst.setTo(list.get(index));}
 		@Override public void copy( Point2D_F64 src, Point2D_F64 dst ) {dst.setTo(src);}

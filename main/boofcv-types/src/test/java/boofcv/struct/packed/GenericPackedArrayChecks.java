@@ -20,6 +20,7 @@ package boofcv.struct.packed;
 
 import boofcv.struct.PackedArray;
 import boofcv.testing.BoofStandardJUnit;
+import org.ddogleg.struct.DogArray_I32;
 import org.junit.jupiter.api.Test;
 
 import java.util.ArrayList;
@@ -123,5 +124,28 @@ public abstract class GenericPackedArrayChecks<T> extends BoofStandardJUnit {
 		PackedArray<T> alg = createAlg();
 		alg.copy(a, b);
 		checkEquals(a, b);
+	}
+
+	@Test void forIdx() {
+		PackedArray<T> array = createAlg();
+		for (int i = 0; i < 26; i++) {
+			array.append(createRandomPoint());
+		}
+
+		List<T> found = new ArrayList<>();
+		DogArray_I32 indexes = new DogArray_I32();
+
+		array.forIdx(2,array.size()-1, (idx, point)->{
+			T copy = createRandomPoint();
+			array.copy(point, copy);
+			found.add(copy);
+			indexes.add(idx);
+		});
+
+		assertEquals(23, indexes.size);
+		for (int i = 0; i < indexes.size; i++) {
+			assertEquals(i+2, indexes.get(i));
+			checkEquals(array.getTemp(i+2), found.get(i));
+		}
 	}
 }

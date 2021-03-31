@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -42,21 +42,6 @@ class TestPointCloudWriter extends BoofStandardJUnit {
 		public abstract int size( PointCloudWriter data );
 		public abstract Point3D_F64 getPoint(PointCloudWriter data , int i );
 		public abstract int getColor(PointCloudWriter data , int i);
-		@Test
-		void simpleXyz() {
-			PointCloudWriter alg = create();
-
-			assertEquals(0,size(alg));
-			alg.add(0,1,2);
-			assertEquals(1,size(alg));
-			alg.add(2,1,3);
-			assertEquals(2,size(alg));
-
-			Point3D_F64 found = getPoint(alg,1);
-			assertEquals(2,found.x, UtilEjml.TEST_F64);
-			assertEquals(1,found.y, UtilEjml.TEST_F64);
-			assertEquals(3,found.z, UtilEjml.TEST_F64);
-		}
 
 		@Test
 		void simpleXyzColor() {

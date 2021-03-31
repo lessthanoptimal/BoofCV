@@ -18,6 +18,7 @@
 
 package boofcv.struct.feature;
 
+import boofcv.misc.BoofLambdas;
 import boofcv.struct.PackedArray;
 import org.ddogleg.struct.DogArray_I8;
 
@@ -79,5 +80,15 @@ public class PackedTupleArray_U8 implements PackedArray<TupleDesc_U8> {
 
 	@Override public Class<TupleDesc_U8> getElementType() {
 		return TupleDesc_U8.class;
+	}
+
+	@Override public void forIdx( int idx0, int idx1, BoofLambdas.ProcessIndex<TupleDesc_U8> op ) {
+		int pointIndex = idx0;
+		idx0 *= dof;
+		idx1 *= dof;
+		for (int i = idx0; i < idx1; i += dof) {
+			System.arraycopy(array.data, i, temp.data, 0, dof);
+			op.process(pointIndex++, temp);
+		}
 	}
 }
