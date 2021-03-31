@@ -19,15 +19,16 @@
 package boofcv.gui.d3;
 
 import boofcv.gui.BoofSwingUtil;
+import boofcv.struct.PackedArray;
 import boofcv.struct.Point3dRgbI_F64;
 import boofcv.visualize.PointCloudViewer;
 import georegression.struct.ConvertFloatType;
+import georegression.struct.point.Point3D_F32;
 import georegression.struct.point.Point3D_F64;
 import georegression.struct.se.Se3_F32;
 import georegression.struct.se.Se3_F64;
+import org.ddogleg.struct.BigDogArray_I32;
 import org.ddogleg.struct.DogArray;
-import org.ddogleg.struct.DogArray_F32;
-import org.ddogleg.struct.DogArray_I32;
 import org.jetbrains.annotations.Nullable;
 
 import javax.swing.*;
@@ -176,29 +177,18 @@ public class PointCloudViewerSwing implements PointCloudViewer {
 		else
 			copy.reset();
 
+		DogArray<Point3dRgbI_F64> _copy = copy;
+
 		// See if it has color information on the points or not
-		final DogArray_F32 cloudXyz = panel.getCloudXyz();
-		final DogArray_I32 cloudColor = panel.getCloudColor();
+		final PackedArray<Point3D_F32> cloudXyz = panel.getCloudXyz();
+		final BigDogArray_I32 cloudColor = panel.getCloudColor();
 		synchronized (cloudXyz) {
-			int N = cloudXyz.size / 3;
-			if (N == cloudColor.size) {
-				int idxXyz = 0;
-				for (int i = 0; i < N; i++) {
-					Point3dRgbI_F64 p = copy.grow();
-					p.x = cloudXyz.data[idxXyz++];
-					p.y = cloudXyz.data[idxXyz++];
-					p.z = cloudXyz.data[idxXyz++];
-					p.rgb = cloudColor.data[i];
-				}
+			if (cloudXyz.size()==cloudColor.size) {
+				cloudXyz.forIdx(0, cloudXyz.size(), ( idx, point ) ->
+						_copy.grow().setTo(point.x, point.y, point.z, cloudColor.get(idx)));
 			} else {
-				int idxXyz = 0;
-				for (int i = 0; i < N; i++) {
-					Point3dRgbI_F64 p = copy.grow();
-					p.x = cloudXyz.data[idxXyz++];
-					p.y = cloudXyz.data[idxXyz++];
-					p.z = cloudXyz.data[idxXyz++];
-					p.rgb = 0;
-				}
+				cloudXyz.forIdx(0, cloudXyz.size(), ( idx, point ) ->
+						_copy.grow().setTo(point.x, point.y, point.z));
 			}
 		}
 

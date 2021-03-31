@@ -46,7 +46,6 @@ public class ExampleViewPointCloud {
 		DogArray<Point3dRgbI_F32> cloud = new DogArray<>(Point3dRgbI_F32::new);
 		PointCloudIO.load(PointCloudIO.Format.PLY, new FileInputStream(filePath), PointCloudWriter.wrapF32RGB(cloud));
 
-		cloud.size = 500_000;
 		System.out.println("Total Points " + cloud.size);
 
 		// Create the 3D viewer as a Swing panel that will have some minimal controls for adjusting the clouds

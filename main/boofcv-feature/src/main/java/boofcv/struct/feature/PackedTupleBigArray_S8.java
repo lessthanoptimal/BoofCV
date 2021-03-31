@@ -18,6 +18,7 @@
 
 package boofcv.struct.feature;
 
+import boofcv.misc.BoofLambdas;
 import boofcv.struct.PackedArray;
 import org.ddogleg.struct.BigDogArray;
 import org.ddogleg.struct.BigDogArray_I8;
@@ -43,7 +44,7 @@ public class PackedTupleBigArray_S8 implements PackedArray<TupleDesc_S8> {
 	public PackedTupleBigArray_S8( int dof ) {
 		this.dof = dof;
 		this.temp = new TupleDesc_S8(dof);
-		array = new BigDogArray_I8(dof,dof*65536, BigDogArray.Growth.GROW_FIRST);
+		array = new BigDogArray_I8(dof, dof*65536, BigDogArray.Growth.GROW_FIRST);
 		array.resize(0);
 	}
 
@@ -80,5 +81,15 @@ public class PackedTupleBigArray_S8 implements PackedArray<TupleDesc_S8> {
 
 	@Override public Class<TupleDesc_S8> getElementType() {
 		return TupleDesc_S8.class;
+	}
+
+	@Override public void forIdx( int idx0, int idx1, BoofLambdas.ProcessIndex<TupleDesc_S8> op ) {
+		array.processByBlock(idx0*dof, idx1*dof, ( array, arrayIdx0, arrayIdx1, offset ) -> {
+			int pointIndex = idx0 + offset/dof;
+			for (int i = arrayIdx0; i < arrayIdx1; i += dof) {
+				System.arraycopy(array, i, temp.data, 0, dof);
+				op.process(pointIndex++, temp);
+			}
+		});
 	}
 }
