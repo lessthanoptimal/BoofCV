@@ -16,18 +16,8 @@
  * limitations under the License.
  */
 
-package boofcv.abst.feature.describe;
+package boofcv.alg.similar;
 
-import boofcv.testing.BoofStandardJUnit;
-import org.junit.jupiter.api.Test;
+import boofcv.struct.StandardConfigurationChecks;
 
-import static org.junit.jupiter.api.Assertions.fail;
-
-/**
- * @author Peter Abeles
- */
-public class TestDescribeSurf_Point extends BoofStandardJUnit {
-	@Test void implement() {
-		fail("Implement");
-	}
-}
+public class TestConfigSimilarImagesTrackThenMatch  extends StandardConfigurationChecks {}

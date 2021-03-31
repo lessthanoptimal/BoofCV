@@ -19,20 +19,19 @@
 package boofcv.factory.structure;
 
 import boofcv.abst.feature.associate.AssociateDescriptionHashSets;
+import boofcv.abst.feature.describe.DescribePoint;
 import boofcv.abst.feature.detdesc.DetectDescribePoint;
 import boofcv.abst.geo.bundle.MetricBundleAdjustmentUtils;
 import boofcv.abst.scene.FeatureSceneRecognition;
 import boofcv.abst.tracker.PointTracker;
 import boofcv.alg.mvs.MultiViewStereoFromKnownSceneStructure;
-import boofcv.alg.similar.ConfigSimilarImagesSceneRecognition;
-import boofcv.alg.similar.ImageSimilarityAssociatedRatio;
-import boofcv.alg.similar.SimilarImagesPointTracker;
-import boofcv.alg.similar.SimilarImagesSceneRecognition;
+import boofcv.alg.similar.*;
 import boofcv.alg.structure.*;
 import boofcv.alg.structure.score3d.ScoreFundamentalReprojectionError;
 import boofcv.alg.structure.score3d.ScoreRatioFundamentalHomography;
 import boofcv.factory.disparity.FactoryStereoDisparity;
 import boofcv.factory.feature.associate.FactoryAssociation;
+import boofcv.factory.feature.describe.FactoryDescribePoint;
 import boofcv.factory.feature.detdesc.FactoryDetectDescribe;
 import boofcv.factory.geo.FactoryMultiViewRobust;
 import boofcv.factory.scene.FactorySceneRecognition;
@@ -191,6 +190,33 @@ public class FactorySceneReconstruction {
 
 		similar.setSimilarityTest(new ImageSimilarityAssociatedRatio(config.minimumSimilar));
 		similar.setLimitMatchesConsider(config.limitMatchesConsider);
+
+		return similar;
+	}
+
+	/**
+	 * Creates {@link SimilarImagesSceneRecognition}.
+	 */
+	public static <Image extends ImageGray<Image>, TD extends TupleDesc<TD>>
+	SimilarImagesTrackThenMatch<Image, TD> createTrackThenMatch( @Nullable ConfigSimilarImagesTrackThenMatch config,
+																 ImageType<Image> imageType ) {
+		if (config == null)
+			config = new ConfigSimilarImagesTrackThenMatch();
+
+		DescribePoint<Image, TD> detector =	FactoryDescribePoint.generic(config.descriptions, imageType);
+
+		FeatureSceneRecognition<TD> recognitizer =
+				FactorySceneRecognition.createSceneNister2006(config.recognizeNister2006, detector::createDescription);
+
+		AssociateDescriptionHashSets<TD> associator = new AssociateDescriptionHashSets<>(
+				FactoryAssociation.generic(config.associate, detector));
+
+		var similar = new SimilarImagesTrackThenMatch<>(detector, associator, recognitizer,
+				() -> FactoryTupleDesc.createPacked(detector));
+
+		similar.setSimilarityTest(new ImageSimilarityAssociatedRatio(config.minimumSimilar));
+		similar.setLimitQuery(config.limitQuery);
+		similar.setMinimumRecognizeDistance(config.minimumRecognizeDistance);
 
 		return similar;
 	}
