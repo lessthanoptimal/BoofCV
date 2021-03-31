@@ -23,12 +23,13 @@ import boofcv.struct.image.ImageBase;
 import boofcv.struct.image.ImageType;
 
 /**
- * Computes a description of the region around a point from its location only.
+ * High level interface for describing the region around a point when given the pixel coordinate of the point
+ * only.
  *
  * @author Peter Abeles
  */
-public interface DescribePoint<T extends ImageBase<T>, Desc extends TupleDesc<Desc>>
-		extends DescriptorInfo<Desc> {
+public interface DescribePoint<T extends ImageBase<T>, TD extends TupleDesc<TD>>
+		extends DescriptorInfo<TD> {
 	/**
 	 * Specified the image which is to be processed.
 	 *
@@ -47,7 +48,7 @@ public interface DescribePoint<T extends ImageBase<T>, Desc extends TupleDesc<De
 	 * @param description (output) Storage for extracted feature.  Use {@link #createDescription} to create descriptor.
 	 * @return true if a descriptor can computed or false if not.
 	 */
-	boolean process( double x, double y, Desc description );
+	boolean process( double x, double y, TD description );
 
 	/**
 	 * Description of the type of image it can process

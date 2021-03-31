@@ -36,7 +36,7 @@ abstract class GenericDescribeRegionPointChecks<T extends ImageBase<T>, TD exten
 		extends BoofStandardJUnit {
 	protected ImageType<T> imageType;
 
-	protected abstract DescribePointGivenRegion<T, TD> createAlg();
+	protected abstract DescribePointRadiusAngle<T, TD> createAlg();
 
 	protected GenericDescribeRegionPointChecks( ImageType<T> imageType ) {
 		this.imageType = imageType;
@@ -60,7 +60,7 @@ abstract class GenericDescribeRegionPointChecks<T extends ImageBase<T>, TD exten
 		GImageMiscOps.fill(image.subimage(cx - aradius, cy - aradius, cx + aradius + 1, cy + aradius + 1), 50);
 //		image.set(cx,cy,100); // give it some texture so it doesn't amplify noise
 
-		DescribePointGivenRegion<T, TD> describe = createAlg();
+		DescribePointRadiusAngle<T, TD> describe = createAlg();
 		describe.setImage(image);
 
 		TD t1 = describe.createDescription();

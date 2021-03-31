@@ -19,7 +19,7 @@
 package boofcv.abst.scene;
 
 import boofcv.factory.feature.describe.ConfigConvertTupleDesc;
-import boofcv.factory.feature.describe.ConfigDescribeRegionPoint;
+import boofcv.factory.feature.describe.ConfigDescribeRegion;
 import boofcv.factory.scene.FactorySceneRecognition;
 import boofcv.struct.image.GrayU8;
 import boofcv.struct.image.ImageType;
@@ -59,7 +59,7 @@ class TestWrapFeatureToSceneRecognition extends BoofStandardJUnit {
 			var config = new ConfigFeatureToSceneRecognition();
 			config.recognizeNister2006.tree.branchFactor = 5;
 			config.recognizeNister2006.tree.maximumLevel = 3;
-			config.features.typeDescribe = ConfigDescribeRegionPoint.DescriptorType.BRIEF;
+			config.features.typeDescribe = ConfigDescribeRegion.Type.BRIEF;
 			config.features.describeBrief.fixed = false;
 			config.features.detectFastHessian.extract.radius = 12;
 			config.features.convertDescriptor.outputData = ConfigConvertTupleDesc.DataType.NATIVE;

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -21,7 +21,7 @@ package boofcv.alg.tracker.tld;
 import boofcv.alg.feature.describe.DescribePointPixelRegionNCC;
 import boofcv.alg.interpolate.InterpolatePixelS;
 import boofcv.alg.misc.ImageMiscOps;
-import boofcv.factory.feature.describe.FactoryDescribePointAlgs;
+import boofcv.factory.feature.describe.FactoryDescribeAlgs;
 import boofcv.factory.interpolate.FactoryInterpolation;
 import boofcv.struct.ImageRectangle;
 import boofcv.struct.border.BorderType;
@@ -92,7 +92,7 @@ public class TestTldTemplateMatching extends BoofStandardJUnit {
 		alg.computeNccDescriptor(found,2,3,17,18);
 
 		NccFeature expected = alg.createDescriptor();
-		DescribePointPixelRegionNCC descriptor = FactoryDescribePointAlgs.pixelRegionNCC(15,15,GrayU8.class);
+		DescribePointPixelRegionNCC descriptor = FactoryDescribeAlgs.pixelRegionNCC(15,15,GrayU8.class);
 	    descriptor.setImage(input);
 		descriptor.process(7+2,7+3,expected);
 

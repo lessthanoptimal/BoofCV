@@ -127,4 +127,8 @@ public class DescribePointBriefSO<T extends ImageGray<T>> {
 	public BinaryCompareDefinition_I32 getDefinition() {
 		return definition;
 	}
+
+	public double getCanonicalWidth() {
+		return definition.radius*2 + 1;
+	}
 }

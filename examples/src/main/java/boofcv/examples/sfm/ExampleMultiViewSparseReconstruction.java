@@ -172,7 +172,7 @@ public class ExampleMultiViewSparseReconstruction {
 		configTracker.klt.templateRadius = radius;
 		configTracker.klt.maximumTracks.setFixed(800);
 		configTracker.klt.config.maxIterations = 30;
-		configTracker.detDesc.typeDetector = ConfigDetectInterestPoint.DetectorType.POINT;
+		configTracker.detDesc.typeDetector = ConfigDetectInterestPoint.Type.POINT;
 		configTracker.detDesc.detectPoint.type = PointDetectorTypes.SHI_TOMASI;
 		configTracker.detDesc.detectPoint.shiTomasi.radius = 6;
 		configTracker.detDesc.detectPoint.general.radius = 4;

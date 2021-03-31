@@ -18,10 +18,10 @@
 
 package boofcv.abst.feature.detdesc;
 
-import boofcv.abst.feature.describe.DescribePointGivenRegion;
+import boofcv.abst.feature.describe.DescribePointRadiusAngle;
 import boofcv.abst.feature.detect.interest.InterestPointDetector;
 import boofcv.abst.feature.orientation.OrientationImage;
-import boofcv.factory.feature.describe.FactoryDescribeRegionPoint;
+import boofcv.factory.feature.describe.FactoryDescribePointRadiusAngle;
 import boofcv.factory.feature.detect.interest.FactoryInterestPoint;
 import boofcv.factory.feature.orientation.FactoryOrientationAlgs;
 import boofcv.struct.feature.TupleDesc;
@@ -48,7 +48,7 @@ public class TestDetectDescribeFusion extends BoofStandardJUnit {
 	public void checkFeatureNotInBounds() {
 
 		InterestPointDetector detector = new DummyDetector();
-		DescribePointGivenRegion describe = new DummyRegionPoint();
+		DescribePointRadiusAngle describe = new DummyRegionPoint();
 
 		DetectDescribeFusion alg = new DetectDescribeFusion(detector,null,describe);
 
@@ -73,8 +73,8 @@ public class TestDetectDescribeFusion extends BoofStandardJUnit {
 			public DetectDescribePoint createDetDesc() {
 				final InterestPointDetector<GrayF32> detector = FactoryInterestPoint.fastHessian(null,GrayF32.class);
 				final OrientationImage ori = FactoryOrientationAlgs.nogradient(1.0/2.0,5,GrayF32.class);
-				final DescribePointGivenRegion<GrayF32,TupleDesc_F64> desc =
-						FactoryDescribeRegionPoint.surfStable(null, GrayF32.class);
+				final DescribePointRadiusAngle<GrayF32,TupleDesc_F64> desc =
+						FactoryDescribePointRadiusAngle.surfStable(null, GrayF32.class);
 				return new DetectDescribeFusion(detector,ori,desc);
 			}
 		}.allTests();
@@ -87,8 +87,8 @@ public class TestDetectDescribeFusion extends BoofStandardJUnit {
 			@Override
 			public DetectDescribePoint createDetDesc() {
 				final InterestPointDetector<GrayF32> detector = FactoryInterestPoint.fastHessian(null,GrayF32.class);
-				final DescribePointGivenRegion<GrayF32,TupleDesc_F64> desc =
-						FactoryDescribeRegionPoint.surfStable(null, GrayF32.class);
+				final DescribePointRadiusAngle<GrayF32,TupleDesc_F64> desc =
+						FactoryDescribePointRadiusAngle.surfStable(null, GrayF32.class);
 				return new DetectDescribeFusion(detector,null,desc);
 			}
 		}.allTests();
@@ -127,7 +127,7 @@ public class TestDetectDescribeFusion extends BoofStandardJUnit {
 		}
 	}
 
-	public static class DummyRegionPoint implements DescribePointGivenRegion {
+	public static class DummyRegionPoint implements DescribePointRadiusAngle {
 
 		int calls = 0;
 

@@ -24,7 +24,7 @@ import boofcv.abst.feature.detect.interest.ConfigPointDetector;
 import boofcv.abst.feature.detect.interest.ConfigSiftDetector;
 import boofcv.abst.feature.orientation.ConfigOrientation2;
 import boofcv.factory.feature.describe.ConfigConvertTupleDesc;
-import boofcv.factory.feature.describe.ConfigDescribeRegionPoint;
+import boofcv.factory.feature.describe.ConfigDescribeRegion;
 import boofcv.factory.feature.detect.interest.ConfigDetectInterestPoint;
 import boofcv.struct.Configuration;
 
@@ -35,9 +35,9 @@ import boofcv.struct.Configuration;
  */
 public class ConfigDetectDescribe implements Configuration {
 	/** The feature descriptor is used. Not always used. */
-	public ConfigDescribeRegionPoint.DescriptorType typeDescribe = ConfigDescribeRegionPoint.DescriptorType.SURF_FAST;
+	public ConfigDescribeRegion.Type typeDescribe = ConfigDescribeRegion.Type.SURF_FAST;
 	/** The feature detector is used. Not always used. */
-	public ConfigDetectInterestPoint.DetectorType typeDetector = ConfigDetectInterestPoint.DetectorType.FAST_HESSIAN;
+	public ConfigDetectInterestPoint.Type typeDetector = ConfigDetectInterestPoint.Type.FAST_HESSIAN;
 
 	/** Describes the scale-space used by SIFT detector / descriptor. */
 	public ConfigSiftScaleSpace scaleSpaceSift = new ConfigSiftScaleSpace();
@@ -61,7 +61,7 @@ public class ConfigDetectDescribe implements Configuration {
 	/** Convert the descriptor into a different format */
 	public ConfigConvertTupleDesc convertDescriptor = new ConfigConvertTupleDesc();
 
-	public void copyRefTo( ConfigDescribeRegionPoint dst ) {
+	public void copyRefTo( ConfigDescribeRegion dst ) {
 		dst.type = this.typeDescribe;
 		dst.scaleSpaceSift = this.scaleSpaceSift;
 		dst.template = this.describeTemplate;
@@ -82,7 +82,7 @@ public class ConfigDetectDescribe implements Configuration {
 		};
 	}
 
-	public void copyRefFrom( ConfigDescribeRegionPoint src ) {
+	public void copyRefFrom( ConfigDescribeRegion src ) {
 		this.typeDescribe = src.type;
 		this.scaleSpaceSift = src.scaleSpaceSift;
 		this.describeTemplate = src.template;

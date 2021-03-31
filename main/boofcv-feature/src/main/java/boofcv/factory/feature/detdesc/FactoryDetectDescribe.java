@@ -20,7 +20,7 @@ package boofcv.factory.feature.detdesc;
 
 import boofcv.abst.feature.convert.ConvertTupleDesc;
 import boofcv.abst.feature.describe.ConfigSurfDescribe;
-import boofcv.abst.feature.describe.DescribePointGivenRegion;
+import boofcv.abst.feature.describe.DescribePointRadiusAngle;
 import boofcv.abst.feature.detdesc.*;
 import boofcv.abst.feature.detect.interest.ConfigFastHessian;
 import boofcv.abst.feature.detect.interest.InterestPointDetector;
@@ -67,14 +67,14 @@ public class FactoryDetectDescribe {
 	DetectDescribePoint<Image, Desc> generic( ConfigDetectDescribe config, Class<Image> imageType ) {
 		DetectDescribePoint detDesc = null;
 
-		if (config.typeDetector == ConfigDetectInterestPoint.DetectorType.FAST_HESSIAN) {
+		if (config.typeDetector == ConfigDetectInterestPoint.Type.FAST_HESSIAN) {
 			switch (config.typeDescribe) {
 				case SURF_FAST -> detDesc = FactoryDetectDescribe.surfFast(
 						config.detectFastHessian, config.describeSurfFast, config.orientation.averageIntegral, imageType);
 				case SURF_STABLE -> detDesc = FactoryDetectDescribe.surfStable(
 						config.detectFastHessian, config.describeSurfStability, config.orientation.slidingIntegral, imageType);
 			}
-		} else if (config.typeDescribe == ConfigDescribeRegionPoint.DescriptorType.SIFT) {
+		} else if (config.typeDescribe == ConfigDescribeRegion.Type.SIFT) {
 			var configSift = new ConfigCompleteSift();
 			configSift.scaleSpace = config.scaleSpaceSift;
 			configSift.detector = config.detectSift;
@@ -96,12 +96,12 @@ public class FactoryDetectDescribe {
 			}
 			default -> throw new IllegalArgumentException("Unknown detector");
 		}
-		DescribePointGivenRegion descriptor = switch (config.typeDescribe) {
-			case SURF_FAST -> FactoryDescribeRegionPoint.surfFast(config.describeSurfFast, imageType);
-			case SURF_STABLE -> FactoryDescribeRegionPoint.surfStable(config.describeSurfStability, imageType);
-			case SIFT -> FactoryDescribeRegionPoint.sift(config.scaleSpaceSift, config.describeSift, imageType);
-			case BRIEF -> FactoryDescribeRegionPoint.brief(config.describeBrief, imageType);
-			case TEMPLATE -> FactoryDescribeRegionPoint.template(config.describeTemplate, imageType);
+		DescribePointRadiusAngle descriptor = switch (config.typeDescribe) {
+			case SURF_FAST -> FactoryDescribePointRadiusAngle.surfFast(config.describeSurfFast, imageType);
+			case SURF_STABLE -> FactoryDescribePointRadiusAngle.surfStable(config.describeSurfStability, imageType);
+			case SIFT -> FactoryDescribePointRadiusAngle.sift(config.scaleSpaceSift, config.describeSift, imageType);
+			case BRIEF -> FactoryDescribePointRadiusAngle.brief(config.describeBrief, imageType);
+			case TEMPLATE -> FactoryDescribePointRadiusAngle.template(config.describeTemplate, imageType);
 			default -> throw new IllegalArgumentException("Unknown descriptor");
 		};
 
@@ -111,12 +111,7 @@ public class FactoryDetectDescribe {
 		if (descriptor.isOriented()) {
 //			if( descriptor.isScalable() ) {
 			Class integralType = GIntegralImageOps.getIntegralType(imageType);
-			OrientationIntegral orientationII =
-					switch (config.orientation.type) {
-						case AVERAGE -> FactoryOrientationAlgs.average_ii(config.orientation.averageIntegral, integralType);
-						case SLIDING -> FactoryOrientationAlgs.sliding_ii(config.orientation.slidingIntegral, integralType);
-						default -> throw new RuntimeException("Unsupported orientation type for scalable.");
-					};
+			OrientationIntegral orientationII = FactoryOrientation.genericIntegral(config.orientation, integralType);
 			orientation = FactoryOrientation.convertImage(orientationII, imageType);
 //			}
 			// TODO add fixed scale orientations
@@ -137,7 +132,7 @@ public class FactoryDetectDescribe {
 
 		int dof = original.createDescription().size();
 		ConvertTupleDesc<In, Out> converter = FactoryConvertTupleDesc.generic(config, dof, original.getDescriptionType());
-		return new DetectDescribeConvert<>(original, converter);
+		return new DetectDescribeConvertTuple<>(original, converter);
 	}
 
 	/**
@@ -150,7 +145,7 @@ public class FactoryDetectDescribe {
 	public static <T extends ImageGray<T>>
 	DetectDescribePoint<T, TupleDesc_F64> sift( @Nullable ConfigCompleteSift config, Class<T> imageType ) {
 		CompleteSift dds = FactoryDetectDescribeAlgs.sift(config);
-		return new DetectDescribe_CompleteSift<>(dds, imageType);
+		return new CompleteSift_DetectDescribe<>(dds, imageType);
 	}
 
 	/**
@@ -181,13 +176,13 @@ public class FactoryDetectDescribe {
 		Class<II> integralType = GIntegralImageOps.getIntegralType(imageType);
 
 		FastHessianFeatureDetector<II> detector = FactoryInterestPointAlgs.fastHessian(configDetector);
-		DescribePointSurf<II> describe = FactoryDescribePointAlgs.surfSpeed(configDesc, integralType);
+		DescribePointSurf<II> describe = FactoryDescribeAlgs.surfSpeed(configDesc, integralType);
 		OrientationIntegral<II> orientation = FactoryOrientationAlgs.average_ii(configOrientation, integralType);
 
 		if (BoofConcurrency.USE_CONCURRENT) {
-			return new WrapDetectDescribeSurf_MT<>(detector, orientation, describe, imageType);
+			return new Surf_DetectDescribe_MT<>(detector, orientation, describe, imageType);
 		} else {
-			return new WrapDetectDescribeSurf<>(detector, orientation, describe, imageType);
+			return new Surf_DetectDescribe<>(detector, orientation, describe, imageType);
 		}
 	}
 
@@ -216,7 +211,7 @@ public class FactoryDetectDescribe {
 		Class<II> integralType = GIntegralImageOps.getIntegralType(bandType);
 
 		FastHessianFeatureDetector<II> detector = FactoryInterestPointAlgs.fastHessian(configDetector);
-		DescribePointSurf<II> describe = FactoryDescribePointAlgs.surfSpeed(configDesc, integralType);
+		DescribePointSurf<II> describe = FactoryDescribeAlgs.surfSpeed(configDesc, integralType);
 		OrientationIntegral<II> orientation = FactoryOrientationAlgs.average_ii(configOrientation, integralType);
 
 		if (imageType.getFamily() == ImageType.Family.PLANAR) {
@@ -225,7 +220,7 @@ public class FactoryDetectDescribe {
 
 			DetectDescribeSurfPlanar<II> detectDesc = createDescribeSurfPlanar(detector, orientation, describeMulti);
 
-			return new SurfPlanar_to_DetectDescribePoint(detectDesc, bandType, integralType);
+			return new SurfPlanar_to_DetectDescribe(detectDesc, bandType, integralType);
 		} else {
 			throw new IllegalArgumentException("Image type not supported");
 		}
@@ -272,13 +267,13 @@ public class FactoryDetectDescribe {
 		Class<II> integralType = GIntegralImageOps.getIntegralType(imageType);
 
 		FastHessianFeatureDetector<II> detector = FactoryInterestPointAlgs.fastHessian(configDetector);
-		DescribePointSurfMod<II> describe = FactoryDescribePointAlgs.surfStability(configDescribe, integralType);
+		DescribePointSurfMod<II> describe = FactoryDescribeAlgs.surfStability(configDescribe, integralType);
 		OrientationIntegral<II> orientation = FactoryOrientationAlgs.sliding_ii(configOrientation, integralType);
 
 		if (BoofConcurrency.USE_CONCURRENT) {
-			return new WrapDetectDescribeSurf_MT<>(detector, orientation, describe, imageType);
+			return new Surf_DetectDescribe_MT<>(detector, orientation, describe, imageType);
 		} else {
-			return new WrapDetectDescribeSurf<>(detector, orientation, describe, imageType);
+			return new Surf_DetectDescribe<>(detector, orientation, describe, imageType);
 		}
 	}
 
@@ -308,7 +303,7 @@ public class FactoryDetectDescribe {
 		Class<II> integralType = GIntegralImageOps.getIntegralType(bandType);
 
 		FastHessianFeatureDetector<II> detector = FactoryInterestPointAlgs.fastHessian(configDetector);
-		DescribePointSurfMod<II> describe = FactoryDescribePointAlgs.surfStability(configDescribe, integralType);
+		DescribePointSurfMod<II> describe = FactoryDescribeAlgs.surfStability(configDescribe, integralType);
 		OrientationIntegral<II> orientation = FactoryOrientationAlgs.sliding_ii(configOrientation, integralType);
 
 		if (imageType.getFamily() == ImageType.Family.PLANAR) {
@@ -317,7 +312,7 @@ public class FactoryDetectDescribe {
 
 			DetectDescribeSurfPlanar<II> detectDesc = createDescribeSurfPlanar(detector, orientation, describeMulti);
 
-			return new SurfPlanar_to_DetectDescribePoint(detectDesc, bandType, integralType);
+			return new SurfPlanar_to_DetectDescribe(detectDesc, bandType, integralType);
 		} else {
 			throw new IllegalArgumentException("Image type not supported");
 		}
@@ -335,7 +330,7 @@ public class FactoryDetectDescribe {
 	public static <T extends ImageGray<T>, TD extends TupleDesc<TD>>
 	DetectDescribePoint<T, TD> fuseTogether( InterestPointDetector<T> detector,
 											 @Nullable OrientationImage<T> orientation,
-											 DescribePointGivenRegion<T, TD> describe ) {
+											 DescribePointRadiusAngle<T, TD> describe ) {
 		return new DetectDescribeFusion<>(detector, orientation, describe);
 	}
 }

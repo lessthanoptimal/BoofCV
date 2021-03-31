@@ -32,7 +32,7 @@ import boofcv.struct.image.ImageGray;
  * @see DescriptorDistance#ncc(boofcv.struct.feature.NccFeature, boofcv.struct.feature.NccFeature)
  */
 public abstract class DescribePointPixelRegionNCC<T extends ImageGray<T>>
-		extends DescribePointRectangleRegion<T> {
+		extends DescribePointRawPixelsRectangle<T> {
 	protected DescribePointPixelRegionNCC( int regionWidth, int regionHeight ) {
 		super(regionWidth, regionHeight);
 	}

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -20,7 +20,7 @@ package boofcv.factory.mvs;
 
 import boofcv.alg.mvs.video.SelectFramesForReconstruction3D;
 import boofcv.factory.feature.associate.ConfigAssociate;
-import boofcv.factory.feature.describe.ConfigDescribeRegionPoint;
+import boofcv.factory.feature.describe.ConfigDescribeRegion;
 import boofcv.factory.feature.detect.selector.ConfigSelectLimit;
 import boofcv.factory.tracker.ConfigPointTracker;
 import boofcv.misc.BoofMiscOps;
@@ -76,7 +76,7 @@ public class ConfigSelectFrames3D implements Configuration {
 	public final ConfigPointTracker tracker = new ConfigPointTracker();
 
 	/** Used to describe the area around a feature track */
-	public final ConfigDescribeRegionPoint describe = new ConfigDescribeRegionPoint();
+	public final ConfigDescribeRegion describe = new ConfigDescribeRegion();
 
 	/** Used to associate features between two images when recovering from a bad frame */
 	public final ConfigAssociate associate = new ConfigAssociate();
@@ -97,7 +97,7 @@ public class ConfigSelectFrames3D implements Configuration {
 		tracker.detDesc.detectPoint.general.selector.setTo(ConfigSelectLimit.selectUniform(3.0));
 
 		// best compromise between speed and stability
-		describe.type = ConfigDescribeRegionPoint.DescriptorType.SURF_STABLE;
+		describe.type = ConfigDescribeRegion.Type.SURF_STABLE;
 		// Video sequence, improve results by assuming there are not huge jumps in location
 		associate.maximumDistancePixels.setRelative(0.25, 50);
 		associate.greedy.forwardsBackwards = true;

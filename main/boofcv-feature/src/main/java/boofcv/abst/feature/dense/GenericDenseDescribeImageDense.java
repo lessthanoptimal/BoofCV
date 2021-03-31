@@ -18,7 +18,7 @@
 
 package boofcv.abst.feature.dense;
 
-import boofcv.abst.feature.describe.DescribePointGivenRegion;
+import boofcv.abst.feature.describe.DescribePointRadiusAngle;
 import boofcv.struct.feature.TupleDesc;
 import boofcv.struct.image.ImageBase;
 import boofcv.struct.image.ImageType;
@@ -28,14 +28,14 @@ import org.ddogleg.struct.DogArray;
 import java.util.List;
 
 /**
- * Dense feature computation which uses {@link DescribePointGivenRegion} internally.
+ * Dense feature computation which uses {@link DescribePointRadiusAngle} internally.
  *
  * @author Peter Abeles
  */
 public class GenericDenseDescribeImageDense<T extends ImageBase<T>, Desc extends TupleDesc<Desc>>
 		implements DescribeImageDense<T, Desc> {
 	// Computes the image feature
-	DescribePointGivenRegion<T, Desc> alg;
+	DescribePointRadiusAngle<T, Desc> alg;
 
 	// Radius of the "detected" feature
 	double radius;
@@ -56,7 +56,7 @@ public class GenericDenseDescribeImageDense<T extends ImageBase<T>, Desc extends
 	 * @param samplePeriodX How frequently the image is sampled in pixels. X-axis
 	 * @param samplePeriodY How frequently the image is sampled in pixels. Y-axis
 	 */
-	public GenericDenseDescribeImageDense( DescribePointGivenRegion<T, Desc> alg,
+	public GenericDenseDescribeImageDense( DescribePointRadiusAngle<T, Desc> alg,
 										   double descriptorScale,
 										   double samplePeriodX,
 										   double samplePeriodY ) {

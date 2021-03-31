@@ -18,11 +18,11 @@
 
 package boofcv.factory.mvs;
 
-import boofcv.abst.feature.describe.DescribePointGivenRegion;
+import boofcv.abst.feature.describe.DescribePointRadiusAngle;
 import boofcv.alg.mvs.video.RelativeBetter;
 import boofcv.alg.mvs.video.SelectFramesForReconstruction3D;
 import boofcv.factory.feature.associate.FactoryAssociation;
-import boofcv.factory.feature.describe.FactoryDescribeRegionPoint;
+import boofcv.factory.feature.describe.FactoryDescribePointRadiusAngle;
 import boofcv.factory.geo.ConfigLMedS;
 import boofcv.factory.geo.FactoryMultiViewRobust;
 import boofcv.factory.tracker.FactoryPointTracker;
@@ -54,7 +54,7 @@ public class FactoryMultiViewStereo {
 		// Image tracker currently only supports gray images
 		Class<T> grayType = imageType.getImageClass();
 
-		DescribePointGivenRegion<T, TupleDesc_F64> describe = FactoryDescribeRegionPoint.generic(config.describe, imageType);
+		DescribePointRadiusAngle<T, TupleDesc_F64> describe = FactoryDescribePointRadiusAngle.generic(config.describe, imageType);
 
 		var alg = new SelectFramesForReconstruction3D<T>(describe);
 		alg.config.setTo(config);

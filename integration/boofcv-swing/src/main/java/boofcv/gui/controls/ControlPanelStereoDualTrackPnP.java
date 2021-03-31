@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -20,7 +20,7 @@ package boofcv.gui.controls;
 
 import boofcv.abst.sfm.d3.StereoVisualOdometry;
 import boofcv.abst.tracker.PointTracker;
-import boofcv.factory.feature.describe.ConfigDescribeRegionPoint;
+import boofcv.factory.feature.describe.ConfigDescribeRegion;
 import boofcv.factory.sfm.ConfigStereoDualTrackPnP;
 import boofcv.factory.sfm.FactoryVisualOdometry;
 import boofcv.gui.StandardAlgConfigPanel;
@@ -130,7 +130,7 @@ public class ControlPanelStereoDualTrackPnP extends JTabbedPane {
 		public void actionPerformed(ActionEvent e) {
 			if( comboDescribe == e.getSource() ) {
 				configDetDesc.typeDescribe =
-						ConfigDescribeRegionPoint.DescriptorType.values()[comboDescribe.getSelectedIndex()];
+						ConfigDescribeRegion.Type.values()[comboDescribe.getSelectedIndex()];
 				handleDescriptorChanged();
 				listener.changedStereoDualTrackPnP();
 			}

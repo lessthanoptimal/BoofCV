@@ -30,7 +30,7 @@ import boofcv.struct.Configuration;
 public class ConfigDetectInterestPoint implements Configuration {
 
 	/** The feature detector is used. Not always used. */
-	public DetectorType type = DetectorType.POINT;
+	public Type type = Type.POINT;
 
 	/** Describes the scale-space used by SIFT detector / descriptor. */
 	public ConfigSiftScaleSpace scaleSpaceSift = new ConfigSiftScaleSpace();
@@ -50,7 +50,7 @@ public class ConfigDetectInterestPoint implements Configuration {
 		sift.checkValidity();
 	}
 
-	public enum DetectorType {
+	public enum Type {
 		POINT, FAST_HESSIAN, SIFT,
 	}
 

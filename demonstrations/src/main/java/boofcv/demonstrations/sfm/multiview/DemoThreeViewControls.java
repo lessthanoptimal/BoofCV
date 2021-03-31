@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -23,7 +23,7 @@ import boofcv.factory.disparity.ConfigDisparityBMBest5;
 import boofcv.factory.disparity.ConfigDisparitySGM;
 import boofcv.factory.disparity.DisparityError;
 import boofcv.factory.feature.associate.ConfigAssociate;
-import boofcv.factory.feature.describe.ConfigDescribeRegionPoint;
+import boofcv.factory.feature.describe.ConfigDescribeRegion;
 import boofcv.factory.feature.detect.interest.ConfigDetectInterestPoint;
 import boofcv.factory.transform.census.CensusVariants;
 import boofcv.gui.StandardAlgConfigPanel;
@@ -214,11 +214,11 @@ public class DemoThreeViewControls extends StandardAlgConfigPanel
 
 		@Override
 		public void initializeControlsGUI() {
-			configDetDesc.typeDetector = ConfigDetectInterestPoint.DetectorType.FAST_HESSIAN;
+			configDetDesc.typeDetector = ConfigDetectInterestPoint.Type.FAST_HESSIAN;
 			configDetDesc.detectFastHessian.extract.radius = 4;
 			configDetDesc.detectFastHessian.maxFeaturesPerScale = 1000;
 
-			configDetDesc.typeDescribe = ConfigDescribeRegionPoint.DescriptorType.SURF_STABLE;
+			configDetDesc.typeDescribe = ConfigDescribeRegion.Type.SURF_STABLE;
 
 			configAssociate.type = ConfigAssociate.AssociationType.GREEDY;
 			configAssociate.greedy.scoreRatioThreshold = 1.0;

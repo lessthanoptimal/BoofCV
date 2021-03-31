@@ -22,7 +22,7 @@ import boofcv.abst.disparity.StereoDisparitySparse;
 import boofcv.abst.feature.associate.AssociateDescription2D;
 import boofcv.abst.feature.associate.EnforceUniqueByScore;
 import boofcv.abst.feature.associate.ScoreAssociation;
-import boofcv.abst.feature.describe.DescribePointGivenRegion;
+import boofcv.abst.feature.describe.DescribePointRadiusAngle;
 import boofcv.abst.feature.detdesc.DetectDescribePoint;
 import boofcv.abst.geo.Estimate1ofPnP;
 import boofcv.abst.geo.EstimateNofPnP;
@@ -46,7 +46,7 @@ import boofcv.alg.sfm.d3.structure.VisOdomKeyFrameManager;
 import boofcv.alg.sfm.robust.DistancePlane2DToPixelSq;
 import boofcv.alg.sfm.robust.GenerateSe2_PlanePtPixel;
 import boofcv.factory.feature.associate.FactoryAssociation;
-import boofcv.factory.feature.describe.FactoryDescribeRegionPoint;
+import boofcv.factory.feature.describe.FactoryDescribePointRadiusAngle;
 import boofcv.factory.feature.detdesc.FactoryDetectDescribe;
 import boofcv.factory.geo.ConfigTriangulation;
 import boofcv.factory.geo.EnumPNP;
@@ -387,7 +387,7 @@ public class FactoryVisualOdometry {
 			case TICK_TOCK -> new TickTockKeyFrameManager(configVO.keyframes.tickPeriod);
 		};
 
-		DescribePointGivenRegion<T, Desc> descriptor = FactoryDescribeRegionPoint.
+		DescribePointRadiusAngle<T, Desc> descriptor = FactoryDescribePointRadiusAngle.
 				generic(hack.stereoDescribe, ImageType.single(imageType));
 		Class<Desc> descType = descriptor.getDescriptionType();
 		ScoreAssociation<Desc> scorer = FactoryAssociation.defaultScore(descType);

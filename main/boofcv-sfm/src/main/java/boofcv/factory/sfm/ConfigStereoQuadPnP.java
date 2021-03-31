@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -21,7 +21,7 @@ package boofcv.factory.sfm;
 import boofcv.abst.feature.detect.interest.PointDetectorTypes;
 import boofcv.factory.feature.associate.ConfigAssociate;
 import boofcv.factory.feature.associate.ConfigAssociateGreedy;
-import boofcv.factory.feature.describe.ConfigDescribeRegionPoint;
+import boofcv.factory.feature.describe.ConfigDescribeRegion;
 import boofcv.factory.feature.detdesc.ConfigDetectDescribe;
 import boofcv.factory.feature.detect.interest.ConfigDetectInterestPoint;
 import boofcv.factory.feature.detect.selector.SelectLimitTypes;
@@ -63,10 +63,10 @@ public class ConfigStereoQuadPnP implements Configuration {
 	public double epipolarTol = 1.0;
 
 	{
-		detectDescribe.typeDescribe = ConfigDescribeRegionPoint.DescriptorType.BRIEF;
+		detectDescribe.typeDescribe = ConfigDescribeRegion.Type.BRIEF;
 		detectDescribe.describeBrief.fixed = true;
 
-		detectDescribe.typeDetector = ConfigDetectInterestPoint.DetectorType.FAST_HESSIAN;
+		detectDescribe.typeDetector = ConfigDetectInterestPoint.Type.FAST_HESSIAN;
 		detectDescribe.detectFastHessian.extract.radius = 2;
 		detectDescribe.detectFastHessian.maxFeaturesPerScale = 200;
 		detectDescribe.detectFastHessian.numberOfOctaves = 4;

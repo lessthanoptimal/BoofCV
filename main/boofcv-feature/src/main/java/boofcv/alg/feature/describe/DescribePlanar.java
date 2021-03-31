@@ -18,7 +18,7 @@
 
 package boofcv.alg.feature.describe;
 
-import boofcv.abst.feature.describe.DescribePointGivenRegion;
+import boofcv.abst.feature.describe.DescribePointRadiusAngle;
 import boofcv.struct.feature.TupleDesc;
 import boofcv.struct.image.ImageGray;
 import boofcv.struct.image.Planar;
@@ -33,10 +33,10 @@ import java.lang.reflect.Array;
  * @author Peter Abeles
  */
 public abstract class DescribePlanar<T extends ImageGray<T>, Desc extends TupleDesc<Desc>>
-		implements DescribePointGivenRegion<Planar<T>, Desc> {
+		implements DescribePointRadiusAngle<Planar<T>, Desc> {
 
 	// descriptor for each band in the image
-	DescribePointGivenRegion<T, Desc>[] describers;
+	DescribePointRadiusAngle<T, Desc>[] describers;
 
 	// number of elements in the output descriptor
 	int length;
@@ -50,7 +50,7 @@ public abstract class DescribePlanar<T extends ImageGray<T>, Desc extends TupleD
 	 *
 	 * @param describers A descriptor for each band in the image.
 	 */
-	protected DescribePlanar( DescribePointGivenRegion<T, Desc>[] describers ) {
+	protected DescribePlanar( DescribePointRadiusAngle<T, Desc>[] describers ) {
 		this.describers = describers;
 
 		descType = describers[0].getDescriptionType();

@@ -18,14 +18,14 @@
 
 package boofcv.alg.feature.describe;
 
-import boofcv.abst.feature.describe.DescribePointGivenRegion;
+import boofcv.abst.feature.describe.DescribePointRadiusAngle;
 import boofcv.alg.feature.describe.brief.FactoryBriefDefinition;
 import boofcv.alg.filter.derivative.GImageDerivativeOps;
 import boofcv.alg.misc.GImageMiscOps;
 import boofcv.alg.transform.ii.GIntegralImageOps;
 import boofcv.core.image.GConvertImage;
-import boofcv.factory.feature.describe.FactoryDescribePointAlgs;
-import boofcv.factory.feature.describe.FactoryDescribeRegionPoint;
+import boofcv.factory.feature.describe.FactoryDescribeAlgs;
+import boofcv.factory.feature.describe.FactoryDescribePointRadiusAngle;
 import boofcv.factory.filter.blur.FactoryBlurFilter;
 import boofcv.struct.feature.TupleDesc;
 import boofcv.struct.feature.TupleDesc_B;
@@ -99,7 +99,7 @@ public class BenchmarkDescribe<I extends ImageGray<I>, D extends ImageGray<D>, I
 	}
 
 	@Benchmark public void Brief512() {
-		DescribePointBrief<I> alg = FactoryDescribePointAlgs.brief(FactoryBriefDefinition.gaussian2(new Random(123), 16, 512),
+		DescribePointBrief<I> alg = FactoryDescribeAlgs.brief(FactoryBriefDefinition.gaussian2(new Random(123), 16, 512),
 				FactoryBlurFilter.gaussian(imageType, 0, 4));
 
 		alg.setImage(gray);
@@ -112,7 +112,7 @@ public class BenchmarkDescribe<I extends ImageGray<I>, D extends ImageGray<D>, I
 
 	@Benchmark public void BriefSO512() {
 		int briefRadius = 16;
-		DescribePointBriefSO<I> alg = FactoryDescribePointAlgs.
+		DescribePointBriefSO<I> alg = FactoryDescribeAlgs.
 				briefso(FactoryBriefDefinition.gaussian2(new Random(123), briefRadius, 512),
 						FactoryBlurFilter.gaussian(imageType, 0, 4));
 
@@ -125,26 +125,26 @@ public class BenchmarkDescribe<I extends ImageGray<I>, D extends ImageGray<D>, I
 	}
 
 	@Benchmark public void SURF_F() {
-		process(FactoryDescribeRegionPoint.<I, II>surfFast(null, imageType));
+		process(FactoryDescribePointRadiusAngle.<I, II>surfFast(null, imageType));
 	}
 
 	@Benchmark public void SURF_F_Color() {
-		process(FactoryDescribeRegionPoint.surfColorFast(null, ImageType.pl(3, imageType)));
+		process(FactoryDescribePointRadiusAngle.surfColorFast(null, ImageType.pl(3, imageType)));
 	}
 
 	@Benchmark public void SURF_S() {
-		process(FactoryDescribeRegionPoint.<I, II>surfStable(null, imageType));
+		process(FactoryDescribePointRadiusAngle.<I, II>surfStable(null, imageType));
 	}
 
 	@Benchmark public void SURF_S_Color() {
-		process(FactoryDescribeRegionPoint.surfColorStable(null, ImageType.pl(3, imageType)));
+		process(FactoryDescribePointRadiusAngle.surfColorStable(null, ImageType.pl(3, imageType)));
 	}
 
 	@Benchmark public void SIFT() {
-		process(FactoryDescribeRegionPoint.sift(null, null, imageType));
+		process(FactoryDescribePointRadiusAngle.sift(null, null, imageType));
 	}
 
-	public <PD extends TupleDesc> void process( DescribePointGivenRegion alg ) {
+	public <PD extends TupleDesc> void process( DescribePointRadiusAngle alg ) {
 		if (alg.getImageType().getFamily() == ImageType.Family.GRAY)
 			alg.setImage(gray);
 		else

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -18,7 +18,7 @@
 
 package boofcv.abst.tracker;
 
-import boofcv.factory.feature.describe.ConfigDescribeRegionPoint;
+import boofcv.factory.feature.describe.ConfigDescribeRegion;
 import boofcv.factory.feature.detect.interest.ConfigDetectInterestPoint;
 import boofcv.factory.tracker.ConfigPointTracker;
 import boofcv.factory.tracker.FactoryPointTracker;
@@ -37,11 +37,11 @@ class TestPointTrackerHybrid extends GenericChecksPointTracker<GrayF32> {
 	public PointTracker<GrayF32> createTracker() {
 		ConfigPointTracker config = new ConfigPointTracker();
 		config.typeTracker = ConfigPointTracker.TrackerType.HYBRID;
-		config.detDesc.typeDetector = ConfigDetectInterestPoint.DetectorType.POINT;
+		config.detDesc.typeDetector = ConfigDetectInterestPoint.Type.POINT;
 		config.detDesc.detectPoint.shiTomasi.radius = 2;
 		config.detDesc.detectPoint.general.radius = 2;
 		config.detDesc.detectPoint.general.maxFeatures = 100;
-		config.detDesc.typeDescribe = ConfigDescribeRegionPoint.DescriptorType.BRIEF;
+		config.detDesc.typeDescribe = ConfigDescribeRegion.Type.BRIEF;
 		config.detDesc.describeBrief.fixed = true;
 		config.associate.greedy.maxErrorThreshold = 400;
 

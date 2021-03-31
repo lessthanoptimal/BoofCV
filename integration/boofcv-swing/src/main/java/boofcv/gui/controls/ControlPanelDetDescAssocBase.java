@@ -20,14 +20,14 @@ package boofcv.gui.controls;
 
 import boofcv.abst.feature.associate.AssociateDescription;
 import boofcv.abst.feature.associate.AssociateDescription2D;
-import boofcv.abst.feature.describe.DescribePointGivenRegion;
+import boofcv.abst.feature.describe.DescribePointRadiusAngle;
 import boofcv.abst.feature.describe.DescriptorInfo;
 import boofcv.abst.feature.detdesc.DetectDescribePoint;
 import boofcv.abst.feature.detect.interest.InterestPointDetector;
 import boofcv.factory.feature.associate.ConfigAssociate;
 import boofcv.factory.feature.associate.FactoryAssociation;
-import boofcv.factory.feature.describe.ConfigDescribeRegionPoint;
-import boofcv.factory.feature.describe.FactoryDescribeRegionPoint;
+import boofcv.factory.feature.describe.ConfigDescribeRegion;
+import boofcv.factory.feature.describe.FactoryDescribePointRadiusAngle;
 import boofcv.factory.feature.detdesc.ConfigDetectDescribe;
 import boofcv.factory.feature.detdesc.FactoryDetectDescribe;
 import boofcv.factory.feature.detect.interest.ConfigDetectInterestPoint;
@@ -82,8 +82,8 @@ public abstract class ControlPanelDetDescAssocBase extends StandardAlgConfigPane
 	}
 
 	public void initializeControlsGUI() {
-		comboDetect = combo(configDetDesc.typeDetector.ordinal(), (Object[])ConfigDetectInterestPoint.DetectorType.values());
-		comboDescribe = combo(configDetDesc.typeDescribe.ordinal(), (Object[])ConfigDescribeRegionPoint.DescriptorType.values());
+		comboDetect = combo(configDetDesc.typeDetector.ordinal(), (Object[])ConfigDetectInterestPoint.Type.values());
+		comboDescribe = combo(configDetDesc.typeDescribe.ordinal(), (Object[])ConfigDescribeRegion.Type.values());
 		if (associateWithPixels) {
 			comboAssociate = combo(configAssociate.type.ordinal(), ConfigAssociate.AssociationType.GREEDY);
 		} else {
@@ -177,8 +177,8 @@ public abstract class ControlPanelDetDescAssocBase extends StandardAlgConfigPane
 	}
 
 	public <T extends ImageGray<T>, D extends ImageGray<D>>
-	DescribePointGivenRegion<T, ?> createDescriptor( Class<T> imageType ) {
-		ConfigDescribeRegionPoint c = new ConfigDescribeRegionPoint();
+	DescribePointRadiusAngle<T, ?> createDescriptor( Class<T> imageType ) {
+		ConfigDescribeRegion c = new ConfigDescribeRegion();
 		c.type = configDetDesc.typeDescribe;
 		c.brief = configDetDesc.describeBrief;
 		c.surfFast = configDetDesc.describeSurfFast;
@@ -186,7 +186,7 @@ public abstract class ControlPanelDetDescAssocBase extends StandardAlgConfigPane
 		c.scaleSpaceSift = configDetDesc.scaleSpaceSift;
 		c.template = configDetDesc.describeTemplate;
 
-		return FactoryDescribeRegionPoint.generic(c, ImageType.single(imageType));
+		return FactoryDescribePointRadiusAngle.generic(c, ImageType.single(imageType));
 	}
 
 	public AssociateDescription createAssociate( DescriptorInfo descriptor ) {

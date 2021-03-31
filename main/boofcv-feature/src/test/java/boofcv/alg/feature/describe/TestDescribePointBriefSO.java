@@ -26,7 +26,7 @@ import boofcv.alg.feature.describe.brief.FactoryBriefDefinition;
 import boofcv.alg.interpolate.InterpolatePixelS;
 import boofcv.alg.misc.GImageMiscOps;
 import boofcv.alg.misc.GPixelMath;
-import boofcv.factory.feature.describe.FactoryDescribePointAlgs;
+import boofcv.factory.feature.describe.FactoryDescribeAlgs;
 import boofcv.factory.filter.blur.FactoryBlurFilter;
 import boofcv.factory.interpolate.FactoryInterpolation;
 import boofcv.struct.border.BorderType;
@@ -64,7 +64,7 @@ public class TestDescribePointBriefSO extends BoofStandardJUnit {
 	}
 
 	protected DescribePointBriefSO<GrayF32> createAlg() {
-		return FactoryDescribePointAlgs.briefso(def, filterBlur);
+		return FactoryDescribeAlgs.briefso(def, filterBlur);
 	}
 
 	/**

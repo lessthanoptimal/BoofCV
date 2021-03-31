@@ -19,10 +19,10 @@
 package boofcv.demonstrations.feature.describe;
 
 import boofcv.abst.feature.describe.ConfigBrief;
-import boofcv.abst.feature.describe.DescribePointGivenRegion;
+import boofcv.abst.feature.describe.DescribePointRadiusAngle;
 import boofcv.core.image.GConvertImage;
 import boofcv.core.image.GeneralizedImageOps;
-import boofcv.factory.feature.describe.FactoryDescribeRegionPoint;
+import boofcv.factory.feature.describe.FactoryDescribePointRadiusAngle;
 import boofcv.gui.DemonstrationBase;
 import boofcv.gui.StandardAlgConfigPanel;
 import boofcv.gui.feature.SelectRegionDescriptionPanel;
@@ -53,7 +53,7 @@ public class VisualizeRegionDescriptionApp<T extends ImageGray<T>>
 	BufferedImage image;
 
 	private final Object lock = new Object();
-	private DescribePointGivenRegion describe;
+	private DescribePointRadiusAngle describe;
 
 	private SelectRegionDescriptionPanel panel = new SelectRegionDescriptionPanel();
 	private Controls controls = new Controls();
@@ -143,25 +143,25 @@ public class VisualizeRegionDescriptionApp<T extends ImageGray<T>>
 		synchronized (lock) {
 			switch (controls.selectedDescriptor) {
 				case 0:
-					describe = FactoryDescribeRegionPoint.surfStable(null, imageType);
+					describe = FactoryDescribePointRadiusAngle.surfStable(null, imageType);
 					break;
 				case 1:
-					describe = FactoryDescribeRegionPoint.surfColorStable(null, ImageType.pl(3, imageType));
+					describe = FactoryDescribePointRadiusAngle.surfColorStable(null, ImageType.pl(3, imageType));
 					break;
 				case 2:
-					describe = FactoryDescribeRegionPoint.sift(null, null, imageType);
+					describe = FactoryDescribePointRadiusAngle.sift(null, null, imageType);
 					break;
 				case 3:
-					describe = FactoryDescribeRegionPoint.brief(new ConfigBrief(true), imageType);
+					describe = FactoryDescribePointRadiusAngle.brief(new ConfigBrief(true), imageType);
 					break;
 				case 4:
-					describe = FactoryDescribeRegionPoint.brief(new ConfigBrief(false), imageType);
+					describe = FactoryDescribePointRadiusAngle.brief(new ConfigBrief(false), imageType);
 					break;
 				case 5:
-					describe = FactoryDescribeRegionPoint.pixel(5, 5, imageType);
+					describe = FactoryDescribePointRadiusAngle.pixel(5, 5, imageType);
 					break;
 				case 6:
-					describe = FactoryDescribeRegionPoint.pixelNCC(5, 5, imageType);
+					describe = FactoryDescribePointRadiusAngle.pixelNCC(5, 5, imageType);
 					break;
 			}
 		}

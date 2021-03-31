@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -26,7 +26,7 @@ import boofcv.abst.tracker.PointTracker;
 import boofcv.alg.filter.derivative.GImageDerivativeOps;
 import boofcv.alg.sfm.DepthSparse3D;
 import boofcv.factory.feature.associate.ConfigAssociate;
-import boofcv.factory.feature.describe.ConfigDescribeRegionPoint;
+import boofcv.factory.feature.describe.ConfigDescribeRegion;
 import boofcv.factory.feature.detect.interest.ConfigDetectInterestPoint;
 import boofcv.factory.feature.detect.selector.SelectLimitTypes;
 import boofcv.factory.sfm.ConfigVisOdomTrackPnP;
@@ -432,7 +432,7 @@ public class VisualizeDepthVisualOdometryApp
 			algType = AlgType.FEATURE;
 
 			configTracker.typeTracker = ConfigPointTracker.TrackerType.KLT;
-			configTracker.detDesc.typeDetector = ConfigDetectInterestPoint.DetectorType.POINT;
+			configTracker.detDesc.typeDetector = ConfigDetectInterestPoint.Type.POINT;
 
 			PointTracker tracker = FactoryPointTracker.tracker(configTracker, imageType, derivType);
 			alg = FactoryVisualOdometry.depthDepthPnP(configVO, sparseDepth, tracker, imageType, GrayU16.class);
@@ -446,8 +446,8 @@ public class VisualizeDepthVisualOdometryApp
 			algType = AlgType.FEATURE;
 
 			configTracker.typeTracker = ConfigPointTracker.TrackerType.DDA;
-			configTracker.detDesc.typeDetector = ConfigDetectInterestPoint.DetectorType.POINT;
-			configTracker.detDesc.typeDescribe = ConfigDescribeRegionPoint.DescriptorType.BRIEF;
+			configTracker.detDesc.typeDetector = ConfigDetectInterestPoint.Type.POINT;
+			configTracker.detDesc.typeDescribe = ConfigDescribeRegion.Type.BRIEF;
 
 			PointTracker tracker = FactoryPointTracker.tracker(configTracker, imageType, derivType);
 
@@ -459,8 +459,8 @@ public class VisualizeDepthVisualOdometryApp
 			algType = AlgType.FEATURE;
 
 			configTracker.typeTracker = ConfigPointTracker.TrackerType.HYBRID;
-			configTracker.detDesc.typeDetector = ConfigDetectInterestPoint.DetectorType.POINT;
-			configTracker.detDesc.typeDescribe = ConfigDescribeRegionPoint.DescriptorType.SURF_STABLE;
+			configTracker.detDesc.typeDetector = ConfigDetectInterestPoint.Type.POINT;
+			configTracker.detDesc.typeDescribe = ConfigDescribeRegion.Type.SURF_STABLE;
 
 			PointTracker tracker = FactoryPointTracker.tracker(configTracker, imageType, derivType);
 

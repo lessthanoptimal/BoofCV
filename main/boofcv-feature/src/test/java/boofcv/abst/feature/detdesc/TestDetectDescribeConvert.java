@@ -37,7 +37,7 @@ public class TestDetectDescribeConvert extends BoofStandardJUnit {
 	 * Makes sure all the other functions have been passed through
 	 */
 	@Test void passedThrough() {
-		var alg = new DetectDescribeConvert<>(new DummyDD(), new MockConvert());
+		var alg = new DetectDescribeConvertTuple<>(new DummyDD(), new MockConvert());
 
 		assertEquals(1, alg.createDescription().size());
 		assertSame(TupleDesc_U8.class, alg.getDescriptionType());

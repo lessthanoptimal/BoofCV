@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -18,7 +18,7 @@
 
 package boofcv.abst.sfm.d3;
 
-import boofcv.factory.feature.describe.ConfigDescribeRegionPoint;
+import boofcv.factory.feature.describe.ConfigDescribeRegion;
 import boofcv.factory.feature.detect.interest.ConfigDetectInterestPoint;
 import boofcv.factory.sfm.ConfigStereoDualTrackPnP;
 import boofcv.factory.sfm.FactoryVisualOdometry;
@@ -78,13 +78,13 @@ public class TestWrapVisOdomDualTrackPnP extends BoofStandardJUnit {
 			config.scene.ransac.inlierThreshold = 1.5;
 
 			config.tracker.typeTracker = ConfigPointTracker.TrackerType.DDA;
-			config.tracker.detDesc.typeDetector = ConfigDetectInterestPoint.DetectorType.POINT;
+			config.tracker.detDesc.typeDetector = ConfigDetectInterestPoint.Type.POINT;
 			config.tracker.detDesc.detectPoint.general.maxFeatures = 300;
 			config.tracker.detDesc.detectPoint.scaleRadius = 12;
 			config.tracker.detDesc.detectPoint.general.radius = 3;
 			config.tracker.detDesc.detectPoint.general.threshold = 0;
 			config.tracker.detDesc.detectPoint.shiTomasi.radius = 2;
-			config.tracker.detDesc.typeDescribe = ConfigDescribeRegionPoint.DescriptorType.BRIEF;
+			config.tracker.detDesc.typeDescribe = ConfigDescribeRegion.Type.BRIEF;
 			config.tracker.detDesc.describeBrief.fixed = true;
 
 			return FactoryVisualOdometry.stereoDualTrackerPnP(config, GrayF32.class);
