@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -66,11 +66,63 @@ public interface PointCloudViewer {
 
 	void setBackgroundColor( int rgb );
 
-	void addCloud( List<Point3D_F64> cloudXyz , int colorsRgb[] );
+	/**
+	 * Adds a point cloud to the viewer
+	 * @param iterator Iterator with 3D point and optionally color information
+	 * @param hasColor true if the iterator has valid color
+	 */
+	void addCloud( IteratePoint iterator, boolean hasColor );
 
-	void addCloud( List<Point3D_F64> cloud );
+	/**
+	 * Adds the point cloud using a data structure that can be access by index and has a known size. Knowing
+	 * the size can allow the internal implementation to preallocate memory.
+	 *
+	 * @param accessPoint Accessor to point information
+	 * @param accessColor Accessor to RGB color information. If null then 0xFF0000 is assumed.
+	 * @param size Number of elements
+	 */
+	default void addCloud( AccessPointIndex accessPoint, @Nullable AccessColorIndex accessColor, int size ) {
+		if (accessColor==null) {
+			addCloud(new IteratePoint() {
+				int index = 0;
+				@Override public int next( Point3D_F64 point ) {
+					accessPoint.getPoint(index++, point);
+					return -1;
+				}
 
-	void addCloud(DogArray_F32 cloudXYZ , DogArray_I32 colorRGB );
+				@Override public boolean hasNext() {return index < size;}
+			}, false);
+		} else {
+			addCloud(new IteratePoint() {
+				int index = 0;
+				@Override public int next( Point3D_F64 point ) {
+					accessPoint.getPoint(index, point);
+					return accessColor.getRGB(index++);
+				}
+
+				@Override public boolean hasNext() {return index < size;}
+			}, true);
+		}
+	}
+
+	@Deprecated
+	default void addCloud( List<Point3D_F64> cloudXyz , int []colorsRgb ) {
+		addCloud((index, p)->p.setTo(cloudXyz.get(index)), (index)->colorsRgb[index], cloudXyz.size());
+	}
+
+	@Deprecated
+	default void addCloud( List<Point3D_F64> cloud ) {
+		addCloud((index, p)->p.setTo(cloud.get(index)), null, cloud.size());
+	}
+
+	@Deprecated
+	default void addCloud(DogArray_F32 cloudXYZ , DogArray_I32 colorRGB ) {
+		int size = cloudXYZ.size/3;
+		addCloud((index, p)->{
+			int i = index*3;
+			p.setTo(cloudXYZ.data[i],cloudXYZ.data[i+1],cloudXYZ.data[i+2]);
+		}, colorRGB::get, size);
+	}
 
 	/**
 	 * adds a single point to the point cloud. This method can be very slow compared to doing it in a batch
@@ -135,5 +187,24 @@ public interface PointCloudViewer {
 	 */
 	interface Colorizer {
 		int color( int index , double x , double y , double z );
+	}
+
+	/** Provides access to a 3D point by index */
+	@FunctionalInterface interface AccessPointIndex {
+		void getPoint( int index, Point3D_F64 point );
+	}
+
+	/** Provides access to a RGB color by index */
+	@FunctionalInterface interface AccessColorIndex {
+		int getRGB( int index );
+	}
+
+	/** Iterator like interface for accessing point information */
+	interface IteratePoint {
+		/** Loads the next point and returns its color. If no color is available it should return 0 */
+		int next( Point3D_F64 point );
+
+		/** True if there ar remaining points */
+		boolean hasNext();
 	}
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -38,66 +38,78 @@ import java.nio.ByteOrder;
  * @author Peter Abeles
  */
 public class PointCloudIO {
-
 	/**
 	 * Saves point cloud to disk using a high level API. For more control over the format use the CODEC directly.
 	 *
 	 * @see PlyCodec
-	 *
-	 * @param format
-	 * @param cloud
-	 * @param saveRGB
-	 * @param outputStream
-	 * @throws IOException
 	 */
-	public static void save3D(Format format, PointCloudReader cloud , boolean saveRGB, OutputStream outputStream ) throws IOException {
-		switch( format ) {
-			case PLY:
-				PlyCodec.saveBinary(cloud, ByteOrder.BIG_ENDIAN, saveRGB,false, outputStream);
-				break;
-
-			default:
-				throw new IllegalArgumentException("Unknown format "+format);
+	public static void save3D( Format format, PointCloudReader cloud, boolean saveRGB, OutputStream outputStream ) throws IOException {
+		switch (format) {
+			case PLY -> PlyCodec.saveBinary(cloud, ByteOrder.BIG_ENDIAN, saveRGB, false, outputStream);
 		}
 	}
 
-
 	public static DogArray<Point3D_F32>
-	load3D32F( Format format , InputStream input , @Nullable DogArray<Point3D_F32> storage  ) throws IOException {
-		if( storage == null )
+	load3D32F( Format format, InputStream input, @Nullable DogArray<Point3D_F32> storage ) throws IOException {
+		if (storage == null)
 			storage = new DogArray<>(Point3D_F32::new);
 		PointCloudWriter output = PointCloudWriter.wrapF32(storage);
-		load(format,input,output);
+		load(format, input, output);
 		return storage;
 	}
 
 	public static DogArray<Point3D_F64>
-	load3D64F( Format format , InputStream input , @Nullable DogArray<Point3D_F64> storage  ) throws IOException {
-		if( storage == null )
+	load3D64F( Format format, InputStream input, @Nullable DogArray<Point3D_F64> storage ) throws IOException {
+		if (storage == null)
 			storage = new DogArray<>(Point3D_F64::new);
 		PointCloudWriter output = PointCloudWriter.wrapF64(storage);
-		load(format,input,output);
+		load(format, input, output);
 		return storage;
 	}
 
 	public static DogArray<Point3dRgbI_F64>
-	load3DRgb64F(Format format , InputStream input , @Nullable DogArray<Point3dRgbI_F64> storage  ) throws IOException {
-		if( storage == null )
+	load3DRgb64F( Format format, InputStream input, @Nullable DogArray<Point3dRgbI_F64> storage ) throws IOException {
+		if (storage == null)
 			storage = new DogArray<>(Point3dRgbI_F64::new);
 		PointCloudWriter output = PointCloudWriter.wrapF64RGB(storage);
-		load(format,input,output);
+		load(format, input, output);
 		return storage;
 	}
 
-	public static void
-	load(Format format , InputStream input , PointCloudWriter output ) throws IOException {
-		switch( format ) {
-			case PLY:
-				PlyCodec.read(input,output);
-				break;
-			default:
-				throw new IllegalArgumentException("Unknown format "+format);
+	/**
+	 * Reads a point cloud from the input stream in the specified format and writes it to the output.
+	 *
+	 * @param format Storage format
+	 * @param input Input stream
+	 * @param output Output cloud writer
+	 */
+	public static void load( Format format, InputStream input, PointCloudWriter output ) throws IOException {
+		switch (format) {
+			case PLY -> PlyCodec.read(input, output);
 		}
+	}
+
+	/**
+	 * The same as {@link #load(Format, InputStream, PointCloudWriter)}, but with a simplified writer that
+	 * removes the initialization function. Result is more concise code with less flexibility
+	 */
+	public static void load( Format format, InputStream input, FunctionalWriter output ) throws IOException {
+		PointCloudWriter pcw = new PointCloudWriter() {
+			@Override public void initialize( int size, boolean hasColor ) {}
+
+			@Override public void add( double x, double y, double z, int rgb ) {
+				output.add(x, y, z, rgb);
+			}
+		};
+		load(format, input, pcw);
+	}
+
+	/**
+	 * A writer without the initialization step. Used to simplify the code
+	 */
+	@FunctionalInterface
+	public interface FunctionalWriter {
+		void add( double x, double y, double z, int rgb );
 	}
 
 	public enum Format {

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -39,9 +39,9 @@ import java.util.List;
 public class PointCloudViewerPanel extends JPanel {
 
 	// Control panel for adjusting the visualization
-	private @Getter	ControlPanelPointCloud controls = new ControlPanelPointCloud(this::handleControlChange);
+	private final @Getter ControlPanelPointCloud controls = new ControlPanelPointCloud(this::handleControlChange);
 	// Where the point cloud is rendered
-	private @Getter	PointCloudViewer viewer = VisualizeData.createPointCloudViewer();
+	private final @Getter PointCloudViewer viewer = VisualizeData.createPointCloudViewer();
 
 	// Basic unit of distance for colorization period
 	public double periodBaseline = 1.0;

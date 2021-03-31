@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -208,7 +208,7 @@ public class PlyCodec {
 		if (format == null)
 			throw new IOException("Format is never specified");
 
-		output.init(vertexCount);
+		output.initialize(vertexCount, rgb);
 
 		switch (format) {
 			case ASCII -> readAscii(output, input, dataWords, buffer, vertexCount, rgb);
@@ -255,7 +255,7 @@ public class PlyCodec {
 			if (rgb) {
 				output.add(x, y, z, r << 16 | g << 8 | b);
 			} else {
-				output.add(x, y, z);
+				output.add(x, y, z, 0x0);
 			}
 		}
 	}
@@ -316,7 +316,7 @@ public class PlyCodec {
 			if (rgb) {
 				output.add(x, y, z, r << 16 | g << 8 | b);
 			} else {
-				output.add(x, y, z);
+				output.add(x, y, z, 0x0);
 			}
 		}
 	}
