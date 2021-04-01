@@ -99,20 +99,34 @@ public class ScoreFundamentalReprojectionError implements EpipolarScore3D {
 
 	@Override public boolean process( List<AssociatedPair> pairs, DMatrixRMaj fundamental, DogArray_I32 inliersIdx ) {
 		// Not enough points to compute F
-		if (pairs.size() < ransac3D.getMinimumSize())
+		if (pairs.size() < ransac3D.getMinimumSize()) {
+			if (verbose != null) verbose.printf("pairs.size=%d less than ransac3D.getMinimumSize()\n", pairs.size());
 			return false;
+		}
+
+		final int minimumAllowed = minimumInliers.computeI(pairs.size());
+		if (pairs.size() < minimumAllowed) {
+			if (verbose != null)
+				verbose.printf("pairs.size=%d less than the minimum.size=%d\n", pairs.size(), minimumAllowed);
+			return false;
+		}
 
 		if (!ransac3D.process(pairs)) {
 			// assume it failed because the data was noise free and pure rotation encountered
 			// Even if it failed due to NaN in the input, it's still true there was no geometric info!
 			is3D = false;
 			score = 0.0;
+			if (verbose != null) verbose.println("ransac failed. not 3D");
 			return true;
 		}
 
 		// if there are too few matches then it's probably noise
-		if (ransac3D.getMatchSet().size() < minimumInliers.computeI(pairs.size()))
+		if (ransac3D.getMatchSet().size() < minimumAllowed) {
+			if (verbose != null)
+				verbose.printf("inlier.size=%d is too small. minimum.size=%d\n",
+						ransac3D.getMatchSet().size(), minimumAllowed);
 			return false;
+		}
 
 		// Save the inliers and compute the epipolar geometric error for F
 		fundamental.setTo(ransac3D.getModelParameters());
@@ -151,7 +165,8 @@ public class ScoreFundamentalReprojectionError implements EpipolarScore3D {
 		score /= (100.0*maxRatioScore); // purely cosmetic to keep the numbers smaller
 
 		if (verbose != null)
-			verbose.printf("score=%7.2f errorH=%6.2f errorF=%5.2f 3d=%s\n", score, errorH, errorF, is3D);
+			verbose.printf("score=%7.2f pairs=%d inliers=%d ratio=%6.2f errorH=%6.2f errorF=%5.2f 3d=%s\n",
+					score, pairs.size(), inliersIdx.size, ratio, errorH, errorF, is3D);
 
 		if (is3D)
 			return true;

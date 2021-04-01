@@ -60,7 +60,6 @@ public class ConfigSimilarImagesTrackThenMatch implements Configuration {
 	public final ConfigAssociate associate = new ConfigAssociate();
 
 	{
-		// Let's use SURF-FAST by default
 		descriptions.descriptors.type = ConfigDescribeRegion.Type.SURF_STABLE;
 
 		// Reduce memory usage with very little loss in accuracy
