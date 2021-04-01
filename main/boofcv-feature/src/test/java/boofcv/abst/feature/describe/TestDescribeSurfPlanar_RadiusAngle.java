@@ -27,7 +27,7 @@ import boofcv.struct.image.Planar;
 /**
  * @author Peter Abeles
  */
-class TestDescribeSurfPlanar_RadiusAngle extends GenericDescribeRegionPointChecks<Planar<GrayF32>, TupleDesc_F64> {
+class TestDescribeSurfPlanar_RadiusAngle extends GenericDescribePointRadiusAngleChecks<Planar<GrayF32>, TupleDesc_F64> {
 	TestDescribeSurfPlanar_RadiusAngle() {
 		super(ImageType.pl(3,GrayF32.class));
 	}

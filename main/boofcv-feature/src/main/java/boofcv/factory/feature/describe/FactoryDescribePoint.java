@@ -27,11 +27,9 @@ import boofcv.alg.feature.describe.DescribePointSurf;
 import boofcv.alg.transform.ii.GIntegralImageOps;
 import boofcv.factory.feature.orientation.FactoryOrientation;
 import boofcv.struct.feature.TupleDesc;
-import boofcv.struct.feature.TupleDesc_F64;
 import boofcv.struct.image.ImageGray;
 import boofcv.struct.image.ImageType;
 import org.jetbrains.annotations.Nullable;
-
 
 /**
  * Factory for creating implementations of {@link DescribePointRadiusAngle}.
@@ -48,8 +46,10 @@ public class FactoryDescribePoint {
 		Class<T> imageClass = imageType.getImageClass();
 
 		DescribePoint<T, TD> ret = switch (config.descriptors.type) {
-			case SURF_FAST -> (DescribePoint<T,TD>)surfFast(
+			case SURF_FAST -> (DescribePoint<T, TD>)surfFast(
 					config.descriptors.surfFast, config.orientation, config.radius, imageClass);
+			case SURF_STABLE -> (DescribePoint<T, TD>)surfStable(
+					config.descriptors.surfStability, config.orientation, config.radius, imageClass);
 			default -> {
 				DescribePointRadiusAngle<T, TD> radAng =
 						FactoryDescribePointRadiusAngle.generic(config.descriptors, imageType);
@@ -68,17 +68,29 @@ public class FactoryDescribePoint {
 
 		// Descriptor is going to be modified, create the converter then wrap the algorithm
 		int dof = ret.createDescription().size();
-		ConvertTupleDesc<?,TD> converter = FactoryConvertTupleDesc.generic(config.convert, dof, ret.getDescriptionType());
+		ConvertTupleDesc<?, TD> converter = FactoryConvertTupleDesc.generic(config.convert, dof, ret.getDescriptionType());
 		return new DescribePointConvertTuple(ret, converter);
 	}
 
 	public static <T extends ImageGray<T>, II extends ImageGray<II>>
-	DescribePoint<T, TupleDesc_F64> surfFast( @Nullable ConfigSurfDescribe.Fast configSurf,
-											  ConfigOrientation2 configOrientation,
-											  double regionRadius, Class<T> imageType ) {
+	DescribeSurf_Point<T, II> surfFast( @Nullable ConfigSurfDescribe.Fast configSurf,
+										ConfigOrientation2 configOrientation,
+										double regionRadius, Class<T> imageType ) {
 		Class<II> integralType = GIntegralImageOps.getIntegralType(imageType);
 
 		DescribePointSurf<II> alg = FactoryDescribeAlgs.surfSpeed(configSurf, integralType);
+		OrientationIntegral<II> orientationII = FactoryOrientation.genericIntegral(configOrientation, integralType);
+
+		return new DescribeSurf_Point<>(alg, orientationII, regionRadius, imageType);
+	}
+
+	public static <T extends ImageGray<T>, II extends ImageGray<II>>
+	DescribeSurf_Point<T, II> surfStable( @Nullable ConfigSurfDescribe.Stability config,
+										  ConfigOrientation2 configOrientation,
+										  double regionRadius, Class<T> imageType ) {
+		Class<II> integralType = GIntegralImageOps.getIntegralType(imageType);
+
+		DescribePointSurf<II> alg = FactoryDescribeAlgs.surfStability(config, integralType);
 		OrientationIntegral<II> orientationII = FactoryOrientation.genericIntegral(configOrientation, integralType);
 
 		return new DescribeSurf_Point<>(alg, orientationII, regionRadius, imageType);

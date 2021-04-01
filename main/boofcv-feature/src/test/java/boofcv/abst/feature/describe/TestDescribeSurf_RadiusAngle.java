@@ -26,7 +26,7 @@ import boofcv.struct.image.ImageType;
 /**
  * @author Peter Abeles
  */
-class TestDescribeSurf_RadiusAngle extends GenericDescribeRegionPointChecks<GrayF32, TupleDesc_F64> {
+class TestDescribeSurf_RadiusAngle extends GenericDescribePointRadiusAngleChecks<GrayF32, TupleDesc_F64> {
 	TestDescribeSurf_RadiusAngle() {
 		super(ImageType.single(GrayF32.class));
 	}

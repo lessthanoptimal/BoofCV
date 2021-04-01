@@ -33,7 +33,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 /**
  * @author Peter Abeles
  */
-class TestDescribeSift_RadiusAngle extends GenericDescribeRegionPointChecks<GrayF32, TupleDesc_F64> {
+class TestDescribeSift_RadiusAngle extends GenericDescribePointRadiusAngleChecks<GrayF32, TupleDesc_F64> {
 
 	TestDescribeSift_RadiusAngle() {
 		super(ImageType.single(GrayF32.class));
