@@ -43,12 +43,22 @@ public class ConfigSimilarImagesTrackThenMatch implements Configuration {
 	public int minimumRecognizeDistance = 30;
 
 	/**
+	 * @see SimilarImagesPointTracker#searchRadius
+	 */
+	public int sequentialSearchRadius = 5;
+
+	/**
+	 * @see SimilarImagesPointTracker#minimumCommonTracks
+	 */
+	public final ConfigLength sequentialMinimumCommonTracks = ConfigLength.relative(0.01, 0.0);
+
+	/**
 	 * Specifies how many features need to be matched for an image to be considered similar. Absolute
 	 * is the number of matches. Fraction is relative to the number of images in each image.
 	 *
 	 * The default minimum number of matches is probably set too low.
 	 */
-	public final ConfigLength minimumSimilar = ConfigLength.relative(0.4, 50);
+	public final ConfigLength minimumSimilar = ConfigLength.relative(0.3, 50);
 
 	/** Image feature descriptions */
 	public final ConfigDescribePoint descriptions = new ConfigDescribePoint();
@@ -72,9 +82,12 @@ public class ConfigSimilarImagesTrackThenMatch implements Configuration {
 		descriptions.checkValidity();
 		recognizeNister2006.checkValidity();
 		associate.checkValidity();
+		sequentialMinimumCommonTracks.checkValidity();
 	}
 
 	public void setTo( ConfigSimilarImagesTrackThenMatch src ) {
+		this.sequentialSearchRadius = src.sequentialSearchRadius;
+		this.sequentialMinimumCommonTracks.setTo(src.sequentialMinimumCommonTracks);
 		this.limitQuery = src.limitQuery;
 		this.minimumRecognizeDistance = src.minimumRecognizeDistance;
 		this.minimumSimilar.setTo(src.minimumSimilar);

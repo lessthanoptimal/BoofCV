@@ -43,9 +43,15 @@ import java.util.Set;
 /**
  * Runs RANSAC to find the fundamental matrix. Score is computed by computing a homography then recomputing
  * the fundamental matrix from the homography and an epipole. If the homography is compatible with F then F
- * will be recomputed, if not then you have jump. These two versions of F then compute reprojection error
- * and if they are similar then the scene is dominated by a plane. That can be a physical plane or one at
- * infinity created by a pure rotation. See code comments.
+ * will be recomputed correctly, otherwise an the recomputed F will be incorrect. The homography will be
+ * compatible if the scene is planar or the motion was purely rotational.
+ *
+ * The score is found by computing the number of pairs that are "inliers" between the two versions of F. The ratio
+ * of inliers is used to determine if there's 3D information and compute the score. The score also seeds
+ * to encourage more image features in the RANSAC inlier set.
+ *
+ * The inlier threshold used for RANSAC and {@link #inlierErrorTol} do not need to be the same but they would
+ * probably be similar.
  *
  * @author Peter Abeles
  */
@@ -58,9 +64,6 @@ public class ScoreFundamentalReprojectionError implements EpipolarScore3D {
 	 */
 	public @Getter @Setter double ratio3D = 1.5;
 
-	/** Smoothing parameter and avoid divide by zero. This is typically < 1.0 since error is computed in pixels */
-	public @Getter @Setter double eps = 0.01;
-
 	/**
 	 * The error ratio can get massive and this number prevents large values for being weighted too much in the score
 	 */
@@ -68,6 +71,11 @@ public class ScoreFundamentalReprojectionError implements EpipolarScore3D {
 
 	/** The minimum number of inliers for an edge to be accepted. If relative, then relative to pairs. */
 	public @Getter final ConfigLength minimumInliers = ConfigLength.fixed(30);
+
+	/**
+	 * A pair of observations are within tolerance to the model if the error is less than or equal to this
+	 */
+	public @Getter @Setter double inlierErrorTol = 1.0;
 
 	// Storage for inliers
 	List<AssociatedPair> inliers = new ArrayList<>();
@@ -136,7 +144,7 @@ public class ScoreFundamentalReprojectionError implements EpipolarScore3D {
 			inliersIdx.set(i, ransac3D.getInputIndex(i));
 			inliers.add(pairs.get(inliersIdx.get(i)));
 		}
-		double errorF = computeAverageEuclideanError(ransac3D.getModelParameters());
+		int fitModelF = countFitModel(ransac3D.getModelParameters());
 
 		// Compute a homography to detect degenerate geometry
 		estimateH.generate(inliers, H2);
@@ -151,22 +159,19 @@ public class ScoreFundamentalReprojectionError implements EpipolarScore3D {
 		// This only works if H is compatible with F. That only happens for planar scenes or pure rotation
 		MultiViewOps.extractEpipoles(fundamental, e1, e2);
 		GeometryMath_F64.multCrossA(e2, H, F_alt);
-		// TODO experiment with compatibility score? normalize magnitude of variables?
 
 		// Compute errors using the mangled fundamental matrix
-		double errorH = computeAverageEuclideanError(F_alt);
+		int fitModelH = countFitModel(F_alt)+1;
 
-		double ratio = (errorH + eps)/(errorF + eps);
-		is3D = ratio > ratio3D;
+		is3D = fitModelH*ratio3D <= fitModelF;
 
-		// The final score prefers sets with more inliers and a much better errorF, but caps the benefit from a large
-		// errorF since it can get ridiculously high and there's little benefit after a certain point
-		score = Math.min(maxRatioScore, ratio)*inliers.size();
-		score /= (100.0*maxRatioScore); // purely cosmetic to keep the numbers smaller
+		// Prefer a more distinctive F and more points. /200 is cosmetic
+		double ratio = fitModelF/(double)fitModelH;
+		score = Math.min(maxRatioScore, ratio)*inliersIdx.size/200.0;
 
 		if (verbose != null)
-			verbose.printf("score=%7.2f pairs=%d inliers=%d ratio=%6.2f errorH=%6.2f errorF=%5.2f 3d=%s\n",
-					score, pairs.size(), inliersIdx.size, ratio, errorH, errorF, is3D);
+			verbose.printf("score=%7.2f pairs=%d inliers=%d ratio=%6.2f fitH=%4d fitF=%4d 3d=%s\n",
+					score, pairs.size(), inliersIdx.size, ratio, fitModelH, fitModelF, is3D);
 
 		if (is3D)
 			return true;
@@ -201,20 +206,22 @@ public class ScoreFundamentalReprojectionError implements EpipolarScore3D {
 	}
 
 	/**
-	 * The distance function computes the Euclidean distance squared for the feature in the left and right side from
-	 * the closest point on the epipolar line. This function divides that error by 2 (now the average Euclidean
-	 * squared) then takes the square root and sums it. Finally it divides it by the total count.
-	 *
-	 * this should have a linear response to changes in model performance
+	 * Returns the number of times an observations is within tolerance of the model
 	 */
-	private double computeAverageEuclideanError( DMatrixRMaj fundamental ) {
+	private int countFitModel( DMatrixRMaj fundamental ) {
 		distanceF.setModel(fundamental);
-		double error = 0.0;
+		int total = 0;
+		double threshold = inlierErrorTol*inlierErrorTol*2.0;
+
 		for (int i = 0; i < inliers.size(); i++) {
 			double doubleDistanceSq = distanceF.distance(inliers.get(i));
-			error += Math.sqrt(doubleDistanceSq/2.0);
+			if (doubleDistanceSq <= threshold)
+				total++;
 		}
-		return error/inliers.size();
+		return total;
+
+		// NOTE: Originally a score was computed based on error. This  was excessively sensitive as the ratio
+		//       would explode quickly as H became a miss match. mean and percentile error was explored.
 	}
 
 	@Override public double getScore() {

@@ -95,7 +95,7 @@ public class FactorySceneReconstruction {
 					}
 					case FUNDAMENTAL_ERROR -> {
 						var alg = new ScoreFundamentalReprojectionError(ransac3D);
-						alg.eps = config.score.typeErrors.eps;
+						alg.inlierErrorTol = config.score.typeErrors.inlierErrorTol;
 						alg.ratio3D = config.score.typeErrors.ratio3D;
 						alg.maxRatioScore = config.score.typeErrors.maxRatioScore;
 						alg.minimumInliers.setTo(config.score.typeErrors.minimumInliers);
@@ -217,6 +217,8 @@ public class FactorySceneReconstruction {
 		similar.setSimilarityTest(new ImageSimilarityAssociatedRatio(config.minimumSimilar));
 		similar.setLimitQuery(config.limitQuery);
 		similar.setMinimumRecognizeDistance(config.minimumRecognizeDistance);
+		similar.searchRadius = config.sequentialSearchRadius;
+		similar.minimumCommonTracks.setTo(config.sequentialMinimumCommonTracks);
 
 		return similar;
 	}
