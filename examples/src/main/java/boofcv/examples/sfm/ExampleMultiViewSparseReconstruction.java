@@ -22,11 +22,12 @@ import boofcv.abst.feature.detect.interest.PointDetectorTypes;
 import boofcv.abst.geo.bundle.SceneStructureMetric;
 import boofcv.abst.tracker.PointTracker;
 import boofcv.alg.mvs.ColorizeMultiViewStereoResults;
-import boofcv.alg.similar.SimilarImagesPointTracker;
+import boofcv.alg.similar.ConfigSimilarImagesTrackThenMatch;
 import boofcv.alg.structure.*;
 import boofcv.core.image.LookUpColorRgbFormats;
 import boofcv.factory.feature.detect.interest.ConfigDetectInterestPoint;
-import boofcv.factory.feature.detect.selector.ConfigSelectLimit;
+import boofcv.factory.structure.ConfigEpipolarScore3D;
+import boofcv.factory.structure.ConfigGeneratePairwiseImageGraph;
 import boofcv.factory.structure.FactorySceneReconstruction;
 import boofcv.factory.tracker.ConfigPointTracker;
 import boofcv.factory.tracker.FactoryPointTracker;
@@ -164,24 +165,31 @@ public class ExampleMultiViewSparseReconstruction {
 		System.out.println("### Creating Similar Images");
 
 		// Configure the KLT tracker
-		int radius = 5;
 		var configTracker = new ConfigPointTracker();
 		configTracker.typeTracker = ConfigPointTracker.TrackerType.KLT;
 		configTracker.klt.pruneClose = true;
-		configTracker.klt.toleranceFB = 2;
-		configTracker.klt.templateRadius = radius;
+		configTracker.klt.toleranceFB = 1;
+		configTracker.klt.templateRadius = 5;
 		configTracker.klt.maximumTracks.setFixed(800);
 		configTracker.klt.config.maxIterations = 30;
 		configTracker.detDesc.typeDetector = ConfigDetectInterestPoint.Type.POINT;
 		configTracker.detDesc.detectPoint.type = PointDetectorTypes.SHI_TOMASI;
-		configTracker.detDesc.detectPoint.shiTomasi.radius = 6;
-		configTracker.detDesc.detectPoint.general.radius = 4;
-//		configTracker.detDesc.detectPoint.general.threshold = 0;
-		configTracker.detDesc.detectPoint.general.selector = ConfigSelectLimit.selectUniform(2.0);
+		configTracker.detDesc.detectPoint.shiTomasi.radius = 3;
+		configTracker.detDesc.detectPoint.general.radius = 6;
+		configTracker.detDesc.detectPoint.general.threshold = 0;
+//		configTracker.detDesc.detectPoint.general.selector = ConfigSelectLimit.selectUniform(2.0);
 
 		PointTracker<GrayU8> tracker = FactoryPointTracker.tracker(configTracker, GrayU8.class, null);
 
-		var trackerSimilar = new SimilarImagesPointTracker();
+		var config = new ConfigSimilarImagesTrackThenMatch();
+		config.recognizeNister2006.learningMinimumPointsForChildren.setFixed(20);
+		config.minimumSimilar.setRelative(0.35, 150);
+		config.descriptions.radius = 20;
+		config.sequentialSearchRadius = 8;
+		config.sequentialMinimumCommonTracks.setRelative(0.4, 200);
+
+		final var similarImages = FactorySceneReconstruction.createTrackThenMatch(config, ImageType.SB_U8);
+		similarImages.setVerbose(System.out, null);
 
 		// Track features across the entire sequence and save the results
 		BoofMiscOps.profile(() -> {
@@ -192,13 +200,13 @@ public class ExampleMultiViewSparseReconstruction {
 				Objects.requireNonNull(frame,"Failed to load image");
 				if (first) {
 					first = false;
-					trackerSimilar.initialize(frame.width, frame.height);
+					similarImages.initialize(frame.width, frame.height);
 				}
 				tracker.process(frame);
 				int active = tracker.getTotalActive();
 				int dropped = tracker.getDroppedTracks(null).size();
 				tracker.spawnTracks();
-				trackerSimilar.processFrame(tracker);
+				similarImages.processFrame(frame, tracker);
 				String id = frameId + "";//trackerSimilar.frames.getTail().frameID;
 				System.out.println("frame id = " + id + " active=" + active + " dropped=" + dropped);
 
@@ -208,9 +216,11 @@ public class ExampleMultiViewSparseReconstruction {
 				if (frameId >= maxFrames)
 					break;
 			}
-		}, "Tracking Features");
 
-		similarImages = trackerSimilar;
+			similarImages.finishedTracking();
+		}, "Finding Similar");
+
+		this.similarImages = similarImages;
 	}
 
 	/**
@@ -235,7 +245,11 @@ public class ExampleMultiViewSparseReconstruction {
 		trackImageFeatures();
 		System.out.println("----------------------------------------------------------------------------");
 		System.out.println("### Creating Pairwise");
-		GeneratePairwiseImageGraph generatePairwise = FactorySceneReconstruction.generatePairwise(null);
+		var config = new ConfigGeneratePairwiseImageGraph();
+		config.score.type = ConfigEpipolarScore3D.Type.FUNDAMENTAL_ERROR;
+		config.score.typeErrors.minimumInliers.setRelative(0.4,200);
+		config.score.ransacF.inlierThreshold = 2.0;
+		GeneratePairwiseImageGraph generatePairwise = FactorySceneReconstruction.generatePairwise(config);
 		BoofMiscOps.profile(() -> {
 			generatePairwise.setVerbose(System.out, null);
 			generatePairwise.process(similarImages);
@@ -360,7 +374,7 @@ public class ExampleMultiViewSparseReconstruction {
 		viewer.setColorizer(new TwoAxisRgbPlane.Z_XY(1.0).fperiod(40));
 		viewer.setDotSize(1);
 		viewer.setTranslationStep(0.15);
-		viewer.addCloud(cloudXyz, rgb.data);
+		viewer.addCloud((idx,p)->p.setTo(cloudXyz.get(idx)), rgb::get,rgb.size);
 		viewer.setCameraHFov(UtilAngle.radian(60));
 
 		SwingUtilities.invokeLater(() -> {

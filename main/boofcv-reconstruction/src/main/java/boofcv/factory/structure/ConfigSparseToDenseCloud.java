@@ -20,6 +20,7 @@ package boofcv.factory.structure;
 
 import boofcv.abst.disparity.ConfigSpeckleFilter;
 import boofcv.factory.disparity.ConfigDisparity;
+import boofcv.factory.sfm.ConfigMultiviewStereo;
 import boofcv.struct.Configuration;
 
 /**
