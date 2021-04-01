@@ -32,18 +32,18 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 /**
  * @author Peter Abeles
  */
-abstract class GenericDescribeRegionPointChecks<T extends ImageBase<T>, TD extends TupleDesc<TD>>
+abstract class GenericDescribePointRadiusAngleChecks<T extends ImageBase<T>, TD extends TupleDesc<TD>>
 		extends BoofStandardJUnit {
 	protected ImageType<T> imageType;
 
 	protected abstract DescribePointRadiusAngle<T, TD> createAlg();
 
-	protected GenericDescribeRegionPointChecks( ImageType<T> imageType ) {
+	protected GenericDescribePointRadiusAngleChecks( ImageType<T> imageType ) {
 		this.imageType = imageType;
 	}
 
 	/**
-	 * A course check to see if it respects the radius size parameter. just checks to see if the descriptor changes
+	 * A crude check to see if it respects the radius size parameter. just checks to see if the descriptor changes
 	 * when it hits a certain size
 	 */
 	@Test
@@ -76,7 +76,7 @@ abstract class GenericDescribeRegionPointChecks<T extends ImageBase<T>, TD exten
 		checkNotEquals(t1, t2);
 	}
 
-	void checkEquals( TupleDesc a, TupleDesc b ) {
+	void checkEquals( TupleDesc<?> a, TupleDesc<?> b ) {
 		assertEquals(a.size(), b.size());
 
 		int totalMissMatches = 0;
@@ -88,7 +88,7 @@ abstract class GenericDescribeRegionPointChecks<T extends ImageBase<T>, TD exten
 		assertTrue(totalMissMatches <= a.size()/32);
 	}
 
-	void checkNotEquals( TupleDesc a, TupleDesc b ) {
+	void checkNotEquals( TupleDesc<?> a, TupleDesc<?> b ) {
 		assertEquals(a.size(), b.size());
 		int totalMissMatches = 0;
 		for (int i = 0; i < a.size(); i++) {
