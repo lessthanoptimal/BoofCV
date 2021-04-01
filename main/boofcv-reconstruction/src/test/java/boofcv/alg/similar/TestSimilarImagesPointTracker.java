@@ -58,7 +58,7 @@ class TestSimilarImagesPointTracker extends GenericLookUpSimilarImagesChecks {
 			alg.frameMap.put(f.frameID, f);
 			f.initActive(numFeatures);
 			for (int j = 0; j < i; j++) {
-				Match m = alg.matches.grow();
+				Match m = alg.connections.grow();
 				m.init(numFeatures);
 				SimilarImagesPointTracker.Frame r = alg.frames.get(j);
 				f.related.add(r);
@@ -126,14 +126,14 @@ class TestSimilarImagesPointTracker extends GenericLookUpSimilarImagesChecks {
 		assertEquals(50, alg.imageWidth);
 		assertEquals(10, alg.imageHeight);
 
-		alg.matches.grow();
+		alg.connections.grow();
 		alg.frames.grow();
 		alg.frameMap.put("asdasd", alg.frames.grow());
 
 		alg.initialize(51, 12);
 		assertEquals(51, alg.imageWidth);
 		assertEquals(12, alg.imageHeight);
-		assertEquals(0, alg.matches.size);
+		assertEquals(0, alg.connections.size);
 		assertEquals(0, alg.frames.size);
 		assertEquals(0, alg.frameMap.size());
 	}
@@ -223,7 +223,7 @@ class TestSimilarImagesPointTracker extends GenericLookUpSimilarImagesChecks {
 		for (int i = 0; i < alg.frames.size; i++) {
 			Frame f = alg.frames.get(i);
 			assertEquals(1, f.matches.size());
-			Match matches = alg.matches.get(0);
+			Match matches = alg.connections.get(0);
 			assertEquals(19, matches.size());
 			assertNotSame(matches.frameSrc, matches.frameDst);
 			assertTrue(matches.frameSrc == f || matches.frameDst == f);

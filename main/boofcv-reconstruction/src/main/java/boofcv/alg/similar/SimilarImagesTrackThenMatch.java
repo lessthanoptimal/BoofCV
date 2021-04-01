@@ -25,6 +25,7 @@ import boofcv.abst.scene.SceneRecognition;
 import boofcv.abst.tracker.PointTracker;
 import boofcv.misc.BoofLambdas;
 import boofcv.struct.PackedArray;
+import boofcv.struct.feature.AssociatedIndex;
 import boofcv.struct.feature.TupleDesc;
 import boofcv.struct.image.ImageBase;
 import georegression.struct.point.Point2D_F64;
@@ -32,6 +33,7 @@ import lombok.Getter;
 import lombok.Setter;
 import org.ddogleg.struct.DogArray;
 import org.ddogleg.struct.DogArray_I32;
+import org.ddogleg.struct.FastAccess;
 import org.ddogleg.struct.VerbosePrint;
 import org.jetbrains.annotations.Nullable;
 
@@ -47,6 +49,9 @@ import java.util.Set;
  */
 public class SimilarImagesTrackThenMatch<Image extends ImageBase<Image>, TD extends TupleDesc<TD>>
 		extends SimilarImagesPointTracker implements VerbosePrint {
+
+	// TODO if matched frames have common tracks save those in the associations
+
 	/**
 	 * Minimum number of frames (by ID) away two frames need to be for loop closure logic to connect them
 	 */
@@ -84,6 +89,9 @@ public class SimilarImagesTrackThenMatch<Image extends ImageBase<Image>, TD exte
 	// Temporary storage for a single feature description and pixel
 	final TD tempDescription;
 
+	// Descriptor with default value to use when stuff goes worng
+	final TD nullDescription;
+
 	// Storage used for association
 	final DogArray<TD> sourceDescriptions;
 	final DogArray<Point2D_F64> sourcePixels;
@@ -104,6 +112,7 @@ public class SimilarImagesTrackThenMatch<Image extends ImageBase<Image>, TD exte
 		descriptions = factoryPackedDesc.newInstance();
 
 		tempDescription = describer.createDescription();
+		nullDescription = describer.createDescription();
 
 		sourceDescriptions = new DogArray<>(describer::createDescription);
 		destinationDescriptions = new DogArray<>(describer::createDescription);
@@ -116,28 +125,29 @@ public class SimilarImagesTrackThenMatch<Image extends ImageBase<Image>, TD exte
 		featureAssociator.createNewSetsFromDestination = false;
 	}
 
-	@Override public void processFrame( PointTracker<?> tracker ) {
+	public void processFrame( Image image, PointTracker<?> tracker ) {
 		super.processFrame(tracker);
 
 		// Compute and save the feature description
 		Frame frame = frames.getTail();
-		TD nullDescription = describer.createDescription();
-		TD description = describer.createDescription();
+
+		describer.setImage(image);
 
 		// save the index in 'featureDescriptions' that the first description is located at
 		frameStartIndexes.add(descriptions.size());
 
 		// Get pixel coordinates then compute the description
 		Point2D_F64 pixel = new Point2D_F64();
+
 		int numFeatures = frame.featureCount();
 		for (int featIdx = 0; featIdx < numFeatures; featIdx++) {
 			frame.getPixel(featIdx, pixel);
-			if (!describer.process(pixel.x, pixel.y, description)) {
+			if (!describer.process(pixel.x, pixel.y, tempDescription)) {
 				// It couldn't compute the description, probably going outside the image
 				// Not sure what else to do here. Skipping the feature will involve a lot of new code
 				descriptions.append(nullDescription);
 			} else {
-				descriptions.append(description);
+				descriptions.append(tempDescription);
 			}
 		}
 
@@ -153,7 +163,9 @@ public class SimilarImagesTrackThenMatch<Image extends ImageBase<Image>, TD exte
 		if (learnModel) {
 			recognizer.learnModel(new Iterator<>() {
 				int frameIdx = 0;
+
 				@Override public boolean hasNext() {return frameIdx < frameStartIndexes.size();}
+
 				@Override public FeatureSceneRecognition.Features<TD> next() {
 					return wrapFeatures(frameIdx++);
 				}
@@ -173,8 +185,14 @@ public class SimilarImagesTrackThenMatch<Image extends ImageBase<Image>, TD exte
 	 * Use the recognizer to search for frames that match but were not
 	 */
 	private void searchForMatchingFrames() {
+		// save so that we know how many frames got matched
+		int priorConnectedFrames = connections.size;
+
 		// Handle the case where the searchRadius is infinite and has been set to a negative value
 		int searchRadius = Math.max(0, this.searchRadius);
+
+		// Total connections considered
+		int totalConsidered = 0;
 
 		// Search for loops at every frame
 		for (int frameIdx = 0; frameIdx < frameStartIndexes.size; frameIdx++) {
@@ -184,6 +202,9 @@ public class SimilarImagesTrackThenMatch<Image extends ImageBase<Image>, TD exte
 			loadFrameIntoSource(frameIdx);
 
 			Frame frameTarget = frames.get(frameIdx);
+
+			if (verbose != null)
+				verbose.printf("query[%d] match.size=%d\n", frameIdx, queryMatches.size);
 
 			for (int queryIdx = 0; queryIdx < queryMatches.size; queryIdx++) {
 				int matchedFrameIdx = Integer.parseInt(queryMatches.get(queryIdx).id);
@@ -215,9 +236,14 @@ public class SimilarImagesTrackThenMatch<Image extends ImageBase<Image>, TD exte
 				if (!checkConnection)
 					continue;
 
+				totalConsidered++;
 				attemptToConnectFrames(frameIdx, matchedFrameIdx);
 			}
 		}
+
+		if (verbose != null)
+			verbose.printf("Recognition created %d connections. Considered %d\n",
+					(connections.size - priorConnectedFrames), totalConsidered);
 	}
 
 	/**
@@ -229,21 +255,25 @@ public class SimilarImagesTrackThenMatch<Image extends ImageBase<Image>, TD exte
 		// Use the image descriptors to match features
 		featureAssociator.associate();
 
+		FastAccess<AssociatedIndex> matches = featureAssociator.getMatches();
+
 		// See if the found feature matches pass a similarity test
-		boolean similar = similarityTest.isSimilar(
-				sourcePixels, destinationPixels, featureAssociator.getMatches());
+		boolean similar = similarityTest.isSimilar(sourcePixels, destinationPixels, matches);
 
 		if (!similar)
 			return;
 
+		if (verbose != null)
+			verbose.printf("connecting %3d to %3d. matches.size=%d\n", frameIdx, matchedFrameIdx, matches.size);
+
 		// Connect the two frames using the matched features
-		connectFrames(frames.get(frameIdx), frames.get(matchedFrameIdx), featureAssociator.getMatches());
+		connectFrames(frames.get(frameIdx), frames.get(matchedFrameIdx), matches);
 	}
 
-	private void loadFrameIntoSource( int frameIdxA ) {
-		Frame frame = frames.get(frameIdxA);
+	private void loadFrameIntoSource( int frameIdx ) {
+		Frame frame = frames.get(frameIdx);
 
-		int featureOffset = frameStartIndexes.get(frameIdxA);
+		int featureOffset = frameStartIndexes.get(frameIdx);
 		int numberOfFeatures = frame.featureCount();
 
 		// Load the target/source image features
@@ -256,14 +286,14 @@ public class SimilarImagesTrackThenMatch<Image extends ImageBase<Image>, TD exte
 			frame.getPixel(i, sourcePixels.grow());
 
 			// Add this feature to the associator
-			featureAssociator.addSource(desc, recognizer.getQueryWord(i));
+			featureAssociator.addSource(desc, recognizer.lookupWord(desc));
 		}
 	}
 
-	private void loadFrameIntoDestination( int frameIdxA ) {
-		Frame frame = frames.get(frameIdxA);
+	private void loadFrameIntoDestination( int frameIdx ) {
+		Frame frame = frames.get(frameIdx);
 
-		int featureOffset = frameStartIndexes.get(frameIdxA);
+		int featureOffset = frameStartIndexes.get(frameIdx);
 		int numberOfFeatures = frame.featureCount();
 
 		// Load the target/source image features
@@ -277,7 +307,7 @@ public class SimilarImagesTrackThenMatch<Image extends ImageBase<Image>, TD exte
 			frame.getPixel(i, destinationPixels.grow());
 
 			// Add this feature to the associator
-			featureAssociator.addDestination(desc, recognizer.getQueryWord(i));
+			featureAssociator.addDestination(desc, recognizer.lookupWord(desc));
 		}
 	}
 

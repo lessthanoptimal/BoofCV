@@ -88,6 +88,13 @@ public class ScoreRatioFundamentalHomography implements EpipolarScore3D {
 		inliersIdx.reset();
 		fundamental.fill(0);
 
+		int minimumAllowed = minimumInliers.computeI(pairs.size());
+		if (pairs.size() < minimumAllowed) {
+			if (verbose != null)
+				verbose.printf("pairs.size=%d is too small. minimum=%d\n", pairs.size(), minimumAllowed);
+			return false;
+		}
+
 		// Fitting Essential/Fundamental works when the scene is not planar and not pure rotation
 		countF = 0;
 		if (ransac3D.process(pairs)) {
@@ -102,23 +109,26 @@ public class ScoreRatioFundamentalHomography implements EpipolarScore3D {
 
 		is3D = countF > countH*ratio3D;
 
-		if (verbose != null)
-			verbose.println("ransac F=" + countF + " H=" + countH + " pairs.size=" + pairs.size() + " 3d=" + is3D);
+		boolean accepted = false;
 
 		// Always use fundamental if it's available
-		if (countF >= minimumInliers.computeI(pairs.size())) {
+		if (countF >= minimumAllowed) {
 			saveInlierMatches(ransac3D, inliersIdx);
 			fundamental.setTo(ransac3D.getModelParameters());
-		} else if (countH >= minimumInliers.computeI(pairs.size())) {
+			accepted = true;
+		} else if (countH >= minimumAllowed) {
 			saveInlierMatches(ransacH, inliersIdx);
 			Homography2D_F64 H = ransacH.getModelParameters();
 			DConvertMatrixStruct.convert(H, fundamental);
 			// returning H instead of F could cause some confusion here. Will deal with that when it becomes an issue
-		} else {
-			return false;
+			accepted = true;
 		}
 
-		return true;
+		if (verbose != null)
+			verbose.println("ransac F=" + countF + " H=" + countH +
+					" pairs=" + pairs.size() + " 3d=" + is3D + " accepted=" + accepted);
+
+		return accepted;
 	}
 
 	@Override public double getScore() {

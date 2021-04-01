@@ -70,7 +70,7 @@ public class SimilarImagesPointTracker implements LookUpSimilarImages {
 	/** Quick way to retrieve a frame based on its ID */
 	public final Map<String, Frame> frameMap = new HashMap<>();
 	/** List of all matches between frames */
-	public final DogArray<Match> matches = new DogArray<>(Match::new, Match::reset);
+	public final DogArray<Match> connections = new DogArray<>(Match::new, Match::reset);
 
 	// shape of images
 	public int imageWidth, imageHeight;
@@ -89,7 +89,7 @@ public class SimilarImagesPointTracker implements LookUpSimilarImages {
 		// reset internal data structures to their initial state
 		frames.reset();
 		frameMap.clear();
-		matches.reset();
+		connections.reset();
 	}
 
 	/**
@@ -174,7 +174,7 @@ public class SimilarImagesPointTracker implements LookUpSimilarImages {
 	 */
 	protected void connectFrames( Frame current, Frame previous, FastAccess<AssociatedIndex> associated ) {
 		// Create a match that describes the observations of common features/tracks
-		Match m = matches.grow();
+		Match m = connections.grow();
 		m.init(associated.size);
 		m.frameSrc = current;
 		m.frameDst = previous;
