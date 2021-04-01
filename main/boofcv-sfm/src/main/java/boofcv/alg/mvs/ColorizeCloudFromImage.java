@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -20,7 +20,6 @@ package boofcv.alg.mvs;
 
 import boofcv.core.image.LookUpColorRgb;
 import boofcv.misc.BoofLambdas;
-import boofcv.misc.BoofMiscOps;
 import boofcv.struct.distort.Point2Transform2_F64;
 import boofcv.struct.geo.PointIndex3D_F64;
 import boofcv.struct.geo.PointIndex4D_F64;
@@ -82,11 +81,14 @@ public class ColorizeCloudFromImage<T extends ImageBase<T>> {
 
 			norm_to_pixel.compute(viewPt.x/viewPt.z, viewPt.y/viewPt.z, pixel);
 
-			if (!BoofMiscOps.isInside(image, pixel.x, pixel.y))
+			if (pixel.x < 0.0 || pixel.y < 0.0)
 				continue;
 
 			int xx = (int)(pixel.x + 0.5);
 			int yy = (int)(pixel.y + 0.5);
+
+			if (xx >= image.width || yy >= image.height)
+				continue;
 
 			int rgb = colorLookup.lookupRgb(xx, yy);
 			colorizer.setRgb(pidx.index, (rgb >> 16) & 0xFF, (rgb >> 8) & 0xFF, rgb & 0xFF);
@@ -124,11 +126,14 @@ public class ColorizeCloudFromImage<T extends ImageBase<T>> {
 			// w component is ignored. x = [I(3) 0]*X
 			norm_to_pixel.compute(viewPt4.x/viewPt4.z, viewPt4.y/viewPt4.z, pixel);
 
-			if (!BoofMiscOps.isInside(image, pixel.x, pixel.y))
+			if (pixel.x < 0.0 || pixel.y < 0.0)
 				continue;
 
 			int xx = (int)(pixel.x + 0.5);
 			int yy = (int)(pixel.y + 0.5);
+
+			if (xx >= image.width || yy >= image.height)
+				continue;
 
 			int rgb = colorLookup.lookupRgb(xx, yy);
 			colorizer.setRgb(pidx.index, (rgb >> 16) & 0xFF, (rgb >> 8) & 0xFF, rgb & 0xFF);
