@@ -213,6 +213,9 @@ public class VisualizeAssociationMatchesApp<T extends ImageGray<T>, D extends Im
 		controls.setTime((time1 - time0)*1e-6); // TODO in gui thread?
 
 		SwingUtilities.invokeLater(() -> {
+			controls.setCountLeft(leftDesc.size);
+			controls.setCountRight(rightDesc.size);
+			controls.setCountMatched(matcher.getMatches().size);
 			panel.setAssociation(leftPts, rightPts, matcher.getMatches());
 			repaint();
 		});
@@ -268,6 +271,9 @@ public class VisualizeAssociationMatchesApp<T extends ImageGray<T>, D extends Im
 	class AssociateControls extends ControlPanelDdaComboTabs {
 		final JLabel labelTime = new JLabel();
 		final JLabel labelSize = new JLabel();
+		final JLabel labelCountLeft = new JLabel();
+		final JLabel labelCountRight = new JLabel();
+		final JLabel labelCountMatched = new JLabel();
 
 		public AssociateControls() {
 			super(() -> {
@@ -311,6 +317,9 @@ public class VisualizeAssociationMatchesApp<T extends ImageGray<T>, D extends Im
 
 			addLabeled(labelTime, "Time (ms)");
 			add(labelSize);
+			addLabeled(labelCountLeft, "Left Count");
+			addLabeled(labelCountRight, "Right Count");
+			addLabeled(labelCountMatched, "Matched");
 			super.layoutComponents();
 		}
 
@@ -320,6 +329,18 @@ public class VisualizeAssociationMatchesApp<T extends ImageGray<T>, D extends Im
 
 		public void setImageSize( int width, int height ) {
 			labelSize.setText(width + " x " + height);
+		}
+
+		public void setCountLeft( int total) {
+			labelCountLeft.setText(""+total);
+		}
+
+		public void setCountRight( int total) {
+			labelCountRight.setText(""+total);
+		}
+
+		public void setCountMatched( int total) {
+			labelCountMatched.setText(""+total);
 		}
 	}
 
