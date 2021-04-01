@@ -133,6 +133,9 @@ public class GeneratePairwiseImageGraph implements VerbosePrint {
 		DMatrixRMaj fundamental = new DMatrixRMaj(3, 3);
 		DogArray_I32 inlierIdx = new DogArray_I32();
 
+		// no new line since epipolarScore should print something about this pair
+		if (verbose!=null) verbose.printf("  createEdge['%s'] -> '%s'  ",src,dst);
+
 		if (!epipolarScore.process(pairs.toList(), fundamental, inlierIdx)) {
 			// Don't create an edge here
 			return;

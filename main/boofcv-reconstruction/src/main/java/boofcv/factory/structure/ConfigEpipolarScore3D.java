@@ -18,6 +18,7 @@
 
 package boofcv.factory.structure;
 
+import boofcv.alg.structure.score3d.ScoreFundamentalReprojectionError;
 import boofcv.factory.geo.ConfigFundamental;
 import boofcv.factory.geo.ConfigHomography;
 import boofcv.factory.geo.ConfigRansac;
@@ -125,26 +126,25 @@ public class ConfigEpipolarScore3D implements Configuration {
 	}
 
 	/**
-	 * Configuration for {@link boofcv.alg.structure.score3d.ScoreFundamentalReprojectionError}
+	 * Configuration for {@link ScoreFundamentalReprojectionError}
 	 */
 	public static class FundamentalError implements Configuration {
-		/** Higher values indicate more evidence is needed for a scene to be 3D */
-		public double ratio3D = 2.0;
+		/** @see ScoreFundamentalReprojectionError#ratio3D */
+		public double ratio3D = 1.3;
 
-		/** Smoothing parameter and avoid divide by zero. This is typically < 1.0 since error is computed in pixels */
-		public double eps = 0.01;
+		/** @see ScoreFundamentalReprojectionError#inlierErrorTol */
+		public double inlierErrorTol = 1.0;
 
 		/**
-		 * Caps how much influence the geometric score can have. The error ratio can sky rocket as the baseline
-		 * increased but the benefit doesn't seem to increase after a point.
+		 * @see ScoreFundamentalReprojectionError#maxRatioScore
 		 */
-		public double maxRatioScore = 5.0;
+		public double maxRatioScore = 2.5;
 
 		/** The minimum number of inliers for an edge to be accepted. If relative, then relative to pairs.  */
 		public final ConfigLength minimumInliers = ConfigLength.fixed(30);
 
 		@Override public void checkValidity() {
-			BoofMiscOps.checkTrue(eps >= 0);
+			BoofMiscOps.checkTrue(inlierErrorTol >= 0);
 			BoofMiscOps.checkTrue(ratio3D > 0.0);
 			BoofMiscOps.checkTrue(maxRatioScore > 0.0);
 			minimumInliers.checkValidity();
@@ -152,7 +152,7 @@ public class ConfigEpipolarScore3D implements Configuration {
 
 		public void setTo( FundamentalError src ) {
 			this.ratio3D = src.ratio3D;
-			this.eps = src.eps;
+			this.inlierErrorTol = src.inlierErrorTol;
 			this.maxRatioScore = src.maxRatioScore;
 			this.minimumInliers.setTo(src.minimumInliers);
 		}

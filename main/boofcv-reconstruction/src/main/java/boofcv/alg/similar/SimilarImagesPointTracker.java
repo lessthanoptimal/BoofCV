@@ -55,7 +55,7 @@ import java.util.Map;
 public class SimilarImagesPointTracker implements LookUpSimilarImages {
 	/**
 	 * Maximum number of frames in forwards and backwards direction which will be searched for being related.
-	 * If zero then there is no hard limit.
+	 * If less than zero there are no hard limit.
 	 */
 	public int searchRadius = 5;
 
@@ -141,7 +141,7 @@ public class SimilarImagesPointTracker implements LookUpSimilarImages {
 
 		// Both values below are needed for early termination of search
 		int currentTrackCount = frames.getTail().featureCount();
-		int oldestFrameConsidered = searchRadius <= 0 ? 0 : Math.max(0, frames.size - 1 - searchRadius);
+		int oldestFrameConsidered = searchRadius < 0 ? 0 : Math.max(0, frames.size - 1 - searchRadius);
 
 		// Check the most recent past frames first, up until it hits the limit or there are too few tracks
 		for (int frameCnt = frames.size - 2; frameCnt >= oldestFrameConsidered; frameCnt--) {
