@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -74,19 +74,18 @@ public class FactoryMultiViewRobust {
 	 * @param configLMedS Parameters for LMedS.  Can't be null.
 	 * @return Robust Se3_F64 estimator
 	 */
-	public static ModelMatcherMultiview<Se3_F64, Point2D3D> pnpLMedS(@Nullable ConfigPnP configPnP,
-																	 ConfigLMedS configLMedS)
-	{
-		if( configPnP == null )
+	public static ModelMatcherMultiview<Se3_F64, Point2D3D> pnpLMedS( @Nullable ConfigPnP configPnP,
+																	  ConfigLMedS configLMedS ) {
+		if (configPnP == null)
 			configPnP = new ConfigPnP();
 		configPnP.checkValidity();
 		configLMedS.checkValidity();
 
-		Estimate1ofPnP estimatorPnP = FactoryMultiView.pnp_1( configPnP.which , configPnP.epnpIterations, configPnP.numResolve);
+		Estimate1ofPnP estimatorPnP = FactoryMultiView.pnp_1(configPnP.which, configPnP.epnpIterations, configPnP.numResolve);
 
-		DistanceFromModelMultiView<Se3_F64,Point2D3D> distance = new PnPDistanceReprojectionSq();
+		DistanceFromModelMultiView<Se3_F64, Point2D3D> distance = new PnPDistanceReprojectionSq();
 		ModelManagerSe3_F64 manager = new ModelManagerSe3_F64();
-		EstimatorToGenerator<Se3_F64,Point2D3D> generator = new EstimatorToGenerator<>(estimatorPnP);
+		EstimatorToGenerator<Se3_F64, Point2D3D> generator = new EstimatorToGenerator<>(estimatorPnP);
 
 		LeastMedianOfSquaresMultiView<Se3_F64, Point2D3D> lmeds =
 				new LeastMedianOfSquaresMultiView<>(configLMedS.randSeed, configLMedS.totalCycles, manager, generator, distance);
@@ -102,30 +101,30 @@ public class FactoryMultiViewRobust {
 	 *
 	 * <p>See code for all the details.</p>
 	 *
-	 * @see Estimate1ofPnP
-	 *
-	 * @param pnp PnP parameters.  Can't be null.
-	 * @param ransac Parameters for RANSAC.  Can't be null.
+	 * @param configPnP PnP parameters.  Can't be null.
+	 * @param configRansac Parameters for RANSAC.  Can't be null.
 	 * @return Robust Se3_F64 estimator
+	 * @see Estimate1ofPnP
 	 */
-	public static ModelMatcherMultiview<Se3_F64, Point2D3D> pnpRansac( @Nullable ConfigPnP pnp,
-																	   ConfigRansac ransac )
-	{
-		if( pnp == null )
-			pnp = new ConfigPnP();
-		pnp.checkValidity();
-		ransac.checkValidity();
+	public static ModelMatcherMultiview<Se3_F64, Point2D3D> pnpRansac( @Nullable ConfigPnP configPnP,
+																	   ConfigRansac configRansac ) {
+		if (configPnP == null)
+			configPnP = new ConfigPnP();
+		configPnP.checkValidity();
+		configRansac.checkValidity();
 
-		Estimate1ofPnP estimatorPnP = FactoryMultiView.pnp_1(pnp.which, pnp.epnpIterations, pnp.numResolve);
-		DistanceFromModelMultiView<Se3_F64,Point2D3D> distance = new PnPDistanceReprojectionSq();
+		Estimate1ofPnP estimatorPnP = FactoryMultiView.pnp_1(
+				configPnP.which, configPnP.epnpIterations, configPnP.numResolve);
+		DistanceFromModelMultiView<Se3_F64, Point2D3D> distance = new PnPDistanceReprojectionSq();
 		ModelManagerSe3_F64 manager = new ModelManagerSe3_F64();
-		EstimatorToGenerator<Se3_F64,Point2D3D> generator =
+		EstimatorToGenerator<Se3_F64, Point2D3D> generator =
 				new EstimatorToGenerator<>(estimatorPnP);
 
 		// convert from pixels to pixels squared
-		double threshold = ransac.inlierThreshold*ransac.inlierThreshold;
+		double threshold = configRansac.inlierThreshold*configRansac.inlierThreshold;
 
-		return new RansacCalibrated<>(ransac.randSeed, manager, generator, distance, ransac.iterations, threshold);
+		return new RansacCalibrated<>(
+				configRansac.randSeed, configRansac.iterations, threshold, manager, generator, distance);
 	}
 
 	/**
@@ -138,60 +137,57 @@ public class FactoryMultiViewRobust {
 	 *
 	 * <p>See code for all the details.</p>
 	 *
-	 * @param essential Essential matrix estimation parameters.  Can't be null.
-	 * @param lmeds Parameters for RANSAC.  Can't be null.
+	 * @param configEssential Essential matrix estimation parameters.  Can't be null.
+	 * @param configLMedS Parameters for RANSAC.  Can't be null.
 	 * @return Robust Se3_F64 estimator
 	 */
-	public static ModelMatcherMultiview<Se3_F64, AssociatedPair> baselineLMedS( @Nullable ConfigEssential essential,
-																				ConfigLMedS lmeds )
-	{
-		if( essential == null )
-			essential = new ConfigEssential();
+	public static ModelMatcherMultiview<Se3_F64, AssociatedPair> baselineLMedS( @Nullable ConfigEssential configEssential,
+																				ConfigLMedS configLMedS ) {
+		if (configEssential == null)
+			configEssential = new ConfigEssential();
 		else
-			essential.checkValidity();
+			configEssential.checkValidity();
 
 		Estimate1ofEpipolar epipolar = FactoryMultiView.
-				essential_1(essential.which, essential.numResolve);
+				essential_1(configEssential.which, configEssential.numResolve);
 
 		Triangulate2ViewsMetric triangulate = FactoryMultiView.triangulate2ViewMetric(
 				new ConfigTriangulation(ConfigTriangulation.Type.GEOMETRIC));
-		ModelManager<Se3_F64> manager = new ModelManagerSe3_F64();
-		ModelGenerator<Se3_F64, AssociatedPair> generateEpipolarMotion =
-				new Se3FromEssentialGenerator(epipolar, triangulate);
+		var manager = new ModelManagerSe3_F64();
+		var generateEpipolarMotion = new Se3FromEssentialGenerator(epipolar, triangulate);
 
-		DistanceFromModelMultiView<Se3_F64, AssociatedPair> distanceSe3 = new DistanceSe3SymmetricSq(triangulate);
+		var distanceSe3 = new DistanceSe3SymmetricSq(triangulate);
 
-		LeastMedianOfSquaresMultiView<Se3_F64, AssociatedPair> config = new LeastMedianOfSquaresMultiView<>
-				(lmeds.randSeed, lmeds.totalCycles, manager, generateEpipolarMotion, distanceSe3);
-		config.setErrorFraction(lmeds.errorFraction);
+		var config = new LeastMedianOfSquaresMultiView<>(
+				configLMedS.randSeed, configLMedS.totalCycles, manager, generateEpipolarMotion, distanceSe3);
+		config.setErrorFraction(configLMedS.errorFraction);
 		return config;
 	}
 
-	public static ModelMatcher<DMatrixRMaj, AssociatedPair> fundamentalLMedS( @Nullable ConfigFundamental fundamental,
-																			  ConfigLMedS lmeds ) {
-		if (fundamental==null)
-			fundamental = new ConfigFundamental();
+	public static ModelMatcher<DMatrixRMaj, AssociatedPair>
+	fundamentalLMedS( @Nullable ConfigFundamental configFundamental, ConfigLMedS configLMedS ) {
+		if (configFundamental == null)
+			configFundamental = new ConfigFundamental();
 
-		fundamental.checkValidity();
-		lmeds.checkValidity();
+		configFundamental.checkValidity();
+		configLMedS.checkValidity();
 
-		ModelManager<DMatrixRMaj> managerF = new ModelManagerEpipolarMatrix();
-		Estimate1ofEpipolar estimateF = FactoryMultiView.fundamental_1(fundamental.which,
-				fundamental.numResolve);
+		var managerF = new ModelManagerEpipolarMatrix();
+		Estimate1ofEpipolar estimateF = FactoryMultiView.fundamental_1(
+				configFundamental.which, configFundamental.numResolve);
 		GenerateEpipolarMatrix generateF = new GenerateEpipolarMatrix(estimateF);
 
 		// How the error is measured
-		DistanceFromModel<DMatrixRMaj,AssociatedPair> errorMetric = switch (fundamental.errorModel) {
+		DistanceFromModel<DMatrixRMaj, AssociatedPair> errorMetric = switch (configFundamental.errorModel) {
 			case SAMPSON -> new DistanceFromModelResidual<>(new FundamentalResidualSampson());
 			case GEOMETRIC -> new DistanceFundamentalGeometric();
-			default -> throw new RuntimeException("Unknown");
 		};
 
-
-		LeastMedianOfSquares<DMatrixRMaj, AssociatedPair> config = new LeastMedianOfSquares<>
-				(lmeds.randSeed, lmeds.totalCycles, managerF, generateF, errorMetric);
-		config.setErrorFraction(lmeds.errorFraction);
-		return config;
+		var alg = new LeastMedianOfSquares<>(
+				configLMedS.randSeed, configLMedS.totalCycles, managerF, AssociatedPair.class);
+		alg.setModel(() -> generateF, () -> errorMetric);
+		alg.setErrorFraction(configLMedS.errorFraction);
+		return alg;
 	}
 
 	/**
@@ -200,25 +196,24 @@ public class FactoryMultiViewRobust {
 	 *
 	 * <p>See code for all the details.</p>
 	 *
-	 * @param essential Essential matrix estimation parameters.
-	 * @param ransac Parameters for RANSAC.  Can't be null.
+	 * @param configEssential Essential matrix estimation parameters.
+	 * @param configRansac Parameters for RANSAC.  Can't be null.
 	 * @return Robust Se3_F64 estimator
 	 */
-	public static ModelMatcherMultiview<Se3_F64, AssociatedPair> baselineRansac(@Nullable ConfigEssential essential,
-																				ConfigRansac ransac )
-	{
-		if( essential == null )
-			essential = new ConfigEssential();
+	public static ModelMatcherMultiview<Se3_F64, AssociatedPair> baselineRansac( @Nullable ConfigEssential configEssential,
+																				 ConfigRansac configRansac ) {
+		if (configEssential == null)
+			configEssential = new ConfigEssential();
 		else
-			essential.checkValidity();
-		ransac.checkValidity();
+			configEssential.checkValidity();
+		configRansac.checkValidity();
 
-		if( essential.errorModel != ConfigEssential.ErrorModel.GEOMETRIC) {
+		if (configEssential.errorModel != ConfigEssential.ErrorModel.GEOMETRIC) {
 			throw new RuntimeException("Error model has to be Euclidean");
 		}
 
 		Estimate1ofEpipolar epipolar = FactoryMultiView.
-				essential_1(essential.which, essential.numResolve);
+				essential_1(configEssential.which, configEssential.numResolve);
 
 		Triangulate2ViewsMetric triangulate = FactoryMultiView.triangulate2ViewMetric(
 				new ConfigTriangulation(ConfigTriangulation.Type.GEOMETRIC));
@@ -229,73 +224,64 @@ public class FactoryMultiViewRobust {
 		DistanceFromModelMultiView<Se3_F64, AssociatedPair> distanceSe3 =
 				new DistanceSe3SymmetricSq(triangulate);
 
-		double ransacTOL = ransac.inlierThreshold * ransac.inlierThreshold * 2.0;
+		double ransacTOL = configRansac.inlierThreshold*configRansac.inlierThreshold*2.0;
 
-		return new RansacCalibrated<>(ransac.randSeed, manager, generateEpipolarMotion, distanceSe3,
-				ransac.iterations, ransacTOL);
+		return new RansacCalibrated<>(configRansac.randSeed, configRansac.iterations, ransacTOL,
+				manager, generateEpipolarMotion, distanceSe3);
 	}
 
-	public static ModelMatcherMultiview<DMatrixRMaj, AssociatedPair>  essentialRansac(@Nullable ConfigEssential essential,
-																					  ConfigRansac ransac )
-	{
-		if( essential == null )
-			essential = new ConfigEssential();
+	public static ModelMatcherMultiview<DMatrixRMaj, AssociatedPair>
+	essentialRansac( @Nullable ConfigEssential configEssential, ConfigRansac configRansac ) {
+		if (configEssential == null)
+			configEssential = new ConfigEssential();
 		else
-			essential.checkValidity();
-		ransac.checkValidity();
+			configEssential.checkValidity();
+		configRansac.checkValidity();
 
-		if( essential.errorModel == ConfigEssential.ErrorModel.GEOMETRIC) {
+		if (configEssential.errorModel == ConfigEssential.ErrorModel.GEOMETRIC) {
 			// The best error has been selected. Compute using the baseline algorithm then convert back into
 			// essential matrix
-			return new MmmvSe3ToEssential(baselineRansac(essential,ransac));
+			return new MmmvSe3ToEssential(baselineRansac(configEssential, configRansac));
 		}
 
 		ModelManager<DMatrixRMaj> managerE = new ModelManagerEpipolarMatrix();
-		Estimate1ofEpipolar estimateF = FactoryMultiView.essential_1(essential.which,
-				essential.numResolve);
+		Estimate1ofEpipolar estimateF = FactoryMultiView.essential_1(configEssential.which,
+				configEssential.numResolve);
 		GenerateEpipolarMatrix generateE = new GenerateEpipolarMatrix(estimateF);
 
 		// How the error is measured
-		DistanceFromModelMultiView<DMatrixRMaj,AssociatedPair> errorMetric =
+		DistanceFromModelMultiView<DMatrixRMaj, AssociatedPair> errorMetric =
 				new DistanceMultiView_EssentialSampson();
-		double ransacTOL = ransac.inlierThreshold * ransac.inlierThreshold;
+		double ransacTOL = configRansac.inlierThreshold*configRansac.inlierThreshold;
 
-		return new RansacCalibrated<>(ransac.randSeed, managerE, generateE, errorMetric,
-				ransac.iterations, ransacTOL);
+		return new RansacCalibrated<>(configRansac.randSeed, configRansac.iterations, ransacTOL,
+				managerE, generateE, errorMetric);
 	}
 
-
 	public static ModelMatcher<DMatrixRMaj, AssociatedPair> fundamentalRansac(
-			ConfigFundamental fundamental,
-			ConfigRansac ransac ) {
+			ConfigFundamental configFundamental,
+			ConfigRansac configRansac ) {
 
-		fundamental.checkValidity();
-		ransac.checkValidity();
+		configFundamental.checkValidity();
+		configRansac.checkValidity();
 
 		ModelManager<DMatrixRMaj> managerF = new ModelManagerEpipolarMatrix();
-		Estimate1ofEpipolar estimateF = FactoryMultiView.fundamental_1(fundamental.which,
-				fundamental.numResolve);
+		Estimate1ofEpipolar estimateF = FactoryMultiView.fundamental_1(configFundamental.which,
+				configFundamental.numResolve);
 		GenerateEpipolarMatrix generateF = new GenerateEpipolarMatrix(estimateF);
 
 		// How the error is measured
-		DistanceFromModel<DMatrixRMaj,AssociatedPair> errorMetric;
+		DistanceFromModel<DMatrixRMaj, AssociatedPair> errorMetric = switch (configFundamental.errorModel) {
+			case SAMPSON -> new DistanceFromModelResidual<>(new FundamentalResidualSampson());
+			case GEOMETRIC -> new DistanceFundamentalGeometric();
+		};
 
-		switch( fundamental.errorModel ) {
-			case SAMPSON:
-				errorMetric = new DistanceFromModelResidual<>(new FundamentalResidualSampson());
-				break;
+		double ransacTOL = configRansac.inlierThreshold*configRansac.inlierThreshold;
 
-			case GEOMETRIC:
-				errorMetric = new DistanceFundamentalGeometric();
-				break;
-
-			default:
-				throw new RuntimeException("Unknown");
-		}
-
-		double ransacTOL = ransac.inlierThreshold * ransac.inlierThreshold;
-
-		return new Ransac<>(ransac.randSeed, managerF, generateF, errorMetric, ransac.iterations, ransacTOL);
+		var ransac = new Ransac<>(configRansac.randSeed, configRansac.iterations, ransacTOL,
+				managerF, AssociatedPair.class);
+		ransac.setModel(() -> generateF, () -> errorMetric);
+		return ransac;
 	}
 
 	/**
@@ -309,22 +295,22 @@ public class FactoryMultiViewRobust {
 	 *
 	 * <p>See code for all the details.</p>
 	 *
-	 * @param homography Homography estimation parameters.  If null default is used.
+	 * @param configHomography Homography estimation parameters.  If null default is used.
 	 * @param configLMedS Parameters for LMedS.  Can't be null.
 	 * @return Homography estimator
 	 */
-	public static LeastMedianOfSquares<Homography2D_F64,AssociatedPair>
-	homographyLMedS(@Nullable ConfigHomography homography , ConfigLMedS configLMedS )
-	{
-		if( homography == null )
-			homography = new ConfigHomography();
+	public static LeastMedianOfSquares<Homography2D_F64, AssociatedPair>
+	homographyLMedS( @Nullable ConfigHomography configHomography, ConfigLMedS configLMedS ) {
+		if (configHomography == null)
+			configHomography = new ConfigHomography();
 
 		ModelManager<Homography2D_F64> manager = new ModelManagerHomography2D_F64();
-		GenerateHomographyLinear modelFitter = new GenerateHomographyLinear(homography.normalize);
+		GenerateHomographyLinear modelFitter = new GenerateHomographyLinear(configHomography.normalize);
 		DistanceHomographySq distance = new DistanceHomographySq();
 
-		LeastMedianOfSquares<Homography2D_F64,AssociatedPair> lmeds= new LeastMedianOfSquares<>
-				(configLMedS.randSeed, configLMedS.totalCycles, manager, modelFitter, distance);
+		var lmeds = new LeastMedianOfSquares<>(
+				configLMedS.randSeed, configLMedS.totalCycles, manager, AssociatedPair.class);
+		lmeds.setModel(()->modelFitter, ()->distance);
 		lmeds.setErrorFraction(configLMedS.errorFraction);
 		return lmeds;
 	}
@@ -340,114 +326,114 @@ public class FactoryMultiViewRobust {
 	 *
 	 * <p>See code for all the details.</p>
 	 *
-	 * @param homography Homography estimation parameters.  If null default is used.
-	 * @param ransac Parameters for RANSAC.  Can't be null.
+	 * @param configHomography Homography estimation parameters.  If null default is used.
+	 * @param configRansac Parameters for RANSAC.  Can't be null.
 	 * @return Homography estimator
 	 */
-	public static Ransac<Homography2D_F64,AssociatedPair>
-	homographyRansac( @Nullable ConfigHomography homography , ConfigRansac ransac )
-	{
-		if( homography == null )
-			homography = new ConfigHomography();
+	public static Ransac<Homography2D_F64, AssociatedPair>
+	homographyRansac( @Nullable ConfigHomography configHomography, ConfigRansac configRansac ) {
+		if (configHomography == null)
+			configHomography = new ConfigHomography();
 
 		ModelManager<Homography2D_F64> manager = new ModelManagerHomography2D_F64();
-		GenerateHomographyLinear modelFitter = new GenerateHomographyLinear(homography.normalize);
+		GenerateHomographyLinear modelFitter = new GenerateHomographyLinear(configHomography.normalize);
 		DistanceHomographySq distance = new DistanceHomographySq();
 
-		double ransacTol = ransac.inlierThreshold*ransac.inlierThreshold;
-
-		return new Ransac<>(ransac.randSeed, manager, modelFitter, distance, ransac.iterations, ransacTol);
+		double ransacTol = configRansac.inlierThreshold*configRansac.inlierThreshold;
+		var ransac = new Ransac<>(
+				configRansac.randSeed, configRansac.iterations, ransacTol, manager, AssociatedPair.class);
+		ransac.setModel(()->modelFitter, ()->distance);
+		return ransac;
 	}
 
 	/**
 	 * Estimates a homography from normalized image coordinates but computes the error in pixel coordinates
 	 *
+	 * @param configRansac RANSAC configuration
+	 * @return Ransac
 	 * @see GenerateHomographyLinear
 	 * @see DistanceHomographyCalibratedSq
-	 *
-	 * @param ransac RANSAC configuration
-	 * @return Ransac
 	 */
-	public static RansacCalibrated<Homography2D_F64,AssociatedPair>
-	homographyCalibratedRansac( ConfigRansac ransac )
-	{
-		ModelManager<Homography2D_F64> manager = new ModelManagerHomography2D_F64();
-		GenerateHomographyLinear modelFitter = new GenerateHomographyLinear(false);
-		DistanceHomographyCalibratedSq distance = new DistanceHomographyCalibratedSq();
+	public static RansacCalibrated<Homography2D_F64, AssociatedPair>
+	homographyCalibratedRansac( ConfigRansac configRansac ) {
+		var manager = new ModelManagerHomography2D_F64();
+		var modelFitter = new GenerateHomographyLinear(false);
+		var distance = new DistanceHomographyCalibratedSq();
 
-		double ransacTol = ransac.inlierThreshold*ransac.inlierThreshold;
+		double ransacTol = configRansac.inlierThreshold*configRansac.inlierThreshold;
 
 		return new RansacCalibrated<>
-				(ransac.randSeed, manager, modelFitter, distance, ransac.iterations, ransacTol);
+				(configRansac.randSeed, configRansac.iterations, ransacTol, manager, modelFitter, distance);
 	}
 
 	/**
 	 * Robust RANSAC based estimator for
 	 *
-	 * @see FactoryMultiView#trifocal_1
-	 *
-	 * @param trifocal Configuration for trifocal tensor calculation
-	 * @param error Configuration for how trifocal error is computed
-	 * @param ransac Configuration for RANSAC
+	 * @param configTrifocal Configuration for trifocal tensor calculation
+	 * @param configError Configuration for how trifocal error is computed
+	 * @param configRansac Configuration for RANSAC
 	 * @return RANSAC
+	 * @see FactoryMultiView#trifocal_1
 	 */
 	public static Ransac<TrifocalTensor, AssociatedTriple>
-	trifocalRansac( @Nullable ConfigTrifocal trifocal ,
-					@Nullable ConfigTrifocalError error,
-					ConfigRansac ransac ) {
-		if( trifocal == null )
-			trifocal = new ConfigTrifocal();
-		if( error == null )
-			error = new ConfigTrifocalError();
+	trifocalRansac( @Nullable ConfigTrifocal configTrifocal,
+					@Nullable ConfigTrifocalError configError,
+					ConfigRansac configRansac ) {
+		if (configTrifocal == null)
+			configTrifocal = new ConfigTrifocal();
+		if (configError == null)
+			configError = new ConfigTrifocalError();
 
-		trifocal.checkValidity();
+		configTrifocal.checkValidity();
 
 		double ransacTol;
-		DistanceFromModel<TrifocalTensor,AssociatedTriple> distance;
+		DistanceFromModel<TrifocalTensor, AssociatedTriple> distance;
 
-		switch (error.model) {
+		switch (configError.model) {
 			case REPROJECTION -> {
-				ransacTol = 3.0 * ransac.inlierThreshold * ransac.inlierThreshold;
+				ransacTol = 3.0*configRansac.inlierThreshold*configRansac.inlierThreshold;
 				distance = new DistanceTrifocalReprojectionSq();
 			}
 			case REPROJECTION_REFINE -> {
-				ransacTol = 3.0 * ransac.inlierThreshold * ransac.inlierThreshold;
-				distance = new DistanceTrifocalReprojectionSq(error.converge.gtol, error.converge.maxIterations);
+				ransacTol = 3.0*configRansac.inlierThreshold*configRansac.inlierThreshold;
+				distance = new DistanceTrifocalReprojectionSq(configError.converge.gtol, configError.converge.maxIterations);
 			}
 			case POINT_TRANSFER -> {
-				ransacTol = 2.0 * ransac.inlierThreshold * ransac.inlierThreshold;
+				ransacTol = 2.0*configRansac.inlierThreshold*configRansac.inlierThreshold;
 				distance = new DistanceTrifocalTransferSq();
 			}
-			default -> throw new IllegalArgumentException("Unknown error model " + error.model);
+			default -> throw new IllegalArgumentException("Unknown error model " + configError.model);
 		}
 
-		Estimate1ofTrifocalTensor estimator = FactoryMultiView.trifocal_1(trifocal);
+		Estimate1ofTrifocalTensor estimator = FactoryMultiView.trifocal_1(configTrifocal);
 		ModelManager<TrifocalTensor> manager = new ManagerTrifocalTensor();
-		ModelGenerator<TrifocalTensor,AssociatedTriple> generator = new GenerateTrifocalTensor(estimator);
+		ModelGenerator<TrifocalTensor, AssociatedTriple> generator = new GenerateTrifocalTensor(estimator);
 
-		return new Ransac<>(ransac.randSeed, manager, generator, distance, ransac.iterations, ransacTol);
+		Ransac<TrifocalTensor, AssociatedTriple> ransac =
+				new Ransac<>(configRansac.randSeed, configRansac.iterations, ransacTol, manager, AssociatedTriple.class);
+		ransac.setModel(() -> generator, () -> distance);
+		return ransac;
 	}
 
 	/**
 	 * Projective to metric self calibration from 3-views
 	 *
-	 * @param selfcalib (Input) configuration for self calibration
-	 * @param ransac (Input) configuration for RANSAC
+	 * @param configSelfcalib (Input) configuration for self calibration
+	 * @param configRansac (Input) configuration for RANSAC
 	 * @return RANSAC
 	 */
 	public static RansacProjective<MetricCameraTriple, AssociatedTriple>
-	metricThreeViewRansac( @Nullable ConfigPixelsToMetric selfcalib,
-						   ConfigRansac ransac)
-	{
+	metricThreeViewRansac( @Nullable ConfigPixelsToMetric configSelfcalib,
+						   ConfigRansac configRansac ) {
 		// Pixel error squared in two views
-		double ransacTol = ransac.inlierThreshold*ransac.inlierThreshold*2;
+		double ransacTol = configRansac.inlierThreshold*configRansac.inlierThreshold*2;
 
 		// lint:forbidden ignore_below 1
-		var generator = FactoryMultiView.selfCalibThree(selfcalib);
+		var generator = FactoryMultiView.selfCalibThree(configSelfcalib);
 		var manager = new ModelManagerMetricCameraTriple();
 		var distance = new DistanceFromModelIntoViews<MetricCameraTriple, AssociatedTriple, ImageDimension>
-				(new DistanceMetricTripleReprojection23(),3);
+				(new DistanceMetricTripleReprojection23(), 3);
 
-		return new RansacProjective<>(ransac.randSeed, manager, generator, distance, ransac.iterations, ransacTol);
+		return new RansacProjective<>(configRansac.randSeed, manager, generator, distance, configRansac.iterations, ransacTol);
 	}
 }

@@ -68,7 +68,7 @@ import georegression.fitting.se.ModelManagerSe2_F64;
 import georegression.fitting.se.ModelManagerSe3_F64;
 import georegression.struct.se.Se2_F64;
 import georegression.struct.se.Se3_F64;
-import org.ddogleg.fitting.modelset.ModelMatcher;
+import org.ddogleg.fitting.modelset.ModelMatcherPost;
 import org.ddogleg.fitting.modelset.ransac.Ransac;
 import org.jetbrains.annotations.Nullable;
 
@@ -109,8 +109,9 @@ public class FactoryVisualOdometry {
 		DistancePlane2DToPixelSq distance = new DistancePlane2DToPixelSq();
 		GenerateSe2_PlanePtPixel generator = new GenerateSe2_PlanePtPixel();
 
-		ModelMatcher<Se2_F64, PlanePtPixel> motion =
-				new Ransac<>(2323, manager, generator, distance, ransacIterations, ransacTOL);
+		ModelMatcherPost<Se2_F64, PlanePtPixel> motion =
+				new Ransac<>(2323, ransacIterations, ransacTOL, manager, PlanePtPixel.class);
+		motion.setModel(()->generator, ()->distance);
 
 		VisOdomMonoPlaneInfinity<T> alg =
 				new VisOdomMonoPlaneInfinity<>(thresholdAdd, thresholdRetire, inlierPixelTol, motion, tracker);
@@ -195,8 +196,9 @@ public class FactoryVisualOdometry {
 		// Need to square the error RANSAC inliers
 		double ransacTOL = configVO.ransac.inlierThreshold*configVO.ransac.inlierThreshold;
 
-		var motion = new Ransac<>(configVO.ransac.randSeed, manager, generator, distance,
-				configVO.ransac.iterations, ransacTOL);
+		Ransac<Se3_F64, Point2D3D> motion = new Ransac<>(
+				configVO.ransac.randSeed, configVO.ransac.iterations, ransacTOL, manager, Point2D3D.class);
+		motion.setModel(()->generator, ()->distance);
 
 		RefinePnP refine = null;
 
@@ -216,6 +218,7 @@ public class FactoryVisualOdometry {
 		alg.setThresholdRetireTracks(configVO.dropOutlierTracks);
 		alg.getBundleViso().getSelectTracks().maxFeaturesPerFrame = configVO.bundleMaxFeaturesPerFrame;
 		alg.getBundleViso().getSelectTracks().minTrackObservations = configVO.bundleMinObservations;
+
 		return new WrapVisOdomMonoStereoDepthPnP<>(alg, pixelTo3D, distance, imageType);
 	}
 
@@ -256,8 +259,9 @@ public class FactoryVisualOdometry {
 		// 1/2 a pixel tolerance for RANSAC inliers
 		double ransacTOL = inlierPixelTol*inlierPixelTol;
 
-		ModelMatcher<Se3_F64, Point2D3D> motion =
-				new Ransac<>(2323, manager, generator, distance, ransacIterations, ransacTOL);
+		Ransac<Se3_F64, Point2D3D> motion = new Ransac<>(
+				2323, ransacIterations, ransacTOL, manager, Point2D3D.class);
+		motion.setModel(()->generator, ()->distance);
 
 		RefinePnP refine = null;
 
@@ -291,8 +295,10 @@ public class FactoryVisualOdometry {
 		// 1/2 a pixel tolerance for RANSAC inliers
 		double ransacTOL = configVO.ransac.inlierThreshold*configVO.ransac.inlierThreshold;
 
-		var motion = new Ransac<>(configVO.ransac.randSeed, manager, generator, distance,
-				configVO.ransac.iterations, ransacTOL);
+		Ransac<Se3_F64, Point2D3D> motion = new Ransac<>(
+				configVO.ransac.randSeed, configVO.ransac.iterations, ransacTOL,
+				manager, Point2D3D.class);
+		motion.setModel(()->generator, ()->distance);
 
 		RefinePnP refine = null;
 
@@ -358,8 +364,12 @@ public class FactoryVisualOdometry {
 		// Pixel tolerance for RANSAC inliers - euclidean error squared from left + right images
 		double ransacTOL = 2*configVO.ransac.inlierThreshold*configVO.ransac.inlierThreshold;
 
-		ModelMatcher<Se3_F64, Stereo2D3D> motion = new Ransac<>(configVO.ransac.randSeed, manager, generator,
-				distanceStereo, configVO.ransac.iterations, ransacTOL);
+
+		ModelMatcherPost<Se3_F64, Stereo2D3D> motion = new Ransac<>(
+				configVO.ransac.randSeed, configVO.ransac.iterations, ransacTOL,
+				manager, Stereo2D3D.class);
+		motion.setModel(()->generator, ()->distanceStereo);
+
 		RefinePnPStereo refinePnP = null;
 
 		if (configVO.refineIterations > 0) {
@@ -411,8 +421,8 @@ public class FactoryVisualOdometry {
 	StereoVisualOdometry<T> stereoQuadPnP( ConfigStereoQuadPnP config, Class<T> imageType ) {
 		EstimateNofPnP pnp = FactoryMultiView.pnp_N(config.pnp, -1);
 		DistanceFromModelMultiView<Se3_F64, Point2D3D> distanceMono = new PnPDistanceReprojectionSq();
-		PnPStereoDistanceReprojectionSq distanceStereo = new PnPStereoDistanceReprojectionSq();
 		PnPStereoEstimator pnpStereo = new PnPStereoEstimator(pnp, distanceMono, 0);
+		PnPStereoDistanceReprojectionSq distanceStereo = new PnPStereoDistanceReprojectionSq();
 
 		ModelManagerSe3_F64 manager = new ModelManagerSe3_F64();
 		EstimatorToGenerator<Se3_F64, Stereo2D3D> generator = new EstimatorToGenerator<>(pnpStereo);
@@ -420,8 +430,10 @@ public class FactoryVisualOdometry {
 		// Pixel tolerance for RANSAC inliers - euclidean error squared from left + right images
 		double ransacTOL = 2*config.ransac.inlierThreshold*config.ransac.inlierThreshold;
 
-		ModelMatcher<Se3_F64, Stereo2D3D> motion = new Ransac<>(config.ransac.randSeed, manager, generator,
-				distanceStereo, config.ransac.iterations, ransacTOL);
+		ModelMatcherPost<Se3_F64, Stereo2D3D> motion =
+				new Ransac<>(config.ransac.randSeed, config.ransac.iterations, ransacTOL,
+						manager, Stereo2D3D.class);
+		motion.setModel(()->generator, ()->distanceStereo);
 		RefinePnPStereo refinePnP = null;
 
 		if (config.refineIterations > 0) {

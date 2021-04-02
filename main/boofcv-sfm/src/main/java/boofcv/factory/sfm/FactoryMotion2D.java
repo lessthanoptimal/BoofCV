@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -32,7 +32,6 @@ import boofcv.struct.border.BorderType;
 import boofcv.struct.geo.AssociatedPair;
 import boofcv.struct.image.ImageBase;
 import boofcv.struct.image.ImageType;
-import georegression.fitting.MotionTransformPoint;
 import georegression.fitting.affine.ModelManagerAffine2D_F64;
 import georegression.fitting.homography.ModelManagerHomography2D_F64;
 import georegression.fitting.se.ModelManagerSe2_F64;
@@ -40,10 +39,10 @@ import georegression.fitting.se.MotionSe2PointSVD_F64;
 import georegression.struct.InvertibleTransform;
 import georegression.struct.affine.Affine2D_F64;
 import georegression.struct.homography.Homography2D_F64;
-import georegression.struct.point.Point2D_F64;
 import georegression.struct.se.Se2_F64;
 import org.ddogleg.fitting.modelset.*;
 import org.ddogleg.fitting.modelset.ransac.Ransac;
+import org.ddogleg.struct.Factory;
 
 /**
  * Factory for creating algorithms related to 2D image motion.  Typically used for image stabilization, mosaic, and
@@ -70,6 +69,7 @@ public class FactoryMotion2D {
 	 * @param <IT> Model model
 	 * @return ImageMotion2D
 	 */
+	@SuppressWarnings({"unchecked", "rawtypes"})
 	public static <I extends ImageBase<I>, IT extends InvertibleTransform>
 	ImageMotion2D<I, IT> createMotion2D( int ransacIterations, double inlierThreshold, int outlierPrune,
 										 int absoluteMinimumTracks, double respawnTrackFraction,
@@ -78,37 +78,34 @@ public class FactoryMotion2D {
 										 PointTracker<I> tracker, IT motionModel ) {
 
 		ModelManager<IT> manager;
-		ModelGenerator<IT, AssociatedPair> fitter;
-		DistanceFromModel<IT, AssociatedPair> distance;
+		Factory<ModelGenerator<IT, AssociatedPair>> fitter;
+		Factory<DistanceFromModel<IT, AssociatedPair>> distance;
 		ModelFitter<IT, AssociatedPair> modelRefiner = null;
 
 		if (motionModel instanceof Homography2D_F64) {
-			GenerateHomographyLinear mf = new GenerateHomographyLinear(true);
 			manager = (ModelManager)new ModelManagerHomography2D_F64();
-			fitter = (ModelGenerator)mf;
 			if (refineEstimate)
-				modelRefiner = (ModelFitter)mf;
-			distance = (DistanceFromModel)new DistanceHomographySq();
+				modelRefiner = (ModelFitter)new GenerateHomographyLinear(true);
+			fitter = ()->(ModelGenerator)new GenerateHomographyLinear(true);
+			distance = ()->(DistanceFromModel)new DistanceHomographySq();
 		} else if (motionModel instanceof Affine2D_F64) {
 			manager = (ModelManager)new ModelManagerAffine2D_F64();
-			GenerateAffine2D mf = new GenerateAffine2D();
-			fitter = (ModelGenerator)mf;
 			if (refineEstimate)
-				modelRefiner = (ModelFitter)mf;
-			distance = (DistanceFromModel)new DistanceAffine2DSq();
+				modelRefiner = (ModelFitter)new GenerateAffine2D();
+			fitter = ()->(ModelGenerator)new GenerateAffine2D();
+			distance = ()->(DistanceFromModel)new DistanceAffine2DSq();
 		} else if (motionModel instanceof Se2_F64) {
 			manager = (ModelManager)new ModelManagerSe2_F64();
-			MotionTransformPoint<Se2_F64, Point2D_F64> alg = new MotionSe2PointSVD_F64();
-			GenerateSe2_AssociatedPair mf = new GenerateSe2_AssociatedPair(alg);
-			fitter = (ModelGenerator)mf;
-			distance = (DistanceFromModel)new DistanceSe2Sq();
+			fitter = ()-> (ModelGenerator)new GenerateSe2_AssociatedPair(new MotionSe2PointSVD_F64());
+			distance = ()->(DistanceFromModel)new DistanceSe2Sq();
 			// no refine, already optimal
 		} else {
 			throw new RuntimeException("Unknown model type: " + motionModel.getClass().getSimpleName());
 		}
 
-		ModelMatcher<IT, AssociatedPair> modelMatcher =
-				new Ransac(123123, manager, fitter, distance, ransacIterations, inlierThreshold);
+		ModelMatcherPost<IT, AssociatedPair> modelMatcher =
+				new Ransac<>(123123, ransacIterations, inlierThreshold, manager, AssociatedPair.class);
+		modelMatcher.setModel(fitter, distance);
 
 		ImageMotionPointTrackerKey<I, IT> lowlevel =
 				new ImageMotionPointTrackerKey<>(tracker, modelMatcher, modelRefiner, motionModel, outlierPrune);
