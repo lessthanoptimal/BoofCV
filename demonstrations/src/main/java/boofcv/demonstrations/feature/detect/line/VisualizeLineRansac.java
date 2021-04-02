@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -43,7 +43,7 @@ import georegression.fitting.line.ModelManagerLinePolar2D_F32;
 import georegression.struct.line.LinePolar2D_F32;
 import georegression.struct.line.LineSegment2D_F32;
 import org.ddogleg.fitting.modelset.ModelManager;
-import org.ddogleg.fitting.modelset.ModelMatcher;
+import org.ddogleg.fitting.modelset.ModelMatcherPost;
 import org.ddogleg.fitting.modelset.ransac.Ransac;
 
 import java.awt.*;
@@ -78,11 +78,11 @@ public class VisualizeLineRansac<I extends ImageGray<I>, D extends ImageGray<D>>
 		GrayU8 detected = new GrayU8(input.width, input.height);
 
 		ModelManager<LinePolar2D_F32> manager = new ModelManagerLinePolar2D_F32();
-		GridLineModelDistance distance = new GridLineModelDistance((float)(Math.PI*0.75));
-		GridLineModelFitter fitter = new GridLineModelFitter((float)(Math.PI*0.75));
 
-		ModelMatcher<LinePolar2D_F32, Edgel> matcher =
-				new Ransac<>(123123, manager, fitter, distance, 25, 1);
+		ModelMatcherPost<LinePolar2D_F32, Edgel> matcher = new Ransac<>(123123, 25, 1, manager, Edgel.class);
+		matcher.setModel(
+				()->new GridLineModelFitter((float)(Math.PI*0.75)),
+				()->new GridLineModelDistance((float)(Math.PI*0.75)));
 
 		ImageGradient<I, D> gradient = FactoryDerivative.sobel(imageType, derivType);
 

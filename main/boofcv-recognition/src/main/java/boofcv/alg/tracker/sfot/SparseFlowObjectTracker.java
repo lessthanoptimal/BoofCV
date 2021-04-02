@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -100,11 +100,10 @@ public class SparseFlowObjectTracker<Image extends ImageGray<Image>, Derivative 
 		klt = FactoryTrackerAlg.kltPyramid(config.trackerConfig, imageType, derivType);
 
 		ModelManagerScaleTranslateRotate2D manager = new ModelManagerScaleTranslateRotate2D();
-		GenerateScaleTranslateRotate2D generator = new GenerateScaleTranslateRotate2D();
-		DistanceScaleTranslateRotate2DSq distance = new DistanceScaleTranslateRotate2DSq();
 
 		estimateMotion = new LeastMedianOfSquares<>(
-				config.randSeed, config.robustCycles, Double.MAX_VALUE, 0, manager, generator, distance);
+				config.randSeed, config.robustCycles, Double.MAX_VALUE, 0, manager, AssociatedPair.class);
+		estimateMotion.setModel(GenerateScaleTranslateRotate2D::new, DistanceScaleTranslateRotate2DSq::new);
 	}
 
 	public void init( Image input, RectangleRotate_F64 region ) {

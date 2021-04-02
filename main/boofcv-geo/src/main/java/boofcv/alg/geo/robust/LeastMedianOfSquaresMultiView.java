@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -41,14 +41,16 @@ public class LeastMedianOfSquaresMultiView<Model,Point> extends LeastMedianOfSqu
 										 ModelGenerator<Model, Point> generator,
 										 DistanceFromModelMultiView<Model,Point> errorMetric)
 	{
-		super(randSeed, totalCycles, maxMedianError, inlierFraction, modelManager, generator, errorMetric);
+		super(randSeed, totalCycles, maxMedianError, inlierFraction, modelManager, errorMetric.getPointType());
+		setModel(()->generator, ()->errorMetric);
 		this.modelDistance = errorMetric;
 	}
 
 	public LeastMedianOfSquaresMultiView(long randSeed, int totalCycles, ModelManager<Model> modelManager,
 										 ModelGenerator<Model, Point> generator,
 										 DistanceFromModelMultiView<Model, Point> errorMetric) {
-		super(randSeed, totalCycles, modelManager, generator, errorMetric);
+		super(randSeed, totalCycles, modelManager, errorMetric.getPointType());
+		setModel(()->generator, ()->errorMetric);
 		this.modelDistance = errorMetric;
 	}
 

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -34,13 +34,14 @@ public class RansacCalibrated<Model,Point> extends Ransac<Model,Point>
 {
 	private DistanceFromModelMultiView<Model,Point> modelDistance;
 
-	public RansacCalibrated( long randSeed,
+	public RansacCalibrated( long randSeed, int maxIterations, double thresholdFit,
 							 ModelManager<Model> modelManager,
 							 ModelGenerator<Model, Point> modelGenerator,
-							 DistanceFromModelMultiView<Model,Point> modelDistance, int maxIterations, double thresholdFit)
+							 DistanceFromModelMultiView<Model,Point> modelDistance)
 	{
-		super(randSeed, modelManager, modelGenerator, modelDistance, maxIterations, thresholdFit);
+		super(randSeed,  maxIterations, thresholdFit, modelManager, modelDistance.getPointType());
 		this.modelDistance = modelDistance;
+		setModel(()->modelGenerator, ()->modelDistance);
 	}
 
 	@Override

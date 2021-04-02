@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -24,8 +24,6 @@ import boofcv.alg.sfm.robust.ModelManagerScaleTranslate2D;
 import boofcv.struct.geo.AssociatedPair;
 import boofcv.struct.sfm.ScaleTranslate2D;
 import georegression.struct.shapes.Rectangle2D_F64;
-import org.ddogleg.fitting.modelset.DistanceFromModel;
-import org.ddogleg.fitting.modelset.ModelGenerator;
 import org.ddogleg.fitting.modelset.ModelManager;
 import org.ddogleg.fitting.modelset.lmeds.LeastMedianOfSquares;
 import org.ddogleg.struct.DogArray;
@@ -50,11 +48,10 @@ public class TldAdjustRegion {
 	public TldAdjustRegion( int numCycles ) {
 
 		ModelManager<ScaleTranslate2D> manager = new ModelManagerScaleTranslate2D();
-		ModelGenerator<ScaleTranslate2D,AssociatedPair> generator = new GenerateScaleTranslate2D();
-		DistanceFromModel<ScaleTranslate2D,AssociatedPair> distance = new DistanceScaleTranslate2DSq();
 
 		estimateMotion = new LeastMedianOfSquares<>(123123, numCycles, Double.MAX_VALUE,
-				0, manager, generator, distance);
+				0, manager, AssociatedPair.class);
+		estimateMotion.setModel(GenerateScaleTranslate2D::new, DistanceScaleTranslate2DSq::new);
 	}
 
 	public void init( int imageWidth , int imageHeight ) {

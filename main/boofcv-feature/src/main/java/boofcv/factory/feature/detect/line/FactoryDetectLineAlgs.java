@@ -33,7 +33,7 @@ import boofcv.struct.image.GrayS16;
 import boofcv.struct.image.ImageGray;
 import georegression.fitting.line.ModelManagerLinePolar2D_F32;
 import georegression.struct.line.LinePolar2D_F32;
-import org.ddogleg.fitting.modelset.ModelMatcher;
+import org.ddogleg.fitting.modelset.ModelMatcherPost;
 import org.ddogleg.fitting.modelset.ransac.Ransac;
 import org.jetbrains.annotations.Nullable;
 
@@ -61,14 +61,16 @@ public class FactoryDetectLineAlgs {
 		if (config == null)
 			config = new ConfigLineRansac();
 
+		ConfigLineRansac _config = config;
+
 		ImageGradient<I, D> gradient = FactoryDerivative.sobel(imageType, derivType);
 
 		ModelManagerLinePolar2D_F32 manager = new ModelManagerLinePolar2D_F32();
-		GridLineModelDistance distance = new GridLineModelDistance((float)config.thresholdAngle);
-		GridLineModelFitter fitter = new GridLineModelFitter((float)config.thresholdAngle);
 
-		ModelMatcher<LinePolar2D_F32, Edgel> matcher =
-				new Ransac<>(123123, manager, fitter, distance, 25, 1);
+		ModelMatcherPost<LinePolar2D_F32, Edgel> matcher = new Ransac<>(123123, 25, 1, manager, Edgel.class);
+		matcher.setModel(
+				()->new GridLineModelFitter((float)_config.thresholdAngle),
+				()->new GridLineModelDistance((float)_config.thresholdAngle));
 
 		GridRansacLineDetector<D> alg;
 		if (derivType == GrayF32.class) {

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -30,6 +30,7 @@ import georegression.fitting.line.ModelManagerLinePolar2D_F32;
 import georegression.struct.line.LinePolar2D_F32;
 import georegression.struct.line.LineSegment2D_F32;
 import org.ddogleg.fitting.modelset.ModelMatcher;
+import org.ddogleg.fitting.modelset.ModelMatcherPost;
 import org.ddogleg.fitting.modelset.ransac.Ransac;
 import org.junit.jupiter.api.Test;
 
@@ -79,11 +80,9 @@ public abstract class CommonGridRansacLineDetectorChecks< D extends ImageGray<D>
 		}
 
 		ModelManagerLinePolar2D_F32 manager = new ModelManagerLinePolar2D_F32();
-		GridLineModelDistance distance = new GridLineModelDistance(0.9f);
-		GridLineModelFitter fitter = new GridLineModelFitter(0.9f);
 
-		ModelMatcher<LinePolar2D_F32, Edgel> matcher =
-				new Ransac<>(123123, manager, fitter, distance, 25, 1);
+		ModelMatcherPost<LinePolar2D_F32, Edgel> matcher = new Ransac<>(123123, 25, 1, manager,Edgel.class);
+		matcher.setModel(()->new GridLineModelFitter(0.9f), ()->new GridLineModelDistance(0.9f));
 		GridRansacLineDetector<D> alg = createDetector(regionSize,5,matcher);
 
 		alg.process(derivX,derivY,edgeImage);
@@ -97,7 +96,7 @@ public abstract class CommonGridRansacLineDetectorChecks< D extends ImageGray<D>
 		for( int i = 0; i < lines.height; i++ ) {
 			List<LineSegment2D_F32> l = lines.get(gridCol,i);
 
-			assertTrue(l.size()==1);
+			assertEquals(l.size(), 1);
 			LineSegment2D_F32 a = l.get(0);
 			assertTrue(Math.abs(a.slopeY())>1);
 			assertTrue(Math.abs(a.slopeX())<0.01);
