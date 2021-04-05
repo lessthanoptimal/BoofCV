@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -18,6 +18,7 @@
 
 package boofcv.factory.geo;
 
+import boofcv.misc.BoofMiscOps;
 import boofcv.struct.Configuration;
 import org.ddogleg.fitting.modelset.lmeds.LeastMedianOfSquares;
 
@@ -44,7 +45,7 @@ public class ConfigLMedS implements Configuration {
 	public ConfigLMedS() {
 	}
 
-	public ConfigLMedS(long randSeed, int totalCycles) {
+	public ConfigLMedS( long randSeed, int totalCycles ) {
 		this.randSeed = randSeed;
 		this.totalCycles = totalCycles;
 	}
@@ -57,7 +58,8 @@ public class ConfigLMedS implements Configuration {
 
 	@Override
 	public void checkValidity() {
-		if( totalCycles <= 0 ) {
+		BoofMiscOps.checkTrue(errorFraction >= 0.0 && errorFraction <= 1.0, "errorFraction is 0 to 1.0");
+		if (totalCycles <= 0) {
 			throw new RuntimeException("You need to set the number of cycles. Varies by problem. Try 100 and increase");
 		}
 	}

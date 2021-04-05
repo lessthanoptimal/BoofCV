@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -42,7 +42,7 @@ public class ConfigSelfCalibDualQuadratic implements Configuration {
 	@Override
 	public void checkValidity() {
 		BoofMiscOps.checkTrue(aspectRatio > 0);
-		checkTrue( knownAspectRatio && zeroSkew , "If aspect ratio is known then zero skew must be assumed");
+		checkTrue(knownAspectRatio && zeroSkew, "If aspect ratio is known then zero skew must be assumed");
 	}
 
 	public void setTo( ConfigSelfCalibDualQuadratic src ) {

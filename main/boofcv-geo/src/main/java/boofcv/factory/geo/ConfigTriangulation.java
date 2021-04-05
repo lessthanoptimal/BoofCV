@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -39,21 +39,23 @@ public class ConfigTriangulation implements Configuration {
 	/**
 	 * If an iterative technique is selected this is the convergence criteria
 	 */
-	public ConfigConverge converge = new ConfigConverge(1e-8,1e-8,10);
+	public ConfigConverge converge = new ConfigConverge(1e-8, 1e-8, 10);
 
 	public ConfigTriangulation() {
 	}
 
-	public ConfigTriangulation(Type type) {
+	public ConfigTriangulation( Type type ) {
 		this.type = type;
 	}
 
 	public static ConfigTriangulation DLT() {
 		return new ConfigTriangulation(Type.DLT);
 	}
+
 	public static ConfigTriangulation ALGEBRAIC() {
 		return new ConfigTriangulation(Type.ALGEBRAIC);
 	}
+
 	public static ConfigTriangulation GEOMETRIC() {
 		return new ConfigTriangulation(Type.GEOMETRIC);
 	}
@@ -65,7 +67,7 @@ public class ConfigTriangulation implements Configuration {
 
 	@Override
 	public void checkValidity() {
-
+		converge.checkValidity();
 	}
 
 	public enum Type {

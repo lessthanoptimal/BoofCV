@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -37,7 +37,7 @@ public class ConfigTrifocalError implements Configuration {
 	/**
 	 * If an iterative method was selected, this specifies the convergence criteria
 	 */
-	public ConfigConverge converge = new ConfigConverge(1e-8,1e-8,20);
+	public final ConfigConverge converge = new ConfigConverge(1e-8, 1e-8, 20);
 
 	public void setTo( ConfigTrifocalError src ) {
 		this.model = src.model;
@@ -46,7 +46,7 @@ public class ConfigTrifocalError implements Configuration {
 
 	@Override
 	public void checkValidity() {
-
+		converge.checkValidity();
 	}
 
 	public enum Model {
