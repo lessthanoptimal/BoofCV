@@ -119,9 +119,9 @@ public class FactoryMultiViewRobust {
 		Estimate1ofPnP estimatorPnP = FactoryMultiView.pnp_1(
 				configPnP.which, configPnP.epnpIterations, configPnP.numResolve);
 		DistanceFromModelMultiView<Se3_F64, Point2D3D> distance = new PnPDistanceReprojectionSq();
+
 		ModelManagerSe3_F64 manager = new ModelManagerSe3_F64();
-		EstimatorToGenerator<Se3_F64, Point2D3D> generator =
-				new EstimatorToGenerator<>(estimatorPnP);
+		EstimatorToGenerator<Se3_F64, Point2D3D> generator = new EstimatorToGenerator<>(estimatorPnP);
 
 		// convert from pixels to pixels squared
 		double threshold = configRansac.inlierThreshold*configRansac.inlierThreshold;
@@ -148,8 +148,8 @@ public class FactoryMultiViewRobust {
 																				ConfigLMedS configLMedS ) {
 		if (configEssential == null)
 			configEssential = new ConfigEssential();
-		else
-			configEssential.checkValidity();
+		configEssential.checkValidity();
+		configLMedS.checkValidity();
 
 		Estimate1ofEpipolar epipolar = FactoryMultiView.
 				essential_1(configEssential.which, configEssential.numResolve);
@@ -175,7 +175,7 @@ public class FactoryMultiViewRobust {
 		configFundamental.checkValidity();
 		configLMedS.checkValidity();
 
-		var managerF = new ModelManagerEpipolarMatrix();
+		var manager = new ModelManagerEpipolarMatrix();
 		Estimate1ofEpipolar estimateF = FactoryMultiView.fundamental_1(
 				configFundamental.which, configFundamental.numResolve);
 		GenerateEpipolarMatrix generateF = new GenerateEpipolarMatrix(estimateF);
@@ -186,10 +186,10 @@ public class FactoryMultiViewRobust {
 			case GEOMETRIC -> new DistanceFundamentalGeometric();
 		};
 
-		var alg = new LeastMedianOfSquares<>(
-				configLMedS.randSeed, configLMedS.totalCycles, managerF, AssociatedPair.class);
+		LeastMedianOfSquares<DMatrixRMaj, AssociatedPair> alg = createLMEDS(configLMedS, manager, AssociatedPair.class);
 		alg.setModel(() -> generateF, () -> errorMetric);
 		alg.setErrorFraction(configLMedS.errorFraction);
+
 		return alg;
 	}
 
@@ -207,8 +207,7 @@ public class FactoryMultiViewRobust {
 																				 ConfigRansac configRansac ) {
 		if (configEssential == null)
 			configEssential = new ConfigEssential();
-		else
-			configEssential.checkValidity();
+		configEssential.checkValidity();
 		configRansac.checkValidity();
 
 		if (configEssential.errorModel != ConfigEssential.ErrorModel.GEOMETRIC) {
@@ -237,8 +236,7 @@ public class FactoryMultiViewRobust {
 	essentialRansac( @Nullable ConfigEssential configEssential, ConfigRansac configRansac ) {
 		if (configEssential == null)
 			configEssential = new ConfigEssential();
-		else
-			configEssential.checkValidity();
+		configEssential.checkValidity();
 		configRansac.checkValidity();
 
 		if (configEssential.errorModel == ConfigEssential.ErrorModel.GEOMETRIC) {
@@ -268,18 +266,12 @@ public class FactoryMultiViewRobust {
 		configFundamental.checkValidity();
 		configRansac.checkValidity();
 
-		ModelManager<DMatrixRMaj> managerF = new ModelManagerEpipolarMatrix();
+		ModelManager<DMatrixRMaj> manager = new ModelManagerEpipolarMatrix();
 
-		double ransacTOL = configRansac.inlierThreshold*configRansac.inlierThreshold;
+		double ransacTol = configRansac.inlierThreshold*configRansac.inlierThreshold;
 
-		Ransac<DMatrixRMaj, AssociatedPair> ransac;
-		if (BoofConcurrency.isUseConcurrent()) {
-			ransac = new Ransac_MT<>(
-					configRansac.randSeed, configRansac.iterations, ransacTOL, managerF, AssociatedPair.class);
-		} else {
-			ransac = new Ransac<>(
-					configRansac.randSeed, configRansac.iterations, ransacTOL, managerF, AssociatedPair.class);
-		}
+		Ransac<DMatrixRMaj, AssociatedPair> ransac =
+				createRansac(configRansac, ransacTol, manager, AssociatedPair.class);
 
 		ransac.setModel(
 				() -> {
@@ -313,18 +305,15 @@ public class FactoryMultiViewRobust {
 	homographyLMedS( @Nullable ConfigHomography configHomography, ConfigLMedS configLMedS ) {
 		if (configHomography == null)
 			configHomography = new ConfigHomography();
+		configHomography.checkValidity();
+		configLMedS.checkValidity();
 
 		ConfigHomography _configHomography = configHomography;
 
 		var manager = new ModelManagerHomography2D_F64();
 
 		LeastMedianOfSquares<Homography2D_F64, AssociatedPair> lmeds =
-				BoofConcurrency.isUseConcurrent() ?
-						new LeastMedianOfSquares_MT<>(
-								configLMedS.randSeed, configLMedS.totalCycles, manager, AssociatedPair.class)
-						:
-						new LeastMedianOfSquares<>(
-								configLMedS.randSeed, configLMedS.totalCycles, manager, AssociatedPair.class);
+				createLMEDS(configLMedS,manager,AssociatedPair.class);
 
 		lmeds.setModel(
 				() -> new GenerateHomographyLinear(_configHomography.normalize),
@@ -352,19 +341,16 @@ public class FactoryMultiViewRobust {
 	homographyRansac( @Nullable ConfigHomography configHomography, ConfigRansac configRansac ) {
 		if (configHomography == null)
 			configHomography = new ConfigHomography();
+		configHomography.checkValidity();
+		configRansac.checkValidity();
 
 		ConfigHomography _configHomography = configHomography;
 
 		ModelManager<Homography2D_F64> manager = new ModelManagerHomography2D_F64();
 
 		double ransacTol = configRansac.inlierThreshold*configRansac.inlierThreshold;
-		Ransac<Homography2D_F64, AssociatedPair> ransac = BoofConcurrency.isUseConcurrent() ?
-				new Ransac_MT<>(
-						configRansac.randSeed, configRansac.iterations, ransacTol, manager, AssociatedPair.class)
-				:
-				new Ransac<>(
-						configRansac.randSeed, configRansac.iterations, ransacTol, manager, AssociatedPair.class);
-
+		Ransac<Homography2D_F64, AssociatedPair> ransac =
+				createRansac(configRansac, ransacTol, manager, AssociatedPair.class);
 		ransac.setModel(
 				() -> new GenerateHomographyLinear(_configHomography.normalize),
 				DistanceHomographySq::new);
@@ -381,6 +367,8 @@ public class FactoryMultiViewRobust {
 	 */
 	public static RansacCalibrated<Homography2D_F64, AssociatedPair>
 	homographyCalibratedRansac( ConfigRansac configRansac ) {
+		configRansac.checkValidity();
+
 		var manager = new ModelManagerHomography2D_F64();
 		var modelFitter = new GenerateHomographyLinear(false);
 		var distance = new DistanceHomographyCalibratedSq();
@@ -438,14 +426,9 @@ public class FactoryMultiViewRobust {
 
 		ModelManager<TrifocalTensor> manager = new ManagerTrifocalTensor();
 
-		Ransac<TrifocalTensor, AssociatedTriple> ransac;
-		if (BoofConcurrency.isUseConcurrent()) {
-			ransac = new Ransac_MT<>(
-					configRansac.randSeed, configRansac.iterations, ransacTol, manager, AssociatedTriple.class);
-		} else {
-			ransac = new Ransac<>(
-					configRansac.randSeed, configRansac.iterations, ransacTol, manager, AssociatedTriple.class);
-		}
+		Ransac<TrifocalTensor, AssociatedTriple> ransac =
+				createRansac(configRansac, ransacTol, manager, AssociatedTriple.class);
+
 		ransac.setModel(
 				() -> new GenerateTrifocalTensor(FactoryMultiView.trifocal_1(_configTrifocal)),
 				distance);
@@ -462,6 +445,8 @@ public class FactoryMultiViewRobust {
 	public static RansacProjective<MetricCameraTriple, AssociatedTriple>
 	metricThreeViewRansac( @Nullable ConfigPixelsToMetric configSelfcalib,
 						   ConfigRansac configRansac ) {
+		configRansac.checkValidity();
+
 		// Pixel error squared in two views
 		double ransacTol = configRansac.inlierThreshold*configRansac.inlierThreshold*2;
 
@@ -472,5 +457,21 @@ public class FactoryMultiViewRobust {
 				(new DistanceMetricTripleReprojection23(), 3);
 
 		return new RansacProjective<>(configRansac.randSeed, manager, generator, distance, configRansac.iterations, ransacTol);
+	}
+
+	public static<Model, Point> LeastMedianOfSquares<Model, Point>
+	createLMEDS(ConfigLMedS configLMedS, ModelManager<Model> manager, Class<Point> pointType) {
+		return BoofConcurrency.isUseConcurrent() ?
+				new LeastMedianOfSquares_MT<>(configLMedS.randSeed, configLMedS.totalCycles, manager, pointType)
+				:
+				new LeastMedianOfSquares<>(configLMedS.randSeed, configLMedS.totalCycles, manager, pointType);
+	}
+
+	public static<Model, Point> Ransac<Model, Point>
+	createRansac(ConfigRansac configRansac, double ransacTol, ModelManager<Model> manager, Class<Point> pointType) {
+		return BoofConcurrency.isUseConcurrent() ?
+				new Ransac_MT<>(configRansac.randSeed, configRansac.iterations, ransacTol, manager, pointType)
+				:
+				new Ransac<>(configRansac.randSeed, configRansac.iterations, ransacTol, manager, pointType);
 	}
 }
