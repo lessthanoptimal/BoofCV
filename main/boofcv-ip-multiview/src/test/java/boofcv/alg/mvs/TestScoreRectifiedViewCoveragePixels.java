@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -46,16 +46,17 @@ class TestScoreRectifiedViewCoveragePixels extends BoofStandardJUnit {
 		alg.initialize(width, height, new DoNothingPixelTransform_F64());
 
 		// add a view that's half the size and rectification is simply identity (no change in pixels)
-		alg.addView(width/2, height, CommonOps_DDRM.diag(1, 1, 1), 1.0f);
+		alg.addView(width/2, height, CommonOps_DDRM.diag(1, 1, 1), 1.0f, Float::max);
 
 		// compute for just this one view
 		alg.process();
 		// coverage should be 0.5 and average 1.0
 		double expected0 = 0.5*(alg.scoreAverageOffset + 300.0/(1.0 + 300.0));
 		assertEquals(expected0, alg.getScore(), UtilEjml.TEST_F64);
+		assertEquals(0.5, alg.getCovered(), UtilEjml.TEST_F64);
 
 		// Add another image which will cover everything
-		alg.addView(width, height, CommonOps_DDRM.diag(1, 1, 1), 1.0f);
+		alg.addView(width, height, CommonOps_DDRM.diag(1, 1, 1), 1.0f, Float::sum);
 		alg.process();
 		double expected1 = 1.0*(alg.scoreAverageOffset + 900/(1.0 + 600.0));
 		assertEquals(expected1, alg.getScore(), UtilEjml.TEST_F64);
@@ -95,7 +96,7 @@ class TestScoreRectifiedViewCoveragePixels extends BoofStandardJUnit {
 		DMatrixRMaj rect = CommonOps_DDRM.diag(2.0, 1.0, 1.0);
 
 		// Call the function being tested. Note that the height is smaller
-		alg.addView(width, 1000, rect, 0.5f);
+		alg.addView(width, 1000, rect, 0.5f, Float::sum);
 
 		for (int y = 0; y < 30; y++) {
 			for (int x = 0; x < 20; x++) {
@@ -110,5 +111,22 @@ class TestScoreRectifiedViewCoveragePixels extends BoofStandardJUnit {
 				}
 			}
 		}
+	}
+
+	@Test void fractionIntersection() {
+		// simplify the math
+		width = 30;
+		height = 30;
+		var pixel_to_undist = new PixelTransformAffine_F64(new Affine2D_F64(1, 0, 0, 1, 0, 0));
+
+		var alg = new ScoreRectifiedViewCoveragePixels();
+		alg.maxSide = 30;
+		alg.initialize(width, height, pixel_to_undist);
+
+		DMatrixRMaj rectification = new DMatrixRMaj(3,3,true,1,0,-2,0,1,1,0,0,1);
+
+		// Fraction that was moved out of the image due to rectification
+		double expected = ((alg.maxSide-2)*(alg.maxSide-1))/(double)(alg.maxSide*alg.maxSide);
+		assertEquals(expected,alg.fractionIntersection(width,height,rectification), UtilEjml.TEST_F64);
 	}
 }

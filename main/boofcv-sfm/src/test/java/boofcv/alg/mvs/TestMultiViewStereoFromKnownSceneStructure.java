@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -53,8 +53,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static georegression.struct.se.SpecialEuclideanOps_F64.eulerXyz;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 
 /**
  * @author Peter Abeles
@@ -110,11 +109,11 @@ public class TestMultiViewStereoFromKnownSceneStructure extends BoofStandardJUni
 	@Test void multiple_clusters() {
 		createScene(4);
 
-		// Two completely disconnected clusters. (0,1) and (2,3)
-		pairs.vertexes.get("id=0").pairs.forEach(e -> {if (e.va.indexSba >= 2 || e.vb.indexSba >= 2) e.quality3D = 0;});
-		pairs.vertexes.get("id=1").pairs.forEach(e -> {if (e.va.indexSba >= 2 || e.vb.indexSba >= 2) e.quality3D = 0;});
-		pairs.vertexes.get("id=2").pairs.forEach(e -> {if (e.va.indexSba <= 1 || e.vb.indexSba <= 1) e.quality3D = 0;});
-		pairs.vertexes.get("id=3").pairs.forEach(e -> {if (e.va.indexSba <= 1 || e.vb.indexSba <= 1) e.quality3D = 0;});
+		// Disconnect the pairs and create two clusters
+		prunePairs(pairs.vertexes.get("id=0").pairs, 0, 1);
+		prunePairs(pairs.vertexes.get("id=1").pairs, 0, 1);
+		prunePairs(pairs.vertexes.get("id=2").pairs, 2, 3);
+		prunePairs(pairs.vertexes.get("id=3").pairs, 2, 3);
 
 		MultiViewStereoFromKnownSceneStructure<GrayF32> alg = createAlg();
 		alg.process(scene, pairs);
@@ -122,7 +121,22 @@ public class TestMultiViewStereoFromKnownSceneStructure extends BoofStandardJUni
 		if (visualize) visualizeResults(alg);
 
 		checkCloudPlane(alg.getCloud());
-		assertEquals(alg.getDisparityCloud().viewPointIdx.size, 3);
+
+		// There should be 2 clusters which means there will be 3 elements. [0] = start of view 1, [1] = start view 2,
+		// [2] = last point index
+		assertEquals(3, alg.getDisparityCloud().viewPointIdx.size);
+	}
+
+	void prunePairs( List<StereoPairGraph.Edge> pairs , int keep0 , int keep1 ) {
+		for (int i = pairs.size()-1; i >= 0; i--) {
+			StereoPairGraph.Edge e = pairs.get(i);
+			if (e.va.indexSba == keep0 || e.va.indexSba == keep1) {
+				if (e.vb.indexSba == keep0 || e.vb.indexSba == keep1) {
+					continue;
+				}
+			}
+			pairs.remove(i);
+		}
 	}
 
 	/**
@@ -193,6 +207,45 @@ public class TestMultiViewStereoFromKnownSceneStructure extends BoofStandardJUni
 
 		// See if the correct two views were added
 		assertTrue(alg.imagePairIndexesSba.contains(2));
+	}
+
+	/**
+	 * Checks to see if it obeys the threshold constraint
+	 */
+	@Test void pruneViewsThatAreSimilarByNeighbors() {
+		createScene(4);
+
+		// All views will always intersect by the same amount
+		var alg = new MultiViewStereoFromKnownSceneStructure<>(new DummyLookUp(), ImageType.SB_U8) {
+			final double fraction = 0.6;
+			@Override protected double computeIntersection( SceneStructureMetric scene, ViewInfo connected ) {
+				return fraction;
+			}
+		};
+
+		// set it to the same value as "fraction" above. This will test to see if it's inclusive
+		alg.maximumCenterOverlap = 0.6;
+
+		// Initialize data structures
+		pairs.vertexes.values().forEach(v->alg.arrayScores.grow().relations=v);
+		alg.arrayScores.forIdx((idx,v)->v.index=idx);
+		alg.arrayScores.forEach(v->v.metric=scene.views.get(v.relations.indexSba));
+		alg.arrayScores.forEach(v->alg.mapScores.put(v.relations.id,v));
+		alg.arrayScores.forEach(v->v.dimension.setTo(width, height));
+
+		// everything should be connected
+		alg.pruneViewsThatAreSimilarByNeighbors(scene);
+		alg.arrayScores.forEach(v->assertFalse(v.used));
+
+		// only one view should be unused since all views are connected to each other and overlap with each other
+		alg.maximumCenterOverlap = 0.5999999;
+		alg.pruneViewsThatAreSimilarByNeighbors(scene);
+		int totalUnused = 0;
+		for( var v : alg.arrayScores.toList() ) {
+			if (!v.used)
+				totalUnused++;
+		}
+		assertEquals(1, totalUnused);
 	}
 
 	private void createScene( int numViews ) {

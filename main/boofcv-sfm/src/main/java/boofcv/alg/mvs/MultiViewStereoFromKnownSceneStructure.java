@@ -77,7 +77,12 @@ public class MultiViewStereoFromKnownSceneStructure<T extends ImageGray<T>> impl
 	 *
 	 * @see ScoreRectifiedViewCoveragePixels
 	 */
-	public @Getter @Setter double minimumQuality3D = 0.25;
+	public @Getter @Setter double minimumQuality3D = 0.15;
+
+	/**
+	 * Maximum amount of screen space two connected views can have and both of them be a center. Inclusive. 0 to 1.0
+	 */
+	public @Getter @Setter double maximumCenterOverlap = 0.80;
 
 	/** Maximum number of stereo pairs that will be combined. If more than this number then the best are selected */
 	public @Getter @Setter int maxCombinePairs = 10;
@@ -168,6 +173,9 @@ public class MultiViewStereoFromKnownSceneStructure<T extends ImageGray<T>> impl
 
 		// Sort views based on their score for being the center view. best views are first
 		Collections.sort(arrayScores.toList(), Comparator.comparingDouble(a -> -a.score));
+
+		// Prune centers with redundant information
+		pruneViewsThatAreSimilarByNeighbors(scene);
 
 		// Go through the list of views and use unused views as center views when computing the overall 3D cloud
 		for (int index = 0; index < arrayScores.size; index++) {
@@ -281,7 +289,7 @@ public class MultiViewStereoFromKnownSceneStructure<T extends ImageGray<T>> impl
 				computeRectification.processView2(connectedCamera,
 						connected.dimension.width, connected.dimension.height, view1_to_view2);
 				scoreCoverage.addView(connected.dimension.width, connected.dimension.height,
-						computeRectification.undist_to_rect2, (float)pair.quality3D);
+						computeRectification.undist_to_rect2, (float)pair.quality3D, Float::sum);
 			}
 
 			// Look at the sum of all information and see what the score is
@@ -290,9 +298,89 @@ public class MultiViewStereoFromKnownSceneStructure<T extends ImageGray<T>> impl
 			if (verbose != null) {
 				averageQuality = totalQualifiedConnections > 0 ? averageQuality/totalQualifiedConnections : -1;
 				verbose.printf("View[%s] center score=%5.2f aveQuality=%.2f conn=%d/%d\n",
-						center.relations.id,center.score,averageQuality,totalQualifiedConnections,pairs.size());
+						center.relations.id, center.score, averageQuality, totalQualifiedConnections, pairs.size());
 			}
 		}
+	}
+
+	/**
+	 * Marks a view as used so that it can't be used as a center if most of the view is "covered" by another
+	 * view which has a higher score and most of the view area is covered by other views. The exception to this
+	 * rule is if there are a significant number of pixels not covered by any neighbors.
+	 */
+	protected void pruneViewsThatAreSimilarByNeighbors( SceneStructureMetric scene ) {
+		for (int rankIndex = 0; rankIndex < arrayScores.size; rankIndex++) {
+			ViewInfo center = arrayScores.get(rankIndex);
+			List<StereoPairGraph.Edge> pairs = center.relations.pairs;
+			BundleAdjustmentCamera candidateCamera = scene.cameras.get(center.metric.camera).model;
+			computeRectification.setView1(candidateCamera, center.dimension.width, center.dimension.height);
+			scoreCoverage.initialize(center.dimension.width, center.dimension.height,
+					computeRectification.view1_dist_to_undist);
+
+			scene.getWorldToView(center.metric, world_to_view1, tmp);
+
+			boolean tooSimilar = false;
+
+			for (int pairIdx = 0; pairIdx < pairs.size(); pairIdx++) {
+				StereoPairGraph.Edge pair = pairs.get(pairIdx);
+
+				ViewInfo connected = mapScores.get(pair.other(center.relations).id);
+
+				// If the view has already been prune then there can't be any overlap
+				if (connected.used)
+					continue;
+
+				// Only consider overlap with views that have a better score (and have already been accepted)
+				if (connected.score < center.score)
+					continue;
+
+				// Handle the situations where they have identical scores. This probably means the two images
+				// are identical. Break the tie using their ID
+				if (connected.score == center.score && connected.relations.id.compareTo(center.relations.id) < 0)
+					continue;
+
+				double intersection = computeIntersection(scene, connected);
+
+				// NOTE: This can be problematic if one stereo image is much closer than the other. It will be
+				// contained inside it 100% but the areas will be very different. IOU was attempted but that ran
+				// into the problem that the rectification can be unstable and create very large regions that
+				// cause similar images being marked as not similar.
+				//
+				// Maybe a symmetric intersection where the intersection is computed from both image's POV and
+				// the smallest area is accepted
+
+				if (intersection > maximumCenterOverlap) {
+					tooSimilar = true;
+					if (verbose != null) verbose.printf("excluding view['%s'] because view['%s'] covered %.2f\n",
+							center.relations.id, connected.relations.id, intersection);
+					break;
+				}
+			}
+
+			if (tooSimilar)
+				center.used = true;
+		}
+	}
+
+	/**
+	 * Computes how much the two rectified images intersect each other
+	 *
+	 * @return fraction of intersection, 0.0 to 1.0
+	 */
+	protected double computeIntersection( SceneStructureMetric scene, ViewInfo connected ) {
+		BundleAdjustmentCamera connectedCamera = scene.cameras.get(connected.metric.camera).model;
+
+		// Compute the transform from view-1 to view-2
+		scene.getWorldToView(connected.metric, world_to_view2, tmp);
+		world_to_view1.invert(tmp).concat(world_to_view2, view1_to_view2);
+
+		// Compute rectification then apply coverage with geometric score
+		computeRectification.processView2(connectedCamera,
+				connected.dimension.width, connected.dimension.height, view1_to_view2);
+
+		// Find how much the rectified image intersects
+		return scoreCoverage.fractionIntersection(connected.dimension.width, connected.dimension.height,
+				computeRectification.undist_to_rect2);
 	}
 
 	/**
@@ -363,9 +451,6 @@ public class MultiViewStereoFromKnownSceneStructure<T extends ImageGray<T>> impl
 			// Add view to the look up table and mark it as the second image in a stereo pair
 			indexSbaToViewID.put(other.indexSba, other.id);
 			imagePairIndexesSba.add(other.indexSba);
-
-			// This view has been consumed so it can't be used as a center view
-			mapScores.get(other.id).used = true;
 		}
 	}
 
@@ -379,7 +464,7 @@ public class MultiViewStereoFromKnownSceneStructure<T extends ImageGray<T>> impl
 		computeFused.setStereoDisparity(stereoDisparity);
 	}
 
-	public void setImageLookUp(LookUpImages imageLookUp) {
+	public void setImageLookUp( LookUpImages imageLookUp ) {
 		this.computeFused.setLookUpImages(imageLookUp);
 		this.imageLookUp = imageLookUp;
 	}

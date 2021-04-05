@@ -57,6 +57,7 @@ class TestSparseSceneToDenseCloud extends BoofStandardJUnit {
 		alg.getGenerateGraph().minimumCommonFeaturesFrac = 0.1;
 //		alg.getGenerateGraph().setVerbose(System.out, null);
 		alg.getMultiViewStereo().minimumQuality3D = 0.01;
+		alg.getMultiViewStereo().maximumCenterOverlap = 1.0; // default value is too aggressive
 		alg.getMultiViewStereo().setStereoDisparity(stereo);
 //		alg.getMultiViewStereo().setVerbose(System.out, null);
 
