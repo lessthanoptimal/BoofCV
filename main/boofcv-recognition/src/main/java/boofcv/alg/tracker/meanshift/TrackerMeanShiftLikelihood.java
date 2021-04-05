@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -52,7 +52,7 @@ public class TrackerMeanShiftLikelihood<T extends ImageBase<T>> {
 	private SparseImageSample_F32<T> targetModel;
 
 	// image used to store the likelihood
-	private GrayF32 pdf = new GrayF32(1,1);
+	private GrayF32 pdf = new GrayF32(1, 1);
 	// current location of the target
 	private RectangleLength2D_I32 location = new RectangleLength2D_I32();
 
@@ -77,9 +77,9 @@ public class TrackerMeanShiftLikelihood<T extends ImageBase<T>> {
 	 * @param targetModel Target used to model the target's likelihood
 	 * @param maxIterations Maximum number of iterations.  try 20
 	 * @param minFractionDrop If the likelihood drops below its initial value by this fraction the track is
-	 *                           assumed to be lost
+	 * assumed to be lost
 	 */
-	public TrackerMeanShiftLikelihood(PixelLikelihood<T> targetModel, int maxIterations, float minFractionDrop) {
+	public TrackerMeanShiftLikelihood( PixelLikelihood<T> targetModel, int maxIterations, float minFractionDrop ) {
 		this.targetModel = targetModel;
 		this.maxIterations = maxIterations;
 		this.minFractionDrop = minFractionDrop;
@@ -87,18 +87,19 @@ public class TrackerMeanShiftLikelihood<T extends ImageBase<T>> {
 
 	/**
 	 * Specifies the initial target location so that it can learn its description
+	 *
 	 * @param image Image
 	 * @param initial Initial target location and the mean-shift bandwidth
 	 */
-	public void initialize( T image , RectangleLength2D_I32 initial ) {
-		if( !image.isInBounds(initial.x0,initial.y0) )
+	public void initialize( T image, RectangleLength2D_I32 initial ) {
+		if (!image.isInBounds(initial.x0, initial.y0))
 			throw new IllegalArgumentException("Initial rectangle is out of bounds!");
-		if( !image.isInBounds(initial.x0+initial.width,initial.y0+initial.height) )
+		if (!image.isInBounds(initial.x0 + initial.width, initial.y0 + initial.height))
 			throw new IllegalArgumentException("Initial rectangle is out of bounds!");
 
 
-		pdf.reshape(image.width,image.height);
-		ImageMiscOps.fill(pdf,-1);
+		pdf.reshape(image.width, image.height);
+		ImageMiscOps.fill(pdf, -1);
 
 		setTrackLocation(initial);
 
@@ -108,9 +109,9 @@ public class TrackerMeanShiftLikelihood<T extends ImageBase<T>> {
 		minimumSum = 0;
 		targetModel.setImage(image);
 
-		for( int y = 0; y < initial.height; y++ ) {
-			for( int x = 0; x < initial.width; x++ ) {
-				minimumSum += targetModel.compute(x+initial.x0,y+initial.y0);
+		for (int y = 0; y < initial.height; y++) {
+			for (int x = 0; x < initial.width; x++) {
+				minimumSum += targetModel.compute(x + initial.x0, y + initial.y0);
 			}
 		}
 		minimumSum *= minFractionDrop;
@@ -118,6 +119,7 @@ public class TrackerMeanShiftLikelihood<T extends ImageBase<T>> {
 
 	/**
 	 * Used to set the location of the track without changing any appearance history.
+	 *
 	 * @param location new location
 	 */
 	public void setTrackLocation( RectangleLength2D_I32 location ) {
@@ -125,8 +127,8 @@ public class TrackerMeanShiftLikelihood<T extends ImageBase<T>> {
 
 		// massage the rectangle so that it has an odd width and height
 		// otherwise it could experience a bias when localizing
-		this.location.width += 1- this.location.width%2;
-		this.location.height += 1- this.location.height%2;
+		this.location.width += 1 - this.location.width%2;
+		this.location.height += 1 - this.location.height%2;
 
 		failed = false;
 	}
@@ -140,7 +142,7 @@ public class TrackerMeanShiftLikelihood<T extends ImageBase<T>> {
 	 */
 	public boolean process( T image ) {
 
-		if( failed )
+		if (failed)
 			return false;
 
 		targetModel.setImage(image);
@@ -148,7 +150,7 @@ public class TrackerMeanShiftLikelihood<T extends ImageBase<T>> {
 		// mark the region where the pdf has been modified as dirty
 		dirty.setTo(location.x0, location.y0, location.x0 + location.width, location.y0 + location.height);
 		// compute the pdf inside the initial rectangle
-		updatePdfImage(location.x0 , location.y0 , location.x0+location.width , location.y0+location.height);
+		updatePdfImage(location.x0, location.y0, location.x0 + location.width, location.y0 + location.height);
 
 		// current location of the target
 		int x0 = location.x0;
@@ -159,47 +161,46 @@ public class TrackerMeanShiftLikelihood<T extends ImageBase<T>> {
 		int prevY = y0;
 
 		// iterate until it converges or reaches the maximum number of iterations
-		for( int i = 0; i < maxIterations; i++ ) {
-
+		for (int i = 0; i < maxIterations; i++) {
 			// compute the weighted centroid using the likelihood function
 			float totalPdf = 0;
 			float sumX = 0;
 			float sumY = 0;
 
-			for( int y = 0; y < location.height; y++ ) {
-				int indexPdf = pdf.startIndex + pdf.stride*(y+y0) + x0;
-				for( int x = 0; x < location.width; x++ ) {
+			for (int y = 0; y < location.height; y++) {
+				int indexPdf = pdf.startIndex + pdf.stride*(y + y0) + x0;
+				for (int x = 0; x < location.width; x++) {
 					float p = pdf.data[indexPdf++];
 
 					totalPdf += p;
-					sumX += (x0+x)*p;
-					sumY += (y0+y)*p;
+					sumX += (x0 + x)*p;
+					sumY += (y0 + y)*p;
 				}
 			}
 
 			// if the target isn't likely to be in view, give up
-			if( totalPdf <= minimumSum ) {
+			if (totalPdf <= minimumSum) {
 				failed = true;
 				return false;
 			}
 
 			// Use the new center to find the new top left corner, while rounding to the nearest integer
-			x0 = (int)(sumX/totalPdf-location.width/2+0.5f);
-			y0 = (int)(sumY/totalPdf-location.height/2+0.5f);
+			x0 = (int)(sumX/totalPdf - location.width/2 + 0.5f);
+			y0 = (int)(sumY/totalPdf - location.height/2 + 0.5f);
 
 			// make sure it doesn't go outside the image
-			if( x0 < 0 )
+			if (x0 < 0)
 				x0 = 0;
-			else if( x0 >= image.width-location.width )
-				x0 = image.width-location.width;
+			else if (x0 >= image.width - location.width)
+				x0 = image.width - location.width;
 
-			if( y0 < 0 )
+			if (y0 < 0)
 				y0 = 0;
-			else if( y0 >= image.height-location.height )
-				y0 = image.height-location.height;
+			else if (y0 >= image.height - location.height)
+				y0 = image.height - location.height;
 
 			// see if it has converged
-			if( x0 == prevX && y0 == prevY )
+			if (x0 == prevX && y0 == prevY)
 				break;
 
 			// save the previous location
@@ -207,7 +208,7 @@ public class TrackerMeanShiftLikelihood<T extends ImageBase<T>> {
 			prevY = y0;
 
 			// update the pdf
-			updatePdfImage(x0,y0,x0+location.width,y0+location.height);
+			updatePdfImage(x0, y0, x0 + location.width, y0 + location.height);
 		}
 
 		// update the output
@@ -215,7 +216,7 @@ public class TrackerMeanShiftLikelihood<T extends ImageBase<T>> {
 		location.y0 = y0;
 
 		// clean up the image for the next iteration
-		ImageMiscOps.fillRectangle(pdf,-1,dirty.x0,dirty.y0,dirty.x1-dirty.x0,dirty.y1-dirty.y0);
+		ImageMiscOps.fillRectangle(pdf, -1, dirty.x0, dirty.y0, dirty.x1 - dirty.x0, dirty.y1 - dirty.y0);
 
 		return true;
 	}
@@ -223,30 +224,31 @@ public class TrackerMeanShiftLikelihood<T extends ImageBase<T>> {
 	/**
 	 * Computes the PDF only inside the image as needed amd update the dirty rectangle
 	 */
-	protected void updatePdfImage(  int x0 , int y0 , int x1 , int y1 ) {
+	protected void updatePdfImage( int x0, int y0, int x1, int y1 ) {
 
-		for( int y = y0; y < y1; y++ ) {
+		for (int y = y0; y < y1; y++) {
 			int indexOut = pdf.startIndex + pdf.stride*y + x0;
-			for( int x = x0; x < x1; x++ , indexOut++ ) {
+			for (int x = x0; x < x1; x++, indexOut++) {
 
-				if( pdf.data[indexOut] < 0 )
+				if (pdf.data[indexOut] < 0)
 					pdf.data[indexOut] = targetModel.compute(x, y);
 			}
 		}
 
 		// update the dirty region
-		if( dirty.x0 > x0 )
+		if (dirty.x0 > x0)
 			dirty.x0 = x0;
-		if( dirty.y0 > y0 )
+		if (dirty.y0 > y0)
 			dirty.y0 = y0;
-		if( dirty.x1 < x1 )
+		if (dirty.x1 < x1)
 			dirty.x1 = x1;
-		if( dirty.y1 < y1 )
+		if (dirty.y1 < y1)
 			dirty.y1 = y1;
 	}
 
 	/**
 	 * Current location of target in the image
+	 *
 	 * @return rectangle containing the target
 	 */
 	public RectangleLength2D_I32 getLocation() {

@@ -16,23 +16,8 @@
  * limitations under the License.
  */
 
-package boofcv.alg.tracker.meanshift;
+package boofcv.alg.tracker.sfot;
 
-import boofcv.struct.image.ImageBase;
-import boofcv.struct.sparse.SparseImageSample_F32;
-import georegression.struct.shapes.RectangleLength2D_I32;
+import boofcv.struct.StandardConfigurationChecks;
 
-/**
- * Computes the likelihood that a pixel belongs to the target.
- *
- * @author Peter Abeles
- */
-public interface PixelLikelihood<T extends ImageBase<T>> extends SparseImageSample_F32<T> {
-	/**
-	 * Specifies where the initial location of the target is in the image and computes the model using pixels
-	 * inside the rectangle
-	 *
-	 * @param target Location of target inside the image
-	 */
-	void createModel( RectangleLength2D_I32 target );
-}
+class TestSfotConfig extends StandardConfigurationChecks {}

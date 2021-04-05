@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -36,7 +36,7 @@ import java.util.List;
  * The histogram is stored in a row major format.
  *
  * @author Peter Abeles
-**/
+ **/
 public class LocalWeightedHistogramRotRect<T extends ImageBase<T>> {
 
 	// Interpolation function
@@ -50,10 +50,10 @@ public class LocalWeightedHistogramRotRect<T extends ImageBase<T>> {
 	private int numBins;
 
 	// cosine and sine of rotation rectangle angle
-	protected float c,s;
+	protected float c, s;
 
 	// output of conversion from region to image coordinates
-	public float imageX,imageY;
+	public float imageX, imageY;
 
 	// which element in the histogram does a coordinate in the grid belong to
 	protected int[] sampleHistIndex;
@@ -75,17 +75,17 @@ public class LocalWeightedHistogramRotRect<T extends ImageBase<T>> {
 	 * @param maxPixelValue Maximum value of a pixel across all bands
 	 * @param interpolate Function used to interpolate the image
 	 */
-	public LocalWeightedHistogramRotRect(int numSamples, double numSigmas,
-										 int numHistogramBins, int numBands,
-										 float maxPixelValue,
-										 InterpolatePixelMB<T> interpolate) {
+	public LocalWeightedHistogramRotRect( int numSamples, double numSigmas,
+										  int numHistogramBins, int numBands,
+										  float maxPixelValue,
+										  InterpolatePixelMB<T> interpolate ) {
 		this.numBins = numHistogramBins;
 		this.maxPixelValue = maxPixelValue*1.0001f; // avoid the possibility exceeding the max histogram size
 		this.interpolate = interpolate;
 
-		sampleHistIndex = new int[ numSamples*numSamples ];
-		histogram = new float[ (int)Math.pow(numHistogramBins,numBands) ];
-		value = new float[ numBands ];
+		sampleHistIndex = new int[numSamples*numSamples];
+		histogram = new float[(int)Math.pow(numHistogramBins, numBands)];
+		value = new float[numBands];
 
 		createSamplePoints(numSamples);
 		computeWeights(numSamples, numSigmas);
@@ -94,17 +94,17 @@ public class LocalWeightedHistogramRotRect<T extends ImageBase<T>> {
 	/**
 	 * compute the weights by convolving 1D gaussian kernel
 	 */
-	protected void computeWeights(int numSamples, double numSigmas) {
-		weights = new float[ numSamples*numSamples ];
+	protected void computeWeights( int numSamples, double numSigmas ) {
+		weights = new float[numSamples*numSamples];
 
-		float[] w = new float[ numSamples ];
-		for( int i = 0; i < numSamples; i++ ) {
-			float x = i/(float)(numSamples-1);
-			w[i] = (float) UtilGaussian.computePDF(0, 1, 2f*numSigmas * (x - 0.5f));
+		float[] w = new float[numSamples];
+		for (int i = 0; i < numSamples; i++) {
+			float x = i/(float)(numSamples - 1);
+			w[i] = (float)UtilGaussian.computePDF(0, 1, 2f*numSigmas*(x - 0.5f));
 		}
 
-		for( int y = 0; y < numSamples; y++ ) {
-			for( int x = 0; x < numSamples; x++ ) {
+		for (int y = 0; y < numSamples; y++) {
+			for (int x = 0; x < numSamples; x++) {
 				weights[y*numSamples + x] = w[y]*w[x];
 			}
 		}
@@ -114,13 +114,13 @@ public class LocalWeightedHistogramRotRect<T extends ImageBase<T>> {
 	 * create the list of points in square coordinates that it will sample.  values will range
 	 * from -0.5 to 0.5 along each axis.
 	 */
-	protected void createSamplePoints(int numSamples) {
-		for( int y = 0; y < numSamples; y++ ) {
-			float regionY = (y/(numSamples-1.0f) - 0.5f);
+	protected void createSamplePoints( int numSamples ) {
+		for (int y = 0; y < numSamples; y++) {
+			float regionY = (y/(numSamples - 1.0f) - 0.5f);
 
-			for( int x = 0; x < numSamples; x++  ) {
-				float regionX = (x/(numSamples-1.0f) - 0.5f);
-				samplePts.add( new Point2D_F32(regionX,regionY));
+			for (int x = 0; x < numSamples; x++) {
+				float regionX = (x/(numSamples - 1.0f) - 0.5f);
+				samplePts.add(new Point2D_F32(regionX, regionY));
 			}
 		}
 	}
@@ -131,20 +131,20 @@ public class LocalWeightedHistogramRotRect<T extends ImageBase<T>> {
 	 * @param image Input image
 	 * @param region Region which is to be sampled
 	 */
-	public void computeHistogram( T image , RectangleRotate_F32 region ) {
+	public void computeHistogram( T image, RectangleRotate_F32 region ) {
 
 		interpolate.setImage(image);
 
-		c = (float)Math.cos( region.theta );
-		s = (float)Math.sin( region.theta );
+		c = (float)Math.cos(region.theta);
+		s = (float)Math.sin(region.theta);
 
-		for( int i = 0; i < histogram.length; i++ ) {
+		for (int i = 0; i < histogram.length; i++) {
 			histogram[i] = 0;
 		}
 
 		// if it is entirely inside the image, interpolate using a faster technique
-		if( isInFastBounds(region) ) {
-			computeHistogramInside( region);
+		if (isInFastBounds(region)) {
+			computeHistogramInside(region);
 		} else {
 			computeHistogramBorder(image, region);
 		}
@@ -155,17 +155,17 @@ public class LocalWeightedHistogramRotRect<T extends ImageBase<T>> {
 	/**
 	 * Computes the histogram quickly inside the image
 	 */
-	protected void computeHistogramInside( RectangleRotate_F32 region) {
-		for( int i = 0; i < samplePts.size(); i++ ) {
+	protected void computeHistogramInside( RectangleRotate_F32 region ) {
+		for (int i = 0; i < samplePts.size(); i++) {
 			Point2D_F32 p = samplePts.get(i);
 
 			squareToImageSample(p.x, p.y, region);
 
-			interpolate.get_fast(imageX,imageY,value);
+			interpolate.get_fast(imageX, imageY, value);
 
 			int indexHistogram = computeHistogramBin(value);
 
-			sampleHistIndex[ i ] = indexHistogram;
+			sampleHistIndex[i] = indexHistogram;
 			histogram[indexHistogram] += weights[i];
 		}
 	}
@@ -173,22 +173,22 @@ public class LocalWeightedHistogramRotRect<T extends ImageBase<T>> {
 	/**
 	 * Computes the histogram and skips pixels which are outside the image border
 	 */
-	protected void computeHistogramBorder(T image, RectangleRotate_F32 region) {
-		for( int i = 0; i < samplePts.size(); i++ ) {
+	protected void computeHistogramBorder( T image, RectangleRotate_F32 region ) {
+		for (int i = 0; i < samplePts.size(); i++) {
 			Point2D_F32 p = samplePts.get(i);
 
 			squareToImageSample(p.x, p.y, region);
 
 			// make sure its inside the image
-			if( !BoofMiscOps.isInside(image, imageX, imageY)) {
-				sampleHistIndex[ i ] = -1;
+			if (!BoofMiscOps.isInside(image, imageX, imageY)) {
+				sampleHistIndex[i] = -1;
 			} else {
 				// use the slower interpolation which can handle the border
 				interpolate.get(imageX, imageY, value);
 
 				int indexHistogram = computeHistogramBin(value);
 
-				sampleHistIndex[ i ] = indexHistogram;
+				sampleHistIndex[i] = indexHistogram;
 				histogram[indexHistogram] += weights[i];
 			}
 		}
@@ -200,7 +200,7 @@ public class LocalWeightedHistogramRotRect<T extends ImageBase<T>> {
 	protected int computeHistogramBin( float[] value ) {
 		int indexHistogram = 0;
 		int binStride = 1;
-		for( int bandIndex = 0; bandIndex < value.length; bandIndex++ ) {
+		for (int bandIndex = 0; bandIndex < value.length; bandIndex++) {
 			int bin = (int)(numBins*value[bandIndex]/maxPixelValue);
 
 			indexHistogram += bin*binStride;
@@ -212,19 +212,19 @@ public class LocalWeightedHistogramRotRect<T extends ImageBase<T>> {
 	/**
 	 * Checks to see if the region can be sampled using the fast algorithm
 	 */
-	protected boolean isInFastBounds(RectangleRotate_F32 region) {
+	protected boolean isInFastBounds( RectangleRotate_F32 region ) {
 
 		squareToImageSample(-0.5f, -0.5f, region);
-		if( !interpolate.isInFastBounds(imageX, imageY))
+		if (!interpolate.isInFastBounds(imageX, imageY))
 			return false;
 		squareToImageSample(-0.5f, 0.5f, region);
-		if( !interpolate.isInFastBounds(imageX, imageY))
+		if (!interpolate.isInFastBounds(imageX, imageY))
 			return false;
 		squareToImageSample(0.5f, 0.5f, region);
-		if( !interpolate.isInFastBounds(imageX, imageY))
+		if (!interpolate.isInFastBounds(imageX, imageY))
 			return false;
 		squareToImageSample(0.5f, -0.5f, region);
-		if( !interpolate.isInFastBounds(imageX, imageY))
+		if (!interpolate.isInFastBounds(imageX, imageY))
 			return false;
 
 		return true;
@@ -232,10 +232,10 @@ public class LocalWeightedHistogramRotRect<T extends ImageBase<T>> {
 
 	protected void normalizeHistogram() {
 		float total = 0;
-		for( int i = 0; i < histogram.length; i++ ) {
+		for (int i = 0; i < histogram.length; i++) {
 			total += histogram[i];
 		}
-		for( int i = 0; i < histogram.length; i++ ) {
+		for (int i = 0; i < histogram.length; i++) {
 			histogram[i] /= total;
 		}
 	}
@@ -243,10 +243,10 @@ public class LocalWeightedHistogramRotRect<T extends ImageBase<T>> {
 	/**
 	 * Converts a point from square coordinates into image coordinates
 	 */
-	protected void squareToImageSample(float x, float y, RectangleRotate_F32 region) {
+	protected void squareToImageSample( float x, float y, RectangleRotate_F32 region ) {
 		// -1 because it starts counting at 0.  otherwise width+1 samples are made
-		x *= region.width-1;
-		y *= region.height-1;
+		x *= region.width - 1;
+		y *= region.height - 1;
 
 		imageX = x*c - y*s + region.cx;
 		imageY = x*s + y*c + region.cy;
@@ -263,5 +263,4 @@ public class LocalWeightedHistogramRotRect<T extends ImageBase<T>> {
 	public List<Point2D_F32> getSamplePts() {
 		return samplePts;
 	}
-
 }

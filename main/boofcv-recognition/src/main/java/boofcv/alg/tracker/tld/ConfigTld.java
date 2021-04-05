@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -24,9 +24,8 @@ import boofcv.struct.Configuration;
 /**
  * Configuration file for TLD tracker.
  *
- * @see TldTracker
- *
  * @author Peter Abeles
+ * @see TldTracker
  */
 public class ConfigTld implements Configuration {
 
@@ -167,7 +166,5 @@ public class ConfigTld implements Configuration {
 	}
 
 	@Override
-	public void checkValidity() {
-
-	}
+	public void checkValidity() {}
 }

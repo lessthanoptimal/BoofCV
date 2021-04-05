@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -62,9 +62,9 @@ public class TldLearning<T extends ImageGray<T>> {
 	/**
 	 * Creates and configures learning
 	 */
-	public TldLearning(Random rand, ConfigTld config,
-					   TldTemplateMatching<T> template, TldVarianceFilter<T> variance, TldFernClassifier<T> fern,
-					   TldDetection<T> detection ) {
+	public TldLearning( Random rand, ConfigTld config,
+						TldTemplateMatching<T> template, TldVarianceFilter<T> variance, TldFernClassifier<T> fern,
+						TldDetection<T> detection ) {
 		this.rand = rand;
 		this.config = config;
 		this.template = template;
@@ -80,7 +80,7 @@ public class TldLearning<T extends ImageGray<T>> {
 	 * @param targetRegion user selected region
 	 * @param cascadeRegions Set of regions used by the cascade detector
 	 */
-	public void initialLearning( Rectangle2D_F64 targetRegion ,
+	public void initialLearning( Rectangle2D_F64 targetRegion,
 								 DogArray<ImageRectangle> cascadeRegions ) {
 		storageMetric.reset();
 		fernNegative.clear();
@@ -96,16 +96,16 @@ public class TldLearning<T extends ImageGray<T>> {
 		fern.learnFernNoise(true, targetRegion_I32);
 
 		// Find all the regions which can be used to learn a negative descriptor
-		for( int i = 0; i < cascadeRegions.size; i++ ) {
+		for (int i = 0; i < cascadeRegions.size; i++) {
 			ImageRectangle r = cascadeRegions.get(i);
 
 			// see if it passes the variance test
-			if( !variance.checkVariance(r) )
+			if (!variance.checkVariance(r))
 				continue;
 
 			// learn features far away from the target region
 			double overlap = helper.computeOverlap(targetRegion_I32, r);
-			if( overlap > config.overlapLower )
+			if (overlap > config.overlapLower)
 				continue;
 
 			fernNegative.add(r);
@@ -115,8 +115,8 @@ public class TldLearning<T extends ImageGray<T>> {
 //		Collections.shuffle(fernNegative,rand);
 		int N = fernNegative.size();//Math.min(config.numNegativeFerns,fernNegative.size());
 
-		for( int i = 0; i < N; i++ ) {
-			fern.learnFern(false, fernNegative.get(i) );
+		for (int i = 0; i < N; i++) {
+			fern.learnFern(false, fernNegative.get(i));
 		}
 
 		// run detection algorithm and if there is an ambiguous solution mark it as not target
@@ -125,9 +125,9 @@ public class TldLearning<T extends ImageGray<T>> {
 		learnAmbiguousNegative(targetRegion);
 	}
 
-
 	/**
 	 * Updates learning using the latest tracking results.
+	 *
 	 * @param targetRegion Region selected by the fused tracking
 	 */
 	public void updateLearning( Rectangle2D_F64 targetRegion ) {
@@ -143,8 +143,8 @@ public class TldLearning<T extends ImageGray<T>> {
 		// mark only a few of the far away regions as negative.  Marking all of them as negative is
 		// computationally expensive
 		DogArray<TldRegionFernInfo> ferns = detection.getFernInfo();
-		int N = Math.min(config.numNegativeFerns,ferns.size);
-		for( int i = 0; i < N; i++ ) {
+		int N = Math.min(config.numNegativeFerns, ferns.size);
+		for (int i = 0; i < N; i++) {
 			int index = rand.nextInt(ferns.size);
 			TldRegionFernInfo f = ferns.get(index);
 
@@ -152,10 +152,10 @@ public class TldLearning<T extends ImageGray<T>> {
 
 			// learn features far away from the target region
 			double overlap = helper.computeOverlap(targetRegion_I32, f.r);
-			if( overlap > config.overlapLower )
+			if (overlap > config.overlapLower)
 				continue;
 
-			fern.learnFern(false, f.r );
+			fern.learnFern(false, f.r);
 		}
 
 		learnAmbiguousNegative(targetRegion);
@@ -165,17 +165,17 @@ public class TldLearning<T extends ImageGray<T>> {
 	 * Mark regions which were local maximums and had high confidence as negative.  These regions were
 	 * candidates for the tracker but were not selected
 	 */
-	protected void learnAmbiguousNegative(Rectangle2D_F64 targetRegion) {
+	protected void learnAmbiguousNegative( Rectangle2D_F64 targetRegion ) {
 
 		TldHelperFunctions.convertRegion(targetRegion, targetRegion_I32);
 
-		if( detection.isSuccess() ) {
+		if (detection.isSuccess()) {
 			TldRegion best = detection.getBest();
 
 			// see if it found the correct solution
-			double overlap = helper.computeOverlap(best.rect,targetRegion_I32);
-			if( overlap <= config.overlapLower ) {
-				template.addDescriptor(false,best.rect);
+			double overlap = helper.computeOverlap(best.rect, targetRegion_I32);
+			if (overlap <= config.overlapLower) {
+				template.addDescriptor(false, best.rect);
 //				fern.learnFernNoise(false, best.rect );
 			}
 
@@ -183,10 +183,10 @@ public class TldLearning<T extends ImageGray<T>> {
 			List<ImageRectangle> ambiguous = detection.getAmbiguousRegions();
 			for (int ambiguousIdx = 0; ambiguousIdx < ambiguous.size(); ambiguousIdx++) {
 				ImageRectangle r = ambiguous.get(ambiguousIdx);
-				overlap = helper.computeOverlap(r,targetRegion_I32);
-				if( overlap <= config.overlapLower ) {
-					fern.learnFernNoise(false, r );
-					template.addDescriptor(false,r);
+				overlap = helper.computeOverlap(r, targetRegion_I32);
+				if (overlap <= config.overlapLower) {
+					fern.learnFernNoise(false, r);
+					template.addDescriptor(false, r);
 				}
 			}
 		}
