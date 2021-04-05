@@ -99,7 +99,7 @@ public class SparseFlowObjectTracker<Image extends ImageGray<Image>, Derivative 
 
 		klt = FactoryTrackerAlg.kltPyramid(config.trackerConfig, imageType, derivType);
 
-		ModelManagerScaleTranslateRotate2D manager = new ModelManagerScaleTranslateRotate2D();
+		var manager = new ModelManagerScaleTranslateRotate2D();
 
 		estimateMotion = new LeastMedianOfSquares<>(
 				config.randSeed, config.robustCycles, Double.MAX_VALUE, 0, manager, AssociatedPair.class);
