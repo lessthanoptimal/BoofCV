@@ -20,7 +20,6 @@ package boofcv.factory.geo;
 
 import boofcv.abst.geo.Estimate1ofEpipolar;
 import boofcv.abst.geo.Estimate1ofPnP;
-import boofcv.abst.geo.Estimate1ofTrifocalTensor;
 import boofcv.abst.geo.Triangulate2ViewsMetric;
 import boofcv.abst.geo.fitting.DistanceFromModelResidual;
 import boofcv.abst.geo.fitting.GenerateEpipolarMatrix;
@@ -32,6 +31,7 @@ import boofcv.alg.geo.robust.*;
 import boofcv.alg.geo.selfcalib.DistanceMetricTripleReprojection23;
 import boofcv.alg.geo.selfcalib.MetricCameraTriple;
 import boofcv.alg.geo.selfcalib.ModelManagerMetricCameraTriple;
+import boofcv.concurrency.BoofConcurrency;
 import boofcv.struct.geo.AssociatedPair;
 import boofcv.struct.geo.AssociatedTriple;
 import boofcv.struct.geo.Point2D3D;
@@ -46,7 +46,10 @@ import org.ddogleg.fitting.modelset.ModelGenerator;
 import org.ddogleg.fitting.modelset.ModelManager;
 import org.ddogleg.fitting.modelset.ModelMatcher;
 import org.ddogleg.fitting.modelset.lmeds.LeastMedianOfSquares;
+import org.ddogleg.fitting.modelset.lmeds.LeastMedianOfSquares_MT;
 import org.ddogleg.fitting.modelset.ransac.Ransac;
+import org.ddogleg.fitting.modelset.ransac.Ransac_MT;
+import org.ddogleg.struct.Factory;
 import org.ejml.data.DMatrixRMaj;
 import org.jetbrains.annotations.Nullable;
 
@@ -266,21 +269,28 @@ public class FactoryMultiViewRobust {
 		configRansac.checkValidity();
 
 		ModelManager<DMatrixRMaj> managerF = new ModelManagerEpipolarMatrix();
-		Estimate1ofEpipolar estimateF = FactoryMultiView.fundamental_1(configFundamental.which,
-				configFundamental.numResolve);
-		GenerateEpipolarMatrix generateF = new GenerateEpipolarMatrix(estimateF);
-
-		// How the error is measured
-		DistanceFromModel<DMatrixRMaj, AssociatedPair> errorMetric = switch (configFundamental.errorModel) {
-			case SAMPSON -> new DistanceFromModelResidual<>(new FundamentalResidualSampson());
-			case GEOMETRIC -> new DistanceFundamentalGeometric();
-		};
 
 		double ransacTOL = configRansac.inlierThreshold*configRansac.inlierThreshold;
 
-		var ransac = new Ransac<>(configRansac.randSeed, configRansac.iterations, ransacTOL,
-				managerF, AssociatedPair.class);
-		ransac.setModel(() -> generateF, () -> errorMetric);
+		Ransac<DMatrixRMaj, AssociatedPair> ransac;
+		if (BoofConcurrency.isUseConcurrent()) {
+			ransac = new Ransac_MT<>(
+					configRansac.randSeed, configRansac.iterations, ransacTOL, managerF, AssociatedPair.class);
+		} else {
+			ransac = new Ransac<>(
+					configRansac.randSeed, configRansac.iterations, ransacTOL, managerF, AssociatedPair.class);
+		}
+
+		ransac.setModel(
+				() -> {
+					Estimate1ofEpipolar estimateF = FactoryMultiView.fundamental_1(configFundamental.which,
+							configFundamental.numResolve);
+					return new GenerateEpipolarMatrix(estimateF);
+				},
+				() -> switch (configFundamental.errorModel) {
+					case SAMPSON -> new DistanceFromModelResidual<>(new FundamentalResidualSampson());
+					case GEOMETRIC -> new DistanceFundamentalGeometric();
+				});
 		return ransac;
 	}
 
@@ -304,13 +314,21 @@ public class FactoryMultiViewRobust {
 		if (configHomography == null)
 			configHomography = new ConfigHomography();
 
-		ModelManager<Homography2D_F64> manager = new ModelManagerHomography2D_F64();
-		GenerateHomographyLinear modelFitter = new GenerateHomographyLinear(configHomography.normalize);
-		DistanceHomographySq distance = new DistanceHomographySq();
+		ConfigHomography _configHomography = configHomography;
 
-		var lmeds = new LeastMedianOfSquares<>(
-				configLMedS.randSeed, configLMedS.totalCycles, manager, AssociatedPair.class);
-		lmeds.setModel(()->modelFitter, ()->distance);
+		var manager = new ModelManagerHomography2D_F64();
+
+		LeastMedianOfSquares<Homography2D_F64, AssociatedPair> lmeds =
+				BoofConcurrency.isUseConcurrent() ?
+						new LeastMedianOfSquares_MT<>(
+								configLMedS.randSeed, configLMedS.totalCycles, manager, AssociatedPair.class)
+						:
+						new LeastMedianOfSquares<>(
+								configLMedS.randSeed, configLMedS.totalCycles, manager, AssociatedPair.class);
+
+		lmeds.setModel(
+				() -> new GenerateHomographyLinear(_configHomography.normalize),
+				DistanceHomographySq::new);
 		lmeds.setErrorFraction(configLMedS.errorFraction);
 		return lmeds;
 	}
@@ -335,14 +353,21 @@ public class FactoryMultiViewRobust {
 		if (configHomography == null)
 			configHomography = new ConfigHomography();
 
+		ConfigHomography _configHomography = configHomography;
+
 		ModelManager<Homography2D_F64> manager = new ModelManagerHomography2D_F64();
-		GenerateHomographyLinear modelFitter = new GenerateHomographyLinear(configHomography.normalize);
-		DistanceHomographySq distance = new DistanceHomographySq();
 
 		double ransacTol = configRansac.inlierThreshold*configRansac.inlierThreshold;
-		var ransac = new Ransac<>(
-				configRansac.randSeed, configRansac.iterations, ransacTol, manager, AssociatedPair.class);
-		ransac.setModel(()->modelFitter, ()->distance);
+		Ransac<Homography2D_F64, AssociatedPair> ransac = BoofConcurrency.isUseConcurrent() ?
+				new Ransac_MT<>(
+						configRansac.randSeed, configRansac.iterations, ransacTol, manager, AssociatedPair.class)
+				:
+				new Ransac<>(
+						configRansac.randSeed, configRansac.iterations, ransacTol, manager, AssociatedPair.class);
+
+		ransac.setModel(
+				() -> new GenerateHomographyLinear(_configHomography.normalize),
+				DistanceHomographySq::new);
 		return ransac;
 	}
 
@@ -385,33 +410,45 @@ public class FactoryMultiViewRobust {
 			configError = new ConfigTrifocalError();
 
 		configTrifocal.checkValidity();
+		configError.checkValidity();
+
+		// needed for lambdas
+		final ConfigTrifocal _configTrifocal = configTrifocal;
+		final ConfigTrifocalError _configError = configError;
 
 		double ransacTol;
-		DistanceFromModel<TrifocalTensor, AssociatedTriple> distance;
+		Factory<DistanceFromModel<TrifocalTensor, AssociatedTriple>> distance;
 
 		switch (configError.model) {
 			case REPROJECTION -> {
 				ransacTol = 3.0*configRansac.inlierThreshold*configRansac.inlierThreshold;
-				distance = new DistanceTrifocalReprojectionSq();
+				distance = DistanceTrifocalReprojectionSq::new;
 			}
 			case REPROJECTION_REFINE -> {
 				ransacTol = 3.0*configRansac.inlierThreshold*configRansac.inlierThreshold;
-				distance = new DistanceTrifocalReprojectionSq(configError.converge.gtol, configError.converge.maxIterations);
+				distance = ()->new DistanceTrifocalReprojectionSq(
+						_configError.converge.gtol, _configError.converge.maxIterations);
 			}
 			case POINT_TRANSFER -> {
 				ransacTol = 2.0*configRansac.inlierThreshold*configRansac.inlierThreshold;
-				distance = new DistanceTrifocalTransferSq();
+				distance = DistanceTrifocalTransferSq::new;
 			}
 			default -> throw new IllegalArgumentException("Unknown error model " + configError.model);
 		}
 
-		Estimate1ofTrifocalTensor estimator = FactoryMultiView.trifocal_1(configTrifocal);
 		ModelManager<TrifocalTensor> manager = new ManagerTrifocalTensor();
-		ModelGenerator<TrifocalTensor, AssociatedTriple> generator = new GenerateTrifocalTensor(estimator);
 
-		Ransac<TrifocalTensor, AssociatedTriple> ransac =
-				new Ransac<>(configRansac.randSeed, configRansac.iterations, ransacTol, manager, AssociatedTriple.class);
-		ransac.setModel(() -> generator, () -> distance);
+		Ransac<TrifocalTensor, AssociatedTriple> ransac;
+		if (BoofConcurrency.isUseConcurrent()) {
+			ransac = new Ransac_MT<>(
+					configRansac.randSeed, configRansac.iterations, ransacTol, manager, AssociatedTriple.class);
+		} else {
+			ransac = new Ransac<>(
+					configRansac.randSeed, configRansac.iterations, ransacTol, manager, AssociatedTriple.class);
+		}
+		ransac.setModel(
+				() -> new GenerateTrifocalTensor(FactoryMultiView.trifocal_1(_configTrifocal)),
+				distance);
 		return ransac;
 	}
 
