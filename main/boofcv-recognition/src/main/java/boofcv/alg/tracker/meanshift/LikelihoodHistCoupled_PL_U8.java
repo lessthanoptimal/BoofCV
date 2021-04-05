@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -35,51 +35,51 @@ import georegression.struct.shapes.RectangleLength2D_I32;
  * The reason operations in {@link boofcv.alg.feature.color.GHistogramFeatureOps} is not used internally is because
  * those are for histograms stored in double arrays, while this has to use floats/
  * </p>
+ *
  * @author Peter Abeles
  */
-public class LikelihoodHistCoupled_PL_U8 implements PixelLikelihood<Planar<GrayU8>>
-{
+public class LikelihoodHistCoupled_PL_U8 implements PixelLikelihood<Planar<GrayU8>> {
 	Planar<GrayU8> image;
 
 	// maximum value a pixel can have.
 	int maxPixelValue;
 	// Number of bins for each channel in the histogram
 	int numBins;
-	float hist[] = new float[0];
+	float[] hist = new float[0];
 
-	public LikelihoodHistCoupled_PL_U8(int maxPixelValue, int numBins) {
-		this.maxPixelValue = maxPixelValue+1;
+	public LikelihoodHistCoupled_PL_U8( int maxPixelValue, int numBins ) {
+		this.maxPixelValue = maxPixelValue + 1;
 		this.numBins = numBins;
 	}
 
 	@Override
-	public void setImage(Planar<GrayU8> image) {
+	public void setImage( Planar<GrayU8> image ) {
 		this.image = image;
 
 		int histElements = 1;
-		for( int i = 0; i < image.getNumBands(); i++ ) {
+		for (int i = 0; i < image.getNumBands(); i++) {
 			histElements *= numBins;
 		}
 
-		if( hist.length != histElements ) {
+		if (hist.length != histElements) {
 			hist = new float[histElements];
 		}
 	}
 
 	@Override
-	public boolean isInBounds(int x, int y) {
-		return image.isInBounds(x,y);
+	public boolean isInBounds( int x, int y ) {
+		return image.isInBounds(x, y);
 	}
 
 	@Override
-	public void createModel(RectangleLength2D_I32 target) {
-		for( int y = 0; y < target.height; y++ ) {
+	public void createModel( RectangleLength2D_I32 target ) {
+		for (int y = 0; y < target.height; y++) {
 
-			int index = image.startIndex + (y+target.y0)*image.stride + target.x0;
-			for( int x = 0; x < target.width; x++ , index++ ) {
+			int index = image.startIndex + (y + target.y0)*image.stride + target.x0;
+			for (int x = 0; x < target.width; x++, index++) {
 				int indexBin = 0;
 				int binStride = 1;
-				for( int i = 0; i < image.getNumBands(); i++ ) {
+				for (int i = 0; i < image.getNumBands(); i++) {
 					GrayU8 band = image.getBand(i);
 					int value = band.data[index] & 0xFF;
 					int bin = numBins*value/maxPixelValue;
@@ -93,18 +93,18 @@ public class LikelihoodHistCoupled_PL_U8 implements PixelLikelihood<Planar<GrayU
 		}
 
 		float total = target.width*target.height;
-		for( int i = 0; i < hist.length; i++ ) {
+		for (int i = 0; i < hist.length; i++) {
 			hist[i] /= total;
 		}
 	}
 
 	@Override
-	public float compute(int x, int y) {
+	public float compute( int x, int y ) {
 		int index = image.startIndex + y*image.stride + x;
 
 		int indexBin = 0;
 		int binStride = 1;
-		for( int i = 0; i < image.getNumBands(); i++ ) {
+		for (int i = 0; i < image.getNumBands(); i++) {
 			GrayU8 band = image.getBand(i);
 			int value = band.data[index] & 0xFF;
 			int bin = numBins*value/maxPixelValue;

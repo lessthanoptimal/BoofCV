@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -46,9 +46,9 @@ public class TldNonMaximalSuppression {
 	 * Configures non-maximum suppression
 	 *
 	 * @param connectionThreshold Two regions are considered connected of their overlap is &ge; to this value.
-	 *                               0 to 1.0. A value of 0.5 is recommended
+	 * 0 to 1.0. A value of 0.5 is recommended
 	 */
-	public TldNonMaximalSuppression(double connectionThreshold) {
+	public TldNonMaximalSuppression( double connectionThreshold ) {
 		this.connectionThreshold = connectionThreshold;
 	}
 
@@ -58,28 +58,28 @@ public class TldNonMaximalSuppression {
 	 * @param regions Set of high confidence regions for target
 	 * @param output Output after non-maximum suppression
 	 */
-	public void process( DogArray<TldRegion> regions , DogArray<TldRegion> output ) {
+	public void process( DogArray<TldRegion> regions, DogArray<TldRegion> output ) {
 
 		final int N = regions.size;
 
 		// set all connections to be a local maximum initially
 		conn.reserve(N);
-		for( int i = 0; i < N; i++ ) {
+		for (int i = 0; i < N; i++) {
 			conn.data[i].reset();
 		}
 
 		// Create the graph of connected regions and mark which regions are local maximums
-		for( int i = 0; i < N; i++ ) {
+		for (int i = 0; i < N; i++) {
 			TldRegion ra = regions.get(i);
 			Connections ca = conn.data[i];
 
-			for( int j = i+1; j < N; j++ ) {
+			for (int j = i + 1; j < N; j++) {
 				TldRegion rb = regions.get(j);
 				Connections cb = conn.data[j];
 
 				// see if they are connected
-				double overlap = helper.computeOverlap(ra.rect,rb.rect);
-				if( overlap < connectionThreshold ) {
+				double overlap = helper.computeOverlap(ra.rect, rb.rect);
+				if (overlap < connectionThreshold) {
 					continue;
 				}
 
@@ -92,16 +92,16 @@ public class TldNonMaximalSuppression {
 		}
 
 		// Compute the output from local maximums.
-		for( int i = 0; i < N; i++ ) {
+		for (int i = 0; i < N; i++) {
 			TldRegion ra = regions.get(i);
 			Connections ca = conn.data[i];
 
-			if( ca.maximum ) {
+			if (ca.maximum) {
 				TldRegion o = output.grow();
 				o.connections = ra.connections;
 				o.confidence = ra.confidence;
 				o.rect.setTo(ra.rect);
-			} else if( ra.connections == 0 ) {
+			} else if (ra.connections == 0) {
 				System.out.println("Not a maximum but has zero connections?");
 			}
 		}
@@ -114,8 +114,7 @@ public class TldNonMaximalSuppression {
 	/**
 	 * Contains connection information for a specific rectangular region
 	 */
-	public static class Connections
-	{
+	public static class Connections {
 		// if true then it's a local maximum
 		boolean maximum;
 

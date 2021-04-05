@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -50,9 +50,9 @@ public class TldDetection<T extends ImageGray<T>> {
 	protected ConfigTld config;
 
 	// Storage for sorting of results
-	private DogArray_F64 storageMetric = new DogArray_F64();
-	private DogArray_I32 storageIndexes = new DogArray_I32();
-	private List<ImageRectangle> storageRect = new ArrayList<>();
+	private final DogArray_F64 storageMetric = new DogArray_F64();
+	private final DogArray_I32 storageIndexes = new DogArray_I32();
+	private final List<ImageRectangle> storageRect = new ArrayList<>();
 
 	// storage for regions which pass the fern test
 	protected List<ImageRectangle> fernRegions = new ArrayList<>();
@@ -60,12 +60,12 @@ public class TldDetection<T extends ImageGray<T>> {
 	// list all regions which had the template test run on them
 	protected DogArray<TldRegion> candidateDetections = new DogArray<>(TldRegion::new);
 	// results from non-maximum suppression
-	private DogArray<TldRegion> localMaximums = new DogArray<>(TldRegion::new);
+	private final DogArray<TldRegion> localMaximums = new DogArray<>(TldRegion::new);
 
 	// list of regions which have almost the same confidence as the maximum
-	private List<ImageRectangle> ambiguousRegions = new ArrayList<>();
+	private final List<ImageRectangle> ambiguousRegions = new ArrayList<>();
 
-	private TldHelperFunctions helper = new TldHelperFunctions();
+	private final TldHelperFunctions helper = new TldHelperFunctions();
 
 	// the most likely region
 	private TldRegion best;
@@ -77,7 +77,7 @@ public class TldDetection<T extends ImageGray<T>> {
 	// Removes all but the best rectangles.
 	private TldNonMaximalSuppression nonmax;
 
-	public TldDetection(TldFernClassifier<T> fern, TldTemplateMatching<T> template, TldVarianceFilter<T> variance, ConfigTld config) {
+	public TldDetection( TldFernClassifier<T> fern, TldTemplateMatching<T> template, TldVarianceFilter<T> variance, ConfigTld config ) {
 		this.fern = fern;
 		this.template = template;
 		this.variance = variance;
@@ -115,16 +115,16 @@ public class TldDetection<T extends ImageGray<T>> {
 		// Run through all candidate regions, ignore ones without enough variance, compute
 		// the fern for each one
 		TldRegionFernInfo info = fernInfo.grow();
-		for( int i = 0; i < cascadeRegions.size; i++ ) {
+		for (int i = 0; i < cascadeRegions.size; i++) {
 			ImageRectangle region = cascadeRegions.get(i);
 
-			if( !variance.checkVariance(region)) {
+			if (!variance.checkVariance(region)) {
 				continue;
 			}
 
 			info.r = region;
 
-			if( fern.lookupFernPN(info)) {
+			if (fern.lookupFernPN(info)) {
 				totalP += info.sumP;
 				totalN += info.sumN;
 				info = fernInfo.grow();
@@ -133,9 +133,9 @@ public class TldDetection<T extends ImageGray<T>> {
 		fernInfo.removeTail();
 
 		// avoid overflow errors in the future by re-normalizing the Fern detector
-		if( totalP > 0x0fffffff)
+		if (totalP > 0x0fffffff)
 			fern.renormalizeP();
-		if( totalN > 0x0fffffff)
+		if (totalN > 0x0fffffff)
 			fern.renormalizeN();
 
 		// Select the ferns with the highest likelihood
@@ -144,7 +144,7 @@ public class TldDetection<T extends ImageGray<T>> {
 		// From the remaining regions, score using the template algorithm
 		computeTemplateConfidence();
 
-		if( candidateDetections.size == 0 ) {
+		if (candidateDetections.size == 0) {
 			return;
 		}
 
@@ -152,7 +152,7 @@ public class TldDetection<T extends ImageGray<T>> {
 		nonmax.process(candidateDetections, localMaximums);
 
 		best = selectBest();
-		if( best != null ) {
+		if (best != null) {
 			ambiguous = checkAmbiguous(best);
 
 			success = true;
@@ -164,14 +164,14 @@ public class TldDetection<T extends ImageGray<T>> {
 	 */
 	protected void computeTemplateConfidence() {
 		double max = 0;
-		for( int i = 0; i < fernRegions.size(); i++ ) {
+		for (int i = 0; i < fernRegions.size(); i++) {
 			ImageRectangle region = fernRegions.get(i);
 
 			double confidence = template.computeConfidence(region);
 
-			max = Math.max(max,confidence);
+			max = Math.max(max, confidence);
 
-			if( confidence < config.confidenceThresholdUpper)
+			if (confidence < config.confidenceThresholdUpper)
 				continue;
 			TldRegion r = candidateDetections.grow();
 			r.connections = 0;
@@ -186,29 +186,29 @@ public class TldDetection<T extends ImageGray<T>> {
 	 *
 	 * NOTE: This is a big change from the original paper
 	 */
-	protected void selectBestRegionsFern(double totalP, double totalN) {
+	protected void selectBestRegionsFern( double totalP, double totalN ) {
 
-		for( int i = 0; i < fernInfo.size; i++ ) {
+		for (int i = 0; i < fernInfo.size; i++) {
 			TldRegionFernInfo info = fernInfo.get(i);
 
 			double probP = info.sumP/totalP;
 			double probN = info.sumN/totalN;
 
 			// only consider regions with a higher P likelihood
-			if( probP > probN ) {
+			if (probP > probN) {
 				// reward regions with a large difference between the P and N values
-				storageMetric.add(-(probP-probN));
-				storageRect.add( info.r );
+				storageMetric.add(-(probP - probN));
+				storageRect.add(info.r);
 			}
 		}
 
 		// Select the N regions with the highest fern probability
-		if( config.maximumCascadeConsider < storageMetric.size ) {
+		if (config.maximumCascadeConsider < storageMetric.size) {
 			int N = Math.min(config.maximumCascadeConsider, storageMetric.size);
 			storageIndexes.resize(storageMetric.size);
 
 			QuickSelect.selectIndex(storageMetric.data, N - 1, storageMetric.size, storageIndexes.data);
-			for( int i = 0; i < N; i++ ) {
+			for (int i = 0; i < N; i++) {
 				fernRegions.add(storageRect.get(storageIndexes.get(i)));
 			}
 		} else {
@@ -220,10 +220,10 @@ public class TldDetection<T extends ImageGray<T>> {
 		TldRegion best = null;
 		double bestConfidence = 0;
 
-		for( int i = 0; i < localMaximums.size; i++ ) {
+		for (int i = 0; i < localMaximums.size; i++) {
 			TldRegion r = localMaximums.get(i);
 
-			if( r.confidence > bestConfidence ) {
+			if (r.confidence > bestConfidence) {
 				bestConfidence = r.confidence;
 				best = r;
 			}
@@ -235,13 +235,13 @@ public class TldDetection<T extends ImageGray<T>> {
 	private boolean checkAmbiguous( TldRegion best ) {
 		double thresh = best.confidence*0.9;
 
-		for( int i = 0; i < localMaximums.size; i++ ) {
+		for (int i = 0; i < localMaximums.size; i++) {
 			TldRegion r = localMaximums.get(i);
 
-			if( r.confidence >= thresh ) {
-				double overlap = helper.computeOverlap(r.rect,best.rect);
+			if (r.confidence >= thresh) {
+				double overlap = helper.computeOverlap(r.rect, best.rect);
 
-				if( overlap <= config.overlapLower )  {
+				if (overlap <= config.overlapLower) {
 					ambiguousRegions.add(r.rect);
 				}
 			}
@@ -288,6 +288,7 @@ public class TldDetection<T extends ImageGray<T>> {
 
 	/**
 	 * Rectangles selected by the fern classifier as candidates
+	 *
 	 * @return List of rectangles
 	 */
 	public List<ImageRectangle> getSelectedFernRectangles() {

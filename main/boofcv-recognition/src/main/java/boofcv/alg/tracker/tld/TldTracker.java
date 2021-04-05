@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -60,40 +60,40 @@ import java.util.Random;
  * <p>
  * [1] Zdenek Kalal, "Tracking-Learning-Detection" University of Surrey, April 2011 Phd Thesis.
  * </p>
+ *
  * @author Peter Abeles
  */
 public class TldTracker<T extends ImageGray<T>, D extends ImageGray<D>> {
-
 	// specified configuration parameters for the tracker
-	private ConfigTld config;
+	private final ConfigTld config;
 
 	// selected region for output
-	private Rectangle2D_F64 targetRegion = new Rectangle2D_F64();
+	private final Rectangle2D_F64 targetRegion = new Rectangle2D_F64();
 
 	// region selected by KLT tracker
 	// NOTE: The tracker updates a pointing point region.  Rounding to the closest integer rectangle introduces errors
 	//       which can build up.
-	private Rectangle2D_F64 trackerRegion = new Rectangle2D_F64();
-	private ImageRectangle trackerRegion_I32 = new ImageRectangle();
+	private final Rectangle2D_F64 trackerRegion = new Rectangle2D_F64();
+	private final ImageRectangle trackerRegion_I32 = new ImageRectangle();
 
 	// Region used inside detection cascade
-	private DogArray<ImageRectangle> cascadeRegions = new DogArray<>(ImageRectangle::new);
+	private final DogArray<ImageRectangle> cascadeRegions = new DogArray<>(ImageRectangle::new);
 
 	// Image pyramid of input image
 	private PyramidDiscrete<T> imagePyramid;
 
 	// Tracks features inside the current region
-	private TldRegionTracker<T,D> tracking;
+	private final TldRegionTracker<T, D> tracking;
 	// Adjusts the region using track information
-	private TldAdjustRegion adjustRegion;
+	private final TldAdjustRegion adjustRegion;
 	// Detects rectangles: Removes candidates which lack texture
-	private TldVarianceFilter<T> variance;
+	private final TldVarianceFilter<T> variance;
 	// Detects rectangles: Removes candidates don't match the fern descriptors
-	private TldFernClassifier<T> fern;
+	private final TldFernClassifier<T> fern;
 	// Detects rectangles: Removes candidates don't match NCC descriptors
-	private TldTemplateMatching<T> template;
+	private final TldTemplateMatching<T> template;
 	// code for detection cascade
-	private TldDetection<T> detection;
+	private final TldDetection<T> detection;
 
 	// did tracking totally fail and it needs to reacquire a track?
 	private boolean reacquiring;
@@ -106,7 +106,7 @@ public class TldTracker<T extends ImageGray<T>, D extends ImageGray<D>> {
 	// area of the previous track before it lost track
 	private double previousTrackArea;
 
-	private TldLearning<T> learning;
+	private final TldLearning<T> learning;
 
 	// is learning on or off
 	private boolean performLearning = true;
@@ -116,9 +116,9 @@ public class TldTracker<T extends ImageGray<T>, D extends ImageGray<D>> {
 	 *
 	 * @param config Configuration class which specifies the tracker's behavior
 	 */
-	public TldTracker( ConfigTld config ,
-					   InterpolatePixelS<T> interpolate , ImageGradient<T,D> gradient ,
-					   Class<T> imageType , Class<D> derivType) {
+	public TldTracker( ConfigTld config,
+					   InterpolatePixelS<T> interpolate, ImageGradient<T, D> gradient,
+					   Class<T> imageType, Class<D> derivType ) {
 		this.config = config;
 
 		Random rand = new Random(config.randomSeed);
@@ -146,20 +146,20 @@ public class TldTracker<T extends ImageGray<T>, D extends ImageGray<D>> {
 	 * @param x1 Bottom-right corner of rectangle. x-axis
 	 * @param y1 Bottom-right corner of rectangle. y-axis
 	 */
-	public void initialize( T image , int x0 , int y0 , int x1 , int y1 ) {
+	public void initialize( T image, int x0, int y0, int x1, int y1 ) {
 
-		if( imagePyramid == null ||
-				imagePyramid.getInputWidth() != image.width || imagePyramid.getInputHeight() != image.height ) {
-			int minSize = (config.trackerFeatureRadius*2+1)*5;
+		if (imagePyramid == null ||
+				imagePyramid.getInputWidth() != image.width || imagePyramid.getInputHeight() != image.height) {
+			int minSize = (config.trackerFeatureRadius*2 + 1)*5;
 			ConfigDiscreteLevels configLevels = ConfigDiscreteLevels.minSize(minSize);
-			imagePyramid = FactoryPyramid.discreteGaussian(configLevels,-1,1,true,image.getImageType());
+			imagePyramid = FactoryPyramid.discreteGaussian(configLevels, -1, 1, true, image.getImageType());
 		}
 		imagePyramid.process(image);
 
 		reacquiring = false;
 
 		targetRegion.setTo(x0, y0, x1, y1);
-		createCascadeRegion(image.width,image.height);
+		createCascadeRegion(image.width, image.height);
 
 		template.reset();
 		fern.reset();
@@ -168,7 +168,7 @@ public class TldTracker<T extends ImageGray<T>, D extends ImageGray<D>> {
 		variance.setImage(image);
 		template.setImage(image);
 		fern.setImage(image);
-		adjustRegion.init(image.width,image.height);
+		adjustRegion.init(image.width, image.height);
 
 		learning.initialLearning(targetRegion, cascadeRegions);
 		strongMatch = true;
@@ -181,64 +181,63 @@ public class TldTracker<T extends ImageGray<T>, D extends ImageGray<D>> {
 	 * Move the track region but keep the same aspect ratio as it had before
 	 * So scale the region and re-center it
 	 */
-	public void setTrackerLocation( int x0 , int y0 , int x1 , int y1 ) {
+	public void setTrackerLocation( int x0, int y0, int x1, int y1 ) {
 
-		int width = x1-x0;
-		int height = y1-y0;
+		int width = x1 - x0;
+		int height = y1 - y0;
 
 		// change change in scale
 		double scale = (width/targetRegion.getWidth() + height/targetRegion.getHeight())/2.0;
 
 		// new center location
-		double centerX = (x0+x1)/2.0;
-		double centerY = (y0+y1)/2.0;
+		double centerX = (x0 + x1)/2.0;
+		double centerY = (y0 + y1)/2.0;
 
-		targetRegion.p0.x = centerX-scale*targetRegion.getWidth()/2.0;
+		targetRegion.p0.x = centerX - scale*targetRegion.getWidth()/2.0;
 		targetRegion.p1.x = targetRegion.p0.x + scale*targetRegion.getWidth();
-		targetRegion.p0.y = centerY-scale*targetRegion.getHeight()/2.0;
+		targetRegion.p0.y = centerY - scale*targetRegion.getHeight()/2.0;
 		targetRegion.p1.y = targetRegion.p0.y + scale*targetRegion.getHeight();
 	}
-
 
 	/**
 	 * Creates a list containing all the regions which need to be tested
 	 */
-	private void createCascadeRegion( int imageWidth , int imageHeight ) {
+	private void createCascadeRegion( int imageWidth, int imageHeight ) {
 
 		cascadeRegions.reset();
 
-		int rectWidth = (int)(targetRegion.getWidth()+0.5);
-		int rectHeight = (int)(targetRegion.getHeight()+0.5);
+		int rectWidth = (int)(targetRegion.getWidth() + 0.5);
+		int rectHeight = (int)(targetRegion.getHeight() + 0.5);
 
-		for( int scaleInt = -config.scaleSpread; scaleInt <= config.scaleSpread; scaleInt++ ) {
+		for (int scaleInt = -config.scaleSpread; scaleInt <= config.scaleSpread; scaleInt++) {
 			// try several scales as specified in the paper
-			double scale = Math.pow(1.2,scaleInt);
+			double scale = Math.pow(1.2, scaleInt);
 
 			// the actual rectangular region being tested at this scale
 			int actualWidth = (int)(rectWidth*scale);
 			int actualHeight = (int)(rectHeight*scale);
 
 			// see if the region is too small or too large
-			if( actualWidth < config.detectMinimumSide || actualHeight < config.detectMinimumSide )
+			if (actualWidth < config.detectMinimumSide || actualHeight < config.detectMinimumSide)
 				continue;
 
-			if( actualWidth >= imageWidth || actualHeight >= imageHeight )
+			if (actualWidth >= imageWidth || actualHeight >= imageHeight)
 				continue;
 
 			// step size at this scale
 			int stepWidth = (int)(rectWidth*scale*0.1);
 			int stepHeight = (int)(rectHeight*scale*0.1);
 
-			if( stepWidth < 1 ) stepWidth = 1;
-			if( stepHeight < 1 ) stepHeight = 1;
+			if (stepWidth < 1) stepWidth = 1;
+			if (stepHeight < 1) stepHeight = 1;
 
 			// maximum allowed values
-			int maxX = imageWidth-actualWidth;
-			int maxY = imageHeight-actualHeight;
+			int maxX = imageWidth - actualWidth;
+			int maxY = imageHeight - actualHeight;
 
 			// start at (1,1).  Otherwise a more complex algorithm needs to be used for integral images
-			for( int y0 = 1; y0 < maxY; y0 += stepHeight ) {
-				for( int x0 = 1; x0 < maxX; x0 += stepWidth) {
+			for (int y0 = 1; y0 < maxY; y0 += stepHeight) {
+				for (int x0 = 1; x0 < maxX; x0 += stepWidth) {
 					ImageRectangle r = cascadeRegions.grow();
 
 					r.x0 = x0;
@@ -266,10 +265,10 @@ public class TldTracker<T extends ImageGray<T>, D extends ImageGray<D>> {
 		variance.setImage(image);
 		fern.setImage(image);
 
-		if( reacquiring ) {
+		if (reacquiring) {
 			// It can reinitialize if there is a single detection
 			detection.detectionCascade(cascadeRegions);
-			if( detection.isSuccess() && !detection.isAmbiguous() ) {
+			if (detection.isSuccess() && !detection.isAmbiguous()) {
 				TldRegion region = detection.getBest();
 
 				reacquiring = false;
@@ -281,7 +280,6 @@ public class TldTracker<T extends ImageGray<T>, D extends ImageGray<D>> {
 				tracking.initialize(imagePyramid);
 
 				checkNewTrackStrong(region.confidence);
-
 			} else {
 				success = false;
 			}
@@ -294,19 +292,18 @@ public class TldTracker<T extends ImageGray<T>, D extends ImageGray<D>> {
 			trackingWorked &= adjustRegion.process(tracking.getPairs(), trackerRegion);
 			TldHelperFunctions.convertRegion(trackerRegion, trackerRegion_I32);
 
-			if( hypothesisFusion( trackingWorked , detection.isSuccess() ) ) {
+			if (hypothesisFusion(trackingWorked, detection.isSuccess())) {
 				// if it found a hypothesis and it is valid for learning, then learn
-				if( valid && performLearning ) {
+				if (valid && performLearning) {
 					learning.updateLearning(targetRegion);
 				}
-
 			} else {
 				reacquiring = true;
 				success = false;
 			}
 		}
 
-		if( strongMatch ) {
+		if (strongMatch) {
 			previousTrackArea = targetRegion.area();
 		}
 
@@ -318,8 +315,8 @@ public class TldTracker<T extends ImageGray<T>, D extends ImageGray<D>> {
 		// see if there is very high confidence of a match
 		strongMatch = confidence > config.confidenceThresholdStrong;
 		// otherwise see if it's the expected shape
-		if( !strongMatch ) {
-			double similarity = Math.abs( (targetRegion.area() - previousTrackArea)/previousTrackArea);
+		if (!strongMatch) {
+			double similarity = Math.abs((targetRegion.area() - previousTrackArea)/previousTrackArea);
 			strongMatch = similarity <= config.thresholdSimilarArea;
 		}
 	}
@@ -330,7 +327,7 @@ public class TldTracker<T extends ImageGray<T>, D extends ImageGray<D>> {
 	 * @param trackingWorked If the sequential tracker updated the track region successfully or not
 	 * @return true a hypothesis was found, false if it failed to find a hypothesis
 	 */
-	protected boolean hypothesisFusion( boolean trackingWorked , boolean detectionWorked ) {
+	protected boolean hypothesisFusion( boolean trackingWorked, boolean detectionWorked ) {
 
 		valid = false;
 
@@ -339,19 +336,19 @@ public class TldTracker<T extends ImageGray<T>, D extends ImageGray<D>> {
 
 		double confidenceTarget;
 
-		if( trackingWorked ) {
+		if (trackingWorked) {
 
 			// get the scores from tracking and detection
 			double scoreTrack = template.computeConfidence(trackerRegion_I32);
 			double scoreDetected = 0;
 
-			if( uniqueDetection ) {
+			if (uniqueDetection) {
 				scoreDetected = detectedRegion.confidence;
 			}
 
 			double adjustment = strongMatch ? 0.07 : 0.02;
 
-			if( uniqueDetection && scoreDetected > scoreTrack + adjustment ) {
+			if (uniqueDetection && scoreDetected > scoreTrack + adjustment) {
 				// if there is a unique detection and it has higher confidence than the
 				// track region, use the detected region
 				TldHelperFunctions.convertRegion(detectedRegion.rect, targetRegion);
@@ -359,7 +356,6 @@ public class TldTracker<T extends ImageGray<T>, D extends ImageGray<D>> {
 
 				// if it's far away from the current track, re-evaluate if it's a strongMatch
 				checkNewTrackStrong(scoreDetected);
-
 			} else {
 				// Otherwise use the tracker region
 				targetRegion.setTo(trackerRegion);
@@ -368,11 +364,11 @@ public class TldTracker<T extends ImageGray<T>, D extends ImageGray<D>> {
 				strongMatch |= confidenceTarget > config.confidenceThresholdStrong;
 
 				// see if the most likely detected region overlaps the track region
-				if( strongMatch && confidenceTarget >= config.confidenceThresholdLower )  {
+				if (strongMatch && confidenceTarget >= config.confidenceThresholdLower) {
 					valid = true;
 				}
 			}
-		} else if( uniqueDetection ) {
+		} else if (uniqueDetection) {
 			// just go with the best detected region
 			detectedRegion = detection.getBest();
 			TldHelperFunctions.convertRegion(detectedRegion.rect, targetRegion);
@@ -387,22 +383,23 @@ public class TldTracker<T extends ImageGray<T>, D extends ImageGray<D>> {
 
 	/**
 	 * Selects the scale for the image pyramid based on image size and feature size
+	 *
 	 * @return scales for image pyramid
 	 */
-	public static int[] selectPyramidScale( int imageWidth , int imageHeight, int minSize ) {
-		int w = Math.max(imageWidth,imageHeight);
+	public static int[] selectPyramidScale( int imageWidth, int imageHeight, int minSize ) {
+		int w = Math.max(imageWidth, imageHeight);
 
 		int maxScale = w/minSize;
 		int n = 1;
 		int scale = 1;
-		while( scale*2 < maxScale ) {
+		while (scale*2 < maxScale) {
 			n++;
 			scale *= 2;
 		}
 
 		int[] ret = new int[n];
 		scale = 1;
-		for( int i = 0; i < n; i++ ) {
+		for (int i = 0; i < n; i++) {
 			ret[i] = scale;
 			scale *= 2;
 		}
@@ -414,7 +411,7 @@ public class TldTracker<T extends ImageGray<T>, D extends ImageGray<D>> {
 		return performLearning;
 	}
 
-	public void setPerformLearning(boolean performLearning) {
+	public void setPerformLearning( boolean performLearning ) {
 		this.performLearning = performLearning;
 	}
 
@@ -424,6 +421,7 @@ public class TldTracker<T extends ImageGray<T>, D extends ImageGray<D>> {
 
 	/**
 	 * Returns the estimated location of the target in the current image
+	 *
 	 * @return Location of the target
 	 */
 	public Rectangle2D_F64 getTargetRegion() {

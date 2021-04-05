@@ -36,17 +36,15 @@ import org.ddogleg.struct.DogArray;
 public class TldAdjustRegion {
 
 	// used for estimating motion from track locations
-	private LeastMedianOfSquares<ScaleTranslate2D,AssociatedPair> estimateMotion;
+	private LeastMedianOfSquares<ScaleTranslate2D, AssociatedPair> estimateMotion;
 
 	int imageWidth;
 	int imageHeight;
 
 	/**
-	 *
 	 * @param numCycles Number of iterations in robust motion estimation.  Try 50.
 	 */
 	public TldAdjustRegion( int numCycles ) {
-
 		ModelManager<ScaleTranslate2D> manager = new ModelManagerScaleTranslate2D();
 
 		estimateMotion = new LeastMedianOfSquares<>(123123, numCycles, Double.MAX_VALUE,
@@ -54,7 +52,7 @@ public class TldAdjustRegion {
 		estimateMotion.setModel(GenerateScaleTranslate2D::new, DistanceScaleTranslate2DSq::new);
 	}
 
-	public void init( int imageWidth , int imageHeight ) {
+	public void init( int imageWidth, int imageHeight ) {
 		this.imageWidth = imageWidth;
 		this.imageHeight = imageHeight;
 	}
@@ -66,19 +64,19 @@ public class TldAdjustRegion {
 	 * @param targetRectangle (Input) current location of rectangle.  (output) adjusted location
 	 * @return true if successful
 	 */
-	public boolean process( DogArray<AssociatedPair> pairs , Rectangle2D_F64 targetRectangle ) {
+	public boolean process( DogArray<AssociatedPair> pairs, Rectangle2D_F64 targetRectangle ) {
 		// estimate how the rectangle has changed and update it
-		if( !estimateMotion.process(pairs.toList()) )
+		if (!estimateMotion.process(pairs.toList()))
 			return false;
 
 		ScaleTranslate2D motion = estimateMotion.getModelParameters();
 
-		adjustRectangle(targetRectangle,motion);
+		adjustRectangle(targetRectangle, motion);
 
-		if( targetRectangle.p0.x < 0 || targetRectangle.p0.y < 0 )
+		if (targetRectangle.p0.x < 0 || targetRectangle.p0.y < 0)
 			return false;
 
-		if( targetRectangle.p1.x >= imageWidth || targetRectangle.p1.y >= imageHeight )
+		if (targetRectangle.p1.x >= imageWidth || targetRectangle.p1.y >= imageHeight)
 			return false;
 
 		return true;
@@ -87,7 +85,7 @@ public class TldAdjustRegion {
 	/**
 	 * Estimate motion of points inside the rectangle and updates the rectangle using the found motion.
 	 */
-	protected void adjustRectangle( Rectangle2D_F64 rect , ScaleTranslate2D motion ) {
+	protected void adjustRectangle( Rectangle2D_F64 rect, ScaleTranslate2D motion ) {
 		rect.p0.x = rect.p0.x*motion.scale + motion.transX;
 		rect.p0.y = rect.p0.y*motion.scale + motion.transY;
 		rect.p1.x = rect.p1.x*motion.scale + motion.transX;

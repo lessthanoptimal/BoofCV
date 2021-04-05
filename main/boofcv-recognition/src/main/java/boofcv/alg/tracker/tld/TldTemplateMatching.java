@@ -82,7 +82,6 @@ public class TldTemplateMatching<T extends ImageGray<T>> {
 	 * @param positive if it is a positive or negative example
 	 */
 	public void addDescriptor( boolean positive, ImageRectangle rect ) {
-
 		addDescriptor(positive, rect.x0, rect.y0, rect.x1, rect.y1);
 	}
 
