@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -19,13 +19,14 @@
 package boofcv.alg.tracker.sfot;
 
 import boofcv.alg.tracker.klt.ConfigKlt;
+import boofcv.struct.Configuration;
 
 /**
- * fContains configuration parameters for {@link SparseFlowObjectTracker}.
+ * Contains configuration parameters for {@link SparseFlowObjectTracker}.
  *
  * @author Peter Abeles
  */
-public class SfotConfig {
+public class SfotConfig implements Configuration {
 
 	/**
 	 * Random seed used by random number generator
@@ -41,7 +42,6 @@ public class SfotConfig {
 	public double robustMaxError = 10;
 	public int trackerFeatureRadius = 5;
 
-
 	/**
 	 * Number of points it samples along one side of the grid.
 	 */
@@ -55,10 +55,24 @@ public class SfotConfig {
 	/**
 	 * Basic parameters for tracker.  KltConfig.createDefault() with maxIterations = 50 is suggested.
 	 */
-	public ConfigKlt trackerConfig;
+	public final ConfigKlt trackerConfig;
 
 	public SfotConfig() {
 		trackerConfig = new ConfigKlt();
 		trackerConfig.maxIterations = 50;
+	}
+
+	public void setTo(SfotConfig src) {
+		this.randSeed = src.randSeed;
+		this.robustCycles = src.robustCycles;
+		this.robustMaxError = src.robustMaxError;
+		this.trackerFeatureRadius = src.trackerFeatureRadius;
+		this.numberOfSamples = src.numberOfSamples;
+		this.maximumErrorFB = src.maximumErrorFB;
+		this.trackerConfig.setTo(src.trackerConfig);
+	}
+
+	@Override public void checkValidity() {
+		trackerConfig.checkValidity();
 	}
 }

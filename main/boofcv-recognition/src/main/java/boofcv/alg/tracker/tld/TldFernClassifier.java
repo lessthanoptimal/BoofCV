@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -61,8 +61,8 @@ public class TldFernClassifier<T extends ImageGray<T>> {
 	 * @param fernLearnNoise The noise's standard deviation
 	 * @param interpolate Interpolation function for the image
 	 */
-	public TldFernClassifier( Random rand , int numFerns , int descriptorSize ,
-							  int numLearnRandom , float fernLearnNoise ,
+	public TldFernClassifier( Random rand, int numFerns, int descriptorSize,
+							  int numLearnRandom, float fernLearnNoise,
 							  InterpolatePixelS<T> interpolate ) {
 
 		this.rand = rand;
@@ -74,8 +74,8 @@ public class TldFernClassifier<T extends ImageGray<T>> {
 		managers = new TldFernManager[numFerns];
 
 		// create random ferns
-		for( int i = 0; i < numFerns; i++ ) {
-			ferns[i] = new TldFernDescription(rand,descriptorSize);
+		for (int i = 0; i < numFerns; i++) {
+			ferns[i] = new TldFernDescription(rand, descriptorSize);
 			managers[i] = new TldFernManager(descriptorSize);
 		}
 	}
@@ -87,7 +87,7 @@ public class TldFernClassifier<T extends ImageGray<T>> {
 	 * Discard all information on fern values and their probabilities
 	 */
 	public void reset() {
-		for( int i = 0; i < managers.length; i++ )
+		for (int i = 0; i < managers.length; i++)
 			managers[i].reset();
 	}
 
@@ -96,27 +96,27 @@ public class TldFernClassifier<T extends ImageGray<T>> {
 	 *
 	 * @param gray Input image.
 	 */
-	public void setImage(T gray) {
+	public void setImage( T gray ) {
 		interpolate.setImage(gray);
 	}
 
 	/**
 	 * Learns a fern from the specified region.  No noise is added.
 	 */
-	public void learnFern(boolean positive, ImageRectangle r) {
+	public void learnFern( boolean positive, ImageRectangle r ) {
 
 		float rectWidth = r.getWidth();
 		float rectHeight = r.getHeight();
 
-		float c_x = r.x0+(rectWidth-1)/2f;
-		float c_y = r.y0+(rectHeight-1)/2f;
+		float c_x = r.x0 + (rectWidth - 1)/2f;
+		float c_y = r.y0 + (rectHeight - 1)/2f;
 
-		for( int i = 0; i < ferns.length; i++ ) {
+		for (int i = 0; i < ferns.length; i++) {
 
 			// first learn it with no noise
-			int value = computeFernValue(c_x, c_y, rectWidth, rectHeight,ferns[i]);
+			int value = computeFernValue(c_x, c_y, rectWidth, rectHeight, ferns[i]);
 			TldFernFeature f = managers[i].lookupFern(value);
-			increment(f,positive);
+			increment(f, positive);
 		}
 	}
 
@@ -124,25 +124,25 @@ public class TldFernClassifier<T extends ImageGray<T>> {
 	 * Computes the value for each fern inside the region and update's their P and N value.  Noise is added
 	 * to the image measurements to take in account the variability.
 	 */
-	public void learnFernNoise(boolean positive, ImageRectangle r) {
+	public void learnFernNoise( boolean positive, ImageRectangle r ) {
 
 		float rectWidth = r.getWidth();
 		float rectHeight = r.getHeight();
 
-		float c_x = r.x0+(rectWidth-1)/2.0f;
-		float c_y = r.y0+(rectHeight-1)/2.0f;
+		float c_x = r.x0 + (rectWidth - 1)/2.0f;
+		float c_y = r.y0 + (rectHeight - 1)/2.0f;
 
-		for( int i = 0; i < ferns.length; i++ ) {
+		for (int i = 0; i < ferns.length; i++) {
 
 			// first learn it with no noise
-			int value = computeFernValue(c_x, c_y, rectWidth, rectHeight,ferns[i]);
+			int value = computeFernValue(c_x, c_y, rectWidth, rectHeight, ferns[i]);
 			TldFernFeature f = managers[i].lookupFern(value);
-			increment(f,positive);
+			increment(f, positive);
 
-			for( int j = 0; j < numLearnRandom; j++ ) {
-				value = computeFernValueRand(c_x, c_y, rectWidth, rectHeight,ferns[i]);
+			for (int j = 0; j < numLearnRandom; j++) {
+				value = computeFernValueRand(c_x, c_y, rectWidth, rectHeight, ferns[i]);
 				f = managers[i].lookupFern(value);
-				increment(f,positive);
+				increment(f, positive);
 			}
 		}
 	}
@@ -151,14 +151,14 @@ public class TldFernClassifier<T extends ImageGray<T>> {
 	 * Increments the P and N value for a fern.  Also updates the maxP and maxN statistics so that it
 	 * knows when to re-normalize data structures.
 	 */
-	private void increment( TldFernFeature f , boolean positive ) {
-		if( positive ) {
+	private void increment( TldFernFeature f, boolean positive ) {
+		if (positive) {
 			f.incrementP();
-			if( f.numP > maxP )
+			if (f.numP > maxP)
 				maxP = f.numP;
 		} else {
 			f.incrementN();
-			if( f.numN > maxN )
+			if (f.numN > maxN)
 				maxN = f.numN;
 		}
 	}
@@ -166,6 +166,7 @@ public class TldFernClassifier<T extends ImageGray<T>> {
 	/**
 	 * For the specified regions, computes the values of each fern inside of it and then retrives their P and N values.
 	 * The sum of which is stored inside of info.
+	 *
 	 * @param info (Input) Location/Rectangle (output) P and N values
 	 * @return true if a known value for any of the ferns was observed in this region
 	 */
@@ -176,19 +177,19 @@ public class TldFernClassifier<T extends ImageGray<T>> {
 		float rectWidth = r.getWidth();
 		float rectHeight = r.getHeight();
 
-		float c_x = r.x0+(rectWidth-1)/2.0f;
-		float c_y = r.y0+(rectHeight-1)/2.0f;
+		float c_x = r.x0 + (rectWidth - 1)/2.0f;
+		float c_y = r.y0 + (rectHeight - 1)/2.0f;
 
 		int sumP = 0;
 		int sumN = 0;
 
-		for( int i = 0; i < ferns.length; i++ ) {
+		for (int i = 0; i < ferns.length; i++) {
 			TldFernDescription fern = ferns[i];
 
 			int value = computeFernValue(c_x, c_y, rectWidth, rectHeight, fern);
 
 			TldFernFeature f = managers[i].table[value];
-			if( f != null ) {
+			if (f != null) {
 				sumP += f.numP;
 				sumN += f.numN;
 			}
@@ -203,22 +204,22 @@ public class TldFernClassifier<T extends ImageGray<T>> {
 	/**
 	 * Computes the value of the specified fern at the specified location in the image.
 	 */
-	protected int computeFernValue(float c_x, float c_y, float rectWidth , float rectHeight , TldFernDescription fern ) {
+	protected int computeFernValue( float c_x, float c_y, float rectWidth, float rectHeight, TldFernDescription fern ) {
 
 		rectWidth -= 1;
 		rectHeight -= 1;
 
 		int desc = 0;
-		for( int i = 0; i < fern.pairs.length; i++ ) {
+		for (int i = 0; i < fern.pairs.length; i++) {
 			Point2D_F32 p_a = fern.pairs[i].a;
 			Point2D_F32 p_b = fern.pairs[i].b;
 
-			float valA = interpolate.get_fast(c_x + p_a.x * rectWidth, c_y + p_a.y * rectHeight);
-			float valB = interpolate.get_fast(c_x + p_b.x * rectWidth, c_y + p_b.y * rectHeight);
+			float valA = interpolate.get_fast(c_x + p_a.x*rectWidth, c_y + p_a.y*rectHeight);
+			float valB = interpolate.get_fast(c_x + p_b.x*rectWidth, c_y + p_b.y*rectHeight);
 
 			desc *= 2;
 
-			if( valA < valB ) {
+			if (valA < valB) {
 				desc += 1;
 			}
 		}
@@ -229,25 +230,25 @@ public class TldFernClassifier<T extends ImageGray<T>> {
 	/**
 	 * Computes the value of a fern after adding noise to the image being sampled.
 	 */
-	protected int computeFernValueRand(float c_x, float c_y, float rectWidth , float rectHeight , TldFernDescription fern ) {
+	protected int computeFernValueRand( float c_x, float c_y, float rectWidth, float rectHeight, TldFernDescription fern ) {
 
 		rectWidth -= 1;
 		rectHeight -= 1;
 
 		int desc = 0;
-		for( int i = 0; i < fern.pairs.length; i++ ) {
+		for (int i = 0; i < fern.pairs.length; i++) {
 			Point2D_F32 p_a = fern.pairs[i].a;
 			Point2D_F32 p_b = fern.pairs[i].b;
 
-			float valA = interpolate.get_fast(c_x + p_a.x * rectWidth, c_y + p_a.y * rectHeight);
-			float valB = interpolate.get_fast(c_x + p_b.x * rectWidth, c_y + p_b.y * rectHeight);
+			float valA = interpolate.get_fast(c_x + p_a.x*rectWidth, c_y + p_a.y*rectHeight);
+			float valB = interpolate.get_fast(c_x + p_b.x*rectWidth, c_y + p_b.y*rectHeight);
 
 			valA += (float)rand.nextGaussian()*fernLearnNoise;
 			valB += (float)rand.nextGaussian()*fernLearnNoise;
 
 			desc *= 2;
 
-			if( valA < valB ) {
+			if (valA < valB) {
 				desc += 1;
 			}
 		}
@@ -261,11 +262,11 @@ public class TldFernClassifier<T extends ImageGray<T>> {
 	public void renormalizeP() {
 		int targetMax = maxP/20;
 
-		for( int i = 0; i < managers.length; i++ ) {
+		for (int i = 0; i < managers.length; i++) {
 			TldFernManager m = managers[i];
-			for( int j = 0; j < m.table.length; j++ ) {
+			for (int j = 0; j < m.table.length; j++) {
 				TldFernFeature f = m.table[j];
-				if( f == null )
+				if (f == null)
 					continue;
 				f.numP = targetMax*f.numP/maxP;
 			}
@@ -279,11 +280,11 @@ public class TldFernClassifier<T extends ImageGray<T>> {
 	public void renormalizeN() {
 		int targetMax = maxN/20;
 
-		for( int i = 0; i < managers.length; i++ ) {
+		for (int i = 0; i < managers.length; i++) {
 			TldFernManager m = managers[i];
-			for( int j = 0; j < m.table.length; j++ ) {
+			for (int j = 0; j < m.table.length; j++) {
 				TldFernFeature f = m.table[j];
-				if( f == null )
+				if (f == null)
 					continue;
 				f.numN = targetMax*f.numN/maxN;
 			}

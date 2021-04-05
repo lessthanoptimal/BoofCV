@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -44,17 +44,17 @@ public class TldVarianceFilter<T extends ImageGray<T>> {
 	/**
 	 * Constructor which specifies the input image type.
 	 *
-	 * @param imageType  Either {@link GrayU8} or {@link GrayF32}
+	 * @param imageType Either {@link GrayU8} or {@link GrayF32}
 	 */
 	public TldVarianceFilter( Class<T> imageType ) {
 
 		// declare integral images.
-		if(GeneralizedImageOps.isFloatingPoint(imageType) ) {
-			integral = new GrayF32(1,1);
-			integralSq = new GrayF64(1,1);
+		if (GeneralizedImageOps.isFloatingPoint(imageType)) {
+			integral = new GrayF32(1, 1);
+			integralSq = new GrayF64(1, 1);
 		} else {
-			integral = new GrayS32(1,1);
-			integralSq = new GrayS64(1,1);
+			integral = new GrayS32(1, 1);
+			integralSq = new GrayS64(1, 1);
 		}
 	}
 
@@ -66,15 +66,15 @@ public class TldVarianceFilter<T extends ImageGray<T>> {
 	 *
 	 * @param gray input image
 	 */
-	public void setImage(T gray) {
-		integral.reshape(gray.width,gray.height);
-		integralSq.reshape(gray.width,gray.height);
+	public void setImage( T gray ) {
+		integral.reshape(gray.width, gray.height);
+		integralSq.reshape(gray.width, gray.height);
 
-		GIntegralImageOps.transform(gray,integral);
-		if( gray.getDataType().isInteger())
-			transformSq((GrayU8)gray,(GrayS64)integralSq);
+		GIntegralImageOps.transform(gray, integral);
+		if (gray.getDataType().isInteger())
+			transformSq((GrayU8)gray, (GrayS64)integralSq);
 		else
-			transformSq((GrayF32)gray,(GrayF64)integralSq);
+			transformSq((GrayF32)gray, (GrayF64)integralSq);
 	}
 
 	/**
@@ -93,7 +93,7 @@ public class TldVarianceFilter<T extends ImageGray<T>> {
 	 */
 	public boolean checkVariance( ImageRectangle r ) {
 
-		double sigma2 = computeVariance(r.x0,r.y0,r.x1,r.y1);
+		double sigma2 = computeVariance(r.x0, r.y0, r.x1, r.y1);
 
 		return sigma2 >= thresholdLower;
 	}
@@ -103,11 +103,11 @@ public class TldVarianceFilter<T extends ImageGray<T>> {
 	 *
 	 * @return variance
 	 */
-	protected double computeVariance(int x0, int y0, int x1, int y1) {
+	protected double computeVariance( int x0, int y0, int x1, int y1 ) {
 		// can use unsafe operations here since x0 > 0 and y0 > 0
 		double square = GIntegralImageOps.block_unsafe(integralSq, x0 - 1, y0 - 1, x1 - 1, y1 - 1);
 
-		double area = (x1-x0)*(y1-y0);
+		double area = (x1 - x0)*(y1 - y0);
 		double mean = GIntegralImageOps.block_unsafe(integral, x0 - 1, y0 - 1, x1 - 1, y1 - 1)/area;
 
 		return square/area - mean*mean;
@@ -115,13 +115,14 @@ public class TldVarianceFilter<T extends ImageGray<T>> {
 
 	/**
 	 * Computes the variance inside the specified rectangle.
+	 *
 	 * @return variance
 	 */
-	protected double computeVarianceSafe(int x0, int y0, int x1, int y1) {
+	protected double computeVarianceSafe( int x0, int y0, int x1, int y1 ) {
 		// can use unsafe operations here since x0 > 0 and y0 > 0
 		double square = GIntegralImageOps.block_zero(integralSq, x0 - 1, y0 - 1, x1 - 1, y1 - 1);
 
-		double area = (x1-x0)*(y1-y0);
+		double area = (x1 - x0)*(y1 - y0);
 		double mean = GIntegralImageOps.block_zero(integral, x0 - 1, y0 - 1, x1 - 1, y1 - 1)/area;
 
 		return square/area - mean*mean;
@@ -130,19 +131,18 @@ public class TldVarianceFilter<T extends ImageGray<T>> {
 	/**
 	 * Integral image of pixel value squared. integer
 	 */
-	public static void transformSq(final GrayU8 input , final GrayS64 transformed )
-	{
+	public static void transformSq( final GrayU8 input, final GrayS64 transformed ) {
 		int indexSrc = input.startIndex;
 		int indexDst = transformed.startIndex;
 		int end = indexSrc + input.width;
 
 		long total = 0;
-		for( ; indexSrc < end; indexSrc++ ) {
-			int value = input.data[indexSrc]& 0xFF;
+		for (; indexSrc < end; indexSrc++) {
+			int value = input.data[indexSrc] & 0xFF;
 			transformed.data[indexDst++] = total += value*value;
 		}
 
-		for( int y = 1; y < input.height; y++ ) {
+		for (int y = 1; y < input.height; y++) {
 			indexSrc = input.startIndex + input.stride*y;
 			indexDst = transformed.startIndex + transformed.stride*y;
 			int indexPrev = indexDst - transformed.stride;
@@ -150,9 +150,9 @@ public class TldVarianceFilter<T extends ImageGray<T>> {
 			end = indexSrc + input.width;
 
 			total = 0;
-			for( ; indexSrc < end; indexSrc++ ) {
-				int value = input.data[indexSrc]& 0xFF;
-				total +=  value*value;
+			for (; indexSrc < end; indexSrc++) {
+				int value = input.data[indexSrc] & 0xFF;
+				total += value*value;
 				transformed.data[indexDst++] = transformed.data[indexPrev++] + total;
 			}
 		}
@@ -161,19 +161,18 @@ public class TldVarianceFilter<T extends ImageGray<T>> {
 	/**
 	 * Integral image of pixel value squared.  floating point
 	 */
-	public static void transformSq(final GrayF32 input , final GrayF64 transformed )
-	{
+	public static void transformSq( final GrayF32 input, final GrayF64 transformed ) {
 		int indexSrc = input.startIndex;
 		int indexDst = transformed.startIndex;
 		int end = indexSrc + input.width;
 
 		double total = 0;
-		for( ; indexSrc < end; indexSrc++ ) {
+		for (; indexSrc < end; indexSrc++) {
 			float value = input.data[indexSrc];
 			transformed.data[indexDst++] = total += value*value;
 		}
 
-		for( int y = 1; y < input.height; y++ ) {
+		for (int y = 1; y < input.height; y++) {
 			indexSrc = input.startIndex + input.stride*y;
 			indexDst = transformed.startIndex + transformed.stride*y;
 			int indexPrev = indexDst - transformed.stride;
@@ -181,9 +180,9 @@ public class TldVarianceFilter<T extends ImageGray<T>> {
 			end = indexSrc + input.width;
 
 			total = 0;
-			for( ; indexSrc < end; indexSrc++ ) {
+			for (; indexSrc < end; indexSrc++) {
 				float value = input.data[indexSrc];
-				total +=  value*value;
+				total += value*value;
 				transformed.data[indexDst++] = transformed.data[indexPrev++] + total;
 			}
 		}

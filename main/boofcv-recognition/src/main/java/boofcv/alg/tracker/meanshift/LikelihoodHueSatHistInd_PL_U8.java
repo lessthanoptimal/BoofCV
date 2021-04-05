@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -35,23 +35,22 @@ import georegression.struct.shapes.RectangleLength2D_I32;
  *
  * @author Peter Abeles
  */
-public class LikelihoodHueSatHistInd_PL_U8 implements PixelLikelihood<Planar<GrayU8>>
-{
+public class LikelihoodHueSatHistInd_PL_U8 implements PixelLikelihood<Planar<GrayU8>> {
 	// each band in the image
 	private GrayU8 imageRed;
 	private GrayU8 imageGreen;
 	private GrayU8 imageBlue;
 
 	// storage for RGB to HSV conversion
-	private float hsv[] = new float[3];
+	private float[] hsv = new float[3];
 
 	// the minimum value allowed
 	private float minimumValue;
 
 	// Hue has a range of 0 to 2*pi and this is a discretized histogram
-	protected float binsH[];
+	protected float[] binsH;
 	// Saturation has a range of 0 to 1 and this is a discretized histogram
-	protected float binsS[];
+	protected float[] binsS;
 
 	// size of the hue and saturation bins
 	protected float sizeH, sizeS;
@@ -62,11 +61,11 @@ public class LikelihoodHueSatHistInd_PL_U8 implements PixelLikelihood<Planar<Gra
 	 * @param maxPixelValue The maximum intensity value a pixel can take on.
 	 * @param numHistogramBins Number of bins in the Hue and Saturation histogram.
 	 */
-	public LikelihoodHueSatHistInd_PL_U8(int maxPixelValue, int numHistogramBins) {
-		minimumValue = (maxPixelValue+1)*0.01f;
+	public LikelihoodHueSatHistInd_PL_U8( int maxPixelValue, int numHistogramBins ) {
+		minimumValue = (maxPixelValue + 1)*0.01f;
 
-		binsH = new float[ numHistogramBins ];
-		binsS = new float[ numHistogramBins ];
+		binsH = new float[numHistogramBins];
+		binsS = new float[numHistogramBins];
 
 		// divide it by a number slightly larger than the max to avoid the special case where it is equal to the max
 		sizeH = (float)(2.001*Math.PI/numHistogramBins);
@@ -74,62 +73,61 @@ public class LikelihoodHueSatHistInd_PL_U8 implements PixelLikelihood<Planar<Gra
 	}
 
 	@Override
-	public void setImage(Planar<GrayU8> image) {
+	public void setImage( Planar<GrayU8> image ) {
 		imageRed = image.getBand(0);
 		imageGreen = image.getBand(1);
 		imageBlue = image.getBand(2);
 	}
 
 	@Override
-	public boolean isInBounds(int x, int y) {
-		return imageRed.isInBounds(x,y);
+	public boolean isInBounds( int x, int y ) {
+		return imageRed.isInBounds(x, y);
 	}
 
 	@Override
-	public void createModel(RectangleLength2D_I32 target) {
-
+	public void createModel( RectangleLength2D_I32 target ) {
 		float total = 0;
 
-		for( int y = 0; y < target.height; y++ ) {
-			int index = imageRed.startIndex + (y+target.y0)*imageRed.stride + target.x0;
-			for( int x = 0; x < target.width; x++ , index++ ) {
+		for (int y = 0; y < target.height; y++) {
+			int index = imageRed.startIndex + (y + target.y0)*imageRed.stride + target.x0;
+			for (int x = 0; x < target.width; x++, index++) {
 				int r = imageRed.data[index] & 0xFF;
 				int g = imageGreen.data[index] & 0xFF;
 				int b = imageBlue.data[index] & 0xFF;
 
-				ColorHsv.rgbToHsv(r,g,b,hsv);
+				ColorHsv.rgbToHsv(r, g, b, hsv);
 
-				if( hsv[2] < minimumValue )
+				if (hsv[2] < minimumValue)
 					continue;
 
-				binsH[ (int)(hsv[0] / sizeH) ]++;
-				binsS[ (int)(hsv[1] / sizeS) ]++;
+				binsH[(int)(hsv[0]/sizeH)]++;
+				binsS[(int)(hsv[1]/sizeS)]++;
 
 				total++;
 			}
 		}
 
 		// normalize the sum to one
-		for( int i = 0; i < binsH.length; i++ )  {
+		for (int i = 0; i < binsH.length; i++) {
 			binsH[i] /= total;
 			binsS[i] /= total;
 		}
 	}
 
 	@Override
-	public float compute(int x, int y) {
+	public float compute( int x, int y ) {
 
-		int index = imageRed.getIndex(x,y);
+		int index = imageRed.getIndex(x, y);
 
 		int r = imageRed.data[index] & 0xFF;
 		int g = imageGreen.data[index] & 0xFF;
 		int b = imageBlue.data[index] & 0xFF;
 
-		ColorHsv.rgbToHsv(r,g,b,hsv);
+		ColorHsv.rgbToHsv(r, g, b, hsv);
 
-		if( hsv[2] < minimumValue )
+		if (hsv[2] < minimumValue)
 			return 0f;
 
-		return binsH[ (int)(hsv[0] / sizeH) ]*binsS[ (int)(hsv[1] / sizeS) ];
+		return binsH[(int)(hsv[0]/sizeH)]*binsS[(int)(hsv[1]/sizeS)];
 	}
 }
