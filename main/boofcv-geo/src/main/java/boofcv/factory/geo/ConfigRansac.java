@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -18,6 +18,7 @@
 
 package boofcv.factory.geo;
 
+import boofcv.misc.BoofMiscOps;
 import boofcv.struct.Configuration;
 
 /**
@@ -39,7 +40,7 @@ public class ConfigRansac implements Configuration {
 	 */
 	public double inlierThreshold;
 
-	public ConfigRansac(int iterations, double inlierThreshold) {
+	public ConfigRansac( int iterations, double inlierThreshold ) {
 		this.iterations = iterations;
 		this.inlierThreshold = inlierThreshold;
 	}
@@ -49,7 +50,7 @@ public class ConfigRansac implements Configuration {
 
 	@Override
 	public void checkValidity() {
-
+		BoofMiscOps.checkTrue(iterations >= 0, "Must specify a non-negative number for number of iterations");
 	}
 
 	public void setTo( ConfigRansac src ) {

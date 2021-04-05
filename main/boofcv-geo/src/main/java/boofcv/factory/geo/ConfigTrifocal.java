@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -22,20 +22,20 @@ import boofcv.misc.ConfigConverge;
 import boofcv.struct.Configuration;
 
 /**
+ * Configuration for estimating {@link boofcv.struct.geo.TrifocalTensor}
+ *
  * @author Peter Abeles
  */
-public class ConfigTrifocal implements Configuration
-{
+public class ConfigTrifocal implements Configuration {
 	/**
 	 * Which method to use
 	 */
 	public EnumTrifocal which = EnumTrifocal.LINEAR_7;
 
-
 	/**
 	 * If an iterative method was selected, this specifies the convergence criteria
 	 */
-	public ConfigConverge converge = new ConfigConverge(1e-8,1e-8,10);
+	public ConfigConverge converge = new ConfigConverge(1e-8, 1e-8, 10);
 
 	public void setTo( ConfigTrifocal src ) {
 		this.which = src.which;
@@ -44,6 +44,6 @@ public class ConfigTrifocal implements Configuration
 
 	@Override
 	public void checkValidity() {
-
+		converge.checkValidity();
 	}
 }

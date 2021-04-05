@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -26,9 +26,19 @@ import boofcv.struct.Configuration;
  * @author Peter Abeles
  */
 public class ConfigConverge implements Configuration {
-
+	/**
+	 * Relative threshold for change in function value between iterations. 0 &le; ftol &le; 1.
+	 */
 	public double ftol;
+
+	/**
+	 * Absolute threshold for convergence based on the gradient's norm. 0 disables test. gtol &ge; 0.
+	 */
 	public double gtol;
+
+	/**
+	 * Maximum number of iterations. What is defined as an iteration is implementation specific.
+	 */
 	public int maxIterations;
 
 	public ConfigConverge( double ftol, double gtol, int maxIterations ) {
@@ -43,7 +53,7 @@ public class ConfigConverge implements Configuration {
 
 	public ConfigConverge() {}
 
-	public void set( double ftol, double gtol, int maxIterations ) {
+	public void setTo( double ftol, double gtol, int maxIterations ) {
 		this.ftol = ftol;
 		this.gtol = gtol;
 		this.maxIterations = maxIterations;
@@ -57,6 +67,9 @@ public class ConfigConverge implements Configuration {
 
 	@Override
 	public void checkValidity() {
+		BoofMiscOps.checkTrue(ftol >= 0.0 && ftol <= 1.0, "ftol is out of range");
+		BoofMiscOps.checkTrue(gtol >= 0.0, "gtol is out of range");
+
 		if( maxIterations < 0)
 			throw new IllegalArgumentException("Max iterations has to be set to a value more than or equal to zero");
 	}

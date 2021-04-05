@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -18,6 +18,7 @@
 
 package boofcv.factory.geo;
 
+import boofcv.misc.BoofMiscOps;
 import boofcv.struct.Configuration;
 
 /**
@@ -53,6 +54,9 @@ public class ConfigFundamental implements Configuration {
 
 	@Override
 	public void checkValidity() {
+		if (which == EnumFundamental.LINEAR_8)
+			return;
+		BoofMiscOps.checkTrue(numResolve > 0, "At least one point is required to handle ambiguity");
 	}
 
 	public enum ErrorModel {
