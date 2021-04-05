@@ -109,9 +109,10 @@ public class FactoryVisualOdometry {
 		DistancePlane2DToPixelSq distance = new DistancePlane2DToPixelSq();
 		GenerateSe2_PlanePtPixel generator = new GenerateSe2_PlanePtPixel();
 
+		// TODO add concurrent variant
 		ModelMatcherPost<Se2_F64, PlanePtPixel> motion =
 				new Ransac<>(2323, ransacIterations, ransacTOL, manager, PlanePtPixel.class);
-		motion.setModel(()->generator, ()->distance);
+		motion.setModel(() -> generator, () -> distance);
 
 		VisOdomMonoPlaneInfinity<T> alg =
 				new VisOdomMonoPlaneInfinity<>(thresholdAdd, thresholdRetire, inlierPixelTol, motion, tracker);
@@ -158,7 +159,6 @@ public class FactoryVisualOdometry {
 				ransacIterations, inlierGroundTol*inlierGroundTol, thresholdRetire,
 				absoluteMinimumTracks, respawnTrackFraction, respawnCoverageFraction, false, tracker, new Se2_F64());
 
-
 		VisOdomMonoOverheadMotion2D<T> alg =
 				new VisOdomMonoOverheadMotion2D<>(cellSize, maxCellsPerPixel, mapHeightFraction, motion2D, imageType);
 
@@ -196,9 +196,10 @@ public class FactoryVisualOdometry {
 		// Need to square the error RANSAC inliers
 		double ransacTOL = configVO.ransac.inlierThreshold*configVO.ransac.inlierThreshold;
 
+		// TODO add concurrent variant
 		Ransac<Se3_F64, Point2D3D> motion = new Ransac<>(
 				configVO.ransac.randSeed, configVO.ransac.iterations, ransacTOL, manager, Point2D3D.class);
-		motion.setModel(()->generator, ()->distance);
+		motion.setModel(() -> generator, () -> distance);
 
 		RefinePnP refine = null;
 
@@ -259,9 +260,10 @@ public class FactoryVisualOdometry {
 		// 1/2 a pixel tolerance for RANSAC inliers
 		double ransacTOL = inlierPixelTol*inlierPixelTol;
 
+		// TODO add concurrent variant
 		Ransac<Se3_F64, Point2D3D> motion = new Ransac<>(
 				2323, ransacIterations, ransacTOL, manager, Point2D3D.class);
-		motion.setModel(()->generator, ()->distance);
+		motion.setModel(() -> generator, () -> distance);
 
 		RefinePnP refine = null;
 
@@ -295,10 +297,11 @@ public class FactoryVisualOdometry {
 		// 1/2 a pixel tolerance for RANSAC inliers
 		double ransacTOL = configVO.ransac.inlierThreshold*configVO.ransac.inlierThreshold;
 
+		// TODO add concurrent variant
 		Ransac<Se3_F64, Point2D3D> motion = new Ransac<>(
 				configVO.ransac.randSeed, configVO.ransac.iterations, ransacTOL,
 				manager, Point2D3D.class);
-		motion.setModel(()->generator, ()->distance);
+		motion.setModel(() -> generator, () -> distance);
 
 		RefinePnP refine = null;
 
@@ -364,11 +367,11 @@ public class FactoryVisualOdometry {
 		// Pixel tolerance for RANSAC inliers - euclidean error squared from left + right images
 		double ransacTOL = 2*configVO.ransac.inlierThreshold*configVO.ransac.inlierThreshold;
 
-
+		// TODO add concurrent variant
 		ModelMatcherPost<Se3_F64, Stereo2D3D> motion = new Ransac<>(
 				configVO.ransac.randSeed, configVO.ransac.iterations, ransacTOL,
 				manager, Stereo2D3D.class);
-		motion.setModel(()->generator, ()->distanceStereo);
+		motion.setModel(() -> generator, () -> distanceStereo);
 
 		RefinePnPStereo refinePnP = null;
 
@@ -430,10 +433,11 @@ public class FactoryVisualOdometry {
 		// Pixel tolerance for RANSAC inliers - euclidean error squared from left + right images
 		double ransacTOL = 2*config.ransac.inlierThreshold*config.ransac.inlierThreshold;
 
+		// TODO add concurrent variant
 		ModelMatcherPost<Se3_F64, Stereo2D3D> motion =
 				new Ransac<>(config.ransac.randSeed, config.ransac.iterations, ransacTOL,
 						manager, Stereo2D3D.class);
-		motion.setModel(()->generator, ()->distanceStereo);
+		motion.setModel(() -> generator, () -> distanceStereo);
 		RefinePnPStereo refinePnP = null;
 
 		if (config.refineIterations > 0) {
