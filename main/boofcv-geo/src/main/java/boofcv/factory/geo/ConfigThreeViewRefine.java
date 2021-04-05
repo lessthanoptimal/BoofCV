@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -32,12 +32,12 @@ public class ConfigThreeViewRefine implements Configuration {
 	 * If true pixel coordinates will be normalized using {@link LowLevelMultiViewOps}. Set to false
 	 * only if pixels have already been scaled.
 	 */
-	public boolean normalizePixels=true;
+	public boolean normalizePixels = true;
 
 	/**
 	 * Convergence criteria
 	 */
-	public ConfigConverge converge = new ConfigConverge(1e-8,1e-8,100);
+	public ConfigConverge converge = new ConfigConverge(1e-8, 1e-8, 100);
 
 	/**
 	 * Specifies which algorithm to apply
@@ -52,7 +52,7 @@ public class ConfigThreeViewRefine implements Configuration {
 
 	@Override
 	public void checkValidity() {
-
+		converge.checkValidity();
 	}
 
 	public enum Algorithm {

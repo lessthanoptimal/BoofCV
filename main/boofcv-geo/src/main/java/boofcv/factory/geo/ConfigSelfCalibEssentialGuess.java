@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -30,19 +30,19 @@ import static boofcv.misc.BoofMiscOps.checkTrue;
  */
 public class ConfigSelfCalibEssentialGuess implements Configuration {
 	/** Specifies the lower and upper limit for focal lengths it will consider. Relative to image max(width,height) */
-	public double sampleMin=0.3,sampleMax=3;
+	public double sampleMin = 0.3, sampleMax = 3;
 
 	/** Number of focal length values it will sample for each camera. 200 is better but is slow */
-	public int numberOfSamples=50;
+	public int numberOfSamples = 50;
 
-	/** if true the focus is assumed to be the same for the first two images*/
+	/** if true the focus is assumed to be the same for the first two images */
 	public boolean fixedFocus = true;
 
 	@Override
 	public void checkValidity() {
-		checkTrue(sampleMin>0,"Minimum focal length must be more than 0");
-		checkTrue(sampleMin<sampleMax,"Minimum focal length must less than the maximum");
-		BoofMiscOps.checkTrue(numberOfSamples>=1);
+		checkTrue(sampleMin > 0, "Minimum focal length must be more than 0");
+		checkTrue(sampleMin < sampleMax, "Minimum focal length must less than the maximum");
+		BoofMiscOps.checkTrue(numberOfSamples >= 1);
 	}
 
 	public void setTo( ConfigSelfCalibEssentialGuess src ) {

@@ -73,12 +73,12 @@ class TestVisOdomBundleAdjustment extends BoofStandardJUnit {
 		}
 
 		// first test a negative. If should fail 1 iteration isn't enough to fully optimize
-		alg.bundle.configConverge.set(1e-6, 1e-6, 1);
+		alg.bundle.configConverge.setTo(1e-6, 1e-6, 1);
 		alg.optimize(null);
 		assertNotEquals(0.0, alg.bundle.sba.getFitScore(), 0.001);
 
 		// This should do much better
-		alg.bundle.configConverge.set(1e-6, 1e-6, 10);
+		alg.bundle.configConverge.setTo(1e-6, 1e-6, 10);
 //		alg.bundleAdjustment.setVerbose(System.out,0);
 		alg.optimize(null);
 		assertEquals(0.0, alg.bundle.sba.getFitScore(), 0.001);

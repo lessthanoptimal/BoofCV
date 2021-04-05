@@ -84,14 +84,15 @@ public class FactoryMultiViewRobust {
 		configPnP.checkValidity();
 		configLMedS.checkValidity();
 
-		Estimate1ofPnP estimatorPnP = FactoryMultiView.pnp_1(configPnP.which, configPnP.epnpIterations, configPnP.numResolve);
+		Estimate1ofPnP estimatorPnP = FactoryMultiView.pnp_1(
+				configPnP.which, configPnP.epnpIterations, configPnP.numResolve);
 
 		DistanceFromModelMultiView<Se3_F64, Point2D3D> distance = new PnPDistanceReprojectionSq();
 		ModelManagerSe3_F64 manager = new ModelManagerSe3_F64();
 		EstimatorToGenerator<Se3_F64, Point2D3D> generator = new EstimatorToGenerator<>(estimatorPnP);
 
-		LeastMedianOfSquaresMultiView<Se3_F64, Point2D3D> lmeds =
-				new LeastMedianOfSquaresMultiView<>(configLMedS.randSeed, configLMedS.totalCycles, manager, generator, distance);
+		LeastMedianOfSquaresMultiView<Se3_F64, Point2D3D> lmeds = new LeastMedianOfSquaresMultiView<>(
+				configLMedS.randSeed, configLMedS.totalCycles, manager, generator, distance);
 		lmeds.setErrorFraction(configLMedS.errorFraction);
 		return lmeds;
 	}
@@ -144,8 +145,8 @@ public class FactoryMultiViewRobust {
 	 * @param configLMedS Parameters for RANSAC.  Can't be null.
 	 * @return Robust Se3_F64 estimator
 	 */
-	public static ModelMatcherMultiview<Se3_F64, AssociatedPair> baselineLMedS( @Nullable ConfigEssential configEssential,
-																				ConfigLMedS configLMedS ) {
+	public static ModelMatcherMultiview<Se3_F64, AssociatedPair>
+	baselineLMedS( @Nullable ConfigEssential configEssential, ConfigLMedS configLMedS ) {
 		if (configEssential == null)
 			configEssential = new ConfigEssential();
 		configEssential.checkValidity();
@@ -203,8 +204,8 @@ public class FactoryMultiViewRobust {
 	 * @param configRansac Parameters for RANSAC.  Can't be null.
 	 * @return Robust Se3_F64 estimator
 	 */
-	public static ModelMatcherMultiview<Se3_F64, AssociatedPair> baselineRansac( @Nullable ConfigEssential configEssential,
-																				 ConfigRansac configRansac ) {
+	public static ModelMatcherMultiview<Se3_F64, AssociatedPair>
+	baselineRansac( @Nullable ConfigEssential configEssential, ConfigRansac configRansac ) {
 		if (configEssential == null)
 			configEssential = new ConfigEssential();
 		configEssential.checkValidity();
@@ -451,7 +452,8 @@ public class FactoryMultiViewRobust {
 		double ransacTol = configRansac.inlierThreshold*configRansac.inlierThreshold*2;
 
 		// lint:forbidden ignore_below 1
-		var generator = FactoryMultiView.selfCalibThree(configSelfcalib);
+		ModelGeneratorViews<MetricCameraTriple, AssociatedTriple, ImageDimension> generator =
+				FactoryMultiView.selfCalibThree(configSelfcalib);
 		var manager = new ModelManagerMetricCameraTriple();
 		var distance = new DistanceFromModelIntoViews<MetricCameraTriple, AssociatedTriple, ImageDimension>
 				(new DistanceMetricTripleReprojection23(), 3);
