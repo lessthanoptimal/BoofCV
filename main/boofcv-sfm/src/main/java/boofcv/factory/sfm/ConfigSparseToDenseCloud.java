@@ -38,6 +38,9 @@ public class ConfigSparseToDenseCloud implements Configuration {
 	/** Specifies how to create the stereo graph */
 	public final ConfigGenerateStereoGraph graph = new ConfigGenerateStereoGraph();
 
+	/** Specifies how multiple stereo views are combined into a single stereo view */
+	public final ConfigMultiviewStereo mvs = new ConfigMultiviewStereo();
+
 	{
 		// much faster than SGM and much better than regular block matching
 		disparity.approach = ConfigDisparity.Approach.BLOCK_MATCH_5;
@@ -47,11 +50,13 @@ public class ConfigSparseToDenseCloud implements Configuration {
 		disparity.checkValidity();
 		smoother.checkValidity();
 		graph.checkValidity();
+		mvs.checkValidity();
 	}
 
 	public void setTo( ConfigSparseToDenseCloud src ) {
 		this.disparity.setTo(src.disparity);
 		this.smoother.setTo(src.smoother);
 		this.graph.setTo(src.graph);
+		this.mvs.setTo(src.mvs);
 	}
 }

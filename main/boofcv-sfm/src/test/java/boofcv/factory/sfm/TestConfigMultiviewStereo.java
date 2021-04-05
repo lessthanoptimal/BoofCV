@@ -16,8 +16,8 @@
  * limitations under the License.
  */
 
-package boofcv.alg.tracker.sfot;
+package boofcv.factory.sfm;
 
 import boofcv.struct.StandardConfigurationChecks;
 
-class TestSfotConfig extends StandardConfigurationChecks {}
+public class TestConfigMultiviewStereo extends StandardConfigurationChecks {}

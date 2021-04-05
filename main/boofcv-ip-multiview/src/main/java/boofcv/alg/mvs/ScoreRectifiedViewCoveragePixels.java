@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -51,6 +51,12 @@ public class ScoreRectifiedViewCoveragePixels {
 	/** This is used to adjust the influence of average. Larger the value less influence */
 	public @Getter @Setter double scoreAverageOffset = 10.0;
 
+	/** The actual fraction of the image covered by neighboring views */
+	public @Getter @Setter double covered = 0.0;
+
+	/** Average value of covered pixels */
+	public @Getter @Setter double averageValue = 0.0;
+
 	// Calibrated intrinsic parameters for "left" camera
 	double scale;
 	// Indicates the number of times a 3D disparity lands on this pixel. -1 means the pixel is invalid
@@ -73,6 +79,7 @@ public class ScoreRectifiedViewCoveragePixels {
 							PixelTransform<Point2D_F64> transform_pixel_to_undist ) {
 
 		score = 0.0;
+		covered = 0.0;
 
 		// Compute the scale of the small image relative to the original
 		scale = Math.min(maxSide/(double)width, maxSide/(double)height);
@@ -105,7 +112,7 @@ public class ScoreRectifiedViewCoveragePixels {
 	 * @param quality3D (Input) Signifies the quality of 3D information available. Higher numbers mean more 3D
 	 * information from this view. A value of 0 indicates no 3D information. Typically this ranges from 0 to 1.
 	 */
-	public void addView( int width, int height, DMatrixRMaj rect, float quality3D ) {
+	public void addView( int width, int height, DMatrixRMaj rect, float quality3D, Operation op ) {
 		// if the quality is zero it can't contribute
 		if (quality3D == 0.0f)
 			return;
@@ -128,9 +135,38 @@ public class ScoreRectifiedViewCoveragePixels {
 				if (!BoofMiscOps.isInside(width, height, rectified.x, rectified.y))
 					continue;
 
-				viewed.data[index] += quality3D;
+				viewed.data[index] = op.process(viewed.data[index], quality3D);
 			}
 		}
+	}
+
+	/**
+	 * Computes the fraction of the rectified image which is inside the image
+	 */
+	public double fractionIntersection( int width, int height, DMatrixRMaj rect ) {
+		pixel_to_rect.setTo(rect);
+
+		int intersectedCount = 0;
+
+		for (int y = 0, index = 0; y < viewed.height; y++) {
+			for (int x = 0; x < viewed.width; x++, index++) {
+				// skip if invalid
+				if (viewed.data[index] < 0)
+					continue;
+				Point2D_F64 fusedNorm = pixel_to_undist.get(index);
+
+				// undistorted to rectified pixels
+				HomographyPointOps_F64.transform(pixel_to_rect, fusedNorm.x, fusedNorm.y, rectified);
+
+				// Make sure it's inside the disparity image before sampling
+				if (!BoofMiscOps.isInside(width, height, rectified.x, rectified.y))
+					continue;
+
+				intersectedCount++;
+			}
+		}
+
+		return intersectedCount/(double)(viewed.width*viewed.height);
 	}
 
 	/**
@@ -151,8 +187,15 @@ public class ScoreRectifiedViewCoveragePixels {
 			}
 		}
 
-		double average = total/(double)(1 + totalValid);
+		covered = totalValid/(double)(viewed.width*viewed.height);
 
-		score = (totalValid/(double)(viewed.width*viewed.height))*(scoreAverageOffset + average);
+		double average = total/(double)(1 + totalValid);
+		score = covered*(scoreAverageOffset + average);
+
+		averageValue = total/(1.0f + totalValid);
+	}
+
+	@FunctionalInterface interface Operation {
+		float process( float a, float b );
 	}
 }

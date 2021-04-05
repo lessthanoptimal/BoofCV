@@ -135,6 +135,10 @@ public class FactorySceneReconstruction {
 		SparseSceneToDenseCloud<T> s2c = new SparseSceneToDenseCloud<>(grayType);
 		MultiViewStereoFromKnownSceneStructure<T> mvs = s2c.getMultiViewStereo();
 
+		mvs.minimumQuality3D = config.mvs.minimumQuality3D;
+		mvs.maximumCenterOverlap = config.mvs.maximumCenterOverlap;
+		mvs.maxCombinePairs = config.mvs.maxCombinePairs;
+
 		mvs.setStereoDisparity(FactoryStereoDisparity.generic(
 				config.disparity, grayType, GrayF32.class));
 		mvs.getComputeFused().setDisparitySmoother(

@@ -452,8 +452,7 @@ public class FactoryMultiViewRobust {
 		double ransacTol = configRansac.inlierThreshold*configRansac.inlierThreshold*2;
 
 		// lint:forbidden ignore_below 1
-		ModelGeneratorViews<MetricCameraTriple, AssociatedTriple, ImageDimension> generator =
-				FactoryMultiView.selfCalibThree(configSelfcalib);
+		var generator = FactoryMultiView.selfCalibThree(configSelfcalib);
 		var manager = new ModelManagerMetricCameraTriple();
 		var distance = new DistanceFromModelIntoViews<MetricCameraTriple, AssociatedTriple, ImageDimension>
 				(new DistanceMetricTripleReprojection23(), 3);
