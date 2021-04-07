@@ -319,7 +319,7 @@ public class SimilarImagesSceneRecognition<Image extends ImageBase<Image>, TD ex
 		asscociator.clearDestination();
 
 		// Load the match/destination image features
-		sourceDescriptions.reset();
+		destinationDescriptions.reset();
 		destinationPixels.reset();
 		for (int featureIndex = 0; featureIndex < destFeatureSize; featureIndex++) {
 			TD desc = destinationDescriptions.grow();
