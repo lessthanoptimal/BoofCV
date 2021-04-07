@@ -47,16 +47,31 @@ public class ConfigFeatureToSceneRecognition implements Configuration {
 	public final ConfigRecognitionNister2006 recognizeNister2006 = new ConfigRecognitionNister2006();
 
 	{
+		// 500 features is a good trade off for memory and performance. Accuracy can be improved
+		// with more features but becomes prohibitively expensive in larger datasets
+		// Tuning was found auto a semi-automated process ok Holidays and UKBench datasets. See tech report.
+
 		// Let's use SURF-FAST by default
 		features.typeDescribe = ConfigDescribeRegion.Type.SURF_STABLE;
 		features.typeDetector = ConfigDetectInterestPoint.Type.FAST_HESSIAN;
+
 		// Settings a threshold degrades overall results, even if in some specific situations makes it better
-		features.detectFastHessian.extract.threshold = 0;
+		features.detectFastHessian.extract.threshold = 0.01f;
 		features.detectFastHessian.extract.radius = 2;
-		// 500 features is a good trade off for memory and performance. Accuracy can be improved
-		// with more features but becomes prohibitively expensive in larger datasets
 		features.detectFastHessian.maxFeaturesAll = 500;
 		features.detectFastHessian.maxFeaturesPerScale = 0;
+		features.detectFastHessian.numberOfOctaves = 4;
+
+		// Configure SIFT
+		features.detectSift.extract.threshold = 0.004f;
+		features.detectSift.extract.radius = 2; // best results were found with 6, but that could cause problems
+		features.detectSift.edgeR = 19.1;
+		features.detectSift.maxFeaturesAll = 500;
+		features.detectSift.maxFeaturesPerScale = 0;
+		features.scaleSpaceSift.sigma0 = 3.5f;
+		features.scaleSpaceSift.lastOctave = 5;
+		features.describeSift.sigmaToPixels = 1.54;
+		features.describeSift.maxDescriptorElementValue = 0.25;
 
 		// Reduce memory usage with very little loss in accuracy
 		features.convertDescriptor.outputData = ConfigConvertTupleDesc.DataType.F32;
