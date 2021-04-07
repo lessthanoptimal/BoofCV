@@ -51,15 +51,13 @@ Version : 0.38
   * Added: Galvez-Lopez, Tardos, "Bag of Binary Words for Fast Place Recognition in Image Sequences" 2012
       TODO Finish
   * Added: Nister, Stewenius, "Scalable recognition with a vocabulary tree", CVPR 2006
-      TODO Optimize query. It's much slower than IPOL
-      TODO Find best tuning parameters through a study. Document in a design doc. ukbench and inria
-- TODO Loop Closure
 - TODO Generic calibration target for multi cameras
   * QR Code for first version
 - TODO Multi Camera Calibration
 - Scene Reconstruction
   * Added high level implementations which break down sparse and dense reconstruction down to their bare inputs
   * Multiview Stereo has better center view selection which reduces amount of redundant views
+  * Added SimilarImages implementations that use Image Recognition, i.e. loop closure
   * TODO Improve stability of sparse metric upgrade. Local SBA and multiple seeds?
   * TODO Pruning of views when creating pairwise graph. If too similar do not include it. Could be done before pairwise
   * TODO when associating objects split into feature types, e.g. white and black blobs
