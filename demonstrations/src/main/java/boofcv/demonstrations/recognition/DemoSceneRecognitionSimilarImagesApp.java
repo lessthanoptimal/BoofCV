@@ -52,6 +52,7 @@ import java.awt.geom.Ellipse2D;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import static boofcv.io.UtilIO.systemToUnix;
@@ -64,10 +65,12 @@ import static boofcv.io.UtilIO.systemToUnix;
 public class DemoSceneRecognitionSimilarImagesApp<Gray extends ImageGray<Gray>, TD extends TupleDesc<TD>>
 		extends DemonstrationBase {
 
-	// TODO Colorize by association
 	// TODO Info panel next to image with useful statistics
 	// TODO Add a tuning panel
 	// TODO Load full resolution image for the selected target
+	// TODO progress bar + status when doing math
+	// TODO save / load DB
+	// TODO Use prebuilt vocab
 
 	public static final int PREVIEW_PIXELS = 400*300;
 
@@ -82,6 +85,7 @@ public class DemoSceneRecognitionSimilarImagesApp<Gray extends ImageGray<Gray>, 
 	// List of which images are similar to each other
 	final Object imageLock = new Object();
 	DogArray<DogArray_I32> imagesSimilar = new DogArray<>(DogArray_I32::new, DogArray_I32::reset);
+	DogArray<DogArray_I32> imagesSimilarCounts = new DogArray<>(DogArray_I32::new, DogArray_I32::reset);
 	DogArray<DogArray_I32> imagesWords = new DogArray<>(DogArray_I32::new, DogArray_I32::reset);
 	List<String> imagePaths = new ArrayList<>();
 	List<BufferedImage> imagePreviews = new ArrayList<>();
@@ -174,6 +178,7 @@ public class DemoSceneRecognitionSimilarImagesApp<Gray extends ImageGray<Gray>, 
 			imagePaths.clear();
 			imagePreviews.clear();
 			imagesSimilar.reset();
+			imagesSimilarCounts.reset();
 			imagesWords.reset();
 		}
 		SwingUtilities.invokeLater(() -> viewControlPanel.updateImagePaths());
@@ -225,16 +230,30 @@ public class DemoSceneRecognitionSimilarImagesApp<Gray extends ImageGray<Gray>, 
 
 		System.out.print("Finding Similar: ");
 		imagesSimilar.reset();
+		imagesSimilarCounts.reset();
 		imagesWords.reset();
+		var info = new DogArray<>(SimilarInfo::new);
+		var pairs = new DogArray<>(AssociatedIndex::new);
 		for (String path : foundFiles) {
 			List<String> foundIDs = new ArrayList<>();
 			sceneSimilar.findSimilar(path, foundIDs);
 
 			// Save indexes of similar images
-			DogArray_I32 similar = imagesSimilar.grow();
+			info.reset();
 			for (String s : foundIDs) {
-				similar.add(foundFiles.indexOf(s));
+				sceneSimilar.lookupMatches(path, s, pairs);
+				info.grow().setTo(s,pairs.size());
 			}
+			// Sort it best first
+			Collections.sort(info.toList());
+
+			// Save the results
+			DogArray_I32 similar = imagesSimilar.grow();
+			DogArray_I32 matchCount = imagesSimilarCounts.grow();
+			info.forEach(n->{
+				similar.add(foundFiles.indexOf(n.id));
+				matchCount.add(n.matches);
+			});
 
 			// Save which words appeared in the images
 			sceneSimilar.lookupImageWords(path, imagesWords.grow());
@@ -277,8 +296,8 @@ public class DemoSceneRecognitionSimilarImagesApp<Gray extends ImageGray<Gray>, 
 		public boolean drawFeatures = false;
 		public ColorFeatures colorization = ColorFeatures.ASSOCIATION;
 
-		protected JLabel processingTimeLabel = new JLabel();
-		protected JLabel imageSizeLabel = new JLabel();
+		protected JLabel processingTimeLabel = new JLabel("-----");
+		protected JLabel imageSizeLabel = new JLabel("-----");
 
 		JList<String> listImages;
 
@@ -292,12 +311,18 @@ public class DemoSceneRecognitionSimilarImagesApp<Gray extends ImageGray<Gray>, 
 			listImages.setLayoutOrientation(JList.VERTICAL);
 			listImages.setVisibleRowCount(-1);
 			listImages.addListSelectionListener(this);
+			var listScrollPane = new JScrollPane(listImages) {
+				// Forces it to fill the entire window
+				public Dimension getPreferredSize() {
+					return ViewControlPanel.this.getSize();
+				}
+			};
 
 			addLabeled(processingTimeLabel, "Time (s)");
 			addLabeled(imageSizeLabel, "Image Size");
 			addAlignLeft(checkFeatures);
 			addLabeled(comboColor, "Color");
-			addAlignCenter(new JScrollPane(listImages));
+			addAlignCenter(listScrollPane);
 			setPreferredSize(new Dimension(250, 500));
 		}
 
@@ -449,11 +474,12 @@ public class DemoSceneRecognitionSimilarImagesApp<Gray extends ImageGray<Gray>, 
 
 			textArea.setText(createInfoText(selectedIndex));
 
-			DogArray_I32 similar = imagesSimilar.get(selectedIndex);
+			DogArray_I32 matchIds = imagesSimilar.get(selectedIndex);
+			DogArray_I32 matchCounts = imagesSimilarCounts.get(selectedIndex);
+
 			gridPanel.removeAll();
-			similar.forEach(imageIndex -> {
-				gridPanel.add(new ImageLabeledPanel(imageIndex));
-			});
+			matchIds.forIdx((idx,imageIndex) ->
+					gridPanel.add(new ImageLabeledPanel(imageIndex,matchCounts.get(idx) )));
 			gridPanel.validate();
 			gridPanel.repaint();
 		}
@@ -463,13 +489,16 @@ public class DemoSceneRecognitionSimilarImagesApp<Gray extends ImageGray<Gray>, 
 	 * Draws the image and the image's name below it.
 	 */
 	class ImageLabeledPanel extends JPanel {
-		public ImageLabeledPanel( int imageIndex ) {
-			super(new BorderLayout());
+		public ImageLabeledPanel( int imageIndex, int count ) {
+			setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
 			var image = new VisualizeImage(imageIndex);
-			var label = new JLabel(new File(image.imageID).getName());
+			var labelID = new JLabel(new File(image.imageID).getName());
+			var labelScore = new JLabel("Match: "+count);
 
-			add(image, BorderLayout.CENTER);
-			add(label, BorderLayout.SOUTH);
+			add(image);
+			add(labelID);
+			add(labelScore);
+			add(Box.createVerticalGlue());
 		}
 	}
 
@@ -560,6 +589,23 @@ public class DemoSceneRecognitionSimilarImagesApp<Gray extends ImageGray<Gray>, 
 				VisualizeFeatures.drawPoint(g2,
 						offsetX + p.x*imageScale, offsetY + p.y*imageScale, 5.0, color, true, ellipse);
 			}
+		}
+	}
+
+	/**
+	 * Stores information on a similar image to the query image
+	 */
+	static class SimilarInfo implements Comparable<SimilarInfo> {
+		String id; // image ID
+		int matches; // number of features which were matched
+
+		public void setTo( String id, int matches ) {
+			this.id = id;
+			this.matches = matches;
+		}
+
+		@Override public int compareTo( SimilarInfo o ) {
+			return Integer.compare(o.matches, matches);
 		}
 	}
 
