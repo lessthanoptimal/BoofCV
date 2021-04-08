@@ -22,7 +22,7 @@ import boofcv.abst.feature.associate.AssociateDescriptionHashSets;
 import boofcv.abst.feature.describe.DescribePoint;
 import boofcv.abst.scene.FeatureSceneRecognition;
 import boofcv.abst.scene.SceneRecognition;
-import boofcv.abst.tracker.PointTracker;
+import boofcv.abst.tracker.PointTrack;
 import boofcv.misc.BoofLambdas;
 import boofcv.struct.PackedArray;
 import boofcv.struct.feature.AssociatedIndex;
@@ -39,6 +39,7 @@ import org.jetbrains.annotations.Nullable;
 
 import java.io.PrintStream;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Set;
 
 /**
@@ -48,7 +49,7 @@ import java.util.Set;
  * @author Peter Abeles
  */
 public class SimilarImagesTrackThenMatch<Image extends ImageBase<Image>, TD extends TupleDesc<TD>>
-		extends SimilarImagesPointTracker implements VerbosePrint {
+		extends SimilarImagesFromTracks<PointTrack> implements VerbosePrint {
 
 	// TODO if matched frames have common tracks save those in the associations
 
@@ -79,7 +80,10 @@ public class SimilarImagesTrackThenMatch<Image extends ImageBase<Image>, TD exte
 	/** Logic used to decide if two images are similar to each other */
 	@Getter @Setter SimilarImagesSceneRecognition.SimilarityTest similarityTest = new ImageSimilarityAssociatedRatio();
 
+	// Storage for all the descriptions across all frames
 	PackedArray<TD> descriptions;
+
+	// List of indexes in 'description' where the descriptions for a frame start
 	DogArray_I32 frameStartIndexes = new DogArray_I32();
 
 	//========================= Internal Workspace
@@ -89,7 +93,7 @@ public class SimilarImagesTrackThenMatch<Image extends ImageBase<Image>, TD exte
 	// Temporary storage for a single feature description and pixel
 	final TD tempDescription;
 
-	// Descriptor with default value to use when stuff goes worng
+	// Descriptor with default value to use when stuff goes wrong
 	final TD nullDescription;
 
 	// Storage used for association
@@ -106,6 +110,7 @@ public class SimilarImagesTrackThenMatch<Image extends ImageBase<Image>, TD exte
 										AssociateDescriptionHashSets<TD> featureAssociator,
 										FeatureSceneRecognition<TD> recognizer,
 										BoofLambdas.Factory<PackedArray<TD>> factoryPackedDesc ) {
+		super(t -> t.featureId, ( t, pixel ) -> pixel.setTo(t.pixel));
 		this.describer = describer;
 		this.featureAssociator = featureAssociator;
 		this.recognizer = recognizer;
@@ -125,8 +130,16 @@ public class SimilarImagesTrackThenMatch<Image extends ImageBase<Image>, TD exte
 		featureAssociator.createNewSetsFromDestination = false;
 	}
 
-	public void processFrame( Image image, PointTracker<?> tracker ) {
-		super.processFrame(tracker);
+	/**
+	 * Processes a frame. Updates the relationship between features using tracks and descriptors computed
+	 * at the track's pixel coordinate
+	 *
+	 * @param image (Input) Image most recent image tin the sequence
+	 * @param tracks (Input) List of active tracks visible in the current frame
+	 * @param frameID (Input) Identifier for this image/frame
+	 */
+	public void processFrame( Image image, List<PointTrack> tracks, long frameID ) {
+		super.processFrame(tracks, frameID);
 
 		// Compute and save the feature description
 		Frame frame = frames.getTail();
@@ -270,6 +283,9 @@ public class SimilarImagesTrackThenMatch<Image extends ImageBase<Image>, TD exte
 		connectFrames(frames.get(frameIdx), frames.get(matchedFrameIdx), matches);
 	}
 
+	/**
+	 * Loads descriptors in the specified frame into the source for association
+	 */
 	private void loadFrameIntoSource( int frameIdx ) {
 		Frame frame = frames.get(frameIdx);
 
@@ -290,6 +306,9 @@ public class SimilarImagesTrackThenMatch<Image extends ImageBase<Image>, TD exte
 		}
 	}
 
+	/**
+	 * Loads descriptors in the specified frame into the destination for association
+	 */
 	private void loadFrameIntoDestination( int frameIdx ) {
 		Frame frame = frames.get(frameIdx);
 
@@ -311,10 +330,16 @@ public class SimilarImagesTrackThenMatch<Image extends ImageBase<Image>, TD exte
 		}
 	}
 
+	/**
+	 * Wraps features in the specified frame so that the scene recognition can access them
+	 */
 	private FeatureSceneRecognition.Features<TD> wrapFeatures( int frameIdx ) {
 		int offset = frameStartIndexes.get(frameIdx);
 		return new FeatureSceneRecognition.Features<>() {
+			// Storage for the feature's pixel coordinate in the image
 			final Point2D_F64 pixel = new Point2D_F64();
+
+			// Reference to the image/frame in question
 			final Frame frame = frames.get(frameIdx);
 
 			@Override public Point2D_F64 getPixel( int index ) {

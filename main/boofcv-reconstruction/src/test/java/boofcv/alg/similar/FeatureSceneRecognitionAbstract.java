@@ -34,7 +34,7 @@ import java.util.Set;
  *
  * @author Peter Abeles
  */
-public class MockFeatureSceneRecognition<TD extends TupleDesc<TD>> implements FeatureSceneRecognition<TD> {
+public class FeatureSceneRecognitionAbstract<TD extends TupleDesc<TD>> implements FeatureSceneRecognition<TD> {
 	// @formatter:off
 	@Override public void learnModel( Iterator<Features<TD>> images ) {}
 	@Override public void clearDatabase() {}
