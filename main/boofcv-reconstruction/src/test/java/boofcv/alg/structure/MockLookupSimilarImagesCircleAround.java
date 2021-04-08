@@ -21,6 +21,7 @@ package boofcv.alg.structure;
 import boofcv.BoofTesting;
 import boofcv.alg.geo.PerspectiveOps;
 import boofcv.alg.structure.PairwiseImageGraph.View;
+import boofcv.misc.BoofLambdas;
 import boofcv.struct.calib.CameraPinhole;
 import boofcv.struct.feature.AssociatedIndex;
 import boofcv.struct.image.ImageDimension;
@@ -61,6 +62,7 @@ class MockLookupSimilarImagesCircleAround implements LookUpSimilarImages {
 	public FastArray<DMatrixRMaj> listCameraMatricesZeroPrinciple = new FastArray<>(DMatrixRMaj.class);
 
 	public PairwiseImageGraph graph = new PairwiseImageGraph();
+	private String queryID;
 
 	public MockLookupSimilarImagesCircleAround() {}
 
@@ -225,7 +227,7 @@ class MockLookupSimilarImagesCircleAround implements LookUpSimilarImages {
 	}
 
 	@Override
-	public void findSimilar( String target, List<String> similar ) {
+	public void findSimilar( String target, BoofLambdas.Filter<String> filter, List<String> similar ) {
 		similar.clear();
 		for (int i = 0; i < viewIds.size(); i++) {
 			if (!viewIds.get(i).equals(target)) {
@@ -236,6 +238,7 @@ class MockLookupSimilarImagesCircleAround implements LookUpSimilarImages {
 
 	@Override
 	public void lookupPixelFeats( String target, DogArray<Point2D_F64> features ) {
+		this.queryID = target;
 		int index = viewIds.indexOf(target);
 		List<Point2D_F64> l = viewObs.get(index);
 		features.reset();
@@ -247,8 +250,8 @@ class MockLookupSimilarImagesCircleAround implements LookUpSimilarImages {
 	}
 
 	@Override
-	public boolean lookupMatches( String viewA, String viewB, DogArray<AssociatedIndex> pairs ) {
-		int[] tableA = featToView.get(indexOfView(viewA));
+	public boolean lookupAssociated( String viewB, DogArray<AssociatedIndex> pairs ) {
+		int[] tableA = featToView.get(indexOfView(queryID));
 		int[] tableB = featToView.get(indexOfView(viewB));
 
 		pairs.reset();

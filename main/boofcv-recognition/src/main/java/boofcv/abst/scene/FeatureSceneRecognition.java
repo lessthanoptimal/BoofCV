@@ -18,11 +18,13 @@
 
 package boofcv.abst.scene;
 
+import boofcv.misc.BoofLambdas;
 import boofcv.struct.feature.TupleDesc;
 import georegression.struct.point.Point2D_F64;
 import org.ddogleg.struct.DogArray;
 import org.ddogleg.struct.DogArray_I32;
 import org.ddogleg.struct.VerbosePrint;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.Iterator;
 
@@ -55,15 +57,19 @@ public interface FeatureSceneRecognition<TD extends TupleDesc<TD>> extends Verbo
 	void addImage( String id, Features<TD> features );
 
 	/**
-	 * Finds the best matches in the database to the query image.
+	 * Finds the best matches in the database to the query image. The filter can (optionally) be used to remove
+	 * matches which are not of interest, i.e. too close in time.
 	 *
-	 * @param query (Input) Image
+	 * @param query (Input) Features in the query image
+	 * @param filter (Input) Filter results by ID. true = keep, false = reject. Null means no filter.
 	 * @param limit (Input) The maximum number of results it will return. If &le; 0 then all matches are returned.
 	 * @param matches (Output) Set of matches found in best first order. List is always cleared
 	 * @return true if at least one valid match was found or false if no valid matches could be found. If false
 	 * that means matches is empty. This is strictly a convenience.
 	 */
-	boolean query( Features<TD> query, int limit, DogArray<SceneRecognition.Match> matches );
+	boolean query( Features<TD> query,
+				   @Nullable BoofLambdas.Filter<String> filter,
+				   int limit, DogArray<SceneRecognition.Match> matches );
 
 	/**
 	 * Returns a single word which describes this image feature. If multiple words describe a feature in its

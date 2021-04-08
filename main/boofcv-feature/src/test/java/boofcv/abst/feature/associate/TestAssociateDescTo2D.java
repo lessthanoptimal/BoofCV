@@ -58,7 +58,7 @@ public class TestAssociateDescTo2D extends BoofStandardJUnit {
 		assertSame(MatchScoreType.CORRELATION, alg.getScoreType());
 	}
 
-	private static class Dummy extends AssociateDescriptionDefault<TupleDesc_F64> {
+	private static class Dummy extends AssociateDescriptionAbstract<TupleDesc_F64> {
 		public FastAccess<TupleDesc_F64> listSrc;
 		public FastAccess<TupleDesc_F64> listDst;
 		public boolean calledAssociate = false;

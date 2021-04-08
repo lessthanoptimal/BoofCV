@@ -32,7 +32,9 @@ import boofcv.gui.image.ScaleOptions;
 import boofcv.io.UtilIO;
 import boofcv.io.image.ConvertBufferedImage;
 import boofcv.io.image.UtilImageIO;
+import boofcv.misc.BoofLambdas;
 import boofcv.misc.BoofMiscOps;
+import boofcv.misc.FactoryFilterLambdas;
 import boofcv.struct.feature.AssociatedIndex;
 import boofcv.struct.feature.TupleDesc;
 import boofcv.struct.image.*;
@@ -41,6 +43,7 @@ import gnu.trove.map.TIntIntMap;
 import gnu.trove.map.hash.TIntIntHashMap;
 import org.ddogleg.struct.DogArray;
 import org.ddogleg.struct.DogArray_I32;
+import org.jetbrains.annotations.Nullable;
 
 import javax.swing.*;
 import javax.swing.event.ListSelectionEvent;
@@ -53,8 +56,9 @@ import java.awt.geom.Ellipse2D;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.util.ArrayList;
-import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import static boofcv.io.UtilIO.systemToUnix;
 
@@ -68,12 +72,17 @@ public class DemoSceneRecognitionSimilarImagesApp<Gray extends ImageGray<Gray>, 
 
 	// TODO Info panel next to image with useful statistics
 	// TODO Add a tuning panel
+	// TODO Tune input image size
+	// TODO Show size of original image before scaling
+	// TODO select a group of features
+	// TODO select features in similar image
 	// TODO Load full resolution image for the selected target
 	// TODO progress bar + status when doing math
 	// TODO save / load DB
 	// TODO Use prebuilt vocab
 
 	public static final int PREVIEW_PIXELS = 400*300;
+	public static final int INPUT_PIXELS = 640*480;
 
 	VisualizePanel gui = new VisualizePanel();
 	ViewControlPanel viewControlPanel = new ViewControlPanel();
@@ -85,11 +94,9 @@ public class DemoSceneRecognitionSimilarImagesApp<Gray extends ImageGray<Gray>, 
 
 	// List of which images are similar to each other
 	final Object imageLock = new Object();
-	DogArray<DogArray_I32> imagesSimilar = new DogArray<>(DogArray_I32::new, DogArray_I32::reset);
-	DogArray<DogArray_I32> imagesSimilarCounts = new DogArray<>(DogArray_I32::new, DogArray_I32::reset);
-	DogArray<DogArray_I32> imagesWords = new DogArray<>(DogArray_I32::new, DogArray_I32::reset);
+	Map<String, SimilarInfo> imagesSimilar = new HashMap<>();
 	List<String> imagePaths = new ArrayList<>();
-	List<BufferedImage> imagePreviews = new ArrayList<>();
+	Map<String, BufferedImage> imagePreviews = new HashMap<>();
 
 	// If true it's done doing all computations
 	boolean computingFinished;
@@ -178,27 +185,26 @@ public class DemoSceneRecognitionSimilarImagesApp<Gray extends ImageGray<Gray>, 
 		synchronized (imageLock) {
 			imagePaths.clear();
 			imagePreviews.clear();
-			imagesSimilar.reset();
-			imagesSimilarCounts.reset();
-			imagesWords.reset();
+			imagesSimilar.clear();
 		}
 		SwingUtilities.invokeLater(() -> viewControlPanel.updateImagePaths());
 
 		var config = new ConfigSimilarImagesSceneRecognition();
-		config.features.detectFastHessian.extract.radius = 5;
-		config.features.detectFastHessian.maxFeaturesAll = 500;
+//		config.features.detectFastHessian.extract.radius = 2;
 		config.limitMatchesConsider = 15;
 		config.minimumSimilar.setRelative(0.3, 100);
 		config.recognizeNister2006.learningMinimumPointsForChildren.setRelative(0.001, 100);
 //		config.associate.greedy.scoreRatioThreshold = 0.9;
-		config.recognizeNister2006.minimumDepthFromRoot = 1;
-		config.recognizeNister2006.featureSingleWordHops = 5;
+//		config.recognizeNister2006.minimumDepthFromRoot = 1;
+//		config.recognizeNister2006.featureSingleWordHops = 5;
 //		config.recognizeNister2006.learnNodeWeights = false;
 
 		sceneSimilar = FactorySceneReconstruction.createSimilarImages(config, ImageType.single(grayType));
-		sceneSimilar.setVerbose(System.out, null);
+//		sceneSimilar.setVerbose(System.out, null);
 
 		Gray gray = GeneralizedImageOps.createImage(grayType, 1, 1, 0);
+		BoofLambdas.Transform<Gray> transform =
+				FactoryFilterLambdas.createDownSampleFilter(INPUT_PIXELS, gray.getImageType());
 
 		System.out.print("Adding images: ");
 		long time0 = System.currentTimeMillis();
@@ -213,13 +219,13 @@ public class DemoSceneRecognitionSimilarImagesApp<Gray extends ImageGray<Gray>, 
 			preview.createGraphics().drawImage(buffered, AffineTransform.getScaleInstance(scale, scale), null);
 			synchronized (imageLock) {
 				imagePaths.add(path);
-				imagePreviews.add(preview);
+				imagePreviews.put(path, preview);
 			}
 			SwingUtilities.invokeLater(() -> viewControlPanel.updateImagePaths());
 
 			// Convert to gray for image processing
 			ConvertBufferedImage.convertFrom(buffered, gray, true);
-			sceneSimilar.addImage(path, gray);
+			sceneSimilar.addImage(path, transform.process(gray));
 		}
 		long time1 = System.currentTimeMillis();
 		System.out.println((time1 - time0) + " (ms)");
@@ -229,40 +235,7 @@ public class DemoSceneRecognitionSimilarImagesApp<Gray extends ImageGray<Gray>, 
 		long time2 = System.currentTimeMillis();
 		System.out.println((time2 - time1) + " (ms)");
 
-		System.out.print("Finding Similar: ");
-		imagesSimilar.reset();
-		imagesSimilarCounts.reset();
-		imagesWords.reset();
-		var info = new DogArray<>(SimilarInfo::new);
-		var pairs = new DogArray<>(AssociatedIndex::new);
-		for (String path : foundFiles) {
-			List<String> foundIDs = new ArrayList<>();
-			sceneSimilar.findSimilar(path, foundIDs);
-
-			// Save indexes of similar images
-			info.reset();
-			for (String s : foundIDs) {
-				sceneSimilar.lookupMatches(path, s, pairs);
-				info.grow().setTo(s, pairs.size());
-			}
-			// Sort it best first
-			Collections.sort(info.toList());
-
-			// Save the results
-			DogArray_I32 similar = imagesSimilar.grow();
-			DogArray_I32 matchCount = imagesSimilarCounts.grow();
-			info.forEach(n -> {
-				similar.add(foundFiles.indexOf(n.id));
-				matchCount.add(n.matches);
-			});
-
-			// Save which words appeared in the images
-			sceneSimilar.lookupImageWords(path, imagesWords.grow());
-		}
-		long time3 = System.currentTimeMillis();
-		System.out.println((time3 - time2) + " (ms)");
-
-		SwingUtilities.invokeLater(() -> viewControlPanel.setProcessingTimeS((time3 - time0)*1e-3));
+		SwingUtilities.invokeLater(() -> viewControlPanel.setProcessingTimeS((time2 - time0)*1e-3));
 	}
 
 	/**
@@ -272,9 +245,12 @@ public class DemoSceneRecognitionSimilarImagesApp<Gray extends ImageGray<Gray>, 
 		if (!computingFinished)
 			return "";
 
+		// Look up all the words in the image
+		DogArray_I32 words = new DogArray_I32();
+		sceneSimilar.lookupImageWords(imagePaths.get(imageIndex), words);
+
 		// Find any features appear in each word
 		TIntIntMap wordHistogram = new TIntIntHashMap();
-		DogArray_I32 words = imagesWords.get(imageIndex);
 		words.forEach(word -> wordHistogram.put(word, wordHistogram.get(word) + 1));
 
 		// Find number of features in the most common word
@@ -284,7 +260,7 @@ public class DemoSceneRecognitionSimilarImagesApp<Gray extends ImageGray<Gray>, 
 		}
 
 		String text = "";
-		text += String.format("Similar Images: %d\n", imagesSimilar.get(imageIndex).size);
+		text += String.format("Similar Images: %d\n", imagesSimilar.size());
 		text += String.format("Total Features: %d\n", words.size());
 		text += String.format("Total Words: %d\n", wordHistogram.size());
 		text += String.format("Mean Feats/Word: %.1f\n", words.size()/(double)wordHistogram.size());
@@ -297,7 +273,8 @@ public class DemoSceneRecognitionSimilarImagesApp<Gray extends ImageGray<Gray>, 
 		public boolean drawFeatures = false;
 		public ColorFeatures colorization = ColorFeatures.ASSOCIATION;
 
-		protected JLabel processingTimeLabel = new JLabel("-----");
+		protected JLabel buildTimeLabel = new JLabel("-----");
+		protected JLabel queryTimeLabel = new JLabel("-----");
 		protected JLabel imageSizeLabel = new JLabel("-----");
 
 		JList<String> listImages;
@@ -319,7 +296,8 @@ public class DemoSceneRecognitionSimilarImagesApp<Gray extends ImageGray<Gray>, 
 				}
 			};
 
-			addLabeled(processingTimeLabel, "Time (s)");
+			addLabeled(buildTimeLabel, "Build (s)");
+			addLabeled(queryTimeLabel, "Query (ms)");
 			addLabeled(imageSizeLabel, "Image Size");
 			addAlignLeft(checkFeatures);
 			addLabeled(comboColor, "Color");
@@ -358,7 +336,11 @@ public class DemoSceneRecognitionSimilarImagesApp<Gray extends ImageGray<Gray>, 
 		}
 
 		public void setProcessingTimeS( double seconds ) {
-			processingTimeLabel.setText(String.format("%7.1f", (seconds*1000)));
+			buildTimeLabel.setText(String.format("%7.1f", (seconds)));
+		}
+
+		public void setQueryTimeMS( double milliseconds ) {
+			queryTimeLabel.setText(String.format("%7.2f", milliseconds));
 		}
 
 		@Override public void valueChanged( ListSelectionEvent e ) {
@@ -380,7 +362,7 @@ public class DemoSceneRecognitionSimilarImagesApp<Gray extends ImageGray<Gray>, 
 	}
 
 	class VisualizePanel extends JPanel {
-		final VisualizeImage mainImage = new VisualizeImage(-1);
+		final VisualizeImage mainImage = new VisualizeImage(null);
 
 		final JTextArea textArea = new JTextArea();
 
@@ -452,15 +434,18 @@ public class DemoSceneRecognitionSimilarImagesApp<Gray extends ImageGray<Gray>, 
 			selectedSrcID = -1;
 
 			int selectedIndex = viewControlPanel.listImages.getSelectedIndex();
-			mainImage.changeImage(selectedIndex);
 
 			// Nothing is selected so remove any images being displayed
 			if (selectedIndex < 0) {
-				mainImage.setImageRepaint(null);
+				mainImage.changeImage(null);
 				gridPanel.removeAll();
 				gridPanel.validate();
 				return;
 			}
+
+			String imageID = imagePaths.get(selectedIndex);
+
+			mainImage.changeImage(imageID);
 
 			// Update the image shape
 			ImageDimension shape = mainImage.shape;
@@ -473,16 +458,39 @@ public class DemoSceneRecognitionSimilarImagesApp<Gray extends ImageGray<Gray>, 
 				return;
 			}
 
+			lookupSimilarImages(imageID);
+
 			textArea.setText(createInfoText(selectedIndex));
 
-			DogArray_I32 matchIds = imagesSimilar.get(selectedIndex);
-			DogArray_I32 matchCounts = imagesSimilarCounts.get(selectedIndex);
-
 			gridPanel.removeAll();
-			matchIds.forIdx(( idx, imageIndex ) ->
-					gridPanel.add(new ImageLabeledPanel(imageIndex, matchCounts.get(idx))));
+			for (String viewID : imagesSimilar.keySet()) {
+				SimilarInfo match = imagesSimilar.get(viewID);
+				gridPanel.add(new ImageLabeledPanel(match.id, match.associated.size));
+			}
 			gridPanel.validate();
 			gridPanel.repaint();
+		}
+
+		// TODO Move outside of GUI to avoid any sort of slow down
+		private void lookupSimilarImages( String imageID ) {
+			List<String> foundIDs = new ArrayList<>();
+			imagesSimilar.clear();
+			long time0 = System.nanoTime();
+			sceneSimilar.findSimilar(imageID, ( id ) -> true, foundIDs);
+			long time1 = System.nanoTime();
+
+			viewControlPanel.setQueryTimeMS((time1 - time0)*1e-6);
+			System.out.printf("query took %.3f (ms) found=%d\n", (time1 - time0)*1e-6, foundIDs.size());
+
+			// Save indexes of similar images
+			var info = new DogArray<>(SimilarInfo::new);
+			for (String s : foundIDs) {
+				SimilarInfo similar = info.grow();
+				similar.id = s;
+				if (!sceneSimilar.lookupAssociated(s, similar.associated))
+					System.out.println("BUG! lookupAssociated failed");
+				imagesSimilar.put(s, similar);
+			}
 		}
 	}
 
@@ -490,14 +498,14 @@ public class DemoSceneRecognitionSimilarImagesApp<Gray extends ImageGray<Gray>, 
 	 * Draws the image and the image's name below it.
 	 */
 	class ImageLabeledPanel extends JSpringPanel {
-		public ImageLabeledPanel( int imageIndex, int count ) {
-			var labelID = new JLabel(new File(imagePaths.get(imageIndex)).getName());
+		public ImageLabeledPanel( String imageID, int count ) {
+			var labelID = new JLabel(new File(imageID).getName());
 			var labelScore = new JLabel("Match: " + count);
 
 			// Take in account the text when scaling the images so that it's still visible even when small
 			int heightOfLabels = labelID.getPreferredSize().height + labelScore.getPreferredSize().height + 4;
 
-			VisualizeImage image = new VisualizeImage(imageIndex) {
+			VisualizeImage image = new VisualizeImage(imageID) {
 				// All of this sizing crap is to keep the box tight around the image
 				@Override public Dimension getPreferredSize() {
 					if (img == null)
@@ -540,24 +548,23 @@ public class DemoSceneRecognitionSimilarImagesApp<Gray extends ImageGray<Gray>, 
 		Ellipse2D.Double ellipse = new Ellipse2D.Double();
 		String imageID;
 
-		public VisualizeImage( int imageIndex ) {
+		public VisualizeImage( @Nullable String imageID ) {
 			super(300, 300);
 			setScaling(ScaleOptions.DOWN);
-			if (imageIndex >= 0)
-				changeImage(imageIndex);
+			if (imageID != null)
+				changeImage(imageID);
 		}
 
-		public void changeImage( int imageIndex ) {
+		public void changeImage( @Nullable String imageID ) {
 			BoofSwingUtil.checkGuiThread();
 			features.reset();
+			this.imageID = imageID;
+			if (imageID == null) {
+				setImageRepaint(null);
+				return;
+			}
 			synchronized (imageLock) {
-				if (imageIndex < 0 || imageIndex >= imagePreviews.size()) {
-					imageID = null;
-					setImageRepaint(null);
-					return;
-				}
-				setImageRepaint(imagePreviews.get(imageIndex));
-				imageID = imagePaths.get(imageIndex);
+				setImageRepaint(imagePreviews.get(imageID));
 			}
 		}
 
@@ -575,14 +582,20 @@ public class DemoSceneRecognitionSimilarImagesApp<Gray extends ImageGray<Gray>, 
 			if (features.isEmpty()) {
 				sceneSimilar.lookupPixelFeats(imageID, features);
 				sceneSimilar.lookupShape(imageID, shape);
-				int imageIndex = imagePaths.indexOf(imageID);
-				words.setTo(imagesWords.get(imageIndex));
+				sceneSimilar.lookupImageWords(imageID, words);
 
 				// look up corresponding features in the mainImage
 				mainFeatureIdx.resize(words.size, -1);
-				DogArray<AssociatedIndex> pairs = new DogArray<>(AssociatedIndex::new);
-				sceneSimilar.lookupMatches(gui.mainImage.imageID, imageID, pairs);
-				pairs.forEach(p -> mainFeatureIdx.set(p.dst, p.src));
+				SimilarInfo info = imagesSimilar.get(imageID);
+				if (info !=null) {
+					info.associated.forEach(p -> mainFeatureIdx.set(p.dst, p.src));
+				} else {
+					// This must be displaying the selected image and not one of the similar ones
+					// so every feature is a main feature
+					for (int i = 0; i < words.size; i++) {
+						mainFeatureIdx.set(i, i);
+					}
+				}
 			}
 
 			double imageScale = getImageScale();
@@ -626,15 +639,10 @@ public class DemoSceneRecognitionSimilarImagesApp<Gray extends ImageGray<Gray>, 
 	 */
 	static class SimilarInfo implements Comparable<SimilarInfo> {
 		String id; // image ID
-		int matches; // number of features which were matched
-
-		public void setTo( String id, int matches ) {
-			this.id = id;
-			this.matches = matches;
-		}
+		DogArray<AssociatedIndex> associated = new DogArray<>(AssociatedIndex::new);
 
 		@Override public int compareTo( SimilarInfo o ) {
-			return Integer.compare(o.matches, matches);
+			return Integer.compare(o.associated.size, associated.size);
 		}
 	}
 

@@ -24,7 +24,7 @@ import org.ddogleg.struct.DogArray_I32;
 import org.ddogleg.struct.FastAccess;
 
 /** Provides default implementations for all functions. Primarily for testing. */
-public class AssociateDescriptionDefault<Desc> implements AssociateDescription<Desc> {
+public class AssociateDescriptionAbstract<Desc> implements AssociateDescription<Desc> {
 	// @formatter:off
 	@Override public void associate() {}
 	@Override public FastAccess<AssociatedIndex> getMatches() { return null; }

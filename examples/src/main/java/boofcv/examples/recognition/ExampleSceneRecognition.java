@@ -86,7 +86,7 @@ public class ExampleSceneRecognition {
 
 			System.out.println("Saving tree");
 			BoofMiscOps.profile(() -> RecognitionIO.saveFeatureToScene(
-					(WrapFeatureToSceneRecognition<GrayU8,?>)recognizer, saveDirectory), "");
+					(WrapFeatureToSceneRecognition<GrayU8, ?>)recognizer, saveDirectory), "");
 		}
 
 		ListDisplayPanel gui = new ListDisplayPanel();
@@ -97,7 +97,7 @@ public class ExampleSceneRecognition {
 		// Look up images
 		DogArray<SceneRecognition.Match> matches = new DogArray<>(SceneRecognition.Match::new);
 		imageIterator.reset();
-		recognizer.query(imageIterator.next(), 10, matches);
+		recognizer.query(imageIterator.next(),/* filter */ ( id ) -> true,/* limit */ 10, matches);
 		for (int i = 0; i < matches.size; i++) {
 			String file = matches.get(i).id;
 			double error = matches.get(i).error;

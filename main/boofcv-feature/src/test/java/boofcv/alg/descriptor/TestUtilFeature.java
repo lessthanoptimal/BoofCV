@@ -234,7 +234,7 @@ class TestUtilFeature extends BoofStandardJUnit {
 		}
 	}
 
-	static class MockAssociateDescription extends AssociateDescriptionDefault<TupleDesc_F64> {
+	static class MockAssociateDescription extends AssociateDescriptionAbstract<TupleDesc_F64> {
 		@Override public Class<TupleDesc_F64> getDescriptionType() {return TupleDesc_F64.class;}
 	}
 

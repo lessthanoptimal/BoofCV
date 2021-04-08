@@ -35,7 +35,7 @@ import java.util.Set;
 
 /**
  * Converts {@link FeatureSceneRecognition} into {@link SceneRecognition}.
- * 
+ *
  * @author Peter Abeles
  */
 public class WrapFeatureToSceneRecognition<Image extends ImageBase<Image>, TD extends TupleDesc<TD>>
@@ -69,6 +69,7 @@ public class WrapFeatureToSceneRecognition<Image extends ImageBase<Image>, TD ex
 	@Override public void learnModel( Iterator<Image> images ) {
 		recognizer.learnModel(new Iterator<>() {
 			@Override public boolean hasNext() {return images.hasNext();}
+
 			@Override public FeatureSceneRecognition.Features<TD> next() {
 				detector.detect(images.next());
 				return wrappedDetector;
@@ -85,9 +86,10 @@ public class WrapFeatureToSceneRecognition<Image extends ImageBase<Image>, TD ex
 		recognizer.addImage(id, wrappedDetector);
 	}
 
-	@Override public boolean query( Image queryImage, int limit, DogArray<Match> matches ) {
+	@Override
+	public boolean query( Image queryImage, @Nullable BoofLambdas.Filter<String> filter, int limit, DogArray<Match> matches ) {
 		detector.detect(queryImage);
-		return recognizer.query(wrappedDetector, limit, matches);
+		return recognizer.query(wrappedDetector, filter, limit, matches);
 	}
 
 	@Override public ImageType<Image> getImageType() {
@@ -108,7 +110,7 @@ public class WrapFeatureToSceneRecognition<Image extends ImageBase<Image>, TD ex
 	}
 	// @formatter:on
 
-	public <T extends FeatureSceneRecognition<TD>>T getRecognizer() {
+	public <T extends FeatureSceneRecognition<TD>> T getRecognizer() {
 		return (T)recognizer;
 	}
 }

@@ -53,7 +53,6 @@ class TestFeatureSceneRecognitionNister2006 extends GenericFeatureSceneRecogniti
 		assertEquals(5, words.size);
 		assertTrue(words.isEquals(5,4,3,2,1));
 
-
 		alg.lookupWordsFromLeafID(2,words);
 		assertEquals(2, words.size);
 		assertTrue(words.isEquals(2,1));

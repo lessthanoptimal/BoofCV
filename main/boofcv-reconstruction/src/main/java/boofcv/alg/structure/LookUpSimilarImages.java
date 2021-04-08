@@ -18,10 +18,12 @@
 
 package boofcv.alg.structure;
 
+import boofcv.misc.BoofLambdas;
 import boofcv.struct.feature.AssociatedIndex;
 import boofcv.struct.image.ImageDimension;
 import georegression.struct.point.Point2D_F64;
 import org.ddogleg.struct.DogArray;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
 
@@ -44,11 +46,12 @@ public interface LookUpSimilarImages {
 	 * the perspective of the 'target', so viewA might think viewB is similar to it, but viewB might think
 	 * viewA is not similar to it.
 	 *
-	 * @param target ID of target image
-	 * @param similar Storage for IDs of similar images. Cleared upon each call
+	 * @param target (Input) ID of target image
+	 * @param filter (Input) Filter results by ID. true = keep, false = reject. Null means no filter.
+	 * @param similarImages (Output) Storage for IDs of similar images. Cleared upon each call
 	 * @throws IllegalArgumentException If the target is not known
 	 */
-	void findSimilar( String target, List<String> similar );
+	void findSimilar( String target, @Nullable BoofLambdas.Filter<String> filter, List<String> similarImages );
 
 	/**
 	 * Looks up pixel observations of features in the specified view.
@@ -60,16 +63,16 @@ public interface LookUpSimilarImages {
 	void lookupPixelFeats( String target, DogArray<Point2D_F64> features );
 
 	/**
-	 * Returns associated features between the two views. The set of common features will not be dependent
-	 * which view is src or dst, but the the returned values in pairs will be.
+	 * Looks up pairs of associated features from a similar image which was returned in the most
+	 * recent call to {@link #findSimilar}. The src will be the target in 'findSimilar' and the dst
+	 * will be the requested similar image.
 	 *
-	 * @param viewSrc name of view which will be the src
-	 * @param viewDst name of view which will be the dst
+	 * @param similarD ID of a similar image to the target when calling {@link #findSimilar}.
 	 * @param pairs Storage for associated features. Cleared upon each call
 	 * @return true if views are similar and have known associations. False if not and results should be ignored
 	 * @throws IllegalArgumentException If the one of the views is not known
 	 */
-	boolean lookupMatches( String viewSrc, String viewDst, DogArray<AssociatedIndex> pairs );
+	boolean lookupAssociated( String similarD, DogArray<AssociatedIndex> pairs );
 
 	/**
 	 * Looks up the original images width and height

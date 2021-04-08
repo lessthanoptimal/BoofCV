@@ -79,7 +79,7 @@ class TestSimilarImagesFromTracks extends GenericLookUpSimilarImagesChecks {
 	}
 
 	private SimilarImagesFromTracks<PointTrack> createTracker() {
-		return new SimilarImagesFromTracks<>(t->t.featureId, ( t, pixel)->pixel.setTo(t.pixel));
+		return new SimilarImagesFromTracks<>(t -> t.featureId, ( t, pixel ) -> pixel.setTo(t.pixel));
 	}
 
 	@Test void processFrame() {
@@ -110,14 +110,14 @@ class TestSimilarImagesFromTracks extends GenericLookUpSimilarImagesChecks {
 				assertEquals(i + 1, features.get(i).y, UtilEjml.TEST_F64);
 			}
 
-			alg.findSimilar("" + targetIdx, similarIds);
+			alg.findSimilar("" + targetIdx, ( id ) -> true, similarIds);
 			// 6 is expected and not 10 because every time 5 less tracks out of 20 match.
 			assertEquals(6, similarIds.size());
 			for (String similarId : similarIds) {
 				int similarIdx = Integer.parseInt(similarId);
 				// the expected number of matches is dependent on how many frames apart they are
 				int expected = 20 - 5*Math.abs(similarIdx - targetIdx);
-				assertTrue(alg.lookupMatches(targetId, similarId, associated));
+				assertTrue(alg.lookupAssociated(similarId, associated));
 				assertEquals(expected, associated.size());
 			}
 		}
@@ -242,7 +242,7 @@ class TestSimilarImagesFromTracks extends GenericLookUpSimilarImagesChecks {
 		var tracker = new MockTracker();
 		tracker.numTracks = 20;
 		SimilarImagesFromTracks<PointTrack> alg = createTracker();
-		alg.initialize(30,40);
+		alg.initialize(30, 40);
 		// every frame there is one less track in common. Since there are 20 tracks, 18 means it should
 		// be matched with 2 frames within its radius
 		alg.minimumCommonTracks.setFixed(18);
@@ -251,15 +251,15 @@ class TestSimilarImagesFromTracks extends GenericLookUpSimilarImagesChecks {
 			tracker.offsetID++; // this is what causes N-1 features to be in common between frames
 			alg.processFrame(tracker.getActiveTracks(null), tracker.getFrameID());
 
-			if (i<=2)
+			if (i <= 2)
 				continue;
 			// Check the most recently added frame
 			SimilarImagesFromTracks.Frame frame = alg.frames.getTail();
-			assertEquals(2,frame.related.size());
+			assertEquals(2, frame.related.size());
 		}
 
 		// double check that it's matching them symmetrically
-		assertEquals(4,alg.frames.get(3).related.size());
+		assertEquals(4, alg.frames.get(3).related.size());
 	}
 
 	@Test void getImageIDs() {

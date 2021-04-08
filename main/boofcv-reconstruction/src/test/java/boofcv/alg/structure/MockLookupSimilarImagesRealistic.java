@@ -22,6 +22,7 @@ import boofcv.BoofTesting;
 import boofcv.alg.geo.PerspectiveOps;
 import boofcv.alg.geo.WorldToCameraToPixel;
 import boofcv.alg.geo.bundle.BundleAdjustmentOps;
+import boofcv.misc.BoofLambdas;
 import boofcv.misc.BoofMiscOps;
 import boofcv.struct.calib.CameraPinhole;
 import boofcv.struct.feature.AssociatedIndex;
@@ -53,6 +54,9 @@ public class MockLookupSimilarImagesRealistic implements LookUpSimilarImages {
 	public int numFeatures = 100;
 	public Random rand = BoofTesting.createRandom(3);
 	public boolean loop = true;
+
+	// recent query image for findSimilar()
+	String queryID;
 
 	public List<Feature> points = new ArrayList<>();
 	public List<View> views = new ArrayList<>();
@@ -263,7 +267,7 @@ public class MockLookupSimilarImagesRealistic implements LookUpSimilarImages {
 		var working = new SceneWorkingGraph();
 		pairwise.nodes.forIdx(( i, v ) -> working.addView(v));
 
-		working.viewList.forEach(v -> BundleAdjustmentOps.convert(intrinsic,v.intrinsic));
+		working.viewList.forEach(v -> BundleAdjustmentOps.convert(intrinsic, v.intrinsic));
 		BoofMiscOps.forIdx(working.viewList, ( i, v ) -> v.projective.setTo(views.get(i).camera));
 		BoofMiscOps.forIdx(working.viewList, ( i, v ) -> v.world_to_view.setTo(views.get(i).world_to_view));
 		BoofMiscOps.forIdx(working.viewList, ( i, v ) -> v.index = i);
@@ -279,7 +283,8 @@ public class MockLookupSimilarImagesRealistic implements LookUpSimilarImages {
 	}
 
 	@Override
-	public void findSimilar( String target, List<String> similar ) {
+	public void findSimilar( String target, BoofLambdas.Filter<String> filter, List<String> similar ) {
+		this.queryID = target;
 		View view = getView(target);
 
 		similar.clear();
@@ -303,8 +308,8 @@ public class MockLookupSimilarImagesRealistic implements LookUpSimilarImages {
 	}
 
 	@Override
-	public boolean lookupMatches( String identA, String identB, DogArray<AssociatedIndex> pairs ) {
-		View viewA = getView(identA);
+	public boolean lookupAssociated( String identB, DogArray<AssociatedIndex> pairs ) {
+		View viewA = getView(queryID);
 		View viewB = getView(identB);
 
 		if (!viewA.connected.contains(viewB))
