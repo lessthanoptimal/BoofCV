@@ -25,6 +25,7 @@ import boofcv.factory.structure.FactorySceneReconstruction;
 import boofcv.gui.BoofSwingUtil;
 import boofcv.gui.DemonstrationBase;
 import boofcv.gui.StandardAlgConfigPanel;
+import boofcv.gui.dialogs.JSpringPanel;
 import boofcv.gui.feature.VisualizeFeatures;
 import boofcv.gui.image.ImagePanel;
 import boofcv.gui.image.ScaleOptions;
@@ -242,7 +243,7 @@ public class DemoSceneRecognitionSimilarImagesApp<Gray extends ImageGray<Gray>, 
 			info.reset();
 			for (String s : foundIDs) {
 				sceneSimilar.lookupMatches(path, s, pairs);
-				info.grow().setTo(s,pairs.size());
+				info.grow().setTo(s, pairs.size());
 			}
 			// Sort it best first
 			Collections.sort(info.toList());
@@ -250,7 +251,7 @@ public class DemoSceneRecognitionSimilarImagesApp<Gray extends ImageGray<Gray>, 
 			// Save the results
 			DogArray_I32 similar = imagesSimilar.grow();
 			DogArray_I32 matchCount = imagesSimilarCounts.grow();
-			info.forEach(n->{
+			info.forEach(n -> {
 				similar.add(foundFiles.indexOf(n.id));
 				matchCount.add(n.matches);
 			});
@@ -383,7 +384,7 @@ public class DemoSceneRecognitionSimilarImagesApp<Gray extends ImageGray<Gray>, 
 
 		final JTextArea textArea = new JTextArea();
 
-		final JPanel gridPanel = new JPanel(new GridLayout(0, 4, 10, 10));
+		final JPanel gridPanel = new JPanel(new GridLayout(0, 4, 4, 4));
 
 		// Selected index of a feature in the "source" image
 		int selectedSrcID = -1;
@@ -478,8 +479,8 @@ public class DemoSceneRecognitionSimilarImagesApp<Gray extends ImageGray<Gray>, 
 			DogArray_I32 matchCounts = imagesSimilarCounts.get(selectedIndex);
 
 			gridPanel.removeAll();
-			matchIds.forIdx((idx,imageIndex) ->
-					gridPanel.add(new ImageLabeledPanel(imageIndex,matchCounts.get(idx) )));
+			matchIds.forIdx(( idx, imageIndex ) ->
+					gridPanel.add(new ImageLabeledPanel(imageIndex, matchCounts.get(idx))));
 			gridPanel.validate();
 			gridPanel.repaint();
 		}
@@ -488,17 +489,45 @@ public class DemoSceneRecognitionSimilarImagesApp<Gray extends ImageGray<Gray>, 
 	/**
 	 * Draws the image and the image's name below it.
 	 */
-	class ImageLabeledPanel extends JPanel {
+	class ImageLabeledPanel extends JSpringPanel {
 		public ImageLabeledPanel( int imageIndex, int count ) {
-			setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
-			var image = new VisualizeImage(imageIndex);
-			var labelID = new JLabel(new File(image.imageID).getName());
-			var labelScore = new JLabel("Match: "+count);
+			var labelID = new JLabel(new File(imagePaths.get(imageIndex)).getName());
+			var labelScore = new JLabel("Match: " + count);
+
+			// Take in account the text when scaling the images so that it's still visible even when small
+			int heightOfLabels = labelID.getPreferredSize().height + labelScore.getPreferredSize().height + 4;
+
+			VisualizeImage image = new VisualizeImage(imageIndex) {
+				// All of this sizing crap is to keep the box tight around the image
+				@Override public Dimension getPreferredSize() {
+					if (img == null)
+						return super.getPreferredSize();
+
+					Dimension s = ImageLabeledPanel.this.getSize();
+					double adjustedHeight = Math.max(0.0, s.getHeight() - heightOfLabels);
+
+					double scale = Math.min(s.getWidth()/img.getWidth(), adjustedHeight/img.getHeight());
+					if (scale > 1.0)
+						scale = 1.0;
+					int width = (int)(scale*img.getWidth() + 0.5);
+					int height = (int)(scale*img.getHeight() + 0.5);
+					return new Dimension(width, height);
+				}
+			};
+
+			// This component will stretch out, but there's nothing in it
+			JPanel glue = new JPanel();
 
 			add(image);
 			add(labelID);
 			add(labelScore);
-			add(Box.createVerticalGlue());
+			add(glue);
+
+			constrainWestNorthEast(image, null, 0, 0);
+			constrainWestNorthEast(labelID, image, 2, 4);
+			constrainWestNorthEast(labelScore, labelID, 2, 4);
+			constrainWestNorthEast(glue, labelScore, 0, 0);
+			layout.putConstraint(SpringLayout.SOUTH, glue, 0, SpringLayout.SOUTH, this);
 		}
 	}
 
