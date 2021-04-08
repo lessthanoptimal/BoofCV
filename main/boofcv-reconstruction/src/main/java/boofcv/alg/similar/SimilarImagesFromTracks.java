@@ -18,259 +18,385 @@
 
 package boofcv.alg.similar;
 
+import boofcv.abst.tracker.PointTrack;
+import boofcv.abst.tracker.PointTracker;
 import boofcv.alg.structure.LookUpSimilarImages;
 import boofcv.misc.BoofMiscOps;
+import boofcv.struct.ConfigLength;
 import boofcv.struct.feature.AssociatedIndex;
 import boofcv.struct.image.ImageDimension;
 import georegression.struct.point.Point2D_F64;
-import gnu.trove.impl.Constants;
 import gnu.trove.map.TLongIntMap;
 import gnu.trove.map.hash.TLongIntHashMap;
 import org.ddogleg.struct.DogArray;
-import org.ddogleg.struct.DogArray_I64;
+import org.ddogleg.struct.FastAccess;
 
 import java.util.ArrayList;
-import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
- * Given a set of feature tracks across several images, convert into {@link LookUpSimilarImages}.
+ * Processes frames from {@link PointTracker} and converts the tracking results into a {@link LookUpSimilarImages}.
+ * This is intended for scene reconstruction from video sequences.
+ *
+ * <ul>
+ *     <li>Results are ready as soon as {@link #processFrame} finishes</li>
+ *     <li>The unique string for each image is set to the frameID</li>
+ *     <li>Frames can only be matched to each other with they are withing {@link #searchRadius} of each other</li>
+ *     <li>No loop closure is performed</li>
+ * </ul>
+ *
+ * Internally arrays are used as much as possible to reduce memory overhead as higher level objects have a very
+ * large amount of overhead.
  *
  * @author Peter Abeles
  */
 public class SimilarImagesFromTracks<Track> implements LookUpSimilarImages {
+	/**
+	 * Maximum number of frames in forwards and backwards direction which will be searched for being related.
+	 * If less than zero there are no hard limit.
+	 */
+	public int searchRadius = 5;
 
+	/**
+	 * If the number of common tracks between two frames drops below this then they are considered to be
+	 * disconnected. If relative, then it's relative to the minimum number of observed tracks in each frame..
+	 */
+	public final ConfigLength minimumCommonTracks = ConfigLength.relative(0.01, 0.0);
+
+	/** Stores observations and track ID for every frame */
+	public final DogArray<Frame> frames = new DogArray<>(Frame::new, Frame::reset);
+	/** Quick way to retrieve a frame based on its ID */
+	public final Map<String, Frame> frameMap = new HashMap<>();
+	/** List of all matches between frames */
+	public final DogArray<Match> connections = new DogArray<>(Match::new, Match::reset);
+
+	// Accessors to track information
 	TrackToID<Track> lookupID;
 	TrackToPixel<Track> lookupPixel;
 
-	DogArray<Frame> frames = new DogArray<>(Frame::new, Frame::reset);
-	List<String> frameIds = new ArrayList<>();
+	// shape of images
+	public int imageWidth, imageHeight;
 
-	// storage for keys of all the features in a frame
-	DogArray_I64 keys = new DogArray_I64();
+	// Storage for pixel coordinate from a track
+	Point2D_F64 pixel = new Point2D_F64();
+
+	//------------------- Internal Workspace ------------------------------------
+	protected List<PointTrack> tracks = new ArrayList<>();
+	protected DogArray<AssociatedIndex> pairs = new DogArray<>(AssociatedIndex::new);
 
 	public SimilarImagesFromTracks( TrackToID<Track> lookupID, TrackToPixel<Track> lookupPixel ) {
 		this.lookupID = lookupID;
 		this.lookupPixel = lookupPixel;
 	}
 
-	public void reset() {
+	/**
+	 * Resets all data structures and saves the image size. Must be called before other functions
+	 */
+	public void initialize( int width, int height ) {
+		this.imageWidth = width;
+		this.imageHeight = height;
+
+		// reset internal data structures to their initial state
 		frames.reset();
-		frameIds.clear();
+		frameMap.clear();
+		connections.reset();
 	}
 
 	/**
-	 * Creates a new image/frame from the tracks. It's ID will be the index in the frame list
+	 * Process the latest observations from the tracker. Save the results and
 	 *
-	 * @param tracks List of tracks
+	 * @param tracks (Input) List of active tracks visible in the current frame
+	 * @param frameID (Input) Identifier for this image/frame
 	 */
-	public void addFrame( int width, int height, List<Track> tracks ) {
-		Frame f = frames.grow();
-		f.shape.setTo(width, height);
-		f.pixels.reserve(tracks.size());
-		f.id = "" + (frames.size - 1);
-		frameIds.add(f.id);
+	public void processFrame( List<Track> tracks, long frameID ) {
+		BoofMiscOps.checkTrue(imageWidth != 0, "Must call initialize first and specify the image size");
 
-		for (int pixelIdx = 0; pixelIdx < tracks.size(); pixelIdx++) {
-			Track t = tracks.get(pixelIdx);
-			long id = lookupID.getId(t);
-			f.trackToIndex.put(id, pixelIdx);
-			lookupPixel.getPixel(t, f.pixels.grow());
-		}
+		// Create a new frame and save the observations
+		Frame current = createFrameSaveObservations(tracks, frameID);
+
+		// find related frames
+		findRelatedPastFrames(current);
 	}
 
 	/**
-	 * Determines which frames/images have a relationship with each other. A relationship is determined by having
-	 * at least minCommon features in common with each other. A brute force O(N^2) algorithm is used
-	 *
-	 * @param reidentification If false then the number of common tracks with future frames can only decrease
-	 * @param minFeatures Minimum number of common features between two similar images.
-	 * @param maxSimilar The maximum number of similar views a Frame can have. Preference is given to connections
-	 * with more features. If less than zero then there's no constraint
+	 * Create a new frame from the tracker's current observations.
 	 */
-	public void computeSimilarRelationships( boolean reidentification, int minFeatures, int maxSimilar ) {
-		// Make sure everything is in the initial state
-		for (int idx = 0; idx < frames.size; idx++) {
-			frames.get(idx).similar.reset();
+	protected Frame createFrameSaveObservations( List<Track> tracks, long frameID ) {
+		// Create a new frame and record all the tracks visible in this frame
+		Frame current = frames.grow();
+		current.frameID = frameID + "";
+		current.initActive(tracks.size());
+		int index = 0;
+		for (int trackCnt = 0; trackCnt < tracks.size(); trackCnt++) {
+			Track t = tracks.get(trackCnt);
+			lookupPixel.getPixel(t, pixel);
+			current.observations[index++] = (float)pixel.x;
+			current.observations[index++] = (float)pixel.y;
+			current.ids[trackCnt] = lookupID.getId(t);
+			current.id_to_index.put(lookupID.getId(t), trackCnt);
 		}
+		frameMap.put(current.frameID, current);
+		return current;
+	}
 
-		// Brute force O(N^2) checks to see if they are related
-		for (int idxA = 0; idxA < frames.size; idxA++) {
-			Frame frameA = frames.get(idxA);
+	/**
+	 * Search the past N frames to see if they are related to the current frame. If related create a new {@link Match}
+	 * and save which observations points to the same features
+	 *
+	 * @param current The current from for the tracker
+	 */
+	void findRelatedPastFrames( Frame current ) {
 
-			for (int idxB = idxA + 1; idxB < frames.size; idxB++) {
-				Frame frameB = frames.get(idxB);
-				int common = countCommon(frameA, frameB);
+		// Both values below are needed for early termination of search
+		int currentTrackCount = frames.getTail().featureCount();
+		int oldestFrameConsidered = searchRadius < 0 ? 0 : Math.max(0, frames.size - 1 - searchRadius);
 
-				// See if there are two few
-				if (common < minFeatures) {
-					// If we know it can only get worse from here we can stop
-					if (!reidentification)
-						break;
+		// Check the most recent past frames first, up until it hits the limit or there are too few tracks
+		for (int frameCnt = frames.size - 2; frameCnt >= oldestFrameConsidered; frameCnt--) {
+			Frame previous = frames.get(frameCnt);
+
+			// See if there are any features which have been observed in both frames
+			pairs.reset();
+			final int prevNumObs = previous.featureCount();
+			for (int previousIdx = 0; previousIdx < prevNumObs; previousIdx++) {
+				int currentIdx = current.id_to_index.get(previous.getID(previousIdx));
+				if (currentIdx < 0)
 					continue;
-				}
-
-				// Add the relationship between these two frames
-				frameA.similar.grow().setTo(frameB, common);
-				frameB.similar.grow().setTo(frameA, common);
-			}
-		}
-
-		if (maxSimilar <= 0)
-			return;
-
-		// Enforce max views per frame
-		for (int idxA = 0; idxA < frames.size; idxA++) {
-			Frame frameA = frames.get(idxA);
-			if (frameA.similar.size() <= maxSimilar)
-				continue;
-
-			Collections.sort(frameA.similar.toList(), ( a, b ) -> Integer.compare(b.common, a.common));
-
-			while (frameA.similar.size > maxSimilar) {
-				Connected a_to_b = frameA.similar.removeTail();
-				Frame frameB = a_to_b.dst;
-				int indexOfAinB = frameB.similar.findIdx(a -> a.dst == frameA);
-				BoofMiscOps.checkTrue(indexOfAinB >= 0, "BUG! connectivity isn't symmetric");
-
-				frameB.similar.removeSwap(indexOfAinB);
+				pairs.grow().setTo(currentIdx, previousIdx);
 			}
 
-			BoofMiscOps.checkTrue(frameA.similar.size() <= maxSimilar);
+			// If the number of common tracks is too small, don't consider this pairing
+			// The loop will stop here since there is the simplifying assumption that the number of common
+			// tracks can only go down. The loop closure logic should partially make up for this if it isn't true
+			// otherwise we have to consider the entire history
+			if (pairs.size == 0 ||
+					pairs.size < minimumCommonTracks.computeI(Math.min(currentTrackCount, previous.featureCount())))
+				break;
+
+			connectFrames(current, previous, pairs);
 		}
 	}
 
 	/**
-	 * Counts the number of common features between the two frames
+	 * Connects the two frames and remembers the associated features between them
 	 */
-	int countCommon( Frame frameA, Frame frameB ) {
-		// Avoid creating/destroying memory when getting a set of keys in this frame
-		keys.resize(frameA.trackToIndex.size());
-		frameA.trackToIndex.keys(keys.data);
-
-		// Count the number of keys/track Ids
-		int total = 0;
-		for (int i = 0; i < keys.size; i++) {
-			long key = keys.get(i);
-			if (frameB.trackToIndex.containsKey(key))
-				total++;
+	protected void connectFrames( Frame current, Frame previous, FastAccess<AssociatedIndex> associated ) {
+		// Create a match that describes the observations of common features/tracks
+		Match m = connections.grow();
+		m.init(associated.size);
+		m.frameSrc = current;
+		m.frameDst = previous;
+		for (int assocIdx = 0; assocIdx < associated.size; assocIdx++) {
+			AssociatedIndex a = associated.get(assocIdx);
+			m.src[assocIdx] = a.src;
+			m.dst[assocIdx] = a.dst;
 		}
-
-		return total;
+		m.frameSrc.matches.add(m);
+		m.frameDst.matches.add(m);
+		previous.related.add(current);
+		current.related.add(previous);
 	}
 
-	/** Give the frame ID find the frame. Throw an exception of the target isn't known */
-	Frame getFrame( String target ) {
-		int index = Integer.parseInt(target);
-		if (index < 0 || index >= frames.size)
-			throw new IllegalArgumentException("Invalid or out of range target. " + target);
-		Frame f = frames.get(index);
-		return f;
+	/**
+	 * Returns the list of image ID's in the same order they were processed.
+	 */
+	@Override
+	public List<String> getImageIDs() {
+		var list = new ArrayList<String>();
+		for (int i = 0; i < frames.size; i++) {
+			list.add(frames.get(i).frameID);
+		}
+		return list;
 	}
 
-	@Override public List<String> getImageIDs() {
-		return frameIds;
-	}
-
-	@Override public void findSimilar( String target, List<String> similar ) {
-		Frame f = getFrame(target);
-
+	@Override
+	public void findSimilar( String target, List<String> similar ) {
 		similar.clear();
-		for (int i = 0; i < f.similar.size(); i++) {
-			similar.add(f.similar.get(i).dst.id);
+		Frame f = frameMap.get(target);
+		BoofMiscOps.checkTrue(f != null, "Unknown image");
+		for (int i = 0; i < f.related.size(); i++) {
+			similar.add(f.related.get(i).frameID);
 		}
 	}
 
-	@Override public void lookupPixelFeats( String target, DogArray<Point2D_F64> features ) {
-		Frame f = getFrame(target);
-
+	@Override
+	public void lookupPixelFeats( String target, DogArray<Point2D_F64> features ) {
 		features.reset();
-		features.resize(f.pixels.size);
+		Frame f = frameMap.get(target);
+		if (f == null)
+			throw new IllegalArgumentException("Unknown view=" + target);
 
-		for (int i = 0; i < f.pixels.size; i++) {
-			features.get(i).setTo(f.pixels.get(i));
+		final int N = f.featureCount();
+		for (int i = 0; i < N; i++) {
+			f.getPixel(i, features.grow());
 		}
 	}
 
-	@Override public boolean lookupMatches( String viewA, String viewB, DogArray<AssociatedIndex> pairs ) {
+	@Override
+	public boolean lookupMatches( String viewA, String viewB, DogArray<AssociatedIndex> pairs ) {
+		// clear the set of pairs so that if it fails it will be empty
 		pairs.reset();
 
-		Frame frameA = getFrame(viewA);
-		Frame frameB = getFrame(viewB);
+		Frame src = frameMap.get(viewA);
+		Frame dst = frameMap.get(viewB);
+		if (src == null || dst == null)
+			throw new IllegalArgumentException("Unknown view: src=" + viewA + " dst=" + viewB);
 
-		// See if the two views have a similar relationship
-		if (null == frameA.findConnected(frameB))
+		// If either view doesn't exist there can't be any pairs
+		// Handle special case where the viewA and viewB are the same
+		if (viewA.equals(viewB)) {
+			int numFeatures = src.featureCount();
+			pairs.reserve(numFeatures);
+			for (int i = 0; i < numFeatures; i++) {
+				pairs.grow().setTo(i, i);
+			}
+			return true;
+		}
+
+		// Look up the two frames based on their ID.
+		boolean matched = false;
+		for (int i = 0; i < src.related.size(); i++) {
+			if (src.related.get(i) == dst) {
+				matched = true;
+				break;
+			}
+		}
+		if (!matched)
 			return false;
 
-		// Look up all the feature IDs in frameA
-		keys.resize(frameA.trackToIndex.size());
-		frameA.trackToIndex.keys(keys.data);
+		// See if the two frames have any matches together
+		Match m = null;
+		for (int i = 0; i < src.matches.size(); i++) {
+			Match a = src.matches.get(i);
+			if (a.frameSrc == dst || a.frameDst == dst) {
+				m = a;
+				break;
+			}
+		}
+		if (m == null)
+			return false;
 
-		// Create index pairs of common features
-		for (int i = 0; i < keys.size; i++) {
-			long key = keys.get(i);
-			int idxB = frameB.trackToIndex.get(key);
-			if (idxB < 0)
-				continue;
-			int idxA = frameA.trackToIndex.get(key);
-			pairs.grow().setTo(idxA, idxB);
+		// Go through the match and construct the list of associated features
+		boolean swapped = m.frameSrc != src;
+		int size = m.size();
+		for (int i = 0; i < size; i++) {
+			if (swapped) {
+				pairs.grow().setTo(m.dst[i], m.src[i]);
+			} else {
+				pairs.grow().setTo(m.src[i], m.dst[i]);
+			}
 		}
 
 		return true;
 	}
 
-	@Override public void lookupShape( String target, ImageDimension shape ) {
-		shape.setTo(getFrame(target).shape);
+	@Override
+	public void lookupShape( String target, ImageDimension shape ) {
+		shape.setTo(imageWidth, imageHeight);
 	}
 
-	static class Frame {
-		// shape of original image
-		final ImageDimension shape = new ImageDimension();
-		final DogArray<Point2D_F64> pixels = new DogArray<>(Point2D_F64::new);
-		// Looks up track to index and uses a value of -1 when there's no entry
-		final TLongIntMap trackToIndex = new TLongIntHashMap(
-				Constants.DEFAULT_CAPACITY, Constants.DEFAULT_LOAD_FACTOR, -1, -1);
-		final DogArray<Connected> similar = new DogArray<>(Connected::new, Connected::reset);
+	/**
+	 * Describes how two frames are related to each other through common observations of the same feature
+	 */
+	public static class Match {
+		// observation indexes for the same feature in each frame
+		public int[] src;
+		public int[] dst;
 
-		String id = "";
+		// which frame in the src and which one is the dst
+		public Frame frameSrc;
+		public Frame frameDst;
 
-		void reset() {
-			shape.setTo(-1, -1);
-			pixels.reset();
-			trackToIndex.clear();
-			similar.reset();
-			id = "";
+		public void init( int total ) {
+			src = new int[total];
+			dst = new int[total];
 		}
 
-		Connected findConnected( Frame dst ) {
-			for (int i = 0; i < similar.size; i++) {
-				if (similar.get(i).dst == dst) {
-					return similar.get(i);
-				}
-			}
-			return null;
-		}
-	}
-
-	static class Connected {
-		Frame dst;
-		int common;
-
-		void setTo( Frame dst, int common ) {
-			this.dst = dst;
-			this.common = common;
+		/** Number of features/observations */
+		public int size() {
+			return src.length;
 		}
 
-		void reset() {
+		public void reset() {
+			src = null;
 			dst = null;
-			common = -1;
+			frameSrc = null;
+			frameDst = null;
 		}
 	}
 
+	/**
+	 * Observations for a frame. Arrays are used to reduce memory footprint.
+	 */
+	public static class Frame {
+		// Unique ID assigned to this frame
+		public String frameID;
+		// pixel observations for all the tracks (x,y) interleaved. This is floats and not doubles since we really
+		// don't need double precision for sub-pixel accuracy of visual landmarks. 1/100 is very good precision
+		public float[] observations;
+		// list of all the active tracks in this frame
+		public long[] ids;
+
+		// lookup table from track ID to observation index. If ID not in the set then -1 is returned
+		TLongIntMap id_to_index = new TLongIntHashMap() {{
+			no_entry_value = -1;
+		}};
+
+		// List of frames which are related to this one
+		public final List<Frame> related = new ArrayList<>();
+		// Matches to related frames.
+		public final List<Match> matches = new ArrayList<>();
+
+		public void initActive( int totalFeatures ) {
+			observations = new float[totalFeatures*2];
+			ids = new long[totalFeatures];
+		}
+
+		/** Number of feature observations */
+		public int featureCount() {
+			return ids.length;
+		}
+
+		public void getPixel( int index, Point2D_F64 out ) {
+			index *= 2;
+			out.x = observations[index];
+			out.y = observations[index + 1];
+		}
+
+		public long getID( int index ) {
+			return ids[index];
+		}
+
+		/**
+		 * Returns true if this frame is matche/dconnected to 'frame'
+		 */
+		public boolean isMatched( Frame frame ) {
+			for (int i = 0; i < matches.size(); i++) {
+				Match m = matches.get(i);
+				if (m.frameSrc == frame || m.frameDst == frame)
+					return true;
+			}
+			return false;
+		}
+
+		public void reset() {
+			observations = null;
+			ids = null;
+			frameID = null;
+			id_to_index.clear();
+			related.clear();
+			matches.clear();
+		}
+	}
+
+	/** Gets a unique ID from the track */
 	public interface TrackToID<Track> {
 		long getId( Track track );
 	}
 
+	/** Gets the pixel coordinate of the track */
 	public interface TrackToPixel<Track> {
 		void getPixel( Track track, Point2D_F64 pixel );
 	}

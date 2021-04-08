@@ -148,7 +148,7 @@ public class TestSimilarImagesSceneRecognition extends GenericLookUpSimilarImage
 		SimilarImagesSceneRecognition<GrayU8, TupleDesc_F32> alg = createFullyLoaded();
 
 		// Return known words
-		alg.recognizer = new MockFeatureSceneRecognition<>() {
+		alg.recognizer = new FeatureSceneRecognitionAbstract<>() {
 			int counter = 1;
 
 			@Override public int lookupWord( TupleDesc_F32 description ) {return counter++;}

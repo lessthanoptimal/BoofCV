@@ -20,9 +20,10 @@ package boofcv.alg.structure;
 
 import boofcv.abst.geo.bundle.SceneObservations;
 import boofcv.abst.geo.bundle.SceneStructureMetric;
+import boofcv.abst.tracker.PointTrack;
 import boofcv.abst.tracker.PointTracker;
 import boofcv.alg.filter.misc.AverageDownSampleOps;
-import boofcv.alg.similar.SimilarImagesPointTracker;
+import boofcv.alg.similar.SimilarImagesFromTracks;
 import boofcv.misc.LookUpImages;
 import boofcv.struct.image.ImageGray;
 import boofcv.struct.image.ImageType;
@@ -34,6 +35,7 @@ import org.ddogleg.struct.VerbosePrint;
 import org.jetbrains.annotations.Nullable;
 
 import java.io.PrintStream;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
@@ -48,7 +50,7 @@ public class ImageSequenceToSparseScene<T extends ImageGray<T>> implements Verbo
 	/** Frame to frame image tracker */
 	@Getter PointTracker<T> tracker;
 	/** Identifies similar images taking advantage of features being tracked in a sequence */
-	@Getter SimilarImagesPointTracker trackerSimilar;
+	@Getter SimilarImagesFromTracks trackerSimilar;
 	/** Creates a pairwise gram from similar images */
 	@Getter GeneratePairwiseImageGraph generatePairwise;
 	/** Create a metric scene from a pairwise image graph */
@@ -69,6 +71,9 @@ public class ImageSequenceToSparseScene<T extends ImageGray<T>> implements Verbo
 	final private T imageFull;
 	final private T imageDown;
 
+	// Storage for active tracks
+	final List<PointTrack> activeTracks = new ArrayList<>();
+
 	// Profiling information
 	private @Getter double timeTrackingMS;
 	private @Getter double timePairwiseMS;
@@ -79,7 +84,7 @@ public class ImageSequenceToSparseScene<T extends ImageGray<T>> implements Verbo
 	 * Constructor which specifies all the internal implementations
 	 */
 	public ImageSequenceToSparseScene( PointTracker<T> tracker,
-									   SimilarImagesPointTracker trackerSimilar,
+									   SimilarImagesFromTracks trackerSimilar,
 									   GeneratePairwiseImageGraph generatePairwise,
 									   MetricFromUncalibratedPairwiseGraph metricFromPairwise,
 									   RefineMetricWorkingGraph refineScene,
@@ -126,7 +131,8 @@ public class ImageSequenceToSparseScene<T extends ImageGray<T>> implements Verbo
 
 			tracker.process(image);
 			tracker.spawnTracks();
-			trackerSimilar.processFrame(tracker);
+			tracker.getActiveTracks(activeTracks);
+			trackerSimilar.processFrame(activeTracks, tracker.getFrameID());
 		}
 
 		// Find the pairwise geometric relationship between views

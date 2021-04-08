@@ -20,6 +20,7 @@ package boofcv.examples.sfm;
 
 import boofcv.abst.feature.detect.interest.PointDetectorTypes;
 import boofcv.abst.geo.bundle.SceneStructureMetric;
+import boofcv.abst.tracker.PointTrack;
 import boofcv.abst.tracker.PointTracker;
 import boofcv.alg.mvs.ColorizeMultiViewStereoResults;
 import boofcv.alg.similar.ConfigSimilarImagesTrackThenMatch;
@@ -180,6 +181,7 @@ public class ExampleMultiViewSparseReconstruction {
 //		configTracker.detDesc.detectPoint.general.selector = ConfigSelectLimit.selectUniform(2.0);
 
 		PointTracker<GrayU8> tracker = FactoryPointTracker.tracker(configTracker, GrayU8.class, null);
+		var activeTracks = new ArrayList<PointTrack>();
 
 		var config = new ConfigSimilarImagesTrackThenMatch();
 		config.recognizeNister2006.learningMinimumPointsForChildren.setFixed(20);
@@ -203,12 +205,12 @@ public class ExampleMultiViewSparseReconstruction {
 					similarImages.initialize(frame.width, frame.height);
 				}
 				tracker.process(frame);
-				int active = tracker.getTotalActive();
+				tracker.getActiveTracks(activeTracks);
 				int dropped = tracker.getDroppedTracks(null).size();
 				tracker.spawnTracks();
-				similarImages.processFrame(frame, tracker);
+				similarImages.processFrame(frame, activeTracks, tracker.getFrameID());
 				String id = frameId + "";//trackerSimilar.frames.getTail().frameID;
-				System.out.println("frame id = " + id + " active=" + active + " dropped=" + dropped);
+				System.out.println("frame id = " + id + " active=" + activeTracks.size() + " dropped=" + dropped);
 
 				// TODO drop tracks which have been viewed for too long to reduce the negative affects of track drift?
 

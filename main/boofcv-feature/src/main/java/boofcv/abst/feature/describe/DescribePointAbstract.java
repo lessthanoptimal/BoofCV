@@ -18,9 +18,11 @@
 
 package boofcv.abst.feature.describe;
 
+import boofcv.misc.BoofLambdas;
 import boofcv.struct.feature.TupleDesc;
 import boofcv.struct.image.ImageBase;
 import boofcv.struct.image.ImageType;
+import org.jetbrains.annotations.Nullable;
 
 /**
  * Default implementations for all functions in {@link DescribePoint}. Primary for testing purposes.
@@ -30,11 +32,21 @@ import boofcv.struct.image.ImageType;
 public abstract class DescribePointAbstract<T extends ImageBase<T>, TD extends TupleDesc<TD>>
 		implements DescribePoint<T, TD> {
 
+	protected @Nullable Class<TD> type;
+	protected @Nullable BoofLambdas.Factory<TD> factory;
+
+	public DescribePointAbstract(){}
+
+	public DescribePointAbstract( BoofLambdas.Factory<TD> factory ) {
+		this.factory = factory;
+		type = (Class)factory.newInstance().getClass();
+	}
+
 	// @formatter:off
 	@Override public void setImage( T image ) {}
 	@Override public boolean process( double x, double y, TD description ) {return false;}
 	@Override public ImageType<T> getImageType() {return null;}
-	@Override public TD createDescription() {return null;}
-	@Override public Class<TD> getDescriptionType() {return null;}
+	@Override public TD createDescription() {return factory==null?null:factory.newInstance();}
+	@Override public Class<TD> getDescriptionType() {return type;}
 	// @formatter:on
 }

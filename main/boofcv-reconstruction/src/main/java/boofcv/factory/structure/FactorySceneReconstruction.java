@@ -23,6 +23,7 @@ import boofcv.abst.feature.describe.DescribePoint;
 import boofcv.abst.feature.detdesc.DetectDescribePoint;
 import boofcv.abst.geo.bundle.MetricBundleAdjustmentUtils;
 import boofcv.abst.scene.FeatureSceneRecognition;
+import boofcv.abst.tracker.PointTrack;
 import boofcv.abst.tracker.PointTracker;
 import boofcv.alg.mvs.MultiViewStereoFromKnownSceneStructure;
 import boofcv.alg.similar.*;
@@ -121,7 +122,7 @@ public class FactorySceneReconstruction {
 		PointTracker<T> tracker = FactoryPointTracker.tracker(config.tracker, imageType.getImageClass(), null);
 
 		GeneratePairwiseImageGraph pairwise = generatePairwise(config.pairwise);
-		var similar = new SimilarImagesPointTracker();
+		var similar = new SimilarImagesFromTracks<PointTrack>(t -> t.featureId, ( t, pixel ) -> pixel.setTo(t.pixel));
 		var metric = new MetricFromUncalibratedPairwiseGraph(config.projective);
 		var refine = new RefineMetricWorkingGraph(bundleUtils(config.bundleAdjustment));
 
@@ -203,7 +204,7 @@ public class FactorySceneReconstruction {
 		if (config == null)
 			config = new ConfigSimilarImagesTrackThenMatch();
 
-		DescribePoint<Image, TD> detector =	FactoryDescribePoint.generic(config.descriptions, imageType);
+		DescribePoint<Image, TD> detector = FactoryDescribePoint.generic(config.descriptions, imageType);
 
 		FeatureSceneRecognition<TD> recognitizer =
 				FactorySceneRecognition.createSceneNister2006(config.recognizeNister2006, detector::createDescription);
