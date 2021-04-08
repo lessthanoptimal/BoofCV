@@ -18,10 +18,14 @@
 
 package boofcv.alg.similar;
 
+import boofcv.abst.feature.associate.AssociateDescriptionAbstract;
+import boofcv.abst.feature.associate.AssociateDescriptionHashSets;
 import boofcv.abst.feature.detdesc.DetectDescribePointAbstract;
+import boofcv.abst.scene.SceneRecognition;
 import boofcv.alg.structure.GenericLookUpSimilarImagesChecks;
 import boofcv.alg.structure.LookUpSimilarImages;
 import boofcv.factory.structure.FactorySceneReconstruction;
+import boofcv.misc.BoofLambdas;
 import boofcv.struct.feature.AssociatedIndex;
 import boofcv.struct.feature.TupleDesc_F32;
 import boofcv.struct.image.GrayU8;
@@ -30,7 +34,12 @@ import boofcv.struct.image.ImageType;
 import georegression.struct.point.Point2D_F64;
 import org.ddogleg.struct.DogArray;
 import org.ddogleg.struct.DogArray_I32;
+import org.ddogleg.struct.FastAccess;
+import org.jetbrains.annotations.Nullable;
 import org.junit.jupiter.api.Test;
+
+import java.util.ArrayList;
+import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -39,6 +48,9 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  * @author Peter Abeles
  */
 public class TestSimilarImagesSceneRecognition extends GenericLookUpSimilarImagesChecks {
+
+	int numViews = 5;
+	int numFeaturesPerView = 11;
 
 	/**
 	 * Populates internal data structures with a scene. Used when checking contract of accessors
@@ -50,16 +62,18 @@ public class TestSimilarImagesSceneRecognition extends GenericLookUpSimilarImage
 		SimilarImagesSceneRecognition<GrayU8, TupleDesc_F32> alg =
 				FactorySceneReconstruction.createSimilarImages(config, ImageType.SB_U8);
 
-		int numViews = 5;
-		int numFeaturesPerView = 11;
-		int totalFeatures = numViews*numFeaturesPerView;
+		alg.recognizer = new HelperRecognizer(numViews);
+		alg.asscociator = new AssociateDescriptionHashSets<>(new HelperAssociate(numFeaturesPerView));
 
 		alg.imageFeatureStartIndexes.resize(numViews*2);
 
 		for (int viewIdx = 0; viewIdx < numViews; viewIdx++) {
 			for (int i = 0; i < numFeaturesPerView; i++) {
 				alg.pixels.append(new Point2D_F64(1, 1));
-				alg.descriptions.append(alg.detector.createDescription());
+				// encode the view into the descriptor so that the recognition helper knows which images to return
+				TupleDesc_F32 desc = alg.detector.createDescription();
+				desc.data[0] = viewIdx;
+				alg.descriptions.append(desc);
 			}
 			alg.imageFeatureStartIndexes.data[viewIdx*2] = numFeaturesPerView*viewIdx;
 			alg.imageFeatureStartIndexes.data[viewIdx*2 + 1] = numFeaturesPerView;
@@ -67,21 +81,6 @@ public class TestSimilarImagesSceneRecognition extends GenericLookUpSimilarImage
 			alg.imageIDs.add(viewIdx + "");
 			alg.imageToIndex.put(viewIdx + "", viewIdx);
 			alg.imageShapes.grow().setTo(30, 40);
-			DogArray_I32 pairIndexes = alg.imageToPairIndexes.grow();
-
-			for (int connView = 0; connView < viewIdx; connView++) {
-				int pairIndex = alg.pairedImages.size;
-				pairIndexes.add(pairIndex);
-				alg.imageToPairIndexes.get(connView).add(pairIndex);
-
-				SimilarImagesSceneRecognition.PairInfo pairs = alg.pairedImages.grow();
-				pairs.src = connView;
-				pairs.dst = viewIdx;
-
-				for (int featIter = 0; featIter < numFeaturesPerView; featIter++) {
-					pairs.associated.grow().setTo(rand.nextInt(totalFeatures), rand.nextInt(totalFeatures));
-				}
-			}
 		}
 		return (T)alg;
 	}
@@ -108,40 +107,22 @@ public class TestSimilarImagesSceneRecognition extends GenericLookUpSimilarImage
 
 		// For all these other functions just check to see if something got populated
 		DogArray_I32 words = new DogArray_I32();
-		alg.lookupImageWords("" + 3, words);
+		alg.lookupImageWords("3", words);
 		assertTrue(words.size > 0);
 
 		var features = new DogArray<>(Point2D_F64::new);
-		alg.lookupPixelFeats(""+1, features);
+		alg.lookupPixelFeats("1", features);
 		assertTrue(features.size > 0);
+
+
+		// Look up similar images. All but the query view should be similar
+		List<String> similarImages = new ArrayList<>();
+		alg.findSimilar("0",(a)->true, similarImages);
+		assertTrue(similarImages.size() > 0);
 
 		var pairs = new DogArray<>(AssociatedIndex::new);
-		alg.lookupMatches(""+0,""+1, pairs);
+		alg.lookupAssociated(similarImages.get(0), pairs);
 		assertTrue(features.size > 0);
-	}
-
-	@Test void saveImagePairInfo() {
-		SimilarImagesSceneRecognition<GrayU8, TupleDesc_F32> alg = createFullyLoaded();
-		// clear previously added pair information
-		alg.imageToPairIndexes.forEach(DogArray_I32::reset);
-		alg.pairedImages.reset();
-
-		// Add a couple of pairs
-		alg.saveImagePairInfo(0, 1);
-		alg.saveImagePairInfo(1, 2);
-
-		// Check the data structures to see if they were updated correctly
-		assertEquals(2, alg.pairedImages.size);
-		assertEquals(1, alg.imageToPairIndexes.get(0).size);
-		assertEquals(2, alg.imageToPairIndexes.get(1).size);
-		assertEquals(1, alg.imageToPairIndexes.get(2).size);
-
-		assertEquals(0, alg.imageToPairIndexes.get(0).get(0));
-		assertEquals(1, alg.imageToPairIndexes.get(1).get(1));
-		assertEquals(1, alg.imageToPairIndexes.get(2).get(0));
-
-		assertEquals(1, alg.pairedImages.get(1).src);
-		assertEquals(2, alg.pairedImages.get(1).dst);
 	}
 
 	@Test void lookupImageWords() {
@@ -188,5 +169,67 @@ public class TestSimilarImagesSceneRecognition extends GenericLookUpSimilarImage
 		@Override public TupleDesc_F32 createDescription() {return new TupleDesc_F32(64);}
 
 		@Override public int getNumberOfFeatures() {return 10 + imageCount;}
+	}
+
+	/**
+	 * All images are matched to every other image, including itself.
+	 */
+	static class HelperRecognizer extends FeatureSceneRecognitionAbstract<TupleDesc_F32> {
+		int numViews;
+
+		public HelperRecognizer( int numViews ) {
+			this.numViews = numViews;
+		}
+
+		@Override
+		public boolean query( Features<TupleDesc_F32> query,
+							  @Nullable BoofLambdas.Filter<String> filter,
+							  int limit, DogArray<SceneRecognition.Match> matches ) {
+			matches.reset();
+
+			for (int i = 0; i < Math.min(limit, numViews); i++) {
+				String id = "" + i;
+				if (filter !=null && !filter.process(id))
+					continue;
+				matches.grow().id = id;
+			}
+
+			return true;
+		}
+
+		@Override public int getTotalWords() {
+			return 1;
+		}
+	}
+
+	/**
+	 * Matches every feature up with every feature
+	 */
+	static class HelperAssociate extends AssociateDescriptionAbstract<TupleDesc_F32> {
+		int numFeatures;
+
+		public HelperAssociate( int numFeatures ) {
+			this.numFeatures = numFeatures;
+		}
+
+		@Override public FastAccess<AssociatedIndex> getMatches() {
+			var matches = new DogArray<>(AssociatedIndex::new);
+			for (int i = 0; i < numFeatures; i++) {
+				matches.grow().setTo(i,i);
+			}
+			return matches;
+		}
+
+		@Override public Class<TupleDesc_F32> getDescriptionType() {
+			return TupleDesc_F32.class;
+		}
+
+		@Override public DogArray_I32 getUnassociatedSource() {
+			return new DogArray_I32();
+		}
+
+		@Override public DogArray_I32 getUnassociatedDestination() {
+			return new DogArray_I32();
+		}
 	}
 }

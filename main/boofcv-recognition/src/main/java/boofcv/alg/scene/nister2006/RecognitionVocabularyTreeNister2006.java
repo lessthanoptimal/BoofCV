@@ -20,6 +20,7 @@ package boofcv.alg.scene.nister2006;
 
 import boofcv.alg.scene.vocabtree.HierarchicalVocabularyTree;
 import boofcv.alg.scene.vocabtree.HierarchicalVocabularyTree.Node;
+import boofcv.misc.BoofLambdas;
 import boofcv.struct.ConfigLength;
 import lombok.Getter;
 import lombok.Setter;
@@ -155,10 +156,11 @@ public class RecognitionVocabularyTreeNister2006<Point> implements VerbosePrint 
 	 * {@link #getMatches()}.
 	 *
 	 * @param queryImage Set of feature descriptors from the query image
+	 * @param filter Filter which can be used to reject matches that the user doesn't want returned. False = reject.
 	 * @param limit Maximum number of matches it will return.
 	 * @return The best matching image with score from the database
 	 */
-	public boolean query( List<Point> queryImage, int limit ) {
+	public boolean query( List<Point> queryImage, @Nullable BoofLambdas.FilterInt filter, int limit ) {
 		matches.reset();
 
 		// Can't match to anything if it's empty
@@ -176,22 +178,61 @@ public class RecognitionVocabularyTreeNister2006<Point> implements VerbosePrint 
 		// Book keeping
 		for (int i = 0; i < matches.size(); i++) {
 			Match m = matches.get(i);
+
 			// Undo changes and make sure all elements are -1 again
 			imageIdx_to_match.set(m.identification, -1);
 			// m.identification is overloaded earlier and actually stores the index
 			m.identification = imagesDB.get(m.identification);
 		}
 
-		// When dealing with 1 million images using quick select first makes a significant improvement
-		// Sorting everything was taking 300 to 500 ms before and after it was taking 15 to 45 ms.
-		if (matches.size > limit) {
-			// Quick select ensures that the first N elements have the smallest N values, but they are not ordered
-			QuickSelect.select(matches.data, limit, matches.size);
-			matches.size = limit;
+		filterAndSortMatches(filter, limit);
+
+		return matches.size > 0;
+	}
+
+	/**
+	 * When dealing with 1 million images using quick select first makes a significant improvement
+	 * Sorting everything was taking 300 to 500 ms before and after it was taking 15 to 45 ms.
+	 */
+	void filterAndSortMatches( @Nullable BoofLambdas.FilterInt filter, int limit ) {
+		if (filter !=null) {
+			// Iterate until the limit the best 'limit' matches pass the filter
+			int startIdx = 0;
+			while (startIdx < matches.size) {
+				// Select first set of possible matches
+				if (limit < matches.size)
+					QuickSelect.select(matches.data, limit-startIdx, startIdx, matches.size);
+
+			   // Filter these. This will potentially mess up the order
+				int localLimit = Math.min(limit, matches.size);
+				for (int i = startIdx; i < localLimit;) {
+					if (filter.process(matches.get(i).identification)) {
+						i++;
+						continue;
+					}
+					// Swap an element at the end of the list the quick sort region in to the current location
+					matches.swap(i, localLimit-1);
+					// Take the mach which got filtered out and remove it from the match list entirely
+					matches.removeSwap(localLimit-1);
+					// quick sort region is now smaller
+					localLimit--;
+				}
+
+				// If the local limit is the same as the hard limit then stop
+				if (localLimit==Math.min(limit, matches.size))
+					break;
+				startIdx += localLimit - startIdx;
+			}
+			matches.size = Math.min(matches.size, limit);
+	   } else {
+			// Very simple logic if there's no filter
+			if (matches.size > limit) {
+				// Quick select ensures that the first N elements have the smallest N values, but they are not ordered
+				QuickSelect.select(matches.data, limit, matches.size);
+				matches.size = limit;
+			}
 		}
 		Collections.sort(matches.toList());
-
-		return true;
 	}
 
 	/**

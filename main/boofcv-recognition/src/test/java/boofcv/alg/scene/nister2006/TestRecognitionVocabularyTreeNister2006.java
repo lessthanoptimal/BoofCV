@@ -53,7 +53,7 @@ class TestRecognitionVocabularyTreeNister2006 extends BoofStandardJUnit {
 
 		for (int i = 0; i < 5; i++) {
 			// The best match should be the input image since the exact same image is being passed in
-			assertTrue(alg.query(images.get(i), Integer.MAX_VALUE));
+			assertTrue(alg.query(images.get(i), ( a ) -> true, Integer.MAX_VALUE));
 			Match best = alg.getMatches().get(0);
 
 			assertEquals(0.0, best.error, UtilEjml.TEST_F32);
@@ -109,6 +109,88 @@ class TestRecognitionVocabularyTreeNister2006 extends BoofStandardJUnit {
 		// L2-norm should be 1.0
 		float norm = (float)Math.sqrt(f1*f1 + f2*f2 + f3*f3 + f5*f5);
 		assertEquals(1.0f, norm, UtilEjml.TEST_F32);
+	}
+
+	/**
+	 * The filter accepts everything
+	 */
+	@Test void filterAndSortMatches_true() {
+		var alg = new RecognitionVocabularyTreeNister2006<Point2D_F64>();
+
+		alg.matches.resize(10);
+		alg.matches.forIdx(( idx, m ) -> m.identification = idx);
+		alg.matches.forIdx(( idx, m ) -> m.error = 10 - idx);
+
+		// Limit is greater than the number of matches
+		// All matches should be left, but the order changed
+		alg.filterAndSortMatches(( id ) -> true, 20);
+		assertEquals(10, alg.matches.size);
+		alg.matches.forIdx(( idx, m ) -> assertEquals(9 - idx, m.identification));
+
+		// Limit is less than the number of matches
+		alg.matches.forIdx(( idx, m ) -> m.identification = idx);
+		alg.matches.forIdx(( idx, m ) -> m.error = 10 - idx);
+		alg.filterAndSortMatches(( id ) -> true, 4);
+		assertEquals(4, alg.matches.size);
+		alg.matches.forIdx(( idx, m ) -> assertEquals(9 - idx, m.identification));
+	}
+
+	/**
+	 * The filter will reject even numbers
+	 */
+	@Test void filterAndSortMatches_Filtered() {
+		var alg = new RecognitionVocabularyTreeNister2006<Point2D_F64>();
+
+		// Limit is greater than the number of matches, before filtering
+		// The filter will remove all odd ID and return half
+		alg.matches.resize(50);
+		alg.matches.forIdx(( idx, m ) -> m.identification = idx);
+		alg.matches.forIdx(( idx, m ) -> m.error = 50 - idx);
+		alg.filterAndSortMatches(( id ) -> id%2==0, 100);
+		assertEquals(25, alg.matches.size);
+		alg.matches.forIdx(( idx, m ) -> assertEquals(48 - idx*2, m.identification));
+
+		// Limit is greater than the number of matches, after filtering
+		alg.matches.resize(50);
+		alg.matches.forIdx(( idx, m ) -> m.identification = idx);
+		alg.matches.forIdx(( idx, m ) -> m.error = 50 - idx);
+		alg.filterAndSortMatches(( id ) -> id%2==0, 27);
+		assertEquals(25, alg.matches.size);
+		alg.matches.forIdx(( idx, m ) -> assertEquals(48 - idx*2, m.identification));
+
+		// Limit is less than the number of matches, after filtering
+		for (int limit = 5; limit < 20; limit++) {
+			alg.matches.resize(50);
+			alg.matches.forIdx(( idx, m ) -> m.identification = idx);
+			alg.matches.forIdx(( idx, m ) -> m.error = 50 - idx);
+			alg.filterAndSortMatches(( id ) -> id%2==0, limit);
+			assertEquals(limit, alg.matches.size);
+			alg.matches.forIdx(( idx, m ) -> assertEquals(48 - idx*2, m.identification));
+		}
+	}
+
+	/**
+	 * Null is passed in as the filter
+	 */
+	@Test void filterAndSortMatches_noFilter() {
+		var alg = new RecognitionVocabularyTreeNister2006<Point2D_F64>();
+
+		alg.matches.resize(10);
+		alg.matches.forIdx(( idx, m ) -> m.identification = idx);
+		alg.matches.forIdx(( idx, m ) -> m.error = 10 - idx);
+
+		// Limit is greater than the number of matches
+		// All matches should be left, but the order changed
+		alg.filterAndSortMatches(null, 20);
+		assertEquals(10, alg.matches.size);
+		alg.matches.forIdx(( idx, m ) -> assertEquals(9 - idx, m.identification));
+
+		// Limit is less than the number of matches
+		alg.matches.forIdx(( idx, m ) -> m.identification = idx);
+		alg.matches.forIdx(( idx, m ) -> m.error = 10 - idx);
+		alg.filterAndSortMatches(null, 4);
+		assertEquals(4, alg.matches.size);
+		alg.matches.forIdx(( idx, m ) -> assertEquals(9 - idx, m.identification));
 	}
 
 	public static HierarchicalVocabularyTree<Point2D_F64> create2x2Tree() {

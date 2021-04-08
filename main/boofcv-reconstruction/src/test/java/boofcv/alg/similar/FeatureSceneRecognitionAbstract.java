@@ -20,6 +20,7 @@ package boofcv.alg.similar;
 
 import boofcv.abst.scene.FeatureSceneRecognition;
 import boofcv.abst.scene.SceneRecognition;
+import boofcv.misc.BoofLambdas;
 import boofcv.struct.feature.TupleDesc;
 import org.ddogleg.struct.DogArray;
 import org.ddogleg.struct.DogArray_I32;
@@ -39,12 +40,13 @@ public class FeatureSceneRecognitionAbstract<TD extends TupleDesc<TD>> implement
 	@Override public void learnModel( Iterator<Features<TD>> images ) {}
 	@Override public void clearDatabase() {}
 	@Override public void addImage( String id, Features<TD> features ) {}
-	@Override public boolean query( Features<TD> query, int limit, DogArray<SceneRecognition.Match> matches ) {return false;}
+	@Override public boolean query( Features<TD> query, BoofLambdas.Filter<String> filter,
+									int limit, DogArray<SceneRecognition.Match> matches ) {return false;}
 	@Override public int getQueryWord( int featureIdx ) {return 0;}
 	@Override public void getQueryWords( int featureIdx, DogArray_I32 word ) {}
 	@Override public int lookupWord( TD description ) {return 0;}
 	@Override public void lookupWords( TD description, DogArray_I32 word ) {}
-	@Override public int getTotalWords() {return 0;}
+	@Override public int getTotalWords() {return 1;}
 	@Override public Class<TD> getDescriptorType() {return null;}
 	@Override public void setVerbose( @Nullable PrintStream printStream, @Nullable Set<String> set ) {}
 	// @formatter:on

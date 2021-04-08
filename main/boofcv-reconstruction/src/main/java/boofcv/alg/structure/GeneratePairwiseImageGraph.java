@@ -88,7 +88,7 @@ public class GeneratePairwiseImageGraph implements VerbosePrint {
 		for (int idxTgt = 0; idxTgt < imageIds.size(); idxTgt++) {
 			String src = imageIds.get(idxTgt);
 
-			db.findSimilar(src, similar);
+			db.findSimilar(src, ( id ) -> true, similar);
 			db.lookupPixelFeats(src, srcFeats);
 
 			if (verbose != null) verbose.println("ID=" + src + " similar=" + similar.size() + "  obs=" + srcFeats.size);
@@ -105,7 +105,7 @@ public class GeneratePairwiseImageGraph implements VerbosePrint {
 
 				// get information on the features and association
 				db.lookupPixelFeats(dst, dstFeats);
-				db.lookupMatches(src, dst, matches);
+				db.lookupAssociated(dst, matches);
 
 				pairs.reset();
 				for (int i = 0; i < matches.size; i++) {
@@ -134,7 +134,7 @@ public class GeneratePairwiseImageGraph implements VerbosePrint {
 		DogArray_I32 inlierIdx = new DogArray_I32();
 
 		// no new line since epipolarScore should print something about this pair
-		if (verbose!=null) verbose.printf("  createEdge['%s'] -> '%s'  ",src,dst);
+		if (verbose != null) verbose.printf("  createEdge['%s'] -> '%s'  ", src, dst);
 
 		if (!epipolarScore.process(pairs.toList(), fundamental, inlierIdx)) {
 			// Don't create an edge here

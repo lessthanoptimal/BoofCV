@@ -98,9 +98,14 @@ public abstract class GenericFeatureSceneRecognitionChecks<TD extends TupleDesc<
 
 		// It should have some matches and make sure the limit is respected
 		var matches = new DogArray<>(SceneRecognition.Match::new);
-		assertTrue(alg.query(getFeatures(1, images), 3, matches));
+		assertTrue(alg.query(getFeatures(1, images), ( id ) -> true, 3, matches));
 		assertTrue(matches.size > 0 && matches.size <= 3);
 
+		// See if it handles a null filter correctly. Should produce the same results
+		var matchesNull = new DogArray<>(SceneRecognition.Match::new);
+		assertTrue(alg.query(getFeatures(1, images), null, 3, matchesNull));
+		assertEquals(matchesNull.size, matchesNull.size);
+		matches.forIdx((idx,e)->assertEquals(e.id, matchesNull.get(idx).id));
 
 		// It should always find a word since it was part of the training set
 		for (int imageIdx = 0; imageIdx < images.size(); imageIdx++) {
@@ -116,7 +121,7 @@ public abstract class GenericFeatureSceneRecognitionChecks<TD extends TupleDesc<
 
 		// See if clearing the DB works
 		alg.clearDatabase();
-		assertFalse(alg.query(getFeatures(1, images), 3, matches));
+		assertFalse(alg.query(getFeatures(1, images), ( id ) -> true, 3, matches));
 	}
 
 	private FeatureSceneRecognition.Features<TD> getFeatures( int imageIdx, List<List<TD>> images ) {

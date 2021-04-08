@@ -19,6 +19,7 @@
 package boofcv.alg.structure;
 
 import boofcv.alg.geo.PerspectiveOps;
+import boofcv.misc.BoofLambdas;
 import boofcv.struct.calib.CameraPinhole;
 import boofcv.struct.feature.AssociatedIndex;
 import boofcv.struct.image.ImageDimension;
@@ -56,6 +57,8 @@ class MockLookupSimilarImages implements LookUpSimilarImages {
 	public List<DMatrixRMaj> listCameraMatrices = new ArrayList<>();
 
 	public PairwiseImageGraph graph = new PairwiseImageGraph();
+
+	String queryID;
 
 	public MockLookupSimilarImages( int numViews, long seed ) {
 		this.rand = new Random(seed);
@@ -160,7 +163,8 @@ class MockLookupSimilarImages implements LookUpSimilarImages {
 	}
 
 	@Override
-	public void findSimilar( String target, List<String> similar ) {
+	public void findSimilar( String target, BoofLambdas.Filter<String> filter, List<String> similar ) {
+		this.queryID = target;
 		similar.clear();
 		for (int i = 0; i < viewIds.size(); i++) {
 			if (!viewIds.get(i).equals(target)) {
@@ -180,8 +184,8 @@ class MockLookupSimilarImages implements LookUpSimilarImages {
 	}
 
 	@Override
-	public boolean lookupMatches( String viewA, String viewB, DogArray<AssociatedIndex> pairs ) {
-		int[] tableA = featToView.get(indexOfView(viewA));
+	public boolean lookupAssociated( String viewB, DogArray<AssociatedIndex> pairs ) {
+		int[] tableA = featToView.get(indexOfView(queryID));
 		int[] tableB = featToView.get(indexOfView(viewB));
 
 		pairs.reset();

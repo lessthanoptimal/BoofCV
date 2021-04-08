@@ -50,7 +50,7 @@ public abstract class GenericLookUpSimilarImagesChecks extends BoofStandardJUnit
 		List<String> similar = new ArrayList<>();
 		similar.add("ASDASDASD");
 
-		alg.findSimilar(alg.getImageIDs().get(0), similar);
+		alg.findSimilar(alg.getImageIDs().get(0), ( id ) -> true, similar);
 
 		assertTrue(similar.size() >= 1);
 		assertNotEquals("ASDASDASD", similar.get(0));
@@ -83,97 +83,108 @@ public abstract class GenericLookUpSimilarImagesChecks extends BoofStandardJUnit
 		assertThrows(IllegalArgumentException.class, () -> alg.lookupPixelFeats("asdasd", features));
 	}
 
-	/**
-	 * Tests to see if when requesting matching features between the two views that the src and dst order
-	 * is respected
-	 */
-	@Test void lookupMatches_src_dst() {
+	@Test void findSimilar_filter() {
 		LookUpSimilarImages alg = createFullyLoaded();
 
 		List<String> images = alg.getImageIDs();
 		String viewA = images.get(0);
 
 		List<String> similar = new ArrayList<>();
-		alg.findSimilar(viewA, similar);
+		alg.findSimilar(viewA, ( id ) -> true, similar);
 		String viewB = similar.get(0);
 
-		var pairsAB = new DogArray<>(AssociatedIndex::new);
-		assertTrue(alg.lookupMatches(viewA, viewB, pairsAB));
-
-		var pairsBA = new DogArray<>(AssociatedIndex::new);
-		assertTrue(alg.lookupMatches(viewB, viewA, pairsBA));
-
-		// Make sure there are a few elements in it
-		assertTrue(pairsAB.size >= 5);
-		// Make sure they are "equivalent"
-		assertEquals(pairsAB.size, pairsBA.size);
-		int countIdentical = 0;
-		for (int i = 0; i < pairsAB.size; i++) {
-			if (pairsAB.get(i).src == pairsAB.get(i).dst)
-				countIdentical++;
-			assertEquals(pairsAB.get(i).src, pairsBA.get(i).dst);
-			assertEquals(pairsAB.get(i).dst, pairsBA.get(i).src);
-		}
-
-		// Sanity check to see if a good set of test data was constructed. If src and dst are the same then
-		// this tests nothing
-		assertNotEquals(countIdentical, pairsAB.size);
+		// search a second time, but now exclude viewB and see if it's removed from the similar list
+		alg.findSimilar(viewA, ( id ) -> !id.equals(viewB), similar);
+		similar.forEach(id -> assertNotEquals(id, viewB));
 	}
 
 	/**
-	 * Requested matches when the src and dst are the same view. All features will be the match
+	 * Compare results when passing in null against results when the filter is always true
 	 */
-	@Test void lookupMatches_sameView() {
+	@Test void findSimilar_filter_null() {
 		LookUpSimilarImages alg = createFullyLoaded();
+
 		List<String> images = alg.getImageIDs();
 		String viewA = images.get(0);
 
-		var pairs = new DogArray<>(AssociatedIndex::new);
-		assertTrue(alg.lookupMatches(viewA, viewA, pairs));
+		List<String> expected = new ArrayList<>();
+		alg.findSimilar(viewA, ( id ) -> true, expected);
 
-		var features = new DogArray<>(Point2D_F64::new);
-		alg.lookupPixelFeats(viewA, features);
+		List<String> found = new ArrayList<>();
+		alg.findSimilar(viewA, null, found);
 
-		// Number of features and pairs must match
-		assertEquals(features.size, pairs.size);
-		assertTrue(features.size >= 5);
-		pairs.forEach(p -> assertEquals(p.src, p.dst));
+		assertEquals(expected.size(), found.size());
+		for (int i = 0; i < expected.size(); i++) {
+			assertEquals(expected.get(i), found.get(i));
+		}
 	}
 
 	/**
-	 * See if it handles requests for views which don't exist well
+	 * Simple sanity check that just sees if it blows up or not
 	 */
-	@Test void lookupMatches_nonExistentViews() {
+	@Test void lookupAssociated() {
 		LookUpSimilarImages alg = createFullyLoaded();
-		DogArray<AssociatedIndex> associated = new DogArray<>(AssociatedIndex::new);
 
-		// Two identical strings which don't exist
-		assertThrows(IllegalArgumentException.class, () -> alg.lookupMatches("asdf", "asdf", associated));
-		// Two different strings which don't exist
-		assertThrows(IllegalArgumentException.class, () -> alg.lookupMatches("asdf", "asdfA", associated));
-
-		// One frame does exists and the other doesn't
 		List<String> images = alg.getImageIDs();
-		assertThrows(IllegalArgumentException.class, () -> alg.lookupMatches(images.get(0), "asdf", associated));
-		assertThrows(IllegalArgumentException.class, () -> alg.lookupMatches("asdf", images.get(0), associated));
+
+		assertFalse(images.isEmpty());
+
+		int totalNonZero = 0;
+		DogArray<AssociatedIndex> pairs = new DogArray<>(AssociatedIndex::new);
+		List<String> similar = new ArrayList<>();
+
+		int N = Math.min(5, images.size());
+		for (int i = 0; i < N; i++) {
+			String id = images.get(i);
+
+			alg.findSimilar(id, (a)->true, similar);
+
+			for (String s : similar) {
+				if (alg.lookupAssociated(s, pairs)) {
+					assertTrue(pairs.size>0);
+					totalNonZero++;
+				} else {
+					assertTrue(pairs.isEmpty());
+				}
+			}
+		}
+
+		assertTrue(totalNonZero>1);
 	}
 
 	/**
-	 * Makes the passed in array is cleared
+	 * Attempt to look up associated features for a view which does not exist/was not similar to the query image
 	 */
-	@Test void lookupMatches_cleared() {
+	@Test void lookupAssociated_nonExistentViews() {
 		LookUpSimilarImages alg = createFullyLoaded();
 
 		List<String> images = alg.getImageIDs();
 		String viewA = images.get(0);
 
 		List<String> similar = new ArrayList<>();
-		alg.findSimilar(viewA, similar);
+		alg.findSimilar(viewA, ( id ) -> true, similar);
+
+		// Request a match to a non-existent similar image
+		var pairs = new DogArray<>(AssociatedIndex::new);
+		assertThrows(IllegalArgumentException.class, () -> alg.lookupAssociated("adsasdasd",pairs));
+	}
+
+	/**
+	 * Makes sure the passed in array is cleared
+	 */
+	@Test void lookupAssociated_cleared() {
+		LookUpSimilarImages alg = createFullyLoaded();
+
+		List<String> images = alg.getImageIDs();
+		String viewA = images.get(0);
+
+		List<String> similar = new ArrayList<>();
+		alg.findSimilar(viewA, ( id ) -> true, similar);
 		String viewB = similar.get(0);
 
 		DogArray<AssociatedIndex> pairsAB = new DogArray<>(AssociatedIndex::new);
 		pairsAB.resize(10, ( e ) -> e.setTo(-2, -2));
-		assertTrue(alg.lookupMatches(viewA, viewB, pairsAB));
+		assertTrue(alg.lookupAssociated(viewB, pairsAB));
 		assertTrue(pairsAB.size() >= 1);
 		// if wasn't cleared then it will have the same value for first element
 		assertNotEquals(-2, pairsAB.get(0).src);

@@ -38,9 +38,7 @@ import org.ddogleg.struct.VerbosePrint;
 import org.jetbrains.annotations.Nullable;
 
 import java.io.PrintStream;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 /**
  * First track features sequentially, then use {@link boofcv.abst.scene.FeatureSceneRecognition} to identify
@@ -69,7 +67,7 @@ public class SimilarImagesTrackThenMatch<Image extends ImageBase<Image>, TD exte
 	@Getter @Setter DescribePoint<Image, TD> describer;
 
 	/** Performs feature based association using 'words' from the recognizer */
-	@Getter AssociateDescriptionHashSets<TD> featureAssociator;
+	@Getter AssociateDescriptionHashSets<TD> associator;
 
 	/** Looks up similar images and provides words for each image feature */
 	@Getter FeatureSceneRecognition<TD> recognizer;
@@ -103,6 +101,10 @@ public class SimilarImagesTrackThenMatch<Image extends ImageBase<Image>, TD exte
 	final DogArray<TD> destinationDescriptions;
 	final DogArray<Point2D_F64> destinationPixels;
 
+	// Information about similar images to a recent query
+	final DogArray<PairInfo> pairInfo = new DogArray<>(PairInfo::new, PairInfo::reset);
+	final Map<String, PairInfo> viewId_to_pairs = new HashMap<>();
+
 	// If not null it will print verbose debugging info
 	PrintStream verbose;
 
@@ -112,7 +114,7 @@ public class SimilarImagesTrackThenMatch<Image extends ImageBase<Image>, TD exte
 										BoofLambdas.Factory<PackedArray<TD>> factoryPackedDesc ) {
 		super(t -> t.featureId, ( t, pixel ) -> pixel.setTo(t.pixel));
 		this.describer = describer;
-		this.featureAssociator = featureAssociator;
+		this.associator = featureAssociator;
 		this.recognizer = recognizer;
 		descriptions = factoryPackedDesc.newInstance();
 
@@ -190,85 +192,112 @@ public class SimilarImagesTrackThenMatch<Image extends ImageBase<Image>, TD exte
 		for (int frameIdx = 0; frameIdx < frameStartIndexes.size; frameIdx++) {
 			recognizer.addImage(frameIdx + "", wrapFeatures(frameIdx));
 		}
-
-		searchForMatchingFrames();
 	}
 
-	/**
-	 * Use the recognizer to search for frames that match but were not
-	 */
-	private void searchForMatchingFrames() {
-		// save so that we know how many frames got matched
-		int priorConnectedFrames = connections.size;
+	@Override public void findSimilar( String target,
+									   @Nullable BoofLambdas.Filter<String> filter,
+									   List<String> similarImages ) {
+		// discard old results
+		viewId_to_pairs.clear();
+		pairInfo.reset();
 
-		// Handle the case where the searchRadius is infinite and has been set to a negative value
-		int searchRadius = Math.max(0, this.searchRadius);
+		// which frame we are doing with and sanity check it
+		int frameIdx = frameToIndex(target);
+		if (frameIdx < 0 || frameIdx >= frames.size)
+			throw new IllegalArgumentException("Unknown target="+target);
 
-		// Total connections considered
-		int totalConsidered = 0;
+		// Look up results from the sequential tracker
+		super.findSimilar(target, filter, similarImages);
 
-		// Search for loops at every frame
-		for (int frameIdx = 0; frameIdx < frameStartIndexes.size; frameIdx++) {
-			recognizer.query(wrapFeatures(frameIdx), 2*searchRadius + 1 + limitQuery, queryMatches);
+		Frame frameTarget = frames.get(frameIdx);
 
-			featureAssociator.initialize(recognizer.getTotalWords());
-			loadFrameIntoSource(frameIdx);
+		// Filter candidate results so that only frames it could possible connect to are considered
+		BoofLambdas.Filter<String> queryFilter = filterQuery(filter, frameIdx, frameTarget);
 
-			Frame frameTarget = frames.get(frameIdx);
+		// Look up potential matches using the recognition algorithm while filtering results
+		recognizer.query(wrapFeatures(frameIdx), queryFilter, 2*searchRadius + 1 + limitQuery, queryMatches);
 
-			if (verbose != null)
-				verbose.printf("query[%d] match.size=%d\n", frameIdx, queryMatches.size);
+		// Set up feature association
+		associator.initialize(recognizer.getTotalWords());
+		loadFrameIntoSource(frameIdx);
 
-			for (int queryIdx = 0; queryIdx < queryMatches.size; queryIdx++) {
-				int matchedFrameIdx = Integer.parseInt(queryMatches.get(queryIdx).id);
-
-				// see if it matches itself
-				if (matchedFrameIdx == frameIdx)
-					continue;
-
-				Frame frameCandidate = frames.get(matchedFrameIdx);
-
-				// See if the two frames are already connected. This needs to be done no matter what since
-				// they could have been connected by an earlier frame in the loop
-				if (frameTarget.isMatched(frameCandidate))
-					continue;
-
-				// See if these two frames could have been paired up by the sequential algorithm
-				boolean checkConnection = false;
-
-				if (Math.abs(matchedFrameIdx - frameIdx) < searchRadius) {
-					// These were not connected by the sequential matcher, but they were within the search radius
-					// that means there could have been an event that broke the sequential tracker but might not
-					// break the feature matcher. E.g. abrupt lighting or short term motion blur
-					checkConnection = true;
-				} else if (Math.abs(matchedFrameIdx - frameIdx) >= minimumRecognizeDistance) {
-					// They are far enough apart that it's advantageous to look for loop closures
-					checkConnection = true;
-				}
-
-				if (!checkConnection)
-					continue;
-
-				totalConsidered++;
-				attemptToConnectFrames(frameIdx, matchedFrameIdx);
-			}
+		// Go through each potential match and see if it is really similar to the query image
+		for (int queryIdx = 0; queryIdx < queryMatches.size; queryIdx++) {
+			int matchedFrameIdx = Integer.parseInt(queryMatches.get(queryIdx).id);
+			checkSimilarConnection(frameIdx, matchedFrameIdx, similarImages);
 		}
 
 		if (verbose != null)
-			verbose.printf("Recognition created %d connections. Considered %d\n",
-					(connections.size - priorConnectedFrames), totalConsidered);
+			verbose.printf("query[%d] match.size=%d similar.size=%d\n", frameIdx, queryMatches.size, similarImages.size());
+	}
+
+	@Override public boolean lookupAssociated( String viewB, DogArray<AssociatedIndex> pairs ) {
+		// Clear as required by the contract
+		pairs.reset();
+
+		// See if this view was associated using recognition
+		PairInfo info = viewId_to_pairs.get(viewB);
+		if (info != null) {
+			pairs.copyAll(info.associated.toList(), ( original, copy ) -> copy.setTo(original));
+			return true;
+		}
+
+		// See of the sequential tracker associated the two views
+		return super.lookupAssociated(viewB, pairs);
 	}
 
 	/**
-	 * Checks to see if these two frames are similar and if so it will connect them
+	 * Creates a filter which will preemptively remove invalid matches so that only distant valid matches are
+	 * considered
 	 */
-	protected void attemptToConnectFrames( int frameIdx, int matchedFrameIdx ) {
+	private BoofLambdas.Filter<String> filterQuery( @Nullable BoofLambdas.Filter<String> filter,
+													int frameIdx, Frame frameTarget ) {
+		return ( id ) -> {
+			int matchedFrameIdx = Integer.parseInt(id);
+
+			// if the result matches the target, skip it
+			if (matchedFrameIdx == frameIdx)
+				return false;
+
+			Frame frameCandidate = frames.get(matchedFrameIdx);
+
+			// See if the two frames are already connected. This needs to be done no matter what since
+			// they could have been connected by an earlier frame in the loop
+			if (frameTarget.isMatched(frameCandidate))
+				return false;
+
+			// Apply user provided filter
+			if (filter != null && !filter.process(id))
+				return false;
+
+			boolean checkConnection = false;
+			if (Math.abs(matchedFrameIdx - frameIdx) < searchRadius) {
+				// These were not connected by the sequential matcher, but they were within the search radius
+				// that means there could have been an event that broke the sequential tracker but might not
+				// break the feature matcher. E.g. abrupt lighting or short term motion blur
+				checkConnection = true;
+			} else if (Math.abs(matchedFrameIdx - frameIdx) >= minimumRecognizeDistance) {
+				// They are far enough apart that it's advantageous to look for loop closures
+				checkConnection = true;
+			}
+
+			return checkConnection;
+		};
+	}
+
+	/**
+	 * Checks to see if these two frames are similar and if so it will connect them.
+	 *
+	 * NOTE: We can't save the results here with the results from the sequential tracker since the filter
+	 * could have changed since the last time similar was called.
+	 */
+	protected void checkSimilarConnection( int frameIdx, int matchedFrameIdx, List<String> similarImages ) {
 		loadFrameIntoDestination(matchedFrameIdx);
 
 		// Use the image descriptors to match features
-		featureAssociator.associate();
+		associator.associate();
 
-		FastAccess<AssociatedIndex> matches = featureAssociator.getMatches();
+		FastAccess<AssociatedIndex> matches = associator.getMatches();
 
 		// See if the found feature matches pass a similarity test
 		boolean similar = similarityTest.isSimilar(sourcePixels, destinationPixels, matches);
@@ -279,8 +308,14 @@ public class SimilarImagesTrackThenMatch<Image extends ImageBase<Image>, TD exte
 		if (verbose != null)
 			verbose.printf("connecting %3d to %3d. matches.size=%d\n", frameIdx, matchedFrameIdx, matches.size);
 
-		// Connect the two frames using the matched features
-		connectFrames(frames.get(frameIdx), frames.get(matchedFrameIdx), matches);
+		// The two frames are similar to each other
+		String id = frames.get(matchedFrameIdx).frameID;
+		similarImages.add(id);
+
+		// Save associated features for later retrieval
+		PairInfo info = pairInfo.grow();
+		info.associated.copyAll(associator.getMatches().toList(), ( original, copy ) -> copy.setTo(original));
+		viewId_to_pairs.put(id, info);
 	}
 
 	/**
@@ -302,7 +337,7 @@ public class SimilarImagesTrackThenMatch<Image extends ImageBase<Image>, TD exte
 			frame.getPixel(i, sourcePixels.grow());
 
 			// Add this feature to the associator
-			featureAssociator.addSource(desc, recognizer.lookupWord(desc));
+			associator.addSource(desc, recognizer.lookupWord(desc));
 		}
 	}
 
@@ -318,7 +353,7 @@ public class SimilarImagesTrackThenMatch<Image extends ImageBase<Image>, TD exte
 		// Load the target/source image features
 		destinationDescriptions.reset();
 		destinationPixels.reset();
-		featureAssociator.clearDestination();
+		associator.clearDestination();
 		for (int i = 0; i < numberOfFeatures; i++) {
 			// Copy description and pixel coordinate into their array
 			TD desc = destinationDescriptions.grow();
@@ -326,7 +361,7 @@ public class SimilarImagesTrackThenMatch<Image extends ImageBase<Image>, TD exte
 			frame.getPixel(i, destinationPixels.grow());
 
 			// Add this feature to the associator
-			featureAssociator.addDestination(desc, recognizer.lookupWord(desc));
+			associator.addDestination(desc, recognizer.lookupWord(desc));
 		}
 	}
 
@@ -355,6 +390,23 @@ public class SimilarImagesTrackThenMatch<Image extends ImageBase<Image>, TD exte
 				return frame.featureCount();
 			}
 		};
+	}
+
+	/**
+	 * Describes the relationship between two images
+	 */
+	protected static class PairInfo {
+		// Image feature index for features which were associated
+		public DogArray<AssociatedIndex> associated = new DogArray<>(AssociatedIndex::new);
+
+		public void reset() {
+			associated.reset();
+		}
+	}
+
+	/** Converts the frame ID into the frame index. It's just an integer string */
+	private int frameToIndex( String id ) {
+		return Integer.parseInt(id);
 	}
 
 	@Override public void setVerbose( @Nullable PrintStream out, @Nullable Set<String> options ) {

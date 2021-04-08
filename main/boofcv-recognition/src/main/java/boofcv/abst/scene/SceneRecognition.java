@@ -18,10 +18,12 @@
 
 package boofcv.abst.scene;
 
+import boofcv.misc.BoofLambdas;
 import boofcv.struct.image.ImageBase;
 import boofcv.struct.image.ImageType;
 import org.ddogleg.struct.DogArray;
 import org.ddogleg.struct.VerbosePrint;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.Iterator;
 
@@ -39,7 +41,6 @@ import java.util.Iterator;
  * </ol>
  *
  * You can also save models and your image database by using functions in RecognitionIO.
- *
  *
  * @author Peter Abeles
  */
@@ -65,12 +66,13 @@ public interface SceneRecognition<T extends ImageBase<T>> extends VerbosePrint {
 	 * Finds the best matches in the database to the query image.
 	 *
 	 * @param queryImage (Input) image being processed
+	 * @param filter (Input) Used to filter results so that known matches don't pollute the results.
 	 * @param limit (Input) The maximum number of results it will return. If &le; 0 then all matches are returned.
 	 * @param matches (Output) Set of matches found in best first order. List is always cleared
 	 * @return true if at least one valid match was found or false if no valid matches could be found. If false
 	 * that means matches is empty. This is strictly a convenience.
 	 */
-	boolean query( T queryImage, int limit, DogArray<Match> matches );
+	boolean query( T queryImage, @Nullable BoofLambdas.Filter<String> filter, int limit, DogArray<Match> matches );
 
 	/** The image data type which can be processed */
 	ImageType<T> getImageType();

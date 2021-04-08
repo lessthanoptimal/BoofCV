@@ -44,7 +44,7 @@ public class ConfigSimilarImagesSceneRecognition implements Configuration {
 	 *
 	 * The default minimum number of matches is probably set too low.
 	 */
-	public final ConfigLength minimumSimilar = ConfigLength.relative(0.4, 50);
+	public final ConfigLength minimumSimilar = ConfigLength.relative(0.4, 1);
 
 	/** Image feature detector */
 	public final ConfigDetectDescribe features = new ConfigDetectDescribe();

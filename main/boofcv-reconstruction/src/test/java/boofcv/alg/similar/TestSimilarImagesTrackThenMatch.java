@@ -27,22 +27,31 @@ import boofcv.alg.structure.GenericLookUpSimilarImagesChecks;
 import boofcv.alg.structure.LookUpSimilarImages;
 import boofcv.factory.feature.associate.FactoryAssociation;
 import boofcv.factory.structure.FactorySceneReconstruction;
+import boofcv.misc.BoofLambdas;
 import boofcv.struct.feature.AssociatedIndex;
-import boofcv.struct.feature.PackedTupleArray_F64;
-import boofcv.struct.feature.TupleDesc_F64;
+import boofcv.struct.feature.PackedTupleArray_F32;
+import boofcv.struct.feature.TupleDesc_F32;
 import boofcv.struct.image.GrayU8;
 import boofcv.struct.image.ImageType;
 import org.ddogleg.struct.DogArray;
 import org.junit.jupiter.api.Test;
 
-import static org.junit.jupiter.api.Assertions.*;
+import java.util.ArrayList;
+import java.util.List;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class TestSimilarImagesTrackThenMatch extends GenericLookUpSimilarImagesChecks {
 	@Override public <T extends LookUpSimilarImages> T createFullyLoaded() {
 		int numFeatures = 11;
-		SimilarImagesTrackThenMatch<GrayU8, ?> alg = FactorySceneReconstruction.createTrackThenMatch(null, ImageType.SB_U8);
+		SimilarImagesTrackThenMatch<GrayU8, TupleDesc_F32> alg =
+				FactorySceneReconstruction.createTrackThenMatch(null, ImageType.SB_U8);
 
 		alg.initialize(200, 210);
+
+		// We don't want it to actually recognize anything when testing
+		alg.recognizer = new DummyRecognizer();
 
 		alg.frames.resize(5);
 		for (int i = 0; i < alg.frames.size; i++) {
@@ -66,6 +75,16 @@ public class TestSimilarImagesTrackThenMatch extends GenericLookUpSimilarImagesC
 					m.dst[k] = rand.nextInt();
 				}
 			}
+
+			alg.frameStartIndexes.add(i*numFeatures);
+		}
+
+		// Create descriptions for all the frames to stop exceptions from being thrown
+		int totalFeatures = alg.frames.size*numFeatures;
+		alg.frameStartIndexes.add(totalFeatures);
+		alg.descriptions.reserve(totalFeatures);
+		for (int i = 0; i < totalFeatures; i++) {
+			alg.descriptions.append(alg.nullDescription);
 		}
 
 		return (T)alg;
@@ -75,11 +94,13 @@ public class TestSimilarImagesTrackThenMatch extends GenericLookUpSimilarImagesC
 	 * Faking the inputs, see if it can attack all frames to the first frame when tracking fails
 	 */
 	@Test void simpleLoop() {
+		int numViews = 6;
+
 		var alg = new SimilarImagesTrackThenMatch<>(
 				new DummyDetector(),
-				new AssociateDescriptionHashSets<>(FactoryAssociation.greedy(null, new ScoreAssociateEuclideanSq.F64())),
-				new DummyRecognizer(),
-				() -> new PackedTupleArray_F64(1));
+				new AssociateDescriptionHashSets<>(FactoryAssociation.greedy(null, new ScoreAssociateEuclideanSq.F32())),
+				new DummyRecognizerLoop(numViews),
+				() -> new PackedTupleArray_F32(1));
 
 		// Remove any restriction on how many frames need to have past
 		alg.minimumRecognizeDistance = 0;
@@ -100,7 +121,7 @@ public class TestSimilarImagesTrackThenMatch extends GenericLookUpSimilarImagesC
 
 		// Process a set of fake frames and "track" features across them. This has been designed so that
 		// the frame-to-frame tracker will fail but the recognizer will match everything to frame 0
-		for (int frameID = 0; frameID < 6; frameID++) {
+		for (int frameID = 0; frameID < numViews; frameID++) {
 			alg.processFrame(image, tracks.toList(), frameID);
 
 			for (int i = 0; i < tracks.size; i++) {
@@ -115,34 +136,36 @@ public class TestSimilarImagesTrackThenMatch extends GenericLookUpSimilarImagesC
 
 		// Storage for association results
 		DogArray<AssociatedIndex> pairs = new DogArray<>(AssociatedIndex::new);
+		List<String> listImages = alg.getImageIDs();
+		List<String> listSimilar = new ArrayList<>();
 
 		// everything should be matched to the first frame
-		for (int frameID = 1; frameID < 6; frameID++) {
-			assertTrue(alg.lookupMatches("0", "" + frameID, pairs));
+		alg.findSimilar(listImages.get(0), null, listSimilar);
+		assertEquals(numViews-1, listSimilar.size());
+		for (String similarID : listSimilar) {
+			assertTrue(alg.lookupAssociated(similarID, pairs));
 			assertEquals(numTracks, pairs.size);
 		}
 
 		// Other frames shouldn't be matched with each other
-		for (int a = 1; a < 6; a++) {
-			for (int b = a + 1; b < 6; b++) {
-				assertFalse(alg.lookupMatches("" + a, "" + b, pairs));
-				assertEquals(0, pairs.size);
-			}
+		for (int frameIdx = 1; frameIdx < 6; frameIdx++) {
+			alg.findSimilar(listImages.get(frameIdx), null, listSimilar);
+			assertEquals(1, listSimilar.size());
 		}
 	}
 
 	/**
 	 * Describes features based on their location
 	 */
-	static class DummyDetector extends DescribePointAbstract<GrayU8, TupleDesc_F64> {
+	static class DummyDetector extends DescribePointAbstract<GrayU8, TupleDesc_F32> {
 		public DummyDetector() {
-			super(() -> new TupleDesc_F64(1));
+			super(() -> new TupleDesc_F32(1));
 		}
 
-		@Override public boolean process( double x, double y, TupleDesc_F64 description ) {
+		@Override public boolean process( double x, double y, TupleDesc_F32 description ) {
 			// each feature has a unique y that's the same across frames. Thus a real association algorithm should
 			// work given this descriptor
-			description.data[0] = y;
+			description.data[0] = (float)y;
 			return true;
 		}
 	}
@@ -150,13 +173,14 @@ public class TestSimilarImagesTrackThenMatch extends GenericLookUpSimilarImagesC
 	/**
 	 * A super hacked recognizer. Figures out the frame from the pixel coordinate and does nothing else of value.
 	 */
-	static class DummyRecognizer extends FeatureSceneRecognitionAbstract<TupleDesc_F64> {
+	static class DummyRecognizer extends FeatureSceneRecognitionAbstract<TupleDesc_F32> {
 		@Override public int getTotalWords() {
 			return 2;
 		}
 
 		@Override
-		public boolean query( Features<TupleDesc_F64> query, int limit, DogArray<SceneRecognition.Match> matches ) {
+		public boolean query( Features<TupleDesc_F32> query, BoofLambdas.Filter<String> filter,
+							  int limit, DogArray<SceneRecognition.Match> matches ) {
 			matches.reset();
 
 			// The frame is encoded in the x-coordinate
@@ -167,6 +191,37 @@ public class TestSimilarImagesTrackThenMatch extends GenericLookUpSimilarImagesC
 
 			// Everything can see the first frame
 			matches.grow().id = "0";
+			return true;
+		}
+	}
+
+	static class DummyRecognizerLoop extends FeatureSceneRecognitionAbstract<TupleDesc_F32> {
+		int numViews;
+
+		public DummyRecognizerLoop( int numViews ) {
+			this.numViews = numViews;
+		}
+
+		@Override public int getTotalWords() {
+			return 1;
+		}
+
+		@Override
+		public boolean query( Features<TupleDesc_F32> query, BoofLambdas.Filter<String> filter,
+							  int limit, DogArray<SceneRecognition.Match> matches ) {
+			matches.reset();
+
+			// The frame is encoded in the x-coordinate
+			int frameID = (int)query.getPixel(0).x;
+
+			if (frameID == 0) {
+				for (int i = 1; i < numViews; i++) {
+					matches.grow().id = ""+i;
+				}
+			} else {
+				matches.grow().id = "0";
+			}
+
 			return true;
 		}
 	}

@@ -45,7 +45,6 @@ public abstract class GenericSceneRecognitionChecks<T extends ImageBase<T>> exte
 
 	/**
 	 * Creates an instance of the algorithm being tested
-	 *
 	 */
 	protected abstract SceneRecognition<T> createAlg();
 
@@ -66,16 +65,15 @@ public abstract class GenericSceneRecognitionChecks<T extends ImageBase<T>> exte
 		images.add(image.clone());
 		GImageMiscOps.fillRectangle(image, 50, 240, 20, 200, 190);
 		images.add(image.clone());
-		GImageMiscOps.addUniform(image, rand, -20,20);
+		GImageMiscOps.addUniform(image, rand, -20, 20);
 		images.add(image.clone());
 		for (int y = 0; y < height; y++) {
 			for (int x = 0; x < width; x++) {
-				GImageMiscOps.fillRectangle(image,y*5,0,y,width,1);
+				GImageMiscOps.fillRectangle(image, y*5, 0, y, width, 1);
 			}
 		}
 		GImageMiscOps.addUniform(image, rand, -30, 30);
 		images.add(image.clone());
-
 	}
 
 	/**
@@ -112,14 +110,14 @@ public abstract class GenericSceneRecognitionChecks<T extends ImageBase<T>> exte
 		// Look up the images and see if the first result is the original
 		DogArray<Match> matches = new DogArray<>(Match::new);
 		for (int i = 0; i < images.size(); i++) {
-			assertTrue(alg.query(images.get(i), maxMatches, matches));
+			assertTrue(alg.query(images.get(i), ( id ) -> true, maxMatches, matches));
 			assertEquals(i, Integer.parseInt(matches.get(0).id));
 		}
 
 		// now clear the database
 		alg.clearDatabase();
 		for (int i = 0; i < images.size(); i++) {
-			assertFalse(alg.query(images.get(i), maxMatches, matches));
+			assertFalse(alg.query(images.get(i), ( id ) -> true, maxMatches, matches));
 			assertEquals(0, matches.size);
 		}
 
@@ -130,9 +128,9 @@ public abstract class GenericSceneRecognitionChecks<T extends ImageBase<T>> exte
 
 		// It should be able to find them again
 		for (int i = 0; i < images.size(); i++) {
-			assertTrue(alg.query(images.get(i), maxMatches, matches));
+			assertTrue(alg.query(images.get(i), ( id ) -> true, maxMatches, matches));
 			assertEquals(i, Integer.parseInt(matches.get(0).id));
-			assertTrue(matches.size<=maxMatches);
+			assertTrue(matches.size <= maxMatches);
 		}
 	}
 }

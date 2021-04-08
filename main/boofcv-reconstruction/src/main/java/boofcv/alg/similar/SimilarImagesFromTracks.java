@@ -21,6 +21,7 @@ package boofcv.alg.similar;
 import boofcv.abst.tracker.PointTrack;
 import boofcv.abst.tracker.PointTracker;
 import boofcv.alg.structure.LookUpSimilarImages;
+import boofcv.misc.BoofLambdas;
 import boofcv.misc.BoofMiscOps;
 import boofcv.struct.ConfigLength;
 import boofcv.struct.feature.AssociatedIndex;
@@ -30,6 +31,7 @@ import gnu.trove.map.TLongIntMap;
 import gnu.trove.map.hash.TLongIntHashMap;
 import org.ddogleg.struct.DogArray;
 import org.ddogleg.struct.FastAccess;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -71,6 +73,9 @@ public class SimilarImagesFromTracks<Track> implements LookUpSimilarImages {
 	public final Map<String, Frame> frameMap = new HashMap<>();
 	/** List of all matches between frames */
 	public final DogArray<Match> connections = new DogArray<>(Match::new, Match::reset);
+
+	// Image that was recently queried for similar matches
+	String recentQueryID;
 
 	// Accessors to track information
 	TrackToID<Track> lookupID;
@@ -212,12 +217,20 @@ public class SimilarImagesFromTracks<Track> implements LookUpSimilarImages {
 	}
 
 	@Override
-	public void findSimilar( String target, List<String> similar ) {
-		similar.clear();
+	public void findSimilar( String target, @Nullable BoofLambdas.Filter<String> filter, List<String> similarImages ) {
+		similarImages.clear();
 		Frame f = frameMap.get(target);
 		BoofMiscOps.checkTrue(f != null, "Unknown image");
+
+		// For later reference
+		this.recentQueryID = target;
+
+		// Retrieve the similar images while filtering them
 		for (int i = 0; i < f.related.size(); i++) {
-			similar.add(f.related.get(i).frameID);
+			if (filter !=null && !filter.process(f.related.get(i).frameID))
+				continue;
+
+			similarImages.add(f.related.get(i).frameID);
 		}
 	}
 
@@ -234,26 +247,14 @@ public class SimilarImagesFromTracks<Track> implements LookUpSimilarImages {
 		}
 	}
 
-	@Override
-	public boolean lookupMatches( String viewA, String viewB, DogArray<AssociatedIndex> pairs ) {
+	@Override public boolean lookupAssociated( String viewB, DogArray<AssociatedIndex> pairs ) {
 		// clear the set of pairs so that if it fails it will be empty
 		pairs.reset();
 
-		Frame src = frameMap.get(viewA);
+		Frame src = frameMap.get(recentQueryID);
 		Frame dst = frameMap.get(viewB);
 		if (src == null || dst == null)
-			throw new IllegalArgumentException("Unknown view: src=" + viewA + " dst=" + viewB);
-
-		// If either view doesn't exist there can't be any pairs
-		// Handle special case where the viewA and viewB are the same
-		if (viewA.equals(viewB)) {
-			int numFeatures = src.featureCount();
-			pairs.reserve(numFeatures);
-			for (int i = 0; i < numFeatures; i++) {
-				pairs.grow().setTo(i, i);
-			}
-			return true;
-		}
+			throw new IllegalArgumentException("Unknown view: src=" + recentQueryID + " dst=" + viewB);
 
 		// Look up the two frames based on their ID.
 		boolean matched = false;

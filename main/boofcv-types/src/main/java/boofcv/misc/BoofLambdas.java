@@ -54,6 +54,14 @@ public interface BoofLambdas {
 		boolean process( T object );
 	}
 
+	@FunctionalInterface interface FilterInt {
+		boolean process( int value );
+	}
+
+	@FunctionalInterface interface FilterLong {
+		boolean process( long value );
+	}
+
 	@FunctionalInterface interface ProcessI {
 		void process( int a );
 	}

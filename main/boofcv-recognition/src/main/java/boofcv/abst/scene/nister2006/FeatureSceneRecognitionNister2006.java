@@ -205,7 +205,8 @@ public class FeatureSceneRecognitionNister2006<TD extends TupleDesc<TD>> impleme
 		databaseN.addImage(imageIndex, imageFeatures.toList());
 	}
 
-	@Override public boolean query( Features<TD> query, int limit, DogArray<SceneRecognition.Match> matches ) {
+	@Override public boolean query( Features<TD> query, @Nullable BoofLambdas.Filter<String> filter,
+									int limit, DogArray<SceneRecognition.Match> matches ) {
 		// Default is no matches
 		matches.resize(0);
 
@@ -218,8 +219,11 @@ public class FeatureSceneRecognitionNister2006<TD extends TupleDesc<TD>> impleme
 			imageFeatures.get(i).setTo(query.getDescription(i));
 		}
 
+		// Wrap the user provided filter by converting the int ID into a String ID
+		BoofLambdas.FilterInt filterInt = filter == null ? null : ( index ) -> filter.process(imageIds.get(index));
+
 		// Look up the closest matches
-		if (!databaseN.query(imageFeatures.toList(), limit))
+		if (!databaseN.query(imageFeatures.toList(), filterInt, limit))
 			return false;
 
 		DogArray<RecognitionVocabularyTreeNister2006.Match> found = databaseN.getMatches();
