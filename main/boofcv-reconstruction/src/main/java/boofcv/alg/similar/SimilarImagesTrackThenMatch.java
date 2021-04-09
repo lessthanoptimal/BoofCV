@@ -42,7 +42,8 @@ import java.util.*;
 
 /**
  * First track features sequentially, then use {@link boofcv.abst.scene.FeatureSceneRecognition} to identify
- * loops.
+ * loops. Association results are saved and memory usage will grow approximately linearly with the number of
+ * images.
  *
  * @author Peter Abeles
  */
@@ -50,6 +51,7 @@ public class SimilarImagesTrackThenMatch<Image extends ImageBase<Image>, TD exte
 		extends SimilarImagesFromTracks<PointTrack> implements VerbosePrint {
 
 	// TODO if matched frames have common tracks save those in the associations
+	// TODO cache association results from recognition
 
 	/**
 	 * Minimum number of frames (by ID) away two frames need to be for loop closure logic to connect them
@@ -60,7 +62,7 @@ public class SimilarImagesTrackThenMatch<Image extends ImageBase<Image>, TD exte
 	 * Limit on number of returned images made during a query. Sequential results are filtered and do not need
 	 * to be compensated for.
 	 */
-	public @Getter @Setter int limitQuery = 30;
+	public @Getter @Setter int limitQuery = 5;
 
 	/** Describes a point */
 	@Getter @Setter DescribePoint<Image, TD> describer;
@@ -205,8 +207,12 @@ public class SimilarImagesTrackThenMatch<Image extends ImageBase<Image>, TD exte
 		if (frameIdx < 0 || frameIdx >= frames.size)
 			throw new IllegalArgumentException("Unknown target="+target);
 
+//		long time0 = System.nanoTime();
+
 		// Look up results from the sequential tracker
 		super.findSimilar(target, filter, similarImages);
+
+//		long time1 = System.nanoTime();
 
 		Frame frameTarget = frames.get(frameIdx);
 
@@ -214,7 +220,9 @@ public class SimilarImagesTrackThenMatch<Image extends ImageBase<Image>, TD exte
 		BoofLambdas.Filter<String> queryFilter = filterQuery(filter, frameIdx, frameTarget);
 
 		// Look up potential matches using the recognition algorithm while filtering results
-		recognizer.query(wrapFeatures(frameIdx), queryFilter, limitQuery, queryMatches);
+		recognizer.query(wrapFeatures(frameIdx), queryFilter, 5, queryMatches);
+
+//		long time2 = System.nanoTime();
 
 		// Set up feature association
 		associator.initialize(recognizer.getTotalWords());
@@ -225,6 +233,11 @@ public class SimilarImagesTrackThenMatch<Image extends ImageBase<Image>, TD exte
 			int matchedFrameIdx = Integer.parseInt(queryMatches.get(queryIdx).id);
 			checkSimilarConnection(frameIdx, matchedFrameIdx, similarImages);
 		}
+
+//		long time3 = System.nanoTime();
+
+//		System.out.printf("seq %.2f rec %.2f assoc %.2f\n",
+//				(time1-time0)*1e-6, (time2-time1)*1e-6, (time3-time2)*1e-6);
 
 		if (verbose != null)
 			verbose.printf("query[%d] match.size=%d similar.size=%d\n", frameIdx, queryMatches.size, similarImages.size());
