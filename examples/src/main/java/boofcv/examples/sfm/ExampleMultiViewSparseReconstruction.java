@@ -204,13 +204,16 @@ public class ExampleMultiViewSparseReconstruction {
 					first = false;
 					similarImages.initialize(frame.width, frame.height);
 				}
+
 				tracker.process(frame);
-				tracker.getActiveTracks(activeTracks);
-				int dropped = tracker.getDroppedTracks(null).size();
+				int activeCount = tracker.getTotalActive();
+				int droppedCount = tracker.getDroppedTracks(null).size();
 				tracker.spawnTracks();
+				activeTracks.clear();
+				tracker.getActiveTracks(activeTracks);
 				similarImages.processFrame(frame, activeTracks, tracker.getFrameID());
 				String id = frameId + "";//trackerSimilar.frames.getTail().frameID;
-				System.out.println("frame id = " + id + " active=" + activeTracks.size() + " dropped=" + dropped);
+				System.out.println("frame id = " + id + " active=" + activeCount + " dropped=" + droppedCount);
 
 				// TODO drop tracks which have been viewed for too long to reduce the negative affects of track drift?
 
