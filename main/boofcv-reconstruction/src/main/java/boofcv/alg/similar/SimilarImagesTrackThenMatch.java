@@ -57,9 +57,8 @@ public class SimilarImagesTrackThenMatch<Image extends ImageBase<Image>, TD exte
 	public @Getter @Setter int minimumRecognizeDistance = 30;
 
 	/**
-	 * Limit how many images it will consider in the query when looking to find loops. If a search radius
-	 * is specified then 2*radius+1 added to this number as a way to ensure that known sequential
-	 * matches don't prevent loop closure..
+	 * Limit on number of returned images made during a query. Sequential results are filtered and do not need
+	 * to be compensated for.
 	 */
 	public @Getter @Setter int limitQuery = 30;
 
@@ -215,7 +214,7 @@ public class SimilarImagesTrackThenMatch<Image extends ImageBase<Image>, TD exte
 		BoofLambdas.Filter<String> queryFilter = filterQuery(filter, frameIdx, frameTarget);
 
 		// Look up potential matches using the recognition algorithm while filtering results
-		recognizer.query(wrapFeatures(frameIdx), queryFilter, 2*searchRadius + 1 + limitQuery, queryMatches);
+		recognizer.query(wrapFeatures(frameIdx), queryFilter, limitQuery, queryMatches);
 
 		// Set up feature association
 		associator.initialize(recognizer.getTotalWords());
