@@ -290,7 +290,7 @@ public class DemoSceneRecognitionSimilarImagesApp<Gray extends ImageGray<Gray>, 
 			listImages.addListSelectionListener(this);
 			var listScrollPane = new JScrollPane(listImages) {
 				// Forces it to fill the entire window
-				public Dimension getPreferredSize() {
+				@Override public Dimension getPreferredSize() {
 					return ViewControlPanel.this.getSize();
 				}
 			};

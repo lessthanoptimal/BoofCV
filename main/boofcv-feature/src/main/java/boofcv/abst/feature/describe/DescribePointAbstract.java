@@ -35,9 +35,9 @@ public abstract class DescribePointAbstract<T extends ImageBase<T>, TD extends T
 	protected @Nullable Class<TD> type;
 	protected @Nullable BoofLambdas.Factory<TD> factory;
 
-	public DescribePointAbstract(){}
+	protected DescribePointAbstract(){}
 
-	public DescribePointAbstract( BoofLambdas.Factory<TD> factory ) {
+	protected DescribePointAbstract( BoofLambdas.Factory<TD> factory ) {
 		this.factory = factory;
 		type = (Class)factory.newInstance().getClass();
 	}
