@@ -24,8 +24,9 @@ import boofcv.abst.tracker.ConfigTrackerDda;
 import boofcv.abst.tracker.PointTracker;
 import boofcv.factory.feature.associate.ConfigAssociate;
 import boofcv.factory.feature.associate.ConfigAssociate.AssociationType;
+import boofcv.factory.feature.describe.ConfigDescribeRegion;
 import boofcv.factory.feature.detdesc.ConfigDetectDescribe;
-import boofcv.factory.feature.detect.interest.ConfigDetectInterestPoint.Type;
+import boofcv.factory.feature.detect.interest.ConfigDetectInterestPoint;
 import boofcv.factory.tracker.FactoryPointTracker;
 import boofcv.gui.StandardAlgConfigPanel;
 import boofcv.struct.image.ImageBase;
@@ -116,13 +117,13 @@ public class ControlPanelDdaTracker extends ControlPanelDetDescAssocBase {
 	public void controlChanged(final Object source) {
 		int which = -1;
 		if (source == comboDetect) {
-			configDetDesc.typeDetector = Type.values()[comboDetect.getSelectedIndex()];
+			configDetDesc.typeDetector = ConfigDetectInterestPoint.Type.values()[comboDetect.getSelectedIndex()];
 			which = 0;
 		} else if (source == comboDescribe) {
-			configDetDesc.typeDescribe = boofcv.factory.feature.describe.ConfigDescribeRegion.Type.values()[comboDescribe.getSelectedIndex()];
+			configDetDesc.typeDescribe = ConfigDescribeRegion.Type.values()[comboDescribe.getSelectedIndex()];
 			which = 1;
 			// since BRIEF is binary only greedy association is supported
-			if( configDetDesc.typeDescribe == boofcv.factory.feature.describe.ConfigDescribeRegion.Type.BRIEF ) {
+			if( configDetDesc.typeDescribe == ConfigDescribeRegion.Type.BRIEF ) {
 				configAssociate.type = AssociationType.GREEDY;
 				comboAssociate.setEnabled(false);
 			} else {
