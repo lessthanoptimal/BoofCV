@@ -70,7 +70,6 @@ import static boofcv.io.UtilIO.systemToUnix;
 public class DemoSceneRecognitionSimilarImagesApp<Gray extends ImageGray<Gray>, TD extends TupleDesc<TD>>
 		extends DemonstrationBase {
 
-	// TODO Info panel next to image with useful statistics
 	// TODO Add a tuning panel
 	// TODO Tune input image size
 	// TODO Show size of original image before scaling
@@ -187,7 +186,7 @@ public class DemoSceneRecognitionSimilarImagesApp<Gray extends ImageGray<Gray>, 
 			imagePreviews.clear();
 			imagesSimilar.clear();
 		}
-		SwingUtilities.invokeLater(() -> viewControlPanel.updateImagePaths());
+		SwingUtilities.invokeLater(() -> viewControlPanel.resetImagePaths());
 
 		var config = new ConfigSimilarImagesSceneRecognition();
 //		config.features.detectFastHessian.extract.radius = 2;
@@ -218,10 +217,9 @@ public class DemoSceneRecognitionSimilarImagesApp<Gray extends ImageGray<Gray>, 
 					(int)(buffered.getWidth()*scale), (int)(buffered.getHeight()*scale), BufferedImage.TYPE_INT_RGB);
 			preview.createGraphics().drawImage(buffered, AffineTransform.getScaleInstance(scale, scale), null);
 			synchronized (imageLock) {
-				imagePaths.add(path);
 				imagePreviews.put(path, preview);
 			}
-			SwingUtilities.invokeLater(() -> viewControlPanel.updateImagePaths());
+			SwingUtilities.invokeLater(() -> viewControlPanel.addImageToPath(path));
 
 			// Convert to gray for image processing
 			ConvertBufferedImage.convertFrom(buffered, gray, true);
@@ -276,6 +274,7 @@ public class DemoSceneRecognitionSimilarImagesApp<Gray extends ImageGray<Gray>, 
 		protected JLabel buildTimeLabel = new JLabel("-----");
 		protected JLabel queryTimeLabel = new JLabel("-----");
 		protected JLabel imageSizeLabel = new JLabel("-----");
+		protected JLabel totalImagesLabel = new JLabel("-----");
 
 		JList<String> listImages;
 
@@ -301,34 +300,44 @@ public class DemoSceneRecognitionSimilarImagesApp<Gray extends ImageGray<Gray>, 
 			addLabeled(imageSizeLabel, "Image Size");
 			addAlignLeft(checkFeatures);
 			addLabeled(comboColor, "Color");
+			addLabeled(totalImagesLabel, "Total Images");
 			addAlignCenter(listScrollPane);
 			setPreferredSize(new Dimension(250, 500));
 		}
 
-		public void updateImagePaths() {
+		public void resetImagePaths() {
 			BoofSwingUtil.checkGuiThread();
-
-			// make a quick copy to avoid locking for long
-			List<String> copyPaths;
 			synchronized (imageLock) {
-				// Just add the file name to keep it short
-				copyPaths = new ArrayList<>(imagePaths.size());
-				for (String path : imagePaths) {
-					copyPaths.add(new File(path).getName());
-				}
+				imagePaths.clear();
 			}
 
 			this.listImages.removeListSelectionListener(this);
 			DefaultListModel<String> model = (DefaultListModel<String>)listImages.getModel();
 			model.clear();
+			listImages.invalidate();
+			listImages.repaint();
+			this.listImages.addListSelectionListener(this);
+		}
 
-			model.addAll(copyPaths);
+		public void addImageToPath( String path ) {
+			BoofSwingUtil.checkGuiThread();
 
-			if (listImages.getSelectedIndex() >= copyPaths.size())
+			int size;
+			synchronized (imageLock) {
+				imagePaths.add(path);
+				size = imagePaths.size();
+			}
+
+			this.listImages.removeListSelectionListener(this);
+			DefaultListModel<String> model = (DefaultListModel<String>)listImages.getModel();
+			model.addElement(new File(path).getName());
+
+			if (listImages.getSelectedIndex() >= size)
 				listImages.setSelectedIndex(0);
 			listImages.invalidate();
 			listImages.repaint();
 			this.listImages.addListSelectionListener(this);
+			setTotalImages(size);
 		}
 
 		public void setImageSize( final int width, final int height ) {
@@ -343,9 +352,13 @@ public class DemoSceneRecognitionSimilarImagesApp<Gray extends ImageGray<Gray>, 
 			queryTimeLabel.setText(String.format("%7.2f", milliseconds));
 		}
 
+		public void setTotalImages( int count ) {
+			totalImagesLabel.setText(""+count);
+		}
+
 		@Override public void valueChanged( ListSelectionEvent e ) {
 			int selected = listImages.getSelectedIndex();
-			if (selected != -1) {
+			if (selected != -1 && !e.getValueIsAdjusting()) {
 				gui.handleSelectedChanged();
 			}
 		}
