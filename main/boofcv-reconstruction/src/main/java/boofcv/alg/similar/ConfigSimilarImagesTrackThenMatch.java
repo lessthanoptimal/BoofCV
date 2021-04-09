@@ -35,7 +35,7 @@ import boofcv.struct.Configuration;
 public class ConfigSimilarImagesTrackThenMatch implements Configuration {
 
 	/** Number of images which will be considered as matches when using the recognizer */
-	public int limitQuery = 30;
+	public int limitQuery = 5;
 
 	/**
 	 * Minimum number of frames (by ID) away two frames need to be for loop closure logic to connect them

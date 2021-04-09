@@ -489,7 +489,7 @@ public class DemoSceneRecognitionSimilarImagesApp<Gray extends ImageGray<Gray>, 
 			List<String> foundIDs = new ArrayList<>();
 			imagesSimilar.clear();
 			long time0 = System.nanoTime();
-			sceneSimilar.findSimilar(imageID, ( id ) -> true, foundIDs);
+			sceneSimilar.findSimilar(imageID, null, foundIDs);
 			long time1 = System.nanoTime();
 
 			viewControlPanel.setQueryTimeMS((time1 - time0)*1e-6);
