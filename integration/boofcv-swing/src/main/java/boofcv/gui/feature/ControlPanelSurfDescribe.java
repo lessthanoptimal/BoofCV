@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -40,7 +40,7 @@ public abstract class ControlPanelSurfDescribe extends StandardAlgConfigPanel {
 	private final JCheckBox checkColor = checkbox("Color", color,
 			"False use the standard gray scale variant if true then the color variant is used");
 
-	Listener listener;
+	final Listener listener;
 
 	protected ControlPanelSurfDescribe( ConfigSurfDescribe config, Listener listener ) {
 		this.config = config;
@@ -138,6 +138,7 @@ public abstract class ControlPanelSurfDescribe extends StandardAlgConfigPanel {
 		}
 	}
 
+	@FunctionalInterface
 	public interface Listener {
 		void handleChangeDescribeSurf();
 	}

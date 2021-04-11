@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -41,32 +41,31 @@ public class ControlPanelSiftDetector extends StandardAlgConfigPanel {
 	private final JSpinner spinnerEdgeResponse;
 	private final ControlPanelSiftScaleSpace controlSS;
 
-	private Listener listener;
+	private final Listener listener;
 
-	public ControlPanelSiftDetector(Listener listener) {
-		this( new ConfigSiftScaleSpace(), new ConfigSiftDetector(), listener);
+	public ControlPanelSiftDetector( Listener listener ) {
+		this(new ConfigSiftScaleSpace(), new ConfigSiftDetector(), listener);
 	}
 
-	public ControlPanelSiftDetector(@Nullable ConfigSiftScaleSpace configSS_ , @Nullable ConfigSiftDetector configDetector_, Listener listener )
-	{
-		this.configSS = configSS_==null?new ConfigSiftScaleSpace() : configSS_;
-		this.configDetector = configDetector_ == null? new ConfigSiftDetector() : configDetector_;
+	public ControlPanelSiftDetector( @Nullable ConfigSiftScaleSpace configSS_, @Nullable ConfigSiftDetector configDetector_, Listener listener ) {
+		this.configSS = configSS_ == null ? new ConfigSiftScaleSpace() : configSS_;
+		this.configDetector = configDetector_ == null ? new ConfigSiftDetector() : configDetector_;
 		this.listener = listener;
 
-		this.controlExtractor = new ControlPanelExtractor(configDetector.extract,listener::handleChangeSiftDetector);
-		this.controlSS = new ControlPanelSiftScaleSpace(configSS,listener::handleChangeSiftDetector);
-		this.spinnerMaxPerScale = spinner(configDetector.maxFeaturesPerScale,0,9999,100);
-		this.spinnerMaxAll = spinner(configDetector.maxFeaturesAll,-1,9999,100);
-		this.comboSelector = combo(configDetector.selector.type.ordinal(), (Object[]) SelectLimitTypes.values());
-		this.spinnerEdgeResponse = spinner(configDetector.edgeR,1.0,1000.0,1.0);
+		this.controlExtractor = new ControlPanelExtractor(configDetector.extract, listener::handleChangeSiftDetector);
+		this.controlSS = new ControlPanelSiftScaleSpace(configSS, listener::handleChangeSiftDetector);
+		this.spinnerMaxPerScale = spinner(configDetector.maxFeaturesPerScale, 0, 9999, 100);
+		this.spinnerMaxAll = spinner(configDetector.maxFeaturesAll, -1, 9999, 100);
+		this.comboSelector = combo(configDetector.selector.type.ordinal(), (Object[])SelectLimitTypes.values());
+		this.spinnerEdgeResponse = spinner(configDetector.edgeR, 1.0, 1000.0, 1.0);
 
 		var controlDetection = new StandardAlgConfigPanel();
 		controlDetection.add(controlExtractor);
-		controlDetection.addLabeled(spinnerMaxPerScale,"Max-Per-Scale","Maximum number of features detected per scale");
-		controlDetection.addLabeled(spinnerMaxAll,"Max-All","Maximum number of features allowed");
-		controlDetection.addLabeled(comboSelector,  "Type",
+		controlDetection.addLabeled(spinnerMaxPerScale, "Max-Per-Scale", "Maximum number of features detected per scale");
+		controlDetection.addLabeled(spinnerMaxAll, "Max-All", "Maximum number of features allowed");
+		controlDetection.addLabeled(comboSelector, "Type",
 				"Method used to select points when more have been detected than the maximum allowed");
-		controlDetection.addLabeled(spinnerEdgeResponse,"Max Edge","Maximum edge response. Larger values are more tolerant");
+		controlDetection.addLabeled(spinnerEdgeResponse, "Max Edge", "Maximum edge response. Larger values are more tolerant");
 
 		// Remove borders and label border
 		controlExtractor.setBorder(BorderFactory.createEmptyBorder());
@@ -78,25 +77,26 @@ public class ControlPanelSiftDetector extends StandardAlgConfigPanel {
 	}
 
 	@Override
-	public void controlChanged(final Object source) {
+	public void controlChanged( final Object source ) {
 		if (source == spinnerMaxPerScale) {
-			configDetector.maxFeaturesPerScale = ((Number) spinnerMaxPerScale.getValue()).intValue();
+			configDetector.maxFeaturesPerScale = ((Number)spinnerMaxPerScale.getValue()).intValue();
 		} else if (source == spinnerMaxAll) {
 			configDetector.maxFeaturesAll = ((Number)spinnerMaxAll.getValue()).intValue();
 		} else if (source == comboSelector) {
 			configDetector.selector.type = SelectLimitTypes.values()[comboSelector.getSelectedIndex()];
-		} else if( source == spinnerEdgeResponse ) {
+		} else if (source == spinnerEdgeResponse) {
 			configDetector.edgeR = ((Number)spinnerEdgeResponse.getValue()).doubleValue();
 		}
 		listener.handleChangeSiftDetector();
 	}
 
+	@FunctionalInterface
 	public interface Listener {
 		void handleChangeSiftDetector();
 	}
 
-	public static void main(String[] args) {
+	public static void main( String[] args ) {
 		var control = new ControlPanelSiftDetector(() -> {});
-		ShowImages.showWindow(control,"Sift Detector",true);
+		ShowImages.showWindow(control, "Sift Detector", true);
 	}
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -29,7 +29,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
-
 /**
  * Shows which two features are associated with each other.  An individual feature
  * can be shown alone by clicking on it.
@@ -42,19 +41,18 @@ public class AssociationPanel extends CompareTwoImagePanel implements MouseListe
 	final Object lock = new Object();
 
 	// which features are associated with each other
-	private int assocLeft[],assocRight[];
+	private int[] assocLeft, assocRight;
 
 	// color of each points.  Randomly select at runtime
-	Color colors[];
+	Color[] colors;
 
-	public AssociationPanel(int borderSize ) {
-		super(borderSize,true);
+	public AssociationPanel( int borderSize ) {
+		super(borderSize, true);
 	}
 
-	public void setAssociation( List<Point2D_F64> leftPts , List<Point2D_F64> rightPts,
-								FastAccess<AssociatedIndex> matches )
-	{
-		synchronized ( lock) {
+	public void setAssociation( List<Point2D_F64> leftPts, List<Point2D_F64> rightPts,
+								FastAccess<AssociatedIndex> matches ) {
+		synchronized (lock) {
 			List<Point2D_F64> allLeft = new ArrayList<>();
 			List<Point2D_F64> allRight = new ArrayList<>();
 
@@ -82,7 +80,7 @@ public class AssociationPanel extends CompareTwoImagePanel implements MouseListe
 	}
 
 	public void setAssociation( List<AssociatedPair> matches ) {
-		synchronized ( lock) {
+		synchronized (lock) {
 			List<Point2D_F64> leftPts = new ArrayList<>();
 			List<Point2D_F64> rightPts = new ArrayList<>();
 
@@ -109,9 +107,9 @@ public class AssociationPanel extends CompareTwoImagePanel implements MouseListe
 		}
 	}
 
-	public void setAssociation( List<Point2D_F64> leftPts , List<Point2D_F64> rightPts ) {
+	public void setAssociation( List<Point2D_F64> leftPts, List<Point2D_F64> rightPts ) {
 
-		synchronized ( lock) {
+		synchronized (lock) {
 			setLocation(leftPts, rightPts);
 
 			assocLeft = new int[leftPts.size()];
@@ -131,10 +129,10 @@ public class AssociationPanel extends CompareTwoImagePanel implements MouseListe
 	}
 
 	@Override
-	protected void drawFeatures(Graphics2D g2 ,
-								double scaleLeft, int leftX, int leftY,
-								double scaleRight, int rightX, int rightY) {
-		synchronized ( lock) {
+	protected void drawFeatures( Graphics2D g2,
+								 double scaleLeft, int leftX, int leftY,
+								 double scaleRight, int rightX, int rightY ) {
+		synchronized (lock) {
 			if (selected.isEmpty())
 				drawAllFeatures(g2, scaleLeft, scaleRight, rightX);
 			else {
@@ -173,12 +171,12 @@ public class AssociationPanel extends CompareTwoImagePanel implements MouseListe
 		}
 	}
 
-	private void drawAllFeatures(Graphics2D g2, double scaleLeft , double scaleRight , int rightX) {
-		if( assocLeft == null || rightPts == null || leftPts == null )
+	private void drawAllFeatures( Graphics2D g2, double scaleLeft, double scaleRight, int rightX ) {
+		if (assocLeft == null || rightPts == null || leftPts == null)
 			return;
 
-		for( int i = 0; i < assocLeft.length; i++ ) {
-			if( assocLeft[i] == -1 )
+		for (int i = 0; i < assocLeft.length; i++) {
+			if (assocLeft[i] == -1)
 				continue;
 
 			Point2D_F64 l = leftPts.get(i);
@@ -186,36 +184,36 @@ public class AssociationPanel extends CompareTwoImagePanel implements MouseListe
 
 			Color color = colors[i];
 
-			drawAssociation(g2, scaleLeft,scaleRight,rightX, l, r, color);
+			drawAssociation(g2, scaleLeft, scaleRight, rightX, l, r, color);
 		}
 	}
 
-	private void drawAssociation(Graphics2D g2, double scaleLeft , double scaleRight , int rightX, Point2D_F64 l, Point2D_F64 r, Color color) {
-		if( r == null ) {
+	private void drawAssociation( Graphics2D g2, double scaleLeft, double scaleRight, int rightX, Point2D_F64 l, Point2D_F64 r, Color color ) {
+		if (r == null) {
 			int x1 = (int)(scaleLeft*l.x);
 			int y1 = (int)(scaleLeft*l.y);
-			VisualizeFeatures.drawPoint(g2,x1,y1,Color.RED);
-		} else if( l == null ) {
+			VisualizeFeatures.drawPoint(g2, x1, y1, Color.RED);
+		} else if (l == null) {
 			int x2 = (int)(scaleRight*r.x) + rightX;
 			int y2 = (int)(scaleRight*r.y);
-			VisualizeFeatures.drawPoint(g2,x2,y2,Color.RED);
+			VisualizeFeatures.drawPoint(g2, x2, y2, Color.RED);
 		} else {
 			int x1 = (int)(scaleLeft*l.x);
 			int y1 = (int)(scaleLeft*l.y);
-			VisualizeFeatures.drawPoint(g2,x1,y1,color);
+			VisualizeFeatures.drawPoint(g2, x1, y1, color);
 
 			int x2 = (int)(scaleRight*r.x) + rightX;
 			int y2 = (int)(scaleRight*r.y);
-			VisualizeFeatures.drawPoint(g2,x2,y2,color);
+			VisualizeFeatures.drawPoint(g2, x2, y2, color);
 
 			g2.setColor(color);
-			g2.drawLine(x1,y1,x2,y2);
+			g2.drawLine(x1, y1, x2, y2);
 		}
 	}
 
 	@Override
-	protected boolean isValidPoint(int index) {
-		if( selectedIsLeft )
+	protected boolean isValidPoint( int index ) {
+		if (selectedIsLeft)
 			return assocLeft[index] >= 0;
 		else
 			return assocRight[index] >= 0;

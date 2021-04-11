@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -55,24 +55,24 @@ public class ScaleSpacePyramidPointPanel extends JPanel implements MouseListener
 		addMouseListener(this);
 	}
 
-	public void setSs(PyramidFloat ss) {
+	public void setSs( PyramidFloat ss ) {
 		this.ss = ss;
 	}
 
 	public void setBackground( BufferedImage background ) {
 		this.background = background;
-		setPreferredSize(new Dimension(background.getWidth(),background.getHeight()));
+		setPreferredSize(new Dimension(background.getWidth(), background.getHeight()));
 	}
 
 	public synchronized void setPoints( List<ScalePoint> points ) {
 		unused.addAll(this.points);
 		this.points.clear();
 
-		for( ScalePoint p : points ) {
-			if( unused.isEmpty() ) {
+		for (ScalePoint p : points) {
+			if (unused.isEmpty()) {
 				this.points.add(p.copy());
 			} else {
-				ScalePoint c = unused.remove( unused.size()-1 );
+				ScalePoint c = unused.remove(unused.size() - 1);
 				c.setTo(p);
 			}
 			this.points.add(p);
@@ -82,23 +82,23 @@ public class ScaleSpacePyramidPointPanel extends JPanel implements MouseListener
 
 	private synchronized void setLevel( int level ) {
 //		System.out.println("level "+level);
-		if( level > 0 && ss != null ) {
+		if (level > 0 && ss != null) {
 
-			ImageGray small = (ImageGray)ss.getLayer(level-1);
+			ImageGray small = (ImageGray)ss.getLayer(level - 1);
 			ImageGray enlarge = GeneralizedImageOps.createSingleBand(small.getClass(), ss.getInputWidth(), ss.getInputHeight());
-			new FDistort(small,enlarge).interpNN().apply();
+			new FDistort(small, enlarge).interpNN().apply();
 
 			// if the size isn't the same null it so a new image will be declared
-			if( levelImage != null &&
-					(levelImage.getWidth() != enlarge.width || levelImage.getHeight() != enlarge.height )) {
+			if (levelImage != null &&
+					(levelImage.getWidth() != enlarge.width || levelImage.getHeight() != enlarge.height)) {
 				levelImage = null;
 			}
-			levelImage = ConvertBufferedImage.convertTo(enlarge,levelImage,true);
+			levelImage = ConvertBufferedImage.convertTo(enlarge, levelImage, true);
 
-			double scale = ss.getScale(level-1);
+			double scale = ss.getScale(level - 1);
 			levelPoints.clear();
-			for( ScalePoint p : points ) {
-				if( p.scale == scale ) {
+			for (ScalePoint p : points) {
+				if (p.scale == scale) {
 					levelPoints.add(p);
 				}
 			}
@@ -111,43 +111,42 @@ public class ScaleSpacePyramidPointPanel extends JPanel implements MouseListener
 	}
 
 	@Override
-	public synchronized void paintComponent(Graphics g) {
+	public synchronized void paintComponent( Graphics g ) {
 		super.paintComponent(g);
 
 		Graphics2D g2 = (Graphics2D)g;
 
-		double scaleX = ss.getInputWidth() / (double)getWidth();
-		double scaleY = ss.getInputHeight() / (double)getHeight();
-		double scale = Math.max(scaleX,scaleY);
+		double scaleX = ss.getInputWidth()/(double)getWidth();
+		double scaleY = ss.getInputHeight()/(double)getHeight();
+		double scale = Math.max(scaleX, scaleY);
 
 		// scale it down so that the whole image is visible
-		if( scale > 1 ) {
+		if (scale > 1) {
 			AffineTransform tran = g2.getTransform();
-			tran.concatenate(AffineTransform.getScaleInstance(1/scale,1/scale));
+			tran.concatenate(AffineTransform.getScaleInstance(1/scale, 1/scale));
 			g2.setTransform(tran);
 		}
 
-		if( activeLevel == 0 )
+		if (activeLevel == 0)
 			showAll(g);
 		else {
-			g.drawImage(levelImage, 0, 0, levelImage.getWidth(), levelImage.getHeight(),null);
-			VisualizeFeatures.drawScalePoints((Graphics2D)g,levelPoints,scaleToRadius);
+			g.drawImage(levelImage, 0, 0, levelImage.getWidth(), levelImage.getHeight(), null);
+			VisualizeFeatures.drawScalePoints((Graphics2D)g, levelPoints, scaleToRadius);
 		}
-
 	}
 
-	private void showAll(Graphics g) {
+	private void showAll( Graphics g ) {
 		//draw the image
 		if (background != null)
-			g.drawImage(background, 0, 0, background.getWidth(), background.getHeight(),null);
+			g.drawImage(background, 0, 0, background.getWidth(), background.getHeight(), null);
 
-		VisualizeFeatures.drawScalePoints((Graphics2D)g,levelPoints,scaleToRadius);
+		VisualizeFeatures.drawScalePoints((Graphics2D)g, levelPoints, scaleToRadius);
 	}
 
 	@Override
-	public void mouseClicked(MouseEvent e) {
+	public void mouseClicked( MouseEvent e ) {
 		int level = activeLevel + 1;
-		if( level > ss.getNumLayers() ) {
+		if (level > ss.getNumLayers()) {
 			level = 0;
 		}
 		setLevel(level);
@@ -155,14 +154,14 @@ public class ScaleSpacePyramidPointPanel extends JPanel implements MouseListener
 	}
 
 	@Override
-	public void mousePressed(MouseEvent e) {}
+	public void mousePressed( MouseEvent e ) {}
 
 	@Override
-	public void mouseReleased(MouseEvent e) {}
+	public void mouseReleased( MouseEvent e ) {}
 
 	@Override
-	public void mouseEntered(MouseEvent e) {}
+	public void mouseEntered( MouseEvent e ) {}
 
 	@Override
-	public void mouseExited(MouseEvent e) {}
+	public void mouseExited( MouseEvent e ) {}
 }

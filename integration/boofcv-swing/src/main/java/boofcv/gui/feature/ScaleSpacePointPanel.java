@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -44,7 +44,7 @@ public class ScaleSpacePointPanel extends JPanel {
 	int activeLevel = 0;
 	double scaleToRadius;
 
-	public ScaleSpacePointPanel( GaussianScaleSpace ss , double scaleToRadius ) {
+	public ScaleSpacePointPanel( GaussianScaleSpace ss, double scaleToRadius ) {
 		this.ss = ss;
 	}
 
@@ -53,7 +53,7 @@ public class ScaleSpacePointPanel extends JPanel {
 		final int width = background.getWidth();
 		final int height = background.getHeight();
 
-		SwingUtilities.invokeLater(() -> setPreferredSize(new Dimension(width,height)));
+		SwingUtilities.invokeLater(() -> setPreferredSize(new Dimension(width, height)));
 	}
 
 	public synchronized void setPoints( List<ScalePoint> points ) {
@@ -61,11 +61,11 @@ public class ScaleSpacePointPanel extends JPanel {
 		this.points.clear();
 		this.activeLevel = 0;
 
-		for( ScalePoint p : points ) {
-			if( unused.isEmpty() ) {
+		for (ScalePoint p : points) {
+			if (unused.isEmpty()) {
 				this.points.add(p.copy());
 			} else {
-				ScalePoint c = unused.remove( unused.size()-1 );
+				ScalePoint c = unused.remove(unused.size() - 1);
 				c.setTo(p);
 			}
 			this.points.add(p);
@@ -74,19 +74,19 @@ public class ScaleSpacePointPanel extends JPanel {
 
 	public synchronized void setLevel( int level ) {
 //		System.out.println("level "+level);
-		if( level > 0 ) {
-			ss.setActiveScale(level-1);
+		if (level > 0) {
+			ss.setActiveScale(level - 1);
 			// if the input image size has changed reallocate the levelImage
-			if( levelImage != null &&
+			if (levelImage != null &&
 					(levelImage.getWidth() != background.getWidth() ||
-					levelImage.getHeight() != background.getHeight()))
+							levelImage.getHeight() != background.getHeight()))
 				levelImage = null;
-			levelImage = ConvertBufferedImage.convertTo(ss.getScaledImage(),levelImage,true);
+			levelImage = ConvertBufferedImage.convertTo(ss.getScaledImage(), levelImage, true);
 
 			double scale = ss.getCurrentScale();
 			levelPoints.clear();
-			for( ScalePoint p : points ) {
-				if( p.scale == scale ) {
+			for (ScalePoint p : points) {
+				if (p.scale == scale) {
 					levelPoints.add(p);
 				}
 			}
@@ -96,37 +96,35 @@ public class ScaleSpacePointPanel extends JPanel {
 	}
 
 	@Override
-	public synchronized void paintComponent(Graphics g) {
+	public synchronized void paintComponent( Graphics g ) {
 		super.paintComponent(g);
 
 		Graphics2D g2 = (Graphics2D)g;
 
-		double scaleX = background.getWidth() / (double)getWidth();
-		double scaleY = background.getHeight() / (double)getHeight();
-		double scale = Math.max(scaleX,scaleY);
+		double scaleX = background.getWidth()/(double)getWidth();
+		double scaleY = background.getHeight()/(double)getHeight();
+		double scale = Math.max(scaleX, scaleY);
 
 		// scale it down so that the whole image is visible
-		if( scale > 1 ) {
+		if (scale > 1) {
 			AffineTransform tran = g2.getTransform();
-			tran.concatenate(AffineTransform.getScaleInstance(1/scale,1/scale));
+			tran.concatenate(AffineTransform.getScaleInstance(1/scale, 1/scale));
 			g2.setTransform(tran);
 		}
 
-		if( activeLevel == 0 )
+		if (activeLevel == 0)
 			showAll(g);
 		else {
-			g2.drawImage(levelImage, 0, 0, levelImage.getWidth(), levelImage.getHeight(),null);
-			VisualizeFeatures.drawScalePoints(g2,levelPoints,scaleToRadius);
+			g2.drawImage(levelImage, 0, 0, levelImage.getWidth(), levelImage.getHeight(), null);
+			VisualizeFeatures.drawScalePoints(g2, levelPoints, scaleToRadius);
 		}
-
 	}
 
-	private void showAll(Graphics g) {
+	private void showAll( Graphics g ) {
 		//draw the image
 		if (background != null)
-			g.drawImage(background, 0, 0, background.getWidth(),background.getHeight(),null);
+			g.drawImage(background, 0, 0, background.getWidth(), background.getHeight(), null);
 
-		VisualizeFeatures.drawScalePoints((Graphics2D)g,points,scaleToRadius);
+		VisualizeFeatures.drawScalePoints((Graphics2D)g, points, scaleToRadius);
 	}
-
 }

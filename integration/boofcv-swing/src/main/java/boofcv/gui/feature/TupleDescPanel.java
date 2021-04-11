@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -23,7 +23,6 @@ import boofcv.struct.feature.TupleDesc;
 import javax.swing.*;
 import java.awt.*;
 
-
 /**
  * Visualizes the a {@link boofcv.struct.feature.TupleDesc_F64}.
  *
@@ -37,20 +36,20 @@ public class TupleDescPanel extends JPanel {
 		return desc;
 	}
 
-	public void setDescription(TupleDesc desc) {
+	public void setDescription( TupleDesc desc ) {
 		this.desc = desc;
 	}
 
 	@Override
-	public synchronized void paintComponent(Graphics g) {
+	public synchronized void paintComponent( Graphics g ) {
 		super.paintComponent(g);
 
 		Graphics2D g2 = (Graphics2D)g;
 
 		TupleDesc desc = this.desc;
-		if( desc == null ) {
+		if (desc == null) {
 			g2.setColor(Color.WHITE);
-			g2.fillRect(0,0,getWidth(),getHeight());
+			g2.fillRect(0, 0, getWidth(), getHeight());
 		} else {
 
 			int h = getHeight();
@@ -58,14 +57,14 @@ public class TupleDescPanel extends JPanel {
 
 			int m = h/2;
 
-			int []x = new int[ desc.size() ];
-			int []y = new int[ desc.size() ];
+			int[] x = new int[desc.size()];
+			int[] y = new int[desc.size()];
 
 			// find the maximum magnitude of any of the elements
 			double max = 0;
-			for( int i = 0; i < desc.size(); i++ ) {
+			for (int i = 0; i < desc.size(); i++) {
 				double d = desc.getDouble(i);
-				if( max < Math.abs(d)) {
+				if (max < Math.abs(d)) {
 					max = Math.abs(d);
 				}
 			}
@@ -73,28 +72,28 @@ public class TupleDescPanel extends JPanel {
 			// draw a normalized histogram plot
 			double stepX = 1.0/desc.size();
 
-			for( int i = 0; i < desc.size(); i++ ) {
+			for (int i = 0; i < desc.size(); i++) {
 				x[i] = (int)(w*i*stepX);
-				y[i] = (int)((m*desc.getDouble(i)/max)+m);
+				y[i] = (int)((m*desc.getDouble(i)/max) + m);
 			}
 
 			g2.setColor(Color.GRAY);
-			g2.drawLine(0,m,w,m);
+			g2.drawLine(0, m, w, m);
 
 			g2.setStroke(new BasicStroke(2));
 			g2.setColor(Color.RED);
-			g2.drawPolyline(x,y,x.length);
+			g2.drawPolyline(x, y, x.length);
 
 			// print out the magnitude
 			g2.setColor(Color.BLACK);
-			String s = String.format("%4.1e",max);
-			g2.drawString(s,0,20);
+			String s = String.format("%4.1e", max);
+			g2.drawString(s, 0, 20);
 
 			g2.setColor(Color.BLUE);
-			for( int i = 0; i < desc.size(); i++ ) {
+			for (int i = 0; i < desc.size(); i++) {
 				int r = 1;
-				w = r*2+1;
-				g2.fillOval(x[i]-r,y[i]-r,w,w);
+				w = r*2 + 1;
+				g2.fillOval(x[i] - r, y[i] - r, w, w);
 			}
 		}
 	}
