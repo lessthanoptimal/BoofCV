@@ -209,7 +209,6 @@ public class ExampleMultiViewSparseReconstruction {
 				int activeCount = tracker.getTotalActive();
 				int droppedCount = tracker.getDroppedTracks(null).size();
 				tracker.spawnTracks();
-				activeTracks.clear();
 				tracker.getActiveTracks(activeTracks);
 				similarImages.processFrame(frame, activeTracks, tracker.getFrameID());
 				String id = frameId + "";//trackerSimilar.frames.getTail().frameID;

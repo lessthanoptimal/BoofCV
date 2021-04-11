@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -70,8 +70,7 @@ public abstract class GenericChecksPointTracker<T extends ImageGray<T>> extends 
 	/**
 	 * The cookie for tracks should not be set
 	 */
-	@Test
-	void checkCookieNull() {
+	@Test void checkCookieNull() {
 		tracker = createTracker();
 		processImage((T)image);
 		tracker.spawnTracks();
@@ -83,8 +82,7 @@ public abstract class GenericChecksPointTracker<T extends ImageGray<T>> extends 
 		}
 	}
 
-	@Test
-	void checkFrameID() {
+	@Test void checkFrameID() {
 		tracker = createTracker();
 		assertEquals(-1,tracker.getFrameID());
 		for (int i = 0; i < 5; i++) {
@@ -106,8 +104,7 @@ public abstract class GenericChecksPointTracker<T extends ImageGray<T>> extends 
 	 * NOTE: This test will return incorrect results if a large group of tracks are predeclared
 	 * and recycled tracks are put at the end of the queue
 	 */
-	@Test
-	void checkCookieSaved() {
+	@Test void checkCookieSaved() {
 		// create tracks
 		tracker = createTracker();
 		processImage((T)image);
@@ -135,8 +132,7 @@ public abstract class GenericChecksPointTracker<T extends ImageGray<T>> extends 
 	/**
 	 * High level spawn tracks test.
 	 */
-	@Test
-	void spawnTracks() {
+	@Test void spawnTracks() {
 		// Process an image and make sure no new tracks have been spawned until requested
 		tracker = createTracker();
 		processImage((T)image);
@@ -179,8 +175,7 @@ public abstract class GenericChecksPointTracker<T extends ImageGray<T>> extends 
 	/**
 	 * When spawn is called, make sure that it doesn't return identical tracks
 	 */
-	@Test
-	void spawnTracks_NoDuplicates() {
+	@Test void spawnTracks_NoDuplicates() {
 		tracker = createTracker();
 		processImage((T)image);
 		tracker.spawnTracks();
@@ -212,8 +207,7 @@ public abstract class GenericChecksPointTracker<T extends ImageGray<T>> extends 
 	/**
 	 * Ensures that the spawn ID is set correctly
 	 */
-	@Test
-	void spawnFrame_and_lastSeenFrame() {
+	@Test void spawnFrame_and_lastSeenFrame() {
 		tracker = createTracker();
 		processImage((T)image);
 		tracker.spawnTracks();
@@ -256,8 +250,7 @@ public abstract class GenericChecksPointTracker<T extends ImageGray<T>> extends 
 		assertTrue(count1 > 5);
 	}
 
-	@Test
-	void dropAllTracks() {
+	@Test void dropAllTracks() {
 		tracker = createTracker();
 		processImage((T)image);
 		tracker.spawnTracks();
@@ -275,8 +268,7 @@ public abstract class GenericChecksPointTracker<T extends ImageGray<T>> extends 
 	/**
 	 * Cause tracks to be dropped during the update
 	 */
-	@Test
-	void updateThenDropTracks() {
+	@Test void updateThenDropTracks() {
 		tracker = createTracker();
 		processImage((T)image);
 		tracker.spawnTracks();
@@ -321,8 +313,7 @@ public abstract class GenericChecksPointTracker<T extends ImageGray<T>> extends 
 		assertEquals(BeforeEach-afterAll,tracker.getDroppedTracks(null).size());
 	}
 	
-	@Test
-	void dropTrack() {
+	@Test void dropTrack() {
 		tracker = createTracker();
 		processImage((T)image);
 		tracker.spawnTracks();
@@ -343,8 +334,7 @@ public abstract class GenericChecksPointTracker<T extends ImageGray<T>> extends 
 
 	}
 
-	@Test
-	void trackUpdate() {
+	@Test void trackUpdate() {
 		tracker = createTracker();
 		processImage((T)image);
 		tracker.spawnTracks();
@@ -362,8 +352,7 @@ public abstract class GenericChecksPointTracker<T extends ImageGray<T>> extends 
 		assertEquals(before , after+dropped);
 	}
 
-	@Test
-	void reset() {
+	@Test void reset() {
 		tracker = createTracker();
 		processImage((T)image);
 		tracker.spawnTracks();
@@ -400,8 +389,7 @@ public abstract class GenericChecksPointTracker<T extends ImageGray<T>> extends 
 		}
 	}
 
-	@Test
-	void getAllTracks() {
+	@Test void getAllTracks() {
 		tracker = createTracker();
 		processImage((T)image);
 		tracker.spawnTracks();
@@ -417,8 +405,7 @@ public abstract class GenericChecksPointTracker<T extends ImageGray<T>> extends 
 		checkIdentical(input,ret);
 	}
 
-	@Test
-	void getActiveTracks() {
+	@Test void getActiveTracks() {
 		tracker = createTracker();
 		processImage((T)image);
 		tracker.spawnTracks();
@@ -434,8 +421,7 @@ public abstract class GenericChecksPointTracker<T extends ImageGray<T>> extends 
 		checkIdentical(input, ret);
 	}
 
-	@Test
-	void getInactiveTracks() {
+	@Test void getInactiveTracks() {
 		tracker = createTracker();
 		processImage((T)image);
 		tracker.spawnTracks();
@@ -452,8 +438,7 @@ public abstract class GenericChecksPointTracker<T extends ImageGray<T>> extends 
 		checkIdentical(input, ret);
 	}
 
-	@Test
-	void getDroppedTracks() {
+	@Test void getDroppedTracks() {
 		tracker = createTracker();
 		processImage((T)image);
 		tracker.spawnTracks();
@@ -472,8 +457,7 @@ public abstract class GenericChecksPointTracker<T extends ImageGray<T>> extends 
 		checkIdentical(input, ret);
 	}
 
-	@Test
-	void getNewTracks() {
+	@Test void getNewTracks() {
 		tracker = createTracker();
 		processImage((T)image);
 		tracker.spawnTracks();
@@ -492,8 +476,7 @@ public abstract class GenericChecksPointTracker<T extends ImageGray<T>> extends 
 	/**
 	 * Makes sure the number of active tracks makes sense
 	 */
-	@Test
-	void totalCounts() {
+	@Test void totalCounts() {
 		// create tracks
 		tracker = createTracker();
 		processImage((T)image);
@@ -516,8 +499,37 @@ public abstract class GenericChecksPointTracker<T extends ImageGray<T>> extends 
 		assertEquals(0, tracker.getTotalInactive());
 	}
 
-	@Test
-	void dropTracks() {
+	@Test void clearLists() {
+		tracker = createTracker();
+		processImage((T)image);
+
+		List<PointTrack> tracks = new ArrayList<>();
+
+		tracker.spawnTracks();
+
+		// pass in the same list, which should be cleared every call
+		assertEquals(tracker.getTotalActive(), tracker.getActiveTracks(tracks).size());
+		// call twice, since it was originally empty
+		assertEquals(tracker.getTotalActive(), tracker.getActiveTracks(tracks).size());
+		assertEquals(tracker.getTotalInactive(), tracker.getInactiveTracks(tracks).size());
+		assertEquals(tracker.getTotalActive(), tracker.getNewTracks(tracks).size());
+		assertEquals(0, tracker.getDroppedTracks(tracks).size());
+		assertEquals(tracker.getTotalActive()+tracker.getTotalInactive(),
+				tracker.getAllTracks(tracks).size());
+		assertTrue(tracker.getTotalActive()>0);
+
+		// see if still works after the next frame is processed
+		processImage((T)image);
+		assertEquals(tracker.getTotalActive(), tracker.getActiveTracks(tracks).size());
+		assertEquals(tracker.getTotalInactive(), tracker.getInactiveTracks(tracks).size());
+		tracks.add(new PointTrack());
+		assertEquals(0, tracker.getNewTracks(tracks).size());
+		assertEquals(tracker.getTotalActive()+tracker.getTotalInactive(),
+				tracker.getAllTracks(tracks).size());
+		assertTrue(tracker.getTotalActive()>0);
+	}
+
+	@Test void dropTracks() {
 		tracker = createTracker();
 		processImage((T)image);
 		tracker.spawnTracks();

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -130,7 +130,7 @@ public interface PointTracker<T extends ImageBase<T>> {
 	/**
 	 * Returns a list of all features that are currently being tracked
 	 *
-	 * @param list Optional storage for the list of tracks.
+	 * @param list Optional storage for the list of tracks. List is cleared before tracks are added.
 	 *             If null a new list will be declared internally.
 	 * @return List of tracks.
 	 */
@@ -140,7 +140,7 @@ public interface PointTracker<T extends ImageBase<T>> {
 	 * Returns a list of active tracks. An active track is defined as a track
 	 * which was found in the most recently processed image.
 	 *
-	 * @param list Optional storage for the list of tracks.
+	 * @param list Optional storage for the list of tracks. List is cleared before tracks are added.
 	 *             If null a new list will be declared internally.
 	 * @return List of tracks.
 	 */
@@ -150,7 +150,7 @@ public interface PointTracker<T extends ImageBase<T>> {
 	 * Returns a list of inactive tracks.  A track is inactive if it is not
 	 * associated with any features in the current image.
 	 *
-	 * @param list Optional storage for the list of tracks.
+	 * @param list Optional storage for the list of tracks. List is cleared before tracks are added.
 	 *             If null a new list will be declared internally.
 	 * @return List of tracks.
 	 */
@@ -160,7 +160,7 @@ public interface PointTracker<T extends ImageBase<T>> {
 	 * Returns a list of tracks dropped by the tracker during the most recent update.
 	 * Tracks dropped by user request are not included in this list.
 	 *
-	 * @param list Optional storage for the list of tracks.
+	 * @param list Optional storage for the list of tracks. List is cleared before tracks are added.
 	 *             If null a new list will be declared internally.
 	 * @return List of tracks.
 	 */
@@ -169,7 +169,7 @@ public interface PointTracker<T extends ImageBase<T>> {
 	/**
 	 * Returns a list of tracks that have been added since process was called.
 	 *
-	 * @param list Optional storage for the list of tracks.
+	 * @param list Optional storage for the list of tracks. List is cleared before tracks are added.
 	 *             If null a new list will be declared internally.
 	 * @return List of tracks.
 	 */

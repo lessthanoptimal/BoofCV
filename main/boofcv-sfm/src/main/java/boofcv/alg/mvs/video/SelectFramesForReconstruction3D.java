@@ -270,7 +270,6 @@ public class SelectFramesForReconstruction3D<T extends ImageBase<T>> implements 
 		requireNonNull(tracker, "Need to specify tracker. Did you call initialize too?");
 		tracker.process(frame);
 		tracker.spawnTracks();
-		activeTracks.clear();
 		tracker.getAllTracks(activeTracks);
 	}
 

@@ -34,7 +34,7 @@ import org.ddogleg.struct.DogArray;
 
 import java.util.List;
 
-import static boofcv.abst.tracker.PointTrackerDda.addAllTracksInList;
+import static boofcv.abst.tracker.PointTrackerUtils.addAllTracksInList;
 
 /**
  * Wrapper around {@link HybridTrackerScalePoint} for {@link PointTracker}. Features are respawned when the
