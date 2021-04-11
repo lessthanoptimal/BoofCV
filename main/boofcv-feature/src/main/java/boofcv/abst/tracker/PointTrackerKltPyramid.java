@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -36,6 +36,8 @@ import lombok.Setter;
 
 import java.util.ArrayList;
 import java.util.List;
+
+import static boofcv.abst.tracker.PointTrackerUtils.declareTrackStorage;
 
 /**
  * Wrapper around {@link boofcv.alg.tracker.klt.PyramidKltTracker} for {@link PointTracker}.  Every track
@@ -422,8 +424,7 @@ public class PointTrackerKltPyramid<I extends ImageGray<I>, D extends ImageGray<
 
 	@Override
 	public List<PointTrack> getActiveTracks( List<PointTrack> list ) {
-		if (list == null)
-			list = new ArrayList<>();
+		list = declareTrackStorage(list);
 
 		addToList(active, list);
 
@@ -435,16 +436,12 @@ public class PointTrackerKltPyramid<I extends ImageGray<I>, D extends ImageGray<
 	 */
 	@Override
 	public List<PointTrack> getInactiveTracks( List<PointTrack> list ) {
-		if (list == null)
-			list = new ArrayList<>();
-
-		return list;
+		return declareTrackStorage(list);
 	}
 
 	@Override
 	public List<PointTrack> getDroppedTracks( List<PointTrack> list ) {
-		if (list == null)
-			list = new ArrayList<>();
+		list = declareTrackStorage(list);
 
 		addToList(dropped, list);
 
@@ -453,8 +450,7 @@ public class PointTrackerKltPyramid<I extends ImageGray<I>, D extends ImageGray<
 
 	@Override
 	public List<PointTrack> getNewTracks( List<PointTrack> list ) {
-		if (list == null)
-			list = new ArrayList<>();
+		list = declareTrackStorage(list);
 
 		addToList(spawned, list);
 

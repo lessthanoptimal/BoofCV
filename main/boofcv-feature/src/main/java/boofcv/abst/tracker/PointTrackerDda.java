@@ -23,7 +23,6 @@ import boofcv.struct.feature.TupleDesc;
 import boofcv.struct.image.ImageGray;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -54,36 +53,26 @@ public class PointTrackerDda<I extends ImageGray<I>, TD extends TupleDesc<TD>>
 
 	@Override
 	public List<PointTrack> getActiveTracks( @Nullable List<PointTrack> list ) {
-		return addAllTracksInList(tracker.getTracksActive(), list);
+		return PointTrackerUtils.addAllTracksInList(tracker.getTracksActive(), list);
 	}
 
 	@Override
 	public List<PointTrack> getDroppedTracks( @Nullable List<PointTrack> list ) {
-		return addAllTracksInList(tracker.getTracksDropped(), list);
+		return PointTrackerUtils.addAllTracksInList(tracker.getTracksDropped(), list);
 	}
 
 	@Override
 	public List<PointTrack> getNewTracks( @Nullable List<PointTrack> list ) {
-		return addAllTracksInList(tracker.getTracksNew(), list);
+		return PointTrackerUtils.addAllTracksInList(tracker.getTracksNew(), list);
 	}
 
 	@Override
 	public List<PointTrack> getAllTracks( @Nullable List<PointTrack> list ) {
-		return addAllTracksInList(tracker.getTracksAll().toList(), list);
+		return PointTrackerUtils.addAllTracksInList(tracker.getTracksAll().toList(), list);
 	}
 
 	@Override
 	public List<PointTrack> getInactiveTracks( @Nullable List<PointTrack> list ) {
-		return addAllTracksInList(tracker.getTracksInactive(), list);
-	}
-
-	public static List<PointTrack> addAllTracksInList( List<PointTrack> tracks, @Nullable List<PointTrack> output ) {
-		if (output == null)
-			output = new ArrayList<>();
-		else
-			output.clear();
-
-		output.addAll(tracks);
-		return output;
+		return PointTrackerUtils.addAllTracksInList(tracker.getTracksInactive(), list);
 	}
 }
