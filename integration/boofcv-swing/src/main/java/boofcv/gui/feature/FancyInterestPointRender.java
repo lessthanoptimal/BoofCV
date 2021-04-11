@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -22,7 +22,6 @@ import java.awt.*;
 import java.util.ArrayList;
 import java.util.List;
 
-
 /**
  * Renders image interest points in a thread safe manor.
  *
@@ -36,37 +35,37 @@ public class FancyInterestPointRender {
 	List<VString> strings = new ArrayList<>();
 
 	public synchronized void draw( Graphics2D g2 ) {
-		for( Point p : points ) {
+		for (Point p : points) {
 			g2.setColor(p.color);
-			int w = p.radius*2+1;
-			g2.fillOval(p.x-p.radius,p.y-p.radius,w,w);
-			w+=2;
-			int r = p.radius+1;
+			int w = p.radius*2 + 1;
+			g2.fillOval(p.x - p.radius, p.y - p.radius, w, w);
+			w += 2;
+			int r = p.radius + 1;
 			g2.setColor(Color.BLACK);
-			g2.drawOval(p.x-r,p.y-r,w,w);
+			g2.drawOval(p.x - r, p.y - r, w, w);
 		}
 
-		for( Circle c : circles ) {
+		for (Circle c : circles) {
 			g2.setColor(c.color);
-			int w = c.radius*2+1;
-			g2.drawOval(c.x-c.radius,c.y-c.radius,w,w);
-			g2.fillOval(c.x-1,c.y-1,3,3);
-			if( !Double.isNaN(c.direction)) {
+			int w = c.radius*2 + 1;
+			g2.drawOval(c.x - c.radius, c.y - c.radius, w, w);
+			g2.fillOval(c.x - 1, c.y - 1, 3, 3);
+			if (!Double.isNaN(c.direction)) {
 				g2.setColor(Color.BLUE);
 				int dx = (int)(Math.cos(c.direction)*c.radius);
 				int dy = (int)(Math.sin(c.direction)*c.radius);
-				g2.drawLine(c.x,c.y,c.x+dx,c.y+dy);
+				g2.drawLine(c.x, c.y, c.x + dx, c.y + dy);
 			}
 		}
 
-		for( Line l : lines ) {
+		for (Line l : lines) {
 			g2.setColor(l.color);
-			g2.drawLine(l.x0,l.y0,l.x1,l.y1);
+			g2.drawLine(l.x0, l.y0, l.x1, l.y1);
 		}
 
-		for( VString l : strings ) {
+		for (VString l : strings) {
 			g2.setColor(l.color);
-			g2.drawString(l.value,l.x,l.y);
+			g2.drawString(l.value, l.x, l.y);
 		}
 	}
 
@@ -77,7 +76,7 @@ public class FancyInterestPointRender {
 		strings.clear();
 	}
 
-	public synchronized void addString( int x , int y , String value , Color color) {
+	public synchronized void addString( int x, int y, String value, Color color ) {
 		VString s = new VString();
 		s.x = x;
 		s.y = y;
@@ -86,14 +85,14 @@ public class FancyInterestPointRender {
 		strings.add(s);
 	}
 
-	public synchronized void addPoint( int x , int y ) {
+	public synchronized void addPoint( int x, int y ) {
 		Point p = new Point();
 		p.x = x;
 		p.y = y;
 		points.add(p);
 	}
 
-	public synchronized void addPoint(  int x , int y , int radius , Color color ) {
+	public synchronized void addPoint( int x, int y, int radius, Color color ) {
 		Point p = new Point();
 		p.x = x;
 		p.y = y;
@@ -102,7 +101,7 @@ public class FancyInterestPointRender {
 		points.add(p);
 	}
 
-	public synchronized void addCircle( int x , int y , int radius ) {
+	public synchronized void addCircle( int x, int y, int radius ) {
 		Circle p = new Circle();
 		p.x = x;
 		p.y = y;
@@ -110,7 +109,7 @@ public class FancyInterestPointRender {
 		circles.add(p);
 	}
 
-	public synchronized void addLine( int x0 , int y0 , int x1 , int y1 ) {
+	public synchronized void addLine( int x0, int y0, int x1, int y1 ) {
 		Line p = new Line();
 		p.x0 = x0;
 		p.y0 = y0;
@@ -119,7 +118,7 @@ public class FancyInterestPointRender {
 		lines.add(p);
 	}
 
-	public synchronized void addCircle( int x , int y , int radius , Color color ) {
+	public synchronized void addCircle( int x, int y, int radius, Color color ) {
 		Circle p = new Circle();
 		p.x = x;
 		p.y = y;
@@ -128,7 +127,7 @@ public class FancyInterestPointRender {
 		circles.add(p);
 	}
 
-	public synchronized void addCircle( int x , int y , int radius , Color color , double direction ) {
+	public synchronized void addCircle( int x, int y, int radius, Color color, double direction ) {
 		Circle p = new Circle();
 		p.x = x;
 		p.y = y;
@@ -138,30 +137,26 @@ public class FancyInterestPointRender {
 		circles.add(p);
 	}
 
-	public static class VString
-	{
-		int x,y;
+	public static class VString {
+		int x, y;
 		String value;
 		Color color = Color.RED;
 	}
 
-	public static class Line
-	{
-		int x0,y0;
-		int x1,y1;
+	public static class Line {
+		int x0, y0;
+		int x1, y1;
 		Color color = Color.BLUE;
 	}
 
-	public static class Point
-	{
-		int x,y;
-		int radius=1;
+	public static class Point {
+		int x, y;
+		int radius = 1;
 		Color color = Color.RED;
 	}
 
-	public static class Circle
-	{
-		int x,y;                   
+	public static class Circle {
+		int x, y;
 		int radius;
 		double direction = Double.NaN;
 		Color color = Color.RED;

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -39,31 +39,32 @@ public class ControlPanelAssociateGreedy extends StandardAlgConfigPanel {
 
 	private final Listener listener;
 
-	public ControlPanelAssociateGreedy(@Nullable ConfigAssociateGreedy config_, Listener listener) {
-		config = config_==null?new ConfigAssociateGreedy():config_;
+	public ControlPanelAssociateGreedy( @Nullable ConfigAssociateGreedy config_, Listener listener ) {
+		config = config_ == null ? new ConfigAssociateGreedy() : config_;
 		this.listener = listener;
 
-		checkForwardsBackwards = checkbox("Validate FB",config.forwardsBackwards,"Forwards-Backwards validation");
-		spinnerRatio = spinner(config.scoreRatioThreshold,0.0,1.0,0.05,1,4);
-		spinnerMaxError = spinner(config.maxErrorThreshold,-1.0,9999,20.0);
+		checkForwardsBackwards = checkbox("Validate FB", config.forwardsBackwards, "Forwards-Backwards validation");
+		spinnerRatio = spinner(config.scoreRatioThreshold, 0.0, 1.0, 0.05, 1, 4);
+		spinnerMaxError = spinner(config.maxErrorThreshold, -1.0, 9999, 20.0);
 
 		addAlignLeft(checkForwardsBackwards);
-		addLabeled(spinnerRatio,"Score Ratio","Score ratio test. 0.0 = strict 1.0 = turned off.");
-		addLabeled(spinnerMaxError,"Max Error","Max allowed error. Disable with <= 0");
+		addLabeled(spinnerRatio, "Score Ratio", "Score ratio test. 0.0 = strict 1.0 = turned off.");
+		addLabeled(spinnerMaxError, "Max Error", "Max allowed error. Disable with <= 0");
 	}
 
 	@Override
-	public void controlChanged(final Object source) {
+	public void controlChanged( final Object source ) {
 		if (source == spinnerRatio) {
-			config.scoreRatioThreshold = ((Number) spinnerRatio.getValue()).doubleValue();
+			config.scoreRatioThreshold = ((Number)spinnerRatio.getValue()).doubleValue();
 		} else if (source == spinnerMaxError) {
-			config.maxErrorThreshold = ((Number) spinnerMaxError.getValue()).doubleValue();
+			config.maxErrorThreshold = ((Number)spinnerMaxError.getValue()).doubleValue();
 		} else if (source == checkForwardsBackwards) {
 			config.forwardsBackwards = checkForwardsBackwards.isSelected();
 		}
 		listener.handleChangeAssociateGreedy();
 	}
 
+	@FunctionalInterface
 	public interface Listener {
 		void handleChangeAssociateGreedy();
 	}

@@ -190,12 +190,16 @@ public class AssociatedTriplePanel extends JPanel {
 		transform(affine3, p3);
 
 		g2.setColor(colors[i/6]);
-		line.x1 = p1.x; line.y1 = p1.y;
-		line.x2 = p2.x; line.y2 = p2.y;
+		line.x1 = p1.x;
+		line.y1 = p1.y;
+		line.x2 = p2.x;
+		line.y2 = p2.y;
 		g2.draw(line);
-		line.x2 = p3.x; line.y2 = p3.y;
+		line.x2 = p3.x;
+		line.y2 = p3.y;
 		g2.draw(line);
-		line.x1 = p2.x; line.y1 = p2.y;
+		line.x1 = p2.x;
+		line.y1 = p2.y;
 		g2.draw(line);
 	}
 
@@ -214,12 +218,16 @@ public class AssociatedTriplePanel extends JPanel {
 			transform(affine3, p3);
 
 			g2.setColor(colors[i/6]);
-			line.x1 = p1.x; line.y1 = p1.y;
-			line.x2 = p2.x; line.y2 = p2.y;
+			line.x1 = p1.x;
+			line.y1 = p1.y;
+			line.x2 = p2.x;
+			line.y2 = p2.y;
 			g2.draw(line);
-			line.x2 = p3.x; line.y2 = p3.y;
+			line.x2 = p3.x;
+			line.y2 = p3.y;
 			g2.draw(line);
-			line.x1 = p2.x; line.y1 = p2.y;
+			line.x1 = p2.x;
+			line.y1 = p2.y;
 			g2.draw(line);
 		}
 	}

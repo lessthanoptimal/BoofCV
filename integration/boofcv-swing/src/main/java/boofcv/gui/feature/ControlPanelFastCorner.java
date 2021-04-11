@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -36,28 +36,28 @@ public class ControlPanelFastCorner extends StandardAlgConfigPanel {
 
 	private final Listener listener;
 
-	public ControlPanelFastCorner( ConfigFastCorner config , Listener listener )
-	{
+	public ControlPanelFastCorner( ConfigFastCorner config, Listener listener ) {
 		this.config = config;
 		this.listener = listener;
 
-		sPixelTol = spinner(config.pixelTol,0,255,1);
-		sContinuous = spinner(config.minContinuous,9,12,1);
+		sPixelTol = spinner(config.pixelTol, 0, 255, 1);
+		sContinuous = spinner(config.minContinuous, 9, 12, 1);
 
-		addLabeled(sPixelTol,"Tolerance","Tolerance for deciding if two pixels are significantly different");
-		addLabeled(sContinuous,"Continuous","How many continuous pixels are required for it to be a corner");
+		addLabeled(sPixelTol, "Tolerance", "Tolerance for deciding if two pixels are significantly different");
+		addLabeled(sContinuous, "Continuous", "How many continuous pixels are required for it to be a corner");
 	}
 
 	@Override
-	public void controlChanged(final Object source) {
-		if( source == sPixelTol ) {
-			config.pixelTol = ((Number) sPixelTol.getValue()).intValue();
-		} else if( source == sContinuous) {
-			config.minContinuous = ((Number) sContinuous.getValue()).intValue();
+	public void controlChanged( final Object source ) {
+		if (source == sPixelTol) {
+			config.pixelTol = ((Number)sPixelTol.getValue()).intValue();
+		} else if (source == sContinuous) {
+			config.minContinuous = ((Number)sContinuous.getValue()).intValue();
 		}
 		listener.handleFastCorner();
 	}
 
+	@FunctionalInterface
 	public interface Listener {
 		void handleFastCorner();
 	}

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -33,7 +33,7 @@ public class ControlPanelSiftScaleSpace extends StandardAlgConfigPanel {
 	private final JSpinner spinnerNumScales;
 	private final JSpinner spinnerNumOctaves;
 
-	private Listener listener;
+	private final Listener listener;
 
 	public ControlPanelSiftScaleSpace(ConfigSiftScaleSpace config, Listener listener) {
 		this.config = config;
@@ -61,6 +61,7 @@ public class ControlPanelSiftScaleSpace extends StandardAlgConfigPanel {
 		listener.handleScaleSpaceChange();
 	}
 
+	@FunctionalInterface
 	public interface Listener {
 		void handleScaleSpaceChange();
 	}

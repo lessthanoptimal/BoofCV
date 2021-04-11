@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -40,39 +40,40 @@ public class ControlPanelDescribeBrief extends StandardAlgConfigPanel {
 
 	private final Listener listener;
 
-	public ControlPanelDescribeBrief(@Nullable ConfigBrief config_, Listener listener) {
-		config = config_==null?new ConfigBrief():config_;
+	public ControlPanelDescribeBrief( @Nullable ConfigBrief config_, Listener listener ) {
+		config = config_ == null ? new ConfigBrief() : config_;
 		this.listener = listener;
 
-		spinnerRadius = spinner(config.radius,1,999,2);
-		spinnerNumPoints = spinner(config.numPoints,1,9999,128);
-		spinnerBlurSigma = spinner(config.blurSigma,-1,100.0,0.5);
-		spinnerBlurRadius = spinner(config.blurRadius,-1,10000,1);
-		checkFixed = checkbox("Fixed",config.fixed,"true = fixed shape. false = scales and rotates");
+		spinnerRadius = spinner(config.radius, 1, 999, 2);
+		spinnerNumPoints = spinner(config.numPoints, 1, 9999, 128);
+		spinnerBlurSigma = spinner(config.blurSigma, -1, 100.0, 0.5);
+		spinnerBlurRadius = spinner(config.blurRadius, -1, 10000, 1);
+		checkFixed = checkbox("Fixed", config.fixed, "true = fixed shape. false = scales and rotates");
 
-		addLabeled(spinnerRadius,"Radius","Radius of the descriptor's sample region");
-		addLabeled(spinnerNumPoints,"Num Points","Number of points it will sample. Descriptor length.");
-		addLabeled(spinnerBlurSigma,"Blur Sigma","Amount of blur applied to the image before sampling.");
-		addLabeled(spinnerBlurRadius,"Blur Radius","Amount of blur applied to the image before sampling.");
+		addLabeled(spinnerRadius, "Radius", "Radius of the descriptor's sample region");
+		addLabeled(spinnerNumPoints, "Num Points", "Number of points it will sample. Descriptor length.");
+		addLabeled(spinnerBlurSigma, "Blur Sigma", "Amount of blur applied to the image before sampling.");
+		addLabeled(spinnerBlurRadius, "Blur Radius", "Amount of blur applied to the image before sampling.");
 		addAlignLeft(checkFixed);
 	}
 
 	@Override
-	public void controlChanged(final Object source) {
+	public void controlChanged( final Object source ) {
 		if (source == spinnerRadius) {
-			config.radius = ((Number) spinnerRadius.getValue()).intValue();
+			config.radius = ((Number)spinnerRadius.getValue()).intValue();
 		} else if (source == spinnerNumPoints) {
-			config.numPoints = ((Number) spinnerNumPoints.getValue()).intValue();
+			config.numPoints = ((Number)spinnerNumPoints.getValue()).intValue();
 		} else if (source == spinnerBlurSigma) {
-			config.blurSigma = ((Number) spinnerBlurSigma.getValue()).doubleValue();
+			config.blurSigma = ((Number)spinnerBlurSigma.getValue()).doubleValue();
 		} else if (source == spinnerBlurRadius) {
-			config.blurRadius = ((Number) spinnerBlurRadius.getValue()).intValue();
+			config.blurRadius = ((Number)spinnerBlurRadius.getValue()).intValue();
 		} else if (source == checkFixed) {
 			config.fixed = checkFixed.isSelected();
 		}
 		listener.handleChangeBrief();
 	}
 
+	@FunctionalInterface
 	public interface Listener {
 		void handleChangeBrief();
 	}

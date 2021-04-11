@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -37,7 +37,7 @@ public class ControlPanelGeneralCorner extends StandardAlgConfigPanel {
 	private @Getter final JSpinner spinnerMaxFeatures;
 	private @Getter final JComboBox<String> comboSelector;
 
-	Listener listener;
+	private final Listener listener;
 
 	public ControlPanelGeneralCorner(ConfigGeneralDetector config , Listener listener ) {
 		this.config = config;
@@ -69,6 +69,7 @@ public class ControlPanelGeneralCorner extends StandardAlgConfigPanel {
 		listener.handleGeneralCorner();
 	}
 
+	@FunctionalInterface
 	public interface Listener {
 		void handleGeneralCorner();
 	}

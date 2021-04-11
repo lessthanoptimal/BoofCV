@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -37,32 +37,34 @@ public class ControlPanelDescribeTemplate extends StandardAlgConfigPanel {
 
 	private final Listener listener;
 
-	public ControlPanelDescribeTemplate(ConfigTemplateDescribe config_, Listener listener) {
-		config = config_==null?new ConfigTemplateDescribe():config_;
+	public ControlPanelDescribeTemplate( ConfigTemplateDescribe config_, Listener listener ) {
+		config = config_ == null ? new ConfigTemplateDescribe() : config_;
 		this.listener = listener;
 
-		comboType = combo(config.type.ordinal(),(Object[]) ConfigTemplateDescribe.Type.values());
-		spinnerWidth = spinner(config.width,1,999,1);
-		spinnerHeight = spinner(config.height,1,999,1);
+		comboType = combo(config.type.ordinal(), (Object[])ConfigTemplateDescribe.Type.values());
+		spinnerWidth = spinner(config.width, 1, 999, 1);
+		spinnerHeight = spinner(config.height, 1, 999, 1);
 
-		addLabeled(comboType,"Type","Type of template descriptor. How the pixels are encoded");
-		addLabeled(spinnerWidth,"Width","Region Width");
-		addLabeled(spinnerHeight,"Height","Region Height");
+		addLabeled(comboType, "Type", "Type of template descriptor. How the pixels are encoded");
+		addLabeled(spinnerWidth, "Width", "Region Width");
+		addLabeled(spinnerHeight, "Height", "Region Height");
 	}
+
 	@Override
-	public void controlChanged(final Object source) {
+	public void controlChanged( final Object source ) {
 		if (source == comboType) {
 			config.type = ConfigTemplateDescribe.Type.values()[comboType.getSelectedIndex()];
 		} else if (source == spinnerWidth) {
-			config.width = ((Number) spinnerWidth.getValue()).intValue();
+			config.width = ((Number)spinnerWidth.getValue()).intValue();
 		} else if (source == spinnerHeight) {
-			config.height = ((Number) spinnerHeight.getValue()).intValue();
+			config.height = ((Number)spinnerHeight.getValue()).intValue();
 		} else {
 			throw new IllegalArgumentException("Unknown control");
 		}
 		listener.handleChangeTemplate();
 	}
 
+	@FunctionalInterface
 	public interface Listener {
 		void handleChangeTemplate();
 	}

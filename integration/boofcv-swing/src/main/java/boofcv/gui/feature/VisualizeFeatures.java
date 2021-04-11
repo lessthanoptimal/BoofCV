@@ -35,8 +35,8 @@ public class VisualizeFeatures {
 	 * distinctive
 	 */
 	public static int trackIdToRgb( long featureId ) {
-		int red = (int)(2.5*((50+featureId)%100));
-		int green = (int)((255.0/150.0)*((100+featureId)%150));
+		int red = (int)(2.5*((50 + featureId)%100));
+		int green = (int)((255.0/150.0)*((100 + featureId)%150));
 		int blue = (int)(featureId%255);
 
 		return (0xFF << 24) | ((red & 0xFF) << 16) | ((green & 0xFF) << 8) | (blue & 0xFF);
@@ -46,7 +46,6 @@ public class VisualizeFeatures {
 								   Color color,
 								   java.util.List<Point2D_I32> points,
 								   int radius ) {
-
 		g2.setStroke(new BasicStroke(2));
 
 		int ro = radius + 1;
