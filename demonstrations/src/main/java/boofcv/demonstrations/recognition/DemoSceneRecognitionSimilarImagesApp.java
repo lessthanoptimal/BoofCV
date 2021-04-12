@@ -267,6 +267,7 @@ public class DemoSceneRecognitionSimilarImagesApp<Gray extends ImageGray<Gray>, 
 	class ViewControlPanel extends StandardAlgConfigPanel implements ListSelectionListener {
 		public boolean drawFeatures = false;
 		public ColorFeatures colorization = ColorFeatures.ASSOCIATION;
+		public int numPreviewColumns = 4;
 
 		protected JLabel buildTimeLabel = new JLabel("-----");
 		protected JLabel queryTimeLabel = new JLabel("-----");
@@ -277,6 +278,7 @@ public class DemoSceneRecognitionSimilarImagesApp<Gray extends ImageGray<Gray>, 
 
 		JCheckBox checkFeatures = checkbox("Features", drawFeatures);
 		JComboBox<String> comboColor = combo(colorization.ordinal(), (Object[])ColorFeatures.values());
+		JSpinner spinnerNumColumns = spinner(numPreviewColumns,1,10,1);
 
 		public ViewControlPanel() {
 			listImages = new JList<>();
@@ -297,6 +299,7 @@ public class DemoSceneRecognitionSimilarImagesApp<Gray extends ImageGray<Gray>, 
 			addLabeled(imageSizeLabel, "Image Size");
 			addAlignLeft(checkFeatures);
 			addLabeled(comboColor, "Color");
+			addLabeled(spinnerNumColumns, "Preview Columns");
 			addLabeled(totalImagesLabel, "Total Images");
 			addAlignCenter(listScrollPane);
 			setPreferredSize(new Dimension(250, 500));
@@ -367,6 +370,9 @@ public class DemoSceneRecognitionSimilarImagesApp<Gray extends ImageGray<Gray>, 
 			} else if (source == comboColor) {
 				colorization = ColorFeatures.values()[comboColor.getSelectedIndex()];
 				gui.repaint();
+			} else if (source == spinnerNumColumns) {
+				numPreviewColumns = (Integer)spinnerNumColumns.getValue();
+				gui.updateGridShape();
 			}
 		}
 	}
@@ -376,7 +382,8 @@ public class DemoSceneRecognitionSimilarImagesApp<Gray extends ImageGray<Gray>, 
 
 		final JTextArea textArea = new JTextArea();
 
-		final JPanel gridPanel = new JPanel(new GridLayout(0, 4, 4, 4));
+		final GridLayout gridLayout = new GridLayout(0, 4, 4, 4);
+		final JPanel gridPanel = new JPanel(gridLayout);
 
 		// Selected index of a feature in the "source" image
 		int selectedSrcID = -1;
@@ -400,6 +407,13 @@ public class DemoSceneRecognitionSimilarImagesApp<Gray extends ImageGray<Gray>, 
 			verticalSplit.setPreferredSize(new Dimension(200, 0));
 
 			add(verticalSplit, BorderLayout.CENTER);
+		}
+
+		public void updateGridShape() {
+			gridLayout.setColumns(viewControlPanel.numPreviewColumns);
+			this.gridPanel.invalidate();
+			this.gridPanel.validate();
+			this.gridPanel.repaint();
 		}
 
 		public void handleSelectedChanged() {
