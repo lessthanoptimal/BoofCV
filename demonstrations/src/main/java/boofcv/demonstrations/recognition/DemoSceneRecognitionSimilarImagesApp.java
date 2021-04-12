@@ -67,7 +67,6 @@ public class DemoSceneRecognitionSimilarImagesApp<Gray extends ImageGray<Gray>, 
 
 	// TODO Add a tuning panel
 	// TODO Tune input image size
-	// TODO Show size of original image before scaling
 	// TODO select features in one of the similar images
 	// TODO Load full resolution image for the selected target
 	// TODO progress bar + status when doing math
@@ -89,6 +88,7 @@ public class DemoSceneRecognitionSimilarImagesApp<Gray extends ImageGray<Gray>, 
 	final Object imageLock = new Object();
 	Map<String, SimilarInfo> imagesSimilar = new HashMap<>();
 	List<String> imagePaths = new ArrayList<>();
+	DogArray<ImageDimension> imageShapes = new DogArray<>(ImageDimension::new);
 	Map<String, BufferedImage> imagePreviews = new HashMap<>();
 
 	// If true it's done doing all computations
@@ -135,11 +135,13 @@ public class DemoSceneRecognitionSimilarImagesApp<Gray extends ImageGray<Gray>, 
 			foundFiles = new ArrayList<>();
 			foundFiles.add(file.getPath());
 		} else {
-			throw new RuntimeException("Doesn't support videos yet");
+			JOptionPane.showMessageDialog(this, "Doesn't support videos yet");
+			return;
 		}
 
 		if (foundFiles.isEmpty()) {
-			throw new RuntimeException("No files selected");
+			JOptionPane.showMessageDialog(this, "No valid files selected");
+			return;
 		}
 
 		// Save the path just incase it wants to reload it later
@@ -179,6 +181,7 @@ public class DemoSceneRecognitionSimilarImagesApp<Gray extends ImageGray<Gray>, 
 			imagePaths.clear();
 			imagePreviews.clear();
 			imagesSimilar.clear();
+			imageShapes.reset();
 		}
 		SwingUtilities.invokeLater(() -> viewControlPanel.resetImagePaths());
 
@@ -212,6 +215,7 @@ public class DemoSceneRecognitionSimilarImagesApp<Gray extends ImageGray<Gray>, 
 			preview.createGraphics().drawImage(buffered, AffineTransform.getScaleInstance(scale, scale), null);
 			synchronized (imageLock) {
 				imagePreviews.put(path, preview);
+				imageShapes.grow().setTo(buffered.getWidth(), buffered.getHeight());
 			}
 			SwingUtilities.invokeLater(() -> viewControlPanel.addImageToPath(path));
 
@@ -269,6 +273,7 @@ public class DemoSceneRecognitionSimilarImagesApp<Gray extends ImageGray<Gray>, 
 		protected JLabel buildTimeLabel = new JLabel("-----");
 		protected JLabel queryTimeLabel = new JLabel("-----");
 		protected JLabel imageSizeLabel = new JLabel("-----");
+		protected JLabel dbSizeLabel = new JLabel("-----");
 		protected JLabel totalImagesLabel = new JLabel("-----");
 
 		JList<String> listImages;
@@ -293,7 +298,8 @@ public class DemoSceneRecognitionSimilarImagesApp<Gray extends ImageGray<Gray>, 
 
 			addLabeled(buildTimeLabel, "Build (s)");
 			addLabeled(queryTimeLabel, "Query (ms)");
-			addLabeled(imageSizeLabel, "Image Size");
+			addLabeled(imageSizeLabel, "Original Size");
+			addLabeled(dbSizeLabel, "DB Size");
 			addAlignLeft(checkFeatures);
 			addLabeled(comboColor, "Color");
 			addLabeled(spinnerNumColumns, "Preview Columns");
@@ -338,7 +344,11 @@ public class DemoSceneRecognitionSimilarImagesApp<Gray extends ImageGray<Gray>, 
 		}
 
 		public void setImageSize( final int width, final int height ) {
-			BoofSwingUtil.invokeNowOrLater(() -> imageSizeLabel.setText(width + " x " + height));
+			imageSizeLabel.setText(width + " x " + height);
+		}
+
+		public void setDbSize( final int width, final int height ) {
+			dbSizeLabel.setText(width + " x " + height);
 		}
 
 		public void setProcessingTimeS( double seconds ) {
@@ -434,8 +444,10 @@ public class DemoSceneRecognitionSimilarImagesApp<Gray extends ImageGray<Gray>, 
 			mainImage.changeImage(imageID);
 
 			// Update the image shape
-			ImageDimension shape = mainImage.shape;
-			viewControlPanel.setImageSize(shape.width, shape.height);
+			synchronized (imageLock) {
+				ImageDimension imageShape = imageShapes.get(selectedIndex);
+				viewControlPanel.setImageSize(imageShape.width, imageShape.height);
+			}
 
 			// Wait until it has finished before trying to visualize the results
 			if (!computingFinished) {
@@ -445,6 +457,10 @@ public class DemoSceneRecognitionSimilarImagesApp<Gray extends ImageGray<Gray>, 
 			}
 
 			lookupSimilarImages(imageID);
+
+			// Get the select image's shape in the DB
+			sceneSimilar.lookupShape(imageID, mainImage.dbShape);
+			viewControlPanel.setDbSize(mainImage.dbShape.width, mainImage.dbShape.height);
 
 			textArea.setText(createInfoText(selectedIndex));
 
@@ -534,7 +550,7 @@ public class DemoSceneRecognitionSimilarImagesApp<Gray extends ImageGray<Gray>, 
 	}
 
 	class VisualizeImage extends ImagePanel {
-		ImageDimension shape = new ImageDimension();
+		ImageDimension dbShape = new ImageDimension();
 		DogArray<Point2D_F64> features = new DogArray<>(Point2D_F64::new);
 		DogArray_I32 words = new DogArray_I32();
 		DogArray_I32 mainFeatureIdx = new DogArray_I32();
@@ -641,7 +657,7 @@ public class DemoSceneRecognitionSimilarImagesApp<Gray extends ImageGray<Gray>, 
 		}
 
 		public double getImageScale() {
-			double previewScale = img.getWidth()/(double)shape.width;
+			double previewScale = img.getWidth()/(double)dbShape.width;
 			return previewScale*scale;
 		}
 
@@ -653,7 +669,7 @@ public class DemoSceneRecognitionSimilarImagesApp<Gray extends ImageGray<Gray>, 
 
 			if (features.isEmpty()) {
 				sceneSimilar.lookupPixelFeats(imageID, features);
-				sceneSimilar.lookupShape(imageID, shape);
+				sceneSimilar.lookupShape(imageID, dbShape);
 				sceneSimilar.lookupImageWords(imageID, words);
 				featureHandler.numFeatures = features.size;
 

@@ -222,13 +222,19 @@ public class MouseSelectImageFeatures extends MouseAdapter {
 			}
 		}
 
-		if (bestIdx == -1)
+		// Reset the selected features
+		selected.reset();
+		selectedMask.resize(0);
+
+		if (bestIdx == -1) {
+			// No points were selected
+			handleSelected.process();
 			return;
+		}
 
 		// Only select this single feature
 		selectedMask.resize(numFeatures, false);
 		selectedMask.set(bestIdx, true);
-		selected.reset();
 		selected.add(bestIdx);
 		handleSelected.process();
 	}
