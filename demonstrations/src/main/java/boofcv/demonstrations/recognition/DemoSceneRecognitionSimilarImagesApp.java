@@ -49,10 +49,7 @@ import javax.swing.*;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 import java.awt.*;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
 import java.awt.geom.AffineTransform;
-import java.awt.geom.Ellipse2D;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.util.ArrayList;
@@ -353,7 +350,7 @@ public class DemoSceneRecognitionSimilarImagesApp<Gray extends ImageGray<Gray>, 
 		}
 
 		public void setTotalImages( int count ) {
-			totalImagesLabel.setText(""+count);
+			totalImagesLabel.setText("" + count);
 		}
 
 		@Override public void valueChanged( ListSelectionEvent e ) {
@@ -388,41 +385,6 @@ public class DemoSceneRecognitionSimilarImagesApp<Gray extends ImageGray<Gray>, 
 
 		public VisualizePanel() {
 			setLayout(new BorderLayout());
-
-			mainImage.addMouseListener(new MouseAdapter() {
-				@Override public void mousePressed( MouseEvent e ) {
-					if (mainImage.features.isEmpty())
-						return;
-					double scale = mainImage.getImageScale();
-					double x = e.getX()/scale;
-					double y = e.getY()/scale;
-
-					int best = -1;
-					double bestDistance = Math.pow(15.0/scale, 2.0);
-					for (int i = 0; i < mainImage.features.size; i++) {
-						Point2D_F64 pixel = mainImage.features.get(i);
-						double d = pixel.distance2(x, y);
-						if (d < bestDistance) {
-							bestDistance = d;
-							best = i;
-						}
-					}
-
-					if (best == -1) {
-						// Only redraw if it deselected
-						if (selectedSrcID != best) {
-							selectedSrcID = -1;
-							selectedWord = -1;
-							gui.repaint();
-						}
-						return;
-					}
-					selectedSrcID = best;
-					selectedWord = mainImage.words.get(best);
-
-					gui.repaint();
-				}
-			});
 			mainImage.requestFocus();
 
 			textArea.setEditable(false);
@@ -558,20 +520,75 @@ public class DemoSceneRecognitionSimilarImagesApp<Gray extends ImageGray<Gray>, 
 		DogArray_I32 words = new DogArray_I32();
 		DogArray_I32 mainFeatureIdx = new DogArray_I32();
 
-		Ellipse2D.Double ellipse = new Ellipse2D.Double();
 		String imageID;
+
+		MouseSelectImageFeatures featureHandler = new MouseSelectImageFeatures(this);
 
 		public VisualizeImage( @Nullable String imageID ) {
 			super(300, 300);
 			setScaling(ScaleOptions.DOWN);
 			if (imageID != null)
 				changeImage(imageID);
+
+			addMouseListener(featureHandler);
+			addMouseMotionListener(featureHandler);
+
+			featureHandler.featureLocation = ( idx, p ) -> p.setTo(features.get(idx));
+			featureHandler.screenToImage = ( x, y, image ) -> {
+				double scale = getImageScale();
+				image.setTo(x/scale, y/scale);
+			};
+			featureHandler.imageToScreen = ( x, y, screen ) -> {
+				double scale = getImageScale();
+				screen.setTo(x*scale, y*scale);
+			};
+
+			featureHandler.featureSkip = ( idx ) -> {
+				boolean filterWords = viewControlPanel.colorization == ColorFeatures.WORD && gui.selectedWord != -1;
+				int word = words.get(idx);
+				if (filterWords && gui.selectedWord != word)
+					return true;
+
+				// Skip over features which are not associated
+				if (viewControlPanel.colorization == ColorFeatures.ASSOCIATION ) {
+					int featureIdx = mainFeatureIdx.get(idx);
+
+					// Skip if there's no corresponding feature in the main view
+					if (featureIdx<0)
+						return true;
+
+					// Skip if the user has selected features and this is not one of the selected
+					if (gui.mainImage.featureHandler.featuresSelected()) {
+						return !gui.mainImage.featureHandler.selectedMask.get(featureIdx);
+					}
+				}
+
+				return false;
+			};
+			featureHandler.featureColor = ( idx ) ->
+					switch (viewControlPanel.colorization) {
+						case ALL -> 0xFF0000;
+						case ASSOCIATION -> VisualizeFeatures.trackIdToRgb(mainFeatureIdx.get(idx));
+						case WORD -> {
+							int word = words.get(idx);
+							yield VisualizeFeatures.trackIdToRgb(word*100L + (word%100));
+						}
+					};
+
+			if (imageID==null) {
+				// if the user selects features in the master panel repaint everything
+				featureHandler.handleSelected = ()-> {gui.repaint();};
+			} else {
+				// Only the master image can the user select features
+				featureHandler.selectRegion = false;
+			}
 		}
 
 		public void changeImage( @Nullable String imageID ) {
 			BoofSwingUtil.checkGuiThread();
 			features.reset();
 			this.imageID = imageID;
+			featureHandler.reset();
 			if (imageID == null) {
 				setImageRepaint(null);
 				return;
@@ -596,11 +613,12 @@ public class DemoSceneRecognitionSimilarImagesApp<Gray extends ImageGray<Gray>, 
 				sceneSimilar.lookupPixelFeats(imageID, features);
 				sceneSimilar.lookupShape(imageID, shape);
 				sceneSimilar.lookupImageWords(imageID, words);
+				featureHandler.numFeatures = features.size;
 
 				// look up corresponding features in the mainImage
 				mainFeatureIdx.resize(words.size, -1);
 				SimilarInfo info = imagesSimilar.get(imageID);
-				if (info !=null) {
+				if (info != null) {
 					info.associated.forEach(p -> mainFeatureIdx.set(p.dst, p.src));
 				} else {
 					// This must be displaying the selected image and not one of the similar ones
@@ -611,39 +629,10 @@ public class DemoSceneRecognitionSimilarImagesApp<Gray extends ImageGray<Gray>, 
 				}
 			}
 
-			double imageScale = getImageScale();
-
 			Graphics2D g2 = BoofSwingUtil.antialiasing(g);
 
-			// Filter by words if a word has been selected and it's colorizing by words
-			boolean filterWords = viewControlPanel.colorization == ColorFeatures.WORD && gui.selectedWord != -1;
 
-			// Filter by feature if showing all features and a feature in the source has been selected
-			boolean filterFeature = viewControlPanel.colorization == ColorFeatures.ASSOCIATION && gui.selectedSrcID != -1;
-
-			for (int i = 0; i < features.size; i++) {
-				int word = words.get(i);
-				Point2D_F64 p = features.get(i);
-
-				if (filterWords && gui.selectedWord != word)
-					continue;
-
-				if (filterFeature && gui.selectedSrcID != mainFeatureIdx.get(i))
-					continue;
-
-				// Skip over features which are not associated
-				if (viewControlPanel.colorization == ColorFeatures.ASSOCIATION && mainFeatureIdx.get(i) < 0)
-					continue;
-
-				Color color = switch (viewControlPanel.colorization) {
-					case ALL -> Color.RED;
-					case ASSOCIATION -> new Color(VisualizeFeatures.trackIdToRgb(mainFeatureIdx.get(i)));
-					case WORD -> new Color(VisualizeFeatures.trackIdToRgb(word*100L + (word%100)));
-				};
-
-				VisualizeFeatures.drawPoint(g2,
-						offsetX + p.x*imageScale, offsetY + p.y*imageScale, 5.0, color, true, ellipse);
-			}
+			featureHandler.paint(g2);
 		}
 	}
 
