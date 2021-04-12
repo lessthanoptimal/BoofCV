@@ -54,23 +54,24 @@ import java.util.List;
  *
  * @author Peter Abeles
  */
-public class VisualizeAssociationMatchesApp<T extends ImageGray<T>, D extends ImageGray<D>>
+public class VisualizeAssociationMatchesApp
+		<Image extends ImageGray<Image>, TD extends TupleDesc<TD>>
 		extends DemonstrationBase {
 
 	// algorithms
-	InterestPointDetector<T> detector;
-	DescribePointRadiusAngle descriptor;
-	AssociateDescription<TupleDesc> matcher;
-	OrientationImage<T> orientation;
+	InterestPointDetector<Image> detector;
+	DescribePointRadiusAngle<Image, TD> descriptor;
+	AssociateDescription<TD> matcher;
+	OrientationImage<Image> orientation;
 	boolean algorithmChange = true;
 	boolean failure = false;
 	// images
 	BufferedImage buffLeft;
 	BufferedImage buffRight;
-	Planar<T> colorLeft, colorRight;
-	T grayLeft, grayRight;
+	Planar<Image> colorLeft, colorRight;
+	Image grayLeft, grayRight;
 
-	Class<T> imageType;
+	Class<Image> imageType;
 
 	AssociationPanel panel = new AssociationPanel(20);
 	AssociateControls controls = new AssociateControls();
@@ -78,7 +79,7 @@ public class VisualizeAssociationMatchesApp<T extends ImageGray<T>, D extends Im
 	// tells the progress monitor how far along it is
 	int progress;
 
-	public VisualizeAssociationMatchesApp( java.util.List<PathLabel> examples, Class<T> imageType ) {
+	public VisualizeAssociationMatchesApp( java.util.List<PathLabel> examples, Class<Image> imageType ) {
 		super(true, false, examples, ImageType.pl(3, imageType));
 		this.imageType = imageType;
 
@@ -94,11 +95,11 @@ public class VisualizeAssociationMatchesApp<T extends ImageGray<T>, D extends Im
 	@Override
 	protected void handleInputChange( int source, InputMethod method, final int width, final int height ) {
 		switch (source) {
-			case 0:
+			case 0 -> {
 				buffLeft = ConvertBufferedImage.checkDeclare(width, height, buffLeft, BufferedImage.TYPE_INT_RGB);
 				colorLeft.reshape(width, height);
 				grayLeft.reshape(width, height);
-				break;
+			}
 
 //			case 1:
 //				buffRight = ConvertBufferedImage.checkDeclare(width,height,buffRight,BufferedImage.TYPE_INT_RGB);
@@ -129,14 +130,13 @@ public class VisualizeAssociationMatchesApp<T extends ImageGray<T>, D extends Im
 	@Override
 	public void processImage( int sourceID, long frameID, BufferedImage bufferedIn, ImageBase input ) {
 		switch (sourceID) {
-			case 0:
+			case 0 -> {
 				failure = false;
 				buffLeft.createGraphics().drawImage(bufferedIn, 0, 0, null);
-				colorLeft.setTo((Planar<T>)input);
+				colorLeft.setTo((Planar<Image>)input);
 				GConvertImage.average(colorLeft, grayLeft);
-				break;
-
-			case 1:
+			}
+			case 1 -> {
 				if (failure) // abort if it failed earlier
 					return;
 				int width = input.width;
@@ -145,14 +145,12 @@ public class VisualizeAssociationMatchesApp<T extends ImageGray<T>, D extends Im
 				buffRight = ConvertBufferedImage.checkDeclare(width, height, buffRight, BufferedImage.TYPE_INT_RGB);
 				colorRight.reshape(width, height);
 				grayRight.reshape(width, height);
-
 				buffRight.createGraphics().drawImage(bufferedIn, 0, 0, null);
-				colorRight.setTo((Planar<T>)input);
+				colorRight.setTo((Planar<Image>)input);
 				GConvertImage.average(colorRight, grayRight);
-
 				BoofSwingUtil.invokeNowOrLater(() -> panel.setImages(buffLeft, buffRight));
 				processImage();
-				break;
+			}
 		}
 	}
 
@@ -180,8 +178,8 @@ public class VisualizeAssociationMatchesApp<T extends ImageGray<T>, D extends Im
 		long time0 = System.nanoTime();
 		final List<Point2D_F64> leftPts = new ArrayList<>();
 		final List<Point2D_F64> rightPts = new ArrayList<>();
-		DogArray<TupleDesc> leftDesc = UtilFeature.createArray(descriptor, 10);
-		DogArray<TupleDesc> rightDesc = UtilFeature.createArray(descriptor, 10);
+		DogArray<TD> leftDesc = UtilFeature.createArray(descriptor, 10);
+		DogArray<TD> rightDesc = UtilFeature.createArray(descriptor, 10);
 
 		final ProgressMonitor progressMonitor = new ProgressMonitor(this,
 				"Associating Features",
@@ -221,12 +219,12 @@ public class VisualizeAssociationMatchesApp<T extends ImageGray<T>, D extends Im
 		});
 	}
 
-	private void extractImageFeatures( Planar<T> color, T gray, DogArray<TupleDesc> descs, List<Point2D_F64> locs ) {
+	private void extractImageFeatures( Planar<Image> color, Image gray, DogArray<TD> descs, List<Point2D_F64> locs ) {
 		detector.detect(gray);
 		if (descriptor.getImageType().getFamily() == ImageType.Family.GRAY)
 			descriptor.setImage(gray);
 		else
-			descriptor.setImage(color);
+			((DescribePointRadiusAngle)descriptor).setImage(color);
 		orientation.setImage(gray);
 
 		if (detector.hasScale()) {
@@ -240,7 +238,7 @@ public class VisualizeAssociationMatchesApp<T extends ImageGray<T>, D extends Im
 					yaw = orientation.compute(pt.x, pt.y);
 				}
 
-				TupleDesc d = descs.grow();
+				TD d = descs.grow();
 				if (descriptor.process(pt.x, pt.y, yaw, radius, d)) {
 					locs.add(pt.copy());
 				} else {
@@ -258,7 +256,7 @@ public class VisualizeAssociationMatchesApp<T extends ImageGray<T>, D extends Im
 					yaw = orientation.compute(pt.x, pt.y);
 				}
 
-				TupleDesc d = descs.grow();
+				TD d = descs.grow();
 				if (descriptor.process(pt.x, pt.y, yaw, radiusScale, d)) {
 					locs.add(pt.copy());
 				} else {

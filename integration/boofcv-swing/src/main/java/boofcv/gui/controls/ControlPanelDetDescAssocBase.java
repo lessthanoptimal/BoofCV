@@ -34,6 +34,7 @@ import boofcv.factory.feature.detect.interest.ConfigDetectInterestPoint;
 import boofcv.factory.feature.detect.interest.FactoryInterestPoint;
 import boofcv.gui.StandardAlgConfigPanel;
 import boofcv.gui.feature.*;
+import boofcv.struct.feature.TupleDesc;
 import boofcv.struct.feature.TupleDesc_F64;
 import boofcv.struct.image.ImageGray;
 import boofcv.struct.image.ImageType;
@@ -176,8 +177,8 @@ public abstract class ControlPanelDetDescAssocBase extends StandardAlgConfigPane
 		return FactoryInterestPoint.generic(c, imageType, null);
 	}
 
-	public <T extends ImageGray<T>, D extends ImageGray<D>>
-	DescribePointRadiusAngle<T, ?> createDescriptor( Class<T> imageType ) {
+	public <T extends ImageGray<T>, TD extends TupleDesc<TD>>
+	DescribePointRadiusAngle<T, TD> createDescriptor( Class<T> imageType ) {
 		ConfigDescribeRegion c = new ConfigDescribeRegion();
 		c.type = configDetDesc.typeDescribe;
 		c.brief = configDetDesc.describeBrief;
