@@ -52,10 +52,8 @@ import java.awt.*;
 import java.awt.geom.AffineTransform;
 import java.awt.image.BufferedImage;
 import java.io.File;
-import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 import static boofcv.io.UtilIO.systemToUnix;
 
@@ -70,14 +68,13 @@ public class DemoSceneRecognitionSimilarImagesApp<Gray extends ImageGray<Gray>, 
 	// TODO Add a tuning panel
 	// TODO Tune input image size
 	// TODO Show size of original image before scaling
-	// TODO select a group of features
-	// TODO select features in similar image
+	// TODO select features in one of the similar images
 	// TODO Load full resolution image for the selected target
 	// TODO progress bar + status when doing math
 	// TODO save / load DB
 	// TODO Use prebuilt vocab
 
-	public static final int PREVIEW_PIXELS = 400*300;
+	public static final int PREVIEW_PIXELS = 500*400;
 	public static final int INPUT_PIXELS = 640*480;
 
 	VisualizePanel gui = new VisualizePanel();
@@ -452,10 +449,18 @@ public class DemoSceneRecognitionSimilarImagesApp<Gray extends ImageGray<Gray>, 
 			textArea.setText(createInfoText(selectedIndex));
 
 			gridPanel.removeAll();
+
+			// Sort the similar images from best to worst based on association
+			List<SimilarInfo> sortedList = new ArrayList<>();
 			for (String viewID : imagesSimilar.keySet()) {
-				SimilarInfo match = imagesSimilar.get(viewID);
+				sortedList.add(imagesSimilar.get(viewID));
+			}
+			Collections.sort(sortedList,(a,b)->Integer.compare(b.associated.size,a.associated.size));
+			for (SimilarInfo match : sortedList) {
 				gridPanel.add(new ImageLabeledPanel(match.id, match.associated.size));
 			}
+
+			// Tell the GUI to update
 			gridPanel.validate();
 			gridPanel.repaint();
 		}
@@ -582,7 +587,13 @@ public class DemoSceneRecognitionSimilarImagesApp<Gray extends ImageGray<Gray>, 
 			featureHandler.featureColor = ( idx ) ->
 					switch (viewControlPanel.colorization) {
 						case ALL -> 0xFF0000;
-						case ASSOCIATION -> VisualizeFeatures.trackIdToRgb(mainFeatureIdx.get(idx));
+						case ASSOCIATION -> {
+							// If only one feature is selected make sure it's easy to see
+							if (gui.mainImage.featureHandler.isSingleSelected()) {
+								yield 0xFF9999;
+							}
+							yield VisualizeFeatures.trackIdToRgb(mainFeatureIdx.get(idx));
+						}
 						case WORD -> {
 							int word = words.get(idx);
 							yield VisualizeFeatures.trackIdToRgb(word*100L + (word%100));
@@ -591,7 +602,24 @@ public class DemoSceneRecognitionSimilarImagesApp<Gray extends ImageGray<Gray>, 
 
 			if (imageID==null) {
 				// if the user selects features in the master panel repaint everything
-				featureHandler.handleSelected = ()-> {gui.repaint();};
+				featureHandler.handleSelected = ()-> {
+					switch (viewControlPanel.colorization) {
+						case WORD -> {
+							// Select the word based on the selected feature
+							if (featureHandler.selected.isEmpty())
+								gui.selectedWord = -1;
+							else
+								gui.selectedWord = words.get(featureHandler.selected.get(0));
+							featureHandler.selected.reset();
+							gui.repaint();
+						}
+						default -> {
+							// make sure no word is selected then repaint everything
+							gui.selectedWord = -1;
+							gui.repaint();
+						}
+					}
+				};
 			} else {
 				// Only the master image can the user select features
 				featureHandler.selectRegion = false;

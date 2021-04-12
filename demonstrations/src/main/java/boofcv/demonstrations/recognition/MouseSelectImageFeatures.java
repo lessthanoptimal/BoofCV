@@ -23,6 +23,7 @@ import georegression.struct.point.Point2D_F64;
 import georegression.struct.point.Point2D_I32;
 import org.ddogleg.struct.DogArray_B;
 import org.ddogleg.struct.DogArray_I32;
+import org.ejml.UtilEjml;
 
 import javax.swing.*;
 import java.awt.*;
@@ -53,6 +54,10 @@ public class MouseSelectImageFeatures extends MouseAdapter {
 	BoofLambdas.ProcessCall handleSelected = ()->{};
 	/** Specifies how many features there are */
 	int numFeatures;
+
+
+	/** How far it will search in screen pixels when user clicks */
+	public int searchRadiusPixels = 20;
 
 	DogArray_I32 selected = new DogArray_I32();
 	DogArray_B selectedMask = new DogArray_B();
@@ -115,6 +120,13 @@ public class MouseSelectImageFeatures extends MouseAdapter {
 		return selectRegion && selectedMask.size == numFeatures && numFeatures > 0;
 	}
 
+	/**
+	 * Returns if only a single feature is selected
+	 */
+	public boolean isSingleSelected() {
+		return selectRegion && selectedMask.size == numFeatures && numFeatures > 0 && selected.size == 1;
+	}
+
 	public void reset() {
 		selectedMask.reset();
 		selected.reset();
@@ -168,6 +180,10 @@ public class MouseSelectImageFeatures extends MouseAdapter {
 		double y0 = Math.min(imagePixel0.y, imagePixel1.y);
 		double y1 = Math.max(imagePixel0.y, imagePixel1.y);
 
+		// See if the user clicked. this is a bit of a hack
+		if (Math.abs(x1-x0) <= 2 || Math.abs(y1-y0) <= 2)
+			return;
+
 		// Find all the features inside this region
 		findPointsInRegion(x0, y0, x1, y1);
 
@@ -184,11 +200,43 @@ public class MouseSelectImageFeatures extends MouseAdapter {
 		}
 	}
 
+	/**
+	 * If clicked then select the closest point
+	 */
+	@Override public void mouseClicked( MouseEvent e ) {
+		int pixelX = e.getX();
+		int pixelY = e.getY();
+
+		// Find the closest feature to where the user clicked that's within the maximum distance
+		double bestDistance = searchRadiusPixels + UtilEjml.EPS;
+		int bestIdx = -1;
+
+		for (int featureIdx = 0; featureIdx < numFeatures; featureIdx++) {
+			featureLocation.lookupPixel(featureIdx, screenPixel);
+			imageToScreen.convert(screenPixel.x, screenPixel.y, screenPixel);
+
+			double d = screenPixel.distance(pixelX, pixelY);
+			if (d < bestDistance) {
+				bestDistance = d;
+				bestIdx = featureIdx;
+			}
+		}
+
+		if (bestIdx == -1)
+			return;
+
+		// Only select this single feature
+		selectedMask.resize(numFeatures, false);
+		selectedMask.set(bestIdx, true);
+		selected.reset();
+		selected.add(bestIdx);
+		handleSelected.process();
+	}
+
 	private void findPointsInRegion( double x0, double y0, double x1, double y1 ) {
 		selected.reset();
 		for (int i = 0; i < numFeatures; i++) {
 			featureLocation.lookupPixel(i, imagePixel0);
-//			imageToScreen.convert(imagePixel0.x, imagePixel0.y, screenPixel);
 			Point2D_F64 p = imagePixel0;
 
 			if (p.x >= x0 && p.x < x1 && p.y >= y0 && p.y < y1) {
