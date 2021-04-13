@@ -189,7 +189,7 @@ public class TestSimilarImagesSceneRecognition extends GenericLookUpSimilarImage
 
 			for (int i = 0; i < Math.min(limit, numViews); i++) {
 				String id = "" + i;
-				if (filter !=null && !filter.process(id))
+				if (filter !=null && !filter.keep(id))
 					continue;
 				matches.grow().id = id;
 			}

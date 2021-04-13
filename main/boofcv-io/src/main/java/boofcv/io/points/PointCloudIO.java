@@ -18,6 +18,8 @@
 
 package boofcv.io.points;
 
+import boofcv.alg.cloud.AccessColorIndex;
+import boofcv.alg.cloud.AccessPointIndex;
 import boofcv.alg.cloud.PointCloudReader;
 import boofcv.alg.cloud.PointCloudWriter;
 import boofcv.io.points.impl.PlyCodec;
@@ -43,10 +45,39 @@ public class PointCloudIO {
 	 *
 	 * @see PlyCodec
 	 */
-	public static void save3D( Format format, PointCloudReader cloud, boolean saveRGB, OutputStream outputStream ) throws IOException {
+	public static void save3D( Format format, PointCloudReader cloud, boolean saveRGB, OutputStream outputStream )
+			throws IOException {
 		switch (format) {
 			case PLY -> PlyCodec.saveBinary(cloud, ByteOrder.BIG_ENDIAN, saveRGB, false, outputStream);
 		}
+	}
+
+	/**
+	 * Saves point cloud using access API.
+	 *
+	 * @see AccessPointIndex
+	 * @see AccessColorIndex
+	 * @see PlyCodec
+	 */
+	public static void save3D( Format format,
+							   AccessPointIndex<Point3D_F64> accessPoint,
+							   AccessColorIndex accessColor,
+							   int size , boolean saveRGB, OutputStream outputStream )
+			throws IOException {
+
+		PointCloudReader reader = new PointCloudReader() {
+			final Point3D_F64 tmp = new Point3D_F64();
+			@Override public void get( int index, Point3D_F32 point ) {
+				accessPoint.getPoint(index, tmp);
+				point.setTo((float)tmp.x, (float)tmp.y, (float)tmp.z);
+			}
+
+			@Override public int size() {return size;}
+			@Override public void get( int index, Point3D_F64 point ) {accessPoint.getPoint(index, point);}
+			@Override public int getRGB( int index ) {return accessColor.getRGB(index);}
+		};
+
+		save3D(format, reader, saveRGB, outputStream);
 	}
 
 	public static DogArray<Point3D_F32>

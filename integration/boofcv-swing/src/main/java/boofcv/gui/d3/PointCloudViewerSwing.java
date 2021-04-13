@@ -18,6 +18,8 @@
 
 package boofcv.gui.d3;
 
+import boofcv.alg.cloud.AccessColorIndex;
+import boofcv.alg.cloud.AccessPointIndex;
 import boofcv.gui.BoofSwingUtil;
 import boofcv.struct.PackedArray;
 import boofcv.struct.Point3dRgbI_F64;
@@ -94,7 +96,7 @@ public class PointCloudViewerSwing implements PointCloudViewer {
 		}
 	}
 
-	@Override public void addCloud( AccessPointIndex accessPoint, @Nullable AccessColorIndex accessColor, int size ) {
+	@Override public void addCloud( AccessPointIndex<Point3D_F64> accessPoint, @Nullable AccessColorIndex accessColor, int size ) {
 		Point3D_F64 p = new Point3D_F64();
 		if( SwingUtilities.isEventDispatchThread() ) {
 			for (int i = 0; i < size; i++) {

@@ -221,7 +221,7 @@ public class FeatureSceneRecognitionNister2006<TD extends TupleDesc<TD>> impleme
 		}
 
 		// Wrap the user provided filter by converting the int ID into a String ID
-		BoofLambdas.FilterInt filterInt = filter == null ? null : ( index ) -> filter.process(imageIds.get(index));
+		BoofLambdas.FilterInt filterInt = filter == null ? null : ( index ) -> filter.keep(imageIds.get(index));
 
 		// Look up the closest matches
 		if (!databaseN.query(imageFeatures.toList(), filterInt, limit))

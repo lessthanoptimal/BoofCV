@@ -227,7 +227,7 @@ public class SimilarImagesFromTracks<Track> implements LookUpSimilarImages {
 
 		// Retrieve the similar images while filtering them
 		for (int i = 0; i < f.related.size(); i++) {
-			if (filter !=null && !filter.process(f.related.get(i).frameID))
+			if (filter !=null && !filter.keep(f.related.get(i).frameID))
 				continue;
 
 			similarImages.add(f.related.get(i).frameID);
