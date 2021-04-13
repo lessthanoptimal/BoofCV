@@ -176,19 +176,22 @@ public class FactoryMultiViewRobust {
 		configFundamental.checkValidity();
 		configLMedS.checkValidity();
 
-		var manager = new ModelManagerEpipolarMatrix();
-		Estimate1ofEpipolar estimateF = FactoryMultiView.fundamental_1(
-				configFundamental.which, configFundamental.numResolve);
-		GenerateEpipolarMatrix generateF = new GenerateEpipolarMatrix(estimateF);
+		ConfigFundamental _configFundamental = configFundamental;
 
-		// How the error is measured
-		DistanceFromModel<DMatrixRMaj, AssociatedPair> errorMetric = switch (configFundamental.errorModel) {
-			case SAMPSON -> new DistanceFromModelResidual<>(new FundamentalResidualSampson());
-			case GEOMETRIC -> new DistanceFundamentalGeometric();
-		};
+		var manager = new ModelManagerEpipolarMatrix();
 
 		LeastMedianOfSquares<DMatrixRMaj, AssociatedPair> alg = createLMEDS(configLMedS, manager, AssociatedPair.class);
-		alg.setModel(() -> generateF, () -> errorMetric);
+		alg.setModel(
+				() -> {
+					Estimate1ofEpipolar estimateF = FactoryMultiView.fundamental_1(_configFundamental.which,
+							_configFundamental.numResolve);
+					return new GenerateEpipolarMatrix(estimateF);
+				},
+				() -> switch (_configFundamental.errorModel) {
+					case SAMPSON -> new DistanceFromModelResidual<>(new FundamentalResidualSampson());
+					case GEOMETRIC -> new DistanceFundamentalGeometric();
+				});
+
 		alg.setErrorFraction(configLMedS.errorFraction);
 
 		return alg;
