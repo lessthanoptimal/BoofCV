@@ -20,6 +20,7 @@ package boofcv.abst.scene.nister2006;
 
 import boofcv.abst.scene.FeatureSceneRecognition;
 import boofcv.abst.scene.SceneRecognition;
+import boofcv.alg.scene.bow.BowMatch;
 import boofcv.alg.scene.nister2006.LearnNodeWeights;
 import boofcv.alg.scene.nister2006.RecognitionVocabularyTreeNister2006;
 import boofcv.alg.scene.vocabtree.HierarchicalVocabularyTree;
@@ -226,14 +227,14 @@ public class FeatureSceneRecognitionNister2006<TD extends TupleDesc<TD>> impleme
 		if (!databaseN.query(imageFeatures.toList(), filterInt, limit))
 			return false;
 
-		DogArray<RecognitionVocabularyTreeNister2006.Match> found = databaseN.getMatches();
+		DogArray<BowMatch> found = databaseN.getMatches();
 
 		if (verbose != null) verbose.println("matches.size=" + found.size + " best.error=" + found.get(0).error);
 
 		// Copy results into output format
 		matches.resize(found.size);
 		for (int i = 0; i < matches.size; i++) {
-			RecognitionVocabularyTreeNister2006.Match f = found.get(i);
+			BowMatch f = found.get(i);
 			matches.get(i).id = imageIds.get(f.identification);
 			matches.get(i).error = f.error;
 		}

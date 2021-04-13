@@ -18,8 +18,8 @@
 
 package boofcv.abst.scene.nister2006;
 
+import boofcv.alg.scene.bow.BowDistanceTypes;
 import boofcv.alg.scene.nister2006.RecognitionVocabularyTreeNister2006;
-import boofcv.alg.scene.nister2006.RecognitionVocabularyTreeNister2006.DistanceTypes;
 import boofcv.alg.scene.vocabtree.ConfigHierarchicalVocabularyTree;
 import boofcv.misc.BoofMiscOps;
 import boofcv.struct.ConfigLength;
@@ -41,7 +41,7 @@ public class ConfigRecognitionNister2006 implements Configuration {
 	public final ConfigHierarchicalVocabularyTree tree = new ConfigHierarchicalVocabularyTree();
 
 	/** Specifies which norm to use. L1 should yield better results but is slower than L2 to compute. */
-	public DistanceTypes distanceNorm = DistanceTypes.L1;
+	public BowDistanceTypes distanceNorm = BowDistanceTypes.L1;
 
 	/**
 	 * Critical tuning parameter for performance. A node can't be a "word" in the descriptor if it's this close

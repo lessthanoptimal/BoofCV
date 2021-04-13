@@ -18,19 +18,21 @@
 
 package boofcv.alg.scene.nister2006;
 
+import boofcv.alg.scene.bow.BowDistanceTypes;
+import boofcv.alg.scene.bow.BowMatch;
+import boofcv.alg.scene.bow.BowUtils;
+import boofcv.alg.scene.bow.InvertedFile;
 import boofcv.alg.scene.vocabtree.HierarchicalVocabularyTree;
 import boofcv.alg.scene.vocabtree.HierarchicalVocabularyTree.Node;
 import boofcv.misc.BoofLambdas;
 import boofcv.struct.ConfigLength;
 import lombok.Getter;
 import lombok.Setter;
-import org.ddogleg.sorting.QuickSelect;
 import org.ddogleg.struct.*;
 import org.jetbrains.annotations.Nullable;
 import pabeles.concurrency.GrowArray;
 
 import java.io.PrintStream;
-import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 
@@ -83,7 +85,7 @@ public class RecognitionVocabularyTreeNister2006<Point> implements VerbosePrint 
 	protected @Getter final BigDogArray_I32 imagesDB = new BigDogArray_I32(100, 10000, BigDogArray.Growth.GROW_FIRST);
 
 	/** Scores for all candidate images which have been sorted */
-	protected @Getter final DogArray<Match> matches = new DogArray<>(Match::new, Match::reset);
+	protected @Getter final DogArray<BowMatch> matches = new DogArray<>(BowMatch::new, BowMatch::reset);
 
 	/** Distance between two TF-IDF descriptors. L1 and L2 norms are provided */
 	protected @Getter @Setter TupleMapDistanceNorm distanceFunction = new TupleMapDistanceNorm.L2();
@@ -144,15 +146,13 @@ public class RecognitionVocabularyTreeNister2006<Point> implements VerbosePrint 
 		describe(imageFeatures, tmpDescWeights, tmpDescWords);
 
 		for (int wordIdx = 0; wordIdx < tmpDescWords.size; wordIdx++) {
-			int nodeIdx = tmpDescWords.get(wordIdx);
-			InvertedFile inv = invertedFiles.get(nodeIdx);
-			inv.weights.add(tmpDescWeights.get(wordIdx));
-			inv.add(imageIdx);
+			int word = tmpDescWords.get(wordIdx);
+			invertedFiles.get(word).addImage(imageIdx, tmpDescWeights.get(wordIdx));
 		}
 	}
 
 	/**
-	 * Looks up the best match from the database. The list of all potential matches can be accessed by calling
+	 * Looks up the best BowMatch from the database. The list of all potential matches can be accessed by calling
 	 * {@link #getMatches()}.
 	 *
 	 * @param queryImage Set of feature descriptors from the query image
@@ -163,7 +163,7 @@ public class RecognitionVocabularyTreeNister2006<Point> implements VerbosePrint 
 	public boolean query( List<Point> queryImage, @Nullable BoofLambdas.FilterInt filter, int limit ) {
 		matches.reset();
 
-		// Can't match to anything if it's empty
+		// Can't BowMatch to anything if it's empty
 		if (queryImage.isEmpty()) {
 			return false;
 		}
@@ -177,7 +177,7 @@ public class RecognitionVocabularyTreeNister2006<Point> implements VerbosePrint 
 
 		// Book keeping
 		for (int i = 0; i < matches.size(); i++) {
-			Match m = matches.get(i);
+			BowMatch m = matches.get(i);
 
 			// Undo changes and make sure all elements are -1 again
 			imageIdx_to_match.set(m.identification, -1);
@@ -185,54 +185,9 @@ public class RecognitionVocabularyTreeNister2006<Point> implements VerbosePrint 
 			m.identification = imagesDB.get(m.identification);
 		}
 
-		filterAndSortMatches(filter, limit);
+		BowUtils.filterAndSortMatches(matches, filter, limit);
 
 		return matches.size > 0;
-	}
-
-	/**
-	 * When dealing with 1 million images using quick select first makes a significant improvement
-	 * Sorting everything was taking 300 to 500 ms before and after it was taking 15 to 45 ms.
-	 */
-	void filterAndSortMatches( @Nullable BoofLambdas.FilterInt filter, int limit ) {
-		if (filter !=null) {
-			// Iterate until the limit the best 'limit' matches pass the filter
-			int startIdx = 0;
-			while (startIdx < matches.size) {
-				// Select first set of possible matches
-				if (limit < matches.size)
-					QuickSelect.select(matches.data, limit-startIdx, startIdx, matches.size);
-
-			   // Filter these. This will potentially mess up the order
-				int localLimit = Math.min(limit, matches.size);
-				for (int i = startIdx; i < localLimit;) {
-					if (filter.process(matches.get(i).identification)) {
-						i++;
-						continue;
-					}
-					// Swap an element at the end of the list the quick sort region in to the current location
-					matches.swap(i, localLimit-1);
-					// Take the mach which got filtered out and remove it from the match list entirely
-					matches.removeSwap(localLimit-1);
-					// quick sort region is now smaller
-					localLimit--;
-				}
-
-				// If the local limit is the same as the hard limit then stop
-				if (localLimit==Math.min(limit, matches.size))
-					break;
-				startIdx += localLimit - startIdx;
-			}
-			matches.size = Math.min(matches.size, limit);
-	   } else {
-			// Very simple logic if there's no filter
-			if (matches.size > limit) {
-				// Quick select ensures that the first N elements have the smallest N values, but they are not ordered
-				QuickSelect.select(matches.data, limit, matches.size);
-				matches.size = limit;
-			}
-		}
-		Collections.sort(matches.toList());
 	}
 
 	/**
@@ -266,7 +221,7 @@ public class RecognitionVocabularyTreeNister2006<Point> implements VerbosePrint 
 				// the inverted file list
 				int imageIdx = invertedFile.get(i);
 
-				Match m;
+				BowMatch m;
 				if (imageIdx_to_match.get(imageIdx) == -1) {
 					imageIdx_to_match.set(imageIdx, matches.size);
 					m = matches.grow();
@@ -350,7 +305,7 @@ public class RecognitionVocabularyTreeNister2006<Point> implements VerbosePrint 
 	}
 
 	/** Used to change distance function to one of the built in types */
-	public void setDistanceType( DistanceTypes type ) {
+	public void setDistanceType( BowDistanceTypes type ) {
 		distanceFunction = switch (type) {
 			case L1 -> new TupleMapDistanceNorm.L1();
 			case L2 -> new TupleMapDistanceNorm.L2();
@@ -376,48 +331,4 @@ public class RecognitionVocabularyTreeNister2006<Point> implements VerbosePrint 
 			node = null;
 		}
 	}
-
-	/**
-	 * Information on candidate match to a query image
-	 */
-	public static class Match implements Comparable<Match> {
-		/** Fit error. 0.0 = perfect. */
-		public float error;
-		/** Reference to the image in the data base that was matched */
-		public int identification;
-
-		public void reset() {
-			error = 2.0f; // See MapDistanceNorm for why the error initially has to be this value
-			identification = -1;
-		}
-
-		@Override public int compareTo( Match o ) {
-			return Float.compare(error, o.error);
-		}
-	}
-
-	/**
-	 * The inverted file is a list of images that were observed in a particular node. Images are
-	 * referenced by array index. This class extends DogArray_I32 to remove the need to store
-	 * an additional java object. might be pre-mature optimization.
-	 */
-	public static class InvertedFile extends DogArray_I32 {
-		// The word weights. In this paper this is d[i] = m[i]*w[i], where w[i] is the weight
-		// assigned to a node. m[i] is the number of occurrences of this word in this image
-		// In the original paper [1] they store m[i] and not d[i] in the inverted file.
-		public final DogArray_F32 weights = new DogArray_F32();
-
-		public InvertedFile() {
-			super(1);
-		}
-
-		@Override
-		public void reset() {
-			super.reset();
-			weights.reset();
-		}
-	}
-
-	/** Different built in distance norms. */
-	public enum DistanceTypes {L1, L2}
 }
