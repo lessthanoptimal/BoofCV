@@ -115,7 +115,7 @@ public class ScoreFundamentalReprojectionError implements EpipolarScore3D {
 		final int minimumAllowed = minimumInliers.computeI(pairs.size());
 		if (pairs.size() < minimumAllowed) {
 			if (verbose != null)
-				verbose.printf("pairs.size=%d less than the minimum.size=%d\n", pairs.size(), minimumAllowed);
+				verbose.printf("REJECTED: pairs.size=%d < minimum.size=%d\n", pairs.size(), minimumAllowed);
 			return false;
 		}
 
@@ -131,8 +131,8 @@ public class ScoreFundamentalReprojectionError implements EpipolarScore3D {
 		// if there are too few matches then it's probably noise
 		if (ransac3D.getMatchSet().size() < minimumAllowed) {
 			if (verbose != null)
-				verbose.printf("inlier.size=%d is too small. minimum.size=%d\n",
-						ransac3D.getMatchSet().size(), minimumAllowed);
+				verbose.printf("REJECTED: pairs.size=%d inlier.size=%d < minimum.size=%d\n",
+						pairs.size(), ransac3D.getMatchSet().size(), minimumAllowed);
 			return false;
 		}
 
