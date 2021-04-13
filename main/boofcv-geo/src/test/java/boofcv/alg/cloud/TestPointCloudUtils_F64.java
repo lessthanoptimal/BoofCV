@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -18,8 +18,10 @@
 
 package boofcv.alg.cloud;
 
+import boofcv.struct.Point3dRgbI_F64;
 import boofcv.testing.BoofStandardJUnit;
 import georegression.struct.point.Point3D_F64;
+import org.ddogleg.struct.DogArray;
 import org.ddogleg.struct.DogArray_I32;
 import org.ejml.UtilEjml;
 import org.junit.jupiter.api.Test;
@@ -33,6 +35,19 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
  * @author Peter Abeles
  */
 public class TestPointCloudUtils_F64 extends BoofStandardJUnit {
+
+	@Test
+	public void filter() {
+		DogArray<Point3dRgbI_F64> input = new DogArray<>(Point3dRgbI_F64::new);
+		for (int i = 0; i < 20; i++) {
+			input.grow().setTo(i,i,i);
+		}
+
+		DogArray<Point3dRgbI_F64> output = PointCloudUtils_F64.filter(
+				(idx, p)->p.setTo(input.get(idx)), (idx)->input.get(idx).rgb, input.size, (idx)->idx<9,null);
+
+		assertEquals(9, output.size);
+	}
 
 	@Test
 	public void autoScale() {

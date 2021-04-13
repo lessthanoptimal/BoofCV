@@ -18,6 +18,8 @@
 
 package boofcv.visualize;
 
+import boofcv.alg.cloud.AccessColorIndex;
+import boofcv.alg.cloud.AccessPointIndex;
 import boofcv.struct.Point3dRgbI_F64;
 import georegression.struct.point.Point3D_F64;
 import georegression.struct.se.Se3_F64;
@@ -81,7 +83,8 @@ public interface PointCloudViewer {
 	 * @param accessColor Accessor to RGB color information. If null then 0xFF0000 is assumed.
 	 * @param size Number of elements
 	 */
-	default void addCloud( AccessPointIndex accessPoint, @Nullable AccessColorIndex accessColor, int size ) {
+	default void addCloud( AccessPointIndex<Point3D_F64> accessPoint,
+						   @Nullable AccessColorIndex accessColor, int size ) {
 		if (accessColor==null) {
 			addCloud(new IteratePoint() {
 				int index = 0;
@@ -187,16 +190,6 @@ public interface PointCloudViewer {
 	 */
 	interface Colorizer {
 		int color( int index , double x , double y , double z );
-	}
-
-	/** Provides access to a 3D point by index */
-	@FunctionalInterface interface AccessPointIndex {
-		void getPoint( int index, Point3D_F64 point );
-	}
-
-	/** Provides access to a RGB color by index */
-	@FunctionalInterface interface AccessColorIndex {
-		int getRGB( int index );
 	}
 
 	/** Iterator like interface for accessing point information */

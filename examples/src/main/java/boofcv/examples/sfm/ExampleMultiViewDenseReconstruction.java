@@ -19,6 +19,8 @@
 package boofcv.examples.sfm;
 
 import boofcv.abst.geo.bundle.SceneStructureMetric;
+import boofcv.alg.cloud.PointCloudReader;
+import boofcv.alg.cloud.PointCloudUtils_F64;
 import boofcv.alg.mvs.DisparityParameters;
 import boofcv.alg.mvs.MultiViewStereoFromKnownSceneStructure;
 import boofcv.alg.structure.SparseSceneToDenseCloud;
@@ -30,7 +32,9 @@ import boofcv.gui.BoofSwingUtil;
 import boofcv.gui.image.ShowImages;
 import boofcv.gui.image.VisualizeImageData;
 import boofcv.io.image.LookUpImageFilesByIndex;
+import boofcv.io.points.PointCloudIO;
 import boofcv.misc.BoofMiscOps;
+import boofcv.struct.Point3dRgbI_F64;
 import boofcv.struct.image.GrayF32;
 import boofcv.struct.image.GrayU8;
 import boofcv.struct.image.ImageType;
@@ -39,11 +43,14 @@ import boofcv.visualize.VisualizeData;
 import georegression.metric.UtilAngle;
 import georegression.struct.point.Point3D_F64;
 import gnu.trove.map.hash.TIntObjectHashMap;
+import org.ddogleg.struct.DogArray;
 import org.ddogleg.struct.DogArray_I32;
 
 import javax.swing.*;
 import java.awt.*;
 import java.awt.image.BufferedImage;
+import java.io.FileOutputStream;
+import java.io.IOException;
 import java.util.List;
 
 /**
@@ -114,8 +121,29 @@ public class ExampleMultiViewDenseReconstruction {
 		if (!sparseToDense.process(example.scene, viewToId, imageLookup))
 			throw new RuntimeException("Dense reconstruction failed!");
 
+		saveCloudToDisk(sparseToDense);
+
 		// Display the dense cloud
 		visualizeInPointCloud(sparseToDense.getCloud(), sparseToDense.getColorRgb(), example.scene);
+	}
+
+	private static void saveCloudToDisk( SparseSceneToDenseCloud<GrayU8> sparseToDense ) {
+		// Save the dense point cloud to disk in PLY format
+		try (FileOutputStream out = new FileOutputStream("saved_cloud.ply")) {
+			// Filter points which are far away to make it easier to view in 3rd party viewers that auto scale
+			// You might need to adjust the threshold for your application if too many points are cut
+			double distanceThreshold = 50.0;
+			List<Point3D_F64> cloud = sparseToDense.getCloud();
+			DogArray_I32 colorsRgb = sparseToDense.getColorRgb();
+
+			DogArray<Point3dRgbI_F64> filtered = PointCloudUtils_F64.filter(
+					(idx,p)->p.setTo(cloud.get(idx)), colorsRgb::get, cloud.size(),
+					(idx)->cloud.get(idx).norm()<=distanceThreshold, null);
+
+			PointCloudIO.save3D(PointCloudIO.Format.PLY,PointCloudReader.wrapF64RGB(filtered.toList()), true, out);
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
 	}
 
 	public static void visualizeInPointCloud( List<Point3D_F64> cloud, DogArray_I32 colorsRgb,
@@ -124,8 +152,7 @@ public class ExampleMultiViewDenseReconstruction {
 		viewer.setFog(true);
 		viewer.setDotSize(1);
 		viewer.setTranslationStep(0.15);
-		viewer.addCloud(cloud, colorsRgb.data);
-//		viewer.setColorizer(new TwoAxisRgbPlane.Z_XY(1.0).fperiod(40));
+		viewer.addCloud((idx,p)->p.setTo(cloud.get(idx)), colorsRgb::get, cloud.size());
 		viewer.setCameraHFov(UtilAngle.radian(60));
 
 		SwingUtilities.invokeLater(() -> {

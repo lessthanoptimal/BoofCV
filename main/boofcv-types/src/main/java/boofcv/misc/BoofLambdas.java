@@ -51,15 +51,18 @@ public interface BoofLambdas {
 	}
 
 	@FunctionalInterface interface Filter<T> {
-		boolean process( T object );
+		/** Returns true if it should keep the object */
+		boolean keep( T object );
 	}
 
 	@FunctionalInterface interface FilterInt {
-		boolean process( int value );
+		/** Returns true if it should keep the object */
+		boolean keep( int value );
 	}
 
 	@FunctionalInterface interface FilterLong {
-		boolean process( long value );
+		/** Returns true if it should keep the object */
+		boolean keep( long value );
 	}
 
 	@FunctionalInterface interface ProcessI {

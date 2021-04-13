@@ -753,7 +753,7 @@ public class UtilIO {
 
 				Files.walkFileTree(Paths.get(baseDirectory), new SimpleFileVisitor<>() {
 					@Override public FileVisitResult visitFile( Path path, BasicFileAttributes attrs ) {
-						if (pathMatcher.matches(path) && filter.process(path)) {
+						if (pathMatcher.matches(path) && filter.keep(path)) {
 							results.add(path.toString());
 						}
 						return FileVisitResult.CONTINUE;
@@ -769,13 +769,13 @@ public class UtilIO {
 		} else {
 			File directory = new File(pathPattern);
 			if (directory.isFile()) {
-				if (filter.process(directory.toPath()))
+				if (filter.keep(directory.toPath()))
 					results.add(pathPattern);
 			} else if (directory.isDirectory()) {
 				File[] files = directory.listFiles();
 				if (files != null) {
 					for (File f : files) {
-						if (!filter.process(f.toPath()))
+						if (!filter.keep(f.toPath()))
 							continue;
 						results.add(f.getPath());
 					}

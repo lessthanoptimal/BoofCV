@@ -48,7 +48,7 @@ public class BowUtils {
 				// Filter these. This will potentially mess up the order
 				int localLimit = Math.min(limit, matches.size);
 				for (int i = startIdx; i < localLimit;) {
-					if (filter.process(matches.get(i).identification)) {
+					if (filter.keep(matches.get(i).identification)) {
 						i++;
 						continue;
 					}

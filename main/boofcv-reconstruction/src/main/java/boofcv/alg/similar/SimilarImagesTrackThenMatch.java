@@ -279,7 +279,7 @@ public class SimilarImagesTrackThenMatch<Image extends ImageBase<Image>, TD exte
 				return false;
 
 			// Apply user provided filter
-			if (filter != null && !filter.process(id))
+			if (filter != null && !filter.keep(id))
 				return false;
 
 			boolean checkConnection = false;

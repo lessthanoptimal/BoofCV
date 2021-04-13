@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -18,6 +18,8 @@
 
 package boofcv.alg.cloud;
 
+import boofcv.misc.BoofLambdas;
+import boofcv.struct.Point3dRgbI_F64;
 import georegression.helper.KdTreePoint3D_F64;
 import georegression.struct.point.Point3D_F64;
 import org.ddogleg.nn.FactoryNearestNeighbor;
@@ -25,6 +27,7 @@ import org.ddogleg.nn.NearestNeighbor;
 import org.ddogleg.nn.NnData;
 import org.ddogleg.struct.DogArray;
 import org.ddogleg.struct.DogArray_I32;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
 
@@ -32,6 +35,38 @@ import java.util.List;
  * @author Peter Abeles
  */
 public class PointCloudUtils_F64 {
+
+	/**
+	 * Creates a new list of points while filtering out points
+	 */
+	public static DogArray<Point3dRgbI_F64> filter( AccessPointIndex<Point3D_F64> accessPoint,
+													AccessColorIndex accessColor,
+													int size ,
+													BoofLambdas.FilterInt filter,
+													@Nullable DogArray<Point3dRgbI_F64> output )
+	{
+		if (output==null)
+			output = new DogArray<>(Point3dRgbI_F64::new);
+
+		output.reset();
+		// Guess how much memory is needed
+		output.reserve(size/5);
+
+		Point3dRgbI_F64 p = output.grow();
+
+		for (int pointIdx = 0; pointIdx < size; pointIdx++) {
+			if (!filter.keep(pointIdx))
+				continue;
+
+			accessPoint.getPoint(pointIdx, p);
+			p.rgb = accessColor.getRGB(pointIdx);
+
+			p = output.grow();
+		}
+
+		output.removeTail();
+		return output;
+	}
 
 	/**
 	 * Automatically rescales the point cloud based so that it has a standard deviation of 'target'
