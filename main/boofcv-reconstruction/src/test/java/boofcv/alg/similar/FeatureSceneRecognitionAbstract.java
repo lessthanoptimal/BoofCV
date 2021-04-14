@@ -43,7 +43,7 @@ public class FeatureSceneRecognitionAbstract<TD extends TupleDesc<TD>> implement
 	@Override public boolean query( Features<TD> query, BoofLambdas.Filter<String> filter,
 									int limit, DogArray<SceneRecognition.Match> matches ) {return false;}
 	@Override public int getQueryWord( int featureIdx ) {return 0;}
-	@Override public void getQueryWords( int featureIdx, DogArray_I32 word ) {}
+	@Override public void getQueryWords( int featureIdx, DogArray_I32 words ) {}
 	@Override public int lookupWord( TD description ) {return 0;}
 	@Override public void lookupWords( TD description, DogArray_I32 word ) {}
 	@Override public int getTotalWords() {return 1;}

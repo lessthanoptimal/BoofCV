@@ -23,6 +23,8 @@ import boofcv.abst.scene.ConfigFeatureToSceneRecognition;
 import boofcv.abst.scene.FeatureSceneRecognition;
 import boofcv.abst.scene.SceneRecognition;
 import boofcv.abst.scene.WrapFeatureToSceneRecognition;
+import boofcv.abst.scene.ann.ConfigRecognitionNearestNeighbor;
+import boofcv.abst.scene.ann.FeatureSceneRecognitionNearestNeighbor;
 import boofcv.abst.scene.nister2006.ConfigRecognitionNister2006;
 import boofcv.abst.scene.nister2006.FeatureSceneRecognitionNister2006;
 import boofcv.factory.feature.detdesc.FactoryDetectDescribe;
@@ -73,5 +75,18 @@ public class FactorySceneRecognition {
 		}
 
 		return new FeatureSceneRecognitionNister2006<>(config, factory);
+	}
+
+	/**
+	 * Creates a new {@link FeatureSceneRecognitionNister2006}.
+	 */
+	public static <TD extends TupleDesc<TD>> FeatureSceneRecognitionNearestNeighbor<TD>
+	createSceneNearestNeighbor( @Nullable ConfigRecognitionNearestNeighbor config,
+								Factory<TD> factory ) {
+		if (config == null) {
+			config = new ConfigRecognitionNearestNeighbor();
+		}
+
+		return new FeatureSceneRecognitionNearestNeighbor<>(config, factory);
 	}
 }

@@ -84,7 +84,7 @@ class TestRecognitionNearestNeighborInvertedFile extends BoofStandardJUnit {
 
 		var alg = new RecognitionNearestNeighborInvertedFile<Point2D_F64>();
 		alg.initialize(FactoryNearestNeighbor.exhaustive(new KdTreePoint2D_F64()), 99);
-		alg.searchNN.setPoints(words, true);
+		alg.nearestNeighbor.setPoints(words, true);
 
 		// randomly generate observations of words
 		List<Point2D_F64> observations = new ArrayList<>();
