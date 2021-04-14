@@ -69,13 +69,19 @@ public class RecognitionNearestNeighborInvertedFile<Point> implements VerbosePri
 	protected @Getter @Setter TupleMapDistanceNorm distanceFunction = new TupleMapDistanceNorm.L2();
 
 	/** List of images added to the database */
-	protected @Getter final BigDogArray_I32 imagesDB = new BigDogArray_I32(100, 10000, BigDogArray.Growth.GROW_FIRST);
+	protected @Getter final BigDogArray_I32 imagesDB = new BigDogArray_I32(100, 10_000, BigDogArray.Growth.GROW_FIRST);
 
 	/** List of all possible images it could BowMatch with */
 	@Getter DogArray<BowMatch> matches = new DogArray<>(BowMatch::new, BowMatch::reset);
 
 	/** List of images in the DB that are observed by each word. One element per word. */
 	@Getter DogArray<InvertedFile> invertedFiles = new DogArray<>(InvertedFile::new, InvertedFile::reset);
+
+	//--------------------------- Internal Work Space
+
+	// Used to search for matching words
+	NearestNeighbor.Search<Point> search;
+	NnData<Point> searchResult = new NnData<>();
 
 	// Look up table from image to BowMatch. All values but be set to -1 after use
 	// The size of this array will be the same as the number of DB images
@@ -103,6 +109,11 @@ public class RecognitionNearestNeighborInvertedFile<Point> implements VerbosePri
 		this.searchNN = searchNN;
 		invertedFiles.resize(numWords);
 		imagesDB.reset();
+
+		wordHistogram.reset();
+		wordHistogram.resize(numWords, 0);
+
+		this.search = searchNN.createSearch();
 	}
 
 	/**
@@ -143,19 +154,17 @@ public class RecognitionNearestNeighborInvertedFile<Point> implements VerbosePri
 	/**
 	 * Computes the number of times each word appears in the list of features
 	 */
-	private void computeWordHistogram( List<Point> imageFeatures ) {
+	void computeWordHistogram( List<Point> imageFeatures ) {
 		// Find and count the number of times each word appears in this set of features
-		NearestNeighbor.Search<Point> search = searchNN.createSearch();
-		NnData<Point> result = new NnData<>();
 		observedWords.reset();
 		for (int featureIdx = 0; featureIdx < imageFeatures.size(); featureIdx++) {
-			if (!search.findNearest(imageFeatures.get(featureIdx), -1, result))
+			if (!search.findNearest(imageFeatures.get(featureIdx), -1, searchResult))
 				continue;
 
-			int count = wordHistogram.data[result.index];
-			wordHistogram.data[result.index] = count + 1;
+			int count = wordHistogram.data[searchResult.index];
+			wordHistogram.data[searchResult.index] = count + 1;
 			if (count == 0) {
-				observedWords.add(result.index);
+				observedWords.add(searchResult.index);
 			}
 		}
 	}
@@ -165,7 +174,7 @@ public class RecognitionNearestNeighborInvertedFile<Point> implements VerbosePri
 	 *
 	 * @param totalUniqueWordsSeenByImage Number of features in this image
 	 */
-	private void computeImageDescriptor( float totalUniqueWordsSeenByImage ) {
+	void computeImageDescriptor( float totalUniqueWordsSeenByImage ) {
 		// Compute the weight for each word in the descriptor based on its frequency
 		tmpDescWeights.reset();
 		for (int i = 0; i < observedWords.size; i++) {
@@ -228,8 +237,8 @@ public class RecognitionNearestNeighborInvertedFile<Point> implements VerbosePri
 	/**
 	 * Finds all the matches using the observed words and the inverted files.
 	 */
-	private void findAndScoreMatches() {
-		// This will always be filled with -1 initially
+	void findAndScoreMatches() {
+		// This will always be filled with -1 initially, resize will just set new elements to -1
 		imageIdx_to_match.resize(imagesDB.size, -1);
 
 		// Create a list of all candidate images in the DB
