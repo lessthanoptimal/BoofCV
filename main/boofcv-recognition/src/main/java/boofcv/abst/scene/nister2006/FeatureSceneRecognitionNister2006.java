@@ -247,9 +247,9 @@ public class FeatureSceneRecognitionNister2006<TD extends TupleDesc<TD>> impleme
 				config.featureSingleWordHops);
 	}
 
-	@Override public void getQueryWords( int featureIdx, DogArray_I32 word ) {
+	@Override public void getQueryWords( int featureIdx, DogArray_I32 words ) {
 		int leafID = getQueryWord(featureIdx);
-		lookupWordsFromLeafID(leafID, word);
+		lookupWordsFromLeafID(leafID, words);
 	}
 
 	@Override public int lookupWord( TD description ) {

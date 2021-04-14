@@ -63,7 +63,7 @@ import java.util.Set;
  */
 public class RecognitionNearestNeighborInvertedFile<Point> implements VerbosePrint {
 	/** A nearest-neighbor search to look up the closest fit to each word */
-	protected @Getter NearestNeighbor<Point> searchNN;
+	protected @Getter NearestNeighbor<Point> nearestNeighbor;
 
 	/** Distance between two TF-IDF descriptors. L1 and L2 norms are provided */
 	protected @Getter @Setter TupleMapDistanceNorm distanceFunction = new TupleMapDistanceNorm.L2();
@@ -80,8 +80,8 @@ public class RecognitionNearestNeighborInvertedFile<Point> implements VerbosePri
 	//--------------------------- Internal Work Space
 
 	// Used to search for matching words
-	NearestNeighbor.Search<Point> search;
-	NnData<Point> searchResult = new NnData<>();
+	public NearestNeighbor.Search<Point> search;
+	public final NnData<Point> searchResult = new NnData<>();
 
 	// Look up table from image to BowMatch. All values but be set to -1 after use
 	// The size of this array will be the same as the number of DB images
@@ -91,7 +91,7 @@ public class RecognitionNearestNeighborInvertedFile<Point> implements VerbosePri
 	// One element for each word
 	DogArray_I32 wordHistogram = new DogArray_I32();
 	// List of words which were observed
-	DogArray_I32 observedWords = new DogArray_I32();
+	public DogArray_I32 observedWords = new DogArray_I32();
 
 	// temporary storage for an image TF-IDF descriptor
 	DogArray_F32 tmpDescWeights = new DogArray_F32();
@@ -102,18 +102,18 @@ public class RecognitionNearestNeighborInvertedFile<Point> implements VerbosePri
 	/**
 	 * Initializes the data structures.
 	 *
-	 * @param searchNN Search used to find the words.
+	 * @param nearestNeighbor Search used to find the words.
 	 * @param numWords Number of words
 	 */
-	public void initialize( NearestNeighbor<Point> searchNN, int numWords ) {
-		this.searchNN = searchNN;
+	public void initialize( NearestNeighbor<Point> nearestNeighbor, int numWords ) {
+		this.nearestNeighbor = nearestNeighbor;
 		invertedFiles.resize(numWords);
 		imagesDB.reset();
 
 		wordHistogram.reset();
 		wordHistogram.resize(numWords, 0);
 
-		this.search = searchNN.createSearch();
+		this.search = nearestNeighbor.createSearch();
 	}
 
 	/**

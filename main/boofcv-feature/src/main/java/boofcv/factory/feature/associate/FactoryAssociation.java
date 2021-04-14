@@ -20,6 +20,7 @@ package boofcv.factory.feature.associate;
 
 import boofcv.abst.feature.associate.*;
 import boofcv.abst.feature.describe.DescriptorInfo;
+import boofcv.alg.descriptor.KdTreeTuple_F32;
 import boofcv.alg.descriptor.KdTreeTuple_F64;
 import boofcv.alg.feature.associate.*;
 import boofcv.concurrency.BoofConcurrency;
@@ -27,6 +28,7 @@ import boofcv.struct.ConfigLength;
 import boofcv.struct.feature.*;
 import org.ddogleg.nn.FactoryNearestNeighbor;
 import org.ddogleg.nn.NearestNeighbor;
+import org.ddogleg.nn.alg.KdTreeDistance;
 import org.jetbrains.annotations.Nullable;
 
 /**
@@ -47,6 +49,7 @@ public class FactoryAssociation {
 			}
 			case KD_TREE:
 				return (AssociateDescription)FactoryAssociation.kdtree(config.nearestNeighbor, DOF);
+
 			case RANDOM_FOREST:
 				return (AssociateDescription)FactoryAssociation.kdRandomForest(
 						config.nearestNeighbor, DOF, 10, 5, 1233445565);
@@ -197,6 +200,16 @@ public class FactoryAssociation {
 				configNN.maxNodesSearched, numTrees, numConsiderSplit, randomSeed);
 
 		return associateNearestNeighbor(configNN, nn);
+	}
+
+	public static <TD extends TupleDesc<TD>> KdTreeDistance<TD> kdtreeDistance( int dof, Class<TD> type ) {
+		if (type==TupleDesc_F64.class) {
+			return (KdTreeDistance)new KdTreeTuple_F64(dof);
+		} else if (type==TupleDesc_F32.class) {
+			return (KdTreeDistance)new KdTreeTuple_F32(dof);
+		} else {
+			throw new IllegalArgumentException("Type isn't known yet");
+		}
 	}
 
 	public static AssociateNearestNeighbor<TupleDesc_F64>

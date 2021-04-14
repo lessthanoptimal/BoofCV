@@ -85,9 +85,9 @@ public interface FeatureSceneRecognition<TD extends TupleDesc<TD>> extends Verbo
 	 * then words it passes through on the way a leaf could go in the words list.
 	 *
 	 * @param featureIdx (Input) Index of the feature in the query.
-	 * @param word (Output) Storage for all the words the feature is associated with
+	 * @param words (Output) Storage for all the words the feature is associated with
 	 */
-	void getQueryWords( int featureIdx, DogArray_I32 word );
+	void getQueryWords( int featureIdx, DogArray_I32 words );
 
 	int lookupWord( TD description );
 
