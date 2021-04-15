@@ -91,6 +91,7 @@ public class ConfigFeatureToSceneRecognition implements Configuration {
 
 	public void setTo( ConfigFeatureToSceneRecognition src ) {
 		this.maxImagePixels = src.maxImagePixels;
+		this.typeRecognize = src.typeRecognize;
 		this.features.setTo(src.features);
 		this.recognizeNister2006.setTo(src.recognizeNister2006);
 	}
