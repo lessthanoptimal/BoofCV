@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -32,7 +32,7 @@ import boofcv.alg.geo.pose.PnPLepetitEPnP;
 public class FactoryGeometryAlgs {
 
 	/**
-	 * Creates a new instance of {@link EssentialNister5}.  See class documentation
+	 * Creates a new instance of {@link EssentialNister5}. See class documentation
 	 * for information on parameters.
 	 */
 	public static EssentialNister5 essential5() {
@@ -40,7 +40,7 @@ public class FactoryGeometryAlgs {
 	}
 
 	/**
-	 * Creates a new instance of {@link FundamentalLinear7}.  See class documentation
+	 * Creates a new instance of {@link FundamentalLinear7}. See class documentation
 	 * for information on parameters.
 	 */
 	public static FundamentalLinear7 fundamental7( boolean computeFundamental ) {
@@ -48,7 +48,7 @@ public class FactoryGeometryAlgs {
 	}
 
 	/**
-	 * Creates a new instance of {@link FundamentalLinear8}.  See class documentation
+	 * Creates a new instance of {@link FundamentalLinear8}. See class documentation
 	 * for information on parameters.
 	 */
 	public static FundamentalLinear8 fundamental8( boolean computeFundamental ) {
@@ -56,7 +56,7 @@ public class FactoryGeometryAlgs {
 	}
 
 	/**
-	 * Creates a new instance of {@link HomographyDirectLinearTransform}.  See class documentation
+	 * Creates a new instance of {@link HomographyDirectLinearTransform}. See class documentation
 	 * for information on parameters.
 	 */
 	public static HomographyDirectLinearTransform homography4(boolean normalize ) {
@@ -64,7 +64,7 @@ public class FactoryGeometryAlgs {
 	}
 
 	/**
-	 * Creates a new instance of {@link PnPLepetitEPnP}.  See class documentation
+	 * Creates a new instance of {@link PnPLepetitEPnP}. See class documentation
 	 * for information on parameters.
 	 */
 	public static PnPLepetitEPnP pnpLepetit( double magicNumber ) {

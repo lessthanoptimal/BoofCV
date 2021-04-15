@@ -54,7 +54,7 @@ import org.ejml.data.DMatrixRMaj;
 import org.jetbrains.annotations.Nullable;
 
 /**
- * Factory for creating robust false-positive tolerant estimation algorithms in multi-view geometry.  These
+ * Factory for creating robust false-positive tolerant estimation algorithms in multi-view geometry. These
  * algorithms tend to have a lot of boilerplate associated with them and the goal of this factory
  * is to make their use much easier and less error prone.
  *
@@ -63,7 +63,7 @@ import org.jetbrains.annotations.Nullable;
 public class FactoryMultiViewRobust {
 
 	/**
-	 * Robust solution to PnP problem using {@link LeastMedianOfSquares LMedS}.  Input observations are
+	 * Robust solution to PnP problem using {@link LeastMedianOfSquares LMedS}. Input observations are
 	 * in normalized image coordinates.
 	 *
 	 * <ul>
@@ -73,8 +73,8 @@ public class FactoryMultiViewRobust {
 	 *
 	 * <p>See code for all the details.</p>
 	 *
-	 * @param configPnP PnP parameters.  Can't be null.
-	 * @param configLMedS Parameters for LMedS.  Can't be null.
+	 * @param configPnP PnP parameters. Can't be null.
+	 * @param configLMedS Parameters for LMedS. Can't be null.
 	 * @return Robust Se3_F64 estimator
 	 */
 	public static ModelMatcherMultiview<Se3_F64, Point2D3D> pnpLMedS( @Nullable ConfigPnP configPnP,
@@ -98,15 +98,15 @@ public class FactoryMultiViewRobust {
 	}
 
 	/**
-	 * Robust solution to PnP problem using {@link Ransac}.  Input observations are in normalized
+	 * Robust solution to PnP problem using {@link Ransac}. Input observations are in normalized
 	 * image coordinates. Found transform is from world to camera.
 	 *
 	 * <p>NOTE: Observations are in normalized image coordinates NOT pixels.</p>
 	 *
 	 * <p>See code for all the details.</p>
 	 *
-	 * @param configPnP PnP parameters.  Can't be null.
-	 * @param configRansac Parameters for RANSAC.  Can't be null.
+	 * @param configPnP PnP parameters. Can't be null.
+	 * @param configRansac Parameters for RANSAC. Can't be null.
 	 * @return Robust Se3_F64 estimator
 	 * @see Estimate1ofPnP
 	 */
@@ -133,7 +133,7 @@ public class FactoryMultiViewRobust {
 
 	/**
 	 * Robust solution for estimating {@link Se3_F64} using epipolar geometry from two views with
-	 * {@link LeastMedianOfSquares LMedS}.  Input observations are in normalized image coordinates.
+	 * {@link LeastMedianOfSquares LMedS}. Input observations are in normalized image coordinates.
 	 *
 	 * <ul>
 	 *     <li>Error units is pixels squared times two</li>
@@ -141,8 +141,8 @@ public class FactoryMultiViewRobust {
 	 *
 	 * <p>See code for all the details.</p>
 	 *
-	 * @param configEssential Essential matrix estimation parameters.  Can't be null.
-	 * @param configLMedS Parameters for RANSAC.  Can't be null.
+	 * @param configEssential Essential matrix estimation parameters. Can't be null.
+	 * @param configLMedS Parameters for RANSAC. Can't be null.
 	 * @return Robust Se3_F64 estimator
 	 */
 	public static ModelMatcherMultiview<Se3_F64, AssociatedPair>
@@ -199,12 +199,12 @@ public class FactoryMultiViewRobust {
 
 	/**
 	 * Robust solution for estimating the stereo baseline {@link Se3_F64} using epipolar geometry from two views with
-	 * {@link RansacCalibrated}.  Input observations are in normalized image coordinates.
+	 * {@link RansacCalibrated}. Input observations are in normalized image coordinates.
 	 *
 	 * <p>See code for all the details.</p>
 	 *
 	 * @param configEssential Essential matrix estimation parameters.
-	 * @param configRansac Parameters for RANSAC.  Can't be null.
+	 * @param configRansac Parameters for RANSAC. Can't be null.
 	 * @return Robust Se3_F64 estimator
 	 */
 	public static ModelMatcherMultiview<Se3_F64, AssociatedPair>
@@ -291,7 +291,7 @@ public class FactoryMultiViewRobust {
 	}
 
 	/**
-	 * Robust solution for estimating {@link Homography2D_F64} with {@link LeastMedianOfSquares LMedS}.  Input
+	 * Robust solution for estimating {@link Homography2D_F64} with {@link LeastMedianOfSquares LMedS}. Input
 	 * observations are in pixel coordinates.
 	 *
 	 * <ul>
@@ -301,8 +301,8 @@ public class FactoryMultiViewRobust {
 	 *
 	 * <p>See code for all the details.</p>
 	 *
-	 * @param configHomography Homography estimation parameters.  If null default is used.
-	 * @param configLMedS Parameters for LMedS.  Can't be null.
+	 * @param configHomography Homography estimation parameters. If null default is used.
+	 * @param configLMedS Parameters for LMedS. Can't be null.
 	 * @return Homography estimator
 	 */
 	public static LeastMedianOfSquares<Homography2D_F64, AssociatedPair>
@@ -327,7 +327,7 @@ public class FactoryMultiViewRobust {
 	}
 
 	/**
-	 * Robust solution for estimating {@link Homography2D_F64} with {@link Ransac}.  Input
+	 * Robust solution for estimating {@link Homography2D_F64} with {@link Ransac}. Input
 	 * observations are in pixel coordinates.
 	 *
 	 * <ul>
@@ -337,8 +337,8 @@ public class FactoryMultiViewRobust {
 	 *
 	 * <p>See code for all the details.</p>
 	 *
-	 * @param configHomography Homography estimation parameters.  If null default is used.
-	 * @param configRansac Parameters for RANSAC.  Can't be null.
+	 * @param configHomography Homography estimation parameters. If null default is used.
+	 * @param configRansac Parameters for RANSAC. Can't be null.
 	 * @return Homography estimator
 	 */
 	public static Ransac<Homography2D_F64, AssociatedPair>

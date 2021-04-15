@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -48,7 +48,7 @@ public enum EnumPNP {
 	 * <ul>
 	 *     <li> Four or more points. Really five points since 4 is unstable.
 	 *     <li> Single solution
-	 *     <li> Requires iteration.  See class JavaDoc for recommendations and peculiarities.
+	 *     <li> Requires iteration. See class JavaDoc for recommendations and peculiarities.
 	 *     <li> Efficient algorithm for many sample points
 	 * </ul>
 	 *

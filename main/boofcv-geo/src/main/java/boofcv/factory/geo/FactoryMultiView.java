@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -177,7 +177,7 @@ public class FactoryMultiView {
 	/**
 	 * Returns an algorithm for estimating a homography matrix given a set of {@link AssociatedPair}.
 	 *
-	 * @param normalizeInput If input is in pixel coordinates set to true.  False if in normalized image coordinates.
+	 * @param normalizeInput If input is in pixel coordinates set to true. False if in normalized image coordinates.
 	 * @return Homography estimator.
 	 * @see HomographyDirectLinearTransform
 	 */
@@ -200,8 +200,8 @@ public class FactoryMultiView {
 	/**
 	 * Creates a non-linear optimizer for refining estimates of homography matrices.
 	 *
-	 * @param tol Tolerance for convergence.  Try 1e-8
-	 * @param maxIterations Maximum number of iterations it will perform.  Try 100 or more.
+	 * @param tol Tolerance for convergence. Try 1e-8
+	 * @param maxIterations Maximum number of iterations it will perform. Try 100 or more.
 	 * @return Homography refinement
 	 * @see HomographyResidualSampson
 	 * @see HomographyResidualTransfer
@@ -219,8 +219,8 @@ public class FactoryMultiView {
 	/**
 	 * <p>
 	 * Returns an algorithm for estimating a fundamental or essential matrix given a set of
-	 * {@link AssociatedPair} in pixel coordinates.  The number of hypotheses returned and minimum number of samples
-	 * is dependent on the implementation.  The ambiguity from multiple hypotheses can be resolved using other
+	 * {@link AssociatedPair} in pixel coordinates. The number of hypotheses returned and minimum number of samples
+	 * is dependent on the implementation. The ambiguity from multiple hypotheses can be resolved using other
 	 * sample points and testing additional constraints.
 	 * </p>
 	 *
@@ -230,20 +230,20 @@ public class FactoryMultiView {
 	 * </p>
 	 *
 	 * <p>
-	 * There are more differences between these algorithms than the minimum number of sample points.  Consult
-	 * the literature for information on critical surfaces which will work or not work with each algorithm.  In
+	 * There are more differences between these algorithms than the minimum number of sample points. Consult
+	 * the literature for information on critical surfaces which will work or not work with each algorithm. In
 	 * general, algorithm which require fewer samples have less issues with critical surfaces than the 8-point
 	 * algorithm.
 	 * </p>
 	 *
 	 * <p>
-	 * IMPORTANT: When estimating a fundamental matrix use pixel coordinates.  When estimating an essential matrix
+	 * IMPORTANT: When estimating a fundamental matrix use pixel coordinates. When estimating an essential matrix
 	 * use normalized image coordinates from a calibrated camera.
 	 * </p>
 	 *
 	 * <p>
-	 * IMPORTANT. The number of allowed sample points varies depending on the algorithm.  The 8 point algorithm can
-	 * process 8 or more points.  Both the 5 an 7 point algorithms require exactly 5 and 7 points exactly. In addition
+	 * IMPORTANT. The number of allowed sample points varies depending on the algorithm. The 8 point algorithm can
+	 * process 8 or more points. Both the 5 an 7 point algorithms require exactly 5 and 7 points exactly. In addition
 	 * the 5-point algorithm is only for the calibrated (essential) case.
 	 * </p>
 	 *
@@ -254,38 +254,26 @@ public class FactoryMultiView {
 	 * @see boofcv.alg.geo.f.FundamentalLinear8
 	 */
 	public static EstimateNofEpipolar fundamental_N( EnumFundamental which ) {
-		switch (which) {
-			case LINEAR_8:
-				return new Estimate1toNofEpipolar(new WrapFundamentalLinear8(true));
-
-			case LINEAR_7:
-				return new WrapFundamentalLinear7(true);
-		}
-
-		throw new IllegalArgumentException("Unknown algorithm " + which);
+		return switch (which) {
+			case LINEAR_8 -> new Estimate1toNofEpipolar(new WrapFundamentalLinear8(true));
+			case LINEAR_7 -> new WrapFundamentalLinear7(true);
+		};
 	}
 
 	public static EstimateNofEpipolar essential_N( EnumEssential which ) {
-		switch (which) {
-			case LINEAR_8:
-				return new Estimate1toNofEpipolar(new WrapFundamentalLinear8(false));
-
-			case LINEAR_7:
-				return new WrapFundamentalLinear7(false);
-
-			case NISTER_5:
-				return new WrapEssentialNister5();
-		}
-
-		throw new IllegalArgumentException("Unknown algorithm " + which);
+		return switch (which) {
+			case LINEAR_8 -> new Estimate1toNofEpipolar(new WrapFundamentalLinear8(false));
+			case LINEAR_7 -> new WrapFundamentalLinear7(false);
+			case NISTER_5 -> new WrapEssentialNister5();
+		};
 	}
 
 	/**
 	 * <p>
-	 * Similar to {@link #fundamental_N}, but it returns only a single hypothesis.  If
+	 * Similar to {@link #fundamental_N}, but it returns only a single hypothesis. If
 	 * the underlying algorithm generates multiple hypotheses they are resolved by considering additional
 	 * sample points. For example, if you are using the 7 point algorithm at least one additional sample point
-	 * is required to resolve that ambiguity.  So 8 or more sample points are now required.
+	 * is required to resolve that ambiguity. So 8 or more sample points are now required.
 	 * </p>
 	 *
 	 * <p>
@@ -300,9 +288,9 @@ public class FactoryMultiView {
 	 *
 	 * <p>
 	 * The 8-point algorithm already returns a single hypothesis and ignores the 'numRemoveAmbiguity' parameter.
-	 * All other algorithms require one or more points to remove ambiguity.  Understanding a bit of theory is required
-	 * to understand what a good number of points is.  If a single point is used then to select the correct answer that
-	 * point must be in the inlier set.  If more than one point, say 10, then not all of those points must be in the
+	 * All other algorithms require one or more points to remove ambiguity. Understanding a bit of theory is required
+	 * to understand what a good number of points is. If a single point is used then to select the correct answer that
+	 * point must be in the inlier set. If more than one point, say 10, then not all of those points must be in the
 	 * inlier set,
 	 * </p>
 	 *
@@ -342,8 +330,8 @@ public class FactoryMultiView {
 	/**
 	 * Creates a non-linear optimizer for refining estimates of fundamental or essential matrices.
 	 *
-	 * @param tol Tolerance for convergence.  Try 1e-8
-	 * @param maxIterations Maximum number of iterations it will perform.  Try 100 or more.
+	 * @param tol Tolerance for convergence. Try 1e-8
+	 * @param maxIterations Maximum number of iterations it will perform. Try 100 or more.
 	 * @return RefineEpipolar
 	 * @see boofcv.alg.geo.f.FundamentalResidualSampson
 	 * @see boofcv.alg.geo.f.FundamentalResidualSimple
@@ -422,21 +410,22 @@ public class FactoryMultiView {
 		MotionTransformPoint<Se3_F64, Point3D_F64> motionFit = FitSpecialEuclideanOps_F64.fitPoints3D();
 
 		switch (which) {
-			case P3P_GRUNERT:
+			case P3P_GRUNERT -> {
 				P3PGrunert grunert = new P3PGrunert(PolynomialOps.createRootFinder(5, RootFinderType.STURM));
 				return new WrapP3PLineDistance(grunert, motionFit);
-
-			case P3P_FINSTERWALDER:
+			}
+			case P3P_FINSTERWALDER -> {
 				P3PFinsterwalder finster = new P3PFinsterwalder(PolynomialOps.createRootFinder(4, RootFinderType.STURM));
 				return new WrapP3PLineDistance(finster, motionFit);
-
-			case EPNP:
+			}
+			case EPNP -> {
 				Estimate1ofPnP epnp = pnp_1(which, numIterations, 0);
 				return new Estimate1toNofPnP(epnp);
-
-			case IPPE:
+			}
+			case IPPE -> {
 				Estimate1ofEpipolar H = FactoryMultiView.homographyTLS();
 				return new Estimate1toNofPnP(new IPPE_to_EstimatePnP(H));
+			}
 		}
 
 		throw new IllegalArgumentException("Type " + which + " not known");
@@ -456,7 +445,7 @@ public class FactoryMultiView {
 	 * @param which The algorithm which is to be returned.
 	 * @param numIterations Number of iterations. Only used by some algorithms and recommended number varies
 	 * significantly by algorithm.
-	 * @param numTest How many additional sample points are used to remove ambiguity in the solutions.  Not used
+	 * @param numTest How many additional sample points are used to remove ambiguity in the solutions. Not used
 	 * if only a single solution is found.
 	 * @return An estimator which returns a single estimate.
 	 */
@@ -489,12 +478,12 @@ public class FactoryMultiView {
 
 	/**
 	 * Returns a solution to the PnP problem for 4 or more points using EPnP. Fast and fairly
-	 * accurate algorithm.  Can handle general and planar scenario automatically.
+	 * accurate algorithm. Can handle general and planar scenario automatically.
 	 *
 	 * <p>NOTE: Observations are in normalized image coordinates NOT pixels.</p>
 	 *
-	 * @param numIterations If more then zero then non-linear optimization is done.  More is not always better.  Try 10
-	 * @param magicNumber Affects how the problem is linearized.  See comments in {@link PnPLepetitEPnP}.  Try 0.1
+	 * @param numIterations If more then zero then non-linear optimization is done. More is not always better. Try 10
+	 * @param magicNumber Affects how the problem is linearized. See comments in {@link PnPLepetitEPnP}. Try 0.1
 	 * @return Estimate1ofPnP
 	 * @see PnPLepetitEPnP
 	 */
@@ -508,7 +497,7 @@ public class FactoryMultiView {
 	 * Refines a pose solution to the PnP problem using non-linear least squares..
 	 *
 	 * @param tol Convergence tolerance. Try 1e-8
-	 * @param maxIterations Maximum number of iterations.  Try 200
+	 * @param maxIterations Maximum number of iterations. Try 200
 	 */
 	public static RefinePnP pnpRefine( double tol, int maxIterations ) {
 		return new PnPRefineRodrigues(tol, maxIterations);
@@ -567,19 +556,17 @@ public class FactoryMultiView {
 		if (config == null)
 			config = new ConfigTriangulation();
 
-		switch (config.type) {
-			case DLT:
-				return new WrapNViewsTriangulateMetricDLT();
+		return switch (config.type) {
+			case DLT -> new WrapNViewsTriangulateMetricDLT();
 
-			case GEOMETRIC: {
+			case GEOMETRIC -> {
 				TriangulateNViewsMetric estimator = new WrapNViewsTriangulateMetricDLT();
 				TriangulateRefineMetricLS refiner = new TriangulateRefineMetricLS(config.converge.gtol, config.converge.maxIterations);
-				return new TriangulateThenRefineMetric(estimator, refiner);
+				yield new TriangulateThenRefineMetric(estimator, refiner);
 			}
 
-			default:
-				throw new IllegalArgumentException("Unknown or unsupported type " + config.type);
-		}
+			default -> throw new IllegalArgumentException("Unknown or unsupported type " + config.type);
+		};
 	}
 
 	/**
@@ -592,19 +579,17 @@ public class FactoryMultiView {
 		if (config == null)
 			config = new ConfigTriangulation();
 
-		switch (config.type) {
-			case DLT:
-				return new WrapNViewsTriangulateMetricHgDLT();
+		return switch (config.type) {
+			case DLT -> new WrapNViewsTriangulateMetricHgDLT();
 
-			case GEOMETRIC: {
+			case GEOMETRIC -> {
 				var estimator = new WrapNViewsTriangulateMetricHgDLT();
 				var refiner = new TriangulateRefineMetricHgLS(config.converge.gtol, config.converge.maxIterations);
-				return new TriangulateThenRefineMetricH(estimator, refiner);
+				yield new TriangulateThenRefineMetricH(estimator, refiner);
 			}
 
-			default:
-				throw new IllegalArgumentException("Unknown or unsupported type " + config.type);
-		}
+			default -> throw new IllegalArgumentException("Unknown or unsupported type " + config.type);
+		};
 	}
 
 	/**
@@ -617,24 +602,21 @@ public class FactoryMultiView {
 		if (config == null)
 			config = new ConfigTriangulation();
 
-		switch (config.type) {
-			case DLT:
-				return new WrapNViewsTriangulateProjectiveDLT();
+		return switch (config.type) {
+			case DLT -> new WrapNViewsTriangulateProjectiveDLT();
 
-			case ALGEBRAIC:
-			case GEOMETRIC: {
+			case ALGEBRAIC, GEOMETRIC -> {
 				TriangulateNViewsProjective estimator = new WrapNViewsTriangulateProjectiveDLT();
 				TriangulateRefineProjectiveLS refiner = new TriangulateRefineProjectiveLS(config.converge.gtol, config.converge.maxIterations);
-				return new TriangulateThenRefineProjective(estimator, refiner);
+				yield new TriangulateThenRefineProjective(estimator, refiner);
 			}
 
-			default:
-				throw new IllegalArgumentException("Unknown or unsupported type " + config.type);
-		}
+			default -> throw new IllegalArgumentException("Unknown or unsupported type " + config.type);
+		};
 	}
 
 	/**
-	 * Refine the triangulation using Sampson error.  Approximately takes in account epipolar constraints.
+	 * Refine the triangulation using Sampson error. Approximately takes in account epipolar constraints.
 	 *
 	 * @param config Convergence criteria
 	 * @return Triangulation refinement algorithm.

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -25,12 +25,12 @@ package boofcv.factory.geo;
  */
 public enum EpipolarError {
 	/**
-	 * Simple to compute error function.  Has a minimum at the global solution, but cost is not the
+	 * Simple to compute error function. Has a minimum at the global solution, but cost is not the
 	 * same as the"optimal" error
 	 */
 	SIMPLE,
 	/**
-	 * Second order approximation of the "best" error function.  Often a good trade between
+	 * Second order approximation of the "best" error function. Often a good trade between
 	 * accuracy and efficiency.
 	 */
 	SAMPSON,
