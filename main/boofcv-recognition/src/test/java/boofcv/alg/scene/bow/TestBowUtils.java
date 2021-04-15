@@ -18,16 +18,13 @@
 
 package boofcv.alg.scene.bow;
 
+import boofcv.testing.BoofStandardJUnit;
 import org.ddogleg.struct.DogArray;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-/**
- * @author Peter Abeles
- */
-class TestBowUtils {
-
+class TestBowUtils extends BoofStandardJUnit {
 	/**
 	 * The filter accepts everything
 	 */

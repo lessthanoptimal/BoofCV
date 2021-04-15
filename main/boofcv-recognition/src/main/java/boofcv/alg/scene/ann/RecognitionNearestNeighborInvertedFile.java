@@ -36,7 +36,9 @@ import java.util.List;
 import java.util.Set;
 
 /**
- * Implementation of the "classical" Bog-Of-Words (BOW) (a.k.a. Bag-Of-Visual-Words) for object/scene recognition.
+ * <p>Implementation of the "classical" Bog-Of-Words (BOW) (a.k.a. Bag-Of-Visual-Words) [1] for object/scene recognition
+ * that uses an inverted file for fast image retrieval [2].</p>
+ *
  * An image is described using a set of local image features (e.g. SIFT) which results in a set of n-dimensional
  * vectors. Each feature vector is converted into a word, which is then used to build a histogram of words in the
  * image. A similarity score is computed between two images using the histogram. Words are learned using k-means
@@ -46,12 +48,8 @@ import java.util.Set;
  * to be swapped out. For example, the nearest-neighbor (NN) search can be done using a brute force approach, kd-tree,
  * or an approximate kd-tree.
  *
- * The image database is stored using an inverted file for quick retrieval and error computation, as was done in [2].
- *
- * TODO go over specifics
- *
- * There is no single source for this specific implementation and borrows ideas from several papers. The paper
- * below is one of the earlier works to discuss the concept for visual BOW.
+ * There is no single source for this specific paper that inspired this implementation and it borrows ideas from
+ * several papers. The paper below is one of the earlier works to discuss the concept for visual BOW.
  * <ol>
  * <li>Sivic, Josef, and Andrew Zisserman. "Video Google: A text retrieval approach to object matching in videos."
  * Computer Vision, IEEE International Conference on. Vol. 3. IEEE Computer Society, 2003.</li>
@@ -59,6 +57,7 @@ import java.util.Set;
  * 2006 IEEE Computer Society Conference on Computer Vision and Pattern Recognition (CVPR'06). Vol. 2. Ieee, 2006.</li>
  * </ol>
  *
+ * @param <Point> Data type for the 'point'. Typically this is a Tuple.
  * @author Peter Abeles
  */
 public class RecognitionNearestNeighborInvertedFile<Point> implements VerbosePrint {
