@@ -187,7 +187,7 @@ class TestConfigGenerator extends BoofStandardJUnit {
 	/**
 	 * A config with different internal data types to test
 	 */
-	static class ConfigDummyA implements Configuration {
+	public static class ConfigDummyA implements Configuration {
 		public char valueChar = 'a';
 		public byte valueByte = 0;
 		public short valueShort = 0;
@@ -217,7 +217,7 @@ class TestConfigGenerator extends BoofStandardJUnit {
 	/**
 	 * Another configuration. Used to test chained configs
 	 */
-	static class ConfigDummyB implements Configuration {
+	public static class ConfigDummyB implements Configuration {
 		public int valueInt = 0;
 		public float valueFloat = 0;
 		public double valueDouble = 0;

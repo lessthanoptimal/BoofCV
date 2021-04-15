@@ -19,6 +19,7 @@
 package boofcv.misc;
 
 import boofcv.errors.BoofCheckFailure;
+import boofcv.struct.Configuration;
 import boofcv.struct.ImageRectangle;
 import boofcv.struct.image.*;
 import georegression.struct.GeoTuple;
@@ -797,5 +798,19 @@ public class BoofMiscOps {
 				costs[s2.length()] = lastValue;
 		}
 		return costs[s2.length()];
+	}
+
+	/**
+	 * Creates a copy of the passed in {@link Configuration}
+	 */
+	public static <C extends Configuration>C copyConfig( C src ) {
+		try {
+			Class<C> type = (Class)src.getClass();
+			C dst = type.getConstructor().newInstance();
+			type.getMethod("setTo", type).invoke(dst, src);
+			return dst;
+		} catch (Exception e) {
+			throw new RuntimeException(e);
+		}
 	}
 }

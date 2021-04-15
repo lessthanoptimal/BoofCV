@@ -68,20 +68,21 @@ public abstract class ConfigGenerator<Config extends Configuration> {
 	protected ConfigGenerator( long seed, Class<Config> type ) {
 		this.seed = seed;
 		this.type = type;
-	}
-
-	/**
-	 * After all the parameters have been set, call this function to finalize internal variables and begin
-	 * the generator.
-	 */
-	public void initialize() {
-		trial = 0;
-		rand = new Random(seed);
 		try {
 			configurationBase = type.getConstructor().newInstance();
 		} catch (Exception e) {
 			throw new RuntimeException(e);
 		}
+	}
+
+	/**
+	 * After all the parameters have been set, call this function to finalize internal variables and begin
+	 * the generator. Up until this function is called, any changes in the baseline will be reflected in
+	 * later calls
+	 */
+	public void initialize() {
+		trial = 0;
+		rand = new Random(seed);
 	}
 
 	/**
@@ -91,19 +92,6 @@ public abstract class ConfigGenerator<Config extends Configuration> {
 		if (p.getStateSize() == 0)
 			throw new RuntimeException("There are an infinite number of states");
 		return p.getStateSize();
-	}
-
-	/**
-	 * Creates a new config and sets it's value to be the same as src
-	 */
-	protected Config createAndAssignConfig( Config src ) {
-		try {
-			Config dst = type.getConstructor().newInstance();
-			type.getMethod("setTo", type).invoke(dst, src);
-			return dst;
-		} catch (Exception e) {
-			throw new RuntimeException(e);
-		}
 	}
 
 	/**

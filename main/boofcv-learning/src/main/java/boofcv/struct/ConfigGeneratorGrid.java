@@ -18,12 +18,8 @@
 
 package boofcv.struct;
 
-import lombok.Getter;
-import lombok.Setter;
+import boofcv.misc.BoofMiscOps;
 import org.ddogleg.struct.DogArray_I32;
-
-import java.util.HashMap;
-import java.util.Map;
 
 /**
  * Implementation of {@link ConfigGenerator} that samples the configuration space using a grid pattern. This will
@@ -31,23 +27,12 @@ import java.util.Map;
  *
  * @author Peter Abeles
  */
-public class ConfigGeneratorGrid<Config extends Configuration> extends ConfigGenerator<Config> {
+public class ConfigGeneratorGrid<Config extends Configuration> extends ConfigGeneratorPatternSearchBase<Config> {
 
-	// TODO share code with vector
 	// TODO Support sampling on a log scale
 
 	// used for grid search
 	DogArray_I32 parameterStates = new DogArray_I32();
-
-	/**
-	 * Specifies how to discretize a continuous range
-	 */
-	Map<String, Discretization> pathToRule = new HashMap<>();
-
-	/**
-	 * If a grid search is requested, the number of discrete values a range is broken up into.
-	 */
-	@Getter @Setter int rangeDiscretization = 10;
 
 	public ConfigGeneratorGrid( long seed, Class<Config> type ) {
 		super(seed, type);
@@ -69,28 +54,10 @@ public class ConfigGeneratorGrid<Config extends Configuration> extends ConfigGen
 		return ret;
 	}
 
-	/**
-	 * Returns the number of possible states a parameter has
-	 */
-	@Override protected int getNumberOfStates( Parameter p ) {
-		if (p.getStateSize() != 0)
-			return p.getStateSize();
-
-		switch (pathToRule.getOrDefault(p.path, Discretization.DEFAULT)) {
-			case DEFAULT:
-				return rangeDiscretization;
-			case INTEGER_VALUES: {
-				double val0 = ((Number)p.selectValue(0.0)).doubleValue();
-				double val1 = ((Number)p.selectValue(1.0)).doubleValue();
-				return (int)(val1 - val0 + 1); // +1 because both extents are inclusive
-			}
-			default:
-				throw new RuntimeException("Unknown rule");
-		}
-	}
-
 	@Override public void initialize() {
 		super.initialize();
+
+		configurationWork = BoofMiscOps.copyConfig(configurationBase);
 
 		// Initialize every parameter to the first legal value
 		parameterStates.reset();
@@ -108,7 +75,7 @@ public class ConfigGeneratorGrid<Config extends Configuration> extends ConfigGen
 			// Initialize all parameters in the base config to their 0.0 state
 			for (int i = 0; i < parameters.size(); i++) {
 				Parameter p = parameters.get(i);
-				assignValue(configurationBase, p.getPath(), p.selectValue(0.0));
+				assignValue(configurationWork, p.getPath(), p.selectValue(0.0));
 			}
 		} catch (Exception e) {
 			throw new RuntimeException(e);
@@ -121,8 +88,9 @@ public class ConfigGeneratorGrid<Config extends Configuration> extends ConfigGen
 	 */
 	@Override public Config next() {
 		trial++;
+
 		// Creates a new config and assigns it to have the same value as configBase
-		configCurrent = createAndAssignConfig(configurationBase);
+		configCurrent = BoofMiscOps.copyConfig(configurationWork);
 
 		try {
 			boolean finished = false;
@@ -144,26 +112,12 @@ public class ConfigGeneratorGrid<Config extends Configuration> extends ConfigGen
 
 				// Modify this parameter and increment the state
 				double fraction = numStates == 1 ? 0.0 : state/(double)(numStates - 1);
-				assignValue(configurationBase, p.getPath(), p.selectValue(fraction));
+				assignValue(configurationWork, p.getPath(), p.selectValue(fraction));
 			}
 		} catch (Exception e) {
 			throw new RuntimeException(e);
 		}
 
 		return configCurrent;
-	}
-
-	/**
-	 * Specifies how continuous ranges should be discretized
-	 */
-	public void setDiscretizationRule( String path, Discretization rule ) {
-		pathToRule.put(path, rule);
-	}
-
-	public enum Discretization {
-		/** Breaks it up into a fixed number of values */
-		DEFAULT,
-		/** breaks it up using the number of whole integers that lie within the range */
-		INTEGER_VALUES
 	}
 }

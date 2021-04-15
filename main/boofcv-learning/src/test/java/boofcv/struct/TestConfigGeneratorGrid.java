@@ -90,6 +90,27 @@ class TestConfigGeneratorGrid extends BoofStandardJUnit {
 		assertEquals(5.0, floatMax, UtilEjml.TEST_F32);
 	}
 
+	/**
+	 * Modify the baseline and see if that has the expected results
+	 */
+	@Test void modifiedBaseline() {
+		var alg = new ConfigGeneratorGrid<>(0xBEEF, TestConfigGenerator.ConfigDummyA.class);
+
+		// Modify two parameters
+		alg.setOfIntegers("valueInt", -2, 1, 3, 10);
+		alg.getConfigurationBase().valueFloat = 123.0f; // this should stick
+		alg.initialize();
+		alg.getConfigurationBase().valueFloat = 321.0f; // this should be ignored
+
+		// Generate the configs
+		int trials = 0;
+		while (alg.hasNext()) {
+			assertEquals(123.0f, alg.next().valueFloat, UtilEjml.TEST_F32);
+			trials++;
+		}
+		assertTrue(trials > 0);
+	}
+
 	@Test void Discretization_Integers() {
 		var alg = new ConfigGeneratorGrid<>(0xBEEF, TestConfigGenerator.ConfigDummyA.class);
 

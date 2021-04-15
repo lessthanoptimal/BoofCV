@@ -18,6 +18,8 @@
 
 package boofcv.struct;
 
+import boofcv.misc.BoofMiscOps;
+
 /**
  * Implementation of {@link ConfigGenerator} that randomly samples each parameter using a uniform distribution
  *
@@ -49,7 +51,7 @@ public class ConfigGeneratorRandom<Config extends Configuration> extends ConfigG
 		}
 
 		// Creates a new config and assigns it to have the same value as configBase
-		configCurrent = createAndAssignConfig(configurationBase);
+		configCurrent = BoofMiscOps.copyConfig(configurationBase);
 		return configCurrent;
 	}
 }

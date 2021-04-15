@@ -18,14 +18,11 @@
 
 package boofcv.struct;
 
-import lombok.Getter;
-import lombok.Setter;
+import boofcv.misc.BoofMiscOps;
 import org.ddogleg.struct.Tuple2;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 /**
  * Implementation of {@link ConfigGenerator} that samples the configuration space using along each degree of
@@ -35,16 +32,7 @@ import java.util.Map;
  *
  * @author Peter Abeles
  */
-public class ConfigGeneratorVector<Config extends Configuration> extends ConfigGenerator<Config> {
-	/**
-	 * Specifies how to discretize a continuous range
-	 */
-	Map<String, Discretization> pathToRule = new HashMap<>();
-
-	/**
-	 * If a grid search is requested, the number of discrete values a range is broken up into.
-	 */
-	@Getter @Setter int rangeDiscretization = 10;
+public class ConfigGeneratorVector<Config extends Configuration> extends ConfigGeneratorPatternSearchBase<Config> {
 
 	public ConfigGeneratorVector( long seed, Class<Config> type ) {
 		super(seed, type);
@@ -66,34 +54,10 @@ public class ConfigGeneratorVector<Config extends Configuration> extends ConfigG
 		return ret;
 	}
 
-	/**
-	 * Returns the number of possible states a parameter has
-	 */
-	@Override protected int getNumberOfStates( Parameter p ) {
-		if (p.getStateSize() != 0)
-			return p.getStateSize();
-
-		switch (pathToRule.getOrDefault(p.path, Discretization.DEFAULT)) {
-			case DEFAULT -> {
-				// If the number of unique values is smaller then the default discretization use that instead.
-				if (p instanceof RangeOfIntegers) {
-					RangeOfIntegers pp = (RangeOfIntegers)p;
-					int uniqueValues = pp.idx1 - pp.idx0 + 1;
-					return Math.min(uniqueValues, rangeDiscretization);
-				}
-				return rangeDiscretization;
-			}
-			case INTEGER_VALUES -> {
-				double val0 = ((Number)p.selectValue(0.0)).doubleValue();
-				double val1 = ((Number)p.selectValue(1.0)).doubleValue();
-				return (int)(val1 - val0 + 1); // +1 because both extents are inclusive
-			}
-			default -> throw new RuntimeException("Unknown rule");
-		}
-	}
-
 	@Override public void initialize() {
 		super.initialize();
+
+		configurationWork = BoofMiscOps.copyConfig(configurationBase);
 
 		numTrials = 0;
 		for (int i = 0; i < parameters.size(); i++) {
@@ -111,7 +75,7 @@ public class ConfigGeneratorVector<Config extends Configuration> extends ConfigG
 	@Override public Config next() {
 
 		// Creates a new config and assigns it to have the same value as configBase
-		configCurrent = createAndAssignConfig(configurationBase);
+		configCurrent = BoofMiscOps.copyConfig(configurationWork);
 
 		try {
 			int firstTrialInParameter = 0;
@@ -151,19 +115,5 @@ public class ConfigGeneratorVector<Config extends Configuration> extends ConfigG
 			list.add(new Tuple2<>(p.path, getNumberOfStates(p)));
 		}
 		return list;
-	}
-
-	/**
-	 * Specifies how continuous ranges should be discretized
-	 */
-	public void setDiscretizationRule( String path, Discretization rule ) {
-		pathToRule.put(path, rule);
-	}
-
-	public enum Discretization {
-		/** Breaks it up into a fixed number of values */
-		DEFAULT,
-		/** breaks it up using the number of whole integers that lie within the range */
-		INTEGER_VALUES
 	}
 }
