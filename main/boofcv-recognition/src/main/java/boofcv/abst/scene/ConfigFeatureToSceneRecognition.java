@@ -18,6 +18,7 @@
 
 package boofcv.abst.scene;
 
+import boofcv.abst.scene.ann.ConfigRecognitionNearestNeighbor;
 import boofcv.abst.scene.nister2006.ConfigRecognitionNister2006;
 import boofcv.factory.feature.describe.ConfigConvertTupleDesc;
 import boofcv.factory.feature.describe.ConfigDescribeRegion;
@@ -40,11 +41,17 @@ public class ConfigFeatureToSceneRecognition implements Configuration {
 	 */
 	public int maxImagePixels = 640*480;
 
+	/** Specifies which recognition algorithm to use */
+	public Type typeRecognize = Type.NISTER_2006;
+
 	/** Image feature detector */
 	public final ConfigDetectDescribe features = new ConfigDetectDescribe();
 
 	/** Configuration for {@link boofcv.alg.scene.nister2006.RecognitionVocabularyTreeNister2006} */
 	public final ConfigRecognitionNister2006 recognizeNister2006 = new ConfigRecognitionNister2006();
+
+	/** Configuration for {@link boofcv.alg.scene.ann.RecognitionNearestNeighborInvertedFile} */
+	public final ConfigRecognitionNearestNeighbor recognizeNeighbor = new ConfigRecognitionNearestNeighbor();
 
 	{
 		// 500 features is a good trade off for memory and performance. Accuracy can be improved
@@ -86,5 +93,13 @@ public class ConfigFeatureToSceneRecognition implements Configuration {
 		this.maxImagePixels = src.maxImagePixels;
 		this.features.setTo(src.features);
 		this.recognizeNister2006.setTo(src.recognizeNister2006);
+	}
+
+	/**
+	 * Which type of recognition algorithm to use
+	 */
+	public enum Type {
+		NISTER_2006,
+		NEAREST_NEIGHBOR
 	}
 }

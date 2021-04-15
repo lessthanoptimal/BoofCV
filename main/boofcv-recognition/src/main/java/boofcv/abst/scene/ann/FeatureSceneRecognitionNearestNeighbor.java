@@ -59,6 +59,9 @@ public class FeatureSceneRecognitionNearestNeighbor<TD extends TupleDesc<TD>> im
 	/** BOW algorithm and storage for image database */
 	@Getter RecognitionNearestNeighborInvertedFile<TD> database;
 
+	/** List of all the words */
+	@Getter List<TD> dictionary = new ArrayList<>();
+
 	/** Stores features found in one image */
 	@Getter @Setter DogArray<TD> imageFeatures;
 
@@ -73,8 +76,8 @@ public class FeatureSceneRecognitionNearestNeighbor<TD extends TupleDesc<TD>> im
 	@Getter long timeLearnClusterMS;
 
 	// Describes how to store the feature descriptor
-	Class<TD> tupleType;
-	int tupleDOF;
+	@Getter Class<TD> tupleType;
+	@Getter int tupleDOF;
 
 	// If not null then print verbose information
 	PrintStream verbose;
@@ -123,11 +126,7 @@ public class FeatureSceneRecognitionNearestNeighbor<TD extends TupleDesc<TD>> im
 		timeLearnClusterMS = time2 - time1;
 
 		// The dictionary is now defined. Initialize the dataset
-		NearestNeighbor<TD> nearestNeighbor = FactoryNearestNeighbor.generic(config.nearestNeighbor,
-				FactoryAssociation.kdtreeDistance(tupleDOF, tupleType));
-		nearestNeighbor.setPoints(clustering.getBestClusters().toList(), true);
-
-		database.initialize(nearestNeighbor, config.numberOfWords);
+		setDictionary(clustering.getBestClusters().toList());
 	}
 
 	@Override public void clearDatabase() {
@@ -190,6 +189,21 @@ public class FeatureSceneRecognitionNearestNeighbor<TD extends TupleDesc<TD>> im
 		}
 
 		return !matches.isEmpty();
+	}
+
+	/**
+	 * Replaces the old dictionary with the new dictionary.
+	 *
+	 * @param dictionary Dictionary of words
+	 */
+	public void setDictionary( List<TD> dictionary ) {
+		clearDatabase();
+		this.dictionary = dictionary;
+		NearestNeighbor<TD> nearestNeighbor = FactoryNearestNeighbor.generic(config.nearestNeighbor,
+				FactoryAssociation.kdtreeDistance(tupleDOF, tupleType));
+		nearestNeighbor.setPoints(dictionary, true);
+
+		database.initialize(nearestNeighbor, dictionary.size());
 	}
 
 	@Override public int getQueryWord( int featureIdx ) {

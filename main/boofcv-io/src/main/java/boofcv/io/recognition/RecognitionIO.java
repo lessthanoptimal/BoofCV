@@ -21,7 +21,9 @@ package boofcv.io.recognition;
 import boofcv.BoofVersion;
 import boofcv.abst.scene.ConfigFeatureToSceneRecognition;
 import boofcv.abst.scene.WrapFeatureToSceneRecognition;
+import boofcv.abst.scene.ann.FeatureSceneRecognitionNearestNeighbor;
 import boofcv.abst.scene.nister2006.FeatureSceneRecognitionNister2006;
+import boofcv.alg.scene.ann.RecognitionNearestNeighborInvertedFile;
 import boofcv.alg.scene.bow.InvertedFile;
 import boofcv.alg.scene.nister2006.RecognitionVocabularyTreeNister2006;
 import boofcv.alg.scene.vocabtree.HierarchicalVocabularyTree;
@@ -36,10 +38,14 @@ import boofcv.struct.kmeans.TuplePointDistanceEuclideanSq;
 import boofcv.struct.kmeans.TuplePointDistanceHamming;
 import org.ddogleg.clustering.PointDistance;
 import org.ddogleg.struct.BigDogArray_I32;
+import org.ddogleg.struct.DogArray;
+import org.ddogleg.struct.FastAccess;
 import org.jetbrains.annotations.Nullable;
 
 import java.io.*;
 import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Objects;
 
 /**
@@ -47,7 +53,16 @@ import java.util.Objects;
  *
  * @author Peter Abeles
  **/
+@SuppressWarnings({"unchecked", "rawtypes"})
 public class RecognitionIO {
+
+	// save file names
+	public static final String CONFIG_NAME = "config.yaml";
+	public static final String IMAGE_ID_NAME = "image_ids.yaml";
+	public static final String DATABASE_NAME = "database.bin";
+	public static final String DICTIONARY_NAME = "dictionary.bin";
+	public static final String INVERTED_NAME = "inverted_files.bin";
+
 	/**
 	 * Saves {@link WrapFeatureToSceneRecognition} to disk inside of the specified directory
 	 *
@@ -61,11 +76,25 @@ public class RecognitionIO {
 		if (!dir.exists())
 			BoofMiscOps.checkTrue(dir.mkdirs());
 
-		UtilIO.saveConfig(def.getConfig(), new File(dir, "config.yaml"));
+		UtilIO.saveConfig(def.getConfig(), new File(dir, CONFIG_NAME));
 
-		FeatureSceneRecognitionNister2006<TD> recognizer = (FeatureSceneRecognitionNister2006<TD>)def.getRecognizer();
-		saveTreeBin(recognizer.getDatabaseN(), new File(dir, "database.bin"));
-		UtilIO.saveListStringYaml(recognizer.getImageIds(), new File(dir, "image_ids.yaml"));
+		switch (def.getConfig().typeRecognize) {
+			case NISTER_2006 -> {
+				FeatureSceneRecognitionNister2006<TD> recognizer = def.getRecognizer();
+				saveTreeBin(recognizer.getDatabase(), new File(dir, DATABASE_NAME));
+				UtilIO.saveListStringYaml(recognizer.getImageIds(), new File(dir, IMAGE_ID_NAME));
+			}
+
+			case NEAREST_NEIGHBOR -> {
+				FeatureSceneRecognitionNearestNeighbor<TD> recognizer = def.getRecognizer();
+
+				saveDictionaryBin(recognizer.getDictionary(),
+						recognizer.getTupleDOF(),
+						recognizer.getDescriptorType(), new File(dir, DICTIONARY_NAME));
+				saveNearestNeighborBin(recognizer.getDatabase(), new File(dir, INVERTED_NAME));
+				UtilIO.saveListStringYaml(recognizer.getImageIds(), new File(dir, IMAGE_ID_NAME));
+			}
+		}
 	}
 
 	public static <Image extends ImageBase<Image>, TD extends TupleDesc<TD>>
@@ -75,16 +104,34 @@ public class RecognitionIO {
 		if (!dir.isDirectory())
 			throw new IllegalArgumentException("Path is not a directory: " + dir.getPath());
 
-		ConfigFeatureToSceneRecognition config = UtilIO.loadConfig(new File(dir, "config.yaml"));
+		ConfigFeatureToSceneRecognition config = UtilIO.loadConfig(new File(dir, CONFIG_NAME));
 		WrapFeatureToSceneRecognition<Image, TD> alg = FactorySceneRecognition.createFeatureToScene(config, imageType);
 
-		FeatureSceneRecognitionNister2006<TD> recognizer = (FeatureSceneRecognitionNister2006<TD>)alg.getRecognizer();
+		switch (config.typeRecognize) {
+			case NISTER_2006 -> {
+				FeatureSceneRecognitionNister2006<TD> recognizer = alg.getRecognizer();
 
-		loadTreeBin(new File(dir, "database.bin"), recognizer.getDatabaseN());
-		recognizer.getImageIds().addAll(UtilIO.loadListStringYaml(new File(dir, "image_ids.yaml")));
+				loadTreeBin(new File(dir, DATABASE_NAME), recognizer.getDatabase());
+				recognizer.getImageIds().addAll(UtilIO.loadListStringYaml(new File(dir, IMAGE_ID_NAME)));
 
-		// Need to do this so that the tree reference is correctly set up
-		recognizer.setDatabase(recognizer.getDatabaseN());
+				// Need to do this so that the tree reference is correctly set up
+				recognizer.setDatabase(recognizer.getDatabase());
+			}
+
+			case NEAREST_NEIGHBOR -> {
+				FeatureSceneRecognitionNearestNeighbor<TD> recognizer = alg.getRecognizer();
+
+				// Add the dictionary
+				List<TD> dictionary = loadDictionaryBin(new File(dir, DICTIONARY_NAME));
+				recognizer.setDictionary(dictionary);
+
+				// Add the images now
+				recognizer.getImageIds().addAll(UtilIO.loadListStringYaml(new File(dir, IMAGE_ID_NAME)));
+				loadNearestNeighborBin(new File(dir, INVERTED_NAME), recognizer.getDatabase());
+			}
+
+			default -> throw new IllegalArgumentException("Unknown type: " + config.typeRecognize);
+		}
 
 		return alg;
 	}
@@ -102,9 +149,9 @@ public class RecognitionIO {
 		if (!dir.exists())
 			BoofMiscOps.checkTrue(dir.mkdirs());
 
-		UtilIO.saveConfig(def.getConfig(), new File(dir, "config.yaml"));
-		saveTreeBin(def.getDatabaseN(), new File(dir, "database.bin"));
-		UtilIO.saveListStringYaml(def.getImageIds(), new File(dir, "image_ids.yaml"));
+		UtilIO.saveConfig(def.getConfig(), new File(dir, CONFIG_NAME));
+		saveTreeBin(def.getDatabase(), new File(dir, DATABASE_NAME));
+		UtilIO.saveListStringYaml(def.getImageIds(), new File(dir, IMAGE_ID_NAME));
 	}
 
 	/**
@@ -113,25 +160,23 @@ public class RecognitionIO {
 	 * @param dir Directory containing saved graph
 	 * @param recognizer (Output) where it's loaded into
 	 */
-	public static < TD extends TupleDesc<TD>>
-	void loadNister2006( File dir, FeatureSceneRecognitionNister2006<TD> recognizer) {
+	public static <TD extends TupleDesc<TD>>
+	void loadNister2006( File dir, FeatureSceneRecognitionNister2006<TD> recognizer ) {
 		if (!dir.exists())
 			throw new IllegalArgumentException("Directory doesn't exist: " + dir.getPath());
 		if (!dir.isDirectory())
 			throw new IllegalArgumentException("Path is not a directory: " + dir.getPath());
 
-		loadTreeBin(new File(dir, "database.bin"), recognizer.getDatabaseN());
-		recognizer.getImageIds().addAll(UtilIO.loadListStringYaml(new File(dir, "image_ids.yaml")));
+		loadTreeBin(new File(dir, DATABASE_NAME), recognizer.getDatabase());
+		recognizer.getImageIds().addAll(UtilIO.loadListStringYaml(new File(dir, IMAGE_ID_NAME)));
 
 		// Need to do this so that the tree reference is correctly set up
-		recognizer.setDatabase(recognizer.getDatabaseN());
+		recognizer.setDatabase(recognizer.getDatabase());
 	}
 
 	public static <TD extends TupleDesc<TD>> void saveBin( HierarchicalVocabularyTree<TD> tree, File file ) {
-		try {
-			var out = new FileOutputStream(file);
+		try (var out = new FileOutputStream(file)) {
 			saveTreeBin(tree, out);
-			out.close();
 		} catch (IOException e) {
 			throw new UncheckedIOException(e);
 		}
@@ -139,11 +184,42 @@ public class RecognitionIO {
 
 	public static <TD extends TupleDesc<TD>>
 	HierarchicalVocabularyTree<TD> loadTreeBin( File file, @Nullable HierarchicalVocabularyTree<TD> tree ) {
-		try {
-			var in = new FileInputStream(file);
-			tree = loadTreeBin(in, tree);
-			in.close();
-			return tree;
+		try (var in = new FileInputStream(file)) {
+			return loadTreeBin(in, tree);
+		} catch (IOException e) {
+			throw new UncheckedIOException(e);
+		}
+	}
+
+	public static <TD extends TupleDesc<TD>> void saveDictionaryBin( List<TD> dictionary,
+																	 int dof, Class<TD> descType, File file ) {
+		try (var out = new FileOutputStream(file)) {
+			saveDictionaryBin(dictionary, dof, descType, out);
+		} catch (IOException e) {
+			throw new UncheckedIOException(e);
+		}
+	}
+
+	public static <TD extends TupleDesc<TD>>
+	List<TD> loadDictionaryBin( File file ) {
+		try (var in = new FileInputStream(file)) {
+			return loadDictionaryBin(in);
+		} catch (IOException e) {
+			throw new UncheckedIOException(e);
+		}
+	}
+
+	public static void saveNearestNeighborBin( RecognitionNearestNeighborInvertedFile<?> nn, File file ) {
+		try (var out = new FileOutputStream(file)) {
+			saveNearestNeighborBin(nn, out);
+		} catch (IOException e) {
+			throw new UncheckedIOException(e);
+		}
+	}
+
+	public static void loadNearestNeighborBin( File file, RecognitionNearestNeighborInvertedFile<?> nn ) {
+		try (var in = new FileInputStream(file)) {
+			loadNearestNeighborBin(in, nn);
 		} catch (IOException e) {
 			throw new UncheckedIOException(e);
 		}
@@ -312,6 +388,184 @@ public class RecognitionIO {
 			readCheckUTF(input, "END_BOOFCV_HIERARCHICAL_VOCABULARY_TREE");
 
 			return tree;
+		} catch (IOException e) {
+			throw new RuntimeException(e);
+		}
+	}
+
+	/**
+	 * Saves a TupleDesc dictionary in a binary format
+	 *
+	 * @param dictionary (Input) Tree that's saved
+	 * @param out (Output) Stream the tree is written to
+	 */
+	public static <TD extends TupleDesc<TD>> void saveDictionaryBin( List<TD> dictionary,
+																	 int dof, Class<TD> descType,
+																	 OutputStream out ) {
+		String header = "BOOFCV_TUPLE_DICTIONARY\n";
+		header += "# tuple format: raw array used internally\n";
+		header += "format_version 1\n";
+		header += "boofcv_version " + BoofVersion.VERSION + "\n";
+		header += "git_sha " + BoofVersion.GIT_SHA + "\n";
+		header += "point_type " + descType.getSimpleName() + "\n";
+		header += "point_dof " + dof + "\n";
+		header += "size " + dictionary.size() + "\n";
+		header += "BEGIN_DICTIONARY\n";
+		try {
+			out.write(header.getBytes(StandardCharsets.UTF_8));
+
+			DataOutputStream dout = new DataOutputStream(out);
+			for (int wordIdx = 0; wordIdx < dictionary.size(); wordIdx++) {
+				writeBin(dictionary.get(wordIdx), dout);
+			}
+			dout.writeUTF("END_BOOFCV_TUPLE_DICTIONARY");
+			dout.flush();
+		} catch (IOException e) {
+			throw new UncheckedIOException(e);
+		}
+	}
+
+	public static <TD extends TupleDesc<TD>>
+	List<TD> loadDictionaryBin( InputStream in ) {
+		var dictionary = new ArrayList<TD>();
+		var builder = new StringBuilder();
+		try {
+			String line = UtilIO.readLine(in, builder);
+			if (!line.equals("BOOFCV_TUPLE_DICTIONARY"))
+				throw new IOException("Unexpected first line. line.length=" + line.length());
+
+			String pointType = "";
+			int dof = 0;
+			int size = 0;
+
+			while (true) {
+				line = UtilIO.readLine(in, builder);
+				if (line.equals("BEGIN_DICTIONARY"))
+					break;
+				if (line.startsWith("#"))
+					continue;
+				String[] words = line.split("\\s");
+				if (words[0].equals("point_type")) {
+					pointType = words[1];
+				} else if (words[0].equals("point_dof")) {
+					dof = Integer.parseInt(words[1]);
+				} else if (words[0].equals("size")) {
+					size = Integer.parseInt(words[1]);
+				}
+			}
+
+			TD tuple;
+			switch (pointType) {
+				case "TupleDesc_F64" -> tuple = (TD)new TupleDesc_F64(dof);
+				case "TupleDesc_F32" -> tuple = (TD)new TupleDesc_F32(dof);
+				case "TupleDesc_U8" -> tuple = (TD)new TupleDesc_U8(dof);
+				case "TupleDesc_S8" -> tuple = (TD)new TupleDesc_S8(dof);
+				case "TupleDesc_B" -> tuple = (TD)new TupleDesc_B(dof);
+				default -> throw new IOException("Unknown point type. " + pointType);
+			}
+
+			DataInputStream input = new DataInputStream(in);
+
+			for (int i = 0; i < size; i++) {
+				readBin(tuple, input);
+				dictionary.add(tuple.copy());
+			}
+
+			readCheckUTF(input, "END_BOOFCV_TUPLE_DICTIONARY");
+
+			return dictionary;
+		} catch (IOException e) {
+			throw new RuntimeException(e);
+		}
+	}
+
+	public static void saveNearestNeighborBin( RecognitionNearestNeighborInvertedFile<?> nn, OutputStream out ) {
+		FastAccess<InvertedFile> inverted = nn.getInvertedFiles();
+		BigDogArray_I32 imageDB = nn.getImagesDB();
+
+		String header = "BOOFCV_RECOGNITION_NEAREST_NEIGHBOR\n";
+		header += "# inverted files: (int=size), array [int=index, float=weights]\n";
+		header += "format_version 1\n";
+		header += "boofcv_version " + BoofVersion.VERSION + "\n";
+		header += "git_sha " + BoofVersion.GIT_SHA + "\n";
+		header += "images.size " + imageDB.size + "\n";
+		header += "inverted.size " + inverted.size() + "\n";
+		header += "BEGIN_INVERTED\n";
+		try {
+			out.write(header.getBytes(StandardCharsets.UTF_8));
+
+			DataOutputStream dout = new DataOutputStream(out);
+			for (int invertedIdx = 0; invertedIdx < inverted.size(); invertedIdx++) {
+				InvertedFile inv = inverted.get(invertedIdx);
+				dout.writeInt(inv.size);
+				for (int imageIdx = 0; imageIdx < inv.size; imageIdx++) {
+					dout.writeInt(inv.get(imageIdx));
+					dout.writeFloat(inv.weights.get(imageIdx));
+				}
+			}
+			dout.writeUTF("BEGIN_IMAGES");
+			imageDB.forEach(0, imageDB.size, ( index ) -> {
+				try {
+					dout.writeInt(index);
+				} catch (IOException e) {
+					throw new UncheckedIOException(e);
+				}
+			});
+			dout.writeUTF("END_BOOFCV_RECOGNITION_NEAREST_NEIGHBOR");
+			dout.flush();
+		} catch (IOException e) {
+			throw new UncheckedIOException(e);
+		}
+	}
+
+	public static void loadNearestNeighborBin( InputStream in, RecognitionNearestNeighborInvertedFile<?> nn ) {
+		DogArray<InvertedFile> inverted = nn.getInvertedFiles();
+		BigDogArray_I32 imageDB = nn.getImagesDB();
+
+		inverted.reset();
+		imageDB.reset();
+
+		var builder = new StringBuilder();
+		try {
+			String line = UtilIO.readLine(in, builder);
+			if (!line.equals("BOOFCV_RECOGNITION_NEAREST_NEIGHBOR"))
+				throw new IOException("Unexpected first line. line.length=" + line.length());
+
+			int invertedCount = 0;
+			int imageCount = 0;
+
+			while (true) {
+				line = UtilIO.readLine(in, builder);
+				if (line.startsWith("BEGIN_INVERTED"))
+					break;
+				if (line.startsWith("#"))
+					continue;
+				String[] words = line.split("\\s");
+				if (words[0].equals("inverted.size")) {
+					invertedCount = Integer.parseInt(words[1]);
+				} else if (words[0].equals("images.size")) {
+					imageCount = Integer.parseInt(words[1]);
+				}
+			}
+
+			DataInputStream input = new DataInputStream(in);
+			for (int invertedIdx = 0; invertedIdx < invertedCount; invertedIdx++) {
+				InvertedFile inv = inverted.grow();
+				int fileCount = input.readInt();
+
+				for (int imageIdx = 0; imageIdx < fileCount; imageIdx++) {
+					int index = input.readInt();
+					float weight = input.readFloat();
+					inv.addImage(index, weight);
+				}
+			}
+
+			readCheckUTF(input, "BEGIN_IMAGES");
+			for (int imageIdx = 0; imageIdx < imageCount; imageIdx++) {
+				imageDB.add(input.readInt());
+			}
+
+			readCheckUTF(input, "END_BOOFCV_RECOGNITION_NEAREST_NEIGHBOR");
 		} catch (IOException e) {
 			throw new RuntimeException(e);
 		}

@@ -71,7 +71,7 @@ public class RecognitionNearestNeighborInvertedFile<Point> implements VerbosePri
 	/** List of images added to the database */
 	protected @Getter final BigDogArray_I32 imagesDB = new BigDogArray_I32(100, 10_000, BigDogArray.Growth.GROW_FIRST);
 
-	/** List of all possible images it could BowMatch with */
+	/** List of all images the query was found to be similar/matched with */
 	@Getter DogArray<BowMatch> matches = new DogArray<>(BowMatch::new, BowMatch::reset);
 
 	/** List of images in the DB that are observed by each word. One element per word. */

@@ -20,19 +20,24 @@ package boofcv.io.recognition;
 
 import boofcv.abst.scene.ConfigFeatureToSceneRecognition;
 import boofcv.abst.scene.WrapFeatureToSceneRecognition;
+import boofcv.abst.scene.ann.FeatureSceneRecognitionNearestNeighbor;
 import boofcv.abst.scene.nister2006.ConfigRecognitionNister2006;
 import boofcv.abst.scene.nister2006.FeatureSceneRecognitionNister2006;
+import boofcv.alg.scene.ann.RecognitionNearestNeighborInvertedFile;
 import boofcv.alg.scene.bow.InvertedFile;
 import boofcv.alg.scene.nister2006.RecognitionVocabularyTreeNister2006;
 import boofcv.alg.scene.vocabtree.HierarchicalVocabularyTree;
 import boofcv.factory.scene.FactorySceneRecognition;
 import boofcv.io.UtilIO;
 import boofcv.struct.feature.PackedTupleBigArray_F64;
+import boofcv.struct.feature.TupleDesc;
 import boofcv.struct.feature.TupleDesc_F64;
 import boofcv.struct.image.GrayU8;
 import boofcv.struct.image.ImageType;
 import boofcv.struct.kmeans.TuplePointDistanceEuclideanSq;
 import boofcv.testing.BoofStandardJUnit;
+import org.ddogleg.struct.DogArray;
+import org.ddogleg.struct.FastAccess;
 import org.jetbrains.annotations.NotNull;
 import org.junit.jupiter.api.Test;
 
@@ -40,20 +45,21 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.InputStream;
+import java.util.ArrayList;
+import java.util.List;
 
+import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-/**
- * @author Peter Abeles
- **/
 public class TestRecognitionIO extends BoofStandardJUnit {
 	/**
 	 * Very basic test. Mostly just checks to see if things blow up or not
 	 */
-	@Test void save_load_FeatureToScene() {
-		File dir = new File(System.getProperty("java.io.tmpdir"),"feature_to_scene");
+	@Test void save_load_FeatureToScene_Nister2006() {
+		File dir = new File(System.getProperty("java.io.tmpdir"), "feature_to_scene");
 		try {
 			var config = new ConfigFeatureToSceneRecognition();
+			config.typeRecognize = ConfigFeatureToSceneRecognition.Type.NISTER_2006;
 			ImageType<GrayU8> imageType = ImageType.SB_U8;
 
 			var original = FactorySceneRecognition.createFeatureToScene(config, imageType);
@@ -61,11 +67,11 @@ public class TestRecognitionIO extends BoofStandardJUnit {
 					setDatabase(createDefaultNister2006());
 
 			RecognitionIO.saveFeatureToScene(original, dir);
-			WrapFeatureToSceneRecognition<GrayU8,TupleDesc_F64> found = RecognitionIO.loadFeatureToScene(dir, imageType);
+			WrapFeatureToSceneRecognition<GrayU8, TupleDesc_F64> found = RecognitionIO.loadFeatureToScene(dir, imageType);
 
 			// Check a some things to make sure it actually loaded
 			FeatureSceneRecognitionNister2006<TupleDesc_F64> foundRecognizer = found.getRecognizer();
-			assertEquals(20, foundRecognizer.getDatabaseN().getImagesDB().size);
+			assertEquals(20, foundRecognizer.getDatabase().getImagesDB().size);
 			assertEquals(5, foundRecognizer.getTree().nodes.size());
 		} finally {
 			// clean up
@@ -77,20 +83,48 @@ public class TestRecognitionIO extends BoofStandardJUnit {
 	/**
 	 * Very basic test. Mostly just checks to see if things blow up or not
 	 */
+	@Test void save_load_FeatureToScene_NearestNeighbor() {
+		File dir = new File(System.getProperty("java.io.tmpdir"), "feature_to_scene");
+		try {
+			var config = new ConfigFeatureToSceneRecognition();
+			config.typeRecognize = ConfigFeatureToSceneRecognition.Type.NEAREST_NEIGHBOR;
+			ImageType<GrayU8> imageType = ImageType.SB_U8;
+
+			var original = FactorySceneRecognition.createFeatureToScene(config, imageType);
+			createNearestNeighbor(original.getRecognizer());
+
+			RecognitionIO.saveFeatureToScene(original, dir);
+			WrapFeatureToSceneRecognition<GrayU8, TupleDesc_F64> found =
+					RecognitionIO.loadFeatureToScene(dir, imageType);
+
+			// Check a some things to make sure it actually loaded
+			FeatureSceneRecognitionNearestNeighbor<TupleDesc_F64> foundRecognizer = found.getRecognizer();
+			assertEquals(20, foundRecognizer.getDatabase().getImagesDB().size);
+			assertEquals(9, foundRecognizer.getDatabase().getInvertedFiles().size());
+		} finally {
+			// clean up
+			if (dir.exists())
+				UtilIO.deleteRecursive(dir);
+		}
+	}
+
+	/**
+	 * Very basic test. Mostly just checks to see if things blow up or not
+	 */
 	@Test void save_load_nister2006() {
-		File dir = new File(System.getProperty("java.io.tmpdir"),"nister2006");
+		File dir = new File(System.getProperty("java.io.tmpdir"), "nister2006");
 		try {
 			var config = new ConfigRecognitionNister2006();
 
-			var original = new FeatureSceneRecognitionNister2006<>(config,()->new TupleDesc_F64(10));
+			var original = new FeatureSceneRecognitionNister2006<>(config, () -> new TupleDesc_F64(10));
 			original.setDatabase(createDefaultNister2006());
 
 			RecognitionIO.saveNister2006(original, dir);
-			var found = new FeatureSceneRecognitionNister2006<>(config,()->new TupleDesc_F64(10));
+			var found = new FeatureSceneRecognitionNister2006<>(config, () -> new TupleDesc_F64(10));
 			RecognitionIO.loadNister2006(dir, found);
 
 			// Check a some things to make sure it actually loaded
-			assertEquals(20, found.getDatabaseN().getImagesDB().size);
+			assertEquals(20, found.getDatabase().getImagesDB().size);
 			assertEquals(5, found.getTree().nodes.size());
 		} finally {
 			// clean up
@@ -162,7 +196,7 @@ public class TestRecognitionIO extends BoofStandardJUnit {
 			n.userIdx = i*2;
 
 			// make sure the number of descriptions doesn't match the number of nodes. this was a bug once.
-			if (i==0)
+			if (i == 0)
 				continue;
 
 			var desc = new TupleDesc_F64(DOF);
@@ -214,6 +248,64 @@ public class TestRecognitionIO extends BoofStandardJUnit {
 		}
 	}
 
+	@Test void nearestNeighborBin_stream() {
+		var expected = new RecognitionNearestNeighborInvertedFile<>();
+		expected.getImagesDB().resize(45);
+
+		for (int i = 0; i < 20; i++) {
+			InvertedFile iv = expected.getInvertedFiles().grow();
+			int N = rand.nextInt(10);
+			for (int j = 0; j < N; j++) {
+				iv.addImage(rand.nextInt(1_000_000), rand.nextFloat());
+			}
+		}
+
+		// Encode then decode
+		ByteArrayOutputStream stream = new ByteArrayOutputStream();
+		RecognitionIO.saveNearestNeighborBin(expected, stream);
+
+		var found = new RecognitionNearestNeighborInvertedFile<>();
+		InputStream input = new ByteArrayInputStream(stream.toByteArray());
+		RecognitionIO.loadNearestNeighborBin(input, found);
+
+		// See if they are identical
+		compareInverted(expected.getInvertedFiles(), found.getInvertedFiles());
+		assertEquals(expected.getImagesDB().size, found.getImagesDB().size);
+	}
+
+	private void compareInverted( FastAccess<InvertedFile> expected, FastAccess<InvertedFile> found ) {
+		assertEquals(expected.size(), found.size());
+		for (int invIdx = 0; invIdx < expected.size(); invIdx++) {
+			assertArrayEquals(expected.get(invIdx).data, found.get(invIdx).data);
+			assertArrayEquals(expected.get(invIdx).weights.data, found.get(invIdx).weights.data);
+		}
+	}
+
+	@Test void dictionaryBin_stream() {
+		int DOF = 11;
+		List<TupleDesc_F64> expected = new ArrayList<>();
+		for (int i = 0; i < 12; i++) {
+			var d = new TupleDesc_F64(DOF);
+			for (int j = 0; j < DOF; j++) {
+				d.data[j] = rand.nextDouble();
+			}
+			expected.add(d);
+		}
+
+		// Encode then decode
+		ByteArrayOutputStream stream = new ByteArrayOutputStream();
+		RecognitionIO.saveDictionaryBin(expected, DOF, TupleDesc_F64.class, stream);
+
+		InputStream input = new ByteArrayInputStream(stream.toByteArray());
+		List<TupleDesc_F64> found = RecognitionIO.loadDictionaryBin(input);
+
+		// See if they are identical
+		assertEquals(expected.size(), found.size());
+		for (int i = 0; i < expected.size(); i++) {
+			assertArrayEquals(expected.get(i).data, found.get(i).data);
+		}
+	}
+
 	@NotNull
 	private RecognitionVocabularyTreeNister2006<TupleDesc_F64> createDefaultNister2006() {
 		var db = new RecognitionVocabularyTreeNister2006<TupleDesc_F64>();
@@ -221,7 +313,7 @@ public class TestRecognitionIO extends BoofStandardJUnit {
 
 		db.getImagesDB().resize(20);
 		for (int i = 0; i < 20; i++) {
-			db.getImagesDB().set(i,rand.nextInt());
+			db.getImagesDB().set(i, rand.nextInt());
 		}
 
 		for (int i = 0; i < db.tree.nodes.size; i++) {
@@ -230,5 +322,21 @@ public class TestRecognitionIO extends BoofStandardJUnit {
 			ld.weights.add(rand.nextFloat());
 		}
 		return db;
+	}
+
+	private <TD extends TupleDesc<TD>>
+	void createNearestNeighbor( FeatureSceneRecognitionNearestNeighbor<TD> recNN ) {
+		var db = recNN.getDatabase();
+		db.getImagesDB().resize(20);
+		for (int i = 0; i < 20; i++) {
+			db.getImagesDB().set(i, rand.nextInt());
+		}
+
+		DogArray<InvertedFile> inverted = db.getInvertedFiles();
+		for (int i = 0; i < 9; i++) {
+			InvertedFile ld = inverted.grow();
+			ld.add(rand.nextInt(20));
+			ld.weights.add(rand.nextFloat());
+		}
 	}
 }

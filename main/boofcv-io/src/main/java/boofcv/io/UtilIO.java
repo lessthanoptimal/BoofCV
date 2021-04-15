@@ -53,11 +53,9 @@ public class UtilIO {
 	 * Saves a list of strings as a YAML file
 	 */
 	public static void saveListStringYaml( List<String> list, File file ) {
-		try {
-			var output = new BufferedOutputStream(new FileOutputStream(file));
+		try (var output = new BufferedOutputStream(new FileOutputStream(file))) {
 			Yaml yaml = createYmlObject();
 			yaml.dump(list, new OutputStreamWriter(output, UTF_8));
-			output.close();
 		} catch (IOException e) {
 			throw new UncheckedIOException(e);
 		}
@@ -67,9 +65,8 @@ public class UtilIO {
 	 * Saves a list of strings from a YAML file
 	 */
 	public static List<String> loadListStringYaml( File file ) {
-		try {
+		try (var reader = new BufferedInputStream(new FileInputStream(file))) {
 			Yaml yaml = createYmlObject();
-			var reader = new BufferedInputStream(new FileInputStream(file));
 			return yaml.load(reader);
 		} catch (IOException e) {
 			throw new UncheckedIOException(e);
