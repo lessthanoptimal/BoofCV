@@ -57,7 +57,7 @@ public class FeatureSceneRecognitionNister2006<TD extends TupleDesc<TD>> impleme
 	@Getter HierarchicalVocabularyTree<TD> tree;
 
 	/** Manages saving and locating images */
-	@Getter RecognitionVocabularyTreeNister2006<TD> databaseN;
+	@Getter RecognitionVocabularyTreeNister2006<TD> database;
 
 	/** Stores features found in one image */
 	@Getter @Setter DogArray<TD> imageFeatures;
@@ -83,18 +83,18 @@ public class FeatureSceneRecognitionNister2006<TD extends TupleDesc<TD>> impleme
 	public FeatureSceneRecognitionNister2006( ConfigRecognitionNister2006 config, Factory<TD> factory ) {
 		this.config = config;
 		this.imageFeatures = new DogArray<>(factory);
-		this.databaseN = new RecognitionVocabularyTreeNister2006<>();
+		this.database = new RecognitionVocabularyTreeNister2006<>();
 
-		databaseN.setDistanceType(config.distanceNorm);
-		databaseN.minimumDepthFromRoot = config.minimumDepthFromRoot;
-		databaseN.maximumQueryImagesInNode.setTo(config.queryMaximumImagesInNode);
+		database.setDistanceType(config.distanceNorm);
+		database.minimumDepthFromRoot = config.minimumDepthFromRoot;
+		database.maximumQueryImagesInNode.setTo(config.queryMaximumImagesInNode);
 
 		tupleDOF = imageFeatures.grow().size();
 		tupleType = (Class)imageFeatures.get(0).getClass();
 	}
 
 	public void setDatabase( RecognitionVocabularyTreeNister2006<TD> db ) {
-		databaseN = db;
+		database = db;
 		tree = db.getTree();
 	}
 
@@ -171,7 +171,7 @@ public class FeatureSceneRecognitionNister2006<TD extends TupleDesc<TD>> impleme
 		long time3 = System.currentTimeMillis();
 
 		// Initialize the database
-		databaseN.initializeTree(tree);
+		database.initializeTree(tree);
 
 		// Compute internal profiling
 		timeLearnDescribeMS = time1 - time0;
@@ -185,7 +185,7 @@ public class FeatureSceneRecognitionNister2006<TD extends TupleDesc<TD>> impleme
 
 	@Override public void clearDatabase() {
 		imageIds.clear();
-		databaseN.clearImages();
+		database.clearImages();
 	}
 
 	@Override public void addImage( String id, Features<TD> features ) {
@@ -203,7 +203,7 @@ public class FeatureSceneRecognitionNister2006<TD extends TupleDesc<TD>> impleme
 			verbose.println("added[" + imageIndex + "].size=" + features.size() + " id=" + id);
 
 		// Add the image
-		databaseN.addImage(imageIndex, imageFeatures.toList());
+		database.addImage(imageIndex, imageFeatures.toList());
 	}
 
 	@Override public boolean query( Features<TD> query, @Nullable BoofLambdas.Filter<String> filter,
@@ -224,10 +224,10 @@ public class FeatureSceneRecognitionNister2006<TD extends TupleDesc<TD>> impleme
 		BoofLambdas.FilterInt filterInt = filter == null ? null : ( index ) -> filter.keep(imageIds.get(index));
 
 		// Look up the closest matches
-		if (!databaseN.query(imageFeatures.toList(), filterInt, limit))
+		if (!database.query(imageFeatures.toList(), filterInt, limit))
 			return false;
 
-		DogArray<BowMatch> found = databaseN.getMatches();
+		DogArray<BowMatch> found = database.getMatches();
 
 		if (verbose != null) verbose.println("matches.size=" + found.size + " best.error=" + found.get(0).error);
 
@@ -243,7 +243,7 @@ public class FeatureSceneRecognitionNister2006<TD extends TupleDesc<TD>> impleme
 	}
 
 	@Override public int getQueryWord( int featureIdx ) {
-		return traverseUpGetID(databaseN.getFeatureIdxToLeafID().get(featureIdx),
+		return traverseUpGetID(database.getFeatureIdxToLeafID().get(featureIdx),
 				config.featureSingleWordHops);
 	}
 
@@ -253,7 +253,7 @@ public class FeatureSceneRecognitionNister2006<TD extends TupleDesc<TD>> impleme
 	}
 
 	@Override public int lookupWord( TD description ) {
-		return traverseUpGetID(databaseN.tree.searchPathToLeaf(description, ( idx, n ) -> {}),
+		return traverseUpGetID(database.tree.searchPathToLeaf(description, ( idx, n ) -> {}),
 				config.featureSingleWordHops);
 	}
 
@@ -266,13 +266,13 @@ public class FeatureSceneRecognitionNister2006<TD extends TupleDesc<TD>> impleme
 	 */
 	protected void lookupWordsFromLeafID( int leafID, DogArray_I32 word ) {
 		word.reset();
-		HierarchicalVocabularyTree.Node node = databaseN.tree.nodes.get(leafID);
+		HierarchicalVocabularyTree.Node node = database.tree.nodes.get(leafID);
 		while (node != null) {
 			// the root node has a parent of -1 and we don't want to use that as a word since every feature has it
 			if (node.parent == -1)
 				break;
 			word.add(node.index);
-			node = databaseN.tree.nodes.get(node.parent);
+			node = database.tree.nodes.get(node.parent);
 		}
 	}
 
@@ -281,9 +281,9 @@ public class FeatureSceneRecognitionNister2006<TD extends TupleDesc<TD>> impleme
 	 */
 	protected int traverseUpGetID( int id, int maxHops ) {
 		int hops = maxHops;
-		HierarchicalVocabularyTree.Node node = databaseN.tree.nodes.get(id);
+		HierarchicalVocabularyTree.Node node = database.tree.nodes.get(id);
 		while (hops-- > 0) {
-			node = databaseN.tree.nodes.get(node.parent);
+			node = database.tree.nodes.get(node.parent);
 			// the root node has a parent of -1 and we don't want to use that as a word since every feature has it
 			if (node.parent == -1)
 				break;
@@ -293,7 +293,7 @@ public class FeatureSceneRecognitionNister2006<TD extends TupleDesc<TD>> impleme
 	}
 
 	@Override public int getTotalWords() {
-		return databaseN.tree.nodes.size;
+		return database.tree.nodes.size;
 	}
 
 	@Override public Class<TD> getDescriptorType() {

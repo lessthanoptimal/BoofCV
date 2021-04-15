@@ -37,16 +37,16 @@ class TestFeatureSceneRecognitionNister2006 extends GenericFeatureSceneRecogniti
 
 	@Test void lookupWordsFromLeafID() {
 		FeatureSceneRecognitionNister2006<TupleDesc_F32> alg = createAlg();
-		alg.databaseN.tree = new HierarchicalVocabularyTree<>(
+		alg.database.tree = new HierarchicalVocabularyTree<>(
 				new TuplePointDistanceEuclideanSq.F32(), new PackedTupleArray_F32(5));
-		alg.databaseN.tree.nodes.resize(10);
+		alg.database.tree.nodes.resize(10);
 
 		for (int depth = 1; depth <= 5; depth++) {
-			HierarchicalVocabularyTree.Node n = alg.databaseN.tree.nodes.get(depth);
+			HierarchicalVocabularyTree.Node n = alg.database.tree.nodes.get(depth);
 			n.parent = depth-1;
 			n.index = depth;
 		}
-		alg.databaseN.tree.nodes.get(0).parent = -1;
+		alg.database.tree.nodes.get(0).parent = -1;
 
 		var words = new DogArray_I32();
 		alg.lookupWordsFromLeafID(5,words);
@@ -67,16 +67,16 @@ class TestFeatureSceneRecognitionNister2006 extends GenericFeatureSceneRecogniti
 	 */
 	@Test void traverseUpGetID() {
 		FeatureSceneRecognitionNister2006<TupleDesc_F32> alg = createAlg();
-		alg.databaseN.tree = new HierarchicalVocabularyTree<>(
+		alg.database.tree = new HierarchicalVocabularyTree<>(
 				new TuplePointDistanceEuclideanSq.F32(), new PackedTupleArray_F32(5));
-		alg.databaseN.tree.nodes.resize(10);
+		alg.database.tree.nodes.resize(10);
 
 		for (int depth = 1; depth <= 5; depth++) {
-			HierarchicalVocabularyTree.Node n = alg.databaseN.tree.nodes.get(depth);
+			HierarchicalVocabularyTree.Node n = alg.database.tree.nodes.get(depth);
 			n.parent = depth-1;
 			n.index = depth;
 		}
-		alg.databaseN.tree.nodes.get(0).parent = -1;
+		alg.database.tree.nodes.get(0).parent = -1;
 
 		assertEquals(1, alg.traverseUpGetID(5,100));
 		assertEquals(5, alg.traverseUpGetID(5,0));

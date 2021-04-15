@@ -56,8 +56,10 @@ public class FactorySceneRecognition {
 		BoofLambdas.Transform<Image> downSample =
 				FactoryFilterLambdas.createDownSampleFilter(config.maxImagePixels, imageType);
 
-		FeatureSceneRecognition<TD> recognitizer =
-				createSceneNister2006(config.recognizeNister2006, detector::createDescription);
+		FeatureSceneRecognition<TD> recognitizer = switch (config.typeRecognize) {
+			case NISTER_2006 -> createSceneNister2006(config.recognizeNister2006, detector::createDescription);
+			case NEAREST_NEIGHBOR -> createSceneNearestNeighbor(config.recognizeNeighbor, detector::createDescription);
+		};
 
 		var alg = new WrapFeatureToSceneRecognition<>(detector, downSample, recognitizer);
 		alg.config = config;
