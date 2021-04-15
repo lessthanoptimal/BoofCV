@@ -47,6 +47,7 @@ public class ConfigRecognitionNearestNeighbor implements Configuration {
 	{
 		// this is the only one that will be fast enough with high DOF feature descriptors
 		nearestNeighbor.type = ConfigNearestNeighborSearch.Type.RANDOM_FOREST;
+		nearestNeighbor.randomForest.maxNodesSearched = 200;
 
 		// Finding the absolute "best" cluster doesn't seem to improve scoring significantly
 		kmeans.reseedAfterIterations = 30;
