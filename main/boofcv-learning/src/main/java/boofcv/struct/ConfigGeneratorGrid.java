@@ -32,6 +32,10 @@ import java.util.Map;
  * @author Peter Abeles
  */
 public class ConfigGeneratorGrid<Config extends Configuration> extends ConfigGenerator<Config> {
+
+	// TODO share code with vector
+	// TODO Support sampling on a log scale
+
 	// used for grid search
 	DogArray_I32 parameterStates = new DogArray_I32();
 

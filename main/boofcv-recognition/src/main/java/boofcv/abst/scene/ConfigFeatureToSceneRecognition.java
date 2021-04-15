@@ -87,6 +87,7 @@ public class ConfigFeatureToSceneRecognition implements Configuration {
 	@Override public void checkValidity() {
 		features.checkValidity();
 		recognizeNister2006.checkValidity();
+		recognizeNeighbor.checkValidity();
 	}
 
 	public void setTo( ConfigFeatureToSceneRecognition src ) {
@@ -94,6 +95,7 @@ public class ConfigFeatureToSceneRecognition implements Configuration {
 		this.typeRecognize = src.typeRecognize;
 		this.features.setTo(src.features);
 		this.recognizeNister2006.setTo(src.recognizeNister2006);
+		this.recognizeNeighbor.setTo(src.recognizeNeighbor);
 	}
 
 	/**
