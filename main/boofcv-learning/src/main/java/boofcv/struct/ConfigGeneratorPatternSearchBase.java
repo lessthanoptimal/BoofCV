@@ -43,7 +43,7 @@ public abstract class ConfigGeneratorPatternSearchBase<Config extends Configurat
 	/** Copied from baseline at initialization. Modified while searching the grid */
 	protected Config configurationWork;
 
-	public ConfigGeneratorPatternSearchBase( long seed, Class<Config> type ) {
+	protected ConfigGeneratorPatternSearchBase( long seed, Class<Config> type ) {
 		super(seed, type);
 	}
 
