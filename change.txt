@@ -17,6 +17,8 @@ Version : 0.38
   * CameraCalibration can now just save detections
   * Several apps now let you specify a path using 'glob:' and 'regex:' greatly improving its versatility
   * TODO FiducialDetection add new fiducials to this
+- Android
+  * Fixed SimpleCamera2Activity not properly settings intrinsics. Thanks infologika-outsrc for the bug report
 - Functional API
   * Added forEachXY and forEachPixel to images
   * PixelMath.lambda is now PixelMath.operator

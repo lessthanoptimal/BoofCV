@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -953,9 +953,12 @@ public abstract class SimpleCamera2Activity extends Activity {
 					return true;
 				}
 			}
-			// 60 degrees seems reasonable for a random guess
-			PerspectiveOps.createIntrinsic(open.mCameraSize.getWidth(), open.mCameraSize.getHeight(),
-					UtilAngle.radian(60));
+
+			// We don't have the mCameraCharacterstics to make an informed decision with, so we will just guess
+			// that it's 60 degrees. That's often reasonable.
+			intrinsic.setTo( PerspectiveOps.createIntrinsic(
+					open.mCameraSize.getWidth(), open.mCameraSize.getHeight(),
+					UtilAngle.radian(60)));
 			return true;
 		} finally {
 			open.mLock.unlock();
