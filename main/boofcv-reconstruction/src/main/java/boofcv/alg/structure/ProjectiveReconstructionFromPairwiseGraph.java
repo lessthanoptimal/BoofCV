@@ -59,8 +59,12 @@ import java.util.Map;
  */
 public class ProjectiveReconstructionFromPairwiseGraph extends ReconstructionFromPairwiseGraph {
 
+	/** Contains the found projective scene */
+	public final @Getter SceneWorkingGraph workGraph = new SceneWorkingGraph();
+
 	/** Computes the initial scene from the seed and some of it's neighbors */
 	private final @Getter ProjectiveInitializeAllCommon initProjective;
+
 	/** Adds a new view to an existing projective scene */
 	private final @Getter ProjectiveExpandByOneView expandProjective;
 
@@ -88,7 +92,6 @@ public class ProjectiveReconstructionFromPairwiseGraph extends ReconstructionFro
 	 * @return true if successful or false if it failed and results can't be used
 	 */
 	public boolean process( LookUpSimilarImages db, PairwiseImageGraph graph ) {
-		exploredViews.clear();
 		workGraph.reset();
 
 		// Score nodes for their ability to be seeds
@@ -148,7 +151,7 @@ public class ProjectiveReconstructionFromPairwiseGraph extends ReconstructionFro
 			if (verbose != null) verbose.println("  view.id=`" + view.id + "`");
 			DMatrixRMaj cameraMatrix = initProjective.utils.structure.views.get(structViewIdx).worldToView;
 			workGraph.addView(view).projective.setTo(cameraMatrix);
-			exploredViews.add(view.id);
+			workGraph.exploredViews.add(view.id);
 		}
 
 		// save which features were used for later use in metric reconstruction
@@ -163,16 +166,19 @@ public class ProjectiveReconstructionFromPairwiseGraph extends ReconstructionFro
 	private void expandScene( LookUpSimilarImages db ) {
 		if (verbose != null) verbose.println("ENTER Expanding Scene:");
 		// Create a list of views that can be added the work graph
-		FastArray<PairwiseImageGraph.View> open = findAllOpenViews();
+		findAllOpenViews(workGraph);
+		FastArray<PairwiseImageGraph.View> open = workGraph.open;
 
 		// Grow the projective scene until there are no more views to process
 		DMatrixRMaj cameraMatrix = new DMatrixRMaj(3, 4);
+		Expansion score = new Expansion();
 		while (open.size > 0) {
-			PairwiseImageGraph.View selected = selectNextToProcess(open);
-			if (selected == null) {
+			if (!selectNextToProcess(workGraph, score)) {
 				if (verbose != null) verbose.println("  No valid views left. open.size=" + open.size);
 				break;
 			}
+
+			PairwiseImageGraph.View selected = score.scene.open.removeSwap(score.openIdx);
 
 			if (!expandProjective.process(db, workGraph, selected, cameraMatrix)) {
 				if (verbose != null) verbose.println("  Failed to expand/add view=" + selected.id + ". Discarding.");
@@ -192,7 +198,7 @@ public class ProjectiveReconstructionFromPairwiseGraph extends ReconstructionFro
 			utils.saveRansacInliers(wview);
 
 			// Add views which are neighbors
-			addOpenForView(wview.pview, open);
+			addOpenForView(workGraph, wview.pview);
 		}
 		if (verbose != null) verbose.println("EXIT Expanding Scene");
 	}

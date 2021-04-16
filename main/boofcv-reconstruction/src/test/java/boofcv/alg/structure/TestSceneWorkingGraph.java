@@ -27,8 +27,7 @@ import static org.junit.jupiter.api.Assertions.*;
  * @author Peter Abeles
  */
 class TestSceneWorkingGraph extends BoofStandardJUnit {
-	@Test
-	void isKnown() {
+	@Test void isKnown() {
 		var alg = new SceneWorkingGraph();
 		var viewA = new PairwiseImageGraph.View();
 		viewA.id = "moo";
@@ -45,8 +44,7 @@ class TestSceneWorkingGraph extends BoofStandardJUnit {
 		assertTrue(alg.isKnown(viewB));
 	}
 
-	@Test
-	void addView() {
+	@Test void addView() {
 		var alg = new SceneWorkingGraph();
 		var pview = new PairwiseImageGraph.View();
 		pview.id = "moo";
@@ -55,11 +53,25 @@ class TestSceneWorkingGraph extends BoofStandardJUnit {
 		assertSame(found, alg.views.get(pview.id));
 	}
 
-	@Test
-	void createFeature() {
+	@Test void createFeature() {
 		var alg = new SceneWorkingGraph();
 		SceneWorkingGraph.Feature found = alg.createFeature();
 		assertEquals(1, alg.features.size());
 		assertSame(alg.features.get(0), found);
+	}
+
+	@Test void InlierInfo_setTo() {
+		var expected = new SceneWorkingGraph.InlierInfo();
+		var found = new SceneWorkingGraph.InlierInfo();
+
+		expected.views.add(new PairwiseImageGraph.View());
+		expected.observations.resize(4,p->p.setTo(1,2,3));
+
+		found.setTo(expected);
+
+		assertEquals(1, found.views.size);
+		assertSame(expected.views.get(0), found.views.get(0));
+		assertEquals(4, found.observations.size);
+		found.observations.forEach(v->assertEquals(3, v.size));
 	}
 }

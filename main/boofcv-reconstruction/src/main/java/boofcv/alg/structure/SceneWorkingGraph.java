@@ -24,7 +24,6 @@ import georegression.struct.point.Point2D_F64;
 import georegression.struct.point.Point4D_F64;
 import georegression.struct.se.Se3_F64;
 import gnu.trove.map.TObjectIntMap;
-import gnu.trove.map.hash.TIntObjectHashMap;
 import gnu.trove.map.hash.TObjectIntHashMap;
 import org.ddogleg.struct.DogArray;
 import org.ddogleg.struct.DogArray_I32;
@@ -32,10 +31,7 @@ import org.ddogleg.struct.FastArray;
 import org.ejml.data.DMatrixRMaj;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 import static boofcv.misc.BoofMiscOps.checkTrue;
 
@@ -49,17 +45,30 @@ public class SceneWorkingGraph {
 
 	/** List of all views in the scene graph. Look up based on the image/view's id */
 	public final Map<String, View> views = new HashMap<>();
-	public final List<View> viewList = new ArrayList<>();
+	public final List<View> workingViews = new ArrayList<>();
+
 	/** List of all features in the scene */
 	public final List<Feature> features = new ArrayList<>(); // TODO change to something else so remove() is faster
+
+	/** list of views that have already been explored when expanding the scene */
+	public HashSet<String> exploredViews = new HashSet<>();
+
+	/** If stored in an array, the index of the scene in the array */
+	public int index;
+
+	/** List of views in pairwise graph it could expand into */
+	public FastArray<PairwiseImageGraph.View> open = new FastArray<>(PairwiseImageGraph.View.class);
 
 	/**
 	 * Resets it into it's initial state.
 	 */
 	public void reset() {
 		views.clear();
-		viewList.clear();
+		workingViews.clear();
 		features.clear();
+		exploredViews.clear();
+		index = -1;
+		open.reset();
 	}
 
 	public View lookupView( String id ) {
@@ -81,8 +90,8 @@ public class SceneWorkingGraph {
 		v.pview = pview;
 		checkTrue(null == views.put(v.pview.id, v),
 				"There shouldn't be an existing view with the same key: '" + v.pview.id + "'");
-		v.index = viewList.size();
-		viewList.add(v);
+		v.index = workingViews.size();
+		workingViews.add(v);
 		return v;
 	}
 
@@ -94,7 +103,7 @@ public class SceneWorkingGraph {
 	}
 
 	public List<View> getAllViews() {
-		return viewList;
+		return workingViews;
 	}
 
 	/**
@@ -166,6 +175,15 @@ public class SceneWorkingGraph {
 		/** Returns total number of features are included in this inlier set */
 		public int getInlierCount() { return observations.get(0).size; }
 
+		public void setTo( InlierInfo src ) {
+			this.reset();
+			this.views.addAll(src.views);
+			this.observations.resize(src.observations.size);
+			for (int i = 0; i < src.observations.size; i++) {
+				this.observations.get(i).setTo(src.observations.get(i));
+			}
+		}
+
 		public void reset() {
 			views.reset();
 			observations.reset();
@@ -182,8 +200,8 @@ public class SceneWorkingGraph {
 		if (storage == null)
 			storage = new TObjectIntHashMap<>();
 
-		for (int i = 0; i < viewList.size(); i++) {
-			storage.put(viewList.get(i).pview.id, i);
+		for (int i = 0; i < workingViews.size(); i++) {
+			storage.put(workingViews.get(i).pview.id, i);
 		}
 
 		return storage;
@@ -194,9 +212,6 @@ public class SceneWorkingGraph {
 	 */
 	static public class View {
 		public PairwiseImageGraph.View pview;
-		// view to global
-		// provides a way to lookup features given their ID in the view
-		public final TIntObjectHashMap<Feature> obs_to_feat = new TIntObjectHashMap<>();
 
 		// Specifies which observations were used to compute the projective transform for this view
 		// If empty that means one set of inliers are used for multiple views and only one view needed this to be saved
@@ -213,28 +228,10 @@ public class SceneWorkingGraph {
 		// Index of the view in the list. This will be the same index in the SBA scene
 		public int index = -1;
 
-		/**
-		 * Given the observation index return the feature associated with it. Return null if there are none
-		 */
-		public Feature getFeatureFromObs( int observationIdx ) {
-			return obs_to_feat.get(observationIdx);
-		}
-
-		/**
-		 * Assigns the specified observation in this view to the specified feature
-		 *
-		 * @param observationIdx Index of the observation
-		 * @param feature Which feature it belongs to
-		 */
-		public void setObsToFeature( int observationIdx, Feature feature ) {
-			obs_to_feat.put(observationIdx, feature);
-		}
-
 		public void reset() {
 			index = -1;
 			pview = null;
 			imageDimension.setTo(-1, -1);
-			obs_to_feat.clear();
 			projective.zero();
 			intrinsic.reset();
 			inliers.reset();

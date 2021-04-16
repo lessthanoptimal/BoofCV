@@ -149,14 +149,14 @@ public class ImageSequenceToSparseScene<T extends ImageGray<T>> implements Verbo
 
 		// Order of views in this graph is the same as the views in the SBA scene
 		// Since the image name is lost in the tracker it's referred to by frame number
-		SceneWorkingGraph graph = metricFromPairwise.workGraph;
-		for (int sbaIdx = 0; sbaIdx < graph.viewList.size(); sbaIdx++) {
-			int imageIdx = Integer.parseInt(graph.viewList.get(sbaIdx).pview.id);
+		SceneWorkingGraph graph = metricFromPairwise.getLargestScene();
+		for (int sbaIdx = 0; sbaIdx < graph.workingViews.size(); sbaIdx++) {
+			int imageIdx = Integer.parseInt(graph.workingViews.get(sbaIdx).pview.id);
 			imageIdToSceneViewIdx.put(imageIDs.get(imageIdx), sbaIdx);
 		}
 
 		// Refine the entire scene all at once to get a better estimate
-		if (!refineScene.process(trackerSimilar, metricFromPairwise.getWorkGraph())) {
+		if (!refineScene.process(trackerSimilar, graph)) {
 			if (verbose != null) verbose.println("Failed at scene refine");
 			return false;
 		}

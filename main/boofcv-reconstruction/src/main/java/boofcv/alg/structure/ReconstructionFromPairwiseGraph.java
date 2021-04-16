@@ -21,10 +21,8 @@ package boofcv.alg.structure;
 import boofcv.alg.structure.PairwiseImageGraph.View;
 import boofcv.misc.BoofMiscOps;
 import boofcv.struct.ScoreIndex;
-import lombok.Getter;
 import org.ddogleg.struct.DogArray;
 import org.ddogleg.struct.DogArray_I32;
-import org.ddogleg.struct.FastArray;
 import org.ddogleg.struct.VerbosePrint;
 import org.jetbrains.annotations.Nullable;
 
@@ -41,9 +39,6 @@ import java.util.*;
  */
 public abstract class ReconstructionFromPairwiseGraph implements VerbosePrint {
 
-	/** Contains the found projective scene */
-	public final @Getter SceneWorkingGraph workGraph = new SceneWorkingGraph();
-
 	// Common functions used in projective reconstruction
 	protected PairwiseGraphUtils utils;
 
@@ -52,11 +47,12 @@ public abstract class ReconstructionFromPairwiseGraph implements VerbosePrint {
 
 	//--------------------------------------------- Internal workspace
 	// scores of individual motions for a View
-	DogArray<ScoreIndex> scoresMotions = new DogArray<>(ScoreIndex::new);
-	// list of views that have already been explored
-	HashSet<String> exploredViews = new HashSet<>();
+	public DogArray<ScoreIndex> scoresMotions = new DogArray<>(ScoreIndex::new);
+
 	// information related to each view being a potential seed
 	DogArray<SeedInfo> seedScores = new DogArray<>(SeedInfo::new, SeedInfo::reset);
+
+	private final List<View> valid = new ArrayList<>();
 
 	protected ReconstructionFromPairwiseGraph( PairwiseGraphUtils utils ) {
 		this.utils = utils;
@@ -65,14 +61,10 @@ public abstract class ReconstructionFromPairwiseGraph implements VerbosePrint {
 	/**
 	 * Searches all connections to known views and creates a list of connected views which have a 3D relationship
 	 */
-	protected FastArray<View> findAllOpenViews() {
-		FastArray<View> found = new FastArray<>(View.class);
-
-		for (SceneWorkingGraph.View wview : workGraph.getAllViews()) {
-			addOpenForView(wview.pview, found);
+	protected void findAllOpenViews( SceneWorkingGraph scene ) {
+		for (SceneWorkingGraph.View wview : scene.getAllViews()) {
+			addOpenForView(scene, wview.pview);
 		}
-
-		return found;
 	}
 
 	/**
@@ -80,47 +72,52 @@ public abstract class ReconstructionFromPairwiseGraph implements VerbosePrint {
 	 * view more than once
 	 *
 	 * @param view (Input) Inspects connected views to add to found
-	 * @param found (Output) Storage for selected views
 	 */
-	protected void addOpenForView( View view, FastArray<View> found ) {
+	protected void addOpenForView( SceneWorkingGraph scene, View view ) {
 		for (PairwiseImageGraph.Motion c : view.connections.toList()) {
 			if (!c.is3D)
 				continue;
 
 			View o = c.other(view);
 
-			if (exploredViews.contains(o.id))
+			if (scene.exploredViews.contains(o.id))
 				continue;
 
-			if (found.contains(o))
+			if (scene.open.contains(o))
 				continue;
 
-			if (verbose != null) verbose.println("  Adding to open list view.id='" + o.id + "'");
-			found.add(o);
-			exploredViews.add(o.id);
+			if (verbose != null) verbose.println("  scene[" + scene.index + "] adding to open view.id='" + o.id + "'");
+			scene.open.add(o);
+			scene.exploredViews.add(o.id);
 		}
 	}
 
 	/**
 	 * Selects next View to process based on the score of it's known connections. Two connections which both
 	 * connect to each other is required.
+	 *
+	 * @param selection The results
+	 * @return true if a valid choice was found. Otherwise false.
 	 */
-	protected View selectNextToProcess( FastArray<View> open ) {
+	protected boolean selectNextToProcess( SceneWorkingGraph scene, Expansion selection ) {
+		selection.reset();
+		selection.scene = scene;
+
 		int bestIdx = -1;
 		double bestScore = 0.0;
 		int bestValidCount = 0;
 
-		List<View> valid = new ArrayList<>();
+		valid.clear();
 
-		for (int openIdx = 0; openIdx < open.size; openIdx++) {
-			final View pview = open.get(openIdx);
+		for (int openIdx = 0; openIdx < scene.open.size; openIdx++) {
+			final View pview = scene.open.get(openIdx);
 
 			// Create a list of valid views pview can connect too
 			valid.clear();
 			for (int connIdx = 0; connIdx < pview.connections.size; connIdx++) {
 				PairwiseImageGraph.Motion m = pview.connections.get(connIdx);
 				View dst = m.other(pview);
-				if (!m.is3D || !workGraph.isKnown(dst))
+				if (!m.is3D || !scene.isKnown(dst))
 					continue;
 				valid.add(dst);
 			}
@@ -153,9 +150,9 @@ public abstract class ReconstructionFromPairwiseGraph implements VerbosePrint {
 
 		if (bestIdx < 0) {
 			if (verbose != null) {
-				verbose.println("  Failed to find a valid view to connect. open.size=" + open.size);
-				for (int i = 0; i < open.size; i++) {
-					View v = open.get(i);
+				verbose.println("  Failed to find a valid view to connect. open.size=" + scene.open.size);
+				for (int i = 0; i < scene.open.size; i++) {
+					View v = scene.open.get(i);
 					verbose.print("    id='" + v.id + "' conn={ ");
 					for (int j = 0; j < v.connections.size; j++) {
 						verbose.print("'" + v.connections.get(j).other(v).id + "' ");
@@ -164,14 +161,17 @@ public abstract class ReconstructionFromPairwiseGraph implements VerbosePrint {
 				}
 			}
 
-			return null;
+			return false;
 		}
 
-		View selected = open.removeSwap(bestIdx);
 		if (verbose != null)
-			verbose.println("  open.size=" + open.size + " selected.id='" + selected.id + "' score=" + bestScore + " conn=" + bestValidCount);
+			verbose.println("  scene[" + scene.index + "].open.size=" + scene.open.size + " score=" +
+					bestScore + " conn=" + bestValidCount);
 
-		return selected;
+		selection.score = bestScore;
+		selection.openIdx = bestIdx;
+
+		return true;
 	}
 
 	/**
@@ -209,8 +209,8 @@ public abstract class ReconstructionFromPairwiseGraph implements VerbosePrint {
 		// ignore nodes with too low of a score
 		double minScore = candidates.get(candidates.size() - 1).score*0.2;
 
-		if (verbose!=null) {
-			verbose.printf("SelectSeeds: candidates.size=%d minScore=%.2f\n",candidates.size,minScore);
+		if (verbose != null) {
+			verbose.printf("SelectSeeds: candidates.size=%d minScore=%.2f\n", candidates.size, minScore);
 		}
 
 		// Collect summary information on rejections
@@ -230,7 +230,7 @@ public abstract class ReconstructionFromPairwiseGraph implements VerbosePrint {
 
 			// All scores for now on will be below the minimum since they are sorted
 			if (s.score <= minScore) {
-				rejectedScore = i+1;
+				rejectedScore = i + 1;
 				break;
 			}
 
@@ -255,9 +255,9 @@ public abstract class ReconstructionFromPairwiseGraph implements VerbosePrint {
 			}
 		}
 
-		if (verbose!=null)
+		if (verbose != null)
 			verbose.printf("Seed Rejections: neighbor=%3d score=%3d close=%3d\n",
-					rejectedNeighbor,rejectedScore,rejectedClose);
+					rejectedNeighbor, rejectedScore, rejectedClose);
 
 
 		return seeds;
@@ -316,5 +316,21 @@ public abstract class ReconstructionFromPairwiseGraph implements VerbosePrint {
 		}
 
 		@Override public int compareTo( SeedInfo o ) { return Double.compare(score, o.score); }
+	}
+
+	/**
+	 * Contains information on a potential expansion
+	 */
+	protected static class Expansion {
+		public SceneWorkingGraph scene;
+		public int openIdx;
+
+		public double score;
+
+		public void reset() {
+			scene = null;
+			openIdx = -1;
+			score = -1;
+		}
 	}
 }

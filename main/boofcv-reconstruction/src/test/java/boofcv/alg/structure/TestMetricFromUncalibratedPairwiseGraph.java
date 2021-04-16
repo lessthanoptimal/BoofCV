@@ -33,8 +33,7 @@ import org.junit.jupiter.api.Test;
 import java.util.ArrayList;
 import java.util.List;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 
 /**
  * @author Peter Abeles
@@ -49,11 +48,11 @@ class TestMetricFromUncalibratedPairwiseGraph extends BoofStandardJUnit {
 	/**
 	 * Random scene with fairly linear motion. Everything is randomized and physical constraints on camera are enforced
 	 */
-	@Test
-	void process_perfect() {
+	@Test void process_perfect() {
 		// NOTE: Self calibration assumes image center is the principle point and that fx==fy and zero skew. Make
 		// sure truth matches that assumption
 
+		// TODO make this test run faster
 		var alg = new MetricFromUncalibratedPairwiseGraph();
 //		alg.setVerbose(System.out, null);
 //		alg.getRefineWorking().setVerbose(System.out, null);
@@ -74,7 +73,8 @@ class TestMetricFromUncalibratedPairwiseGraph extends BoofStandardJUnit {
 	 * Compare found camera matrices against truth by converting them into the same projective scale
 	 */
 	private void checkReconstruction( MetricFromUncalibratedPairwiseGraph alg, MockLookupSimilarImagesRealistic db ) {
-		List<SceneWorkingGraph.View> foundViews = alg.workGraph.getAllViews();
+		SceneWorkingGraph workGraph = alg.getLargestScene();
+		List<SceneWorkingGraph.View> foundViews = workGraph.getAllViews();
 		assertEquals(db.views.size(), foundViews.size());
 
 		//------------- Check intrinsic parameters
@@ -86,11 +86,11 @@ class TestMetricFromUncalibratedPairwiseGraph extends BoofStandardJUnit {
 		//------------- Check camera motion up to scale
 		// The the origin can float in truth and found so let's pick a view arbitrarily and make that the origin
 		String originID = db.views.get(0).id;
-		Se3_F64 fndWorld_to_origin = alg.workGraph.lookupView(originID).world_to_view;
+		Se3_F64 fndWorld_to_origin = workGraph.lookupView(originID).world_to_view;
 		Se3_F64 expWorld_to_origin = db.views.get(0).world_to_view;
 
 		for (var trueView : db.views) {
-			SceneWorkingGraph.View wview = alg.workGraph.lookupView(trueView.id);
+			SceneWorkingGraph.View wview = workGraph.lookupView(trueView.id);
 			Se3_F64 found = wview.world_to_view.invert(null).concat(fndWorld_to_origin, null);
 			Se3_F64 expected = trueView.world_to_view.invert(null).concat(expWorld_to_origin, null);
 
@@ -104,8 +104,7 @@ class TestMetricFromUncalibratedPairwiseGraph extends BoofStandardJUnit {
 		// Should also check the inliers to see if they make sense.
 	}
 
-	@Test
-	void saveMetricSeed() {
+	@Test void saveMetricSeed() {
 		var graph = new PairwiseImageGraph();
 		List<String> viewIds = BoofMiscOps.asList("A", "B", "C");
 		List<ImageDimension> dimensions = new ArrayList<>();
@@ -134,8 +133,8 @@ class TestMetricFromUncalibratedPairwiseGraph extends BoofStandardJUnit {
 		}
 
 		var alg = new MetricFromUncalibratedPairwiseGraph();
-		alg.saveMetricSeed(graph, viewIds, dimensions, inlierToSeed, inlierToOther, results);
-		SceneWorkingGraph wgraph = alg.getWorkGraph();
+		var wgraph = new SceneWorkingGraph();
+		alg.saveMetricSeed(graph, viewIds, dimensions, inlierToSeed, inlierToOther, results, wgraph);
 
 		// See metric view info got saved correctly
 		BoofMiscOps.forIdx(viewIds, ( idx, viewId ) -> {
@@ -168,5 +167,20 @@ class TestMetricFromUncalibratedPairwiseGraph extends BoofStandardJUnit {
 				obs.forIdx(( i, value ) -> assertEquals(i*2 + 1 + c, value));
 			}
 		});
+	}
+
+	@Test void getLargestScene() {
+		var alg = new MetricFromUncalibratedPairwiseGraph();
+		// Create scenes with increasing number of views
+		alg.scenes.resize(4,(idx,scene)->{
+			for (int i = 0; i < idx; i++) {
+				var v = new PairwiseImageGraph.View();
+				v.init(i, i+"");
+				scene.addView(v);
+			}
+		});
+
+		// Test it against the known solution
+		assertSame(alg.scenes.getTail(), alg.getLargestScene());
 	}
 }
