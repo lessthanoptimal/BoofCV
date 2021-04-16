@@ -185,6 +185,26 @@ class TestConfigGenerator extends BoofStandardJUnit {
 	}
 
 	/**
+	 * A config references a object which doesn't implement Configuration but is very similar
+	 */
+	@Test void assignValue_NotConfig() {
+		var config = new ConfigParent();
+
+		ConfigGenerator.assignValue(config, "next.a", 5);
+		assertEquals(5, config.next.a);
+	}
+
+	/**
+	 * A config references a object which doesn't implement Configuration but is very similar
+	 */
+	@Test void getValue_NotConfig() {
+		var config = new ConfigParent();
+		config.next.a = 5;
+		int found = (Integer)ConfigGenerator.getValue(config, "next.a");
+		assertEquals(5, found);
+	}
+
+	/**
 	 * A config with different internal data types to test
 	 */
 	public static class ConfigDummyA implements Configuration {
@@ -233,6 +253,17 @@ class TestConfigGenerator extends BoofStandardJUnit {
 			this.valueDouble = src.valueDouble;
 			this.valueEnum = src.valueEnum;
 		}
+	}
+
+	public static class ConfigParent implements Configuration {
+		public int a = 0;
+		public final ConfigLike next = new ConfigLike();
+
+		@Override public void checkValidity() {}
+	}
+
+	public static class ConfigLike {
+		public int a = 0;
 	}
 
 	enum EnumType {

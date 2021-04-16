@@ -204,33 +204,28 @@ public abstract class ConfigGenerator<Config extends Configuration> {
 	 * Assigns a field in the config to the specified value.
 	 */
 	@SuppressWarnings("SelfAssignment")
-	public static <Config extends Configuration>
-	void assignValue( Config config, String path, Object value ) {
+	public static void assignValue( Object config, String path, Object value ) {
 		try {
 			String[] names = path.split("\\.");
 			// Traverse through the config until it gets to the variable
 			Field field = null;
 			Class<?> fieldType = null;
-			boolean finished = false;
 			for (int i = 0; i < names.length; i++) {
 				String fieldName = names[i];
 				field = config.getClass().getField(fieldName);
 				fieldType = field.getType();
-				if (Configuration.class.isAssignableFrom(fieldType)) {
-					config = (Config)field.get(config);
-					continue;
-				}
-				if (i + 1 != names.length) {
-					throw new RuntimeException("Path continued with configuration ended. names[" + i + "]=" + fieldName);
-				}
-				finished = true;
+
+				if (i + 1 < names.length)
+					config = field.get(config);
 			}
-			if (!finished)
-				throw new RuntimeException("Path did not end at a variable. " + fieldType.getName());
 
 			// Double are used as a common data type with floats
-			if (field.getType() == float.class && value.getClass() == Double.class)
+			if (fieldType == float.class && value.getClass() == Double.class)
 				value = (float)((double)value);
+			else if (fieldType != value.getClass() && fieldType != value.getClass().getField("TYPE").get(null))
+				throw new RuntimeException("Unexpected type. path=" + path + " expected=" +
+						value.getClass().getSimpleName() + " found=" + fieldType.getSimpleName());
+
 			// assign the new value
 			Objects.requireNonNull(field).set(config, value);
 		} catch (Exception e) {
@@ -242,29 +237,18 @@ public abstract class ConfigGenerator<Config extends Configuration> {
 		}
 	}
 
-	public static <Config extends Configuration>
-	Object getValue( Config config, String path ) {
+	public static Object getValue( Object config, String path ) {
 		try {
 			String[] names = path.split("\\.");
 			// Traverse through the config until it gets to the variable
 			Field field = null;
-			Class<?> fieldType = null;
-			boolean finished = false;
 			for (int i = 0; i < names.length; i++) {
 				String fieldName = names[i];
 				field = config.getClass().getField(fieldName);
-				fieldType = field.getType();
-				if (Configuration.class.isAssignableFrom(fieldType)) {
-					config = (Config)field.get(config);
-					continue;
-				}
-				if (i + 1 != names.length) {
-					throw new RuntimeException("Path continued with configuration ended. names[" + i + "]=" + fieldName);
-				}
-				finished = true;
+
+				if (i + 1 < names.length)
+					config = field.get(config);
 			}
-			if (!finished)
-				throw new RuntimeException("Path did not end at a variable. " + fieldType.getName());
 
 			return Objects.requireNonNull(field).get(config);
 		} catch (Exception e) {
@@ -281,24 +265,17 @@ public abstract class ConfigGenerator<Config extends Configuration> {
 	 */
 	protected void checkPath( String parameter, Class<?> variableType ) {
 		String[] names = parameter.split("\\.");
+		if (names.length==0)
+			throw new IllegalArgumentException("path of length 0. path="+parameter);
 
 		Class<?> pathType = type;
 		try {
-			boolean finished = false;
+			Field field;
 			for (int i = 0; i < names.length; i++) {
 				String fieldName = names[i];
-				Field field = pathType.getField(fieldName);
+				field = pathType.getField(fieldName);
 				pathType = field.getType();
-				if (Configuration.class.isAssignableFrom(pathType)) {
-					continue;
-				}
-				if (i + 1 != names.length) {
-					throw new RuntimeException("Path continued with configuration ended. names[" + i + "]=" + fieldName);
-				}
-				finished = true;
 			}
-			if (!finished)
-				throw new RuntimeException("Path did not end at a variable. " + parameter);
 		} catch (Exception e) {
 			// Keep the path clean and don't wrap the exception
 			if (e instanceof RuntimeException)
@@ -312,8 +289,8 @@ public abstract class ConfigGenerator<Config extends Configuration> {
 				throw new IllegalArgumentException("Expected floating point but found " + variableType.getSimpleName());
 		} else {
 			if (variableType != pathType)
-				throw new IllegalArgumentException(
-						"Expected " + pathType.getSimpleName() + " point but found " + variableType.getSimpleName());
+				throw new RuntimeException("Unexpected type. path=" + parameter + " expected=" +
+						variableType.getSimpleName() + " found=" + pathType.getSimpleName());
 		}
 	}
 
