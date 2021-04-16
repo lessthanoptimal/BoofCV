@@ -44,15 +44,15 @@ public class TestSelectNeighborsAroundView extends BoofStandardJUnit {
 
 		// there needs to be some inlier sets for this to work. Intentionally make this complex and force it
 		// to handle situations where the seed has no inliers, some views have no inliers in the candidate set
-		createInliers(working.viewList.get(2), 1, 4, working);
-		createInliers(working.viewList.get(4), 4, 5, working);
-		createInliers(working.viewList.get(7), 6, 8, working);
-		createInliers(working.viewList.get(11), 9, 12, working);
+		createInliers(working.workingViews.get(2), 1, 4, working);
+		createInliers(working.workingViews.get(4), 4, 5, working);
+		createInliers(working.workingViews.get(7), 6, 8, working);
+		createInliers(working.workingViews.get(11), 9, 12, working);
 
 		var alg = new SelectNeighborsAroundView();
 		alg.maxViews = 6;
 		alg.minNeighbors = 3;
-		SceneWorkingGraph.View seed = working.viewList.get(6);
+		SceneWorkingGraph.View seed = working.workingViews.get(6);
 		alg.process(seed, working);
 
 		// see if found local graph meets our request
@@ -68,9 +68,9 @@ public class TestSelectNeighborsAroundView extends BoofStandardJUnit {
 	private void checkLocalGraph( int numViews, int minNeighbors,
 								  SelectNeighborsAroundView alg, SceneWorkingGraph.View seed ) {
 		SceneWorkingGraph found = alg.getLocalWorking();
-		assertEquals(numViews, found.viewList.size());
+		assertEquals(numViews, found.workingViews.size());
 		int totalNeighbors = 0;
-		for (SceneWorkingGraph.View v : found.viewList) {
+		for (SceneWorkingGraph.View v : found.workingViews) {
 			if (v.pview.findMotion(seed.pview) != null) {
 				totalNeighbors++;
 			}
@@ -90,15 +90,15 @@ public class TestSelectNeighborsAroundView extends BoofStandardJUnit {
 		SceneWorkingGraph working = db.createWorkingGraph(pairwise);
 
 		// needs to have inliers
-		createInliers(working.viewList.get(6), 1, 12, working);
+		createInliers(working.workingViews.get(6), 1, 12, working);
 
 		// remove one view
-		SceneWorkingGraph.View removed = working.viewList.get(8);
+		SceneWorkingGraph.View removed = working.workingViews.get(8);
 		working.views.remove(removed.pview.id);
 
 		// if it doesn't blow up that's a success
 		var alg = new SelectNeighborsAroundView();
-		SceneWorkingGraph.View seed = working.viewList.get(6);
+		SceneWorkingGraph.View seed = working.workingViews.get(6);
 		alg.process(seed, working);
 	}
 
@@ -113,26 +113,26 @@ public class TestSelectNeighborsAroundView extends BoofStandardJUnit {
 		var alg = new SelectNeighborsAroundView();
 
 		// Start with a literal edge case that won't have the max number
-		alg.addNeighbors2(working.viewList.get(0), working);
+		alg.addNeighbors2(working.workingViews.get(0), working);
 		assertEquals(4, alg.candidates.size());
 		assertEquals(5, alg.lookup.size());
 		assertEquals(7, alg.edges.size);
-		assertFalse(alg.candidates.contains(working.viewList.get(0)));
+		assertFalse(alg.candidates.contains(working.workingViews.get(0)));
 		for (int id : new int[]{1, 2, 3, 4}) {
-			SceneWorkingGraph.View v = working.viewList.get(id);
+			SceneWorkingGraph.View v = working.workingViews.get(id);
 			assertTrue(alg.lookup.containsKey(v.pview.id));
 			assertTrue(alg.candidates.contains(v));
 		}
 
 		// Try another in the middle
 		alg.initialize();
-		alg.addNeighbors2(working.viewList.get(4), working);
+		alg.addNeighbors2(working.workingViews.get(4), working);
 		assertEquals(8, alg.candidates.size());
 		assertEquals(9, alg.lookup.size());
 		assertEquals(15, alg.edges.size);
-		assertFalse(alg.candidates.contains(working.viewList.get(4)));
+		assertFalse(alg.candidates.contains(working.workingViews.get(4)));
 		for (int id : new int[]{0, 1, 2, 3, 5, 6, 7, 8}) {
-			SceneWorkingGraph.View v = working.viewList.get(id);
+			SceneWorkingGraph.View v = working.workingViews.get(id);
 			assertTrue(alg.lookup.containsKey(v.pview.id));
 			assertTrue(alg.candidates.contains(v));
 		}
@@ -146,7 +146,7 @@ public class TestSelectNeighborsAroundView extends BoofStandardJUnit {
 		PairwiseImageGraph pairwise = db.createPairwise();
 		SceneWorkingGraph working = db.createWorkingGraph(pairwise);
 
-		SceneWorkingGraph.View seed = working.viewList.get(4);
+		SceneWorkingGraph.View seed = working.workingViews.get(4);
 		seed.pview.connections.forEach(m->m.score3D+=1000); // make it not want to select immediate neighbors
 		var alg = new SelectNeighborsAroundView();
 
@@ -252,8 +252,8 @@ public class TestSelectNeighborsAroundView extends BoofStandardJUnit {
 
 		var alg = new SelectNeighborsAroundView();
 		alg.minNeighbors = 2;
-		var seed = working.viewList.get(5);
-		var target = working.viewList.get(4);
+		var seed = working.workingViews.get(5);
+		var target = working.workingViews.get(4);
 		// easier to construct internal data structures this way
 		alg.addNeighbors2(seed, working);
 
@@ -268,7 +268,7 @@ public class TestSelectNeighborsAroundView extends BoofStandardJUnit {
 
 		// Now let's trigger the orphan removal by removing everything that would be connected to 1
 		for (int i = 2; i < 4; i++) {
-			alg.removeCandidateNode(working.viewList.get(i).pview.id, seed);
+			alg.removeCandidateNode(working.workingViews.get(i).pview.id, seed);
 		}
 		assertEquals(4, alg.candidates.size());
 		assertEquals(5, alg.lookup.size());
@@ -285,7 +285,7 @@ public class TestSelectNeighborsAroundView extends BoofStandardJUnit {
 		var alg = new SelectNeighborsAroundView();
 
 		// The 'lookup' map isn't populated so everything is an orphan
-		SceneWorkingGraph.View v1 = working.viewList.get(6);
+		SceneWorkingGraph.View v1 = working.workingViews.get(6);
 		assertTrue(alg.isOrphan(v1));
 
 		// Adding v1 to the known list shouldn't make it not an orphan
@@ -293,7 +293,7 @@ public class TestSelectNeighborsAroundView extends BoofStandardJUnit {
 		assertTrue(alg.isOrphan(v1));
 
 		// Adding v2 will make them both not orphans
-		SceneWorkingGraph.View v2 = working.viewList.get(7);
+		SceneWorkingGraph.View v2 = working.workingViews.get(7);
 		assertFalse(alg.isOrphan(v2));
 		alg.lookup.put(v2.pview.id, v2);
 		assertFalse(alg.isOrphan(v1));
@@ -307,12 +307,12 @@ public class TestSelectNeighborsAroundView extends BoofStandardJUnit {
 		PairwiseImageGraph pairwise = db.createPairwise();
 		SceneWorkingGraph working = db.createWorkingGraph(pairwise);
 		// Fill in arbitrary values for everything that has not already been filled in and will be checked
-		BoofMiscOps.forIdx(working.viewList, ( i, v ) -> {
+		BoofMiscOps.forIdx(working.workingViews, ( i, v ) -> {
 			v.intrinsic.f = 100 + i;
 			v.imageDimension.width = 97 + i;
 		});
 
-		SceneWorkingGraph.View seed = working.viewList.get(6);
+		SceneWorkingGraph.View seed = working.workingViews.get(6);
 
 		var alg = new SelectNeighborsAroundView();
 		alg.initialize();
@@ -329,16 +329,16 @@ public class TestSelectNeighborsAroundView extends BoofStandardJUnit {
 		// put ever view into this inlier set, except for 10. For that it will need to go outside
 		createInliers(seed, 2, 9, working);
 		// Inliers for 10 come from 11
-		createInliers(working.viewList.get(11), 10, 12, working);
+		createInliers(working.workingViews.get(11), 10, 12, working);
 		// Create the local graph
 		alg.initialize();
 		alg.addNeighbors2(seed, working);
 		alg.createLocalGraph(seed, working);
 		// examine the results
 		SceneWorkingGraph localGraph = alg.localWorking;
-		assertEquals(alg.candidates.size() + 1, localGraph.viewList.size());
+		assertEquals(alg.candidates.size() + 1, localGraph.workingViews.size());
 		for (int i = 2; i <= 10; i++) {
-			SceneWorkingGraph.View v = working.viewList.get(i);
+			SceneWorkingGraph.View v = working.workingViews.get(i);
 			SceneWorkingGraph.View lv = localGraph.views.get(v.pview.id);
 			assertNotNull(lv);
 
@@ -360,7 +360,7 @@ public class TestSelectNeighborsAroundView extends BoofStandardJUnit {
 								SceneWorkingGraph working ) {
 		// put ever view into this inlier set, except for 10. For that it will need to go outside
 		for (int i = idx0; i <= idx1; i++) {
-			PairwiseImageGraph.View pv = working.viewList.get(i).pview;
+			PairwiseImageGraph.View pv = working.workingViews.get(i).pview;
 			v.inliers.views.add(pv);
 			DogArray_I32 obs = v.inliers.observations.grow();
 			for (int j = 0; j < 5 + i; j++) {

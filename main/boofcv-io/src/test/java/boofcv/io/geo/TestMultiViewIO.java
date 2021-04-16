@@ -153,12 +153,12 @@ class TestMultiViewIO extends BoofStandardJUnit {
 	}
 
 	private void checkIdentical( SceneWorkingGraph a, SceneWorkingGraph b ) {
-		assertEquals(a.viewList.size(), b.viewList.size());
+		assertEquals(a.workingViews.size(), b.workingViews.size());
 		assertEquals(a.views.size(), b.views.size());
 
-		for (int viewIdx = 0; viewIdx < a.viewList.size(); viewIdx++) {
-			SceneWorkingGraph.View va = a.viewList.get(viewIdx);
-			SceneWorkingGraph.View vb = b.viewList.get(viewIdx);
+		for (int viewIdx = 0; viewIdx < a.workingViews.size(); viewIdx++) {
+			SceneWorkingGraph.View va = a.workingViews.get(viewIdx);
+			SceneWorkingGraph.View vb = b.workingViews.get(viewIdx);
 
 			assertSame(va, a.views.get(va.pview.id));
 			assertSame(vb, b.views.get(vb.pview.id));
@@ -195,7 +195,7 @@ class TestMultiViewIO extends BoofStandardJUnit {
 
 		var candidates = DogArray_I32.range(0, pairwise.nodes.size);
 
-		ret.viewList.forEach(v -> {
+		ret.workingViews.forEach(v -> {
 			v.intrinsic.f = rand.nextDouble();
 			v.intrinsic.k1 = rand.nextDouble();
 			v.intrinsic.k2 = rand.nextDouble();

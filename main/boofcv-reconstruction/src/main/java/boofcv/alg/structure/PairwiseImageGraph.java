@@ -33,10 +33,10 @@ import java.util.Map;
  */
 public class PairwiseImageGraph {
 
-	public DogArray<View> nodes = new DogArray<>(View::new);
-	public DogArray<Motion> edges = new DogArray<>(Motion::new, Motion::reset);
+	public final DogArray<View> nodes = new DogArray<>(View::new);
+	public final DogArray<Motion> edges = new DogArray<>(Motion::new, Motion::reset);
 
-	public Map<String, View> mapNodes = new HashMap<>();
+	public final Map<String, View> mapNodes = new HashMap<>();
 
 	public void reset() {
 		mapNodes.clear();
@@ -46,7 +46,7 @@ public class PairwiseImageGraph {
 
 	public View createNode( String id ) {
 		View v = nodes.grow();
-		v.init(id);
+		v.init(nodes.size-1, id);
 		mapNodes.put(id, v);
 		return v;
 	}
@@ -68,13 +68,17 @@ public class PairwiseImageGraph {
 	public static class View {
 		/** Unique identifier for this view */
 		public String id;
+		/** Array index of this view in the 'nodes' array */
+		public int index;
 		/** Total number of features observations in this view */
 		public int totalObservations;
 		/** List of motions associated with this view. It can be either the src or dst */
 		public FastArray<Motion> connections = new FastArray<>(Motion.class);
 
-		void init( String id ) {
+		void init( int index, String id ) {
 			this.id = id;
+			this.index = index;
+			this.totalObservations = 0;
 			this.connections.reset();
 		}
 

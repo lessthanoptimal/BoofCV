@@ -450,8 +450,8 @@ public class MultiViewIO {
 		out.println("# " + working.getClass().getSimpleName() + " in YAML format. BoofCV " + BoofVersion.VERSION);
 
 		List<Map<String, Object>> views = new ArrayList<>();
-		for (int viewIdx = 0; viewIdx < working.viewList.size(); viewIdx++) {
-			SceneWorkingGraph.View wview = working.viewList.get(viewIdx);
+		for (int viewIdx = 0; viewIdx < working.workingViews.size(); viewIdx++) {
+			SceneWorkingGraph.View wview = working.workingViews.get(viewIdx);
 //			assertEq(viewIdx,wview.index,"Inconsistent view index."); // not required to be valid always
 
 			Map<String, Object> element = new HashMap<>();

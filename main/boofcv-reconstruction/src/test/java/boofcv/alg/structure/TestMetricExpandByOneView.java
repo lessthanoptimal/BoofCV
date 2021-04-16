@@ -71,7 +71,7 @@ class TestMetricExpandByOneView extends BoofStandardJUnit {
 		PairwiseImageGraph.View target = pairwise.nodes.get(targetViewIdx);
 
 		// remove the view from the work graph
-		workGraph.viewList.remove(workGraph.views.remove(target.id));
+		workGraph.workingViews.remove(workGraph.views.remove(target.id));
 
 		// add the target view
 		assertTrue(alg.process(db, workGraph, target));
@@ -123,7 +123,7 @@ class TestMetricExpandByOneView extends BoofStandardJUnit {
 		// Decide which view will be estimated
 		PairwiseImageGraph.View target = pairwise.nodes.get(targetViewIdx);
 
-		workGraph.viewList.remove(workGraph.views.remove(target.id));
+		workGraph.workingViews.remove(workGraph.views.remove(target.id));
 
 		// This should fail and not add it to the work graph
 		assertFalse(alg.process(db, workGraph, target));

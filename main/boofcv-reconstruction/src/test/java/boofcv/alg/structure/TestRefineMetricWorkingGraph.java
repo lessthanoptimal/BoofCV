@@ -61,25 +61,25 @@ class TestRefineMetricWorkingGraph extends BoofStandardJUnit {
 				pathLine(5, 0.1, 0.6, 2);
 		var pairwise = db.createPairwise();
 		var graph = db.createWorkingGraph(pairwise);
-		graph.viewList.forEach(v -> v.intrinsic.setTo(new BundlePinholeSimplified(400, 0, 0)));
-		graph.viewList.forEach(v -> intrinsicZ.getDimension(v.imageDimension));
+		graph.workingViews.forEach(v -> v.intrinsic.setTo(new BundlePinholeSimplified(400, 0, 0)));
+		graph.workingViews.forEach(v -> intrinsicZ.getDimension(v.imageDimension));
 
 		// Create two views with inliers
-		graph.viewList.get(0).inliers.views.add(pairwise.nodes.get(0));
-		graph.viewList.get(0).inliers.views.add(pairwise.nodes.get(1));
-		graph.viewList.get(0).inliers.views.add(pairwise.nodes.get(2));
-		graph.viewList.get(0).inliers.views.add(pairwise.nodes.get(3));
-		selectObservations(db, graph.viewList.get(0).inliers);
-		graph.viewList.get(3).inliers.views.add(pairwise.nodes.get(2));
-		graph.viewList.get(3).inliers.views.add(pairwise.nodes.get(3));
-		graph.viewList.get(3).inliers.views.add(pairwise.nodes.get(4));
-		selectObservations(db, graph.viewList.get(3).inliers);
+		graph.workingViews.get(0).inliers.views.add(pairwise.nodes.get(0));
+		graph.workingViews.get(0).inliers.views.add(pairwise.nodes.get(1));
+		graph.workingViews.get(0).inliers.views.add(pairwise.nodes.get(2));
+		graph.workingViews.get(0).inliers.views.add(pairwise.nodes.get(3));
+		selectObservations(db, graph.workingViews.get(0).inliers);
+		graph.workingViews.get(3).inliers.views.add(pairwise.nodes.get(2));
+		graph.workingViews.get(3).inliers.views.add(pairwise.nodes.get(3));
+		graph.workingViews.get(3).inliers.views.add(pairwise.nodes.get(4));
+		selectObservations(db, graph.workingViews.get(3).inliers);
 
 		if (addNoise) {
 			// Make a few of the parameters in correct and see if it can recover from it. Observations are perfect
 			// so there is still a "perfect" global minimum
-			graph.viewList.get(2).world_to_view.T.x += 0.05;
-			graph.viewList.get(1).intrinsic.f += -100;
+			graph.workingViews.get(2).world_to_view.T.x += 0.05;
+			graph.workingViews.get(1).intrinsic.f += -100;
 		}
 		var alg = new RefineMetricWorkingGraph();
 		assertTrue(alg.process(db, graph));
@@ -87,7 +87,7 @@ class TestRefineMetricWorkingGraph extends BoofStandardJUnit {
 		// The scale is not locked and the first view is not at the origin. Let's just use reprojection error as
 		// a test since comparing translation is more complex
 		assertEquals(0.0, alg.bundleAdjustment.sba.getFitScore(), 1e-6);
-		BoofMiscOps.forIdx(graph.viewList, ( i, v ) -> {
+		BoofMiscOps.forIdx(graph.workingViews, ( i, v ) -> {
 			assertEquals(400, v.intrinsic.f, 1e-3);
 			assertEquals(0, v.intrinsic.k1, 1e-6);
 			assertEquals(0, v.intrinsic.k2, 1e-6);
@@ -134,19 +134,19 @@ class TestRefineMetricWorkingGraph extends BoofStandardJUnit {
 				pathLine(5, 0.1, 0.6, 2);
 		var pairwise = db.createPairwise();
 		var graph = db.createWorkingGraph(pairwise);
-		graph.viewList.forEach(v -> v.intrinsic.setTo(new BundlePinholeSimplified(400, 0, 0)));
-		graph.viewList.forEach(v -> intrinsicZ.getDimension(v.imageDimension));
+		graph.workingViews.forEach(v -> v.intrinsic.setTo(new BundlePinholeSimplified(400, 0, 0)));
+		graph.workingViews.forEach(v -> intrinsicZ.getDimension(v.imageDimension));
 
 		// Create two views with inliers
-		graph.viewList.get(0).inliers.views.add(pairwise.nodes.get(0));
-		graph.viewList.get(0).inliers.views.add(pairwise.nodes.get(1));
-		graph.viewList.get(0).inliers.views.add(pairwise.nodes.get(2));
-		graph.viewList.get(0).inliers.views.add(pairwise.nodes.get(3));
-		selectObservations(db, graph.viewList.get(0).inliers);
-		graph.viewList.get(3).inliers.views.add(pairwise.nodes.get(2));
-		graph.viewList.get(3).inliers.views.add(pairwise.nodes.get(3));
-		graph.viewList.get(3).inliers.views.add(pairwise.nodes.get(4));
-		selectObservations(db, graph.viewList.get(3).inliers);
+		graph.workingViews.get(0).inliers.views.add(pairwise.nodes.get(0));
+		graph.workingViews.get(0).inliers.views.add(pairwise.nodes.get(1));
+		graph.workingViews.get(0).inliers.views.add(pairwise.nodes.get(2));
+		graph.workingViews.get(0).inliers.views.add(pairwise.nodes.get(3));
+		selectObservations(db, graph.workingViews.get(0).inliers);
+		graph.workingViews.get(3).inliers.views.add(pairwise.nodes.get(2));
+		graph.workingViews.get(3).inliers.views.add(pairwise.nodes.get(3));
+		graph.workingViews.get(3).inliers.views.add(pairwise.nodes.get(4));
+		selectObservations(db, graph.workingViews.get(3).inliers);
 
 		var alg = new RefineMetricWorkingGraph();
 		assertTrue(alg.process(db, graph));
@@ -155,7 +155,7 @@ class TestRefineMetricWorkingGraph extends BoofStandardJUnit {
 		// The scale is not locked and the first view is not at the origin. Let's just use reprojection error as
 		// a test since comparing translation is more complex
 		assertEquals(0.0, alg.bundleAdjustment.sba.getFitScore(), 1e-6);
-		BoofMiscOps.forIdx(graph.viewList, ( i, v ) -> {
+		BoofMiscOps.forIdx(graph.workingViews, ( i, v ) -> {
 			assertEquals(400, v.intrinsic.f, 1e-3);
 			assertEquals(0, v.intrinsic.k1, 1e-6);
 			assertEquals(0, v.intrinsic.k2, 1e-6);
@@ -167,8 +167,8 @@ class TestRefineMetricWorkingGraph extends BoofStandardJUnit {
 		var db = new MockLookupSimilarImagesRealistic().pathLine(5, 0.3, 1.5, 2);
 		var pairwise = db.createPairwise();
 		var graph = db.createWorkingGraph(pairwise);
-		graph.viewList.forEach(v -> v.intrinsic.setTo(new BundlePinholeSimplified(400, 0, 0)));
-		graph.viewList.forEach(v -> db.intrinsic.getDimension(v.imageDimension));
+		graph.workingViews.forEach(v -> v.intrinsic.setTo(new BundlePinholeSimplified(400, 0, 0)));
+		graph.workingViews.forEach(v -> db.intrinsic.getDimension(v.imageDimension));
 
 		// create an inlier set composed of observations from 3 views
 		var inliers = new SceneWorkingGraph.InlierInfo();
@@ -210,8 +210,8 @@ class TestRefineMetricWorkingGraph extends BoofStandardJUnit {
 		var db = new MockLookupSimilarImagesRealistic().pathLine(5, 0.3, 1.5, 2);
 		var pairwise = db.createPairwise();
 		var graph = db.createWorkingGraph(pairwise);
-		graph.viewList.forEach(v -> v.intrinsic.setTo(new BundlePinholeSimplified(400, 0, 0)));
-		graph.viewList.forEach(v -> db.intrinsic.getDimension(v.imageDimension));
+		graph.workingViews.forEach(v -> v.intrinsic.setTo(new BundlePinholeSimplified(400, 0, 0)));
+		graph.workingViews.forEach(v -> db.intrinsic.getDimension(v.imageDimension));
 
 		var alg = new RefineMetricWorkingGraph() {
 			// Override so that it can return an error for which all should be accepted or rejected
@@ -246,7 +246,7 @@ class TestRefineMetricWorkingGraph extends BoofStandardJUnit {
 		// it keeps tracks of what was actually assigned by removing it
 		assertEquals(shouldReject ? unassignedOrig.size : 0, alg.unassigned.size);
 
-		BoofMiscOps.forIdx(graph.viewList, ( i, v ) -> {
+		BoofMiscOps.forIdx(graph.workingViews, ( i, v ) -> {
 			// See if the observation were added to the inliers and nothing changed for others
 			boolean isInlier = inliers.views.contains(v.pview);
 			int inlierViewIdx = inliers.views.indexOf(v.pview);
@@ -290,8 +290,8 @@ class TestRefineMetricWorkingGraph extends BoofStandardJUnit {
 		var db = new MockLookupSimilarImagesRealistic().pathLine(5, 0.3, 1.5, 2);
 		var pairwise = db.createPairwise();
 		var graph = db.createWorkingGraph(pairwise);
-		graph.viewList.forEach(v -> v.intrinsic.setTo(new BundlePinholeSimplified(400, 0, 0)));
-		graph.viewList.forEach(v -> db.intrinsic.getDimension(v.imageDimension));
+		graph.workingViews.forEach(v -> v.intrinsic.setTo(new BundlePinholeSimplified(400, 0, 0)));
+		graph.workingViews.forEach(v -> db.intrinsic.getDimension(v.imageDimension));
 
 		var alg = new RefineMetricWorkingGraph();
 		alg.initializeDataStructures(db, graph);

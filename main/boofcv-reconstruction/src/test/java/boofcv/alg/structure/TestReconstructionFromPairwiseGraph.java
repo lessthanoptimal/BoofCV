@@ -34,72 +34,73 @@ import static org.junit.jupiter.api.Assertions.*;
  */
 class TestReconstructionFromPairwiseGraph extends BoofStandardJUnit {
 
-	@Test
-	void addOpenForView() {
+	@Test void addOpenForView() {
 		var alg = new Helper();
 		PairwiseImageGraph graph = createLinearGraph(8, 1);
 
-		var found = new FastArray<>(PairwiseImageGraph.View.class);
+		var scene = new SceneWorkingGraph();
 
 		// it should add these two children since they are unknown
-		alg.addOpenForView(graph.nodes.get(4), found);
-		assertEquals(2, found.size);
-		assertTrue(found.contains(graph.nodes.get(3)));
-		assertTrue(found.contains(graph.nodes.get(5)));
+		alg.addOpenForView(scene, graph.nodes.get(4));
+		assertEquals(2, scene.open.size);
+		assertTrue(scene.open.contains(graph.nodes.get(3)));
+		assertTrue(scene.open.contains(graph.nodes.get(5)));
 
 		// they should not be added a second time
-		found.clear();
-		alg.addOpenForView(graph.nodes.get(4), found);
-		assertEquals(0, found.size);
+		scene.open.clear();
+		alg.addOpenForView(scene, graph.nodes.get(4));
+		assertEquals(0, scene.open.size);
 	}
 
 	/**
 	 * All three connections (a->b, a->c, b->c)  must have good scores for it to be selected
 	 */
-	@Test
-	void selectNextToProcess_AllScoresGood() {
+	@Test void selectNextToProcess_AllScoresGood() {
 		var alg = new Helper();
 
 		// Create a linear graph and make every node known and add it to the list
-		var open = new FastArray<>(PairwiseImageGraph.View.class);
 		PairwiseImageGraph graph = createLinearGraph(8, 2);
 		// Ensure every view has at most 3 connections to make designing this test easier
 		removeLastConnection(graph);
 
-		open.addAll(graph.nodes);
-		open.forIdx(( i, o ) -> alg.workGraph.addView(o));
-		PairwiseImageGraph.View expected = open.get(4); // make #4 only have a slightly better score, and a valid set of connections
+		var scene = new SceneWorkingGraph();
+		var selection = new ReconstructionFromPairwiseGraph.Expansion();
+
+		scene.open.addAll(graph.nodes);
+		scene.open.forIdx(( i, o ) -> scene.addView(o));
+		PairwiseImageGraph.View expected = scene.open.get(4); // make #4 only have a slightly better score, and a valid set of connections
 		PairwiseImageGraph.View expectedConnA = expected.connections.get(0).other(expected);
 		PairwiseImageGraph.View expectedConnB = expected.connections.get(1).other(expected);
 		expected.connections.get(0).score3D = 1.3;
 		expected.connections.get(1).score3D = 1.3;
 		expectedConnA.findMotion(expectedConnB).score3D = 1.3; // it picks the lowest scored connection
 
-		PairwiseImageGraph.View selected = alg.selectNextToProcess(open);
-		assertSame(expected, selected);
+		assertTrue(alg.selectNextToProcess(scene, selection));
+		assertSame(expected, scene.open.get(selection.openIdx));
 	}
 
 	/**
 	 * Ensures that only solutions which are known will be considered
 	 */
-	@Test
-	void selectNextToProcess_MustBeKnown() {
+	@Test void selectNextToProcess_MustBeKnown() {
 		var alg = new Helper();
 
 		// Create a linear graph and make every node known and add it to the list
-		var open = new FastArray<>(PairwiseImageGraph.View.class);
 		PairwiseImageGraph graph = createLinearGraph(8, 2);
 		// Ensure every view has at most 3 connections to make designing this test easier
 		removeLastConnection(graph);
 
-		open.addAll(graph.nodes);
+		var scene = new SceneWorkingGraph();
+		var selection = new ReconstructionFromPairwiseGraph.Expansion();
+
+		scene.open.addAll(graph.nodes);
 		// Only #7 will have a full set of known connections
-		open.forIdx(5, 8, ( i, o ) -> alg.workGraph.addView(o));
-		PairwiseImageGraph.View expected = open.get(7);
-		PairwiseImageGraph.View selected = alg.selectNextToProcess(open);
+		scene.open.forIdx(5, 8, ( i, o ) -> scene.addView(o));
+		PairwiseImageGraph.View expected = scene.open.get(7);
+		assertTrue(alg.selectNextToProcess(scene, selection));
 
 		// if all where known then #2 would be selected since it's earlier in the order
-		assertSame(expected, selected);
+		assertSame(expected, scene.open.get(selection.openIdx));
 	}
 
 	private void removeLastConnection( PairwiseImageGraph graph ) {
@@ -112,23 +113,24 @@ class TestReconstructionFromPairwiseGraph extends BoofStandardJUnit {
 	/**
 	 * Fail if two connections have no common connection between them
 	 */
-	@Test
-	void selectNextToProcess_TwoConnections_NoCommon() {
+	@Test void selectNextToProcess_TwoConnections_NoCommon() {
 		var alg = new Helper();
 
 		// Each view will have two connections but the connections with not be connected to each other
 		var open = new FastArray<>(PairwiseImageGraph.View.class);
 		PairwiseImageGraph graph = createLinearGraph(8, 1);
 
-		open.addAll(graph.nodes);
-		open.forIdx(( i, o ) -> alg.workGraph.addView(o));
+		var scene = new SceneWorkingGraph();
+		var selection = new ReconstructionFromPairwiseGraph.Expansion();
 
-		PairwiseImageGraph.View selected = alg.selectNextToProcess(open);
-		assertSame(null, selected);
+		open.addAll(graph.nodes);
+		open.forIdx(( i, o ) -> scene.addView(o));
+
+		assertFalse(alg.selectNextToProcess(scene, selection));
+		assertEquals(-1, selection.openIdx);
 	}
 
-	@Test
-	void selectSeeds() {
+	@Test void selectSeeds() {
 		var alg = new Helper();
 
 		// linear graph with each node/view just as good as any other
@@ -180,8 +182,7 @@ class TestReconstructionFromPairwiseGraph extends BoofStandardJUnit {
 		}
 	}
 
-	@Test
-	void score_view() {
+	@Test void score_view() {
 		var alg = new Helper();
 
 		// first has the best connection but should have a worse sum score

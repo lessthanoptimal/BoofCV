@@ -117,7 +117,7 @@ public class ExampleMultiViewDenseReconstruction {
 		// It needs a look up table to go from SBA view index to image name. It loads images as needed to perform
 		// stereo disparity
 		var viewToId = new TIntObjectHashMap<String>();
-		BoofMiscOps.forIdx(example.working.viewList, ( workIdxI, wv ) -> viewToId.put(wv.index, wv.pview.id));
+		BoofMiscOps.forIdx(example.working.workingViews, ( workIdxI, wv ) -> viewToId.put(wv.index, wv.pview.id));
 		if (!sparseToDense.process(example.scene, viewToId, imageLookup))
 			throw new RuntimeException("Dense reconstruction failed!");
 
