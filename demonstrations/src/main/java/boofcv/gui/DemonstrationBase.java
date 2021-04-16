@@ -120,9 +120,7 @@ public abstract class DemonstrationBase extends JPanel {
 
 			// smoother font
 			System.setProperty("apple.awt.textantialiasing", "true");
-		} catch (Exception ignore) {
-
-		}
+		} catch (Exception ignore) {}
 
 		// If the default layout manager tabbed panes will get smaller and smaller since it has a border
 		Insets insets = UIManager.getInsets("TabbedPane.contentBorderInsets");
@@ -462,8 +460,7 @@ public abstract class DemonstrationBase extends JPanel {
 //				System.out.println("  invalid URL");
 				url = null;
 			}
-		} catch (MalformedURLException ignore) {
-		}
+		} catch (MalformedURLException ignore) {}
 
 		if (url == null) {
 //			System.out.println("Invalid URL");
@@ -1035,22 +1032,9 @@ public abstract class DemonstrationBase extends JPanel {
 				// Throttle speed if requested
 				if (streamPeriod > 0) {
 					long time = Math.max(0, streamPeriod - (System.currentTimeMillis() - before));
-					if (time > 0) {
-						try {
-							Thread.sleep(time);
-						} catch (InterruptedException ignore) {
-						}
-					} else {
-						try {
-							Thread.sleep(5);
-						} catch (InterruptedException ignore) {
-						}
-					}
+					BoofMiscOps.sleep(time > 0 ? time : 5);
 				} else {
-					try {
-						Thread.sleep(5);
-					} catch (InterruptedException ignore) {
-					}
+					BoofMiscOps.sleep(5);
 				}
 				before = System.currentTimeMillis();
 
@@ -1063,10 +1047,7 @@ public abstract class DemonstrationBase extends JPanel {
 				if (streamPaused && inputMethod == InputMethod.VIDEO) {
 					enterPausedState();
 					while (streamPaused && !requestStop) {
-						try {
-							Thread.sleep(5);
-						} catch (InterruptedException ignore) {
-						}
+						BoofMiscOps.sleep(5);
 					}
 				}
 			}

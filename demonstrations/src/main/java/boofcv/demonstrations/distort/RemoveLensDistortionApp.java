@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -83,8 +83,7 @@ public class RemoveLensDistortionApp<T extends ImageBase<T>> extends Demonstrati
 			try {
 				model = CalibrationIO.load(UtilIO.ensureURL(c.getPath()));
 				break;
-			} catch (RuntimeException ignore) {
-			}
+			} catch (RuntimeException ignore) {}
 		}
 		if (model == null) {
 			System.err.println("Can't find camera model for this image");

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -123,8 +123,7 @@ public class ImageStreamSequence<T extends ImageBase<T>>
 	public void close() {
 		try {
 			in.close();
-		} catch (IOException ignore) {
-		}
+		} catch (IOException ignore) {}
 		in = null;
 	}
 

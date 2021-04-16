@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -303,8 +303,7 @@ public class FilePreviewChooser extends JPanel {
 				InterleavedU8 frame = sequence.next();
 				full = ConvertBufferedImage.convertTo(frame, null, true);
 			}
-		} catch (RuntimeException ignore) {
-		}
+		} catch (RuntimeException ignore) {}
 		return full;
 	}
 

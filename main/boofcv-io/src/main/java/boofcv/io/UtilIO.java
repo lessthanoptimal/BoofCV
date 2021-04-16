@@ -287,8 +287,7 @@ public class UtilIO {
 			} else {
 				return url.openStream();
 			}
-		} catch (IOException ignore) {
-		}
+		} catch (IOException ignore) {}
 		return null;
 	}
 
@@ -708,8 +707,7 @@ public class UtilIO {
 				} else if (url.getProtocol().equals("jar")) {
 					return listJarPrefix(url, prefix, suffix);
 				}
-			} catch (MalformedURLException ignore) {
-			}
+			} catch (MalformedURLException ignore) {}
 		}
 		if (!d.isDirectory())
 			throw new IllegalArgumentException("Must specify an directory. " + directory);
@@ -868,8 +866,7 @@ public class UtilIO {
 				} else if (url.getProtocol().equals("jar")) {
 					return listJarRegex(url, regex);
 				}
-			} catch (MalformedURLException ignore) {
-			}
+			} catch (MalformedURLException ignore) {}
 		}
 		if (!d.isDirectory())
 			throw new IllegalArgumentException("Must specify an directory. " + directory);
@@ -919,8 +916,7 @@ public class UtilIO {
 			} else {
 				throw new RuntimeException("Not sure what to do with this url. " + url.toString());
 			}
-		} catch (MalformedURLException ignore) {
-		}
+		} catch (MalformedURLException ignore) {}
 
 		File d = new File(directory);
 
@@ -955,8 +951,7 @@ public class UtilIO {
 			} else {
 				throw new RuntimeException("Not sure what to do with this url. " + url.toString());
 			}
-		} catch (MalformedURLException ignore) {
-		}
+		} catch (MalformedURLException ignore) {}
 
 		File d = new File(directory);
 
@@ -975,8 +970,7 @@ public class UtilIO {
 
 				if (mimeType.contains(type))
 					ret.add(f.getAbsolutePath());
-			} catch (IOException ignore) {
-			}
+			} catch (IOException ignore) {}
 		}
 
 		Collections.sort(ret);

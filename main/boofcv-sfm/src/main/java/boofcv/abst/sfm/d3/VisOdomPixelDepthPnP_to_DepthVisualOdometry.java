@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -80,8 +80,7 @@ public class VisOdomPixelDepthPnP_to_DepthVisualOdometry<Vis extends ImageBase<V
 			Point4D_F64 p = ((VisOdomBundleAdjustment.BTrack)active.get(index).getCookie()).worldLoc;
 			world.setTo(p.x/p.w, p.y/p.w, p.z/p.w);
 			return true;
-		} catch (RuntimeException ignore) {
-		}
+		} catch (RuntimeException ignore) { /* not handled */ }
 		world.setTo(((Point2D3D)active.get(index).getCookie()).getLocation());
 		return true;
 	}
@@ -111,8 +110,8 @@ public class VisOdomPixelDepthPnP_to_DepthVisualOdometry<Vis extends ImageBase<V
 		try {
 			Point2D3DTrack t = active.get(index).getCookie();
 			return t.lastInlier == alg.getFrameID();
-		} catch (RuntimeException ignore) {
-		}
+		} catch (RuntimeException ignore) {}
+
 		VisOdomMonoDepthPnP.Track t = active.get(index).getCookie();
 		return t.lastUsed == alg.getFrameID();
 	}

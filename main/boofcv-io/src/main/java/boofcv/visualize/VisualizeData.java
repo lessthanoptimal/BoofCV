@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -27,17 +27,16 @@ public class VisualizeData {
 	public static PointCloudViewer createPointCloudViewer() {
 
 		PointCloudViewer viewer = null;
-//		try {
-//			viewer = loadGenerator("boofcv.javafx.PointCloudViewerFX");
-//		} catch (RuntimeException e) {
-//		}
+		try {
+			viewer = loadGenerator("boofcv.javafx.PointCloudViewerFX");
+		} catch (RuntimeException ignore) {}
 
 		if (viewer == null) {
 			try {
 				viewer = loadGenerator("boofcv.gui.d3.PointCloudViewerSwing");
-			} catch (RuntimeException e) {
-			}
+			} catch (RuntimeException ignore) {}
 		}
+
 		if (viewer == null)
 			throw new RuntimeException("You must either add swing or javafx integration");
 

@@ -4,7 +4,7 @@ import org.gradle.api.tasks.testing.logging.TestExceptionFormat
 
 plugins {
     id "com.peterabeles.gversion" version "1.10" apply false
-    id "net.ltgt.errorprone" version "1.2.1" apply false
+    id "net.ltgt.errorprone" version "2.0.1" apply false
     id "com.diffplug.spotless" version "5.6.1" apply false
 }
 
@@ -57,7 +57,7 @@ subprojects {
         resolutionStrategy {
             force 'org.jetbrains:annotations:20.0.0'
             force 'com.google.guava:guava:30.1-jre'
-            force 'com.google.errorprone:error_prone_annotations:2.4.0'
+            force 'com.google.errorprone:error_prone_annotations:2.6.0'
             force 'com.google.code.findbugs:jsr305:3.0.2'
             force 'org.checkerframework:checker-qual:2.10.0'
         }
@@ -152,8 +152,7 @@ subprojects {
         annotationProcessor "org.projectlombok:lombok:${project.lombok_version}"  // @Getter @Setter
         noautoAnnotationProcessor "org.projectlombok:lombok:${project.lombok_version}"  // @Getter @Setter
 
-        errorprone("com.google.errorprone:error_prone_core:2.4.0")
-        errorproneJavac("com.google.errorprone:javac:9+181-r4173-1")
+        errorprone("com.google.errorprone:error_prone_core:2.6.0")
 
 //        // even if it's not used you still need to include the dependency
 //        annotationProcessor "com.uber.nullaway:nullaway:0.8.0"
@@ -172,8 +171,8 @@ subprojects {
                 "ReferenceEquality", // This is done intentionally a TON. Good test but not here
                 "MutablePublicArray", // Done intentionally in every case
                 "CatchAndPrintStackTrace", // Should clean up, but done too often right now
-                "FallThrough", // JDK-14 Error Prone BUG
                 "UnnecessaryParentheses", // Log SPAM due to JDK-14 Error Prone BUG
+                "SameNameButDifferent", // Lombok confuses it
                 "MissingSummary", "UnescapedEntity", "EmptyBlockTag")
         options.errorprone.error("MissingOverride", "MissingCasesInEnumSwitch", "BadInstanceof",
                 "PublicConstructorForAbstractClass", "NarrowingCompoundAssignment", "JdkObsolete")

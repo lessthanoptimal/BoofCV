@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -17,6 +17,8 @@
  */
 
 package boofcv.gui.image;
+
+import boofcv.misc.BoofMiscOps;
 
 import javax.swing.*;
 import java.awt.*;
@@ -90,10 +92,8 @@ public class AnimatePanel extends JPanel {
 			previousTime = 0;
 			synchronized(this){
 				while( running ) {
-					try {
-						wait(period);
-						repaint();
-					} catch (InterruptedException e) {}
+					BoofMiscOps.sleep(period);
+					repaint();
 				}
 			}
 		}
