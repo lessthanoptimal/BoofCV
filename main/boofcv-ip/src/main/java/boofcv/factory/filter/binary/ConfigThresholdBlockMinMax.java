@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -17,7 +17,6 @@
  */
 
 package boofcv.factory.filter.binary;
-
 
 import boofcv.struct.ConfigLength;
 import lombok.Getter;
@@ -40,11 +39,11 @@ public class ConfigThresholdBlockMinMax extends ConfigThreshold {
 		scale = 0.85;
 	}
 
-	public ConfigThresholdBlockMinMax(int width , double minimumSpread, boolean down ) {
-		this(ConfigLength.fixed(width),minimumSpread,down);
+	public ConfigThresholdBlockMinMax( int width, double minimumSpread, boolean down ) {
+		this(ConfigLength.fixed(width), minimumSpread, down);
 	}
 
-	public ConfigThresholdBlockMinMax(ConfigLength width , double minimumSpread, boolean down ) {
+	public ConfigThresholdBlockMinMax( ConfigLength width, double minimumSpread, boolean down ) {
 		this.type = ThresholdType.BLOCK_MIN_MAX;
 		this.width = width;
 		this.minimumSpread = minimumSpread;

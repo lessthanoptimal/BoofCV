@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -29,13 +29,11 @@ import boofcv.abst.filter.binary.BinaryLabelContourFinderChang2004;
  */
 public class FactoryBinaryContourFinder {
 	/**
-	 *
-	 * @see boofcv.alg.filter.binary.LinearContourLabelChang2004
-	 *
 	 * @return new instance
+	 * @see boofcv.alg.filter.binary.LinearContourLabelChang2004
 	 */
 	public static BinaryLabelContourFinder linearChang2004() {
-		if( BOverrideFactoryBinaryContourFinder.chang2004 != null ) {
+		if (BOverrideFactoryBinaryContourFinder.chang2004 != null) {
 			return BOverrideFactoryBinaryContourFinder.chang2004.createChang2004();
 		} else {
 			return new BinaryLabelContourFinderChang2004();

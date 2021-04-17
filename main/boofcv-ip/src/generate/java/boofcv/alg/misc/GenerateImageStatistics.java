@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -184,7 +184,7 @@ public class GenerateImageStatistics extends CodeGeneratorBase {
 		out.print("\t/**\n" +
 				"\t * Returns the mean pixel intensity value.\n" +
 				"\t * \n" +
-				"\t * @param img Input image.  Not modified.\n" +
+				"\t * @param img Input image. Not modified.\n" +
 				"\t * @return Mean pixel intensity value\n" +
 				"\t */\n" +
 				"\tpublic static " + sumType + " mean( " + input.getImageName(family) + " img ) {\n" +
@@ -200,7 +200,7 @@ public class GenerateImageStatistics extends CodeGeneratorBase {
 				"\t * Computes the variance of pixel intensity values inside the image.\n" +
 				"\t *\n" +
 				"\t * @param img Input image. Not modified.\n" +
-				"\t * @param mean Mean pixel intensity value.   \n" +
+				"\t * @param mean Mean pixel intensity value.\n" +
 				"\t * @return Pixel variance   \n" +
 				"\t */\n" +
 				"\tpublic static " + sumType + " variance( " + input.getSingleBandName() + " img, " + sumType + " mean ) {\n" +

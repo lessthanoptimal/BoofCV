@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -38,13 +38,13 @@ public abstract class BilinearPixelS<T extends ImageGray<T>> implements Interpol
 	protected int height;
 
 	@Override
-	public void setBorder(ImageBorder<T> border) {
+	public void setBorder( ImageBorder<T> border ) {
 		this.border = border;
 	}
 
 	@Override
-	public void setImage(T image) {
-		if( border != null )
+	public void setImage( T image ) {
+		if (border != null)
 			border.setImage(image);
 		this.orig = image;
 		this.stride = orig.getStride();
@@ -58,8 +58,8 @@ public abstract class BilinearPixelS<T extends ImageGray<T>> implements Interpol
 	}
 
 	@Override
-	public boolean isInFastBounds(float x, float y) {
-		return !(x < 0 || y < 0 || x > width-2 || y > height-2);
+	public boolean isInFastBounds( float x, float y ) {
+		return !(x < 0 || y < 0 || x > width - 2 || y > height - 2);
 	}
 
 	@Override

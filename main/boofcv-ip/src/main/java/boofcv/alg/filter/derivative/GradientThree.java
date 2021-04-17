@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -31,7 +31,6 @@ import boofcv.struct.convolve.Kernel1D_S32;
 import boofcv.struct.image.*;
 import org.jetbrains.annotations.Nullable;
 
-
 /**
  * <p>
  * Computes the image's first derivative along the x and y axises using [-1 0 1] kernel.
@@ -49,128 +48,125 @@ import org.jetbrains.annotations.Nullable;
  */
 public class GradientThree {
 
-	public static Kernel1D_S32 kernelDeriv_I32 = new Kernel1D_S32(new int[]{-1,0,1},3);
-	public static Kernel1D_F32 kernelDeriv_F32 = new Kernel1D_F32(new float[]{-0.5f,0,0.5f},3);
+	public static Kernel1D_S32 kernelDeriv_I32 = new Kernel1D_S32(new int[]{-1, 0, 1}, 3);
+	public static Kernel1D_F32 kernelDeriv_F32 = new Kernel1D_F32(new float[]{-0.5f, 0, 0.5f}, 3);
 
 	/**
 	 * Returns the kernel for computing the derivative along the x-axis.
 	 */
 	public static Kernel1D getKernelX( boolean isInteger ) {
-		if( isInteger )
+		if (isInteger)
 			return kernelDeriv_I32;
 		else
 			return kernelDeriv_F32;
 	}
 
-	public static<I extends ImageGray<I>,D extends ImageGray<D>> void process(I input , D derivX , D derivY ,
-																			  @Nullable ImageBorder border)
-	{
-		switch( input.getImageType().getDataType()) {
-			case U8: process((GrayU8)input,(GrayS16)derivX, (GrayS16) derivY , (ImageBorder_S32)border); break;
-			case S16: process((GrayS16)input,(GrayS16)derivX, (GrayS16) derivY , (ImageBorder_S32)border); break;
-			case F32: process((GrayF32)input,(GrayF32)derivX, (GrayF32) derivY , (ImageBorder_F32)border); break;
-			default:
-				throw new IllegalArgumentException("Unknown input image type");
+	public static <I extends ImageGray<I>, D extends ImageGray<D>> void process( I input, D derivX, D derivY,
+																				 @Nullable ImageBorder border ) {
+		switch (input.getImageType().getDataType()) {
+			case U8 -> process((GrayU8)input, (GrayS16)derivX, (GrayS16)derivY, (ImageBorder_S32)border);
+			case S16 -> process((GrayS16)input, (GrayS16)derivX, (GrayS16)derivY, (ImageBorder_S32)border);
+			case F32 -> process((GrayF32)input, (GrayF32)derivX, (GrayF32)derivY, (ImageBorder_F32)border);
+			default -> throw new IllegalArgumentException("Unknown input image type");
 		}
 	}
 
 	/**
 	 * Computes the derivative of an {@link GrayU8} along the x and y axes.
 	 *
-	 * @param orig   Which which is to be differentiated. Not Modified.
+	 * @param orig Which which is to be differentiated. Not Modified.
 	 * @param derivX Derivative along the x-axis. Modified.
 	 * @param derivY Derivative along the y-axis. Modified.
 	 * @param border Specifies how the image border is handled. If null the border is not processed.
 	 */
-	public static void process(GrayU8 orig,
-							   GrayS16 derivX,
-							   GrayS16 derivY, @Nullable ImageBorder_S32 border ) {
+	public static void process( GrayU8 orig,
+								GrayS16 derivX,
+								GrayS16 derivY, @Nullable ImageBorder_S32 border ) {
 		InputSanityCheck.reshapeOneIn(orig, derivX, derivY);
 
-		if( BoofConcurrency.USE_CONCURRENT ) {
+		if (BoofConcurrency.USE_CONCURRENT) {
 			GradientThree_Standard_MT.process(orig, derivX, derivY);
 		} else {
 			GradientThree_Standard.process(orig, derivX, derivY);
 		}
 
-		if( border != null ) {
-			DerivativeHelperFunctions.processBorderHorizontal(orig, derivX , kernelDeriv_I32, border);
-			DerivativeHelperFunctions.processBorderVertical(orig, derivY , kernelDeriv_I32, border);
+		if (border != null) {
+			DerivativeHelperFunctions.processBorderHorizontal(orig, derivX, kernelDeriv_I32, border);
+			DerivativeHelperFunctions.processBorderVertical(orig, derivY, kernelDeriv_I32, border);
 		}
 	}
 
 	/**
 	 * Computes the derivative of an {@link GrayU8} along the x and y axes.
 	 *
-	 * @param orig   Which which is to be differentiated. Not Modified.
+	 * @param orig Which which is to be differentiated. Not Modified.
 	 * @param derivX Derivative along the x-axis. Modified.
 	 * @param derivY Derivative along the y-axis. Modified.
 	 * @param border Specifies how the image border is handled. If null the border is not processed.
 	 */
-	public static void process(GrayU8 orig,
-							   GrayS32 derivX,
-							   GrayS32 derivY, @Nullable ImageBorder_S32 border ) {
+	public static void process( GrayU8 orig,
+								GrayS32 derivX,
+								GrayS32 derivY, @Nullable ImageBorder_S32 border ) {
 		InputSanityCheck.reshapeOneIn(orig, derivX, derivY);
 
-		if( BoofConcurrency.USE_CONCURRENT ) {
+		if (BoofConcurrency.USE_CONCURRENT) {
 			GradientThree_Standard_MT.process(orig, derivX, derivY);
 		} else {
 			GradientThree_Standard.process(orig, derivX, derivY);
 		}
 
-		if( border != null ) {
-			DerivativeHelperFunctions.processBorderHorizontal(orig, derivX , kernelDeriv_I32, border);
-			DerivativeHelperFunctions.processBorderVertical(orig, derivY , kernelDeriv_I32, border);
+		if (border != null) {
+			DerivativeHelperFunctions.processBorderHorizontal(orig, derivX, kernelDeriv_I32, border);
+			DerivativeHelperFunctions.processBorderVertical(orig, derivY, kernelDeriv_I32, border);
 		}
 	}
 
 	/**
 	 * Computes the derivative of an {@link GrayS16} along the x and y axes.
 	 *
-	 * @param orig   Which which is to be differentiated. Not Modified.
+	 * @param orig Which which is to be differentiated. Not Modified.
 	 * @param derivX Derivative along the x-axis. Modified.
 	 * @param derivY Derivative along the y-axis. Modified.
 	 * @param border Specifies how the image border is handled. If null the border is not processed.
 	 */
-	public static void process(GrayS16 orig,
-							   GrayS16 derivX,
-							   GrayS16 derivY, @Nullable ImageBorder_S32 border) {
+	public static void process( GrayS16 orig,
+								GrayS16 derivX,
+								GrayS16 derivY, @Nullable ImageBorder_S32 border ) {
 		InputSanityCheck.reshapeOneIn(orig, derivX, derivY);
 
-		if( BoofConcurrency.USE_CONCURRENT ) {
+		if (BoofConcurrency.USE_CONCURRENT) {
 			GradientThree_Standard_MT.process(orig, derivX, derivY);
 		} else {
 			GradientThree_Standard.process(orig, derivX, derivY);
 		}
 
-		if( border != null ) {
-			DerivativeHelperFunctions.processBorderHorizontal(orig, derivX , kernelDeriv_I32, border);
-			DerivativeHelperFunctions.processBorderVertical(orig, derivY , kernelDeriv_I32, border);
+		if (border != null) {
+			DerivativeHelperFunctions.processBorderHorizontal(orig, derivX, kernelDeriv_I32, border);
+			DerivativeHelperFunctions.processBorderVertical(orig, derivY, kernelDeriv_I32, border);
 		}
 	}
 
 	/**
 	 * Computes the derivative of an {@link GrayF32} along the x and y axes.
 	 *
-	 * @param orig   Which which is to be differentiated. Not Modified.
+	 * @param orig Which which is to be differentiated. Not Modified.
 	 * @param derivX Derivative along the x-axis. Modified.
 	 * @param derivY Derivative along the y-axis. Modified.
 	 * @param border Specifies how the image border is handled. If null the border is not processed.
 	 */
-	public static void process(GrayF32 orig,
-							   GrayF32 derivX,
-							   GrayF32 derivY, @Nullable ImageBorder_F32 border) {
+	public static void process( GrayF32 orig,
+								GrayF32 derivX,
+								GrayF32 derivY, @Nullable ImageBorder_F32 border ) {
 		InputSanityCheck.reshapeOneIn(orig, derivX, derivY);
 
-		if( BoofConcurrency.USE_CONCURRENT ) {
+		if (BoofConcurrency.USE_CONCURRENT) {
 			GradientThree_Standard_MT.process(orig, derivX, derivY);
 		} else {
 			GradientThree_Standard.process(orig, derivX, derivY);
 		}
-		if( border != null ) {
-			DerivativeHelperFunctions.processBorderHorizontal(orig, derivX , kernelDeriv_F32, border);
-			DerivativeHelperFunctions.processBorderVertical(orig, derivY , kernelDeriv_F32, border);
+		if (border != null) {
+			DerivativeHelperFunctions.processBorderHorizontal(orig, derivX, kernelDeriv_F32, border);
+			DerivativeHelperFunctions.processBorderVertical(orig, derivY, kernelDeriv_F32, border);
 		}
 	}
-
 }

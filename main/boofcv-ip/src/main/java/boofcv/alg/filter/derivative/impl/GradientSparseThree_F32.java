@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -38,7 +38,7 @@ public class GradientSparseThree_F32 implements SparseImageGradient<GrayF32,Grad
 	GradientValue_F32 gradient = new GradientValue_F32();
 
 	/**
-	 * Specifies how border pixels are handled.  If null then the border is not handled.
+	 * Specifies how border pixels are handled. If null then the border is not handled.
 	 * @param border how borders are handled
 	 */
 	public GradientSparseThree_F32(ImageBorder_F32 border) {

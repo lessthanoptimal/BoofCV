@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -620,7 +620,7 @@ public class GeneratePixelMath extends CodeGeneratorBase {
 				"\t *\n" +
 				"\t * @param mean (Input) Image with local mean\n" +
 				"\t * @param pow2 (Input) Image with local mean pixel-wise power of 2 \n" +
-				"\t * @param stdev (Output) standard deviation of each pixel. Can be same instance as either input.  \n" +
+				"\t * @param stdev (Output) standard deviation of each pixel. Can be same instance as either input.\n" +
 				"\t */\n" +
 				"\tpublic static void stdev( " + typeMean.getSingleBandName() + " mean , " + typePow2.getSingleBandName() + " pow2 , " + typeMean.getSingleBandName() + " stdev) {\n" +
 				"\n" +

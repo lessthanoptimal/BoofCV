@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -18,13 +18,11 @@
 
 package boofcv.alg.filter.kernel;
 
-
 /**
  * Computes the magnitude of each basis function
  *
  * @author Peter Abeles
  */
 public interface SteerableCoefficients {
-
-	public double compute( double angle , int basis );
+	double compute( double angle, int basis );
 }

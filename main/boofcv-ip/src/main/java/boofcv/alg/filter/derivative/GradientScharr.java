@@ -78,7 +78,7 @@ public class GradientScharr {
 	/**
 	 * Computes the derivative in the X and Y direction using an integer Sobel edge detector.
 	 *
-	 * @param orig Input image.  Not modified.
+	 * @param orig Input image. Not modified.
 	 * @param derivX Storage for image derivative along the x-axis. Modified.
 	 * @param derivY Storage for image derivative along the y-axis. Modified.
 	 * @param border Specifies how the image border is handled. If null the border is not processed.
@@ -102,7 +102,7 @@ public class GradientScharr {
 	/**
 	 * Computes the derivative in the X and Y direction using an integer Sobel edge detector.
 	 *
-	 * @param orig Input image.  Not modified.
+	 * @param orig Input image. Not modified.
 	 * @param derivX Storage for image derivative along the x-axis. Modified.
 	 * @param derivY Storage for image derivative along the y-axis. Modified.
 	 * @param border Specifies how the image border is handled. If null the border is not processed.
@@ -126,7 +126,7 @@ public class GradientScharr {
 	/**
 	 * Computes the derivative in the X and Y direction using an integer Sobel edge detector.
 	 *
-	 * @param orig Input image.  Not modified.
+	 * @param orig Input image. Not modified.
 	 * @param derivX Storage for image derivative along the x-axis. Modified.
 	 * @param derivY Storage for image derivative along the y-axis. Modified.
 	 * @param border Specifies how the image border is handled. If null the border is not processed.

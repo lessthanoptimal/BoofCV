@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -21,7 +21,6 @@ package boofcv.alg.interpolate;
 import boofcv.struct.border.ImageBorder;
 import boofcv.struct.image.ImageBase;
 import boofcv.struct.image.ImageType;
-
 
 /**
  * Interface for interpolation between pixels on a per-pixel basis.  If a whole rectangular region needs
@@ -48,7 +47,7 @@ public interface InterpolatePixel<T extends ImageBase<T>> {
 	 *
 	 * @param image An image.
 	 */
-	void setImage(T image);
+	void setImage( T image );
 
 	/**
 	 * Returns the image which is being interpolated.
@@ -62,9 +61,9 @@ public interface InterpolatePixel<T extends ImageBase<T>> {
 	 *
 	 * @param x Point's x-coordinate.
 	 * @param y Point's y-coordinate.
-	 * @return  true if get_fast() can be called.
+	 * @return true if get_fast() can be called.
 	 */
-	boolean isInFastBounds(float x, float y);
+	boolean isInFastBounds( float x, float y );
 
 	/**
 	 * Border around the image that fast interpolation cannot be called.
@@ -89,5 +88,4 @@ public interface InterpolatePixel<T extends ImageBase<T>> {
 	 * Type of image it can process
 	 */
 	ImageType<T> getImageType();
-
 }

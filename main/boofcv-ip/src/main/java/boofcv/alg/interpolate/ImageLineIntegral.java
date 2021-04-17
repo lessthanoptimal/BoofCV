@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -52,7 +52,6 @@ public class ImageLineIntegral {
 	// length of the line just computed
 	double length;
 
-
 	/**
 	 * Specify input image.
 	 *
@@ -72,12 +71,12 @@ public class ImageLineIntegral {
 	 * @param y1 end point of line segment. y-coordinate
 	 * @return line integral
 	 */
-	public double compute(double x0, double y0, double x1, double y1) {
+	public double compute( double x0, double y0, double x1, double y1 ) {
 
 		double sum = 0;
 
-		double slopeX = x1-x0;
-		double slopeY = y1-y0;
+		double slopeX = x1 - x0;
+		double slopeY = y1 - y0;
 
 		length = Math.sqrt(slopeX*slopeX + slopeY*slopeY);
 
@@ -87,9 +86,9 @@ public class ImageLineIntegral {
 		int px = (int)x0;
 		int py = (int)y0;
 
-		if( slopeX == 0 || slopeY == 0 ) {
+		if (slopeX == 0 || slopeY == 0) {
 			// handle a pathological case
-			if( slopeX == slopeY )
+			if (slopeX == slopeY)
 				return 0;
 
 			double t;
@@ -99,11 +98,11 @@ public class ImageLineIntegral {
 				t = slopeX > 0 ? px + 1 - x0 : px - x0;
 			}
 
-			t /= (slopeX+slopeY);
+			t /= (slopeX + slopeY);
 			if (t > 1) t = 1;
-			if( t > 0 )
-				sum += t * image.unsafe_getD(px, py);
-			double deltaT = (sgnX+sgnY)/ (slopeX+slopeY);
+			if (t > 0)
+				sum += t*image.unsafe_getD(px, py);
+			double deltaT = (sgnX + sgnY)/(slopeX + slopeY);
 
 			while (t < 1) {
 				px += sgnX;
@@ -114,7 +113,7 @@ public class ImageLineIntegral {
 					actualDeltaT = 1 - t;
 				}
 				t = nextT;
-				sum += actualDeltaT * image.unsafe_getD(px, py);
+				sum += actualDeltaT*image.unsafe_getD(px, py);
 			}
 		} else {
 			double deltaTX = slopeX > 0 ? px + 1 - x0 : px - x0;
@@ -122,10 +121,10 @@ public class ImageLineIntegral {
 			deltaTX /= slopeX;
 			deltaTY /= slopeY;
 
-			double t = Math.min(deltaTX,deltaTY);
+			double t = Math.min(deltaTX, deltaTY);
 			if (t > 1) t = 1;
-			if( t > 0 )
-				sum += t * image.unsafe_getD(px, py);
+			if (t > 0)
+				sum += t*image.unsafe_getD(px, py);
 
 			double x = x0 + t*slopeX;
 			double y = y0 + t*slopeY;
@@ -134,26 +133,26 @@ public class ImageLineIntegral {
 			int nx = px + sgnX;
 			int ny = py + sgnY;
 
-			while( t < 1 ) {
-				deltaTX = (nx-x)/slopeX; // TODO reformulate so that very small slope values can be handled?
-				deltaTY = (ny-y)/slopeY;
+			while (t < 1) {
+				deltaTX = (nx - x)/slopeX; // TODO reformulate so that very small slope values can be handled?
+				deltaTY = (ny - y)/slopeY;
 
-				double deltaT = Math.min(deltaTX,deltaTY);
+				double deltaT = Math.min(deltaTX, deltaTY);
 
 				// see if it already hit the destination
-				if( deltaT <= UtilEjml.TEST_F64 ) {
-					deltaT = Math.max(deltaTX,deltaTY);
+				if (deltaT <= UtilEjml.TEST_F64) {
+					deltaT = Math.max(deltaTX, deltaTY);
 				}
 				double nextT = t + deltaT;
-				if( nextT > 1 ) {
-					deltaT = 1-t;
+				if (nextT > 1) {
+					deltaT = 1 - t;
 				}
 
 				double sampleT = t + 0.5f*deltaT;
 				x = x0 + sampleT*slopeX;
 				y = y0 + sampleT*slopeY;
 
-				sum += deltaT*image.unsafe_getD((int)x,(int)y);
+				sum += deltaT*image.unsafe_getD((int)x, (int)y);
 				t = t + deltaT;
 				x = x0 + t*slopeX;
 				y = y0 + t*slopeY;
@@ -161,7 +160,6 @@ public class ImageLineIntegral {
 				py = (int)y;
 				nx = px + sgnX;
 				ny = py + sgnY;
-
 			}
 		}
 
@@ -184,11 +182,12 @@ public class ImageLineIntegral {
 	 * @return true if inside or false if outside
 	 */
 	public boolean isInside( double x, double y ) {
-		return BoofMiscOps.isInside(image.getWidth(),image.getHeight(),x,y);
+		return BoofMiscOps.isInside(image.getWidth(), image.getHeight(), x, y);
 	}
 
 	/**
 	 * Returns the line segment's length
+	 *
 	 * @return length
 	 */
 	public double getLength() {

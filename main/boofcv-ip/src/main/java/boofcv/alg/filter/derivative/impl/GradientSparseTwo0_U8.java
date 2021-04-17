@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -38,7 +38,7 @@ public class GradientSparseTwo0_U8 implements SparseImageGradient<GrayU8,Gradien
 	GradientValue_I32 gradient = new GradientValue_I32();
 
 	/**
-	 * Specifies how border pixels are handled.  If null then the border is not handled.
+	 * Specifies how border pixels are handled. If null then the border is not handled.
 	 * @param border how borders are handled
 	 */
 	public GradientSparseTwo0_U8(ImageBorder_S32<GrayU8> border) {

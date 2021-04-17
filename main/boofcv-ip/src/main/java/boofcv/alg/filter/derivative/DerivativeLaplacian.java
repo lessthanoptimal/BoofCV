@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -50,7 +50,7 @@ import org.jetbrains.annotations.Nullable;
  * </pre>
  * </p>
  * <p>
- * This formulation is derived by using the [-1 1 0] and [0 -1 1] difference kernels for the image derivative.  Alternative
+ * This formulation is derived by using the [-1 1 0] and [0 -1 1] difference kernels for the image derivative. Alternative
  * formulations can be found using other kernels.
  * </p>
  * <p>
@@ -67,7 +67,7 @@ public class DerivativeLaplacian {
 	/**
 	 * Computes the Laplacian of input image.
 	 *
-	 * @param orig  Input image.  Not modified.
+	 * @param orig  Input image. Not modified.
 	 * @param deriv Where the Laplacian is written to. Modified.
 	 */
 	public static void process(GrayU8 orig, GrayS16 deriv, @Nullable ImageBorder_S32<GrayU8> border ) {
@@ -107,7 +107,7 @@ public class DerivativeLaplacian {
 	/**
 	 * Computes the Laplacian of 'orig'.
 	 *
-	 * @param orig  Input image.  Not modified.
+	 * @param orig  Input image. Not modified.
 	 * @param deriv Where the Laplacian is written to. Modified.
 	 */
 	public static void process(GrayF32 orig, GrayF32 deriv, @Nullable ImageBorder_F32 border) {

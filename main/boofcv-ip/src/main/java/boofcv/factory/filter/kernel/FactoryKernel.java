@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -42,73 +42,73 @@ import java.util.Random;
 @SuppressWarnings({"ForLoopReplaceableByForEach", "unchecked"})
 public class FactoryKernel {
 
-	public static <T extends KernelBase> T createKernelForImage( int width , int offset, int DOF , ImageDataType type ) {
+	public static <T extends KernelBase> T createKernelForImage( int width, int offset, int DOF, ImageDataType type ) {
 		boolean isFloat = !type.isInteger();
 		int numBits = Math.max(32, type.getNumBits());
 
-		return createKernel(width,offset,DOF,isFloat,numBits);
+		return createKernel(width, offset, DOF, isFloat, numBits);
 	}
 
-	public static <T extends KernelBase> T createKernelForImage( int width , int offset, int DOF , Class imageType ) {
+	public static <T extends KernelBase> T createKernelForImage( int width, int offset, int DOF, Class imageType ) {
 		boolean isFloat = GeneralizedImageOps.isFloatingPoint(imageType);
 		int numBits = Math.max(32, GeneralizedImageOps.getNumBits(imageType));
 
-		return createKernel(width,offset,DOF,isFloat,numBits);
+		return createKernel(width, offset, DOF, isFloat, numBits);
 	}
 
-	public static <T extends KernelBase> T createKernel(int width , int offset, int DOF, boolean isFloat, int numBits ) {
-		if( DOF == 1 ) {
-			if( isFloat ) {
-				if( numBits == 32 )
-					return (T)new Kernel1D_F32(width,offset);
-				else if( numBits == 64 )
-					return (T)new Kernel1D_F64(width,offset);
+	public static <T extends KernelBase> T createKernel( int width, int offset, int DOF, boolean isFloat, int numBits ) {
+		if (DOF == 1) {
+			if (isFloat) {
+				if (numBits == 32)
+					return (T)new Kernel1D_F32(width, offset);
+				else if (numBits == 64)
+					return (T)new Kernel1D_F64(width, offset);
 			} else {
-				if( numBits == 32 )
-					return (T)new Kernel1D_S32(width,offset);
+				if (numBits == 32)
+					return (T)new Kernel1D_S32(width, offset);
 			}
-		} else if( DOF == 2 ) {
-			if( isFloat ) {
-				if( numBits == 32 )
-					return (T)new Kernel2D_F32(width,offset);
-				else if( numBits == 64 )
-					return (T)new Kernel2D_F64(width,offset);
+		} else if (DOF == 2) {
+			if (isFloat) {
+				if (numBits == 32)
+					return (T)new Kernel2D_F32(width, offset);
+				else if (numBits == 64)
+					return (T)new Kernel2D_F64(width, offset);
 			} else {
-				if( numBits == 32 )
-					return (T)new Kernel2D_S32(width,offset);
+				if (numBits == 32)
+					return (T)new Kernel2D_S32(width, offset);
 			}
 		}
-		throw new IllegalArgumentException("Unsupported specifications. DOF = "+DOF+" float = "+isFloat+" bits = "+numBits);
+		throw new IllegalArgumentException("Unsupported specifications. DOF = " + DOF + " float = " + isFloat + " bits = " + numBits);
 	}
 
-	public static Kernel1D createKernel1D( int offset , int data[] , Class kernelType ) {
+	public static Kernel1D createKernel1D( int offset, int data[], Class kernelType ) {
 		Kernel1D out;
 
-		if( kernelType == Kernel1D_F32.class ) {
-			out = new Kernel1D_F32(data.length,offset);
-		} else if( kernelType == Kernel1D_F64.class ) {
-			out = new Kernel1D_F64(data.length,offset);
-		} else if( kernelType == Kernel1D_S32.class ) {
-			out = new Kernel1D_S32(data.length,offset);
+		if (kernelType == Kernel1D_F32.class) {
+			out = new Kernel1D_F32(data.length, offset);
+		} else if (kernelType == Kernel1D_F64.class) {
+			out = new Kernel1D_F64(data.length, offset);
+		} else if (kernelType == Kernel1D_S32.class) {
+			out = new Kernel1D_S32(data.length, offset);
 		} else {
-			throw new RuntimeException("Unknown kernel type "+kernelType.getSimpleName());
+			throw new RuntimeException("Unknown kernel type " + kernelType.getSimpleName());
 		}
 
 		for (int i = 0; i < data.length; i++) {
-			out.setD(i,data[i]);
+			out.setD(i, data[i]);
 		}
 
 		return out;
 	}
 
 	public static void setTable( KernelBase kernel ) {
-		if( kernel instanceof Kernel2D_F32 ) {
+		if (kernel instanceof Kernel2D_F32) {
 			Kernel2D_F32 k = (Kernel2D_F32)kernel;
 			Arrays.fill(k.data, 1.0f/(k.width*k.width));
-		} else if( kernel instanceof Kernel2D_F64 ) {
+		} else if (kernel instanceof Kernel2D_F64) {
 			Kernel2D_F64 k = (Kernel2D_F64)kernel;
 			Arrays.fill(k.data, 1.0/(k.width*k.width));
-		} else if( kernel instanceof Kernel2D_S32 ) {
+		} else if (kernel instanceof Kernel2D_S32) {
 			Kernel2D_S32 k = (Kernel2D_S32)kernel;
 			Arrays.fill(k.data, 1);
 		}
@@ -126,8 +126,8 @@ public class FactoryKernel {
 	 * @param radius kernel's radius.
 	 * @return table kernel.
 	 */
-	public static Kernel1D_S32 table1D_S32(int radius) {
-		Kernel1D_S32 ret = new Kernel1D_S32(radius * 2 + 1);
+	public static Kernel1D_S32 table1D_S32( int radius ) {
+		Kernel1D_S32 ret = new Kernel1D_S32(radius*2 + 1);
 
 		for (int i = 0; i < ret.data.length; i++) {
 			ret.data[i] = 1;
@@ -136,7 +136,7 @@ public class FactoryKernel {
 		return ret;
 	}
 
-	public static Kernel1D_S32 table1D_S32(int offset, int length) {
+	public static Kernel1D_S32 table1D_S32( int offset, int length ) {
 		Kernel1D_S32 ret = new Kernel1D_S32(length, offset);
 
 		for (int i = 0; i < length; i++) {
@@ -159,10 +159,10 @@ public class FactoryKernel {
 	 * @param radius kernel's radius.
 	 * @return table kernel.
 	 */
-	public static Kernel1D_F32 table1D_F32(int radius, boolean normalized) {
-		Kernel1D_F32 ret = new Kernel1D_F32(radius * 2 + 1);
+	public static Kernel1D_F32 table1D_F32( int radius, boolean normalized ) {
+		Kernel1D_F32 ret = new Kernel1D_F32(radius*2 + 1);
 
-		float val = normalized ? 1.0f / ret.width : 1.0f;
+		float val = normalized ? 1.0f/ret.width : 1.0f;
 
 		for (int i = 0; i < ret.data.length; i++) {
 			ret.data[i] = val;
@@ -171,10 +171,10 @@ public class FactoryKernel {
 		return ret;
 	}
 
-	public static Kernel1D_F32 table1D_F32(int offset, int length, boolean normalized) {
-		Kernel1D_F32 ret = new Kernel1D_F32(length,offset);
+	public static Kernel1D_F32 table1D_F32( int offset, int length, boolean normalized ) {
+		Kernel1D_F32 ret = new Kernel1D_F32(length, offset);
 
-		float val = normalized ? 1.0f / ret.width : 1.0f;
+		float val = normalized ? 1.0f/ret.width : 1.0f;
 
 		for (int i = 0; i < length; i++) {
 			ret.data[i] = val;
@@ -183,20 +183,20 @@ public class FactoryKernel {
 		return ret;
 	}
 
-	public static Kernel1D_F64 table1D_F64(int radius, boolean normalized) {
-		Kernel1D_F64 ret = new Kernel1D_F64(radius * 2 + 1);
+	public static Kernel1D_F64 table1D_F64( int radius, boolean normalized ) {
+		Kernel1D_F64 ret = new Kernel1D_F64(radius*2 + 1);
 
-		double val = normalized ? 1.0 / ret.width : 1.0;
+		double val = normalized ? 1.0/ret.width : 1.0;
 
 		Arrays.fill(ret.data, val);
 
 		return ret;
 	}
 
-	public static Kernel1D_F64 table1D_F64(int offset, int length, boolean normalized) {
-		Kernel1D_F64 ret = new Kernel1D_F64(length,offset);
+	public static Kernel1D_F64 table1D_F64( int offset, int length, boolean normalized ) {
+		Kernel1D_F64 ret = new Kernel1D_F64(length, offset);
 
-		double val = normalized ? 1.0 / ret.width : 1.0;
+		double val = normalized ? 1.0/ret.width : 1.0;
 
 		Arrays.fill(ret.data, val);
 
@@ -214,29 +214,27 @@ public class FactoryKernel {
 	 * @param rand Random number generator.
 	 * @return The generated kernel.
 	 */
-	public static <T extends KernelBase> T random( Class<?> type , int radius , int min , int max , Random rand )
-	{
-		int width = radius*2+1;
+	public static <T extends KernelBase> T random( Class<?> type, int radius, int min, int max, Random rand ) {
+		int width = radius*2 + 1;
 
-		return random(type,width,radius,min,max,rand);
+		return random(type, width, radius, min, max, rand);
 	}
 
-	public static <T extends KernelBase> T random( Class<?> type , int width , int offset , int min , int max , Random rand )
-	{
+	public static <T extends KernelBase> T random( Class<?> type, int width, int offset, int min, int max, Random rand ) {
 		if (Kernel1D_F32.class == type) {
-			return (T) FactoryKernel.random1D_F32(width, offset, min, max, rand);
+			return (T)FactoryKernel.random1D_F32(width, offset, min, max, rand);
 		} else if (Kernel1D_F64.class == type) {
-			return (T) FactoryKernel.random1D_F64(width, offset, min, max, rand);
+			return (T)FactoryKernel.random1D_F64(width, offset, min, max, rand);
 		} else if (Kernel1D_S32.class == type) {
-			return (T) FactoryKernel.random1D_I32(width, offset, min, max, rand);
+			return (T)FactoryKernel.random1D_I32(width, offset, min, max, rand);
 		} else if (Kernel2D_S32.class == type) {
-			return (T) FactoryKernel.random2D_I32(width, offset, min, max, rand);
+			return (T)FactoryKernel.random2D_I32(width, offset, min, max, rand);
 		} else if (Kernel2D_F32.class == type) {
-			return (T) FactoryKernel.random2D_F32(width, offset, min, max, rand);
+			return (T)FactoryKernel.random2D_F32(width, offset, min, max, rand);
 		} else if (Kernel2D_F64.class == type) {
-			return (T) FactoryKernel.random2D_F64(width, offset, min, max, rand);
+			return (T)FactoryKernel.random2D_F64(width, offset, min, max, rand);
 		} else {
-			throw new RuntimeException("Unknown kernel type. "+type.getSimpleName());
+			throw new RuntimeException("Unknown kernel type. " + type.getSimpleName());
 		}
 	}
 
@@ -245,13 +243,13 @@ public class FactoryKernel {
 	 *
 	 * @param width Kernel's width.
 	 * @param offset Offset for element zero in the kernel
-	 * @param min	minimum value.
-	 * @param max	maximum value.
-	 * @param rand   Random number generator.
+	 * @param min minimum value.
+	 * @param max maximum value.
+	 * @param rand Random number generator.
 	 * @return Randomized kernel.
 	 */
-	public static Kernel1D_S32 random1D_I32(int width , int offset, int min, int max, Random rand) {
-		Kernel1D_S32 ret = new Kernel1D_S32(width,offset);
+	public static Kernel1D_S32 random1D_I32( int width, int offset, int min, int max, Random rand ) {
+		Kernel1D_S32 ret = new Kernel1D_S32(width, offset);
 
 		int range = max - min;
 		for (int i = 0; i < ret.data.length; i++) {
@@ -266,29 +264,28 @@ public class FactoryKernel {
 	 *
 	 * @param width Kernel's width.
 	 * @param offset Offset for element zero in the kernel
-	 * @param min	minimum value.
-	 * @param max	maximum value.
-	 * @param rand   Random number generator.
+	 * @param min minimum value.
+	 * @param max maximum value.
+	 * @param rand Random number generator.
 	 * @return Randomized kernel.
 	 */
-	public static Kernel1D_F32 random1D_F32(int width , int offset, float min, float max, Random rand) {
-		Kernel1D_F32 ret = new Kernel1D_F32(width,offset);
+	public static Kernel1D_F32 random1D_F32( int width, int offset, float min, float max, Random rand ) {
+		Kernel1D_F32 ret = new Kernel1D_F32(width, offset);
 
 		float range = max - min;
 		for (int i = 0; i < ret.data.length; i++) {
-			ret.data[i] = rand.nextFloat() * range + min;
+			ret.data[i] = rand.nextFloat()*range + min;
 		}
 
 		return ret;
 	}
 
-
-	public static Kernel1D_F64 random1D_F64(int width , int offset, double min, double max, Random rand) {
-		Kernel1D_F64 ret = new Kernel1D_F64(width,offset);
+	public static Kernel1D_F64 random1D_F64( int width, int offset, double min, double max, Random rand ) {
+		Kernel1D_F64 ret = new Kernel1D_F64(width, offset);
 
 		double range = max - min;
 		for (int i = 0; i < ret.data.length; i++) {
-			ret.data[i] = rand.nextDouble() * range + min;
+			ret.data[i] = rand.nextDouble()*range + min;
 		}
 
 		return ret;
@@ -299,13 +296,13 @@ public class FactoryKernel {
 	 *
 	 * @param width Kernel's width.
 	 * @param offset Offset for element zero in the kernel
-	 * @param min	minimum value.
-	 * @param max	maximum value.
-	 * @param rand   Random number generator.
+	 * @param min minimum value.
+	 * @param max maximum value.
+	 * @param rand Random number generator.
 	 * @return Randomized kernel.
 	 */
-	public static Kernel2D_S32 random2D_I32(int width , int offset, int min, int max, Random rand) {
-		Kernel2D_S32 ret = new Kernel2D_S32(width,offset);
+	public static Kernel2D_S32 random2D_I32( int width, int offset, int min, int max, Random rand ) {
+		Kernel2D_S32 ret = new Kernel2D_S32(width, offset);
 
 		int range = max - min;
 		for (int i = 0; i < ret.data.length; i++) {
@@ -320,17 +317,17 @@ public class FactoryKernel {
 	 *
 	 * @param width Kernel's width.
 	 * @param offset Offset for element zero in the kernel
-	 * @param min	minimum value.
-	 * @param max	maximum value.
-	 * @param rand   Random number generator.
+	 * @param min minimum value.
+	 * @param max maximum value.
+	 * @param rand Random number generator.
 	 * @return Randomized kernel.
 	 */
-	public static Kernel2D_F32 random2D_F32(int width , int offset, float min, float max, Random rand) {
-		Kernel2D_F32 ret = new Kernel2D_F32(width,offset);
+	public static Kernel2D_F32 random2D_F32( int width, int offset, float min, float max, Random rand ) {
+		Kernel2D_F32 ret = new Kernel2D_F32(width, offset);
 
 		float range = max - min;
 		for (int i = 0; i < ret.data.length; i++) {
-			ret.data[i] = rand.nextFloat() * range + min;
+			ret.data[i] = rand.nextFloat()*range + min;
 		}
 
 		return ret;
@@ -341,48 +338,48 @@ public class FactoryKernel {
 	 *
 	 * @param width Kernel's width.
 	 * @param offset Offset for element zero in the kernel
-	 * @param min	minimum value.
-	 * @param max	maximum value.
-	 * @param rand   Random number generator.
+	 * @param min minimum value.
+	 * @param max maximum value.
+	 * @param rand Random number generator.
 	 * @return Randomized kernel.
 	 */
-	public static Kernel2D_F64 random2D_F64(int width , int offset, double min, double max, Random rand) {
-		Kernel2D_F64 ret = new Kernel2D_F64(width,offset);
+	public static Kernel2D_F64 random2D_F64( int width, int offset, double min, double max, Random rand ) {
+		Kernel2D_F64 ret = new Kernel2D_F64(width, offset);
 
 		double range = max - min;
 		for (int i = 0; i < ret.data.length; i++) {
-			ret.data[i] = rand.nextDouble() * range + min;
+			ret.data[i] = rand.nextDouble()*range + min;
 		}
 
 		return ret;
 	}
 
-	public static <K1 extends Kernel1D , K2 extends Kernel2D>
+	public static <K1 extends Kernel1D, K2 extends Kernel2D>
 	Class<K1> get1DType( Class<K2> kernelType ) {
-		if( kernelType == Kernel2D_F32.class )
+		if (kernelType == Kernel2D_F32.class)
 			return (Class<K1>)Kernel1D_F32.class;
 		else
 			return (Class<K1>)Kernel1D_S32.class;
 	}
 
 	public static <K extends KernelBase, T extends ImageGray>
-	Class<K> getKernelType(ImageDataType type , int DOF ) {
-		if( type == ImageDataType.F32 ) {
-			if( DOF == 1 )
+	Class<K> getKernelType( ImageDataType type, int DOF ) {
+		if (type == ImageDataType.F32) {
+			if (DOF == 1)
 				return (Class)Kernel1D_F32.class;
 			else
 				return (Class)Kernel2D_F32.class;
-		} else if( type.isInteger() ) {
-			if( DOF == 1 )
+		} else if (type.isInteger()) {
+			if (DOF == 1)
 				return (Class)Kernel1D_S32.class;
 			else
 				return (Class)Kernel2D_S32.class;
 		}
-		throw new IllegalArgumentException("Unknown image type: "+type);
+		throw new IllegalArgumentException("Unknown image type: " + type);
 	}
 
 	public static <K extends KernelBase, T extends ImageGray>
-	Class<K> getKernelType( Class<T> imageType , int DOF ) {
-		return getKernelType( ImageDataType.classToType(imageType), DOF);
+	Class<K> getKernelType( Class<T> imageType, int DOF ) {
+		return getKernelType(ImageDataType.classToType(imageType), DOF);
 	}
 }

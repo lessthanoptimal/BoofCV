@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -20,7 +20,6 @@ package boofcv.alg.interpolate;
 
 import boofcv.struct.image.ImageBase;
 
-
 /**
  * Interface for interpolation between pixels on a per-pixel basis for a multi-band image.
  *
@@ -28,7 +27,7 @@ import boofcv.struct.image.ImageBase;
  */
 // TODO experiment with adding an offset to the "values" array.  That way it can potentially write directly into
 //      the output image
-public interface InterpolatePixelMB<T extends ImageBase<T>> extends InterpolatePixel<T>{
+public interface InterpolatePixelMB<T extends ImageBase<T>> extends InterpolatePixel<T> {
 
 	/**
 	 * Returns the interpolated pixel values at the specified location while taking in account
@@ -39,7 +38,7 @@ public interface InterpolatePixelMB<T extends ImageBase<T>> extends InterpolateP
 	 * @param y Point's y-coordinate. y &ge; 0 && y &lt; image.height
 	 * @param values Interpolated value across all bands.
 	 */
-	void get(float x, float y, float []values );
+	void get( float x, float y, float[] values );
 
 	/**
 	 * Returns the interpolated pixel values at the specified location while assuming it is inside
@@ -49,12 +48,11 @@ public interface InterpolatePixelMB<T extends ImageBase<T>> extends InterpolateP
 	 * @param y Point's y-coordinate.
 	 * @param values Interpolated value across all bands.
 	 */
-	void get_fast(float x, float y, float []values );
+	void get_fast( float x, float y, float[] values );
 
 	/**
 	 * Creates a new instance of this interpolation method
 	 */
 	@Override
 	InterpolatePixelMB<T> copy();
-
 }

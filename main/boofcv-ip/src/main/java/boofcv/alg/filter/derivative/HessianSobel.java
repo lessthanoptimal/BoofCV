@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -34,13 +34,13 @@ import org.jetbrains.annotations.Nullable;
 
 /**
  * <p>
- * Computes the second derivative (Hessian) of an image using.  This hessian is derived using the {@link GradientSobel}
+ * Computes the second derivative (Hessian) of an image using. This hessian is derived using the {@link GradientSobel}
  * gradient function.
  * </p>
  *
  * <p>
  * WARNING: It is computationally more expensive to compute the Hessian with this operation than applying the Sobel
- * gradient operator multiple times.  However, this does not require the creation additional storage to save
+ * gradient operator multiple times. However, this does not require the creation additional storage to save
  * intermediate results.
  * </p>
  *
@@ -108,14 +108,9 @@ public class HessianSobel {
 																				 D derivXX, D derivYY, D derivXY,
 																				 @Nullable ImageBorder border ) {
 		switch (input.getImageType().getDataType()) {
-			case U8:
-				process((GrayU8)input, (GrayS16)derivXX, (GrayS16)derivYY, (GrayS16)derivXY, (ImageBorder_S32)border);
-				break;
-			case F32:
-				process((GrayF32)input, (GrayF32)derivXX, (GrayF32)derivYY, (GrayF32)derivXY, (ImageBorder_F32)border);
-				break;
-			default:
-				throw new IllegalArgumentException("Unknown input image type");
+			case U8 -> process((GrayU8)input, (GrayS16)derivXX, (GrayS16)derivYY, (GrayS16)derivXY, (ImageBorder_S32)border);
+			case F32 -> process((GrayF32)input, (GrayF32)derivXX, (GrayF32)derivYY, (GrayF32)derivXY, (ImageBorder_F32)border);
+			default -> throw new IllegalArgumentException("Unknown input image type");
 		}
 	}
 

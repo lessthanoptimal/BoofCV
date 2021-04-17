@@ -25,7 +25,7 @@ import boofcv.struct.image.*;
 import java.util.Random;
 
 /**
- * Generalized version of {@link ImageMiscOps}.  Type checking is performed at runtime instead of at compile type.
+ * Generalized version of {@link ImageMiscOps}. Type checking is performed at runtime instead of at compile type.
  *
  * @author Peter Abeles
  */
@@ -362,7 +362,7 @@ public class GImageMiscOps {
 	/**
 	 * Draws a filled rectangle that is aligned along the image axis inside the image.
 	 *
-	 * @param input Image the rectangle is drawn in.  Modified
+	 * @param input Image the rectangle is drawn in. Modified
 	 * @param value Value of the rectangle
 	 * @param x0 Top left x-coordinate
 	 * @param y0 Top left y-coordinate
@@ -412,11 +412,11 @@ public class GImageMiscOps {
 	}
 
 	/**
-	 * Sets each value in the image to a value drawn from a Gaussian distribution.  A user
+	 * Sets each value in the image to a value drawn from a Gaussian distribution. A user
 	 * specified lower and upper bound is provided to ensure that the values are within a legal
-	 * range.  A drawn value outside the allowed range will be set to the closest bound.
+	 * range. A drawn value outside the allowed range will be set to the closest bound.
 	 *
-	 * @param input Input image.  Modified.
+	 * @param input Input image. Modified.
 	 * @param rand Random number generator
 	 * @param mean Distribution's mean.
 	 * @param sigma Distribution's standard deviation.
@@ -468,10 +468,10 @@ public class GImageMiscOps {
 	/**
 	 * Sets each value in the image to a value drawn from an uniform distribution that has a range of min &le; X < max.
 	 *
-	 * @param input Image which is to be filled.  Modified,
+	 * @param input Image which is to be filled. Modified,
 	 * @param rand Random number generator
-	 * @param min Minimum value of the distribution.  Inclusive.
-	 * @param max Maximum value of the distribution.  Inclusive.
+	 * @param min Minimum value of the distribution. Inclusive.
+	 * @param max Maximum value of the distribution. Inclusive.
 	 */
 	public static void fillUniform( ImageBase input, Random rand, double min, double max ) {
 		if (input instanceof ImageGray) {
@@ -535,10 +535,10 @@ public class GImageMiscOps {
 	}
 
 	/**
-	 * Adds Gaussian/normal i.i.d noise to each pixel in the image.  If a value exceeds the specified
+	 * Adds Gaussian/normal i.i.d noise to each pixel in the image. If a value exceeds the specified
 	 * it will be set to the closest bound.
 	 *
-	 * @param input Input image.  Modified.
+	 * @param input Input image. Modified.
 	 * @param rand Random number generator.
 	 * @param sigma Distributions standard deviation.
 	 * @param lowerBound Allowed lower bound
@@ -596,7 +596,7 @@ public class GImageMiscOps {
 	}
 
 	/**
-	 * Adds uniform i.i.d noise to each pixel in the image.  Noise range is min &le; X < max.
+	 * Adds uniform i.i.d noise to each pixel in the image. Noise range is min &le; X < max.
 	 */
 	public static void addUniform( ImageBase input, Random rand, double min, double max ) {
 		if (input instanceof ImageGray) {
@@ -711,7 +711,7 @@ public class GImageMiscOps {
 	}
 
 	/**
-	 * In-place 90 degree image rotation in the clockwise direction.  Only works on
+	 * In-place 90 degree image rotation in the clockwise direction. Only works on
 	 * square images.
 	 */
 	public static void rotateCW( ImageBase image ) {
@@ -789,7 +789,7 @@ public class GImageMiscOps {
 	}
 
 	/**
-	 * In-place 90 degree image rotation in the counter-clockwise direction.  Only works on
+	 * In-place 90 degree image rotation in the counter-clockwise direction. Only works on
 	 * square images.
 	 */
 	public static void rotateCCW( ImageBase image ) {

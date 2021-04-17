@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -31,33 +31,35 @@ public class ImageNormalization {
 
 	/**
 	 * Applies the normalization to the image.
+	 *
 	 * @param input Input image.
 	 * @param parameter Normalziation parameters
 	 * @param output Output image. Can be the same instance as the input image.
 	 */
-	public static void apply(ImageGray input, NormalizeParameters parameter, ImageGray output) {
-		GPixelMath.plus(input,parameter.offset,output);
-		GPixelMath.multiply(output,1.0f/parameter.divisor,output);
+	public static void apply( ImageGray input, NormalizeParameters parameter, ImageGray output ) {
+		GPixelMath.plus(input, parameter.offset, output);
+		GPixelMath.multiply(output, 1.0f/parameter.divisor, output);
 	}
 
 	/**
 	 * Normalizes the image so that the max abs of the image is 1.
+	 *
 	 * @param input Input image
 	 * @param output Scaled output image.
 	 * @param parameters the parameters
 	 */
-	public static void maxAbsOfOne( ImageGray input , ImageGray output , @Nullable NormalizeParameters parameters ) {
+	public static void maxAbsOfOne( ImageGray input, ImageGray output, @Nullable NormalizeParameters parameters ) {
 		output.reshape(input);
-		if( output.getDataType().isInteger() )
+		if (output.getDataType().isInteger())
 			throw new IllegalArgumentException("Output must be a floating point image");
 		double scale = GImageStatistics.maxAbs(input);
 
-		if( scale == 0.0 ) {
+		if (scale == 0.0) {
 			scale = 1.0;
 		} else {
-			GPixelMath.multiply(input, 1.0f / scale, output);
+			GPixelMath.multiply(input, 1.0f/scale, output);
 		}
-		if( parameters != null ) {
+		if (parameters != null) {
 			parameters.offset = 0.0;
 			parameters.divisor = scale;
 		}
@@ -65,17 +67,18 @@ public class ImageNormalization {
 
 	/**
 	 * Ensures that the output image has a mean zero and a max abs(pixel) of 1
+	 *
 	 * @param input Input image
 	 * @param output Scaled output image.
 	 */
-	public static void zeroMeanMaxOne(ImageGray input , ImageGray output , @Nullable NormalizeParameters parameters ) {
+	public static void zeroMeanMaxOne( ImageGray input, ImageGray output, @Nullable NormalizeParameters parameters ) {
 		output.reshape(input);
-		if( output.getDataType().isInteger() )
+		if (output.getDataType().isInteger())
 			throw new IllegalArgumentException("Output must be a floating point image");
 
 		// Numerical errors is a concern and if you sum up the input it could overflow
 		double scale = GImageStatistics.maxAbs(input);
-		if( scale != 0.0 ) {
+		if (scale != 0.0) {
 			GPixelMath.multiply(input, 1.0f/scale, output);
 			// Work with this scaled image
 			double mean = GImageStatistics.mean(output);
@@ -87,14 +90,14 @@ public class ImageNormalization {
 				// image is scaled from 0 to 1.0
 				scale2 = mean < 0.5 ? 1.0 - mean : mean;
 			}
-			if( scale2 != 0.0 )
+			if (scale2 != 0.0)
 				GPixelMath.multiply(output, 1.0f/scale2, output);
 			else
 				scale2 = 1.0;
 
 			if (parameters != null) {
-				parameters.offset = -mean * scale;
-				parameters.divisor = scale * scale2;
+				parameters.offset = -mean*scale;
+				parameters.divisor = scale*scale2;
 			}
 		} else {
 			if (parameters != null) {
@@ -111,26 +114,26 @@ public class ImageNormalization {
 	 * @param input Input image
 	 * @param output Scaled output image.
 	 */
-	public static void zeroMeanStdOne(ImageGray input , ImageGray output , @Nullable NormalizeParameters parameters ) {
+	public static void zeroMeanStdOne( ImageGray input, ImageGray output, @Nullable NormalizeParameters parameters ) {
 		output.reshape(input);
-		if( output.getDataType().isInteger() )
+		if (output.getDataType().isInteger())
 			throw new IllegalArgumentException("Output must be a floating point image");
 
 		// avoid overflow
 		double scale = GImageStatistics.maxAbs(input);
-		if( scale != 0.0 ) {
+		if (scale != 0.0) {
 			GPixelMath.multiply(input, 1.0f/scale, output);
 			double mean = GImageStatistics.mean(output);
-			double stdev = Math.sqrt(GImageStatistics.variance(output,mean));
+			double stdev = Math.sqrt(GImageStatistics.variance(output, mean));
 
-			GPixelMath.minus(output,mean,output);
-			if( stdev != 0.0 ) {
-				GPixelMath.multiply(output,1.0f/stdev,output);
+			GPixelMath.minus(output, mean, output);
+			if (stdev != 0.0) {
+				GPixelMath.multiply(output, 1.0f/stdev, output);
 			} else {
 				stdev = 1.0;
 			}
 
-			if( parameters != null ) {
+			if (parameters != null) {
 				parameters.offset = -mean*scale;
 				parameters.divisor = stdev*scale;
 			}

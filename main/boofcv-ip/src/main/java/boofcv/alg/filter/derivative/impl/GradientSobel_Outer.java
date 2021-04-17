@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -27,8 +27,8 @@ import boofcv.struct.image.GrayU8;
 /**
  * <p>
  * While not as fast as {@link boofcv.alg.filter.derivative.GradientSobel} it a big improvement over {@link GradientSobel_Naive} and much
- * more readable.  The general idea is that the outer diagonal elements are both read by the horizontal
- * and vertical operations.  This can be taken advantage of with some simple arithmetic to reduce the number
+ * more readable. The general idea is that the outer diagonal elements are both read by the horizontal
+ * and vertical operations. This can be taken advantage of with some simple arithmetic to reduce the number
  * of floating point operations and matrix reads and writes.
  * </p>
  * <p>
@@ -42,7 +42,7 @@ import boofcv.struct.image.GrayU8;
 public class GradientSobel_Outer {
 
 	/**
-	 * Computes derivative of GrayU8.  None of the images can be sub-images.
+	 * Computes derivative of GrayU8. None of the images can be sub-images.
 	 */
 	public static void process( GrayU8 orig, GrayS16 derivX, GrayS16 derivY ) {
 		final byte[] data = orig.data;
@@ -69,7 +69,7 @@ public class GradientSobel_Outer {
 	}
 
 	/**
-	 * Computes derivative of GrayU8.  Inputs can be sub-images.
+	 * Computes derivative of GrayU8. Inputs can be sub-images.
 	 */
 	public static void process_sub( GrayU8 orig,
 									GrayS16 derivX,
@@ -134,7 +134,7 @@ public class GradientSobel_Outer {
 	}
 
 	/**
-	 * Computes derivative of GrayF32.  None of the images can be sub-images.
+	 * Computes derivative of GrayF32. None of the images can be sub-images.
 	 */
 	public static void process( GrayF32 orig,
 								GrayF32 derivX,

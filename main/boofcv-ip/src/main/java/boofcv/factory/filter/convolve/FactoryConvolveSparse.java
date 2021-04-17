@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -37,101 +37,101 @@ import boofcv.struct.image.ImageGray;
 public class FactoryConvolveSparse {
 
 	public static <T extends ImageGray<T>, K extends Kernel2D>
-	ImageConvolveSparse<T,K> convolve2D(Class<T> imageType, K kernel) {
-		if( GeneralizedImageOps.isFloatingPoint(imageType)) {
-			return (ImageConvolveSparse<T,K>)new Convolve2D_F32((Kernel2D_F32)kernel);
+	ImageConvolveSparse<T, K> convolve2D( Class<T> imageType, K kernel ) {
+		if (GeneralizedImageOps.isFloatingPoint(imageType)) {
+			return (ImageConvolveSparse<T, K>)new Convolve2D_F32((Kernel2D_F32)kernel);
 		} else {
-			return (ImageConvolveSparse<T,K>)new Convolve2D_I32((Kernel2D_S32)kernel);
+			return (ImageConvolveSparse<T, K>)new Convolve2D_I32((Kernel2D_S32)kernel);
 		}
 	}
 
 	public static <T extends ImageGray<T>, K extends Kernel1D>
-	ImageConvolveSparse<T,K> vertical1D(Class<T> imageType, K kernel) {
-		if( GeneralizedImageOps.isFloatingPoint(imageType)) {
-			return (ImageConvolveSparse<T,K>)new Vertical1D_F32((Kernel1D_F32)kernel);
+	ImageConvolveSparse<T, K> vertical1D( Class<T> imageType, K kernel ) {
+		if (GeneralizedImageOps.isFloatingPoint(imageType)) {
+			return (ImageConvolveSparse<T, K>)new Vertical1D_F32((Kernel1D_F32)kernel);
 		} else {
-			return (ImageConvolveSparse<T,K>)new Vertical1D_I32((Kernel1D_S32)kernel);
+			return (ImageConvolveSparse<T, K>)new Vertical1D_I32((Kernel1D_S32)kernel);
 		}
 	}
 
 	public static <T extends ImageGray<T>, K extends Kernel1D>
-	ImageConvolveSparse<T,K> horizontal1D(Class<T> imageType, K kernel) {
-		if( GeneralizedImageOps.isFloatingPoint(imageType)) {
-			return (ImageConvolveSparse<T,K>)new Horizontal1D_F32((Kernel1D_F32)kernel);
+	ImageConvolveSparse<T, K> horizontal1D( Class<T> imageType, K kernel ) {
+		if (GeneralizedImageOps.isFloatingPoint(imageType)) {
+			return (ImageConvolveSparse<T, K>)new Horizontal1D_F32((Kernel1D_F32)kernel);
 		} else {
-			return (ImageConvolveSparse<T,K>)new Horizontal1D_I32((Kernel1D_S32)kernel);
+			return (ImageConvolveSparse<T, K>)new Horizontal1D_I32((Kernel1D_S32)kernel);
 		}
 	}
 
 	public static class Convolve2D_F32 extends ImageConvolveSparse<GrayF32, Kernel2D_F32> {
 
-		public Convolve2D_F32(Kernel2D_F32 kernel) {
+		public Convolve2D_F32( Kernel2D_F32 kernel ) {
 			super(kernel);
 		}
 
 		@Override
-		public double compute(int x, int y) {
-			return ConvolveImageSparse.convolve(kernel,(ImageBorder_F32)image,x,y);
+		public double compute( int x, int y ) {
+			return ConvolveImageSparse.convolve(kernel, (ImageBorder_F32)image, x, y);
 		}
 	}
 
 	public static class Convolve2D_I32<T extends GrayI<T>> extends ImageConvolveSparse<T, Kernel2D_S32> {
 
-		public Convolve2D_I32(Kernel2D_S32 kernel) {
+		public Convolve2D_I32( Kernel2D_S32 kernel ) {
 			super(kernel);
 		}
 
 		@Override
-		public double compute(int x, int y) {
-			return ConvolveImageSparse.convolve(kernel,(ImageBorder_S32)image,x,y);
+		public double compute( int x, int y ) {
+			return ConvolveImageSparse.convolve(kernel, (ImageBorder_S32)image, x, y);
 		}
 	}
 
 	public static class Horizontal1D_F32 extends ImageConvolveSparse<GrayF32, Kernel1D_F32> {
 
-		public Horizontal1D_F32(Kernel1D_F32 kernel) {
+		public Horizontal1D_F32( Kernel1D_F32 kernel ) {
 			super(kernel);
 		}
 
 		@Override
-		public double compute(int x, int y) {
-			return ConvolveImageSparse.horizontal(kernel, (ImageBorder_F32) image, x, y);
+		public double compute( int x, int y ) {
+			return ConvolveImageSparse.horizontal(kernel, (ImageBorder_F32)image, x, y);
 		}
 	}
 
 	public static class Horizontal1D_I32 extends ImageConvolveSparse<GrayF32, Kernel1D_S32> {
 
-		public Horizontal1D_I32(Kernel1D_S32 kernel) {
+		public Horizontal1D_I32( Kernel1D_S32 kernel ) {
 			super(kernel);
 		}
 
 		@Override
-		public double compute(int x, int y) {
-			return ConvolveImageSparse.horizontal(kernel, (ImageBorder_S32) image, x, y);
+		public double compute( int x, int y ) {
+			return ConvolveImageSparse.horizontal(kernel, (ImageBorder_S32)image, x, y);
 		}
 	}
 
 	public static class Vertical1D_F32 extends ImageConvolveSparse<GrayF32, Kernel1D_F32> {
 
-		public Vertical1D_F32(Kernel1D_F32 kernel) {
+		public Vertical1D_F32( Kernel1D_F32 kernel ) {
 			super(kernel);
 		}
 
 		@Override
-		public double compute(int x, int y) {
-			return ConvolveImageSparse.vertical(kernel, (ImageBorder_F32) image, x, y);
+		public double compute( int x, int y ) {
+			return ConvolveImageSparse.vertical(kernel, (ImageBorder_F32)image, x, y);
 		}
 	}
 
 	public static class Vertical1D_I32 extends ImageConvolveSparse<GrayF32, Kernel1D_S32> {
 
-		public Vertical1D_I32(Kernel1D_S32 kernel) {
+		public Vertical1D_I32( Kernel1D_S32 kernel ) {
 			super(kernel);
 		}
 
 		@Override
-		public double compute(int x, int y) {
-			return ConvolveImageSparse.vertical(kernel,(ImageBorder_S32)image,x,y);
+		public double compute( int x, int y ) {
+			return ConvolveImageSparse.vertical(kernel, (ImageBorder_S32)image, x, y);
 		}
 	}
 }

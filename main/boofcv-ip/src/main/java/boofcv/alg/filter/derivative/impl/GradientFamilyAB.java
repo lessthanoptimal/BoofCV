@@ -32,7 +32,7 @@ import boofcv.struct.image.GrayU8;
 @SuppressWarnings("Duplicates")
 public class GradientFamilyAB {
 	/**
-	 * Computes derivative of GrayU8.  Inputs can be sub-images.
+	 * Computes derivative of GrayU8. Inputs can be sub-images.
 	 */
 	public static void process( GrayU8 src,
 								final int a, final int b,
@@ -98,7 +98,7 @@ public class GradientFamilyAB {
 	}
 
 	/**
-	 * Computes derivative of GrayF32.  None of the images can be sub-images.
+	 * Computes derivative of GrayF32. None of the images can be sub-images.
 	 */
 	public static void process( GrayF32 src,
 								final float a, final float b,

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -25,13 +25,12 @@ import boofcv.struct.image.ImageDataType;
 import boofcv.struct.image.ImageGray;
 import org.ddogleg.stats.UtilGaussian;
 
-
 /**
  * @author Peter Abeles
  */
 // TODO don't use radius use width so that even and odd width kernels are supported
-	//  Maybe do the transition by adding a boolean parameter for one release?
-	//  Just rename...
+//  Maybe do the transition by adding a boolean parameter for one release?
+//  Just rename...
 // TODO remove ability to normalize with a flag.  Use kernel math instead.  More explicit, easier testing
 // todo add size heuristic for derivative that is different from regular kernel
 public class FactoryKernelGaussian {
@@ -47,22 +46,21 @@ public class FactoryKernelGaussian {
 	 * @param radius Number of pixels in the kernel's radius.  If &le; 0 then the sigma will be computed from the sigma.
 	 * @return The computed Gaussian kernel.
 	 */
-	public static <T extends KernelBase> T gaussian(Class<T> kernelType, double sigma, int radius )
-	{
+	public static <T extends KernelBase> T gaussian( Class<T> kernelType, double sigma, int radius ) {
 		if (Kernel1D_F32.class == kernelType) {
 			return gaussian(1, true, 32, sigma, radius);
 		} else if (Kernel1D_F64.class == kernelType) {
-			return gaussian(1,true, 64, sigma,radius);
+			return gaussian(1, true, 64, sigma, radius);
 		} else if (Kernel1D_S32.class == kernelType) {
-			return gaussian(1,false, 32, sigma,radius);
+			return gaussian(1, false, 32, sigma, radius);
 		} else if (Kernel2D_S32.class == kernelType) {
-			return gaussian(2,false, 32, sigma,radius);
+			return gaussian(2, false, 32, sigma, radius);
 		} else if (Kernel2D_F32.class == kernelType) {
-			return gaussian(2,true, 32, sigma,radius);
+			return gaussian(2, true, 32, sigma, radius);
 		} else if (Kernel2D_F64.class == kernelType) {
-			return gaussian(2,true, 64, sigma,radius);
+			return gaussian(2, true, 64, sigma, radius);
 		} else {
-			throw new RuntimeException("Unknown kernel type. "+kernelType.getSimpleName());
+			throw new RuntimeException("Unknown kernel type. " + kernelType.getSimpleName());
 		}
 	}
 
@@ -75,13 +73,12 @@ public class FactoryKernelGaussian {
 	 * @return The computed Gaussian kernel.
 	 */
 	public static <T extends ImageGray<T>, K extends Kernel1D>
-	K gaussian1D(Class<T> imageType, double sigma, int radius )
-	{
+	K gaussian1D( Class<T> imageType, double sigma, int radius ) {
 		boolean isFloat = GeneralizedImageOps.isFloatingPoint(imageType);
 		int numBits = GeneralizedImageOps.getNumBits(imageType);
-		if( numBits < 32 )
+		if (numBits < 32)
 			numBits = 32;
-		return gaussian(1,isFloat, numBits, sigma,radius);
+		return gaussian(1, isFloat, numBits, sigma, radius);
 	}
 
 	/**
@@ -93,19 +90,17 @@ public class FactoryKernelGaussian {
 	 * @return The computed Gaussian kernel.
 	 */
 	public static <T extends ImageGray<T>, K extends Kernel2D>
-	K gaussian2D(Class<T> imageType, double sigma, int radius )
-	{
+	K gaussian2D( Class<T> imageType, double sigma, int radius ) {
 		boolean isFloat = GeneralizedImageOps.isFloatingPoint(imageType);
 		int numBits = Math.max(32, GeneralizedImageOps.getNumBits(imageType));
-		return gaussian(2,isFloat, numBits, sigma,radius);
+		return gaussian(2, isFloat, numBits, sigma, radius);
 	}
 
 	public static <T extends ImageGray<T>, K extends Kernel2D>
-	K gaussian2D(ImageDataType imageType, double sigma, int radius )
-	{
-		int numBits =  imageType.getNumBits() <= 32 ? 32 :  imageType.getNumBits();
+	K gaussian2D( ImageDataType imageType, double sigma, int radius ) {
+		int numBits = imageType.getNumBits() <= 32 ? 32 : imageType.getNumBits();
 
-		return gaussian(2,!imageType.isInteger(), numBits, sigma,radius);
+		return gaussian(2, !imageType.isInteger(), numBits, sigma, radius);
 	}
 
 	/**
@@ -117,41 +112,40 @@ public class FactoryKernelGaussian {
 	 * @param sigma The distributions stdev.  If &le; 0 then the sigma will be computed from the radius.
 	 * @param radius Number of pixels in the kernel's radius.  If &le; 0 then the sigma will be computed from the sigma.   @return The computed Gaussian kernel.
 	 */
-	public static <T extends KernelBase> T gaussian(int DOF, boolean isFloat, int numBits, double sigma, int radius)
-	{
-		if( radius <= 0 )
-			radius = FactoryKernelGaussian.radiusForSigma(sigma,0);
-		else if( sigma <= 0 )
-			sigma = FactoryKernelGaussian.sigmaForRadius(radius,0);
+	public static <T extends KernelBase> T gaussian( int DOF, boolean isFloat, int numBits, double sigma, int radius ) {
+		if (radius <= 0)
+			radius = FactoryKernelGaussian.radiusForSigma(sigma, 0);
+		else if (sigma <= 0)
+			sigma = FactoryKernelGaussian.sigmaForRadius(radius, 0);
 
-		if( DOF == 2 ) {
-			if( numBits == 32 ) {
-				Kernel2D_F32 k = gaussian2D_F32(sigma,radius, true, isFloat);
-				if( isFloat )
+		if (DOF == 2) {
+			if (numBits == 32) {
+				Kernel2D_F32 k = gaussian2D_F32(sigma, radius, true, isFloat);
+				if (isFloat)
 					return (T)k;
-				return (T) KernelMath.convert(k,MIN_FRAC);
-			} else if( numBits == 64 ) {
-				Kernel2D_F64 k = gaussian2D_F64(sigma,radius, true, isFloat);
-				if( isFloat )
+				return (T)KernelMath.convert(k, MIN_FRAC);
+			} else if (numBits == 64) {
+				Kernel2D_F64 k = gaussian2D_F64(sigma, radius, true, isFloat);
+				if (isFloat)
 					return (T)k;
 				else
 					throw new IllegalArgumentException("64bit int kernels supported");
 			} else {
 				throw new IllegalArgumentException("Bits must be 32 or 64");
 			}
-		} else if( DOF == 1 ) {
-			if( numBits == 32 ) {
-				Kernel1D_F32 k = gaussian1D_F32(sigma,radius, true, isFloat);
-				if( isFloat )
+		} else if (DOF == 1) {
+			if (numBits == 32) {
+				Kernel1D_F32 k = gaussian1D_F32(sigma, radius, true, isFloat);
+				if (isFloat)
 					return (T)k;
-				return (T)KernelMath.convert(k,MIN_FRAC);
-			} else if( numBits == 64 ) {
+				return (T)KernelMath.convert(k, MIN_FRAC);
+			} else if (numBits == 64) {
 				Kernel1D_F64 k = gaussian1D_F64(sigma, radius, true, isFloat);
-				if( isFloat )
+				if (isFloat)
 					return (T)k;
-				return (T)KernelMath.convert(k,MIN_FRACD);
+				return (T)KernelMath.convert(k, MIN_FRACD);
 			} else {
-				throw new IllegalArgumentException("Bits must be 32 or 64 not "+numBits);
+				throw new IllegalArgumentException("Bits must be 32 or 64 not " + numBits);
 			}
 		} else {
 			throw new IllegalArgumentException("DOF not supported");
@@ -159,20 +153,18 @@ public class FactoryKernelGaussian {
 	}
 
 	public static <T extends ImageGray<T>, K extends Kernel1D>
-	K derivativeI( Class<T> imageType , int order,
-				   double sigma, int radius )
-	{
+	K derivativeI( Class<T> imageType, int order,
+				   double sigma, int radius ) {
 		boolean isFloat = GeneralizedImageOps.isFloatingPoint(imageType);
-		return derivative(order,isFloat,sigma,radius);
+		return derivative(order, isFloat, sigma, radius);
 	}
 
-	public static <T extends Kernel1D> T derivativeK( Class<T> kernelType , int order,
-													  double sigma, int radius )
-	{
+	public static <T extends Kernel1D> T derivativeK( Class<T> kernelType, int order,
+													  double sigma, int radius ) {
 		if (Kernel1D_F32.class == kernelType)
-			return derivative(order,true,sigma,radius);
+			return derivative(order, true, sigma, radius);
 		else
-			return derivative(order,false,sigma,radius);
+			return derivative(order, false, sigma, radius);
 	}
 
 	/**
@@ -185,24 +177,23 @@ public class FactoryKernelGaussian {
 	 * @return The computed Gaussian kernel.
 	 */
 	public static <T extends Kernel1D> T derivative( int order, boolean isFloat,
-													 double sigma, int radius )
-	{
+													 double sigma, int radius ) {
 		// zero order is a regular gaussian
-		if( order == 0 ) {
-			return gaussian(1,isFloat, 32, sigma,radius);
+		if (order == 0) {
+			return gaussian(1, isFloat, 32, sigma, radius);
 		}
 
-		if( radius <= 0 )
-			radius = FactoryKernelGaussian.radiusForSigma(sigma,order);
-		else if( sigma <= 0 ) {
-			sigma = FactoryKernelGaussian.sigmaForRadius(radius,order);
+		if (radius <= 0)
+			radius = FactoryKernelGaussian.radiusForSigma(sigma, order);
+		else if (sigma <= 0) {
+			sigma = FactoryKernelGaussian.sigmaForRadius(radius, order);
 		}
 
-		Kernel1D_F32 k = derivative1D_F32(order,sigma,radius, true);
+		Kernel1D_F32 k = derivative1D_F32(order, sigma, radius, true);
 
-		if( isFloat )
+		if (isFloat)
 			return (T)k;
-		return (T)KernelMath.convert(k,MIN_FRAC);
+		return (T)KernelMath.convert(k, MIN_FRAC);
 	}
 
 	/**
@@ -210,24 +201,25 @@ public class FactoryKernelGaussian {
 	 * Creates a floating point Gaussian kernel with the sigma and radius.
 	 * If normalized is set to true then the elements in the kernel will sum up to one.
 	 * </p>
-	 * @param sigma     Distributions standard deviation.
-	 * @param radius    Kernel's radius.
+	 *
+	 * @param sigma Distributions standard deviation.
+	 * @param radius Kernel's radius.
 	 * @param odd Does the kernel have an even or add width
 	 * @param normalize If the kernel should be normalized to one or not.
 	 */
-	protected static Kernel1D_F32 gaussian1D_F32(double sigma, int radius, boolean odd, boolean normalize) {
+	protected static Kernel1D_F32 gaussian1D_F32( double sigma, int radius, boolean odd, boolean normalize ) {
 		Kernel1D_F32 ret;
-		if( odd ) {
-			ret = new Kernel1D_F32(radius * 2 + 1);
+		if (odd) {
+			ret = new Kernel1D_F32(radius*2 + 1);
 			int index = 0;
 			for (int i = radius; i >= -radius; i--) {
-				ret.data[index++] = (float) UtilGaussian.computePDF(0, sigma, i);
+				ret.data[index++] = (float)UtilGaussian.computePDF(0, sigma, i);
 			}
 		} else {
-			ret = new Kernel1D_F32(radius * 2);
+			ret = new Kernel1D_F32(radius*2);
 			int index = 0;
 			for (int i = radius; i > -radius; i--) {
-				ret.data[index++] = (float) UtilGaussian.computePDF(0, sigma, i-0.5);
+				ret.data[index++] = (float)UtilGaussian.computePDF(0, sigma, i - 0.5);
 			}
 		}
 		if (normalize) {
@@ -237,19 +229,19 @@ public class FactoryKernelGaussian {
 		return ret;
 	}
 
-	protected static Kernel1D_F64 gaussian1D_F64(double sigma, int radius, boolean odd, boolean normalize) {
+	protected static Kernel1D_F64 gaussian1D_F64( double sigma, int radius, boolean odd, boolean normalize ) {
 		Kernel1D_F64 ret;
-		if( odd ) {
-			ret = new Kernel1D_F64(radius * 2 + 1);
+		if (odd) {
+			ret = new Kernel1D_F64(radius*2 + 1);
 			int index = 0;
 			for (int i = radius; i >= -radius; i--) {
 				ret.data[index++] = UtilGaussian.computePDF(0, sigma, i);
 			}
 		} else {
-			ret = new Kernel1D_F64(radius * 2);
+			ret = new Kernel1D_F64(radius*2);
 			int index = 0;
 			for (int i = radius; i > -radius; i--) {
-				ret.data[index++] = UtilGaussian.computePDF(0, sigma, i-0.5);
+				ret.data[index++] = UtilGaussian.computePDF(0, sigma, i - 0.5);
 			}
 		}
 		if (normalize) {
@@ -261,13 +253,14 @@ public class FactoryKernelGaussian {
 
 	/**
 	 * Creates a kernel for a 2D convolution.  This should only be used for validation purposes.
+	 *
 	 * @param sigma Distributions standard deviation.
 	 * @param radius Kernel's radius.
 	 * @param odd Does the kernel have an even or add width
 	 * @param normalize If the kernel should be normalized to one or not.
 	 */
-	public static Kernel2D_F32 gaussian2D_F32(double sigma, int radius, boolean odd, boolean normalize) {
-		Kernel1D_F32 kernel1D = gaussian1D_F32(sigma,radius, odd, false);
+	public static Kernel2D_F32 gaussian2D_F32( double sigma, int radius, boolean odd, boolean normalize ) {
+		Kernel1D_F32 kernel1D = gaussian1D_F32(sigma, radius, odd, false);
 		Kernel2D_F32 ret = KernelMath.convolve2D(kernel1D, kernel1D);
 
 		if (normalize) {
@@ -279,11 +272,11 @@ public class FactoryKernelGaussian {
 
 	// This will throw an exception because 2D kernels have to have the same width. Leaving it here as
 	// a reminder to fix that
-	public static Kernel2D_F32 gaussian2D_F32(double sigmaX, int radiusX, boolean oddX,
-											  double sigmaY, int radiusY, boolean oddY,
-											  boolean normalize) {
-		Kernel1D_F32 kernelX = gaussian1D_F32(sigmaX,radiusX, oddX, false);
-		Kernel1D_F32 kernelY = gaussian1D_F32(sigmaY,radiusY, oddY, false);
+	public static Kernel2D_F32 gaussian2D_F32( double sigmaX, int radiusX, boolean oddX,
+											   double sigmaY, int radiusY, boolean oddY,
+											   boolean normalize ) {
+		Kernel1D_F32 kernelX = gaussian1D_F32(sigmaX, radiusX, oddX, false);
+		Kernel1D_F32 kernelY = gaussian1D_F32(sigmaY, radiusY, oddY, false);
 
 		Kernel2D_F32 ret = KernelMath.convolve2D(kernelX, kernelY);
 
@@ -294,8 +287,8 @@ public class FactoryKernelGaussian {
 		return ret;
 	}
 
-	public static Kernel2D_F64 gaussian2D_F64(double sigma, int radius, boolean odd, boolean normalize) {
-		Kernel1D_F64 kernel1D = gaussian1D_F64(sigma,radius, odd, false);
+	public static Kernel2D_F64 gaussian2D_F64( double sigma, int radius, boolean odd, boolean normalize ) {
+		Kernel1D_F64 kernel1D = gaussian1D_F64(sigma, radius, odd, false);
 		Kernel2D_F64 ret = KernelMath.convolve2D(kernel1D, kernel1D);
 
 		if (normalize) {
@@ -305,11 +298,11 @@ public class FactoryKernelGaussian {
 		return ret;
 	}
 
-	public static Kernel2D_F64 gaussian2D_F64(double sigmaX, int radiusX, boolean oddX,
-											  double sigmaY, int radiusY, boolean oddY,
-											  boolean normalize) {
-		Kernel1D_F64 kernelX = gaussian1D_F64(sigmaX,radiusX, oddX, false);
-		Kernel1D_F64 kernelY = gaussian1D_F64(sigmaY,radiusY, oddY, false);
+	public static Kernel2D_F64 gaussian2D_F64( double sigmaX, int radiusX, boolean oddX,
+											   double sigmaY, int radiusY, boolean oddY,
+											   boolean normalize ) {
+		Kernel1D_F64 kernelX = gaussian1D_F64(sigmaX, radiusX, oddX, false);
+		Kernel1D_F64 kernelY = gaussian1D_F64(sigmaY, radiusY, oddY, false);
 
 		Kernel2D_F64 ret = KernelMath.convolve2D(kernelX, kernelY);
 
@@ -325,36 +318,35 @@ public class FactoryKernelGaussian {
 	 *
 	 * @param sigma Distributions standard deviation.
 	 * @param radius Kernel's radius.
-	 * @param normalize
 	 * @return The derivative of the gaussian
 	 */
-	protected static Kernel1D_F32 derivative1D_F32(int order, double sigma, int radius, boolean normalize) {
+	protected static Kernel1D_F32 derivative1D_F32( int order, double sigma, int radius, boolean normalize ) {
 
-		Kernel1D_F32 ret = new Kernel1D_F32(radius * 2 + 1);
+		Kernel1D_F32 ret = new Kernel1D_F32(radius*2 + 1);
 		float[] gaussian = ret.data;
 		int index = 0;
-		switch( order ) {
+		switch (order) {
 			case 1:
 				for (int i = radius; i >= -radius; i--) {
-					gaussian[index++] = (float) UtilGaussian.derivative1(0, sigma, i);
+					gaussian[index++] = (float)UtilGaussian.derivative1(0, sigma, i);
 				}
 				break;
 
 			case 2:
 				for (int i = radius; i >= -radius; i--) {
-					gaussian[index++] = (float) UtilGaussian.derivative2(0, sigma, i);
+					gaussian[index++] = (float)UtilGaussian.derivative2(0, sigma, i);
 				}
 				break;
 
 			case 3:
 				for (int i = radius; i >= -radius; i--) {
-					gaussian[index++] = (float) UtilGaussian.derivative3(0, sigma, i);
+					gaussian[index++] = (float)UtilGaussian.derivative3(0, sigma, i);
 				}
 				break;
 
 			case 4:
 				for (int i = radius; i >= -radius; i--) {
-					gaussian[index++] = (float) UtilGaussian.derivative4(0, sigma, i);
+					gaussian[index++] = (float)UtilGaussian.derivative4(0, sigma, i);
 				}
 				break;
 
@@ -364,7 +356,7 @@ public class FactoryKernelGaussian {
 
 		// multiply by the same factor as the gaussian would be normalized by
 		// otherwise it will effective change the intensity of the input image
-		if( normalize ) {
+		if (normalize) {
 			double sum = 0;
 			for (int i = radius; i >= -radius; i--) {
 				sum += UtilGaussian.computePDF(0, sigma, i);
@@ -373,7 +365,7 @@ public class FactoryKernelGaussian {
 				gaussian[i] /= (float)sum;
 			}
 		}
-		
+
 		return ret;
 	}
 
@@ -381,15 +373,16 @@ public class FactoryKernelGaussian {
 	 * <p>
 	 * Given the the radius of a Gaussian distribution and the order of its derivative, choose an appropriate sigma.
 	 * </p>
+	 *
 	 * @param radius Kernel's radius
 	 * @param order Order of the derivative.  0 original distribution
 	 * @return Default sigma
 	 */
-	public static double sigmaForRadius(double radius , int order ) {
-		if( radius <= 0 )
+	public static double sigmaForRadius( double radius, int order ) {
+		if (radius <= 0)
 			throw new IllegalArgumentException("Radius must be > 0");
 
-		return (radius* 2.0 + 1.0 ) / (5.0+0.8*order);
+		return (radius*2.0 + 1.0)/(5.0 + 0.8*order);
 	}
 
 	/**
@@ -401,49 +394,49 @@ public class FactoryKernelGaussian {
 	 * @param order Order of the derivative.  0 original distribution
 	 * @return Default sigma
 	 */
-	public static int radiusForSigma(double sigma, int order ) {
-		if( sigma <= 0 )
+	public static int radiusForSigma( double sigma, int order ) {
+		if (sigma <= 0)
 			throw new IllegalArgumentException("Sigma must be > 0");
 
-		return (int)Math.ceil((((5+0.8*order)*sigma)-1)/2);
+		return (int)Math.ceil((((5 + 0.8*order)*sigma) - 1)/2);
 	}
 
 	/**
 	 * Create a gaussian kernel based on its width.  Supports kernels of even or odd widths
 	 * .
+	 *
 	 * @param sigma Sigma of the Gaussian distribution. If &le; 0 then the width will be used.
 	 * @param width How wide the kernel is.  Can be even or odd.
 	 * @return Gaussian convolution kernel.
 	 */
-	public static Kernel2D_F64 gaussianWidth( double sigma , int width )
-	{
-		if( sigma <= 0 )
-			sigma = sigmaForRadius(width/2,0);
-		else if( width <= 0 )
+	public static Kernel2D_F64 gaussianWidth( double sigma, int width ) {
+		if (sigma <= 0)
+			sigma = sigmaForRadius(width/2, 0);
+		else if (width <= 0)
 			throw new IllegalArgumentException("Must specify the width since it doesn't know if it should be even or odd");
 
-		if( width % 2 == 0 ) {
-			int r = width/2-1;
+		if (width%2 == 0) {
+			int r = width/2 - 1;
 			Kernel2D_F64 ret = new Kernel2D_F64(width);
 			double sum = 0;
-			for( int y = 0; y < width; y++ ) {
-				double dy = y <= r ? Math.abs(y-r)+0.5 : Math.abs(y-r-1)+0.5;
-				for( int x = 0; x < width; x++ ) {
-					double dx = x <= r ? Math.abs(x-r)+0.5 : Math.abs(x-r-1)+0.5;
+			for (int y = 0; y < width; y++) {
+				double dy = y <= r ? Math.abs(y - r) + 0.5 : Math.abs(y - r - 1) + 0.5;
+				for (int x = 0; x < width; x++) {
+					double dx = x <= r ? Math.abs(x - r) + 0.5 : Math.abs(x - r - 1) + 0.5;
 					double d = Math.sqrt(dx*dx + dy*dy);
-					double val = UtilGaussian.computePDF(0,sigma,d);
-					ret.set(x,y,val);
+					double val = UtilGaussian.computePDF(0, sigma, d);
+					ret.set(x, y, val);
 					sum += val;
 				}
 			}
 
-			for( int i = 0; i < ret.data.length; i++ ) {
+			for (int i = 0; i < ret.data.length; i++) {
 				ret.data[i] /= sum;
 			}
 
 			return ret;
 		} else {
-			return gaussian2D_F64(sigma,width/2, true, true);
+			return gaussian2D_F64(sigma, width/2, true, true);
 		}
 	}
 }

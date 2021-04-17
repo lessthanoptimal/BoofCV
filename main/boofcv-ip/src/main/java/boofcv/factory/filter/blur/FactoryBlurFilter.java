@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -38,11 +38,11 @@ public class FactoryBlurFilter {
 	 * @param radius Size of the filter.
 	 * @return Median image filter.
 	 */
-	public static <T extends ImageBase<T>> BlurStorageFilter<T> median(ImageType<T> type , int radius ) {
+	public static <T extends ImageBase<T>> BlurStorageFilter<T> median( ImageType<T> type, int radius ) {
 		return new BlurStorageFilter<>("median", type, radius);
 	}
 
-	public static <T extends ImageGray<T>> BlurStorageFilter<T> median(Class<T> type , int radius ) {
+	public static <T extends ImageGray<T>> BlurStorageFilter<T> median( Class<T> type, int radius ) {
 		return median(ImageType.single(type), radius);
 	}
 
@@ -53,23 +53,23 @@ public class FactoryBlurFilter {
 	 * @param radius Size of the filter.
 	 * @return mean image filter.
 	 */
-	public static <T extends ImageBase<T>> BlurStorageFilter<T> mean(ImageType<T> type , int radius ) {
+	public static <T extends ImageBase<T>> BlurStorageFilter<T> mean( ImageType<T> type, int radius ) {
 		return new BlurStorageFilter<>("mean", type, radius);
 	}
 
-	public static <T extends ImageBase<T>> BlurStorageFilter<T> mean(ImageType<T> type , int radiusX , int radiusY ) {
+	public static <T extends ImageBase<T>> BlurStorageFilter<T> mean( ImageType<T> type, int radiusX, int radiusY ) {
 		return new BlurStorageFilter<>("mean", type, radiusX, radiusY);
 	}
 
-	public static <T extends ImageGray<T>> BlurStorageFilter<T> mean(Class<T> type , int radius ) {
+	public static <T extends ImageGray<T>> BlurStorageFilter<T> mean( Class<T> type, int radius ) {
 		return mean(ImageType.single(type), radius);
 	}
 
-	public static <T extends ImageGray<T>> BlurStorageFilter<T> mean(Class<T> type , int radiusX, int radiusY ) {
-		return mean(ImageType.single(type), radiusX,radiusY);
+	public static <T extends ImageGray<T>> BlurStorageFilter<T> mean( Class<T> type, int radiusX, int radiusY ) {
+		return mean(ImageType.single(type), radiusX, radiusY);
 	}
 
-	public static <T extends ImageBase<T>> BlurStorageFilter<T> meanB(ImageType<T> type , int radiusX, int radiusY, ImageBorder<T> border ) {
+	public static <T extends ImageBase<T>> BlurStorageFilter<T> meanB( ImageType<T> type, int radiusX, int radiusY, ImageBorder<T> border ) {
 		BlurStorageFilter<T> filter = new BlurStorageFilter<>("meanB", type, radiusX, radiusY);
 		filter.setBorder(border);
 		return filter;
@@ -82,21 +82,21 @@ public class FactoryBlurFilter {
 	 * @param radius Size of the filter.
 	 * @return mean image filter.
 	 */
-	public static <T extends ImageBase<T>> BlurStorageFilter<T> gaussian(ImageType<T> type , double sigma , int radius ) {
-		return new BlurStorageFilter<>("gaussian", type, sigma, radius,sigma, radius);
+	public static <T extends ImageBase<T>> BlurStorageFilter<T> gaussian( ImageType<T> type, double sigma, int radius ) {
+		return new BlurStorageFilter<>("gaussian", type, sigma, radius, sigma, radius);
 	}
 
-	public static <T extends ImageGray<T>> BlurStorageFilter<T> gaussian(Class<T> type , double sigma , int radius ) {
+	public static <T extends ImageGray<T>> BlurStorageFilter<T> gaussian( Class<T> type, double sigma, int radius ) {
 		return gaussian(ImageType.single(type), sigma, radius);
 	}
 
 	public static <T extends ImageBase<T>> BlurStorageFilter<T>
-	gaussian(ImageType<T> type , double sigmaX , int radiusX, double sigmaY,int radiusY ) {
-		return new BlurStorageFilter<T>("gaussian", type, sigmaX, radiusX,sigmaY, radiusY);
+	gaussian( ImageType<T> type, double sigmaX, int radiusX, double sigmaY, int radiusY ) {
+		return new BlurStorageFilter<T>("gaussian", type, sigmaX, radiusX, sigmaY, radiusY);
 	}
 
 	public static <T extends ImageGray<T>> BlurStorageFilter<T>
-	gaussian(Class<T> type , double sigmaX , int radiusX , double sigmaY, int radiusY) {
+	gaussian( Class<T> type, double sigmaX, int radiusX, double sigmaY, int radiusY ) {
 		return gaussian(ImageType.single(type), sigmaX, radiusX, sigmaY, radiusY);
 	}
 }

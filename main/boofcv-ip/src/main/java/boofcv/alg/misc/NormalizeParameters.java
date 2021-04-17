@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -32,7 +32,7 @@ public class NormalizeParameters {
 	public NormalizeParameters() {
 	}
 
-	public NormalizeParameters(double offset, double divisor) {
+	public NormalizeParameters( double offset, double divisor ) {
 		this.offset = offset;
 		this.divisor = divisor;
 	}
@@ -41,7 +41,7 @@ public class NormalizeParameters {
 		return offset;
 	}
 
-	public void setOffset(double offset) {
+	public void setOffset( double offset ) {
 		this.offset = offset;
 	}
 
@@ -49,7 +49,7 @@ public class NormalizeParameters {
 		return divisor;
 	}
 
-	public void setDivisor(double divisor) {
+	public void setDivisor( double divisor ) {
 		this.divisor = divisor;
 	}
 }

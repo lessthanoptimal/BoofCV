@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -23,45 +23,44 @@ import boofcv.struct.image.GrayF32;
 import boofcv.struct.image.GrayI;
 import boofcv.struct.image.ImageGray;
 
-
 /**
  * Contains generalized function with weak typing from {@link KernelMath}.
  *
  * @author Peter Abeles
  */
 public class GKernelMath {
-	
+
 	public static Kernel2D transpose( Kernel2D a ) {
-		if( a instanceof Kernel2D_F32)
+		if (a instanceof Kernel2D_F32)
 			return KernelMath.transpose((Kernel2D_F32)a);
 		else
 			return KernelMath.transpose((Kernel2D_S32)a);
 	}
 
-	public static Kernel1D convolve1D( Kernel1D a , Kernel1D b ) {
-		if( a.isInteger() != b.isInteger() )
+	public static Kernel1D convolve1D( Kernel1D a, Kernel1D b ) {
+		if (a.isInteger() != b.isInteger())
 			throw new IllegalArgumentException("But input kernels must be of the same type.");
 
-		if( a.isInteger() ) {
+		if (a.isInteger()) {
 			throw new IllegalArgumentException("Add support");
 		} else {
-			return KernelMath.convolve1D_F32((Kernel1D_F32)a,(Kernel1D_F32)b);
+			return KernelMath.convolve1D_F32((Kernel1D_F32)a, (Kernel1D_F32)b);
 		}
 	}
 
-	public static Kernel2D convolve( Kernel1D a , Kernel1D b ) {
-		if( a.isInteger() != b.isInteger() )
+	public static Kernel2D convolve( Kernel1D a, Kernel1D b ) {
+		if (a.isInteger() != b.isInteger())
 			throw new IllegalArgumentException("But input kernels must be of the same type.");
 
-		if( a.isInteger() ) {
-			return KernelMath.convolve2D((Kernel1D_S32) a, (Kernel1D_S32) b);
+		if (a.isInteger()) {
+			return KernelMath.convolve2D((Kernel1D_S32)a, (Kernel1D_S32)b);
 		} else {
-			return KernelMath.convolve2D((Kernel1D_F32) a, (Kernel1D_F32) b);
+			return KernelMath.convolve2D((Kernel1D_F32)a, (Kernel1D_F32)b);
 		}
 	}
 
-	public static <T extends ImageGray> T convertToImage(Kernel2D kernel ) {
-		if( kernel.isInteger() ) {
+	public static <T extends ImageGray> T convertToImage( Kernel2D kernel ) {
+		if (kernel.isInteger()) {
 			return (T)KernelMath.convertToImage((Kernel2D_S32)kernel);
 		} else {
 			return (T)KernelMath.convertToImage((Kernel2D_F32)kernel);
@@ -69,7 +68,7 @@ public class GKernelMath {
 	}
 
 	public static Kernel2D convertToKernel( ImageGray image ) {
-		if( image.getDataType().isInteger() ) {
+		if (image.getDataType().isInteger()) {
 			return KernelMath.convertToKernel((GrayI)image);
 		} else {
 			return KernelMath.convertToKernel((GrayF32)image);

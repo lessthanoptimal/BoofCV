@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -39,21 +39,20 @@ public class GradientReduceToSingle {
 	 * @param outX Output gradient X
 	 * @param outY Output gradient Y
 	 */
-	public static void maxf(Planar<GrayF32> inX , Planar<GrayF32> inY , GrayF32 outX , GrayF32 outY )
-	{
+	public static void maxf( Planar<GrayF32> inX, Planar<GrayF32> inY, GrayF32 outX, GrayF32 outY ) {
 		// input and output should be the same shape
-		InputSanityCheck.checkSameShape(inX,inY);
-		InputSanityCheck.reshapeOneIn(inX,outX,outY);
+		InputSanityCheck.checkSameShape(inX, inY);
+		InputSanityCheck.reshapeOneIn(inX, outX, outY);
 
 		// make sure that the pixel index is the same
-		InputSanityCheck.checkIndexing(inX,inY);
-		InputSanityCheck.checkIndexing(outX,outY);
+		InputSanityCheck.checkIndexing(inX, inY);
+		InputSanityCheck.checkIndexing(outX, outY);
 
 		for (int y = 0; y < inX.height; y++) {
 			int indexIn = inX.startIndex + inX.stride*y;
 			int indexOut = outX.startIndex + outX.stride*y;
 
-			for (int x = 0; x < inX.width; x++, indexIn++, indexOut++ ) {
+			for (int x = 0; x < inX.width; x++, indexIn++, indexOut++) {
 				float maxValueX = inX.bands[0].data[indexIn];
 				float maxValueY = inY.bands[0].data[indexIn];
 				float maxNorm = maxValueX*maxValueX + maxValueY*maxValueY;
@@ -63,7 +62,7 @@ public class GradientReduceToSingle {
 					float valueY = inY.bands[band].data[indexIn];
 
 					float n = valueX*valueX + valueY*valueY;
-					if( n > maxNorm ) {
+					if (n > maxNorm) {
 						maxNorm = n;
 						maxValueX = valueX;
 						maxValueY = valueY;
@@ -85,22 +84,21 @@ public class GradientReduceToSingle {
 	 * @param outX Output gradient X
 	 * @param outY Output gradient Y
 	 */
-	public static void maxf(Planar<GrayU8> inX , Planar<GrayU8> inY ,
-							GrayU8 outX , GrayU8 outY )
-	{
+	public static void maxf( Planar<GrayU8> inX, Planar<GrayU8> inY,
+							 GrayU8 outX, GrayU8 outY ) {
 		// input and output should be the same shape
-		InputSanityCheck.checkSameShape(inX,inY);
-		InputSanityCheck.reshapeOneIn(inX,outX,outY);
+		InputSanityCheck.checkSameShape(inX, inY);
+		InputSanityCheck.reshapeOneIn(inX, outX, outY);
 
 		// make sure that the pixel index is the same
-		InputSanityCheck.checkIndexing(inX,inY);
-		InputSanityCheck.checkIndexing(outX,outY);
+		InputSanityCheck.checkIndexing(inX, inY);
+		InputSanityCheck.checkIndexing(outX, outY);
 
 		for (int y = 0; y < inX.height; y++) {
 			int indexIn = inX.startIndex + inX.stride*y;
 			int indexOut = outX.startIndex + outX.stride*y;
 
-			for (int x = 0; x < inX.width; x++, indexIn++, indexOut++ ) {
+			for (int x = 0; x < inX.width; x++, indexIn++, indexOut++) {
 				int maxValueX = inX.bands[0].data[indexIn] & 0xFF;
 				int maxValueY = inY.bands[0].data[indexIn] & 0xFF;
 				int maxNorm = maxValueX*maxValueX + maxValueY*maxValueY;
@@ -110,7 +108,7 @@ public class GradientReduceToSingle {
 					int valueY = inY.bands[band].data[indexIn] & 0xFF;
 
 					int n = valueX*valueX + valueY*valueY;
-					if( n > maxNorm ) {
+					if (n > maxNorm) {
 						maxNorm = n;
 						maxValueX = valueX;
 						maxValueY = valueY;
