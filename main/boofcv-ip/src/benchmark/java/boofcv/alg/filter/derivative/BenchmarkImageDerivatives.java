@@ -30,6 +30,7 @@ import org.openjdk.jmh.runner.Runner;
 import org.openjdk.jmh.runner.RunnerException;
 import org.openjdk.jmh.runner.options.Options;
 import org.openjdk.jmh.runner.options.OptionsBuilder;
+import org.openjdk.jmh.runner.options.TimeValue;
 
 import java.util.Random;
 import java.util.concurrent.TimeUnit;
@@ -37,9 +38,9 @@ import java.util.concurrent.TimeUnit;
 @BenchmarkMode(Mode.AverageTime)
 @OutputTimeUnit(TimeUnit.MILLISECONDS)
 @Warmup(iterations = 2)
-@Measurement(iterations = 5)
+@Measurement(iterations = 3)
 @State(Scope.Benchmark)
-@Fork(value=2)
+@Fork(value=1)
 public class BenchmarkImageDerivatives {
 	@Param({"true","false"})
 	public boolean concurrent;
@@ -52,8 +53,7 @@ public class BenchmarkImageDerivatives {
 	GrayS16 derivY = new GrayS16(size, size);
 	ImageBorder_S32<GrayU8> borderI32 = new ImageBorder1D_S32(BorderIndex1D_Extend::new);
 
-	@Setup
-	public void setup() {
+	@Setup public void setup() {
 		BoofConcurrency.USE_CONCURRENT = concurrent;
 		Random rand = new Random(234);
 
@@ -64,44 +64,22 @@ public class BenchmarkImageDerivatives {
 		ImageMiscOps.fillUniform(input,rand,0,200);
 	}
 
-	@Benchmark
-	public void prewitt() {
-		GradientPrewitt.process(input,derivX,derivY,borderI32);
-	}
-
-	@Benchmark
-	public void laplacian() {
-		DerivativeLaplacian.process(input,derivX,borderI32);
-	}
-
-	@Benchmark
-	public void hessianDet() {
-		HessianThreeDeterminant.process(input,derivX,borderI32);
-	}
-
-	@Benchmark
-	public void sobel() {
-		GradientSobel.process(input,derivX,derivY,borderI32);
-	}
-
-	@Benchmark
-	public void three() {
-		GradientThree.process(input,derivX,derivY,borderI32);
-	}
-
-	@Benchmark
-	public void two0() {
-		GradientTwo0.process(input,derivX,derivY,borderI32);
-	}
-
-	@Benchmark
-	public void two1() {
-		GradientTwo1.process(input,derivX,derivY,borderI32);
-	}
+	// @formatter:off
+	@Benchmark public void prewitt() { GradientPrewitt.process(input,derivX,derivY,borderI32); }
+	@Benchmark public void laplacian() { DerivativeLaplacian.process(input,derivX,borderI32); }
+	@Benchmark public void hessianDet() { HessianThreeDeterminant.process(input,derivX,borderI32); }
+	@Benchmark public void sobel() { GradientSobel.process(input,derivX,derivY,borderI32); }
+	@Benchmark public void scharr() { GradientScharr.process(input,derivX,derivY,borderI32); }
+	@Benchmark public void three() { GradientThree.process(input,derivX,derivY,borderI32); }
+	@Benchmark public void two0() { GradientTwo0.process(input,derivX,derivY,borderI32); }
+	@Benchmark public void two1() { GradientTwo1.process(input,derivX,derivY,borderI32); }
+	// @formatter:on
 
 	public static void main(String[] args) throws RunnerException {
 		Options opt = new OptionsBuilder()
 				.include(BenchmarkImageDerivatives.class.getSimpleName())
+				.warmupTime(TimeValue.seconds(1))
+				.measurementTime(TimeValue.seconds(1))
 				.build();
 
 		new Runner(opt).run();
