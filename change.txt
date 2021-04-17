@@ -37,6 +37,7 @@ Version : 0.38
     Thanks gerripeach for finding the issue and helping debug it!
 - Image Processing
   * Re-ordered loops to speed up vertical convolution for inner image. 1.2x to 3x faster. Except for U8_I16
+  * Added Scharr Gradient 3x3
 - Image Features
   * Fast Corners are now concurrent
   * SIFT the entire scale space is computed at once. This might result in a net ~10% increase memory.
@@ -44,18 +45,11 @@ Version : 0.38
   * SIFT concurrent implementation is running. Single thread is about 3% slower.
 - Image Processing
   * Wolf and Niback Binarization
-  * TODO make sure everything SIFT touches doesn't go threaded if too small
 - Image Stitching
   * TODO N-View stitching https://github.com/lessthanoptimal/BoofCV/issues/167
 - Image Recognition
   * Added: Bag-of-Words Nearest Neighbor search with Inverted Files
-      TODO Finish
-  * Added: Galvez-Lopez, Tardos, "Bag of Binary Words for Fast Place Recognition in Image Sequences" 2012
-      TODO Finish
   * Added: Nister, Stewenius, "Scalable recognition with a vocabulary tree", CVPR 2006
-- TODO Generic calibration target for multi cameras
-  * QR Code for first version
-- TODO Multi Camera Calibration
 - Scene Reconstruction
   * Added high level implementations which break down sparse and dense reconstruction down to their bare inputs
   * Multiview Stereo has better center view selection which reduces amount of redundant views
@@ -67,15 +61,15 @@ Version : 0.38
 - MultiViewOps
   * compatibleHomography
   * homographyToFundamental given 2 points
-- Multi-View Stereo
-  * TODO Improve point filtering of dense cloud. Way too noisy now
 - Misc
   * Added ConfigGenerator for easily creating a set of Configurations when parameter tuning
 
-TODO NonMaximum consider making radius ConfigLength and relative to sqrt(pixels)
+TODO NonMaximum: consider making radius ConfigLength and relative to sqrt(pixels)
 TODO Would subpixel corners make repeatability better?
-TODO RANSAC provide way to feed in candidate models before it starts
-TODO RANSAC concurrent implementation
+TODO RANSAC: provide way to feed in candidate models before it starts
+TODO Galvez-Lopez, Tardos, "Bag of Binary Words for Fast Place Recognition in Image Sequences" 2012
+TODO Generic calibration target for multi cameras, QR Code for first version
+TODO Multi Camera Calibration API
 
 ---------------------------------------------
 Date    : 2020/Dec/21

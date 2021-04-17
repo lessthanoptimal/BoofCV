@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -97,6 +97,7 @@ public class FactoryDerivative {
 		return switch (type) {
 			case PREWITT -> new ImageGradient_SB.Prewitt<>(inputType, derivType);
 			case SOBEL -> new ImageGradient_SB.Sobel<>(inputType, derivType);
+			case SCHARR -> new ImageGradient_SB.Scharr<>(inputType, derivType);
 			case THREE -> new ImageGradient_SB.Three<>(inputType, derivType);
 			case TWO_0 -> new ImageGradient_SB.Two0<>(inputType, derivType);
 			case TWO_1 -> new ImageGradient_SB.Two1<>(inputType, derivType);
@@ -170,6 +171,14 @@ public class FactoryDerivative {
 			derivType = GImageDerivativeOps.getDerivativeType(inputType);
 
 		return new ImageGradient_SB.Sobel<>(inputType, derivType);
+	}
+
+	public static <I extends ImageGray<I>, D extends ImageGray<D>>
+	ImageGradient<I, D> scharr( Class<I> inputType, @Nullable Class<D> derivType ) {
+		if (derivType == null)
+			derivType = GImageDerivativeOps.getDerivativeType(inputType);
+
+		return new ImageGradient_SB.Scharr<>(inputType, derivType);
 	}
 
 	public static <I extends ImageGray<I>, D extends ImageGray<D>>
