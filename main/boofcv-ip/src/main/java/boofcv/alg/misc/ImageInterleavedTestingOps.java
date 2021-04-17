@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -22,7 +22,6 @@ import boofcv.struct.image.InterleavedI8;
 
 import java.util.Random;
 
-
 /**
  * @author Peter Abeles
  */
@@ -30,10 +29,10 @@ public class ImageInterleavedTestingOps {
 	/**
 	 * Fills the whole image with the specified pixel value
 	 *
-	 * @param img   An image.
+	 * @param img An image.
 	 * @param value The value that the image is being filled with.
 	 */
-	public static void fill(InterleavedI8 img, byte... value) {
+	public static void fill( InterleavedI8 img, byte... value ) {
 		if (value.length != img.numBands)
 			throw new IllegalArgumentException("Unexpected number of bands");
 
@@ -43,7 +42,7 @@ public class ImageInterleavedTestingOps {
 		byte[] data = img.data;
 
 		for (int y = 0; y < h; y++) {
-			int index = img.getStartIndex() + y * img.getStride();
+			int index = img.getStartIndex() + y*img.getStride();
 			for (int x = 0; x < w; x++) {
 				for (int k = 0; k < img.numBands; k++)
 					data[index++] = value[k];
@@ -54,10 +53,10 @@ public class ImageInterleavedTestingOps {
 	/**
 	 * Fills the whole image with random values
 	 *
-	 * @param img  An image.
+	 * @param img An image.
 	 * @param rand The value that the image is being filled with.
 	 */
-	public static void randomize(InterleavedI8 img, Random rand) {
+	public static void randomize( InterleavedI8 img, Random rand ) {
 		final int h = img.getHeight();
 		final int w = img.getWidth();
 
@@ -65,10 +64,10 @@ public class ImageInterleavedTestingOps {
 		int range = Byte.MAX_VALUE - Byte.MIN_VALUE;
 
 		for (int y = 0; y < h; y++) {
-			int index = img.getStartIndex() + y * img.getStride();
+			int index = img.getStartIndex() + y*img.getStride();
 			for (int x = 0; x < w; x++) {
 				for (int k = 0; k < img.numBands; k++)
-					data[index++] = (byte) (rand.nextInt(range) + Byte.MIN_VALUE);
+					data[index++] = (byte)(rand.nextInt(range) + Byte.MIN_VALUE);
 			}
 		}
 	}

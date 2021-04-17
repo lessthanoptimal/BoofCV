@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -29,7 +29,6 @@ import boofcv.struct.convolve.Kernel2D;
 import boofcv.struct.convolve.Kernel2D_F32;
 import boofcv.struct.image.ImageGray;
 
-
 /**
  * <p>
  * Creates different steerable kernels.  Steerable kernels are kernels which can be computed at an arbitrary angle easily
@@ -47,61 +46,59 @@ public class FactorySteerable {
 	 * @param kernelType Specifies which type of 2D kernel should be generated.
 	 * @param orderX Order of the derivative in the x-axis.
 	 * @param orderY Order of the derivative in the y-axis.
-	 *
-	 * @param sigma
-	 *@param radius Radius of the kernel.  @return Steerable kernel generator for the specified gaussian derivative.
+	 * @param radius Radius of the kernel.  @return Steerable kernel generator for the specified gaussian derivative.
 	 */
-	public static <K extends Kernel2D> SteerableKernel<K> gaussian(Class<K> kernelType, int orderX, int orderY, double sigma, int radius) {
-		if( orderX < 0 || orderX > 4 )
+	public static <K extends Kernel2D> SteerableKernel<K> gaussian( Class<K> kernelType, int orderX, int orderY, double sigma, int radius ) {
+		if (orderX < 0 || orderX > 4)
 			throw new IllegalArgumentException("derivX must be from 0 to 4 inclusive.");
-		if( orderY < 0 || orderY > 4 )
+		if (orderY < 0 || orderY > 4)
 			throw new IllegalArgumentException("derivT must be from 0 to 4 inclusive.");
 
 		int order = orderX + orderY;
 
-		if( order > 4 ) {
+		if (order > 4) {
 			throw new IllegalArgumentException("The total order of x and y can't be greater than 4");
 		}
-		int maxOrder = Math.max(orderX,orderY);
+		int maxOrder = Math.max(orderX, orderY);
 
-		if( sigma <= 0 )
-			sigma = (float)FactoryKernelGaussian.sigmaForRadius(radius,maxOrder);
-		else if( radius <= 0 )
-			radius = FactoryKernelGaussian.radiusForSigma(sigma,maxOrder);
+		if (sigma <= 0)
+			sigma = (float)FactoryKernelGaussian.sigmaForRadius(radius, maxOrder);
+		else if (radius <= 0)
+			radius = FactoryKernelGaussian.radiusForSigma(sigma, maxOrder);
 
 		Class kernel1DType = FactoryKernel.get1DType(kernelType);
-		Kernel1D kerX =  FactoryKernelGaussian.derivativeK(kernel1DType,orderX,sigma,radius);
-		Kernel1D kerY = FactoryKernelGaussian.derivativeK(kernel1DType,orderY,sigma,radius);
-		Kernel2D kernel = GKernelMath.convolve(kerY,kerX);
+		Kernel1D kerX = FactoryKernelGaussian.derivativeK(kernel1DType, orderX, sigma, radius);
+		Kernel1D kerY = FactoryKernelGaussian.derivativeK(kernel1DType, orderY, sigma, radius);
+		Kernel2D kernel = GKernelMath.convolve(kerY, kerX);
 
-		Kernel2D []basis = new Kernel2D[order+1];
+		Kernel2D[] basis = new Kernel2D[order + 1];
 
 		// convert it into an image which can be rotated
 		ImageGray image = GKernelMath.convertToImage(kernel);
-		ImageGray imageRotated = (ImageGray)image.createNew(image.width,image.height);
+		ImageGray imageRotated = (ImageGray)image.createNew(image.width, image.height);
 
 		basis[0] = kernel;
 
 		// form the basis by created rotated versions of the kernel
 		double angleStep = Math.PI/basis.length;
 
-		for( int index = 1; index <= order; index++ ) {
+		for (int index = 1; index <= order; index++) {
 			float angle = (float)(angleStep*index);
 
 			GImageMiscOps.fill(imageRotated, 0);
-			new FDistort(image,imageRotated).rotate(angle).apply();
+			new FDistort(image, imageRotated).rotate(angle).apply();
 
 			basis[index] = GKernelMath.convertToKernel(imageRotated);
 		}
 
 		SteerableKernel<K> ret;
 
-		if( kernelType == Kernel2D_F32.class )
+		if (kernelType == Kernel2D_F32.class)
 			ret = (SteerableKernel<K>)new SteerableKernel_F32();
 		else
 			ret = (SteerableKernel<K>)new SteerableKernel_I32();
 
-		ret.setBasis(FactorySteerCoefficients.polynomial(order),basis);
+		ret.setBasis(FactorySteerCoefficients.polynomial(order), basis);
 
 		return ret;
 	}

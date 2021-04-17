@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -43,26 +43,24 @@ import boofcv.struct.sparse.SparseImageGradient;
  *
  * @author Peter Abeles
  */
-@SuppressWarnings({"unchecked"})
+@SuppressWarnings({"unchecked", "rawtypes"})
 public class FactoryDerivativeSparse {
 
 	/**
 	 * Creates a sparse Laplacian filter.
 	 *
-	 * @see DerivativeLaplacian
-	 *
 	 * @param imageType The type of image which is to be processed.
 	 * @param border How the border should be handled.  If null {@link BorderType#EXTENDED} will be used.
 	 * @return Filter for performing a sparse laplacian.
+	 * @see DerivativeLaplacian
 	 */
 	public static <T extends ImageGray<T>>
-	ImageFunctionSparse<T> createLaplacian( Class<T> imageType , ImageBorder<T> border )
-	{
-		if( border == null ) {
+	ImageFunctionSparse<T> createLaplacian( Class<T> imageType, ImageBorder<T> border ) {
+		if (border == null) {
 			border = FactoryImageBorder.single(BorderType.EXTENDED, imageType);
 		}
 
-		if( GeneralizedImageOps.isFloatingPoint(imageType)) {
+		if (GeneralizedImageOps.isFloatingPoint(imageType)) {
 			ImageConvolveSparse<GrayF32, Kernel2D_F32> r = FactoryConvolveSparse.convolve2D(GrayF32.class, DerivativeLaplacian.kernel_F32);
 
 			r.setImageBorder((ImageBorder_F32)border);
@@ -80,105 +78,95 @@ public class FactoryDerivativeSparse {
 	/**
 	 * Creates a sparse sobel gradient operator.
 	 *
-	 * @see GradientSobel
-	 *
 	 * @param imageType The type of image which is to be processed.
 	 * @param border How the border should be handled.  If null then the borders can't be processed.
 	 * @return Sparse gradient
+	 * @see GradientSobel
 	 */
 	public static <T extends ImageGray<T>, G extends GradientValue>
-	SparseImageGradient<T,G> createSobel( Class<T> imageType , ImageBorder<T> border )
-	{
-		if( imageType == GrayF32.class) {
+	SparseImageGradient<T, G> createSobel( Class<T> imageType, ImageBorder<T> border ) {
+		if (imageType == GrayF32.class) {
 			return (SparseImageGradient)new GradientSparseSobel_F32((ImageBorder_F32)border);
-		} else if( imageType == GrayU8.class ){
+		} else if (imageType == GrayU8.class) {
 			return (SparseImageGradient)new GradientSparseSobel_U8((ImageBorder_S32)border);
 		} else {
-			throw new IllegalArgumentException("Unsupported image type "+imageType.getSimpleName());
+			throw new IllegalArgumentException("Unsupported image type " + imageType.getSimpleName());
 		}
 	}
 
 	/**
 	 * Creates a sparse prewitt gradient operator.
 	 *
-	 * @see boofcv.alg.filter.derivative.GradientPrewitt
-	 *
 	 * @param imageType The type of image which is to be processed.
 	 * @param border How the border should be handled.  If null then the borders can't be processed.
 	 * @return Sparse gradient.
+	 * @see boofcv.alg.filter.derivative.GradientPrewitt
 	 */
 	public static <T extends ImageGray<T>, G extends GradientValue>
-	SparseImageGradient<T,G> createPrewitt( Class<T> imageType , ImageBorder<T> border )
-	{
-		if( imageType == GrayF32.class) {
+	SparseImageGradient<T, G> createPrewitt( Class<T> imageType, ImageBorder<T> border ) {
+		if (imageType == GrayF32.class) {
 			return (SparseImageGradient)new GradientSparsePrewitt_F32((ImageBorder_F32)border);
-		} else if( imageType == GrayU8.class ){
+		} else if (imageType == GrayU8.class) {
 			return (SparseImageGradient)new GradientSparsePrewitt_U8((ImageBorder_S32)border);
 		} else {
-			throw new IllegalArgumentException("Unsupported image type "+imageType.getSimpleName());
+			throw new IllegalArgumentException("Unsupported image type " + imageType.getSimpleName());
 		}
 	}
 
 	/**
 	 * Creates a sparse three gradient operator.
 	 *
-	 * @see boofcv.alg.filter.derivative.GradientThree
-	 *
 	 * @param imageType The type of image which is to be processed.
 	 * @param border How the border should be handled.  If null then the borders can't be processed.
 	 * @return Sparse gradient.
+	 * @see boofcv.alg.filter.derivative.GradientThree
 	 */
 	public static <T extends ImageGray<T>, G extends GradientValue>
-	SparseImageGradient<T,G> createThree( Class<T> imageType , ImageBorder<T> border )
-	{
-		if( imageType == GrayF32.class) {
+	SparseImageGradient<T, G> createThree( Class<T> imageType, ImageBorder<T> border ) {
+		if (imageType == GrayF32.class) {
 			return (SparseImageGradient)new GradientSparseThree_F32((ImageBorder_F32)border);
-		} else if( imageType == GrayU8.class ){
+		} else if (imageType == GrayU8.class) {
 			return (SparseImageGradient)new GradientSparseThree_U8((ImageBorder_S32)border);
 		} else {
-			throw new IllegalArgumentException("Unsupported image type "+imageType.getSimpleName());
+			throw new IllegalArgumentException("Unsupported image type " + imageType.getSimpleName());
 		}
 	}
 
 	/**
 	 * Creates a sparse two-0 gradient operator.
 	 *
-	 * @see boofcv.alg.filter.derivative.GradientTwo0
-	 *
 	 * @param imageType The type of image which is to be processed.
 	 * @param border How the border should be handled.  If null then the borders can't be processed.
 	 * @return Sparse gradient.
+	 * @see boofcv.alg.filter.derivative.GradientTwo0
 	 */
 	public static <T extends ImageGray<T>, G extends GradientValue>
-	SparseImageGradient<T,G> createTwo0( Class<T> imageType , ImageBorder<T> border )
-	{
-		if( imageType == GrayF32.class) {
+	SparseImageGradient<T, G> createTwo0( Class<T> imageType, ImageBorder<T> border ) {
+		if (imageType == GrayF32.class) {
 			return (SparseImageGradient)new GradientSparseTwo0_F32((ImageBorder_F32)border);
-		} else if( imageType == GrayU8.class ){
+		} else if (imageType == GrayU8.class) {
 			return (SparseImageGradient)new GradientSparseTwo0_U8((ImageBorder_S32)border);
 		} else {
-			throw new IllegalArgumentException("Unsupported image type "+imageType.getSimpleName());
+			throw new IllegalArgumentException("Unsupported image type " + imageType.getSimpleName());
 		}
 	}
 
 	/**
 	 * Creates a sparse two-1 gradient operator.
 	 *
-	 * @see boofcv.alg.filter.derivative.GradientTwo1
-	 *
 	 * @param imageType The type of image which is to be processed.
 	 * @param border How the border should be handled.  If null then the borders can't be processed.
 	 * @return Sparse gradient.
+	 * @see boofcv.alg.filter.derivative.GradientTwo1
 	 */
 	public static <T extends ImageGray<T>, G extends GradientValue>
-	SparseImageGradient<T,G> createTwo1( Class<T> imageType , ImageBorder<T> border )
-	{
-		if( imageType == GrayF32.class) {
+	SparseImageGradient<T, G> createTwo1( Class<T> imageType, ImageBorder<T> border ) {
+		if (imageType == GrayF32.class) {
 			return (SparseImageGradient)new GradientSparseTwo1_F32((ImageBorder_F32)border);
-		} else if( imageType == GrayU8.class ){
+		} else if (imageType == GrayU8.class) {
 			return (SparseImageGradient)new GradientSparseTwo1_U8((ImageBorder_S32)border);
 		} else {
-			throw new IllegalArgumentException("Unsupported image type "+imageType.getSimpleName());
+			throw new IllegalArgumentException("Unsupported image type " + imageType.getSimpleName());
 		}
 	}
 }

@@ -84,7 +84,7 @@ public class FactoryDerivative {
 	 *
 	 * @param type Type of gradient
 	 * @param inputType Type of input image
-	 * @param derivType Type of gradient image.  null for default
+	 * @param derivType Type of gradient image. null for default
 	 * @param <I> Input image
 	 * @param <D> Derivative image
 	 * @return gradient filter

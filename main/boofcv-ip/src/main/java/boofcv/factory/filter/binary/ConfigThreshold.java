@@ -98,10 +98,10 @@ public class ConfigThreshold implements Configuration {
 	}
 
 	public static ConfigThreshold global( ThresholdType type ) {
-		if( !type.isAdaptive() )
+		if (!type.isAdaptive())
 			throw new IllegalArgumentException("Type must be adaptive");
 
-		if( !type.isGlobal() )
+		if (!type.isGlobal())
 			throw new IllegalArgumentException("Type must be global");
 
 		ConfigThreshold config = new ConfigThreshold();
@@ -109,21 +109,21 @@ public class ConfigThreshold implements Configuration {
 		return config;
 	}
 
-	public static <T extends ConfigThreshold>T local( ThresholdType type , int width ) {
+	public static <T extends ConfigThreshold> T local( ThresholdType type, int width ) {
 		return local(type, ConfigLength.fixed(width));
 	}
 
-	public static <T extends ConfigThreshold>T local( ThresholdType type , ConfigLength width ) {
-		if( !type.isAdaptive() )
+	public static <T extends ConfigThreshold> T local( ThresholdType type, ConfigLength width ) {
+		if (!type.isAdaptive())
 			throw new IllegalArgumentException("Type must be adaptive");
 
-		if( type.isGlobal() )
+		if (type.isGlobal())
 			throw new IllegalArgumentException("Type must be local");
 
 		ConfigThreshold config;
-		if( type == ThresholdType.BLOCK_MIN_MAX) {
+		if (type == ThresholdType.BLOCK_MIN_MAX) {
 			config = new ConfigThresholdBlockMinMax(width, 10, true);
-		} else if( type == ThresholdType.BLOCK_OTSU) {
+		} else if (type == ThresholdType.BLOCK_OTSU) {
 			config = new ConfigThresholdLocalOtsu();
 		} else {
 			config = new ConfigThreshold();

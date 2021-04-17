@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -25,7 +25,6 @@ import boofcv.override.BOverrideManager;
 /**
  * Override for {@link FactoryBinaryContourFinder}.+
  *
- *
  * @author Peter Abeles
  */
 public class BOverrideFactoryBinaryContourFinder extends BOverrideClass {
@@ -39,5 +38,4 @@ public class BOverrideFactoryBinaryContourFinder extends BOverrideClass {
 	public interface Chang2004 {
 		BinaryLabelContourFinder createChang2004();
 	}
-
 }

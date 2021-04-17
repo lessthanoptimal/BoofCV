@@ -33,9 +33,8 @@ import boofcv.struct.image.*;
  *
  * @author Peter Abeles
  */
-@SuppressWarnings({"unchecked", "rawtypes"}) 
+@SuppressWarnings({"unchecked", "rawtypes"})
 public class GImageDerivativeOps {
-
 	public static <I extends ImageGray<I>, D extends ImageGray<D>>
 	void laplace( I input, D output, BorderType borderType ) {
 		ImageBorder<I> border = BorderType.SKIP == borderType ? null : FactoryImageBorder.wrap(borderType, input);

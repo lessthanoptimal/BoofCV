@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -27,7 +27,7 @@ import boofcv.struct.image.GrayU8;
 /**
  * <p>
  * This is a further improvement on {@link GradientSobel_Outer} where it reduces the number of times the array needs to be
- * read from by saving past reads in a local variable.  This required the loops to be partially unwound.  In
+ * read from by saving past reads in a local variable. This required the loops to be partially unwound. In
  * tests it runs about 25% faster than {@link GradientSobel_Outer}.
  * </p>
  *

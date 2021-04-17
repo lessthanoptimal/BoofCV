@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -34,7 +34,6 @@ import boofcv.struct.image.Planar;
 
 import java.lang.reflect.Method;
 
-
 /**
  * Factory class for creating abstracted convolve down filters.
  *
@@ -44,37 +43,25 @@ import java.lang.reflect.Method;
 public class FactoryConvolveDown {
 
 	public static <In extends ImageBase<In>, Out extends ImageBase<Out>>
-	ConvolveDown<In,Out> convolve(Kernel1D kernel, BorderType border ,
-								   boolean isHorizontal , int skip , ImageType<In> inputType , ImageType<Out> outputType )
-	{
-		switch( inputType.getFamily() ) {
-			case PLANAR:
-				return convolvePL(kernel, border, isHorizontal, skip, inputType.getNumBands(),
-						inputType.getImageClass(), outputType.getImageClass());
-			case GRAY:
-				return convolveSB(kernel, border, isHorizontal, skip, inputType.getImageClass(), outputType.getImageClass());
-
-			case INTERLEAVED:
-				throw new IllegalArgumentException("Interleaved images are not yet supported");
-		}
-		throw new IllegalArgumentException("Unknown image type");
+	ConvolveDown<In, Out> convolve( Kernel1D kernel, BorderType border,
+									boolean isHorizontal, int skip, ImageType<In> inputType, ImageType<Out> outputType ) {
+		return switch (inputType.getFamily()) {
+			case PLANAR -> convolvePL(kernel, border, isHorizontal, skip, inputType.getNumBands(),
+					inputType.getImageClass(), outputType.getImageClass());
+			case GRAY -> convolveSB(kernel, border, isHorizontal, skip, inputType.getImageClass(), outputType.getImageClass());
+			case INTERLEAVED -> throw new IllegalArgumentException("Interleaved images are not yet supported");
+		};
 	}
 
 	public static <In extends ImageBase<In>, Out extends ImageBase<Out>>
-	ConvolveDown<In,Out> convolve(Kernel2D kernel, BorderType border ,
-								  int skip , ImageType<In> inputType , ImageType<Out> outputType )
-	{
-		switch( inputType.getFamily() ) {
-			case PLANAR:
-				return convolvePL(kernel, border, skip, inputType.getNumBands(),
-						inputType.getImageClass(), outputType.getImageClass());
-			case GRAY:
-				return convolveSB(kernel, border, skip, inputType.getImageClass(), outputType.getImageClass());
-
-			case INTERLEAVED:
-				throw new IllegalArgumentException("Interleaved images are not yet supported");
-		}
-		throw new IllegalArgumentException("Unknown image type");
+	ConvolveDown<In, Out> convolve( Kernel2D kernel, BorderType border,
+									int skip, ImageType<In> inputType, ImageType<Out> outputType ) {
+		return switch (inputType.getFamily()) {
+			case PLANAR -> convolvePL(kernel, border, skip, inputType.getNumBands(),
+					inputType.getImageClass(), outputType.getImageClass());
+			case GRAY -> convolveSB(kernel, border, skip, inputType.getImageClass(), outputType.getImageClass());
+			case INTERLEAVED -> throw new IllegalArgumentException("Interleaved images are not yet supported");
+		};
 	}
 
 	/**
@@ -87,32 +74,21 @@ public class FactoryConvolveDown {
 	 * @return FilterInterface which will perform the specified convolution.
 	 */
 	public static <Input extends ImageGray<Input>, Output extends ImageGray<Output>>
-	GenericConvolveDown<Input,Output>
-	convolveSB(Kernel1D kernel, BorderType border, boolean isHorizontal, int skip, Class<Input> inputType, Class<Output> outputType)
-	{
+	GenericConvolveDown<Input, Output>
+	convolveSB( Kernel1D kernel, BorderType border, boolean isHorizontal, int skip, Class<Input> inputType, Class<Output> outputType ) {
 		outputType = BoofTesting.convertToGenericType(outputType);
 
 		String direction = isHorizontal ? "horizontal" : "vertical";
 		Method m;
 		try {
-			switch( border ) {
-				case SKIP:
-					m = ConvolveImageDownNoBorder.class.
-							getMethod(direction,kernel.getClass(),inputType,outputType,int.class);
-					break;
-
-				case EXTENDED:
-					throw new IllegalArgumentException("Extended border is currently not supported.");
-
-				case NORMALIZED:
-					m = ConvolveImageDownNormalized.class.
-							getMethod(direction,kernel.getClass(),inputType,outputType,int.class);
-					break;
-
-				default:
-					throw new IllegalArgumentException("Unknown border type "+border);
-
-			}
+			m = switch (border) {
+				case SKIP -> ConvolveImageDownNoBorder.class.
+						getMethod(direction, kernel.getClass(), inputType, outputType, int.class);
+				case EXTENDED -> throw new IllegalArgumentException("Extended border is currently not supported.");
+				case NORMALIZED -> ConvolveImageDownNormalized.class.
+						getMethod(direction, kernel.getClass(), inputType, outputType, int.class);
+				default -> throw new IllegalArgumentException("Unknown border type " + border);
+			};
 		} catch (NoSuchMethodException e) {
 			throw new IllegalArgumentException("The specified convolution cannot be found");
 		}
@@ -130,31 +106,20 @@ public class FactoryConvolveDown {
 	 * @return FilterInterface which will perform the specified convolution.
 	 */
 	public static <Input extends ImageGray<Input>, Output extends ImageGray<Output>>
-	GenericConvolveDown<Input,Output>
-	convolveSB(Kernel2D kernel, BorderType border, int skip, Class<Input> inputType, Class<Output> outputType)
-	{
+	GenericConvolveDown<Input, Output>
+	convolveSB( Kernel2D kernel, BorderType border, int skip, Class<Input> inputType, Class<Output> outputType ) {
 		outputType = BoofTesting.convertToGenericType(outputType);
 
 		Method m;
 		try {
-			switch( border ) {
-				case SKIP:
-					m = ConvolveImageDownNoBorder.class.getMethod(
-							"convolve",kernel.getClass(),inputType,outputType,int.class);
-					break;
-
-				case EXTENDED:
-					throw new IllegalArgumentException("Extended border is currently not supported.");
-
-				case NORMALIZED:
-					m = ConvolveImageDownNormalized.class.getMethod(
-							"convolve",kernel.getClass(),inputType,outputType,int.class);
-					break;
-
-				default:
-					throw new IllegalArgumentException("Unknown border type "+border);
-
-			}
+			m = switch (border) {
+				case SKIP -> ConvolveImageDownNoBorder.class.getMethod(
+						"convolve", kernel.getClass(), inputType, outputType, int.class);
+				case EXTENDED -> throw new IllegalArgumentException("Extended border is currently not supported.");
+				case NORMALIZED -> ConvolveImageDownNormalized.class.getMethod(
+						"convolve", kernel.getClass(), inputType, outputType, int.class);
+				default -> throw new IllegalArgumentException("Unknown border type " + border);
+			};
 		} catch (NoSuchMethodException e) {
 			throw new IllegalArgumentException("The specified convolution cannot be found");
 		}
@@ -163,20 +128,18 @@ public class FactoryConvolveDown {
 	}
 
 	public static <Input extends ImageGray<Input>, Output extends ImageGray<Output>>
-	ConvolveDown<Planar<Input>,Planar<Output>>
-	convolvePL(Kernel1D kernel, BorderType border, boolean isHorizontal, int skip,
-			   int numBands, Class<Input> inputType, Class<Output> outputType)
-	{
-		ConvolveDown<Input,Output> grayDown = convolveSB(kernel, border, isHorizontal, skip, inputType, outputType);
+	ConvolveDown<Planar<Input>, Planar<Output>>
+	convolvePL( Kernel1D kernel, BorderType border, boolean isHorizontal, int skip,
+				int numBands, Class<Input> inputType, Class<Output> outputType ) {
+		ConvolveDown<Input, Output> grayDown = convolveSB(kernel, border, isHorizontal, skip, inputType, outputType);
 		return new PlanarConvolveDown<>(grayDown, numBands);
 	}
 
 	public static <Input extends ImageGray<Input>, Output extends ImageGray<Output>>
-	ConvolveDown<Planar<Input>,Planar<Output>>
-	convolvePL(Kernel2D kernel, BorderType border, int skip,
-			   int numBands, Class<Input> inputType, Class<Output> outputType)
-	{
-		ConvolveDown<Input,Output> grayDown = convolveSB(kernel, border, skip, inputType, outputType);
+	ConvolveDown<Planar<Input>, Planar<Output>>
+	convolvePL( Kernel2D kernel, BorderType border, int skip,
+				int numBands, Class<Input> inputType, Class<Output> outputType ) {
+		ConvolveDown<Input, Output> grayDown = convolveSB(kernel, border, skip, inputType, outputType);
 		return new PlanarConvolveDown<>(grayDown, numBands);
 	}
 }

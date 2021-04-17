@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -24,7 +24,7 @@ import boofcv.struct.image.*;
 import javax.annotation.Generated;
 
 /**
- * Generalized version of {@link PixelMath}.  Type checking is performed at runtime instead of at compile type.
+ * Generalized version of {@link PixelMath}. Type checking is performed at runtime instead of at compile type.
  *
  * <p>DO NOT MODIFY. Automatically generated code created by GenerateGPixelMath</p>
  *
@@ -1127,7 +1127,7 @@ public class GPixelMath {
 	 * Performs pixel-wise division<br>
 	 * output(x,y) = imgA(x,y) / imgB(x,y)
 	 * </p>
-	 * Only floating point images are supported.  If the numerator has multiple bands and the denominator is a single
+	 * Only floating point images are supported. If the numerator has multiple bands and the denominator is a single
 	 * band then the denominator will divide each band.
 	 *
 	 * @param imgA Input image. Not modified.
@@ -1171,7 +1171,7 @@ public class GPixelMath {
 	 * Performs pixel-wise multiplication<br>
 	 * output(x,y) = imgA(x,y) * imgB(x,y)
 	 * </p>
-	 * Only floating point images are supported.  If one image has multiple bands and the other is gray then
+	 * Only floating point images are supported. If one image has multiple bands and the other is gray then
 	 * the gray image will be multiplied by each band in the multiple band image.
 	 *
 	 * @param imgA Input image. Not modified.

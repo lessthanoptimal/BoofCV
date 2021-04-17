@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -35,7 +35,7 @@ public class DerivativeLaplacian_Inner {
 	/**
 	 * Computes the Laplacian of input image.
 	 *
-	 * @param orig  Input image.  Not modified.
+	 * @param orig  Input image. Not modified.
 	 * @param deriv Where the Laplacian is written to. Modified.
 	 */
 	public static void process(GrayU8 orig, GrayS16 deriv) {
@@ -97,7 +97,7 @@ public class DerivativeLaplacian_Inner {
 	/**
 	 * Computes the Laplacian of 'orig'.
 	 *
-	 * @param orig  Input image.  Not modified.
+	 * @param orig  Input image. Not modified.
 	 * @param deriv Where the Laplacian is written to. Modified.
 	 */
 	public static void process(GrayF32 orig, GrayF32 deriv) {

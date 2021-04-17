@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -52,42 +52,42 @@ public class ImageLocalNormalization<T extends GrayF<T>> {
 
 	protected Class<T> imageType;
 
-	// handle the image border.  If null then normalization is used
+	// handle the image border. If null then normalization is used
 	ImageBorder<T> border;
 
 	/**
 	 * Configures normalization
 	 *
 	 * @param imageType Type of input image
-	 * @param borderType How image borders are handled.  {@link BorderType#NORMALIZED} is recommended
+	 * @param borderType How image borders are handled. {@link BorderType#NORMALIZED} is recommended
 	 */
-	public ImageLocalNormalization( Class<T> imageType , BorderType borderType ) {
+	public ImageLocalNormalization( Class<T> imageType, BorderType borderType ) {
 		this.imageType = imageType;
 
-		if( borderType != BorderType.NORMALIZED )
+		if (borderType != BorderType.NORMALIZED)
 			border = FactoryImageBorder.generic(borderType, ImageType.single(imageType));
 
-		adjusted = GeneralizedImageOps.createSingleBand(imageType,1,1);
-		localMean = GeneralizedImageOps.createSingleBand(imageType,1,1);
-		pow2 = GeneralizedImageOps.createSingleBand(imageType,1,1);
-		localPow2 = GeneralizedImageOps.createSingleBand(imageType,1,1);
+		adjusted = GeneralizedImageOps.createSingleBand(imageType, 1, 1);
+		localMean = GeneralizedImageOps.createSingleBand(imageType, 1, 1);
+		pow2 = GeneralizedImageOps.createSingleBand(imageType, 1, 1);
+		localPow2 = GeneralizedImageOps.createSingleBand(imageType, 1, 1);
 	}
 
 	/*
-		 * <p>Normalizes the input image such that local weighted statics are a zero mean and with standard deviation
-		 * of 1.  The image border is handled by truncating the kernel and renormalizing it so that it's sum is
-		 * still one.</p>
-		 *
-		 * <p>output[x,y] = (input[x,y]-mean[x,y])/(stdev[x,y] + delta)</p>
-		 *
-		 * @param kernel Separable kernel.  Typically Gaussian
-		 * @param input Input image
-		 * @param maxPixelValue maximum value of a pixel element in the input image. -1 = compute max value.
-		 * Typically this is 255 or 1.
-		 * @param delta A small value used to avoid divide by zero errors.  Typical 1e-4f for 32 bit and 1e-8 for 64bit
-		 * @param output Storage for output
-		 */
-	public void zeroMeanStdOne(Kernel1D kernel, T input , double maxPixelValue , double delta , T output ) {
+	 * <p>Normalizes the input image such that local weighted statics are a zero mean and with standard deviation
+	 * of 1. The image border is handled by truncating the kernel and renormalizing it so that it's sum is
+	 * still one.</p>
+	 *
+	 * <p>output[x,y] = (input[x,y]-mean[x,y])/(stdev[x,y] + delta)</p>
+	 *
+	 * @param kernel Separable kernel. Typically Gaussian
+	 * @param input Input image
+	 * @param maxPixelValue maximum value of a pixel element in the input image. -1 = compute max value.
+	 * Typically this is 255 or 1.
+	 * @param delta A small value used to avoid divide by zero errors. Typical 1e-4f for 32 bit and 1e-8 for 64bit
+	 * @param output Storage for output
+	 */
+	public void zeroMeanStdOne( Kernel1D kernel, T input, double maxPixelValue, double delta, T output ) {
 		// check preconditions and initialize data structures
 		initialize(input, output);
 
@@ -95,7 +95,7 @@ public class ImageLocalNormalization<T extends GrayF<T>> {
 		T adjusted = ensureMaxValueOfOne(input, maxPixelValue);
 
 		// take advantage of 2D gaussian kernels being separable
-		if( border == null ) {
+		if (border == null) {
 			GConvolveImageOps.horizontalNormalized(kernel, adjusted, output);
 			GConvolveImageOps.verticalNormalized(kernel, output, localMean);
 			GPixelMath.pow2(adjusted, pow2);
@@ -110,7 +110,7 @@ public class ImageLocalNormalization<T extends GrayF<T>> {
 		}
 
 		// Compute the final output
-		if( imageType == GrayF32.class )
+		if (imageType == GrayF32.class)
 			computeOutput((GrayF32)input, (float)delta, (GrayF32)output, (GrayF32)adjusted);
 		else
 			computeOutput((GrayF64)input, delta, (GrayF64)output, (GrayF64)adjusted);
@@ -118,18 +118,18 @@ public class ImageLocalNormalization<T extends GrayF<T>> {
 
 	/*
 	 * <p>Normalizes the input image such that local statics are a zero mean and with standard deviation
-	 * of 1.  The image border is handled by truncating the kernel and renormalizing it so that it's sum is
+	 * of 1. The image border is handled by truncating the kernel and renormalizing it so that it's sum is
 	 * still one.</p>
 	 *
 	 * <p>output[x,y] = (input[x,y]-mean[x,y])/(stdev[x,y] + delta)</p>
 	 *
 	 * @param input Input image
-	 * @param maxPixelValue maximum value of a pixel element in the input image. -1 = compute max value.  Typically
+	 * @param maxPixelValue maximum value of a pixel element in the input image. -1 = compute max value. Typically
 	 * this is 255 or 1.
-	 * @param delta A small value used to avoid divide by zero errors.  Typical 1e-4f for 32 bit and 1e-8 for 64bit
+	 * @param delta A small value used to avoid divide by zero errors. Typical 1e-4f for 32 bit and 1e-8 for 64bit
 	 * @param output Storage for output
 	 */
-	public void zeroMeanStdOne( int radius , T input , double maxPixelValue , double delta , T output ) {
+	public void zeroMeanStdOne( int radius, T input, double maxPixelValue, double delta, T output ) {
 		// check preconditions and initialize data structures
 		initialize(input, output);
 
@@ -137,77 +137,77 @@ public class ImageLocalNormalization<T extends GrayF<T>> {
 		T adjusted = ensureMaxValueOfOne(input, maxPixelValue);
 
 		// take advantage of 2D gaussian kernels being separable
-		if( border == null ) {
+		if (border == null) {
 			GrowArray work = GeneralizedImageOps.createGrowArray(input.getImageType());
 			GBlurImageOps.mean(adjusted, localMean, radius, output, work);
 			GPixelMath.pow2(adjusted, pow2);
 			GBlurImageOps.mean(pow2, localPow2, radius, output, work);
 		} else {
-			throw new IllegalArgumentException("Only renormalize border supported here so far.  This can be changed...");
+			throw new IllegalArgumentException("Only renormalize border supported here so far. This can be changed...");
 		}
 
 		// Compute the final output
-		if( imageType == GrayF32.class )
+		if (imageType == GrayF32.class)
 			computeOutput((GrayF32)input, (float)delta, (GrayF32)output, (GrayF32)adjusted);
 		else
 			computeOutput((GrayF64)input, delta, (GrayF64)output, (GrayF64)adjusted);
 	}
 
-	private void initialize(T input, T output) {
-		InputSanityCheck.checkSameShape(input,output);
+	private void initialize( T input, T output ) {
+		InputSanityCheck.checkSameShape(input, output);
 
-		adjusted.reshape(input.width,input.height);
-		localMean.reshape(input.width,input.height);
-		pow2.reshape(input.width,input.height);
-		localPow2.reshape(input.width,input.height);
+		adjusted.reshape(input.width, input.height);
+		localMean.reshape(input.width, input.height);
+		pow2.reshape(input.width, input.height);
+		localPow2.reshape(input.width, input.height);
 	}
 
-	private void computeOutput(GrayF32 input, float delta, GrayF32 output, GrayF32 adjusted) {
+	private void computeOutput( GrayF32 input, float delta, GrayF32 output, GrayF32 adjusted ) {
 		GrayF32 localMean = (GrayF32)this.localMean;
 		GrayF32 localPow2 = (GrayF32)this.localPow2;
 
 		for (int y = 0; y < input.height; y++) {
 			int indexIn = y*input.width;
-			int indexEnd = indexIn+input.width;
+			int indexEnd = indexIn + input.width;
 			int indexOut = output.startIndex + y*output.stride;
 
-			while( indexIn < indexEnd ) {
+			while (indexIn < indexEnd) {
 
 				float ave = localMean.data[indexIn];
 				float std = (float)Math.sqrt(localPow2.data[indexIn] - ave*ave + delta);
 
-				output.data[indexOut++] = (adjusted.data[indexIn]-ave)/std;
+				output.data[indexOut++] = (adjusted.data[indexIn] - ave)/std;
 				indexIn++;
 			}
 		}
 	}
 
-	private void computeOutput(GrayF64 input, double delta, GrayF64 output, GrayF64 adjusted) {
+	private void computeOutput( GrayF64 input, double delta, GrayF64 output, GrayF64 adjusted ) {
 		GrayF64 localMean = (GrayF64)this.localMean;
 		GrayF64 localPow2 = (GrayF64)this.localPow2;
 
 		for (int y = 0; y < input.height; y++) {
 			int indexIn = y*input.width;
-			int indexEnd = indexIn+input.width;
+			int indexEnd = indexIn + input.width;
 			int indexOut = output.startIndex + y*output.stride;
 
-			while( indexIn < indexEnd ) {
+			while (indexIn < indexEnd) {
 
 				double ave = localMean.data[indexIn];
 				double std = Math.sqrt(localPow2.data[indexIn] - ave*ave + delta);
 
-				output.data[indexOut++] = (adjusted.data[indexIn]-ave)/std;
+				output.data[indexOut++] = (adjusted.data[indexIn] - ave)/std;
 				indexIn++;
 			}
 		}
 	}
 
-	private T ensureMaxValueOfOne(T input, double maxPixelValue) {
+	private T ensureMaxValueOfOne( T input, double maxPixelValue ) {
 		T adjusted;
-		if( maxPixelValue < 0 ) {
+		if (maxPixelValue < 0) {
 			maxPixelValue = GImageStatistics.max(input);
 		}
-		if( maxPixelValue != 1.0f ) {
+		if (maxPixelValue != 1.0f) {
 			adjusted = this.adjusted;
 			GPixelMath.divide(input, maxPixelValue, adjusted);
 		} else {

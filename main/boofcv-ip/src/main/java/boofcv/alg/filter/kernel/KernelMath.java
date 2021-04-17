@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -23,112 +23,111 @@ import boofcv.struct.image.GrayF32;
 import boofcv.struct.image.GrayI;
 import boofcv.struct.image.GrayS32;
 
-
 /**
  * @author Peter Abeles
  */
 public class KernelMath {
 
-	public static void scale( Kernel1D_F32 kernel , float value ) {
-		for( int i = 0; i < kernel.width; i++ ) {
+	public static void scale( Kernel1D_F32 kernel, float value ) {
+		for (int i = 0; i < kernel.width; i++) {
 			kernel.data[i] *= value;
 		}
 	}
 
-	public static void scale( Kernel1D_F64 kernel , double value ) {
-		for( int i = 0; i < kernel.width; i++ ) {
+	public static void scale( Kernel1D_F64 kernel, double value ) {
+		for (int i = 0; i < kernel.width; i++) {
 			kernel.data[i] *= value;
 		}
 	}
 
-	public static void divide( Kernel1D_F32 kernel , float value ) {
-		for( int i = 0; i < kernel.width; i++ ) {
+	public static void divide( Kernel1D_F32 kernel, float value ) {
+		for (int i = 0; i < kernel.width; i++) {
 			kernel.data[i] /= value;
 		}
 	}
 
-	public static void divide( Kernel1D_F64 kernel , double value ) {
-		for( int i = 0; i < kernel.width; i++ ) {
+	public static void divide( Kernel1D_F64 kernel, double value ) {
+		for (int i = 0; i < kernel.width; i++) {
 			kernel.data[i] /= value;
 		}
 	}
 
-	public static void divide( Kernel2D_F32 kernel , float value ) {
+	public static void divide( Kernel2D_F32 kernel, float value ) {
 		int N = kernel.width*kernel.width;
-		for( int i = 0; i < N; i++ ) {
+		for (int i = 0; i < N; i++) {
 			kernel.data[i] /= value;
 		}
 	}
 
-	public static void divide( Kernel2D_F64 kernel , double value ) {
+	public static void divide( Kernel2D_F64 kernel, double value ) {
 		int N = kernel.width*kernel.width;
-		for( int i = 0; i < N; i++ ) {
+		for (int i = 0; i < N; i++) {
 			kernel.data[i] /= value;
 		}
 	}
 
-	public static void fill( Kernel2D_F32 kernel , float value ) {
+	public static void fill( Kernel2D_F32 kernel, float value ) {
 		int N = kernel.width*kernel.width;
-		for( int i = 0; i < N; i++ ) {
+		for (int i = 0; i < N; i++) {
 			kernel.data[i] = value;
 		}
 	}
 
-	public static void fill(Kernel2D_S32 kernel , int value ) {
+	public static void fill( Kernel2D_S32 kernel, int value ) {
 		int N = kernel.width*kernel.width;
-		for( int i = 0; i < N; i++ ) {
+		for (int i = 0; i < N; i++) {
 			kernel.data[i] = value;
 		}
 	}
 
 	public static Kernel2D_F32 transpose( Kernel2D_F32 a ) {
-		Kernel2D_F32 b = new Kernel2D_F32( a.width );
+		Kernel2D_F32 b = new Kernel2D_F32(a.width);
 
-		for( int i = 0; i < a.width; i++ ) {
-			for( int j = 0; j < a.width; j++ ) {
-				b.set(j,i,a.get(i,j));
+		for (int i = 0; i < a.width; i++) {
+			for (int j = 0; j < a.width; j++) {
+				b.set(j, i, a.get(i, j));
 			}
 		}
 		return b;
 	}
 
-	public static Kernel2D_S32 transpose(Kernel2D_S32 a ) {
-		Kernel2D_S32 b = new Kernel2D_S32( a.width );
+	public static Kernel2D_S32 transpose( Kernel2D_S32 a ) {
+		Kernel2D_S32 b = new Kernel2D_S32(a.width);
 
-		for( int i = 0; i < a.width; i++ ) {
-			for( int j = 0; j < a.width; j++ ) {
-				b.set(j,i,a.get(i,j));
+		for (int i = 0; i < a.width; i++) {
+			for (int j = 0; j < a.width; j++) {
+				b.set(j, i, a.get(i, j));
 			}
 		}
 		return b;
 	}
 
-	public static Kernel1D convolve1D( Kernel1D a , Kernel1D b ) {
-		if( a instanceof Kernel1D_S32) {
-			return convolve1D_I32((Kernel1D_S32)a,(Kernel1D_S32)b);
-		} else if( a instanceof Kernel1D_F32 ) {
-			return convolve1D_F32((Kernel1D_F32)a,(Kernel1D_F32)b);
+	public static Kernel1D convolve1D( Kernel1D a, Kernel1D b ) {
+		if (a instanceof Kernel1D_S32) {
+			return convolve1D_I32((Kernel1D_S32)a, (Kernel1D_S32)b);
+		} else if (a instanceof Kernel1D_F32) {
+			return convolve1D_F32((Kernel1D_F32)a, (Kernel1D_F32)b);
 		} else {
 			throw new RuntimeException("Unknown kernel type");
 		}
 	}
 
-	public static Kernel1D_S32 convolve1D_I32(Kernel1D_S32 a , Kernel1D_S32 b ) {
-		int w = a.width+b.width-1;
+	public static Kernel1D_S32 convolve1D_I32( Kernel1D_S32 a, Kernel1D_S32 b ) {
+		int w = a.width + b.width - 1;
 
 		Kernel1D_S32 ret = new Kernel1D_S32(w);
 
-		int end = w-(b.getWidth()-1);
-		int N = b.width-1;
+		int end = w - (b.getWidth() - 1);
+		int N = b.width - 1;
 
 		int index = 0;
-		for( int j = -(b.getWidth()-1); j < end; j++ ) {
+		for (int j = -(b.getWidth() - 1); j < end; j++) {
 
 			int sum = 0;
-			for( int k = 0; k < b.getWidth(); k++ ) {
-				if( j+k >= 0 && j+k < a.getWidth() ) {
-					int valB = b.data[N-k];
-					int valA = a.data[j+k];
+			for (int k = 0; k < b.getWidth(); k++) {
+				if (j + k >= 0 && j + k < a.getWidth()) {
+					int valB = b.data[N - k];
+					int valA = a.data[j + k];
 					sum += valB*valA;
 				}
 			}
@@ -139,22 +138,22 @@ public class KernelMath {
 		return ret;
 	}
 
-	public static Kernel1D_F32 convolve1D_F32(Kernel1D_F32 a , Kernel1D_F32 b ) {
-		int w = a.width+b.width-1;
+	public static Kernel1D_F32 convolve1D_F32( Kernel1D_F32 a, Kernel1D_F32 b ) {
+		int w = a.width + b.width - 1;
 
 		Kernel1D_F32 ret = new Kernel1D_F32(w);
 
-		int end = w-(b.getWidth()-1);
-		int N = b.width-1;
+		int end = w - (b.getWidth() - 1);
+		int N = b.width - 1;
 
 		int index = 0;
-		for( int j = -(b.getWidth()-1); j < end; j++ ) {
+		for (int j = -(b.getWidth() - 1); j < end; j++) {
 
 			float sum = 0;
-			for( int k = 0; k < b.getWidth(); k++ ) {
-				if( j+k >= 0 && j+k < a.getWidth() ) {
-					float valB = b.data[N-k];
-					float valA = a.data[j+k];
+			for (int k = 0; k < b.getWidth(); k++) {
+				if (j + k >= 0 && j + k < a.getWidth()) {
+					float valB = b.data[N - k];
+					float valA = a.data[j + k];
 					sum += valB*valA;
 				}
 			}
@@ -168,13 +167,14 @@ public class KernelMath {
 	/**
 	 * Applies a smoothing kernel the the array. The kernel must sum to 1. Array borders are handling by
 	 * normalizing based on the overlap of the kernel with the image at that point
+	 *
 	 * @param kernel Smothing kernel that sums to 1
 	 * @param src Input array
 	 * @param dst Output array
 	 * @param length Effective length of the array
 	 */
-	public static void convolveSmooth( final Kernel1D_F32 kernel ,
-									   final float[]src , final float[]dst ,
+	public static void convolveSmooth( final Kernel1D_F32 kernel,
+									   final float[] src, final float[] dst,
 									   final int length ) {
 		int idx0 = kernel.offset;
 		int idx1 = length - kernel.width + kernel.offset;
@@ -182,8 +182,8 @@ public class KernelMath {
 		// Convolve the inner array first where we don't need to worry about the border
 		for (int i = idx0; i < idx1; i++) {
 			float sum = 0;
-			int loc = i-kernel.offset;
-			for (int j = 0; j < kernel.width; j++, loc++ ) {
+			int loc = i - kernel.offset;
+			for (int j = 0; j < kernel.width; j++, loc++) {
 				sum += kernel.data[j]*src[loc];
 			}
 			dst[i] = sum;
@@ -193,10 +193,10 @@ public class KernelMath {
 		for (int i = 0; i < idx0; i++) {
 			float weight = 0;
 			float sum = 0;
-			int loc = i-kernel.offset;
-			for (int j = 0; j < kernel.width; j++, loc++ ) {
-				if( loc > 0 && loc < length ) {
-					sum += kernel.data[j] * src[loc];
+			int loc = i - kernel.offset;
+			for (int j = 0; j < kernel.width; j++, loc++) {
+				if (loc > 0 && loc < length) {
+					sum += kernel.data[j]*src[loc];
 					weight += kernel.data[j];
 				}
 			}
@@ -205,10 +205,10 @@ public class KernelMath {
 		for (int i = idx1; i < length; i++) {
 			float weight = 0;
 			float sum = 0;
-			int loc = i-kernel.offset;
-			for (int j = 0; j < kernel.width; j++, loc++ ) {
-				if( loc > 0 && loc < length ) {
-					sum += kernel.data[j] * src[loc];
+			int loc = i - kernel.offset;
+			for (int j = 0; j < kernel.width; j++, loc++) {
+				if (loc > 0 && loc < length) {
+					sum += kernel.data[j]*src[loc];
 					weight += kernel.data[j];
 				}
 			}
@@ -216,18 +216,18 @@ public class KernelMath {
 		}
 	}
 
-	public static Kernel2D convolve2D( Kernel2D a , Kernel2D b ) {
-		if( a instanceof Kernel2D_S32) {
-			return convolve2D((Kernel2D_S32)a,(Kernel2D_S32)b);
-		} else if( a instanceof Kernel2D_F32 ) {
-			return convolve2D((Kernel2D_F32)a,(Kernel2D_F32)b);
+	public static Kernel2D convolve2D( Kernel2D a, Kernel2D b ) {
+		if (a instanceof Kernel2D_S32) {
+			return convolve2D((Kernel2D_S32)a, (Kernel2D_S32)b);
+		} else if (a instanceof Kernel2D_F32) {
+			return convolve2D((Kernel2D_F32)a, (Kernel2D_F32)b);
 		} else {
 			throw new RuntimeException("Unknown kernel type");
 		}
 	}
 
-	public static Kernel2D_S32 convolve2D(Kernel2D_S32 a , Kernel2D_S32 b ) {
-		int w = a.width+b.width-1;
+	public static Kernel2D_S32 convolve2D( Kernel2D_S32 a, Kernel2D_S32 b ) {
+		int w = a.width + b.width - 1;
 		int r = w/2;
 
 		Kernel2D_S32 ret = new Kernel2D_S32(w);
@@ -235,41 +235,41 @@ public class KernelMath {
 		int aR = a.width/2;
 		int bR = b.width/2;
 
-		for( int y = -r; y <= r; y++ ) {
-			for( int x = -r; x <= r; x++ ) {
+		for (int y = -r; y <= r; y++) {
+			for (int x = -r; x <= r; x++) {
 
 				int sum = 0;
 
 				// go through kernel A
-				for( int y0 = -aR; y0 <= aR; y0++ ) {
+				for (int y0 = -aR; y0 <= aR; y0++) {
 					// convert to kernel coordinates
 					int ay = -y0 + aR;
 					int by = y + y0 + bR;
 
-					if( by < 0 || by >= b.width )
+					if (by < 0 || by >= b.width)
 						continue;
 
-					for( int x0 = -aR; x0 <= aR; x0++ ) {
+					for (int x0 = -aR; x0 <= aR; x0++) {
 
 						// convert to kernel coordinates
 						int ax = -x0 + aR;
 						int bx = x + x0 + bR;
 
-						if( bx < 0 || bx >= b.width )
+						if (bx < 0 || bx >= b.width)
 							continue;
 
-						sum += a.get(ax,ay) * b.get(bx,by);
+						sum += a.get(ax, ay)*b.get(bx, by);
 					}
 				}
-				ret.set(x+r,y+r,sum);
+				ret.set(x + r, y + r, sum);
 			}
 		}
 
 		return ret;
 	}
 
-	public static Kernel2D_F32 convolve2D(Kernel2D_F32 a , Kernel2D_F32 b ) {
-		int w = a.width+b.width-1;
+	public static Kernel2D_F32 convolve2D( Kernel2D_F32 a, Kernel2D_F32 b ) {
+		int w = a.width + b.width - 1;
 		int r = w/2;
 
 		Kernel2D_F32 ret = new Kernel2D_F32(w);
@@ -277,33 +277,33 @@ public class KernelMath {
 		int aR = a.width/2;
 		int bR = b.width/2;
 
-		for( int y = -r; y <= r; y++ ) {
-			for( int x = -r; x <= r; x++ ) {
+		for (int y = -r; y <= r; y++) {
+			for (int x = -r; x <= r; x++) {
 
 				float sum = 0;
 
 				// go through kernel A
-				for( int y0 = -aR; y0 <= aR; y0++ ) {
+				for (int y0 = -aR; y0 <= aR; y0++) {
 					// convert to kernel coordinates
 					int ay = -y0 + aR;
 					int by = y + y0 + bR;
 
-					if( by < 0 || by >= b.width )
+					if (by < 0 || by >= b.width)
 						continue;
 
-					for( int x0 = -aR; x0 <= aR; x0++ ) {
+					for (int x0 = -aR; x0 <= aR; x0++) {
 
 						// convert to kernel coordinates
 						int ax = -x0 + aR;
 						int bx = x + x0 + bR;
 
-						if( bx < 0 || bx >= b.width )
+						if (bx < 0 || bx >= b.width)
 							continue;
 
-						sum += a.get(ax,ay) * b.get(bx,by);
+						sum += a.get(ax, ay)*b.get(bx, by);
 					}
 				}
-				ret.set(x+r,y+r,sum);
+				ret.set(x + r, y + r, sum);
 			}
 		}
 
@@ -317,17 +317,18 @@ public class KernelMath {
 	 * @param b Input horizontal 1D kernel
 	 * @return Resulting 2D kernel
 	 */
-	public static Kernel2D convolve2D(Kernel1D a, Kernel1D b) {
-		if( a instanceof Kernel1D_S32) {
-			return convolve2D((Kernel1D_S32)a,(Kernel1D_S32)b);
-		} else if( a instanceof Kernel1D_F32 ) {
-			return convolve2D((Kernel1D_F32)a,(Kernel1D_F32)b);
-		} else if( a instanceof Kernel1D_F64 ) {
-			return convolve2D((Kernel1D_F64)a,(Kernel1D_F64)b);
+	public static Kernel2D convolve2D( Kernel1D a, Kernel1D b ) {
+		if (a instanceof Kernel1D_S32) {
+			return convolve2D((Kernel1D_S32)a, (Kernel1D_S32)b);
+		} else if (a instanceof Kernel1D_F32) {
+			return convolve2D((Kernel1D_F32)a, (Kernel1D_F32)b);
+		} else if (a instanceof Kernel1D_F64) {
+			return convolve2D((Kernel1D_F64)a, (Kernel1D_F64)b);
 		} else {
 			throw new RuntimeException("Unknown kernel type");
 		}
 	}
+
 	/**
 	 * Convolve two 1D kernels together to form a 2D kernel.
 	 *
@@ -335,10 +336,10 @@ public class KernelMath {
 	 * @param b Input horizontal 1D kernel
 	 * @return Resulting 2D kernel
 	 */
-	public static Kernel2D_F32 convolve2D(Kernel1D_F32 a, Kernel1D_F32 b) {
-		if( a.width != b.width )
+	public static Kernel2D_F32 convolve2D( Kernel1D_F32 a, Kernel1D_F32 b ) {
+		if (a.width != b.width)
 			throw new IllegalArgumentException("Only kernels with the same width supported");
-		if( a.offset != b.width/2 )
+		if (a.offset != b.width/2)
 			throw new IllegalArgumentException("Only kernels with the offset in the middle supported");
 
 		int w = a.width;
@@ -346,9 +347,9 @@ public class KernelMath {
 		Kernel2D_F32 ret = new Kernel2D_F32(w);
 
 		int index = 0;
-		for( int i = 0; i < w; i++ ) {
-			for( int j = 0; j < w; j++ ) {
-				ret.data[ index++ ] = a.data[i] * b.data[j];
+		for (int i = 0; i < w; i++) {
+			for (int j = 0; j < w; j++) {
+				ret.data[index++] = a.data[i]*b.data[j];
 			}
 		}
 
@@ -362,10 +363,10 @@ public class KernelMath {
 	 * @param b Input horizontal 1D kernel
 	 * @return Resulting 2D kernel
 	 */
-	public static Kernel2D_F64 convolve2D(Kernel1D_F64 a, Kernel1D_F64 b) {
-		if( a.width != b.width )
+	public static Kernel2D_F64 convolve2D( Kernel1D_F64 a, Kernel1D_F64 b ) {
+		if (a.width != b.width)
 			throw new IllegalArgumentException("Only kernels with the same width supported");
-		if( a.offset != b.width/2 )
+		if (a.offset != b.width/2)
 			throw new IllegalArgumentException("Only kernels with the offset in the middle supported");
 
 		int w = a.width;
@@ -373,9 +374,9 @@ public class KernelMath {
 		Kernel2D_F64 ret = new Kernel2D_F64(w);
 
 		int index = 0;
-		for( int i = 0; i < w; i++ ) {
-			for( int j = 0; j < w; j++ ) {
-				ret.data[ index++ ] = a.data[i] * b.data[j];
+		for (int i = 0; i < w; i++) {
+			for (int j = 0; j < w; j++) {
+				ret.data[index++] = a.data[i]*b.data[j];
 			}
 		}
 
@@ -389,10 +390,10 @@ public class KernelMath {
 	 * @param b Input horizontal 1D kernel
 	 * @return Resulting 2D kernel
 	 */
-	public static Kernel2D_S32 convolve2D(Kernel1D_S32 a, Kernel1D_S32 b) {
-		if( a.width != b.width )
+	public static Kernel2D_S32 convolve2D( Kernel1D_S32 a, Kernel1D_S32 b ) {
+		if (a.width != b.width)
 			throw new IllegalArgumentException("Only kernels with the same width supported");
-		if( a.offset != b.width/2 )
+		if (a.offset != b.width/2)
 			throw new IllegalArgumentException("Only kernels with the offset in the middle supported");
 
 		int w = a.width;
@@ -400,9 +401,9 @@ public class KernelMath {
 		Kernel2D_S32 ret = new Kernel2D_S32(w);
 
 		int index = 0;
-		for( int i = 0; i < w; i++ ) {
-			for( int j = 0; j < w; j++ ) {
-				ret.data[ index++ ] = a.data[i] * b.data[j];
+		for (int i = 0; i < w; i++) {
+			for (int j = 0; j < w; j++) {
+				ret.data[index++] = a.data[i]*b.data[j];
 			}
 		}
 
@@ -414,7 +415,7 @@ public class KernelMath {
 	 *
 	 * @param kernel The kernel being normalized.
 	 */
-	public static void normalizeSumToOne(Kernel1D_F32 kernel) {
+	public static void normalizeSumToOne( Kernel1D_F32 kernel ) {
 
 		float[] data = kernel.data;
 		float total = 0;
@@ -422,7 +423,7 @@ public class KernelMath {
 		for (int i = 0; i < data.length; i++) data[i] /= total;
 	}
 
-	public static void normalizeSumToOne(Kernel1D_F64 kernel) {
+	public static void normalizeSumToOne( Kernel1D_F64 kernel ) {
 
 		double[] data = kernel.data;
 		double total = 0;
@@ -435,7 +436,7 @@ public class KernelMath {
 	 *
 	 * @param kernel The kernel being normalized.
 	 */
-	public static void normalizeSumToOne(Kernel2D_F32 kernel) {
+	public static void normalizeSumToOne( Kernel2D_F32 kernel ) {
 
 		float[] data = kernel.data;
 		float total = 0;
@@ -443,7 +444,7 @@ public class KernelMath {
 		for (int i = 0; i < data.length; i++) data[i] /= total;
 	}
 
-	public static void normalizeSumToOne(Kernel2D_F64 kernel) {
+	public static void normalizeSumToOne( Kernel2D_F64 kernel ) {
 
 		double[] data = kernel.data;
 		double total = 0;
@@ -456,7 +457,7 @@ public class KernelMath {
 	 *
 	 * @param kernel The kernel being normalized.
 	 */
-	public static void normalizeAbsSumToOne(Kernel2D_F32 kernel) {
+	public static void normalizeAbsSumToOne( Kernel2D_F32 kernel ) {
 
 		float[] data = kernel.data;
 		float total = 0;
@@ -464,7 +465,7 @@ public class KernelMath {
 		for (int i = 0; i < data.length; i++) data[i] /= total;
 	}
 
-	public static double sum(Kernel2D_F64 kernel) {
+	public static double sum( Kernel2D_F64 kernel ) {
 
 		double[] data = kernel.data;
 		double total = 0;
@@ -472,7 +473,7 @@ public class KernelMath {
 		return total;
 	}
 
-	public static void normalizeF(Kernel2D_F64 kernel) {
+	public static void normalizeF( Kernel2D_F64 kernel ) {
 
 		double[] data = kernel.data;
 		double norm = 0;
@@ -484,37 +485,37 @@ public class KernelMath {
 	/**
 	 * Normalizes it such that the largest element is equal to one
 	 */
-	public static void normalizeMaxOne(Kernel2D_F64 kernel) {
+	public static void normalizeMaxOne( Kernel2D_F64 kernel ) {
 		double max = -Double.MAX_VALUE;
 		int N = kernel.width*kernel.width;
 		for (int i = 0; i < N; i++) {
-			max = Math.max(max,kernel.data[i]);
+			max = Math.max(max, kernel.data[i]);
 		}
 		for (int i = 0; i < N; i++) {
 			kernel.data[i] /= max;
 		}
 	}
 
-	public static GrayF32 convertToImage(Kernel2D_F32 kernel ) {
+	public static GrayF32 convertToImage( Kernel2D_F32 kernel ) {
 		int w = kernel.getWidth();
-		GrayF32 ret = new GrayF32(w,w);
+		GrayF32 ret = new GrayF32(w, w);
 
-		for( int i = 0; i < w; i++ ) {
-			for( int j = 0; j < w; j++ ) {
-				ret.set(j,i,kernel.get(j,i));
+		for (int i = 0; i < w; i++) {
+			for (int j = 0; j < w; j++) {
+				ret.set(j, i, kernel.get(j, i));
 			}
 		}
 
 		return ret;
 	}
 
-	public static GrayS32 convertToImage(Kernel2D_S32 kernel ) {
+	public static GrayS32 convertToImage( Kernel2D_S32 kernel ) {
 		int w = kernel.getWidth();
-		GrayS32 ret = new GrayS32(w,w);
+		GrayS32 ret = new GrayS32(w, w);
 
-		for( int i = 0; i < w; i++ ) {
-			for( int j = 0; j < w; j++ ) {
-				ret.set(j,i,kernel.get(j,i));
+		for (int i = 0; i < w; i++) {
+			for (int j = 0; j < w; j++) {
+				ret.set(j, i, kernel.get(j, i));
 			}
 		}
 
@@ -525,136 +526,136 @@ public class KernelMath {
 		int w = image.getWidth();
 		Kernel2D_F32 ret = new Kernel2D_F32(w);
 
-		for( int i = 0; i < w; i++ ) {
-			for( int j = 0; j < w; j++ ) {
-				ret.set(j,i,image.get(j,i));
+		for (int i = 0; i < w; i++) {
+			for (int j = 0; j < w; j++) {
+				ret.set(j, i, image.get(j, i));
 			}
 		}
 
 		return ret;
 	}
 
-	public static Kernel2D_S32 convertToKernel(GrayI image ) {
+	public static Kernel2D_S32 convertToKernel( GrayI image ) {
 		int w = image.getWidth();
 		Kernel2D_S32 ret = new Kernel2D_S32(w);
 
-		for( int i = 0; i < w; i++ ) {
-			for( int j = 0; j < w; j++ ) {
-				ret.set(j,i,image.get(j,i));
+		for (int i = 0; i < w; i++) {
+			for (int j = 0; j < w; j++) {
+				ret.set(j, i, image.get(j, i));
 			}
 		}
 
 		return ret;
 	}
 
-	public static Kernel2D_S32 convert(Kernel2D_F32 original , float minFrac ) {
+	public static Kernel2D_S32 convert( Kernel2D_F32 original, float minFrac ) {
 		Kernel2D_S32 ret = new Kernel2D_S32(original.width);
-		convert( original.data,ret.data,original.width*original.width,minFrac);
+		convert(original.data, ret.data, original.width*original.width, minFrac);
 		return ret;
 	}
 
-	public static Kernel1D_S32 convert(Kernel1D_F32 original , float minFrac ) {
+	public static Kernel1D_S32 convert( Kernel1D_F32 original, float minFrac ) {
 
 		Kernel1D_S32 ret = new Kernel1D_S32(original.width, original.offset);
-		convert( original.data,ret.data,original.width,minFrac);
+		convert(original.data, ret.data, original.width, minFrac);
 
 		return ret;
 	}
 
-	public static Kernel1D_S32 convert(Kernel1D_F64 original , double minFrac ) {
+	public static Kernel1D_S32 convert( Kernel1D_F64 original, double minFrac ) {
 
 		Kernel1D_S32 ret = new Kernel1D_S32(original.width, original.offset);
-		convert( original.data,ret.data,original.width,minFrac);
+		convert(original.data, ret.data, original.width, minFrac);
 
 		return ret;
 	}
 
-	public static void convert( float input[] , int output[] , int size , float minFrac) {
-		float max = maxAbs(input,size);
-		float min = minAbs(input,size,max*minFrac);
+	public static void convert( float input[], int output[], int size, float minFrac ) {
+		float max = maxAbs(input, size);
+		float min = minAbs(input, size, max*minFrac);
 
-		for( int i = 0; i < size; i++ ) {
+		for (int i = 0; i < size; i++) {
 			output[i] = (int)(input[i]/min);
 		}
 	}
 
-	public static void convert( double input[] , int output[] , int size , double minFrac) {
-		double max = maxAbs(input,size);
-		double min = minAbs(input,size,max*minFrac);
+	public static void convert( double input[], int output[], int size, double minFrac ) {
+		double max = maxAbs(input, size);
+		double min = minAbs(input, size, max*minFrac);
 
-		for( int i = 0; i < size; i++ ) {
+		for (int i = 0; i < size; i++) {
 			output[i] = (int)(input[i]/min);
 		}
 	}
 
-	public static float maxAbs( float data[] , int size ) {
+	public static float maxAbs( float data[], int size ) {
 		float max = 0;
-		for( int i = 0; i < size; i++ ) {
+		for (int i = 0; i < size; i++) {
 			float v = Math.abs(data[i]);
 
-			if( v > max )
+			if (v > max)
 				max = v;
 		}
 		return max;
 	}
 
-	public static double maxAbs( double data[] , int size ) {
+	public static double maxAbs( double data[], int size ) {
 		double max = 0;
-		for( int i = 0; i < size; i++ ) {
+		for (int i = 0; i < size; i++) {
 			double v = Math.abs(data[i]);
 
-			if( v > max )
+			if (v > max)
 				max = v;
 		}
 		return max;
 	}
 
-	public static float minAbs( float data[] , int size , float minValue ) {
+	public static float minAbs( float data[], int size, float minValue ) {
 		float min = Float.MAX_VALUE;
-		for( int i = 0; i < size; i++ ) {
+		for (int i = 0; i < size; i++) {
 			float v = Math.abs(data[i]);
 
-			if( v < min && v >= minValue )
+			if (v < min && v >= minValue)
 				min = v;
 		}
 		return min;
 	}
 
-	public static double minAbs( double data[] , int size , double minValue ) {
+	public static double minAbs( double data[], int size, double minValue ) {
 		double min = Float.MAX_VALUE;
-		for( int i = 0; i < size; i++ ) {
+		for (int i = 0; i < size; i++) {
 			double v = Math.abs(data[i]);
 
-			if( v < min && v >= minValue )
+			if (v < min && v >= minValue)
 				min = v;
 		}
 		return min;
 	}
 
-	public static boolean isEqualsFrac( float expected[] , float found[] , int size , float fracTol , float zero ) {
-		for( int i = 0; i < size; i++ ) {
-			float norm = Math.max(Math.abs(expected[i]),Math.abs(found[i]));
-			if( norm < zero ) continue;
+	public static boolean isEqualsFrac( float expected[], float found[], int size, float fracTol, float zero ) {
+		for (int i = 0; i < size; i++) {
+			float norm = Math.max(Math.abs(expected[i]), Math.abs(found[i]));
+			if (norm < zero) continue;
 			float diff = Math.abs(expected[i] - found[i])/norm;
-			if( diff > fracTol )
+			if (diff > fracTol)
 				return false;
 		}
 		return true;
 	}
 
-	public static boolean isEquals( float expected[] , float found[] , int size , float tol ) {
-		for( int i = 0; i < size; i++ ) {
+	public static boolean isEquals( float expected[], float found[], int size, float tol ) {
+		for (int i = 0; i < size; i++) {
 			float diff = Math.abs(expected[i] - found[i]);
-			if( diff > tol )
+			if (diff > tol)
 				return false;
 		}
 		return true;
 	}
 
-	public static boolean isEquals( int expected[] , int found[] , int size ) {
-		for( int i = 0; i < size; i++ ) {
+	public static boolean isEquals( int expected[], int found[], int size ) {
+		for (int i = 0; i < size; i++) {
 			float diff = Math.abs(expected[i] - found[i]);
-			if( diff > 0 )
+			if (diff > 0)
 				return false;
 		}
 		return true;

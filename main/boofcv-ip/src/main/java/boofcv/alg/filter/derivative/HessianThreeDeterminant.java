@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -46,20 +46,20 @@ public class HessianThreeDeterminant {
 	/**
 	 * Computes the Laplacian of input image.
 	 *
-	 * @param orig  Input image.  Not modified.
+	 * @param orig Input image. Not modified.
 	 * @param deriv Where the Laplacian is written to. Modified.
 	 */
-	public static void process(GrayU8 orig, GrayS16 deriv, @Nullable ImageBorder_S32<GrayU8> border ) {
-		deriv.reshape(orig.width,orig.height);
+	public static void process( GrayU8 orig, GrayS16 deriv, @Nullable ImageBorder_S32<GrayU8> border ) {
+		deriv.reshape(orig.width, orig.height);
 
-		if( BoofConcurrency.USE_CONCURRENT ) {
-			HessianThreeDeterminant_Inner_MT.process(orig,deriv);
+		if (BoofConcurrency.USE_CONCURRENT) {
+			HessianThreeDeterminant_Inner_MT.process(orig, deriv);
 		} else {
-			HessianThreeDeterminant_Inner.process(orig,deriv);
+			HessianThreeDeterminant_Inner.process(orig, deriv);
 		}
 
-		if( border != null ) {
-			HessianThreeDeterminant_Border.process(orig,deriv, border);
+		if (border != null) {
+			HessianThreeDeterminant_Border.process(orig, deriv, border);
 		}
 	}
 
@@ -67,37 +67,37 @@ public class HessianThreeDeterminant {
 	 * Computes Laplacian on an U8 image but outputs derivative in a F32 image. Removes a step when processing
 	 * images for feature detection
 	 */
-	public static void process(GrayU8 orig, GrayF32 deriv, @Nullable ImageBorder_S32<GrayU8> border) {
-		deriv.reshape(orig.width,orig.height);
+	public static void process( GrayU8 orig, GrayF32 deriv, @Nullable ImageBorder_S32<GrayU8> border ) {
+		deriv.reshape(orig.width, orig.height);
 
-		if( BoofConcurrency.USE_CONCURRENT ) {
-			HessianThreeDeterminant_Inner_MT.process(orig,deriv);
+		if (BoofConcurrency.USE_CONCURRENT) {
+			HessianThreeDeterminant_Inner_MT.process(orig, deriv);
 		} else {
-			HessianThreeDeterminant_Inner.process(orig,deriv);
+			HessianThreeDeterminant_Inner.process(orig, deriv);
 		}
 
-		if( border != null ) {
-			HessianThreeDeterminant_Border.process(orig,deriv, border);
+		if (border != null) {
+			HessianThreeDeterminant_Border.process(orig, deriv, border);
 		}
 	}
 
 	/**
 	 * Computes the Laplacian of 'orig'.
 	 *
-	 * @param orig  Input image.  Not modified.
+	 * @param orig Input image. Not modified.
 	 * @param deriv Where the Laplacian is written to. Modified.
 	 */
-	public static void process(GrayF32 orig, GrayF32 deriv, @Nullable ImageBorder_F32 border) {
-		deriv.reshape(orig.width,orig.height);
+	public static void process( GrayF32 orig, GrayF32 deriv, @Nullable ImageBorder_F32 border ) {
+		deriv.reshape(orig.width, orig.height);
 
-		if( BoofConcurrency.USE_CONCURRENT ) {
-			HessianThreeDeterminant_Inner_MT.process(orig,deriv);
+		if (BoofConcurrency.USE_CONCURRENT) {
+			HessianThreeDeterminant_Inner_MT.process(orig, deriv);
 		} else {
-			HessianThreeDeterminant_Inner.process(orig,deriv);
+			HessianThreeDeterminant_Inner.process(orig, deriv);
 		}
 
-		if( border != null ) {
-			HessianThreeDeterminant_Border.process(orig,deriv, border);
+		if (border != null) {
+			HessianThreeDeterminant_Border.process(orig, deriv, border);
 		}
 	}
 }

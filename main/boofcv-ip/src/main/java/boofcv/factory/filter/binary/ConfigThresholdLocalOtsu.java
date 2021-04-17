@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -37,7 +37,7 @@ public class ConfigThresholdLocalOtsu extends ConfigThreshold {
 	 *
 	 * @see ThresholdBlockOtsu
 	 */
-	public double tuning=0;
+	public double tuning = 0;
 
 	/**
 	 * If true it will use Otsu 2. Produce much better results in binary or nearly binary images.
@@ -46,13 +46,13 @@ public class ConfigThresholdLocalOtsu extends ConfigThreshold {
 	 */
 	public boolean useOtsu2 = true;
 
-	public ConfigThresholdLocalOtsu(int regionWidth , double tuning) {
-		this(ConfigLength.fixed(regionWidth),tuning);
+	public ConfigThresholdLocalOtsu( int regionWidth, double tuning ) {
+		this(ConfigLength.fixed(regionWidth), tuning);
 	}
 
-	public ConfigThresholdLocalOtsu(ConfigLength regionWidth , double tuning) {
+	public ConfigThresholdLocalOtsu( ConfigLength regionWidth, double tuning ) {
 		this();
-		this.width =regionWidth;
+		this.width = regionWidth;
 		this.tuning = tuning;
 	}
 

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -28,21 +28,20 @@ import boofcv.struct.image.ImageType;
  *
  * @author Peter Abeles
  */
-public class InterpolatePixel_S_to_MB<T extends ImageGray<T>> implements InterpolatePixelMB<T>
-{
+public class InterpolatePixel_S_to_MB<T extends ImageGray<T>> implements InterpolatePixelMB<T> {
 	InterpolatePixelS<T> interp;
 
-	public InterpolatePixel_S_to_MB(InterpolatePixelS<T> interp) {
+	public InterpolatePixel_S_to_MB( InterpolatePixelS<T> interp ) {
 		this.interp = interp;
 	}
 
 	@Override
-	public void get(float x, float y, float[] values) {
-		values[0] = interp.get(x,y);
+	public void get( float x, float y, float[] values ) {
+		values[0] = interp.get(x, y);
 	}
 
 	@Override
-	public void get_fast(float x, float y, float[] values) {
+	public void get_fast( float x, float y, float[] values ) {
 		values[0] = interp.get_fast(x, y);
 	}
 
@@ -52,7 +51,7 @@ public class InterpolatePixel_S_to_MB<T extends ImageGray<T>> implements Interpo
 	}
 
 	@Override
-	public void setBorder(ImageBorder<T> border) {
+	public void setBorder( ImageBorder<T> border ) {
 		interp.setBorder(border);
 	}
 
@@ -62,7 +61,7 @@ public class InterpolatePixel_S_to_MB<T extends ImageGray<T>> implements Interpo
 	}
 
 	@Override
-	public void setImage(T image) {
+	public void setImage( T image ) {
 		interp.setImage(image);
 	}
 
@@ -72,8 +71,8 @@ public class InterpolatePixel_S_to_MB<T extends ImageGray<T>> implements Interpo
 	}
 
 	@Override
-	public boolean isInFastBounds(float x, float y) {
-		return interp.isInFastBounds(x,y);
+	public boolean isInFastBounds( float x, float y ) {
+		return interp.isInFastBounds(x, y);
 	}
 
 	@Override

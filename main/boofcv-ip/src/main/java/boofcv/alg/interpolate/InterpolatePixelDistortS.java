@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -31,30 +31,28 @@ import georegression.struct.point.Point2D_F32;
  * @author Peter Abeles
  */
 public class InterpolatePixelDistortS<T extends ImageGray<T>>
-		implements InterpolatePixelS<T>
-{
+		implements InterpolatePixelS<T> {
 	protected InterpolatePixelS<T> interpolate;
 	protected Point2Transform2_F32 distorter;
 
 	Point2D_F32 p = new Point2D_F32();
 
-	public InterpolatePixelDistortS(InterpolatePixelS<T> interpolate,
-									Point2Transform2_F32 distorter)
-	{
+	public InterpolatePixelDistortS( InterpolatePixelS<T> interpolate,
+									 Point2Transform2_F32 distorter ) {
 		this.interpolate = interpolate;
 		this.distorter = distorter;
 	}
 
 	@Override
-	public float get(float x, float y) {
-		distorter.compute(x,y,p);
-		return interpolate.get(p.x,p.y);
+	public float get( float x, float y ) {
+		distorter.compute(x, y, p);
+		return interpolate.get(p.x, p.y);
 	}
 
 	@Override
-	public float get_fast(float x, float y) {
-		distorter.compute(x,y,p);
-		return interpolate.get_fast(p.x,p.y);
+	public float get_fast( float x, float y ) {
+		distorter.compute(x, y, p);
+		return interpolate.get_fast(p.x, p.y);
 	}
 
 	@Override
@@ -63,7 +61,7 @@ public class InterpolatePixelDistortS<T extends ImageGray<T>>
 	}
 
 	@Override
-	public void setBorder(ImageBorder<T> border) {
+	public void setBorder( ImageBorder<T> border ) {
 		interpolate.setBorder(border);
 	}
 
@@ -73,7 +71,7 @@ public class InterpolatePixelDistortS<T extends ImageGray<T>>
 	}
 
 	@Override
-	public void setImage(T image) {
+	public void setImage( T image ) {
 		interpolate.setImage(image);
 	}
 
@@ -83,8 +81,8 @@ public class InterpolatePixelDistortS<T extends ImageGray<T>>
 	}
 
 	@Override
-	public boolean isInFastBounds(float x, float y) {
-		return interpolate.isInFastBounds(x,y);
+	public boolean isInFastBounds( float x, float y ) {
+		return interpolate.isInFastBounds(x, y);
 	}
 
 	@Override

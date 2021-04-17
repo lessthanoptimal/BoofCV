@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -34,7 +34,7 @@ public interface InterpolateRectangle<T extends ImageGray<T>> {
 	 *
 	 * @param image An image.
 	 */
-	public void setImage(T image);
+	public void setImage( T image );
 
 	/**
 	 * Returns the image which is being interpolated.
@@ -47,10 +47,10 @@ public interface InterpolateRectangle<T extends ImageGray<T>> {
 	 * Copies a grid from the source image starting at the specified coordinate
 	 * into the destination image.  The 'dest' image must be within the original image.
 	 *
-	 * @param tl_x	  upper left corner of the region in the image.
-	 * @param tl_y	  upper left corner of the region in the image.
+	 * @param tl_x upper left corner of the region in the image.
+	 * @param tl_y upper left corner of the region in the image.
 	 * @param dest Where the interpolated region is to be copied into
 	 */
-	public void region(float tl_x, float tl_y, GrayF32 dest );
+	public void region( float tl_x, float tl_y, GrayF32 dest );
 //	public void region(float tl_x, float tl_y, float[] results, int regWidth, int regHeight);
 }

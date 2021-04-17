@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -33,8 +33,8 @@ public class HistogramStatistics {
 	 * @param N number of bins in the histogram.
 	 * @return variance
 	 */
-	public static double variance(int[] histogram, double mean , int N ) {
-		return variance(histogram, mean, count(histogram,N), N);
+	public static double variance( int[] histogram, double mean, int N ) {
+		return variance(histogram, mean, count(histogram, N), N);
 	}
 
 	/**
@@ -46,14 +46,14 @@ public class HistogramStatistics {
 	 * @param N number of bins in the histogram.
 	 * @return variance of values inside the histogram
 	 */
-	public static double variance(int[] histogram, double mean, int counts , int N) {
+	public static double variance( int[] histogram, double mean, int counts, int N ) {
 		double sum = 0.0;
-		for(int i=0;i<N;i++) {
+		for (int i = 0; i < N; i++) {
 			double d = i - mean;
-			sum += (d*d) * histogram[i];
+			sum += (d*d)*histogram[i];
 		}
 
-		return sum / counts;
+		return sum/counts;
 	}
 
 	/**
@@ -63,9 +63,9 @@ public class HistogramStatistics {
 	 * @param N number of bins in the histogram.
 	 * @return Sum of all values in the histogram array.
 	 */
-	public static int count(int[] histogram, int N) {
+	public static int count( int[] histogram, int N ) {
 		int counts = 0;
-		for(int i=0;i<N;i++) {
+		for (int i = 0; i < N; i++) {
 			counts += histogram[i];
 		}
 		return counts;
@@ -78,31 +78,32 @@ public class HistogramStatistics {
 	 * @param N number of bins in the histogram.
 	 * @return Mean pixel intensity value
 	 */
-	public static double mean(int[] histogram, int N ) {
-		return mean(histogram, count(histogram,N),N);
+	public static double mean( int[] histogram, int N ) {
+		return mean(histogram, count(histogram, N), N);
 	}
 
-	public static double mean(int[] histogram, int counts, int N) {
+	public static double mean( int[] histogram, int counts, int N ) {
 		double sum = 0.0;
-		for(int i=0;i<N;i++) {
+		for (int i = 0; i < N; i++) {
 			sum += (histogram[i]*i);
 		}
 
 		return sum/counts;
 	}
 
-	public static int percentile(int[] histogram, double fraction , int N) {
-		return percentile(histogram, count(histogram,N),fraction,N);
+	public static int percentile( int[] histogram, double fraction, int N ) {
+		return percentile(histogram, count(histogram, N), fraction, N);
 	}
-	public static int percentile(int[] histogram, int counts, double fraction , int N) {
-		int target = (int)(counts*fraction+0.5);
+
+	public static int percentile( int[] histogram, int counts, double fraction, int N ) {
+		int target = (int)(counts*fraction + 0.5);
 		int count = 0;
 		int i;
-		if( count >= target )
+		if (count >= target)
 			return 0;
-		for(i=0;i<N;i++) {
+		for (i = 0; i < N; i++) {
 			count += histogram[i];
-			if( count >= target )
+			if (count >= target)
 				break;
 		}
 

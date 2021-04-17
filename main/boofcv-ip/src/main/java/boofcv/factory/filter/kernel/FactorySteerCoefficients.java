@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -22,7 +22,6 @@ import boofcv.alg.filter.kernel.SteerableCoefficients;
 
 import static java.lang.Math.*;
 
-
 /**
  * <p>
  * Coefficients for common steerable bases.
@@ -44,13 +43,13 @@ public class FactorySteerCoefficients {
 	 * @return Steering coeficient.
 	 */
 	public static SteerableCoefficients polynomial( int order ) {
-		if( order == 1 )
+		if (order == 1)
 			return new PolyOrder1();
-		else if( order == 2 )
+		else if (order == 2)
 			return new PolyOrder2();
-		else if( order == 3 )
+		else if (order == 3)
 			return new PolyOrder3();
-		else if( order == 4 )
+		else if (order == 4)
 			return new PolyOrder4();
 		else
 			throw new IllegalArgumentException("Only supports orders 1 to 4");
@@ -67,11 +66,10 @@ public class FactorySteerCoefficients {
 	}
 
 	// forumulas for steering even or odd parity polynomials
-	public static class PolyOrder1 implements SteerableCoefficients
-	{
+	public static class PolyOrder1 implements SteerableCoefficients {
 		@Override
-		public double compute(double angle, int basis) {
-			if( basis == 0 ) {
+		public double compute( double angle, int basis ) {
+			if (basis == 0) {
 				return Math.cos(angle);
 			} else {
 				return Math.sin(angle);
@@ -79,60 +77,56 @@ public class FactorySteerCoefficients {
 		}
 	}
 
-	public static class PolyOrder2 implements SteerableCoefficients
-	{
+	public static class PolyOrder2 implements SteerableCoefficients {
 		@Override
-		public double compute(double angle, int basis) {
+		public double compute( double angle, int basis ) {
 			angle -= basis*Math.PI/3.0;
 
 			return (1.0/3.0)*(1.0 + 2.0*Math.cos(2*angle));
 		}
 	}
 
-	public static class PolyOrder3 implements SteerableCoefficients
-	{
+	public static class PolyOrder3 implements SteerableCoefficients {
 		@Override
-		public double compute(double angle, int basis) {
+		public double compute( double angle, int basis ) {
 			angle -= basis*Math.PI/4.0;
 
-			return (1.0/4.0)*(2.0*Math.cos(angle)+2.0*Math.cos(3.0*angle));
+			return (1.0/4.0)*(2.0*Math.cos(angle) + 2.0*Math.cos(3.0*angle));
 		}
 	}
 
-	public static class PolyOrder4 implements SteerableCoefficients
-	{
+	public static class PolyOrder4 implements SteerableCoefficients {
 		@Override
-		public double compute(double angle, int basis) {
+		public double compute( double angle, int basis ) {
 			angle -= basis*Math.PI/5.0;
 
-			return (1.0/5.0)*(1+2.0*Math.cos(2.0*angle)+2.0*Math.cos(4.0*angle));
+			return (1.0/5.0)*(1 + 2.0*Math.cos(2.0*angle) + 2.0*Math.cos(4.0*angle));
 		}
 	}
 
-	public static class Separable implements SteerableCoefficients
-	{
+	public static class Separable implements SteerableCoefficients {
 		final int order;
 
-		public Separable(int order) {
+		public Separable( int order ) {
 			this.order = order;
 		}
 
 		@Override
-		public double compute(double angle, int basis) {
-			int powerC = order-basis;
+		public double compute( double angle, int basis ) {
+			int powerC = order - basis;
 
-			int middleIndex = Math.min(basis,order-basis);
+			int middleIndex = Math.min(basis, order - basis);
 
 			float middle = 1;
-			if( middleIndex > 0 ) {
+			if (middleIndex > 0) {
 				middle = order;
 				int inc = order;
-				for( int i = 1; i < middleIndex; i++ ) {
+				for (int i = 1; i < middleIndex; i++) {
 					inc -= 2;
 					middle += inc;
 				}
 			}
-			middle *= (float)Math.pow(-1,basis);
+			middle *= (float)Math.pow(-1, basis);
 
 //			if( order == 2 ) {
 //				if( basis == 0 )
@@ -144,7 +138,7 @@ public class FactorySteerCoefficients {
 //			}
 
 //			System.out.println("order "+order+" basis "+basis+" middle "+middle);
-			return middle*pow(cos(angle),powerC)*pow(sin(angle),basis);
+			return middle*pow(cos(angle), powerC)*pow(sin(angle), basis);
 		}
 	}
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -35,42 +35,42 @@ public class FactoryBinaryImageOps {
 	/**
 	 * Filter implementation of {@link BinaryImageOps#erode4(GrayU8, int, GrayU8)}
 	 */
-	public static FilterImageInterface<GrayU8, GrayU8> erode4(int numTimes) {
+	public static FilterImageInterface<GrayU8, GrayU8> erode4( int numTimes ) {
 		return new BinaryFilters.Erode4(numTimes);
 	}
 
 	/**
 	 * Filter implementation of {@link BinaryImageOps#erode8(GrayU8, int, GrayU8)}
 	 */
-	public static FilterImageInterface<GrayU8, GrayU8> erode8(int numTimes) {
+	public static FilterImageInterface<GrayU8, GrayU8> erode8( int numTimes ) {
 		return new BinaryFilters.Erode8(numTimes);
 	}
 
 	/**
 	 * Filter implementation of {@link BinaryImageOps#dilate4(GrayU8, int, GrayU8)}
 	 */
-	public static FilterImageInterface<GrayU8, GrayU8> dilate4(int numTimes) {
+	public static FilterImageInterface<GrayU8, GrayU8> dilate4( int numTimes ) {
 		return new BinaryFilters.Dilate4(numTimes);
 	}
 
 	/**
 	 * Filter implementation of {@link BinaryImageOps#dilate8(GrayU8, int, GrayU8)}
 	 */
-	public static FilterImageInterface<GrayU8, GrayU8> dilate8(int numTimes) {
+	public static FilterImageInterface<GrayU8, GrayU8> dilate8( int numTimes ) {
 		return new BinaryFilters.Dilate8(numTimes);
 	}
 
 	/**
 	 * Filter implementation of {@link BinaryImageOps#edge4(GrayU8, GrayU8, boolean)}
 	 */
-	public static FilterImageInterface<GrayU8, GrayU8> edge4(boolean outsideZero) {
+	public static FilterImageInterface<GrayU8, GrayU8> edge4( boolean outsideZero ) {
 		return new BinaryFilters.Edge4(outsideZero);
 	}
 
 	/**
 	 * Filter implementation of {@link BinaryImageOps#edge8(GrayU8, GrayU8, boolean)}
 	 */
-	public static FilterImageInterface<GrayU8, GrayU8> edge8(boolean outsideZero) {
+	public static FilterImageInterface<GrayU8, GrayU8> edge8( boolean outsideZero ) {
 		return new BinaryFilters.Edge8(outsideZero);
 	}
 
@@ -87,5 +87,4 @@ public class FactoryBinaryImageOps {
 	public static FilterImageInterface<GrayS32, GrayU8> labelToBinary() {
 		return new FilterImageReflection<>(BinaryImageOps.class, "labelToBinary", 0, 0, GrayS32.class, GrayU8.class);
 	}
-
 }

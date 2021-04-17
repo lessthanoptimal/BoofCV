@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -27,17 +27,17 @@ import lombok.Getter;
  * a grid on top of the image. The size of a cell depends on the maximum number of possible features which can be
  * detected.
  *
+ * @author Peter Abeles
  * @see ConfigGridUniform
  * @see ImageGrid
- * @author Peter Abeles
  */
 public class ImageCoverage {
 
 	/** Configuration for overlaying a grid. You probably want to leave this as is */
-	public final ConfigGridUniform configUniform = new ConfigGridUniform(1.5,1);
+	public final ConfigGridUniform configUniform = new ConfigGridUniform(1.5, 1);
 
 	// grid cells. Stored in row major format
-	public final ImageGrid<Cell> grid = new ImageGrid<>(Cell::new,Cell::reset);
+	public final ImageGrid<Cell> grid = new ImageGrid<>(Cell::new, Cell::reset);
 
 	/** Fraction of the image covered by image features */
 	public @Getter double fraction;
@@ -46,13 +46,14 @@ public class ImageCoverage {
 
 	/**
 	 * Resets and adjusts the grid size
+	 *
 	 * @param maxFeatures Maximum number of features which can be inside an image
 	 * @param width image width
 	 * @param height image height
 	 */
-	public void reset( int maxFeatures, int width , int height ) {
-		targetCellPixels = configUniform.selectTargetCellSize(maxFeatures,width,height);
-		grid.initialize(targetCellPixels,width,height);
+	public void reset( int maxFeatures, int width, int height ) {
+		targetCellPixels = configUniform.selectTargetCellSize(maxFeatures, width, height);
+		grid.initialize(targetCellPixels, width, height);
 		fraction = 0.0;
 //		System.out.println("Coverage reset tl="+targetLength+" mf="+maxFeatures+" w="+width+" h="+height);
 	}
@@ -61,7 +62,7 @@ public class ImageCoverage {
 	 * Marks a pixel in the image as having contained a feature. The pixel must lie inside the image. Outside
 	 * pixels have undefined and likely very bad behavior.
 	 */
-	public void markPixel(int pixelX , int pixelY ) {
+	public void markPixel( int pixelX, int pixelY ) {
 		grid.getCellAtPixel(pixelX, pixelY).covered = true;
 	}
 
@@ -71,7 +72,7 @@ public class ImageCoverage {
 	public void process() {
 		int total = 0;
 		for (int i = 0; i < grid.cells.size; i++) {
-			if( grid.cells.data[i].covered )
+			if (grid.cells.data[i].covered)
 				total++;
 		}
 		fraction = total/(double)grid.cells.size;

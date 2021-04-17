@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -18,9 +18,7 @@
 
 package boofcv.alg.filter.kernel;
 
-
 import boofcv.struct.convolve.Kernel2D;
-
 
 /**
  * <p>
@@ -35,8 +33,7 @@ import boofcv.struct.convolve.Kernel2D;
  *
  * @author Peter Abeles
  */
-public interface SteerableKernel< K extends Kernel2D> {
-
+public interface SteerableKernel<K extends Kernel2D> {
 
 	/**
 	 * Compute the steerable filter.
@@ -44,7 +41,7 @@ public interface SteerableKernel< K extends Kernel2D> {
 	 * @param coef Coefficients for each basis.
 	 * @param basis Kernels which form the basis for the steerable filter.
 	 */
-	public void setBasis( SteerableCoefficients coef ,  Kernel2D...basis );
+	void setBasis( SteerableCoefficients coef, Kernel2D... basis );
 
 	/**
 	 * Computes the kernel at the specified angle.
@@ -52,9 +49,9 @@ public interface SteerableKernel< K extends Kernel2D> {
 	 * @param angle Angle the kernel should be pointed at.
 	 * @return The computed kernel.  Data is recycled each time compute is called.
 	 */
-	public K compute( double angle );
+	K compute( double angle );
 
-	public int getBasisSize() ;
+	int getBasisSize();
 
-	public K getBasis( int index ) ;
+	K getBasis( int index );
 }

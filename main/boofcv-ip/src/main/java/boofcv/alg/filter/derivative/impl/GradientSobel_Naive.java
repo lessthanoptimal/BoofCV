@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -24,7 +24,7 @@ import boofcv.struct.image.GrayI;
 /**
  * <p>
  * This implementation of the sobel edge dector is implements it in such as way that the code can be easily read
- * and verified for correctness, however it is much slower than it needs to be.  The intended purpose of this
+ * and verified for correctness, however it is much slower than it needs to be. The intended purpose of this
  * class is to compare it against others.
  * </p>
  * <p>

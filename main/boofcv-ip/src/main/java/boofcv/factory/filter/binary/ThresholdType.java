@@ -29,103 +29,103 @@ public enum ThresholdType {
 	/**
 	 * Fixed threshold
 	 */
-	FIXED(false,true),
+	FIXED(false, true),
 	/**
 	 * Globally adaptive set using entropy equation
 	 *
 	 * @see boofcv.alg.filter.binary.GThresholdImageOps#computeEntropy(int[], int, int)
 	 */
-	GLOBAL_ENTROPY(true,true),
+	GLOBAL_ENTROPY(true, true),
 	/**
 	 * Globally adaptive set using Otsu's equation
 	 *
 	 * @see boofcv.alg.filter.binary.GThresholdImageOps#computeOtsu(int[], int, int)
 	 */
-	GLOBAL_OTSU(true,true),
+	GLOBAL_OTSU(true, true),
 	/**
 	 * Global Adaptive using Li's equation.
 	 *
 	 * @see boofcv.alg.filter.binary.GThresholdImageOps#computeLi(int[], int)
 	 */
-	GLOBAL_LI(true,true),
+	GLOBAL_LI(true, true),
 	/**
 	 * Global Adaptive using Huang's equation.
 	 *
 	 * @see boofcv.alg.filter.binary.GThresholdImageOps#computeHuang(int[], int)
 	 */
-	GLOBAL_HUANG(true,true),
+	GLOBAL_HUANG(true, true),
 	/**
 	 * Locally adaptive computed using Guassian weights
 	 *
 	 * @see ThresholdImageOps#localGaussian
 	 */
-	LOCAL_GAUSSIAN(true,false),
+	LOCAL_GAUSSIAN(true, false),
 	/**
 	 * Locally adaptive using an average
 	 *
 	 * @see ThresholdImageOps#localMean
 	 */
-	LOCAL_MEAN(true,false),
+	LOCAL_MEAN(true, false),
 	/**
 	 * Applies a local Otsu across the entire image
 	 *
 	 * @see ThresholdLocalOtsu
 	 */
-	LOCAL_OTSU(true,false),
+	LOCAL_OTSU(true, false),
 	/**
 	 * Breaks the image into blocks and computes the min and max inside each block.  Then thresholds
 	 * each pixel using interpolated min/max values.
 	 *
 	 * @see ThresholdBlockMinMax
 	 */
-	BLOCK_MIN_MAX(true,false),
+	BLOCK_MIN_MAX(true, false),
 
 	/**
 	 * Breaks the image into blocks and computes the mean inside each block.
 	 *
 	 * @see ThresholdBlockMean
 	 */
-	BLOCK_MEAN(true,false),
+	BLOCK_MEAN(true, false),
 
 	/**
 	 * Breaks the image into blocks and computes the an Otsu threshold in each block
 	 *
 	 * @see ThresholdBlockOtsu
 	 */
-	BLOCK_OTSU(true,false),
+	BLOCK_OTSU(true, false),
 
 	/**
 	 * Locally adaptive computed using Niblack's method
 	 *
 	 * @see ThresholdNiblackFamily
 	 */
-	LOCAL_NIBLACK(true,false),
+	LOCAL_NIBLACK(true, false),
 
 	/**
 	 * Locally adaptive computed using Savola's method
 	 *
 	 * @see ThresholdNiblackFamily
 	 */
-	LOCAL_SAVOLA(true,false),
+	LOCAL_SAVOLA(true, false),
 
 	/**
 	 * Locally adaptive computed using Wolf's method
 	 *
 	 * @see ThresholdNiblackFamily
 	 */
-	LOCAL_WOLF(true,false),
+	LOCAL_WOLF(true, false),
 
 	/**
 	 * Locally adaptive computed using NICK method
 	 *
 	 * @see boofcv.alg.filter.binary.ThresholdNick
 	 */
-	LOCAL_NICK(true,false);
+	LOCAL_NICK(true, false);
 
 	final boolean adaptive;
 	final boolean global;
 
-	ThresholdType(boolean adaptive, boolean global) {
+	ThresholdType( boolean adaptive, boolean global ) {
 		this.adaptive = adaptive;
 		this.global = global;
 	}
