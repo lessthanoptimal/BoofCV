@@ -35,7 +35,7 @@ public class GradientFamilyAB {
 	 * Computes derivative of GrayU8. Inputs can be sub-images.
 	 */
 	public static void process( GrayU8 src,
-								final int a, final int b,
+								final int kerA, final int kerB,
 								GrayS16 derivX, GrayS16 derivY ) {
 		final byte[] data = src.data;
 		final short[] imgX = derivX.data;
@@ -53,20 +53,39 @@ public class GradientFamilyAB {
 			int indexX = derivX.startIndex + derivX.stride*y + 1;
 			int indexY = derivY.startIndex + derivY.stride*y + 1;
 
+			int a11, a12, a21, a22, a31, a32;
+
+			a11 = data[indexSrc - strideSrc - 1] & 0xFF;
+			a12 = data[indexSrc - strideSrc] & 0xFF;
+			a21 = data[indexSrc - 1] & 0xFF;
+			a22 = data[indexSrc] & 0xFF;
+			a31 = data[indexSrc + strideSrc - 1] & 0xFF;
+			a32 = data[indexSrc + strideSrc] & 0xFF;
+
 			for (; indexSrc < endX; indexSrc++) {
-				int v = ((data[indexSrc + strideSrc + 1] & 0xFF) - (data[indexSrc - strideSrc - 1] & 0xFF))*a;
-				int w = ((data[indexSrc + strideSrc - 1] & 0xFF) - (data[indexSrc - strideSrc + 1] & 0xFF))*a;
+				int a13 = data[indexSrc - strideSrc + 1] & 0xFF;
+				int a23 = data[indexSrc + 1] & 0xFF;
+				int a33 = data[indexSrc + strideSrc + 1] & 0xFF;
 
-				imgY[indexY++] = (short)(((data[indexSrc + strideSrc] & 0xFF) - (data[indexSrc - strideSrc] & 0xFF))*b + v + w);
+				int v = (a33 - a11)*kerA;
+				int w = (a31 - a13)*kerA;
 
-				imgX[indexX++] = (short)(((data[indexSrc + 1] & 0xFF) - (data[indexSrc - 1] & 0xFF))*b + v - w);
+				imgY[indexY++] = (short)((a32 - a12)*kerB + v + w);
+				imgX[indexX++] = (short)((a23 - a21)*kerB + v - w);
+
+				a11 = a12;
+				a12 = a13;
+				a21 = a22;
+				a22 = a23;
+				a31 = a32;
+				a32 = a33;
 			}
 		}
 		//CONCURRENT_ABOVE });
 	}
 
 	public static void process( GrayS16 src,
-								final int a, final int b,
+								final int kerA, final int kerB,
 								GrayS16 derivX,
 								GrayS16 derivY ) {
 		final short[] data = src.data;
@@ -85,13 +104,32 @@ public class GradientFamilyAB {
 			int indexX = derivX.startIndex + derivX.stride*y + 1;
 			int indexY = derivY.startIndex + derivY.stride*y + 1;
 
+			int a11, a12, a21, a22, a31, a32;
+
+			a11 = data[indexSrc - strideSrc - 1];
+			a12 = data[indexSrc - strideSrc];
+			a21 = data[indexSrc - 1];
+			a22 = data[indexSrc];
+			a31 = data[indexSrc + strideSrc - 1];
+			a32 = data[indexSrc + strideSrc];
+
 			for (; indexSrc < endX; indexSrc++) {
-				int v = (data[indexSrc + strideSrc + 1] - data[indexSrc - strideSrc - 1])*a;
-				int w = (data[indexSrc + strideSrc - 1] - data[indexSrc - strideSrc + 1])*a;
+				int a13 = data[indexSrc - strideSrc + 1];
+				int a23 = data[indexSrc + 1];
+				int a33 = data[indexSrc + strideSrc + 1];
 
-				imgY[indexY++] = (short)((data[indexSrc + strideSrc] - data[indexSrc - strideSrc])*b + v + w);
+				int v = (a33 - a11)*kerA;
+				int w = (a31 - a13)*kerA;
 
-				imgX[indexX++] = (short)((data[indexSrc + 1] - data[indexSrc - 1])*b + v - w);
+				imgY[indexY++] = (short)((a32 - a12)*kerB + v + w);
+				imgX[indexX++] = (short)((a23 - a21)*kerB + v - w);
+
+				a11 = a12;
+				a12 = a13;
+				a21 = a22;
+				a22 = a23;
+				a31 = a32;
+				a32 = a33;
 			}
 		}
 		//CONCURRENT_ABOVE });
@@ -101,7 +139,7 @@ public class GradientFamilyAB {
 	 * Computes derivative of GrayF32. None of the images can be sub-images.
 	 */
 	public static void process( GrayF32 src,
-								final float a, final float b,
+								final float kerA, final float kerB,
 								GrayF32 derivX,
 								GrayF32 derivY ) {
 		final float[] data = src.data;
@@ -120,13 +158,32 @@ public class GradientFamilyAB {
 			int indexX = derivX.startIndex + derivX.stride*y + 1;
 			int indexY = derivY.startIndex + derivY.stride*y + 1;
 
+			float a11, a12, a21, a22, a31, a32;
+
+			a11 = data[indexSrc - strideSrc - 1];
+			a12 = data[indexSrc - strideSrc];
+			a21 = data[indexSrc - 1];
+			a22 = data[indexSrc];
+			a31 = data[indexSrc + strideSrc - 1];
+			a32 = data[indexSrc + strideSrc];
+
 			for (; indexSrc < endX; indexSrc++) {
-				float v = (data[indexSrc + strideSrc + 1] - data[indexSrc - strideSrc - 1])*a;
-				float w = (data[indexSrc + strideSrc - 1] - data[indexSrc - strideSrc + 1])*a;
+				float a13 = data[indexSrc - strideSrc + 1];
+				float a23 = data[indexSrc + 1];
+				float a33 = data[indexSrc + strideSrc + 1];
 
-				imgY[indexY++] = (data[indexSrc + strideSrc] - data[indexSrc - strideSrc])*b + v + w;
+				float v = (a33 - a11)*kerA;
+				float w = (a31 - a13)*kerA;
 
-				imgX[indexX++] = (data[indexSrc + 1] - data[indexSrc - 1])*b + v - w;
+				imgY[indexY++] = (a32 - a12)*kerB + v + w;
+				imgX[indexX++] = (a23 - a21)*kerB + v - w;
+
+				a11 = a12;
+				a12 = a13;
+				a21 = a22;
+				a22 = a23;
+				a31 = a32;
+				a32 = a33;
 			}
 		}
 		//CONCURRENT_ABOVE });

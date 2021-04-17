@@ -21,8 +21,11 @@ package boofcv.alg.filter.derivative;
 import boofcv.alg.misc.ImageMiscOps;
 import boofcv.concurrency.BoofConcurrency;
 import boofcv.core.image.border.BorderIndex1D_Extend;
+import boofcv.struct.border.ImageBorder1D_F32;
 import boofcv.struct.border.ImageBorder1D_S32;
+import boofcv.struct.border.ImageBorder_F32;
 import boofcv.struct.border.ImageBorder_S32;
+import boofcv.struct.image.GrayF32;
 import boofcv.struct.image.GrayS16;
 import boofcv.struct.image.GrayU8;
 import org.openjdk.jmh.annotations.*;
@@ -40,42 +43,61 @@ import java.util.concurrent.TimeUnit;
 @Warmup(iterations = 2)
 @Measurement(iterations = 3)
 @State(Scope.Benchmark)
-@Fork(value=1)
+@Fork(value = 1)
 public class BenchmarkImageDerivatives {
-	@Param({"true","false"})
+	@Param({"true", "false"})
 	public boolean concurrent;
 
 	@Param({"2000"})
 	public int size;
 
-	GrayU8 input = new GrayU8(size, size);
-	GrayS16 derivX = new GrayS16(size, size);
-	GrayS16 derivY = new GrayS16(size, size);
+	GrayU8 input_U8 = new GrayU8(size, size);
+	GrayS16 derivX_S16 = new GrayS16(size, size);
+	GrayS16 derivY_S16 = new GrayS16(size, size);
 	ImageBorder_S32<GrayU8> borderI32 = new ImageBorder1D_S32(BorderIndex1D_Extend::new);
+
+	GrayF32 input_F32 = new GrayF32(size, size);
+	GrayF32 derivX_F32 = new GrayF32(size, size);
+	GrayF32 derivY_F32 = new GrayF32(size, size);
+	ImageBorder_F32 borderF32 = new ImageBorder1D_F32(BorderIndex1D_Extend::new);
 
 	@Setup public void setup() {
 		BoofConcurrency.USE_CONCURRENT = concurrent;
-		Random rand = new Random(234);
 
-		input.reshape(size, size);
-		derivX.reshape(size, size);
-		derivY.reshape(size, size);
+		input_U8.reshape(size, size);
+		derivX_S16.reshape(size, size);
+		derivY_S16.reshape(size, size);
 
-		ImageMiscOps.fillUniform(input,rand,0,200);
+		input_F32.reshape(size, size);
+		derivX_F32.reshape(size, size);
+		derivY_F32.reshape(size, size);
+
+		var rand = new Random(234);
+		ImageMiscOps.fillUniform(input_U8, rand, 0, 200);
+		ImageMiscOps.fillUniform(input_F32, rand, 0, 200);
 	}
 
 	// @formatter:off
-	@Benchmark public void prewitt() { GradientPrewitt.process(input,derivX,derivY,borderI32); }
-	@Benchmark public void laplacian() { DerivativeLaplacian.process(input,derivX,borderI32); }
-	@Benchmark public void hessianDet() { HessianThreeDeterminant.process(input,derivX,borderI32); }
-	@Benchmark public void sobel() { GradientSobel.process(input,derivX,derivY,borderI32); }
-	@Benchmark public void scharr() { GradientScharr.process(input,derivX,derivY,borderI32); }
-	@Benchmark public void three() { GradientThree.process(input,derivX,derivY,borderI32); }
-	@Benchmark public void two0() { GradientTwo0.process(input,derivX,derivY,borderI32); }
-	@Benchmark public void two1() { GradientTwo1.process(input,derivX,derivY,borderI32); }
+	@Benchmark public void prewitt_U8() { GradientPrewitt.process(input_U8,derivX_S16,derivY_S16,borderI32); }
+	@Benchmark public void laplacian_U8() { DerivativeLaplacian.process(input_U8,derivX_S16,borderI32); }
+	@Benchmark public void hessianDet_U8() { HessianThreeDeterminant.process(input_U8,derivX_S16,borderI32); }
+	@Benchmark public void sobel_U8() { GradientSobel.process(input_U8,derivX_S16,derivY_S16,borderI32); }
+	@Benchmark public void scharr_U8() { GradientScharr.process(input_U8,derivX_S16,derivY_S16,borderI32); }
+	@Benchmark public void three_U8() { GradientThree.process(input_U8,derivX_S16,derivY_S16,borderI32); }
+	@Benchmark public void two0_U8() { GradientTwo0.process(input_U8,derivX_S16,derivY_S16,borderI32); }
+	@Benchmark public void two1_U8() { GradientTwo1.process(input_U8,derivX_S16,derivY_S16,borderI32); }
+
+	@Benchmark public void prewitt_F32() { GradientPrewitt.process(input_F32,derivX_F32,derivY_F32,borderF32); }
+	@Benchmark public void laplacian_F32() { DerivativeLaplacian.process(input_F32,derivX_F32,borderF32); }
+	@Benchmark public void hessianDet_F32() { HessianThreeDeterminant.process(input_F32,derivX_F32,borderF32); }
+	@Benchmark public void sobel_F32() { GradientSobel.process(input_F32,derivX_F32,derivY_F32,borderF32); }
+	@Benchmark public void scharr_F32() { GradientScharr.process(input_F32,derivX_F32,derivY_F32,borderF32); }
+	@Benchmark public void three_F32() { GradientThree.process(input_F32,derivX_F32,derivY_F32,borderF32); }
+	@Benchmark public void two0_F32() { GradientTwo0.process(input_F32,derivX_F32,derivY_F32,borderF32); }
+	@Benchmark public void two1_F32() { GradientTwo1.process(input_F32,derivX_F32,derivY_F32,borderF32); }
 	// @formatter:on
 
-	public static void main(String[] args) throws RunnerException {
+	public static void main( String[] args ) throws RunnerException {
 		Options opt = new OptionsBuilder()
 				.include(BenchmarkImageDerivatives.class.getSimpleName())
 				.warmupTime(TimeValue.seconds(1))
