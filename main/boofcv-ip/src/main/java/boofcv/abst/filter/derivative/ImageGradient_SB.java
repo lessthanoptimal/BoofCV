@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -89,6 +89,15 @@ public abstract class ImageGradient_SB<Input extends ImageGray<Input>, Output ex
 		@Override
 		public void process( T inputImage, D derivX, D derivY ) {
 			GradientPrewitt.process(inputImage, derivX, derivY, border);
+		}
+	}
+
+	public static class Scharr<T extends ImageGray<T>, D extends ImageGray<D>> extends ImageGradient_SB<T, D> {
+		public Scharr( Class<T> inputType, Class<D> derivType ) { super(inputType, derivType); }
+
+		@Override
+		public void process( T inputImage, D derivX, D derivY ) {
+			GradientScharr.process(inputImage, derivX, derivY, border);
 		}
 	}
 

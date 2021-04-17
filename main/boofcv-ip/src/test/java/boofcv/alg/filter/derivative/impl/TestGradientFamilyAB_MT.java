@@ -31,24 +31,16 @@ import java.util.Random;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-/**
- * @author Peter Abeles
- */
 @SuppressWarnings({"rawtypes", "unchecked"})
-public abstract class CommonGradientMultiThreadToSingle extends BoofStandardJUnit {
+class TestGradientFamilyAB_MT extends BoofStandardJUnit {
 	protected int width = 100, height = 90;
-	Class targetClass, testClass;
-	int totalExpected;
 
-	protected CommonGradientMultiThreadToSingle( Class targetClass, Class testClass, int totalExpected ) {
-		this.targetClass = targetClass;
-		this.testClass = testClass;
-		this.totalExpected = totalExpected;
-	}
+	Class targetClass = GradientFamilyAB_MT.class;
+	Class testClass = GradientFamilyAB.class;
 
-	/**
-	 * Compares results to single threaded
-	 */
+	int a = 3;
+	int b = 10;
+
 	@Test void compareToSingle() {
 		Random random = new Random(234);
 		int count = 0;
@@ -63,10 +55,10 @@ public abstract class CommonGradientMultiThreadToSingle extends BoofStandardJUni
 			Method testM = BoofTesting.findMethod(testClass, name, params);
 
 			ImageBase input = GeneralizedImageOps.createImage(params[0], width, height, 2);
-			ImageBase expectedX = GeneralizedImageOps.createImage(params[1], width, height, 2);
-			ImageBase foundX = GeneralizedImageOps.createImage(params[1], width, height, 2);
-			ImageBase expectedY = GeneralizedImageOps.createImage(params[2], width, height, 2);
-			ImageBase foundY = GeneralizedImageOps.createImage(params[2], width, height, 2);
+			ImageBase expectedX = GeneralizedImageOps.createImage(params[3], width, height, 2);
+			ImageBase foundX = GeneralizedImageOps.createImage(params[3], width, height, 2);
+			ImageBase expectedY = GeneralizedImageOps.createImage(params[4], width, height, 2);
+			ImageBase foundY = GeneralizedImageOps.createImage(params[4], width, height, 2);
 
 //			System.out.println("Method " + name + " " + input.getImageType());
 
@@ -74,8 +66,13 @@ public abstract class CommonGradientMultiThreadToSingle extends BoofStandardJUni
 
 			try {
 				Object oe, of;
-				oe = testM.invoke(null, input, expectedX, expectedY);
-				of = m.invoke(null, input, foundX, foundY);
+				if (input.getImageType().getDataType().isInteger()) {
+					oe = testM.invoke(null, input, a, b, expectedX, expectedY);
+					of = m.invoke(null, input, a, b, foundX, foundY);
+				} else {
+					oe = testM.invoke(null, input, (float)a, (float)b, expectedX, expectedY);
+					of = m.invoke(null, input, (float)a, (float)b, foundX, foundY);
+				}
 				assertEquals(oe, of);
 			} catch (Exception e) {
 				e.printStackTrace();
@@ -88,7 +85,7 @@ public abstract class CommonGradientMultiThreadToSingle extends BoofStandardJUni
 			count++;
 		}
 
-		assertEquals(totalExpected, count);
+		assertEquals(3, count);
 	}
 
 	private boolean isTestMethod( Method m ) {
@@ -96,3 +93,4 @@ public abstract class CommonGradientMultiThreadToSingle extends BoofStandardJUni
 		return name.startsWith("process");
 	}
 }
+
