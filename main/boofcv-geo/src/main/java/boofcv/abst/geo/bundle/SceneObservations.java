@@ -199,8 +199,8 @@ public class SceneObservations {
 		}
 
 		public void resize( int numPoints ) {
-			point.resize(numPoints, -1);
-			observations.resize(numPoints*2, -1);
+			point.resetResize(numPoints, -1);
+			observations.resetResize(numPoints*2, -1);
 		}
 	}
 

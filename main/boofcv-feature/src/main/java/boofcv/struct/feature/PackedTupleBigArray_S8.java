@@ -20,8 +20,8 @@ package boofcv.struct.feature;
 
 import boofcv.misc.BoofLambdas;
 import boofcv.struct.PackedArray;
-import org.ddogleg.struct.BigDogArray;
 import org.ddogleg.struct.BigDogArray_I8;
+import org.ddogleg.struct.BigDogGrowth;
 
 /**
  * Stores a set of tuples in a single continuous array. This is intended to make storage of a large number of tuples
@@ -44,7 +44,7 @@ public class PackedTupleBigArray_S8 implements PackedArray<TupleDesc_S8> {
 	public PackedTupleBigArray_S8( int dof ) {
 		this.dof = dof;
 		this.temp = new TupleDesc_S8(dof);
-		array = new BigDogArray_I8(dof, dof*65536, BigDogArray.Growth.GROW_FIRST);
+		array = new BigDogArray_I8(dof, dof*65536, BigDogGrowth.GROW_FIRST);
 		array.resize(0);
 	}
 

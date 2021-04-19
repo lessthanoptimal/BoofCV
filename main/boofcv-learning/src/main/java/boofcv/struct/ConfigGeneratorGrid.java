@@ -60,8 +60,7 @@ public class ConfigGeneratorGrid<Config extends Configuration> extends ConfigGen
 		configurationWork = BoofMiscOps.copyConfig(configurationBase);
 
 		// Initialize every parameter to the first legal value
-		parameterStates.reset();
-		parameterStates.resize(parameters.size(), 0);
+		parameterStates.resetResize(parameters.size(), 0);
 
 		numTrials = 1;
 		for (int i = 0; i < parameters.size(); i++) {

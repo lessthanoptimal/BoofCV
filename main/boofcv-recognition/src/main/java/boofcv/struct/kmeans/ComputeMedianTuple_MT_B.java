@@ -64,7 +64,7 @@ public class ComputeMedianTuple_MT_B extends ComputeMedianTuple_B {
 			final DogArray<int[]> bitCounts = data.bitCounts;
 			final DogArray_I32 assignmentCounts = data.assignmentCounts;
 
-			assignmentCounts.resize(numClusters, 0);
+			assignmentCounts.resetResize(numClusters, 0);
 			bitCounts.resize(numClusters);
 			for (int i = 0; i < bitCounts.size; i++) {
 				Arrays.fill(bitCounts.data[i], 0);

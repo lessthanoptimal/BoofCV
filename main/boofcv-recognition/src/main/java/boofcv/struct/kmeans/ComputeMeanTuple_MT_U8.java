@@ -91,6 +91,7 @@ public class ComputeMeanTuple_MT_U8 extends ComputeMeanTuple_U8 {
 		});
 
 		// Stitch results from threads back together
+		counts.reset();
 		counts.resize(clusters.size, 0);
 		means.resize(clusters.size);
 		for (int i = 0; i < clusters.size; i++) {

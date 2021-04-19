@@ -53,7 +53,7 @@ public class ComputeMedianTuple_B implements ComputeMeanClusters<TupleDesc_B> {
 			throw new IllegalArgumentException("Points and assignments need to be the same size");
 
 		// set the number of points in each cluster to zero and zero the clusters
-		assignmentCounts.resize(clusters.size, 0);
+		assignmentCounts.resetResize(clusters.size, 0);
 		bitCounts.resize(clusters.size);
 		for (int i = 0; i < bitCounts.size; i++) {
 			Arrays.fill(bitCounts.get(i), 0);

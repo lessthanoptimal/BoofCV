@@ -21,8 +21,8 @@ package boofcv.struct.packed;
 import boofcv.misc.BoofLambdas;
 import boofcv.struct.PackedArray;
 import georegression.struct.point.Point2D_F64;
-import org.ddogleg.struct.BigDogArray;
 import org.ddogleg.struct.BigDogArray_F64;
+import org.ddogleg.struct.BigDogGrowth;
 
 /**
  * Packed array of {@link Point2D_F64}. Internally the point is stored in an interleaved format.
@@ -44,15 +44,13 @@ public class PackedBigArrayPoint2D_F64 implements PackedArray<Point2D_F64> {
 	/**
 	 * Constructor where the default is used for all parameters.
 	 */
-	public PackedBigArrayPoint2D_F64() {
-		this(10);
-	}
+	public PackedBigArrayPoint2D_F64() {this(10);}
 
 	/**
 	 * Constructor where the initial number of points is specified and everything else is default
 	 */
 	public PackedBigArrayPoint2D_F64( int reservedPoints ) {
-		this(reservedPoints, 50_000, BigDogArray.Growth.GROW_FIRST);
+		this(reservedPoints, 50_000, BigDogGrowth.GROW_FIRST);
 	}
 
 	/**
@@ -62,7 +60,7 @@ public class PackedBigArrayPoint2D_F64 implements PackedArray<Point2D_F64> {
 	 * @param blockSize A single block will be able to store this number of points
 	 * @param growth Growth strategy to use
 	 */
-	public PackedBigArrayPoint2D_F64( int reservedPoints, int blockSize, BigDogArray.Growth growth ) {
+	public PackedBigArrayPoint2D_F64( int reservedPoints, int blockSize, BigDogGrowth growth ) {
 		dog = new BigDogArray_F64(reservedPoints*DOF, blockSize*DOF, growth);
 	}
 
@@ -120,11 +118,11 @@ public class PackedBigArrayPoint2D_F64 implements PackedArray<Point2D_F64> {
 	}
 
 	@Override public void forIdx( int idx0, int idx1, BoofLambdas.ProcessIndex<Point2D_F64> op ) {
-		dog.processByBlock(idx0*DOF, idx1*DOF, (array, arrayIdx0, arrayIdx1, offset )-> {
+		dog.processByBlock(idx0*DOF, idx1*DOF, ( array, arrayIdx0, arrayIdx1, offset ) -> {
 			int pointIndex = idx0 + offset/DOF;
 			for (int i = arrayIdx0; i < arrayIdx1; i += DOF) {
 				temp.x = array[i];
-				temp.y = array[i+1];
+				temp.y = array[i + 1];
 				op.process(pointIndex++, temp);
 			}
 		});

@@ -21,8 +21,8 @@ package boofcv.struct.packed;
 import boofcv.misc.BoofLambdas;
 import boofcv.struct.PackedArray;
 import georegression.struct.point.Point4D_F64;
-import org.ddogleg.struct.BigDogArray;
 import org.ddogleg.struct.BigDogArray_F64;
+import org.ddogleg.struct.BigDogGrowth;
 
 /**
  * Packed array of {@link Point4D_F64}. Internally the point is stored in an interleaved format.
@@ -52,7 +52,7 @@ public class PackedBigArrayPoint4D_F64 implements PackedArray<Point4D_F64> {
 	 * Constructor where the initial number of points is specified and everything else is default
 	 */
 	public PackedBigArrayPoint4D_F64( int reservedPoints ) {
-		this(reservedPoints, 50_000, BigDogArray.Growth.GROW_FIRST);
+		this(reservedPoints, 50_000, BigDogGrowth.GROW_FIRST);
 	}
 
 	/**
@@ -62,7 +62,7 @@ public class PackedBigArrayPoint4D_F64 implements PackedArray<Point4D_F64> {
 	 * @param blockSize A single block will be able to store this number of points
 	 * @param growth Growth strategy to use
 	 */
-	public PackedBigArrayPoint4D_F64( int reservedPoints, int blockSize, BigDogArray.Growth growth ) {
+	public PackedBigArrayPoint4D_F64( int reservedPoints, int blockSize, BigDogGrowth growth ) {
 		dog = new BigDogArray_F64(reservedPoints*DOF, blockSize*DOF, growth);
 	}
 

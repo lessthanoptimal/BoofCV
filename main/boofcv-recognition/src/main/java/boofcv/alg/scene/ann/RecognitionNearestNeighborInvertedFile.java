@@ -68,7 +68,7 @@ public class RecognitionNearestNeighborInvertedFile<Point> implements VerbosePri
 	protected @Getter @Setter TupleMapDistanceNorm distanceFunction = new TupleMapDistanceNorm.L2();
 
 	/** List of images added to the database */
-	protected @Getter final BigDogArray_I32 imagesDB = new BigDogArray_I32(100, 10_000, BigDogArray.Growth.GROW_FIRST);
+	protected @Getter final BigDogArray_I32 imagesDB = new BigDogArray_I32(100, 10_000, BigDogGrowth.GROW_FIRST);
 
 	/** List of all images the query was found to be similar/matched with */
 	@Getter DogArray<BowMatch> matches = new DogArray<>(BowMatch::new, BowMatch::reset);
@@ -109,8 +109,7 @@ public class RecognitionNearestNeighborInvertedFile<Point> implements VerbosePri
 		invertedFiles.resize(numWords);
 		imagesDB.reset();
 
-		wordHistogram.reset();
-		wordHistogram.resize(numWords, 0);
+		wordHistogram.resetResize(numWords, 0);
 
 		this.search = nearestNeighbor.createSearch();
 	}

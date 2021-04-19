@@ -79,7 +79,7 @@ public class LearnNodeWeights<Point> {
 	 */
 	public void reset( HierarchicalVocabularyTree<Point> tree ) {
 		this.tree = tree;
-		numberOfImagesWithNode.resize(tree.nodes.size, 0);
+		numberOfImagesWithNode.resetResize(tree.nodes.size, 0);
 		totalImages = 0;
 	}
 

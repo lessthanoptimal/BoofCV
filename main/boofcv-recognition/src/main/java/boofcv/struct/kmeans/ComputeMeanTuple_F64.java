@@ -40,7 +40,7 @@ public class ComputeMeanTuple_F64 implements ComputeMeanClusters<TupleDesc_F64> 
 			throw new IllegalArgumentException("Points and assignments need to be the same size");
 
 		// set the number of points in each cluster to zero and zero the clusters
-		counts.resize(clusters.size, 0);
+		counts.resetResize(clusters.size, 0);
 		for (int i = 0; i < clusters.size; i++) {
 			clusters.get(i).fill(0.0);
 		}

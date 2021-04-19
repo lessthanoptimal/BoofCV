@@ -441,7 +441,7 @@ public class PairwiseGraphUtils {
 	public static void createTableViewAtoB( View viewA,
 											Motion edge,
 											DogArray_I32 table_a_to_b ) {
-		table_a_to_b.resize(viewA.totalObservations, -1);
+		table_a_to_b.resetResize(viewA.totalObservations, -1);
 		boolean src_is_A = edge.src == viewA;
 		for (int i = 0; i < edge.inliers.size; i++) {
 			AssociatedIndex assoc = edge.inliers.get(i);

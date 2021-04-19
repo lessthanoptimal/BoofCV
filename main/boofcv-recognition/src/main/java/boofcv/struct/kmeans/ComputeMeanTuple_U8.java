@@ -50,7 +50,7 @@ public class ComputeMeanTuple_U8 implements ComputeMeanClusters<TupleDesc_U8> {
 			throw new IllegalArgumentException("Points and assignments need to be the same size");
 
 		// set the number of points in each cluster to zero and zero the clusters
-		counts.resize(clusters.size, 0);
+		counts.resetResize(clusters.size, 0);
 		means.resize(clusters.size);
 		for (int i = 0; i < means.size; i++) {
 			Arrays.fill(means.get(i),0);

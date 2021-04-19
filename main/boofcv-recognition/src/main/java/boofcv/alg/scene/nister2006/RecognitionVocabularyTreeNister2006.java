@@ -82,7 +82,7 @@ public class RecognitionVocabularyTreeNister2006<Point> implements VerbosePrint 
 	public final GrowArray<InvertedFile> invertedFiles = new GrowArray<>(InvertedFile::new, InvertedFile::reset);
 
 	/** List of images added to the database */
-	protected @Getter final BigDogArray_I32 imagesDB = new BigDogArray_I32(100, 10000, BigDogArray.Growth.GROW_FIRST);
+	protected @Getter final BigDogArray_I32 imagesDB = new BigDogArray_I32(100, 10000, BigDogGrowth.GROW_FIRST);
 
 	/** Scores for all candidate images which have been sorted */
 	protected @Getter final DogArray<BowMatch> matches = new DogArray<>(BowMatch::new, BowMatch::reset);

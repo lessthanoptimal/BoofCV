@@ -20,7 +20,7 @@ package boofcv.struct.packed;
 
 import boofcv.struct.PackedArray;
 import georegression.struct.point.Point3D_F64;
-import org.ddogleg.struct.BigDogArray;
+import org.ddogleg.struct.BigDogGrowth;
 import org.ejml.UtilEjml;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -32,7 +32,7 @@ import static org.junit.jupiter.api.Assertions.assertNotEquals;
 public class TestPackedBigArrayPoint3D_F64 extends GenericPackedArrayChecks<Point3D_F64> {
 
 	@Override protected PackedArray<Point3D_F64> createAlg() {
-		return new PackedBigArrayPoint3D_F64(3,11, BigDogArray.Growth.GROW_FIRST);
+		return new PackedBigArrayPoint3D_F64(3, 11, BigDogGrowth.GROW_FIRST);
 	}
 
 	@Override protected Point3D_F64 createRandomPoint() {
