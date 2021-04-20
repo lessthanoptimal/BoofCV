@@ -300,6 +300,9 @@ public class UtilIO {
 			int v = input.read();
 			if (v == -1 || v == '\n')
 				return buffer.toString();
+			// handle windows \r\n new line
+			if (v == '\r')
+				continue;
 			buffer.append((char)v);
 		}
 	}
