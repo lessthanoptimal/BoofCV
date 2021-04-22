@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -18,8 +18,8 @@
 
 package boofcv.alg.sfm.d2;
 
-import boofcv.abst.tracker.PointTrack;
 import boofcv.abst.tracker.PointTracker;
+import boofcv.abst.tracker.PointTrackerDefault;
 import boofcv.struct.geo.AssociatedPair;
 import boofcv.struct.image.GrayF32;
 import boofcv.testing.BoofStandardJUnit;
@@ -282,62 +282,9 @@ public class TestImageMotionPtkSmartRespawn extends BoofStandardJUnit {
 		}
 	}
 
-	private static class Tracker implements PointTracker<GrayF32> {
-		@Override
-		public void process( GrayF32 image ) {}
-
-		@Override
-		public void reset() {}
-
-		@Override
-		public long getFrameID() { return 0; }
-
-		@Override
-		public int getTotalActive() { return 0; }
-
-		@Override
-		public int getTotalInactive() { return 0; }
-
-		@Override
-		public void dropAllTracks() {}
-
-		@Override
-		public int getMaxSpawn() {return 0;}
-
-		@Override
-		public boolean dropTrack( PointTrack track ) {return false;}
-
-		@Override
-		public void dropTracks( Dropper dropper ) {
+	private static class Tracker extends PointTrackerDefault<GrayF32> {
+		@Override public void dropTracks( Dropper dropper ) {
 			throw new RuntimeException("HMM");
 		}
-
-		@Override
-		public List<PointTrack> getAllTracks( List<PointTrack> list ) {
-			return new ArrayList<>();
-		}
-
-		@Override
-		public List<PointTrack> getActiveTracks( List<PointTrack> list ) {
-			return new ArrayList<>();
-		}
-
-		@Override
-		public List<PointTrack> getInactiveTracks( List<PointTrack> list ) {
-			return new ArrayList<>();
-		}
-
-		@Override
-		public List<PointTrack> getDroppedTracks( List<PointTrack> list ) {
-			return new ArrayList<>();
-		}
-
-		@Override
-		public List<PointTrack> getNewTracks( List<PointTrack> list ) {
-			return new ArrayList<>();
-		}
-
-		@Override
-		public void spawnTracks() {}
 	}
 }

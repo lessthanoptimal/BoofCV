@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -19,7 +19,7 @@
 package boofcv.alg.sfm.d2;
 
 import boofcv.abst.tracker.PointTrack;
-import boofcv.abst.tracker.PointTracker;
+import boofcv.abst.tracker.PointTrackerDefault;
 import boofcv.struct.geo.AssociatedPair;
 import boofcv.struct.image.GrayU8;
 import boofcv.testing.BoofStandardJUnit;
@@ -156,7 +156,7 @@ public class TestImageMotionPointTrackerKey extends BoofStandardJUnit {
 		assertEquals(6, tracker.numDropped);
 	}
 
-	public static class DummyTracker implements PointTracker<GrayU8> {
+	public static class DummyTracker extends PointTrackerDefault<GrayU8> {
 		public int numSpawn = 0;
 		public int numDropped = 0;
 		public int numDropAll = 0;
@@ -174,12 +174,6 @@ public class TestImageMotionPointTrackerKey extends BoofStandardJUnit {
 
 		@Override
 		public long getFrameID() { return frameID; }
-
-		@Override
-		public int getTotalActive() { return 0; }
-
-		@Override
-		public int getTotalInactive() { return 0; }
 
 		@Override
 		public void process( GrayU8 image ) {frameID++;}

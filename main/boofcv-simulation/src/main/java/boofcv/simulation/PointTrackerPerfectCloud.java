@@ -27,6 +27,7 @@ import boofcv.struct.calib.CameraPinhole;
 import boofcv.struct.calib.CameraPinholeBrown;
 import boofcv.struct.distort.Point2Transform2_F64;
 import boofcv.struct.image.ImageBase;
+import boofcv.struct.image.ImageType;
 import georegression.struct.point.Point2D_F64;
 import georegression.struct.point.Point3D_F64;
 import georegression.struct.se.Se3_F64;
@@ -246,6 +247,8 @@ public class PointTrackerPerfectCloud<T extends ImageBase<T>> implements PointTr
 			spawned.add(track);
 		});
 	}
+
+	@Override public ImageType<T> getImageType() {throw new IllegalArgumentException("Not implemented");}
 
 	public void setCamera( CameraPinhole intrinsic ) {
 		norm_to_pixel = new LensDistortionPinhole(intrinsic).distort_F64(false,true);

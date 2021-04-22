@@ -63,6 +63,7 @@ Version : 0.38
   * homographyToFundamental given 2 points
 - Misc
   * Added ConfigGenerator for easily creating a set of Configurations when parameter tuning
+  * Added PointTracker.getImageType() so you know what type of image it requires
 
 TODO NonMaximum: consider making radius ConfigLength and relative to sqrt(pixels)
 TODO Would subpixel corners make repeatability better?

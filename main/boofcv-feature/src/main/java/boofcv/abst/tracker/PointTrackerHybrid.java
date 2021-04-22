@@ -56,13 +56,22 @@ public class PointTrackerHybrid<I extends ImageGray<I>, D extends ImageGray<D>, 
 	// Number of active tracks after respawning
 	private int countAfterSpawn;
 
+	// Reference to image passed to process()
 	I image;
+
+	// Image pyramid data structures
 	PyramidDiscrete<I> pyramid;
 	D[] derivX;
 	D[] derivY;
+
+	// Image type used to store gradient
 	ImageType<D> derivType;
 
+	// Computes the image gradient
 	ImageGradient<I, D> gradient;
+
+	// Type of input image
+	ImageType<I> inputType;
 
 	// If true that means feature detection has already been called once and new features can be spawned
 	boolean detectCalled;
@@ -72,6 +81,7 @@ public class PointTrackerHybrid<I extends ImageGray<I>, D extends ImageGray<D>, 
 							   Class<I> imageType, Class<D> derivType ) {
 		this.tracker = tracker;
 		this.derivType = ImageType.single(derivType);
+		this.inputType = ImageType.single(imageType);
 
 		pyramid = FactoryPyramid.discreteGaussian(configLevels, -1, 2, true, ImageType.single(imageType));
 		gradient = FactoryDerivative.sobel(imageType, derivType);
@@ -125,6 +135,10 @@ public class PointTrackerHybrid<I extends ImageGray<I>, D extends ImageGray<D>, 
 		}
 		tracker.spawnNewTracks();
 		countAfterSpawn = tracker.getTracksActive().size;
+	}
+
+	@Override public ImageType<I> getImageType() {
+		return inputType;
 	}
 
 	@Override public void reset() {

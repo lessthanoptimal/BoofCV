@@ -21,6 +21,7 @@ package boofcv.abst.tracker;
 import boofcv.alg.tracker.dda.DetectDescribeAssociateTracker;
 import boofcv.struct.feature.TupleDesc;
 import boofcv.struct.image.ImageGray;
+import boofcv.struct.image.ImageType;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
@@ -48,7 +49,8 @@ public class PointTrackerDda<I extends ImageGray<I>, TD extends TupleDesc<TD>>
 	@Override public int getMaxSpawn() { return 0; } // not supported by this tracker
 	@Override public boolean dropTrack( PointTrack track ) {return tracker.dropTrack(track);}
 	@Override public void dropTracks( Dropper dropper ) {tracker.dropTracks(dropper);}
-	@Override public void spawnTracks() { tracker.spawnTracks(); }
+	@Override public void spawnTracks() {tracker.spawnTracks();}
+	@Override public ImageType<I> getImageType() {return tracker.getImageType();}
 	// @formatter:on
 
 	@Override

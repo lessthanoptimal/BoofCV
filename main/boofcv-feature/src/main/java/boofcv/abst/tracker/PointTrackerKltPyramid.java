@@ -254,6 +254,10 @@ public class PointTrackerKltPyramid<I extends ImageGray<I>, D extends ImageGray<
 		addToTracks(scaleBottom, detector.getMaximums());
 	}
 
+	@Override public ImageType<I> getImageType() {
+		return ImageType.single(detector.getImageType());
+	}
+
 	private void addToTracks( float scaleBottom, QueueCorner found ) {
 		for (int i = 0; i < found.size(); i++) {
 			Point2D_I16 pt = found.get(i);

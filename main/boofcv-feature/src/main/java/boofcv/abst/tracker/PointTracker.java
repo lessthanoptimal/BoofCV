@@ -19,6 +19,7 @@
 package boofcv.abst.tracker;
 
 import boofcv.struct.image.ImageBase;
+import boofcv.struct.image.ImageType;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
@@ -65,7 +66,7 @@ public interface PointTracker<T extends ImageBase<T>> {
 	 *
 	 * @param image Next image in the sequence
 	 */
-	void process(T image);
+	void process( T image );
 
 	/**
 	 * Discard memory of all current and past tracks.  Growing buffered might not be reset to
@@ -116,7 +117,7 @@ public interface PointTracker<T extends ImageBase<T>> {
 	 * @return true if the request to drop the track was done or if it was ignored because the track wasn't being
 	 * tracked
 	 */
-	boolean dropTrack(PointTrack track);
+	boolean dropTrack( PointTrack track );
 
 	/**
 	 * Used to drop multiple tracks using a rule. This can be more efficient than dropping them one at a time.
@@ -131,49 +132,49 @@ public interface PointTracker<T extends ImageBase<T>> {
 	 * Returns a list of all features that are currently being tracked
 	 *
 	 * @param list Optional storage for the list of tracks. List is cleared before tracks are added.
-	 *             If null a new list will be declared internally.
+	 * If null a new list will be declared internally.
 	 * @return List of tracks.
 	 */
-	List<PointTrack> getAllTracks( @Nullable List<PointTrack> list);
+	List<PointTrack> getAllTracks( @Nullable List<PointTrack> list );
 
 	/**
 	 * Returns a list of active tracks. An active track is defined as a track
 	 * which was found in the most recently processed image.
 	 *
 	 * @param list Optional storage for the list of tracks. List is cleared before tracks are added.
-	 *             If null a new list will be declared internally.
+	 * If null a new list will be declared internally.
 	 * @return List of tracks.
 	 */
-	List<PointTrack> getActiveTracks( @Nullable List<PointTrack> list);
+	List<PointTrack> getActiveTracks( @Nullable List<PointTrack> list );
 
 	/**
 	 * Returns a list of inactive tracks.  A track is inactive if it is not
 	 * associated with any features in the current image.
 	 *
 	 * @param list Optional storage for the list of tracks. List is cleared before tracks are added.
-	 *             If null a new list will be declared internally.
+	 * If null a new list will be declared internally.
 	 * @return List of tracks.
 	 */
-	List<PointTrack> getInactiveTracks( @Nullable List<PointTrack> list);
+	List<PointTrack> getInactiveTracks( @Nullable List<PointTrack> list );
 
 	/**
 	 * Returns a list of tracks dropped by the tracker during the most recent update.
 	 * Tracks dropped by user request are not included in this list.
 	 *
 	 * @param list Optional storage for the list of tracks. List is cleared before tracks are added.
-	 *             If null a new list will be declared internally.
+	 * If null a new list will be declared internally.
 	 * @return List of tracks.
 	 */
-	List<PointTrack> getDroppedTracks( @Nullable List<PointTrack> list);
+	List<PointTrack> getDroppedTracks( @Nullable List<PointTrack> list );
 
 	/**
 	 * Returns a list of tracks that have been added since process was called.
 	 *
 	 * @param list Optional storage for the list of tracks. List is cleared before tracks are added.
-	 *             If null a new list will be declared internally.
+	 * If null a new list will be declared internally.
 	 * @return List of tracks.
 	 */
-	List<PointTrack> getNewTracks( @Nullable List<PointTrack> list);
+	List<PointTrack> getNewTracks( @Nullable List<PointTrack> list );
 
 	/**
 	 * Automatically selects new features in the image to track. Returned tracks must
@@ -183,6 +184,11 @@ public interface PointTracker<T extends ImageBase<T>> {
 	 * NOTE: This function may or may not also modify the active and inactive lists.
 	 */
 	void spawnTracks();
+
+	/**
+	 * Input image type
+	 */
+	ImageType<T> getImageType();
 
 	/**
 	 * Provides a custom rule for dropping tracks

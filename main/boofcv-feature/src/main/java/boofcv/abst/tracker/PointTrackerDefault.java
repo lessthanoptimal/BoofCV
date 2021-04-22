@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -19,6 +19,7 @@
 package boofcv.abst.tracker;
 
 import boofcv.struct.image.ImageBase;
+import boofcv.struct.image.ImageType;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -113,7 +114,8 @@ public class PointTrackerDefault<T extends ImageBase<T>> implements PointTracker
 	}
 
 	@Override
-	public void spawnTracks() {
+	public void spawnTracks() {}
 
-	}
+	@Override public ImageType<T> getImageType() {throw new IllegalArgumentException("Not implemented");}
+
 }

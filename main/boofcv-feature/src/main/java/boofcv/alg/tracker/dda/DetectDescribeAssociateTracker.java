@@ -28,6 +28,7 @@ import boofcv.alg.descriptor.UtilFeature;
 import boofcv.struct.feature.AssociatedIndex;
 import boofcv.struct.feature.TupleDesc;
 import boofcv.struct.image.ImageGray;
+import boofcv.struct.image.ImageType;
 import georegression.struct.point.Point2D_F64;
 import lombok.Getter;
 import lombok.Setter;
@@ -343,5 +344,9 @@ public class DetectDescribeAssociateTracker<I extends ImageGray<I>, TD extends T
 				continue;
 			dropTrackIndexInAll(i);
 		}
+	}
+
+	public ImageType<I> getImageType() {
+		return this.detector.getInputType();
 	}
 }

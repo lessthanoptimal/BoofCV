@@ -553,6 +553,10 @@ public abstract class GenericChecksPointTracker<T extends ImageGray<T>> extends 
 		assertNull(after.get(1).cookie);
 	}
 
+	@Test void imageTypeIsNotNull() {
+		assertNotNull(createTracker().getImageType());
+	}
+
 	private void checkIdentical( List<PointTrack> a , List<PointTrack> b ){
 		assertEquals(a.size(),b.size());
 
