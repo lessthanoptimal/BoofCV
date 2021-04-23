@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -22,47 +22,47 @@ import boofcv.alg.feature.detect.intensity.KitRosCornerIntensity;
 import boofcv.struct.ListIntPoint2D;
 import boofcv.struct.image.GrayF32;
 import boofcv.struct.image.ImageGray;
+import org.jetbrains.annotations.Nullable;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 
 /**
  * Wrapper around children of {@link boofcv.alg.feature.detect.intensity.GradientCornerIntensity}.
- * 
+ *
  * @author Peter Abeles
  */
-public class WrapperKitRosCornerIntensity<I extends ImageGray<I>,D extends ImageGray<D>>
-		extends BaseGeneralFeatureIntensity<I,D>
-{
+public class WrapperKitRosCornerIntensity<I extends ImageGray<I>, D extends ImageGray<D>>
+		extends BaseGeneralFeatureIntensity<I, D> {
 	Method m;
 
-	public WrapperKitRosCornerIntensity(Class<D> derivType ) {
-		super(null,derivType);
+	public WrapperKitRosCornerIntensity( Class<D> derivType ) {
+		super(null, derivType);
 		try {
-			m = KitRosCornerIntensity.class.getMethod("process",GrayF32.class,derivType,derivType,derivType,derivType,derivType);
+			m = KitRosCornerIntensity.class.getMethod("process", GrayF32.class, derivType, derivType, derivType, derivType, derivType);
 		} catch (NoSuchMethodException e) {
 			throw new RuntimeException(e);
 		}
 	}
 
 	@Override
-	public void process(I image , D derivX, D derivY, D derivXX, D derivYY, D derivXY ) {
-		init(image.width,image.height);
+	public void process( I image, D derivX, D derivY, D derivXX, D derivYY, D derivXY ) {
+		init(image.width, image.height);
 
 		try {
-			m.invoke(null,intensity,derivX,derivY,derivXX,derivYY,derivXY);
+			m.invoke(null, intensity, derivX, derivY, derivXX, derivYY, derivXY);
 		} catch (IllegalAccessException | InvocationTargetException e) {
 			throw new RuntimeException(e);
 		}
 	}
 
 	@Override
-	public ListIntPoint2D getCandidatesMin() {
+	public @Nullable ListIntPoint2D getCandidatesMin() {
 		return null;
 	}
 
 	@Override
-	public ListIntPoint2D getCandidatesMax() {
+	public @Nullable ListIntPoint2D getCandidatesMax() {
 		return null;
 	}
 

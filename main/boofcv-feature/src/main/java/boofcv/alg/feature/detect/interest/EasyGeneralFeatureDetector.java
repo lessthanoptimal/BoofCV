@@ -25,6 +25,7 @@ import boofcv.core.image.GeneralizedImageOps;
 import boofcv.factory.filter.derivative.FactoryDerivative;
 import boofcv.struct.QueueCorner;
 import boofcv.struct.image.ImageGray;
+import boofcv.struct.image.ImageType;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.Objects;
@@ -158,5 +159,11 @@ public class EasyGeneralFeatureDetector<T extends ImageGray<T>, D extends ImageG
 
 	public QueueCorner getMinimums() {
 		return detector.getMinimums();
+	}
+
+	public ImageType<T> getInputType() {
+		if (detector.getRequiresGradient() || detector.getRequiresHessian())
+			return gradient.getInputType();
+		return ImageType.single(detector.getImageType());
 	}
 }

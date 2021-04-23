@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -145,6 +145,6 @@ public class GeneralToInterestPoint<T extends ImageGray<T>, D extends ImageGray<
 	}
 
 	@Override public ImageType<T> getInputType() {
-		return ImageType.single(super.detector.getImageType());
+		return super.getInputType();
 	}
 }

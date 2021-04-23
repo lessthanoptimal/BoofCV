@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -21,6 +21,7 @@ package boofcv.abst.feature.detect.intensity;
 import boofcv.alg.feature.detect.intensity.GradientCornerIntensity;
 import boofcv.struct.ListIntPoint2D;
 import boofcv.struct.image.ImageGray;
+import org.jetbrains.annotations.Nullable;
 
 /**
  * Wrapper around children of {@link boofcv.alg.feature.detect.intensity.GradientCornerIntensity}.
@@ -37,59 +38,48 @@ public class WrapperGradientCornerIntensity<I extends ImageGray<I>,D extends Ima
 		this.alg = alg;
 	}
 
-	@Override
-	public void process(I image , D derivX, D derivY, D derivXX, D derivYY, D derivXY ) {
+	@Override public void process(I image , D derivX, D derivY, D derivXX, D derivYY, D derivXY ) {
 		init(image.width,image.height);
 		alg.process(derivX,derivY,intensity);
 	}
 
-	@Override
-	public ListIntPoint2D getCandidatesMin() {
+	@Override public @Nullable ListIntPoint2D getCandidatesMin() {
 		return null;
 	}
 
-	@Override
-	public ListIntPoint2D getCandidatesMax() {
+	@Override public @Nullable ListIntPoint2D getCandidatesMax() {
 		return null;
 	}
 
-	@Override
-	public boolean getRequiresGradient() {
+	@Override public boolean getRequiresGradient() {
 		return true;
 	}
 
-	@Override
-	public boolean getRequiresHessian() {
+	@Override public boolean getRequiresHessian() {
 		return false;
 	}
 
-	@Override
-	public boolean hasCandidates() {
+	@Override public boolean hasCandidates() {
 		return false;
 	}
 
-	@Override
-	public int getIgnoreBorder() {
+	@Override public int getIgnoreBorder() {
 		return alg.getIgnoreBorder();
 	}
 
-	@Override
-	public boolean localMaximums() {
+	@Override public boolean localMaximums() {
 		return true;
 	}
 
-	@Override
-	public Class<I> getImageType() {
-		return null;
+	@Override public Class<I> getImageType() {
+		throw new IllegalArgumentException("Uses gradient only and does not know original input image type");
 	}
 
-	@Override
-	public Class<D> getDerivType() {
+	@Override public Class<D> getDerivType() {
 		return alg.getInputType();
 	}
 
-	@Override
-	public boolean localMinimums() {
+	@Override public boolean localMinimums() {
 		return false;
 	}
 }

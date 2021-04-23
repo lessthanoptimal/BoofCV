@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -23,59 +23,60 @@ import boofcv.alg.feature.detect.intensity.MedianCornerIntensity;
 import boofcv.struct.ListIntPoint2D;
 import boofcv.struct.image.GrayF32;
 import boofcv.struct.image.ImageGray;
+import org.jetbrains.annotations.Nullable;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 
 /**
- * Wrapper around children of {@link boofcv.alg.feature.detect.intensity.MedianCornerIntensity}.  This is a bit of a hack since
+ * Wrapper around children of {@link boofcv.alg.feature.detect.intensity.MedianCornerIntensity}. This is a bit of a hack since
  * the median image is not provided as a standard input so it has to compute it internally
- * 
+ *
  * @author Peter Abeles
  */
 public class WrapperMedianCornerIntensity<I extends ImageGray<I>, D extends ImageGray<D>>
-		extends BaseGeneralFeatureIntensity<I,D>  {
+		extends BaseGeneralFeatureIntensity<I, D> {
 
 	Method m;
 	BlurStorageFilter<I> medianFilter;
 	I medianImage;
 
-	public WrapperMedianCornerIntensity(BlurStorageFilter<I> medianFilter) {
-		super(medianFilter.getInputType().getImageClass(),null);
+	public WrapperMedianCornerIntensity( BlurStorageFilter<I> medianFilter ) {
+		super(medianFilter.getInputType().getImageClass(), null);
 		this.medianFilter = medianFilter;
 		Class<I> imageType = medianFilter.getInputType().getImageClass();
 		try {
-			m = MedianCornerIntensity.class.getMethod("process",imageType,imageType,GrayF32.class);
+			m = MedianCornerIntensity.class.getMethod("process", imageType, imageType, GrayF32.class);
 		} catch (NoSuchMethodException e) {
 			throw new RuntimeException(e);
 		}
 	}
 
 	@Override
-	public void process(I input, D derivX , D derivY , D derivXX , D derivYY , D derivXY ) {
-		init(input.width,input.height);
+	public void process( I input, D derivX, D derivY, D derivXX, D derivYY, D derivXY ) {
+		init(input.width, input.height);
 
-		if( medianImage == null ) {
-			medianImage = (I)input.createNew(input.width,input.height);
+		if (medianImage == null) {
+			medianImage = (I)input.createNew(input.width, input.height);
 		} else {
-			medianImage.reshape(input.width,input.height);
+			medianImage.reshape(input.width, input.height);
 		}
-		
-		medianFilter.process(input,medianImage);
+
+		medianFilter.process(input, medianImage);
 		try {
-			m.invoke(null,input,medianImage,intensity);
+			m.invoke(null, input, medianImage, intensity);
 		} catch (IllegalAccessException | InvocationTargetException e) {
 			throw new RuntimeException(e);
 		}
 	}
 
 	@Override
-	public ListIntPoint2D getCandidatesMin() {
+	public @Nullable ListIntPoint2D getCandidatesMin() {
 		return null;
 	}
 
 	@Override
-	public ListIntPoint2D getCandidatesMax() {
+	public @Nullable ListIntPoint2D getCandidatesMax() {
 		return null;
 	}
 

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -27,41 +27,41 @@ import boofcv.struct.border.ImageBorder_S32;
 import boofcv.struct.image.GrayF32;
 import boofcv.struct.image.GrayU8;
 import boofcv.struct.image.ImageGray;
+import org.jetbrains.annotations.Nullable;
 
 /**
  * Computes the Hessian determinant directory from the input image. Ignores other derivatives passed on
  *
  * @author Peter Abeles
  */
-public class WrapperHessianThreeImageDetIntensity<I extends ImageGray<I>,D extends ImageGray<D>>
-		extends BaseGeneralFeatureIntensity<I,D>
-{
+public class WrapperHessianThreeImageDetIntensity<I extends ImageGray<I>, D extends ImageGray<D>>
+		extends BaseGeneralFeatureIntensity<I, D> {
 	ImageBorder_F32 borderF32 = (ImageBorder_F32)FactoryImageBorder.single(BorderType.EXTENDED, GrayF32.class);
 	ImageBorder_S32 borderS32 = (ImageBorder_S32<GrayU8>)FactoryImageBorder.single(BorderType.EXTENDED, GrayU8.class);
 
 	public WrapperHessianThreeImageDetIntensity( Class<I> imageType ) {
-		super(imageType,null);
+		super(imageType, null);
 	}
 
 	@Override
-	public void process(I image, D derivX, D derivY, D derivXX, D derivYY, D derivXY) {
-		init(image.width,image.height);
-		if( image instanceof GrayU8) {
-			HessianThreeDeterminant.process((GrayU8)image,intensity,borderS32);
-		} else if( image instanceof GrayF32) {
-			HessianThreeDeterminant.process((GrayF32)image,intensity, borderF32);
+	public void process( I image, D derivX, D derivY, D derivXX, D derivYY, D derivXY ) {
+		init(image.width, image.height);
+		if (image instanceof GrayU8) {
+			HessianThreeDeterminant.process((GrayU8)image, intensity, borderS32);
+		} else if (image instanceof GrayF32) {
+			HessianThreeDeterminant.process((GrayF32)image, intensity, borderF32);
 		} else {
 			throw new IllegalArgumentException("Unsupported input image type");
 		}
 	}
 
 	@Override
-	public ListIntPoint2D getCandidatesMin() {
+	public @Nullable ListIntPoint2D getCandidatesMin() {
 		return null;
 	}
 
 	@Override
-	public ListIntPoint2D getCandidatesMax() {
+	public @Nullable ListIntPoint2D getCandidatesMax() {
 		return null;
 	}
 

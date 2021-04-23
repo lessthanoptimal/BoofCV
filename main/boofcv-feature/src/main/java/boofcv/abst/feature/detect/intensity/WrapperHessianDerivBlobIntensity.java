@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -22,6 +22,7 @@ import boofcv.alg.feature.detect.intensity.HessianBlobIntensity;
 import boofcv.struct.ListIntPoint2D;
 import boofcv.struct.image.GrayF32;
 import boofcv.struct.image.ImageGray;
+import org.jetbrains.annotations.Nullable;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
@@ -32,30 +33,26 @@ import java.lang.reflect.Method;
  * @author Peter Abeles
  */
 public class WrapperHessianDerivBlobIntensity<I extends ImageGray<I>, D extends ImageGray<D>>
-		extends BaseGeneralFeatureIntensity<I,D>
-{
+		extends BaseGeneralFeatureIntensity<I, D> {
 
 	HessianBlobIntensity.Type type;
 	Method m;
 	boolean minimum;
 
-	public WrapperHessianDerivBlobIntensity(HessianBlobIntensity.Type type, Class<D> derivType) {
-		super(null,derivType);
+	public WrapperHessianDerivBlobIntensity( HessianBlobIntensity.Type type, Class<D> derivType ) {
+		super(null, derivType);
 		this.type = type;
 		try {
-			switch( type ) {
-				case DETERMINANT:
+			switch (type) {
+				case DETERMINANT -> {
 					minimum = true;
-					m = HessianBlobIntensity.class.getMethod("determinant",GrayF32.class,derivType,derivType,derivType);
-					break;
-
-				case TRACE:
+					m = HessianBlobIntensity.class.getMethod("determinant", GrayF32.class, derivType, derivType, derivType);
+				}
+				case TRACE -> {
 					minimum = true;
-					m = HessianBlobIntensity.class.getMethod("trace",GrayF32.class,derivType,derivType);
-					break;
-
-				default:
-					throw new RuntimeException("Not supported yet");
+					m = HessianBlobIntensity.class.getMethod("trace", GrayF32.class, derivType, derivType);
+				}
+				default -> throw new RuntimeException("Not supported yet");
 			}
 		} catch (NoSuchMethodException e) {
 			throw new RuntimeException(e);
@@ -63,18 +60,13 @@ public class WrapperHessianDerivBlobIntensity<I extends ImageGray<I>, D extends 
 	}
 
 	@Override
-	public void process(I image, D derivX, D derivY, D derivXX, D derivYY, D derivXY) {
-		init(image.width,image.height);
+	public void process( I image, D derivX, D derivY, D derivXX, D derivYY, D derivXY ) {
+		init(image.width, image.height);
 
 		try {
-			switch( type ) {
-				case DETERMINANT:
-					m.invoke(null,intensity,derivXX,derivYY,derivXY);
-					break;
-
-				case TRACE:
-					m.invoke(null,intensity,derivXX,derivYY);
-					break;
+			switch (type) {
+				case DETERMINANT -> m.invoke(null, intensity, derivXX, derivYY, derivXY);
+				case TRACE -> m.invoke(null, intensity, derivXX, derivYY);
 			}
 		} catch (IllegalAccessException | InvocationTargetException e) {
 			throw new RuntimeException(e);
@@ -82,12 +74,12 @@ public class WrapperHessianDerivBlobIntensity<I extends ImageGray<I>, D extends 
 	}
 
 	@Override
-	public ListIntPoint2D getCandidatesMin() {
+	public @Nullable ListIntPoint2D getCandidatesMin() {
 		return null;
 	}
 
 	@Override
-	public ListIntPoint2D getCandidatesMax() {
+	public @Nullable ListIntPoint2D getCandidatesMax() {
 		return null;
 	}
 
@@ -98,7 +90,7 @@ public class WrapperHessianDerivBlobIntensity<I extends ImageGray<I>, D extends 
 
 	@Override
 	public boolean getRequiresHessian() {
-		return( true );
+		return (true);
 	}
 
 	@Override

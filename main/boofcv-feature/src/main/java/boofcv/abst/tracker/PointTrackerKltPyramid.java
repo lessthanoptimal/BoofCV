@@ -115,7 +115,8 @@ public class PointTrackerKltPyramid<I extends ImageGray<I>, D extends ImageGray<
 	public PointTrackerKltPyramid( ConfigKlt config,
 								   double toleranceFB,
 								   int templateRadius,
-								   boolean performPruneClose, PyramidDiscrete<I> pyramid,
+								   boolean performPruneClose,
+								   PyramidDiscrete<I> pyramid,
 								   GeneralFeatureDetector<I, D> detector,
 								   ImageGradient<I, D> gradient,
 								   InterpolateRectangle<I> interpInput,
@@ -255,7 +256,7 @@ public class PointTrackerKltPyramid<I extends ImageGray<I>, D extends ImageGray<
 	}
 
 	@Override public ImageType<I> getImageType() {
-		return ImageType.single(detector.getImageType());
+		return gradient.getInputType();
 	}
 
 	private void addToTracks( float scaleBottom, QueueCorner found ) {

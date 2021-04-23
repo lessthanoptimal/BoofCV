@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -25,26 +25,25 @@ import boofcv.struct.border.BorderType;
 import boofcv.struct.image.GrayF32;
 import boofcv.struct.image.GrayU8;
 import boofcv.struct.image.ImageGray;
+import org.jetbrains.annotations.Nullable;
 
 /**
- *
- *
  * @author Peter Abeles
  */
-public class WrapperLaplacianBlobIntensity<I extends ImageGray<I>,D extends ImageGray<D>>
-		extends BaseGeneralFeatureIntensity<I,D> {
+public class WrapperLaplacianBlobIntensity<I extends ImageGray<I>, D extends ImageGray<D>>
+		extends BaseGeneralFeatureIntensity<I, D> {
 
-	public WrapperLaplacianBlobIntensity(Class<I> imageType) {
+	public WrapperLaplacianBlobIntensity( Class<I> imageType ) {
 		super(imageType, null);
 	}
 
 	@Override
-	public void process(I image, D derivX, D derivY, D derivXX, D derivYY, D derivXY) {
-		init(image.width,image.height);
-		if( image instanceof GrayU8) {
-			DerivativeLaplacian.process((GrayU8)image,intensity);
-		} else if( image instanceof GrayF32) {
-			GImageDerivativeOps.laplace(image,intensity, BorderType.SKIP);
+	public void process( I image, D derivX, D derivY, D derivXX, D derivYY, D derivXY ) {
+		init(image.width, image.height);
+		if (image instanceof GrayU8) {
+			DerivativeLaplacian.process((GrayU8)image, intensity);
+		} else if (image instanceof GrayF32) {
+			GImageDerivativeOps.laplace(image, intensity, BorderType.SKIP);
 			// border would ideally be EXTENDED but the special code for U8 doesn't support borders yet
 			// when this is fixed change ignoreBorder to 0 below
 		} else {
@@ -53,12 +52,12 @@ public class WrapperLaplacianBlobIntensity<I extends ImageGray<I>,D extends Imag
 	}
 
 	@Override
-	public ListIntPoint2D getCandidatesMin() {
+	public @Nullable ListIntPoint2D getCandidatesMin() {
 		return null;
 	}
 
 	@Override
-	public ListIntPoint2D getCandidatesMax() {
+	public @Nullable ListIntPoint2D getCandidatesMax() {
 		return null;
 	}
 

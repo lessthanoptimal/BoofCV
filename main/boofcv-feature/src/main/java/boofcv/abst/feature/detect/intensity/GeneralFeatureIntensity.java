@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -24,21 +24,18 @@ import boofcv.struct.image.ImageGray;
 import org.jetbrains.annotations.Nullable;
 
 /**
- * Extracts corners from a the image and or its gradient.  This is a generalized interface and lacks some of the functionality
+ * Extracts corners from a the image and or its gradient. This is a generalized interface and lacks some of the functionality
  * of more specialized classes.
- *
- * @see boofcv.alg.feature.detect.intensity.FeatureIntensity
- * @see boofcv.abst.feature.detect.extract.NonMaxSuppression
  *
  * @param <I> Input image type.
  * @param <D> Image derivative type.
- *
  * @author Peter Abeles
+ * @see boofcv.alg.feature.detect.intensity.FeatureIntensity
+ * @see boofcv.abst.feature.detect.extract.NonMaxSuppression
  */
-
-public interface GeneralFeatureIntensity<I extends ImageGray<I>,D extends ImageGray<D>> {
+public interface GeneralFeatureIntensity<I extends ImageGray<I>, D extends ImageGray<D>> {
 	/**
-	 * Computes the corner's intensity.  Before computing the various image derivatives call
+	 * Computes the corner's intensity. Before computing the various image derivatives call
 	 * {@link #getRequiresGradient()} and {@link #getRequiresHessian()} to see if they are needed.
 	 *
 	 * @param image Original input image
@@ -47,9 +44,8 @@ public interface GeneralFeatureIntensity<I extends ImageGray<I>,D extends ImageG
 	 * @param derivXX Second derivative x-axis x-axis
 	 * @param derivYY Second derivative x-axis y-axis
 	 * @param derivXY Second derivative x-axis y-axis
-	 *
 	 */
-	void process( I image , D derivX , D derivY , D derivXX , D derivYY , D derivXY );
+	void process( I image, D derivX, D derivY, D derivXX, D derivYY, D derivXY );
 
 	/**
 	 * Returns an image containing an intensity mapping showing how corner like each pixel is.
@@ -62,16 +58,16 @@ public interface GeneralFeatureIntensity<I extends ImageGray<I>,D extends ImageG
 	/**
 	 * (Optional) Returns a list of candidate for local minimums.
 	 *
-	 * @return List of potential features.  If not supported then null is returned.
+	 * @return List of potential features. If not supported then null is returned.
 	 */
-	ListIntPoint2D getCandidatesMin();
+	@Nullable ListIntPoint2D getCandidatesMin();
 
 	/**
-	 *  (Optional) Returns a list of candidate for local maximums.
+	 * (Optional) Returns a list of candidate for local maximums.
 	 *
-	 * @return List of potential features.  If not supported then null is returned.
+	 * @return List of potential features. If not supported then null is returned.
 	 */
-	ListIntPoint2D getCandidatesMax();
+	@Nullable ListIntPoint2D getCandidatesMax();
 
 	/**
 	 * If the image gradient is required for calculations.
