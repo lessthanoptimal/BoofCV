@@ -96,7 +96,10 @@ public class ResolveSignAmbiguityPositiveDepth {
 				}
 
 				// Find point in view-1 reference frame and check constraint
-				triangulateN.triangulate(pixelNorms.toList(), worldToViews.toList(), pointIn1);
+				if (!triangulateN.triangulate(pixelNorms.toList(), worldToViews.toList(), pointIn1)) {
+					foundInvalid += 2;
+					continue;
+				}
 
 				if (pointIn1.z < 0)
 					foundInvalid++;
