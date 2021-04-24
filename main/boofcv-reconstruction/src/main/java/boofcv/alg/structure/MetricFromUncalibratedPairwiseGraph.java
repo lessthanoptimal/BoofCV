@@ -26,7 +26,6 @@ import boofcv.factory.geo.FactoryMultiView;
 import boofcv.misc.BoofMiscOps;
 import boofcv.struct.geo.AssociatedTupleDN;
 import boofcv.struct.image.ImageDimension;
-import georegression.struct.se.Se3_F64;
 import lombok.Getter;
 import lombok.Setter;
 import org.ddogleg.struct.DogArray;
@@ -86,6 +85,8 @@ public class MetricFromUncalibratedPairwiseGraph extends ReconstructionFromPairw
 	final @Getter DogArray<SceneWorkingGraph> scenes =
 			new DogArray<>(SceneWorkingGraph::new, SceneWorkingGraph::reset);
 
+	SceneMergingOperations mergeOps = new SceneMergingOperations();
+
 	/** Which scenes are include which views */
 	PairwiseViewScenes nodeViews = new PairwiseViewScenes();
 
@@ -143,7 +144,7 @@ public class MetricFromUncalibratedPairwiseGraph extends ReconstructionFromPairw
 		// TODO while expanding perform local SBA
 
 		// Merge scenes together until there are no more scenes which can be merged
-		mergeScenes();
+		mergeScenes(db);
 		// TODO local SBA with fixed parameters in master when merging
 
 		// There can be multiple scenes at the end that are disconnected and share no views in common
@@ -236,6 +237,10 @@ public class MetricFromUncalibratedPairwiseGraph extends ReconstructionFromPairw
 
 		if (verbose != null) verbose.println("Expanding scenes");
 
+		// TODO keep on expanding into a view no matter what if it does not have a set of inliers
+		//     this means it was in the seed group but not the seed view. If the seed was bad
+		//     then we want to be able to expand through these views without issue. Plus it makes merging logic simpler
+
 		// Loop until it can't expand any more
 		while (true) {
 			// Clear previous best results
@@ -297,12 +302,11 @@ public class MetricFromUncalibratedPairwiseGraph extends ReconstructionFromPairw
 	/**
 	 * Merge the different scenes together if they share common views
 	 */
-	void mergeScenes() {
+	void mergeScenes( LookUpSimilarImages db ) {
 		if (verbose != null) verbose.println("Merging Scenes. scenes.size=" + scenes.size);
 
-		SceneMergingOperations mergeOps = new SceneMergingOperations();
 		SceneMergingOperations.SelectedScenes selected = new SceneMergingOperations.SelectedScenes();
-		Se3_F64 src_to_dst = new Se3_F64();
+		ScaleSe3_F64 src_to_dst = new ScaleSe3_F64();
 
 		// Compute the number of views which are in common between all the scenes
 		mergeOps.countCommonViews(nodeViews, scenes.size);
@@ -319,16 +323,17 @@ public class MetricFromUncalibratedPairwiseGraph extends ReconstructionFromPairw
 				src = tmp;
 			}
 
-			if (verbose != null) verbose.println("  scenes: src=" + src.index + " dst=" + dst.index +
-					" views: (" + src.workingViews.size() + " , " + dst.workingViews.size() + ")");
-
 			// Remove both views from the counts for now
 			mergeOps.adjustSceneCounts(src, nodeViews, false);
 			mergeOps.adjustSceneCounts(dst, nodeViews, false);
 
 			// Determine how to convert the coordinate systems
-			if (!mergeOps.findTransformSe3(src, dst, src_to_dst))
+			if (!mergeOps.findTransform(db, src, dst, src_to_dst))
 				throw new RuntimeException("ACK! Don't know how to merge coordinate systems. Handle this.");
+
+			if (verbose != null) verbose.println("scenes: src=" + src.index + " dst=" + dst.index +
+					" views: (" + src.workingViews.size() + " , " + dst.workingViews.size() +
+					") scale="+src_to_dst.scale);
 
 			// Merge the views
 			SceneMergingOperations.mergeViews(src, dst, src_to_dst);
@@ -353,11 +358,11 @@ public class MetricFromUncalibratedPairwiseGraph extends ReconstructionFromPairw
 	 */
 	void expandIntoView( LookUpSimilarImages db, SceneWorkingGraph scene, PairwiseImageGraph.View selected ) {
 		if (!expandMetric.process(db, scene, selected)) {
-			if (verbose != null) verbose.println("  Failed to expand/add view='" + selected.id + "'. Discarding.");
+			if (verbose != null) verbose.println("Failed to expand/add view='" + selected.id + "'. Discarding.");
 			return; // TODO handle this failure somehow. mark the scene as dead?
 		}
 		if (verbose != null) {
-			verbose.println("    Expanded view='" + selected.id + "'  inliers="
+			verbose.println("Expanded view='" + selected.id + "'  inliers="
 					+ utils.inliersThreeView.size() + " / " + utils.matchesTriple.size);
 		}
 
@@ -526,6 +531,6 @@ public class MetricFromUncalibratedPairwiseGraph extends ReconstructionFromPairw
 	@Override
 	public void setVerbose( @Nullable PrintStream out, @Nullable Set<String> configuration ) {
 		this.verbose = BoofMiscOps.addPrefix(this, out);
-		BoofMiscOps.verboseChildren(out, configuration, initProjective, expandMetric, refineWorking);
+		BoofMiscOps.verboseChildren(verbose, configuration, initProjective, expandMetric, refineWorking, mergeOps);
 	}
 }

@@ -18,16 +18,25 @@
 
 package boofcv.alg.structure;
 
+import boofcv.alg.distort.brown.RemoveBrownPtoN_F64;
+import boofcv.alg.geo.bundle.cameras.BundlePinholeSimplified;
 import boofcv.alg.structure.MetricFromUncalibratedPairwiseGraph.PairwiseViewScenes;
 import boofcv.alg.structure.MetricFromUncalibratedPairwiseGraph.ViewScenes;
 import boofcv.misc.BoofMiscOps;
-import georegression.struct.point.Point3D_F64;
+import boofcv.struct.image.ImageDimension;
+import georegression.struct.point.Point2D_F64;
 import georegression.struct.se.Se3_F64;
-import georegression.transform.se.AverageRotationMatrix_F64;
 import org.ddogleg.sorting.QuickSort_S32;
 import org.ddogleg.struct.DogArray;
-import org.ejml.data.DMatrixRMaj;
-import org.ejml.dense.row.CommonOps_DDRM;
+import org.ddogleg.struct.DogArray_I32;
+import org.ddogleg.struct.VerbosePrint;
+import org.ddogleg.util.PrimitiveArrays;
+import org.jetbrains.annotations.Nullable;
+
+import java.io.PrintStream;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Set;
 
 /**
  * <p>Contains operations used to merge all the connected spawned scenes in {@link MetricFromUncalibratedPairwiseGraph}
@@ -38,7 +47,7 @@ import org.ejml.dense.row.CommonOps_DDRM;
  *
  * @author Peter Abeles
  */
-public class SceneMergingOperations {
+public class SceneMergingOperations implements VerbosePrint {
 	/**
 	 * <p>Storage for the number of common views between the scenes. Look at {@link #countCommonViews} for
 	 * how these counts are stored. It's not entirely obvious</p>
@@ -51,10 +60,21 @@ public class SceneMergingOperations {
 	// Predeclare memory for sorting since this will be done a ton
 	QuickSort_S32 sorter = new QuickSort_S32();
 
-	// These are used to compute the average rigid body transform between two views
-	AverageRotationMatrix_F64 averageRotation = new AverageRotationMatrix_F64();
-	DogArray<DMatrixRMaj> listRotation = new DogArray<>(() -> new DMatrixRMaj(3, 3));
-	Point3D_F64 sumTranslation = new Point3D_F64();
+	//----------------------------------------
+	// Workspace for resolving the scale ambiguity between the two scenes
+	ResolveSceneScaleAmbiguity resolveScale = new ResolveSceneScaleAmbiguity();
+	List<Se3_F64> listWorldToViewSrc = new ArrayList<>();
+	DogArray<RemoveBrownPtoN_F64> listIntrinsicsSrc = new DogArray<>(RemoveBrownPtoN_F64::new);
+	List<Se3_F64> listWorldToViewDst = new ArrayList<>();
+	DogArray<RemoveBrownPtoN_F64> listIntrinsicsDst = new DogArray<>(RemoveBrownPtoN_F64::new);
+	// List of feature pixels in the target view that are common between the two scenes
+	DogArray<Point2D_F64> zeroViewPixels = new DogArray<>(Point2D_F64::new);
+	// storage for image feature pixel coordinates retrieved from the database
+	DogArray<Point2D_F64> dbPixels = new DogArray<>(Point2D_F64::new);
+	// Conversion from target view feature index into the index in the common view. -1 if it's not common
+	DogArray_I32 zeroFeatureToCommonIndex = new DogArray_I32();
+
+	PrintStream verbose;
 
 	/**
 	 * Creates a sparse data structure that stores the number of views that each scene shares with all
@@ -135,7 +155,12 @@ public class SceneMergingOperations {
 	 * @param dst (Input/Output) The destination scene
 	 * @param src_to_dst Known transform from the coordinate system of src to dst.
 	 */
-	public static void mergeViews( SceneWorkingGraph src, SceneWorkingGraph dst, Se3_F64 src_to_dst ) {
+	public static void mergeViews( SceneWorkingGraph src, SceneWorkingGraph dst, ScaleSe3_F64 src_to_dst ) {
+		Se3_F64 src_to_view = new Se3_F64();
+
+		// src_to_dst is between the world coordinate systems. We need dst_to_src * src_to_view
+		Se3_F64 transform_dst_to_src = src_to_dst.transform.invert(null);
+
 		for (int srcViewIdx = 0; srcViewIdx < src.workingViews.size(); srcViewIdx++) {
 			SceneWorkingGraph.View srcView = src.workingViews.get(srcViewIdx);
 
@@ -148,7 +173,13 @@ public class SceneMergingOperations {
 			dstView.imageDimension.setTo(srcView.imageDimension);
 			dstView.intrinsic.setTo(srcView.intrinsic);
 			dstView.inliers.setTo(srcView.inliers);
-			srcView.world_to_view.concat(src_to_dst, dstView.world_to_view);
+
+			// Copy the src transform since we need to modify it
+			src_to_view.setTo(srcView.world_to_view);
+			// Convert it to the same scale as the dst
+			src_to_view.T.scale(src_to_dst.scale);
+			// Apply te coordinate transform
+			transform_dst_to_src.concat(src_to_view, dstView.world_to_view);
 		}
 	}
 
@@ -156,50 +187,258 @@ public class SceneMergingOperations {
 	 * Using the common views between the scenes, compute the average transform to go from 'src' to 'dst' coordinate
 	 * system
 	 */
-	public boolean findTransformSe3( SceneWorkingGraph src, SceneWorkingGraph dst, Se3_F64 src_to_dst ) {
+	public boolean findTransform( LookUpSimilarImages db,
+								  SceneWorkingGraph src, SceneWorkingGraph dst, ScaleSe3_F64 src_to_dst ) {
+		double bestScore = 0.0;
+		SceneWorkingGraph.View selectedSrc = null;
+		SceneWorkingGraph.View selectedDst = null;
 
-		// We will sum up the translation to find the average
-		sumTranslation.setTo(0, 0, 0);
-
-		// "Average" rotation is a bit more complex. This only works well if the rotations are all similar
-		listRotation.reset();
+		// Number of common views that can be used for merging
+		int totalCommon = 0;
 
 		// Go through all the views in the src list
 		for (int srcViewIdx = 0; srcViewIdx < src.workingViews.size(); srcViewIdx++) {
 			SceneWorkingGraph.View srcView = src.workingViews.get(srcViewIdx);
-
-			// If this view is not common, skip it
-			if (!dst.views.containsKey(srcView.pview.id))
-				continue;
-
 			SceneWorkingGraph.View dstView = dst.views.get(srcView.pview.id);
 
-			double dx = dstView.world_to_view.T.x - srcView.world_to_view.T.x;
-			double dy = dstView.world_to_view.T.y - srcView.world_to_view.T.y;
-			double dz = dstView.world_to_view.T.z - srcView.world_to_view.T.z;
+			// Skip if the view is unknown in dst or if either of them are from the seed set
+			if (dstView == null || srcView.inliers.isEmpty() || dstView.inliers.isEmpty())
+				continue; // TODO this doesn't really check if seed set
 
-			System.out.println("    Delta Translation (" + dx+" , "+dy+" , "+dz+" )");
-			if (!srcView.inliers.isEmpty() && !dstView.inliers.isEmpty()) {
-				System.out.println("      Inliers src=" + srcView.inliers.getInlierCount() +
-						" dst=" + dstView.inliers.getInlierCount());
-			}
+			totalCommon++;
 
-			// Compute the transform from src to dst and add it to the average calculation
-			sumTranslation.x += dstView.world_to_view.T.x - srcView.world_to_view.T.x;
-			sumTranslation.y += dstView.world_to_view.T.y - srcView.world_to_view.T.y;
-			sumTranslation.z += dstView.world_to_view.T.z - srcView.world_to_view.T.z;
+			// Evaluate the quality of 3D information
+			double score = Math.min(srcView.inliers.getInlierCount(), dstView.inliers.getInlierCount());
+			if (score <= bestScore)
+				continue;
 
-			CommonOps_DDRM.multTransA(srcView.world_to_view.R, dstView.world_to_view.R, listRotation.grow());
+			bestScore = score;
+			selectedSrc = srcView;
+			selectedDst = dstView;
 		}
 
-		if (!averageRotation.process(listRotation.toList(), src_to_dst.R))
+		if (selectedSrc == null || selectedDst == null) {
+			if (verbose != null) verbose.println("Select merge views: Failed.");
 			return false;
+		}
 
-		src_to_dst.T.x = sumTranslation.x/listRotation.size;
-		src_to_dst.T.y = sumTranslation.y/listRotation.size;
-		src_to_dst.T.z = sumTranslation.z/listRotation.size;
+		if (verbose != null)
+			verbose.println("Select merge views: candidates=" + totalCommon + " bestScore=" + bestScore +
+					" id='" + selectedSrc.pview.id + "'");
 
-		return true;
+		return computeSceneToSceneTransform(db, src, dst, selectedSrc, selectedDst, src_to_dst);
+	}
+
+	private boolean computeSceneToSceneTransform( LookUpSimilarImages db,
+												  SceneWorkingGraph src, SceneWorkingGraph dst,
+												  SceneWorkingGraph.View selectedSrc,
+												  SceneWorkingGraph.View selectedDst,
+												  ScaleSe3_F64 src_to_dst ) {
+		// Sanity check
+		BoofMiscOps.checkTrue(selectedSrc.pview == selectedDst.pview);
+
+		if (verbose!=null) {
+			verbose.print("src.inliers.views = { ");
+			for (int i = 0; i < selectedSrc.inliers.views.size; i++) {
+				verbose.print("'"+selectedSrc.inliers.views.get(i).id+"' ");
+			}
+			verbose.println("}");
+			verbose.print("dst.inliers.views = { ");
+			for (int i = 0; i < selectedDst.inliers.views.size; i++) {
+				verbose.print("'"+selectedDst.inliers.views.get(i).id+"' ");
+			}
+			verbose.println("}");
+		}
+
+		// Get the set feature indexes for the selected view that were inliers in each scene
+		DogArray_I32 zeroSrcIdx = selectedSrc.inliers.observations.get(0);
+		DogArray_I32 zeroDstIdx = selectedDst.inliers.observations.get(0);
+
+		// Find features in the target view that are common between the two scenes inlier feature sets
+		int numCommon = findCommonInliers(zeroSrcIdx, zeroDstIdx, zeroFeatureToCommonIndex);
+
+		// Load observation of common features in view[0]
+		loadViewZeroCommonObservations(db, selectedSrc.imageDimension, numCommon, selectedSrc.pview.id);
+
+		List<DogArray<Point2D_F64>> listViewPixelsSrc = getCommonFeaturePixelsViews(db, src, selectedSrc.inliers);
+		List<DogArray<Point2D_F64>> listViewPixelsDst = getCommonFeaturePixelsViews(db, dst, selectedDst.inliers);
+
+		// Load the extrinsics and convert the intrinsics into a usable format
+		loadExtrinsicsIntrinsics(src, selectedSrc.inliers, listWorldToViewSrc, listIntrinsicsSrc);
+		loadExtrinsicsIntrinsics(dst, selectedDst.inliers, listWorldToViewDst, listIntrinsicsDst);
+
+		if (verbose != null) verbose.println("commonInliers.size=" + numCommon + " src.size=" + zeroSrcIdx.size +
+				" dst.size=" + zeroDstIdx.size);
+
+		// Pass in everything to the scale resolving algorithm
+		resolveScale.initialize(zeroViewPixels.size);
+		resolveScale.setScene1(
+				( viewIdx, featureIdx, pixel ) -> {
+					if (viewIdx == 0)
+						pixel.setTo(zeroViewPixels.get(featureIdx));
+					else
+						pixel.setTo(listViewPixelsSrc.get(viewIdx - 1).get(featureIdx));
+				},
+				listWorldToViewSrc, (List)listIntrinsicsSrc.toList());
+		resolveScale.setScene2(
+				( viewIdx, featureIdx, pixel ) -> {
+					if (viewIdx == 0)
+						pixel.setTo(zeroViewPixels.get(featureIdx));
+					else
+						pixel.setTo(listViewPixelsDst.get(viewIdx - 1).get(featureIdx));
+				},
+				listWorldToViewDst, (List)listIntrinsicsDst.toList());
+
+		return resolveScale.process(src_to_dst);
+	}
+
+	/**
+	 * Creates the set of pixels in the target view that are common between the two scenes.
+	 *
+	 * @param db Storage with feature pixel coordinates
+	 * @param numCommon Number of features that are common between the two scenes in this view
+	 * @param viewID The ID of the view
+	 */
+	private void loadViewZeroCommonObservations( LookUpSimilarImages db,
+												 ImageDimension imageShape,
+												 int numCommon,
+												 String viewID ) {
+		db.lookupPixelFeats(viewID, dbPixels);
+
+		// camera model assumes pixels have been recentered
+		double cx = imageShape.width/2;
+		double cy = imageShape.height/2;
+
+		zeroViewPixels.resetResize(numCommon);
+		for (int featureIdx = 0; featureIdx < zeroFeatureToCommonIndex.size; featureIdx++) {
+			// See if only one of the scenes had this feature as an inlier
+			int commonIdx = zeroFeatureToCommonIndex.get(featureIdx);
+			if (commonIdx == -1) {
+				continue;
+			}
+			Point2D_F64 p = zeroViewPixels.get(commonIdx);
+			p.setTo(dbPixels.get(featureIdx));
+			p.x -= cx;
+			p.y -= cy;
+		}
+	}
+
+	/**
+	 * Loads information about the view's intrinsics and estimated intrinsics in the specified scene
+	 *
+	 * @param scene Which scene is being considered
+	 * @param inliers Information on the views and inlier set used to estimate the target view
+	 * @param listWorldToViewSrc (Output) Extrinsics
+	 * @param listIntrinsicsSrc (Output) Intrinsics
+	 */
+	private void loadExtrinsicsIntrinsics( SceneWorkingGraph scene, SceneWorkingGraph.InlierInfo inliers,
+										   List<Se3_F64> listWorldToViewSrc,
+										   DogArray<RemoveBrownPtoN_F64> listIntrinsicsSrc ) {
+		// Clear lists
+		listWorldToViewSrc.clear();
+		listIntrinsicsSrc.reset();
+
+		// Go through each view and extract it's SE3 and
+		for (int viewIdx = 0; viewIdx < inliers.views.size; viewIdx++) {
+			PairwiseImageGraph.View pview = inliers.views.get(viewIdx);
+			SceneWorkingGraph.View wview = scene.views.get(pview.id);
+			BundlePinholeSimplified cam = wview.intrinsic;
+
+			// Save the view's pose
+			listWorldToViewSrc.add(wview.world_to_view);
+
+			// Convert the intrinsics model to one that can be used to go from pixel to normalized
+			RemoveBrownPtoN_F64 pixelToNorm = listIntrinsicsSrc.grow();
+			pixelToNorm.setK(cam.f, cam.f, 0, 0, 0);
+			pixelToNorm.setDistortion(cam.k1, cam.k2);
+		}
+	}
+
+	/**
+	 * Retrieves the pixel coordinates for all the other views in InlierInfo, excludes the first/target.
+	 *
+	 * @param db Used to look up image feature pixel coordinates
+	 * @param inliers List of image features that were part of the inlier set in all the views
+	 * @return List of observations in each view (expet the target) that are part of the inler and common set
+	 */
+	private List<DogArray<Point2D_F64>> getCommonFeaturePixelsViews( LookUpSimilarImages db,
+																	 SceneWorkingGraph workingGraph,
+																	 SceneWorkingGraph.InlierInfo inliers ) {
+		List<DogArray<Point2D_F64>> listViewPixels = new ArrayList<>();
+
+		// Which features are inliers in view[0] / common view
+		DogArray_I32 viewZeroInlierIdx = inliers.observations.get(0);
+
+		// View 0 = common view and is skipped here
+		int numViews = inliers.observations.size;
+		for (int viewIdx = 1; viewIdx < numViews; viewIdx++) {
+			// Retrieve the feature pixel coordinates for this view
+			db.lookupPixelFeats(inliers.views.get(viewIdx).id, dbPixels);
+			// Which features are part of the inlier set
+			DogArray_I32 inlierIdx = inliers.observations.get(viewIdx);
+			BoofMiscOps.checkEq(viewZeroInlierIdx.size, inlierIdx.size, "Inliers count should be the same");
+
+			// Create storage for all the pixels in each view
+			DogArray<Point2D_F64> viewPixels = new DogArray<>(Point2D_F64::new);
+			listViewPixels.add(viewPixels);
+			viewPixels.resize(zeroViewPixels.size);
+
+			// camera model assumes pixels have been recentered
+			ImageDimension imageShape = workingGraph.views.get(inliers.views.get(viewIdx).id).imageDimension;
+			double cx = imageShape.width/2;
+			double cy = imageShape.height/2;
+
+			// Add the inlier pixels from this view to the array in the correct order
+			for (int idx = 0; idx < inlierIdx.size; idx++) {
+				// feature ID in view[0]
+				int viewZeroIdx = viewZeroInlierIdx.get(idx);
+
+				// feature ID in the common list
+				int commonFeatureIdx = zeroFeatureToCommonIndex.get(viewZeroIdx);
+				if (commonFeatureIdx < 0)
+					continue;
+
+				// Copy the pixel from this view into the appropriate location
+				Point2D_F64 p = viewPixels.get(commonFeatureIdx);
+				p.setTo(dbPixels.get(inlierIdx.get(idx)));
+				p.x -= cx;
+				p.y -= cy;
+			}
+		}
+
+		return listViewPixels;
+	}
+
+	/**
+	 * Given the indexes of image features that were found to be inliers in each scene, find the set of image features
+	 * that were selected in both scenes. The output is a look up table that takes in the feature's index and
+	 * outputs -1 if the feature was not seen in both scenes or its new index in a common list
+	 *
+	 * @param indexesA List of features that are inliers in a scene
+	 * @param indexesB List of features that are inliers in a scene
+	 * @param zeroFeatureToCommonIndex Output. Look up table from feature in view[0] to index in common list
+	 * @return Number of common features
+	 */
+	static int findCommonInliers( DogArray_I32 indexesA, DogArray_I32 indexesB,
+								  DogArray_I32 zeroFeatureToCommonIndex ) {
+		// Create a histogram of occurrences. Each index should appear once in each set
+		int maxValue = PrimitiveArrays.max(indexesA.data, 0, indexesA.size);
+		maxValue = Math.max(maxValue, PrimitiveArrays.max(indexesB.data, 0, indexesB.size));
+
+		zeroFeatureToCommonIndex.resetResize(maxValue + 1, 0);
+		indexesA.forEach(v -> zeroFeatureToCommonIndex.data[v]++);
+		indexesB.forEach(v -> zeroFeatureToCommonIndex.data[v]++);
+
+		// Convert the histogram into a look up table from feature index to a new sorted array with just the common
+		// elements between the two sets
+		int count = 0;
+		for (int i = 0; i < maxValue; i++) {
+			if (zeroFeatureToCommonIndex.data[i] == 2)
+				zeroFeatureToCommonIndex.data[i] = count++;
+			else
+				zeroFeatureToCommonIndex.data[i] = -1;
+		}
+		return count;
 	}
 
 	/**
@@ -279,6 +518,11 @@ public class SceneMergingOperations {
 		SceneCommonCounts match = list.grow();
 		match.sceneIndex = targetScene;
 		return match;
+	}
+
+	@Override public void setVerbose( @Nullable PrintStream out, @Nullable Set<String> configuration ) {
+		this.verbose = BoofMiscOps.addPrefix(this, out);
+		BoofMiscOps.verboseChildren(verbose, configuration, resolveScale);
 	}
 
 	/**
