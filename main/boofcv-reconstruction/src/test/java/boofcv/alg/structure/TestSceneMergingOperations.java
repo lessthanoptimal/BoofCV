@@ -111,8 +111,8 @@ public class TestSceneMergingOperations extends BoofStandardJUnit {
 		var src = new SceneWorkingGraph();
 		var dst = new SceneWorkingGraph();
 
-		var src_to_dst = new Se3_F64();
-		src_to_dst.T.x = 10;
+		var src_to_dst = new ScaleSe3_F64();
+		src_to_dst.transform.T.x = 10;
 
 		// Add views. Some will be common and some will not be
 		for (int i = 0; i < 5; i++) {
@@ -175,11 +175,12 @@ public class TestSceneMergingOperations extends BoofStandardJUnit {
 			wa.world_to_view.concat(src_to_dst, wb.world_to_view);
 		}
 
-		var found = new Se3_F64();
+		var found = new ScaleSe3_F64();
 		var alg = new SceneMergingOperations();
-		alg.findTransformSe3(src, dst, found);
+		alg.findTransform(null, src, dst, found);
 
-		SpecialEuclideanOps_F64.isIdentical(src_to_dst, found, 1e-4, 1e-4);
+		SpecialEuclideanOps_F64.isIdentical(src_to_dst, found.transform, 1e-4, 1e-4);
+		fail("Check scale");
 	}
 
 	@Test void adjustSceneCounts() {
