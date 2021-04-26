@@ -28,7 +28,7 @@ import java.io.PrintStream;
  * @author Peter Abeles
  */
 public class PrintStreamInjectIndent extends PrintStream {
-	public PrintStreamInjectIndent( String prefix, int numIndent, OutputStream out ) {
+	public PrintStreamInjectIndent( String prefix, int numIndent, PrintStream out ) {
 		super(new Injector(out, prefix, numIndent*2));
 	}
 
@@ -36,12 +36,20 @@ public class PrintStreamInjectIndent extends PrintStream {
 		return ((Injector)out).numSpaces;
 	}
 
+	public int getIndentCount() {
+		return ((Injector)out).numSpaces/2;
+	}
+
+	public PrintStream getOriginalStream() {
+		return ((Injector)out).out;
+	}
+
 	public static class Injector extends OutputStream {
-		OutputStream out;
+		PrintStream out;
 		int numSpaces;
 		String prefix;
 
-		public Injector( OutputStream out, String prefix, int numSpaces ) {
+		public Injector( PrintStream out, String prefix, int numSpaces ) {
 			this.out = out;
 			this.prefix = prefix;
 			this.numSpaces = numSpaces;

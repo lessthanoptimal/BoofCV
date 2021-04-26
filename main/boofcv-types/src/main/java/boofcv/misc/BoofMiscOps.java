@@ -47,6 +47,11 @@ import java.util.*;
 public class BoofMiscOps {
 
 	/**
+	 * Number of characters in the class name prefix in verbose printing
+	 */
+	public static int VERBOSE_PREFIX_LENGTH = 6;
+
+	/**
 	 * Computes the elapsed time in calling the provided function in nano seconds
 	 */
 	public static long timeNano( BoofLambdas.ProcessCall process ) {
@@ -824,9 +829,12 @@ public class BoofMiscOps {
 	public static void verboseChildren( @Nullable PrintStream out, @Nullable Set<String> configuration,
 										VerbosePrint... children ) {
 		// See how many tabs have already been added
-		int numTabs = 0;
+		int numIndents = 0;
+		PrintStream originalOut = out;
 		if (out instanceof PrintStreamInjectIndent) {
-			numTabs += ((PrintStreamInjectIndent)out).getIndentSpaces()/2;
+			numIndents = ((PrintStreamInjectIndent)out).getIndentCount();
+			// This will keep the tabs, but remove previous modifications
+			originalOut = ((PrintStreamInjectIndent)out).getOriginalStream();
 		}
 
 		// If not cursive then do nothing
@@ -843,10 +851,10 @@ public class BoofMiscOps {
 		}
 
 		// Add tabs to children when in verbose mode
-		numTabs += 1;
+		numIndents += 1;
 		for (int i = 0; i < children.length; i++) {
-			String pre = nameToShort(children[i].getClass().getSimpleName(), 6);
-			var tabbed = new PrintStreamInjectIndent(pre, numTabs, out);
+			String pre = nameToShort(children[i].getClass().getSimpleName(), VERBOSE_PREFIX_LENGTH);
+			var tabbed = new PrintStreamInjectIndent(pre, numIndents, originalOut);
 			children[i].setVerbose(tabbed, configuration);
 		}
 	}
@@ -855,8 +863,8 @@ public class BoofMiscOps {
 		if (out instanceof PrintStreamInjectIndent)
 			return out;
 
-		String pre = nameToShort(owner.getClass().getSimpleName(), 6);
-		return new PrintStream(new PrintStreamInjectIndent(pre, 1, out));
+		String pre = nameToShort(owner.getClass().getSimpleName(), VERBOSE_PREFIX_LENGTH);
+		return new PrintStreamInjectIndent(pre, 1, out);
 	}
 
 	/**
