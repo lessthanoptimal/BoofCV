@@ -23,6 +23,7 @@ import boofcv.alg.geo.MetricCameras;
 import boofcv.alg.geo.bundle.BundleAdjustmentOps;
 import boofcv.factory.geo.ConfigSelfCalibDualQuadratic;
 import boofcv.factory.geo.FactoryMultiView;
+import boofcv.misc.BoofMiscOps;
 import boofcv.struct.geo.AssociatedTupleDN;
 import boofcv.struct.image.ImageDimension;
 import lombok.Getter;
@@ -31,10 +32,13 @@ import org.ddogleg.struct.DogArray;
 import org.ddogleg.struct.DogArray_I32;
 import org.ddogleg.struct.FastArray;
 import org.ejml.data.DMatrixRMaj;
+import org.jetbrains.annotations.Nullable;
 
+import java.io.PrintStream;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import static boofcv.misc.BoofMiscOps.checkEq;
 import static boofcv.misc.BoofMiscOps.checkTrue;
@@ -171,7 +175,7 @@ public class MetricFromUncalibratedPairwiseGraph extends ReconstructionFromPairw
 		if (verbose != null) verbose.println("Saving initial seed camera matrices");
 		for (int structViewIdx = 0; structViewIdx < initProjective.utils.structure.views.size; structViewIdx++) {
 			PairwiseImageGraph.View view = initProjective.getPairwiseGraphViewByStructureIndex(structViewIdx);
-			if (verbose != null) verbose.println("  view.id=`" + view.id + "`");
+			if (verbose != null) verbose.println("view.id=`" + view.id + "`");
 		}
 
 		return true;
@@ -259,16 +263,16 @@ public class MetricFromUncalibratedPairwiseGraph extends ReconstructionFromPairw
 		while (open.size > 0) {
 			PairwiseImageGraph.View selected = selectNextToProcess(open);
 			if (selected == null) {
-				if (verbose != null) verbose.println("  No valid views left. open.size=" + open.size);
+				if (verbose != null) verbose.println("No valid views left. open.size=" + open.size);
 				break;
 			}
 
 			if (!expandMetric.process(db, workGraph, selected)) {
-				if (verbose != null) verbose.println("  Failed to expand/add view='" + selected.id + "'. Discarding.");
+				if (verbose != null) verbose.println("Failed to expand/add view='" + selected.id + "'. Discarding.");
 				continue;
 			}
 			if (verbose != null) {
-				verbose.println("    Expanded view='" + selected.id + "'  inliers="
+				verbose.println("Expanded view='" + selected.id + "'  inliers="
 						+ utils.inliersThreeView.size() + " / " + utils.matchesTriple.size);
 			}
 
@@ -284,5 +288,11 @@ public class MetricFromUncalibratedPairwiseGraph extends ReconstructionFromPairw
 			addOpenForView(wview.pview, open);
 		}
 		if (verbose != null) verbose.println("EXIT expandMetricScene()");
+	}
+
+	@Override
+	public void setVerbose( @Nullable PrintStream out, @Nullable Set<String> configuration ) {
+		this.verbose = BoofMiscOps.addPrefix(this, out);
+		BoofMiscOps.verboseChildren(out, configuration, initProjective, expandMetric, refineWorking);
 	}
 }

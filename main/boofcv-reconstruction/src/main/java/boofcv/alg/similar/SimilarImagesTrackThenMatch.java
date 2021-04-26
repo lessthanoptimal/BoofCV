@@ -24,6 +24,7 @@ import boofcv.abst.scene.FeatureSceneRecognition;
 import boofcv.abst.scene.SceneRecognition;
 import boofcv.abst.tracker.PointTrack;
 import boofcv.misc.BoofLambdas;
+import boofcv.misc.BoofMiscOps;
 import boofcv.struct.PackedArray;
 import boofcv.struct.feature.AssociatedIndex;
 import boofcv.struct.feature.TupleDesc;
@@ -205,7 +206,7 @@ public class SimilarImagesTrackThenMatch<Image extends ImageBase<Image>, TD exte
 		// which frame we are doing with and sanity check it
 		int frameIdx = frameToIndex(target);
 		if (frameIdx < 0 || frameIdx >= frames.size)
-			throw new IllegalArgumentException("Unknown target="+target);
+			throw new IllegalArgumentException("Unknown target=" + target);
 
 //		long time0 = System.nanoTime();
 
@@ -422,6 +423,7 @@ public class SimilarImagesTrackThenMatch<Image extends ImageBase<Image>, TD exte
 	}
 
 	@Override public void setVerbose( @Nullable PrintStream out, @Nullable Set<String> options ) {
-		this.verbose = out;
+		this.verbose = BoofMiscOps.addPrefix(this, out);
+		BoofMiscOps.verboseChildren(out, options, recognizer);
 	}
 }

@@ -18,6 +18,7 @@
 
 package boofcv.alg.structure;
 
+import boofcv.misc.BoofMiscOps;
 import boofcv.struct.feature.AssociatedIndex;
 import boofcv.struct.geo.AssociatedPair;
 import georegression.struct.point.Point2D_F64;
@@ -134,7 +135,7 @@ public class GeneratePairwiseImageGraph implements VerbosePrint {
 		DogArray_I32 inlierIdx = new DogArray_I32();
 
 		// no new line since epipolarScore should print something about this pair
-		if (verbose != null) verbose.printf("  createEdge['%s'] -> '%s'  ", src, dst);
+		if (verbose != null) verbose.printf("createEdge['%s'] -> '%s'  ", src, dst);
 
 		if (!epipolarScore.process(pairs.toList(), fundamental, inlierIdx)) {
 			// Don't create an edge here
@@ -159,7 +160,8 @@ public class GeneratePairwiseImageGraph implements VerbosePrint {
 
 	@Override
 	public void setVerbose( @Nullable PrintStream out, @Nullable Set<String> configuration ) {
-		this.verbose = out;
-		this.epipolarScore.setVerbose(out, configuration);
+		this.verbose = BoofMiscOps.addPrefix(this, out);
+		// The verbose print statements between these two classes are designed to work together
+		this.epipolarScore.setVerbose(verbose, configuration);
 	}
 }

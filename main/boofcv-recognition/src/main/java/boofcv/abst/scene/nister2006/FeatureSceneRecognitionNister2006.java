@@ -27,6 +27,7 @@ import boofcv.alg.scene.vocabtree.HierarchicalVocabularyTree;
 import boofcv.alg.scene.vocabtree.LearnHierarchicalTree;
 import boofcv.factory.struct.FactoryTupleDesc;
 import boofcv.misc.BoofLambdas;
+import boofcv.misc.BoofMiscOps;
 import boofcv.struct.PackedArray;
 import boofcv.struct.feature.TupleDesc;
 import boofcv.struct.kmeans.FactoryTupleCluster;
@@ -137,12 +138,13 @@ public class FeatureSceneRecognitionNister2006<TD extends TupleDesc<TD>> impleme
 		LearnHierarchicalTree<TD> learnTree = new LearnHierarchicalTree<>(
 				() -> FactoryTupleDesc.createPackedBig(tupleDOF, tupleType), factoryKMeans, config.randSeed);
 		learnTree.minimumPointsForChildren.setTo(config.learningMinimumPointsForChildren);
-		learnTree.setVerbose(verbose, null);
+		if (verbose!=null)
+			BoofMiscOps.verboseChildren(verbose, null, learnTree);
 		learnTree.process(packedFeatures, tree);
 		long time2 = System.currentTimeMillis();
 
 		if (verbose != null) {
-			verbose.println(" Tree {bf=" + tree.branchFactor + " ml=" + tree.maximumLevel +
+			verbose.println("Tree {bf=" + tree.branchFactor + " ml=" + tree.maximumLevel +
 					" nodes.size=" + tree.nodes.size + "}");
 		}
 
@@ -301,6 +303,6 @@ public class FeatureSceneRecognitionNister2006<TD extends TupleDesc<TD>> impleme
 	}
 
 	@Override public void setVerbose( @Nullable PrintStream out, @Nullable Set<String> set ) {
-		this.verbose = out;
+		this.verbose = BoofMiscOps.addPrefix(this, out);
 	}
 }

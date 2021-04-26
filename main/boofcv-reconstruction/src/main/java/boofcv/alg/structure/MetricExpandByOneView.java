@@ -130,7 +130,7 @@ public class MetricExpandByOneView extends ExpandByOneView {
 				verbose.println("Failed to expand because two connections couldn't be found. valid.size=" +
 						validCandidates.size());
 				for (int i = 0; i < validCandidates.size(); i++) {
-					verbose.println("   valid view.id='" + validCandidates.get(i).other(target).id + "'");
+					verbose.println("valid view.id='" + validCandidates.get(i).other(target).id + "'");
 				}
 			}
 			return false;

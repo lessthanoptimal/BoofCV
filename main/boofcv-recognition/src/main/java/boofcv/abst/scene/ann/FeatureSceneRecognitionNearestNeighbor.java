@@ -25,6 +25,7 @@ import boofcv.alg.scene.bow.BowMatch;
 import boofcv.factory.feature.associate.FactoryAssociation;
 import boofcv.factory.struct.FactoryTupleDesc;
 import boofcv.misc.BoofLambdas;
+import boofcv.misc.BoofMiscOps;
 import boofcv.struct.PackedArray;
 import boofcv.struct.feature.TupleDesc;
 import boofcv.struct.kmeans.FactoryTupleCluster;
@@ -234,6 +235,6 @@ public class FeatureSceneRecognitionNearestNeighbor<TD extends TupleDesc<TD>> im
 	}
 
 	@Override public void setVerbose( @Nullable PrintStream out, @Nullable Set<String> config ) {
-		this.verbose = out;
+		this.verbose = BoofMiscOps.addPrefix(this, out);
 	}
 }

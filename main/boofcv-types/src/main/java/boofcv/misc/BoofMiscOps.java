@@ -18,6 +18,7 @@
 
 package boofcv.misc;
 
+import boofcv.BoofVerbose;
 import boofcv.errors.BoofCheckFailure;
 import boofcv.struct.Configuration;
 import boofcv.struct.ImageRectangle;
@@ -52,12 +53,12 @@ public class BoofMiscOps {
 		long time0 = System.nanoTime();
 		process.process();
 		long time1 = System.nanoTime();
-		return time1-time0;
+		return time1 - time0;
 	}
 
 	public static void profile( BoofLambdas.ProcessCall process, String description ) {
 		long nano = timeNano(process);
-		System.out.println("Elapsed: "+(nano*1e-6)+" (ms) "+description);
+		System.out.println("Elapsed: " + (nano*1e-6) + " (ms) " + description);
 	}
 
 	public static String timeStr() {
@@ -299,16 +300,16 @@ public class BoofMiscOps {
 			r.y1 = b.height;
 	}
 
-	public static double min( double a, double b, double c) {
-		return Math.min(Math.min(a,b),c);
+	public static double min( double a, double b, double c ) {
+		return Math.min(Math.min(a, b), c);
 	}
 
-	public static float min( float a, float b, float c) {
-		return Math.min(Math.min(a,b),c);
+	public static float min( float a, float b, float c ) {
+		return Math.min(Math.min(a, b), c);
 	}
 
-	public static int min( int a, int b, int c) {
-		return Math.min(Math.min(a,b),c);
+	public static int min( int a, int b, int c ) {
+		return Math.min(Math.min(a, b), c);
 	}
 
 	public static boolean isInside( ImageBase b, ImageRectangle r ) {
@@ -603,8 +604,8 @@ public class BoofMiscOps {
 	 * Checks to see if the passed in value is a fraction from 0 to 1.0, inclusive
 	 */
 	public static void checkFraction( double fraction, String message ) {
-		if (fraction<0.0 || fraction > 1.0)
-			throw new BoofCheckFailure("Fraction out of range. "+fraction+" "+message);
+		if (fraction < 0.0 || fraction > 1.0)
+			throw new BoofCheckFailure("Fraction out of range. " + fraction + " " + message);
 	}
 
 	public static <T> void forIdx( List<T> list, BoofLambdas.ProcessIndex<T> func ) {
@@ -629,29 +630,29 @@ public class BoofMiscOps {
 	 * Returns a random number from min to max, inclusive.
 	 */
 	public static double uniform( double min, double max, Random rand ) {
-		return rand.nextDouble()*(max-min)+min;
+		return rand.nextDouble()*(max - min) + min;
 	}
 
 	/**
 	 * Returns a random number from min to max, inclusive.
 	 */
 	public static float uniform( float min, float max, Random rand ) {
-		return rand.nextFloat()*(max-min)+min;
+		return rand.nextFloat()*(max - min) + min;
 	}
 
 	/** Returns the last element in the list. Does not check if the list is empty */
-	public static <T>T tail( List<T> list ) {
-		return list.get(list.size()-1);
+	public static <T> T tail( List<T> list ) {
+		return list.get(list.size() - 1);
 	}
 
 	/** Returns and removes the last element in the list. Does not check if the list is empty */
-	public static <T>T removeTail( List<T> list ) {
-		return list.remove(list.size()-1);
+	public static <T> T removeTail( List<T> list ) {
+		return list.remove(list.size() - 1);
 	}
 
 	/** Safe way to convert an object to string which checks to see if object is null */
 	public static <T> String toString( T o, BoofLambdas.ToString<T> op ) {
-		if (o==null)
+		if (o == null)
 			return "Null";
 		return op.process(o);
 	}
@@ -705,7 +706,7 @@ public class BoofMiscOps {
 	}
 
 	public static boolean[] checkDeclare( @Nullable DogArray_B queue, int length, boolean zero ) {
-		if (queue==null)
+		if (queue == null)
 			queue = new DogArray_B(length);
 		queue.resize(length);
 		if (zero)
@@ -714,43 +715,43 @@ public class BoofMiscOps {
 	}
 
 	public static byte[] checkDeclare( @Nullable DogArray_I8 queue, int length, boolean zero ) {
-		if (queue==null)
+		if (queue == null)
 			queue = new DogArray_I8(length);
 		queue.resize(length);
-		if( zero )
+		if (zero)
 			queue.fill((byte)0);
 		return queue.data;
 	}
 
 	public static int[] checkDeclare( @Nullable DogArray_I32 queue, int length, boolean zero ) {
-		if (queue==null)
+		if (queue == null)
 			queue = new DogArray_I32(length);
 		queue.resize(length);
-		if( zero )
+		if (zero)
 			queue.fill(0);
 		return queue.data;
 	}
 
 	public static float[] checkDeclare( @Nullable DogArray_F32 queue, int length, boolean zero ) {
-		if (queue==null)
+		if (queue == null)
 			queue = new DogArray_F32(length);
 		queue.resize(length);
-		if( zero )
+		if (zero)
 			queue.fill(0.0f);
 		return queue.data;
 	}
 
 	public static double[] checkDeclare( @Nullable DogArray_F64 queue, int length, boolean zero ) {
-		if (queue==null)
+		if (queue == null)
 			queue = new DogArray_F64(length);
 		queue.resize(length);
-		if( zero )
+		if (zero)
 			queue.fill(0.0);
 		return queue.data;
 	}
 
-	public static<T> GrowArray<T> checkDeclare( @Nullable GrowArray<T> growable,
-												ConcurrencyOps.NewInstance<T> factory ) {
+	public static <T> GrowArray<T> checkDeclare( @Nullable GrowArray<T> growable,
+												 ConcurrencyOps.NewInstance<T> factory ) {
 		growable = growable == null ? new GrowArray<>(factory) : growable;
 		growable.reset();
 		return growable;
@@ -761,19 +762,22 @@ public class BoofMiscOps {
 	 *
 	 * Taken from stack overflow, which was taken from some place else.
 	 */
-	public static double similarity(String s1, String s2) {
+	public static double similarity( String s1, String s2 ) {
 		String longer = s1, shorter = s2;
 		if (s1.length() < s2.length()) { // longer should always have greater length
-			longer = s2; shorter = s1;
+			longer = s2;
+			shorter = s1;
 		}
 		int longerLength = longer.length();
-		if (longerLength == 0) { return 1.0; /* both strings are zero length */ }
-		return (longerLength - editDistance(longer, shorter)) / (double) longerLength;
+		if (longerLength == 0) {
+			return 1.0; /* both strings are zero length */
+		}
+		return (longerLength - editDistance(longer, shorter))/(double)longerLength;
 	}
 
 	// Example implementation of the Levenshtein Edit Distance
 	// See http://rosettacode.org/wiki/Levenshtein_distance#Java
-	public static int editDistance(String s1, String s2) {
+	public static int editDistance( String s1, String s2 ) {
 		s1 = s1.toLowerCase();
 		s2 = s2.toLowerCase();
 
@@ -803,7 +807,7 @@ public class BoofMiscOps {
 	/**
 	 * Creates a copy of the passed in {@link Configuration}
 	 */
-	public static <C extends Configuration>C copyConfig( C src ) {
+	public static <C extends Configuration> C copyConfig( C src ) {
 		try {
 			Class<C> type = (Class)src.getClass();
 			C dst = type.getConstructor().newInstance();
@@ -812,5 +816,75 @@ public class BoofMiscOps {
 		} catch (Exception e) {
 			throw new RuntimeException(e);
 		}
+	}
+
+	/**
+	 * Function which handles boilerplate for support recursive verbose print
+	 */
+	public static void verboseChildren( @Nullable PrintStream out, @Nullable Set<String> configuration,
+										VerbosePrint... children ) {
+		// See how many tabs have already been added
+		int numTabs = 0;
+		if (out instanceof PrintStreamInjectIndent) {
+			numTabs += ((PrintStreamInjectIndent)out).getIndentSpaces()/2;
+		}
+
+		// If not cursive then do nothing
+		if (configuration == null || !configuration.contains(BoofVerbose.RECURSIVE)) {
+			return;
+		}
+
+		// If the output is null then its turning off print
+		if (out == null) {
+			for (int i = 0; i < children.length; i++) {
+				children[i].setVerbose(null, configuration);
+			}
+			return;
+		}
+
+		// Add tabs to children when in verbose mode
+		numTabs += 1;
+		for (int i = 0; i < children.length; i++) {
+			String pre = nameToShort(children[i].getClass().getSimpleName(), 6);
+			var tabbed = new PrintStreamInjectIndent(pre, numTabs, out);
+			children[i].setVerbose(tabbed, configuration);
+		}
+	}
+
+	public static PrintStream addPrefix( VerbosePrint owner, PrintStream out ) {
+		if (out instanceof PrintStreamInjectIndent)
+			return out;
+
+		String pre = nameToShort(owner.getClass().getSimpleName(), 6);
+		return new PrintStream(new PrintStreamInjectIndent(pre, 1, out));
+	}
+
+	/**
+	 * Assumes names are camel case and that the capital letters are important. Same for numbers
+	 */
+	public static String nameToShort( String name, int length ) {
+		String text = "";
+		for (int i = 0; i < name.length() && text.length() < length; i++) {
+			char c = name.charAt(i);
+			if (Character.isUpperCase(c) || Character.isDigit(c)) {
+				text += c;
+			}
+		}
+
+		if (text.length() < length) {
+			for (int i = text.length(); i < length; i++) {
+				text += " ";
+			}
+		}
+
+		return text;
+	}
+
+	public static <T> Set<T> hashSet( T... values ) {
+		HashSet<T> ret = new HashSet<>();
+		for (int i = 0; i < values.length; i++) {
+			ret.add(values[i]);
+		}
+		return ret;
 	}
 }

@@ -198,6 +198,6 @@ public class LearnHierarchicalTree<Point> implements VerbosePrint {
 	}
 
 	@Override public void setVerbose( @Nullable PrintStream out, @Nullable Set<String> set ) {
-		this.verbose = out;
+		this.verbose = BoofMiscOps.addPrefix(this, out);
 	}
 }

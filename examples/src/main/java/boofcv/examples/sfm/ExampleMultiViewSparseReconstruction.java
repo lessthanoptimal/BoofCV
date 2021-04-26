@@ -18,6 +18,7 @@
 
 package boofcv.examples.sfm;
 
+import boofcv.BoofVerbose;
 import boofcv.abst.feature.detect.interest.PointDetectorTypes;
 import boofcv.abst.geo.bundle.SceneStructureMetric;
 import boofcv.abst.tracker.PointTrack;
@@ -191,7 +192,7 @@ public class ExampleMultiViewSparseReconstruction {
 		config.sequentialMinimumCommonTracks.setRelative(0.4, 200);
 
 		final var similarImages = FactorySceneReconstruction.createTrackThenMatch(config, ImageType.SB_U8);
-		similarImages.setVerbose(System.out, null);
+		similarImages.setVerbose(System.out, BoofMiscOps.hashSet(BoofVerbose.RECURSIVE));
 
 		// Track features across the entire sequence and save the results
 		BoofMiscOps.profile(() -> {
@@ -289,9 +290,7 @@ public class ExampleMultiViewSparseReconstruction {
 		System.out.println("### Metric Reconstruction");
 
 		var metric = new MetricFromUncalibratedPairwiseGraph();
-		metric.setVerbose(System.out, null);
-		metric.getInitProjective().setVerbose(System.out, null);
-		metric.getExpandMetric().setVerbose(System.out, null);
+		metric.setVerbose(System.out, BoofMiscOps.hashSet(BoofVerbose.RECURSIVE));
 		BoofMiscOps.profile(() -> {
 			if (!metric.process(similarImages, pairwise)) {
 				System.err.println("Reconstruction failed");
