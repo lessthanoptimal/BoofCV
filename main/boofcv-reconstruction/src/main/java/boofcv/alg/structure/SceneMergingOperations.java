@@ -26,6 +26,7 @@ import boofcv.misc.BoofMiscOps;
 import boofcv.struct.image.ImageDimension;
 import georegression.struct.point.Point2D_F64;
 import georegression.struct.se.Se3_F64;
+import lombok.Getter;
 import org.ddogleg.sorting.QuickSort_S32;
 import org.ddogleg.struct.DogArray;
 import org.ddogleg.struct.DogArray_I32;
@@ -40,9 +41,11 @@ import java.util.Set;
 
 /**
  * <p>Contains operations used to merge all the connected spawned scenes in {@link MetricFromUncalibratedPairwiseGraph}
- * into a single scene.</p>
+ * into a single scene. Scale ambiguity is resolved by selecting a single view with the "best" geometric
+ * information and then feeding that to {@link ResolveSceneScaleAmbiguity}.</p>
  *
- * First call  {@link #countCommonViews} as it will initialize all data structures. Then all the other operations
+ * Usage:<br>
+ * First call {@link #countCommonViews} as it will initialize all data structures. Then all the other operations
  * can be called.
  *
  * @author Peter Abeles
@@ -60,18 +63,21 @@ public class SceneMergingOperations implements VerbosePrint {
 	// Predeclare memory for sorting since this will be done a ton
 	QuickSort_S32 sorter = new QuickSort_S32();
 
+	/** Estimates the scale and SE3 transform from one scene to another */
+	@Getter ResolveSceneScaleAmbiguity resolveScale = new ResolveSceneScaleAmbiguity();
+
 	//----------------------------------------
 	// Workspace for resolving the scale ambiguity between the two scenes
-	ResolveSceneScaleAmbiguity resolveScale = new ResolveSceneScaleAmbiguity();
 	List<Se3_F64> listWorldToViewSrc = new ArrayList<>();
 	DogArray<RemoveBrownPtoN_F64> listIntrinsicsSrc = new DogArray<>(RemoveBrownPtoN_F64::new);
 	List<Se3_F64> listWorldToViewDst = new ArrayList<>();
 	DogArray<RemoveBrownPtoN_F64> listIntrinsicsDst = new DogArray<>(RemoveBrownPtoN_F64::new);
-	// List of feature pixels in the target view that are common between the two scenes
+	// List of feature pixels in the zero view that are common between the two scenes
 	DogArray<Point2D_F64> zeroViewPixels = new DogArray<>(Point2D_F64::new);
 	// storage for image feature pixel coordinates retrieved from the database
 	DogArray<Point2D_F64> dbPixels = new DogArray<>(Point2D_F64::new);
-	// Conversion from target view feature index into the index in the common view. -1 if it's not common
+	// Conversion from zero view (view[0]) feature index into the index in the common feature list.
+	// -1 if it's not int common list
 	DogArray_I32 zeroFeatureToCommonIndex = new DogArray_I32();
 
 	PrintStream verbose;
@@ -90,7 +96,7 @@ public class SceneMergingOperations implements VerbosePrint {
 		commonViewCounts.reset();
 		commonViewCounts.resize(numScenes);
 
-		// Go through each view and count the common views between the scenes
+		// Go through each view and count the number of scenes that contain that view
 		for (int viewsIdx = 0; viewsIdx < viewScenes.views.size; viewsIdx++) {
 			ViewScenes v = viewScenes.views.get(viewsIdx);
 
@@ -237,18 +243,7 @@ public class SceneMergingOperations implements VerbosePrint {
 		// Sanity check
 		BoofMiscOps.checkTrue(selectedSrc.pview == selectedDst.pview);
 
-		if (verbose!=null) {
-			verbose.print("src.inliers.views = { ");
-			for (int i = 0; i < selectedSrc.inliers.views.size; i++) {
-				verbose.print("'"+selectedSrc.inliers.views.get(i).id+"' ");
-			}
-			verbose.println("}");
-			verbose.print("dst.inliers.views = { ");
-			for (int i = 0; i < selectedDst.inliers.views.size; i++) {
-				verbose.print("'"+selectedDst.inliers.views.get(i).id+"' ");
-			}
-			verbose.println("}");
-		}
+		if (verbose != null) printInlierViews(selectedSrc, selectedDst);
 
 		// Get the set feature indexes for the selected view that were inliers in each scene
 		DogArray_I32 zeroSrcIdx = selectedSrc.inliers.observations.get(0);
@@ -290,6 +285,22 @@ public class SceneMergingOperations implements VerbosePrint {
 				listWorldToViewDst, (List)listIntrinsicsDst.toList());
 
 		return resolveScale.process(src_to_dst);
+	}
+
+	/**
+	 * Prints debugging information about which views are in the inlier sets
+	 */
+	private void printInlierViews( SceneWorkingGraph.View selectedSrc, SceneWorkingGraph.View selectedDst ) {
+		verbose.print("src.inliers.views = { ");
+		for (int i = 0; i < selectedSrc.inliers.views.size; i++) {
+			verbose.print("'" + selectedSrc.inliers.views.get(i).id + "' ");
+		}
+		verbose.println("}");
+		verbose.print("dst.inliers.views = { ");
+		for (int i = 0; i < selectedDst.inliers.views.size; i++) {
+			verbose.print("'" + selectedDst.inliers.views.get(i).id + "' ");
+		}
+		verbose.println("}");
 	}
 
 	/**

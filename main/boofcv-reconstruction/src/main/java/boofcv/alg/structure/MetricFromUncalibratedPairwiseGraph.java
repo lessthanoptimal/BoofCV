@@ -161,7 +161,8 @@ public class MetricFromUncalibratedPairwiseGraph extends ReconstructionFromPairw
 		if (verbose != null) verbose.println("ENTER spawn seeds.size=" + seeds.size());
 		for (int seedIdx = 0; seedIdx < seeds.size(); seedIdx++) {
 			SeedInfo info = seeds.get(seedIdx);
-			if (verbose != null) verbose.println("Spawn index="+seedIdx+"  count " + (seedIdx + 1) + " / " + seeds.size());
+			if (verbose != null)
+				verbose.println("Spawn index=" + seedIdx + "  count " + (seedIdx + 1) + " / " + seeds.size());
 
 			// TODO reject a seed if it's too similar to other seeds? Should that be done earlier?
 
@@ -195,7 +196,7 @@ public class MetricFromUncalibratedPairwiseGraph extends ReconstructionFromPairw
 			refineWorking.process(db, scene);
 
 			if (verbose != null)
-				verbose.println("  scene.index="+scene.index+" views.size="+scene.workingViews.size());
+				verbose.println("  scene.index=" + scene.index + " views.size=" + scene.workingViews.size());
 
 			// Add this scene to each node so that we know they are connected
 			for (int i = 0; i < scene.workingViews.size(); i++) {
@@ -262,9 +263,29 @@ public class MetricFromUncalibratedPairwiseGraph extends ReconstructionFromPairw
 				int openSizeBefore = scene.open.size;
 				for (int openIdx = scene.open.size - 1; openIdx >= 0; openIdx--) {
 					final PairwiseImageGraph.View pview = scene.open.get(openIdx);
-					if (nodeViews.getView(pview).viewedBy.size > 1) {
-						scene.open.removeSwap(openIdx);
+					// nothing has viewed it. Free to move in
+					if (nodeViews.getView(pview).viewedBy.size <= 1)
+						continue;
+
+					// it can still expand into this node if the other scenes contain this view in their seed
+					// set of views. The idea being that we want redundancy if there's a bad seed
+					ViewScenes views = nodeViews.getView(pview);
+					boolean usable = true;
+					for (int idxA = 0; idxA < views.viewedBy.size; idxA++) {
+						SceneWorkingGraph viewsByScene = scenes.get(views.viewedBy.get(idxA));
+						// Skip over if it's this scene
+						if (viewsByScene == scene)
+							continue;
+
+						// If it has an inlier set it was spawned outside of the seed set (except for the seed view)
+						// and we should not
+						if (!viewsByScene.views.get(pview.id).inliers.isEmpty()) {
+							usable = false;
+							break;
+						}
 					}
+					if (!usable)
+						scene.open.removeSwap(openIdx);
 				}
 				if (verbose != null)
 					verbose.println("  scene[" + sceneIdx + "] removed open " + (openSizeBefore - scene.open.size));
@@ -329,14 +350,16 @@ public class MetricFromUncalibratedPairwiseGraph extends ReconstructionFromPairw
 
 			// Determine how to convert the coordinate systems
 			if (!mergeOps.findTransform(db, src, dst, src_to_dst))
-				throw new RuntimeException("ACK! Don't know how to merge coordinate systems. Handle this.");
+				throw new RuntimeException("Merge fails. Unable to determine src_to_dst. What to do?");
 
-			if (verbose != null) verbose.println("scenes: src=" + src.index + " dst=" + dst.index +
-					" views: (" + src.workingViews.size() + " , " + dst.workingViews.size() +
-					") scale="+src_to_dst.scale);
+			int dstViewCountBefore = dst.workingViews.size();
 
 			// Merge the views
 			SceneMergingOperations.mergeViews(src, dst, src_to_dst);
+
+			if (verbose != null) verbose.println("scenes: src=" + src.index + " dst=" + dst.index +
+					" views: (" + src.workingViews.size() + " , " + dstViewCountBefore +
+					") -> "+dst.workingViews.size()+", scale=" + src_to_dst.scale);
 
 			// Remove the one that's no longer needed
 			SceneMergingOperations.removeScene(src, nodeViews);
