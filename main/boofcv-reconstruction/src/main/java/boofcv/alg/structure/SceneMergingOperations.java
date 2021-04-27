@@ -150,7 +150,7 @@ public class SceneMergingOperations implements VerbosePrint {
 	 * looks at the number of views in each scene.
 	 */
 	public boolean decideFirstIntoSecond( SceneWorkingGraph scene1, SceneWorkingGraph scene2 ) {
-		return scene1.workingViews.size() < scene2.workingViews.size();
+		return scene1.listViews.size() < scene2.listViews.size();
 	}
 
 	/**
@@ -161,20 +161,43 @@ public class SceneMergingOperations implements VerbosePrint {
 	 * @param dst (Input/Output) The destination scene
 	 * @param src_to_dst Known transform from the coordinate system of src to dst.
 	 */
-	public static void mergeViews( SceneWorkingGraph src, SceneWorkingGraph dst, ScaleSe3_F64 src_to_dst ) {
+	public void mergeViews( SceneWorkingGraph src, SceneWorkingGraph dst, ScaleSe3_F64 src_to_dst ) {
 		Se3_F64 src_to_view = new Se3_F64();
 
 		// src_to_dst is between the world coordinate systems. We need dst_to_src * src_to_view
 		Se3_F64 transform_dst_to_src = src_to_dst.transform.invert(null);
 
-		for (int srcViewIdx = 0; srcViewIdx < src.workingViews.size(); srcViewIdx++) {
-			SceneWorkingGraph.View srcView = src.workingViews.get(srcViewIdx);
+		for (int srcViewIdx = 0; srcViewIdx < src.listViews.size(); srcViewIdx++) {
+			SceneWorkingGraph.View srcView = src.listViews.get(srcViewIdx);
 
-			// If it already has this view skip it
-			if (dst.views.containsKey(srcView.pview.id))
-				continue;
+			SceneWorkingGraph.View dstView;
+			if (dst.views.containsKey(srcView.pview.id)) {
+				// If both scenes have the same view, go with the one that has be most reliable estimate
+				dstView = dst.views.get(srcView.pview.id);
 
-			SceneWorkingGraph.View dstView = dst.addView(srcView.pview);
+				// TODO handle this later
+				// Ignore the special case where one of them is in the seed set of views
+				if (srcView.inliers.isEmpty() || dstView.inliers.isEmpty())
+					continue;
+
+				// For now we will go with the number of inliers as a test of quality
+				boolean replace = srcView.inliers.getInlierCount() > dstView.inliers.getInlierCount();
+
+				if (verbose != null) {
+					verbose.printf("%-7s view='%s' inliers: %d vs %d src.f=%.1f dst.f=%.1f\n", replace ? "REPLACE" : "SKIP",
+							srcView.pview.id, srcView.inliers.getInlierCount(), dstView.inliers.getInlierCount(),
+							srcView.intrinsic.f, dstView.intrinsic.f);
+				}
+
+				// Do nothing if we are not replacing values in the dst view
+				if (!replace)
+					continue;
+			} else {
+				if (verbose != null)
+					verbose.printf("%-7s view='%s' f=%.1f\n", "NEW", srcView.pview.id, srcView.intrinsic.f);
+				// Create a new view in the dst scene
+				dstView = dst.addView(srcView.pview);
+			}
 
 			dstView.imageDimension.setTo(srcView.imageDimension);
 			dstView.intrinsic.setTo(srcView.intrinsic);
@@ -203,8 +226,8 @@ public class SceneMergingOperations implements VerbosePrint {
 		int totalCommon = 0;
 
 		// Go through all the views in the src list
-		for (int srcViewIdx = 0; srcViewIdx < src.workingViews.size(); srcViewIdx++) {
-			SceneWorkingGraph.View srcView = src.workingViews.get(srcViewIdx);
+		for (int srcViewIdx = 0; srcViewIdx < src.listViews.size(); srcViewIdx++) {
+			SceneWorkingGraph.View srcView = src.listViews.get(srcViewIdx);
 			SceneWorkingGraph.View dstView = dst.views.get(srcView.pview.id);
 
 			// Skip if the view is unknown in dst or if either of them are from the seed set
@@ -464,7 +487,7 @@ public class SceneMergingOperations implements VerbosePrint {
 		int amount = addCounts ? 1 : -1;
 
 		// Go through all the views which are part of this scene
-		target.workingViews.forEach(( wv ) -> {
+		target.listViews.forEach(( wv ) -> {
 			ViewScenes v = views.getView(wv.pview);
 
 			for (int srcIdx = 0; srcIdx < v.viewedBy.size; srcIdx++) {
@@ -494,7 +517,7 @@ public class SceneMergingOperations implements VerbosePrint {
 	 */
 	public static void removeScene( SceneWorkingGraph target, PairwiseViewScenes viewScenes ) {
 		// Go through all the views which are part of this scene
-		target.workingViews.forEach(( wv ) -> {
+		target.listViews.forEach(( wv ) -> {
 			ViewScenes v = viewScenes.getView(wv.pview);
 
 			// Remove this view from the scene. Notice the counts are not adjusted. It's

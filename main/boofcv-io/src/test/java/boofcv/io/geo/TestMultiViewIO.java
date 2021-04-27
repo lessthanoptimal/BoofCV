@@ -45,7 +45,6 @@ import static org.junit.jupiter.api.Assertions.*;
  * @author Peter Abeles
  */
 class TestMultiViewIO extends BoofStandardJUnit {
-
 	@Test void save_load_PairwiseImageGraph() {
 		for (int trial = 0; trial < 20; trial++) {
 			PairwiseImageGraph expected = createPairwise();
@@ -71,6 +70,7 @@ class TestMultiViewIO extends BoofStandardJUnit {
 			assertSame(va, a.mapNodes.get(va.id));
 			assertSame(vb, b.mapNodes.get(vb.id));
 
+			assertEquals(va.index, vb.index);
 			assertEquals(va.id, vb.id);
 			assertEquals(va.totalObservations, vb.totalObservations);
 			assertEquals(va.connections.size, vb.connections.size);
@@ -109,6 +109,7 @@ class TestMultiViewIO extends BoofStandardJUnit {
 		ret.nodes.resize(rand.nextInt(10) + 1);
 		for (int viewIdx = 0; viewIdx < ret.nodes.size; viewIdx++) {
 			PairwiseImageGraph.View v = ret.nodes.get(viewIdx);
+			v.index = viewIdx;
 			v.id = rand.nextInt() + "";
 			v.totalObservations = rand.nextInt(200);
 			ret.mapNodes.put(v.id, v);
@@ -153,12 +154,12 @@ class TestMultiViewIO extends BoofStandardJUnit {
 	}
 
 	private void checkIdentical( SceneWorkingGraph a, SceneWorkingGraph b ) {
-		assertEquals(a.workingViews.size(), b.workingViews.size());
+		assertEquals(a.listViews.size(), b.listViews.size());
 		assertEquals(a.views.size(), b.views.size());
 
-		for (int viewIdx = 0; viewIdx < a.workingViews.size(); viewIdx++) {
-			SceneWorkingGraph.View va = a.workingViews.get(viewIdx);
-			SceneWorkingGraph.View vb = b.workingViews.get(viewIdx);
+		for (int viewIdx = 0; viewIdx < a.listViews.size(); viewIdx++) {
+			SceneWorkingGraph.View va = a.listViews.get(viewIdx);
+			SceneWorkingGraph.View vb = b.listViews.get(viewIdx);
 
 			assertSame(va, a.views.get(va.pview.id));
 			assertSame(vb, b.views.get(vb.pview.id));
@@ -195,7 +196,7 @@ class TestMultiViewIO extends BoofStandardJUnit {
 
 		var candidates = DogArray_I32.range(0, pairwise.nodes.size);
 
-		ret.workingViews.forEach(v -> {
+		ret.listViews.forEach(v -> {
 			v.intrinsic.f = rand.nextDouble();
 			v.intrinsic.k1 = rand.nextDouble();
 			v.intrinsic.k2 = rand.nextDouble();

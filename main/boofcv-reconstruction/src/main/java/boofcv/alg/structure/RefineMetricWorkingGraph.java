@@ -143,13 +143,13 @@ public class RefineMetricWorkingGraph implements VerbosePrint {
 		final SceneObservations observations = bundleAdjustment.observations;
 
 		// Initialize the structure, but save initializing the points for later
-		structure.initialize(graph.workingViews.size(), graph.workingViews.size(), 0);
+		structure.initialize(graph.listViews.size(), graph.listViews.size(), 0);
 
 		// Declare enough space for each actual observation. This will make keeping track of which observations have
 		// features associated with them easier
-		observations.initialize(graph.workingViews.size());
-		for (int viewIdx = 0; viewIdx < graph.workingViews.size(); viewIdx++) {
-			SceneWorkingGraph.View wview = graph.workingViews.get(viewIdx);
+		observations.initialize(graph.listViews.size());
+		for (int viewIdx = 0; viewIdx < graph.listViews.size(); viewIdx++) {
+			SceneWorkingGraph.View wview = graph.listViews.get(viewIdx);
 			SceneObservations.View oview = observations.getView(viewIdx);
 
 			viewToIntegerID.put(wview.pview.id, viewIdx);
@@ -183,8 +183,8 @@ public class RefineMetricWorkingGraph implements VerbosePrint {
 	 */
 	void createFeatures3D( SceneWorkingGraph graph ) {
 		// For each view, with a set inliers, create a set of triangulated 3D point features
-		for (int workingIdx = 0; workingIdx < graph.workingViews.size(); workingIdx++) {
-			SceneWorkingGraph.View wview = graph.workingViews.get(workingIdx);
+		for (int workingIdx = 0; workingIdx < graph.listViews.size(); workingIdx++) {
+			SceneWorkingGraph.View wview = graph.listViews.get(workingIdx);
 			if (wview.inliers.isEmpty())
 				continue;
 
@@ -280,7 +280,7 @@ public class RefineMetricWorkingGraph implements VerbosePrint {
 			observations.getView(whichViewID).getPixel(viewObsIdx, pixelObserved);
 
 			// look up scene information for this view
-			SceneWorkingGraph.View wview = graph.workingViews.get(whichViewID);
+			SceneWorkingGraph.View wview = graph.listViews.get(whichViewID);
 			Point2Transform2_F64 normToPixels = listNormToPixel.get(whichViewID);
 
 			// See which 3D feature best matches this observation
@@ -444,8 +444,8 @@ public class RefineMetricWorkingGraph implements VerbosePrint {
 		final SceneStructureMetric structure = bundleAdjustment.structure;
 
 		// save the results
-		for (int viewIdx = 0; viewIdx < graph.workingViews.size(); viewIdx++) {
-			SceneWorkingGraph.View wview = graph.workingViews.get(viewIdx);
+		for (int viewIdx = 0; viewIdx < graph.listViews.size(); viewIdx++) {
+			SceneWorkingGraph.View wview = graph.listViews.get(viewIdx);
 			wview.world_to_view.setTo(structure.getParentToView(viewIdx));
 			wview.intrinsic.setTo((BundlePinholeSimplified)structure.cameras.get(viewIdx).model);
 		}

@@ -377,9 +377,10 @@ public class MultiViewIO {
 			graph.nodes.resize(yamlViews.size());
 			graph.edges.resize(yamlMotions.size());
 
-			for (int i = 0; i < yamlViews.size(); i++) {
-				Map<String, Object> yamlView = yamlViews.get(i);
-				PairwiseImageGraph.View v = graph.nodes.get(i);
+			for (int viewIdx = 0; viewIdx < yamlViews.size(); viewIdx++) {
+				Map<String, Object> yamlView = yamlViews.get(viewIdx);
+				PairwiseImageGraph.View v = graph.nodes.get(viewIdx);
+				v.index = viewIdx;
 				v.id = getOrThrow(yamlView, "id");
 				v.totalObservations = getOrThrow(yamlView, "total_observations");
 
@@ -450,8 +451,8 @@ public class MultiViewIO {
 		out.println("# " + working.getClass().getSimpleName() + " in YAML format. BoofCV " + BoofVersion.VERSION);
 
 		List<Map<String, Object>> views = new ArrayList<>();
-		for (int viewIdx = 0; viewIdx < working.workingViews.size(); viewIdx++) {
-			SceneWorkingGraph.View wview = working.workingViews.get(viewIdx);
+		for (int viewIdx = 0; viewIdx < working.listViews.size(); viewIdx++) {
+			SceneWorkingGraph.View wview = working.listViews.get(viewIdx);
 //			assertEq(viewIdx,wview.index,"Inconsistent view index."); // not required to be valid always
 
 			Map<String, Object> element = new HashMap<>();

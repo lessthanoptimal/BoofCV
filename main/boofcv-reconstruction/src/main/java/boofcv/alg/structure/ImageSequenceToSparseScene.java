@@ -150,8 +150,8 @@ public class ImageSequenceToSparseScene<T extends ImageGray<T>> implements Verbo
 		// Order of views in this graph is the same as the views in the SBA scene
 		// Since the image name is lost in the tracker it's referred to by frame number
 		SceneWorkingGraph graph = metricFromPairwise.getLargestScene();
-		for (int sbaIdx = 0; sbaIdx < graph.workingViews.size(); sbaIdx++) {
-			int imageIdx = Integer.parseInt(graph.workingViews.get(sbaIdx).pview.id);
+		for (int sbaIdx = 0; sbaIdx < graph.listViews.size(); sbaIdx++) {
+			int imageIdx = Integer.parseInt(graph.listViews.get(sbaIdx).pview.id);
 			imageIdToSceneViewIdx.put(imageIDs.get(imageIdx), sbaIdx);
 		}
 
