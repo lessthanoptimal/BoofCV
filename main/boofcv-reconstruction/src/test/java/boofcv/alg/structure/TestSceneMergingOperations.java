@@ -93,14 +93,14 @@ public class TestSceneMergingOperations extends BoofStandardJUnit {
 
 		// First scene will have more and the second should be merged in to it
 		for (int i = 0; i < 3; i++) {
-			scene1.workingViews.add(new SceneWorkingGraph.View());
+			scene1.listViews.add(new SceneWorkingGraph.View());
 		}
 		var alg = new SceneMergingOperations();
 		assertFalse(alg.decideFirstIntoSecond(scene1, scene2));
 
 		// second scene will now have more
 		for (int i = 0; i < 4; i++) {
-			scene2.workingViews.add(new SceneWorkingGraph.View());
+			scene2.listViews.add(new SceneWorkingGraph.View());
 		}
 		assertTrue(alg.decideFirstIntoSecond(scene1, scene2));
 
@@ -108,6 +108,7 @@ public class TestSceneMergingOperations extends BoofStandardJUnit {
 	}
 
 	@Test void mergeViews() {
+		var alg = new SceneMergingOperations();
 		var src = new SceneWorkingGraph();
 		var dst = new SceneWorkingGraph();
 
@@ -134,10 +135,10 @@ public class TestSceneMergingOperations extends BoofStandardJUnit {
 		}
 
 		// Call the function being tested
-		SceneMergingOperations.mergeViews(src, dst, src_to_dst);
+		alg.mergeViews(src, dst, src_to_dst);
 
 		// src has 3 views NOT in dst
-		assertEquals(8, dst.workingViews.size());
+		assertEquals(8, dst.listViews.size());
 
 		// make sure the views which were the same were not modified
 		assertEquals(0.0, dst.views.get("3").world_to_view.T.x);
@@ -200,7 +201,7 @@ public class TestSceneMergingOperations extends BoofStandardJUnit {
 			var wv = new SceneWorkingGraph.View();
 			wv.pview = new PairwiseImageGraph.View();
 			wv.pview.index = i;
-			scene.workingViews.add(wv);
+			scene.listViews.add(wv);
 		}
 
 		var alg = new SceneMergingOperations();
@@ -258,7 +259,7 @@ public class TestSceneMergingOperations extends BoofStandardJUnit {
 			var wv = new SceneWorkingGraph.View();
 			wv.pview = new PairwiseImageGraph.View();
 			wv.pview.index = i;
-			scene.workingViews.add(wv);
+			scene.listViews.add(wv);
 		}
 
 		SceneMergingOperations.removeScene(scene, viewScenes);

@@ -45,7 +45,7 @@ public class SceneWorkingGraph {
 
 	/** List of all views in the scene graph. Look up based on the image/view's id */
 	public final Map<String, View> views = new HashMap<>();
-	public final List<View> workingViews = new ArrayList<>();
+	public final List<View> listViews = new ArrayList<>();
 
 	/** List of all features in the scene */
 	public final List<Feature> features = new ArrayList<>(); // TODO change to something else so remove() is faster
@@ -64,7 +64,7 @@ public class SceneWorkingGraph {
 	 */
 	public void reset() {
 		views.clear();
-		workingViews.clear();
+		listViews.clear();
 		features.clear();
 		exploredViews.clear();
 		index = -1;
@@ -90,8 +90,8 @@ public class SceneWorkingGraph {
 		v.pview = pview;
 		checkTrue(null == views.put(v.pview.id, v),
 				"There shouldn't be an existing view with the same key: '" + v.pview.id + "'");
-		v.index = workingViews.size();
-		workingViews.add(v);
+		v.index = listViews.size();
+		listViews.add(v);
 		return v;
 	}
 
@@ -103,7 +103,7 @@ public class SceneWorkingGraph {
 	}
 
 	public List<View> getAllViews() {
-		return workingViews;
+		return listViews;
 	}
 
 	/**
@@ -200,8 +200,8 @@ public class SceneWorkingGraph {
 		if (storage == null)
 			storage = new TObjectIntHashMap<>();
 
-		for (int i = 0; i < workingViews.size(); i++) {
-			storage.put(workingViews.get(i).pview.id, i);
+		for (int i = 0; i < listViews.size(); i++) {
+			storage.put(listViews.get(i).pview.id, i);
 		}
 
 		return storage;

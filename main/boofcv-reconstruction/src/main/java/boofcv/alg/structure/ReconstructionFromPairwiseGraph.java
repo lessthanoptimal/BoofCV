@@ -74,16 +74,16 @@ public abstract class ReconstructionFromPairwiseGraph implements VerbosePrint {
 	 * @param view (Input) Inspects connected views to add to found
 	 */
 	protected void addOpenForView( SceneWorkingGraph scene, View view ) {
-		for (PairwiseImageGraph.Motion c : view.connections.toList()) {
+		for (int connIdx = 0; connIdx < view.connections.size; connIdx++) {
+			PairwiseImageGraph.Motion c = view.connections.get(connIdx);
+			// If there isn't 3D information skip it
 			if (!c.is3D)
 				continue;
 
 			View o = c.other(view);
 
+			// Make sure it hasn't been added or considered already
 			if (scene.exploredViews.contains(o.id))
-				continue;
-
-			if (scene.open.contains(o))
 				continue;
 
 			if (verbose != null) verbose.println("  scene[" + scene.index + "] adding to open view.id='" + o.id + "'");

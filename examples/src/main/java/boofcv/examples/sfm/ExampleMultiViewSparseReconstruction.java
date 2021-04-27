@@ -146,7 +146,7 @@ public class ExampleMultiViewSparseReconstruction {
 			var wv = working.lookupView(pv.id);
 			if (wv == null)
 				continue;
-			int order = working.workingViews.indexOf(wv);
+			int order = working.listViews.indexOf(wv);
 			ConvertRotation3D_F64.matrixToRodrigues(wv.world_to_view.R, rod);
 			System.out.printf("view[%2d]='%2s' f=%6.1f k1=%6.3f k2=%6.3f T={%5.1f,%5.1f,%5.1f} R=%4.2f\n",
 					order, wv.pview.id, wv.intrinsic.f, wv.intrinsic.k1, wv.intrinsic.k2,

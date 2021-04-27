@@ -196,15 +196,16 @@ public class MetricFromUncalibratedPairwiseGraph extends ReconstructionFromPairw
 			refineWorking.process(db, scene);
 
 			if (verbose != null)
-				verbose.println("  scene.index=" + scene.index + " views.size=" + scene.workingViews.size());
+				verbose.println("  scene.index=" + scene.index + " views.size=" + scene.listViews.size());
 
 			// Add this scene to each node so that we know they are connected
-			for (int i = 0; i < scene.workingViews.size(); i++) {
-				SceneWorkingGraph.View wview = scene.workingViews.get(i);
-				nodeViews.getView(wview.pview).viewedBy.add(scene.index);
+			for (int i = 0; i < scene.listViews.size(); i++) {
+				SceneWorkingGraph.View wview = scene.listViews.get(i);
+				PairwiseImageGraph.View pview = wview.pview;
+				nodeViews.getView(pview).viewedBy.add(scene.index);
 
 				if (verbose != null)
-					verbose.println("   view['" + wview.pview.id + "']  intrinsic.f=" + wview.intrinsic.f);
+					verbose.println("  view['" + pview.id + "']  intrinsic.f=" + wview.intrinsic.f+"  view.index="+pview.index);
 			}
 		}
 		if (verbose != null) verbose.println("EXIT spawn seeds: scenes.size=" + scenes.size());
@@ -224,7 +225,7 @@ public class MetricFromUncalibratedPairwiseGraph extends ReconstructionFromPairw
 			SceneWorkingGraph scene = scenes.get(sceneIdx);
 
 			// Mark views which were learned in the spawn as known
-			scene.workingViews.forEach(wv -> scene.exploredViews.add(wv.pview.id));
+			scene.listViews.forEach(wv -> scene.exploredViews.add(wv.pview.id));
 
 			// Add views which can be expanded into
 			findAllOpenViews(scene);
@@ -238,10 +239,6 @@ public class MetricFromUncalibratedPairwiseGraph extends ReconstructionFromPairw
 
 		if (verbose != null) verbose.println("Expanding scenes");
 
-		// TODO keep on expanding into a view no matter what if it does not have a set of inliers
-		//     this means it was in the seed group but not the seed view. If the seed was bad
-		//     then we want to be able to expand through these views without issue. Plus it makes merging logic simpler
-
 		// Loop until it can't expand any more
 		while (true) {
 			// Clear previous best results
@@ -253,44 +250,9 @@ public class MetricFromUncalibratedPairwiseGraph extends ReconstructionFromPairw
 				if (scene.open.isEmpty())
 					continue;
 
-				// TODO this logic should be to remove if an open view has no neighbor that isn't just
-				// 	    owned by this scene
+				// TODO consider removing scenes from the open list if other scenes have grown into this territory
+				//      there is probably too much overlap now
 
-				// The logic below doesn't do what I want it to do, but does limit growth and help debug rest of the
-				// code
-
-				// Remove views from open list which can't be expanded to
-				int openSizeBefore = scene.open.size;
-				for (int openIdx = scene.open.size - 1; openIdx >= 0; openIdx--) {
-					final PairwiseImageGraph.View pview = scene.open.get(openIdx);
-					// nothing has viewed it. Free to move in
-					if (nodeViews.getView(pview).viewedBy.size <= 1)
-						continue;
-
-					// it can still expand into this node if the other scenes contain this view in their seed
-					// set of views. The idea being that we want redundancy if there's a bad seed
-					ViewScenes views = nodeViews.getView(pview);
-					boolean usable = true;
-					for (int idxA = 0; idxA < views.viewedBy.size; idxA++) {
-						SceneWorkingGraph viewsByScene = scenes.get(views.viewedBy.get(idxA));
-						// Skip over if it's this scene
-						if (viewsByScene == scene)
-							continue;
-
-						// If it has an inlier set it was spawned outside of the seed set (except for the seed view)
-						// and we should not
-						if (!viewsByScene.views.get(pview.id).inliers.isEmpty()) {
-							usable = false;
-							break;
-						}
-					}
-					if (!usable)
-						scene.open.removeSwap(openIdx);
-				}
-				if (verbose != null)
-					verbose.println("  scene[" + sceneIdx + "] removed open " + (openSizeBefore - scene.open.size));
-
-				// TODO this can be optimized by only searching the open list for a new best when there's a change
 				if (!selectNextToProcess(scene, candidate)) {
 					// TODO remove this scene from the active list?
 					if (verbose != null) verbose.println("  No valid views left. open.size=" + scene.open.size);
@@ -318,6 +280,35 @@ public class MetricFromUncalibratedPairwiseGraph extends ReconstructionFromPairw
 
 			expandIntoView(db, best.scene, view);
 		}
+	}
+
+	/**
+	 * Check to see the scene is allowed to expand from the specified view. The goal here is to have some redundancy
+	 * in views between scenes but not let all scenes expand unbounded and end up as duplicates of each other.
+	 *
+	 * @return true if the scene can be expanded from this view
+	 */
+	boolean canSpawnFromView(SceneWorkingGraph scene, PairwiseImageGraph.View pview) {
+		// If no scene already contains the view then there are no restrictions
+		if (nodeViews.getView(pview).viewedBy.size == 0)
+			return true;
+
+		// If another scene also occupies the view then we can only expand from it if it is part of the seeds set
+		// The idea is that the seed set could have produced a bad reconstruction that needs to be jumped over
+		ViewScenes views = nodeViews.getView(pview);
+		boolean usable = true;
+		for (int idxA = 0; idxA < views.viewedBy.size; idxA++) {
+			SceneWorkingGraph viewsByScene = scenes.get(views.viewedBy.get(idxA));
+			BoofMiscOps.checkTrue(viewsByScene != scene, "Scene should not already have this view");
+
+			// If it has an inlier set it was spawned outside of the seed set (except for the seed view)
+			// and we should not
+			if (!viewsByScene.views.get(pview.id).inliers.isEmpty()) {
+				usable = false;
+				break;
+			}
+		}
+		return usable;
 	}
 
 	/**
@@ -352,14 +343,14 @@ public class MetricFromUncalibratedPairwiseGraph extends ReconstructionFromPairw
 			if (!mergeOps.findTransform(db, src, dst, src_to_dst))
 				throw new RuntimeException("Merge fails. Unable to determine src_to_dst. What to do?");
 
-			int dstViewCountBefore = dst.workingViews.size();
+			int dstViewCountBefore = dst.listViews.size();
 
 			// Merge the views
-			SceneMergingOperations.mergeViews(src, dst, src_to_dst);
+			mergeOps.mergeViews(src, dst, src_to_dst);
 
 			if (verbose != null) verbose.println("scenes: src=" + src.index + " dst=" + dst.index +
-					" views: (" + src.workingViews.size() + " , " + dstViewCountBefore +
-					") -> "+dst.workingViews.size()+", scale=" + src_to_dst.scale);
+					" views: (" + src.listViews.size() + " , " + dstViewCountBefore +
+					") -> "+dst.listViews.size()+", scale=" + src_to_dst.scale);
 
 			// Remove the one that's no longer needed
 			SceneMergingOperations.removeScene(src, nodeViews);
@@ -370,7 +361,7 @@ public class MetricFromUncalibratedPairwiseGraph extends ReconstructionFromPairw
 
 		// remove scenes that got merged into others
 		for (int i = scenes.size - 1; i >= 0; i--) {
-			if (!scenes.get(i).workingViews.isEmpty())
+			if (!scenes.get(i).listViews.isEmpty())
 				continue;
 			scenes.removeSwap(i);
 		}
@@ -384,10 +375,6 @@ public class MetricFromUncalibratedPairwiseGraph extends ReconstructionFromPairw
 			if (verbose != null) verbose.println("Failed to expand/add view='" + selected.id + "'. Discarding.");
 			return; // TODO handle this failure somehow. mark the scene as dead?
 		}
-		if (verbose != null) {
-			verbose.println("Expanded view='" + selected.id + "'  inliers="
-					+ utils.inliersThreeView.size() + " / " + utils.matchesTriple.size);
-		}
 
 		// Saves the set of inliers used to estimate this views metric view for later use
 		SceneWorkingGraph.View wview = scene.lookupView(selected.id);
@@ -398,22 +385,18 @@ public class MetricFromUncalibratedPairwiseGraph extends ReconstructionFromPairw
 //			refineWorking.process(db, workGraph);
 
 		int openSizePrior = scene.open.size;
-		// Add neighboring views which have yet to be added to the open list
-		addOpenForView(scene, wview.pview);
 
-		// If the view is already part of another scene, do not allow this scene to expand into views that already
-		// already occupied. This is a way to prevent all scenes from consuming all views.
-		if (nodeViews.getView(wview.pview).viewedBy.size == 0) {
-			for (int openIdx = scene.open.size - 1; openIdx >= openSizePrior; openIdx--) {
-				PairwiseImageGraph.View pview = scene.open.get(openIdx);
-				if (!nodeViews.getView(pview).viewedBy.isEmpty())
-					continue;
-				scene.open.removeSwap(openIdx);
-			}
+		// Examine other scenes which contains this view when deciding if we should continue to expand from here
+		if (canSpawnFromView(scene, wview.pview))
+			addOpenForView(scene, wview.pview);
+
+		if (verbose != null) {
+			verbose.println("Expanded view='" + selected.id + "'  inliers="+ utils.inliersThreeView.size() + "/" +
+					utils.matchesTriple.size+" added.size="+(scene.open.size-openSizePrior));
 		}
 
 		// Add this view to the list
-		nodeViews.getView(wview.pview).viewedBy.add(scene.index);
+		nodeViews.getView(selected).viewedBy.add(scene.index);
 	}
 
 	/**
@@ -507,7 +490,7 @@ public class MetricFromUncalibratedPairwiseGraph extends ReconstructionFromPairw
 		SceneWorkingGraph best = scenes.get(0);
 		for (int i = 1; i < scenes.size; i++) {
 			SceneWorkingGraph scene = scenes.get(i);
-			if (scene.workingViews.size() > best.workingViews.size()) {
+			if (scene.listViews.size() > best.listViews.size()) {
 				best = scene;
 			}
 		}
