@@ -30,7 +30,6 @@ import boofcv.alg.geo.selfcalib.TwoViewToCalibratingHomography;
 import boofcv.misc.BoofMiscOps;
 import boofcv.struct.geo.AssociatedPair;
 import boofcv.struct.geo.AssociatedTriple;
-import georegression.geometry.UtilPoint3D_F64;
 import georegression.struct.point.Point2D_F64;
 import georegression.struct.point.Point4D_F64;
 import georegression.struct.se.Se3_F64;
@@ -171,18 +170,20 @@ public class MetricExpandByOneView extends ExpandByOneView {
 		}
 
 		// Match the local coordinate system's scale to the global coordinate system's scale
-		int which = UtilPoint3D_F64.axisLargestAbs(view1_to_view2.T);
-		double scale = view1_to_view2.T.getIdx(which)/view1_to_view2H.T.getIdx(which);
-		view1_to_target.T.scale(scale);
+		double scaleGlobalToLocal = MultiViewOps.findScale(view1_to_view2H.T, view1_to_view2.T);
+		// If the original scale was negative you just want to change the magnitude now otherwise you will change
+		// the direction if you apply the negative sign again!
+		scaleGlobalToLocal = Math.abs(scaleGlobalToLocal);
+		view1_to_target.T.scale(scaleGlobalToLocal);
 
 		// Convert local coordinate into world coordinates for the view's pose
 		Se3_F64 world_to_view1 = workGraph.views.get(utils.seed.id).world_to_view;
 		world_to_view1.concat(view1_to_target, wtarget.world_to_view);
 
 		if (verbose != null) {
-			verbose.printf("Rescaled Local T={%.1f %.1f %.1f) scale=%f\n",
-					view1_to_target.T.x, view1_to_target.T.y, view1_to_target.T.z, scale);
-			verbose.printf("Final Global   T={%.1f %.1f %.1f)\n",
+			verbose.printf("Rescaled Local T={%.2f %.2f %.2f) scale=%f\n",
+					view1_to_target.T.x, view1_to_target.T.y, view1_to_target.T.z, scaleGlobalToLocal);
+			verbose.printf("Final Global   T={%.2f %.2f %.2f)\n",
 					wtarget.world_to_view.T.x, wtarget.world_to_view.T.y, wtarget.world_to_view.T.z);
 		}
 
@@ -215,13 +216,13 @@ public class MetricExpandByOneView extends ExpandByOneView {
 		}
 
 		// Now set the global view-1 to view-2 at the local scale
-		double scale = MultiViewOps.findScale(view1_to_view2.T, view1_to_view2H.T);
+		double scaleLocalToGlobal = MultiViewOps.findScale(view1_to_view2.T, view1_to_view2H.T);
 		view1_to_view2H.setTo(view1_to_view2);
-		view1_to_view2H.T.scale(scale);
+		view1_to_view2H.T.scale(scaleLocalToGlobal);
 
 		if (verbose != null) {
-			verbose.printf("G View 1 to 2     T={%.1f %.1f %.1f)\n",
-					view1_to_view2H.T.x, view1_to_view2H.T.y, view1_to_view2H.T.z);
+			verbose.printf("G View 1 to 2     T={%.1f %.1f %.1f) scale=%g\n",
+					view1_to_view2H.T.x, view1_to_view2H.T.y, view1_to_view2H.T.z, scaleLocalToGlobal);
 			verbose.printf("Initial fx=%6.1f k1=%6.3f k2=%6.3f T={%.1f %.1f %.1f)\n",
 					wview.intrinsic.f, wview.intrinsic.k1, wview.intrinsic.k2,
 					view1_to_target.T.x, view1_to_target.T.y, view1_to_target.T.z);
