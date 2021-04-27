@@ -880,8 +880,9 @@ public class BoofMiscOps {
 		}
 
 		if (text.length() < length) {
+			// Fill in unused characters with a dash. Makes it visually easier to see spacing between indents.
 			for (int i = text.length(); i < length; i++) {
-				text += " ";
+				text += "-";
 			}
 		}
 

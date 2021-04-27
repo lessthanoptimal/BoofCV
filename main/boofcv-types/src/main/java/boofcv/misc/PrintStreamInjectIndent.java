@@ -48,6 +48,7 @@ public class PrintStreamInjectIndent extends PrintStream {
 		PrintStream out;
 		int numSpaces;
 		String prefix;
+		boolean newLine = true;
 
 		public Injector( PrintStream out, String prefix, int numSpaces ) {
 			this.out = out;
@@ -56,15 +57,19 @@ public class PrintStreamInjectIndent extends PrintStream {
 		}
 
 		@Override public void write( int b ) throws IOException {
-			out.write(b);
-			// inject tab at the new line
-			if (b == '\n') {
+			if (newLine) {
 				for (int i = 0; i < prefix.length(); i++) {
 					out.write(prefix.charAt(i));
 				}
 				for (int i = 0; i < numSpaces; i++) {
 					out.write(' ');
 				}
+				newLine = false;
+			}
+			out.write(b);
+			// inject tab at the new line
+			if (b == '\n') {
+				newLine = true;
 			}
 		}
 	}
