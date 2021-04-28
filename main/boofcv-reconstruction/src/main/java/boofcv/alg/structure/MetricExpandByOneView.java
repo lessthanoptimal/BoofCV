@@ -189,7 +189,7 @@ public class MetricExpandByOneView extends ExpandByOneView {
 		db.lookupShape(target.id, wtarget.imageDimension);
 
 		// Match the local coordinate system's scale to the global coordinate system's scale
-		view1_to_target.T.divide(scaleLocalToGlobal);
+		view1_to_target.T.scale(scaleLocalToGlobal);
 
 		// Convert local coordinate into world coordinates for the view's pose
 		Se3_F64 world_to_view1 = workGraph.views.get(utils.seed.id).world_to_view;
@@ -225,27 +225,36 @@ public class MetricExpandByOneView extends ExpandByOneView {
 		view1_to_target.T.divide(normTarget);
 		view1_to_view2H.T.divide(normTarget);
 
-		if (verbose != null) {
-			// print the found view 1 to view 2 using local information only
-			verbose.printf("L View 1 to 2     T=(%.1f %.1f %.1f)\n",
-					view1_to_view2H.T.x, view1_to_view2H.T.y, view1_to_view2H.T.z);
-		}
-
 		// Let's use the "known" view1_to_view2, but to do that we will need to resolve the scale ambiguity
 		SceneWorkingGraph.View wview1 = workGraph.lookupView(utils.seed.id);
 		SceneWorkingGraph.View wview2 = workGraph.lookupView(utils.viewB.id);
 		wview1.world_to_view.invert(null).concat(wview2.world_to_view, view1_to_view2);
 
+		if (verbose != null) {
+			verbose.printf("G  View 1 to 2     T=(%.1f %.1f %.1f)\n",
+					view1_to_view2.T.x, view1_to_view2.T.y, view1_to_view2.T.z);
+			// print the found view 1 to view 2 using local information only
+			verbose.printf("L  View 1 to 2     T=(%.1f %.1f %.1f)\n",
+					view1_to_view2H.T.x, view1_to_view2H.T.y, view1_to_view2H.T.z);
+		}
+
+
 		// This assumes the vectors are only significantly different in magnitude. In practice their
 		// direction can be drastically different. We will ignore that and hope for the best..
-		scaleLocalToGlobal = view1_to_view2H.T.norm()/view1_to_view2.T.norm();
+		scaleLocalToGlobal = view1_to_view2.T.norm()/view1_to_view2H.T.norm();
 		// Sanity check. If this fails then something wrong wrong much earlier
 		BoofMiscOps.checkTrue(scaleLocalToGlobal != 0.0 && !UtilEjml.isUncountable(scaleLocalToGlobal));
+		boolean negate = MultiViewOps.findScale(view1_to_view2H.T, view1_to_view2.T) < 0.0;
 		view1_to_view2H.setTo(view1_to_view2);
-		view1_to_view2H.T.scale(scaleLocalToGlobal);
+		view1_to_view2H.T.divide(scaleLocalToGlobal);
+
+		if (negate) {
+			view1_to_target.T.scale(-1);
+		}
 
 		if (verbose != null) {
-			verbose.printf("G View 1 to 2     T=(%.1f %.1f %.1f) scale=%g\n",
+			verbose.println("negate="+negate);
+			verbose.printf("SL View 1 to 2     T=(%.1f %.1f %.1f) scale=%g\n",
 					view1_to_view2H.T.x, view1_to_view2H.T.y, view1_to_view2H.T.z, scaleLocalToGlobal);
 			verbose.printf("Initial fx=%6.1f k1=%6.3f k2=%6.3f T=(%.1f %.1f %.1f)\n",
 					intrinsic.f, intrinsic.k1, intrinsic.k2,

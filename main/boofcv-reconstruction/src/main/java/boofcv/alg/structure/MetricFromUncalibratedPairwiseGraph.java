@@ -30,6 +30,7 @@ import lombok.Getter;
 import lombok.Setter;
 import org.ddogleg.struct.DogArray;
 import org.ddogleg.struct.DogArray_I32;
+import org.ddogleg.struct.VerbosePrint;
 import org.ejml.data.DMatrixRMaj;
 import org.jetbrains.annotations.Nullable;
 
@@ -130,9 +131,6 @@ public class MetricFromUncalibratedPairwiseGraph extends ReconstructionFromPairw
 		List<SeedInfo> seeds = selectSeeds(seedScores, mapScores);
 		// TODO also take in account distance from other seeds when selecting
 
-//		while (seeds.size() > 1)
-//			seeds.remove(0);
-
 		if (seeds.isEmpty()) {
 			if (verbose != null) verbose.println("No valid seeds found.");
 			return false;
@@ -202,6 +200,9 @@ public class MetricFromUncalibratedPairwiseGraph extends ReconstructionFromPairw
 
 			// Refine initial estimate
 			refineWorking.process(db, scene);
+
+			if (sanityChecks)
+				metricChecks.inlierTriangulatePositiveDepth(0.1, db, scene, info.seed.id);
 
 			if (verbose != null)
 				verbose.println("  scene.index=" + scene.index + " views.size=" + scene.listViews.size());
@@ -579,5 +580,9 @@ public class MetricFromUncalibratedPairwiseGraph extends ReconstructionFromPairw
 		this.verbose = BoofMiscOps.addPrefix(this, out);
 		BoofMiscOps.verboseChildren(verbose, configuration,
 				initProjective, expandMetric, refineWorking, mergeOps, metricChecks);
+
+		if (projectiveToMetric instanceof VerbosePrint) {
+			BoofMiscOps.verboseChildren(verbose, configuration, (VerbosePrint)projectiveToMetric);
+		}
 	}
 }

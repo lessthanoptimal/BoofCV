@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -42,8 +42,7 @@ import java.util.List;
  * @author Peter Abeles
  */
 public class GenerateMetricTripleFromProjective implements
-		ModelGeneratorViews<MetricCameraTriple, AssociatedTriple, ImageDimension>
-{
+		ModelGeneratorViews<MetricCameraTriple, AssociatedTriple, ImageDimension> {
 	// Computes a trifocal tensor from input observations from which projective cameras are extracted
 	public Estimate1ofTrifocalTensor trifocal;
 	// from projective cameras computes metric cameras
@@ -57,13 +56,13 @@ public class GenerateMetricTripleFromProjective implements
 	@Getter final DMatrixRMaj P3;
 
 	// Data structures which have been converted
-	@Getter final DogArray<AssociatedTuple> observationsN = new DogArray<>(()->new AssociatedTupleN(3));
-	@Getter final DogArray<DMatrixRMaj> projective = new DogArray<>(()->new DMatrixRMaj(3,4));
+	@Getter final DogArray<AssociatedTuple> observationsN = new DogArray<>(() -> new AssociatedTupleN(3));
+	@Getter final DogArray<DMatrixRMaj> projective = new DogArray<>(() -> new DMatrixRMaj(3, 4));
 	@Getter final DogArray<ImageDimension> dimensions = new DogArray<>(ImageDimension::new);
 	@Getter final MetricCameras metricN = new MetricCameras();
 
-	public GenerateMetricTripleFromProjective(Estimate1ofTrifocalTensor trifocal,
-											  ProjectiveToMetricCameras projectiveToMetric) {
+	public GenerateMetricTripleFromProjective( Estimate1ofTrifocalTensor trifocal,
+											   ProjectiveToMetricCameras projectiveToMetric ) {
 		this.trifocal = trifocal;
 		this.projectiveToMetric = projectiveToMetric;
 
@@ -74,7 +73,7 @@ public class GenerateMetricTripleFromProjective implements
 	}
 
 	@Override
-	public void setView(int view, ImageDimension viewInfo) {
+	public void setView( int view, ImageDimension viewInfo ) {
 		dimensions.get(view).setTo(viewInfo);
 	}
 
@@ -84,18 +83,18 @@ public class GenerateMetricTripleFromProjective implements
 	}
 
 	@Override
-	public boolean generate(List<AssociatedTriple> observationTriple, MetricCameraTriple output) {
+	public boolean generate( List<AssociatedTriple> observationTriple, MetricCameraTriple output ) {
 		// Get trifocal tensor
-		if( !trifocal.process(observationTriple,tensor) )
+		if (!trifocal.process(observationTriple, tensor))
 			return false;
 
 		// Get camera matrices from trifocal
 		extractor.setTensor(tensor);
-		extractor.extractCamera(P2,P3);
+		extractor.extractCamera(P2, P3);
 
 		MultiViewOps.convertTr(observationTriple, observationsN);
 
-		if( !projectiveToMetric.process(dimensions.toList(),projective.toList(),observationsN.toList(),metricN) )
+		if (!projectiveToMetric.process(dimensions.toList(), projective.toList(), observationsN.toList(), metricN))
 			return false;
 
 		// Converts the output

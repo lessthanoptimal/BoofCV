@@ -30,8 +30,12 @@ import georegression.struct.point.Point3D_F64;
 import georegression.struct.se.Se3_F64;
 import georegression.transform.se.SePointOps_F64;
 import org.ddogleg.struct.DogArray;
+import org.ddogleg.struct.VerbosePrint;
+import org.jetbrains.annotations.Nullable;
 
+import java.io.PrintStream;
 import java.util.List;
+import java.util.Set;
 
 /**
  * There's a sign ambiguity which flips the translation vector for several self calibration functions. This
@@ -39,7 +43,7 @@ import java.util.List;
  *
  * @author Peter Abeles
  */
-public class ResolveSignAmbiguityPositiveDepth {
+public class ResolveSignAmbiguityPositiveDepth implements VerbosePrint {
 	/** Triangulation for n-view case */
 	public TriangulateNViewsMetric triangulateN = FactoryMultiView.triangulateNViewMetric(null);
 
@@ -58,6 +62,8 @@ public class ResolveSignAmbiguityPositiveDepth {
 	// Storage for normalized image coordinates
 	DogArray<Point2D_F64> pixelNorms = new DogArray<>(Point2D_F64::new);
 	DogArray<Se3_F64> worldToViews = new DogArray<>(Se3_F64::new);
+
+	@Nullable PrintStream verbose;
 
 	/**
 	 * Processes the results and observations to fix the sign
@@ -86,7 +92,7 @@ public class ResolveSignAmbiguityPositiveDepth {
 		signChanged = false;
 		int best = -1;
 		bestInvalid = Integer.MAX_VALUE;
-		for (int trial = 0; trial < 4; trial++) {
+		for (int trial = 0; trial < 2; trial++) {
 			int foundInvalid = 0;
 			for (int obsIdx = 0; obsIdx < numObs; obsIdx++) {
 				// convert pixels into normalized image coordinates
@@ -113,6 +119,8 @@ public class ResolveSignAmbiguityPositiveDepth {
 				}
 			}
 
+			if (verbose != null) verbose.println("trial=" + trial + " invalid=" + foundInvalid + " obs=" + numObs);
+
 			// flip to test other hypothesis next iteration
 			for (int i = 1; i < worldToViews.size(); i++) {
 				worldToViews.get(i).T.scale(-1);
@@ -131,6 +139,8 @@ public class ResolveSignAmbiguityPositiveDepth {
 				views.motion_1_to_k.get(viewIdx).T.scale(-1);
 			}
 		}
+
+		if (verbose != null) verbose.println("best="+best+" signChanged="+signChanged);
 	}
 
 	/**
@@ -188,6 +198,9 @@ public class ResolveSignAmbiguityPositiveDepth {
 					foundInvalid++;
 			}
 
+			if (verbose != null)
+				verbose.println("trial=" + trial + " invalid=" + foundInvalid + " obs=" + observations.size());
+
 			// flip to test other hypothesis next iteration
 			for (int i = 1; i < worldToViews.size(); i++) {
 				worldToViews.get(i).T.scale(-1);
@@ -201,8 +214,15 @@ public class ResolveSignAmbiguityPositiveDepth {
 		}
 
 		if (best == 1) {
+			signChanged = true;
 			result.view_1_to_2.T.scale(-1);
 			result.view_1_to_3.T.scale(-1);
 		}
+
+		if (verbose != null) verbose.println("best="+best+" signChanged="+signChanged);
+	}
+
+	@Override public void setVerbose( @Nullable PrintStream out, @Nullable Set<String> configuration ) {
+		this.verbose = BoofMiscOps.addPrefix(this, out);
 	}
 }

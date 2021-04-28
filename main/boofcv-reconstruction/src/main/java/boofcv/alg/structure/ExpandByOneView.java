@@ -39,7 +39,7 @@ import static boofcv.misc.BoofMiscOps.checkTrue;
  */
 public abstract class ExpandByOneView implements VerbosePrint {
 	// If not null then print debugging information
-	protected PrintStream verbose;
+	protected @Nullable PrintStream verbose;
 
 	// Reference to the working scene graph
 	protected SceneWorkingGraph workGraph;

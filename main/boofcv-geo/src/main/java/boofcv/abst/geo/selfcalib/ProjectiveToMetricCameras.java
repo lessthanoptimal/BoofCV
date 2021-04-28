@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -37,12 +37,12 @@ public interface ProjectiveToMetricCameras {
 	 * @param dimensions (Input) Dimension of input image in each view, including the first
 	 * @param views (Input) List of projective camera matrices. First view is P=[I|0] implicitly and is not included
 	 * @param observations (Input) Observations of common features among all the views. Observations are in pixels.
-	 *                     some implementations might require the pixel observations be offset by the principle point.
+	 * some implementations might require the pixel observations be offset by the principle point.
 	 * @param results (Output) Storage for found metric upgrade. Translations are scaled automatically to be close to 1.0.
 	 * @return true if successful or false if it failed
 	 */
-	boolean process(List<ImageDimension> dimensions, List<DMatrixRMaj> views, List<AssociatedTuple> observations,
-					MetricCameras results);
+	boolean process( List<ImageDimension> dimensions, List<DMatrixRMaj> views, List<AssociatedTuple> observations,
+					 MetricCameras results );
 
 	/**
 	 * Returns the minimum number of views required to estimate the metric upgrade
