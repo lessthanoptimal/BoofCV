@@ -702,7 +702,9 @@ public class FactoryMultiView {
 				new SelfCalibrationLinearDualQuadratic(c.aspectRatio) :
 				new SelfCalibrationLinearDualQuadratic(c.zeroSkew);
 
-		return new ProjectiveToMetricCameraDualQuadratic(selfCalib);
+		var ret = new ProjectiveToMetricCameraDualQuadratic(selfCalib);
+		ret.invalidFractionAccept = c.invalidFractionAccept;
+		return ret;
 	}
 
 	/**

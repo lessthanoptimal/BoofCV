@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -42,19 +42,18 @@ public class ProjectiveToMetricCameraEssentialGuessAndCheck implements Projectiv
 	final @Getter SelfCalibrationEssentialGuessAndCheck selfCalib;
 
 	//--------------- Internal Work Space
-	DMatrixRMaj K = new DMatrixRMaj(3,3);
+	DMatrixRMaj K = new DMatrixRMaj(3, 3);
 	DogArray<AssociatedPair> pairs = new DogArray<>(AssociatedPair::new);
-	DMatrixRMaj F21 = new DMatrixRMaj(3,3);
+	DMatrixRMaj F21 = new DMatrixRMaj(3, 3);
 
-	public ProjectiveToMetricCameraEssentialGuessAndCheck(SelfCalibrationEssentialGuessAndCheck selfCalib) {
+	public ProjectiveToMetricCameraEssentialGuessAndCheck( SelfCalibrationEssentialGuessAndCheck selfCalib ) {
 		this.selfCalib = selfCalib;
 	}
 
 	@Override
-	public boolean process(List<ImageDimension> dimensions, List<DMatrixRMaj> views,
-						   List<AssociatedTuple> observations, MetricCameras metricViews)
-	{
-		BoofMiscOps.checkTrue(views.size()+1==dimensions.size());
+	public boolean process( List<ImageDimension> dimensions, List<DMatrixRMaj> views,
+							List<AssociatedTuple> observations, MetricCameras metricViews ) {
+		BoofMiscOps.checkTrue(views.size() + 1 == dimensions.size());
 		metricViews.reset();
 
 		// initialize
@@ -62,30 +61,30 @@ public class ProjectiveToMetricCameraEssentialGuessAndCheck implements Projectiv
 
 		// Convert the projective cameras into a fundamental matrix
 		DMatrixRMaj P2 = views.get(0);
-		MultiViewOps.projectiveToFundamental(P2,F21);
+		MultiViewOps.projectiveToFundamental(P2, F21);
 
 		// Convert observations into AssociatedPairs
-		MultiViewOps.convertTu(observations,0,1,pairs);
+		MultiViewOps.convertTu(observations, 0, 1, pairs);
 
 		// Projective to Metric calibration
-		if( !selfCalib.process(F21,P2,pairs.toList()) )
+		if (!selfCalib.process(F21, P2, pairs.toList()))
 			return false;
-//		if( alg.isLimit )
+//		if (alg.isLimit)
 //			return false;
 		final DMatrixRMaj H = selfCalib.rectifyingHomography;
 
 		// solved for the focal lengths in the first two views
-		metricViews.intrinsics.grow().fsetK(selfCalib.focalLengthA,selfCalib.focalLengthA,0,0,0,-1,-1);
-		metricViews.intrinsics.grow().fsetK(selfCalib.focalLengthB,selfCalib.focalLengthB,0,0,0,-1,-1);
+		metricViews.intrinsics.grow().fsetK(selfCalib.focalLengthA, selfCalib.focalLengthA, 0, 0, 0, -1, -1);
+		metricViews.intrinsics.grow().fsetK(selfCalib.focalLengthB, selfCalib.focalLengthB, 0, 0, 0, -1, -1);
 		// extract camera motion for view 2 using found
-		PerspectiveOps.pinholeToMatrix(metricViews.intrinsics.get(1),K);
-		if( !MultiViewOps.projectiveToMetricKnownK(P2,H,K,metricViews.motion_1_to_k.grow()) )
+		PerspectiveOps.pinholeToMatrix(metricViews.intrinsics.get(1), K);
+		if (!MultiViewOps.projectiveToMetricKnownK(P2, H, K, metricViews.motion_1_to_k.grow()))
 			return false;
 		// For the remaining views use H to find motion and intrinsics
 		for (int viewIdx = 1; viewIdx < views.size(); viewIdx++) {
-			if( !MultiViewOps.projectiveToMetric(views.get(viewIdx),H,metricViews.motion_1_to_k.grow(),K) )
+			if (!MultiViewOps.projectiveToMetric(views.get(viewIdx), H, metricViews.motion_1_to_k.grow(), K))
 				return false;
-			PerspectiveOps.matrixToPinhole(K,-1,-1,metricViews.intrinsics.grow());
+			PerspectiveOps.matrixToPinhole(K, -1, -1, metricViews.intrinsics.grow());
 		}
 
 		return true;

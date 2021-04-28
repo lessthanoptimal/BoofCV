@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -42,43 +42,42 @@ public class ProjectiveToMetricCameraPracticalGuessAndCheck implements Projectiv
 	final @Getter SelfCalibrationPraticalGuessAndCheckFocus selfCalib;
 
 	// intrinsic calibration matrix
-	final DMatrixRMaj K = new DMatrixRMaj(3,3);
+	final DMatrixRMaj K = new DMatrixRMaj(3, 3);
 
 	final ResolveSignAmbiguityPositiveDepth resolveSign = new ResolveSignAmbiguityPositiveDepth();
 
-	public ProjectiveToMetricCameraPracticalGuessAndCheck(SelfCalibrationPraticalGuessAndCheckFocus selfCalib) {
+	public ProjectiveToMetricCameraPracticalGuessAndCheck( SelfCalibrationPraticalGuessAndCheckFocus selfCalib ) {
 		this.selfCalib = selfCalib;
 	}
 
 	@Override
-	public boolean process(List<ImageDimension> dimensions, List<DMatrixRMaj> views,
-						   List<AssociatedTuple> observations, MetricCameras metricViews)
-	{
-		BoofMiscOps.checkTrue(views.size()+1==dimensions.size());
+	public boolean process( List<ImageDimension> dimensions, List<DMatrixRMaj> views,
+							List<AssociatedTuple> observations, MetricCameras metricViews ) {
+		BoofMiscOps.checkTrue(views.size() + 1 == dimensions.size());
 		metricViews.reset();
 
 		// tell it the image size
 		ImageDimension dimension = dimensions.get(0);
-		selfCalib.setCamera(0.0,0.0,0.0,dimension.width, dimension.height);
+		selfCalib.setCamera(0.0, 0.0, 0.0, dimension.width, dimension.height);
 
 		// Perform self calibration
-		if( !selfCalib.process(views) )
+		if (!selfCalib.process(views))
 			return false;
 
 		DMatrixRMaj H = selfCalib.getRectifyingHomography();
 
 		// the top left 3x3 matrix is K in view 1
-		CommonOps_DDRM.extract(H,0,0,K);
-		PerspectiveOps.matrixToPinhole(K,-1,-1,metricViews.intrinsics.grow());
+		CommonOps_DDRM.extract(H, 0, 0, K);
+		PerspectiveOps.matrixToPinhole(K, -1, -1, metricViews.intrinsics.grow());
 
 		// Get the solution for the remaining cameras / views
 		double largestT = 0.0;
 		for (int viewIdx = 0; viewIdx < views.size(); viewIdx++) {
 			DMatrixRMaj P = views.get(viewIdx);
-			if( !MultiViewOps.projectiveToMetric(P,H,metricViews.motion_1_to_k.grow(),K) )
+			if (!MultiViewOps.projectiveToMetric(P, H, metricViews.motion_1_to_k.grow(), K))
 				return false;
-			PerspectiveOps.matrixToPinhole(K,-1,-1,metricViews.intrinsics.grow());
-			largestT = Math.max(largestT,metricViews.motion_1_to_k.getTail().T.norm());
+			PerspectiveOps.matrixToPinhole(K, -1, -1, metricViews.intrinsics.grow());
+			largestT = Math.max(largestT, metricViews.motion_1_to_k.getTail().T.norm());
 		}
 
 		// Ensure the found motion has a scale around 1.0

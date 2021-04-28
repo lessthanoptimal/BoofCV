@@ -23,6 +23,7 @@ import boofcv.alg.distort.brown.RemoveBrownPtoN_F64;
 import boofcv.factory.geo.FactoryMultiView;
 import boofcv.misc.BoofMiscOps;
 import boofcv.struct.image.ImageDimension;
+import georegression.geometry.ConvertRotation3D_F64;
 import georegression.struct.point.Point2D_F64;
 import georegression.struct.point.Point4D_F64;
 import georegression.struct.se.Se3_F64;
@@ -42,7 +43,7 @@ import java.util.Set;
  */
 public class MetricSanityChecks implements VerbosePrint {
 
-	PrintStream verbose;
+	@Nullable PrintStream verbose;
 
 	public TriangulateNViewsMetricH triangulator = FactoryMultiView.triangulateNViewMetricH(null);
 
@@ -114,10 +115,18 @@ public class MetricSanityChecks implements VerbosePrint {
 		}
 
 		if (verbose != null)
-			verbose.println("Depth Sanity: target='"+targetID+"', Depth: "+bad+"/"+numFeatures);
+			verbose.println("Depth Sanity: target='"+targetID+"', Bad Depth: "+bad+"/"+numFeatures);
 
-		if (bad > numFeatures*tolerance)
-			throw new RuntimeException("Failed positive depth. bad="+bad+"/"+numFeatures);
+		if (bad > numFeatures*tolerance) {
+			if (verbose != null) {
+				for (int i = 0; i < listMotion.size(); i++) {
+					Se3_F64 m = listMotion.get(i);
+					double theta = ConvertRotation3D_F64.matrixToRodrigues(m.R,null).theta;
+					verbose.printf("Sanity T=(%.2f %.2f %.2f) R=%.4f\n", m.T.x, m.T.y, m.T.z,theta);
+				}
+			}
+			throw new RuntimeException("Failed positive depth. bad=" + bad + "/" + numFeatures);
+		}
 	}
 
 	@Override public void setVerbose( @Nullable PrintStream out, @Nullable Set<String> configuration ) {

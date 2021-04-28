@@ -38,10 +38,13 @@ public class ConfigSelfCalibDualQuadratic implements Configuration {
 	public boolean knownAspectRatio = true;
 	/** The assumed aspect ratio. Only used if {@link #knownAspectRatio} is true */
 	public double aspectRatio = 1.0;
+	/** Maximum fraction of invalid observations it will accept before failing */
+	public double invalidFractionAccept = 0.15;
 
 	@Override
 	public void checkValidity() {
 		BoofMiscOps.checkTrue(aspectRatio > 0);
+		BoofMiscOps.checkTrue(invalidFractionAccept >= 0 && invalidFractionAccept <= 1.0);
 		checkTrue(knownAspectRatio && zeroSkew, "If aspect ratio is known then zero skew must be assumed");
 	}
 
@@ -49,5 +52,6 @@ public class ConfigSelfCalibDualQuadratic implements Configuration {
 		this.zeroSkew = src.zeroSkew;
 		this.knownAspectRatio = src.knownAspectRatio;
 		this.aspectRatio = src.aspectRatio;
+		this.invalidFractionAccept = src.invalidFractionAccept;
 	}
 }
