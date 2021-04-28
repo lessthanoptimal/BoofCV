@@ -66,6 +66,9 @@ public class SceneMergingOperations implements VerbosePrint {
 	/** Estimates the scale and SE3 transform from one scene to another */
 	@Getter ResolveSceneScaleAmbiguity resolveScale = new ResolveSceneScaleAmbiguity();
 
+	/** List of views that were modified by the merge operation */
+	public final List<SceneWorkingGraph.View> modifiedViews = new ArrayList<>();
+
 	//----------------------------------------
 	// Workspace for resolving the scale ambiguity between the two scenes
 	List<Se3_F64> listWorldToViewSrc = new ArrayList<>();
@@ -162,6 +165,7 @@ public class SceneMergingOperations implements VerbosePrint {
 	 * @param src_to_dst Known transform from the coordinate system of src to dst.
 	 */
 	public void mergeViews( SceneWorkingGraph src, SceneWorkingGraph dst, ScaleSe3_F64 src_to_dst ) {
+		modifiedViews.clear();
 		Se3_F64 src_to_view = new Se3_F64();
 
 		// src_to_dst is between the world coordinate systems. We need dst_to_src * src_to_view
@@ -199,6 +203,10 @@ public class SceneMergingOperations implements VerbosePrint {
 				dstView = dst.addView(srcView.pview);
 			}
 
+			// Create a list of views that were modified so we can sanity check them later on
+			modifiedViews.add(dstView);
+
+			// Update/Create the view in the dst scene
 			dstView.imageDimension.setTo(srcView.imageDimension);
 			dstView.intrinsic.setTo(srcView.intrinsic);
 			dstView.inliers.setTo(srcView.inliers);

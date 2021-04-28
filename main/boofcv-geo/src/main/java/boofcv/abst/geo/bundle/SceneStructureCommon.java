@@ -212,7 +212,6 @@ public abstract class SceneStructureCommon implements SceneStructure {
 		public void reset() {
 			views.reset();
 			coordinate[0] = Double.NaN;
-			coordinate[1] = 1.0; // default to one so that if you read a 3D point as homogenous it works
 		}
 
 		/**
