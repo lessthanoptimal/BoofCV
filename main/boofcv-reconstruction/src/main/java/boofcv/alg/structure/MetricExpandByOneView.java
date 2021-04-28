@@ -21,6 +21,7 @@ package boofcv.alg.structure;
 import boofcv.abst.geo.TriangulateNViewsMetricH;
 import boofcv.abst.geo.bundle.MetricBundleAdjustmentUtils;
 import boofcv.abst.geo.bundle.SceneObservations;
+import boofcv.abst.geo.bundle.SceneStructureCommon;
 import boofcv.abst.geo.bundle.SceneStructureMetric;
 import boofcv.alg.distort.brown.RemoveBrownPtoN_F64;
 import boofcv.alg.geo.MultiViewOps;
@@ -33,7 +34,9 @@ import boofcv.struct.geo.AssociatedTriple;
 import georegression.struct.point.Point2D_F64;
 import georegression.struct.point.Point4D_F64;
 import georegression.struct.se.Se3_F64;
+import georegression.transform.se.SePointOps_F64;
 import org.ddogleg.struct.DogArray;
+import org.ejml.UtilEjml;
 import org.ejml.data.DMatrixRMaj;
 
 import java.util.ArrayList;
@@ -65,12 +68,14 @@ import static boofcv.misc.BoofMiscOps.checkTrue;
  * @author Peter Abeles
  */
 public class MetricExpandByOneView extends ExpandByOneView {
-
 	// Finds the calibrating homography when metric parameters are known for two views
 	protected TwoViewToCalibratingHomography projectiveHomography = new TwoViewToCalibratingHomography();
 
 	/** Bundle Adjustment functions and configurations */
 	public final MetricBundleAdjustmentUtils bundleAdjustment = new MetricBundleAdjustmentUtils();
+
+	/** Maximum number of features which can be behind one of the cameras for this to be accepted */
+	public double maxFractionBehind = 0.15;
 
 	// Used for triangulation
 	protected final List<Point2D_F64> pixelNorms = BoofMiscOps.createListFilled(3, Point2D_F64::new);
@@ -98,6 +103,12 @@ public class MetricExpandByOneView extends ExpandByOneView {
 	Se3_F64 view1_to_view2H = new Se3_F64(); // found with calibrating homography
 	// K calibration matrix for target view
 	DMatrixRMaj K_target = new DMatrixRMaj(3, 3);
+
+	// Conversion from the local to global scale factor
+	double scaleLocalToGlobal;
+
+	// Storage for target view parameters
+	final BundlePinholeSimplified targetIntrinsic = new BundlePinholeSimplified();
 
 	public MetricExpandByOneView() {
 		listMotion.add(view1_to_view1);
@@ -157,33 +168,37 @@ public class MetricExpandByOneView extends ExpandByOneView {
 		if (!computeCalibratingHomography())
 			return false;
 
-		// Now that the metric upgrade is known add it to work graph
-		SceneWorkingGraph.View wtarget = workGraph.addView(utils.viewC);
-		db.lookupShape(wtarget.pview.id, wtarget.imageDimension);
-
 		// Find the metric upgrade of the target
-		upgradeToMetric(wtarget, projectiveHomography.getCalibrationHomography());
+		if (!upgradeToMetric(targetIntrinsic, projectiveHomography.getCalibrationHomography())) {
+			return false;
+		}
 
 		// Refine using bundle adjustment, if configured to do so
 		if (utils.configConvergeSBA.maxIterations > 0) {
 			refineWithBundleAdjustment(workGraph);
+			// Sanity check geometry for a bad solution
+			if (!checkBehind()) {
+				if (verbose != null) verbose.println("FAILED behind view check");
+				return false;
+			}
 		}
 
+		// Now that the metric upgrade is known add it to work graph
+		SceneWorkingGraph.View wtarget = workGraph.addView(target);
+		wtarget.intrinsic.setTo(targetIntrinsic);
+		db.lookupShape(target.id, wtarget.imageDimension);
+
 		// Match the local coordinate system's scale to the global coordinate system's scale
-		double scaleGlobalToLocal = MultiViewOps.findScale(view1_to_view2H.T, view1_to_view2.T);
-		// If the original scale was negative you just want to change the magnitude now otherwise you will change
-		// the direction if you apply the negative sign again!
-		scaleGlobalToLocal = Math.abs(scaleGlobalToLocal);
-		view1_to_target.T.scale(scaleGlobalToLocal);
+		view1_to_target.T.divide(scaleLocalToGlobal);
 
 		// Convert local coordinate into world coordinates for the view's pose
 		Se3_F64 world_to_view1 = workGraph.views.get(utils.seed.id).world_to_view;
 		world_to_view1.concat(view1_to_target, wtarget.world_to_view);
 
 		if (verbose != null) {
-			verbose.printf("Rescaled Local T={%.2f %.2f %.2f) scale=%f\n",
-					view1_to_target.T.x, view1_to_target.T.y, view1_to_target.T.z, scaleGlobalToLocal);
-			verbose.printf("Final Global   T={%.2f %.2f %.2f)\n",
+			verbose.printf("Rescaled Local T=(%.2f %.2f %.2f) scale=%f\n",
+					view1_to_target.T.x, view1_to_target.T.y, view1_to_target.T.z, 1.0/scaleLocalToGlobal);
+			verbose.printf("Final Global   T=(%.2f %.2f %.2f)\n",
 					wtarget.world_to_view.T.x, wtarget.world_to_view.T.y, wtarget.world_to_view.T.z);
 		}
 
@@ -193,40 +208,51 @@ public class MetricExpandByOneView extends ExpandByOneView {
 	/**
 	 * Use previously computed calibration homography to upgrade projective scene to metric
 	 */
-	private void upgradeToMetric( SceneWorkingGraph.View wview, DMatrixRMaj H_cal ) {
+	private boolean upgradeToMetric( BundlePinholeSimplified intrinsic, DMatrixRMaj H_cal ) {
 		// Compute metric upgrade from found projective camera matrices
-		MultiViewOps.projectiveToMetric(utils.P2, H_cal, view1_to_view2H, K_target); // discard K_target
-		MultiViewOps.projectiveToMetric(utils.P3, H_cal, view1_to_target, K_target);
-		BundleAdjustmentOps.convert(K_target, wview.intrinsic);
+		if (!MultiViewOps.projectiveToMetric(utils.P2, H_cal, view1_to_view2H, K_target)) {
+			if (verbose != null) verbose.println("FAILED projectiveToMetric P2");
+			return false;
+		}
+		if (!MultiViewOps.projectiveToMetric(utils.P3, H_cal, view1_to_target, K_target)) {
+			if (verbose != null) verbose.println("FAILED projectiveToMetric P3");
+			return false;
+		}
+		BundleAdjustmentOps.convert(K_target, intrinsic);
 
 		// Normalize the scale so that it's close to 1.0
 		double normTarget = view1_to_target.T.norm();
 		view1_to_target.T.divide(normTarget);
 		view1_to_view2H.T.divide(normTarget);
 
+		if (verbose != null) {
+			// print the found view 1 to view 2 using local information only
+			verbose.printf("L View 1 to 2     T=(%.1f %.1f %.1f)\n",
+					view1_to_view2H.T.x, view1_to_view2H.T.y, view1_to_view2H.T.z);
+		}
+
 		// Let's use the "known" view1_to_view2, but to do that we will need to resolve the scale ambiguity
 		SceneWorkingGraph.View wview1 = workGraph.lookupView(utils.seed.id);
 		SceneWorkingGraph.View wview2 = workGraph.lookupView(utils.viewB.id);
 		wview1.world_to_view.invert(null).concat(wview2.world_to_view, view1_to_view2);
 
-		if (verbose != null) {
-			// print the found view 1 to view 2 using local information only
-			verbose.printf("L View 1 to 2     T={%.1f %.1f %.1f)\n",
-					view1_to_view2H.T.x, view1_to_view2H.T.y, view1_to_view2H.T.z);
-		}
-
-		// Now set the global view-1 to view-2 at the local scale
-		double scaleLocalToGlobal = MultiViewOps.findScale(view1_to_view2.T, view1_to_view2H.T);
+		// This assumes the vectors are only significantly different in magnitude. In practice their
+		// direction can be drastically different. We will ignore that and hope for the best..
+		scaleLocalToGlobal = view1_to_view2H.T.norm()/view1_to_view2.T.norm();
+		// Sanity check. If this fails then something wrong wrong much earlier
+		BoofMiscOps.checkTrue(scaleLocalToGlobal != 0.0 && !UtilEjml.isUncountable(scaleLocalToGlobal));
 		view1_to_view2H.setTo(view1_to_view2);
 		view1_to_view2H.T.scale(scaleLocalToGlobal);
 
 		if (verbose != null) {
-			verbose.printf("G View 1 to 2     T={%.1f %.1f %.1f) scale=%g\n",
+			verbose.printf("G View 1 to 2     T=(%.1f %.1f %.1f) scale=%g\n",
 					view1_to_view2H.T.x, view1_to_view2H.T.y, view1_to_view2H.T.z, scaleLocalToGlobal);
-			verbose.printf("Initial fx=%6.1f k1=%6.3f k2=%6.3f T={%.1f %.1f %.1f)\n",
-					wview.intrinsic.f, wview.intrinsic.k1, wview.intrinsic.k2,
+			verbose.printf("Initial fx=%6.1f k1=%6.3f k2=%6.3f T=(%.1f %.1f %.1f)\n",
+					intrinsic.f, intrinsic.k1, intrinsic.k2,
 					view1_to_target.T.x, view1_to_target.T.y, view1_to_target.T.z);
 		}
+
+		return true;
 	}
 
 	/**
@@ -239,7 +265,6 @@ public class MetricExpandByOneView extends ExpandByOneView {
 		// Look up known information
 		SceneWorkingGraph.View wview1 = workGraph.lookupView(utils.seed.id);
 		SceneWorkingGraph.View wview2 = workGraph.lookupView(utils.viewB.id);
-		SceneWorkingGraph.View wview3 = workGraph.lookupView(utils.viewC.id);
 
 		// configure camera pose and intrinsics
 		List<AssociatedTriple> triples = utils.inliersThreeView;
@@ -257,15 +282,19 @@ public class MetricExpandByOneView extends ExpandByOneView {
 		// Argument against: Past mistakes are propagated and go from bad to total failure
 		structure.setCamera(0, true, wview1.intrinsic);
 		structure.setCamera(1, true, wview2.intrinsic);
-		structure.setCamera(2, false, wview3.intrinsic);
+		structure.setCamera(2, false, targetIntrinsic);
+		// view1 has to be fixed since it's the original
+		// view2 could be optimized too to reduce influence of past mistakes, but the problem is that when SBA is run
+		// on everything if the target view is inconsistent with 1 and 2 then it will introduce a large error
+		// we want to catch those errors now.
 		structure.setView(0, 0, true, view1_to_view1);
-		structure.setView(1, 1, false, view1_to_view2H);
+		structure.setView(1, 1, true, view1_to_view2H);
 		structure.setView(2, 2, false, view1_to_target);
 
 		// Add observations and 3D feature locations
 		normalize1.setK(wview1.intrinsic.f, wview1.intrinsic.f, 0, 0, 0).setDistortion(wview1.intrinsic.k1, wview1.intrinsic.k2);
 		normalize2.setK(wview2.intrinsic.f, wview2.intrinsic.f, 0, 0, 0).setDistortion(wview2.intrinsic.k1, wview2.intrinsic.k2);
-		normalize3.setK(wview3.intrinsic.f, wview3.intrinsic.f, 0, 0, 0).setDistortion(wview3.intrinsic.k1, wview3.intrinsic.k2);
+		normalize3.setK(targetIntrinsic.f, targetIntrinsic.f, 0, 0, 0).setDistortion(targetIntrinsic.k1, targetIntrinsic.k2);
 
 		SceneObservations.View viewObs1 = observations.getView(0);
 		SceneObservations.View viewObs2 = observations.getView(1);
@@ -302,15 +331,12 @@ public class MetricExpandByOneView extends ExpandByOneView {
 			throw new RuntimeException("Bundle adjustment failed. Handle this");
 
 		// copy results for output
-		wview3.intrinsic.setTo((BundlePinholeSimplified)structure.cameras.get(2).model);
-		view1_to_view2H.setTo(structure.getParentToView(1));
+		targetIntrinsic.setTo((BundlePinholeSimplified)structure.cameras.get(2).model);
 		view1_to_target.setTo(structure.getParentToView(2));
 
 		if (verbose != null) {
-			verbose.printf("G View 1 to 2     T={%.1f %.1f %.1f)\n",
-					view1_to_view2H.T.x, view1_to_view2H.T.y, view1_to_view2H.T.z);
-			verbose.printf("Refined fx=%6.1f k1=%6.3f k2=%6.3f T={%.1f %.1f %.1f)\n",
-					wview3.intrinsic.f, wview3.intrinsic.k1, wview3.intrinsic.k2,
+			verbose.printf("Refined fx=%6.1f k1=%6.3f k2=%6.3f T=(%.1f %.1f %.1f)\n",
+					targetIntrinsic.f, targetIntrinsic.k1, targetIntrinsic.k2,
 					view1_to_target.T.x, view1_to_target.T.y, view1_to_target.T.z);
 		}
 	}
@@ -319,7 +345,6 @@ public class MetricExpandByOneView extends ExpandByOneView {
 	 * Computes the transform needed to go from one projective space into another
 	 */
 	boolean computeCalibratingHomography() {
-
 		// convert everything in to the correct data format
 		MultiViewOps.projectiveToFundamental(utils.P2, F21);
 		projectiveHomography.initialize(F21, utils.P2);
@@ -335,5 +360,52 @@ public class MetricExpandByOneView extends ExpandByOneView {
 		}
 
 		return projectiveHomography.process(K1, K2, pairs.toList());
+	}
+
+	/**
+	 * Validates the results by seeing if they are behind the camera
+	 */
+	boolean checkBehind() {
+		final SceneStructureMetric structure = bundleAdjustment.structure;
+		final int numPoints = structure.points.size;
+
+		// storage for number of features behind the views
+		int behind1 = 0;
+		int behind2 = 0;
+		int behind3 = 0;
+
+		var worldP = new Point4D_F64(0, 0, 0, 1);
+		var viewP = new Point4D_F64();
+
+		for (int featIdx = 0; featIdx < numPoints; featIdx++) {
+			// extract the coordinate from SBA results
+			SceneStructureCommon.Point p = structure.points.get(featIdx);
+			worldP.x = p.getX();
+			worldP.y = p.getY();
+			worldP.z = p.getZ();
+			if (structure.isHomogenous()) {
+				worldP.w = p.getW();
+				// ignore points at infinity
+				if (worldP.w == 0.0)
+					continue;
+			}
+
+			// Check to see if it appears behind any of the three views
+			if (worldP.z/worldP.w < 0.0)
+				behind1++;
+
+			SePointOps_F64.transform(view1_to_view2H, worldP, viewP);
+			if (viewP.z/viewP.w < 0.0)
+				behind2++;
+
+			SePointOps_F64.transform(view1_to_target, worldP, viewP);
+			if (viewP.z/viewP.w < 0.0)
+				behind3++;
+		}
+
+		if (verbose != null) verbose.printf("Behind: %3d %3d %3d out of %d\n", behind1, behind2, behind3, numPoints);
+
+		int threshold = (int)(numPoints*maxFractionBehind);
+		return behind1 < threshold && behind2 < threshold && behind3 < threshold;
 	}
 }

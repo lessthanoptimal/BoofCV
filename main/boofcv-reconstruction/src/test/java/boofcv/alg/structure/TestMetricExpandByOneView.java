@@ -39,8 +39,7 @@ class TestMetricExpandByOneView extends BoofStandardJUnit {
 	/**
 	 * Perfect inputs that should yield perfect results.
 	 */
-	@Test
-	void perfect() {
+	@Test void perfect() {
 		// make sure (cx,cy) = (width/2, height/2) or else unit test will fail because it doesn't perfectly
 		// match the model
 		var db = new MockLookupSimilarImagesRealistic().
@@ -89,8 +88,7 @@ class TestMetricExpandByOneView extends BoofStandardJUnit {
 	/**
 	 * When it fails to find the metric upgrade make sure it doesn't add it to th work graph
 	 */
-	@Test
-	void fail_and_doNotAdd() {
+	@Test void fail_and_doNotAdd() {
 		var db = new MockLookupSimilarImagesRealistic().
 				setIntrinsic(new CameraPinhole(400, 420, 0, 400, 400, 800, 800)).
 				pathLine(5, 0.3, 1.5, 2);
@@ -133,8 +131,7 @@ class TestMetricExpandByOneView extends BoofStandardJUnit {
 	/**
 	 * Check the calibrating homography computation by feeding it noise three data from 3 views
 	 */
-	@Test
-	void computeCalibratingHomography() {
+	@Test void computeCalibratingHomography() {
 		var db = new MockLookupSimilarImagesRealistic().
 				setIntrinsic(new CameraPinhole(400, 400, 0, 0, 0, 800, 800)).
 				pathLine(5, 0.3, 1.5, 2);
@@ -174,5 +171,9 @@ class TestMetricExpandByOneView extends BoofStandardJUnit {
 		assertEquals(db.intrinsic.cx, foundK.get(0, 2), 1e-7);
 		assertEquals(db.intrinsic.cy, foundK.get(1, 2), 1e-7);
 		assertEquals(db.intrinsic.skew, foundK.get(0, 1), 1e-7);
+	}
+
+	@Test void checkBehind() {
+		fail("Implement");
 	}
 }

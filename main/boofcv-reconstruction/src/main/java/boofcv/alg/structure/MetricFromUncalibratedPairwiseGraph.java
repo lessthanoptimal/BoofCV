@@ -81,6 +81,9 @@ public class MetricFromUncalibratedPairwiseGraph extends ReconstructionFromPairw
 
 	private final @Getter RefineMetricWorkingGraph refineWorking = new RefineMetricWorkingGraph();
 
+	/** If true it will apply sanity checks on results for debugging. This could be expensive */
+	public boolean sanityChecks = false;
+
 	/** List of all the scenes. There can be multiple at the end if not everything is connected */
 	final @Getter DogArray<SceneWorkingGraph> scenes =
 			new DogArray<>(SceneWorkingGraph::new, SceneWorkingGraph::reset);
@@ -89,6 +92,8 @@ public class MetricFromUncalibratedPairwiseGraph extends ReconstructionFromPairw
 
 	/** Which scenes are include which views */
 	PairwiseViewScenes nodeViews = new PairwiseViewScenes();
+
+	MetricSanityChecks metricChecks = new MetricSanityChecks();
 
 	public MetricFromUncalibratedPairwiseGraph( PairwiseGraphUtils utils ) {
 		super(utils);
@@ -124,6 +129,9 @@ public class MetricFromUncalibratedPairwiseGraph extends ReconstructionFromPairw
 		Map<String, SeedInfo> mapScores = scoreNodesAsSeeds(pairwise);
 		List<SeedInfo> seeds = selectSeeds(seedScores, mapScores);
 		// TODO also take in account distance from other seeds when selecting
+
+//		while (seeds.size() > 1)
+//			seeds.remove(0);
 
 		if (seeds.isEmpty()) {
 			if (verbose != null) verbose.println("No valid seeds found.");
@@ -302,7 +310,7 @@ public class MetricFromUncalibratedPairwiseGraph extends ReconstructionFromPairw
 			BoofMiscOps.checkTrue(viewsByScene != scene, "Scene should not already have this view");
 
 			// If it has an inlier set it was spawned outside of the seed set (except for the seed view)
-			// and we should not
+			// and we should not expand in to it
 			if (!viewsByScene.views.get(pview.id).inliers.isEmpty()) {
 				usable = false;
 				break;
@@ -335,6 +343,26 @@ public class MetricFromUncalibratedPairwiseGraph extends ReconstructionFromPairw
 				src = tmp;
 			}
 
+			// TODO break this up into multiple functions
+			// See if the src id contained entirely in the dst
+			boolean subset = true;
+			for (int i = 0; i < src.listViews.size(); i++) {
+				if (!dst.views.containsKey(src.listViews.get(i).pview.id)) {
+					subset = false;
+					break;
+				}
+			}
+
+			// Don't merge in this situation
+			if (subset) {
+				if (verbose != null) verbose.println("src is a subset of dst. Removing");
+				mergeOps.adjustSceneCounts(src, nodeViews, false);
+				mergeOps.adjustSceneCounts(dst, nodeViews, false);
+				SceneMergingOperations.removeScene(src, nodeViews);
+				mergeOps.adjustSceneCounts(dst, nodeViews, true);
+				continue;
+			}
+
 			// Remove both views from the counts for now
 			mergeOps.adjustSceneCounts(src, nodeViews, false);
 			mergeOps.adjustSceneCounts(dst, nodeViews, false);
@@ -348,6 +376,14 @@ public class MetricFromUncalibratedPairwiseGraph extends ReconstructionFromPairw
 			// Merge the views
 			mergeOps.mergeViews(src, dst, src_to_dst);
 
+			// Check the views which were modified for geometric consistency to catch bugs in the code
+			if (sanityChecks) {
+				for (int i = 0; i < mergeOps.modifiedViews.size(); i++) {
+					SceneWorkingGraph.View wview = mergeOps.modifiedViews.get(i);
+					metricChecks.inlierTriangulatePositiveDepth(0.1, db, dst, wview.pview.id);
+				}
+			}
+
 			if (verbose != null) verbose.println("scenes: src=" + src.index + " dst=" + dst.index +
 					" views: (" + src.listViews.size() + " , " + dstViewCountBefore +
 					") -> "+dst.listViews.size()+", scale=" + src_to_dst.scale);
@@ -359,7 +395,7 @@ public class MetricFromUncalibratedPairwiseGraph extends ReconstructionFromPairw
 			mergeOps.adjustSceneCounts(dst, nodeViews, true);
 		}
 
-		// remove scenes that got merged into others
+		// remove scenes that got merged into others. This is output to the user
 		for (int i = scenes.size - 1; i >= 0; i--) {
 			if (!scenes.get(i).listViews.isEmpty())
 				continue;
@@ -373,12 +409,16 @@ public class MetricFromUncalibratedPairwiseGraph extends ReconstructionFromPairw
 	void expandIntoView( LookUpSimilarImages db, SceneWorkingGraph scene, PairwiseImageGraph.View selected ) {
 		if (!expandMetric.process(db, scene, selected)) {
 			if (verbose != null) verbose.println("Failed to expand/add view='" + selected.id + "'. Discarding.");
-			return; // TODO handle this failure somehow. mark the scene as dead?
+			return; // TODO handle this failure somehow. mark the scene as dead? Revisit it later on?
 		}
 
 		// Saves the set of inliers used to estimate this views metric view for later use
 		SceneWorkingGraph.View wview = scene.lookupView(selected.id);
 		utils.saveRansacInliers(wview);
+
+		// Check results for geometric consistency
+		if (sanityChecks)
+			metricChecks.inlierTriangulatePositiveDepth(0.1, db, scene, selected.id);
 
 		// TODO Refining at this point is essential for long term stability but optimizing everything is not scalable
 		// maybe identify views with large residuals and optimizing up to N views surrounding them to fix the issue?
@@ -537,6 +577,7 @@ public class MetricFromUncalibratedPairwiseGraph extends ReconstructionFromPairw
 	@Override
 	public void setVerbose( @Nullable PrintStream out, @Nullable Set<String> configuration ) {
 		this.verbose = BoofMiscOps.addPrefix(this, out);
-		BoofMiscOps.verboseChildren(verbose, configuration, initProjective, expandMetric, refineWorking, mergeOps);
+		BoofMiscOps.verboseChildren(verbose, configuration,
+				initProjective, expandMetric, refineWorking, mergeOps, metricChecks);
 	}
 }
