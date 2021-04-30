@@ -37,6 +37,7 @@ import org.jetbrains.annotations.Nullable;
 import java.io.PrintStream;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.Set;
 
 /**
@@ -132,6 +133,8 @@ public class SceneMergingOperations implements VerbosePrint {
 	public boolean selectViewsToMerge( SelectedScenes selected ) {
 		int bestCommon = 0;
 
+		// TODO this isn't correctly implemented. Add unit tests.
+		//      I'm also seeing negative counts in some cases. fix that
 		for (int sceneIndexA = 0; sceneIndexA < commonViewCounts.size; sceneIndexA++) {
 			DogArray<SceneCommonCounts> list = commonViewCounts.get(sceneIndexA);
 			for (int j = 0; j < list.size; j++) {
@@ -184,21 +187,15 @@ public class SceneMergingOperations implements VerbosePrint {
 				if (srcView.inliers.isEmpty() || dstView.inliers.isEmpty())
 					continue;
 
-				// For now we will go with the number of inliers as a test of quality
-				boolean replace = srcView.inliers.getInlierCount() > dstView.inliers.getInlierCount();
-
 				if (verbose != null) {
-					verbose.printf("%-7s view='%s' inliers: %d vs %d src.f=%.1f dst.f=%.1f\n", replace ? "REPLACE" : "SKIP",
-							srcView.pview.id, srcView.inliers.getInlierCount(), dstView.inliers.getInlierCount(),
+					verbose.printf("%-7s view='%s', sets={%d %d}, inliers: %d vs %d, src.f=%.1f dst.f=%.1f\n",
+							"MERGE", srcView.pview.id, srcView.inliers.size, dstView.inliers.size,
+							srcView.countLargestInlierSet(), dstView.countLargestInlierSet(),
 							srcView.intrinsic.f, dstView.intrinsic.f);
 				}
-
-				// Do nothing if we are not replacing values in the dst view
-				if (!replace)
-					continue;
 			} else {
 				if (verbose != null)
-					verbose.printf("%-7s view='%s' f=%.1f\n", "NEW", srcView.pview.id, srcView.intrinsic.f);
+					verbose.printf("%-7s view='%s', f=%.1f\n", "NEW", srcView.pview.id, srcView.intrinsic.f);
 				// Create a new view in the dst scene
 				dstView = dst.addView(srcView.pview);
 			}
@@ -209,7 +206,11 @@ public class SceneMergingOperations implements VerbosePrint {
 			// Update/Create the view in the dst scene
 			dstView.imageDimension.setTo(srcView.imageDimension);
 			dstView.intrinsic.setTo(srcView.intrinsic);
-			dstView.inliers.setTo(srcView.inliers);
+			for (int infoIdx = 0; infoIdx < srcView.inliers.size; infoIdx++) {
+				// It's not uncommon to have the same views in both inlier sets. For now will not optimize this part
+				// of the code since there being some redundancy here isn't likely to cause any harm
+				dstView.inliers.grow().setTo(srcView.inliers.get(infoIdx));
+			}
 
 			// Copy the src transform since we need to modify it
 			src_to_view.setTo(srcView.world_to_view);
@@ -245,7 +246,7 @@ public class SceneMergingOperations implements VerbosePrint {
 			totalCommon++;
 
 			// Evaluate the quality of 3D information
-			double score = Math.min(srcView.inliers.getInlierCount(), dstView.inliers.getInlierCount());
+			double score = Math.min(srcView.countLargestInlierSet(), dstView.countLargestInlierSet());
 			if (score <= bestScore)
 				continue;
 
@@ -277,8 +278,11 @@ public class SceneMergingOperations implements VerbosePrint {
 		if (verbose != null) printInlierViews(selectedSrc, selectedDst);
 
 		// Get the set feature indexes for the selected view that were inliers in each scene
-		DogArray_I32 zeroSrcIdx = selectedSrc.inliers.observations.get(0);
-		DogArray_I32 zeroDstIdx = selectedDst.inliers.observations.get(0);
+		SceneWorkingGraph.InlierInfo inliersSrc = Objects.requireNonNull(selectedSrc.getBestInliers());
+		SceneWorkingGraph.InlierInfo inliersDst = Objects.requireNonNull(selectedDst.getBestInliers());
+
+		DogArray_I32 zeroSrcIdx = inliersSrc.observations.get(0);
+		DogArray_I32 zeroDstIdx = inliersDst.observations.get(0);
 
 		// Find features in the target view that are common between the two scenes inlier feature sets
 		int numCommon = findCommonInliers(zeroSrcIdx, zeroDstIdx, zeroFeatureToCommonIndex);
@@ -286,12 +290,12 @@ public class SceneMergingOperations implements VerbosePrint {
 		// Load observation of common features in view[0]
 		loadViewZeroCommonObservations(db, selectedSrc.imageDimension, numCommon, selectedSrc.pview.id);
 
-		List<DogArray<Point2D_F64>> listViewPixelsSrc = getCommonFeaturePixelsViews(db, src, selectedSrc.inliers);
-		List<DogArray<Point2D_F64>> listViewPixelsDst = getCommonFeaturePixelsViews(db, dst, selectedDst.inliers);
+		List<DogArray<Point2D_F64>> listViewPixelsSrc = getCommonFeaturePixelsViews(db, src, inliersSrc);
+		List<DogArray<Point2D_F64>> listViewPixelsDst = getCommonFeaturePixelsViews(db, dst, inliersDst);
 
 		// Load the extrinsics and convert the intrinsics into a usable format
-		loadExtrinsicsIntrinsics(src, selectedSrc.inliers, listWorldToViewSrc, listIntrinsicsSrc);
-		loadExtrinsicsIntrinsics(dst, selectedDst.inliers, listWorldToViewDst, listIntrinsicsDst);
+		loadExtrinsicsIntrinsics(src, inliersSrc, listWorldToViewSrc, listIntrinsicsSrc);
+		loadExtrinsicsIntrinsics(dst, inliersDst, listWorldToViewDst, listIntrinsicsDst);
 
 		if (verbose != null) verbose.println("commonInliers.size=" + numCommon + " src.size=" + zeroSrcIdx.size +
 				" dst.size=" + zeroDstIdx.size);
@@ -322,16 +326,23 @@ public class SceneMergingOperations implements VerbosePrint {
 	 * Prints debugging information about which views are in the inlier sets
 	 */
 	private void printInlierViews( SceneWorkingGraph.View selectedSrc, SceneWorkingGraph.View selectedDst ) {
-		verbose.print("src.inliers.views = { ");
-		for (int i = 0; i < selectedSrc.inliers.views.size; i++) {
-			verbose.print("'" + selectedSrc.inliers.views.get(i).id + "' ");
+		for (int infoIdx = 0; infoIdx < selectedSrc.inliers.size; infoIdx++) {
+			verbose.print("src.inliers["+infoIdx+"].views = { ");
+			SceneWorkingGraph.InlierInfo inliers = selectedSrc.inliers.get(infoIdx);
+			for (int i = 0; i < inliers.views.size; i++) {
+				verbose.print("'" + inliers.views.get(i).id + "' ");
+			}
+			verbose.println("}");
 		}
-		verbose.println("}");
-		verbose.print("dst.inliers.views = { ");
-		for (int i = 0; i < selectedDst.inliers.views.size; i++) {
-			verbose.print("'" + selectedDst.inliers.views.get(i).id + "' ");
+
+		for (int infoIdx = 0; infoIdx < selectedDst.inliers.size; infoIdx++) {
+			verbose.print("dst.inliers["+infoIdx+"].views = { ");
+			SceneWorkingGraph.InlierInfo inliers = selectedDst.inliers.get(infoIdx);
+			for (int i = 0; i < inliers.views.size; i++) {
+				verbose.print("'" + inliers.views.get(i).id + "' ");
+			}
+			verbose.println("}");
 		}
-		verbose.println("}");
 	}
 
 	/**

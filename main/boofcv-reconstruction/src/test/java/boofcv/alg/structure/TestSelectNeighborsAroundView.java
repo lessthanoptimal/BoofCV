@@ -147,7 +147,7 @@ public class TestSelectNeighborsAroundView extends BoofStandardJUnit {
 		SceneWorkingGraph working = db.createWorkingGraph(pairwise);
 
 		SceneWorkingGraph.View seed = working.listViews.get(4);
-		seed.pview.connections.forEach(m->m.score3D+=1000); // make it not want to select immediate neighbors
+		seed.pview.connections.forEach(m -> m.score3D += 1000); // make it not want to select immediate neighbors
 		var alg = new SelectNeighborsAroundView();
 
 		// for the first test we want to prune NOTHING
@@ -347,11 +347,11 @@ public class TestSelectNeighborsAroundView extends BoofStandardJUnit {
 			assertEquals(lv.imageDimension.width, v.imageDimension.width);
 
 			if (i == 6) {
-				assertEquals(8, lv.inliers.views.size);
+				assertEquals(8, lv.inliers.get(0).views.size);
 			} else if (i == 10) {
-				assertEquals(1, lv.inliers.views.size);
+				assertEquals(1, lv.inliers.get(0).views.size);
 			} else {
-				assertEquals(0, lv.inliers.views.size);
+				assertTrue(lv.inliers.isEmpty());
 			}
 		}
 	}
@@ -361,8 +361,9 @@ public class TestSelectNeighborsAroundView extends BoofStandardJUnit {
 		// put ever view into this inlier set, except for 10. For that it will need to go outside
 		for (int i = idx0; i <= idx1; i++) {
 			PairwiseImageGraph.View pv = working.listViews.get(i).pview;
-			v.inliers.views.add(pv);
-			DogArray_I32 obs = v.inliers.observations.grow();
+			SceneWorkingGraph.InlierInfo inlier = v.inliers.isEmpty() ? v.inliers.grow() : v.inliers.get(0);
+			inlier.views.add(pv);
+			DogArray_I32 obs = inlier.observations.grow();
 			for (int j = 0; j < 5 + i; j++) {
 				obs.add(j);
 			}

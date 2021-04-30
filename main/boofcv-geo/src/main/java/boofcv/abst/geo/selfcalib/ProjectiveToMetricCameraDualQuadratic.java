@@ -132,12 +132,14 @@ public class ProjectiveToMetricCameraDualQuadratic implements ProjectiveToMetric
 		resolveSign.process(observations, metricViews);
 
 		// bestInvalid is the sum across all views. Use the average fraction across all views as the test
-		double fractionInvalid = (resolveSign.bestInvalid / (double)views.size())/observations.size();
+		double fractionInvalid = (resolveSign.bestInvalid/(double)views.size())/observations.size();
 		if (fractionInvalid <= invalidFractionAccept) {
 			return true;
 		}
 
-		if (verbose != null) verbose.println("FAILED invalid="+fractionInvalid);
+		if (verbose != null)
+			verbose.printf("FAILED: Features behind camera. fraction=%.3f threshold=%.3f\n",
+					fractionInvalid, invalidFractionAccept);
 
 		return false;
 	}

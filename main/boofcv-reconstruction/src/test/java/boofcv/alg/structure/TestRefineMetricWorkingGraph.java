@@ -65,15 +65,17 @@ class TestRefineMetricWorkingGraph extends BoofStandardJUnit {
 		graph.listViews.forEach(v -> intrinsicZ.getDimension(v.imageDimension));
 
 		// Create two views with inliers
-		graph.listViews.get(0).inliers.views.add(pairwise.nodes.get(0));
-		graph.listViews.get(0).inliers.views.add(pairwise.nodes.get(1));
-		graph.listViews.get(0).inliers.views.add(pairwise.nodes.get(2));
-		graph.listViews.get(0).inliers.views.add(pairwise.nodes.get(3));
-		selectObservations(db, graph.listViews.get(0).inliers);
-		graph.listViews.get(3).inliers.views.add(pairwise.nodes.get(2));
-		graph.listViews.get(3).inliers.views.add(pairwise.nodes.get(3));
-		graph.listViews.get(3).inliers.views.add(pairwise.nodes.get(4));
-		selectObservations(db, graph.listViews.get(3).inliers);
+		SceneWorkingGraph.InlierInfo inlier0 = graph.listViews.get(0).inliers.grow();
+		inlier0.views.add(pairwise.nodes.get(0));
+		inlier0.views.add(pairwise.nodes.get(1));
+		inlier0.views.add(pairwise.nodes.get(2));
+		inlier0.views.add(pairwise.nodes.get(3));
+		selectObservations(db, inlier0);
+		SceneWorkingGraph.InlierInfo inlier3 = graph.listViews.get(3).inliers.grow();
+		inlier3.views.add(pairwise.nodes.get(2));
+		inlier3.views.add(pairwise.nodes.get(3));
+		inlier3.views.add(pairwise.nodes.get(4));
+		selectObservations(db, inlier3);
 
 		if (addNoise) {
 			// Make a few of the parameters in correct and see if it can recover from it. Observations are perfect
@@ -138,15 +140,17 @@ class TestRefineMetricWorkingGraph extends BoofStandardJUnit {
 		graph.listViews.forEach(v -> intrinsicZ.getDimension(v.imageDimension));
 
 		// Create two views with inliers
-		graph.listViews.get(0).inliers.views.add(pairwise.nodes.get(0));
-		graph.listViews.get(0).inliers.views.add(pairwise.nodes.get(1));
-		graph.listViews.get(0).inliers.views.add(pairwise.nodes.get(2));
-		graph.listViews.get(0).inliers.views.add(pairwise.nodes.get(3));
-		selectObservations(db, graph.listViews.get(0).inliers);
-		graph.listViews.get(3).inliers.views.add(pairwise.nodes.get(2));
-		graph.listViews.get(3).inliers.views.add(pairwise.nodes.get(3));
-		graph.listViews.get(3).inliers.views.add(pairwise.nodes.get(4));
-		selectObservations(db, graph.listViews.get(3).inliers);
+		SceneWorkingGraph.InlierInfo inlier0 = graph.listViews.get(0).inliers.grow();
+		inlier0.views.add(pairwise.nodes.get(0));
+		inlier0.views.add(pairwise.nodes.get(1));
+		inlier0.views.add(pairwise.nodes.get(2));
+		inlier0.views.add(pairwise.nodes.get(3));
+		selectObservations(db, inlier0);
+		SceneWorkingGraph.InlierInfo inlier3 = graph.listViews.get(3).inliers.grow();
+		inlier3.views.add(pairwise.nodes.get(2));
+		inlier3.views.add(pairwise.nodes.get(3));
+		inlier3.views.add(pairwise.nodes.get(4));
+		selectObservations(db, inlier3);
 
 		var alg = new RefineMetricWorkingGraph();
 		assertTrue(alg.process(db, graph));

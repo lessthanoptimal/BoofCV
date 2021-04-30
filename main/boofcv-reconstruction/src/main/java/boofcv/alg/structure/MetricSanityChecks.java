@@ -56,12 +56,17 @@ public class MetricSanityChecks implements VerbosePrint {
 												String targetID ) {
 
 		SceneWorkingGraph.View wview1 = workGraph.lookupView(targetID);
-		SceneWorkingGraph.InlierInfo inliers = wview1.inliers;
 
-		// see there are inleirs to sanity check
-		if (inliers.isEmpty())
-			return;
+		for (int infoIdx = 0; infoIdx < wview1.inliers.size; infoIdx++) {
+			SceneWorkingGraph.InlierInfo inliers = wview1.inliers.get(infoIdx);
+			checkInlierSet(tolerance, db, workGraph, targetID, wview1, inliers);
+		}
+	}
 
+	private void checkInlierSet( double tolerance, LookUpSimilarImages db,
+								 SceneWorkingGraph workGraph, String targetID,
+								 SceneWorkingGraph.View wview1,
+								 SceneWorkingGraph.InlierInfo inliers ) {
 		List<SceneWorkingGraph.View> listViews = new ArrayList<>();
 		List<RemoveBrownPtoN_F64> listNormalize = new ArrayList<>();
 		List<Se3_F64> listMotion = new ArrayList<>();
@@ -94,7 +99,7 @@ public class MetricSanityChecks implements VerbosePrint {
 
 		int bad = 0;
 
-		int numFeatures = wview1.inliers.getInlierCount();
+		int numFeatures = inliers.getInlierCount();
 		for (int inlierIdx = 0; inlierIdx < numFeatures; inlierIdx++) {
 			for (int viewIdx = 0; viewIdx < listViews.size(); viewIdx++) {
 				Point2D_F64 p = listFeatures.get(viewIdx).get(inliers.observations.get(viewIdx).get(inlierIdx));
@@ -115,7 +120,7 @@ public class MetricSanityChecks implements VerbosePrint {
 		}
 
 		if (verbose != null)
-			verbose.println("Depth Sanity: target='"+targetID+"', Bad Depth: "+bad+"/"+numFeatures);
+			verbose.println("Depth Sanity: target='"+ targetID +"', Bad Depth: "+bad+"/"+numFeatures);
 
 		if (bad > numFeatures*tolerance) {
 			if (verbose != null) {

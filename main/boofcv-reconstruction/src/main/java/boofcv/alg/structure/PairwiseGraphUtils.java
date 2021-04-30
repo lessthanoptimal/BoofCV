@@ -283,7 +283,7 @@ public class PairwiseGraphUtils {
 	 *
 	 * @param view Which view should be the first view in the list and have its inliers updated.
 	 */
-	public void saveRansacInliers( SceneWorkingGraph.View view ) {
+	public InlierInfo saveRansacInliers( SceneWorkingGraph.View view ) {
 		int viewIdx = seed == view.pview ? 0 : viewB == view.pview ? 1 : viewC == view.pview ? 2 : -1;
 
 		int[] order = switch (viewIdx) {
@@ -294,8 +294,8 @@ public class PairwiseGraphUtils {
 		};
 
 		int numInliers = inliersThreeView.size();
-		final InlierInfo info = view.inliers;
-		checkTrue(info.views.size == 0, "Inliers should not have already been set for this view");
+		checkTrue(view.inliers.size == 0, "Inliers should not have already been set for this view");
+		final InlierInfo info = view.inliers.grow();
 
 		info.observations.reset();
 		info.observations.resize(3);
@@ -321,6 +321,8 @@ public class PairwiseGraphUtils {
 			};
 			info.views.set(order[i], v);
 		}
+
+		return info;
 	}
 
 	/**

@@ -208,14 +208,16 @@ class MockLookupSimilarImagesCircleAround implements LookUpSimilarImages {
 				wv.projective.setTo(listCameraMatrices.get(viewCnt));
 			}
 
-			wv.inliers.views.add(pv);
-			wv.inliers.observations.grow().addAll(featToView.get(viewCnt), 0, numFeatures);
+			SceneWorkingGraph.InlierInfo inlier = wv.inliers.grow();
+
+			inlier.views.add(pv);
+			inlier.observations.grow().addAll(featToView.get(viewCnt), 0, numFeatures);
 			for (int connCnt = 0; connCnt < pv.connections.size; connCnt++) {
 				PairwiseImageGraph.Motion m = pv.connections.get(connCnt);
 				PairwiseImageGraph.View mv = m.other(pv);
 				int mv_index = graph.nodes.indexOf(mv);
-				wv.inliers.views.add(mv);
-				wv.inliers.observations.grow().addAll(featToView.get(mv_index), 0, numFeatures);
+				inlier.views.add(mv);
+				inlier.observations.grow().addAll(featToView.get(mv_index), 0, numFeatures);
 			}
 		}
 		return working;

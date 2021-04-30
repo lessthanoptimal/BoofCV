@@ -65,6 +65,7 @@ class TestMetricFromUncalibratedPairwiseGraph extends BoofStandardJUnit {
 					setSeed(numViews).setFeatures(Math.max(400, 50*numViews)).pathLine(numViews, 0.30, 6.0, 2);
 			PairwiseImageGraph graph = db.createPairwise();
 			assertTrue(alg.process(db, graph));
+			assertEquals(1, alg.getScenes().size);
 			checkReconstruction(alg, db);
 		}
 	}
@@ -153,29 +154,37 @@ class TestMetricFromUncalibratedPairwiseGraph extends BoofStandardJUnit {
 
 			if (idx != 0) {
 				// only the first view (the seed) should have inliers saved
-				assertEquals(0, wview.inliers.views.size);
-				assertEquals(0, wview.inliers.observations.size);
+				assertEquals(0, wview.inliers.size);
 				return;
 			}
 
-			assertEquals(viewIds.size(), wview.inliers.views.size);
-			assertEquals(viewIds.size(), wview.inliers.observations.size);
-			assertEquals(viewId, wview.inliers.views.get(0).id);
+			assertEquals(1, wview.inliers.size);
+			SceneWorkingGraph.InlierInfo inlier = wview.inliers.get(0);
+
+			assertTrue(inlier.scoreGeometric > 0.0);
+
+			assertEquals(viewIds.size(), inlier.views.size);
+			assertEquals(viewIds.size(), inlier.observations.size);
+			assertEquals(viewId, inlier.views.get(0).id);
 			for (int checkIdx = 0; checkIdx < viewIds.size(); checkIdx++) {
 				final int c = checkIdx;
-				DogArray_I32 obs = wview.inliers.observations.get(checkIdx);
+				DogArray_I32 obs = inlier.observations.get(checkIdx);
 				obs.forIdx(( i, value ) -> assertEquals(i*2 + 1 + c, value));
 			}
 		});
 	}
 
+	@Test void mergeScenes() {
+		fail("Implement");
+	}
+
 	@Test void getLargestScene() {
 		var alg = new MetricFromUncalibratedPairwiseGraph();
 		// Create scenes with increasing number of views
-		alg.scenes.resize(4,(idx,scene)->{
+		alg.scenes.resize(4, ( idx, scene ) -> {
 			for (int i = 0; i < idx; i++) {
 				var v = new PairwiseImageGraph.View();
-				v.init(i, i+"");
+				v.init(i, i + "");
 				scene.addView(v);
 			}
 		});

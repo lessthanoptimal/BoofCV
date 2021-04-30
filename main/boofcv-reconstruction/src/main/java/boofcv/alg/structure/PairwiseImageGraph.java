@@ -65,6 +65,9 @@ public class PairwiseImageGraph {
 		return m;
 	}
 
+	/**
+	 * Information associated with a single image/frame/view
+	 */
 	public static class View {
 		/** Unique identifier for this view */
 		public String id;
