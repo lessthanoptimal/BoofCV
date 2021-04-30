@@ -107,6 +107,9 @@ public class TestSceneMergingOperations extends BoofStandardJUnit {
 		// If there are equal views that's undefined and doesn't matter which one wins
 	}
 
+	/**
+	 * Handle nominal cases.
+	 */
 	@Test void mergeViews() {
 		var alg = new SceneMergingOperations();
 		var src = new SceneWorkingGraph();
@@ -150,6 +153,20 @@ public class TestSceneMergingOperations extends BoofStandardJUnit {
 			assertEquals(10.0, dst.views.get(id).world_to_view.T.x);
 			assertEquals(i, dst.views.get(id).intrinsic.f);
 		}
+	}
+
+	/**
+	 * Check the case where there are multiple inlier sets that need to be merged
+	 */
+	@Test void mergeViews_MultipleInliers() {
+		fail("Implement");
+	}
+
+	/**
+	 * Merge views when seed set views are involved
+	 */
+	@Test void mergeViews_Seeds() {
+		fail("implement");
 	}
 
 	@Test void findTransformSe3() {

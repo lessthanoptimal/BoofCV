@@ -174,17 +174,22 @@ class TestMultiViewIO extends BoofStandardJUnit {
 			assertEquals(va.imageDimension.width, vb.imageDimension.width);
 			assertEquals(va.imageDimension.height, vb.imageDimension.height);
 
-			assertEquals(va.inliers.views.size, vb.inliers.views.size);
-			assertEquals(va.inliers.observations.size, vb.inliers.observations.size);
+			assertEquals(va.inliers.size, vb.inliers.size);
+			for (int inlierInfo = 0; inlierInfo < va.inliers.size; inlierInfo++) {
+				SceneWorkingGraph.InlierInfo infoa = va.inliers.get(inlierInfo);
+				SceneWorkingGraph.InlierInfo infob = vb.inliers.get(inlierInfo);
 
-			final int numViews = va.inliers.views.size;
-			for (int i = 0; i < numViews; i++) {
-				assertEquals(va.inliers.views.get(i).id, vb.inliers.views.get(i).id);
+				assertEquals(infoa.observations.size, infob.observations.size);
 
-				DogArray_I32 oa = va.inliers.observations.get(i);
-				DogArray_I32 ob = vb.inliers.observations.get(i);
-				assertEquals(oa.size, ob.size);
-				oa.forIdx(( idx, v ) -> assertEquals(v, ob.get(idx)));
+				final int numViews = infoa.views.size;
+				for (int i = 0; i < numViews; i++) {
+					assertEquals(infoa.views.get(i).id, infob.views.get(i).id);
+
+					DogArray_I32 oa = infoa.observations.get(i);
+					DogArray_I32 ob = infob.observations.get(i);
+					assertEquals(oa.size, ob.size);
+					oa.forIdx(( idx, v ) -> assertEquals(v, ob.get(idx)));
+				}
 			}
 		}
 	}
@@ -211,16 +216,23 @@ class TestMultiViewIO extends BoofStandardJUnit {
 			RandomMatrices_DDRM.fillUniform(v.projective, rand);
 
 			PrimitiveArrays.shuffle(candidates.data, 0, candidates.size, rand);
-			int numViews = rand.nextInt(Math.min(5, candidates.size));
-			int numObs = rand.nextInt(20) + 1;
-			v.inliers.views.resize(numViews);
-			v.inliers.observations.resize(numViews);
-			for (int i = 0; i < numViews; i++) {
-				v.inliers.views.set(i, pairwise.nodes.get(candidates.get(i)));
-				DogArray_I32 obs = v.inliers.observations.get(i);
-				obs.resize(numObs);
-				for (int j = 0; j < numObs; j++) {
-					obs.data[j] = rand.nextInt();
+
+			v.inliers.resetResize(2);
+			for (int infoIdx = 0; infoIdx < v.inliers.size; infoIdx++) {
+				SceneWorkingGraph.InlierInfo inlier = v.inliers.get(infoIdx);
+
+				int numViews = rand.nextInt(Math.min(5, candidates.size));
+				int numObs = rand.nextInt(20) + 1;
+
+				inlier.views.resize(numViews);
+				inlier.observations.resize(numViews);
+				for (int i = 0; i < numViews; i++) {
+					inlier.views.set(i, pairwise.nodes.get(candidates.get(i)));
+					DogArray_I32 obs = inlier.observations.get(i);
+					obs.resize(numObs);
+					for (int j = 0; j < numObs; j++) {
+						obs.data[j] = rand.nextInt();
+					}
 				}
 			}
 		});

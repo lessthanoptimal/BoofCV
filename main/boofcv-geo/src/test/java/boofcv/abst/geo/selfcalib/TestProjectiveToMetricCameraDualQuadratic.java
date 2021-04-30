@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -19,6 +19,9 @@
 package boofcv.abst.geo.selfcalib;
 
 import boofcv.alg.geo.selfcalib.SelfCalibrationLinearDualQuadratic;
+import org.junit.jupiter.api.Test;
+
+import static org.junit.jupiter.api.Assertions.fail;
 
 /**
  * @author Peter Abeles
@@ -28,5 +31,12 @@ class TestProjectiveToMetricCameraDualQuadratic extends CommonProjectiveToMetric
 	public ProjectiveToMetricCameras createEstimator() {
 		var alg = new SelfCalibrationLinearDualQuadratic(1.0);
 		return new ProjectiveToMetricCameraDualQuadratic(alg);
+	}
+
+	/**
+	 * Make sure it fails if it converges to a solution with too many points behind the camera
+	 */
+	@Test void invalidFractionAccept() {
+		fail("Implement");
 	}
 }

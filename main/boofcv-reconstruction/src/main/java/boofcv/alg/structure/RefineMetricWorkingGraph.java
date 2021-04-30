@@ -75,7 +75,7 @@ public class RefineMetricWorkingGraph implements VerbosePrint {
 	// Storage for the index/ID of a particular view
 	TObjectIntHashMap<String> viewToIntegerID = new TObjectIntHashMap<>();
 
-	private PrintStream verbose;
+	private @Nullable PrintStream verbose;
 
 	//------------------------ Internal workspace
 
@@ -185,54 +185,61 @@ public class RefineMetricWorkingGraph implements VerbosePrint {
 		// For each view, with a set inliers, create a set of triangulated 3D point features
 		for (int workingIdx = 0; workingIdx < graph.listViews.size(); workingIdx++) {
 			SceneWorkingGraph.View wview = graph.listViews.get(workingIdx);
-			if (wview.inliers.isEmpty())
-				continue;
 
-			final SceneWorkingGraph.InlierInfo inliers = wview.inliers;
-			final FastArray<PairwiseImageGraph.View> inlierViews = inliers.views;
+			for (int infoIdx = 0; infoIdx < wview.inliers.size; infoIdx++) {
+				final SceneWorkingGraph.InlierInfo inliers = wview.inliers.get(infoIdx);
 
-			// Initialize data structures for this particular set of inlier observations
-			initLookUpTablesForInlierSet(graph, inlierViews);
+				if (verbose != null) verbose.println("inlier["+infoIdx+"] view='" + wview.pview.id +
+						"' size=" + inliers.getInlierCount());
 
-			int numInliers = wview.inliers.getInlierCount();
+				createFeaturesFromInlierInfo(graph, inliers);
+			}
+		}
+	}
 
-			if (verbose != null) verbose.println("Inlier view='" + wview.pview.id + "' inliers=" + numInliers);
+	private void createFeaturesFromInlierInfo( SceneWorkingGraph graph, SceneWorkingGraph.InlierInfo inliers ) {
+		final FastArray<PairwiseImageGraph.View> inlierViews = inliers.views;
 
-			int countMatched = 0;
-			int countMixed = 0;
-			int tooFew = 0;
+		// Initialize data structures for this particular set of inlier observations
+		initLookUpTablesForInlierSet(graph, inlierViews);
 
-			for (int inlierIdx = 0; inlierIdx < numInliers; inlierIdx++) {
-				// Create a list of views which have not yet been assigned an observation and also create a list
-				// of 3D features which have been assigned an observation from this set
-				findUnassignedObsAndKnown3D(inliers, inlierIdx);
+		final int numInliers = inliers.getInlierCount();
 
-				if (unassigned.size != 0 && featureIdx3D.size != 0) {
-					countMixed++;
-				} else if (featureIdx3D.size != 0) {
-					countMatched++;
-				}
+		int countMatched = 0;
+		int countMixed = 0;
+		int tooFew = 0;
 
-				// For each observations which is unassigned, assign it to the 3D feature which has the smallest
-				// reprojection error
-				if (featureIdx3D.size > 0)
-					assignKnown3DToUnassignedObs(graph, inliers, inlierIdx);
+		for (int inlierIdx = 0; inlierIdx < numInliers; inlierIdx++) {
+			// Create a list of views which have not yet been assigned an observation and also create a list
+			// of 3D features which have been assigned an observation from this set
+			findUnassignedObsAndKnown3D(inliers, inlierIdx);
 
-				// If there is 2 or more unassigned observations remaining triangulate and create a new 3D feature
-				if (unassigned.size < 2) {
-					tooFew++;
-					continue;
-				}
-
-				// Create a new feature and save the unassigned observations to it
-				triangulateAndSave(inliers, inlierIdx);
-
-				// NOTE: it is possible that 2+ features are created for one physical feature with this greedy approach
+			if (unassigned.size != 0 && featureIdx3D.size != 0) {
+				countMixed++;
+			} else if (featureIdx3D.size != 0) {
+				countMatched++;
 			}
 
-			if (verbose != null)
-				verbose.println("   unmatched=" + (numInliers - countMatched) + "  matched=" + countMatched + " mixed=" +
-						countMixed + " tooFew=" + tooFew);
+			// For each observations which is unassigned, assign it to the 3D feature which has the smallest
+			// reprojection error
+			if (featureIdx3D.size > 0)
+				assignKnown3DToUnassignedObs(graph, inliers, inlierIdx);
+
+			// If there is 2 or more unassigned observations remaining triangulate and create a new 3D feature
+			if (unassigned.size < 2) {
+				tooFew++;
+				continue;
+			}
+
+			// Create a new feature and save the unassigned observations to it
+			triangulateAndSave(inliers, inlierIdx);
+
+			// NOTE: it is possible that 2+ features are created for one physical feature with this greedy approach
+		}
+
+		if (verbose != null) {
+			verbose.println("unmatched=" + (numInliers - countMatched) + "  matched=" + countMatched + " mixed=" +
+					countMixed + " tooFew=" + tooFew);
 		}
 	}
 
@@ -454,6 +461,6 @@ public class RefineMetricWorkingGraph implements VerbosePrint {
 
 	@Override
 	public void setVerbose( @Nullable PrintStream out, @Nullable Set<String> configuration ) {
-		this.verbose = out;
+		this.verbose = BoofMiscOps.addPrefix(this, out);
 	}
 }

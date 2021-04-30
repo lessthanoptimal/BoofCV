@@ -374,32 +374,41 @@ public class SelectNeighborsAroundView implements VerbosePrint {
 			if (hasFeatures.contains(origView.pview.id))
 				continue;
 
+			SceneWorkingGraph.InlierInfo origInlier = origView.inliers.grow();
+
 			// Search for a connected view which has this view inside its inlier list. There has to be
 			// at least one
+			connectionsLoop:
 			for (int connIdx = 0; connIdx < origView.pview.connections.size; connIdx++) {
 				PairwiseImageGraph.Motion m = origView.pview.connections.get(connIdx);
 				View v = working.lookupView(m.other(origView.pview).id);
+
+				// skip if there isn't a known metric upgrade yet
 				if (v == null)
 					continue;
 
-				if (v.inliers.isEmpty())
-					continue;
-				for (int j = 0; j < v.inliers.views.size; j++) {
-					if (!v.inliers.views.get(j).id.equals(origView.pview.id))
-						continue;
+				for (int infoIdx = 0; infoIdx < v.inliers.size; infoIdx++) {
+					SceneWorkingGraph.InlierInfo otherInlier = v.inliers.get(infoIdx);
 
-					// Create an inlier list
-					origView.inliers.views.add(origView.pview);
-					origView.inliers.observations.grow().setTo(v.inliers.observations.get(j));
+					for (int j = 0; j < otherInlier.views.size; j++) {
+						if (!otherInlier.views.get(j).id.equals(origView.pview.id))
+							continue;
 
-					// Use the first inlier list that we found
-					break;
+						// Create an inlier list
+						origInlier.views.add(origView.pview);
+						origInlier.observations.grow().setTo(otherInlier.observations.get(j));
+
+						// Use the first inlier list that we found
+						break;
+					}
+
+					// Found one. Now it's done
+					if (!origInlier.isEmpty())
+						break connectionsLoop;
 				}
-
-				if (!origView.inliers.isEmpty())
-					break;
 			}
-			checkTrue(!origView.inliers.isEmpty(), "BUG! there can be no estimated state if it was never in an " +
+
+			checkTrue(!origInlier.isEmpty(), "BUG! there can be no estimated state if it was never in an " +
 					"inlier list of a neighbor. view.id=" + origView.pview.id);
 		}
 	}
@@ -418,22 +427,23 @@ public class SelectNeighborsAroundView implements VerbosePrint {
 		localView.world_to_view.setTo(origView.world_to_view);
 		localView.imageDimension.setTo(origView.imageDimension);
 
-		// If this isn't a view with inliers move on
-		if (origView.inliers.isEmpty())
-			return;
+		for (int infoIdx = 0; infoIdx < origView.inliers.size; infoIdx++) {
+			SceneWorkingGraph.InlierInfo origInliers = origView.inliers.get(infoIdx);
+			SceneWorkingGraph.InlierInfo localInliers = localView.inliers.grow();
 
-		// Copy over inliers that are in the sub graph
-		for (int i = 0; i < origView.inliers.views.size; i++) {
-			PairwiseImageGraph.View pview = origView.inliers.views.get(i);
-			// see if it's in the sub graph
-			if (!lookup.containsKey(pview.id))
-				continue;
-			// mark this as having features assigned to it
-			hasFeatures.add(pview.id);
+			// Copy over inliers that are in the sub graph
+			for (int i = 0; i < origInliers.views.size; i++) {
+				PairwiseImageGraph.View pview = origInliers.views.get(i);
+				// see if it's in the sub graph
+				if (!lookup.containsKey(pview.id))
+					continue;
+				// mark this as having features assigned to it
+				hasFeatures.add(pview.id);
 
-			// Add the inliers to the local view
-			localView.inliers.views.add(pview);
-			localView.inliers.observations.grow().setTo(origView.inliers.observations.get(i));
+				// Add the inliers to the local view
+				localInliers.views.add(pview);
+				localInliers.observations.grow().setTo(origInliers.observations.get(i));
+			}
 		}
 	}
 

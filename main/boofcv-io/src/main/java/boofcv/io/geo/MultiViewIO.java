@@ -24,6 +24,7 @@ import boofcv.abst.geo.bundle.SceneStructureMetric;
 import boofcv.alg.geo.bundle.cameras.BundlePinholeSimplified;
 import boofcv.alg.structure.PairwiseImageGraph;
 import boofcv.alg.structure.SceneWorkingGraph;
+import boofcv.alg.structure.SceneWorkingGraph.InlierInfo;
 import boofcv.misc.BoofMiscOps;
 import boofcv.struct.feature.AssociatedIndex;
 import boofcv.struct.image.ImageDimension;
@@ -526,50 +527,57 @@ public class MultiViewIO {
 		return working;
 	}
 
-	public static Map<String, Object> putInlierInfo( SceneWorkingGraph.InlierInfo inliers ) {
-		Map<String, Object> map = new HashMap<>();
+	public static List<Object> putInlierInfo( FastAccess<InlierInfo> listInliers ) {
+		List<Object> list = new ArrayList<>();
+		for (int infoIdx = 0; infoIdx < listInliers.size; infoIdx++) {
+			InlierInfo inliers = listInliers.get(infoIdx);
 
-		List<String> views = new ArrayList<>();
-		inliers.views.forIdx(( i, v ) -> views.add(v.id));
+			Map<String, Object> map = new HashMap<>();
 
-		List<List<Integer>> observations = new ArrayList<>();
-		for (int viewIdx = 0; viewIdx < inliers.views.size; viewIdx++) {
-			List<Integer> obs = new ArrayList<>();
-			inliers.observations.get(viewIdx).forIdx(( i, v ) -> obs.add(v));
-			observations.add(obs);
+			List<String> views = new ArrayList<>();
+			inliers.views.forIdx(( i, v ) -> views.add(v.id));
+
+			List<List<Integer>> observations = new ArrayList<>();
+			for (int viewIdx = 0; viewIdx < inliers.views.size; viewIdx++) {
+				List<Integer> obs = new ArrayList<>();
+				inliers.observations.get(viewIdx).forIdx(( i, v ) -> obs.add(v));
+				observations.add(obs);
+			}
+
+			map.put("views", views);
+			map.put("observations", observations);
+			list.add(map);
 		}
-
-		map.put("views", views);
-		map.put("observations", observations);
-
-		return map;
+		return list;
 	}
 
-	public static SceneWorkingGraph.InlierInfo loadInlierInfo( Map<String, Object> map,
-															   PairwiseImageGraph pairwise,
-															   @Nullable SceneWorkingGraph.InlierInfo inliers )
+	public static void loadInlierInfo( List<Object> list,
+									   PairwiseImageGraph pairwise,
+									   DogArray<InlierInfo> listInliers )
 			throws IOException {
-		if (inliers == null)
-			inliers = new SceneWorkingGraph.InlierInfo();
-		SceneWorkingGraph.InlierInfo _inliers = inliers;
 
-		List<String> views = getOrThrow(map, "views");
-		List<List<Integer>> observations = getOrThrow(map, "observations");
+		listInliers.resetResize(list.size());
+		for (int infoIdx = 0; infoIdx < list.size(); infoIdx++) {
+			Map<String, Object> map = (Map)list.get(infoIdx);
 
-		inliers.views.resize(views.size());
-		inliers.views.reset();
-		BoofMiscOps.forIdx(views, ( i, v ) -> _inliers.views.add(pairwise.lookupNode(v)));
+			InlierInfo inliers = listInliers.get(infoIdx);
 
-		inliers.observations.resize(views.size());
-		for (int viewIdx = 0; viewIdx < inliers.views.size; viewIdx++) {
-			List<Integer> src = observations.get(viewIdx);
-			DogArray_I32 dst = inliers.observations.get(viewIdx);
-			dst.resize(src.size());
-			dst.reset();
-			src.forEach(dst::add);
+			List<String> views = getOrThrow(map, "views");
+			List<List<Integer>> observations = getOrThrow(map, "observations");
+
+			inliers.views.resize(views.size());
+			inliers.views.reset();
+			BoofMiscOps.forIdx(views, ( i, v ) -> inliers.views.add(pairwise.lookupNode(v)));
+
+			inliers.observations.resize(views.size());
+			for (int viewIdx = 0; viewIdx < inliers.views.size; viewIdx++) {
+				List<Integer> src = observations.get(viewIdx);
+				DogArray_I32 dst = inliers.observations.get(viewIdx);
+				dst.resize(src.size());
+				dst.reset();
+				src.forEach(dst::add);
+			}
 		}
-
-		return inliers;
 	}
 
 	public static Map<String, Object> putDimension( ImageDimension d ) {

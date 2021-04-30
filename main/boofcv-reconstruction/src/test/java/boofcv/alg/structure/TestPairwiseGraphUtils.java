@@ -430,15 +430,17 @@ class TestPairwiseGraphUtils extends BoofStandardJUnit {
 			alg.saveRansacInliers(view0);
 
 			// Check the results
-			SceneWorkingGraph.InlierInfo inliers = view0.inliers;
-			assertEquals(3, inliers.views.size);
-			assertSame(view0.pview, inliers.views.get(0));
-			assertNotSame(view0.pview, inliers.views.get(1));
-			assertNotSame(view0.pview, inliers.views.get(2));
-			assertEquals(3, inliers.observations.size);
+			assertEquals(1, view0.inliers.size);
+			SceneWorkingGraph.InlierInfo inlier = view0.inliers.get(0);
+			assertEquals(0.0, inlier.scoreGeometric);
+			assertEquals(3, inlier.views.size);
+			assertSame(view0.pview, inlier.views.get(0));
+			assertNotSame(view0.pview, inlier.views.get(1));
+			assertNotSame(view0.pview, inlier.views.get(2));
+			assertEquals(3, inlier.observations.size);
 			for (int checkView = 0; checkView < 3; checkView++) {
-				PairwiseImageGraph.View v = inliers.views.get(checkView);
-				DogArray_I32 indexes = inliers.observations.get(checkView);
+				PairwiseImageGraph.View v = inlier.views.get(checkView);
+				DogArray_I32 indexes = inlier.observations.get(checkView);
 				assertEquals(numInliers, indexes.size);
 
 				if (alg.seed == v) {

@@ -145,6 +145,11 @@ public class MetricFromUncalibratedPairwiseGraph extends ReconstructionFromPairw
 		// Spawn as many seeds as possible
 		spawnSeeds(db, pairwise, seeds);
 
+		if (scenes.isEmpty()) {
+			if (verbose != null) verbose.println("Failed to upgrade any of the seeds to a metric scene.");
+			return false;
+		}
+
 		// Expand all the scenes until they can't any more
 		expandScenes(db);
 		// TODO while expanding perform local SBA
@@ -155,7 +160,7 @@ public class MetricFromUncalibratedPairwiseGraph extends ReconstructionFromPairw
 
 		// There can be multiple scenes at the end that are disconnected and share no views in common
 
-		if (verbose != null) verbose.println("Done. scenes.size=" + scenes.size);
+		if (verbose != null) verbose.println("Done.");
 		return true;
 	}
 
@@ -182,7 +187,7 @@ public class MetricFromUncalibratedPairwiseGraph extends ReconstructionFromPairw
 			if (verbose != null) verbose.println("  Selected seed.id='" + info.seed.id + "' common=" + common.size);
 
 			if (!estimateProjectiveSceneFromSeed(db, info, common)) {
-				if (verbose != null) verbose.println("    FAILED: Projective estimate seed.id='" + info.seed.id);
+				if (verbose != null) verbose.println("  FAILED: Projective estimate seed.id='" + info.seed.id);
 				continue;
 			}
 
@@ -192,7 +197,7 @@ public class MetricFromUncalibratedPairwiseGraph extends ReconstructionFromPairw
 
 			// Elevate initial seed to metric
 			if (!projectiveSeedToMetric(pairwise, scene)) {
-				if (verbose != null) verbose.println("    FAILED: Projective to metric seed.id='" + info.seed.id);
+				if (verbose != null) verbose.println("  FAILED: Projective to metric seed.id='" + info.seed.id);
 				// reclaim the failed graph
 				scenes.removeTail();
 				continue;
@@ -214,7 +219,7 @@ public class MetricFromUncalibratedPairwiseGraph extends ReconstructionFromPairw
 				nodeViews.getView(pview).viewedBy.add(scene.index);
 
 				if (verbose != null)
-					verbose.println("  view['" + pview.id + "']  intrinsic.f=" + wview.intrinsic.f+"  view.index="+pview.index);
+					verbose.println("  view['" + pview.id + "']  intrinsic.f=" + wview.intrinsic.f + "  view.index=" + pview.index);
 			}
 		}
 		if (verbose != null) verbose.println("EXIT spawn seeds: scenes.size=" + scenes.size());
@@ -226,7 +231,7 @@ public class MetricFromUncalibratedPairwiseGraph extends ReconstructionFromPairw
 	 * connected views does not belong to any other scenes.
 	 */
 	void expandScenes( LookUpSimilarImages db ) {
-		if (verbose != null) verbose.println("Finding open views in each scene");
+		if (verbose != null) verbose.println("Expand Scenes: Finding open views in each scene");
 
 		// Initialize the expansion by finding all the views each scene could expand into
 		for (int sceneIdx = 0; sceneIdx < scenes.size; sceneIdx++) {
@@ -246,10 +251,10 @@ public class MetricFromUncalibratedPairwiseGraph extends ReconstructionFromPairw
 		Expansion best = new Expansion();
 		Expansion candidate = new Expansion();
 
-		if (verbose != null) verbose.println("Expanding scenes");
-
 		// Loop until it can't expand any more
 		while (true) {
+			if (verbose != null) verbose.println("Selecting next scene/view to expand.");
+
 			// Clear previous best results
 			best.reset();
 
@@ -285,7 +290,7 @@ public class MetricFromUncalibratedPairwiseGraph extends ReconstructionFromPairw
 			PairwiseImageGraph.View view = best.scene.open.removeSwap(best.openIdx);
 
 			if (verbose != null)
-				verbose.println("  expand sceneIdx=" + best.scene.index + " view='" + view.id + "' score=" + best.score);
+				verbose.println("  Expanding scene=" + best.scene.index + " view='" + view.id + "' score=" + best.score);
 
 			expandIntoView(db, best.scene, view);
 		}
@@ -297,7 +302,7 @@ public class MetricFromUncalibratedPairwiseGraph extends ReconstructionFromPairw
 	 *
 	 * @return true if the scene can be expanded from this view
 	 */
-	boolean canSpawnFromView(SceneWorkingGraph scene, PairwiseImageGraph.View pview) {
+	boolean canSpawnFromView( SceneWorkingGraph scene, PairwiseImageGraph.View pview ) {
 		// If no scene already contains the view then there are no restrictions
 		if (nodeViews.getView(pview).viewedBy.size == 0)
 			return true;
@@ -356,7 +361,8 @@ public class MetricFromUncalibratedPairwiseGraph extends ReconstructionFromPairw
 
 			// Don't merge in this situation
 			if (subset) {
-				if (verbose != null) verbose.println("src is a subset of dst. Removing");
+				if (verbose != null)
+					verbose.println("scenes: src=" + src.index + " dst=" + dst.index + " Removing: src is a subset.");
 				mergeOps.adjustSceneCounts(src, nodeViews, false);
 				mergeOps.adjustSceneCounts(dst, nodeViews, false);
 				SceneMergingOperations.removeScene(src, nodeViews);
@@ -385,9 +391,10 @@ public class MetricFromUncalibratedPairwiseGraph extends ReconstructionFromPairw
 				}
 			}
 
-			if (verbose != null) verbose.println("scenes: src=" + src.index + " dst=" + dst.index +
-					" views: (" + src.listViews.size() + " , " + dstViewCountBefore +
-					") -> "+dst.listViews.size()+", scale=" + src_to_dst.scale);
+			if (verbose != null)
+				verbose.println("scenes: src=" + src.index + " dst=" + dst.index +
+						" views: (" + src.listViews.size() + " , " + dstViewCountBefore +
+						") -> " + dst.listViews.size() + ", scale=" + src_to_dst.scale);
 
 			// Remove the one that's no longer needed
 			SceneMergingOperations.removeScene(src, nodeViews);
@@ -402,6 +409,13 @@ public class MetricFromUncalibratedPairwiseGraph extends ReconstructionFromPairw
 				continue;
 			scenes.removeSwap(i);
 		}
+
+		if (verbose != null) {
+			verbose.println("scenes.size=" + scenes.size);
+			for (int i = 0; i < scenes.size; i++) {
+				verbose.println("  scene[" + i + "].size = " + scenes.get(i).listViews.size());
+			}
+		}
 	}
 
 	/**
@@ -409,13 +423,15 @@ public class MetricFromUncalibratedPairwiseGraph extends ReconstructionFromPairw
 	 */
 	void expandIntoView( LookUpSimilarImages db, SceneWorkingGraph scene, PairwiseImageGraph.View selected ) {
 		if (!expandMetric.process(db, scene, selected)) {
-			if (verbose != null) verbose.println("Failed to expand/add view='" + selected.id + "'. Discarding.");
+			if (verbose != null)
+				verbose.println("Failed to expand/add scene=" + scene.index + " view='" + selected.id + "'. Discarding.");
 			return; // TODO handle this failure somehow. mark the scene as dead? Revisit it later on?
 		}
 
 		// Saves the set of inliers used to estimate this views metric view for later use
 		SceneWorkingGraph.View wview = scene.lookupView(selected.id);
-		utils.saveRansacInliers(wview);
+		SceneWorkingGraph.InlierInfo inlier = utils.saveRansacInliers(wview);
+		inlier.scoreGeometric = computeGeometricScore(scene, inlier);
 
 		// Check results for geometric consistency
 		if (sanityChecks)
@@ -432,8 +448,9 @@ public class MetricFromUncalibratedPairwiseGraph extends ReconstructionFromPairw
 			addOpenForView(scene, wview.pview);
 
 		if (verbose != null) {
-			verbose.println("Expanded view='" + selected.id + "'  inliers="+ utils.inliersThreeView.size() + "/" +
-					utils.matchesTriple.size+" added.size="+(scene.open.size-openSizePrior));
+			verbose.println("  Expanded  scene=" + scene.index + " view='" + selected.id + "'  inliers=" +
+					utils.inliersThreeView.size() + "/" + utils.matchesTriple.size + " Open added.size=" +
+					(scene.open.size - openSizePrior));
 		}
 
 		// Add this view to the list
@@ -468,7 +485,6 @@ public class MetricFromUncalibratedPairwiseGraph extends ReconstructionFromPairw
 		// Pass the projective scene and elevate into a metric scene
 		MetricCameras results = new MetricCameras();
 		if (!projectiveToMetric.process(dimensions.toList(), views.toList(), (List)observations.toList(), results)) {
-			if (verbose != null) verbose.println("Failed to elevate initial seed to metric");
 			return false;
 		}
 
@@ -504,21 +520,29 @@ public class MetricFromUncalibratedPairwiseGraph extends ReconstructionFromPairw
 
 		// Save the inliers used to construct the metric scene
 		SceneWorkingGraph.View wtarget = scene.lookupView(viewIds.get(0));
-		checkEq(wtarget.inliers.views.size, 0, "There should be at most one set of inliers per view");
-		SceneWorkingGraph.InlierInfo inliers = wtarget.inliers;
-		inliers.views.resize(viewIds.size());
-		inliers.observations.resize(viewIds.size());
+		checkEq(wtarget.inliers.size, 0, "There should be at most one set of inliers per view");
+		SceneWorkingGraph.InlierInfo inlier = wtarget.inliers.grow();
+		inlier.views.resize(viewIds.size());
+		inlier.observations.resetResize(viewIds.size());
 		for (int viewIdx = 0; viewIdx < viewIds.size(); viewIdx++) {
-			inliers.views.set(viewIdx, graph.lookupNode(viewIds.get(viewIdx)));
+			inlier.views.set(viewIdx, graph.lookupNode(viewIds.get(viewIdx)));
 			if (viewIdx == 0) {
-				inliers.observations.get(0).setTo(inlierToSeed);
-				checkTrue(inliers.observations.get(0).size > 0, "There should be observations");
+				inlier.observations.get(0).setTo(inlierToSeed);
+				checkTrue(inlier.observations.get(0).size > 0, "There should be observations");
 				continue;
 			}
-			inliers.observations.get(viewIdx).setTo(inlierToOther.get(viewIdx - 1));
-			checkEq(inliers.observations.get(viewIdx).size, inliers.observations.get(0).size,
+			inlier.observations.get(viewIdx).setTo(inlierToOther.get(viewIdx - 1));
+			checkEq(inlier.observations.get(viewIdx).size, inlier.observations.get(0).size,
 					"Each view should have the same number of observations");
 		}
+		inlier.scoreGeometric = computeGeometricScore(scene, inlier);
+	}
+
+	/**
+	 * Estimates the quality of the geometry information contained in the inlier set. Higher values are better.
+	 */
+	public double computeGeometricScore( SceneWorkingGraph scene, SceneWorkingGraph.InlierInfo inlier ) {
+		return inlier.getInlierCount();
 	}
 
 	/**

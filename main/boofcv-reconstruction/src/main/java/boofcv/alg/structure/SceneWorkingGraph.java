@@ -170,6 +170,11 @@ public class SceneWorkingGraph {
 		 */
 		public final DogArray<DogArray_I32> observations = new DogArray<>(DogArray_I32::new, DogArray_I32::reset);
 
+		/**
+		 * Score for this inlier set and how good the geometry is. Used to compare the merit of different sets.
+		 */
+		public double scoreGeometric;
+
 		public boolean isEmpty() { return observations.size == 0; }
 
 		/** Returns total number of features are included in this inlier set */
@@ -182,11 +187,13 @@ public class SceneWorkingGraph {
 			for (int i = 0; i < src.observations.size; i++) {
 				this.observations.get(i).setTo(src.observations.get(i));
 			}
+			this.scoreGeometric = src.scoreGeometric;
 		}
 
 		public void reset() {
 			views.reset();
 			observations.reset();
+			scoreGeometric = 0.0;
 		}
 	}
 
@@ -216,7 +223,7 @@ public class SceneWorkingGraph {
 		// Specifies which observations were used to compute the projective transform for this view
 		// If empty that means one set of inliers are used for multiple views and only one view needed this to be saved
 		// this happens for the seed view
-		public final InlierInfo inliers = new InlierInfo();
+		public final DogArray<InlierInfo> inliers = new DogArray<>(InlierInfo::new, InlierInfo::reset);
 
 		// projective camera matrix
 		public final DMatrixRMaj projective = new DMatrixRMaj(3, 4);
@@ -227,6 +234,35 @@ public class SceneWorkingGraph {
 
 		// Index of the view in the list. This will be the same index in the SBA scene
 		public int index = -1;
+
+		/**
+		 * Returns the number of features in the largest inlier set
+		 */
+		public int countLargestInlierSet() {
+			int max = 0;
+			for (int i = 0; i < inliers.size; i++) {
+				max = Math.max(max, inliers.get(i).getInlierCount());
+			}
+			return max;
+		}
+
+		/**
+		 * Returns the inlier set with the best score. null if there are no inlier sets
+		 */
+		public @Nullable InlierInfo getBestInliers() {
+			InlierInfo best = null;
+			double bestScore = 0.0;
+
+			for (int i = 0; i < inliers.size; i++) {
+				InlierInfo info = inliers.get(i);
+				if (info.scoreGeometric > bestScore) {
+					best = info;
+					bestScore = info.scoreGeometric;
+				}
+			}
+
+			return best;
+		}
 
 		public void reset() {
 			index = -1;

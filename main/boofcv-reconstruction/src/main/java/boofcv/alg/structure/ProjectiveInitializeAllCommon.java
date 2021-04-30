@@ -123,13 +123,19 @@ public class ProjectiveInitializeAllCommon implements VerbosePrint {
 		// the assumption that geometry was simply bad
 		checkTrue(seedFeatsIdx.size >= 6,
 				"need at least 6 common features to estimate camera matrix");
-		checkTrue(seedConnIdx.size >= 2,
-				"2-views, a.k.a. stereo, is a special case and requires different logic and isn't yet supported");
 		checkTrue(seed.connections.size >= seedConnIdx.size,
 				"Can't have more seed connection indexes than actual connections");
 
 		if (verbose != null)
-			verbose.println("ENTER projectiveSceneN: seed=" + seed.id + " common.size=" + seedFeatsIdx.size + " conn.size=" + seedConnIdx.size);
+			verbose.println("ENTER projectiveSceneN: seed=" + seed.id + " common.size=" + seedFeatsIdx.size +
+					" conn.size=" + seedConnIdx.size);
+
+		if (seedConnIdx.size < 2) {
+			if (verbose != null)
+				verbose.println("2-views, a.k.a. stereo, is a special case and requires different" +
+						" logic and isn't yet supported");
+			return false;
+		}
 
 		// initialize data structures
 		utils.db = db;
