@@ -111,11 +111,7 @@ public class MetricSanityChecks implements VerbosePrint {
 				continue;
 			}
 
-			// points at infinity are a weird case
-			if (foundX.w == 0.0)
-				continue;
-
-			if (foundX.z/foundX.w < 0)
+			if (foundX.z*foundX.w < 0)
 				bad++;
 		}
 
