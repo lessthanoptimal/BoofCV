@@ -59,6 +59,10 @@ public class SceneWorkingGraph {
 	/** List of views in pairwise graph it could expand into */
 	public FastArray<PairwiseImageGraph.View> open = new FastArray<>(PairwiseImageGraph.View.class);
 
+	// Number of views in the seed set. This is used to determine if a feature is a member of the seed set
+	// as the first views are always part of the seed
+	int numSeedViews;
+
 	/**
 	 * Resets it into it's initial state.
 	 */
@@ -69,10 +73,15 @@ public class SceneWorkingGraph {
 		exploredViews.clear();
 		index = -1;
 		open.reset();
+		numSeedViews = 0;
 	}
 
 	public View lookupView( String id ) {
 		return views.get(id);
+	}
+
+	public boolean isSeedSet( String id ) {
+		return views.get(id).index < numSeedViews;
 	}
 
 	public boolean isKnown( PairwiseImageGraph.View pview ) {
@@ -236,12 +245,12 @@ public class SceneWorkingGraph {
 		public int index = -1;
 
 		/**
-		 * Returns the number of features in the largest inlier set
+		 * Returns the score from the best inlier set
 		 */
-		public int countLargestInlierSet() {
-			int max = 0;
+		public double getBestInlierScore() {
+			double max = 0;
 			for (int i = 0; i < inliers.size; i++) {
-				max = Math.max(max, inliers.get(i).getInlierCount());
+				max = Math.max(max, inliers.get(i).scoreGeometric);
 			}
 			return max;
 		}

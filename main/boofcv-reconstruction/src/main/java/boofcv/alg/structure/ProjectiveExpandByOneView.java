@@ -97,7 +97,7 @@ public class ProjectiveExpandByOneView extends ExpandByOneView {
 		utils.viewB = connections.get(0).other(target);
 		utils.viewC = connections.get(1).other(target);
 		utils.createThreeViewLookUpTables();
-		utils.findCommonFeatures();
+		utils.findFullyConnectedTriple();
 
 		if (verbose != null) {
 			verbose.println("Expanding to view='" + target.id + "' using views ( '" + utils.viewB.id + "' , '" + utils.viewC.id +

@@ -151,7 +151,7 @@ public class MetricExpandByOneView extends ExpandByOneView {
 		utils.viewB = connections.get(1).other(target);
 		utils.viewC = target; // easier if target is viewC when doing metric elevation
 		utils.createThreeViewLookUpTables();
-		utils.findCommonFeatures();
+		utils.findFullyConnectedTriple();
 
 		if (verbose != null) {
 			verbose.println("Expanding to view='" + target.id + "' using views ( '" + utils.seed.id + "' , '" + utils.viewB.id +

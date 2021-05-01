@@ -132,17 +132,19 @@ public class PairwiseGraphUtils {
 	protected PairwiseGraphUtils() {}
 
 	/**
-	 * Finds the indexes of tracks which are common to all views
+	 * Finds the indexes of tracks which are common to all views and are inliers.
 	 *
 	 * @param seed (Input) The view which is used as the reference point
 	 * @param connectIdx (Input) Indexes of connections in the seed view that will be searched for common connections
+	 * @param commonIdx (Output) Indexes of observation in seed that are visible in connected views
 	 * @return indexes of common tracks. Indexes are indexes in the seed View
 	 */
-	public DogArray_I32 findCommonFeatures( View seed, DogArray_I32 connectIdx ) {
+	public void findAllConnectedSeed( View seed, DogArray_I32 connectIdx, DogArray_I32 commonIdx ) {
 		if (connectIdx.size < 1)
 			throw new RuntimeException("Called when there are no connections");
+
 		// if true then it is visible in all tracks
-		visibleAll.resize(seed.totalObservations);
+		visibleAll.resetResize(seed.totalObservations, true);
 		// used to keep track of which features are visible in the current motion
 		visibleMotion.resize(seed.totalObservations);
 
@@ -156,22 +158,20 @@ public class PairwiseGraphUtils {
 				AssociatedIndex a = m.inliers.get(i);
 				visibleMotion.data[seedIsSrc ? a.src : a.dst] = true;
 			}
-			// Update the table visible in all views
-			if (idxMotion == 0) {
-				visibleAll.setTo(visibleMotion);
-				continue;
-			}
+
+			// This will mark features that were not visible as false
 			for (int i = 0; i < seed.totalObservations; i++) {
 				visibleAll.data[i] &= visibleMotion.data[i];
 			}
 		}
-		DogArray_I32 common = new DogArray_I32(visibleAll.count(true));
+
+		// Make a list of indexes of features that are common for all views
+		commonIdx.reset();
 		for (int i = 0; i < seed.totalObservations; i++) {
 			if (visibleAll.data[i]) {
-				common.add(i);
+				commonIdx.add(i);
 			}
 		}
-		return common;
 	}
 
 	/**
@@ -192,7 +192,7 @@ public class PairwiseGraphUtils {
 	 * Finds which features are common between all three views using the look up tables. Results are stored in
 	 * {@link #commonIdx} by index of feature in {@link #seed}.
 	 */
-	public void findCommonFeatures() {
+	public void findFullyConnectedTriple() {
 		final int N = seed.totalObservations;
 		commonIdx.reset();
 		for (int featureIdxA = 0; featureIdxA < N; featureIdxA++) {
@@ -209,11 +209,11 @@ public class PairwiseGraphUtils {
 	}
 
 	/**
-	 * Same as {@link #findCommonFeatures()} but with a list that specified a subset of features in {@link #seed}.
+	 * Same as {@link #findFullyConnectedTriple()} but with a list that specified a subset of features in {@link #seed}.
 	 *
 	 * @param selectedIdxA List of feature indexes in A to consider
 	 */
-	public void findCommonFeatures( DogArray_I32 selectedIdxA ) {
+	public void findFullyConnectedTriple( DogArray_I32 selectedIdxA ) {
 		commonIdx.reset();
 		for (int selectedIdx = 0; selectedIdx < selectedIdxA.size; selectedIdx++) {
 			final int featureIdxA = selectedIdxA.get(selectedIdx);

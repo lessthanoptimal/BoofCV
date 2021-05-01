@@ -54,7 +54,7 @@ class TestMetricFromUncalibratedPairwiseGraph extends BoofStandardJUnit {
 
 		// TODO make this test run faster
 		var alg = new MetricFromUncalibratedPairwiseGraph();
-//		alg.setVerbose(System.out, null);
+//		alg.setVerbose(System.out, BoofMiscOps.hashSet(BoofVerbose.RECURSIVE));
 //		alg.getRefineWorking().setVerbose(System.out, null);
 		for (int numViews = 3; numViews <= 23; numViews += 5) {
 //			System.out.println("Number of views "+numViews);
@@ -109,14 +109,16 @@ class TestMetricFromUncalibratedPairwiseGraph extends BoofStandardJUnit {
 		var graph = new PairwiseImageGraph();
 		List<String> viewIds = BoofMiscOps.asList("A", "B", "C");
 		List<ImageDimension> dimensions = new ArrayList<>();
-		var inlierToSeed = DogArray_I32.array(1, 3, 5, 7, 9);
-		var inlierToOther = new DogArray<>(DogArray_I32::new, DogArray_I32::reset);
+		var listInliers = new DogArray<>(DogArray_I32::new, DogArray_I32::reset);
+		// specify the seed view
+		listInliers.grow().setTo(1, 3, 5, 7, 9);
+		int numInliers = listInliers.get(0).size;
 
 		// create distinctive sets of inlier indexes for each view
-		for (int otherIdx = 0; otherIdx < viewIds.size() - 1; otherIdx++) {
-			DogArray_I32 inliers = inlierToOther.grow();
-			for (int i = 0; i < inlierToSeed.size; i++) {
-				inliers.add(inlierToSeed.get(i) + 1 + otherIdx);
+		for (int otherIdx = 0; otherIdx < viewIds.size()-1; otherIdx++) {
+			DogArray_I32 inliers = listInliers.grow();
+			for (int i = 0; i < numInliers; i++) {
+				inliers.add(listInliers.get(0).get(i) + 1 + otherIdx);
 			}
 			dimensions.add(new ImageDimension(800, 800));
 		}
@@ -135,7 +137,7 @@ class TestMetricFromUncalibratedPairwiseGraph extends BoofStandardJUnit {
 
 		var alg = new MetricFromUncalibratedPairwiseGraph();
 		var wgraph = new SceneWorkingGraph();
-		alg.saveMetricSeed(graph, viewIds, dimensions, inlierToSeed, inlierToOther, results, wgraph);
+		alg.saveMetricSeed(graph, viewIds, dimensions, listInliers, results, wgraph);
 
 		// See metric view info got saved correctly
 		BoofMiscOps.forIdx(viewIds, ( idx, viewId ) -> {
@@ -152,12 +154,6 @@ class TestMetricFromUncalibratedPairwiseGraph extends BoofStandardJUnit {
 		BoofMiscOps.forIdx(viewIds, ( idx, viewId ) -> {
 			SceneWorkingGraph.View wview = wgraph.lookupView(viewId);
 
-			if (idx != 0) {
-				// only the first view (the seed) should have inliers saved
-				assertEquals(0, wview.inliers.size);
-				return;
-			}
-
 			assertEquals(1, wview.inliers.size);
 			SceneWorkingGraph.InlierInfo inlier = wview.inliers.get(0);
 
@@ -166,9 +162,10 @@ class TestMetricFromUncalibratedPairwiseGraph extends BoofStandardJUnit {
 			assertEquals(viewIds.size(), inlier.views.size);
 			assertEquals(viewIds.size(), inlier.observations.size);
 			assertEquals(viewId, inlier.views.get(0).id);
-			for (int checkIdx = 0; checkIdx < viewIds.size(); checkIdx++) {
-				final int c = checkIdx;
-				DogArray_I32 obs = inlier.observations.get(checkIdx);
+			for (int inlierIdx = 0; inlierIdx < viewIds.size(); inlierIdx++) {
+				int offset = (idx + inlierIdx)%viewIds.size();
+				final int c = offset;
+				DogArray_I32 obs = inlier.observations.get(inlierIdx);
 				obs.forIdx(( i, value ) -> assertEquals(i*2 + 1 + c, value));
 			}
 		});

@@ -66,6 +66,7 @@ class TestSceneWorkingGraph extends BoofStandardJUnit {
 
 		expected.views.add(new PairwiseImageGraph.View());
 		expected.observations.resize(4,p->p.setTo(1,2,3));
+		expected.scoreGeometric = 1.5;
 
 		found.setTo(expected);
 
@@ -73,5 +74,6 @@ class TestSceneWorkingGraph extends BoofStandardJUnit {
 		assertSame(expected.views.get(0), found.views.get(0));
 		assertEquals(4, found.observations.size);
 		found.observations.forEach(v->assertEquals(3, v.size));
+		assertEquals(expected.scoreGeometric, found.scoreGeometric);
 	}
 }

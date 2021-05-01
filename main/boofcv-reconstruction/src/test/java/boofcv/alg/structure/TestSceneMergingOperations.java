@@ -22,6 +22,7 @@ import boofcv.alg.structure.MetricFromUncalibratedPairwiseGraph.PairwiseViewScen
 import boofcv.alg.structure.MetricFromUncalibratedPairwiseGraph.ViewScenes;
 import boofcv.alg.structure.SceneMergingOperations.SceneCommonCounts;
 import boofcv.alg.structure.SceneMergingOperations.SelectedScenes;
+import boofcv.alg.structure.SceneMergingOperations.SelectedViews;
 import boofcv.testing.BoofStandardJUnit;
 import georegression.struct.se.Se3_F64;
 import georegression.struct.se.SpecialEuclideanOps_F64;
@@ -116,6 +117,7 @@ public class TestSceneMergingOperations extends BoofStandardJUnit {
 		var dst = new SceneWorkingGraph();
 
 		var src_to_dst = new ScaleSe3_F64();
+		src_to_dst.scale = 2.5;
 		src_to_dst.transform.T.x = 10;
 
 		// Add views. Some will be common and some will not be
@@ -135,6 +137,8 @@ public class TestSceneMergingOperations extends BoofStandardJUnit {
 
 			wa.intrinsic.f = i;
 			wb.intrinsic.f = j;
+
+			wa.world_to_view.T.setTo(i, 0, 0);
 		}
 
 		// Call the function being tested
@@ -150,7 +154,7 @@ public class TestSceneMergingOperations extends BoofStandardJUnit {
 		// Views that were unique to src should have been converted
 		for (int i = 0; i < 3; i++) {
 			String id = "" + i;
-			assertEquals(10.0, dst.views.get(id).world_to_view.T.x);
+			assertEquals(i*2.5 - 10.0, dst.views.get(id).world_to_view.T.x);
 			assertEquals(i, dst.views.get(id).intrinsic.f);
 		}
 	}
@@ -163,18 +167,18 @@ public class TestSceneMergingOperations extends BoofStandardJUnit {
 	}
 
 	/**
-	 * Merge views when seed set views are involved
+	 * Test that makes sure the src is copied into the dst only if it has a better estimate
 	 */
-	@Test void mergeViews_Seeds() {
+	@Test void mergeViews_CopySrcOnlyIfBetter() {
 		fail("implement");
 	}
 
-	@Test void findTransformSe3() {
+	@Test void selectViewsToEstimateTransform() {
 		var src = new SceneWorkingGraph();
 		var dst = new SceneWorkingGraph();
 
 		var src_to_dst = new Se3_F64();
-		SpecialEuclideanOps_F64.eulerXyz(1, 2, -1, 0.1, 0.2, -0.03, src_to_dst);
+		SpecialEuclideanOps_F64.eulerXyz(1, 2, -1, 0, 0, 0, src_to_dst);
 
 		// All views are common with a noise free fixed transform between the two scenes
 		for (int i = 0; i < 5; i++) {
@@ -187,18 +191,17 @@ public class TestSceneMergingOperations extends BoofStandardJUnit {
 			SceneWorkingGraph.View wa = src.addView(a);
 			SceneWorkingGraph.View wb = dst.addView(b);
 
-			SpecialEuclideanOps_F64.eulerXyz(rand.nextGaussian(), rand.nextGaussian(), rand.nextGaussian(),
-					rand.nextGaussian(), rand.nextGaussian(), rand.nextGaussian(), wa.world_to_view);
-
-			wa.world_to_view.concat(src_to_dst, wb.world_to_view);
+			// The best pair will be the pair with the highest minimum score
+			wa.inliers.grow().scoreGeometric = 11 - i;
+			wb.inliers.grow().scoreGeometric = i;
 		}
 
-		var found = new ScaleSe3_F64();
+		var found = new SelectedViews();
 		var alg = new SceneMergingOperations();
-		alg.findTransform(null, src, dst, found);
+		alg.selectViewsToEstimateTransform(src, dst, found);
 
-		SpecialEuclideanOps_F64.isIdentical(src_to_dst, found.transform, 1e-4, 1e-4);
-		fail("Check scale");
+		assertSame(src.listViews.get(4), found.src);
+		assertSame(dst.listViews.get(4), found.dst);
 	}
 
 	@Test void adjustSceneCounts() {

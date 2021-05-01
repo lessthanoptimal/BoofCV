@@ -84,7 +84,7 @@ public class SceneMergingOperations implements VerbosePrint {
 	// -1 if it's not int common list
 	DogArray_I32 zeroFeatureToCommonIndex = new DogArray_I32();
 
-	PrintStream verbose;
+	@Nullable PrintStream verbose;
 
 	/**
 	 * Creates a sparse data structure that stores the number of views that each scene shares with all
@@ -177,20 +177,19 @@ public class SceneMergingOperations implements VerbosePrint {
 		for (int srcViewIdx = 0; srcViewIdx < src.listViews.size(); srcViewIdx++) {
 			SceneWorkingGraph.View srcView = src.listViews.get(srcViewIdx);
 
+			boolean copySrc = true;
 			SceneWorkingGraph.View dstView;
 			if (dst.views.containsKey(srcView.pview.id)) {
-				// If both scenes have the same view, go with the one that has be most reliable estimate
+				// Both contain the same scene
 				dstView = dst.views.get(srcView.pview.id);
 
-				// TODO handle this later
-				// Ignore the special case where one of them is in the seed set of views
-				if (srcView.inliers.isEmpty() || dstView.inliers.isEmpty())
-					continue;
+				// Only copy the src value if it is "better" than the dst
+				copySrc = srcView.getBestInlierScore() > dstView.getBestInlierScore();
 
 				if (verbose != null) {
-					verbose.printf("%-7s view='%s', sets={%d %d}, inliers: %d vs %d, src.f=%.1f dst.f=%.1f\n",
-							"MERGE", srcView.pview.id, srcView.inliers.size, dstView.inliers.size,
-							srcView.countLargestInlierSet(), dstView.countLargestInlierSet(),
+					verbose.printf("%-7s view='%s', sets={%d %d}, scores: %.1f vs %.1f, src.f=%.1f dst.f=%.1f\n",
+							copySrc ? "SRC" : "DST", srcView.pview.id, srcView.inliers.size, dstView.inliers.size,
+							srcView.getBestInlierScore(), dstView.getBestInlierScore(),
 							srcView.intrinsic.f, dstView.intrinsic.f);
 				}
 			} else {
@@ -203,15 +202,20 @@ public class SceneMergingOperations implements VerbosePrint {
 			// Create a list of views that were modified so we can sanity check them later on
 			modifiedViews.add(dstView);
 
-			// Update/Create the view in the dst scene
-			dstView.imageDimension.setTo(srcView.imageDimension);
-			dstView.intrinsic.setTo(srcView.intrinsic);
+			// Always copy the src inliers into the dst. This ensures islands do not form
 			for (int infoIdx = 0; infoIdx < srcView.inliers.size; infoIdx++) {
 				// It's not uncommon to have the same views in both inlier sets. For now will not optimize this part
 				// of the code since there being some redundancy here isn't likely to cause any harm
 				dstView.inliers.grow().setTo(srcView.inliers.get(infoIdx));
 			}
 
+			// Stop here if the dst has a better estimate
+			if (!copySrc)
+				continue;
+
+			// Update/Create the view in the dst scene
+			dstView.imageDimension.setTo(srcView.imageDimension);
+			dstView.intrinsic.setTo(srcView.intrinsic);
 			// Copy the src transform since we need to modify it
 			src_to_view.setTo(srcView.world_to_view);
 			// Convert it to the same scale as the dst
@@ -222,11 +226,11 @@ public class SceneMergingOperations implements VerbosePrint {
 	}
 
 	/**
-	 * Using the common views between the scenes, compute the average transform to go from 'src' to 'dst' coordinate
-	 * system
+	 * Determines the transform (scale and SE3) between the two scenes. This is done using a single view
 	 */
-	public boolean findTransform( LookUpSimilarImages db,
-								  SceneWorkingGraph src, SceneWorkingGraph dst, ScaleSe3_F64 src_to_dst ) {
+	public boolean selectViewsToEstimateTransform(
+			SceneWorkingGraph src, SceneWorkingGraph dst, SelectedViews selectedPair ) {
+
 		double bestScore = 0.0;
 		SceneWorkingGraph.View selectedSrc = null;
 		SceneWorkingGraph.View selectedDst = null;
@@ -239,14 +243,13 @@ public class SceneMergingOperations implements VerbosePrint {
 			SceneWorkingGraph.View srcView = src.listViews.get(srcViewIdx);
 			SceneWorkingGraph.View dstView = dst.views.get(srcView.pview.id);
 
-			// Skip if the view is unknown in dst or if either of them are from the seed set
-			if (dstView == null || srcView.inliers.isEmpty() || dstView.inliers.isEmpty())
-				continue; // TODO this doesn't really check if seed set
+			if (dstView == null)
+				continue;
 
 			totalCommon++;
 
 			// Evaluate the quality of 3D information
-			double score = Math.min(srcView.countLargestInlierSet(), dstView.countLargestInlierSet());
+			double score = Math.min(srcView.getBestInlierScore(), dstView.getBestInlierScore());
 			if (score <= bestScore)
 				continue;
 
@@ -255,8 +258,8 @@ public class SceneMergingOperations implements VerbosePrint {
 			selectedDst = dstView;
 		}
 
-		if (selectedSrc == null || selectedDst == null) {
-			if (verbose != null) verbose.println("Select merge views: Failed.");
+		// Return false if it couldn't
+		if (selectedSrc == null) {
 			return false;
 		}
 
@@ -264,14 +267,22 @@ public class SceneMergingOperations implements VerbosePrint {
 			verbose.println("Select merge views: candidates=" + totalCommon + " bestScore=" + bestScore +
 					" id='" + selectedSrc.pview.id + "'");
 
-		return computeSceneToSceneTransform(db, src, dst, selectedSrc, selectedDst, src_to_dst);
+		selectedPair.src = selectedSrc;
+		selectedPair.dst = selectedDst;
+
+		return true;
 	}
 
-	private boolean computeSceneToSceneTransform( LookUpSimilarImages db,
-												  SceneWorkingGraph src, SceneWorkingGraph dst,
-												  SceneWorkingGraph.View selectedSrc,
-												  SceneWorkingGraph.View selectedDst,
-												  ScaleSe3_F64 src_to_dst ) {
+	/**
+	 * Computes the transform between the two views in different scenes. This is done by computing the depth
+	 * for all common image features. The depth is used to estimate the scale difference between the scenes.
+	 * After that finding the SE3 transform is trivial.
+	 */
+	public boolean computeSceneTransform( LookUpSimilarImages db,
+										  SceneWorkingGraph src, SceneWorkingGraph dst,
+										  SceneWorkingGraph.View selectedSrc,
+										  SceneWorkingGraph.View selectedDst,
+										  ScaleSe3_F64 src_to_dst ) {
 		// Sanity check
 		BoofMiscOps.checkTrue(selectedSrc.pview == selectedDst.pview);
 
@@ -327,7 +338,7 @@ public class SceneMergingOperations implements VerbosePrint {
 	 */
 	private void printInlierViews( SceneWorkingGraph.View selectedSrc, SceneWorkingGraph.View selectedDst ) {
 		for (int infoIdx = 0; infoIdx < selectedSrc.inliers.size; infoIdx++) {
-			verbose.print("src.inliers["+infoIdx+"].views = { ");
+			verbose.print("src.inliers[" + infoIdx + "].views = { ");
 			SceneWorkingGraph.InlierInfo inliers = selectedSrc.inliers.get(infoIdx);
 			for (int i = 0; i < inliers.views.size; i++) {
 				verbose.print("'" + inliers.views.get(i).id + "' ");
@@ -336,7 +347,7 @@ public class SceneMergingOperations implements VerbosePrint {
 		}
 
 		for (int infoIdx = 0; infoIdx < selectedDst.inliers.size; infoIdx++) {
-			verbose.print("dst.inliers["+infoIdx+"].views = { ");
+			verbose.print("dst.inliers[" + infoIdx + "].views = { ");
 			SceneWorkingGraph.InlierInfo inliers = selectedDst.inliers.get(infoIdx);
 			for (int i = 0; i < inliers.views.size; i++) {
 				verbose.print("'" + inliers.views.get(i).id + "' ");
@@ -414,9 +425,9 @@ public class SceneMergingOperations implements VerbosePrint {
 	 * @param inliers List of image features that were part of the inlier set in all the views
 	 * @return List of observations in each view (expet the target) that are part of the inler and common set
 	 */
-	private List<DogArray<Point2D_F64>> getCommonFeaturePixelsViews( LookUpSimilarImages db,
-																	 SceneWorkingGraph workingGraph,
-																	 SceneWorkingGraph.InlierInfo inliers ) {
+	List<DogArray<Point2D_F64>> getCommonFeaturePixelsViews( LookUpSimilarImages db,
+															 SceneWorkingGraph workingGraph,
+															 SceneWorkingGraph.InlierInfo inliers ) {
 		List<DogArray<Point2D_F64>> listViewPixels = new ArrayList<>();
 
 		// Which features are inliers in view[0] / common view
@@ -427,6 +438,7 @@ public class SceneMergingOperations implements VerbosePrint {
 		for (int viewIdx = 1; viewIdx < numViews; viewIdx++) {
 			// Retrieve the feature pixel coordinates for this view
 			db.lookupPixelFeats(inliers.views.get(viewIdx).id, dbPixels);
+
 			// Which features are part of the inlier set
 			DogArray_I32 inlierIdx = inliers.observations.get(viewIdx);
 			BoofMiscOps.checkEq(viewZeroInlierIdx.size, inlierIdx.size, "Inliers count should be the same");
@@ -600,5 +612,10 @@ public class SceneMergingOperations implements VerbosePrint {
 	public static class SelectedScenes {
 		public int sceneA;
 		public int sceneB;
+	}
+
+	public static class SelectedViews {
+		public SceneWorkingGraph.View src;
+		public SceneWorkingGraph.View dst;
 	}
 }
