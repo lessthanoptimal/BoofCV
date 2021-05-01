@@ -86,7 +86,7 @@ public class MockLookupSimilarImagesRealistic implements LookUpSimilarImages {
 	public MockLookupSimilarImagesRealistic pathLine( int numViews, double stepLength, double pathLength, int numViewConnect ) {
 		double r = 0.5;
 
-		for (Point3D_F64 X : UtilPoint3D_F64.random(new Point3D_F64(0, 0, 0), -r, pathLength + r, -r, r, -r, r, numFeatures, rand)) {
+		for (Point3D_F64 X : UtilPoint3D_F64.random(new Point3D_F64(0, 0, 2.0*r), -r, pathLength + r, -r, r, -r, r, numFeatures, rand)) {
 			Feature f = new Feature();
 			f.world.setTo(X);
 			points.add(f);
@@ -99,8 +99,8 @@ public class MockLookupSimilarImagesRealistic implements LookUpSimilarImages {
 
 			// Move the camera down the x-axis and push back enough to see most of the points
 			camera_to_world.T.x = stepLength*viewCnt;
-			camera_to_world.T.y = rand.nextGaussian()*0.05;
-			camera_to_world.T.z = rand.nextGaussian()*0.05 - 2*r;
+			camera_to_world.T.y = rand.nextGaussian()*0.1;
+			camera_to_world.T.z = rand.nextGaussian()*0.05;
 
 			// Point camera towards the cloud of points
 			double noiseRotX = rand.nextGaussian()*0.01;

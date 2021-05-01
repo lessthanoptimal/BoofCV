@@ -52,6 +52,11 @@ public class BoofMiscOps {
 	public static int VERBOSE_PREFIX_LENGTH = 6;
 
 	/**
+	 * Prints a table explaining what the prefixes are
+	 */
+	public static boolean VERBOSE_PRINT_TABLE = true;
+
+	/**
 	 * Computes the elapsed time in calling the provided function in nano seconds
 	 */
 	public static long timeNano( BoofLambdas.ProcessCall process ) {
@@ -853,18 +858,24 @@ public class BoofMiscOps {
 		// Add tabs to children when in verbose mode
 		numIndents += 1;
 		for (int i = 0; i < children.length; i++) {
-			String pre = nameToShort(children[i].getClass().getSimpleName(), VERBOSE_PREFIX_LENGTH);
-			var tabbed = new PrintStreamInjectIndent(pre, numIndents, originalOut);
+			PrintStream tabbed = addPrefix(children[i], numIndents, originalOut);
 			children[i].setVerbose(tabbed, configuration);
 		}
 	}
 
 	public static PrintStream addPrefix( VerbosePrint owner, PrintStream out ) {
+		return addPrefix(owner, 1, out);
+	}
+
+	public static PrintStream addPrefix( VerbosePrint owner, int numIndents, PrintStream out ) {
 		if (out instanceof PrintStreamInjectIndent)
 			return out;
 
-		String pre = nameToShort(owner.getClass().getSimpleName(), VERBOSE_PREFIX_LENGTH);
-		return new PrintStreamInjectIndent(pre, 1, out);
+		String simpleName = owner.getClass().getSimpleName();
+		String pre = nameToShort(simpleName, VERBOSE_PREFIX_LENGTH);
+		if (VERBOSE_PRINT_TABLE)
+			out.println("Verbose: "+pre+" "+simpleName);
+		return new PrintStreamInjectIndent(pre, numIndents, out);
 	}
 
 	/**

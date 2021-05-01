@@ -42,8 +42,7 @@ import static org.junit.jupiter.api.Assertions.*;
  */
 class TestPairwiseGraphUtils extends BoofStandardJUnit {
 
-	@Test
-	void findCommonFeatures() {
+	@Test void findFullyConnectedTriple() {
 		PairwiseImageGraph.View seed = new PairwiseImageGraph.View();
 		seed.totalObservations = 100;
 
@@ -75,7 +74,7 @@ class TestPairwiseGraphUtils extends BoofStandardJUnit {
 		alg.viewB = seed.connections.get(0).other(seed);
 		alg.viewC = seed.connections.get(1).other(seed);
 		alg.createThreeViewLookUpTables();
-		alg.findCommonFeatures();
+		alg.findFullyConnectedTriple();
 
 		assertEquals(seed.totalObservations, alg.commonIdx.size);
 		for (int i = 0; i < alg.commonIdx.size; i++) {
@@ -83,8 +82,7 @@ class TestPairwiseGraphUtils extends BoofStandardJUnit {
 		}
 	}
 
-	@Test
-	void findCommonFeatures_list() {
+	@Test void findFullyConnectedTriple_list() {
 		PairwiseImageGraph.View seed = new PairwiseImageGraph.View();
 		seed.totalObservations = 100;
 		DogArray_I32 seedFeatsIdx = new DogArray_I32();
@@ -121,7 +119,7 @@ class TestPairwiseGraphUtils extends BoofStandardJUnit {
 		alg.viewB = seed.connections.get(0).other(seed);
 		alg.viewC = seed.connections.get(1).other(seed);
 		alg.createThreeViewLookUpTables();
-		alg.findCommonFeatures(seedFeatsIdx);
+		alg.findFullyConnectedTriple(seedFeatsIdx);
 
 		assertEquals(seed.totalObservations/2, alg.commonIdx.size);
 		for (int i = 0; i < alg.commonIdx.size; i++) {
@@ -129,8 +127,59 @@ class TestPairwiseGraphUtils extends BoofStandardJUnit {
 		}
 	}
 
-	@Test
-	void createThreeViewLookUpTables() {
+	@Test void findAllConnectedSeed() {
+		PairwiseImageGraph.View seed = new PairwiseImageGraph.View();
+		seed.totalObservations = 100;
+		DogArray_I32 seedFeatsIdx = new DogArray_I32();
+
+		for (int i = 0; i < seed.totalObservations/2; i++) {
+			seedFeatsIdx.add(i);
+		}
+
+		// Create the connections to the seed
+		for (int i = 0; i < 6; i++) {
+			PairwiseImageGraph.Motion motion = new PairwiseImageGraph.Motion();
+			motion.src = seed;
+			motion.dst = new PairwiseImageGraph.View();
+			motion.dst.totalObservations = 110; // give it a few extra and see if that causes a problem
+
+			boolean swapped = i%2==0;
+			if (swapped) {
+				PairwiseImageGraph.View tmp = motion.src;
+				motion.src = motion.dst;
+				motion.dst = tmp;
+			}
+
+			for (int j = 0; j < 50; j++) {
+				// every other one in the seed will be in the inlier set
+				if (swapped) {
+					motion.inliers.grow().setTo(j, j*2, 0);
+				} else {
+					motion.inliers.grow().setTo(j*2, j, 0);
+				}
+			}
+			// The order should not matter
+			motion.inliers.shuffle(rand);
+			seed.connections.add(motion);
+		}
+
+		// NOTE: Connections between the non-seed views is not specified since we don't care about them
+
+		// Specify which connected view to the seed we are concerned about
+		DogArray_I32 connectIdx = DogArray_I32.array(1,2,4);
+
+		// Find the common tracks
+		var commonIdx = new DogArray_I32();
+		var alg = new PairwiseGraphUtils();
+		alg.findAllConnectedSeed(seed, connectIdx, commonIdx);
+
+		assertEquals(50, commonIdx.size);
+		for (int i = 0; i < commonIdx.size; i++) {
+			assertEquals(i*2, commonIdx.get(i));
+		}
+	}
+
+	@Test void createThreeViewLookUpTables() {
 		var alg = new PairwiseGraphUtils();
 		var db = new MockLookupSimilarImages(4, 0xDEADBEEF);
 		alg.db = db;
@@ -156,8 +205,7 @@ class TestPairwiseGraphUtils extends BoofStandardJUnit {
 	}
 
 	@SuppressWarnings("IntegerDivisionInFloatingPointContext")
-	@Test
-	void createTripleFromCommon() {
+	@Test void createTripleFromCommon() {
 		var alg = new PairwiseGraphUtils();
 		var db = new MockLookupSimilarImages(4, 0xDEADBEEF);
 		alg.db = db;
@@ -192,8 +240,7 @@ class TestPairwiseGraphUtils extends BoofStandardJUnit {
 		assertEquals(2, alg.matchesTriple.size);
 	}
 
-	@Test
-	void initializeSbaSceneThreeView() {
+	@Test void initializeSbaSceneThreeView() {
 		var db = new MockLookupSimilarImages(4, 0xDEADBEEF);
 		var alg = new PairwiseGraphUtils() {
 			boolean called = false;
@@ -228,8 +275,7 @@ class TestPairwiseGraphUtils extends BoofStandardJUnit {
 		assertTrue(MatrixFeatures_DDRM.isIdentical(alg.P3, alg.structure.views.get(2).worldToView, 1e-8));
 	}
 
-	@Test
-	void estimateProjectiveCamerasRobustly() {
+	@Test void estimateProjectiveCamerasRobustly() {
 		var alg = new PairwiseGraphUtils(new ConfigProjectiveReconstruction());
 		var db = new MockLookupSimilarImages(4, 0xDEADBEEF);
 		alg.db = db;
@@ -239,7 +285,7 @@ class TestPairwiseGraphUtils extends BoofStandardJUnit {
 
 		// Create boilerplate input for RANSAC
 		alg.createThreeViewLookUpTables();
-		alg.findCommonFeatures();
+		alg.findFullyConnectedTriple();
 		alg.createTripleFromCommon();
 
 		// Simple test where we see how many inliers there are
@@ -257,8 +303,7 @@ class TestPairwiseGraphUtils extends BoofStandardJUnit {
 		assertFalse(MatrixFeatures_DDRM.isIdentity(alg.P3, 1e-8));
 	}
 
-	@Test
-	void triangulateFeatures() {
+	@Test void triangulateFeatures() {
 		var alg = new PairwiseGraphUtils(new ConfigProjectiveReconstruction());
 		var db = new MockLookupSimilarImages(4, 0xDEADBEEF);
 
@@ -310,8 +355,7 @@ class TestPairwiseGraphUtils extends BoofStandardJUnit {
 		}
 	}
 
-	@Test
-	void initializeSbaObservationsThreeView() {
+	@Test void initializeSbaObservationsThreeView() {
 		var alg = new PairwiseGraphUtils();
 		var db = new MockLookupSimilarImages(4, 0xDEADBEEF);
 
@@ -343,8 +387,7 @@ class TestPairwiseGraphUtils extends BoofStandardJUnit {
 		}
 	}
 
-	@Test
-	void createTableViewAtoB() {
+	@Test void createTableViewAtoB() {
 		// Create a randomized table showing how features are matched between the two views
 		DogArray_I32 table_src_to_dst = DogArray_I32.range(0, 50);
 		PrimitiveArrays.shuffle(table_src_to_dst.data, 0, table_src_to_dst.size, rand);
@@ -387,8 +430,7 @@ class TestPairwiseGraphUtils extends BoofStandardJUnit {
 		}
 	}
 
-	@Test
-	void saveRansacInliers() {
+	@Test void saveRansacInliers() {
 		var alg = new PairwiseGraphUtils();
 
 		SceneWorkingGraph.View viewA = new SceneWorkingGraph.View();

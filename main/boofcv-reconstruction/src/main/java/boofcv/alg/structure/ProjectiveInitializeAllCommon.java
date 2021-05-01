@@ -71,12 +71,8 @@ public class ProjectiveInitializeAllCommon implements VerbosePrint {
 	@Getter @Setter PairwiseGraphUtils utils;
 
 	/**
-	 * List of feature indexes in the seed view that are the inliers from robust model matching.
-	 */
-	protected @Getter final DogArray_I32 inlierToSeed = new DogArray_I32();
-	/**
-	 * List of feature indexes for connected views. Order is in `seedConnIdx` order. Each array of inliers points
-	 * to the same feature as each index in 'inlierToSeed'.
+	 * List of feature indexes for each view that are part of the inlier set. The seed view is at index 0. The other
+	 * indexes are in order of 'seedConnIdx'.
 	 */
 	protected @Getter final DogArray<DogArray_I32> inlierIndexes =
 			new DogArray<>(DogArray_I32::new, DogArray_I32::reset);
@@ -140,10 +136,11 @@ public class ProjectiveInitializeAllCommon implements VerbosePrint {
 		// initialize data structures
 		utils.db = db;
 		viewsByStructureIndex.reset();
+		inlierIndexes.resetResize(1 + seedConnIdx.size);
 
 		// find the 3 view combination with the best score
 		if (!selectInitialTriplet(seed, seedConnIdx, selectedTriple)) {
-			if (verbose != null) verbose.println("failed to select initial triplet");
+			if (verbose != null) verbose.println("FAILED: Select initial triplet");
 			return false;
 		}
 
@@ -152,17 +149,22 @@ public class ProjectiveInitializeAllCommon implements VerbosePrint {
 		utils.viewB = utils.seed.connections.get(selectedTriple[0]).other(seed);
 		utils.viewC = utils.seed.connections.get(selectedTriple[1]).other(seed);
 		utils.createThreeViewLookUpTables();
-		utils.findCommonFeatures(seedFeatsIdx);
+		utils.findFullyConnectedTriple(seedFeatsIdx);
 
 		if (verbose != null) {
 			verbose.println("Selected Triplet: seed='" + utils.seed.id + "' viewB='" + utils.viewB.id + "' viewC='" +
 					utils.viewC.id + "' common.size=" + utils.commonIdx.size + " connections.size=" + seedConnIdx.size);
 		}
 
+		if (utils.commonIdx.isEmpty()) {
+			if (verbose != null) verbose.println("FAILED: No common features found");
+			return false;
+		}
+
 		// Estimate the initial projective cameras using trifocal tensor
 		utils.createTripleFromCommon();
 		if (!utils.estimateProjectiveCamerasRobustly()) {
-			if (verbose != null) verbose.println("failed to created projective from initial triplet");
+			if (verbose != null) verbose.println("FAILED: Created projective from initial triplet");
 			return false;
 		}
 
@@ -175,7 +177,7 @@ public class ProjectiveInitializeAllCommon implements VerbosePrint {
 			initializeStructureForAllViews(db, utils.ransac.getMatchSet().size(), seed, seedConnIdx);
 
 			if (!findRemainingCameraMatrices(db, seed, seedConnIdx)) {
-				if (verbose != null) verbose.println("Finding remaining cameras failed. TODO recover from this");
+				if (verbose != null) verbose.println("FAILED: Finding remaining cameras. TODO recover from this");
 				return false;
 			}
 		} else {
@@ -257,13 +259,16 @@ public class ProjectiveInitializeAllCommon implements VerbosePrint {
 		final int numInliers = utils.ransac.getMatchSet().size();
 		seedToStructure.resize(viewA.totalObservations);
 		seedToStructure.fill(-1); // -1 indicates no match
+		DogArray_I32 inlierToSeed = inlierIndexes.get(0);
 		inlierToSeed.resize(numInliers);
 		for (int i = 0; i < numInliers; i++) {
 			int inputIdx = utils.ransac.getInputIndex(i);
 
 			// table to go from inlier list into seed feature index
 			inlierToSeed.data[i] = utils.commonIdx.get(inputIdx);
+
 			// seed feature index into the output structure index
+			BoofMiscOps.checkTrue(seedToStructure.data[inlierToSeed.data[i]]==-1);
 			seedToStructure.data[inlierToSeed.data[i]] = i;
 		}
 	}
@@ -320,10 +325,12 @@ public class ProjectiveInitializeAllCommon implements VerbosePrint {
 	 * Uses the triangulated points and observations in the root view to estimate the camera matrix for
 	 * all the views which are remaining. We are assuming that outliers have already been removed.
 	 *
+	 * @param seedConnIdx (Input) Specifies which connections in 'seed.connections' are to be used.
 	 * @return true if successful or false if not
 	 */
 	boolean findRemainingCameraMatrices( LookUpSimilarImages db, View seed, DogArray_I32 seedConnIdx ) {
-		BoofMiscOps.checkTrue(inlierToSeed.size == utils.inliersThreeView.size());
+		int numInliers = inlierIndexes.get(0).size;
+		BoofMiscOps.checkTrue(numInliers == utils.inliersThreeView.size());
 
 		// Look up the 3D coordinates of features from the scene's structure previously computed
 		points3D.reset(); // points in 3D
@@ -333,8 +340,8 @@ public class ProjectiveInitializeAllCommon implements VerbosePrint {
 
 		// contains associated pairs of pixel observations
 		// save a call to db by using the previously loaded points for the seed view
-		assocPixel.resize(inlierToSeed.size);
-		for (int i = 0; i < inlierToSeed.size; i++) {
+		assocPixel.resize(numInliers);
+		for (int i = 0; i < numInliers; i++) {
 			// inliers from triple RANSAC
 			// each of these inliers was declared a feature in the world reference frame
 			assocPixel.get(i).p1.setTo(utils.inliersThreeView.get(i).p1);
@@ -369,7 +376,7 @@ public class ProjectiveInitializeAllCommon implements VerbosePrint {
 			// observation of features
 			SceneObservations.View sbaObsView = utils.observations.getView(indexSbaView);
 			checkTrue(sbaObsView.size() == 0, "Must be reset to initial state first");
-			for (int i = 0; i < inlierToSeed.size; i++) {
+			for (int i = 0; i < numInliers; i++) {
 				Point2D_F64 p = assocPixel.get(i).p2;
 				sbaObsView.add(i, (float)p.x, (float)p.y);
 			}
@@ -390,6 +397,7 @@ public class ProjectiveInitializeAllCommon implements VerbosePrint {
 	 * @return true if successful
 	 */
 	boolean computeCameraMatrix( View seed, Motion edge, DogArray<Point2D_F64> featsB, DMatrixRMaj cameraMatrix ) {
+		DogArray_I32 inlierToSeed = inlierIndexes.get(0);
 		BoofMiscOps.checkTrue(assocPixel.size == inlierToSeed.size);
 
 		// how to convert a feature in the seed to one in viewI
@@ -418,9 +426,9 @@ public class ProjectiveInitializeAllCommon implements VerbosePrint {
 	 * @param seedConnIdx Which edges in seed to use
 	 */
 	protected void createObservationsForBundleAdjustment( DogArray_I32 seedConnIdx ) {
+		DogArray_I32 inlierToSeed = inlierIndexes.get(0);
 		// seed view + the motions
-		utils.observations.initialize(seedConnIdx.size + 1);
-		inlierIndexes.resize(seedConnIdx.size);
+		utils.observations.initialize(inlierIndexes.size);
 
 		// Observations for the seed view are a special case
 		{
@@ -444,7 +452,7 @@ public class ProjectiveInitializeAllCommon implements VerbosePrint {
 			BoofMiscOps.offsetPixels(utils.featsB.toList(), -utils.dimenB.width/2, -utils.dimenB.height/2);
 
 			// indicate which observation from this view contributed to which 3D feature
-			DogArray_I32 connInlierIndexes = inlierIndexes.get(motionIdx);
+			DogArray_I32 connInlierIndexes = inlierIndexes.get(motionIdx+1);
 			connInlierIndexes.resize(inlierToSeed.size);
 
 			for (int epipolarInlierIdx = 0; epipolarInlierIdx < m.inliers.size; epipolarInlierIdx++) {
@@ -478,8 +486,9 @@ public class ProjectiveInitializeAllCommon implements VerbosePrint {
 		viewIds.clear();
 		dimensions.resize(numViews);
 		cameraMatrices.resize(numViews - 1);
-		observations.resize(inlierToSeed.size);
+		observations.resize(inlierIndexes.get(0).size);
 
+		// pre-allocate memory
 		for (int obsIdx = 0; obsIdx < observations.size; obsIdx++) {
 			observations.get(obsIdx).resize(numViews);
 		}

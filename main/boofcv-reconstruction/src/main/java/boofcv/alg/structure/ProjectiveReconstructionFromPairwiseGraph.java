@@ -111,14 +111,15 @@ public class ProjectiveReconstructionFromPairwiseGraph extends ReconstructionFro
 		// TODO redo every component to use scaled pixels
 
 		// Find the common features
-		DogArray_I32 common = utils.findCommonFeatures(info.seed, info.motions);
-		if (common.size < 6) // if less than the minimum it will fail
+		var commonPairwise = new DogArray_I32();
+		utils.findAllConnectedSeed(info.seed, info.motions, commonPairwise);
+		if (commonPairwise.size < 6) // if less than the minimum it will fail
 			return false;
 
-		if (verbose != null) verbose.println("Selected seed.id=" + info.seed.id + " common=" + common.size);
+		if (verbose != null) verbose.println("Selected seed.id=" + info.seed.id + " common=" + commonPairwise.size);
 
 		// TODO build up a scene so that SBA can be run on the whole thing
-		if (!estimateInitialSceneFromSeed(db, info, common))
+		if (!estimateInitialSceneFromSeed(db, info, commonPairwise))
 			return false;
 
 		// NOTE: Computing H to scale camera matrices didn't prevent them from vanishing

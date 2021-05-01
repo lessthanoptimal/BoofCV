@@ -21,6 +21,7 @@ package boofcv.alg.structure;
 import boofcv.abst.geo.selfcalib.ProjectiveToMetricCameras;
 import boofcv.alg.geo.MetricCameras;
 import boofcv.alg.geo.bundle.BundleAdjustmentOps;
+import boofcv.alg.structure.SceneMergingOperations.SelectedViews;
 import boofcv.factory.geo.ConfigSelfCalibDualQuadratic;
 import boofcv.factory.geo.FactoryMultiView;
 import boofcv.misc.BoofMiscOps;
@@ -30,6 +31,7 @@ import lombok.Getter;
 import lombok.Setter;
 import org.ddogleg.struct.DogArray;
 import org.ddogleg.struct.DogArray_I32;
+import org.ddogleg.struct.FastAccess;
 import org.ddogleg.struct.VerbosePrint;
 import org.ejml.data.DMatrixRMaj;
 import org.jetbrains.annotations.Nullable;
@@ -41,7 +43,6 @@ import java.util.Map;
 import java.util.Set;
 
 import static boofcv.misc.BoofMiscOps.checkEq;
-import static boofcv.misc.BoofMiscOps.checkTrue;
 
 /**
  * Fully computes views (intrinsics + SE3) for each view and saves which observations were inliers. This should
@@ -95,6 +96,9 @@ public class MetricFromUncalibratedPairwiseGraph extends ReconstructionFromPairw
 	PairwiseViewScenes nodeViews = new PairwiseViewScenes();
 
 	MetricSanityChecks metricChecks = new MetricSanityChecks();
+
+	// Storage for selected views to estimate the transform between the two scenes
+	SelectedViews selectedViews = new SelectedViews();
 
 	public MetricFromUncalibratedPairwiseGraph( PairwiseGraphUtils utils ) {
 		super(utils);
@@ -170,6 +174,9 @@ public class MetricFromUncalibratedPairwiseGraph extends ReconstructionFromPairw
 	 */
 	private void spawnSeeds( LookUpSimilarImages db, PairwiseImageGraph pairwise, List<SeedInfo> seeds ) {
 		if (verbose != null) verbose.println("ENTER spawn seeds.size=" + seeds.size());
+
+		var commonPairwise = new DogArray_I32();
+
 		for (int seedIdx = 0; seedIdx < seeds.size(); seedIdx++) {
 			SeedInfo info = seeds.get(seedIdx);
 			if (verbose != null)
@@ -178,16 +185,17 @@ public class MetricFromUncalibratedPairwiseGraph extends ReconstructionFromPairw
 			// TODO reject a seed if it's too similar to other seeds? Should that be done earlier?
 
 			// Find the common features
-			DogArray_I32 common = utils.findCommonFeatures(info.seed, info.motions);
-			if (common.size < 6) {// if less than the minimum it will fail
-				if (verbose != null) verbose.println("  FAILED: Too few common features seed.id=" + info.seed.id);
+			utils.findAllConnectedSeed(info.seed, info.motions, commonPairwise);
+			if (commonPairwise.size < 6) {// if less than the minimum it will fail
+				if (verbose != null) verbose.println("  FAILED: Too few common features. seed.id=" + info.seed.id);
 				continue;
 			}
 
-			if (verbose != null) verbose.println("  Selected seed.id='" + info.seed.id + "' common=" + common.size);
+			if (verbose != null)
+				verbose.println("  Selected seed.id='" + info.seed.id + "' common=" + commonPairwise.size);
 
-			if (!estimateProjectiveSceneFromSeed(db, info, common)) {
-				if (verbose != null) verbose.println("  FAILED: Projective estimate seed.id='" + info.seed.id);
+			if (!estimateProjectiveSceneFromSeed(db, info, commonPairwise)) {
+				if (verbose != null) verbose.println("  FAILED: Projective estimate. seed.id='" + info.seed.id + "'");
 				continue;
 			}
 
@@ -197,7 +205,7 @@ public class MetricFromUncalibratedPairwiseGraph extends ReconstructionFromPairw
 
 			// Elevate initial seed to metric
 			if (!projectiveSeedToMetric(pairwise, scene)) {
-				if (verbose != null) verbose.println("  FAILED: Projective to metric seed.id='" + info.seed.id);
+				if (verbose != null) verbose.println("  FAILED: Projective to metric. seed.id='" + info.seed.id + "'");
 				// reclaim the failed graph
 				scenes.removeTail();
 				continue;
@@ -307,7 +315,7 @@ public class MetricFromUncalibratedPairwiseGraph extends ReconstructionFromPairw
 		if (nodeViews.getView(pview).viewedBy.size == 0)
 			return true;
 
-		// If another scene also occupies the view then we can only expand from it if it is part of the seeds set
+		// If another scene also occupies the view then we can only expand from it if it is part of the seed set
 		// The idea is that the seed set could have produced a bad reconstruction that needs to be jumped over
 		ViewScenes views = nodeViews.getView(pview);
 		boolean usable = true;
@@ -317,7 +325,7 @@ public class MetricFromUncalibratedPairwiseGraph extends ReconstructionFromPairw
 
 			// If it has an inlier set it was spawned outside of the seed set (except for the seed view)
 			// and we should not expand in to it
-			if (!viewsByScene.views.get(pview.id).inliers.isEmpty()) {
+			if (!viewsByScene.isSeedSet(pview.id)) {
 				usable = false;
 				break;
 			}
@@ -374,9 +382,13 @@ public class MetricFromUncalibratedPairwiseGraph extends ReconstructionFromPairw
 			mergeOps.adjustSceneCounts(src, nodeViews, false);
 			mergeOps.adjustSceneCounts(dst, nodeViews, false);
 
-			// Determine how to convert the coordinate systems
-			if (!mergeOps.findTransform(db, src, dst, src_to_dst))
-				throw new RuntimeException("Merge fails. Unable to determine src_to_dst. What to do?");
+			// Select which view pair to determine the relationship between the scenes from
+			if (!mergeOps.selectViewsToEstimateTransform(src, dst, selectedViews))
+				throw new RuntimeException("Merge failed. Unable to selected a view pair");
+
+			// Estimate the transform from the pair
+			if (!mergeOps.computeSceneTransform(db, src, dst, selectedViews.src, selectedViews.dst, src_to_dst))
+				throw new RuntimeException("Merge failed. Unable to determine transform");
 
 			int dstViewCountBefore = dst.listViews.size();
 
@@ -489,24 +501,26 @@ public class MetricFromUncalibratedPairwiseGraph extends ReconstructionFromPairw
 		}
 
 		// Save the results to the working graph
-		saveMetricSeed(pairwise, viewIds, dimensions.toList(),
-				initProjective.getInlierToSeed(), initProjective.getInlierIndexes(), results, scene);
+		saveMetricSeed(pairwise, viewIds, dimensions.toList(), initProjective.getInlierIndexes(), results, scene);
 
 		return true;
 	}
 
 	/**
-	 * Saves the elevated metric results to the scene.
+	 * Saves the elevated metric results to the scene. Each view is given a copy of the inlier that has been
+	 * adjusted so that it is view zero.
 	 *
-	 * @param inlierToSeed Indexes of observations which are part of the inlier set
-	 * @param inlierToOther Indexes of observations for all the other views which are part of the inlier set.
+	 * @param viewInlierIndexes Which observations in each view are part of the inlier set
 	 */
 	void saveMetricSeed( PairwiseImageGraph graph, List<String> viewIds, List<ImageDimension> dimensions,
-						 DogArray_I32 inlierToSeed,
-						 DogArray<DogArray_I32> inlierToOther,
+						 FastAccess<DogArray_I32> viewInlierIndexes,
 						 MetricCameras results,
 						 SceneWorkingGraph scene ) {
 		checkEq(viewIds.size(), results.motion_1_to_k.size + 1, "Implicit view[0] no included");
+		checkEq(viewIds.size(), viewInlierIndexes.size());
+
+		// Save the number of views in the seed
+		scene.numSeedViews = viewIds.size();
 
 		// Save the metric views
 		for (int i = 0; i < viewIds.size(); i++) {
@@ -518,24 +532,27 @@ public class MetricFromUncalibratedPairwiseGraph extends ReconstructionFromPairw
 			wview.imageDimension.setTo(dimensions.get(i));
 		}
 
-		// Save the inliers used to construct the metric scene
-		SceneWorkingGraph.View wtarget = scene.lookupView(viewIds.get(0));
-		checkEq(wtarget.inliers.size, 0, "There should be at most one set of inliers per view");
-		SceneWorkingGraph.InlierInfo inlier = wtarget.inliers.grow();
-		inlier.views.resize(viewIds.size());
-		inlier.observations.resetResize(viewIds.size());
-		for (int viewIdx = 0; viewIdx < viewIds.size(); viewIdx++) {
-			inlier.views.set(viewIdx, graph.lookupNode(viewIds.get(viewIdx)));
-			if (viewIdx == 0) {
-				inlier.observations.get(0).setTo(inlierToSeed);
-				checkTrue(inlier.observations.get(0).size > 0, "There should be observations");
-				continue;
+		// Create the inlier set for each view, but adjust it so that the target view is view[0] in the set
+		for (int constructIdx = 0; constructIdx < viewIds.size(); constructIdx++) {
+			SceneWorkingGraph.View wtarget = scene.lookupView(viewIds.get(constructIdx));
+			SceneWorkingGraph.InlierInfo inlier = wtarget.inliers.grow();
+			inlier.views.resize(viewIds.size());
+			inlier.observations.resetResize(viewIds.size());
+			for (int offset = 0; offset < viewIds.size(); offset++) {
+				int viewIdx = (constructIdx + offset)%viewIds.size();
+
+				inlier.views.set(offset, graph.lookupNode(viewIds.get(viewIdx)));
+				inlier.observations.get(offset).setTo(viewInlierIndexes.get(viewIdx));
+				checkEq(inlier.observations.get(offset).size, inlier.observations.get(0).size,
+						"Each view should have the same number of observations");
 			}
-			inlier.observations.get(viewIdx).setTo(inlierToOther.get(viewIdx - 1));
-			checkEq(inlier.observations.get(viewIdx).size, inlier.observations.get(0).size,
-					"Each view should have the same number of observations");
 		}
-		inlier.scoreGeometric = computeGeometricScore(scene, inlier);
+
+		// The geometric score should be the same for all views
+		double scoreGeometric = computeGeometricScore(scene, scene.listViews.get(0).inliers.get(0));
+		for (int viewIdx = 0; viewIdx < scene.listViews.size(); viewIdx++) {
+			scene.listViews.get(viewIdx).inliers.get(0).scoreGeometric = scoreGeometric;
+		}
 	}
 
 	/**

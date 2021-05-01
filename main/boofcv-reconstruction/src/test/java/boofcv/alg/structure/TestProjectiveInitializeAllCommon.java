@@ -61,8 +61,7 @@ class TestProjectiveInitializeAllCommon extends BoofStandardJUnit {
 	/**
 	 * Perfect scene with 2 connections. This is the simplest case
 	 */
-	@Test
-	void perfect_connections_2() {
+	@Test void perfect_connections_2() {
 
 		// NOTES: Using regular pixels maxed out at 12
 		//        With zero centering maxed out at 14
@@ -94,8 +93,7 @@ class TestProjectiveInitializeAllCommon extends BoofStandardJUnit {
 	/**
 	 * Perfect scene with 3 to 5 connections
 	 */
-	@Test
-	void perfect_connections_3_to_5() {
+	@Test void perfect_connections_3_to_5() {
 		var alg = new ProjectiveInitializeAllCommon();
 
 		for (int numConnections = 3; numConnections <= 6; numConnections++) {
@@ -162,8 +160,7 @@ class TestProjectiveInitializeAllCommon extends BoofStandardJUnit {
 	/**
 	 * Add a tiny bit of noise and see if it blows up
 	 */
-	@Test
-	void small_noise() {
+	@Test void small_noise() {
 		var db = new MockLookupSimilarImages(4, 0xDEADBEEF);
 		var alg = new ProjectiveInitializeAllCommon();
 
@@ -177,8 +174,7 @@ class TestProjectiveInitializeAllCommon extends BoofStandardJUnit {
 	/**
 	 * Test out different configurations of SBA and see if they all work
 	 */
-	@Test
-	void configurations_sba() {
+	@Test void configurations_sba() {
 		var db = new MockLookupSimilarImages(5, 0xDEADBEEF);
 		var alg = new ProjectiveInitializeAllCommon();
 
@@ -229,16 +225,16 @@ class TestProjectiveInitializeAllCommon extends BoofStandardJUnit {
 		// Sanity check the number of each type of structure
 		assertEquals(seedConnIdx.size + 1, structure.views.size);
 		assertEquals(numFeatures, structure.points.size);
-		assertEquals(numFeatures, alg.inlierToSeed.size);
+		alg.inlierIndexes.forEach(list->assertEquals(numFeatures, list.size));
 
 		int dbIndexSeed = db.viewIds.indexOf(alg.getPairwiseGraphViewByStructureIndex(0).id);
 
-		// Check results for consistency. Can't do a direct comparision to ground truth since a different
+		// Check results for consistency. Can't do a direct comparison to ground truth since a different
 		// but equivalent projective frame would have been estimated.
 		Point4D_F64 X = new Point4D_F64();
 		Point2D_F64 found = new Point2D_F64();
-		for (int i = 0; i < alg.inlierToSeed.size; i++) {
-			int seedFeatureIdx = alg.inlierToSeed.get(i);
+		for (int i = 0; i < numFeatures; i++) {
+			int seedFeatureIdx = alg.inlierIndexes.get(0).get(i);
 			int truthFeatIdx = db.viewToFeat.get(dbIndexSeed)[seedFeatureIdx];
 			int structureIdx = alg.seedToStructure.get(seedFeatureIdx);
 			assertTrue(structureIdx >= 0); // only features that have structure should be in this list
@@ -285,8 +281,9 @@ class TestProjectiveInitializeAllCommon extends BoofStandardJUnit {
 		// but equivalent projective frame would have been estimated.
 		Point4D_F64 X = new Point4D_F64();
 		Point2D_F64 found = new Point2D_F64();
-		for (int i = 0; i < alg.inlierToSeed.size; i++) {
-			int seedFeatureIdx = alg.inlierToSeed.get(i);
+		DogArray_I32 inlierToSeed = alg.inlierIndexes.get(0);
+		for (int i = 0; i < inlierToSeed.size; i++) {
+			int seedFeatureIdx = inlierToSeed.get(i);
 			int truthFeatIdx = db.observationToFeatureIdx(dbIndexSeed, seedFeatureIdx);
 			int structureIdx = alg.seedToStructure.get(seedFeatureIdx);
 			assertTrue(structureIdx >= 0); // only features that have structure should be in this list
@@ -351,8 +348,7 @@ class TestProjectiveInitializeAllCommon extends BoofStandardJUnit {
 		}
 	}
 
-	@Test
-	void selectInitialTriplet() {
+	@Test void selectInitialTriplet() {
 		// Set up a view graph with several valid options
 		var seed = new View();
 
@@ -389,8 +385,7 @@ class TestProjectiveInitializeAllCommon extends BoofStandardJUnit {
 	/**
 	 * Give it a set of three views which are not mutually connected in a complete circle
 	 */
-	@Test
-	void scoreTripleView_NotCircle() {
+	@Test void scoreTripleView_NotCircle() {
 		var alg = new ProjectiveInitializeAllCommon();
 
 		View seedA = new View();
@@ -418,8 +413,7 @@ class TestProjectiveInitializeAllCommon extends BoofStandardJUnit {
 	/**
 	 * See if it scores a set of three views higher if they have stronger 3D information
 	 */
-	@Test
-	void scoreTripleView_Prefer3D() {
+	@Test void scoreTripleView_Prefer3D() {
 		var alg = new ProjectiveInitializeAllCommon();
 
 		View seedA = new View();
@@ -457,8 +451,7 @@ class TestProjectiveInitializeAllCommon extends BoofStandardJUnit {
 		assertTrue(alg.scoreTripleView(seedA, viewB, viewC) < score0);
 	}
 
-	@Test
-	void createStructureLookUpTables() {
+	@Test void createStructureLookUpTables() {
 		int offset = 5;
 
 		var db = new MockLookupSimilarImages(4, 0xDEADBEEF);
@@ -474,22 +467,23 @@ class TestProjectiveInitializeAllCommon extends BoofStandardJUnit {
 
 		View seed = db.graph.nodes.get(0);
 
+		alg.inlierIndexes.resize(3);
 		alg.createStructureLookUpTables(seed);
 
 		// Check to see if inlier indexes are correct
 		int numInliers = db.feats3D.size() - offset;
-		assertEquals(numInliers, alg.inlierToSeed.size);
+		DogArray_I32 inlierToSeed = alg.inlierIndexes.get(0);
+		assertEquals(numInliers, inlierToSeed.size);
 		for (int i = 0; i < numInliers; i++) {
-			assertEquals(alg.utils.commonIdx.get(i + offset), alg.inlierToSeed.get(i));
+			assertEquals(alg.utils.commonIdx.get(i + offset), inlierToSeed.get(i));
 		}
-		// mapping from seed features to structure featuers
+		// mapping from seed features to structure features
 		for (int i = 0; i < db.feats3D.size(); i++) {
 			assertEquals(i < offset ? -1 : i - offset, alg.seedToStructure.get(alg.utils.commonIdx.get(i)));
 		}
 	}
 
-	@Test
-	void createObservationsForBundleAdjustment() {
+	@Test void createObservationsForBundleAdjustment() {
 		var db = new MockLookupSimilarImages(5, 0xDEADBEEF);
 		PairwiseImageGraph graph = db.graph;
 		View seed = graph.nodes.get(0);
@@ -502,13 +496,15 @@ class TestProjectiveInitializeAllCommon extends BoofStandardJUnit {
 		// make every other feature an inlier
 		alg.seedToStructure.resize(db.feats3D.size());
 		alg.seedToStructure.fill(-1);
+		DogArray_I32 inlierToSeed = alg.inlierIndexes.grow();
 		for (int i = 0; i < db.feats3D.size(); i += 2) {
-			alg.seedToStructure.data[i] = alg.inlierToSeed.size;
-			alg.inlierToSeed.add(i);
+			alg.seedToStructure.data[i] = inlierToSeed.size;
+			inlierToSeed.add(i);
 		}
 		db.lookupPixelFeats(seed.id, alg.utils.featsA);
 
 		// Call the function being tested
+		alg.inlierIndexes.resize(motionIndexes.size+1); // allocate for rest of the views
 		alg.createObservationsForBundleAdjustment(motionIndexes);
 
 		SceneObservations found = alg.utils.observations;
@@ -519,10 +515,10 @@ class TestProjectiveInitializeAllCommon extends BoofStandardJUnit {
 		assertEquals(4, found.views.size); // seed + 3 connected views
 		for (int i = 0; i < 4; i++) {
 			SceneObservations.View view = found.views.get(i);
-			assertEquals(alg.inlierToSeed.size, view.size());
+			assertEquals(inlierToSeed.size, view.size());
 			for (int j = 0; j < view.size(); j++) {
 				// crude sanity check on the index
-				assertTrue(view.getPointId(j) < alg.inlierToSeed.size);
+				assertTrue(view.getPointId(j) < inlierToSeed.size);
 			}
 		}
 
