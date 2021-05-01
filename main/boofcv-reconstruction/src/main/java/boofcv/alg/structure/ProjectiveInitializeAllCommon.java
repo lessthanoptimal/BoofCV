@@ -95,7 +95,7 @@ public class ProjectiveInitializeAllCommon implements VerbosePrint {
 	 */
 	protected final DogArray_I32 seedToStructure = new DogArray_I32();
 
-	public ProjectiveInitializeAllCommon(ConfigProjectiveReconstruction configProjective) {
+	public ProjectiveInitializeAllCommon( ConfigProjectiveReconstruction configProjective ) {
 		utils = new PairwiseGraphUtils(configProjective);
 	}
 
@@ -268,7 +268,7 @@ public class ProjectiveInitializeAllCommon implements VerbosePrint {
 			inlierToSeed.data[i] = utils.commonIdx.get(inputIdx);
 
 			// seed feature index into the output structure index
-			BoofMiscOps.checkTrue(seedToStructure.data[inlierToSeed.data[i]]==-1);
+			BoofMiscOps.checkTrue(seedToStructure.data[inlierToSeed.data[i]] == -1);
 			seedToStructure.data[inlierToSeed.data[i]] = i;
 		}
 	}
@@ -452,7 +452,7 @@ public class ProjectiveInitializeAllCommon implements VerbosePrint {
 			BoofMiscOps.offsetPixels(utils.featsB.toList(), -utils.dimenB.width/2, -utils.dimenB.height/2);
 
 			// indicate which observation from this view contributed to which 3D feature
-			DogArray_I32 connInlierIndexes = inlierIndexes.get(motionIdx+1);
+			DogArray_I32 connInlierIndexes = inlierIndexes.get(motionIdx + 1);
 			connInlierIndexes.resize(inlierToSeed.size);
 
 			for (int epipolarInlierIdx = 0; epipolarInlierIdx < m.inliers.size; epipolarInlierIdx++) {
@@ -505,7 +505,9 @@ public class ProjectiveInitializeAllCommon implements VerbosePrint {
 			BoofMiscOps.checkTrue(oview.size() == observations.size);
 
 			for (int obsIdx = 0; obsIdx < observations.size; obsIdx++) {
-				oview.getPixel(obsIdx, observations.get(obsIdx).get(viewIdx));
+				int featureIdx = oview.getPointId(obsIdx);
+				BoofMiscOps.checkTrue(featureIdx != -1, "Every feature should be visible in all views");
+				oview.getPixel(obsIdx, observations.get(featureIdx).get(viewIdx));
 			}
 		}
 	}
