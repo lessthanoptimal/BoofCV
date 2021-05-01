@@ -203,7 +203,7 @@ public abstract class SceneStructureCommon implements SceneStructure {
 		/**
 		 * Indexes of the views that this point appears in
 		 */
-		public DogArray_I32 views = new DogArray_I32();
+		public DogArray_I32 views = new DogArray_I32(0);
 
 		public Point( int dof ) {
 			coordinate = new double[dof];

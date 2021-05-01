@@ -18,7 +18,7 @@
 
 package boofcv.alg.geo.selfcalib;
 
-import boofcv.abst.geo.TriangulateNViewsMetric;
+import boofcv.abst.geo.TriangulateNViewsMetricH;
 import boofcv.alg.distort.pinhole.PinholePtoN_F64;
 import boofcv.alg.geo.MetricCameras;
 import boofcv.factory.geo.FactoryMultiView;
@@ -26,7 +26,7 @@ import boofcv.misc.BoofMiscOps;
 import boofcv.struct.geo.AssociatedTriple;
 import boofcv.struct.geo.AssociatedTuple;
 import georegression.struct.point.Point2D_F64;
-import georegression.struct.point.Point3D_F64;
+import georegression.struct.point.Point4D_F64;
 import georegression.struct.se.Se3_F64;
 import georegression.transform.se.SePointOps_F64;
 import org.ddogleg.struct.DogArray;
@@ -45,7 +45,7 @@ import java.util.Set;
  */
 public class ResolveSignAmbiguityPositiveDepth implements VerbosePrint {
 	/** Triangulation for n-view case */
-	public TriangulateNViewsMetric triangulateN = FactoryMultiView.triangulateNViewMetric(null);
+	public TriangulateNViewsMetricH triangulator = FactoryMultiView.triangulateNViewMetricH(null);
 
 	/** Indicates if the sign was changed */
 	public boolean signChanged;
@@ -53,9 +53,9 @@ public class ResolveSignAmbiguityPositiveDepth implements VerbosePrint {
 	public int bestInvalid;
 
 	// 3D coordinate in view-1
-	Point3D_F64 pointIn1 = new Point3D_F64();
+	Point4D_F64 pointIn1 = new Point4D_F64();
 	// 3D coordinate in view-I
-	Point3D_F64 Xcam = new Point3D_F64();
+	Point4D_F64 Xcam = new Point4D_F64();
 
 	// precompute how to convert pixels into normalized image coordinates
 	DogArray<PinholePtoN_F64> normalizers = new DogArray<>(PinholePtoN_F64::new);
@@ -102,18 +102,18 @@ public class ResolveSignAmbiguityPositiveDepth implements VerbosePrint {
 				}
 
 				// Find point in view-1 reference frame and check constraint
-				if (!triangulateN.triangulate(pixelNorms.toList(), worldToViews.toList(), pointIn1)) {
+				if (!triangulator.triangulate(pixelNorms.toList(), worldToViews.toList(), pointIn1)) {
 					foundInvalid += 2;
 					continue;
 				}
 
-				if (pointIn1.z < 0)
+				if (pointIn1.z*pointIn1.w < 0)
 					foundInvalid++;
 
 				// Consistency check for remaining views
 				for (int viewIdx = 1; viewIdx < numViews; viewIdx++) {
 					SePointOps_F64.transform(worldToViews.get(viewIdx), pointIn1, Xcam);
-					if (Xcam.z < 0) {
+					if (Xcam.z*Xcam.w < 0) {
 						foundInvalid++;
 					}
 				}
@@ -183,18 +183,18 @@ public class ResolveSignAmbiguityPositiveDepth implements VerbosePrint {
 				normalize2.compute(ap.p3.x, ap.p3.y, n3);
 
 				// Find point in view-1 reference frame and check constraint
-				triangulateN.triangulate(pixelNorms.toList(), worldToViews.toList(), pointIn1);
-				if (pointIn1.z < 0)
+				triangulator.triangulate(pixelNorms.toList(), worldToViews.toList(), pointIn1);
+				if (pointIn1.z*pointIn1.w < 0)
 					foundInvalid++;
 
 				// Find in view-2 and check +z constraint
 				SePointOps_F64.transform(result.view_1_to_2, pointIn1, Xcam);
-				if (Xcam.z < 0)
+				if (Xcam.z*Xcam.w < 0)
 					foundInvalid++;
 
 				// Find in view-3 and check +z constraint
 				SePointOps_F64.transform(result.view_1_to_3, pointIn1, Xcam);
-				if (Xcam.z < 0)
+				if (Xcam.z*Xcam.w < 0)
 					foundInvalid++;
 			}
 
