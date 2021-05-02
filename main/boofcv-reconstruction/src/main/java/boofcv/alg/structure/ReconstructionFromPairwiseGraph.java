@@ -177,13 +177,13 @@ public abstract class ReconstructionFromPairwiseGraph implements VerbosePrint {
 	/**
 	 * Considers every view in the graph as a potential seed and computes their scores
 	 */
-	protected Map<String, SeedInfo> scoreNodesAsSeeds( PairwiseImageGraph graph ) {
+	protected Map<String, SeedInfo> scoreNodesAsSeeds( PairwiseImageGraph graph, int maxMotions ) {
 		seedScores.reset();
 		Map<String, SeedInfo> mapScores = new HashMap<>();
 		for (int idxView = 0; idxView < graph.nodes.size; idxView++) {
 			View v = graph.nodes.get(idxView);
 			SeedInfo info = seedScores.grow();
-			scoreAsSeed(v, info);
+			scoreSeedAndSelectSet(v, maxMotions, info);
 			mapScores.put(v.id, info);
 		}
 		return mapScores;
@@ -264,11 +264,11 @@ public abstract class ReconstructionFromPairwiseGraph implements VerbosePrint {
 	}
 
 	/**
-	 * Score a view for how well it could be a seed based on the the 3 best 3D motions associated with it
+	 * Scores how the target as a seed and selects the initial set of views it should spawn from.
 	 */
-	protected SeedInfo scoreAsSeed( View target, SeedInfo output ) {
+	protected SeedInfo scoreSeedAndSelectSet( View target, int maxMotions, SeedInfo output ) {
 		output.seed = target;
-		scoresMotions.reset(); // TODO ditch this?
+		scoresMotions.reset();
 
 		// score all edges
 		for (int i = 0; i < target.connections.size; i++) {
@@ -281,7 +281,7 @@ public abstract class ReconstructionFromPairwiseGraph implements VerbosePrint {
 
 		// After a view has been selected, the others are selected based on their connection to the already
 		// selected ones. This avoids selecting two nearly identical views
-		while (output.motions.size < 3) {
+		while (output.motions.size < maxMotions && !scoresMotions.isEmpty()) {
 			double bestScore = 0;
 			int bestMotion = -1;
 			for (int i = 0; i < scoresMotions.size; i++) {
@@ -289,17 +289,24 @@ public abstract class ReconstructionFromPairwiseGraph implements VerbosePrint {
 				double score = scoresMotions.get(i).score;
 				PairwiseImageGraph.View va = target.connections.get(scoresMotions.get(i).index).other(target);
 
-				// Go through all already selected motions. Make sure this view has 3D connection to one of them
-				// and update its score as the worst connection score.
-				boolean foundValid = output.motions.size == 0;
+				// Go through all already selected motions. Reduce the score is similar to another view.
+				// Disqualify if so similar it doesn't have a 3D connection
+				boolean foundValid = true;
 				for (int outIdx = 0; outIdx < output.motions.size; outIdx++) {
 					int connIdx = output.motions.get(outIdx);
 					PairwiseImageGraph.View vb = target.connections.get(connIdx).other(target);
 					PairwiseImageGraph.Motion m = va.findMotion(vb);
-					if (m == null || !m.is3D)
+
+					// No connection so they are not similar
+					if (m == null)
 						continue;
+
+					// It's very similar to another view, abort
+					if (!m.is3D) {
+						foundValid = false;
+						break;
+					}
 					score = Math.min(score, m.score3D);
-					foundValid = true;
 				}
 				if (!foundValid || score <= bestScore)
 					continue;

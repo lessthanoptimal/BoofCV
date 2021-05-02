@@ -95,7 +95,7 @@ public class ProjectiveReconstructionFromPairwiseGraph extends ReconstructionFro
 		workGraph.reset();
 
 		// Score nodes for their ability to be seeds
-		Map<String, SeedInfo> mapScores = scoreNodesAsSeeds(graph);
+		Map<String, SeedInfo> mapScores = scoreNodesAsSeeds(graph, 4);
 		List<SeedInfo> seeds = selectSeeds(seedScores, mapScores);
 
 		if (seeds.size() == 0)

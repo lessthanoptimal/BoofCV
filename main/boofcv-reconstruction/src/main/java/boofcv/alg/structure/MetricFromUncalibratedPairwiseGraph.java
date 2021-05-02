@@ -131,7 +131,7 @@ public class MetricFromUncalibratedPairwiseGraph extends ReconstructionFromPairw
 		scenes.reset();
 
 		// Score nodes for their ability to be seeds
-		Map<String, SeedInfo> mapScores = scoreNodesAsSeeds(pairwise);
+		Map<String, SeedInfo> mapScores = scoreNodesAsSeeds(pairwise, 4);
 		List<SeedInfo> seeds = selectSeeds(seedScores, mapScores);
 		// TODO also take in account distance from other seeds when selecting
 

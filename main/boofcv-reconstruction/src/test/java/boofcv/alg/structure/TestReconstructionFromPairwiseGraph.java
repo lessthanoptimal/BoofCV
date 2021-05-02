@@ -136,7 +136,7 @@ class TestReconstructionFromPairwiseGraph extends BoofStandardJUnit {
 		// linear graph with each node/view just as good as any other
 		{
 			PairwiseImageGraph graph = createLinearGraph(8, 1);
-			Map<String, SeedInfo> mapScores = alg.scoreNodesAsSeeds(graph);
+			Map<String, SeedInfo> mapScores = alg.scoreNodesAsSeeds(graph, 2);
 			List<SeedInfo> seeds = alg.selectSeeds(alg.seedScores, mapScores);
 			assertEquals(3, seeds.size()); // determined through manual inspection
 			sanityCheckSeeds(seeds);
@@ -145,7 +145,7 @@ class TestReconstructionFromPairwiseGraph extends BoofStandardJUnit {
 		// Similar situation but with one more view
 		{
 			PairwiseImageGraph graph = createLinearGraph(9, 1);
-			Map<String, SeedInfo> mapScores = alg.scoreNodesAsSeeds(graph);
+			Map<String, SeedInfo> mapScores = alg.scoreNodesAsSeeds(graph, 2);
 			List<SeedInfo> seeds = alg.selectSeeds(alg.seedScores, mapScores);
 			assertEquals(3, seeds.size()); // determined through manual inspection
 			sanityCheckSeeds(seeds);
@@ -159,7 +159,7 @@ class TestReconstructionFromPairwiseGraph extends BoofStandardJUnit {
 				PairwiseImageGraph.View target = graph.nodes.get(targetIdx);
 				target.connections.forIdx(( i, o ) -> o.score3D = 5.0);
 
-				Map<String, SeedInfo> mapScores = alg.scoreNodesAsSeeds(graph);
+				Map<String, SeedInfo> mapScores = alg.scoreNodesAsSeeds(graph, 2);
 				List<SeedInfo> seeds = alg.selectSeeds(alg.seedScores, mapScores);
 				assertTrue(3 == seeds.size() || 2 == seeds.size()); // determined through manual inspection
 				sanityCheckSeeds(seeds);
@@ -186,16 +186,24 @@ class TestReconstructionFromPairwiseGraph extends BoofStandardJUnit {
 		var alg = new Helper();
 
 		// first has the best connection but should have a worse sum score
-		SeedInfo info0 = alg.scoreAsSeed(viewByConnections(90, 200, 150, 80), new SeedInfo());
-		SeedInfo info1 = alg.scoreAsSeed(viewByConnections(90, 190, 185, 150), new SeedInfo());
+		// score between the "other" views is set higher than the score to the root so that score
+		// that matters is the connection to the root
+		SeedInfo info0 = alg.scoreSeedAndSelectSet(viewByConnections(300, 90, 200, 150, 80), 2, new SeedInfo());
+		SeedInfo info1 = alg.scoreSeedAndSelectSet(viewByConnections(300, 90, 190, 185, 150), 2, new SeedInfo());
 		assertTrue(info1.score > info0.score);
+		assertEquals(2, info0.motions.size);
+		assertEquals(2, info1.motions.size);
+
+		// make sure the highest scoring motion was selected
+		assertTrue(info0.motions.contains(1));
 
 		// the new score has a much higher single score but it's a single score
-		SeedInfo info2 = alg.scoreAsSeed(viewByConnections(250), new SeedInfo());
+		SeedInfo info2 = alg.scoreSeedAndSelectSet(viewByConnections(300, 250), 2, new SeedInfo());
 		assertTrue(info1.score > info2.score);
+		assertEquals(1, info2.motions.size);
 
 		// just a test to see if it blows up
-		SeedInfo info3 = alg.scoreAsSeed(viewByConnections(), new SeedInfo());
+		SeedInfo info3 = alg.scoreSeedAndSelectSet(viewByConnections(300), 2, new SeedInfo());
 		assertEquals(0.0, info3.score, UtilEjml.TEST_F64);
 	}
 
@@ -204,19 +212,56 @@ class TestReconstructionFromPairwiseGraph extends BoofStandardJUnit {
 	 * not be included together
 	 */
 	@Test void score_IdenticalViews() {
-		fail("Implement");
+		var alg = new Helper();
+
+		// The score between the "others" is low and will dominate
+		SeedInfo info0 = alg.scoreSeedAndSelectSet(viewByConnections(20, 200, 200, 200, 200), 2, new SeedInfo());
+		SeedInfo info1 = alg.scoreSeedAndSelectSet(viewByConnections(50, 90, 200, 150, 80), 2, new SeedInfo());
+
+		assertEquals(2, info0.motions.size);
+		assertEquals(2, info1.motions.size);
+		assertTrue(info1.score > info0.score);
+
+		// We will make other[0] and other[1] not have a 3D relationship. This should cause one
+		// of them to be excluded
+		PairwiseImageGraph.View root = viewByConnections(200, 200, 200, 50);
+		root.connections.get(0).other(root).connections.get(1).is3D = false;
+		SeedInfo info2 = alg.scoreSeedAndSelectSet(root, 2, new SeedInfo());
+		assertFalse(info2.motions.contains(0) && info2.motions.contains(1));
+
 	}
 
-	private PairwiseImageGraph.View viewByConnections( int... counts ) {
-		PairwiseImageGraph.View v = new PairwiseImageGraph.View();
-		v.id = "id";
+	private PairwiseImageGraph.View viewByConnections( int betweenCounts, int... counts ) {
+		PairwiseImageGraph.View root = new PairwiseImageGraph.View();
+		root.id = "id";
 		for (int count : counts) {
 			PairwiseImageGraph.Motion m = new PairwiseImageGraph.Motion();
+			m.dst = root;
+			m.src = new PairwiseImageGraph.View();
 			m.score3D = count/100.0;
 			m.is3D = true;
-			v.connections.add(m);
+			root.connections.add(m);
+			m.src.connections.add(m);
 		}
-		return v;
+
+		// Connections between the view are also considered
+		for (int i = 0; i < root.connections.size; i++) {
+			PairwiseImageGraph.View va = root.connections.get(i).other(root);
+
+			for (int j = i+1; j < root.connections.size; j++) {
+				PairwiseImageGraph.View vb = root.connections.get(j).other(root);
+
+				PairwiseImageGraph.Motion m = new PairwiseImageGraph.Motion();
+				m.src = va;
+				m.dst = vb;
+				m.score3D = betweenCounts/100.0;
+				m.is3D = true;
+				va.connections.add(m);
+				vb.connections.add(m);
+			}
+		}
+
+		return root;
 	}
 
 	/**
