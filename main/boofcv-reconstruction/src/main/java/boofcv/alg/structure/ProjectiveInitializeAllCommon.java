@@ -123,7 +123,7 @@ public class ProjectiveInitializeAllCommon implements VerbosePrint {
 				"Can't have more seed connection indexes than actual connections");
 
 		if (verbose != null)
-			verbose.println("ENTER projectiveSceneN: seed=" + seed.id + " common.size=" + seedFeatsIdx.size +
+			verbose.println("ENTER projectiveSceneN: seed='" + seed.id + "' common.size=" + seedFeatsIdx.size +
 					" conn.size=" + seedConnIdx.size);
 
 		if (seedConnIdx.size < 2) {
