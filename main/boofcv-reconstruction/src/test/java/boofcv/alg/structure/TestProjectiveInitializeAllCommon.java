@@ -225,7 +225,7 @@ class TestProjectiveInitializeAllCommon extends BoofStandardJUnit {
 		// Sanity check the number of each type of structure
 		assertEquals(seedConnIdx.size + 1, structure.views.size);
 		assertEquals(numFeatures, structure.points.size);
-		alg.inlierIndexes.forEach(list->assertEquals(numFeatures, list.size));
+		alg.inlierIndexes.forEach(list -> assertEquals(numFeatures, list.size));
 
 		int dbIndexSeed = db.viewIds.indexOf(alg.getPairwiseGraphViewByStructureIndex(0).id);
 
@@ -504,7 +504,7 @@ class TestProjectiveInitializeAllCommon extends BoofStandardJUnit {
 		db.lookupPixelFeats(seed.id, alg.utils.featsA);
 
 		// Call the function being tested
-		alg.inlierIndexes.resize(motionIndexes.size+1); // allocate for rest of the views
+		alg.inlierIndexes.resize(motionIndexes.size + 1); // allocate for rest of the views
 		alg.createObservationsForBundleAdjustment(motionIndexes);
 
 		SceneObservations found = alg.utils.observations;
@@ -523,6 +523,13 @@ class TestProjectiveInitializeAllCommon extends BoofStandardJUnit {
 		}
 
 		// Not doing a detailed check of the values since that will be very complex
+	}
+
+	/**
+	 * Looks up features then tests using triangulation and checks for perfect results.
+	 */
+	@Test void lookupInfoForMetricElevation() {
+		fail("Implement");
 	}
 
 	private static class MockRansac implements ModelMatcher<TrifocalTensor, AssociatedTriple> {

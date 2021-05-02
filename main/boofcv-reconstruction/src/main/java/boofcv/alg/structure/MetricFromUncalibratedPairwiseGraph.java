@@ -497,6 +497,7 @@ public class MetricFromUncalibratedPairwiseGraph extends ReconstructionFromPairw
 		// Pass the projective scene and elevate into a metric scene
 		MetricCameras results = new MetricCameras();
 		if (!projectiveToMetric.process(dimensions.toList(), views.toList(), (List)observations.toList(), results)) {
+			if (verbose != null) verbose.println("  views=" + BoofMiscOps.toStringLine(viewIds));
 			return false;
 		}
 

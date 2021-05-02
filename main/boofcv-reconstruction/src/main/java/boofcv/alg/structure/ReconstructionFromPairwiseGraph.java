@@ -268,7 +268,7 @@ public abstract class ReconstructionFromPairwiseGraph implements VerbosePrint {
 	 */
 	protected SeedInfo scoreAsSeed( View target, SeedInfo output ) {
 		output.seed = target;
-		scoresMotions.reset();
+		scoresMotions.reset(); // TODO ditch this?
 
 		// score all edges
 		for (int i = 0; i < target.connections.size; i++) {
@@ -279,12 +279,40 @@ public abstract class ReconstructionFromPairwiseGraph implements VerbosePrint {
 			scoresMotions.grow().set(m.score3D, i);
 		}
 
-		// only score the 3 best. This is to avoid biasing it for
-		Collections.sort(scoresMotions.toList());
+		// After a view has been selected, the others are selected based on their connection to the already
+		// selected ones. This avoids selecting two nearly identical views
+		while (output.motions.size < 3) {
+			double bestScore = 0;
+			int bestMotion = -1;
+			for (int i = 0; i < scoresMotions.size; i++) {
+				// set the score initially to the score with the target
+				double score = scoresMotions.get(i).score;
+				PairwiseImageGraph.View va = target.connections.get(scoresMotions.get(i).index).other(target);
 
-		for (int i = Math.min(3, scoresMotions.size) - 1; i >= 0; i--) {
-			output.motions.add(scoresMotions.get(i).index);
-			output.score += scoresMotions.get(i).score;
+				// Go through all already selected motions. Make sure this view has 3D connection to one of them
+				// and update its score as the worst connection score.
+				boolean foundValid = output.motions.size == 0;
+				for (int outIdx = 0; outIdx < output.motions.size; outIdx++) {
+					int connIdx = output.motions.get(outIdx);
+					PairwiseImageGraph.View vb = target.connections.get(connIdx).other(target);
+					PairwiseImageGraph.Motion m = va.findMotion(vb);
+					if (m == null || !m.is3D)
+						continue;
+					score = Math.min(score, m.score3D);
+					foundValid = true;
+				}
+				if (!foundValid || score <= bestScore)
+					continue;
+				bestScore = score;
+				bestMotion = i;
+			}
+
+			// stop if it can't find another valid view
+			if (bestScore == 0.0)
+				break;
+
+			output.motions.add(scoresMotions.removeSwap(bestMotion).index);
+			output.score += bestScore;
 		}
 
 		return output;

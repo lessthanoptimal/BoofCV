@@ -55,7 +55,7 @@ public class MetricBundleAdjustmentUtils {
 	}
 
 	public MetricBundleAdjustmentUtils() {
-		this(null,true);
+		this(null, true);
 	}
 
 	/**
@@ -118,9 +118,7 @@ public class MetricBundleAdjustmentUtils {
 	 * Prints the number of different data structures in the scene
 	 */
 	public void printCounts( PrintStream out ) {
-		out.println("Points=" + structure.points.size);
-		out.println("Views=" + structure.views.size);
-		out.println("Cameras=" + structure.cameras.size);
+		out.println("Bundle: Points=" + structure.points.size + " Views=" + structure.views.size + " Cameras=" + structure.cameras.size);
 		for (int viewIdx = 0; viewIdx < observations.views.size; viewIdx++) {
 			out.println("view[" + viewIdx + "].observations.size=" + observations.views.get(viewIdx).size());
 		}
