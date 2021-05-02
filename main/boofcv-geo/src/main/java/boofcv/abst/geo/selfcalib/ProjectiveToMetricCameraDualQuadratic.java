@@ -26,8 +26,11 @@ import boofcv.alg.geo.selfcalib.ResolveSignAmbiguityPositiveDepth;
 import boofcv.alg.geo.selfcalib.SelfCalibrationLinearDualQuadratic;
 import boofcv.alg.geo.structure.DecomposeAbsoluteDualQuadratic;
 import boofcv.misc.BoofMiscOps;
+import boofcv.struct.calib.CameraPinhole;
 import boofcv.struct.geo.AssociatedTuple;
 import boofcv.struct.image.ImageDimension;
+import georegression.geometry.ConvertRotation3D_F64;
+import georegression.struct.se.Se3_F64;
 import lombok.Getter;
 import org.ddogleg.struct.FastAccess;
 import org.ddogleg.struct.VerbosePrint;
@@ -137,11 +140,27 @@ public class ProjectiveToMetricCameraDualQuadratic implements ProjectiveToMetric
 			return true;
 		}
 
-		if (verbose != null)
+		if (verbose != null) {
 			verbose.printf("FAILED: Features behind camera. fraction=%.3f threshold=%.3f\n",
 					fractionInvalid, invalidFractionAccept);
+			printFoundMetric(dimensions, metricViews);
+		}
 
 		return false;
+	}
+
+	private void printFoundMetric( List<ImageDimension> dimensions, MetricCameras metricViews ) {
+		for (int i = 0; i < dimensions.size(); i++) {
+			CameraPinhole cam = metricViews.intrinsics.get(i);
+			verbose.printf("metric[%d] fx=%.1f fy=%.1f", i, cam.fx, cam.fy);
+			if (i == 0) {
+				verbose.println();
+				continue;
+			}
+			Se3_F64 m = metricViews.motion_1_to_k.get(i - 1);
+			double theta = ConvertRotation3D_F64.matrixToRodrigues(m.R, null).theta;
+			verbose.printf(" T=(%.2f %.2f %.2f) R=%.4f\n", m.T.x, m.T.y, m.T.z, theta);
+		}
 	}
 
 	@Override

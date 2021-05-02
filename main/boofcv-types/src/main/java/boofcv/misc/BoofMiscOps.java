@@ -863,6 +863,14 @@ public class BoofMiscOps {
 		}
 	}
 
+	public static<T> String toStringLine( List<T> list ) {
+		String out = "{ ";
+		for (int i = 0; i < list.size(); i++) {
+			out += "'"+list.get(i)+"' ";
+		}
+		return out + "}";
+	}
+
 	public static PrintStream addPrefix( VerbosePrint owner, PrintStream out ) {
 		return addPrefix(owner, 1, out);
 	}

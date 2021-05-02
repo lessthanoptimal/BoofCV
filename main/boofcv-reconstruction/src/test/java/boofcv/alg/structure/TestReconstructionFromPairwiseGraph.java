@@ -199,6 +199,14 @@ class TestReconstructionFromPairwiseGraph extends BoofStandardJUnit {
 		assertEquals(0.0, info3.score, UtilEjml.TEST_F64);
 	}
 
+	/**
+	 * Two views have a high score but are identical and have a low connecting score or are not 3D and should
+	 * not be included together
+	 */
+	@Test void score_IdenticalViews() {
+		fail("Implement");
+	}
+
 	private PairwiseImageGraph.View viewByConnections( int... counts ) {
 		PairwiseImageGraph.View v = new PairwiseImageGraph.View();
 		v.id = "id";
