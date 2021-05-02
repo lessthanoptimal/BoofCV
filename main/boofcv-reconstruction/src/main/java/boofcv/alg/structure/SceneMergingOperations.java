@@ -29,6 +29,7 @@ import georegression.struct.se.Se3_F64;
 import lombok.Getter;
 import org.ddogleg.sorting.QuickSort_S32;
 import org.ddogleg.struct.DogArray;
+import org.ddogleg.struct.DogArray_B;
 import org.ddogleg.struct.DogArray_I32;
 import org.ddogleg.struct.VerbosePrint;
 import org.ddogleg.util.PrimitiveArrays;
@@ -46,20 +47,23 @@ import java.util.Set;
  * information and then feeding that to {@link ResolveSceneScaleAmbiguity}.</p>
  *
  * Usage:<br>
- * First call {@link #countCommonViews} as it will initialize all data structures. Then all the other operations
+ * First call {@link #initializeViewCounts} as it will initialize all data structures. Then all the other operations
  * can be called.
  *
  * @author Peter Abeles
  */
 public class SceneMergingOperations implements VerbosePrint {
 	/**
-	 * <p>Storage for the number of common views between the scenes. Look at {@link #countCommonViews} for
+	 * <p>Storage for the number of common views between the scenes. Look at {@link #initializeViewCounts} for
 	 * how these counts are stored. It's not entirely obvious</p>
 	 * commonViewCounts.size == number of scenes<br>
 	 * commonViewCounts[i].size == number of scenes that scene[i] has common views AND i < j.<br>
 	 */
 	DogArray<DogArray<SceneCommonCounts>> commonViewCounts = new DogArray<>(
 			() -> new DogArray<>(SceneCommonCounts::new, SceneCommonCounts::reset), DogArray::reset);
+
+	/** Indicates which scenes are enabled or disabled. If disabled then its not included in the counts. */
+	DogArray_B enabledScenes = new DogArray_B();
 
 	// Predeclare memory for sorting since this will be done a ton
 	QuickSort_S32 sorter = new QuickSort_S32();
@@ -92,13 +96,13 @@ public class SceneMergingOperations implements VerbosePrint {
 	 *
 	 * @param viewScenes (Input) List of all the views and the scenes that reference them
 	 */
-	public void countCommonViews( PairwiseViewScenes viewScenes, int numScenes ) {
+	public void initializeViewCounts( PairwiseViewScenes viewScenes, int numScenes ) {
 		BoofMiscOps.checkTrue(viewScenes.views.size > 0, "There are no views");
 		BoofMiscOps.checkTrue(numScenes > 0, "There are no scenes");
 
 		// Initializes data structures
-		commonViewCounts.reset();
-		commonViewCounts.resize(numScenes);
+		commonViewCounts.resetResize(numScenes);
+		enabledScenes.resetResize(numScenes, true);
 
 		// Go through each view and count the number of scenes that contain that view
 		for (int viewsIdx = 0; viewsIdx < viewScenes.views.size; viewsIdx++) {
@@ -124,6 +128,53 @@ public class SceneMergingOperations implements VerbosePrint {
 		}
 	}
 
+
+	/**
+	 * Toggles the enabled state of a view and update its counts accordingly
+	 *
+	 * @param target Scene that will have its counts modified.
+	 * @param views List of views + scenes that views them
+	 */
+	public void toggleViewEnabled( SceneWorkingGraph target, PairwiseViewScenes views) {
+		// if true, then that means we are enabling the scene
+		boolean enable = !enabledScenes.get(target.index);
+
+		// Should we add or remove counts
+		int amount = enable ? 1 : -1;
+
+		// Go through all the views which are part of this scene
+		target.listViews.forEach(( wv ) -> {
+			ViewScenes v = views.getView(wv.pview);
+
+			for (int srcIdx = 0; srcIdx < v.viewedBy.size; srcIdx++) {
+				int sceneSrc = v.viewedBy.get(srcIdx);
+
+				DogArray<SceneCommonCounts> countsSrc = commonViewCounts.get(sceneSrc);
+
+				if (sceneSrc == target.index) {
+					// the scene is the one being removed. So all the ones that come after it will be in its list
+					for (int dstIdx = srcIdx + 1; dstIdx < v.viewedBy.size; dstIdx++) {
+						int sceneDst = v.viewedBy.get(dstIdx);
+						// If this scene is disabled we do not need to update the counts
+						if (!enabledScenes.get(sceneDst))
+							continue;
+
+						findViewCounts(countsSrc, sceneDst).counts += amount;
+					}
+				} else if (sceneSrc < target.index) {
+					// If this scene is disabled we do not need to update the counts
+					if (!enabledScenes.get(sceneSrc))
+						continue;
+					// This scene is before the target so it owns the counter
+					findViewCounts(countsSrc, target.index).counts += amount;
+				}
+			}
+		});
+
+		// Update it's state
+		enabledScenes.set(target.index, enable);
+	}
+
 	/**
 	 * Selects the two scenes with the most common views to merge together.
 	 *
@@ -133,12 +184,17 @@ public class SceneMergingOperations implements VerbosePrint {
 	public boolean selectViewsToMerge( SelectedScenes selected ) {
 		int bestCommon = 0;
 
-		// TODO this isn't correctly implemented. Add unit tests.
-		//      I'm also seeing negative counts in some cases. fix that
 		for (int sceneIndexA = 0; sceneIndexA < commonViewCounts.size; sceneIndexA++) {
+			// if the view is disabled, skip it
+			if (!enabledScenes.get(sceneIndexA))
+				continue;
+
 			DogArray<SceneCommonCounts> list = commonViewCounts.get(sceneIndexA);
 			for (int j = 0; j < list.size; j++) {
 				SceneCommonCounts overlap = list.get(j);
+				if (!enabledScenes.get(overlap.sceneIndex))
+					continue;
+
 				if (overlap.counts <= bestCommon)
 					continue;
 
@@ -194,7 +250,7 @@ public class SceneMergingOperations implements VerbosePrint {
 				}
 			} else {
 				if (verbose != null)
-					verbose.printf("%-7s view='%s', f=%.1f\n", "NEW", srcView.pview.id, srcView.intrinsic.f);
+					verbose.printf("%-7s view='%s', f=%.1f\n", "ADD", srcView.pview.id, srcView.intrinsic.f);
 				// Create a new view in the dst scene
 				dstView = dst.addView(srcView.pview);
 			}
@@ -337,13 +393,15 @@ public class SceneMergingOperations implements VerbosePrint {
 	 * Prints debugging information about which views are in the inlier sets
 	 */
 	private void printInlierViews( SceneWorkingGraph.View selectedSrc, SceneWorkingGraph.View selectedDst ) {
+		final PrintStream verbose = Objects.requireNonNull(this.verbose);
+
 		for (int infoIdx = 0; infoIdx < selectedSrc.inliers.size; infoIdx++) {
 			verbose.print("src.inliers[" + infoIdx + "].views = { ");
 			SceneWorkingGraph.InlierInfo inliers = selectedSrc.inliers.get(infoIdx);
 			for (int i = 0; i < inliers.views.size; i++) {
 				verbose.print("'" + inliers.views.get(i).id + "' ");
 			}
-			verbose.println("}");
+			verbose.printf("} count=%d score=%.1f\n",inliers.getInlierCount(),inliers.scoreGeometric);
 		}
 
 		for (int infoIdx = 0; infoIdx < selectedDst.inliers.size; infoIdx++) {
@@ -352,7 +410,7 @@ public class SceneMergingOperations implements VerbosePrint {
 			for (int i = 0; i < inliers.views.size; i++) {
 				verbose.print("'" + inliers.views.get(i).id + "' ");
 			}
-			verbose.println("}");
+			verbose.printf("} count=%d score=%.1f\n",inliers.getInlierCount(),inliers.scoreGeometric);
 		}
 	}
 
@@ -363,6 +421,7 @@ public class SceneMergingOperations implements VerbosePrint {
 	 * @param numCommon Number of features that are common between the two scenes in this view
 	 * @param viewID The ID of the view
 	 */
+	@SuppressWarnings("IntegerDivisionInFloatingPointContext")
 	private void loadViewZeroCommonObservations( LookUpSimilarImages db,
 												 ImageDimension imageShape,
 												 int numCommon,
@@ -425,6 +484,7 @@ public class SceneMergingOperations implements VerbosePrint {
 	 * @param inliers List of image features that were part of the inlier set in all the views
 	 * @return List of observations in each view (expet the target) that are part of the inler and common set
 	 */
+	@SuppressWarnings("IntegerDivisionInFloatingPointContext")
 	List<DogArray<Point2D_F64>> getCommonFeaturePixelsViews( LookUpSimilarImages db,
 															 SceneWorkingGraph workingGraph,
 															 SceneWorkingGraph.InlierInfo inliers ) {
@@ -504,71 +564,6 @@ public class SceneMergingOperations implements VerbosePrint {
 				zeroFeatureToCommonIndex.data[i] = -1;
 		}
 		return count;
-	}
-
-	/**
-	 * Common function for either adding or removing counts from the list of common counts that involve the
-	 * specified scene
-	 *
-	 * @param target Scene that will have its counts modified.
-	 * @param views List of views + scenes that views them
-	 * @param addCounts true to add and false to remove
-	 */
-	public void adjustSceneCounts( SceneWorkingGraph target, PairwiseViewScenes views, boolean addCounts ) {
-		int amount = addCounts ? 1 : -1;
-
-		// Go through all the views which are part of this scene
-		target.listViews.forEach(( wv ) -> {
-			ViewScenes v = views.getView(wv.pview);
-
-			for (int srcIdx = 0; srcIdx < v.viewedBy.size; srcIdx++) {
-				int sceneSrc = v.viewedBy.get(srcIdx);
-				DogArray<SceneCommonCounts> countsSrc = commonViewCounts.get(sceneSrc);
-
-				if (sceneSrc == target.index) {
-					// the scene is the one being removed. So all the ones that come after it will be in its list
-					for (int dstIdx = srcIdx + 1; dstIdx < v.viewedBy.size; dstIdx++) {
-						int sceneDst = v.viewedBy.get(dstIdx);
-
-						findViewCounts(countsSrc, sceneDst).counts += amount;
-					}
-				} else if (sceneSrc < target.index) {
-					// This scene is before the target so it owns the counter
-					findViewCounts(countsSrc, target.index).counts += amount;
-				}
-			}
-		});
-	}
-
-	/**
-	 * Removes the scene from the list of views
-	 *
-	 * @param target The scene that is to be removed
-	 * @param viewScenes List of views and the scenes that see them
-	 */
-	public static void removeScene( SceneWorkingGraph target, PairwiseViewScenes viewScenes ) {
-		// Go through all the views which are part of this scene
-		target.listViews.forEach(( wv ) -> {
-			ViewScenes v = viewScenes.getView(wv.pview);
-
-			// Remove this view from the scene. Notice the counts are not adjusted. It's
-			// assumed that its counts have already been removed
-			boolean found = false;
-			for (int srcIdx = 0; srcIdx < v.viewedBy.size; srcIdx++) {
-				int sceneSrc = v.viewedBy.get(srcIdx);
-				if (sceneSrc != target.index)
-					continue;
-
-				found = true;
-				v.viewedBy.remove(srcIdx);
-				break;
-			}
-
-			BoofMiscOps.checkTrue(found, "Failed sanity check!");
-		});
-
-		// reset the view so that it's clear it shouldn't be used any more
-		target.reset();
 	}
 
 	/**
