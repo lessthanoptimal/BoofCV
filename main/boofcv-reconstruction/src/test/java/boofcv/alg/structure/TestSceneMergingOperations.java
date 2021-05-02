@@ -28,12 +28,13 @@ import georegression.struct.se.Se3_F64;
 import georegression.struct.se.SpecialEuclideanOps_F64;
 import org.ddogleg.struct.DogArray;
 import org.ddogleg.util.PrimitiveArrays;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.*;
 
 public class TestSceneMergingOperations extends BoofStandardJUnit {
-	@Test void countCommonViews() {
+	@Test void initializeViewCounts() {
 		var viewScenes = new PairwiseViewScenes();
 		// Every view is seen by every Scene
 		for (int viewIdx = 0; viewIdx < 6; viewIdx++) {
@@ -48,7 +49,11 @@ public class TestSceneMergingOperations extends BoofStandardJUnit {
 
 		// Process and compute how many views each scene has in common
 		var alg = new SceneMergingOperations();
-		alg.countCommonViews(viewScenes, 5);
+		alg.initializeViewCounts(viewScenes, 5);
+
+		// All scenes should be enabled
+		assertEquals(5, alg.enabledScenes.size);
+		alg.enabledScenes.forEach(Assertions::assertTrue);
 
 		assertEquals(5, alg.commonViewCounts.size);
 		assertEquals(0, alg.commonViewCounts.get(0).size); // never added to any of the views
@@ -77,12 +82,42 @@ public class TestSceneMergingOperations extends BoofStandardJUnit {
 
 		// create a set of observations with a known solution
 		alg.commonViewCounts.resize(6);
+		alg.enabledScenes.resize(6, true);
 		alg.commonViewCounts.get(1).resize(4, ( idx, v ) -> v.sceneIndex = idx + 2);
 		alg.commonViewCounts.get(3).resize(1, ( idx, v ) -> v.sceneIndex = idx + 4);
 
 		alg.commonViewCounts.get(1).get(2).counts = 4;
 		alg.commonViewCounts.get(3).get(0).counts = 8;
 
+		assertTrue(alg.selectViewsToMerge(selected));
+		assertEquals(3, selected.sceneA);
+		assertEquals(4, selected.sceneB);
+	}
+
+	/**
+	 * Make sure it ignores disabled scenes
+	 */
+	@Test void selectViewsToMerge_disabled() {
+		var alg = new SceneMergingOperations();
+		var selected = new SelectedScenes();
+
+		// create a set of observations with a known solution
+		alg.commonViewCounts.resize(6);
+		alg.commonViewCounts.get(1).resize(4, ( idx, v ) -> v.sceneIndex = idx + 2);
+		alg.commonViewCounts.get(3).resize(1, ( idx, v ) -> v.sceneIndex = idx + 4);
+		alg.commonViewCounts.get(1).get(2).counts = 4;
+		alg.commonViewCounts.get(3).get(0).counts = 8;
+
+		// Disable every view. This should cause it to fail
+		alg.enabledScenes.resize(6, false);
+		assertFalse(alg.selectViewsToMerge(selected));
+
+		// enable just one view. Should still fail since it can't merge with anything
+		alg.enabledScenes.set(3, true);
+		assertFalse(alg.selectViewsToMerge(selected));
+
+		// enable one more scene. it should work now
+		alg.enabledScenes.set(4, true);
 		assertTrue(alg.selectViewsToMerge(selected));
 		assertEquals(3, selected.sceneA);
 		assertEquals(4, selected.sceneB);
@@ -160,17 +195,64 @@ public class TestSceneMergingOperations extends BoofStandardJUnit {
 	}
 
 	/**
-	 * Check the case where there are multiple inlier sets that need to be merged
-	 */
-	@Test void mergeViews_MultipleInliers() {
-		fail("Implement");
-	}
-
-	/**
 	 * Test that makes sure the src is copied into the dst only if it has a better estimate
 	 */
 	@Test void mergeViews_CopySrcOnlyIfBetter() {
-		fail("implement");
+		var alg = new SceneMergingOperations();
+		var src = new SceneWorkingGraph();
+		var dst = new SceneWorkingGraph();
+
+		// transform will do nothing
+		var src_to_dst = new ScaleSe3_F64();
+
+		// Add views. Some will be common and some will not be
+		for (int i = 0; i < 5; i++) {
+			var a = new PairwiseImageGraph.View();
+			var b = new PairwiseImageGraph.View();
+
+			// Every view will overlap
+			a.id = "" + i;
+			b.id = "" + i;
+
+			SceneWorkingGraph.View wa = src.addView(a);
+			SceneWorkingGraph.View wb = dst.addView(b);
+
+			// give each view a distinctive value that makes it easy to see which one "won"
+			wa.imageDimension.setTo(1, 1);
+			wb.imageDimension.setTo(2, 2);
+
+			wa.intrinsic.f = 1;
+			wb.intrinsic.f = 2;
+
+			wa.world_to_view.T.setTo(1, 0, 0);
+			wb.world_to_view.T.setTo(2, 0, 0);
+
+			// alternate which view will have a better score
+			wa.inliers.grow().scoreGeometric = i%2 == 0 ? 100 : 50;
+			wb.inliers.grow().scoreGeometric = 75;
+		}
+
+		// Call the function being tested
+		alg.mergeViews(src, dst, src_to_dst);
+
+		assertEquals(5, dst.listViews.size());
+
+		for (int i = 0; i < 5; i++) {
+			SceneWorkingGraph.View wb = dst.lookupView("" + i);
+
+			assertEquals(2, wb.inliers.size);
+
+			// src will dominate on even views
+			if (i%2 == 0) {
+				assertEquals(1, wb.imageDimension.width);
+				assertEquals(1, wb.intrinsic.f);
+				assertEquals(1, wb.world_to_view.T.x);
+			} else {
+				assertEquals(2, wb.imageDimension.width);
+				assertEquals(2, wb.intrinsic.f);
+				assertEquals(2, wb.world_to_view.T.x);
+			}
+		}
 	}
 
 	@Test void selectViewsToEstimateTransform() {
@@ -204,7 +286,7 @@ public class TestSceneMergingOperations extends BoofStandardJUnit {
 		assertSame(dst.listViews.get(4), found.dst);
 	}
 
-	@Test void adjustSceneCounts() {
+	@Test void toggleViewEnabled() {
 		int numScenes = 4;
 		int numViews = 6;
 		var viewScenes = new PairwiseViewScenes();
@@ -225,10 +307,15 @@ public class TestSceneMergingOperations extends BoofStandardJUnit {
 		}
 
 		var alg = new SceneMergingOperations();
-		alg.countCommonViews(viewScenes, numScenes);
+		alg.initializeViewCounts(viewScenes, numScenes);
 
-		// Remove it
-		alg.adjustSceneCounts(scene, viewScenes, false);
+		// Disable it
+		alg.toggleViewEnabled(scene, viewScenes);
+
+		// Verify that it has been disabled
+		assertFalse(alg.enabledScenes.get(scene.index));
+
+		// See if the counts were updated correctly
 		alg.commonViewCounts.forIdx(( idx, v ) -> {
 			if (idx == 0) {
 				// scenes with a lower index should have zero counts for this scene
@@ -245,7 +332,9 @@ public class TestSceneMergingOperations extends BoofStandardJUnit {
 		});
 
 		// Add it back. It will be visible in every scene again
-		alg.adjustSceneCounts(scene, viewScenes, true);
+		alg.toggleViewEnabled(scene, viewScenes);
+		assertTrue(alg.enabledScenes.get(scene.index));
+
 		alg.commonViewCounts.forIdx(( idx, v ) -> {
 			if (idx == 0) {
 				// scenes with a lower index should have zero counts for this scene
@@ -259,35 +348,6 @@ public class TestSceneMergingOperations extends BoofStandardJUnit {
 				// there should be no change if the index is higher
 				assertEquals(3 - idx, v.size);
 			}
-		});
-	}
-
-	@Test void removeScene() {
-		int numScenes = 4;
-		int numViews = 6;
-		var viewScenes = new PairwiseViewScenes();
-		// Every view is seen by every Scene
-		for (int viewIdx = 0; viewIdx < numViews; viewIdx++) {
-			ViewScenes v = viewScenes.views.grow();
-			v.viewedBy.resize(numScenes, ( idx ) -> idx);
-		}
-
-		// Create the scene which will be adjusted
-		var scene = new SceneWorkingGraph();
-		scene.index = 1;
-		for (int i = 0; i < viewScenes.views.size; i++) {
-			var wv = new SceneWorkingGraph.View();
-			wv.pview = new PairwiseImageGraph.View();
-			wv.pview.index = i;
-			scene.listViews.add(wv);
-		}
-
-		SceneMergingOperations.removeScene(scene, viewScenes);
-
-		// See if the scene was removed from all the views
-		viewScenes.views.forIdx(( idx, v ) -> {
-			assertEquals(numScenes - 1, v.viewedBy.size);
-			assertEquals(-1, v.viewedBy.indexOf(scene.index));
 		});
 	}
 

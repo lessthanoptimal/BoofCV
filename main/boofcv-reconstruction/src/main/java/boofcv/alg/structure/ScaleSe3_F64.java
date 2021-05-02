@@ -27,7 +27,7 @@ import georegression.struct.se.Se3_F64;
  */
 public class ScaleSe3_F64 {
 	/** Specifies the difference in scale. Apply to translation BEFORE applying 'transform' */
-	public double scale;
+	public double scale = 1.0;
 
 	/** Rigid body transform between */
 	public final Se3_F64 transform = new Se3_F64();

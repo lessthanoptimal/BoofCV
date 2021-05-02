@@ -343,7 +343,7 @@ public class MetricFromUncalibratedPairwiseGraph extends ReconstructionFromPairw
 		ScaleSe3_F64 src_to_dst = new ScaleSe3_F64();
 
 		// Compute the number of views which are in common between all the scenes
-		mergeOps.countCommonViews(nodeViews, scenes.size);
+		mergeOps.initializeViewCounts(nodeViews, scenes.size);
 
 		// Merge views until views can no longer be merged
 		while (mergeOps.selectViewsToMerge(selected)) {
@@ -370,17 +370,18 @@ public class MetricFromUncalibratedPairwiseGraph extends ReconstructionFromPairw
 			// Don't merge in this situation
 			if (subset) {
 				if (verbose != null)
-					verbose.println("scenes: src=" + src.index + " dst=" + dst.index + " Removing: src is a subset.");
-				mergeOps.adjustSceneCounts(src, nodeViews, false);
-				mergeOps.adjustSceneCounts(dst, nodeViews, false);
-				SceneMergingOperations.removeScene(src, nodeViews);
-				mergeOps.adjustSceneCounts(dst, nodeViews, true);
+					verbose.println("merge results: src=" + src.index + " dst=" + dst.index + " Removing: src is a subset.");
+				mergeOps.toggleViewEnabled(src, nodeViews);
+				BoofMiscOps.checkTrue(!mergeOps.enabledScenes.get(src.index), "Should be disabled now");
+				BoofMiscOps.checkTrue(mergeOps.enabledScenes.get(dst.index), "Should be enabled now");
 				continue;
 			}
 
+			if (verbose != null) verbose.println("Merging: src="+ src.index + " dst=" + dst.index);
+
 			// Remove both views from the counts for now
-			mergeOps.adjustSceneCounts(src, nodeViews, false);
-			mergeOps.adjustSceneCounts(dst, nodeViews, false);
+			mergeOps.toggleViewEnabled(src, nodeViews);
+			mergeOps.toggleViewEnabled(dst, nodeViews);
 
 			// Select which view pair to determine the relationship between the scenes from
 			if (!mergeOps.selectViewsToEstimateTransform(src, dst, selectedViews))
@@ -404,20 +405,19 @@ public class MetricFromUncalibratedPairwiseGraph extends ReconstructionFromPairw
 			}
 
 			if (verbose != null)
-				verbose.println("scenes: src=" + src.index + " dst=" + dst.index +
+				verbose.println("merge results: src=" + src.index + " dst=" + dst.index +
 						" views: (" + src.listViews.size() + " , " + dstViewCountBefore +
 						") -> " + dst.listViews.size() + ", scale=" + src_to_dst.scale);
 
-			// Remove the one that's no longer needed
-			SceneMergingOperations.removeScene(src, nodeViews);
-
-			// Update the scene counts with the new combined scene
-			mergeOps.adjustSceneCounts(dst, nodeViews, true);
+			// Update the counts of dst and enable it again
+			mergeOps.toggleViewEnabled(dst, nodeViews);
+			BoofMiscOps.checkTrue(!mergeOps.enabledScenes.get(src.index), "Should be disabled now");
+			BoofMiscOps.checkTrue(mergeOps.enabledScenes.get(dst.index), "Should be enabled now");
 		}
 
 		// remove scenes that got merged into others. This is output to the user
 		for (int i = scenes.size - 1; i >= 0; i--) {
-			if (!scenes.get(i).listViews.isEmpty())
+			if (mergeOps.enabledScenes.get(scenes.get(i).index))
 				continue;
 			scenes.removeSwap(i);
 		}
