@@ -175,7 +175,11 @@ public class MetricExpandByOneView extends ExpandByOneView {
 
 		// Refine using bundle adjustment, if configured to do so
 		if (utils.configConvergeSBA.maxIterations > 0) {
-			refineWithBundleAdjustment(workGraph);
+			if (!refineWithBundleAdjustment(workGraph)) {
+				if (verbose != null) verbose.println("FAILED bundle adjustment");
+				return false;
+			}
+
 			// Sanity check geometry for a bad solution
 			if (!checkBehind()) {
 				if (verbose != null) verbose.println("FAILED behind view check");
@@ -267,7 +271,7 @@ public class MetricExpandByOneView extends ExpandByOneView {
 	/**
 	 * Optimize the three view metric local scene using SBA
 	 */
-	private void refineWithBundleAdjustment( SceneWorkingGraph workGraph ) {
+	private boolean refineWithBundleAdjustment( SceneWorkingGraph workGraph ) {
 		final SceneStructureMetric structure = bundleAdjustment.structure;
 		final SceneObservations observations = bundleAdjustment.observations;
 
@@ -337,7 +341,7 @@ public class MetricExpandByOneView extends ExpandByOneView {
 
 		// Refine using bundle adjustment
 		if (!bundleAdjustment.process(null))
-			throw new RuntimeException("Bundle adjustment failed. Handle this");
+			return false;
 
 		// copy results for output
 		targetIntrinsic.setTo((BundlePinholeSimplified)structure.cameras.get(2).model);
@@ -348,6 +352,8 @@ public class MetricExpandByOneView extends ExpandByOneView {
 					targetIntrinsic.f, targetIntrinsic.k1, targetIntrinsic.k2,
 					view1_to_target.T.x, view1_to_target.T.y, view1_to_target.T.z);
 		}
+
+		return true;
 	}
 
 	/**
