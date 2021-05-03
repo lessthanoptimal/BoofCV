@@ -71,6 +71,12 @@ import static boofcv.misc.BoofMiscOps.checkEq;
  */
 public class MetricFromUncalibratedPairwiseGraph extends ReconstructionFromPairwiseGraph {
 
+	/**
+	 * When expanding a scene, SBA is applied to the entire scene until it has this many views. This often helps
+	 * improve the initial metric scene estimate significantly, but can be expensive.
+	 */
+	public @Getter @Setter int refineSceneWhileExpandingMaxViews = 10;
+
 	/** Computes the initial scene from the seed and some of it's neighbors */
 	private final @Getter ProjectiveInitializeAllCommon initProjective;
 
@@ -302,7 +308,13 @@ public class MetricFromUncalibratedPairwiseGraph extends ReconstructionFromPairw
 			if (verbose != null)
 				verbose.println("  Expanding scene=" + best.scene.index + " view='" + view.id + "' score=" + best.score);
 
-			expandIntoView(db, best.scene, view);
+			if (!expandIntoView(db, best.scene, view))
+				continue;
+
+			if ( best.scene.listViews.size() > refineSceneWhileExpandingMaxViews)
+				continue;
+
+			refineWorking.process(db, best.scene);
 		}
 	}
 
@@ -434,12 +446,14 @@ public class MetricFromUncalibratedPairwiseGraph extends ReconstructionFromPairw
 
 	/**
 	 * Expands the scene to include the specified view
+	 *
+	 * @return true if it could expand into the view and updated the scene. False if it failed
 	 */
-	void expandIntoView( LookUpSimilarImages db, SceneWorkingGraph scene, PairwiseImageGraph.View selected ) {
+	boolean expandIntoView( LookUpSimilarImages db, SceneWorkingGraph scene, PairwiseImageGraph.View selected ) {
 		if (!expandMetric.process(db, scene, selected)) {
 			if (verbose != null)
 				verbose.println("Failed to expand/add scene=" + scene.index + " view='" + selected.id + "'. Discarding.");
-			return; // TODO handle this failure somehow. mark the scene as dead? Revisit it later on?
+			return false;
 		}
 
 		// Saves the set of inliers used to estimate this views metric view for later use
@@ -469,6 +483,8 @@ public class MetricFromUncalibratedPairwiseGraph extends ReconstructionFromPairw
 
 		// Add this view to the list
 		nodeViews.getView(selected).viewedBy.add(scene.index);
+
+		return true;
 	}
 
 	/**

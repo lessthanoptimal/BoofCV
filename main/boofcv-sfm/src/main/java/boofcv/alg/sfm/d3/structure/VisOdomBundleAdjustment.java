@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -77,7 +77,8 @@ public class VisOdomBundleAdjustment<T extends VisOdomBundleAdjustment.BTrack> {
 		selectTracks.selectTracks(this, selectedTracks);
 		setupBundleStructure();
 
-		if (!bundle.process(verbose)) {
+		bundle.setVerbose(verbose, null); // TODO replace by implementing VerbosePrint
+		if (!bundle.process()) {
 			if (verbose != null) verbose.println("Bundle adjustment failed!");
 		}
 

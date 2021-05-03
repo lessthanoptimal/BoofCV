@@ -21,19 +21,22 @@ package boofcv.abst.geo.bundle;
 import boofcv.abst.geo.TriangulateNViewsMetricH;
 import boofcv.factory.geo.ConfigTriangulation;
 import boofcv.factory.geo.FactoryMultiView;
+import boofcv.misc.BoofMiscOps;
 import boofcv.misc.ConfigConverge;
 import lombok.Getter;
 import lombok.Setter;
+import org.ddogleg.struct.VerbosePrint;
 import org.jetbrains.annotations.Nullable;
 
 import java.io.PrintStream;
+import java.util.Set;
 
 /**
  * Contains everything you need to do metric bundle adjustment in one location
  *
  * @author Peter Abeles
  */
-public class MetricBundleAdjustmentUtils {
+public class MetricBundleAdjustmentUtils implements VerbosePrint {
 	/** Configures convergence criteria for SBA */
 	public final @Getter ConfigConverge configConverge = new ConfigConverge(1e-5, 1e-5, 30);
 	/** Toggles on and off scaling parameters */
@@ -49,6 +52,8 @@ public class MetricBundleAdjustmentUtils {
 	public @Getter @Setter TriangulateNViewsMetricH triangulator;
 	public @Getter ScaleSceneStructure scaler = new ScaleSceneStructure();
 
+	@Nullable PrintStream verbose;
+
 	public MetricBundleAdjustmentUtils( @Nullable ConfigTriangulation triangulation, boolean homogenous ) {
 		triangulator = FactoryMultiView.triangulateNViewMetricH(triangulation);
 		structure = new SceneStructureMetric(homogenous);
@@ -63,7 +68,7 @@ public class MetricBundleAdjustmentUtils {
 	 *
 	 * @return true if successful
 	 */
-	public boolean process( @Nullable PrintStream verbose ) {
+	public boolean process() {
 		if (configConverge.maxIterations == 0)
 			return true;
 		if (configScale)
@@ -122,5 +127,9 @@ public class MetricBundleAdjustmentUtils {
 		for (int viewIdx = 0; viewIdx < observations.views.size; viewIdx++) {
 			out.println("view[" + viewIdx + "].observations.size=" + observations.views.get(viewIdx).size());
 		}
+	}
+
+	@Override public void setVerbose( @Nullable PrintStream out, @Nullable Set<String> configuration ) {
+		this.verbose = BoofMiscOps.addPrefix(this, out);
 	}
 }

@@ -359,7 +359,7 @@ public class MetricExpandByOneView extends ExpandByOneView {
 		}
 
 		// Refine using bundle adjustment
-		if (!bundleAdjustment.process(null))
+		if (!bundleAdjustment.process())
 			return false;
 
 		return true;
