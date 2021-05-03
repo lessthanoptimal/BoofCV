@@ -37,6 +37,7 @@ import org.ddogleg.struct.DogArray_I32;
 import org.ddogleg.struct.FastArray;
 import org.ddogleg.struct.VerbosePrint;
 import org.ejml.data.DMatrixRMaj;
+import org.ejml.dense.row.MatrixFeatures_DDRM;
 import org.jetbrains.annotations.Nullable;
 
 import java.io.PrintStream;
@@ -77,6 +78,7 @@ public class ProjectiveInitializeAllCommon implements VerbosePrint {
 	protected @Getter final DogArray<DogArray_I32> inlierIndexes =
 			new DogArray<>(DogArray_I32::new, DogArray_I32::reset);
 
+	// Retrieve a Pairwise.View given it's index in the SBA structure
 	protected final FastArray<View> viewsByStructureIndex = new FastArray<>(View.class);
 
 	// Indicates if debugging information should be printed
@@ -495,11 +497,14 @@ public class ProjectiveInitializeAllCommon implements VerbosePrint {
 
 		// Copy results from bundle adjustment data structures
 		for (int viewIdx = 0; viewIdx < numViews; viewIdx++) {
+			SceneStructureProjective.View pview = utils.structure.views.get(viewIdx);
 			if (viewIdx != 0)
-				cameraMatrices.get(viewIdx - 1).setTo(utils.structure.views.get(viewIdx).worldToView);
+				cameraMatrices.get(viewIdx - 1).setTo(pview.worldToView);
+			else
+				BoofMiscOps.checkTrue(MatrixFeatures_DDRM.isIdentity(pview.worldToView, 1e-8));
 			String id = viewsByStructureIndex.get(viewIdx).id;
 			viewIds.add(id);
-			utils.db.lookupShape(id, dimensions.get(viewIdx));
+			dimensions.get(viewIdx).setTo(pview.width, pview.height);
 
 			SceneObservations.View oview = utils.observations.views.get(viewIdx);
 			BoofMiscOps.checkTrue(oview.size() == observations.size);

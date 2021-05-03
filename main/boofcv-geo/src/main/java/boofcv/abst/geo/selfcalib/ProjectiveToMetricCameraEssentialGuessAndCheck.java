@@ -51,16 +51,16 @@ public class ProjectiveToMetricCameraEssentialGuessAndCheck implements Projectiv
 	}
 
 	@Override
-	public boolean process( List<ImageDimension> dimensions, List<DMatrixRMaj> views,
+	public boolean process( List<ImageDimension> dimensions, List<DMatrixRMaj> cameraMatrices,
 							List<AssociatedTuple> observations, MetricCameras metricViews ) {
-		BoofMiscOps.checkTrue(views.size() + 1 == dimensions.size());
+		BoofMiscOps.checkTrue(cameraMatrices.size() + 1 == dimensions.size());
 		metricViews.reset();
 
 		// initialize
 		selfCalib.imageLengthPixels = dimensions.get(0).getMaxLength();
 
 		// Convert the projective cameras into a fundamental matrix
-		DMatrixRMaj P2 = views.get(0);
+		DMatrixRMaj P2 = cameraMatrices.get(0);
 		MultiViewOps.projectiveToFundamental(P2, F21);
 
 		// Convert observations into AssociatedPairs
@@ -81,8 +81,8 @@ public class ProjectiveToMetricCameraEssentialGuessAndCheck implements Projectiv
 		if (!MultiViewOps.projectiveToMetricKnownK(P2, H, K, metricViews.motion_1_to_k.grow()))
 			return false;
 		// For the remaining views use H to find motion and intrinsics
-		for (int viewIdx = 1; viewIdx < views.size(); viewIdx++) {
-			if (!MultiViewOps.projectiveToMetric(views.get(viewIdx), H, metricViews.motion_1_to_k.grow(), K))
+		for (int viewIdx = 1; viewIdx < cameraMatrices.size(); viewIdx++) {
+			if (!MultiViewOps.projectiveToMetric(cameraMatrices.get(viewIdx), H, metricViews.motion_1_to_k.grow(), K))
 				return false;
 			PerspectiveOps.matrixToPinhole(K, -1, -1, metricViews.intrinsics.grow());
 		}

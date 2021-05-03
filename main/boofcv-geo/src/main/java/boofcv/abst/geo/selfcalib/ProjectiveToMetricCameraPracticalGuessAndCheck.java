@@ -51,9 +51,9 @@ public class ProjectiveToMetricCameraPracticalGuessAndCheck implements Projectiv
 	}
 
 	@Override
-	public boolean process( List<ImageDimension> dimensions, List<DMatrixRMaj> views,
+	public boolean process( List<ImageDimension> dimensions, List<DMatrixRMaj> cameraMatrices,
 							List<AssociatedTuple> observations, MetricCameras metricViews ) {
-		BoofMiscOps.checkTrue(views.size() + 1 == dimensions.size());
+		BoofMiscOps.checkTrue(cameraMatrices.size() + 1 == dimensions.size());
 		metricViews.reset();
 
 		// tell it the image size
@@ -61,7 +61,7 @@ public class ProjectiveToMetricCameraPracticalGuessAndCheck implements Projectiv
 		selfCalib.setCamera(0.0, 0.0, 0.0, dimension.width, dimension.height);
 
 		// Perform self calibration
-		if (!selfCalib.process(views))
+		if (!selfCalib.process(cameraMatrices))
 			return false;
 
 		DMatrixRMaj H = selfCalib.getRectifyingHomography();
@@ -72,8 +72,8 @@ public class ProjectiveToMetricCameraPracticalGuessAndCheck implements Projectiv
 
 		// Get the solution for the remaining cameras / views
 		double largestT = 0.0;
-		for (int viewIdx = 0; viewIdx < views.size(); viewIdx++) {
-			DMatrixRMaj P = views.get(viewIdx);
+		for (int viewIdx = 0; viewIdx < cameraMatrices.size(); viewIdx++) {
+			DMatrixRMaj P = cameraMatrices.get(viewIdx);
 			if (!MultiViewOps.projectiveToMetric(P, H, metricViews.motion_1_to_k.grow(), K))
 				return false;
 			PerspectiveOps.matrixToPinhole(K, -1, -1, metricViews.intrinsics.grow());

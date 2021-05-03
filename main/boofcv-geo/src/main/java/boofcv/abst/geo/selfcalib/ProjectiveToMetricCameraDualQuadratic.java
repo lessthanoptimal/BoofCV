@@ -78,13 +78,13 @@ public class ProjectiveToMetricCameraDualQuadratic implements ProjectiveToMetric
 	}
 
 	@Override
-	public boolean process( List<ImageDimension> dimensions, List<DMatrixRMaj> views,
+	public boolean process( List<ImageDimension> dimensions, List<DMatrixRMaj> cameraMatrices,
 							List<AssociatedTuple> observations, MetricCameras metricViews ) {
-		checkEq(views.size() + 1, dimensions.size(), "View[0] is implicitly identity and not included");
+		checkEq(cameraMatrices.size() + 1, dimensions.size(), "View[0] is implicitly identity and not included");
 		metricViews.reset();
 
 		// Perform self calibration and estimate the metric views
-		if (!solveThenDecompose(views))
+		if (!solveThenDecompose(cameraMatrices))
 			return false;
 
 		FastAccess<SelfCalibrationLinearDualQuadratic.Intrinsic> solutions = selfCalib.getSolutions();
@@ -93,14 +93,14 @@ public class ProjectiveToMetricCameraDualQuadratic implements ProjectiveToMetric
 			return false;
 		}
 
-		if (!reformatResults(views, solutions, metricViews))
+		if (!reformatResults(cameraMatrices, solutions, metricViews))
 			return false;
 
 		// Need to resolve the sign ambiguity
 		resolveSign.process(observations, metricViews);
 
 		// Sanity check results by seeing if too many points are behind the camera, which is physically impossible
-		if (checkBehindCamera(views.size(), observations.size()))
+		if (checkBehindCamera(cameraMatrices.size(), observations.size()))
 			return true;
 
 		// Failed, but print what it found to help debug
@@ -145,12 +145,12 @@ public class ProjectiveToMetricCameraDualQuadratic implements ProjectiveToMetric
 	/**
 	 * Given the results from self calibration, reformat them so fit the expected format specified by the interface
 	 *
-	 * @param views (Input)
+	 * @param cameraMatrices (Input)
 	 * @param solutions (Input)
 	 * @param metricViews (Output)
 	 * @return true if successful
 	 */
-	boolean reformatResults( List<DMatrixRMaj> views,
+	boolean reformatResults( List<DMatrixRMaj> cameraMatrices,
 							 FastAccess<SelfCalibrationLinearDualQuadratic.Intrinsic> solutions,
 							 MetricCameras metricViews ) {
 		for (int i = 0; i < solutions.size; i++) {
@@ -159,8 +159,8 @@ public class ProjectiveToMetricCameraDualQuadratic implements ProjectiveToMetric
 
 		// skip the first view since it's the origin and already known
 		double largestT = 0.0;
-		for (int i = 0; i < views.size(); i++) {
-			DMatrixRMaj P = views.get(i);
+		for (int i = 0; i < cameraMatrices.size(); i++) {
+			DMatrixRMaj P = cameraMatrices.get(i);
 			PerspectiveOps.pinholeToMatrix(metricViews.intrinsics.get(i + 1), K);
 			if (!MultiViewOps.projectiveToMetricKnownK(P, H, K, metricViews.motion_1_to_k.grow())) {
 				if (verbose != null) verbose.println("FAILED projectiveToMetricKnownK");
