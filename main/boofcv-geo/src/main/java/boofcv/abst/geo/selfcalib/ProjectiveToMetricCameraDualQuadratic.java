@@ -40,6 +40,7 @@ import org.jetbrains.annotations.Nullable;
 
 import java.io.PrintStream;
 import java.util.List;
+import java.util.Objects;
 import java.util.Set;
 
 import static boofcv.misc.BoofMiscOps.checkEq;
@@ -51,6 +52,7 @@ import static boofcv.misc.BoofMiscOps.checkEq;
  */
 public class ProjectiveToMetricCameraDualQuadratic implements ProjectiveToMetricCameras, VerbosePrint {
 
+	/** Self calibration algorithm used internally */
 	final @Getter SelfCalibrationLinearDualQuadratic selfCalib;
 
 	/** Accept a solution if the number of invalid features is less than or equal to this fraction */
@@ -81,6 +83,38 @@ public class ProjectiveToMetricCameraDualQuadratic implements ProjectiveToMetric
 		checkEq(views.size() + 1, dimensions.size(), "View[0] is implicitly identity and not included");
 		metricViews.reset();
 
+		// Perform self calibration and estimate the metric views
+		if (!solveThenDecompose(views))
+			return false;
+
+		FastAccess<SelfCalibrationLinearDualQuadratic.Intrinsic> solutions = selfCalib.getSolutions();
+		if (solutions.size != dimensions.size()) {
+			if (verbose != null) verbose.println("FAILED solution.size miss match");
+			return false;
+		}
+
+		if (!reformatResults(views, solutions, metricViews))
+			return false;
+
+		// Need to resolve the sign ambiguity
+		resolveSign.process(observations, metricViews);
+
+		// Sanity check results by seeing if too many points are behind the camera, which is physically impossible
+		if (checkBehindCamera(views.size(), observations.size()))
+			return true;
+
+		// Failed, but print what it found to help debug
+		if (verbose != null) printFoundMetric(dimensions, metricViews);
+
+		return false;
+	}
+
+	/**
+	 * Performs self calibration and then finds rectifying homography
+	 *
+	 * @return true if successful
+	 */
+	boolean solveThenDecompose( List<DMatrixRMaj> views ) {
 		// Determine metric parameters
 		selfCalib.reset();
 		selfCalib.addCameraMatrix(P1);
@@ -105,12 +139,20 @@ public class ProjectiveToMetricCameraDualQuadratic implements ProjectiveToMetric
 			return false;
 		}
 
-		FastAccess<SelfCalibrationLinearDualQuadratic.Intrinsic> solutions = selfCalib.getSolutions();
-		if (solutions.size != dimensions.size()) {
-			if (verbose != null) verbose.println("FAILED solution miss match");
-			return false;
-		}
+		return true;
+	}
 
+	/**
+	 * Given the results from self calibration, reformat them so fit the expected format specified by the interface
+	 *
+	 * @param views (Input)
+	 * @param solutions (Input)
+	 * @param metricViews (Output)
+	 * @return true if successful
+	 */
+	boolean reformatResults( List<DMatrixRMaj> views,
+							 FastAccess<SelfCalibrationLinearDualQuadratic.Intrinsic> solutions,
+							 MetricCameras metricViews ) {
 		for (int i = 0; i < solutions.size; i++) {
 			solutions.get(i).copyTo(metricViews.intrinsics.grow());
 		}
@@ -131,11 +173,18 @@ public class ProjectiveToMetricCameraDualQuadratic implements ProjectiveToMetric
 		for (int i = 0; i < metricViews.motion_1_to_k.size; i++) {
 			metricViews.motion_1_to_k.get(i).T.divide(largestT);
 		}
+		return true;
+	}
 
-		resolveSign.process(observations, metricViews);
-
+	/**
+	 * When resolving for the sign ambiguity it has to check to see if triangulated points are behind the camera.
+	 * This looks at the number of points behind the camera and decides if it can trust this solution or not
+	 *
+	 * @return true If it passes the test
+	 */
+	boolean checkBehindCamera(  int numViews, int numObservations ) {
 		// bestInvalid is the sum across all views. Use the average fraction across all views as the test
-		double fractionInvalid = (resolveSign.bestInvalid/(double)views.size())/observations.size();
+		double fractionInvalid = (resolveSign.bestInvalid/(double)numViews)/numObservations;
 		if (fractionInvalid <= invalidFractionAccept) {
 			return true;
 		}
@@ -143,13 +192,13 @@ public class ProjectiveToMetricCameraDualQuadratic implements ProjectiveToMetric
 		if (verbose != null) {
 			verbose.printf("FAILED: Features behind camera. fraction=%.3f threshold=%.3f\n",
 					fractionInvalid, invalidFractionAccept);
-			printFoundMetric(dimensions, metricViews);
 		}
-
 		return false;
 	}
 
 	private void printFoundMetric( List<ImageDimension> dimensions, MetricCameras metricViews ) {
+		PrintStream verbose = Objects.requireNonNull(this.verbose);
+
 		for (int i = 0; i < dimensions.size(); i++) {
 			CameraPinhole cam = metricViews.intrinsics.get(i);
 			verbose.printf("metric[%d] fx=%.1f fy=%.1f", i, cam.fx, cam.fy);
@@ -163,10 +212,7 @@ public class ProjectiveToMetricCameraDualQuadratic implements ProjectiveToMetric
 		}
 	}
 
-	@Override
-	public int getMinimumViews() {
-		return selfCalib.getMinimumProjectives();
-	}
+	@Override public int getMinimumViews() { return selfCalib.getMinimumProjectives(); }
 
 	@Override public void setVerbose( @Nullable PrintStream out, @Nullable Set<String> configuration ) {
 		this.verbose = BoofMiscOps.addPrefix(this, out);

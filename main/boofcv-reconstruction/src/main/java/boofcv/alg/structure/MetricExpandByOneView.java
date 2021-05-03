@@ -175,16 +175,8 @@ public class MetricExpandByOneView extends ExpandByOneView {
 
 		// Refine using bundle adjustment, if configured to do so
 		if (utils.configConvergeSBA.maxIterations > 0) {
-			if (!refineWithBundleAdjustment(workGraph)) {
-				if (verbose != null) verbose.println("FAILED bundle adjustment");
+			if (!performBundleAndCheckResults(workGraph))
 				return false;
-			}
-
-			// Sanity check geometry for a bad solution
-			if (!checkBehind()) {
-				if (verbose != null) verbose.println("FAILED behind view check");
-				return false;
-			}
 		}
 
 		// Now that the metric upgrade is known add it to work graph
@@ -206,6 +198,33 @@ public class MetricExpandByOneView extends ExpandByOneView {
 					wtarget.world_to_view.T.x, wtarget.world_to_view.T.y, wtarget.world_to_view.T.z);
 		}
 
+		return true;
+	}
+
+	/**
+	 * Performs bundle adjustment on the scene and sanity checks the results
+	 */
+	boolean performBundleAndCheckResults( SceneWorkingGraph workGraph ) {
+		if (!refineWithBundleAdjustment(workGraph)) {
+			if (verbose != null) verbose.println("FAILED bundle adjustment");
+			return false;
+		}
+
+		// Sanity check geometry for a bad solution
+		if (!checkBehind()) {
+			if (verbose != null) verbose.println("FAILED behind view check");
+			return false;
+		}
+
+		// copy results for output
+		targetIntrinsic.setTo((BundlePinholeSimplified)bundleAdjustment.structure.cameras.get(2).model);
+		view1_to_target.setTo(bundleAdjustment.structure.getParentToView(2));
+
+		if (verbose != null) {
+			verbose.printf("Refined fx=%6.1f k1=%6.3f k2=%6.3f T=(%.1f %.1f %.1f)\n",
+					targetIntrinsic.f, targetIntrinsic.k1, targetIntrinsic.k2,
+					view1_to_target.T.x, view1_to_target.T.y, view1_to_target.T.z);
+		}
 		return true;
 	}
 
@@ -343,16 +362,6 @@ public class MetricExpandByOneView extends ExpandByOneView {
 		if (!bundleAdjustment.process(null))
 			return false;
 
-		// copy results for output
-		targetIntrinsic.setTo((BundlePinholeSimplified)structure.cameras.get(2).model);
-		view1_to_target.setTo(structure.getParentToView(2));
-
-		if (verbose != null) {
-			verbose.printf("Refined fx=%6.1f k1=%6.3f k2=%6.3f T=(%.1f %.1f %.1f)\n",
-					targetIntrinsic.f, targetIntrinsic.k1, targetIntrinsic.k2,
-					view1_to_target.T.x, view1_to_target.T.y, view1_to_target.T.z);
-		}
-
 		return true;
 	}
 
@@ -392,6 +401,10 @@ public class MetricExpandByOneView extends ExpandByOneView {
 		var worldP = new Point4D_F64(0, 0, 0, 1);
 		var viewP = new Point4D_F64();
 
+		// view1 is the world coordinate system
+		Se3_F64 view1_to_view2 = structure.getParentToView(1);
+		Se3_F64 view1_to_view3 = structure.getParentToView(2);
+
 		for (int featIdx = 0; featIdx < numPoints; featIdx++) {
 			// extract the coordinate from SBA results
 			SceneStructureCommon.Point p = structure.points.get(featIdx);
@@ -409,11 +422,11 @@ public class MetricExpandByOneView extends ExpandByOneView {
 			if (worldP.z/worldP.w < 0.0)
 				behind1++;
 
-			SePointOps_F64.transform(view1_to_view2H, worldP, viewP);
+			SePointOps_F64.transform(view1_to_view2, worldP, viewP);
 			if (viewP.z/viewP.w < 0.0)
 				behind2++;
 
-			SePointOps_F64.transform(view1_to_target, worldP, viewP);
+			SePointOps_F64.transform(view1_to_view3, worldP, viewP);
 			if (viewP.z/viewP.w < 0.0)
 				behind3++;
 		}
