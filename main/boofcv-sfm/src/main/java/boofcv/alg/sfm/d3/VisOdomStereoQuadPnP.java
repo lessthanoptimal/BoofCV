@@ -31,6 +31,7 @@ import boofcv.alg.descriptor.UtilFeature;
 import boofcv.factory.distort.LensDistortionFactory;
 import boofcv.factory.geo.ConfigTriangulation;
 import boofcv.factory.geo.FactoryMultiView;
+import boofcv.misc.BoofMiscOps;
 import boofcv.misc.ConfigConverge;
 import boofcv.struct.calib.StereoParameters;
 import boofcv.struct.distort.Point2Transform2_F64;
@@ -650,7 +651,7 @@ public class VisOdomStereoQuadPnP<T extends ImageGray<T>, TD extends TupleDesc<T
 			observations.getView(3).add(trackIdx, (float)t.v3.x, (float)t.v3.y);
 		}
 
-		if (!bundle.process(verbose))
+		if (!bundle.process())
 			return;
 
 		// Update the state of tracks and the current views
@@ -746,6 +747,11 @@ public class VisOdomStereoQuadPnP<T extends ImageGray<T>, TD extends TupleDesc<T
 		// Default to no verbose messages
 		this.verbose = null;
 		this.profileOut = null;
+
+		if (out != null) {
+			BoofMiscOps.verboseChildren(out, configuration, bundle);
+			out = BoofMiscOps.addPrefix(this, out);
+		}
 
 		// Update the level of verbosity based on the request
 		if (configuration == null) {

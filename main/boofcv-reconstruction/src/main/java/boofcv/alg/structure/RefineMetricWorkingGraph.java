@@ -189,8 +189,8 @@ public class RefineMetricWorkingGraph implements VerbosePrint {
 			for (int infoIdx = 0; infoIdx < wview.inliers.size; infoIdx++) {
 				final SceneWorkingGraph.InlierInfo inliers = wview.inliers.get(infoIdx);
 
-				if (verbose != null) verbose.println("inlier["+infoIdx+"] view='" + wview.pview.id +
-						"' size=" + inliers.getInlierCount());
+				if (verbose != null) verbose.print("inlier["+infoIdx+"] view='" + wview.pview.id +
+						"' size=" + inliers.getInlierCount()+" , ");
 
 				createFeaturesFromInlierInfo(graph, inliers);
 			}
@@ -238,7 +238,7 @@ public class RefineMetricWorkingGraph implements VerbosePrint {
 		}
 
 		if (verbose != null) {
-			verbose.println("unmatched=" + (numInliers - countMatched) + "  matched=" + countMatched + " mixed=" +
+			verbose.println("Adding Points: unmatched=" + (numInliers - countMatched) + "  matched=" + countMatched + " mixed=" +
 					countMixed + " tooFew=" + tooFew);
 		}
 	}
@@ -444,8 +444,9 @@ public class RefineMetricWorkingGraph implements VerbosePrint {
 	 * @return true is successful or false is SBA failed
 	 */
 	protected boolean refineViews( SceneWorkingGraph graph ) {
-		if (verbose != null) bundleAdjustment.printCounts(verbose);
-		if (!bundleAdjustment.process(verbose))
+//		if (verbose != null) bundleAdjustment.printCounts(verbose);
+
+		if (!bundleAdjustment.process())
 			return false;
 
 		final SceneStructureMetric structure = bundleAdjustment.structure;
@@ -462,5 +463,6 @@ public class RefineMetricWorkingGraph implements VerbosePrint {
 	@Override
 	public void setVerbose( @Nullable PrintStream out, @Nullable Set<String> configuration ) {
 		this.verbose = BoofMiscOps.addPrefix(this, out);
+		BoofMiscOps.verboseChildren(out, configuration, bundleAdjustment);
 	}
 }
