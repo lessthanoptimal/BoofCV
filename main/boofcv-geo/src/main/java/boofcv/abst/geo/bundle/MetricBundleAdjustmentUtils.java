@@ -76,28 +76,28 @@ public class MetricBundleAdjustmentUtils implements VerbosePrint {
 		sba.configure(configConverge.ftol, configConverge.gtol, configConverge.maxIterations);
 
 		sba.setParameters(structure, observations);
-		if (verbose != null)
-			verbose.println("SBA BEFORE        average error=" + (Math.sqrt(sba.getFitScore())/observations.getObservationCount()));
+		if (verbose != null) printAverageError("BEFORE", verbose);
 		if (!sba.optimize(structure))
 			return false;
-		if (verbose != null)
-			verbose.println("SBA AFTER         average error=" + (Math.sqrt(sba.getFitScore())/observations.getObservationCount()));
+		if (verbose != null) printAverageError("AFTER", verbose);
 
 		if (keepFraction < 1.0) {
 			// don't prune views since they might be required
 			prune(keepFraction, -1, 1);
 			sba.setParameters(structure, observations);
-			if (verbose != null)
-				verbose.println("SBA PRUNED-BEFORE average error=" + (Math.sqrt(sba.getFitScore())/observations.getObservationCount()));
 			if (!sba.optimize(structure))
 				return false;
-			if (verbose != null)
-				verbose.println("SBA PRUNED-AFTER  average error=" + (Math.sqrt(sba.getFitScore())/observations.getObservationCount()));
+			if (verbose != null) printAverageError("PRUNED-AFTER", verbose);
 		}
 
 		if (configScale)
 			scaler.undoScale(structure, observations);
 		return true;
+	}
+
+	private void printAverageError( String location, PrintStream out ) {
+		double averageError = Math.sqrt(sba.getFitScore())/observations.getObservationCount();
+		out.printf("SBA %13s average error=%.2e\n", location, averageError);
 	}
 
 	/**
