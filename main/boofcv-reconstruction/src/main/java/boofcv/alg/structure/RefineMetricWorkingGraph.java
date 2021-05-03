@@ -161,8 +161,7 @@ public class RefineMetricWorkingGraph implements VerbosePrint {
 
 			// The camera model assumes the principle point is (0,0) and this is done by assuming it's the image center
 			ImageDimension dimension = wview.imageDimension;
-			checkTrue(dimension.width > 0,
-					"You must assign width and height so that pixels can be re-centered");
+			checkTrue(dimension.width > 0, "You must assign width and height so that pixels can be re-centered");
 			float cx = (float)(dimension.width/2);
 			float cy = (float)(dimension.height/2);
 
@@ -189,8 +188,8 @@ public class RefineMetricWorkingGraph implements VerbosePrint {
 			for (int infoIdx = 0; infoIdx < wview.inliers.size; infoIdx++) {
 				final SceneWorkingGraph.InlierInfo inliers = wview.inliers.get(infoIdx);
 
-				if (verbose != null) verbose.print("inlier["+infoIdx+"] view='" + wview.pview.id +
-						"' size=" + inliers.getInlierCount()+" , ");
+				if (verbose != null) verbose.print("inlier[" + infoIdx + "] view='" + wview.pview.id +
+						"' size=" + inliers.getInlierCount() + " , ");
 
 				createFeaturesFromInlierInfo(graph, inliers);
 			}
@@ -227,7 +226,8 @@ public class RefineMetricWorkingGraph implements VerbosePrint {
 
 			// If there is 2 or more unassigned observations remaining triangulate and create a new 3D feature
 			if (unassigned.size < 2) {
-				tooFew++;
+				if (unassigned.size > 0)
+					tooFew++;
 				continue;
 			}
 
@@ -238,7 +238,7 @@ public class RefineMetricWorkingGraph implements VerbosePrint {
 		}
 
 		if (verbose != null) {
-			verbose.println("Adding Points: unmatched=" + (numInliers - countMatched) + "  matched=" + countMatched + " mixed=" +
+			verbose.println("Adding Points: unmatched=" + (numInliers - countMatched) + " matched=" + countMatched + " mixed=" +
 					countMixed + " tooFew=" + tooFew);
 		}
 	}
@@ -446,6 +446,14 @@ public class RefineMetricWorkingGraph implements VerbosePrint {
 	protected boolean refineViews( SceneWorkingGraph graph ) {
 //		if (verbose != null) bundleAdjustment.printCounts(verbose);
 
+//		for (int viewIdx = 0; viewIdx < graph.listViews.size(); viewIdx++) {
+//			if (verbose != null) {
+//				Se3_F64 m = bundleAdjustment.structure.getParentToView(viewIdx);
+//				double theta = ConvertRotation3D_F64.matrixToRodrigues(m.R,null).theta;
+//				verbose.printf("BEFORE SBA T=(%.2f %.2f %.2f) R=%.4f\n", m.T.x, m.T.y, m.T.z,theta);
+//			}
+//		}
+
 		if (!bundleAdjustment.process())
 			return false;
 
@@ -456,6 +464,12 @@ public class RefineMetricWorkingGraph implements VerbosePrint {
 			SceneWorkingGraph.View wview = graph.listViews.get(viewIdx);
 			wview.world_to_view.setTo(structure.getParentToView(viewIdx));
 			wview.intrinsic.setTo((BundlePinholeSimplified)structure.cameras.get(viewIdx).model);
+
+//			if (verbose != null) {
+//				Se3_F64 m = bundleAdjustment.structure.getParentToView(viewIdx);
+//				double theta = ConvertRotation3D_F64.matrixToRodrigues(m.R,null).theta;
+//				verbose.printf("AFTER SBA T=(%.2f %.2f %.2f) R=%.4f\n", m.T.x, m.T.y, m.T.z,theta);
+//			}
 		}
 		return true;
 	}
