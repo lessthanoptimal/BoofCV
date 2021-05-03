@@ -21,6 +21,7 @@ package boofcv.alg.structure;
 import boofcv.BoofTesting;
 import boofcv.abst.geo.bundle.SceneObservations;
 import boofcv.abst.geo.bundle.SceneStructureProjective;
+import boofcv.alg.geo.MultiViewOps;
 import boofcv.alg.geo.PerspectiveOps;
 import boofcv.alg.geo.pose.CompatibleProjectiveHomography;
 import boofcv.alg.structure.PairwiseImageGraph.Motion;
@@ -28,11 +29,14 @@ import boofcv.alg.structure.PairwiseImageGraph.View;
 import boofcv.misc.BoofMiscOps;
 import boofcv.struct.feature.AssociatedIndex;
 import boofcv.struct.geo.AssociatedTriple;
+import boofcv.struct.geo.AssociatedTupleDN;
 import boofcv.struct.geo.TrifocalTensor;
+import boofcv.struct.image.ImageDimension;
 import boofcv.testing.BoofStandardJUnit;
 import georegression.struct.point.Point2D_F64;
 import georegression.struct.point.Point4D_F64;
 import org.ddogleg.fitting.modelset.ModelMatcher;
+import org.ddogleg.struct.DogArray;
 import org.ddogleg.struct.DogArray_I32;
 import org.ddogleg.util.PrimitiveArrays;
 import org.ejml.UtilEjml;
@@ -529,7 +533,74 @@ class TestProjectiveInitializeAllCommon extends BoofStandardJUnit {
 	 * Looks up features then tests using triangulation and checks for perfect results.
 	 */
 	@Test void lookupInfoForMetricElevation() {
-		fail("Implement");
+		int numViews = 4;
+		var db = new MockLookupSimilarImages(numViews, 0xDEADBEEF);
+		var alg = new ProjectiveInitializeAllCommon();
+		alg.utils.db = db;
+
+		// sanity check that all features are visible in all views. Requirement of metric escalation
+		for (int i = 0; i < db.viewIds.size(); i++) {
+			assertEquals(db.numFeatures, db.viewObs.get(i).size());
+		}
+
+		// dividing number of features by two because only even observations are inliers
+		alg.utils.structure.initialize(numViews, db.numFeatures/2);
+		alg.utils.observations.initialize(numViews);
+
+		// Transform that makes view[0] identity
+		DMatrixRMaj H = new DMatrixRMaj(4, 4);
+		MultiViewOps.projectiveToIdentityH(db.listCameraMatrices.get(0), H);
+
+		// construct projective SBA scene from metric ground truth
+		for (int viewIdx = 0; viewIdx < db.viewIds.size(); viewIdx++) {
+			DMatrixRMaj P = new DMatrixRMaj(3, 4);
+			CommonOps_DDRM.mult(db.listCameraMatrices.get(viewIdx), H, P);
+
+			alg.viewsByStructureIndex.add(db.graph.nodes.get(viewIdx));
+			alg.utils.structure.views.get(viewIdx).worldToView.setTo(P);
+			alg.utils.structure.views.get(viewIdx).width = viewIdx;
+
+			// only features with an even ID will be inliers
+			DogArray_I32 inliers = alg.inlierIndexes.grow();
+
+			int[] featureIDs = db.viewToFeat.get(viewIdx);
+			SceneObservations.View oview = alg.utils.observations.views.get(viewIdx);
+			for (int obsIdx = 0; obsIdx < featureIDs.length; obsIdx++) {
+				int featureID = featureIDs[obsIdx];
+				if (featureID%2 == 1)
+					continue;
+				inliers.add(oview.size());
+				Point2D_F64 pixel = db.viewObs.get(viewIdx).get(obsIdx);
+				oview.add(featureID/2, (float)pixel.x, (float)pixel.y);
+			}
+		}
+
+		// Call the function we are testing
+		List<String> viewIds = new ArrayList<>();
+		DogArray<ImageDimension> dimensions = new DogArray<>(ImageDimension::new);
+		DogArray<DMatrixRMaj> cameraMatrices = new DogArray<>(() -> new DMatrixRMaj(3, 4));
+		DogArray<AssociatedTupleDN> observations = new DogArray<>(AssociatedTupleDN::new);
+		alg.lookupInfoForMetricElevation(viewIds, dimensions, cameraMatrices, observations);
+
+		// check what can be checked trivially by comparing to the db
+		assertEquals(4, viewIds.size());
+		assertEquals(4, dimensions.size());
+		assertEquals(3, cameraMatrices.size());
+		assertEquals(db.numFeatures/2, observations.size());
+
+		for (int viewIdx = 0; viewIdx < 4; viewIdx++) {
+			assertEquals(db.viewIds.get(viewIdx), viewIds.get(viewIdx));
+			assertEquals(viewIdx, dimensions.get(viewIdx).width);
+		}
+
+		// See if it unscrambled the observations
+		for (int obsIdx = 0; obsIdx < db.numFeatures/2; obsIdx++) {
+			for (int viewIdx = 0; viewIdx < 4; viewIdx++) {
+				Point2D_F64 expected = db.viewObs.get(viewIdx).get(db.featToView.get(viewIdx)[obsIdx*2]);
+				Point2D_F64 found = observations.get(obsIdx).get(viewIdx);
+				assertEquals(0.0, expected.distance(found), UtilEjml.TEST_F32);
+			}
+		}
 	}
 
 	private static class MockRansac implements ModelMatcher<TrifocalTensor, AssociatedTriple> {

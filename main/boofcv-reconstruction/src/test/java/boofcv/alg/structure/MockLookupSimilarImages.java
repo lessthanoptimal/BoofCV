@@ -73,13 +73,13 @@ class MockLookupSimilarImages implements LookUpSimilarImages {
 		feats3D = UtilPoint3D_F64.random(new Point3D_F64(0, 0, 1), -0.5, 0.5, numFeatures, rand);
 
 		// render pixel coordinates of all points
-		for (int i = 0; i < numViews; i++) {
+		for (int viewIdx = 0; viewIdx < numViews; viewIdx++) {
 			Se3_F64 view0_to_viewi = SpecialEuclideanOps_F64.eulerXyz(
-					0.01 + 0.1*i, 0, rand.nextGaussian()*0.03,
+					0.01 + 0.1*viewIdx, 0, rand.nextGaussian()*0.03,
 					rand.nextGaussian()*0.03, rand.nextGaussian()*0.03, rand.nextGaussian()*0.1, null);
 
 			// first view is the origin
-			if (i == 0)
+			if (viewIdx == 0)
 				view0_to_viewi.reset();
 
 			// Create the camera matrix P
@@ -96,7 +96,7 @@ class MockLookupSimilarImages implements LookUpSimilarImages {
 			// create look up table from view to feature
 			// we don't want features to have same index because that's not realistic and would hide bugs
 			int[] v2f = PrimitiveArrays.fillCounting(numFeatures);
-			if (i > 0)
+			if (viewIdx > 0)
 				PrimitiveArrays.shuffle(v2f, 0, numFeatures, rand);
 			viewToFeat.add(v2f);
 
@@ -108,9 +108,11 @@ class MockLookupSimilarImages implements LookUpSimilarImages {
 			featToView.add(f2v);
 
 			// note the featIdx is the index of the feature in the view
-			for (int viewIdx = 0; viewIdx < feats3D.size(); viewIdx++) {
-				Point3D_F64 X = feats3D.get(v2f[viewIdx]);
+			for (int observationIdx = 0; observationIdx < feats3D.size(); observationIdx++) {
+				Point3D_F64 X = feats3D.get(v2f[observationIdx]);
 				viewPixels.add(PerspectiveOps.renderPixel(view0_to_viewi, intrinsic, X, null));
+//				System.out.println("viewIdx="+viewIdx+" feature="+v2f[viewObsIdx]+" obs="+viewObsIdx+
+//						" "+viewPixels.get(viewPixels.size()-1));
 			}
 		}
 

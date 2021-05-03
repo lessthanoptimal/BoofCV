@@ -507,14 +507,14 @@ public class MetricFromUncalibratedPairwiseGraph extends ReconstructionFromPairw
 		// Declare storage for projective scene in a format that 'projectiveToMetric' understands
 		List<String> viewIds = new ArrayList<>();
 		DogArray<ImageDimension> dimensions = new DogArray<>(ImageDimension::new);
-		DogArray<DMatrixRMaj> views = new DogArray<>(() -> new DMatrixRMaj(3, 4));
+		DogArray<DMatrixRMaj> cameraMatrices = new DogArray<>(() -> new DMatrixRMaj(3, 4));
 		DogArray<AssociatedTupleDN> observations = new DogArray<>(AssociatedTupleDN::new);
 
-		initProjective.lookupInfoForMetricElevation(viewIds, dimensions, views, observations);
+		initProjective.lookupInfoForMetricElevation(viewIds, dimensions, cameraMatrices, observations);
 
 		// Pass the projective scene and elevate into a metric scene
 		MetricCameras results = new MetricCameras();
-		if (!projectiveToMetric.process(dimensions.toList(), views.toList(), (List)observations.toList(), results)) {
+		if (!projectiveToMetric.process(dimensions.toList(), cameraMatrices.toList(), (List)observations.toList(), results)) {
 			if (verbose != null) verbose.println("  views=" + BoofMiscOps.toStringLine(viewIds));
 			return false;
 		}
