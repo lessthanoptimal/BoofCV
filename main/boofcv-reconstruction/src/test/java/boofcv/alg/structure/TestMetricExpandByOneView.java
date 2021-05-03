@@ -19,13 +19,20 @@
 package boofcv.alg.structure;
 
 import boofcv.BoofTesting;
+import boofcv.abst.geo.bundle.SceneObservations;
 import boofcv.alg.geo.MultiViewOps;
 import boofcv.misc.BoofMiscOps;
 import boofcv.struct.calib.CameraPinhole;
 import boofcv.testing.BoofStandardJUnit;
+import georegression.geometry.ConvertRotation3D_F64;
+import georegression.geometry.UtilPoint3D_F64;
+import georegression.struct.EulerType;
+import georegression.struct.point.Point2D_F64;
+import georegression.struct.point.Point3D_F64;
 import georegression.struct.se.Se3_F64;
 import org.ddogleg.struct.DogArray_I32;
 import org.ejml.data.DMatrixRMaj;
+import org.ejml.dense.row.CommonOps_DDRM;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
@@ -173,7 +180,50 @@ class TestMetricExpandByOneView extends BoofStandardJUnit {
 		assertEquals(db.intrinsic.skew, foundK.get(0, 1), 1e-7);
 	}
 
+	/**
+	 * Intentionally forces observations to be behind the camera and sees if it fails
+	 */
 	@Test void checkBehind() {
-		fail("Implement");
+		var alg = new MetricExpandByOneView();
+
+		// Create a scene where all points will be visible and in front of all cameras
+		List<Point3D_F64> cloud = UtilPoint3D_F64.random(new Point3D_F64(0, 0, 2), -1, 1, -1, 1, -0.5, 0.5, 50, rand);
+		alg.bundleAdjustment.structure.initialize(3, 3, cloud.size());
+		alg.bundleAdjustment.observations.initialize(3);
+
+		Se3_F64 world_to_view = new Se3_F64();
+		Se3_F64 tmpSE = new Se3_F64();
+		Point3D_F64 tmpX = new Point3D_F64();
+		Point2D_F64 pixel = new Point2D_F64();
+
+		BoofMiscOps.forIdx(cloud, ( idx, p ) -> alg.bundleAdjustment.structure.setPoint(idx, p.x, p.y, p.z, 1.0));
+
+		for (int viewIdx = 0; viewIdx < 3; viewIdx++) {
+			alg.bundleAdjustment.structure.setCamera(viewIdx, true, new CameraPinhole(500, 500, 0, 500, 500, 0, 0));
+			alg.bundleAdjustment.structure.setView(viewIdx, viewIdx, true, new Se3_F64());
+			SceneObservations.View oview = alg.bundleAdjustment.observations.getView(viewIdx);
+			for (int pointIdx = 0; pointIdx < cloud.size(); pointIdx++) {
+				assertTrue(alg.bundleAdjustment.structure.
+						projectToPixel(pointIdx, viewIdx, world_to_view, tmpSE, tmpX, pixel));
+				oview.add(pointIdx, (float)pixel.x, (float)pixel.y);
+			}
+		}
+
+		// Positive case. Everything should be good here
+		assertTrue(alg.checkBehind());
+
+		// Flip the view around and see if it fails
+		for (int viewIdx = 1; viewIdx < 3; viewIdx++) {
+			// Flip the view
+			ConvertRotation3D_F64.eulerToMatrix(EulerType.XYZ, Math.PI, 0, 0,
+					alg.bundleAdjustment.structure.motions.get(1).motion.R);
+			assertFalse(alg.checkBehind());
+			// undo the flip
+			CommonOps_DDRM.setIdentity(alg.bundleAdjustment.structure.motions.get(1).motion.R);
+		}
+
+		// Test by flipping the points
+		BoofMiscOps.forIdx(cloud, ( idx, p ) -> alg.bundleAdjustment.structure.setPoint(idx, p.x, p.y, -p.z, 1.0));
+		assertFalse(alg.checkBehind());
 	}
 }

@@ -21,7 +21,8 @@ package boofcv.abst.geo.selfcalib;
 import boofcv.alg.geo.selfcalib.SelfCalibrationLinearDualQuadratic;
 import org.junit.jupiter.api.Test;
 
-import static org.junit.jupiter.api.Assertions.fail;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  * @author Peter Abeles
@@ -37,6 +38,21 @@ class TestProjectiveToMetricCameraDualQuadratic extends CommonProjectiveToMetric
 	 * Make sure it fails if it converges to a solution with too many points behind the camera
 	 */
 	@Test void invalidFractionAccept() {
-		fail("Implement");
+		var selfcalib = new SelfCalibrationLinearDualQuadratic(1.0);
+		var alg = new ProjectiveToMetricCameraDualQuadratic(selfcalib);
+		alg.invalidFractionAccept = 0.10;
+
+		alg.resolveSign.bestInvalid = 0;
+		assertTrue(alg.checkBehindCamera(2,100));
+
+		alg.resolveSign.bestInvalid = 19;
+		assertTrue(alg.checkBehindCamera(2,100));
+
+		// this ensures that it's <=
+		alg.resolveSign.bestInvalid = 20;
+		assertTrue(alg.checkBehindCamera(2,100));
+
+		alg.resolveSign.bestInvalid = 21;
+		assertFalse(alg.checkBehindCamera(2,100));
 	}
 }
