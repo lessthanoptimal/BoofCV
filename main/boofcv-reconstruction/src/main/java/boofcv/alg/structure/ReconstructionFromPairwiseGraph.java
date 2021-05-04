@@ -95,7 +95,7 @@ public abstract class ReconstructionFromPairwiseGraph implements VerbosePrint {
 		if (verbose == null)
 			return;
 
-		verbose.print("  scene[" + scene.index + "].view='"+view.id+"' adding: size=" +
+		verbose.print("_ scene[" + scene.index + "].view='" + view.id + "' adding: size=" +
 				(scene.open.size - openSizeBefore) + " views={ ");
 		for (int i = openSizeBefore; i < scene.open.size; i++) {
 			verbose.print("'" + scene.open.get(i).id + "' ");
@@ -163,10 +163,10 @@ public abstract class ReconstructionFromPairwiseGraph implements VerbosePrint {
 
 		if (bestIdx < 0) {
 			if (verbose != null) {
-				verbose.println("  Failed to find a valid view to connect. open.size=" + scene.open.size);
+				verbose.println("_ Failed to find a valid view to connect. open.size=" + scene.open.size);
 				for (int i = 0; i < scene.open.size; i++) {
 					View v = scene.open.get(i);
-					verbose.print("    id='" + v.id + "' conn={ ");
+					verbose.print("___ id='" + v.id + "' conn={ ");
 					for (int j = 0; j < v.connections.size; j++) {
 						verbose.print("'" + v.connections.get(j).other(v).id + "' ");
 					}
@@ -178,8 +178,8 @@ public abstract class ReconstructionFromPairwiseGraph implements VerbosePrint {
 		}
 
 		if (verbose != null)
-			verbose.println("  scene[" + scene.index + "].open.size=" + scene.open.size + " score=" +
-					bestScore + " conn=" + bestValidCount);
+			verbose.printf("_ scene[%d].open.size=%d score=%.2f conn=%d\n",
+					scene.index, scene.open.size, bestScore, bestValidCount);
 
 		selection.score = bestScore;
 		selection.openIdx = bestIdx;

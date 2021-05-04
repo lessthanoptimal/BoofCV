@@ -182,7 +182,7 @@ public class MetricFromUncalibratedPairwiseGraph extends ReconstructionFromPairw
 		// Find the common features
 		utils.findAllConnectedSeed(info.seed, info.motions, commonPairwise);
 		if (commonPairwise.size < 6) {// if less than the minimum it will fail
-			if (verbose != null) verbose.println("  FAILED: Too few common features. seed.id=" + info.seed.id);
+			if (verbose != null) verbose.println("_ FAILED: Too few common features. seed.id=" + info.seed.id);
 			return false;
 		}
 
@@ -191,7 +191,7 @@ public class MetricFromUncalibratedPairwiseGraph extends ReconstructionFromPairw
 					"' common=" + commonPairwise.size + " score=" + info.score);
 
 		if (!estimateProjectiveSceneFromSeed(db, info, commonPairwise)) {
-			if (verbose != null) verbose.println("  FAILED: Projective estimate. seed.id='" + info.seed.id + "'");
+			if (verbose != null) verbose.println("_ FAILED: Projective estimate. seed.id='" + info.seed.id + "'");
 			return false;
 		}
 
@@ -201,7 +201,7 @@ public class MetricFromUncalibratedPairwiseGraph extends ReconstructionFromPairw
 
 		// Elevate initial seed to metric
 		if (!projectiveSeedToMetric(pairwise, scene)) {
-			if (verbose != null) verbose.println("  FAILED: Projective to metric. seed.id='" + info.seed.id + "'");
+			if (verbose != null) verbose.println("_ FAILED: Projective to metric. seed.id='" + info.seed.id + "'");
 			// reclaim the failed graph
 			scenes.removeTail();
 			return false;
@@ -214,7 +214,7 @@ public class MetricFromUncalibratedPairwiseGraph extends ReconstructionFromPairw
 			metricChecks.inlierTriangulatePositiveDepth(0.1, db, scene, info.seed.id);
 
 		if (verbose != null)
-			verbose.println("  scene[" + scene.index + "].views.size=" + scene.listViews.size());
+			verbose.println("_ scene[" + scene.index + "].views.size=" + scene.listViews.size());
 
 		// Add this scene to each node so that we know they are connected
 		for (int i = 0; i < scene.listViews.size(); i++) {
@@ -223,7 +223,7 @@ public class MetricFromUncalibratedPairwiseGraph extends ReconstructionFromPairw
 			nodeViews.getView(pview).viewedBy.add(scene.index);
 
 			if (verbose != null)
-				verbose.println("  view['" + pview.id + "']  intrinsic.f=" + wview.intrinsic.f + "  view.index=" + pview.index);
+				verbose.println("_ view['" + pview.id + "']  intrinsic.f=" + wview.intrinsic.f + "  view.index=" + pview.index);
 		}
 		return true;
 	}
@@ -271,7 +271,7 @@ public class MetricFromUncalibratedPairwiseGraph extends ReconstructionFromPairw
 
 				if (!selectNextToProcess(scene, candidate)) {
 					// TODO remove this scene from the active list?
-					if (verbose != null) verbose.println("  No valid views left. open.size=" + scene.open.size);
+					if (verbose != null) verbose.println("_ No valid views left. open.size=" + scene.open.size);
 					continue;
 				}
 
@@ -292,7 +292,7 @@ public class MetricFromUncalibratedPairwiseGraph extends ReconstructionFromPairw
 			PairwiseImageGraph.View view = best.scene.open.removeSwap(best.openIdx);
 
 			if (verbose != null)
-				verbose.println("  Expanding scene[" + best.scene.index + "].view='" + view.id + "' score=" + best.score);
+				verbose.println("Expanding scene[" + best.scene.index + "].view='" + view.id + "' score=" + best.score);
 
 			if (!expandIntoView(db, best.scene, view))
 				continue;
@@ -425,7 +425,7 @@ public class MetricFromUncalibratedPairwiseGraph extends ReconstructionFromPairw
 		if (verbose != null) {
 			verbose.println("scenes.size=" + scenes.size);
 			for (int i = 0; i < scenes.size; i++) {
-				verbose.println("  scene[" + i + "].size = " + scenes.get(i).listViews.size());
+				verbose.println("_ scene[" + i + "].size = " + scenes.get(i).listViews.size());
 			}
 		}
 	}
@@ -464,7 +464,7 @@ public class MetricFromUncalibratedPairwiseGraph extends ReconstructionFromPairw
 			addOpenForView(scene, wview.pview);
 
 		if (verbose != null) {
-			verbose.println("  Expanded scene=" + scene.index + " view='" + selected.id + "'  inliers=" +
+			verbose.println("_ Expanded scene=" + scene.index + " view='" + selected.id + "'  inliers=" +
 					utils.inliersThreeView.size() + "/" + utils.matchesTriple.size + " Open added.size=" +
 					(scene.open.size - openSizePrior));
 		}
@@ -503,7 +503,7 @@ public class MetricFromUncalibratedPairwiseGraph extends ReconstructionFromPairw
 		// Pass the projective scene and elevate into a metric scene
 		MetricCameras results = new MetricCameras();
 		if (!projectiveToMetric.process(dimensions.toList(), cameraMatrices.toList(), (List)observations.toList(), results)) {
-			if (verbose != null) verbose.println("  views=" + BoofMiscOps.toStringLine(viewIds));
+			if (verbose != null) verbose.println("_ views=" + BoofMiscOps.toStringLine(viewIds));
 			return false;
 		}
 
