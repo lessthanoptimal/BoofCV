@@ -200,7 +200,8 @@ public class MetricFromUncalibratedPairwiseGraph extends ReconstructionFromPairw
 			}
 
 			if (verbose != null)
-				verbose.println("  Selected seed.id='" + info.seed.id + "' common=" + commonPairwise.size);
+				verbose.println("  Selected seed.id='" + info.seed.id +
+						"' common=" + commonPairwise.size + " score=" + info.score);
 
 			if (!estimateProjectiveSceneFromSeed(db, info, commonPairwise)) {
 				if (verbose != null) verbose.println("  FAILED: Projective estimate. seed.id='" + info.seed.id + "'");
@@ -311,7 +312,7 @@ public class MetricFromUncalibratedPairwiseGraph extends ReconstructionFromPairw
 			if (!expandIntoView(db, best.scene, view))
 				continue;
 
-			if ( best.scene.listViews.size() > refineSceneWhileExpandingMaxViews)
+			if (best.scene.listViews.size() > refineSceneWhileExpandingMaxViews)
 				continue;
 
 			refineWorking.process(db, best.scene);
@@ -391,7 +392,7 @@ public class MetricFromUncalibratedPairwiseGraph extends ReconstructionFromPairw
 				continue;
 			}
 
-			if (verbose != null) verbose.println("Merging: src="+ src.index + " dst=" + dst.index);
+			if (verbose != null) verbose.println("Merging: src=" + src.index + " dst=" + dst.index);
 
 			// Remove both views from the counts for now
 			mergeOps.toggleViewEnabled(src, nodeViews);
