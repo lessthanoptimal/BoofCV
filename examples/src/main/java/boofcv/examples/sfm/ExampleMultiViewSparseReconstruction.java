@@ -99,9 +99,9 @@ public class ExampleMultiViewSparseReconstruction {
 		var example = new ExampleMultiViewSparseReconstruction();
 		example.maxFrames = 100;       // This will process the entire sequence
 //		example.compute("tree_snow_01.mp4");
-//		example.compute("ditch_02.mp4");
+		example.compute("ditch_02.mp4");
 //		example.compute("holiday_display_01.mp4");
-		example.compute("log_building_02.mp4");
+//		example.compute("log_building_02.mp4");
 		example.visualizeSparseCloud();
 
 		System.out.println("done");
@@ -117,25 +117,28 @@ public class ExampleMultiViewSparseReconstruction {
 
 		// Convert the video into an image sequence. Later on we will need to access the images in random order
 		var imageDirectory = new File(workDirectory, "images");
-		if (!imageDirectory.exists())
+
+		if (imageDirectory.exists()) {
+			imageFiles = UtilIO.listSmart(String.format("glob:%s/images/*.png",workDirectory), true, ( f ) -> true);
+		} else {
 			checkTrue(imageDirectory.mkdirs(), "Failed to image directory");
-		SimpleImageSequence<InterleavedU8> sequence = DefaultMediaManager.INSTANCE.openVideo(path, ImageType.IL_U8);
-		System.out.println("----------------------------------------------------------------------------");
-		System.out.println("### Decoding Video");
-		BoofMiscOps.profile(() -> {
-			int frame = 0;
-			while (sequence.hasNext() && frame < maxFrames) {
-				InterleavedU8 image = sequence.next();
-				File imageFile = new File(imageDirectory, String.format("frame%04d.png", frame++));
-				imageFiles.add(imageFile.getPath());
-				// This is commented out for what appears to be a JRE bug.
-				// V  [libjvm.so+0xdc4059]  SWPointer::SWPointer(MemNode*, SuperWord*, Node_Stack*, bool)
+			SimpleImageSequence<InterleavedU8> sequence = DefaultMediaManager.INSTANCE.openVideo(path, ImageType.IL_U8);
+			System.out.println("----------------------------------------------------------------------------");
+			System.out.println("### Decoding Video");
+			BoofMiscOps.profile(() -> {
+				int frame = 0;
+				while (sequence.hasNext() && frame < maxFrames) {
+					InterleavedU8 image = sequence.next();
+					File imageFile = new File(imageDirectory, String.format("frame%04d.png", frame++));
+					imageFiles.add(imageFile.getPath());
+					// This is commented out for what appears to be a JRE bug.
+					// V  [libjvm.so+0xdc4059]  SWPointer::SWPointer(MemNode*, SuperWord*, Node_Stack*, bool)
 //				if (imageFile.exists())
 //					continue;
-				UtilImageIO.saveImage(image, imageFile.getPath());
-			}
-		}, "Video Decoding");
-
+					UtilImageIO.saveImage(image, imageFile.getPath());
+				}
+			}, "Video Decoding");
+		}
 		computePairwiseGraph();
 		metricFromPairwise();
 		bundleAdjustmentRefine();
@@ -161,7 +164,7 @@ public class ExampleMultiViewSparseReconstruction {
 	 * not realize you're back at the initial location. Typically this results in a noticeable miss alignment.
 	 */
 	private void trackImageFeatures() {
-		if (similarImages!=null)
+		if (similarImages != null)
 			return;
 		System.out.println("----------------------------------------------------------------------------");
 		System.out.println("### Creating Similar Images");
@@ -200,7 +203,7 @@ public class ExampleMultiViewSparseReconstruction {
 			for (int frameId = 0; frameId < imageFiles.size(); frameId++) {
 				String filePath = imageFiles.get(frameId);
 				GrayU8 frame = UtilImageIO.loadImage(filePath, GrayU8.class);
-				Objects.requireNonNull(frame,"Failed to load image");
+				Objects.requireNonNull(frame, "Failed to load image");
 				if (first) {
 					first = false;
 					similarImages.initialize(frame.width, frame.height);
@@ -252,7 +255,8 @@ public class ExampleMultiViewSparseReconstruction {
 		System.out.println("### Creating Pairwise");
 		var config = new ConfigGeneratePairwiseImageGraph();
 		config.score.type = ConfigEpipolarScore3D.Type.FUNDAMENTAL_ERROR;
-		config.score.typeErrors.minimumInliers.setRelative(0.4,200);
+		config.score.typeErrors.minimumInliers.setRelative(0.4, 200);
+		config.score.typeErrors.maxRatioScore = 10.0; // TODO make default?
 		config.score.ransacF.inlierThreshold = 2.0;
 		GeneratePairwiseImageGraph generatePairwise = FactorySceneReconstruction.generatePairwise(config);
 		BoofMiscOps.profile(() -> {
@@ -280,7 +284,7 @@ public class ExampleMultiViewSparseReconstruction {
 		}
 
 		// Recompute if the number of images has changed
-		if (working != null){
+		if (working != null) {
 			System.out.println("Loaded Metric Reconstruction");
 			return;
 		}
@@ -378,7 +382,7 @@ public class ExampleMultiViewSparseReconstruction {
 		viewer.setColorizer(new TwoAxisRgbPlane.Z_XY(1.0).fperiod(40));
 		viewer.setDotSize(1);
 		viewer.setTranslationStep(0.15);
-		viewer.addCloud((idx,p)->p.setTo(cloudXyz.get(idx)), rgb::get,rgb.size);
+		viewer.addCloud(( idx, p ) -> p.setTo(cloudXyz.get(idx)), rgb::get, rgb.size);
 		viewer.setCameraHFov(UtilAngle.radian(60));
 
 		SwingUtilities.invokeLater(() -> {

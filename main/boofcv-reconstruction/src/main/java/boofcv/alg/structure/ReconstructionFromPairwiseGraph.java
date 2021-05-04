@@ -246,6 +246,8 @@ public abstract class ReconstructionFromPairwiseGraph implements VerbosePrint {
 			if (skip)
 				continue;
 
+			// TODO Attempt metric upgrade here! If it fails move on....
+
 			// This is a valid seed so add it to the list
 			seeds.add(s);
 
@@ -297,12 +299,8 @@ public abstract class ReconstructionFromPairwiseGraph implements VerbosePrint {
 					PairwiseImageGraph.View vb = target.connections.get(connIdx).other(target);
 					PairwiseImageGraph.Motion m = va.findMotion(vb);
 
-					// No connection so they are not similar
-					if (m == null)
-						continue;
-
-					// It's very similar to another view, abort
-					if (!m.is3D) {
+					// All seed views must be connected with each other with a 3D relationship
+					if (m == null || !m.is3D) {
 						foundValid = false;
 						break;
 					}

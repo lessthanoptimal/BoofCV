@@ -306,7 +306,7 @@ class TestRefineMetricWorkingGraph extends BoofStandardJUnit {
 			inliers.views.add(pairwise.nodes.get(viewIdx));
 			inliers.observations.grow().setTo(DogArray_I32.array(1, 2, 3, 5, 6));
 		}
-		alg.viewIntIds.setTo(DogArray_I32.array(1, 2, 3));
+		alg.sceneViewIntIds.setTo(DogArray_I32.array(1, 2, 3));
 		alg.unassigned.setTo(DogArray_I32.array(1, 2));
 
 		alg.initLookUpTablesForInlierSet(graph, inliers.views);
@@ -323,7 +323,7 @@ class TestRefineMetricWorkingGraph extends BoofStandardJUnit {
 		// observations should now point to this new 3D feature
 		BoofMiscOps.forIdx(inliers.views.toList(), ( i, v ) -> {
 			int expected = alg.unassigned.contains(i) ? 0 : -1;
-			int viewID = alg.viewIntIds.get(i);
+			int viewID = alg.sceneViewIntIds.get(i);
 			assertEquals(expected, alg.bundleAdjustment.observations.getView(viewID).point.get(6));
 		});
 	}
