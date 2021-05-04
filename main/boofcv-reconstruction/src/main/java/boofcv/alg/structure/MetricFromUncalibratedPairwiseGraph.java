@@ -136,35 +136,29 @@ public class MetricFromUncalibratedPairwiseGraph extends ReconstructionFromPairw
 	public boolean process( LookUpSimilarImages db, PairwiseImageGraph pairwise ) {
 		scenes.reset();
 
-		// Score nodes for their ability to be seeds
-		// TODO change how initial seeds are handled. 1) Number should be dynamically adjusted. 2) Determine why
-		//      it does much better when the number of views is 3. Something isn't handled correctly later on.
-		Map<String, SeedInfo> mapScores = scoreNodesAsSeeds(pairwise, 2);
-		List<SeedInfo> seeds = selectSeeds(seedScores, mapScores);
-		// TODO also take in account distance from other seeds when selecting
-
-		if (seeds.isEmpty()) {
-			if (verbose != null) verbose.println("No valid seeds found.");
-			return false;
-		}
-
-		if (verbose != null)
-			verbose.println("Selected seeds.size=" + seeds.size() + " seeds out of " + pairwise.nodes.size + " nodes");
-
 		// Declare storage for book keeping at each view
 		nodeViews.initialize(pairwise);
 
-		// Spawn as many seeds as possible
-		spawnSeeds(db, pairwise, seeds);
+		// Score nodes for their ability to be seeds
+		Map<String, SeedInfo> mapScores = scoreNodesAsSeeds(pairwise, 2);
+
+		// Create new seeds in priority of their scores
+		selectAndSpawnSeeds(db, pairwise, seedScores, mapScores);
+		// TODO change how initial seeds are handled. 1) Number should be dynamically adjusted. 2) Determine why
+		//      it does much better when the number of views is 3. Something isn't handled correctly later on.
+
+		// Questions:
+		//  Ditch - why did both scenes grow to consume all views?
 
 		if (scenes.isEmpty()) {
 			if (verbose != null) verbose.println("Failed to upgrade any of the seeds to a metric scene.");
 			return false;
 		}
 
+		if (verbose != null) verbose.println("Total Scenes: "+scenes.size);
+
 		// Expand all the scenes until they can't any more
 		expandScenes(db);
-		// TODO while expanding perform local SBA
 
 		// Merge scenes together until there are no more scenes which can be merged
 		mergeScenes(db);
@@ -177,69 +171,61 @@ public class MetricFromUncalibratedPairwiseGraph extends ReconstructionFromPairw
 	}
 
 	/**
-	 * Create a new scene for every seed that it can successfully create a metric estimate from. By using multiple
-	 * seeds there is less change for a single point of failure.
+	 * It will attempt to find a metric scene around the specified scene.
+	 *
+	 * @return true if successful or false if it failed
 	 */
-	private void spawnSeeds( LookUpSimilarImages db, PairwiseImageGraph pairwise, List<SeedInfo> seeds ) {
-		if (verbose != null) verbose.println("ENTER spawn seeds.size=" + seeds.size());
+	@Override
+	protected boolean spawnSceneFromSeed( LookUpSimilarImages db, PairwiseImageGraph pairwise, SeedInfo info ) {
 
 		var commonPairwise = new DogArray_I32();
-
-		for (int seedIdx = 0; seedIdx < seeds.size(); seedIdx++) {
-			SeedInfo info = seeds.get(seedIdx);
-			if (verbose != null)
-				verbose.println("Spawn index=" + seedIdx + "  count " + (seedIdx + 1) + " / " + seeds.size());
-
-			// TODO reject a seed if it's too similar to other seeds? Should that be done earlier?
-
-			// Find the common features
-			utils.findAllConnectedSeed(info.seed, info.motions, commonPairwise);
-			if (commonPairwise.size < 6) {// if less than the minimum it will fail
-				if (verbose != null) verbose.println("  FAILED: Too few common features. seed.id=" + info.seed.id);
-				continue;
-			}
-
-			if (verbose != null)
-				verbose.println("  Selected seed.id='" + info.seed.id +
-						"' common=" + commonPairwise.size + " score=" + info.score);
-
-			if (!estimateProjectiveSceneFromSeed(db, info, commonPairwise)) {
-				if (verbose != null) verbose.println("  FAILED: Projective estimate. seed.id='" + info.seed.id + "'");
-				continue;
-			}
-
-			// Create a new scene
-			SceneWorkingGraph scene = scenes.grow();
-			scene.index = scenes.size - 1;
-
-			// Elevate initial seed to metric
-			if (!projectiveSeedToMetric(pairwise, scene)) {
-				if (verbose != null) verbose.println("  FAILED: Projective to metric. seed.id='" + info.seed.id + "'");
-				// reclaim the failed graph
-				scenes.removeTail();
-				continue;
-			}
-
-			// Refine initial estimate
-			refineWorking.process(db, scene);
-
-			if (sanityChecks)
-				metricChecks.inlierTriangulatePositiveDepth(0.1, db, scene, info.seed.id);
-
-			if (verbose != null)
-				verbose.println("  scene.index=" + scene.index + " views.size=" + scene.listViews.size());
-
-			// Add this scene to each node so that we know they are connected
-			for (int i = 0; i < scene.listViews.size(); i++) {
-				SceneWorkingGraph.View wview = scene.listViews.get(i);
-				PairwiseImageGraph.View pview = wview.pview;
-				nodeViews.getView(pview).viewedBy.add(scene.index);
-
-				if (verbose != null)
-					verbose.println("  view['" + pview.id + "']  intrinsic.f=" + wview.intrinsic.f + "  view.index=" + pview.index);
-			}
+		// Find the common features
+		utils.findAllConnectedSeed(info.seed, info.motions, commonPairwise);
+		if (commonPairwise.size < 6) {// if less than the minimum it will fail
+			if (verbose != null) verbose.println("  FAILED: Too few common features. seed.id=" + info.seed.id);
+			return false;
 		}
-		if (verbose != null) verbose.println("EXIT spawn seeds: scenes.size=" + scenes.size());
+
+		if (verbose != null)
+			verbose.println("Selected seed.id='" + info.seed.id +
+					"' common=" + commonPairwise.size + " score=" + info.score);
+
+		if (!estimateProjectiveSceneFromSeed(db, info, commonPairwise)) {
+			if (verbose != null) verbose.println("  FAILED: Projective estimate. seed.id='" + info.seed.id + "'");
+			return false;
+		}
+
+		// Create a new scene
+		SceneWorkingGraph scene = scenes.grow();
+		scene.index = scenes.size - 1;
+
+		// Elevate initial seed to metric
+		if (!projectiveSeedToMetric(pairwise, scene)) {
+			if (verbose != null) verbose.println("  FAILED: Projective to metric. seed.id='" + info.seed.id + "'");
+			// reclaim the failed graph
+			scenes.removeTail();
+			return false;
+		}
+
+		// Refine initial estimate
+		refineWorking.process(db, scene);
+
+		if (sanityChecks)
+			metricChecks.inlierTriangulatePositiveDepth(0.1, db, scene, info.seed.id);
+
+		if (verbose != null)
+			verbose.println("  scene[" + scene.index + "].views.size=" + scene.listViews.size());
+
+		// Add this scene to each node so that we know they are connected
+		for (int i = 0; i < scene.listViews.size(); i++) {
+			SceneWorkingGraph.View wview = scene.listViews.get(i);
+			PairwiseImageGraph.View pview = wview.pview;
+			nodeViews.getView(pview).viewedBy.add(scene.index);
+
+			if (verbose != null)
+				verbose.println("  view['" + pview.id + "']  intrinsic.f=" + wview.intrinsic.f + "  view.index=" + pview.index);
+		}
+		return true;
 	}
 
 	/**
@@ -252,7 +238,6 @@ public class MetricFromUncalibratedPairwiseGraph extends ReconstructionFromPairw
 
 		// Initialize the expansion by finding all the views each scene could expand into
 		for (int sceneIdx = 0; sceneIdx < scenes.size; sceneIdx++) {
-			if (verbose != null) verbose.println("scene.index=" + sceneIdx);
 			SceneWorkingGraph scene = scenes.get(sceneIdx);
 
 			// Mark views which were learned in the spawn as known
@@ -307,7 +292,7 @@ public class MetricFromUncalibratedPairwiseGraph extends ReconstructionFromPairw
 			PairwiseImageGraph.View view = best.scene.open.removeSwap(best.openIdx);
 
 			if (verbose != null)
-				verbose.println("  Expanding scene=" + best.scene.index + " view='" + view.id + "' score=" + best.score);
+				verbose.println("  Expanding scene[" + best.scene.index + "].view='" + view.id + "' score=" + best.score);
 
 			if (!expandIntoView(db, best.scene, view))
 				continue;

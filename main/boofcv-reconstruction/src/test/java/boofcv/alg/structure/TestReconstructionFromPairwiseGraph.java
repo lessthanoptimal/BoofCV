@@ -137,7 +137,7 @@ class TestReconstructionFromPairwiseGraph extends BoofStandardJUnit {
 		{
 			PairwiseImageGraph graph = createLinearGraph(8, 1);
 			Map<String, SeedInfo> mapScores = alg.scoreNodesAsSeeds(graph, 2);
-			List<SeedInfo> seeds = alg.selectSeeds(alg.seedScores, mapScores);
+			List<SeedInfo> seeds = alg.selectAndSpawnSeeds(alg.seedScores, mapScores);
 			assertEquals(3, seeds.size()); // determined through manual inspection
 			sanityCheckSeeds(seeds);
 		}
@@ -146,7 +146,7 @@ class TestReconstructionFromPairwiseGraph extends BoofStandardJUnit {
 		{
 			PairwiseImageGraph graph = createLinearGraph(9, 1);
 			Map<String, SeedInfo> mapScores = alg.scoreNodesAsSeeds(graph, 2);
-			List<SeedInfo> seeds = alg.selectSeeds(alg.seedScores, mapScores);
+			List<SeedInfo> seeds = alg.selectAndSpawnSeeds(alg.seedScores, mapScores);
 			assertEquals(3, seeds.size()); // determined through manual inspection
 			sanityCheckSeeds(seeds);
 		}
@@ -160,7 +160,7 @@ class TestReconstructionFromPairwiseGraph extends BoofStandardJUnit {
 				target.connections.forIdx(( i, o ) -> o.score3D = 5.0);
 
 				Map<String, SeedInfo> mapScores = alg.scoreNodesAsSeeds(graph, 2);
-				List<SeedInfo> seeds = alg.selectSeeds(alg.seedScores, mapScores);
+				List<SeedInfo> seeds = alg.selectAndSpawnSeeds(alg.seedScores, mapScores);
 				assertTrue(3 == seeds.size() || 2 == seeds.size()); // determined through manual inspection
 				sanityCheckSeeds(seeds);
 				assertSame(seeds.get(0).seed, target);

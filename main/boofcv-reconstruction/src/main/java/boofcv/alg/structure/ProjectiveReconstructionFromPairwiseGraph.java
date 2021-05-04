@@ -24,7 +24,7 @@ import org.ddogleg.struct.DogArray_I32;
 import org.ddogleg.struct.FastArray;
 import org.ejml.data.DMatrixRMaj;
 
-import java.util.List;
+import java.util.Collections;
 import java.util.Map;
 
 /**
@@ -96,31 +96,16 @@ public class ProjectiveReconstructionFromPairwiseGraph extends ReconstructionFro
 
 		// Score nodes for their ability to be seeds
 		Map<String, SeedInfo> mapScores = scoreNodesAsSeeds(graph, 4);
-		List<SeedInfo> seeds = selectSeeds(seedScores, mapScores);
 
-		if (seeds.size() == 0)
-			return false;
+		// Doesn't support multiple seeds here. So remove all but the highest score
+		Collections.sort(seedScores.toList());
+		while (seedScores.size > 1)
+			seedScores.remove(seedScores.size-2);
 
-		if (verbose != null)
-			verbose.println("Selected " + seeds.size() + " seeds out of " + graph.nodes.size + " nodes");
-
-		// For now we are keeping this very simple. Only a single seed is considered
-		SeedInfo info = seeds.get(0);
+		selectAndSpawnSeeds(db, graph, seedScores, mapScores);
 
 		// TODO redo every component to use shifted pixels
 		// TODO redo every component to use scaled pixels
-
-		// Find the common features
-		var commonPairwise = new DogArray_I32();
-		utils.findAllConnectedSeed(info.seed, info.motions, commonPairwise);
-		if (commonPairwise.size < 6) // if less than the minimum it will fail
-			return false;
-
-		if (verbose != null) verbose.println("Selected seed.id=" + info.seed.id + " common=" + commonPairwise.size);
-
-		// TODO build up a scene so that SBA can be run on the whole thing
-		if (!estimateInitialSceneFromSeed(db, info, commonPairwise))
-			return false;
 
 		// NOTE: Computing H to scale camera matrices didn't prevent them from vanishing
 
@@ -138,9 +123,16 @@ public class ProjectiveReconstructionFromPairwiseGraph extends ReconstructionFro
 	/**
 	 * Initializes the scene at the seed view
 	 */
-	private boolean estimateInitialSceneFromSeed( LookUpSimilarImages db, SeedInfo info, DogArray_I32 common ) {
+	@Override
+	protected boolean spawnSceneFromSeed( LookUpSimilarImages db, PairwiseImageGraph pairwise, SeedInfo info ) {
+		// Find the common features
+		var commonPairwise = new DogArray_I32();
+		utils.findAllConnectedSeed(info.seed, info.motions, commonPairwise);
+		if (commonPairwise.size < 6) // if less than the minimum it will fail
+			return false;
+
 		// initialize projective scene using common tracks
-		if (!initProjective.projectiveSceneN(db, info.seed, common, info.motions)) {
+		if (!initProjective.projectiveSceneN(db, info.seed, commonPairwise, info.motions)) {
 			if (verbose != null) verbose.println("Failed initialize seed");
 			return false;
 		}
