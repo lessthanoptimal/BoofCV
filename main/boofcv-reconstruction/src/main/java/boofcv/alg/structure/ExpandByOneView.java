@@ -29,8 +29,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
-import static boofcv.misc.BoofMiscOps.checkTrue;
-
 /**
  * Common parent for metric and projective expand scene by one. Mostly contains functions for selecting which of the
  * known views it should use
@@ -75,28 +73,39 @@ public abstract class ExpandByOneView implements VerbosePrint {
 		// Create a list of connections in the target that can be used
 		createListOfValid(target, validCandidates);
 
+		int considered = 0;
 		double bestScore = 0.0;
-		for (int connectionCnt = 0; connectionCnt < validCandidates.size(); connectionCnt++) {
-			PairwiseImageGraph.Motion connectB = validCandidates.get(connectionCnt);
-			PairwiseImageGraph.Motion connectC = findBestCommon(target, connectB, validCandidates);
-			if (connectC == null)
-				continue; // no common connection could be found
+		for (int connIdxB = 0; connIdxB < validCandidates.size(); connIdxB++) {
+			PairwiseImageGraph.Motion connectB = validCandidates.get(connIdxB);
 			PairwiseImageGraph.View viewB = connectB.other(target);
-			PairwiseImageGraph.View viewC = connectC.other(target);
 
-			PairwiseImageGraph.Motion connectBtoC = viewB.findMotion(viewC);
-			checkTrue(connectBtoC != null, "BUG");
+			// Skip if it can't possibly have a better score
+			if (connectB.score3D < bestScore) {
+				continue;
+			}
 
-			double score = BoofMiscOps.min(connectB.score3D, connectC.score3D, connectBtoC.score3D);
+			for (int connIdxC = connIdxB+1; connIdxC < validCandidates.size(); connIdxC++) {
+				PairwiseImageGraph.Motion connectC = validCandidates.get(connIdxC);
+				PairwiseImageGraph.View viewC = connectC.other(target);
 
-			if (score > bestScore) {
-				bestScore = score;
-				connections.clear();
-				connections.add(connectB);
-				connections.add(connectC);
+				PairwiseImageGraph.Motion connectBtoC = viewB.findMotion(viewC);
+				if (connectBtoC==null || !connectBtoC.is3D)
+					continue;
+
+				double score = BoofMiscOps.min(connectB.score3D, connectC.score3D, connectBtoC.score3D);
+
+				considered++;
+				if (score > bestScore) {
+					bestScore = score;
+					connections.clear();
+					connections.add(connectB);
+					connections.add(connectC);
+				}
 			}
 		}
-		if (verbose != null) verbose.printf("best selected pair score=%f\n", bestScore);
+		if (verbose != null)
+			verbose.printf("best pair: score=%.2f from pairs=%d views.size=%d\n",
+					bestScore, considered, validCandidates.size());
 
 		return !connections.isEmpty();
 	}
@@ -115,44 +124,6 @@ public abstract class ExpandByOneView implements VerbosePrint {
 				continue;
 			validConnections.add(connectB);
 		}
-	}
-
-	/**
-	 * Selects the view C which has the best connection from A to C and B to C. Best is defined using the
-	 * scoring function and being 3D.
-	 *
-	 * @param viewA (input) The root node all motions must connect to
-	 * @param connAB (input) A connection from view A to view B
-	 * @param validConnections (input) List of connections that are known to be valid potential solutions
-	 * @return The selected common view. null if none could be found
-	 */
-	public PairwiseImageGraph.Motion findBestCommon( PairwiseImageGraph.View viewA, PairwiseImageGraph.Motion connAB, List<PairwiseImageGraph.Motion> validConnections ) {
-		double bestScore = 0.0;
-		PairwiseImageGraph.Motion bestConnection = null;
-
-		PairwiseImageGraph.View viewB = connAB.other(viewA);
-
-		for (int connIdx = 0; connIdx < validConnections.size(); connIdx++) {
-			PairwiseImageGraph.Motion connAC = validConnections.get(connIdx);
-			if (connAC == connAB)
-				continue;
-			PairwiseImageGraph.View viewC = connAC.other(viewA);
-
-			// The views must form a complete loop with 3D information
-			PairwiseImageGraph.Motion connBC = viewB.findMotion(viewC);
-			if (null == connBC || !connBC.is3D)
-				continue;
-
-			// Maximize worst case 3D information
-			double score = Math.min(connAC.score3D, connBC.score3D);
-
-			if (score > bestScore) {
-				bestScore = score;
-				bestConnection = connAC;
-			}
-		}
-
-		return bestConnection;
 	}
 
 	@Override
