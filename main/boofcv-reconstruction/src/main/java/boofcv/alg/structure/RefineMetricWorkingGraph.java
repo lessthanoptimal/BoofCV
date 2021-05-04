@@ -31,6 +31,7 @@ import boofcv.misc.BoofMiscOps;
 import boofcv.struct.calib.CameraPinholeBrown;
 import boofcv.struct.distort.Point2Transform2_F64;
 import boofcv.struct.image.ImageDimension;
+import georegression.geometry.ConvertRotation3D_F64;
 import georegression.struct.point.Point2D_F64;
 import georegression.struct.point.Point4D_F64;
 import georegression.struct.se.Se3_F64;
@@ -460,9 +461,12 @@ public class RefineMetricWorkingGraph implements VerbosePrint {
 
 //		for (int viewIdx = 0; viewIdx < graph.listViews.size(); viewIdx++) {
 //			if (verbose != null) {
+//				SceneWorkingGraph.View wview = graph.listViews.get(viewIdx);
 //				Se3_F64 m = bundleAdjustment.structure.getParentToView(viewIdx);
-//				double theta = ConvertRotation3D_F64.matrixToRodrigues(m.R,null).theta;
-//				verbose.printf("BEFORE SBA T=(%.2f %.2f %.2f) R=%.4f\n", m.T.x, m.T.y, m.T.z,theta);
+//				double theta = ConvertRotation3D_F64.matrixToRodrigues(m.R, null).theta;
+//				verbose.printf("BEFORE SBA T=(%.2f %.2f %.2f) R=%.4f, f=%.1f k1=%.1e k2=%.1e\n",
+//						m.T.x, m.T.y, m.T.z, theta,
+//						wview.intrinsic.f, wview.intrinsic.k1, wview.intrinsic.k2);
 //			}
 //		}
 
@@ -477,11 +481,13 @@ public class RefineMetricWorkingGraph implements VerbosePrint {
 			wview.world_to_view.setTo(structure.getParentToView(viewIdx));
 			wview.intrinsic.setTo((BundlePinholeSimplified)structure.cameras.get(viewIdx).model);
 
-//			if (verbose != null) {
-//				Se3_F64 m = bundleAdjustment.structure.getParentToView(viewIdx);
-//				double theta = ConvertRotation3D_F64.matrixToRodrigues(m.R,null).theta;
-//				verbose.printf("AFTER SBA T=(%.2f %.2f %.2f) R=%.4f\n", m.T.x, m.T.y, m.T.z,theta);
-//			}
+			if (verbose != null) {
+
+				Se3_F64 m = bundleAdjustment.structure.getParentToView(viewIdx);
+				double theta = ConvertRotation3D_F64.matrixToRodrigues(m.R, null).theta;
+				verbose.printf("AFTER SBA T=(%.2f %.2f %.2f) R=%.4f, f=%.1f k1=%.1e k2=%.1e\n", m.T.x, m.T.y, m.T.z, theta,
+						wview.intrinsic.f, wview.intrinsic.k1, wview.intrinsic.k2);
+			}
 		}
 		return true;
 	}

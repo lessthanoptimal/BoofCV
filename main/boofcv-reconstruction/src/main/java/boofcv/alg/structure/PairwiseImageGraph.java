@@ -21,6 +21,7 @@ package boofcv.alg.structure;
 import boofcv.struct.feature.AssociatedIndex;
 import org.ddogleg.struct.DogArray;
 import org.ddogleg.struct.FastArray;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.HashMap;
 import java.util.List;
@@ -89,7 +90,7 @@ public class PairwiseImageGraph {
 			return connections.get(index).other(this);
 		}
 
-		public Motion findMotion( View target ) {
+		public @Nullable Motion findMotion( View target ) {
 			int idx = findMotionIdx(target);
 			if (idx == -1)
 				return null;
