@@ -75,7 +75,7 @@ public class MetricFromUncalibratedPairwiseGraph extends ReconstructionFromPairw
 	 * When expanding a scene, SBA is applied to the entire scene until it has this many views. This often helps
 	 * improve the initial metric scene estimate significantly, but can be expensive.
 	 */
-	public @Getter @Setter int refineSceneWhileExpandingMaxViews = 10;
+	public @Getter @Setter int refineSceneWhileExpandingMaxViews = 6;
 
 	/** Computes the initial scene from the seed and some of it's neighbors */
 	private final @Getter ProjectiveInitializeAllCommon initProjective;
@@ -451,6 +451,8 @@ public class MetricFromUncalibratedPairwiseGraph extends ReconstructionFromPairw
 	 * @return true if it could expand into the view and updated the scene. False if it failed
 	 */
 	boolean expandIntoView( LookUpSimilarImages db, SceneWorkingGraph scene, PairwiseImageGraph.View selected ) {
+		// TODO if it fails to expand into a view put it into a list to consider again later if another view is
+		//      updated to metric and connected to this view.
 		if (!expandMetric.process(db, scene, selected)) {
 			if (verbose != null)
 				verbose.println("Failed to expand/add scene=" + scene.index + " view='" + selected.id + "'. Discarding.");
@@ -477,7 +479,7 @@ public class MetricFromUncalibratedPairwiseGraph extends ReconstructionFromPairw
 			addOpenForView(scene, wview.pview);
 
 		if (verbose != null) {
-			verbose.println("  Expanded  scene=" + scene.index + " view='" + selected.id + "'  inliers=" +
+			verbose.println("  Expanded scene=" + scene.index + " view='" + selected.id + "'  inliers=" +
 					utils.inliersThreeView.size() + "/" + utils.matchesTriple.size + " Open added.size=" +
 					(scene.open.size - openSizePrior));
 		}

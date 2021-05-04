@@ -123,15 +123,17 @@ public abstract class ReconstructionFromPairwiseGraph implements VerbosePrint {
 			}
 			double bestLocalScore = 0.0;
 			for (int idx0 = 0; idx0 < valid.size(); idx0++) {
-				View dst = valid.get(idx0);
+				View viewB = valid.get(idx0);
+				PairwiseImageGraph.Motion m0 = Objects.requireNonNull(pview.findMotion(viewB));
 
 				for (int idx1 = idx0 + 1; idx1 < valid.size(); idx1++) {
-					if (null == dst.findMotion(valid.get(idx1)))
+					View viewC = valid.get(idx1);
+					PairwiseImageGraph.Motion m2 = viewB.findMotion(viewC);
+
+					if (m2 == null || !m2.is3D)
 						continue;
 
-					PairwiseImageGraph.Motion m0 = pview.findMotion(dst);
-					PairwiseImageGraph.Motion m1 = pview.findMotion(valid.get(idx1));
-					PairwiseImageGraph.Motion m2 = dst.findMotion(valid.get(idx1));
+					PairwiseImageGraph.Motion m1 = Objects.requireNonNull(pview.findMotion(viewC));
 
 					double s = BoofMiscOps.min(m0.score3D, m1.score3D, m2.score3D);
 
