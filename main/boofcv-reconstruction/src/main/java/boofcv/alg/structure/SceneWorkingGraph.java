@@ -284,7 +284,7 @@ public class SceneWorkingGraph {
 
 		@Override
 		public String toString() {
-			return "View{id='" + pview.id + "' inliers=" + (!inliers.isEmpty()) + "}";
+			return "View{id='" + pview.id + "' inliers=" + inliers.size + "}";
 		}
 	}
 }

@@ -89,6 +89,7 @@ public class MockLookupSimilarImagesRealistic implements LookUpSimilarImages {
 		for (Point3D_F64 X : UtilPoint3D_F64.random(new Point3D_F64(0, 0, 2.0*r), -r, pathLength + r, -r, r, -r, r, numFeatures, rand)) {
 			Feature f = new Feature();
 			f.world.setTo(X);
+			f.featureIdx = points.size();
 			points.add(f);
 		}
 
@@ -121,6 +122,7 @@ public class MockLookupSimilarImagesRealistic implements LookUpSimilarImages {
 		for (Point3D_F64 X : UtilPoint3D_F64.random(new Point3D_F64(0, 0, 0), -0.5, 0.5, numFeatures, rand)) {
 			Feature f = new Feature();
 			f.world.setTo(X);
+			f.featureIdx = points.size();
 			points.add(f);
 		}
 
@@ -268,11 +270,64 @@ public class MockLookupSimilarImagesRealistic implements LookUpSimilarImages {
 		pairwise.nodes.forIdx(( i, v ) -> working.addView(v));
 
 		working.listViews.forEach(v -> BundleAdjustmentOps.convert(intrinsic, v.intrinsic));
+		working.listViews.forEach(v -> v.imageDimension.setTo(intrinsic.width, intrinsic.height));
 		BoofMiscOps.forIdx(working.listViews, ( i, v ) -> v.projective.setTo(views.get(i).camera));
 		BoofMiscOps.forIdx(working.listViews, ( i, v ) -> v.world_to_view.setTo(views.get(i).world_to_view));
 		BoofMiscOps.forIdx(working.listViews, ( i, v ) -> v.index = i);
 
 		return working;
+	}
+
+	/**
+	 * Adds inlier info to the specified view
+	 */
+	public void addInlierInfo( PairwiseImageGraph pairwise,
+							   SceneWorkingGraph.View wv, int... connected ) {
+		var commonCount = new DogArray_I32();
+		commonCount.resize(points.size(), 0);
+
+		// Find features visible in every view
+		views.get(wv.index).observations.forEach(o -> commonCount.data[o.feature.featureIdx]++);
+		for (int viewIdx : connected) {
+			BoofMiscOps.checkTrue(viewIdx != wv.index);
+			views.get(viewIdx).observations.forEach(o -> commonCount.data[o.feature.featureIdx]++);
+		}
+
+		// Create the info now
+		SceneWorkingGraph.InlierInfo info = wv.inliers.grow();
+		info.views.add(wv.pview);
+		for (int i = 0; i < connected.length; i++) {
+			info.views.add(pairwise.nodes.get(connected[i]));
+		}
+		info.observations.resize(info.views.size);
+
+		// Count the number of features seen by all views
+		for (int featureID = 0; featureID < commonCount.size; featureID++) {
+			// See if this is a common feature
+			if (commonCount.data[featureID] != connected.length + 1)
+				continue;
+
+			// Go through each view and determine which observation belongs to this feature
+			for (int inlierViewIdx = 0; inlierViewIdx < info.views.size; inlierViewIdx++) {
+				PairwiseImageGraph.View pview = info.views.get(inlierViewIdx);
+				View v = views.get(pview.index);
+
+				// brute force search but it works. Could change to O(N) later
+				boolean found = false;
+				for (int obsIdx = 0; obsIdx < v.observations.size(); obsIdx++) {
+					if (v.observations.get(obsIdx).feature.featureIdx != featureID) {
+						continue;
+					}
+
+					found = true;
+					info.observations.get(inlierViewIdx).add(obsIdx);
+					break;
+				}
+				BoofMiscOps.checkTrue(found);
+			}
+		}
+
+		BoofMiscOps.checkTrue(info.observations.get(0).size > 0);
 	}
 
 	@Override
@@ -370,7 +425,7 @@ public class MockLookupSimilarImagesRealistic implements LookUpSimilarImages {
 	public int observationToFeatureIdx( int viewIdx, int observationIdx ) {
 		View v = views.get(viewIdx);
 		Feature f = v.observations.get(observationIdx).feature;
-		return points.indexOf(f);
+		return f.featureIdx;
 	}
 
 	public Observation featureToObservation( int viewIdx, int featureIdx ) {
@@ -384,6 +439,7 @@ public class MockLookupSimilarImagesRealistic implements LookUpSimilarImages {
 	}
 
 	public static class Feature {
+		public int featureIdx;
 		public Point3D_F64 world = new Point3D_F64();
 	}
 

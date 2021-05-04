@@ -196,8 +196,8 @@ public class ResolveSceneScaleAmbiguity implements VerbosePrint {
 
 		if (verbose != null) {
 			verbose.println("scales.size=" + scales.size + "/" + numFeatures +
-					" failures: tri=" + failedTriangulate + " inf=" + failedInfinity + " behind1=" + failedBehind1 +
-					" behind2=" + failedBehind2 + " success=" + success + " scale=" + scene1_to_scene2.scale);
+					" depth_check: tri=" + failedTriangulate + " inf=" + failedInfinity + " behind1=" + failedBehind1 +
+					" behind2=" + failedBehind2 + ", success=" + success + " scale=" + scene1_to_scene2.scale);
 		}
 
 		return success;

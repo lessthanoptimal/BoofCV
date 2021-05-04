@@ -71,8 +71,12 @@ public class SceneMergingOperations implements VerbosePrint {
 	/** Estimates the scale and SE3 transform from one scene to another */
 	@Getter ResolveSceneScaleAmbiguity resolveScale = new ResolveSceneScaleAmbiguity();
 
-	/** List of views that were modified by the merge operation */
-	public final List<SceneWorkingGraph.View> modifiedViews = new ArrayList<>();
+	@Getter RefineMetricGraphSubset refineSubset = new RefineMetricGraphSubset();
+
+	/** Views that were in src but were either added or already existed in dst */
+	public final List<SceneWorkingGraph.View> mergedViews = new ArrayList<>();
+	/** Views which were both src and dst */
+	public final List<SceneWorkingGraph.View> duplicateViews = new ArrayList<>();
 
 	//----------------------------------------
 	// Workspace for resolving the scale ambiguity between the two scenes
@@ -128,14 +132,13 @@ public class SceneMergingOperations implements VerbosePrint {
 		}
 	}
 
-
 	/**
 	 * Toggles the enabled state of a view and update its counts accordingly
 	 *
 	 * @param target Scene that will have its counts modified.
 	 * @param views List of views + scenes that views them
 	 */
-	public void toggleViewEnabled( SceneWorkingGraph target, PairwiseViewScenes views) {
+	public void toggleViewEnabled( SceneWorkingGraph target, PairwiseViewScenes views ) {
 		// if true, then that means we are enabling the scene
 		boolean enable = !enabledScenes.get(target.index);
 
@@ -181,7 +184,7 @@ public class SceneMergingOperations implements VerbosePrint {
 	 * @param selected (Output) Selected scenes to merge
 	 * @return true if it could find two valid scenes to merge
 	 */
-	public boolean selectViewsToMerge( SelectedScenes selected ) {
+	public boolean selectScenesToMerge( SelectedScenes selected ) {
 		int bestCommon = 0;
 
 		for (int sceneIndexA = 0; sceneIndexA < commonViewCounts.size; sceneIndexA++) {
@@ -216,15 +219,55 @@ public class SceneMergingOperations implements VerbosePrint {
 	}
 
 	/**
-	 * Merges the 'src' scene into the 'dst' scene. All views which are not in dst already are added after applying
-	 * the transform to the coordinate system.
+	 * Merges the 'src' scene into the 'dst' scene. Copies then refines the extrinsics/intrinsics to ensure
+	 * the merge doesn't have artifacts.
 	 *
 	 * @param src (Input) The source scene which which is merged into 'dst'
 	 * @param dst (Input/Output) The destination scene
 	 * @param src_to_dst Known transform from the coordinate system of src to dst.
 	 */
-	public void mergeViews( SceneWorkingGraph src, SceneWorkingGraph dst, ScaleSe3_F64 src_to_dst ) {
-		modifiedViews.clear();
+	public boolean mergeViews( LookUpSimilarImages db,
+							   SceneWorkingGraph src, SceneWorkingGraph dst, ScaleSe3_F64 src_to_dst ) {
+		// Copy the src views into the dst scene
+		mergeStructure(src, dst, src_to_dst);
+
+		// The scenes might have a different version of reality because they converged to slightly different solutions
+		// this can and does cause geometric contradictions.
+		refineSubset.setSubset(dst, mergedViews);
+
+		// Mark the views which were in both scenes as fixed. This way we can't make the dst worse than it was before
+		// and we will force src to switch over to dst's version of reality
+		for (int listIdx = 0; listIdx < duplicateViews.size(); listIdx++) {
+			refineSubset.setViewKnown(duplicateViews.get(listIdx).pview.id);
+		}
+
+		// Refine and update the views
+		if (!refineSubset.process(db)) {
+			if (verbose != null) verbose.println("Refine subset failed! Something went really wrong");
+			return false;
+		}
+
+		if (verbose!=null) {
+			for (int mergedCnt = 0; mergedCnt < mergedViews.size(); mergedCnt++) {
+				SceneWorkingGraph.View view = mergedViews.get(mergedCnt);
+				verbose.printf("after view='%s' f=%.2f\n",view.pview.id, view.intrinsic.f);
+			}
+		}
+
+		return true;
+	}
+
+	/**
+	 * Finds views which are in 'src' but not in 'dst' scene and copies them over while applying the extrinsic
+	 * transform. Keeps tracks of which views are in common too.
+	 *
+	 * @param src (Input) The source scene which which is merged into 'dst'
+	 * @param dst (Input/Output) The destination scene
+	 * @param src_to_dst Known transform from the coordinate system of src to dst.
+	 */
+	void mergeStructure( SceneWorkingGraph src, SceneWorkingGraph dst, ScaleSe3_F64 src_to_dst ) {
+		mergedViews.clear();
+		duplicateViews.clear();
 		Se3_F64 src_to_view = new Se3_F64();
 
 		// src_to_dst is between the world coordinate systems. We need dst_to_src * src_to_view
@@ -233,30 +276,30 @@ public class SceneMergingOperations implements VerbosePrint {
 		for (int srcViewIdx = 0; srcViewIdx < src.listViews.size(); srcViewIdx++) {
 			SceneWorkingGraph.View srcView = src.listViews.get(srcViewIdx);
 
-			boolean copySrc = true;
+			boolean copySrc = false;
 			SceneWorkingGraph.View dstView;
 			if (dst.views.containsKey(srcView.pview.id)) {
 				// Both contain the same scene
 				dstView = dst.views.get(srcView.pview.id);
-
-				// Only copy the src value if it is "better" than the dst
-				copySrc = srcView.getBestInlierScore() > dstView.getBestInlierScore();
+				duplicateViews.add(dstView);
 
 				if (verbose != null) {
-					verbose.printf("%-7s view='%s', sets={%d %d}, scores: %.1f vs %.1f, src.f=%.1f dst.f=%.1f\n",
-							copySrc ? "SRC" : "DST", srcView.pview.id, srcView.inliers.size, dstView.inliers.size,
+					verbose.printf("view='%s', sets={%d %d}, scores: %.1f vs %.1f, src.f=%.1f dst.f=%.1f\n",
+							srcView.pview.id, srcView.inliers.size, dstView.inliers.size,
 							srcView.getBestInlierScore(), dstView.getBestInlierScore(),
 							srcView.intrinsic.f, dstView.intrinsic.f);
 				}
 			} else {
-				if (verbose != null)
-					verbose.printf("%-7s view='%s', f=%.1f\n", "ADD", srcView.pview.id, srcView.intrinsic.f);
 				// Create a new view in the dst scene
 				dstView = dst.addView(srcView.pview);
-			}
+				copySrc = true;
 
-			// Create a list of views that were modified so we can sanity check them later on
-			modifiedViews.add(dstView);
+				if (verbose != null) {
+					verbose.printf("view='%s', sets=%d, score: %.1f, src.f=%.1f\n",
+							srcView.pview.id, srcView.inliers.size, srcView.getBestInlierScore(), srcView.intrinsic.f);
+				}
+			}
+			mergedViews.add(dstView);
 
 			// Always copy the src inliers into the dst. This ensures islands do not form
 			for (int infoIdx = 0; infoIdx < srcView.inliers.size; infoIdx++) {
@@ -269,14 +312,12 @@ public class SceneMergingOperations implements VerbosePrint {
 			if (!copySrc)
 				continue;
 
-			// Update/Create the view in the dst scene
+			// Copy information from src to dst while updating the extrinsic info
 			dstView.imageDimension.setTo(srcView.imageDimension);
 			dstView.intrinsic.setTo(srcView.intrinsic);
-			// Copy the src transform since we need to modify it
+
 			src_to_view.setTo(srcView.world_to_view);
-			// Convert it to the same scale as the dst
 			src_to_view.T.scale(src_to_dst.scale);
-			// Apply te coordinate transform
 			transform_dst_to_src.concat(src_to_view, dstView.world_to_view);
 		}
 	}
@@ -401,7 +442,7 @@ public class SceneMergingOperations implements VerbosePrint {
 			for (int i = 0; i < inliers.views.size; i++) {
 				verbose.print("'" + inliers.views.get(i).id + "' ");
 			}
-			verbose.printf("} count=%d score=%.1f\n",inliers.getInlierCount(),inliers.scoreGeometric);
+			verbose.printf("} count=%d score=%.1f\n", inliers.getInlierCount(), inliers.scoreGeometric);
 		}
 
 		for (int infoIdx = 0; infoIdx < selectedDst.inliers.size; infoIdx++) {
@@ -410,7 +451,7 @@ public class SceneMergingOperations implements VerbosePrint {
 			for (int i = 0; i < inliers.views.size; i++) {
 				verbose.print("'" + inliers.views.get(i).id + "' ");
 			}
-			verbose.printf("} count=%d score=%.1f\n",inliers.getInlierCount(),inliers.scoreGeometric);
+			verbose.printf("} count=%d score=%.1f\n", inliers.getInlierCount(), inliers.scoreGeometric);
 		}
 	}
 
@@ -582,7 +623,7 @@ public class SceneMergingOperations implements VerbosePrint {
 
 	@Override public void setVerbose( @Nullable PrintStream out, @Nullable Set<String> configuration ) {
 		this.verbose = BoofMiscOps.addPrefix(this, out);
-		BoofMiscOps.verboseChildren(verbose, configuration, resolveScale);
+		BoofMiscOps.verboseChildren(verbose, configuration, resolveScale, refineSubset);
 	}
 
 	/**

@@ -77,6 +77,8 @@ public class RefineMetricWorkingGraph implements VerbosePrint {
 	TObjectIntHashMap<String> viewToIntegerID = new TObjectIntHashMap<>();
 
 	private @Nullable PrintStream verbose;
+	/** If verbose, then it will print view specific information. This can get very verbose in large scenes */
+	public boolean verboseViewInfo = true;
 
 	//------------------------ Internal workspace
 
@@ -122,12 +124,27 @@ public class RefineMetricWorkingGraph implements VerbosePrint {
 	 * parameters on output.
 	 */
 	public boolean process( LookUpSimilarImages db, SceneWorkingGraph graph ) {
+		return process(db, graph, ( utils ) -> {});
+	}
+
+	/**
+	 * Use the `graph` to define a 3D scene which can be optimized.
+	 *
+	 * @param db (Input) Used to lookup common features between views.
+	 * @param graph (Input, Output) Describes scene and provides initial estimate for parameters. Updated with refined
+	 * parameters on output.
+	 */
+	public boolean process( LookUpSimilarImages db, SceneWorkingGraph graph,
+							CallBeforeRefine op ) {
 		// Pre-declare and compute basic data structures
 		initializeDataStructures(db, graph);
 		// Use observations defined in the graph to create the list of 3D features which will be optimized
 		createFeatures3D(graph);
 		// Clean up by removing observations which were never assigned to a feature
 		pruneUnassignedObservations();
+
+		// Use provided function that allows for customization
+		op.process(bundleAdjustment);
 
 		return refineViews(graph);
 	}
@@ -191,8 +208,8 @@ public class RefineMetricWorkingGraph implements VerbosePrint {
 			for (int infoIdx = 0; infoIdx < wview.inliers.size; infoIdx++) {
 				final SceneWorkingGraph.InlierInfo inliers = wview.inliers.get(infoIdx);
 
-				if (verbose != null) verbose.print("inlier[" + infoIdx + "] view='" + wview.pview.id +
-						"' size=" + inliers.getInlierCount() + " , ");
+				if (verbose != null && verboseViewInfo)
+					verbose.print("inlier[" + infoIdx + "] view='" + wview.pview.id + "' size=" + inliers.getInlierCount() + " , ");
 
 				createFeaturesFromInlierInfo(graph, inliers);
 			}
@@ -243,7 +260,7 @@ public class RefineMetricWorkingGraph implements VerbosePrint {
 			// NOTE: it is possible that 2+ features are created for one physical feature with this greedy approach
 		}
 
-		if (verbose != null) {
+		if (verbose != null && verboseViewInfo) {
 			verbose.println("Adding Points: unmatched=" + (numInliers - countMatched) + " matched=" + countMatched + " mixed=" +
 					countMixed + " tooFew=" + tooFew);
 		}
@@ -481,8 +498,7 @@ public class RefineMetricWorkingGraph implements VerbosePrint {
 			wview.world_to_view.setTo(structure.getParentToView(viewIdx));
 			wview.intrinsic.setTo((BundlePinholeSimplified)structure.cameras.get(viewIdx).model);
 
-			if (verbose != null) {
-
+			if (verbose != null && verboseViewInfo) {
 				Se3_F64 m = bundleAdjustment.structure.getParentToView(viewIdx);
 				double theta = ConvertRotation3D_F64.matrixToRodrigues(m.R, null).theta;
 				verbose.printf("AFTER SBA T=(%.2f %.2f %.2f) R=%.4f, f=%.1f k1=%.1e k2=%.1e\n", m.T.x, m.T.y, m.T.z, theta,
@@ -496,5 +512,13 @@ public class RefineMetricWorkingGraph implements VerbosePrint {
 	public void setVerbose( @Nullable PrintStream out, @Nullable Set<String> configuration ) {
 		this.verbose = BoofMiscOps.addPrefix(this, out);
 		BoofMiscOps.verboseChildren(out, configuration, bundleAdjustment);
+	}
+
+	/**
+	 * Helper function that allows for arbitrary customization before it optimizes.
+	 */
+	@FunctionalInterface
+	public interface CallBeforeRefine {
+		void process( MetricBundleAdjustmentUtils utils );
 	}
 }
