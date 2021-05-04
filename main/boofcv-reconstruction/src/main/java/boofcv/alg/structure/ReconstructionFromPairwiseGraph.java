@@ -74,6 +74,8 @@ public abstract class ReconstructionFromPairwiseGraph implements VerbosePrint {
 	 * @param view (Input) Inspects connected views to add to found
 	 */
 	protected void addOpenForView( SceneWorkingGraph scene, View view ) {
+		int openSizeBefore = scene.open.size;
+
 		for (int connIdx = 0; connIdx < view.connections.size; connIdx++) {
 			PairwiseImageGraph.Motion c = view.connections.get(connIdx);
 			// If there isn't 3D information skip it
@@ -86,10 +88,19 @@ public abstract class ReconstructionFromPairwiseGraph implements VerbosePrint {
 			if (scene.exploredViews.contains(o.id))
 				continue;
 
-			if (verbose != null) verbose.println("  scene[" + scene.index + "] adding to open view.id='" + o.id + "'");
 			scene.open.add(o);
 			scene.exploredViews.add(o.id);
 		}
+
+		if (verbose == null)
+			return;
+
+		verbose.print("  scene[" + scene.index + "].view='"+view.id+"' adding: size=" +
+				(scene.open.size - openSizeBefore) + " views={ ");
+		for (int i = openSizeBefore; i < scene.open.size; i++) {
+			verbose.print("'" + scene.open.get(i).id + "' ");
+		}
+		verbose.println("}");
 	}
 
 	/**
@@ -192,33 +203,36 @@ public abstract class ReconstructionFromPairwiseGraph implements VerbosePrint {
 	}
 
 	/**
-	 * Get a list of all nodes which can be seeds. From the list of candidate seeds it picks the seeds with the
-	 * highest score first. Then all of their children are marked as having a score of zero, which means they
-	 * will be skipped over later on.
+	 * Goes through every candidate for a seed and greedily selects the ones with the best score. It then
+	 * attempts a metric upgrade. If successful it then uses that as a seed and marks all of its neighbors
+	 * so that they are not selected as seeds themselves.
 	 *
 	 * @param candidates (input) All the candidate views for seeds
 	 * @param lookupInfo (input) Used to lookup SeedInfo by View ID
-	 * @return List of seeds with the best seeds first.
 	 */
-	protected List<SeedInfo> selectSeeds( DogArray<SeedInfo> candidates, Map<String, SeedInfo> lookupInfo ) {
-		// Storage for selected seeds
-		List<SeedInfo> seeds = new ArrayList<>();
+	protected void selectAndSpawnSeeds( LookUpSimilarImages db, PairwiseImageGraph pairwise,
+										DogArray<SeedInfo> candidates, Map<String, SeedInfo> lookupInfo ) {
+
 		// sort it so best scores are last
 		Collections.sort(candidates.toList());
 
 		// Should geometry should be used to select the minimum possible score not just a relative score?
 
 		// ignore nodes with too low of a score
-		double minScore = candidates.get(candidates.size() - 1).score*0.2;
+		double scoreThreshold = candidates.get(candidates.size() - 1).score*0.5;
 
 		if (verbose != null) {
-			verbose.printf("SelectSeeds: candidates.size=%d minScore=%.2f\n", candidates.size, minScore);
+			double maxScore = candidates.get(candidates.size - 1).score;
+			double minScore = candidates.get(0).score;
+			verbose.printf("Select Seeds: candidates.size=%d scores=(%.2f - %.2f)\n",
+					candidates.size, minScore, maxScore);
 		}
 
 		// Collect summary information on rejections
 		int rejectedNeighbor = 0;
 		int rejectedScore = 0;
 		int rejectedClose = 0;
+		int rejectedSpawn = 0;
 
 		// Start iterating from the best scores
 		for (int i = candidates.size() - 1; i >= 0; i--) {
@@ -231,7 +245,7 @@ public abstract class ReconstructionFromPairwiseGraph implements VerbosePrint {
 			}
 
 			// All scores for now on will be below the minimum since they are sorted
-			if (s.score <= minScore) {
+			if (s.score <= scoreThreshold) {
 				rejectedScore = i + 1;
 				break;
 			}
@@ -248,10 +262,13 @@ public abstract class ReconstructionFromPairwiseGraph implements VerbosePrint {
 			if (skip)
 				continue;
 
-			// TODO Attempt metric upgrade here! If it fails move on....
+			// Attempt to create a new scene here.
+			if (!spawnSceneFromSeed(db, pairwise, s)) {
+				rejectedSpawn++;
+				continue;
+			}
 
-			// This is a valid seed so add it to the list
-			seeds.add(s);
+			if (verbose != null) verbose.println("Successfully spawned view.id='" + s.seed.id + "', remaining=" + i);
 
 			// zero the score of children so that they can't be a seed. This acts as a sort of non-maximum suppression
 			for (int j = 0; j < s.seed.connections.size; j++) {
@@ -259,13 +276,20 @@ public abstract class ReconstructionFromPairwiseGraph implements VerbosePrint {
 			}
 		}
 
-		if (verbose != null)
-			verbose.printf("Seed Rejections: neighbor=%3d score=%3d close=%3d\n",
-					rejectedNeighbor, rejectedScore, rejectedClose);
-
-
-		return seeds;
+		if (verbose != null) {
+			verbose.printf("Seed Rejections: neighbor=%3d score=%3d close=%3d spawn=%d\n",
+					rejectedNeighbor, rejectedScore, rejectedClose, rejectedSpawn);
+		}
 	}
+
+	/**
+	 * Attempts to create a scene from the passed in seed. If successful this function needs
+	 * to add it to the list of scenes. If it fails then there should be no change.
+	 *
+	 * @param info Seed for a new scene
+	 * @return true if successful or false if it failed
+	 */
+	protected abstract boolean spawnSceneFromSeed( LookUpSimilarImages db, PairwiseImageGraph pairwise, SeedInfo info );
 
 	/**
 	 * Scores how the target as a seed and selects the initial set of views it should spawn from.
