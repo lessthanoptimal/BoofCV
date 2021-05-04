@@ -26,7 +26,8 @@ import org.junit.jupiter.api.Test;
 import java.util.ArrayList;
 import java.util.List;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  * @author Peter Abeles
@@ -98,71 +99,6 @@ class TestExpandByOneView extends BoofStandardJUnit {
 		alg.createListOfValid(seed, valid);
 
 		assertEquals(2, valid.size());
-	}
-
-	/**
-	 * Creates a slightly complex situation where the number of elements in common and lists is not the same as sees
-	 * if it selects the best connection
-	 */
-	@Test
-	void findBestCommon() {
-		var graph = new PairwiseImageGraph();
-		View viewA = graph.createNode("A");
-		View viewB = graph.createNode("B");
-		graph.connect(viewA, viewB);
-
-		List<Motion> connectionsA = new ArrayList<>();
-
-		for (int i = 0; i < 6; i++) {
-			View viewI = graph.createNode("" + i);
-
-			// make sure src/dst is handled correctly
-			Motion mA = i%2 == 0 ? graph.connect(viewA, viewI) : graph.connect(viewI, viewA);
-			mA.score3D = 1.0 + i*0.05;
-			mA.is3D = true;
-
-			connectionsA.add(mA);
-
-			if (i >= 5) // not all the nodes will be connected to A and B
-				continue;
-
-			Motion mB = i%2 == 0 ? graph.connect(viewB, viewI) : graph.connect(viewI, viewB);
-			mB.score3D = 1.0 - i*0.05;
-			mB.is3D = true;
-		}
-
-		var alg = new ChildProjectiveExpandByOneView();
-		Motion found = alg.findBestCommon(viewA, viewA.connections.get(0), connectionsA);
-
-		assertSame(found, viewA.connections.get(1));
-	}
-
-	/**
-	 * Makes sure it checks the is3D flag
-	 */
-	@Test
-	void findBestCommon_is3D() {
-		var graph = new PairwiseImageGraph();
-		View viewA = graph.createNode("A");
-		View viewB = graph.createNode("B");
-		graph.connect(viewA, viewB);
-
-		View viewI = graph.createNode("0");
-		Motion mA = graph.connect(viewA, viewI);
-		Motion mB = graph.connect(viewB, viewI);
-
-		List<Motion> connectionsA = new ArrayList<>();
-		connectionsA.add(mA);
-
-		mA.score3D = mB.score3D = 1.1;
-		mB.is3D = false;
-
-		// Not 3D so it will fail
-		var alg = new ChildProjectiveExpandByOneView();
-		assertNull(alg.findBestCommon(viewA, viewA.connections.get(0), connectionsA));
-		// Should work now
-		mB.is3D = true;
-		assertSame(mA, alg.findBestCommon(viewA, viewA.connections.get(0), connectionsA));
 	}
 
 	private static class ChildProjectiveExpandByOneView extends ExpandByOneView {}

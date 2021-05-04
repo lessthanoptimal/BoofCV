@@ -292,7 +292,7 @@ public class MetricFromUncalibratedPairwiseGraph extends ReconstructionFromPairw
 			PairwiseImageGraph.View view = best.scene.open.removeSwap(best.openIdx);
 
 			if (verbose != null)
-				verbose.println("Expanding scene[" + best.scene.index + "].view='" + view.id + "' score=" + best.score);
+				verbose.printf("Expanding scene[%d].view='%s' score=%.2f\n", best.scene.index, view.id, best.score);
 
 			if (!expandIntoView(db, best.scene, view))
 				continue;
@@ -346,7 +346,7 @@ public class MetricFromUncalibratedPairwiseGraph extends ReconstructionFromPairw
 		mergeOps.initializeViewCounts(nodeViews, scenes.size);
 
 		// Merge views until views can no longer be merged
-		while (mergeOps.selectViewsToMerge(selected)) {
+		while (mergeOps.selectScenesToMerge(selected)) {
 			SceneWorkingGraph src = scenes.get(selected.sceneA);
 			SceneWorkingGraph dst = scenes.get(selected.sceneB);
 
@@ -394,12 +394,14 @@ public class MetricFromUncalibratedPairwiseGraph extends ReconstructionFromPairw
 			int dstViewCountBefore = dst.listViews.size();
 
 			// Merge the views
-			mergeOps.mergeViews(src, dst, src_to_dst);
+			if (!mergeOps.mergeViews(db, src, dst, src_to_dst)) {
+				throw new RuntimeException("Merge failed. Something went really wrong");
+			}
 
 			// Check the views which were modified for geometric consistency to catch bugs in the code
 			if (sanityChecks) {
-				for (int i = 0; i < mergeOps.modifiedViews.size(); i++) {
-					SceneWorkingGraph.View wview = mergeOps.modifiedViews.get(i);
+				for (int i = 0; i < mergeOps.mergedViews.size(); i++) {
+					SceneWorkingGraph.View wview = mergeOps.mergedViews.get(i);
 					metricChecks.inlierTriangulatePositiveDepth(0.1, db, dst, wview.pview.id);
 				}
 			}

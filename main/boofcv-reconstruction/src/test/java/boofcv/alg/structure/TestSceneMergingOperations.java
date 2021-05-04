@@ -78,7 +78,7 @@ public class TestSceneMergingOperations extends BoofStandardJUnit {
 		var selected = new SelectedScenes();
 
 		// Empty list so it should fail
-		assertFalse(alg.selectViewsToMerge(selected));
+		assertFalse(alg.selectScenesToMerge(selected));
 
 		// create a set of observations with a known solution
 		alg.commonViewCounts.resize(6);
@@ -89,7 +89,7 @@ public class TestSceneMergingOperations extends BoofStandardJUnit {
 		alg.commonViewCounts.get(1).get(2).counts = 4;
 		alg.commonViewCounts.get(3).get(0).counts = 8;
 
-		assertTrue(alg.selectViewsToMerge(selected));
+		assertTrue(alg.selectScenesToMerge(selected));
 		assertEquals(3, selected.sceneA);
 		assertEquals(4, selected.sceneB);
 	}
@@ -110,15 +110,15 @@ public class TestSceneMergingOperations extends BoofStandardJUnit {
 
 		// Disable every view. This should cause it to fail
 		alg.enabledScenes.resize(6, false);
-		assertFalse(alg.selectViewsToMerge(selected));
+		assertFalse(alg.selectScenesToMerge(selected));
 
 		// enable just one view. Should still fail since it can't merge with anything
 		alg.enabledScenes.set(3, true);
-		assertFalse(alg.selectViewsToMerge(selected));
+		assertFalse(alg.selectScenesToMerge(selected));
 
 		// enable one more scene. it should work now
 		alg.enabledScenes.set(4, true);
-		assertTrue(alg.selectViewsToMerge(selected));
+		assertTrue(alg.selectScenesToMerge(selected));
 		assertEquals(3, selected.sceneA);
 		assertEquals(4, selected.sceneB);
 	}
@@ -146,7 +146,7 @@ public class TestSceneMergingOperations extends BoofStandardJUnit {
 	/**
 	 * Handle nominal cases.
 	 */
-	@Test void mergeViews() {
+	@Test void mergeStructure() {
 		var alg = new SceneMergingOperations();
 		var src = new SceneWorkingGraph();
 		var dst = new SceneWorkingGraph();
@@ -177,7 +177,7 @@ public class TestSceneMergingOperations extends BoofStandardJUnit {
 		}
 
 		// Call the function being tested
-		alg.mergeViews(src, dst, src_to_dst);
+		alg.mergeStructure(src, dst, src_to_dst);
 
 		// src has 3 views NOT in dst
 		assertEquals(8, dst.listViews.size());
@@ -197,7 +197,7 @@ public class TestSceneMergingOperations extends BoofStandardJUnit {
 	/**
 	 * Test that makes sure the src is copied into the dst only if it has a better estimate
 	 */
-	@Test void mergeViews_CopySrcOnlyIfBetter() {
+	@Test void mergeStructure_CopySrcOnlyIfBetter() {
 		var alg = new SceneMergingOperations();
 		var src = new SceneWorkingGraph();
 		var dst = new SceneWorkingGraph();
@@ -233,7 +233,7 @@ public class TestSceneMergingOperations extends BoofStandardJUnit {
 		}
 
 		// Call the function being tested
-		alg.mergeViews(src, dst, src_to_dst);
+		alg.mergeStructure(src, dst, src_to_dst);
 
 		assertEquals(5, dst.listViews.size());
 

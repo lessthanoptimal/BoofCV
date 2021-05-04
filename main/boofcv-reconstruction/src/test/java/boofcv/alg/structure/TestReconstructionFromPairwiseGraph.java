@@ -25,7 +25,6 @@ import org.ejml.UtilEjml;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
-import java.util.Map;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -130,42 +129,43 @@ class TestReconstructionFromPairwiseGraph extends BoofStandardJUnit {
 		assertEquals(-1, selection.openIdx);
 	}
 
-	@Test void selectSeeds() {
-		var alg = new Helper();
-
-		// linear graph with each node/view just as good as any other
-		{
-			PairwiseImageGraph graph = createLinearGraph(8, 1);
-			Map<String, SeedInfo> mapScores = alg.scoreNodesAsSeeds(graph, 2);
-			List<SeedInfo> seeds = alg.selectAndSpawnSeeds(alg.seedScores, mapScores);
-			assertEquals(3, seeds.size()); // determined through manual inspection
-			sanityCheckSeeds(seeds);
-		}
-
-		// Similar situation but with one more view
-		{
-			PairwiseImageGraph graph = createLinearGraph(9, 1);
-			Map<String, SeedInfo> mapScores = alg.scoreNodesAsSeeds(graph, 2);
-			List<SeedInfo> seeds = alg.selectAndSpawnSeeds(alg.seedScores, mapScores);
-			assertEquals(3, seeds.size()); // determined through manual inspection
-			sanityCheckSeeds(seeds);
-		}
-
-		// Let's make one node clearly very desirable and see if it's selected
-		{
-			// select different targets to stress the system more
-			for (int targetIdx = 1; targetIdx < 4; targetIdx++) {
-				PairwiseImageGraph graph = createLinearGraph(9, 1);
-				PairwiseImageGraph.View target = graph.nodes.get(targetIdx);
-				target.connections.forIdx(( i, o ) -> o.score3D = 5.0);
-
-				Map<String, SeedInfo> mapScores = alg.scoreNodesAsSeeds(graph, 2);
-				List<SeedInfo> seeds = alg.selectAndSpawnSeeds(alg.seedScores, mapScores);
-				assertTrue(3 == seeds.size() || 2 == seeds.size()); // determined through manual inspection
-				sanityCheckSeeds(seeds);
-				assertSame(seeds.get(0).seed, target);
-			}
-		}
+	@Test void selectAndSpawnSeeds() {
+		fail("rewrite");
+//		var alg = new Helper();
+//
+//		// linear graph with each node/view just as good as any other
+//		{
+//			PairwiseImageGraph graph = createLinearGraph(8, 1);
+//			Map<String, SeedInfo> mapScores = alg.scoreNodesAsSeeds(graph, 2);
+//			List<SeedInfo> seeds = alg.selectAndSpawnSeeds(alg.seedScores, mapScores);
+//			assertEquals(3, seeds.size()); // determined through manual inspection
+//			sanityCheckSeeds(seeds);
+//		}
+//
+//		// Similar situation but with one more view
+//		{
+//			PairwiseImageGraph graph = createLinearGraph(9, 1);
+//			Map<String, SeedInfo> mapScores = alg.scoreNodesAsSeeds(graph, 2);
+//			List<SeedInfo> seeds = alg.selectAndSpawnSeeds(alg.seedScores, mapScores);
+//			assertEquals(3, seeds.size()); // determined through manual inspection
+//			sanityCheckSeeds(seeds);
+//		}
+//
+//		// Let's make one node clearly very desirable and see if it's selected
+//		{
+//			// select different targets to stress the system more
+//			for (int targetIdx = 1; targetIdx < 4; targetIdx++) {
+//				PairwiseImageGraph graph = createLinearGraph(9, 1);
+//				PairwiseImageGraph.View target = graph.nodes.get(targetIdx);
+//				target.connections.forIdx(( i, o ) -> o.score3D = 5.0);
+//
+//				Map<String, SeedInfo> mapScores = alg.scoreNodesAsSeeds(graph, 2);
+//				List<SeedInfo> seeds = alg.selectAndSpawnSeeds(alg.seedScores, mapScores);
+//				assertTrue(3 == seeds.size() || 2 == seeds.size()); // determined through manual inspection
+//				sanityCheckSeeds(seeds);
+//				assertSame(seeds.get(0).seed, target);
+//			}
+//		}
 	}
 
 	/**
@@ -292,5 +292,10 @@ class TestReconstructionFromPairwiseGraph extends BoofStandardJUnit {
 
 	private class Helper extends ReconstructionFromPairwiseGraph {
 		public Helper() {super(new PairwiseGraphUtils());}
+
+		@Override
+		protected boolean spawnSceneFromSeed( LookUpSimilarImages db, PairwiseImageGraph pairwise, SeedInfo info ) {
+			return false;
+		}
 	}
 }

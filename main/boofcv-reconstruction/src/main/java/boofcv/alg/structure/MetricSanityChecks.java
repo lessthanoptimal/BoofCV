@@ -81,7 +81,7 @@ public class MetricSanityChecks implements VerbosePrint {
 			normalize.setK(w.intrinsic.f, w.intrinsic.f, 0, 0, 0).setDistortion(w.intrinsic.k1, w.intrinsic.k2);
 			listNormalize.add(normalize);
 
-			listMotion.add(view1_to_world.concat(w.world_to_view,null));
+			listMotion.add(view1_to_world.concat(w.world_to_view, null));
 
 			var features = new DogArray<>(Point2D_F64::new);
 			db.lookupPixelFeats(w.pview.id, features);
@@ -89,7 +89,7 @@ public class MetricSanityChecks implements VerbosePrint {
 			db.lookupShape(w.pview.id, shape);
 			double cx = shape.width/2;
 			double cy = shape.height/2;
-			features.forEach(p->p.setTo(p.x-cx, p.y-cy));
+			features.forEach(p -> p.setTo(p.x - cx, p.y - cy));
 			listFeatures.add(features);
 		}
 
@@ -115,15 +115,22 @@ public class MetricSanityChecks implements VerbosePrint {
 				bad++;
 		}
 
-		if (verbose != null)
-			verbose.println("Depth Sanity: target='"+ targetID +"', Bad Depth: "+bad+"/"+numFeatures);
+		if (verbose != null) {
+			verbose.print("Depth Sanity: target='" + targetID + "', Bad Depth: " + bad + "/" + numFeatures+", ");
+			verbose.print("inlier.views={ ");
+			for (int i = 0; i < inliers.views.size(); i++) {
+				verbose.print("'" + inliers.views.get(i).id + "' ");
+			}
+			verbose.println("}");
+		}
 
 		if (bad > numFeatures*tolerance) {
 			if (verbose != null) {
 				for (int i = 0; i < listMotion.size(); i++) {
 					Se3_F64 m = listMotion.get(i);
-					double theta = ConvertRotation3D_F64.matrixToRodrigues(m.R,null).theta;
-					verbose.printf("Sanity T=(%.2f %.2f %.2f) R=%.4f\n", m.T.x, m.T.y, m.T.z,theta);
+					double theta = ConvertRotation3D_F64.matrixToRodrigues(m.R, null).theta;
+					verbose.printf("_ view['%s'] T=(%.2f %.2f %.2f) R=%.4f f=%.2f\n",
+							listViews.get(i).pview.id, m.T.x, m.T.y, m.T.z, theta, listViews.get(i).intrinsic.f);
 				}
 			}
 			throw new RuntimeException("Failed positive depth. bad=" + bad + "/" + numFeatures);
