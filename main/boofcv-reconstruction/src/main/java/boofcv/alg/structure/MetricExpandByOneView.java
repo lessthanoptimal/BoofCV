@@ -350,10 +350,11 @@ public class MetricExpandByOneView extends ExpandByOneView {
 		}
 
 		if (verbose != null) {
-			verbose.println("negate=" + negate);
+//			verbose.println("negate=" + negate);
 			verbose.printf("SL View 1 to 2     T=(%.1f %.1f %.1f) scale=%g\n",
 					view1_to_view2H.T.x, view1_to_view2H.T.y, view1_to_view2H.T.z, scaleLocalToGlobal);
-			verbose.printf("Initial fx=%6.1f k1=%6.3f k2=%6.3f T=(%.1f %.1f %.1f)\n",
+			verbose.printf("view1.f=%.2f view2.f=%.2f\n", wview1.intrinsic.f, wview2.intrinsic.f);
+			verbose.printf("Initial f=%6.1f k1=%6.3f k2=%6.3f T=(%.1f %.1f %.1f)\n",
 					intrinsic.f, intrinsic.k1, intrinsic.k2,
 					view1_to_target.T.x, view1_to_target.T.y, view1_to_target.T.z);
 		}

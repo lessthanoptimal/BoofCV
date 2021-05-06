@@ -141,8 +141,10 @@ public class MetricSanityChecks implements VerbosePrint {
 				for (int i = 0; i < listMotion.size(); i++) {
 					Se3_F64 m = listMotion.get(i);
 					double theta = ConvertRotation3D_F64.matrixToRodrigues(m.R, null).theta;
-					verbose.printf("_ view['%s'] T=(%.2f %.2f %.2f) R=%.4f f=%.2f\n",
-							listViews.get(i).pview.id, m.T.x, m.T.y, m.T.z, theta, listViews.get(i).intrinsic.f);
+					BundlePinholeSimplified intrinsic = listViews.get(i).intrinsic;
+					verbose.printf("_ view['%s'] T=(%.2f %.2f %.2f) R=%.4f f=%.2f k1=%.2e k2=%.2e\n",
+							listViews.get(i).pview.id, m.T.x, m.T.y, m.T.z, theta,
+							intrinsic.f, intrinsic.k1, intrinsic.k2);
 				}
 			}
 			throw new RuntimeException("Failed positive depth. bad=" + bad + "/" + numFeatures);

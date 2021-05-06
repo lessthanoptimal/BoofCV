@@ -170,7 +170,6 @@ public class MetricFromUncalibratedPairwiseGraph extends ReconstructionFromPairw
 	@Override
 	protected boolean spawnSceneFromSeed( LookUpSimilarImages db, PairwiseImageGraph pairwise, SeedInfo info ) {
 		if (!spawnScene.process(db, pairwise, info.seed, info.motions)) {
-			if (verbose != null) verbose.println("_ FAILED: Spawn seed.id=" + info.seed.id);
 			return false;
 		}
 

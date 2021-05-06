@@ -20,7 +20,9 @@ package boofcv.alg.structure;
 
 import boofcv.alg.structure.PairwiseImageGraph.View;
 import boofcv.misc.BoofMiscOps;
+import boofcv.struct.ConfigLength;
 import boofcv.struct.ScoreIndex;
+import lombok.Getter;
 import org.ddogleg.struct.DogArray;
 import org.ddogleg.struct.DogArray_I32;
 import org.ddogleg.struct.VerbosePrint;
@@ -38,6 +40,12 @@ import java.util.*;
  * @see ProjectiveReconstructionFromPairwiseGraph
  */
 public abstract class ReconstructionFromPairwiseGraph implements VerbosePrint {
+
+	/**
+	 * It will stop spawning more seeds when it fails this many times. If relative, then its relative to the
+	 * maximum number of candidate views for seeds.
+	 */
+	public final @Getter ConfigLength maximumSeedFailures = ConfigLength.relative(0.1,10);
 
 	// Common functions used in projective reconstruction
 	protected PairwiseGraphUtils utils;
@@ -216,11 +224,6 @@ public abstract class ReconstructionFromPairwiseGraph implements VerbosePrint {
 		// sort it so best scores are last
 		Collections.sort(candidates.toList());
 
-		// Should geometry should be used to select the minimum possible score not just a relative score?
-
-		// ignore nodes with too low of a score
-		double scoreThreshold = candidates.get(candidates.size() - 1).score*0.5;
-
 		if (verbose != null) {
 			double maxScore = candidates.get(candidates.size - 1).score;
 			double minScore = candidates.get(0).score;
@@ -228,26 +231,23 @@ public abstract class ReconstructionFromPairwiseGraph implements VerbosePrint {
 					candidates.size, minScore, maxScore);
 		}
 
+		// When it reaches the maximum number of failed seeds/spawns it will stop trying
+		int maxFailures = maximumSeedFailures.computeI(candidates.size);
+
 		// Collect summary information on rejections
 		int rejectedNeighbor = 0;
-		int rejectedScore = 0;
 		int rejectedClose = 0;
 		int rejectedSpawn = 0;
+		int successes = 0;
 
 		// Start iterating from the best scores
-		for (int i = candidates.size() - 1; i >= 0; i--) {
+		for (int i = candidates.size() - 1; i >= 0 && rejectedSpawn < maxFailures; i--) {
 			SeedInfo s = candidates.get(i);
 
-			// skip if it's a neighbor to an already selected seed
-			if (s.neighbor) {
+			// skip if it's a neighbor to an already selected seed. Also if it has no connections.
+			if (s.neighbor || s.motions.isEmpty()) {
 				rejectedNeighbor++;
 				continue;
-			}
-
-			// All scores for now on will be below the minimum since they are sorted
-			if (s.score <= scoreThreshold) {
-				rejectedScore = i + 1;
-				break;
 			}
 
 			// If any of the connected seeds are zero it's too close to another seed and you should pass over it
@@ -264,6 +264,7 @@ public abstract class ReconstructionFromPairwiseGraph implements VerbosePrint {
 
 			// Attempt to create a new scene here.
 			if (!spawnSceneFromSeed(db, pairwise, s)) {
+				if (verbose != null) verbose.println("FAILED: Spawn view.id='" + s.seed.id + "', remaining=" + i);
 				rejectedSpawn++;
 				continue;
 			}
@@ -274,11 +275,13 @@ public abstract class ReconstructionFromPairwiseGraph implements VerbosePrint {
 			for (int j = 0; j < s.seed.connections.size; j++) {
 				lookupInfo.get(s.seed.connections.get(j).other(s.seed).id).neighbor = true;
 			}
+
+			successes++;
 		}
 
 		if (verbose != null) {
-			verbose.printf("Seed Rejections: neighbor=%3d score=%3d close=%3d spawn=%d\n",
-					rejectedNeighbor, rejectedScore, rejectedClose, rejectedSpawn);
+			verbose.printf("Seed Summary: candidates=%d, success=%d, failures: neighbor=%d close=%d spawn=%d\n",
+					candidates.size, successes, rejectedNeighbor, rejectedClose, rejectedSpawn);
 		}
 	}
 
