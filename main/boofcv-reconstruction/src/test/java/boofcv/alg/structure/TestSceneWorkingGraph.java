@@ -27,6 +27,11 @@ import static org.junit.jupiter.api.Assertions.*;
  * @author Peter Abeles
  */
 class TestSceneWorkingGraph extends BoofStandardJUnit {
+
+	@Test void setTo() {
+		fail("Implement");
+	}
+
 	@Test void isKnown() {
 		var alg = new SceneWorkingGraph();
 		var viewA = new PairwiseImageGraph.View();
@@ -51,13 +56,6 @@ class TestSceneWorkingGraph extends BoofStandardJUnit {
 		SceneWorkingGraph.View found = alg.addView(pview);
 		assertSame(found.pview, pview);
 		assertSame(found, alg.views.get(pview.id));
-	}
-
-	@Test void createFeature() {
-		var alg = new SceneWorkingGraph();
-		SceneWorkingGraph.Feature found = alg.createFeature();
-		assertEquals(1, alg.features.size());
-		assertSame(alg.features.get(0), found);
 	}
 
 	@Test void InlierInfo_setTo() {
