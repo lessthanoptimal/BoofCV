@@ -21,7 +21,6 @@ package boofcv.alg.structure;
 import boofcv.abst.geo.TriangulateNViewsMetricH;
 import boofcv.abst.geo.bundle.MetricBundleAdjustmentUtils;
 import boofcv.abst.geo.bundle.SceneObservations;
-import boofcv.abst.geo.bundle.SceneStructureCommon;
 import boofcv.abst.geo.bundle.SceneStructureMetric;
 import boofcv.alg.distort.brown.RemoveBrownPtoN_F64;
 import boofcv.alg.geo.MultiViewOps;
@@ -31,16 +30,19 @@ import boofcv.alg.geo.selfcalib.TwoViewToCalibratingHomography;
 import boofcv.misc.BoofMiscOps;
 import boofcv.struct.geo.AssociatedPair;
 import boofcv.struct.geo.AssociatedTriple;
+import boofcv.struct.image.ImageDimension;
 import georegression.struct.point.Point2D_F64;
 import georegression.struct.point.Point4D_F64;
 import georegression.struct.se.Se3_F64;
-import georegression.transform.se.SePointOps_F64;
 import org.ddogleg.struct.DogArray;
 import org.ejml.UtilEjml;
 import org.ejml.data.DMatrixRMaj;
+import org.jetbrains.annotations.Nullable;
 
+import java.io.PrintStream;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 
 import static boofcv.misc.BoofMiscOps.checkTrue;
 
@@ -74,15 +76,18 @@ public class MetricExpandByOneView extends ExpandByOneView {
 	/** Bundle Adjustment functions and configurations */
 	public final MetricBundleAdjustmentUtils bundleAdjustment = new MetricBundleAdjustmentUtils();
 
-	/** Maximum number of features which can be behind one of the cameras for this to be accepted */
-	public double maxFractionBehind = 0.15;
-
 	// Used for triangulation
 	protected final List<Point2D_F64> pixelNorms = BoofMiscOps.createListFilled(3, Point2D_F64::new);
 	protected final List<Se3_F64> listMotion = new ArrayList<>();
 	protected final RemoveBrownPtoN_F64 normalize1 = new RemoveBrownPtoN_F64();
 	protected final RemoveBrownPtoN_F64 normalize2 = new RemoveBrownPtoN_F64();
 	protected final RemoveBrownPtoN_F64 normalize3 = new RemoveBrownPtoN_F64();
+
+	/** Used to check results to see if they can be trusted */
+	public final MetricSanityChecks checks = new MetricSanityChecks();
+
+	/** If less than this number of features fail the physical constraint test, attempt to recover by removing them */
+	public double fractionBadFeaturesRecover = 0.05;
 
 	//------------------------- Local work space
 
@@ -110,11 +115,17 @@ public class MetricExpandByOneView extends ExpandByOneView {
 	// Storage for target view parameters
 	final BundlePinholeSimplified targetIntrinsic = new BundlePinholeSimplified();
 
+	List<ImageDimension> listImageShape = new ArrayList<>();
+	MetricSanityChecks bundleChecks = new MetricSanityChecks();
+
 	public MetricExpandByOneView() {
 		listMotion.add(view1_to_view1);
 		listMotion.add(view1_to_view2);
 		listMotion.add(view1_to_target);
 //		bundleAdjustment.keepFraction = 0.95; <-- this made it worse by a lot?!
+
+		// TODO clean this up. Only fail on unrecoverable errors, e.g. focal length
+		bundleChecks.maxFractionFail = 1.0;
 	}
 
 	/**
@@ -173,11 +184,17 @@ public class MetricExpandByOneView extends ExpandByOneView {
 			return false;
 		}
 
-		// Refine using bundle adjustment, if configured to do so
-		if (utils.configConvergeSBA.maxIterations > 0) {
-			if (!performBundleAndCheckResults(workGraph))
-				return false;
-		}
+		// Refine using bundle adjustment
+		if (!performBundleAdjustment(workGraph))
+			return false;
+
+		// Look for bad features which fail basic physical sanity checks. Remove them then optimize again.
+		if (!removedBadFeatures(workGraph))
+			return false;
+
+		// copy results from bundle adjustment now that they have passed
+		targetIntrinsic.setTo((BundlePinholeSimplified)bundleAdjustment.structure.cameras.get(2).model);
+		view1_to_target.setTo(bundleAdjustment.structure.getParentToView(2));
 
 		// Now that the metric upgrade is known add it to work graph
 		SceneWorkingGraph.View wtarget = workGraph.addView(target);
@@ -202,29 +219,86 @@ public class MetricExpandByOneView extends ExpandByOneView {
 	}
 
 	/**
-	 * Performs bundle adjustment on the scene and sanity checks the results
+	 * Applies the physical constraints to identify bad image features. It then removes those if there are only
+	 * a few and runs bundle adjustment again. If there are no bad features then it accepts this solution.
+	 *
+	 * @return true if it passes
 	 */
-	boolean performBundleAndCheckResults( SceneWorkingGraph workGraph ) {
+	private boolean removedBadFeatures( SceneWorkingGraph workGraph ) {
+		listImageShape.clear();
+		listImageShape.add(utils.dimenA);
+		listImageShape.add(utils.dimenB);
+		listImageShape.add(utils.dimenC);
+		if (!bundleChecks.checkPhysicalConstraints(bundleAdjustment, listImageShape)) {
+			if (verbose != null) verbose.println("Fatal error when checking constraints");
+			return false;
+		}
+
+		BoofMiscOps.checkTrue(utils.inliersThreeView.size() == bundleChecks.badFeatures.size);
+
+		// See if there are too many bad features for it to trust it
+		int countBadFeatures = bundleChecks.badFeatures.count(true);
+		if (countBadFeatures > fractionBadFeaturesRecover*bundleChecks.badFeatures.size) {
+			if (verbose != null)
+				verbose.println("Failed check on image and physical constraints. bad=" +
+						countBadFeatures + "/" + bundleChecks.badFeatures.size);
+			return false;
+		}
+
+		// Everything looks good!
+		if (countBadFeatures == 0)
+			return true;
+
+		// Remove the bad features and try again
+		for (int inlierIdx = bundleChecks.badFeatures.size - 1; inlierIdx >= 0; inlierIdx--) {
+			if (!bundleChecks.badFeatures.get(inlierIdx))
+				continue;
+			// Order of the inliers doesn't matter, but these two lists need to refer to the same feature
+			utils.inliersThreeView.removeSwap(inlierIdx);
+			utils.inlierIdx.removeSwap(inlierIdx);
+		}
+
+		if (verbose != null) verbose.println("Removed bad features. Optimizing again.");
+
+		if (!performBundleAdjustment(workGraph))
+			return false;
+
+		if (!bundleChecks.checkPhysicalConstraints(bundleAdjustment, listImageShape)) {
+			if (verbose != null) verbose.println("Fatal error when checking constraints, second time.");
+			return false;
+		}
+
+		// If there are bad features after re-optimizing then the solution is likely to be unstable and can't
+		// be trusted even if there are only a few
+		int countBadFeatures2 = bundleChecks.badFeatures.count(true);
+		if (countBadFeatures2 > 0) {
+			if (verbose != null)
+				verbose.println("Failed check on image and physical constraints. bad=" +
+						countBadFeatures2 + "/" + bundleChecks.badFeatures.size);
+			return false;
+		}
+
+		return true;
+	}
+
+	/**
+	 * Performs bundle adjustment on the scene
+	 */
+	boolean performBundleAdjustment( SceneWorkingGraph workGraph ) {
 		if (!refineWithBundleAdjustment(workGraph)) {
 			if (verbose != null) verbose.println("FAILED bundle adjustment");
 			return false;
 		}
 
-		// Sanity check geometry for a bad solution
-		if (!checkBehind()) {
-			if (verbose != null) verbose.println("FAILED behind view check");
-			return false;
-		}
-
-		// copy results for output
-		targetIntrinsic.setTo((BundlePinholeSimplified)bundleAdjustment.structure.cameras.get(2).model);
-		view1_to_target.setTo(bundleAdjustment.structure.getParentToView(2));
-
 		if (verbose != null) {
+			// Print out the results so that if it fails sanity checks we can see why
+			BundlePinholeSimplified intrinsics = (BundlePinholeSimplified)bundleAdjustment.structure.cameras.get(2).model;
+			Se3_F64 view1_to_target = bundleAdjustment.structure.getParentToView(2);
 			verbose.printf("Refined fx=%6.1f k1=%6.3f k2=%6.3f T=(%.1f %.1f %.1f)\n",
-					targetIntrinsic.f, targetIntrinsic.k1, targetIntrinsic.k2,
+					intrinsics.f, intrinsics.k1, intrinsics.k2,
 					view1_to_target.T.x, view1_to_target.T.y, view1_to_target.T.z);
 		}
+
 		return true;
 	}
 
@@ -276,7 +350,7 @@ public class MetricExpandByOneView extends ExpandByOneView {
 		}
 
 		if (verbose != null) {
-			verbose.println("negate="+negate);
+			verbose.println("negate=" + negate);
 			verbose.printf("SL View 1 to 2     T=(%.1f %.1f %.1f) scale=%g\n",
 					view1_to_view2H.T.x, view1_to_view2H.T.y, view1_to_view2H.T.z, scaleLocalToGlobal);
 			verbose.printf("Initial fx=%6.1f k1=%6.3f k2=%6.3f T=(%.1f %.1f %.1f)\n",
@@ -299,7 +373,7 @@ public class MetricExpandByOneView extends ExpandByOneView {
 		SceneWorkingGraph.View wview2 = workGraph.lookupView(utils.viewB.id);
 
 		// configure camera pose and intrinsics
-		List<AssociatedTriple> triples = utils.inliersThreeView;
+		List<AssociatedTriple> triples = utils.inliersThreeView.toList();
 		final int numFeatures = triples.size();
 		structure.initialize(3, 3, numFeatures);
 		observations.initialize(3);
@@ -386,54 +460,9 @@ public class MetricExpandByOneView extends ExpandByOneView {
 		return projectiveHomography.process(K1, K2, pairs.toList());
 	}
 
-	/**
-	 * Validates the results by seeing if they are behind the camera
-	 */
-	boolean checkBehind() {
-		final SceneStructureMetric structure = bundleAdjustment.structure;
-		final int numPoints = structure.points.size;
+	@Override public void setVerbose( @Nullable PrintStream out, @Nullable Set<String> configuration ) {
+		super.setVerbose(out, configuration);
 
-		// storage for number of features behind the views
-		int behind1 = 0;
-		int behind2 = 0;
-		int behind3 = 0;
-
-		var worldP = new Point4D_F64(0, 0, 0, 1);
-		var viewP = new Point4D_F64();
-
-		// view1 is the world coordinate system
-		Se3_F64 view1_to_view2 = structure.getParentToView(1);
-		Se3_F64 view1_to_view3 = structure.getParentToView(2);
-
-		for (int featIdx = 0; featIdx < numPoints; featIdx++) {
-			// extract the coordinate from SBA results
-			SceneStructureCommon.Point p = structure.points.get(featIdx);
-			worldP.x = p.getX();
-			worldP.y = p.getY();
-			worldP.z = p.getZ();
-			if (structure.isHomogenous()) {
-				worldP.w = p.getW();
-				// ignore points at infinity
-				if (worldP.w == 0.0)
-					continue;
-			}
-
-			// Check to see if it appears behind any of the three views
-			if (worldP.z/worldP.w < 0.0)
-				behind1++;
-
-			SePointOps_F64.transform(view1_to_view2, worldP, viewP);
-			if (viewP.z/viewP.w < 0.0)
-				behind2++;
-
-			SePointOps_F64.transform(view1_to_view3, worldP, viewP);
-			if (viewP.z/viewP.w < 0.0)
-				behind3++;
-		}
-
-		if (verbose != null) verbose.printf("Behind: %3d %3d %3d out of %d\n", behind1, behind2, behind3, numPoints);
-
-		int threshold = (int)(numPoints*maxFractionBehind);
-		return behind1 < threshold && behind2 < threshold && behind3 < threshold;
+		BoofMiscOps.verboseChildren(verbose, configuration, bundleChecks);
 	}
 }
