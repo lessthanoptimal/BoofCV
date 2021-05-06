@@ -1,0 +1,220 @@
+/*
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
+ *
+ * This file is part of BoofCV (http://boofcv.org).
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *   http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+package boofcv.alg.structure;
+
+import boofcv.abst.geo.selfcalib.ProjectiveToMetricCameras;
+import boofcv.alg.geo.MetricCameras;
+import boofcv.alg.geo.bundle.BundleAdjustmentOps;
+import boofcv.factory.geo.ConfigSelfCalibDualQuadratic;
+import boofcv.factory.geo.FactoryMultiView;
+import boofcv.misc.BoofMiscOps;
+import boofcv.struct.geo.AssociatedTupleDN;
+import boofcv.struct.image.ImageDimension;
+import lombok.Getter;
+import lombok.Setter;
+import org.ddogleg.struct.DogArray;
+import org.ddogleg.struct.DogArray_I32;
+import org.ddogleg.struct.FastAccess;
+import org.ddogleg.struct.VerbosePrint;
+import org.ejml.data.DMatrixRMaj;
+import org.jetbrains.annotations.Nullable;
+
+import java.io.PrintStream;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Set;
+
+import static boofcv.misc.BoofMiscOps.checkEq;
+
+/**
+ * Given a view and set of views connected to it, attempt to create a new metric scene. First a projective scene
+ * is found. From this projective scene and metric one is created. Then bundle adjustment is used to refine the
+ * metric scene. Features are then sanity checked to see if the pass basic physical constraints, see
+ * {@link MetricSanityChecks}. If too many fail then the reconstruction is aborted. Otherwise, all the failing
+ * features are removed and assumed to be outliers and bundle adjustment is run again. If there are no more
+ * bad features it's considered to be a successful reconstruction.
+ *
+ * @author Peter Abeles
+ */
+public class MetricSpawnSceneFromView implements VerbosePrint {
+
+	/** Computes the initial scene from the seed and some of it's neighbors */
+	private final @Getter ProjectiveInitializeAllCommon initProjective;
+
+	private final @Getter RefineMetricWorkingGraph refineWorking;
+
+	/** Used elevate the projective scene into a metric scene */
+	private @Getter @Setter ProjectiveToMetricCameras projectiveToMetric =
+			FactoryMultiView.projectiveToMetric((ConfigSelfCalibDualQuadratic)null);
+
+	// Common functions used in projective reconstruction
+	protected PairwiseGraphUtils utils;
+
+	List<ImageDimension> listImageShape = new ArrayList<>();
+	MetricSanityChecks bundleChecks = new MetricSanityChecks();
+
+	/** The found metric scene. Only valid if {@link #process} returns true. */
+	private @Getter final SceneWorkingGraph scene = new SceneWorkingGraph();
+
+	PrintStream verbose;
+
+	public MetricSpawnSceneFromView( RefineMetricWorkingGraph refineWorking, PairwiseGraphUtils utils ) {
+		this.refineWorking = refineWorking;
+		this.initProjective = new ProjectiveInitializeAllCommon();
+		this.initProjective.utils = utils;
+	}
+
+	public MetricSpawnSceneFromView() {
+		this(new RefineMetricWorkingGraph(), new PairwiseGraphUtils());
+	}
+
+	/**
+	 * Computes the metric scene given the seed and related views
+	 *
+	 * @param db Image data base to retieve feature and shape info
+	 * @param pairwise Pairwise graph
+	 * @param seed The view which will be the origin of the metric scene
+	 * @param motions edges in seed that were used to generate the score
+	 * @return true if successful or false if it failed
+	 */
+	protected boolean process( LookUpSimilarImages db, PairwiseImageGraph pairwise,
+							   PairwiseImageGraph.View seed,
+							   DogArray_I32 motions ) {
+		scene.reset();
+		var commonPairwise = new DogArray_I32();
+
+		// Find the common features
+		utils.findAllConnectedSeed(seed, motions, commonPairwise);
+		if (commonPairwise.size < 6) {// if less than the minimum it will fail
+			if (verbose != null) verbose.println("FAILED: Too few common features. seed.id=" + seed.id);
+			return false;
+		}
+
+		// initialize projective scene using common tracks
+		if (!initProjective.projectiveSceneN(db, seed, commonPairwise, motions)) {
+			if (verbose != null) verbose.println("FAILED: Initialize projective scene");
+			return false;
+		}
+
+		// Elevate initial seed to metric
+		if (!projectiveSeedToMetric(pairwise)) {
+			if (verbose != null) verbose.println("FAILED: Projective to metric. seed.id='" + seed.id + "'");
+			return false;
+		}
+
+		// Refine initial estimate
+		if (!refineWorking.process(db, scene)) {
+			if (verbose != null) verbose.println("FAILED: Refine metric. seed.id='" + seed.id + "'");
+			return false;
+		}
+
+		// TODO prune bad features and re-run refine
+
+		// Sanity check results against physical constraints
+		listImageShape.clear();
+		for (int i = 0; i < scene.listViews.size(); i++) {
+			listImageShape.add(scene.listViews.get(i).imageDimension);
+		}
+		if (!bundleChecks.checkPhysicalConstraints(refineWorking.bundleAdjustment, listImageShape)) {
+			if (verbose != null)
+				verbose.println("FAILED: Checks on physical constraints. seed.id='" + seed.id + "'");
+			return false;
+		}
+
+		return true;
+	}
+
+
+	/**
+	 * Elevate the initial projective scene into a metric scene.
+	 */
+	private boolean projectiveSeedToMetric( PairwiseImageGraph pairwise ) {
+		// Declare storage for projective scene in a format that 'projectiveToMetric' understands
+		List<String> viewIds = new ArrayList<>();
+		DogArray<ImageDimension> dimensions = new DogArray<>(ImageDimension::new);
+		DogArray<DMatrixRMaj> cameraMatrices = new DogArray<>(() -> new DMatrixRMaj(3, 4));
+		DogArray<AssociatedTupleDN> observations = new DogArray<>(AssociatedTupleDN::new);
+
+		initProjective.lookupInfoForMetricElevation(viewIds, dimensions, cameraMatrices, observations);
+
+		// Pass the projective scene and elevate into a metric scene
+		MetricCameras results = new MetricCameras();
+		if (!projectiveToMetric.process(dimensions.toList(), cameraMatrices.toList(), (List)observations.toList(), results)) {
+			if (verbose != null) verbose.println("_ views=" + BoofMiscOps.toStringLine(viewIds));
+			return false;
+		}
+
+		saveMetricSeed(pairwise, viewIds, dimensions.toList(), initProjective.getInlierIndexes(), results, scene);
+
+
+		return true;
+	}
+
+	/**
+	 * Saves the elevated metric results to the scene. Each view is given a copy of the inlier that has been
+	 * adjusted so that it is view zero.
+	 *
+	 * @param viewInlierIndexes Which observations in each view are part of the inlier set
+	 */
+	void saveMetricSeed( PairwiseImageGraph graph, List<String> viewIds, List<ImageDimension> dimensions,
+						 FastAccess<DogArray_I32> viewInlierIndexes,
+						 MetricCameras results,
+						 SceneWorkingGraph scene ) {
+		checkEq(viewIds.size(), results.motion_1_to_k.size + 1, "Implicit view[0] no included");
+		checkEq(viewIds.size(), viewInlierIndexes.size());
+
+		// Save the number of views in the seed
+		scene.numSeedViews = viewIds.size();
+
+		// Save the metric views
+		for (int i = 0; i < viewIds.size(); i++) {
+			PairwiseImageGraph.View pview = graph.lookupNode(viewIds.get(i));
+			SceneWorkingGraph.View wview = scene.addView(pview);
+			if (i > 0)
+				wview.world_to_view.setTo(results.motion_1_to_k.get(i - 1));
+			BundleAdjustmentOps.convert(results.intrinsics.get(i), wview.intrinsic);
+			wview.imageDimension.setTo(dimensions.get(i));
+		}
+
+		// Create the inlier set for each view, but adjust it so that the target view is view[0] in the set
+		for (int constructIdx = 0; constructIdx < viewIds.size(); constructIdx++) {
+			SceneWorkingGraph.View wtarget = scene.lookupView(viewIds.get(constructIdx));
+			SceneWorkingGraph.InlierInfo inlier = wtarget.inliers.grow();
+			inlier.views.resize(viewIds.size());
+			inlier.observations.resetResize(viewIds.size());
+			for (int offset = 0; offset < viewIds.size(); offset++) {
+				int viewIdx = (constructIdx + offset)%viewIds.size();
+
+				inlier.views.set(offset, graph.lookupNode(viewIds.get(viewIdx)));
+				inlier.observations.get(offset).setTo(viewInlierIndexes.get(viewIdx));
+				checkEq(inlier.observations.get(offset).size, inlier.observations.get(0).size,
+						"Each view should have the same number of observations");
+			}
+		}
+	}
+
+	@Override public void setVerbose( @Nullable PrintStream out, @Nullable Set<String> configuration ) {
+		this.verbose = BoofMiscOps.addPrefix(this, out);
+		BoofMiscOps.verboseChildren(verbose, configuration, initProjective);
+
+		if (projectiveToMetric instanceof VerbosePrint) {
+			BoofMiscOps.verboseChildren(verbose, configuration, (VerbosePrint)projectiveToMetric);
+		}
+	}
+}

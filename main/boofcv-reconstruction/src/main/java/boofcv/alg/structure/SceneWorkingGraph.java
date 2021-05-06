@@ -21,7 +21,6 @@ package boofcv.alg.structure;
 import boofcv.alg.geo.bundle.cameras.BundlePinholeSimplified;
 import boofcv.struct.image.ImageDimension;
 import georegression.struct.point.Point2D_F64;
-import georegression.struct.point.Point4D_F64;
 import georegression.struct.se.Se3_F64;
 import gnu.trove.map.TObjectIntMap;
 import gnu.trove.map.hash.TObjectIntHashMap;
@@ -47,9 +46,6 @@ public class SceneWorkingGraph {
 	public final Map<String, View> views = new HashMap<>();
 	public final List<View> listViews = new ArrayList<>();
 
-	/** List of all features in the scene */
-	public final List<Feature> features = new ArrayList<>(); // TODO change to something else so remove() is faster
-
 	/** list of views that have already been explored when expanding the scene */
 	public HashSet<String> exploredViews = new HashSet<>();
 
@@ -69,11 +65,22 @@ public class SceneWorkingGraph {
 	public void reset() {
 		views.clear();
 		listViews.clear();
-		features.clear();
 		exploredViews.clear();
 		index = -1;
 		open.reset();
 		numSeedViews = 0;
+	}
+
+	public void setTo( SceneWorkingGraph src ) {
+		reset();
+		for (int viewIdx = 0; viewIdx < src.listViews.size(); viewIdx++) {
+			View vsrc = src.listViews.get(viewIdx);
+			addView(vsrc.pview).setTo(vsrc);
+		}
+		this.exploredViews.addAll(src.exploredViews);
+		this.index = -1;
+		this.numSeedViews = src.numSeedViews;
+		this.open.addAll(src.open);
 	}
 
 	public View lookupView( String id ) {
@@ -104,38 +111,8 @@ public class SceneWorkingGraph {
 		return v;
 	}
 
-	public Feature createFeature() {
-		Feature f = new Feature();
-		f.reset();
-		features.add(f);
-		return f;
-	}
-
 	public List<View> getAllViews() {
 		return listViews;
-	}
-
-	/**
-	 * A 3D point feature and the list of observations of this feature.
-	 */
-	public static class Feature {
-		// location in world coordinates
-		public final Point4D_F64 location = new Point4D_F64();
-		// which views it's visible in
-		public final List<Observation> observations = new ArrayList<>();
-
-		public void reset() {
-			location.setTo(Double.NaN, Double.NaN, Double.NaN, Double.NaN);
-			observations.clear();
-		}
-
-		public Point2D_F64 findObservation( View v ) {
-			for (int i = 0; i < observations.size(); i++) {
-				if (observations.get(i).view == v)
-					return observations.get(i).pixel;
-			}
-			return null;
-		}
 	}
 
 	/**
@@ -280,6 +257,19 @@ public class SceneWorkingGraph {
 			projective.zero();
 			intrinsic.reset();
 			inliers.reset();
+		}
+
+		public void setTo( View src ) {
+			reset();
+			index = src.index;
+			pview = src.pview;
+			imageDimension.setTo(src.imageDimension);
+			projective.setTo(src.projective);
+			intrinsic.setTo(src.intrinsic);
+			inliers.resetResize(src.inliers.size);
+			for (int i = 0; i < src.inliers.size; i++) {
+				inliers.get(i).setTo(src.inliers.get(i));
+			}
 		}
 
 		@Override

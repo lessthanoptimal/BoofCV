@@ -18,22 +18,13 @@
 
 package boofcv.alg.structure;
 
-import boofcv.abst.geo.selfcalib.ProjectiveToMetricCameras;
-import boofcv.alg.geo.MetricCameras;
-import boofcv.alg.geo.bundle.BundleAdjustmentOps;
 import boofcv.alg.structure.SceneMergingOperations.SelectedViews;
-import boofcv.factory.geo.ConfigSelfCalibDualQuadratic;
-import boofcv.factory.geo.FactoryMultiView;
 import boofcv.misc.BoofMiscOps;
-import boofcv.struct.geo.AssociatedTupleDN;
 import boofcv.struct.image.ImageDimension;
 import lombok.Getter;
 import lombok.Setter;
 import org.ddogleg.struct.DogArray;
 import org.ddogleg.struct.DogArray_I32;
-import org.ddogleg.struct.FastAccess;
-import org.ddogleg.struct.VerbosePrint;
-import org.ejml.data.DMatrixRMaj;
 import org.jetbrains.annotations.Nullable;
 
 import java.io.PrintStream;
@@ -41,8 +32,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-
-import static boofcv.misc.BoofMiscOps.checkEq;
 
 /**
  * Fully computes views (intrinsics + SE3) for each view and saves which observations were inliers. This should
@@ -77,17 +66,12 @@ public class MetricFromUncalibratedPairwiseGraph extends ReconstructionFromPairw
 	 */
 	public @Getter @Setter int refineSceneWhileExpandingMaxViews = 6;
 
-	/** Computes the initial scene from the seed and some of it's neighbors */
-	private final @Getter ProjectiveInitializeAllCommon initProjective;
-
-	/** Used elevate the projective scene into a metric scene */
-	private @Getter @Setter ProjectiveToMetricCameras projectiveToMetric =
-			FactoryMultiView.projectiveToMetric((ConfigSelfCalibDualQuadratic)null);
-
 	// Uses known metric views to expand the metric reconstruction by one view
 	private final @Getter MetricExpandByOneView expandMetric = new MetricExpandByOneView();
 
 	private final @Getter RefineMetricWorkingGraph refineWorking = new RefineMetricWorkingGraph();
+
+	private final @Getter MetricSpawnSceneFromView spawnScene;
 
 	/** If true it will apply sanity checks on results for debugging. This could be expensive */
 	public boolean sanityChecks = false;
@@ -111,11 +95,10 @@ public class MetricFromUncalibratedPairwiseGraph extends ReconstructionFromPairw
 
 	public MetricFromUncalibratedPairwiseGraph( PairwiseGraphUtils utils ) {
 		super(utils);
-		initProjective = new ProjectiveInitializeAllCommon();
-		initProjective.utils = utils;
 		expandMetric.utils = utils;
 
 		bundleChecks.maxFractionFail = 0.02;
+		spawnScene = new MetricSpawnSceneFromView(refineWorking, utils);
 	}
 
 	public MetricFromUncalibratedPairwiseGraph( ConfigProjectiveReconstruction config ) {
@@ -186,69 +169,23 @@ public class MetricFromUncalibratedPairwiseGraph extends ReconstructionFromPairw
 	 */
 	@Override
 	protected boolean spawnSceneFromSeed( LookUpSimilarImages db, PairwiseImageGraph pairwise, SeedInfo info ) {
-
-		var commonPairwise = new DogArray_I32();
-		// Find the common features
-		utils.findAllConnectedSeed(info.seed, info.motions, commonPairwise);
-		if (commonPairwise.size < 6) {// if less than the minimum it will fail
-			if (verbose != null) verbose.println("_ FAILED: Too few common features. seed.id=" + info.seed.id);
+		if (!spawnScene.process(db, pairwise, info.seed, info.motions)) {
+			if (verbose != null) verbose.println("_ FAILED: Spawn seed.id=" + info.seed.id);
 			return false;
 		}
 
-		if (verbose != null)
-			verbose.println("Selected seed.id='" + info.seed.id +
-					"' common=" + commonPairwise.size + " score=" + info.score);
-
-		if (!estimateProjectiveSceneFromSeed(db, info, commonPairwise)) {
-			if (verbose != null) verbose.println("_ FAILED: Projective estimate. seed.id='" + info.seed.id + "'");
-			return false;
-		}
-
-		// Create a new scene
+		// Save the new scene
 		SceneWorkingGraph scene = scenes.grow();
-		scene.index = scenes.size - 1;
+		scene.setTo(spawnScene.getScene());
+		scene.index = scenes.size-1;
 
-		// Elevate initial seed to metric
-		if (!projectiveSeedToMetric(pairwise, scene)) {
-			if (verbose != null) verbose.println("_ FAILED: Projective to metric. seed.id='" + info.seed.id + "'");
-			// reclaim the failed graph
-			scenes.removeTail();
-			return false;
+		// The function for computing geometric score for an inlier set lies in this code so we have to add it here
+		// The geometric score should be the same for all views
+		double scoreGeometric = computeGeometricScore(scene, scene.listViews.get(0).inliers.get(0));
+		for (int viewIdx = 0; viewIdx < scene.listViews.size(); viewIdx++) {
+			scene.listViews.get(viewIdx).inliers.get(0).scoreGeometric = scoreGeometric;
 		}
 
-		// Refine initial estimate
-		if (!refineWorking.process(db, scene)) {
-			if (verbose != null) verbose.println("_ FAILED: Refine metric. seed.id='" + info.seed.id + "'");
-			// reclaim the failed graph
-			scenes.removeTail();
-			return false;
-		}
-
-
-		// Sanity check results against physical constraints
-		listImageShape.clear();
-		for (int i = 0; i < scene.listViews.size(); i++) {
-			listImageShape.add(scene.listViews.get(i).imageDimension);
-		}
-		if (!bundleChecks.checkPhysicalConstraints(refineWorking.bundleAdjustment, listImageShape)) {
-			if (verbose != null)
-				verbose.println("_ FAILED: Checks on physical constraints. seed.id='" + info.seed.id + "'");
-			scenes.removeTail();
-			return false;
-		}
-
-		if (verbose != null)
-			verbose.println("_ scene[" + scene.index + "].views.size=" + scene.listViews.size());
-
-		// Add this scene to each node so that we know they are connected
-		for (int i = 0; i < scene.listViews.size(); i++) {
-			SceneWorkingGraph.View wview = scene.listViews.get(i);
-			PairwiseImageGraph.View pview = wview.pview;
-			nodeViews.getView(pview).viewedBy.add(scene.index);
-
-			if (verbose != null)
-				verbose.println("_ view['" + pview.id + "']  intrinsic.f=" + wview.intrinsic.f + "  view.index=" + pview.index);
-		}
 		return true;
 	}
 
@@ -485,9 +422,7 @@ public class MetricFromUncalibratedPairwiseGraph extends ReconstructionFromPairw
 		if (sanityChecks)
 			metricChecks.inlierTriangulatePositiveDepth(0.1, db, scene, selected.id);
 
-		// TODO Refining at this point is essential for long term stability but optimizing everything is not scalable
-		// maybe identify views with large residuals and optimizing up to N views surrounding them to fix the issue?
-//			refineWorking.process(db, workGraph);
+		// TODO consider local refinement while expanding to help mitigate the unbounded growth in errors
 
 		int openSizePrior = scene.open.size;
 
@@ -505,93 +440,6 @@ public class MetricFromUncalibratedPairwiseGraph extends ReconstructionFromPairw
 		nodeViews.getView(selected).viewedBy.add(scene.index);
 
 		return true;
-	}
-
-	/**
-	 * Initializes the scene at the seed view
-	 */
-	private boolean estimateProjectiveSceneFromSeed( LookUpSimilarImages db, SeedInfo info, DogArray_I32 common ) {
-		// initialize projective scene using common tracks
-		if (!initProjective.projectiveSceneN(db, info.seed, common, info.motions)) {
-			if (verbose != null) verbose.println("Failed initialize seed");
-			return false;
-		}
-
-		return true;
-	}
-
-	/**
-	 * Elevate the initial projective scene into a metric scene.
-	 */
-	private boolean projectiveSeedToMetric( PairwiseImageGraph pairwise, SceneWorkingGraph scene ) {
-		// Declare storage for projective scene in a format that 'projectiveToMetric' understands
-		List<String> viewIds = new ArrayList<>();
-		DogArray<ImageDimension> dimensions = new DogArray<>(ImageDimension::new);
-		DogArray<DMatrixRMaj> cameraMatrices = new DogArray<>(() -> new DMatrixRMaj(3, 4));
-		DogArray<AssociatedTupleDN> observations = new DogArray<>(AssociatedTupleDN::new);
-
-		initProjective.lookupInfoForMetricElevation(viewIds, dimensions, cameraMatrices, observations);
-
-		// Pass the projective scene and elevate into a metric scene
-		MetricCameras results = new MetricCameras();
-		if (!projectiveToMetric.process(dimensions.toList(), cameraMatrices.toList(), (List)observations.toList(), results)) {
-			if (verbose != null) verbose.println("_ views=" + BoofMiscOps.toStringLine(viewIds));
-			return false;
-		}
-
-		// Save the results to the working graph
-		saveMetricSeed(pairwise, viewIds, dimensions.toList(), initProjective.getInlierIndexes(), results, scene);
-
-		return true;
-	}
-
-	/**
-	 * Saves the elevated metric results to the scene. Each view is given a copy of the inlier that has been
-	 * adjusted so that it is view zero.
-	 *
-	 * @param viewInlierIndexes Which observations in each view are part of the inlier set
-	 */
-	void saveMetricSeed( PairwiseImageGraph graph, List<String> viewIds, List<ImageDimension> dimensions,
-						 FastAccess<DogArray_I32> viewInlierIndexes,
-						 MetricCameras results,
-						 SceneWorkingGraph scene ) {
-		checkEq(viewIds.size(), results.motion_1_to_k.size + 1, "Implicit view[0] no included");
-		checkEq(viewIds.size(), viewInlierIndexes.size());
-
-		// Save the number of views in the seed
-		scene.numSeedViews = viewIds.size();
-
-		// Save the metric views
-		for (int i = 0; i < viewIds.size(); i++) {
-			PairwiseImageGraph.View pview = graph.lookupNode(viewIds.get(i));
-			SceneWorkingGraph.View wview = scene.addView(pview);
-			if (i > 0)
-				wview.world_to_view.setTo(results.motion_1_to_k.get(i - 1));
-			BundleAdjustmentOps.convert(results.intrinsics.get(i), wview.intrinsic);
-			wview.imageDimension.setTo(dimensions.get(i));
-		}
-
-		// Create the inlier set for each view, but adjust it so that the target view is view[0] in the set
-		for (int constructIdx = 0; constructIdx < viewIds.size(); constructIdx++) {
-			SceneWorkingGraph.View wtarget = scene.lookupView(viewIds.get(constructIdx));
-			SceneWorkingGraph.InlierInfo inlier = wtarget.inliers.grow();
-			inlier.views.resize(viewIds.size());
-			inlier.observations.resetResize(viewIds.size());
-			for (int offset = 0; offset < viewIds.size(); offset++) {
-				int viewIdx = (constructIdx + offset)%viewIds.size();
-
-				inlier.views.set(offset, graph.lookupNode(viewIds.get(viewIdx)));
-				inlier.observations.get(offset).setTo(viewInlierIndexes.get(viewIdx));
-				checkEq(inlier.observations.get(offset).size, inlier.observations.get(0).size,
-						"Each view should have the same number of observations");
-			}
-		}
-
-		// The geometric score should be the same for all views
-		double scoreGeometric = computeGeometricScore(scene, scene.listViews.get(0).inliers.get(0));
-		for (int viewIdx = 0; viewIdx < scene.listViews.size(); viewIdx++) {
-			scene.listViews.get(viewIdx).inliers.get(0).scoreGeometric = scoreGeometric;
-		}
 	}
 
 	/**
@@ -659,10 +507,6 @@ public class MetricFromUncalibratedPairwiseGraph extends ReconstructionFromPairw
 	public void setVerbose( @Nullable PrintStream out, @Nullable Set<String> configuration ) {
 		this.verbose = BoofMiscOps.addPrefix(this, out);
 		BoofMiscOps.verboseChildren(verbose, configuration,
-				initProjective, expandMetric, refineWorking, mergeOps, metricChecks, bundleChecks);
-
-		if (projectiveToMetric instanceof VerbosePrint) {
-			BoofMiscOps.verboseChildren(verbose, configuration, (VerbosePrint)projectiveToMetric);
-		}
+				spawnScene, expandMetric, refineWorking, mergeOps, metricChecks, bundleChecks);
 	}
 }
