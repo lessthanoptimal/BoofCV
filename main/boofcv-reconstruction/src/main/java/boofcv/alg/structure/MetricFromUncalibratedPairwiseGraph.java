@@ -106,11 +106,16 @@ public class MetricFromUncalibratedPairwiseGraph extends ReconstructionFromPairw
 	// Storage for selected views to estimate the transform between the two scenes
 	SelectedViews selectedViews = new SelectedViews();
 
+	List<ImageDimension> listImageShape = new ArrayList<>();
+	MetricSanityChecks bundleChecks = new MetricSanityChecks();
+
 	public MetricFromUncalibratedPairwiseGraph( PairwiseGraphUtils utils ) {
 		super(utils);
 		initProjective = new ProjectiveInitializeAllCommon();
 		initProjective.utils = utils;
 		expandMetric.utils = utils;
+
+		bundleChecks.maxFractionFail = 0.02;
 	}
 
 	public MetricFromUncalibratedPairwiseGraph( ConfigProjectiveReconstruction config ) {
@@ -150,12 +155,16 @@ public class MetricFromUncalibratedPairwiseGraph extends ReconstructionFromPairw
 		// Questions:
 		//  Ditch - why did both scenes grow to consume all views?
 
+		for( var scene : scenes.toList())
+			scene.listViews.forEach(v->BoofMiscOps.checkTrue(!v.inliers.isEmpty()));
+
+
 		if (scenes.isEmpty()) {
 			if (verbose != null) verbose.println("Failed to upgrade any of the seeds to a metric scene.");
 			return false;
 		}
 
-		if (verbose != null) verbose.println("Total Scenes: "+scenes.size);
+		if (verbose != null) verbose.println("Total Scenes: " + scenes.size);
 
 		// Expand all the scenes until they can't any more
 		expandScenes(db);
@@ -208,10 +217,25 @@ public class MetricFromUncalibratedPairwiseGraph extends ReconstructionFromPairw
 		}
 
 		// Refine initial estimate
-		refineWorking.process(db, scene);
+		if (!refineWorking.process(db, scene)) {
+			if (verbose != null) verbose.println("_ FAILED: Refine metric. seed.id='" + info.seed.id + "'");
+			// reclaim the failed graph
+			scenes.removeTail();
+			return false;
+		}
 
-		if (sanityChecks)
-			metricChecks.inlierTriangulatePositiveDepth(0.1, db, scene, info.seed.id);
+
+		// Sanity check results against physical constraints
+		listImageShape.clear();
+		for (int i = 0; i < scene.listViews.size(); i++) {
+			listImageShape.add(scene.listViews.get(i).imageDimension);
+		}
+		if (!bundleChecks.checkPhysicalConstraints(refineWorking.bundleAdjustment, listImageShape)) {
+			if (verbose != null)
+				verbose.println("_ FAILED: Checks on physical constraints. seed.id='" + info.seed.id + "'");
+			scenes.removeTail();
+			return false;
+		}
 
 		if (verbose != null)
 			verbose.println("_ scene[" + scene.index + "].views.size=" + scene.listViews.size());
@@ -294,8 +318,14 @@ public class MetricFromUncalibratedPairwiseGraph extends ReconstructionFromPairw
 			if (verbose != null)
 				verbose.printf("Expanding scene[%d].view='%s' score=%.2f\n", best.scene.index, view.id, best.score);
 
-			if (!expandIntoView(db, best.scene, view))
+			best.scene.listViews.forEach(v->BoofMiscOps.checkTrue(!v.inliers.isEmpty()));
+
+			if (!expandIntoView(db, best.scene, view)) {
+				best.scene.listViews.forEach(v->BoofMiscOps.checkTrue(!v.inliers.isEmpty()));
 				continue;
+			}
+
+			best.scene.listViews.forEach(v->BoofMiscOps.checkTrue(!v.inliers.isEmpty()));
 
 			if (best.scene.listViews.size() > refineSceneWhileExpandingMaxViews)
 				continue;
@@ -442,7 +472,7 @@ public class MetricFromUncalibratedPairwiseGraph extends ReconstructionFromPairw
 		//      updated to metric and connected to this view.
 		if (!expandMetric.process(db, scene, selected)) {
 			if (verbose != null)
-				verbose.println("Failed to expand/add scene=" + scene.index + " view='" + selected.id + "'. Discarding.");
+				verbose.println("FAILED: Expand/add scene=" + scene.index + " view='" + selected.id + "'. Discarding.");
 			return false;
 		}
 
@@ -629,7 +659,7 @@ public class MetricFromUncalibratedPairwiseGraph extends ReconstructionFromPairw
 	public void setVerbose( @Nullable PrintStream out, @Nullable Set<String> configuration ) {
 		this.verbose = BoofMiscOps.addPrefix(this, out);
 		BoofMiscOps.verboseChildren(verbose, configuration,
-				initProjective, expandMetric, refineWorking, mergeOps, metricChecks);
+				initProjective, expandMetric, refineWorking, mergeOps, metricChecks, bundleChecks);
 
 		if (projectiveToMetric instanceof VerbosePrint) {
 			BoofMiscOps.verboseChildren(verbose, configuration, (VerbosePrint)projectiveToMetric);

@@ -32,7 +32,6 @@ import org.ejml.UtilEjml;
 import org.ejml.dense.row.MatrixFeatures_DDRM;
 import org.junit.jupiter.api.Test;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -255,7 +254,6 @@ class TestPairwiseGraphUtils extends BoofStandardJUnit {
 		alg.seed = db.graph.nodes.get(0);
 		alg.viewB = db.graph.nodes.get(1);
 		alg.viewC = db.graph.nodes.get(3);
-		alg.inliersThreeView = new ArrayList<>();
 		alg.P1.setTo(db.listCameraMatrices.get(0));
 		alg.P2.setTo(db.listCameraMatrices.get(1));
 		alg.P3.setTo(db.listCameraMatrices.get(3));
@@ -312,7 +310,6 @@ class TestPairwiseGraphUtils extends BoofStandardJUnit {
 		alg.P1.setTo(db.listCameraMatrices.get(0));
 		alg.P2.setTo(db.listCameraMatrices.get(1));
 		alg.P3.setTo(db.listCameraMatrices.get(3));
-		alg.inliersThreeView = new ArrayList<>();
 
 		// Create the set of inliers. Only these inliers will be considered when computing 3D features
 		for (int i = offset; i < db.feats3D.size(); i++) {
@@ -364,7 +361,6 @@ class TestPairwiseGraphUtils extends BoofStandardJUnit {
 		alg.P1.setTo(db.listCameraMatrices.get(views[0]));
 		alg.P2.setTo(db.listCameraMatrices.get(views[1]));
 		alg.P3.setTo(db.listCameraMatrices.get(views[2]));
-		alg.inliersThreeView = new ArrayList<>();
 		for (int i = 0; i < db.feats3D.size(); i++) {
 			Point2D_F64 o1 = db.viewObs.get(views[0]).get(i);
 			Point2D_F64 o2 = db.viewObs.get(views[1]).get(i);
@@ -450,14 +446,14 @@ class TestPairwiseGraphUtils extends BoofStandardJUnit {
 
 		alg.commonIdx.setTo(DogArray_I32.range(0, numInliers*2));
 
-		// just add elements until it hits the desired size
-		alg.inliersThreeView = new ArrayList<>();
-		for (int i = 0; i < numInliers; i++) {
-			alg.inliersThreeView.add(new AssociatedTriple());
-		}
-
 		// j = i*2
 		alg.ransac = new MockRansac();
+
+		// just add elements until it hits the desired size
+		for (int i = 0; i < numInliers; i++) {
+			alg.inliersThreeView.add(new AssociatedTriple());
+			alg.inlierIdx.add(alg.ransac.getInputIndex(i));
+		}
 
 		// Go through all 3 possible views as the first view in the inliers
 		for (int firstView = 0; firstView < 3; firstView++) {

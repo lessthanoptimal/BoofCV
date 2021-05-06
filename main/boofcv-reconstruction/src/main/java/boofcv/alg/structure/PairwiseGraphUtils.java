@@ -44,6 +44,7 @@ import org.ddogleg.fitting.modelset.ModelMatcher;
 import org.ddogleg.struct.DogArray;
 import org.ddogleg.struct.DogArray_B;
 import org.ddogleg.struct.DogArray_I32;
+import org.ddogleg.struct.FastArray;
 import org.ejml.data.DMatrixRMaj;
 import org.ejml.dense.row.CommonOps_DDRM;
 
@@ -89,7 +90,9 @@ public class PairwiseGraphUtils {
 
 	public final DogArray<AssociatedTriple> matchesTriple = new DogArray<>(AssociatedTriple::new);
 	/** Inliers from robust fitting of trifocal tensor */
-	public List<AssociatedTriple> inliersThreeView;
+	public final FastArray<AssociatedTriple> inliersThreeView = new FastArray<>(AssociatedTriple.class);
+	/** Which features the inliers correspond to */
+	public final DogArray_I32 inlierIdx = new DogArray_I32();
 
 	/** Projective camera matrices for 3-View reconstruction. P1 is always identity */
 	public final DMatrixRMaj P1 = new DMatrixRMaj(3, 4);
@@ -273,8 +276,13 @@ public class PairwiseGraphUtils {
 		CommonOps_DDRM.setIdentity(P1);
 		MultiViewOps.trifocalCameraMatrices(model, P2, P3);
 
-		inliersThreeView = ransac.getMatchSet();
-
+		inliersThreeView.reset();
+		inliersThreeView.addAll(ransac.getMatchSet());
+		inlierIdx.reset();
+		inlierIdx.resize(inliersThreeView.size);
+		for (int i = 0; i < inliersThreeView.size; i++) {
+			inlierIdx.data[i] = ransac.getInputIndex(i);
+		}
 		return true;
 	}
 
@@ -294,6 +302,7 @@ public class PairwiseGraphUtils {
 		};
 
 		int numInliers = inliersThreeView.size();
+		checkTrue(numInliers == inlierIdx.size);
 		checkTrue(view.inliers.size == 0, "Inliers should not have already been set for this view");
 		final InlierInfo info = view.inliers.grow();
 
@@ -304,8 +313,7 @@ public class PairwiseGraphUtils {
 		final DogArray_I32 indexesC = info.observations.get(order[2]);
 
 		for (int inlierCnt = 0; inlierCnt < numInliers; inlierCnt++) {
-			int inputIdx = ransac.getInputIndex(inlierCnt);
-			int indexA = commonIdx.get(inputIdx);
+			int indexA = commonIdx.get(inlierIdx.get(inlierCnt));
 			indexesA.add(indexA);
 			indexesB.add(table_A_to_B.data[indexA]);
 			indexesC.add(table_A_to_C.data[indexA]);

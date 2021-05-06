@@ -19,7 +19,12 @@
 package boofcv.alg.structure;
 
 import boofcv.abst.geo.TriangulateNViewsMetricH;
+import boofcv.abst.geo.bundle.MetricBundleAdjustmentUtils;
+import boofcv.abst.geo.bundle.SceneObservations;
+import boofcv.abst.geo.bundle.SceneStructureCommon;
+import boofcv.abst.geo.bundle.SceneStructureMetric;
 import boofcv.alg.distort.brown.RemoveBrownPtoN_F64;
+import boofcv.alg.geo.bundle.cameras.BundlePinholeSimplified;
 import boofcv.factory.geo.FactoryMultiView;
 import boofcv.misc.BoofMiscOps;
 import boofcv.struct.image.ImageDimension;
@@ -27,7 +32,9 @@ import georegression.geometry.ConvertRotation3D_F64;
 import georegression.struct.point.Point2D_F64;
 import georegression.struct.point.Point4D_F64;
 import georegression.struct.se.Se3_F64;
+import georegression.transform.se.SePointOps_F64;
 import org.ddogleg.struct.DogArray;
+import org.ddogleg.struct.DogArray_B;
 import org.ddogleg.struct.VerbosePrint;
 import org.jetbrains.annotations.Nullable;
 
@@ -46,6 +53,11 @@ public class MetricSanityChecks implements VerbosePrint {
 	@Nullable PrintStream verbose;
 
 	public TriangulateNViewsMetricH triangulator = FactoryMultiView.triangulateNViewMetricH(null);
+
+	public double maxFractionFail = 0.15;
+	public double maxReprojectionErrorSq = 100.0;
+	// If true then the feature was marked as bad
+	public DogArray_B badFeatures = new DogArray_B();
 
 	/**
 	 * Applies a positive depth constraint on triangulated inlier features for a view.
@@ -116,7 +128,7 @@ public class MetricSanityChecks implements VerbosePrint {
 		}
 
 		if (verbose != null) {
-			verbose.print("Depth Sanity: target='" + targetID + "', Bad Depth: " + bad + "/" + numFeatures+", ");
+			verbose.print("Depth Sanity: target='" + targetID + "', Bad Depth: " + bad + "/" + numFeatures + ", ");
 			verbose.print("inlier.views={ ");
 			for (int i = 0; i < inliers.views.size(); i++) {
 				verbose.print("'" + inliers.views.get(i).id + "' ");
@@ -135,6 +147,97 @@ public class MetricSanityChecks implements VerbosePrint {
 			}
 			throw new RuntimeException("Failed positive depth. bad=" + bad + "/" + numFeatures);
 		}
+	}
+
+	public boolean checkPhysicalConstraints( MetricBundleAdjustmentUtils bundle,
+											 List<ImageDimension> listDimensions ) {
+		return checkPhysicalConstraints(bundle.structure, bundle.observations, listDimensions);
+	}
+
+	public boolean checkPhysicalConstraints( SceneStructureMetric structure,
+											 SceneObservations observations,
+											 List<ImageDimension> listDimensions ) {
+		for (int i = 0; i < structure.cameras.size; i++) {
+			BundlePinholeSimplified pinhole = (BundlePinholeSimplified)structure.cameras.get(i).model;
+			if (pinhole.f < 0.0f) {
+				if (verbose != null) verbose.println("Bad focal length. f=" + pinhole.f);
+				return false;
+			}
+		}
+
+		badFeatures.resetResize(structure.points.size, false);
+
+		boolean success = true;
+
+		var worldP = new Point4D_F64(0, 0, 0, 1);
+		var viewP = new Point4D_F64();
+		var observedPixel = new Point2D_F64();
+		var predictdPixel = new Point2D_F64();
+
+		for (int viewIdx = 0; viewIdx < observations.views.size; viewIdx++) {
+			ImageDimension dimension = listDimensions.get(viewIdx);
+			int width = dimension.width;
+			int height = dimension.height;
+
+			float cx = (float)(width/2);
+			float cy = (float)(height/2);
+
+			int failedBehind = 0;
+			int failedImageBounds = 0;
+			int failedReprojection = 0;
+
+			Se3_F64 world_to_view = structure.getParentToView(viewIdx);
+			SceneObservations.View oview = observations.views.get(viewIdx);
+
+			int threshold = (int)(oview.size()*maxFractionFail);
+
+			for (int i = 0; i < oview.size(); i++) {
+				boolean badObservation = false;
+
+				oview.getPixel(i, observedPixel);
+				SceneStructureCommon.Point p = structure.points.get(oview.getPointId(i));
+				worldP.x = p.getX();
+				worldP.y = p.getY();
+				worldP.z = p.getZ();
+				if (structure.isHomogenous()) {
+					worldP.w = p.getW();
+					// ignore points at infinity
+					if (worldP.w == 0.0)
+						continue;
+				}
+
+				SePointOps_F64.transform(world_to_view, worldP, viewP);
+				if (viewP.z/viewP.w < 0.0) {
+					badObservation = true;
+					failedBehind++;
+				}
+
+				structure.cameras.get(viewIdx).model.project(viewP.x, viewP.y, viewP.z, predictdPixel);
+
+				double reprojectionError = predictdPixel.distance2(observedPixel);
+				if (reprojectionError > maxReprojectionErrorSq) {
+					badObservation = true;
+					failedReprojection++;
+				}
+
+				if (!BoofMiscOps.isInside(width, height, predictdPixel.x + cx, predictdPixel.y + cy)) {
+					badObservation = true;
+					failedImageBounds++;
+				}
+
+				if (badObservation) {
+					badFeatures.set(oview.getPointId(i), true);
+				}
+			}
+
+			if (verbose != null) verbose.printf("view[%d] errors: behind=%d bounds=%d reprojection=%d. obs=%d\n",
+					viewIdx, failedBehind, failedImageBounds, failedReprojection, oview.size());
+
+			if (failedBehind > threshold || failedImageBounds > threshold || failedReprojection > threshold)
+				success = false;
+		}
+
+		return success;
 	}
 
 	@Override public void setVerbose( @Nullable PrintStream out, @Nullable Set<String> configuration ) {
