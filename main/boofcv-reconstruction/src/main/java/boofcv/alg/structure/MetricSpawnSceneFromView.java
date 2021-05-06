@@ -63,22 +63,34 @@ public class MetricSpawnSceneFromView implements VerbosePrint {
 	private @Getter @Setter ProjectiveToMetricCameras projectiveToMetric =
 			FactoryMultiView.projectiveToMetric((ConfigSelfCalibDualQuadratic)null);
 
+	/** If less than this number of features fail the physical constraint test, attempt to recover by removing them */
+	public double fractionBadFeaturesRecover = 0.05;
+
 	// Common functions used in projective reconstruction
 	protected PairwiseGraphUtils utils;
-
-	List<ImageDimension> listImageShape = new ArrayList<>();
-	MetricSanityChecks bundleChecks = new MetricSanityChecks();
 
 	/** The found metric scene. Only valid if {@link #process} returns true. */
 	private @Getter final SceneWorkingGraph scene = new SceneWorkingGraph();
 
 	PrintStream verbose;
 
+	//------------ Internal Work Space
+	List<String> viewIds = new ArrayList<>();
+	DogArray<ImageDimension> dimensions = new DogArray<>(ImageDimension::new);
+	DogArray<DMatrixRMaj> cameraMatrices = new DogArray<>(() -> new DMatrixRMaj(3, 4));
+	DogArray<AssociatedTupleDN> observations = new DogArray<>(AssociatedTupleDN::new);
+	MetricCameras elevationResults = new MetricCameras();
+
+	List<ImageDimension> listImageShape = new ArrayList<>();
+	MetricSanityChecks checks = new MetricSanityChecks();
+
 	public MetricSpawnSceneFromView( RefineMetricWorkingGraph refineWorking, PairwiseGraphUtils utils ) {
 		this.refineWorking = refineWorking;
 		this.initProjective = new ProjectiveInitializeAllCommon();
 		this.initProjective.utils = utils;
 		this.utils = utils;
+
+		this.checks.maxFractionFail = 1.0;
 	}
 
 	public MetricSpawnSceneFromView() {
@@ -119,50 +131,96 @@ public class MetricSpawnSceneFromView implements VerbosePrint {
 			return false;
 		}
 
-		// Refine initial estimate
-		if (!refineWorking.process(db, scene)) {
-			if (verbose != null) verbose.println("FAILED: Refine metric. seed.id='" + seed.id + "'");
-			return false;
-		}
+		return refineAndRemoveBadFeatures(db, seed);
+	}
 
-		// TODO prune bad features and re-run refine
-
+	/**
+	 * Performs non-linear refinement while attempting to remove outliers
+	 */
+	private boolean refineAndRemoveBadFeatures( LookUpSimilarImages db, PairwiseImageGraph.View seed ) {
 		// Sanity check results against physical constraints
 		listImageShape.clear();
 		for (int i = 0; i < scene.listViews.size(); i++) {
 			listImageShape.add(scene.listViews.get(i).imageDimension);
 		}
-		if (!bundleChecks.checkPhysicalConstraints(refineWorking.bundleAdjustment, listImageShape)) {
+
+		// Try two passes before giving up
+		for (int loop = 0; loop < 2; loop++) {
+			// Refine initial estimate
+			if (!refineWorking.process(db, scene)) {
+				if (verbose != null) verbose.println("FAILED: Refine metric. seed.id='" + seed.id + "'");
+				return false;
+			}
+
+			if (!checks.checkPhysicalConstraints(refineWorking.bundleAdjustment, listImageShape)) {
+				if (verbose != null) verbose.println("FAILED: Unrecoverable physical constraint");
+				return false;
+			}
+
+			// All views have identical inliers
+			int numInliers = scene.listViews.get(0).inliers.get(0).getInlierCount();
+			BoofMiscOps.checkTrue(numInliers == checks.badFeatures.size);
+
+			int countBadFeatures = checks.badFeatures.count(true);
+			if (countBadFeatures > fractionBadFeaturesRecover*checks.badFeatures.size) {
+				if (verbose != null)
+					verbose.println("FAILED: Too many bad features. bad=" + countBadFeatures + "/" + numInliers);
+				return false;
+			}
+
+			// Everything looks good!
+			if (countBadFeatures == 0)
+				return true;
+
+			if (loop != 0) {
+				if (verbose != null)
+					verbose.println("FAILED: Couldn't fix the upgrade. bad=" + countBadFeatures + "/" + numInliers);
+				return false;
+			}
+
 			if (verbose != null)
-				verbose.println("FAILED: Checks on physical constraints. seed.id='" + seed.id + "'");
-			return false;
+				verbose.println("Removed bad features. Optimizing again. bad=" + countBadFeatures + "/" + numInliers);
+
+			// Remove the bad features and try again
+			for (int inlierIdx = checks.badFeatures.size - 1; inlierIdx >= 0; inlierIdx--) {
+				if (!checks.badFeatures.get(inlierIdx))
+					continue;
+				// Order of the inliers doesn't matter, just needs to be consistent across all views
+				for (int listIdx = 0; listIdx < scene.listViews.size(); listIdx++) {
+					SceneWorkingGraph.InlierInfo info = scene.listViews.get(listIdx).inliers.get(0);
+					for (int viewIdx = 0; viewIdx < info.observations.size; viewIdx++) {
+						info.observations.get(viewIdx).removeSwap(inlierIdx);
+					}
+				}
+			}
+
+			// Settings lens distortion back to zero since outliers can drive it to extremes that are hard to recover from
+			for (int viewIdx = 0; viewIdx < scene.listViews.size(); viewIdx++) {
+				SceneWorkingGraph.View v = scene.listViews.get(viewIdx);
+				v.intrinsic.k1 = 0.0;
+				v.intrinsic.k2 = 0.0;
+			}
+			// NOTE: Setting extrinsic and intrinsic back to original state before SBA is worth investigating
 		}
 
-		return true;
+		throw new RuntimeException("BUG! Should have already returned");
 	}
-
 
 	/**
 	 * Elevate the initial projective scene into a metric scene.
 	 */
 	private boolean projectiveSeedToMetric( PairwiseImageGraph pairwise ) {
-		// Declare storage for projective scene in a format that 'projectiveToMetric' understands
-		List<String> viewIds = new ArrayList<>();
-		DogArray<ImageDimension> dimensions = new DogArray<>(ImageDimension::new);
-		DogArray<DMatrixRMaj> cameraMatrices = new DogArray<>(() -> new DMatrixRMaj(3, 4));
-		DogArray<AssociatedTupleDN> observations = new DogArray<>(AssociatedTupleDN::new);
-
+		// Get results in a format that 'projectiveToMetric' understands
 		initProjective.lookupInfoForMetricElevation(viewIds, dimensions, cameraMatrices, observations);
 
 		// Pass the projective scene and elevate into a metric scene
-		MetricCameras results = new MetricCameras();
-		if (!projectiveToMetric.process(dimensions.toList(), cameraMatrices.toList(), (List)observations.toList(), results)) {
+		if (!projectiveToMetric.process(dimensions.toList(), cameraMatrices.toList(),
+				(List)observations.toList(), elevationResults)) {
 			if (verbose != null) verbose.println("_ views=" + BoofMiscOps.toStringLine(viewIds));
 			return false;
 		}
 
-		saveMetricSeed(pairwise, viewIds, dimensions.toList(), initProjective.getInlierIndexes(), results, scene);
-
+		saveMetricSeed(pairwise, viewIds, dimensions.toList(), initProjective.getInlierIndexes(), elevationResults, scene);
 
 		return true;
 	}
@@ -212,7 +270,7 @@ public class MetricSpawnSceneFromView implements VerbosePrint {
 
 	@Override public void setVerbose( @Nullable PrintStream out, @Nullable Set<String> configuration ) {
 		this.verbose = BoofMiscOps.addPrefix(this, out);
-		BoofMiscOps.verboseChildren(verbose, configuration, initProjective);
+		BoofMiscOps.verboseChildren(verbose, configuration, initProjective, checks);
 
 		if (projectiveToMetric instanceof VerbosePrint) {
 			BoofMiscOps.verboseChildren(verbose, configuration, (VerbosePrint)projectiveToMetric);
