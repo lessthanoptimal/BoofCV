@@ -55,9 +55,11 @@ public class SceneWorkingGraph {
 	/** List of views in pairwise graph it could expand into */
 	public FastArray<PairwiseImageGraph.View> open = new FastArray<>(PairwiseImageGraph.View.class);
 
-	// Number of views in the seed set. This is used to determine if a feature is a member of the seed set
-	// as the first views are always part of the seed
-	int numSeedViews;
+	/**
+	 * Number of views in the seed set. This is used to determine if a feature is a member of the seed set
+	 * as the first views are always part of the seed
+	 */
+	public int numSeedViews;
 
 	/**
 	 * Resets it into it's initial state.
@@ -78,7 +80,7 @@ public class SceneWorkingGraph {
 			addView(vsrc.pview).setTo(vsrc);
 		}
 		this.exploredViews.addAll(src.exploredViews);
-		this.index = -1;
+		this.index = src.index;
 		this.numSeedViews = src.numSeedViews;
 		this.open.addAll(src.open);
 	}
@@ -181,6 +183,10 @@ public class SceneWorkingGraph {
 			observations.reset();
 			scoreGeometric = 0.0;
 		}
+
+		public String toString() {
+			return String.format("InlierInfo {views.size=%d, score=%.1f}",views.size, scoreGeometric);
+		}
 	}
 
 	/**
@@ -257,6 +263,7 @@ public class SceneWorkingGraph {
 			projective.zero();
 			intrinsic.reset();
 			inliers.reset();
+			world_to_view.reset();
 		}
 
 		public void setTo( View src ) {
@@ -270,6 +277,7 @@ public class SceneWorkingGraph {
 			for (int i = 0; i < src.inliers.size; i++) {
 				inliers.get(i).setTo(src.inliers.get(i));
 			}
+			world_to_view.setTo(src.world_to_view);
 		}
 
 		@Override

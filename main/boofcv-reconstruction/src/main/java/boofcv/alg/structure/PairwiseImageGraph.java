@@ -47,7 +47,7 @@ public class PairwiseImageGraph {
 
 	public View createNode( String id ) {
 		View v = nodes.grow();
-		v.init(nodes.size-1, id);
+		v.init(nodes.size - 1, id);
 		mapNodes.put(id, v);
 		return v;
 	}
@@ -78,6 +78,12 @@ public class PairwiseImageGraph {
 		public int totalObservations;
 		/** List of motions associated with this view. It can be either the src or dst */
 		public FastArray<Motion> connections = new FastArray<>(Motion.class);
+
+		public View() {}
+
+		public View( String id ) {
+			this.id = id;
+		}
 
 		void init( int index, String id ) {
 			this.id = id;
