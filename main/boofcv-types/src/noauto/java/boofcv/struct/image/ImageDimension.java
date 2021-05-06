@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -45,6 +45,10 @@ public class ImageDimension {
 	public void setTo( int width, int height ) {
 		this.width = width;
 		this.height = height;
+	}
+
+	public boolean isIdentical( ImageDimension a ) {
+		return width == a.width && height == a.height;
 	}
 
 	@Override
