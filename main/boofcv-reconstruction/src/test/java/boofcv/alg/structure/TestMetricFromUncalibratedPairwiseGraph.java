@@ -43,11 +43,32 @@ class TestMetricFromUncalibratedPairwiseGraph extends BoofStandardJUnit {
 	 * Random scene with fairly linear motion. Everything is randomized and physical constraints on camera are enforced
 	 */
 	@Test void process_perfect() {
-		// NOTE: Self calibration assumes image center is the principle point and that fx==fy and zero skew. Make
-		// sure truth matches that assumption
-
 		// TODO make this test run faster
-		var alg = new MetricFromUncalibratedPairwiseGraph();
+
+		// Add extra internal checks
+		var alg = new MetricFromUncalibratedPairwiseGraph() {
+			@Override
+			protected boolean spawnSceneFromSeed( LookUpSimilarImages db, PairwiseImageGraph pairwise, SeedInfo info ) {
+				if (!super.spawnSceneFromSeed(db, pairwise, info))
+					return false;
+				sanityCheckNodeViews();
+				return true;
+			}
+
+			@Override
+			boolean expandIntoView( LookUpSimilarImages db, SceneWorkingGraph scene, PairwiseImageGraph.View selected ) {
+				if (!super.expandIntoView(db, scene, selected))
+					return false;
+				sanityCheckNodeViews();
+				return true;
+			}
+
+			@Override void mergeScenes( LookUpSimilarImages db ) {
+				// TODO this test isn't triggering merge logic. Create a new scene which will trigger it?
+				super.mergeScenes(db);
+				mergeOps.sanityCheckTable(scenes.toList());
+			}
+		};
 //		alg.setVerbose(System.out, BoofMiscOps.hashSet(BoofVerbose.RECURSIVE));
 //		alg.getRefineWorking().setVerbose(System.out, null);
 		for (int numViews = 3; numViews <= 23; numViews += 5) {

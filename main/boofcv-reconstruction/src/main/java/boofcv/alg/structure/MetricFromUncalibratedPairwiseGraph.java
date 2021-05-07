@@ -20,7 +20,6 @@ package boofcv.alg.structure;
 
 import boofcv.alg.structure.SceneMergingOperations.SelectedViews;
 import boofcv.misc.BoofMiscOps;
-import boofcv.struct.image.ImageDimension;
 import lombok.Getter;
 import lombok.Setter;
 import org.ddogleg.struct.DogArray;
@@ -83,21 +82,17 @@ public class MetricFromUncalibratedPairwiseGraph extends ReconstructionFromPairw
 	SceneMergingOperations mergeOps = new SceneMergingOperations();
 
 	/** Which scenes are include which views */
-	PairwiseViewScenes nodeViews = new PairwiseViewScenes();
+	PairwiseViewScenes scenesInEachView = new PairwiseViewScenes();
 
 	MetricSanityChecks metricChecks = new MetricSanityChecks();
 
 	// Storage for selected views to estimate the transform between the two scenes
 	SelectedViews selectedViews = new SelectedViews();
 
-	List<ImageDimension> listImageShape = new ArrayList<>();
-	MetricSanityChecks bundleChecks = new MetricSanityChecks();
-
 	public MetricFromUncalibratedPairwiseGraph( PairwiseGraphUtils utils ) {
 		super(utils);
 		expandMetric.utils = utils;
 
-		bundleChecks.maxFractionFail = 0.02;
 		spawnScene = new MetricSpawnSceneFromView(refineWorking, utils);
 	}
 
@@ -125,7 +120,7 @@ public class MetricFromUncalibratedPairwiseGraph extends ReconstructionFromPairw
 		scenes.reset();
 
 		// Declare storage for book keeping at each view
-		nodeViews.initialize(pairwise);
+		scenesInEachView.initialize(pairwise);
 
 		// Score nodes for their ability to be seeds
 		Map<String, SeedInfo> mapScores = scoreNodesAsSeeds(pairwise, 2);
@@ -137,10 +132,6 @@ public class MetricFromUncalibratedPairwiseGraph extends ReconstructionFromPairw
 
 		// Questions:
 		//  Ditch - why did both scenes grow to consume all views?
-
-		for( var scene : scenes.toList())
-			scene.listViews.forEach(v->BoofMiscOps.checkTrue(!v.inliers.isEmpty()));
-
 
 		if (scenes.isEmpty()) {
 			if (verbose != null) verbose.println("Failed to upgrade any of the seeds to a metric scene.");
@@ -154,6 +145,7 @@ public class MetricFromUncalibratedPairwiseGraph extends ReconstructionFromPairw
 
 		// Merge scenes together until there are no more scenes which can be merged
 		mergeScenes(db);
+		removeMergedScenes();
 		// TODO local SBA with fixed parameters in master when merging
 
 		// There can be multiple scenes at the end that are disconnected and share no views in common
@@ -176,13 +168,16 @@ public class MetricFromUncalibratedPairwiseGraph extends ReconstructionFromPairw
 		// Save the new scene
 		SceneWorkingGraph scene = scenes.grow();
 		scene.setTo(spawnScene.getScene());
-		scene.index = scenes.size-1;
+		scene.index = scenes.size - 1;
 
 		// The function for computing geometric score for an inlier set lies in this code so we have to add it here
 		// The geometric score should be the same for all views
 		double scoreGeometric = computeGeometricScore(scene, scene.listViews.get(0).inliers.get(0));
 		for (int viewIdx = 0; viewIdx < scene.listViews.size(); viewIdx++) {
 			scene.listViews.get(viewIdx).inliers.get(0).scoreGeometric = scoreGeometric;
+
+			// Also add it to the list of scenes in each view
+			scenesInEachView.getView(scene.listViews.get(viewIdx).pview).viewedBy.add(scene.index);
 		}
 
 		return true;
@@ -254,14 +249,14 @@ public class MetricFromUncalibratedPairwiseGraph extends ReconstructionFromPairw
 			if (verbose != null)
 				verbose.printf("Expanding scene[%d].view='%s' score=%.2f\n", best.scene.index, view.id, best.score);
 
-			best.scene.listViews.forEach(v->BoofMiscOps.checkTrue(!v.inliers.isEmpty()));
+			best.scene.listViews.forEach(v -> BoofMiscOps.checkTrue(!v.inliers.isEmpty()));
 
 			if (!expandIntoView(db, best.scene, view)) {
-				best.scene.listViews.forEach(v->BoofMiscOps.checkTrue(!v.inliers.isEmpty()));
+				best.scene.listViews.forEach(v -> BoofMiscOps.checkTrue(!v.inliers.isEmpty()));
 				continue;
 			}
 
-			best.scene.listViews.forEach(v->BoofMiscOps.checkTrue(!v.inliers.isEmpty()));
+			best.scene.listViews.forEach(v -> BoofMiscOps.checkTrue(!v.inliers.isEmpty()));
 
 			if (best.scene.listViews.size() > refineSceneWhileExpandingMaxViews)
 				continue;
@@ -278,12 +273,12 @@ public class MetricFromUncalibratedPairwiseGraph extends ReconstructionFromPairw
 	 */
 	boolean canSpawnFromView( SceneWorkingGraph scene, PairwiseImageGraph.View pview ) {
 		// If no scene already contains the view then there are no restrictions
-		if (nodeViews.getView(pview).viewedBy.size == 0)
+		if (scenesInEachView.getView(pview).viewedBy.size == 0)
 			return true;
 
 		// If another scene also occupies the view then we can only expand from it if it is part of the seed set
 		// The idea is that the seed set could have produced a bad reconstruction that needs to be jumped over
-		ViewScenes views = nodeViews.getView(pview);
+		ViewScenes views = scenesInEachView.getView(pview);
 		boolean usable = true;
 		for (int idxA = 0; idxA < views.viewedBy.size; idxA++) {
 			SceneWorkingGraph viewsByScene = scenes.get(views.viewedBy.get(idxA));
@@ -309,7 +304,7 @@ public class MetricFromUncalibratedPairwiseGraph extends ReconstructionFromPairw
 		ScaleSe3_F64 src_to_dst = new ScaleSe3_F64();
 
 		// Compute the number of views which are in common between all the scenes
-		mergeOps.initializeViewCounts(nodeViews, scenes.size);
+		mergeOps.initializeViewCounts(scenesInEachView, scenes.size);
 
 		// Merge views until views can no longer be merged
 		while (mergeOps.selectScenesToMerge(selected)) {
@@ -336,18 +331,21 @@ public class MetricFromUncalibratedPairwiseGraph extends ReconstructionFromPairw
 			// Don't merge in this situation
 			if (subset) {
 				if (verbose != null)
-					verbose.println("merge results: src=" + src.index + " dst=" + dst.index + " Removing: src is a subset.");
-				mergeOps.toggleViewEnabled(src, nodeViews);
+					verbose.println("merge results: src=" + src.index + " dst=" + dst.index + " sizes=(" +
+							src.listViews.size() + " " + dst.listViews.size() + "), Removing: src is a subset.");
+				mergeOps.toggleViewEnabled(src, scenesInEachView);
 				BoofMiscOps.checkTrue(!mergeOps.enabledScenes.get(src.index), "Should be disabled now");
 				BoofMiscOps.checkTrue(mergeOps.enabledScenes.get(dst.index), "Should be enabled now");
 				continue;
 			}
 
-			if (verbose != null) verbose.println("Merging: src=" + src.index + " dst=" + dst.index);
+			if (verbose != null)
+				verbose.println("Merging: src=" + src.index + " dst=" + dst.index + " sizes=(" +
+								src.listViews.size() + " " + dst.listViews.size() + ")");
 
 			// Remove both views from the counts for now
-			mergeOps.toggleViewEnabled(src, nodeViews);
-			mergeOps.toggleViewEnabled(dst, nodeViews);
+			mergeOps.toggleViewEnabled(src, scenesInEachView);
+			mergeOps.toggleViewEnabled(dst, scenesInEachView);
 
 			// Select which view pair to determine the relationship between the scenes from
 			if (!mergeOps.selectViewsToEstimateTransform(src, dst, selectedViews))
@@ -360,7 +358,7 @@ public class MetricFromUncalibratedPairwiseGraph extends ReconstructionFromPairw
 			int dstViewCountBefore = dst.listViews.size();
 
 			// Merge the views
-			if (!mergeOps.mergeViews(db, src, dst, src_to_dst)) {
+			if (!mergeOps.mergeViews(db, src, dst, src_to_dst, scenesInEachView)) {
 				throw new RuntimeException("Merge failed. Something went really wrong");
 			}
 
@@ -378,11 +376,16 @@ public class MetricFromUncalibratedPairwiseGraph extends ReconstructionFromPairw
 						") -> " + dst.listViews.size() + ", scale=" + src_to_dst.scale);
 
 			// Update the counts of dst and enable it again
-			mergeOps.toggleViewEnabled(dst, nodeViews);
+			mergeOps.toggleViewEnabled(dst, scenesInEachView);
 			BoofMiscOps.checkTrue(!mergeOps.enabledScenes.get(src.index), "Should be disabled now");
 			BoofMiscOps.checkTrue(mergeOps.enabledScenes.get(dst.index), "Should be enabled now");
 		}
+	}
 
+	/**
+	 * If a scene has been merged into another one remove it from the list of scenes
+	 */
+	private void removeMergedScenes() {
 		// remove scenes that got merged into others. This is output to the user
 		for (int i = scenes.size - 1; i >= 0; i--) {
 			if (mergeOps.enabledScenes.get(scenes.get(i).index))
@@ -436,9 +439,40 @@ public class MetricFromUncalibratedPairwiseGraph extends ReconstructionFromPairw
 		}
 
 		// Add this view to the list
-		nodeViews.getView(selected).viewedBy.add(scene.index);
+		scenesInEachView.getView(selected).viewedBy.add(scene.index);
 
 		return true;
+	}
+
+	/**
+	 * Makes sure the number of scenes that have each view is correctly counted. Used for debugging.
+	 */
+	protected void sanityCheckNodeViews() {
+		List<SceneWorkingGraph> expected = new ArrayList<>();
+		for (int viewIdx = 0; viewIdx < scenesInEachView.views.size; viewIdx++) {
+			int _viewIdx = viewIdx;
+
+			// Find all scenes with this view
+			expected.clear();
+			scenes.forEach(scene -> {
+				for (int i = 0; i < scene.listViews.size(); i++) {
+					if (scene.listViews.get(i).pview.index == _viewIdx) {
+						expected.add(scene);
+						break;
+					}
+				}
+			});
+
+			ViewScenes found = scenesInEachView.views.get(viewIdx);
+			BoofMiscOps.checkEq(expected.size(), found.viewedBy.size, "Number of scenes do not match. view=" +
+					viewIdx);
+
+			for (int i = 0; i < expected.size(); i++) {
+				if (!found.viewedBy.contains(expected.get(i).index)) {
+					throw new RuntimeException("Scene is missing from nodeViews. scene.index=" + expected.get(i).index);
+				}
+			}
+		}
 	}
 
 	/**
@@ -506,6 +540,6 @@ public class MetricFromUncalibratedPairwiseGraph extends ReconstructionFromPairw
 	public void setVerbose( @Nullable PrintStream out, @Nullable Set<String> configuration ) {
 		this.verbose = BoofMiscOps.addPrefix(this, out);
 		BoofMiscOps.verboseChildren(verbose, configuration,
-				spawnScene, expandMetric, refineWorking, mergeOps, metricChecks, bundleChecks);
+				spawnScene, expandMetric, refineWorking, mergeOps, metricChecks);
 	}
 }
