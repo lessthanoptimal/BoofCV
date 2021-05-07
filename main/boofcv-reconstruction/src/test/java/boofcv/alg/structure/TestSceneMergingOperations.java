@@ -177,7 +177,8 @@ public class TestSceneMergingOperations extends BoofStandardJUnit {
 		}
 
 		// Call the function being tested
-		alg.mergeStructure(src, dst, src_to_dst);
+		alg.mergeStructure(src, dst, src_to_dst, null);
+		alg.sanityCheckTable(null); // TODO remove fix and see if this triggers it
 
 		// src has 3 views NOT in dst
 		assertEquals(8, dst.listViews.size());
@@ -233,7 +234,7 @@ public class TestSceneMergingOperations extends BoofStandardJUnit {
 		}
 
 		// Call the function being tested
-		alg.mergeStructure(src, dst, src_to_dst);
+		alg.mergeStructure(src, dst, src_to_dst, null);
 
 		assertEquals(5, dst.listViews.size());
 

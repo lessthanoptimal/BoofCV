@@ -98,10 +98,10 @@ public class SceneMergingOperations implements VerbosePrint {
 	 * Creates a sparse data structure that stores the number of views that each scene shares with all
 	 * the other scenes.
 	 *
-	 * @param viewScenes (Input) List of all the views and the scenes that reference them
+	 * @param scenesInEachView (Input) List of all the views and the scenes that reference them
 	 */
-	public void initializeViewCounts( PairwiseViewScenes viewScenes, int numScenes ) {
-		BoofMiscOps.checkTrue(viewScenes.views.size > 0, "There are no views");
+	public void initializeViewCounts( PairwiseViewScenes scenesInEachView, int numScenes ) {
+		BoofMiscOps.checkTrue(scenesInEachView.views.size > 0, "There are no views");
 		BoofMiscOps.checkTrue(numScenes > 0, "There are no scenes");
 
 		// Initializes data structures
@@ -109,8 +109,8 @@ public class SceneMergingOperations implements VerbosePrint {
 		enabledScenes.resetResize(numScenes, true);
 
 		// Go through each view and count the number of scenes that contain that view
-		for (int viewsIdx = 0; viewsIdx < viewScenes.views.size; viewsIdx++) {
-			ViewScenes v = viewScenes.views.get(viewsIdx);
+		for (int viewsIdx = 0; viewsIdx < scenesInEachView.views.size; viewsIdx++) {
+			ViewScenes v = scenesInEachView.views.get(viewsIdx);
 
 			// Put it in ascending order by index. This 'owner' of a count is the scene with a lower index
 			v.viewedBy.sort(sorter);
@@ -136,9 +136,11 @@ public class SceneMergingOperations implements VerbosePrint {
 	 * Toggles the enabled state of a view and update its counts accordingly
 	 *
 	 * @param target Scene that will have its counts modified.
-	 * @param views List of views + scenes that views them
+	 * @param scenesInEachView List of views + scenes that views them
 	 */
-	public void toggleViewEnabled( SceneWorkingGraph target, PairwiseViewScenes views ) {
+	public void toggleViewEnabled( SceneWorkingGraph target, PairwiseViewScenes scenesInEachView ) {
+		BoofMiscOps.checkTrue(!target.listViews.isEmpty());
+
 		// if true, then that means we are enabling the scene
 		boolean enable = !enabledScenes.get(target.index);
 
@@ -147,10 +149,13 @@ public class SceneMergingOperations implements VerbosePrint {
 
 		// Go through all the views which are part of this scene
 		target.listViews.forEach(( wv ) -> {
-			ViewScenes v = views.getView(wv.pview);
+			ViewScenes v = scenesInEachView.getView(wv.pview);
 
 			for (int srcIdx = 0; srcIdx < v.viewedBy.size; srcIdx++) {
 				int sceneSrc = v.viewedBy.get(srcIdx);
+
+				if (srcIdx > 0 && v.viewedBy.get(srcIdx-1) >= sceneSrc)
+					throw new RuntimeException("BUG! viewdBy isn't sorted");
 
 				DogArray<SceneCommonCounts> countsSrc = commonViewCounts.get(sceneSrc);
 
@@ -227,9 +232,10 @@ public class SceneMergingOperations implements VerbosePrint {
 	 * @param src_to_dst Known transform from the coordinate system of src to dst.
 	 */
 	public boolean mergeViews( LookUpSimilarImages db,
-							   SceneWorkingGraph src, SceneWorkingGraph dst, ScaleSe3_F64 src_to_dst ) {
+							   SceneWorkingGraph src, SceneWorkingGraph dst, ScaleSe3_F64 src_to_dst,
+							   PairwiseViewScenes scenesInEachView ) {
 		// Copy the src views into the dst scene
-		mergeStructure(src, dst, src_to_dst);
+		mergeStructure(src, dst, src_to_dst, scenesInEachView);
 
 		// The scenes might have a different version of reality because they converged to slightly different solutions
 		// this can and does cause geometric contradictions.
@@ -247,12 +253,15 @@ public class SceneMergingOperations implements VerbosePrint {
 			return false;
 		}
 
-		if (verbose!=null) {
+		if (verbose != null) {
 			for (int mergedCnt = 0; mergedCnt < mergedViews.size(); mergedCnt++) {
 				SceneWorkingGraph.View view = mergedViews.get(mergedCnt);
-				verbose.printf("after view='%s' f=%.2f\n",view.pview.id, view.intrinsic.f);
+				verbose.printf("after view='%s' f=%.2f\n", view.pview.id, view.intrinsic.f);
 			}
 		}
+
+		// Make this an empty scene to ensure if it's used it will fail fast
+		src.purgeViews();
 
 		return true;
 	}
@@ -265,7 +274,8 @@ public class SceneMergingOperations implements VerbosePrint {
 	 * @param dst (Input/Output) The destination scene
 	 * @param src_to_dst Known transform from the coordinate system of src to dst.
 	 */
-	void mergeStructure( SceneWorkingGraph src, SceneWorkingGraph dst, ScaleSe3_F64 src_to_dst ) {
+	void mergeStructure( SceneWorkingGraph src, SceneWorkingGraph dst, ScaleSe3_F64 src_to_dst,
+						 PairwiseViewScenes scenesInEachView ) {
 		mergedViews.clear();
 		duplicateViews.clear();
 		Se3_F64 src_to_view = new Se3_F64();
@@ -290,6 +300,14 @@ public class SceneMergingOperations implements VerbosePrint {
 							srcView.intrinsic.f, dstView.intrinsic.f);
 				}
 			} else {
+				// Need to add the dst to the list of scenes which contains this view. Do not mess with the counters
+				// since that's handle by the toggle function
+//				if (scenesInEachView.getView(srcView.pview).viewedBy.contains(dst.index))
+//					throw new RuntimeException("BUG!");
+				scenesInEachView.getView(srcView.pview).viewedBy.add(dst.index);
+				scenesInEachView.getView(srcView.pview).viewedBy.sort(sorter);
+				// NOTE: This sorted insert could be speed up
+
 				// Create a new view in the dst scene
 				dstView = dst.addView(srcView.pview);
 				copySrc = true;
@@ -303,12 +321,12 @@ public class SceneMergingOperations implements VerbosePrint {
 
 			// Always copy the src inliers into the dst. This ensures islands do not form
 			for (int infoIdx = 0; infoIdx < srcView.inliers.size; infoIdx++) {
-				// It's not uncommon to have the same views in both inlier sets. For now will not optimize this part
-				// of the code since there being some redundancy here isn't likely to cause any harm
+				// It's not uncommon to have the same views in both inlier sets. Ignoring this potential inefficiency
+				// for now since it works
 				dstView.inliers.grow().setTo(srcView.inliers.get(infoIdx));
 			}
 
-			// Stop here if the dst has a better estimate
+			// Stop here the view already exists in dst
 			if (!copySrc)
 				continue;
 
@@ -619,6 +637,55 @@ public class SceneMergingOperations implements VerbosePrint {
 		SceneCommonCounts match = list.grow();
 		match.sceneIndex = targetScene;
 		return match;
+	}
+
+	/**
+	 * Debugging tool to make sure the feature count table isn't messed up using brute force
+	 */
+	public void sanityCheckTable( List<SceneWorkingGraph> scenes ) {
+		BoofMiscOps.checkEq(scenes.size(), commonViewCounts.size);
+
+		for (int sceneIdxA = 0; sceneIdxA < scenes.size(); sceneIdxA++) {
+			if (!enabledScenes.get(sceneIdxA))
+				continue;
+
+			DogArray<SceneCommonCounts> counts = commonViewCounts.get(sceneIdxA);
+
+			for (int sceneIdxB = sceneIdxA + 1; sceneIdxB < scenes.size(); sceneIdxB++) {
+				if (!enabledScenes.get(sceneIdxB))
+					continue;
+
+				SceneWorkingGraph sceneB = scenes.get(sceneIdxB);
+				int found = countCommonViews(scenes.get(sceneIdxA), sceneB);
+
+				int indexInCounts = counts.findIdx(( v ) -> v.sceneIndex == sceneB.index);
+				if (found == 0 && indexInCounts != -1)
+					throw new RuntimeException("Counts not zero when there are no common scenes. " +
+							sceneIdxA + "->" + sceneIdxB + " counts=" + found);
+				else if (found != 0) {
+					if (indexInCounts == -1)
+						throw new RuntimeException("There are matches but that's not in the table: scenes, " +
+								sceneIdxA + "<->" + sceneIdxB);
+					int tableCounts = counts.get(indexInCounts).counts;
+					if (tableCounts != found)
+						throw new RuntimeException("Found and table counts do not match. " +
+								sceneIdxA + "->" + sceneIdxB + " counts={" + found + "," + tableCounts + "}");
+				}
+			}
+		}
+	}
+
+	private int countCommonViews( SceneWorkingGraph sceneA, SceneWorkingGraph sceneB ) {
+		int commonCount = 0;
+		for (int i = 0; i < sceneA.listViews.size(); i++) {
+			PairwiseImageGraph.View va = sceneA.listViews.get(i).pview;
+
+			if (-1 == BoofMiscOps.indexOf(sceneB.listViews, ( v ) -> v.pview == va))
+				continue;
+
+			commonCount++;
+		}
+		return commonCount;
 	}
 
 	@Override public void setVerbose( @Nullable PrintStream out, @Nullable Set<String> configuration ) {

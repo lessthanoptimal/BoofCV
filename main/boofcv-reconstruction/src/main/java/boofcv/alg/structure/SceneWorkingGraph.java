@@ -117,6 +117,11 @@ public class SceneWorkingGraph {
 		return listViews;
 	}
 
+	public void purgeViews() {
+		listViews.clear();
+		views.clear();
+	}
+
 	/**
 	 * Observation (pixel coordinates) of an image feature inside of a {@link View}. Specifies which observation in
 	 * the view it's associated with, the view, and a copy of the actual obnervation.

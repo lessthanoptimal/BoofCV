@@ -625,6 +625,19 @@ public class BoofMiscOps {
 	}
 
 	/**
+	 * Searches the list for the first index where the operation returns true. When a match is found it returns
+	 * the index. Otherwise it returns -1 if no match is found.
+	 */
+	public static <T> int indexOf( List<T> list, BoofLambdas.Filter<T> op ) {
+		for (int i = 0; i < list.size(); i++) {
+			if (op.keep(list.get(i))) {
+				return i;
+			}
+		}
+		return -1;
+	}
+
+	/**
 	 * Extracts elements from a list and returns a list
 	 */
 	public static <In, Out> List<Out> collectList( List<In> list, BoofLambdas.Extract<In, Out> func ) {
