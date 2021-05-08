@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -103,8 +103,8 @@ public class FundamentalLinear7 extends FundamentalLinear {
 			return false;
 
 		// Undo normalization on F
-		PerspectiveOps.multTranA(N2.matrix(), F1, N1.matrix(), F1);
-		PerspectiveOps.multTranA(N2.matrix(), F2, N1.matrix(), F2);
+		PerspectiveOps.multTranA(N2.matrix(null), F1, N1.matrix(null), F1);
+		PerspectiveOps.multTranA(N2.matrix(null), F2, N1.matrix(null), F2);
 
 		// compute polynomial coefficients
 		computeCoefficients(F1, F2, poly.c);

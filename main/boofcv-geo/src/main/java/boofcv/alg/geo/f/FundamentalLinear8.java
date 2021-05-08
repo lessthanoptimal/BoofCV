@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -17,7 +17,6 @@
  */
 
 package boofcv.alg.geo.f;
-
 
 import boofcv.alg.geo.LowLevelMultiViewOps;
 import boofcv.alg.geo.PerspectiveOps;
@@ -64,25 +63,25 @@ public class FundamentalLinear8 extends FundamentalLinear {
 	 * </p>
 	 *
 	 * @param points List of corresponding image coordinates. In pixel for fundamental matrix or
-	 *               normalized coordinates for essential matrix.
+	 * normalized coordinates for essential matrix.
 	 * @return true If successful or false if it failed
 	 */
-	public boolean process( List<AssociatedPair> points , DMatrixRMaj solution ) {
-		if( points.size() < 8 )
-			throw new IllegalArgumentException("Must be at least 8 points. Was only "+points.size());
+	public boolean process( List<AssociatedPair> points, DMatrixRMaj solution ) {
+		if (points.size() < 8)
+			throw new IllegalArgumentException("Must be at least 8 points. Was only " + points.size());
 
 		// use normalized coordinates for pixel and calibrated
 		// TODO re-evaluate decision to normalize for calibrated case
 		LowLevelMultiViewOps.computeNormalization(points, N1, N2);
-		createA(points,A);
+		createA(points, A);
 
-		if (process(A,solution))
+		if (process(A, solution))
 			return false;
 
 		// undo normalization on F
-		PerspectiveOps.multTranA(N2.matrix(),solution,N1.matrix(),solution);
+		PerspectiveOps.multTranA(N2.matrix(null), solution, N1.matrix(null), solution);
 
-		if( computeFundamental )
+		if (computeFundamental)
 			return projectOntoFundamentalSpace(solution);
 		else
 			return projectOntoEssential(solution);
@@ -91,8 +90,8 @@ public class FundamentalLinear8 extends FundamentalLinear {
 	/**
 	 * Computes the SVD of A and extracts the essential/fundamental matrix from its null space
 	 */
-	protected boolean process(DMatrixRMaj A, DMatrixRMaj F ) {
-		if( !solverNull.process(A,1,F) )
+	protected boolean process( DMatrixRMaj A, DMatrixRMaj F ) {
+		if (!solverNull.process(A, 1, F))
 			return true;
 
 		F.numRows = 3;
