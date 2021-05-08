@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -50,10 +50,10 @@ import java.util.List;
  * </p>
  *
  * <p>
- *     The conic algorithm specifies a constraint using a pair of conics. A minimum of 3 conics are required for a
- *     unique solution using this linear method [2]. If all possible pairs are used then the growth is O(N^2) instead
- *     linear set of pairs are added which has O(N) growth by adding adjacent conics as pairs. This behavior
- *     can be toggled.
+ * The conic algorithm specifies a constraint using a pair of conics. A minimum of 3 conics are required for a
+ * unique solution using this linear method [2]. If all possible pairs are used then the growth is O(N^2) instead
+ * linear set of pairs are added which has O(N) growth by adding adjacent conics as pairs. This behavior
+ * can be toggled.
  * </p>
  *
  * <p>
@@ -69,7 +69,7 @@ import java.util.List;
 public class HomographyDirectLinearTransform {
 
 	// contains the set of equations that are solved
-	protected DMatrixRMaj A = new DMatrixRMaj(1,9);
+	protected DMatrixRMaj A = new DMatrixRMaj(1, 9);
 	protected SolveNullSpace<DMatrixRMaj> solverNullspace = new SolveNullSpaceSvd_DDRM();
 
 	// Used to normalize input points
@@ -104,7 +104,7 @@ public class HomographyDirectLinearTransform {
 	 *
 	 * @param normalizeInput Should image coordinate be normalized?  Needed when coordinates are in units of pixels.
 	 */
-	public HomographyDirectLinearTransform(boolean normalizeInput) {
+	public HomographyDirectLinearTransform( boolean normalizeInput ) {
 		this.normalize = normalizeInput;
 	}
 
@@ -120,8 +120,8 @@ public class HomographyDirectLinearTransform {
 	 * @param foundH Output: Storage for the found solution. 3x3 matrix.
 	 * @return True if successful. False if it failed.
 	 */
-	public boolean process( List<AssociatedPair> points , DMatrixRMaj foundH ) {
-		return process(points,null,null,foundH);
+	public boolean process( List<AssociatedPair> points, DMatrixRMaj foundH ) {
+		return process(points, null, null, foundH);
 	}
 
 	/**
@@ -133,11 +133,10 @@ public class HomographyDirectLinearTransform {
 	 * @param foundH (Output) The estimated homography
 	 * @return True if successful. False if it failed.
 	 */
-	public boolean process( @Nullable List<AssociatedPair> points2D ,
-							@Nullable List<AssociatedPair3D> points3D ,
-							@Nullable List<AssociatedPairConic> conics ,
-							DMatrixRMaj foundH )
-	{
+	public boolean process( @Nullable List<AssociatedPair> points2D,
+							@Nullable List<AssociatedPair3D> points3D,
+							@Nullable List<AssociatedPairConic> conics,
+							DMatrixRMaj foundH ) {
 		// no sanity check is done to see if the minimum number of points and conics has been provided because
 		// that is actually really complex to determine. Especially for conics
 
@@ -145,48 +144,47 @@ public class HomographyDirectLinearTransform {
 		int num3D = points3D != null ? points3D.size() : 0;
 		int numConic = conics != null ? conics.size() : 0;
 
-		int numRows = computeTotalRows(num2D,num3D,numConic);
+		int numRows = computeTotalRows(num2D, num3D, numConic);
 
 		// only 2D points need to be normalzied because of the implicit z=1
 		// 3D points are homogenous or lines and the vector can be normalized to 1
 		// same goes for the conic equation
 		shouldNormalize = false;//normalize && points2D != null;
 
-		if( shouldNormalize ) {
+		if (shouldNormalize) {
 			LowLevelMultiViewOps.computeNormalization(points2D, N1, N2);
 		}
-		A.reshape(numRows,9);
+		A.reshape(numRows, 9);
 		A.zero();
 
 		int rows = 0;
-		if( points2D != null )
-			rows = addPoints2D(points2D,A,rows);
-		if( points3D != null )
-			rows = addPoints3D(points3D,A,rows);
-		if( conics != null )
-			addConics(conics,A,rows);
+		if (points2D != null)
+			rows = addPoints2D(points2D, A, rows);
+		if (points3D != null)
+			rows = addPoints3D(points3D, A, rows);
+		if (conics != null)
+			addConics(conics, A, rows);
 
 		// compute the homograph matrix up to a scale factor
-		if (computeH(A,foundH))
+		if (computeH(A, foundH))
 			return false;
 
-		if( shouldNormalize )
-			undoNormalizationH(foundH,N1,N2);
+		if (shouldNormalize)
+			undoNormalizationH(foundH, N1, N2);
 
 		// pick a good scale and sign for H
-		if( points2D != null )
-			adjust.adjust(foundH,points2D.get(0));
+		if (points2D != null)
+			adjust.adjust(foundH, points2D.get(0));
 
 		return true;
 	}
 
-
 	/**
 	 * Computes the SVD of A and extracts the homography matrix from its null space
 	 */
-	protected boolean computeH(DMatrixRMaj A, DMatrixRMaj H) {
+	protected boolean computeH( DMatrixRMaj A, DMatrixRMaj H ) {
 
-		if( !solverNullspace.process(A.copy(),1,H) )
+		if (!solverNullspace.process(A.copy(), 1, H))
 			return true;
 
 		H.numRows = 3;
@@ -198,18 +196,18 @@ public class HomographyDirectLinearTransform {
 	/**
 	 * Undoes normalization for a homography matrix.
 	 */
-	public static void undoNormalizationH(DMatrixRMaj M, NormalizationPoint2D N1, NormalizationPoint2D N2) {
+	public static void undoNormalizationH( DMatrixRMaj M, NormalizationPoint2D N1, NormalizationPoint2D N2 ) {
 		SimpleMatrix a = SimpleMatrix.wrap(M);
-		SimpleMatrix b = SimpleMatrix.wrap(N1.matrix());
-		SimpleMatrix c_inv = SimpleMatrix.wrap(N2.matrixInv());
+		SimpleMatrix b = SimpleMatrix.wrap(N1.matrix(null));
+		SimpleMatrix c_inv = SimpleMatrix.wrap(N2.matrixInv(null));
 
 		SimpleMatrix result = c_inv.mult(a).mult(b);
 
 		M.setTo(result.getDDRM());
 	}
 
-	private void adjustPoint( AssociatedPair pair , Point2D_F64 a1 , Point2D_F64 a2 ) {
-		if( shouldNormalize ) {
+	private void adjustPoint( AssociatedPair pair, Point2D_F64 a1, Point2D_F64 a2 ) {
+		if (shouldNormalize) {
 			N1.apply(pair.p1, a1);
 			N2.apply(pair.p2, a2);
 		} else {
@@ -218,12 +216,12 @@ public class HomographyDirectLinearTransform {
 		}
 	}
 
-	int computeTotalRows( int num2D , int num3D , int numConic ) {
+	int computeTotalRows( int num2D, int num3D, int numConic ) {
 		return 2*num2D + 2*num3D + 9*numConic;
 	}
 
-	private void adjustPoint(AssociatedPair3D pair , Point3D_F64 a1 , Point3D_F64 a2 ) {
-		if( shouldNormalize ) {
+	private void adjustPoint( AssociatedPair3D pair, Point3D_F64 a1, Point3D_F64 a2 ) {
+		if (shouldNormalize) {
 			N1.apply(pair.p1, a1);
 			N2.apply(pair.p2, a2);
 		} else {
@@ -242,55 +240,55 @@ public class HomographyDirectLinearTransform {
 //		}
 //	}
 
-	protected int addPoints2D( List<AssociatedPair> points , DMatrixRMaj A, int rows ) {
+	protected int addPoints2D( List<AssociatedPair> points, DMatrixRMaj A, int rows ) {
 		Point2D_F64 f = new Point2D_F64();
 		Point2D_F64 s = new Point2D_F64();
 
-		for( int i = 0; i < points.size(); i++ ) {
+		for (int i = 0; i < points.size(); i++) {
 			AssociatedPair p = points.get(i);
 
-			adjustPoint(p,f,s);
+			adjustPoint(p, f, s);
 
-			A.set(rows , 3 , -f.x);
-			A.set(rows , 4 , -f.y);
-			A.set(rows , 5 , -1);
-			A.set(rows , 6 , s.y*f.x);
-			A.set(rows , 7 , s.y*f.y);
-			A.set(rows , 8 , s.y);
+			A.set(rows, 3, -f.x);
+			A.set(rows, 4, -f.y);
+			A.set(rows, 5, -1);
+			A.set(rows, 6, s.y*f.x);
+			A.set(rows, 7, s.y*f.y);
+			A.set(rows, 8, s.y);
 			rows++;
-			A.set(rows , 0 , f.x);
-			A.set(rows , 1 , f.y);
-			A.set(rows , 2 , 1);
-			A.set(rows , 6 , -s.x*f.x);
-			A.set(rows , 7 , -s.x*f.y);
-			A.set(rows , 8 , -s.x);
+			A.set(rows, 0, f.x);
+			A.set(rows, 1, f.y);
+			A.set(rows, 2, 1);
+			A.set(rows, 6, -s.x*f.x);
+			A.set(rows, 7, -s.x*f.y);
+			A.set(rows, 8, -s.x);
 			rows++;
 		}
 		return rows;
 	}
 
-	protected int addPoints3D(List<AssociatedPair3D> points , DMatrixRMaj A, int rows ) {
+	protected int addPoints3D( List<AssociatedPair3D> points, DMatrixRMaj A, int rows ) {
 		Point3D_F64 f = new Point3D_F64();
 		Point3D_F64 s = new Point3D_F64();
 
-		for( int i = 0; i < points.size(); i++ ) {
+		for (int i = 0; i < points.size(); i++) {
 			AssociatedPair3D p = points.get(i);
 
-			adjustPoint(p,f,s);
+			adjustPoint(p, f, s);
 
-			A.set(rows , 3 , -s.z*f.x);
-			A.set(rows , 4 , -s.z*f.y);
-			A.set(rows , 5 , -s.z*f.z);
-			A.set(rows , 6 , s.y*f.x);
-			A.set(rows , 7 , s.y*f.y);
-			A.set(rows , 8 , s.y*f.z);
+			A.set(rows, 3, -s.z*f.x);
+			A.set(rows, 4, -s.z*f.y);
+			A.set(rows, 5, -s.z*f.z);
+			A.set(rows, 6, s.y*f.x);
+			A.set(rows, 7, s.y*f.y);
+			A.set(rows, 8, s.y*f.z);
 			rows++;
-			A.set(rows , 0 , s.z*f.x);
-			A.set(rows , 1 , s.z*f.y);
-			A.set(rows , 2 , s.z*f.z);
-			A.set(rows , 6 , -s.x*f.x);
-			A.set(rows , 7 , -s.x*f.y);
-			A.set(rows , 8 , -s.x*f.z);
+			A.set(rows, 0, s.z*f.x);
+			A.set(rows, 1, s.z*f.y);
+			A.set(rows, 2, s.z*f.z);
+			A.set(rows, 6, -s.x*f.x);
+			A.set(rows, 7, -s.x*f.y);
+			A.set(rows, 8, -s.x*f.z);
 			rows++;
 		}
 		return rows;
@@ -303,24 +301,23 @@ public class HomographyDirectLinearTransform {
 	 * inv(C[1]')*(C[2]')*H - H*invC[1]*C[2] == 0
 	 *
 	 * Note: x' = H*x. C' is conic from the same view as x' and C from x. It can be shown that C = H^T*C'*H
-	 *
 	 */
-	protected int addConics(List<AssociatedPairConic> points , DMatrixRMaj A, int rows ) {
+	protected int addConics( List<AssociatedPairConic> points, DMatrixRMaj A, int rows ) {
 
-		if( exhaustiveConics ) {
+		if (exhaustiveConics) {
 			// adds an exhaustive set of linear conics
 			for (int i = 0; i < points.size(); i++) {
-				for (int j = i+1; j < points.size(); j++) {
-					rows = addConicPairConstraints(points.get(i),points.get(j),A,rows);
+				for (int j = i + 1; j < points.size(); j++) {
+					rows = addConicPairConstraints(points.get(i), points.get(j), A, rows);
 				}
 			}
 		} else {
 			// adds pairs and has linear time complexity
 			for (int i = 1; i < points.size(); i++) {
-				rows = addConicPairConstraints(points.get(i-1),points.get(i),A,rows);
+				rows = addConicPairConstraints(points.get(i - 1), points.get(i), A, rows);
 			}
 			int N = points.size();
-			rows = addConicPairConstraints(points.get(0),points.get(N-1),A,rows);
+			rows = addConicPairConstraints(points.get(0), points.get(N - 1), A, rows);
 		}
 
 		return rows;
@@ -329,7 +326,7 @@ public class HomographyDirectLinearTransform {
 	/**
 	 * Add constraint for a pair of conics
 	 */
-	protected int addConicPairConstraints( AssociatedPairConic a , AssociatedPairConic b , DMatrixRMaj A , int rowA ) {
+	protected int addConicPairConstraints( AssociatedPairConic a, AssociatedPairConic b, DMatrixRMaj A, int rowA ) {
 		// s*C[i] = H^T*V[i]*H
 		// C[i] = a, C[j] = b
 		// Conic in view 1 is C and view 2 is V, e.g. x' = H*x.  x' is in view 2 and x in view 1
@@ -344,9 +341,9 @@ public class HomographyDirectLinearTransform {
 		CommonOps_DDF3.invert(V2, V2_inv);
 
 		// L = inv(V[i])*V[j]
-		CommonOps_DDF3.mult(V1_inv, V2,L);
+		CommonOps_DDF3.mult(V1_inv, V2, L);
 		// R = C[i]*inv(C[j])
-		CommonOps_DDF3.mult(C1_inv, C2,R);
+		CommonOps_DDF3.mult(C1_inv, C2, R);
 
 		// clear this row
 		int idxA = rowA*9;
@@ -359,13 +356,13 @@ public class HomographyDirectLinearTransform {
 		for (int row = 0; row < 3; row++) {
 			for (int col = 0; col < 3; col++) {
 				for (int i = 0; i < 3; i++) {
-					A.data[idxA + 3*i + col] += L.get(row,i);
-					A.data[idxA + 3*row + i] -= R.get(i,col);
+					A.data[idxA + 3*i + col] += L.get(row, i);
+					A.data[idxA + 3*row + i] -= R.get(i, col);
 				}
 				idxA += 9;
 			}
 		}
-		return rowA+9;
+		return rowA + 9;
 	}
 
 	public SolveNullSpace<DMatrixRMaj> getSolverNullspace() {
@@ -380,7 +377,7 @@ public class HomographyDirectLinearTransform {
 		return exhaustiveConics;
 	}
 
-	public void setExhaustiveConics(boolean exhaustiveConics) {
+	public void setExhaustiveConics( boolean exhaustiveConics ) {
 		this.exhaustiveConics = exhaustiveConics;
 	}
 }

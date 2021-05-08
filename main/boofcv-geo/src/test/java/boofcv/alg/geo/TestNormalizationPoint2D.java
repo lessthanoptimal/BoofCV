@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -108,7 +108,7 @@ class TestNormalizationPoint2D extends BoofStandardJUnit {
 
 		DMatrixRMaj H = new DMatrixRMaj(new double[][]{{1,2,3,9},{3,4,5,8},{5,6,7,7}});
 		DMatrixRMaj H_orig = H.copy();
-		DMatrixRMaj N = n.matrix();
+		DMatrixRMaj N = n.matrix(null);
 
 		DMatrixRMaj expected = new DMatrixRMaj(3,4);
 		CommonOps_DDRM.mult(N,H,expected);
@@ -126,8 +126,8 @@ class TestNormalizationPoint2D extends BoofStandardJUnit {
 	void matrixInv() {
 		NormalizationPoint2D n = new NormalizationPoint2D(1,2,3,4);
 
-		DMatrixRMaj A = n.matrix();
-		DMatrixRMaj B = n.matrixInv();
+		DMatrixRMaj A = n.matrix(null);
+		DMatrixRMaj B = n.matrixInv(null);
 
 		DMatrixRMaj C = new DMatrixRMaj(3,3);
 		CommonOps_DDRM.mult(A,B,C);

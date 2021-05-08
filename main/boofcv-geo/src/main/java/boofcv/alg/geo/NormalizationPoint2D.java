@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -24,6 +24,7 @@ import georegression.struct.point.Point2D_F64;
 import georegression.struct.point.Point3D_F64;
 import org.ejml.data.DMatrix3x3;
 import org.ejml.data.DMatrixRMaj;
+import org.jetbrains.annotations.Nullable;
 
 /**
  * Describes how to normalize a set of points such that they have zero mean and variance. This is equivalent
@@ -121,7 +122,7 @@ public class NormalizationPoint2D {
 	 */
 	public void apply( ConicGeneral_F64 p, ConicGeneral_F64 output ) {
 		DMatrixRMaj C = UtilCurves_F64.convert(p, (DMatrixRMaj)null);
-		DMatrixRMaj Hinv = matrixInv();
+		DMatrixRMaj Hinv = matrixInv(null);
 		DMatrixRMaj CP = new DMatrixRMaj(3, 3);
 		PerspectiveOps.multTranA(Hinv, C, Hinv, CP);
 		UtilCurves_F64.convert(CP, output);
@@ -147,7 +148,7 @@ public class NormalizationPoint2D {
 
 	public void remove( ConicGeneral_F64 p, ConicGeneral_F64 output ) {
 		DMatrixRMaj C = UtilCurves_F64.convert(p, (DMatrixRMaj)null);
-		DMatrixRMaj H = matrix();
+		DMatrixRMaj H = matrix(null);
 		DMatrixRMaj CP = new DMatrixRMaj(3, 3);
 		PerspectiveOps.multTranA(H, C, H, CP);
 		UtilCurves_F64.convert(CP, output);
@@ -158,8 +159,11 @@ public class NormalizationPoint2D {
 		PerspectiveOps.multTranA(H, C, H, output);
 	}
 
-	public DMatrixRMaj matrix() {
-		DMatrixRMaj M = new DMatrixRMaj(3, 3);
+	public DMatrixRMaj matrix( @Nullable DMatrixRMaj M ) {
+		if (M==null)
+			M = new DMatrixRMaj(3, 3);
+		else
+			M.reshape(3,3);
 		M.set(0, 0, 1.0/stdX);
 		M.set(1, 1, 1.0/stdY);
 		M.set(0, 2, -meanX/stdX);
@@ -168,8 +172,11 @@ public class NormalizationPoint2D {
 		return M;
 	}
 
-	public DMatrixRMaj matrixInv() {
-		DMatrixRMaj M = new DMatrixRMaj(3, 3);
+	public DMatrixRMaj matrixInv( @Nullable DMatrixRMaj M ) {
+		if (M==null)
+			M = new DMatrixRMaj(3, 3);
+		else
+			M.reshape(3,3);
 		M.set(0, 0, stdX);
 		M.set(1, 1, stdY);
 		M.set(0, 2, meanX);
@@ -178,7 +185,7 @@ public class NormalizationPoint2D {
 		return M;
 	}
 
-	public DMatrix3x3 matrix3( DMatrix3x3 M ) {
+	public DMatrix3x3 matrix3( @Nullable DMatrix3x3 M ) {
 		if (M == null)
 			M = new DMatrix3x3();
 		else {

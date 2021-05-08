@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -201,10 +201,10 @@ public class TrifocalLinearPoint7 {
 	 * Translates the trifocal tensor back into regular coordinate system
 	 */
 	protected void removeNormalization( TrifocalTensor solution ) {
-		DMatrixRMaj N2_inv = N2.matrixInv();
-		DMatrixRMaj N3_inv = N3.matrixInv();
+		DMatrixRMaj N2_inv = N2.matrixInv(null);
+		DMatrixRMaj N3_inv = N3.matrixInv(null);
 
-		DMatrixRMaj N1 = this.N1.matrix();
+		DMatrixRMaj N1 = this.N1.matrix(null);
 
 		for (int i = 0; i < 3; i++) {
 			DMatrixRMaj T = solution.getT(i);
