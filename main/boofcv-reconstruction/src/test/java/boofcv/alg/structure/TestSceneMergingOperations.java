@@ -281,7 +281,7 @@ public class TestSceneMergingOperations extends BoofStandardJUnit {
 
 		var found = new SelectedViews();
 		var alg = new SceneMergingOperations();
-		alg.selectViewsToEstimateTransform(src, dst, found);
+		alg.selectViewToEstimateTransform(src, dst, found);
 
 		assertSame(src.listViews.get(4), found.src);
 		assertSame(dst.listViews.get(4), found.dst);
@@ -364,5 +364,9 @@ public class TestSceneMergingOperations extends BoofStandardJUnit {
 		assertSame(found1, found3);
 		assertEquals(5, found1.sceneIndex);
 		assertEquals(6, found2.sceneIndex);
+	}
+
+	@Test void inlierSetToBundle() {
+		fail("Implement");
 	}
 }
