@@ -27,10 +27,7 @@ import org.ddogleg.struct.VerbosePrint;
 import org.jetbrains.annotations.Nullable;
 
 import java.io.PrintStream;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 /**
  * Used to refine only part of a {@link SceneWorkingGraph}. All the views which are to be optimized are first
@@ -59,7 +56,7 @@ public class RefineMetricGraphSubset implements VerbosePrint {
 	DogArray_B viewsFixed = new DogArray_B();
 
 	// Reference to the passed in list of views
-	List<SceneWorkingGraph.View> srcViews;
+	final List<SceneWorkingGraph.View> srcViews = new ArrayList<>();
 
 	// Transform from view0 to the world frame
 	@Getter Se3_F64 local_to_world = new Se3_F64();
@@ -78,6 +75,23 @@ public class RefineMetricGraphSubset implements VerbosePrint {
 	}
 
 	/**
+	 * Creates a sub-graph from a single view and inlier set
+	 */
+	public void setSubset( SceneWorkingGraph src, SceneWorkingGraph.View srcView, int infoIdx ) {
+		srcViews.clear();
+		srcViews.add(srcView);
+
+		viewsFixed.resetResize(srcViews.size(), false);
+		srcToCpy.clear();
+
+		// First copy the view's intrinsics/Intrinsics
+		subgraph.reset();
+
+		copyIntrinsicsExtrinsics(srcView);
+		copyViewAndInlierSet(src, srcView, infoIdx);
+	}
+
+	/**
 	 * Creates a subset of the scene using the provided views. If a view references other views not in this list
 	 * in its inlier sets then those views are added to the subview but marked as known so that they aren't updated
 	 *
@@ -85,7 +99,8 @@ public class RefineMetricGraphSubset implements VerbosePrint {
 	 * @param srcViews The views in the scene which compose the sub-scene
 	 */
 	public void setSubset( SceneWorkingGraph src, List<SceneWorkingGraph.View> srcViews ) {
-		this.srcViews = srcViews;
+		this.srcViews.clear();
+		this.srcViews.addAll(srcViews);
 
 		copySubGraph(src, srcViews);
 		rescaleLocalCoordinateSystem();
@@ -112,32 +127,39 @@ public class RefineMetricGraphSubset implements VerbosePrint {
 		// Copy the inlier sets. If a view is not in the subset, add it so we can triangulate the points
 		for (int listIdx = 0; listIdx < srcViews.size(); listIdx++) {
 			SceneWorkingGraph.View srcView = srcViews.get(listIdx);
-			SceneWorkingGraph.View cpyView = srcToCpy.get(srcView.pview.id);
 
 			BoofMiscOps.checkTrue(!srcView.inliers.isEmpty(), "BUG no inliers");
 
 			for (int infoIdx = 0; infoIdx < srcView.inliers.size; infoIdx++) {
-				SceneWorkingGraph.InlierInfo srcInfo = srcView.inliers.get(infoIdx);
-				SceneWorkingGraph.InlierInfo cpyInfo = cpyView.inliers.grow();
-
-				for (int infoViewsIdx = 0; infoViewsIdx < srcInfo.views.size; infoViewsIdx++) {
-					PairwiseImageGraph.View pview = srcInfo.views.get(infoViewsIdx);
-
-					SceneWorkingGraph.View infoView = srcToCpy.get(pview.id);
-					if (infoView == null) {
-						// Add a new view to the subgraph. Mark it as fixed since the user isn't interested in it
-						copyIntrinsicsExtrinsics(src.lookupView(pview.id));
-						viewsFixed.add(true);
-					}
-
-					// Copy everything over
-					cpyInfo.views.add(pview);
-					cpyInfo.scoreGeometric = srcInfo.scoreGeometric;
-					cpyInfo.observations.grow().setTo(srcInfo.observations.get(infoViewsIdx));
-
-					// NOTE: Could just reference the original inlier sets once all new views have been added
-				}
+				copyViewAndInlierSet(src, srcView, infoIdx);
 			}
+		}
+	}
+
+	private void copyViewAndInlierSet( SceneWorkingGraph src, SceneWorkingGraph.View srcView, int infoIdx ) {
+		SceneWorkingGraph.View cpyView = srcToCpy.get(srcView.pview.id);
+
+		BoofMiscOps.checkTrue(!srcView.inliers.isEmpty(), "BUG no inliers");
+
+		SceneWorkingGraph.InlierInfo srcInfo = srcView.inliers.get(infoIdx);
+		SceneWorkingGraph.InlierInfo cpyInfo = cpyView.inliers.grow();
+
+		for (int infoViewsIdx = 0; infoViewsIdx < srcInfo.views.size; infoViewsIdx++) {
+			PairwiseImageGraph.View pview = srcInfo.views.get(infoViewsIdx);
+
+			SceneWorkingGraph.View infoView = srcToCpy.get(pview.id);
+			if (infoView == null) {
+				// Add a new view to the subgraph. Mark it as fixed since the user isn't interested in it
+				copyIntrinsicsExtrinsics(src.lookupView(pview.id));
+				viewsFixed.add(true);
+			}
+
+			// Copy everything over
+			cpyInfo.views.add(pview);
+			cpyInfo.scoreGeometric = srcInfo.scoreGeometric;
+			cpyInfo.observations.grow().setTo(srcInfo.observations.get(infoViewsIdx));
+
+			// NOTE: Could just reference the original inlier sets once all new views have been added
 		}
 	}
 

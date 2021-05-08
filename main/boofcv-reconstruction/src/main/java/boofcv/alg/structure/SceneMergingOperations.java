@@ -343,7 +343,7 @@ public class SceneMergingOperations implements VerbosePrint {
 	/**
 	 * Determines the transform (scale and SE3) between the two scenes. This is done using a single view
 	 */
-	public boolean selectViewsToEstimateTransform(
+	public boolean selectViewToEstimateTransform(
 			SceneWorkingGraph src, SceneWorkingGraph dst, SelectedViews selectedPair ) {
 
 		double bestScore = 0.0;

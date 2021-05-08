@@ -56,6 +56,7 @@ Version : 0.38
   * Added SimilarImages implementations that use Image Recognition, i.e. loop closure
   * TODO Improve stability of sparse metric upgrade. Local SBA and multiple seeds?
   * TODO Pruning of views when creating pairwise graph. If too similar do not include it. Could be done before pairwise
+  * TODO After merge is fully working, reconsider old expand by one logic and see if stability can be improved
   * TODO when associating objects split into feature types, e.g. white and black blobs
   * TODO try improving 3-view by estimating lens distortion in projective camera
 - MultiViewOps
