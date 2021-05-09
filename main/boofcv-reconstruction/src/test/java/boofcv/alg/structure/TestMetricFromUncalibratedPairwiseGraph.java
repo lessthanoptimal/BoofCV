@@ -51,7 +51,7 @@ class TestMetricFromUncalibratedPairwiseGraph extends BoofStandardJUnit {
 			protected boolean spawnSceneFromSeed( LookUpSimilarImages db, PairwiseImageGraph pairwise, SeedInfo info ) {
 				if (!super.spawnSceneFromSeed(db, pairwise, info))
 					return false;
-				sanityCheckNodeViews();
+				sanityCheckScenesInEachView();
 				return true;
 			}
 
@@ -59,7 +59,7 @@ class TestMetricFromUncalibratedPairwiseGraph extends BoofStandardJUnit {
 			boolean expandIntoView( LookUpSimilarImages db, SceneWorkingGraph scene, PairwiseImageGraph.View selected ) {
 				if (!super.expandIntoView(db, scene, selected))
 					return false;
-				sanityCheckNodeViews();
+				sanityCheckScenesInEachView();
 				return true;
 			}
 
