@@ -18,10 +18,8 @@
 
 package boofcv.alg.structure;
 
-import boofcv.abst.geo.bundle.MetricBundleAdjustmentUtils;
 import boofcv.alg.structure.SceneMergingOperations.SelectedViews;
 import boofcv.misc.BoofMiscOps;
-import boofcv.struct.image.ImageDimension;
 import lombok.Getter;
 import lombok.Setter;
 import org.ddogleg.struct.DogArray;
@@ -73,6 +71,8 @@ public class MetricFromUncalibratedPairwiseGraph extends ReconstructionFromPairw
 	private final @Getter RefineMetricWorkingGraph refineWorking = new RefineMetricWorkingGraph();
 
 	private final @Getter MetricSpawnSceneFromView spawnScene;
+
+	private final @Getter MetricMergeScenes mergeScenes = new MetricMergeScenes();
 
 	/** If true it will apply sanity checks on results for debugging. This could be expensive */
 	public boolean sanityChecks = false;
@@ -334,11 +334,30 @@ public class MetricFromUncalibratedPairwiseGraph extends ReconstructionFromPairw
 				verbose.println("Merging: src=" + src.index + " dst=" + dst.index + " sizes=(" +
 								src.listViews.size() + " " + dst.listViews.size() + ")");
 
-			// Merge src into dst and try to mesh the scenes geometry at a global level
-			mergeScenesGlobally(db, src, dst);
+			// Remove both views from the counts for now
+			mergeOps.toggleViewEnabled(src, scenesInEachView);
+			mergeOps.toggleViewEnabled(dst, scenesInEachView);
 
-			// Identify and fix views which are geometrically inconsistent
-			fixMergedSceneLocally(db, dst);
+			// Merge the two scenes together
+			int sizeBefore = dst.listViews.size();
+			if (!mergeScenes.merge(db, src, dst))
+				throw new RuntimeException("Handle merge failing");
+			// TODO add logic to handle a failure
+
+			// Mark all the newly added views and being inside of dst
+			for (int i = sizeBefore; i < dst.listViews.size(); i++) {
+				SceneWorkingGraph.View wview = dst.listViews.get(i);
+				scenesInEachView.getView(wview.pview).viewedBy.add(dst.index);
+				scenesInEachView.getView(wview.pview).viewedBy.sort();// TODO use sorter
+			}
+
+			// Add the dst scene back in
+			mergeOps.toggleViewEnabled(dst, scenesInEachView);
+			BoofMiscOps.checkTrue(!mergeOps.enabledScenes.get(src.index), "Should be disabled now");
+			BoofMiscOps.checkTrue(mergeOps.enabledScenes.get(dst.index), "Should be enabled now");
+
+//			sanityCheckScenesInEachView();
+//			mergeOps.sanityCheckTable(scenes.toList());
 
 			// Check the views which were modified for geometric consistency to catch bugs in the code
 			if (sanityChecks) {
@@ -362,130 +381,6 @@ public class MetricFromUncalibratedPairwiseGraph extends ReconstructionFromPairw
 			}
 		}
 		return subset;
-	}
-
-	/**
-	 * Merges tow scenes together by 1) finding common views. 2) Finding a single global transform. 3)
-	 * Applying the transform. 4) Batch optimization on all views that were in the 'src' scene.
-	 */
-	private void mergeScenesGlobally( LookUpSimilarImages db, SceneWorkingGraph src, SceneWorkingGraph dst ) {
-		ScaleSe3_F64 src_to_dst = new ScaleSe3_F64();
-
-		// Remove both views from the counts for now
-		mergeOps.toggleViewEnabled(src, scenesInEachView);
-		mergeOps.toggleViewEnabled(dst, scenesInEachView);
-
-		// Select which view pair to determine the relationship between the scenes from
-		if (!mergeOps.selectViewToEstimateTransform(src, dst, selectedViews))
-			throw new RuntimeException("Merge failed. Unable to selected a view pair");
-
-		// Estimate the transform from the pair
-		if (!mergeOps.computeSceneTransform(db, src, dst, selectedViews.src, selectedViews.dst, src_to_dst))
-			throw new RuntimeException("Merge failed. Unable to determine transform");
-
-		int srcViewCountBefore = src.listViews.size();
-		int dstViewCountBefore = dst.listViews.size();
-
-		// Merge the views
-		if (!mergeOps.mergeViews(db, src, dst, src_to_dst, scenesInEachView)) {
-			throw new RuntimeException("Merge failed. Something went really wrong");
-		}
-
-		if (verbose != null)
-			verbose.println("merge results: src=" + src.index + " dst=" + dst.index +
-					" views: (" + srcViewCountBefore + " , " + dstViewCountBefore +
-					") -> " + dst.listViews.size() + ", scale=" + src_to_dst.scale);
-
-		// Update the counts of dst and enable it again
-		mergeOps.toggleViewEnabled(dst, scenesInEachView);
-		BoofMiscOps.checkTrue(!mergeOps.enabledScenes.get(src.index), "Should be disabled now");
-		BoofMiscOps.checkTrue(mergeOps.enabledScenes.get(dst.index), "Should be enabled now");
-	}
-
-	/**
-	 * Looks at each view and checks physical constraints. If it does not pass that test a local optimization
-	 * is done in an attempt to fix the situation. Previously found inlier sets are used.
-	 *
-	 * TODO write what's actually done
-	 */
-	private void fixMergedSceneLocally( LookUpSimilarImages db, SceneWorkingGraph scene ) {
-		if (verbose != null) verbose.println("Fix Merge!");
-
-		var dimensions = new ArrayList<ImageDimension>();
-
-		int badMergedViews = 0;
-		for (int mergeIdx = 0; mergeIdx < mergeOps.mergedViews.size(); mergeIdx++) {
-			SceneWorkingGraph.View wview = mergeOps.mergedViews.get(mergeIdx);
-
-			// sanity check
-			BoofMiscOps.checkTrue(!wview.inliers.isEmpty());
-
-//			DogArray_I32 same = new DogArray_I32(1000);
-//			same.resize(1000);
-//			for (int idxA = 0; idxA < wview.inliers.size; idxA++) {
-//				same.fill(0);
-//				DogArray_I32 a = wview.inliers.get(idxA).observations.get(0);
-//				a.forEach(value->same.data[value]++);
-//				for (int idxB = idxA+1; idxB < wview.inliers.size; idxB++) {
-//					DogArray_I32 b = wview.inliers.get(idxB).observations.get(0);
-//					b.forEach(value->same.data[value]++);
-//					int count = same.count(2);
-//					System.out.printf("view['%s'] inliers %d and %d overlap %d / (%d %d)\n",
-//							wview.pview.id,idxA,idxB,count,a.size,b.size);
-//					if (count == 0) {
-//						System.out.println("Investigate");
-//					}
-//					b.forEach(value->same.data[value]--);
-//				}
-//			}
-
-			boolean conflict = false;
-
-			// Go through each inlier set and verify it's valid
-			for (int setIdx = 0; setIdx < wview.inliers.size; setIdx++) {
-				mergeOps.refineSubset.setSubset(scene, wview, setIdx);
-				mergeOps.refineSubset.refiner.initializeDataStructures(db, mergeOps.refineSubset.subgraph);
-				mergeOps.refineSubset.refiner.createFeatures3D(mergeOps.refineSubset.subgraph);
-				mergeOps.refineSubset.refiner.pruneUnassignedObservations();
-				MetricBundleAdjustmentUtils utils = mergeOps.refineSubset.refiner.bundleAdjustment;
-
-				dimensions.clear();
-				for (int viewIdx = 0; viewIdx < mergeOps.refineSubset.subgraph.listViews.size(); viewIdx++) {
-					dimensions.add(mergeOps.refineSubset.subgraph.listViews.get(viewIdx).imageDimension);
-				}
-
-				if (!metricChecks.checkPhysicalConstraints(utils, dimensions)) {
-//					throw new RuntimeException("Need to handle this fatal failure");
-				}
-
-				int badObservations = metricChecks.badFeatures.count(true);
-
-				if (badObservations > 10)
-					conflict = true;
-//					badMergedViews++;
-
-				int numFeatures = utils.structure.points.size;
-				if (verbose != null) {
-					verbose.print("_ view='" + wview.pview.id + "' inlier[" + setIdx + "].bad=" + badObservations + "/" + numFeatures);
-					SceneWorkingGraph.InlierInfo info = wview.inliers.get(setIdx);
-					verbose.print(" inliers.views={ ");
-					for (int i = 0; i < info.views.size; i++) {
-						verbose.print("'"+info.views.get(i).id+"' ");
-					}
-					verbose.println("}");
-				}
-			}
-
-//			if (conflict) {
-//				mergeOps.refineSubset.setSubset(scene, wview, setIdx);
-//				mergeOps.refineSubset.refiner.refineViews(mergeOps.refineSubset.subgraph))
-//				metricChecks.checkPhysicalConstraints(utils, dimensions);
-//				badObservations = metricChecks.badFeatures.count(true);
-//				System.out.println("bad after="+badObservations);
-//			}
-
-		}
-		if (verbose != null) verbose.println("Merge. Total failures: "+badMergedViews);
 	}
 
 	/**
@@ -553,7 +448,7 @@ public class MetricFromUncalibratedPairwiseGraph extends ReconstructionFromPairw
 	/**
 	 * Makes sure the number of scenes that have each view is correctly counted. Used for debugging.
 	 */
-	protected void sanityCheckNodeViews() {
+	protected void sanityCheckScenesInEachView() {
 		List<SceneWorkingGraph> expected = new ArrayList<>();
 		for (int viewIdx = 0; viewIdx < scenesInEachView.views.size; viewIdx++) {
 			int _viewIdx = viewIdx;
@@ -646,6 +541,6 @@ public class MetricFromUncalibratedPairwiseGraph extends ReconstructionFromPairw
 	public void setVerbose( @Nullable PrintStream out, @Nullable Set<String> configuration ) {
 		this.verbose = BoofMiscOps.addPrefix(this, out);
 		BoofMiscOps.verboseChildren(verbose, configuration,
-				spawnScene, expandMetric, refineWorking, mergeOps, metricChecks);
+				spawnScene, expandMetric, refineWorking, mergeOps, metricChecks, mergeScenes);
 	}
 }
