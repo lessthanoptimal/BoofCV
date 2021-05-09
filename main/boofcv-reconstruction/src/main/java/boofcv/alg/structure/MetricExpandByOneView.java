@@ -116,7 +116,6 @@ public class MetricExpandByOneView extends ExpandByOneView {
 	final BundlePinholeSimplified targetIntrinsic = new BundlePinholeSimplified();
 
 	List<ImageDimension> listImageShape = new ArrayList<>();
-	MetricSanityChecks bundleChecks = new MetricSanityChecks();
 
 	public MetricExpandByOneView() {
 		listMotion.add(view1_to_view1);
@@ -125,7 +124,7 @@ public class MetricExpandByOneView extends ExpandByOneView {
 //		bundleAdjustment.keepFraction = 0.95; <-- this made it worse by a lot?!
 
 		// TODO clean this up. Only fail on unrecoverable errors, e.g. focal length
-		bundleChecks.maxFractionFail = 1.0;
+		checks.maxFractionFail = 1.0;
 	}
 
 	/**
@@ -229,19 +228,19 @@ public class MetricExpandByOneView extends ExpandByOneView {
 		listImageShape.add(utils.dimenA);
 		listImageShape.add(utils.dimenB);
 		listImageShape.add(utils.dimenC);
-		if (!bundleChecks.checkPhysicalConstraints(bundleAdjustment, listImageShape)) {
+		if (!checks.checkPhysicalConstraints(bundleAdjustment, listImageShape)) {
 			if (verbose != null) verbose.println("Fatal error when checking constraints");
 			return false;
 		}
 
-		BoofMiscOps.checkTrue(utils.inliersThreeView.size() == bundleChecks.badFeatures.size);
+		BoofMiscOps.checkTrue(utils.inliersThreeView.size() == checks.badFeatures.size);
 
 		// See if there are too many bad features for it to trust it
-		int countBadFeatures = bundleChecks.badFeatures.count(true);
-		if (countBadFeatures > fractionBadFeaturesRecover*bundleChecks.badFeatures.size) {
+		int countBadFeatures = checks.badFeatures.count(true);
+		if (countBadFeatures > fractionBadFeaturesRecover*checks.badFeatures.size) {
 			if (verbose != null)
 				verbose.println("Failed check on image and physical constraints. bad=" +
-						countBadFeatures + "/" + bundleChecks.badFeatures.size);
+						countBadFeatures + "/" + checks.badFeatures.size);
 			return false;
 		}
 
@@ -250,8 +249,8 @@ public class MetricExpandByOneView extends ExpandByOneView {
 			return true;
 
 		// Remove the bad features and try again
-		for (int inlierIdx = bundleChecks.badFeatures.size - 1; inlierIdx >= 0; inlierIdx--) {
-			if (!bundleChecks.badFeatures.get(inlierIdx))
+		for (int inlierIdx = checks.badFeatures.size - 1; inlierIdx >= 0; inlierIdx--) {
+			if (!checks.badFeatures.get(inlierIdx))
 				continue;
 			// Order of the inliers doesn't matter, but these two lists need to refer to the same feature
 			utils.inliersThreeView.removeSwap(inlierIdx);
@@ -263,18 +262,18 @@ public class MetricExpandByOneView extends ExpandByOneView {
 		if (!performBundleAdjustment(workGraph))
 			return false;
 
-		if (!bundleChecks.checkPhysicalConstraints(bundleAdjustment, listImageShape)) {
+		if (!checks.checkPhysicalConstraints(bundleAdjustment, listImageShape)) {
 			if (verbose != null) verbose.println("Fatal error when checking constraints, second time.");
 			return false;
 		}
 
 		// If there are bad features after re-optimizing then the solution is likely to be unstable and can't
 		// be trusted even if there are only a few
-		int countBadFeatures2 = bundleChecks.badFeatures.count(true);
+		int countBadFeatures2 = checks.badFeatures.count(true);
 		if (countBadFeatures2 > 0) {
 			if (verbose != null)
 				verbose.println("Failed check on image and physical constraints. bad=" +
-						countBadFeatures2 + "/" + bundleChecks.badFeatures.size);
+						countBadFeatures2 + "/" + checks.badFeatures.size);
 			return false;
 		}
 
@@ -464,6 +463,6 @@ public class MetricExpandByOneView extends ExpandByOneView {
 	@Override public void setVerbose( @Nullable PrintStream out, @Nullable Set<String> configuration ) {
 		super.setVerbose(out, configuration);
 
-		BoofMiscOps.verboseChildren(verbose, configuration, bundleChecks);
+		BoofMiscOps.verboseChildren(verbose, configuration, checks);
 	}
 }

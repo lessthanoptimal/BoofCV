@@ -22,10 +22,7 @@ import boofcv.misc.BoofMiscOps;
 import boofcv.struct.image.ImageDimension;
 import georegression.struct.se.Se3_F64;
 import lombok.Getter;
-import org.ddogleg.struct.DogArray;
-import org.ddogleg.struct.DogArray_B;
-import org.ddogleg.struct.FastArray;
-import org.ddogleg.struct.VerbosePrint;
+import org.ddogleg.struct.*;
 import org.jetbrains.annotations.Nullable;
 
 import java.io.PrintStream;
@@ -57,6 +54,9 @@ public class MetricMergeScenes implements VerbosePrint {
 	// Helpful functions
 	SceneMergingOperations mergingOps = new SceneMergingOperations();
 
+	/** If less than this number of features fail the physical constraint test, attempt to recover by removing them */
+	public double fractionBadFeaturesRecover = 0.05;
+
 	/** Used to refine the scene */
 	@Getter RefineMetricWorkingGraph refiner = new RefineMetricWorkingGraph();
 
@@ -81,8 +81,13 @@ public class MetricMergeScenes implements VerbosePrint {
 	// List of views in 'src' that already have had their inlier sets added to the scene
 	Set<String> viewsWithInliers = new HashSet<>();
 
+	Set<String> viewsNotMerged = new HashSet<>();
+
 	// Used to see if any views that are not known yet have been added. If not we will need to add some
 	int unknownViewsAdded;
+
+	// Views in the scene which need to be validated/fixed still
+	DogArray_I32 viewsToCheck = new DogArray_I32();
 
 	// Local workspace
 	Se3_F64 src_to_view = new Se3_F64();
@@ -105,8 +110,10 @@ public class MetricMergeScenes implements VerbosePrint {
 				if (knownViews.get(wview.index))
 					continue;
 
-				if (wview.inliers.isEmpty())
+				if (viewsNotMerged.contains(wview.pview.id))
 					return false;
+//				if (wview.inliers.isEmpty())
+//					return false;
 			}
 			return true;
 		};
@@ -121,6 +128,7 @@ public class MetricMergeScenes implements VerbosePrint {
 	 * @return true if src was merged into dst or false if it failed and nothing has been modified
 	 */
 	public boolean merge( LookUpSimilarImages db, SceneWorkingGraph src, SceneWorkingGraph dst ) {
+		BoofMiscOps.checkTrue(viewsToCheck.isEmpty(), "If not empty then not all were checked last time");
 		unknownViewsAdded = 0;
 		dimensions.clear();
 		viewsNeedingInliers.clear();
@@ -155,9 +163,12 @@ public class MetricMergeScenes implements VerbosePrint {
 					src.listViews.size(), dst.listViews.size(), commonViews.size, scene.listViews.size(), src_to_dst.scale);
 
 		// Add all the views while merging them in
-		incrementallyAddViewsToScene(db, src);
+		if (!incrementallyAddViewsToScene(db, src)) {
+			viewsToCheck.reset();
+			return false;
+		}
 
-		checks.checkPhysicalConstraints(refiner.bundleAdjustment, dimensions);
+//		checks.checkPhysicalConstraints(refiner.bundleAdjustment, dimensions);
 
 		// Sanity check to make sure the entire src has been merged
 		int estimatedSrcSize = commonViews.size + knownViews.count(false);
@@ -168,6 +179,9 @@ public class MetricMergeScenes implements VerbosePrint {
 		// Copy the results over
 		mergeWorkingSceneIntoDst(dst);
 
+		if (!viewsToCheck.isEmpty())
+			System.out.println("Check here");
+
 		if (verbose != null) verbose.println("merged dst.size="+dst.listViews.size());
 
 		return true;
@@ -177,7 +191,7 @@ public class MetricMergeScenes implements VerbosePrint {
 	 * Grows the work scene by adding views which are closest to the dst scene's border first. This avoids issue
 	 * where the two scenes have diverged so much that distant views in src converge to a bad minimum
 	 */
-	private void incrementallyAddViewsToScene( LookUpSimilarImages db, SceneWorkingGraph src ) {
+	private boolean incrementallyAddViewsToScene( LookUpSimilarImages db, SceneWorkingGraph src ) {
 		// TODO consider locking a view if it was added a couple of iterations ago to speed things up?
 		int iteration = 0;
 		while (true) {
@@ -185,18 +199,31 @@ public class MetricMergeScenes implements VerbosePrint {
 
 			BoofMiscOps.checkEq(scene.listViews.size(), knownViews.size);
 
-			boolean success = refiner.process(db, scene, utils -> {
+			if (!refiner.process(db, scene, utils -> {
 				for (int i = 0; i < knownViews.size; i++) {
 					utils.structure.cameras.get(i).known = knownViews.get(i);
 					utils.structure.motions.get(i).known = knownViews.get(i);
-				}
-			});
-
-			if (!success) {
-				throw new RuntimeException("Refine failed");
+				}})) {
+				if (verbose != null) verbose.println("Refine failed. First pass.");
+				return false;
 			}
 
-			// TODO sanity check and fix minor errors if needed
+			// all the new views now have information from 'dst' and are now merged
+			viewsNotMerged.clear();
+
+			// Run with all the inlier sets
+			if (!refiner.process(db, scene, utils -> {
+				for (int i = 0; i < knownViews.size; i++) {
+					utils.structure.cameras.get(i).known = knownViews.get(i);
+					utils.structure.motions.get(i).known = knownViews.get(i);
+				}})) {
+				if (verbose != null) verbose.println("Refine failed. Second pass.");
+				return false;
+			}
+
+			// Attempt to fix views which were just added
+			if (!examineAndFixViews(db))
+				return false;
 
 			// If a view was added before, but without its inlier sets, add those inlier sets now and add
 			// the views it references without inlier sets
@@ -206,6 +233,8 @@ public class MetricMergeScenes implements VerbosePrint {
 				SceneWorkingGraph.View wview = viewsNeedingInliers.get(i);
 				SceneWorkingGraph.View origView = src.views.get(wview.pview.id);
 
+				viewsToCheck.add(wview.index);
+				BoofMiscOps.checkTrue(wview.index < scene.listViews.size());
 				DogArray<SceneWorkingGraph.InlierInfo> inliersSrc = origView.inliers;
 
 				viewsWithInliers.add(wview.pview.id);
@@ -220,6 +249,7 @@ public class MetricMergeScenes implements VerbosePrint {
 					addViewsButNoInliers(src, orig.views, false);
 				}
 			}
+
 			// Remove from the list views which have had their inliers added
 			for (int i = 0; i < sizeBefore; i++) {
 				viewsNeedingInliers.remove(0);
@@ -241,7 +271,25 @@ public class MetricMergeScenes implements VerbosePrint {
 				utils.structure.motions.get(i).known = knownViews.get(i);
 			}
 		});
-		// TODO Fix views
+		if (!success)
+			if (verbose != null) verbose.println("Refine at the end failed");
+
+		if (!examineAndFixViews(db))
+			return false;
+
+		return true;
+	}
+
+	private boolean examineAndFixViews( LookUpSimilarImages db ) {
+		while (!viewsToCheck.isEmpty()) {
+			int viewIdx = viewsToCheck.removeTail();
+			SceneWorkingGraph.View wview = scene.listViews.get(viewIdx);
+			if (!fixView(db, wview)) {
+				if (verbose != null) verbose.println("Unable to fix view='"+wview.pview.id+"'");
+				return false;
+			}
+		}
+		return true;
 	}
 
 	private void mergeWorkingSceneIntoDst( SceneWorkingGraph dst ) {
@@ -278,6 +326,7 @@ public class MetricMergeScenes implements VerbosePrint {
 			knownViews.add(true);
 			dimensions.add(wview.imageDimension);
 			viewsWithInliers.add(wview.pview.id);
+			viewsToCheck.add(i);
 		}
 
 		// Add the inliers from dst first. This is used to anchor the world in place
@@ -346,18 +395,20 @@ public class MetricMergeScenes implements VerbosePrint {
 		if (!markAsKnown)
 			convertNewViewCoordinateSystem(copyView);
 
-		if (!markAsKnown)
+		if (!markAsKnown) {
+			BoofMiscOps.checkTrue(viewsNotMerged.add(copyView.pview.id));
 			unknownViewsAdded++;
+		}
 	}
 
 	private void addViewsWhichReferenceViewsWithInliers( SceneWorkingGraph src ) {
 		for (int i = 0; i < src.listViews.size(); i++) {
-			SceneWorkingGraph.View wview = src.listViews.get(i);
-			if (scene.views.containsKey(wview.pview.id))
+			SceneWorkingGraph.View srcWView = src.listViews.get(i);
+			if (scene.views.containsKey(srcWView.pview.id))
 				continue;
 
 			boolean referencesKnown = false;
-			DogArray<SceneWorkingGraph.InlierInfo> inliers = wview.inliers;
+			DogArray<SceneWorkingGraph.InlierInfo> inliers = srcWView.inliers;
 			escape:
 			for (int inlierIdx = 0; inlierIdx < inliers.size; inlierIdx++) {
 				SceneWorkingGraph.InlierInfo info = inliers.get(inlierIdx);
@@ -366,7 +417,7 @@ public class MetricMergeScenes implements VerbosePrint {
 					if (!viewsWithInliers.contains(id))
 						continue;
 					if (verbose != null)
-						verbose.println("Adding view-no-inliers id='" + wview.pview.id + "' references'" + id + "' f="+wview.intrinsic.f);
+						verbose.println("Adding view-no-inliers id='" + srcWView.pview.id + "' references'" + id + "' f="+srcWView.intrinsic.f);
 					referencesKnown = true;
 					break escape;
 				}
@@ -375,7 +426,7 @@ public class MetricMergeScenes implements VerbosePrint {
 			if (!referencesKnown)
 				continue;
 
-			copyIntoSceneJustState(src, false, wview.pview);
+			copyIntoSceneJustState(src, false, srcWView.pview);
 		}
 	}
 
@@ -413,6 +464,31 @@ public class MetricMergeScenes implements VerbosePrint {
 			verbose.println("}");
 		}
 	}
+
+	boolean fixView( LookUpSimilarImages db, SceneWorkingGraph.View wview ) {
+		if (scene.listViews.get(wview.index).inliers.isEmpty())
+			throw new RuntimeException("BUG");
+
+		if (verbose!=null) verbose.println("Validating/Fixing view='"+wview.pview.id+"'");
+
+		RefineMetricGraphSubset refineLocal = new RefineMetricGraphSubset();
+		refineLocal.setSubset(scene, wview);
+		refineLocal.refiner.constructBundleScene(db, refineLocal.subgraph);
+
+		if (!checks.checkPhysicalConstraints(refineLocal.refiner.bundleAdjustment, refineLocal.imageDimensions))
+			return false;
+
+		int countBadFeatures = checks.badFeatures.count(true);
+		if (countBadFeatures > fractionBadFeaturesRecover*checks.badFeatures.size) {
+			if (verbose != null)
+				verbose.println("Failed physical constraints. bad=" +
+						countBadFeatures + "/" + checks.badFeatures.size);
+			return false;
+		}
+
+		return true;
+	}
+
 
 	@Override public void setVerbose( @Nullable PrintStream out, @Nullable Set<String> configuration ) {
 		this.verbose = BoofMiscOps.addPrefix(this, out);

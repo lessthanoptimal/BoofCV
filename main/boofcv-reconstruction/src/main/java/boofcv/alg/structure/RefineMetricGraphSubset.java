@@ -20,6 +20,7 @@ package boofcv.alg.structure;
 
 import boofcv.abst.geo.bundle.MetricBundleAdjustmentUtils;
 import boofcv.misc.BoofMiscOps;
+import boofcv.struct.image.ImageDimension;
 import georegression.struct.se.Se3_F64;
 import lombok.Getter;
 import org.ddogleg.struct.DogArray_B;
@@ -66,6 +67,8 @@ public class RefineMetricGraphSubset implements VerbosePrint {
 
 	PrintStream verbose;
 
+	List<ImageDimension> imageDimensions = new ArrayList<>();
+
 	// Internal workspace
 	Se3_F64 tmp = new Se3_F64();
 
@@ -75,9 +78,11 @@ public class RefineMetricGraphSubset implements VerbosePrint {
 	}
 
 	/**
-	 * Creates a sub-graph from a single view and inlier set
+	 * Creates a sub-graph from a single view and add all its inlier sets. This will also require adding the
+	 * views referenced in the inlier sets
 	 */
-	public void setSubset( SceneWorkingGraph src, SceneWorkingGraph.View srcView, int infoIdx ) {
+	public void setSubset( SceneWorkingGraph src, SceneWorkingGraph.View srcView) {
+		imageDimensions.clear();
 		srcViews.clear();
 		srcViews.add(srcView);
 
@@ -88,7 +93,12 @@ public class RefineMetricGraphSubset implements VerbosePrint {
 		subgraph.reset();
 
 		copyIntrinsicsExtrinsics(srcView);
-		copyViewAndInlierSet(src, srcView, infoIdx);
+		for (int infoIdx = 0; infoIdx < srcView.inliers.size; infoIdx++) {
+			copyViewAndInlierSet(src, srcView, infoIdx);
+		}
+
+		// Sanity checks
+		BoofMiscOps.checkEq(imageDimensions.size(), subgraph.listViews.size());
 	}
 
 	/**
@@ -99,6 +109,7 @@ public class RefineMetricGraphSubset implements VerbosePrint {
 	 * @param srcViews The views in the scene which compose the sub-scene
 	 */
 	public void setSubset( SceneWorkingGraph src, List<SceneWorkingGraph.View> srcViews ) {
+		imageDimensions.clear();
 		this.srcViews.clear();
 		this.srcViews.addAll(srcViews);
 
@@ -134,6 +145,9 @@ public class RefineMetricGraphSubset implements VerbosePrint {
 				copyViewAndInlierSet(src, srcView, infoIdx);
 			}
 		}
+
+		// Sanity checks
+		BoofMiscOps.checkEq(imageDimensions.size(), subgraph.listViews.size());
 	}
 
 	private void copyViewAndInlierSet( SceneWorkingGraph src, SceneWorkingGraph.View srcView, int infoIdx ) {
@@ -169,6 +183,8 @@ public class RefineMetricGraphSubset implements VerbosePrint {
 		cpyView.world_to_view.setTo(srcView.world_to_view);
 		cpyView.intrinsic.setTo(srcView.intrinsic);
 		cpyView.imageDimension.setTo(srcView.imageDimension);
+
+		imageDimensions.add(cpyView.imageDimension);
 
 		BoofMiscOps.checkTrue(null == srcToCpy.put(srcView.pview.id, cpyView));
 	}
