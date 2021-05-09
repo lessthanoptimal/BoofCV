@@ -69,7 +69,7 @@ public class RefineMetricWorkingGraph implements VerbosePrint {
 	/** Bundle Adjustment functions and configurations */
 	public final MetricBundleAdjustmentUtils bundleAdjustment;
 
-	// pixels to undistorted normalized image coordinates and the erverse
+	// pixels to undistorted normalized image coordinates and the reverse
 	protected final List<Point2Transform2_F64> listPixelToNorm = new ArrayList<>();
 	protected final List<Point2Transform2_F64> listNormToPixel = new ArrayList<>();
 
@@ -79,6 +79,9 @@ public class RefineMetricWorkingGraph implements VerbosePrint {
 	private @Nullable PrintStream verbose;
 	/** If verbose, then it will print view specific information. This can get very verbose in large scenes */
 	public boolean verboseViewInfo = true;
+
+	/** Used to provide custom logic when triangulating points. Useful when merging scenes */
+	public FilterInlierSet inlierFilter = ( scene, info ) -> true;
 
 	//------------------------ Internal workspace
 
@@ -138,8 +141,11 @@ public class RefineMetricWorkingGraph implements VerbosePrint {
 							CallBeforeRefine op ) {
 		// Pre-declare and compute basic data structures
 		initializeDataStructures(db, graph);
+
 		// Use observations defined in the graph to create the list of 3D features which will be optimized
-		createFeatures3D(graph);
+		if (!createFeatures3D(graph))
+			return false;
+
 		// Clean up by removing observations which were never assigned to a feature
 		pruneUnassignedObservations();
 
@@ -200,7 +206,9 @@ public class RefineMetricWorkingGraph implements VerbosePrint {
 	/**
 	 * Computes the 3D features by triangulating inliers
 	 */
-	void createFeatures3D( SceneWorkingGraph graph ) {
+	boolean createFeatures3D( SceneWorkingGraph graph ) {
+		int filtered = 0;
+		int total = 0;
 		// For each view, with a set inliers, create a set of triangulated 3D point features
 		for (int workingIdx = 0; workingIdx < graph.listViews.size(); workingIdx++) {
 			SceneWorkingGraph.View wview = graph.listViews.get(workingIdx);
@@ -208,12 +216,23 @@ public class RefineMetricWorkingGraph implements VerbosePrint {
 			for (int infoIdx = 0; infoIdx < wview.inliers.size; infoIdx++) {
 				final SceneWorkingGraph.InlierInfo inliers = wview.inliers.get(infoIdx);
 
+				// See if it should skip over these features
+				if (!inlierFilter.keep(wview, inliers)) {
+					filtered++;
+					continue;
+				}
+
 				if (verbose != null && verboseViewInfo)
 					verbose.print("inlier[" + infoIdx + "] view='" + wview.pview.id + "' size=" + inliers.getInlierCount() + " , ");
 
 				createFeaturesFromInlierInfo(graph, inliers);
 			}
+			total += wview.inliers.size;
 		}
+
+		if (verbose != null) verbose.println("triangulation: sets: skipped="+filtered+" total="+total);
+
+		return filtered < total;
 	}
 
 	private void createFeaturesFromInlierInfo( SceneWorkingGraph graph, SceneWorkingGraph.InlierInfo inlierSet ) {
@@ -520,5 +539,13 @@ public class RefineMetricWorkingGraph implements VerbosePrint {
 	@FunctionalInterface
 	public interface CallBeforeRefine {
 		void process( MetricBundleAdjustmentUtils utils );
+	}
+
+	/**
+	 * Filter for inlier sets. if it returns true it should be processed
+	 */
+	@FunctionalInterface
+	public interface FilterInlierSet {
+		boolean keep( SceneWorkingGraph.View view, SceneWorkingGraph.InlierInfo info );
 	}
 }
