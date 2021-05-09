@@ -92,7 +92,24 @@ public class MetricMergeScenes implements VerbosePrint {
 
 	public MetricMergeScenes() {
 		checks.maxFractionFail = 1.0;
-//		refiner.verboseViewInfo = false;
+		refiner.verboseViewInfo = false;
+
+		// This adds a filter that prevents features from being added to the SBA scene which would be
+		// triangulated using views that have been merged in. This is to prevent the old 'src' state
+		// from fighting the merger into 'dst'
+		refiner.inlierFilter = (view, info) -> {
+			for (int i = 0; i < info.views.size; i++) {
+				SceneWorkingGraph.View wview = scene.views.get(info.views.get(i).id);
+
+				// If it's "known" it doesn't require inliers. Probably from 'dst' scene
+				if (knownViews.get(wview.index))
+					continue;
+
+				if (wview.inliers.isEmpty())
+					return false;
+			}
+			return true;
+		};
 	}
 
 	/**
@@ -140,7 +157,7 @@ public class MetricMergeScenes implements VerbosePrint {
 		// Add all the views while merging them in
 		incrementallyAddViewsToScene(db, src);
 
-//		checks.checkPhysicalConstraints(refiner.bundleAdjustment, dimensions);
+		checks.checkPhysicalConstraints(refiner.bundleAdjustment, dimensions);
 
 		// Sanity check to make sure the entire src has been merged
 		int estimatedSrcSize = commonViews.size + knownViews.count(false);
@@ -167,8 +184,6 @@ public class MetricMergeScenes implements VerbosePrint {
 			if (verbose != null) verbose.printf("Iteration=%d, scene.size=%d\n", iteration++, scene.listViews.size());
 
 			BoofMiscOps.checkEq(scene.listViews.size(), knownViews.size);
-
-			// TODO when a view is first added do not use inliers that would be triangulated without info from dst
 
 			boolean success = refiner.process(db, scene, utils -> {
 				for (int i = 0; i < knownViews.size; i++) {
@@ -217,6 +232,16 @@ public class MetricMergeScenes implements VerbosePrint {
 			if (unknownViewsAdded == 0)
 				break;
 		}
+
+		// One last refinement with everything all together now. The last iteration might not include all the
+		// features it could
+		boolean success = refiner.process(db, scene, utils -> {
+			for (int i = 0; i < knownViews.size; i++) {
+				utils.structure.cameras.get(i).known = knownViews.get(i);
+				utils.structure.motions.get(i).known = knownViews.get(i);
+			}
+		});
+		// TODO Fix views
 	}
 
 	private void mergeWorkingSceneIntoDst( SceneWorkingGraph dst ) {
@@ -373,8 +398,10 @@ public class MetricMergeScenes implements VerbosePrint {
 			commonViews.grow().setTo(srcView, dstView, score);
 
 			if (verbose != null) {
-				verbose.printf("common.id='%s' src.f=%.2f dst.f=%.2f\n",
-						srcView.pview.id, srcView.intrinsic.f, dstView.intrinsic.f);
+				verbose.printf("common.id='%s' src={ f=%.1f k1=%.1e k2=%.1e } dst={ f=%.1f k1=%.1e k2=%.1e }\n",
+						srcView.pview.id,
+						srcView.intrinsic.f, srcView.intrinsic.k1, srcView.intrinsic.k2,
+						dstView.intrinsic.f,dstView.intrinsic.k1,dstView.intrinsic.k2);
 			}
 		}
 
