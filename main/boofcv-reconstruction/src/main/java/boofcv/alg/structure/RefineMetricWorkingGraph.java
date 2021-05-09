@@ -139,6 +139,19 @@ public class RefineMetricWorkingGraph implements VerbosePrint {
 	 */
 	public boolean process( LookUpSimilarImages db, SceneWorkingGraph graph,
 							CallBeforeRefine op ) {
+		if (!constructBundleScene(db, graph))
+			return false;
+
+		// Use provided function that allows for customization
+		op.process(bundleAdjustment);
+
+		return refineViews(graph);
+	}
+
+	/**
+	 * Initializes the scene in bundle adjustment
+	 */
+	public boolean constructBundleScene( LookUpSimilarImages db, SceneWorkingGraph graph ) {
 		// Pre-declare and compute basic data structures
 		initializeDataStructures(db, graph);
 
@@ -149,10 +162,7 @@ public class RefineMetricWorkingGraph implements VerbosePrint {
 		// Clean up by removing observations which were never assigned to a feature
 		pruneUnassignedObservations();
 
-		// Use provided function that allows for customization
-		op.process(bundleAdjustment);
-
-		return refineViews(graph);
+		return true;
 	}
 
 	/**
@@ -230,7 +240,7 @@ public class RefineMetricWorkingGraph implements VerbosePrint {
 			total += wview.inliers.size;
 		}
 
-		if (verbose != null) verbose.println("triangulation: sets: skipped="+filtered+" total="+total);
+		if (verbose != null) verbose.println("triangulation: sets: skipped=" + filtered + " total=" + total);
 
 		return filtered < total;
 	}
