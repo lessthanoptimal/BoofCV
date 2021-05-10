@@ -59,6 +59,11 @@ public class MetricSanityChecks implements VerbosePrint {
 	// If true then the feature was marked as bad
 	public DogArray_B badFeatures = new DogArray_B();
 
+	int failedTriangulate;
+	int failedBehind;
+	int failedImageBounds;
+	int failedReprojection;
+
 	/**
 	 * Applies a positive depth constraint on triangulated inlier features for a view.
 	 */
@@ -149,6 +154,109 @@ public class MetricSanityChecks implements VerbosePrint {
 			}
 			throw new RuntimeException("Failed positive depth. bad=" + bad + "/" + numFeatures);
 		}
+	}
+
+	public boolean checkPhysicalConstraints( LookUpSimilarImages db,
+											 SceneWorkingGraph scene, SceneWorkingGraph.View wview, int setIdx ) {
+		failedTriangulate = 0;
+		failedBehind = 0;
+		failedImageBounds = 0;
+		failedReprojection = 0;
+
+		SceneWorkingGraph.InlierInfo inliers = wview.inliers.get(setIdx);
+
+		int numFeatures = inliers.getInlierCount();
+		badFeatures.resetResize(numFeatures, false);
+
+		List<SceneWorkingGraph.View> listViews = new ArrayList<>();
+		List<RemoveBrownPtoN_F64> listNormalize = new ArrayList<>();
+		List<Se3_F64> listMotion = new ArrayList<>();
+		List<DogArray<Point2D_F64>> listFeatures = new ArrayList<>();
+		List<Point2D_F64> listViewPixels = new ArrayList<>();
+
+		Se3_F64 view1_to_world = wview.world_to_view.invert(null);
+
+		for (int i = 0; i < inliers.views.size; i++) {
+			SceneWorkingGraph.View w = scene.lookupView(inliers.views.get(i).id);
+			if (w.intrinsic.f <= 0.0) {
+				if (verbose != null) verbose.println("Negative focal length. view='"+w.pview.id+"'");
+				return false;
+			}
+
+			listViews.add(w);
+			var normalize = new RemoveBrownPtoN_F64();
+			normalize.setK(w.intrinsic.f, w.intrinsic.f, 0, 0, 0).setDistortion(w.intrinsic.k1, w.intrinsic.k2);
+			listNormalize.add(normalize);
+
+			listMotion.add(view1_to_world.concat(w.world_to_view, null));
+
+			var features = new DogArray<>(Point2D_F64::new);
+			db.lookupPixelFeats(w.pview.id, features);
+			double cx = w.imageDimension.width/2;
+			double cy = w.imageDimension.height/2;
+			features.forEach(p -> p.setTo(p.x - cx, p.y - cy));
+			listFeatures.add(features);
+		}
+
+		List<Point2D_F64> pixelNorms = BoofMiscOps.createListFilled(inliers.views.size, Point2D_F64::new);
+
+		Point4D_F64 foundX = new Point4D_F64();
+		Point4D_F64 viewX = new Point4D_F64();
+		Point2D_F64 predictdPixel = new Point2D_F64();
+
+		for (int inlierIdx = 0; inlierIdx < numFeatures; inlierIdx++) {
+			listViewPixels.clear();
+			for (int viewIdx = 0; viewIdx < listViews.size(); viewIdx++) {
+				Point2D_F64 p = listFeatures.get(viewIdx).get(inliers.observations.get(viewIdx).get(inlierIdx));
+				listViewPixels.add(p);
+				listNormalize.get(viewIdx).compute(p.x, p.y, pixelNorms.get(viewIdx));
+			}
+
+			if (!triangulator.triangulate(pixelNorms, listMotion, foundX)) {
+				failedTriangulate++;
+				badFeatures.set(inlierIdx, true);
+				continue;
+			}
+
+			boolean badObservation = false;
+
+			for (int viewIdx = 0; viewIdx < listViews.size(); viewIdx++) {
+				Se3_F64 view1_to_view = listMotion.get(viewIdx);
+				SceneWorkingGraph.View w = listViews.get(viewIdx);
+				int width = w.imageDimension.width;
+				int height = w.imageDimension.height;
+
+				double cx = width/2;
+				double cy = height/2;
+
+				if (foundX.z*foundX.w < 0) {
+					badObservation = true;
+					failedBehind++;
+				}
+
+				SePointOps_F64.transform(view1_to_view, foundX, viewX);
+				wview.intrinsic.project(viewX.x, viewX.y, viewX.z, predictdPixel);
+				double reprojectionError = predictdPixel.distance2(listViewPixels.get(viewIdx));
+				if (reprojectionError > maxReprojectionErrorSq) {
+					badObservation = true;
+					failedReprojection++;
+				}
+
+				if (!BoofMiscOps.isInside(width, height, predictdPixel.x + cx, predictdPixel.y + cy)) {
+					badObservation = true;
+					failedImageBounds++;
+				}
+			}
+
+			badFeatures.set(inlierIdx, badObservation);
+		}
+
+		if (verbose != null)
+			verbose.printf("view.id='%s' inlierIdx=%d, errors: behind=%d bounds=%d reprojection=%d tri=%d. obs=%d\n",
+					wview.pview.id, setIdx,
+					failedBehind, failedImageBounds, failedReprojection, failedTriangulate, numFeatures);
+
+		return true;
 	}
 
 	public boolean checkPhysicalConstraints( MetricBundleAdjustmentUtils bundle,
