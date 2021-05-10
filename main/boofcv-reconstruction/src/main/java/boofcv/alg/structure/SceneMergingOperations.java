@@ -92,6 +92,8 @@ public class SceneMergingOperations implements VerbosePrint {
 	// -1 if it's not int common list
 	DogArray_I32 zeroFeatureToCommonIndex = new DogArray_I32();
 
+	DogArray<FailedMerged> failedMerges = new DogArray<>(FailedMerged::new, FailedMerged::reset);
+
 	@Nullable PrintStream verbose;
 
 	/**
@@ -103,6 +105,9 @@ public class SceneMergingOperations implements VerbosePrint {
 	public void initializeViewCounts( PairwiseViewScenes scenesInEachView, int numScenes ) {
 		BoofMiscOps.checkTrue(scenesInEachView.views.size > 0, "There are no views");
 		BoofMiscOps.checkTrue(numScenes > 0, "There are no scenes");
+
+		// not used for view counts, but needs to be reset also
+		failedMerges.reset();
 
 		// Initializes data structures
 		commonViewCounts.resetResize(numScenes);
@@ -206,6 +211,10 @@ public class SceneMergingOperations implements VerbosePrint {
 				if (overlap.counts <= bestCommon)
 					continue;
 
+				// See if this has been banned
+				if (isMergedBlocked(sceneIndexA, overlap.sceneIndex))
+					continue;
+
 				bestCommon = overlap.counts;
 				selected.sceneA = sceneIndexA;
 				selected.sceneB = overlap.sceneIndex;
@@ -213,6 +222,32 @@ public class SceneMergingOperations implements VerbosePrint {
 		}
 
 		return bestCommon > 0;
+	}
+
+	/**
+	 * Checks to see if the two scenes can be merged together
+	 *
+	 * @return true means they are NOT allowed to merge. I.e. they are blocked
+	 */
+	public boolean isMergedBlocked( int indexSrc, int indexDst ) {
+		BoofMiscOps.checkTrue(indexSrc < indexDst);
+
+		for (int failedIdx = 0; failedIdx < failedMerges.size; failedIdx++) {
+			FailedMerged f = failedMerges.get(failedIdx);
+			if (f.src.index != indexSrc || f.dst.index != indexDst) {
+				continue;
+			}
+
+			// See if either list has been modified
+			if (f.src.listViews.size() == f.viewCountSrc && f.dst.listViews.size() == f.viewCountDst ) {
+				return true;
+			}
+
+			// one of the scenes has been modified and the ban is no longer valid
+			failedMerges.removeSwap(failedIdx);
+			return false;
+		}
+		return false;
 	}
 
 	/**
@@ -694,6 +729,25 @@ public class SceneMergingOperations implements VerbosePrint {
 	}
 
 	/**
+	 * Mark merging these two scenes as illegal until one of them has been merged with another scene or modified
+	 * in some way.
+	 */
+	public void markAsFailed( SceneWorkingGraph src, SceneWorkingGraph dst ) {
+		// We will define the src as always the one with the lower index to make retrieval easier
+		if (src.index > dst.index) {
+			SceneWorkingGraph tmp = src;
+			src = dst;
+			dst = tmp;
+		}
+
+		FailedMerged failed = failedMerges.grow();
+		failed.src = src;
+		failed.dst = dst;
+		failed.viewCountSrc = src.listViews.size();
+		failed.viewCountDst = dst.listViews.size();
+	}
+
+	/**
 	 * Specifies how many views two scenes have in common. The first scene will have a list of this and is
 	 * implicitly the 'other' scene, which is why only one is contained here.
 	 */
@@ -720,5 +774,19 @@ public class SceneMergingOperations implements VerbosePrint {
 	public static class SelectedViews {
 		public SceneWorkingGraph.View src;
 		public SceneWorkingGraph.View dst;
+	}
+
+	public static class FailedMerged {
+		public SceneWorkingGraph src;
+		public SceneWorkingGraph dst;
+		public int viewCountSrc;
+		public int viewCountDst;
+
+		public void reset() {
+			src = null;
+			dst = null;
+			viewCountSrc = -1;
+			viewCountDst = -1;
+		}
 	}
 }

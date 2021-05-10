@@ -332,17 +332,22 @@ public class MetricFromUncalibratedPairwiseGraph extends ReconstructionFromPairw
 
 			if (verbose != null)
 				verbose.println("Merging: src=" + src.index + " dst=" + dst.index + " sizes=(" +
-								src.listViews.size() + " " + dst.listViews.size() + ")");
+						src.listViews.size() + " " + dst.listViews.size() + ")");
+
+
+			// Merge the two scenes together
+			int sizeBefore = dst.listViews.size();
+			if (!mergeScenes.merge(db, src, dst)) {
+				if (verbose != null)
+					verbose.println("FAILED: Merged locking until modified. src=" + src.index + " dst=" + dst.index);
+				// Mark merging these two scenes are impossible until one of them is modified
+				mergeOps.markAsFailed(src, dst);
+				continue;
+			}
 
 			// Remove both views from the counts for now
 			mergeOps.toggleViewEnabled(src, scenesInEachView);
 			mergeOps.toggleViewEnabled(dst, scenesInEachView);
-
-			// Merge the two scenes together
-			int sizeBefore = dst.listViews.size();
-			if (!mergeScenes.merge(db, src, dst))
-				throw new RuntimeException("Handle merge failing");
-			// TODO add logic to handle a failure
 
 			// Mark all the newly added views and being inside of dst
 			for (int i = sizeBefore; i < dst.listViews.size(); i++) {
