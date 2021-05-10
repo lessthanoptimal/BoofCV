@@ -530,7 +530,8 @@ public class RefineMetricWorkingGraph implements VerbosePrint {
 			if (verbose != null && verboseViewInfo) {
 				Se3_F64 m = bundleAdjustment.structure.getParentToView(viewIdx);
 				double theta = ConvertRotation3D_F64.matrixToRodrigues(m.R, null).theta;
-				verbose.printf("AFTER SBA T=(%.2f %.2f %.2f) R=%.4f, f=%.1f k1=%.1e k2=%.1e\n", m.T.x, m.T.y, m.T.z, theta,
+				verbose.printf("AFTER view='%s' T=(%.2f %.2f %.2f) R=%.4f, f=%.1f k1=%.1e k2=%.1e\n",
+						wview.pview.id, m.T.x, m.T.y, m.T.z, theta,
 						wview.intrinsic.f, wview.intrinsic.k1, wview.intrinsic.k2);
 			}
 		}
