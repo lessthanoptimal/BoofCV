@@ -331,7 +331,7 @@ public class MetricFromUncalibratedPairwiseGraph extends ReconstructionFromPairw
 			}
 
 			if (verbose != null)
-				verbose.println("Merging: src=" + src.index + " dst=" + dst.index + " sizes=(" +
+				verbose.println("Merge: src=" + src.index + " dst=" + dst.index + " sizes=(" +
 						src.listViews.size() + " " + dst.listViews.size() + ")");
 
 
@@ -344,6 +344,8 @@ public class MetricFromUncalibratedPairwiseGraph extends ReconstructionFromPairw
 				mergeOps.markAsFailed(src, dst);
 				continue;
 			}
+
+			if (verbose != null) verbose.println("Success merging. dst.size="+dst.listViews.size());
 
 			// Remove both views from the counts for now
 			mergeOps.toggleViewEnabled(src, scenesInEachView);
