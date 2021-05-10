@@ -140,7 +140,6 @@ public class PairwiseGraphUtils {
 	 * @param seed (Input) The view which is used as the reference point
 	 * @param connectIdx (Input) Indexes of connections in the seed view that will be searched for common connections
 	 * @param commonIdx (Output) Indexes of observation in seed that are visible in connected views
-	 * @return indexes of common tracks. Indexes are indexes in the seed View
 	 */
 	public void findAllConnectedSeed( View seed, DogArray_I32 connectIdx, DogArray_I32 commonIdx ) {
 		if (connectIdx.size < 1)

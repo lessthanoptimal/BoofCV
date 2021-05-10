@@ -189,7 +189,7 @@ public class SceneWorkingGraph {
 			scoreGeometric = 0.0;
 		}
 
-		public String toString() {
+		@Override public String toString() {
 			return String.format("InlierInfo {views.size=%d, score=%.1f}",views.size, scoreGeometric);
 		}
 	}

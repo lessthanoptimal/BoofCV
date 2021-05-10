@@ -179,7 +179,7 @@ public class MetricSanityChecks implements VerbosePrint {
 		for (int i = 0; i < inliers.views.size; i++) {
 			SceneWorkingGraph.View w = scene.lookupView(inliers.views.get(i).id);
 			if (w.intrinsic.f <= 0.0) {
-				if (verbose != null) verbose.println("Negative focal length. view='"+w.pview.id+"'");
+				if (verbose != null) verbose.println("Negative focal length. view='" + w.pview.id + "'");
 				return false;
 			}
 

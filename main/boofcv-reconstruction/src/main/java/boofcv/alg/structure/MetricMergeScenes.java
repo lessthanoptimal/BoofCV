@@ -44,7 +44,7 @@ import java.util.Set;
  * 4) Copy inlier sets, view location, and camera intrinsics from 'dst' into common views
  * 5) Refine the working scene
  * 6) Check common views for violations of physical constraints. Accept merger, and fix minor issues, if none.
- *</pre>
+ * </pre>
  *
  * Only common views are checked for logical inconsistencies since we assume rest of the 'src' scene is consistent
  * and not being modified as heavily by refinement. Only common views have their state forcibly changed.
@@ -122,10 +122,11 @@ public class MetricMergeScenes implements VerbosePrint {
 
 		// Refine the working scene. This will help mend the differences between the two scenes
 		if (!refiner.process(db, workScene, utils -> {
-					for (int i = 0; i < knownViews.size; i++) {
-						utils.structure.cameras.get(i).known = knownViews.get(i);
-						utils.structure.motions.get(i).known = knownViews.get(i);
-					}})) {
+			for (int i = 0; i < knownViews.size; i++) {
+				utils.structure.cameras.get(i).known = knownViews.get(i);
+				utils.structure.motions.get(i).known = knownViews.get(i);
+			}
+		})) {
 			if (verbose != null) verbose.println("FAiLED: Refiner return false");
 			return false;
 		}
