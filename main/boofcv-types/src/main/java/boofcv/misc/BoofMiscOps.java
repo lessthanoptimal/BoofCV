@@ -889,7 +889,7 @@ public class BoofMiscOps {
 	}
 
 	public static PrintStream addPrefix( VerbosePrint owner, int numIndents, PrintStream out ) {
-		if (out instanceof PrintStreamInjectIndent)
+		if (out == null || out instanceof PrintStreamInjectIndent)
 			return out;
 
 		String simpleName = owner.getClass().getSimpleName();
