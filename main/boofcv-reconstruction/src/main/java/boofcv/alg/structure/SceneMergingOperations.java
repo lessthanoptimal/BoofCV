@@ -447,6 +447,8 @@ public class SceneMergingOperations implements VerbosePrint {
 
 		// Find features in the target view that are common between the two scenes inlier feature sets
 		int numCommon = findCommonInliers(zeroSrcIdx, zeroDstIdx, zeroFeatureToCommonIndex);
+		if (numCommon == 0)
+			return false;
 
 		// Load observation of common features in view[0]
 		loadViewZeroCommonObservations(db, selectedSrc.imageDimension, numCommon, selectedSrc.pview.id);
