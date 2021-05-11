@@ -130,7 +130,7 @@ public class ConfigEpipolarScore3D implements Configuration {
 	 */
 	public static class FundamentalError implements Configuration {
 		/** @see ScoreFundamentalReprojectionError#ratio3D */
-		public double ratio3D = 1.3;
+		public double ratio3D = 1.02;
 
 		/** @see ScoreFundamentalReprojectionError#inlierErrorTol */
 		public double inlierErrorTol = 1.0;
@@ -138,7 +138,7 @@ public class ConfigEpipolarScore3D implements Configuration {
 		/**
 		 * @see ScoreFundamentalReprojectionError#maxRatioScore
 		 */
-		public double maxRatioScore = 2.5;
+		public double maxRatioScore = 10.0;
 
 		/** The minimum number of inliers for an edge to be accepted. If relative, then relative to pairs.  */
 		public final ConfigLength minimumInliers = ConfigLength.fixed(30);

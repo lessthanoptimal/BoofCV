@@ -35,22 +35,22 @@ import boofcv.struct.Configuration;
 public class ConfigSimilarImagesTrackThenMatch implements Configuration {
 
 	/** Number of images which will be considered as matches when using the recognizer */
-	public int limitQuery = 5;
+	public int limitQuery = 20;
 
 	/**
 	 * Minimum number of frames (by ID) away two frames need to be for loop closure logic to connect them
 	 */
-	public int minimumRecognizeDistance = 30;
+	public int minimumRecognizeDistance = 10;
 
 	/**
 	 * @see SimilarImagesFromTracks#searchRadius
 	 */
-	public int sequentialSearchRadius = 5;
+	public int sequentialSearchRadius = 15;
 
 	/**
 	 * @see SimilarImagesFromTracks#minimumCommonTracks
 	 */
-	public final ConfigLength sequentialMinimumCommonTracks = ConfigLength.relative(0.01, 0.0);
+	public final ConfigLength sequentialMinimumCommonTracks = ConfigLength.relative(0.2, 0.0);
 
 	/**
 	 * Specifies how many features need to be matched for an image to be considered similar. Absolute
