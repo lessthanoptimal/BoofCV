@@ -19,9 +19,12 @@
 package boofcv.alg.structure;
 
 import boofcv.BoofTesting;
+import boofcv.abst.geo.bundle.SceneObservations;
+import boofcv.abst.geo.bundle.SceneStructureMetric;
 import boofcv.alg.geo.MultiViewOps;
 import boofcv.misc.BoofMiscOps;
 import boofcv.struct.calib.CameraPinhole;
+import boofcv.struct.image.ImageDimension;
 import boofcv.testing.BoofStandardJUnit;
 import georegression.struct.se.Se3_F64;
 import org.ddogleg.struct.DogArray_I32;
@@ -174,9 +177,79 @@ class TestMetricExpandByOneView extends BoofStandardJUnit {
 	}
 
 	/**
-	 * Intentionally forces observations to be behind the camera and sees if it fails
+	 * Checks return value and handles a fatal error
 	 */
-	@Test void checkBehind() {
-		fail("Update to whatever this becomes");
+	@Test void removedBadFeatures_FatalError() {
+		// This will always have a fatal error
+		var checks = new DummySanityChecks();
+		checks.success = false;
+
+		var alg = new MetricExpandByOneView();
+		alg.checks = checks;
+
+		var workGraph = new SceneWorkingGraph();
+
+		// The fatal error should be detected early on, processing stop, and the function return false
+		assertFalse(alg.removedBadFeatures(workGraph));
+	}
+
+	/**
+	 * Correctly applies the bad feature threshold that defines an unrecoverable error
+	 */
+	@Test void removedBadFeatures_BadFeaturesThreshold() {
+		var scene = new SceneWorkingGraph();
+		var checks = new DummySanityChecks();
+		var alg = new MetricExpandByOneView() {
+			@Override boolean performBundleAdjustment( SceneWorkingGraph workGraph ) {
+				return true; // need this to do nothing
+			}
+		};
+
+		// If 10% of the features are bad it will try to fix the situation
+		alg.fractionBadFeaturesRecover = 0.1;
+		alg.checks = checks;
+
+		// need to make the number of inliers 100 so that internal checks pass
+		alg.utils.inliersThreeView.resize(100);
+		alg.utils.inlierIdx.resize(100);
+
+		// First test will have too many, above the threshold. Second time will have just the right number to pass
+		checks.numFeatures = 100;
+		checks.numBad = 11;
+		assertFalse(alg.removedBadFeatures(scene));
+		assertEquals(100, alg.utils.inliersThreeView.size);
+
+		checks.counter = 0;
+		checks.numBad = 10;
+		assertTrue(alg.removedBadFeatures(scene));
+		assertEquals(90, alg.utils.inliersThreeView.size);
+		assertEquals(90, alg.utils.inlierIdx.size);
+
+		// The second pass will always be perfect and isn't checked by this function
+	}
+
+	private static class DummySanityChecks extends MetricSanityChecks {
+		boolean success = true;
+		int numFeatures = 100;
+		int numBad = 0;
+
+		int counter = 0;
+
+		@Override
+		public boolean checkPhysicalConstraints( SceneStructureMetric structure,
+												 SceneObservations observations,
+												 List<ImageDimension> listDimensions ) {
+			if (counter == 0) {
+				badFeatures.resetResize(numFeatures, false);
+				for (int i = 0; i < numBad; i++) {
+					badFeatures.set(i, true);
+				}
+			} else {
+				// second pass will be good
+				badFeatures.fill(false);
+			}
+			counter++;
+			return success;
+		}
 	}
 }

@@ -89,8 +89,6 @@ public class MetricSpawnSceneFromView implements VerbosePrint {
 		this.initProjective = new ProjectiveInitializeAllCommon();
 		this.initProjective.utils = utils;
 		this.utils = utils;
-
-		this.checks.maxFractionFail = 1.0;
 	}
 
 	public MetricSpawnSceneFromView() {

@@ -74,9 +74,6 @@ public class MetricFromUncalibratedPairwiseGraph extends ReconstructionFromPairw
 
 	private final @Getter MetricMergeScenes mergeScenes = new MetricMergeScenes();
 
-	/** If true it will apply sanity checks on results for debugging. This could be expensive */
-	public boolean sanityChecks = false;
-
 	/** List of all the scenes. There can be multiple at the end if not everything is connected */
 	final @Getter DogArray<SceneWorkingGraph> scenes =
 			new DogArray<>(SceneWorkingGraph::new, SceneWorkingGraph::reset);
@@ -85,8 +82,6 @@ public class MetricFromUncalibratedPairwiseGraph extends ReconstructionFromPairw
 
 	/** Which scenes are include which views */
 	PairwiseViewScenes scenesInEachView = new PairwiseViewScenes();
-
-	MetricSanityChecks metricChecks = new MetricSanityChecks();
 
 	// Storage for selected views to estimate the transform between the two scenes
 	SelectedViews selectedViews = new SelectedViews();
@@ -345,7 +340,7 @@ public class MetricFromUncalibratedPairwiseGraph extends ReconstructionFromPairw
 				continue;
 			}
 
-			if (verbose != null) verbose.println("Success merging. dst.size="+dst.listViews.size());
+			if (verbose != null) verbose.println("Success merging. dst.size=" + dst.listViews.size());
 
 			// Remove both views from the counts for now
 			mergeOps.toggleViewEnabled(src, scenesInEachView);
@@ -363,16 +358,9 @@ public class MetricFromUncalibratedPairwiseGraph extends ReconstructionFromPairw
 			BoofMiscOps.checkTrue(!mergeOps.enabledScenes.get(src.index), "Should be disabled now");
 			BoofMiscOps.checkTrue(mergeOps.enabledScenes.get(dst.index), "Should be enabled now");
 
+			// Uncomment to run sanity checks on the validity of each of data structures
 //			sanityCheckScenesInEachView();
 //			mergeOps.sanityCheckTable(scenes.toList());
-
-			// Check the views which were modified for geometric consistency to catch bugs in the code
-			if (sanityChecks) {
-				for (int i = 0; i < mergeOps.mergedViews.size(); i++) {
-					SceneWorkingGraph.View wview = mergeOps.mergedViews.get(i);
-					metricChecks.inlierTriangulatePositiveDepth(0.1, db, dst, wview.pview.id);
-				}
-			}
 		}
 	}
 
@@ -427,10 +415,6 @@ public class MetricFromUncalibratedPairwiseGraph extends ReconstructionFromPairw
 		SceneWorkingGraph.View wview = scene.lookupView(selected.id);
 		SceneWorkingGraph.InlierInfo inlier = utils.saveRansacInliers(wview);
 		inlier.scoreGeometric = computeGeometricScore(scene, inlier);
-
-		// Check results for geometric consistency
-		if (sanityChecks)
-			metricChecks.inlierTriangulatePositiveDepth(0.1, db, scene, selected.id);
 
 		// TODO consider local refinement while expanding to help mitigate the unbounded growth in errors
 
@@ -548,6 +532,6 @@ public class MetricFromUncalibratedPairwiseGraph extends ReconstructionFromPairw
 	public void setVerbose( @Nullable PrintStream out, @Nullable Set<String> configuration ) {
 		this.verbose = BoofMiscOps.addPrefix(this, out);
 		BoofMiscOps.verboseChildren(verbose, configuration,
-				spawnScene, expandMetric, refineWorking, mergeOps, metricChecks, mergeScenes);
+				spawnScene, expandMetric, refineWorking, mergeOps, mergeScenes);
 	}
 }
