@@ -89,8 +89,6 @@ public class MetricMergeScenes implements VerbosePrint {
 	@Nullable PrintStream verbose;
 
 	public MetricMergeScenes() {
-		// only fail on catastrophic errors
-		checks.maxFractionFail = 1.0;
 		// Don't spam stdout
 		refiner.verboseViewInfo = false;
 	}

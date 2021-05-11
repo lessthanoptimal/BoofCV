@@ -84,7 +84,7 @@ public class MetricExpandByOneView extends ExpandByOneView {
 	protected final RemoveBrownPtoN_F64 normalize3 = new RemoveBrownPtoN_F64();
 
 	/** Used to check results to see if they can be trusted */
-	public final MetricSanityChecks checks = new MetricSanityChecks();
+	public MetricSanityChecks checks = new MetricSanityChecks();
 
 	/** If less than this number of features fail the physical constraint test, attempt to recover by removing them */
 	public double fractionBadFeaturesRecover = 0.05;
@@ -122,9 +122,6 @@ public class MetricExpandByOneView extends ExpandByOneView {
 		listMotion.add(view1_to_view2);
 		listMotion.add(view1_to_target);
 //		bundleAdjustment.keepFraction = 0.95; <-- this made it worse by a lot?!
-
-		// TODO clean this up. Only fail on unrecoverable errors, e.g. focal length
-		checks.maxFractionFail = 1.0;
 	}
 
 	/**
@@ -223,7 +220,7 @@ public class MetricExpandByOneView extends ExpandByOneView {
 	 *
 	 * @return true if it passes
 	 */
-	private boolean removedBadFeatures( SceneWorkingGraph workGraph ) {
+	boolean removedBadFeatures( SceneWorkingGraph workGraph ) {
 		listImageShape.clear();
 		listImageShape.add(utils.dimenA);
 		listImageShape.add(utils.dimenB);
@@ -248,7 +245,7 @@ public class MetricExpandByOneView extends ExpandByOneView {
 		if (countBadFeatures == 0)
 			return true;
 
-		// Remove the bad features and try again
+		// Remove the bad features
 		for (int inlierIdx = checks.badFeatures.size - 1; inlierIdx >= 0; inlierIdx--) {
 			if (!checks.badFeatures.get(inlierIdx))
 				continue;
@@ -259,6 +256,7 @@ public class MetricExpandByOneView extends ExpandByOneView {
 
 		if (verbose != null) verbose.println("Removed bad features. Optimizing again.");
 
+		// Refine again and see if those issues were fixed
 		if (!performBundleAdjustment(workGraph))
 			return false;
 
@@ -462,7 +460,6 @@ public class MetricExpandByOneView extends ExpandByOneView {
 
 	@Override public void setVerbose( @Nullable PrintStream out, @Nullable Set<String> configuration ) {
 		super.setVerbose(out, configuration);
-
 		BoofMiscOps.verboseChildren(verbose, configuration, checks);
 	}
 }

@@ -299,7 +299,6 @@ public class ExampleMultiViewSparseReconstruction {
 		System.out.println("### Metric Reconstruction");
 
 		var metric = new MetricFromUncalibratedPairwiseGraph();
-		metric.sanityChecks = true; // For debugging
 		metric.setVerbose(System.out, BoofMiscOps.hashSet(BoofVerbose.RECURSIVE));
 		BoofMiscOps.profile(() -> {
 			if (!metric.process(similarImages, pairwise)) {
