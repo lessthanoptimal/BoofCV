@@ -74,7 +74,7 @@ public class MetricExpandByOneView extends ExpandByOneView {
 	protected TwoViewToCalibratingHomography projectiveHomography = new TwoViewToCalibratingHomography();
 
 	/** Bundle Adjustment functions and configurations */
-	public final MetricBundleAdjustmentUtils bundleAdjustment = new MetricBundleAdjustmentUtils();
+	public final MetricBundleAdjustmentUtils metricSba = new MetricBundleAdjustmentUtils();
 
 	// Used for triangulation
 	protected final List<Point2D_F64> pixelNorms = BoofMiscOps.createListFilled(3, Point2D_F64::new);
@@ -189,8 +189,8 @@ public class MetricExpandByOneView extends ExpandByOneView {
 			return false;
 
 		// copy results from bundle adjustment now that they have passed
-		targetIntrinsic.setTo((BundlePinholeSimplified)bundleAdjustment.structure.cameras.get(2).model);
-		view1_to_target.setTo(bundleAdjustment.structure.getParentToView(2));
+		targetIntrinsic.setTo((BundlePinholeSimplified)metricSba.structure.cameras.get(2).model);
+		view1_to_target.setTo(metricSba.structure.getParentToView(2));
 
 		// Now that the metric upgrade is known add it to work graph
 		SceneWorkingGraph.View wtarget = workGraph.addView(target);
@@ -225,7 +225,7 @@ public class MetricExpandByOneView extends ExpandByOneView {
 		listImageShape.add(utils.dimenA);
 		listImageShape.add(utils.dimenB);
 		listImageShape.add(utils.dimenC);
-		if (!checks.checkPhysicalConstraints(bundleAdjustment, listImageShape)) {
+		if (!checks.checkPhysicalConstraints(metricSba, listImageShape)) {
 			if (verbose != null) verbose.println("Fatal error when checking constraints");
 			return false;
 		}
@@ -260,7 +260,7 @@ public class MetricExpandByOneView extends ExpandByOneView {
 		if (!performBundleAdjustment(workGraph))
 			return false;
 
-		if (!checks.checkPhysicalConstraints(bundleAdjustment, listImageShape)) {
+		if (!checks.checkPhysicalConstraints(metricSba, listImageShape)) {
 			if (verbose != null) verbose.println("Fatal error when checking constraints, second time.");
 			return false;
 		}
@@ -289,8 +289,8 @@ public class MetricExpandByOneView extends ExpandByOneView {
 
 		if (verbose != null) {
 			// Print out the results so that if it fails sanity checks we can see why
-			BundlePinholeSimplified intrinsics = (BundlePinholeSimplified)bundleAdjustment.structure.cameras.get(2).model;
-			Se3_F64 view1_to_target = bundleAdjustment.structure.getParentToView(2);
+			BundlePinholeSimplified intrinsics = (BundlePinholeSimplified)metricSba.structure.cameras.get(2).model;
+			Se3_F64 view1_to_target = metricSba.structure.getParentToView(2);
 			verbose.printf("Refined fx=%6.1f k1=%6.3f k2=%6.3f T=(%.1f %.1f %.1f)\n",
 					intrinsics.f, intrinsics.k1, intrinsics.k2,
 					view1_to_target.T.x, view1_to_target.T.y, view1_to_target.T.z);
@@ -363,8 +363,8 @@ public class MetricExpandByOneView extends ExpandByOneView {
 	 * Optimize the three view metric local scene using SBA
 	 */
 	private boolean refineWithBundleAdjustment( SceneWorkingGraph workGraph ) {
-		final SceneStructureMetric structure = bundleAdjustment.structure;
-		final SceneObservations observations = bundleAdjustment.observations;
+		final SceneStructureMetric structure = metricSba.structure;
+		final SceneObservations observations = metricSba.observations;
 
 		// Look up known information
 		SceneWorkingGraph.View wview1 = workGraph.lookupView(utils.seed.id);
@@ -404,7 +404,7 @@ public class MetricExpandByOneView extends ExpandByOneView {
 		SceneObservations.View viewObs2 = observations.getView(1);
 		SceneObservations.View viewObs3 = observations.getView(2);
 
-		final TriangulateNViewsMetricH triangulator = bundleAdjustment.triangulator;
+		final TriangulateNViewsMetricH triangulator = metricSba.triangulator;
 		var foundX = new Point4D_F64();
 		for (int featIdx = 0; featIdx < numFeatures; featIdx++) {
 			AssociatedTriple a = triples.get(featIdx);
@@ -431,7 +431,7 @@ public class MetricExpandByOneView extends ExpandByOneView {
 		}
 
 		// Refine using bundle adjustment
-		if (!bundleAdjustment.process())
+		if (!metricSba.process())
 			return false;
 
 		return true;

@@ -18,7 +18,6 @@
 
 package boofcv.alg.structure;
 
-import boofcv.alg.structure.SceneMergingOperations.SelectedViews;
 import boofcv.misc.BoofMiscOps;
 import lombok.Getter;
 import lombok.Setter;
@@ -83,9 +82,6 @@ public class MetricFromUncalibratedPairwiseGraph extends ReconstructionFromPairw
 	/** Which scenes are include which views */
 	PairwiseViewScenes scenesInEachView = new PairwiseViewScenes();
 
-	// Storage for selected views to estimate the transform between the two scenes
-	SelectedViews selectedViews = new SelectedViews();
-
 	public MetricFromUncalibratedPairwiseGraph( PairwiseGraphUtils utils ) {
 		super(utils);
 		expandMetric.utils = utils;
@@ -103,7 +99,7 @@ public class MetricFromUncalibratedPairwiseGraph extends ReconstructionFromPairw
 
 	{
 		// prune outlier observations and run SBA a second time
-		refineWorking.bundleAdjustment.keepFraction = 0.95;
+		refineWorking.metricSba.keepFraction = 0.95;
 	}
 
 	/**

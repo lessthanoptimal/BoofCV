@@ -88,7 +88,7 @@ class TestRefineMetricWorkingGraph extends BoofStandardJUnit {
 
 		// The scale is not locked and the first view is not at the origin. Let's just use reprojection error as
 		// a test since comparing translation is more complex
-		assertEquals(0.0, alg.bundleAdjustment.sba.getFitScore(), 1e-6);
+		assertEquals(0.0, alg.metricSba.sba.getFitScore(), 1e-6);
 		BoofMiscOps.forIdx(graph.listViews, ( i, v ) -> {
 			assertEquals(400, v.intrinsic.f, 1e-3);
 			assertEquals(0, v.intrinsic.k1, 1e-6);
@@ -158,7 +158,7 @@ class TestRefineMetricWorkingGraph extends BoofStandardJUnit {
 
 		// The scale is not locked and the first view is not at the origin. Let's just use reprojection error as
 		// a test since comparing translation is more complex
-		assertEquals(0.0, alg.bundleAdjustment.sba.getFitScore(), 1e-6);
+		assertEquals(0.0, alg.metricSba.sba.getFitScore(), 1e-6);
 		BoofMiscOps.forIdx(graph.listViews, ( i, v ) -> {
 			assertEquals(400, v.intrinsic.f, 1e-3);
 			assertEquals(0, v.intrinsic.k1, 1e-6);
@@ -188,8 +188,8 @@ class TestRefineMetricWorkingGraph extends BoofStandardJUnit {
 		int inlierIdx = 1;
 
 		// have one observation point to a 3D feature
-		alg.bundleAdjustment.structure.points.grow().set(1, 2, 3, 4);
-		alg.bundleAdjustment.observations.getView(3).point.set(2, 0);
+		alg.metricSba.structure.points.grow().set(1, 2, 3, 4);
+		alg.metricSba.observations.getView(3).point.set(2, 0);
 
 		alg.findUnassignedObsAndKnown3D(inliers, inlierIdx);
 
@@ -228,7 +228,7 @@ class TestRefineMetricWorkingGraph extends BoofStandardJUnit {
 		};
 		alg.maxReprojectionErrorPixel = 10;
 		alg.initializeDataStructures(db, graph);
-		alg.bundleAdjustment.structure.points.resize(20);
+		alg.metricSba.structure.points.resize(20);
 
 		// create an inlier set composed of observations from 3 views
 		var inliers = new SceneWorkingGraph.InlierInfo();
@@ -259,13 +259,13 @@ class TestRefineMetricWorkingGraph extends BoofStandardJUnit {
 			if (shouldBeAssigned) {
 				// Make sure the point in the inlier set which is being inspected was assigned a value
 				int pointID = inliers.observations.get(inlierViewIdx).get(inlierFeatIdx);
-				DogArray_I32 point = alg.bundleAdjustment.observations.views.get(i).point;
+				DogArray_I32 point = alg.metricSba.observations.views.get(i).point;
 				assertEquals(3, point.get(pointID));
 				// Set it to -1 make the next test easier since everything should now be -1
 				point.set(pointID, -1);
 			}
 
-			alg.bundleAdjustment.observations.views.get(i).point.forIdx(( j, value ) -> assertEquals(-1, value));
+			alg.metricSba.observations.views.get(i).point.forIdx(( j, value ) -> assertEquals(-1, value));
 		});
 	}
 
@@ -315,8 +315,8 @@ class TestRefineMetricWorkingGraph extends BoofStandardJUnit {
 		// see if it added the point to the structure correctly
 		Point3D_F64 expectedX = db.points.get(5).world;
 		Point4D_F64 foundX = new Point4D_F64();
-		assertEquals(1, alg.bundleAdjustment.structure.points.size);
-		alg.bundleAdjustment.structure.points.get(0).get(foundX);
+		assertEquals(1, alg.metricSba.structure.points.size);
+		alg.metricSba.structure.points.get(0).get(foundX);
 		foundX.divideIP(foundX.w);
 		assertEquals(0.0, expectedX.distance(expectedX.x, expectedX.y, expectedX.z), 1e-6);
 
@@ -324,7 +324,7 @@ class TestRefineMetricWorkingGraph extends BoofStandardJUnit {
 		BoofMiscOps.forIdx(inliers.views.toList(), ( i, v ) -> {
 			int expected = alg.unassigned.contains(i) ? 0 : -1;
 			int viewID = alg.sceneViewIntIds.get(i);
-			assertEquals(expected, alg.bundleAdjustment.observations.getView(viewID).point.get(6));
+			assertEquals(expected, alg.metricSba.observations.getView(viewID).point.get(6));
 		});
 	}
 
@@ -335,12 +335,12 @@ class TestRefineMetricWorkingGraph extends BoofStandardJUnit {
 	@Test
 	void pruneUnassignedObservations() {
 		var alg = new RefineMetricWorkingGraph();
-		alg.bundleAdjustment.observations.initialize(6);
+		alg.metricSba.observations.initialize(6);
 		for (int i = 0; i < 6; i++) {
 			for (int j = 0; j < i; j++) {
-				alg.bundleAdjustment.observations.getView(i).resize(j + 1);
+				alg.metricSba.observations.getView(i).resize(j + 1);
 				for (int k = 0; k <= j; k++) {
-					alg.bundleAdjustment.observations.getView(i).set(k, k%2 == 0 ? k : -1, 1, 2 + k);
+					alg.metricSba.observations.getView(i).set(k, k%2 == 0 ? k : -1, 1, 2 + k);
 				}
 			}
 		}
@@ -350,11 +350,11 @@ class TestRefineMetricWorkingGraph extends BoofStandardJUnit {
 		for (int i = 0; i < 6; i++) {
 			// first see if the size has changed after having some removed
 			int expectedCount = i - i/2;
-			assertEquals(expectedCount, alg.bundleAdjustment.observations.getView(i).size());
-			assertEquals(2*expectedCount, alg.bundleAdjustment.observations.getView(i).observations.size);
+			assertEquals(expectedCount, alg.metricSba.observations.getView(i).size());
+			assertEquals(2*expectedCount, alg.metricSba.observations.getView(i).observations.size);
 			// the order might have changed. So check to see if it contains the expected reference to the 3D point
 			for (int j = 0; j + 1 < i; j += 2) {
-				assertTrue(alg.bundleAdjustment.observations.getView(i).point.contains(j));
+				assertTrue(alg.metricSba.observations.getView(i).point.contains(j));
 			}
 		}
 	}

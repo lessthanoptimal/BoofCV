@@ -43,10 +43,15 @@ class TestMetricFromUncalibratedPairwiseGraph extends BoofStandardJUnit {
 	 * Random scene with fairly linear motion. Everything is randomized and physical constraints on camera are enforced
 	 */
 	@Test void process_perfect() {
-		// TODO make this test run faster
+		// attempt to speed things up by telling it to not try as hard
+		var config = new ConfigProjectiveReconstruction();
+		config.ransac.iterations = 1;
+		config.sbaConverge.maxIterations = 0;
+		config.ransacTrifocal.converge.maxIterations = 0;
+		// Can this be speed up any more? Should profile and see what the slow down is
 
 		// Add extra internal checks
-		var alg = new MetricFromUncalibratedPairwiseGraph() {
+		var alg = new MetricFromUncalibratedPairwiseGraph(config) {
 			@Override
 			protected boolean spawnSceneFromSeed( LookUpSimilarImages db, PairwiseImageGraph pairwise, SeedInfo info ) {
 				if (!super.spawnSceneFromSeed(db, pairwise, info))
@@ -69,10 +74,15 @@ class TestMetricFromUncalibratedPairwiseGraph extends BoofStandardJUnit {
 				mergeOps.sanityCheckTable(scenes.toList());
 			}
 		};
+		// Attempting to speed up the test. It has perfect data so it shouldn't need to iterate so many times
+		alg.getRefineWorking().metricSba.configConverge.maxIterations = 4;
+		alg.getExpandMetric().metricSba.configConverge.maxIterations = 4;
+		alg.getMergeScenes().refiner.metricSba.configConverge.maxIterations = 4;
+
 //		alg.setVerbose(System.out, BoofMiscOps.hashSet(BoofVerbose.RECURSIVE));
 //		alg.getRefineWorking().setVerbose(System.out, null);
 		for (int numViews = 3; numViews <= 23; numViews += 5) {
-//			System.out.println("Number of views "+numViews);
+//			System.out.println("Number of views " + numViews);
 			// Need to increase the number of features to ensure everything is connected properly and that there is
 			// enough info for a good estimate
 			var db = new MockLookupSimilarImagesRealistic().setLoop(false).
@@ -118,10 +128,6 @@ class TestMetricFromUncalibratedPairwiseGraph extends BoofStandardJUnit {
 		}
 
 		// Should also check the inliers to see if they make sense.
-	}
-
-	@Test void mergeScenes() {
-		fail("Implement");
 	}
 
 	@Test void getLargestScene() {

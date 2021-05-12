@@ -336,13 +336,13 @@ public class ExampleMultiViewSparseReconstruction {
 		var refine = new RefineMetricWorkingGraph();
 		BoofMiscOps.profile(() -> {
 			// Bundle adjustment is run twice, with the worse 5% of points discarded in an attempt to reduce noise
-			refine.bundleAdjustment.keepFraction = 0.95;
-			refine.bundleAdjustment.getSba().setVerbose(System.out, null);
+			refine.metricSba.keepFraction = 0.95;
+			refine.metricSba.getSba().setVerbose(System.out, null);
 			if (!refine.process(similarImages, working)) {
 				System.out.println("SBA REFINE FAILED");
 			}
 		}, "Bundle Adjustment refine");
-		scene = refine.bundleAdjustment.structure;
+		scene = refine.metricSba.structure;
 		MultiViewIO.save(scene, savePath.getPath());
 	}
 
