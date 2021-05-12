@@ -150,7 +150,7 @@ public class MetricSpawnSceneFromView implements VerbosePrint {
 				return false;
 			}
 
-			if (!checks.checkPhysicalConstraints(refineWorking.bundleAdjustment, listImageShape)) {
+			if (!checks.checkPhysicalConstraints(refineWorking.metricSba, listImageShape)) {
 				if (verbose != null) verbose.println("FAILED: Unrecoverable physical constraint");
 				return false;
 			}

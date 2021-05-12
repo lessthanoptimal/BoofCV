@@ -130,7 +130,7 @@ public class ConfigEpipolarScore3D implements Configuration {
 	 */
 	public static class FundamentalError implements Configuration {
 		/** @see ScoreFundamentalReprojectionError#ratio3D */
-		public double ratio3D = 1.02;
+		public double ratio3D = 1.1;
 
 		/** @see ScoreFundamentalReprojectionError#inlierErrorTol */
 		public double inlierErrorTol = 1.0;

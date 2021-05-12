@@ -172,12 +172,12 @@ public class ImageSequenceToSparseScene<T extends ImageGray<T>> implements Verbo
 
 	/** Returns the found sparse scene which has been reconstructed */
 	public SceneStructureMetric getSceneStructure() {
-		return refineScene.bundleAdjustment.structure;
+		return refineScene.metricSba.structure;
 	}
 
 	/** Returns the observations used to reconstruct the scene */
 	public SceneObservations getSceneObservations() {
-		return refineScene.bundleAdjustment.observations;
+		return refineScene.metricSba.observations;
 	}
 
 	@Override public void setVerbose( @Nullable PrintStream out, @Nullable Set<String> set ) {

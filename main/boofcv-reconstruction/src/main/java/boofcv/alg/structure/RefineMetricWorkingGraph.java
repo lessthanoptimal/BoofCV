@@ -67,7 +67,7 @@ public class RefineMetricWorkingGraph implements VerbosePrint {
 	public double maxReprojectionErrorPixel = 1e100;
 
 	/** Bundle Adjustment functions and configurations */
-	public final MetricBundleAdjustmentUtils bundleAdjustment;
+	public final MetricBundleAdjustmentUtils metricSba;
 
 	// pixels to undistorted normalized image coordinates and the reverse
 	protected final List<Point2Transform2_F64> listPixelToNorm = new ArrayList<>();
@@ -111,8 +111,8 @@ public class RefineMetricWorkingGraph implements VerbosePrint {
 	// Storage for triangulated point
 	private final Point4D_F64 found3D = new Point4D_F64();
 
-	public RefineMetricWorkingGraph( MetricBundleAdjustmentUtils bundleAdjustment ) {
-		this.bundleAdjustment = bundleAdjustment;
+	public RefineMetricWorkingGraph( MetricBundleAdjustmentUtils metricSba ) {
+		this.metricSba = metricSba;
 	}
 
 	public RefineMetricWorkingGraph() {
@@ -143,7 +143,7 @@ public class RefineMetricWorkingGraph implements VerbosePrint {
 			return false;
 
 		// Use provided function that allows for customization
-		op.process(bundleAdjustment);
+		op.process(metricSba);
 
 		return refineViews(graph);
 	}
@@ -173,8 +173,8 @@ public class RefineMetricWorkingGraph implements VerbosePrint {
 		listPixelToNorm.clear();
 		listNormToPixel.clear();
 
-		final SceneStructureMetric structure = bundleAdjustment.structure;
-		final SceneObservations observations = bundleAdjustment.observations;
+		final SceneStructureMetric structure = metricSba.structure;
+		final SceneObservations observations = metricSba.observations;
 
 		// Initialize the structure, but save initializing the points for later
 		structure.initialize(graph.listViews.size(), graph.listViews.size(), 0);
@@ -329,8 +329,8 @@ public class RefineMetricWorkingGraph implements VerbosePrint {
 	 */
 	void assignKnown3DToUnassignedObs( SceneWorkingGraph graph, SceneWorkingGraph.InlierInfo inliers,
 									   int inlierIdx ) {
-		final SceneStructureMetric structure = bundleAdjustment.structure;
-		final SceneObservations observations = bundleAdjustment.observations;
+		final SceneStructureMetric structure = metricSba.structure;
+		final SceneObservations observations = metricSba.observations;
 
 		// Go through all the views/observations which have yet to be assigned a 3D feature
 		for (int unassignedIdx = unassigned.size - 1; unassignedIdx >= 0; unassignedIdx--) {
@@ -400,7 +400,7 @@ public class RefineMetricWorkingGraph implements VerbosePrint {
 			// Get observation index of the inlier in this view
 			int obsIdx = inlierSet.observations.get(inlierViewIdx).get(inlierIdx);
 			// Look up the corresponding (if any) feature that this observation is observing
-			int featIdx = bundleAdjustment.observations.views.get(sceneViewIntIds.get(inlierViewIdx)).getPointId(obsIdx);
+			int featIdx = metricSba.observations.views.get(sceneViewIntIds.get(inlierViewIdx)).getPointId(obsIdx);
 			if (featIdx >= 0) {
 				// This observation has been assigned already and points to a known feature
 				if (!featureIdx3D.contains(featIdx))
@@ -429,9 +429,9 @@ public class RefineMetricWorkingGraph implements VerbosePrint {
 	 * @param inlierIdx which inlier is being triangulated
 	 */
 	void triangulateAndSave( SceneWorkingGraph.InlierInfo inlierSet, int inlierIdx ) {
-		final SceneStructureMetric structure = bundleAdjustment.structure;
-		final SceneObservations observations = bundleAdjustment.observations;
-		final TriangulateNViewsMetricH triangulator = bundleAdjustment.triangulator;
+		final SceneStructureMetric structure = metricSba.structure;
+		final SceneObservations observations = metricSba.observations;
+		final TriangulateNViewsMetricH triangulator = metricSba.triangulator;
 
 		// Get a list of observations in normalized image coordinates
 		for (int inlierViewIdx = 0; inlierViewIdx < sceneViewIntIds.size; inlierViewIdx++) {
@@ -479,7 +479,7 @@ public class RefineMetricWorkingGraph implements VerbosePrint {
 	 * Prunes unassigned observations from each view. This is done by swapping which is fast but does change the order
 	 */
 	void pruneUnassignedObservations() {
-		final SceneObservations observations = bundleAdjustment.observations;
+		final SceneObservations observations = metricSba.observations;
 
 		for (int i = 0; i < observations.views.size; i++) {
 			SceneObservations.View v = observations.views.get(i);
@@ -516,10 +516,10 @@ public class RefineMetricWorkingGraph implements VerbosePrint {
 //			}
 //		}
 
-		if (!bundleAdjustment.process())
+		if (!metricSba.process())
 			return false;
 
-		final SceneStructureMetric structure = bundleAdjustment.structure;
+		final SceneStructureMetric structure = metricSba.structure;
 
 		// save the results
 		for (int viewIdx = 0; viewIdx < graph.listViews.size(); viewIdx++) {
@@ -528,7 +528,7 @@ public class RefineMetricWorkingGraph implements VerbosePrint {
 			wview.intrinsic.setTo((BundlePinholeSimplified)structure.cameras.get(viewIdx).model);
 
 			if (verbose != null && verboseViewInfo) {
-				Se3_F64 m = bundleAdjustment.structure.getParentToView(viewIdx);
+				Se3_F64 m = metricSba.structure.getParentToView(viewIdx);
 				double theta = ConvertRotation3D_F64.matrixToRodrigues(m.R, null).theta;
 				verbose.printf("AFTER view='%s' T=(%.2f %.2f %.2f) R=%.4f, f=%.1f k1=%.1e k2=%.1e\n",
 						wview.pview.id, m.T.x, m.T.y, m.T.z, theta,
@@ -541,7 +541,7 @@ public class RefineMetricWorkingGraph implements VerbosePrint {
 	@Override
 	public void setVerbose( @Nullable PrintStream out, @Nullable Set<String> configuration ) {
 		this.verbose = BoofMiscOps.addPrefix(this, out);
-		BoofMiscOps.verboseChildren(out, configuration, bundleAdjustment);
+		BoofMiscOps.verboseChildren(out, configuration, metricSba);
 	}
 
 	/**
