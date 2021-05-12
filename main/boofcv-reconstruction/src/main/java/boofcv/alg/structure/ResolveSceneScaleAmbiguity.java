@@ -136,8 +136,7 @@ public class ResolveSceneScaleAmbiguity implements VerbosePrint {
 		sanityCheckCommonObservations(numFeatures/2);
 
 		// Pre-allocate memory
-		workNormalized.reset();
-		workNormalized.resize(numFeatures);
+		workNormalized.resetResize(numFeatures);
 
 		scales.reset();
 		scales.reserve(numFeatures);

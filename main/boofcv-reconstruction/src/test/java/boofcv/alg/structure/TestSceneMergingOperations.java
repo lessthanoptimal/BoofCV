@@ -22,10 +22,7 @@ import boofcv.alg.structure.MetricFromUncalibratedPairwiseGraph.PairwiseViewScen
 import boofcv.alg.structure.MetricFromUncalibratedPairwiseGraph.ViewScenes;
 import boofcv.alg.structure.SceneMergingOperations.SceneCommonCounts;
 import boofcv.alg.structure.SceneMergingOperations.SelectedScenes;
-import boofcv.alg.structure.SceneMergingOperations.SelectedViews;
 import boofcv.testing.BoofStandardJUnit;
-import georegression.struct.se.Se3_F64;
-import georegression.struct.se.SpecialEuclideanOps_F64;
 import org.ddogleg.struct.DogArray;
 import org.ddogleg.util.PrimitiveArrays;
 import org.junit.jupiter.api.Assertions;
@@ -150,7 +147,6 @@ public class TestSceneMergingOperations extends BoofStandardJUnit {
 		var alg = new SceneMergingOperations();
 		var src = new SceneWorkingGraph();
 		var dst = new SceneWorkingGraph();
-
 		var src_to_dst = new ScaleSe3_F64();
 		src_to_dst.scale = 2.5;
 		src_to_dst.transform.T.x = 10;
@@ -176,12 +172,17 @@ public class TestSceneMergingOperations extends BoofStandardJUnit {
 			wa.world_to_view.T.setTo(i, 0, 0);
 		}
 
+		var scenesInView = new PairwiseViewScenes();
+		scenesInView.views.resize(5 + 3);
+
 		// Call the function being tested
-		alg.mergeStructure(src, dst, src_to_dst, null);
-		alg.sanityCheckTable(null); // TODO remove fix and see if this triggers it
+		alg.mergeStructure(src, dst, src_to_dst, scenesInView);
 
 		// src has 3 views NOT in dst
 		assertEquals(8, dst.listViews.size());
+		assertTrue(scenesInView.getView(src.listViews.get(0).pview).viewedBy.contains(dst.index));
+		assertTrue(scenesInView.getView(src.listViews.get(1).pview).viewedBy.contains(dst.index));
+		assertTrue(scenesInView.getView(src.listViews.get(2).pview).viewedBy.contains(dst.index));
 
 		// make sure the views which were the same were not modified
 		assertEquals(0.0, dst.views.get("3").world_to_view.T.x);
@@ -193,98 +194,6 @@ public class TestSceneMergingOperations extends BoofStandardJUnit {
 			assertEquals(i*2.5 - 10.0, dst.views.get(id).world_to_view.T.x);
 			assertEquals(i, dst.views.get(id).intrinsic.f);
 		}
-	}
-
-	/**
-	 * Test that makes sure the src is copied into the dst only if it has a better estimate
-	 */
-	@Test void mergeStructure_CopySrcOnlyIfBetter() {
-		var alg = new SceneMergingOperations();
-		var src = new SceneWorkingGraph();
-		var dst = new SceneWorkingGraph();
-
-		// transform will do nothing
-		var src_to_dst = new ScaleSe3_F64();
-
-		// Add views. Some will be common and some will not be
-		for (int i = 0; i < 5; i++) {
-			var a = new PairwiseImageGraph.View();
-			var b = new PairwiseImageGraph.View();
-
-			// Every view will overlap
-			a.id = "" + i;
-			b.id = "" + i;
-
-			SceneWorkingGraph.View wa = src.addView(a);
-			SceneWorkingGraph.View wb = dst.addView(b);
-
-			// give each view a distinctive value that makes it easy to see which one "won"
-			wa.imageDimension.setTo(1, 1);
-			wb.imageDimension.setTo(2, 2);
-
-			wa.intrinsic.f = 1;
-			wb.intrinsic.f = 2;
-
-			wa.world_to_view.T.setTo(1, 0, 0);
-			wb.world_to_view.T.setTo(2, 0, 0);
-
-			// alternate which view will have a better score
-			wa.inliers.grow().scoreGeometric = i%2 == 0 ? 100 : 50;
-			wb.inliers.grow().scoreGeometric = 75;
-		}
-
-		// Call the function being tested
-		alg.mergeStructure(src, dst, src_to_dst, null);
-
-		assertEquals(5, dst.listViews.size());
-
-		for (int i = 0; i < 5; i++) {
-			SceneWorkingGraph.View wb = dst.lookupView("" + i);
-
-			assertEquals(2, wb.inliers.size);
-
-			// src will dominate on even views
-			if (i%2 == 0) {
-				assertEquals(1, wb.imageDimension.width);
-				assertEquals(1, wb.intrinsic.f);
-				assertEquals(1, wb.world_to_view.T.x);
-			} else {
-				assertEquals(2, wb.imageDimension.width);
-				assertEquals(2, wb.intrinsic.f);
-				assertEquals(2, wb.world_to_view.T.x);
-			}
-		}
-	}
-
-	@Test void selectViewsToEstimateTransform() {
-		var src = new SceneWorkingGraph();
-		var dst = new SceneWorkingGraph();
-
-		var src_to_dst = new Se3_F64();
-		SpecialEuclideanOps_F64.eulerXyz(1, 2, -1, 0, 0, 0, src_to_dst);
-
-		// All views are common with a noise free fixed transform between the two scenes
-		for (int i = 0; i < 5; i++) {
-			var a = new PairwiseImageGraph.View();
-			var b = new PairwiseImageGraph.View();
-
-			a.id = "" + i;
-			b.id = a.id;
-
-			SceneWorkingGraph.View wa = src.addView(a);
-			SceneWorkingGraph.View wb = dst.addView(b);
-
-			// The best pair will be the pair with the highest minimum score
-			wa.inliers.grow().scoreGeometric = 11 - i;
-			wb.inliers.grow().scoreGeometric = i;
-		}
-
-		var found = new SelectedViews();
-		var alg = new SceneMergingOperations();
-		alg.selectViewToEstimateTransform(src, dst, found);
-
-		assertSame(src.listViews.get(4), found.src);
-		assertSame(dst.listViews.get(4), found.dst);
 	}
 
 	@Test void toggleViewEnabled() {
@@ -364,9 +273,5 @@ public class TestSceneMergingOperations extends BoofStandardJUnit {
 		assertSame(found1, found3);
 		assertEquals(5, found1.sceneIndex);
 		assertEquals(6, found2.sceneIndex);
-	}
-
-	@Test void inlierSetToBundle() {
-		fail("Implement");
 	}
 }

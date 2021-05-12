@@ -103,7 +103,7 @@ public class MetricMergeScenes implements VerbosePrint {
 	 */
 	public boolean merge( LookUpSimilarImages db, SceneWorkingGraph src, SceneWorkingGraph dst ) {
 		// Find the common views
-		findCommonViews(src, dst);
+		findCommonViews(src, dst, commonViews, verbose);
 		if (commonViews.isEmpty())
 			return false;
 
@@ -112,7 +112,8 @@ public class MetricMergeScenes implements VerbosePrint {
 
 		// Compute the coordinate transform between the scenes using the "best" pair of views
 		CommonView best = commonViews.getTail();
-		mergingOps.computeSceneTransform(db, src, dst, best.src, best.dst, src_to_dst);
+		if (!mergingOps.computeSceneTransform(db, src, dst, best.src, best.dst, src_to_dst))
+			return false;
 		src_to_dst.transform.invert(transform_dst_to_src);
 
 		// Creates a working scene from 'src' but adding values from 'dst' as needed
@@ -147,7 +148,7 @@ public class MetricMergeScenes implements VerbosePrint {
 		}
 
 		// Copy the results to 'dst'.
-		mergeWorkingSceneIntoDst(dst);
+		mergeWorkIntoDst(dst);
 
 		return true;
 	}
@@ -174,43 +175,57 @@ public class MetricMergeScenes implements VerbosePrint {
 					return false;
 				}
 
-				SceneWorkingGraph.InlierInfo info = wview.inliers.get(inlierIdx);
-				int numInliers = info.getInlierCount();
-
-				BoofMiscOps.checkEq(numInliers, checks.badFeatures.size);
-				int countBadFeatures = checks.badFeatures.count(true);
-
-				if (countBadFeatures > fractionBadFeaturesRecover*checks.badFeatures.size) {
-					// TODO print out more info about the views
-					if (verbose != null)
-						verbose.println("FAILED: Inlier set had too many bad features. bad=" + countBadFeatures + "/" + numInliers);
+				if (!removeBadFeatures(wview.inliers.get(inlierIdx)))
 					return false;
-				}
-
-				// If there are no issues move on to the next view
-				if (countBadFeatures == 0)
-					continue;
-
-				if (verbose != null)
-					verbose.println("Removing bad features to try to fix. bad=" + countBadFeatures + "/" + numInliers);
-
-				for (int obsIdx = numInliers - 1; obsIdx >= 0; obsIdx--) {
-					// get the feature ID that the observation references and see if that feature was marked as bad
-					if (!checks.badFeatures.get(obsIdx))
-						continue;
-					for (int viewIdx = 0; viewIdx < info.observations.size; viewIdx++) {
-						info.observations.get(viewIdx).removeSwap(obsIdx);
-					}
-				}
 			}
 		}
 		return true;
 	}
 
 	/**
+	 * Removes features flagged by the sanity checks from the inlier set
+	 *
+	 * @param info The inlier set
+	 * @return true No fatal error was detected or false if a fatal error wsa detected
+	 */
+	boolean removeBadFeatures( SceneWorkingGraph.InlierInfo info ) {
+		int numInliers = info.getInlierCount();
+
+		BoofMiscOps.checkEq(numInliers, checks.badFeatures.size);
+		int countBadFeatures = checks.badFeatures.count(true);
+
+		if (countBadFeatures > fractionBadFeaturesRecover*checks.badFeatures.size) {
+			// TODO print out more info about the views
+			if (verbose != null)
+				verbose.println("FAILED: Inlier set had too many bad features. bad=" + countBadFeatures + "/" + numInliers);
+			return false;
+		}
+
+		// If there are no issues move on to the next view
+		if (countBadFeatures == 0)
+			return true;
+
+		if (verbose != null)
+			verbose.println("Removing bad features to try to fix. bad=" + countBadFeatures + "/" + numInliers);
+
+		for (int obsIdx = numInliers - 1; obsIdx >= 0; obsIdx--) {
+			// get the feature ID that the observation references and see if that feature was marked as bad
+			if (!checks.badFeatures.get(obsIdx))
+				continue;
+			for (int viewIdx = 0; viewIdx < info.observations.size; viewIdx++) {
+				info.observations.get(viewIdx).removeSwap(obsIdx);
+			}
+		}
+
+		return true;
+	}
+
+	/**
 	 * Creates a local work scene by making a copy of 'src' and copying over parts of 'dst' as needed
 	 */
-	private void createWorkScene( SceneWorkingGraph src, SceneWorkingGraph dst ) {
+	void createWorkScene( SceneWorkingGraph src, SceneWorkingGraph dst ) {
+		BoofMiscOps.checkTrue(!commonViews.isEmpty());
+
 		// Local copy of the 'src' scene
 		workScene.setTo(src);
 		// All views that are in 'src' will be modified
@@ -246,22 +261,25 @@ public class MetricMergeScenes implements VerbosePrint {
 	}
 
 	/**
-	 * Copy the working scene into 'dst'. We do not copy the common views over, only add their inliers. The idea
-	 * being that we could have messed up their state when refining the working scene.
+	 * Copies views from 'workScene' scene into 'dst' that are not in 'dst'. If a view is already in 'dst' then
+	 * only the inlier set in 'workScene' is copied. 'dst' is considered to be the dominant scene which is why we
+	 * don't want to modify the state of common views.
+	 *
+	 * Please look at how 'workScene' is constructed to understand the inlier logic below
 	 */
-	private void mergeWorkingSceneIntoDst( SceneWorkingGraph dst ) {
+	void mergeWorkIntoDst( SceneWorkingGraph dst ) {
 		for (int viewIdx = 0; viewIdx < workScene.listViews.size(); viewIdx++) {
-			SceneWorkingGraph.View wview = workScene.listViews.get(viewIdx);
-			SceneWorkingGraph.View viewDst = dst.views.get(wview.pview.id);
+			SceneWorkingGraph.View viewSrc = workScene.listViews.get(viewIdx);
+			SceneWorkingGraph.View viewDst = dst.views.get(viewSrc.pview.id);
 			if (viewDst != null) {
 				// just need to copy the inliers over from src. 'dst' inliers are at the end
-				int end = wview.inliers.size - viewDst.inliers.size;
+				int end = viewSrc.inliers.size - viewDst.inliers.size;
 				for (int inlierIdx = 0; inlierIdx < end; inlierIdx++) {
-					viewDst.inliers.grow().setTo(wview.inliers.get(inlierIdx));
+					viewDst.inliers.grow().setTo(viewSrc.inliers.get(inlierIdx));
 				}
 			} else {
-				viewDst = dst.addView(wview.pview);
-				viewDst.setTo(wview);
+				viewDst = dst.addView(viewSrc.pview);
+				viewDst.setTo(viewSrc);
 				viewDst.index = dst.listViews.size() - 1; // setTo() overwrote the index
 			}
 
@@ -272,7 +290,7 @@ public class MetricMergeScenes implements VerbosePrint {
 	/**
 	 * Converts the coordinate system in 'src' into one that is compatible with 'dst'
 	 */
-	private void convertNewViewCoordinateSystem( SceneWorkingGraph.View wview ) {
+	void convertNewViewCoordinateSystem( SceneWorkingGraph.View wview ) {
 		src_to_view.setTo(wview.world_to_view);
 		src_to_view.T.scale(src_to_dst.scale);
 		transform_dst_to_src.concat(src_to_view, wview.world_to_view);
@@ -280,7 +298,7 @@ public class MetricMergeScenes implements VerbosePrint {
 
 	private void addViewsButNoInliers( SceneWorkingGraph origScene,
 									   FastArray<PairwiseImageGraph.View> viewsToCopy,
-									   boolean markAsKNown ) {
+									   boolean markAsKnown ) {
 		for (int viewIdx = 0; viewIdx < viewsToCopy.size; viewIdx++) {
 			PairwiseImageGraph.View pview = viewsToCopy.get(viewIdx);
 			if (workScene.views.containsKey(pview.id))
@@ -288,11 +306,18 @@ public class MetricMergeScenes implements VerbosePrint {
 
 			// Make sure all the views which are referenced are added to the local sub-scene
 			// They will be static so we don't need to add their inlier info too
-			copyIntoSceneJustState(origScene, markAsKNown, pview);
-			if (verbose != null) verbose.println("Adding view-no-inliers id='" + pview.id + "' known=" + markAsKNown);
+			copyIntoSceneJustState(origScene, markAsKnown, pview);
+			if (verbose != null) verbose.println("Adding view-no-inliers id='" + pview.id + "' known=" + markAsKnown);
 		}
 	}
 
+	/**
+	 * Copies the view's state from 'origScene' into the 'workScene' and marks the scene as known or not.
+	 *
+	 * @param origScene The scene which provides the view's state
+	 * @param markAsKnown If the copied view will be marked as known or not
+	 * @param pview Which view is to be copied
+	 */
 	private void copyIntoSceneJustState( SceneWorkingGraph origScene, boolean markAsKnown, PairwiseImageGraph.View pview ) {
 		SceneWorkingGraph.View origView = origScene.views.get(pview.id);
 		SceneWorkingGraph.View copyView = workScene.addView(pview);
@@ -305,7 +330,9 @@ public class MetricMergeScenes implements VerbosePrint {
 	/**
 	 * Finds all views which are common between the two scenes
 	 */
-	public void findCommonViews( SceneWorkingGraph src, SceneWorkingGraph dst ) {
+	static void findCommonViews( SceneWorkingGraph src, SceneWorkingGraph dst,
+								 DogArray<CommonView> commonViews,
+								 @Nullable PrintStream verbose ) {
 		commonViews.reset();
 
 		// Go through all the views in the src list

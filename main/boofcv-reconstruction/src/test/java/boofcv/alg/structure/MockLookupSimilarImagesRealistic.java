@@ -175,8 +175,14 @@ public class MockLookupSimilarImagesRealistic implements LookUpSimilarImages {
 			for (Feature f : points) {
 				if (!w2p.transform(f.world, pixel))
 					continue;
-				if (pixel.x < 0 || pixel.y < 0 || pixel.x > intrinsic.width - 1 || pixel.y > intrinsic.height - 1)
+
+				// Adjust pixel coordinates if intrinsics has principle point at (0,0) instead of inside the image
+				double xx = pixel.x + (intrinsic.cx == 0.0 ? intrinsic.width/2 : 0.0);
+				double yy = pixel.y + (intrinsic.cy == 0.0 ? intrinsic.height/2 : 0.0);
+
+				if (xx < 0 || yy < 0 || xx >= intrinsic.width || yy >= intrinsic.height)
 					continue;
+
 				Observation o = new Observation();
 				o.feature = f;
 				o.pixel.setTo(pixel);
@@ -187,6 +193,15 @@ public class MockLookupSimilarImagesRealistic implements LookUpSimilarImages {
 //			System.out.println("view="+viewCnt+" obs.size="+v.observations.size());
 			// Randomize the order of the observations
 			Collections.shuffle(v.observations, rand);
+
+//			for (int i = 0; i < v.observations.size(); i++) {
+//				for (int j = i+1; j < v.observations.size(); j++) {
+//					if (v.observations.get(i).feature == v.observations.get(j).feature ) {
+//						throw new RuntimeException("Observing the same feature more than once!");
+//					}
+//				}
+//			}
+
 			views.add(v);
 		}
 
@@ -287,9 +302,9 @@ public class MockLookupSimilarImagesRealistic implements LookUpSimilarImages {
 		commonCount.resize(points.size(), 0);
 
 		// Find features visible in every view
-		views.get(wv.index).observations.forEach(o -> commonCount.data[o.feature.featureIdx]++);
+		views.get(wv.pview.index).observations.forEach(o -> commonCount.data[o.feature.featureIdx]++);
 		for (int viewIdx : connected) {
-			BoofMiscOps.checkTrue(viewIdx != wv.index);
+			BoofMiscOps.checkTrue(viewIdx != wv.pview.index);
 			views.get(viewIdx).observations.forEach(o -> commonCount.data[o.feature.featureIdx]++);
 		}
 
@@ -300,6 +315,7 @@ public class MockLookupSimilarImagesRealistic implements LookUpSimilarImages {
 			info.views.add(pairwise.nodes.get(connected[i]));
 		}
 		info.observations.resize(info.views.size);
+		info.scoreGeometric = 10; // give it a positive score so it isn't ignored.
 
 		// Count the number of features seen by all views
 		for (int featureID = 0; featureID < commonCount.size; featureID++) {
@@ -323,7 +339,7 @@ public class MockLookupSimilarImagesRealistic implements LookUpSimilarImages {
 					info.observations.get(inlierViewIdx).add(obsIdx);
 					break;
 				}
-				BoofMiscOps.checkTrue(found);
+				BoofMiscOps.checkTrue(found, "Inlier not in all views?!");
 			}
 		}
 

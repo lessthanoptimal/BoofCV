@@ -24,7 +24,10 @@ import org.ddogleg.struct.FastArray;
 import org.ejml.UtilEjml;
 import org.junit.jupiter.api.Test;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+import java.util.Objects;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -130,53 +133,74 @@ class TestReconstructionFromPairwiseGraph extends BoofStandardJUnit {
 	}
 
 	@Test void selectAndSpawnSeeds() {
-		fail("rewrite");
-//		var alg = new Helper();
-//
-//		// linear graph with each node/view just as good as any other
-//		{
-//			PairwiseImageGraph graph = createLinearGraph(8, 1);
-//			Map<String, SeedInfo> mapScores = alg.scoreNodesAsSeeds(graph, 2);
-//			List<SeedInfo> seeds = alg.selectAndSpawnSeeds(alg.seedScores, mapScores);
-//			assertEquals(3, seeds.size()); // determined through manual inspection
-//			sanityCheckSeeds(seeds);
-//		}
-//
-//		// Similar situation but with one more view
-//		{
-//			PairwiseImageGraph graph = createLinearGraph(9, 1);
-//			Map<String, SeedInfo> mapScores = alg.scoreNodesAsSeeds(graph, 2);
-//			List<SeedInfo> seeds = alg.selectAndSpawnSeeds(alg.seedScores, mapScores);
-//			assertEquals(3, seeds.size()); // determined through manual inspection
-//			sanityCheckSeeds(seeds);
-//		}
-//
-//		// Let's make one node clearly very desirable and see if it's selected
-//		{
-//			// select different targets to stress the system more
-//			for (int targetIdx = 1; targetIdx < 4; targetIdx++) {
-//				PairwiseImageGraph graph = createLinearGraph(9, 1);
-//				PairwiseImageGraph.View target = graph.nodes.get(targetIdx);
-//				target.connections.forIdx(( i, o ) -> o.score3D = 5.0);
-//
-//				Map<String, SeedInfo> mapScores = alg.scoreNodesAsSeeds(graph, 2);
-//				List<SeedInfo> seeds = alg.selectAndSpawnSeeds(alg.seedScores, mapScores);
-//				assertTrue(3 == seeds.size() || 2 == seeds.size()); // determined through manual inspection
-//				sanityCheckSeeds(seeds);
-//				assertSame(seeds.get(0).seed, target);
-//			}
-//		}
+		var db = new MockLookupSimilarImages(1,1); // not actually used
+		var alg = new Helper();
+		alg.spawnSceneReturn = true;
+
+		// linear graph with each node/view just as good as any other
+		// it will also only be able to find 1 neighbor since they won't be connected
+		{
+			PairwiseImageGraph graph = createLinearGraph(8, 1);
+			Map<String, SeedInfo> mapScores = alg.scoreNodesAsSeeds(graph, 2);
+			alg.selectAndSpawnSeeds(db, graph, alg.seedScores, mapScores);
+			assertEquals(3, alg.selected.size()); // determined through manual inspection
+			sanityCheckSeeds(alg.selected, 1);
+		}
+
+		// There are more connections now and the seed set should have 3 elements in it
+		{
+			alg.selected.clear();
+			PairwiseImageGraph graph = createLinearGraph(8, 2);
+			Map<String, SeedInfo> mapScores = alg.scoreNodesAsSeeds(graph, 2);
+			alg.selectAndSpawnSeeds(db, graph, alg.seedScores, mapScores);
+			sanityCheckSeeds(alg.selected, 2);
+		}
+
+		// Similar situation but with one more view
+		{
+			alg.selected.clear();
+			PairwiseImageGraph graph = createLinearGraph(9, 2);
+			Map<String, SeedInfo> mapScores = alg.scoreNodesAsSeeds(graph, 2);
+			alg.selectAndSpawnSeeds(db, graph, alg.seedScores, mapScores);
+			assertEquals(2, alg.selected.size()); // determined through manual inspection
+			sanityCheckSeeds(alg.selected, 2);
+		}
+
+		// Let's make one node clearly very desirable and see if it's selected
+		{
+			// select different targets to stress the system more
+			for (int targetIdx = 1; targetIdx < 4; targetIdx++) {
+				PairwiseImageGraph graph = createLinearGraph(9, 2);
+				PairwiseImageGraph.View target = graph.nodes.get(targetIdx);
+				target.connections.get(0).score3D = 5;
+				// Give the first two connections a higher motion score to make this triplet stand out
+				PairwiseImageGraph.View ta = target.connections.get(0).other(target);
+				PairwiseImageGraph.View tb = target.connections.get(1).other(target);
+				Objects.requireNonNull(ta.findMotion(tb)).score3D = 4.0;
+
+				Map<String, SeedInfo> mapScores = alg.scoreNodesAsSeeds(graph, 2);
+				alg.selected.clear();
+				alg.selectAndSpawnSeeds(db, graph, alg.seedScores, mapScores);
+				assertTrue(3 == alg.selected.size() || 2 == alg.selected.size()); // determined through manual inspection
+				sanityCheckSeeds(alg.selected, 2);
+				assertSame(target, alg.selected.get(0).seed);
+			}
+		}
 	}
 
 	/**
 	 * A few simple sanity checks on the selected seeds
 	 */
-	void sanityCheckSeeds( List<SeedInfo> seeds ) {
+	void sanityCheckSeeds( List<SeedInfo> seeds, int numSelected ) {
 		// make sure non of the seeds are connected to each other
 		for (int i = 0; i < seeds.size(); i++) {
 			SeedInfo a = seeds.get(i);
+			assertEquals(numSelected, a.motions.size);
+
+			// make sure none of the seeds appear in any other seeds
 			for (int j = i + 1; j < seeds.size(); j++) {
 				SeedInfo b = seeds.get(j);
+				// none of the other seeds should be neighbors of a
 				assertNull(a.seed.findMotion(b.seed));
 			}
 		}
@@ -293,9 +317,13 @@ class TestReconstructionFromPairwiseGraph extends BoofStandardJUnit {
 	private class Helper extends ReconstructionFromPairwiseGraph {
 		public Helper() {super(new PairwiseGraphUtils());}
 
+		List<SeedInfo> selected = new ArrayList<>();
+		boolean spawnSceneReturn = true;
+
 		@Override
 		protected boolean spawnSceneFromSeed( LookUpSimilarImages db, PairwiseImageGraph pairwise, SeedInfo info ) {
-			return false;
+			selected.add(info);
+			return spawnSceneReturn;
 		}
 	}
 }
