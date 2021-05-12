@@ -215,21 +215,29 @@ public class SceneWorkingGraph {
 	 * Data structure related to an image. Points to image features, intrinsic parameters, and extrinsic parameters.
 	 */
 	static public class View {
+		/** Reference to the {@link PairwiseImageGraph.View} that this view was generated from */
 		public PairwiseImageGraph.View pview;
 
-		// Specifies which observations were used to compute the projective transform for this view
-		// If empty that means one set of inliers are used for multiple views and only one view needed this to be saved
-		// this happens for the seed view
+		/**
+		 * Specifies which observations were used to compute the projective transform for this view
+		 * If empty that means one set of inliers are used for multiple views and only one view needed
+		 * this to be saved this happens for the seed view
+		 */
 		public final DogArray<InlierInfo> inliers = new DogArray<>(InlierInfo::new, InlierInfo::reset);
 
-		// projective camera matrix
+		/** projective camera matrix */
 		public final DMatrixRMaj projective = new DMatrixRMaj(3, 4);
-		// metric camera
+
+		/** metric camera */
 		public final BundlePinholeSimplified intrinsic = new BundlePinholeSimplified();
+
+		/** SE3 from world to this view */
 		public final Se3_F64 world_to_view = new Se3_F64();
+
+		/** Shape of this view's image */
 		public final ImageDimension imageDimension = new ImageDimension();
 
-		// Index of the view in the list. This will be the same index in the SBA scene
+		/** Index of the view in the list. This will be the same index in the SBA scene */
 		public int index = -1;
 
 		/**

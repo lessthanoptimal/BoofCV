@@ -259,55 +259,13 @@ public class SceneMergingOperations implements VerbosePrint {
 	}
 
 	/**
-	 * Merges the 'src' scene into the 'dst' scene. Copies then refines the extrinsics/intrinsics to ensure
-	 * the merge doesn't have artifacts.
-	 *
-	 * @param src (Input) The source scene which which is merged into 'dst'
-	 * @param dst (Input/Output) The destination scene
-	 * @param src_to_dst Known transform from the coordinate system of src to dst.
-	 */
-	public boolean mergeViews( LookUpSimilarImages db,
-							   SceneWorkingGraph src, SceneWorkingGraph dst, ScaleSe3_F64 src_to_dst,
-							   PairwiseViewScenes scenesInEachView ) {
-		// Copy the src views into the dst scene
-		mergeStructure(src, dst, src_to_dst, scenesInEachView);
-
-		// The scenes might have a different version of reality because they converged to slightly different solutions
-		// this can and does cause geometric contradictions.
-		refineSubset.setSubset(dst, mergedViews);
-
-		// Mark the views which were in both scenes as fixed. This way we can't make the dst worse than it was before
-		// and we will force src to switch over to dst's version of reality
-		for (int listIdx = 0; listIdx < duplicateViews.size(); listIdx++) {
-			refineSubset.setViewKnown(duplicateViews.get(listIdx).pview.id);
-		}
-
-		// Refine and update the views
-		if (!refineSubset.process(db)) {
-			if (verbose != null) verbose.println("Refine subset failed! Something went really wrong");
-			return false;
-		}
-
-		if (verbose != null) {
-			for (int mergedCnt = 0; mergedCnt < mergedViews.size(); mergedCnt++) {
-				SceneWorkingGraph.View view = mergedViews.get(mergedCnt);
-				verbose.printf("after view='%s' f=%.2f\n", view.pview.id, view.intrinsic.f);
-			}
-		}
-
-		// Make this an empty scene to ensure if it's used it will fail fast
-		src.purgeViews();
-
-		return true;
-	}
-
-	/**
 	 * Finds views which are in 'src' but not in 'dst' scene and copies them over while applying the extrinsic
 	 * transform. Keeps tracks of which views are in common too.
 	 *
 	 * @param src (Input) The source scene which which is merged into 'dst'
 	 * @param dst (Input/Output) The destination scene
-	 * @param src_to_dst Known transform from the coordinate system of src to dst.
+	 * @param src_to_dst (Input) Known transform from the coordinate system of src to dst.
+	 * @param scenesInEachView (Output) Modified to include changes to 'dst' in views that are in src and not dst
 	 */
 	void mergeStructure( SceneWorkingGraph src, SceneWorkingGraph dst, ScaleSe3_F64 src_to_dst,
 						 PairwiseViewScenes scenesInEachView ) {
@@ -373,54 +331,6 @@ public class SceneMergingOperations implements VerbosePrint {
 			src_to_view.T.scale(src_to_dst.scale);
 			transform_dst_to_src.concat(src_to_view, dstView.world_to_view);
 		}
-	}
-
-	/**
-	 * Determines the transform (scale and SE3) between the two scenes. This is done using a single view
-	 */
-	public boolean selectViewToEstimateTransform(
-			SceneWorkingGraph src, SceneWorkingGraph dst, SelectedViews selectedPair ) {
-
-		double bestScore = 0.0;
-		SceneWorkingGraph.View selectedSrc = null;
-		SceneWorkingGraph.View selectedDst = null;
-
-		// Number of common views that can be used for merging
-		int totalCommon = 0;
-
-		// Go through all the views in the src list
-		for (int srcViewIdx = 0; srcViewIdx < src.listViews.size(); srcViewIdx++) {
-			SceneWorkingGraph.View srcView = src.listViews.get(srcViewIdx);
-			SceneWorkingGraph.View dstView = dst.views.get(srcView.pview.id);
-
-			if (dstView == null)
-				continue;
-
-			totalCommon++;
-
-			// Evaluate the quality of 3D information
-			double score = Math.min(srcView.getBestInlierScore(), dstView.getBestInlierScore());
-			if (score <= bestScore)
-				continue;
-
-			bestScore = score;
-			selectedSrc = srcView;
-			selectedDst = dstView;
-		}
-
-		// Return false if it couldn't
-		if (selectedSrc == null) {
-			return false;
-		}
-
-		if (verbose != null)
-			verbose.println("Select merge views: candidates=" + totalCommon + " bestScore=" + bestScore +
-					" id='" + selectedSrc.pview.id + "'");
-
-		selectedPair.src = selectedSrc;
-		selectedPair.dst = selectedDst;
-
-		return true;
 	}
 
 	/**
