@@ -222,6 +222,7 @@ public class BoofSwingUtil {
 			switch (filter) {
 				case DIRECTORIES -> directories = true;
 				case IMAGES, VIDEOS -> images = true;
+				default -> {}
 			}
 		}
 		if (!directories && images) {

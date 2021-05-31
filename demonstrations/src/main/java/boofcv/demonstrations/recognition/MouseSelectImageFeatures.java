@@ -41,19 +41,19 @@ public class MouseSelectImageFeatures extends MouseAdapter {
 	final JComponent owner;
 
 	/** Converts a screen pixel into an image pixel */
-	ScreenToImage screenToImage;
+	public ScreenToImage screenToImage;
 	/** Converts an image pixel into a screen pixel */
-	ImageToScreen imageToScreen;
+	public ImageToScreen imageToScreen;
 	/** Gets the feature's pixel coordinate in the image */
-	FeatureLocation featureLocation;
+	public FeatureLocation featureLocation;
 	/** Looks up feature color by index */
-	FeatureColor featureColor = ( idx ) -> 0xFF0000;
+	public FeatureColor featureColor = ( idx ) -> 0xFF0000;
 	/** Checks to see if the feature should be skipped */
-	FeatureSkip featureSkip = ( idx ) -> false;
+	public FeatureSkip featureSkip = ( idx ) -> false;
 	/** Called after the user has selected a region */
-	BoofLambdas.ProcessCall handleSelected = ()->{};
+	public BoofLambdas.ProcessCall handleSelected = ()->{};
 	/** Specifies how many features there are */
-	int numFeatures;
+	public int numFeatures;
 
 
 	/** How far it will search in screen pixels when user clicks */

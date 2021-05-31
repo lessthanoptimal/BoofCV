@@ -22,12 +22,15 @@ import boofcv.BoofVersion;
 import boofcv.abst.geo.bundle.SceneStructureCommon;
 import boofcv.abst.geo.bundle.SceneStructureMetric;
 import boofcv.alg.geo.bundle.cameras.BundlePinholeSimplified;
+import boofcv.alg.similar.SimilarImagesData;
+import boofcv.alg.structure.LookUpSimilarImages;
 import boofcv.alg.structure.PairwiseImageGraph;
 import boofcv.alg.structure.SceneWorkingGraph;
 import boofcv.alg.structure.SceneWorkingGraph.InlierInfo;
 import boofcv.misc.BoofMiscOps;
 import boofcv.struct.feature.AssociatedIndex;
 import boofcv.struct.image.ImageDimension;
+import georegression.struct.point.Point2D_F64;
 import georegression.struct.se.Se3_F64;
 import org.ddogleg.struct.DogArray;
 import org.ddogleg.struct.DogArray_I32;
@@ -52,6 +55,73 @@ import static java.nio.charset.StandardCharsets.UTF_8;
  * @author Peter Abeles
  */
 public class MultiViewIO {
+
+	public static void save( LookUpSimilarImages db, String path ) {
+		try {
+			Writer writer = new OutputStreamWriter(new FileOutputStream(path), UTF_8);
+			save(db, writer);
+		} catch (IOException e) {
+			throw new UncheckedIOException(e);
+		}
+	}
+
+	/**
+	 * Saves a {@link LookUpSimilarImages} into the {@link Writer}.
+	 *
+	 * @param db (Input) Information on similar images
+	 * @param outputWriter (Output) where the graph is writen to
+	 */
+	public static void save( LookUpSimilarImages db, Writer outputWriter ) {
+		PrintWriter out = new PrintWriter(outputWriter);
+
+		Yaml yaml = createYmlObject();
+
+		out.println("# " + db.getClass().getSimpleName() + " in YAML format. BoofCV " + BoofVersion.VERSION);
+
+		// Get list of all the images
+		List<String> imageIds = db.getImageIDs();
+
+		// Storage for image information
+		List<Map<String, Object>> imageInfo = new ArrayList<>();
+		ImageDimension shape = new ImageDimension();
+		DogArray<Point2D_F64> features = new DogArray<>(Point2D_F64::new);
+
+		for (int i = 0; i < imageIds.size(); i++) {
+			List<String> similarImages = new ArrayList<>();
+
+			String id = imageIds.get(i);
+
+			db.lookupShape(id, shape);
+			db.lookupPixelFeats(id, features);
+			db.findSimilar(id, ( s ) -> true, similarImages);
+
+			// Flatten the pixels into an array for easy storage
+			double[] pixels = new double[features.size*2];
+			for (int j = 0; j < features.size; j++) {
+				Point2D_F64 p = features.get(j);
+				pixels[j*2] = p.x;
+				pixels[j*2 + 1] = p.y;
+			}
+
+			Map<String, Object> imageMap = new HashMap<>();
+			imageMap.put("width", shape.width);
+			imageMap.put("height", shape.height);
+			imageMap.put("similar", similarImages);
+			imageMap.put("features", pixels);
+
+			imageInfo.add(imageMap);
+		}
+
+		Map<String, Object> data = new HashMap<>();
+		data.put("images", imageIds);
+		data.put("info", imageInfo);
+		data.put("data_type", "SimilarImages");
+		data.put("version", 0);
+
+		yaml.dump(data, out);
+
+		out.close();
+	}
 
 	public static void save( PairwiseImageGraph graph, String path ) {
 		try {
@@ -342,6 +412,60 @@ public class MultiViewIO {
 		}
 
 		return scene;
+	}
+
+	public static LookUpSimilarImages loadSimilarImages( String path ) {
+		try {
+			Reader reader = new InputStreamReader(new FileInputStream(path), UTF_8);
+			return loadSimilarImages(reader);
+		} catch (IOException e) {
+			throw new UncheckedIOException(e);
+		}
+	}
+
+	/**
+	 * Decodes {@link LookUpSimilarImages} encoded in a YAML format from a reader.
+	 *
+	 * @param reader (Input/output) where to read the data from
+	 * @return The decoded graph
+	 */
+	public static LookUpSimilarImages loadSimilarImages( Reader reader ) {
+		Yaml yaml = createYmlObject();
+
+		SimilarImagesData ret = new SimilarImagesData();
+
+		DogArray<Point2D_F64> features = new DogArray<>(Point2D_F64::new);
+
+		Map<String, Object> data = yaml.load(reader);
+		try {
+			reader.close();
+			List<String> listImages = getOrThrow(data, "images");
+			List<Map<String, Object>> yamlInfo = getOrThrow(data, "info");
+
+			BoofMiscOps.checkEq(listImages.size(), yamlInfo.size());
+
+			for (int imageIdx = 0; imageIdx < listImages.size(); imageIdx++) {
+				String id = listImages.get(imageIdx);
+				Map<String, Object> yamlImage = yamlInfo.get(imageIdx);
+
+				int width = (int)yamlImage.get("width");
+				int height = (int)yamlImage.get("height");
+				List<String> similar = getOrThrow(yamlImage, "similar");
+				List<Double> yamlPixels = getOrThrow(yamlImage, "features");
+				features.resize(yamlPixels.size()/2);
+				for (int i = 0; i < yamlPixels.size(); i += 2) {
+					double x = yamlPixels.get(i);
+					double y = yamlPixels.get(i + 1);
+					features.get(i/2).setTo(x, y);
+				}
+
+				ret.add(id, width, height, features.toList(), similar);
+			}
+		} catch (IOException e) {
+			throw new UncheckedIOException(e);
+		}
+
+		return ret;
 	}
 
 	public static PairwiseImageGraph load( String path, @Nullable PairwiseImageGraph graph ) {

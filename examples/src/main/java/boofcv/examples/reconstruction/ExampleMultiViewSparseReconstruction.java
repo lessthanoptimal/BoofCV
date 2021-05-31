@@ -169,6 +169,9 @@ public class ExampleMultiViewSparseReconstruction {
 			} else {
 				similarImagesFromUnsorted();
 			}
+
+			var savePath = new File(workDirectory, "similar.yaml");
+			MultiViewIO.save(similarImages, savePath.getPath());
 		}
 
 		if (pairwise == null)
