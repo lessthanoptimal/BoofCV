@@ -30,7 +30,7 @@ public class ConfigMultiviewStereo implements Configuration {
 	/**
 	 * @see boofcv.alg.mvs.MultiViewStereoFromKnownSceneStructure#minimumQuality3D
 	 */
-	public double minimumQuality3D = 0.15;
+	public double minimumQuality3D = 0.05;
 
 	/**
 	 * @see boofcv.alg.mvs.MultiViewStereoFromKnownSceneStructure#maximumCenterOverlap
