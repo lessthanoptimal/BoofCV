@@ -56,6 +56,8 @@ import java.util.List;
 import java.util.*;
 
 import static boofcv.io.UtilIO.systemToUnix;
+import static javax.swing.ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER;
+import static javax.swing.ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS;
 
 /**
  * Visualizes similar images using scene recognition. Shows images features, words, and allows interaction.
@@ -280,7 +282,7 @@ public class DemoSceneRecognitionSimilarImagesApp<Gray extends ImageGray<Gray>, 
 
 		JCheckBox checkFeatures = checkbox("Features", drawFeatures);
 		JComboBox<String> comboColor = combo(colorization.ordinal(), (Object[])ColorFeatures.values());
-		JSpinner spinnerNumColumns = spinner(numPreviewColumns,1,10,1);
+		JSpinner spinnerNumColumns = spinner(numPreviewColumns, 1, 10, 1);
 
 		public ViewControlPanel() {
 			listImages = new JList<>();
@@ -390,12 +392,14 @@ public class DemoSceneRecognitionSimilarImagesApp<Gray extends ImageGray<Gray>, 
 		final JTextArea textArea = new JTextArea();
 
 		final GridLayout gridLayout = new GridLayout(0, 4, 4, 4);
-		final JPanel gridPanel = new JPanel(gridLayout);
+		final ScrollablePanel gridPanel = new ScrollablePanel(gridLayout);
 
 		// Selected index of a feature in the "source" image
 		int selectedSrcID = -1;
 		// The word of the feature in the selected feature
 		int selectedWord = -1;
+
+		JScrollPane gridScrollPanel;
 
 		public VisualizePanel() {
 			setLayout(new BorderLayout());
@@ -406,10 +410,12 @@ public class DemoSceneRecognitionSimilarImagesApp<Gray extends ImageGray<Gray>, 
 			textArea.setLineWrap(true);
 			textArea.setMinimumSize(new Dimension(0, 0));
 
-			JSplitPane mainPanelSplit = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, textArea, mainImage);
+			var mainPanelSplit = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, textArea, mainImage);
 			mainPanelSplit.setDividerLocation(200);
 
-			JSplitPane verticalSplit = new JSplitPane(JSplitPane.VERTICAL_SPLIT, mainPanelSplit, gridPanel);
+			gridScrollPanel = new JScrollPane(gridPanel, VERTICAL_SCROLLBAR_ALWAYS, HORIZONTAL_SCROLLBAR_NEVER);
+
+			var verticalSplit = new JSplitPane(JSplitPane.VERTICAL_SPLIT, mainPanelSplit, gridScrollPanel);
 			verticalSplit.setDividerLocation(300);
 			verticalSplit.setPreferredSize(new Dimension(200, 0));
 
@@ -421,6 +427,9 @@ public class DemoSceneRecognitionSimilarImagesApp<Gray extends ImageGray<Gray>, 
 			this.gridPanel.invalidate();
 			this.gridPanel.validate();
 			this.gridPanel.repaint();
+			this.gridScrollPanel.invalidate();
+			this.gridScrollPanel.validate();
+			this.gridScrollPanel.repaint();
 		}
 
 		public void handleSelectedChanged() {
@@ -471,7 +480,7 @@ public class DemoSceneRecognitionSimilarImagesApp<Gray extends ImageGray<Gray>, 
 			for (String viewID : imagesSimilar.keySet()) {
 				sortedList.add(imagesSimilar.get(viewID));
 			}
-			Collections.sort(sortedList,(a,b)->Integer.compare(b.associated.size,a.associated.size));
+			Collections.sort(sortedList, ( a, b ) -> Integer.compare(b.associated.size, a.associated.size));
 			for (SimilarInfo match : sortedList) {
 				gridPanel.add(new ImageLabeledPanel(match.id, match.associated.size));
 			}
@@ -508,44 +517,44 @@ public class DemoSceneRecognitionSimilarImagesApp<Gray extends ImageGray<Gray>, 
 	 * Draws the image and the image's name below it.
 	 */
 	class ImageLabeledPanel extends JSpringPanel {
+		VisualizeImage image;
+		int heightOfLabels;
+
 		public ImageLabeledPanel( String imageID, int count ) {
 			var labelID = new JLabel(new File(imageID).getName());
 			var labelScore = new JLabel("Match: " + count);
 
 			// Take in account the text when scaling the images so that it's still visible even when small
-			int heightOfLabels = labelID.getPreferredSize().height + labelScore.getPreferredSize().height + 4;
+			heightOfLabels = labelID.getPreferredSize().height + labelScore.getPreferredSize().height + 10;
 
-			VisualizeImage image = new VisualizeImage(imageID) {
-				// All of this sizing crap is to keep the box tight around the image
-				@Override public Dimension getPreferredSize() {
-					if (img == null)
-						return super.getPreferredSize();
-
-					Dimension s = ImageLabeledPanel.this.getSize();
-					double adjustedHeight = Math.max(0.0, s.getHeight() - heightOfLabels);
-
-					double scale = Math.min(s.getWidth()/img.getWidth(), adjustedHeight/img.getHeight());
-					if (scale > 1.0)
-						scale = 1.0;
-					int width = (int)(scale*img.getWidth() + 0.5);
-					int height = (int)(scale*img.getHeight() + 0.5);
-					return new Dimension(width, height);
-				}
-			};
-
-			// This component will stretch out, but there's nothing in it
-			JPanel glue = new JPanel();
+			image = new VisualizeImage(imageID);
+			image.setPreferredSize(new Dimension(image.getImage().getWidth(), image.getImage().getHeight()));
 
 			add(image);
 			add(labelID);
 			add(labelScore);
-			add(glue);
 
 			constrainWestNorthEast(image, null, 0, 0);
-			constrainWestNorthEast(labelID, image, 2, 4);
-			constrainWestNorthEast(labelScore, labelID, 2, 4);
-			constrainWestNorthEast(glue, labelScore, 0, 0);
-			layout.putConstraint(SpringLayout.SOUTH, glue, 0, SpringLayout.SOUTH, this);
+			constrainWestSouthEast(labelScore, null, 2, 4 );
+			constrainWestSouthEast(labelID, labelScore, 2, 4 );
+			layout.putConstraint(SpringLayout.SOUTH, image, 0, SpringLayout.NORTH, labelID);
+		}
+
+		@Override public Dimension getPreferredSize() {
+			if (this.image == null)
+				return super.getPreferredSize();
+
+			BufferedImage img = this.image.getImage();
+			if (img == null)
+				return super.getPreferredSize();
+
+			Dimension s = this.getSize();
+
+			double scale = Math.min(img.getWidth(), s.getWidth())/img.getWidth();
+			int width = (int)(scale*img.getWidth() + 0.5);
+			int height = (int)(scale*img.getHeight() + 0.5) + heightOfLabels;
+
+			return new Dimension(width, height);
 		}
 	}
 
@@ -585,11 +594,11 @@ public class DemoSceneRecognitionSimilarImagesApp<Gray extends ImageGray<Gray>, 
 					return true;
 
 				// Skip over features which are not associated
-				if (viewControlPanel.colorization == ColorFeatures.ASSOCIATION ) {
+				if (viewControlPanel.colorization == ColorFeatures.ASSOCIATION) {
 					int featureIdx = mainFeatureIdx.get(idx);
 
 					// Skip if there's no corresponding feature in the main view
-					if (featureIdx<0)
+					if (featureIdx < 0)
 						return true;
 
 					// Skip if the user has selected features and this is not one of the selected
@@ -616,9 +625,9 @@ public class DemoSceneRecognitionSimilarImagesApp<Gray extends ImageGray<Gray>, 
 						}
 					};
 
-			if (imageID==null) {
+			if (imageID == null) {
 				// if the user selects features in the master panel repaint everything
-				featureHandler.handleSelected = ()-> {
+				featureHandler.handleSelected = () -> {
 					switch (viewControlPanel.colorization) {
 						case WORD -> {
 							// Select the word based on the selected feature
@@ -686,11 +695,7 @@ public class DemoSceneRecognitionSimilarImagesApp<Gray extends ImageGray<Gray>, 
 					}
 				}
 			}
-
-			Graphics2D g2 = BoofSwingUtil.antialiasing(g);
-
-
-			featureHandler.paint(g2);
+			featureHandler.paint(BoofSwingUtil.antialiasing(g));
 		}
 	}
 
@@ -708,6 +713,32 @@ public class DemoSceneRecognitionSimilarImagesApp<Gray extends ImageGray<Gray>, 
 
 	enum ColorFeatures {
 		ASSOCIATION, WORD, ALL
+	}
+
+	private static class ScrollablePanel extends JPanel implements Scrollable {
+		public ScrollablePanel( LayoutManager layout ) {
+			super(layout);
+		}
+
+		public Dimension getPreferredScrollableViewportSize() {
+			return getPreferredSize();
+		}
+
+		public int getScrollableUnitIncrement(Rectangle visibleRect, int orientation, int direction) {
+			return 10;
+		}
+
+		public int getScrollableBlockIncrement(Rectangle visibleRect, int orientation, int direction) {
+			return ((orientation == SwingConstants.VERTICAL) ? visibleRect.height : visibleRect.width) - 10;
+		}
+
+		public boolean getScrollableTracksViewportWidth() {
+			return true;
+		}
+
+		public boolean getScrollableTracksViewportHeight() {
+			return false;
+		}
 	}
 
 	public static void main( String[] args ) {
