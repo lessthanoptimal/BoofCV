@@ -184,7 +184,7 @@ public class MultiViewStereoFromKnownSceneStructure<T extends ImageGray<T>> impl
 			if (center.used)
 				continue;
 
-			if (verbose != null) verbose.println("Center[" + index + "] View=" + center.relations.id);
+			if (verbose != null) verbose.println("Center[" + index + "] View='" + center.relations.id + "'");
 
 			// TODO compute fraction of view area which has already been covered by a previous center
 			//      and skip if over a certain value to avoid wasting time. This can happen if a view is very
@@ -195,7 +195,7 @@ public class MultiViewStereoFromKnownSceneStructure<T extends ImageGray<T>> impl
 
 			// If none of the connected views had enough quality abort
 			if (imagePairIndexesSba.size() < 1) {
-				if (verbose != null) verbose.println("  too few connections to use as a center");
+				if (verbose != null) verbose.println("_ too few connections to use as a center");
 				continue;
 			}
 
@@ -446,11 +446,17 @@ public class MultiViewStereoFromKnownSceneStructure<T extends ImageGray<T>> impl
 			// Look up the "other" view this is connected to
 			StereoPairGraph.Vertex other = connected.other(center);
 
-			if (verbose != null) verbose.println("  connected.id=" + other.id);
-
 			// Add view to the look up table and mark it as the second image in a stereo pair
 			indexSbaToViewID.put(other.indexSba, other.id);
 			imagePairIndexesSba.add(other.indexSba);
+		}
+
+		if (verbose != null) {
+			verbose.print("_ connected: consider=" + totalConsider + " views=[");
+			for (String id : indexSbaToViewID.valueCollection()) {
+				verbose.print(" '" + id + "'");
+			}
+			if (verbose != null) verbose.println(" ].size=" + indexSbaToViewID.size());
 		}
 	}
 
@@ -470,7 +476,8 @@ public class MultiViewStereoFromKnownSceneStructure<T extends ImageGray<T>> impl
 	}
 
 	@Override public void setVerbose( @Nullable PrintStream out, @Nullable Set<String> configuration ) {
-		this.verbose = out;
+		this.verbose = BoofMiscOps.addPrefix(this, out);
+		BoofMiscOps.verboseChildren(out, configuration, computeFused);
 	}
 
 	/** Information on each view that's used to select and compute the disparity images */
