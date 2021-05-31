@@ -21,11 +21,16 @@ package boofcv.io.geo;
 import boofcv.abst.geo.bundle.SceneStructureCommon;
 import boofcv.abst.geo.bundle.SceneStructureMetric;
 import boofcv.alg.geo.bundle.cameras.BundlePinholeSimplified;
+import boofcv.alg.similar.SimilarImagesData;
+import boofcv.alg.structure.LookUpSimilarImages;
 import boofcv.alg.structure.PairwiseImageGraph;
 import boofcv.alg.structure.SceneWorkingGraph;
 import boofcv.struct.feature.AssociatedIndex;
+import boofcv.struct.image.ImageDimension;
 import boofcv.testing.BoofStandardJUnit;
+import georegression.struct.point.Point2D_F64;
 import georegression.struct.se.SpecialEuclideanOps_F64;
+import org.ddogleg.struct.DogArray;
 import org.ddogleg.struct.DogArray_I32;
 import org.ddogleg.util.PrimitiveArrays;
 import org.ejml.UtilEjml;
@@ -37,6 +42,8 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
+import java.util.ArrayList;
+import java.util.List;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
 import static org.junit.jupiter.api.Assertions.*;
@@ -45,6 +52,50 @@ import static org.junit.jupiter.api.Assertions.*;
  * @author Peter Abeles
  */
 class TestMultiViewIO extends BoofStandardJUnit {
+	@Test void save_load_SimilarImages() {
+		SimilarImagesData expected = new SimilarImagesData();
+		for (int i = 0; i < 4; i++) {
+			String id = "" + i;
+			int width = 10;
+			int height = 11 + i;
+
+			List<String> similar = new ArrayList<>();
+			similar.add("foo");
+			List<Point2D_F64> features = new ArrayList<>();
+			for (int j = 0; j < 4 + i; j++) {
+				features.add(new Point2D_F64(i + j, 1));
+			}
+
+			expected.add(id, width, height, features, similar);
+		}
+
+		var output = new ByteArrayOutputStream();
+		MultiViewIO.save(expected, new OutputStreamWriter(output, UTF_8));
+
+		var input = new ByteArrayInputStream(output.toByteArray());
+
+		LookUpSimilarImages found = MultiViewIO.loadSimilarImages(new InputStreamReader(input, UTF_8));
+
+		assertEquals(expected.listImages.size(), found.getImageIDs().size());
+
+		DogArray<Point2D_F64> features = new DogArray<>(Point2D_F64::new);
+		ImageDimension shape = new ImageDimension();
+		for (String id : expected.listImages) {
+			int i = Integer.parseInt(id);
+
+			found.lookupShape(id, shape);
+			assertEquals(10, shape.width);
+			assertEquals(11 + i, shape.height);
+
+			List<String> similar = new ArrayList<>();
+			found.findSimilar(id, ( s ) -> true, similar);
+			assertEquals(1, similar.size());
+
+			found.lookupPixelFeats(id, features);
+			assertEquals(4 + i, features.size);
+		}
+	}
+
 	@Test void save_load_PairwiseImageGraph() {
 		for (int trial = 0; trial < 20; trial++) {
 			PairwiseImageGraph expected = createPairwise();

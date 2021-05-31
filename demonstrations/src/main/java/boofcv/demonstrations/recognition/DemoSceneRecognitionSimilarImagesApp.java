@@ -21,6 +21,7 @@ package boofcv.demonstrations.recognition;
 import boofcv.alg.similar.ConfigSimilarImagesSceneRecognition;
 import boofcv.alg.similar.SimilarImagesSceneRecognition;
 import boofcv.core.image.GeneralizedImageOps;
+import boofcv.demonstrations.reconstruction.ScrollableJPanel;
 import boofcv.factory.structure.FactorySceneReconstruction;
 import boofcv.gui.BoofSwingUtil;
 import boofcv.gui.DemonstrationBase;
@@ -392,7 +393,7 @@ public class DemoSceneRecognitionSimilarImagesApp<Gray extends ImageGray<Gray>, 
 		final JTextArea textArea = new JTextArea();
 
 		final GridLayout gridLayout = new GridLayout(0, 4, 4, 4);
-		final ScrollablePanel gridPanel = new ScrollablePanel(gridLayout);
+		final ScrollableJPanel gridPanel = new ScrollableJPanel(gridLayout);
 
 		// Selected index of a feature in the "source" image
 		int selectedSrcID = -1;
@@ -713,32 +714,6 @@ public class DemoSceneRecognitionSimilarImagesApp<Gray extends ImageGray<Gray>, 
 
 	enum ColorFeatures {
 		ASSOCIATION, WORD, ALL
-	}
-
-	private static class ScrollablePanel extends JPanel implements Scrollable {
-		public ScrollablePanel( LayoutManager layout ) {
-			super(layout);
-		}
-
-		public Dimension getPreferredScrollableViewportSize() {
-			return getPreferredSize();
-		}
-
-		public int getScrollableUnitIncrement(Rectangle visibleRect, int orientation, int direction) {
-			return 10;
-		}
-
-		public int getScrollableBlockIncrement(Rectangle visibleRect, int orientation, int direction) {
-			return ((orientation == SwingConstants.VERTICAL) ? visibleRect.height : visibleRect.width) - 10;
-		}
-
-		public boolean getScrollableTracksViewportWidth() {
-			return true;
-		}
-
-		public boolean getScrollableTracksViewportHeight() {
-			return false;
-		}
 	}
 
 	public static void main( String[] args ) {
