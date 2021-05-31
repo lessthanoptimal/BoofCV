@@ -89,10 +89,13 @@ public class GeneratePairwiseImageGraph implements VerbosePrint {
 		for (int idxTgt = 0; idxTgt < imageIds.size(); idxTgt++) {
 			String src = imageIds.get(idxTgt);
 
+			if (verbose != null)
+				verbose.println("Target view='" + src + "' similar=" + similar.size() + " obs=" + srcFeats.size);
+
 			db.findSimilar(src, null, similar);
 			db.lookupPixelFeats(src, srcFeats);
 
-			if (verbose != null) verbose.println("ID=" + src + " similar=" + similar.size() + "  obs=" + srcFeats.size);
+			if (verbose != null) verbose.println("similar=" + similar.size() + " obs=" + srcFeats.size);
 
 			graph.nodes.get(idxTgt).totalObservations = srcFeats.size;
 

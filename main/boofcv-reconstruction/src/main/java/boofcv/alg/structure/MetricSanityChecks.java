@@ -179,7 +179,7 @@ public class MetricSanityChecks implements VerbosePrint {
 		}
 
 		if (verbose != null)
-			verbose.printf("view.id='%s' inlierIdx=%d, errors: behind=%d bounds=%d reprojection=%d tri=%d. obs=%d\n",
+			verbose.printf("view.id='%s' inlierIdx=%d, errors: behind=%d bounds=%d reprojection=%d tri=%d, obs=%d\n",
 					wview.pview.id, setIdx,
 					failedBehind, failedImageBounds, failedReprojection, failedTriangulate, numFeatures);
 
@@ -274,7 +274,7 @@ public class MetricSanityChecks implements VerbosePrint {
 				}
 			}
 
-			if (verbose != null) verbose.printf("view[%d] errors: behind=%d bounds=%d reprojection=%d. obs=%d\n",
+			if (verbose != null) verbose.printf("view[%d] errors: behind=%d bounds=%d reprojection=%d, obs=%d\n",
 					viewIdx, failedBehind, failedImageBounds, failedReprojection, oview.size());
 		}
 

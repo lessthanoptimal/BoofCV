@@ -330,7 +330,7 @@ public class MetricFromUncalibratedPairwiseGraph extends ReconstructionFromPairw
 			int sizeBefore = dst.listViews.size();
 			if (!mergeScenes.merge(db, src, dst)) {
 				if (verbose != null)
-					verbose.println("FAILED: Merged locking until modified. src=" + src.index + " dst=" + dst.index);
+					verbose.println("FAILED: Merged blocked until scenes modified. src=" + src.index + " dst=" + dst.index);
 				// Mark merging these two scenes are impossible until one of them is modified
 				mergeOps.markAsFailed(src, dst);
 				continue;

@@ -209,7 +209,7 @@ public class ConnectedTwoRowSpeckleFiller_F32 extends ConnectedTwoRowSpeckleFill
 		float value = image.unsafe_get(x, y);
 
 		if (Float.isInfinite(value) || Float.isNaN(value))
-			throw new RuntimeException("BAd value");
+			throw new RuntimeException("Bad value: " + value);
 
 		if (value == fillValue || Math.abs(value - targetValue) > tol)
 			return;
