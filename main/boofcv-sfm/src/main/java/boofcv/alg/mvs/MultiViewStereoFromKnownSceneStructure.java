@@ -453,7 +453,7 @@ public class MultiViewStereoFromKnownSceneStructure<T extends ImageGray<T>> impl
 
 		if (verbose != null) {
 			verbose.print("_ connected: consider=" + totalConsider + " views=[");
-			for (String id : indexSbaToViewID.valueCollection()) {
+			for (String id : indexSbaToViewID.valueCollection()) { // lint:forbidden ignore_line
 				verbose.print(" '" + id + "'");
 			}
 			if (verbose != null) verbose.println(" ].size=" + indexSbaToViewID.size());
