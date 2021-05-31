@@ -216,13 +216,15 @@ public class BoofSwingUtil {
 
 		// For now don't use the preview chooser if there are directories
 		boolean directories = false;
+		// Make sure it will try to load images
+		boolean images = false;
 		for (var filter : filters) {
-			if (filter == FileTypes.DIRECTORIES) {
-				directories = true;
-				break;
+			switch (filter) {
+				case DIRECTORIES -> directories = true;
+				case IMAGES, VIDEOS -> images = true;
 			}
 		}
-		if (!directories) {
+		if (!directories && images) {
 			// Default to the new preview if they only want to see images
 			return fileChooserPreview(null, parent, true, defaultPath, filters);
 		} else {
