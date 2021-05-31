@@ -210,7 +210,12 @@ public class SelectFramesForReconstruction3D<T extends ImageBase<T>> implements 
 			createPairsWithKeyFrameTracking(keyFrame, currentFrame);
 
 			if (pairs.size < config.minimumPairs) {
-				if (verbose != null) verbose.printf("Too few pairs. pairs.size=%d\n",pairs.size);
+				// Almost all tracks got dropped. Could have been caused by something like a temporary obstruction
+				// or motion blur. Save the image and start tracking again
+				saveImage = true;
+				if (verbose != null)
+					verbose.printf("Too few pairs. pairs.size=%d, key.size=%d current.size=%d\n",
+							pairs.size, keyFrame.size(), currentFrame.size());
 				break escape;
 			}
 			// Note that there were enough feature pairs
@@ -222,7 +227,7 @@ public class SelectFramesForReconstruction3D<T extends ImageBase<T>> implements 
 			double maxMotionThresh = config.maxTranslation.computeI(Math.max(width, height));
 
 			if (verbose != null) verbose.printf("  Motion: distance=%.1f min=%.1f max=%.1f\n",
-						frameMotion, minMotionThresh, maxMotionThresh);
+					frameMotion, minMotionThresh, maxMotionThresh);
 
 			if (frameMotion >= minMotionThresh) {
 				if (frameMotion > maxMotionThresh) {
@@ -255,6 +260,7 @@ public class SelectFramesForReconstruction3D<T extends ImageBase<T>> implements 
 
 	/**
 	 * Retrieves the locations of tracks in the current frame which were visible in the key frame
+	 *
 	 * @param tracks (Output) Storage for track locations
 	 */
 	public void lookupKeyFrameTracksInCurrentFrame( DogArray<Point2D_F64> tracks ) {
@@ -405,7 +411,7 @@ public class SelectFramesForReconstruction3D<T extends ImageBase<T>> implements 
 	 * which caused the tracks to drop but is now gone. In that case save this frame and skip over the bad stuff
 	 */
 	protected boolean checkSkippedBadFrame() {
-		if (config.skipEvidenceRatio<1.0)
+		if (config.skipEvidenceRatio < 1.0)
 			return false;
 		requireNonNull(associate);
 
