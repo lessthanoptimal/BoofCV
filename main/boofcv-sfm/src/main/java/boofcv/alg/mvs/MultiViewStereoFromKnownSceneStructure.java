@@ -77,7 +77,7 @@ public class MultiViewStereoFromKnownSceneStructure<T extends ImageGray<T>> impl
 	 *
 	 * @see ScoreRectifiedViewCoveragePixels
 	 */
-	public @Getter @Setter double minimumQuality3D = 0.15;
+	public @Getter @Setter double minimumQuality3D = 0.05;
 
 	/**
 	 * Maximum amount of screen space two connected views can have and both of them be a center. Inclusive. 0 to 1.0
