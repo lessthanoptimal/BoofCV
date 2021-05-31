@@ -87,7 +87,7 @@ public class BatchDownsizeImage {
 		System.out.println("input pattern  = " + inputPattern);
 		System.out.println("output dir     = " + outputPath);
 
-		List<String> paths = UtilIO.listSmartImages(inputPattern, false);
+		List<String> paths = UtilIO.listSmartImages(inputPattern, true);
 
 		if (paths.isEmpty())
 			System.out.println("No inputs found. Bath path or pattern? " + inputPattern);
