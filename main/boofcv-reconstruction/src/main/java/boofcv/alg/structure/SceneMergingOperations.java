@@ -32,7 +32,6 @@ import org.ddogleg.struct.DogArray;
 import org.ddogleg.struct.DogArray_B;
 import org.ddogleg.struct.DogArray_I32;
 import org.ddogleg.struct.VerbosePrint;
-import org.ddogleg.util.PrimitiveArrays;
 import org.jetbrains.annotations.Nullable;
 
 import java.io.PrintStream;
@@ -344,7 +343,7 @@ public class SceneMergingOperations implements VerbosePrint {
 										  SceneWorkingGraph.View selectedDst,
 										  ScaleSe3_F64 src_to_dst ) {
 		// Sanity check
-		BoofMiscOps.checkTrue(selectedSrc.pview == selectedDst.pview);
+		BoofMiscOps.checkSame(selectedSrc.pview, selectedDst.pview);
 
 		if (verbose != null) printInlierViews(selectedSrc, selectedDst);
 
@@ -355,8 +354,11 @@ public class SceneMergingOperations implements VerbosePrint {
 		DogArray_I32 zeroSrcIdx = inliersSrc.observations.get(0);
 		DogArray_I32 zeroDstIdx = inliersDst.observations.get(0);
 
+		// Number of feature observations in this view
+		int numObservations = selectedSrc.pview.totalObservations;
+
 		// Find features in the target view that are common between the two scenes inlier feature sets
-		int numCommon = findCommonInliers(zeroSrcIdx, zeroDstIdx, zeroFeatureToCommonIndex);
+		int numCommon = findCommonInliers(zeroSrcIdx, zeroDstIdx, numObservations, zeroFeatureToCommonIndex);
 		if (numCommon == 0)
 			return false;
 
@@ -547,23 +549,22 @@ public class SceneMergingOperations implements VerbosePrint {
 	 *
 	 * @param indexesA List of features that are inliers in a scene
 	 * @param indexesB List of features that are inliers in a scene
+	 * @param numObservations Number of feature observations in this view.
 	 * @param zeroFeatureToCommonIndex Output. Look up table from feature in view[0] to index in common list
 	 * @return Number of common features
 	 */
 	static int findCommonInliers( DogArray_I32 indexesA, DogArray_I32 indexesB,
+								  int numObservations,
 								  DogArray_I32 zeroFeatureToCommonIndex ) {
-		// Create a histogram of occurrences. Each index should appear once in each set
-		int maxValue = PrimitiveArrays.max(indexesA.data, 0, indexesA.size);
-		maxValue = Math.max(maxValue, PrimitiveArrays.max(indexesB.data, 0, indexesB.size));
-
-		zeroFeatureToCommonIndex.resetResize(maxValue + 1, 0);
+		// Create a histogram of occurrences that each observations is in the two inlier sets.
+		zeroFeatureToCommonIndex.resetResize(numObservations, 0);
 		indexesA.forEach(v -> zeroFeatureToCommonIndex.data[v]++);
 		indexesB.forEach(v -> zeroFeatureToCommonIndex.data[v]++);
 
 		// Convert the histogram into a look up table from feature index to a new sorted array with just the common
 		// elements between the two sets
 		int count = 0;
-		for (int i = 0; i < maxValue; i++) {
+		for (int i = 0; i < numObservations; i++) {
 			if (zeroFeatureToCommonIndex.data[i] == 2)
 				zeroFeatureToCommonIndex.data[i] = count++;
 			else

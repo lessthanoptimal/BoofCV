@@ -124,7 +124,7 @@ public class CreateCloudFromDisparityImages {
 				if (mask.data[indexMask] != 0)
 					continue;
 				// Get the disparity and see if it has a valid value
-				float d = disparity.data[indexDisp];
+				double d = disparity.data[indexDisp];
 				if (d >= parameters.disparityRange)
 					continue;
 

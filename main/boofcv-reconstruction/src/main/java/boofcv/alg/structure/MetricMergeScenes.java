@@ -195,7 +195,6 @@ public class MetricMergeScenes implements VerbosePrint {
 		int countBadFeatures = checks.badFeatures.count(true);
 
 		if (countBadFeatures > fractionBadFeaturesRecover*checks.badFeatures.size) {
-			// TODO print out more info about the views
 			if (verbose != null)
 				verbose.println("FAILED: Inlier set had too many bad features. bad=" + countBadFeatures + "/" + numInliers);
 			return false;

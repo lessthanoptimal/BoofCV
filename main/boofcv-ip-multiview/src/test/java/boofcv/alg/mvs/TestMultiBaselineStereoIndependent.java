@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -187,6 +187,11 @@ public class TestMultiBaselineStereoIndependent extends BoofStandardJUnit {
 			sbaIndexToViewID.put(i, i + "");
 		}
 		alg.lookUpImages = new MockLookUp(images);
+
+		// Override so that it will always be happy
+		alg.performFusion = new MultiBaselineDisparityMedian() {
+			@Override public boolean process( GrayF32 disparity ) {return true;}
+		};
 
 		// just see if it blows up
 		assertTrue(alg.process(scene, 0, DogArray_I32.array(1, 2), sbaIndexToViewID::get));
