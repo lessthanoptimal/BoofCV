@@ -103,7 +103,7 @@ public class MultiBaselineStereoIndependent<Image extends ImageGray<Image>> impl
 	// Storage for stereo disparity results
 	final StereoResults results = new StereoResults();
 	// Fuses multiple disparity images together provided they have the same "left" view
-	final MultiBaselineDisparityMedian performFusion = new MultiBaselineDisparityMedian();
+	MultiBaselineDisparityMedian performFusion = new MultiBaselineDisparityMedian();
 
 	// Storage for the original images in the stereo pair
 	Image image1, image2;
@@ -190,7 +190,7 @@ public class MultiBaselineStereoIndependent<Image extends ImageGray<Image>> impl
 			performFusion.addDisparity(results.disparity, results.mask, results.param, results.undist_to_rect1);
 		}
 
-		if (verbose != null) verbose.println("Created fused stereo disparity image. inputs.size="+pairIdxs.size);
+		if (verbose != null) verbose.println("Created fused stereo disparity image. inputs.size=" + pairIdxs.size);
 
 		// Fuse all of these into a single disparity image
 		if (!performFusion.process(fusedDisparity)) {

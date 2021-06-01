@@ -610,6 +610,16 @@ public class BoofMiscOps {
 			throw new BoofCheckFailure(valA + " != " + valB + " " + message);
 	}
 
+	public static void checkSame( Object a, Object b ) {
+		checkSame(a, b, "");
+	}
+
+	public static void checkSame( Object a, Object b, String message ) {
+		if (a == b)
+			return;
+		throw new BoofCheckFailure("Objects not the same instance. " + message);
+	}
+
 	/**
 	 * Checks to see if the passed in value is a fraction from 0 to 1.0, inclusive
 	 */
@@ -876,10 +886,10 @@ public class BoofMiscOps {
 		}
 	}
 
-	public static<T> String toStringLine( List<T> list ) {
+	public static <T> String toStringLine( List<T> list ) {
 		String out = "{ ";
 		for (int i = 0; i < list.size(); i++) {
-			out += "'"+list.get(i)+"' ";
+			out += "'" + list.get(i) + "' ";
 		}
 		return out + "}";
 	}
@@ -895,7 +905,7 @@ public class BoofMiscOps {
 		String simpleName = owner.getClass().getSimpleName();
 		String pre = nameToShort(simpleName, VERBOSE_PREFIX_LENGTH);
 		if (VERBOSE_PRINT_TABLE)
-			out.println("Verbose: "+pre+" "+simpleName);
+			out.println("Verbose: " + pre + " " + simpleName);
 		return new PrintStreamInjectIndent(pre, numIndents, out);
 	}
 

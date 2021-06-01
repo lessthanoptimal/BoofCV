@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -32,8 +32,7 @@ import org.ejml.data.DMatrixRMaj;
 import org.ejml.dense.row.CommonOps_DDRM;
 import org.junit.jupiter.api.Test;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 
 public class TestMultiBaselineDisparityMedian extends BoofStandardJUnit {
 
@@ -170,7 +169,7 @@ public class TestMultiBaselineDisparityMedian extends BoofStandardJUnit {
 		}
 
 		GrayF32 found = new GrayF32(10, 8);
-		alg.computeFused(found);
+		assertTrue(alg.computeFused(found));
 
 		// manually compute the solution. Use a brute force approach for median value since it requires no thinking
 		DogArray_F32 expected = new DogArray_F32();
@@ -188,6 +187,19 @@ public class TestMultiBaselineDisparityMedian extends BoofStandardJUnit {
 				expected.add(expected.size + 0.5f);
 			}
 		}
+	}
+
+	/**
+	 * Should fail if it can't find a valid pixel
+	 */
+	@Test void computeFused_AllInvalid() {
+		var alg = new MultiBaselineDisparityMedian();
+		intrinsic.width = 10;
+		intrinsic.height = 8;
+		alg.initialize(intrinsic, new DoNothingPixelTransform_F64());
+
+		// This will fail because every pixel is empty
+		assertFalse(alg.computeFused(new GrayF32(10, 8)));
 	}
 
 	/** See if it handles the change in disparity parameters between images correctly */
