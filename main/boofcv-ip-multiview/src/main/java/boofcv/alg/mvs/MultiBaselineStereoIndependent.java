@@ -194,7 +194,7 @@ public class MultiBaselineStereoIndependent<Image extends ImageGray<Image>> impl
 
 		// Fuse all of these into a single disparity image
 		if (!performFusion.process(fusedDisparity)) {
-			if (verbose != null) verbose.println("Failed to fuse together disparity images");
+			if (verbose != null) verbose.println("FAILED: Can't fuse disparity images");
 			return false;
 		}
 
@@ -302,6 +302,8 @@ public class MultiBaselineStereoIndependent<Image extends ImageGray<Image>> impl
 
 	@Override public void setVerbose( @Nullable PrintStream out, @Nullable Set<String> configuration ) {
 		this.verbose = BoofMiscOps.addPrefix(this, out);
+		BoofMiscOps.verboseChildren(out, configuration, performFusion);
+
 		this.verboseProfiling = null;
 		if (configuration != null && configuration.contains(BoofVerbose.RUNTIME)) {
 			verboseProfiling = out;

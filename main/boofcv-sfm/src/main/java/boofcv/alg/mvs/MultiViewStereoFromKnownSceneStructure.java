@@ -206,7 +206,12 @@ public class MultiViewStereoFromKnownSceneStructure<T extends ImageGray<T>> impl
 			indexSbaToViewID.put(center.relations.indexSba, center.relations.id);
 
 			// Compute the fused disparity from all the views, then add points to the point cloud
-			computeFusedDisparityAddCloud(scene, center, indexSbaToViewID, imagePairIndexesSba);
+			if (!computeFusedDisparityAddCloud(scene, center, indexSbaToViewID, imagePairIndexesSba) ) {
+				// Failed to compute a fused disparity image
+				// Remove it from the lists
+				listCenters.remove(listCenters.size()-1);
+				indexSbaToViewID.remove(center.relations.indexSba);
+			}
 		}
 	}
 
@@ -386,10 +391,12 @@ public class MultiViewStereoFromKnownSceneStructure<T extends ImageGray<T>> impl
 	/**
 	 * Combing stereo information from all images in this cluster, compute a disparity image and add it to the cloud
 	 */
-	void computeFusedDisparityAddCloud( SceneStructureMetric scene, ViewInfo center,
+	boolean computeFusedDisparityAddCloud( SceneStructureMetric scene, ViewInfo center,
 										TIntObjectMap<String> sbaIndexToName, DogArray_I32 pairIndexes ) {
-		if (!computeFused.process(scene, center.relations.indexSba, pairIndexes, sbaIndexToName::get))
-			throw new RuntimeException("Disparity failed!");
+		if (!computeFused.process(scene, center.relations.indexSba, pairIndexes, sbaIndexToName::get)) {
+			if (verbose != null) verbose.println("FAILED: fused disparity. center.index="+center.index);
+			return false;
+		}
 
 		// The fused disparity doesn't compute a mask since all invalid pixels are marked as invalid using
 		// he disparity value
@@ -415,6 +422,8 @@ public class MultiViewStereoFromKnownSceneStructure<T extends ImageGray<T>> impl
 		// the cloud
 		disparityCloud.addDisparity(disparity, dummyMask, world_to_view1, computeFused.fusedParam,
 				norm_to_pixel, new PointToPixelTransform_F64(pixel_to_norm));
+
+		return true;
 	}
 
 	/**
