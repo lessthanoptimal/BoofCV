@@ -16,7 +16,7 @@
  * limitations under the License.
  */
 
-package boofcv.examples.sfm;
+package boofcv.examples.reconstruction;
 
 import boofcv.BoofVerbose;
 import boofcv.abst.feature.detect.interest.PointDetectorTypes;
@@ -24,6 +24,7 @@ import boofcv.abst.geo.bundle.SceneStructureMetric;
 import boofcv.abst.tracker.PointTrack;
 import boofcv.abst.tracker.PointTracker;
 import boofcv.alg.mvs.ColorizeMultiViewStereoResults;
+import boofcv.alg.similar.ConfigSimilarImagesSceneRecognition;
 import boofcv.alg.similar.ConfigSimilarImagesTrackThenMatch;
 import boofcv.alg.structure.*;
 import boofcv.core.image.LookUpColorRgbFormats;
@@ -103,8 +104,8 @@ public class ExampleMultiViewSparseReconstruction {
 //		example.compute("holiday_display_01.mp4");
 //		example.compute("log_building_02.mp4");
 //		example.compute("steps_zoom_01.mp4");
-//		example.compute("towel_box.mp4");
-		example.compute("steps_reg_01.mp4");
+		example.compute("drone_park_01.mp4", false);
+//		example.compute("steps_reg_01.mp4");
 //		example.compute("steps_wide_01.mp4");
 //		example.compute("rock_loop_01.mp4");
 		example.visualizeSparseCloud();
@@ -112,7 +113,7 @@ public class ExampleMultiViewSparseReconstruction {
 		System.out.println("done");
 	}
 
-	public void compute( String videoName ) {
+	public void compute( String videoName, boolean sequential ) {
 		// Turn on threaded code for bundle adjustment
 		DDoglegConcurrency.USE_CONCURRENT = true;
 
@@ -120,11 +121,26 @@ public class ExampleMultiViewSparseReconstruction {
 		String path = UtilIO.pathExample("mvs/" + videoName);
 		workDirectory = "mvs_work/" + FilenameUtils.getBaseName(videoName);
 
+		// Attempt to reload intermediate results if previously computed
+		if (!rebuild) {
+			try {
+				pairwise = MultiViewIO.load(new File(workDirectory, "pairwise.yaml").getPath(), (PairwiseImageGraph)null);
+			} catch (UncheckedIOException ignore) {}
+
+			try {
+				working = MultiViewIO.load(new File(workDirectory, "working.yaml").getPath(), pairwise, null);
+			} catch (UncheckedIOException ignore) {}
+
+			try {
+				scene = MultiViewIO.load(new File(workDirectory, "structure.yaml").getPath(), (SceneStructureMetric)null);
+			} catch (UncheckedIOException ignore) {}
+		}
+
 		// Convert the video into an image sequence. Later on we will need to access the images in random order
 		var imageDirectory = new File(workDirectory, "images");
 
 		if (imageDirectory.exists()) {
-			imageFiles = UtilIO.listSmart(String.format("glob:%s/images/*.png",workDirectory), true, ( f ) -> true);
+			imageFiles = UtilIO.listSmart(String.format("glob:%s/images/*.png", workDirectory), true, ( f ) -> true);
 		} else {
 			checkTrue(imageDirectory.mkdirs(), "Failed to image directory");
 			SimpleImageSequence<InterleavedU8> sequence = DefaultMediaManager.INSTANCE.openVideo(path, ImageType.IL_U8);
@@ -144,9 +160,22 @@ public class ExampleMultiViewSparseReconstruction {
 				}
 			}, "Video Decoding");
 		}
-		computePairwiseGraph();
-		metricFromPairwise();
-		bundleAdjustmentRefine();
+
+		// Only determine the visual relationship between images if needed
+		if (pairwise == null || working == null) {
+			if (sequential) {
+				similarImagesFromSequence();
+			} else {
+				similarImagesFromUnsorted();
+			}
+		}
+
+		if (pairwise == null)
+			computePairwiseGraph();
+		if (working == null)
+			metricFromPairwise();
+		if (scene == null )
+			bundleAdjustmentRefine();
 
 		Rodrigues_F64 rod = new Rodrigues_F64();
 		System.out.println("----------------------------------------------------------------------------");
@@ -168,11 +197,9 @@ public class ExampleMultiViewSparseReconstruction {
 	 * sequence, KLT is an easy and fast way to do this. However, KLT will not "close the loop", and it will
 	 * not realize you're back at the initial location. Typically this results in a noticeable miss alignment.
 	 */
-	private void trackImageFeatures() {
-		if (similarImages != null)
-			return;
+	private void similarImagesFromSequence() {
 		System.out.println("----------------------------------------------------------------------------");
-		System.out.println("### Creating Similar Images");
+		System.out.println("### Creating Similar Images from an oredered set of images");
 
 		// Configure the KLT tracker
 		var configTracker = new ConfigPointTracker();
@@ -237,30 +264,54 @@ public class ExampleMultiViewSparseReconstruction {
 	}
 
 	/**
+	 * Assumes that the images are complete unsorted
+	 */
+	private void similarImagesFromUnsorted() {
+		System.out.println("----------------------------------------------------------------------------");
+		System.out.println("### Creating Similar Images from unordered images");
+
+		var config = new ConfigSimilarImagesSceneRecognition();
+		config.recognizeNister2006.learningMinimumPointsForChildren.setFixed(20);
+		config.minimumSimilar.setRelative(0.2, 100);
+
+		// This is tuned for an image that's 800x600
+		config.features.detectFastHessian.maxFeaturesAll = 1000;
+		config.features.detectFastHessian.extract.radius = 6;
+//		config.features.detectFastHessian.selector = ConfigSelectLimit.selectUniform(8.0);
+
+		final var similarImages = FactorySceneReconstruction.createSimilarImages(config, ImageType.SB_U8);
+		similarImages.setVerbose(System.out, BoofMiscOps.hashSet(BoofVerbose.RECURSIVE));
+
+		// Track features across the entire sequence and save the results
+		BoofMiscOps.profile(() -> {
+			for (int frameId = 0; frameId < imageFiles.size(); frameId++) {
+				String filePath = imageFiles.get(frameId);
+				GrayU8 frame = UtilImageIO.loadImage(filePath, GrayU8.class);
+				Objects.requireNonNull(frame, "Failed to load image");
+
+				similarImages.addImage(frameId + "", frame);
+
+				// To keep things manageable only process the first few frames, if configured to do so
+				if (frameId >= maxFrames)
+					break;
+			}
+
+			similarImages.fixate();
+		}, "Finding Similar");
+
+		this.similarImages = similarImages;
+	}
+
+	/**
 	 * This step attempts to determine which views have a 3D (not homographic) relationship with each other and which
 	 * features are real and not fake.
 	 */
 	public void computePairwiseGraph() {
-		var savePath = new File(workDirectory, "pairwise.yaml");
-		try {
-			pairwise = MultiViewIO.load(savePath.getPath(), (PairwiseImageGraph)null);
-		} catch (UncheckedIOException ignore) {}
-
-		// Recompute if the number of images has changed
-		if (!rebuild && pairwise != null && pairwise.nodes.size == imageFiles.size()) {
-			System.out.println("Loaded Pairwise Graph");
-			return;
-		} else {
-			rebuild = true;
-			pairwise = null;
-		}
-
-		trackImageFeatures();
 		System.out.println("----------------------------------------------------------------------------");
 		System.out.println("### Creating Pairwise");
 		var config = new ConfigGeneratePairwiseImageGraph();
 		config.score.type = ConfigEpipolarScore3D.Type.FUNDAMENTAL_ERROR;
-		config.score.typeErrors.minimumInliers.setRelative(0.4, 200);
+		config.score.typeErrors.minimumInliers.setRelative(0.4, 100);
 		config.score.typeErrors.maxRatioScore = 10.0; // TODO make default?
 		config.score.ransacF.inlierThreshold = 2.0;
 		GeneratePairwiseImageGraph generatePairwise = FactorySceneReconstruction.generatePairwise(config);
@@ -269,6 +320,8 @@ public class ExampleMultiViewSparseReconstruction {
 			generatePairwise.process(similarImages);
 		}, "Created Pairwise graph");
 		pairwise = generatePairwise.getGraph();
+
+		var savePath = new File(workDirectory, "pairwise.yaml");
 		MultiViewIO.save(pairwise, savePath.getPath());
 		System.out.println("  nodes.size=" + pairwise.nodes.size);
 		System.out.println("  edges.size=" + pairwise.edges.size);
@@ -280,21 +333,6 @@ public class ExampleMultiViewSparseReconstruction {
 	 * the sparse metric reconstruction.
 	 */
 	public void metricFromPairwise() {
-		var savePath = new File(workDirectory, "working.yaml");
-
-		if (!rebuild) {
-			try {
-				working = MultiViewIO.load(savePath.getPath(), pairwise, null);
-			} catch (UncheckedIOException ignore) {}
-		}
-
-		// Recompute if the number of images has changed
-		if (working != null) {
-			System.out.println("Loaded Metric Reconstruction");
-			return;
-		}
-
-		trackImageFeatures();
 		System.out.println("----------------------------------------------------------------------------");
 		System.out.println("### Metric Reconstruction");
 
@@ -308,6 +346,8 @@ public class ExampleMultiViewSparseReconstruction {
 		}, "Metric Reconstruction");
 
 		working = metric.getLargestScene();
+
+		var savePath = new File(workDirectory, "working.yaml");
 		MultiViewIO.save(working, savePath.getPath());
 	}
 
@@ -316,20 +356,6 @@ public class ExampleMultiViewSparseReconstruction {
 	 * means all parameters (camera, view pose, point location) are optimized all at once.
 	 */
 	public void bundleAdjustmentRefine() {
-		var savePath = new File(workDirectory, "structure.yaml");
-
-		if (!rebuild) {
-			try {
-				scene = MultiViewIO.load(savePath.getPath(), (SceneStructureMetric)null);
-			} catch (UncheckedIOException ignore) {}
-		}
-		// Recompute if the number of images has changed
-		if (scene != null) {
-			System.out.println("Loaded Refined Scene");
-			return;
-		}
-
-		trackImageFeatures();
 		System.out.println("----------------------------------------------------------------------------");
 		System.out.println("Refining the scene");
 
@@ -343,6 +369,8 @@ public class ExampleMultiViewSparseReconstruction {
 			}
 		}, "Bundle Adjustment refine");
 		scene = refine.metricSba.structure;
+
+		var savePath = new File(workDirectory, "structure.yaml");
 		MultiViewIO.save(scene, savePath.getPath());
 	}
 
