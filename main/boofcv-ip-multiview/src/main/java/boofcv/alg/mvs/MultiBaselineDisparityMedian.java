@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -19,6 +19,7 @@
 package boofcv.alg.mvs;
 
 import boofcv.alg.InputSanityCheck;
+import boofcv.misc.BoofMiscOps;
 import boofcv.struct.calib.CameraPinhole;
 import boofcv.struct.distort.PixelTransform;
 import boofcv.struct.image.GrayF32;
@@ -30,9 +31,15 @@ import lombok.Getter;
 import org.ddogleg.sorting.QuickSelect;
 import org.ddogleg.struct.DogArray;
 import org.ddogleg.struct.DogArray_F32;
+import org.ddogleg.struct.VerbosePrint;
+import org.ejml.UtilEjml;
 import org.ejml.data.DMatrixRMaj;
 import org.ejml.dense.row.CommonOps_DDRM;
 import org.ejml.ops.DConvertMatrixStruct;
+import org.jetbrains.annotations.Nullable;
+
+import java.io.PrintStream;
+import java.util.Set;
 
 import static boofcv.misc.BoofMiscOps.checkTrue;
 
@@ -47,7 +54,7 @@ import static boofcv.misc.BoofMiscOps.checkTrue;
  *
  * @author Peter Abeles
  */
-public class MultiBaselineDisparityMedian {
+public class MultiBaselineDisparityMedian implements VerbosePrint {
 
 	// Disparity parameters for fused view
 	@Getter final CameraPinhole fusedIntrinsic = new CameraPinhole();
@@ -66,6 +73,8 @@ public class MultiBaselineDisparityMedian {
 
 	// Storage for transform from rectified to unrectified pixels
 	private final Homography2D_F64 rect = new Homography2D_F64();
+
+	PrintStream verbose;
 
 	/**
 	 * Must call before adding images. Specifies the size of the original image before rectification and clears
@@ -127,12 +136,14 @@ public class MultiBaselineDisparityMedian {
 		}
 
 		// Combine all the disparity information together robustly
-		computeFused(disparity);
+		if (!computeFused(disparity)) {
+			if (verbose != null)
+				verbose.println("FAILED: Not a single disparity computed in any of the images. images.size=" + images.size);
+			return false;
+		}
 
 		// Adjust stereo parameters to ensure the fixed range is good
-		computeDynamicParameters(disparity);
-
-		return true;
+		return computeDynamicParameters(disparity);
 	}
 
 	/**
@@ -193,10 +204,11 @@ public class MultiBaselineDisparityMedian {
 //				if (imageDisp < 1.0f || imageDisp > imageRange-1.0f)
 //					continue;  TODO consider in the future once there are metrics
 
-				if (imageDisp + imageMin != 0) {
+				float d = imageDisp + imageMin;
+				if (d != 0) {
 					// Convert the disparity from "image" into "fused image"
 					// First compute the 3D point in the rectified coordinate system
-					double rectZ = imageBaseline*imageFocalX/(imageDisp + imageMin);
+					double rectZ = imageBaseline*imageFocalX/d;
 					double rectX = rectZ*(rectPixX - imagePinhole.cx)/imagePinhole.fx;
 					double rectY = rectZ*(rectPixY - imagePinhole.cy)/imagePinhole.fy;
 					// Go from rectified to left camera, which is the fused camera
@@ -224,8 +236,13 @@ public class MultiBaselineDisparityMedian {
 	/**
 	 * Computes the fused output image. The median value is used if a pixel has more than 2 values. Otherwise the
 	 * mean will be used.
+	 *
+	 * @return true if the disparity image is not entirely empty
 	 */
-	void computeFused( GrayF32 disparity ) {
+	boolean computeFused( GrayF32 disparity ) {
+		// If there's one pixel with a valid value this will pass
+		boolean singleValidPixel = false;
+
 		for (int y = 0; y < fused.height; y++) {
 			int indexOut = disparity.startIndex + y*disparity.stride;
 			for (int x = 0; x < fused.width; x++) {
@@ -236,23 +253,30 @@ public class MultiBaselineDisparityMedian {
 					// time isn't known
 					outputValue = Float.MAX_VALUE;
 				} else if (values.size == 1) {
+					singleValidPixel = true;
 					outputValue = values.data[0];
 				} else if (values.size == 2) {
+					singleValidPixel = true;
 					outputValue = 0.5f*(values.data[0] + values.data[1]);
 				} else {
 					// median value
 					outputValue = QuickSelect.select(values.data, values.size/2, values.size);
+					singleValidPixel = true;
 				}
 				disparity.data[indexOut++] = outputValue;
 			}
 		}
+
+		return singleValidPixel;
 	}
 
 	/**
 	 * The baseline and disparityMin are dynamically computed to ensure a range of 100. After this adjustment the
 	 * resulting point cloud should be unchanged.
+	 *
+	 * @return true if a disparity value greater than zero was found
 	 */
-	void computeDynamicParameters( GrayF32 disparity ) {
+	boolean computeDynamicParameters( GrayF32 disparity ) {
 		// Find the min and max values for scaling the baseline
 		float dispMax = 0;
 		for (int y = 0; y < disparity.height; y++) {
@@ -263,6 +287,11 @@ public class MultiBaselineDisparityMedian {
 					continue;
 				dispMax = Math.max(dispMax, d);
 			}
+		}
+
+		if (dispMax <= 0.0) {
+			if (verbose != null) verbose.println("FAILED: all valid points are at infinity");
+			return false;
 		}
 
 		// -1 because range is the number of possible values. The max range is range-1.
@@ -280,8 +309,16 @@ public class MultiBaselineDisparityMedian {
 					continue;
 				}
 				disparity.data[index] = disparity.data[index]*scale;
+				if (UtilEjml.isUncountable(disparity.data[index]))
+					throw new RuntimeException("BUG");
 			}
 		}
+
+		return true;
+	}
+
+	@Override public void setVerbose( @Nullable PrintStream out, @Nullable Set<String> configuration ) {
+		this.verbose = BoofMiscOps.addPrefix(this, out);
 	}
 
 	/** All the information for a disparity image */

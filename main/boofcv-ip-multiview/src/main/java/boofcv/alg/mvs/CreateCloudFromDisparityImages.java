@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -19,6 +19,7 @@
 package boofcv.alg.mvs;
 
 import boofcv.alg.InputSanityCheck;
+import boofcv.alg.misc.ImageStatistics;
 import boofcv.struct.calib.CameraPinhole;
 import boofcv.struct.distort.PixelTransform;
 import boofcv.struct.distort.Point2Transform2_F64;
@@ -32,6 +33,7 @@ import georegression.transform.se.SePointOps_F64;
 import lombok.Getter;
 import org.ddogleg.struct.DogArray;
 import org.ddogleg.struct.DogArray_I32;
+import org.ejml.UtilEjml;
 
 import java.util.List;
 
@@ -99,6 +101,9 @@ public class CreateCloudFromDisparityImages {
 		MultiViewStereoOps.maskOutPointsInCloud(cloud.toList(), disparity, parameters, world_to_view,
 				rectNorm_to_dispPixel, disparitySimilarTol, mask);
 
+		if (UtilEjml.isUncountable(ImageStatistics.sum(disparity)))
+			throw new RuntimeException("BUG");
+
 		// normalized image coordinates of disparity image
 		final Point2D_F64 norm = new Point2D_F64();
 		// 3D point in rectified stereo reference frame
@@ -123,11 +128,16 @@ public class CreateCloudFromDisparityImages {
 				if (d >= parameters.disparityRange)
 					continue;
 
+				// Make sure there are no points at infinity. THose can't be handled here
+				d += disparityMin;
+				if (d <= 0.0)
+					continue;
+
 				// Get normalized image coordinates.
 				dispPixel_to_rectNorm.compute(x, y, norm);
 
 				// Find 3D point in rectified reference frame
-				rectP.z = baseline*intrinsic.fx/(d + disparityMin);
+				rectP.z = baseline*intrinsic.fx/d;
 				rectP.x = rectP.z*norm.x;
 				rectP.y = rectP.z*norm.y;
 
