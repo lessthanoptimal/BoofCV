@@ -16,7 +16,7 @@
  * limitations under the License.
  */
 
-package boofcv.examples.sfm;
+package boofcv.examples.reconstruction;
 
 import boofcv.alg.distort.brown.LensDistortionBrown;
 import boofcv.alg.geo.RectifyImageOps;
@@ -68,7 +68,7 @@ public class ExampleMultiBaselineStereo {
 		var example = new ExampleMultiViewSparseReconstruction();
 		// Specifies the "center" frame to use
 		int centerViewIdx = 15;
-		example.compute("tree_snow_01.mp4");
+		example.compute("tree_snow_01.mp4", true);
 //		example.compute("ditch_02.mp4");
 //		example.compute("holiday_display_01.mp4");
 //		example.compute("log_building_02.mp4");

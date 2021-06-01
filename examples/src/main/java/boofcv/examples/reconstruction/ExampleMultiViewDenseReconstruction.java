@@ -16,8 +16,9 @@
  * limitations under the License.
  */
 
-package boofcv.examples.sfm;
+package boofcv.examples.reconstruction;
 
+import boofcv.BoofVerbose;
 import boofcv.abst.geo.bundle.SceneStructureMetric;
 import boofcv.alg.cloud.PointCloudReader;
 import boofcv.alg.cloud.PointCloudUtils_F64;
@@ -69,7 +70,11 @@ public class ExampleMultiViewDenseReconstruction {
 //		example.compute("ditch_02.mp4");
 //		example.compute("holiday_display_01.mp4");
 //		example.compute("log_building_02.mp4");
-		example.compute("turning_around_02.mp4");
+//		example.compute("turning_around_02.mp4", true);
+//		example.compute("drone_park_01.mp4", false);
+//		example.compute("drone_park_01.mp4", false);
+		example.compute("drone_industrial_01.mp4", false);
+
 
 		// Looks up images based on their index in the file list
 		var imageLookup = new LookUpImageFilesByIndex(example.imageFiles);
@@ -85,7 +90,7 @@ public class ExampleMultiViewDenseReconstruction {
 		ConfigDisparitySGM configSgm = config.disparity.approachSGM;
 		configSgm.validateRtoL = 0;
 		configSgm.texture = 0.75;
-		configSgm.disparityRange = 120;
+		configSgm.disparityRange = 250;
 		configSgm.paths = ConfigDisparitySGM.Paths.P4;
 		configSgm.configBlockMatch.radiusX = 3;
 		configSgm.configBlockMatch.radiusY = 3;
@@ -95,7 +100,8 @@ public class ExampleMultiViewDenseReconstruction {
 				FactorySceneReconstruction.sparseSceneToDenseCloud(config, ImageType.SB_U8);
 
 		// To help make the time go by faster while we wait about 1 to 2 minutes for it to finish, let's print stuff
-		sparseToDense.getMultiViewStereo().getComputeFused().setVerboseProfiling(System.out);
+		sparseToDense.getMultiViewStereo().setVerbose(
+				System.out, BoofMiscOps.hashSet(BoofVerbose.RECURSIVE, BoofVerbose.RUNTIME));
 
 		// To visualize intermediate results we will add a listener. This will show fused disparity images
 		sparseToDense.getMultiViewStereo().setListener(new MultiViewStereoFromKnownSceneStructure.Listener<>() {
@@ -104,6 +110,12 @@ public class ExampleMultiViewDenseReconstruction {
 											 GrayF32 disparity, GrayU8 mask, DisparityParameters parameters ) {
 				// Displaying individual stereo pair results can be very useful for debugging, but this isn't done
 				// because of the amount of information it would show
+//				BufferedImage outLeft = ConvertBufferedImage.convertTo(rect0, null);
+//				BufferedImage outRight = ConvertBufferedImage.convertTo(rect1, null);
+//
+//				ShowImages.showWindow(new RectifiedPairPanel(true, outLeft, outRight), "Rectification: "+left+" "+right);
+//				BufferedImage colorized = VisualizeImageData.disparity(disparity, null, parameters.disparityRange, 0);
+//				ShowImages.showWindow(colorized, "Disparity " + left + " " + right);
 			}
 
 			@Override
@@ -138,10 +150,10 @@ public class ExampleMultiViewDenseReconstruction {
 			DogArray_I32 colorsRgb = sparseToDense.getColorRgb();
 
 			DogArray<Point3dRgbI_F64> filtered = PointCloudUtils_F64.filter(
-					(idx,p)->p.setTo(cloud.get(idx)), colorsRgb::get, cloud.size(),
-					(idx)->cloud.get(idx).norm()<=distanceThreshold, null);
+					( idx, p ) -> p.setTo(cloud.get(idx)), colorsRgb::get, cloud.size(),
+					( idx ) -> cloud.get(idx).norm() <= distanceThreshold, null);
 
-			PointCloudIO.save3D(PointCloudIO.Format.PLY,PointCloudReader.wrapF64RGB(filtered.toList()), true, out);
+			PointCloudIO.save3D(PointCloudIO.Format.PLY, PointCloudReader.wrapF64RGB(filtered.toList()), true, out);
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
@@ -153,7 +165,7 @@ public class ExampleMultiViewDenseReconstruction {
 		viewer.setFog(true);
 		viewer.setDotSize(1);
 		viewer.setTranslationStep(0.15);
-		viewer.addCloud((idx,p)->p.setTo(cloud.get(idx)), colorsRgb::get, cloud.size());
+		viewer.addCloud(( idx, p ) -> p.setTo(cloud.get(idx)), colorsRgb::get, cloud.size());
 		viewer.setCameraHFov(UtilAngle.radian(60));
 
 		SwingUtilities.invokeLater(() -> {
