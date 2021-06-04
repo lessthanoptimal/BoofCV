@@ -58,6 +58,7 @@ Version : 0.38
   * Instead of a single seed for the metric reconstruction multiple seeds are spawned, grown, then merged.
   * TODO Pruning of views when creating pairwise graph. If too similar do not include it. Could be done before pairwise
          Should be able to process a video sequence where it's static for several frames
+  * TODO Regriession. Add unordered sequences and ones with smaller images. 320x240 and 640x480
 - MultiViewOps
   * compatibleHomography
   * homographyToFundamental given 2 points
