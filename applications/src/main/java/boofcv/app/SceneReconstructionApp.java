@@ -25,6 +25,8 @@ import boofcv.abst.tracker.PointTrack;
 import boofcv.abst.tracker.PointTracker;
 import boofcv.alg.cloud.PointCloudReader;
 import boofcv.alg.cloud.PointCloudUtils_F64;
+import boofcv.alg.mvs.DisparityParameters;
+import boofcv.alg.mvs.MultiViewStereoFromKnownSceneStructure;
 import boofcv.alg.similar.ConfigSimilarImagesSceneRecognition;
 import boofcv.alg.similar.ConfigSimilarImagesTrackThenMatch;
 import boofcv.alg.structure.*;
@@ -41,9 +43,11 @@ import boofcv.factory.tracker.ConfigPointTracker;
 import boofcv.factory.tracker.FactoryPointTracker;
 import boofcv.gui.BoofSwingUtil;
 import boofcv.gui.image.ShowImages;
+import boofcv.gui.image.VisualizeImageData;
 import boofcv.io.MirrorStream;
 import boofcv.io.UtilIO;
 import boofcv.io.geo.MultiViewIO;
+import boofcv.io.image.UtilImageIO;
 import boofcv.io.points.PointCloudIO;
 import boofcv.io.wrapper.images.LoadFileImageSequence2;
 import boofcv.misc.BoofMiscOps;
@@ -67,8 +71,10 @@ import org.kohsuke.args4j.Option;
 
 import javax.swing.*;
 import java.awt.*;
+import java.awt.image.BufferedImage;
 import java.io.*;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 /**
@@ -77,9 +83,6 @@ import java.util.List;
  * @author Peter Abeles
  */
 public class SceneReconstructionApp {
-	// TODO tweak verbose print
-	// TODO dump disparity images to disk also
-
 	ConfigPointTracker configTracker = new ConfigPointTracker();
 	ConfigSimilarImagesTrackThenMatch configSimilarTracker = new ConfigSimilarImagesTrackThenMatch();
 	ConfigSimilarImagesSceneRecognition configSimilarUnordered = new ConfigSimilarImagesSceneRecognition();
@@ -96,34 +99,45 @@ public class SceneReconstructionApp {
 	@Option(name = "-o", aliases = {"--Output"}, usage = "Path to output directory.")
 	String outputPath = "output";
 
-	@Option(name = "--ConfigPath", usage = "Path to directory containing configuration files it should use")
+	@Option(name = "--ConfigPath", usage = "Path to directory containing configuration files it should use. " +
+			"This will override the defaults. Be prepared to read source code if you want to understand everything.")
 	String configPath = "";
 
 	@Option(name = "--GUI", usage = "Ignore all other command line arguments and switch to GUI mode")
 	boolean guiMode = false;
 
-	@Option(name = "--MaxPixels", usage = "Maximum number of images in an image before its down sampled.")
+	@Option(name = "--MaxPixels", usage = "Maximum number of images in an image before its down sampled. E.g. 800*600=480000")
 	int maxPixels = 800*600;
 
-	@Option(name = "--Ordered", usage = "Images are assumed to be in order and a feature tracker can be used")
+	@Option(name = "--Ordered", usage = "Images are assumed to be in sequential order and a feature tracker can be used")
 	boolean ordered = false;
 
-	@Option(name = "--TryHarder", usage = "Slower but has a greater chance of doing a good reconstruction")
+	@Option(name = "--TryHarder", usage = "Slower but has a greater chance of doing a good reconstruction. " +
+			"Lower thresholds and more iterations to remove outliers.")
 	boolean tryHarder = false;
 
 	@Option(name = "--Verbose", usage = "Prints lots of debugging information to stdout")
 	boolean verbose = false;
 
-	@Option(name = "--ShowCloud", usage = "Show the final point cloud after processing")
+	@Option(name = "--ShowCloud", usage = "Show the final point cloud after processing each scene")
 	boolean showCloud = false;
+
+	@Option(name = "--AllScenes", usage = "If true, a dense reconstruction will be done for all scenes. Not just the largest")
+	boolean allScenes = false;
+
+	@Option(name = "--SaveFusedDisparity", usage = "If true, it will save the fused disparity images")
+	boolean saveFusedDisparity = false;
 
 	// Storage for intermediate results
 	PairwiseImageGraph pairwise = null;
 	LookUpSimilarImages similarImages;
-	SceneWorkingGraph working = null;
 	SceneStructureMetric scene = null;
 	SparseSceneToDenseCloud<GrayU8> sparseToDense;
 
+	// List of all the independent scenes it was able to construct
+	List<SceneWorkingGraph> listScenes = new ArrayList<>();
+
+	// Used to load images and resize them. Also storage for image dimensions needed later on
 	LoadFileImageSequence2<Planar<GrayU8>> images;
 	List<ImageDimension> listDimensions = new ArrayList<>();
 
@@ -179,17 +193,38 @@ public class SceneReconstructionApp {
 
 			computePairwise();
 			computeMetric();
-			bundleAdjustmentRefine();
-			printSparseSummary();
 
-			computeDense(paths);
-			saveCloudToDisk();
-			if (showCloud)
-				visualizeInPointCloud(sparseToDense.getCloud(), sparseToDense.getColorRgb(), scene);
+			// Finish constructing the largest or all the scenes
+			if (allScenes) {
+				// Number of digits needed to contain all the scenes
+				int numDigits = BoofMiscOps.numDigits(listScenes.size());
+				for (int sceneIndex = 0; sceneIndex < listScenes.size(); sceneIndex++) {
+					reconstructScene(paths, listScenes.get(sceneIndex), new File(outputPath, String.format("scene%0" + numDigits + "d", sceneIndex)));
+				}
+			} else {
+				reconstructScene(paths, listScenes.get(0), new File(outputPath, "scene"));
+			}
+
 			out.flush();
 		} catch (FileNotFoundException e) {
 			e.printStackTrace();
 		}
+		System.out.println("Finished!");
+	}
+
+	private void reconstructScene( List<String> paths, SceneWorkingGraph working, File sceneDirectory ) {
+		if (!sceneDirectory.exists()) {
+			BoofMiscOps.checkTrue(sceneDirectory.mkdirs());
+		}
+
+		bundleAdjustmentRefine(sceneDirectory, working);
+		MultiViewIO.save(working, new File(sceneDirectory, "working.yaml").getPath());
+		printSparseSummary(working);
+
+		computeDense(paths, working, sceneDirectory);
+		saveCloudToDisk(sceneDirectory);
+		if (showCloud)
+			visualizeInPointCloud(sparseToDense.getCloud(), sparseToDense.getColorRgb(), scene, sceneDirectory.getName());
 	}
 
 	private void configureDefault() {
@@ -274,7 +309,7 @@ public class SceneReconstructionApp {
 	 * If it can, it will load the configuration and return a new instsance. Otherwise it will return the passed in
 	 * instance and print an error message
 	 */
-	private  <T extends Configuration> T loadConfiguration( File file, T config ) {
+	private <T extends Configuration> T loadConfiguration( File file, T config ) {
 		if (!file.exists()) {
 			System.err.println("Configuration file doesn't exist: " + file.getPath());
 			return config;
@@ -368,11 +403,11 @@ public class SceneReconstructionApp {
 			}
 		}, "Metric Reconstruction");
 
-		working = metric.getLargestScene();
-		MultiViewIO.save(working, new File(outputPath, "working.yaml").getPath());
+		listScenes.addAll(metric.getScenes().toList());
+		Collections.sort(listScenes, ( a, b ) -> Integer.compare(b.listViews.size(), a.listViews.size()));
 	}
 
-	public void bundleAdjustmentRefine() {
+	public void bundleAdjustmentRefine( File sceneDirectory, SceneWorkingGraph working ) {
 		var refine = new RefineMetricWorkingGraph();
 		BoofMiscOps.profile(() -> {
 			// Bundle adjustment is run twice, with the worse 5% of points discarded in an attempt to reduce noise
@@ -384,10 +419,10 @@ public class SceneReconstructionApp {
 		}, "Bundle Adjustment refine");
 		scene = refine.metricSba.structure;
 
-		MultiViewIO.save(scene, new File(outputPath, "structure.yaml").getPath());
+		MultiViewIO.save(scene, new File(sceneDirectory, "structure.yaml").getPath());
 	}
 
-	private void printSparseSummary() {
+	private void printSparseSummary( SceneWorkingGraph working ) {
 		Rodrigues_F64 rod = new Rodrigues_F64();
 		out.println("----------------------------------------------------------------------------");
 		for (PairwiseImageGraph.View pv : pairwise.nodes.toList()) {
@@ -403,8 +438,29 @@ public class SceneReconstructionApp {
 		out.println("   Views used: " + scene.views.size + " / " + pairwise.nodes.size);
 	}
 
-	private void computeDense( List<String> paths ) {
+	private void computeDense( List<String> paths, SceneWorkingGraph working, File sceneDirectory ) {
 		sparseToDense = FactorySceneReconstruction.sparseSceneToDenseCloud(configSparseToDense, ImageType.SB_U8);
+
+		// If requested, save disparity information as it's computed
+		if (saveFusedDisparity) {
+			File outputFused = new File(sceneDirectory,"fused");
+			if (!outputFused.exists())
+				BoofMiscOps.checkTrue(outputFused.mkdirs());
+
+			sparseToDense.getMultiViewStereo().setListener(new MultiViewStereoFromKnownSceneStructure.Listener<>() {
+				@Override
+				public void handlePairDisparity( String left, String right, GrayU8 rect0, GrayU8 rect1,
+												 GrayF32 disparity, GrayU8 mask, DisparityParameters parameters ) {}
+
+				@Override
+				public void handleFusedDisparity( String name, GrayF32 disparity, GrayU8 mask, DisparityParameters parameters ) {
+					BufferedImage colorized = VisualizeImageData.disparity(disparity, null, parameters.disparityRange, 0);
+					UtilImageIO.saveImage(colorized, new File(outputFused,"visualized_"+name+".png").getPath());
+
+					// It's not obvious what format to save the float and binary images in. leaving that for the future
+				}
+			});
+		}
 
 		if (verbose)
 			sparseToDense.getMultiViewStereo().setVerbose(out,
@@ -440,9 +496,9 @@ public class SceneReconstructionApp {
 		};
 	}
 
-	private void saveCloudToDisk() {
+	private void saveCloudToDisk( File outputDirectory ) {
 		// Save the dense point cloud to disk in PLY format
-		try (FileOutputStream out = new FileOutputStream(new File(outputPath, "saved_cloud.ply"))) {
+		try (FileOutputStream out = new FileOutputStream(new File(outputDirectory, "cloud.ply"))) {
 			// Filter points which are far away to make it easier to view in 3rd party viewers that auto scale
 			// You might need to adjust the threshold for your application if too many points are cut
 			double distanceThreshold = 50.0;
@@ -460,7 +516,8 @@ public class SceneReconstructionApp {
 	}
 
 	public void visualizeInPointCloud( List<Point3D_F64> cloud, DogArray_I32 colorsRgb,
-									   SceneStructureMetric structure ) {
+									   SceneStructureMetric structure,
+									   String name ) {
 		PointCloudViewer viewer = VisualizeData.createPointCloudViewer();
 		viewer.setFog(true);
 		viewer.setDotSize(1);
@@ -474,7 +531,7 @@ public class SceneReconstructionApp {
 
 			// Display the point cloud
 			viewer.getComponent().setPreferredSize(new Dimension(600, 600));
-			ShowImages.showWindow(viewer.getComponent(), "Dense Reconstruction Cloud", true);
+			ShowImages.showWindow(viewer.getComponent(), "Cloud: " + name, true);
 		});
 	}
 
