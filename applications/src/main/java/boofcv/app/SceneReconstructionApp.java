@@ -48,6 +48,7 @@ import boofcv.io.points.PointCloudIO;
 import boofcv.io.wrapper.images.LoadFileImageSequence2;
 import boofcv.misc.BoofMiscOps;
 import boofcv.misc.LookUpImages;
+import boofcv.struct.Configuration;
 import boofcv.struct.Point3dRgbI_F64;
 import boofcv.struct.image.*;
 import boofcv.visualize.PointCloudViewer;
@@ -76,8 +77,6 @@ import java.util.List;
  * @author Peter Abeles
  */
 public class SceneReconstructionApp {
-	// TODO dump configurations to a directory <-- always do this
-	// TODO load configurations from a directory
 	// TODO tweak verbose print
 	// TODO dump disparity images to disk also
 
@@ -97,6 +96,9 @@ public class SceneReconstructionApp {
 	@Option(name = "-o", aliases = {"--Output"}, usage = "Path to output directory.")
 	String outputPath = "output";
 
+	@Option(name = "--ConfigPath", usage = "Path to directory containing configuration files it should use")
+	String configPath = "";
+
 	@Option(name = "--GUI", usage = "Ignore all other command line arguments and switch to GUI mode")
 	boolean guiMode = false;
 
@@ -107,7 +109,7 @@ public class SceneReconstructionApp {
 	boolean ordered = false;
 
 	@Option(name = "--TryHarder", usage = "Slower but has a greater chance of doing a good reconstruction")
-	boolean tryHarder = true;
+	boolean tryHarder = false;
 
 	@Option(name = "--Verbose", usage = "Prints lots of debugging information to stdout")
 	boolean verbose = false;
@@ -148,11 +150,16 @@ public class SceneReconstructionApp {
 		// TODO if video sequences are found, decompress them into images
 		System.out.println("Total images: " + paths.size());
 
-		if (tryHarder)
-			configureHarder();
-		else
-			configureDefault();
-		// TODO add option to dump the configurations
+		// See if the user
+		if (configPath.isEmpty()) {
+			if (tryHarder)
+				configureHarder();
+			else
+				configureDefault();
+		} else {
+			loadConfigurations();
+		}
+		saveConfigurations();
 
 		try (PrintStream fileOut = new PrintStream(new File(outputPath, "verbose.txt"))) {
 			// If verbose print the stream to stdout, otherwise just log it to the file
@@ -206,6 +213,7 @@ public class SceneReconstructionApp {
 		configPairwise.score.typeErrors.minimumInliers.setRelative(0.4, 150);
 		configPairwise.score.typeErrors.maxRatioScore = 10.0;
 		configPairwise.score.ransacF.inlierThreshold = 2.0;
+		configPairwise.score.ransacF.iterations = 1000;
 
 		configSparseToDense.disparity.approach = ConfigDisparity.Approach.SGM;
 		ConfigDisparitySGM configSgm = configSparseToDense.disparity.approachSGM;
@@ -233,6 +241,51 @@ public class SceneReconstructionApp {
 		configPairwise.score.ransacF.iterations = 3000;
 
 		configSimilarUnordered.minimumSimilar.setRelative(0.2, 50);
+	}
+
+	private void saveConfigurations() {
+		File configDir = new File(outputPath, "configurations");
+		if (!configDir.exists()) {
+			BoofMiscOps.checkTrue(configDir.mkdirs());
+		}
+
+		UtilIO.saveConfig(configTracker, new ConfigPointTracker(),
+				new File(configDir, "tracker.yaml"));
+		UtilIO.saveConfig(configSimilarTracker, new ConfigSimilarImagesTrackThenMatch(),
+				new File(configDir, "similar_tracker.yaml"));
+		UtilIO.saveConfig(configSimilarUnordered, new ConfigSimilarImagesSceneRecognition(),
+				new File(configDir, "similar_unordered.yaml"));
+		UtilIO.saveConfig(configPairwise, new ConfigGeneratePairwiseImageGraph(),
+				new File(configDir, "pairwise.yaml"));
+		UtilIO.saveConfig(configSparseToDense, new ConfigSparseToDenseCloud(),
+				new File(configDir, "sparse_to_dense.yaml"));
+	}
+
+	private void loadConfigurations() {
+		File configDir = new File(outputPath, "configurations");
+		configTracker = loadConfiguration(new File(configDir, "tracker.yaml"), configTracker);
+		configSimilarTracker = loadConfiguration(new File(configDir, "similar_tracker.yaml"), configSimilarTracker);
+		configSimilarUnordered = loadConfiguration(new File(configDir, "similar_unordered.yaml"), configSimilarUnordered);
+		configPairwise = loadConfiguration(new File(configDir, "pairwise.yaml"), configPairwise);
+		configSparseToDense = loadConfiguration(new File(configDir, "sparse_to_dense.yaml"), configSparseToDense);
+	}
+
+	/**
+	 * If it can, it will load the configuration and return a new instsance. Otherwise it will return the passed in
+	 * instance and print an error message
+	 */
+	private  <T extends Configuration> T loadConfiguration( File file, T config ) {
+		if (!file.exists()) {
+			System.err.println("Configuration file doesn't exist: " + file.getPath());
+			return config;
+		}
+		try {
+			return UtilIO.loadConfig(file);
+		} catch (Exception e) {
+			System.err.println("Failed to load config: " + file.getPath());
+			System.err.println("Message: " + e.getMessage());
+			return config;
+		}
 	}
 
 	private void findSimilarImagesUnsorted() {
