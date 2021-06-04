@@ -42,6 +42,7 @@ public class Help {
 			CreateQrCodeDocument.class,
 			DownSelectVideoFramesFor3DApp.class,
 			SceneReconstructionApp.class,
+			PointCloudViewerApp.class,
 	};
 
 	public static void printHelp() {
