@@ -175,14 +175,7 @@ public class AverageDownSampleOps {
 				}
 			}
 		} else if (Planar.class.isAssignableFrom(input.getClass())) {
-			Planar in = (Planar)input;
-			Planar out = (Planar)output;
-
-			int N = in.getNumBands();
-
-			for (int i = 0; i < N; i++) {
-				down(in.getBand(i), out.getBand(i));
-			}
+			down((Planar)input, (Planar)output);
 		}
 	}
 
@@ -207,6 +200,7 @@ public class AverageDownSampleOps {
 	 * @param output Output image. Modified.
 	 */
 	public static <T extends ImageGray<T>> void down( Planar<T> input, Planar<T> output ) {
+		output.setNumberOfBands(input.getNumBands());
 		for (int band = 0; band < input.getNumBands(); band++) {
 			down(input.getBand(band), output.getBand(band));
 		}

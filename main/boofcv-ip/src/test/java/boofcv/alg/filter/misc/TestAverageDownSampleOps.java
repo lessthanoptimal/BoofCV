@@ -79,4 +79,13 @@ public class TestAverageDownSampleOps extends BoofStandardJUnit {
 			BoofTesting.assertEquals(expected, found, 1e-4);
 		}
 	}
+
+	/** Make sure it adjusts the number of bands in the output image */
+	@Test void down_Planar_NumBands() {
+		Planar<GrayU8> input = new Planar<>(GrayU8.class, 400, 300, 3);
+		Planar<GrayU8> output = new Planar<>(GrayU8.class, 200, 140, 1);
+
+		AverageDownSampleOps.down(input, output);
+		assertEquals(3, output.getNumBands());
+	}
 }
