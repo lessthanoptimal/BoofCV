@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -33,7 +33,7 @@ import pabeles.concurrency.IntRangeObjectConsumer;
 
 /**
  * <p>
- * Implementation of {@link boofcv.alg.feature.disparity.DisparityScoreWindowFive} for processing
+ * Implementation of {@link boofcv.alg.feature.disparity.DisparityBlockMatchBestFive} for processing
  * images of type {@link GrayF32}.
  * </p>
  *
@@ -148,6 +148,8 @@ public class DisparityScoreBMBestFive_F32<DI extends ImageGray<DI>>
 	 * rows.
 	 */
 	private void computeFirstRow( final int row0, final WorkSpace ws ) {
+		int disparityMax = Math.min(left.width, this.disparityMax);
+
 		ws.activeVerticalScore = 1;
 
 		// compute horizontal scores for first row block
@@ -159,7 +161,7 @@ public class DisparityScoreBMBestFive_F32<DI extends ImageGray<DI>>
 		}
 
 		// compute score for the top possible row
-		final float firstRow[] = ws.verticalScore[0];
+		final float[] firstRow = ws.verticalScore[0];
 		for (int i = 0; i < widthDisparityBlock; i++) {
 			float sum = 0;
 			for (int row = 0; row < regionHeight; row++) {
@@ -180,6 +182,8 @@ public class DisparityScoreBMBestFive_F32<DI extends ImageGray<DI>>
 	 * added.
 	 */
 	private void computeRemainingRows( final int row0, final int row1, final WorkSpace ws ) {
+		int disparityMax = Math.min(left.width, this.disparityMax);
+
 		for (int row = row0 + regionHeight; row < row1; row++, ws.activeVerticalScore++) {
 			int activeIndex = ws.activeVerticalScore%regionHeight;
 			int oldRow = (row - row0)%regionHeight;
@@ -245,8 +249,9 @@ public class DisparityScoreBMBestFive_F32<DI extends ImageGray<DI>>
 	 * Compute the final score by sampling the 5 regions.  Four regions are sampled around the center
 	 * region.  Out of those four only the two with the smallest score are used.
 	 */
-	protected void computeScoreFive( float top[], float middle[], float bottom[], float score[], int width,
+	protected void computeScoreFive( float[] top, float[] middle, float[] bottom, float[] score, int width,
 									 Compare_F32 compare ) {
+		int disparityMax = Math.min(left.width, this.disparityMax);
 
 		float WORST_SCORE = Float.MAX_VALUE*compare.compare(0, 1);
 

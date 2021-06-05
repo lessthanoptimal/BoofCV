@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -20,6 +20,7 @@ package boofcv.abst.disparity;
 
 import boofcv.BoofTesting;
 import boofcv.alg.misc.GImageMiscOps;
+import boofcv.concurrency.BoofConcurrency;
 import boofcv.core.image.GeneralizedImageOps;
 import boofcv.struct.image.ImageBase;
 import boofcv.struct.image.ImageGray;
@@ -98,6 +99,15 @@ public abstract class GenericStereoDisparityChecks<Image extends ImageBase<Image
 		alg.process(left, right);
 
 		BoofTesting.assertEquals(expected, alg.getDisparity(), 1e-4);
+	}
+
+	/** Checks to see if it blows up if the image's width is smaller than the maximum disparity */
+	@Test void disparityLargerThanImage() {
+		BoofConcurrency.USE_CONCURRENT = false;
+		Image left = this.left.createNew(15,30);
+		Image right = this.right.createNew(15,30);
+
+		createAlg(0, 30).process(left, right);
 	}
 
 	private void checkDisparity( int min, int range, Disparity disparity ) {

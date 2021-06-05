@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -34,7 +34,7 @@ import pabeles.concurrency.IntRangeObjectConsumer;
 
 /**
  * <p>
- * Implementation of {@link boofcv.alg.feature.disparity.DisparityScoreWindowFive} for processing
+ * Implementation of {@link boofcv.alg.feature.disparity.DisparityBlockMatchBestFive} for processing
  * images of type {@link GrayU8}.
  * </p>
  *
@@ -160,6 +160,8 @@ public class DisparityScoreBMBestFive_S32<T extends ImageBase<T>,DI extends Imag
 	 * rows.
 	 */
 	private void computeFirstRow( final int row0 , final WorkSpace ws ) {
+		int disparityMax = Math.min(left.width, this.disparityMax);
+
 		ws.activeVerticalScore = 1;
 
 		// compute horizontal scores for first row block
@@ -172,7 +174,7 @@ public class DisparityScoreBMBestFive_S32<T extends ImageBase<T>,DI extends Imag
 		}
 
 		// compute score for the top possible row
-		final int firstRow[] = ws.verticalScore[0];
+		final int[] firstRow = ws.verticalScore[0];
 		for(int i = 0; i < widthDisparityBlock; i++ ) {
 			int sum = 0;
 			for( int row = 0; row < regionHeight; row++ ) {
@@ -192,13 +194,14 @@ public class DisparityScoreBMBestFive_S32<T extends ImageBase<T>,DI extends Imag
 	 * When a new block is processes the last row/column is subtracted and the new row/column is
 	 * added.
 	 */
-	private void computeRemainingRows(final int row0 , final int row1, final WorkSpace ws )
-	{
+	private void computeRemainingRows(final int row0 , final int row1, final WorkSpace ws ) {
+		int disparityMax = Math.min(left.width, this.disparityMax);
+
 		for( int row = row0+regionHeight; row < row1; row++ , ws.activeVerticalScore++) {
 			int activeIndex = ws.activeVerticalScore % regionHeight;
 			int oldRow = (row-row0)%regionHeight;
-			int previous[] = ws.verticalScore[ (ws.activeVerticalScore -1) % regionHeight ];
-			int active[] = ws.verticalScore[ activeIndex ];
+			int[] previous = ws.verticalScore[ (ws.activeVerticalScore -1) % regionHeight ];
+			int[] active = ws.verticalScore[ activeIndex ];
 
 			// subtract first row from vertical score
 			int[] scores = ws.horizontalScore[oldRow];
@@ -259,9 +262,9 @@ public class DisparityScoreBMBestFive_S32<T extends ImageBase<T>,DI extends Imag
 	 * Compute the final score by sampling the 5 regions.  Four regions are sampled around the center
 	 * region.  Out of those four only the two with the smallest score are used.
 	 */
-	protected void computeScoreFive( int top[] , int middle[] , int bottom[] , int score[] , int width ,
-									 Compare_S32 compare  )
-	{
+	protected void computeScoreFive( int[] top, int[] middle, int[] bottom, int[] score, int width ,
+									 Compare_S32 compare  ) {
+		int disparityMax = Math.min(left.width, this.disparityMax);
 		final int WORST_SCORE = Integer.MAX_VALUE*compare.compare(0,1);
 
 		// disparity as the outer loop to maximize common elements in inner loops, reducing redundant calculations

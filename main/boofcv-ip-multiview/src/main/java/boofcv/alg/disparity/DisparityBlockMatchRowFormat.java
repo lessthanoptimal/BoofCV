@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -115,10 +115,6 @@ public abstract class DisparityBlockMatchRowFormat
 	public void process( Input left, Input right, Disparity disparity ) {
 		// initialize data structures
 		InputSanityCheck.checkSameShape(left, right);
-
-		if (disparityMax > left.width)
-			throw new RuntimeException(
-					"The maximum disparity is too large for this image size: max size " + left.width);
 
 		// Stores error for all x-coordinates and disparity values along a single row
 		widthDisparityBlock = left.width*disparityRange;
