@@ -24,6 +24,7 @@ import boofcv.abst.scene.FeatureSceneRecognition;
 import boofcv.abst.scene.SceneRecognition;
 import boofcv.alg.structure.LookUpSimilarImages;
 import boofcv.misc.BoofLambdas;
+import boofcv.misc.BoofMiscOps;
 import boofcv.struct.PackedArray;
 import boofcv.struct.feature.AssociatedIndex;
 import boofcv.struct.feature.TupleDesc;
@@ -332,7 +333,7 @@ public class SimilarImagesSceneRecognition<Image extends ImageBase<Image>, TD ex
 
 		// The user probably made a mistake and is trying to get info from an image which wasn't similar
 		if (info == null)
-			throw new IllegalArgumentException("View is not similar "+viewDst);
+			throw new IllegalArgumentException("View is not similar " + viewDst);
 
 		pairs.copyAll(info.associated.toList(), ( original, copy ) -> copy.setTo(original));
 
@@ -382,7 +383,8 @@ public class SimilarImagesSceneRecognition<Image extends ImageBase<Image>, TD ex
 	}
 
 	@Override public void setVerbose( @Nullable PrintStream out, @Nullable Set<String> options ) {
-		this.verbose = out;
+		this.verbose = BoofMiscOps.addPrefix(this, out);
+		BoofMiscOps.verboseChildren(verbose, options, recognizer);
 	}
 
 	/**
