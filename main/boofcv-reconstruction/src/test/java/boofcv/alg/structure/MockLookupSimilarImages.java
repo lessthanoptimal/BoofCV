@@ -169,6 +169,9 @@ class MockLookupSimilarImages implements LookUpSimilarImages {
 		this.queryID = target;
 		similar.clear();
 		for (int i = 0; i < viewIds.size(); i++) {
+			if (!filter.keep(viewIds.get(i)))
+				continue;
+
 			if (!viewIds.get(i).equals(target)) {
 				similar.add(viewIds.get(i));
 			}
