@@ -129,7 +129,7 @@ public class BatchRemoveLensDistortion {
 		List<String> paths = UtilIO.listSmartImages(inputPattern, false);
 
 		if (paths.isEmpty())
-			System.out.println("No inputs found. Bath path or pattern? " + inputPattern);
+			System.out.println("No inputs found. Bad path or pattern? " + inputPattern);
 
 		System.out.println("Found a total of " + paths.size() + " matching files");
 
