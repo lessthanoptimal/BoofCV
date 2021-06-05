@@ -21,6 +21,7 @@ package boofcv.io;
 import boofcv.BoofVersion;
 import boofcv.io.calibration.CalibrationIO;
 import boofcv.misc.BoofLambdas;
+import boofcv.misc.BoofMiscOps;
 import boofcv.struct.Configuration;
 import boofcv.struct.calib.CameraPinholeBrown;
 import org.apache.commons.io.FilenameUtils;
@@ -1179,6 +1180,39 @@ public class UtilIO {
 				break;
 		}
 		return filename;
+	}
+
+	/**
+	 * Convenience function which creates a directory and everything along its path if it does not exist.
+	 * Also checks to make sure the path leads to a directory if it does exist
+	 *
+	 * @param directory Path to the directory
+	 */
+	public static void mkdirs( File directory ) {
+		if (directory.exists()) {
+			BoofMiscOps.checkTrue(directory.isDirectory());
+		} else {
+			BoofMiscOps.checkTrue(directory.mkdirs());
+		}
+	}
+
+	/**
+	 * Checks to directory exists. If it does and delete is true it will recursively delete it and all its children.
+	 * Then creates the directory again. If delete is false then it calls {@link #mkdirs(File)}.
+	 *
+	 * @param directory Path to the directory
+	 * @param delete if true it will delete the original directory
+	 */
+	public static void mkdirs( File directory, boolean delete ) {
+		if (!delete) {
+			mkdirs(directory);
+			return;
+		}
+
+		if (directory.exists()) {
+			deleteRecursive(directory);
+		}
+		BoofMiscOps.checkTrue(directory.mkdirs());
 	}
 
 	public interface FileTest {

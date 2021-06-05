@@ -83,7 +83,7 @@ public class BatchScanQrCodes {
 		List<String> inputs = UtilIO.listSmartImages(inputPattern, false);
 
 		if (inputs.isEmpty()) {
-			System.err.println("No inputs found. Bath path or pattern? " + inputPattern);
+			System.err.println("No inputs found. Bad path or pattern? " + inputPattern);
 			return;
 		}
 

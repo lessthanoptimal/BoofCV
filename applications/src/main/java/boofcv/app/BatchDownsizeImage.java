@@ -90,7 +90,7 @@ public class BatchDownsizeImage {
 		List<String> paths = UtilIO.listSmartImages(inputPattern, true);
 
 		if (paths.isEmpty())
-			System.out.println("No inputs found. Bath path or pattern? " + inputPattern);
+			System.out.println("No inputs found. Bad path or pattern? " + inputPattern);
 
 		// Create the output directory if it doesn't exist
 		if (!new File(outputPath).exists()) {

@@ -116,7 +116,7 @@ public class SceneReconstructionApp {
 			"Lower thresholds and more iterations to remove outliers.")
 	boolean tryHarder = false;
 
-	@Option(name = "--Verbose", usage = "Prints lots of debugging information to stdout")
+	@Option(name = "--Verbose", usage = "Prints lots of debugging information to stdout. This is always saved to disk too.")
 	boolean verbose = false;
 
 	@Option(name = "--ShowCloud", usage = "Show the final point cloud after processing each scene")
@@ -127,6 +127,9 @@ public class SceneReconstructionApp {
 
 	@Option(name = "--SaveFusedDisparity", usage = "If true, it will save the fused disparity images")
 	boolean saveFusedDisparity = false;
+
+	@Option(name = "--DeleteOutput", usage = "If true, it will recursively delete the output directory if it already exists")
+	boolean deleteOutput = false;
 
 	// Storage for intermediate results
 	PairwiseImageGraph pairwise = null;
@@ -144,6 +147,7 @@ public class SceneReconstructionApp {
 	PrintStream out;
 
 	public void process() {
+		long time0 = System.currentTimeMillis();
 		System.out.println("ordered        = " + ordered);
 		System.out.println("max pixels     = " + maxPixels + " , sqrt=" + Math.sqrt(maxPixels));
 		System.out.println("input pattern  = " + inputPattern);
@@ -152,17 +156,16 @@ public class SceneReconstructionApp {
 		List<String> paths = UtilIO.listSmartImages(inputPattern, true);
 
 		if (paths.isEmpty()) {
-			System.err.println("No inputs found. Bath path or pattern? " + inputPattern);
+			System.err.println("No inputs found. Bad path or pattern? " + inputPattern);
 			System.exit(-1);
 		}
 
 		// Create the output directory if it doesn't exist
-		if (!new File(outputPath).exists()) {
-			BoofMiscOps.checkTrue(new File(outputPath).mkdirs());
-		}
+		UtilIO.mkdirs(new File(outputPath), deleteOutput);
 
 		// TODO if video sequences are found, decompress them into images
 		System.out.println("Total images: " + paths.size());
+		saveIndexToImageTable(paths);
 
 		// See if the user
 		if (configPath.isEmpty()) {
@@ -205,17 +208,34 @@ public class SceneReconstructionApp {
 				reconstructScene(paths, listScenes.get(0), new File(outputPath, "scene"));
 			}
 
+			// Print total processing time
+			System.out.println("Total Time: "+BoofMiscOps.milliToHuman(System.currentTimeMillis()-time0));
 			out.flush();
 		} catch (FileNotFoundException e) {
 			e.printStackTrace();
+			System.exit(1);
 		}
 		System.out.println("Finished!");
 	}
 
-	private void reconstructScene( List<String> paths, SceneWorkingGraph working, File sceneDirectory ) {
-		if (!sceneDirectory.exists()) {
-			BoofMiscOps.checkTrue(sceneDirectory.mkdirs());
+	/**
+	 * Save the input image list so that you know what the numeric values of each image represents
+	 */
+	private void saveIndexToImageTable( List<String> paths ) {
+		try (PrintStream out = new PrintStream(new File(outputPath, "index_to_image.txt"))) {
+			for (int i = 0; i < paths.size(); i++) {
+				out.println(paths.get(i));
+			}
+		} catch (FileNotFoundException e) {
+			e.printStackTrace();
+			System.exit(1);
 		}
+	}
+
+	private void reconstructScene( List<String> paths, SceneWorkingGraph working, File sceneDirectory ) {
+		out.println("----- Building "+sceneDirectory.getName());
+
+		UtilIO.mkdirs(sceneDirectory);
 
 		bundleAdjustmentRefine(sceneDirectory, working);
 		MultiViewIO.save(working, new File(sceneDirectory, "working.yaml").getPath());
@@ -280,9 +300,7 @@ public class SceneReconstructionApp {
 
 	private void saveConfigurations() {
 		File configDir = new File(outputPath, "configurations");
-		if (!configDir.exists()) {
-			BoofMiscOps.checkTrue(configDir.mkdirs());
-		}
+		UtilIO.mkdirs(configDir);
 
 		UtilIO.saveConfig(configTracker, new ConfigPointTracker(),
 				new File(configDir, "tracker.yaml"));
@@ -326,8 +344,7 @@ public class SceneReconstructionApp {
 	private void findSimilarImagesUnsorted() {
 		final var similarImages = FactorySceneReconstruction.createSimilarImages(configSimilarUnordered, ImageType.SB_U8);
 
-		if (verbose)
-			similarImages.setVerbose(out, BoofMiscOps.hashSet(BoofVerbose.RECURSIVE));
+		similarImages.setVerbose(out, BoofMiscOps.hashSet(BoofVerbose.RECURSIVE));
 
 		// Track features across the entire sequence and save the results
 		BoofMiscOps.profile(() -> {
@@ -351,8 +368,7 @@ public class SceneReconstructionApp {
 
 		final var similarImages = FactorySceneReconstruction.createTrackThenMatch(configSimilarTracker, ImageType.SB_U8);
 
-		if (verbose)
-			similarImages.setVerbose(out, BoofMiscOps.hashSet(BoofVerbose.RECURSIVE));
+		similarImages.setVerbose(out, BoofMiscOps.hashSet(BoofVerbose.RECURSIVE));
 
 		// Track features across the entire sequence and save the results
 		BoofMiscOps.profile(() -> {
@@ -394,12 +410,11 @@ public class SceneReconstructionApp {
 
 	private void computeMetric() {
 		var metric = new MetricFromUncalibratedPairwiseGraph();
-		if (verbose)
-			metric.setVerbose(out, BoofMiscOps.hashSet(BoofVerbose.RECURSIVE));
+		metric.setVerbose(out, BoofMiscOps.hashSet(BoofVerbose.RECURSIVE));
 		BoofMiscOps.profile(() -> {
 			if (!metric.process(similarImages, pairwise)) {
 				System.err.println("Reconstruction failed");
-				System.exit(0);
+				System.exit(1);
 			}
 		}, "Metric Reconstruction");
 
@@ -409,10 +424,10 @@ public class SceneReconstructionApp {
 
 	public void bundleAdjustmentRefine( File sceneDirectory, SceneWorkingGraph working ) {
 		var refine = new RefineMetricWorkingGraph();
+		refine.metricSba.getSba().setVerbose(out, null);
 		BoofMiscOps.profile(() -> {
 			// Bundle adjustment is run twice, with the worse 5% of points discarded in an attempt to reduce noise
 			refine.metricSba.keepFraction = 0.95;
-			refine.metricSba.getSba().setVerbose(out, null);
 			if (!refine.process(similarImages, working)) {
 				out.println("SBA REFINE FAILED");
 			}
@@ -431,7 +446,7 @@ public class SceneReconstructionApp {
 				continue;
 			int order = working.listViews.indexOf(wv);
 			ConvertRotation3D_F64.matrixToRodrigues(wv.world_to_view.R, rod);
-			out.printf("view[%2d]='%2s' f=%6.1f k1=%6.3f k2=%6.3f T={%5.1f,%5.1f,%5.1f} R=%4.2f\n",
+			out.printf("view[%2d]='%2s' f=%6.1f k1=%6.3f k2=%6.3f T={%5.1f,%5.1f,%5.1f} R=%5.3f\n",
 					order, wv.pview.id, wv.intrinsic.f, wv.intrinsic.k1, wv.intrinsic.k2,
 					wv.world_to_view.T.x, wv.world_to_view.T.y, wv.world_to_view.T.z, rod.theta);
 		}
@@ -444,8 +459,7 @@ public class SceneReconstructionApp {
 		// If requested, save disparity information as it's computed
 		if (saveFusedDisparity) {
 			File outputFused = new File(sceneDirectory,"fused");
-			if (!outputFused.exists())
-				BoofMiscOps.checkTrue(outputFused.mkdirs());
+			UtilIO.mkdirs(outputFused);
 
 			sparseToDense.getMultiViewStereo().setListener(new MultiViewStereoFromKnownSceneStructure.Listener<>() {
 				@Override
@@ -462,9 +476,7 @@ public class SceneReconstructionApp {
 			});
 		}
 
-		if (verbose)
-			sparseToDense.getMultiViewStereo().setVerbose(out,
-					BoofMiscOps.hashSet(BoofVerbose.RECURSIVE, BoofVerbose.RUNTIME));
+		sparseToDense.getMultiViewStereo().setVerbose(out, BoofMiscOps.hashSet(BoofVerbose.RECURSIVE, BoofVerbose.RUNTIME));
 
 		LookUpImages imageLookup = lookupAndRescale(paths);
 
