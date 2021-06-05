@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -29,20 +29,20 @@ import lombok.Getter;
  * @author Peter Abeles
  */
 @SuppressWarnings({"MissingOverride"})
-public abstract class DisparitySparseRectifiedScoreBM_F32 extends DisparitySparseRectifiedScoreBM<float[],GrayF32> {
+public abstract class DisparitySparseRectifiedScoreBM_F32 extends DisparitySparseRectifiedScoreBM<float[], GrayF32> {
 
 	// Fit scores as a function of disparity. scores[0] = score at disparity of disparityMin
 	@Getter protected float[] scoreLtoR; // left to right
 	@Getter protected float[] scoreRtoL; // right to left
 
-	protected DisparitySparseRectifiedScoreBM_F32(int radiusX, int radiusY) {
+	protected DisparitySparseRectifiedScoreBM_F32( int radiusX, int radiusY ) {
 		super(radiusX, radiusY, GrayF32.class);
 	}
 
 	@Override
-	public void configure(int disparityMin, int disparityRange) {
+	public void configure( int disparityMin, int disparityRange ) {
 		super.configure(disparityMin, disparityRange);
-		scoreLtoR = new float[ disparityRange ];
-		scoreRtoL = new float[ disparityRange ];
+		scoreLtoR = new float[disparityRange];
+		scoreRtoL = new float[disparityRange];
 	}
 }
