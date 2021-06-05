@@ -262,7 +262,7 @@ public class SimilarImagesSceneRecognition<Image extends ImageBase<Image>, TD ex
 			addDestFeaturesThenAssociate(imageIndexMatch);
 
 			if (verbose != null) {
-				verbose.printf("   dst.size=%d associated[%d].size=%d",
+				verbose.printf("_ dst.size=%d associated[%d].size=%d",
 						destinationPixels.size, imageIndexMatch, asscociator.getMatches().size);
 			}
 
@@ -279,7 +279,7 @@ public class SimilarImagesSceneRecognition<Image extends ImageBase<Image>, TD ex
 			info.associated.copyAll(asscociator.getMatches().toList(), ( original, copy ) -> copy.setTo(original));
 			viewId_to_info.put(match.id, info);
 
-			if (verbose != null) verbose.println("  accepted");
+			if (verbose != null) verbose.println("_ accepted");
 		}
 	}
 
