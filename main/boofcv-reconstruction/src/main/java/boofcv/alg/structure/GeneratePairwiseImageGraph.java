@@ -92,10 +92,12 @@ public class GeneratePairwiseImageGraph implements VerbosePrint {
 			if (verbose != null)
 				verbose.println("Target view='" + src + "'");
 
-			db.findSimilar(src, null, similar);
+			// Find similar, but filter out images which have a lower index as those matches have already been considered
+			int _idxTgt = idxTgt;
+			db.findSimilar(src, (id)-> imageToIndex.get(id) > _idxTgt, similar);
 			db.lookupPixelFeats(src, srcFeats);
 
-			if (verbose != null) verbose.println("similar=" + similar.size() + " obs=" + srcFeats.size);
+			if (verbose != null) verbose.println("similar.size=" + similar.size() + " feats.size=" + srcFeats.size);
 
 			graph.nodes.get(idxTgt).totalObservations = srcFeats.size;
 
@@ -105,7 +107,7 @@ public class GeneratePairwiseImageGraph implements VerbosePrint {
 				// make sure it isn't considering the same motion twice
 				int dstIdx = imageToIndex.get(dst);
 				if (dstIdx <= idxTgt)
-					continue;
+					throw new RuntimeException("BUG! should have been filtered by find similar");
 
 				// get information on the features and association
 				db.lookupPixelFeats(dst, dstFeats);
@@ -138,7 +140,7 @@ public class GeneratePairwiseImageGraph implements VerbosePrint {
 		DogArray_I32 inlierIdx = new DogArray_I32();
 
 		// no new line since epipolarScore should print something about this pair
-		if (verbose != null) verbose.printf("createEdge['%s'] -> '%s'  ", src, dst);
+		if (verbose != null) verbose.printf("_ createEdge['%s'] -> '%s'  ", src, dst);
 
 		if (!epipolarScore.process(pairs.toList(), fundamental, inlierIdx)) {
 			// Don't create an edge here

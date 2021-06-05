@@ -313,7 +313,7 @@ public class MetricFromUncalibratedPairwiseGraph extends ReconstructionFromPairw
 			// Don't merge in this situation
 			if (isSubset(src, dst)) {
 				if (verbose != null)
-					verbose.println("merge results: src=" + src.index + " dst=" + dst.index + " sizes=(" +
+					verbose.println("Merge results: src=" + src.index + " dst=" + dst.index + " sizes=(" +
 							src.listViews.size() + " " + dst.listViews.size() + "), Removing: src is a subset.");
 				mergeOps.toggleViewEnabled(src, scenesInEachView);
 				BoofMiscOps.checkTrue(!mergeOps.enabledScenes.get(src.index), "Should be disabled now");
@@ -322,7 +322,7 @@ public class MetricFromUncalibratedPairwiseGraph extends ReconstructionFromPairw
 			}
 
 			if (verbose != null)
-				verbose.println("Merge: src=" + src.index + " dst=" + dst.index + " sizes=(" +
+				verbose.println("Attempt merge: src=" + src.index + " dst=" + dst.index + " sizes=(" +
 						src.listViews.size() + " " + dst.listViews.size() + ")");
 
 

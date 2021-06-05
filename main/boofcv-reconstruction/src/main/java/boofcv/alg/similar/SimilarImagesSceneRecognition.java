@@ -279,7 +279,7 @@ public class SimilarImagesSceneRecognition<Image extends ImageBase<Image>, TD ex
 			info.associated.copyAll(asscociator.getMatches().toList(), ( original, copy ) -> copy.setTo(original));
 			viewId_to_info.put(match.id, info);
 
-			if (verbose != null) verbose.println("_ accepted");
+			if (verbose != null) verbose.println(" accepted");
 		}
 	}
 
