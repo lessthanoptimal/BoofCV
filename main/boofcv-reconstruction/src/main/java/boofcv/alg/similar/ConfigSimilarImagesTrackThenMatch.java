@@ -40,7 +40,7 @@ public class ConfigSimilarImagesTrackThenMatch implements Configuration {
 	/**
 	 * Minimum number of frames (by ID) away two frames need to be for loop closure logic to connect them
 	 */
-	public int minimumRecognizeDistance = 10;
+	public int minimumRecognizeDistance = 30;
 
 	/**
 	 * @see SimilarImagesFromTracks#searchRadius

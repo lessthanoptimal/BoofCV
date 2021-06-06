@@ -221,7 +221,7 @@ public class SimilarImagesTrackThenMatch<Image extends ImageBase<Image>, TD exte
 		BoofLambdas.Filter<String> queryFilter = filterQuery(filter, frameIdx, frameTarget);
 
 		// Look up potential matches using the recognition algorithm while filtering results
-		recognizer.query(wrapFeatures(frameIdx), queryFilter, 5, queryMatches);
+		recognizer.query(wrapFeatures(frameIdx), queryFilter, limitQuery, queryMatches);
 
 //		long time2 = System.nanoTime();
 

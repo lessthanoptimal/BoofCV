@@ -265,6 +265,7 @@ public class SceneReconstructionApp {
 		configTracker.detDesc.detectPoint.general.threshold = 0;
 
 		configSimilarTracker.recognizeNister2006.learningMinimumPointsForChildren.setFixed(20);
+		configSimilarTracker.descriptions.radius = 20;
 
 		configSimilarUnordered.recognizeNister2006.learningMinimumPointsForChildren.setFixed(20);
 
@@ -272,7 +273,6 @@ public class SceneReconstructionApp {
 		configPairwise.score.typeErrors.minimumInliers.setRelative(0.4, 150);
 		configPairwise.score.typeErrors.maxRatioScore = 10.0;
 		configPairwise.score.ransacF.inlierThreshold = 2.0;
-		configPairwise.score.ransacF.iterations = 1000;
 
 		configSparseToDense.disparity.approach = ConfigDisparity.Approach.SGM;
 		ConfigDisparitySGM configSgm = configSparseToDense.disparity.approachSGM;
@@ -287,19 +287,22 @@ public class SceneReconstructionApp {
 	private void configureHarder() {
 		configureDefault();
 
-		configSimilarTracker.minimumSimilar.setRelative(0.35, 150);
+		configTracker.klt.maximumTracks.setFixed(1200);
+		configTracker.detDesc.detectPoint.general.radius = 3;
+
+		configSimilarTracker.minimumSimilar.setRelative(0.15, 50);
 		configSimilarTracker.descriptions.radius = 20;
-		configSimilarTracker.sequentialSearchRadius = 8;
+		configSimilarTracker.sequentialSearchRadius = 15;
+		configSimilarTracker.limitQuery = 30;
+		configSimilarTracker.minimumRecognizeDistance = 0;
 		configSimilarTracker.sequentialMinimumCommonTracks.setRelative(0.4, 200);
 
 		configSimilarUnordered.features.detectFastHessian.extract.radius = 1;
 		configSimilarUnordered.features.detectFastHessian.maxFeaturesAll = 1200;
-		configSimilarUnordered.minimumSimilar.setRelative(0.2, 100);
+		configSimilarUnordered.minimumSimilar.setRelative(0.1, 50);
 
-		configPairwise.score.typeErrors.minimumInliers.setRelative(0.1, 20);
-		configPairwise.score.ransacF.iterations = 3000;
-
-		configSimilarUnordered.minimumSimilar.setRelative(0.2, 50);
+		configPairwise.score.typeErrors.minimumInliers.setRelative(0.1, 50);
+		configPairwise.score.ransacF.iterations = 2000;
 	}
 
 	private void saveConfigurations() {
