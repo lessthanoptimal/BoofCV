@@ -19,6 +19,7 @@
 package boofcv.factory.scene;
 
 import boofcv.abst.feature.detdesc.DetectDescribePoint;
+import boofcv.abst.feature.detect.interest.PointDetectorTypes;
 import boofcv.abst.scene.ConfigFeatureToSceneRecognition;
 import boofcv.abst.scene.FeatureSceneRecognition;
 import boofcv.abst.scene.SceneRecognition;
@@ -28,6 +29,8 @@ import boofcv.abst.scene.ann.FeatureSceneRecognitionNearestNeighbor;
 import boofcv.abst.scene.nister2006.ConfigRecognitionNister2006;
 import boofcv.abst.scene.nister2006.FeatureSceneRecognitionNister2006;
 import boofcv.factory.feature.detdesc.FactoryDetectDescribe;
+import boofcv.factory.feature.detect.interest.ConfigDetectInterestPoint;
+import boofcv.factory.tracker.ConfigPointTracker;
 import boofcv.misc.BoofLambdas;
 import boofcv.misc.FactoryFilterLambdas;
 import boofcv.struct.feature.TupleDesc;
@@ -42,6 +45,28 @@ import org.jetbrains.annotations.Nullable;
  * @author Peter Abeles
  */
 public class FactorySceneRecognition {
+
+	/**
+	 * Creates the default config for a {@link boofcv.abst.tracker.PointTracker} for use with scene reconstruction
+	 */
+	public static ConfigPointTracker createDefaultTrackerConfig() {
+		var config = new ConfigPointTracker();
+
+		config.typeTracker = ConfigPointTracker.TrackerType.KLT;
+		config.klt.pruneClose = true;
+		config.klt.toleranceFB = 1;
+		config.klt.templateRadius = 5;
+		config.klt.maximumTracks.setFixed(800);
+		config.klt.config.maxIterations = 30;
+		config.detDesc.typeDetector = ConfigDetectInterestPoint.Type.POINT;
+		config.detDesc.detectPoint.type = PointDetectorTypes.SHI_TOMASI;
+		config.detDesc.detectPoint.shiTomasi.radius = 3;
+		config.detDesc.detectPoint.general.radius = 6;
+		config.detDesc.detectPoint.general.threshold = 0;
+
+		return config;
+	}
+
 	/**
 	 * Creates a new {@link SceneRecognition} that is a wrapper around {@link FeatureSceneRecognition}
 	 */

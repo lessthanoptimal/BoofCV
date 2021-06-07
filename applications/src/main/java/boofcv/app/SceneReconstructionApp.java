@@ -19,7 +19,6 @@
 package boofcv.app;
 
 import boofcv.BoofVerbose;
-import boofcv.abst.feature.detect.interest.PointDetectorTypes;
 import boofcv.abst.geo.bundle.SceneStructureMetric;
 import boofcv.abst.tracker.PointTrack;
 import boofcv.abst.tracker.PointTracker;
@@ -34,7 +33,7 @@ import boofcv.core.image.ConvertImage;
 import boofcv.core.image.GConvertImage;
 import boofcv.factory.disparity.ConfigDisparity;
 import boofcv.factory.disparity.ConfigDisparitySGM;
-import boofcv.factory.feature.detect.interest.ConfigDetectInterestPoint;
+import boofcv.factory.scene.FactorySceneRecognition;
 import boofcv.factory.structure.ConfigEpipolarScore3D;
 import boofcv.factory.structure.ConfigGeneratePairwiseImageGraph;
 import boofcv.factory.structure.ConfigSparseToDenseCloud;
@@ -87,7 +86,7 @@ public class SceneReconstructionApp {
 	// TODO sparse only
 	// TODO Resume from saved
 
-	ConfigPointTracker configTracker = new ConfigPointTracker();
+	ConfigPointTracker configTracker = FactorySceneRecognition.createDefaultTrackerConfig();
 	ConfigSimilarImagesTrackThenMatch configSimilarTracker = new ConfigSimilarImagesTrackThenMatch();
 	ConfigSimilarImagesSceneRecognition configSimilarUnordered = new ConfigSimilarImagesSceneRecognition();
 
@@ -213,7 +212,7 @@ public class SceneReconstructionApp {
 			}
 
 			// Print total processing time
-			System.out.println("Total Time: "+BoofMiscOps.milliToHuman(System.currentTimeMillis()-time0));
+			System.out.println("Total Time: " + BoofMiscOps.milliToHuman(System.currentTimeMillis() - time0));
 			out.flush();
 		} catch (FileNotFoundException e) {
 			e.printStackTrace();
@@ -237,7 +236,7 @@ public class SceneReconstructionApp {
 	}
 
 	private void reconstructScene( List<String> paths, SceneWorkingGraph working, File sceneDirectory ) {
-		out.println("----- Building "+sceneDirectory.getName());
+		out.println("----- Building " + sceneDirectory.getName());
 
 		UtilIO.mkdirs(sceneDirectory);
 
@@ -252,18 +251,6 @@ public class SceneReconstructionApp {
 	}
 
 	private void configureDefault() {
-		configTracker.typeTracker = ConfigPointTracker.TrackerType.KLT;
-		configTracker.klt.pruneClose = true;
-		configTracker.klt.toleranceFB = 1;
-		configTracker.klt.templateRadius = 5;
-		configTracker.klt.maximumTracks.setFixed(800);
-		configTracker.klt.config.maxIterations = 30;
-		configTracker.detDesc.typeDetector = ConfigDetectInterestPoint.Type.POINT;
-		configTracker.detDesc.detectPoint.type = PointDetectorTypes.SHI_TOMASI;
-		configTracker.detDesc.detectPoint.shiTomasi.radius = 3;
-		configTracker.detDesc.detectPoint.general.radius = 6;
-		configTracker.detDesc.detectPoint.general.threshold = 0;
-
 		configSimilarTracker.recognizeNister2006.learningMinimumPointsForChildren.setFixed(20);
 		configSimilarTracker.descriptions.radius = 20;
 
@@ -462,7 +449,7 @@ public class SceneReconstructionApp {
 
 		// If requested, save disparity information as it's computed
 		if (saveFusedDisparity) {
-			File outputFused = new File(sceneDirectory,"fused");
+			File outputFused = new File(sceneDirectory, "fused");
 			UtilIO.mkdirs(outputFused);
 
 			sparseToDense.getMultiViewStereo().setListener(new MultiViewStereoFromKnownSceneStructure.Listener<>() {
@@ -473,7 +460,7 @@ public class SceneReconstructionApp {
 				@Override
 				public void handleFusedDisparity( String name, GrayF32 disparity, GrayU8 mask, DisparityParameters parameters ) {
 					BufferedImage colorized = VisualizeImageData.disparity(disparity, null, parameters.disparityRange, 0);
-					UtilImageIO.saveImage(colorized, new File(outputFused,"visualized_"+name+".png").getPath());
+					UtilImageIO.saveImage(colorized, new File(outputFused, "visualized_" + name + ".png").getPath());
 
 					// It's not obvious what format to save the float and binary images in. leaving that for the future
 				}
