@@ -44,7 +44,7 @@ public class ConfigSimilarImagesSceneRecognition implements Configuration {
 	 *
 	 * The default minimum number of matches is probably set too low.
 	 */
-	public final ConfigLength minimumSimilar = ConfigLength.relative(0.4, 1);
+	public final ConfigLength minimumSimilar = ConfigLength.relative(0.2, 1);
 
 	/** Image feature detector */
 	public final ConfigDetectDescribe features = new ConfigDetectDescribe();
@@ -61,18 +61,18 @@ public class ConfigSimilarImagesSceneRecognition implements Configuration {
 		features.typeDetector = ConfigDetectInterestPoint.Type.FAST_HESSIAN;
 		// Settings a threshold degrades overall results, even if in some specific situations makes it better
 		features.detectFastHessian.extract.threshold = 0.5f;
-		features.detectFastHessian.extract.radius = 6;
+		features.detectFastHessian.extract.radius = 5;
 		features.detectFastHessian.numberOfOctaves = 7;
 		// 500 features is a good trade off for memory and performance. Accuracy can be improved
 		// with more features but becomes prohibitively expensive in larger datasets
-		features.detectFastHessian.maxFeaturesAll = 500;
+		features.detectFastHessian.maxFeaturesAll = 800;
 		features.detectFastHessian.maxFeaturesPerScale = 0;
 
 		// Also give SIFT reasonable parameters
 		features.describeSift.sigmaToPixels = 2.0f;
 		features.detectSift.extract.threshold = 0.5f;
 		features.detectSift.extract.radius = 6;
-		features.detectSift.maxFeaturesAll = 500;
+		features.detectSift.maxFeaturesAll = 800;
 		features.detectSift.maxFeaturesPerScale = 0;
 
 		// Reduce memory usage with very little loss in accuracy
