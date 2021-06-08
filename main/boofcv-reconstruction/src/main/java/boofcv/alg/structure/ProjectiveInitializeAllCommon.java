@@ -109,13 +109,14 @@ public class ProjectiveInitializeAllCommon implements VerbosePrint {
 	 * Computes a projective reconstruction. Reconstruction will be relative the 'seed' and only use features
 	 * listed in 'common'. The list of views is taken from seed and is specified in 'motions'.
 	 *
-	 * @param db (Input) Data based used to look up information on each image
+	 * @param dbSimilar (Input) Data based used to look up information on each image
 	 * @param seed (Input) The seed view that will act as the origin
 	 * @param seedFeatsIdx (Input) Indexes of common features in the seed view which are to be used.
 	 * @param seedConnIdx (Input) Indexes of motions in the seed view to use when initializing
 	 * @return true is successful or false if it failed
 	 */
-	public boolean projectiveSceneN( LookUpSimilarImages db,
+	public boolean projectiveSceneN( LookUpSimilarImages dbSimilar,
+									 LookUpCameraInfo dbCams,
 									 View seed, DogArray_I32 seedFeatsIdx, DogArray_I32 seedConnIdx ) {
 		// Check preconditions. Exceptions are thrown since these are easily checked and shouldn't be ignored under
 		// the assumption that geometry was simply bad
@@ -136,7 +137,8 @@ public class ProjectiveInitializeAllCommon implements VerbosePrint {
 		}
 
 		// initialize data structures
-		utils.db = db;
+		utils.dbSimilar = dbSimilar;
+		utils.dbCams = dbCams;
 		viewsByStructureIndex.reset();
 		inlierIndexes.resetResize(1 + seedConnIdx.size);
 
@@ -176,9 +178,9 @@ public class ProjectiveInitializeAllCommon implements VerbosePrint {
 		// Estimate projective cameras for each view not in the original triplet
 		// This is simple because the 3D coordinate of each point is already known
 		if (seedConnIdx.size > 2) { // only do if more than 3 views
-			initializeStructureForAllViews(db, utils.ransac.getMatchSet().size(), seed, seedConnIdx);
+			initializeStructureForAllViews(dbCams, utils.ransac.getMatchSet().size(), seed, seedConnIdx);
 
-			if (!findRemainingCameraMatrices(db, seed, seedConnIdx)) {
+			if (!findRemainingCameraMatrices(dbSimilar, dbCams, seed, seedConnIdx)) {
 				if (verbose != null) verbose.println("FAILED: Finding remaining cameras. TODO recover from this");
 				return false;
 			}
@@ -206,7 +208,7 @@ public class ProjectiveInitializeAllCommon implements VerbosePrint {
 	 * Initializes the bundle adjustment structure for all views not just the initial set of 3. The seed view is
 	 * view index=0. The other views are in order of `seedConnIdx` after that.
 	 */
-	private void initializeStructureForAllViews( LookUpSimilarImages db, int numberOfFeatures, View seed, DogArray_I32 seedConnIdx ) {
+	private void initializeStructureForAllViews( LookUpCameraInfo db, int numberOfFeatures, View seed, DogArray_I32 seedConnIdx ) {
 		utils.observations.initialize(1 + seedConnIdx.size);
 		utils.structure.initialize(1 + seedConnIdx.size, numberOfFeatures);
 		viewsByStructureIndex.resize(utils.structure.views.size, null);
@@ -214,7 +216,7 @@ public class ProjectiveInitializeAllCommon implements VerbosePrint {
 		utils.triangulateFeatures();
 
 		// Added the seed view
-		db.lookupShape(seed.id, shape);
+		db.lookupViewShape(seed.id, shape);
 		utils.structure.setView(0, true, utils.P1, shape.width, shape.height);
 
 		// Add the two views connected to it. Note that the index of these views is based on their index
@@ -226,7 +228,7 @@ public class ProjectiveInitializeAllCommon implements VerbosePrint {
 		for (int i = 0; i < 2; i++) {
 			Motion motion = seed.connections.get(selectedTriple[i]);
 			View view = motion.other(seed);
-			db.lookupShape(view.id, shape);
+			db.lookupViewShape(view.id, shape);
 			utils.structure.setView(
 					i == 0 ? indexSbaViewB : indexSbaViewC, false,
 					i == 0 ? utils.P2 : utils.P3, shape.width, shape.height);
@@ -330,7 +332,8 @@ public class ProjectiveInitializeAllCommon implements VerbosePrint {
 	 * @param seedConnIdx (Input) Specifies which connections in 'seed.connections' are to be used.
 	 * @return true if successful or false if not
 	 */
-	boolean findRemainingCameraMatrices( LookUpSimilarImages db, View seed, DogArray_I32 seedConnIdx ) {
+	boolean findRemainingCameraMatrices( LookUpSimilarImages dbSimilar, LookUpCameraInfo dbCams,
+										 View seed, DogArray_I32 seedConnIdx ) {
 		int numInliers = inlierIndexes.get(0).size;
 		BoofMiscOps.checkTrue(numInliers == utils.inliersThreeView.size());
 
@@ -359,9 +362,9 @@ public class ProjectiveInitializeAllCommon implements VerbosePrint {
 			View viewI = edge.other(seed);
 
 			// Lookup pixel locations of features in the connected view
-			db.lookupShape(viewI.id, utils.dimenB);
-			db.lookupPixelFeats(viewI.id, utils.featsB);
-			BoofMiscOps.offsetPixels(utils.featsB.toList(), -utils.dimenB.width/2, -utils.dimenB.height/2);
+			dbCams.lookupCalibration(viewI.id, utils.cameraB);
+			dbSimilar.lookupPixelFeats(viewI.id, utils.featsB);
+			BoofMiscOps.offsetPixels(utils.featsB.toList(), -utils.cameraB.cx, -utils.cameraB.cy);
 
 			if (!computeCameraMatrix(seed, edge, utils.featsB, cameraMatrix)) {
 				if (verbose != null) verbose.println("Pose estimator failed! view='" + viewI.id + "'");
@@ -373,7 +376,7 @@ public class ProjectiveInitializeAllCommon implements VerbosePrint {
 			// Add all the information from this view to SBA data structure
 			int indexSbaView = motionIdx + 1;
 			// image information and found camera matrix
-			db.lookupShape(edge.other(seed).id, shape);
+			dbCams.lookupViewShape(edge.other(seed).id, shape);
 			utils.structure.setView(indexSbaView, false, cameraMatrix, shape.width, shape.height);
 			// observation of features
 			SceneObservations.View sbaObsView = utils.observations.getView(indexSbaView);
@@ -449,9 +452,9 @@ public class ProjectiveInitializeAllCommon implements VerbosePrint {
 			Motion m = utils.seed.connections.get(seedConnIdx.get(motionIdx));
 			View v = m.other(utils.seed);
 			boolean seedIsSrc = m.src == utils.seed;
-			utils.db.lookupShape(v.id, utils.dimenB);
-			utils.db.lookupPixelFeats(v.id, utils.featsB);
-			BoofMiscOps.offsetPixels(utils.featsB.toList(), -utils.dimenB.width/2, -utils.dimenB.height/2);
+			utils.dbCams.lookupCalibration(utils.dbCams.viewToCamera(v.id), utils.cameraB);
+			utils.dbSimilar.lookupPixelFeats(v.id, utils.featsB);
+			BoofMiscOps.offsetPixels(utils.featsB.toList(), -utils.cameraB.cx, -utils.cameraB.cy);
 
 			// indicate which observation from this view contributed to which 3D feature
 			DogArray_I32 connInlierIndexes = inlierIndexes.get(motionIdx + 1);

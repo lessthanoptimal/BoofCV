@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -24,6 +24,7 @@ import org.ejml.FancyPrint;
 import org.jetbrains.annotations.Nullable;
 
 import java.io.Serializable;
+import java.util.Arrays;
 
 /**
  * <p>Adds radial and tangential distortion to the intrinsic parameters of a {@link CameraPinhole pinhole camera}.</p>
@@ -67,6 +68,14 @@ public class CameraPinholeBrown extends CameraPinhole implements Serializable {
 							  double cx, double cy,
 							  int width, int height ) {
 		fsetK(fx, fy, skew, cx, cy, width, height);
+	}
+
+	@Override
+	public void reset() {
+		super.reset();
+		if (radial != null)
+			Arrays.fill(radial, 0.0);
+		t1 = t2 = 0.0;
 	}
 
 	@Override

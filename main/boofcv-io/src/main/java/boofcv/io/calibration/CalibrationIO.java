@@ -51,7 +51,7 @@ import static java.nio.charset.StandardCharsets.UTF_8;
 @SuppressWarnings("ALL")
 public class CalibrationIO {
 	public static String MODEL_PINHOLE = "pinhole";
-	public static String MODEL_PINHOLE_RADIAL_TAN = "pinhole_radial_tangential";
+	public static String MODEL_BROWN = "pinhole_radial_tangential";
 	public static String MODEL_OMNIDIRECTIONAL_UNIVERSAL = "omnidirectional_universal";
 	public static String MODEL_STEREO = "stereo_camera";
 	public static String MODEL_RIGID_BODY = "rigid_body";
@@ -78,7 +78,7 @@ public class CalibrationIO {
 			out.println("# (fx,fy) = focal length, (cx,cy) = principle point, (width,height) = image shape");
 			out.println("# radial = radial distortion, (t1,t2) = tangential distortion");
 			out.println();
-			putModelRadial((CameraPinholeBrown)parameters, data);
+			putModelBrown((CameraPinholeBrown)parameters, data);
 		} else if (parameters instanceof CameraUniversalOmni) {
 			out.println("# Omnidirectional camera model with radial and tangential distortion");
 			out.println("# C. Mei, and P. Rives. \"Single view point omnidirectional camera calibration" +
@@ -128,8 +128,8 @@ public class CalibrationIO {
 		Map<String, Object> map = new HashMap<>();
 		map.put("model", MODEL_STEREO);
 		map.put(VERSION, 0);
-		map.put("left", putModelRadial(parameters.left, null));
-		map.put("right", putModelRadial(parameters.right, null));
+		map.put("left", putModelBrown(parameters.left, null));
+		map.put("right", putModelBrown(parameters.right, null));
 		map.put("rightToLeft", putSe3(parameters.right_to_left));
 
 		PrintWriter out = new PrintWriter(outputWriter);
@@ -194,7 +194,7 @@ public class CalibrationIO {
 		map.put(VERSION, 0);
 		map.put("max_depth", parameters.getMaxDepth());
 		map.put("no_depth", parameters.getPixelNoDepth());
-		map.put("intrinsic", putModelRadial(parameters.getVisualParam(), null));
+		map.put("intrinsic", putModelBrown(parameters.getVisualParam(), null));
 
 		PrintWriter out = new PrintWriter(outputWriter);
 		out.println("# RGB Depth Camera Calibration");
@@ -207,7 +207,7 @@ public class CalibrationIO {
 		Map<String, Object> map = new HashMap<>();
 		map.put("model", MODEL_MONO_PLANE);
 		map.put(VERSION, 0);
-		map.put("intrinsic", putModelRadial(parameters.getIntrinsic(), null));
+		map.put("intrinsic", putModelBrown(parameters.getIntrinsic(), null));
 		map.put("plane_to_camera", putSe3(parameters.getPlaneToCamera()));
 
 		PrintWriter out = new PrintWriter(outputWriter);
@@ -259,7 +259,7 @@ public class CalibrationIO {
 		}
 	}
 
-	private static <T> T load( Map<String, Object> data ) throws IOException {
+	public static <T> T load( Map<String, Object> data ) throws IOException {
 //		int version = data.containsKey("version") ? (int)data.get("version") : 0;
 
 		String model = (String)data.get("model");
@@ -271,7 +271,7 @@ public class CalibrationIO {
 			loadPinhole(getOrThrow(data, "pinhole"), parameters);
 
 			return (T)parameters;
-		} else if (model.equals(MODEL_PINHOLE_RADIAL_TAN)) {
+		} else if (model.equals(MODEL_BROWN)) {
 			CameraPinholeBrown parameters = new CameraPinholeBrown();
 
 			loadPinhole((Map<String, Object>)data.get("pinhole"), parameters);
@@ -337,7 +337,7 @@ public class CalibrationIO {
 		}
 	}
 
-	private static Map<String, Object> putModelPinhole( CameraPinhole parameters, Map<String, Object> map ) {
+	public static Map<String, Object> putModelPinhole( CameraPinhole parameters, Map<String, Object> map ) {
 		if (map == null)
 			map = new HashMap<>();
 
@@ -348,11 +348,12 @@ public class CalibrationIO {
 		return map;
 	}
 
-	private static Map<String, Object> putModelRadial( CameraPinholeBrown parameters, Map<String, Object> map ) {
+	public static Map<String, Object> putModelBrown( CameraPinholeBrown parameters,
+													  @Nullable Map<String, Object> map ) {
 		if (map == null)
 			map = new HashMap<>();
 
-		map.put("model", MODEL_PINHOLE_RADIAL_TAN);
+		map.put("model", MODEL_BROWN);
 		map.put(VERSION, 0);
 		map.put("pinhole", putParamsPinhole(parameters));
 		map.put("radial_tangential", putParamsRadialTangent(parameters));
@@ -360,7 +361,8 @@ public class CalibrationIO {
 		return map;
 	}
 
-	private static Map<String, Object> putModelUniversalOmni( CameraUniversalOmni parameters, Map<String, Object> map ) {
+	public static Map<String, Object> putModelUniversalOmni( CameraUniversalOmni parameters,
+															  @Nullable Map<String, Object> map ) {
 		if (map == null)
 			map = new HashMap<>();
 

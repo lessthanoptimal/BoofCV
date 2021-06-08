@@ -47,7 +47,7 @@ class TestMetricSpawnSceneFromView extends BoofStandardJUnit {
 		int numInliers = listInliers.get(0).size;
 
 		// create distinctive sets of inlier indexes for each view
-		for (int otherIdx = 0; otherIdx < viewIds.size()-1; otherIdx++) {
+		for (int otherIdx = 0; otherIdx < viewIds.size() - 1; otherIdx++) {
 			DogArray_I32 inliers = listInliers.grow();
 			for (int i = 0; i < numInliers; i++) {
 				inliers.add(listInliers.get(0).get(i) + 1 + otherIdx);
@@ -68,8 +68,9 @@ class TestMetricSpawnSceneFromView extends BoofStandardJUnit {
 		}
 
 		var alg = new MetricSpawnSceneFromView();
+		alg.utils.dbCams = new MockLookUpCameraInfo(800, 800);
 		var wgraph = new SceneWorkingGraph();
-		alg.saveMetricSeed(graph, viewIds, dimensions, listInliers, results, wgraph);
+		alg.saveMetricSeed(graph, viewIds, listInliers, results, wgraph);
 
 		// See metric view info got saved correctly
 		BoofMiscOps.forIdx(viewIds, ( idx, viewId ) -> {

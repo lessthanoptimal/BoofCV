@@ -142,7 +142,7 @@ class TestPairwiseGraphUtils extends BoofStandardJUnit {
 			motion.dst = new PairwiseImageGraph.View();
 			motion.dst.totalObservations = 110; // give it a few extra and see if that causes a problem
 
-			boolean swapped = i%2==0;
+			boolean swapped = i%2 == 0;
 			if (swapped) {
 				PairwiseImageGraph.View tmp = motion.src;
 				motion.src = motion.dst;
@@ -165,7 +165,7 @@ class TestPairwiseGraphUtils extends BoofStandardJUnit {
 		// NOTE: Connections between the non-seed views is not specified since we don't care about them
 
 		// Specify which connected view to the seed we are concerned about
-		DogArray_I32 connectIdx = DogArray_I32.array(1,2,4);
+		DogArray_I32 connectIdx = DogArray_I32.array(1, 2, 4);
 
 		// Find the common tracks
 		var commonIdx = new DogArray_I32();
@@ -180,25 +180,26 @@ class TestPairwiseGraphUtils extends BoofStandardJUnit {
 
 	@Test void createThreeViewLookUpTables() {
 		var alg = new PairwiseGraphUtils();
-		var db = new MockLookupSimilarImages(4, 0xDEADBEEF);
-		alg.db = db;
-		alg.seed = db.graph.nodes.get(0);
-		alg.viewB = db.graph.nodes.get(1);
-		alg.viewC = db.graph.nodes.get(3);
+		var dbSimilar = new MockLookupSimilarImages(4, 0xDEADBEEF);
+		alg.dbSimilar = dbSimilar;
+		alg.dbCams = new MockLookUpCameraInfo(dbSimilar.intrinsic);
+		alg.seed = dbSimilar.graph.nodes.get(0);
+		alg.viewB = dbSimilar.graph.nodes.get(1);
+		alg.viewC = dbSimilar.graph.nodes.get(3);
 
 		// Compute and check the results
 		alg.createThreeViewLookUpTables();
 
-		final int N = db.feats3D.size();
+		final int N = dbSimilar.feats3D.size();
 		assertEquals(N, alg.table_A_to_B.size);
 		assertEquals(N, alg.table_A_to_C.size);
 		assertEquals(N, alg.table_B_to_C.size);
 
 		// compare to ground truth tables
 		for (int i = 0; i < N; i++) {
-			assertEquals(db.featToView.get(1)[i], alg.table_A_to_B.data[i]);
-			assertEquals(db.featToView.get(3)[i], alg.table_A_to_C.data[i]);
-			int b_to_c = db.featToView.get(3)[db.viewToFeat.get(1)[i]];
+			assertEquals(dbSimilar.featToView.get(1)[i], alg.table_A_to_B.data[i]);
+			assertEquals(dbSimilar.featToView.get(3)[i], alg.table_A_to_C.data[i]);
+			int b_to_c = dbSimilar.featToView.get(3)[dbSimilar.viewToFeat.get(1)[i]];
 			assertEquals(b_to_c, alg.table_B_to_C.data[i]);
 		}
 	}
@@ -206,11 +207,12 @@ class TestPairwiseGraphUtils extends BoofStandardJUnit {
 	@SuppressWarnings("IntegerDivisionInFloatingPointContext")
 	@Test void createTripleFromCommon() {
 		var alg = new PairwiseGraphUtils();
-		var db = new MockLookupSimilarImages(4, 0xDEADBEEF);
-		alg.db = db;
-		alg.seed = db.graph.nodes.get(0);
-		alg.viewB = db.graph.nodes.get(1);
-		alg.viewC = db.graph.nodes.get(3);
+		var dbSimilar = new MockLookupSimilarImages(4, 0xDEADBEEF);
+		alg.dbSimilar = dbSimilar;
+		alg.dbCams = new MockLookUpCameraInfo(dbSimilar.intrinsic);
+		alg.seed = dbSimilar.graph.nodes.get(0);
+		alg.viewB = dbSimilar.graph.nodes.get(1);
+		alg.viewC = dbSimilar.graph.nodes.get(3);
 
 		// common is empty
 		alg.createTripleFromCommon();
@@ -224,12 +226,12 @@ class TestPairwiseGraphUtils extends BoofStandardJUnit {
 		assertEquals(1, alg.matchesTriple.size);
 		// undo the shift in pixel coordinates
 		for (int i = 0; i < 3; i++) {
-			alg.matchesTriple.get(0).get(i).x += db.intrinsic.width/2;
-			alg.matchesTriple.get(0).get(i).y += db.intrinsic.height/2;
+			alg.matchesTriple.get(0).get(i).x += dbSimilar.intrinsic.cx;
+			alg.matchesTriple.get(0).get(i).y += dbSimilar.intrinsic.cy;
 		}
-		assertEquals(0.0, alg.matchesTriple.get(0).p1.distance(db.viewObs.get(0).get(0)));
-		assertEquals(0.0, alg.matchesTriple.get(0).p2.distance(db.viewObs.get(1).get(1)));
-		assertEquals(0.0, alg.matchesTriple.get(0).p3.distance(db.viewObs.get(3).get(5)));
+		assertEquals(0.0, alg.matchesTriple.get(0).p1.distance(dbSimilar.viewObs.get(0).get(0)));
+		assertEquals(0.0, alg.matchesTriple.get(0).p2.distance(dbSimilar.viewObs.get(1).get(1)));
+		assertEquals(0.0, alg.matchesTriple.get(0).p3.distance(dbSimilar.viewObs.get(3).get(5)));
 
 		// Add one more
 		alg.table_A_to_B.add(2);
@@ -240,7 +242,7 @@ class TestPairwiseGraphUtils extends BoofStandardJUnit {
 	}
 
 	@Test void initializeSbaSceneThreeView() {
-		var db = new MockLookupSimilarImages(4, 0xDEADBEEF);
+		var dbSimilar = new MockLookupSimilarImages(4, 0xDEADBEEF);
 		var alg = new PairwiseGraphUtils() {
 			boolean called = false;
 
@@ -250,13 +252,14 @@ class TestPairwiseGraphUtils extends BoofStandardJUnit {
 			}
 		};
 
-		alg.db = db;
-		alg.seed = db.graph.nodes.get(0);
-		alg.viewB = db.graph.nodes.get(1);
-		alg.viewC = db.graph.nodes.get(3);
-		alg.P1.setTo(db.listCameraMatrices.get(0));
-		alg.P2.setTo(db.listCameraMatrices.get(1));
-		alg.P3.setTo(db.listCameraMatrices.get(3));
+		alg.dbSimilar = dbSimilar;
+		alg.dbCams = new MockLookUpCameraInfo(dbSimilar.intrinsic);
+		alg.seed = dbSimilar.graph.nodes.get(0);
+		alg.viewB = dbSimilar.graph.nodes.get(1);
+		alg.viewC = dbSimilar.graph.nodes.get(3);
+		alg.P1.setTo(dbSimilar.listCameraMatrices.get(0));
+		alg.P2.setTo(dbSimilar.listCameraMatrices.get(1));
+		alg.P3.setTo(dbSimilar.listCameraMatrices.get(3));
 
 		alg.inliersThreeView.add(new AssociatedTriple());
 
@@ -275,11 +278,12 @@ class TestPairwiseGraphUtils extends BoofStandardJUnit {
 
 	@Test void estimateProjectiveCamerasRobustly() {
 		var alg = new PairwiseGraphUtils(new ConfigProjectiveReconstruction());
-		var db = new MockLookupSimilarImages(4, 0xDEADBEEF);
-		alg.db = db;
-		alg.seed = db.graph.nodes.get(0);
-		alg.viewB = db.graph.nodes.get(1);
-		alg.viewC = db.graph.nodes.get(3);
+		var dbSimilar = new MockLookupSimilarImages(4, 0xDEADBEEF);
+		alg.dbSimilar = dbSimilar;
+		alg.dbCams = new MockLookUpCameraInfo(dbSimilar.intrinsic);
+		alg.seed = dbSimilar.graph.nodes.get(0);
+		alg.viewB = dbSimilar.graph.nodes.get(1);
+		alg.viewC = dbSimilar.graph.nodes.get(3);
 
 		// Create boilerplate input for RANSAC
 		alg.createThreeViewLookUpTables();
@@ -288,12 +292,12 @@ class TestPairwiseGraphUtils extends BoofStandardJUnit {
 
 		// Simple test where we see how many inliers there are
 		assertTrue(alg.estimateProjectiveCamerasRobustly());
-		assertEquals(db.feats3D.size(), alg.ransac.getMatchSet().size());
+		assertEquals(dbSimilar.feats3D.size(), alg.ransac.getMatchSet().size());
 
 		// Change one of the edges to see if it handles src/dst swap correctly
-		alg.viewB = db.graph.nodes.get(2);
+		alg.viewB = dbSimilar.graph.nodes.get(2);
 		// Everything should be an inlier since there's no noise
-		assertEquals(db.feats3D.size(), alg.ransac.getMatchSet().size());
+		assertEquals(dbSimilar.feats3D.size(), alg.ransac.getMatchSet().size());
 
 		// Crude test to see if it saved some reasonable results
 		assertTrue(MatrixFeatures_DDRM.isIdentity(alg.P1, 1e-8));
@@ -306,7 +310,7 @@ class TestPairwiseGraphUtils extends BoofStandardJUnit {
 		var db = new MockLookupSimilarImages(4, 0xDEADBEEF);
 
 		int offset = 5;
-		alg.db = db;
+		alg.dbSimilar = db;
 		alg.P1.setTo(db.listCameraMatrices.get(0));
 		alg.P2.setTo(db.listCameraMatrices.get(1));
 		alg.P3.setTo(db.listCameraMatrices.get(3));
@@ -357,7 +361,7 @@ class TestPairwiseGraphUtils extends BoofStandardJUnit {
 		var db = new MockLookupSimilarImages(4, 0xDEADBEEF);
 
 		int[] views = new int[]{0, 1, 3};
-		alg.db = db;
+		alg.dbSimilar = db;
 		alg.P1.setTo(db.listCameraMatrices.get(views[0]));
 		alg.P2.setTo(db.listCameraMatrices.get(views[1]));
 		alg.P3.setTo(db.listCameraMatrices.get(views[2]));

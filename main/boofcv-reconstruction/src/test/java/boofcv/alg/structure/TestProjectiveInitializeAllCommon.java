@@ -74,23 +74,25 @@ class TestProjectiveInitializeAllCommon extends BoofStandardJUnit {
 //		alg.utils.sba.setVerbose(System.out,null);
 
 		for (int seedIdx = 0; seedIdx < 3; seedIdx++) {
-			var db = new MockLookupSimilarImagesRealistic().pathCircle(4, 2);
-			PairwiseImageGraph graph = db.createPairwise();
+			var dbSimilar = new MockLookupSimilarImagesRealistic().pathCircle(4, 2);
+			var dbCams = new MockLookUpCameraInfo(dbSimilar.intrinsic);
+
+			PairwiseImageGraph graph = dbSimilar.createPairwise();
 
 			View seed = graph.nodes.get(seedIdx);
 			var seedConnIdx = DogArray_I32.array(0, 2);
 
 			// in this specific scenario all features are visible by all frames
-			var seedFeatsIdx = DogArray_I32.range(0, db.numFeatures);
+			var seedFeatsIdx = DogArray_I32.range(0, dbSimilar.numFeatures);
 			// however not all features are in the inlier set. Remove all features not in inlier set
 			removeConnectionOutliers(seed, seedFeatsIdx);
 
 			// Reconstruct the projective scene
-			assertTrue(alg.projectiveSceneN(db, seed, seedFeatsIdx, seedConnIdx));
+			assertTrue(alg.projectiveSceneN(dbSimilar, dbCams, seed, seedFeatsIdx, seedConnIdx));
 
 			// test results
-			checkReconstruction(alg, db, seedConnIdx, reprojectionTol);
-			checkCameraMatrices(alg, db);
+			checkReconstruction(alg, dbSimilar, seedConnIdx, reprojectionTol);
+			checkCameraMatrices(alg, dbSimilar);
 		}
 	}
 
@@ -103,10 +105,12 @@ class TestProjectiveInitializeAllCommon extends BoofStandardJUnit {
 		for (int numConnections = 3; numConnections <= 6; numConnections++) {
 			// do a few trials since things are randomized to shake out more bugs potentially
 			for (int trial = 0; trial < 3; trial++) {
-				var db = new MockLookupSimilarImagesRealistic().pathCircle(6, 2);
-				List<String> viewIdStr = db.getImageIDs();
+				var dbSimilar = new MockLookupSimilarImagesRealistic().pathCircle(6, 2);
+				var dbCams = new MockLookUpCameraInfo(dbSimilar.intrinsic);
 
-				PairwiseImageGraph graph = db.createPairwise();
+				List<String> viewIdStr = dbSimilar.getImageIDs();
+
+				PairwiseImageGraph graph = dbSimilar.createPairwise();
 				View seed = graph.nodes.get(0);
 
 				// randomly select the connections
@@ -127,17 +131,17 @@ class TestProjectiveInitializeAllCommon extends BoofStandardJUnit {
 				}
 
 				// in this specific scenario all features are visible by all frames
-				var seedFeatsIdx = DogArray_I32.range(0, db.numFeatures);
+				var seedFeatsIdx = DogArray_I32.range(0, dbSimilar.numFeatures);
 				// however not all features are in the inlier set. Remove all features not in inlier set
 				removeConnectionOutliers(seed, seedFeatsIdx);
 
 				PrimitiveArrays.shuffle(seedFeatsIdx.data, 0, seedFeatsIdx.size, rand); // order should not matter
 
 				// Reconstruct the projective scene
-				assertTrue(alg.projectiveSceneN(db, seed, seedFeatsIdx, seedConnIdx));
+				assertTrue(alg.projectiveSceneN(dbSimilar, dbCams, seed, seedFeatsIdx, seedConnIdx));
 
 				// test results
-				checkReconstruction(alg, db, seedConnIdx, reprojectionTol);
+				checkReconstruction(alg, dbSimilar, seedConnIdx, reprojectionTol);
 			}
 		}
 	}
@@ -165,54 +169,58 @@ class TestProjectiveInitializeAllCommon extends BoofStandardJUnit {
 	 * Add a tiny bit of noise and see if it blows up
 	 */
 	@Test void small_noise() {
-		var db = new MockLookupSimilarImages(4, 0xDEADBEEF);
+		var dbSimilar = new MockLookupSimilarImages(4, 0xDEADBEEF);
+		var dbCams = new MockLookUpCameraInfo(dbSimilar.intrinsic);
+
 		var alg = new ProjectiveInitializeAllCommon();
 
 		// These observations are no longer perfect, just a little bit of error
-		db.viewObs.get(0).get(20).x += 0.1;
-		db.viewObs.get(3).get(25).y += 0.1;
+		dbSimilar.viewObs.get(0).get(20).x += 0.1;
+		dbSimilar.viewObs.get(3).get(25).y += 0.1;
 
-		checkConfiguration(alg, db, true, true, false, 0.1);
+		checkConfiguration(alg, dbSimilar, dbCams, true, true, false, 0.1);
 	}
 
 	/**
 	 * Test out different configurations of SBA and see if they all work
 	 */
 	@Test void configurations_sba() {
-		var db = new MockLookupSimilarImages(5, 0xDEADBEEF);
+		var dbSimilar = new MockLookupSimilarImages(5, 0xDEADBEEF);
+		var dbCams = new MockLookUpCameraInfo(dbSimilar.intrinsic);
 		var alg = new ProjectiveInitializeAllCommon();
 
-		checkConfiguration(alg, db, true, true, false, 1e-4);
-		checkConfiguration(alg, db, true, true, true, 1e-4);
-		checkConfiguration(alg, db, true, false, false, 1e-4);
-		checkConfiguration(alg, db, false, true, false, 1e-4);
-		checkConfiguration(alg, db, false, true, true, 1e-4);
-		checkConfiguration(alg, db, false, false, false, 1e-4);
+		checkConfiguration(alg, dbSimilar, dbCams, true, true, false, 1e-4);
+		checkConfiguration(alg, dbSimilar, dbCams, true, true, true, 1e-4);
+		checkConfiguration(alg, dbSimilar, dbCams, true, false, false, 1e-4);
+		checkConfiguration(alg, dbSimilar, dbCams, false, true, false, 1e-4);
+		checkConfiguration(alg, dbSimilar, dbCams, false, true, true, 1e-4);
+		checkConfiguration(alg, dbSimilar, dbCams, false, false, false, 1e-4);
 	}
 
-	private void checkConfiguration( ProjectiveInitializeAllCommon alg, MockLookupSimilarImages db,
+	private void checkConfiguration( ProjectiveInitializeAllCommon alg,
+									 MockLookupSimilarImages dbSimilar, MockLookUpCameraInfo dbCams,
 									 boolean threeViews,
 									 boolean sba, boolean scale, double reprojectionTol ) {
 		alg.utils.configConvergeSBA.maxIterations = sba ? 50 : -1;
 		alg.utils.configScaleSBA = scale;
 
-		View seed = db.graph.nodes.get(0);
+		View seed = dbSimilar.graph.nodes.get(0);
 		var seedFeatsIdx = new DogArray_I32();
 		var seedConnIdx = threeViews ? DogArray_I32.array(0, 2) : DogArray_I32.array(1, 2, 3);
 
 		// Give a subset as a test to see if the size is being properly pass down the chain
 		int offset = 0;
-		int numFeatures = db.feats3D.size() - offset;
+		int numFeatures = dbSimilar.feats3D.size() - offset;
 		for (int i = offset; i < numFeatures; i++) {
 			seedFeatsIdx.add(i);
 		}
 		PrimitiveArrays.shuffle(seedFeatsIdx.data, 0, seedFeatsIdx.size, rand); // order should not matter
 
 		// Reconstruct the projective scene
-		assertTrue(alg.projectiveSceneN(db, seed, seedFeatsIdx, seedConnIdx));
+		assertTrue(alg.projectiveSceneN(dbSimilar, dbCams, seed, seedFeatsIdx, seedConnIdx));
 
 		// test results
-		checkReconstruction(alg, db, seedConnIdx, numFeatures, reprojectionTol);
+		checkReconstruction(alg, dbSimilar, seedConnIdx, numFeatures, reprojectionTol);
 	}
 
 	/**
@@ -253,8 +261,8 @@ class TestProjectiveInitializeAllCommon extends BoofStandardJUnit {
 				DMatrixRMaj P = structure.views.get(viewIdx).worldToView;
 				PerspectiveOps.renderPixel(P, X, found);
 				// undo the offset
-				found.x += db.intrinsic.width/2;
-				found.y += db.intrinsic.height/2;
+				found.x += db.intrinsic.cx;
+				found.y += db.intrinsic.cy;
 
 				// Lookup the expected pixel location
 				// The seed feature ID and the ground truth feature ID are the same
@@ -302,8 +310,8 @@ class TestProjectiveInitializeAllCommon extends BoofStandardJUnit {
 				DMatrixRMaj P = structure.views.get(viewIdx).worldToView;
 				PerspectiveOps.renderPixel(P, X, found);
 				// undo the offset
-				found.x += db.intrinsic.width/2;
-				found.y += db.intrinsic.height/2;
+				found.x += db.intrinsic.cx;
+				found.y += db.intrinsic.cy;
 
 				// Lookup the expected pixel location
 				// The seed feature ID and the ground truth feature ID are the same
@@ -324,8 +332,8 @@ class TestProjectiveInitializeAllCommon extends BoofStandardJUnit {
 
 		// Undo the shift in pixel coordinates
 		DMatrixRMaj M = CommonOps_DDRM.identity(3);
-		M.set(0, 2, db.intrinsic.width/2);
-		M.set(1, 2, db.intrinsic.height/2);
+		M.set(0, 2, db.intrinsic.cx);
+		M.set(1, 2, db.intrinsic.cy);
 
 		List<String> viewIds = BoofMiscOps.collectList(db.views, v -> v.id);
 		for (int i = 0; i < 3; i++) {
@@ -461,7 +469,7 @@ class TestProjectiveInitializeAllCommon extends BoofStandardJUnit {
 		var db = new MockLookupSimilarImages(4, 0xDEADBEEF);
 		var alg = new ProjectiveInitializeAllCommon();
 		alg.utils.ransac = new MockRansac(offset, db.feats3D.size() - offset);
-		alg.utils.db = db;
+		alg.utils.dbSimilar = db;
 		alg.utils.P1.setTo(db.listCameraMatrices.get(0));
 		alg.utils.P2.setTo(db.listCameraMatrices.get(1));
 		alg.utils.P3.setTo(db.listCameraMatrices.get(3));
@@ -488,24 +496,27 @@ class TestProjectiveInitializeAllCommon extends BoofStandardJUnit {
 	}
 
 	@Test void createObservationsForBundleAdjustment() {
-		var db = new MockLookupSimilarImages(5, 0xDEADBEEF);
-		PairwiseImageGraph graph = db.graph;
+		var dbSimilar = new MockLookupSimilarImages(5, 0xDEADBEEF);
+		var dbCams = new MockLookUpCameraInfo(dbSimilar.intrinsic);
+
+		PairwiseImageGraph graph = dbSimilar.graph;
 		View seed = graph.nodes.get(0);
 		DogArray_I32 motionIndexes = DogArray_I32.array(0, 2, 3); // which edges in the first view should be considered
 		var alg = new ProjectiveInitializeAllCommon();
-		alg.utils.db = db;
+		alg.utils.dbSimilar = dbSimilar;
+		alg.utils.dbCams = dbCams;
 		alg.utils.seed = seed;
 
 		//------------------------------ Initialize internal data structures
 		// make every other feature an inlier
-		alg.seedToStructure.resize(db.feats3D.size());
+		alg.seedToStructure.resize(dbSimilar.feats3D.size());
 		alg.seedToStructure.fill(-1);
 		DogArray_I32 inlierToSeed = alg.inlierIndexes.grow();
-		for (int i = 0; i < db.feats3D.size(); i += 2) {
+		for (int i = 0; i < dbSimilar.feats3D.size(); i += 2) {
 			alg.seedToStructure.data[i] = inlierToSeed.size;
 			inlierToSeed.add(i);
 		}
-		db.lookupPixelFeats(seed.id, alg.utils.featsA);
+		dbSimilar.lookupPixelFeats(seed.id, alg.utils.featsA);
 
 		// Call the function being tested
 		alg.inlierIndexes.resize(motionIndexes.size + 1); // allocate for rest of the views
@@ -536,7 +547,7 @@ class TestProjectiveInitializeAllCommon extends BoofStandardJUnit {
 		int numViews = 4;
 		var db = new MockLookupSimilarImages(numViews, 0xDEADBEEF);
 		var alg = new ProjectiveInitializeAllCommon();
-		alg.utils.db = db;
+		alg.utils.dbSimilar = db;
 
 		// sanity check that all features are visible in all views. Requirement of metric escalation
 		for (int i = 0; i < db.viewIds.size(); i++) {

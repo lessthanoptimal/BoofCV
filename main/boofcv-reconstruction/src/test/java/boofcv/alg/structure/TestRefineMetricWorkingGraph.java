@@ -48,21 +48,20 @@ class TestRefineMetricWorkingGraph extends BoofStandardJUnit {
 	/**
 	 * Run everything together with and without noise
 	 */
-	@Test
-	void process() {
+	@Test void process() {
 		process_perfect(false);
 		process_perfect(true);
 	}
 
 	void process_perfect( boolean addNoise ) {
-		var db = new MockLookupSimilarImagesRealistic().
+		var dbSimilar = new MockLookupSimilarImagesRealistic().
 				setFeatures(500).
 				setIntrinsic(intrinsic).
 				pathLine(5, 0.1, 0.6, 2);
-		var pairwise = db.createPairwise();
-		var graph = db.createWorkingGraph(pairwise);
+		var pairwise = dbSimilar.createPairwise();
+		var graph = dbSimilar.createWorkingGraph(pairwise);
 		graph.listViews.forEach(v -> v.intrinsic.setTo(new BundlePinholeSimplified(400, 0, 0)));
-		graph.listViews.forEach(v -> intrinsicZ.getDimension(v.imageDimension));
+		graph.listViews.forEach(v -> v.priorCamera.setTo(intrinsic));
 
 		// Create two views with inliers
 		SceneWorkingGraph.InlierInfo inlier0 = graph.listViews.get(0).inliers.grow();
@@ -70,12 +69,12 @@ class TestRefineMetricWorkingGraph extends BoofStandardJUnit {
 		inlier0.views.add(pairwise.nodes.get(1));
 		inlier0.views.add(pairwise.nodes.get(2));
 		inlier0.views.add(pairwise.nodes.get(3));
-		selectObservations(db, inlier0);
+		selectObservations(dbSimilar, inlier0);
 		SceneWorkingGraph.InlierInfo inlier3 = graph.listViews.get(3).inliers.grow();
 		inlier3.views.add(pairwise.nodes.get(2));
 		inlier3.views.add(pairwise.nodes.get(3));
 		inlier3.views.add(pairwise.nodes.get(4));
-		selectObservations(db, inlier3);
+		selectObservations(dbSimilar, inlier3);
 
 		if (addNoise) {
 			// Make a few of the parameters in correct and see if it can recover from it. Observations are perfect
@@ -84,7 +83,7 @@ class TestRefineMetricWorkingGraph extends BoofStandardJUnit {
 			graph.listViews.get(1).intrinsic.f += -100;
 		}
 		var alg = new RefineMetricWorkingGraph();
-		assertTrue(alg.process(db, graph));
+		assertTrue(alg.process(dbSimilar, graph));
 
 		// The scale is not locked and the first view is not at the origin. Let's just use reprojection error as
 		// a test since comparing translation is more complex
@@ -96,13 +95,13 @@ class TestRefineMetricWorkingGraph extends BoofStandardJUnit {
 		});
 	}
 
-	private void selectObservations( MockLookupSimilarImagesRealistic db, SceneWorkingGraph.InlierInfo inliers ) {
+	private void selectObservations( MockLookupSimilarImagesRealistic dbSimilar, SceneWorkingGraph.InlierInfo inliers ) {
 		// Find the set of features visible in all the inliers
-		List<MockLookupSimilarImagesRealistic.Feature> features = new ArrayList<>(db.points);
+		List<MockLookupSimilarImagesRealistic.Feature> features = new ArrayList<>(dbSimilar.points);
 		List<MockLookupSimilarImagesRealistic.View> dbViews = new ArrayList<>();
 
 		for (PairwiseImageGraph.View v : inliers.views.toList()) {
-			dbViews.add(db.views.stream().filter(it -> it.id.equals(v.id)).findFirst().get());
+			dbViews.add(dbSimilar.views.stream().filter(it -> it.id.equals(v.id)).findFirst().get());
 		}
 
 		for (MockLookupSimilarImagesRealistic.View v : dbViews) {
@@ -130,14 +129,14 @@ class TestRefineMetricWorkingGraph extends BoofStandardJUnit {
 	 */
 	@Test
 	void process_CallMultipleTimes() {
-		var db = new MockLookupSimilarImagesRealistic().
+		var dbSimilar = new MockLookupSimilarImagesRealistic().
 				setFeatures(500).
 				setIntrinsic(intrinsic).
 				pathLine(5, 0.1, 0.6, 2);
-		var pairwise = db.createPairwise();
-		var graph = db.createWorkingGraph(pairwise);
+		var pairwise = dbSimilar.createPairwise();
+		var graph = dbSimilar.createWorkingGraph(pairwise);
 		graph.listViews.forEach(v -> v.intrinsic.setTo(new BundlePinholeSimplified(400, 0, 0)));
-		graph.listViews.forEach(v -> intrinsicZ.getDimension(v.imageDimension));
+		graph.listViews.forEach(v -> v.priorCamera.setTo(intrinsic));
 
 		// Create two views with inliers
 		SceneWorkingGraph.InlierInfo inlier0 = graph.listViews.get(0).inliers.grow();
@@ -145,16 +144,16 @@ class TestRefineMetricWorkingGraph extends BoofStandardJUnit {
 		inlier0.views.add(pairwise.nodes.get(1));
 		inlier0.views.add(pairwise.nodes.get(2));
 		inlier0.views.add(pairwise.nodes.get(3));
-		selectObservations(db, inlier0);
+		selectObservations(dbSimilar, inlier0);
 		SceneWorkingGraph.InlierInfo inlier3 = graph.listViews.get(3).inliers.grow();
 		inlier3.views.add(pairwise.nodes.get(2));
 		inlier3.views.add(pairwise.nodes.get(3));
 		inlier3.views.add(pairwise.nodes.get(4));
-		selectObservations(db, inlier3);
+		selectObservations(dbSimilar, inlier3);
 
 		var alg = new RefineMetricWorkingGraph();
-		assertTrue(alg.process(db, graph));
-		assertTrue(alg.process(db, graph));
+		assertTrue(alg.process(dbSimilar, graph));
+		assertTrue(alg.process(dbSimilar, graph));
 
 		// The scale is not locked and the first view is not at the origin. Let's just use reprojection error as
 		// a test since comparing translation is more complex
@@ -168,11 +167,11 @@ class TestRefineMetricWorkingGraph extends BoofStandardJUnit {
 
 	@Test
 	void findUnassignedObsAndKnown3D() {
-		var db = new MockLookupSimilarImagesRealistic().pathLine(5, 0.3, 1.5, 2);
-		var pairwise = db.createPairwise();
-		var graph = db.createWorkingGraph(pairwise);
+		var dbSimilar = new MockLookupSimilarImagesRealistic().pathLine(5, 0.3, 1.5, 2);
+		var pairwise = dbSimilar.createPairwise();
+		var graph = dbSimilar.createWorkingGraph(pairwise);
 		graph.listViews.forEach(v -> v.intrinsic.setTo(new BundlePinholeSimplified(400, 0, 0)));
-		graph.listViews.forEach(v -> db.intrinsic.getDimension(v.imageDimension));
+		graph.listViews.forEach(v -> v.priorCamera.setTo(dbSimilar.intrinsic));
 
 		// create an inlier set composed of observations from 3 views
 		var inliers = new SceneWorkingGraph.InlierInfo();
@@ -182,7 +181,7 @@ class TestRefineMetricWorkingGraph extends BoofStandardJUnit {
 		}
 
 		var alg = new RefineMetricWorkingGraph();
-		alg.initializeDataStructures(db, graph);
+		alg.initializeDataStructures(dbSimilar, graph);
 		alg.initLookUpTablesForInlierSet(graph, inliers.views);
 
 		int inlierIdx = 1;
@@ -210,12 +209,11 @@ class TestRefineMetricWorkingGraph extends BoofStandardJUnit {
 	}
 
 	void assignKnown3DToUnassignedObs( boolean shouldReject ) {
-
-		var db = new MockLookupSimilarImagesRealistic().pathLine(5, 0.3, 1.5, 2);
-		var pairwise = db.createPairwise();
-		var graph = db.createWorkingGraph(pairwise);
+		var dbSimilar = new MockLookupSimilarImagesRealistic().pathLine(5, 0.3, 1.5, 2);
+		var pairwise = dbSimilar.createPairwise();
+		var graph = dbSimilar.createWorkingGraph(pairwise);
 		graph.listViews.forEach(v -> v.intrinsic.setTo(new BundlePinholeSimplified(400, 0, 0)));
-		graph.listViews.forEach(v -> db.intrinsic.getDimension(v.imageDimension));
+		graph.listViews.forEach(v -> v.priorCamera.setTo(dbSimilar.intrinsic));
 
 		var alg = new RefineMetricWorkingGraph() {
 			// Override so that it can return an error for which all should be accepted or rejected
@@ -227,7 +225,7 @@ class TestRefineMetricWorkingGraph extends BoofStandardJUnit {
 			}
 		};
 		alg.maxReprojectionErrorPixel = 10;
-		alg.initializeDataStructures(db, graph);
+		alg.initializeDataStructures(dbSimilar, graph);
 		alg.metricSba.structure.points.resize(20);
 
 		// create an inlier set composed of observations from 3 views
@@ -291,14 +289,14 @@ class TestRefineMetricWorkingGraph extends BoofStandardJUnit {
 
 	@Test
 	void triangulateAndSave() {
-		var db = new MockLookupSimilarImagesRealistic().pathLine(5, 0.3, 1.5, 2);
-		var pairwise = db.createPairwise();
-		var graph = db.createWorkingGraph(pairwise);
+		var dbSimilar = new MockLookupSimilarImagesRealistic().pathLine(5, 0.3, 1.5, 2);
+		var pairwise = dbSimilar.createPairwise();
+		var graph = dbSimilar.createWorkingGraph(pairwise);
 		graph.listViews.forEach(v -> v.intrinsic.setTo(new BundlePinholeSimplified(400, 0, 0)));
-		graph.listViews.forEach(v -> db.intrinsic.getDimension(v.imageDimension));
+		graph.listViews.forEach(v -> v.priorCamera.setTo(dbSimilar.intrinsic));
 
 		var alg = new RefineMetricWorkingGraph();
-		alg.initializeDataStructures(db, graph);
+		alg.initializeDataStructures(dbSimilar, graph);
 
 		// create an inlier set composed of observations from 3 views
 		var inliers = new SceneWorkingGraph.InlierInfo();
@@ -313,7 +311,7 @@ class TestRefineMetricWorkingGraph extends BoofStandardJUnit {
 		alg.triangulateAndSave(inliers, 4);
 
 		// see if it added the point to the structure correctly
-		Point3D_F64 expectedX = db.points.get(5).world;
+		Point3D_F64 expectedX = dbSimilar.points.get(5).world;
 		Point4D_F64 foundX = new Point4D_F64();
 		assertEquals(1, alg.metricSba.structure.points.size);
 		alg.metricSba.structure.points.get(0).get(foundX);

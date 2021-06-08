@@ -80,7 +80,7 @@ class TestSceneWorkingGraph extends BoofStandardJUnit {
 		var expected = new SceneWorkingGraph.View();
 		var found = new SceneWorkingGraph.View();
 
-		expected.imageDimension.setTo(50, 60);
+		expected.priorCamera.fsetShape(50, 60);
 		expected.world_to_view.T.setTo(1, 2, 3);
 		expected.inliers.resize(2);
 		expected.inliers.get(0).scoreGeometric = 5;
@@ -91,7 +91,7 @@ class TestSceneWorkingGraph extends BoofStandardJUnit {
 
 		found.setTo(expected);
 
-		assertTrue(expected.imageDimension.isIdentical(found.imageDimension));
+		assertEquals(expected.priorCamera.width, found.priorCamera.width);
 		assertEquals(0.0, expected.world_to_view.T.distance(found.world_to_view.T));
 		assertEquals(2, found.inliers.size);
 		assertEquals(5, found.inliers.get(0).scoreGeometric);

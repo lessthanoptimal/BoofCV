@@ -36,19 +36,19 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 class TestProjectiveExpandByOneView extends BoofStandardJUnit {
 	private final static double MATRIX_TOL = 1e-4;
 
-	@Test
-	void perfect() {
-		var db = new MockLookupSimilarImagesRealistic().pathLine(5, 0.3, 1.5, 2);
+	@Test void perfect() {
+		var dbSimilar = new MockLookupSimilarImagesRealistic().pathLine(5, 0.3, 1.5, 2);
+		var dbCams = new MockLookUpCameraInfo(dbSimilar.intrinsic);
 		var alg = new ProjectiveExpandByOneView();
-		PairwiseImageGraph graph = db.createPairwise();
+		PairwiseImageGraph graph = dbSimilar.createPairwise();
 
 		// Undo apply and undo the shift in pixel coordinates
 		DMatrixRMaj M = CommonOps_DDRM.identity(3);
-		M.set(0, 2, -db.intrinsic.width/2);
-		M.set(1, 2, -db.intrinsic.height/2);
+		M.set(0, 2, -dbSimilar.intrinsic.cx);
+		M.set(1, 2, -dbSimilar.intrinsic.cy);
 		DMatrixRMaj M_inv = CommonOps_DDRM.identity(3);
-		M_inv.set(0, 2, db.intrinsic.width/2);
-		M_inv.set(1, 2, db.intrinsic.height/2);
+		M_inv.set(0, 2, dbSimilar.intrinsic.cx);
+		M_inv.set(1, 2, dbSimilar.intrinsic.cy);
 
 		var tmp = new DMatrixRMaj(3, 4);
 		var found = new DMatrixRMaj(3, 4);
@@ -59,16 +59,16 @@ class TestProjectiveExpandByOneView extends BoofStandardJUnit {
 			for (int startNode = 0; startNode < 2; startNode++) {
 				var working = new SceneWorkingGraph();
 				for (int i = startNode; i < 3; i++) {
-					CommonOps_DDRM.mult(M, db.views.get(i).camera, working.addView(graph.nodes.get(i)).projective);
+					CommonOps_DDRM.mult(M, dbSimilar.views.get(i).camera, working.addView(graph.nodes.get(i)).projective);
 //					working.addView(graph.nodes.get(i)).projective.set(db.views.get(i).camera);
 				}
 
 				View target = graph.nodes.get(targetIdx);
-				assertTrue(alg.process(db, working, target, tmp));
+				assertTrue(alg.process(dbSimilar, dbCams, working, target, tmp));
 				CommonOps_DDRM.mult(M_inv, tmp, found);
 
 				// they should now be the same up to a scale factor
-				DMatrixRMaj expected = db.views.get(targetIdx).camera;
+				DMatrixRMaj expected = dbSimilar.views.get(targetIdx).camera;
 				double scale = MultiViewOps.findScale(found, expected);
 				CommonOps_DDRM.scale(scale, found);
 				assertTrue(MatrixFeatures_DDRM.isEquals(expected, found, MATRIX_TOL));

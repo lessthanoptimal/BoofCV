@@ -67,18 +67,20 @@ public class ProjectiveExpandByOneView extends ExpandByOneView {
 	/**
 	 * Attempts to estimate the camera model in the global projective space for the specified view
 	 *
-	 * @param db (Input) image data base
+	 * @param dbSimilar (Input) image data base
 	 * @param workGraph (Input) scene graph
 	 * @param target (Input) The view that needs its projective camera estimated and the graph is being expanded into
 	 * @param cameraMatrix (output) the found camera matrix
 	 * @return true if successful and the camera matrix computed
 	 */
-	public boolean process( LookUpSimilarImages db,
+	public boolean process( LookUpSimilarImages dbSimilar,
+							LookUpCameraInfo dbCams,
 							SceneWorkingGraph workGraph,
 							View target,
 							DMatrixRMaj cameraMatrix ) {
 		this.workGraph = workGraph;
-		this.utils.db = db;
+		this.utils.dbSimilar = dbSimilar;
+		this.utils.dbCams = dbCams;
 
 		// Select two known connected Views
 		if (!selectTwoConnections(target, connections)) {

@@ -22,7 +22,6 @@ import boofcv.alg.geo.PerspectiveOps;
 import boofcv.misc.BoofLambdas;
 import boofcv.struct.calib.CameraPinhole;
 import boofcv.struct.feature.AssociatedIndex;
-import boofcv.struct.image.ImageDimension;
 import georegression.geometry.UtilPoint3D_F64;
 import georegression.struct.point.Point2D_F64;
 import georegression.struct.point.Point3D_F64;
@@ -199,11 +198,6 @@ class MockLookupSimilarImages implements LookUpSimilarImages {
 		}
 
 		return true;
-	}
-
-	@Override
-	public void lookupShape( String target, ImageDimension shape ) {
-		shape.setTo(intrinsic.width, intrinsic.height);
 	}
 
 	public int indexOfView( String name ) {

@@ -61,14 +61,14 @@ public class TestMetricMergeScenes extends BoofStandardJUnit {
 
 			BundleAdjustmentOps.convert(db.intrinsic, src.listViews.get(i).intrinsic);
 			BundleAdjustmentOps.convert(db.intrinsic, dst.listViews.get(i).intrinsic);
-			src.listViews.get(i).imageDimension.setTo(db.intrinsic.width, db.intrinsic.height);
-			dst.listViews.get(i).imageDimension.setTo(db.intrinsic.width, db.intrinsic.height);
+			src.listViews.get(i).priorCamera.setTo(db.intrinsic);
+			dst.listViews.get(i).priorCamera.setTo(db.intrinsic);
 		}
 		// Add one overlapping view between src and dst
 		db.addInlierInfo(pairwise, dst.addView(pairwise.nodes.get(4)), 5, 6);
 		dst.lookupView(pairwise.nodes.get(4).id).world_to_view.setTo(db.views.get(4).world_to_view);
 		BundleAdjustmentOps.convert(db.intrinsic, dst.listViews.get(5).intrinsic);
-		dst.listViews.get(5).imageDimension.setTo(db.intrinsic.width, db.intrinsic.height);
+		dst.listViews.get(5).priorCamera.setTo(db.intrinsic);
 
 		// Connect views to each other
 		for (int i = 0; i < 5; i++) {
@@ -250,11 +250,11 @@ public class TestMetricMergeScenes extends BoofStandardJUnit {
 
 			if (i > 3) {
 				assertEquals(i*2 + 1, wview.world_to_view.T.x, UtilEjml.TEST_F64);
-				assertEquals(200, wview.imageDimension.width);
+				assertEquals(200, wview.priorCamera.width);
 				assertEquals(5, wview.intrinsic.f, UtilEjml.TEST_F64);
 			} else {
 				assertEquals(i*2, wview.world_to_view.T.x, UtilEjml.TEST_F64);
-				assertEquals(400, wview.imageDimension.width);
+				assertEquals(400, wview.priorCamera.width);
 				assertEquals(10, wview.intrinsic.f, UtilEjml.TEST_F64);
 			}
 
@@ -301,7 +301,7 @@ public class TestMetricMergeScenes extends BoofStandardJUnit {
 			if (i < 8) {
 				SceneWorkingGraph.View viewSrc = src.addView(pview);
 				viewSrc.world_to_view.T.x = i*2;
-				viewSrc.imageDimension.setTo(400, 300);
+				viewSrc.priorCamera.fsetShape(400, 300);
 				viewSrc.intrinsic.f = 10;
 				viewSrc.inliers.grow().scoreGeometric = 10;
 			}
@@ -309,7 +309,7 @@ public class TestMetricMergeScenes extends BoofStandardJUnit {
 			if (i > 3) {
 				SceneWorkingGraph.View viewDst = dst.addView(pview);
 				viewDst.world_to_view.T.x = 1 + i*2;
-				viewDst.imageDimension.setTo(200, 0);
+				viewDst.priorCamera.fsetShape(200, 0);
 				viewDst.intrinsic.f = 5;
 				viewDst.inliers.grow().scoreGeometric = 8;
 			}

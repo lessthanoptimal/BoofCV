@@ -29,7 +29,6 @@ import boofcv.misc.BoofLambdas;
 import boofcv.struct.feature.AssociatedIndex;
 import boofcv.struct.feature.TupleDesc_F32;
 import boofcv.struct.image.GrayU8;
-import boofcv.struct.image.ImageDimension;
 import boofcv.struct.image.ImageType;
 import georegression.struct.point.Point2D_F64;
 import org.ddogleg.struct.DogArray;
@@ -80,7 +79,6 @@ public class TestSimilarImagesSceneRecognition extends GenericLookUpSimilarImage
 
 			alg.imageIDs.add(viewIdx + "");
 			alg.imageToIndex.put(viewIdx + "", viewIdx);
-			alg.imageShapes.grow().setTo(30, 40);
 		}
 		return (T)alg;
 	}
@@ -100,11 +98,6 @@ public class TestSimilarImagesSceneRecognition extends GenericLookUpSimilarImage
 		}
 		alg.fixate();
 
-		ImageDimension shape = new ImageDimension();
-		alg.lookupShape("" + 2, shape);
-		assertEquals(50, shape.width);
-		assertEquals(10, shape.height);
-
 		// For all these other functions just check to see if something got populated
 		DogArray_I32 words = new DogArray_I32();
 		alg.lookupImageWords("3", words);
@@ -114,10 +107,9 @@ public class TestSimilarImagesSceneRecognition extends GenericLookUpSimilarImage
 		alg.lookupPixelFeats("1", features);
 		assertTrue(features.size > 0);
 
-
 		// Look up similar images. All but the query view should be similar
 		List<String> similarImages = new ArrayList<>();
-		alg.findSimilar("0",(a)->true, similarImages);
+		alg.findSimilar("0", ( a ) -> true, similarImages);
 		assertTrue(similarImages.size() > 0);
 
 		var pairs = new DogArray<>(AssociatedIndex::new);
@@ -189,7 +181,7 @@ public class TestSimilarImagesSceneRecognition extends GenericLookUpSimilarImage
 
 			for (int i = 0; i < Math.min(limit, numViews); i++) {
 				String id = "" + i;
-				if (filter !=null && !filter.keep(id))
+				if (filter != null && !filter.keep(id))
 					continue;
 				matches.grow().id = id;
 			}
@@ -215,7 +207,7 @@ public class TestSimilarImagesSceneRecognition extends GenericLookUpSimilarImage
 		@Override public FastAccess<AssociatedIndex> getMatches() {
 			var matches = new DogArray<>(AssociatedIndex::new);
 			for (int i = 0; i < numFeatures; i++) {
-				matches.grow().setTo(i,i);
+				matches.grow().setTo(i, i);
 			}
 			return matches;
 		}

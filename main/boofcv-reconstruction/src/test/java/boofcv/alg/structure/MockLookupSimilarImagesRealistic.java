@@ -27,7 +27,6 @@ import boofcv.misc.BoofMiscOps;
 import boofcv.struct.calib.CameraPinhole;
 import boofcv.struct.feature.AssociatedIndex;
 import boofcv.struct.geo.AssociatedTriple;
-import boofcv.struct.image.ImageDimension;
 import georegression.geometry.ConvertRotation3D_F64;
 import georegression.geometry.UtilPoint3D_F64;
 import georegression.struct.EulerType;
@@ -285,7 +284,7 @@ public class MockLookupSimilarImagesRealistic implements LookUpSimilarImages {
 		pairwise.nodes.forIdx(( i, v ) -> working.addView(v));
 
 		working.listViews.forEach(v -> BundleAdjustmentOps.convert(intrinsic, v.intrinsic));
-		working.listViews.forEach(v -> v.imageDimension.setTo(intrinsic.width, intrinsic.height));
+		working.listViews.forEach(v -> v.priorCamera.setTo(intrinsic));
 		BoofMiscOps.forIdx(working.listViews, ( i, v ) -> v.projective.setTo(views.get(i).camera));
 		BoofMiscOps.forIdx(working.listViews, ( i, v ) -> v.world_to_view.setTo(views.get(i).world_to_view));
 		BoofMiscOps.forIdx(working.listViews, ( i, v ) -> v.index = i);
@@ -391,11 +390,6 @@ public class MockLookupSimilarImagesRealistic implements LookUpSimilarImages {
 		shared.forEach(a -> pairs.grow().setTo(a));
 
 		return true;
-	}
-
-	@Override
-	public void lookupShape( String target, ImageDimension shape ) {
-		shape.setTo(intrinsic.width, intrinsic.height);
 	}
 
 	/**

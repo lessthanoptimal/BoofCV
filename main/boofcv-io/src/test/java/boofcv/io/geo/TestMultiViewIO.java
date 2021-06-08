@@ -82,8 +82,7 @@ class TestMultiViewIO extends BoofStandardJUnit {
 		ImageDimension shape = new ImageDimension();
 		for (String id : expected.listImages) {
 			int i = Integer.parseInt(id);
-
-			found.lookupShape(id, shape);
+			
 			assertEquals(10, shape.width);
 			assertEquals(11 + i, shape.height);
 
@@ -222,8 +221,8 @@ class TestMultiViewIO extends BoofStandardJUnit {
 			assertEquals(0.0, va.world_to_view.T.distance(vb.world_to_view.T), UtilEjml.EPS);
 			assertTrue(MatrixFeatures_DDRM.isEquals(va.world_to_view.R, vb.world_to_view.R, UtilEjml.EPS));
 
-			assertEquals(va.imageDimension.width, vb.imageDimension.width);
-			assertEquals(va.imageDimension.height, vb.imageDimension.height);
+			assertEquals(va.priorCamera.width, vb.priorCamera.width);
+			assertEquals(va.priorCamera.height, vb.priorCamera.height);
 
 			assertEquals(va.inliers.size, vb.inliers.size);
 			for (int inlierInfo = 0; inlierInfo < va.inliers.size; inlierInfo++) {
@@ -261,8 +260,8 @@ class TestMultiViewIO extends BoofStandardJUnit {
 					rand.nextDouble(), rand.nextDouble(), rand.nextDouble(),
 					rand.nextDouble(), rand.nextDouble(), rand.nextDouble(), v.world_to_view);
 
-			v.imageDimension.width = rand.nextInt();
-			v.imageDimension.height = rand.nextInt();
+			v.priorCamera.width = rand.nextInt();
+			v.priorCamera.height = rand.nextInt();
 
 			RandomMatrices_DDRM.fillUniform(v.projective, rand);
 

@@ -41,7 +41,6 @@ import android.view.View;
 import android.widget.Toast;
 import boofcv.alg.geo.PerspectiveOps;
 import boofcv.struct.calib.CameraPinhole;
-import georegression.metric.UtilAngle;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -958,7 +957,7 @@ public abstract class SimpleCamera2Activity extends Activity {
 			// that it's 60 degrees. That's often reasonable.
 			intrinsic.setTo( PerspectiveOps.createIntrinsic(
 					open.mCameraSize.getWidth(), open.mCameraSize.getHeight(),
-					UtilAngle.radian(60)));
+					60, null));
 			return true;
 		} finally {
 			open.mLock.unlock();

@@ -373,7 +373,7 @@ public class FiducialDetection extends BaseStandardInputApp {
 			System.out.println("There will be a lot more jitter and inaccurate pose");
 			System.out.println();
 
-			return PerspectiveOps.createIntrinsic(width, height, 35);
+			return PerspectiveOps.createIntrinsic(width, height, 35, null);
 		} else {
 			if (intrinsic.width != width || intrinsic.height != height) {
 				System.out.println();

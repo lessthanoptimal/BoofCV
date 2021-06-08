@@ -85,7 +85,7 @@ public class DemoSceneRecognitionSimilarImagesApp<Gray extends ImageGray<Gray>, 
 	Class<Gray> grayType;
 	ImageType<Planar<Gray>> colorType;
 
-	SimilarImagesSceneRecognition<Gray, TD> sceneSimilar;
+	SimilarImagesSceneRecognition<Gray, TD> dbSimilar;
 
 	// List of which images are similar to each other
 	final Object imageLock = new Object();
@@ -198,7 +198,7 @@ public class DemoSceneRecognitionSimilarImagesApp<Gray extends ImageGray<Gray>, 
 //		config.recognizeNister2006.featureSingleWordHops = 5;
 //		config.recognizeNister2006.learnNodeWeights = false;
 
-		sceneSimilar = FactorySceneReconstruction.createSimilarImages(config, ImageType.single(grayType));
+		dbSimilar = FactorySceneReconstruction.createSimilarImages(config, ImageType.single(grayType));
 //		sceneSimilar.setVerbose(System.out, null);
 
 		Gray gray = GeneralizedImageOps.createImage(grayType, 1, 1, 0);
@@ -224,13 +224,13 @@ public class DemoSceneRecognitionSimilarImagesApp<Gray extends ImageGray<Gray>, 
 
 			// Convert to gray for image processing
 			ConvertBufferedImage.convertFrom(buffered, gray, true);
-			sceneSimilar.addImage(path, transform.process(gray));
+			dbSimilar.addImage(path, transform.process(gray));
 		}
 		long time1 = System.currentTimeMillis();
 		System.out.println((time1 - time0) + " (ms)");
 
 		System.out.print("Fixating: ");
-		sceneSimilar.fixate();
+		dbSimilar.fixate();
 		long time2 = System.currentTimeMillis();
 		System.out.println((time2 - time1) + " (ms)");
 
@@ -246,7 +246,7 @@ public class DemoSceneRecognitionSimilarImagesApp<Gray extends ImageGray<Gray>, 
 
 		// Look up all the words in the image
 		DogArray_I32 words = new DogArray_I32();
-		sceneSimilar.lookupImageWords(imagePaths.get(imageIndex), words);
+		dbSimilar.lookupImageWords(imagePaths.get(imageIndex), words);
 
 		// Find any features appear in each word
 		TIntIntMap wordHistogram = new TIntIntHashMap();
@@ -457,6 +457,7 @@ public class DemoSceneRecognitionSimilarImagesApp<Gray extends ImageGray<Gray>, 
 			synchronized (imageLock) {
 				ImageDimension imageShape = imageShapes.get(selectedIndex);
 				viewControlPanel.setImageSize(imageShape.width, imageShape.height);
+				mainImage.dbShape.setTo(imageShape);
 			}
 
 			// Wait until it has finished before trying to visualize the results
@@ -468,8 +469,6 @@ public class DemoSceneRecognitionSimilarImagesApp<Gray extends ImageGray<Gray>, 
 
 			lookupSimilarImages(imageID);
 
-			// Get the select image's shape in the DB
-			sceneSimilar.lookupShape(imageID, mainImage.dbShape);
 			viewControlPanel.setDbSize(mainImage.dbShape.width, mainImage.dbShape.height);
 
 			textArea.setText(createInfoText(selectedIndex));
@@ -496,7 +495,7 @@ public class DemoSceneRecognitionSimilarImagesApp<Gray extends ImageGray<Gray>, 
 			List<String> foundIDs = new ArrayList<>();
 			imagesSimilar.clear();
 			long time0 = System.nanoTime();
-			sceneSimilar.findSimilar(imageID, null, foundIDs);
+			dbSimilar.findSimilar(imageID, null, foundIDs);
 			long time1 = System.nanoTime();
 
 			viewControlPanel.setQueryTimeMS((time1 - time0)*1e-6);
@@ -507,7 +506,7 @@ public class DemoSceneRecognitionSimilarImagesApp<Gray extends ImageGray<Gray>, 
 			for (String s : foundIDs) {
 				SimilarInfo similar = info.grow();
 				similar.id = s;
-				if (!sceneSimilar.lookupAssociated(s, similar.associated))
+				if (!dbSimilar.lookupAssociated(s, similar.associated))
 					System.out.println("BUG! lookupAssociated failed");
 				imagesSimilar.put(s, similar);
 			}
@@ -678,9 +677,8 @@ public class DemoSceneRecognitionSimilarImagesApp<Gray extends ImageGray<Gray>, 
 				return;
 
 			if (features.isEmpty()) {
-				sceneSimilar.lookupPixelFeats(imageID, features);
-				sceneSimilar.lookupShape(imageID, dbShape);
-				sceneSimilar.lookupImageWords(imageID, words);
+				dbSimilar.lookupPixelFeats(imageID, features);
+				dbSimilar.lookupImageWords(imageID, words);
 				featureHandler.numFeatures = features.size;
 
 				// look up corresponding features in the mainImage

@@ -28,9 +28,9 @@ import boofcv.alg.geo.bundle.BundleAdjustmentOps;
 import boofcv.alg.geo.bundle.cameras.BundlePinholeSimplified;
 import boofcv.alg.geo.selfcalib.TwoViewToCalibratingHomography;
 import boofcv.misc.BoofMiscOps;
+import boofcv.struct.calib.CameraPinholeBrown;
 import boofcv.struct.geo.AssociatedPair;
 import boofcv.struct.geo.AssociatedTriple;
-import boofcv.struct.image.ImageDimension;
 import georegression.struct.point.Point2D_F64;
 import georegression.struct.point.Point4D_F64;
 import georegression.struct.se.Se3_F64;
@@ -115,7 +115,7 @@ public class MetricExpandByOneView extends ExpandByOneView {
 	// Storage for target view parameters
 	final BundlePinholeSimplified targetIntrinsic = new BundlePinholeSimplified();
 
-	List<ImageDimension> listImageShape = new ArrayList<>();
+	List<CameraPinholeBrown> listPriorCameras = new ArrayList<>();
 
 	public MetricExpandByOneView() {
 		listMotion.add(view1_to_view1);
@@ -127,19 +127,21 @@ public class MetricExpandByOneView extends ExpandByOneView {
 	/**
 	 * Attempts to estimate the camera model in the global projective space for the specified view
 	 *
-	 * @param db (Input) image data base
+	 * @param dbSimilar (Input) image data base
 	 * @param workGraph (Input/Output) scene graph. On input it will have the known scene and if successful the metric
 	 * information for the target view.
 	 * @param target (Input) The view that needs its projective camera estimated and the graph is being expanded into
 	 * @return true if successful target view has an estimated calibration matrix and pose, which have already been
 	 * added to "workGraph"
 	 */
-	public boolean process( LookUpSimilarImages db,
+	public boolean process( LookUpSimilarImages dbSimilar,
+							LookUpCameraInfo dbCam,
 							SceneWorkingGraph workGraph,
 							PairwiseImageGraph.View target ) {
 		checkTrue(!workGraph.isKnown(target), "Target shouldn't already be in the workGraph");
 		this.workGraph = workGraph;
-		this.utils.db = db;
+		this.utils.dbSimilar = dbSimilar;
+		this.utils.dbCams = dbCam;
 
 		// Select two known connected Views
 		if (!selectTwoConnections(target, connections)) {
@@ -195,7 +197,7 @@ public class MetricExpandByOneView extends ExpandByOneView {
 		// Now that the metric upgrade is known add it to work graph
 		SceneWorkingGraph.View wtarget = workGraph.addView(target);
 		wtarget.intrinsic.setTo(targetIntrinsic);
-		db.lookupShape(target.id, wtarget.imageDimension);
+		dbCam.lookupCalibration(dbCam.viewToCamera(target.id), wtarget.priorCamera);
 
 		// Match the local coordinate system's scale to the global coordinate system's scale
 		view1_to_target.T.scale(scaleLocalToGlobal);
@@ -221,11 +223,11 @@ public class MetricExpandByOneView extends ExpandByOneView {
 	 * @return true if it passes
 	 */
 	boolean removedBadFeatures( SceneWorkingGraph workGraph ) {
-		listImageShape.clear();
-		listImageShape.add(utils.dimenA);
-		listImageShape.add(utils.dimenB);
-		listImageShape.add(utils.dimenC);
-		if (!checks.checkPhysicalConstraints(metricSba, listImageShape)) {
+		listPriorCameras.clear();
+		listPriorCameras.add(utils.cameraA);
+		listPriorCameras.add(utils.cameraB);
+		listPriorCameras.add(utils.cameraC);
+		if (!checks.checkPhysicalConstraints(metricSba, listPriorCameras)) {
 			if (verbose != null) verbose.println("Fatal error when checking constraints");
 			return false;
 		}
@@ -260,7 +262,7 @@ public class MetricExpandByOneView extends ExpandByOneView {
 		if (!performBundleAdjustment(workGraph))
 			return false;
 
-		if (!checks.checkPhysicalConstraints(metricSba, listImageShape)) {
+		if (!checks.checkPhysicalConstraints(metricSba, listPriorCameras)) {
 			if (verbose != null) verbose.println("Fatal error when checking constraints, second time.");
 			return false;
 		}

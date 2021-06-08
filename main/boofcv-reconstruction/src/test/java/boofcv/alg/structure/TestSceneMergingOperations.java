@@ -163,8 +163,8 @@ public class TestSceneMergingOperations extends BoofStandardJUnit {
 			SceneWorkingGraph.View wa = src.addView(a);
 			SceneWorkingGraph.View wb = dst.addView(b);
 
-			wa.imageDimension.setTo(i, i);
-			wb.imageDimension.setTo(j, j);
+			wa.priorCamera.fsetShape(i, i);
+			wb.priorCamera.fsetShape(j, j);
 
 			wa.intrinsic.f = i;
 			wb.intrinsic.f = j;

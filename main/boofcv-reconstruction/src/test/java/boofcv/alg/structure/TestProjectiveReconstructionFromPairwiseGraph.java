@@ -50,11 +50,13 @@ class TestProjectiveReconstructionFromPairwiseGraph extends BoofStandardJUnit {
 		// limiting it to 12 views since it blows up soon after that. It's believe the approach is
 		// fundamentally unstable. For a real test try 20 or 30 views
 		for (int numViews = 3; numViews <= 12; numViews++) {
-			var db = new MockLookupSimilarImagesRealistic().setLoop(false).setSeed(numViews).
+			var dbSimilar = new MockLookupSimilarImagesRealistic().setLoop(false).setSeed(numViews).
 					setFeatures(450).pathLine(numViews, 0.30, 6.0, 2);
-			PairwiseImageGraph graph = db.createPairwise();
-			assertTrue(alg.process(db, graph));
-			checkCameraMatrices(alg, db);
+			var dbCams = new MockLookUpCameraInfo(dbSimilar.intrinsic);
+
+			PairwiseImageGraph graph = dbSimilar.createPairwise();
+			assertTrue(alg.process(dbSimilar, dbCams, graph));
+			checkCameraMatrices(alg, dbSimilar);
 		}
 	}
 
@@ -67,8 +69,8 @@ class TestProjectiveReconstructionFromPairwiseGraph extends BoofStandardJUnit {
 
 		// Undo apply and undo the shift in pixel coordinates
 		DMatrixRMaj M_inv = CommonOps_DDRM.identity(3);
-		M_inv.set(0, 2, db.intrinsic.width/2);
-		M_inv.set(1, 2, db.intrinsic.height/2);
+		M_inv.set(0, 2, db.intrinsic.cx);
+		M_inv.set(1, 2, db.intrinsic.cy);
 
 		var tmp = new DMatrixRMaj(3, 4);
 

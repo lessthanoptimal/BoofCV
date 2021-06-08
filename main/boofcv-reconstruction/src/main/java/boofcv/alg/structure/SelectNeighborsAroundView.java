@@ -425,7 +425,7 @@ public class SelectNeighborsAroundView implements VerbosePrint {
 		// copy geometric information over
 		localView.intrinsic.setTo(origView.intrinsic);
 		localView.world_to_view.setTo(origView.world_to_view);
-		localView.imageDimension.setTo(origView.imageDimension);
+		localView.priorCamera.setTo(origView.priorCamera);
 
 		for (int infoIdx = 0; infoIdx < origView.inliers.size; infoIdx++) {
 			SceneWorkingGraph.InlierInfo origInliers = origView.inliers.get(infoIdx);

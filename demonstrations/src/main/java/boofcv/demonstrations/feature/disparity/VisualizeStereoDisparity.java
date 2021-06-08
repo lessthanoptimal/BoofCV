@@ -221,8 +221,8 @@ public class VisualizeStereoDisparity<T extends ImageGray<T>, D extends ImageGra
 			origCalib = new StereoParameters();
 			origCalib.right_to_left = new Se3_F64();
 			origCalib.right_to_left.T.x = 1;
-			origCalib.left = PerspectiveOps.createIntrinsic(origLeft.getWidth(), origLeft.getHeight(), 90);
-			origCalib.right = PerspectiveOps.createIntrinsic(origRight.getWidth(), origRight.getHeight(), 90);
+			origCalib.left = PerspectiveOps.createIntrinsic(origLeft.getWidth(), origLeft.getHeight(), 90, null);
+			origCalib.right = PerspectiveOps.createIntrinsic(origRight.getWidth(), origRight.getHeight(), 90, null);
 		} else {
 			throw new IllegalArgumentException("Unexpected number of files. " + files.length);
 		}

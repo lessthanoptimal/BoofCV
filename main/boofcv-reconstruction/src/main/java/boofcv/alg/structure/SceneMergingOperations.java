@@ -23,7 +23,7 @@ import boofcv.alg.geo.bundle.cameras.BundlePinholeSimplified;
 import boofcv.alg.structure.MetricFromUncalibratedPairwiseGraph.PairwiseViewScenes;
 import boofcv.alg.structure.MetricFromUncalibratedPairwiseGraph.ViewScenes;
 import boofcv.misc.BoofMiscOps;
-import boofcv.struct.image.ImageDimension;
+import boofcv.struct.calib.CameraPinholeBrown;
 import georegression.struct.point.Point2D_F64;
 import georegression.struct.se.Se3_F64;
 import lombok.Getter;
@@ -158,7 +158,7 @@ public class SceneMergingOperations implements VerbosePrint {
 			for (int srcIdx = 0; srcIdx < v.viewedBy.size; srcIdx++) {
 				int sceneSrc = v.viewedBy.get(srcIdx);
 
-				if (srcIdx > 0 && v.viewedBy.get(srcIdx-1) >= sceneSrc)
+				if (srcIdx > 0 && v.viewedBy.get(srcIdx - 1) >= sceneSrc)
 					throw new RuntimeException("BUG! viewdBy isn't sorted");
 
 				DogArray<SceneCommonCounts> countsSrc = commonViewCounts.get(sceneSrc);
@@ -238,7 +238,7 @@ public class SceneMergingOperations implements VerbosePrint {
 			}
 
 			// See if either list has been modified
-			if (f.src.listViews.size() == f.viewCountSrc && f.dst.listViews.size() == f.viewCountDst ) {
+			if (f.src.listViews.size() == f.viewCountSrc && f.dst.listViews.size() == f.viewCountDst) {
 				return true;
 			}
 
@@ -323,7 +323,7 @@ public class SceneMergingOperations implements VerbosePrint {
 				continue;
 
 			// Copy information from src to dst while updating the extrinsic info
-			dstView.imageDimension.setTo(srcView.imageDimension);
+			dstView.priorCamera.setTo(srcView.priorCamera);
 			dstView.intrinsic.setTo(srcView.intrinsic);
 
 			src_to_view.setTo(srcView.world_to_view);
@@ -337,7 +337,7 @@ public class SceneMergingOperations implements VerbosePrint {
 	 * for all common image features. The depth is used to estimate the scale difference between the scenes.
 	 * After that finding the SE3 transform is trivial.
 	 */
-	public boolean computeSceneTransform( LookUpSimilarImages db,
+	public boolean computeSceneTransform( LookUpSimilarImages dbSimilar,
 										  SceneWorkingGraph src, SceneWorkingGraph dst,
 										  SceneWorkingGraph.View selectedSrc,
 										  SceneWorkingGraph.View selectedDst,
@@ -363,10 +363,10 @@ public class SceneMergingOperations implements VerbosePrint {
 			return false;
 
 		// Load observation of common features in view[0]
-		loadViewZeroCommonObservations(db, selectedSrc.imageDimension, numCommon, selectedSrc.pview.id);
+		loadViewZeroCommonObservations(dbSimilar, selectedSrc.priorCamera, numCommon, selectedSrc.pview.id);
 
-		List<DogArray<Point2D_F64>> listViewPixelsSrc = getCommonFeaturePixelsViews(db, src, inliersSrc);
-		List<DogArray<Point2D_F64>> listViewPixelsDst = getCommonFeaturePixelsViews(db, dst, inliersDst);
+		List<DogArray<Point2D_F64>> listViewPixelsSrc = getCommonFeaturePixelsViews(dbSimilar, src, inliersSrc);
+		List<DogArray<Point2D_F64>> listViewPixelsDst = getCommonFeaturePixelsViews(dbSimilar, dst, inliersDst);
 
 		// Load the extrinsics and convert the intrinsics into a usable format
 		loadExtrinsicsIntrinsics(src, inliersSrc, listWorldToViewSrc, listIntrinsicsSrc);
@@ -425,20 +425,16 @@ public class SceneMergingOperations implements VerbosePrint {
 	/**
 	 * Creates the set of pixels in the target view that are common between the two scenes.
 	 *
-	 * @param db Storage with feature pixel coordinates
+	 * @param dbSimilar Storage with feature pixel coordinates
 	 * @param numCommon Number of features that are common between the two scenes in this view
 	 * @param viewID The ID of the view
 	 */
 	@SuppressWarnings("IntegerDivisionInFloatingPointContext")
-	private void loadViewZeroCommonObservations( LookUpSimilarImages db,
-												 ImageDimension imageShape,
+	private void loadViewZeroCommonObservations( LookUpSimilarImages dbSimilar,
+												 CameraPinholeBrown cameraPrior,
 												 int numCommon,
 												 String viewID ) {
-		db.lookupPixelFeats(viewID, dbPixels);
-
-		// camera model assumes pixels have been recentered
-		double cx = imageShape.width/2;
-		double cy = imageShape.height/2;
+		dbSimilar.lookupPixelFeats(viewID, dbPixels);
 
 		zeroViewPixels.resetResize(numCommon);
 		for (int featureIdx = 0; featureIdx < zeroFeatureToCommonIndex.size; featureIdx++) {
@@ -449,8 +445,8 @@ public class SceneMergingOperations implements VerbosePrint {
 			}
 			Point2D_F64 p = zeroViewPixels.get(commonIdx);
 			p.setTo(dbPixels.get(featureIdx));
-			p.x -= cx;
-			p.y -= cy;
+			p.x -= cameraPrior.cx;
+			p.y -= cameraPrior.cy;
 		}
 	}
 
@@ -517,9 +513,7 @@ public class SceneMergingOperations implements VerbosePrint {
 			viewPixels.resize(zeroViewPixels.size);
 
 			// camera model assumes pixels have been recentered
-			ImageDimension imageShape = workingGraph.views.get(inliers.views.get(viewIdx).id).imageDimension;
-			double cx = imageShape.width/2;
-			double cy = imageShape.height/2;
+			CameraPinholeBrown cameraPrior = workingGraph.views.get(inliers.views.get(viewIdx).id).priorCamera;
 
 			// Add the inlier pixels from this view to the array in the correct order
 			for (int idx = 0; idx < inlierIdx.size; idx++) {
@@ -534,8 +528,8 @@ public class SceneMergingOperations implements VerbosePrint {
 				// Copy the pixel from this view into the appropriate location
 				Point2D_F64 p = viewPixels.get(commonFeatureIdx);
 				p.setTo(dbPixels.get(inlierIdx.get(idx)));
-				p.x -= cx;
-				p.y -= cy;
+				p.x -= cameraPrior.cx;
+				p.y -= cameraPrior.cy;
 			}
 		}
 
