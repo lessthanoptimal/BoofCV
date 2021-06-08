@@ -33,10 +33,10 @@ import boofcv.factory.geo.FactoryMultiView;
 import boofcv.factory.geo.FactoryMultiViewRobust;
 import boofcv.misc.BoofMiscOps;
 import boofcv.misc.ConfigConverge;
+import boofcv.struct.calib.CameraPinholeBrown;
 import boofcv.struct.feature.AssociatedIndex;
 import boofcv.struct.geo.AssociatedTriple;
 import boofcv.struct.geo.TrifocalTensor;
-import boofcv.struct.image.ImageDimension;
 import georegression.struct.point.Point2D_F64;
 import georegression.struct.point.Point4D_F64;
 import lombok.Getter;
@@ -60,7 +60,8 @@ import static boofcv.misc.BoofMiscOps.checkTrue;
  */
 public class PairwiseGraphUtils {
 
-	LookUpSimilarImages db;
+	LookUpSimilarImages dbSimilar;
+	LookUpCameraInfo dbCams;
 
 	DogArray_B visibleAll = new DogArray_B();
 	DogArray_B visibleMotion = new DogArray_B();
@@ -83,10 +84,10 @@ public class PairwiseGraphUtils {
 
 	/** The three views used in three view algorithms */
 	public View seed, viewB, viewC;
-	/** Shape if each image */
-	public ImageDimension dimenA = new ImageDimension();
-	public ImageDimension dimenB = new ImageDimension();
-	public ImageDimension dimenC = new ImageDimension();
+	/** Prior calibration information for each view's camera */
+	public CameraPinholeBrown cameraA = new CameraPinholeBrown(2);
+	public CameraPinholeBrown cameraB = new CameraPinholeBrown(2);
+	public CameraPinholeBrown cameraC = new CameraPinholeBrown(2);
 
 	public final DogArray<AssociatedTriple> matchesTriple = new DogArray<>(AssociatedTriple::new);
 	/** Inliers from robust fitting of trifocal tensor */
@@ -111,8 +112,6 @@ public class PairwiseGraphUtils {
 	public final DogArray_I32 table_C_to_A = new DogArray_I32();
 	// List indexes in the seed view that are common among all the views
 	public final DogArray_I32 commonIdx = new DogArray_I32();
-
-	protected final ImageDimension shape = new ImageDimension();
 
 	public PairwiseGraphUtils( TriangulateNViewsProjective triangulator,
 							   ModelMatcher<TrifocalTensor, AssociatedTriple> ransac,
@@ -233,20 +232,20 @@ public class PairwiseGraphUtils {
 	 * Convert triple from indexes into coordinates
 	 */
 	public void createTripleFromCommon() {
-		// Shape of each input image
-		db.lookupShape(seed.id, dimenA);
-		db.lookupShape(viewB.id, dimenB);
-		db.lookupShape(viewC.id, dimenC);
+		// Camera info for each view
+		dbCams.lookupCalibration(dbCams.viewToCamera(seed.id), cameraA);
+		dbCams.lookupCalibration(dbCams.viewToCamera(viewB.id), cameraB);
+		dbCams.lookupCalibration(dbCams.viewToCamera(viewC.id), cameraC);
 
 		// Get coordinates of features in each view
-		db.lookupPixelFeats(seed.id, featsA);
-		db.lookupPixelFeats(viewB.id, featsB);
-		db.lookupPixelFeats(viewC.id, featsC);
+		dbSimilar.lookupPixelFeats(seed.id, featsA);
+		dbSimilar.lookupPixelFeats(viewB.id, featsB);
+		dbSimilar.lookupPixelFeats(viewC.id, featsC);
 
 		// Make the pixels zero centered
-		BoofMiscOps.offsetPixels(featsA.toList(), -dimenA.width/2, -dimenA.height/2);
-		BoofMiscOps.offsetPixels(featsB.toList(), -dimenB.width/2, -dimenB.height/2);
-		BoofMiscOps.offsetPixels(featsC.toList(), -dimenC.width/2, -dimenC.height/2);
+		BoofMiscOps.offsetPixels(featsA.toList(), -cameraA.cx, -cameraA.cy);
+		BoofMiscOps.offsetPixels(featsB.toList(), -cameraB.cx, -cameraB.cy);
+		BoofMiscOps.offsetPixels(featsC.toList(), -cameraC.cx, -cameraC.cy);
 
 		// pre-declare memory
 		matchesTriple.reset();
@@ -346,13 +345,14 @@ public class PairwiseGraphUtils {
 		structure.initialize(3, inliersThreeView.size());
 
 		// specify the found projective camera matrices
-		db.lookupShape(seed.id, shape);
+		dbCams.lookupCalibration(dbCams.viewToCamera(seed.id), cameraA);
+		dbCams.lookupCalibration(dbCams.viewToCamera(viewB.id), cameraB);
+		dbCams.lookupCalibration(dbCams.viewToCamera(viewC.id), cameraC);
+
 		// The first view is assumed to be the coordinate system's origin and is identity by definition
-		structure.setView(0, fixedSeed, P1, shape.width, shape.height);
-		db.lookupShape(viewB.id, shape);
-		structure.setView(1, !fixedSeed, P2, shape.width, shape.height);
-		db.lookupShape(viewC.id, shape);
-		structure.setView(2, !fixedSeed, P3, shape.width, shape.height);
+		structure.setView(0, fixedSeed, P1, cameraA.width, cameraA.height);
+		structure.setView(1, !fixedSeed, P2, cameraB.width, cameraB.height);
+		structure.setView(2, !fixedSeed, P3, cameraC.width, cameraC.height);
 
 		// triangulate homogenous coordinates for each point in the inlier set
 		triangulateFeatures();

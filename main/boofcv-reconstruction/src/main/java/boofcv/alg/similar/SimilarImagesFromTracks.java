@@ -25,7 +25,6 @@ import boofcv.misc.BoofLambdas;
 import boofcv.misc.BoofMiscOps;
 import boofcv.struct.ConfigLength;
 import boofcv.struct.feature.AssociatedIndex;
-import boofcv.struct.image.ImageDimension;
 import georegression.struct.point.Point2D_F64;
 import gnu.trove.map.TLongIntMap;
 import gnu.trove.map.hash.TLongIntHashMap;
@@ -291,11 +290,6 @@ public class SimilarImagesFromTracks<Track> implements LookUpSimilarImages {
 		}
 
 		return true;
-	}
-
-	@Override
-	public void lookupShape( String target, ImageDimension shape ) {
-		shape.setTo(imageWidth, imageHeight);
 	}
 
 	/**

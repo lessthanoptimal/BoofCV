@@ -83,7 +83,7 @@ public class PerspectiveOps {
 
 		double vfov = Math.acos(abdot/(normA*normB));
 
-		return createIntrinsic(width, height, UtilAngle.degree(hfov), UtilAngle.degree(vfov));
+		return createIntrinsic(width, height, UtilAngle.degree(hfov), UtilAngle.degree(vfov), null);
 	}
 
 	/**
@@ -95,8 +95,14 @@ public class PerspectiveOps {
 	 * @param vfov Vertical FOV in degrees
 	 * @return guess camera parameters
 	 */
-	public static CameraPinhole createIntrinsic( int width, int height, double hfov, double vfov ) {
-		CameraPinhole intrinsic = new CameraPinhole();
+	public static CameraPinhole createIntrinsic( int width, int height, double hfov, double vfov,
+												 @Nullable CameraPinhole intrinsic ) {
+		if (intrinsic == null)
+			intrinsic = new CameraPinhole();
+		else {
+			intrinsic.reset();
+		}
+
 		intrinsic.width = width;
 		intrinsic.height = height;
 		intrinsic.cx = width/2;
@@ -116,8 +122,14 @@ public class PerspectiveOps {
 	 * @param hfov Horizontal FOV in degrees
 	 * @return guess camera parameters
 	 */
-	public static CameraPinholeBrown createIntrinsic( int width, int height, double hfov ) {
-		CameraPinholeBrown intrinsic = new CameraPinholeBrown();
+	public static CameraPinholeBrown createIntrinsic( int width, int height, double hfov,
+													  @Nullable CameraPinholeBrown intrinsic ) {
+		if (intrinsic == null)
+			intrinsic = new CameraPinholeBrown();
+		else {
+			intrinsic.reset();
+		}
+
 		intrinsic.width = width;
 		intrinsic.height = height;
 		intrinsic.cx = width/2;
@@ -1032,6 +1044,6 @@ public class PerspectiveOps {
 	 * @return Euclidean distance
 	 */
 	public static double distance3DvsH( Point3D_F64 a, Point4D_F64 b, double tol ) {
-		return ImplPerspectiveOps_F64.distance3DvsH(a,b,tol);
+		return ImplPerspectiveOps_F64.distance3DvsH(a, b, tol);
 	}
 }

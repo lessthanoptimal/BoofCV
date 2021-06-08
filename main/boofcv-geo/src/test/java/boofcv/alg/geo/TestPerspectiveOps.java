@@ -59,7 +59,7 @@ import static org.junit.jupiter.api.Assertions.*;
 
 class TestPerspectiveOps extends BoofStandardJUnit {
 	@Test void approximatePinhole() {
-		CameraPinhole original = PerspectiveOps.createIntrinsic(640, 480, 75, 70);
+		CameraPinhole original = PerspectiveOps.createIntrinsic(640, 480, 75, 70, null);
 
 		LensDistortionPinhole distortion = new LensDistortionPinhole(original);
 
@@ -78,7 +78,7 @@ class TestPerspectiveOps extends BoofStandardJUnit {
 		double hfov = 30;
 		double vfov = 35;
 
-		CameraPinhole found = PerspectiveOps.createIntrinsic(640, 480, hfov, vfov);
+		CameraPinhole found = PerspectiveOps.createIntrinsic(640, 480, hfov, vfov, null);
 
 		assertEquals(UtilAngle.degreeToRadian(hfov), 2.0*Math.atan(found.cx/found.fx), 1e-6);
 		assertEquals(UtilAngle.degreeToRadian(vfov), 2.0*Math.atan(found.cy/found.fy), 1e-6);
@@ -88,7 +88,7 @@ class TestPerspectiveOps extends BoofStandardJUnit {
 
 		double hfov = 30;
 
-		CameraPinholeBrown found = PerspectiveOps.createIntrinsic(640, 480, hfov);
+		CameraPinholeBrown found = PerspectiveOps.createIntrinsic(640, 480, hfov, null);
 
 		assertEquals(UtilAngle.degreeToRadian(hfov), 2.0*Math.atan(found.cx/found.fx), 1e-6);
 		assertEquals(found.fx, found.fy, 1e-6);

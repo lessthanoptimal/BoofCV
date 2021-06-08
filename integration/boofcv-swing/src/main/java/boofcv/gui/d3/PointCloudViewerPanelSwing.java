@@ -278,7 +278,7 @@ public class PointCloudViewerPanelSwing extends JPanel
 		rendering.imageDepth.reshape(w, h);
 		rendering.imageRgb.reshape(w, h);
 
-		CameraPinhole intrinsic = PerspectiveOps.createIntrinsic(w, h, UtilAngle.degree(hfov));
+		CameraPinhole intrinsic = PerspectiveOps.createIntrinsic(w, h, UtilAngle.degree(hfov), null);
 
 		ImageMiscOps.fill(rendering.imageDepth, Float.MAX_VALUE);
 		ImageMiscOps.fill(rendering.imageRgb, backgroundColor);

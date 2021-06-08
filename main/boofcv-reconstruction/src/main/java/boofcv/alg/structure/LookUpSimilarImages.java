@@ -20,7 +20,6 @@ package boofcv.alg.structure;
 
 import boofcv.misc.BoofLambdas;
 import boofcv.struct.feature.AssociatedIndex;
-import boofcv.struct.image.ImageDimension;
 import georegression.struct.point.Point2D_F64;
 import org.ddogleg.struct.DogArray;
 import org.jetbrains.annotations.Nullable;
@@ -73,13 +72,4 @@ public interface LookUpSimilarImages {
 	 * @throws IllegalArgumentException If the one of the views is not known
 	 */
 	boolean lookupAssociated( String similarD, DogArray<AssociatedIndex> pairs );
-
-	/**
-	 * Looks up the original images width and height
-	 *
-	 * @param target (Input) the image to retrieve from
-	 * @param shape (Output) storage for width and height
-	 * @throws IllegalArgumentException If the target is not known
-	 */
-	void lookupShape( String target, ImageDimension shape );
 }

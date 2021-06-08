@@ -87,11 +87,12 @@ public class ProjectiveReconstructionFromPairwiseGraph extends ReconstructionFro
 	/**
 	 * Performs a projective reconstruction of the scene from the views contained in the graph
 	 *
-	 * @param db (input) Contains information on each image
+	 * @param dbSimilar (input) Contains information on each image
 	 * @param graph (input) Relationship between the images
 	 * @return true if successful or false if it failed and results can't be used
 	 */
-	public boolean process( LookUpSimilarImages db, PairwiseImageGraph graph ) {
+	public boolean process( LookUpSimilarImages dbSimilar, LookUpCameraInfo dbCams,
+							PairwiseImageGraph graph ) {
 		workGraph.reset();
 
 		// Score nodes for their ability to be seeds
@@ -100,16 +101,16 @@ public class ProjectiveReconstructionFromPairwiseGraph extends ReconstructionFro
 		// Doesn't support multiple seeds here. So remove all but the highest score
 		Collections.sort(seedScores.toList());
 		while (seedScores.size > 1)
-			seedScores.remove(seedScores.size-2);
+			seedScores.remove(seedScores.size - 2);
 
-		selectAndSpawnSeeds(db, graph, seedScores, mapScores);
+		selectAndSpawnSeeds(dbSimilar, dbCams, graph, seedScores, mapScores);
 
 		// TODO redo every component to use shifted pixels
 		// TODO redo every component to use scaled pixels
 
 		// NOTE: Computing H to scale camera matrices didn't prevent them from vanishing
 
-		expandScene(db);
+		expandScene(dbSimilar, dbCams);
 
 		// TODO compute features across all views for SBA
 		// NOTE: Could do one last bundle adjustment on the entire scene. not doing that here since it would
@@ -124,7 +125,8 @@ public class ProjectiveReconstructionFromPairwiseGraph extends ReconstructionFro
 	 * Initializes the scene at the seed view
 	 */
 	@Override
-	protected boolean spawnSceneFromSeed( LookUpSimilarImages db, PairwiseImageGraph pairwise, SeedInfo info ) {
+	protected boolean spawnSceneFromSeed( LookUpSimilarImages dbSimilar, LookUpCameraInfo dbCams,
+										  PairwiseImageGraph pairwise, SeedInfo info ) {
 		// Find the common features
 		var commonPairwise = new DogArray_I32();
 		utils.findAllConnectedSeed(info.seed, info.motions, commonPairwise);
@@ -132,7 +134,7 @@ public class ProjectiveReconstructionFromPairwiseGraph extends ReconstructionFro
 			return false;
 
 		// initialize projective scene using common tracks
-		if (!initProjective.projectiveSceneN(db, info.seed, commonPairwise, info.motions)) {
+		if (!initProjective.projectiveSceneN(dbSimilar, dbCams, info.seed, commonPairwise, info.motions)) {
 			if (verbose != null) verbose.println("Failed initialize seed");
 			return false;
 		}
@@ -156,7 +158,7 @@ public class ProjectiveReconstructionFromPairwiseGraph extends ReconstructionFro
 	/**
 	 * Adds all the remaining views to the scene
 	 */
-	private void expandScene( LookUpSimilarImages db ) {
+	private void expandScene( LookUpSimilarImages dbSimilar, LookUpCameraInfo dbCams ) {
 		if (verbose != null) verbose.println("ENTER Expanding Scene:");
 		// Create a list of views that can be added the work graph
 		findAllOpenViews(workGraph);
@@ -173,7 +175,7 @@ public class ProjectiveReconstructionFromPairwiseGraph extends ReconstructionFro
 
 			PairwiseImageGraph.View selected = score.scene.open.removeSwap(score.openIdx);
 
-			if (!expandProjective.process(db, workGraph, selected, cameraMatrix)) {
+			if (!expandProjective.process(dbSimilar, dbCams, workGraph, selected, cameraMatrix)) {
 				if (verbose != null) verbose.println("  Failed to expand/add view=" + selected.id + ". Discarding.");
 				continue;
 			}

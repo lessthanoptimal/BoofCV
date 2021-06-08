@@ -53,16 +53,18 @@ class TestMetricFromUncalibratedPairwiseGraph extends BoofStandardJUnit {
 		// Add extra internal checks
 		var alg = new MetricFromUncalibratedPairwiseGraph(config) {
 			@Override
-			protected boolean spawnSceneFromSeed( LookUpSimilarImages db, PairwiseImageGraph pairwise, SeedInfo info ) {
-				if (!super.spawnSceneFromSeed(db, pairwise, info))
+			protected boolean spawnSceneFromSeed( LookUpSimilarImages dbSimilar, LookUpCameraInfo dbCams,
+												  PairwiseImageGraph pairwise, SeedInfo info ) {
+				if (!super.spawnSceneFromSeed(dbSimilar, dbCams, pairwise, info))
 					return false;
 				sanityCheckScenesInEachView();
 				return true;
 			}
 
 			@Override
-			boolean expandIntoView( LookUpSimilarImages db, SceneWorkingGraph scene, PairwiseImageGraph.View selected ) {
-				if (!super.expandIntoView(db, scene, selected))
+			boolean expandIntoView( LookUpSimilarImages dbSimilar, LookUpCameraInfo dbCams,
+									SceneWorkingGraph scene, PairwiseImageGraph.View selected ) {
+				if (!super.expandIntoView(dbSimilar, dbCams, scene, selected))
 					return false;
 				sanityCheckScenesInEachView();
 				return true;
@@ -85,13 +87,15 @@ class TestMetricFromUncalibratedPairwiseGraph extends BoofStandardJUnit {
 //			System.out.println("Number of views " + numViews);
 			// Need to increase the number of features to ensure everything is connected properly and that there is
 			// enough info for a good estimate
-			var db = new MockLookupSimilarImagesRealistic().setLoop(false).
+			var dbSimilar = new MockLookupSimilarImagesRealistic().setLoop(false).
 					setIntrinsic(new CameraPinhole(410, 410, 0, 400, 400, 800, 800)).
 					setSeed(numViews).setFeatures(Math.max(400, 50*numViews)).pathLine(numViews, 0.30, 6.0, 2);
-			PairwiseImageGraph graph = db.createPairwise();
-			assertTrue(alg.process(db, graph));
+			var dbCams = new MockLookUpCameraInfo(dbSimilar.intrinsic);
+
+			PairwiseImageGraph graph = dbSimilar.createPairwise();
+			assertTrue(alg.process(dbSimilar, dbCams, graph));
 			assertEquals(1, alg.getScenes().size);
-			checkReconstruction(alg, db);
+			checkReconstruction(alg, dbSimilar);
 		}
 	}
 

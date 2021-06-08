@@ -320,7 +320,7 @@ public class MetricMergeScenes implements VerbosePrint {
 	private void copyIntoSceneJustState( SceneWorkingGraph origScene, boolean markAsKnown, PairwiseImageGraph.View pview ) {
 		SceneWorkingGraph.View origView = origScene.views.get(pview.id);
 		SceneWorkingGraph.View copyView = workScene.addView(pview);
-		copyView.imageDimension.setTo(origView.imageDimension);
+		copyView.priorCamera.setTo(origView.priorCamera);
 		copyView.world_to_view.setTo(origView.world_to_view);
 		copyView.intrinsic.setTo(origView.intrinsic);
 		knownViews.add(markAsKnown);

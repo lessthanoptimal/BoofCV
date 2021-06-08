@@ -19,7 +19,6 @@
 package boofcv.alg.structure;
 
 import boofcv.struct.feature.AssociatedIndex;
-import boofcv.struct.image.ImageDimension;
 import boofcv.testing.BoofStandardJUnit;
 import georegression.struct.point.Point2D_F64;
 import org.ddogleg.struct.DogArray;
@@ -189,22 +188,5 @@ public abstract class GenericLookUpSimilarImagesChecks extends BoofStandardJUnit
 		// if wasn't cleared then it will have the same value for first element
 		assertNotEquals(-2, pairsAB.get(0).src);
 		assertNotEquals(-2, pairsAB.get(0).dst);
-	}
-
-	/**
-	 * Very basic sanity check to make sure it returns a shape for every view and that it's a valid value
-	 */
-	@Test void lookupShape_valid() {
-		LookUpSimilarImages alg = createFullyLoaded();
-
-		List<String> images = alg.getImageIDs();
-
-		ImageDimension found = new ImageDimension(-1, -1);
-		for (String view : images) {
-			found.setTo(-1, -1);
-			alg.lookupShape(view, found);
-			assertTrue(found.width > 0);
-			assertTrue(found.height > 0);
-		}
 	}
 }

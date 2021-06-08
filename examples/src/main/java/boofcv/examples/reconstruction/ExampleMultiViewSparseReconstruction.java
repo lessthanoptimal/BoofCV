@@ -90,7 +90,8 @@ public class ExampleMultiViewSparseReconstruction {
 	List<String> imageFiles = new ArrayList<>();
 
 	PairwiseImageGraph pairwise = null;
-	LookUpSimilarImages similarImages;
+	LookUpSimilarImages dbSimilar;
+	LookUpCameraInfo dbCams = new LookUpCameraInfo();
 	SceneWorkingGraph working = null;
 	SceneStructureMetric scene = null;
 
@@ -105,9 +106,9 @@ public class ExampleMultiViewSparseReconstruction {
 //		example.compute("log_building_02.mp4", true);
 //		example.compute("steps_zoom_01.mp4", true);
 //		example.compute("drone_park_01.mp4", false);
-		example.compute("steps_zoom_01.mp4", true);
+//		example.compute("steps_zoom_01.mp4", true);
 //		example.compute("steps_reg_01.mp4", true);
-//		example.compute("steps_wide_01.mp4", true);
+		example.compute("steps_wide_01.mp4", true);
 //		example.compute("rock_loop_01.mp4", true);
 		example.visualizeSparseCloud();
 
@@ -170,8 +171,8 @@ public class ExampleMultiViewSparseReconstruction {
 				similarImagesFromUnsorted();
 			}
 
-			var savePath = new File(workDirectory, "similar.yaml");
-			MultiViewIO.save(similarImages, savePath.getPath());
+//			var savePath = new File(workDirectory, "similar.yaml");
+//			MultiViewIO.save(similarImages, savePath.getPath());
 		}
 
 		if (pairwise == null)
@@ -230,8 +231,8 @@ public class ExampleMultiViewSparseReconstruction {
 		config.sequentialSearchRadius = 8;
 		config.sequentialMinimumCommonTracks.setRelative(0.4, 200);
 
-		final var similarImages = FactorySceneReconstruction.createTrackThenMatch(config, ImageType.SB_U8);
-		similarImages.setVerbose(System.out, BoofMiscOps.hashSet(BoofVerbose.RECURSIVE));
+		final var dbSimilar = FactorySceneReconstruction.createTrackThenMatch(config, ImageType.SB_U8);
+		dbSimilar.setVerbose(System.out, BoofMiscOps.hashSet(BoofVerbose.RECURSIVE));
 
 		// Track features across the entire sequence and save the results
 		BoofMiscOps.profile(() -> {
@@ -242,7 +243,8 @@ public class ExampleMultiViewSparseReconstruction {
 				Objects.requireNonNull(frame, "Failed to load image");
 				if (first) {
 					first = false;
-					similarImages.initialize(frame.width, frame.height);
+					dbSimilar.initialize(frame.width, frame.height);
+					dbCams.addDefaultCamera(frame.width, frame.height, 60.0);
 				}
 
 				tracker.process(frame);
@@ -250,9 +252,12 @@ public class ExampleMultiViewSparseReconstruction {
 				int droppedCount = tracker.getDroppedTracks(null).size();
 				tracker.spawnTracks();
 				tracker.getActiveTracks(activeTracks);
-				similarImages.processFrame(frame, activeTracks, tracker.getFrameID());
+				dbSimilar.processFrame(frame, activeTracks, tracker.getFrameID());
 				String id = frameId + "";//trackerSimilar.frames.getTail().frameID;
 				System.out.println("frame id = " + id + " active=" + activeCount + " dropped=" + droppedCount);
+
+				// Everything maps to the same camera
+				dbCams.addView(id, 0);
 
 				// TODO drop tracks which have been viewed for too long to reduce the negative affects of track drift?
 
@@ -261,10 +266,10 @@ public class ExampleMultiViewSparseReconstruction {
 					break;
 			}
 
-			similarImages.finishedTracking();
+			dbSimilar.finishedTracking();
 		}, "Finding Similar");
 
-		this.similarImages = similarImages;
+		this.dbSimilar = dbSimilar;
 	}
 
 	/**
@@ -293,7 +298,13 @@ public class ExampleMultiViewSparseReconstruction {
 				GrayU8 frame = UtilImageIO.loadImage(filePath, GrayU8.class);
 				Objects.requireNonNull(frame, "Failed to load image");
 
-				similarImages.addImage(frameId + "", frame);
+				String viewID = frameId + "";
+
+				similarImages.addImage(viewID, frame);
+				// Everything maps to the same camera
+				if (frameId == 0)
+					dbCams.addDefaultCamera(frame.width, frame.height, 60.0);
+				dbCams.addView(viewID, 0);
 
 				// To keep things manageable only process the first few frames, if configured to do so
 				if (frameId >= maxFrames)
@@ -303,7 +314,7 @@ public class ExampleMultiViewSparseReconstruction {
 			similarImages.fixate();
 		}, "Finding Similar");
 
-		this.similarImages = similarImages;
+		this.dbSimilar = similarImages;
 	}
 
 	/**
@@ -321,7 +332,7 @@ public class ExampleMultiViewSparseReconstruction {
 		GeneratePairwiseImageGraph generatePairwise = FactorySceneReconstruction.generatePairwise(config);
 		BoofMiscOps.profile(() -> {
 			generatePairwise.setVerbose(System.out, null);
-			generatePairwise.process(similarImages);
+			generatePairwise.process(dbSimilar);
 		}, "Created Pairwise graph");
 		pairwise = generatePairwise.getGraph();
 
@@ -343,7 +354,7 @@ public class ExampleMultiViewSparseReconstruction {
 		var metric = new MetricFromUncalibratedPairwiseGraph();
 		metric.setVerbose(System.out, BoofMiscOps.hashSet(BoofVerbose.RECURSIVE));
 		BoofMiscOps.profile(() -> {
-			if (!metric.process(similarImages, pairwise)) {
+			if (!metric.process(dbSimilar, dbCams, pairwise)) {
 				System.err.println("Reconstruction failed");
 				System.exit(0);
 			}
@@ -368,7 +379,7 @@ public class ExampleMultiViewSparseReconstruction {
 			// Bundle adjustment is run twice, with the worse 5% of points discarded in an attempt to reduce noise
 			refine.metricSba.keepFraction = 0.95;
 			refine.metricSba.getSba().setVerbose(System.out, null);
-			if (!refine.process(similarImages, working)) {
+			if (!refine.process(dbSimilar, working)) {
 				System.out.println("SBA REFINE FAILED");
 			}
 		}, "Bundle Adjustment refine");

@@ -136,7 +136,8 @@ public class SceneReconstructionApp {
 
 	// Storage for intermediate results
 	PairwiseImageGraph pairwise = null;
-	LookUpSimilarImages similarImages;
+	LookUpSimilarImages dbSimilar;
+	LookUpCameraInfo dbCams = new LookUpCameraInfo();
 	SceneStructureMetric scene = null;
 	SparseSceneToDenseCloud<GrayU8> sparseToDense;
 
@@ -342,18 +343,23 @@ public class SceneReconstructionApp {
 
 		// Track features across the entire sequence and save the results
 		BoofMiscOps.profile(() -> {
-			GrayU8 gray = new GrayU8(1, 1);
+			GrayU8 gray = new GrayU8(images.getWidth(), images.getHeight());
+			dbCams.addDefaultCamera(gray.width, gray.height, 60.0);
 			while (images.hasNext()) {
 				Planar<GrayU8> color = images.next();
 				ConvertImage.average(color, gray);
-				similarImages.addImage(images.getFrameNumber() + "", gray);
+				String viewID = images.getFrameNumber() + "";
+				similarImages.addImage(viewID, gray);
 				listDimensions.add(new ImageDimension(gray.width, gray.height));
+
+				// Assume all views come from the same camera
+				dbCams.addView(viewID, 0);
 			}
 
 			similarImages.fixate();
 		}, "Finding Similar");
 
-		this.similarImages = similarImages;
+		this.dbSimilar = similarImages;
 	}
 
 	private void findSimilarImagesSequence() {
@@ -375,12 +381,14 @@ public class SceneReconstructionApp {
 				if (first) {
 					first = false;
 					similarImages.initialize(gray.width, gray.height);
+					dbCams.addDefaultCamera(gray.width, gray.height, 60.0);
 				}
 
 				tracker.process(gray);
 				tracker.spawnTracks();
 				tracker.getActiveTracks(activeTracks);
 				similarImages.processFrame(gray, activeTracks, tracker.getFrameID());
+				dbCams.addView(similarImages.frames.getTail().frameID, 0);
 
 				listDimensions.add(new ImageDimension(gray.width, gray.height));
 			}
@@ -388,14 +396,14 @@ public class SceneReconstructionApp {
 			similarImages.finishedTracking();
 		}, "Finding Similar");
 
-		this.similarImages = similarImages;
+		this.dbSimilar = similarImages;
 	}
 
 	private void computePairwise() {
 		GeneratePairwiseImageGraph generatePairwise = FactorySceneReconstruction.generatePairwise(configPairwise);
 		BoofMiscOps.profile(() -> {
 			generatePairwise.setVerbose(out, null);
-			generatePairwise.process(similarImages);
+			generatePairwise.process(dbSimilar);
 		}, "Created Pairwise graph");
 		pairwise = generatePairwise.getGraph();
 
@@ -406,7 +414,7 @@ public class SceneReconstructionApp {
 		var metric = new MetricFromUncalibratedPairwiseGraph();
 		metric.setVerbose(out, BoofMiscOps.hashSet(BoofVerbose.RECURSIVE));
 		BoofMiscOps.profile(() -> {
-			if (!metric.process(similarImages, pairwise)) {
+			if (!metric.process(dbSimilar, dbCams, pairwise)) {
 				System.err.println("Reconstruction failed");
 				System.exit(1);
 			}
@@ -422,7 +430,7 @@ public class SceneReconstructionApp {
 		BoofMiscOps.profile(() -> {
 			// Bundle adjustment is run twice, with the worse 5% of points discarded in an attempt to reduce noise
 			refine.metricSba.keepFraction = 0.95;
-			if (!refine.process(similarImages, working)) {
+			if (!refine.process(dbSimilar, working)) {
 				out.println("SBA REFINE FAILED");
 			}
 		}, "Bundle Adjustment refine");

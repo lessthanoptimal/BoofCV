@@ -27,7 +27,7 @@ import boofcv.alg.distort.brown.RemoveBrownPtoN_F64;
 import boofcv.alg.geo.bundle.cameras.BundlePinholeSimplified;
 import boofcv.factory.geo.FactoryMultiView;
 import boofcv.misc.BoofMiscOps;
-import boofcv.struct.image.ImageDimension;
+import boofcv.struct.calib.CameraPinholeBrown;
 import georegression.struct.point.Point2D_F64;
 import georegression.struct.point.Point4D_F64;
 import georegression.struct.se.Se3_F64;
@@ -77,13 +77,13 @@ public class MetricSanityChecks implements VerbosePrint {
 	 * Checks physical constraints for one inlier set in a {@link SceneWorkingGraph}. Features are triangulated
 	 * directly from observations. Raw counts for each type of error can be found for this function.
 	 *
-	 * @param db Use to get feature locations in the image
+	 * @param dbSimilar Use to get feature locations in the image
 	 * @param scene The scene
 	 * @param wview The view to check
 	 * @param setIdx Which inlier set in the view
 	 * @return true if nothing went wrong or false if a very nasty error was detected
 	 */
-	public boolean checkPhysicalConstraints( LookUpSimilarImages db,
+	public boolean checkPhysicalConstraints( LookUpSimilarImages dbSimilar,
 											 SceneWorkingGraph scene, SceneWorkingGraph.View wview, int setIdx ) {
 		failedTriangulate = 0;
 		failedBehind = 0;
@@ -111,6 +111,9 @@ public class MetricSanityChecks implements VerbosePrint {
 			}
 
 			listViews.add(w);
+
+			// TODO switch to known camera if available
+
 			var normalize = new RemoveBrownPtoN_F64();
 			normalize.setK(w.intrinsic.f, w.intrinsic.f, 0, 0, 0).setDistortion(w.intrinsic.k1, w.intrinsic.k2);
 			listNormalize.add(normalize);
@@ -118,9 +121,9 @@ public class MetricSanityChecks implements VerbosePrint {
 			listMotion.add(view1_to_world.concat(w.world_to_view, null));
 
 			var features = new DogArray<>(Point2D_F64::new);
-			db.lookupPixelFeats(w.pview.id, features);
-			double cx = (double)(w.imageDimension.width/2);
-			double cy = (double)(w.imageDimension.height/2);
+			dbSimilar.lookupPixelFeats(w.pview.id, features);
+			double cx = w.priorCamera.cx;
+			double cy = w.priorCamera.cy;
 			features.forEach(p -> p.setTo(p.x - cx, p.y - cy));
 			listFeatures.add(features);
 		}
@@ -150,11 +153,6 @@ public class MetricSanityChecks implements VerbosePrint {
 			for (int viewIdx = 0; viewIdx < listViews.size(); viewIdx++) {
 				Se3_F64 view1_to_view = listMotion.get(viewIdx);
 				SceneWorkingGraph.View w = listViews.get(viewIdx);
-				int width = w.imageDimension.width;
-				int height = w.imageDimension.height;
-
-				double cx = width/2;
-				double cy = height/2;
 
 				if (foundX.z*foundX.w < 0) {
 					badObservation = true;
@@ -169,6 +167,10 @@ public class MetricSanityChecks implements VerbosePrint {
 					failedReprojection++;
 				}
 
+				int width = w.priorCamera.width;
+				int height = w.priorCamera.height;
+				double cx = w.priorCamera.cx;
+				double cy = w.priorCamera.cy;
 				if (!BoofMiscOps.isInside(width, height, predictdPixel.x + cx, predictdPixel.y + cy)) {
 					badObservation = true;
 					failedImageBounds++;
@@ -195,13 +197,13 @@ public class MetricSanityChecks implements VerbosePrint {
 	 * @return true if a fatal catastrophic error is detected. E.g. negative focal length.
 	 */
 	public boolean checkPhysicalConstraints( MetricBundleAdjustmentUtils bundle,
-											 List<ImageDimension> listDimensions ) {
+											 List<CameraPinholeBrown> listDimensions ) {
 		return checkPhysicalConstraints(bundle.structure, bundle.observations, listDimensions);
 	}
 
 	public boolean checkPhysicalConstraints( SceneStructureMetric structure,
 											 SceneObservations observations,
-											 List<ImageDimension> listDimensions ) {
+											 List<CameraPinholeBrown> listPriors ) {
 		for (int i = 0; i < structure.cameras.size; i++) {
 			BundlePinholeSimplified pinhole = (BundlePinholeSimplified)structure.cameras.get(i).model;
 			if (pinhole.f < 0.0f) {
@@ -218,13 +220,13 @@ public class MetricSanityChecks implements VerbosePrint {
 		var predictdPixel = new Point2D_F64();
 
 		for (int viewIdx = 0; viewIdx < observations.views.size; viewIdx++) {
-			ImageDimension dimension = listDimensions.get(viewIdx);
-			int width = dimension.width;
-			int height = dimension.height;
+			CameraPinholeBrown priorCamera = listPriors.get(viewIdx);
+			int width = priorCamera.width;
+			int height = priorCamera.height;
 
 			// Used to compoensate for the lens model having its origin at the image center
-			float cx = (float)(width/2);
-			float cy = (float)(height/2);
+			float cx = (float)priorCamera.cx;
+			float cy = (float)priorCamera.cy;
 
 			// Number of times each test failed in this particular view
 			int failedBehind = 0;

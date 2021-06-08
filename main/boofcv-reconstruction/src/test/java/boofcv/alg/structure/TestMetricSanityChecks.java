@@ -33,17 +33,17 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  * @author Peter Abeles
  */
 public class TestMetricSanityChecks extends BoofStandardJUnit {
-	MockLookupSimilarImagesRealistic db;
+	MockLookupSimilarImagesRealistic dbSimilar;
 	PairwiseImageGraph pairwise;
 	SceneWorkingGraph scene;
 	SceneWorkingGraph.View wview;
 
 	@BeforeEach void initialize() {
-		db = new MockLookupSimilarImagesRealistic().pathLine(4, 0.1, 0.3, 1);
-		pairwise = db.createPairwise();
-		scene = db.createWorkingGraph(pairwise);
+		dbSimilar = new MockLookupSimilarImagesRealistic().pathLine(4, 0.1, 0.3, 1);
+		pairwise = dbSimilar.createPairwise();
+		scene = dbSimilar.createWorkingGraph(pairwise);
 		wview = scene.listViews.get(1);
-		db.addInlierInfo(pairwise, wview, 0, 2);
+		dbSimilar.addInlierInfo(pairwise, wview, 0, 2);
 	}
 
 	/**
@@ -55,7 +55,7 @@ public class TestMetricSanityChecks extends BoofStandardJUnit {
 		// Sanity check to make sure it's testing something
 		assertTrue(wview.inliers.get(0).getInlierCount() > 20);
 
-		alg.checkPhysicalConstraints(db, scene, wview, 0);
+		alg.checkPhysicalConstraints(dbSimilar, scene, wview, 0);
 		assertEquals(0, alg.failedTriangulate);
 		assertEquals(0, alg.failedBehind);
 		assertEquals(0, alg.failedImageBounds);
@@ -70,7 +70,7 @@ public class TestMetricSanityChecks extends BoofStandardJUnit {
 		int N = wview.inliers.get(0).getInlierCount();
 		assertTrue(N > 20);
 
-		alg.checkPhysicalConstraints(db, scene, wview, 0);
+		alg.checkPhysicalConstraints(dbSimilar, scene, wview, 0);
 		assertEquals(N, alg.failedTriangulate);
 		assertEquals(0, alg.failedBehind);
 		assertEquals(0, alg.failedImageBounds);
@@ -92,7 +92,7 @@ public class TestMetricSanityChecks extends BoofStandardJUnit {
 		int N = wview.inliers.get(0).getInlierCount();
 		assertTrue(N > 20);
 
-		alg.checkPhysicalConstraints(db, scene, wview, 0);
+		alg.checkPhysicalConstraints(dbSimilar, scene, wview, 0);
 		assertEquals(0, alg.failedTriangulate);
 		assertEquals(N*3, alg.failedBehind);
 //		assertEquals(0, alg.failedImageBounds);
@@ -103,14 +103,17 @@ public class TestMetricSanityChecks extends BoofStandardJUnit {
 		var alg = new MetricSanityChecks();
 
 		// this will cause all points to be out of bounds
-		wview.imageDimension.setTo(0, 0);
+		for (var v : scene.listViews) {
+			v.priorCamera.fsetShape(0, 0);
+		}
+
 		// this will mess up other stuff too as it will try to re-center the pixels at another location
 
 		// Sanity check to make sure it's testing something
 		int N = wview.inliers.get(0).getInlierCount();
 		assertTrue(N > 20);
 
-		alg.checkPhysicalConstraints(db, scene, wview, 0);
+		alg.checkPhysicalConstraints(dbSimilar, scene, wview, 0);
 		assertEquals(0, alg.failedTriangulate);
 		assertEquals(N*3, alg.failedImageBounds);
 	}
@@ -125,7 +128,7 @@ public class TestMetricSanityChecks extends BoofStandardJUnit {
 		int N = wview.inliers.get(0).getInlierCount();
 		assertTrue(N > 20);
 
-		alg.checkPhysicalConstraints(db, scene, wview, 0);
+		alg.checkPhysicalConstraints(dbSimilar, scene, wview, 0);
 		assertEquals(0, alg.failedTriangulate);
 		assertTrue(alg.failedReprojection > N/2);
 	}

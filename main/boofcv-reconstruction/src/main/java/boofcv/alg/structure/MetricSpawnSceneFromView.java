@@ -24,6 +24,7 @@ import boofcv.alg.geo.bundle.BundleAdjustmentOps;
 import boofcv.factory.geo.ConfigSelfCalibDualQuadratic;
 import boofcv.factory.geo.FactoryMultiView;
 import boofcv.misc.BoofMiscOps;
+import boofcv.struct.calib.CameraPinholeBrown;
 import boofcv.struct.geo.AssociatedTupleDN;
 import boofcv.struct.image.ImageDimension;
 import lombok.Getter;
@@ -81,7 +82,7 @@ public class MetricSpawnSceneFromView implements VerbosePrint {
 	DogArray<AssociatedTupleDN> observations = new DogArray<>(AssociatedTupleDN::new);
 	MetricCameras elevationResults = new MetricCameras();
 
-	List<ImageDimension> listImageShape = new ArrayList<>();
+	List<CameraPinholeBrown> listPriorCameras = new ArrayList<>();
 	MetricSanityChecks checks = new MetricSanityChecks();
 
 	public MetricSpawnSceneFromView( RefineMetricWorkingGraph refineWorking, PairwiseGraphUtils utils ) {
@@ -98,13 +99,15 @@ public class MetricSpawnSceneFromView implements VerbosePrint {
 	/**
 	 * Computes the metric scene given the seed and related views
 	 *
-	 * @param db Image data base to retieve feature and shape info
+	 * @param dbSimilar Image data base to retieve feature and shape info
 	 * @param pairwise Pairwise graph
 	 * @param seed The view which will be the origin of the metric scene
 	 * @param motions edges in seed that were used to generate the score
 	 * @return true if successful or false if it failed
 	 */
-	protected boolean process( LookUpSimilarImages db, PairwiseImageGraph pairwise,
+	protected boolean process( LookUpSimilarImages dbSimilar,
+							   LookUpCameraInfo dbCams,
+							   PairwiseImageGraph pairwise,
 							   PairwiseImageGraph.View seed,
 							   DogArray_I32 motions ) {
 		scene.reset();
@@ -118,7 +121,7 @@ public class MetricSpawnSceneFromView implements VerbosePrint {
 		}
 
 		// initialize projective scene using common tracks
-		if (!initProjective.projectiveSceneN(db, seed, commonPairwise, motions)) {
+		if (!initProjective.projectiveSceneN(dbSimilar, dbCams, seed, commonPairwise, motions)) {
 			if (verbose != null) verbose.println("FAILED: Initialize projective scene");
 			return false;
 		}
@@ -129,7 +132,7 @@ public class MetricSpawnSceneFromView implements VerbosePrint {
 			return false;
 		}
 
-		return refineAndRemoveBadFeatures(db, seed);
+		return refineAndRemoveBadFeatures(dbSimilar, seed);
 	}
 
 	/**
@@ -137,9 +140,9 @@ public class MetricSpawnSceneFromView implements VerbosePrint {
 	 */
 	private boolean refineAndRemoveBadFeatures( LookUpSimilarImages db, PairwiseImageGraph.View seed ) {
 		// Sanity check results against physical constraints
-		listImageShape.clear();
+		listPriorCameras.clear();
 		for (int i = 0; i < scene.listViews.size(); i++) {
-			listImageShape.add(scene.listViews.get(i).imageDimension);
+			listPriorCameras.add(scene.listViews.get(i).priorCamera);
 		}
 
 		// Try two passes before giving up
@@ -150,7 +153,7 @@ public class MetricSpawnSceneFromView implements VerbosePrint {
 				return false;
 			}
 
-			if (!checks.checkPhysicalConstraints(refineWorking.metricSba, listImageShape)) {
+			if (!checks.checkPhysicalConstraints(refineWorking.metricSba, listPriorCameras)) {
 				if (verbose != null) verbose.println("FAILED: Unrecoverable physical constraint");
 				return false;
 			}
@@ -218,7 +221,7 @@ public class MetricSpawnSceneFromView implements VerbosePrint {
 			return false;
 		}
 
-		saveMetricSeed(pairwise, viewIds, dimensions.toList(), initProjective.getInlierIndexes(), elevationResults, scene);
+		saveMetricSeed(pairwise, viewIds, initProjective.getInlierIndexes(), elevationResults, scene);
 
 		return true;
 	}
@@ -229,7 +232,7 @@ public class MetricSpawnSceneFromView implements VerbosePrint {
 	 *
 	 * @param viewInlierIndexes Which observations in each view are part of the inlier set
 	 */
-	void saveMetricSeed( PairwiseImageGraph graph, List<String> viewIds, List<ImageDimension> dimensions,
+	void saveMetricSeed( PairwiseImageGraph graph, List<String> viewIds,
 						 FastAccess<DogArray_I32> viewInlierIndexes,
 						 MetricCameras results,
 						 SceneWorkingGraph scene ) {
@@ -246,7 +249,7 @@ public class MetricSpawnSceneFromView implements VerbosePrint {
 			if (i > 0)
 				wview.world_to_view.setTo(results.motion_1_to_k.get(i - 1));
 			BundleAdjustmentOps.convert(results.intrinsics.get(i), wview.intrinsic);
-			wview.imageDimension.setTo(dimensions.get(i));
+			utils.dbCams.lookupCalibration(wview.pview.id, wview.priorCamera);
 		}
 
 		// Create the inlier set for each view, but adjust it so that the target view is view[0] in the set

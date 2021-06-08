@@ -24,7 +24,7 @@ import boofcv.abst.geo.bundle.SceneStructureMetric;
 import boofcv.alg.geo.MultiViewOps;
 import boofcv.misc.BoofMiscOps;
 import boofcv.struct.calib.CameraPinhole;
-import boofcv.struct.image.ImageDimension;
+import boofcv.struct.calib.CameraPinholeBrown;
 import boofcv.testing.BoofStandardJUnit;
 import georegression.struct.se.Se3_F64;
 import org.ddogleg.struct.DogArray_I32;
@@ -45,29 +45,31 @@ class TestMetricExpandByOneView extends BoofStandardJUnit {
 	@Test void perfect() {
 		// make sure (cx,cy) = (width/2, height/2) or else unit test will fail because it doesn't perfectly
 		// match the model
-		var db = new MockLookupSimilarImagesRealistic().
+		var dbSimilar = new MockLookupSimilarImagesRealistic().
 				setIntrinsic(new CameraPinhole(400, 400, 0, 400, 400, 800, 800)).
 				pathLine(5, 0.3, 1.5, 2);
+		var dbCams = new MockLookUpCameraInfo(dbSimilar.intrinsic);
 		var alg = new MetricExpandByOneView();
 
 		// Perfect without SBA - Will normally not be done this way, but with perfect data it should return
 		// perfect results and will highlight bugs that might be hidden by SBA
 		alg.utils.configConvergeSBA.maxIterations = 0;
 		for (int i = 0; i < 5; i++) {
-			checkPerfect(db, alg, i);
+			checkPerfect(dbSimilar, dbCams, alg, i);
 		}
 
 		// Turn SBA back on and estimate each of the views after leaving them out one at a time
 		alg.utils.configConvergeSBA.maxIterations = 50;
 		for (int i = 0; i < 5; i++) {
-			checkPerfect(db, alg, i);
+			checkPerfect(dbSimilar, dbCams, alg, i);
 		}
 	}
 
-	private void checkPerfect( MockLookupSimilarImagesRealistic db,
+	private void checkPerfect( MockLookupSimilarImagesRealistic dbSimilar,
+							   MockLookUpCameraInfo dbCams,
 							   MetricExpandByOneView alg, int targetViewIdx ) {
-		PairwiseImageGraph pairwise = db.createPairwise();
-		SceneWorkingGraph workGraph = db.createWorkingGraph(pairwise);
+		PairwiseImageGraph pairwise = dbSimilar.createPairwise();
+		SceneWorkingGraph workGraph = dbSimilar.createWorkingGraph(pairwise);
 
 		// Decide which view will be estimated
 		PairwiseImageGraph.View target = pairwise.nodes.get(targetViewIdx);
@@ -76,25 +78,26 @@ class TestMetricExpandByOneView extends BoofStandardJUnit {
 		workGraph.listViews.remove(workGraph.views.remove(target.id));
 
 		// add the target view
-		assertTrue(alg.process(db, workGraph, target));
+		assertTrue(alg.process(dbSimilar, dbCams, workGraph, target));
 
 		SceneWorkingGraph.View found = workGraph.views.get(target.id);
 
 		// Check calibration
-		assertEquals(db.intrinsic.fx, found.intrinsic.f, 1e-4);
-		assertEquals(db.intrinsic.fy, found.intrinsic.f, 1e-4);
+		assertEquals(dbSimilar.intrinsic.fx, found.intrinsic.f, 1e-4);
+		assertEquals(dbSimilar.intrinsic.fy, found.intrinsic.f, 1e-4);
 
 		// Check pose
-		BoofTesting.assertEquals(db.views.get(targetViewIdx).world_to_view, found.world_to_view, 0.01, 0.01);
+		BoofTesting.assertEquals(dbSimilar.views.get(targetViewIdx).world_to_view, found.world_to_view, 0.01, 0.01);
 	}
 
 	/**
 	 * When it fails to find the metric upgrade make sure it doesn't add it to th work graph
 	 */
 	@Test void fail_and_doNotAdd() {
-		var db = new MockLookupSimilarImagesRealistic().
+		var dbSimilar = new MockLookupSimilarImagesRealistic().
 				setIntrinsic(new CameraPinhole(400, 420, 0, 400, 400, 800, 800)).
 				pathLine(5, 0.3, 1.5, 2);
+		var dbCams = new MockLookUpCameraInfo(dbSimilar.intrinsic);
 
 		// force it to fail at these two different points
 		var alg1 = new MetricExpandByOneView() {
@@ -112,14 +115,15 @@ class TestMetricExpandByOneView extends BoofStandardJUnit {
 			}
 		};
 
-		fail_and_doNotAdd(db, alg1, 0);
-		fail_and_doNotAdd(db, alg2, 0);
+		fail_and_doNotAdd(dbSimilar, dbCams, alg1, 0);
+		fail_and_doNotAdd(dbSimilar, dbCams, alg2, 0);
 	}
 
-	private void fail_and_doNotAdd( MockLookupSimilarImagesRealistic db,
+	private void fail_and_doNotAdd( MockLookupSimilarImagesRealistic dbSimilar,
+									MockLookUpCameraInfo dbCams,
 									MetricExpandByOneView alg, int targetViewIdx ) {
-		PairwiseImageGraph pairwise = db.createPairwise();
-		SceneWorkingGraph workGraph = db.createWorkingGraph(pairwise);
+		PairwiseImageGraph pairwise = dbSimilar.createPairwise();
+		SceneWorkingGraph workGraph = dbSimilar.createWorkingGraph(pairwise);
 
 		// Decide which view will be estimated
 		PairwiseImageGraph.View target = pairwise.nodes.get(targetViewIdx);
@@ -127,7 +131,7 @@ class TestMetricExpandByOneView extends BoofStandardJUnit {
 		workGraph.listViews.remove(workGraph.views.remove(target.id));
 
 		// This should fail and not add it to the work graph
-		assertFalse(alg.process(db, workGraph, target));
+		assertFalse(alg.process(dbSimilar, dbCams, workGraph, target));
 		assertFalse(workGraph.isKnown(target));
 	}
 
@@ -238,7 +242,7 @@ class TestMetricExpandByOneView extends BoofStandardJUnit {
 		@Override
 		public boolean checkPhysicalConstraints( SceneStructureMetric structure,
 												 SceneObservations observations,
-												 List<ImageDimension> listDimensions ) {
+												 List<CameraPinholeBrown> listPriors ) {
 			if (counter == 0) {
 				badFeatures.resetResize(numFeatures, false);
 				for (int i = 0; i < numBad; i++) {

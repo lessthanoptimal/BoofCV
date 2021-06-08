@@ -19,7 +19,7 @@
 package boofcv.alg.structure;
 
 import boofcv.alg.geo.bundle.cameras.BundlePinholeSimplified;
-import boofcv.struct.image.ImageDimension;
+import boofcv.struct.calib.CameraPinholeBrown;
 import georegression.struct.point.Point2D_F64;
 import georegression.struct.se.Se3_F64;
 import gnu.trove.map.TObjectIntMap;
@@ -234,8 +234,8 @@ public class SceneWorkingGraph {
 		/** SE3 from world to this view */
 		public final Se3_F64 world_to_view = new Se3_F64();
 
-		/** Shape of this view's image */
-		public final ImageDimension imageDimension = new ImageDimension();
+		/** Prior information about this camera's calibration */
+		public final CameraPinholeBrown priorCamera = new CameraPinholeBrown(2);
 
 		/** Index of the view in the list. This will be the same index in the SBA scene */
 		public int index = -1;
@@ -272,7 +272,7 @@ public class SceneWorkingGraph {
 		public void reset() {
 			index = -1;
 			pview = null;
-			imageDimension.setTo(-1, -1);
+			priorCamera.reset();
 			projective.zero();
 			intrinsic.reset();
 			inliers.reset();
@@ -283,7 +283,7 @@ public class SceneWorkingGraph {
 			reset();
 			index = src.index;
 			pview = src.pview;
-			imageDimension.setTo(src.imageDimension);
+			priorCamera.setTo(src.priorCamera);
 			projective.setTo(src.projective);
 			intrinsic.setTo(src.intrinsic);
 			inliers.resetResize(src.inliers.size);

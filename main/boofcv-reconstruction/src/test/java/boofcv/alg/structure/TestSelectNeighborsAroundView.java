@@ -309,7 +309,7 @@ public class TestSelectNeighborsAroundView extends BoofStandardJUnit {
 		// Fill in arbitrary values for everything that has not already been filled in and will be checked
 		BoofMiscOps.forIdx(working.listViews, ( i, v ) -> {
 			v.intrinsic.f = 100 + i;
-			v.imageDimension.width = 97 + i;
+			v.priorCamera.width = 97 + i;
 		});
 
 		SceneWorkingGraph.View seed = working.listViews.get(6);
@@ -344,7 +344,7 @@ public class TestSelectNeighborsAroundView extends BoofStandardJUnit {
 
 			assertEquals(lv.intrinsic.f, v.intrinsic.f);
 			assertEquals(lv.world_to_view.T.x, v.world_to_view.T.x);
-			assertEquals(lv.imageDimension.width, v.imageDimension.width);
+			assertEquals(lv.priorCamera.width, v.priorCamera.width);
 
 			if (i == 6) {
 				assertEquals(8, lv.inliers.get(0).views.size);

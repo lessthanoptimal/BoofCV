@@ -105,11 +105,11 @@ public class MetricFromUncalibratedPairwiseGraph extends ReconstructionFromPairw
 	/**
 	 * Performs a projective reconstruction of the scene from the views contained in the graph
 	 *
-	 * @param db (input) Contains information on each image
+	 * @param dbSimilar (input) Contains information on each image
 	 * @param pairwise (input) Relationship between the images
 	 * @return true if successful or false if it failed and results can't be used
 	 */
-	public boolean process( LookUpSimilarImages db, PairwiseImageGraph pairwise ) {
+	public boolean process( LookUpSimilarImages dbSimilar, LookUpCameraInfo dbCams, PairwiseImageGraph pairwise ) {
 		scenes.reset();
 
 		// Declare storage for book keeping at each view
@@ -119,7 +119,7 @@ public class MetricFromUncalibratedPairwiseGraph extends ReconstructionFromPairw
 		Map<String, SeedInfo> mapScores = scoreNodesAsSeeds(pairwise, 2);
 
 		// Create new seeds in priority of their scores
-		selectAndSpawnSeeds(db, pairwise, seedScores, mapScores);
+		selectAndSpawnSeeds(dbSimilar, dbCams, pairwise, seedScores, mapScores);
 		// TODO change how initial seeds are handled. 1) Number should be dynamically adjusted. 2) Determine why
 		//      it does much better when the number of views is 3. Something isn't handled correctly later on.
 
@@ -134,10 +134,10 @@ public class MetricFromUncalibratedPairwiseGraph extends ReconstructionFromPairw
 		if (verbose != null) verbose.println("Total Scenes: " + scenes.size);
 
 		// Expand all the scenes until they can't any more
-		expandScenes(db);
+		expandScenes(dbSimilar, dbCams);
 
 		// Merge scenes together until there are no more scenes which can be merged
-		mergeScenes(db);
+		mergeScenes(dbSimilar);
 		removeMergedScenes();
 		// TODO local SBA with fixed parameters in master when merging
 
@@ -153,8 +153,9 @@ public class MetricFromUncalibratedPairwiseGraph extends ReconstructionFromPairw
 	 * @return true if successful or false if it failed
 	 */
 	@Override
-	protected boolean spawnSceneFromSeed( LookUpSimilarImages db, PairwiseImageGraph pairwise, SeedInfo info ) {
-		if (!spawnScene.process(db, pairwise, info.seed, info.motions)) {
+	protected boolean spawnSceneFromSeed( LookUpSimilarImages dbSimilar, LookUpCameraInfo dbCams,
+										  PairwiseImageGraph pairwise, SeedInfo info ) {
+		if (!spawnScene.process(dbSimilar, dbCams, pairwise, info.seed, info.motions)) {
 			return false;
 		}
 
@@ -181,7 +182,7 @@ public class MetricFromUncalibratedPairwiseGraph extends ReconstructionFromPairw
 	 * a view if it's connected to a view which already belongs to the scene and at least one of those
 	 * connected views does not belong to any other scenes.
 	 */
-	void expandScenes( LookUpSimilarImages db ) {
+	void expandScenes( LookUpSimilarImages dbSimilar, LookUpCameraInfo dbCam ) {
 		if (verbose != null) verbose.println("Expand Scenes: Finding open views in each scene");
 
 		// Initialize the expansion by finding all the views each scene could expand into
@@ -244,7 +245,7 @@ public class MetricFromUncalibratedPairwiseGraph extends ReconstructionFromPairw
 
 			best.scene.listViews.forEach(v -> BoofMiscOps.checkTrue(!v.inliers.isEmpty()));
 
-			if (!expandIntoView(db, best.scene, view)) {
+			if (!expandIntoView(dbSimilar, dbCam, best.scene, view)) {
 				best.scene.listViews.forEach(v -> BoofMiscOps.checkTrue(!v.inliers.isEmpty()));
 				continue;
 			}
@@ -254,7 +255,7 @@ public class MetricFromUncalibratedPairwiseGraph extends ReconstructionFromPairw
 			if (best.scene.listViews.size() > refineSceneWhileExpandingMaxViews)
 				continue;
 
-			refineWorking.process(db, best.scene);
+			refineWorking.process(dbSimilar, best.scene);
 		}
 	}
 
@@ -398,10 +399,11 @@ public class MetricFromUncalibratedPairwiseGraph extends ReconstructionFromPairw
 	 *
 	 * @return true if it could expand into the view and updated the scene. False if it failed
 	 */
-	boolean expandIntoView( LookUpSimilarImages db, SceneWorkingGraph scene, PairwiseImageGraph.View selected ) {
+	boolean expandIntoView( LookUpSimilarImages dbSimilar, LookUpCameraInfo dbCam,
+							SceneWorkingGraph scene, PairwiseImageGraph.View selected ) {
 		// TODO if it fails to expand into a view put it into a list to consider again later if another view is
 		//      updated to metric and connected to this view.
-		if (!expandMetric.process(db, scene, selected)) {
+		if (!expandMetric.process(dbSimilar, dbCam, scene, selected)) {
 			if (verbose != null)
 				verbose.println("FAILED: Expand/add scene=" + scene.index + " view='" + selected.id + "'. Discarding.");
 			return false;

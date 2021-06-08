@@ -27,6 +27,7 @@ import boofcv.alg.structure.LookUpSimilarImages;
 import boofcv.alg.structure.PairwiseImageGraph;
 import boofcv.alg.structure.SceneWorkingGraph;
 import boofcv.alg.structure.SceneWorkingGraph.InlierInfo;
+import boofcv.io.calibration.CalibrationIO;
 import boofcv.misc.BoofMiscOps;
 import boofcv.struct.feature.AssociatedIndex;
 import boofcv.struct.image.ImageDimension;
@@ -91,7 +92,6 @@ public class MultiViewIO {
 
 			String id = imageIds.get(i);
 
-			db.lookupShape(id, shape);
 			db.lookupPixelFeats(id, features);
 			db.findSimilar(id, ( s ) -> true, similarImages);
 
@@ -586,7 +586,7 @@ public class MultiViewIO {
 			element.put("projective", wview.projective.data);
 			element.put("intrinsic", putPinholeSimplified(wview.intrinsic));
 			element.put("world_to_view", putSe3(wview.world_to_view));
-			element.put("image_dimension", putDimension(wview.imageDimension));
+			element.put("camera_prior", CalibrationIO.putModelBrown(wview.priorCamera, null));
 			element.put("inliers", putInlierInfo(wview.inliers));
 		}
 
@@ -641,7 +641,7 @@ public class MultiViewIO {
 				copyIntoMatrix(getOrThrow(yamlView, "projective"), wview.projective);
 				loadPinholeSimplified(getOrThrow(yamlView, "intrinsic"), wview.intrinsic);
 				loadSe3(getOrThrow(yamlView, "world_to_view"), wview.world_to_view);
-				loadDimension(getOrThrow(yamlView, "image_dimension"), wview.imageDimension);
+				wview.priorCamera.setTo(CalibrationIO.load((Map<String, Object>)getOrThrow(yamlView, "camera_prior")));
 				loadInlierInfo(getOrThrow(yamlView, "inliers"), pairwise, wview.inliers);
 			}
 		} catch (IOException e) {

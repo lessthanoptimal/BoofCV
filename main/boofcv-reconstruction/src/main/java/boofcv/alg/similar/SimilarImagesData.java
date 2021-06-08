@@ -80,10 +80,6 @@ public class SimilarImagesData implements LookUpSimilarImages {
 		return false;
 	}
 
-	@Override public void lookupShape( String target, ImageDimension shape ) {
-		shape.setTo(imageMap.get(target).shape);
-	}
-
 	public static class Info {
 		public final List<String> similar = new ArrayList<>();
 		public final ImageDimension shape = new ImageDimension();

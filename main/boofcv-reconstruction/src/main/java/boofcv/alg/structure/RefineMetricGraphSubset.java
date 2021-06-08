@@ -20,7 +20,7 @@ package boofcv.alg.structure;
 
 import boofcv.abst.geo.bundle.MetricBundleAdjustmentUtils;
 import boofcv.misc.BoofMiscOps;
-import boofcv.struct.image.ImageDimension;
+import boofcv.struct.calib.CameraPinholeBrown;
 import georegression.struct.se.Se3_F64;
 import lombok.Getter;
 import org.ddogleg.struct.DogArray_B;
@@ -67,7 +67,7 @@ public class RefineMetricGraphSubset implements VerbosePrint {
 
 	PrintStream verbose;
 
-	List<ImageDimension> imageDimensions = new ArrayList<>();
+	List<CameraPinholeBrown> cameraPriors = new ArrayList<>();
 
 	// Internal workspace
 	Se3_F64 tmp = new Se3_F64();
@@ -82,7 +82,7 @@ public class RefineMetricGraphSubset implements VerbosePrint {
 	 * views referenced in the inlier sets
 	 */
 	public void setSubset( SceneWorkingGraph src, SceneWorkingGraph.View srcView) {
-		imageDimensions.clear();
+		cameraPriors.clear();
 		srcViews.clear();
 		srcViews.add(srcView);
 
@@ -98,7 +98,7 @@ public class RefineMetricGraphSubset implements VerbosePrint {
 		}
 
 		// Sanity checks
-		BoofMiscOps.checkEq(imageDimensions.size(), subgraph.listViews.size());
+		BoofMiscOps.checkEq(cameraPriors.size(), subgraph.listViews.size());
 	}
 
 	/**
@@ -109,7 +109,7 @@ public class RefineMetricGraphSubset implements VerbosePrint {
 	 * @param srcViews The views in the scene which compose the sub-scene
 	 */
 	public void setSubset( SceneWorkingGraph src, List<SceneWorkingGraph.View> srcViews ) {
-		imageDimensions.clear();
+		cameraPriors.clear();
 		this.srcViews.clear();
 		this.srcViews.addAll(srcViews);
 
@@ -147,7 +147,7 @@ public class RefineMetricGraphSubset implements VerbosePrint {
 		}
 
 		// Sanity checks
-		BoofMiscOps.checkEq(imageDimensions.size(), subgraph.listViews.size());
+		BoofMiscOps.checkEq(cameraPriors.size(), subgraph.listViews.size());
 	}
 
 	private void copyViewAndInlierSet( SceneWorkingGraph src, SceneWorkingGraph.View srcView, int infoIdx ) {
@@ -182,9 +182,9 @@ public class RefineMetricGraphSubset implements VerbosePrint {
 
 		cpyView.world_to_view.setTo(srcView.world_to_view);
 		cpyView.intrinsic.setTo(srcView.intrinsic);
-		cpyView.imageDimension.setTo(srcView.imageDimension);
+		cpyView.priorCamera.setTo(srcView.priorCamera);
 
-		imageDimensions.add(cpyView.imageDimension);
+		cameraPriors.add(cpyView.priorCamera);
 
 		BoofMiscOps.checkTrue(null == srcToCpy.put(srcView.pview.id, cpyView));
 	}

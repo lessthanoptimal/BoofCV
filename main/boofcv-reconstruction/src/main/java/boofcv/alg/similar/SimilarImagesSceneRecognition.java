@@ -29,7 +29,6 @@ import boofcv.struct.PackedArray;
 import boofcv.struct.feature.AssociatedIndex;
 import boofcv.struct.feature.TupleDesc;
 import boofcv.struct.image.ImageBase;
-import boofcv.struct.image.ImageDimension;
 import boofcv.struct.packed.PackedArrayPoint2D_F64;
 import georegression.struct.point.Point2D_F64;
 import gnu.trove.impl.Constants;
@@ -87,8 +86,6 @@ public class SimilarImagesSceneRecognition<Image extends ImageBase<Image>, TD ex
 	final List<String> imageIDs = new ArrayList<>();
 	// Mapping from image ID to image array index. -1 means no mapping
 	final TObjectIntMap<String> imageToIndex = new TObjectIntHashMap<>(Constants.DEFAULT_CAPACITY, Constants.DEFAULT_LOAD_FACTOR, -1);
-	// Dimension of each image
-	final DogArray<ImageDimension> imageShapes = new DogArray<>(ImageDimension::new);
 	// Information about similar images to a recent query
 	final DogArray<PairInfo> pairInfo = new DogArray<>(PairInfo::new, PairInfo::reset);
 	final Map<String, PairInfo> viewId_to_info = new HashMap<>();
@@ -156,7 +153,6 @@ public class SimilarImagesSceneRecognition<Image extends ImageBase<Image>, TD ex
 	public void addImage( String id, Image image ) {
 		imageToIndex.put(id, imageIDs.size());
 		imageIDs.add(id);
-		imageShapes.grow().setTo(image.width, image.height);
 
 		// Detect the point features
 		detector.detect(image);
@@ -338,11 +334,6 @@ public class SimilarImagesSceneRecognition<Image extends ImageBase<Image>, TD ex
 		pairs.copyAll(info.associated.toList(), ( original, copy ) -> copy.setTo(original));
 
 		return !pairs.isEmpty();
-	}
-
-	@Override public void lookupShape( String target, ImageDimension shape ) {
-		int imageIndex = imageToIndex.get(target);
-		shape.setTo(imageShapes.get(imageIndex));
 	}
 
 	/**

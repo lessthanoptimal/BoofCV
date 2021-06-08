@@ -133,7 +133,9 @@ class TestReconstructionFromPairwiseGraph extends BoofStandardJUnit {
 	}
 
 	@Test void selectAndSpawnSeeds() {
-		var db = new MockLookupSimilarImages(1,1); // not actually used
+		var dbSimilar = new MockLookupSimilarImages(1, 1); // not actually used
+		var dbCams = new MockLookUpCameraInfo(dbSimilar.intrinsic);
+
 		var alg = new Helper();
 		alg.spawnSceneReturn = true;
 
@@ -142,7 +144,7 @@ class TestReconstructionFromPairwiseGraph extends BoofStandardJUnit {
 		{
 			PairwiseImageGraph graph = createLinearGraph(8, 1);
 			Map<String, SeedInfo> mapScores = alg.scoreNodesAsSeeds(graph, 2);
-			alg.selectAndSpawnSeeds(db, graph, alg.seedScores, mapScores);
+			alg.selectAndSpawnSeeds(dbSimilar, dbCams, graph, alg.seedScores, mapScores);
 			assertEquals(3, alg.selected.size()); // determined through manual inspection
 			sanityCheckSeeds(alg.selected, 1);
 		}
@@ -152,7 +154,7 @@ class TestReconstructionFromPairwiseGraph extends BoofStandardJUnit {
 			alg.selected.clear();
 			PairwiseImageGraph graph = createLinearGraph(8, 2);
 			Map<String, SeedInfo> mapScores = alg.scoreNodesAsSeeds(graph, 2);
-			alg.selectAndSpawnSeeds(db, graph, alg.seedScores, mapScores);
+			alg.selectAndSpawnSeeds(dbSimilar, dbCams, graph, alg.seedScores, mapScores);
 			sanityCheckSeeds(alg.selected, 2);
 		}
 
@@ -161,7 +163,7 @@ class TestReconstructionFromPairwiseGraph extends BoofStandardJUnit {
 			alg.selected.clear();
 			PairwiseImageGraph graph = createLinearGraph(9, 2);
 			Map<String, SeedInfo> mapScores = alg.scoreNodesAsSeeds(graph, 2);
-			alg.selectAndSpawnSeeds(db, graph, alg.seedScores, mapScores);
+			alg.selectAndSpawnSeeds(dbSimilar, dbCams, graph, alg.seedScores, mapScores);
 			assertEquals(2, alg.selected.size()); // determined through manual inspection
 			sanityCheckSeeds(alg.selected, 2);
 		}
@@ -180,7 +182,7 @@ class TestReconstructionFromPairwiseGraph extends BoofStandardJUnit {
 
 				Map<String, SeedInfo> mapScores = alg.scoreNodesAsSeeds(graph, 2);
 				alg.selected.clear();
-				alg.selectAndSpawnSeeds(db, graph, alg.seedScores, mapScores);
+				alg.selectAndSpawnSeeds(dbSimilar, dbCams, graph, alg.seedScores, mapScores);
 				assertTrue(3 == alg.selected.size() || 2 == alg.selected.size()); // determined through manual inspection
 				sanityCheckSeeds(alg.selected, 2);
 				assertSame(target, alg.selected.get(0).seed);
@@ -252,7 +254,6 @@ class TestReconstructionFromPairwiseGraph extends BoofStandardJUnit {
 		root.connections.get(0).other(root).connections.get(1).is3D = false;
 		SeedInfo info2 = alg.scoreSeedAndSelectSet(root, 2, new SeedInfo());
 		assertFalse(info2.motions.contains(0) && info2.motions.contains(1));
-
 	}
 
 	private PairwiseImageGraph.View viewByConnections( int betweenCounts, int... counts ) {
@@ -272,7 +273,7 @@ class TestReconstructionFromPairwiseGraph extends BoofStandardJUnit {
 		for (int i = 0; i < root.connections.size; i++) {
 			PairwiseImageGraph.View va = root.connections.get(i).other(root);
 
-			for (int j = i+1; j < root.connections.size; j++) {
+			for (int j = i + 1; j < root.connections.size; j++) {
 				PairwiseImageGraph.View vb = root.connections.get(j).other(root);
 
 				PairwiseImageGraph.Motion m = new PairwiseImageGraph.Motion();
@@ -321,7 +322,8 @@ class TestReconstructionFromPairwiseGraph extends BoofStandardJUnit {
 		boolean spawnSceneReturn = true;
 
 		@Override
-		protected boolean spawnSceneFromSeed( LookUpSimilarImages db, PairwiseImageGraph pairwise, SeedInfo info ) {
+		protected boolean spawnSceneFromSeed( LookUpSimilarImages dbSimilar, LookUpCameraInfo dbCams,
+											  PairwiseImageGraph pairwise, SeedInfo info ) {
 			selected.add(info);
 			return spawnSceneReturn;
 		}

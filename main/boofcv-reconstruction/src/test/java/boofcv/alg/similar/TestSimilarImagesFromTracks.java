@@ -25,7 +25,6 @@ import boofcv.alg.similar.SimilarImagesFromTracks.Match;
 import boofcv.alg.structure.GenericLookUpSimilarImagesChecks;
 import boofcv.struct.feature.AssociatedIndex;
 import boofcv.struct.image.GrayU8;
-import boofcv.struct.image.ImageDimension;
 import georegression.struct.point.Point2D_F64;
 import org.ddogleg.struct.DogArray;
 import org.ddogleg.util.PrimitiveArrays;
@@ -272,17 +271,6 @@ class TestSimilarImagesFromTracks extends GenericLookUpSimilarImagesChecks {
 		for (int i = 0; i < 5; i++) {
 			assertEquals("" + i, found.get(i));
 		}
-	}
-
-	@Test void lookupShape() {
-		SimilarImagesFromTracks<PointTrack> alg = createTracker();
-		alg.initialize(123, 321);
-
-		ImageDimension shape = new ImageDimension();
-		// always returns the same for all images since it's constant
-		alg.lookupShape("sadfsf", shape);
-		assertEquals(123, shape.width);
-		assertEquals(321, shape.height);
 	}
 
 	@Nested

@@ -218,7 +218,8 @@ public abstract class ReconstructionFromPairwiseGraph implements VerbosePrint {
 	 * @param candidates (input) All the candidate views for seeds
 	 * @param lookupInfo (input) Used to lookup SeedInfo by View ID
 	 */
-	protected void selectAndSpawnSeeds( LookUpSimilarImages db, PairwiseImageGraph pairwise,
+	protected void selectAndSpawnSeeds( LookUpSimilarImages dbSimilar, LookUpCameraInfo dbCams,
+										PairwiseImageGraph pairwise,
 										DogArray<SeedInfo> candidates, Map<String, SeedInfo> lookupInfo ) {
 
 		// sort it so best scores are last
@@ -263,7 +264,7 @@ public abstract class ReconstructionFromPairwiseGraph implements VerbosePrint {
 				continue;
 
 			// Attempt to create a new scene here.
-			if (!spawnSceneFromSeed(db, pairwise, s)) {
+			if (!spawnSceneFromSeed(dbSimilar, dbCams, pairwise, s)) {
 				if (verbose != null) verbose.println("FAILED: Spawn view.id='" + s.seed.id + "', remaining=" + i);
 				rejectedSpawn++;
 				continue;
@@ -292,7 +293,8 @@ public abstract class ReconstructionFromPairwiseGraph implements VerbosePrint {
 	 * @param info Seed for a new scene
 	 * @return true if successful or false if it failed
 	 */
-	protected abstract boolean spawnSceneFromSeed( LookUpSimilarImages db, PairwiseImageGraph pairwise, SeedInfo info );
+	protected abstract boolean spawnSceneFromSeed( LookUpSimilarImages dbSimilar, LookUpCameraInfo dbCams,
+												   PairwiseImageGraph pairwise, SeedInfo info );
 
 	/**
 	 * Scores how the target as a seed and selects the initial set of views it should spawn from.

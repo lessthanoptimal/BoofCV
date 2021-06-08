@@ -23,11 +23,12 @@ import boofcv.abst.feature.describe.DescribePoint;
 import boofcv.abst.feature.detdesc.DetectDescribePoint;
 import boofcv.abst.geo.bundle.MetricBundleAdjustmentUtils;
 import boofcv.abst.scene.FeatureSceneRecognition;
-import boofcv.abst.tracker.PointTrack;
-import boofcv.abst.tracker.PointTracker;
 import boofcv.alg.mvs.MultiViewStereoFromKnownSceneStructure;
 import boofcv.alg.similar.*;
-import boofcv.alg.structure.*;
+import boofcv.alg.structure.EpipolarScore3D;
+import boofcv.alg.structure.GeneratePairwiseImageGraph;
+import boofcv.alg.structure.GenerateStereoPairGraphFromScene;
+import boofcv.alg.structure.SparseSceneToDenseCloud;
 import boofcv.alg.structure.score3d.ScoreFundamentalReprojectionError;
 import boofcv.alg.structure.score3d.ScoreRatioFundamentalHomography;
 import boofcv.factory.disparity.FactoryStereoDisparity;
@@ -38,7 +39,6 @@ import boofcv.factory.geo.FactoryMultiViewRobust;
 import boofcv.factory.scene.FactorySceneRecognition;
 import boofcv.factory.sfm.ConfigBundleUtils;
 import boofcv.factory.struct.FactoryTupleDesc;
-import boofcv.factory.tracker.FactoryPointTracker;
 import boofcv.struct.feature.TupleDesc;
 import boofcv.struct.geo.AssociatedPair;
 import boofcv.struct.image.GrayF32;
@@ -105,31 +105,6 @@ public class FactorySceneReconstruction {
 				};
 
 		return new GeneratePairwiseImageGraph(scorer);
-	}
-
-	/**
-	 * Creates {@link ImageSequenceToSparseScene}
-	 *
-	 * @param config (Input) Optional configuration. Null will use default values.
-	 * @param imageType (Input) Image type it uses internally.
-	 * @return New instance
-	 */
-	public static <T extends ImageGray<T>> ImageSequenceToSparseScene<T>
-	sequenceToSparseScene( @Nullable ConfigSequenceToSparseScene config, ImageType<T> imageType ) {
-		if (config == null)
-			config = new ConfigSequenceToSparseScene();
-
-		PointTracker<T> tracker = FactoryPointTracker.tracker(config.tracker, imageType.getImageClass(), null);
-
-		GeneratePairwiseImageGraph pairwise = generatePairwise(config.pairwise);
-		var similar = new SimilarImagesFromTracks<PointTrack>(t -> t.featureId, ( t, pixel ) -> pixel.setTo(t.pixel));
-		var metric = new MetricFromUncalibratedPairwiseGraph(config.projective);
-		var refine = new RefineMetricWorkingGraph(bundleUtils(config.bundleAdjustment));
-
-		var alg = new ImageSequenceToSparseScene<>(tracker, similar, pairwise, metric, refine, imageType);
-		alg.maxImagePixels = config.maxImagePixels;
-
-		return alg;
 	}
 
 	/**
