@@ -197,10 +197,10 @@ public class MetricSpawnSceneFromView implements VerbosePrint {
 			}
 
 			// Settings lens distortion back to zero since outliers can drive it to extremes that are hard to recover from
-			for (int viewIdx = 0; viewIdx < scene.listViews.size(); viewIdx++) {
-				SceneWorkingGraph.View v = scene.listViews.get(viewIdx);
-				v.viewIntrinsic.k1 = 0.0;
-				v.viewIntrinsic.k2 = 0.0;
+			for (int cameraIdx = 0; cameraIdx < scene.listCameras.size(); cameraIdx++) {
+				SceneWorkingGraph.Camera c = scene.listCameras.get(cameraIdx);
+				c.intrinsic.k1 = 0.0;
+				c.intrinsic.k2 = 0.0;
 			}
 			// NOTE: Setting extrinsic and intrinsic back to original state before SBA is worth investigating
 		}
@@ -258,7 +258,6 @@ public class MetricSpawnSceneFromView implements VerbosePrint {
 
 			// Save the extrinsics for this view
 			SceneWorkingGraph.View wview = scene.addView(pview, camera);
-			BundleAdjustmentOps.convert(results.intrinsics.get(i), wview.viewIntrinsic);
 
 			if (i > 0)
 				wview.world_to_view.setTo(results.motion_1_to_k.get(i - 1));

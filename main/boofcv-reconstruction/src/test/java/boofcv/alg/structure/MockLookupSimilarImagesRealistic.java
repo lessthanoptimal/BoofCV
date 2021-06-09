@@ -288,7 +288,6 @@ public class MockLookupSimilarImagesRealistic implements LookUpSimilarImages {
 
 		pairwise.nodes.forIdx(( i, v ) -> working.addView(v, c));
 
-		working.listViews.forEach(v -> BundleAdjustmentOps.convert(intrinsic, v.viewIntrinsic));
 		BoofMiscOps.forIdx(working.listViews, ( i, v ) -> v.projective.setTo(views.get(i).camera));
 		BoofMiscOps.forIdx(working.listViews, ( i, v ) -> v.world_to_view.setTo(views.get(i).world_to_view));
 		BoofMiscOps.forIdx(working.listViews, ( i, v ) -> v.index = i);

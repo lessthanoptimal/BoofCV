@@ -205,7 +205,6 @@ public class MetricExpandByOneView extends ExpandByOneView {
 
 		// Now that the metric upgrade is known add it to work graph
 		SceneWorkingGraph.View wtarget = workGraph.addView(target, camera);
-		wtarget.viewIntrinsic.setTo(targetIntrinsic);
 
 		// Match the local coordinate system's scale to the global coordinate system's scale
 		view1_to_target.T.scale(scaleLocalToGlobal);
@@ -358,9 +357,11 @@ public class MetricExpandByOneView extends ExpandByOneView {
 
 		if (verbose != null) {
 //			verbose.println("negate=" + negate);
+			SceneWorkingGraph.Camera camera1 = workGraph.getViewCamera(wview1);
+			SceneWorkingGraph.Camera camera2 = workGraph.getViewCamera(wview2);
 			verbose.printf("SL View 1 to 2     T=(%.1f %.1f %.1f) scale=%g\n",
 					view1_to_view2H.T.x, view1_to_view2H.T.y, view1_to_view2H.T.z, scaleLocalToGlobal);
-			verbose.printf("view1.f=%.2f view2.f=%.2f\n", wview1.viewIntrinsic.f, wview2.viewIntrinsic.f);
+			verbose.printf("view1.f=%.2f view2.f=%.2f\n", camera1.intrinsic.f, camera2.intrinsic.f);
 			verbose.printf("Initial f=%6.1f k1=%6.3f k2=%6.3f T=(%.1f %.1f %.1f)\n",
 					intrinsic.f, intrinsic.k1, intrinsic.k2,
 					view1_to_target.T.x, view1_to_target.T.y, view1_to_target.T.z);
@@ -394,8 +395,10 @@ public class MetricExpandByOneView extends ExpandByOneView {
 		// Argument for fixing: Reduce drift and past information can make up for sparse or poor observations in
 		// the current triplet
 		// Argument against: Past mistakes are propagated and go from bad to total failure
-		structure.setCamera(0, true, wview1.viewIntrinsic);
-		structure.setCamera(1, true, wview2.viewIntrinsic);
+		BundlePinholeSimplified camera1 = workGraph.getViewCamera(wview1).intrinsic;
+		BundlePinholeSimplified camera2 = workGraph.getViewCamera(wview2).intrinsic;
+		structure.setCamera(0, true, camera1);
+		structure.setCamera(1, true, camera2);
 		structure.setCamera(2, false, targetIntrinsic);
 		// view1 has to be fixed since it's the original
 		// view2 could be optimized too to reduce influence of past mistakes, but the problem is that when SBA is run
@@ -406,8 +409,8 @@ public class MetricExpandByOneView extends ExpandByOneView {
 		structure.setView(2, 2, false, view1_to_target);
 
 		// Add observations and 3D feature locations
-		normalize1.setK(wview1.viewIntrinsic.f, wview1.viewIntrinsic.f, 0, 0, 0).setDistortion(wview1.viewIntrinsic.k1, wview1.viewIntrinsic.k2);
-		normalize2.setK(wview2.viewIntrinsic.f, wview2.viewIntrinsic.f, 0, 0, 0).setDistortion(wview2.viewIntrinsic.k1, wview2.viewIntrinsic.k2);
+		normalize1.setK(camera1.f, camera1.f, 0, 0, 0).setDistortion(camera1.k1, camera1.k2);
+		normalize2.setK(camera2.f, camera2.f, 0, 0, 0).setDistortion(camera2.k1, camera2.k2);
 		normalize3.setK(targetIntrinsic.f, targetIntrinsic.f, 0, 0, 0).setDistortion(targetIntrinsic.k1, targetIntrinsic.k2);
 
 		SceneObservations.View viewObs1 = observations.getView(0);
@@ -455,8 +458,11 @@ public class MetricExpandByOneView extends ExpandByOneView {
 		MultiViewOps.projectiveToFundamental(utils.P2, F21);
 		projectiveHomography.initialize(F21, utils.P2);
 
-		BundleAdjustmentOps.convert(workGraph.lookupView(utils.seed.id).viewIntrinsic, K1);
-		BundleAdjustmentOps.convert(workGraph.lookupView(utils.viewB.id).viewIntrinsic, K2);
+		BundlePinholeSimplified camera1 = workGraph.getViewCamera(workGraph.lookupView(utils.seed.id)).intrinsic;
+		BundlePinholeSimplified camera2 = workGraph.getViewCamera(workGraph.lookupView(utils.viewB.id)).intrinsic;
+
+		BundleAdjustmentOps.convert(camera1, K1);
+		BundleAdjustmentOps.convert(camera2, K2);
 
 		DogArray<AssociatedTriple> triples = utils.matchesTriple;
 		pairs.resize(triples.size());

@@ -293,13 +293,6 @@ public class SceneWorkingGraph {
 		/** projective camera matrix */
 		public final DMatrixRMaj projective = new DMatrixRMaj(3, 4);
 
-		/**
-		 * metric camera estimate for this specific view. There's also the global that's used when the
-		 * entire scene is optimized
-		 */
-		public final BundlePinholeSimplified viewIntrinsic = new BundlePinholeSimplified();
-		// TODO remove this. Use global as an initial seed but don't save
-
 		/** SE3 from world to this view */
 		public final Se3_F64 world_to_view = new Se3_F64();
 
@@ -343,7 +336,6 @@ public class SceneWorkingGraph {
 			pview = null;
 			cameraIdx = -1;
 			projective.zero();
-			viewIntrinsic.reset();
 			inliers.reset();
 			world_to_view.reset();
 		}
@@ -354,7 +346,6 @@ public class SceneWorkingGraph {
 			pview = src.pview;
 			cameraIdx = src.cameraIdx;
 			projective.setTo(src.projective);
-			viewIntrinsic.setTo(src.viewIntrinsic);
 			inliers.resetResize(src.inliers.size);
 			for (int i = 0; i < src.inliers.size; i++) {
 				inliers.get(i).setTo(src.inliers.get(i));

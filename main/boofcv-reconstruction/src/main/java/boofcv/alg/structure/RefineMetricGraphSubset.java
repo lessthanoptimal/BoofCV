@@ -172,7 +172,6 @@ public class RefineMetricGraphSubset implements VerbosePrint {
 		SceneWorkingGraph.View cpyView = subgraph.addView(srcView.pview, cpyCamera);
 
 		cpyView.world_to_view.setTo(srcView.world_to_view);
-		cpyView.viewIntrinsic.setTo(srcView.viewIntrinsic);
 
 		cameraPriors.add(cpyCamera.prior);
 
@@ -229,7 +228,6 @@ public class RefineMetricGraphSubset implements VerbosePrint {
 				continue;
 
 			localToGlobal(cpyView.world_to_view, srcView.world_to_view);
-			srcView.viewIntrinsic.setTo(cpyView.viewIntrinsic);
 		}
 
 		return true;

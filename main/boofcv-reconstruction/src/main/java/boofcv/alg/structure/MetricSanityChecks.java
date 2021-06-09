@@ -106,7 +106,8 @@ public class MetricSanityChecks implements VerbosePrint {
 
 		for (int i = 0; i < inliers.views.size; i++) {
 			SceneWorkingGraph.View w = scene.lookupView(inliers.views.get(i).id);
-			if (w.viewIntrinsic.f <= 0.0) {
+			SceneWorkingGraph.Camera c = scene.getViewCamera(w);
+			if (c.intrinsic.f <= 0.0) {
 				if (verbose != null) verbose.println("Negative focal length. view='" + w.pview.id + "'");
 				return false;
 			}
@@ -116,7 +117,7 @@ public class MetricSanityChecks implements VerbosePrint {
 			// TODO switch to known camera if available
 
 			var normalize = new RemoveBrownPtoN_F64();
-			normalize.setK(w.viewIntrinsic.f, w.viewIntrinsic.f, 0, 0, 0).setDistortion(w.viewIntrinsic.k1, w.viewIntrinsic.k2);
+			normalize.setK(c.intrinsic.f, c.intrinsic.f, 0, 0, 0).setDistortion(c.intrinsic.k1, c.intrinsic.k2);
 			listNormalize.add(normalize);
 
 			listMotion.add(view1_to_world.concat(w.world_to_view, null));
@@ -135,6 +136,8 @@ public class MetricSanityChecks implements VerbosePrint {
 		Point4D_F64 foundX = new Point4D_F64();
 		Point4D_F64 viewX = new Point4D_F64();
 		Point2D_F64 predictdPixel = new Point2D_F64();
+
+		SceneWorkingGraph.Camera wviewCamera = scene.getViewCamera(wview);
 
 		for (int inlierIdx = 0; inlierIdx < numFeatures; inlierIdx++) {
 			listViewPixels.clear();
@@ -162,7 +165,7 @@ public class MetricSanityChecks implements VerbosePrint {
 				}
 
 				SePointOps_F64.transform(view1_to_view, foundX, viewX);
-				wview.viewIntrinsic.project(viewX.x, viewX.y, viewX.z, predictdPixel);
+				wviewCamera.intrinsic.project(viewX.x, viewX.y, viewX.z, predictdPixel);
 				double reprojectionError = predictdPixel.distance2(listViewPixels.get(viewIdx));
 				if (reprojectionError > maxReprojectionErrorSq) {
 					badObservation = true;

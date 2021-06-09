@@ -18,6 +18,7 @@
 
 package boofcv.alg.structure;
 
+import boofcv.alg.geo.bundle.cameras.BundlePinholeSimplified;
 import boofcv.misc.BoofMiscOps;
 import georegression.struct.se.Se3_F64;
 import lombok.Getter;
@@ -147,8 +148,9 @@ public class MetricMergeScenes implements VerbosePrint {
 				if (dst.views.get(wview.pview.id) != null)
 					continue;
 
+				BundlePinholeSimplified intrinsic = workScene.getViewCamera(wview).intrinsic;
 				verbose.printf("After id='%s' src={ f=%.1f k1=%.1e k2=%.1e }\n",
-						wview.pview.id, wview.viewIntrinsic.f, wview.viewIntrinsic.k1, wview.viewIntrinsic.k2);
+						wview.pview.id, intrinsic.f, intrinsic.k1, intrinsic.k2);
 			}
 		}
 
@@ -252,7 +254,6 @@ public class MetricMergeScenes implements VerbosePrint {
 
 			// Force the common views to match 'dst'
 			wview.world_to_view.setTo(viewDst.world_to_view);
-			wview.viewIntrinsic.setTo(viewDst.viewIntrinsic);
 
 			// Add inliers from 'dst'
 			DogArray<SceneWorkingGraph.InlierInfo> inliersDst = commonViews.get(i).dst.inliers;
@@ -366,7 +367,6 @@ public class MetricMergeScenes implements VerbosePrint {
 
 		SceneWorkingGraph.View copyView = workScene.addView(pview, copyCamera);
 		copyView.world_to_view.setTo(origView.world_to_view);
-		copyView.viewIntrinsic.setTo(origView.viewIntrinsic);
 		knownViews.add(markAsKnown);
 	}
 
@@ -385,8 +385,9 @@ public class MetricMergeScenes implements VerbosePrint {
 
 			if (dstView == null) {
 				if (verbose != null) {
+					BundlePinholeSimplified intrinsic = src.getViewCamera(srcView).intrinsic;
 					verbose.printf("id='%s' src={ f=%.1f k1=%.1e k2=%.1e }\n",
-							srcView.pview.id, srcView.viewIntrinsic.f, srcView.viewIntrinsic.k1, srcView.viewIntrinsic.k2);
+							srcView.pview.id, intrinsic.f, intrinsic.k1, intrinsic.k2);
 				}
 				continue;
 			}
@@ -396,10 +397,13 @@ public class MetricMergeScenes implements VerbosePrint {
 			commonViews.grow().setTo(srcView, dstView, score);
 
 			if (verbose != null) {
+				BundlePinholeSimplified srcIntrinsic = src.getViewCamera(srcView).intrinsic;
+				BundlePinholeSimplified dstIntrinsic = dst.getViewCamera(dstView).intrinsic;
+
 				verbose.printf("id='%s' src={ f=%.1f k1=%.1e k2=%.1e } dst={ f=%.1f k1=%.1e k2=%.1e }\n",
 						srcView.pview.id,
-						srcView.viewIntrinsic.f, srcView.viewIntrinsic.k1, srcView.viewIntrinsic.k2,
-						dstView.viewIntrinsic.f, dstView.viewIntrinsic.k1, dstView.viewIntrinsic.k2);
+						srcIntrinsic.f, srcIntrinsic.k1, srcIntrinsic.k2,
+						dstIntrinsic.f, dstIntrinsic.k1, dstIntrinsic.k2);
 			}
 		}
 

@@ -225,10 +225,6 @@ class TestMultiViewIO extends BoofStandardJUnit {
 			assertSame(va, a.views.get(va.pview.id));
 			assertSame(vb, b.views.get(vb.pview.id));
 
-			assertEquals(va.viewIntrinsic.f, vb.viewIntrinsic.f);
-			assertEquals(va.viewIntrinsic.k1, vb.viewIntrinsic.k1);
-			assertEquals(va.viewIntrinsic.k2, vb.viewIntrinsic.k2);
-
 			assertEquals(0.0, va.world_to_view.T.distance(vb.world_to_view.T), UtilEjml.EPS);
 			assertTrue(MatrixFeatures_DDRM.isEquals(va.world_to_view.R, vb.world_to_view.R, UtilEjml.EPS));
 
@@ -270,10 +266,6 @@ class TestMultiViewIO extends BoofStandardJUnit {
 		var candidates = DogArray_I32.range(0, pairwise.nodes.size);
 
 		ret.listViews.forEach(v -> {
-			v.viewIntrinsic.f = rand.nextDouble();
-			v.viewIntrinsic.k1 = rand.nextDouble();
-			v.viewIntrinsic.k2 = rand.nextDouble();
-
 			SpecialEuclideanOps_F64.eulerXyz(
 					rand.nextDouble(), rand.nextDouble(), rand.nextDouble(),
 					rand.nextDouble(), rand.nextDouble(), rand.nextDouble(), v.world_to_view);

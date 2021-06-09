@@ -191,7 +191,7 @@ public class RefineMetricWorkingGraph implements VerbosePrint {
 			SceneObservations.View oview = observations.getView(viewIdx);
 
 			viewToIntegerID.put(wview.pview.id, viewIdx);
-			createProjectionModel(wview.viewIntrinsic);
+			createProjectionModel(graph.getViewCamera(wview).intrinsic);
 
 			// Add all observations in this view to the SBA observations.
 			// Observations that are not assigned to a 3D point will be pruned later on. Much easier this way.
@@ -535,11 +535,12 @@ public class RefineMetricWorkingGraph implements VerbosePrint {
 
 
 			if (verbose != null && verboseViewInfo) {
+				BundlePinholeSimplified intrinsics = graph.getViewCamera(wview).intrinsic;
 				Se3_F64 m = metricSba.structure.getParentToView(viewIdx);
 				double theta = ConvertRotation3D_F64.matrixToRodrigues(m.R, null).theta;
 				verbose.printf("AFTER view='%s' T=(%.2f %.2f %.2f) R=%.4f, f=%.1f k1=%.1e k2=%.1e\n",
 						wview.pview.id, m.T.x, m.T.y, m.T.z, theta,
-						wview.viewIntrinsic.f, wview.viewIntrinsic.k1, wview.viewIntrinsic.k2);
+						intrinsics.f, intrinsics.k1, intrinsics.k2);
 			}
 		}
 		return true;

@@ -269,15 +269,6 @@ public class SceneMergingOperations implements VerbosePrint {
 	void mergeStructure( SceneWorkingGraph src, SceneWorkingGraph dst, ScaleSe3_F64 src_to_dst,
 						 PairwiseViewScenes scenesInEachView ) {
 
-		// Copy cameras from 'src' to 'dst' if they don't exist in dst
-		for (int cameraSrcIdx = 0; cameraSrcIdx < src.listCameras.size; cameraSrcIdx++) {
-			SceneWorkingGraph.Camera cameraSrc = src.listCameras.get(cameraSrcIdx);
-			SceneWorkingGraph.Camera cameraDst = dst.cameras.get(cameraSrc.indexDB);
-			if (cameraDst != null)
-				continue;
-			dst.addCameraCopy(cameraSrc);
-		}
-
 		mergedViews.clear();
 		duplicateViews.clear();
 		Se3_F64 src_to_view = new Se3_F64();
@@ -296,10 +287,13 @@ public class SceneMergingOperations implements VerbosePrint {
 				duplicateViews.add(dstView);
 
 				if (verbose != null) {
+					BundlePinholeSimplified srcIntrinsic = src.getViewCamera(srcView).intrinsic;
+					BundlePinholeSimplified dstIntrinsic = dst.getViewCamera(dstView).intrinsic;
+
 					verbose.printf("view='%s', sets={%d %d}, scores: %.1f vs %.1f, src.f=%.1f dst.f=%.1f\n",
 							srcView.pview.id, srcView.inliers.size, dstView.inliers.size,
 							srcView.getBestInlierScore(), dstView.getBestInlierScore(),
-							srcView.viewIntrinsic.f, dstView.viewIntrinsic.f);
+							srcIntrinsic.f, dstIntrinsic.f);
 				}
 			} else {
 				// Need to add the dst to the list of scenes which contains this view. Do not mess with the counters
@@ -313,12 +307,16 @@ public class SceneMergingOperations implements VerbosePrint {
 				// Create a new view in the dst scene
 				SceneWorkingGraph.Camera cameraSrc = src.getViewCamera(srcView);
 				SceneWorkingGraph.Camera cameraDst = dst.cameras.get(cameraSrc.indexDB);
+				if (cameraDst == null) {
+					cameraDst = dst.addCameraCopy(cameraSrc);
+				}
 				dstView = dst.addView(srcView.pview, cameraDst);
 				copySrc = true;
 
 				if (verbose != null) {
+					BundlePinholeSimplified srcIntrinsic = src.getViewCamera(srcView).intrinsic;
 					verbose.printf("view='%s', sets=%d, score: %.1f, src.f=%.1f\n",
-							srcView.pview.id, srcView.inliers.size, srcView.getBestInlierScore(), srcView.viewIntrinsic.f);
+							srcView.pview.id, srcView.inliers.size, srcView.getBestInlierScore(), srcIntrinsic.f);
 				}
 			}
 			mergedViews.add(dstView);
@@ -334,12 +332,18 @@ public class SceneMergingOperations implements VerbosePrint {
 			if (!copySrc)
 				continue;
 
-			// Copy information from src to dst while updating the extrinsic info
-			dstView.viewIntrinsic.setTo(srcView.viewIntrinsic);
-
 			src_to_view.setTo(srcView.world_to_view);
 			src_to_view.T.scale(src_to_dst.scale);
 			transform_dst_to_src.concat(src_to_view, dstView.world_to_view);
+		}
+
+		// Copy cameras from 'src' to 'dst' if they don't exist in dst
+		for (int cameraSrcIdx = 0; cameraSrcIdx < src.listCameras.size; cameraSrcIdx++) {
+			SceneWorkingGraph.Camera cameraSrc = src.listCameras.get(cameraSrcIdx);
+			SceneWorkingGraph.Camera cameraDst = dst.cameras.get(cameraSrc.indexDB);
+			if (cameraDst != null)
+				continue;
+			dst.addCameraCopy(cameraSrc);
 		}
 	}
 
@@ -477,11 +481,11 @@ public class SceneMergingOperations implements VerbosePrint {
 		listWorldToViewSrc.clear();
 		listIntrinsicsSrc.reset();
 
-		// Go through each view and extract it's SE3 and
+		// Go through each view and extract it's SE3
 		for (int viewIdx = 0; viewIdx < inliers.views.size; viewIdx++) {
 			PairwiseImageGraph.View pview = inliers.views.get(viewIdx);
 			SceneWorkingGraph.View wview = scene.views.get(pview.id);
-			BundlePinholeSimplified cam = wview.viewIntrinsic;
+			BundlePinholeSimplified cam = scene.getViewCamera(wview).intrinsic;
 
 			// Save the view's pose
 			listWorldToViewSrc.add(wview.world_to_view);
