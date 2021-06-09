@@ -65,14 +65,10 @@ public class TestMetricMergeScenes extends BoofStandardJUnit {
 
 			// Change the scale
 			src.listViews.get(i).world_to_view.T.scale(scale);
-
-			BundleAdjustmentOps.convert(dbSimilar.intrinsic, src.listViews.get(i).viewIntrinsic);
-			BundleAdjustmentOps.convert(dbSimilar.intrinsic, dst.listViews.get(i).viewIntrinsic);
 		}
 		// Add one overlapping view between src and dst
 		dbSimilar.addInlierInfo(pairwise, dst.addView(pairwise.nodes.get(4), cameraDst), 5, 6);
 		dst.lookupView(pairwise.nodes.get(4).id).world_to_view.setTo(dbSimilar.views.get(4).world_to_view);
-		BundleAdjustmentOps.convert(dbSimilar.intrinsic, dst.listViews.get(5).viewIntrinsic);
 
 		// Connect views to each other
 		for (int i = 0; i < 5; i++) {
@@ -265,10 +261,8 @@ public class TestMetricMergeScenes extends BoofStandardJUnit {
 			assertEquals(1, camera.indexDB);
 			if (i > 3) {
 				assertEquals(i*2 + 1, wview.world_to_view.T.x, UtilEjml.TEST_F64);
-				assertEquals(5, wview.viewIntrinsic.f, UtilEjml.TEST_F64);
 			} else {
 				assertEquals(i*2, wview.world_to_view.T.x, UtilEjml.TEST_F64);
-				assertEquals(10, wview.viewIntrinsic.f, UtilEjml.TEST_F64);
 			}
 
 			// In overlapping views there should be two inlier sets
@@ -323,14 +317,12 @@ public class TestMetricMergeScenes extends BoofStandardJUnit {
 			if (i < 8) {
 				SceneWorkingGraph.View viewSrc = src.addView(pview, cameraSrc);
 				viewSrc.world_to_view.T.x = i*2;
-				viewSrc.viewIntrinsic.f = 10;
 				viewSrc.inliers.grow().scoreGeometric = 10;
 			}
 
 			if (i > 3) {
 				SceneWorkingGraph.View viewDst = dst.addView(pview, cameraDst);
 				viewDst.world_to_view.T.x = 1 + i*2;
-				viewDst.viewIntrinsic.f = 5;
 				viewDst.inliers.grow().scoreGeometric = 8;
 			}
 		}

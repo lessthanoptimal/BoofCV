@@ -104,7 +104,6 @@ class TestMetricSpawnSceneFromView extends BoofStandardJUnit {
 			assertTrue(wgraph.isKnown(pview));
 			SceneWorkingGraph.View wview = wgraph.lookupView(viewId);
 
-			assertEquals(100 + idx, wview.viewIntrinsic.f, 1e-8);
 			assertEquals(idx == 0 ? 0 : 1, wview.world_to_view.T.x, 1e-8);
 			assertEquals(idx, wview.world_to_view.T.y, 1e-8);
 		});

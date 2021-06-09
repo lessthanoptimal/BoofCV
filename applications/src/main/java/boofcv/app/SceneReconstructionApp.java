@@ -24,6 +24,7 @@ import boofcv.abst.tracker.PointTrack;
 import boofcv.abst.tracker.PointTracker;
 import boofcv.alg.cloud.PointCloudReader;
 import boofcv.alg.cloud.PointCloudUtils_F64;
+import boofcv.alg.geo.bundle.cameras.BundlePinholeSimplified;
 import boofcv.alg.mvs.DisparityParameters;
 import boofcv.alg.mvs.MultiViewStereoFromKnownSceneStructure;
 import boofcv.alg.similar.ConfigSimilarImagesSceneRecognition;
@@ -445,8 +446,9 @@ public class SceneReconstructionApp {
 		for (int workIdx = 0; workIdx < working.listViews.size(); workIdx++) {
 			SceneWorkingGraph.View wv = working.listViews.get(workIdx);
 			ConvertRotation3D_F64.matrixToRodrigues(wv.world_to_view.R, rod);
+			BundlePinholeSimplified intrinsics = working.getViewCamera(wv).intrinsic;
 			out.printf("view[%2d]='%2s' f=%6.1f k1=%6.3f k2=%6.3f T={%5.1f,%5.1f,%5.1f} R=%5.3f\n",
-					workIdx, wv.pview.id, wv.viewIntrinsic.f, wv.viewIntrinsic.k1, wv.viewIntrinsic.k2,
+					workIdx, wv.pview.id, intrinsics.f, intrinsics.k1, intrinsics.k2,
 					wv.world_to_view.T.x, wv.world_to_view.T.y, wv.world_to_view.T.z, rod.theta);
 		}
 		out.println("   Views used: " + scene.views.size + " / " + pairwise.nodes.size);

@@ -84,13 +84,9 @@ class TestRefineMetricWorkingGraph extends BoofStandardJUnit {
 
 		// The scale is not locked and the first view is not at the origin. Let's just use reprojection error as
 		// a test since comparing translation is more complex
+		assertEquals(1, graph.listCameras.size);
 		assertEquals(400.0, graph.listCameras.get(0).intrinsic.f, 1e-3);
 		assertEquals(0.0, alg.metricSba.sba.getFitScore(), 1e-6);
-		BoofMiscOps.forIdx(graph.listViews, ( i, v ) -> {
-			assertEquals(400, v.viewIntrinsic.f, 1e-3);
-			assertEquals(0, v.viewIntrinsic.k1, 1e-6);
-			assertEquals(0, v.viewIntrinsic.k2, 1e-6);
-		});
 	}
 
 	private void selectObservations( MockLookupSimilarImagesRealistic dbSimilar, SceneWorkingGraph.InlierInfo inliers ) {
@@ -153,12 +149,9 @@ class TestRefineMetricWorkingGraph extends BoofStandardJUnit {
 
 		// The scale is not locked and the first view is not at the origin. Let's just use reprojection error as
 		// a test since comparing translation is more complex
+		assertEquals(1, graph.listCameras.size);
+		assertEquals(400.0, graph.listCameras.get(0).intrinsic.f, 1e-3);
 		assertEquals(0.0, alg.metricSba.sba.getFitScore(), 1e-6);
-		BoofMiscOps.forIdx(graph.listViews, ( i, v ) -> {
-			assertEquals(400, v.viewIntrinsic.f, 1e-3);
-			assertEquals(0, v.viewIntrinsic.k1, 1e-6);
-			assertEquals(0, v.viewIntrinsic.k2, 1e-6);
-		});
 	}
 
 	@Test

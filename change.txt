@@ -67,11 +67,10 @@ Version : 0.38
   * Added PointTracker.getImageType() so you know what type of image it requires
 
 TODO DB
-    - MetricWorking: Split camera intrinsics off into their own list.
-      - WAIT keep view specific estimate, but have a global also that you can use as a seed
-    - Metric: Use information that views are from the same camera for projective to metric
-    - Metric: Use information that views are from the same camera for SBA
-    - Metric: Use known cameras
+    - Metric: Make sure the scene's intrinsic isn't modified when it shouldn't be
+    - Metric: Use information that views are from the same camera for projective to metric (spawning)
+    - Metric: Use information that all cameras are known when expanding by one
+    - Pairwise: Handle planes
     - Ransac: Tell it the minimum threshold and abort early if it can't be meet?
 
 TODO Uncalibrated Stereo: Figure out why it seems to select an invalid solution when it got almost everything right.

@@ -597,7 +597,6 @@ public class MultiViewIO {
 			views.add(element);
 			element.put("pview", wview.pview.id);
 			element.put("projective", wview.projective.data);
-			element.put("intrinsic", putPinholeSimplified(wview.viewIntrinsic));
 			element.put("world_to_view", putSe3(wview.world_to_view));
 			element.put("camera_index", camera.localIndex);
 			element.put("inliers", putInlierInfo(wview.inliers));
@@ -665,7 +664,6 @@ public class MultiViewIO {
 			for (Map<String, Object> yamlView : yamlViews) {
 				SceneWorkingGraph.View wview = working.lookupView(getOrThrow(yamlView, "pview"));
 				copyIntoMatrix(getOrThrow(yamlView, "projective"), wview.projective);
-				loadPinholeSimplified(getOrThrow(yamlView, "intrinsic"), wview.viewIntrinsic);
 				loadSe3(getOrThrow(yamlView, "world_to_view"), wview.world_to_view);
 				loadInlierInfo(getOrThrow(yamlView, "inliers"), pairwise, wview.inliers);
 			}

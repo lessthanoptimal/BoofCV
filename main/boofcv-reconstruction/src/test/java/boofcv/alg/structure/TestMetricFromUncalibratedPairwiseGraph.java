@@ -108,9 +108,9 @@ class TestMetricFromUncalibratedPairwiseGraph extends BoofStandardJUnit {
 		assertEquals(db.views.size(), foundViews.size());
 
 		//------------- Check intrinsic parameters
-		for (SceneWorkingGraph.View v : foundViews) {
-			assertEquals(db.intrinsic.fx, v.viewIntrinsic.f, focalTol);
-			assertEquals(db.intrinsic.fy, v.viewIntrinsic.f, focalTol);
+		for (SceneWorkingGraph.Camera c : workGraph.listCameras.toList()) {
+			assertEquals(db.intrinsic.fx, c.intrinsic.f, focalTol);
+			assertEquals(db.intrinsic.fy, c.intrinsic.f, focalTol);
 		}
 
 		//------------- Check camera motion up to scale

@@ -18,7 +18,6 @@
 
 package boofcv.alg.structure;
 
-import boofcv.misc.BoofMiscOps;
 import boofcv.testing.BoofStandardJUnit;
 import org.ddogleg.struct.DogArray_I32;
 import org.junit.jupiter.api.Test;
@@ -299,7 +298,6 @@ public class TestSelectNeighborsAroundView extends BoofStandardJUnit {
 		SceneWorkingGraph working = db.createWorkingGraph(pairwise);
 		// Fill in arbitrary values for everything that has not already been filled in and will be checked
 		working.listCameras.forIdx(( idx, c ) -> c.prior.width = 97 + idx);
-		BoofMiscOps.forIdx(working.listViews, ( i, v ) -> v.viewIntrinsic.f = 100 + i);
 
 		SceneWorkingGraph.View seed = working.listViews.get(6);
 
@@ -339,7 +337,6 @@ public class TestSelectNeighborsAroundView extends BoofStandardJUnit {
 			SceneWorkingGraph.View lv = localGraph.views.get(v.pview.id);
 			assertNotNull(lv);
 
-			assertEquals(lv.viewIntrinsic.f, v.viewIntrinsic.f);
 			assertEquals(lv.world_to_view.T.x, v.world_to_view.T.x);
 
 			if (i == 6) {

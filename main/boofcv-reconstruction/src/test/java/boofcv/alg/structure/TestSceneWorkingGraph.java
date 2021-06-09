@@ -92,7 +92,6 @@ class TestSceneWorkingGraph extends BoofStandardJUnit {
 		expected.inliers.get(0).scoreGeometric = 5;
 		expected.index = 2;
 		expected.projective.set(0, 0, 2);
-		expected.viewIntrinsic.f = 50;
 		expected.pview = new PairwiseImageGraph.View();
 
 		found.setTo(expected);
@@ -103,7 +102,6 @@ class TestSceneWorkingGraph extends BoofStandardJUnit {
 		assertEquals(5, found.inliers.get(0).scoreGeometric);
 		assertEquals(2, found.index);
 		assertTrue(MatrixFeatures_DDRM.isIdentical(expected.projective, found.projective, 1e-8));
-		assertEquals(expected.viewIntrinsic.f, found.viewIntrinsic.f);
 		assertSame(expected.pview, found.pview);
 	}
 

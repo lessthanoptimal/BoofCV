@@ -167,9 +167,6 @@ public class TestSceneMergingOperations extends BoofStandardJUnit {
 			SceneWorkingGraph.View wa = src.addView(a, cameraSrc);
 			SceneWorkingGraph.View wb = dst.addView(b, cameraDst);
 
-			wa.viewIntrinsic.f = i;
-			wb.viewIntrinsic.f = j;
-
 			wa.world_to_view.T.setTo(i, 0, 0);
 		}
 
@@ -198,7 +195,6 @@ public class TestSceneMergingOperations extends BoofStandardJUnit {
 		for (int i = 0; i < 3; i++) {
 			String id = "" + i;
 			assertEquals(i*2.5 - 10.0, dst.views.get(id).world_to_view.T.x);
-			assertEquals(i, dst.views.get(id).viewIntrinsic.f);
 		}
 	}
 

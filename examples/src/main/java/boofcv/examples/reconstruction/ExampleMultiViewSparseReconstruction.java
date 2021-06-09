@@ -23,6 +23,7 @@ import boofcv.abst.feature.detect.interest.PointDetectorTypes;
 import boofcv.abst.geo.bundle.SceneStructureMetric;
 import boofcv.abst.tracker.PointTrack;
 import boofcv.abst.tracker.PointTracker;
+import boofcv.alg.geo.bundle.cameras.BundlePinholeSimplified;
 import boofcv.alg.mvs.ColorizeMultiViewStereoResults;
 import boofcv.alg.similar.ConfigSimilarImagesSceneRecognition;
 import boofcv.alg.similar.ConfigSimilarImagesTrackThenMatch;
@@ -190,8 +191,9 @@ public class ExampleMultiViewSparseReconstruction {
 				continue;
 			int order = working.listViews.indexOf(wv);
 			ConvertRotation3D_F64.matrixToRodrigues(wv.world_to_view.R, rod);
+			BundlePinholeSimplified intrinsics = working.getViewCamera(wv).intrinsic;
 			System.out.printf("view[%2d]='%2s' f=%6.1f k1=%6.3f k2=%6.3f T={%5.1f,%5.1f,%5.1f} R=%4.2f\n",
-					order, wv.pview.id, wv.viewIntrinsic.f, wv.viewIntrinsic.k1, wv.viewIntrinsic.k2,
+					order, wv.pview.id, intrinsics.f, intrinsics.k1, intrinsics.k2,
 					wv.world_to_view.T.x, wv.world_to_view.T.y, wv.world_to_view.T.z, rod.theta);
 		}
 		System.out.println("   Views used: " + scene.views.size + " / " + pairwise.nodes.size);
