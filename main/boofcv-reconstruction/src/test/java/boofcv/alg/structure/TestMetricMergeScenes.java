@@ -38,12 +38,12 @@ public class TestMetricMergeScenes extends BoofStandardJUnit {
 	 * Create a scene that should be merged without issues and make sure everything passes
 	 */
 	@Test void simpleCase() {
-		var db = new MockLookupSimilarImagesRealistic();
+		var dbSimilar = new MockLookupSimilarImagesRealistic();
 		// true camera will match the model used exactly. Default does not causing the scale to not be quite accurate
-		db.setIntrinsic(new CameraPinhole(410, 410, 0, 400, 400, 800, 800));
-		db.pathLine(10, 0.1, 0.9, 1);
+		dbSimilar.setIntrinsic(new CameraPinhole(410, 410, 0, 400, 400, 800, 800));
+		dbSimilar.pathLine(10, 0.1, 0.9, 1);
 
-		PairwiseImageGraph pairwise = db.createPairwise();
+		PairwiseImageGraph pairwise = dbSimilar.createPairwise();
 
 		double scale = 0.5;
 
@@ -51,24 +51,28 @@ public class TestMetricMergeScenes extends BoofStandardJUnit {
 		var src = new SceneWorkingGraph();
 		var dst = new SceneWorkingGraph();
 
+		SceneWorkingGraph.Camera cameraSrc = src.addCamera(1);
+		cameraSrc.prior.setTo(dbSimilar.intrinsic);
+		BundleAdjustmentOps.convert(dbSimilar.intrinsic, cameraSrc.intrinsic);
+		SceneWorkingGraph.Camera cameraDst = dst.addCamera(1);
+		cameraDst.prior.setTo(dbSimilar.intrinsic);
+		BundleAdjustmentOps.convert(dbSimilar.intrinsic, cameraDst.intrinsic);
+
 		for (int i = 0; i < 5; i++) {
 			int j = i + 5;
-			src.addView(pairwise.nodes.get(i)).world_to_view.setTo(db.views.get(i).world_to_view);
-			dst.addView(pairwise.nodes.get(j)).world_to_view.setTo(db.views.get(j).world_to_view);
+			src.addView(pairwise.nodes.get(i), cameraSrc).world_to_view.setTo(dbSimilar.views.get(i).world_to_view);
+			dst.addView(pairwise.nodes.get(j), cameraDst).world_to_view.setTo(dbSimilar.views.get(j).world_to_view);
 
 			// Change the scale
 			src.listViews.get(i).world_to_view.T.scale(scale);
 
-			BundleAdjustmentOps.convert(db.intrinsic, src.listViews.get(i).intrinsic);
-			BundleAdjustmentOps.convert(db.intrinsic, dst.listViews.get(i).intrinsic);
-			src.listViews.get(i).priorCamera.setTo(db.intrinsic);
-			dst.listViews.get(i).priorCamera.setTo(db.intrinsic);
+			BundleAdjustmentOps.convert(dbSimilar.intrinsic, src.listViews.get(i).viewIntrinsic);
+			BundleAdjustmentOps.convert(dbSimilar.intrinsic, dst.listViews.get(i).viewIntrinsic);
 		}
 		// Add one overlapping view between src and dst
-		db.addInlierInfo(pairwise, dst.addView(pairwise.nodes.get(4)), 5, 6);
-		dst.lookupView(pairwise.nodes.get(4).id).world_to_view.setTo(db.views.get(4).world_to_view);
-		BundleAdjustmentOps.convert(db.intrinsic, dst.listViews.get(5).intrinsic);
-		dst.listViews.get(5).priorCamera.setTo(db.intrinsic);
+		dbSimilar.addInlierInfo(pairwise, dst.addView(pairwise.nodes.get(4), cameraDst), 5, 6);
+		dst.lookupView(pairwise.nodes.get(4).id).world_to_view.setTo(dbSimilar.views.get(4).world_to_view);
+		BundleAdjustmentOps.convert(dbSimilar.intrinsic, dst.listViews.get(5).viewIntrinsic);
 
 		// Connect views to each other
 		for (int i = 0; i < 5; i++) {
@@ -80,20 +84,20 @@ public class TestMetricMergeScenes extends BoofStandardJUnit {
 			else
 				connected = new int[]{i - 1, i + 1};
 
-			db.addInlierInfo(pairwise, src.listViews.get(i), connected);
+			dbSimilar.addInlierInfo(pairwise, src.listViews.get(i), connected);
 			connected[0] += 5;
 			connected[1] += 5;
-			db.addInlierInfo(pairwise, dst.listViews.get(i), connected);
+			dbSimilar.addInlierInfo(pairwise, dst.listViews.get(i), connected);
 		}
 
 		// merge the two scenes now
 		var alg = new MetricMergeScenes();
-		assertTrue(alg.merge(db, src, dst));
+		assertTrue(alg.merge(dbSimilar, src, dst));
 
 		// See if 'dst' contains all the views now and that they are correctly scaled
 		assertEquals(10, dst.listViews.size());
-		for (int viewIdx = 0; viewIdx < db.views.size(); viewIdx++) {
-			Se3_F64 expected = db.views.get(viewIdx).world_to_view;
+		for (int viewIdx = 0; viewIdx < dbSimilar.views.size(); viewIdx++) {
+			Se3_F64 expected = dbSimilar.views.get(viewIdx).world_to_view;
 			SceneWorkingGraph.View wview = dst.lookupView("" + viewIdx);
 			assertTrue(SpecialEuclideanOps_F64.isIdentical(expected, wview.world_to_view, 1e-4, 1e-4));
 		}
@@ -105,10 +109,10 @@ public class TestMetricMergeScenes extends BoofStandardJUnit {
 	@Test void merge_NoCommon() {
 		var src = new SceneWorkingGraph();
 		var dst = new SceneWorkingGraph();
-		var db = new MockLookupSimilarImagesCircleAround();
+		var dbSimilar = new MockLookupSimilarImagesCircleAround();
 
 		var alg = new MetricMergeScenes();
-		assertFalse(alg.merge(db, src, dst));
+		assertFalse(alg.merge(dbSimilar, src, dst));
 	}
 
 	@Test void removeBadFeatures() {
@@ -235,6 +239,15 @@ public class TestMetricMergeScenes extends BoofStandardJUnit {
 
 		alg.mergeWorkIntoDst(dst);
 
+		// Compare the cameras. There is one common camera and the 'dst' values should not be modified
+		assertEquals(1, dst.listCameras.size);
+		assertEquals(1, dst.cameras.size());
+		for (int i = 0; i < src.listCameras.size; i++) {
+			SceneWorkingGraph.Camera cdst = dst.listCameras.get(i);
+			assertEquals(200, cdst.prior.width);
+			assertEquals(12, cdst.intrinsic.f);
+		}
+
 		// Makes sure the exact number of views are found
 		assertEquals(10, dst.listViews.size());
 		assertEquals(10, dst.views.size());
@@ -247,15 +260,15 @@ public class TestMetricMergeScenes extends BoofStandardJUnit {
 		// Makes sure the correct view info is contained in the results. 'dst' should be dominant
 		for (int i = 0; i < 10; i++) {
 			SceneWorkingGraph.View wview = dst.views.get(i + "");
+			SceneWorkingGraph.Camera camera = dst.getViewCamera(wview);
 
+			assertEquals(1, camera.indexDB);
 			if (i > 3) {
 				assertEquals(i*2 + 1, wview.world_to_view.T.x, UtilEjml.TEST_F64);
-				assertEquals(200, wview.priorCamera.width);
-				assertEquals(5, wview.intrinsic.f, UtilEjml.TEST_F64);
+				assertEquals(5, wview.viewIntrinsic.f, UtilEjml.TEST_F64);
 			} else {
 				assertEquals(i*2, wview.world_to_view.T.x, UtilEjml.TEST_F64);
-				assertEquals(400, wview.priorCamera.width);
-				assertEquals(10, wview.intrinsic.f, UtilEjml.TEST_F64);
+				assertEquals(10, wview.viewIntrinsic.f, UtilEjml.TEST_F64);
 			}
 
 			// In overlapping views there should be two inlier sets
@@ -268,15 +281,17 @@ public class TestMetricMergeScenes extends BoofStandardJUnit {
 		var src = new SceneWorkingGraph();
 		var dst = new SceneWorkingGraph();
 
+		var cameraDummy = new SceneWorkingGraph.Camera();
+
 		// Create two scenes with overlapping and non-overlapping views
 		for (int i = 0; i < 10; i++) {
 			var pview = new PairwiseImageGraph.View(i + "");
 
 			if (i < 8)
-				src.addView(pview);
+				src.addView(pview, cameraDummy);
 
 			if (i > 3)
-				dst.addView(pview);
+				dst.addView(pview, cameraDummy);
 		}
 
 		// Find common views
@@ -295,22 +310,27 @@ public class TestMetricMergeScenes extends BoofStandardJUnit {
 	 * Create two scenes with only some common and some overlapping views
 	 */
 	private void createTwoScenesWithSomeCommon( SceneWorkingGraph src, SceneWorkingGraph dst ) {
+		SceneWorkingGraph.Camera cameraSrc = src.addCamera(1);
+		cameraSrc.prior.fsetShape(400, 300);
+		cameraSrc.intrinsic.f = 11;
+		SceneWorkingGraph.Camera cameraDst = dst.addCamera(1);
+		cameraDst.prior.fsetShape(200, 0);
+		cameraDst.intrinsic.f = 12;
+
 		for (int i = 0; i < 10; i++) {
 			var pview = new PairwiseImageGraph.View(i + "");
 
 			if (i < 8) {
-				SceneWorkingGraph.View viewSrc = src.addView(pview);
+				SceneWorkingGraph.View viewSrc = src.addView(pview, cameraSrc);
 				viewSrc.world_to_view.T.x = i*2;
-				viewSrc.priorCamera.fsetShape(400, 300);
-				viewSrc.intrinsic.f = 10;
+				viewSrc.viewIntrinsic.f = 10;
 				viewSrc.inliers.grow().scoreGeometric = 10;
 			}
 
 			if (i > 3) {
-				SceneWorkingGraph.View viewDst = dst.addView(pview);
+				SceneWorkingGraph.View viewDst = dst.addView(pview, cameraDst);
 				viewDst.world_to_view.T.x = 1 + i*2;
-				viewDst.priorCamera.fsetShape(200, 0);
-				viewDst.intrinsic.f = 5;
+				viewDst.viewIntrinsic.f = 5;
 				viewDst.inliers.grow().scoreGeometric = 8;
 			}
 		}

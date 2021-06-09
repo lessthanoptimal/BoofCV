@@ -191,7 +191,7 @@ public class ExampleMultiViewSparseReconstruction {
 			int order = working.listViews.indexOf(wv);
 			ConvertRotation3D_F64.matrixToRodrigues(wv.world_to_view.R, rod);
 			System.out.printf("view[%2d]='%2s' f=%6.1f k1=%6.3f k2=%6.3f T={%5.1f,%5.1f,%5.1f} R=%4.2f\n",
-					order, wv.pview.id, wv.intrinsic.f, wv.intrinsic.k1, wv.intrinsic.k2,
+					order, wv.pview.id, wv.viewIntrinsic.f, wv.viewIntrinsic.k1, wv.viewIntrinsic.k2,
 					wv.world_to_view.T.x, wv.world_to_view.T.y, wv.world_to_view.T.z, rod.theta);
 		}
 		System.out.println("   Views used: " + scene.views.size + " / " + pairwise.nodes.size);

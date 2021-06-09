@@ -99,7 +99,7 @@ public class SelectNeighborsAroundView implements VerbosePrint {
 	/**
 	 * Computes a local graph with the view as a seed. Local graph can be accessed by calling {@link #getLocalWorking()}
 	 *
-	 * @param target (Input) The view that a local graph is to be built around
+	 * @param target (Input) The view in 'working' that a local graph is to be built around
 	 * @param working (Input) A graph of the entire scene that a sub graph is to be made from
 	 */
 	public void process( View target, SceneWorkingGraph working ) {
@@ -122,7 +122,7 @@ public class SelectNeighborsAroundView implements VerbosePrint {
 	}
 
 	/**
-	 * Adds target's neighbors and their neighbors
+	 * Adds target view's neighbors and their neighbors to the list of candidate views
 	 */
 	void addNeighbors2( View seed, SceneWorkingGraph working ) {
 		// put the target into the lookup list to avoid double counting. Target isn't a candidate since it's mandatory
@@ -362,9 +362,9 @@ public class SelectNeighborsAroundView implements VerbosePrint {
 	 */
 	void createLocalGraph( View seed, SceneWorkingGraph working ) {
 		hasFeatures.clear();
-		addViewToLocal(seed);
+		addViewToLocal(working, seed);
 		for (int i = 0; i < candidates.size(); i++) {
-			addViewToLocal(candidates.get(i));
+			addViewToLocal(working, candidates.get(i));
 		}
 		// For views with no features look at its neighbors to see if it's an inlier then add those
 		for (int i = 0; i < candidates.size(); i++) {
@@ -418,14 +418,21 @@ public class SelectNeighborsAroundView implements VerbosePrint {
 	 *
 	 * @param origView View in the original graph that was passed in
 	 */
-	void addViewToLocal( View origView ) {
+	void addViewToLocal( SceneWorkingGraph origScene, View origView ) {
+
+		// Add the camera it references if it has not already been added
+		SceneWorkingGraph.Camera origCamera = origScene.getViewCamera(origView);
+		SceneWorkingGraph.Camera localCamera = localWorking.cameras.get(origCamera.indexDB);
+		if (localCamera == null) {
+			localCamera = localWorking.addCameraCopy(origCamera);
+		}
+
 		// Create the local node
-		View localView = localWorking.addView(origView.pview);
+		View localView = localWorking.addView(origView.pview, localCamera);
 
 		// copy geometric information over
-		localView.intrinsic.setTo(origView.intrinsic);
+		localView.viewIntrinsic.setTo(origView.viewIntrinsic);
 		localView.world_to_view.setTo(origView.world_to_view);
-		localView.priorCamera.setTo(origView.priorCamera);
 
 		for (int infoIdx = 0; infoIdx < origView.inliers.size; infoIdx++) {
 			SceneWorkingGraph.InlierInfo origInliers = origView.inliers.get(infoIdx);

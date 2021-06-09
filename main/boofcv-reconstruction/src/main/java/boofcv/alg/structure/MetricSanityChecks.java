@@ -40,6 +40,7 @@ import org.jetbrains.annotations.Nullable;
 import java.io.PrintStream;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.Set;
 
 /**
@@ -105,7 +106,7 @@ public class MetricSanityChecks implements VerbosePrint {
 
 		for (int i = 0; i < inliers.views.size; i++) {
 			SceneWorkingGraph.View w = scene.lookupView(inliers.views.get(i).id);
-			if (w.intrinsic.f <= 0.0) {
+			if (w.viewIntrinsic.f <= 0.0) {
 				if (verbose != null) verbose.println("Negative focal length. view='" + w.pview.id + "'");
 				return false;
 			}
@@ -115,15 +116,16 @@ public class MetricSanityChecks implements VerbosePrint {
 			// TODO switch to known camera if available
 
 			var normalize = new RemoveBrownPtoN_F64();
-			normalize.setK(w.intrinsic.f, w.intrinsic.f, 0, 0, 0).setDistortion(w.intrinsic.k1, w.intrinsic.k2);
+			normalize.setK(w.viewIntrinsic.f, w.viewIntrinsic.f, 0, 0, 0).setDistortion(w.viewIntrinsic.k1, w.viewIntrinsic.k2);
 			listNormalize.add(normalize);
 
 			listMotion.add(view1_to_world.concat(w.world_to_view, null));
 
+			SceneWorkingGraph.Camera wcamera = scene.getViewCamera(w);
 			var features = new DogArray<>(Point2D_F64::new);
 			dbSimilar.lookupPixelFeats(w.pview.id, features);
-			double cx = w.priorCamera.cx;
-			double cy = w.priorCamera.cy;
+			double cx = wcamera.prior.cx;
+			double cy = wcamera.prior.cy;
 			features.forEach(p -> p.setTo(p.x - cx, p.y - cy));
 			listFeatures.add(features);
 		}
@@ -160,17 +162,18 @@ public class MetricSanityChecks implements VerbosePrint {
 				}
 
 				SePointOps_F64.transform(view1_to_view, foundX, viewX);
-				wview.intrinsic.project(viewX.x, viewX.y, viewX.z, predictdPixel);
+				wview.viewIntrinsic.project(viewX.x, viewX.y, viewX.z, predictdPixel);
 				double reprojectionError = predictdPixel.distance2(listViewPixels.get(viewIdx));
 				if (reprojectionError > maxReprojectionErrorSq) {
 					badObservation = true;
 					failedReprojection++;
 				}
 
-				int width = w.priorCamera.width;
-				int height = w.priorCamera.height;
-				double cx = w.priorCamera.cx;
-				double cy = w.priorCamera.cy;
+				SceneWorkingGraph.Camera wcamera = scene.getViewCamera(w);
+				int width = wcamera.prior.width;
+				int height = wcamera.prior.height;
+				double cx = wcamera.prior.cx;
+				double cy = wcamera.prior.cy;
 				if (!BoofMiscOps.isInside(width, height, predictdPixel.x + cx, predictdPixel.y + cy)) {
 					badObservation = true;
 					failedImageBounds++;
@@ -204,6 +207,8 @@ public class MetricSanityChecks implements VerbosePrint {
 	public boolean checkPhysicalConstraints( SceneStructureMetric structure,
 											 SceneObservations observations,
 											 List<CameraPinholeBrown> listPriors ) {
+		BoofMiscOps.checkEq(listPriors.size(), structure.views.size);
+
 		for (int i = 0; i < structure.cameras.size; i++) {
 			BundlePinholeSimplified pinhole = (BundlePinholeSimplified)structure.cameras.get(i).model;
 			if (pinhole.f < 0.0f) {
@@ -220,6 +225,9 @@ public class MetricSanityChecks implements VerbosePrint {
 		var predictdPixel = new Point2D_F64();
 
 		for (int viewIdx = 0; viewIdx < observations.views.size; viewIdx++) {
+			int cameraIdx = structure.views.get(viewIdx).camera;
+			BundlePinholeSimplified pinhole = (BundlePinholeSimplified)
+					Objects.requireNonNull(structure.cameras.get(cameraIdx).model);
 			CameraPinholeBrown priorCamera = listPriors.get(viewIdx);
 			int width = priorCamera.width;
 			int height = priorCamera.height;
@@ -258,7 +266,7 @@ public class MetricSanityChecks implements VerbosePrint {
 					failedBehind++;
 				}
 
-				structure.cameras.get(viewIdx).model.project(viewP.x, viewP.y, viewP.z, predictdPixel);
+				pinhole.project(viewP.x, viewP.y, viewP.z, predictdPixel);
 
 				double reprojectionError = predictdPixel.distance2(observedPixel);
 				if (reprojectionError > maxReprojectionErrorSq) {

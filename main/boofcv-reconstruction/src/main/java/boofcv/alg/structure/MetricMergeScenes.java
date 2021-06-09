@@ -82,6 +82,9 @@ public class MetricMergeScenes implements VerbosePrint {
 	// Look up table indicating which views in 'scene' are not to be modified when refining
 	DogArray_B knownViews = new DogArray_B();
 
+	// Look up table indicating which cameras in 'scene' are not to be modified when refining
+	DogArray_B knownCameras = new DogArray_B();
+
 	// Local workspace
 	Se3_F64 src_to_view = new Se3_F64();
 	Se3_F64 transform_dst_to_src = new Se3_F64();
@@ -96,12 +99,12 @@ public class MetricMergeScenes implements VerbosePrint {
 	/**
 	 * Merges the 'src' scene into 'dst'. Both scenes are only modified if true is returned.
 	 *
-	 * @param db Contains image related information
+	 * @param dbSimilar Contains image related information
 	 * @param src The scene being merged into 'dst'
 	 * @param dst Where the combined scene will be stored. This is assumed to be the 'more correct' scene
 	 * @return true if src was merged into dst or false if it failed and nothing has been modified
 	 */
-	public boolean merge( LookUpSimilarImages db, SceneWorkingGraph src, SceneWorkingGraph dst ) {
+	public boolean merge( LookUpSimilarImages dbSimilar, SceneWorkingGraph src, SceneWorkingGraph dst ) {
 		// Find the common views
 		findCommonViews(src, dst, commonViews, verbose);
 		if (commonViews.isEmpty())
@@ -112,7 +115,7 @@ public class MetricMergeScenes implements VerbosePrint {
 
 		// Compute the coordinate transform between the scenes using the "best" pair of views
 		CommonView best = commonViews.getTail();
-		if (!mergingOps.computeSceneTransform(db, src, dst, best.src, best.dst, src_to_dst))
+		if (!mergingOps.computeSceneTransform(dbSimilar, src, dst, best.src, best.dst, src_to_dst))
 			return false;
 		src_to_dst.transform.invert(transform_dst_to_src);
 
@@ -120,9 +123,11 @@ public class MetricMergeScenes implements VerbosePrint {
 		createWorkScene(src, dst);
 
 		// Refine the working scene. This will help mend the differences between the two scenes
-		if (!refiner.process(db, workScene, utils -> {
+		if (!refiner.process(dbSimilar, workScene, utils -> {
+			for (int i = 0; i < knownCameras.size; i++) {
+				utils.structure.cameras.get(i).known = knownCameras.get(i);
+			}
 			for (int i = 0; i < knownViews.size; i++) {
-				utils.structure.cameras.get(i).known = knownViews.get(i);
 				utils.structure.motions.get(i).known = knownViews.get(i);
 			}
 		})) {
@@ -132,7 +137,7 @@ public class MetricMergeScenes implements VerbosePrint {
 
 		// Examine all the common views to see if the physical constraints in 'src' inlier sets are still valid
 		// If they are, fix minor errors, then the merge is considered to be successful
-		if (!verifyAndFixConstraints(db))
+		if (!verifyAndFixConstraints(dbSimilar))
 			return false;
 
 		// Print the state of views which are not common so you can see how much they have changed.
@@ -143,7 +148,7 @@ public class MetricMergeScenes implements VerbosePrint {
 					continue;
 
 				verbose.printf("After id='%s' src={ f=%.1f k1=%.1e k2=%.1e }\n",
-						wview.pview.id, wview.intrinsic.f, wview.intrinsic.k1, wview.intrinsic.k2);
+						wview.pview.id, wview.viewIntrinsic.f, wview.viewIntrinsic.k1, wview.viewIntrinsic.k2);
 			}
 		}
 
@@ -227,8 +232,12 @@ public class MetricMergeScenes implements VerbosePrint {
 
 		// Local copy of the 'src' scene
 		workScene.setTo(src);
-		// All views that are in 'src' will be modified
+		// All views and cameras that are in 'src' will be modified
 		knownViews.resetResize(workScene.listViews.size(), false);
+		knownCameras.resetResize(workScene.listCameras.size(), false);
+
+		// Copy cameras from 'dst' into the workScene
+		copyDstCamerasIntoWork(dst);
 
 		// Change the scene's coordinate system and scale factor to match 'dst'
 		for (int i = 0; i < workScene.listViews.size(); i++) {
@@ -243,7 +252,7 @@ public class MetricMergeScenes implements VerbosePrint {
 
 			// Force the common views to match 'dst'
 			wview.world_to_view.setTo(viewDst.world_to_view);
-			wview.intrinsic.setTo(viewDst.intrinsic);
+			wview.viewIntrinsic.setTo(viewDst.viewIntrinsic);
 
 			// Add inliers from 'dst'
 			DogArray<SceneWorkingGraph.InlierInfo> inliersDst = commonViews.get(i).dst.inliers;
@@ -260,6 +269,26 @@ public class MetricMergeScenes implements VerbosePrint {
 	}
 
 	/**
+	 * If 'dst' has the same camera use its state instead since 'dst' is the dominant scene
+	 */
+	void copyDstCamerasIntoWork( SceneWorkingGraph dst ) {
+		for (int srcCameraIdx = 0; srcCameraIdx < workScene.listCameras.size; srcCameraIdx++) {
+			SceneWorkingGraph.Camera wrkCamera = workScene.listCameras.get(srcCameraIdx);
+			SceneWorkingGraph.Camera dstCamera = dst.cameras.get(wrkCamera.indexDB);
+
+			if (dstCamera == null)
+				continue;
+
+			// If there is a dst camera use that state of that one
+			wrkCamera.intrinsic.setTo(dstCamera.intrinsic);
+			wrkCamera.prior.setTo(dstCamera.prior);
+
+			// Mark cameras that are in 'dst' as known so that their state doesn't get messed up
+			knownCameras.set(srcCameraIdx, true);
+		}
+	}
+
+	/**
 	 * Copies views from 'workScene' scene into 'dst' that are not in 'dst'. If a view is already in 'dst' then
 	 * only the inlier set in 'workScene' is copied. 'dst' is considered to be the dominant scene which is why we
 	 * don't want to modify the state of common views.
@@ -270,6 +299,14 @@ public class MetricMergeScenes implements VerbosePrint {
 		for (int viewIdx = 0; viewIdx < workScene.listViews.size(); viewIdx++) {
 			SceneWorkingGraph.View viewSrc = workScene.listViews.get(viewIdx);
 			SceneWorkingGraph.View viewDst = dst.views.get(viewSrc.pview.id);
+
+			// If the camera does not exist in 'dst' already add a copy of the 'src' camera in to it
+			SceneWorkingGraph.Camera cameraSrc = workScene.getViewCamera(viewSrc);
+			SceneWorkingGraph.Camera cameraDst = dst.cameras.get(cameraSrc.indexDB);
+			if (cameraDst == null) {
+				cameraDst = dst.addCameraCopy(cameraSrc);
+			}
+
 			if (viewDst != null) {
 				// just need to copy the inliers over from src. 'dst' inliers are at the end
 				int end = viewSrc.inliers.size - viewDst.inliers.size;
@@ -277,7 +314,7 @@ public class MetricMergeScenes implements VerbosePrint {
 					viewDst.inliers.grow().setTo(viewSrc.inliers.get(inlierIdx));
 				}
 			} else {
-				viewDst = dst.addView(viewSrc.pview);
+				viewDst = dst.addView(viewSrc.pview, cameraDst);
 				viewDst.setTo(viewSrc);
 				viewDst.index = dst.listViews.size() - 1; // setTo() overwrote the index
 			}
@@ -319,10 +356,17 @@ public class MetricMergeScenes implements VerbosePrint {
 	 */
 	private void copyIntoSceneJustState( SceneWorkingGraph origScene, boolean markAsKnown, PairwiseImageGraph.View pview ) {
 		SceneWorkingGraph.View origView = origScene.views.get(pview.id);
-		SceneWorkingGraph.View copyView = workScene.addView(pview);
-		copyView.priorCamera.setTo(origView.priorCamera);
+
+		SceneWorkingGraph.Camera origCamera = origScene.getViewCamera(origView);
+		SceneWorkingGraph.Camera copyCamera = workScene.cameras.get(origCamera.indexDB);
+		if (copyCamera == null) {
+			copyCamera = workScene.addCameraCopy(origCamera);
+			knownCameras.add(markAsKnown);
+		}
+
+		SceneWorkingGraph.View copyView = workScene.addView(pview, copyCamera);
 		copyView.world_to_view.setTo(origView.world_to_view);
-		copyView.intrinsic.setTo(origView.intrinsic);
+		copyView.viewIntrinsic.setTo(origView.viewIntrinsic);
 		knownViews.add(markAsKnown);
 	}
 
@@ -342,7 +386,7 @@ public class MetricMergeScenes implements VerbosePrint {
 			if (dstView == null) {
 				if (verbose != null) {
 					verbose.printf("id='%s' src={ f=%.1f k1=%.1e k2=%.1e }\n",
-							srcView.pview.id, srcView.intrinsic.f, srcView.intrinsic.k1, srcView.intrinsic.k2);
+							srcView.pview.id, srcView.viewIntrinsic.f, srcView.viewIntrinsic.k1, srcView.viewIntrinsic.k2);
 				}
 				continue;
 			}
@@ -354,8 +398,8 @@ public class MetricMergeScenes implements VerbosePrint {
 			if (verbose != null) {
 				verbose.printf("id='%s' src={ f=%.1f k1=%.1e k2=%.1e } dst={ f=%.1f k1=%.1e k2=%.1e }\n",
 						srcView.pview.id,
-						srcView.intrinsic.f, srcView.intrinsic.k1, srcView.intrinsic.k2,
-						dstView.intrinsic.f, dstView.intrinsic.k1, dstView.intrinsic.k2);
+						srcView.viewIntrinsic.f, srcView.viewIntrinsic.k1, srcView.viewIntrinsic.k2,
+						dstView.viewIntrinsic.f, dstView.viewIntrinsic.k1, dstView.viewIntrinsic.k2);
 			}
 		}
 
