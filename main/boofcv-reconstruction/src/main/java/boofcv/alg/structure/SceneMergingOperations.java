@@ -268,6 +268,16 @@ public class SceneMergingOperations implements VerbosePrint {
 	 */
 	void mergeStructure( SceneWorkingGraph src, SceneWorkingGraph dst, ScaleSe3_F64 src_to_dst,
 						 PairwiseViewScenes scenesInEachView ) {
+
+		// Copy cameras from 'src' to 'dst' if they don't exist in dst
+		for (int cameraSrcIdx = 0; cameraSrcIdx < src.listCameras.size; cameraSrcIdx++) {
+			SceneWorkingGraph.Camera cameraSrc = src.listCameras.get(cameraSrcIdx);
+			SceneWorkingGraph.Camera cameraDst = dst.cameras.get(cameraSrc.indexDB);
+			if (cameraDst != null)
+				continue;
+			dst.addCameraCopy(cameraSrc);
+		}
+
 		mergedViews.clear();
 		duplicateViews.clear();
 		Se3_F64 src_to_view = new Se3_F64();
@@ -289,7 +299,7 @@ public class SceneMergingOperations implements VerbosePrint {
 					verbose.printf("view='%s', sets={%d %d}, scores: %.1f vs %.1f, src.f=%.1f dst.f=%.1f\n",
 							srcView.pview.id, srcView.inliers.size, dstView.inliers.size,
 							srcView.getBestInlierScore(), dstView.getBestInlierScore(),
-							srcView.intrinsic.f, dstView.intrinsic.f);
+							srcView.viewIntrinsic.f, dstView.viewIntrinsic.f);
 				}
 			} else {
 				// Need to add the dst to the list of scenes which contains this view. Do not mess with the counters
@@ -301,12 +311,14 @@ public class SceneMergingOperations implements VerbosePrint {
 				// NOTE: This sorted insert could be speed up
 
 				// Create a new view in the dst scene
-				dstView = dst.addView(srcView.pview);
+				SceneWorkingGraph.Camera cameraSrc = src.getViewCamera(srcView);
+				SceneWorkingGraph.Camera cameraDst = dst.cameras.get(cameraSrc.indexDB);
+				dstView = dst.addView(srcView.pview, cameraDst);
 				copySrc = true;
 
 				if (verbose != null) {
 					verbose.printf("view='%s', sets=%d, score: %.1f, src.f=%.1f\n",
-							srcView.pview.id, srcView.inliers.size, srcView.getBestInlierScore(), srcView.intrinsic.f);
+							srcView.pview.id, srcView.inliers.size, srcView.getBestInlierScore(), srcView.viewIntrinsic.f);
 				}
 			}
 			mergedViews.add(dstView);
@@ -323,8 +335,7 @@ public class SceneMergingOperations implements VerbosePrint {
 				continue;
 
 			// Copy information from src to dst while updating the extrinsic info
-			dstView.priorCamera.setTo(srcView.priorCamera);
-			dstView.intrinsic.setTo(srcView.intrinsic);
+			dstView.viewIntrinsic.setTo(srcView.viewIntrinsic);
 
 			src_to_view.setTo(srcView.world_to_view);
 			src_to_view.T.scale(src_to_dst.scale);
@@ -363,7 +374,8 @@ public class SceneMergingOperations implements VerbosePrint {
 			return false;
 
 		// Load observation of common features in view[0]
-		loadViewZeroCommonObservations(dbSimilar, selectedSrc.priorCamera, numCommon, selectedSrc.pview.id);
+		SceneWorkingGraph.Camera cameraSrc = src.getViewCamera(selectedSrc);
+		loadViewZeroCommonObservations(dbSimilar, cameraSrc.prior, numCommon, selectedSrc.pview.id);
 
 		List<DogArray<Point2D_F64>> listViewPixelsSrc = getCommonFeaturePixelsViews(dbSimilar, src, inliersSrc);
 		List<DogArray<Point2D_F64>> listViewPixelsDst = getCommonFeaturePixelsViews(dbSimilar, dst, inliersDst);
@@ -469,7 +481,7 @@ public class SceneMergingOperations implements VerbosePrint {
 		for (int viewIdx = 0; viewIdx < inliers.views.size; viewIdx++) {
 			PairwiseImageGraph.View pview = inliers.views.get(viewIdx);
 			SceneWorkingGraph.View wview = scene.views.get(pview.id);
-			BundlePinholeSimplified cam = wview.intrinsic;
+			BundlePinholeSimplified cam = wview.viewIntrinsic;
 
 			// Save the view's pose
 			listWorldToViewSrc.add(wview.world_to_view);
@@ -513,7 +525,9 @@ public class SceneMergingOperations implements VerbosePrint {
 			viewPixels.resize(zeroViewPixels.size);
 
 			// camera model assumes pixels have been recentered
-			CameraPinholeBrown cameraPrior = workingGraph.views.get(inliers.views.get(viewIdx).id).priorCamera;
+			SceneWorkingGraph.View wview = workingGraph.views.get(inliers.views.get(viewIdx).id);
+			SceneWorkingGraph.Camera camera = workingGraph.getViewCamera(wview);
+			CameraPinholeBrown cameraPrior = camera.prior;
 
 			// Add the inlier pixels from this view to the array in the correct order
 			for (int idx = 0; idx < inlierIdx.size; idx++) {

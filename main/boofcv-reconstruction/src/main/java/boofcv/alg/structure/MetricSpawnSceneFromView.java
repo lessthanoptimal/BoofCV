@@ -115,8 +115,8 @@ public class MetricSpawnSceneFromView implements VerbosePrint {
 
 		// Find the common features
 		utils.findAllConnectedSeed(seed, motions, commonPairwise);
-		if (commonPairwise.size < 6) {// if less than the minimum it will fail
-			if (verbose != null) verbose.println("FAILED: Too few common features. seed.id=" + seed.id);
+		if (commonPairwise.size < 6) { // if less than the minimum it will fail
+			if (verbose != null) verbose.println("FAILED: Too few common features. seed.id='" + seed.id + "'");
 			return false;
 		}
 
@@ -138,17 +138,18 @@ public class MetricSpawnSceneFromView implements VerbosePrint {
 	/**
 	 * Performs non-linear refinement while attempting to remove outliers
 	 */
-	private boolean refineAndRemoveBadFeatures( LookUpSimilarImages db, PairwiseImageGraph.View seed ) {
+	private boolean refineAndRemoveBadFeatures( LookUpSimilarImages dbSimilar, PairwiseImageGraph.View seed ) {
 		// Sanity check results against physical constraints
 		listPriorCameras.clear();
 		for (int i = 0; i < scene.listViews.size(); i++) {
-			listPriorCameras.add(scene.listViews.get(i).priorCamera);
+			SceneWorkingGraph.Camera camera = scene.getViewCamera(scene.listViews.get(i));
+			listPriorCameras.add(camera.prior);
 		}
 
 		// Try two passes before giving up
 		for (int loop = 0; loop < 2; loop++) {
 			// Refine initial estimate
-			if (!refineWorking.process(db, scene)) {
+			if (!refineWorking.process(dbSimilar, scene)) {
 				if (verbose != null) verbose.println("FAILED: Refine metric. seed.id='" + seed.id + "'");
 				return false;
 			}
@@ -198,8 +199,8 @@ public class MetricSpawnSceneFromView implements VerbosePrint {
 			// Settings lens distortion back to zero since outliers can drive it to extremes that are hard to recover from
 			for (int viewIdx = 0; viewIdx < scene.listViews.size(); viewIdx++) {
 				SceneWorkingGraph.View v = scene.listViews.get(viewIdx);
-				v.intrinsic.k1 = 0.0;
-				v.intrinsic.k2 = 0.0;
+				v.viewIntrinsic.k1 = 0.0;
+				v.viewIntrinsic.k2 = 0.0;
 			}
 			// NOTE: Setting extrinsic and intrinsic back to original state before SBA is worth investigating
 		}
@@ -245,11 +246,22 @@ public class MetricSpawnSceneFromView implements VerbosePrint {
 		// Save the metric views
 		for (int i = 0; i < viewIds.size(); i++) {
 			PairwiseImageGraph.View pview = graph.lookupNode(viewIds.get(i));
-			SceneWorkingGraph.View wview = scene.addView(pview);
+
+			// See if a camera needs to be created for this view or if one already exists
+			int cameraDbIdx = utils.dbCams.viewToCamera(pview.id);
+			SceneWorkingGraph.Camera camera = scene.cameras.get(cameraDbIdx);
+			if (camera == null) {
+				camera = scene.addCamera(cameraDbIdx);
+				utils.dbCams.lookupCalibration(cameraDbIdx, camera.prior);
+				BundleAdjustmentOps.convert(results.intrinsics.get(i), camera.intrinsic);
+			}
+
+			// Save the extrinsics for this view
+			SceneWorkingGraph.View wview = scene.addView(pview, camera);
+			BundleAdjustmentOps.convert(results.intrinsics.get(i), wview.viewIntrinsic);
+
 			if (i > 0)
 				wview.world_to_view.setTo(results.motion_1_to_k.get(i - 1));
-			BundleAdjustmentOps.convert(results.intrinsics.get(i), wview.intrinsic);
-			utils.dbCams.lookupCalibration(wview.pview.id, wview.priorCamera);
 		}
 
 		// Create the inlier set for each view, but adjust it so that the target view is view[0] in the set

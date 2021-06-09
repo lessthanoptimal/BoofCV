@@ -204,8 +204,19 @@ class TestMultiViewIO extends BoofStandardJUnit {
 	}
 
 	private void checkIdentical( SceneWorkingGraph a, SceneWorkingGraph b ) {
+		assertEquals(a.listCameras.size(), b.listCameras.size());
 		assertEquals(a.listViews.size(), b.listViews.size());
 		assertEquals(a.views.size(), b.views.size());
+
+		for (int cameraIdx = 0; cameraIdx < a.listCameras.size(); cameraIdx++) {
+			SceneWorkingGraph.Camera ca = a.listCameras.get(cameraIdx);
+			SceneWorkingGraph.Camera cb = b.listCameras.get(cameraIdx);
+
+			assertEquals(ca.indexDB, cb.indexDB);
+			assertEquals(ca.localIndex, cb.localIndex);
+			assertEquals(ca.prior.fx, cb.prior.fx);
+			assertEquals(ca.intrinsic.f, cb.intrinsic.f);
+		}
 
 		for (int viewIdx = 0; viewIdx < a.listViews.size(); viewIdx++) {
 			SceneWorkingGraph.View va = a.listViews.get(viewIdx);
@@ -214,15 +225,12 @@ class TestMultiViewIO extends BoofStandardJUnit {
 			assertSame(va, a.views.get(va.pview.id));
 			assertSame(vb, b.views.get(vb.pview.id));
 
-			assertEquals(va.intrinsic.f, vb.intrinsic.f);
-			assertEquals(va.intrinsic.k1, vb.intrinsic.k1);
-			assertEquals(va.intrinsic.k2, vb.intrinsic.k2);
+			assertEquals(va.viewIntrinsic.f, vb.viewIntrinsic.f);
+			assertEquals(va.viewIntrinsic.k1, vb.viewIntrinsic.k1);
+			assertEquals(va.viewIntrinsic.k2, vb.viewIntrinsic.k2);
 
 			assertEquals(0.0, va.world_to_view.T.distance(vb.world_to_view.T), UtilEjml.EPS);
 			assertTrue(MatrixFeatures_DDRM.isEquals(va.world_to_view.R, vb.world_to_view.R, UtilEjml.EPS));
-
-			assertEquals(va.priorCamera.width, vb.priorCamera.width);
-			assertEquals(va.priorCamera.height, vb.priorCamera.height);
 
 			assertEquals(va.inliers.size, vb.inliers.size);
 			for (int inlierInfo = 0; inlierInfo < va.inliers.size; inlierInfo++) {
@@ -247,21 +255,28 @@ class TestMultiViewIO extends BoofStandardJUnit {
 	private SceneWorkingGraph createWorkingGraph( PairwiseImageGraph pairwise ) {
 		var ret = new SceneWorkingGraph();
 
-		pairwise.nodes.forIdx(( i, v ) -> ret.addView(v));
+		// Add a camera for each view
+		for (int cameraIdx = 0; cameraIdx < pairwise.nodes.size; cameraIdx++) {
+			SceneWorkingGraph.Camera c = ret.addCamera(cameraIdx);
+			c.intrinsic.f = rand.nextDouble();
+			c.intrinsic.k1 = rand.nextDouble();
+			c.intrinsic.k2 = rand.nextDouble();
+
+			c.prior.fx = rand.nextDouble();
+		}
+
+		pairwise.nodes.forIdx(( i, v ) -> ret.addView(v, ret.listCameras.get(i)));
 
 		var candidates = DogArray_I32.range(0, pairwise.nodes.size);
 
 		ret.listViews.forEach(v -> {
-			v.intrinsic.f = rand.nextDouble();
-			v.intrinsic.k1 = rand.nextDouble();
-			v.intrinsic.k2 = rand.nextDouble();
+			v.viewIntrinsic.f = rand.nextDouble();
+			v.viewIntrinsic.k1 = rand.nextDouble();
+			v.viewIntrinsic.k2 = rand.nextDouble();
 
 			SpecialEuclideanOps_F64.eulerXyz(
 					rand.nextDouble(), rand.nextDouble(), rand.nextDouble(),
 					rand.nextDouble(), rand.nextDouble(), rand.nextDouble(), v.world_to_view);
-
-			v.priorCamera.width = rand.nextInt();
-			v.priorCamera.height = rand.nextInt();
 
 			RandomMatrices_DDRM.fillUniform(v.projective, rand);
 

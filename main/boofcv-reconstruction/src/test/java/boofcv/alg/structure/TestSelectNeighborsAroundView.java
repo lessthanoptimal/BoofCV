@@ -34,10 +34,8 @@ public class TestSelectNeighborsAroundView extends BoofStandardJUnit {
 	 * Test everything all at once. This just checks (crudely) to see if it's a valid sub graph and doesn't check
 	 * to see if it's a good sub graph
 	 */
-	@Test
-	void process() {
-		var db = new MockLookupSimilarImagesRealistic().setFeatures(50).
-				pathLine(15, 0.1, 1.5, 2);
+	@Test void process() {
+		var db = new MockLookupSimilarImagesRealistic().setFeatures(50).pathLine(15, 0.1, 1.5, 2);
 
 		PairwiseImageGraph pairwise = db.createPairwise();
 		SceneWorkingGraph working = db.createWorkingGraph(pairwise);
@@ -81,8 +79,7 @@ public class TestSelectNeighborsAroundView extends BoofStandardJUnit {
 	/**
 	 * See if the situation where there is no work view for a pairwise view is handled
 	 */
-	@Test
-	void process_NullWorkViews() {
+	@Test void process_NullWorkViews() {
 		var db = new MockLookupSimilarImagesRealistic().setFeatures(50).
 				pathLine(15, 0.1, 1.5, 2);
 
@@ -102,8 +99,7 @@ public class TestSelectNeighborsAroundView extends BoofStandardJUnit {
 		alg.process(seed, working);
 	}
 
-	@Test
-	void addNeighbors2() {
+	@Test void addNeighbors2() {
 		var db = new MockLookupSimilarImagesRealistic().setFeatures(50).
 				pathLine(15, 0.1, 1.5, 2);
 
@@ -138,8 +134,7 @@ public class TestSelectNeighborsAroundView extends BoofStandardJUnit {
 		}
 	}
 
-	@Test
-	void pruneViews() {
+	@Test void pruneViews() {
 		var db = new MockLookupSimilarImagesRealistic().setFeatures(50).
 				pathLine(15, 0.1, 1.5, 2);
 
@@ -201,8 +196,7 @@ public class TestSelectNeighborsAroundView extends BoofStandardJUnit {
 		}
 	}
 
-	@Test
-	void scoreForRemoval() {
+	@Test void scoreForRemoval() {
 		var alg = new SelectNeighborsAroundView();
 		// It will return the score of the second best
 		alg.worstOfTop = 2;
@@ -242,8 +236,7 @@ public class TestSelectNeighborsAroundView extends BoofStandardJUnit {
 		workView.pview.connections.add(m);
 	}
 
-	@Test
-	void removeCandidateNode() {
+	@Test void removeCandidateNode() {
 		var db = new MockLookupSimilarImagesRealistic().setFeatures(50).
 				pathLine(15, 0.1, 1.5, 2);
 
@@ -274,8 +267,7 @@ public class TestSelectNeighborsAroundView extends BoofStandardJUnit {
 		assertEquals(5, alg.lookup.size());
 	}
 
-	@Test
-	void isOrphan() {
+	@Test void isOrphan() {
 		var db = new MockLookupSimilarImagesRealistic().setFeatures(50).
 				pathLine(15, 0.1, 1.5, 2);
 
@@ -299,18 +291,15 @@ public class TestSelectNeighborsAroundView extends BoofStandardJUnit {
 		assertFalse(alg.isOrphan(v1));
 	}
 
-	@Test
-	void createLocalGraph() {
+	@Test void createLocalGraph() {
 		var db = new MockLookupSimilarImagesRealistic().setFeatures(50).
 				pathLine(15, 0.1, 1.5, 2);
 
 		PairwiseImageGraph pairwise = db.createPairwise();
 		SceneWorkingGraph working = db.createWorkingGraph(pairwise);
 		// Fill in arbitrary values for everything that has not already been filled in and will be checked
-		BoofMiscOps.forIdx(working.listViews, ( i, v ) -> {
-			v.intrinsic.f = 100 + i;
-			v.priorCamera.width = 97 + i;
-		});
+		working.listCameras.forIdx(( idx, c ) -> c.prior.width = 97 + idx);
+		BoofMiscOps.forIdx(working.listViews, ( i, v ) -> v.viewIntrinsic.f = 100 + i);
 
 		SceneWorkingGraph.View seed = working.listViews.get(6);
 
@@ -337,14 +326,21 @@ public class TestSelectNeighborsAroundView extends BoofStandardJUnit {
 		// examine the results
 		SceneWorkingGraph localGraph = alg.localWorking;
 		assertEquals(alg.candidates.size() + 1, localGraph.listViews.size());
+
+		assertEquals(localGraph.cameras.size(), working.cameras.size());
+		for (int i = 0; i < working.listCameras.size; i++) {
+			SceneWorkingGraph.Camera c = working.listCameras.get(i);
+			SceneWorkingGraph.Camera lc = localGraph.cameras.get(c.indexDB);
+			assertEquals(lc.prior.width, c.prior.width);
+		}
+
 		for (int i = 2; i <= 10; i++) {
 			SceneWorkingGraph.View v = working.listViews.get(i);
 			SceneWorkingGraph.View lv = localGraph.views.get(v.pview.id);
 			assertNotNull(lv);
 
-			assertEquals(lv.intrinsic.f, v.intrinsic.f);
+			assertEquals(lv.viewIntrinsic.f, v.viewIntrinsic.f);
 			assertEquals(lv.world_to_view.T.x, v.world_to_view.T.x);
-			assertEquals(lv.priorCamera.width, v.priorCamera.width);
 
 			if (i == 6) {
 				assertEquals(8, lv.inliers.get(0).views.size);

@@ -119,24 +119,23 @@ public class RefineMetricWorkingGraph implements VerbosePrint {
 	/**
 	 * Use the `graph` to define a 3D scene which can be optimized.
 	 *
-	 * @param db (Input) Used to lookup common features between views.
+	 * @param dbSimilar (Input) Used to lookup common features between views.
 	 * @param graph (Input, Output) Describes scene and provides initial estimate for parameters. Updated with refined
 	 * parameters on output.
 	 */
-	public boolean process( LookUpSimilarImages db, SceneWorkingGraph graph ) {
-		return process(db, graph, ( utils ) -> {});
+	public boolean process( LookUpSimilarImages dbSimilar, SceneWorkingGraph graph ) {
+		return process(dbSimilar, graph, ( utils ) -> {});
 	}
 
 	/**
 	 * Use the `graph` to define a 3D scene which can be optimized.
 	 *
-	 * @param db (Input) Used to lookup common features between views.
+	 * @param dbSimilar (Input) Used to lookup common features between views.
 	 * @param graph (Input, Output) Describes scene and provides initial estimate for parameters. Updated with refined
 	 * parameters on output.
 	 */
-	public boolean process( LookUpSimilarImages db, SceneWorkingGraph graph,
-							CallBeforeRefine op ) {
-		if (!constructBundleScene(db, graph))
+	public boolean process( LookUpSimilarImages dbSimilar, SceneWorkingGraph graph, CallBeforeRefine op ) {
+		if (!constructBundleScene(dbSimilar, graph))
 			return false;
 
 		// Use provided function that allows for customization
@@ -148,9 +147,9 @@ public class RefineMetricWorkingGraph implements VerbosePrint {
 	/**
 	 * Initializes the scene in bundle adjustment
 	 */
-	public boolean constructBundleScene( LookUpSimilarImages db, SceneWorkingGraph graph ) {
+	public boolean constructBundleScene( LookUpSimilarImages dbSimilar, SceneWorkingGraph graph ) {
 		// Pre-declare and compute basic data structures
-		initializeDataStructures(db, graph);
+		initializeDataStructures(dbSimilar, graph);
 
 		// Use observations defined in the graph to create the list of 3D features which will be optimized
 		if (!createFeatures3D(graph))
@@ -165,7 +164,7 @@ public class RefineMetricWorkingGraph implements VerbosePrint {
 	/**
 	 * Initialized several data structures and resets it into the initial state
 	 */
-	void initializeDataStructures( LookUpSimilarImages db, SceneWorkingGraph graph ) {
+	void initializeDataStructures( LookUpSimilarImages dbSimilar, SceneWorkingGraph graph ) {
 		viewToIntegerID.clear();
 		listPixelToNorm.clear();
 		listNormToPixel.clear();
@@ -174,28 +173,36 @@ public class RefineMetricWorkingGraph implements VerbosePrint {
 		final SceneObservations observations = metricSba.observations;
 
 		// Initialize the structure, but save initializing the points for later
-		structure.initialize(graph.listViews.size(), graph.listViews.size(), 0);
+		structure.initialize(graph.listCameras.size, graph.listViews.size(), 0);
 
 		// Go through each view and load the observations then add them to the scene, but don't specify which
 		// 3D point they are observing yet
 		observations.initialize(graph.listViews.size());
+
+		// First add cameras to the structure
+		for (int cameraIdx = 0; cameraIdx < graph.listCameras.size; cameraIdx++) {
+			SceneWorkingGraph.Camera wcam = graph.listCameras.get(cameraIdx);
+			structure.setCamera(cameraIdx, false, wcam.intrinsic);
+		}
+
+		// add views next
 		for (int viewIdx = 0; viewIdx < graph.listViews.size(); viewIdx++) {
 			SceneWorkingGraph.View wview = graph.listViews.get(viewIdx);
 			SceneObservations.View oview = observations.getView(viewIdx);
 
 			viewToIntegerID.put(wview.pview.id, viewIdx);
-			createProjectionModel(wview.intrinsic);
+			createProjectionModel(wview.viewIntrinsic);
 
 			// Add all observations in this view to the SBA observations.
 			// Observations that are not assigned to a 3D point will be pruned later on. Much easier this way.
 			oview.resize(wview.pview.totalObservations);
-			db.lookupPixelFeats(wview.pview.id, pixels);
+			dbSimilar.lookupPixelFeats(wview.pview.id, pixels);
 			BoofMiscOps.checkEq(pixels.size, wview.pview.totalObservations);
 
 			// The camera model assumes the principle point is (0,0) and this is done by assuming it's the image center
-			CameraPinholeBrown priorCamera = wview.priorCamera;
-			float cx = (float)(priorCamera.cx);
-			float cy = (float)(priorCamera.cy);
+			SceneWorkingGraph.Camera camera = graph.getViewCamera(wview);
+			float cx = (float)camera.prior.cx;
+			float cy = (float)camera.prior.cy;
 
 			// specify the observation pixel coordinates but not which 3D feature is matched to the observation
 			for (int obsIdx = 0; obsIdx < pixels.size; obsIdx++) {
@@ -203,9 +210,8 @@ public class RefineMetricWorkingGraph implements VerbosePrint {
 				oview.setPixel(obsIdx, (float)(p.x - cx), (float)(p.y - cy));
 			}
 
-			// Add the view pose and intrinsics
-			structure.setCamera(viewIdx, false, wview.intrinsic);
-			structure.setView(viewIdx, viewIdx, viewIdx == 0, wview.world_to_view);
+			// Add this view to the graph and it's location
+			structure.setView(viewIdx, camera.localIndex, viewIdx == 0, wview.world_to_view);
 		}
 	}
 
@@ -518,17 +524,22 @@ public class RefineMetricWorkingGraph implements VerbosePrint {
 		final SceneStructureMetric structure = metricSba.structure;
 
 		// save the results
+		for (int cameraIdx = 0; cameraIdx < graph.listCameras.size(); cameraIdx++) {
+			BundlePinholeSimplified found = (BundlePinholeSimplified)structure.cameras.get(cameraIdx).model;
+			graph.listCameras.get(cameraIdx).intrinsic.setTo(found);
+		}
+
 		for (int viewIdx = 0; viewIdx < graph.listViews.size(); viewIdx++) {
 			SceneWorkingGraph.View wview = graph.listViews.get(viewIdx);
 			wview.world_to_view.setTo(structure.getParentToView(viewIdx));
-			wview.intrinsic.setTo((BundlePinholeSimplified)structure.cameras.get(viewIdx).model);
+
 
 			if (verbose != null && verboseViewInfo) {
 				Se3_F64 m = metricSba.structure.getParentToView(viewIdx);
 				double theta = ConvertRotation3D_F64.matrixToRodrigues(m.R, null).theta;
 				verbose.printf("AFTER view='%s' T=(%.2f %.2f %.2f) R=%.4f, f=%.1f k1=%.1e k2=%.1e\n",
 						wview.pview.id, m.T.x, m.T.y, m.T.z, theta,
-						wview.intrinsic.f, wview.intrinsic.k1, wview.intrinsic.k2);
+						wview.viewIntrinsic.f, wview.viewIntrinsic.k1, wview.viewIntrinsic.k2);
 			}
 		}
 		return true;

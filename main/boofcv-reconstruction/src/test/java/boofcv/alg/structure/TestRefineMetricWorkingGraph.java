@@ -20,7 +20,6 @@ package boofcv.alg.structure;
 
 import boofcv.alg.distort.pinhole.LensDistortionPinhole;
 import boofcv.alg.geo.PerspectiveOps;
-import boofcv.alg.geo.bundle.cameras.BundlePinholeSimplified;
 import boofcv.misc.BoofMiscOps;
 import boofcv.struct.calib.CameraPinhole;
 import boofcv.struct.distort.Point2Transform2_F64;
@@ -60,8 +59,6 @@ class TestRefineMetricWorkingGraph extends BoofStandardJUnit {
 				pathLine(5, 0.1, 0.6, 2);
 		var pairwise = dbSimilar.createPairwise();
 		var graph = dbSimilar.createWorkingGraph(pairwise);
-		graph.listViews.forEach(v -> v.intrinsic.setTo(new BundlePinholeSimplified(400, 0, 0)));
-		graph.listViews.forEach(v -> v.priorCamera.setTo(intrinsic));
 
 		// Create two views with inliers
 		SceneWorkingGraph.InlierInfo inlier0 = graph.listViews.get(0).inliers.grow();
@@ -80,18 +77,19 @@ class TestRefineMetricWorkingGraph extends BoofStandardJUnit {
 			// Make a few of the parameters in correct and see if it can recover from it. Observations are perfect
 			// so there is still a "perfect" global minimum
 			graph.listViews.get(2).world_to_view.T.x += 0.05;
-			graph.listViews.get(1).intrinsic.f += -100;
+			graph.listCameras.get(0).intrinsic.f += -100;
 		}
 		var alg = new RefineMetricWorkingGraph();
 		assertTrue(alg.process(dbSimilar, graph));
 
 		// The scale is not locked and the first view is not at the origin. Let's just use reprojection error as
 		// a test since comparing translation is more complex
+		assertEquals(400.0, graph.listCameras.get(0).intrinsic.f, 1e-3);
 		assertEquals(0.0, alg.metricSba.sba.getFitScore(), 1e-6);
 		BoofMiscOps.forIdx(graph.listViews, ( i, v ) -> {
-			assertEquals(400, v.intrinsic.f, 1e-3);
-			assertEquals(0, v.intrinsic.k1, 1e-6);
-			assertEquals(0, v.intrinsic.k2, 1e-6);
+			assertEquals(400, v.viewIntrinsic.f, 1e-3);
+			assertEquals(0, v.viewIntrinsic.k1, 1e-6);
+			assertEquals(0, v.viewIntrinsic.k2, 1e-6);
 		});
 	}
 
@@ -135,8 +133,6 @@ class TestRefineMetricWorkingGraph extends BoofStandardJUnit {
 				pathLine(5, 0.1, 0.6, 2);
 		var pairwise = dbSimilar.createPairwise();
 		var graph = dbSimilar.createWorkingGraph(pairwise);
-		graph.listViews.forEach(v -> v.intrinsic.setTo(new BundlePinholeSimplified(400, 0, 0)));
-		graph.listViews.forEach(v -> v.priorCamera.setTo(intrinsic));
 
 		// Create two views with inliers
 		SceneWorkingGraph.InlierInfo inlier0 = graph.listViews.get(0).inliers.grow();
@@ -159,9 +155,9 @@ class TestRefineMetricWorkingGraph extends BoofStandardJUnit {
 		// a test since comparing translation is more complex
 		assertEquals(0.0, alg.metricSba.sba.getFitScore(), 1e-6);
 		BoofMiscOps.forIdx(graph.listViews, ( i, v ) -> {
-			assertEquals(400, v.intrinsic.f, 1e-3);
-			assertEquals(0, v.intrinsic.k1, 1e-6);
-			assertEquals(0, v.intrinsic.k2, 1e-6);
+			assertEquals(400, v.viewIntrinsic.f, 1e-3);
+			assertEquals(0, v.viewIntrinsic.k1, 1e-6);
+			assertEquals(0, v.viewIntrinsic.k2, 1e-6);
 		});
 	}
 
@@ -170,8 +166,6 @@ class TestRefineMetricWorkingGraph extends BoofStandardJUnit {
 		var dbSimilar = new MockLookupSimilarImagesRealistic().pathLine(5, 0.3, 1.5, 2);
 		var pairwise = dbSimilar.createPairwise();
 		var graph = dbSimilar.createWorkingGraph(pairwise);
-		graph.listViews.forEach(v -> v.intrinsic.setTo(new BundlePinholeSimplified(400, 0, 0)));
-		graph.listViews.forEach(v -> v.priorCamera.setTo(dbSimilar.intrinsic));
 
 		// create an inlier set composed of observations from 3 views
 		var inliers = new SceneWorkingGraph.InlierInfo();
@@ -212,8 +206,6 @@ class TestRefineMetricWorkingGraph extends BoofStandardJUnit {
 		var dbSimilar = new MockLookupSimilarImagesRealistic().pathLine(5, 0.3, 1.5, 2);
 		var pairwise = dbSimilar.createPairwise();
 		var graph = dbSimilar.createWorkingGraph(pairwise);
-		graph.listViews.forEach(v -> v.intrinsic.setTo(new BundlePinholeSimplified(400, 0, 0)));
-		graph.listViews.forEach(v -> v.priorCamera.setTo(dbSimilar.intrinsic));
 
 		var alg = new RefineMetricWorkingGraph() {
 			// Override so that it can return an error for which all should be accepted or rejected
@@ -292,8 +284,6 @@ class TestRefineMetricWorkingGraph extends BoofStandardJUnit {
 		var dbSimilar = new MockLookupSimilarImagesRealistic().pathLine(5, 0.3, 1.5, 2);
 		var pairwise = dbSimilar.createPairwise();
 		var graph = dbSimilar.createWorkingGraph(pairwise);
-		graph.listViews.forEach(v -> v.intrinsic.setTo(new BundlePinholeSimplified(400, 0, 0)));
-		graph.listViews.forEach(v -> v.priorCamera.setTo(dbSimilar.intrinsic));
 
 		var alg = new RefineMetricWorkingGraph();
 		alg.initializeDataStructures(dbSimilar, graph);

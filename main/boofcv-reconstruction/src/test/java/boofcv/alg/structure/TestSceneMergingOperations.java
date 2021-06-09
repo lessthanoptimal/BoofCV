@@ -151,6 +151,10 @@ public class TestSceneMergingOperations extends BoofStandardJUnit {
 		src_to_dst.scale = 2.5;
 		src_to_dst.transform.T.x = 10;
 
+		// Add cameras
+		SceneWorkingGraph.Camera cameraSrc = src.addCamera(0);
+		SceneWorkingGraph.Camera cameraDst = dst.addCamera(2);
+
 		// Add views. Some will be common and some will not be
 		for (int i = 0; i < 5; i++) {
 			var a = new PairwiseImageGraph.View();
@@ -160,14 +164,11 @@ public class TestSceneMergingOperations extends BoofStandardJUnit {
 			a.id = "" + i;
 			b.id = "" + j; // 2 of the views will have the same ID
 
-			SceneWorkingGraph.View wa = src.addView(a);
-			SceneWorkingGraph.View wb = dst.addView(b);
+			SceneWorkingGraph.View wa = src.addView(a, cameraSrc);
+			SceneWorkingGraph.View wb = dst.addView(b, cameraDst);
 
-			wa.priorCamera.fsetShape(i, i);
-			wb.priorCamera.fsetShape(j, j);
-
-			wa.intrinsic.f = i;
-			wb.intrinsic.f = j;
+			wa.viewIntrinsic.f = i;
+			wb.viewIntrinsic.f = j;
 
 			wa.world_to_view.T.setTo(i, 0, 0);
 		}
@@ -177,6 +178,11 @@ public class TestSceneMergingOperations extends BoofStandardJUnit {
 
 		// Call the function being tested
 		alg.mergeStructure(src, dst, src_to_dst, scenesInView);
+
+		// There should be 2 cameras in dst now
+		assertEquals(2, dst.listCameras.size);
+		assertEquals(0, dst.cameras.get(0).indexDB);
+		assertEquals(2, dst.cameras.get(2).indexDB);
 
 		// src has 3 views NOT in dst
 		assertEquals(8, dst.listViews.size());
@@ -192,7 +198,7 @@ public class TestSceneMergingOperations extends BoofStandardJUnit {
 		for (int i = 0; i < 3; i++) {
 			String id = "" + i;
 			assertEquals(i*2.5 - 10.0, dst.views.get(id).world_to_view.T.x);
-			assertEquals(i, dst.views.get(id).intrinsic.f);
+			assertEquals(i, dst.views.get(id).viewIntrinsic.f);
 		}
 	}
 
@@ -273,5 +279,12 @@ public class TestSceneMergingOperations extends BoofStandardJUnit {
 		assertSame(found1, found3);
 		assertEquals(5, found1.sceneIndex);
 		assertEquals(6, found2.sceneIndex);
+	}
+
+	/**
+	 * Make sure cameras are correctly merged
+	 */
+	@Test void cameraMerging() {
+		fail("Implement");
 	}
 }

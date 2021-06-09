@@ -103,8 +103,8 @@ public class TestMetricSanityChecks extends BoofStandardJUnit {
 		var alg = new MetricSanityChecks();
 
 		// this will cause all points to be out of bounds
-		for (var v : scene.listViews) {
-			v.priorCamera.fsetShape(0, 0);
+		for (var c : scene.listCameras.toList()) {
+			c.prior.fsetShape(0, 0);
 		}
 
 		// this will mess up other stuff too as it will try to re-center the pixels at another location

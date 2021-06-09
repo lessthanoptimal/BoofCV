@@ -41,6 +41,7 @@ class TestExpandByOneView extends BoofStandardJUnit {
 	void selectTwoConnections() {
 		var working = new SceneWorkingGraph();
 		var graph = new PairwiseImageGraph();
+		SceneWorkingGraph.Camera camera = working.addCamera(2);
 		View seed = graph.createNode("A");
 
 		for (int i = 0; i < 6; i++) {
@@ -52,7 +53,7 @@ class TestExpandByOneView extends BoofStandardJUnit {
 			mA.score3D = 2.0;
 			mA.is3D = true;
 
-			working.addView(viewI);
+			working.addView(viewI, camera);
 		}
 
 		View viewB = seed.connection(1);
@@ -80,6 +81,7 @@ class TestExpandByOneView extends BoofStandardJUnit {
 	void createListOfValid() {
 		var working = new SceneWorkingGraph();
 		var graph = new PairwiseImageGraph();
+		SceneWorkingGraph.Camera camera = working.addCamera(2);
 		View seed = graph.createNode("A");
 
 		for (int i = 0; i < 10; i++) {
@@ -89,7 +91,7 @@ class TestExpandByOneView extends BoofStandardJUnit {
 			// is3D and being known are at different frequencies and will only intersect twice
 			mA.is3D = i%2 == 0;
 			if (i%3 == 0)
-				working.addView(viewI);
+				working.addView(viewI, camera);
 		}
 
 		var alg = new ChildProjectiveExpandByOneView();

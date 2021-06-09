@@ -20,6 +20,7 @@ package boofcv.alg.structure;
 
 import boofcv.BoofTesting;
 import boofcv.alg.geo.PerspectiveOps;
+import boofcv.alg.geo.bundle.BundleAdjustmentOps;
 import boofcv.alg.structure.PairwiseImageGraph.View;
 import boofcv.misc.BoofLambdas;
 import boofcv.struct.calib.CameraPinhole;
@@ -198,9 +199,15 @@ class MockLookupSimilarImagesCircleAround implements LookUpSimilarImages {
 
 	public SceneWorkingGraph createWorkingGraph( boolean zeroCP ) {
 		var working = new SceneWorkingGraph();
+
+		// one camera for all views
+		SceneWorkingGraph.Camera camera = working.addCamera(2);
+		camera.prior.setTo(intrinsic);
+		BundleAdjustmentOps.convert(intrinsic, camera.intrinsic);
+
 		for (int viewCnt = 0; viewCnt < graph.nodes.size; viewCnt++) {
 			PairwiseImageGraph.View pv = graph.nodes.get(viewCnt);
-			SceneWorkingGraph.View wv = working.addView(pv);
+			SceneWorkingGraph.View wv = working.addView(pv, camera);
 			if (zeroCP) {
 				wv.projective.setTo(listCameraMatricesZeroPrinciple.get(viewCnt));
 			} else {

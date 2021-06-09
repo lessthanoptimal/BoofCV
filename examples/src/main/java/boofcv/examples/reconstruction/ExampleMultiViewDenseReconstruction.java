@@ -65,8 +65,8 @@ import java.util.List;
 public class ExampleMultiViewDenseReconstruction {
 	public static void main( String[] args ) {
 		var example = new ExampleMultiViewSparseReconstruction();
-		example.maxFrames = 1000;       // This will process the entire sequence
-//		example.compute("tree_snow_01.mp4", true);
+		example.maxFrames = 50;       // This will process the entire sequence
+		example.compute("tree_snow_01.mp4", true);
 //		example.compute("ditch_02.mp4", true);
 //		example.compute("holiday_display_01.mp4", true);
 //		example.compute("log_building_02.mp4", true);
@@ -74,7 +74,7 @@ public class ExampleMultiViewDenseReconstruction {
 //		example.compute("drone_park_01.mp4", false);
 //		example.compute("drone_park_01.mp4", false);
 //		example.compute("drone_industrial_01.mp4", false);
-		example.compute("rock_loop_01.mp4", true);
+//		example.compute("rock_loop_01.mp4", true);
 
 		// Looks up images based on their index in the file list
 		var imageLookup = new LookUpImageFilesByIndex(example.imageFiles);

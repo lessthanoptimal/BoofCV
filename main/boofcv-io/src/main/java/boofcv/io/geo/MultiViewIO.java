@@ -575,22 +575,36 @@ public class MultiViewIO {
 
 		out.println("# " + working.getClass().getSimpleName() + " in YAML format. BoofCV " + BoofVersion.VERSION);
 
+		List<Map<String, Object>> cameras = new ArrayList<>();
+		for (int cameraIdx = 0; cameraIdx < working.listCameras.size(); cameraIdx++) {
+			SceneWorkingGraph.Camera camera = working.listCameras.get(cameraIdx);
+
+			Map<String, Object> element = new HashMap<>();
+			cameras.add(element);
+			element.put("index_db", camera.indexDB);
+			element.put("prior", CalibrationIO.putModelBrown(camera.prior, null));
+			element.put("intrinsic", putPinholeSimplified(camera.intrinsic));
+		}
+
 		List<Map<String, Object>> views = new ArrayList<>();
 		for (int viewIdx = 0; viewIdx < working.listViews.size(); viewIdx++) {
 			SceneWorkingGraph.View wview = working.listViews.get(viewIdx);
+			SceneWorkingGraph.Camera camera = working.getViewCamera(wview);
+
 //			assertEq(viewIdx,wview.index,"Inconsistent view index."); // not required to be valid always
 
 			Map<String, Object> element = new HashMap<>();
 			views.add(element);
 			element.put("pview", wview.pview.id);
 			element.put("projective", wview.projective.data);
-			element.put("intrinsic", putPinholeSimplified(wview.intrinsic));
+			element.put("intrinsic", putPinholeSimplified(wview.viewIntrinsic));
 			element.put("world_to_view", putSe3(wview.world_to_view));
-			element.put("camera_prior", CalibrationIO.putModelBrown(wview.priorCamera, null));
+			element.put("camera_index", camera.localIndex);
 			element.put("inliers", putInlierInfo(wview.inliers));
 		}
 
 		Map<String, Object> data = new HashMap<>();
+		data.put("cameras", cameras);
 		data.put("views", views);
 		data.put("data_type", "SceneWorkingGraph");
 		data.put("version", 0);
@@ -629,19 +643,30 @@ public class MultiViewIO {
 		try {
 			reader.close();
 
-			List<Map<String, Object>> yamlViews = getOrThrow(data, "views");
+			List<Map<String, Object>> yamlCameras = getOrThrow(data, "cameras");
+			for (int cameraIdx = 0; cameraIdx < yamlCameras.size(); cameraIdx++) {
+				Map<String, Object> yamlCamera = yamlCameras.get(cameraIdx);
+
+				int indexDB = getOrThrow(yamlCamera, "index_db");
+				SceneWorkingGraph.Camera camera = working.addCamera(indexDB);
+				camera.prior.setTo(CalibrationIO.load((Map<String, Object>)getOrThrow(yamlCamera, "prior")));
+				loadPinholeSimplified(getOrThrow(yamlCamera, "intrinsic"), camera.intrinsic);
+			}
 
 			// First declare all the views and link to their respective pview
+			List<Map<String, Object>> yamlViews = getOrThrow(data, "views");
 			for (Map<String, Object> yamlView : yamlViews) {
 				PairwiseImageGraph.View pview = pairwise.lookupNode(getOrThrow(yamlView, "pview"));
-				working.addView(pview);
+				int cameraIdx = getOrThrow(yamlView, "camera_index");
+				SceneWorkingGraph.Camera camera = working.listCameras.get(cameraIdx);
+				working.addView(pview, camera);
 			}
+
 			for (Map<String, Object> yamlView : yamlViews) {
 				SceneWorkingGraph.View wview = working.lookupView(getOrThrow(yamlView, "pview"));
 				copyIntoMatrix(getOrThrow(yamlView, "projective"), wview.projective);
-				loadPinholeSimplified(getOrThrow(yamlView, "intrinsic"), wview.intrinsic);
+				loadPinholeSimplified(getOrThrow(yamlView, "intrinsic"), wview.viewIntrinsic);
 				loadSe3(getOrThrow(yamlView, "world_to_view"), wview.world_to_view);
-				wview.priorCamera.setTo(CalibrationIO.load((Map<String, Object>)getOrThrow(yamlView, "camera_prior")));
 				loadInlierInfo(getOrThrow(yamlView, "inliers"), pairwise, wview.inliers);
 			}
 		} catch (IOException e) {

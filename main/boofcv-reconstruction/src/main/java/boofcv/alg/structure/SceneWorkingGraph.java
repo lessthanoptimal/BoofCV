@@ -22,7 +22,9 @@ import boofcv.alg.geo.bundle.cameras.BundlePinholeSimplified;
 import boofcv.struct.calib.CameraPinholeBrown;
 import georegression.struct.point.Point2D_F64;
 import georegression.struct.se.Se3_F64;
+import gnu.trove.map.TIntObjectMap;
 import gnu.trove.map.TObjectIntMap;
+import gnu.trove.map.hash.TIntObjectHashMap;
 import gnu.trove.map.hash.TObjectIntHashMap;
 import org.ddogleg.struct.DogArray;
 import org.ddogleg.struct.DogArray_I32;
@@ -41,6 +43,11 @@ import static boofcv.misc.BoofMiscOps.checkTrue;
  * @author Peter Abeles
  */
 public class SceneWorkingGraph {
+
+	/** Camera database ID to scene Camera*/
+	public final TIntObjectMap<Camera> cameras = new TIntObjectHashMap<>();
+	/** List of scene cameras */
+	public final DogArray<Camera> listCameras = new DogArray<>(Camera::new, Camera::reset);
 
 	/** List of all views in the scene graph. Look up based on the image/view's id */
 	public final Map<String, View> views = new HashMap<>();
@@ -65,6 +72,8 @@ public class SceneWorkingGraph {
 	 * Resets it into it's initial state.
 	 */
 	public void reset() {
+		cameras.clear();
+		listCameras.reset();
 		views.clear();
 		listViews.clear();
 		exploredViews.clear();
@@ -75,9 +84,16 @@ public class SceneWorkingGraph {
 
 	public void setTo( SceneWorkingGraph src ) {
 		reset();
+		for (int cameraIdx = 0; cameraIdx < src.listCameras.size; cameraIdx++) {
+			Camera csrc = src.listCameras.get(cameraIdx);
+			Camera c = listCameras.grow();
+			c.setTo(csrc);
+			cameras.put(c.indexDB, c);
+		}
 		for (int viewIdx = 0; viewIdx < src.listViews.size(); viewIdx++) {
 			View vsrc = src.listViews.get(viewIdx);
-			addView(vsrc.pview).setTo(vsrc);
+			Camera c = getViewCamera(vsrc);
+			addView(vsrc.pview, c).setTo(vsrc);
 		}
 		this.exploredViews.addAll(src.exploredViews);
 		this.index = src.index;
@@ -97,15 +113,34 @@ public class SceneWorkingGraph {
 		return views.containsKey(pview.id);
 	}
 
+	public Camera addCamera( int indexDB ) {
+		Camera c = listCameras.grow();
+		c.localIndex = listCameras.size - 1;
+		c.indexDB = indexDB;
+		cameras.put(indexDB, c);
+		return c;
+	}
+
+	public Camera addCameraCopy( Camera src ) {
+		Camera c = listCameras.grow();
+		c.localIndex = listCameras.size - 1;
+		c.indexDB = src.indexDB;
+		c.prior.setTo(src.prior);
+		c.intrinsic.setTo(src.intrinsic);
+		cameras.put(src.indexDB, c);
+		return c;
+	}
+
 	/**
 	 * Adds a new view to the graph. If the view already exists an exception is thrown
 	 *
 	 * @param pview (Input) Pairwise view to create the new view from.
 	 * @return The new view created
 	 */
-	public View addView( PairwiseImageGraph.View pview ) {
+	public View addView( PairwiseImageGraph.View pview, Camera camera ) {
 		View v = new View();
 		v.pview = pview;
+		v.cameraIdx = camera.localIndex;
 		checkTrue(null == views.put(v.pview.id, v),
 				"There shouldn't be an existing view with the same key: '" + v.pview.id + "'");
 		v.index = listViews.size();
@@ -117,9 +152,8 @@ public class SceneWorkingGraph {
 		return listViews;
 	}
 
-	public void purgeViews() {
-		listViews.clear();
-		views.clear();
+	public Camera getViewCamera( View v ) {
+		return listCameras.get(v.cameraIdx);
 	}
 
 	/**
@@ -190,7 +224,7 @@ public class SceneWorkingGraph {
 		}
 
 		@Override public String toString() {
-			return String.format("InlierInfo {views.size=%d, score=%.1f}",views.size, scoreGeometric);
+			return String.format("InlierInfo {views.size=%d, score=%.1f}", views.size, scoreGeometric);
 		}
 	}
 
@@ -212,6 +246,37 @@ public class SceneWorkingGraph {
 	}
 
 	/**
+	 * Information on a camera which captured one or more views in this scene.
+	 */
+	public static class Camera {
+		/** Index in this scene's array */
+		public int localIndex;
+
+		/** Camera's index in the DB */
+		public int indexDB;
+
+		/** Prior information about this camera's calibration */
+		public final CameraPinholeBrown prior = new CameraPinholeBrown(2);
+
+		/** The estimate value of this camera's intrinsics */
+		public final BundlePinholeSimplified intrinsic = new BundlePinholeSimplified();
+
+		public void reset() {
+			localIndex = -1;
+			indexDB = -1;
+			prior.reset();
+			intrinsic.reset();
+		}
+
+		public void setTo( Camera src ) {
+			this.localIndex = src.localIndex;
+			this.indexDB = src.indexDB;
+			this.prior.setTo(src.prior);
+			this.intrinsic.setTo(src.intrinsic);
+		}
+	}
+
+	/**
 	 * Data structure related to an image. Points to image features, intrinsic parameters, and extrinsic parameters.
 	 */
 	static public class View {
@@ -228,14 +293,18 @@ public class SceneWorkingGraph {
 		/** projective camera matrix */
 		public final DMatrixRMaj projective = new DMatrixRMaj(3, 4);
 
-		/** metric camera */
-		public final BundlePinholeSimplified intrinsic = new BundlePinholeSimplified();
+		/**
+		 * metric camera estimate for this specific view. There's also the global that's used when the
+		 * entire scene is optimized
+		 */
+		public final BundlePinholeSimplified viewIntrinsic = new BundlePinholeSimplified();
+		// TODO remove this. Use global as an initial seed but don't save
 
 		/** SE3 from world to this view */
 		public final Se3_F64 world_to_view = new Se3_F64();
 
-		/** Prior information about this camera's calibration */
-		public final CameraPinholeBrown priorCamera = new CameraPinholeBrown(2);
+		/** Index of the camera that generated this view */
+		public int cameraIdx = -1;
 
 		/** Index of the view in the list. This will be the same index in the SBA scene */
 		public int index = -1;
@@ -272,9 +341,9 @@ public class SceneWorkingGraph {
 		public void reset() {
 			index = -1;
 			pview = null;
-			priorCamera.reset();
+			cameraIdx = -1;
 			projective.zero();
-			intrinsic.reset();
+			viewIntrinsic.reset();
 			inliers.reset();
 			world_to_view.reset();
 		}
@@ -283,9 +352,9 @@ public class SceneWorkingGraph {
 			reset();
 			index = src.index;
 			pview = src.pview;
-			priorCamera.setTo(src.priorCamera);
+			cameraIdx = src.cameraIdx;
 			projective.setTo(src.projective);
-			intrinsic.setTo(src.intrinsic);
+			viewIntrinsic.setTo(src.viewIntrinsic);
 			inliers.resetResize(src.inliers.size);
 			for (int i = 0; i < src.inliers.size; i++) {
 				inliers.get(i).setTo(src.inliers.get(i));

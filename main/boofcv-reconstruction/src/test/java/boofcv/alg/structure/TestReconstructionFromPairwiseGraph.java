@@ -67,9 +67,10 @@ class TestReconstructionFromPairwiseGraph extends BoofStandardJUnit {
 
 		var scene = new SceneWorkingGraph();
 		var selection = new ReconstructionFromPairwiseGraph.Expansion();
+		var cameraDummy = new SceneWorkingGraph.Camera();
 
 		scene.open.addAll(graph.nodes);
-		scene.open.forIdx(( i, o ) -> scene.addView(o));
+		scene.open.forIdx(( i, o ) -> scene.addView(o, cameraDummy));
 		PairwiseImageGraph.View expected = scene.open.get(4); // make #4 only have a slightly better score, and a valid set of connections
 		PairwiseImageGraph.View expectedConnA = expected.connections.get(0).other(expected);
 		PairwiseImageGraph.View expectedConnB = expected.connections.get(1).other(expected);
@@ -93,11 +94,12 @@ class TestReconstructionFromPairwiseGraph extends BoofStandardJUnit {
 		removeLastConnection(graph);
 
 		var scene = new SceneWorkingGraph();
+		var cameraDummy = new SceneWorkingGraph.Camera();
 		var selection = new ReconstructionFromPairwiseGraph.Expansion();
 
 		scene.open.addAll(graph.nodes);
 		// Only #7 will have a full set of known connections
-		scene.open.forIdx(5, 8, ( i, o ) -> scene.addView(o));
+		scene.open.forIdx(5, 8, ( i, o ) -> scene.addView(o, cameraDummy));
 		PairwiseImageGraph.View expected = scene.open.get(7);
 		assertTrue(alg.selectNextToProcess(scene, selection));
 
@@ -123,10 +125,11 @@ class TestReconstructionFromPairwiseGraph extends BoofStandardJUnit {
 		PairwiseImageGraph graph = createLinearGraph(8, 1);
 
 		var scene = new SceneWorkingGraph();
+		var cameraDummy = new SceneWorkingGraph.Camera();
 		var selection = new ReconstructionFromPairwiseGraph.Expansion();
 
 		open.addAll(graph.nodes);
-		open.forIdx(( i, o ) -> scene.addView(o));
+		open.forIdx(( i, o ) -> scene.addView(o, cameraDummy));
 
 		assertFalse(alg.selectNextToProcess(scene, selection));
 		assertEquals(-1, selection.openIdx);

@@ -90,6 +90,10 @@ public class TestRefineMetricGraphSubset extends BoofStandardJUnit {
 		for (int i = 5; i < 7; i++) {
 			assertTrue(alg.viewsFixed.get(i));
 		}
+
+		// Check cameras now. Only one camera in this scenario
+		assertEquals(1, alg.camerasFixed.size);
+		assertFalse(alg.camerasFixed.get(0));
 	}
 
 	/**
@@ -97,16 +101,17 @@ public class TestRefineMetricGraphSubset extends BoofStandardJUnit {
 	 */
 	@Test void localCoordinateTransform() {
 		var alg = new RefineMetricGraphSubset();
+		var cameraDummy = new SceneWorkingGraph.Camera();
 		for (int i = 0; i < 10; i++) {
 			var pview = new PairwiseImageGraph.View();
-			pview.id = ""+i;
-			SceneWorkingGraph.View wv = alg.subgraph.addView(pview);
-			wv.world_to_view.T.setTo(i,0.1,-0.1*i);
+			pview.id = "" + i;
+			SceneWorkingGraph.View wv = alg.subgraph.addView(pview, cameraDummy);
+			wv.world_to_view.T.setTo(i, 0.1, -0.1*i);
 		}
 
 		alg.rescaleLocalCoordinateSystem();
 		double maxNorm = 0.0;
-		for( var wv : alg.subgraph.listViews) {
+		for (var wv : alg.subgraph.listViews) {
 			maxNorm = Math.max(maxNorm, wv.world_to_view.T.norm());
 		}
 
@@ -118,7 +123,6 @@ public class TestRefineMetricGraphSubset extends BoofStandardJUnit {
 			assertEquals(i, found.T.x, UtilEjml.TEST_F64);
 			assertEquals(0.1, found.T.y, UtilEjml.TEST_F64);
 			assertEquals(-0.1*i, found.T.z, UtilEjml.TEST_F64);
-
 		}
 	}
 }

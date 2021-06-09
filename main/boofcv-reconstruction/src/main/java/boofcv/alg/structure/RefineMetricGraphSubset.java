@@ -55,6 +55,8 @@ public class RefineMetricGraphSubset implements VerbosePrint {
 	Map<String, SceneWorkingGraph.View> srcToCpy = new HashMap<>();
 	// Look up table that indicates which views in the subgraph are fixed and should not be optimized
 	DogArray_B viewsFixed = new DogArray_B();
+	// Look up table that indicates which cameras in the subgraph are fixed and should not be optimized
+	DogArray_B camerasFixed = new DogArray_B();
 
 	// Reference to the passed in list of views
 	final List<SceneWorkingGraph.View> srcViews = new ArrayList<>();
@@ -78,35 +80,11 @@ public class RefineMetricGraphSubset implements VerbosePrint {
 	}
 
 	/**
-	 * Creates a sub-graph from a single view and add all its inlier sets. This will also require adding the
-	 * views referenced in the inlier sets
-	 */
-	public void setSubset( SceneWorkingGraph src, SceneWorkingGraph.View srcView) {
-		cameraPriors.clear();
-		srcViews.clear();
-		srcViews.add(srcView);
-
-		viewsFixed.resetResize(srcViews.size(), false);
-		srcToCpy.clear();
-
-		// First copy the view's intrinsics/Intrinsics
-		subgraph.reset();
-
-		copyIntrinsicsExtrinsics(srcView);
-		for (int infoIdx = 0; infoIdx < srcView.inliers.size; infoIdx++) {
-			copyViewAndInlierSet(src, srcView, infoIdx);
-		}
-
-		// Sanity checks
-		BoofMiscOps.checkEq(cameraPriors.size(), subgraph.listViews.size());
-	}
-
-	/**
 	 * Creates a subset of the scene using the provided views. If a view references other views not in this list
 	 * in its inlier sets then those views are added to the subview but marked as known so that they aren't updated
 	 *
 	 * @param src The scene
-	 * @param srcViews The views in the scene which compose the sub-scene
+	 * @param srcViews Views in the scene which compose the sub-scene
 	 */
 	public void setSubset( SceneWorkingGraph src, List<SceneWorkingGraph.View> srcViews ) {
 		cameraPriors.clear();
@@ -129,11 +107,14 @@ public class RefineMetricGraphSubset implements VerbosePrint {
 		viewsFixed.resetResize(srcViews.size(), false);
 		srcToCpy.clear();
 
-		// First copy the view's intrinsics/Intrinsics
+		// First copy each view's intrinsics/Intrinsics
 		subgraph.reset();
 		for (int listIdx = 0; listIdx < srcViews.size(); listIdx++) {
-			copyIntrinsicsExtrinsics(srcViews.get(listIdx));
+			copyIntrinsicsExtrinsics(src, srcViews.get(listIdx));
 		}
+
+		// Mark all cameras as dynamic
+		camerasFixed.resetResize(subgraph.cameras.size(), false);
 
 		// Copy the inlier sets. If a view is not in the subset, add it so we can triangulate the points
 		for (int listIdx = 0; listIdx < srcViews.size(); listIdx++) {
@@ -164,8 +145,13 @@ public class RefineMetricGraphSubset implements VerbosePrint {
 			SceneWorkingGraph.View infoView = srcToCpy.get(pview.id);
 			if (infoView == null) {
 				// Add a new view to the subgraph. Mark it as fixed since the user isn't interested in it
-				copyIntrinsicsExtrinsics(src.lookupView(pview.id));
+				copyIntrinsicsExtrinsics(src, src.lookupView(pview.id));
 				viewsFixed.add(true);
+
+				// If a new camera was added mark it as fixed too
+				if (camerasFixed.size != subgraph.cameras.size()) {
+					camerasFixed.add(true);
+				}
 			}
 
 			// Copy everything over
@@ -177,14 +163,18 @@ public class RefineMetricGraphSubset implements VerbosePrint {
 		}
 	}
 
-	private void copyIntrinsicsExtrinsics( SceneWorkingGraph.View srcView ) {
-		SceneWorkingGraph.View cpyView = subgraph.addView(srcView.pview);
+	private void copyIntrinsicsExtrinsics( SceneWorkingGraph src, SceneWorkingGraph.View srcView ) {
+		SceneWorkingGraph.Camera srcCamera = src.getViewCamera(srcView);
+		SceneWorkingGraph.Camera cpyCamera = subgraph.cameras.get(srcCamera.indexDB);
+		if (cpyCamera == null) {
+			cpyCamera = subgraph.addCameraCopy(srcCamera);
+		}
+		SceneWorkingGraph.View cpyView = subgraph.addView(srcView.pview, cpyCamera);
 
 		cpyView.world_to_view.setTo(srcView.world_to_view);
-		cpyView.intrinsic.setTo(srcView.intrinsic);
-		cpyView.priorCamera.setTo(srcView.priorCamera);
+		cpyView.viewIntrinsic.setTo(srcView.viewIntrinsic);
 
-		cameraPriors.add(cpyView.priorCamera);
+		cameraPriors.add(cpyCamera.prior);
 
 		BoofMiscOps.checkTrue(null == srcToCpy.put(srcView.pview.id, cpyView));
 	}
@@ -239,7 +229,7 @@ public class RefineMetricGraphSubset implements VerbosePrint {
 				continue;
 
 			localToGlobal(cpyView.world_to_view, srcView.world_to_view);
-			srcView.intrinsic.setTo(cpyView.intrinsic);
+			srcView.viewIntrinsic.setTo(cpyView.viewIntrinsic);
 		}
 
 		return true;
@@ -255,9 +245,17 @@ public class RefineMetricGraphSubset implements VerbosePrint {
 	}
 
 	/**
-	 * If a view is known then mark its extrinsics and intrinsics as known
+	 * If a view or camera is fixed then mark it as known
 	 */
 	protected void markKnownParameters( MetricBundleAdjustmentUtils utils ) {
+		BoofMiscOps.checkEq(camerasFixed.size, utils.structure.cameras.size);
+		for (int cameraIdx = 0; cameraIdx < camerasFixed.size; cameraIdx++) {
+			// skip if not fixed
+			if (!viewsFixed.get(cameraIdx))
+				continue;
+			utils.structure.cameras.get(cameraIdx).known = true;
+		}
+
 		BoofMiscOps.checkEq(viewsFixed.size, utils.structure.views.size);
 
 		for (int viewIdx = 0; viewIdx < viewsFixed.size; viewIdx++) {
@@ -265,7 +263,6 @@ public class RefineMetricGraphSubset implements VerbosePrint {
 			if (!viewsFixed.get(viewIdx))
 				continue;
 			utils.structure.motions.get(viewIdx).known = true;
-			utils.structure.cameras.get(viewIdx).known = true;
 		}
 	}
 

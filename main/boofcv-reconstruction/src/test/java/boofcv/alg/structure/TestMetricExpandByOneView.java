@@ -83,8 +83,8 @@ class TestMetricExpandByOneView extends BoofStandardJUnit {
 		SceneWorkingGraph.View found = workGraph.views.get(target.id);
 
 		// Check calibration
-		assertEquals(dbSimilar.intrinsic.fx, found.intrinsic.f, 1e-4);
-		assertEquals(dbSimilar.intrinsic.fy, found.intrinsic.f, 1e-4);
+		assertEquals(dbSimilar.intrinsic.fx, found.viewIntrinsic.f, 1e-4);
+		assertEquals(dbSimilar.intrinsic.fy, found.viewIntrinsic.f, 1e-4);
 
 		// Check pose
 		BoofTesting.assertEquals(dbSimilar.views.get(targetViewIdx).world_to_view, found.world_to_view, 0.01, 0.01);
