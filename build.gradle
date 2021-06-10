@@ -50,7 +50,7 @@ subprojects {
     // Prevents tons of errors if someone is using ASCII
     tasks.withType(JavaCompile).configureEach { options.encoding = "UTF-8" }
     // Creates Java 8 byte code
-//    tasks.withType(JavaCompile).configureEach { options.release = 8 }
+    tasks.withType(JavaCompile).configureEach { options.release = 8 }
 
     // To make ErrorProne and Kotlin plugins happy
     configurations.configureEach {
