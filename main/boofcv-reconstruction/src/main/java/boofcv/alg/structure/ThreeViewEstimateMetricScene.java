@@ -33,8 +33,8 @@ import boofcv.alg.geo.selfcalib.TwoViewToCalibratingHomography;
 import boofcv.factory.geo.*;
 import boofcv.misc.ConfigConverge;
 import boofcv.struct.calib.CameraPinhole;
+import boofcv.struct.calib.ElevateViewInfo;
 import boofcv.struct.geo.*;
-import boofcv.struct.image.ImageDimension;
 import georegression.geometry.ConvertRotation3D_F64;
 import georegression.struct.point.Point3D_F64;
 import georegression.struct.se.Se3_F64;
@@ -83,6 +83,7 @@ import static boofcv.alg.geo.MultiViewOps.triangulatePoints;
  * @author Peter Abeles
  */
 public class ThreeViewEstimateMetricScene implements VerbosePrint {
+	// TODO modify so that you can tell it if each view has the same intrinsics or not
 
 	// Make all configurations public for ease of manipulation
 	public ConfigRansac configRansac = new ConfigRansac();
@@ -400,9 +401,9 @@ public class ThreeViewEstimateMetricScene implements VerbosePrint {
 
 			ProjectiveToMetricCameras selfcalib = FactoryMultiView.projectiveToMetric(config);
 
-			List<ImageDimension> dimensions = new ArrayList<>();
+			List<ElevateViewInfo> views = new ArrayList<>();
 			for (int i = 0; i < 3; i++) {
-				dimensions.add(new ImageDimension(width, height));
+				views.add(new ElevateViewInfo(width, height, i));
 			}
 			List<DMatrixRMaj> cameras = new ArrayList<>();
 			cameras.add(P2);
@@ -411,7 +412,7 @@ public class ThreeViewEstimateMetricScene implements VerbosePrint {
 			MultiViewOps.convertTr(ransac.getMatchSet(), observations);
 
 			var results = new MetricCameras();
-			boolean success = selfcalib.process(dimensions, cameras, observations.toList(), results);
+			boolean success = selfcalib.process(views, cameras, observations.toList(), results);
 
 			if (success) {
 				successfulSelfCalibration = true;

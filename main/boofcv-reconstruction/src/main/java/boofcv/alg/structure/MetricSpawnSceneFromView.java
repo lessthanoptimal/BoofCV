@@ -25,8 +25,8 @@ import boofcv.factory.geo.ConfigSelfCalibDualQuadratic;
 import boofcv.factory.geo.FactoryMultiView;
 import boofcv.misc.BoofMiscOps;
 import boofcv.struct.calib.CameraPinholeBrown;
+import boofcv.struct.calib.ElevateViewInfo;
 import boofcv.struct.geo.AssociatedTupleDN;
-import boofcv.struct.image.ImageDimension;
 import lombok.Getter;
 import lombok.Setter;
 import org.ddogleg.struct.DogArray;
@@ -77,7 +77,7 @@ public class MetricSpawnSceneFromView implements VerbosePrint {
 
 	//------------ Internal Work Space
 	List<String> viewIds = new ArrayList<>();
-	DogArray<ImageDimension> dimensions = new DogArray<>(ImageDimension::new);
+	DogArray<ElevateViewInfo> viewInfos = new DogArray<>(ElevateViewInfo::new);
 	DogArray<DMatrixRMaj> cameraMatrices = new DogArray<>(() -> new DMatrixRMaj(3, 4));
 	DogArray<AssociatedTupleDN> observations = new DogArray<>(AssociatedTupleDN::new);
 	MetricCameras elevationResults = new MetricCameras();
@@ -213,10 +213,10 @@ public class MetricSpawnSceneFromView implements VerbosePrint {
 	 */
 	private boolean projectiveSeedToMetric( PairwiseImageGraph pairwise ) {
 		// Get results in a format that 'projectiveToMetric' understands
-		initProjective.lookupInfoForMetricElevation(viewIds, dimensions, cameraMatrices, observations);
+		initProjective.lookupInfoForMetricElevation(viewIds, viewInfos, cameraMatrices, observations);
 
 		// Pass the projective scene and elevate into a metric scene
-		if (!projectiveToMetric.process(dimensions.toList(), cameraMatrices.toList(),
+		if (!projectiveToMetric.process(viewInfos.toList(), cameraMatrices.toList(),
 				(List)observations.toList(), elevationResults)) {
 			if (verbose != null) verbose.println("_ views=" + BoofMiscOps.toStringLine(viewIds));
 			return false;

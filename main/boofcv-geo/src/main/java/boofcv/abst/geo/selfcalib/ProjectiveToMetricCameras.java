@@ -19,8 +19,8 @@
 package boofcv.abst.geo.selfcalib;
 
 import boofcv.alg.geo.MetricCameras;
+import boofcv.struct.calib.ElevateViewInfo;
 import boofcv.struct.geo.AssociatedTuple;
-import boofcv.struct.image.ImageDimension;
 import org.ejml.data.DMatrixRMaj;
 
 import java.util.List;
@@ -34,14 +34,15 @@ public interface ProjectiveToMetricCameras {
 	/**
 	 * Computes metric upgrade from projective cameras.
 	 *
-	 * @param dimensions (Input) Dimension of input image in each view, including the first
+	 * @param views (Input) Specifies the image's shape and if the same camera was used to capture multiple views
 	 * @param cameraMatrices (Input) List of projective camera matrices. First view is P=[I|0] implicitly and is not included
 	 * @param observations (Input) Observations of common features among all the views. Observations are in pixels.
 	 * some implementations might require the pixel observations be offset by the principle point.
 	 * @param results (Output) Storage for found metric upgrade. Translations are scaled automatically to be close to 1.0.
 	 * @return true if successful or false if it failed
 	 */
-	boolean process( List<ImageDimension> dimensions, List<DMatrixRMaj> cameraMatrices,
+	boolean process( List<ElevateViewInfo> views,
+					 List<DMatrixRMaj> cameraMatrices,
 					 List<AssociatedTuple> observations, MetricCameras results );
 
 	/**

@@ -23,6 +23,7 @@ import boofcv.abst.geo.bundle.SceneStructureProjective;
 import boofcv.alg.structure.PairwiseImageGraph.Motion;
 import boofcv.alg.structure.PairwiseImageGraph.View;
 import boofcv.misc.BoofMiscOps;
+import boofcv.struct.calib.ElevateViewInfo;
 import boofcv.struct.feature.AssociatedIndex;
 import boofcv.struct.geo.AssociatedPair;
 import boofcv.struct.geo.AssociatedTriple;
@@ -30,6 +31,8 @@ import boofcv.struct.geo.AssociatedTupleDN;
 import boofcv.struct.image.ImageDimension;
 import georegression.struct.point.Point2D_F64;
 import georegression.struct.point.Point4D_F64;
+import gnu.trove.map.TIntIntMap;
+import gnu.trove.map.hash.TIntIntHashMap;
 import lombok.Getter;
 import lombok.Setter;
 import org.ddogleg.struct.DogArray;
@@ -96,6 +99,11 @@ public class ProjectiveInitializeAllCommon implements VerbosePrint {
 	 * of the inlier set.
 	 */
 	protected final DogArray_I32 seedToStructure = new DogArray_I32();
+
+	// Used to reassign camera IDs
+	TIntIntMap dbToCamera = new TIntIntHashMap() {{
+		no_entry_value = -1;
+	}};
 
 	public ProjectiveInitializeAllCommon( ConfigProjectiveReconstruction configProjective ) {
 		utils = new PairwiseGraphUtils(configProjective);
@@ -478,20 +486,20 @@ public class ProjectiveInitializeAllCommon implements VerbosePrint {
 	 * Copies results into a format that's useful for projective to metric conversion
 	 *
 	 * @param viewIds (Output) ID of each view
-	 * @param dimensions (Output) Shape of images in each view
+	 * @param views (Output) Shape of images in each view
 	 * @param cameraMatrices (Output) Found camera matrices. view[0] is skipped since it is identity
 	 * @param observations (Output) Found observations shifted to have (0,0) center
 	 */
 	public void lookupInfoForMetricElevation( List<String> viewIds,
-											  DogArray<ImageDimension> dimensions,
+											  DogArray<ElevateViewInfo> views,
 											  DogArray<DMatrixRMaj> cameraMatrices,
 											  DogArray<AssociatedTupleDN> observations ) {
 		// Initialize all data structures to the correct size
 		final int numViews = utils.structure.views.size;
 		viewIds.clear();
-		dimensions.resize(numViews);
+		views.resize(numViews);
 		cameraMatrices.resize(numViews - 1);
-		observations.resize(inlierIndexes.get(0).size);
+		observations.resize(inlierIndexes.get(0).size);		TIntIntMap dbToCamera = new TIntIntHashMap(){{no_entry_value = -1;}};
 
 		// pre-allocate memory
 		for (int obsIdx = 0; obsIdx < observations.size; obsIdx++) {
@@ -507,7 +515,17 @@ public class ProjectiveInitializeAllCommon implements VerbosePrint {
 				BoofMiscOps.checkTrue(MatrixFeatures_DDRM.isIdentity(pview.worldToView, 1e-8));
 			String id = viewsByStructureIndex.get(viewIdx).id;
 			viewIds.add(id);
-			dimensions.get(viewIdx).setTo(pview.width, pview.height);
+
+			// See if this camera has already been assigned an index
+			int cameraDB = utils.dbCams.viewToCamera(id);
+			int cameraIdx = dbToCamera.get(cameraDB);
+			if (cameraIdx == -1) {
+				// Add this camera to the map since it's unknown
+				cameraIdx = dbToCamera.size();
+				dbToCamera.put(cameraDB, cameraIdx);
+			}
+
+			views.get(viewIdx).setTo(pview.width, pview.height, cameraIdx);
 
 			SceneObservations.View oview = utils.observations.views.get(viewIdx);
 			BoofMiscOps.checkTrue(oview.size() == observations.size);

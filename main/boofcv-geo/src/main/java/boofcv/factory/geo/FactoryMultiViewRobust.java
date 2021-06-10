@@ -32,11 +32,11 @@ import boofcv.alg.geo.selfcalib.DistanceMetricTripleReprojection23;
 import boofcv.alg.geo.selfcalib.MetricCameraTriple;
 import boofcv.alg.geo.selfcalib.ModelManagerMetricCameraTriple;
 import boofcv.concurrency.BoofConcurrency;
+import boofcv.struct.calib.ElevateViewInfo;
 import boofcv.struct.geo.AssociatedPair;
 import boofcv.struct.geo.AssociatedTriple;
 import boofcv.struct.geo.Point2D3D;
 import boofcv.struct.geo.TrifocalTensor;
-import boofcv.struct.image.ImageDimension;
 import georegression.fitting.homography.ModelManagerHomography2D_F64;
 import georegression.fitting.se.ModelManagerSe3_F64;
 import georegression.struct.homography.Homography2D_F64;
@@ -457,7 +457,7 @@ public class FactoryMultiViewRobust {
 		// lint:forbidden ignore_below 1
 		var generator = FactoryMultiView.selfCalibThree(configSelfcalib);
 		var manager = new ModelManagerMetricCameraTriple();
-		var distance = new DistanceFromModelIntoViews<MetricCameraTriple, AssociatedTriple, ImageDimension>
+		var distance = new DistanceFromModelIntoViews<MetricCameraTriple, AssociatedTriple, ElevateViewInfo>
 				(new DistanceMetricTripleReprojection23(), 3);
 
 		return new RansacProjective<>(configRansac.randSeed, manager, generator, distance, configRansac.iterations, ransacTol);

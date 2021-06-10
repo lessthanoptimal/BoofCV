@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -25,8 +25,8 @@ import boofcv.alg.geo.selfcalib.SelfCalibrationEssentialGuessAndCheck;
 import boofcv.alg.geo.selfcalib.SelfCalibrationLinearDualQuadratic;
 import boofcv.alg.geo.selfcalib.SelfCalibrationPraticalGuessAndCheckFocus;
 import boofcv.factory.geo.FactoryMultiView;
+import boofcv.struct.calib.ElevateViewInfo;
 import boofcv.struct.geo.AssociatedTriple;
-import boofcv.struct.image.ImageDimension;
 import boofcv.testing.BoofStandardJUnit;
 import org.junit.jupiter.api.Nested;
 
@@ -38,11 +38,11 @@ class TestGenerateMetricTripleFromProjective extends BoofStandardJUnit {
 	@Nested
 	class DualQuadratic extends CommonGenerateMetricCameraTripleChecks {
 		@Override
-		public ModelGeneratorViews<MetricCameraTriple, AssociatedTriple, ImageDimension> createGenerator() {
+		public ModelGeneratorViews<MetricCameraTriple, AssociatedTriple, ElevateViewInfo> createGenerator() {
 			Estimate1ofTrifocalTensor trifocal = FactoryMultiView.trifocal_1(null);
 			var alg = new SelfCalibrationLinearDualQuadratic(1.0);
 			var wrapper = new ProjectiveToMetricCameraDualQuadratic(alg);
-			return new GenerateMetricTripleFromProjective(trifocal,wrapper);
+			return new GenerateMetricTripleFromProjective(trifocal, wrapper);
 		}
 	}
 
@@ -53,14 +53,14 @@ class TestGenerateMetricTripleFromProjective extends BoofStandardJUnit {
 		}
 
 		@Override
-		public ModelGeneratorViews<MetricCameraTriple, AssociatedTriple, ImageDimension> createGenerator() {
+		public ModelGeneratorViews<MetricCameraTriple, AssociatedTriple, ElevateViewInfo> createGenerator() {
 			Estimate1ofTrifocalTensor trifocal = FactoryMultiView.trifocal_1(null);
 			var alg = new SelfCalibrationEssentialGuessAndCheck();
 			alg.fixedFocus = false;
 			alg.numberOfSamples = 200;
-			alg.configure(0.3,2.5);
+			alg.configure(0.3, 2.5);
 			var wrapper = new ProjectiveToMetricCameraEssentialGuessAndCheck(alg);
-			return new GenerateMetricTripleFromProjective(trifocal,wrapper);
+			return new GenerateMetricTripleFromProjective(trifocal, wrapper);
 		}
 	}
 
@@ -72,13 +72,13 @@ class TestGenerateMetricTripleFromProjective extends BoofStandardJUnit {
 		}
 
 		@Override
-		public ModelGeneratorViews<MetricCameraTriple, AssociatedTriple, ImageDimension> createGenerator() {
+		public ModelGeneratorViews<MetricCameraTriple, AssociatedTriple, ElevateViewInfo> createGenerator() {
 			Estimate1ofTrifocalTensor trifocal = FactoryMultiView.trifocal_1(null);
 			var alg = new SelfCalibrationPraticalGuessAndCheckFocus();
-			alg.setSampling(0.3,2,100);
+			alg.setSampling(0.3, 2, 100);
 			alg.setSingleCamera(false);
 			var wrapper = new ProjectiveToMetricCameraPracticalGuessAndCheck(alg);
-			return new GenerateMetricTripleFromProjective(trifocal,wrapper);
+			return new GenerateMetricTripleFromProjective(trifocal, wrapper);
 		}
 	}
 }
