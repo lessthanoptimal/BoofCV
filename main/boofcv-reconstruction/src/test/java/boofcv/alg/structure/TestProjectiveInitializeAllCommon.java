@@ -546,8 +546,10 @@ class TestProjectiveInitializeAllCommon extends BoofStandardJUnit {
 	@Test void lookupInfoForMetricElevation() {
 		int numViews = 4;
 		var dbSimilar = new MockLookupSimilarImages(numViews, 0xDEADBEEF);
+		var dbCams = new MockLookUpCameraInfo(800, 800);
 		var alg = new ProjectiveInitializeAllCommon();
 		alg.utils.dbSimilar = dbSimilar;
+		alg.utils.dbCams = dbCams;
 
 		// sanity check that all features are visible in all views. Requirement of metric escalation
 		for (int i = 0; i < dbSimilar.viewIds.size(); i++) {
@@ -602,6 +604,7 @@ class TestProjectiveInitializeAllCommon extends BoofStandardJUnit {
 		for (int viewIdx = 0; viewIdx < 4; viewIdx++) {
 			assertEquals(dbSimilar.viewIds.get(viewIdx), viewIds.get(viewIdx));
 			assertEquals(viewIdx, views.get(viewIdx).shape.width);
+			assertEquals(0, views.get(viewIdx).cameraID); // only one camera
 		}
 
 		// See if it unscrambled the observations

@@ -246,7 +246,7 @@ public class ExampleMultiViewSparseReconstruction {
 				if (first) {
 					first = false;
 					dbSimilar.initialize(frame.width, frame.height);
-					dbCams.addDefaultCamera(frame.width, frame.height, 60.0);
+					dbCams.addCameraCanonical(frame.width, frame.height, 60.0);
 				}
 
 				tracker.process(frame);
@@ -305,7 +305,7 @@ public class ExampleMultiViewSparseReconstruction {
 				similarImages.addImage(viewID, frame);
 				// Everything maps to the same camera
 				if (frameId == 0)
-					dbCams.addDefaultCamera(frame.width, frame.height, 60.0);
+					dbCams.addCameraCanonical(frame.width, frame.height, 60.0);
 				dbCams.addView(viewID, 0);
 
 				// To keep things manageable only process the first few frames, if configured to do so
