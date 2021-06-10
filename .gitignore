@@ -12,3 +12,5 @@ Project.xml
 **/build/
 # Avoid ignoring Gradle wrapper jar file (.jar files are usually ignored)
 !gradle-wrapper.jar
+# Adding to allow local changes to avoid problems in IntelliJ
+build.gradle
