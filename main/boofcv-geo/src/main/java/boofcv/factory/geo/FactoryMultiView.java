@@ -47,9 +47,9 @@ import boofcv.alg.geo.triangulate.*;
 import boofcv.alg.geo.trifocal.RefineThreeViewProjectiveGeometric;
 import boofcv.alg.geo.trifocal.TrifocalAlgebraicPoint7;
 import boofcv.misc.ConfigConverge;
+import boofcv.struct.calib.ElevateViewInfo;
 import boofcv.struct.geo.AssociatedPair;
 import boofcv.struct.geo.AssociatedTriple;
-import boofcv.struct.image.ImageDimension;
 import georegression.fitting.MotionTransformPoint;
 import georegression.fitting.se.FitSpecialEuclideanOps_F64;
 import georegression.struct.point.Point3D_F64;
@@ -668,7 +668,7 @@ public class FactoryMultiView {
 	 * @param config (Input) Configuration for metric elevation. Can be null.
 	 * @return ModelGenerator
 	 */
-	public static ModelGeneratorViews<MetricCameraTriple, AssociatedTriple, ImageDimension>
+	public static ModelGeneratorViews<MetricCameraTriple, AssociatedTriple, ElevateViewInfo>
 	selfCalibThree( @Nullable ConfigPixelsToMetric config ) {
 		if (config == null)
 			config = new ConfigPixelsToMetric();

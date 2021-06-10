@@ -24,11 +24,11 @@ import boofcv.alg.geo.MultiViewOps;
 import boofcv.alg.geo.robust.ModelGeneratorViews;
 import boofcv.alg.geo.selfcalib.MetricCameraTriple;
 import boofcv.alg.geo.trifocal.TrifocalExtractGeometries;
+import boofcv.struct.calib.ElevateViewInfo;
 import boofcv.struct.geo.AssociatedTriple;
 import boofcv.struct.geo.AssociatedTuple;
 import boofcv.struct.geo.AssociatedTupleN;
 import boofcv.struct.geo.TrifocalTensor;
-import boofcv.struct.image.ImageDimension;
 import lombok.Getter;
 import org.ddogleg.struct.DogArray;
 import org.ejml.data.DMatrixRMaj;
@@ -42,7 +42,7 @@ import java.util.List;
  * @author Peter Abeles
  */
 public class GenerateMetricTripleFromProjective implements
-		ModelGeneratorViews<MetricCameraTriple, AssociatedTriple, ImageDimension> {
+		ModelGeneratorViews<MetricCameraTriple, AssociatedTriple, ElevateViewInfo> {
 	// Computes a trifocal tensor from input observations from which projective cameras are extracted
 	public Estimate1ofTrifocalTensor trifocal;
 	// from projective cameras computes metric cameras
@@ -58,7 +58,7 @@ public class GenerateMetricTripleFromProjective implements
 	// Data structures which have been converted
 	@Getter final DogArray<AssociatedTuple> observationsN = new DogArray<>(() -> new AssociatedTupleN(3));
 	@Getter final DogArray<DMatrixRMaj> projective = new DogArray<>(() -> new DMatrixRMaj(3, 4));
-	@Getter final DogArray<ImageDimension> dimensions = new DogArray<>(ImageDimension::new);
+	@Getter final DogArray<ElevateViewInfo> views = new DogArray<>(ElevateViewInfo::new);
 	@Getter final MetricCameras metricN = new MetricCameras();
 
 	public GenerateMetricTripleFromProjective( Estimate1ofTrifocalTensor trifocal,
@@ -66,15 +66,15 @@ public class GenerateMetricTripleFromProjective implements
 		this.trifocal = trifocal;
 		this.projectiveToMetric = projectiveToMetric;
 
-		dimensions.resize(3);
+		views.resize(3);
 		projective.resize(2);
 		P2 = projective.get(0);
 		P3 = projective.get(1);
 	}
 
 	@Override
-	public void setView( int view, ImageDimension viewInfo ) {
-		dimensions.get(view).setTo(viewInfo);
+	public void setView( int view, ElevateViewInfo viewInfo ) {
+		views.get(view).setTo(viewInfo);
 	}
 
 	@Override
@@ -94,7 +94,7 @@ public class GenerateMetricTripleFromProjective implements
 
 		MultiViewOps.convertTr(observationTriple, observationsN);
 
-		if (!projectiveToMetric.process(dimensions.toList(), projective.toList(), observationsN.toList(), metricN))
+		if (!projectiveToMetric.process(views.toList(), projective.toList(), observationsN.toList(), metricN))
 			return false;
 
 		// Converts the output

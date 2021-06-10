@@ -19,7 +19,7 @@
 package boofcv.alg.geo.robust;
 
 import boofcv.misc.BoofMiscOps;
-import boofcv.struct.image.ImageDimension;
+import boofcv.struct.calib.ElevateViewInfo;
 import org.ddogleg.fitting.modelset.ModelManager;
 import org.ddogleg.fitting.modelset.ransac.Ransac;
 
@@ -29,28 +29,26 @@ import org.ddogleg.fitting.modelset.ransac.Ransac;
  *
  * @author Peter Abeles
  */
-public class RansacProjective<Model,Point> extends Ransac<Model,Point>
-		implements ModelMatcherViews<Model,Point, ImageDimension>
-{
-	private final DistanceFromModelViews<Model,Point,ImageDimension> modelDistance;
-	private final ModelGeneratorViews<Model,Point,ImageDimension> modelGenerator;
+public class RansacProjective<Model, Point> extends Ransac<Model, Point>
+		implements ModelMatcherViews<Model, Point, ElevateViewInfo> {
+	private final DistanceFromModelViews<Model, Point, ElevateViewInfo> modelDistance;
+	private final ModelGeneratorViews<Model, Point, ElevateViewInfo> modelGenerator;
 
-	public RansacProjective(long randSeed,
-							ModelManager<Model> modelManager,
-							ModelGeneratorViews<Model, Point,ImageDimension> modelGenerator,
-							DistanceFromModelViews<Model,Point,ImageDimension> modelDistance, int maxIterations, double thresholdFit)
-	{
+	public RansacProjective( long randSeed,
+							 ModelManager<Model> modelManager,
+							 ModelGeneratorViews<Model, Point, ElevateViewInfo> modelGenerator,
+							 DistanceFromModelViews<Model, Point, ElevateViewInfo> modelDistance, int maxIterations, double thresholdFit ) {
 		super(randSeed, maxIterations, thresholdFit, modelManager, modelDistance.getPointType());
-		setModel(()-> modelGenerator, ()-> modelDistance);
+		setModel(() -> modelGenerator, () -> modelDistance);
 		this.modelDistance = modelDistance;
 		this.modelGenerator = modelGenerator;
 		BoofMiscOps.checkTrue(modelDistance.getNumberOfViews() == modelGenerator.getNumberOfViews());
 	}
 
 	@Override
-	public void setView(int view , ImageDimension intrinsic ) {
-		this.modelDistance.setView(view,intrinsic);
-		this.modelGenerator.setView(view,intrinsic);
+	public void setView( int view, ElevateViewInfo info ) {
+		this.modelDistance.setView(view, info);
+		this.modelGenerator.setView(view, info);
 	}
 
 	@Override

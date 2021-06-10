@@ -23,9 +23,9 @@ import boofcv.alg.geo.MultiViewOps;
 import boofcv.alg.geo.PerspectiveOps;
 import boofcv.alg.geo.selfcalib.SelfCalibrationEssentialGuessAndCheck;
 import boofcv.misc.BoofMiscOps;
+import boofcv.struct.calib.ElevateViewInfo;
 import boofcv.struct.geo.AssociatedPair;
 import boofcv.struct.geo.AssociatedTuple;
-import boofcv.struct.image.ImageDimension;
 import lombok.Getter;
 import org.ddogleg.struct.DogArray;
 import org.ejml.data.DMatrixRMaj;
@@ -51,13 +51,13 @@ public class ProjectiveToMetricCameraEssentialGuessAndCheck implements Projectiv
 	}
 
 	@Override
-	public boolean process( List<ImageDimension> dimensions, List<DMatrixRMaj> cameraMatrices,
+	public boolean process( List<ElevateViewInfo> dimensions, List<DMatrixRMaj> cameraMatrices,
 							List<AssociatedTuple> observations, MetricCameras metricViews ) {
 		BoofMiscOps.checkTrue(cameraMatrices.size() + 1 == dimensions.size());
 		metricViews.reset();
 
 		// initialize
-		selfCalib.imageLengthPixels = dimensions.get(0).getMaxLength();
+		selfCalib.imageLengthPixels = dimensions.get(0).shape.getMaxLength();
 
 		// Convert the projective cameras into a fundamental matrix
 		DMatrixRMaj P2 = cameraMatrices.get(0);

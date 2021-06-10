@@ -27,8 +27,8 @@ import boofcv.alg.geo.selfcalib.SelfCalibrationLinearDualQuadratic;
 import boofcv.alg.geo.structure.DecomposeAbsoluteDualQuadratic;
 import boofcv.misc.BoofMiscOps;
 import boofcv.struct.calib.CameraPinhole;
+import boofcv.struct.calib.ElevateViewInfo;
 import boofcv.struct.geo.AssociatedTuple;
-import boofcv.struct.image.ImageDimension;
 import georegression.geometry.ConvertRotation3D_F64;
 import georegression.struct.se.Se3_F64;
 import lombok.Getter;
@@ -78,9 +78,9 @@ public class ProjectiveToMetricCameraDualQuadratic implements ProjectiveToMetric
 	}
 
 	@Override
-	public boolean process( List<ImageDimension> dimensions, List<DMatrixRMaj> cameraMatrices,
+	public boolean process( List<ElevateViewInfo> views, List<DMatrixRMaj> cameraMatrices,
 							List<AssociatedTuple> observations, MetricCameras metricViews ) {
-		checkEq(cameraMatrices.size() + 1, dimensions.size(), "View[0] is implicitly identity and not included");
+		checkEq(cameraMatrices.size() + 1, views.size(), "View[0] is implicitly identity and not included");
 		metricViews.reset();
 
 		// Perform self calibration and estimate the metric views
@@ -88,7 +88,7 @@ public class ProjectiveToMetricCameraDualQuadratic implements ProjectiveToMetric
 			return false;
 
 		FastAccess<SelfCalibrationLinearDualQuadratic.Intrinsic> solutions = selfCalib.getSolutions();
-		if (solutions.size != dimensions.size()) {
+		if (solutions.size != views.size()) {
 			if (verbose != null) verbose.println("FAILED solution.size miss match");
 			return false;
 		}
@@ -104,7 +104,7 @@ public class ProjectiveToMetricCameraDualQuadratic implements ProjectiveToMetric
 			return true;
 
 		// Failed, but print what it found to help debug
-		if (verbose != null) printFoundMetric(dimensions, metricViews);
+		if (verbose != null) printFoundMetric(views, metricViews);
 
 		return false;
 	}
@@ -196,10 +196,10 @@ public class ProjectiveToMetricCameraDualQuadratic implements ProjectiveToMetric
 		return false;
 	}
 
-	private void printFoundMetric( List<ImageDimension> dimensions, MetricCameras metricViews ) {
+	private void printFoundMetric( List<ElevateViewInfo> views, MetricCameras metricViews ) {
 		PrintStream verbose = Objects.requireNonNull(this.verbose);
 
-		for (int i = 0; i < dimensions.size(); i++) {
+		for (int i = 0; i < views.size(); i++) {
 			CameraPinhole cam = metricViews.intrinsics.get(i);
 			verbose.printf("metric[%d] fx=%.1f fy=%.1f", i, cam.fx, cam.fy);
 			if (i == 0) {

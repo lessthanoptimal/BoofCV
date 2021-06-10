@@ -24,6 +24,7 @@ import boofcv.alg.geo.PerspectiveOps;
 import boofcv.alg.geo.selfcalib.ResolveSignAmbiguityPositiveDepth;
 import boofcv.alg.geo.selfcalib.SelfCalibrationPraticalGuessAndCheckFocus;
 import boofcv.misc.BoofMiscOps;
+import boofcv.struct.calib.ElevateViewInfo;
 import boofcv.struct.geo.AssociatedTuple;
 import boofcv.struct.image.ImageDimension;
 import lombok.Getter;
@@ -51,13 +52,13 @@ public class ProjectiveToMetricCameraPracticalGuessAndCheck implements Projectiv
 	}
 
 	@Override
-	public boolean process( List<ImageDimension> dimensions, List<DMatrixRMaj> cameraMatrices,
+	public boolean process( List<ElevateViewInfo> views, List<DMatrixRMaj> cameraMatrices,
 							List<AssociatedTuple> observations, MetricCameras metricViews ) {
-		BoofMiscOps.checkTrue(cameraMatrices.size() + 1 == dimensions.size());
+		BoofMiscOps.checkTrue(cameraMatrices.size() + 1 == views.size());
 		metricViews.reset();
 
 		// tell it the image size
-		ImageDimension dimension = dimensions.get(0);
+		ImageDimension dimension = views.get(0).shape;
 		selfCalib.setCamera(0.0, 0.0, 0.0, dimension.width, dimension.height);
 
 		// Perform self calibration
