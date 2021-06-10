@@ -198,6 +198,49 @@ public class TestSceneMergingOperations extends BoofStandardJUnit {
 		}
 	}
 
+	/**
+	 * A view will not be in 'dst' but it will reference a camera that is in 'dst'. Make sure that camera
+	 * is not modified when merged.
+	 */
+	@Test void mergeStructure_EnsureCameraNotModifiedInDst() {
+		var src = new SceneWorkingGraph();
+		var dst = new SceneWorkingGraph();
+		var src_to_dst = new ScaleSe3_F64();
+
+		// Add cameras
+		SceneWorkingGraph.Camera cameraSrc0 = src.addCamera(0);
+		SceneWorkingGraph.Camera cameraSrc2 = src.addCamera(2);
+		SceneWorkingGraph.Camera cameraDst2 = dst.addCamera(2);
+
+		// Give the cameras different focal lengths so we can see if the camera in 'dst' got modified
+		cameraSrc2.intrinsic.f = 100;
+		cameraDst2.intrinsic.f = 102;
+
+		// None of the views will overlap
+		for (int i = 0; i < 2; i++) {
+			var a = new PairwiseImageGraph.View("" + i);
+			var b = new PairwiseImageGraph.View("" + (i+3));
+
+			// swap between the two cameras to make things interesting
+			src.addView(a, i%2 == 0 ? cameraSrc0 : cameraSrc2);
+			dst.addView(b, cameraDst2);
+		}
+
+		var scenesInView = new PairwiseViewScenes();
+		scenesInView.views.resize(5 + 3);
+
+		// Call the function being tested
+		var alg = new SceneMergingOperations();
+		alg.mergeStructure(src, dst, src_to_dst, scenesInView);
+
+		// make sure the common camera was not modified
+		assertEquals(2, dst.listCameras.size);
+		assertEquals(102, dst.cameras.get(2).intrinsic.f);
+
+		// simple sanity check on views
+		assertEquals(4, dst.listViews.size());
+	}
+
 	@Test void toggleViewEnabled() {
 		int numScenes = 4;
 		int numViews = 6;
@@ -275,12 +318,5 @@ public class TestSceneMergingOperations extends BoofStandardJUnit {
 		assertSame(found1, found3);
 		assertEquals(5, found1.sceneIndex);
 		assertEquals(6, found2.sceneIndex);
-	}
-
-	/**
-	 * Make sure cameras are correctly merged
-	 */
-	@Test void cameraMerging() {
-		fail("Implement");
 	}
 }

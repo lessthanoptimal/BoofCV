@@ -102,10 +102,10 @@ public class LookUpCameraInfo {
 	 *
 	 * @param width (Input) Image width
 	 * @param height (Input) Image height
-	 * @param fov (Input) Field-of-view in degrees
+	 * @param hfov (Input) Horizontal field-of-view in degrees
 	 */
-	public void addDefaultCamera( int width, int height, double fov ) {
-		PerspectiveOps.createIntrinsic(width, height, fov, listCalibration.grow());
+	public void addCameraCanonical( int width, int height, double hfov ) {
+		PerspectiveOps.createIntrinsic(width, height, hfov, listCalibration.grow());
 	}
 
 	/**

@@ -345,7 +345,7 @@ public class SceneReconstructionApp {
 		// Track features across the entire sequence and save the results
 		BoofMiscOps.profile(() -> {
 			GrayU8 gray = new GrayU8(images.getWidth(), images.getHeight());
-			dbCams.addDefaultCamera(gray.width, gray.height, 60.0);
+			dbCams.addCameraCanonical(gray.width, gray.height, 60.0);
 			while (images.hasNext()) {
 				Planar<GrayU8> color = images.next();
 				ConvertImage.average(color, gray);
@@ -382,7 +382,7 @@ public class SceneReconstructionApp {
 				if (first) {
 					first = false;
 					similarImages.initialize(gray.width, gray.height);
-					dbCams.addDefaultCamera(gray.width, gray.height, 60.0);
+					dbCams.addCameraCanonical(gray.width, gray.height, 60.0);
 				}
 
 				tracker.process(gray);

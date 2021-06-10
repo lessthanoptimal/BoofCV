@@ -304,7 +304,8 @@ public class SceneMergingOperations implements VerbosePrint {
 				scenesInEachView.getView(srcView.pview).viewedBy.sort(sorter);
 				// NOTE: This sorted insert could be speed up
 
-				// Create a new view in the dst scene
+				// If the camera doesn't exist in 'dst' add a new camera. Otherwise, keep 'dst' version of it
+				// unmodified.
 				SceneWorkingGraph.Camera cameraSrc = src.getViewCamera(srcView);
 				SceneWorkingGraph.Camera cameraDst = dst.cameras.get(cameraSrc.indexDB);
 				if (cameraDst == null) {
@@ -335,15 +336,6 @@ public class SceneMergingOperations implements VerbosePrint {
 			src_to_view.setTo(srcView.world_to_view);
 			src_to_view.T.scale(src_to_dst.scale);
 			transform_dst_to_src.concat(src_to_view, dstView.world_to_view);
-		}
-
-		// Copy cameras from 'src' to 'dst' if they don't exist in dst
-		for (int cameraSrcIdx = 0; cameraSrcIdx < src.listCameras.size; cameraSrcIdx++) {
-			SceneWorkingGraph.Camera cameraSrc = src.listCameras.get(cameraSrcIdx);
-			SceneWorkingGraph.Camera cameraDst = dst.cameras.get(cameraSrc.indexDB);
-			if (cameraDst != null)
-				continue;
-			dst.addCameraCopy(cameraSrc);
 		}
 	}
 
