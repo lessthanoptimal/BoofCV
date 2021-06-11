@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -42,7 +42,7 @@ public class CommonAutoCalibrationChecks extends BoofStandardJUnit {
 	List<Se3_F64> listCameraToWorld = new ArrayList<>();
 
 	List<DMatrixRMaj> listP = new ArrayList<>();
-	DMatrixRMaj p=new DMatrixRMaj(3,1); // plane at infinity [p';1]
+	DMatrixRMaj p = new DMatrixRMaj(3, 1); // plane at infinity [p';1]
 	DMatrixRMaj Q;
 
 	public void renderTranslationOnly( CameraPinhole camera ) {
@@ -50,14 +50,14 @@ public class CommonAutoCalibrationChecks extends BoofStandardJUnit {
 		for (int i = 0; i < 11; i++) {
 			Se3_F64 R = new Se3_F64();
 			Se3_F64 axis = new Se3_F64();
-			axis.T.z = -2+rand.nextGaussian()*0.01;
+			axis.T.z = -2 + rand.nextGaussian()*0.01;
 			axis.T.x = rand.nextGaussian()*0.4;
 			axis.T.y = rand.nextGaussian()*0.4;
 
 			Se3_F64 cameraToWorld = new Se3_F64();
-			R.concat(axis,cameraToWorld);
+			R.concat(axis, cameraToWorld);
 
-			listCameraToWorld.add( cameraToWorld );
+			listCameraToWorld.add(cameraToWorld);
 			cameras.add(camera);
 		}
 
@@ -72,9 +72,9 @@ public class CommonAutoCalibrationChecks extends BoofStandardJUnit {
 			double roll = rand.nextGaussian()*0.1;
 
 			Se3_F64 cameraToWorld = new Se3_F64();
-			ConvertRotation3D_F64.eulerToMatrix(EulerType.YZX,yaw,roll,pitch,cameraToWorld.R);
+			ConvertRotation3D_F64.eulerToMatrix(EulerType.YZX, yaw, roll, pitch, cameraToWorld.R);
 
-			listCameraToWorld.add( cameraToWorld );
+			listCameraToWorld.add(cameraToWorld);
 			cameras.add(camera);
 		}
 
@@ -87,9 +87,9 @@ public class CommonAutoCalibrationChecks extends BoofStandardJUnit {
 			double pitch = Math.PI*i/20.0;
 
 			Se3_F64 cameraToWorld = new Se3_F64();
-			ConvertRotation3D_F64.eulerToMatrix(EulerType.YZX,0,0,pitch,cameraToWorld.R);
+			ConvertRotation3D_F64.eulerToMatrix(EulerType.YZX, 0, 0, pitch, cameraToWorld.R);
 
-			listCameraToWorld.add( cameraToWorld );
+			listCameraToWorld.add(cameraToWorld);
 			cameras.add(camera);
 		}
 
@@ -103,9 +103,9 @@ public class CommonAutoCalibrationChecks extends BoofStandardJUnit {
 			double pitch = Math.PI*i/20.0;
 
 			Se3_F64 cameraToWorld = new Se3_F64();
-			ConvertRotation3D_F64.eulerToMatrix(EulerType.YZX,yaw,0,pitch,cameraToWorld.R);
+			ConvertRotation3D_F64.eulerToMatrix(EulerType.YZX, yaw, 0, pitch, cameraToWorld.R);
 
-			listCameraToWorld.add( cameraToWorld );
+			listCameraToWorld.add(cameraToWorld);
 			cameras.add(camera);
 		}
 
@@ -116,7 +116,7 @@ public class CommonAutoCalibrationChecks extends BoofStandardJUnit {
 		List<CameraPinhole> cameras = new ArrayList<>();
 		for (int i = 0; i < 11; i++) {
 			Se3_F64 cameraToWorld = new Se3_F64();
-			listCameraToWorld.add( cameraToWorld );
+			listCameraToWorld.add(cameraToWorld);
 			cameras.add(camera);
 		}
 
@@ -130,33 +130,33 @@ public class CommonAutoCalibrationChecks extends BoofStandardJUnit {
 			double roll = rand.nextGaussian()*0.05;
 
 			Se3_F64 R = new Se3_F64();
-			ConvertRotation3D_F64.eulerToMatrix(EulerType.YZX,yaw,roll,pitch,R.R);
+			ConvertRotation3D_F64.eulerToMatrix(EulerType.YZX, yaw, roll, pitch, R.R);
 			Se3_F64 axis = new Se3_F64();
-			axis.T.z = -2+rand.nextGaussian()*0.01;
+			axis.T.z = -2 + rand.nextGaussian()*0.01;
 			axis.T.x = rand.nextGaussian()*0.1;
 			axis.T.y = rand.nextGaussian()*0.1;
 
 			Se3_F64 cameraToWorld = new Se3_F64();
-			R.concat(axis,cameraToWorld);
+			R.concat(axis, cameraToWorld);
 
-			listCameraToWorld.add( cameraToWorld );
+			listCameraToWorld.add(cameraToWorld);
 		}
 
 		render(cameras);
 	}
 
-	private void render(List<CameraPinhole> cameras) {
-		cloud = UtilPoint3D_F64.random(-1,1,200,rand);
+	private void render( List<CameraPinhole> cameras ) {
+		cloud = UtilPoint3D_F64.random(-1, 1, 200, rand);
 
 		// make camera[0] origin. probably not needed
 		Se3_F64 a = listCameraToWorld.get(0).invert(null);
 		for (int i = 0; i < cloud.size(); i++) {
-			a.transform(cloud.get(i),cloud.get(i));
+			a.transform(cloud.get(i), cloud.get(i));
 		}
 
 		Se3_F64 tmp = new Se3_F64();
 		for (int i = 0; i < listCameraToWorld.size(); i++) {
-			a.concat(listCameraToWorld.get(i),tmp);
+			a.concat(listCameraToWorld.get(i), tmp);
 			listCameraToWorld.get(i).setTo(tmp);
 		}
 
@@ -168,10 +168,10 @@ public class CommonAutoCalibrationChecks extends BoofStandardJUnit {
 		{
 
 			// random scale, positive or negative, that isn't zero
-			double scale = (rand.nextDouble()+0.1) * (rand.nextGaussian() < 0 ? -1 : 1);
+			double scale = (rand.nextDouble() + 0.1)*(rand.nextGaussian() < 0 ? -1 : 1);
 
-			DMatrixRMaj K = PerspectiveOps.pinholeToMatrix(cameras.get(0),(DMatrixRMaj)null);
-			eq.alias(K,"K",p,"p",scale,"scale");
+			DMatrixRMaj K = PerspectiveOps.pinholeToMatrix(cameras.get(0), (DMatrixRMaj)null);
+			eq.alias(K, "K", p, "p", scale, "scale");
 			eq.process("p=[0.5,0.25,0.4]'");
 			eq.process("H = scale*[K [0;0;0]; -p'*K 1]"); // projective to metric
 			eq.process("Hinv = inv(H)"); // metric to projective
@@ -179,12 +179,12 @@ public class CommonAutoCalibrationChecks extends BoofStandardJUnit {
 //		eq.lookupDDRM("H").print();
 
 		for (int i = 0; i < listCameraToWorld.size(); i++) {
-			double scale = (rand.nextDouble()+0.1) *( rand.nextGaussian() < 0 ? -1 : 1);
-			DMatrixRMaj K = PerspectiveOps.pinholeToMatrix(cameras.get(i),(DMatrixRMaj)null);
+			double scale = (rand.nextDouble() + 0.1)*(rand.nextGaussian() < 0 ? -1 : 1);
+			DMatrixRMaj K = PerspectiveOps.pinholeToMatrix(cameras.get(i), (DMatrixRMaj)null);
 
 			Se3_F64 b_to_a = listCameraToWorld.get(i);
 
-			eq.alias(K,"K",b_to_a.R,"R",b_to_a.T,"T",scale,"scale");
+			eq.alias(K, "K", b_to_a.R, "R", b_to_a.T, "T", scale, "scale");
 			DMatrixRMaj P = eq.process("P = scale*[K*R, K*T]*Hinv").lookupDDRM("P").copy();
 //			DMatrixRMaj P = eq.process("P = [K*R, K*T]").lookupDDRM("P").copy();
 			listP.add(P);
@@ -196,7 +196,7 @@ public class CommonAutoCalibrationChecks extends BoofStandardJUnit {
 //		Q.print();
 	}
 
-	public void addProjectives(SelfCalibrationBase alg ) {
+	public void addProjectives( SelfCalibrationBase alg ) {
 		for (int i = 0; i < listP.size(); i++) {
 			alg.addCameraMatrix(listP.get(i));
 		}

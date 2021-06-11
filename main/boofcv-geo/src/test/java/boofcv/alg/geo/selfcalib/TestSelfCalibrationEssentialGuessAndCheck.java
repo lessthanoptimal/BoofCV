@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -27,21 +27,19 @@ import static org.junit.jupiter.api.Assertions.*;
  * @author Peter Abeles
  */
 public class TestSelfCalibrationEssentialGuessAndCheck extends CommonThreeViewSelfCalibration {
-
 	/**
 	 * fixed focus for all the cameras
 	 */
-	@Test
-	public void perfect_fixedFocus() {
+	@Test void perfect_fixedFocus() {
 		standardScene();
-		var camera = new CameraPinhole(700,700,0.0,0,0,800,600);
-		setCameras(camera,camera,camera);
+		var camera = new CameraPinhole(700, 700, 0.0, 0, 0, 800, 600);
+		setCameras(camera, camera, camera);
 		simulateScene(0);
 
 		var alg = new SelfCalibrationEssentialGuessAndCheck();
 		alg.imageLengthPixels = 800;
 		alg.fixedFocus = true;
-		alg.process(F21,P2, observations2);
+		alg.process(F21, P2, observations2);
 
 		assertFalse(alg.isLimit);
 		assertEquals(camera.fx, alg.focalLengthA, 25);
@@ -51,19 +49,18 @@ public class TestSelfCalibrationEssentialGuessAndCheck extends CommonThreeViewSe
 	/**
 	 * See if it can estimate two different camera models
 	 */
-	@Test
-	public void perfect_two_cameras() {
+	@Test void perfect_two_cameras() {
 		standardScene();
-		var camera1 = new CameraPinhole(700,700,0.0,0,0,800,600);
-		var camera2 = new CameraPinhole(450,450,0.0,0,0,800,600);
+		var camera1 = new CameraPinhole(700, 700, 0.0, 0, 0, 800, 600);
+		var camera2 = new CameraPinhole(450, 450, 0.0, 0, 0, 800, 600);
 
-		setCameras(camera1,camera2,camera2);
+		setCameras(camera1, camera2, camera2);
 		simulateScene(0);
 
 		var alg = new SelfCalibrationEssentialGuessAndCheck();
 		alg.imageLengthPixels = 800;
 		alg.fixedFocus = false;
-		alg.process(F21,P2, observations2);
+		alg.process(F21, P2, observations2);
 
 		assertFalse(alg.isLimit);
 		assertEquals(camera1.fx, alg.focalLengthA, 25);
@@ -73,19 +70,18 @@ public class TestSelfCalibrationEssentialGuessAndCheck extends CommonThreeViewSe
 	/**
 	 * See if it blows up if noise is added
 	 */
-	@Test
-	public void noisy_two_cameras() {
+	@Test void noisy_two_cameras() {
 		standardScene();
-		var camera1 = new CameraPinhole(700,700,0.0,0,0,800,600);
-		var camera2 = new CameraPinhole(450,450,0.0,0,0,800,600);
+		var camera1 = new CameraPinhole(700, 700, 0.0, 0, 0, 800, 600);
+		var camera2 = new CameraPinhole(450, 450, 0.0, 0, 0, 800, 600);
 
-		setCameras(camera1,camera2,camera2);
+		setCameras(camera1, camera2, camera2);
 		simulateScene(0.25);
 
 		var alg = new SelfCalibrationEssentialGuessAndCheck();
 		alg.imageLengthPixels = 800;
 		alg.fixedFocus = false;
-		alg.process(F21,P2, observations2);
+		alg.process(F21, P2, observations2);
 
 		assertFalse(alg.isLimit);
 		assertEquals(camera1.fx, alg.focalLengthA, 25);
@@ -95,18 +91,17 @@ public class TestSelfCalibrationEssentialGuessAndCheck extends CommonThreeViewSe
 	/**
 	 * See if the hit limit flag actually works
 	 */
-	@Test
-	public void hit_limit() {
+	@Test void hit_limit() {
 		standardScene();
-		var camera = new CameraPinhole(1500,1500,0.0,0,0,800,600);
-		setCameras(camera,camera,camera);
+		var camera = new CameraPinhole(1500, 1500, 0.0, 0, 0, 800, 600);
+		setCameras(camera, camera, camera);
 		simulateScene(0);
 
 		var alg = new SelfCalibrationEssentialGuessAndCheck();
 		alg.imageLengthPixels = 800;
 		alg.fixedFocus = true;
-		alg.configure(0.3,1.0);
-		alg.process(F21,P2, observations2);
+		alg.configure(0.3, 1.0);
+		alg.process(F21, P2, observations2);
 
 		// true value of focal length is greater than the range it will test. It should git the limit
 		assertTrue(alg.isLimit);
