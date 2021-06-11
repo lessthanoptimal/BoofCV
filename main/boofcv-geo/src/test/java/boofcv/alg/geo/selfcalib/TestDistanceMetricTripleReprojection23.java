@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -32,8 +32,7 @@ class TestDistanceMetricTripleReprojection23 extends CommonThreeViewSelfCalibrat
 	/**
 	 * Give it perfect input and see if it computes the expected values
 	 */
-	@Test
-	void perfect() {
+	@Test void perfect() {
 		standardScene();
 		simulateScene(0);
 
@@ -63,8 +62,7 @@ class TestDistanceMetricTripleReprojection23 extends CommonThreeViewSelfCalibrat
 	/**
 	 * Checks to see if distance() and distances() return the same value and the the error is larger than 0
 	 */
-	@Test
-	void noisy() {
+	@Test void noisy() {
 		standardScene();
 		simulateScene(0);
 

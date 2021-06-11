@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -44,8 +44,7 @@ class TestTwoViewToCalibratingHomography extends CommonThreeViewSelfCalibration 
 	/**
 	 * Give it cameras with various structures and see if it blows up
 	 */
-	@Test
-	void perfect_cameras() {
+	@Test void perfect_cameras() {
 		List<CameraPinhole> cameras = new ArrayList<>();
 		cameras.add(new CameraPinhole(600, 600, 0.1, 400, 410, 800, 600));
 		cameras.add(new CameraPinhole(600, 650, 0, 400, 410, 800, 600));
@@ -71,8 +70,7 @@ class TestTwoViewToCalibratingHomography extends CommonThreeViewSelfCalibration 
 	/**
 	 * Have 3 different cameras render the scene
 	 */
-	@Test
-	void perfect_different_cameras() {
+	@Test void perfect_different_cameras() {
 		standardScene();
 		cameraA = new CameraPinhole(600, 600, 0.1, 400, 410, 800, 600);
 		cameraB = new CameraPinhole(600, 650, 0, 400, 410, 800, 600);
@@ -110,8 +108,7 @@ class TestTwoViewToCalibratingHomography extends CommonThreeViewSelfCalibration 
 	/**
 	 * Give it hand selected degenerate motions and see if it blows up
 	 */
-	@Test
-	void perfect_motions() {
+	@Test void perfect_motions() {
 		perfect_motions(eulerXyz(1, 0.1, -2, -0.1, 0, 0.05, null).invert(null));
 		perfect_motions(eulerXyz(1, 0.1, -2, -0.1, 0, 0.05, null).invert(null));
 
@@ -165,8 +162,7 @@ class TestTwoViewToCalibratingHomography extends CommonThreeViewSelfCalibration 
 	/**
 	 * Add a little bit of noise and see if it blows up
 	 */
-	@Test
-	void noisy() {
+	@Test void noisy() {
 		standardScene();
 		simulateScene(0.4);
 
@@ -190,8 +186,7 @@ class TestTwoViewToCalibratingHomography extends CommonThreeViewSelfCalibration 
 	/**
 	 * Tests the computeHypothesesForH by giving it its inputs directly
 	 */
-	@Test
-	void computeHypothesesForH() {
+	@Test void computeHypothesesForH() {
 		standardScene();
 		simulateScene(0);
 

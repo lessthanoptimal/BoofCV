@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -34,8 +34,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  * @author Peter Abeles
  */
 public class TestRefineDualQuadraticAlgebra extends CommonAutoCalibrationChecks {
-	@Test
-	public void solvePerfect() {
+	@Test void solvePerfect() {
 		List<CameraPinhole> expected = new ArrayList<>();
 		List<CameraPinhole> found = new ArrayList<>();
 		for (int i = 0; i < 10; i++) {
@@ -48,8 +47,7 @@ public class TestRefineDualQuadraticAlgebra extends CommonAutoCalibrationChecks 
 		checkRefine(alg, expected, found, UtilEjml.TEST_F64);
 	}
 
-	@Test
-	public void solveNoise() {
+	@Test void solveNoise() {
 		List<CameraPinhole> expected = new ArrayList<>();
 		List<CameraPinhole> found = new ArrayList<>();
 		for (int i = 0; i < 30; i++) {
@@ -67,8 +65,7 @@ public class TestRefineDualQuadraticAlgebra extends CommonAutoCalibrationChecks 
 		checkRefine(alg, expected, found, 5);
 	}
 
-	@Test
-	public void solveNoise_ZeroSkew() {
+	@Test void solveNoise_ZeroSkew() {
 		List<CameraPinhole> expected = new ArrayList<>();
 		List<CameraPinhole> found = new ArrayList<>();
 		for (int i = 0; i < 30; i++) {
@@ -87,8 +84,7 @@ public class TestRefineDualQuadraticAlgebra extends CommonAutoCalibrationChecks 
 		checkRefine(alg, expected, found, 6);
 	}
 
-	@Test
-	public void solveNoise_ZeroPrinciplePoint() {
+	@Test void solveNoise_ZeroPrinciplePoint() {
 		List<CameraPinhole> expected = new ArrayList<>();
 		List<CameraPinhole> found = new ArrayList<>();
 		for (int i = 0; i < 30; i++) {
@@ -105,8 +101,7 @@ public class TestRefineDualQuadraticAlgebra extends CommonAutoCalibrationChecks 
 		checkRefine(alg, expected, found, 6);
 	}
 
-	@Test
-	public void solveFixedAspect() {
+	@Test void solveFixedAspect() {
 		List<CameraPinhole> expected = new ArrayList<>();
 		List<CameraPinhole> found = new ArrayList<>();
 		for (int i = 0; i < 30; i++) {

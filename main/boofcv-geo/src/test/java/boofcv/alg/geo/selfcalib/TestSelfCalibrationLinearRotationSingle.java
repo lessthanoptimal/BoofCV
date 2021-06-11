@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -37,53 +37,49 @@ import static org.junit.jupiter.api.Assertions.*;
 /**
  * @author Peter Abeles
  */
-public class TestSelfCalibrationLinearRotationSingle extends CommonAutoCalibrationChecks
-{
-	@Test
-	public void perfect() {
-		CameraPinhole intrinsic = new CameraPinhole(400,420,0.1,450,475,0,0);
+public class TestSelfCalibrationLinearRotationSingle extends CommonAutoCalibrationChecks {
+	@Test void perfect() {
+		CameraPinhole intrinsic = new CameraPinhole(400, 420, 0.1, 450, 475, 0, 0);
 		renderRotationOnly(intrinsic);
 		performTest(intrinsic);
 	}
 
-	@Test
-	public void two_axis() {
-		CameraPinhole intrinsic = new CameraPinhole(400,420,0.1,450,475,0,0);
+	@Test void two_axis() {
+		CameraPinhole intrinsic = new CameraPinhole(400, 420, 0.1, 450, 475, 0, 0);
 		renderRotateTwoAxis(intrinsic);
 		performTest(intrinsic);
 	}
 
-	private void performTest(CameraPinhole intrinsic) {
+	private void performTest( CameraPinhole intrinsic ) {
 		// compute planes at infinity
 		List<Homography2D_F64> homographies = new ArrayList<>();
 		for (int i = 0; i < listP.size(); i++) {
 			DMatrixRMaj P = listP.get(i);
 
 			Equation eq = new Equation();
-			eq.alias(P,"P",p,"p");
+			eq.alias(P, "P", p, "p");
 			eq.process("H = P(:,0:2) - P(:,3)*p'");
 			Homography2D_F64 H = new Homography2D_F64();
-			DConvertMatrixStruct.convert(eq.lookupDDRM("H"),H);
+			DConvertMatrixStruct.convert(eq.lookupDDRM("H"), H);
 			homographies.add(H);
 		}
 
 		SelfCalibrationLinearRotationSingle alg = new SelfCalibrationLinearRotationSingle();
 		CameraPinhole found = new CameraPinhole();
-		assertTrue(alg.estimate(homographies,found));
+		assertTrue(alg.estimate(homographies, found));
 
-		assertEquals(intrinsic.fx,   found.fx,   UtilEjml.TEST_F64_SQ);
-		assertEquals(intrinsic.fy,   found.fy,   UtilEjml.TEST_F64_SQ);
-		assertEquals(intrinsic.cx,   found.cx,   UtilEjml.TEST_F64_SQ);
-		assertEquals(intrinsic.cy,   found.cy,   UtilEjml.TEST_F64_SQ);
+		assertEquals(intrinsic.fx, found.fx, UtilEjml.TEST_F64_SQ);
+		assertEquals(intrinsic.fy, found.fy, UtilEjml.TEST_F64_SQ);
+		assertEquals(intrinsic.cx, found.cx, UtilEjml.TEST_F64_SQ);
+		assertEquals(intrinsic.cy, found.cy, UtilEjml.TEST_F64_SQ);
 		assertEquals(intrinsic.skew, found.skew, UtilEjml.TEST_F64_SQ);
 	}
 
 	/**
 	 * This should fail because there isn't enough visual motion
 	 */
-	@Test
-	public void stationary() {
-		CameraPinhole intrinsic = new CameraPinhole(400,420,0.1,450,475,0,0);
+	@Test void stationary() {
+		CameraPinhole intrinsic = new CameraPinhole(400, 420, 0.1, 450, 475, 0, 0);
 		renderStationary(intrinsic);
 		checkFailure();
 	}
@@ -91,9 +87,8 @@ public class TestSelfCalibrationLinearRotationSingle extends CommonAutoCalibrati
 	/**
 	 * One axis rotation will fail
 	 */
-	@Test
-	public void one_axis() {
-		CameraPinhole intrinsic = new CameraPinhole(400,420,0.1,450,475,0,0);
+	@Test void one_axis() {
+		CameraPinhole intrinsic = new CameraPinhole(400, 420, 0.1, 450, 475, 0, 0);
 		renderRotateOneAxis(intrinsic);
 		checkFailure();
 	}
@@ -105,27 +100,26 @@ public class TestSelfCalibrationLinearRotationSingle extends CommonAutoCalibrati
 			DMatrixRMaj P = listP.get(i);
 
 			Equation eq = new Equation();
-			eq.alias(P,"P",p,"p");
+			eq.alias(P, "P", p, "p");
 			eq.process("H = P(:,0:2) - P(:,3)*p'");
 			Homography2D_F64 H = new Homography2D_F64();
-			DConvertMatrixStruct.convert(eq.lookupDDRM("H"),H);
+			DConvertMatrixStruct.convert(eq.lookupDDRM("H"), H);
 			homographies.add(H);
 		}
 
 		SelfCalibrationLinearRotationSingle alg = new SelfCalibrationLinearRotationSingle();
 		CameraPinhole found = new CameraPinhole();
-		assertFalse(alg.estimate(homographies,found));
+		assertFalse(alg.estimate(homographies, found));
 	}
 
-	@Test
-	public void checkLinearSystem() {
-		CameraPinhole intrinsic = new CameraPinhole(400,420,0.1,450,475,0,0);
+	@Test void checkLinearSystem() {
+		CameraPinhole intrinsic = new CameraPinhole(400, 420, 0.1, 450, 475, 0, 0);
 		renderRotationOnly(intrinsic);
 
-		DMatrixRMaj K = new DMatrixRMaj(3,3);
-		PerspectiveOps.pinholeToMatrix(intrinsic,K);
-		DMatrixRMaj w = new DMatrixRMaj(3,3);
-		CommonOps_DDRM.multTransB(K,K,w);
+		DMatrixRMaj K = new DMatrixRMaj(3, 3);
+		PerspectiveOps.pinholeToMatrix(intrinsic, K);
+		DMatrixRMaj w = new DMatrixRMaj(3, 3);
+		CommonOps_DDRM.multTransB(K, K, w);
 
 		// compute planes at infinity
 		List<Homography2D_F64> homographies = new ArrayList<>();
@@ -134,7 +128,7 @@ public class TestSelfCalibrationLinearRotationSingle extends CommonAutoCalibrati
 			DMatrixRMaj P = listP.get(i);
 
 			Equation eq = new Equation();
-			eq.alias(P,"P",p,"p",K,"K",w,"w");
+			eq.alias(P, "P", p, "p", K, "K", w, "w");
 			eq.process("H = P(:,0:2) - P(:,3)*p'");
 //			eq.process("w2 = H*w*H'");
 //			eq.process("w2 = w2 - w");
@@ -145,7 +139,7 @@ public class TestSelfCalibrationLinearRotationSingle extends CommonAutoCalibrati
 //			eq.lookupDDRM("w2").print();
 
 			Homography2D_F64 H = new Homography2D_F64();
-			DConvertMatrixStruct.convert(eq.lookupDDRM("H"),H);
+			DConvertMatrixStruct.convert(eq.lookupDDRM("H"), H);
 			homographies.add(H);
 //			H.print();
 		}
@@ -154,12 +148,12 @@ public class TestSelfCalibrationLinearRotationSingle extends CommonAutoCalibrati
 		alg.ensureDeterminantOfOne(homographies);
 
 		int N = homographies.size();
-		DMatrixRMaj A = new DMatrixRMaj(6*N,6);
-		DMatrixRMaj X = new DMatrixRMaj(6,1);
-		DMatrixRMaj found = new DMatrixRMaj(A.numRows,1);
+		DMatrixRMaj A = new DMatrixRMaj(6*N, 6);
+		DMatrixRMaj X = new DMatrixRMaj(6, 1);
+		DMatrixRMaj found = new DMatrixRMaj(A.numRows, 1);
 
 		for (int i = 0; i < homographies.size(); i++) {
-			alg.add(i,homographies.get(i),A);
+			alg.add(i, homographies.get(i), A);
 		}
 
 		X.data[0] = w.data[0];
@@ -169,7 +163,7 @@ public class TestSelfCalibrationLinearRotationSingle extends CommonAutoCalibrati
 		X.data[4] = w.data[5];
 		X.data[5] = w.data[8];
 
-		CommonOps_DDRM.mult(A,X,found);
+		CommonOps_DDRM.mult(A, X, found);
 		assertEquals(0, NormOps_DDRM.normF(found), UtilEjml.TEST_F64);
 	}
 }

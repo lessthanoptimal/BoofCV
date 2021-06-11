@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -45,36 +45,34 @@ import static org.junit.jupiter.api.Assertions.*;
  * @author Peter Abeles
  */
 public class TestSelfCalibrationLinearRotationMulti
-	extends CommonAutoCalibrationChecks
-{
-	CameraPinhole camera = new CameraPinhole(400,410,0,500,520,0,0);
-	DMatrixRMaj K = new DMatrixRMaj(3,3);
+		extends CommonAutoCalibrationChecks {
+	CameraPinhole camera = new CameraPinhole(400, 410, 0, 500, 520, 0, 0);
+	DMatrixRMaj K = new DMatrixRMaj(3, 3);
 
 	@BeforeEach
 	public void before() {
-		camera = new CameraPinhole(400,410,0,500,520,0,0);
-		PerspectiveOps.pinholeToMatrix(camera,K);
+		camera = new CameraPinhole(400, 410, 0, 500, 520, 0, 0);
+		PerspectiveOps.pinholeToMatrix(camera, K);
 	}
 
-	@Test
-	public void perfect_zeroSkew() {
+	@Test void perfect_zeroSkew() {
 		renderRotationOnly(camera);
 
 		List<Homography2D_F64> viewsI_to_view0 = computeHomographies();
 
 		SelfCalibrationLinearRotationMulti alg = new SelfCalibrationLinearRotationMulti();
-		alg.setConstraints(true,false,false,-1);
+		alg.setConstraints(true, false, false, -1);
 		assertSame(alg.estimate(viewsI_to_view0), GeometricResult.SUCCESS);
 
 		DogArray<CameraPinhole> found = alg.getFound();
 
 		for (int i = 0; i < found.size; i++) {
 			CameraPinhole f = found.get(i);
-			assertEquals(camera.fx,f.fx, UtilEjml.TEST_F64);
-			assertEquals(camera.fy,f.fy, UtilEjml.TEST_F64);
-			assertEquals(camera.skew,f.skew, UtilEjml.TEST_F64);
-			assertEquals(camera.cx,f.cx, UtilEjml.TEST_F64);
-			assertEquals(camera.cy,f.cy, UtilEjml.TEST_F64);
+			assertEquals(camera.fx, f.fx, UtilEjml.TEST_F64);
+			assertEquals(camera.fy, f.fy, UtilEjml.TEST_F64);
+			assertEquals(camera.skew, f.skew, UtilEjml.TEST_F64);
+			assertEquals(camera.cx, f.cx, UtilEjml.TEST_F64);
+			assertEquals(camera.cy, f.cy, UtilEjml.TEST_F64);
 		}
 	}
 
@@ -89,314 +87,303 @@ public class TestSelfCalibrationLinearRotationMulti
 			V.z = rand.nextGaussian();
 			V.normalize();
 
-			DMatrixRMaj H = MultiViewOps.createHomography(c2w.R,c2w.T,1.1,V,K);
+			DMatrixRMaj H = MultiViewOps.createHomography(c2w.R, c2w.T, 1.1, V, K);
 			Homography2D_F64 HH = new Homography2D_F64();
-			DConvertMatrixStruct.convert(H,HH);
+			DConvertMatrixStruct.convert(H, HH);
 			viewsI_to_view0.add(HH);
 		}
 		return viewsI_to_view0;
 	}
 
-	@Test
-	public void perfect_PrincipleZero() {
+	@Test void perfect_PrincipleZero() {
 		// set the principle point to zero
-		camera = new CameraPinhole(400,410,0.5,0,0,0,0);
-		PerspectiveOps.pinholeToMatrix(camera,K);
+		camera = new CameraPinhole(400, 410, 0.5, 0, 0, 0, 0);
+		PerspectiveOps.pinholeToMatrix(camera, K);
 
 		renderRotationOnly(camera);
 
 		List<Homography2D_F64> viewsI_to_view0 = computeHomographies();
 
 		SelfCalibrationLinearRotationMulti alg = new SelfCalibrationLinearRotationMulti();
-		alg.setConstraints(false,true,false,-1);
+		alg.setConstraints(false, true, false, -1);
 		assertSame(alg.estimate(viewsI_to_view0), GeometricResult.SUCCESS);
 
 		DogArray<CameraPinhole> found = alg.getFound();
 
 		for (int i = 0; i < found.size; i++) {
 			CameraPinhole f = found.get(i);
-			assertEquals(camera.fx,f.fx, UtilEjml.TEST_F64);
-			assertEquals(camera.fy,f.fy, UtilEjml.TEST_F64);
-			assertEquals(camera.skew,f.skew, UtilEjml.TEST_F64);
-			assertEquals(camera.cx,f.cx, UtilEjml.TEST_F64);
-			assertEquals(camera.cy,f.cy, UtilEjml.TEST_F64);
+			assertEquals(camera.fx, f.fx, UtilEjml.TEST_F64);
+			assertEquals(camera.fy, f.fy, UtilEjml.TEST_F64);
+			assertEquals(camera.skew, f.skew, UtilEjml.TEST_F64);
+			assertEquals(camera.cx, f.cx, UtilEjml.TEST_F64);
+			assertEquals(camera.cy, f.cy, UtilEjml.TEST_F64);
 		}
 	}
 
-	@Test
-	public void perfect_AllLinear() {
+	@Test void perfect_AllLinear() {
 
 		// set the principle point to zero
-		camera = new CameraPinhole(400,420,0,510,540,0,0);
-		PerspectiveOps.pinholeToMatrix(camera,K);
+		camera = new CameraPinhole(400, 420, 0, 510, 540, 0, 0);
+		PerspectiveOps.pinholeToMatrix(camera, K);
 
 		renderRotationOnly(camera);
 
 		List<Homography2D_F64> viewsI_to_view0 = computeHomographies();
 
 		SelfCalibrationLinearRotationMulti alg = new SelfCalibrationLinearRotationMulti();
-		alg.setConstraints(true,false,true,camera.fy/camera.fx);
+		alg.setConstraints(true, false, true, camera.fy/camera.fx);
 		assertSame(alg.estimate(viewsI_to_view0), GeometricResult.SUCCESS);
 
 		DogArray<CameraPinhole> found = alg.getFound();
 
 		for (int i = 0; i < found.size; i++) {
 			CameraPinhole f = found.get(i);
-			assertEquals(camera.fx,f.fx, UtilEjml.TEST_F64);
-			assertEquals(camera.fy,f.fy, UtilEjml.TEST_F64);
-			assertEquals(camera.skew,f.skew, UtilEjml.TEST_F64);
-			assertEquals(camera.cx,f.cx, UtilEjml.TEST_F64);
-			assertEquals(camera.cy,f.cy, UtilEjml.TEST_F64);
+			assertEquals(camera.fx, f.fx, UtilEjml.TEST_F64);
+			assertEquals(camera.fy, f.fy, UtilEjml.TEST_F64);
+			assertEquals(camera.skew, f.skew, UtilEjml.TEST_F64);
+			assertEquals(camera.cx, f.cx, UtilEjml.TEST_F64);
+			assertEquals(camera.cy, f.cy, UtilEjml.TEST_F64);
 		}
 	}
 
-	@Test
-	public void fillInConstraintMatrix_zeroSkew() {
+	@Test void fillInConstraintMatrix_zeroSkew() {
 		renderRotationOnly(camera);
 		List<Homography2D_F64> viewsI_to_view0 = computeHomographies();
 		SelfCalibrationLinearRotationMulti alg = new SelfCalibrationLinearRotationMulti();
-		alg.setConstraints(true,false,false,1);
+		alg.setConstraints(true, false, false, 1);
 		alg.computeInverseH(viewsI_to_view0);
 		alg.fillInConstraintMatrix();
 		checkFillInConstraintMatrix(alg);
 	}
 
-	@Test
-	public void fillInConstraintMatrix_ZeroPP() {
-		camera = new CameraPinhole(400,420,0.5,0,0,0,0);
-		PerspectiveOps.pinholeToMatrix(camera,K);
+	@Test void fillInConstraintMatrix_ZeroPP() {
+		camera = new CameraPinhole(400, 420, 0.5, 0, 0, 0, 0);
+		PerspectiveOps.pinholeToMatrix(camera, K);
 
 		renderRotationOnly(camera);
 		List<Homography2D_F64> viewsI_to_view0 = computeHomographies();
 		SelfCalibrationLinearRotationMulti alg = new SelfCalibrationLinearRotationMulti();
-		alg.setConstraints(false,true,false,1);
+		alg.setConstraints(false, true, false, 1);
 		alg.computeInverseH(viewsI_to_view0);
 		alg.fillInConstraintMatrix();
 		checkFillInConstraintMatrix(alg);
 	}
 
-	@Test
-	public void fillInConstraintMatrix_ZeroSkew_KnownAspect() {
-		camera = new CameraPinhole(400,420,0,450,460,0,0);
-		PerspectiveOps.pinholeToMatrix(camera,K);
+	@Test void fillInConstraintMatrix_ZeroSkew_KnownAspect() {
+		camera = new CameraPinhole(400, 420, 0, 450, 460, 0, 0);
+		PerspectiveOps.pinholeToMatrix(camera, K);
 
 		renderRotationOnly(camera);
 		List<Homography2D_F64> viewsI_to_view0 = computeHomographies();
 		SelfCalibrationLinearRotationMulti alg = new SelfCalibrationLinearRotationMulti();
-		alg.setConstraints(true,false,true,camera.fy/camera.fx);
+		alg.setConstraints(true, false, true, camera.fy/camera.fx);
 		alg.computeInverseH(viewsI_to_view0);
 		alg.fillInConstraintMatrix();
 		checkFillInConstraintMatrix(alg);
 	}
 
-	@Test
-	public void fillInConstraintMatrix_AllLinear() {
-		camera = new CameraPinhole(400,420,0,0,0,0,0);
-		PerspectiveOps.pinholeToMatrix(camera,K);
+	@Test void fillInConstraintMatrix_AllLinear() {
+		camera = new CameraPinhole(400, 420, 0, 0, 0, 0, 0);
+		PerspectiveOps.pinholeToMatrix(camera, K);
 
 		renderRotationOnly(camera);
 		List<Homography2D_F64> viewsI_to_view0 = computeHomographies();
 		SelfCalibrationLinearRotationMulti alg = new SelfCalibrationLinearRotationMulti();
-		alg.setConstraints(true,true,true,camera.fy/camera.fx);
+		alg.setConstraints(true, true, true, camera.fy/camera.fx);
 		alg.computeInverseH(viewsI_to_view0);
 		alg.fillInConstraintMatrix();
 		checkFillInConstraintMatrix(alg);
 	}
 
-	private void checkFillInConstraintMatrix(SelfCalibrationLinearRotationMulti alg) {
+	private void checkFillInConstraintMatrix( SelfCalibrationLinearRotationMulti alg ) {
 		// if the matrix is computed correctly then it should have nullity of 1
-		assertEquals(1, SingularOps_DDRM.nullity(alg.A,1e-12));
+		assertEquals(1, SingularOps_DDRM.nullity(alg.A, 1e-12));
 
 		// Compute 'w' which should be in the null space
-		DMatrixRMaj w = new DMatrixRMaj(3,3);
-		CommonOps_DDRM.multTransB(K,K,w);
+		DMatrixRMaj w = new DMatrixRMaj(3, 3);
+		CommonOps_DDRM.multTransB(K, K, w);
 		CommonOps_DDRM.invert(w);
-		CommonOps_DDRM.divide(w,w.get(2,2));
+		CommonOps_DDRM.divide(w, w.get(2, 2));
 
-		DMatrixRMaj x = new DMatrixRMaj(6,1);
-		x.data[0] = w.get(0,0);
-		x.data[1] = w.get(0,1);
-		x.data[2] = w.get(0,2);
-		x.data[3] = w.get(1,1);
-		x.data[4] = w.get(1,2);
-		x.data[5] = w.get(2,2);
+		DMatrixRMaj x = new DMatrixRMaj(6, 1);
+		x.data[0] = w.get(0, 0);
+		x.data[1] = w.get(0, 1);
+		x.data[2] = w.get(0, 2);
+		x.data[3] = w.get(1, 1);
+		x.data[4] = w.get(1, 2);
+		x.data[5] = w.get(2, 2);
 
-		DMatrixRMaj b = new DMatrixRMaj(6,1);
-		CommonOps_DDRM.mult(alg.A,x,b);
+		DMatrixRMaj b = new DMatrixRMaj(6, 1);
+		CommonOps_DDRM.mult(alg.A, x, b);
 
 		for (int i = 0; i < 6; i++) {
-			assertEquals(0,b.get(i,0), UtilEjml.TEST_F64);
+			assertEquals(0, b.get(i, 0), UtilEjml.TEST_F64);
 		}
 	}
 
-	@Test
-	public void numberOfConstraints() {
+	@Test void numberOfConstraints() {
 		SelfCalibrationLinearRotationMulti alg = new SelfCalibrationLinearRotationMulti();
-		assertEquals(0,alg.numberOfConstraints());
+		assertEquals(0, alg.numberOfConstraints());
 
-		alg.setConstraints(true,false,false,0);
-		assertEquals(1,alg.numberOfConstraints());
+		alg.setConstraints(true, false, false, 0);
+		assertEquals(1, alg.numberOfConstraints());
 
-		alg.setConstraints(false,true,false,0);
-		assertEquals(2,alg.numberOfConstraints());
+		alg.setConstraints(false, true, false, 0);
+		assertEquals(2, alg.numberOfConstraints());
 
-		alg.setConstraints(true,false,true,1);
-		assertEquals(2,alg.numberOfConstraints());
+		alg.setConstraints(true, false, true, 1);
+		assertEquals(2, alg.numberOfConstraints());
 
-		alg.setConstraints(true,true,true,1);
-		assertEquals(4,alg.numberOfConstraints());
+		alg.setConstraints(true, true, true, 1);
+		assertEquals(4, alg.numberOfConstraints());
 	}
 
 	/**
 	 * Explicitly compute null space and feed it in. Then see if the correct
 	 * calibration is found
 	 */
-	@Test
-	public void extractReferenceW() {
+	@Test void extractReferenceW() {
 		SelfCalibrationLinearRotationMulti alg = new SelfCalibrationLinearRotationMulti();
 
 		// Compute 'w' which should be in the null space
-		DMatrixRMaj w = new DMatrixRMaj(3,3);
-		CommonOps_DDRM.multTransB(K,K,w);
+		DMatrixRMaj w = new DMatrixRMaj(3, 3);
+		CommonOps_DDRM.multTransB(K, K, w);
 		CommonOps_DDRM.invert(w);
-		CommonOps_DDRM.divide(w,w.get(2,2));
+		CommonOps_DDRM.divide(w, w.get(2, 2));
 
-		DMatrixRMaj x = new DMatrixRMaj(6,1);
-		x.data[0] = w.get(0,0);
-		x.data[1] = w.get(0,1);
-		x.data[2] = w.get(0,2);
-		x.data[3] = w.get(1,1);
-		x.data[4] = w.get(1,2);
-		x.data[5] = w.get(2,2);
+		DMatrixRMaj x = new DMatrixRMaj(6, 1);
+		x.data[0] = w.get(0, 0);
+		x.data[1] = w.get(0, 1);
+		x.data[2] = w.get(0, 2);
+		x.data[3] = w.get(1, 1);
+		x.data[4] = w.get(1, 2);
+		x.data[5] = w.get(2, 2);
 
 		CameraPinhole found = new CameraPinhole();
 		alg.extractReferenceW(x);
-		alg.convertW(alg.W0,found);
+		alg.convertW(alg.W0, found);
 
-		assertEquals(camera.fx,found.fx, UtilEjml.TEST_F64);
-		assertEquals(camera.fy,found.fy, UtilEjml.TEST_F64);
-		assertEquals(camera.skew,found.skew, UtilEjml.TEST_F64);
-		assertEquals(camera.cx,found.cx, UtilEjml.TEST_F64);
-		assertEquals(camera.cy,found.cy, UtilEjml.TEST_F64);
+		assertEquals(camera.fx, found.fx, UtilEjml.TEST_F64);
+		assertEquals(camera.fy, found.fy, UtilEjml.TEST_F64);
+		assertEquals(camera.skew, found.skew, UtilEjml.TEST_F64);
+		assertEquals(camera.cx, found.cx, UtilEjml.TEST_F64);
+		assertEquals(camera.cy, found.cy, UtilEjml.TEST_F64);
 	}
 
-	@Test
-	public void convertW_unmodifiedInput() {
+	@Test void convertW_unmodifiedInput() {
 		SelfCalibrationLinearRotationMulti alg = new SelfCalibrationLinearRotationMulti();
 
-		Homography2D_F64 W = new Homography2D_F64(1,2,3,4,5,6,7,8,9);
+		Homography2D_F64 W = new Homography2D_F64(1, 2, 3, 4, 5, 6, 7, 8, 9);
 
 		CameraPinhole found = new CameraPinhole();
-		alg.convertW(W,found);
+		alg.convertW(W, found);
 
-		assertEquals(1,W.a11,UtilEjml.TEST_F64);
-		assertEquals(2,W.a12,UtilEjml.TEST_F64);
-		assertEquals(3,W.a13,UtilEjml.TEST_F64);
-		assertEquals(4,W.a21,UtilEjml.TEST_F64);
-		assertEquals(5,W.a22,UtilEjml.TEST_F64);
-		assertEquals(6,W.a23,UtilEjml.TEST_F64);
-		assertEquals(7,W.a31,UtilEjml.TEST_F64);
-		assertEquals(8,W.a32,UtilEjml.TEST_F64);
-		assertEquals(9,W.a33,UtilEjml.TEST_F64);
+		assertEquals(1, W.a11, UtilEjml.TEST_F64);
+		assertEquals(2, W.a12, UtilEjml.TEST_F64);
+		assertEquals(3, W.a13, UtilEjml.TEST_F64);
+		assertEquals(4, W.a21, UtilEjml.TEST_F64);
+		assertEquals(5, W.a22, UtilEjml.TEST_F64);
+		assertEquals(6, W.a23, UtilEjml.TEST_F64);
+		assertEquals(7, W.a31, UtilEjml.TEST_F64);
+		assertEquals(8, W.a32, UtilEjml.TEST_F64);
+		assertEquals(9, W.a33, UtilEjml.TEST_F64);
 	}
 
-	@Test
-	public void convertW() {
+	@Test void convertW() {
 		double tol = 0.001;
 
-		Homography2D_F64 K = new Homography2D_F64(300,1,320,0,305,330,0,0,1);
+		Homography2D_F64 K = new Homography2D_F64(300, 1, 320, 0, 305, 330, 0, 0, 1);
 		Homography2D_F64 W = new Homography2D_F64();
-		CommonOps_DDF3.multTransB(K,K,W);
-		CommonOps_DDF3.invert(W,W);
+		CommonOps_DDF3.multTransB(K, K, W);
+		CommonOps_DDF3.invert(W, W);
 		CameraPinhole found = new CameraPinhole();
 
 		SelfCalibrationLinearRotationMulti alg = new SelfCalibrationLinearRotationMulti();
-		alg.setConstraints(false,false,false,-1);
-		alg.convertW(W,found);
-		assertEquals(K.a11,found.fx, tol);
-		assertEquals(K.a12,found.skew, tol);
-		assertEquals(K.a13,found.cx, tol);
-		assertEquals(K.a22,found.fy, tol);
-		assertEquals(K.a23,found.cy, tol);
+		alg.setConstraints(false, false, false, -1);
+		alg.convertW(W, found);
+		assertEquals(K.a11, found.fx, tol);
+		assertEquals(K.a12, found.skew, tol);
+		assertEquals(K.a13, found.cx, tol);
+		assertEquals(K.a22, found.fy, tol);
+		assertEquals(K.a23, found.cy, tol);
 
 		// Add zero Skew
 		K.a12 = 0;
-		CommonOps_DDF3.multTransB(K,K,W);
-		CommonOps_DDF3.invert(W,W);
-		alg.setConstraints(true,false,false,-1);
-		alg.convertW(W,found);
-		assertEquals(K.a11,found.fx, tol);
-		assertEquals(0,found.skew, tol);
-		assertEquals(K.a13,found.cx, tol);
-		assertEquals(K.a22,found.fy, tol);
-		assertEquals(K.a23,found.cy, tol);
+		CommonOps_DDF3.multTransB(K, K, W);
+		CommonOps_DDF3.invert(W, W);
+		alg.setConstraints(true, false, false, -1);
+		alg.convertW(W, found);
+		assertEquals(K.a11, found.fx, tol);
+		assertEquals(0, found.skew, tol);
+		assertEquals(K.a13, found.cx, tol);
+		assertEquals(K.a22, found.fy, tol);
+		assertEquals(K.a23, found.cy, tol);
 
 		// Add origin at zero
 		K.a13 = K.a23 = 0;
-		CommonOps_DDF3.multTransB(K,K,W);
-		CommonOps_DDF3.invert(W,W);
-		alg.setConstraints(true,true,false,-1);
-		alg.convertW(W,found);
-		assertEquals(K.a11,found.fx, tol);
-		assertEquals(0,found.skew, tol);
-		assertEquals(0,found.cx, tol);
-		assertEquals(K.a22,found.fy, tol);
-		assertEquals(0,found.cy, tol);
+		CommonOps_DDF3.multTransB(K, K, W);
+		CommonOps_DDF3.invert(W, W);
+		alg.setConstraints(true, true, false, -1);
+		alg.convertW(W, found);
+		assertEquals(K.a11, found.fx, tol);
+		assertEquals(0, found.skew, tol);
+		assertEquals(0, found.cx, tol);
+		assertEquals(K.a22, found.fy, tol);
+		assertEquals(0, found.cy, tol);
 
 		// Add known aspect ratio
 		double aspect = K.a22/K.a11;
-		CommonOps_DDF3.multTransB(K,K,W);
-		CommonOps_DDF3.invert(W,W);
-		alg.setConstraints(true,true,true,aspect);
-		alg.convertW(W,found);
-		assertEquals(K.a11,found.fx, tol);
-		assertEquals(0,found.skew, tol);
-		assertEquals(0,found.cx, tol);
-		assertEquals(K.a22,found.fy, tol);
-		assertEquals(0,found.cy, tol);
+		CommonOps_DDF3.multTransB(K, K, W);
+		CommonOps_DDF3.invert(W, W);
+		alg.setConstraints(true, true, true, aspect);
+		alg.convertW(W, found);
+		assertEquals(K.a11, found.fx, tol);
+		assertEquals(0, found.skew, tol);
+		assertEquals(0, found.cx, tol);
+		assertEquals(K.a22, found.fy, tol);
+		assertEquals(0, found.cy, tol);
 
 		// sanity check. give it a bad skew and see what happens
-		alg.setConstraints(true,true,true,aspect*aspect);
-		alg.convertW(W,found);
-		assertTrue(Math.abs(K.a22-found.fy) > tol);
+		alg.setConstraints(true, true, true, aspect*aspect);
+		alg.convertW(W, found);
+		assertTrue(Math.abs(K.a22 - found.fy) > tol);
 	}
 
 	/**
 	 * Test it by computing W0 from W1, then compute W1 again.
 	 */
-	@Test
-	public void extractCalibration() {
+	@Test void extractCalibration() {
 		// camera calibration matrix
-		Homography2D_F64 K1 = new Homography2D_F64(300,1,320,0,305,330,0,0,1);
+		Homography2D_F64 K1 = new Homography2D_F64(300, 1, 320, 0, 305, 330, 0, 0, 1);
 		// W = K*K'
 		Homography2D_F64 W1 = new Homography2D_F64();
-		CommonOps_DDF3.multTransB(K1,K1,W1);
-		CommonOps_DDF3.invert(W1,W1);
+		CommonOps_DDF3.multTransB(K1, K1, W1);
+		CommonOps_DDF3.invert(W1, W1);
 
-		Se3_F64 v1_to_v0 = SpecialEuclideanOps_F64.eulerXyz(1,0,0.1,0.1,0.05,-0.09,null);
-		DMatrixRMaj H = MultiViewOps.createHomography(v1_to_v0.R,v1_to_v0.T,1,new Vector3D_F64(0,0,1));
+		Se3_F64 v1_to_v0 = SpecialEuclideanOps_F64.eulerXyz(1, 0, 0.1, 0.1, 0.05, -0.09, null);
+		DMatrixRMaj H = MultiViewOps.createHomography(v1_to_v0.R, v1_to_v0.T, 1, new Vector3D_F64(0, 0, 1));
 		Homography2D_F64 H1 = new Homography2D_F64();
 		Homography2D_F64 H1_inv = new Homography2D_F64();
-		DConvertMatrixStruct.convert(H,H1);
-		CommonOps_DDF3.invert(H1,H1_inv);
+		DConvertMatrixStruct.convert(H, H1);
+		CommonOps_DDF3.invert(H1, H1_inv);
 
 		Homography2D_F64 tmp = new Homography2D_F64();
 		Homography2D_F64 W0 = new Homography2D_F64();
-		CommonOps_DDF3.multTransA(H1,W1,tmp);
-		CommonOps_DDF3.mult(tmp,H1,W0);
+		CommonOps_DDF3.multTransA(H1, W1, tmp);
+		CommonOps_DDF3.mult(tmp, H1, W0);
 
 		SelfCalibrationLinearRotationMulti alg = new SelfCalibrationLinearRotationMulti();
-		alg.setConstraints(false,false,false,-1);
+		alg.setConstraints(false, false, false, -1);
 		alg.W0.setTo(W0);
 
 		CameraPinhole found = new CameraPinhole();
-		alg.extractCalibration(H1_inv,found);
+		alg.extractCalibration(H1_inv, found);
 
 		double tol = 0.001;
-		assertEquals(K1.a11,found.fx, tol);
-		assertEquals(K1.a12,found.skew, tol);
-		assertEquals(K1.a13,found.cx, tol);
-		assertEquals(K1.a22,found.fy, tol);
-		assertEquals(K1.a23,found.cy, tol);
+		assertEquals(K1.a11, found.fx, tol);
+		assertEquals(K1.a12, found.skew, tol);
+		assertEquals(K1.a13, found.cx, tol);
+		assertEquals(K1.a22, found.fy, tol);
+		assertEquals(K1.a23, found.cy, tol);
 	}
 }

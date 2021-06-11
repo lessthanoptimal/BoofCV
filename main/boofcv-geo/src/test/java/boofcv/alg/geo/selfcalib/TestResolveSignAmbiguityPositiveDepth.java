@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -24,7 +24,7 @@ import org.junit.jupiter.api.Test;
 /**
  * @author Peter Abeles
  */
-class TestResolveSignAmbiguityPositiveDepth extends CommonThreeViewSelfCalibration{
+class TestResolveSignAmbiguityPositiveDepth extends CommonThreeViewSelfCalibration {
 	@Test
 	void simple() {
 		standardScene();
@@ -39,17 +39,17 @@ class TestResolveSignAmbiguityPositiveDepth extends CommonThreeViewSelfCalibrati
 		results.view2.setTo(super.cameraB);
 		results.view3.setTo(super.cameraC);
 
-		alg.process(observations3,results);
+		alg.process(observations3, results);
 		// there should be no change
-		BoofTesting.assertEquals(super.truthView_1_to_i(1),results.view_1_to_2,1e-8,1e-8);
-		BoofTesting.assertEquals(super.truthView_1_to_i(2),results.view_1_to_3,1e-8,1e-8);
+		BoofTesting.assertEquals(super.truthView_1_to_i(1), results.view_1_to_2, 1e-8, 1e-8);
+		BoofTesting.assertEquals(super.truthView_1_to_i(2), results.view_1_to_3, 1e-8, 1e-8);
 
 		// flip the sign now
 		results.view_1_to_2.T.scale(-1);
 		results.view_1_to_3.T.scale(-1);
-		alg.process(observations3,results);
+		alg.process(observations3, results);
 		// the change should be reverted
-		BoofTesting.assertEquals(super.truthView_1_to_i(1),results.view_1_to_2,1e-8,1e-8);
-		BoofTesting.assertEquals(super.truthView_1_to_i(2),results.view_1_to_3,1e-8,1e-8);
+		BoofTesting.assertEquals(super.truthView_1_to_i(1), results.view_1_to_2, 1e-8, 1e-8);
+		BoofTesting.assertEquals(super.truthView_1_to_i(2), results.view_1_to_3, 1e-8, 1e-8);
 	}
 }
