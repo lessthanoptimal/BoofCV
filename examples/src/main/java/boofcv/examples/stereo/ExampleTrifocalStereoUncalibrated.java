@@ -224,7 +224,7 @@ public class ExampleTrifocalStereoUncalibrated {
 		GeometricResult result = selfcalib.solve();
 		if (GeometricResult.SOLVE_FAILED != result) {
 			for (int i = 0; i < 3; i++) {
-				Intrinsic c = selfcalib.getSolutions().get(i);
+				Intrinsic c = selfcalib.getIntrinsics().get(i);
 				CameraPinhole p = new CameraPinhole(c.fx, c.fy, 0, 0, 0, width, height);
 				listPinhole.add(p);
 			}

@@ -1423,11 +1423,19 @@ public class MultiViewOps {
 	 */
 	public static boolean enforceAbsoluteQuadraticConstraints( DMatrix4x4 Q, boolean zeroCenter, boolean zeroSkew ) {
 
+		return enforceAbsoluteQuadraticConstraints(Q, zeroCenter, zeroSkew, null);
+	}
+
+	public static boolean enforceAbsoluteQuadraticConstraints( DMatrix4x4 Q, boolean zeroCenter, boolean zeroSkew,
+															   @Nullable DecomposeAbsoluteDualQuadratic alg ) {
+
+		if (alg == null)
+			alg = new DecomposeAbsoluteDualQuadratic();
+
 		// see if it's potentially just off by a sign
 		if (Q.a33 < 0)
 			CommonOps_DDF4.scale(-1, Q);
 
-		DecomposeAbsoluteDualQuadratic alg = new DecomposeAbsoluteDualQuadratic();
 		if (!alg.decompose(Q))
 			return false;
 
@@ -1495,6 +1503,38 @@ public class MultiViewOps {
 				Q.data[indexQ++] = sum;
 			}
 		}
+	}
+
+	/**
+	 * Constructs a canonical rectifying homography from its components, 3x3 intrinsic matrix K and p the plane
+	 * at infinity. See 19.2 page 460 in [1]. This assumes that camera matrix P1 = [I|0].
+	 *
+	 * <p>H=[K*K, 0; -p'*k, 1]</p>
+	 *
+	 * <ol>
+	 * <li> R. Hartley, and A. Zisserman, "Multiple View Geometry in Computer Vision", 2nd Ed, Cambridge 2003 </li>
+	 * </ol>
+	 *
+	 * @param K (Input) 3x3 intrinsic calibration matrix
+	 * @param planeAtInfinity (Input) Plane at infinity
+	 * @param H (Output) rectifying homography.
+	 */
+	public static void canonicalRectifyingHomographyFromKPinf( DMatrixRMaj K, Point3D_F64 planeAtInfinity, DMatrixRMaj H ) {
+		H.reshape(4, 4);
+		CommonOps_DDRM.insert(K, H, 0, 0);
+
+		// v = -p'*K
+		double v1 = -(planeAtInfinity.x*K.data[0] + planeAtInfinity.y*K.data[3] + planeAtInfinity.z*K.data[6]);
+		double v2 = -(planeAtInfinity.x*K.data[1] + planeAtInfinity.y*K.data[4] + planeAtInfinity.z*K.data[7]);
+		double v3 = -(planeAtInfinity.x*K.data[2] + planeAtInfinity.y*K.data[5] + planeAtInfinity.z*K.data[8]);
+
+		H.unsafe_set(3, 0, v1);
+		H.unsafe_set(3, 1, v2);
+		H.unsafe_set(3, 2, v3);
+		H.unsafe_set(3, 3, 1.0);
+		H.unsafe_set(0, 3, 0);
+		H.unsafe_set(1, 3, 0);
+		H.unsafe_set(2, 3, 0);
 	}
 
 	/**
@@ -2027,7 +2067,7 @@ public class MultiViewOps {
 	 * @param K2 (Input) Intrinsic camera matrix 2
 	 * @return The homography in normalized image coordinates
 	 */
-	public static DMatrixRMaj homographyToCalibrated( DMatrixRMaj H21, DMatrixRMaj K1, DMatrixRMaj K2) {
+	public static DMatrixRMaj homographyToCalibrated( DMatrixRMaj H21, DMatrixRMaj K1, DMatrixRMaj K2 ) {
 		return null;
 	}
 }

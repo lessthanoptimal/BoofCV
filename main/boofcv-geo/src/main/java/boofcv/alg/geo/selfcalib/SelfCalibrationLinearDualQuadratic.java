@@ -20,6 +20,7 @@ package boofcv.alg.geo.selfcalib;
 
 import boofcv.alg.geo.GeometricResult;
 import boofcv.alg.geo.MultiViewOps;
+import boofcv.alg.geo.structure.DecomposeAbsoluteDualQuadratic;
 import boofcv.struct.calib.CameraPinhole;
 import lombok.Getter;
 import lombok.Setter;
@@ -71,9 +72,11 @@ public class SelfCalibrationLinearDualQuadratic extends SelfCalibrationBase {
 	@Getter SingularValueDecomposition_F64<DMatrixRMaj> svd = DecompositionFactory_DDRM.svd(10, 10,
 			false, true, true);
 
+	public @Getter DecomposeAbsoluteDualQuadratic decomposeADQ = new DecomposeAbsoluteDualQuadratic();
+
 	// constraints
-	@Getter boolean knownAspect;
-	@Getter boolean zeroSkew;
+	public @Getter boolean knownAspect;
+	public @Getter boolean zeroSkew;
 
 	// number of equations
 	int eqs;
@@ -177,7 +180,7 @@ public class SelfCalibrationLinearDualQuadratic extends SelfCalibrationBase {
 			return GeometricResult.SOLVE_FAILED;
 
 		// Enforce constraints and solve for each view
-		if (!MultiViewOps.enforceAbsoluteQuadraticConstraints(Q, true, zeroSkew)) {
+		if (!MultiViewOps.enforceAbsoluteQuadraticConstraints(Q, true, zeroSkew, decomposeADQ)) {
 			return GeometricResult.SOLVE_FAILED;
 		}
 		computeSolutions(Q);
@@ -356,8 +359,12 @@ public class SelfCalibrationLinearDualQuadratic extends SelfCalibrationBase {
 		}
 	}
 
-	public FastAccess<Intrinsic> getSolutions() {
+	public FastAccess<Intrinsic> getIntrinsics() {
 		return solutions;
+	}
+
+	public DMatrix3 getPlaneAtInfinity() {
+		return decomposeADQ.getP();
 	}
 
 	/**

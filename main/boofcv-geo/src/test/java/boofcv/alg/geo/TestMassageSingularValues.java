@@ -19,15 +19,42 @@
 package boofcv.alg.geo;
 
 import boofcv.testing.BoofStandardJUnit;
+import org.ejml.UtilEjml;
+import org.ejml.data.DMatrixRMaj;
+import org.ejml.dense.row.MatrixFeatures_DDRM;
+import org.ejml.dense.row.RandomMatrices_DDRM;
+import org.ejml.dense.row.SingularOps_DDRM;
 import org.junit.jupiter.api.Test;
 
-import static org.junit.jupiter.api.Assertions.fail;
+import static org.junit.jupiter.api.Assertions.*;
 
 /**
  * @author Peter Abeles
  */
 public class TestMassageSingularValues extends BoofStandardJUnit {
-	@Test void test() {
-		fail("Implement");
+	/**
+	 * Should return a very similar class back
+	 */
+	@Test void doNothing() {
+		DMatrixRMaj A = RandomMatrices_DDRM.rectangle(4, 4, rand);
+		DMatrixRMaj found = A.copy();
+
+		var alg = new MassageSingularValues(W -> {});
+		assertTrue(alg.process(found));
+
+		assertTrue(MatrixFeatures_DDRM.isEquals(A, found, UtilEjml.TEST_F64));
+	}
+
+	@Test void zeroSmallestSingularValue() {
+		DMatrixRMaj A = RandomMatrices_DDRM.rectangle(4, 4, rand);
+		DMatrixRMaj found = A.copy();
+
+		var alg = new MassageSingularValues(W -> {W.set(3, 3, 0.0);});
+		assertTrue(alg.process(found));
+
+		assertFalse(MatrixFeatures_DDRM.isEquals(A, found, UtilEjml.TEST_F64));
+		double[] sv = SingularOps_DDRM.singularValues(found);
+		assertEquals(0.0, sv[3], UtilEjml.TEST_F64);
+		assertNotEquals(0.0, sv[2], UtilEjml.TEST_F64);
 	}
 }

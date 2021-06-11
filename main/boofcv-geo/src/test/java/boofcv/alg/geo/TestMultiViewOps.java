@@ -1156,6 +1156,23 @@ class TestMultiViewOps extends BoofStandardJUnit {
 		assertTrue(MatrixFeatures_D.isIdentical(Q, foundQ, UtilEjml.TEST_F64));
 	}
 
+	@Test void canonicalRectifyingHomographyFromKPinf() {
+		Equation eq = new Equation();
+		eq.process("K=[300 1 50;0 310 60; 0 0 1]");
+		eq.process("p=rand(3,1)");
+		eq.process("u=-p'*K");
+		eq.process("H=[K [0;0;0]; u 1]");
+
+		DMatrixRMaj K = eq.lookupDDRM("K");
+		DMatrixRMaj p = eq.lookupDDRM("p");
+		Point3D_F64 _p = new Point3D_F64(p.get(0), p.get(1), p.get(2));
+
+		DMatrixRMaj found = new DMatrixRMaj(1,1); // wrong size intentionally
+
+		MultiViewOps.canonicalRectifyingHomographyFromKPinf(K,_p, found);
+		assertTrue(MatrixFeatures_DDRM.isEquals(eq.lookupDDRM("H"), found, UtilEjml.TEST_F64));
+	}
+
 	@Test void intrinsicFromAbsoluteQuadratic() {
 		Equation eq = new Equation();
 		eq.process("K1=[300 1 50;0 310 60; 0 0 1]");

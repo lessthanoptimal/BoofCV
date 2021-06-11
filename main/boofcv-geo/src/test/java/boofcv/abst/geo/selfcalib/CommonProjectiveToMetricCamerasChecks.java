@@ -71,35 +71,37 @@ abstract class CommonProjectiveToMetricCamerasChecks extends CommonThreeViewSelf
 	/**
 	 * 3 views with one camera model for all. Perfect observations.
 	 */
-	@Test
-	void perfect3_one_unique_camera() {
+	@Test void perfect3_one_unique_camera() {
 		standardScene();
 		simulateScene(0);
-		checkScene();
+		checkScene(false);
 	}
 
 	/**
 	 * 3 views with three camera model for all. Perfect observations.
 	 */
-	@Test
-	void perfect3_three_cameras() {
+	@Test void perfect3_three_cameras() {
 		standardScene();
 		cameraA = new CameraPinhole(600, 600, 0, 0, 0, imageWidth, imageHeight);
 		cameraB = new CameraPinhole(800, 800, 0, 0, 0, imageWidth, imageHeight);
 		cameraC = new CameraPinhole(350, 350, 0, 0, 0, imageWidth, imageHeight);
 		simulateScene(0);
 
-		checkScene();
+		checkScene(false);
 	}
 
-	private void checkScene() {
+	/**
+	 * @param singleCamera if true then the algorithm will be told all views come from one camera
+	 */
+	private void checkScene( boolean singleCamera ) {
 		ProjectiveToMetricCameras alg = createEstimator();
 		assertTrue(alg.getMinimumViews() >= 1);
 		assertTrue(alg.getMinimumViews() <= 3);
 
 		List<ElevateViewInfo> views = new ArrayList<>();
 		for (int i = 0; i < 3; i++) {
-			views.add(new ElevateViewInfo(imageWidth, imageHeight, i));
+			int cameraIdx = singleCamera ? 0 : i;
+			views.add(new ElevateViewInfo(imageWidth, imageHeight, cameraIdx));
 		}
 
 		List<DMatrixRMaj> inputCameras = new ArrayList<>();
@@ -133,8 +135,7 @@ abstract class CommonProjectiveToMetricCamerasChecks extends CommonThreeViewSelf
 	/**
 	 * 3 views with three camera model for all. Slightly noisy.
 	 */
-	@Test
-	void noisy3_three_cameras() {
+	@Test void noisy3_three_cameras() {
 		standardScene();
 		cameraA = new CameraPinhole(600, 600, 0, 0, 0, imageWidth, imageHeight);
 		cameraB = new CameraPinhole(800, 800, 0, 0, 0, imageWidth, imageHeight);
@@ -145,14 +146,27 @@ abstract class CommonProjectiveToMetricCamerasChecks extends CommonThreeViewSelf
 		rotationTol = 0.1;
 		skewTol = skewTol*10;
 		focusTol = 30;
-		checkScene();
+		checkScene(false);
+	}
+
+	@Test void noisy_one_camera_three_views() {
+		standardScene();
+		cameraA = new CameraPinhole(600, 600, 0, 0, 0, imageWidth, imageHeight);
+		cameraB = cameraA;
+		cameraC = cameraA;
+		simulateScene(noiseSigma);
+
+		translationTol = 0.1;
+		rotationTol = 0.1;
+		skewTol = skewTol*10;
+		focusTol = 30;
+		checkScene(true);
 	}
 
 	/**
 	 * In this situation a scene was created where points appeared behind the camera. Taken from real data
 	 */
-	@Test
-	void real_world_case0() {
+	@Test void real_world_case0() {
 		DMatrixRMaj P2 = new DMatrixRMaj(3, 4, true,
 				71.2714309, -1.50598476, -354.50553, -.052935998,
 				-1.28683386, 39.1891727, 672.658283, -.994592935,
@@ -217,8 +231,7 @@ abstract class CommonProjectiveToMetricCamerasChecks extends CommonThreeViewSelf
 	/**
 	 * The implicit camera was added. it should fail
 	 */
-	@Test
-	void unexpected_number_of_cameras() {
+	@Test void unexpected_number_of_cameras() {
 		standardScene();
 		simulateScene(0);
 
