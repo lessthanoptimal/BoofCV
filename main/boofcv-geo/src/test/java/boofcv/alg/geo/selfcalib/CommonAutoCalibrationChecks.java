@@ -42,7 +42,7 @@ public class CommonAutoCalibrationChecks extends BoofStandardJUnit {
 	List<Se3_F64> listCameraToWorld = new ArrayList<>();
 
 	List<DMatrixRMaj> listP = new ArrayList<>();
-	DMatrixRMaj p = new DMatrixRMaj(3, 1); // plane at infinity [p';1]
+	DMatrixRMaj planeAtInfinity = new DMatrixRMaj(3, 1); // plane at infinity [p';1]
 	DMatrixRMaj Q;
 
 	public void renderTranslationOnly( CameraPinhole camera ) {
@@ -171,7 +171,7 @@ public class CommonAutoCalibrationChecks extends BoofStandardJUnit {
 			double scale = (rand.nextDouble() + 0.1)*(rand.nextGaussian() < 0 ? -1 : 1);
 
 			DMatrixRMaj K = PerspectiveOps.pinholeToMatrix(cameras.get(0), (DMatrixRMaj)null);
-			eq.alias(K, "K", p, "p", scale, "scale");
+			eq.alias(K, "K", planeAtInfinity, "p", scale, "scale");
 			eq.process("p=[0.5,0.25,0.4]'");
 			eq.process("H = scale*[K [0;0;0]; -p'*K 1]"); // projective to metric
 			eq.process("Hinv = inv(H)"); // metric to projective
