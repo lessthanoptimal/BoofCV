@@ -87,12 +87,18 @@ public class SelfCalibrationLinearDualQuadratic extends SelfCalibrationBase {
 	// The dual absolute quadratic
 	DMatrix4x4 Q = new DMatrix4x4();
 
+	// Modifies the singular values so that the smallest one will be zero
+//	protected final MassageSingularValues forceSmallestSingularToZero;  <-- kept for future work/ideas
+
 	// A singular value is considered zero if it is smaller than this number
 	@Getter @Setter double singularThreshold = 1e-3;
 
 	//---------------- Internal workspace
 	private final DMatrixRMaj L = new DMatrixRMaj(1, 1);
 	private final DMatrixRMaj w_i = new DMatrixRMaj(3, 3);
+
+	// Storage for null space vector
+	private final DMatrixRMaj nv = new DMatrixRMaj(10, 1);
 
 	/**
 	 * Constructor for zero-principle point and (optional) zero-skew
@@ -120,6 +126,7 @@ public class SelfCalibrationLinearDualQuadratic extends SelfCalibrationBase {
 	private SelfCalibrationLinearDualQuadratic( int equations ) {
 		eqs = equations;
 		minimumProjectives = (int)Math.ceil(10.0/eqs);
+//		forceSmallestSingularToZero = new MassageSingularValues(( W ) -> W.unsafe_set(3, 3, 0.0));
 	}
 
 	/**
@@ -153,8 +160,8 @@ public class SelfCalibrationLinearDualQuadratic extends SelfCalibrationBase {
 			return GeometricResult.SOLVE_FAILED;
 		}
 
-		// Examine the null space to find the values of Q
-		extractSolutionForQ(Q);
+		// Extract the null space
+		SingularOps_DDRM.nullVector(svd, true, nv);
 
 		// determine if the solution is good by looking at two smallest singular values
 		// If there isn't a steep drop it either isn't singular or more there is more than 1 singular value
@@ -164,6 +171,10 @@ public class SelfCalibrationLinearDualQuadratic extends SelfCalibrationBase {
 //			System.out.println("ratio = "+(sv[0]/sv[1]));
 			return GeometricResult.GEOMETRY_POOR;
 		}
+
+		// Examine the null space to find the values of Q
+		if (!extractSolutionForQ(Q))
+			return GeometricResult.SOLVE_FAILED;
 
 		// Enforce constraints and solve for each view
 		if (!MultiViewOps.enforceAbsoluteQuadraticConstraints(Q, true, zeroSkew)) {
@@ -181,12 +192,21 @@ public class SelfCalibrationLinearDualQuadratic extends SelfCalibrationBase {
 	/**
 	 * Extracts the null space and converts it into the Q matrix
 	 */
-	private void extractSolutionForQ( DMatrix4x4 Q ) {
-		DMatrixRMaj nv = new DMatrixRMaj(10, 1);
-		SingularOps_DDRM.nullVector(svd, true, nv);
-
+	private boolean extractSolutionForQ( DMatrix4x4 Q ) {
 		// Convert the solution into a fixed sized matrix because it's easier to read
 		encodeQ(Q, nv.data);
+
+		// The code below is commented out since it seems to make things worse. Unit tests which used to
+		// pass but now fail appear to have a much small difference in value between the smallest and second smallest
+		// singular values. That could be a hint as to what's going on.
+
+		// Enforce Q being a rank-3 matrix
+//		L.reshape(4, 4); // recycle this variable
+//		DConvertMatrixStruct.convert(Q, L);
+//
+//		if (!forceSmallestSingularToZero.process(L))
+//			return false;
+//		DConvertMatrixStruct.convert(L, Q);
 
 		// diagonal elements must be positive because Q = [K*K' .. ; ... ]
 		// If they are a mix of positive and negative that's bad and can't be fixed
@@ -194,6 +214,7 @@ public class SelfCalibrationLinearDualQuadratic extends SelfCalibrationBase {
 		if (Q.a11 < 0 || Q.a22 < 0 || Q.a33 < 0) {
 			CommonOps_DDF4.scale(-1, Q);
 		}
+		return true;
 	}
 
 	/**

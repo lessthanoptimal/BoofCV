@@ -77,7 +77,7 @@ public class SelfCalibrationBase {
 		}
 	}
 
-	public static void encodeQ( DMatrix4x4 Q, double param[] ) {
+	public static void encodeQ( DMatrix4x4 Q, double[] param ) {
 		Q.a11 = param[0];
 		Q.a12 = Q.a21 = param[1];
 		Q.a13 = Q.a31 = param[2];
