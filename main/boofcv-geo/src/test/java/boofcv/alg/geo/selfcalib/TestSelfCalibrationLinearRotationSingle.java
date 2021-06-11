@@ -57,7 +57,7 @@ public class TestSelfCalibrationLinearRotationSingle extends CommonAutoCalibrati
 			DMatrixRMaj P = listP.get(i);
 
 			Equation eq = new Equation();
-			eq.alias(P, "P", p, "p");
+			eq.alias(P, "P", planeAtInfinity, "p");
 			eq.process("H = P(:,0:2) - P(:,3)*p'");
 			Homography2D_F64 H = new Homography2D_F64();
 			DConvertMatrixStruct.convert(eq.lookupDDRM("H"), H);
@@ -100,7 +100,7 @@ public class TestSelfCalibrationLinearRotationSingle extends CommonAutoCalibrati
 			DMatrixRMaj P = listP.get(i);
 
 			Equation eq = new Equation();
-			eq.alias(P, "P", p, "p");
+			eq.alias(P, "P", planeAtInfinity, "p");
 			eq.process("H = P(:,0:2) - P(:,3)*p'");
 			Homography2D_F64 H = new Homography2D_F64();
 			DConvertMatrixStruct.convert(eq.lookupDDRM("H"), H);
@@ -128,7 +128,7 @@ public class TestSelfCalibrationLinearRotationSingle extends CommonAutoCalibrati
 			DMatrixRMaj P = listP.get(i);
 
 			Equation eq = new Equation();
-			eq.alias(P, "P", p, "p", K, "K", w, "w");
+			eq.alias(P, "P", planeAtInfinity, "p", K, "K", w, "w");
 			eq.process("H = P(:,0:2) - P(:,3)*p'");
 //			eq.process("w2 = H*w*H'");
 //			eq.process("w2 = w2 - w");
