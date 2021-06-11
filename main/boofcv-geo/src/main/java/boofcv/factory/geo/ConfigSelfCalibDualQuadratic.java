@@ -20,6 +20,7 @@ package boofcv.factory.geo;
 
 import boofcv.alg.geo.selfcalib.SelfCalibrationLinearDualQuadratic;
 import boofcv.misc.BoofMiscOps;
+import boofcv.misc.ConfigConverge;
 import boofcv.struct.Configuration;
 
 import static boofcv.misc.BoofMiscOps.checkTrue;
@@ -40,9 +41,12 @@ public class ConfigSelfCalibDualQuadratic implements Configuration {
 	public double aspectRatio = 1.0;
 	/** Maximum fraction of invalid observations it will accept before failing */
 	public double invalidFractionAccept = 0.15;
+	/** Performs non-linear refinement minimizing a algebraic cost function */
+	public ConfigConverge refineAlgebraic = new ConfigConverge(1e-12, 1e-8, 20);
 
 	@Override
 	public void checkValidity() {
+		refineAlgebraic.checkValidity();
 		BoofMiscOps.checkTrue(aspectRatio > 0);
 		BoofMiscOps.checkTrue(invalidFractionAccept >= 0 && invalidFractionAccept <= 1.0);
 		checkTrue(knownAspectRatio && zeroSkew, "If aspect ratio is known then zero skew must be assumed");
@@ -53,5 +57,6 @@ public class ConfigSelfCalibDualQuadratic implements Configuration {
 		this.knownAspectRatio = src.knownAspectRatio;
 		this.aspectRatio = src.aspectRatio;
 		this.invalidFractionAccept = src.invalidFractionAccept;
+		this.refineAlgebraic.setTo(src.refineAlgebraic);
 	}
 }

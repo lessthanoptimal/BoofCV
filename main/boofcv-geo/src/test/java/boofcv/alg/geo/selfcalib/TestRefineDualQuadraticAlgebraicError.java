@@ -131,7 +131,7 @@ public class TestRefineDualQuadraticAlgebraicError extends CommonAutoCalibration
 
 		var alg = new RefineDualQuadraticAlgebraicError();
 		alg.setKnownPrinciplePoint(true);
-		checkRefine(alg, expected, found, 2);
+		checkRefine(alg, expected, found, 5);
 	}
 
 	@Test void solveFixedAspect() {
@@ -151,7 +151,7 @@ public class TestRefineDualQuadraticAlgebraicError extends CommonAutoCalibration
 
 		var alg = new RefineDualQuadraticAlgebraicError();
 		alg.setKnownAspect(true);
-		checkRefine(alg, expected, found, 2);
+		checkRefine(alg, expected, found, 5);
 	}
 
 	private void checkRefine( RefineDualQuadraticAlgebraicError alg,

@@ -68,7 +68,6 @@ Version : 0.38
 
 TODO DB
     - Metric: Make sure the scene's intrinsic isn't modified when it shouldn't be
-    - Metric: Use information that views are from the same camera for projective to metric (spawning)
     - Metric: Use information that all cameras are known when expanding by one
     - Pairwise: Handle planes
     - Ransac: Tell it the minimum threshold and abort early if it can't be meet?

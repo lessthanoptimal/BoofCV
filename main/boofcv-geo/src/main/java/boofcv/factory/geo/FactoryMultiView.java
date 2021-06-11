@@ -39,10 +39,7 @@ import boofcv.alg.geo.h.HomographyResidualTransfer;
 import boofcv.alg.geo.h.HomographyTotalLeastSquares;
 import boofcv.alg.geo.pose.*;
 import boofcv.alg.geo.robust.ModelGeneratorViews;
-import boofcv.alg.geo.selfcalib.MetricCameraTriple;
-import boofcv.alg.geo.selfcalib.SelfCalibrationEssentialGuessAndCheck;
-import boofcv.alg.geo.selfcalib.SelfCalibrationLinearDualQuadratic;
-import boofcv.alg.geo.selfcalib.SelfCalibrationPraticalGuessAndCheckFocus;
+import boofcv.alg.geo.selfcalib.*;
 import boofcv.alg.geo.triangulate.*;
 import boofcv.alg.geo.trifocal.RefineThreeViewProjectiveGeometric;
 import boofcv.alg.geo.trifocal.TrifocalAlgebraicPoint7;
@@ -704,6 +701,8 @@ public class FactoryMultiView {
 
 		var ret = new ProjectiveToMetricCameraDualQuadratic(selfCalib);
 		ret.invalidFractionAccept = c.invalidFractionAccept;
+		ret.getRefiner().converge.setTo(c.refineAlgebraic);
+
 		return ret;
 	}
 
@@ -746,5 +745,17 @@ public class FactoryMultiView {
 		selfCalib.setSampling(c.sampleMin, c.sampleMax, c.numberOfSamples);
 		selfCalib.setSingleCamera(c.fixedFocus);
 		return new ProjectiveToMetricCameraPracticalGuessAndCheck(selfCalib);
+	}
+
+	/**
+	 * Returns {@link RefineDualQuadraticAlgebraicError} which can be used to minimize the Dual Quadratic
+	 * by minimizing algebraic error.
+	 *
+	 * @param config Converge criteria
+	 */
+	public static RefineDualQuadraticAlgebraicError refineDualAbsoluteQuadratic( ConfigConverge config ) {
+		var alg = new RefineDualQuadraticAlgebraicError();
+		alg.getConverge().setTo(config);
+		return alg;
 	}
 }

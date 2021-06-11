@@ -33,6 +33,7 @@ import org.ddogleg.struct.DogArray_I32;
 import org.ddogleg.struct.VerbosePrint;
 import org.ejml.data.DMatrixRMaj;
 import org.ejml.dense.row.CommonOps_DDRM;
+import org.ejml.dense.row.NormOps_DDRM;
 import org.jetbrains.annotations.Nullable;
 
 import java.io.PrintStream;
@@ -47,20 +48,20 @@ import java.util.Set;
  * the plane at infinity.
  * </p>
  *
- * Optional Assumptions: known aspect ratio, known principle point, single camera.
+ * <p>Optional Assumptions: known aspect ratio, known principle point, single camera.</p>
  *
  * <p>
  * w<sup>*</sup><sub>i</sub> = K<sub>i</sub> *K<sup>T</sup><sub>i</sub> <br>
  * w<sup>*</sup><sub>i</sub> = P<sub>i</sub>Q<sup>*</sup><sub>&infin;</sub>P<sup>T</sup><sub>i</sub>
  * </p>
- * where K<sub>i</sub>  is the 3x3 camera calibration matrix for view i. Q is a 4x4 symmetric matrix and is the absolute dual
- * quadratic. P<sub>i</sub> is a projective transform from view i+1 to i.
+ * where K<sub>i</sub>  is the 3x3 camera calibration matrix for view i. Q is a 4x4 symmetric matrix and is the
+ * absolute dual quadratic. P<sub>i</sub> is a projective transform from view i+1 to i.
  *
  * <p>
  * A[i] = P<sub>i</sub>Q<sup>*</sup><sub>&infin;</sub>P<sup>T</sup><sub>i</sub> <br>
- * residual[i] = w<sup>*</sup><sub>i</sub>- A[i]/A[i](3,3)
+ * residual[i] = w<sup>*</sup><sub>i</sub>/||w<sup>*</sup><sub>i</sub>|| - A[i]/||A[i]||
  * </p>
- * Residuals are computed for each projective camera. The F-norm of the residuals are what is minimized.
+ * Residuals are computed for each projective. The F-norm of the residuals are what is minimized.
  * w and A are normalized to ensure that they have the same scale.
  *
  * NOTE: It would be possible to add zero-skew but this is much more simplistic without it and you rarely need
@@ -76,7 +77,8 @@ import java.util.Set;
 public class RefineDualQuadraticAlgebraicError implements VerbosePrint {
 
 	/** Optimization algorithm */
-	public @Getter @Setter UnconstrainedLeastSquares<DMatrixRMaj> minimizer = FactoryOptimization.levenbergMarquardt(null, false);
+	public @Getter @Setter
+	UnconstrainedLeastSquares<DMatrixRMaj> minimizer = FactoryOptimization.levenbergMarquardt(null, false);
 
 	/** If true then the images are assumed to have a known aspect ratio */
 	public @Getter @Setter boolean knownAspect = false;
@@ -85,7 +87,7 @@ public class RefineDualQuadraticAlgebraicError implements VerbosePrint {
 	public @Getter @Setter boolean knownPrinciplePoint = false;
 
 	/** Convergence criteria */
-	public @Getter final ConfigConverge converge = new ConfigConverge(1e-6, 1e-5, 20);
+	public @Getter final ConfigConverge converge = new ConfigConverge(1e-12, 1e-8, 20);
 
 	/** Resulting plane at infinity that was found */
 	public @Getter final Point3D_F64 planeAtInfinity = new Point3D_F64();
@@ -212,6 +214,13 @@ public class RefineDualQuadraticAlgebraicError implements VerbosePrint {
 		// Extract the output
 		decodeParameters(minimizer.getParameters(), cameras, planeAtInfinity);
 
+		// Crude sanity check. Things went poorly if there is a non-positive focal length
+		for (int i = 0; i < cameras.size; i++) {
+			CameraState c = cameras.get(i);
+			if (c.fx <= 0 || c.aspectRatio <= 0)
+				return false;
+		}
+
 		return true;
 	}
 
@@ -328,15 +337,17 @@ public class RefineDualQuadraticAlgebraicError implements VerbosePrint {
 				CommonOps_DDRM.mult(P, Q, PQ);
 				CommonOps_DDRM.multTransB(PQ, P, PQP);
 
-				// KK(3,3) = 1 so we will scape PQP so that it has the same property
-				CommonOps_DDRM.divide(PQP, PQP.unsafe_get(2, 2));
+				// Resolve scale ambiguity by normalizing the matrices
+				CommonOps_DDRM.divide(PQP, NormOps_DDRM.normPInf(PQP));
+				CommonOps_DDRM.divide(KK, NormOps_DDRM.normPInf(KK));
 
-				output[indexOutput++] = KK.data[0] - PQP.data[0]; // (0,0)
-				output[indexOutput++] = KK.data[1] - PQP.data[1]; // (0,1)
-				output[indexOutput++] = KK.data[2] - PQP.data[2]; // (0,2)
-				output[indexOutput++] = KK.data[4] - PQP.data[4]; // (1,1)
-				output[indexOutput++] = KK.data[5] - PQP.data[5]; // (1,2)
-				// (2,2) will be 1.0 for both LL amd PQP
+				// Compute residuals. off diagonal elements are multiply by two since the matrix is symmetric
+				output[indexOutput++] = KK.data[0] - PQP.data[0];       // (0,0)
+				output[indexOutput++] = 2.0*(KK.data[1] - PQP.data[1]); // (0,1)
+				output[indexOutput++] = 2.0*(KK.data[2] - PQP.data[2]); // (0,2)
+				output[indexOutput++] = KK.data[4] - PQP.data[4];       // (1,1)
+				output[indexOutput++] = 2.0*(KK.data[5] - PQP.data[5]); // (1,2)
+				output[indexOutput++] = KK.data[8] - PQP.data[8];       // (2,2)
 			}
 		}
 
@@ -352,7 +363,7 @@ public class RefineDualQuadraticAlgebraicError implements VerbosePrint {
 		}
 
 		@Override public int getNumOfOutputsM() {
-			return 5*projectiveCameras.size;
+			return 6*projectiveCameras.size;
 		}
 	}
 

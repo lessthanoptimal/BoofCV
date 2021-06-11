@@ -233,6 +233,13 @@ class TestMetricExpandByOneView extends BoofStandardJUnit {
 		// The second pass will always be perfect and isn't checked by this function
 	}
 
+	/**
+	 * Make sure the local optimization doesn't update any global intrinsic parameters
+	 */
+	@Test void globalIntrinsicsNotModified() {
+		fail("Implement");
+	}
+
 	private static class DummySanityChecks extends MetricSanityChecks {
 		boolean success = true;
 		int numFeatures = 100;
