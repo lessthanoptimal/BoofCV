@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -18,16 +18,15 @@
 
 package boofcv.alg.geo.f;
 
+import boofcv.alg.geo.MassageSingularValues;
 import boofcv.alg.geo.NormalizationPoint2D;
+import boofcv.misc.BoofLambdas;
 import boofcv.struct.geo.AssociatedPair;
 import georegression.struct.point.Point2D_F64;
+import lombok.Getter;
 import org.ejml.data.DMatrixRMaj;
-import org.ejml.dense.row.CommonOps_DDRM;
-import org.ejml.dense.row.SingularOps_DDRM;
-import org.ejml.dense.row.factory.DecompositionFactory_DDRM;
 import org.ejml.dense.row.linsol.svd.SolveNullSpaceSvd_DDRM;
 import org.ejml.interfaces.SolveNullSpace;
-import org.ejml.interfaces.decomposition.SingularValueDecomposition_F64;
 
 import java.util.List;
 
@@ -50,22 +49,18 @@ public abstract class FundamentalLinear {
 	protected DMatrixRMaj A = new DMatrixRMaj(1, 9);
 	// svd used to extract the null space
 	protected SolveNullSpace<DMatrixRMaj> solverNull = new SolveNullSpaceSvd_DDRM();
-	// svd used to enforce constraings on 3x3 matrix
-	protected SingularValueDecomposition_F64<DMatrixRMaj> svdConstraints = DecompositionFactory_DDRM.svd(3, 3, true, true, false);
 
-	// SVD decomposition of F = U*S*V^T
-	protected DMatrixRMaj svdU;
-	protected DMatrixRMaj svdS;
-	protected DMatrixRMaj svdV;
-
-	protected DMatrixRMaj temp0 = new DMatrixRMaj(3, 3);
+	// Used to put a matrix onto essential or fundamental space
+	protected MassageSingularValues massger = new MassageSingularValues();
+	protected BoofLambdas.ProcessObject<DMatrixRMaj> opEssential;
+	protected BoofLambdas.ProcessObject<DMatrixRMaj> opFundamental;
 
 	// matrix used to normalize results
 	protected NormalizationPoint2D N1 = new NormalizationPoint2D();
 	protected NormalizationPoint2D N2 = new NormalizationPoint2D();
 
-	// should it compute a fundamental (true) or essential (false) matrix?
-	boolean computeFundamental;
+	/** should it compute a fundamental (true) or essential (false) matrix? */
+	@Getter boolean computeFundamental;
 
 	/**
 	 * Specifies which type of matrix is to be computed
@@ -74,6 +69,20 @@ public abstract class FundamentalLinear {
 	 */
 	protected FundamentalLinear( boolean computeFundamental ) {
 		this.computeFundamental = computeFundamental;
+
+		opEssential = (W)-> {
+			// project it into essential space
+			// the scale factor is arbitrary, but the first two singular values need
+			// to be the same.  so just set them to one
+			W.unsafe_set(0, 0, 1);
+			W.unsafe_set(1, 1, 1);
+			W.unsafe_set(2, 2, 0);
+		};
+
+		opFundamental = (W)-> {
+			// the smallest singular value needs to be set to zero, unlike
+			W.set(2, 2, 0);
+		};
 	}
 
 	/**
@@ -82,27 +91,7 @@ public abstract class FundamentalLinear {
 	 * @return true if svd returned true.
 	 */
 	protected boolean projectOntoEssential( DMatrixRMaj E ) {
-		if (!svdConstraints.decompose(E)) {
-			return false;
-		}
-		svdV = svdConstraints.getV(svdV, false);
-		svdU = svdConstraints.getU(svdU, false);
-		svdS = svdConstraints.getW(svdS);
-
-		SingularOps_DDRM.descendingOrder(svdU, false, svdS, svdV, false);
-
-		// project it into essential space
-		// the scale factor is arbitrary, but the first two singular values need
-		// to be the same.  so just set them to one
-		svdS.unsafe_set(0, 0, 1);
-		svdS.unsafe_set(1, 1, 1);
-		svdS.unsafe_set(2, 2, 0);
-
-		// recompute F
-		CommonOps_DDRM.mult(svdU, svdS, temp0);
-		CommonOps_DDRM.multTransB(temp0, svdV, E);
-
-		return true;
+		return massger.process(E, opEssential);
 	}
 
 	/**
@@ -111,23 +100,7 @@ public abstract class FundamentalLinear {
 	 * @return true if svd returned true.
 	 */
 	protected boolean projectOntoFundamentalSpace( DMatrixRMaj F ) {
-		if (!svdConstraints.decompose(F)) {
-			return false;
-		}
-		svdV = svdConstraints.getV(svdV, false);
-		svdU = svdConstraints.getU(svdU, false);
-		svdS = svdConstraints.getW(svdS);
-
-		SingularOps_DDRM.descendingOrder(svdU, false, svdS, svdV, false);
-
-		// the smallest singular value needs to be set to zero, unlike
-		svdS.set(2, 2, 0);
-
-		// recompute F
-		CommonOps_DDRM.mult(svdU, svdS, temp0);
-		CommonOps_DDRM.multTransB(temp0, svdV, F);
-
-		return true;
+		return massger.process(F, opFundamental);
 	}
 
 	/**
@@ -168,41 +141,5 @@ public abstract class FundamentalLinear {
 			A.unsafe_set(i, 7, f_norm.y);
 			A.unsafe_set(i, 8, 1);
 		}
-	}
-
-	/**
-	 * Returns the U from the SVD of F.
-	 *
-	 * @return U matrix.
-	 */
-	public DMatrixRMaj getSvdU() {
-		return svdU;
-	}
-
-	/**
-	 * Returns the S from the SVD of F.
-	 *
-	 * @return S matrix.
-	 */
-	public DMatrixRMaj getSvdS() {
-		return svdS;
-	}
-
-	/**
-	 * Returns the V from the SVD of F.
-	 *
-	 * @return V matrix.
-	 */
-	public DMatrixRMaj getSvdV() {
-		return svdV;
-	}
-
-	/**
-	 * Returns true if it is computing a fundamental matrix or false if it is an essential matrix.
-	 *
-	 * @return true for fundamental and false for essential
-	 */
-	public boolean isComputeFundamental() {
-		return computeFundamental;
 	}
 }
