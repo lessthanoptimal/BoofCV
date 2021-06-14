@@ -67,9 +67,10 @@ Version : 0.38
   * Added PointTracker.getImageType() so you know what type of image it requires
 
 TODO DB
-    - Metric: Make sure the scene's intrinsic isn't modified when it shouldn't be
-    - Metric: Use information that all cameras are known when expanding by one
-    - Pairwise: Handle planes
+    - Metric: Use prior camera when spawning and another hypothesis
+    - Pairwise: Handle planes correctly when scoring
+    - Metric: Expand using 2-views
+    - Metric: Initialize using 2-views
     - Ransac: Tell it the minimum threshold and abort early if it can't be meet?
 
 TODO Uncalibrated Stereo: Figure out why it seems to select an invalid solution when it got almost everything right.

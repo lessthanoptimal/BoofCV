@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -133,5 +133,10 @@ public class RemoveBrownPtoN_F64 implements Point2Transform2_F64 {
 		ret.a23 = a23;
 		ret.params = new RadialTangential_F64(params);
 		return ret;
+	}
+
+	public void reset() {
+		cx = cy = skew = fx = fy = 0;
+		a11 = a12 = a13 = a22 = a23 = 0;
 	}
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -23,6 +23,7 @@ import georegression.metric.ClosestPoint3D_F64;
 import georegression.struct.line.LineParametric3D_F64;
 import georegression.struct.point.Point2D_F64;
 import georegression.struct.point.Point3D_F64;
+import georegression.struct.point.Point4D_F64;
 import georegression.struct.point.Vector3D_F64;
 import georegression.struct.se.Se3_F64;
 
@@ -47,11 +48,39 @@ public class Triangulate2ViewsGeometricMetric {
 	 * @param a Observation from camera view 'a' in normalized coordinates. Not modified.
 	 * @param b Observation from camera view 'b' in normalized coordinates. Not modified.
 	 * @param a_to_b Transformation from camera view 'a' to 'b'  Not modified.
-	 * @param foundInA (Output) Found 3D position of the point in reference frame 'a'.  Modified.
+	 * @param foundInA (Output) Found 3D position of the point in reference frame 'a'. Modified.
+	 * @return true if they intersect at a point that's not at infinity
 	 */
-	public void triangulate( Point2D_F64 a, Point2D_F64 b,
-							 Se3_F64 a_to_b,
-							 Point3D_F64 foundInA ) {
+	public boolean triangulate( Point2D_F64 a, Point2D_F64 b, Se3_F64 a_to_b, Point3D_F64 foundInA ) {
+		// b_to_a = R'*(X_b-T)=X_a
+		// rayB should start at origin of B so X_b = 0
+		// Thus, rayB.p = -R'*T
+
+		// set camera B's principle point
+		Vector3D_F64 t = a_to_b.getT();
+		rayB.p.setTo(-t.x, -t.y, -t.z);
+
+		// rotate observation in B into camera A's view
+		GeometryMath_F64.multTran(a_to_b.getR(), rayB.p, rayB.p);
+		GeometryMath_F64.multTran(a_to_b.getR(), b, rayB.slope);
+
+		rayA.slope.setTo(a.x, a.y, 1);
+
+		return null != ClosestPoint3D_F64.closestPoint(rayA, rayB, foundInA);
+	}
+
+	/**
+	 * <p>
+	 * Same as {@link #triangulate(Point2D_F64, Point2D_F64, Se3_F64, Point3D_F64)} but in homogenous coordinates
+	 * and can handle points at infinity.
+	 * </p>
+	 *
+	 * @param a Observation from camera view 'a' in normalized coordinates. Not modified.
+	 * @param b Observation from camera view 'b' in normalized coordinates. Not modified.
+	 * @param a_to_b Transformation from camera view 'a' to 'b'  Not modified.
+	 * @param foundInA (Output) Found 3D position of the point in reference frame 'a'. Homogenous coordinates. Modified.
+	 */
+	public void triangulate( Point2D_F64 a, Point2D_F64 b, Se3_F64 a_to_b, Point4D_F64 foundInA ) {
 		// b_to_a = R'*(X_b-T)=X_a
 		// rayB should start at origin of B so X_b = 0
 		// Thus, rayB.p = -R'*T

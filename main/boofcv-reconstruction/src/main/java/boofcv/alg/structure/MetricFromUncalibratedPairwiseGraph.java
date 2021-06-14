@@ -69,6 +69,8 @@ public class MetricFromUncalibratedPairwiseGraph extends ReconstructionFromPairw
 
 	private final @Getter RefineMetricWorkingGraph refineWorking = new RefineMetricWorkingGraph();
 
+	private final @Getter RefineMetricWorkingGraph refineBeforeMerge = new RefineMetricWorkingGraph();
+
 	private final @Getter MetricSpawnSceneFromView spawnScene;
 
 	private final @Getter MetricMergeScenes mergeScenes = new MetricMergeScenes();
@@ -135,6 +137,9 @@ public class MetricFromUncalibratedPairwiseGraph extends ReconstructionFromPairw
 
 		// Expand all the scenes until they can't any more
 		expandScenes(dbSimilar, dbCams);
+
+		// Refine all the scenes using all data available
+		refineScenes(dbSimilar);
 
 		// Merge scenes together until there are no more scenes which can be merged
 		mergeScenes(dbSimilar);
@@ -288,10 +293,17 @@ public class MetricFromUncalibratedPairwiseGraph extends ReconstructionFromPairw
 		return usable;
 	}
 
+	void refineScenes( LookUpSimilarImages dbSimilar ) {
+		if (verbose != null) verbose.println("Refining all scenes before merging");
+		for (int sceneIdx = 0; sceneIdx < scenes.size; sceneIdx++) {
+			refineBeforeMerge.process(dbSimilar, scenes.get(sceneIdx));
+		}
+	}
+
 	/**
 	 * Merge the different scenes together if they share common views
 	 */
-	void mergeScenes( LookUpSimilarImages db ) {
+	void mergeScenes( LookUpSimilarImages dbSimilar ) {
 		if (verbose != null) verbose.println("Merging Scenes. scenes.size=" + scenes.size);
 
 		SceneMergingOperations.SelectedScenes selected = new SceneMergingOperations.SelectedScenes();
@@ -329,7 +341,7 @@ public class MetricFromUncalibratedPairwiseGraph extends ReconstructionFromPairw
 
 			// Merge the two scenes together
 			int sizeBefore = dst.listViews.size();
-			if (!mergeScenes.merge(db, src, dst)) {
+			if (!mergeScenes.merge(dbSimilar, src, dst)) {
 				if (verbose != null)
 					verbose.println("FAILED: Merged blocked until scenes modified. src=" + src.index + " dst=" + dst.index);
 				// Mark merging these two scenes are impossible until one of them is modified
@@ -409,9 +421,9 @@ public class MetricFromUncalibratedPairwiseGraph extends ReconstructionFromPairw
 			return false;
 		}
 
-		// Saves the set of inliers used to estimate this views metric view for later use
+		// Compute the score for view's inliers
 		SceneWorkingGraph.View wview = scene.lookupView(selected.id);
-		SceneWorkingGraph.InlierInfo inlier = utils.saveRansacInliers(wview);
+		SceneWorkingGraph.InlierInfo inlier = wview.inliers.getTail();
 		inlier.scoreGeometric = computeGeometricScore(scene, inlier);
 
 		// TODO consider local refinement while expanding to help mitigate the unbounded growth in errors

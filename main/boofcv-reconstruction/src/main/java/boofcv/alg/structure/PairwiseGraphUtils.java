@@ -85,12 +85,12 @@ public class PairwiseGraphUtils {
 	/** The three views used in three view algorithms */
 	public View seed, viewB, viewC;
 	/** Prior calibration information for each view's camera */
-	public CameraPinholeBrown cameraA = new CameraPinholeBrown(2);
-	public CameraPinholeBrown cameraB = new CameraPinholeBrown(2);
-	public CameraPinholeBrown cameraC = new CameraPinholeBrown(2);
+	public CameraPinholeBrown priorCamA = new CameraPinholeBrown(2);
+	public CameraPinholeBrown priorCamB = new CameraPinholeBrown(2);
+	public CameraPinholeBrown priorCamC = new CameraPinholeBrown(2);
 
 	public final DogArray<AssociatedTriple> matchesTriple = new DogArray<>(AssociatedTriple::new);
-	/** Inliers from robust fitting of trifocal tensor */
+	/** Inliers from robust fitting of trifocal tensor. Pixels */
 	public final FastArray<AssociatedTriple> inliersThreeView = new FastArray<>(AssociatedTriple.class);
 	/** Which features the inliers correspond to */
 	public final DogArray_I32 inlierIdx = new DogArray_I32();
@@ -233,9 +233,9 @@ public class PairwiseGraphUtils {
 	 */
 	public void createTripleFromCommon() {
 		// Camera info for each view
-		dbCams.lookupCalibration(dbCams.viewToCamera(seed.id), cameraA);
-		dbCams.lookupCalibration(dbCams.viewToCamera(viewB.id), cameraB);
-		dbCams.lookupCalibration(dbCams.viewToCamera(viewC.id), cameraC);
+		dbCams.lookupCalibration(dbCams.viewToCamera(seed.id), priorCamA);
+		dbCams.lookupCalibration(dbCams.viewToCamera(viewB.id), priorCamB);
+		dbCams.lookupCalibration(dbCams.viewToCamera(viewC.id), priorCamC);
 
 		// Get coordinates of features in each view
 		dbSimilar.lookupPixelFeats(seed.id, featsA);
@@ -243,9 +243,9 @@ public class PairwiseGraphUtils {
 		dbSimilar.lookupPixelFeats(viewC.id, featsC);
 
 		// Make the pixels zero centered
-		BoofMiscOps.offsetPixels(featsA.toList(), -cameraA.cx, -cameraA.cy);
-		BoofMiscOps.offsetPixels(featsB.toList(), -cameraB.cx, -cameraB.cy);
-		BoofMiscOps.offsetPixels(featsC.toList(), -cameraC.cx, -cameraC.cy);
+		BoofMiscOps.offsetPixels(featsA.toList(), -priorCamA.cx, -priorCamA.cy);
+		BoofMiscOps.offsetPixels(featsB.toList(), -priorCamB.cx, -priorCamB.cy);
+		BoofMiscOps.offsetPixels(featsC.toList(), -priorCamC.cx, -priorCamC.cy);
 
 		// pre-declare memory
 		matchesTriple.reset();
@@ -287,9 +287,10 @@ public class PairwiseGraphUtils {
 	/**
 	 * Saves which features were used as inliers.
 	 *
+	 * @param inlierIdx Which features in 'commonIdx' are inliers and should be added to the set
 	 * @param view Which view should be the first view in the list and have its inliers updated.
 	 */
-	public InlierInfo saveRansacInliers( SceneWorkingGraph.View view ) {
+	public InlierInfo saveRansacInliers( SceneWorkingGraph.View view, DogArray_I32 inlierIdx ) {
 		int viewIdx = seed == view.pview ? 0 : viewB == view.pview ? 1 : viewC == view.pview ? 2 : -1;
 
 		int[] order = switch (viewIdx) {
@@ -299,8 +300,7 @@ public class PairwiseGraphUtils {
 			default -> throw new RuntimeException("Passed in view is not any of the three expected");
 		};
 
-		int numInliers = inliersThreeView.size();
-		checkTrue(numInliers == inlierIdx.size);
+		int numInliers = inlierIdx.size();
 		checkTrue(view.inliers.size == 0, "Inliers should not have already been set for this view");
 		final InlierInfo info = view.inliers.grow();
 
@@ -345,14 +345,14 @@ public class PairwiseGraphUtils {
 		structure.initialize(3, inliersThreeView.size());
 
 		// specify the found projective camera matrices
-		dbCams.lookupCalibration(dbCams.viewToCamera(seed.id), cameraA);
-		dbCams.lookupCalibration(dbCams.viewToCamera(viewB.id), cameraB);
-		dbCams.lookupCalibration(dbCams.viewToCamera(viewC.id), cameraC);
+		dbCams.lookupCalibration(dbCams.viewToCamera(seed.id), priorCamA);
+		dbCams.lookupCalibration(dbCams.viewToCamera(viewB.id), priorCamB);
+		dbCams.lookupCalibration(dbCams.viewToCamera(viewC.id), priorCamC);
 
 		// The first view is assumed to be the coordinate system's origin and is identity by definition
-		structure.setView(0, fixedSeed, P1, cameraA.width, cameraA.height);
-		structure.setView(1, !fixedSeed, P2, cameraB.width, cameraB.height);
-		structure.setView(2, !fixedSeed, P3, cameraC.width, cameraC.height);
+		structure.setView(0, fixedSeed, P1, priorCamA.width, priorCamA.height);
+		structure.setView(1, !fixedSeed, P2, priorCamB.width, priorCamB.height);
+		structure.setView(2, !fixedSeed, P3, priorCamC.width, priorCamC.height);
 
 		// triangulate homogenous coordinates for each point in the inlier set
 		triangulateFeatures();
