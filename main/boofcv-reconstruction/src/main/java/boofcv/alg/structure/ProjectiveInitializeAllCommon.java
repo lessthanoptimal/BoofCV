@@ -370,9 +370,9 @@ public class ProjectiveInitializeAllCommon implements VerbosePrint {
 			View viewI = edge.other(seed);
 
 			// Lookup pixel locations of features in the connected view
-			dbCams.lookupCalibration(viewI.id, utils.cameraB);
+			dbCams.lookupCalibration(viewI.id, utils.priorCamB);
 			dbSimilar.lookupPixelFeats(viewI.id, utils.featsB);
-			BoofMiscOps.offsetPixels(utils.featsB.toList(), -utils.cameraB.cx, -utils.cameraB.cy);
+			BoofMiscOps.offsetPixels(utils.featsB.toList(), -utils.priorCamB.cx, -utils.priorCamB.cy);
 
 			if (!computeCameraMatrix(seed, edge, utils.featsB, cameraMatrix)) {
 				if (verbose != null) verbose.println("Pose estimator failed! view='" + viewI.id + "'");
@@ -460,9 +460,9 @@ public class ProjectiveInitializeAllCommon implements VerbosePrint {
 			Motion m = utils.seed.connections.get(seedConnIdx.get(motionIdx));
 			View v = m.other(utils.seed);
 			boolean seedIsSrc = m.src == utils.seed;
-			utils.dbCams.lookupCalibration(utils.dbCams.viewToCamera(v.id), utils.cameraB);
+			utils.dbCams.lookupCalibration(utils.dbCams.viewToCamera(v.id), utils.priorCamB);
 			utils.dbSimilar.lookupPixelFeats(v.id, utils.featsB);
-			BoofMiscOps.offsetPixels(utils.featsB.toList(), -utils.cameraB.cx, -utils.cameraB.cy);
+			BoofMiscOps.offsetPixels(utils.featsB.toList(), -utils.priorCamB.cx, -utils.priorCamB.cy);
 
 			// indicate which observation from this view contributed to which 3D feature
 			DogArray_I32 connInlierIndexes = inlierIndexes.get(motionIdx + 1);

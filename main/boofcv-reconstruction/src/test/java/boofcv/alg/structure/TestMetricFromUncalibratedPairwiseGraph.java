@@ -78,7 +78,7 @@ class TestMetricFromUncalibratedPairwiseGraph extends BoofStandardJUnit {
 		};
 		// Attempting to speed up the test. It has perfect data so it shouldn't need to iterate so many times
 		alg.getRefineWorking().metricSba.configConverge.maxIterations = 4;
-		alg.getExpandMetric().metricSba.configConverge.maxIterations = 4;
+		alg.getExpandMetric().expandUnknown.estimateUtils.metricSba.configConverge.maxIterations = 4;
 		alg.getMergeScenes().refiner.metricSba.configConverge.maxIterations = 4;
 
 //		alg.setVerbose(System.out, BoofMiscOps.hashSet(BoofVerbose.RECURSIVE));

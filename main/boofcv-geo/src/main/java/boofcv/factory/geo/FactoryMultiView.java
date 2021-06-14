@@ -528,6 +528,24 @@ public class FactoryMultiView {
 	}
 
 	/**
+	 * Triangulate two view using the Discrete Linear Transform (DLT) with a calibrated camera.
+	 *
+	 * @return Two view triangulation algorithm
+	 * @see TriangulateMetricLinearDLT
+	 * @see Triangulate2ViewsGeometricMetric
+	 */
+	public static Triangulate2ViewsMetricH triangulate2ViewMetricH( @Nullable ConfigTriangulation config ) {
+		if (config == null)
+			config = new ConfigTriangulation();
+
+		return switch (config.type) {
+			case DLT -> new Wrap2ViewsTriangulateMetricDLTH();
+			case GEOMETRIC -> new Wrap2ViewsTriangulateGeometricH();
+			default -> throw new IllegalArgumentException("Unknown or unsupported type " + config.type);
+		};
+	}
+
+	/**
 	 * Triangulate two view using the Discrete Linear Transform (DLT) with an uncalibrated camera.
 	 *
 	 * @return Two view triangulation algorithm
