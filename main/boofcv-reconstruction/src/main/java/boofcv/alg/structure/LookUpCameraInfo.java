@@ -19,6 +19,7 @@
 package boofcv.alg.structure;
 
 import boofcv.alg.geo.PerspectiveOps;
+import boofcv.misc.BoofMiscOps;
 import boofcv.struct.calib.CameraPinholeBrown;
 import boofcv.struct.image.ImageDimension;
 import gnu.trove.map.TObjectIntMap;
@@ -105,6 +106,8 @@ public class LookUpCameraInfo {
 	 * @param hfov (Input) Horizontal field-of-view in degrees
 	 */
 	public void addCameraCanonical( int width, int height, double hfov ) {
+		BoofMiscOps.checkTrue(width > 0 && height > 0, "width and height must be more than zero");
+		BoofMiscOps.checkTrue(hfov > 0, "hfov must be more than zero degrees");
 		PerspectiveOps.createIntrinsic(width, height, hfov, listCalibration.grow());
 	}
 
