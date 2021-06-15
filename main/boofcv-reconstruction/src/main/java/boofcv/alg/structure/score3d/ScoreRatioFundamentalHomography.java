@@ -20,6 +20,7 @@ package boofcv.alg.structure.score3d;
 
 import boofcv.alg.structure.EpipolarScore3D;
 import boofcv.struct.ConfigLength;
+import boofcv.struct.calib.CameraPinholeBrown;
 import boofcv.struct.geo.AssociatedPair;
 import georegression.struct.homography.Homography2D_F64;
 import lombok.Getter;
@@ -83,7 +84,8 @@ public class ScoreRatioFundamentalHomography implements EpipolarScore3D {
 
 	protected ScoreRatioFundamentalHomography() {}
 
-	@Override public boolean process( List<AssociatedPair> pairs, DMatrixRMaj fundamental, DogArray_I32 inliersIdx ) {
+	@Override public boolean process( CameraPinholeBrown cameraA, CameraPinholeBrown cameraB,
+									  List<AssociatedPair> pairs, DMatrixRMaj fundamental, DogArray_I32 inliersIdx ) {
 		// Reset output
 		inliersIdx.reset();
 		fundamental.fill(0);

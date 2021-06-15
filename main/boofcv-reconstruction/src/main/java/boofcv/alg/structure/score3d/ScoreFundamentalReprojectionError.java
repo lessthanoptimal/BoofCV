@@ -23,6 +23,7 @@ import boofcv.alg.geo.robust.DistanceFundamentalGeometric;
 import boofcv.alg.geo.robust.GenerateHomographyLinear;
 import boofcv.alg.structure.EpipolarScore3D;
 import boofcv.struct.ConfigLength;
+import boofcv.struct.calib.CameraPinholeBrown;
 import boofcv.struct.geo.AssociatedPair;
 import georegression.geometry.GeometryMath_F64;
 import georegression.struct.homography.Homography2D_F64;
@@ -105,7 +106,8 @@ public class ScoreFundamentalReprojectionError implements EpipolarScore3D {
 		this.ransac3D = ransac3D;
 	}
 
-	@Override public boolean process( List<AssociatedPair> pairs, DMatrixRMaj fundamental, DogArray_I32 inliersIdx ) {
+	@Override public boolean process( CameraPinholeBrown cameraA, CameraPinholeBrown cameraB,
+									  List<AssociatedPair> pairs, DMatrixRMaj fundamental, DogArray_I32 inliersIdx ) {
 		// Not enough points to compute F
 		if (pairs.size() < ransac3D.getMinimumSize()) {
 			if (verbose != null) verbose.printf("pairs.size=%d less than ransac3D.getMinimumSize()\n", pairs.size());

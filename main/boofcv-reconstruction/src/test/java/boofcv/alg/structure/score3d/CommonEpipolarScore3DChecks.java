@@ -20,7 +20,7 @@ package boofcv.alg.structure.score3d;
 
 import boofcv.alg.geo.PerspectiveOps;
 import boofcv.alg.structure.EpipolarScore3D;
-import boofcv.struct.calib.CameraPinhole;
+import boofcv.struct.calib.CameraPinholeBrown;
 import boofcv.struct.geo.AssociatedPair;
 import boofcv.testing.BoofStandardJUnit;
 import georegression.geometry.UtilPoint3D_F64;
@@ -47,6 +47,9 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  */
 public abstract class CommonEpipolarScore3DChecks extends BoofStandardJUnit {
 
+	// TODO have different values for each image
+	CameraPinholeBrown intrinsic = new CameraPinholeBrown(400, 410, 0, 500, 500, 1000, 1000);
+
 	DMatrixRMaj fundamental = new DMatrixRMaj(3, 3);
 	DogArray_I32 inlierIdx = new DogArray_I32();
 
@@ -71,7 +74,8 @@ public abstract class CommonEpipolarScore3DChecks extends BoofStandardJUnit {
 		EpipolarScore3D alg = createAlg();
 
 		for( Se3_F64 view0_to_view1 : shouldPass) {
-			assertTrue(alg.process(createAssociations(numPoints, null, view0_to_view1), fundamental, inlierIdx));
+			assertTrue(alg.process(intrinsic, intrinsic,
+					createAssociations(numPoints, null, view0_to_view1), fundamental, inlierIdx));
 			assertTrue(alg.is3D());
 			assertTrue(inlierIdx.size >= numPoints*0.7);
 			// just check to see if something is filled in
@@ -96,7 +100,8 @@ public abstract class CommonEpipolarScore3DChecks extends BoofStandardJUnit {
 		var generalPlane = new PlaneNormal3D_F64(0, 0, 1, -0.05, 0.1, 1);
 
 		for( Se3_F64 view0_to_view1 : scenarios) {
-			assertTrue(alg.process(createAssociations(numPoints, generalPlane, view0_to_view1), fundamental, inlierIdx));
+			assertTrue(alg.process(intrinsic, intrinsic, createAssociations(numPoints, generalPlane, view0_to_view1),
+					fundamental, inlierIdx));
 			assertFalse(alg.is3D());
 			assertTrue(inlierIdx.size >= numPoints*0.7);
 			// just check to see if something is filled in
@@ -126,7 +131,8 @@ public abstract class CommonEpipolarScore3DChecks extends BoofStandardJUnit {
 		EpipolarScore3D alg = createAlg();
 
 		for( Se3_F64 view0_to_view1 : shouldPass) {
-			assertTrue(alg.process(createAssociations(numPoints, generalPlane, view0_to_view1), fundamental, inlierIdx));
+			assertTrue(alg.process(intrinsic, intrinsic, createAssociations(numPoints, generalPlane, view0_to_view1),
+					fundamental, inlierIdx));
 			assertTrue(alg.is3D());
 			assertTrue(inlierIdx.size >= numPoints*0.7);
 			// just check to see if something is filled in
@@ -146,8 +152,6 @@ public abstract class CommonEpipolarScore3DChecks extends BoofStandardJUnit {
 	}
 
 	private List<AssociatedPair> createAssociations( int N, @Nullable PlaneNormal3D_F64 plane, Se3_F64 view0_to_view1 ) {
-		var intrinsic = new CameraPinhole(400, 410, 0, 500, 500, 1000, 1000);
-
 		List<Point3D_F64> feats3D;
 
 		if (plane != null) {

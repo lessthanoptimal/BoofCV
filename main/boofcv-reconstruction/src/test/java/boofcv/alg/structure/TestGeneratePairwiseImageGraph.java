@@ -35,8 +35,9 @@ class TestGeneratePairwiseImageGraph extends BoofStandardJUnit {
 		GeneratePairwiseImageGraph alg = FactorySceneReconstruction.generatePairwise(null);
 
 		for (int numViews = 0; numViews < 2; numViews++) {
-			MockLookupSimilarImages similar = new MockLookupSimilarImages(numViews, 123123);
-			alg.process(similar);
+			var dbSimilar = new MockLookupSimilarImages(numViews, 123123);
+			var dbCams = new MockLookUpCameraInfo(400,300);
+			alg.process(dbSimilar, dbCams);
 
 			PairwiseImageGraph graph = alg.getGraph();
 			assertEquals(numViews, graph.nodes.size);
@@ -50,8 +51,9 @@ class TestGeneratePairwiseImageGraph extends BoofStandardJUnit {
 	@Test void process_connected() {
 		GeneratePairwiseImageGraph alg = FactorySceneReconstruction.generatePairwise(null);
 
-		var similar = new MockLookupSimilarImages(4, 123123);
-		alg.process(similar);
+		var dbSimilar = new MockLookupSimilarImages(4, 123123);
+		var dbCams = new MockLookUpCameraInfo(400,300);
+		alg.process(dbSimilar, dbCams);
 
 		PairwiseImageGraph graph = alg.getGraph();
 		assertEquals(4, graph.nodes.size);
