@@ -64,8 +64,14 @@ public class LoadFileImageSequence2<T extends ImageBase<T>> implements SimpleIma
 		this.type = type;
 		this.paths = paths;
 
-		image = type.createImage(1, 1);
-		work = type.createImage(1, 1);
+		image = type.createImage(0, 0);
+		work = type.createImage(0, 0);
+
+		if (paths.isEmpty())
+			return;
+
+		// Load the first image so that image has a correct size
+		loadImage(paths.get(0));
 	}
 
 	@Override
