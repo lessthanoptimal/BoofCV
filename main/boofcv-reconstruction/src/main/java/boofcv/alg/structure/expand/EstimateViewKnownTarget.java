@@ -16,12 +16,14 @@
  * limitations under the License.
  */
 
-package boofcv.alg.structure;
+package boofcv.alg.structure.expand;
 
 import boofcv.abst.geo.Triangulate2ViewsMetricH;
 import boofcv.alg.distort.brown.RemoveBrownPtoN_F64;
 import boofcv.alg.geo.robust.ModelMatcherMultiview;
-import boofcv.alg.structure.EstimateViewUtils.RemoveResults;
+import boofcv.alg.structure.PairwiseGraphUtils;
+import boofcv.alg.structure.SceneWorkingGraph;
+import boofcv.alg.structure.expand.EstimateViewUtils.RemoveResults;
 import boofcv.factory.geo.*;
 import boofcv.misc.BoofMiscOps;
 import boofcv.struct.ConfigLength;

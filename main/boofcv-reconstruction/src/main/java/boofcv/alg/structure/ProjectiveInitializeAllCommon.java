@@ -72,7 +72,7 @@ import static boofcv.misc.BoofMiscOps.checkTrue;
 public class ProjectiveInitializeAllCommon implements VerbosePrint {
 
 	/** Common algorithms for reconstructing the projective scene */
-	@Getter @Setter PairwiseGraphUtils utils;
+	public @Getter @Setter PairwiseGraphUtils utils;
 
 	/**
 	 * List of feature indexes for each view that are part of the inlier set. The seed view is at index 0. The other

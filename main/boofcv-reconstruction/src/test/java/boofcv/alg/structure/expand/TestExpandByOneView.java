@@ -16,10 +16,12 @@
  * limitations under the License.
  */
 
-package boofcv.alg.structure;
+package boofcv.alg.structure.expand;
 
+import boofcv.alg.structure.PairwiseImageGraph;
 import boofcv.alg.structure.PairwiseImageGraph.Motion;
 import boofcv.alg.structure.PairwiseImageGraph.View;
+import boofcv.alg.structure.SceneWorkingGraph;
 import boofcv.testing.BoofStandardJUnit;
 import org.junit.jupiter.api.Test;
 

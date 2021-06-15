@@ -16,9 +16,11 @@
  * limitations under the License.
  */
 
-package boofcv.alg.structure;
+package boofcv.alg.structure.expand;
 
 import boofcv.alg.geo.MultiViewOps;
+import boofcv.alg.structure.MockLookupSimilarImagesRealistic;
+import boofcv.alg.structure.PairwiseImageGraph;
 import boofcv.misc.BoofMiscOps;
 import boofcv.struct.calib.CameraPinhole;
 import georegression.struct.se.Se3_F64;

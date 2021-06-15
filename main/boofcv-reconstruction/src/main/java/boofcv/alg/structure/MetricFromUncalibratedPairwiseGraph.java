@@ -18,6 +18,8 @@
 
 package boofcv.alg.structure;
 
+import boofcv.alg.structure.expand.MetricExpandByOneView;
+import boofcv.alg.structure.spawn.MetricSpawnSceneFromView;
 import boofcv.misc.BoofMiscOps;
 import lombok.Getter;
 import lombok.Setter;

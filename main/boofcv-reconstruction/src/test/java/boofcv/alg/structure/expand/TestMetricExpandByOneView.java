@@ -16,10 +16,14 @@
  * limitations under the License.
  */
 
-package boofcv.alg.structure;
+package boofcv.alg.structure.expand;
 
 import boofcv.BoofTesting;
 import boofcv.alg.geo.bundle.BundleAdjustmentOps;
+import boofcv.alg.structure.MockLookUpCameraInfo;
+import boofcv.alg.structure.MockLookupSimilarImagesRealistic;
+import boofcv.alg.structure.PairwiseImageGraph;
+import boofcv.alg.structure.SceneWorkingGraph;
 import boofcv.struct.calib.CameraPinhole;
 import boofcv.testing.BoofStandardJUnit;
 import org.junit.jupiter.api.Test;

@@ -16,9 +16,10 @@
  * limitations under the License.
  */
 
-package boofcv.alg.structure;
+package boofcv.alg.structure.expand;
 
 import boofcv.alg.geo.bundle.cameras.BundlePinholeSimplified;
+import boofcv.alg.structure.*;
 import boofcv.misc.BoofMiscOps;
 import georegression.struct.se.Se3_F64;
 import org.ddogleg.struct.DogArray_I32;

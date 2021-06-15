@@ -16,7 +16,7 @@
  * limitations under the License.
  */
 
-package boofcv.alg.structure;
+package boofcv.alg.structure.expand;
 
 import org.junit.jupiter.api.Test;
 

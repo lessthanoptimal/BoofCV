@@ -16,7 +16,7 @@
  * limitations under the License.
  */
 
-package boofcv.alg.structure;
+package boofcv.alg.structure.expand;
 
 import boofcv.abst.geo.TriangulateNViewsMetricH;
 import boofcv.abst.geo.bundle.MetricBundleAdjustmentUtils;
@@ -24,6 +24,9 @@ import boofcv.abst.geo.bundle.SceneObservations;
 import boofcv.abst.geo.bundle.SceneStructureMetric;
 import boofcv.alg.distort.brown.RemoveBrownPtoN_F64;
 import boofcv.alg.geo.bundle.cameras.BundlePinholeSimplified;
+import boofcv.alg.structure.MetricSanityChecks;
+import boofcv.alg.structure.PairwiseGraphUtils;
+import boofcv.alg.structure.SceneWorkingGraph;
 import boofcv.misc.BoofMiscOps;
 import boofcv.struct.calib.CameraPinholeBrown;
 import boofcv.struct.geo.AssociatedTriple;
