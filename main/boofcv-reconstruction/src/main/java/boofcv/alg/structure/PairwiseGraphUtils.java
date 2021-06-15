@@ -60,11 +60,11 @@ import static boofcv.misc.BoofMiscOps.checkTrue;
  */
 public class PairwiseGraphUtils {
 
-	LookUpSimilarImages dbSimilar;
-	LookUpCameraInfo dbCams;
+	public LookUpSimilarImages dbSimilar;
+	public LookUpCameraInfo dbCams;
 
-	DogArray_B visibleAll = new DogArray_B();
-	DogArray_B visibleMotion = new DogArray_B();
+	public DogArray_B visibleAll = new DogArray_B();
+	public DogArray_B visibleMotion = new DogArray_B();
 
 	//-------------------------------- Configurations. Must call fixate() if modified
 	/** Converge tolerance for SBA */
@@ -131,7 +131,7 @@ public class PairwiseGraphUtils {
 		configScaleSBA = config.sbaScale;
 	}
 
-	protected PairwiseGraphUtils() {}
+	public PairwiseGraphUtils() {}
 
 	/**
 	 * Finds the indexes of tracks which are common to all views and are inliers.

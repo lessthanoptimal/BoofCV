@@ -16,11 +16,12 @@
  * limitations under the License.
  */
 
-package boofcv.alg.structure;
+package boofcv.alg.structure.spawn;
 
 import boofcv.abst.geo.selfcalib.ProjectiveToMetricCameras;
 import boofcv.alg.geo.MetricCameras;
 import boofcv.alg.geo.bundle.BundleAdjustmentOps;
+import boofcv.alg.structure.*;
 import boofcv.factory.geo.ConfigSelfCalibDualQuadratic;
 import boofcv.factory.geo.FactoryMultiView;
 import boofcv.misc.BoofMiscOps;
@@ -105,11 +106,11 @@ public class MetricSpawnSceneFromView implements VerbosePrint {
 	 * @param motions edges in seed that were used to generate the score
 	 * @return true if successful or false if it failed
 	 */
-	protected boolean process( LookUpSimilarImages dbSimilar,
-							   LookUpCameraInfo dbCams,
-							   PairwiseImageGraph pairwise,
-							   PairwiseImageGraph.View seed,
-							   DogArray_I32 motions ) {
+	public boolean process( LookUpSimilarImages dbSimilar,
+							LookUpCameraInfo dbCams,
+							PairwiseImageGraph pairwise,
+							PairwiseImageGraph.View seed,
+							DogArray_I32 motions ) {
 		scene.reset();
 		var commonPairwise = new DogArray_I32();
 

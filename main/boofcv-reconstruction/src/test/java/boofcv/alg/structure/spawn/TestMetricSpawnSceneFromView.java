@@ -16,9 +16,10 @@
  * limitations under the License.
  */
 
-package boofcv.alg.structure;
+package boofcv.alg.structure.spawn;
 
 import boofcv.alg.geo.MetricCameras;
+import boofcv.alg.structure.*;
 import boofcv.misc.BoofMiscOps;
 import boofcv.struct.calib.CameraPinhole;
 import boofcv.testing.BoofStandardJUnit;

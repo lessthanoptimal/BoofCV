@@ -16,12 +16,14 @@
  * limitations under the License.
  */
 
-package boofcv.alg.structure;
+package boofcv.alg.structure.expand;
 
 import boofcv.alg.geo.MultiViewOps;
 import boofcv.alg.geo.bundle.BundleAdjustmentOps;
 import boofcv.alg.geo.bundle.cameras.BundlePinholeSimplified;
 import boofcv.alg.geo.selfcalib.TwoViewToCalibratingHomography;
+import boofcv.alg.structure.PairwiseGraphUtils;
+import boofcv.alg.structure.SceneWorkingGraph;
 import boofcv.misc.BoofMiscOps;
 import boofcv.struct.geo.AssociatedPair;
 import boofcv.struct.geo.AssociatedTriple;

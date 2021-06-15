@@ -16,8 +16,12 @@
  * limitations under the License.
  */
 
-package boofcv.alg.structure;
+package boofcv.alg.structure.expand;
 
+import boofcv.alg.structure.ConfigProjectiveReconstruction;
+import boofcv.alg.structure.PairwiseGraphUtils;
+import boofcv.alg.structure.PairwiseImageGraph;
+import boofcv.alg.structure.SceneWorkingGraph;
 import boofcv.misc.BoofMiscOps;
 import lombok.Getter;
 import lombok.Setter;
@@ -43,14 +47,14 @@ public abstract class ExpandByOneView implements VerbosePrint {
 	protected SceneWorkingGraph workGraph;
 
 	/** Common algorithms for reconstructing the projective scene */
-	protected @Getter @Setter PairwiseGraphUtils utils;
+	public @Getter @Setter PairwiseGraphUtils utils;
 
 	//------------------------- Local work space
 
 	// candidates for being used as known connections
 	protected List<PairwiseImageGraph.Motion> validCandidates = new ArrayList<>();
 
-	protected ExpandByOneView(ConfigProjectiveReconstruction configProjective) {
+	protected ExpandByOneView( ConfigProjectiveReconstruction configProjective) {
 		utils = new PairwiseGraphUtils(configProjective);
 	}
 
