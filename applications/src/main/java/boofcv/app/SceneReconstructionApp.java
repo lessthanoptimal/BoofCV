@@ -404,7 +404,7 @@ public class SceneReconstructionApp {
 		GeneratePairwiseImageGraph generatePairwise = FactorySceneReconstruction.generatePairwise(configPairwise);
 		BoofMiscOps.profile(() -> {
 			generatePairwise.setVerbose(out, null);
-			generatePairwise.process(dbSimilar);
+			generatePairwise.process(dbSimilar, dbCams);
 		}, "Created Pairwise graph");
 		pairwise = generatePairwise.getGraph();
 

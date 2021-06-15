@@ -110,6 +110,7 @@ public class ExampleMultiViewSparseReconstruction {
 //		example.compute("steps_zoom_01.mp4", true);
 //		example.compute("steps_reg_01.mp4", true);
 		example.compute("steps_wide_01.mp4", true);
+//		example.compute("towel_box.mp4", true);
 //		example.compute("rock_loop_01.mp4", true);
 		example.visualizeSparseCloud();
 
@@ -334,7 +335,7 @@ public class ExampleMultiViewSparseReconstruction {
 		GeneratePairwiseImageGraph generatePairwise = FactorySceneReconstruction.generatePairwise(config);
 		BoofMiscOps.profile(() -> {
 			generatePairwise.setVerbose(System.out, null);
-			generatePairwise.process(dbSimilar);
+			generatePairwise.process(dbSimilar, dbCams);
 		}, "Created Pairwise graph");
 		pairwise = generatePairwise.getGraph();
 

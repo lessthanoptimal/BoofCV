@@ -19,6 +19,7 @@
 package boofcv.alg.structure;
 
 import boofcv.misc.BoofMiscOps;
+import boofcv.struct.calib.CameraPinholeBrown;
 import boofcv.struct.feature.AssociatedIndex;
 import boofcv.struct.geo.AssociatedPair;
 import georegression.struct.point.Point2D_F64;
@@ -50,6 +51,12 @@ public class GeneratePairwiseImageGraph implements VerbosePrint {
 
 	private PrintStream verbose;
 
+	//--------- Internal Workspace
+
+	// Storage for prior information on each camera
+	CameraPinholeBrown priorA = new CameraPinholeBrown(2);
+	CameraPinholeBrown priorB = new CameraPinholeBrown(2);
+
 	/**
 	 * Specifies consensus matching algorithms
 	 */
@@ -61,10 +68,10 @@ public class GeneratePairwiseImageGraph implements VerbosePrint {
 	 * Connects images by testing features for a geometric relationship. Retrieve the results using
 	 * {@link #getGraph()}
 	 *
-	 * @param db Images with feature associations
+	 * @param dbSimilar Images with feature associations
 	 */
-	public void process( LookUpSimilarImages db ) {
-		this.imageIds = db.getImageIDs();
+	public void process( LookUpSimilarImages dbSimilar, LookUpCameraInfo dbCams ) {
+		this.imageIds = dbSimilar.getImageIDs();
 		this.graph.reset();
 
 		List<String> similar = new ArrayList<>();
@@ -94,8 +101,8 @@ public class GeneratePairwiseImageGraph implements VerbosePrint {
 
 			// Find similar, but filter out images which have a lower index as those matches have already been considered
 			int _idxTgt = idxTgt;
-			db.findSimilar(src, (id)-> imageToIndex.get(id) > _idxTgt, similar);
-			db.lookupPixelFeats(src, srcFeats);
+			dbSimilar.findSimilar(src, (id)-> imageToIndex.get(id) > _idxTgt, similar);
+			dbSimilar.lookupPixelFeats(src, srcFeats);
 
 			if (verbose != null) verbose.println("similar.size=" + similar.size() + " feats.size=" + srcFeats.size);
 
@@ -110,8 +117,8 @@ public class GeneratePairwiseImageGraph implements VerbosePrint {
 					throw new RuntimeException("BUG! should have been filtered by find similar");
 
 				// get information on the features and association
-				db.lookupPixelFeats(dst, dstFeats);
-				db.lookupAssociated(dst, matches);
+				dbSimilar.lookupPixelFeats(dst, dstFeats);
+				dbSimilar.lookupAssociated(dst, matches);
 
 				pairs.reset();
 				for (int i = 0; i < matches.size; i++) {
@@ -119,7 +126,7 @@ public class GeneratePairwiseImageGraph implements VerbosePrint {
 					pairs.grow().setTo(srcFeats.get(m.src), dstFeats.get(m.dst));
 				}
 
-				createEdge(src, dst, pairs, matches);
+				createEdge(dbCams, src, dst, pairs, matches);
 			}
 		}
 	}
@@ -133,7 +140,8 @@ public class GeneratePairwiseImageGraph implements VerbosePrint {
 	 * @param pairs Associated features pixels
 	 * @param matches Associated features feature indexes
 	 */
-	protected void createEdge( String src, String dst,
+	protected void createEdge( LookUpCameraInfo dbCams,
+							   String src, String dst,
 							   DogArray<AssociatedPair> pairs, DogArray<AssociatedIndex> matches ) {
 
 		DMatrixRMaj fundamental = new DMatrixRMaj(3, 3);
@@ -142,7 +150,11 @@ public class GeneratePairwiseImageGraph implements VerbosePrint {
 		// no new line since epipolarScore should print something about this pair
 		if (verbose != null) verbose.printf("_ createEdge['%s'] -> '%s'  ", src, dst);
 
-		if (!epipolarScore.process(pairs.toList(), fundamental, inlierIdx)) {
+		// Retrieve any prior information on the cameras
+		dbCams.lookupCalibration(src, priorA);
+		dbCams.lookupCalibration(dst, priorB);
+
+		if (!epipolarScore.process(priorA, priorB, pairs.toList(), fundamental, inlierIdx)) {
 			// Don't create an edge here
 			return;
 		}
