@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -18,12 +18,13 @@
 
 package boofcv.alg.geo.robust;
 
-import boofcv.abst.geo.Triangulate2ViewsMetric;
+import boofcv.abst.geo.Triangulate2ViewsMetricH;
 import boofcv.alg.geo.DistanceFromModelMultiView;
 import boofcv.alg.geo.NormalizedToPixelError;
+import boofcv.alg.geo.PerspectiveOps;
 import boofcv.struct.calib.CameraPinhole;
 import boofcv.struct.geo.AssociatedPair;
-import georegression.struct.point.Point3D_F64;
+import georegression.struct.point.Point4D_F64;
 import georegression.struct.se.Se3_F64;
 import georegression.transform.se.SePointOps_F64;
 
@@ -31,8 +32,8 @@ import java.util.List;
 
 /**
  * <p>
- * Computes the error for a given camera motion from two calibrated views.  First a point
- * is triangulated from the two views and the motion.  Then the difference between
+ * Computes the error for a given camera motion from two calibrated views. First a point
+ * is triangulated in homogenous coordinates from the two views and the motion. Then the difference between
  * the observed and projected point is found at each view. Error is normalized pixel difference
  * squared.
  * </p>
@@ -41,9 +42,11 @@ import java.util.List;
  * &Delta;x<sub>2</sub><sup>2</sup> + &Delta;y<sub>2</sub><sup>2</sup>
  * </p>
  *
+ * <p>Homogenous coordinates are used so that pure/nearly pure rotation can be handled. Points will be at infinity.</p>
+ *
  * <p>
- * Error units can be in either pixels<sup>2</sup> or unit less (normalized pixel coordinates).  To compute
- * the error in pixels pass in the correct intrinsic calibration parameters in the constructor.  Otherwise
+ * Error units can be in either pixels<sup>2</sup> or unit less (normalized pixel coordinates). To compute
+ * the error in pixels pass in the correct intrinsic calibration parameters in the constructor. Otherwise
  * pass in fx=1.fy=1,skew=0 for normalized.
  * </p>
  *
@@ -61,10 +64,10 @@ public class DistanceSe3SymmetricSq implements DistanceFromModelMultiView<Se3_F6
 
 	// transform from key frame to current frame
 	private Se3_F64 keyToCurr;
-	// triangulation algorithm
-	private Triangulate2ViewsMetric triangulate;
+	// triangulation algorithm.
+	private Triangulate2ViewsMetricH triangulator;
 	// working storage
-	private Point3D_F64 p = new Point3D_F64();
+	private Point4D_F64 p = new Point4D_F64();
 
 	// Used to compute error in pixels
 	private NormalizedToPixelError errorCam1 = new NormalizedToPixelError();
@@ -73,10 +76,10 @@ public class DistanceSe3SymmetricSq implements DistanceFromModelMultiView<Se3_F6
 	/**
 	 * Configure distance calculation.
 	 *
-	 * @param triangulate Triangulates the intersection of two observations
+	 * @param triangulator Triangulates the intersection of two observations
 	 */
-	public DistanceSe3SymmetricSq( Triangulate2ViewsMetric triangulate ) {
-		this.triangulate = triangulate;
+	public DistanceSe3SymmetricSq( Triangulate2ViewsMetricH triangulator ) {
+		this.triangulator = triangulator;
 	}
 
 	@Override
@@ -92,18 +95,19 @@ public class DistanceSe3SymmetricSq implements DistanceFromModelMultiView<Se3_F6
 	 */
 	@Override
 	public double distance( AssociatedPair obs ) {
-
 		// triangulate the point in 3D space
-		triangulate.triangulate(obs.p1, obs.p2, keyToCurr, p);
+		if (!triangulator.triangulate(obs.p1, obs.p2, keyToCurr, p))
+			throw new RuntimeException("Triangulate failed. p1=" + obs.p1 + " p2=" + obs.p2);
 
-		if (p.z < 0)
+		// If the point is at infinity then a different test needs to be used
+		if (PerspectiveOps.isBehindCamera(p))
 			return Double.MAX_VALUE;
 
 		// compute observational error in each view
 		double error = errorCam1.errorSq(obs.p1.x, obs.p1.y, p.x/p.z, p.y/p.z);
 
 		SePointOps_F64.transform(keyToCurr, p, p);
-		if (p.z < 0)
+		if (PerspectiveOps.isBehindCamera(p))
 			return Double.MAX_VALUE;
 
 		error += errorCam2.errorSq(obs.p2.x, obs.p2.y, p.x/p.z, p.y/p.z);

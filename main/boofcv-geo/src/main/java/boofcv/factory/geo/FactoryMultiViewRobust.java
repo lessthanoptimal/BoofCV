@@ -20,7 +20,7 @@ package boofcv.factory.geo;
 
 import boofcv.abst.geo.Estimate1ofEpipolar;
 import boofcv.abst.geo.Estimate1ofPnP;
-import boofcv.abst.geo.Triangulate2ViewsMetric;
+import boofcv.abst.geo.Triangulate2ViewsMetricH;
 import boofcv.abst.geo.fitting.DistanceFromModelResidual;
 import boofcv.abst.geo.fitting.GenerateEpipolarMatrix;
 import boofcv.abst.geo.fitting.ModelManagerEpipolarMatrix;
@@ -155,7 +155,7 @@ public class FactoryMultiViewRobust {
 		Estimate1ofEpipolar epipolar = FactoryMultiView.
 				essential_1(configEssential.which, configEssential.numResolve);
 
-		Triangulate2ViewsMetric triangulate = FactoryMultiView.triangulate2ViewMetric(
+		Triangulate2ViewsMetricH triangulate = FactoryMultiView.triangulate2ViewMetricH(
 				new ConfigTriangulation(ConfigTriangulation.Type.GEOMETRIC));
 		var manager = new ModelManagerSe3_F64();
 		var generateEpipolarMotion = new Se3FromEssentialGenerator(epipolar, triangulate);
@@ -221,7 +221,7 @@ public class FactoryMultiViewRobust {
 		Estimate1ofEpipolar epipolar = FactoryMultiView.
 				essential_1(configEssential.which, configEssential.numResolve);
 
-		Triangulate2ViewsMetric triangulate = FactoryMultiView.triangulate2ViewMetric(
+		Triangulate2ViewsMetricH triangulate = FactoryMultiView.triangulate2ViewMetricH(
 				new ConfigTriangulation(ConfigTriangulation.Type.GEOMETRIC));
 		ModelManager<Se3_F64> manager = new ModelManagerSe3_F64();
 		ModelGenerator<Se3_F64, AssociatedPair> generateEpipolarMotion =

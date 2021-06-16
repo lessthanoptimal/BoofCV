@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -19,7 +19,7 @@
 package boofcv.alg.geo.robust;
 
 import boofcv.abst.geo.Estimate1ofEpipolar;
-import boofcv.abst.geo.Triangulate2ViewsMetric;
+import boofcv.abst.geo.Triangulate2ViewsMetricH;
 import boofcv.alg.geo.DecomposeEssential;
 import boofcv.struct.geo.AssociatedPair;
 import georegression.struct.se.Se3_F64;
@@ -40,7 +40,7 @@ public class Se3FromEssentialGenerator implements ModelGenerator<Se3_F64,Associa
 	// Estimates essential matrix from observations
 	Estimate1ofEpipolar computeEssential;
 
-	SelectBestStereoTransform selectBest;
+	SelectBestStereoTransformH selectBest;
 
 	// decomposes essential matrix to extract motion
 	DecomposeEssential decomposeE = new DecomposeEssential();
@@ -53,10 +53,10 @@ public class Se3FromEssentialGenerator implements ModelGenerator<Se3_F64,Associa
 	 * @param computeEssential Algorithm for computing the essential matrix
 	 */
 	public Se3FromEssentialGenerator(Estimate1ofEpipolar computeEssential,
-									 Triangulate2ViewsMetric triangulate ) {
+									 Triangulate2ViewsMetricH triangulate ) {
 		this.computeEssential = computeEssential;
 
-		selectBest = new SelectBestStereoTransform(triangulate);
+		selectBest = new SelectBestStereoTransformH(triangulate);
 	}
 
 	/**

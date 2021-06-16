@@ -59,9 +59,15 @@ Version : 0.38
   * TODO Pruning of views when creating pairwise graph. If too similar do not include it. Could be done before pairwise
          Should be able to process a video sequence where it's static for several frames
   * TODO Regriession. Add unordered sequences and ones with smaller images. 320x240 and 640x480
+- SFM
+  * Triangulate 2-views in homogenous coordinates
+  * Switched several 2-view triangulation classes over to using homogenous coordinates so that
+    points at or near infinity are no longer a failure mode
 - MultiViewOps
   * compatibleHomography
   * homographyToFundamental given 2 points
+- PerspectiveOps
+  * isBehindCamera(homogenous) handles the more nuanced case of determining if a homogenous point is behind
 - Misc
   * Added ConfigGenerator for easily creating a set of Configurations when parameter tuning
   * Added PointTracker.getImageType() so you know what type of image it requires

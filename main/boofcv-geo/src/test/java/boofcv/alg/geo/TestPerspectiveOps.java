@@ -736,13 +736,53 @@ class TestPerspectiveOps extends BoofStandardJUnit {
 	}
 
 	@Test void distance3DvsH() {
-		Point3D_F64 a = new Point3D_F64(0,0,3);
-		Point4D_F64 b = new Point4D_F64(0,0,20,1.0);
+		Point3D_F64 a = new Point3D_F64(0, 0, 3);
+		Point4D_F64 b = new Point4D_F64(0, 0, 20, 1.0);
 
-		assertEquals(17.0, PerspectiveOps.distance3DvsH(a,b,1e-8));
+		assertEquals(17.0, PerspectiveOps.distance3DvsH(a, b, 1e-8));
 		b.scale(-1e-10);
-		assertEquals(17.0, PerspectiveOps.distance3DvsH(a,b,1e-8));
-		b.w=0;
-		assertEquals(Double.POSITIVE_INFINITY, PerspectiveOps.distance3DvsH(a,b,1e-8));
+		assertEquals(17.0, PerspectiveOps.distance3DvsH(a, b, 1e-8));
+		b.w = 0;
+		assertEquals(Double.POSITIVE_INFINITY, PerspectiveOps.distance3DvsH(a, b, 1e-8));
+	}
+
+	@Test void isBehindCamera_homogenous() {
+		// Easy numerically
+		isBehindCamera_homogenous(1.0);
+
+		// Check for underflow and overflow issues
+		isBehindCamera_homogenous(1e20);
+		isBehindCamera_homogenous(1e-20);
+
+		// Mix very large and small numbers
+		checkBehindSwapSign(new Point4D_F64(0, 0, -1e20, 1e-20), true);
+		checkBehindSwapSign(new Point4D_F64(0, 0, 1e-20, 1e20), false);
+		checkBehindSwapSign(new Point4D_F64(0, 0, -1e200, 1e-200), true);
+		checkBehindSwapSign(new Point4D_F64(0, 0, 1e-200, 1e200), false);
+		checkBehindSwapSign(new Point4D_F64(0, 0, -1, Double.POSITIVE_INFINITY), true);
+		checkBehindSwapSign(new Point4D_F64(0, 0, 1, Double.POSITIVE_INFINITY), false);
+	}
+
+	void isBehindCamera_homogenous( double v ) {
+		// Standard scenarios
+		checkBehindSwapSign(new Point4D_F64(0, 0, -v, v), true);
+		checkBehindSwapSign(new Point4D_F64(0, 0, v, v), false);
+
+		// Test points on the x-y plane
+		checkBehindSwapSign(new Point4D_F64(0, 0, 0, v), true);
+		checkBehindSwapSign(new Point4D_F64(0, 0, 0, -v), true);
+		checkBehindSwapSign(new Point4D_F64(v, 2*v, 0, -v), true);
+
+		// Check points at infinity
+		assertTrue(PerspectiveOps.isBehindCamera(new Point4D_F64(0, 0, -v, 0)));
+		assertTrue(PerspectiveOps.isBehindCamera(new Point4D_F64(2*v, -v, -v, 0)));
+		assertFalse(PerspectiveOps.isBehindCamera(new Point4D_F64(0, 0, v, 0)));
+		assertFalse(PerspectiveOps.isBehindCamera(new Point4D_F64(2*v, -v, v, 0)));
+	}
+
+	void checkBehindSwapSign( Point4D_F64 p, boolean expected ) {
+		assertEquals(expected, PerspectiveOps.isBehindCamera(p));
+		p.scale(-1);
+		assertEquals(expected, PerspectiveOps.isBehindCamera(p));
 	}
 }

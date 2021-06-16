@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -19,7 +19,7 @@
 package boofcv.alg.geo.robust;
 
 import boofcv.abst.geo.Estimate1ofEpipolar;
-import boofcv.abst.geo.Triangulate2ViewsMetric;
+import boofcv.abst.geo.Triangulate2ViewsMetricH;
 import boofcv.factory.geo.ConfigTriangulation;
 import boofcv.factory.geo.EnumFundamental;
 import boofcv.factory.geo.FactoryMultiView;
@@ -44,18 +44,17 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  */
 public class TestSe3FromEssentialGenerator extends BoofStandardJUnit {
 
-	@Test
-	public void simpleTest() {
+	@Test void simpleTest() {
 		// define motion
 		Se3_F64 motion = new Se3_F64();
 		motion.getR().setTo(ConvertRotation3D_F64.eulerToMatrix(EulerType.XYZ, 0.1, -0.05, -0.01, null));
-		motion.getT().setTo(2,-0.1,0.1);
+		motion.getT().setTo(2, -0.1, 0.1);
 
 		// define observations
 		List<AssociatedPair> obs = new ArrayList<>();
 
-		for( int i = 0; i < 8; i++ ) {
-			Point3D_F64 p = new Point3D_F64(rand.nextGaussian()*0.1,rand.nextGaussian()*0.1,3+rand.nextGaussian()*0.1);
+		for (int i = 0; i < 8; i++) {
+			Point3D_F64 p = new Point3D_F64(rand.nextGaussian()*0.1, rand.nextGaussian()*0.1, 3 + rand.nextGaussian()*0.1);
 
 			AssociatedPair o = new AssociatedPair();
 
@@ -63,7 +62,7 @@ public class TestSe3FromEssentialGenerator extends BoofStandardJUnit {
 			o.p1.y = p.y/p.z;
 
 			Point3D_F64 pp = new Point3D_F64();
-			SePointOps_F64.transform(motion,p,pp);
+			SePointOps_F64.transform(motion, p, pp);
 
 			o.p2.x = pp.x/pp.z;
 			o.p2.y = pp.y/pp.z;
@@ -73,10 +72,10 @@ public class TestSe3FromEssentialGenerator extends BoofStandardJUnit {
 
 		// create alg
 		Estimate1ofEpipolar essentialAlg = FactoryMultiView.fundamental_1(EnumFundamental.LINEAR_8, 0);
-		Triangulate2ViewsMetric triangulate = FactoryMultiView.triangulate2ViewMetric(
+		Triangulate2ViewsMetricH triangulate = FactoryMultiView.triangulate2ViewMetricH(
 				new ConfigTriangulation(ConfigTriangulation.Type.GEOMETRIC));
 
-		Se3FromEssentialGenerator alg = new Se3FromEssentialGenerator(essentialAlg,triangulate);
+		Se3FromEssentialGenerator alg = new Se3FromEssentialGenerator(essentialAlg, triangulate);
 
 		Se3_F64 found = new Se3_F64();
 
@@ -86,11 +85,10 @@ public class TestSe3FromEssentialGenerator extends BoofStandardJUnit {
 		// account for scale difference
 		double scale = found.getT().norm()/motion.getT().norm();
 
-		assertTrue(MatrixFeatures_DDRM.isIdentical(motion.getR(),found.getR(),1e-6));
+		assertTrue(MatrixFeatures_DDRM.isIdentical(motion.getR(), found.getR(), 1e-6));
 
-		assertEquals(motion.getT().x*scale,found.getT().x,1e-8);
-		assertEquals(motion.getT().y*scale,found.getT().y,1e-8);
-		assertEquals(motion.getT().z*scale,found.getT().z,1e-8);
+		assertEquals(motion.getT().x*scale, found.getT().x, 1e-8);
+		assertEquals(motion.getT().y*scale, found.getT().y, 1e-8);
+		assertEquals(motion.getT().z*scale, found.getT().z, 1e-8);
 	}
-
 }
