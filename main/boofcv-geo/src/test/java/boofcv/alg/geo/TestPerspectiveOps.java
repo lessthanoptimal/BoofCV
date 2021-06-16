@@ -785,4 +785,8 @@ class TestPerspectiveOps extends BoofStandardJUnit {
 		p.scale(-1);
 		assertEquals(expected, PerspectiveOps.isBehindCamera(p));
 	}
+
+	@Test void invertCalibrationMatrix() {
+		fail("Implement");
+	}
 }
