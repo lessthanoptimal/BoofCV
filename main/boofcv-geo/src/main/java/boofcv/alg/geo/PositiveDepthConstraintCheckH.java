@@ -18,11 +18,11 @@
 
 package boofcv.alg.geo;
 
-import boofcv.abst.geo.Triangulate2ViewsMetric;
+import boofcv.abst.geo.Triangulate2ViewsMetricH;
 import boofcv.factory.geo.ConfigTriangulation;
 import boofcv.factory.geo.FactoryMultiView;
 import georegression.struct.point.Point2D_F64;
-import georegression.struct.point.Point3D_F64;
+import georegression.struct.point.Point4D_F64;
 import georegression.struct.se.Se3_F64;
 import georegression.transform.se.SePointOps_F64;
 
@@ -35,25 +35,27 @@ import georegression.transform.se.SePointOps_F64;
  * if you use this class.
  * </p>
  *
+ * <p>Triangulation is done in homogenous coordinates so that points at infinity can be handled</p>
+ *
  * <p>
  * COORDINATE SYSTEM: Right handed coordinate system with +z is pointing along the camera's optical axis,
  * </p>
  *
  * @author Peter Abeles
  */
-public class PositiveDepthConstraintCheck {
+public class PositiveDepthConstraintCheckH {
 	// algorithm used to triangulate point location
-	Triangulate2ViewsMetric triangulate;
+	Triangulate2ViewsMetricH triangulate;
 
 	// location of triangulated point in 3D space
-	Point3D_F64 P = new Point3D_F64();
+	Point4D_F64 p = new Point4D_F64();
 
-	public PositiveDepthConstraintCheck( Triangulate2ViewsMetric triangulate ) {
+	public PositiveDepthConstraintCheckH( Triangulate2ViewsMetricH triangulate ) {
 		this.triangulate = triangulate;
 	}
 
-	public PositiveDepthConstraintCheck() {
-		this(FactoryMultiView.triangulate2ViewMetric(new ConfigTriangulation(ConfigTriangulation.Type.GEOMETRIC)));
+	public PositiveDepthConstraintCheckH() {
+		this(FactoryMultiView.triangulate2ViewMetricH(new ConfigTriangulation(ConfigTriangulation.Type.GEOMETRIC)));
 	}
 
 	/**
@@ -65,14 +67,14 @@ public class PositiveDepthConstraintCheck {
 	 * @return If the triangulated point appears in front of both cameras.
 	 */
 	public boolean checkConstraint( Point2D_F64 viewA, Point2D_F64 viewB, Se3_F64 fromAtoB ) {
-		if (!triangulate.triangulate(viewA, viewB, fromAtoB, P)) {
+		if (!triangulate.triangulate(viewA, viewB, fromAtoB, p))
 			throw new RuntimeException("Triangulate failed. p1=" + viewA + " p2=" + viewB);
-		}
 
-		if (P.z > 0) {
-			SePointOps_F64.transform(fromAtoB, P, P);
-			return P.z > 0;
-		}
-		return false;
+		if (PerspectiveOps.isBehindCamera(p))
+			return false;
+
+		SePointOps_F64.transform(fromAtoB, p, p);
+
+		return !PerspectiveOps.isBehindCamera(p);
 	}
 }

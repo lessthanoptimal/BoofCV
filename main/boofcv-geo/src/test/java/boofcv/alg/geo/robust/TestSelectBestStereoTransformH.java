@@ -34,9 +34,9 @@ import java.util.List;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-public class TestSelectBestStereoTransform extends BoofStandardJUnit {
+public class TestSelectBestStereoTransformH extends BoofStandardJUnit {
 
-	@Test void simple() {
+	@Test void scenario1() {
 		List<Se3_F64> candidatesAtoB = new ArrayList<>();
 
 		for (int i = 0; i < 3; i++) {
@@ -47,8 +47,27 @@ public class TestSelectBestStereoTransform extends BoofStandardJUnit {
 		ConvertRotation3D_F64.eulerToMatrix(EulerType.XYZ, 0, Math.PI, 0, candidatesAtoB.get(1).R);
 		candidatesAtoB.get(2).T.x = 1;
 
+		checkScenario(candidatesAtoB, 2);
+	}
+
+	@Test void scenario2() {
+		List<Se3_F64> candidatesAtoB = new ArrayList<>();
+
+		for (int i = 0; i < 3; i++) {
+			candidatesAtoB.add(new Se3_F64());
+		}
+		candidatesAtoB.get(0).T.y = 1e-4;
+		ConvertRotation3D_F64.eulerToMatrix(EulerType.XYZ, Math.PI/2, 0, 0, candidatesAtoB.get(0).R);
+		candidatesAtoB.get(1).T.x = -1;
+		ConvertRotation3D_F64.eulerToMatrix(EulerType.XYZ, 0, Math.PI, 0, candidatesAtoB.get(1).R);
+		candidatesAtoB.get(2).T.x = 0.5;
+
+		checkScenario(candidatesAtoB, 2);
+	}
+
+	void checkScenario(List<Se3_F64> candidatesAtoB, int trueBest) {
 		List<AssociatedPair> observations = new ArrayList<>();
-		Se3_F64 a_to_b = candidatesAtoB.get(2);
+		Se3_F64 a_to_b = candidatesAtoB.get(trueBest);
 		for (int i = 0; i < 8; i++) {
 			Point3D_F64 p = new Point3D_F64(rand.nextGaussian()*0.1, rand.nextGaussian()*0.1, 3 + rand.nextGaussian()*0.1);
 
@@ -66,7 +85,7 @@ public class TestSelectBestStereoTransform extends BoofStandardJUnit {
 			observations.add(o);
 		}
 
-		SelectBestStereoTransform alg = new SelectBestStereoTransform();
+		var alg = new SelectBestStereoTransformH();
 
 		Se3_F64 found = new Se3_F64();
 		alg.select(candidatesAtoB, observations, found);

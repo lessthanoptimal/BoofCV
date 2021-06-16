@@ -23,6 +23,7 @@ import georegression.geometry.ConvertRotation3D_F64;
 import georegression.struct.EulerType;
 import georegression.struct.point.Point2D_F64;
 import georegression.struct.point.Point3D_F64;
+import georegression.struct.point.Point4D_F64;
 import georegression.struct.point.Vector3D_F64;
 import georegression.struct.se.Se3_F64;
 import georegression.transform.se.SePointOps_F64;
@@ -35,7 +36,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 /**
  * @author Peter Abeles
  */
-public class TestPositiveDepthConstraintCheck extends BoofStandardJUnit {
+public class TestPositiveDepthConstraintCheckH extends BoofStandardJUnit {
 
 	/**
 	 * Point a point in front of both cameras and see if it returns true
@@ -54,7 +55,26 @@ public class TestPositiveDepthConstraintCheck extends BoofStandardJUnit {
 		Point3D_F64 pt_inB = SePointOps_F64.transform(fromAtoB, pt, null);
 		Point2D_F64 obsB = new Point2D_F64(pt_inB.x/pt_inB.z, pt_inB.y/pt_inB.z);
 
-		PositiveDepthConstraintCheck alg = new PositiveDepthConstraintCheck();
+		var alg = new PositiveDepthConstraintCheckH();
+
+		assertTrue(alg.checkConstraint(obsA, obsB, fromAtoB));
+	}
+
+	@Test void positive_NearlyPureRotation() {
+		// create transform from A to B
+		DMatrixRMaj R = ConvertRotation3D_F64.eulerToMatrix(EulerType.XYZ, 0, -0.05, 0, null);
+		Vector3D_F64 T = new Vector3D_F64(1e-4, 0, 0);
+		Se3_F64 fromAtoB = new Se3_F64(R, T);
+
+		// point in front of both cameras
+		Point4D_F64 pt = new Point4D_F64(0, 0, 1e3, 1e-5);
+
+		// create observations of the point in calibrated coordinates
+		Point2D_F64 obsA = new Point2D_F64(0, 0);
+		Point4D_F64 pt_inB = SePointOps_F64.transform(fromAtoB, pt, (Point4D_F64)null);
+		Point2D_F64 obsB = new Point2D_F64(pt_inB.x/pt_inB.z, pt_inB.y/pt_inB.z);
+
+		var alg = new PositiveDepthConstraintCheckH();
 
 		assertTrue(alg.checkConstraint(obsA, obsB, fromAtoB));
 	}
@@ -76,7 +96,26 @@ public class TestPositiveDepthConstraintCheck extends BoofStandardJUnit {
 		Point3D_F64 pt_inB = SePointOps_F64.transform(fromAtoB, pt, null);
 		Point2D_F64 obsB = new Point2D_F64(pt_inB.x/pt_inB.z, pt_inB.y/pt_inB.z);
 
-		PositiveDepthConstraintCheck alg = new PositiveDepthConstraintCheck();
+		var alg = new PositiveDepthConstraintCheckH();
+
+		assertFalse(alg.checkConstraint(obsA, obsB, fromAtoB));
+	}
+
+	@Test void negative_NearlyPureRotation() {
+		// create transform from A to B
+		DMatrixRMaj R = ConvertRotation3D_F64.eulerToMatrix(EulerType.XYZ, 0, -0.05, 0, null);
+		Vector3D_F64 T = new Vector3D_F64(1e-4, 0, 0);
+		Se3_F64 fromAtoB = new Se3_F64(R, T);
+
+		// point in front of both cameras
+		Point4D_F64 pt = new Point4D_F64(0, 0, -1e3, 1e-5);
+
+		// create observations of the point in calibrated coordinates
+		Point2D_F64 obsA = new Point2D_F64(0, 0);
+		Point4D_F64 pt_inB = SePointOps_F64.transform(fromAtoB, pt, (Point4D_F64)null);
+		Point2D_F64 obsB = new Point2D_F64(pt_inB.x/pt_inB.z, pt_inB.y/pt_inB.z);
+
+		var alg = new PositiveDepthConstraintCheckH();
 
 		assertFalse(alg.checkConstraint(obsA, obsB, fromAtoB));
 	}
