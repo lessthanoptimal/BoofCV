@@ -24,6 +24,7 @@ import boofcv.alg.distort.pinhole.PinholePtoN_F32;
 import boofcv.alg.distort.pinhole.PinholePtoN_F64;
 import boofcv.alg.geo.impl.ImplPerspectiveOps_F32;
 import boofcv.alg.geo.impl.ImplPerspectiveOps_F64;
+import boofcv.misc.BoofMiscOps;
 import boofcv.struct.calib.CameraModel;
 import boofcv.struct.calib.CameraPinhole;
 import boofcv.struct.calib.CameraPinholeBrown;
@@ -1062,5 +1063,31 @@ public class PerspectiveOps {
 		// Not at infinity. Don't compute the z-coordinate since that requires dividing by p.w, which could be very
 		// small and blow up. Worst case here is that the multiplication becomes zero or infinity
 		return p.z*p.w <= 0.0;
+	}
+
+	/**
+	 * Inverts a camera calibration matrix using an analytic formula that takes advantage of its structure.
+	 * K and K_inv can be the same instance.
+	 *
+	 * @param K (Input) 3x3 intrinsic calibration matrix
+	 * @param K_inv (Output) inverted calibration matrix.
+	 */
+	public static void invertCalibrationMatrix( DMatrixRMaj K, DMatrixRMaj K_inv ) {
+		BoofMiscOps.checkEq(3, K.numCols);
+		BoofMiscOps.checkEq(3, K.numRows);
+
+		double fx = K.unsafe_get(0, 0);
+		double fy = K.unsafe_get(1, 1);
+		double skew = K.unsafe_get(0, 1);
+		double cx = K.unsafe_get(0, 2);
+		double cy = K.unsafe_get(1, 2);
+
+		K_inv.reshape(3, 3);
+		K_inv.zero();
+		K_inv.set(0, 0, (double)(1.0/fx));
+		K_inv.set(0, 1, (double)(-skew/(fx*fy)));
+		K_inv.set(0, 2, (double)((skew*cy - cx*fy)/(fx*fy)));
+		K_inv.set(1, 1, (double)(1.0/fy));
+		K_inv.set(1, 2, (double)(-cy/fy));
 	}
 }
