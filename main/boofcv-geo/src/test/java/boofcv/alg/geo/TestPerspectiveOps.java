@@ -787,6 +787,18 @@ class TestPerspectiveOps extends BoofStandardJUnit {
 	}
 
 	@Test void invertCalibrationMatrix() {
-		fail("Implement");
+		CameraPinhole pinhole = new CameraPinhole(400, 450, 0.2, 500, 470, 0, 0);
+		DMatrixRMaj K = new DMatrixRMaj(3, 3);
+		PerspectiveOps.pinholeToMatrix(pinhole, K);
+		DMatrixRMaj K_inv = new DMatrixRMaj(3, 3);
+		assertTrue(CommonOps_DDRM.invert(K, K_inv));
+
+		DMatrixRMaj K_found = PerspectiveOps.invertCalibrationMatrix(K, null);
+		assertTrue(MatrixFeatures_DDRM.isIdentical(K_inv, K_found, 1e-6));
+
+		// Test recycling a matrix
+		K_found.fill(2.5);
+		PerspectiveOps.invertCalibrationMatrix(K, K_found);
+		assertTrue(MatrixFeatures_DDRM.isIdentical(K_inv, K_found, 1e-6));
 	}
 }

@@ -1072,9 +1072,12 @@ public class PerspectiveOps {
 	 * @param K (Input) 3x3 intrinsic calibration matrix
 	 * @param K_inv (Output) inverted calibration matrix.
 	 */
-	public static void invertCalibrationMatrix( DMatrixRMaj K, DMatrixRMaj K_inv ) {
+	public static DMatrixRMaj invertCalibrationMatrix( DMatrixRMaj K, @Nullable DMatrixRMaj K_inv ) {
 		BoofMiscOps.checkEq(3, K.numCols);
 		BoofMiscOps.checkEq(3, K.numRows);
+
+		if (K_inv == null)
+			K_inv = new DMatrixRMaj(3, 3);
 
 		double fx = K.unsafe_get(0, 0);
 		double fy = K.unsafe_get(1, 1);
@@ -1089,5 +1092,8 @@ public class PerspectiveOps {
 		K_inv.set(0, 2, (double)((skew*cy - cx*fy)/(fx*fy)));
 		K_inv.set(1, 1, (double)(1.0/fy));
 		K_inv.set(1, 2, (double)(-cy/fy));
+		K_inv.set(2, 2, 1.0);
+
+		return K_inv;
 	}
 }
