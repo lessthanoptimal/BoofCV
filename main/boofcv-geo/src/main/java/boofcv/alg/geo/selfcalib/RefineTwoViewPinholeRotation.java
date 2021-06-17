@@ -48,6 +48,10 @@ import java.util.Set;
  * The two views can have coupled or independent intrinsic parameters, i.e. they were taken using the same camera or
  * not.
  *
+ * WARNING: More thought needs to be put into the theory. When given imperfect initial conditions byt perfect
+ * observations it will converge to having zero error but warped intrinsic parameters. Rotation will be surprisingly
+ * accurate. There are probably additional constraints that need to be taken in account but are not.
+ *
  * @author Peter Abeles
  */
 public class RefineTwoViewPinholeRotation implements VerbosePrint {
@@ -59,13 +63,16 @@ public class RefineTwoViewPinholeRotation implements VerbosePrint {
 	UnconstrainedLeastSquares<DMatrixRMaj> minimizer = FactoryOptimization.levenbergMarquardt(null, false);
 
 	/** If true then the intrinsic parameters are assumed to be the same for both views */
-	@Getter @Setter boolean sameIntrinsics = false;
+	@Getter @Setter boolean assumeSameIntrinsics = false;
 
 	/** If true then skew is assumed to be zero */
 	@Getter @Setter boolean zeroSkew = true;
 
 	/** If true then the aspect ratio is assumed to be 1.0. I.e. fx == fy */
 	@Getter @Setter boolean assumeUnityAspect = true;
+
+	/** Focal length is known */
+	@Getter @Setter boolean knownFocalLength = false;
 
 	/** Initial error before optimization */
 	@Getter double errorBefore;
@@ -83,6 +90,10 @@ public class RefineTwoViewPinholeRotation implements VerbosePrint {
 
 	PrintStream verbose = null;
 
+	CameraPinhole inputIntrinsic1;
+	CameraPinhole inputIntrinsic2;
+
+
 	/**
 	 * Refines the provided parameters. Inputs are only modified if it returns true. If two views are specified
 	 * but there's a single view assumption then only the first view is used.
@@ -97,6 +108,8 @@ public class RefineTwoViewPinholeRotation implements VerbosePrint {
 						   CameraPinhole intrinsic1, CameraPinhole intrinsic2 ) {
 
 		this.associatedPixels = associatedPixels;
+		this.inputIntrinsic1 = intrinsic1;
+		this.inputIntrinsic2 = intrinsic2;
 
 		// Copy inputs over
 		ConvertRotation3D_F64.matrixToRodrigues(rotation, function.state.rotation);
@@ -110,7 +123,7 @@ public class RefineTwoViewPinholeRotation implements VerbosePrint {
 		minimizer.setFunction(function, new NumericalJacobianForward_DDRM(new ResidualFunction()));
 		minimizer.initialize(initialParameters.data, converge.ftol, converge.gtol);
 
-		double errorBefore = minimizer.getFunctionValue();
+		errorBefore = minimizer.getFunctionValue();
 
 		// Iterate until a final condition has been met
 		int iterations;
@@ -119,9 +132,11 @@ public class RefineTwoViewPinholeRotation implements VerbosePrint {
 				break;
 		}
 
+		errorAfter = minimizer.getFunctionValue();
+
 		if (verbose != null)
 			verbose.printf("before=%.2e after=%.2e iterations=%d converged=%s\n",
-					errorBefore, minimizer.getFunctionValue(), iterations, minimizer.isConverged());
+					errorBefore, errorAfter, iterations, minimizer.isConverged());
 
 		// Get the refined values
 		function.state.decode(minimizer.getParameters());
@@ -160,7 +175,7 @@ public class RefineTwoViewPinholeRotation implements VerbosePrint {
 		public void encode( double[] parameters ) {
 			int index = 0;
 			index = encodeIntrinsics(intrinsic1, index, parameters);
-			if (!sameIntrinsics)
+			if (!assumeSameIntrinsics)
 				index = encodeIntrinsics(intrinsic2, index, parameters);
 
 			parameters[index++] = rotation.unitAxisRotation.x;
@@ -171,9 +186,9 @@ public class RefineTwoViewPinholeRotation implements VerbosePrint {
 
 		public void decode( double[] parameters ) {
 			int index = 0;
-			index = decodeIntrinsics(parameters, index, intrinsic1);
-			if (!sameIntrinsics)
-				index = decodeIntrinsics(parameters, index, intrinsic2);
+			index = decodeIntrinsics(inputIntrinsic1, parameters, index, intrinsic1);
+			if (!assumeSameIntrinsics)
+				index = decodeIntrinsics(inputIntrinsic2, parameters, index, intrinsic2);
 			else
 				intrinsic2.setTo(intrinsic1);
 
@@ -187,29 +202,41 @@ public class RefineTwoViewPinholeRotation implements VerbosePrint {
 		}
 
 		private int encodeIntrinsics( CameraPinhole intrinsic, int index, double[] parameters ) {
-			parameters[index++] = intrinsic.fx;
 			parameters[index++] = intrinsic.cx;
 			parameters[index++] = intrinsic.cy;
+
+			if (!knownFocalLength) {
+				parameters[index++] = intrinsic.fx;
+				if (!assumeUnityAspect)
+					parameters[index++] = intrinsic.fy;
+			}
+
 			if (!zeroSkew)
 				parameters[index++] = intrinsic.skew;
-			if (!assumeUnityAspect)
-				parameters[index++] = intrinsic.fy;
+
 			return index;
 		}
 
-		private int decodeIntrinsics( double[] parameters, int index, CameraPinhole intrinsic ) {
-			intrinsic.fx = parameters[index++];
+		private int decodeIntrinsics( CameraPinhole prior, double[] parameters, int index, CameraPinhole intrinsic ) {
 			intrinsic.cx = parameters[index++];
 			intrinsic.cy = parameters[index++];
+
+			if (!knownFocalLength) {
+				intrinsic.fx = parameters[index++];
+				if (!assumeUnityAspect)
+					intrinsic.fy = parameters[index++];
+				else
+					intrinsic.fy = intrinsic.fx;
+			} else {
+				intrinsic.fx = prior.fx;
+				intrinsic.fy = prior.fy;
+			}
+
 			if (!zeroSkew)
 				intrinsic.skew = parameters[index++];
 			else
 				intrinsic.skew = 0.0;
 
-			if (!assumeUnityAspect)
-				intrinsic.fy = parameters[index++];
-			else
-				intrinsic.fy = intrinsic.fx;
 			return index;
 		}
 	}
@@ -261,14 +288,19 @@ public class RefineTwoViewPinholeRotation implements VerbosePrint {
 		}
 
 		@Override public int getNumOfInputsN() {
-			int intrinsicUnknown = 3; // focal length fx, cx, cy
+
+			int intrinsicUnknown = 2; // cx, cy
+
 			if (!zeroSkew)
 				intrinsicUnknown += 1; // skew
 
-			if (!assumeUnityAspect)
-				intrinsicUnknown += 1; // focal length fy
+			if (!knownFocalLength) {
+				intrinsicUnknown += 1; // focal length fx
+				if (!assumeUnityAspect)
+					intrinsicUnknown += 1; // focal length fy
+			}
 
-			if (sameIntrinsics)
+			if (!assumeSameIntrinsics)
 				intrinsicUnknown *= 2; // two cameras
 
 			// 4 = over parameterized Rodriguez for rotation
