@@ -22,6 +22,7 @@ import boofcv.alg.geo.MultiViewOps;
 import boofcv.alg.geo.robust.DistanceFundamentalGeometric;
 import boofcv.alg.geo.robust.GenerateHomographyLinear;
 import boofcv.alg.structure.EpipolarScore3D;
+import boofcv.misc.BoofMiscOps;
 import boofcv.struct.ConfigLength;
 import boofcv.struct.calib.CameraPinholeBrown;
 import boofcv.struct.geo.AssociatedPair;
@@ -54,9 +55,12 @@ import java.util.Set;
  * The inlier threshold used for RANSAC and {@link #inlierErrorTol} do not need to be the same but they would
  * probably be similar.
  *
+ * WARNING: Has known issues with dominant planes where it will mark them as not having 3D as it mistakes it for
+ * pure rotation.
+ *
  * @author Peter Abeles
  */
-public class ScoreFundamentalReprojectionError implements EpipolarScore3D {
+public class ScoreFundamentalHomographyCompatibility implements EpipolarScore3D {
 	/** Robust model matching algorithm. Inlier set is used but not the error */
 	@Getter ModelMatcher<DMatrixRMaj, AssociatedPair> ransac3D;
 
@@ -102,23 +106,26 @@ public class ScoreFundamentalReprojectionError implements EpipolarScore3D {
 	Point3D_F64 e2 = new Point3D_F64();
 	DMatrixRMaj F_alt = new DMatrixRMaj(3, 3);
 
-	public ScoreFundamentalReprojectionError( ModelMatcher<DMatrixRMaj, AssociatedPair> ransac3D ) {
+	public ScoreFundamentalHomographyCompatibility( ModelMatcher<DMatrixRMaj, AssociatedPair> ransac3D ) {
 		this.ransac3D = ransac3D;
 	}
 
-	@Override public boolean process( CameraPinholeBrown cameraA, CameraPinholeBrown cameraB,
-									  List<AssociatedPair> pairs, DMatrixRMaj fundamental, DogArray_I32 inliersIdx ) {
+	@Override public void process( CameraPinholeBrown cameraA, @Nullable CameraPinholeBrown cameraB,
+								   List<AssociatedPair> pairs, DMatrixRMaj fundamental, DogArray_I32 inliersIdx ) {
+		is3D = false;
+		score = 0.0;
+
 		// Not enough points to compute F
 		if (pairs.size() < ransac3D.getMinimumSize()) {
 			if (verbose != null) verbose.printf("pairs.size=%d less than ransac3D.getMinimumSize()\n", pairs.size());
-			return false;
+			return;
 		}
 
 		final int minimumAllowed = minimumInliers.computeI(pairs.size());
 		if (pairs.size() < minimumAllowed) {
 			if (verbose != null)
 				verbose.printf("REJECTED: pairs.size=%d < minimum.size=%d\n", pairs.size(), minimumAllowed);
-			return false;
+			return;
 		}
 
 		if (!ransac3D.process(pairs)) {
@@ -127,7 +134,7 @@ public class ScoreFundamentalReprojectionError implements EpipolarScore3D {
 			is3D = false;
 			score = 0.0;
 			if (verbose != null) verbose.println("ransac failed. not 3D");
-			return true;
+			return;
 		}
 
 		// if there are too few matches then it's probably noise
@@ -135,7 +142,7 @@ public class ScoreFundamentalReprojectionError implements EpipolarScore3D {
 			if (verbose != null)
 				verbose.printf("REJECTED: pairs.size=%d inlier.size=%d < minimum.size=%d\n",
 						pairs.size(), ransac3D.getMatchSet().size(), minimumAllowed);
-			return false;
+			return;
 		}
 
 		// Save the inliers and compute the epipolar geometric error for F
@@ -163,7 +170,7 @@ public class ScoreFundamentalReprojectionError implements EpipolarScore3D {
 		GeometryMath_F64.multCrossA(e2, H, F_alt);
 
 		// Compute errors using the mangled fundamental matrix
-		int fitModelH = countFitModel(F_alt)+1;
+		int fitModelH = countFitModel(F_alt) + 1;
 
 		is3D = fitModelH*ratio3D <= fitModelF;
 
@@ -174,37 +181,6 @@ public class ScoreFundamentalReprojectionError implements EpipolarScore3D {
 		if (verbose != null)
 			verbose.printf("score=%7.2f pairs=%d inliers=%d ratio=%6.2f fitH=%4d fitF=%4d 3d=%s\n",
 					score, pairs.size(), inliersIdx.size, ratio, fitModelH, fitModelF, is3D);
-
-		if (is3D)
-			return true;
-
-		// Figuring out if we are dealing with a translation viewing a plane or pure rotation isn't trivial
-		//
-		// After going through the math more it looks like that pure rotation and general motion do have a
-		// distinctive subsets of the general homography. However, even in the case of pure rotation, you basically
-		// have to solve the camera calibration problem to find the best fit parameters.
-		// Look at the equations for the motion field to see this. If this was done, then you could find
-		// the best fit homography for pure rotation and see how much larger the residuals are compared to
-		// the already known solution.
-		//
-		// Original comments are left below to avoid duplicating work in the future.
-		//
-		// Failed attempts:
-		// 1) F and H compatibility. only false for non-planar scenes
-		// 2) F -> camera matrix, setting "translation" to (0,0,0). That's not how projective cameras work
-		// 3) Self calibration using pure rotation fails because there aren't enough views
-		// 4) Triangulating projective points, forcing p.w=0, compare reprojection error. Always massive error
-		//
-		// I think the major issue where is that in both cases points lie on a plane. For pure rotation, the plane is
-		// at infinity but it's still a plane.
-		//
-		// What might work is looking at the apparent motion of the points.  There won't be a vanishing point
-		// if its pure rotation. However rotation along z-axis and pure translation might be difficult to distinguish
-		// from pure translation along x-axis.
-		//
-		// Also can't assume that both cameras have the same intrinsic parameters
-
-		return true;
 	}
 
 	/**
@@ -235,6 +211,6 @@ public class ScoreFundamentalReprojectionError implements EpipolarScore3D {
 	}
 
 	@Override public void setVerbose( @Nullable PrintStream out, @Nullable Set<String> param ) {
-		this.verbose = out;
+		this.verbose = BoofMiscOps.addPrefix(this, out);
 	}
 }

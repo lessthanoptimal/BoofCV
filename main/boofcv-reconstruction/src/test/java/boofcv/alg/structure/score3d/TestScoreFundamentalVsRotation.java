@@ -30,10 +30,10 @@ import org.junit.jupiter.api.Test;
 /**
  * @author Peter Abeles
  */
-public class TestScoreFundamentalWithoutTranslation extends CommonEpipolarScore3DChecks {
+class TestScoreFundamentalVsRotation extends CommonEpipolarScore3DChecks {
 
-	// Can't detect translational motion for planar scenes. See code comments
-	@Test @Override void planar() {}
+	// self calibration things its zooming if it can adjust two cameras
+	@Test @Override void planar_translate_z_twoCameras() {}
 
 	@Override public EpipolarScore3D createAlg() {
 		ConfigRansac configRansac = new ConfigRansac();
@@ -43,8 +43,6 @@ public class TestScoreFundamentalWithoutTranslation extends CommonEpipolarScore3
 		ModelMatcher<DMatrixRMaj, AssociatedPair> ransac3D =
 				FactoryMultiViewRobust.fundamentalRansac(new ConfigFundamental(), configRansac);
 
-		var alg = new ScoreFundamentalReprojectionError(ransac3D);
-		alg.ratio3D = 1.2;
-		return alg;
+		return new ScoreFundamentalVsRotation(ransac3D);
 	}
 }

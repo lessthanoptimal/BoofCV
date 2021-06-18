@@ -136,9 +136,9 @@ public class DistanceSe3SymmetricSq implements DistanceFromModelMultiView<Se3_F6
 	@Override
 	public void setIntrinsic( int view, CameraPinhole intrinsic ) {
 		if (view == 0)
-			errorCam1.set(intrinsic.fx, intrinsic.fy, intrinsic.skew);
+			errorCam1.setTo(intrinsic.fx, intrinsic.fy, intrinsic.skew);
 		else if (view == 1)
-			errorCam2.set(intrinsic.fx, intrinsic.fy, intrinsic.skew);
+			errorCam2.setTo(intrinsic.fx, intrinsic.fy, intrinsic.skew);
 		else
 			throw new IllegalArgumentException("View must be 0 or 1");
 	}

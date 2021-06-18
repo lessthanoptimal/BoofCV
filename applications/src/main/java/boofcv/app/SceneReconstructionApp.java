@@ -35,7 +35,6 @@ import boofcv.core.image.GConvertImage;
 import boofcv.factory.disparity.ConfigDisparity;
 import boofcv.factory.disparity.ConfigDisparitySGM;
 import boofcv.factory.scene.FactorySceneRecognition;
-import boofcv.factory.structure.ConfigEpipolarScore3D;
 import boofcv.factory.structure.ConfigGeneratePairwiseImageGraph;
 import boofcv.factory.structure.ConfigSparseToDenseCloud;
 import boofcv.factory.structure.FactorySceneReconstruction;
@@ -258,11 +257,6 @@ public class SceneReconstructionApp {
 
 		configSimilarUnordered.recognizeNister2006.learningMinimumPointsForChildren.setFixed(20);
 
-		configPairwise.score.type = ConfigEpipolarScore3D.Type.FUNDAMENTAL_ERROR;
-		configPairwise.score.typeErrors.minimumInliers.setRelative(0.4, 150);
-		configPairwise.score.typeErrors.maxRatioScore = 10.0;
-		configPairwise.score.ransacF.inlierThreshold = 2.0;
-
 		configSparseToDense.disparity.approach = ConfigDisparity.Approach.SGM;
 		ConfigDisparitySGM configSgm = configSparseToDense.disparity.approachSGM;
 		configSgm.validateRtoL = 0;
@@ -290,7 +284,7 @@ public class SceneReconstructionApp {
 		configSimilarUnordered.features.detectFastHessian.maxFeaturesAll = 1200;
 		configSimilarUnordered.minimumSimilar.setRelative(0.1, 50);
 
-		configPairwise.score.typeErrors.minimumInliers.setRelative(0.1, 50);
+		configPairwise.score.typeRotation.minimumInliers.setRelative(0.1, 50);
 		configPairwise.score.ransacF.iterations = 2000;
 	}
 

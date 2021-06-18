@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -69,7 +69,7 @@ public class DistancePlane2DToPixelSq implements DistanceFromModel<Se2_F64, Plan
 	 * @param skew camera skew
 	 */
 	public void setIntrinsic( double fx, double fy, double skew ) {
-		errorCamera.set(fx, fy, skew);
+		errorCamera.setTo(fx, fy, skew);
 	}
 
 	@Override

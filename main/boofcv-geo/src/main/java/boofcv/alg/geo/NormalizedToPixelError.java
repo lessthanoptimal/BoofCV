@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -32,7 +32,7 @@ public class NormalizedToPixelError {
 	private double skew; // pixel skew
 
 	public NormalizedToPixelError( double fx, double fy, double skew ) {
-		set(fx, fy, skew);
+		setTo(fx, fy, skew);
 	}
 
 	public NormalizedToPixelError() {}
@@ -44,7 +44,7 @@ public class NormalizedToPixelError {
 	 * @param fy focal length y
 	 * @param skew camera skew
 	 */
-	public void set( double fx, double fy, double skew ) {
+	public void setTo( double fx, double fy, double skew ) {
 		this.fx = fx;
 		this.fy = fy;
 		this.skew = skew;
