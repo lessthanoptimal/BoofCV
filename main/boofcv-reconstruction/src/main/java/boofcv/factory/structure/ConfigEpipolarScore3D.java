@@ -18,7 +18,8 @@
 
 package boofcv.factory.structure;
 
-import boofcv.alg.structure.score3d.ScoreFundamentalReprojectionError;
+import boofcv.alg.structure.score3d.ScoreFundamentalHomographyCompatibility;
+import boofcv.alg.structure.score3d.ScoreFundamentalVsRotation;
 import boofcv.factory.geo.ConfigFundamental;
 import boofcv.factory.geo.ConfigHomography;
 import boofcv.factory.geo.ConfigRansac;
@@ -40,21 +41,24 @@ public class ConfigEpipolarScore3D implements Configuration {
 	public final ConfigFundamental fundamental = new ConfigFundamental();
 
 	/** Which algorithm it should use */
-	public Type type = Type.MODEL_INLIERS;
+	public Type type = Type.FUNDAMENTAL_ROTATION;
 
 	/** Configuration used if {@link Type#MODEL_INLIERS} is selected */
 	public final ModelInliers typeInliers = new ModelInliers();
 
-	/** Configuration used if {@link Type#FUNDAMENTAL_ERROR} is selected */
-	public final FundamentalError typeErrors = new FundamentalError();
+	/** Configuration used if {@link Type#FUNDAMENTAL_COMPATIBLE} is selected */
+	public final FundamentalCompatible typeCompatible = new FundamentalCompatible();
+
+	/** Configuration used if {@link Type#FUNDAMENTAL_ROTATION} is selected */
+	public final FundamentalRotation typeRotation = new FundamentalRotation();
 
 	{
 		ransacF.iterations = 500;
-		ransacF.inlierThreshold = 1;
+		ransacF.inlierThreshold = 2.0;
 
 		// F computes epipolar error, which isn't as strict as reprojection error for H, so give H a larger error tol
 		typeInliers.ransacH.iterations = 500;
-		typeInliers.ransacH.inlierThreshold = 2.0;
+		typeInliers.ransacH.inlierThreshold = 4.0;
 
 		fundamental.errorModel = ConfigFundamental.ErrorModel.GEOMETRIC;
 		fundamental.numResolve = 1;
@@ -64,7 +68,7 @@ public class ConfigEpipolarScore3D implements Configuration {
 		ransacF.checkValidity();
 		fundamental.checkValidity();
 		typeInliers.checkValidity();
-		typeErrors.checkValidity();
+		typeCompatible.checkValidity();
 	}
 
 	public void setTo( ConfigEpipolarScore3D src ) {
@@ -72,7 +76,8 @@ public class ConfigEpipolarScore3D implements Configuration {
 		this.fundamental.setTo(src.fundamental);
 		this.type = src.type;
 		this.typeInliers.setTo(src.typeInliers);
-		this.typeErrors.setTo(typeErrors);
+		this.typeCompatible.setTo(src.typeCompatible);
+		this.typeRotation.setTo(src.typeRotation);
 	}
 
 	/**
@@ -80,7 +85,8 @@ public class ConfigEpipolarScore3D implements Configuration {
 	 */
 	public enum Type {
 		MODEL_INLIERS,
-		FUNDAMENTAL_ERROR
+		FUNDAMENTAL_COMPATIBLE,
+		FUNDAMENTAL_ROTATION
 	}
 
 	/**
@@ -126,22 +132,22 @@ public class ConfigEpipolarScore3D implements Configuration {
 	}
 
 	/**
-	 * Configuration for {@link ScoreFundamentalReprojectionError}
+	 * Configuration for {@link ScoreFundamentalHomographyCompatibility}
 	 */
-	public static class FundamentalError implements Configuration {
-		/** @see ScoreFundamentalReprojectionError#ratio3D */
-		public double ratio3D = 1.1;
+	public static class FundamentalCompatible implements Configuration {
+		/** @see ScoreFundamentalHomographyCompatibility#ratio3D */
+		public double ratio3D = 1.2;
 
-		/** @see ScoreFundamentalReprojectionError#inlierErrorTol */
-		public double inlierErrorTol = 1.0;
+		/** @see ScoreFundamentalHomographyCompatibility#inlierErrorTol */
+		public double inlierErrorTol = 2.0;
 
 		/**
-		 * @see ScoreFundamentalReprojectionError#maxRatioScore
+		 * @see ScoreFundamentalHomographyCompatibility#maxRatioScore
 		 */
 		public double maxRatioScore = 10.0;
 
 		/** The minimum number of inliers for an edge to be accepted. If relative, then relative to pairs.  */
-		public final ConfigLength minimumInliers = ConfigLength.fixed(30);
+		public final ConfigLength minimumInliers = ConfigLength.relative(0.2, 40);
 
 		@Override public void checkValidity() {
 			BoofMiscOps.checkTrue(inlierErrorTol >= 0);
@@ -150,7 +156,40 @@ public class ConfigEpipolarScore3D implements Configuration {
 			minimumInliers.checkValidity();
 		}
 
-		public void setTo( FundamentalError src ) {
+		public void setTo( FundamentalCompatible src ) {
+			this.ratio3D = src.ratio3D;
+			this.inlierErrorTol = src.inlierErrorTol;
+			this.maxRatioScore = src.maxRatioScore;
+			this.minimumInliers.setTo(src.minimumInliers);
+		}
+	}
+
+	/**
+	 * Configuration for {@link ScoreFundamentalVsRotation}
+	 */
+	public static class FundamentalRotation implements Configuration {
+		/** @see ScoreFundamentalVsRotation#ratio3D */
+		public double ratio3D = 1.2;
+
+		/** @see ScoreFundamentalVsRotation#inlierErrorTol */
+		public double inlierErrorTol = 1.5;
+
+		/**
+		 * @see ScoreFundamentalVsRotation#maxRatioScore
+		 */
+		public double maxRatioScore = 10.0;
+
+		/** The minimum number of inliers for an edge to be accepted. If relative, then relative to pairs.  */
+		public final ConfigLength minimumInliers = ConfigLength.relative(0.2, 40);
+
+		@Override public void checkValidity() {
+			BoofMiscOps.checkTrue(inlierErrorTol >= 0);
+			BoofMiscOps.checkTrue(ratio3D > 0.0);
+			BoofMiscOps.checkTrue(maxRatioScore > 0.0);
+			minimumInliers.checkValidity();
+		}
+
+		public void setTo( FundamentalRotation src ) {
 			this.ratio3D = src.ratio3D;
 			this.inlierErrorTol = src.inlierErrorTol;
 			this.maxRatioScore = src.maxRatioScore;

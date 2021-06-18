@@ -2065,9 +2065,32 @@ public class MultiViewOps {
 	 * @param H21 (Input) Homography in pixel coordinates
 	 * @param K1 (Input) Intrinsic camera matrix 1
 	 * @param K2 (Input) Intrinsic camera matrix 2
-	 * @return The homography in normalized image coordinates
+	 * @return The homography in normalized image coordinates. Which is (in theory) a rotation matrix.
 	 */
 	public static DMatrixRMaj homographyToCalibrated( DMatrixRMaj H21, DMatrixRMaj K1, DMatrixRMaj K2 ) {
 		return null;
+	}
+
+	/**
+	 * Creates a pixel homography from a rotation matrix and the intrinsic calibration matrices. H = K2*R21*inv(K1)
+	 *
+	 * @param R21 (Input) Rotation matrix
+	 * @param K1 (Input) Intrinsic camera matrix 1
+	 * @param K2 (Input) Intrinsic camera matrix 2
+	 * @return The homography
+	 */
+	public static DMatrixRMaj homographyFromRotation( DMatrixRMaj R21, DMatrixRMaj K1, DMatrixRMaj K2,
+													  @Nullable DMatrixRMaj H21 ) {
+		if (H21 == null)
+			H21 = new DMatrixRMaj(3, 3);
+
+		DMatrixRMaj K1_inv = new DMatrixRMaj(3, 3);
+		DMatrixRMaj KR = new DMatrixRMaj(3, 3);
+
+		PerspectiveOps.invertCalibrationMatrix(K1, K1_inv);
+		CommonOps_DDRM.mult(K2, R21, KR);
+		CommonOps_DDRM.mult(KR, K1_inv, H21);
+
+		return H21;
 	}
 }

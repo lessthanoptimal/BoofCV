@@ -25,6 +25,7 @@ import boofcv.struct.calib.CameraPinhole;
 import boofcv.struct.geo.AssociatedPair;
 import georegression.geometry.ConvertRotation3D_F64;
 import georegression.geometry.GeometryMath_F64;
+import georegression.metric.UtilAngle;
 import georegression.struct.point.Point2D_F64;
 import georegression.struct.so.Rodrigues_F64;
 import lombok.Getter;
@@ -44,19 +45,29 @@ import java.util.List;
 import java.util.Set;
 
 /**
+ * <P>
  * Non-linear refinement of intrinsics and rotation while under pure rotation given two views and associated features.
  * The two views can have coupled or independent intrinsic parameters, i.e. they were taken using the same camera or
  * not.
+ * </p>
  *
- * WARNING: More thought needs to be put into the theory. When given imperfect initial conditions byt perfect
+ * <P>
+ * WARNING: Results can be physically impossible but have a low residual. This is an unconstrained optimization and
+ * there is nothing stopping it from selecting negative focal lengths or centers outside the image. Typically this
+ * is an indication that there was not pure rotation.
+ * </P>
+ *
+ * <p>
+ * WARNING: More thought needs to be put into the theory. When given imperfect initial conditions by perfect
  * observations it will converge to having zero error but warped intrinsic parameters. Rotation will be surprisingly
  * accurate. There are probably additional constraints that need to be taken in account but are not.
+ * </p>
  *
  * @author Peter Abeles
  */
 public class RefineTwoViewPinholeRotation implements VerbosePrint {
 	/** Convergence criteria */
-	public @Getter final ConfigConverge converge = new ConfigConverge(1e-12, 1e-8, 20);
+	public @Getter final ConfigConverge converge = new ConfigConverge(1e-12, 1e-8, 100);
 
 	/** Optimization algorithm */
 	public @Getter @Setter
@@ -92,7 +103,6 @@ public class RefineTwoViewPinholeRotation implements VerbosePrint {
 
 	CameraPinhole inputIntrinsic1;
 	CameraPinhole inputIntrinsic2;
-
 
 	/**
 	 * Refines the provided parameters. Inputs are only modified if it returns true. If two views are specified
@@ -134,22 +144,19 @@ public class RefineTwoViewPinholeRotation implements VerbosePrint {
 
 		errorAfter = minimizer.getFunctionValue();
 
-		if (verbose != null)
-			verbose.printf("before=%.2e after=%.2e iterations=%d converged=%s\n",
-					errorBefore, errorAfter, iterations, minimizer.isConverged());
-
 		// Get the refined values
 		function.state.decode(minimizer.getParameters());
 
-		// Sanity checks
-		if (function.state.intrinsic1.fx <= 0.0 || function.state.intrinsic1.fy <= 0.0) {
-			if (verbose != null) verbose.println("Negative focal length view-1");
-			return false;
-		}
-
-		if (function.state.intrinsic2.fx <= 0.0 || function.state.intrinsic2.fy <= 0.0) {
-			if (verbose != null) verbose.println("Negative focal length view-2");
-			return false;
+		if (verbose != null) {
+			double theta = UtilAngle.degree(function.state.rotation.theta);
+			CameraPinhole found1 = function.state.intrinsic1;
+			CameraPinhole found2 = function.state.intrinsic2;
+			verbose.printf("before=%.2e after=%.2e iterations=%d converged=%s, " +
+							"view1={fx=%.1f fy=%.1f, cx=%.1f cy=%.1f), " +
+							"view2=(fx=%.1f fy=%.1f, cx=%.1f cy=%.1f) theta=%.2f\n",
+					errorBefore, errorAfter, iterations, minimizer.isConverged(),
+					found1.fx, found1.fy, found1.cx, found1.cy, found2.fx, found2.fy, found2.cx, found2.cy,
+					theta);
 		}
 
 		// Copy results

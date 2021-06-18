@@ -153,11 +153,10 @@ public class GeneratePairwiseImageGraph implements VerbosePrint {
 		// Retrieve any prior information on the cameras
 		dbCams.lookupCalibration(src, priorA);
 		dbCams.lookupCalibration(dst, priorB);
+		boolean sameCamera = dbCams.viewToCamera(src) == dbCams.viewToCamera(dst);
 
-		if (!epipolarScore.process(priorA, priorB, pairs.toList(), fundamental, inlierIdx)) {
-			// Don't create an edge here
-			return;
-		}
+		// Pass in null if it's the same camera so that score algorithm will know it's dealing with a single camera
+		epipolarScore.process(priorA, sameCamera ? null : priorB, pairs.toList(), fundamental, inlierIdx);
 
 		PairwiseImageGraph.Motion edge = graph.edges.grow();
 		edge.is3D = epipolarScore.is3D();

@@ -30,7 +30,6 @@ import boofcv.alg.similar.ConfigSimilarImagesTrackThenMatch;
 import boofcv.alg.structure.*;
 import boofcv.core.image.LookUpColorRgbFormats;
 import boofcv.factory.feature.detect.interest.ConfigDetectInterestPoint;
-import boofcv.factory.structure.ConfigEpipolarScore3D;
 import boofcv.factory.structure.ConfigGeneratePairwiseImageGraph;
 import boofcv.factory.structure.FactorySceneReconstruction;
 import boofcv.factory.tracker.ConfigPointTracker;
@@ -107,11 +106,13 @@ public class ExampleMultiViewSparseReconstruction {
 //		example.compute("log_building_02.mp4", true);
 //		example.compute("steps_zoom_01.mp4", true);
 //		example.compute("drone_park_01.mp4", false);
+//		example.compute("drone_buildings_01.mp4", false);
 //		example.compute("steps_zoom_01.mp4", true);
 //		example.compute("steps_reg_01.mp4", true);
 		example.compute("steps_wide_01.mp4", true);
 //		example.compute("towel_box.mp4", true);
 //		example.compute("rock_loop_01.mp4", true);
+//		example.compute("turning_around_02.mp4", true);
 		example.visualizeSparseCloud();
 
 		System.out.println("done");
@@ -328,10 +329,11 @@ public class ExampleMultiViewSparseReconstruction {
 		System.out.println("----------------------------------------------------------------------------");
 		System.out.println("### Creating Pairwise");
 		var config = new ConfigGeneratePairwiseImageGraph();
-		config.score.type = ConfigEpipolarScore3D.Type.FUNDAMENTAL_ERROR;
-		config.score.typeErrors.minimumInliers.setRelative(0.4, 100);
-		config.score.typeErrors.maxRatioScore = 10.0; // TODO make default?
-		config.score.ransacF.inlierThreshold = 2.0;
+		// TODO make default?
+//		config.score.type = ConfigEpipolarScore3D.Type.FUNDAMENTAL_COMPATIBLE;
+//		config.score.typeCompatible.minimumInliers.setRelative(0.4, 40);
+//		config.score.typeCompatible.maxRatioScore = 10.0; // TODO make default?
+//		config.score.ransacF.inlierThreshold = 2.0;
 		GeneratePairwiseImageGraph generatePairwise = FactorySceneReconstruction.generatePairwise(config);
 		BoofMiscOps.profile(() -> {
 			generatePairwise.setVerbose(System.out, null);

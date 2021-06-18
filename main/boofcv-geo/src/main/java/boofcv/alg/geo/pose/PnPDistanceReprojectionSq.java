@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -89,7 +89,7 @@ public class PnPDistanceReprojectionSq implements DistanceFromModelMultiView<Se3
 
 	@Override
 	public void setIntrinsic( int view, CameraPinhole intrinsic ) {
-		pixelError.set(intrinsic.fx, intrinsic.fy, intrinsic.skew);
+		pixelError.setTo(intrinsic.fx, intrinsic.fy, intrinsic.skew);
 	}
 
 	@Override

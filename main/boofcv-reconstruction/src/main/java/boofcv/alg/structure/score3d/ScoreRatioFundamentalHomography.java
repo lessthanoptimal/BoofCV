@@ -19,6 +19,7 @@
 package boofcv.alg.structure.score3d;
 
 import boofcv.alg.structure.EpipolarScore3D;
+import boofcv.misc.BoofMiscOps;
 import boofcv.struct.ConfigLength;
 import boofcv.struct.calib.CameraPinholeBrown;
 import boofcv.struct.geo.AssociatedPair;
@@ -84,8 +85,8 @@ public class ScoreRatioFundamentalHomography implements EpipolarScore3D {
 
 	protected ScoreRatioFundamentalHomography() {}
 
-	@Override public boolean process( CameraPinholeBrown cameraA, CameraPinholeBrown cameraB,
-									  List<AssociatedPair> pairs, DMatrixRMaj fundamental, DogArray_I32 inliersIdx ) {
+	@Override public void process( CameraPinholeBrown cameraA, @Nullable CameraPinholeBrown cameraB,
+								   List<AssociatedPair> pairs, DMatrixRMaj fundamental, DogArray_I32 inliersIdx ) {
 		// Reset output
 		inliersIdx.reset();
 		fundamental.fill(0);
@@ -94,7 +95,7 @@ public class ScoreRatioFundamentalHomography implements EpipolarScore3D {
 		if (pairs.size() < minimumAllowed) {
 			if (verbose != null)
 				verbose.printf("pairs.size=%d is too small. minimum=%d\n", pairs.size(), minimumAllowed);
-			return false;
+			return;
 		}
 
 		// Fitting Essential/Fundamental works when the scene is not planar and not pure rotation
@@ -129,8 +130,6 @@ public class ScoreRatioFundamentalHomography implements EpipolarScore3D {
 		if (verbose != null)
 			verbose.println("ransac F=" + countF + " H=" + countH +
 					" pairs=" + pairs.size() + " 3d=" + is3D + " accepted=" + accepted);
-
-		return accepted;
 	}
 
 	@Override public double getScore() {
@@ -151,7 +150,7 @@ public class ScoreRatioFundamentalHomography implements EpipolarScore3D {
 	}
 
 	@Override public void setVerbose( @Nullable PrintStream verbose, @Nullable Set<String> options ) {
-		this.verbose = verbose;
+		this.verbose = BoofMiscOps.addPrefix(this, verbose);
 	}
 
 	/**

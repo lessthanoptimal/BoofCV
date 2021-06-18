@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -75,7 +75,7 @@ public class DistanceHomographyCalibratedSq implements DistanceFromModelMultiVie
 	@Override
 	public void setIntrinsic( int view, CameraPinhole intrinsic ) {
 		if (view == 1)
-			errorCam2.set(intrinsic.fx, intrinsic.fy, intrinsic.skew);
+			errorCam2.setTo(intrinsic.fx, intrinsic.fy, intrinsic.skew);
 		else if (view != 0)
 			throw new IllegalArgumentException("View must be 0 or 1");
 	}

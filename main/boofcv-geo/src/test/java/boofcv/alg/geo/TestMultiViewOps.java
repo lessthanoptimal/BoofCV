@@ -1447,6 +1447,10 @@ class TestMultiViewOps extends BoofStandardJUnit {
 		assertEquals(0.0, MultiViewOps.compatibleHomography(foundF, H), UtilEjml.TEST_F64);
 	}
 
+	@Test void homographyFromRotation() {
+		fail("implement");
+	}
+
 	private class BundleSceneHelper {
 		Se3_F64 world_to_view0;
 		Se3_F64 world_to_view1;

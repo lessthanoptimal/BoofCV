@@ -29,7 +29,8 @@ import boofcv.alg.structure.EpipolarScore3D;
 import boofcv.alg.structure.GeneratePairwiseImageGraph;
 import boofcv.alg.structure.GenerateStereoPairGraphFromScene;
 import boofcv.alg.structure.SparseSceneToDenseCloud;
-import boofcv.alg.structure.score3d.ScoreFundamentalReprojectionError;
+import boofcv.alg.structure.score3d.ScoreFundamentalHomographyCompatibility;
+import boofcv.alg.structure.score3d.ScoreFundamentalVsRotation;
 import boofcv.alg.structure.score3d.ScoreRatioFundamentalHomography;
 import boofcv.factory.disparity.FactoryStereoDisparity;
 import boofcv.factory.feature.associate.FactoryAssociation;
@@ -94,12 +95,20 @@ public class FactorySceneReconstruction {
 						alg.ratio3D = config.score.typeInliers.ratio3D;
 						yield alg;
 					}
-					case FUNDAMENTAL_ERROR -> {
-						var alg = new ScoreFundamentalReprojectionError(ransac3D);
-						alg.inlierErrorTol = config.score.typeErrors.inlierErrorTol;
-						alg.ratio3D = config.score.typeErrors.ratio3D;
-						alg.maxRatioScore = config.score.typeErrors.maxRatioScore;
-						alg.minimumInliers.setTo(config.score.typeErrors.minimumInliers);
+					case FUNDAMENTAL_COMPATIBLE -> {
+						var alg = new ScoreFundamentalHomographyCompatibility(ransac3D);
+						alg.inlierErrorTol = config.score.typeCompatible.inlierErrorTol;
+						alg.ratio3D = config.score.typeCompatible.ratio3D;
+						alg.maxRatioScore = config.score.typeCompatible.maxRatioScore;
+						alg.minimumInliers.setTo(config.score.typeCompatible.minimumInliers);
+						yield alg;
+					}
+					case FUNDAMENTAL_ROTATION -> {
+						var alg = new ScoreFundamentalVsRotation(ransac3D);
+						alg.inlierErrorTol = config.score.typeRotation.inlierErrorTol;
+						alg.ratio3D = config.score.typeRotation.ratio3D;
+						alg.maxRatioScore = config.score.typeRotation.maxRatioScore;
+						alg.minimumInliers.setTo(config.score.typeRotation.minimumInliers);
 						yield alg;
 					}
 				};
