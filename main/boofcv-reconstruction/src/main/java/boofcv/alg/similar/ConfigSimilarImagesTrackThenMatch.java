@@ -45,12 +45,12 @@ public class ConfigSimilarImagesTrackThenMatch implements Configuration {
 	/**
 	 * @see SimilarImagesFromTracks#searchRadius
 	 */
-	public int sequentialSearchRadius = 15;
+	public int sequentialSearchRadius = 8;
 
 	/**
 	 * @see SimilarImagesFromTracks#minimumCommonTracks
 	 */
-	public final ConfigLength sequentialMinimumCommonTracks = ConfigLength.relative(0.2, 0.0);
+	public final ConfigLength sequentialMinimumCommonTracks = ConfigLength.relative(0.4, 200.0);
 
 	/**
 	 * Specifies how many features need to be matched for an image to be considered similar. Absolute
@@ -58,7 +58,7 @@ public class ConfigSimilarImagesTrackThenMatch implements Configuration {
 	 *
 	 * The default minimum number of matches is probably set too low.
 	 */
-	public final ConfigLength minimumSimilar = ConfigLength.relative(0.3, 50);
+	public final ConfigLength minimumSimilar = ConfigLength.relative(0.35, 150);
 
 	/** Image feature descriptions */
 	public final ConfigDescribePoint descriptions = new ConfigDescribePoint();
@@ -70,7 +70,10 @@ public class ConfigSimilarImagesTrackThenMatch implements Configuration {
 	public final ConfigAssociate associate = new ConfigAssociate();
 
 	{
+		recognizeNister2006.learningMinimumPointsForChildren.setFixed(20);
+
 		descriptions.descriptors.type = ConfigDescribeRegion.Type.SURF_STABLE;
+		descriptions.radius = 20;
 
 		// Reduce memory usage with very little loss in accuracy
 		descriptions.convert.outputData = ConfigConvertTupleDesc.DataType.F32;

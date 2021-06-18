@@ -19,7 +19,6 @@
 package boofcv.examples.reconstruction;
 
 import boofcv.BoofVerbose;
-import boofcv.abst.feature.detect.interest.PointDetectorTypes;
 import boofcv.abst.geo.bundle.SceneStructureMetric;
 import boofcv.abst.tracker.PointTrack;
 import boofcv.abst.tracker.PointTracker;
@@ -29,7 +28,7 @@ import boofcv.alg.similar.ConfigSimilarImagesSceneRecognition;
 import boofcv.alg.similar.ConfigSimilarImagesTrackThenMatch;
 import boofcv.alg.structure.*;
 import boofcv.core.image.LookUpColorRgbFormats;
-import boofcv.factory.feature.detect.interest.ConfigDetectInterestPoint;
+import boofcv.factory.scene.FactorySceneRecognition;
 import boofcv.factory.structure.ConfigGeneratePairwiseImageGraph;
 import boofcv.factory.structure.FactorySceneReconstruction;
 import boofcv.factory.tracker.ConfigPointTracker;
@@ -211,29 +210,12 @@ public class ExampleMultiViewSparseReconstruction {
 		System.out.println("### Creating Similar Images from an oredered set of images");
 
 		// Configure the KLT tracker
-		var configTracker = new ConfigPointTracker();
-		configTracker.typeTracker = ConfigPointTracker.TrackerType.KLT;
-		configTracker.klt.pruneClose = true;
-		configTracker.klt.toleranceFB = 1;
-		configTracker.klt.templateRadius = 5;
-		configTracker.klt.maximumTracks.setFixed(800);
-		configTracker.klt.config.maxIterations = 30;
-		configTracker.detDesc.typeDetector = ConfigDetectInterestPoint.Type.POINT;
-		configTracker.detDesc.detectPoint.type = PointDetectorTypes.SHI_TOMASI;
-		configTracker.detDesc.detectPoint.shiTomasi.radius = 3;
-		configTracker.detDesc.detectPoint.general.radius = 6;
-		configTracker.detDesc.detectPoint.general.threshold = 0;
-//		configTracker.detDesc.detectPoint.general.selector = ConfigSelectLimit.selectUniform(2.0);
+		ConfigPointTracker configTracker = FactorySceneRecognition.createDefaultTrackerConfig();
 
 		PointTracker<GrayU8> tracker = FactoryPointTracker.tracker(configTracker, GrayU8.class, null);
 		var activeTracks = new ArrayList<PointTrack>();
 
 		var config = new ConfigSimilarImagesTrackThenMatch();
-		config.recognizeNister2006.learningMinimumPointsForChildren.setFixed(20);
-		config.minimumSimilar.setRelative(0.35, 150);
-		config.descriptions.radius = 20;
-		config.sequentialSearchRadius = 8;
-		config.sequentialMinimumCommonTracks.setRelative(0.4, 200);
 
 		final var dbSimilar = FactorySceneReconstruction.createTrackThenMatch(config, ImageType.SB_U8);
 		dbSimilar.setVerbose(System.out, BoofMiscOps.hashSet(BoofVerbose.RECURSIVE));
@@ -284,13 +266,6 @@ public class ExampleMultiViewSparseReconstruction {
 		System.out.println("### Creating Similar Images from unordered images");
 
 		var config = new ConfigSimilarImagesSceneRecognition();
-		config.recognizeNister2006.learningMinimumPointsForChildren.setFixed(20);
-		config.minimumSimilar.setRelative(0.2, 100);
-
-		// This is tuned for an image that's 800x600
-		config.features.detectFastHessian.maxFeaturesAll = 1000;
-		config.features.detectFastHessian.extract.radius = 6;
-//		config.features.detectFastHessian.selector = ConfigSelectLimit.selectUniform(8.0);
 
 		final var similarImages = FactorySceneReconstruction.createSimilarImages(config, ImageType.SB_U8);
 		similarImages.setVerbose(System.out, BoofMiscOps.hashSet(BoofVerbose.RECURSIVE));

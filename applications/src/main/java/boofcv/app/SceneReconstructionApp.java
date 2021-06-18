@@ -252,11 +252,6 @@ public class SceneReconstructionApp {
 	}
 
 	private void configureDefault() {
-		configSimilarTracker.recognizeNister2006.learningMinimumPointsForChildren.setFixed(20);
-		configSimilarTracker.descriptions.radius = 20;
-
-		configSimilarUnordered.recognizeNister2006.learningMinimumPointsForChildren.setFixed(20);
-
 		configSparseToDense.disparity.approach = ConfigDisparity.Approach.SGM;
 		ConfigDisparitySGM configSgm = configSparseToDense.disparity.approachSGM;
 		configSgm.validateRtoL = 0;
@@ -367,17 +362,12 @@ public class SceneReconstructionApp {
 
 		// Track features across the entire sequence and save the results
 		BoofMiscOps.profile(() -> {
-			boolean first = true;
-			GrayU8 gray = new GrayU8(1, 1);
+			GrayU8 gray = new GrayU8(images.getWidth(), images.getHeight());
+			similarImages.initialize(images.getWidth(), images.getHeight());
+			dbCams.addCameraCanonical(images.getWidth(), images.getHeight(), 60);
 			while (images.hasNext()) {
 				Planar<GrayU8> color = images.next();
 				ConvertImage.average(color, gray);
-
-				if (first) {
-					first = false;
-					similarImages.initialize(gray.width, gray.height);
-					dbCams.addCameraCanonical(gray.width, gray.height, 60.0);
-				}
 
 				tracker.process(gray);
 				tracker.spawnTracks();
@@ -504,13 +494,21 @@ public class SceneReconstructionApp {
 	}
 
 	private void saveCloudToDisk( File outputDirectory ) {
-		// Save the dense point cloud to disk in PLY format
+		List<Point3D_F64> cloud = sparseToDense.getCloud();
+		DogArray_I32 colorsRgb = sparseToDense.getColorRgb();
+
+		// Save everything
 		try (FileOutputStream out = new FileOutputStream(new File(outputDirectory, "cloud.ply"))) {
+			PointCloudIO.save3D(PointCloudIO.Format.PLY, PointCloudReader.wrapF64(cloud, colorsRgb.data), true, out);
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+
+		// Save the dense point cloud to disk in PLY format
+		try (FileOutputStream out = new FileOutputStream(new File(outputDirectory, "cloud_clipped.ply"))) {
 			// Filter points which are far away to make it easier to view in 3rd party viewers that auto scale
 			// You might need to adjust the threshold for your application if too many points are cut
 			double distanceThreshold = 50.0;
-			List<Point3D_F64> cloud = sparseToDense.getCloud();
-			DogArray_I32 colorsRgb = sparseToDense.getColorRgb();
 
 			DogArray<Point3dRgbI_F64> filtered = PointCloudUtils_F64.filter(
 					( idx, p ) -> p.setTo(cloud.get(idx)), colorsRgb::get, cloud.size(),

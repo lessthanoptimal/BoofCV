@@ -41,10 +41,8 @@ public class ConfigSimilarImagesSceneRecognition implements Configuration {
 	/**
 	 * Specifies how many features need to be matched for an image to be considered similar. Absolute
 	 * is the number of matches. Fraction is relative to the number of images in each image.
-	 *
-	 * The default minimum number of matches is probably set too low.
 	 */
-	public final ConfigLength minimumSimilar = ConfigLength.relative(0.2, 1);
+	public final ConfigLength minimumSimilar = ConfigLength.relative(0.2, 100);
 
 	/** Image feature detector */
 	public final ConfigDetectDescribe features = new ConfigDetectDescribe();
@@ -56,6 +54,8 @@ public class ConfigSimilarImagesSceneRecognition implements Configuration {
 	public final ConfigAssociate associate = new ConfigAssociate();
 
 	{
+		recognizeNister2006.learningMinimumPointsForChildren.setFixed(20);
+
 		// Let's use SURF-FAST by default
 		features.typeDescribe = ConfigDescribeRegion.Type.SURF_STABLE;
 		features.typeDetector = ConfigDetectInterestPoint.Type.FAST_HESSIAN;
@@ -65,7 +65,8 @@ public class ConfigSimilarImagesSceneRecognition implements Configuration {
 		features.detectFastHessian.numberOfOctaves = 7;
 		// 500 features is a good trade off for memory and performance. Accuracy can be improved
 		// with more features but becomes prohibitively expensive in larger datasets
-		features.detectFastHessian.maxFeaturesAll = 800;
+		features.detectFastHessian.maxFeaturesAll = 1000;
+		features.detectFastHessian.extract.radius = 6; // tuned for 800x600 image
 		features.detectFastHessian.maxFeaturesPerScale = 0;
 
 		// Also give SIFT reasonable parameters
