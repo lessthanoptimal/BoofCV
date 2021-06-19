@@ -1167,9 +1167,9 @@ class TestMultiViewOps extends BoofStandardJUnit {
 		DMatrixRMaj p = eq.lookupDDRM("p");
 		Point3D_F64 _p = new Point3D_F64(p.get(0), p.get(1), p.get(2));
 
-		DMatrixRMaj found = new DMatrixRMaj(1,1); // wrong size intentionally
+		DMatrixRMaj found = new DMatrixRMaj(1, 1); // wrong size intentionally
 
-		MultiViewOps.canonicalRectifyingHomographyFromKPinf(K,_p, found);
+		MultiViewOps.canonicalRectifyingHomographyFromKPinf(K, _p, found);
 		assertTrue(MatrixFeatures_DDRM.isEquals(eq.lookupDDRM("H"), found, UtilEjml.TEST_F64));
 	}
 
@@ -1447,8 +1447,34 @@ class TestMultiViewOps extends BoofStandardJUnit {
 		assertEquals(0.0, MultiViewOps.compatibleHomography(foundF, H), UtilEjml.TEST_F64);
 	}
 
+	/**
+	 * Tests the constructed homography matrix using its properties
+	 */
 	@Test void homographyFromRotation() {
-		fail("implement");
+		// pure rotation
+		Se3_F64 left_to_right = SpecialEuclideanOps_F64.eulerXyz(0, 0, 0, 0.2, 0, 0, null);
+
+		// Two distinct cameras
+		CameraPinhole intrinsic1 = new CameraPinhole(500, 500, 0, 250, 250, 500, 500);
+		CameraPinhole intrinsic2 = new CameraPinhole(1000, 1100, 0, 300, 310, 500, 500);
+		DMatrixRMaj K1 = PerspectiveOps.pinholeToMatrix(intrinsic1, (DMatrixRMaj)null);
+		DMatrixRMaj K2 = PerspectiveOps.pinholeToMatrix(intrinsic2, (DMatrixRMaj)null);
+
+		// Point in front of both views
+		Point3D_F64 X = new Point3D_F64(0.1, -0.05, 1.2);
+
+		// Compute the expected value and input
+		Point2D_F64 pixel1 = PerspectiveOps.renderPixel(intrinsic1, X, null);
+		Point2D_F64 pixel2 = PerspectiveOps.renderPixel(left_to_right, intrinsic2, X, null);
+
+		// Call the function being tested
+		DMatrixRMaj H21 = MultiViewOps.homographyFromRotation(left_to_right.R, K1, K2, null);
+
+		// See it transferred the point
+		Point2D_F64 found = new Point2D_F64();
+		GeometryMath_F64.mult(H21,pixel1, found);
+
+		assertEquals(0.0, found.distance(pixel2), 1e-6);
 	}
 
 	private class BundleSceneHelper {

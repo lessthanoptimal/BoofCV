@@ -23,6 +23,7 @@ import boofcv.alg.structure.MockLookupSimilarImagesRealistic;
 import boofcv.alg.structure.PairwiseImageGraph;
 import boofcv.misc.BoofMiscOps;
 import boofcv.struct.calib.CameraPinhole;
+import boofcv.testing.BoofStandardJUnit;
 import georegression.struct.se.Se3_F64;
 import org.ddogleg.struct.DogArray_I32;
 import org.ejml.data.DMatrixRMaj;
@@ -36,7 +37,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 /**
  * @author Peter Abeles
  */
-public class TestEstimateViewSelfCalibrate {
+public class TestEstimateViewSelfCalibrate extends BoofStandardJUnit {
 	/**
 	 * Check the calibrating homography computation by feeding it noise three data from 3 views
 	 */

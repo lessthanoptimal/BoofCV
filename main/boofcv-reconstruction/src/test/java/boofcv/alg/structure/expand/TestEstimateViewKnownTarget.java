@@ -18,6 +18,7 @@
 
 package boofcv.alg.structure.expand;
 
+import boofcv.testing.BoofStandardJUnit;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.fail;
@@ -25,7 +26,7 @@ import static org.junit.jupiter.api.Assertions.fail;
 /**
  * @author Peter Abeles
  */
-public class TestEstimateViewKnownTarget {
+public class TestEstimateViewKnownTarget extends BoofStandardJUnit {
 	/**
 	 * TODO each view has its own intrinsics.
 	 */
