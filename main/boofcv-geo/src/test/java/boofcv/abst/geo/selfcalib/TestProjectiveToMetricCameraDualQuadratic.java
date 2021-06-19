@@ -36,7 +36,7 @@ import static org.junit.jupiter.api.Assertions.*;
  */
 class TestProjectiveToMetricCameraDualQuadratic extends CommonProjectiveToMetricCamerasChecks {
 	@Override
-	public ProjectiveToMetricCameras createEstimator() {
+	public ProjectiveToMetricCameras createEstimator( boolean singleCamera ) {
 		var alg = new SelfCalibrationLinearDualQuadratic(1.0);
 		return new ProjectiveToMetricCameraDualQuadratic(alg);
 	}
