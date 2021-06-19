@@ -57,7 +57,7 @@ abstract class CommonProjectiveToMetricCamerasChecks extends CommonThreeViewSelf
 
 	protected boolean zeroPrinciplePoint = true;
 
-	public abstract ProjectiveToMetricCameras createEstimator();
+	public abstract ProjectiveToMetricCameras createEstimator( boolean singleCamera );
 
 	@Override
 	protected void standardScene() {
@@ -94,7 +94,7 @@ abstract class CommonProjectiveToMetricCamerasChecks extends CommonThreeViewSelf
 	 * @param singleCamera if true then the algorithm will be told all views come from one camera
 	 */
 	private void checkScene( boolean singleCamera ) {
-		ProjectiveToMetricCameras alg = createEstimator();
+		ProjectiveToMetricCameras alg = createEstimator(singleCamera);
 		assertTrue(alg.getMinimumViews() >= 1);
 		assertTrue(alg.getMinimumViews() <= 3);
 
@@ -211,7 +211,7 @@ abstract class CommonProjectiveToMetricCamerasChecks extends CommonThreeViewSelf
 
 		var results = new MetricCameras();
 
-		ProjectiveToMetricCameras alg = createEstimator();
+		ProjectiveToMetricCameras alg = createEstimator(false);
 		assertTrue(alg.process(views, inputCameras, observations.toList(), results));
 
 		// Yes internally most implementations run this function, but the number of invalid was > 0 before
@@ -244,7 +244,7 @@ abstract class CommonProjectiveToMetricCamerasChecks extends CommonThreeViewSelf
 		inputCameras.add(P2);
 		inputCameras.add(P3);
 
-		ProjectiveToMetricCameras alg = createEstimator();
+		ProjectiveToMetricCameras alg = createEstimator(false);
 		assertThrows(RuntimeException.class, () ->
 				alg.process(views, inputCameras, observationsN, new MetricCameras()));
 	}
@@ -264,7 +264,7 @@ abstract class CommonProjectiveToMetricCamerasChecks extends CommonThreeViewSelf
 		inputCameras.add(P2);
 		inputCameras.add(P3);
 
-		ProjectiveToMetricCameras alg = createEstimator();
+		ProjectiveToMetricCameras alg = createEstimator(false);
 		assertThrows(RuntimeException.class, () ->
 				alg.process(views, inputCameras, observationsN, new MetricCameras()));
 	}

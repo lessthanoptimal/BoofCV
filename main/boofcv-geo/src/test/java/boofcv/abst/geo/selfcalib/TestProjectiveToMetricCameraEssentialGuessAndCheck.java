@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -25,11 +25,11 @@ import boofcv.alg.geo.selfcalib.SelfCalibrationEssentialGuessAndCheck;
  */
 class TestProjectiveToMetricCameraEssentialGuessAndCheck extends CommonProjectiveToMetricCamerasChecks {
 	@Override
-	public ProjectiveToMetricCameras createEstimator() {
+	public ProjectiveToMetricCameras createEstimator( boolean singleCamera ) {
 		var alg = new SelfCalibrationEssentialGuessAndCheck();
-		alg.fixedFocus = false;
+		alg.fixedFocus = singleCamera;
 		alg.numberOfSamples = 200;
-		alg.configure(0.3,2.5);
+		alg.configure(0.3, 2.5);
 		return new ProjectiveToMetricCameraEssentialGuessAndCheck(alg);
 	}
 
