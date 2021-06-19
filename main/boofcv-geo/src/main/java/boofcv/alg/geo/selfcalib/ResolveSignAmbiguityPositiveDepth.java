@@ -21,6 +21,7 @@ package boofcv.alg.geo.selfcalib;
 import boofcv.abst.geo.TriangulateNViewsMetricH;
 import boofcv.alg.distort.pinhole.PinholePtoN_F64;
 import boofcv.alg.geo.MetricCameras;
+import boofcv.alg.geo.PerspectiveOps;
 import boofcv.factory.geo.FactoryMultiView;
 import boofcv.misc.BoofMiscOps;
 import boofcv.struct.geo.AssociatedTriple;
@@ -107,15 +108,14 @@ public class ResolveSignAmbiguityPositiveDepth implements VerbosePrint {
 					continue;
 				}
 
-				if (pointIn1.z*pointIn1.w < 0)
+				if (PerspectiveOps.isBehindCamera(pointIn1))
 					foundInvalid++;
 
 				// Consistency check for remaining views
 				for (int viewIdx = 1; viewIdx < numViews; viewIdx++) {
 					SePointOps_F64.transform(worldToViews.get(viewIdx), pointIn1, Xcam);
-					if (Xcam.z*Xcam.w < 0) {
+					if (PerspectiveOps.isBehindCamera(Xcam))
 						foundInvalid++;
-					}
 				}
 			}
 
@@ -184,17 +184,17 @@ public class ResolveSignAmbiguityPositiveDepth implements VerbosePrint {
 
 				// Find point in view-1 reference frame and check constraint
 				triangulator.triangulate(pixelNorms.toList(), worldToViews.toList(), pointIn1);
-				if (pointIn1.z*pointIn1.w < 0)
+				if (PerspectiveOps.isBehindCamera(pointIn1))
 					foundInvalid++;
 
 				// Find in view-2 and check +z constraint
 				SePointOps_F64.transform(result.view_1_to_2, pointIn1, Xcam);
-				if (Xcam.z*Xcam.w < 0)
+				if (PerspectiveOps.isBehindCamera(Xcam))
 					foundInvalid++;
 
 				// Find in view-3 and check +z constraint
 				SePointOps_F64.transform(result.view_1_to_3, pointIn1, Xcam);
-				if (Xcam.z*Xcam.w < 0)
+				if (PerspectiveOps.isBehindCamera(Xcam))
 					foundInvalid++;
 			}
 

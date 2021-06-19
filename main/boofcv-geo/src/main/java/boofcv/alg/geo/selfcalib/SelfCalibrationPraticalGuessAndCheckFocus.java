@@ -19,6 +19,7 @@
 package boofcv.alg.geo.selfcalib;
 
 import boofcv.alg.geo.MultiViewOps;
+import boofcv.misc.BoofMiscOps;
 import boofcv.struct.calib.CameraPinhole;
 import georegression.struct.point.Vector3D_F64;
 import org.ddogleg.struct.DogArray;
@@ -397,6 +398,6 @@ public class SelfCalibrationPraticalGuessAndCheckFocus implements VerbosePrint {
 
 	@Override
 	public void setVerbose( @Nullable PrintStream out, @Nullable Set<String> configuration ) {
-		this.verbose = out;
+		this.verbose = BoofMiscOps.addPrefix(this, out);
 	}
 }
