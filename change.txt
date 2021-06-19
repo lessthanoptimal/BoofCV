@@ -58,7 +58,6 @@ Version : 0.38
   * Instead of a single seed for the metric reconstruction multiple seeds are spawned, grown, then merged.
   * TODO Pruning of views when creating pairwise graph. If too similar do not include it. Could be done before pairwise
          Should be able to process a video sequence where it's static for several frames
-  * TODO Regriession. Add unordered sequences and ones with smaller images. 320x240 and 640x480
 - SFM
   * Triangulate 2-views in homogenous coordinates
   * Switched several 2-view triangulation classes over to using homogenous coordinates so that
@@ -74,7 +73,6 @@ Version : 0.38
 
 TODO DB
     - Metric: Use prior camera when spawning and another hypothesis
-    - Pairwise: Handle planes correctly when scoring
     - Metric: Expand using 2-views
     - Metric: Initialize using 2-views
     - Ransac: Tell it the minimum threshold and abort early if it can't be meet?
