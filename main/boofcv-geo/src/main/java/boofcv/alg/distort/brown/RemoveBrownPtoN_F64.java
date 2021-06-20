@@ -33,12 +33,12 @@ import static boofcv.alg.distort.brown.RemoveBrownNtoN_F64.removeRadial;
 public class RemoveBrownPtoN_F64 implements Point2Transform2_F64 {
 
 	// principle point / image center
-	protected double cx, cy;
+	public double cx, cy;
 	// other intrinsic parameters
-	protected double fx, fy, skew;
+	public double fx, fy, skew;
 
 	// distortion parameters
-	protected RadialTangential_F64 params;
+	public RadialTangential_F64 params;
 
 	// inverse of camera calibration matrix
 	// These are the upper triangular elements in a 3x3 matrix
@@ -66,7 +66,6 @@ public class RemoveBrownPtoN_F64 implements Point2Transform2_F64 {
 	 * @param cy center center y-axis in pixels
 	 */
 	public RemoveBrownPtoN_F64 setK( /**/double fx, /**/double fy, /**/double skew, /**/double cx, /**/double cy ) {
-
 		this.fx = (double)fx;
 		this.fy = (double)fy;
 		this.skew = (double)skew;
