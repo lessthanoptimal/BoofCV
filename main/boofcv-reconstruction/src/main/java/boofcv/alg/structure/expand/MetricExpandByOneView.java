@@ -60,8 +60,8 @@ public class MetricExpandByOneView extends ExpandByOneView {
 	/** Do not consider the uncalibrated case if the camera is already known */
 	public boolean onlyConsiderCalibrated = false;
 
-	public EstimateViewKnownTarget expandCalibrated = new EstimateViewKnownTarget(utils);
-	public EstimateViewSelfCalibrate expandUnknown = new EstimateViewSelfCalibrate(utils);
+	public EstimateViewKnownTarget expandCalibrated = new EstimateViewKnownTarget();
+	public EstimateViewSelfCalibrate expandUnknown = new EstimateViewSelfCalibrate();
 
 	MetricExpandByOneView.Solution solutionCalibrated = new MetricExpandByOneView.Solution();
 	MetricExpandByOneView.Solution solutionUnknown = new MetricExpandByOneView.Solution();
@@ -139,8 +139,7 @@ public class MetricExpandByOneView extends ExpandByOneView {
 			solutionUnknown.reset();
 			if (verbose != null) verbose.println("Skipping uncalibrated case");
 		} else {
-			expandUnknown.pairwiseUtils = this.utils;
-			if (expandUnknown.process(workGraph, solutionUnknown)) {
+			if (expandUnknown.process(utils, workGraph, solutionUnknown)) {
 				BoofMiscOps.checkEq(tripleInliers, utils.inliersThreeView.size, "BUG! Don't modify inliers.");
 				success = true;
 			} else {
@@ -150,9 +149,7 @@ public class MetricExpandByOneView extends ExpandByOneView {
 
 		if (workGraph.cameras.containsKey(cameraIndexDB)) {
 			// Camera is known. Let's estimate the view using that info
-			expandCalibrated.pairwiseUtils = this.utils;
-			expandCalibrated.workGraph = workGraph;
-			if (expandCalibrated.process(workGraph, solutionCalibrated)) {
+			if (expandCalibrated.process(utils, workGraph, solutionCalibrated)) {
 				BoofMiscOps.checkEq(tripleInliers, utils.inliersThreeView.size, "BUG! Don't modify inliers.");
 				success = true;
 			} else {

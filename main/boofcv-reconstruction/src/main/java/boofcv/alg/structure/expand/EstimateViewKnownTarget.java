@@ -43,12 +43,18 @@ import java.util.List;
 import java.util.Set;
 
 /**
- * Expands to a new view using know camera intrinsics for all views.
+ * Expands to a new view using know camera intrinsics for all views. Inliers from 3-view are triangulated
+ * using the two known views. Then the 3rd view (the one being added) has its pose estimated using PNP + RANSAC. Then
+ * all the points and views are refined using bundle adjustment. The cameras will not be optimized as they are
+ * considered to be known.
  *
  * @author Peter Abeles
  */
 public class EstimateViewKnownTarget implements VerbosePrint {
+	// Contains functions for working with pairwise graph AND information for which view is being estimated
 	PairwiseGraphUtils pairwiseUtils;
+
+	// Information about the known metric scene
 	SceneWorkingGraph workGraph;
 
 	/** If less than this number of features fail the physical constraint test, attempt to recover by removing them */
@@ -59,38 +65,35 @@ public class EstimateViewKnownTarget implements VerbosePrint {
 
 	public final EstimateViewUtils estimateUtils = new EstimateViewUtils();
 
-	// Triangulate from the two known views
+	/** Triangulate from the two known views */
 	public Triangulate2ViewsMetricH triangulate2;
-	// Estimates the new view's location
+	/** Estimates the new view's location */
 	public ModelMatcherMultiview<Se3_F64, Point2D3D> ransacPnP;
 
 	// Intrinsic parameters in a format ransac can understand
-	DogArray<RemoveBrownPtoN_F64> listPixelToNorm = new DogArray<>(RemoveBrownPtoN_F64::new);
+	final DogArray<RemoveBrownPtoN_F64> listPixelToNorm = new DogArray<>(RemoveBrownPtoN_F64::new);
 	// 2D/3D observations for computing the camera's pose
-	DogArray<Point2D3D> list2D3D = new DogArray<>(Point2D3D::new);
+	final DogArray<Point2D3D> list2D3D = new DogArray<>(Point2D3D::new);
 
 	// conversion from input element for PnP to inlier element in 3-view inlier set
-	public DogArray_I32 inputPnP_to_inliersThreeView = new DogArray_I32();
+	public final DogArray_I32 inputPnP_to_inliersThreeView = new DogArray_I32();
 
 	//------------- Internal Work Space
-	public CameraPinhole pinhole = new CameraPinhole();
-	Point2D_F64 norm1 = new Point2D_F64();
-	Point2D_F64 norm2 = new Point2D_F64();
-	Point2D_F64 norm3 = new Point2D_F64();
-	Point4D_F64 X = new Point4D_F64();
+	public final CameraPinhole pinhole = new CameraPinhole();
+	final Point2D_F64 norm1 = new Point2D_F64();
+	final Point2D_F64 norm2 = new Point2D_F64();
+	final Point2D_F64 norm3 = new Point2D_F64();
+	final Point4D_F64 X = new Point4D_F64();
 
 	PrintStream verbose;
 
-	public EstimateViewKnownTarget( PairwiseGraphUtils utils ) {
-		this.pairwiseUtils = utils;
-		defaultConfiguration();
-	}
-
 	public EstimateViewKnownTarget() {
-		this( new PairwiseGraphUtils() );
 		defaultConfiguration();
 	}
 
+	/**
+	 * Instantiates triangulation and RANSAC using default parameters
+	 */
 	public void defaultConfiguration() {
 		var configTriangulate = new ConfigTriangulation();
 		var configPnP = new ConfigPnP();
@@ -102,12 +105,26 @@ public class EstimateViewKnownTarget implements VerbosePrint {
 		configure(configTriangulate, configPnP, configRansac);
 	}
 
+	/**
+	 * Use Configuration classes to initialize triangulate and RANSAC
+	 */
 	public void configure( ConfigTriangulation configTriangulate, ConfigPnP configPnP, ConfigRansac configRansac ) {
 		triangulate2 = FactoryMultiView.triangulate2ViewMetricH(configTriangulate);
 		ransacPnP = FactoryMultiViewRobust.pnpRansac(configPnP, configRansac);
 	}
 
-	public boolean process( SceneWorkingGraph workGraph, MetricExpandByOneView.Solution solution ) {
+	/**
+	 * Estimates the pose of a view and which features are in its inlier set.
+	 *
+	 * @param pairwiseUtils (Input) Pairwise information and specifies which view is being estimated
+	 * @param workGraph (Input) Working graph with metric information
+	 * @param solution (Output) The estimated state of the new view
+	 * @return true if successful or false if it failed
+	 */
+	public boolean process( PairwiseGraphUtils pairwiseUtils,
+							SceneWorkingGraph workGraph,
+							MetricExpandByOneView.Solution solution ) {
+		this.pairwiseUtils = pairwiseUtils;
 		this.workGraph = workGraph;
 		solution.reset();
 
@@ -139,6 +156,10 @@ public class EstimateViewKnownTarget implements VerbosePrint {
 		return true;
 	}
 
+	/**
+	 * Triangulates points using the two known views then uses PNP to determine view-3's location
+	 * @return true if nothing went wrong
+	 */
 	boolean estimateViewPose() {
 		triangulateForPnP();
 
@@ -171,6 +192,12 @@ public class EstimateViewKnownTarget implements VerbosePrint {
 		return true;
 	}
 
+	/**
+	 * Triangulates points. Triangulation is done in homogenous coordinates but then converted to 3D points
+	 * since there current isn't a variant of PnP in BoofCV which can handle homogenous points.
+	 *
+	 * As a results, thigns will go poorly if a point is at or very near to infinity
+	 */
 	private void triangulateForPnP() {
 		list2D3D.reset();
 		inputPnP_to_inliersThreeView.reset();
@@ -202,10 +229,15 @@ public class EstimateViewKnownTarget implements VerbosePrint {
 		}
 	}
 
+	/**
+	 * Refines the pose estimate using bundle adjustment now that there's an estimate for everything
+	 *
+	 * @return true if an error did not occur
+	 */
 	private boolean refineWithBundleAdjustment() {
 		estimateUtils.configureSbaStructure(pairwiseUtils.inliersThreeView.toList());
 
-		// We will refine it's pose, everything else is static
+		// We will refine its pose, everything else is static
 		estimateUtils.metricSba.structure.motions.get(2).known = false;
 
 		return estimateUtils.performBundleAdjustment(verbose);
@@ -236,6 +268,9 @@ public class EstimateViewKnownTarget implements VerbosePrint {
 		return estimateUtils.verifyPhysicalConstraints(0.0, verbose);
 	}
 
+	/**
+	 * Makes sure it hasn't prune too many features and needs to abort.
+	 */
 	private boolean checkEnoughRemainingInliers() {
 		int numMatches = estimateUtils.usedThreeViewInliers.size();
 		if (numMatches < minimumInliers.computeI(pairwiseUtils.commonIdx.size)) {
