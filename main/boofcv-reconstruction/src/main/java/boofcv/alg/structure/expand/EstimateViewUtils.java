@@ -83,6 +83,14 @@ public class EstimateViewUtils {
 		listMotion.add(view1_to_target);
 	}
 
+	/**
+	 * Initializes data structures for when a new view is being processed. The state of 'pairwiseUtils' is used to
+	 * determine which views are used as input.
+	 *
+	 * @param knownView3 If true then prior information on view-3 (target view) is being used.
+	 * @param workGraph The working graph
+	 * @param pairwiseUtils Pairwise information and specifies which views are being considered.
+	 */
 	public void initialize( boolean knownView3, SceneWorkingGraph workGraph, PairwiseGraphUtils pairwiseUtils ) {
 		// Due to some weirdness. view1 and view2 are known views
 		// view3/viewC is the target view
@@ -111,11 +119,23 @@ public class EstimateViewUtils {
 		view1_to_view2.T.divide(local_to_global);
 	}
 
+	/**
+	 * Specifies the intrinsics for view-3's camera. This should be called if it's not known at the time
+	 * {@link #initialize} was called.
+	 *
+	 * @param camera3 Intrinsic parameters for view-3.
+	 */
 	public void setCamera3( BundlePinholeSimplified camera3 ) {
 		this.camera3 = camera3;
 		normalize3.setK(camera3.f, camera3.f, 0, 0, 0).setDistortion(camera3.k1, camera3.k2);
 	}
 
+	/**
+	 * Copies the found parameters for the new view into the 'solution' object provided
+	 *
+	 * @param pairwiseUtils Pairwise information
+	 * @param solution (Output) view parameters are copied here.
+	 */
 	public void copyToSolution( PairwiseGraphUtils pairwiseUtils, MetricExpandByOneView.Solution solution ) {
 		// Save the final set of image features that were used.
 		solution.commonFeatureIndexes.resize(usedThreeViewInliers.size());
@@ -131,6 +151,13 @@ public class EstimateViewUtils {
 		solution.intrinsic.setTo(camera3);
 	}
 
+	/**
+	 * Configures data structures for running SBA. Which observations are used is specified by the provided inliers.
+	 * By default all cameras and views are set to known. If these need to be optimized for a specific use case then
+	 * 'known' should be set to false.
+	 *
+	 * @param inliersThreeView Specifies the observations
+	 */
 	public void configureSbaStructure( List<AssociatedTriple> inliersThreeView ) {
 		final SceneStructureMetric structure = metricSba.structure;
 		final SceneObservations observations = metricSba.observations;
@@ -189,6 +216,11 @@ public class EstimateViewUtils {
 		}
 	}
 
+	/**
+	 * Runs bundle adjustment and optimizes the scene.
+	 *
+	 * @param verbose If not null, then verbose information is printed
+	 */
 	public boolean performBundleAdjustment( @Nullable PrintStream verbose ) {
 		// Refine using bundle adjustment
 		if (!metricSba.process())
@@ -211,8 +243,8 @@ public class EstimateViewUtils {
 	 * @return true if it passes
 	 */
 	public RemoveResults removedBadFeatures( PairwiseGraphUtils utils,
-									   double fractionBadFeaturesRecover,
-									   @Nullable PrintStream verbose ) {
+											 double fractionBadFeaturesRecover,
+											 @Nullable PrintStream verbose ) {
 		listPriorCameras.clear();
 		listPriorCameras.add(utils.priorCamA);
 		listPriorCameras.add(utils.priorCamB);
@@ -248,6 +280,14 @@ public class EstimateViewUtils {
 		return RemoveResults.AGAIN;
 	}
 
+	/**
+	 * Inspects the observations to see if they pass a check on known constraints.
+	 *
+	 * @param fractionAccept Fraction of points which can fail the test and this returns true
+	 * @param verbose If not null then verbose information will be printed
+	 * @return true if it passes the constraints check
+	 * @see MetricSanityChecks
+	 */
 	public boolean verifyPhysicalConstraints( double fractionAccept, @Nullable PrintStream verbose ) {
 		if (!checks.checkPhysicalConstraints(metricSba, listPriorCameras)) {
 			if (verbose != null) verbose.println("Fatal error when checking constraints");
@@ -269,8 +309,11 @@ public class EstimateViewUtils {
 	}
 
 	enum RemoveResults {
+		/** No errors found */
 		GOOD,
+		/** Too many errors found */
 		FAILED,
+		/** It should attempt to fix the errors */
 		AGAIN
 	}
 }

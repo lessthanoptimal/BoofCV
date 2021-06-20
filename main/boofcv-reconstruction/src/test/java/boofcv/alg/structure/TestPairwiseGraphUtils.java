@@ -469,7 +469,7 @@ class TestPairwiseGraphUtils extends BoofStandardJUnit {
 				default -> throw new RuntimeException("BUG");
 			};
 			//-------- Call the function being tested
-			alg.saveRansacInliers(view0, null);
+			alg.saveRansacInliers(view0, alg.inlierIdx);
 
 			// Check the results
 			assertEquals(1, view0.inliers.size);
