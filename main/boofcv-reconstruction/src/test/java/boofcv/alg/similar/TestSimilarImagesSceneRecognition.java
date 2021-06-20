@@ -56,6 +56,8 @@ public class TestSimilarImagesSceneRecognition extends GenericLookUpSimilarImage
 	 */
 	@Override public <T extends LookUpSimilarImages> T createFullyLoaded() {
 		var config = new ConfigSimilarImagesSceneRecognition();
+		// Needed to do this because the default assumes a certain number of image features
+		config.minimumSimilar.setRelative(0.1, 0.0);
 
 		// Create the algorithm from a factory since it's so much easier
 		SimilarImagesSceneRecognition<GrayU8, TupleDesc_F32> alg =
@@ -88,6 +90,10 @@ public class TestSimilarImagesSceneRecognition extends GenericLookUpSimilarImage
 	 */
 	@Test void simpleAllTogether() {
 		var config = new ConfigSimilarImagesSceneRecognition();
+		// Needed to do some hacking since the defaults assume there are a bunch of image features
+		config.minimumSimilar.setRelative(0.1, 0.0);
+		config.recognizeNister2006.minimumDepthFromRoot = 0;
+
 		SimilarImagesSceneRecognition<GrayU8, TupleDesc_F32> alg =
 				FactorySceneReconstruction.createSimilarImages(config, ImageType.SB_U8);
 

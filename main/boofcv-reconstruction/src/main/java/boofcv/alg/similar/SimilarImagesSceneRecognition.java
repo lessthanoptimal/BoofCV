@@ -230,7 +230,10 @@ public class SimilarImagesSceneRecognition<Image extends ImageBase<Image>, TD ex
 		int targetFeatureSize = imageFeatureStartIndexes.get(imageIndex*2 + 1);
 
 		// Look up similar images
-		recognizer.query(createFeaturesLambda(imageIndex), filter, limitMatchesConsider, sceneMatches);
+		if (!recognizer.query(createFeaturesLambda(imageIndex), filter, limitMatchesConsider, sceneMatches)) {
+			if (verbose != null) verbose.printf("image[%d] cbir found no matches\n", imageIndex);
+			return;
+		}
 
 		if (verbose != null) verbose.printf("image[%d].cbir_matches.size=%d\n", imageIndex, sceneMatches.size);
 
