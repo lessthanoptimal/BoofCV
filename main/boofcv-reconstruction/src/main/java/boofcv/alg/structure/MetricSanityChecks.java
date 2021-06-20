@@ -24,6 +24,7 @@ import boofcv.abst.geo.bundle.SceneObservations;
 import boofcv.abst.geo.bundle.SceneStructureCommon;
 import boofcv.abst.geo.bundle.SceneStructureMetric;
 import boofcv.alg.distort.brown.RemoveBrownPtoN_F64;
+import boofcv.alg.geo.PerspectiveOps;
 import boofcv.alg.geo.bundle.cameras.BundlePinholeSimplified;
 import boofcv.factory.geo.FactoryMultiView;
 import boofcv.misc.BoofMiscOps;
@@ -159,12 +160,12 @@ public class MetricSanityChecks implements VerbosePrint {
 				Se3_F64 view1_to_view = listMotion.get(viewIdx);
 				SceneWorkingGraph.View w = listViews.get(viewIdx);
 
-				if (foundX.z*foundX.w < 0) {
+				SePointOps_F64.transform(view1_to_view, foundX, viewX);
+				if (PerspectiveOps.isBehindCamera(viewX)) {
 					badObservation = true;
 					failedBehind++;
 				}
 
-				SePointOps_F64.transform(view1_to_view, foundX, viewX);
 				wviewCamera.intrinsic.project(viewX.x, viewX.y, viewX.z, predictdPixel);
 				double reprojectionError = predictdPixel.distance2(listViewPixels.get(viewIdx));
 				if (reprojectionError > maxReprojectionErrorSq) {
@@ -235,7 +236,7 @@ public class MetricSanityChecks implements VerbosePrint {
 			int width = priorCamera.width;
 			int height = priorCamera.height;
 
-			// Used to compoensate for the lens model having its origin at the image center
+			// Used to compensates for the lens model having its origin at the image center
 			float cx = (float)priorCamera.cx;
 			float cy = (float)priorCamera.cy;
 
@@ -258,13 +259,11 @@ public class MetricSanityChecks implements VerbosePrint {
 				worldP.z = p.getZ();
 				if (structure.isHomogenous()) {
 					worldP.w = p.getW();
-					// ignore points at infinity
-					if (worldP.w == 0.0)
-						continue;
 				}
+				// worldP.w = 1 was already set for 3D points
 
 				SePointOps_F64.transform(world_to_view, worldP, viewP);
-				if (viewP.z/viewP.w < 0.0) {
+				if (PerspectiveOps.isBehindCamera(viewP)) {
 					badObservation = true;
 					failedBehind++;
 				}

@@ -232,6 +232,26 @@ public class MockLookupSimilarImagesRealistic implements LookUpSimilarImages {
 		return this;
 	}
 
+	/**
+	 * Create the camera database. There's only one camera for all the views
+	 */
+	public LookUpCameraInfo createLookUpCams() {
+		var dbCams = new LookUpCameraInfo();
+		for (int i = 0; i < views.size(); i++) {
+			dbCams.addView(views.get(i).id, 2);
+			// note everything points to camera 2
+			// This is done to make sure the camera ID is actually used correctly and not using the default of 0
+		}
+		// Add multiple cameras, but only camera 2 has the correct parameters
+		for (int i = 0; i < 5; i++) {
+			double f = 2000*i*20;
+			dbCams.listCalibration.grow().fsetK(f, f, 0, 610, 610, 1000, 1000);
+		}
+		dbCams.listCalibration.get(2).setTo(intrinsic);
+
+		return dbCams;
+	}
+
 	public PairwiseImageGraph createPairwise() {
 		var graph = new PairwiseImageGraph();
 		// Create all the views in the graph

@@ -72,15 +72,17 @@ public class EstimateViewSelfCalibrate implements VerbosePrint {
 
 	PrintStream verbose;
 
-	public EstimateViewSelfCalibrate( PairwiseGraphUtils pairwiseUtils ) {
+	/**
+	 * Estimates the pose and intrinsics of a new view.
+	 *
+	 * @param pairwiseUtils (Input) Pairwise information and specifies which view is to be estimated
+	 * @param workGraph (Input) Information on the metric scene
+	 * @param solution  (Output) Parameters for the new view and its inlier set
+	 * @return true if successful and solution was found
+	 */
+	public boolean process( PairwiseGraphUtils pairwiseUtils,
+							SceneWorkingGraph workGraph, MetricExpandByOneView.Solution solution ) {
 		this.pairwiseUtils = pairwiseUtils;
-	}
-
-	public EstimateViewSelfCalibrate() {
-		this(new PairwiseGraphUtils());
-	}
-
-	public boolean process( SceneWorkingGraph workGraph, MetricExpandByOneView.Solution solution ) {
 		this.workGraph = workGraph;
 		solution.reset();
 

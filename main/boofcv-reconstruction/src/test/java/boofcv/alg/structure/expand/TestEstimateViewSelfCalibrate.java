@@ -20,6 +20,7 @@ package boofcv.alg.structure.expand;
 
 import boofcv.alg.geo.MultiViewOps;
 import boofcv.alg.structure.MockLookupSimilarImagesRealistic;
+import boofcv.alg.structure.PairwiseGraphUtils;
 import boofcv.alg.structure.PairwiseImageGraph;
 import boofcv.misc.BoofMiscOps;
 import boofcv.struct.calib.CameraPinhole;
@@ -49,6 +50,7 @@ public class TestEstimateViewSelfCalibrate extends BoofStandardJUnit {
 
 		var alg = new EstimateViewSelfCalibrate();
 		alg.workGraph = db.createWorkingGraph(pairwise);
+		alg.pairwiseUtils = new PairwiseGraphUtils();
 
 		alg.pairwiseUtils.seed = pairwise.nodes.get(0);
 		alg.pairwiseUtils.viewB = pairwise.nodes.get(1);
