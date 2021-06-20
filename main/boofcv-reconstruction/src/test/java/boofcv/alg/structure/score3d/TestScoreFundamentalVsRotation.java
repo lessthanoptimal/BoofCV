@@ -43,6 +43,8 @@ class TestScoreFundamentalVsRotation extends CommonEpipolarScore3DChecks {
 		ModelMatcher<DMatrixRMaj, AssociatedPair> ransac3D =
 				FactoryMultiViewRobust.fundamentalRansac(new ConfigFundamental(), configRansac);
 
-		return new ScoreFundamentalVsRotation(ransac3D);
+		var alg = new ScoreFundamentalVsRotation(ransac3D);
+		alg.inlierErrorTol = configRansac.inlierThreshold;
+		return alg;
 	}
 }
