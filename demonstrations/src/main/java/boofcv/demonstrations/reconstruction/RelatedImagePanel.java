@@ -59,7 +59,7 @@ public class RelatedImagePanel extends JPanel {
 
 	JScrollPane gridScrollPanel;
 
-	public int numPreviewColumns=3;
+	public int numPreviewColumns = 3;
 
 	public RelatedImagePanel() {
 		setLayout(new BorderLayout());
@@ -99,7 +99,6 @@ public class RelatedImagePanel extends JPanel {
 
 		mainImage.clear();
 		relatedImages.reset();
-
 	}
 
 	public void setMainImage( String label, BufferedImage image, List<Point2D_F64> features ) {
@@ -129,7 +128,6 @@ public class RelatedImagePanel extends JPanel {
 
 	public void setAssociations( String label, List<AssociatedIndex> indexes, boolean mainIsSrc ) {
 		BoofSwingUtil.checkGuiThread();
-
 	}
 
 	BufferedImage scaleToPreview( BufferedImage original ) {
@@ -197,7 +195,7 @@ public class RelatedImagePanel extends JPanel {
 		}
 	}
 
-	class VisualizeImage extends ImagePanel {
+	static class VisualizeImage extends ImagePanel {
 		ImageDimension dbShape = new ImageDimension();
 		DogArray<Point2D_F64> features = new DogArray<>(Point2D_F64::new);
 
@@ -224,7 +222,7 @@ public class RelatedImagePanel extends JPanel {
 		}
 
 		public void clear() {
-			dbShape.setTo(0,0);
+			dbShape.setTo(0, 0);
 			features.reset();
 			imageID = "";
 		}

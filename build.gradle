@@ -148,6 +148,9 @@ subprojects {
         // needed to use Java 11+ syntax with Java 1.8 byte code
         annotationProcessor('com.github.bsideup.jabel:jabel-javac-plugin:0.3.0')
         noautoAnnotationProcessor('com.github.bsideup.jabel:jabel-javac-plugin:0.3.0')
+        testAnnotationProcessor('com.github.bsideup.jabel:jabel-javac-plugin:0.3.0')
+        benchmarkAnnotationProcessor('com.github.bsideup.jabel:jabel-javac-plugin:0.3.0')
+        generateAnnotationProcessor('com.github.bsideup.jabel:jabel-javac-plugin:0.3.0')
 
         annotationProcessor "org.projectlombok:lombok:${project.lombok_version}"  // @Getter @Setter
         noautoAnnotationProcessor "org.projectlombok:lombok:${project.lombok_version}"  // @Getter @Setter
