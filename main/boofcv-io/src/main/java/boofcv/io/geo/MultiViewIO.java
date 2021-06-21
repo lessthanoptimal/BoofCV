@@ -33,6 +33,8 @@ import boofcv.struct.feature.AssociatedIndex;
 import boofcv.struct.image.ImageDimension;
 import georegression.struct.point.Point2D_F64;
 import georegression.struct.se.Se3_F64;
+import gnu.trove.map.TObjectIntMap;
+import gnu.trove.map.hash.TObjectIntHashMap;
 import org.ddogleg.struct.DogArray;
 import org.ddogleg.struct.DogArray_I32;
 import org.ddogleg.struct.FastAccess;
@@ -84,17 +86,23 @@ public class MultiViewIO {
 
 		// Storage for image information
 		List<Map<String, Object>> imageInfo = new ArrayList<>();
-		ImageDimension shape = new ImageDimension();
 		DogArray<Point2D_F64> features = new DogArray<>(Point2D_F64::new);
+		DogArray<AssociatedIndex> matches = new DogArray<>(AssociatedIndex::new);
 
+		// Create a look up table from view ID to index in array. Only need to save associations of lower views
+		TObjectIntMap<String> viewToIndex = new TObjectIntHashMap<>();
 		for (int i = 0; i < imageIds.size(); i++) {
-			List<String> similarImages = new ArrayList<>();
+			viewToIndex.put(imageIds.get(i), i);
+		}
 
-			String id = imageIds.get(i);
+		for (int viewIndex = 0; viewIndex < imageIds.size(); viewIndex++) {
+			String id = imageIds.get(viewIndex);
 
+			// Map contaiing all the data related to this image/view
+			Map<String, Object> imageMap = new HashMap<>();
+
+			// Add the list of features in this image
 			db.lookupPixelFeats(id, features);
-			db.findSimilar(id, ( s ) -> true, similarImages);
-
 			// Flatten the pixels into an array for easy storage
 			double[] pixels = new double[features.size*2];
 			for (int j = 0; j < features.size; j++) {
@@ -103,12 +111,33 @@ public class MultiViewIO {
 				pixels[j*2 + 1] = p.y;
 			}
 
-			Map<String, Object> imageMap = new HashMap<>();
-			imageMap.put("width", shape.width);
-			imageMap.put("height", shape.height);
-			imageMap.put("similar", similarImages);
-			imageMap.put("features", pixels);
+			List<String> similarIds = new ArrayList<>();
+			db.findSimilar(id, ( s ) -> true, similarIds);
 
+			// Create the list of views its similar to and the feature pairs between the two views
+			List<Map<String, Object>> listRelated = new ArrayList<>();
+			for (int similarIdx = 0; similarIdx < similarIds.size(); similarIdx++) {
+				// don't need to save the same information twice
+				int similarViewIndex = viewToIndex.get(similarIds.get(similarIdx));
+				if (similarViewIndex < viewIndex)
+					continue;
+
+				db.lookupAssociated(similarIds.get(similarIdx), matches);
+				Map<String, Object> relationship = new HashMap<>();
+				int[] matchesIndexes = new int[matches.size*2];
+				for (int j = 0; j < matches.size; j++) {
+					AssociatedIndex p = matches.get(j);
+					matchesIndexes[j*2] = p.src;
+					matchesIndexes[j*2 + 1] = p.dst;
+				}
+
+				relationship.put("id", similarIds.get(similarIdx));
+				relationship.put("pairs", matchesIndexes);
+				listRelated.add(relationship);
+			}
+
+			imageMap.put("features", pixels);
+			imageMap.put("similar", listRelated);
 			imageInfo.add(imageMap);
 		}
 
@@ -444,13 +473,11 @@ public class MultiViewIO {
 
 			BoofMiscOps.checkEq(listImages.size(), yamlInfo.size());
 
+			// Add all the images
 			for (int imageIdx = 0; imageIdx < listImages.size(); imageIdx++) {
 				String id = listImages.get(imageIdx);
 				Map<String, Object> yamlImage = yamlInfo.get(imageIdx);
 
-				int width = (int)yamlImage.get("width");
-				int height = (int)yamlImage.get("height");
-				List<String> similar = getOrThrow(yamlImage, "similar");
 				List<Double> yamlPixels = getOrThrow(yamlImage, "features");
 				features.resize(yamlPixels.size()/2);
 				for (int i = 0; i < yamlPixels.size(); i += 2) {
@@ -459,8 +486,30 @@ public class MultiViewIO {
 					features.get(i/2).setTo(x, y);
 				}
 
-				ret.add(id, width, height, features.toList(), similar);
+				ret.add(id, features.toList());
 			}
+
+			// Add the relationships
+			var pairs = new DogArray<>(AssociatedIndex::new);
+			for (int imageIdx = 0; imageIdx < listImages.size(); imageIdx++) {
+				String id = listImages.get(imageIdx);
+				Map<String, Object> yamlImage = yamlInfo.get(imageIdx);
+
+				List<Map<String, Object>> listSimilar = getOrThrow(yamlImage, "similar");
+				for (int i = 0; i < listSimilar.size(); i++) {
+					Map<String, Object> yamlSimilar = listSimilar.get(i);
+					String similarID = getOrThrow(yamlSimilar, "id");
+					List<Integer> yamlPairs = getOrThrow(yamlSimilar, "pairs");
+
+					pairs.resetResize(yamlPairs.size()/2);
+					for (int j = 0; j < pairs.size; j++) {
+						pairs.get(j).setTo(yamlPairs.get(j*2), yamlPairs.get(j*2+1));
+					}
+					ret.setRelationship(id, similarID, pairs.toList());
+				}
+			}
+
+
 		} catch (IOException e) {
 			throw new UncheckedIOException(e);
 		}
