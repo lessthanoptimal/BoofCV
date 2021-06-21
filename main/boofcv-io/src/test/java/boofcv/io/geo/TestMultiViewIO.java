@@ -26,7 +26,6 @@ import boofcv.alg.structure.LookUpSimilarImages;
 import boofcv.alg.structure.PairwiseImageGraph;
 import boofcv.alg.structure.SceneWorkingGraph;
 import boofcv.struct.feature.AssociatedIndex;
-import boofcv.struct.image.ImageDimension;
 import boofcv.testing.BoofStandardJUnit;
 import georegression.struct.point.Point2D_F64;
 import georegression.struct.se.SpecialEuclideanOps_F64;
@@ -56,18 +55,20 @@ class TestMultiViewIO extends BoofStandardJUnit {
 		SimilarImagesData expected = new SimilarImagesData();
 		for (int i = 0; i < 4; i++) {
 			String id = "" + i;
-			int width = 10;
-			int height = 11 + i;
 
-			List<String> similar = new ArrayList<>();
-			similar.add("foo");
 			List<Point2D_F64> features = new ArrayList<>();
 			for (int j = 0; j < 4 + i; j++) {
 				features.add(new Point2D_F64(i + j, 1));
 			}
 
-			expected.add(id, width, height, features, similar);
+			expected.add(id, features);
 		}
+
+		var matches12 = new ArrayList<AssociatedIndex>();
+		for (int i = 0; i < 8; i++) {
+			matches12.add( new AssociatedIndex(rand.nextInt(), rand.nextInt()));
+		}
+		expected.setRelationship("2","1", matches12);
 
 		var output = new ByteArrayOutputStream();
 		MultiViewIO.save(expected, new OutputStreamWriter(output, UTF_8));
@@ -79,19 +80,31 @@ class TestMultiViewIO extends BoofStandardJUnit {
 		assertEquals(expected.listImages.size(), found.getImageIDs().size());
 
 		DogArray<Point2D_F64> features = new DogArray<>(Point2D_F64::new);
-		ImageDimension shape = new ImageDimension();
+		DogArray<AssociatedIndex> pairs = new DogArray<>(AssociatedIndex::new);
+
 		for (String id : expected.listImages) {
 			int i = Integer.parseInt(id);
-			
-			assertEquals(10, shape.width);
-			assertEquals(11 + i, shape.height);
-
-			List<String> similar = new ArrayList<>();
-			found.findSimilar(id, ( s ) -> true, similar);
-			assertEquals(1, similar.size());
 
 			found.lookupPixelFeats(id, features);
 			assertEquals(4 + i, features.size);
+
+
+		}
+
+		for (String id : expected.listImages) {
+			int i = Integer.parseInt(id);
+
+			List<String> similarIds = new ArrayList<>();
+			found.findSimilar(id, ( s ) -> true, similarIds);
+
+			if (i != 2 && i != 1) {
+				assertEquals(0, similarIds.size());
+				continue;
+			}
+
+			assertEquals(1, similarIds.size());
+			found.lookupAssociated(similarIds.get(0), pairs);
+			assertEquals(8, pairs.size());
 		}
 	}
 
