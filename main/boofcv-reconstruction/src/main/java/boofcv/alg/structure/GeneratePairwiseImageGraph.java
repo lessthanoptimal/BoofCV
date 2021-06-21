@@ -147,8 +147,7 @@ public class GeneratePairwiseImageGraph implements VerbosePrint {
 		DMatrixRMaj fundamental = new DMatrixRMaj(3, 3);
 		DogArray_I32 inlierIdx = new DogArray_I32();
 
-		// no new line since epipolarScore should print something about this pair
-		if (verbose != null) verbose.printf("_ createEdge['%s'] -> '%s'  ", src, dst);
+		if (verbose != null) verbose.printf("_ createEdge['%s'] -> '%s'\n", src, dst);
 
 		// Retrieve any prior information on the cameras
 		dbCams.lookupCalibration(src, priorA);
