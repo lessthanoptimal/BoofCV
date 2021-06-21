@@ -3,7 +3,7 @@ dependencies {
 	api project(':main:boofcv-feature')
 	api project(':main:boofcv-geo')
 
-	['main','models'].each {String a ->
+	['main','models','io'].each {String a ->
 		api( group: 'org.deepboof', name: a, version: project.deepboof_version) {
 			exclude group: 'com.thoughtworks.xstream'
 			exclude group: 'org.ddogleg'
