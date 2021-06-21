@@ -32,6 +32,7 @@ class TestProjectiveToMetricCameraPracticalGuessAndCheck extends CommonProjectiv
 		noiseSigma = 0.1;
 	}
 
+	@Override
 	@Test void noisy_one_camera_three_views() {
 		// Test does not pass unless noise is removed
 		noiseSigma = 0.0;
