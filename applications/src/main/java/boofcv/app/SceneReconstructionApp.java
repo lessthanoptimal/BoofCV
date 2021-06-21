@@ -61,6 +61,7 @@ import georegression.metric.UtilAngle;
 import georegression.struct.point.Point3D_F64;
 import georegression.struct.so.Rodrigues_F64;
 import gnu.trove.map.hash.TIntObjectHashMap;
+import org.ddogleg.DDoglegConcurrency;
 import org.ddogleg.struct.DogArray;
 import org.ddogleg.struct.DogArray_I32;
 import org.jetbrains.annotations.NotNull;
@@ -163,6 +164,9 @@ public class SceneReconstructionApp {
 			System.err.println("No inputs found. Bad path or pattern? " + inputPattern);
 			System.exit(-1);
 		}
+
+		// This will make SBA concurrent
+		DDoglegConcurrency.USE_CONCURRENT = true;
 
 		// Create the output directory if it doesn't exist
 		UtilIO.mkdirs(new File(outputPath), deleteOutput);
