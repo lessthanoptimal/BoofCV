@@ -19,11 +19,8 @@
 package boofcv.alg.structure.expand;
 
 import boofcv.BoofTesting;
-import boofcv.alg.geo.bundle.BundleAdjustmentOps;
-import boofcv.alg.structure.MockLookUpCameraInfo;
-import boofcv.alg.structure.MockLookupSimilarImagesRealistic;
-import boofcv.alg.structure.PairwiseImageGraph;
-import boofcv.alg.structure.SceneWorkingGraph;
+import boofcv.alg.geo.bundle.cameras.BundlePinholeSimplified;
+import boofcv.alg.structure.*;
 import boofcv.struct.calib.CameraPinhole;
 import boofcv.testing.BoofStandardJUnit;
 import org.junit.jupiter.api.Test;
@@ -45,14 +42,16 @@ class TestMetricExpandByOneView extends BoofStandardJUnit {
 		var dbSimilar = new MockLookupSimilarImagesRealistic().
 				setIntrinsic(new CameraPinhole(400, 400, 0, 400, 400, 800, 800)).
 				pathLine(5, 0.3, 1.5, 2);
-		var dbCams = new MockLookUpCameraInfo(dbSimilar.intrinsic);
+		LookUpCameraInfo dbCams = dbSimilar.createLookUpCams();
 		var alg = new MetricExpandByOneView();
 
 		// Perfect without SBA - Will normally not be done this way, but with perfect data it should return
 		// perfect results and will highlight bugs that might be hidden by SBA
 		alg.utils.configConvergeSBA.maxIterations = 0;
 		for (int i = 0; i < 5; i++) {
-			checkPerfect(dbSimilar, dbCams, alg, false, i);
+			// alternate the camera being known to test both situations
+			boolean knownCamera = i%2 == 0;
+			checkPerfect(dbSimilar, dbCams, alg, knownCamera, i);
 		}
 
 		// Turn SBA back on and estimate each of the views after leaving them out one at a time
@@ -71,22 +70,23 @@ class TestMetricExpandByOneView extends BoofStandardJUnit {
 		var dbSimilar = new MockLookupSimilarImagesRealistic().
 				setIntrinsic(new CameraPinhole(400, 400, 0, 400, 400, 800, 800)).
 				pathLine(5, 0.3, 1.5, 2);
-		var dbCams = new MockLookUpCameraInfo(dbSimilar.intrinsic);
+		LookUpCameraInfo dbCams = dbSimilar.createLookUpCams();
 		var alg = new MetricExpandByOneView();
 
 		checkPerfect(dbSimilar, dbCams, alg, true, 0);
 	}
 
 	private void checkPerfect( MockLookupSimilarImagesRealistic dbSimilar,
-							   MockLookUpCameraInfo dbCams,
+							   LookUpCameraInfo dbCams,
 							   MetricExpandByOneView alg, boolean cameraKnown, int targetViewIdx ) {
 		PairwiseImageGraph pairwise = dbSimilar.createPairwise();
 		SceneWorkingGraph workGraph = dbSimilar.createWorkingGraph(pairwise);
 
-		if (cameraKnown) {
-			SceneWorkingGraph.Camera c = workGraph.addCamera(0);
-			BundleAdjustmentOps.convert(dbSimilar.intrinsic, c.intrinsic);
-			c.prior.setTo(dbSimilar.intrinsic);
+		if (!cameraKnown) {
+			// The target view will now reference camera 0, the default is camera 2
+			dbCams.viewToCamera.set(targetViewIdx, 0);
+			// Change 0 will now have correct prior information
+			dbCams.listCalibration.get(0).setTo(dbSimilar.intrinsic);
 		}
 
 		// Decide which view will be estimated
@@ -98,22 +98,19 @@ class TestMetricExpandByOneView extends BoofStandardJUnit {
 		// add the target view
 		assertTrue(alg.process(dbSimilar, dbCams, workGraph, target));
 
-		// Check calibration
-		workGraph.listCameras.forEach(c -> {
-			assertEquals(dbSimilar.intrinsic.fx, c.intrinsic.f, 1e-4);
-			assertEquals(dbSimilar.intrinsic.fy, c.intrinsic.f, 1e-4);
-		});
+		BundlePinholeSimplified foundCamera = workGraph.listCameras.get(cameraKnown?0:1).intrinsic;
+		if (cameraKnown) {
+			// If known the camera should never be modified
+			assertEquals(dbSimilar.intrinsic.fx, foundCamera.f, 0.0);
+		} else {
+			// If unknown, then the camera should be close to but not exactly truth
+			assertEquals(dbSimilar.intrinsic.fx, foundCamera.f, 1e-4);
+			assertNotEquals(dbSimilar.intrinsic.fx, foundCamera.f, 0.0);
+		}
 
 		// Check pose
 		SceneWorkingGraph.View found = workGraph.views.get(target.id);
 		BoofTesting.assertEquals(dbSimilar.views.get(targetViewIdx).world_to_view, found.world_to_view, 0.01, 0.01);
-	}
-
-	/**
-	 * Perfect inputs that should yield perfect results. Camera is known/calibrated.
-	 */
-	@Test void perfect_Calibrated() {
-		fail("Implement");
 	}
 
 	/**
@@ -151,12 +148,5 @@ class TestMetricExpandByOneView extends BoofStandardJUnit {
 		// This should fail and not add it to the work graph
 		assertFalse(alg.process(dbSimilar, dbCams, workGraph, target));
 		assertFalse(workGraph.isKnown(target));
-	}
-
-	/**
-	 * Make sure the local optimization doesn't update any global intrinsic parameters
-	 */
-	@Test void globalIntrinsicsNotModified() {
-		fail("Implement");
 	}
 }

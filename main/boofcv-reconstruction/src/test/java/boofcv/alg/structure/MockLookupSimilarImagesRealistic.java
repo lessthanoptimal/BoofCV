@@ -54,6 +54,8 @@ public class MockLookupSimilarImagesRealistic implements LookUpSimilarImages {
 	public Random rand = BoofTesting.createRandom(3);
 	public boolean loop = true;
 
+	public int defaultCameraID = 2;
+
 	// recent query image for findSimilar()
 	String queryID;
 
@@ -302,7 +304,7 @@ public class MockLookupSimilarImagesRealistic implements LookUpSimilarImages {
 	public SceneWorkingGraph createWorkingGraph( PairwiseImageGraph pairwise ) {
 		var working = new SceneWorkingGraph();
 
-		SceneWorkingGraph.Camera c = working.addCamera(2);
+		SceneWorkingGraph.Camera c = working.addCamera(defaultCameraID);
 		c.prior.setTo(intrinsic);
 		BundleAdjustmentOps.convert(intrinsic, c.intrinsic);
 
@@ -311,7 +313,7 @@ public class MockLookupSimilarImagesRealistic implements LookUpSimilarImages {
 		BoofMiscOps.forIdx(working.listViews, ( i, v ) -> v.projective.setTo(views.get(i).camera));
 		BoofMiscOps.forIdx(working.listViews, ( i, v ) -> v.world_to_view.setTo(views.get(i).world_to_view));
 		BoofMiscOps.forIdx(working.listViews, ( i, v ) -> v.index = i);
-
+		BoofMiscOps.forIdx(working.listViews, ( i, v ) -> v.cameraIdx = c.localIndex);
 		return working;
 	}
 

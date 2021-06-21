@@ -28,6 +28,7 @@ import org.jetbrains.annotations.Nullable;
 import java.io.PrintStream;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.Set;
 
 import static boofcv.misc.BoofMiscOps.checkTrue;
@@ -165,36 +166,68 @@ public class MetricExpandByOneView extends ExpandByOneView {
 		}
 
 		if (verbose != null) {
-			verbose.printf("calibrated.size=%d unknown.size=%d : triples.size=%d\n", solutionCalibrated.commonFeatureIndexes.size, solutionUnknown.commonFeatureIndexes.size, utils.inliersThreeView.size);
-			verbose.printf("calibrated: T=(%.2f %.2f %.2f) f=%.1f\n", solutionCalibrated.world_to_target.T.x, solutionCalibrated.world_to_target.T.y, solutionCalibrated.world_to_target.T.z, solutionCalibrated.intrinsic.f);
-			verbose.printf("unknown:    T=(%.2f %.2f %.2f) f=%.1f\n", solutionUnknown.world_to_target.T.x, solutionUnknown.world_to_target.T.y, solutionUnknown.world_to_target.T.z, solutionUnknown.intrinsic.f);
+			printSolutionSummary();
 		}
 
-		MetricExpandByOneView.Solution solutionBest;
-	 	if (solutionCalibrated.commonFeatureIndexes.size >= solutionUnknown.commonFeatureIndexes.size*overfitHandyCap) {
-			solutionBest = solutionCalibrated;
-			if (verbose != null) verbose.println("Selected calibrated");
-		} else {
-			solutionBest = solutionUnknown;
-			if (verbose != null) verbose.println("Selected unknown");
-		}
+		Solution solutionBest = selectBestSolution();
 
-	 	// Create the camera if it's unknown
+		addNewViewToWorkGraph(dbCam, workGraph, target, cameraIndexDB, solutionBest);
+
+		return true;
+	}
+
+	private void printSolutionSummary() {
+		PrintStream verbose = Objects.requireNonNull(this.verbose);
+
+		Se3_F64 calibrated = solutionCalibrated.world_to_target;
+		Se3_F64 unknown = solutionUnknown.world_to_target;
+		verbose.printf("calibrated.size=%d unknown.size=%d : triples.size=%d\n",
+				solutionCalibrated.commonFeatureIndexes.size, solutionUnknown.commonFeatureIndexes.size, utils.inliersThreeView.size);
+		verbose.printf("calibrated: T=(%.2f %.2f %.2f) f=%.1f\n",
+				calibrated.T.x, calibrated.T.y, calibrated.T.z, solutionCalibrated.intrinsic.f);
+		verbose.printf("unknown:    T=(%.2f %.2f %.2f) f=%.1f\n",
+				unknown.T.x, unknown.T.y, unknown.T.z, solutionUnknown.intrinsic.f);
+	}
+
+	/**
+	 * Successfully found the view's parameters. Add it to the work graph
+	 */
+	private void addNewViewToWorkGraph( LookUpCameraInfo dbCam, SceneWorkingGraph workGraph,
+										PairwiseImageGraph.View target, int cameraIndexDB,
+										Solution solution ) {
+
+
+		// Create the camera if it's unknown
 		SceneWorkingGraph.Camera camera = workGraph.cameras.get(cameraIndexDB);
 		if (camera == null) {
 			camera = workGraph.addCamera(cameraIndexDB);
-			camera.intrinsic.setTo(solutionBest.intrinsic);
+			camera.intrinsic.setTo(solution.intrinsic);
 			dbCam.lookupCalibration(cameraIndexDB, camera.prior);
 		}
 
 		// Now that the pose of the new view is known, add it ot the scene
 		SceneWorkingGraph.View wtarget = workGraph.addView(target, camera);
-		wtarget.world_to_view.setTo(solutionBest.world_to_target);
+		wtarget.world_to_view.setTo(solution.world_to_target);
 
 		// Save the inlier set
-		utils.saveRansacInliers(wtarget, solutionBest.commonFeatureIndexes);
+		utils.saveRansacInliers(wtarget, solution.commonFeatureIndexes);
+	}
 
-		return true;
+	/**
+	 * Selects the best solution to the view's parameters based on number of inliers with a preference for the
+	 * solution based on prior info.
+	 */
+	private Solution selectBestSolution() {
+		Solution solutionBest;
+		if (solutionCalibrated.commonFeatureIndexes.size >=
+				solutionUnknown.commonFeatureIndexes.size*overfitHandyCap) {
+		   solutionBest = solutionCalibrated;
+		   if (verbose != null) verbose.println("Selected calibrated");
+	   } else {
+		   solutionBest = solutionUnknown;
+		   if (verbose != null) verbose.println("Selected unknown");
+	   }
+		return solutionBest;
 	}
 
 	/**
