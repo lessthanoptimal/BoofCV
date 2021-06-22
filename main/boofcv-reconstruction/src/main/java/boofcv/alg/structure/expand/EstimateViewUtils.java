@@ -250,6 +250,12 @@ public class EstimateViewUtils {
 	public RemoveResults removedBadFeatures( PairwiseGraphUtils utils,
 											 double fractionBadFeaturesRecover,
 											 @Nullable PrintStream verbose ) {
+		if (verbose != null) {
+			verbose.printf("prior: A={fx=%.1f cx=%.1f %.1f} B={fx=%.1f cx=%.1f %.1f} C={fx=%.1f cx=%.1f %.1f}\n",
+					utils.priorCamA.fx, utils.priorCamA.cx, utils.priorCamA.cy,
+					utils.priorCamB.fx, utils.priorCamB.cx, utils.priorCamB.cy,
+					utils.priorCamC.fx, utils.priorCamC.cx, utils.priorCamC.cy);
+		}
 		listPriorCameras.clear();
 		listPriorCameras.add(utils.priorCamA);
 		listPriorCameras.add(utils.priorCamB);

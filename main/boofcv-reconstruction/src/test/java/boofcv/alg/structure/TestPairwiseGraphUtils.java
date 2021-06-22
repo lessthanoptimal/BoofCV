@@ -215,14 +215,14 @@ class TestPairwiseGraphUtils extends BoofStandardJUnit {
 		alg.viewC = dbSimilar.graph.nodes.get(3);
 
 		// common is empty
-		alg.createTripleFromCommon();
+		alg.createTripleFromCommon(null);
 		assertEquals(0, alg.matchesTriple.size);
 
 		// one element
 		alg.table_A_to_B.add(1);
 		alg.table_A_to_C.add(5);
 		alg.commonIdx.add(0);
-		alg.createTripleFromCommon();
+		alg.createTripleFromCommon(null);
 		assertEquals(1, alg.matchesTriple.size);
 		// undo the shift in pixel coordinates
 		for (int i = 0; i < 3; i++) {
@@ -237,7 +237,7 @@ class TestPairwiseGraphUtils extends BoofStandardJUnit {
 		alg.table_A_to_B.add(2);
 		alg.table_A_to_C.add(2);
 		alg.commonIdx.add(1);
-		alg.createTripleFromCommon();
+		alg.createTripleFromCommon(null);
 		assertEquals(2, alg.matchesTriple.size);
 	}
 
@@ -288,7 +288,7 @@ class TestPairwiseGraphUtils extends BoofStandardJUnit {
 		// Create boilerplate input for RANSAC
 		alg.createThreeViewLookUpTables();
 		alg.findFullyConnectedTriple();
-		alg.createTripleFromCommon();
+		alg.createTripleFromCommon(null);
 
 		// Simple test where we see how many inliers there are
 		assertTrue(alg.estimateProjectiveCamerasRobustly());

@@ -47,7 +47,9 @@ import org.ddogleg.struct.DogArray_I32;
 import org.ddogleg.struct.FastArray;
 import org.ejml.data.DMatrixRMaj;
 import org.ejml.dense.row.CommonOps_DDRM;
+import org.jetbrains.annotations.Nullable;
 
+import java.io.PrintStream;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -231,11 +233,18 @@ public class PairwiseGraphUtils {
 	/**
 	 * Convert triple from indexes into coordinates
 	 */
-	public void createTripleFromCommon() {
+	public void createTripleFromCommon( @Nullable PrintStream verbose ) {
 		// Camera info for each view
 		dbCams.lookupCalibration(dbCams.viewToCamera(seed.id), priorCamA);
 		dbCams.lookupCalibration(dbCams.viewToCamera(viewB.id), priorCamB);
 		dbCams.lookupCalibration(dbCams.viewToCamera(viewC.id), priorCamC);
+
+		if (verbose != null) {
+			verbose.printf("prior: A={fx=%.1f cx=%.1f %.1f} B={fx=%.1f cx=%.1f %.1f} C={fx=%.1f cx=%.1f %.1f}\n",
+					priorCamA.fx, priorCamA.cx, priorCamA.cy,
+					priorCamB.fx, priorCamB.cx, priorCamB.cy,
+					priorCamC.fx, priorCamC.cx, priorCamC.cy);
+		}
 
 		// Get coordinates of features in each view
 		dbSimilar.lookupPixelFeats(seed.id, featsA);

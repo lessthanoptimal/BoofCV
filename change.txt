@@ -72,10 +72,12 @@ Version : 0.38
   * Added PointTracker.getImageType() so you know what type of image it requires
 
 TODO DB
-    - Metric: Use prior camera when spawning and another hypothesis
+    - Check all views when merging scenes for consistency
+    - Root cause why it diverges if you consider too many images
     - Metric: Expand using 2-views
     - Metric: Initialize using 2-views
     - Ransac: Tell it the minimum threshold and abort early if it can't be meet?
+    - Ransac: Specify max iterations using probability instead?
 
 TODO Uncalibrated Stereo: Figure out why it seems to select an invalid solution when it got almost everything right.
 TODO NonMaximum: consider making radius ConfigLength and relative to sqrt(pixels)

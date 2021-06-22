@@ -149,8 +149,8 @@ public class ScoreRatioFundamentalHomography implements EpipolarScore3D {
 		return is3D;
 	}
 
-	@Override public void setVerbose( @Nullable PrintStream verbose, @Nullable Set<String> options ) {
-		this.verbose = BoofMiscOps.addPrefix(this, verbose);
+	@Override public void setVerbose( @Nullable PrintStream out, @Nullable Set<String> options ) {
+		this.verbose = BoofMiscOps.addPrefix(this, out);
 	}
 
 	/**

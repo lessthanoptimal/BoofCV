@@ -45,6 +45,7 @@ import org.jetbrains.annotations.Nullable;
 
 import java.io.PrintStream;
 import java.util.List;
+import java.util.Objects;
 import java.util.Set;
 
 import static boofcv.misc.BoofMiscOps.checkTrue;
@@ -174,7 +175,7 @@ public class ProjectiveInitializeAllCommon implements VerbosePrint {
 		}
 
 		// Estimate the initial projective cameras using trifocal tensor
-		utils.createTripleFromCommon();
+		utils.createTripleFromCommon(verbose);
 		if (!utils.estimateProjectiveCamerasRobustly()) {
 			if (verbose != null) verbose.println("FAILED: Created projective from initial triplet");
 			return false;
@@ -319,8 +320,8 @@ public class ProjectiveInitializeAllCommon implements VerbosePrint {
 	 * @return higher is better. zero means worthless
 	 */
 	double scoreTripleView( View seedA, View viewB, View viewC ) {
-		Motion motionAB = seedA.findMotion(viewB);
-		Motion motionAC = seedA.findMotion(viewC);
+		Motion motionAB = Objects.requireNonNull(seedA.findMotion(viewB));
+		Motion motionAC = Objects.requireNonNull(seedA.findMotion(viewC));
 		Motion motionBC = viewB.findMotion(viewC);
 		if (motionBC == null)
 			return 0.0;
@@ -554,6 +555,6 @@ public class ProjectiveInitializeAllCommon implements VerbosePrint {
 
 	@Override
 	public void setVerbose( @Nullable PrintStream out, @Nullable Set<String> configuration ) {
-		this.verbose = out;
+		this.verbose = BoofMiscOps.addPrefix(this, out);
 	}
 }
