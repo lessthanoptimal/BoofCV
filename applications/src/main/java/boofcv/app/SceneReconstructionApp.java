@@ -391,7 +391,7 @@ public class SceneReconstructionApp {
 	private void computePairwise() {
 		GeneratePairwiseImageGraph generatePairwise = FactorySceneReconstruction.generatePairwise(configPairwise);
 		BoofMiscOps.profile(() -> {
-			generatePairwise.setVerbose(out, null);
+			generatePairwise.setVerbose(out, BoofMiscOps.hashSet(BoofVerbose.RECURSIVE));
 			generatePairwise.process(dbSimilar, dbCams);
 		}, "Created Pairwise graph");
 		pairwise = generatePairwise.getGraph();

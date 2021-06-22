@@ -66,12 +66,6 @@ public class LoadFileImageSequence2<T extends ImageBase<T>> implements SimpleIma
 
 		image = type.createImage(0, 0);
 		work = type.createImage(0, 0);
-
-		if (paths.isEmpty())
-			return;
-
-		// Load the first image so that image has a correct size
-		loadImage(paths.get(0));
 	}
 
 	@Override
@@ -85,11 +79,21 @@ public class LoadFileImageSequence2<T extends ImageBase<T>> implements SimpleIma
 
 	@Override
 	public int getWidth() {
+		// lazy determining of size because the user could have set targetPixels after calling constructor
+		if (image.width == 0) {
+			// Load the first image so that image has a correct size
+			loadImage(paths.get(0));
+		}
 		return image.getWidth();
 	}
 
 	@Override
 	public int getHeight() {
+		// lazy determining of size because the user could have set targetPixels after calling constructor
+		if (image.width == 0) {
+			// Load the first image so that image has a correct size
+			loadImage(paths.get(0));
+		}
 		return image.getHeight();
 	}
 

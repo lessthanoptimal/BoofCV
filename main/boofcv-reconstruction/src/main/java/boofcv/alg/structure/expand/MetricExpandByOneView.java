@@ -123,7 +123,7 @@ public class MetricExpandByOneView extends ExpandByOneView {
 		}
 
 		// Estimate trifocal tensor using three view observations
-		utils.createTripleFromCommon();
+		utils.createTripleFromCommon(verbose);
 		if (!utils.estimateProjectiveCamerasRobustly())
 			return false;
 		if (verbose != null) verbose.println("Trifocal RANSAC inliers.size=" + utils.inliersThreeView.size());
