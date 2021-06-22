@@ -50,7 +50,7 @@ import java.util.Set;
  *
  * @author Peter Abeles
  */
-public class EstimateViewKnownTarget implements VerbosePrint {
+public class EstimateViewKnownCalibration implements VerbosePrint {
 	// Contains functions for working with pairwise graph AND information for which view is being estimated
 	PairwiseGraphUtils pairwiseUtils;
 
@@ -87,7 +87,7 @@ public class EstimateViewKnownTarget implements VerbosePrint {
 
 	PrintStream verbose;
 
-	public EstimateViewKnownTarget() {
+	public EstimateViewKnownCalibration() {
 		defaultConfiguration();
 	}
 

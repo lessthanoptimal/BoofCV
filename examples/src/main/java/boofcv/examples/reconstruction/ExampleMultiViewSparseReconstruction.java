@@ -304,14 +304,9 @@ public class ExampleMultiViewSparseReconstruction {
 		System.out.println("----------------------------------------------------------------------------");
 		System.out.println("### Creating Pairwise");
 		var config = new ConfigGeneratePairwiseImageGraph();
-		// TODO make default?
-//		config.score.type = ConfigEpipolarScore3D.Type.FUNDAMENTAL_COMPATIBLE;
-//		config.score.typeCompatible.minimumInliers.setRelative(0.4, 40);
-//		config.score.typeCompatible.maxRatioScore = 10.0; // TODO make default?
-//		config.score.ransacF.inlierThreshold = 2.0;
 		GeneratePairwiseImageGraph generatePairwise = FactorySceneReconstruction.generatePairwise(config);
 		BoofMiscOps.profile(() -> {
-			generatePairwise.setVerbose(System.out, null);
+			generatePairwise.setVerbose(System.out, BoofMiscOps.hashSet(BoofVerbose.RECURSIVE));
 			generatePairwise.process(dbSimilar, dbCams);
 		}, "Created Pairwise graph");
 		pairwise = generatePairwise.getGraph();
