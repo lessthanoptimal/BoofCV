@@ -259,7 +259,7 @@ public class ProjectiveToMetricCameraDualQuadratic implements ProjectiveToMetric
 			cameraCounts.data[info.cameraID]++;
 
 			if (verbose != null) {
-				verbose.printf("before[%d] fx=%.1f fy=%.1f skew=%.2f\n", i, estimated.fx, estimated.fy, estimated.skew);
+				verbose.printf("view[%d] fx=%.1f fy=%.1f skew=%.2f\n", i, estimated.fx, estimated.fy, estimated.skew);
 			}
 		}
 
@@ -281,7 +281,7 @@ public class ProjectiveToMetricCameraDualQuadratic implements ProjectiveToMetric
 		if (verbose != null) {
 			for (int i = 0; i < numCameras; i++) {
 				CameraPinhole cam = workCameras.get(i);
-				verbose.printf("merged[%d] fx=%.1f fy=%.1f skew=%.2f, count=%d\n",
+				verbose.printf("camera[%d] fx=%.1f fy=%.1f skew=%.2f, count=%d\n",
 						i, cam.fx, cam.fy, cam.skew, cameraCounts.get(i));
 			}
 		}

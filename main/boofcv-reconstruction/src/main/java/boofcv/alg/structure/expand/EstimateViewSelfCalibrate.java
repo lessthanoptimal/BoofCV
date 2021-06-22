@@ -191,7 +191,7 @@ public class EstimateViewSelfCalibrate implements VerbosePrint {
 			SceneWorkingGraph.Camera camera2 = workGraph.getViewCamera(estimateUtils.wview2);
 			Se3_F64 view1_to_target = estimateUtils.view1_to_target;
 			verbose.printf("view1.f=%.2f view2.f=%.2f\n", camera1.intrinsic.f, camera2.intrinsic.f);
-			verbose.printf("Initial T=(%.1f %.1f %.1f) f=%6.1f k1=%6.3f k2=%6.3f\n",
+			verbose.printf("Initial T=(%.1f %.1f %.1f) f=%.1f k1=%.3f k2=%.3f\n",
 					view1_to_target.T.x, view1_to_target.T.y, view1_to_target.T.z,
 					estimateUtils.camera3.f, estimateUtils.camera3.k1, estimateUtils.camera3.k2);
 		}

@@ -147,12 +147,14 @@ public class GeneratePairwiseImageGraph implements VerbosePrint {
 		DMatrixRMaj fundamental = new DMatrixRMaj(3, 3);
 		DogArray_I32 inlierIdx = new DogArray_I32();
 
-		if (verbose != null) verbose.printf("_ createEdge['%s'] -> '%s'\n", src, dst);
-
 		// Retrieve any prior information on the cameras
 		dbCams.lookupCalibration(src, priorA);
 		dbCams.lookupCalibration(dst, priorB);
 		boolean sameCamera = dbCams.viewToCamera(src) == dbCams.viewToCamera(dst);
+
+		if (verbose != null)
+			verbose.printf("_ createEdge['%s'] -> '%s', prior: src={fx=%.1f cx=%.1f cy=%.1f}  dst={fx=%.1f cx=%.1f cy=%.1f} \n",
+					src, dst, priorA.fx, priorA.cx, priorA.cy, priorB.fx, priorB.cx, priorB.cy);
 
 		// Pass in null if it's the same camera so that score algorithm will know it's dealing with a single camera
 		epipolarScore.process(priorA, sameCamera ? null : priorB, pairs.toList(), fundamental, inlierIdx);
@@ -176,7 +178,6 @@ public class GeneratePairwiseImageGraph implements VerbosePrint {
 	@Override
 	public void setVerbose( @Nullable PrintStream out, @Nullable Set<String> configuration ) {
 		this.verbose = BoofMiscOps.addPrefix(this, out);
-		// The verbose print statements between these two classes are designed to work together
-		this.epipolarScore.setVerbose(verbose, configuration);
+		BoofMiscOps.verboseChildren(verbose, configuration, epipolarScore);
 	}
 }

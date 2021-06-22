@@ -35,7 +35,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 /**
  * @author Peter Abeles
  */
-public class TestEstimateViewKnownTarget extends BoofStandardJUnit {
+public class TestEstimateViewKnownCalibration extends BoofStandardJUnit {
 	/**
 	 * Generate a known scene and pass in everything but the location of the 3rd view. Make sure
 	 * it's able to estimate it. A couple of outliers will be added and checked to make sure they are removed.
@@ -94,7 +94,7 @@ public class TestEstimateViewKnownTarget extends BoofStandardJUnit {
 			a.p3.y -= db.intrinsic.cy;
 		}
 
-		var alg = new EstimateViewKnownTarget();
+		var alg = new EstimateViewKnownCalibration();
 //		alg.setVerbose(System.out, BoofMiscOps.hashSet(BoofVerbose.RECURSIVE));
 		var solution = new MetricExpandByOneView.Solution();
 		assertTrue(alg.process(pairwiseUtils, scene, solution));

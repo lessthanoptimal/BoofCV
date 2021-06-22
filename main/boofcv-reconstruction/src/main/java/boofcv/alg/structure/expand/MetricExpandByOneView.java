@@ -61,7 +61,7 @@ public class MetricExpandByOneView extends ExpandByOneView {
 	/** Do not consider the uncalibrated case if the camera is already known */
 	public boolean onlyConsiderCalibrated = false;
 
-	public EstimateViewKnownTarget expandCalibrated = new EstimateViewKnownTarget();
+	public EstimateViewKnownCalibration expandCalibrated = new EstimateViewKnownCalibration();
 	public EstimateViewSelfCalibrate expandUnknown = new EstimateViewSelfCalibrate();
 
 	MetricExpandByOneView.Solution solutionCalibrated = new MetricExpandByOneView.Solution();

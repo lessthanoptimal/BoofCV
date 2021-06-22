@@ -229,8 +229,13 @@ public class EstimateViewUtils {
 		// Save the results
 		view1_to_target.setTo(metricSba.structure.getParentToView(2));
 
+		// NOTE: No need to copy since SBA will modify camera3, if it's not marked as known
+//		camera3.setTo((BundlePinholeSimplified)metricSba.structure.cameras.get(2).model);
+
 		if (verbose != null) {
-			verbose.printf("refined 1_to_3 T=(%.2f %.2f %.2f)\n", view1_to_target.T.x, view1_to_target.T.y, view1_to_target.T.z);
+			verbose.printf("refined 1_to_3 T=(%.2f %.2f %.2f) f=%.1f k1=%.3f k2=%.3f\n",
+					view1_to_target.T.x, view1_to_target.T.y, view1_to_target.T.z,
+					camera3.f, camera3.k1, camera3.k2);
 		}
 
 		return true;
