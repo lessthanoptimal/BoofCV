@@ -437,7 +437,7 @@ class TestMultiViewOps extends BoofStandardJUnit {
 		DMatrixRMaj found3 = new DMatrixRMaj(3, 3);
 
 		TrifocalTensor input = tensor.copy();
-		MultiViewOps.trifocalFundamental(input, found2, found3);
+		MultiViewOps.trifocalToFundamental(input, found2, found3);
 
 		// make sure the input was not modified
 		for (int i = 0; i < 3; i++)
@@ -462,7 +462,7 @@ class TestMultiViewOps extends BoofStandardJUnit {
 		DMatrixRMaj P3 = new DMatrixRMaj(3, 4);
 
 		TrifocalTensor input = tensor.copy();
-		MultiViewOps.trifocalCameraMatrices(input, P2, P3);
+		MultiViewOps.trifocalToCameraMatrices(input, P2, P3);
 
 		// make sure the input was not modified
 		for (int i = 0; i < 3; i++)
@@ -909,7 +909,7 @@ class TestMultiViewOps extends BoofStandardJUnit {
 		TestDecomposeHomography.checkHasOriginal(solutionsSE, solutionsN, R, T, d, N);
 	}
 
-	@Test void transfer13_PL() {
+	@Test void transfer_1_to_3_PL() {
 		Point3D_F64 X = new Point3D_F64(0.1, -0.05, 2);
 
 		computeLines(X, line1, line2, line3);
@@ -928,7 +928,7 @@ class TestMultiViewOps extends BoofStandardJUnit {
 		assertEquals(x3.y, found.y, UtilEjml.TEST_F64);
 	}
 
-	@Test void transfer13_PP() {
+	@Test void transfer_1_to_3_PP() {
 		Point3D_F64 X = new Point3D_F64(0.1, -0.05, 2);
 
 		// When the tensor was constructed the first view was assumed to be [I|0], which
@@ -937,16 +937,16 @@ class TestMultiViewOps extends BoofStandardJUnit {
 		Point2D_F64 x2 = PerspectiveOps.renderPixel(worldToCam2, K, X, null);
 		Point2D_F64 x3 = PerspectiveOps.renderPixel(worldToCam3, K, X, null);
 
-		Point3D_F64 found = MultiViewOps.transfer_1_to_3(tensor, x1, x3, null);
+		Point3D_F64 found = MultiViewOps.transfer_1_to_3(tensor, x1, x2, null);
 
 		found.x /= found.z;
 		found.y /= found.z;
 
-		assertEquals(x2.x, found.x, UtilEjml.TEST_F64);
-		assertEquals(x2.y, found.y, UtilEjml.TEST_F64);
+		assertEquals(x3.x, found.x, UtilEjml.TEST_F64);
+		assertEquals(x3.y, found.y, UtilEjml.TEST_F64);
 	}
 
-	@Test void transfer12_PL() {
+	@Test void transfer_1_to_2_PL() {
 		Point3D_F64 X = new Point3D_F64(0.1, -0.05, 2);
 
 		computeLines(X, line1, line2, line3);
@@ -965,7 +965,7 @@ class TestMultiViewOps extends BoofStandardJUnit {
 		assertEquals(x2.y, found.y, UtilEjml.TEST_F64);
 	}
 
-	@Test void transfer12_PP() {
+	@Test void transfer_1_to_2_PP() {
 		Point3D_F64 X = new Point3D_F64(0.1, -0.05, 2);
 
 		// When the tensor was constructed the first view was assumed to be [I|0], which

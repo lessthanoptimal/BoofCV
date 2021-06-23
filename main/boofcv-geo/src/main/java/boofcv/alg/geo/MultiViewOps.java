@@ -628,7 +628,7 @@ public class MultiViewOps {
 	 * @param F31 Output: Fundamental matrix for views 1 and 3. Modified.
 	 * @see TrifocalExtractGeometries
 	 */
-	public static void trifocalFundamental( TrifocalTensor tensor, DMatrixRMaj F21, DMatrixRMaj F31 ) {
+	public static void trifocalToFundamental( TrifocalTensor tensor, DMatrixRMaj F21, DMatrixRMaj F31 ) {
 		TrifocalExtractGeometries e = new TrifocalExtractGeometries();
 		e.setTensor(tensor);
 		e.extractFundmental(F21, F31);
@@ -648,7 +648,7 @@ public class MultiViewOps {
 	 * @param P3 Output: 3x4 camera matrix for views 1 to 3. Modified.
 	 * @see TrifocalExtractGeometries
 	 */
-	public static void trifocalCameraMatrices( TrifocalTensor tensor, DMatrixRMaj P2, DMatrixRMaj P3 ) {
+	public static void trifocalToCameraMatrices( TrifocalTensor tensor, DMatrixRMaj P2, DMatrixRMaj P3 ) {
 		TrifocalExtractGeometries e = new TrifocalExtractGeometries();
 		e.setTensor(tensor);
 		e.extractCamera(P2, P3);
@@ -1288,7 +1288,7 @@ public class MultiViewOps {
 	}
 
 	/**
-	 * Transfers a point from the first view to the second view using the observed location in the third view
+	 * Transfers a point to the third view given observed locations in the first and second views
 	 *
 	 * @param x1 (Input) point (pixel) in first view
 	 * @param x2 (Input) point (pixel) in second view
@@ -1296,16 +1296,16 @@ public class MultiViewOps {
 	 * @param x3 (Output) Induced point (pixel) in third view. Homogenous coordinates.
 	 * @return induced point.
 	 */
-	public static Point3D_F64 transfer_1_to_3( TrifocalTensor T, Point2D_F64 x1, Point2D_F64 x3,
-											   @Nullable Point3D_F64 x2 ) {
-		if (x2 == null)
-			x2 = new Point3D_F64();
+	public static Point3D_F64 transfer_1_to_3( TrifocalTensor T, Point2D_F64 x1, Point2D_F64 x2,
+											   @Nullable Point3D_F64 x3 ) {
+		if (x3 == null)
+			x3 = new Point3D_F64();
 
 		TrifocalTransfer transfer = new TrifocalTransfer();
 		transfer.setTrifocal(T);
-		transfer.transfer_1_to_2(x1.x, x1.y, x3.x, x3.y, x2);
+		transfer.transfer_1_to_3(x1.x, x1.y, x2.x, x2.y, x3);
 
-		return x2;
+		return x3;
 	}
 
 	/**

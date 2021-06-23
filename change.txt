@@ -11,7 +11,7 @@ Version : 0.38
   * Now uses Toolchains. This should eliminate problems caused by people using an incompatible JDK.
 - Examples
   * Added an example for computing the Trifocal Tensor
-  * TODO Added an example showing how the trifocal tensor can be used
+  * Added an example showing how the trifocal tensor can be used
 - Applications
   * Batch down sample app now lets you scale for a fix number of pixels and keep aspect ratio.
   * CameraCalibration can now just save detections

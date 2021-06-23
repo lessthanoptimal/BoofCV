@@ -150,23 +150,10 @@ public class ExampleTrifocalStereoUncalibrated {
 		associateThree.detectFeatures(image01, 0);
 		associateThree.detectFeatures(image02, 1);
 		associateThree.detectFeatures(image03, 2);
-		DogArray<AssociatedTripleIndex> associatedIdx = associateThree.threeViewPairwiseAssociate();
 
 		System.out.println("features01.size = " + associateThree.features01.size);
 		System.out.println("features02.size = " + associateThree.features02.size);
 		System.out.println("features03.size = " + associateThree.features03.size);
-
-		// Convert the matched indexes into AssociatedTriple which contain the actual pixel coordinates
-		var associated = new DogArray<>(AssociatedTriple::new);
-		associatedIdx.forEach(p->associated.grow().setTo(
-				associateThree.locations01.get(p.a),
-				associateThree.locations02.get(p.b),
-				associateThree.locations03.get(p.c)));
-
-		// Converting data formats for the found features into what can be processed by SFM algorithms
-		// Notice how the image center is subtracted from the coordinates? In many cases a principle point
-		// of zero is assumed. This is a reasonable assumption in almost all modern cameras. Errors in
-		// the principle point tend to materialize as translations and are non fatal.
 
 		int width = image01.width, height = image01.height;
 		System.out.println("Image Shape " + width + " x " + height);
@@ -177,6 +164,21 @@ public class ExampleTrifocalStereoUncalibrated {
 		associateThree.locations01.forEach(p->p.setTo(p.x-cx,p.y-cy));
 		associateThree.locations02.forEach(p->p.setTo(p.x-cx,p.y-cy));
 		associateThree.locations03.forEach(p->p.setTo(p.x-cx,p.y-cy));
+
+		// Converting data formats for the found features into what can be processed by SFM algorithms
+		// Notice how the image center is subtracted from the coordinates? In many cases a principle point
+		// of zero is assumed. This is a reasonable assumption in almost all modern cameras. Errors in
+		// the principle point tend to materialize as translations and are non fatal.
+
+		// Associate features in the three views using image information alone
+		DogArray<AssociatedTripleIndex> associatedIdx = associateThree.threeViewPairwiseAssociate();
+
+		// Convert the matched indexes into AssociatedTriple which contain the actual pixel coordinates
+		var associated = new DogArray<>(AssociatedTriple::new);
+		associatedIdx.forEach(p->associated.grow().setTo(
+				associateThree.locations01.get(p.a),
+				associateThree.locations02.get(p.b),
+				associateThree.locations03.get(p.c)));
 
 		System.out.println("Total Matched Triples = " + associated.size);
 
@@ -205,7 +207,7 @@ public class ExampleTrifocalStereoUncalibrated {
 		DMatrixRMaj P1 = CommonOps_DDRM.identity(3, 4);
 		DMatrixRMaj P2 = new DMatrixRMaj(3, 4);
 		DMatrixRMaj P3 = new DMatrixRMaj(3, 4);
-		MultiViewOps.trifocalCameraMatrices(model, P2, P3);
+		MultiViewOps.trifocalToCameraMatrices(model, P2, P3);
 
 		// Most of the time this refinement step makes little difference, but in some edges cases it appears
 		// to help convergence

@@ -272,7 +272,7 @@ public class PairwiseGraphUtils {
 		// Extract camera matrices
 		TrifocalTensor model = ransac.getModelParameters();
 		CommonOps_DDRM.setIdentity(P1);
-		MultiViewOps.trifocalCameraMatrices(model, P2, P3);
+		MultiViewOps.trifocalToCameraMatrices(model, P2, P3);
 
 		inliersThreeView.reset();
 		inliersThreeView.addAll(ransac.getMatchSet());

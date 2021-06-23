@@ -112,7 +112,7 @@ public class TestSelfCalibrationLinearDualQuadratic extends CommonAutoCalibratio
 		DMatrixRMaj P2 = new DMatrixRMaj(3, 4);
 		DMatrixRMaj P3 = new DMatrixRMaj(3, 4);
 
-		MultiViewOps.trifocalCameraMatrices(tensor, P2, P3);
+		MultiViewOps.trifocalToCameraMatrices(tensor, P2, P3);
 
 		SelfCalibrationLinearDualQuadratic alg = new SelfCalibrationLinearDualQuadratic(1.0);
 		alg.addCameraMatrix(P1);
