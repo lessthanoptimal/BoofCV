@@ -122,7 +122,7 @@ public class CommonThreeViewSelfCalibration extends BoofStandardJUnit {
 		// The method of creating a trifocal tensor was found to cause a unit test to fail due to numerical instability
 		// other less sensitive methods did pass using it though
 //		MultiViewOps.createTrifocal(projective.get(0),projective.get(1),projective.get(2),tensor);
-		MultiViewOps.trifocalCameraMatrices(tensor, P2, P3);
-		MultiViewOps.trifocalFundamental(tensor, F21, F31);
+		MultiViewOps.trifocalToCameraMatrices(tensor, P2, P3);
+		MultiViewOps.trifocalToFundamental(tensor, F21, F31);
 	}
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -46,6 +46,45 @@ import java.util.List;
  * and Essential matrices) which have issues along the epipolar lines.
  */
 public class ExampleComputeTrifocalTensor {
+	/**
+	 * Computes the trifocal tensor given three images. Returns the set of inlier features found when computing
+	 * the tensor
+	 */
+	public static List<AssociatedTriple> imagesToTrifocal(
+			GrayU8 gray01, GrayU8 gray02, GrayU8 gray03, TrifocalTensor model) {
+		// Using SURF features. Robust and fairly fast to compute
+		var configDetector = new ConfigFastHessian();
+		configDetector.maxFeaturesAll = 2500; // limit the feature count
+		configDetector.extract.radius = 4;
+		DetectDescribePoint<GrayU8, TupleDesc_F64> detDesc = FactoryDetectDescribe.surfStable(configDetector, null, null, GrayU8.class);
+
+		// Associate features across all three views using previous example code
+		var associateThree = new ExampleAssociateThreeView();
+		associateThree.initialize(detDesc);
+		associateThree.detectFeatures(gray01, 0);
+		associateThree.detectFeatures(gray02, 1);
+		associateThree.detectFeatures(gray03, 2);
+		DogArray<AssociatedTripleIndex> associatedIdx = associateThree.threeViewPairwiseAssociate();
+
+		System.out.println("features01.size = " + associateThree.features01.size);
+		System.out.println("features02.size = " + associateThree.features02.size);
+		System.out.println("features03.size = " + associateThree.features03.size);
+
+		// Convert the matched indexes into AssociatedTriple which contain the actual pixel coordinates
+		var associated = new DogArray<>(AssociatedTriple::new);
+		associatedIdx.forEach(p->associated.grow().setTo(
+				associateThree.locations01.get(p.a),
+				associateThree.locations02.get(p.b),
+				associateThree.locations03.get(p.c)));
+
+		System.out.println("Total Matched Triples = " + associated.size);
+
+		// Storage for the found model. In this example we don't actually use the tensor.
+		List<AssociatedTriple> inliers = computeTrifocal(associated, model);
+		System.out.println("Remaining after RANSAC " + inliers.size());
+
+		return inliers;
+	}
 
 	/**
 	 * Computes the Trifocal Tensor using RANSAC given associated features across 3-views. The found tensor
@@ -75,38 +114,11 @@ public class ExampleComputeTrifocalTensor {
 		GrayU8 gray02 = UtilImageIO.loadImage(UtilIO.pathExample("triple/" + name + "02.jpg"), GrayU8.class);
 		GrayU8 gray03 = UtilImageIO.loadImage(UtilIO.pathExample("triple/" + name + "03.jpg"), GrayU8.class);
 
-		// Using SURF features. Robust and fairly fast to compute
-		DetectDescribePoint<GrayU8, TupleDesc_F64> detDesc = FactoryDetectDescribe.surfStable(
-				new ConfigFastHessian(0, 4, 1000, 1, 9, 4, 2), null, null, GrayU8.class);
-
-		// Associate features across all three views using previous example code
-		var associateThree = new ExampleAssociateThreeView();
-		associateThree.initialize(detDesc);
-		associateThree.detectFeatures(gray01, 0);
-		associateThree.detectFeatures(gray02, 1);
-		associateThree.detectFeatures(gray03, 2);
-		DogArray<AssociatedTripleIndex> associatedIdx = associateThree.threeViewPairwiseAssociate();
-
-		System.out.println("features01.size = " + associateThree.features01.size);
-		System.out.println("features02.size = " + associateThree.features02.size);
-		System.out.println("features03.size = " + associateThree.features03.size);
-
-		// Convert the matched indexes into AssociatedTriple which contain the actual pixel coordinates
-		var associated = new DogArray<>(AssociatedTriple::new);
-		associatedIdx.forEach(p->associated.grow().setTo(
-				associateThree.locations01.get(p.a),
-				associateThree.locations02.get(p.b),
-				associateThree.locations03.get(p.c)));
-
-		System.out.println("Total Matched Triples = " + associated.size);
-
-		// Storage for the found model. In this example we don't actually use the tensor.
+		// Compute the trifocal tensor which matches features inside these images
 		var model = new TrifocalTensor();
-		List<AssociatedTriple> inliers = computeTrifocal(associated, model);
+		List<AssociatedTriple> inliers = imagesToTrifocal(gray01, gray02, gray03, model);
 
-		System.out.println("Remaining after RANSAC " + inliers.size());
-
-		// Show remaining associations from RANSAC
+		// Show inlier associations from RANSAC
 		var triplePanel = new AssociatedTriplePanel();
 		triplePanel.setImages(
 				UtilImageIO.loadImage(UtilIO.pathExample("triple/" + name + "01.jpg")),
