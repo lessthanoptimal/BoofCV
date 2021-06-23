@@ -24,7 +24,8 @@ allprojects {
 }
 
 project.ext.set("deepboof_version", '0.5.1-SNAPSHOT')
-project.ext.set("lombok_version", '1.18.18')
+project.ext.set("lombok_version", '1.18.20')
+project.ext.set("errorprone_version", '2.7.1')
 
 // Which native platforms are supported can be specified in the command line.  Otherwise
 // the default is to support all of them
@@ -57,7 +58,7 @@ subprojects {
         resolutionStrategy {
             force 'org.jetbrains:annotations:20.0.0'
             force 'com.google.guava:guava:30.1-jre'
-            force 'com.google.errorprone:error_prone_annotations:2.6.0'
+            force "com.google.errorprone:error_prone_annotations:$project.errorprone_version"
             force 'com.google.code.findbugs:jsr305:3.0.2'
             force 'org.checkerframework:checker-qual:2.10.0'
         }
@@ -155,8 +156,7 @@ subprojects {
         annotationProcessor "org.projectlombok:lombok:${project.lombok_version}"  // @Getter @Setter
         noautoAnnotationProcessor "org.projectlombok:lombok:${project.lombok_version}"  // @Getter @Setter
 
-        errorprone("com.google.errorprone:error_prone_core:2.6.0")
-
+        errorprone("com.google.errorprone:error_prone_core:$project.errorprone_version")
 //        // even if it's not used you still need to include the dependency
 //        annotationProcessor "com.uber.nullaway:nullaway:0.8.0"
 //        testAnnotationProcessor "com.uber.nullaway:nullaway:0.8.0"
