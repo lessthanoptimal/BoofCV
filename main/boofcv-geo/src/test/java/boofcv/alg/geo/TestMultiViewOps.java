@@ -974,13 +974,13 @@ class TestMultiViewOps extends BoofStandardJUnit {
 		Point2D_F64 x2 = PerspectiveOps.renderPixel(worldToCam2, K, X, null);
 		Point2D_F64 x3 = PerspectiveOps.renderPixel(worldToCam3, K, X, null);
 
-		Point3D_F64 found = MultiViewOps.transfer_1_to_2(tensor, x1, x2, null);
+		Point3D_F64 found = MultiViewOps.transfer_1_to_2(tensor, x1, x3, null);
 
 		found.x /= found.z;
 		found.y /= found.z;
 
-		assertEquals(x3.x, found.x, UtilEjml.TEST_F64);
-		assertEquals(x3.y, found.y, UtilEjml.TEST_F64);
+		assertEquals(x2.x, found.x, UtilEjml.TEST_F64);
+		assertEquals(x2.y, found.y, UtilEjml.TEST_F64);
 	}
 
 	@Test void projectiveToMetric() {

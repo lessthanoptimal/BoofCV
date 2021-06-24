@@ -1301,7 +1301,7 @@ public class MultiViewOps {
 		if (x3 == null)
 			x3 = new Point3D_F64();
 
-		TrifocalTransfer transfer = new TrifocalTransfer();
+		var transfer = new TrifocalTransfer();
 		transfer.setTrifocal(T);
 		transfer.transfer_1_to_3(x1.x, x1.y, x2.x, x2.y, x3);
 
@@ -1349,16 +1349,16 @@ public class MultiViewOps {
 	 * @param x2 (Output) Induced point (pixel) in second view. Homogenous coordinates.
 	 * @return induced point.
 	 */
-	public static Point3D_F64 transfer_1_to_2( TrifocalTensor T, Point2D_F64 x1, Point2D_F64 x2,
-											   @Nullable Point3D_F64 x3 ) {
-		if (x3 == null)
-			x3 = new Point3D_F64();
+	public static Point3D_F64 transfer_1_to_2( TrifocalTensor T, Point2D_F64 x1, Point2D_F64 x3,
+											   @Nullable Point3D_F64 x2 ) {
+		if (x2 == null)
+			x2 = new Point3D_F64();
 
-		TrifocalTransfer transfer = new TrifocalTransfer();
+		var transfer = new TrifocalTransfer();
 		transfer.setTrifocal(T);
-		transfer.transfer_1_to_3(x1.x, x1.y, x2.x, x2.y, x3);
+		transfer.transfer_1_to_2(x1.x, x1.y, x3.x, x3.y, x2);
 
-		return x3;
+		return x2;
 	}
 
 	/**
