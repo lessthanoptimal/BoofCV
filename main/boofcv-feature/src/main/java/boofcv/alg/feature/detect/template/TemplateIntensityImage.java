@@ -75,7 +75,6 @@ public class TemplateIntensityImage<T extends ImageBase<T>>
 
 		// deference to avoid causing a memory leak
 		this.template = null;
-		this.mask = null;
 	}
 
 	protected void processInner( int w, int h ) {
