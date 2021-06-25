@@ -24,7 +24,7 @@ allprojects {
 }
 
 project.ext.set("deepboof_version", '0.5.1-SNAPSHOT')
-project.ext.set("lombok_version", '1.18.20')
+project.ext.set("lombok_version", '1.18.18')
 project.ext.set("errorprone_version", '2.7.1')
 
 // Which native platforms are supported can be specified in the command line.  Otherwise
