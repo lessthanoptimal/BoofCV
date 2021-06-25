@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -60,5 +60,12 @@ public enum TemplateScoreType {
 	 *
 	 * @see boofcv.alg.feature.detect.template.TemplateCorrelationFFT
 	 */
-	CORRELATION
+	CORRELATION,
+
+	/**
+	 * Squared Difference normed error
+	 *
+	 * @see boofcv.alg.feature.detect.template.TemplateSqDiffNormed
+	 */
+	SQUARED_DIFFERENCE_NORMED,
 }

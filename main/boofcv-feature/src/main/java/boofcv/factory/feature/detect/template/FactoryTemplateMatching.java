@@ -74,6 +74,16 @@ public class FactoryTemplateMatching {
 				}
 				break;
 
+			case SQUARED_DIFFERENCE_NORMED:
+				if (imageType == GrayU8.class) {
+					method = (EvaluatorMethod<T>)new TemplateSqDiffNormed.U8();
+				} else if (imageType == GrayF32.class) {
+					method = (EvaluatorMethod<T>)new TemplateSqDiffNormed.F32();
+				} else {
+					throw new IllegalArgumentException("Image type not supported. " + imageType.getSimpleName());
+				}
+				break;
+
 			case NCC:
 				if (imageType == GrayU8.class) {
 					method = (EvaluatorMethod<T>)new TemplateNCC.U8();

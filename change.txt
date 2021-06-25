@@ -39,6 +39,7 @@ Version : 0.38
 - Image Processing
   * Re-ordered loops to speed up vertical convolution for inner image. 1.2x to 3x faster. Except for U8_I16
   * Added Scharr Gradient 3x3
+  * Added Template Squared Difference Normed. Thanks rthaenert for the feature request
 - Image Features
   * Fast Corners are now concurrent
   * SIFT the entire scale space is computed at once. This might result in a net ~10% increase memory.
