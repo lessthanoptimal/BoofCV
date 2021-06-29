@@ -109,7 +109,10 @@ public class ScoreFundamentalVsRotation implements EpipolarScore3D {
 	}
 
 	@Override public void process( CameraPinholeBrown cameraA, @Nullable CameraPinholeBrown cameraB,
+								   int featuresA, int featuresB,
 								   List<AssociatedPair> pairs, DMatrixRMaj fundamental, DogArray_I32 inliersIdx ) {
+		BoofMiscOps.checkTrue(featuresA >= pairs.size());
+		BoofMiscOps.checkTrue(featuresB >= pairs.size());
 
 		inliersRotationIdx.reset();
 		inliersIdx.reset();

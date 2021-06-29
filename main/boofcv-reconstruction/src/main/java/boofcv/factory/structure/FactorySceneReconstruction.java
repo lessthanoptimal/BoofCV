@@ -20,6 +20,7 @@ package boofcv.factory.structure;
 
 import boofcv.abst.feature.associate.AssociateDescriptionHashSets;
 import boofcv.abst.feature.describe.DescribePoint;
+import boofcv.abst.feature.describe.DescribePointRadiusAngle;
 import boofcv.abst.feature.detdesc.DetectDescribePoint;
 import boofcv.abst.geo.bundle.MetricBundleAdjustmentUtils;
 import boofcv.abst.scene.FeatureSceneRecognition;
@@ -32,15 +33,19 @@ import boofcv.alg.structure.SparseSceneToDenseCloud;
 import boofcv.alg.structure.score3d.ScoreFundamentalHomographyCompatibility;
 import boofcv.alg.structure.score3d.ScoreFundamentalVsRotation;
 import boofcv.alg.structure.score3d.ScoreRatioFundamentalHomography;
+import boofcv.alg.video.SelectFramesForReconstruction3D;
 import boofcv.factory.disparity.FactoryStereoDisparity;
 import boofcv.factory.feature.associate.FactoryAssociation;
 import boofcv.factory.feature.describe.FactoryDescribePoint;
+import boofcv.factory.feature.describe.FactoryDescribePointRadiusAngle;
 import boofcv.factory.feature.detdesc.FactoryDetectDescribe;
 import boofcv.factory.geo.FactoryMultiViewRobust;
 import boofcv.factory.scene.FactorySceneRecognition;
 import boofcv.factory.sfm.ConfigBundleUtils;
 import boofcv.factory.struct.FactoryTupleDesc;
+import boofcv.factory.tracker.FactoryPointTracker;
 import boofcv.struct.feature.TupleDesc;
+import boofcv.struct.feature.TupleDesc_F64;
 import boofcv.struct.geo.AssociatedPair;
 import boofcv.struct.image.GrayF32;
 import boofcv.struct.image.ImageBase;
@@ -49,6 +54,7 @@ import boofcv.struct.image.ImageType;
 import georegression.struct.homography.Homography2D_F64;
 import org.ddogleg.fitting.modelset.ModelMatcher;
 import org.ejml.data.DMatrixRMaj;
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 /**
@@ -80,40 +86,43 @@ public class FactorySceneReconstruction {
 		if (config == null)
 			config = new ConfigGeneratePairwiseImageGraph();
 
-		ModelMatcher<DMatrixRMaj, AssociatedPair> ransac3D =
-				FactoryMultiViewRobust.fundamentalRansac(config.score.fundamental, config.score.ransacF);
-
-		EpipolarScore3D scorer =
-				switch (config.score.type) {
-					case MODEL_INLIERS -> {
-						ModelMatcher<Homography2D_F64, AssociatedPair> ransacH =
-								FactoryMultiViewRobust.homographyRansac(
-										config.score.typeInliers.homography, config.score.typeInliers.ransacH);
-
-						var alg = new ScoreRatioFundamentalHomography(ransac3D, ransacH);
-						alg.minimumInliers.setTo(config.score.typeInliers.minimumInliers);
-						alg.ratio3D = config.score.typeInliers.ratio3D;
-						yield alg;
-					}
-					case FUNDAMENTAL_COMPATIBLE -> {
-						var alg = new ScoreFundamentalHomographyCompatibility(ransac3D);
-						alg.inlierErrorTol = config.score.typeCompatible.inlierErrorTol;
-						alg.ratio3D = config.score.typeCompatible.ratio3D;
-						alg.maxRatioScore = config.score.typeCompatible.maxRatioScore;
-						alg.minimumInliers.setTo(config.score.typeCompatible.minimumInliers);
-						yield alg;
-					}
-					case FUNDAMENTAL_ROTATION -> {
-						var alg = new ScoreFundamentalVsRotation(ransac3D);
-						alg.inlierErrorTol = config.score.typeRotation.inlierErrorTol;
-						alg.ratio3D = config.score.typeRotation.ratio3D;
-						alg.maxRatioScore = config.score.typeRotation.maxRatioScore;
-						alg.minimumInliers.setTo(config.score.typeRotation.minimumInliers);
-						yield alg;
-					}
-				};
+		EpipolarScore3D scorer = getEpipolarScore3D(config.score);
 
 		return new GeneratePairwiseImageGraph(scorer);
+	}
+
+	private static EpipolarScore3D getEpipolarScore3D( @NotNull ConfigEpipolarScore3D config) {
+		ModelMatcher<DMatrixRMaj, AssociatedPair> ransac3D =
+				FactoryMultiViewRobust.fundamentalRansac(config.fundamental, config.ransacF);
+
+		return switch (config.type) {
+			case MODEL_INLIERS -> {
+				ModelMatcher<Homography2D_F64, AssociatedPair> ransacH =
+						FactoryMultiViewRobust.homographyRansac(
+								config.typeInliers.homography, config.typeInliers.ransacH);
+
+				var alg = new ScoreRatioFundamentalHomography(ransac3D, ransacH);
+				alg.minimumInliers.setTo(config.typeInliers.minimumInliers);
+				alg.ratio3D = config.typeInliers.ratio3D;
+				yield alg;
+			}
+			case FUNDAMENTAL_COMPATIBLE -> {
+				var alg = new ScoreFundamentalHomographyCompatibility(ransac3D);
+				alg.inlierErrorTol = config.typeCompatible.inlierErrorTol;
+				alg.ratio3D = config.typeCompatible.ratio3D;
+				alg.maxRatioScore = config.typeCompatible.maxRatioScore;
+				alg.minimumInliers.setTo(config.typeCompatible.minimumInliers);
+				yield alg;
+			}
+			case FUNDAMENTAL_ROTATION -> {
+				var alg = new ScoreFundamentalVsRotation(ransac3D);
+				alg.inlierErrorTol = config.typeRotation.inlierErrorTol;
+				alg.ratio3D = config.typeRotation.ratio3D;
+				alg.maxRatioScore = config.typeRotation.maxRatioScore;
+				alg.minimumInliers.setTo(config.typeRotation.minimumInliers);
+				yield alg;
+			}
+		};
 	}
 
 	/**
@@ -206,5 +215,32 @@ public class FactorySceneReconstruction {
 		similar.minimumCommonTracks.setTo(config.sequentialMinimumCommonTracks);
 
 		return similar;
+	}
+
+	/**
+	 * Creates {@link SelectFramesForReconstruction3D} which is used for down sampling frames in image sequences
+	 * to select for ones which have significant 3D information
+	 *
+	 * @param config (Optional) Configuration
+	 * @param imageType Type of input image
+	 * @return A new instance.
+	 */
+	public static <T extends ImageGray<T>> SelectFramesForReconstruction3D<T>
+	frameSelector3D( @Nullable ConfigSelectFrames3D config, ImageType<T> imageType ) {
+		if (config == null)
+			config = new ConfigSelectFrames3D();
+
+		// Image tracker currently only supports gray images
+		Class<T> grayType = imageType.getImageClass();
+
+		DescribePointRadiusAngle<T, TupleDesc_F64> describe = FactoryDescribePointRadiusAngle.generic(config.describe, imageType);
+
+		var alg = new SelectFramesForReconstruction3D<T>(describe);
+		alg.config.setTo(config);
+		alg.setTracker(FactoryPointTracker.tracker(config.tracker, grayType, null));
+		alg.setAssociate(FactoryAssociation.generic2(config.associate,describe));
+		alg.setScorer(FactorySceneReconstruction.getEpipolarScore3D(config.scorer3D));
+
+		return alg;
 	}
 }

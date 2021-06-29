@@ -86,6 +86,7 @@ public class ScoreRatioFundamentalHomography implements EpipolarScore3D {
 	protected ScoreRatioFundamentalHomography() {}
 
 	@Override public void process( CameraPinholeBrown cameraA, @Nullable CameraPinholeBrown cameraB,
+								   int featuresA, int featuresB,
 								   List<AssociatedPair> pairs, DMatrixRMaj fundamental, DogArray_I32 inliersIdx ) {
 		// Reset output
 		inliersIdx.reset();

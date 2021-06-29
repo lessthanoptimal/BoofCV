@@ -39,16 +39,19 @@ public interface EpipolarScore3D extends VerbosePrint {
 	 * @param cameraA (Input) Prior information on the camera intrinsics. View A.
 	 * @param cameraB (Input) Prior information on the camera intrinsics. View B. If null then it's assumed the
 	 * two cameras are the same.
+	 * @param featuresA (Input) Number of features in imageA
+	 * @param featuresB (Input) Number of features in imageB
 	 * @param pairs (Input) Set of point feature pairs between the two images
 	 * @param fundamental (Output) Fundamental matrix describing the geometric relationship between the two views
 	 * @param inliersIdx (Output) Which features inside of pairs are in the inlier sets
 	 */
 	void process( CameraPinholeBrown cameraA, @Nullable CameraPinholeBrown cameraB,
+				  int featuresA, int featuresB,
 				  List<AssociatedPair> pairs, DMatrixRMaj fundamental, DogArray_I32 inliersIdx );
 
 	/**
-	 * Returns a score for how much 3D information there is. Higher the value more 3D information. Zero
-	 * means that's no 3D information.
+	 * Returns a score for how much 3D information there is. 0 = no 3D information. 1 = very strong 3D information.
+	 * score is 0 to 1.
 	 *
 	 * @return score
 	 */

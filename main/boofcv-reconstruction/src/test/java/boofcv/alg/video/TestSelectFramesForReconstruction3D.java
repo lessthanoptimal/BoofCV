@@ -16,13 +16,14 @@
  * limitations under the License.
  */
 
-package boofcv.alg.mvs.video;
+package boofcv.alg.video;
 
 import boofcv.abst.feature.associate.AssociateDescription2DDefault;
 import boofcv.abst.feature.describe.DescribePointRadiusAngleAbstract;
 import boofcv.abst.tracker.PointTrackerDefault;
+import boofcv.alg.structure.EpipolarScore3D;
 import boofcv.misc.ModelGeneratorDefault;
-import boofcv.misc.ModelMatcherDefault;
+import boofcv.struct.calib.CameraPinholeBrown;
 import boofcv.struct.feature.AssociatedIndex;
 import boofcv.struct.feature.TupleDesc_F64;
 import boofcv.struct.geo.AssociatedPair;
@@ -34,10 +35,13 @@ import org.ddogleg.struct.DogArray;
 import org.ddogleg.struct.DogArray_I32;
 import org.ddogleg.struct.FastAccess;
 import org.ejml.UtilEjml;
+import org.ejml.data.DMatrixRMaj;
+import org.jetbrains.annotations.Nullable;
 import org.junit.jupiter.api.Test;
 
-import java.util.ArrayList;
+import java.io.PrintStream;
 import java.util.List;
+import java.util.Set;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -175,25 +179,6 @@ class TestSelectFramesForReconstruction3D extends BoofStandardJUnit {
 		assertFalse(alg.isSceneClearlyNot3D());
 	}
 
-	/** See if it correctly identifies a scene as 3D which really is 3D */
-	@Test void isScene3D_actually3D() {
-		SelectFramesForReconstruction3D<GrayF32> alg = createMockAlg();
-
-		alg.setRobust3D(new DummyRobust(50));
-		alg.setRobustH(new DummyRobust(20));
-
-		assertTrue(alg.isScene3D());
-	}
-
-	@Test void isScene3D_Not3D() {
-		SelectFramesForReconstruction3D<GrayF32> alg = createMockAlg();
-
-		alg.setRobust3D(new DummyRobust(50));
-		alg.setRobustH(new DummyRobust(50));
-
-		assertFalse(alg.isScene3D());
-	}
-
 	/** Tracking is good, until one frame when it drops, then the next frame there's good association again */
 	@Test void checkSkippedBadFrame() {
 		SelectFramesForReconstruction3D<GrayF32> alg = createMockAlg();
@@ -212,9 +197,7 @@ class TestSelectFramesForReconstruction3D extends BoofStandardJUnit {
 		alg.config.minimumPairs = 20;
 		alg.setTracker(new MockTracker<>());
 		alg.setAssociate(new MockAssociate());
-		alg.setRobustH(new DummyRobust(0));
-		alg.setRobust3D(new DummyRobust(0));
-		alg.setCompareFit(new RelativeBetter.MaximizeSoftRatio(1.0));
+		alg.setScorer(new MockScore2D());
 
 		return alg;
 	}
@@ -273,20 +256,26 @@ class TestSelectFramesForReconstruction3D extends BoofStandardJUnit {
 		@Override public Class<TupleDesc_F64> getDescriptionType() { return TupleDesc_F64.class; }
 	}
 
-	@SuppressWarnings("rawtypes")
-	private static class DummyRobust extends ModelMatcherDefault {
-		double score;
+	private static class MockScore2D implements EpipolarScore3D {
 
-		public DummyRobust( double score ) { this.score = score; }
+		boolean threeD = false;
+		double score = 1.0;
 
-		@Override public List getMatchSet() {
-			List set = new ArrayList();
-			for (int i = 0; i < 50; i++) {
-				set.add(i);
-			}
-			return set;
+		@Override
+		public void process( CameraPinholeBrown cameraA, @Nullable CameraPinholeBrown cameraB,
+							 int featuresA, int featuresB,
+							 List<AssociatedPair> pairs, DMatrixRMaj fundamental, DogArray_I32 inliersIdx ) {
+
 		}
 
-		@Override public double getFitQuality() { return score; }
+		@Override public double getScore() {
+			return score;
+		}
+
+		@Override public boolean is3D() {
+			return threeD;
+		}
+
+		@Override public void setVerbose( @Nullable PrintStream out, @Nullable Set<String> configuration ) {}
 	}
 }

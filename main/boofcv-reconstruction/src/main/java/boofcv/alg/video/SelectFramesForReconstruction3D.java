@@ -16,15 +16,18 @@
  * limitations under the License.
  */
 
-package boofcv.alg.mvs.video;
+package boofcv.alg.video;
 
 import boofcv.abst.feature.associate.AssociateDescription2D;
 import boofcv.abst.feature.describe.DescribePointRadiusAngle;
 import boofcv.abst.tracker.PointTrack;
 import boofcv.abst.tracker.PointTracker;
+import boofcv.alg.geo.PerspectiveOps;
 import boofcv.alg.geo.robust.GenerateHomographyLinear;
-import boofcv.factory.mvs.ConfigSelectFrames3D;
+import boofcv.alg.structure.EpipolarScore3D;
+import boofcv.factory.structure.ConfigSelectFrames3D;
 import boofcv.misc.BoofMiscOps;
+import boofcv.struct.calib.CameraPinholeBrown;
 import boofcv.struct.feature.AssociatedIndex;
 import boofcv.struct.feature.TupleDesc_F64;
 import boofcv.struct.geo.AssociatedPair;
@@ -38,7 +41,6 @@ import gnu.trove.map.hash.TLongIntHashMap;
 import lombok.Getter;
 import lombok.Setter;
 import org.ddogleg.fitting.modelset.ModelGenerator;
-import org.ddogleg.fitting.modelset.ModelMatcher;
 import org.ddogleg.sorting.QuickSelect;
 import org.ddogleg.struct.*;
 import org.ejml.data.DMatrixRMaj;
@@ -63,7 +65,7 @@ import static java.util.Objects.requireNonNull;
  *
  * Instructions:
  * <ol>
- *     <li>Provide: tracker, descriptor, associate, robust3D, robustH, compareFit</li>
+ *     <li>Provide: tracker, descriptor, associate, score3D</li>
  *     <li>Invoke {@link #initialize(int, int)}</li>
  *     <li>Pass each frame into {@link #next(ImageBase)}</li>
  *     <li>Get results from {@link #getSelectedFrames()}</li>
@@ -96,29 +98,27 @@ public class SelectFramesForReconstruction3D<T extends ImageBase<T>> implements 
 	/** Associates tracks to each other using their descriptors */
 	@Getter @Setter @Nullable AssociateDescription2D<TupleDesc_F64> associate;
 
-	/** Used to see how well a 3D model fits the observations */
-	@Getter @Setter @Nullable ModelMatcher<DMatrixRMaj, AssociatedPair> robust3D = null;
+	@Getter @Setter @Nullable EpipolarScore3D scorer;
 
-	/** Used to see how well a homography model fits the observations */
-	@Getter @Setter @Nullable ModelMatcher<Homography2D_F64, AssociatedPair> robustH = null;
-
-	/** Used to determine if 3D is significantly better than homography model */
-	@Getter @Setter @Nullable RelativeBetter compareFit = null;
+	/** Indexes of pairs which are considered to be inliers for the dominant model */
+	public @Getter final DogArray_I32 inlierIdx = new DogArray_I32();
 
 	//----------------------------- Access to intermediate results
 
 	/** Estimated number of pixels that the image moved. If not computed it will be NaN */
 	private @Getter double frameMotion;
-	/** Fit score for 3D. If not computed it will be NaN */
-	private @Getter double fitScore3D;
-	/** Fit score for homography. If not computed it will be NaN */
-	private @Getter double fitScoreH;
 	/** If it considered that new image could be 3D relative to the keyframe */
 	private @Getter boolean considered3D;
 	/** True if there are too few pairs with the key frame to reliably estimate scene structure */
 	private @Getter boolean sufficientFeaturePairs;
 
 	//----------------------------- Internally used fields
+
+	// Guessed intrinsic parameters
+	CameraPinholeBrown cameraA = new CameraPinholeBrown();
+	CameraPinholeBrown cameraB = new CameraPinholeBrown();
+
+	DMatrixRMaj fundamental = new DMatrixRMaj(3,3);
 
 	// Number of frames currently processed
 	int frameNumber;
@@ -169,9 +169,7 @@ public class SelectFramesForReconstruction3D<T extends ImageBase<T>> implements 
 		// Make sure everything has been properly configured
 		BoofMiscOps.checkTrue(tracker != null, "You must assign tracker a value");
 		BoofMiscOps.checkTrue(associate != null, "You must assign associate a value");
-		BoofMiscOps.checkTrue(robust3D != null, "You must assign ransac3D a value");
-		BoofMiscOps.checkTrue(robustH != null, "You must assign ransacH a value");
-		BoofMiscOps.checkTrue(compareFit != null, "You must assign compareFit a value");
+		BoofMiscOps.checkTrue(scorer != null, "You must assign scorer a value");
 
 		this.width = width;
 		this.height = height;
@@ -180,6 +178,9 @@ public class SelectFramesForReconstruction3D<T extends ImageBase<T>> implements 
 		forceKeyFrame = true;
 		frameNumber = 0;
 		selectedFrames.reset();
+
+		PerspectiveOps.createIntrinsic(width, height, 90, cameraA);
+		PerspectiveOps.createIntrinsic(width, height, 90, cameraB);
 	}
 
 	/**
@@ -192,8 +193,6 @@ public class SelectFramesForReconstruction3D<T extends ImageBase<T>> implements 
 		BoofMiscOps.checkEq(image.width, width, "Width does not match.");
 		BoofMiscOps.checkEq(image.height, height, "Height does not match.");
 		frameMotion = Double.NaN;
-		fitScore3D = Double.NaN;
-		fitScoreH = Double.NaN;
 		considered3D = false;
 		sufficientFeaturePairs = false;
 
@@ -383,27 +382,11 @@ public class SelectFramesForReconstruction3D<T extends ImageBase<T>> implements 
 	 * @return true if 3D
 	 */
 	boolean isScene3D() {
-		requireNonNull(robust3D);
-		requireNonNull(robustH);
+		requireNonNull(scorer);
 
-		if (!robust3D.process(pairs.toList()))
-			return false;
-		double fit3D = robust3D.getFitQuality();
-		if (robust3D.getMatchSet().size() < config.minimumPairs)
-			return false;
+		scorer.process(cameraA, cameraB, keyFrame.size(), currentFrame.size(), pairs.toList(), fundamental, inlierIdx);
 
-		if (!robustH.process(pairs.toList()))
-			return false;
-		double fitH = robustH.getFitQuality();
-
-		fitScore3D = fit3D;
-		fitScoreH = fitH;
-
-		double betterRatio = requireNonNull(compareFit).computeBetterValue(fit3D, fitH);
-
-		if (verbose != null) verbose.printf("  Check3D: H=%4f 3D=%4f ratio=%.1f\n", fitH, fit3D, betterRatio);
-
-		return betterRatio > config.threshold3D;
+		return scorer.is3D();
 	}
 
 	/**
@@ -445,7 +428,8 @@ public class SelectFramesForReconstruction3D<T extends ImageBase<T>> implements 
 	}
 
 	@Override public void setVerbose( @Nullable PrintStream out, @Nullable Set<String> configuration ) {
-		this.verbose = out;
+		this.verbose = BoofMiscOps.addPrefix(this, out);
+		BoofMiscOps.verboseChildren(verbose, configuration, scorer);
 	}
 
 	/** Storage for feature and track information for a single image frame */

@@ -19,10 +19,10 @@
 package boofcv.app;
 
 import boofcv.alg.filter.misc.AverageDownSampleOps;
-import boofcv.alg.mvs.video.SelectFramesForReconstruction3D;
+import boofcv.alg.video.SelectFramesForReconstruction3D;
 import boofcv.core.image.ConvertImage;
-import boofcv.factory.mvs.ConfigSelectFrames3D;
-import boofcv.factory.mvs.FactoryMultiViewStereo;
+import boofcv.factory.structure.ConfigSelectFrames3D;
+import boofcv.factory.structure.FactorySceneReconstruction;
 import boofcv.io.image.ConvertBufferedImage;
 import boofcv.io.image.SimpleImageSequence;
 import boofcv.io.image.UtilImageIO;
@@ -154,7 +154,7 @@ public class DownSelectVideoFramesFor3DApp {
 		config.maxTranslation.setRelative(maxMotion, 20);
 
 		SelectFramesForReconstruction3D<GrayU8> selector =
-				FactoryMultiViewStereo.frameSelector3D(config, ImageType.SB_U8);
+				FactorySceneReconstruction.frameSelector3D(config, ImageType.SB_U8);
 		selector.initialize(smallWidth, smallHeight);
 		selector.setVerbose(System.out, null);
 

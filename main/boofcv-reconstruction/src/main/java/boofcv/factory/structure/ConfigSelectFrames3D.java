@@ -16,9 +16,9 @@
  * limitations under the License.
  */
 
-package boofcv.factory.mvs;
+package boofcv.factory.structure;
 
-import boofcv.alg.mvs.video.SelectFramesForReconstruction3D;
+import boofcv.alg.video.SelectFramesForReconstruction3D;
 import boofcv.factory.feature.associate.ConfigAssociate;
 import boofcv.factory.feature.describe.ConfigDescribeRegion;
 import boofcv.factory.feature.detect.selector.ConfigSelectLimit;
@@ -48,20 +48,17 @@ public class ConfigSelectFrames3D implements Configuration {
 	 */
 	public double thresholdQuick = 0.1;
 
-	/** How much better 3D needs to be than homography. 0.0 = equal or worse. 1.0 = 2x better. 2.0 = 3x better. */
-	public double threshold3D = 0.5;
-
-	/** Minimum number of features in an image before all hope is lost */
-	public int minimumPairs = 100;
-
-	/** Number of iterations it uses when performing robust fitting */
-	public int robustIterations = 50;
-
 	/**
 	 * How much more numerous associated features need to be than tracks to be considered better. A value less than
 	 * 1.0 turn off this check. 1.5 means 50% better.
 	 */
 	public double skipEvidenceRatio = 1.5;
+
+	/** Minimum number of features in an image before all hope is lost */
+	public int minimumPairs = 100;
+
+	/** Configuration for determining if 2-views have a 3D relationship  */
+	public final ConfigEpipolarScore3D scorer3D = new ConfigEpipolarScore3D();
 
 	/** A new keyframe can't be made until the motion is greater than this. Relative to max(width,height) */
 	public final ConfigLength minTranslation = ConfigLength.relative(0.01, 0);
@@ -109,9 +106,7 @@ public class ConfigSelectFrames3D implements Configuration {
 		BoofMiscOps.checkTrue(historyLength >= 0);
 		BoofMiscOps.checkTrue(motionInlierPx >= 0);
 		BoofMiscOps.checkTrue(thresholdQuick >= 0.0 && thresholdQuick <= 1.0);
-		BoofMiscOps.checkTrue(threshold3D >= 0.0);
 		BoofMiscOps.checkTrue(minimumPairs >= 1);
-		BoofMiscOps.checkTrue(robustIterations >= 1);
 		BoofMiscOps.checkTrue(skipEvidenceRatio >= 0);
 
 		minTranslation.checkValidity();
@@ -121,16 +116,16 @@ public class ConfigSelectFrames3D implements Configuration {
 		tracker.checkValidity();
 		describe.checkValidity();
 		associate.checkValidity();
+		scorer3D.checkValidity();
 	}
 
 	public void setTo( ConfigSelectFrames3D src ) {
 		this.historyLength = src.historyLength;
 		this.motionInlierPx = src.motionInlierPx;
 		this.thresholdQuick = src.thresholdQuick;
-		this.threshold3D = src.threshold3D;
 		this.minimumPairs = src.minimumPairs;
-		this.robustIterations = src.robustIterations;
 		this.skipEvidenceRatio = src.skipEvidenceRatio;
+		this.scorer3D.setTo(src.scorer3D);
 		this.minTranslation.setTo(src.minTranslation);
 		this.maxTranslation.setTo(src.maxTranslation);
 		this.featureRadius.setTo(src.featureRadius);
