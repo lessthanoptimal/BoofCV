@@ -108,8 +108,8 @@ public class ExampleMultiViewSparseReconstruction {
 //		example.compute("drone_buildings_01.mp4", false);
 //		example.compute("steps_zoom_01.mp4", true);
 //		example.compute("steps_reg_01.mp4", true);
-		example.compute("steps_wide_01.mp4", true);
-//		example.compute("towel_box.mp4", true);
+//		example.compute("steps_wide_01.mp4", true);
+		example.compute("towel_box.mp4", true);
 //		example.compute("rock_loop_01.mp4", true);
 //		example.compute("turning_around_02.mp4", true);
 		example.visualizeSparseCloud();

@@ -171,6 +171,7 @@ public abstract class CommonEpipolarScore3DChecks extends BoofStandardJUnit {
 		int scenario = 0;
 		for (Se3_F64 view0_to_view1 : scenarios) {
 			alg.process(prior1, oneCamera ? null : prior2,
+					numPoints, numPoints,
 					createAssociations(oneCamera, numPoints, plane, view0_to_view1), fundamental, inlierIdx);
 			assertEquals(expect3D, alg.is3D(), "scenario=" + scenario++);
 			assertTrue(inlierIdx.size >= numPoints*0.7);

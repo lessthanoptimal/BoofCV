@@ -111,6 +111,7 @@ public class ScoreFundamentalHomographyCompatibility implements EpipolarScore3D 
 	}
 
 	@Override public void process( CameraPinholeBrown cameraA, @Nullable CameraPinholeBrown cameraB,
+								   int featuresA, int featuresB,
 								   List<AssociatedPair> pairs, DMatrixRMaj fundamental, DogArray_I32 inliersIdx ) {
 		is3D = false;
 		score = 0.0;

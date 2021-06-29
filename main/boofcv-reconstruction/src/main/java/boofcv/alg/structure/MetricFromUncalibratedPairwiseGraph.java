@@ -122,6 +122,10 @@ public class MetricFromUncalibratedPairwiseGraph extends ReconstructionFromPairw
 		// Score nodes for their ability to be seeds
 		Map<String, SeedInfo> mapScores = scoreNodesAsSeeds(pairwise, 2);
 
+		if (seedScores.isEmpty()) {
+			if (verbose != null) verbose.println("No seeds found. pairwise.size=" + pairwise.nodes.size);
+		}
+
 		// Create new seeds in priority of their scores
 		selectAndSpawnSeeds(dbSimilar, dbCams, pairwise, seedScores, mapScores);
 		// TODO change how initial seeds are handled. 1) Number should be dynamically adjusted. 2) Determine why

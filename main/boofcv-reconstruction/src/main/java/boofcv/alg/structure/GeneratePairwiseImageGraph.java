@@ -57,6 +57,11 @@ public class GeneratePairwiseImageGraph implements VerbosePrint {
 	CameraPinholeBrown priorA = new CameraPinholeBrown(2);
 	CameraPinholeBrown priorB = new CameraPinholeBrown(2);
 
+	DogArray<AssociatedIndex> matches = new DogArray<>(AssociatedIndex::new);
+	DogArray<AssociatedPair> pairs = new DogArray<>(AssociatedPair::new);
+	DogArray<Point2D_F64> srcFeats = new DogArray<>(Point2D_F64::new);
+	DogArray<Point2D_F64> dstFeats = new DogArray<>(Point2D_F64::new);
+
 	/**
 	 * Specifies consensus matching algorithms
 	 */
@@ -75,10 +80,10 @@ public class GeneratePairwiseImageGraph implements VerbosePrint {
 		this.graph.reset();
 
 		List<String> similar = new ArrayList<>();
-		DogArray<Point2D_F64> srcFeats = new DogArray<>(Point2D_F64::new);
-		DogArray<Point2D_F64> dstFeats = new DogArray<>(Point2D_F64::new);
-		DogArray<AssociatedIndex> matches = new DogArray<>(AssociatedIndex::new);
-		DogArray<AssociatedPair> pairs = new DogArray<>(AssociatedPair::new);
+		matches.reset();
+		pairs.reset();
+		srcFeats.reset();
+		dstFeats.reset();
 
 		// map to quickly look up the ID of a view
 		Map<String, Integer> imageToIndex = new HashMap<>();
@@ -101,7 +106,7 @@ public class GeneratePairwiseImageGraph implements VerbosePrint {
 
 			// Find similar, but filter out images which have a lower index as those matches have already been considered
 			int _idxTgt = idxTgt;
-			dbSimilar.findSimilar(src, (id)-> imageToIndex.get(id) > _idxTgt, similar);
+			dbSimilar.findSimilar(src, ( id ) -> imageToIndex.get(id) > _idxTgt, similar);
 			dbSimilar.lookupPixelFeats(src, srcFeats);
 
 			if (verbose != null) verbose.println("similar.size=" + similar.size() + " feats.size=" + srcFeats.size);
@@ -157,7 +162,9 @@ public class GeneratePairwiseImageGraph implements VerbosePrint {
 					src, dst, priorA.fx, priorA.cx, priorA.cy, priorB.fx, priorB.cx, priorB.cy);
 
 		// Pass in null if it's the same camera so that score algorithm will know it's dealing with a single camera
-		epipolarScore.process(priorA, sameCamera ? null : priorB, pairs.toList(), fundamental, inlierIdx);
+		epipolarScore.process(priorA, sameCamera ? null : priorB,
+				srcFeats.size, dstFeats.size,
+				pairs.toList(), fundamental, inlierIdx);
 
 		PairwiseImageGraph.Motion edge = graph.edges.grow();
 		edge.is3D = epipolarScore.is3D();
