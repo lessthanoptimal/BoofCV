@@ -23,7 +23,6 @@ import boofcv.abst.feature.describe.DescribePointRadiusAngle;
 import boofcv.abst.tracker.PointTrack;
 import boofcv.abst.tracker.PointTracker;
 import boofcv.alg.geo.PerspectiveOps;
-import boofcv.alg.geo.robust.GenerateHomographyLinear;
 import boofcv.alg.structure.EpipolarScore3D;
 import boofcv.factory.structure.ConfigSelectFrames3D;
 import boofcv.misc.BoofMiscOps;
@@ -32,15 +31,12 @@ import boofcv.struct.feature.AssociatedIndex;
 import boofcv.struct.feature.TupleDesc_F64;
 import boofcv.struct.geo.AssociatedPair;
 import boofcv.struct.image.ImageBase;
-import georegression.struct.homography.Homography2D_F64;
 import georegression.struct.point.Point2D_F64;
-import georegression.transform.homography.HomographyPointOps_F64;
 import gnu.trove.impl.Constants;
 import gnu.trove.map.TLongIntMap;
 import gnu.trove.map.hash.TLongIntHashMap;
 import lombok.Getter;
 import lombok.Setter;
-import org.ddogleg.fitting.modelset.ModelGenerator;
 import org.ddogleg.sorting.QuickSelect;
 import org.ddogleg.struct.*;
 import org.ejml.data.DMatrixRMaj;
@@ -111,6 +107,8 @@ public class SelectFramesForReconstruction3D<T extends ImageBase<T>> implements 
 	private @Getter boolean considered3D;
 	/** True if there are too few pairs with the key frame to reliably estimate scene structure */
 	private @Getter boolean sufficientFeaturePairs;
+	/** Why it requested a frame be saved */
+	private @Getter Cause cause = Cause.UNKNOWN;
 
 	//----------------------------- Internally used fields
 
@@ -118,7 +116,7 @@ public class SelectFramesForReconstruction3D<T extends ImageBase<T>> implements 
 	CameraPinholeBrown cameraA = new CameraPinholeBrown();
 	CameraPinholeBrown cameraB = new CameraPinholeBrown();
 
-	DMatrixRMaj fundamental = new DMatrixRMaj(3,3);
+	DMatrixRMaj fundamental = new DMatrixRMaj(3, 3);
 
 	// Number of frames currently processed
 	int frameNumber;
@@ -136,12 +134,6 @@ public class SelectFramesForReconstruction3D<T extends ImageBase<T>> implements 
 
 	// Pairs of features between the current frame and key frame
 	@Getter final DogArray<AssociatedPair> pairs = new DogArray<>(AssociatedPair::new);
-
-	// used to do a quick check to see if there is no chance of it being a 3D scene
-	@Getter @Setter ModelGenerator<Homography2D_F64, AssociatedPair> computeHomography =
-			new GenerateHomographyLinear(true);
-	// Storage for the computed homography
-	final Homography2D_F64 foundHomography = new Homography2D_F64();
 
 	// Storage for key frame
 	final Frame keyFrame;
@@ -195,6 +187,7 @@ public class SelectFramesForReconstruction3D<T extends ImageBase<T>> implements 
 		frameMotion = Double.NaN;
 		considered3D = false;
 		sufficientFeaturePairs = false;
+		cause = Cause.UNKNOWN;
 
 		performTracking(image);
 
@@ -203,12 +196,14 @@ public class SelectFramesForReconstruction3D<T extends ImageBase<T>> implements 
 		boolean saveImage = false;
 		escape:
 		if (forceKeyFrame) {
+			cause = Cause.FORCED;
 			forceKeyFrame = false;
 			saveImage = true;
 		} else {
 			createPairsWithKeyFrameTracking(keyFrame, currentFrame);
 
 			if (pairs.size < config.minimumPairs) {
+				cause = Cause.TRACKING_FAILURE;
 				// Almost all tracks got dropped. Could have been caused by something like a temporary obstruction
 				// or motion blur. Save the image and start tracking again
 				saveImage = true;
@@ -225,23 +220,26 @@ public class SelectFramesForReconstruction3D<T extends ImageBase<T>> implements 
 			double minMotionThresh = config.minTranslation.computeI(Math.max(width, height));
 			double maxMotionThresh = config.maxTranslation.computeI(Math.max(width, height));
 
-			if (verbose != null) verbose.printf("  Motion: distance=%.1f min=%.1f max=%.1f\n",
+			if (verbose != null) verbose.printf("_ Motion: distance=%.1f min=%.1f max=%.1f\n",
 					frameMotion, minMotionThresh, maxMotionThresh);
 
 			if (frameMotion >= minMotionThresh) {
 				if (frameMotion > maxMotionThresh) {
+					cause = Cause.EXCESSIVE_MOTION;
 					saveImage = true;
-				} else if (!isSceneStatic() && !isSceneClearlyNot3D()) {
-					considered3D = true;
+				} else if (!isSceneStatic()) {
 					saveImage = isScene3D();
-					if (!saveImage) {
+					considered3D = saveImage;
+					if (saveImage) {
+						cause = Cause.TRANSLATION_3D;
+					} else {
 						saveImage = checkSkippedBadFrame();
 					}
 				}
 			}
 		}
 
-		if (verbose != null) verbose.println("saveImage=" + saveImage);
+		if (verbose != null) verbose.println("saveImage=" + saveImage + " cause=" + cause);
 
 		// Save the frame and make it the new keyframe
 		if (saveImage) {
@@ -338,40 +336,7 @@ public class SelectFramesForReconstruction3D<T extends ImageBase<T>> implements 
 		// Compute the ratio of moved vs stationary
 		double ratio = moved/(double)pairs.size;
 
-		if (verbose != null) verbose.printf("  Static: moved=%4d total=%d ratio=%f\n", moved, pairs.size, ratio);
-
-		return ratio < config.thresholdQuick;
-	}
-
-	/**
-	 * Quick check to see if a homography can describe the track motion. Does not attempt to remove outliers.
-	 *
-	 * @return true if this is clearly not a 3D change relative to the key frame.
-	 */
-	protected boolean isSceneClearlyNot3D() {
-		// Not sure what to do if it fails. Returning true is that it will skip over the 3D check and associated
-		// using descriptions will be run as this is likely to be a bad frame
-		if (pairs.size < computeHomography.getMinimumPoints())
-			return true;
-		if (!computeHomography.generate(pairs.toList(), foundHomography))
-			return true;
-
-		double tol = config.motionInlierPx*config.motionInlierPx;
-		int outliers = 0;
-
-		var transformed = new Point2D_F64();
-		for (int pairIdx = 0; pairIdx < pairs.size; pairIdx++) {
-			AssociatedPair p = pairs.get(pairIdx);
-			HomographyPointOps_F64.transform(foundHomography, p.p1, transformed);
-			if (p.p2.distance2(transformed) > tol) {
-				outliers++;
-			}
-		}
-
-		double ratio = outliers/(double)pairs.size;
-
-		if (verbose != null)
-			verbose.printf("  ClearlyNot3D: outliers=%4d total=%d ratio=%f\n", outliers, pairs.size, ratio);
+		if (verbose != null) verbose.printf("_ Static: moved=%4d total=%d ratio=%f\n", moved, pairs.size, ratio);
 
 		return ratio < config.thresholdQuick;
 	}
@@ -406,7 +371,7 @@ public class SelectFramesForReconstruction3D<T extends ImageBase<T>> implements 
 		boolean skip = matches.size > pairs.size*config.skipEvidenceRatio;
 
 		if (verbose != null)
-			verbose.printf("  Skip: associated=%d tracking=%d skip=%s\n", matches.size, pairs.size, skip);
+			verbose.printf("_ Skip: associated=%d tracking=%d skip=%s\n", matches.size, pairs.size, skip);
 
 		return skip;
 	}
@@ -468,5 +433,16 @@ public class SelectFramesForReconstruction3D<T extends ImageBase<T>> implements 
 				return true;
 			});
 		}
+	}
+
+	/**
+	 * What caused to to request a frame be saved
+	 */
+	public enum Cause {
+		FORCED,
+		TRACKING_FAILURE,
+		EXCESSIVE_MOTION,
+		TRANSLATION_3D,
+		UNKNOWN
 	}
 }

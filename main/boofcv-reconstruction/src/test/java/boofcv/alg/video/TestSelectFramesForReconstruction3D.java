@@ -62,7 +62,6 @@ class TestSelectFramesForReconstruction3D extends BoofStandardJUnit {
 
 		alg.config.minimumPairs = 0;
 		alg.is3D = true;
-		alg.isClearlyNot3D = false;
 		alg.isStatic = false;
 
 		// Can't call init because of null checks
@@ -101,17 +100,14 @@ class TestSelectFramesForReconstruction3D extends BoofStandardJUnit {
 		alg.is3D = true; // 3D check should not be called. Sanity check here
 		alg.next(dummy);
 		alg.isStatic = false;
-		alg.isClearlyNot3D = true;
-		alg.next(dummy);
-		alg.isClearlyNot3D = false;
 		alg.next(dummy);
 
-		assertEquals(4, alg.callsCopy);
-		assertEquals(3, alg.callsCreatePairs);
-		assertEquals(4, alg.callsTracking);
+		assertEquals(3, alg.callsCopy);
+		assertEquals(2, alg.callsCreatePairs);
+		assertEquals(3, alg.callsTracking);
 
 		DogArray_I32 selected = alg.getSelectedFrames();
-		assertTrue(selected.isEquals(0, 3));
+		assertTrue(selected.isEquals(0, 2));
 	}
 
 	@Test void createPairsWithKeyFrameTracking() {
@@ -160,25 +156,6 @@ class TestSelectFramesForReconstruction3D extends BoofStandardJUnit {
 		assertFalse(alg.isSceneStatic());
 	}
 
-	@Test void isSceneClearlyNot3D() {
-		double tol = 2.0;
-		SelectFramesForReconstruction3D<GrayF32> alg = createMockAlg();
-		alg.config.motionInlierPx = tol;
-		// It will generate a model that translate by 2.0 along x-axis
-		alg.setComputeHomography(new MockModelGenerator(2.0));
-		// these will have a motion of 4.0 along the x-axis
-		for (int i = 0; i < 30; i++) {
-			alg.pairs.grow().setTo(0, 1, 4, 1);
-		}
-
-		alg.config.motionInlierPx = tol*1.01;
-		assertTrue(alg.isSceneClearlyNot3D());
-
-		// The tolerance should be just under now
-		alg.config.motionInlierPx = tol*0.99;
-		assertFalse(alg.isSceneClearlyNot3D());
-	}
-
 	/** Tracking is good, until one frame when it drops, then the next frame there's good association again */
 	@Test void checkSkippedBadFrame() {
 		SelectFramesForReconstruction3D<GrayF32> alg = createMockAlg();
@@ -205,7 +182,6 @@ class TestSelectFramesForReconstruction3D extends BoofStandardJUnit {
 	/** Used to check high level logic for deciding when to add a frame */
 	private class MockFrameSelector<T extends ImageBase<T>> extends SelectFramesForReconstruction3D<T> {
 		boolean isStatic = false;
-		boolean isClearlyNot3D = false;
 		boolean is3D = false;
 
 		int callsTracking = 0;
@@ -220,7 +196,6 @@ class TestSelectFramesForReconstruction3D extends BoofStandardJUnit {
 		@Override protected void copyTrackResultsIntoCurrentFrame( T image ) {callsCopy++;}
 		@Override protected void createPairsWithKeyFrameTracking( Frame keyFrame, Frame current ) {callsCreatePairs++;}
 		@Override protected boolean isSceneStatic() {return isStatic;}
-		@Override protected boolean isSceneClearlyNot3D() {return isClearlyNot3D;}
 		@Override protected boolean isScene3D() {return is3D;}
 	}
 
