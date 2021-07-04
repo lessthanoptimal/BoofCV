@@ -18,6 +18,7 @@
 
 package boofcv.examples.recognition;
 
+import boofcv.BoofVerbose;
 import boofcv.abst.scene.ConfigFeatureToSceneRecognition;
 import boofcv.abst.scene.SceneRecognition;
 import boofcv.abst.scene.WrapFeatureToSceneRecognition;
@@ -54,12 +55,14 @@ import java.util.List;
 public class ExampleSceneRecognition {
 
 	public static void main( String[] args ) {
-		String imagePath = "/home/pja/Downloads/inria/jpg1";//UtilIO.pathExample("recognition/vacation");
+		String imagePath = UtilIO.pathExample("recognition/scene");
 		List<String> images = UtilIO.listByPrefix(imagePath, null, ".jpg");
 		Collections.sort(images);
 
 		SceneRecognition<GrayU8> recognizer;
 
+		// Except for real-time applications or when there are more than a few hundred images, you might want to
+		// just learn the dictionary from scratch
 		File saveDirectory = new File("nister2006");
 
 		var imageIterator = new ImageFileListIterator<>(images, ImageType.SB_U8);
@@ -70,9 +73,14 @@ public class ExampleSceneRecognition {
 		} else {
 			// Learn how to describe images
 			var config = new ConfigFeatureToSceneRecognition();
+			// Use a hierarchical vocabulary tree, which is very fast and also one of the more accurate approaches
+			config.typeRecognize = ConfigFeatureToSceneRecognition.Type.NISTER_2006;
+			config.recognizeNister2006.learningMinimumPointsForChildren.setFixed(20);
 
 			recognizer = FactorySceneRecognition.createFeatureToScene(config, ImageType.SB_U8);
-			recognizer.setVerbose(System.out, null);
+
+			// This will print out a lot of debugging information to stdout
+			recognizer.setVerbose(System.out, BoofMiscOps.hashSet(BoofVerbose.RECURSIVE));
 
 			recognizer.learnModel(imageIterator);
 
@@ -91,13 +99,15 @@ public class ExampleSceneRecognition {
 
 		ListDisplayPanel gui = new ListDisplayPanel();
 
+		// Specifies which image it will try to look up. In the example, related images are in sets of 3.
+		int queryImage = 9;
+
 		// Add the target which the other images are being matched against
-		gui.addImage(UtilImageIO.loadImage(images.get(0)), "Target", ScaleOptions.ALL);
+		gui.addImage(UtilImageIO.loadImage(images.get(queryImage)), "Query", ScaleOptions.ALL);
 
 		// Look up images
 		DogArray<SceneRecognition.Match> matches = new DogArray<>(SceneRecognition.Match::new);
-		imageIterator.reset();
-		recognizer.query(imageIterator.next(),/* filter */ ( id ) -> true,/* limit */ 10, matches);
+		recognizer.query(imageIterator.loadImage(queryImage),/* filter */ ( id ) -> true,/* limit */ 5, matches);
 		for (int i = 0; i < matches.size; i++) {
 			String file = matches.get(i).id;
 			double error = matches.get(i).error;
@@ -107,7 +117,7 @@ public class ExampleSceneRecognition {
 		}
 
 		System.out.println("Total images = " + images.size());
-		System.out.println(images.get(imageIterator.getIndex()) + " -> " + matches.get(0).id + " matches.size=" + matches.size);
+		System.out.println(images.get(queryImage) + " -> " + matches.get(0).id + " matches.size=" + matches.size);
 
 		ShowImages.showWindow(gui, "Similar Images by Features", true);
 	}

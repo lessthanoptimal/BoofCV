@@ -21,7 +21,7 @@ package boofcv.alg.scene.bow;
 import org.jetbrains.annotations.NotNull;
 
 /**
- * Common image match data type for Bag-of-Words methds
+ * Common image match data type for Bag-of-Words methods
  *
  * @author Peter Abeles
  */

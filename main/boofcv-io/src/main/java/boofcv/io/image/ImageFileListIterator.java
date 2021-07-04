@@ -65,8 +65,7 @@ public class ImageFileListIterator<T extends ImageBase<T>> implements Iterator<T
 		do {
 			try {
 				index++;
-				BufferedImage buffered = UtilImageIO.loadImage(paths.get(index));
-				ConvertBufferedImage.convertFrom(buffered, true, image);
+				loadImage(index);
 				break;
 			} catch (RuntimeException e) {
 				exception.process(index, paths.get(index), e);
@@ -74,6 +73,12 @@ public class ImageFileListIterator<T extends ImageBase<T>> implements Iterator<T
 		} while (index < paths.size());
 
 		return filter.process(image);
+	}
+
+	public T loadImage( int index ) {
+		BufferedImage buffered = UtilImageIO.loadImage(paths.get(index));
+		ConvertBufferedImage.convertFrom(buffered, true, image);
+		return image;
 	}
 
 	public @FunctionalInterface interface HandleException {

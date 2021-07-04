@@ -20,6 +20,8 @@ package boofcv.abst.scene;
 
 import boofcv.abst.scene.ann.ConfigRecognitionNearestNeighbor;
 import boofcv.abst.scene.nister2006.ConfigRecognitionNister2006;
+import boofcv.alg.scene.ann.RecognitionNearestNeighborInvertedFile;
+import boofcv.alg.scene.nister2006.RecognitionVocabularyTreeNister2006;
 import boofcv.factory.feature.describe.ConfigConvertTupleDesc;
 import boofcv.factory.feature.describe.ConfigDescribeRegion;
 import boofcv.factory.feature.detdesc.ConfigDetectDescribe;
@@ -102,7 +104,13 @@ public class ConfigFeatureToSceneRecognition implements Configuration {
 	 * Which type of recognition algorithm to use
 	 */
 	public enum Type {
+		/**
+		 * @see RecognitionVocabularyTreeNister2006
+		 */
 		NISTER_2006,
+		/**
+		 * @see RecognitionNearestNeighborInvertedFile
+		 */
 		NEAREST_NEIGHBOR
 	}
 }

@@ -37,8 +37,8 @@ import java.util.List;
 import java.util.Set;
 
 /**
- * Image recognition based off of [1] using inverted files. A {@link HierarchicalVocabularyTree} is assumed to hav
- * e been already trained. When an image is added to the database a TF-IDF descriptor is computed using the tree
+ * Image recognition based off of [1] using inverted files. A {@link HierarchicalVocabularyTree} is assumed to have
+ * been already trained. When an image is added to the database a TF-IDF descriptor is computed using the tree
  * and then added to the relevant tree's leaves. When an image is looked up its TF-IDF descriptor is found then
  * all images in the data base are found that share at least one leaf node. These candidate matches are then
  * compared against each other and scored using L2-Norm.
