@@ -54,7 +54,6 @@ import boofcv.struct.image.ImageType;
 import georegression.struct.homography.Homography2D_F64;
 import org.ddogleg.fitting.modelset.ModelMatcher;
 import org.ejml.data.DMatrixRMaj;
-import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 /**
@@ -86,12 +85,15 @@ public class FactorySceneReconstruction {
 		if (config == null)
 			config = new ConfigGeneratePairwiseImageGraph();
 
-		EpipolarScore3D scorer = getEpipolarScore3D(config.score);
+		EpipolarScore3D scorer = epipolarScore3D(config.score);
 
 		return new GeneratePairwiseImageGraph(scorer);
 	}
 
-	private static EpipolarScore3D getEpipolarScore3D( @NotNull ConfigEpipolarScore3D config) {
+	/**
+	 * Creates a new instance of {@link EpipolarScore3D} based on the passed in configuration
+	 */
+	public static EpipolarScore3D epipolarScore3D( ConfigEpipolarScore3D config) {
 		ModelMatcher<DMatrixRMaj, AssociatedPair> ransac3D =
 				FactoryMultiViewRobust.fundamentalRansac(config.fundamental, config.ransacF);
 
@@ -239,7 +241,7 @@ public class FactorySceneReconstruction {
 		alg.config.setTo(config);
 		alg.setTracker(FactoryPointTracker.tracker(config.tracker, grayType, null));
 		alg.setAssociate(FactoryAssociation.generic2(config.associate,describe));
-		alg.setScorer(FactorySceneReconstruction.getEpipolarScore3D(config.scorer3D));
+		alg.setScorer(FactorySceneReconstruction.epipolarScore3D(config.scorer3D));
 
 		return alg;
 	}
