@@ -1,3 +1,30 @@
+0.39
+TODO New fisheye model
+TODO datta2009
+TODO Image Stitching: N-View stitching https://github.com/lessthanoptimal/BoofCV/issues/167
+TODO Monocular VO
+TODO Monocular SLAM
+TODO Stereo SLAM
+
+TODO DB
+    - Check all views when merging scenes for consistency
+    - Root cause why it diverges if you consider too many images
+    - Metric: Expand using 2-views
+    - Metric: Initialize using 2-views
+    - Ransac: Tell it the minimum threshold and abort early if it can't be meet?
+    - Ransac: Specify max iterations using probability instead?
+    * Pruning of views when creating pairwise graph. If too similar do not include it. Could be done before pairwise
+      Should be able to process a video sequence where it's static for several frames
+
+TODO Uncalibrated Stereo: Figure out why it seems to select an invalid solution when it got almost everything right.
+TODO NonMaximum: consider making radius ConfigLength and relative to sqrt(pixels)
+TODO Would subpixel corners make repeatability better?
+TODO RANSAC: provide way to feed in candidate models before it starts
+TODO Galvez-Lopez, Tardos, "Bag of Binary Words for Fast Place Recognition in Image Sequences" 2012
+TODO Generic calibration target for multi cameras, QR Code for first version
+TODO Multi Camera Calibration API
+TODO Application FiducialDetection add new fiducials to this
+
 ----------Next Release
 
 TODO PointTracker

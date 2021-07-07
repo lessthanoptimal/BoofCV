@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -51,6 +51,7 @@ public class ExampleLauncherApp extends ApplicationLauncherApp {
 		packages.add("boofcv.examples.geometry");
 		packages.add("boofcv.examples.imageprocessing");
 		packages.add("boofcv.examples.recognition");
+		packages.add("boofcv.examples.reconstruction");
 		packages.add("boofcv.examples.segmentation");
 		packages.add("boofcv.examples.sfm");
 		packages.add("boofcv.examples.stereo");

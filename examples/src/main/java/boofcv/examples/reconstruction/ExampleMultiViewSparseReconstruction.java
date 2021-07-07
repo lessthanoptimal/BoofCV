@@ -22,6 +22,7 @@ import boofcv.BoofVerbose;
 import boofcv.abst.geo.bundle.SceneStructureMetric;
 import boofcv.abst.tracker.PointTrack;
 import boofcv.abst.tracker.PointTracker;
+import boofcv.alg.cloud.PointCloudReader;
 import boofcv.alg.geo.bundle.cameras.BundlePinholeSimplified;
 import boofcv.alg.mvs.ColorizeMultiViewStereoResults;
 import boofcv.alg.similar.ConfigSimilarImagesSceneRecognition;
@@ -40,8 +41,10 @@ import boofcv.io.geo.MultiViewIO;
 import boofcv.io.image.LookUpImageFilesByIndex;
 import boofcv.io.image.SimpleImageSequence;
 import boofcv.io.image.UtilImageIO;
+import boofcv.io.points.PointCloudIO;
 import boofcv.io.wrapper.DefaultMediaManager;
 import boofcv.misc.BoofMiscOps;
+import boofcv.struct.Point3dRgbI_F64;
 import boofcv.struct.image.GrayU8;
 import boofcv.struct.image.ImageType;
 import boofcv.struct.image.InterleavedU8;
@@ -55,12 +58,12 @@ import georegression.struct.point.Point4D_F64;
 import georegression.struct.so.Rodrigues_F64;
 import org.apache.commons.io.FilenameUtils;
 import org.ddogleg.DDoglegConcurrency;
+import org.ddogleg.struct.DogArray;
 import org.ddogleg.struct.DogArray_I32;
 
 import javax.swing.*;
 import java.awt.*;
-import java.io.File;
-import java.io.UncheckedIOException;
+import java.io.*;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -81,10 +84,6 @@ import static boofcv.misc.BoofMiscOps.checkTrue;
  * @author Peter Abeles
  */
 public class ExampleMultiViewSparseReconstruction {
-
-	// Instead of processing all the frames just process the first N frames
-	int maxFrames = 40;
-
 	String workDirectory;
 	List<String> imageFiles = new ArrayList<>();
 
@@ -98,20 +97,12 @@ public class ExampleMultiViewSparseReconstruction {
 
 	public static void main( String[] args ) {
 		var example = new ExampleMultiViewSparseReconstruction();
-		example.maxFrames = 1000;       // This will process the entire sequence
-//		example.compute("tree_snow_01.mp4", true);
+		example.compute("tree_snow_01.mp4", true);
 //		example.compute("ditch_02.mp4", true);
 //		example.compute("holiday_display_01.mp4", true);
 //		example.compute("log_building_02.mp4", true);
-//		example.compute("steps_zoom_01.mp4", true);
 //		example.compute("drone_park_01.mp4", false);
-//		example.compute("drone_buildings_01.mp4", false);
-//		example.compute("steps_zoom_01.mp4", true);
-//		example.compute("steps_reg_01.mp4", true);
-//		example.compute("steps_wide_01.mp4", true);
-		example.compute("towel_box.mp4", true);
-//		example.compute("rock_loop_01.mp4", true);
-//		example.compute("turning_around_02.mp4", true);
+//		example.compute("stone_sign.mp4", true);
 		example.visualizeSparseCloud();
 
 		System.out.println("done");
@@ -152,7 +143,7 @@ public class ExampleMultiViewSparseReconstruction {
 			System.out.println("### Decoding Video");
 			BoofMiscOps.profile(() -> {
 				int frame = 0;
-				while (sequence.hasNext() && frame < maxFrames) {
+				while (sequence.hasNext()) {
 					InterleavedU8 image = sequence.next();
 					File imageFile = new File(imageDirectory, String.format("frame%04d.png", frame++));
 					imageFiles.add(imageFile.getPath());
@@ -244,12 +235,6 @@ public class ExampleMultiViewSparseReconstruction {
 
 				// Everything maps to the same camera
 				dbCams.addView(id, 0);
-
-				// TODO drop tracks which have been viewed for too long to reduce the negative affects of track drift?
-
-				// To keep things manageable only process the first few frames, if configured to do so
-				if (frameId >= maxFrames)
-					break;
 			}
 
 			dbSimilar.finishedTracking();
@@ -284,10 +269,6 @@ public class ExampleMultiViewSparseReconstruction {
 				if (frameId == 0)
 					dbCams.addCameraCanonical(frame.width, frame.height, 60.0);
 				dbCams.addView(viewID, 0);
-
-				// To keep things manageable only process the first few frames, if configured to do so
-				if (frameId >= maxFrames)
-					break;
 			}
 
 			similarImages.fixate();
@@ -414,6 +395,17 @@ public class ExampleMultiViewSparseReconstruction {
 			// Size the window and show it to the user
 			viewer.getComponent().setPreferredSize(new Dimension(600, 600));
 			ShowImages.showWindow(viewer.getComponent(), "Refined Scene", true);
+
+			DogArray<Point3dRgbI_F64> copy = new DogArray<>(Point3dRgbI_F64::new);
+			viewer.copyCloud(copy);
+
+			try (FileOutputStream out = new FileOutputStream("saved_cloud.ply")) {
+				PointCloudIO.save3D(PointCloudIO.Format.PLY, PointCloudReader.wrapF64RGB(copy.toList()), true, out);
+			} catch (FileNotFoundException e) {
+				e.printStackTrace();
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
 		});
 	}
 }

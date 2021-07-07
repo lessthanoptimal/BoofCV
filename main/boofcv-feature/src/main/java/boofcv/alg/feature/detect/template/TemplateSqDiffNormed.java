@@ -97,7 +97,6 @@ public abstract class TemplateSqDiffNormed<T extends ImageBase<T>>
 
 				for (int x = 0; x < o.template.width; x++) {
 					float v = o.image.data[imageIndex++]*o.mask.data[maskIndex++];
-					;
 					imageSumSq += v*v;
 				}
 			}

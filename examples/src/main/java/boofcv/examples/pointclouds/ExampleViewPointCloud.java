@@ -21,6 +21,7 @@ package boofcv.examples.pointclouds;
 import boofcv.alg.cloud.PointCloudWriter;
 import boofcv.gui.PointCloudViewerPanel;
 import boofcv.gui.image.ShowImages;
+import boofcv.io.UtilIO;
 import boofcv.io.points.PointCloudIO;
 import boofcv.struct.Point3dRgbI_F32;
 import boofcv.visualize.PointCloudViewer;
@@ -40,10 +41,10 @@ import java.io.IOException;
  */
 public class ExampleViewPointCloud {
 	public static void main( String[] args ) throws IOException {
-		String filePath = "cloud_loop2.ply";
+		String filePath = UtilIO.pathExample("mvs/stone_sign.ply");
 
 		// Load the PLY file
-		DogArray<Point3dRgbI_F32> cloud = new DogArray<>(Point3dRgbI_F32::new);
+		var cloud = new DogArray<>(Point3dRgbI_F32::new);
 		PointCloudIO.load(PointCloudIO.Format.PLY, new FileInputStream(filePath), PointCloudWriter.wrapF32RGB(cloud));
 
 		System.out.println("Total Points " + cloud.size);
@@ -56,7 +57,7 @@ public class ExampleViewPointCloud {
 
 		PointCloudViewer viewer = viewerPanel.getViewer();
 		// Change the camera's Field-of-View
-		viewer.setCameraHFov(UtilAngle.radian(100));
+		viewer.setCameraHFov(UtilAngle.radian(60));
 		// So many formats to store a 3D point and color that a functional API is used here
 		viewer.addCloud(
 				( idx, p ) -> ConvertFloatType.convert(cloud.get(idx), p),

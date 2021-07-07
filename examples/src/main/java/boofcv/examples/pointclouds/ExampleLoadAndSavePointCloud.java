@@ -38,17 +38,17 @@ import java.util.List;
  */
 public class ExampleLoadAndSavePointCloud {
 	public static void main( String[] args ) throws IOException {
-		File file = File.createTempFile("boofcv","txt");
+		File file = File.createTempFile("boofcv", "txt");
 
 		// Creating a point cloud and storing it in a more "exotic" format used when dealing with a very large
 		// number of points.
 		PackedArray<Point3D_F64> original = new PackedBigArrayPoint3D_F64();
 		for (int i = 0; i < 100; i++) {
 			// create arbitrary points
-			original.append(new Point3D_F64(i,i+1,-i));
+			original.append(new Point3D_F64(i, i + 1, -i));
 		}
 
-		System.out.println("original.size="+original.size());
+		System.out.println("original.size=" + original.size());
 
 		// Save the colorless point cloud
 		PointCloudIO.save3D(PointCloudIO.Format.PLY,
@@ -57,17 +57,17 @@ public class ExampleLoadAndSavePointCloud {
 						( index, point ) -> point.setTo(original.getTemp(index)),
 						// specifies the number of points
 						original.size()),
-				false,new FileOutputStream(file));
+				/* saveRGB */false, new FileOutputStream(file));
 
 		// create another arbitrary format to store the loaded results
 		List<Point3D_F64> found = new ArrayList<>();
 
 		PointCloudIO.load(PointCloudIO.Format.PLY, new FileInputStream(file),
-				(x,y,z,rgb)->found.add(new Point3D_F64(x,y,z)));
+				( x, y, z, rgb ) -> found.add(new Point3D_F64(x, y, z)));
 		// There's a non functional version of load() which will provide the writer with information about the
 		// clouds size and format.
 
-		System.out.println("found.size="+found.size());
+		System.out.println("found.size=" + found.size());
 
 		// clean up
 		file.delete();

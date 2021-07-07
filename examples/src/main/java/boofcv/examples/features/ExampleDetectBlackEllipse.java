@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -42,7 +42,7 @@ import java.io.File;
  * @author Peter Abeles
  */
 public class ExampleDetectBlackEllipse {
-	public static void main(String[] args) {
+	public static void main( String[] args ) {
 		String[] images = new String[]{
 				"shapes/polygons01.jpg",
 				"shapes/shapes02.png",
@@ -53,11 +53,11 @@ public class ExampleDetectBlackEllipse {
 
 		BinaryEllipseDetector<GrayU8> detector = FactoryShapeDetector.ellipse(null, GrayU8.class);
 
-		for( String fileName : images ) {
+		for (String fileName : images) {
 			BufferedImage image = UtilImageIO.loadImage(UtilIO.pathExample(fileName));
 
 			GrayU8 input = ConvertBufferedImage.convertFromSingle(image, null, GrayU8.class);
-			GrayU8 binary = new GrayU8(input.width,input.height);
+			GrayU8 binary = new GrayU8(input.width, input.height);
 
 			// Binarization is done outside to allows creative tricks.  For example, when applied to a chessboard
 			// pattern where square touch each other, the binary image is eroded first so that they don't touch.
@@ -73,15 +73,15 @@ public class ExampleDetectBlackEllipse {
 			// visualize results by drawing red polygons
 			DogArray<BinaryEllipseDetector.EllipseInfo> found = detector.getFound();
 			Graphics2D g2 = image.createGraphics();
-			g2.setStroke(new BasicStroke(3));
+			g2.setStroke(new BasicStroke(5));
 			g2.setColor(Color.RED);
 			for (int i = 0; i < found.size; i++) {
 				VisualizeShapes.drawEllipse(found.get(i).ellipse, g2);
 			}
 
-			panel.addImage(image,new File(fileName).getName());
+			panel.addImage(image, new File(fileName).getName());
 		}
 
-		ShowImages.showWindow(panel,"Detected Ellipses",true);
+		ShowImages.showWindow(panel, "Detected Ellipses", true);
 	}
 }

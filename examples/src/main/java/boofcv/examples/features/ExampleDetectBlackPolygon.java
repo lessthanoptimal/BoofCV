@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -97,12 +97,12 @@ public class ExampleDetectBlackPolygon {
 			// visualize results by drawing red polygons
 			java.util.List<Polygon2D_F64> found = detector.getPolygons(null,null);
 			Graphics2D g2 = image.createGraphics();
-			g2.setStroke(new BasicStroke(3));
+			g2.setStroke(new BasicStroke(5));
 			for (int i = 0; i < found.size(); i++) {
 				g2.setColor(Color.RED);
 				VisualizeShapes.drawPolygon(found.get(i), true, g2, true);
 				g2.setColor(Color.CYAN);
-				VisualizeShapes.drawPolygonCorners(found.get(i), 2, g2, true);
+				VisualizeShapes.drawPolygonCorners(found.get(i), 3, g2, true);
 			}
 
 			panel.addImage(image,new File(fileName).getName());
