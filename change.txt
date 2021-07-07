@@ -12,16 +12,13 @@ Version : 0.38
 - Examples
   * Added an example for computing a trifocal tensor
   * Added an example showing how the trifocal tensor can be used
-  * TODO Add dataset for scene recognition
 - Applications
   * Batch down sample app now lets you scale for a fix number of pixels and keep aspect ratio.
   * CameraCalibration can now just save detections
   * Several apps now let you specify a path using 'glob:' and 'regex:' greatly improving its versatility
-  * TODO FiducialDetection add new fiducials to this
   * Added Scene reconstruction application. Command line only for now
 - Android
   * Fixed SimpleCamera2Activity not properly settings intrinsics. Thanks infologika-outsrc for the bug report
-  * TODO Update MVS and make sure it works
 - Functional API
   * Added forEachXY and forEachPixel to images
   * PixelMath.lambda is now PixelMath.operator
@@ -58,7 +55,6 @@ Version : 0.38
   * Added SimilarImages implementations that use Image Recognition, i.e. loop closure
   * Instead of a single seed for the metric reconstruction multiple seeds are spawned, grown, then merged.
   * Improved pairwise scoring. It can differentiate between planar scenes and pure rotations.
-  * TODO experiment with 50% error for score 3D with planes
 - SFM
   * Triangulate 2-views in homogenous coordinates
   * Switched several 2-view triangulation classes over to using homogenous coordinates so that
@@ -71,27 +67,6 @@ Version : 0.38
 - Misc
   * Added ConfigGenerator for easily creating a set of Configurations when parameter tuning
   * Added PointTracker.getImageType() so you know what type of image it requires
-
-
-TODO Image Stitching: N-View stitching https://github.com/lessthanoptimal/BoofCV/issues/167
-
-TODO DB
-    - Check all views when merging scenes for consistency
-    - Root cause why it diverges if you consider too many images
-    - Metric: Expand using 2-views
-    - Metric: Initialize using 2-views
-    - Ransac: Tell it the minimum threshold and abort early if it can't be meet?
-    - Ransac: Specify max iterations using probability instead?
-    * Pruning of views when creating pairwise graph. If too similar do not include it. Could be done before pairwise
-      Should be able to process a video sequence where it's static for several frames
-
-TODO Uncalibrated Stereo: Figure out why it seems to select an invalid solution when it got almost everything right.
-TODO NonMaximum: consider making radius ConfigLength and relative to sqrt(pixels)
-TODO Would subpixel corners make repeatability better?
-TODO RANSAC: provide way to feed in candidate models before it starts
-TODO Galvez-Lopez, Tardos, "Bag of Binary Words for Fast Place Recognition in Image Sequences" 2012
-TODO Generic calibration target for multi cameras, QR Code for first version
-TODO Multi Camera Calibration API
 
 ---------------------------------------------
 Date    : 2020/Dec/21

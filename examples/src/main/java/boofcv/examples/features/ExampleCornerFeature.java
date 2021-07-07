@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -44,7 +44,7 @@ import java.awt.image.BufferedImage;
  * @author Peter Abeles
  */
 public class ExampleCornerFeature {
-	public static void main(String[] args) {
+	public static void main( String[] args ) {
 		ConfigGeneralDetector configNonMax = new ConfigGeneralDetector();
 		// a large radius is used to exaggerate weighted/unweighted affects. Try 1 or 2 for a typical value
 		configNonMax.radius = 10;
@@ -55,30 +55,30 @@ public class ExampleCornerFeature {
 		configCorner.weighted = true;              // weighted corners will appear at the corners on a chessboard
 
 		// set weighted to false and see what happens to the feature's locations. unweighted is much faster
-		GeneralFeatureDetector<GrayU8,GrayS16> detector = FactoryDetectPoint.createShiTomasi(configNonMax,configCorner, GrayS16.class);
-		ImageGradient<GrayU8, GrayS16> sobel = FactoryDerivative.sobel(GrayU8.class,GrayS16.class);
+		GeneralFeatureDetector<GrayU8, GrayS16> detector = FactoryDetectPoint.createShiTomasi(configNonMax, configCorner, GrayS16.class);
+		ImageGradient<GrayU8, GrayS16> sobel = FactoryDerivative.sobel(GrayU8.class, GrayS16.class);
 
 		BufferedImage image = UtilImageIO.loadImage(UtilIO.pathExample("calibration/mono/Sony_DSC-HX5V_Chess/frame05.jpg"));
 
 		// Convert the image into a usable format and predeclare memory
-		GrayU8 gray = ConvertBufferedImage.convertFrom(image,(GrayU8)null);
-		GrayS16 derivX = new GrayS16(gray.width,gray.height);
-		GrayS16 derivY = new GrayS16(gray.width,gray.height);
+		GrayU8 gray = ConvertBufferedImage.convertFrom(image, (GrayU8)null);
+		GrayS16 derivX = new GrayS16(gray.width, gray.height);
+		GrayS16 derivY = new GrayS16(gray.width, gray.height);
 
 		// The first image derivatives are needed
-		sobel.process(gray, derivX,derivY);
+		sobel.process(gray, derivX, derivY);
 
 		// Compute the corners
-		detector.process(gray,derivX,derivY,null,null,null);
+		detector.process(gray, derivX, derivY, null, null, null);
 
 		// Visualize the results
 		QueueCorner corners = detector.getMaximums();
 		Graphics2D g2 = image.createGraphics();
 		for (int i = 0; i < corners.size; i++) {
 			Point2D_I16 c = corners.get(i);
-			VisualizeFeatures.drawPoint(g2,c.x,c.y,4,Color.RED,true);
+			VisualizeFeatures.drawPoint(g2, c.x, c.y, 4, Color.RED, true);
 		}
 
-		ShowImages.showWindow(image,"Corners",true);
+		ShowImages.showWindow(image, "Corners", true);
 	}
 }

@@ -49,10 +49,10 @@ public class ExampleDenseImageFeatures {
 
 	// Here's an example of how to use the high level interface. There are a variety of algorithms to choose from
 	// For much larger images you might need to shrink the image down or change the cell size to get good results.
-	public static void HighLevel( GrayF32 input) {
+	public static void HighLevel( GrayF32 input ) {
 		System.out.println("\n------------------- Dense High Level");
-		DescribeImageDense<GrayF32,TupleDesc_F64> describer = FactoryDescribeImageDense.
-				hog(new ConfigDenseHoG(),input.getImageType());
+		DescribeImageDense<GrayF32, TupleDesc_F64> describer = FactoryDescribeImageDense.
+				hog(new ConfigDenseHoG(), input.getImageType());
 //				sift(new ConfigDenseSift(),GrayF32.class);
 //				surfFast(new ConfigDenseSurfFast(),GrayF32.class);
 
@@ -60,12 +60,12 @@ public class ExampleDenseImageFeatures {
 		describer.process(input);
 
 		// print out part of the first few features
-		System.out.println("Total Features = "+describer.getLocations().size());
+		System.out.println("Total Features = " + describer.getLocations().size());
 		for (int i = 0; i < 5; i++) {
 			Point2D_I32 p = describer.getLocations().get(i);
 			TupleDesc_F64 d = describer.getDescriptions().get(i);
 
-			System.out.printf("%3d %3d = [ %f %f %f %f\n",p.x,p.y,d.data[0],d.data[1],d.data[2],d.data[3]);
+			System.out.printf("%3d %3d = [ %f %f %f %f\n", p.x, p.y, d.data[0], d.data[1], d.data[2], d.data[3]);
 
 			// You would process the feature descriptor here
 		}
@@ -83,10 +83,10 @@ public class ExampleDenseImageFeatures {
 
 		// Let's print a few parameters just because we can. They can be modified using the configuration class passed in
 		System.out.println("\n------------------- HOG Low Level");
-		System.out.println("HOG pixels per cell "+describer.getPixelsPerCell());
-		System.out.println("HOG region width "+describer.getRegionWidthPixelX());
-		System.out.println("HOG region height "+describer.getRegionWidthPixelY());
-		System.out.println("HOG bins "+describer.getOrientationBins());
+		System.out.println("HOG pixels per cell " + describer.getPixelsPerCell());
+		System.out.println("HOG region width " + describer.getRegionWidthPixelX());
+		System.out.println("HOG region height " + describer.getRegionWidthPixelY());
+		System.out.println("HOG bins " + describer.getOrientationBins());
 
 		// go through all the cells in the image. If you only wanted to process part of the image it could be done here
 		// In the high level API the order of cells isn't specified and might be in some arbitrary order or in some
@@ -99,9 +99,9 @@ public class ExampleDenseImageFeatures {
 //		}
 	}
 
-	public static void main(String[] args) {
+	public static void main( String[] args ) {
 		BufferedImage buffered = UtilImageIO.loadImage(UtilIO.pathExample("segment/berkeley_man.jpg"));
-		GrayF32 input = ConvertBufferedImage.convertFrom(buffered,(GrayF32)null);
+		GrayF32 input = ConvertBufferedImage.convertFrom(buffered, (GrayF32)null);
 
 		HighLevel(input);
 		LowLevelHOG(input);

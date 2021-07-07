@@ -69,9 +69,11 @@ public class ExampleMultiBaselineStereo {
 		// Specifies the "center" frame to use
 		int centerViewIdx = 15;
 		example.compute("tree_snow_01.mp4", true);
-//		example.compute("ditch_02.mp4");
-//		example.compute("holiday_display_01.mp4");
-//		example.compute("log_building_02.mp4");
+//		example.compute("ditch_02.mp4", true);
+//		example.compute("holiday_display_01.mp4"", true);
+//		example.compute("log_building_02.mp4"", true);
+//		example.compute("drone_park_01.mp4", false);
+//		example.compute("stone_sign.mp4", true);
 
 		// We need a way to load images based on their ID. In this particular case the ID encodes the array index.
 		var imageLookup = new LookUpImageFilesByIndex(example.imageFiles);

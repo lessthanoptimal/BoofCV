@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -21,6 +21,7 @@ package boofcv.gui;
 import boofcv.gui.image.ImagePanel;
 import boofcv.gui.image.ScaleOptions;
 import boofcv.io.image.ConvertBufferedImage;
+import boofcv.misc.BoofMiscOps;
 import boofcv.struct.image.ImageBase;
 
 import javax.swing.*;
@@ -106,6 +107,7 @@ public class ListDisplayPanel extends JPanel implements ListSelectionListener {
 	}
 
 	public void addImage( BufferedImage image, String name, ScaleOptions scaling ) {
+		BoofMiscOps.checkTrue(image != null, "image is null. Does the file not exist?");
 		addItem(new ImagePanel(image, scaling), name);
 	}
 

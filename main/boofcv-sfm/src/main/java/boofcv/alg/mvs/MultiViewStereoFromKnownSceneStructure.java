@@ -399,7 +399,7 @@ public class MultiViewStereoFromKnownSceneStructure<T extends ImageGray<T>> impl
 		}
 
 		// The fused disparity doesn't compute a mask since all invalid pixels are marked as invalid using
-		// he disparity value
+		// the disparity value
 		GrayF32 disparity = computeFused.fusedDisparity;
 		dummyMask.reshape(disparity);
 		ImageMiscOps.fill(dummyMask, 0);

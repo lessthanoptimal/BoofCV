@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -43,7 +43,7 @@ import java.awt.image.BufferedImage;
  */
 public class ExampleDenseOpticalFlow {
 
-	public static void main(String[] args) {
+	public static void main( String[] args ) {
 		MediaManager media = DefaultMediaManager.INSTANCE;
 
 //		String fileName0 = UtilIO.pathExample("denseflow/dogdance07.png");
@@ -65,14 +65,14 @@ public class ExampleDenseOpticalFlow {
 		BufferedImage buff0 = media.openImage(fileName0);
 		BufferedImage buff1 = media.openImage(fileName1);
 
-		GrayF32 full = new GrayF32(buff0.getWidth(),buff0.getHeight());
+		GrayF32 full = new GrayF32(buff0.getWidth(), buff0.getHeight());
 
 		// Dense optical flow is very computationally expensive.  Just process the image at 1/2 resolution
-		GrayF32 previous = new GrayF32(full.width/2,full.height/2);
+		GrayF32 previous = new GrayF32(full.width/2, full.height/2);
 		GrayF32 current = previous.createSameShape();
-		ImageFlow flow = new ImageFlow(previous.width,previous.height);
+		ImageFlow flow = new ImageFlow(previous.width, previous.height);
 
-		ConvertBufferedImage.convertFrom(buff0,full);
+		ConvertBufferedImage.convertFrom(buff0, full);
 		new FDistort(full, previous).scaleExt().apply();
 		ConvertBufferedImage.convertFrom(buff1, full);
 		new FDistort(full, current).scaleExt().apply();
@@ -81,21 +81,21 @@ public class ExampleDenseOpticalFlow {
 		denseFlow.process(previous, current, flow);
 
 		// Visualize the results
-		PanelGridPanel gui = new PanelGridPanel(1,2);
+		PanelGridPanel gui = new PanelGridPanel(1, 2);
 
-		BufferedImage converted0 = new BufferedImage(current.width,current.height,BufferedImage.TYPE_INT_RGB);
-		BufferedImage converted1 = new BufferedImage(current.width,current.height,BufferedImage.TYPE_INT_RGB);
-		BufferedImage visualized = new BufferedImage(current.width,current.height,BufferedImage.TYPE_INT_RGB);
+		BufferedImage converted0 = new BufferedImage(current.width, current.height, BufferedImage.TYPE_INT_RGB);
+		BufferedImage converted1 = new BufferedImage(current.width, current.height, BufferedImage.TYPE_INT_RGB);
+		BufferedImage visualized = new BufferedImage(current.width, current.height, BufferedImage.TYPE_INT_RGB);
 
 		ConvertBufferedImage.convertTo(previous, converted0, true);
 		ConvertBufferedImage.convertTo(current, converted1, true);
 		VisualizeOpticalFlow.colorized(flow, 10, visualized);
 
-		AnimatePanel animate = new AnimatePanel(150,converted0,converted1);
+		AnimatePanel animate = new AnimatePanel(150, converted0, converted1);
 		gui.add(animate);
 		gui.add(visualized);
 		animate.start();
 
-		ShowImages.showWindow(gui,"Dense Optical Flow",true);
+		ShowImages.showWindow(gui, "Dense Optical Flow", true);
 	}
 }

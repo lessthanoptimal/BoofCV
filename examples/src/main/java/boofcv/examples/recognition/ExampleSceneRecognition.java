@@ -63,7 +63,7 @@ public class ExampleSceneRecognition {
 
 		// Except for real-time applications or when there are more than a few hundred images, you might want to
 		// just learn the dictionary from scratch
-		File saveDirectory = new File("nister2006");
+		File saveDirectory = new File("recognition_model");
 
 		var imageIterator = new ImageFileListIterator<>(images, ImageType.SB_U8);
 
