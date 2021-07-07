@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -44,15 +44,15 @@ import java.io.PrintStream;
 import java.util.List;
 
 /**
- * <p>Detects ellipses inside a binary image by finding their contour and fitting an ellipse to the contour.  Fitting
- * is done using pixel precise contour points.  See {@link SnapToEllipseEdge} for a way to use sub-pixel points
- * and improve the fit's accuracy.  Optionally, lens distortion can be removed from the contour points prior
+ * <p>Detects ellipses inside a binary image by finding their contour and fitting an ellipse to the contour. Fitting
+ * is done using pixel precise contour points. See {@link SnapToEllipseEdge} for a way to use sub-pixel points
+ * and improve the fit's accuracy. Optionally, lens distortion can be removed from the contour points prior
  * to processing.</p>
  *
  * After the contour has been found an ellipse is fit to them using the {@link FitEllipseAlgebraic_F64 algebraic}
- * formulation.  Points which are not approximately ellipsoidal are removed.
+ * formulation. Points which are not approximately ellipsoidal are removed.
  * Approximately ellipsoidal is defined by the distance of the farthest contour point away from the ellipse. For
- * computational efficiency reasons a maximum of 20 points are sampled.  If there are more than 20 points in
+ * computational efficiency reasons a maximum of 20 points are sampled. If there are more than 20 points in
  * the contour then they are evenly sampled across the contour. Only external contours are considered.
  *
  * Parameters:
@@ -122,8 +122,8 @@ public class BinaryEllipseDetectorPixel {
 	 * The undistorted image is never explicitly created.</p>
 	 *
 	 * <p>
-	 * WARNING: The undistorted image must have the same bounds as the distorted input image.  This is because
-	 * several of the bounds checks use the image shape.  This are simplified greatly by this assumption.
+	 * WARNING: The undistorted image must have the same bounds as the distorted input image. This is because
+	 * several of the bounds checks use the image shape. This are simplified greatly by this assumption.
 	 * </p>
 	 *
 	 * @param distToUndist Transform from distorted to undistorted image.
@@ -184,7 +184,7 @@ public class BinaryEllipseDetectorPixel {
 		pointsF.reset();
 		undistortContour(contour, pointsF);
 
-		// fit it to an ellipse.  This will just be approximate.  The more precise technique is much slower
+		// fit it to an ellipse. This will just be approximate. The more precise technique is much slower
 		if (!algebraic.process(pointsF.toList())) {
 			if (verbose != null)
 				verbose.println("Rejecting: algebraic fit failed. size = " + pointsF.size());

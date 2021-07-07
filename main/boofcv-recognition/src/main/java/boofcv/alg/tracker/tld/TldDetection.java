@@ -29,9 +29,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Runs a detection cascade for each region.  The cascade is composed of a variance test, Fern classifier, and finally
- * the template classifier.  The next test in the cascade is only considered if the previous passes.  Several changes
- * have been made in how the cascade operates compared to the original paper.  See code for comments.
+ * Runs a detection cascade for each region. The cascade is composed of a variance test, Fern classifier, and finally
+ * the template classifier. The next test in the cascade is only considered if the previous passes. Several changes
+ * have been made in how the cascade operates compared to the original paper. See code for comments.
  *
  * @author Peter Abeles
  */
@@ -90,7 +90,7 @@ public class TldDetection<T extends ImageGray<T>> {
 	}
 
 	/**
-	 * Detects the object inside the image.  Eliminates candidate regions using a cascade of tests
+	 * Detects the object inside the image. Eliminates candidate regions using a cascade of tests
 	 */
 	protected void detectionCascade( DogArray<ImageRectangle> cascadeRegions ) {
 

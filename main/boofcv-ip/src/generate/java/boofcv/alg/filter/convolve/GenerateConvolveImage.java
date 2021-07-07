@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -22,7 +22,7 @@ import boofcv.generate.AutoTypeImage;
 import boofcv.generate.CodeGeneratorBase;
 
 /**
- * NOTE: There is a tinny bit of manual work required.  need to comment out a few lines to unroll
+ * NOTE: There is a tinny bit of manual work required. need to comment out a few lines to unroll
  *
  * @author Peter Abeles
  */

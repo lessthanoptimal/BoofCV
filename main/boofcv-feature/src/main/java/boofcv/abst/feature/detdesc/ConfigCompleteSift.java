@@ -61,12 +61,12 @@ public class ConfigCompleteSift implements Configuration {
 
 	/**
 	 * Constructor which provides access to a few of the more critical parameters which allow you to control
-	 * the number of size of detected features.  If this doesn't result in the desired results try
+	 * the number of size of detected features. If this doesn't result in the desired results try
 	 * the default constructor or manipulating other parameters directory.
 	 *
-	 * @param firstOctave The first octaveo.  Try -1
-	 * @param lastOctave The last octave.  Try 5
-	 * @param maxFeaturesPerScale Maximum number of features it will detect per scale.   &le; 0 will mean all features
+	 * @param firstOctave The first octaveo. Try -1
+	 * @param lastOctave The last octave. Try 5
+	 * @param maxFeaturesPerScale Maximum number of features it will detect per scale.  &le; 0 will mean all features
 	 */
 	public ConfigCompleteSift( int firstOctave, int lastOctave, int maxFeaturesPerScale ) {
 		scaleSpace.firstOctave = firstOctave;

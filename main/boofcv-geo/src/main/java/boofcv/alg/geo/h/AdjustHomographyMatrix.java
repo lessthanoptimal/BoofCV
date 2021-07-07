@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -30,8 +30,8 @@ import org.ejml.interfaces.decomposition.SingularValueDecomposition_F64;
 import java.util.Arrays;
 
 /**
- * The scale and sign of a homography matrix is ambiguous.  This contains functions which pick a reasonable scale
- * and the correct sign.  The second smallest singular value is set to one and the sign is chosen such that
+ * The scale and sign of a homography matrix is ambiguous. This contains functions which pick a reasonable scale
+ * and the correct sign. The second smallest singular value is set to one and the sign is chosen such that
  * the basic properties work.
  *
  * @author Peter Abeles

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -29,7 +29,7 @@ public class SequencePoint2Transform2_F64 implements Point2Transform2_F64 {
 	Point2Transform2_F64[] sequence;
 
 	/**
-	 * Specifies the sequence of transforms.  Lower indexes are applied first.
+	 * Specifies the sequence of transforms. Lower indexes are applied first.
 	 *
 	 * @param sequence Sequence of transforms.
 	 */

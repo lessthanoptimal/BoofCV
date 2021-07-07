@@ -29,7 +29,7 @@ import boofcv.struct.image.GrayU8;
  */
 public class HoughTransformBinary_MT extends HoughTransformBinary {
 	/**
-	 * Specifies parameters of transform.  The minimum number of points specified in the extractor
+	 * Specifies parameters of transform. The minimum number of points specified in the extractor
 	 * is an important tuning parameter.
 	 *
 	 * @param extractor Extracts local maxima from transform space.

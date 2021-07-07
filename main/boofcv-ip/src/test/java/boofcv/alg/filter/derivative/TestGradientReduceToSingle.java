@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -36,8 +36,7 @@ public class TestGradientReduceToSingle extends BoofStandardJUnit {
 	int height = 30;
 	int numbands = 3;
 
-	@Test
-	public void maxf_plf32_f32() {
+	@Test void maxf_plf32_f32() {
 		Planar<GrayF32> inX = new Planar<>(GrayF32.class,width,height,numbands);
 		Planar<GrayF32> inY = new Planar<>(GrayF32.class,width,height,numbands);
 		GrayF32 outX = new GrayF32(width,height);
@@ -72,8 +71,7 @@ public class TestGradientReduceToSingle extends BoofStandardJUnit {
 		}
 	}
 
-	@Test
-	public void maxf_plfu8_u8() {
+	@Test void maxf_plfu8_u8() {
 		Planar<GrayU8> inX = new Planar<>(GrayU8.class,width,height,numbands);
 		Planar<GrayU8> inY = new Planar<>(GrayU8.class,width,height,numbands);
 		GrayU8 outX = new GrayU8(width,height);

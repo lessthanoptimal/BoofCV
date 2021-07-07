@@ -26,9 +26,9 @@ import boofcv.struct.sparse.SparseImageGradient;
 
 /**
  * <p>
- * Modified SURF descriptor which attempts to smooth out edge conditions.  Based upon MU-SURF described in
+ * Modified SURF descriptor which attempts to smooth out edge conditions. Based upon MU-SURF described in
  * [1] it computes features in over lapping sub-regions and has a separate set of weights for the large grid and
- * for sub-regions.  Due to these improvements it will in general produce better results than {@link DescribePointSurf}
+ * for sub-regions. Due to these improvements it will in general produce better results than {@link DescribePointSurf}
  * at the cost of additional computations.
  * </p>
  *
@@ -59,14 +59,14 @@ public class DescribePointSurfMod<II extends ImageGray<II>> extends DescribePoin
 	/**
 	 * Creates a SURF descriptor of arbitrary dimension by changing how the local region is sampled.
 	 *
-	 * @param widthLargeGrid Number of sub-regions wide the large grid is.  Typically 4.
-	 * @param widthSubRegion Number of sample points wide a sub-region is.  Typically 5.
+	 * @param widthLargeGrid Number of sub-regions wide the large grid is. Typically 4.
+	 * @param widthSubRegion Number of sample points wide a sub-region is. Typically 5.
 	 * @param widthSample The size of a sample point. Typically 3.
 	 * @param overLap Number of sample points sub-regions overlap, Typically 2.
 	 * @param sigmaLargeGrid Sigma used to weight points in the large grid. Typically 2.5
 	 * @param sigmaSubRegion Sigma used to weight points in the sub-region grid. Typically 2.5
 	 * @param useHaar If true the Haar wavelet will be used (what was used in [1]), false means an image gradient
-	 * approximation will be used.  True is recommended.
+	 * approximation will be used. True is recommended.
 	 */
 	public DescribePointSurfMod( int widthLargeGrid, int widthSubRegion,
 								 double widthSample, int overLap,
@@ -99,7 +99,7 @@ public class DescribePointSurfMod<II extends ImageGray<II>> extends DescribePoin
 	}
 
 	/**
-	 * Create a SURF-64 descriptor.  See [1] for details.
+	 * Create a SURF-64 descriptor. See [1] for details.
 	 */
 	public DescribePointSurfMod( Class<II> imageType ) {
 		this(4, 5, 3, 2, 2.5, 2.5, false, imageType);
@@ -107,7 +107,7 @@ public class DescribePointSurfMod<II extends ImageGray<II>> extends DescribePoin
 
 	/**
 	 * <p>
-	 * An improved SURF descriptor as presented in CenSurE paper.   The sub-regions now overlap and more
+	 * An improved SURF descriptor as presented in CenSurE paper.  The sub-regions now overlap and more
 	 * points are sampled in the sub-region to allow overlap.
 	 * </p>
 	 *
@@ -116,7 +116,7 @@ public class DescribePointSurfMod<II extends ImageGray<II>> extends DescribePoin
 	 * @param c cosine of the orientation
 	 * @param s sine of the orientation
 	 * @param scale The scale of the wavelets.
-	 * @param features Where the features are written to.  Must be 4*(widthLargeGrid*widthSubRegion)^2 large.
+	 * @param features Where the features are written to. Must be 4*(widthLargeGrid*widthSubRegion)^2 large.
 	 */
 	@Override
 	public void features( double c_x, double c_y,

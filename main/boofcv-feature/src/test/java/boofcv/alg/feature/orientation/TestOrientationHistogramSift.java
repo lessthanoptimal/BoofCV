@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -37,8 +37,7 @@ public class TestOrientationHistogramSift extends BoofStandardJUnit {
 	int width = 50;
 	int height = 60;
 
-	@Test
-	public void process_easy() {
+	@Test void process_easy() {
 		GrayF32 derivX = new GrayF32(width, height);
 		GrayF32 derivY = new GrayF32(width, height);
 
@@ -67,11 +66,10 @@ public class TestOrientationHistogramSift extends BoofStandardJUnit {
 	}
 
 	/**
-	 * Real basic check to see if a uniform gradient is added to the histogram.  Goes through
+	 * Real basic check to see if a uniform gradient is added to the histogram. Goes through
 	 * all angles and makes sure it doesn't blow up at the border
 	 */
-	@Test
-	public void computeHistogram() {
+	@Test void computeHistogram() {
 		GrayF32 derivX = new GrayF32(width, height);
 		GrayF32 derivY = new GrayF32(width, height);
 		int N = 36;
@@ -108,8 +106,7 @@ public class TestOrientationHistogramSift extends BoofStandardJUnit {
 		}
 	}
 
-	@Test
-	public void findHistogramPeaks() {
+	@Test void findHistogramPeaks() {
 		OrientationHistogramSift<GrayF32> alg =
 				new OrientationHistogramSift<>(36,1.5,GrayF32.class);
 
@@ -144,8 +141,7 @@ public class TestOrientationHistogramSift extends BoofStandardJUnit {
 		assertEquals(expected[16],alg.getOrientations().get(1),1e-8);
 	}
 
-	@Test
-	public void computeAngle() {
+	@Test void computeAngle() {
 		double theta0 = 0.5, theta1 = 0.7, theta2 = 0.8;
 		double dx0 = Math.cos(theta0), dx1 = Math.cos(theta1), dx2 = Math.cos(theta2);
 		double dy0 = Math.sin(theta0), dy1 = Math.sin(theta1), dy2 = Math.sin(theta2);
@@ -178,8 +174,7 @@ public class TestOrientationHistogramSift extends BoofStandardJUnit {
 
 	}
 
-	@Test
-	public void interpolateAngle() {
+	@Test void interpolateAngle() {
 		double theta0 = 0.5, theta1 = 0.7, theta2 = 0.8;
 		double dx0 = Math.cos(theta0), dx1 = Math.cos(theta1), dx2 = Math.cos(theta2);
 		double dy0 = Math.sin(theta0), dy1 = Math.sin(theta1), dy2 = Math.sin(theta2);
@@ -198,8 +193,7 @@ public class TestOrientationHistogramSift extends BoofStandardJUnit {
 		assertEquals(0.75,alg.interpolateAngle(2,3,4, 0.5),1e-6);
 	}
 
-	@Test
-	public void computeWeight() {
+	@Test void computeWeight() {
 
 		OrientationHistogramSift<GrayF32> alg = new OrientationHistogramSift<>(36,1.5,GrayF32.class);
 

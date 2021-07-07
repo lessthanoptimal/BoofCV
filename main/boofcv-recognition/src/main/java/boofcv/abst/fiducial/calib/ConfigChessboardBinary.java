@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -38,8 +38,8 @@ import lombok.Setter;
 @Getter @Setter
 public class ConfigChessboardBinary implements Configuration {
 	/**
-	 * The maximum distance in pixels that two corners can be from each other.  In well focused image
-	 * this number can be only a few pixels.  The default value has been selected to handle blurred images.
+	 * The maximum distance in pixels that two corners can be from each other. In well focused image
+	 * this number can be only a few pixels. The default value has been selected to handle blurred images.
 	 *
 	 * If relative it is relative to min(image.width,image.height)
 	 */
@@ -60,7 +60,7 @@ public class ConfigChessboardBinary implements Configuration {
 	public ConfigPolygonDetector square = new ConfigPolygonDetector();
 
 	{
-		// this is being used as a way to smooth out the binary image.  Speeds things up quite a bit
+		// this is being used as a way to smooth out the binary image. Speeds things up quite a bit
 		thresholding.scale = 0.85;
 
 		((ConfigPolylineSplitMerge)square.detector.contourToPoly).cornerScorePenalty = 0.2;

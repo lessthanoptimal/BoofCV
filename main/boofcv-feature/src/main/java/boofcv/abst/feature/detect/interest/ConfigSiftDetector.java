@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -52,7 +52,7 @@ public class ConfigSiftDetector implements Configuration {
 	public ConfigSelectLimit selector = ConfigSelectLimit.selectBestN();
 
 	/**
-	 * Threshold used to remove edge responses.  Larger values means its less strict.  Try 10
+	 * Threshold used to remove edge responses. Larger values means its less strict. Try 10
 	 */
 	public double edgeR = 10;
 

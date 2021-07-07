@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -20,7 +20,7 @@ package boofcv.gui;
 
 /**
  * Simple interface for a GUI to tell the main processing that it needs to render the display
- * or reprocess that data.  Settings are accessed else where and more fine control over what
+ * or reprocess that data. Settings are accessed else where and more fine control over what
  * has changed is not provided.
  *
  * @author Peter Abeles

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -23,7 +23,7 @@ import boofcv.struct.QueueCorner;
 import boofcv.struct.image.GrayU8;
 
 /**
- * A slow but easy to understand correct implementations.  Has been compared against the
+ * A slow but easy to understand correct implementations. Has been compared against the
  * original implementation by Edward Rosten.
  *
  * @author Peter Abeles

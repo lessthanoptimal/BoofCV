@@ -32,7 +32,7 @@ import java.util.List;
 /**
  * Estimates a {@link ScaleTranslateRotate2D} from three 2D point correspondences.
  * The transform will take a point from p1 to p2. First the affine transform is found using the standard
- * linear equation.  Scale and translation are found by finding a bit fit solution using SVD.
+ * linear equation. Scale and translation are found by finding a bit fit solution using SVD.
  *
  * NOTE: The found solution is not going to be optimal due to the initial approximation using an affine transform.
  *
@@ -63,7 +63,7 @@ public class GenerateScaleTranslateRotate2D
 		if (!svd.decompose(R))
 			return false;
 
-		// determinant of a rotation matrix is 1.  Assume that scale makes it not one
+		// determinant of a rotation matrix is 1. Assume that scale makes it not one
 		double[] sv = svd.getSingularValues();
 		output.scale = (sv[0] + sv[1])/2.0;
 

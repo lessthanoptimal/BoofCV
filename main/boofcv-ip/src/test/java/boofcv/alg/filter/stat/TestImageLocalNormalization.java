@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -48,8 +48,7 @@ public class TestImageLocalNormalization extends BoofStandardJUnit {
 	int radius = 3;
 	double maxPixelValue = 5;
 
-	@Test
-	public void zeroMeanStdOne_kernel() {
+	@Test void zeroMeanStdOne_kernel() {
 		for( Class type : types ) {
 			int bits = type == GrayF32.class ? 32 : 64;
 			Kernel1D kernel = FactoryKernelGaussian.gaussian(1,true,bits,-1,radius);
@@ -67,8 +66,7 @@ public class TestImageLocalNormalization extends BoofStandardJUnit {
 		}
 	}
 
-	@Test
-	public void zeroMeanStdOne() {
+	@Test void zeroMeanStdOne() {
 		Kernel1D kernel = FactoryKernel.table1D_F64(radius,false);
 		for( Class type : types ) {
 

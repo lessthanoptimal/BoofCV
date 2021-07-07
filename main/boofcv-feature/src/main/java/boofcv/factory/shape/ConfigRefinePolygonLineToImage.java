@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -29,7 +29,7 @@ import boofcv.struct.Configuration;
 public class ConfigRefinePolygonLineToImage implements Configuration {
 
 	/**
-	 * How far away in pixels it will start sampling the line from a corner.  Corners can become highly aliased
+	 * How far away in pixels it will start sampling the line from a corner. Corners can become highly aliased
 	 * with ambiguous borders.
 	 */
 	public double cornerOffset = 1;
@@ -38,7 +38,7 @@ public class ConfigRefinePolygonLineToImage implements Configuration {
 	 */
 	public int lineSamples = 30;
 	/**
-	 * Number of points tangent to the line in each direction it samples.  In total the number of
+	 * Number of points tangent to the line in each direction it samples. In total the number of
 	 * samples along a line will be lineSamples*(2*sampleRadius+1)
 	 */
 	public int sampleRadius = 1;
@@ -52,7 +52,7 @@ public class ConfigRefinePolygonLineToImage implements Configuration {
 	public double convergeTolPixels = 0.2;
 
 	/**
-	 * Maximum number of pixels a corner can be adjusted in a single iteration.  This becomes important with very
+	 * Maximum number of pixels a corner can be adjusted in a single iteration. This becomes important with very
 	 * small shapes and can prevent divergence.
 	 */
 	public double maxCornerChangePixel = 2.0;

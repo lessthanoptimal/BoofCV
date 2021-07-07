@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -45,8 +45,7 @@ public class TestSplitMergeLineFitLoop extends BoofStandardJUnit {
 	/**
 	 * Tests contours with zero and one points in them
 	 */
-	@Test
-	public void checkZeroOne() {
+	@Test void checkZeroOne() {
 		List<Point2D_I32> contour = new ArrayList<>();
 		SplitMergeLineFitLoop alg = new SplitMergeLineFitLoop(0.15, MINIMUM_LENGTH,100);
 		alg.process(contour,splits);
@@ -60,8 +59,7 @@ public class TestSplitMergeLineFitLoop extends BoofStandardJUnit {
 	/**
 	 * Sees if it can segment a square.
 	 */
-	@Test
-	public void simpleSquareAll() {
+	@Test void simpleSquareAll() {
 		List<Point2D_I32> contour = rectToContour(new RectangleLength2D_I32(0,0,10,5));
 
 		SplitMergeLineFitLoop alg = new SplitMergeLineFitLoop(0.15, MINIMUM_LENGTH,100);
@@ -69,8 +67,7 @@ public class TestSplitMergeLineFitLoop extends BoofStandardJUnit {
 		matchSplitsToExpected(new int[]{8, 12, 21, 25}, splits);
 	}
 
-	@Test
-	public void selectFarthest() {
+	@Test void selectFarthest() {
 		SplitMergeLineFitLoop alg = new SplitMergeLineFitLoop(0.15, MINIMUM_LENGTH,100);
 		List<Point2D_I32> contour = new ArrayList<>();
 		for( int i = 0; i < 10; i++ )
@@ -91,8 +88,7 @@ public class TestSplitMergeLineFitLoop extends BoofStandardJUnit {
 	/**
 	 * Segment where no splitting is required
 	 */
-	@Test
-	public void splitPixels_nosplit() {
+	@Test void splitPixels_nosplit() {
 		SplitMergeLineFitLoop alg = new SplitMergeLineFitLoop(0.15,MINIMUM_LENGTH_5X,100);
 		alg.contour = new ArrayList<>();
 		for( int i = 0; i < 10; i++ )
@@ -116,8 +112,7 @@ public class TestSplitMergeLineFitLoop extends BoofStandardJUnit {
 	/**
 	 * Basic tests with a single split
 	 */
-	@Test
-	public void splitPixels() {
+	@Test void splitPixels() {
 		SplitMergeLineFitLoop alg = new SplitMergeLineFitLoop(0.01, MINIMUM_LENGTH,100);
 		alg.contour = new ArrayList<>();
 		for( int i = 0; i < 10; i++ )
@@ -153,8 +148,7 @@ public class TestSplitMergeLineFitLoop extends BoofStandardJUnit {
 	/**
 	 * Multiple splits are required
 	 */
-	@Test
-	public void splitPixels_multiple() {
+	@Test void splitPixels_multiple() {
 		SplitMergeLineFitLoop alg = new SplitMergeLineFitLoop(0.001, MINIMUM_LENGTH,100);
 		alg.contour = new ArrayList<>();
 		alg.contour.add( new Point2D_I32(0,0));
@@ -181,8 +175,7 @@ public class TestSplitMergeLineFitLoop extends BoofStandardJUnit {
 	}
 
 
-	@Test
-	public void mergeLines() {
+	@Test void mergeLines() {
 		SplitMergeLineFitLoop alg = new SplitMergeLineFitLoop(0.05, MINIMUM_LENGTH,100);
 		alg.contour = new ArrayList<>();
 		for( int i = 0; i < 10; i++ )
@@ -214,8 +207,7 @@ public class TestSplitMergeLineFitLoop extends BoofStandardJUnit {
 		assertTrue(matchSplitsToExpected(new int[]{9, 10, 19, 0}, alg.splits));
 	}
 
-	@Test
-	public void splitSegments() {
+	@Test void splitSegments() {
 		SplitMergeLineFitLoop alg = new SplitMergeLineFitLoop(0.001, MINIMUM_LENGTH,100);
 		alg.contour = new ArrayList<>();
 		for( int i = 0; i < 10; i++ )
@@ -231,8 +223,7 @@ public class TestSplitMergeLineFitLoop extends BoofStandardJUnit {
 		assertTrue(matchSplitsToExpected(new int[]{0, 4, 6}, alg.splits));
 	}
 
-	@Test
-	public void circularDistance() {
+	@Test void circularDistance() {
 		SplitMergeLineFitLoop alg = new SplitMergeLineFitLoop(0.15,MINIMUM_LENGTH_5X,100);
 		alg.N = 15;
 
@@ -245,8 +236,7 @@ public class TestSplitMergeLineFitLoop extends BoofStandardJUnit {
 		assertEquals(14,alg.circularDistance(5,4));
 	}
 
-	@Test
-	public void selectSplitOffset() {
+	@Test void selectSplitOffset() {
 
 		SplitMergeLineFitLoop alg = new SplitMergeLineFitLoop(9.0/9.0, MINIMUM_LENGTH,100);
 
@@ -290,8 +280,7 @@ public class TestSplitMergeLineFitLoop extends BoofStandardJUnit {
 	/**
 	 * Makes sure the selectSplitOffset is obeying the minimumSideLengthPixel parameter
 	 */
-	@Test
-	public void selectSplitOffset_minimumSideLengthPixel() {
+	@Test void selectSplitOffset_minimumSideLengthPixel() {
 		SplitMergeLineFitLoop alg = new SplitMergeLineFitLoop(9.99/9.0, MINIMUM_LENGTH,100);
 
 		alg.contour = new ArrayList<>();
@@ -326,8 +315,7 @@ public class TestSplitMergeLineFitLoop extends BoofStandardJUnit {
 	/**
 	 * Checks to make sure the minimum side length is correctly set
 	 */
-	@Test
-	public void set_minimumSideLengthPixel() {
+	@Test void set_minimumSideLengthPixel() {
 		List<Point2D_I32> contour = new ArrayList<>();
 
 		for (int i = 0; i < 30; i++) {

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -81,13 +81,13 @@ public class CalibrationDetectorSquareGrid implements DetectorFiducialCalibratio
 	}
 
 	/**
-	 * Creates a target that is composed of squares.  The squares are spaced out and each corner provides
+	 * Creates a target that is composed of squares. The squares are spaced out and each corner provides
 	 * a calibration point.
 	 *
 	 * @param numRows Number of rows in calibration target. Must be odd.
-	 * @param numCols Number of column in each calibration target.  Must be odd.
+	 * @param numCols Number of column in each calibration target. Must be odd.
 	 * @param squareWidth How wide each square is. Units are target dependent.
-	 * @param spaceWidth Distance between the sides on each square.  Units are target dependent.
+	 * @param spaceWidth Distance between the sides on each square. Units are target dependent.
 	 * @return Target description
 	 */
 	public static List<Point2D_F64> createLayout(int numRows, int numCols, double squareWidth, double spaceWidth)

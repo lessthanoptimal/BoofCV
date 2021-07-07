@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -29,8 +29,8 @@ import org.ejml.data.DMatrixRMaj;
 import org.ejml.dense.row.CommonOps_DDRM;
 
 /**
- * Base class for all distortions from an equirectangular image.  The output image precomputes pointing vectors from
- * a canonical view.  The source pixel is then computed by rotating each vector and computing the longitude and
+ * Base class for all distortions from an equirectangular image. The output image precomputes pointing vectors from
+ * a canonical view. The source pixel is then computed by rotating each vector and computing the longitude and
  * latitude.
  *
  * @author Peter Abeles
@@ -112,7 +112,7 @@ public abstract class EquirectangularDistortBase_F64 implements PixelTransform<P
 	}
 
 	/**
-	 * Input is in pinhole camera pixel coordinates.  Output is in equirectangular coordinates
+	 * Input is in pinhole camera pixel coordinates. Output is in equirectangular coordinates
 	 *
 	 * @param x Pixel x-coordinate in rendered pinhole camera
 	 * @param y Pixel y-coordinate in rendered pinhole camera

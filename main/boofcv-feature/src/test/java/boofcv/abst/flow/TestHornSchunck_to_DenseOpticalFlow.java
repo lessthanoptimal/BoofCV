@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -29,8 +29,7 @@ import org.junit.jupiter.api.Test;
  */
 public class TestHornSchunck_to_DenseOpticalFlow extends BoofStandardJUnit {
 
-	@Test
-	public void allTests() {
+	@Test void allTests() {
 		Class[] imageTypes = new Class[]{GrayU8.class,GrayF32.class};
 
 		for( Class it : imageTypes ) {

@@ -30,11 +30,11 @@ import org.ddogleg.struct.FastAccess;
 import java.util.List;
 
 /**
- * <p>Matches features using a {@link NearestNeighbor} search from DDogleg.  The source features are processed
+ * <p>Matches features using a {@link NearestNeighbor} search from DDogleg. The source features are processed
  * as a lump using {@link NearestNeighbor#setPoints(List, boolean)} while destination features
  * are matched one at time using {@link NearestNeighbor.Search#findNearest(Object, double, NnData)}.
  * Typically the processing of source features is more expensive and should be minimized while looking up
- * destination features is fast.  Multiple matches for source features are possible while there will only
+ * destination features is fast. Multiple matches for source features are possible while there will only
  * be a unique match for each destination feature.</p>
  *
  * <p>An optional ratio test inspired from [1] can be used. The ratio between the best and second best score is found.

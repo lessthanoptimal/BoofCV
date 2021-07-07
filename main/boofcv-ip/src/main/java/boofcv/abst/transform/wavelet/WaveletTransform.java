@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -25,8 +25,8 @@ import boofcv.struct.wavelet.WlCoef;
 
 /**
  * <p>
- * Easy to use interface for performing a multilevel wavelet transformations.  Internally it handles
- * all buffer maintenance and type conversion.  To create a new instance of this interface use
+ * Easy to use interface for performing a multilevel wavelet transformations. Internally it handles
+ * all buffer maintenance and type conversion. To create a new instance of this interface use
  * {@link boofcv.factory.transform.wavelet.FactoryWaveletTransform}.
  * </p>
  *
@@ -36,11 +36,11 @@ import boofcv.struct.wavelet.WlCoef;
 public interface WaveletTransform
 		<O extends ImageGray<O>, T extends ImageGray<T>, C extends WlCoef> {
 	/**
-	 * Computes the wavelet transform of the input image.  If no output/transform image is provided a new image is
+	 * Computes the wavelet transform of the input image. If no output/transform image is provided a new image is
 	 * created and returned.
 	 *
 	 * @param original Original unmodified image. Not modified.
-	 * @param transformed Where the computed transform is stored.  If null a new image is created. Modified.
+	 * @param transformed Where the computed transform is stored. If null a new image is created. Modified.
 	 * @return Wavelet transform.
 	 */
 	public T transform( O original, T transformed );

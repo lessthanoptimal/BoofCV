@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -123,13 +123,13 @@ public class CalibrationDetectorChessboardBinary implements DetectorFiducialCali
 	}
 
 	/**
-	 * This target is composed of a checkered chess board like squares.  Each corner of an interior square
-	 * touches an adjacent square, but the sides are separated.  Only interior square corners provide
+	 * This target is composed of a checkered chess board like squares. Each corner of an interior square
+	 * touches an adjacent square, but the sides are separated. Only interior square corners provide
 	 * calibration points.
 	 *
 	 * @param numRows Number of grid rows in the calibration target
 	 * @param numCols Number of grid columns in the calibration target
-	 * @param squareWidth How wide each square is.  Units are target dependent.
+	 * @param squareWidth How wide each square is. Units are target dependent.
 	 * @return Target description
 	 */
 	public static List<Point2D_F64> gridChess(int numRows, int numCols, double squareWidth)

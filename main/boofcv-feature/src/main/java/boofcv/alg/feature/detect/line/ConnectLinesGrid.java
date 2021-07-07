@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -29,8 +29,8 @@ import java.util.List;
 /**
  * <p>
  * Given a grid of detected line segments connect line segments together if they appear to be
- * apart of the same line.  First lines inside the same segment are considered and connected together
- * then lines in neighboring segments are linked together.   Connectivity rules are inspired by [1] with
+ * apart of the same line. First lines inside the same segment are considered and connected together
+ * then lines in neighboring segments are linked together.  Connectivity rules are inspired by [1] with
  * a couple of departures and optimizations.
  * </p>
  *
@@ -75,9 +75,9 @@ public class ConnectLinesGrid {
 	/**
 	 * Specify line connecting parameters.
 	 *
-	 * @param lineSlopeAngleTol How similar the slope two lines need to be in radians.  Try 0.062.
-	 * @param tangentTol Tolerance along tangential axis.  Try 1.
-	 * @param parallelTol Tolerance along longitudinal axis.  Try 8.
+	 * @param lineSlopeAngleTol How similar the slope two lines need to be in radians. Try 0.062.
+	 * @param tangentTol Tolerance along tangential axis. Try 1.
+	 * @param parallelTol Tolerance along longitudinal axis. Try 8.
 	 */
 	public ConnectLinesGrid( double lineSlopeAngleTol, double tangentTol, double parallelTol ) {
 		this.lineSlopeAngleTol = (float)lineSlopeAngleTol;
@@ -104,7 +104,7 @@ public class ConnectLinesGrid {
 	}
 
 	/**
-	 * Connect lines in the target region to lines in neighboring regions.  Regions are selected such that
+	 * Connect lines in the target region to lines in neighboring regions. Regions are selected such that
 	 * no two regions are compared against each other more than once.
 	 *
 	 * @param x target region grid x-coordinate
@@ -163,7 +163,7 @@ public class ConnectLinesGrid {
 		target.b.setTo(pt1);
 
 		// adding the merged one back in allows it to be merged with other lines down
-		// the line.  It will be compared against others in 'target's grid though
+		// the line. It will be compared against others in 'target's grid though
 		lines.add(target);
 
 		return true;
@@ -201,7 +201,7 @@ public class ConnectLinesGrid {
 	 * @param target Line being connected to.
 	 * @param candidates List of candidate lines.
 	 * @param start First index in the candidate list it should start searching at.
-	 * @return Index of the candidate it can connect to.  -1 if there is no match.
+	 * @return Index of the candidate it can connect to. -1 if there is no match.
 	 */
 	private int findBestCompatible( LineSegment2D_F32 target,
 									List<LineSegment2D_F32> candidates,

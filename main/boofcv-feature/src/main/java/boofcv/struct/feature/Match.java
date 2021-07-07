@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -21,14 +21,14 @@ package boofcv.struct.feature;
 import georegression.struct.point.Point2D_I32;
 
 /**
- * Found match during template matching.  Provides location and fit score.
+ * Found match during template matching. Provides location and fit score.
  *
  * @author Peter Abeles
  */
 public class Match extends Point2D_I32 {
 	/**
-	 * Score indicating the match quality.  Higher the score the better.  The range will
-	 * depending on the algorithm used.  For some algorithms the score will even be negative.
+	 * Score indicating the match quality. Higher the score the better. The range will
+	 * depending on the algorithm used. For some algorithms the score will even be negative.
 	 */
 	public double score;
 

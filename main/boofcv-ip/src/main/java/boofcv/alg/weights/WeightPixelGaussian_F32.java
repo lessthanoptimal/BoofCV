@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -29,7 +29,7 @@ public class WeightPixelGaussian_F32 extends WeightPixelKernel_F32 {
 	public void setRadius(int radiusX , int radiusY, boolean odd ) {
 
 		if( radiusX != radiusY )
-			throw new IllegalArgumentException("Non-symmetric kernels are not yet supported.  You can request this feature");
+			throw new IllegalArgumentException("Non-symmetric kernels are not yet supported. You can request this feature");
 
 		int radius = radiusX;
 		if( kernel == null || kernel.getRadius() != radius ) {

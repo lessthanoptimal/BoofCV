@@ -28,8 +28,8 @@ import lombok.Setter;
 
 /**
  * Simple implementations of mean-shift intended to finding local peaks inside an intensity image.
- * Implementations differ in how they weigh each point.  In each iterations the mean of the square sample region
- * centered around the target is computed and the center shifted so that location.  It stops when change
+ * Implementations differ in how they weigh each point. In each iterations the mean of the square sample region
+ * centered around the target is computed and the center shifted so that location. It stops when change
  * is less than a delta or the maximum number of iterations has been exceeded.
  *
  * If the image border is hit while searching the square will be push back until it is entirely contained inside
@@ -66,9 +66,9 @@ public class MeanShiftPeak<T extends ImageGray<T>> {
 	/**
 	 * Configures search.
 	 *
-	 * @param maxIterations Maximum number of iterations.  Try 10
-	 * @param convergenceTol Convergence tolerance.  Try 1e-3
-	 * @param weights Used to compute the weight each pixel contributes to the mean.  Try a uniform distribution.
+	 * @param maxIterations Maximum number of iterations. Try 10
+	 * @param convergenceTol Convergence tolerance. Try 1e-3
+	 * @param weights Used to compute the weight each pixel contributes to the mean. Try a uniform distribution.
 	 */
 	public MeanShiftPeak( int maxIterations, float convergenceTol,
 						  WeightPixel_F32 weights, boolean odd,

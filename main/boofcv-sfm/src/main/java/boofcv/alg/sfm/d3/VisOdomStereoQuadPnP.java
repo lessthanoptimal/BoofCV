@@ -160,7 +160,7 @@ public class VisOdomStereoQuadPnP<T extends ImageGray<T>, TD extends TupleDesc<T
 	 * @param assocF2F Association algorithm used for left to left and right to right
 	 * @param assocL2R Assocation algorithm used for left to right
 	 * @param triangulate Used to estimate 3D location of a feature using stereo correspondence
-	 * @param matcher Robust model estimation.  Often RANSAC
+	 * @param matcher Robust model estimation. Often RANSAC
 	 * @param modelRefiner Non-linear refinement of motion estimation
 	 */
 	public VisOdomStereoQuadPnP( DetectDescribePoint<T, TD> detector,

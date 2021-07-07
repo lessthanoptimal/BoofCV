@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -28,7 +28,7 @@ import boofcv.BoofDefaults;
 public class ConfigAverageIntegral implements ConfigOrientation {
 
 	/**
-	 * How to convert the radius to the internal canonical scale.  Can be used to adjust how
+	 * How to convert the radius to the internal canonical scale. Can be used to adjust how
 	 * big or small the region is.
 	 */
 	public double objectRadiusToScale = 1.0/BoofDefaults.SURF_SCALE_TO_RADIUS;
@@ -38,7 +38,7 @@ public class ConfigAverageIntegral implements ConfigOrientation {
 	 */
 	public int radius = 6;
 	/**
-	 * How often the image is sampled.  This number is scaled.  Typically 1.
+	 * How often the image is sampled. This number is scaled. Typically 1.
 	 */
 	public double samplePeriod = 1;
 	/**
@@ -46,7 +46,7 @@ public class ConfigAverageIntegral implements ConfigOrientation {
 	 */
 	public int sampleWidth = 6;
 	/**
-	 * Sigma for weighting.  zero for unweighted. less than zero for automatic. Try -1.
+	 * Sigma for weighting. zero for unweighted. less than zero for automatic. Try -1.
 	 */
 	public double weightSigma = -1;
 

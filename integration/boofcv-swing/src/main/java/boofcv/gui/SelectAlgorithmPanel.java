@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -26,7 +26,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Provides a pull down list form which the user can select which algorithm to run.  After
+ * Provides a pull down list form which the user can select which algorithm to run. After
  * it has been selected the input should be processed and displayed.
  *
  * @author Peter Abeles
@@ -53,7 +53,7 @@ public abstract class SelectAlgorithmPanel extends JPanel
 	}
 
 	/**
-	 * Used to add the main GUI to this panel.   Must use this function.
+	 * Used to add the main GUI to this panel.  Must use this function.
 	 * Algorithm change events will not be posted until this function has been set.
 	 *
 	 * @param gui The main GUI being displayed.
@@ -69,7 +69,7 @@ public abstract class SelectAlgorithmPanel extends JPanel
 	}
 
 	/**
-	 * Tells it to switch again to the current algorithm.  Useful if the input has changed and information
+	 * Tells it to switch again to the current algorithm. Useful if the input has changed and information
 	 * needs to be rendered again.
 	 */
 	public void refreshAlgorithm() {

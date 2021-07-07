@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -29,8 +29,7 @@ import static org.junit.jupiter.api.Assertions.assertSame;
  */
 public class TestCameraPinhole extends BoofStandardJUnit {
 
-	@Test
-	public void constructor_K() {
+	@Test void constructor_K() {
 		CameraPinhole p = new CameraPinhole(200,210,1,320,240,640,380);
 
 		assertEquals(200,p.fx,1e-8);
@@ -42,8 +41,7 @@ public class TestCameraPinhole extends BoofStandardJUnit {
 		assertEquals(380,p.height,1e-8);
 	}
 
-	@Test
-	public void fsetK() {
+	@Test void fsetK() {
 		CameraPinhole p = new CameraPinhole(200,210,1,320,240,640,380);
 
 		assertSame(p, p.fsetK(201, 211, 2, 321, 241, 641, 381));

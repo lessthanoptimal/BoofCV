@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -38,8 +38,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  */
 public class TestTrackerMeanShiftComaniciu2003 extends BoofStandardJUnit {
 
-	@Test
-	public void track() {
+	@Test void track() {
 		InterpolatePixelS<GrayF32> interpSB = FactoryInterpolation.bilinearPixelS(GrayF32.class, BorderType.EXTENDED);
 		InterpolatePixelMB<Planar<GrayF32>> interpolate = FactoryInterpolation.createPixelPL(interpSB);
 		var calcHistogram = new LocalWeightedHistogramRotRect<>(30,3,10,3,255,interpolate);
@@ -72,8 +71,7 @@ public class TestTrackerMeanShiftComaniciu2003 extends BoofStandardJUnit {
 		assertEquals(alg.getRegion().height,34,1);
 	}
 
-	@Test
-	public void updateLocation() {
+	@Test void updateLocation() {
 		InterpolatePixelS<GrayF32> interpSB = FactoryInterpolation.bilinearPixelS(GrayF32.class, BorderType.EXTENDED);
 		InterpolatePixelMB<Planar<GrayF32>> interpolate = FactoryInterpolation.createPixelPL(interpSB);
 		var calcHistogram = new LocalWeightedHistogramRotRect<>(30,3,10,3,255,interpolate);
@@ -108,8 +106,7 @@ public class TestTrackerMeanShiftComaniciu2003 extends BoofStandardJUnit {
 		assertEquals(found.theta,theta,tol);
 	}
 
-	@Test
-	public void distanceHistogram() {
+	@Test void distanceHistogram() {
 		LocalWeightedHistogramRotRect calcHist = new LocalWeightedHistogramRotRect(10,3,5,3,255,null);
 
 		TrackerMeanShiftComaniciu2003 alg = new TrackerMeanShiftComaniciu2003(true,100,1e-4f,0.1f,0.0f,0.1f,calcHist);

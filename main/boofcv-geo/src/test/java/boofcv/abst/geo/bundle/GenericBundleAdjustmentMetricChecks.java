@@ -43,8 +43,7 @@ import static org.junit.jupiter.api.Assertions.fail;
 @SuppressWarnings("ALL") public abstract class GenericBundleAdjustmentMetricChecks extends BoofStandardJUnit {
 	public abstract BundleAdjustment<SceneStructureMetric> createAlg();
 
-	@Test
-	public void horizontalPerfect() {
+	@Test void horizontalPerfect() {
 		BundleAdjustment<SceneStructureMetric> alg = createAlg();
 
 		Tuple2<SceneStructureMetric, SceneObservations> a = createHorizontalMotion( 123,true);
@@ -59,8 +58,7 @@ import static org.junit.jupiter.api.Assertions.fail;
 	/**
 	 * Same solution when called multiple times in a row. Checks to see if it is correctly reset
 	 */
-	@Test
-	public void multipleCalls() {
+	@Test void multipleCalls() {
 		BundleAdjustment<SceneStructureMetric> alg = createAlg();
 
 		Tuple2<SceneStructureMetric, SceneObservations> a = createHorizontalMotion( 123,true);
@@ -75,8 +73,7 @@ import static org.junit.jupiter.api.Assertions.fail;
 		assertEquals(a.d0,b.d0,1e-6,1e-6,1e-6);
 	}
 
-	@Test
-	public void horizontalNoisyObs() {
+	@Test void horizontalNoisyObs() {
 		BundleAdjustment<SceneStructureMetric> alg = createAlg();
 
 		Tuple2<SceneStructureMetric, SceneObservations> a = createHorizontalMotion( 123,true);
@@ -98,8 +95,7 @@ import static org.junit.jupiter.api.Assertions.fail;
 		assertEquals(a.d0,b.d0,1e-6,0.01,0.01);
 	}
 
-	@Test
-	public void horizontalNoisyFeatures() {
+	@Test void horizontalNoisyFeatures() {
 		BundleAdjustment<SceneStructureMetric> alg = createAlg();
 
 		Tuple2<SceneStructureMetric, SceneObservations> a = createHorizontalMotion( 123,true);
@@ -129,8 +125,7 @@ import static org.junit.jupiter.api.Assertions.fail;
 		}
 	}
 
-	@Test
-	public void horizontalNoisyPose() {
+	@Test void horizontalNoisyPose() {
 		BundleAdjustment<SceneStructureMetric> alg = createAlg();
 
 		Tuple2<SceneStructureMetric, SceneObservations> a = createHorizontalMotion( 123,true);

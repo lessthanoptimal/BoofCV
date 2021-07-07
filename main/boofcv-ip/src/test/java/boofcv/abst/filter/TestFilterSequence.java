@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -45,10 +45,9 @@ public class TestFilterSequence extends BoofStandardJUnit {
 	int height = 40;
 
 	/**
-	 * Perform a sequence of convolutions manually.  Should produce the same results
+	 * Perform a sequence of convolutions manually. Should produce the same results
 	 */
-	@Test
-	public void compareToManualSequence() {
+	@Test void compareToManualSequence() {
 		Kernel1D_F32 ker1 = FactoryKernel.random1D_F32(kernelWidth,radius,0,5,rand);
 		Kernel1D_F32 ker2 = FactoryKernel.random1D_F32(kernelWidth+2,radius+1,0,5,rand);
 		Kernel1D_F32 ker3 = FactoryKernel.random1D_F32(kernelWidth+4,radius+2,0,5,rand);

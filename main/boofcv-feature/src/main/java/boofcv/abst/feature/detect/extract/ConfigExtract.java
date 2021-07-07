@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -27,7 +27,7 @@ import boofcv.struct.Configuration;
  */
 public class ConfigExtract implements Configuration {
 	/**
-	 * Search radius of the non-maximum region.  Most common value is 1 for a 3x3 region. Default is 1.
+	 * Search radius of the non-maximum region. Most common value is 1 for a 3x3 region. Default is 1.
 	 */
 	public int radius = 1;
 	/**
@@ -40,7 +40,7 @@ public class ConfigExtract implements Configuration {
 	 */
 	public int ignoreBorder = 0;
 	/**
-	 * Is a strict test used to test for local maximums.  If strict the local maximum must be greater than
+	 * Is a strict test used to test for local maximums. If strict the local maximum must be greater than
 	 * all its neighbors, otherwise it just needs to be greater than or equal to its neighbors. Default is true.
 	 */
 	public boolean useStrictRule = true;

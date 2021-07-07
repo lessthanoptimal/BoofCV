@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -29,8 +29,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
  * @author Peter Abeles
  */
 public class TestJacobianSo3Numerical extends BoofStandardJUnit {
-	@Test
-	public void getRotationMatrix() {
+	@Test void getRotationMatrix() {
 		JacobianSo3Numerical alg = new SimpleSo3();
 
 		// offset of 1 to make sure it doesn't start at zero
@@ -47,8 +46,7 @@ public class TestJacobianSo3Numerical extends BoofStandardJUnit {
 		}
 	}
 
-	@Test
-	public void getPartial() {
+	@Test void getPartial() {
 		JacobianSo3Numerical alg = new SimpleSo3();
 
 		assertEquals(2, alg.getParameterLength());

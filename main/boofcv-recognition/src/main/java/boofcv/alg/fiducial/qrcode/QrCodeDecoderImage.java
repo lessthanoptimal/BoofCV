@@ -100,10 +100,10 @@ public class QrCodeDecoderImage<T extends ImageGray<T>> {
 
 	/**
 	 * <p>Specifies transforms which can be used to change coordinates from distorted to undistorted and the opposite
-	 * coordinates.  The undistorted image is never explicitly created.</p>
+	 * coordinates. The undistorted image is never explicitly created.</p>
 	 *
-	 * @param width Input image width.  Used in sanity check only.
-	 * @param height Input image height.  Used in sanity check only.
+	 * @param width Input image width. Used in sanity check only.
+	 * @param height Input image height. Used in sanity check only.
 	 * @param model distortion model. Null to remove a distortion model.
 	 */
 	public void setLensDistortion( int width, int height,

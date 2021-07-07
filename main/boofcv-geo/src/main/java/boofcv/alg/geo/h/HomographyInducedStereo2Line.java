@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -33,22 +33,22 @@ import org.ejml.dense.row.CommonOps_DDRM;
 
 /**
  * <p>
- * Computes the homography induced by a plane from 2 line correspondences.  Works with both calibrated and
- * uncalibrated cameras.  The Fundamental/Essential matrix must be known.  The found homography will be from view 1
- * to view 2.  The passed in Fundamental matrix must have the following properties for each set of
+ * Computes the homography induced by a plane from 2 line correspondences. Works with both calibrated and
+ * uncalibrated cameras. The Fundamental/Essential matrix must be known. The found homography will be from view 1
+ * to view 2. The passed in Fundamental matrix must have the following properties for each set of
  * point correspondences: x2*F*x1 = 0, where x1 and x2 are views of the point in image 1 and image 2 respectively.
  * </p>
  *
  * <p>
  * Algorithm: For each line correspondence it finds the intersection between the two planes which define the observed
- * lines.  These planes are created by line in the image and the camera origin.  From the two found lines, the
- * equations of the plane are extracted in 3D space.  This equation is then combined with information from
+ * lines. These planes are created by line in the image and the camera origin. From the two found lines, the
+ * equations of the plane are extracted in 3D space. This equation is then combined with information from
  * the fundamental matrix to compute the induced homography.
  * </p>
  *
  * <p>
- * NOTE: Any line which is parallel to camera baseline can't be used.  The lines in both cameras will have the same
- * slope, causing their intersection to be a plane instead of a line.  This can be a significant issue since for
+ * NOTE: Any line which is parallel to camera baseline can't be used. The lines in both cameras will have the same
+ * slope, causing their intersection to be a plane instead of a line. This can be a significant issue since for
  * many stereo rigs it would mean no perfectly horizontal lines can be used.
  * </p>
  *
@@ -89,7 +89,7 @@ public class HomographyInducedStereo2Line {
 	 * Specify the fundamental matrix and the camera 2 epipole.
 	 *
 	 * @param F Fundamental matrix.
-	 * @param e2 Epipole for camera 2.  If null it will be computed internally.
+	 * @param e2 Epipole for camera 2. If null it will be computed internally.
 	 */
 	public void setFundamental( DMatrixRMaj F, Point3D_F64 e2 ) {
 		if (e2 != null)

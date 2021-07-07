@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -29,7 +29,7 @@ import org.ejml.dense.row.CommonOps_DDRM;
 
 /**
  * <p>
- * Computes the Sampson distance residual for a set of observations given an esesntial matrix.  For use
+ * Computes the Sampson distance residual for a set of observations given an esesntial matrix. For use
  * in least-squares non-linear optimization algorithms. Error is computed in pixels.
  * </p>
  *

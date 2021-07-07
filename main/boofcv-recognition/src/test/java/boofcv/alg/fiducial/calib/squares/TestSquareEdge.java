@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -28,8 +28,7 @@ import static org.junit.jupiter.api.Assertions.fail;
  * @author Peter Abeles
  */
 public class TestSquareEdge extends BoofStandardJUnit {
-	@Test
-	public void destination() {
+	@Test void destination() {
 		SquareNode a = new SquareNode();
 		SquareNode b = new SquareNode();
 		SquareNode c = new SquareNode();
@@ -47,8 +46,7 @@ public class TestSquareEdge extends BoofStandardJUnit {
 		} catch( RuntimeException ignore){}
 	}
 
-	@Test
-	public void reset() {
+	@Test void reset() {
 		SquareEdge edge = new SquareEdge();
 		edge.a = new SquareNode();
 		edge.b = new SquareNode();

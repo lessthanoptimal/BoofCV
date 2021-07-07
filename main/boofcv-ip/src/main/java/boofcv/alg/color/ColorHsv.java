@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -27,14 +27,14 @@ import boofcv.struct.image.Planar;
 
 /**
  * <p>
- * Color conversion between RGB and HSV color spaces.  HSV stands for Hue-Saturation-Value.  "Hue" has a range of [0,2*PI]
- * and "Saturation" has a range of [0,1], the two together represent the color.  While "Value" has the same range as the
+ * Color conversion between RGB and HSV color spaces. HSV stands for Hue-Saturation-Value. "Hue" has a range of [0,2*PI]
+ * and "Saturation" has a range of [0,1], the two together represent the color. While "Value" has the same range as the
  * input pixels and represents how light/dark the color is. Original algorithm taken from [1] and modified slightly.
  * </p>
  *
  * <p>
  * NOTE: The hue is represented in radians instead of degrees, as is often done.<br>
- * NOTE: Hue will be set to NaN if it is undefined.  It is undefined when chroma is zero, which happens when the input
+ * NOTE: Hue will be set to NaN if it is undefined. It is undefined when chroma is zero, which happens when the input
  * color is a pure gray (e.g. same value across all color bands).
  * </p>
  *
@@ -350,7 +350,7 @@ public class ColorHsv {
 	}
 
 	/**
-	 * Converts an image from RGB into HSV.  Pixels must have a value within the range of [0,1].
+	 * Converts an image from RGB into HSV. Pixels must have a value within the range of [0,1].
 	 *
 	 * @param rgb (Input) Image in RGB format
 	 * @param hsv (Output) Image in HSV format

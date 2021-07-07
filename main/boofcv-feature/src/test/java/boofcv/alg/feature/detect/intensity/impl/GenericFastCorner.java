@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -49,8 +49,7 @@ public abstract class GenericFastCorner extends BoofStandardJUnit {
 		this.detectDifference = detectDifference;
 	}
 
-	@Test
-	public void perfectCircle() {
+	@Test void perfectCircle() {
 		perfectCircle(true);
 		perfectCircle(false);
 
@@ -87,8 +86,7 @@ public abstract class GenericFastCorner extends BoofStandardJUnit {
 
 	}
 
-	@Test
-	public void compareToNaiveDetection() {
+	@Test void compareToNaiveDetection() {
 
 		GrayU8 input = new GrayU8(40,50);
 		GImageMiscOps.fillUniform(input, rand, 0, 50);
@@ -118,8 +116,7 @@ public abstract class GenericFastCorner extends BoofStandardJUnit {
 		}
 	}
 
-	@Test
-	public void checkIntensity() {
+	@Test void checkIntensity() {
 		GrayU8 input = new GrayU8(40,50);
 		GrayF32 intensity = new GrayF32(input.width,input.height);
 

@@ -23,7 +23,7 @@ import boofcv.struct.image.ImageGray;
 
 /**
  * Describes a rectangular region using its raw pixel intensities. Score between two regions of this type is typically
- * computed using Sum of Absolute Differences (SAD).  If the descriptor goes outside of the image
+ * computed using Sum of Absolute Differences (SAD). If the descriptor goes outside of the image
  * bounds those pixels will be set to zero in the descriptor.
  *
  * @author Peter Abeles

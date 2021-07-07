@@ -133,7 +133,7 @@ public class TestSiftDetector extends BoofStandardJUnit {
 	}
 
 	/**
-	 * The feature intensity is no longer symmetric.  See if the interpolated peak moves in the expected direction
+	 * The feature intensity is no longer symmetric. See if the interpolated peak moves in the expected direction
 	 * away from the pixel level peak.
 	 */
 	@Test void processFeatureCandidate_Shift() {

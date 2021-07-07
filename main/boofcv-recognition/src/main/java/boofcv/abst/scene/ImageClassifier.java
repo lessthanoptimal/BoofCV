@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -30,10 +30,10 @@ import java.util.List;
 public interface ImageClassifier<T extends ImageBase<T>> extends ImageModelBase<T> {
 
 	/**
-	 * Process the image and determine which category it belongs to.  Will throw an exception if the model has
+	 * Process the image and determine which category it belongs to. Will throw an exception if the model has
 	 * not been loaded yet.
 	 *
-	 * @param image Image being processed.  All pixel values have a range of 0 to 255.  If a color image then the
+	 * @param image Image being processed. All pixel values have a range of 0 to 255. If a color image then the
 	 *              bands will be in red, green, blue order.
 	 */
 	void classify( T image );
@@ -45,7 +45,7 @@ public interface ImageClassifier<T extends ImageBase<T>> extends ImageModelBase<
 	int getBestResult();
 
 	/**
-	 * Returns a list of all the likely categories for the image.  What is likely is implementation dependent.
+	 * Returns a list of all the likely categories for the image. What is likely is implementation dependent.
 	 * Each category should be included at least once and might not be included at all.
 	 * @return List of categories and scores
 	 */
@@ -62,7 +62,7 @@ public interface ImageClassifier<T extends ImageBase<T>> extends ImageModelBase<
 	 */
 	class Score {
 		/**
-		 * The score associated with a particular category.  Score's meaning is implementation dependent.
+		 * The score associated with a particular category. Score's meaning is implementation dependent.
 		 */
 		public double score;
 		/**

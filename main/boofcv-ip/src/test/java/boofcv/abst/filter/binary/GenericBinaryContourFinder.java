@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -33,8 +33,7 @@ public abstract class GenericBinaryContourFinder extends GenericBinaryContourInt
 	@Override
 	protected abstract BinaryContourFinder create();
 
-	@Test
-	public void inputNotModified() {
+	@Test void inputNotModified() {
 		GrayU8 input = TEST2.clone();
 
 		BinaryContourFinder alg = create();
@@ -44,8 +43,7 @@ public abstract class GenericBinaryContourFinder extends GenericBinaryContourInt
 		assertEquals(0, ImageStatistics.meanDiffSq(TEST2, input), 1e-8);
 	}
 
-	@Test
-	public void minContour() {
+	@Test void minContour() {
 		GrayU8 input = TEST3.clone();
 
 		BinaryContourFinder alg = create();
@@ -55,8 +53,7 @@ public abstract class GenericBinaryContourFinder extends GenericBinaryContourInt
 		assertEquals(0, alg.getContours().size());
 	}
 
-	@Test
-	public void maxContour() {
+	@Test void maxContour() {
 		GrayU8 input = TEST3.clone();
 
 		BinaryContourFinder alg = create();
@@ -67,8 +64,7 @@ public abstract class GenericBinaryContourFinder extends GenericBinaryContourInt
 		assertEquals(0, alg.getContours().size());
 	}
 
-	@Test
-	public void connectRule() {
+	@Test void connectRule() {
 		GrayU8 input = TEST3.clone();
 
 		BinaryContourFinder alg = create();
@@ -81,8 +77,7 @@ public abstract class GenericBinaryContourFinder extends GenericBinaryContourInt
 		checkExternalSize(alg, 0, 8);
 	}
 
-	@Test
-	public void saveInternal() {
+	@Test void saveInternal() {
 		if (!supportsInternalContour)
 			return;
 
@@ -98,8 +93,7 @@ public abstract class GenericBinaryContourFinder extends GenericBinaryContourInt
 		checkInternalSize(alg, 0, 0, 0);
 	}
 
-	@Test
-	public void testCase1() {
+	@Test void testCase1() {
 		GrayU8 input = TEST1.clone();
 
 		BinaryContourFinder alg = create();
@@ -113,8 +107,7 @@ public abstract class GenericBinaryContourFinder extends GenericBinaryContourInt
 		checkExpectedExternal(new int[]{37}, alg);
 	}
 
-	@Test
-	public void testCase2() {
+	@Test void testCase2() {
 		GrayU8 input = TEST2.clone();
 
 		BinaryContourFinder alg = create();
@@ -128,8 +121,7 @@ public abstract class GenericBinaryContourFinder extends GenericBinaryContourInt
 		checkExpectedExternal(new int[]{1, 3, 4, 32}, alg);
 	}
 
-	@Test
-	public void testCase4() {
+	@Test void testCase4() {
 		GrayU8 input = TEST4.clone();
 		BinaryContourFinder alg = create();
 
@@ -142,8 +134,7 @@ public abstract class GenericBinaryContourFinder extends GenericBinaryContourInt
 		checkExpectedExternal(new int[]{19}, alg);
 	}
 
-	@Test
-	public void testCase5() {
+	@Test void testCase5() {
 		BinaryContourFinder alg = create();
 
 		alg.setConnectRule(ConnectRule.FOUR);
@@ -155,8 +146,7 @@ public abstract class GenericBinaryContourFinder extends GenericBinaryContourInt
 		checkExpectedExternal(new int[]{20}, alg);
 	}
 
-	@Test
-	public void test6() {
+	@Test void test6() {
 		BinaryContourFinder alg = create();
 
 		alg.setConnectRule(ConnectRule.FOUR);
@@ -168,8 +158,7 @@ public abstract class GenericBinaryContourFinder extends GenericBinaryContourInt
 		checkExpectedExternal(new int[]{20}, alg);
 	}
 
-	@Test
-	public void test7() {
+	@Test void test7() {
 		BinaryContourFinder alg = create();
 
 		alg.setConnectRule(ConnectRule.FOUR);

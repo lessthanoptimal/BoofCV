@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -42,8 +42,7 @@ public abstract class GeneralLensDistortionWideFOVChecks extends BoofStandardJUn
 
 	public abstract LensDistortionWideFOV create();
 
-	@Test
-	public void pixel_unit_pixel_F32() {
+	@Test void pixel_unit_pixel_F32() {
 		LensDistortionWideFOV alg = create();
 
 		Point2Transform3_F32 undistort = alg.undistortPtoS_F32();
@@ -59,8 +58,7 @@ public abstract class GeneralLensDistortionWideFOVChecks extends BoofStandardJUn
 		assertEquals(260, found.y, pixel_tol_F32);
 	}
 
-	@Test
-	public void pixel_unit_pixel_F64() {
+	@Test void pixel_unit_pixel_F64() {
 		LensDistortionWideFOV alg = create();
 
 		Point2Transform3_F64 undistort = alg.undistortPtoS_F64();
@@ -77,10 +75,9 @@ public abstract class GeneralLensDistortionWideFOVChecks extends BoofStandardJUn
 	}
 
 	/**
-	 * Give it spherical coordinate pointing slightly behind.  See if it blows up when converting into pixels
+	 * Give it spherical coordinate pointing slightly behind. See if it blows up when converting into pixels
 	 */
-	@Test
-	public void blowup_extreme_angle_F32() {
+	@Test void blowup_extreme_angle_F32() {
 		LensDistortionWideFOV alg = create();
 		Point3Transform2_F32 distort = alg.distortStoP_F32();
 
@@ -97,10 +94,9 @@ public abstract class GeneralLensDistortionWideFOVChecks extends BoofStandardJUn
 	}
 
 	/**
-	 * Give it spherical coordinate pointing slightly behind.  See if it blows up when converting into pixels
+	 * Give it spherical coordinate pointing slightly behind. See if it blows up when converting into pixels
 	 */
-	@Test
-	public void blowup_extreme_angle_F64() {
+	@Test void blowup_extreme_angle_F64() {
 		LensDistortionWideFOV alg = create();
 		Point3Transform2_F64 distort = alg.distortStoP_F64();
 

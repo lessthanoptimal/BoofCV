@@ -47,10 +47,9 @@ public class TestStitchingFromMotion2D extends BoofStandardJUnit {
 	Affine2D_F64 motion0 = new Affine2D_F64(1, 2, 3, 4, 5, 6);
 
 	/**
-	 * Given fake internal algorithms see if it performs as expected.  tests several functions
+	 * Given fake internal algorithms see if it performs as expected. tests several functions
 	 */
-	@Test
-	public void basicTest() {
+	@Test void basicTest() {
 		HelperMotion motion = new HelperMotion();
 		HelperDistort distort = new HelperDistort();
 
@@ -95,8 +94,7 @@ public class TestStitchingFromMotion2D extends BoofStandardJUnit {
 	/**
 	 * Checks to see if the user specified initial transformation is correctly applied
 	 */
-	@Test
-	public void checkInitialTransform() {
+	@Test void checkInitialTransform() {
 		HelperMotion motion = new HelperMotion();
 		HelperDistort distort = new HelperDistort();
 
@@ -119,8 +117,7 @@ public class TestStitchingFromMotion2D extends BoofStandardJUnit {
 	/**
 	 * Provide an extremely different transformation and see if that causes an exception
 	 */
-	@Test
-	public void checkMaxJump() {
+	@Test void checkMaxJump() {
 		HelperMotion motion = new HelperMotion();
 		HelperDistort distort = new HelperDistort();
 
@@ -141,8 +138,7 @@ public class TestStitchingFromMotion2D extends BoofStandardJUnit {
 	/**
 	 * Note that this test does not actually check to see if the correct transform is applied
 	 */
-	@Test
-	public void setOriginToCurrent() {
+	@Test void setOriginToCurrent() {
 		HelperMotion motion = new HelperMotion();
 		HelperDistort distort = new HelperDistort();
 
@@ -160,8 +156,7 @@ public class TestStitchingFromMotion2D extends BoofStandardJUnit {
 		assertEquals(2, distort.numApply);
 	}
 
-	@Test
-	public void resizeStitchImage_noTransform() {
+	@Test void resizeStitchImage_noTransform() {
 		HelperMotion motion = new HelperMotion();
 		HelperDistort distort = new HelperDistort();
 
@@ -188,8 +183,7 @@ public class TestStitchingFromMotion2D extends BoofStandardJUnit {
 		assertEquals(-2, found.ty, 1e-5);
 	}
 
-	@Test
-	public void resizeStitchImage_Transform() {
+	@Test void resizeStitchImage_Transform() {
 		HelperMotion motion = new HelperMotion();
 		InterpolatePixelS interp = FactoryInterpolation.createPixelS(0, 255,
 				InterpolationType.BILINEAR, BorderType.EXTENDED, GrayF32.class);
@@ -233,8 +227,7 @@ public class TestStitchingFromMotion2D extends BoofStandardJUnit {
 		}
 	}
 
-	@Test
-	public void getImageCorners() {
+	@Test void getImageCorners() {
 		HelperMotion motion = new HelperMotion();
 		HelperDistort distort = new HelperDistort();
 
@@ -263,8 +256,7 @@ public class TestStitchingFromMotion2D extends BoofStandardJUnit {
 	/**
 	 * Make sure it doesn't blow up if reset is called before anythign is processed
 	 */
-	@Test
-	public void resetBeforeProcess() {
+	@Test void resetBeforeProcess() {
 		HelperMotion motion = new HelperMotion();
 		HelperDistort distort = new HelperDistort();
 

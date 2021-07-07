@@ -40,12 +40,12 @@ public interface DescribePoint<T extends ImageBase<T>, TD extends TupleDesc<TD>>
 	/**
 	 * Extract a description of the local image at the the pixel coordinate of the point.
 	 *
-	 * WARNING: Check the returned value to make sure a description was actually computed.  Some implementations
+	 * WARNING: Check the returned value to make sure a description was actually computed. Some implementations
 	 * might now allow features to extend outside the image border and will return false.
 	 *
 	 * @param x Coordinate of the point.
 	 * @param y Coordinate of the point.
-	 * @param description (output) Storage for extracted feature.  Use {@link #createDescription} to create descriptor.
+	 * @param description (output) Storage for extracted feature. Use {@link #createDescription} to create descriptor.
 	 * @return true if a descriptor can computed or false if not.
 	 */
 	boolean process( double x, double y, TD description );

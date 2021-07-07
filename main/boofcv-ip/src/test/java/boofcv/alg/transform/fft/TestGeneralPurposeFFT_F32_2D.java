@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -33,8 +33,7 @@ public class TestGeneralPurposeFFT_F32_2D extends BoofStandardJUnit {
 
 	int[] sizes = new int[]{1,2,3,16,32,100,103};
 
-	@Test
-	public void realFull() {
+	@Test void realFull() {
 		for( int i = 0; i < sizes.length; i++ ) {
 			for( int j = 0; j < sizes.length; j++ ) {
 				checkRealFull(sizes[i], sizes[j]);
@@ -73,8 +72,7 @@ public class TestGeneralPurposeFFT_F32_2D extends BoofStandardJUnit {
 		}
 	}
 
-	@Test
-	public void complex() {
+	@Test void complex() {
 		for( int i = 0; i < sizes.length; i++ ) {
 			for( int j = 0; j < sizes.length; j++ ) {
 				checkComplex(sizes[i], sizes[j]);

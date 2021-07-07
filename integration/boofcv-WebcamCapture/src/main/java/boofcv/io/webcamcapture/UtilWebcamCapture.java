@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -46,7 +46,7 @@ public class UtilWebcamCapture {
 	}
 
 	/**
-	 * Searches for the first device which matches the pattern.  Webcam capture doesn't name devices
+	 * Searches for the first device which matches the pattern. Webcam capture doesn't name devices
 	 * using the standard "/dev/video0" scheme, but it includes that in its name.
 	 *
 	 * @param deviceName Partial or complete name of the device you wish to pen

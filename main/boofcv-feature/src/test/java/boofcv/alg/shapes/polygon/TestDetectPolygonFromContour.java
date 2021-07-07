@@ -60,8 +60,8 @@ public class TestDetectPolygonFromContour extends CommonFitPolygonChecks {
 	}
 
 	/**
-	 * See if it uses the provided lens distortion transforms correctly.  The distortion applied
-	 * is actually the affine transform instead of lens distortion.  It should find the original
+	 * See if it uses the provided lens distortion transforms correctly. The distortion applied
+	 * is actually the affine transform instead of lens distortion. It should find the original
 	 * rectangles.
 	 */
 	@Test void usingSetLensDistortion() {

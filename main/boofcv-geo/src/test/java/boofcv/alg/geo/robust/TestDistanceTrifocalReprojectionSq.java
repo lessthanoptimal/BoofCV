@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -29,8 +29,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
  * @author Peter Abeles
  */
 class TestDistanceTrifocalReprojectionSq extends CommonTrifocalChecks {
-	@Test
-	public void perfect() {
+	@Test void perfect() {
 
 		DistanceTrifocalReprojectionSq alg = new DistanceTrifocalReprojectionSq();
 		alg.setModel(tensorPixels);
@@ -40,8 +39,7 @@ class TestDistanceTrifocalReprojectionSq extends CommonTrifocalChecks {
 		}
 	}
 
-	@Test
-	public void noise() {
+	@Test void noise() {
 		DistanceTrifocalReprojectionSq alg = new DistanceTrifocalReprojectionSq();
 		alg.setModel(tensorPixels);
 
@@ -58,8 +56,7 @@ class TestDistanceTrifocalReprojectionSq extends CommonTrifocalChecks {
 		}
 	}
 
-	@Test
-	public void noise_refine() {
+	@Test void noise_refine() {
 		DistanceTrifocalReprojectionSq alg = new DistanceTrifocalReprojectionSq(1e-8, 100);
 		alg.setModel(tensorPixels);
 

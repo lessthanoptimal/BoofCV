@@ -31,8 +31,8 @@ import java.util.List;
 
 /**
  * Attempts to remove camera jitter across multiple video frames by detecting point features inside the image
- * and tracking their motion.  Models are then fit to the feature's motion and the inverse transform
- * computer and rendered.  RANSAC is used internally to remove noise.  Different feature descriptors and motion
+ * and tracking their motion. Models are then fit to the feature's motion and the inverse transform
+ * computer and rendered. RANSAC is used internally to remove noise. Different feature descriptors and motion
  * models can be used. Both the unstabilized input and stabilized output are shown in a window.
  *
  * @param <I> Input image type

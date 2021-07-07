@@ -32,7 +32,7 @@ import org.ddogleg.struct.FastArray;
 /**
  * Wrapper class around independent feature detectors, region orientation, and descriptors, that allow
  * them to be used as a single integrated unit. Providing an algorithm for estimating orientation is
- * optional.  If one is provided, any orientation estimate provided by the detector is ignored.
+ * optional. If one is provided, any orientation estimate provided by the detector is ignored.
  *
  * @author Peter Abeles
  * @see InterestPointDetector

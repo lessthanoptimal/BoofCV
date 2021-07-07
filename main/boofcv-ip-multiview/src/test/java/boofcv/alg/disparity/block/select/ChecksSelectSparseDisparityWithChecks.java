@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -91,7 +91,7 @@ public abstract class ChecksSelectSparseDisparityWithChecks<ArrayData> extends B
 	}
 
 	/**
-	 * There are two similar peaks.  Repeated pattern
+	 * There are two similar peaks. Repeated pattern
 	 */
 	@Test
 	void confidenceMultiplePeak() {
@@ -114,7 +114,7 @@ public abstract class ChecksSelectSparseDisparityWithChecks<ArrayData> extends B
 	}
 
 	/**
-	 * See if multiple peak detection works correctly when the first peak is at zero.  There was a bug related to
+	 * See if multiple peak detection works correctly when the first peak is at zero. There was a bug related to
 	 * this at one point.
 	 */
 	@Test

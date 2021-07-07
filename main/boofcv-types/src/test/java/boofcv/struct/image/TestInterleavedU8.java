@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -48,8 +48,7 @@ public class TestInterleavedU8 extends StandardImageInterleavedTests<Interleaved
 	}
 
 
-	@Test
-	public void get24() {
+	@Test void get24() {
 		InterleavedU8 img = new InterleavedU8(2,3,3);
 		img.set(0,1,233,16,128);
 		img.set(1,1,16,0,200);
@@ -61,8 +60,7 @@ public class TestInterleavedU8 extends StandardImageInterleavedTests<Interleaved
 		assertEquals(expected1,img.get24(1,1));
 	}
 
-	@Test
-	public void get32() {
+	@Test void get32() {
 		InterleavedU8 img = new InterleavedU8(2,3,4);
 		img.set(0,1,208,233,16,128);
 		img.set(1,1,217,16,0,200);
@@ -74,8 +72,7 @@ public class TestInterleavedU8 extends StandardImageInterleavedTests<Interleaved
 		assertEquals(expected1,img.get32(1,1));
 	}
 
-	@Test
-	public void set32() {
+	@Test void set32() {
 		InterleavedU8 img = new InterleavedU8(2,3,4);
 
 
@@ -97,8 +94,7 @@ public class TestInterleavedU8 extends StandardImageInterleavedTests<Interleaved
 		assertEquals(200,img.getBand(1,1,3));
 	}
 
-	@Test
-	public void set24() {
+	@Test void set24() {
 		InterleavedU8 img = new InterleavedU8(2,3,3);
 
 		int expected0 = (233<<16) | (16<<8) | (128);

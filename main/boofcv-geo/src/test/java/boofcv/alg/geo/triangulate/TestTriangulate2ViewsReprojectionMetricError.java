@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -55,16 +55,14 @@ public class TestTriangulate2ViewsReprojectionMetricError extends BoofStandardJU
 		nb.setTo( Xb.x/Xb.z, Xb.y/Xb.z );
 	}
 
-	@Test
-	public void perfect() {
+	@Test void perfect() {
 		var alg = new Triangulate2ViewsReprojectionMetricError();
 		alg.configure(cameraA,cameraB);
 
 		assertEquals(0,alg.process(na,nb,a_to_b,Xa), UtilEjml.TEST_F64);
 	}
 
-	@Test
-	public void errorInA() {
+	@Test void errorInA() {
 		var alg = new Triangulate2ViewsReprojectionMetricError();
 		alg.configure(cameraA,cameraB);
 
@@ -76,8 +74,7 @@ public class TestTriangulate2ViewsReprojectionMetricError extends BoofStandardJU
 		assertEquals(0.5*0.5/2 , alg.process(na,nb,a_to_b,Xa), UtilEjml.TEST_F64);
 	}
 
-	@Test
-	public void errorInB() {
+	@Test void errorInB() {
 		var alg = new Triangulate2ViewsReprojectionMetricError();
 		alg.configure(cameraA,cameraB);
 

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -39,8 +39,7 @@ public abstract class GeneralSearchLocalPeakChecks extends BoofStandardJUnit {
 
 	public abstract SearchLocalPeak createSearch( Class<GrayF32> imageType );
 
-	@Test
-	public void gaussian() {
+	@Test void gaussian() {
 		ImageMiscOps.fill(image,0);
 		Kernel2D_F32 k = FactoryKernelGaussian.gaussian(2,true,32,-1,5);
 
@@ -61,8 +60,7 @@ public abstract class GeneralSearchLocalPeakChecks extends BoofStandardJUnit {
 
 	}
 
-	@Test
-	public void impulse() {
+	@Test void impulse() {
 		ImageMiscOps.fill(image,0);
 
 		int cx = 12;
@@ -97,8 +95,7 @@ public abstract class GeneralSearchLocalPeakChecks extends BoofStandardJUnit {
 		}
 	}
 
-	@Test
-	public void edgeCaseLeft() {
+	@Test void edgeCaseLeft() {
 		ImageMiscOps.fill(image,0);
 
 		image.set(1,10,10);
@@ -110,8 +107,7 @@ public abstract class GeneralSearchLocalPeakChecks extends BoofStandardJUnit {
 		searchSolution(1, 10, search);
 	}
 
-	@Test
-	public void edgeCaseRight() {
+	@Test void edgeCaseRight() {
 		ImageMiscOps.fill(image,0);
 
 		image.set(image.width-2,10,10);
@@ -123,8 +119,7 @@ public abstract class GeneralSearchLocalPeakChecks extends BoofStandardJUnit {
 		searchSolution(image.width-2, 10, search);
 	}
 
-	@Test
-	public void edgeCaseTop() {
+	@Test void edgeCaseTop() {
 		ImageMiscOps.fill(image,0);
 
 		image.set(10,1,10);
@@ -136,8 +131,7 @@ public abstract class GeneralSearchLocalPeakChecks extends BoofStandardJUnit {
 		searchSolution(10, 1, search);
 	}
 
-	@Test
-	public void edgeCaseBottom() {
+	@Test void edgeCaseBottom() {
 		ImageMiscOps.fill(image,0);
 
 		image.set(10,image.height-2,10);

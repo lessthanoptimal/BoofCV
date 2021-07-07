@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -47,13 +47,13 @@ public interface SearchLocalPeak<T extends ImageGray<T>> {
 	public void search( float x , float y );
 
 	/**
-	 * Location of the found peak.  x-coordinate
+	 * Location of the found peak. x-coordinate
 	 * @return x-coordinate
 	 */
 	public float getPeakX();
 
 	/**
-	 * Location of the found peak.  y-coordinate
+	 * Location of the found peak. y-coordinate
 	 * @return y-coordinate
 	 */
 	public float getPeakY();

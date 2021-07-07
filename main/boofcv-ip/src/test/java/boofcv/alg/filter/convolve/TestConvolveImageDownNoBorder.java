@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -27,8 +27,7 @@ import org.junit.jupiter.api.Test;
  * @author Peter Abeles
  */
 public class TestConvolveImageDownNoBorder extends BoofStandardJUnit {
-	@Test
-	public void compareToStandard() {
+	@Test void compareToStandard() {
 		CompareToStandardConvolveDownNoBorder test = new CompareToStandardConvolveDownNoBorder(ConvolveImageDownNoBorder.class);
 		test.setSkip(2);
 

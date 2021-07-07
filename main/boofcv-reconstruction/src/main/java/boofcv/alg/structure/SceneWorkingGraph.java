@@ -192,7 +192,7 @@ public class SceneWorkingGraph {
 		 */
 		public final FastArray<PairwiseImageGraph.View> views = new FastArray<>(PairwiseImageGraph.View.class);
 		/**
-		 * indexes of observations for each view listed in 'views'.  obs[view][idx] will refer to the same feature
+		 * indexes of observations for each view listed in 'views'. obs[view][idx] will refer to the same feature
 		 * for all 'idx'
 		 */
 		public final DogArray<DogArray_I32> observations = new DogArray<>(DogArray_I32::new, DogArray_I32::reset);

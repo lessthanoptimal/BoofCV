@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -41,7 +41,7 @@ import java.util.List;
 public interface CalibrationView {
 
 	/**
-	 * Intialize by providing it a reference to the detector.  This is then used to determine the appearance
+	 * Intialize by providing it a reference to the detector. This is then used to determine the appearance
 	 * of the target
 	 */
 	void initialize( DetectorFiducialCalibration detector );

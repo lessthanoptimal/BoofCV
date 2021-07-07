@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -33,13 +33,11 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  * @author Peter Abeles
  */
 public class TestEdgeIntensityEllipse extends BoofStandardJUnit {
-	@Test
-	public void fullyInside() {
+	@Test void fullyInside() {
 		check(new EllipseRotated_F64(50,60,10,5,0.1));
 	}
 
-	@Test
-	public void partiallyInside() {
+	@Test void partiallyInside() {
 		check(new EllipseRotated_F64(5,60,10,5,0.1));
 	}
 
@@ -58,7 +56,7 @@ public class TestEdgeIntensityEllipse extends BoofStandardJUnit {
 		assertTrue(alg.process(ellipse));
 		double score0 = alg.getEdgeIntensity();
 
-		// now try it again with it offset a little.  score should go down
+		// now try it again with it offset a little. score should go down
 		ellipse.center.x += 0.75;
 		assertTrue(alg.process(ellipse));
 		double score1 = alg.getEdgeIntensity();
@@ -72,8 +70,7 @@ public class TestEdgeIntensityEllipse extends BoofStandardJUnit {
 	/**
 	 * Makes sure the score stays about the same when it is inside and partially outside
 	 */
-	@Test
-	public void scoreInsideAndOutside() {
+	@Test void scoreInsideAndOutside() {
 		EllipseRotated_F64 ellipse = new EllipseRotated_F64(50,60,10,5,0.1);
 		List<EllipseRotated_F64> list = new ArrayList<>();
 		list.add( ellipse );

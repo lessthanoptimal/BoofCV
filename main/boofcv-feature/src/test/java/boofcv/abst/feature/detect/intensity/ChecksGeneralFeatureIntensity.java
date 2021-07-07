@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -60,8 +60,7 @@ public abstract class ChecksGeneralFeatureIntensity<I extends ImageGray<I>, D ex
 	 * values from past runs and not be zero.
 	 */
 	@SuppressWarnings("unchecked")
-	@Test
-	public void checkReshapeBorder() {
+	@Test void checkReshapeBorder() {
 		for( int i = 0; i < listInputTypes.size(); i++ ) {
 			checkReshapeBorder( listInputTypes.get(i), listDerivTypes.get(i));
 		}

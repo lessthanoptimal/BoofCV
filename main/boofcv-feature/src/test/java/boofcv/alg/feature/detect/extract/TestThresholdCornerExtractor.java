@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -34,8 +34,7 @@ public class TestThresholdCornerExtractor extends BoofStandardJUnit {
 	/**
 	 * Tests to see if it extracts the expected number of points
 	 */
-	@Test
-	public void testThreshold() {
+	@Test void testThreshold() {
 		float[] inten = new float[]
 				{0, 1, 0, 0, 3, 4, 4, 0, 0,
 				1, 0, 2, 0, 5, 0, 0, 0, 1,

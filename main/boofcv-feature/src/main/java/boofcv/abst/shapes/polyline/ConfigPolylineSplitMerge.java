@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -39,7 +39,7 @@ public class ConfigPolylineSplitMerge extends BaseConfigPolyline {
 
 	/**
 	 * Used to adjust the penalty for adding a new corner. Larger numbers will bias it towards shapes with fewer
-	 * sides.  For simple convex shapes 0.2 is a reasonable value. For complex concave shapes 0.025 seems to do better.
+	 * sides. For simple convex shapes 0.2 is a reasonable value. For complex concave shapes 0.025 seems to do better.
 	 */
 	public double cornerScorePenalty = 0.025;
 

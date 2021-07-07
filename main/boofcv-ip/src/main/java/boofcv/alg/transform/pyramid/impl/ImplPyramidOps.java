@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -63,7 +63,7 @@ public class ImplPyramidOps {
 	}
 
 	/**
-	 * Scales down the input by a factor of 2.  Every other pixel along both axises is skipped.
+	 * Scales down the input by a factor of 2. Every other pixel along both axises is skipped.
 	 */
 	public static void scaleDown2( GrayF32 input , GrayF32 output ) {
 		
@@ -105,7 +105,7 @@ public class ImplPyramidOps {
 	}
 
 	/**
-	 * Scales down the input by a factor of 2.  Every other pixel along both axises is skipped.
+	 * Scales down the input by a factor of 2. Every other pixel along both axises is skipped.
 	 */
 	public static void scaleDown2( GrayU8 input , GrayU8 output ) {
 		

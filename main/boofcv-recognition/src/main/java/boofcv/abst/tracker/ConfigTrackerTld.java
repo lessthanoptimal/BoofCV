@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -34,7 +34,7 @@ public class ConfigTrackerTld implements Configuration {
 	public boofcv.alg.tracker.tld.ConfigTld parameters = new boofcv.alg.tracker.tld.ConfigTld();
 
 	/**
-	 * Specifies the type of interpolation.  More stable with bilinear, but nearest-neighbor can be
+	 * Specifies the type of interpolation. More stable with bilinear, but nearest-neighbor can be
 	 * used to maximize speed.
 	 */
 	public InterpolationType interpolate = InterpolationType.BILINEAR;

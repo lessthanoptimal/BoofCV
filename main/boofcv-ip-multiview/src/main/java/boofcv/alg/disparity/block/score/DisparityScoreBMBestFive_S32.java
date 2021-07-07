@@ -256,8 +256,8 @@ public class DisparityScoreBMBestFive_S32<T extends ImageBase<T>, DI extends Ima
 	}
 
 	/**
-	 * Compute the final score by sampling the 5 regions.  Four regions are sampled around the center
-	 * region.  Out of those four only the two with the smallest score are used.
+	 * Compute the final score by sampling the 5 regions. Four regions are sampled around the center
+	 * region. Out of those four only the two with the smallest score are used.
 	 */
 	protected void computeScoreFive( int[] top, int[] middle, int[] bottom, int[] score, int width,
 									 Compare_S32 compare ) {

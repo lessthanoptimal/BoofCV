@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -28,8 +28,7 @@ import static org.junit.jupiter.api.Assertions.*;
  */
 public class TestImageGray extends BoofStandardJUnit {
 
-	@Test
-	public void reshape() {
+	@Test void reshape() {
 		DummyImage a = new DummyImage(10,30);
 		// b has the expected values
 		DummyImage b = new DummyImage(11,12);
@@ -58,8 +57,7 @@ public class TestImageGray extends BoofStandardJUnit {
 		} catch( IllegalArgumentException e ) {}
 	}
 
-	@Test
-	public void setTo() {
+	@Test void setTo() {
 		DummyImage a = new DummyImage(10, 20);
 
 		// test it against a regular matrix
@@ -83,8 +81,7 @@ public class TestImageGray extends BoofStandardJUnit {
 	/**
 	 * The two matrices do not have the same shape
 	 */
-	@Test
-	public void setTo_mismatch() {
+	@Test void setTo_mismatch() {
 		DummyImage a = new DummyImage(10, 20);
 		DummyImage b = new DummyImage(11, 21);
 
@@ -97,8 +94,7 @@ public class TestImageGray extends BoofStandardJUnit {
 	/**
 	 * Test the constructor where the width,height and number of bands is specified.
 	 */
-	@Test
-	public void constructor_w_h_n() {
+	@Test void constructor_w_h_n() {
 		DummyImage a = new DummyImage(10, 20);
 
 		assertEquals(10 * 20, a.data.length);
@@ -108,8 +104,7 @@ public class TestImageGray extends BoofStandardJUnit {
 		assertEquals(0, a.getStartIndex());
 	}
 
-	@Test
-	public void subimage() {
+	@Test void subimage() {
 		DummyImage a = new DummyImage(10, 20).subimage(2, 3, 8, 10, null);
 
 		assertTrue(a.subImage);
@@ -120,8 +115,7 @@ public class TestImageGray extends BoofStandardJUnit {
 		assertEquals(3 * 10 + 2, a.getStartIndex());
 	}
 
-	@Test
-	public void isInBounds() {
+	@Test void isInBounds() {
 		DummyImage a = new DummyImage(10, 20);
 
 		assertTrue(a.isInBounds(0, 0));
@@ -133,8 +127,7 @@ public class TestImageGray extends BoofStandardJUnit {
 		assertFalse(a.isInBounds(0, 20));
 	}
 
-	@Test
-	public void getIndex() {
+	@Test void getIndex() {
 		DummyImage a = new DummyImage(10, 20);
 
 		assertEquals(4 * 10 + 3, a.getIndex(3, 4));

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -46,8 +46,7 @@ public class TestSparseIntegralHaar_NoBorder_I32
 		setKernels(kernelX,kernelY);
 	}
 
-	@Test
-	public void allStandard() {
+	@Test void allStandard() {
 		allTests(false);
 	}
 

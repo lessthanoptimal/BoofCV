@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -32,7 +32,7 @@ import boofcv.struct.wavelet.WlCoef_I32;
 
 
 /**
- * Simplified factory for creating {@link boofcv.abst.transform.wavelet.WaveletTransform}.  Factories are provided
+ * Simplified factory for creating {@link boofcv.abst.transform.wavelet.WaveletTransform}. Factories are provided
  * for creating the different wavelet descriptions.
  *
  * @author Peter Abeles

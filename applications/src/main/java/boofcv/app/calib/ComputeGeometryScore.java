@@ -30,7 +30,7 @@ import java.util.List;
 
 /**
  * Estimates if there is enough geometry diversity to compute an initial estimate of the camera calibration parameters
- * by computing a linear estimate and looking at its singular values.  There should only be one null space.
+ * by computing a linear estimate and looking at its singular values. There should only be one null space.
  *
  * @author Peter Abeles
  */
@@ -68,7 +68,7 @@ public class ComputeGeometryScore {
 	}
 
 	/**
-	 * A number from 0 to 1.0 for how close to having the correct geometry it is.  1.0 = done
+	 * A number from 0 to 1.0 for how close to having the correct geometry it is. 1.0 = done
 	 */
 	public double getScore() {
 		return score;

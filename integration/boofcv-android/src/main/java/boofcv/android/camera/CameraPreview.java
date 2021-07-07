@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -29,7 +29,7 @@ import android.view.ViewGroup;
 import java.io.IOException;
 
 /**
- * Displays camera preview.  Android forces the camera preview to be displayed at all times.  This gets
+ * Displays camera preview. Android forces the camera preview to be displayed at all times. This gets
  * around that restriction by making the preview to be 2x2 pixel big .
  *
  * @author Peter Abeles

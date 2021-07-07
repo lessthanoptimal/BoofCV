@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -55,7 +55,7 @@ public class GenerateImplMedianSortEdgeNaive extends CodeGeneratorBase {
 				" *\n" +
 				" * <p>\n" +
 				" * radius: size of the filter's box.<br>\n" +
-				" * storage:  Used to store local values.  If null an array will be declared.\n" +
+				" * storage:  Used to store local values. If null an array will be declared.\n" +
 				" * </p>\n" +
 				generateDocString("Peter Abeles") +
 				"public class " + className + " {\n\n");

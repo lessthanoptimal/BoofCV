@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -28,8 +28,7 @@ import static org.junit.jupiter.api.Assertions.assertSame;
  */
 public class TestGImageDerivativeOps extends BoofStandardJUnit {
 
-	@Test
-	public void lookupKernelX() {
+	@Test void lookupKernelX() {
 		assertSame(GradientPrewitt.kernelDerivX_I32, GImageDerivativeOps.lookupKernelX(DerivativeType.PREWITT, true));
 		assertSame(GradientPrewitt.kernelDerivX_F32, GImageDerivativeOps.lookupKernelX(DerivativeType.PREWITT, false));
 

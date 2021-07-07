@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -47,8 +47,7 @@ public class TestMonocularPlaneVisualOdometryScaleInput extends BoofStandardJUni
 	boolean result;
 	boolean resetCalled = false;
 
-	@Test
-	public void setCalibration() {
+	@Test void setCalibration() {
 		param = null;
 
 		CameraPinholeBrown intrinsic = createIntrinsic();
@@ -65,8 +64,7 @@ public class TestMonocularPlaneVisualOdometryScaleInput extends BoofStandardJUni
 		assertTrue(this.param.planeToCamera.T.x == extrinsic.T.x);
 	}
 
-	@Test
-	public void process() {
+	@Test void process() {
 		image = null;
 
 		CameraPinholeBrown intrinsic = createIntrinsic();
@@ -85,8 +83,7 @@ public class TestMonocularPlaneVisualOdometryScaleInput extends BoofStandardJUni
 		assertEquals(160, image.height);
 	}
 
-	@Test
-	public void getImageType() {
+	@Test void getImageType() {
 
 		Dummy dummy = new Dummy();
 

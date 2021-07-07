@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -64,8 +64,7 @@ public class TestDerivativeIntegralImage extends BoofStandardJUnit {
 		}
 	}
 
-	@Test
-	public void kernelDerivY() {
+	@Test void kernelDerivY() {
 		GrayF32 orig = new GrayF32(width,height);
 		GrayF32 integral = new GrayF32(width,height);
 
@@ -90,8 +89,7 @@ public class TestDerivativeIntegralImage extends BoofStandardJUnit {
 		}
 	}
 
-	@Test
-	public void kernelHaarX() {
+	@Test void kernelHaarX() {
 		GrayF32 orig = new GrayF32(width,height);
 		GrayF32 integral = new GrayF32(width,height);
 
@@ -115,8 +113,7 @@ public class TestDerivativeIntegralImage extends BoofStandardJUnit {
 		}
 	}
 
-	@Test
-	public void kernelHaarY() {
+	@Test void kernelHaarY() {
 		GrayF32 orig = new GrayF32(width,height);
 		GrayF32 integral = new GrayF32(width,height);
 
@@ -142,8 +139,7 @@ public class TestDerivativeIntegralImage extends BoofStandardJUnit {
 		}
 	}
 
-	@Test
-	public void kernelDerivXX() {
+	@Test void kernelDerivXX() {
 		GrayF32 orig = new GrayF32(width,height);
 		GrayF32 integral = new GrayF32(width,height);
 
@@ -168,8 +164,7 @@ public class TestDerivativeIntegralImage extends BoofStandardJUnit {
 		}
 	}
 
-	@Test
-	public void derivXX() {
+	@Test void derivXX() {
 		GrayF32 orig = new GrayF32(width,height);
 		GrayF32 integral = new GrayF32(width,height);
 
@@ -194,8 +189,7 @@ public class TestDerivativeIntegralImage extends BoofStandardJUnit {
 		}
 	}
 
-	@Test
-	public void kernelDerivYY() {
+	@Test void kernelDerivYY() {
 		GrayF32 orig = new GrayF32(width,height);
 		GrayF32 integral = new GrayF32(width,height);
 
@@ -221,8 +215,7 @@ public class TestDerivativeIntegralImage extends BoofStandardJUnit {
 		}
 	}
 
-	@Test
-	public void derivYY() {
+	@Test void derivYY() {
 		GrayF32 orig = new GrayF32(width,height);
 		GrayF32 integral = new GrayF32(width,height);
 
@@ -249,8 +242,7 @@ public class TestDerivativeIntegralImage extends BoofStandardJUnit {
 		}
 	}
 
-	@Test
-	public void kernelDerivXY() {
+	@Test void kernelDerivXY() {
 		GrayF32 orig = new GrayF32(width,height);
 		GrayF32 integral = new GrayF32(width,height);
 
@@ -275,8 +267,7 @@ public class TestDerivativeIntegralImage extends BoofStandardJUnit {
 		}
 	}
 
-	@Test
-	public void derivXY() {
+	@Test void derivXY() {
 		GrayF32 orig = new GrayF32(width,height);
 		GrayF32 integral = new GrayF32(width,height);
 
@@ -320,7 +311,7 @@ public class TestDerivativeIntegralImage extends BoofStandardJUnit {
 	private Kernel2D_F32 createHaarX( int r ) {
 		int size = r*2;
 
-		// TODO kernels only support odd sizes right now...  change if that changes (remove +1)
+		// TODO kernels only support odd sizes right now... change if that changes (remove +1)
 		Kernel2D_F32 ret = new Kernel2D_F32(size+1);
 
 		for( int y = 1; y <= size; y++ ) {

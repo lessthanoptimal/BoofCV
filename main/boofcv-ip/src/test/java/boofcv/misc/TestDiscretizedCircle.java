@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -30,7 +30,7 @@ public class TestDiscretizedCircle extends BoofStandardJUnit {
 	/**
 	 * Make sure the circles have the expected properties.
 	 * <p/>
-	 * Right now it just checks the lengths.  I can do a better job..
+	 * Right now it just checks the lengths. I can do a better job..
 	 */
 	@Test void testCircles() {
 

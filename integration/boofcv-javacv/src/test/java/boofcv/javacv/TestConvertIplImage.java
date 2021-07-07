@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -30,8 +30,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
  * @author Peter Abeles
  */
 public class TestConvertIplImage {
-	@Test
-	public void convertFrom_1U8() {
+	@Test void convertFrom_1U8() {
 		IplImage ipl = IplImage.create(4, 5, IPL_DEPTH_8U, 1);
 
 		ByteBuffer buff = ipl.createBuffer();
@@ -48,8 +47,7 @@ public class TestConvertIplImage {
 		}
 	}
 
-	@Test
-	public void convertFrom_1S16() {
+	@Test void convertFrom_1S16() {
 		IplImage ipl = IplImage.create(4, 5, IPL_DEPTH_16S, 1);
 
 		ShortBuffer buff = ipl.createBuffer();
@@ -66,8 +64,7 @@ public class TestConvertIplImage {
 		}
 	}
 
-	@Test
-	public void convertFrom_1S32() {
+	@Test void convertFrom_1S32() {
 		IplImage ipl = IplImage.create(4, 5, IPL_DEPTH_32S, 1);
 
 		IntBuffer buff = ipl.createBuffer();
@@ -84,8 +81,7 @@ public class TestConvertIplImage {
 		}
 	}
 
-	@Test
-	public void convertFrom_1F32() {
+	@Test void convertFrom_1F32() {
 		IplImage ipl = IplImage.create(4, 5, IPL_DEPTH_32F, 1);
 
 		FloatBuffer buff = ipl.createBuffer();
@@ -102,8 +98,7 @@ public class TestConvertIplImage {
 		}
 	}
 
-	@Test
-	public void convertFrom_1F64() {
+	@Test void convertFrom_1F64() {
 		IplImage ipl = IplImage.create(4, 5, IPL_DEPTH_64F, 1);
 
 		DoubleBuffer buff = ipl.createBuffer();
@@ -121,8 +116,7 @@ public class TestConvertIplImage {
 		}
 	}
 
-	@Test
-	public void convertFrom_2U8() {
+	@Test void convertFrom_2U8() {
 		IplImage ipl = IplImage.create(4, 5, IPL_DEPTH_8U, 2);
 
 		ByteBuffer buff = ipl.createBuffer();
@@ -141,8 +135,7 @@ public class TestConvertIplImage {
 		}
 	}
 
-	@Test
-	public void convertFrom_2S16() {
+	@Test void convertFrom_2S16() {
 		IplImage ipl = IplImage.create(4, 5, IPL_DEPTH_16S, 2);
 
 		ShortBuffer buff = ipl.createBuffer();
@@ -161,8 +154,7 @@ public class TestConvertIplImage {
 		}
 	}
 
-	@Test
-	public void convertFrom_2S32() {
+	@Test void convertFrom_2S32() {
 		IplImage ipl = IplImage.create(4, 5, IPL_DEPTH_32S, 2);
 
 		IntBuffer buff = ipl.createBuffer();
@@ -181,8 +173,7 @@ public class TestConvertIplImage {
 		}
 	}
 
-	@Test
-	public void convertFrom_2F32() {
+	@Test void convertFrom_2F32() {
 		IplImage ipl = IplImage.create(4, 5, IPL_DEPTH_32F, 2);
 
 		FloatBuffer buff = ipl.createBuffer();
@@ -201,8 +192,7 @@ public class TestConvertIplImage {
 		}
 	}
 
-	@Test
-	public void convertFrom_2F64() {
+	@Test void convertFrom_2F64() {
 		IplImage ipl = IplImage.create(4, 5, IPL_DEPTH_64F, 2);
 
 		DoubleBuffer buff = ipl.createBuffer();

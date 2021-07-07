@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -34,8 +34,7 @@ import org.junit.jupiter.api.Test;
  */
 public class TestPlanarConvolveDown extends BoofStandardJUnit {
 
-	@Test
-	public void compareToSingleBand() {
+	@Test void compareToSingleBand() {
 		Kernel1D_S32 kernel = FactoryKernelGaussian.gaussian1D(GrayU8.class, -1, 3);
 		ConvolveDown<GrayU8,GrayU8> downU8 = FactoryConvolveDown.convolveSB(
 				kernel, BorderType.NORMALIZED, true,2, GrayU8.class, GrayU8.class);

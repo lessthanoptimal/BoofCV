@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -29,7 +29,7 @@ import java.util.List;
 
 /**
  * <p>
- * Computes the Sampson distance for a set of observations given a fundamental matrix.  For use
+ * Computes the Sampson distance for a set of observations given a fundamental matrix. For use
  * in non-linear optimization algorithms.
  * </p>
  *

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -21,7 +21,7 @@ package boofcv.abst.feature.detect.interest;
 import georegression.struct.point.Point2D_F64;
 
 /**
- * List of detected features that are invariant to scale and in-plane rotation.  PointSO is short for
+ * List of detected features that are invariant to scale and in-plane rotation. PointSO is short for
  * Point Scale-Orientation.
  *
  * @author Peter Abeles
@@ -39,7 +39,7 @@ public interface FoundPointSO {
 	 * The center location of the feature inside the image.
 	 * </p>
 	 * <p>
-	 * WARNING: Do not save the returned reference, copy instead.  The returned point can be recycled each time
+	 * WARNING: Do not save the returned reference, copy instead. The returned point can be recycled each time
 	 * this function is called.
 	 * </p>
 	 *

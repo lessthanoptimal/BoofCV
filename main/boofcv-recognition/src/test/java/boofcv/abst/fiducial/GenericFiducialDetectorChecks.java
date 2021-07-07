@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -122,8 +122,7 @@ public abstract class GenericFiducialDetectorChecks extends BoofStandardJUnit {
 	 * 1) Does it properly handle setIntrinsic() being called multiple times
 	 * 2) Can it handle no distortion
 	 */
-	@Test
-	public void checkHandleNewIntrinsic() {
+	@Test void checkHandleNewIntrinsic() {
 		for( ImageType type : types ) {
 
 			// distorted camera model
@@ -168,8 +167,7 @@ public abstract class GenericFiducialDetectorChecks extends BoofStandardJUnit {
 	 * Give it an undistorted image. See if it can detect the target. Now give it an distorted image with
 	 * lens parameters and see if it produces the same solution
 	 */
-	@Test
-	public void checkPoseWithAndWithOutDistortion() {
+	@Test void checkPoseWithAndWithOutDistortion() {
 		LensDistortionBrown lensDistorted = new LensDistortionBrown(loadDistortion(true));
 		LensDistortionBrown lensUndistorted = new LensDistortionBrown(loadDistortion(false));
 
@@ -208,8 +206,7 @@ public abstract class GenericFiducialDetectorChecks extends BoofStandardJUnit {
 		}
 	}
 
-	@Test
-	public void checkPoseAccuracy() {
+	@Test void checkPoseAccuracy() {
 
 		// this has to do with the marker coordinate system to image coordinate system
 		// marker is +y up   +x right +z up
@@ -249,8 +246,7 @@ public abstract class GenericFiducialDetectorChecks extends BoofStandardJUnit {
 	/**
 	 * Makes sure the input is not modified
 	 */
-	@Test
-	public void modifyInput() {
+	@Test void modifyInput() {
 		CameraPinholeBrown intrinsic = loadDistortion(true);
 		LensDistortionBrown lensDistorted = new LensDistortionBrown(intrinsic);
 		for( ImageType type : types ) {
@@ -267,8 +263,7 @@ public abstract class GenericFiducialDetectorChecks extends BoofStandardJUnit {
 		}
 	}
 
-	@Test
-	public void checkMultipleRuns() {
+	@Test void checkMultipleRuns() {
 		CameraPinholeBrown intrinsic = loadDistortion(true);
 		LensDistortionBrown lensDistorted = new LensDistortionBrown(intrinsic);
 		for( ImageType type : types ) {
@@ -304,8 +299,7 @@ public abstract class GenericFiducialDetectorChecks extends BoofStandardJUnit {
 		}
 	}
 
-	@Test
-	public void checkSubImage() {
+	@Test void checkSubImage() {
 		CameraPinholeBrown intrinsic = loadDistortion(true);
 		LensDistortionBrown lensDistorted = new LensDistortionBrown(intrinsic);
 		for( ImageType type : types ) {
@@ -345,12 +339,11 @@ public abstract class GenericFiducialDetectorChecks extends BoofStandardJUnit {
 	}
 
 	/**
-	 * See if the stability estimation is reasonable.  First detect targets in the full sized image.  Then shrink it
-	 * by 15% and see if the instability increases.  The instability should always increase for smaller objects with
+	 * See if the stability estimation is reasonable. First detect targets in the full sized image. Then shrink it
+	 * by 15% and see if the instability increases. The instability should always increase for smaller objects with
 	 * the same orientation since the geometry is worse.
 	 */
-	@Test
-	public void checkStability() {
+	@Test void checkStability() {
 		// has to be undistorted otherwise rescaling the image won't work
 		CameraPinholeBrown intrinsic = loadDistortion(false);
 		LensDistortionBrown lensDistorted = new LensDistortionBrown(intrinsic);
@@ -409,8 +402,7 @@ public abstract class GenericFiducialDetectorChecks extends BoofStandardJUnit {
 		}
 	}
 
-	@Test
-	public void checkCenter() {
+	@Test void checkCenter() {
 		// It's not specified if the center should be undistorted or distorted. Just make it easier by
 		// using undistorted
 		CameraPinholeBrown intrinsic = loadDistortion(false);
@@ -448,8 +440,7 @@ public abstract class GenericFiducialDetectorChecks extends BoofStandardJUnit {
 	/**
 	 * Makes sure that if it hasn't been provided intrinsic it can't support pose
 	 */
-	@Test
-	public void is3dWithNoIntrinsic() {
+	@Test void is3dWithNoIntrinsic() {
 		FiducialDetector detector = createDetector(types.get(0));
 
 		assertFalse( detector.is3D() );

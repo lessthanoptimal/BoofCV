@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -43,8 +43,7 @@ public class TestGImageMiscOps extends BaseGClassChecksInMisc{
 		super(GImageMiscOps.class, ImageMiscOps.class);
 	}
 
-	@Test
-	public void compareToPixelMath() {
+	@Test void compareToPixelMath() {
 		performTests(20);
 	}
 
@@ -222,8 +221,7 @@ public class TestGImageMiscOps extends BaseGClassChecksInMisc{
 	/**
 	 * See if it is inclusive for the upper limit
 	 */
-	@Test
-	public void fillUniform_Int_Inclusive() {
+	@Test void fillUniform_Int_Inclusive() {
 		Class[] types = new Class[]{GrayU8.class,GrayS8.class,GrayU16.class,GrayS32.class,GrayS16.class,GrayS64.class};
 
 		for( Class type : types ) {

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -21,7 +21,7 @@ package boofcv.struct.feature;
 import org.ddogleg.struct.DogArray;
 
 /**
- * Stores an array of floats on constant size.  Intended for storing multi band data.
+ * Stores an array of floats on constant size. Intended for storing multi band data.
  *
  * @author Peter Abeles
  */

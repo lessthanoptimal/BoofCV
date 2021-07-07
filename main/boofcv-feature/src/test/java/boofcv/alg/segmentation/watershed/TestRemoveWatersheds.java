@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -29,10 +29,9 @@ import org.junit.jupiter.api.Test;
 public class TestRemoveWatersheds extends BoofStandardJUnit {
 
 	/**
-	 * Simple case.  Still will require multiple passes for all the pixels to be assigned.
+	 * Simple case. Still will require multiple passes for all the pixels to be assigned.
 	 */
-	@Test
-	public void basic() {
+	@Test void basic() {
 		GrayS32 segmented = new GrayS32(5,7);
 		segmented.data = new int[] {
 				-1,-1,-1,-1,-1,

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -33,8 +33,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
  */
 public class TestImageSegmentationOps extends BoofStandardJUnit {
 
-	@Test
-	public void countRegionPixels_single() {
+	@Test void countRegionPixels_single() {
 		GrayS32 output = new GrayS32(4,5);
 
 		output.data = new int[]{
@@ -50,8 +49,7 @@ public class TestImageSegmentationOps extends BoofStandardJUnit {
 		assertEquals(2,ImageSegmentationOps.countRegionPixels(output,3));
 	}
 
-	@Test
-	public void countRegionPixels_all() {
+	@Test void countRegionPixels_all() {
 		GrayS32 output = new GrayS32(4,5);
 
 		output.data = new int[]{
@@ -73,8 +71,7 @@ public class TestImageSegmentationOps extends BoofStandardJUnit {
 	/**
 	 * Manually construct input data and see if it has the expected output
 	 */
-	@Test
-	public void regionPixelId_to_Compact() {
+	@Test void regionPixelId_to_Compact() {
 		GrayS32 graph = new GrayS32(4,5);
 		GrayS32 output = new GrayS32(4,5);
 
@@ -127,8 +124,7 @@ public class TestImageSegmentationOps extends BoofStandardJUnit {
 		return image.getIndex(x,y);
 	}
 
-	@Test
-	public void markRegionBorders1() {
+	@Test void markRegionBorders1() {
 		GrayS32 input = new GrayS32(4,5);
 		input.data = new int[]{
 				0, 0, 0, 1,
@@ -151,8 +147,7 @@ public class TestImageSegmentationOps extends BoofStandardJUnit {
 		BoofTesting.assertEquals(expected, found, 1e-4);
 	}
 
-	@Test
-	public void markRegionBorders2() {
+	@Test void markRegionBorders2() {
 		GrayS32 input = new GrayS32(4,5);
 		input.data = new int[]{
 				0, 0, 0, 0,

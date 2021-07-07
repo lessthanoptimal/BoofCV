@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -31,7 +31,7 @@ import boofcv.struct.image.ImageGray;
 public interface ShrinkThresholdRule<T extends ImageGray<T>> {
 
 	/**
-	 * Applies shrinkage to entire image.  If the rule should only be applied to part
+	 * Applies shrinkage to entire image. If the rule should only be applied to part
 	 * of the image then a sub-image should be passed in. If the threshold is an infinite number
 	 * then all the coefficients are considered below the threshold.
 	 *

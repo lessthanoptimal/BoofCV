@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -49,10 +49,10 @@ import java.util.List;
 public class ShapeFittingOps {
 
 	/**
-	 * <p>Fits a polygon to the provided sequence of connected points.  The found polygon is returned as a list of
-	 * vertices.  Each point in the original sequence is guaranteed to be within "toleranceDist' of a line segment.</p>
+	 * <p>Fits a polygon to the provided sequence of connected points. The found polygon is returned as a list of
+	 * vertices. Each point in the original sequence is guaranteed to be within "toleranceDist' of a line segment.</p>
 	 *
-	 * <p>Internally a split-and-merge algorithm is used.  See referenced classes for more information. Consider
+	 * <p>Internally a split-and-merge algorithm is used. See referenced classes for more information. Consider
 	 * using internal algorithms directly if this function is a performance bottleneck.</p>
 	 *
 	 * @param sequence Ordered and connected list of points.
@@ -82,18 +82,18 @@ public class ShapeFittingOps {
 	}
 
 	/**
-	 * Computes the best fit ellipse based on minimizing Euclidean distance.  An estimate is initially provided
-	 * using algebraic algorithm which is then refined using non-linear optimization.  The amount of non-linear
-	 * optimization can be controlled using 'iterations' parameter.  Will work with partial and complete contours
+	 * Computes the best fit ellipse based on minimizing Euclidean distance. An estimate is initially provided
+	 * using algebraic algorithm which is then refined using non-linear optimization. The amount of non-linear
+	 * optimization can be controlled using 'iterations' parameter. Will work with partial and complete contours
 	 * of objects.
 	 *
-	 * <p>NOTE: To improve speed, make calls directly to classes in Georegression.  Look at the code for details.</p>
+	 * <p>NOTE: To improve speed, make calls directly to classes in Georegression. Look at the code for details.</p>
 	 *
 	 * @param points (Input) Set of unordered points. Not modified.
 	 * @param iterations Number of iterations used to refine the fit. If set to zero then an algebraic solution
 	 * is returned.
 	 * @param computeError If true it will compute the average Euclidean distance error
-	 * @param outputStorage (Output/Optional) Storage for the ellipse.  Can be null.
+	 * @param outputStorage (Output/Optional) Storage for the ellipse. Can be null.
 	 * @return Found ellipse.
 	 */
 	public static FitData<EllipseRotated_F64> fitEllipse_F64( List<Point2D_F64> points, int iterations,
@@ -144,7 +144,7 @@ public class ShapeFittingOps {
 	}
 
 	/**
-	 * Convenience function.  Same as {@link #fitEllipse_F64(java.util.List, int, boolean, FitData)}, but converts the set of integer points
+	 * Convenience function. Same as {@link #fitEllipse_F64(java.util.List, int, boolean, FitData)}, but converts the set of integer points
 	 * into floating point points.
 	 *
 	 * @param points (Input) Set of unordered points. Not modified.
@@ -205,12 +205,12 @@ public class ShapeFittingOps {
 
 	/**
 	 * Computes a circle which has it's center at the mean position of the provided points and radius is equal to the
-	 * average distance of each point from the center.  While fast to compute the provided circle is not a best
+	 * average distance of each point from the center. While fast to compute the provided circle is not a best
 	 * fit circle by any reasonable metric, except for special cases.
 	 *
 	 * @param points (Input) Set of unordered points. Not modified.
-	 * @param optional (Optional) Used internally to store the distance of each point from the center.  Can be null.
-	 * @param outputStorage (Output/Optional) Storage for results.  If null then a new circle instance will be returned.
+	 * @param optional (Optional) Used internally to store the distance of each point from the center. Can be null.
+	 * @param outputStorage (Output/Optional) Storage for results. If null then a new circle instance will be returned.
 	 * @return The found circle fit.
 	 */
 	public static FitData<Circle2D_F64> averageCircle_I32( List<Point2D_I32> points, DogArray_F64 optional,
@@ -264,12 +264,12 @@ public class ShapeFittingOps {
 
 	/**
 	 * Computes a circle which has it's center at the mean position of the provided points and radius is equal to the
-	 * average distance of each point from the center.  While fast to compute the provided circle is not a best
+	 * average distance of each point from the center. While fast to compute the provided circle is not a best
 	 * fit circle by any reasonable metric, except for special cases.
 	 *
 	 * @param points (Input) Set of unordered points. Not modified.
-	 * @param optional (Optional) Used internally to store the distance of each point from the center.  Can be null.
-	 * @param outputStorage (Output/Optional) Storage for results.  If null then a new circle instance will be returned.
+	 * @param optional (Optional) Used internally to store the distance of each point from the center. Can be null.
+	 * @param outputStorage (Output/Optional) Storage for results. If null then a new circle instance will be returned.
 	 * @return The found circle fit.
 	 */
 	public static FitData<Circle2D_F64> averageCircle_F64( List<Point2D_F64> points, DogArray_F64 optional,

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -22,14 +22,14 @@ import boofcv.struct.image.ImageBase;
 
 /**
  * <p>
- * Data structure for an overhead orthogonal view with known metric properties.  Each pixel in the overhead view corresponds
- * to a square of known size and location in the world.  The each size of the square regions is specified
+ * Data structure for an overhead orthogonal view with known metric properties. Each pixel in the overhead view corresponds
+ * to a square of known size and location in the world. The each size of the square regions is specified
  * by cellSize and the origin by (centerX,centerY).
  * </p>
  *
  * <p>
  * The overhead +x axis corresponds to the world's +z axis and the image's +y axis corresponds to the world's -x axis.
- * The user specify the origin by changing centerX and centerY parameters.  It is common to set centerX = 0 ,
+ * The user specify the origin by changing centerX and centerY parameters. It is common to set centerX = 0 ,
  * centerY = output.height*cellSize/2.0.
  * </p>
  *
@@ -41,7 +41,7 @@ import boofcv.struct.image.ImageBase;
  * <p>
  * Notes:
  * <ul>
- *     <li>When rendering the overhead image objects to the left will appear on the right and the other way around.  This
+ *     <li>When rendering the overhead image objects to the left will appear on the right and the other way around. This
  * is an artifact that in image's it's standard for +y to point down (clock-wise of +x), while on 2D maps the standard
  * is +y being counter-clock-wise of +x.</li>
  * </ul>

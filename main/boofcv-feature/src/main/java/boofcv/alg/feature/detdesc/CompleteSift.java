@@ -36,7 +36,7 @@ import org.ddogleg.struct.FastArray;
 import java.util.List;
 
 /**
- * SIFT combined together to simultaneously detect and describe the key points it finds.  Memory is conserved by
+ * SIFT combined together to simultaneously detect and describe the key points it finds. Memory is conserved by
  * only having one octave of the scale-space in memory at any given time.
  *
  * @author Peter Abeles

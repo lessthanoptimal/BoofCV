@@ -62,7 +62,7 @@ public abstract class DenseFlowPyramidBase<T extends ImageGray<T>> {
 	}
 
 	/**
-	 * Processes the raw input images.  Normalizes them and creates image pyramids from them.
+	 * Processes the raw input images. Normalizes them and creates image pyramids from them.
 	 */
 	public void process( T image1, T image2 ) {
 		// declare image data structures
@@ -90,7 +90,7 @@ public abstract class DenseFlowPyramidBase<T extends ImageGray<T>> {
 
 	/**
 	 * Takes the flow from the previous lower resolution layer and uses it to initialize the flow
-	 * in the current layer.  Adjusts for change in image scale.
+	 * in the current layer. Adjusts for change in image scale.
 	 */
 	protected void interpolateFlowScale( GrayF32 prev, GrayF32 curr ) {
 		interp.setImage(prev);
@@ -116,7 +116,7 @@ public abstract class DenseFlowPyramidBase<T extends ImageGray<T>> {
 
 	/**
 	 * Takes the flow from the previous lower resolution layer and uses it to initialize the flow
-	 * in the current layer.  Adjusts for change in image scale.
+	 * in the current layer. Adjusts for change in image scale.
 	 */
 	protected void warpImageTaylor( GrayF32 before, GrayF32 flowX, GrayF32 flowY, GrayF32 after ) {
 		interp.setBorder(FactoryImageBorder.single(BorderType.EXTENDED, before.getImageType().getImageClass()));
@@ -137,7 +137,7 @@ public abstract class DenseFlowPyramidBase<T extends ImageGray<T>> {
 	}
 
 	/**
-	 * Computes dense optical flow from the provided image pyramid.  Image gradient for each layer should be
+	 * Computes dense optical flow from the provided image pyramid. Image gradient for each layer should be
 	 * computed directly from the layer images.
 	 *
 	 * @param image1 Pyramid of first image

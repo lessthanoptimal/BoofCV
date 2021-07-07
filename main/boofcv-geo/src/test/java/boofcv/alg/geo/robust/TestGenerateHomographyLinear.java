@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -36,8 +36,7 @@ import java.util.List;
 public class TestGenerateHomographyLinear extends BoofStandardJUnit
 		implements ModelTestingInterface<Homography2D_F64,AssociatedPair>
 {
-	@Test
-	public void fitModel() {
+	@Test void fitModel() {
 		StandardModelFitterTests<Homography2D_F64,AssociatedPair> alg =
 				new StandardModelFitterTests<Homography2D_F64,AssociatedPair>(this,4) {
 					@Override
@@ -49,8 +48,7 @@ public class TestGenerateHomographyLinear extends BoofStandardJUnit
 		alg.allTest();
 	}
 
-	@Test
-	public void modelGenerator() {
+	@Test void modelGenerator() {
 		StandardModelGeneratorTests<Homography2D_F64,AssociatedPair> alg =
 				new StandardModelGeneratorTests<Homography2D_F64,AssociatedPair>(this,4) {
 					@Override

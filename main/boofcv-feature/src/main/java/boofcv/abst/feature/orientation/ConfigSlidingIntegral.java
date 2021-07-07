@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -28,16 +28,16 @@ import boofcv.BoofDefaults;
 public class ConfigSlidingIntegral implements ConfigOrientation.Integral {
 
 	/**
-	 * How to convert the radius to the internal canonical scale.  Can be used to adjust how
+	 * How to convert the radius to the internal canonical scale. Can be used to adjust how
 	 * big or small the region is.
 	 */
 	public double objectRadiusToScale = 1.0/BoofDefaults.SURF_SCALE_TO_RADIUS;
 	/**
-	 * How often the image is sampled.  This number is scaled.  Typically 0.65.
+	 * How often the image is sampled. This number is scaled. Typically 0.65.
 	 */
 	public double samplePeriod = 0.65;
 	/**
-	 * Angular window that is slide across.  Try PI/3
+	 * Angular window that is slide across. Try PI/3
 	 */
 	public double windowSize = Math.PI / 3.0;
 	/**
@@ -45,11 +45,11 @@ public class ConfigSlidingIntegral implements ConfigOrientation.Integral {
 	 */
 	public int radius = 8;
 	/**
-	 * Sigma for weighting distribution.  0 for unweighted. less than zero for automatic. Try -1
+	 * Sigma for weighting distribution. 0 for unweighted. less than zero for automatic. Try -1
 	 */
 	public double weightSigma = -1;
 	/**
-	 * Size of kernel doing the sampling.  Typically 6.
+	 * Size of kernel doing the sampling. Typically 6.
 	 */
 	public int sampleWidth = 6;
 

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -36,8 +36,7 @@ import static org.junit.jupiter.api.Assertions.*;
  */
 public class TestStereoConsistencyCheck extends BoofStandardJUnit {
 
-	@Test
-	public void checkRectification() {
+	@Test void checkRectification() {
 		Se3_F64 leftToRight = new Se3_F64();
 		ConvertRotation3D_F64.eulerToMatrix(EulerType.XYZ, 0.01, -0.001, 0.005, leftToRight.getR());
 		leftToRight.getT().setTo(-0.1, 0, 0);
@@ -62,8 +61,7 @@ public class TestStereoConsistencyCheck extends BoofStandardJUnit {
 		assertTrue(alg.rectLeft.x > alg.rectRight.x);
 	}
 
-	@Test
-	public void checkRectified() {
+	@Test void checkRectified() {
 
 		StereoConsistencyCheck alg = new StereoConsistencyCheck(1, 2);
 

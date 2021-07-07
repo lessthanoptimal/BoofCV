@@ -23,7 +23,7 @@ import boofcv.struct.image.ImageBase;
 import boofcv.struct.image.ImageType;
 
 /**
- * Interface for interpolation between pixels on a per-pixel basis.  If a whole rectangular region needs
+ * Interface for interpolation between pixels on a per-pixel basis. If a whole rectangular region needs
  * to be interpolated then {@link boofcv.alg.interpolate.InterpolateRectangle} should be considered for performance reasons.
  *
  * @author Peter Abeles

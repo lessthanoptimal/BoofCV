@@ -27,29 +27,29 @@ import java.util.List;
 /**
  * <p>
  * Interface for tracking point features in image sequences with automatic feature selection for use in
- * Structure From Motion (SFM) application.  Access is provided to the pixel location of each track.
+ * Structure From Motion (SFM) application. Access is provided to the pixel location of each track.
  * Implementation specific track information is hidden from the user.
  * </p>
  *
  * <p>
- * Each track can have the following states, active, inactive, new, and dropped.  An active track is one
+ * Each track can have the following states, active, inactive, new, and dropped. An active track is one
  * which was recently updated in the latest image, while an inactive one was not. New tracks were
- * spawned in the most recent image.  Dropped tracks are tracks which were automatically dropped
+ * spawned in the most recent image. Dropped tracks are tracks which were automatically dropped
  * in the most recent update.
  * <p>
  *
  * <p>
  * TRACK MAINTENANCE: Implementations of this interface should not automatically drop tracks or perform other forms of
- * track maintenance unless the feature is hopelessly lost and can no longer be tracked.  It is the responsibility
- * of the user to drop tracks which are inactive for an excessive amount of time.  New tracks should never be spawned
+ * track maintenance unless the feature is hopelessly lost and can no longer be tracked. It is the responsibility
+ * of the user to drop tracks which are inactive for an excessive amount of time. New tracks should never be spawned
  * unless specifically requested by the user.
  * </p>
  *
  * <p>
- * TRACK MEMORY: Implementations of this interface must recycle tracks.  After a track has been dropped, either by
+ * TRACK MEMORY: Implementations of this interface must recycle tracks. After a track has been dropped, either by
  * the user or automatically, the reference should be saved and the user provided cookie
- * left unmodified.  When a new track is added the track information should be updated and the
- * cookie left unmodified again.  The intended purpose of this requirement is to reduce the
+ * left unmodified. When a new track is added the track information should be updated and the
+ * cookie left unmodified again. The intended purpose of this requirement is to reduce the
  * burden of memory maintenance on the user and to encourage good memory management.
  * </p>
  *
@@ -69,7 +69,7 @@ public interface PointTracker<T extends ImageBase<T>> {
 	void process( T image );
 
 	/**
-	 * Discard memory of all current and past tracks.  Growing buffered might not be reset to
+	 * Discard memory of all current and past tracks. Growing buffered might not be reset to
 	 * their initial size by this method.
 	 */
 	void reset();
@@ -148,7 +148,7 @@ public interface PointTracker<T extends ImageBase<T>> {
 	List<PointTrack> getActiveTracks( @Nullable List<PointTrack> list );
 
 	/**
-	 * Returns a list of inactive tracks.  A track is inactive if it is not
+	 * Returns a list of inactive tracks. A track is inactive if it is not
 	 * associated with any features in the current image.
 	 *
 	 * @param list Optional storage for the list of tracks. List is cleared before tracks are added.
@@ -178,7 +178,7 @@ public interface PointTracker<T extends ImageBase<T>> {
 
 	/**
 	 * Automatically selects new features in the image to track. Returned tracks must
-	 * be unique and not duplicates of any existing tracks.  This includes both active
+	 * be unique and not duplicates of any existing tracks. This includes both active
 	 * and inactive tracks.
 	 *
 	 * NOTE: This function may or may not also modify the active and inactive lists.

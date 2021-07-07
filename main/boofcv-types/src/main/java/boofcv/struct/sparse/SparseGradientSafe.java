@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -24,7 +24,7 @@ import java.lang.reflect.InvocationTargetException;
 
 /**
  * Wraps around other {@link SparseImageGradient} classes and checks to see if
- * the image is in bounds or not.  If it is out of bounds the return value is set to one.
+ * the image is in bounds or not. If it is out of bounds the return value is set to one.
  *
  * @author Peter Abeles
  */

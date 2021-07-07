@@ -55,7 +55,7 @@ public class CannyEdgeDynamic<T extends ImageGray<T>, D extends ImageGray<D>> ex
 		threshHigh = max*threshHigh;
 
 		if (threshLow <= 0f && threshHigh <= 0f) {
-			// in this pathological case there is no texture in the image.  It is probably less harmful to return
+			// in this pathological case there is no texture in the image. It is probably less harmful to return
 			// nothing than a whole image
 			if (hysteresisPts != null)
 				hysteresisPts.getContours().clear();

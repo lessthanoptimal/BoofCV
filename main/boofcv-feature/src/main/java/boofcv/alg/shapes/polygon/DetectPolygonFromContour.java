@@ -49,8 +49,8 @@ import java.util.Set;
 
 /**
  * <p>
- * Detects convex polygons with the specified number of sides in an image.  Shapes are assumed to be black shapes
- * against a white background, allowing for thresholding to be used.  Subpixel refinement is done using the
+ * Detects convex polygons with the specified number of sides in an image. Shapes are assumed to be black shapes
+ * against a white background, allowing for thresholding to be used. Subpixel refinement is done using the
  * provided implementation of {@link RefinePolygonToGray}.
  * </p>
  *
@@ -63,9 +63,9 @@ import java.util.Set;
  * </ol>
  *
  * <p>
- * The returned polygons will encompass the entire black polygon.  Here is a simple example in 1D. If all pixels are
- * white, but pixels ranging from 5 to 10, inclusive, then the returned boundaries would be 5.0 to 11.0.  This
- * means that coordinates 5.0 &le; x &lt; 11.0 are all black.  11.0 is included, but note that the entire pixel 11 is white.
+ * The returned polygons will encompass the entire black polygon. Here is a simple example in 1D. If all pixels are
+ * white, but pixels ranging from 5 to 10, inclusive, then the returned boundaries would be 5.0 to 11.0. This
+ * means that coordinates 5.0 &le; x &lt; 11.0 are all black. 11.0 is included, but note that the entire pixel 11 is white.
  * </p>
  *
  * <p>Notes:
@@ -145,7 +145,7 @@ public class DetectPolygonFromContour<T extends ImageGray<T>> implements Verbose
 	 * Configures the detector.
 	 *
 	 * @param contourToPolyline Fits a crude polygon to the shape's binary contour
-	 * @param minimumContour Minimum allowed length of a contour.  Copy stored internally. Try 50 pixels.
+	 * @param minimumContour Minimum allowed length of a contour. Copy stored internally. Try 50 pixels.
 	 * @param outputClockwiseUpY If true then the order of the output polygons will be in clockwise order
 	 * @param touchBorder if true then shapes which touch the image border are allowed
 	 * @param contourEdgeThreshold Polygons with an edge intensity less than this are discarded.
@@ -189,10 +189,10 @@ public class DetectPolygonFromContour<T extends ImageGray<T>> implements Verbose
 
 	/**
 	 * <p>Specifies transforms which can be used to change coordinates from distorted to undistorted and the opposite
-	 * coordinates.  The undistorted image is never explicitly created.</p>
+	 * coordinates. The undistorted image is never explicitly created.</p>
 	 *
-	 * @param width Input image width.  Used in sanity check only.
-	 * @param height Input image height.  Used in sanity check only.
+	 * @param width Input image width. Used in sanity check only.
+	 * @param height Input image height. Used in sanity check only.
 	 * @param distToUndist Transform from distorted to undistorted image.
 	 * @param undistToDist Transform from undistorted to distorted image.
 	 */
@@ -289,8 +289,8 @@ public class DetectPolygonFromContour<T extends ImageGray<T>> implements Verbose
 	}
 
 	/**
-	 * Finds blobs in the binary image.  Then looks for blobs that meet size and shape requirements.  See code
-	 * below for the requirements.  Those that remain are considered to be target candidates.
+	 * Finds blobs in the binary image. Then looks for blobs that meet size and shape requirements. See code
+	 * below for the requirements. Those that remain are considered to be target candidates.
 	 */
 	private void findCandidateShapes() {
 
@@ -529,7 +529,7 @@ public class DetectPolygonFromContour<T extends ImageGray<T>> implements Verbose
 	}
 
 	/**
-	 * Checks to see if some part of the contour touches the image border.  Most likely cropped
+	 * Checks to see if some part of the contour touches the image border. Most likely cropped
 	 */
 	protected final boolean touchesBorder( List<Point2D_I32> contour ) {
 		int endX = imageWidth - 1;
@@ -602,7 +602,7 @@ public class DetectPolygonFromContour<T extends ImageGray<T>> implements Verbose
 		public boolean contourTouchesBorder;
 
 		/**
-		 * Boolean value for each corner being along the border.  If empty then non of the corners are long the border.
+		 * Boolean value for each corner being along the border. If empty then non of the corners are long the border.
 		 * true means the corner is a border corner.
 		 */
 		public DogArray_B borderCorners = new DogArray_B();

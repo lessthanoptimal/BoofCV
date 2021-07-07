@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -58,8 +58,8 @@ public abstract class BaseDenseHog<I extends ImageBase<I>> {
 	/**
 	 * Configures HOG descriptor computation
 	 *
-	 * @param orientationBins Number of bins in a cell's histogram.  9 recommended
-	 * @param pixelsPerCell Number of pixel's wide a cell is.  8 recommended
+	 * @param orientationBins Number of bins in a cell's histogram. 9 recommended
+	 * @param pixelsPerCell Number of pixel's wide a cell is. 8 recommended
 	 * @param cellsPerBlockX Number of cells's wide a block is. x-axis 3 recommended
 	 * @param cellsPerBlockY Number of cells's wide a block is. x-axis 3 recommended
 	 * @param stepBlock Number of cells which are skipped between each block
@@ -87,7 +87,7 @@ public abstract class BaseDenseHog<I extends ImageBase<I>> {
 	}
 
 	/**
-	 * Given different types input images it creates the correct algorithm for computing the image gradient.  The
+	 * Given different types input images it creates the correct algorithm for computing the image gradient. The
 	 * actualy calulcation is always done using {@link DerivativeType#THREE}
 	 */
 	static <Input extends ImageBase<Input>>
@@ -113,7 +113,7 @@ public abstract class BaseDenseHog<I extends ImageBase<I>> {
 	}
 
 	/**
-	 * Specifies input image.  Gradient is computed immediately
+	 * Specifies input image. Gradient is computed immediately
 	 *
 	 * @param input input image
 	 */

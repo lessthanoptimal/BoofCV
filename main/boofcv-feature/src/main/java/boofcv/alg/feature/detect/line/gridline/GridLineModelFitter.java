@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -27,8 +27,8 @@ import org.ddogleg.fitting.modelset.ModelGenerator;
 import java.util.List;
 
 /**
- * Used by {@link boofcv.alg.feature.detect.line.GridRansacLineDetector} to fit edgels inside a region to a line.  If only
- * two Edgels are considered then their angles are checked for consistency.  If the orientations
+ * Used by {@link boofcv.alg.feature.detect.line.GridRansacLineDetector} to fit edgels inside a region to a line. If only
+ * two Edgels are considered then their angles are checked for consistency. If the orientations
  * are too different then the match is discarded.
  *
  * @author Peter Abeles

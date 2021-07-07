@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -34,7 +34,7 @@ import boofcv.struct.wavelet.WlCoef_I32;
 
 /**
  * <p>
- * Provides and easy to use interface for removing noise from images.  In some cases
+ * Provides and easy to use interface for removing noise from images. In some cases
  * more advanced option are hidden for sake of ease of use.
  * </p>
  * 
@@ -47,7 +47,7 @@ public class FactoryImageDenoise {
 	 * Denoises an image using VISU Shrink wavelet denoiser.
 	 *
 	 * @param imageType The type of image being transform.
-	 * @param numLevels Number of levels in the wavelet transform.  If not sure, try using 3.
+	 * @param numLevels Number of levels in the wavelet transform. If not sure, try using 3.
 	 * @param minPixelValue Minimum allowed pixel intensity value
 	 * @param maxPixelValue Maximum allowed pixel intensity value
 	 * @return filter for image noise removal.
@@ -66,7 +66,7 @@ public class FactoryImageDenoise {
 	 * Denoises an image using BayesShrink wavelet denoiser.
 	 *
 	 * @param imageType The type of image being transform.
-	 * @param numLevels Number of levels in the wavelet transform.  If not sure, try using 3.
+	 * @param numLevels Number of levels in the wavelet transform. If not sure, try using 3.
 	 * @param minPixelValue Minimum allowed pixel intensity value
 	 * @param maxPixelValue Maximum allowed pixel intensity value
 	 * @return filter for image noise removal.
@@ -85,7 +85,7 @@ public class FactoryImageDenoise {
 	 * Denoises an image using SureShrink wavelet denoiser.
 	 *
 	 * @param imageType The type of image being transform.
-	 * @param numLevels Number of levels in the wavelet transform.  If not sure, try using 3.
+	 * @param numLevels Number of levels in the wavelet transform. If not sure, try using 3.
 	 * @param minPixelValue Minimum allowed pixel intensity value
 	 * @param maxPixelValue Maximum allowed pixel intensity value
 	 * @return filter for image noise removal.

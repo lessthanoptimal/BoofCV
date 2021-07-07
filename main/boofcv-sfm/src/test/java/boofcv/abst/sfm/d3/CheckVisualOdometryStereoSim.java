@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -34,7 +34,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
- * Performs empirical validation of stereo visual odometry algorithms using synthetic images.  Only a crude test
+ * Performs empirical validation of stereo visual odometry algorithms using synthetic images. Only a crude test
  *
  * @author Peter Abeles
  */
@@ -128,7 +128,7 @@ abstract class CheckVisualOdometryStereoSim<I extends ImageGray<I>>
 			// process the images
 			assertTrue(algorithm.process(left, right));
 
-			// Compare to truth.  Only go for a crude approximation
+			// Compare to truth. Only go for a crude approximation
 			Se3_F64 foundWorldToLeft = algorithm.getCameraToWorld().invert(null);
 
 //			worldToLeft.getT().print();
@@ -178,7 +178,7 @@ abstract class CheckVisualOdometryStereoSim<I extends ImageGray<I>>
 			if (badFrame)
 				continue;
 
-			// Compare to truth.  Only go for a crude approximation
+			// Compare to truth. Only go for a crude approximation
 			Se3_F64 foundWorldToLeft = algorithm.getCameraToWorld().invert(null);
 
 			assertTrue(MatrixFeatures_DDRM.isIdentical(foundWorldToLeft.getR(), worldToLeft.getR(), 0.1));

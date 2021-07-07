@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -59,19 +59,16 @@ public abstract class StandardModelGeneratorTests<Model, Point> extends BoofStan
 		simpleTest();
 	}
 
-	@Test
-	public void checkMinPoints() {
+	@Test public void checkMinPoints() {
 		ModelGenerator<Model, Point> fitter = createAlg();
 		assertEquals(dof,fitter.getMinimumPoints());
 	}
 
 	/**
-	 * Give it points which have been transform by the true affine model.  See
+	 * Give it points which have been transform by the true affine model. See
 	 * if the transform is correctly estimated
 	 */
-	@Test
-	public void simpleTest() {
-
+	@Test public void simpleTest() {
 		Model model = helper.createRandomModel();
 
 		List<Point> dataSet = new ArrayList<>();

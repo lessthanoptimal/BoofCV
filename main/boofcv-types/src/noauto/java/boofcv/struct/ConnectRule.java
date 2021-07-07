@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -27,7 +27,7 @@ import lombok.Getter;
  */
 public enum ConnectRule {
 	/**
-	 * Four connect neighborhood.  (1,0) (0,1) (-1,0) (0,1)
+	 * Four connect neighborhood. (1,0) (0,1) (-1,0) (0,1)
 	 */
 	FOUR("4"),
 	/**

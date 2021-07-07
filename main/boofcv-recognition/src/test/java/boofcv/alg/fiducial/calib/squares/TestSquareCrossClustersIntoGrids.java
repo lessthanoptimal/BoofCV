@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -32,8 +32,7 @@ import static org.junit.jupiter.api.Assertions.*;
  * @author Peter Abeles
  */
 public class TestSquareCrossClustersIntoGrids extends BoofStandardJUnit {
-	@Test
-	public void processCluster_positive() {
+	@Test void processCluster_positive() {
 		SquareCrossClustersIntoGrids alg = new SquareCrossClustersIntoGrids();
 
 		for (int rows = 2; rows <= 5; rows++) {
@@ -72,8 +71,7 @@ public class TestSquareCrossClustersIntoGrids extends BoofStandardJUnit {
 		return levels;
 	}
 
-	@Test
-	public void firstRow1and2() {
+	@Test void firstRow1and2() {
 		// X X X X X
 		//  X X X X
 		checkFirstRow1and2(false,5,4);
@@ -148,8 +146,7 @@ public class TestSquareCrossClustersIntoGrids extends BoofStandardJUnit {
 		fail("Failed");
 	}
 
-	@Test
-	public void addNextRow() {
+	@Test void addNextRow() {
 
 		// X X X X X
 		//  X X X X
@@ -203,8 +200,7 @@ public class TestSquareCrossClustersIntoGrids extends BoofStandardJUnit {
 		}
 	}
 
-	@Test
-	public void lowerEdgeIndex() {
+	@Test void lowerEdgeIndex() {
 		for( int numCorners = 3; numCorners <= 5; numCorners++ ) {
 			for (int first = 0; first < numCorners; first++) {
 				int second = (first + 1) % numCorners;
@@ -223,8 +219,7 @@ public class TestSquareCrossClustersIntoGrids extends BoofStandardJUnit {
 		}
 	}
 
-	@Test
-	public void isOpenEdge() {
+	@Test void isOpenEdge() {
 		SquareNode node = new SquareNode();
 
 		for (int i = 0; i < 4; i++) {
@@ -243,8 +238,7 @@ public class TestSquareCrossClustersIntoGrids extends BoofStandardJUnit {
 		}
 	}
 
-	@Test
-	public void addToRow() {
+	@Test void addToRow() {
 		List<SquareNode> cluster;
 
 		// X
@@ -306,8 +300,7 @@ public class TestSquareCrossClustersIntoGrids extends BoofStandardJUnit {
 		}
 	}
 
-	@Test
-	public void numberOfOpenEdges() {
+	@Test void numberOfOpenEdges() {
 		SquareNode a = new SquareNode();
 		a.square = new Polygon2D_F64(4);
 
@@ -319,7 +312,7 @@ public class TestSquareCrossClustersIntoGrids extends BoofStandardJUnit {
 	}
 
 	/**
-	 * Creates a new two row graph.  Skip indicates if the first row skips the first column or not.  The
+	 * Creates a new two row graph. Skip indicates if the first row skips the first column or not. The
 	 * other two parameters specify how many nodes in each row
 	 */
 	private List<SquareNode> createCluster(boolean skip, int ...levels ) {
@@ -371,8 +364,7 @@ public class TestSquareCrossClustersIntoGrids extends BoofStandardJUnit {
 		b.edges[cornerB] = edge;
 	}
 
-	@Test
-	public void findSeedNode() {
+	@Test void findSeedNode() {
 		List<SquareNode> cluster = new ArrayList<>();
 		cluster.add( new SquareNode());
 		cluster.add( new SquareNode());

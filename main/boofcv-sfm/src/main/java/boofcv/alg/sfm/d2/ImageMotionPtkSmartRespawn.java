@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -33,7 +33,7 @@ import java.util.List;
 /**
  * Examines tracks inside of {@link ImageMotionPointTrackerKey} and decides when new feature tracks should be respawned.
  * Tracks are respawned when an absolute minimum is reached, when the number of inliers has dropped past a certain
- * threshold, and when the area covered by the inliers decreases by too much.  Prunes clusters of closely packed points.
+ * threshold, and when the area covered by the inliers decreases by too much. Prunes clusters of closely packed points.
  * These tend to be non-informative and use up computational resources.
  *
  * @author Peter Abeles
@@ -121,7 +121,7 @@ public class ImageMotionPtkSmartRespawn<I extends ImageBase<I>, IT extends Inver
 		}
 
 		if (setKeyFrame) {
-			// use the new keyframe as an opportunity to discard points that are too close.  commonly occurs
+			// use the new keyframe as an opportunity to discard points that are too close. commonly occurs
 			// when zooming out and points cluster together
 			pruneClosePoints(tracker, input.width, input.height);
 			motion.changeKeyFrame();
@@ -142,7 +142,7 @@ public class ImageMotionPtkSmartRespawn<I extends ImageBase<I>, IT extends Inver
 	}
 
 	/**
-	 * Computes an axis-aligned rectangle that contains all the inliers.  It then computes the area contained in
+	 * Computes an axis-aligned rectangle that contains all the inliers. It then computes the area contained in
 	 * that rectangle to the total area of the image
 	 *
 	 * @param imageArea width*height

@@ -57,8 +57,7 @@ public abstract class BaseTestDescribeSurf<I extends ImageGray<I>, II extends Im
 	/**
 	 * Does it produce a the same features when given a subimage?
 	 */
-	@Test
-	public void checkSubImage() {
+	@Test void checkSubImage() {
 		GImageMiscOps.fillUniform(ii, rand, 0, 100);
 		alg.setImage(ii);
 		TupleDesc_F64 expected = alg.createDescription();
@@ -76,8 +75,7 @@ public abstract class BaseTestDescribeSurf<I extends ImageGray<I>, II extends Im
 	/**
 	 * Does it produce a different feature when scalled?
 	 */
-	@Test
-	public void changeScale() {
+	@Test void changeScale() {
 		GImageMiscOps.fillUniform(ii, rand, 0, 100);
 		alg.setImage(ii);
 		TupleDesc_F64 a = alg.createDescription();
@@ -91,8 +89,7 @@ public abstract class BaseTestDescribeSurf<I extends ImageGray<I>, II extends Im
 	/**
 	 * Does it produce a different feature when rotated?
 	 */
-	@Test
-	public void changeRotation() {
+	@Test void changeRotation() {
 		GImageMiscOps.fillUniform(ii, rand, 0, 100);
 		alg.setImage(ii);
 		TupleDesc_F64 a = alg.createDescription();
@@ -117,8 +114,7 @@ public abstract class BaseTestDescribeSurf<I extends ImageGray<I>, II extends Im
 	 * Can it process descriptors along the image border?  If an exception
 	 * is thrown then it failed the test
 	 */
-	@Test
-	public void checkBorder() {
+	@Test void checkBorder() {
 		alg.setImage(ii);
 
 		for (int i = 0; i < 10; i++) {
@@ -131,8 +127,7 @@ public abstract class BaseTestDescribeSurf<I extends ImageGray<I>, II extends Im
 	/**
 	 * If the image has a constant value then all the features should be zero.
 	 */
-	@Test
-	public void features_constant() {
+	@Test void features_constant() {
 		GImageMiscOps.fill(input, 50);
 
 		GIntegralImageOps.transform(input, ii);
@@ -147,12 +142,11 @@ public abstract class BaseTestDescribeSurf<I extends ImageGray<I>, II extends Im
 	}
 
 	/**
-	 * Create an image which has a constant slope.  The features aligned along that
-	 * direction should be large.  This also checks that the orientation parameter
+	 * Create an image which has a constant slope. The features aligned along that
+	 * direction should be large. This also checks that the orientation parameter
 	 * is being used correctly and that absolute value is being done.
 	 */
-	@Test
-	public void features_increasing() {
+	@Test void features_increasing() {
 		// test the gradient along the x-axis only
 		TestImplSurfDescribeOps.createGradient(0, input);
 		GIntegralImageOps.transform(input, ii);
@@ -184,8 +178,7 @@ public abstract class BaseTestDescribeSurf<I extends ImageGray<I>, II extends Im
 	/**
 	 * Give it a scale factor which is a fraction and see if it blows up
 	 */
-	@Test
-	public void features_fraction() {
+	@Test void features_fraction() {
 		// test the gradient along the x-axis only
 		TestImplSurfDescribeOps.createGradient(0, input);
 		GIntegralImageOps.transform(input, ii);

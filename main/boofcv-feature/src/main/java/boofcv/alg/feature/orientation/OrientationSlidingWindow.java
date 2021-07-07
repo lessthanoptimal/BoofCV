@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -28,9 +28,9 @@ import boofcv.struct.image.ImageGray;
 
 /**
  * <p>
- * Estimates the orientation by sliding window across all angles.  All pixels which are pointing
- * at an angle inside of this window have their gradient summed.  The window with the largest normal
- * is selected as the best window.  The angle is then computed from the best window using atan2()
+ * Estimates the orientation by sliding window across all angles. All pixels which are pointing
+ * at an angle inside of this window have their gradient summed. The window with the largest normal
+ * is selected as the best window. The angle is then computed from the best window using atan2()
  * and the summed gradient.
  * </p>
  *

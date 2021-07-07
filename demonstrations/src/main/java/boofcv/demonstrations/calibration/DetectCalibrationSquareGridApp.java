@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -40,7 +40,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Displays detected square grid fiducials.  Visualizes several of its processing steps making it easier to debug.
+ * Displays detected square grid fiducials. Visualizes several of its processing steps making it easier to debug.
  *
  * @author Peter Abeles
  */

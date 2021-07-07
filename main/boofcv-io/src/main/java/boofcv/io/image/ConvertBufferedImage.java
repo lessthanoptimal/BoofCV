@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -75,10 +75,10 @@ public class ConvertBufferedImage {
 	}
 
 	/**
-	 * Copies the original image into the output image.  If it can't do a copy a new image is created and returned
+	 * Copies the original image into the output image. If it can't do a copy a new image is created and returned
 	 * @param original Original image
 	 * @param output (Optional) Storage for copy.
-	 * @return The copied image.  May be a new instance
+	 * @return The copied image. May be a new instance
 	 */
 	public static BufferedImage checkCopy( BufferedImage original , BufferedImage output ) {
 		ColorModel cm = original.getColorModel();
@@ -102,8 +102,8 @@ public class ConvertBufferedImage {
 	}
 
 	/**
-	 * Returns an image which doesn't have an alpha channel.  If the input image doesn't have an alpha
-	 * channel to start then its returned as is.  Otherwise a new image is created and the RGB channels are
+	 * Returns an image which doesn't have an alpha channel. If the input image doesn't have an alpha
+	 * channel to start then its returned as is. Otherwise a new image is created and the RGB channels are
 	 * copied and the new image returned.
 	 *
 	 * @param image Input image
@@ -123,8 +123,8 @@ public class ConvertBufferedImage {
 
 	/**
 	 * For BufferedImage stored as a byte array internally it extracts an
-	 * interleaved image.  The input image and the returned image will both
-	 * share the same internal data array.  Using this function allows unnecessary
+	 * interleaved image. The input image and the returned image will both
+	 * share the same internal data array. Using this function allows unnecessary
 	 * memory copying to be avoided.
 	 *
 	 * @param img Image whose internal data is extracted and wrapped.
@@ -154,8 +154,8 @@ public class ConvertBufferedImage {
 
 	/**
 	 * For BufferedImage stored as a byte array internally it extracts an
-	 * image.  The input image and the returned image will both
-	 * share the same internal data array.  Using this function allows unnecessary
+	 * image. The input image and the returned image will both
+	 * share the same internal data array. Using this function allows unnecessary
 	 * memory copying to be avoided.
 	 *
 	 * @param img Image whose internal data is extracted and wrapped.
@@ -183,7 +183,7 @@ public class ConvertBufferedImage {
 
 	/**
 	 * Creates a new BufferedImage that internally uses the same data as the provided
-	 * {@link InterleavedU8}.  If 3 bands then the image will be of type TYPE_3BYTE_BGR
+	 * {@link InterleavedU8}. If 3 bands then the image will be of type TYPE_3BYTE_BGR
 	 * or if 1 band TYPE_BYTE_GRAY.
 	 *
 	 * @param img Input image who's data will be wrapped by the returned BufferedImage.
@@ -233,7 +233,7 @@ public class ConvertBufferedImage {
 	/**
 	 * <p>
 	 * Creates a new BufferedImage that internally uses the same data as the provided
-	 * GrayU8.  The returned BufferedImage will be of type TYPE_BYTE_GRAY.
+	 * GrayU8. The returned BufferedImage will be of type TYPE_BYTE_GRAY.
 	 * </p>
 	 * <p/>
 	 * <p>
@@ -338,7 +338,7 @@ public class ConvertBufferedImage {
 	}
 
 	/**
-	 * Converts a buffered image into an image of the specified type.  In a 'dst' image is provided
+	 * Converts a buffered image into an image of the specified type. In a 'dst' image is provided
 	 * it will be used for output, otherwise a new image will be created.
 	 */
 	public static <T extends ImageGray<T>> T convertFromSingle(BufferedImage src, T dst, Class<T> type) {
@@ -354,11 +354,11 @@ public class ConvertBufferedImage {
 	}
 
 	/**
-	 * Converts the buffered image into an {@link GrayU8}.  If the buffered image
+	 * Converts the buffered image into an {@link GrayU8}. If the buffered image
 	 * has multiple channels the intensities of each channel are averaged together.
 	 *
 	 * @param src Input image.
-	 * @param dst Where the converted image is written to.  If null a new unsigned image is created.
+	 * @param dst Where the converted image is written to. If null a new unsigned image is created.
 	 * @return Converted image.
 	 */
 	public static GrayU8 convertFrom(BufferedImage src, GrayU8 dst) {
@@ -390,11 +390,11 @@ public class ConvertBufferedImage {
 	}
 
 	/**
-	 * Converts the buffered image into an {@link GrayI16}.  If the buffered image
+	 * Converts the buffered image into an {@link GrayI16}. If the buffered image
 	 * has multiple channels the intensities of each channel are averaged together.
 	 *
 	 * @param src Input image.
-	 * @param dst Where the converted image is written to.  If null a new unsigned image is created.
+	 * @param dst Where the converted image is written to. If null a new unsigned image is created.
 	 * @return Converted image.
 	 */
 	public static <T extends GrayI16<T>>T convertFrom(BufferedImage src, T dst , Class<T> type ) {
@@ -416,11 +416,11 @@ public class ConvertBufferedImage {
 	}
 
 	/**
-	 * Converts the buffered image into an {@link GrayF32}.  If the buffered image
+	 * Converts the buffered image into an {@link GrayF32}. If the buffered image
 	 * has multiple channels the intensities of each channel are averaged together.
 	 *
 	 * @param src Input image.
-	 * @param dst Where the converted image is written to.  If null a new unsigned image is created.
+	 * @param dst Where the converted image is written to. If null a new unsigned image is created.
 	 * @return Converted image.
 	 */
 	public static GrayF32 convertFrom(BufferedImage src, GrayF32 dst) {
@@ -456,7 +456,7 @@ public class ConvertBufferedImage {
 	 * Converts the buffered image into an {@link Planar} image of the specified ype.
 	 *
 	 * @param src Input image. Not modified.
-	 * @param dst Output. The converted image is written to.  If null a new unsigned image is created.
+	 * @param dst Output. The converted image is written to. If null a new unsigned image is created.
 	 * @param orderRgb If applicable, should it adjust the ordering of each color band to maintain color consistency.
 	 *                 Most of the time you want this to be true.
 	 * @param type Which type of data structure is each band. (GrayU8 or GrayF32)
@@ -638,13 +638,13 @@ public class ConvertBufferedImage {
 	/**
 	 * <p>
 	 * Converts an image into a BufferedImage. The best way to think of this function is that it's a mindless
-	 * typecast.  If you don't provide an output image then it will create one.  However there isn't always a direct
-	 * equivalent between a BoofCV image and BufferedImage internal type.  A "reasonable" choice will be made, but
+	 * typecast. If you don't provide an output image then it will create one. However there isn't always a direct
+	 * equivalent between a BoofCV image and BufferedImage internal type. A "reasonable" choice will be made, but
 	 * for your application it might not be a good choice.
 	 * </p>
 	 *
-	 * @param src Input image.  Pixels must have a value from 0 to 255.
-	 * @param dst Where the converted image is written to.  If null a new image is created.  See comment above about type.
+	 * @param src Input image. Pixels must have a value from 0 to 255.
+	 * @param dst Where the converted image is written to. If null a new image is created. See comment above about type.
 	 * @param orderRgb If applicable, should it change the order of the color bands (assumed RGB or ARGB) into the
 	 *                 order based on BufferedImage.TYPE. Most of the time you want this to be true.
 	 * @return Converted image.
@@ -686,11 +686,11 @@ public class ConvertBufferedImage {
 	}
 
 	/**
-	 * Converts a {@link GrayU8} into a BufferedImage.  If the buffered image
+	 * Converts a {@link GrayU8} into a BufferedImage. If the buffered image
 	 * has multiple channels then the input image is copied into each channel.
 	 *
 	 * @param src Input image.
-	 * @param dst Where the converted image is written to.  If null a new image is created.
+	 * @param dst Where the converted image is written to. If null a new image is created.
 	 * @return Converted image.
 	 */
 	public static BufferedImage convertTo(GrayU8 src, BufferedImage dst) {
@@ -715,11 +715,11 @@ public class ConvertBufferedImage {
 	}
 
 	/**
-	 * Converts a {@link GrayI16} into a BufferedImage.  If the buffered image
+	 * Converts a {@link GrayI16} into a BufferedImage. If the buffered image
 	 * has multiple channels then the input image is copied into each channel.
 	 *
 	 * @param src Input image.
-	 * @param dst Where the converted image is written to.  If null a new image is created.
+	 * @param dst Where the converted image is written to. If null a new image is created.
 	 * @return Converted image.
 	 */
 	public static BufferedImage convertTo(GrayI16 src, BufferedImage dst) {
@@ -746,12 +746,12 @@ public class ConvertBufferedImage {
 	}
 
 	/**
-	 * Converts the buffered image into an {@link GrayF32}.  If the buffered image
-	 * has multiple channels then the input image is copied into each channel.  The floating
+	 * Converts the buffered image into an {@link GrayF32}. If the buffered image
+	 * has multiple channels then the input image is copied into each channel. The floating
 	 * point image is assumed to be between 0 and 255.
 	 *
 	 * @param src Input image.
-	 * @param dst Where the converted image is written to.  If null a new image is created.
+	 * @param dst Where the converted image is written to. If null a new image is created.
 	 * @return Converted image.
 	 */
 	public static BufferedImage convertTo(GrayF32 src, BufferedImage dst) {
@@ -779,7 +779,7 @@ public class ConvertBufferedImage {
 	 * Converts a {@link Planar} {@link GrayU8} into a BufferedImage.
 	 *
 	 * @param src Input image.
-	 * @param dst Where the converted image is written to.  If null a new image is created.
+	 * @param dst Where the converted image is written to. If null a new image is created.
 	 * @param orderRgb If applicable, should it change the order of the color bands (assumed RGB or ARGB) into the
 	 *                 order based on BufferedImage.TYPE. Most of the time you want this to be true.
 	 * @return Converted image.
@@ -813,7 +813,7 @@ public class ConvertBufferedImage {
 	 * Converts a {@link Planar} {@link GrayF32} into a BufferedImage.
 	 *
 	 * @param src Input image.
-	 * @param dst Where the converted image is written to.  If null a new image is created.
+	 * @param dst Where the converted image is written to. If null a new image is created.
 	 * @param orderRgb If applicable, should it change the order of the color bands (assumed RGB or ARGB) into the
 	 *                 order based on BufferedImage.TYPE. Most of the time you want this to be true.
 	 * @return Converted image.
@@ -895,12 +895,12 @@ public class ConvertBufferedImage {
 			if(src instanceof GrayI8)
 				dst = new BufferedImage(src.getWidth(), src.getHeight(), BufferedImage.TYPE_BYTE_GRAY);
 			else if(src instanceof GrayF)
-				// no good equivalent.  Just assume the image is a regular gray scale image
+				// no good equivalent. Just assume the image is a regular gray scale image
 				// with pixel values from 0 to 255
 				dst = new BufferedImage(src.getWidth(), src.getHeight(), BufferedImage.TYPE_BYTE_GRAY);
 //			throw new RuntimeException("Fail!");
 			else if(src instanceof GrayI)
-				// no good equivalent.  I'm giving it the biggest pixel for the range
+				// no good equivalent. I'm giving it the biggest pixel for the range
 				dst = new BufferedImage(src.getWidth(), src.getHeight(), BufferedImage.TYPE_USHORT_GRAY);
 			else
 				dst = new BufferedImage(src.getWidth(), src.getHeight(), BufferedImage.TYPE_INT_RGB);
@@ -927,7 +927,7 @@ public class ConvertBufferedImage {
 	}
 
 	/**
-	 * Returns a new image with the color bands in the appropriate ordering.  The returned image will
+	 * Returns a new image with the color bands in the appropriate ordering. The returned image will
 	 * reference the original image's image arrays.
 	 */
 	public static Planar orderBandsIntoBuffered(Planar src, BufferedImage dst) {

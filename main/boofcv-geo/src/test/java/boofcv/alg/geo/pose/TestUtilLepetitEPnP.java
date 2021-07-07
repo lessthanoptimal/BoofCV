@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -33,8 +33,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  */
 public class TestUtilLepetitEPnP extends BoofStandardJUnit {
 
-	@Test
-	public void jacobian4() {
+	@Test void jacobian4() {
 
 		DMatrixRMaj L_full = RandomMatrices_DDRM.rectangle(6, 10, rand);
 		DMatrixRMaj y = RandomMatrices_DDRM.rectangle(6,1,rand);
@@ -49,8 +48,7 @@ public class TestUtilLepetitEPnP extends BoofStandardJUnit {
 		assertTrue(worked);
 	}
 
-	@Test
-	public void jacobian3() {
+	@Test void jacobian3() {
 
 		DMatrixRMaj L_full = RandomMatrices_DDRM.rectangle(3,6,rand);
 		DMatrixRMaj y = RandomMatrices_DDRM.rectangle(3,1,rand);

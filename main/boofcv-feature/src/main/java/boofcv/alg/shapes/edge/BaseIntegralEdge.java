@@ -49,7 +49,7 @@ public class BaseIntegralEdge<T extends ImageGray<T>> {
 
 	/**
 	 * Used to specify a transform that is applied to pixel coordinates to bring them back into original input
-	 * image coordinates.  For example if the input image has lens distortion but the edge were found
+	 * image coordinates. For example if the input image has lens distortion but the edge were found
 	 * in undistorted coordinates this code needs to know how to go from undistorted back into distorted
 	 * image coordinates in order to read the pixel's value.
 	 *

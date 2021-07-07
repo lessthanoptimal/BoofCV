@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -38,8 +38,7 @@ public abstract class ChecksPointDeformKeyPoints extends BoofStandardJUnit {
 	/**
 	 * Sees if a local copy of inputs points is not made
 	 */
-	@Test
-	public void checkPointsCopied() {
+	@Test void checkPointsCopied() {
 		List<Point2D_F32> src = createTestPoints();
 		List<Point2D_F32> dst = createTestPoints();
 
@@ -77,8 +76,7 @@ public abstract class ChecksPointDeformKeyPoints extends BoofStandardJUnit {
 	/**
 	 * Makes sure modifying a single points is the same as modifying all the points at once
 	 */
-	@Test
-	public void individualSrcSameAsAll() {
+	@Test void individualSrcSameAsAll() {
 		List<Point2D_F32> src = createTestPoints();
 		List<Point2D_F32> dst = createTestPoints();
 
@@ -102,8 +100,7 @@ public abstract class ChecksPointDeformKeyPoints extends BoofStandardJUnit {
 	/**
 	 * Makes sure modifying a single points is the same as modifying all the points at once
 	 */
-	@Test
-	public void individualDstSameAsAll() {
+	@Test void individualDstSameAsAll() {
 		List<Point2D_F32> src = createTestPoints();
 		List<Point2D_F32> dst = createTestPoints();
 

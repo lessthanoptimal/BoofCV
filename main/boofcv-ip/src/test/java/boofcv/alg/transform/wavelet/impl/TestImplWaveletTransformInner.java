@@ -43,23 +43,19 @@ public class TestImplWaveletTransformInner extends CompareToNaiveWavelet {
 		super(2,ImplWaveletTransformInner.class);
 	}
 
-	@Test
-	public void checkAllHorizontal() {
+	@Test void checkAllHorizontal() {
 		checkAll("horizontal","checkHorizontal");
 	}
 
-	@Test
-	public void checkAllVertical() {
+	@Test void checkAllVertical() {
 		checkAll("vertical","checkVertical");
 	}
 
-	@Test
-	public void checkAllHorizontalInverse() {
+	@Test void checkAllHorizontalInverse() {
 		checkAll("horizontalInverse","checkHorizontalInverse");
 	}
 
-	@Test
-	public void checkAllVerticalInverse() {
+	@Test void checkAllVerticalInverse() {
 		checkAll("verticalInverse","checkVerticalInverse");
 	}
 
@@ -134,7 +130,7 @@ public class TestImplWaveletTransformInner extends CompareToNaiveWavelet {
 	}
 
 	/**
-	 * Compares two wavelet transformations while ignoring the input image borders.  Input borders
+	 * Compares two wavelet transformations while ignoring the input image borders. Input borders
 	 * affect the borders of internal segments inside the transformation.
 	 */
 	private void equalsTranHorizontal(WaveletDescription<?> desc,
@@ -151,7 +147,7 @@ public class TestImplWaveletTransformInner extends CompareToNaiveWavelet {
 	}
 
 	/**
-	 * Compares two wavelet transformations while ignoring the input image borders.  Input borders
+	 * Compares two wavelet transformations while ignoring the input image borders. Input borders
 	 * affect the borders of internal segments inside the transformation.
 	 */
 	private void equalsTranHorizontal(ImageGray expected , ImageGray found ,

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -28,36 +28,31 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
  */
 public class TestPrecisionRecall extends BoofStandardJUnit {
 	double TP=1.0,TN=2.0,FP=3.0,FN=4.0;
-	@Test
-	public void getTruePositive() {
+	@Test void getTruePositive() {
 		PrecisionRecall p = new PrecisionRecall(1,2,3,4);
 
 		assertEquals(1, p.getTruePositive(), 1e-8);
 	}
 
-	@Test
-	public void getTrueNegative() {
+	@Test void getTrueNegative() {
 		PrecisionRecall p = new PrecisionRecall(1,2,3,4);
 
 		assertEquals(2, p.getTrueNegative(), 1e-8);
 	}
 
-	@Test
-	public void getFalsePositive() {
+	@Test void getFalsePositive() {
 		PrecisionRecall p = new PrecisionRecall(1,2,3,4);
 
 		assertEquals(3, p.getFalsePositive(), 1e-8);
 	}
 
-	@Test
-	public void getFalseNegative() {
+	@Test void getFalseNegative() {
 		PrecisionRecall p = new PrecisionRecall(1,2,3,4);
 
 		assertEquals(4, p.getFalseNegative(), 1e-8);
 	}
 
-	@Test
-	public void getFMeasure() {
+	@Test void getFMeasure() {
 		PrecisionRecall p = new PrecisionRecall(1,2,3,4);
 
 		double expected = 2.0*(p.getPrecision()*p.getRecall())/(p.getPrecision()+p.getRecall());
@@ -65,16 +60,14 @@ public class TestPrecisionRecall extends BoofStandardJUnit {
 		assertEquals(expected,p.getFMeasure(),1e-8);
 	}
 
-	@Test
-	public void getPrecision() {
+	@Test void getPrecision() {
 		PrecisionRecall p = new PrecisionRecall(TP,TN,FP,FN);
 
 		double expected =  TP/(TP+FP);
 		assertEquals(expected,p.getPrecision(),1e-8);
 	}
 
-	@Test
-	public void getRecall() {
+	@Test void getRecall() {
 		PrecisionRecall p = new PrecisionRecall(TP,TN,FP,FN);
 
 		double expected =  TP/(TP+FN);

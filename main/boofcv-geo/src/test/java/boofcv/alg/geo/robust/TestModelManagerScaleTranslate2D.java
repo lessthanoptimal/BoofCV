@@ -30,15 +30,13 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  */
 public class TestModelManagerScaleTranslate2D extends BoofStandardJUnit {
 
-	@Test
-	public void createModelInstance() {
+	@Test void createModelInstance() {
 		ModelManagerScaleTranslate2D alg = new ModelManagerScaleTranslate2D();
 
 		assertTrue(alg.createModelInstance() != null);
 	}
 
-	@Test
-	public void copyModel() {
+	@Test void copyModel() {
 		ModelManagerScaleTranslate2D alg = new ModelManagerScaleTranslate2D();
 
 		ScaleTranslate2D model = new ScaleTranslate2D(1, 2, 3);

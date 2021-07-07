@@ -32,8 +32,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
  * @author Peter Abeles
  */
 public class TestDistanceScaleTranslateRotate2DSq extends BoofStandardJUnit {
-	@Test
-	public void perfect() {
+	@Test void perfect() {
 		var model = new ScaleTranslateRotate2D(0.2, 1.5, -2, 3);
 
 		AssociatedPair a = apply(-5, 4, model);
@@ -44,8 +43,7 @@ public class TestDistanceScaleTranslateRotate2DSq extends BoofStandardJUnit {
 		assertEquals(0, alg.distance(a), 1e-8);
 	}
 
-	@Test
-	public void noisy() {
+	@Test void noisy() {
 		var model = new ScaleTranslateRotate2D(0.2, 1.5, -2, 3);
 
 		AssociatedPair a = apply(-5, 4, model);
@@ -57,8 +55,7 @@ public class TestDistanceScaleTranslateRotate2DSq extends BoofStandardJUnit {
 		assertEquals(3.5*3.5, alg.distance(a), 1e-8);
 	}
 
-	@Test
-	public void multiple() {
+	@Test void multiple() {
 		var model = new ScaleTranslateRotate2D(0.2, 1.5, -2, 3);
 
 		AssociatedPair a = apply(-5, 4, model);

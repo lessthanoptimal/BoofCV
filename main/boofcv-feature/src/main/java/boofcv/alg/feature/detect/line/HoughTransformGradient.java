@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -90,7 +90,7 @@ public class HoughTransformGradient<D extends ImageGray<D>> {
 	/**
 	 * Specifies parameters of transform.
 	 *
-	 * @param extractor Extracts local maxima from transform space.  A set of candidates is provided, but can be ignored.
+	 * @param extractor Extracts local maxima from transform space. A set of candidates is provided, but can be ignored.
 	 */
 	public HoughTransformGradient( NonMaxSuppression extractor,
 								   HoughTransformParameters parameters,
@@ -162,8 +162,8 @@ public class HoughTransformGradient<D extends ImageGray<D>> {
 			post.add(linesAll.get(i), foundIntensity.get(i));
 		}
 
-		// NOTE: angular accuracy is a function of range from sub image center.  This pruning
-		// function uses a constant value for range accuracy.  A custom algorithm should really
+		// NOTE: angular accuracy is a function of range from sub image center. This pruning
+		// function uses a constant value for range accuracy. A custom algorithm should really
 		// be used here.
 		post.pruneSimilar((float)mergeAngle, (float)mergeDistance, width, height);
 		post.pruneNBest(maxLines);
@@ -223,7 +223,7 @@ public class HoughTransformGradient<D extends ImageGray<D>> {
 	}
 
 	/**
-	 * Returns the intensity/edge count for each returned line.  Useful when doing
+	 * Returns the intensity/edge count for each returned line. Useful when doing
 	 * post processing pruning.
 	 *
 	 * @return Array containing line intensities.

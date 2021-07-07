@@ -26,8 +26,8 @@ import boofcv.struct.image.ImageGray;
 
 /**
  * <p>
- * A Kanade-Lucas-Tomasi (KLT) [1,2,3,4] point feature tracker for a single layer gray scale image.  It tracks point features
- * across a sequence of images by having each feature individually follow the image's gradient.  Feature locations
+ * A Kanade-Lucas-Tomasi (KLT) [1,2,3,4] point feature tracker for a single layer gray scale image. It tracks point features
+ * across a sequence of images by having each feature individually follow the image's gradient. Feature locations
  * are estimated to within sub-pixel accuracy.
  * </p>
  *
@@ -39,8 +39,8 @@ import boofcv.struct.image.ImageGray;
  * <p>
  * Citations:<br>
  * <br>
- * [1] Bruce D. Lucas and Takeo Kanade.  An Iterative Image Registration Technique with an
- * Application to Stereo Vision.  International Joint Conference on Artificial Intelligence,
+ * [1] Bruce D. Lucas and Takeo Kanade. An Iterative Image Registration Technique with an
+ * Application to Stereo Vision. International Joint Conference on Artificial Intelligence,
  * pages 674-679, 1981.<br>
  * [2] Carlo Tomasi and Takeo Kanade. Detection and Tracking of Point Features. Carnegie
  * Mellon University Technical Report CMU-CS-91-132, April 1991.<br>
@@ -144,7 +144,7 @@ public class KltTracker<I extends ImageGray<I>, D extends ImageGray<D>> {
 	 * Sets the features description using the current image and the location of the feature stored in the feature.
 	 * If the feature is an illegal location and cannot be set then false is returned.
 	 *
-	 * @param feature Feature description which is to be set.  Location must be specified.
+	 * @param feature Feature description which is to be set. Location must be specified.
 	 * @return true if the feature's description was modified.
 	 */
 	@SuppressWarnings({"SuspiciousNameCombination"})
@@ -195,7 +195,7 @@ public class KltTracker<I extends ImageGray<I>, D extends ImageGray<D>> {
 	}
 
 	/**
-	 * Computes the descriptor for border features.  All it needs to do
+	 * Computes the descriptor for border features. All it needs to do
 	 * is save the pixel value, but derivative information is also computed
 	 * so that it can reject bad features immediately.
 	 */
@@ -245,7 +245,7 @@ public class KltTracker<I extends ImageGray<I>, D extends ImageGray<D>> {
 
 	/**
 	 * <p>
-	 * Updates the feature's location inside the image.  The feature's position can be modified
+	 * Updates the feature's location inside the image. The feature's position can be modified
 	 * even if tracking fails.
 	 * </p>
 	 *
@@ -290,7 +290,7 @@ public class KltTracker<I extends ImageGray<I>, D extends ImageGray<D>> {
 			if (complete && isFullyInside(feature.x, feature.y)) {
 				computeE(feature, feature.x, feature.y);
 			} else {
-				// once it goes outside it must remain outside.  If it starts outside
+				// once it goes outside it must remain outside. If it starts outside
 				int length = computeGandE_border(feature, feature.x, feature.y);
 
 				det = Gxx*Gyy - Gxy*Gxy;
@@ -489,9 +489,9 @@ public class KltTracker<I extends ImageGray<I>, D extends ImageGray<D>> {
 	}
 
 	/**
-	 * Returns true if the features is entirely outside of the image.  A region is entirely outside if not
-	 * an entire pixel is contained inside the image.  So if only  0.999 of a pixel is inside then the whole
-	 * region is considered to be outside.  Can't interpolate nothing...
+	 * Returns true if the features is entirely outside of the image. A region is entirely outside if not
+	 * an entire pixel is contained inside the image. So if only  0.999 of a pixel is inside then the whole
+	 * region is considered to be outside. Can't interpolate nothing...
 	 */
 	public boolean isFullyOutside( float x, float y ) {
 		if (x < outsideLeft || x > outsideRight)

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -30,8 +30,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
  */
 public class TestWatershedVincentSoille1991 extends BoofStandardJUnit {
 
-	@Test
-	public void sortPixels() {
+	@Test void sortPixels() {
 		WatershedVincentSoille1991 alg = new Dummy();
 
 		GrayU8 image = new GrayU8(3,4);

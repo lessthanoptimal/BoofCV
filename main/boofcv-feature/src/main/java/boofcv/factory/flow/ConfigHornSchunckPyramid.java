@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -29,7 +29,7 @@ import boofcv.struct.Configuration;
 public class ConfigHornSchunckPyramid implements Configuration {
 
 	/**
-	 * Weights importance of image brightness error and velocity smoothness.  Larger values which prefer a smooth
+	 * Weights importance of image brightness error and velocity smoothness. Larger values which prefer a smooth
 	 * flow.
 	 */
 	public float alpha = 0.05f;
@@ -46,15 +46,15 @@ public class ConfigHornSchunckPyramid implements Configuration {
 	 */
 	public int maxInnerIterations = 150;
 	/**
-	 * Convergence tolerance for inner loop.  Specified in per pixel error.
+	 * Convergence tolerance for inner loop. Specified in per pixel error.
 	 */
 	public float convergeTolerance = 1e-5f;
 	/**
-	 * Change in scale between each layer.  Try 0.7
+	 * Change in scale between each layer. Try 0.7
 	 */
 	public double pyrScale = 0.7;
 	/**
-	 * Amount of blur applied to each layer in the pyramid.  If sigma &le; 0 then no blur is applied.
+	 * Amount of blur applied to each layer in the pyramid. If sigma &le; 0 then no blur is applied.
 	 */
 	public double pyrSigma = 0.5;
 	/**
@@ -63,7 +63,7 @@ public class ConfigHornSchunckPyramid implements Configuration {
 	public int pyrMaxLayers = 10;
 
 	/**
-	 * Type of interpolation used.  Bilinear recommended
+	 * Type of interpolation used. Bilinear recommended
 	 */
 	public InterpolationType interpolation = InterpolationType.BILINEAR;
 

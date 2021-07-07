@@ -54,8 +54,7 @@ public abstract class CommonGridRansacLineDetectorChecks< D extends ImageGray<D>
 		this.derivType = derivType;
 	}
 
-	@Test
-	public void checkObvious() {
+	@Test void checkObvious() {
 		for(int size = 11; size <= 19; size += 2 )
 			checkObvious(size);
 	}
@@ -64,7 +63,7 @@ public abstract class CommonGridRansacLineDetectorChecks< D extends ImageGray<D>
 															  ModelMatcher<LinePolar2D_F32, Edgel> robustMatcher );
 
 	/**
-	 * Give it a single straight line and see if it can detect it.  Allow the region size to be changed to check
+	 * Give it a single straight line and see if it can detect it. Allow the region size to be changed to check
 	 * for issues related to that
 	 */
 	protected void checkObvious( int regionSize ) {

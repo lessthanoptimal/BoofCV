@@ -28,11 +28,11 @@ import org.ddogleg.struct.DogArray_I32;
  * <p>
  * Given a labeled image in which pixels that contains the same label may or may not be connected to each other,
  * create a new labeled image in which only connected pixels have the same label.
- * A two pass algorithm is used.  In the first pass pixels are examined from top to bottom, left to right.  For
- * each pixel (the target), the input image and output image labels of its adjacent pixels are examined.  If an adjacent
+ * A two pass algorithm is used. In the first pass pixels are examined from top to bottom, left to right. For
+ * each pixel (the target), the input image and output image labels of its adjacent pixels are examined. If an adjacent
  * pixel has the same input label as the target then it is either assigned the same output label or marked for being
- * merged.  Depending if it is not labeled or has an output label already, respectively. After all the pixels are process
- * the merge requests are examined and a new set of output labels is created.  A pass across the output image is
+ * merged. Depending if it is not labeled or has an output label already, respectively. After all the pixels are process
+ * the merge requests are examined and a new set of output labels is created. A pass across the output image is
  * done to relabel the inputs.
  * </p>
  *
@@ -46,7 +46,7 @@ import org.ddogleg.struct.DogArray_I32;
  */
 public class ClusterLabeledImage extends RegionMergeTree {
 
-	// which connectivity rule is used.  4 or 8.
+	// which connectivity rule is used. 4 or 8.
 	protected ConnectRule connectRule;
 
 	// offset in pixel indices for adjacent pixels
@@ -62,7 +62,7 @@ public class ClusterLabeledImage extends RegionMergeTree {
 	/**
 	 * Configures labeling
 	 *
-	 * @param connectRule Which connectivity rule to use.  4 or 8
+	 * @param connectRule Which connectivity rule to use. 4 or 8
 	 */
 	public ClusterLabeledImage( ConnectRule connectRule ) {
 		this.connectRule = connectRule;
@@ -130,7 +130,7 @@ public class ClusterLabeledImage extends RegionMergeTree {
 		setUpEdges(input, output);
 		ImageMiscOps.fill(output, -1);
 
-		// this is a bit of a hack here.  Normally you call the parent's init function.
+		// this is a bit of a hack here. Normally you call the parent's init function.
 		// since the number of regions is not initially known this will grow
 		mergeList.reset();
 

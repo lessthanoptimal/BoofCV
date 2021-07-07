@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -23,7 +23,7 @@ import georegression.struct.point.Point2D_F64;
 
 /**
  * <p>
- * Flips the image along the vertical axis.  Equivalent to applying this transform, y = height - y - 1.
+ * Flips the image along the vertical axis. Equivalent to applying this transform, y = height - y - 1.
  * Useful when the image coordinate system is left handed and needs to be right handed.
  * </p>
  *

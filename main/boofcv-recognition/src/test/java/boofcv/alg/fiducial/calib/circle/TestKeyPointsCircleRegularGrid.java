@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -37,8 +37,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  * @author Peter Abeles
  */
 public class TestKeyPointsCircleRegularGrid extends BoofStandardJUnit {
-	@Test
-	public void all() {
+	@Test void all() {
 
 		all(new Affine2D_F64());
 
@@ -92,8 +91,7 @@ public class TestKeyPointsCircleRegularGrid extends BoofStandardJUnit {
 		}
 	}
 
-	@Test
-	public void horizontal() {
+	@Test void horizontal() {
 		int numRows=3,numCols=4;
 
 		double space = 3,r=1;
@@ -120,8 +118,7 @@ public class TestKeyPointsCircleRegularGrid extends BoofStandardJUnit {
 		}
 	}
 
-	@Test
-	public void vertical() {
+	@Test void vertical() {
 		int numRows=3,numCols=4;
 
 		double space = 3,r=1;

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -47,11 +47,11 @@ public class GDiscreteFourierTransformOps {
 	}
 
 	/**
-	 * Moves the zero-frequency component into the image center (width/2,height/2).   This function can
+	 * Moves the zero-frequency component into the image center (width/2,height/2).  This function can
 	 * be called to undo the transform.
 	 *
 	 * @param transform the DFT which is to be shifted.
-	 * @param forward If true then it does the shift in the forward direction.  If false then it undoes the transforms.
+	 * @param forward If true then it does the shift in the forward direction. If false then it undoes the transforms.
 	 */
 	public static void shiftZeroFrequency( ImageInterleaved transform, boolean forward ) {
 		if (transform instanceof InterleavedF32) {

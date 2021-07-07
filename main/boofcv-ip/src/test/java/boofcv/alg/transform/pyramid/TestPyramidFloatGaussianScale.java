@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -101,11 +101,10 @@ public class TestPyramidFloatGaussianScale extends GenericPyramidTests<GrayF32> 
 	}
 
 	/**
-	 * Makes sure the amount of Gaussian blur in each level is correctly computed.  Test against hand computed
+	 * Makes sure the amount of Gaussian blur in each level is correctly computed. Test against hand computed
 	 * numbers
 	 */
-	@Test
-	public void checkSigmas() {
+	@Test void checkSigmas() {
 		InterpolatePixelS<GrayF32> interp = FactoryInterpolation.
 				bilinearPixelS(GrayF32.class,BorderType.EXTENDED);
 		double scales[] = new double[]{1,1};

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -64,7 +64,7 @@ public class GenerateImplConvertImage extends CodeGeneratorBase {
 				"/**\n" +
 				" * <p>\n" +
 				" * Functions for converting between different primitive image types. Numerical values do not change or are closely approximated\n" +
-				" * in these functions.  \n" +
+				" * in these functions. \n" +
 				" * </p>\n" +
 				" *\n" +
 				generateDocString("Peter Abeles") +

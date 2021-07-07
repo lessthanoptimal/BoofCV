@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -35,21 +35,21 @@ import boofcv.misc.BoofMiscOps;
 
 /**
  * <p>
- * Activity for processing and displaying video results.  Use of this class can save you a considerable amount of
- * effort if you wish to display processed video frames as an image.  The actual processing of image data is
+ * Activity for processing and displaying video results. Use of this class can save you a considerable amount of
+ * effort if you wish to display processed video frames as an image. The actual processing of image data is
  * done by a class provided to it via {@link #setProcessing}.
  * </p>
  *
  * <p>
  * Shutting down and restarting the camera as the activity transitions to different
- * phases in its life cycle is correctly handled here.  The display can also be customized.
- * User interaction and additional display widgets can be added to the activity.  To access the main content
+ * phases in its life cycle is correctly handled here. The display can also be customized.
+ * User interaction and additional display widgets can be added to the activity. To access the main content
  * view call {@link #getViewContent} and to access the video display call {@link #getViewPreview},
  * </p>
  *
  * <p>
- * If you wish to use this class and not display a preview that is also possible.  Simply set {@link #hidePreview}
- * to false.  To display the FPS which the video sequence is processed at pass in true to {@link #setShowFPS(boolean)},
+ * If you wish to use this class and not display a preview that is also possible. Simply set {@link #hidePreview}
+ * to false. To display the FPS which the video sequence is processed at pass in true to {@link #setShowFPS(boolean)},
  * </p>
  *
  * @author Peter Abeles
@@ -82,7 +82,7 @@ public abstract class VideoDisplayActivity extends Activity implements Camera.Pr
 	}
 
 	/**
-	 * Changes the CV algorithm running.  Should only be called from a GUI thread.
+	 * Changes the CV algorithm running. Should only be called from a GUI thread.
 	 */
 	public void setProcessing( VideoProcessing processing ) {
 		if (this.processing != null) {
@@ -109,7 +109,7 @@ public abstract class VideoDisplayActivity extends Activity implements Camera.Pr
 	}
 
 	/**
-	 * The view containing the camera preview.  The first child in the parent view's list.
+	 * The view containing the camera preview. The first child in the parent view's list.
 	 */
 	public FrameLayout getViewPreview() {
 		return preview;
@@ -285,8 +285,8 @@ public abstract class VideoDisplayActivity extends Activity implements Camera.Pr
 	}
 
 	/**
-	 * Displays an indeterminate progress dialog.   If the dialog is already open this will change the message being
-	 * displayed.  Function blocks until the dialog has been declared.
+	 * Displays an indeterminate progress dialog.  If the dialog is already open this will change the message being
+	 * displayed. Function blocks until the dialog has been declared.
 	 *
 	 * @param message Text shown in dialog
 	 */
@@ -323,7 +323,7 @@ public abstract class VideoDisplayActivity extends Activity implements Camera.Pr
 	}
 
 	/**
-	 * Dismisses the progress dialog.  Can be called even if there is no progressDialog being shown.
+	 * Dismisses the progress dialog. Can be called even if there is no progressDialog being shown.
 	 */
 	protected void hideProgressDialog() {
 		// do nothing if the dialog is already being displayed

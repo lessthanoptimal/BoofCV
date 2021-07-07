@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -32,8 +32,7 @@ public class TestTldNonMaximalSuppression extends BoofStandardJUnit {
 	/**
 	 * Just tests the connections graph generated in process()
 	 */
-	@Test
-	public void process() {
+	@Test void process() {
 		TldNonMaximalSuppression alg = new TldNonMaximalSuppression(0.5);
 
 		DogArray<TldRegion> regions = new DogArray<>(TldRegion::new);

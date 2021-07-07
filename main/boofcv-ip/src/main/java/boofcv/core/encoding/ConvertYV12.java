@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -26,7 +26,7 @@ import boofcv.core.encoding.impl.ImplConvertYV12_MT;
 import boofcv.struct.image.*;
 
 /**
- * YUV / YCbCr image format.  The Y component is contained in the width*height block, followed by a (width/2)*(height/2) block
+ * YUV / YCbCr image format. The Y component is contained in the width*height block, followed by a (width/2)*(height/2) block
  * for Cb and then a block of the same size for Cr.
  *
  * @author Peter Abeles
@@ -103,7 +103,7 @@ public class ConvertYV12 {
 	 * @param data Input: YV12 image data
 	 * @param width Input: image width
 	 * @param height Input: image height
-	 * @param output Output: Optional storage for output image.  Can be null.
+	 * @param output Output: Optional storage for output image. Can be null.
 	 * @return Gray scale image
 	 */
 	public static GrayU8 yu12ToGray( byte[] data, int width, int height, GrayU8 output ) {
@@ -128,7 +128,7 @@ public class ConvertYV12 {
 	 * @param data Input: YV12 image data
 	 * @param width Input: image width
 	 * @param height Input: image height
-	 * @param output Output: Optional storage for output image.  Can be null.
+	 * @param output Output: Optional storage for output image. Can be null.
 	 * @return Gray scale image
 	 */
 	public static GrayF32 yu12ToGray( byte[] data, int width, int height, GrayF32 output ) {

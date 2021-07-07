@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -39,7 +39,7 @@ public class TldFernFeature {
 	public int numN;
 
 	/**
-	 * Posterior probability.  P/(P+N)
+	 * Posterior probability. P/(P+N)
 	 */
 	public double posterior;
 

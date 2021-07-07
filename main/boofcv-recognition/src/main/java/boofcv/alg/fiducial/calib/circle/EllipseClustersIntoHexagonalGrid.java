@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -31,8 +31,8 @@ import java.util.List;
  * its neighbors. Smallest grid size it will detect is 3 x 3.</p>
  *
  *
- * <p>Note that the returned grid is 'sparse'.  every other node is skipped implicitly.
- * This is caused by the asymmetry.  Each row is offset by one circle/grid element.</p>
+ * <p>Note that the returned grid is 'sparse'. every other node is skipped implicitly.
+ * This is caused by the asymmetry. Each row is offset by one circle/grid element.</p>
  *
  * <pre>Examples:
  * 3x6 grid will have 9 elements total.
@@ -48,7 +48,7 @@ import java.util.List;
  * at a minimum search radius should be distance between centers*2 if not more.
  * </p>
  *
- * <p>See {@link Grid} for a description of how the output grids are described.  It uses a sparse format.</p>
+ * <p>See {@link Grid} for a description of how the output grids are described. It uses a sparse format.</p>
  * <p>See {@link DetectCircleHexagonalGrid} for an example of an hexagonal grid</p>
  *
  * @author Peter Abeles
@@ -389,7 +389,7 @@ public class EllipseClustersIntoHexagonalGrid extends EllipseClustersIntoGrid {
 	}
 
 	/**
-	 * Combines the inner and outer grid into one grid for output.  See {@link Grid} for a discussion
+	 * Combines the inner and outer grid into one grid for output. See {@link Grid} for a discussion
 	 * on how elements are ordered internally.
 	 */
 	void saveResults( List<List<NodeInfo>> graph ) {

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -38,11 +38,10 @@ import static org.junit.jupiter.api.Assertions.*;
 public class TestSquaresIntoRegularClusters extends BoofStandardJUnit {
 
 	/**
-	 * Very basic test of the entire class.  Pass in squares which should be two clusters and see if two clusters
+	 * Very basic test of the entire class. Pass in squares which should be two clusters and see if two clusters
 	 * come out.
 	 */
-	@Test
-	public void process() {
+	@Test void process() {
 		List<Polygon2D_F64> squares = new ArrayList<>();
 		double width = 1;
 		for (int i = 0; i < 3; i++) {
@@ -61,8 +60,7 @@ public class TestSquaresIntoRegularClusters extends BoofStandardJUnit {
 		assertEquals(2, clusters.size());
 	}
 
-	@Test
-	public void computeNodeInfo() {
+	@Test void computeNodeInfo() {
 		List<Polygon2D_F64> squares = new ArrayList<>();
 		squares.add(new Polygon2D_F64(-1, 1, 1, 1, 1, -1, -1, -1));
 		squares.add(new Polygon2D_F64(2, 1, 4, 1, 4, -1, 2, -1));
@@ -94,8 +92,7 @@ public class TestSquaresIntoRegularClusters extends BoofStandardJUnit {
 	/**
 	 * Very easy scenario where a rectangular grid should be perefectly connected
 	 */
-	@Test
-	public void connectNodes_oneCluster() {
+	@Test void connectNodes_oneCluster() {
 
 		List<Polygon2D_F64> squares = new ArrayList<>();
 		double width = 1;
@@ -113,10 +110,9 @@ public class TestSquaresIntoRegularClusters extends BoofStandardJUnit {
 	}
 
 	/**
-	 * Two clusters.  They won't connect because they are spaced so far apart
+	 * Two clusters. They won't connect because they are spaced so far apart
 	 */
-	@Test
-	public void connectNodes_twoCluster() {
+	@Test void connectNodes_twoCluster() {
 		List<Polygon2D_F64> squares = new ArrayList<>();
 		double width = 1;
 		for (int i = 0; i < 3; i++) {
@@ -160,10 +156,9 @@ public class TestSquaresIntoRegularClusters extends BoofStandardJUnit {
 	}
 
 	/**
-	 * The usual case.  They should attach
+	 * The usual case. They should attach
 	 */
-	@Test
-	public void considerConnect_nominal() {
+	@Test void considerConnect_nominal() {
 		List<Polygon2D_F64> squares = new ArrayList<>();
 		squares.add(new Polygon2D_F64(-1, 1, 1, 1, 1, -1, -1, -1));
 		squares.add(new Polygon2D_F64(2, 1, 4, 1, 4, -1, 2, -1));
@@ -181,8 +176,7 @@ public class TestSquaresIntoRegularClusters extends BoofStandardJUnit {
 	/**
 	 * Everything is good, but they are offset from each other by too much
 	 */
-	@Test
-	public void considerConnect_shape_offset() {
+	@Test void considerConnect_shape_offset() {
 		List<Polygon2D_F64> squares = new ArrayList<>();
 		squares.add(new Polygon2D_F64(-1, 1, 1, 1, 1, -1, -1, -1));
 		squares.add(new Polygon2D_F64(3, 2, 5, 1, 5, -1, 3, -2));
@@ -199,8 +193,7 @@ public class TestSquaresIntoRegularClusters extends BoofStandardJUnit {
 	/**
 	 * Every thing's good, but the size difference of the squares is too much
 	 */
-	@Test
-	public void considerConnect_shape_size() {
+	@Test void considerConnect_shape_size() {
 		List<Polygon2D_F64> squares = new ArrayList<>();
 		squares.add(new Polygon2D_F64(-1, 1, 1, 1, 1, -1, -1, -1));
 		squares.add(new Polygon2D_F64(2, 4, 10, 4, 10, -4, 2, -4));
@@ -214,8 +207,7 @@ public class TestSquaresIntoRegularClusters extends BoofStandardJUnit {
 		assertNotConnected(a, b);
 	}
 
-	@Test
-	public void areMiddlePointsClose() {
+	@Test void areMiddlePointsClose() {
 		Point2D_F64 p0 = new Point2D_F64(-2, 3);
 		Point2D_F64 p1 = new Point2D_F64(-1, 3);
 		Point2D_F64 p2 = new Point2D_F64(1, 3);
@@ -242,8 +234,7 @@ public class TestSquaresIntoRegularClusters extends BoofStandardJUnit {
 		assertFalse(alg.areMiddlePointsClose(p0, p1, p2, p3));
 	}
 
-	@Test
-	public void disconnectSingleConnections() {
+	@Test void disconnectSingleConnections() {
 		SquaresIntoRegularClusters alg = new SquaresIntoRegularClusters(0.1, 6, 1.35);
 
 		alg.nodes.resize(4);

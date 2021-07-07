@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -39,8 +39,7 @@ public class TestGeoModelEstimator1toN extends BoofStandardJUnit {
 	List<AssociatedPair> points = new ArrayList<>();
 	DogArray<DMatrixRMaj> solutions = new QueueMatrix(3, 3);
 
-	@Test
-	public void basicTest() {
+	@Test void basicTest() {
 		GeoModelEstimator1toN<DMatrixRMaj,AssociatedPair> alg =
 				new GeoModelEstimator1toN<>(new Dummy(true));
 
@@ -57,8 +56,7 @@ public class TestGeoModelEstimator1toN extends BoofStandardJUnit {
 	/**
 	 * Makes sure everything is reset properly on multiple calls
 	 */
-	@Test
-	public void multipleCalls() {
+	@Test void multipleCalls() {
 		GeoModelEstimator1toN<DMatrixRMaj,AssociatedPair> alg =
 				new GeoModelEstimator1toN<>(new Dummy(true));
 

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -36,8 +36,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  */
 public class TestPnPResidualReprojection extends BoofStandardJUnit {
 	
-	@Test
-	public void basicTest() {
+	@Test void basicTest() {
 		Se3_F64 motion = new Se3_F64();
 		ConvertRotation3D_F64.eulerToMatrix(EulerType.XYZ,0.1,1,-0.2,motion.getR());
 		motion.getT().setTo(-0.3,0.4,1);

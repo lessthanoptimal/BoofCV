@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -35,8 +35,7 @@ public class TestDenoiseBayesShrink_F32 extends GenericWaveletDenoiseTests<GrayF
 		super(GrayF32.class, 20, FactoryWaveletDaub.daubJ_F32(4), 3);
 	}
 
-	@Test
-	public void standardTests() {
+	@Test void standardTests() {
 		performTest();
 	}
 

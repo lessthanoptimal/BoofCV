@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -25,7 +25,7 @@ import boofcv.struct.image.*;
 
 /**
  * <p>Contains functions related to working with RGB images and converting RGB images to gray-scale using a weighted
- * equation.  The weighted equation is designed to mimic the intensity seen by the human eye.</p>
+ * equation. The weighted equation is designed to mimic the intensity seen by the human eye.</p>
  *
  * <b>Weighted Equation</b><br>
  * gray = 0.299*r + 0.587*g + 0.114*b

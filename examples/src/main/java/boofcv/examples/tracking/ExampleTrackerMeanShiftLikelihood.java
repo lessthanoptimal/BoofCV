@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -37,15 +37,15 @@ import java.awt.image.BufferedImage;
 
 /**
  * Example of how to use the low level implementation of mean-shift to track a specific color provided by the user.
- * The weights of each pixel is computed by RgbLikelihood, see below, and track regions are rectangular.  This
- * tracker works very well since the ball is almost uniformly blue.  If the light varried then a HSV color
+ * The weights of each pixel is computed by RgbLikelihood, see below, and track regions are rectangular. This
+ * tracker works very well since the ball is almost uniformly blue. If the light varried then a HSV color
  * model might be better.
  *
  * @author Peter Abeles
  */
 public class ExampleTrackerMeanShiftLikelihood {
 	/**
-	 * Very simple implementation of PixelLikelihood.  Uses linear distance to compute how close
+	 * Very simple implementation of PixelLikelihood. Uses linear distance to compute how close
 	 * a color is to the target color.
 	 */
 	public static class RgbLikelihood implements PixelLikelihood<Planar<GrayU8>> {
@@ -64,7 +64,7 @@ public class ExampleTrackerMeanShiftLikelihood {
 		@Override public boolean isInBounds(int x, int y) { return image.isInBounds(x,y); }
 
 		/**
-		 * This function is used to learn the target's model from the select image region.  Since the
+		 * This function is used to learn the target's model from the select image region. Since the
 		 * model is provided in the constructor it isn't needed or used.
 		 */
 		@Override public void createModel(RectangleLength2D_I32 target) { throw new RuntimeException("Not supported"); }

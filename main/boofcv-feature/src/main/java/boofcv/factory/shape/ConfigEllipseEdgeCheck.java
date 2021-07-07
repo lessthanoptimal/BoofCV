@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -28,13 +28,13 @@ import boofcv.struct.Configuration;
 public class ConfigEllipseEdgeCheck implements Configuration {
 	/**
 	 * Check:<br>
-	 * Threshold for minimum edge intensity.  This should be a value which is 0 to (max-min pixel value)
+	 * Threshold for minimum edge intensity. This should be a value which is 0 to (max-min pixel value)
 	 * Set to &le; 0 to disable check.
 	 */
 	public double minimumEdgeIntensity = 20;
 
 	/**
-	 * Refinement: how many points along the contour it will sample.  Set to &le; 0 to disable refinement
+	 * Refinement: how many points along the contour it will sample. Set to &le; 0 to disable refinement
 	 */
 	public int numSampleContour = 20;
 	/**

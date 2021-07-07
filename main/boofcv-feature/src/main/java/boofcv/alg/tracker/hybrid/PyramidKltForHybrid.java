@@ -72,7 +72,7 @@ public class PyramidKltForHybrid<I extends ImageGray<I>, D extends ImageGray<D>>
 	}
 
 	/**
-	 * Updates the track using the latest inputs.  If tracking fails then the feature description
+	 * Updates the track using the latest inputs. If tracking fails then the feature description
 	 * in each layer is unchanged and its global position.
 	 *
 	 * @param feature Feature being updated

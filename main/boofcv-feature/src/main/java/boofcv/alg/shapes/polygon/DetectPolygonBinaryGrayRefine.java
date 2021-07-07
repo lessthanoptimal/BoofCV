@@ -109,10 +109,10 @@ public class DetectPolygonBinaryGrayRefine<T extends ImageGray<T>> {
 
 	/**
 	 * <p>Specifies transforms which can be used to change coordinates from distorted to undistorted and the opposite
-	 * coordinates.  The undistorted image is never explicitly created.</p>
+	 * coordinates. The undistorted image is never explicitly created.</p>
 	 *
-	 * @param width Input image width.  Used in sanity check only.
-	 * @param height Input image height.  Used in sanity check only.
+	 * @param width Input image width. Used in sanity check only.
+	 * @param height Input image height. Used in sanity check only.
 	 * @param distToUndist Transform from distorted to undistorted image.
 	 * @param undistToDist Transform from undistorted to distorted image.
 	 */

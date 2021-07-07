@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -29,18 +29,18 @@ import java.util.List;
 
 /**
  * 1) Look at Torch source code
- *    a) Determine the shape of the input tensor.  That will be used to set imageSize
- *    b) Figure out how it normalizes the input.  Are normalization parameters stored in the network?
+ *    a) Determine the shape of the input tensor. That will be used to set imageSize
+ *    b) Figure out how it normalizes the input. Are normalization parameters stored in the network?
  * 2) Load model and inspect in a debugger
  *    List<TorchObject> list = new ParseBinaryTorch7().parse(new File(path,name));
  * 3) Hopefully no problem loading the target object.
- * 4) Your goal now is to figure out where the network is stored.  Inspect the Lua code and the returned object
- *    There is no standard format.  For
+ * 4) Your goal now is to figure out where the network is stored. Inspect the Lua code and the returned object
+ *    There is no standard format. For
  * 5) For resnet-18.t7 the first element in the list is the start of the network
  *    TorchGeneric torchSequence = (TorchGeneric)list.get(0);
- * 6) Convert it into a DeepBoof network.  Cross your fingers and hope that all the layers are supported.
+ * 6) Convert it into a DeepBoof network. Cross your fingers and hope that all the layers are supported.
  * 7) An exception is thrown and it says something isn't support or it just crashes with a weird message
- *    MO**** F***** it's not supported.  Contact Peter and hope there's an easy fix or get ready to make a code contribution to DeepBoof
+ *    MO**** F***** it's not supported. Contact Peter and hope there's an easy fix or get ready to make a code contribution to DeepBoof
  * 8) You got lucky and no error messages!!!
  *
  * @author Peter Abeles

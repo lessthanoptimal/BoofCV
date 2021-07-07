@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -25,8 +25,8 @@ import boofcv.struct.image.*;
  * Low level implementations of Bitmap conversion routines. Contains functions
  * which are not being used for benchmarking purposes.
  *
- * When converting into 565 format a lookup table is used.  The equations used to compute
- * the table round instead of flooring to minimize error.  I believe that this is what the Android
+ * When converting into 565 format a lookup table is used. The equations used to compute
+ * the table round instead of flooring to minimize error. I believe that this is what the Android
  * library does too, without looking at the code.
  *
  * @author Peter Abeles

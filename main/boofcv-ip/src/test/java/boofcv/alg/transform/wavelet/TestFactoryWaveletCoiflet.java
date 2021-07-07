@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -31,8 +31,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
  */
 public class TestFactoryWaveletCoiflet extends CommonFactoryWavelet {
 
-	@Test
-	public void transform_generate_F32() {
+	@Test void transform_generate_F32() {
 
 		for( int i = 6; i <= 6; i += 2 ) {
 			WaveletDescription<WlCoef_F32> desc = FactoryWaveletCoiflet.generate_F32(i);
@@ -44,8 +43,7 @@ public class TestFactoryWaveletCoiflet extends CommonFactoryWavelet {
 	/**
 	 * Sees if the standard CoifI wavelets have the expected characteristics
 	 */
-	@Test
-	public void generate_F32() {
+	@Test void generate_F32() {
 
 		for( int i = 6; i <= 6; i += 2 ) {
 

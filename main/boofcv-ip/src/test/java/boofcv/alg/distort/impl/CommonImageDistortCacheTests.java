@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -62,8 +62,7 @@ public abstract class CommonImageDistortCacheTests<T extends ImageGray<T>> exten
 		GImageMiscOps.addGaussian(src, rand, 10, 0, 255);
 	}
 
-	@Test
-	public void compareNoCrop() {
+	@Test void compareNoCrop() {
 
 		ImageDistort<T,T> standard = FactoryDistort.distortSB(false, interp, imageType);
 		ImageDistortCache_SB<T,T> alg = create(interp,imageType);
@@ -77,8 +76,7 @@ public abstract class CommonImageDistortCacheTests<T extends ImageGray<T>> exten
 		BoofTesting.assertEquals(dst0, dst1, 1e-4);
 	}
 
-	@Test
-	public void compareCrop() {
+	@Test void compareCrop() {
 
 		ImageDistort<T,T> standard = FactoryDistort.distortSB(false, interp, imageType);
 		ImageDistortCache_SB<T,T> alg = create(interp,imageType);

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -32,7 +32,7 @@ import georegression.struct.se.Se3_F64;
 /**
  * <p>
  * Visual odometry that estimate the camera's ego-motion in Euclidean space using a camera image and
- * a depth image.  Camera motion is estimated relative to the first frame in the left camera's point of view.
+ * a depth image. Camera motion is estimated relative to the first frame in the left camera's point of view.
  * </p>
  *
  * <p>
@@ -58,7 +58,7 @@ import georegression.struct.se.Se3_F64;
  * @param <Depth> Depth camera sensor
  */
 
-// DEVELOPMENT NOTE: This right now assumes that the depth image contains depth.  A transform could be added which
+// DEVELOPMENT NOTE: This right now assumes that the depth image contains depth. A transform could be added which
 //                   would convert it from the internal value into depth. This would allow a sparse depth calculation
 //                   right now the depth of the whole image must be computed.
 public interface DepthVisualOdometry<Vis extends ImageBase<Vis>, Depth extends ImageGray<Depth>>
@@ -72,8 +72,8 @@ public interface DepthVisualOdometry<Vis extends ImageBase<Vis>, Depth extends I
 	void setCalibration( CameraPinholeBrown paramVisual, Point2Transform2_F32 visToDepth );
 
 	/**
-	 * Process the new image and update the motion estimate.  The return value must be checked
-	 * to see if the estimate was actually updated.  If false is returned then {@link #isFault()}
+	 * Process the new image and update the motion estimate. The return value must be checked
+	 * to see if the estimate was actually updated. If false is returned then {@link #isFault()}
 	 * also needs to be checked to see if the pose estimate has been reset.
 	 *
 	 * @param visual Image from visual camera

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -45,8 +45,7 @@ public class TestDetectPolygonBinaryGrayRefine extends CommonFitPolygonChecks {
 
 	GrayU8 binary = new GrayU8(1,1);
 
-	@Test
-	public void simpleDetection() {
+	@Test void simpleDetection() {
 		rectangles.add(new Rectangle2D_I32(30,30,60,60));
 		rectangles.add(new Rectangle2D_I32(90,30,120,60));
 
@@ -72,8 +71,7 @@ public class TestDetectPolygonBinaryGrayRefine extends CommonFitPolygonChecks {
 		checkSolutions(tolRefined, found);
 	}
 
-	@Test
-	public void usingSetLensDistortion() {
+	@Test void usingSetLensDistortion() {
 		rectangles.add(new Rectangle2D_I32(30,30,60,60));
 		rectangles.add(new Rectangle2D_I32(90,30,120,60));
 		rectangles.add(new Rectangle2D_I32(30,90,60,120));
@@ -126,8 +124,7 @@ public class TestDetectPolygonBinaryGrayRefine extends CommonFitPolygonChecks {
 		}
 	}
 
-	@Test
-	public void refineAll() {
+	@Test void refineAll() {
 		rectangles.add(new Rectangle2D_I32(30,30,60,60));
 		rectangles.add(new Rectangle2D_I32(90,30,120,60));
 
@@ -169,8 +166,7 @@ public class TestDetectPolygonBinaryGrayRefine extends CommonFitPolygonChecks {
 	/**
 	 * See if it removes a polygon when bias reduces its size below the minimum
 	 */
-	@Test
-	public void removePolygonWhenAdjustMakesTooSmall() {
+	@Test void removePolygonWhenAdjustMakesTooSmall() {
 		DetectPolygonBinaryGrayRefine alg = createAlg(GrayU8.class, 4,4);
 		alg.detector = new MockDetector();
 		alg.adjustForBias = new MockAdjustBias();

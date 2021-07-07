@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -84,7 +84,7 @@ public class ExampleVisualOdometryDepth {
 				FactoryVisualOdometry.depthDepthPnP(1.5, 120, 2, 200, 50, true,
 				sparseDepth, tracker, GrayU8.class, GrayU16.class);
 
-		// Pass in intrinsic/extrinsic calibration.  This can be changed in the future.
+		// Pass in intrinsic/extrinsic calibration. This can be changed in the future.
 		visualOdometry.setCalibration(param.visualParam,new DoNothing2Transform2_F32());
 
 		// Process the video sequence and output the location plus number of inliers

@@ -58,7 +58,7 @@ public class BundleAdjustmentMetricResidualFunction
 
 	// number of parameters being optimised
 	private int numParameters;
-	// number of observations.  2 for each point in each view
+	// number of observations. 2 for each point in each view
 	private int numObservations;
 
 	// local variable which stores the predicted location of the feature in the camera frame

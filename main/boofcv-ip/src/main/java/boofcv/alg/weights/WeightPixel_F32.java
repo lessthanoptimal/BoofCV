@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -19,8 +19,8 @@
 package boofcv.alg.weights;
 
 /**
- * Used to get the weight for a pixel from a kernel in 2D space.  The kernel is assumed to be centered around 0
- * and has the specified radius.  The kernel has a width of radius*2 + 1.  The information stored inside
+ * Used to get the weight for a pixel from a kernel in 2D space. The kernel is assumed to be centered around 0
+ * and has the specified radius. The kernel has a width of radius*2 + 1. The information stored inside
  * this interface could be represented as a 2D array, but the interface allows a simple return to be used
  * if the value is constant.
  *
@@ -30,7 +30,7 @@ public interface WeightPixel_F32 {
 
 	/**
 	 * <p>
-	 * Faster way to access the weight.  Refers to the index in a row major matrix.<br>
+	 * Faster way to access the weight. Refers to the index in a row major matrix.<br>
 	 * <br>
 	 * x = (index % widthX) - radiusX <br>
 	 * y = (index / widthX) - radiusY <br>

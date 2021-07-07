@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -22,7 +22,7 @@ import boofcv.struct.image.ImageBase;
 
 /**
  *  Generalized interface for filtering images with convolution kernels while skipping pixels.
- * Can invoke different techniques for handling image borders.  The first pixel sampled is always (0,0) and the
+ * Can invoke different techniques for handling image borders. The first pixel sampled is always (0,0) and the
  * sampled pixels are (x*skip,y*skip).
  *
  * @author Peter Abeles

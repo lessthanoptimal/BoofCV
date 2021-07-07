@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -29,8 +29,8 @@ import boofcv.factory.feature.detect.selector.ConfigSelectLimit;
 public class ConfigGeneralDetector extends ConfigExtract {
 
 	/**
-	 * Specifies the maximum number of features it will detect.  If a value is specified then the 'maxFeatures' most
-	 * intense features are returned.  Set to a value &le; 0 to return all selected features.  Default is -1.
+	 * Specifies the maximum number of features it will detect. If a value is specified then the 'maxFeatures' most
+	 * intense features are returned. Set to a value &le; 0 to return all selected features. Default is -1.
 	 */
 	public int maxFeatures = -1;
 	/**

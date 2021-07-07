@@ -22,13 +22,13 @@ import georegression.struct.point.Point2D_I32;
 
 /**
  * <p>
- * Describes the layout of a BRIEF descriptor.  This descriptor is composed of a set of locations
+ * Describes the layout of a BRIEF descriptor. This descriptor is composed of a set of locations
  * where image intensity is sampled and a list of which locations are compared against each other.
  * </p>
  *
  * <p>
- * NOTE: The data structure here is different than the one implied in the paper.  A single list of sample points
- * is provided instead of two lists.  This way a single set of points can sample within the same set, reducing
+ * NOTE: The data structure here is different than the one implied in the paper. A single list of sample points
+ * is provided instead of two lists. This way a single set of points can sample within the same set, reducing
  * the number of samples taken.
  * </p>
  *

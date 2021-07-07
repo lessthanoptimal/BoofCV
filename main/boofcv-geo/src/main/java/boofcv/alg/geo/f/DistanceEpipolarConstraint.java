@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -27,7 +27,7 @@ import org.ejml.dense.row.CommonOps_DDRM;
 import java.util.List;
 
 /**
- * Computes error using the epipolar constraint.  The input matrix is normalized so that different matrices
+ * Computes error using the epipolar constraint. The input matrix is normalized so that different matrices
  * can be compared at the same scale.
  *
  * @author Peter Abeles

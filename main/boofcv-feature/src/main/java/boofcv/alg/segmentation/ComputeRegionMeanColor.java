@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -55,7 +55,7 @@ public abstract class ComputeRegionMeanColor<T extends ImageBase<T>> {
 	 * @param image Input image
 	 * @param pixelToRegion Conversion between pixel to region index
 	 * @param regionMemberCount List which stores the number of members for each region
-	 * @param regionColor (Output) Storage for mean color throughout the region.  Internal array must be fully
+	 * @param regionColor (Output) Storage for mean color throughout the region. Internal array must be fully
 	 * declared.
 	 */
 	public void process( T image, GrayS32 pixelToRegion,
@@ -105,7 +105,7 @@ public abstract class ComputeRegionMeanColor<T extends ImageBase<T>> {
 	}
 
 	/**
-	 * Image type specific implementation.  Adds the pixel value at the specified pixel to sum
+	 * Image type specific implementation. Adds the pixel value at the specified pixel to sum
 	 *
 	 * @param index Pixel index in the image which is being read
 	 * @param sum Where the pixel's value is added to

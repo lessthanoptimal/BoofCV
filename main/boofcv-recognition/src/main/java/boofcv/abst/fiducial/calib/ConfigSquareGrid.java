@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -48,7 +48,7 @@ public class ConfigSquareGrid implements Configuration {
 	public ConfigPolygonDetector square = new ConfigPolygonDetector();
 
 	{
-		// this is being used as a way to smooth out the binary image.  Speeds things up quite a bit
+		// this is being used as a way to smooth out the binary image. Speeds things up quite a bit
 		thresholding.scale = 0.85;
 
 		((ConfigPolylineSplitMerge)square.detector.contourToPoly).cornerScorePenalty = 0.5;

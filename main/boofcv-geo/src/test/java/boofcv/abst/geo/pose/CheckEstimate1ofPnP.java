@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -29,7 +29,7 @@ import java.util.List;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
- * General tests for implementations of Estimate1ofPnP.  Ensures that the returned motion estimate is in
+ * General tests for implementations of Estimate1ofPnP. Ensures that the returned motion estimate is in
  * the correct direction and works under nominal conditions
  *
  *
@@ -51,8 +51,7 @@ public abstract class CheckEstimate1ofPnP extends BaseChecksPnP {
 	/**
 	 * Feed it perfect observations and see if it returns nearly perfect results
 	 */
-	@Test
-	public void perfectObservations() {
+	@Test void perfectObservations() {
 		if( !onlyMinimum ) {
 			// test it with extra observations
 			perfectObservations(alg.getMinimumPoints()+20);
@@ -80,8 +79,7 @@ public abstract class CheckEstimate1ofPnP extends BaseChecksPnP {
 	/**
 	 * Sanity check to see if the minimum number of observations has been set.
 	 */
-	@Test
-	public void checkMinimumPoints() {
+	@Test void checkMinimumPoints() {
 		assertTrue(alg.getMinimumPoints() != 0 );
 	}
 }

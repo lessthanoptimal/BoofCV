@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -43,52 +43,52 @@ import java.util.List;
 /**
  * <p>
  * Implementation of the EPnP algorithm from [1] for solving the PnP problem when N &ge; 5 for the general case
- * and N &ge; 4 for planar data (see note below).  Given a calibrated camera, n pairs of 2D point observations and the known 3D
+ * and N &ge; 4 for planar data (see note below). Given a calibrated camera, n pairs of 2D point observations and the known 3D
  * world coordinates, it solves the for camera's pose.. This solution is non-iterative and claims to be much
- * faster and more accurate than the alternatives.  Works for both planar and non-planar configurations.
+ * faster and more accurate than the alternatives. Works for both planar and non-planar configurations.
  * </p>
  *
  * <p>
- * Expresses the N 3D point as a weighted sum of four virtual control points.  Problem then becomes to estimate
+ * Expresses the N 3D point as a weighted sum of four virtual control points. Problem then becomes to estimate
  * the coordinates of the control points in the camera referential, which can be done in O(n) time.
  * </p>
  *
  * <p>
  * After estimating the control points the solution can be refined using Gauss Newton non-linear
- * optimization.  The objective function being optimizes
+ * optimization. The objective function being optimizes
  * reduces the difference between world and camera control point distances by adjusting
- * the values of beta.  Optimization is very fast, but can degrade accuracy if over optimized.
- * See warning below.  To turn on non-linear optimization set {@link #setNumIterations(int)} to
+ * the values of beta. Optimization is very fast, but can degrade accuracy if over optimized.
+ * See warning below. To turn on non-linear optimization set {@link #setNumIterations(int)} to
  * a positive number.
  * </p>
  *
  * <p>
  * After experimentation there doesn't seem to be any universally best way to choose the control
- * point distribution.  To allow tuning for specific problems the 'magic number' has been provided.
+ * point distribution. To allow tuning for specific problems the 'magic number' has been provided.
  * Larger values increase the control point distribution's size. In general smaller numbers appear
  * to be better for noisier data, but can degrade results if too small.
  * </p>
  *
  * <p>
  * MINIMUM POINTS: According to the original paper [1] only 4 points are needed for the general case.
- * In practice it produces very poor results on average.  The matlab code provided by the original author
- * also exhibits instability in the minimum case.  The article also does not show results for the minimum
- * case, making it hard to judge what should be expected.  However, I'm not ruling out there being a bug
- * in relinearization.  See that code for comments.  Correspondence with the original author indicates that
+ * In practice it produces very poor results on average. The matlab code provided by the original author
+ * also exhibits instability in the minimum case. The article also does not show results for the minimum
+ * case, making it hard to judge what should be expected. However, I'm not ruling out there being a bug
+ * in relinearization. See that code for comments. Correspondence with the original author indicates that
  * he did not expect results from relinearization to be as accurate as the other cases.
  * </p>
  *
  * <p>
- * NOTES: This implementation deviates in some minor ways from what was described in the paper.  However, their
- * own example code (Matlab and C++) are mutually different in significant ways too.  See how solutions are scored,
- * linear systems are solved, and how world control points are computed.  How control points are computed here
+ * NOTES: This implementation deviates in some minor ways from what was described in the paper. However, their
+ * own example code (Matlab and C++) are mutually different in significant ways too. See how solutions are scored,
+ * linear systems are solved, and how world control points are computed. How control points are computed here
  * is inspired from their C++ example (technique used in their matlab example has some stability issues), but
  * there is probably room for more improvement.
  * </p>
  *
  * <p>
- * WARNING: Setting the number of optimization iterations too high can actually degrade accuracy.  The
- * objective function being minimized is not observation residuals.  Locally it appears
+ * WARNING: Setting the number of optimization iterations too high can actually degrade accuracy. The
+ * objective function being minimized is not observation residuals. Locally it appears
  * to be a good approximation, but can diverge and actually produce worse results. Because
  * of this behavior, more advanced optimization routines are unnecessary and counter productive.
  * </p>
@@ -191,10 +191,10 @@ public class PnPLepetitEPnP {
 	}
 
 	/**
-	 * Used to turn on and off non-linear optimization.  To turn on set to a positive number.
+	 * Used to turn on and off non-linear optimization. To turn on set to a positive number.
 	 * See warning in class description about setting the number of iterations too high.
 	 *
-	 * @param numIterations Number of iterations.  Try 10.
+	 * @param numIterations Number of iterations. Try 10.
 	 */
 	public void setNumIterations( int numIterations ) {
 		this.numIterations = numIterations;
@@ -278,8 +278,8 @@ public class PnPLepetitEPnP {
 	}
 
 	/**
-	 * Score a solution based on distance between control points.  Closer the camera
-	 * control points are from the world control points the better the score.  This is
+	 * Score a solution based on distance between control points. Closer the camera
+	 * control points are from the world control points the better the score. This is
 	 * similar to how optimization score works and not the way recommended in the original
 	 * paper.
 	 */
@@ -302,10 +302,10 @@ public class PnPLepetitEPnP {
 	}
 
 	/**
-	 * Selects control points along the data's axis and the data's centroid.  If the data is determined
+	 * Selects control points along the data's axis and the data's centroid. If the data is determined
 	 * to be planar then only 3 control points are selected.
 	 *
-	 * The data's axis is determined by computing the covariance matrix then performing SVD.  The axis
+	 * The data's axis is determined by computing the covariance matrix then performing SVD. The axis
 	 * is contained along the
 	 */
 	public void selectWorldControlPoints( List<Point3D_F64> worldPts, DogArray<Point3D_F64> controlWorldPts ) {
@@ -362,7 +362,7 @@ public class PnPLepetitEPnP {
 
 	/**
 	 * <p>
-	 * Given the control points it computes the 4 weights for each camera point.  This is done by
+	 * Given the control points it computes the 4 weights for each camera point. This is done by
 	 * solving the following linear equation: C*&alpha;=X. where C is the control point matrix,
 	 * &alpha; is the 4 by n matrix containing the solution, and X is the camera point matrix.
 	 * N is the number of points.
@@ -447,7 +447,7 @@ public class PnPLepetitEPnP {
 	}
 
 	/**
-	 * Computes M'*M and finds the null space.  The 4 eigenvectors with the smallest eigenvalues are found
+	 * Computes M'*M and finds the null space. The 4 eigenvectors with the smallest eigenvalues are found
 	 * and the null points extracted from them.
 	 */
 	protected void extractNullPoints( DMatrixRMaj M ) {
@@ -562,7 +562,7 @@ public class PnPLepetitEPnP {
 	}
 
 	/**
-	 * Simple analytical solution.  Just need to solve for the scale difference in one set
+	 * Simple analytical solution. Just need to solve for the scale difference in one set
 	 * of potential control points.
 	 */
 	protected void estimateCase1( double[] betas ) {
@@ -677,9 +677,9 @@ public class PnPLepetitEPnP {
 	}
 
 	/**
-	 * Returns the minimum number of points required to make an estimate.  Technically
-	 * it is 4 for general and 3 for planar.  The minimum number of point cases
-	 * seem to be a bit unstable in some situations.  minimum + 1 or more is stable.
+	 * Returns the minimum number of points required to make an estimate. Technically
+	 * it is 4 for general and 3 for planar. The minimum number of point cases
+	 * seem to be a bit unstable in some situations. minimum + 1 or more is stable.
 	 *
 	 * @return minimum number of points
 	 */

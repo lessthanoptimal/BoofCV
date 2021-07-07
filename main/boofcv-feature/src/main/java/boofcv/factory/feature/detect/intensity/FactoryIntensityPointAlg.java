@@ -39,8 +39,8 @@ public class FactoryIntensityPointAlg {
 	/**
 	 * Common interface for creating a {@link FastCornerDetector} from different image types.
 	 *
-	 * @param pixelTol How different pixels need to be to be considered part of a corner. Image dependent.  Try 20 to start.
-	 * @param minCont Minimum number of continue pixels in a circle for it ot be a corner.  Can be 9,10,11 or 12.
+	 * @param pixelTol How different pixels need to be to be considered part of a corner. Image dependent. Try 20 to start.
+	 * @param minCont Minimum number of continue pixels in a circle for it ot be a corner. Can be 9,10,11 or 12.
 	 * @param imageType Type of input image it is computed form.
 	 * @return Fast corner
 	 */
@@ -88,7 +88,7 @@ public class FactoryIntensityPointAlg {
 	 * @param windowRadius Size of the feature it is detects,Try 2.
 	 * @param kappa Tuning parameter, typically a small number around 0.04
 	 * @param weighted Is the gradient weighted using a Gaussian distribution?  Weighted is much slower than unweighted.
-	 * @param derivType Image derivative type it is computed from.  @return Harris corner
+	 * @param derivType Image derivative type it is computed from. @return Harris corner
 	 */
 	public static <D extends ImageGray<D>>
 	GradientCornerIntensity<D> harris( int windowRadius, float kappa, boolean weighted, Class<D> derivType ) {

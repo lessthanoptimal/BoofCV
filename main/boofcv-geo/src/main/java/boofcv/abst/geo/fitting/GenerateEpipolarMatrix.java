@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -26,7 +26,7 @@ import org.ejml.data.DMatrixRMaj;
 import java.util.List;
 
 /**
- * Wrapper around {@link boofcv.abst.geo.Estimate1ofEpipolar} for {@link ModelGenerator}.  Used for robust model
+ * Wrapper around {@link boofcv.abst.geo.Estimate1ofEpipolar} for {@link ModelGenerator}. Used for robust model
  * fitting with outliers.
  * 
  * @author Peter Abeles

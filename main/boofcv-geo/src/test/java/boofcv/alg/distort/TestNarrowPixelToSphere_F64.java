@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -31,8 +31,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
  * @author Peter Abeles
  */
 public class TestNarrowPixelToSphere_F64 extends BoofStandardJUnit {
-	@Test
-	public void basic() {
+	@Test void basic() {
 
 		NarrowPixelToSphere_F64 alg = new NarrowPixelToSphere_F64(new Dummy());
 

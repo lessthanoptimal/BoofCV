@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -29,8 +29,8 @@ import boofcv.struct.image.*;
 /**
  * <p>
  * Specialized convolution where the center of the convolution skips over a constant number
- * of pixels in the x and/or y axis.  The output it written into an image in a dense fashion,
- * resulting in it being at a lower resolution.  A typical application for this is down sampling
+ * of pixels in the x and/or y axis. The output it written into an image in a dense fashion,
+ * resulting in it being at a lower resolution. A typical application for this is down sampling
  * inside an image pyramid.
  * </p>
  * 

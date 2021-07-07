@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -31,7 +31,7 @@ import javax.annotation.Generated;
  * Performs nearest neighbor interpolation to extract values between pixels in an image.
  * </p>
  *
- * <p>DO NOT MODIFY.  Automatically generated code created by GenerateNearestNeighborPixel_IL</p>
+ * <p>DO NOT MODIFY. Automatically generated code created by GenerateNearestNeighborPixel_IL</p>
  *
  * @author Peter Abeles
  */

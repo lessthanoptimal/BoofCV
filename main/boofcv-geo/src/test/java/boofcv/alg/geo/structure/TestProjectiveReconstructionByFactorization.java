@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -36,8 +36,7 @@ public class TestProjectiveReconstructionByFactorization extends CommonStructure
 	/**
 	 * Perfect observations and perfect input, Output should be just perfect
 	 */
-	@Test
-	public void perfect_input() {
+	@Test void perfect_input() {
 		int numViews = 8;
 		int numFeatures = 10;
 		simulate(numViews,numFeatures,false);
@@ -76,8 +75,7 @@ public class TestProjectiveReconstructionByFactorization extends CommonStructure
 	/**
 	 * All data is perfect, but 1 is used for the depth estimate
 	 */
-	@Test
-	public void perfect_input_badDepths() {
+	@Test void perfect_input_badDepths() {
 		int numViews = 8;
 		int numFeatures = 10;
 		simulate(numViews,numFeatures,false);

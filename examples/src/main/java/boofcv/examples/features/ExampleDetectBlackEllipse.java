@@ -36,7 +36,7 @@ import java.awt.image.BufferedImage;
 import java.io.File;
 
 /**
- * Example of how to detect black ellipses with a white background inside of images.  These ellipses will have a
+ * Example of how to detect black ellipses with a white background inside of images. These ellipses will have a
  * high level of accuracy and are used in camera calibration else where.
  *
  * @author Peter Abeles
@@ -59,7 +59,7 @@ public class ExampleDetectBlackEllipse {
 			GrayU8 input = ConvertBufferedImage.convertFromSingle(image, null, GrayU8.class);
 			GrayU8 binary = new GrayU8(input.width, input.height);
 
-			// Binarization is done outside to allows creative tricks.  For example, when applied to a chessboard
+			// Binarization is done outside to allows creative tricks. For example, when applied to a chessboard
 			// pattern where square touch each other, the binary image is eroded first so that they don't touch.
 			// The squares are expanded automatically during the subpixel optimization step.
 			int threshold = (int)GThresholdImageOps.computeOtsu(input, 0, 255);

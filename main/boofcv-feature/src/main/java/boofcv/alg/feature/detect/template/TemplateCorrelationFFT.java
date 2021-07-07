@@ -100,14 +100,14 @@ public class TemplateCorrelationFFT
 			}
 		}
 
-		// the image border is zero padded due to how the FFT is compute.  So avoid that
+		// the image border is zero padded due to how the FFT is compute. So avoid that
 		borderX0 = template.width/2;
 		borderX1 = template.width - borderX0;
 		borderY0 = template.height/2;
 		borderY1 = template.height - borderY0;
 
 		// insert the template into the enlarged image
-		// want it to be at (0,0) coordinate.  This requires wrapping it around the corners
+		// want it to be at (0,0) coordinate. This requires wrapping it around the corners
 		GImageMiscOps.fill(enlargedTemplate, 0);
 //		int x0 = 0;//enlargedTemplate.width-template.width;
 //		int y0 = 0;//enlargedTemplate.height-template.height;

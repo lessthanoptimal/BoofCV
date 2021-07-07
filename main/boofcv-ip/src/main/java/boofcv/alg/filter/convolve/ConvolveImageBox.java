@@ -34,7 +34,7 @@ import org.jetbrains.annotations.Nullable;
 import pabeles.concurrency.GrowArray;
 
 /**
- * Convolves a kernel which is composed entirely of 1's across an image.  This special kernel can be highly optimized
+ * Convolves a kernel which is composed entirely of 1's across an image. This special kernel can be highly optimized
  * and has a computational complexity independent of the kernel size.
  *
  * @author Peter Abeles

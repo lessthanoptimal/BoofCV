@@ -33,7 +33,7 @@ public class KltFeature {
 	public float x, y;
 
 	/**
-	 * The feature's size.  Each feature is square with a width equal to its
+	 * The feature's size. Each feature is square with a width equal to its
 	 * radius*2+1.
 	 */
 	public int radius;

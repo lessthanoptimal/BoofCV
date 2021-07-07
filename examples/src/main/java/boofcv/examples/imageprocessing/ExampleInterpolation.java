@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -33,7 +33,7 @@ import java.awt.image.BufferedImage;
 
 /**
  * Interpolation is used to convert an image, which is discrete by its nature, into a (piecewise) smooth function.
- * Interpolation is in many CV applications, such as feature detection, and when distorting images.  In this
+ * Interpolation is in many CV applications, such as feature detection, and when distorting images. In this
  * example a low resolution is scaled up using several different techniques to make the differences easily visible.
  * For computer vision applications bilinear interpolation is almost always used.
  *
@@ -50,7 +50,7 @@ public class ExampleInterpolation {
 
 		gui.addImage(buffered, "Original");
 
-		// For sake of simplicity assume it's a gray scale image.  Interpolation functions exist for planar and
+		// For sake of simplicity assume it's a gray scale image. Interpolation functions exist for planar and
 		// interleaved color images too
 		GrayF32 input = ConvertBufferedImage.convertFrom(buffered, (GrayF32)null);
 		GrayF32 scaled = input.createNew(500, 500*input.height/input.width);
@@ -63,10 +63,10 @@ public class ExampleInterpolation {
 			// Tell it which image is being interpolated
 			interp.setImage(input);
 
-			// Manually apply scaling to the input image.  See FDistort() for a built in function which does
+			// Manually apply scaling to the input image. See FDistort() for a built in function which does
 			// the same thing and is slightly more efficient
 			for (int y = 0; y < scaled.height; y++) {
-				// iterate using the 1D index for added performance.  Altertively there is the set(x,y) operator
+				// iterate using the 1D index for added performance. Altertively there is the set(x,y) operator
 				int indexScaled = scaled.startIndex + y*scaled.stride;
 				float origY = y*input.height/(float)scaled.height;
 

@@ -59,8 +59,7 @@ public abstract class BaseTestDescribePointBinaryCompare<T extends ImageGray<T>>
 	/**
 	 * Have brief process a sub-image and see if it produces the same results.
 	 */
-	@Test
-	public void testSubImage() {
+	@Test void testSubImage() {
 		T input = createImage(width, height);
 
 		DescribePointBinaryCompare<T> alg = createAlg(def);
@@ -84,8 +83,7 @@ public abstract class BaseTestDescribePointBinaryCompare<T extends ImageGray<T>>
 	/**
 	 * Change the input image size and see if it handles that case properly.
 	 */
-	@Test
-	public void changeInInputSize() {
+	@Test void changeInInputSize() {
 		T inputA = createImage(width, height);
 		T inputB = createImage(width - 5, height - 5);
 
@@ -103,8 +101,7 @@ public abstract class BaseTestDescribePointBinaryCompare<T extends ImageGray<T>>
 	/**
 	 * Vary the intensity of the input image and see if the description changes.
 	 */
-	@Test
-	public void testIntensityInvariance() {
+	@Test void testIntensityInvariance() {
 		T input = createImage(width, height);
 		T mod = (T)input.clone();
 
@@ -134,8 +131,7 @@ public abstract class BaseTestDescribePointBinaryCompare<T extends ImageGray<T>>
 	/**
 	 * Compute the descriptor manually and see if it gets the same answer
 	 */
-	@Test
-	public void testManualCheck() {
+	@Test void testManualCheck() {
 		T input = createImage(width, height);
 
 		GImageGray a = FactoryGImageGray.wrap(input);
@@ -164,8 +160,7 @@ public abstract class BaseTestDescribePointBinaryCompare<T extends ImageGray<T>>
 	/**
 	 * See if the border is handled correctly
 	 */
-	@Test
-	public void testImageBorder() {
+	@Test void testImageBorder() {
 		T input = createImage(width, height);
 
 		DescribePointBinaryCompare<T> alg = createAlg(def);
@@ -174,7 +169,7 @@ public abstract class BaseTestDescribePointBinaryCompare<T extends ImageGray<T>>
 
 		TupleDesc_B desc = createFeature();
 
-		// just see if it blows up for now.  a more rigorous test would be better
+		// just see if it blows up for now. a more rigorous test would be better
 		alg.process(0, 0, desc);
 		alg.process(width - 1, height - 1, desc);
 

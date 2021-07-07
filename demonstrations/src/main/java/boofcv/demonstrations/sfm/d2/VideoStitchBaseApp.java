@@ -47,7 +47,7 @@ import java.util.List;
 
 /**
  * Parent class for applications which estimate image motion based upon fit parameters to a model on extracted
- * point features.  Only gray scale images are processed, but the output can be in gray scale or color.
+ * point features. Only gray scale images are processed, but the output can be in gray scale or color.
  *
  * @author Peter Abeles
  */

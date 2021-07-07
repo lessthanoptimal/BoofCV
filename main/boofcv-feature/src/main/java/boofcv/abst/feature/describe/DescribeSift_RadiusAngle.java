@@ -29,8 +29,8 @@ import boofcv.struct.image.ImageGray;
 import boofcv.struct.image.ImageType;
 
 /**
- * Allows you to use SIFT features independent of the SIFT detector.  A SIFT scale-space is computed with all octaves
- * and most of the scales saved.  When a few feature is requested it looks up the closest scale image and uses
+ * Allows you to use SIFT features independent of the SIFT detector. A SIFT scale-space is computed with all octaves
+ * and most of the scales saved. When a few feature is requested it looks up the closest scale image and uses
  * that as the input image.
  *
  * @author Peter Abeles
@@ -38,7 +38,7 @@ import boofcv.struct.image.ImageType;
 public class DescribeSift_RadiusAngle<T extends ImageGray<T>>
 	implements DescribePointRadiusAngle<T,TupleDesc_F64>
 {
-	// expected type of input image.  All image types are converted to floats since that's what
+	// expected type of input image. All image types are converted to floats since that's what
 	// the scale-space requires
 	ImageType<T> imageType;
 

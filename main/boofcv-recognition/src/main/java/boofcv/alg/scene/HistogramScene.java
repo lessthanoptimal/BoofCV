@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -28,7 +28,7 @@ import java.io.Serializable;
  */
 public class HistogramScene implements Serializable {
 	/**
-	 * Normalized word frequency histogram.  Normalized so that it sums up to 1.
+	 * Normalized word frequency histogram. Normalized so that it sums up to 1.
 	 */
 	public double histogram[];
 	/**

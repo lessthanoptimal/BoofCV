@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -24,7 +24,7 @@ package boofcv.alg.geo;
  * </p>
  *
  * <p>
- * Note that "residual = predicted - observed".  Typically the "error = residual^T*residual".
+ * Note that "residual = predicted - observed". Typically the "error = residual^T*residual".
  * </p>
  * @author Peter Abeles
  */
@@ -41,7 +41,7 @@ public interface ModelObservationResidualN<Model,Observation> {
 	 * Compute the residual errors for the observation
 	 *
 	 * @param observation Observation of point feature in two views
-	 * @return The new index.  index + getN()
+	 * @return The new index. index + getN()
 	 */
 	public int computeResiduals(Observation observation , double residuals[] , int index );
 

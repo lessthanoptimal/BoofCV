@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -48,8 +48,7 @@ public class TestFactoryConvolveDown extends BoofStandardJUnit {
 	int width = 30;
 	int height = 40;
 
-	@Test
-	public void convolve1D_F32() {
+	@Test void convolve1D_F32() {
 		Kernel1D_F32 kernel = FactoryKernel.random1D_F32(kernelWidth,radius,1,6,rand);
 
 		FilterImageInterface<GrayF32,GrayF32> conv;
@@ -79,8 +78,7 @@ public class TestFactoryConvolveDown extends BoofStandardJUnit {
 		BoofTesting.assertEquals(expected,found,1e-4f);
 	}
 
-	@Test
-	public void convolve1D_I32() {
+	@Test void convolve1D_I32() {
 
 		Kernel1D_S32 kernel = FactoryKernel.random1D_I32(kernelWidth,radius,1,6,rand);
 
@@ -113,8 +111,7 @@ public class TestFactoryConvolveDown extends BoofStandardJUnit {
 		BoofTesting.assertEquals(expected8,found8,0);
 	}
 
-	@Test
-	public void convolve2D_F32() {
+	@Test void convolve2D_F32() {
 		Kernel2D_F32 kernel = FactoryKernel.random2D_F32(kernelWidth,radius,1,6,rand);
 
 		FilterImageInterface<GrayF32,GrayF32> conv;
@@ -144,8 +141,7 @@ public class TestFactoryConvolveDown extends BoofStandardJUnit {
 		BoofTesting.assertEquals(expected,found,1e-4f);
 	}
 
-	@Test
-	public void convolve2D_I32() {
+	@Test void convolve2D_I32() {
 
 		Kernel2D_S32 kernel = FactoryKernel.random2D_I32(kernelWidth,radius,1,6,rand);
 

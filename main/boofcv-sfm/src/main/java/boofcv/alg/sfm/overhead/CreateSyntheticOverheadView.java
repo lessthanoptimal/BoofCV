@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -33,8 +33,8 @@ import org.ddogleg.struct.DogArray;
 /**
  * <p>
  * Converts a camera image into an overhead orthogonal view with known metric properties given a known transform from the
- * plane to camera.  This will only produce a valid orthogonal view when the
- * surface being viewed is entirely planar, non-planar objects are heavily distorted.  See {@link OverheadView}
+ * plane to camera. This will only produce a valid orthogonal view when the
+ * surface being viewed is entirely planar, non-planar objects are heavily distorted. See {@link OverheadView}
  * for more details.
  * </p>
  *
@@ -71,7 +71,7 @@ public abstract class CreateSyntheticOverheadView<T extends ImageBase<T>> {
 	 * Specifies camera configurations.
 	 *
 	 * @param intrinsic Intrinsic camera parameters
-	 * @param planeToCamera Transform from the plane to the camera.  This is the extrinsic parameters.
+	 * @param planeToCamera Transform from the plane to the camera. This is the extrinsic parameters.
 	 * @param centerX X-coordinate of camera center in the overhead image in world units.
 	 * @param centerY Y-coordinate of camera center in the overhead image in world units.
 	 * @param cellSize Size of each cell in the overhead image in world units.

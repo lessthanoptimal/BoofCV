@@ -43,9 +43,9 @@ import java.util.List;
 
 /**
  * After interest points have been detected in two images the next step is to associate the two
- * sets of images so that the relationship can be found.  This is done by computing descriptors for
- * each detected feature and associating them together.  In the code below abstracted interfaces are
- * used to allow different algorithms to be easily used.  The cost of this abstraction is that detector/descriptor
+ * sets of images so that the relationship can be found. This is done by computing descriptors for
+ * each detected feature and associating them together. In the code below abstracted interfaces are
+ * used to allow different algorithms to be easily used. The cost of this abstraction is that detector/descriptor
  * specific information is thrown away, potentially slowing down or degrading performance.
  *
  * @author Peter Abeles
@@ -72,7 +72,7 @@ public class ExampleAssociatePoints<T extends ImageGray<T>, TD extends TupleDesc
 	}
 
 	/**
-	 * Detect and associate point features in the two images.  Display the results.
+	 * Detect and associate point features in the two images. Display the results.
 	 */
 	public void associate( BufferedImage imageA , BufferedImage imageB )
 	{

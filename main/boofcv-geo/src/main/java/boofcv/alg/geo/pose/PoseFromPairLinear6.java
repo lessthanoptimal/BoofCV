@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -31,7 +31,7 @@ import java.util.List;
 /**
  * <p>
  * Estimates the camera motion using linear algebra given a set of N associated point observations and the
- * depth (z-coordinate) of each object, where N &ge; 6.  Note this is similar to, but not exactly the PnP problem.
+ * depth (z-coordinate) of each object, where N &ge; 6. Note this is similar to, but not exactly the PnP problem.
  * </p>
  *
  * <p>
@@ -42,9 +42,9 @@ import java.util.List;
  * in the second.
  *
  * <p>
- * This approach is a modified version of the approach discussed in [1].  It is derived by using
+ * This approach is a modified version of the approach discussed in [1]. It is derived by using
  * bilinear and trilinear constraints, as is discussed in Section 8.3. It has been modified to remove
- * redundant rows and so that the computed rotation matrix is row major.  The solution is derived from
+ * redundant rows and so that the computed rotation matrix is row major. The solution is derived from
  * the equations below and by computing the null space from the resulting matrix:<br>
  * cross(x<sub>2</sub>)*(A*x<sub>1</sub>) + cross(x<sub>2</sub>)*T/&lambda;<sub>i</sub>=0<br>
  * where cross(x) is the cross product matrix of X,  x<sub>i</sub> is the pixel coordinate (normalized or not) in the
@@ -68,12 +68,12 @@ public class PoseFromPairLinear6 {
 	private DMatrixRMaj P = new DMatrixRMaj(3, 4);
 
 	/**
-	 * Computes the transformation between two camera frames using a linear equation.  Both the
+	 * Computes the transformation between two camera frames using a linear equation. Both the
 	 * observed feature locations in each camera image and the depth (z-coordinate) of each feature
-	 * must be known.  Feature locations are in calibrated image coordinates.
+	 * must be known. Feature locations are in calibrated image coordinates.
 	 *
 	 * @param observations List of observations on the image plane in calibrated coordinates.
-	 * @param locations List of object locations.  One for each observation pair.
+	 * @param locations List of object locations. One for each observation pair.
 	 */
 	public boolean process( List<AssociatedPair> observations, List<Point3D_F64> locations ) {
 		if (observations.size() != locations.size())
@@ -94,12 +94,12 @@ public class PoseFromPairLinear6 {
 	}
 
 	/**
-	 * Computes the transformation between two camera frames using a linear equation.  Both the
+	 * Computes the transformation between two camera frames using a linear equation. Both the
 	 * observed feature locations in each camera image and the depth (z-coordinate) of each feature
-	 * must be known.  Feature locations are in calibrated image coordinates.
+	 * must be known. Feature locations are in calibrated image coordinates.
 	 *
 	 * @param observations List of pixel or normalized image coordinate observations
-	 * @param locations List of object locations in homogenous coordinates.  One for each observation pair.
+	 * @param locations List of object locations in homogenous coordinates. One for each observation pair.
 	 */
 	public boolean processHomogenous( List<AssociatedPair> observations, List<Point4D_F64> locations ) {
 		if (observations.size() != locations.size())

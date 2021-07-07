@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -23,9 +23,9 @@ import georegression.struct.InvertibleTransform;
 import georegression.struct.homography.Homography2D_F64;
 
 /**
- * Estimates the 2D motion of images in a video sequence.  All internal motion models must belong to the
+ * Estimates the 2D motion of images in a video sequence. All internal motion models must belong to the
  * {@link Homography2D_F64} transformation family, The returned transformations use the first image as the reference
- * frame, but other images can be converted into the reference frame.  Typically used in image stabilization
+ * frame, but other images can be converted into the reference frame. Typically used in image stabilization
  * or image mosaic applications.
  *
  * @param <I> Input image type
@@ -34,10 +34,10 @@ import georegression.struct.homography.Homography2D_F64;
  */
 public interface ImageMotion2D<I extends ImageBase<I>, IT extends InvertibleTransform> {
 	/**
-	 * Processes and updates the image transform.  The very first image processed will always return
+	 * Processes and updates the image transform. The very first image processed will always return
 	 * true and have a transform of no motion.
 	 *
-	 * @param input Next image in the sequence.  Not modified.
+	 * @param input Next image in the sequence. Not modified.
 	 * @return true if the transform has been updated and false if not
 	 */
 	boolean process( I input );

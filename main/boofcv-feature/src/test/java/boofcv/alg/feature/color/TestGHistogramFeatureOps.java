@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -41,8 +41,7 @@ public class TestGHistogramFeatureOps extends BoofStandardJUnit {
 
 	Class[] supported = new Class[]{GrayU8.class, GrayF32.class};
 
-	@Test
-	public void histogram_sb() {
+	@Test void histogram_sb() {
 
 		for( Class type : supported ) {
 			ImageGray image = GeneralizedImageOps.createSingleBand(type,width,height);
@@ -63,8 +62,7 @@ public class TestGHistogramFeatureOps extends BoofStandardJUnit {
 		}
 	}
 
-	@Test
-	public void histogram_pl() {
+	@Test void histogram_pl() {
 		for( Class type : supported ) {
 			Planar image = new Planar(type,width,height,2);
 			GImageMiscOps.fillUniform(image,rand,0,200);
@@ -87,8 +85,7 @@ public class TestGHistogramFeatureOps extends BoofStandardJUnit {
 	}
 
 
-	@Test
-	public void histogram_array() {
+	@Test void histogram_array() {
 		Planar<GrayU8> image = new Planar(GrayU8.class,width,height,2);
 		GImageMiscOps.fillUniform(image,rand,0,200);
 

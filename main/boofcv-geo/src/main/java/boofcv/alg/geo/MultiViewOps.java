@@ -102,7 +102,7 @@ public class MultiViewOps {
 	 *
 	 * @param P2 Camera matrix for view 2. 3x4 matrix
 	 * @param P3 Camera matrix for view 3. 3x4 matrix
-	 * @param ret Storage for trifocal tensor.  If null a new instance will be created.
+	 * @param ret Storage for trifocal tensor. If null a new instance will be created.
 	 * @return The trifocal tensor
 	 */
 	public static TrifocalTensor createTrifocal( DMatrixRMaj P2, DMatrixRMaj P3,
@@ -144,7 +144,7 @@ public class MultiViewOps {
 	 * @param P1 Camera matrix for view 1. 3x4 matrix
 	 * @param P2 Camera matrix for view 2. 3x4 matrix
 	 * @param P3 Camera matrix for view 3. 3x4 matrix
-	 * @param ret Storage for trifocal tensor.  If null a new instance will be created.
+	 * @param ret Storage for trifocal tensor. If null a new instance will be created.
 	 * @return The trifocal tensor
 	 */
 	public static TrifocalTensor createTrifocal( DMatrixRMaj P1, DMatrixRMaj P2, DMatrixRMaj P3,
@@ -200,7 +200,7 @@ public class MultiViewOps {
 
 	/**
 	 * <p>
-	 * Creates a trifocal tensor from two rigid body motions.  This is for the calibrated camera case.
+	 * Creates a trifocal tensor from two rigid body motions. This is for the calibrated camera case.
 	 * </p>
 	 *
 	 * <p>
@@ -209,7 +209,7 @@ public class MultiViewOps {
 	 *
 	 * @param P2 Transform from view 1 to view 2.
 	 * @param P3 Transform from view 1 to view 3.
-	 * @param ret Storage for trifocal tensor.  If null a new instance will be created.
+	 * @param ret Storage for trifocal tensor. If null a new instance will be created.
 	 * @return The trifocal tensor
 	 */
 	public static TrifocalTensor createTrifocal( Se3_F64 P2, Se3_F64 P3,
@@ -249,8 +249,8 @@ public class MultiViewOps {
 	 * @param l1 A line in the first view.
 	 * @param l2 A line in the second view.
 	 * @param l3 A line in the third view.
-	 * @param ret Storage for output.  If null a new instance will be declared.
-	 * @return Result of applying the constraint.  With perfect inputs will be zero.
+	 * @param ret Storage for output. If null a new instance will be declared.
+	 * @return Result of applying the constraint. With perfect inputs will be zero.
 	 */
 	public static Vector3D_F64 constraint( TrifocalTensor tensor,
 										   Vector3D_F64 l1, Vector3D_F64 l2, Vector3D_F64 l3,
@@ -277,7 +277,7 @@ public class MultiViewOps {
 	 * @param p1 A point in the first view.
 	 * @param l2 A line in the second view.
 	 * @param l3 A line in the third view.
-	 * @return Result of applying the constraint.  With perfect inputs will be zero.
+	 * @return Result of applying the constraint. With perfect inputs will be zero.
 	 */
 	public static double constraint( TrifocalTensor tensor,
 									 Point2D_F64 p1, Vector3D_F64 l2, Vector3D_F64 l3 ) {
@@ -300,7 +300,7 @@ public class MultiViewOps {
 	 * @param p1 A point in the first view.
 	 * @param l2 A line in the second view.
 	 * @param p3 A point in the third view.
-	 * @return Result of applying the constraint.  With perfect inputs will be zero.
+	 * @return Result of applying the constraint. With perfect inputs will be zero.
 	 */
 	public static Vector3D_F64 constraint( TrifocalTensor tensor,
 										   Point2D_F64 p1, Vector3D_F64 l2, Point2D_F64 p3,
@@ -332,7 +332,7 @@ public class MultiViewOps {
 	 * @param p1 A point in the first view.
 	 * @param p2 A point in the second view.
 	 * @param l3 A line in the third view.
-	 * @return Result of applying the constraint.  With perfect inputs will be zero.
+	 * @return Result of applying the constraint. With perfect inputs will be zero.
 	 */
 	public static Vector3D_F64 constraint( TrifocalTensor tensor,
 										   Point2D_F64 p1, Point2D_F64 p2, Vector3D_F64 l3,
@@ -366,8 +366,8 @@ public class MultiViewOps {
 	 * @param p1 A point in the first view.
 	 * @param p2 A point in the second view.
 	 * @param p3 A point in the third view.
-	 * @param ret Optional storage for output. 3x3 matrix.  Modified.
-	 * @return Result of applying the constraint.  With perfect inputs will be zero.
+	 * @param ret Optional storage for output. 3x3 matrix. Modified.
+	 * @return Result of applying the constraint. With perfect inputs will be zero.
 	 */
 	public static DMatrixRMaj constraint( TrifocalTensor tensor,
 										  Point2D_F64 p1, Point2D_F64 p2, Point2D_F64 p3,
@@ -412,7 +412,7 @@ public class MultiViewOps {
 	 * <p>
 	 * Applies the homography constraints to two points:<br>
 	 * z*p2 = H*p1<br>
-	 * where z is a scale factor and (p1,p2) are point observations.  Note that since 2D points are inputted
+	 * where z is a scale factor and (p1,p2) are point observations. Note that since 2D points are inputted
 	 * translation and normalization to homogeneous coordinates with z=1 is automatically handled.
 	 * </p>
 	 *
@@ -431,13 +431,13 @@ public class MultiViewOps {
 	}
 
 	/**
-	 * Computes the homography induced from view 1 to 3 by a line in view 2.  The provided line in
+	 * Computes the homography induced from view 1 to 3 by a line in view 2. The provided line in
 	 * view 2 must contain the view 2 observation.
 	 *
 	 * p3 = H13*p1
 	 *
 	 * @param tensor Input: Trifocal tensor
-	 * @param line2 Input: Line in view 2.  {@link LineGeneral2D_F64 General notation}.
+	 * @param line2 Input: Line in view 2. {@link LineGeneral2D_F64 General notation}.
 	 * @param output Output: Optional storage for homography. 3x3 matrix
 	 * @return Homography from view 1 to 3
 	 */
@@ -479,13 +479,13 @@ public class MultiViewOps {
 	}
 
 	/**
-	 * Computes the homography induced from view 1 to 2 by a line in view 3.  The provided line in
+	 * Computes the homography induced from view 1 to 2 by a line in view 3. The provided line in
 	 * view 3 must contain the view 3 observation.
 	 *
 	 * p2 = H12*p1
 	 *
 	 * @param tensor Input: Trifocal tensor
-	 * @param line3 Input: Line in view 3.  {@link LineGeneral2D_F64 General notation}.
+	 * @param line3 Input: Line in view 3. {@link LineGeneral2D_F64 General notation}.
 	 * @param output Output: Optional storage for homography. 3x3 matrix
 	 * @return Homography from view 1 to 2
 	 */
@@ -588,7 +588,7 @@ public class MultiViewOps {
 
 	/**
 	 * <p>
-	 * Computes the epipoles of the first camera in the second and third images.  Epipoles are found
+	 * Computes the epipoles of the first camera in the second and third images. Epipoles are found
 	 * in homogeneous coordinates and have a norm of 1.
 	 * </p>
 	 *
@@ -601,7 +601,7 @@ public class MultiViewOps {
 	 * where F1i is a fundamental matrix from image 1 to i.
 	 * </p>
 	 *
-	 * @param tensor Trifocal tensor.  Not Modified
+	 * @param tensor Trifocal tensor. Not Modified
 	 * @param e2 Output: Epipole in image 2. Homogeneous coordinates. Modified
 	 * @param e3 Output: Epipole in image 3. Homogeneous coordinates. Modified
 	 * @see TrifocalExtractGeometries
@@ -614,16 +614,16 @@ public class MultiViewOps {
 
 	/**
 	 * <p>
-	 * Extract the fundamental matrices between views 1 + 2 and views 1 + 3.  The returned Fundamental
+	 * Extract the fundamental matrices between views 1 + 2 and views 1 + 3. The returned Fundamental
 	 * matrices will have the following properties: x<sub>i</sub><sup>T</sup>*Fi*x<sub>1</sub> = 0, where i is view 2 or 3.
 	 * </p>
 	 *
 	 * <p>
-	 * NOTE: The first camera is assumed to have the camera matrix of P1 = [I|0].  Thus observations in pixels for
+	 * NOTE: The first camera is assumed to have the camera matrix of P1 = [I|0]. Thus observations in pixels for
 	 * the first camera will not meet the epipolar constraint when applied to the returned fundamental matrices.
 	 * </p>
 	 *
-	 * @param tensor Trifocal tensor.  Not modified.
+	 * @param tensor Trifocal tensor. Not modified.
 	 * @param F21 Output: Fundamental matrix for views 1 and 2. Modified.
 	 * @param F31 Output: Fundamental matrix for views 1 and 3. Modified.
 	 * @see TrifocalExtractGeometries
@@ -643,7 +643,7 @@ public class MultiViewOps {
 	 * NOTE: The camera matrix for the first view is assumed to be P1 = [I|0].
 	 * </p>
 	 *
-	 * @param tensor Trifocal tensor.  Not modified.
+	 * @param tensor Trifocal tensor. Not modified.
 	 * @param P2 Output: 3x4 camera matrix for views 1 to 2. Modified.
 	 * @param P3 Output: 3x4 camera matrix for views 1 to 3. Modified.
 	 * @see TrifocalExtractGeometries
@@ -656,8 +656,8 @@ public class MultiViewOps {
 
 	/**
 	 * <p>
-	 * Computes an essential matrix from a rotation and translation.  This motion
-	 * is the motion from the first camera frame into the second camera frame.  The essential
+	 * Computes an essential matrix from a rotation and translation. This motion
+	 * is the motion from the first camera frame into the second camera frame. The essential
 	 * matrix 'E' is defined as:<br>
 	 * E = hat(T)*R<br>
 	 * where hat(T) is the skew symmetric cross product matrix for vector T.
@@ -739,7 +739,7 @@ public class MultiViewOps {
 
 	/**
 	 * <p>
-	 * Computes an fudamental matrix from a rotation, translation, and calibration matrix.  Motion
+	 * Computes an fudamental matrix from a rotation, translation, and calibration matrix. Motion
 	 * is from the first camera frame into the second camera frame.
 	 * </p>
 	 *
@@ -824,9 +824,9 @@ public class MultiViewOps {
 
 	/**
 	 * <p>
-	 * Extracts the epipoles from an essential or fundamental matrix.  The epipoles are extracted
-	 * from the left and right null space of the provided matrix.  Note that the found epipoles are
-	 * in homogeneous coordinates.  If the epipole is at infinity then z=0
+	 * Extracts the epipoles from an essential or fundamental matrix. The epipoles are extracted
+	 * from the left and right null space of the provided matrix. Note that the found epipoles are
+	 * in homogeneous coordinates. If the epipole is at infinity then z=0
 	 * </p>
 	 *
 	 * <p>
@@ -834,7 +834,7 @@ public class MultiViewOps {
 	 * Right: F*e<sub>1</sub> = 0
 	 * </p>
 	 *
-	 * @param F Input: Fundamental or Essential 3x3 matrix.  Not modified.
+	 * @param F Input: Fundamental or Essential 3x3 matrix. Not modified.
 	 * @param e1 Output: Right epipole in homogeneous coordinates. Can be null. Modified.
 	 * @param e2 Output: Left epipole in homogeneous coordinates. Can be null. Modified.
 	 */
@@ -865,8 +865,8 @@ public class MultiViewOps {
 	 *
 	 * @param F (Input) A fundamental matrix
 	 * @param e2 (Input) Left epipole of fundamental matrix, F<sup>T</sup>*e2 = 0.
-	 * @param v (Input) Arbitrary 3-vector.  Just pick some value, say (0,0,0).
-	 * @param lambda (Input) A non zero scalar.  Try one.
+	 * @param v (Input) Arbitrary 3-vector. Just pick some value, say (0,0,0).
+	 * @param lambda (Input) A non zero scalar. Try one.
 	 * @return The canonical camera (projection) matrix P' (3 by 4) Known up to a projective transform.
 	 * @see #extractEpipoles
 	 * @see FundamentalToProjective
@@ -1008,7 +1008,7 @@ public class MultiViewOps {
 		DMatrixRMaj W = svd.getW(null);
 		DMatrixRMaj V = svd.getV(null, false);
 
-		// settings value of singular values to be [1,1,0].  The first two singular values just need to be equal
+		// settings value of singular values to be [1,1,0]. The first two singular values just need to be equal
 		// for it to be an essential matrix
 		SingularOps_DDRM.descendingOrder(U, false, W, V, false);
 		W.set(0, 0, 1);
@@ -1148,10 +1148,10 @@ public class MultiViewOps {
 	}
 
 	/**
-	 * Decomposes an essential matrix into the rigid body motion which it was constructed from.  Due to ambiguities
-	 * there are four possible solutions.  See {@link DecomposeEssential} for the details.  The correct solution can
+	 * Decomposes an essential matrix into the rigid body motion which it was constructed from. Due to ambiguities
+	 * there are four possible solutions. See {@link DecomposeEssential} for the details. The correct solution can
 	 * be found using triangulation and the positive depth constraint, e.g. the objects must be in front of the camera
-	 * to be seen.  Also note that the scale of the translation is lost, even with perfect data.
+	 * to be seen. Also note that the scale of the translation is lost, even with perfect data.
 	 *
 	 * @param E21 An essential matrix.
 	 * @return Four possible motions. From view 1 to view 2.
@@ -1168,12 +1168,12 @@ public class MultiViewOps {
 	/**
 	 * Decomposes a homography matrix that's in Euclidean space (computed from features in normalized image coordinates).
 	 * The homography is defined as H = (R + (1/d)*T*N<sup>T</sup>), where R is a 3x3 rotation matrix,
-	 * d is the distance of the plane, N is the plane's normal (unit vector), T is the translation vector.  If
-	 * the homography is from view 'a' to 'b' then transform (R,T) will be from reference 'a' to 'b'.  Note that the
+	 * d is the distance of the plane, N is the plane's normal (unit vector), T is the translation vector. If
+	 * the homography is from view 'a' to 'b' then transform (R,T) will be from reference 'a' to 'b'. Note that the
 	 * returned 'T' is divided by 'd'.
 	 *
 	 * @param H Homography in Euclidean space
-	 * @return The set of four possible solutions. First param: motion (R,T).  Second param: plane normal vector.
+	 * @return The set of four possible solutions. First param: motion (R,T). Second param: plane normal vector.
 	 * @see DecomposeHomography
 	 */
 	public static List<Tuple2<Se3_F64, Vector3D_F64>> decomposeHomography( DMatrixRMaj H ) {

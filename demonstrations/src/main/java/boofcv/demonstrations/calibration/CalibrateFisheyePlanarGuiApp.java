@@ -40,7 +40,7 @@ import java.io.File;
 import java.util.List;
 
 /**
- * Computes intrinsic camera calibration parameters from a set of calibration images.  Results
+ * Computes intrinsic camera calibration parameters from a set of calibration images. Results
  * are displayed in a window allowing their accuracy to be easily seen.
  *
  * @author Peter Abeles
@@ -95,7 +95,7 @@ public class CalibrateFisheyePlanarGuiApp extends JPanel {
 						monitor.setMessage(0, file.getName());
 					});
 				} else {
-					System.out.println("Failed to detect image.  " + file.getName());
+					System.out.println("Failed to detect image. " + file.getName());
 				}
 			} else {
 				System.out.println("Failed to load " + images.get(i));

@@ -33,7 +33,7 @@ public class ConfigDenseSurfStable implements Configuration {
 	public ConfigSurfDescribe.Stability surf = new ConfigSurfDescribe.Stability();
 
 	/**
-	 * Specifies the frequency it will sample across the image in pixels.  Default ix period X = 8, period Y = 8.
+	 * Specifies the frequency it will sample across the image in pixels. Default ix period X = 8, period Y = 8.
 	 */
 	public DenseSampling sampling = new DenseSampling(8, 8);
 

@@ -42,23 +42,23 @@ import java.util.List;
 
 /**
  * <p>
- * The Fast Hessian (FH) [1] interest point detector is designed to be a fast multi-scale "blob" detector.  FH
- * is intended for use as a feature detector for SURF [1].  It works  by computing an approximation of the
- * image Hessian's determinant using "box-lets" type features.   Unlike traditional scale-space algorithms
+ * The Fast Hessian (FH) [1] interest point detector is designed to be a fast multi-scale "blob" detector. FH
+ * is intended for use as a feature detector for SURF [1]. It works  by computing an approximation of the
+ * image Hessian's determinant using "box-lets" type features.  Unlike traditional scale-space algorithms
  * the feature itself is rescaled and is efficiently computed using an {@link boofcv.alg.transform.ii.IntegralImageOps integral image}.
  * </p>
  *
  * <p>
- * This class is intended to be a faithful implementation of the algorithm described in [1].  Deviations
- * from that paper are noted in the code an in the comments below.   This detector can be used to implement
- * the FH-9 and FH-15 detectors.  For the FH-15 detector the input image needs to be doubled in size prior
+ * This class is intended to be a faithful implementation of the algorithm described in [1]. Deviations
+ * from that paper are noted in the code an in the comments below.  This detector can be used to implement
+ * the FH-9 and FH-15 detectors. For the FH-15 detector the input image needs to be doubled in size prior
  * to processing and the feature location rescaled.
  * </p>
  *
  * <p>
- * Description of scale space approach, see [1] for a more detailed and complete description.  Features are detected in
- * a series of octaves.  Each octave is defined as a set of scales where higher octaves contain larger scales.
- * A scale is defined by a feature's size in pixels, the size is the feature's width/height.  Improved accuracy in done
+ * Description of scale space approach, see [1] for a more detailed and complete description. Features are detected in
+ * a series of octaves. Each octave is defined as a set of scales where higher octaves contain larger scales.
+ * A scale is defined by a feature's size in pixels, the size is the feature's width/height. Improved accuracy in done
  * by interpolating feature location in pixel coordinates and scale.
  * </p>
  *
@@ -71,8 +71,8 @@ import java.util.List;
  * </p>
  *
  * <p>
- * Features are only detected for sizes which have a size smaller and larger.  For the first octave in the example
- * above that would be for sizes 15 and 21.  Sizes 9 and 27 are only used to identify local maximums in scale space.
+ * Features are only detected for sizes which have a size smaller and larger. For the first octave in the example
+ * above that would be for sizes 15 and 21. Sizes 9 and 27 are only used to identify local maximums in scale space.
  * </p>
  *
  * <p>
@@ -163,7 +163,7 @@ public class FastHessianFeatureDetector<II extends ImageGray<II>> {
 	 * @param initialSize Size/width of the smallest feature/kernel in the lowest octave.
 	 * @param numberScalesPerOctave How many different feature sizes are considered in a single octave
 	 * @param numberOfOctaves How many different octaves are considered.
-	 * @param scaleStepSize Increment between kernel sizes as it goes up in scale.  Try 6
+	 * @param scaleStepSize Increment between kernel sizes as it goes up in scale. Try 6
 	 */
 	public FastHessianFeatureDetector( NonMaxSuppression extractor,
 									   FeatureSelectLimitIntensity<Point2D_I16> selectFeaturesInScale,
@@ -278,7 +278,7 @@ public class FastHessianFeatureDetector<II extends ImageGray<II>> {
 		GrayF32 inten1 = intensity[index1];
 		inten2.setImage(intensity[index2]);
 
-		// find local maximums in image 2D space.  Borders need to be ignored since
+		// find local maximums in image 2D space. Borders need to be ignored since
 		// false positives are found around them as an artifact of pixels outside being
 		// treated as being zero.
 		foundFeatures.reset();
@@ -310,7 +310,7 @@ public class FastHessianFeatureDetector<II extends ImageGray<II>> {
 		for (int i = 0; i < features.size; i++) {
 			Point2D_I16 f = features.get(i);
 
-			// avoid false positives.  see above comment
+			// avoid false positives. see above comment
 			if (f.x < ignoreRadius || f.x >= ignoreWidth || f.y < ignoreRadius || f.y >= ignoreHeight)
 				continue;
 
@@ -320,7 +320,7 @@ public class FastHessianFeatureDetector<II extends ImageGray<II>> {
 			if (checkMax(inten0, intenF, f.x, f.y) && checkMax(inten2, intenF, f.x, f.y)) {
 
 				// find the feature's location to sub-pixel accuracy using a second order polynomial
-				// NOTE: In the original paper this was done using a quadratic.  See comments above.
+				// NOTE: In the original paper this was done using a quadratic. See comments above.
 				// NOTE: Using a 2D polynomial for x and y might produce better results.
 				float peakX = polyPeak(inten1.get(f.x - 1, f.y), inten1.get(f.x, f.y), inten1.get(f.x + 1, f.y));
 				float peakY = polyPeak(inten1.get(f.x, f.y - 1), inten1.get(f.x, f.y), inten1.get(f.x, f.y + 1));
@@ -380,10 +380,10 @@ public class FastHessianFeatureDetector<II extends ImageGray<II>> {
 	 * </p>
 	 *
 	 * <p>
-	 * Note: The original paper fit a 3D Quadratic to the data instead.  This required the first
-	 * and second derivative of the Laplacian to be estimated.  Such estimates are error prone
+	 * Note: The original paper fit a 3D Quadratic to the data instead. This required the first
+	 * and second derivative of the Laplacian to be estimated. Such estimates are error prone
 	 * and using the technique found in OpenSURF produced erratic results and required some hackery
-	 * to get to work.  This should always produce stable results and is much faster.
+	 * to get to work. This should always produce stable results and is much faster.
 	 * </p>
 	 *
 	 * @param lower Value at x=-1

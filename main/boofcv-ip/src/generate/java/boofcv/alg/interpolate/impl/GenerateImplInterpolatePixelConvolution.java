@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -69,8 +69,8 @@ public class GenerateImplInterpolatePixelConvolution extends CodeGeneratorBase {
 				"\n" +
 				"/**\n" +
 				" * <p>\n" +
-				" * Performs interpolation by convolving a continuous-discrete function across the image.  Borders are handled by\n" +
-				" * re-normalizing.  It is assumed that the kernel will sum up to one.  This is particularly\n" +
+				" * Performs interpolation by convolving a continuous-discrete function across the image. Borders are handled by\n" +
+				" * re-normalizing. It is assumed that the kernel will sum up to one. This is particularly\n" +
 				" * important for the unsafe_get() function which does not re-normalize.\n" +
 				" * </p>\n" +
 				generateDocString("Peter Abeles") +

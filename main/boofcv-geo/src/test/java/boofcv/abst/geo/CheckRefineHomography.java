@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -39,8 +39,7 @@ public abstract class CheckRefineHomography extends CommonHomographyChecks {
 	DMatrixRMaj H = new DMatrixRMaj(3,3);
 	DMatrixRMaj found = new DMatrixRMaj(3,3);
 
-	@Test
-	public void perfectInput() {
+	@Test void perfectInput() {
 		createScene(30,false);
 
 		// use the linear algorithm to compute the homography
@@ -59,8 +58,7 @@ public abstract class CheckRefineHomography extends CommonHomographyChecks {
 		assertTrue(MatrixFeatures_DDRM.isEquals(H, found, 1e-8));
 	}
 
-	@Test
-	public void incorrectInput() {
+	@Test void incorrectInput() {
 		createScene(30,false);
 
 		// use the linear algorithm to compute the homography

@@ -31,7 +31,7 @@ import org.ddogleg.stats.UtilGaussian;
 // TODO don't use radius use width so that even and odd width kernels are supported
 //  Maybe do the transition by adding a boolean parameter for one release?
 //  Just rename...
-// TODO remove ability to normalize with a flag.  Use kernel math instead.  More explicit, easier testing
+// TODO remove ability to normalize with a flag. Use kernel math instead. More explicit, easier testing
 // todo add size heuristic for derivative that is different from regular kernel
 public class FactoryKernelGaussian {
 	// when converting to integer kernels what is the minimum size of the an element relative to the maximum
@@ -42,8 +42,8 @@ public class FactoryKernelGaussian {
 	 * Creates a Gaussian kernel of the specified type.
 	 *
 	 * @param kernelType The type of kernel which is to be created.
-	 * @param sigma The distributions stdev.  If &le; 0 then the sigma will be computed from the radius.
-	 * @param radius Number of pixels in the kernel's radius.  If &le; 0 then the sigma will be computed from the sigma.
+	 * @param sigma The distributions stdev. If &le; 0 then the sigma will be computed from the radius.
+	 * @param radius Number of pixels in the kernel's radius. If &le; 0 then the sigma will be computed from the sigma.
 	 * @return The computed Gaussian kernel.
 	 */
 	public static <T extends KernelBase> T gaussian( Class<T> kernelType, double sigma, int radius ) {
@@ -68,8 +68,8 @@ public class FactoryKernelGaussian {
 	 * Creates a 1D Gaussian kernel of the specified type.
 	 *
 	 * @param imageType The type of image which is to be convolved by this kernel.
-	 * @param sigma The distributions stdev.  If &le; 0 then the sigma will be computed from the radius.
-	 * @param radius Number of pixels in the kernel's radius.  If &le; 0 then the sigma will be computed from the sigma.
+	 * @param sigma The distributions stdev. If &le; 0 then the sigma will be computed from the radius.
+	 * @param radius Number of pixels in the kernel's radius. If &le; 0 then the sigma will be computed from the sigma.
 	 * @return The computed Gaussian kernel.
 	 */
 	public static <T extends ImageGray<T>, K extends Kernel1D>
@@ -85,8 +85,8 @@ public class FactoryKernelGaussian {
 	 * Creates a 2D Gaussian kernel of the specified type.
 	 *
 	 * @param imageType The type of image which is to be convolved by this kernel.
-	 * @param sigma The distributions stdev.  If &le; 0 then the sigma will be computed from the radius.
-	 * @param radius Number of pixels in the kernel's radius.  If &le; 0 then the sigma will be computed from the sigma.
+	 * @param sigma The distributions stdev. If &le; 0 then the sigma will be computed from the radius.
+	 * @param radius Number of pixels in the kernel's radius. If &le; 0 then the sigma will be computed from the sigma.
 	 * @return The computed Gaussian kernel.
 	 */
 	public static <T extends ImageGray<T>, K extends Kernel2D>
@@ -109,8 +109,8 @@ public class FactoryKernelGaussian {
 	 * @param DOF 1 for 1D kernel and 2 for 2D kernel.
 	 * @param isFloat True for F32 kernel and false for I32.
 	 * @param numBits Number of bits in each data element. 32 or 64
-	 * @param sigma The distributions stdev.  If &le; 0 then the sigma will be computed from the radius.
-	 * @param radius Number of pixels in the kernel's radius.  If &le; 0 then the sigma will be computed from the sigma.   @return The computed Gaussian kernel.
+	 * @param sigma The distributions stdev. If &le; 0 then the sigma will be computed from the radius.
+	 * @param radius Number of pixels in the kernel's radius. If &le; 0 then the sigma will be computed from the sigma.  @return The computed Gaussian kernel.
 	 */
 	public static <T extends KernelBase> T gaussian( int DOF, boolean isFloat, int numBits, double sigma, int radius ) {
 		if (radius <= 0)
@@ -172,8 +172,8 @@ public class FactoryKernelGaussian {
 	 *
 	 * @param order The order of the gaussian derivative.
 	 * @param isFloat True for F32 kernel and false for I32.
-	 * @param sigma The distributions stdev.  If &le; 0 then the sigma will be computed from the radius.
-	 * @param radius Number of pixels in the kernel's radius.  If &le; 0 then the sigma will be computed from the sigma.
+	 * @param sigma The distributions stdev. If &le; 0 then the sigma will be computed from the radius.
+	 * @param radius Number of pixels in the kernel's radius. If &le; 0 then the sigma will be computed from the sigma.
 	 * @return The computed Gaussian kernel.
 	 */
 	public static <T extends Kernel1D> T derivative( int order, boolean isFloat,
@@ -252,7 +252,7 @@ public class FactoryKernelGaussian {
 	}
 
 	/**
-	 * Creates a kernel for a 2D convolution.  This should only be used for validation purposes.
+	 * Creates a kernel for a 2D convolution. This should only be used for validation purposes.
 	 *
 	 * @param sigma Distributions standard deviation.
 	 * @param radius Kernel's radius.
@@ -375,7 +375,7 @@ public class FactoryKernelGaussian {
 	 * </p>
 	 *
 	 * @param radius Kernel's radius
-	 * @param order Order of the derivative.  0 original distribution
+	 * @param order Order of the derivative. 0 original distribution
 	 * @return Default sigma
 	 */
 	public static double sigmaForRadius( double radius, int order ) {
@@ -391,7 +391,7 @@ public class FactoryKernelGaussian {
 	 * </p>
 	 *
 	 * @param sigma Distribution's sigma
-	 * @param order Order of the derivative.  0 original distribution
+	 * @param order Order of the derivative. 0 original distribution
 	 * @return Default sigma
 	 */
 	public static int radiusForSigma( double sigma, int order ) {
@@ -402,11 +402,11 @@ public class FactoryKernelGaussian {
 	}
 
 	/**
-	 * Create a gaussian kernel based on its width.  Supports kernels of even or odd widths
+	 * Create a gaussian kernel based on its width. Supports kernels of even or odd widths
 	 * .
 	 *
 	 * @param sigma Sigma of the Gaussian distribution. If &le; 0 then the width will be used.
-	 * @param width How wide the kernel is.  Can be even or odd.
+	 * @param width How wide the kernel is. Can be even or odd.
 	 * @return Gaussian convolution kernel.
 	 */
 	public static Kernel2D_F64 gaussianWidth( double sigma, int width ) {

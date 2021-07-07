@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -59,8 +59,7 @@ public class TestImageDistortBasic_IL extends BoofStandardJUnit {
 
 	};
 
-	@Test
-	public void applyRenderAll_true() {
+	@Test void applyRenderAll_true() {
 		Helper alg = new Helper(interp);
 		alg.setRenderAll(true);
 
@@ -83,8 +82,7 @@ public class TestImageDistortBasic_IL extends BoofStandardJUnit {
 		assertEquals(150,alg.getTotal());
 	}
 
-	@Test
-	public void applyRenderAll_False() {
+	@Test void applyRenderAll_False() {
 		Helper alg = new Helper(interp);
 		alg.setRenderAll(false);
 
@@ -107,13 +105,11 @@ public class TestImageDistortBasic_IL extends BoofStandardJUnit {
 		assertEquals(9*14,alg.getTotal());
 	}
 
-	@Test
-	public void renderAll_mask() {
+	@Test void renderAll_mask() {
 		checkMask(true);
 	}
 
-	@Test
-	public void applyOnlyInside_mask() {
+	@Test void applyOnlyInside_mask() {
 		checkMask(false);
 	}
 

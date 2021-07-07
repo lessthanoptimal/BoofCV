@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -54,8 +54,7 @@ public abstract class GenericBackgroundModelStationaryChecks extends BoofStandar
 	 * Basic check were multiple images are feed into the algorithm and another image,
 	 * which has a region which is clearly different is then segmented.
 	 */
-	@Test
-	public void basicCheck() {
+	@Test void basicCheck() {
 		for( ImageType type : imageTypes ) {
 			basicCheck(type);
 		}
@@ -95,8 +94,7 @@ public abstract class GenericBackgroundModelStationaryChecks extends BoofStandar
 	/**
 	 * Sees if reset discard the previous history in the background image
 	 */
-	@Test
-	public void reset() {
+	@Test void reset() {
 		for( ImageType type : imageTypes ) {
 			reset(type);
 		}
@@ -125,7 +123,7 @@ public abstract class GenericBackgroundModelStationaryChecks extends BoofStandar
 		GImageMiscOps.fill(frame, 100);
 		ImageMiscOps.fill(expected, 1);
 
-		// it should be all changed.  really just a sanity check
+		// it should be all changed. really just a sanity check
 		alg.segment(frame,segmented);
 		BoofTesting.assertEquals(expected,segmented,1e-8);
 	}
@@ -133,8 +131,7 @@ public abstract class GenericBackgroundModelStationaryChecks extends BoofStandar
 	/**
 	 * The user tries to segment before specifying the background
 	 */
-	@Test
-	public void segmentBeforeUpdateBackGround() {
+	@Test void segmentBeforeUpdateBackGround() {
 		for( ImageType type : imageTypes ) {
 			segmentBeforeUpdateBackGround(type);
 		}
@@ -156,8 +153,7 @@ public abstract class GenericBackgroundModelStationaryChecks extends BoofStandar
 		BoofTesting.assertEquals(expected, segmented, 1e-8);
 	}
 
-	@Test
-	public void checkSubImage() {
+	@Test void checkSubImage() {
 		for( ImageType type : imageTypes ) {
 			checkSubImage(type);
 		}
@@ -203,8 +199,7 @@ public abstract class GenericBackgroundModelStationaryChecks extends BoofStandar
 	 * For each band in the image have all put one be filled with a constant uniform color.
 	 * Alternate which band has motion in it.
 	 */
-	@Test
-	public void checkBandsUsed() {
+	@Test public void checkBandsUsed() {
 		for( ImageType type : imageTypes ) {
 			checkBandsUsed(type);
 		}
@@ -225,7 +220,7 @@ public abstract class GenericBackgroundModelStationaryChecks extends BoofStandar
 
 			GrayU8 segmented = new GrayU8(width,height);
 
-			// segment with the current frame.  should be no motion
+			// segment with the current frame. should be no motion
 			alg.segment(frame, segmented);
 			for (int y = 0; y < height; y++) {
 				for (int x = 0; x < width; x++) {

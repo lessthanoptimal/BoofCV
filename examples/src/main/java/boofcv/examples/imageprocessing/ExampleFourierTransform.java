@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -62,7 +62,7 @@ public class ExampleFourierTransform {
 		// compute the Fourier Transform
 		dft.forward(input, transform);
 
-		// create the box filter which is centered around the pixel.  Note that the filter gets wrapped around
+		// create the box filter which is centered around the pixel. Note that the filter gets wrapped around
 		// the image edges
 		for (int y = 0; y < 15; y++) {
 			int yy = y - 7 < 0 ? boxImage.height + (y - 7) : y - 7;

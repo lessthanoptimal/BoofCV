@@ -55,7 +55,7 @@ public class ControlPanelDescribeSift extends StandardAlgConfigPanel {
 		addLabeled(spinnerWidthSubregion, "Subregion", "Width of sub-region in samples");
 		addLabeled(spinnerWidthGrid, "Grid", "Width of grid in subregions");
 		addLabeled(spinnerHistogram, "Histogram", "Number of histogram bins");
-		addLabeled(spinnerSigmaToPixels, "Sigma Pixels", "Conversion of sigma to pixels.  Used to scale the descriptor region");
+		addLabeled(spinnerSigmaToPixels, "Sigma Pixels", "Conversion of sigma to pixels. Used to scale the descriptor region");
 		addLabeled(spinnerWeightFraction, "Sigma Frac.", "Sigma for Gaussian weighting function is set to this value * region width");
 		addLabeled(spinnerMaxElementFraction, "Max Frac.", "Maximum fraction a single element can have in descriptor. Helps with non-affine changes in lighting. See paper");
 	}

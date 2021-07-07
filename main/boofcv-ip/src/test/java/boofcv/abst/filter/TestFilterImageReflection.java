@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -31,8 +31,7 @@ public class TestFilterImageReflection extends BoofStandardJUnit {
 	/**
 	 * Checks to see if the provided function is invoked and that it returned the correct border
 	 */
-	@Test
-	public void basicTest2() {
+	@Test void basicTest2() {
 		FilterImageReflection filter = new FilterImageReflection(getClass(),"methodDummy",2,3,GrayU8.class,GrayU16.class);
 
 		GrayU8 in = new GrayU8(5,5);
@@ -49,8 +48,7 @@ public class TestFilterImageReflection extends BoofStandardJUnit {
 	/**
 	 * Some filters have a parameter which specify the number of times it is invoked
 	 */
-	@Test
-	public void basicTest3() {
+	@Test void basicTest3() {
 		FilterImageReflection filter = new FilterImageReflection(getClass(),"methodDummy2",2,3,GrayU8.class,GrayU16.class);
 
 		GrayU8 in = new GrayU8(5,5);

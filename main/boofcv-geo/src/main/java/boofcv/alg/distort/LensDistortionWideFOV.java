@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -25,8 +25,8 @@ import boofcv.struct.distort.Point3Transform2_F64;
 
 /**
  * Interface for creating transform between distorted and undistorted pixel/unit sphere
- * coordinates for camera models that supports FOV more than 180 degrees.  In this situation
- * the entire undistorted image can't be rendered onto a flat plane.  Thus there are no functions
+ * coordinates for camera models that supports FOV more than 180 degrees. In this situation
+ * the entire undistorted image can't be rendered onto a flat plane. Thus there are no functions
  * for working in undistorted pixels.
  *
  * @author Peter Abeles

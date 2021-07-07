@@ -33,8 +33,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Creates a mosaic from an image sequence using tracked point features.  Each the input window
- * moaes toward the mosaic image's boundary it is automatically reset.  When reset the current
+ * Creates a mosaic from an image sequence using tracked point features. Each the input window
+ * moaes toward the mosaic image's boundary it is automatically reset. When reset the current
  * image is put in the initial position and the mosaic distorted accordingly.
  *
  * @param <I> Input image type

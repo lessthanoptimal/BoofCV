@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -48,8 +48,7 @@ public class TestGradientToEdgeFeatures extends BoofStandardJUnit {
 
 	GrayF32 intensity = new GrayF32(width,height);
 
-	@Test
-	public void intensityE()  {
+	@Test void intensityE()  {
 
 		int total = BoofTesting.findMethodThenCall(this,"intensityE",GradientToEdgeFeatures.class,"intensityE");
 
@@ -81,8 +80,7 @@ public class TestGradientToEdgeFeatures extends BoofStandardJUnit {
 		assertEquals(expected,intensity.get(1,2),1e-4);
 	}
 
-	@Test
-	public void intensityAbs()  {
+	@Test void intensityAbs()  {
 
 		int total = BoofTesting.findMethodThenCall(this,"intensityAbs",GradientToEdgeFeatures.class,"intensityAbs");
 
@@ -115,8 +113,7 @@ public class TestGradientToEdgeFeatures extends BoofStandardJUnit {
 		assertEquals(expected,intensity.get(1,2),1e-4);
 	}
 
-	@Test
-	public void direction()  {
+	@Test void direction()  {
 
 		int total = BoofTesting.findMethodThenCall(this,"direction",GradientToEdgeFeatures.class,"direction");
 
@@ -149,8 +146,7 @@ public class TestGradientToEdgeFeatures extends BoofStandardJUnit {
 		assertEquals(expected,direction.get(1,2),1e-4);
 	}
 
-	@Test
-	public void discretizeDirection4() {
+	@Test void discretizeDirection4() {
 		GrayF32 angle = new GrayF32(5,5);
 		angle.set(0,0,(float)(3*Math.PI/8+0.01));
 		angle.set(1,0,(float)(3*Math.PI/8-0.01));
@@ -173,8 +169,7 @@ public class TestGradientToEdgeFeatures extends BoofStandardJUnit {
 		assertEquals(2,d.get(1,1));
 	}
 
-	@Test
-	public void discretizeDirection8() {
+	@Test void discretizeDirection8() {
 		GrayF32 angle = new GrayF32(5,5);
 		for( int i = 0; i < 8; i++ ) {
 			angle.data[i] = (float) UtilAngle.bound(i*Math.PI/4.0);
@@ -190,8 +185,7 @@ public class TestGradientToEdgeFeatures extends BoofStandardJUnit {
 		}
 	}
 
-	@Test
-	public void nonMaxSuppression4() {
+	@Test void nonMaxSuppression4() {
 		GrayF32 intensity = new GrayF32(width,height);
 		GrayS8 direction = new GrayS8(width,height);
 		GrayF32 expected = new GrayF32(width,height);
@@ -225,8 +219,7 @@ public class TestGradientToEdgeFeatures extends BoofStandardJUnit {
 		}
 	}
 
-	@Test
-	public void nonMaxSuppression8() {
+	@Test void nonMaxSuppression8() {
 		GrayF32 intensity = new GrayF32(width,height);
 		GrayS8 direction = new GrayS8(width,height);
 		GrayF32 expected = new GrayF32(width,height);

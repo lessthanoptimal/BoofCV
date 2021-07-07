@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -28,7 +28,7 @@ import boofcv.struct.ConnectRule;
  */
 public class ConfigFh04 implements Configuration {
 	/**
-	 * Tuning parameter.  Larger regions are preferred for larger values of K.  Try 100
+	 * Tuning parameter. Larger regions are preferred for larger values of K. Try 100
 	 */
 	public float K = 100;
 	/**
@@ -36,13 +36,13 @@ public class ConfigFh04 implements Configuration {
 	 */
 	public int minimumRegionSize = 30;
 	/**
-	 * Connection rule used to connect regions.  ConnectRule.EIGHT was using in the original paper.
+	 * Connection rule used to connect regions. ConnectRule.EIGHT was using in the original paper.
 	 */
 	public ConnectRule connectRule = ConnectRule.EIGHT;
 
 	/**
-	 * If set to a value larger than 0 then an approximate sorting routine will be used.  This improves speed
-	 * by about 40%.  A value of 2000 is recommended.
+	 * If set to a value larger than 0 then an approximate sorting routine will be used. This improves speed
+	 * by about 40%. A value of 2000 is recommended.
 	 */
 	public int approximateSortBins = 0;
 

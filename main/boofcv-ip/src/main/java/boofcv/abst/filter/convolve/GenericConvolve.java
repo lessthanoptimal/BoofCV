@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -30,7 +30,7 @@ import java.lang.reflect.Method;
 
 
 /**
- * Generalized interface for filtering images with convolution kernels.  Can invoke different
+ * Generalized interface for filtering images with convolution kernels. Can invoke different
  * techniques for handling image borders.
  *
  * @author Peter Abeles

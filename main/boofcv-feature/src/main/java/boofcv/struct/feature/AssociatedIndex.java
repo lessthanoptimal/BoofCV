@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -31,7 +31,7 @@ public class AssociatedIndex {
 	public @Getter @Setter int src;
 	/** index of the feature in the destination image */
 	public @Getter @Setter int dst;
-	/** The association score.  Meaning will very depending on implementation */
+	/** The association score. Meaning will very depending on implementation */
 	public @Getter @Setter double fitScore;
 
 	public AssociatedIndex( AssociatedIndex original ) {

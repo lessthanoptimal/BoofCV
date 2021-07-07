@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -45,7 +45,7 @@ public class ConfigSquareGridBinary implements Configuration {
 	public ConfigThreshold configThreshold = ConfigThreshold.local(ThresholdType.LOCAL_MEAN, 41);
 
 	/**
-	 * Ordered list of expected square fiducial ID numbers.  Starts from top left and follows a row major
+	 * Ordered list of expected square fiducial ID numbers. Starts from top left and follows a row major
 	 * ordering.
 	 */
 	public long ids[];
@@ -116,7 +116,7 @@ public class ConfigSquareGridBinary implements Configuration {
 	}
 
 	/**
-	 * Parses a simple configuration text sequence that describes the target type.  Example is shown below:
+	 * Parses a simple configuration text sequence that describes the target type. Example is shown below:
 	 * <pre>
 	 * # Description of a binary grid calibration target
 	 * binary_width 3

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -24,7 +24,7 @@ import georegression.struct.point.Point2D_F64;
 
 /**
  * Converts an image pixel coordinate into a normalized pixel coordinate using the
- * camera's intrinsic parameters.  Lens distortion must have already been removed.
+ * camera's intrinsic parameters. Lens distortion must have already been removed.
  *
  * @author Peter Abeles
  */

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -41,13 +41,13 @@ import georegression.struct.point.Point2D_F32;
 import lombok.Getter;
 
 /**
- * <p>High level interface for rendering a distorted image into another one.  Uses a flow style interface to remove
+ * <p>High level interface for rendering a distorted image into another one. Uses a flow style interface to remove
  * much of the drugery.</p>
  *
  * <p>If you are changing the input images and avoiding declaring new memory then you need to be careful
- * how this class is used.  For example, call {@link #setRefs(ImageBase, ImageBase)} instead of
- * {@link #init(ImageBase, ImageBase)}.  Init() will discard the previous settings while with setRefs() it's possible
- * to update only what has changed.  Make sure you follow the instructions in setRefs() and browsing the code in this
+ * how this class is used. For example, call {@link #setRefs(ImageBase, ImageBase)} instead of
+ * {@link #init(ImageBase, ImageBase)}. Init() will discard the previous settings while with setRefs() it's possible
+ * to update only what has changed. Make sure you follow the instructions in setRefs() and browsing the code in this
  * class might help you understand what's going on.</p>
  *
  * @author Peter Abeles
@@ -72,7 +72,7 @@ public class FDistort
 	@Getter boolean cached = false;
 
 	/**
-	 * Constructor in which input and output images are specified.  Equivalent to calling
+	 * Constructor in which input and output images are specified. Equivalent to calling
 	 * {@link #init(ImageBase, ImageBase)}
 	 *
 	 * @param input Input image
@@ -112,7 +112,7 @@ public class FDistort
 	}
 
 	/**
-	 * All this does is set the references to the images.  Nothing else is changed and its up to the
+	 * All this does is set the references to the images. Nothing else is changed and its up to the
 	 * user to correctly update everything else.
 	 *
 	 * If called the first time you need to do the following
@@ -136,7 +136,7 @@ public class FDistort
 	}
 
 	/**
-	 * Changes the input image.  The previous distortion is thrown away only if the input
+	 * Changes the input image. The previous distortion is thrown away only if the input
 	 * image has a different shape
 	 */
 	public FDistort input( ImageBase input ) {
@@ -149,7 +149,7 @@ public class FDistort
 	}
 
 	/**
-	 * Changes the output image.  The previous distortion is thrown away only if the output
+	 * Changes the output image. The previous distortion is thrown away only if the output
 	 * image has a different shape
 	 */
 	public FDistort output( ImageBase output ) {
@@ -215,7 +215,7 @@ public class FDistort
 	 * used to provide a custom interpolation algorithm
 	 *
 	 * <p>
-	 * NOTE: This will force the distorter to be declared again, even if nothing has changed.  This only matters if
+	 * NOTE: This will force the distorter to be declared again, even if nothing has changed. This only matters if
 	 * you are being very careful about your memory management.
 	 * </p>
 	 */
@@ -252,7 +252,7 @@ public class FDistort
 	}
 
 	/**
-	 * Used to manually specify a transform.  From output to input
+	 * Used to manually specify a transform. From output to input
 	 */
 	public FDistort transform( PixelTransform<Point2D_F32> outputToInput ) {
 		this.outputToInput = outputToInput;
@@ -260,7 +260,7 @@ public class FDistort
 	}
 
 	/**
-	 * Used to manually specify a transform.  From output to input
+	 * Used to manually specify a transform. From output to input
 	 */
 	public FDistort transform( Point2Transform2_F32 outputToInput ) {
 		return transform( new PointToPixelTransform_F32(outputToInput));
@@ -299,7 +299,7 @@ public class FDistort
 	}
 
 	/**
-	 * <p>Applies a distortion which will rescale the input image into the output image.  You
+	 * <p>Applies a distortion which will rescale the input image into the output image. You
 	 * might want to consider using {@link #scaleExt()} instead since it sets the border behavior
 	 * to extended, which is probably what you want to do.</p>
 	 *
@@ -318,7 +318,7 @@ public class FDistort
 
 	/**
 	 * Scales the image and sets the border to {@link BorderType#EXTENDED}. This is normally what you want
-	 * to do when scaling an image.  If you don't use an extended border when you hit the right and bottom
+	 * to do when scaling an image. If you don't use an extended border when you hit the right and bottom
 	 * boundaries it will go outside the image bounds and if a fixed value of 0 is used it will average towards
 	 * zero.
 	 */

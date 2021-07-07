@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -33,8 +33,8 @@ import boofcv.struct.pyramid.PyramidDiscrete;
 import java.awt.image.BufferedImage;
 
 /**
- * Demonstrates how to construct and display a {@link PyramidDiscrete}.  Discrete pyramids require that
- * each level has a relative scale with an integer ratio and is updated by sparsely sub-sampling.  These
+ * Demonstrates how to construct and display a {@link PyramidDiscrete}. Discrete pyramids require that
+ * each level has a relative scale with an integer ratio and is updated by sparsely sub-sampling. These
  * restrictions allows a very quick update across scale space.
  *
  * @author Peter Abeles

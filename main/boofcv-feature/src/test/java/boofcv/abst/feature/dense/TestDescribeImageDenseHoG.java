@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -45,11 +45,10 @@ public class TestDescribeImageDenseHoG extends BoofStandardJUnit {
 			ImageType.pl(2, ImageDataType.U8),ImageType.pl(2, ImageDataType.F32) };
 
 	/**
-	 * Checks to see if valid locations are returned.  Very simple test.  Can't test descriptor correctness since
+	 * Checks to see if valid locations are returned. Very simple test. Can't test descriptor correctness since
 	 * there isn't a sparse HOG yet.
 	 */
-	@Test
-	public void checkSampleLocations() {
+	@Test void checkSampleLocations() {
 		ConfigDenseHoG config = new ConfigDenseHoG();
 		config.fastVariant = true;
 		check(config);

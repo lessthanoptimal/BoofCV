@@ -35,15 +35,15 @@ import lombok.Getter;
  * <p/>
  *
  * <p>
- * This implementation works by trying to minimize the number of reads per pixel.  Code is auto generated and samples
+ * This implementation works by trying to minimize the number of reads per pixel. Code is auto generated and samples
  * each point in a series of if statements such that the number of possible candidate corners around a pixel are
- * eliminated.  A different auto generated implementation is provided for Fast 9 to Fast 12. The number indicates how
+ * eliminated. A different auto generated implementation is provided for Fast 9 to Fast 12. The number indicates how
  * many continuous pixels are needed for it to be considered a corner.
  * </p>
  *
  * <p>
  * After a pixel is flagged as a corner then the the intensity the difference between the average
- * exterior pixel value which is part of the corner and the center pixel value.  See code for details.
+ * exterior pixel value which is part of the corner and the center pixel value. See code for details.
  * </p>
  *
  * <p>
@@ -73,7 +73,7 @@ public class FastCornerDetector<T extends ImageGray<T>> implements FeatureIntens
 
 	// pixel index offsets for the circle
 	protected int[] offsets;
-	// the image's stride.  Used to determine if the offsets need to be recomputed
+	// the image's stride. Used to determine if the offsets need to be recomputed
 	int stride = 0;
 
 	// list of pixels that might be corners.

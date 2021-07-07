@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -41,8 +41,7 @@ public class TestFactoryWaveletDaub extends CommonFactoryWavelet {
 	/**
 	 * Sees if the DaubJ transform can reconstruct an image.
 	 */
-	@Test
-	public void transform_daubJ_F32() {
+	@Test void transform_daubJ_F32() {
 
 		for( int i = 4; i <= 4; i += 2 ) {
 			WaveletDescription<WlCoef_F32> desc = FactoryWaveletDaub.daubJ_F32(i);
@@ -54,8 +53,7 @@ public class TestFactoryWaveletDaub extends CommonFactoryWavelet {
 	/**
 	 * Sees if the standard DaubJ wavelets have the expected characteristics
 	 */
-	@Test
-	public void daubJ_F32_forward() {
+	@Test void daubJ_F32_forward() {
 		for( int i = 4; i <= 4; i += 2 ) {
 
 			// test forward coefficients for the expected properties
@@ -83,8 +81,7 @@ public class TestFactoryWaveletDaub extends CommonFactoryWavelet {
 		}
 	}
 
-	@Test
-	public void transform_biorthogonal_F32() {
+	@Test void transform_biorthogonal_F32() {
 
 		for( BorderType type : borderTypes  )
 		{
@@ -96,8 +93,7 @@ public class TestFactoryWaveletDaub extends CommonFactoryWavelet {
 		}
 	}
 
-	@Test
-	public void biorthogonal_F32_forward() {
+	@Test void biorthogonal_F32_forward() {
 
 		for( int i = 5; i <= 5; i += 2 ) {
 
@@ -122,8 +118,7 @@ public class TestFactoryWaveletDaub extends CommonFactoryWavelet {
 		}
 	}
 
-	@Test
-	public void transform_biorthogonal_I32() {
+	@Test void transform_biorthogonal_I32() {
 
 		for( BorderType type : borderTypes ) {
 			for( int i = 5; i <= 5; i += 2 ) {
@@ -134,8 +129,7 @@ public class TestFactoryWaveletDaub extends CommonFactoryWavelet {
 		}
 	}
 
-	@Test
-	public void biorthogonal_I32_forward() {
+	@Test void biorthogonal_I32_forward() {
 
 		for( int i = 5; i <= 5; i += 2 ) {
 
@@ -160,8 +154,7 @@ public class TestFactoryWaveletDaub extends CommonFactoryWavelet {
 		}
 	}
 
-	@Test
-	public void biorthogonal_F32_inverse() {
+	@Test void biorthogonal_F32_inverse() {
 
 		for( BorderType type : borderTypes ) {
 			for( int i = 5; i <= 5; i += 2 ) {
@@ -172,8 +165,7 @@ public class TestFactoryWaveletDaub extends CommonFactoryWavelet {
 		}
 	}
 
-	@Test
-	public void biorthogonal_I32_inverse() {
+	@Test void biorthogonal_I32_inverse() {
 
 		for( BorderType type : borderTypes  ) {
 			for( int i = 5; i <= 5; i += 2 ) {

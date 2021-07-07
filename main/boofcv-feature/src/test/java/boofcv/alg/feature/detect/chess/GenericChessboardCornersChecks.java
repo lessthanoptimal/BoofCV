@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -40,8 +40,7 @@ abstract class GenericChessboardCornersChecks extends CommonChessboardCorners {
 	/**
 	 * Test everything together with perfect input, but rotate the chessboard
 	 */
-	@Test
-	public void process_rotate() {
+	@Test void process_rotate() {
 		// make it bigger so that being a pyramid matters
 		this.w = 50;
 
@@ -61,8 +60,7 @@ abstract class GenericChessboardCornersChecks extends CommonChessboardCorners {
 	/**
 	 * Apply heavy blurring to the input image so that the bottom most layer won't reliably detect corners
 	 */
-	@Test
-	public void process_blurred() {
+	@Test void process_blurred() {
 		// make it bigger so that being a pyramid matters
 		this.w = 50;
 

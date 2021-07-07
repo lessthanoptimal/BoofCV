@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -37,14 +37,12 @@ public class TestFactoryWaveletHaar extends CommonFactoryWavelet {
 	/**
 	 * Encode and decode an image using the Haar wavelet
 	 */
-	@Test
-	public void transform_F32() {
+	@Test void transform_F32() {
 		WaveletDescription<WlCoef_F32> desc = FactoryWaveletHaar.generate(false,32);
 		checkEncodeDecode_F32(desc);
 	}
 
-	@Test
-	public void checkProperties_F32() {
+	@Test void checkProperties_F32() {
 		WaveletDescription<WlCoef_F32> desc = FactoryWaveletHaar.generate(false,32);
 		WlCoef_F32 coef = desc.getForward();
 
@@ -59,8 +57,7 @@ public class TestFactoryWaveletHaar extends CommonFactoryWavelet {
 		checkBiorthogonal_F32(desc);
 	}
 
-	@Test
-	public void checkProperties_I32() {
+	@Test void checkProperties_I32() {
 		WaveletDescription<WlCoef_I32> desc = FactoryWaveletHaar.generate(true,32);
 		WlCoef_I32 coef = desc.getForward();
 

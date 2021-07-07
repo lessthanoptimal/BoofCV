@@ -43,9 +43,9 @@ public class FactoryDistort {
 
 	/**
 	 * Creates a {@link boofcv.alg.distort.ImageDistort} for the specified image type, transformation
-	 * and interpolation instance.  Min and max pixel values are assumed to be 0 and 255, respectively.
+	 * and interpolation instance. Min and max pixel values are assumed to be 0 and 255, respectively.
 	 *
-	 * @param cached If true the distortion is only computed one.  False for recomputed each time, but less memory.
+	 * @param cached If true the distortion is only computed one. False for recomputed each time, but less memory.
 	 * @param interpolationType Which interpolation method it should use
 	 * @param borderType How pixels outside the image border are handled
 	 * @param inputType Type of input image
@@ -65,7 +65,7 @@ public class FactoryDistort {
 	 * Creates a {@link boofcv.alg.distort.ImageDistort} for the specified image type, transformation
 	 * and interpolation instance.
 	 *
-	 * @param cached If true the distortion is only computed one.  False for recomputed each time, but less memory.
+	 * @param cached If true the distortion is only computed one. False for recomputed each time, but less memory.
 	 * @param interp Which interpolation algorithm should be used.
 	 * @param outputType Type of output image.
 	 * @return ImageDistort
@@ -88,7 +88,7 @@ public class FactoryDistort {
 	 * Creates a {@link boofcv.alg.distort.ImageDistort} for the specified image type, transformation
 	 * and interpolation instance.
 	 *
-	 * @param cached If true the distortion is only computed one.  False for recomputed each time, but less memory.
+	 * @param cached If true the distortion is only computed one. False for recomputed each time, but less memory.
 	 * @param interp Which interpolation algorithm should be used.
 	 * @param outputType Type of output image.
 	 */
@@ -124,7 +124,7 @@ public class FactoryDistort {
 	 * Creates a {@link boofcv.alg.distort.ImageDistort} for the planar images, transformation
 	 * and interpolation instance.
 	 *
-	 * @param cached If true the distortion is only computed one.  False for recomputed each time, but less memory.
+	 * @param cached If true the distortion is only computed one. False for recomputed each time, but less memory.
 	 * @param interp Which interpolation algorithm should be used.
 	 * @param outputType Type of output image.
 	 */

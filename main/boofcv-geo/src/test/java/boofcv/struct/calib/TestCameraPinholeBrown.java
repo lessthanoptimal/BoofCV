@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -28,8 +28,7 @@ import static org.junit.jupiter.api.Assertions.*;
  */
 public class TestCameraPinholeBrown extends BoofStandardJUnit {
 
-	@Test
-	public void set_radial() {
+	@Test void set_radial() {
 		CameraPinholeBrown p = new CameraPinholeBrown(200,210,1,320,240,640,380);
 		p.fsetRadial(1,2);
 		p.fsetTangental(2,3);
@@ -40,8 +39,7 @@ public class TestCameraPinholeBrown extends BoofStandardJUnit {
 		equalsR(p,f);
 	}
 
-	@Test
-	public void set_pinhole() {
+	@Test void set_pinhole() {
 		CameraPinhole p = new CameraPinhole(2020,2210,2,2,56,5,234);
 
 		CameraPinholeBrown f = new CameraPinholeBrown(200,210,1,320,240,640,380);
@@ -78,8 +76,7 @@ public class TestCameraPinholeBrown extends BoofStandardJUnit {
 		}
 	}
 
-	@Test
-	public void fsetRadial() {
+	@Test void fsetRadial() {
 		CameraPinholeBrown p = new CameraPinholeBrown(200,210,1,320,240,640,380);
 
 		assertTrue(p == p.fsetRadial(1.1,2.2,3.3));
@@ -100,8 +97,7 @@ public class TestCameraPinholeBrown extends BoofStandardJUnit {
 		assertEquals(0,p.t2, 1e-8);
 	}
 
-	@Test
-	public void fsetTangental() {
+	@Test void fsetTangental() {
 		CameraPinholeBrown p = new CameraPinholeBrown(200,210,1,320,240,640,380);
 
 		assertTrue(p == p.fsetTangental(1.1, 2.2));
@@ -119,8 +115,7 @@ public class TestCameraPinholeBrown extends BoofStandardJUnit {
 		assertTrue(p.radial==null);
 	}
 
-	@Test
-	public void isDistorted() {
+	@Test void isDistorted() {
 		CameraPinholeBrown p = new CameraPinholeBrown(200,210,0,320,240,640,380);
 
 		assertFalse(p.isDistorted());

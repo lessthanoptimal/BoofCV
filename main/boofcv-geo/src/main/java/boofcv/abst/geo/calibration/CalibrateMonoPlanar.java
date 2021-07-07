@@ -37,8 +37,8 @@ import java.util.Set;
 
 /**
  * <p>
- * Performs the full processing loop for calibrating a mono camera from a planar grid.  A
- * directory is specified that the images are read in from.  Calibration points are detected
+ * Performs the full processing loop for calibrating a mono camera from a planar grid. A
+ * directory is specified that the images are read in from. Calibration points are detected
  * inside the image and feed into the Zhang99 algorithm for parameter estimation.
  * </p>
  *
@@ -57,7 +57,7 @@ import java.util.Set;
  * <p>
  * <b>Most 3D operations in BoofCV assume that the image coordinate system is right handed and the +Z axis is
  * pointing out of the camera.</b>  In standard image coordinate the origin (0,0) is at the top left corner with +x going
- * to the right and +y going down, then if it is right handed +z will be out of the image.  <b>However some times
+ * to the right and +y going down, then if it is right handed +z will be out of the image. <b>However some times
  * this pseudo standard is not followed and the y-axis needs to be inverted by setting isInverted to true.</b>
  * </p>
  *
@@ -123,7 +123,7 @@ public class CalibrateMonoPlanar implements VerbosePrint {
 	}
 
 	/**
-	 * Resets internal data structures.  Must call before adding images
+	 * Resets internal data structures. Must call before adding images
 	 */
 	public void reset() {
 		observations = new ArrayList<>();
@@ -156,7 +156,7 @@ public class CalibrateMonoPlanar implements VerbosePrint {
 
 	/**
 	 * After calibration points have been found this invokes the Zhang99 algorithm to
-	 * estimate calibration parameters.  Error statistics are also computed.
+	 * estimate calibration parameters. Error statistics are also computed.
 	 */
 	public <T extends CameraModel> T process() {
 		if (zhang99 == null)

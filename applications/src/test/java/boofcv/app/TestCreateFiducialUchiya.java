@@ -53,8 +53,7 @@ class TestCreateFiducialUchiya extends CommonFiducialPdfChecks {
 		err.used = false;
 	}
 
-	@Test
-	public void case0() throws IOException {
+	@Test void case0() throws IOException {
 		int N = 4;
 		createDocument("--MarkerBorder -w 8 -um 4 -n 30 -o uchiya.pdf");
 		BufferedImage image = loadPDF();
@@ -78,8 +77,7 @@ class TestCreateFiducialUchiya extends CommonFiducialPdfChecks {
 		checkResults(N, detector);
 	}
 
-	@Test
-	public void case1() throws IOException {
+	@Test void case1() throws IOException {
 		int N = 8;
 		createDocument("-rs 4445 -w 5 -um 8 -n 22 -dd 0.6 -o uchiya.pdf");
 		BufferedImage image = loadPDF();

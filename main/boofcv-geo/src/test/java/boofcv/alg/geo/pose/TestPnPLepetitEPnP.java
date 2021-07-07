@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -47,13 +47,11 @@ public class TestPnPLepetitEPnP extends BoofStandardJUnit {
 //		fail("consider");
 //	}
 
-	@Test
-	public void standardTests() {
+	@Test void standardTests() {
 		standardTest(0);
 	}
 
-	@Test
-	public void standardTests_iteration() {
+	@Test void standardTests_iteration() {
 		standardTest(10);
 	}
 
@@ -89,8 +87,7 @@ public class TestPnPLepetitEPnP extends BoofStandardJUnit {
 		}
 	}
 	
-	@Test
-	public void selectWorldControlPoints_planar() {
+	@Test void selectWorldControlPoints_planar() {
 
 		List<Point3D_F64> worldPts = CommonHomographyChecks.createRandomPlane(rand, 3, 30);
 		DogArray<Point3D_F64> controlPts = new DogArray<>(4, Point3D_F64::new);
@@ -119,8 +116,7 @@ public class TestPnPLepetitEPnP extends BoofStandardJUnit {
 		}
 	}
 
-	@Test
-	public void selectControlPoints() {
+	@Test void selectControlPoints() {
 
 		List<Point3D_F64> worldPts = GeoTestingOps.randomPoints_F64(-1, 10, -5, 20, 0.1, 0.5, 30, rand);
 		DogArray<Point3D_F64> controlPts = new DogArray<>(4, Point3D_F64::new);
@@ -147,8 +143,7 @@ public class TestPnPLepetitEPnP extends BoofStandardJUnit {
 		}
 	}
 
-	@Test
-	public void computeBarycentricCoordinates() {
+	@Test void computeBarycentricCoordinates() {
 		List<Point3D_F64> worldPoints = GeoTestingOps.randomPoints_F64(-1, 10, -5, 20, 0.1, 0.5, 30, rand);
 		DogArray<Point3D_F64> worldControlPts = new DogArray<>(4, Point3D_F64::new);
 
@@ -183,8 +178,7 @@ public class TestPnPLepetitEPnP extends BoofStandardJUnit {
 		}
 	}
 
-	@Test
-	public void constructM() {
+	@Test void constructM() {
 		List<Point2D_F64> obsPts = GeoTestingOps.randomPoints_F64(-1, 2, -5, 20, 30, rand);
 		DMatrixRMaj M = RandomMatrices_DDRM.rectangle(2 * obsPts.size(), 12,rand);
 		DMatrixRMaj alpha = RandomMatrices_DDRM.rectangle(obsPts.size(),4,rand);
@@ -200,8 +194,7 @@ public class TestPnPLepetitEPnP extends BoofStandardJUnit {
 		}
 	}
 
-	@Test
-	public void extractNullPoints() {
+	@Test void extractNullPoints() {
 		// create a singular matrix
 		SimpleMatrix M = SimpleMatrix.wrap(RandomMatrices_DDRM.singular(12, 40, rand, 12, 11, 10, 9, 8, 7, 6, 5, 4, 3, 2, 0));
 
@@ -232,8 +225,7 @@ public class TestPnPLepetitEPnP extends BoofStandardJUnit {
 	/**
 	 * Create two sets of points with a known scale difference.
 	 */
-	@Test
-	public void estimateCase1() {
+	@Test void estimateCase1() {
 		PnPLepetitEPnP alg = new PnPLepetitEPnP();
 
 		// skip the adjust step

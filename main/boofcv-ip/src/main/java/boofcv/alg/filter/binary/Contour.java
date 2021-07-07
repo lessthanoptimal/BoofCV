@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -24,7 +24,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Internal and externals contours for a binary blob.  The set of points in each contour list are ordered in
+ * Internal and externals contours for a binary blob. The set of points in each contour list are ordered in
  * CW or CCW directions.
  *
  * @author Peter Abeles

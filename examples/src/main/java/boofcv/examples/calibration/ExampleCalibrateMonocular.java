@@ -38,12 +38,12 @@ import java.util.List;
  * should be in focus and that target evenly spread through out the images. In particular the edges of the image
  * should be covered.
  *
- * After processing both intrinsic camera parameters and lens distortion are estimated.  Square grid and chessboard
+ * After processing both intrinsic camera parameters and lens distortion are estimated. Square grid and chessboard
  * targets are demonstrated by this example. See calibration tutorial for a discussion of different target types
  * and how to collect good calibration images.
  *
- * All the image processing and calibration is taken care of inside of {@link CalibrateMonoPlanar}.  The code below
- * loads calibration images as inputs, calibrates, and saves results to an XML file.  See in code comments for tuning
+ * All the image processing and calibration is taken care of inside of {@link CalibrateMonoPlanar}. The code below
+ * loads calibration images as inputs, calibrates, and saves results to an XML file. See in code comments for tuning
  * and implementation issues.
  *
  * @see CalibrateMonoPlanar

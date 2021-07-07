@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -30,8 +30,7 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
  */
 public class TestModelManagerEpipolarMatrix extends BoofStandardJUnit {
 
-	@Test
-	public void createModelInstance() {
+	@Test void createModelInstance() {
 		ModelManagerEpipolarMatrix alg = new ModelManagerEpipolarMatrix();
 		DMatrixRMaj found = alg.createModelInstance();
 
@@ -40,8 +39,7 @@ public class TestModelManagerEpipolarMatrix extends BoofStandardJUnit {
 		assertEquals(3,found.getNumCols());
 	}
 
-	@Test
-	public void copyModel() {
+	@Test void copyModel() {
 		ModelManagerEpipolarMatrix alg = new ModelManagerEpipolarMatrix();
 
 		DMatrixRMaj m = new DMatrixRMaj(3,3);

@@ -30,9 +30,9 @@ import boofcv.struct.sparse.SparseScaleGradient;
 
 /**
  * <p>
- * Implementation of the SURF feature descriptor, see [1].  SURF features are invariant to illumination, scale,
- * and orientation.  Both the orientated and unoriented varieties can be computed.
- * SURF-64 describes an interest point using a 64 values that are computed from 16 sub regions.  Each sub-region
+ * Implementation of the SURF feature descriptor, see [1]. SURF features are invariant to illumination, scale,
+ * and orientation. Both the orientated and unoriented varieties can be computed.
+ * SURF-64 describes an interest point using a 64 values that are computed from 16 sub regions. Each sub-region
  * contributes 4 features, the sum of dx,|dx|,dy,|dy|, where dx and dy are the local derivatives.
  * </p>
  *
@@ -42,14 +42,14 @@ import boofcv.struct.sparse.SparseScaleGradient;
  * <li>Haar wavelet or image derivative can be used.</li>
  * <li>Derivative sample coordinates are interpolated by rounding to the nearest integer.</li>
  * <li>Weighting function is applied to each sub region as a whole and not to each wavelet inside the sub
- * region.  This allows the weight to be precomputed once.  Unlikely to degrade quality significantly.</li>
+ * region. This allows the weight to be precomputed once. Unlikely to degrade quality significantly.</li>
  * </ul>
  * </p>
  *
  * <p>
  * Usage Notes:<br>
- * If the input image is floating point then normalizing it will very slightly improves stability.  Normalization in
- * this situation means dividing the input image by the maximum pixel intensity value, typically 255.  In stability
+ * If the input image is floating point then normalizing it will very slightly improves stability. Normalization in
+ * this situation means dividing the input image by the maximum pixel intensity value, typically 255. In stability
  * benchmarks it slightly change the results, but not enough to justify the runtime performance hit.
  * </p>
  *
@@ -87,7 +87,7 @@ public class DescribePointSurf<II extends ImageGray<II>> {
 	// can handle sample requests outside the image border
 	protected SparseImageGradient<II, ?> gradientSafe;
 
-	// radius of the descriptor at a scale of 1.  Used to determine if it touches the image boundary
+	// radius of the descriptor at a scale of 1. Used to determine if it touches the image boundary
 	// does not include sample kernel size
 	protected int radiusDescriptor;
 
@@ -97,9 +97,9 @@ public class DescribePointSurf<II extends ImageGray<II>> {
 	 * @param widthLargeGrid Number of sub-regions wide the large grid is. Typically 4
 	 * @param widthSubRegion Number of sample points wide a sub-region is. Typically 5
 	 * @param widthSample The width of a sample point. Typically 4
-	 * @param weightSigma Weighting factor's sigma.  Try 3.8
+	 * @param weightSigma Weighting factor's sigma. Try 3.8
 	 * @param useHaar If true the Haar wavelet will be used (what was used in [1]), false means an image gradient
-	 * approximation will be used.  False is recommended.
+	 * approximation will be used. False is recommended.
 	 */
 	public DescribePointSurf( int widthLargeGrid, int widthSubRegion, double widthSample,
 							  double weightSigma, boolean useHaar,
@@ -131,7 +131,7 @@ public class DescribePointSurf<II extends ImageGray<II>> {
 	}
 
 	/**
-	 * Create a SURF-64 descriptor.  See [1] for details.
+	 * Create a SURF-64 descriptor. See [1] for details.
 	 */
 	public DescribePointSurf( Class<II> inputType ) {
 		this(4, 5, 3, 4.5, false, inputType);
@@ -148,7 +148,7 @@ public class DescribePointSurf<II extends ImageGray<II>> {
 
 	/**
 	 * <p>
-	 * Computes the SURF descriptor for the specified interest point.  If the feature
+	 * Computes the SURF descriptor for the specified interest point. If the feature
 	 * goes outside of the image border (including convolution kernels) then null is returned.
 	 * </p>
 	 *
@@ -192,7 +192,7 @@ public class DescribePointSurf<II extends ImageGray<II>> {
 	 * Deviation from paper:<br>
 	 * <ul>
 	 * <li>Weighting function is applied to each sub region as a whole and not to each wavelet inside the sub
-	 * region.  This allows the weight to be precomputed once.  Unlikely to degrade quality significantly.</li>
+	 * region. This allows the weight to be precomputed once. Unlikely to degrade quality significantly.</li>
 	 * </ul>
 	 * </p>
 	 *
@@ -201,7 +201,7 @@ public class DescribePointSurf<II extends ImageGray<II>> {
 	 * @param c cosine of the orientation
 	 * @param s sine of the orientation
 	 * @param scale The scale of the wavelets.
-	 * @param features Where the features are written to.  Must be 4*(widthLargeGrid*widthSubRegion)^2 large.
+	 * @param features Where the features are written to. Must be 4*(widthLargeGrid*widthSubRegion)^2 large.
 	 */
 	public void features( double c_x, double c_y,
 						  double c, double s, double scale,

@@ -57,11 +57,11 @@ import java.util.List;
 
 /**
  * <p>
- * Base class for square fiducial detectors.  Searches for quadrilaterals inside the image with a black border
- * and inner contours.  It then removes perspective and lens distortion from the candidate quadrilateral and
- * rendered onto a new image.  The just mentioned image is then passed on to the class which extends this one.
+ * Base class for square fiducial detectors. Searches for quadrilaterals inside the image with a black border
+ * and inner contours. It then removes perspective and lens distortion from the candidate quadrilateral and
+ * rendered onto a new image. The just mentioned image is then passed on to the class which extends this one.
  * After being processed by the extending class, the corners are rotated to match and the 3D pose of the
- * target found.  Lens distortion is removed sparsely for performance reasons.
+ * target found. Lens distortion is removed sparsely for performance reasons.
  * </p>
  *
  * <p>
@@ -126,7 +126,7 @@ public abstract class BaseDetectFiducialSquare<T extends ImageGray<T>> {
 	 * @param squareDetector Detects the quadrilaterals in the image
 	 * @param binaryCopy If true a copy is created of the binary image and it's not modified.
 	 * @param borderWidthFraction Fraction of the fiducial's width that the border occupies. 0.25 is recommended.
-	 * @param minimumBorderBlackFraction Minimum fraction of pixels inside the border which must be black.  Try 0.65
+	 * @param minimumBorderBlackFraction Minimum fraction of pixels inside the border which must be black. Try 0.65
 	 * @param squarePixels  Number of pixels wide the undistorted square image of the fiducial's interior is.
 	 *                      This will include the black border.
 	 * @param inputType Type of input image it's processing
@@ -176,7 +176,7 @@ public abstract class BaseDetectFiducialSquare<T extends ImageGray<T>> {
 	 * @param distortion Lens distortion
 	 * @param width Image width
 	 * @param height Image height
-	 * @param cache If there's lens distortion should it cache the transforms?  Speeds it up by about 12%.  Ignored
+	 * @param cache If there's lens distortion should it cache the transforms?  Speeds it up by about 12%. Ignored
 	 *              if no lens distortion
 	 */
 	public void configure(LensDistortionNarrowFOV distortion, int width , int height , boolean cache ) {
@@ -245,7 +245,7 @@ public abstract class BaseDetectFiducialSquare<T extends ImageGray<T>> {
 			// compute the homography from the input image to an undistorted square image
 			// If lens distortion has been specified this polygon will be in undistorted pixels
 			Polygon2D_F64 p = candidates.get(i);
-//			System.out.println(i+"  processing...  "+p.areaSimple()+" at "+p.get(0));
+//			System.out.println(i+"  processing... "+p.areaSimple()+" at "+p.get(0));
 
 			// sanity check before processing
 			if( !checkSideSize(p) ) {
@@ -254,7 +254,7 @@ public abstract class BaseDetectFiducialSquare<T extends ImageGray<T>> {
 			}
 
 			// REMOVE EVENTUALLY  This is a hack around how interpolation is performed
-			// Using a surface integral instead would remove the need for this.  Basically by having it start
+			// Using a surface integral instead would remove the need for this. Basically by having it start
 			// interpolating from the lower extent it samples inside the image more
 			// A good unit test to see if this hack is no longer needed is to rotate the order of the polygon and
 			// see if it returns the same undistorted image each time
@@ -293,9 +293,9 @@ public abstract class BaseDetectFiducialSquare<T extends ImageGray<T>> {
 			ConvertFloatType.convert(H_fixed, transformHomography.getModel());
 
 			// TODO Improve how perspective is removed
-			// The current method introduces artifacts.  If the "square" is larger
+			// The current method introduces artifacts. If the "square" is larger
 			// than the detected region and bilinear interpolation is used then pixels outside will// influence the
-			// value of pixels inside and shift things over.  this is all bad
+			// value of pixels inside and shift things over. this is all bad
 
 			// remove the perspective distortion and process it
 			removePerspective.apply(gray, square);
@@ -360,7 +360,7 @@ public abstract class BaseDetectFiducialSquare<T extends ImageGray<T>> {
 	 * @return fraction of border that's black
 	 */
 	protected double computeFractionBoundary( float pixelThreshold ) {
-		// TODO ignore outer pixels from this computation.  Will require 8 regions (4 corners + top/bottom + left/right)
+		// TODO ignore outer pixels from this computation. Will require 8 regions (4 corners + top/bottom + left/right)
 		final int w = square.width;
 		int radius = (int) (w * borderWidthFraction);
 
@@ -424,7 +424,7 @@ public abstract class BaseDetectFiducialSquare<T extends ImageGray<T>> {
 	}
 
 	/**
-	 * Processes the detected square and matches it to a known fiducial.  Black border
+	 * Processes the detected square and matches it to a known fiducial. Black border
 	 * is included.
 	 *
 	 * @param square Image of the undistorted square
@@ -471,7 +471,7 @@ public abstract class BaseDetectFiducialSquare<T extends ImageGray<T>> {
 		int which;
 		// length of one of the sides in world units
 		double lengthSide;
-		// amount of clockwise rotation.  Each value = +90 degrees
+		// amount of clockwise rotation. Each value = +90 degrees
 		// Just to make things confusion, the rotation is done in the visual clockwise, which
 		// is a counter-clockwise rotation when you look at the actual coordinates
 		int rotation;

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -41,8 +41,7 @@ public class TestCreateSyntheticOverheadView extends BoofStandardJUnit {
 	int height = 850;
 	CameraPinholeBrown param = new CameraPinholeBrown(200, 201, 0, width/2, height/2, width, height).fsetRadial(0.002, 0);
 
-	@Test
-	public void checkPrecomputedTransform() {
+	@Test void checkPrecomputedTransform() {
 		// Easier to make up a plane in this direction
 		Se3_F64 cameraToPlane = new Se3_F64();
 		ConvertRotation3D_F64.eulerToMatrix(EulerType.XYZ, UtilAngle.degreeToRadian(0), 0, 0, cameraToPlane.getR());

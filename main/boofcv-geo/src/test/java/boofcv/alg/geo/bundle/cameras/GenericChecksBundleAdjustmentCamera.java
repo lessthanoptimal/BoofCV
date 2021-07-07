@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -75,8 +75,7 @@ public abstract class GenericChecksBundleAdjustmentCamera extends BoofStandardJU
 	/**
 	 * Check the jacobians numerically
 	 */
-	@Test
-	public void jacobians() {
+	@Test void jacobians() {
 
 		// pick a point which would be in front of the camera
 		for (double[] X : test_X) {
@@ -98,8 +97,7 @@ public abstract class GenericChecksBundleAdjustmentCamera extends BoofStandardJU
 	/**
 	 * Make sure the jacobian of the input is the same no matter how it's computed
 	 */
-	@Test
-	public void compare_input_jacobians() {
+	@Test void compare_input_jacobians() {
 		for (double[] X : test_X) {
 			double[] found0 = new double[3];
 			double[] found1 = new double[3];

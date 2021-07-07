@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -41,8 +41,7 @@ public class TestEquirectangularTools_F64 extends BoofStandardJUnit {
 	 * Test converting back and forth between equirectangular coordinates and lat-lon using different
 	 * centers
 	 */
-	@Test
-	public void equiToLonlat_reverse() {
+	@Test void equiToLonlat_reverse() {
 
 		EquirectangularTools_F64 tools = new EquirectangularTools_F64();
 		tools.configure(width,height);
@@ -66,8 +65,7 @@ public class TestEquirectangularTools_F64 extends BoofStandardJUnit {
 		assertEquals(y,r.y, GrlConstants.TEST_F64);
 	}
 
-	@Test
-	public void equiToLonlatFV_reverse() {
+	@Test void equiToLonlatFV_reverse() {
 
 		EquirectangularTools_F64 tools = new EquirectangularTools_F64();
 		tools.configure(width,height);
@@ -93,8 +91,7 @@ public class TestEquirectangularTools_F64 extends BoofStandardJUnit {
 	/**
 	 * Test one very simple case with a known answer
 	 */
-	@Test
-	public void equiToNorm() {
+	@Test void equiToNorm() {
 		EquirectangularTools_F64 tools = new EquirectangularTools_F64();
 
 		tools.configure(300,250);
@@ -122,8 +119,7 @@ public class TestEquirectangularTools_F64 extends BoofStandardJUnit {
 		assertTrue(found.distance(new Point3D_F64(0,0, -1)) <= GrlConstants.TEST_F64);
 	}
 
-	@Test
-	public void equiToNormFV() {
+	@Test void equiToNormFV() {
 		EquirectangularTools_F64 tools = new EquirectangularTools_F64();
 
 		tools.configure(300,250);
@@ -151,8 +147,7 @@ public class TestEquirectangularTools_F64 extends BoofStandardJUnit {
 		assertTrue(found.distance(new Point3D_F64(0,0, 1)) <= GrlConstants.TEST_F64);
 	}
 
-	@Test
-	public void equiToNorm_reverse() {
+	@Test void equiToNorm_reverse() {
 
 		EquirectangularTools_F64 tools = new EquirectangularTools_F64();
 		tools.configure(width,height);
@@ -160,7 +155,7 @@ public class TestEquirectangularTools_F64 extends BoofStandardJUnit {
 		equiToNorm_reverse(tools, width/2, (height-1)/2);
 		equiToNorm_reverse(tools, 0, height/2);
 		equiToNorm_reverse(tools, width-1, (height-1)/2);
-		equiToNorm_reverse(tools, width/2, 1); // pathological cases at extreme.  many to one mapping
+		equiToNorm_reverse(tools, width/2, 1); // pathological cases at extreme. many to one mapping
 		equiToNorm_reverse(tools, width/2, height-2);
 
 		for (int i = 0; i < 100; i++) {
@@ -184,8 +179,7 @@ public class TestEquirectangularTools_F64 extends BoofStandardJUnit {
 		assertEquals(y,r.y, GrlConstants.TEST_F64);
 	}
 
-	@Test
-	public void equiToNorm_reverseFV() {
+	@Test void equiToNorm_reverseFV() {
 
 		EquirectangularTools_F64 tools = new EquirectangularTools_F64();
 		tools.configure(width,height);
@@ -193,7 +187,7 @@ public class TestEquirectangularTools_F64 extends BoofStandardJUnit {
 		equiToNorm_reverseFV(tools, width/2, height/2);
 		equiToNorm_reverseFV(tools, 0, height/2);
 		equiToNorm_reverseFV(tools, width-1, height/2);
-		equiToNorm_reverseFV(tools, width/2, 1);  // pathological cases at extreme.  many to one mapping
+		equiToNorm_reverseFV(tools, width/2, 1);  // pathological cases at extreme. many to one mapping
 		equiToNorm_reverseFV(tools, width/2, height-2);
 
 		for (int i = 0; i < 100; i++) {
@@ -217,8 +211,7 @@ public class TestEquirectangularTools_F64 extends BoofStandardJUnit {
 		assertEquals(y,r.y, GrlConstants.TEST_F64);
 	}
 
-	@Test
-	public void lonlatToEqui() {
+	@Test void lonlatToEqui() {
 		EquirectangularTools_F64 tools = new EquirectangularTools_F64();
 		tools.configure(width,height);
 
@@ -232,8 +225,7 @@ public class TestEquirectangularTools_F64 extends BoofStandardJUnit {
 		assertEquals(0,found.y, GrlConstants.TEST_F64);
 	}
 
-	@Test
-	public void lonlatToEquiFV() {
+	@Test void lonlatToEquiFV() {
 		EquirectangularTools_F64 tools = new EquirectangularTools_F64();
 		tools.configure(width,height);
 

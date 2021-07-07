@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -64,8 +64,7 @@ public class TestNormalizedToPixelError extends BoofStandardJUnit {
 		n1 = PerspectiveOps.convertPixelToNorm(K,p1,null);
 	}
 
-	@Test
-	public void usingPixels() {
+	@Test void usingPixels() {
 		NormalizedToPixelError alg = new NormalizedToPixelError(fx,fy,skew);
 
 		double expected = p0.distance2(p1);
@@ -74,8 +73,7 @@ public class TestNormalizedToPixelError extends BoofStandardJUnit {
 		assertEquals(expected,found,1e-8);
 	}
 
-	@Test
-	public void usingDoubles() {
+	@Test void usingDoubles() {
 		NormalizedToPixelError alg = new NormalizedToPixelError(fx,fy,skew);
 
 		double expected = p0.distance2(p1);

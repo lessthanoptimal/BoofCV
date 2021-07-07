@@ -33,7 +33,7 @@ public class TldHelperFunctions {
 	/**
 	 * Computes the fractional area of intersection between the two regions.
 	 *
-	 * @return number from 0 to 1.  higher means more intersection
+	 * @return number from 0 to 1. higher means more intersection
 	 */
 	public double computeOverlap( ImageRectangle a, ImageRectangle b ) {
 		if (!a.intersection(b, work))

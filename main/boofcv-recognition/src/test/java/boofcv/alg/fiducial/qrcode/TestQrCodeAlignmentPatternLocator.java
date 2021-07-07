@@ -155,7 +155,7 @@ public class TestQrCodeAlignmentPatternLocator extends BoofStandardJUnit {
 	}
 
 	/**
-	 * The smallest possible configuration for a QR code.  See if it still works
+	 * The smallest possible configuration for a QR code. See if it still works
 	 */
 	@Test void localize_OnePixelModules() {
 		QrCode qr = new QrCodeEncoder().setVersion(2).addNumeric("12340324").fixate();

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -25,12 +25,12 @@ package boofcv.abst.fiducial;
  */
 public class FiducialStability {
 	/**
-	 * Sensitivity of location estimate.  Represents the maximum error found at the given pixel error in the fiducial's
-	 * native units.  Larger number means less stable the estimate is.
+	 * Sensitivity of location estimate. Represents the maximum error found at the given pixel error in the fiducial's
+	 * native units. Larger number means less stable the estimate is.
 	 */
 	public double location;
 	/**
-	 * Sensitivity of orientation estimate.  Represents the maximum error found at the given pixel error in the radians.
+	 * Sensitivity of orientation estimate. Represents the maximum error found at the given pixel error in the radians.
 	 * Larger number means less stable the estimate is.
 	 */
 	public double orientation;

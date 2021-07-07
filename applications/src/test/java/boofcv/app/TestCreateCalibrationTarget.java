@@ -52,8 +52,7 @@ public class TestCreateCalibrationTarget extends CommonFiducialPdfChecks {
 		err.used = false;
 	}
 
-	@Test
-	public void chessboard() throws IOException {
+	@Test void chessboard() throws IOException {
 		createDocument("-r 7 -c 5 -o target -t CHESSBOARD -u cm -w 3 -p LETTER");
 		BufferedImage image = loadPDF();
 
@@ -66,8 +65,7 @@ public class TestCreateCalibrationTarget extends CommonFiducialPdfChecks {
 		assertTrue(detector.process(gray));
 	}
 
-	@Test
-	public void square_grid() throws IOException {
+	@Test void square_grid() throws IOException {
 		createDocument("-r 4 -c 3 -o target -t SQUARE_GRID -u cm -w 3 -s 3 -p LETTER\n");
 		BufferedImage image = loadPDF();
 
@@ -80,8 +78,7 @@ public class TestCreateCalibrationTarget extends CommonFiducialPdfChecks {
 		assertTrue(detector.process(gray));
 	}
 
-	@Test
-	public void circle_hexagonal() throws IOException {
+	@Test void circle_hexagonal() throws IOException {
 		createDocument("-r 8 -c 7 -o target -t CIRCLE_HEXAGONAL -u cm -w 2 -d 3 -p LETTER");
 		BufferedImage image = loadPDF();
 
@@ -94,8 +91,7 @@ public class TestCreateCalibrationTarget extends CommonFiducialPdfChecks {
 		assertTrue(detector.process(gray));
 	}
 
-	@Test
-	public void circle_regular() throws IOException {
+	@Test void circle_regular() throws IOException {
 		createDocument("-r 8 -c 6 -o target -t CIRCLE_GRID -u cm -w 2 -d 3 -p LETTER");
 		BufferedImage image = loadPDF();
 

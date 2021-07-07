@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -35,8 +35,8 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
 * So these tests really fail, but the error margin was made to be very large so that they
-* passed.  Not sure if there is a bug in the implementation or if this is its inherit
-* accuracy.  The matlab code provided by the author exhibited large amounts of error
+* passed. Not sure if there is a bug in the implementation or if this is its inherit
+* accuracy. The matlab code provided by the author exhibited large amounts of error
 * in the minimal case and their paper did not show results for that case...
 *
 * @author Peter Abeles
@@ -48,13 +48,11 @@ public class TestRelinearlize extends BoofStandardJUnit {
 	DMatrixRMaj L_full;
 	DMatrixRMaj y;
 
-	@Test
-	public void numControl4() {
+	@Test void numControl4() {
 		checkNumControl(4);
 	}
 
-	@Test
-	public void numControl3() {
+	@Test void numControl3() {
 		checkNumControl(3);
 	}
 
@@ -82,7 +80,7 @@ public class TestRelinearlize extends BoofStandardJUnit {
 //		System.out.println("error = "+SpecializedOps_DDRM.diffNormF(foundDistance,y));
 
 		// NOTE: This test can pass and the result still be bad because L_full is
-		// an undetermined system.  But at least there is some sort of test here
+		// an undetermined system. But at least there is some sort of test here
 		assertTrue(MatrixFeatures_DDRM.isEquals(foundDistance, y, 2));
 
 		// WARNING!!! the error margin was made to be huge to make sure it passed

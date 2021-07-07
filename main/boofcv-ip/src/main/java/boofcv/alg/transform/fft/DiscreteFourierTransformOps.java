@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -86,7 +86,7 @@ public class DiscreteFourierTransformOps {
 	}
 
 	/**
-	 * Checks to see if the image and its transform are appropriate sizes .  The transform should have
+	 * Checks to see if the image and its transform are appropriate sizes . The transform should have
 	 * twice the width and twice the height as the image.
 	 *
 	 * @param image Storage for an image
@@ -99,11 +99,11 @@ public class DiscreteFourierTransformOps {
 	}
 
 	/**
-	 * Moves the zero-frequency component into the image center (width/2,height/2).   This function can
+	 * Moves the zero-frequency component into the image center (width/2,height/2).  This function can
 	 * be called to undo the transform.
 	 *
 	 * @param transform the DFT which is to be shifted.
-	 * @param forward If true then it does the shift in the forward direction.  If false then it undoes the transforms.
+	 * @param forward If true then it does the shift in the forward direction. If false then it undoes the transforms.
 	 */
 	public static void shiftZeroFrequency( InterleavedF32 transform, boolean forward ) {
 
@@ -173,11 +173,11 @@ public class DiscreteFourierTransformOps {
 	}
 
 	/**
-	 * Moves the zero-frequency component into the image center (width/2,height/2).   This function can
+	 * Moves the zero-frequency component into the image center (width/2,height/2).  This function can
 	 * be called to undo the transform.
 	 *
 	 * @param transform the DFT which is to be shifted.
-	 * @param forward If true then it does the shift in the forward direction.  If false then it undoes the transforms.
+	 * @param forward If true then it does the shift in the forward direction. If false then it undoes the transforms.
 	 */
 	public static void shiftZeroFrequency( InterleavedF64 transform, boolean forward ) {
 

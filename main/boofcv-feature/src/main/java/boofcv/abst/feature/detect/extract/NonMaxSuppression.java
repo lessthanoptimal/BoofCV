@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -25,27 +25,27 @@ import boofcv.struct.image.GrayF32;
 
 /**
  * <p>
- * Detects local minimums and/or maximums in an intensity image inside square regions.  This is known as non-maximum
- * suppression.  The detector can be configured to ignore pixels along the image border by a user specified distance.
- * Some implementations require candidate locations for the features.  This allows for a sparse algorithm to be used,
- * resulting in a significant speed boost.  Pixel values with a value of -Float.MAX_VALUE or Float.MAX_VALUE will
- * not be considered for local minimum/maximum, respectively.  This is a good way to ignore previously detected
+ * Detects local minimums and/or maximums in an intensity image inside square regions. This is known as non-maximum
+ * suppression. The detector can be configured to ignore pixels along the image border by a user specified distance.
+ * Some implementations require candidate locations for the features. This allows for a sparse algorithm to be used,
+ * resulting in a significant speed boost. Pixel values with a value of -Float.MAX_VALUE or Float.MAX_VALUE will
+ * not be considered for local minimum/maximum, respectively. This is a good way to ignore previously detected
  * features.
  * </p>
  *
  * <p>
- * Not all implementations will search for both minimums or maximums.  Be sure you are using the correct one.  If
+ * Not all implementations will search for both minimums or maximums. Be sure you are using the correct one. If
  * you don't intend on detecting a minimum or maximum pass in null for the candidate list and the output found list.
  * </p>
  *
  * <p>
- * An extractor which uses candidate features must always be provided them.  However, an algorithm which does not
- * use candidate features will simply ignore that input and operate as usual.  Can check capabilities at runtime
+ * An extractor which uses candidate features must always be provided them. However, an algorithm which does not
+ * use candidate features will simply ignore that input and operate as usual. Can check capabilities at runtime
  * using the {@link #canDetectMinimums()} and {@link #canDetectMaximums()} functions.
  * </p>
  *
  * <p>
- * A border can be specified around the outside of the image in which extremes can't be detected.  However, a pixel
+ * A border can be specified around the outside of the image in which extremes can't be detected. However, a pixel
  * outside this border can influence if a pixel is a maximum inside, if the local search radius extends that far.
  * This is specified by the border parameter and the valid region is defined as follows:<br>
  * border &le; x &lt; width-border AND border &le; y &lt; height-border</p>
@@ -55,12 +55,12 @@ import boofcv.struct.image.GrayF32;
 public interface NonMaxSuppression {
 
 	/**
-	 * Process a feature intensity image to extract the point features.  If a pixel has an intensity
+	 * Process a feature intensity image to extract the point features. If a pixel has an intensity
 	 * value == -Float.MAX_VALUE  or Float.MAX_VALUE it will not be considered for a local min or max, respectively.
-	 * If an algorithm only detect local minimums or maximums and null can be passed in for unused lists.  This is
+	 * If an algorithm only detect local minimums or maximums and null can be passed in for unused lists. This is
 	 * the recommended procedure since it will force an exception to be thrown if a mistake was made.
 	 *
-	 * @param intensity (Input) Feature intensity image.  Not modified.
+	 * @param intensity (Input) Feature intensity image. Not modified.
 	 * @param candidateMin  (Input) (Optional) List of candidate local minimum features. Can be null if not used.
 	 * @param candidateMax  (Input) (Optional) List of candidate local maximum features  Can be null if not used.
 	 * @param foundMin (Output) Storage for found minimums. Can be null if not used.
@@ -128,7 +128,7 @@ public interface NonMaxSuppression {
 	public void setSearchRadius(int radius);
 
 	/**
-	 * Describes how large the region is that is being searched.  The radius is the number of
+	 * Describes how large the region is that is being searched. The radius is the number of
 	 * pixels away from the center.
 	 *
 	 * @return Search radius

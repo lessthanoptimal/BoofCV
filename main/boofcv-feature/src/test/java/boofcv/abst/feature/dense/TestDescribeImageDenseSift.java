@@ -57,8 +57,7 @@ public class TestDescribeImageDenseSift extends BoofStandardJUnit {
 	/**
 	 * Checks to see if the returned location is actually where it sampled
 	 */
-	@Test
-	public void checkSampleLocations() {
+	@Test void checkSampleLocations() {
 		for (Class type : imageTypes) {
 			ImageGray image = GeneralizedImageOps.createSingleBand(type, width, height);
 			GImageMiscOps.fillUniform(image, rand, 0, 200);
@@ -85,8 +84,7 @@ public class TestDescribeImageDenseSift extends BoofStandardJUnit {
 	/**
 	 * Features should not be sampled so that they go over the image border
 	 */
-	@Test
-	public void checkBorder() {
+	@Test void checkBorder() {
 		for (Class type : imageTypes) {
 			ImageGray image = GeneralizedImageOps.createSingleBand(type, width, height);
 			GImageMiscOps.fillUniform(image, rand, 0, 200);

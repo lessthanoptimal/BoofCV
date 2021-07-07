@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -105,7 +105,7 @@ public class ConvertYuyv {
 	 * @param data Input: Yuyv image data
 	 * @param width Input: image width
 	 * @param height Input: image height
-	 * @param output Output: Optional storage for output image.  Can be null.
+	 * @param output Output: Optional storage for output image. Can be null.
 	 * @return Gray scale image
 	 */
 	public static GrayU8 yuyvToGray(byte[] data , int width , int height , GrayU8 output ) {
@@ -130,7 +130,7 @@ public class ConvertYuyv {
 	 * @param data Input: Yuyv image data
 	 * @param width Input: image width
 	 * @param height Input: image height
-	 * @param output Output: Optional storage for output image.  Can be null.
+	 * @param output Output: Optional storage for output image. Can be null.
 	 * @return Gray scale image
 	 */
 	public static GrayF32 yuyvToGray(byte[] data , int width , int height , GrayF32 output ) {

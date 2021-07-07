@@ -49,8 +49,7 @@ public class TestScoreAssociateNccFeature extends StandardScoreAssociationChecks
 		return a;
 	}
 
-	@Test
-	public void compareToExpected() {
+	@Test void compareToExpected() {
 		ScoreAssociateNccFeature scorer = new ScoreAssociateNccFeature();
 
 		NccFeature a = new NccFeature(5);

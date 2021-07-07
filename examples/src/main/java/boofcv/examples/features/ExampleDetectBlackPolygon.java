@@ -38,10 +38,10 @@ import java.awt.image.BufferedImage;
 import java.io.File;
 
 /**
- * Example of how to use {@link DetectPolygonFromContour} to find black polygons in an image.  This algorithm
+ * Example of how to use {@link DetectPolygonFromContour} to find black polygons in an image. This algorithm
  * is the basis for several fiducial detectors in BoofCV and fits the polygon to sub-pixel accuracy and produces
- * reasonable results on blurred images too.  It is highly configurable and can even sparsely fit polygons
- * in a distorted image.  Meaning the expensive step of undistorting the entire image is not needed.
+ * reasonable results on blurred images too. It is highly configurable and can even sparsely fit polygons
+ * in a distorted image. Meaning the expensive step of undistorting the entire image is not needed.
  *
  * @author Peter Abeles
  */
@@ -83,7 +83,7 @@ public class ExampleDetectBlackPolygon {
 			GrayU8 input = ConvertBufferedImage.convertFromSingle(image, null, GrayU8.class);
 			GrayU8 binary = new GrayU8(input.width,input.height);
 
-			// Binarization is done outside to allows creative tricks.  For example, when applied to a chessboard
+			// Binarization is done outside to allows creative tricks. For example, when applied to a chessboard
 			// pattern where square touch each other, the binary image is eroded first so that they don't touch.
 			// The squares are expanded automatically during the subpixel optimization step.
 			int threshold = (int)GThresholdImageOps.computeOtsu(input, 0, 255);

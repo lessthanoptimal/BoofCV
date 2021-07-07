@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -34,8 +34,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
  */
 public class TestKernelMath extends BoofStandardJUnit {
 
-	@Test
-	public void scale_F32() {
+	@Test void scale_F32() {
 		Kernel1D_F32 a = FactoryKernel.random1D_F32(11,5,-1,1,rand);
 		Kernel1D_F32 expected = new Kernel1D_F32(11);
 
@@ -52,8 +51,7 @@ public class TestKernelMath extends BoofStandardJUnit {
 		}
 	}
 
-	@Test
-	public void scale_F64() {
+	@Test void scale_F64() {
 		Kernel1D_F64 a = FactoryKernel.random1D_F64(11,5,-1,1,rand);
 		Kernel1D_F64 expected = new Kernel1D_F64(11);
 
@@ -70,8 +68,7 @@ public class TestKernelMath extends BoofStandardJUnit {
 		}
 	}
 
-	@Test
-	public void divide_1D_F32() {
+	@Test void divide_1D_F32() {
 		Kernel1D_F32 a = FactoryKernel.random1D_F32(11,5,-10f,10f,rand);
 		Kernel1D_F32 b = a.copy();
 
@@ -83,8 +80,7 @@ public class TestKernelMath extends BoofStandardJUnit {
 		}
 	}
 
-	@Test
-	public void divide_1D_F64() {
+	@Test void divide_1D_F64() {
 		Kernel1D_F64 a = FactoryKernel.random1D_F64(11,5,-10f,10f,rand);
 		Kernel1D_F64 b = a.copy();
 
@@ -96,8 +92,7 @@ public class TestKernelMath extends BoofStandardJUnit {
 		}
 	}
 
-	@Test
-	public void divide_2D_F32() {
+	@Test void divide_2D_F32() {
 		Kernel2D_F32 a = FactoryKernel.random2D_F32(11,5,-10f,10f,rand);
 		Kernel2D_F32 b = a.copy();
 
@@ -109,8 +104,7 @@ public class TestKernelMath extends BoofStandardJUnit {
 		}
 	}
 
-	@Test
-	public void divide_2D_F64() {
+	@Test void divide_2D_F64() {
 		Kernel2D_F64 a = FactoryKernel.random2D_F64(11,5,-10f,10f,rand);
 		Kernel2D_F64 b = a.copy();
 
@@ -122,8 +116,7 @@ public class TestKernelMath extends BoofStandardJUnit {
 		}
 	}
 
-	@Test
-	public void fill_F32() {
+	@Test void fill_F32() {
 		Kernel2D_F32 a = FactoryKernel.random2D_F32(5,2, -2, 2, rand);
 		KernelMath.fill(a,1);
 
@@ -134,8 +127,7 @@ public class TestKernelMath extends BoofStandardJUnit {
 		}
 	}
 
-	@Test
-	public void fill_I32() {
+	@Test void fill_I32() {
 		Kernel2D_S32 a = FactoryKernel.random2D_I32(5,2, -2, 2, rand);
 		KernelMath.fill(a,1);
 
@@ -146,8 +138,7 @@ public class TestKernelMath extends BoofStandardJUnit {
 		}
 	}
 
-	@Test
-	public void transpose_F32() {
+	@Test void transpose_F32() {
 		Kernel2D_F32 a = FactoryKernel.random2D_F32(5,2, -2, 2, rand);
 		Kernel2D_F32 b = KernelMath.transpose(a);
 
@@ -158,8 +149,7 @@ public class TestKernelMath extends BoofStandardJUnit {
 		}
 	}
 
-	@Test
-	public void transpose_I32() {
+	@Test void transpose_I32() {
 		Kernel2D_S32 a = FactoryKernel.random2D_I32(5,2, -2, 2, rand);
 		Kernel2D_S32 b = KernelMath.transpose(a);
 
@@ -170,8 +160,7 @@ public class TestKernelMath extends BoofStandardJUnit {
 		}
 	}
 
-	@Test
-	public void convolve1D_F32() {
+	@Test void convolve1D_F32() {
 		Kernel1D_F32 k1 = new Kernel1D_F32(new float[]{1,2,3,4,5},5);
 		Kernel1D_F32 k2 = new Kernel1D_F32(new float[]{6,7,8},3);
 
@@ -189,8 +178,7 @@ public class TestKernelMath extends BoofStandardJUnit {
 		}
 	}
 
-	@Test
-	public void convolve2D_1D_F32() {
+	@Test void convolve2D_1D_F32() {
 		Kernel1D_F32 k1 = new Kernel1D_F32(new float[]{4,3,2},3,1);
 		Kernel1D_F32 k2 = new Kernel1D_F32(new float[]{9,5,1},3,1);
 
@@ -205,8 +193,7 @@ public class TestKernelMath extends BoofStandardJUnit {
 		}
 	}
 
-	@Test
-	public void convolve_1D_F64() {
+	@Test void convolve_1D_F64() {
 		Kernel1D_F64 k1 = new Kernel1D_F64(new double[]{4,3,2},3,1);
 		Kernel1D_F64 k2 = new Kernel1D_F64(new double[]{9,5,1},3,1);
 
@@ -221,8 +208,7 @@ public class TestKernelMath extends BoofStandardJUnit {
 		}
 	}
 
-	@Test
-	public void convolve_1D_I32() {
+	@Test void convolve_1D_I32() {
 		Kernel1D_S32 k1 = new Kernel1D_S32(new int[]{4,3,2},3,1);
 		Kernel1D_S32 k2 = new Kernel1D_S32(new int[]{9,5,1},3,1);
 
@@ -237,8 +223,7 @@ public class TestKernelMath extends BoofStandardJUnit {
 		}
 	}
 
-	@Test
-	public void convolve2D_F32() {
+	@Test void convolve2D_F32() {
 		Kernel2D_F32 k1 = new Kernel2D_F32(3,new float[]{1,2,3,4,5,6,7,8,9});
 		Kernel2D_F32 k2 = new Kernel2D_F32(3,new float[]{2,3,4,5,6,7,8,9,10});
 
@@ -259,8 +244,7 @@ public class TestKernelMath extends BoofStandardJUnit {
 		}
 	}
 
-	@Test
-	public void normalizeSumToOne_F32_1D() {
+	@Test void normalizeSumToOne_F32_1D() {
 		Kernel1D_F32 kernel = new Kernel1D_F32(3);
 		for (int i = 0; i < 3; i++)
 			kernel.data[i] = 2.0F;
@@ -271,8 +255,7 @@ public class TestKernelMath extends BoofStandardJUnit {
 			assertEquals(kernel.data[i], 2.0F / 6.0f, 1e-4);
 	}
 
-	@Test
-	public void normalizeSumToOne_F64_1D() {
+	@Test void normalizeSumToOne_F64_1D() {
 		Kernel1D_F64 kernel = new Kernel1D_F64(3);
 		for (int i = 0; i < 3; i++)
 			kernel.data[i] = 2.0;
@@ -283,8 +266,7 @@ public class TestKernelMath extends BoofStandardJUnit {
 			assertEquals(kernel.data[i], 2.0 / 6.0, 1e-8);
 	}
 
-	@Test
-	public void normalizeSumToOne_F32_2D() {
+	@Test void normalizeSumToOne_F32_2D() {
 		Kernel2D_F32 kernel = new Kernel2D_F32(3);
 		for (int i = 0; i < 9; i++)
 			kernel.data[i] = 2.0F;
@@ -297,8 +279,7 @@ public class TestKernelMath extends BoofStandardJUnit {
 			assertEquals(2.0F / total,kernel.data[i], 1e-4);
 	}
 
-	@Test
-	public void normalizeSumToOne_F64_2D() {
+	@Test void normalizeSumToOne_F64_2D() {
 		Kernel2D_F64 kernel = new Kernel2D_F64(3);
 		for (int i = 0; i < 9; i++)
 			kernel.data[i] = 2.0F;
@@ -311,8 +292,7 @@ public class TestKernelMath extends BoofStandardJUnit {
 			assertEquals(2.0 / total,kernel.data[i], 1e-8);
 	}
 
-	@Test
-	public void normalizeMaxOne_F64_2D() {
+	@Test void normalizeMaxOne_F64_2D() {
 		Kernel2D_F64 kernel = new Kernel2D_F64(3);
 		for (int i = 0; i < 9; i++)
 			kernel.data[i] = 2.0F*i;
@@ -333,8 +313,7 @@ public class TestKernelMath extends BoofStandardJUnit {
 		assertEquals(1,max,1e-8);
 	}
 
-	@Test
-	public void convertToImage_F32() {
+	@Test void convertToImage_F32() {
 		Kernel2D_F32 kernel = FactoryKernel.random2D_F32(7,3,-10,10,rand);
 		GrayF32 image = KernelMath.convertToImage(kernel);
 
@@ -348,8 +327,7 @@ public class TestKernelMath extends BoofStandardJUnit {
 		}
 	}
 
-	@Test
-	public void convertToImage_I32() {
+	@Test void convertToImage_I32() {
 		Kernel2D_S32 kernel = FactoryKernel.random2D_I32(7,3,-10,10,rand);
 		GrayS32 image = KernelMath.convertToImage(kernel);
 
@@ -363,8 +341,7 @@ public class TestKernelMath extends BoofStandardJUnit {
 		}
 	}
 
-	@Test
-	public void convertToKernel_F32() {
+	@Test void convertToKernel_F32() {
 		GrayF32 image = new GrayF32(7,7);
 		ImageMiscOps.fillUniform(image,rand,-10,10);
 		Kernel2D_F32 kernel = KernelMath.convertToKernel(image);
@@ -379,8 +356,7 @@ public class TestKernelMath extends BoofStandardJUnit {
 		}
 	}
 
-	@Test
-	public void convertToKernel_I32() {
+	@Test void convertToKernel_I32() {
 		GrayS32 image = new GrayS32(7,7);
 		ImageMiscOps.fillUniform(image,rand,-10,10);
 		Kernel2D_S32 kernel = KernelMath.convertToKernel(image);
@@ -395,8 +371,7 @@ public class TestKernelMath extends BoofStandardJUnit {
 		}
 	}
 
-	@Test
-	public void convert_1D_F32_to_I32() {
+	@Test void convert_1D_F32_to_I32() {
 		Kernel1D_F32 orig = new Kernel1D_F32(new float[]{0.1f,1,1e-8f,-1,-0.1f}, 5, 1);
 		Kernel1D_S32 found = KernelMath.convert(orig,1f/60f);
 
@@ -409,8 +384,7 @@ public class TestKernelMath extends BoofStandardJUnit {
 		assertEquals(found.data[4],-1);
 	}
 
-	@Test
-	public void convert_1D_F64_to_I32() {
+	@Test void convert_1D_F64_to_I32() {
 		Kernel1D_F64 orig = new Kernel1D_F64(new double[]{0.1,1,1e-8,-1,-0.1}, 5, 1);
 		Kernel1D_S32 found = KernelMath.convert(orig,1f/60f);
 
@@ -423,8 +397,7 @@ public class TestKernelMath extends BoofStandardJUnit {
 		assertEquals(found.data[4],-1);
 	}
 
-	@Test
-	public void convert_2D_F32_to_I32() {
+	@Test void convert_2D_F32_to_I32() {
 		Kernel2D_F32 orig = new Kernel2D_F32(3,new float[]{0.1f,1,0.1f,1,1e-6f,-1,-0.1f,-1,-0.1f});
 		Kernel2D_S32 found = KernelMath.convert(orig,1f/60f);
 

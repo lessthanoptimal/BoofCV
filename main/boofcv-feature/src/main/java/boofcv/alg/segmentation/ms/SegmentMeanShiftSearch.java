@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -28,21 +28,21 @@ import org.ddogleg.struct.Stoppable;
 
 /**
  * <p>
- * Performs the search step in mean-shift image segmentation [1].  The mode of a pixel is the point at which mean-shift
- * converges when initialized at that pixel.  Pixels which have the same mode belong to the same segment. The weight
- * kernel G(|x-y|^2/h) has independent normalization factors h for spacial and color components.  A precomputed
+ * Performs the search step in mean-shift image segmentation [1]. The mode of a pixel is the point at which mean-shift
+ * converges when initialized at that pixel. Pixels which have the same mode belong to the same segment. The weight
+ * kernel G(|x-y|^2/h) has independent normalization factors h for spacial and color components. A precomputed
  * Normal distribution is used for the weight kernel.
  * </p>
  * <p>
  * Output is provided in the form of an image where each pixel contains the index of a region the pixel belongs to.
  * Three other lists provide color value of the region, number of pixels in the region and the location
- * of the mean-shift peak for that region.  This output is unlikely to be final processing step since it will over
- * segment the image.  Merging of similar modes and pruning of small regions is a common next step.
+ * of the mean-shift peak for that region. This output is unlikely to be final processing step since it will over
+ * segment the image. Merging of similar modes and pruning of small regions is a common next step.
  * </p>
  *
  * <p>
- * An approximation of running mean-shift on each pixel is performed if the 'fast' flag is set to true.  The
- * approximation is about 5x faster and works by saving the mean-shift trajectory [2].  All points along the trajectory
+ * An approximation of running mean-shift on each pixel is performed if the 'fast' flag is set to true. The
+ * approximation is about 5x faster and works by saving the mean-shift trajectory [2]. All points along the trajectory
  * are given the same mode. When performing mean-shift if a pixel is encountered which has already been assigned a
  * mode the search stops. This approximation tends to produce more regions and reduces clustering quality in high
  * texture regions.
@@ -53,9 +53,9 @@ import org.ddogleg.struct.Stoppable;
  * <ul>
  * <li>Spacial distance is normalized by dividing the found Euclidean distance squared by the maximum possible
  * Euclidean distance squared, thus ensuring it will be between 0 and 1.</li>
- * <li>Color distance is normalized by dividing it by the maximum allows Euclidean distance squared.  If its distance
+ * <li>Color distance is normalized by dividing it by the maximum allows Euclidean distance squared. If its distance
  * is more than the maximum allowed value then G() will be zero.</li>
- * <li>Image edges are handled by truncating the spacial kernel.  This truncation
+ * <li>Image edges are handled by truncating the spacial kernel. This truncation
  * will create an asymmetric kernel, but there is really no good way to handle image edges.</li>
  * </ul>
  * </p>
@@ -87,7 +87,7 @@ public abstract class SegmentMeanShiftSearch<T extends ImageBase<T>>
 	// converts a pixel location into the index of the mode that mean-shift converged to
 	protected GrayS32 pixelToMode = new GrayS32(1, 1);
 
-	// Quick look up for the index of a mode from an image pixel.  It is possible for a pixel that is a mode
+	// Quick look up for the index of a mode from an image pixel. It is possible for a pixel that is a mode
 	// to have mean-shift converge to a different pixel
 	protected GrayS32 quickMode = new GrayS32(1, 1);
 
@@ -121,8 +121,8 @@ public abstract class SegmentMeanShiftSearch<T extends ImageBase<T>>
 	/**
 	 * Configures mean-shift segmentation
 	 *
-	 * @param maxIterations Maximum number of mean-shift iterations.  Try 30
-	 * @param convergenceTol When the change is less than this amount stop.  Try 0.005
+	 * @param maxIterations Maximum number of mean-shift iterations. Try 30
+	 * @param convergenceTol When the change is less than this amount stop. Try 0.005
 	 * @param radiusX Spacial kernel radius x-axis
 	 * @param radiusY Spacial kernel radius y-axis
 	 * @param maxColorDistance Maximum allowed Euclidean distance squared for the color component
@@ -179,10 +179,10 @@ public abstract class SegmentMeanShiftSearch<T extends ImageBase<T>>
 	}
 
 	/**
-	 * Returns the weight given the normalized distance.  Instead of computing the kernel distance every time
-	 * a lookup table with linear interpolation is used.  The distance has a domain from 0 to 1, inclusive
+	 * Returns the weight given the normalized distance. Instead of computing the kernel distance every time
+	 * a lookup table with linear interpolation is used. The distance has a domain from 0 to 1, inclusive
 	 *
-	 * @param distance Normalized Euclidean distance squared.  From 0 to 1.
+	 * @param distance Normalized Euclidean distance squared. From 0 to 1.
 	 * @return Weight.
 	 */
 	protected float weight( float distance ) {

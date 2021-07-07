@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -30,8 +30,8 @@ import java.util.List;
 
 /**
  * Minimizes the reprojection residual error for a pose estimate (left camera) in a calibrated stereo camera.
- * Rotation is encoded using rodrigues coordinates.  Transform between left and right camera
- * is assumed to be known and must be specified by the user.  Observations are in normalized image coordinates.
+ * Rotation is encoded using rodrigues coordinates. Transform between left and right camera
+ * is assumed to be known and must be specified by the user. Observations are in normalized image coordinates.
  *
  * @author Peter Abeles
  */

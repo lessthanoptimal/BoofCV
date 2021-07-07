@@ -42,11 +42,11 @@ import org.ddogleg.struct.DogArray;
 import java.lang.reflect.Array;
 
 /**
- * Uses a pyramidal KLT tracker to track features inside the user selected region.  The motion of the region
- * is found robustly using {@link LeastMedianOfSquares} and a translation + rotation model.  Drift is a problem
+ * Uses a pyramidal KLT tracker to track features inside the user selected region. The motion of the region
+ * is found robustly using {@link LeastMedianOfSquares} and a translation + rotation model. Drift is a problem
  * since motion is estimated relative to the previous frame and it will eventually drift away from the original target.
- * When it works well it is very smooth and can handle partially obscured objects.  Can't recover after the target
- * has been lost.  Runs very fast.
+ * When it works well it is very smooth and can handle partially obscured objects. Can't recover after the target
+ * has been lost. Runs very fast.
  *
  * @author Peter Abeles
  */
@@ -137,7 +137,7 @@ public class SparseFlowObjectTracker<Image extends ImageGray<Image>, Derivative 
 
 		trackFeatures(input, region);
 
-		// See if there are enough points remaining.  use of config.numberOfSamples is some what arbitrary
+		// See if there are enough points remaining. use of config.numberOfSamples is some what arbitrary
 		if (pairs.size() < config.numberOfSamples) {
 			System.out.println("Lack of sample pairs");
 			trackLost = true;

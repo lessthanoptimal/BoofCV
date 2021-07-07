@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -32,7 +32,7 @@ import java.awt.image.BufferedImage;
 import java.util.List;
 
 /**
- * GUI display for {@link DebugSquaresSubpixelApp}.  Shows feature location, backgroudn image, and
+ * GUI display for {@link DebugSquaresSubpixelApp}. Shows feature location, backgroudn image, and
  * allows the user to zoom in and out.
  * 
  * @author Peter Abeles

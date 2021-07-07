@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -23,7 +23,7 @@ import boofcv.struct.image.*;
 //CONCURRENT_INLINE import boofcv.concurrency.BoofConcurrency;
 
 /**
- * NV21:  The format is densely packed.  Y is full resolution and UV are interlaced and 1/2 resolution.
+ * NV21:  The format is densely packed. Y is full resolution and UV are interlaced and 1/2 resolution.
  *        So same UV values within a 2x2 square
  *
  * @author Peter Abeles

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -32,8 +32,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  */
 public class TestPnPRodriguesCodec extends BoofStandardJUnit {
 
-	@Test
-	public void decode_encode() {
+	@Test void decode_encode() {
 		double[] param = new double[]{0.1,-0.3,4,1,2,3};
 
 		PnPRodriguesCodec alg = new PnPRodriguesCodec();
@@ -51,8 +50,7 @@ public class TestPnPRodriguesCodec extends BoofStandardJUnit {
 		assertTrue(MatrixFeatures_DDRM.isIdentical(storage.R,storage2.R,1e-8));
 	}
 
-	@Test
-	public void testCase0() {
+	@Test void testCase0() {
 		Se3_F64 a = new Se3_F64();
 
 		a.R = UtilEjml.parse_DDRM(
@@ -75,8 +73,7 @@ public class TestPnPRodriguesCodec extends BoofStandardJUnit {
 	/**
 	 * Pathological place which caused an issue in the past
 	 */
-	@Test
-	public void testCase1() {
+	@Test void testCase1() {
 		Se3_F64 input = new Se3_F64();
 		CommonOps_DDRM.diag(input.getR(),3,1,-1,-1);
 

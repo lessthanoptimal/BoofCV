@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -35,8 +35,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  */
 public class TestParamFundamentalEpipolar extends BoofStandardJUnit {
 
-	@Test
-	public void backAndForth() {
+	@Test void backAndForth() {
 		DMatrixRMaj R = ConvertRotation3D_F64.eulerToMatrix(EulerType.XYZ,1, 2, -0.5, null);
 		Vector3D_F64 T = new Vector3D_F64(0.5,0.7,-0.3);
 

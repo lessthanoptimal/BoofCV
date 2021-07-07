@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -88,8 +88,7 @@ public abstract class GenericNonMaxCandidateTests extends GenericNonMaxTests {
 	/**
 	 * See if null candidates are correctly handled and don't blow up
 	 */
-	@Test
-	public void testNullCandidate() {
+	@Test void testNullCandidate() {
 		reset();
 
 		intensity.set(3, 5, 30);

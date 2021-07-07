@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -19,7 +19,7 @@
 package boofcv.numerics;
 
 /**
- * Do linear interpolation between points in an array.  Sample points must be positive and less than one minus
+ * Do linear interpolation between points in an array. Sample points must be positive and less than one minus
  * the array's index.
  *
  * @author Peter Abeles

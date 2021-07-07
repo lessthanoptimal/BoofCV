@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -47,8 +47,7 @@ public abstract class GenericImplFastCornerInterfaceTests<T extends ImageGray<T>
 		offsets = DiscretizedCircle.imageOffsets(3, image.stride);
 	}
 
-	@Test
-	public void scoreLower() {
+	@Test void scoreLower() {
 		GImageMiscOps.fill(image, 0);
 
 		alg.setImage(image,offsets);
@@ -71,8 +70,7 @@ public abstract class GenericImplFastCornerInterfaceTests<T extends ImageGray<T>
 		assertTrue(valueB < valueA);
 	}
 
-	@Test
-	public void scoreUpper() {
+	@Test void scoreUpper() {
 		GImageMiscOps.fill(image, 0);
 
 		alg.setImage(image,offsets);

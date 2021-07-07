@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -38,7 +38,7 @@ import boofcv.struct.image.ImageType;
 
 /**
  * Factory for implementations of {@link TrackerObjectQuad}, a high level interface for tracking user specified
- * objects inside video sequences.  As usual, the high level interface makes it easier to use these algorithms
+ * objects inside video sequences. As usual, the high level interface makes it easier to use these algorithms
  * at the expensive of algorithm specific features.
  *
  * @author Peter Abeles
@@ -73,7 +73,7 @@ public class FactoryTrackerObjectQuad {
 	 * {@link TrackerObjectQuad} interface.
 	 * @param config Configuration for the tracker,  Null for default.
 	 * @param <T> Image input type
-	 * @param <D> Image derivative type.  Null for default.
+	 * @param <D> Image derivative type. Null for default.
 	 * @return TrackerObjectQuad
 	 */
 	public static <T extends ImageGray<T>,D extends ImageGray<D>>
@@ -98,9 +98,9 @@ public class FactoryTrackerObjectQuad {
 	 *
 	 * @see TrackerMeanShiftLikelihood
 	 *
-	 * @param maxIterations Maximum number of mean-shift iterations.  Try 30.
-	 * @param numBins Number of bins in the histogram color model.  Try 5.
-	 * @param maxPixelValue Maximum number of pixel values.  For 8-bit images this will be 256
+	 * @param maxIterations Maximum number of mean-shift iterations. Try 30.
+	 * @param numBins Number of bins in the histogram color model. Try 5.
+	 * @param maxPixelValue Maximum number of pixel values. For 8-bit images this will be 256
 	 * @param modelType Type of color model used.
 	 * @param imageType Type of image
 	 * @return TrackerObjectQuad based on {@link TrackerMeanShiftLikelihood}.
@@ -143,7 +143,7 @@ public class FactoryTrackerObjectQuad {
 
 	/**
 	 * Implementation of mean-shift which matches the histogram and can handle targets composed of multiple colors.
-	 * The tracker can also be configured to estimate gradual changes in scale.  The track region is
+	 * The tracker can also be configured to estimate gradual changes in scale. The track region is
 	 * composed of a rotated rectangle.
 	 *
 	 * @see TrackerMeanShiftComaniciu2003
@@ -161,9 +161,9 @@ public class FactoryTrackerObjectQuad {
 	}
 
 	/**
-	 * Creates the Circulant feature tracker.  Texture based tracker which uses the theory of circulant matrices,
-	 * Discrete Fourier Transform (DCF), and linear classifiers to track a target.  Fixed sized rectangular target
-	 * and only estimates translation.  Can't detect when it loses track or re-aquire track.
+	 * Creates the Circulant feature tracker. Texture based tracker which uses the theory of circulant matrices,
+	 * Discrete Fourier Transform (DCF), and linear classifiers to track a target. Fixed sized rectangular target
+	 * and only estimates translation. Can't detect when it loses track or re-aquire track.
 	 *
 	 * @see CirculantTracker
 	 *

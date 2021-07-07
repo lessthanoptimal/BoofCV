@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -107,8 +107,8 @@ public class TrifocalTensor {
 	}
 
 	/**
-	 * The scale of the trifocal tensor is arbitrary.  However there are situations when comparing results that
-	 * using a consistent scale is useful.  This function normalizes the sensor such that its Euclidean length
+	 * The scale of the trifocal tensor is arbitrary. However there are situations when comparing results that
+	 * using a consistent scale is useful. This function normalizes the sensor such that its Euclidean length
 	 * (the f-norm) is equal to one.
 	 */
 	public void normalizeScale() {

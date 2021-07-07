@@ -79,8 +79,7 @@ public abstract class GenericTestsDetectDescribePoint<T extends ImageBase<T>, TD
 	/**
 	 * Detects features inside the image and checks to see if it is in compliance of its reported capabilities
 	 */
-	@Test
-	public void detectFeatures() {
+	@Test void detectFeatures() {
 		DetectDescribePoint<T, TD> alg = createDetDesc();
 
 		for (int imageIndex = 0; imageIndex < 10; imageIndex++) {
@@ -129,8 +128,7 @@ public abstract class GenericTestsDetectDescribePoint<T extends ImageBase<T>, TD
 	 * Make sure sub-images are correctly handled by having it process one and see if it produces the
 	 * same results
 	 */
-	@Test
-	public void checkSubImage() {
+	@Test void checkSubImage() {
 		DetectDescribePoint<T, TD> alg1 = createDetDesc();
 		DetectDescribePoint<T, TD> alg2 = createDetDesc();
 
@@ -146,8 +144,7 @@ public abstract class GenericTestsDetectDescribePoint<T extends ImageBase<T>, TD
 	 * Make sure everything has been reset correctly and that multiple calls to the same input
 	 * produce the same output
 	 */
-	@Test
-	public void checkMultipleCalls() {
+	@Test void checkMultipleCalls() {
 		DetectDescribePoint<T, TD> alg1 = createDetDesc();
 		DetectDescribePoint<T, TD> alg2 = createDetDesc();
 
@@ -160,22 +157,19 @@ public abstract class GenericTestsDetectDescribePoint<T extends ImageBase<T>, TD
 		checkIdenticalResponse(alg1, alg2);
 	}
 
-	@Test
-	public void hasScale() {
+	@Test void hasScale() {
 		DetectDescribePoint<T, TD> alg = createDetDesc();
 
 		assertEquals(hasScale, alg.hasScale());
 	}
 
-	@Test
-	public void hasOrientation() {
+	@Test void hasOrientation() {
 		DetectDescribePoint<T, TD> alg = createDetDesc();
 
 		assertEquals(hasOrientation, alg.hasOrientation());
 	}
 
-	@Test
-	public void getDescriptorType() {
+	@Test void getDescriptorType() {
 		DetectDescribePoint<T, TD> alg = createDetDesc();
 
 		assertSame(descType, alg.getDescriptionType());
@@ -184,8 +178,7 @@ public abstract class GenericTestsDetectDescribePoint<T extends ImageBase<T>, TD
 	/**
 	 * BVery basic sanity check to see if sets is correctly implemented
 	 */
-	@Test
-	public void sets() {
+	@Test void sets() {
 		DetectDescribePoint<T, TD> alg = createDetDesc();
 		alg.detect(image);
 
@@ -233,8 +226,7 @@ public abstract class GenericTestsDetectDescribePoint<T extends ImageBase<T>, TD
 	/**
 	 * See if a sanity check is performed for color images. The bands must match
 	 */
-	@Test
-	public void failBandMissMatch() {
+	@Test void failBandMissMatch() {
 		if (!(image instanceof ImageMultiBand)) {
 			return;
 		}

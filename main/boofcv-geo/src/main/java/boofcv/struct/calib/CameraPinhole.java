@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -24,7 +24,7 @@ import lombok.Setter;
 
 /**
  * <p>
- * Intrinsic camera parameters for a pinhole camera.  Specifies the calibration
+ * Intrinsic camera parameters for a pinhole camera. Specifies the calibration
  * matrix K and distortion parameters.
  * </p>
  *
@@ -99,7 +99,7 @@ public class CameraPinhole extends CameraModel {
 	}
 
 	/**
-	 * Is the pixel coordinate inside the image.  For floating points numbers a pixel is inside the image if it is
+	 * Is the pixel coordinate inside the image. For floating points numbers a pixel is inside the image if it is
 	 * less than width or height. Justification for this is if you converted it to an int it would round down and
 	 * be inside.
 	 *

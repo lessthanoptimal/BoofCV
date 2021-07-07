@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -29,8 +29,8 @@ import org.ddogleg.struct.DogArray;
 import org.ddogleg.struct.DogArray_F64;
 
 /**
- * Refines an initial estimate of an elipse using a subpixel contour technique.  A local line integral around each
- * point is used to determine how important each point is.  The contour being
+ * Refines an initial estimate of an elipse using a subpixel contour technique. A local line integral around each
+ * point is used to determine how important each point is. The contour being
  *
  * @author Peter Abeles
  */
@@ -75,7 +75,7 @@ public class SnapToEllipseEdge<T extends ImageGray<T>> extends BaseIntegralEdge<
 	 * Refines provided list by snapping it to edges found in the image
 	 *
 	 * @param input (Output) Close approximation of the ellipse in the image
-	 * @param refined (Output) Storage for refined estimate.  Can be same instance as input
+	 * @param refined (Output) Storage for refined estimate. Can be same instance as input
 	 * @return True if a refined estimate could be found, false if it failed
 	 */
 	public boolean process( EllipseRotated_F64 input, EllipseRotated_F64 refined ) {

@@ -24,9 +24,9 @@ import boofcv.struct.ImageRectangle;
 import boofcv.struct.image.*;
 
 /**
- * Compute the variance for a rectangular region using the integral image.  Supports both U8 and F32 input images.
+ * Compute the variance for a rectangular region using the integral image. Supports both U8 and F32 input images.
  * For each new image in the sequence a call to {@link #setImage(ImageGray)} must be done
- * so that it can compute the required integral images.  See paper for mathematical details on how the variance
+ * so that it can compute the required integral images. See paper for mathematical details on how the variance
  * is computed using integral images.
  *
  * @author Peter Abeles
@@ -62,7 +62,7 @@ public class TldVarianceFilter<T extends ImageGray<T>> {
 	}
 
 	/**
-	 * Sets the input image.  Must be called before other functions/
+	 * Sets the input image. Must be called before other functions/
 	 *
 	 * @param gray input image
 	 */
@@ -78,7 +78,7 @@ public class TldVarianceFilter<T extends ImageGray<T>> {
 	}
 
 	/**
-	 * Selects a threshold based on image statistics.  The paper suggestions 1/2 the variance in the initial patch
+	 * Selects a threshold based on image statistics. The paper suggestions 1/2 the variance in the initial patch
 	 */
 	public void selectThreshold( ImageRectangle r ) {
 		double variance = computeVarianceSafe(r.x0, r.y0, r.x1, r.y1);
@@ -99,7 +99,7 @@ public class TldVarianceFilter<T extends ImageGray<T>> {
 	}
 
 	/**
-	 * Computes the variance inside the specified rectangle.  x0 and y0 must be &gt; 0.
+	 * Computes the variance inside the specified rectangle. x0 and y0 must be &gt; 0.
 	 *
 	 * @return variance
 	 */
@@ -159,7 +159,7 @@ public class TldVarianceFilter<T extends ImageGray<T>> {
 	}
 
 	/**
-	 * Integral image of pixel value squared.  floating point
+	 * Integral image of pixel value squared. floating point
 	 */
 	public static void transformSq( final GrayF32 input, final GrayF64 transformed ) {
 		int indexSrc = input.startIndex;

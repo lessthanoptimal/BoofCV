@@ -30,7 +30,7 @@ import java.util.List;
 import java.util.Random;
 
 /**
- * Shows which two features are associated with each other.  An individual feature
+ * Shows which two features are associated with each other. An individual feature
  * can be shown alone by clicking on it.
  *
  * @author Peter Abeles
@@ -43,7 +43,7 @@ public class AssociationPanel extends CompareTwoImagePanel implements MouseListe
 	// which features are associated with each other
 	private int[] assocLeft, assocRight;
 
-	// color of each points.  Randomly select at runtime
+	// color of each points. Randomly select at runtime
 	Color[] colors;
 
 	public AssociationPanel( int borderSize ) {

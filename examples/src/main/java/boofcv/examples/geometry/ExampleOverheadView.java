@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -35,8 +35,8 @@ import georegression.struct.se.Se3_F64;
 import java.awt.image.BufferedImage;
 
 /**
- * Creates a synthetic overhead view from an image using the known ground plane.  This is commonly used for navigation
- * in man-made environments, such on roads or through hallways.  Objects which are not actually on the ground plane
+ * Creates a synthetic overhead view from an image using the known ground plane. This is commonly used for navigation
+ * in man-made environments, such on roads or through hallways. Objects which are not actually on the ground plane
  * will be heavily distorted in the overhead view.
  *
  * @author Peter Abeles
@@ -70,7 +70,7 @@ public class ExampleOverheadView {
 
 		generateOverhead.process(imageRGB, overheadRGB);
 
-		// note that the left/right values are swapped in the overhead image.  This is an artifact of the plane's
+		// note that the left/right values are swapped in the overhead image. This is an artifact of the plane's
 		// 2D coordinate system having +y pointing up, while images have +y pointing down.
 		BufferedImage output = ConvertBufferedImage.convertTo(overheadRGB, null, true);
 

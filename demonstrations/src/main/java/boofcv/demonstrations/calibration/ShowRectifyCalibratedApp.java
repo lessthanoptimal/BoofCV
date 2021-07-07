@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -49,7 +49,7 @@ import java.util.ArrayList;
 
 /**
  * Given a set of stereo images and their intrinsic parameters, display the rectified images and a horizontal line
- * where the user clicks.  The different rectified images show how the view can be optimized for different purposes.
+ * where the user clicks. The different rectified images show how the view can be optimized for different purposes.
  *
  * @author Peter Abeles
  */

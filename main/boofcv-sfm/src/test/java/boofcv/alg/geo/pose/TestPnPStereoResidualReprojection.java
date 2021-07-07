@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -34,8 +34,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  */
 public class TestPnPStereoResidualReprojection extends CommonStereoMotionNPoint {
 
-	@Test
-	public void basicTest() {
+	@Test void basicTest() {
 		Se3_F64 worldToLeft = new Se3_F64();
 		ConvertRotation3D_F64.eulerToMatrix(EulerType.XYZ, 0.1, 1, -0.2, worldToLeft.getR());
 		worldToLeft.getT().setTo(-0.3, 0.4, 1);
@@ -63,8 +62,7 @@ public class TestPnPStereoResidualReprojection extends CommonStereoMotionNPoint 
 		assertTrue(Math.abs(error[1]) > 1e-8);
 	}
 
-	@Test
-	public void compareToReprojection() {
+	@Test void compareToReprojection() {
 		Se3_F64 worldToLeft = new Se3_F64();
 		ConvertRotation3D_F64.eulerToMatrix(EulerType.XYZ, 0.1, 1, -0.2, worldToLeft.getR());
 		worldToLeft.getT().setTo(-0.3, 0.4, 1);

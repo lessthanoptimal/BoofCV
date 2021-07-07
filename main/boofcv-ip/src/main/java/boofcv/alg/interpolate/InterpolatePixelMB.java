@@ -25,7 +25,7 @@ import boofcv.struct.image.ImageBase;
  *
  * @author Peter Abeles
  */
-// TODO experiment with adding an offset to the "values" array.  That way it can potentially write directly into
+// TODO experiment with adding an offset to the "values" array. That way it can potentially write directly into
 //      the output image
 public interface InterpolatePixelMB<T extends ImageBase<T>> extends InterpolatePixel<T> {
 
@@ -42,7 +42,7 @@ public interface InterpolatePixelMB<T extends ImageBase<T>> extends InterpolateP
 
 	/**
 	 * Returns the interpolated pixel values at the specified location while assuming it is inside
-	 * the image far away from the border.  For any input point {@link #isInFastBounds} should return true.
+	 * the image far away from the border. For any input point {@link #isInFastBounds} should return true.
 	 *
 	 * @param x Point's x-coordinate.
 	 * @param y Point's y-coordinate.

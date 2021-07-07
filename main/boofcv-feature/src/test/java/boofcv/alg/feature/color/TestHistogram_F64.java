@@ -27,8 +27,7 @@ import static org.junit.jupiter.api.Assertions.*;
  * @author Peter Abeles
  */
 public class TestHistogram_F64 extends BoofStandardJUnit {
-	@Test
-	public void constructor() {
+	@Test void constructor() {
 		Histogram_F64 hist = new Histogram_F64(2,3,4);
 
 		assertEquals(2*3*4,hist.data.length);
@@ -37,8 +36,7 @@ public class TestHistogram_F64 extends BoofStandardJUnit {
 		assertEquals(4,hist.getLength(2));
 	}
 
-	@Test
-	public void isRangeSet() {
+	@Test void isRangeSet() {
 		Histogram_F64 hist = new Histogram_F64(2,3,4);
 
 		assertFalse(hist.isRangeSet());
@@ -50,15 +48,13 @@ public class TestHistogram_F64 extends BoofStandardJUnit {
 		assertTrue(hist.isRangeSet());
 	}
 
-	@Test
-	public void getDimensions() {
+	@Test void getDimensions() {
 		Histogram_F64 hist = new Histogram_F64(2,3,4);
 
 		assertEquals(3, hist.getDimensions());
 	}
 
-	@Test
-	public void setRange() {
+	@Test void setRange() {
 		Histogram_F64 hist = new Histogram_F64(2,3,4);
 
 		assertEquals(0,hist.getMinimum(1),1e-8);
@@ -70,8 +66,7 @@ public class TestHistogram_F64 extends BoofStandardJUnit {
 		assertEquals(1,hist.getMaximum(1),1e-8);
 	}
 
-	@Test
-	public void getDimensionIndex_double() {
+	@Test void getDimensionIndex_double() {
 		Histogram_F64 hist = new Histogram_F64(2,6,4);
 
 		hist.setRange(1,-1,1);
@@ -85,8 +80,7 @@ public class TestHistogram_F64 extends BoofStandardJUnit {
 		assertEquals(2, hist.getDimensionIndex(1, period * 2.5 - 1.0));
 	}
 
-	@Test
-	public void getDimensionIndex_int() {
+	@Test void getDimensionIndex_int() {
 		Histogram_F64 hist = new Histogram_F64(2,256,4);
 
 		hist.setRange(1, 0, 255);
@@ -105,8 +99,7 @@ public class TestHistogram_F64 extends BoofStandardJUnit {
 		assertEquals(15, hist.getDimensionIndex(1,40));
 	}
 
-	@Test
-	public void getIndex_two() {
+	@Test void getIndex_two() {
 		Histogram_F64 hist = new Histogram_F64(2,6);
 
 		assertEquals(0,hist.getIndex(0, 0));
@@ -115,8 +108,7 @@ public class TestHistogram_F64 extends BoofStandardJUnit {
 		assertEquals(1,hist.getIndex(0, 1));
 	}
 
-	@Test
-	public void getIndex_three() {
+	@Test void getIndex_three() {
 		Histogram_F64 hist = new Histogram_F64(2,6,4);
 
 		assertEquals(0,hist.getIndex(0, 0, 0));
@@ -126,8 +118,7 @@ public class TestHistogram_F64 extends BoofStandardJUnit {
 		assertEquals(1, hist.getIndex(0, 0, 1));
 	}
 
-	@Test
-	public void getIndex_N() {
+	@Test void getIndex_N() {
 		Histogram_F64 hist = new Histogram_F64(2,6,4);
 
 		assertEquals(0,hist.getIndex(new int[]{0, 0, 0}));
@@ -140,24 +131,21 @@ public class TestHistogram_F64 extends BoofStandardJUnit {
 		assertEquals(2, hist.getIndex(new int[]{2}));
 	}
 
-	@Test
-	public void get_two() {
+	@Test void get_two() {
 		Histogram_F64 hist = new Histogram_F64(2,6);
 
 		hist.data[hist.getIndex(1,2)] = 2;
 		assertEquals(2,hist.get(1,2),1e-8);
 	}
 
-	@Test
-	public void get_three() {
+	@Test void get_three() {
 		Histogram_F64 hist = new Histogram_F64(2,6,4);
 
 		hist.data[hist.getIndex(1,2,1)] = 2;
 		assertEquals(2, hist.get(1, 2,1), 1e-8);
 	}
 
-	@Test
-	public void get_N() {
+	@Test void get_N() {
 		Histogram_F64 hist = new Histogram_F64(2,6,4);
 
 		hist.data[hist.getIndex(1,2,1)] = 2;

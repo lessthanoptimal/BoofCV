@@ -35,18 +35,18 @@ import java.util.List;
 
 /**
  * Refines a set of corner points along a contour by fitting lines to the points between the corners using a
- * least-squares technique.  It then refines the corners estimates by interesting the lines and finding
+ * least-squares technique. It then refines the corners estimates by interesting the lines and finding
  * the closest point on the contour.
  *
  * A surprising number of things can go wrong and there are a lot of adhoc rules in this class and probably valid
- * shapes are rejected.  It's well tested but wouldn't be shocked if it contains bugs that are compensated for else
+ * shapes are rejected. It's well tested but wouldn't be shocked if it contains bugs that are compensated for else
  * where in the code.
  *
  * @author Peter Abeles
  */
 public class FitLinesToContour {
 
-	// maximum number of samples along a line.  After a certain point little is gained by  sampling all of those
+	// maximum number of samples along a line. After a certain point little is gained by  sampling all of those
 	// points and it becomes very computationally expensive
 	int maxSamples = 20;
 
@@ -79,9 +79,9 @@ public class FitLinesToContour {
 	}
 
 	/**
-	 * Fits line segments along the contour with the first and last corner fixed at the original corners.  The output
-	 * will be a new set of corner indexes.  Since the corner list is circular, it is assumed that anchor1 comes after
-	 * anchor0.  The same index can be specified for an anchor, it will just go around the entire circle
+	 * Fits line segments along the contour with the first and last corner fixed at the original corners. The output
+	 * will be a new set of corner indexes. Since the corner list is circular, it is assumed that anchor1 comes after
+	 * anchor0. The same index can be specified for an anchor, it will just go around the entire circle
 	 *
 	 * @param anchor0 corner index of the first end point
 	 * @param anchor1 corner index of the second end point.
@@ -178,8 +178,8 @@ public class FitLinesToContour {
 
 		skippedCorners.reset();
 
-		// this is the index in the contour of the previous corner.  When a new corner is found this is used
-		// to see if the newly fit lines point to the same corner.  If that happens a corner is "skipped"
+		// this is the index in the contour of the previous corner. When a new corner is found this is used
+		// to see if the newly fit lines point to the same corner. If that happens a corner is "skipped"
 		int contourIndexPrevious = contourCorners.get(anchor0);
 		for (int i = 1; i < numLines; i++) {
 			LineGeneral2D_F64 line0 = lines.get(i - 1);
@@ -274,7 +274,7 @@ public class FitLinesToContour {
 				return false;
 
 			if (!fitLine(index0, index1, lines.get(i - 1))) {
-				// TODO do something more intelligent here.  Just leave the corners as is?
+				// TODO do something more intelligent here. Just leave the corners as is?
 				return false;
 			}
 			LineGeneral2D_F64 l = lines.get(i - 1);

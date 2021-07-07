@@ -40,18 +40,18 @@ import org.jetbrains.annotations.Nullable;
  * <p>
  * Creates high level interfaces for computing the disparity between two rectified stereo images.
  * Algorithms which select the best disparity for each region independent of all the others are
- * referred to as Winner Takes All (WTA) in the literature.  Dense algorithms compute the disparity for the
+ * referred to as Winner Takes All (WTA) in the literature. Dense algorithms compute the disparity for the
  * whole image while sparse algorithms do it in a per pixel basis as requested.
  * </p>
  *
  * <p>
  * Typically disparity calculations with regions will produce less erratic results, but their precision will
- * be decreased.  This is especially evident along the border of objects.  Computing a wider range of disparities
+ * be decreased. This is especially evident along the border of objects. Computing a wider range of disparities
  * can better results, but is very computationally expensive.
  * </p>
  *
  * <p>
- * Dense vs Sparse.  Here dense refers to computing the disparity across the whole image at once.  Sparse refers
+ * Dense vs Sparse. Here dense refers to computing the disparity across the whole image at once. Sparse refers
  * to computing the disparity for a single pixel at a time as requested by the user,
  * </p>
  *

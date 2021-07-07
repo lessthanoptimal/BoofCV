@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -31,7 +31,7 @@ public class UtilDenoiseWavelet {
 
 	/**
 	 * <p>
-	 * Robust median estimator of the noise standard deviation.  Typically applied to the HH<sub>1</sub> subband.
+	 * Robust median estimator of the noise standard deviation. Typically applied to the HH<sub>1</sub> subband.
 	 * </p>
 	 *
 	 * <p>
@@ -81,7 +81,7 @@ public class UtilDenoiseWavelet {
 	/**
 	 * <p>
 	 * Computes the universal threshold defined in [1], which is the threshold used by
-	 * VisuShrink.  The same threshold is used by other algorithms.
+	 * VisuShrink. The same threshold is used by other algorithms.
 	 * </p>
 	 *
 	 * <p>
@@ -94,7 +94,7 @@ public class UtilDenoiseWavelet {
 	 * Biometrika, vol 81, pp. 425-455, 1994
 	 * </p>
 	 *
-	 * @param image Input image.  Only the width and height are used in computing this thresold.
+	 * @param image Input image. Only the width and height are used in computing this thresold.
 	 * @param noiseSigma Estimated noise sigma.
 	 * @return universal threshold.
 	 */

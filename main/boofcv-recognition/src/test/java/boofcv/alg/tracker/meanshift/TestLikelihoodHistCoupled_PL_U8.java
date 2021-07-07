@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -32,8 +32,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  */
 public class TestLikelihoodHistCoupled_PL_U8 extends BoofStandardJUnit {
 
-	@Test
-	public void numBins() {
+	@Test void numBins() {
 		LikelihoodHistCoupled_PL_U8 alg = new LikelihoodHistCoupled_PL_U8(255,30);
 
 		Planar<GrayU8> image = new Planar<>(GrayU8.class,30,40,3);
@@ -48,8 +47,7 @@ public class TestLikelihoodHistCoupled_PL_U8 extends BoofStandardJUnit {
 	}
 
 
-	@Test
-	public void singleColor() {
+	@Test void singleColor() {
 		LikelihoodHistCoupled_PL_U8 alg = new LikelihoodHistCoupled_PL_U8(255,11);
 
 		Planar<GrayU8> image = new Planar<>(GrayU8.class,30,40,3);
@@ -66,8 +64,7 @@ public class TestLikelihoodHistCoupled_PL_U8 extends BoofStandardJUnit {
 
 	}
 
-	@Test
-	public void multipleColors() {
+	@Test void multipleColors() {
 		LikelihoodHistCoupled_PL_U8 alg = new LikelihoodHistCoupled_PL_U8(255,11);
 
 		Planar<GrayU8> image = new Planar<>(GrayU8.class,30,40,3);

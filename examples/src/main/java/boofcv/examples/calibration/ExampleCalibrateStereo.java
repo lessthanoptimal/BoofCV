@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -42,8 +42,8 @@ import java.util.List;
  * are demonstrated in this example. See calibration tutorial for a discussion of different target types and how to
  * collect good calibration images.
  *
- * All the image processing and calibration is taken care of inside of {@link CalibrateStereoPlanar}.  The code below
- * loads calibration images as inputs, calibrates, and saves results to an XML file.  See in code comments for tuning
+ * All the image processing and calibration is taken care of inside of {@link CalibrateStereoPlanar}. The code below
+ * loads calibration images as inputs, calibrates, and saves results to an XML file. See in code comments for tuning
  * and implementation issues.
  *
  * @see boofcv.examples.stereo.ExampleRectifyCalibratedStereo

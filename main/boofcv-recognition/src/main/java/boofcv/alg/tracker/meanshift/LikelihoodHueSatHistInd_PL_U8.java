@@ -25,9 +25,9 @@ import georegression.struct.shapes.RectangleLength2D_I32;
 
 /**
  * <p>
- * Converts an RGB image into HSV image to add invariance to changes in lighting conditions.  Creates independent
+ * Converts an RGB image into HSV image to add invariance to changes in lighting conditions. Creates independent
  * histograms for the target's Hue and Saturation, which are then normalized such that
- * their sums are equal to one.  Likelihood is computed multiply the value of the histograms together.
+ * their sums are equal to one. Likelihood is computed multiply the value of the histograms together.
  * </p>
  * <p>
  * Colors with a very small "Value" are ignored since their hue and saturation are not reliable.

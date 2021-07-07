@@ -54,7 +54,7 @@ public class ImageSegmentationOps {
 	}
 
 	/**
-	 * Counts the number of pixels in all regions.  Regions must be have labels from 0 to totalRegions-1.
+	 * Counts the number of pixels in all regions. Regions must be have labels from 0 to totalRegions-1.
 	 *
 	 * @param labeled (Input) labeled image
 	 * @param totalRegions Total number of regions
@@ -78,7 +78,7 @@ public class ImageSegmentationOps {
 	 * in coordinates for sub-images.
 	 *
 	 * @param graph Input segmented image where the ID's are not compacted
-	 * @param segmentId List of segment ID's.  See comment above about what ID's are acceptable.
+	 * @param segmentId List of segment ID's. See comment above about what ID's are acceptable.
 	 * @param output The new image after it has been compacted
 	 */
 	public static void regionPixelId_to_Compact( GrayS32 graph, DogArray_I32 segmentId, GrayS32 output ) {
@@ -110,11 +110,11 @@ public class ImageSegmentationOps {
 	}
 
 	/**
-	 * Indicates border pixels between two regions.  If two adjacent pixels (4-connect) are not from the same region
+	 * Indicates border pixels between two regions. If two adjacent pixels (4-connect) are not from the same region
 	 * then both pixels are marked as true (value of 1) in output image, all other pixels are false (0).
 	 *
 	 * @param labeled Input segmented image.
-	 * @param output Output binary image.  1 for border pixels.
+	 * @param output Output binary image. 1 for border pixels.
 	 */
 	public static void markRegionBorders( GrayS32 labeled, GrayU8 output ) {
 

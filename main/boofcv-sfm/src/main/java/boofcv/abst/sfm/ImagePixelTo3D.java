@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -21,8 +21,8 @@ package boofcv.abst.sfm;
 /**
  * <p>
  * Generalized interface for sensors which allow pixels in an image to be converted into
- * 3D world coordinates.  3D points are returned in homogeneous coordinates so that
- * points at infinity can be handled.  To convert points into 3D coordinates simply divide
+ * 3D world coordinates. 3D points are returned in homogeneous coordinates so that
+ * points at infinity can be handled. To convert points into 3D coordinates simply divide
  * each number by 'w'.
  * </p>
  *
@@ -68,7 +68,7 @@ public interface ImagePixelTo3D {
 	double getZ();
 
 	/**
-	 * Found w-coordinate of point in camera coordinate system.  If a point
+	 * Found w-coordinate of point in camera coordinate system. If a point
 	 * is at infinity then this value will be zero.
 	 *
 	 * @return w-coordinate

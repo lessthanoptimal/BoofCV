@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -33,13 +33,13 @@ import org.ddogleg.struct.DogArray;
 
 /**
  * <p>Computes {@link DescribePointSift SIFT} features in a regular grid across an entire image at a single
- * scale and orientation.   This is more computationally efficient than the more generic {@link DescribePointSift}
- * algorithm because it makes strong assumptions.  If given the same center point, an orientation of 0, and
+ * scale and orientation.  This is more computationally efficient than the more generic {@link DescribePointSift}
+ * algorithm because it makes strong assumptions. If given the same center point, an orientation of 0, and
  * sigmaToPixels is 1, they should produce the same descriptor.</p>
  *
- * <p>Sampling is done in regular increments in a grid pattern.  The example sampling points are computed such that
- * entire area sampled starts and ends at the most extreme possible pixels.  This most likely will require that
- * the sampling period be adjusted.  Multiple descriptors can overlap the same area, so pixel orientation and
+ * <p>Sampling is done in regular increments in a grid pattern. The example sampling points are computed such that
+ * entire area sampled starts and ends at the most extreme possible pixels. This most likely will require that
+ * the sampling period be adjusted. Multiple descriptors can overlap the same area, so pixel orientation and
  * magnitude is just computed once and saved.</p>
  *
  * @author Peter Abeles
@@ -66,11 +66,11 @@ public class DescribeDenseSiftAlg<D extends ImageGray<D>> extends DescribeSiftCo
 	/**
 	 * Specifies SIFT descriptor structure and sampling frequency.
 	 *
-	 * @param widthSubregion Width of sub-region in samples.  Try 4
-	 * @param widthGrid Width of grid in subregions.  Try 4.
-	 * @param numHistogramBins Number of bins in histogram.  Try 8
-	 * @param weightingSigmaFraction Sigma for Gaussian weighting function is set to this value * region width.  Try 0.5
-	 * @param maxDescriptorElementValue Helps with non-affine changes in lighting. See paper.  Try 0.2
+	 * @param widthSubregion Width of sub-region in samples. Try 4
+	 * @param widthGrid Width of grid in subregions. Try 4.
+	 * @param numHistogramBins Number of bins in histogram. Try 8
+	 * @param weightingSigmaFraction Sigma for Gaussian weighting function is set to this value * region width. Try 0.5
+	 * @param maxDescriptorElementValue Helps with non-affine changes in lighting. See paper. Try 0.2
 	 * @param periodColumns Number of pixels between samples along x-axis
 	 * @param periodRows Number of pixels between samples along y-axis
 	 * @param derivType Type of input derivative image

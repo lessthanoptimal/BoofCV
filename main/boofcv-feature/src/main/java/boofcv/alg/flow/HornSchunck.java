@@ -25,9 +25,9 @@ import boofcv.struct.image.ImageType;
 
 /**
  * <p>
- * This is Horn-Schunck's well known work [1] for dense optical flow estimation.  It is based off the following
+ * This is Horn-Schunck's well known work [1] for dense optical flow estimation. It is based off the following
  * equation Ex*u + Ey*v + Et = 0, where (u,v) is the estimated flow for a single pixel, and (Ex,Ey) is the pixel's
- * gradient and Et is the grave in intensity value.  It is assumed that each pixel maintains a constant intensity
+ * gradient and Et is the grave in intensity value. It is assumed that each pixel maintains a constant intensity
  * and that changes in flow are smooth. This implementation is faithful to the original
  * work and does not make any effort to improve its performance using more modern techniques.
  * </p>
@@ -61,8 +61,8 @@ public abstract class HornSchunck<T extends ImageBase<T>, D extends ImageBase<D>
 	/**
 	 * Constructor
 	 *
-	 * @param alpha Larger values place more importance on flow smoothness consistency over brightness consistency.  Try 20
-	 * @param numIterations Number of iterations.  Try 1000
+	 * @param alpha Larger values place more importance on flow smoothness consistency over brightness consistency. Try 20
+	 * @param numIterations Number of iterations. Try 1000
 	 */
 	protected HornSchunck( float alpha, int numIterations, ImageType<D> derivType ) {
 		this.alpha2 = alpha*alpha;

@@ -68,14 +68,14 @@ public interface AssociateThreeDescription<Desc> {
 	void associate();
 
 	/**
-	 * List of associated features.  Indexes refer to the index inside the input lists.
+	 * List of associated features. Indexes refer to the index inside the input lists.
 	 *
 	 * @return List of associated features.
 	 */
 	DogArray<AssociatedTripleIndex> getMatches();
 
 	/**
-	 * Associations are only considered if their score is less than or equal to the specified threshold.  To remove
+	 * Associations are only considered if their score is less than or equal to the specified threshold. To remove
 	 * any threshold test set this value to Double.MAX_VALUE
 	 *
 	 * @param score The threshold.

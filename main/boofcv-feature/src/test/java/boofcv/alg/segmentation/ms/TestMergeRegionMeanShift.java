@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -31,8 +31,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
  * @author Peter Abeles
  */
 public class TestMergeRegionMeanShift extends BoofStandardJUnit {
-	@Test
-	public void basicAll() {
+	@Test void basicAll() {
 		MergeRegionMeanShift alg = new MergeRegionMeanShift(1, 1);
 
 		GrayS32 pixelToRegion = new GrayS32(4, 4);

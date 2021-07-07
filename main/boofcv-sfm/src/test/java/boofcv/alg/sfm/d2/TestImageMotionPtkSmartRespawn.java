@@ -45,8 +45,7 @@ public class TestImageMotionPtkSmartRespawn extends BoofStandardJUnit {
 	/**
 	 * Test the positive case when nothing should go wrong
 	 */
-	@Test
-	public void nominal() {
+	@Test void nominal() {
 		DummyMotion motion = new DummyMotion();
 
 		ImageMotionPtkSmartRespawn<GrayF32, Affine2D_F64> alg =
@@ -80,8 +79,7 @@ public class TestImageMotionPtkSmartRespawn extends BoofStandardJUnit {
 	/**
 	 * Checks to see if a new key-frame is triggered when the number of inliers drops too low
 	 */
-	@Test
-	public void absoluteMinimumTracks() {
+	@Test void absoluteMinimumTracks() {
 		DummyMotion motion = new DummyMotion();
 
 		ImageMotionPtkSmartRespawn<GrayF32, Affine2D_F64> alg =
@@ -110,8 +108,7 @@ public class TestImageMotionPtkSmartRespawn extends BoofStandardJUnit {
 	/**
 	 * Checks to see if a new key-frame is triggered when the relative number of inliers drops too low
 	 */
-	@Test
-	public void relativeMinimumTracks() {
+	@Test void relativeMinimumTracks() {
 		DummyMotion motion = new DummyMotion();
 
 		ImageMotionPtkSmartRespawn<GrayF32, Affine2D_F64> alg =
@@ -137,8 +134,7 @@ public class TestImageMotionPtkSmartRespawn extends BoofStandardJUnit {
 	/**
 	 * Checks to see if a new key-frame is triggered when relative coverage area drops too low
 	 */
-	@Test
-	public void relativeCoverageArea() {
+	@Test void relativeCoverageArea() {
 		DummyMotion motion = new DummyMotion();
 
 		ImageMotionPtkSmartRespawn<GrayF32, Affine2D_F64> alg =

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -42,8 +42,7 @@ public class TestImplAverageDownSample2 extends BoofStandardJUnit {
 	int width = 20;
 	int height = 15;
 
-	@Test
-	public void compareToNaive() {
+	@Test void compareToNaive() {
 		Method[] methods = ImplAverageDownSample2.class.getMethods();
 
 		// sanity check to make sure the functions are being found

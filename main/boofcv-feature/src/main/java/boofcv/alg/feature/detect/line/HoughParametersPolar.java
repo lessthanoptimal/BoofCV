@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -101,7 +101,7 @@ public class HoughParametersPolar implements HoughTransformParameters {
 
 		int w2 = transform.width/2;
 
-		// The line's slope is encoded using the tangent angle.  Those bins are along the image's y-axis
+		// The line's slope is encoded using the tangent angle. Those bins are along the image's y-axis
 		for (int i = 0; i < transform.height; i++) {
 			// distance of closest point on line from a line defined by the point (x,y) and
 			// the tangent theta=PI*i/height

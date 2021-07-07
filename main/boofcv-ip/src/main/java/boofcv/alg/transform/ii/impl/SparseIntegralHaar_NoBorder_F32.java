@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -24,7 +24,7 @@ import boofcv.struct.sparse.GradientValue_F32;
 
 
 /**
- * Computes the gradient Haar wavelet from an integral image.  Does not check for border conditions.
+ * Computes the gradient Haar wavelet from an integral image. Does not check for border conditions.
  *
  * @author Peter Abeles
  */

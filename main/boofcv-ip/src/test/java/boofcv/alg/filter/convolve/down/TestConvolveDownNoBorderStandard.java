@@ -48,8 +48,7 @@ public class TestConvolveDownNoBorderStandard extends BoofStandardJUnit {
 	/**
 	 * Automatically compares all the box filters against a generalize convolution
 	 */
-	@Test
-	public void compareToGeneral() {
+	@Test void compareToGeneral() {
 		// try different image sizes
 		for (int plus = 0; plus <= kernelRadius + 1; plus++) {
 			width = 10 + plus;

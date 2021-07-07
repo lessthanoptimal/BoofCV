@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -39,8 +39,8 @@ import static boofcv.alg.feature.detect.interest.FastHessianFeatureDetector.poly
  * </p>
  * <p>
  * COMMENT ON SCALEPOWER: To normalize feature intensity across scales each feature intensity is multiplied by the scale to the power of 'scalePower'.
- * See [1,2] for how to compute 'scalePower'.  Inside of the image pyramid sub-sampling of the image causes the image
- * gradient to be a factor of 'scale' larger than it would be without sub-sampling.  In some situations this can negate
+ * See [1,2] for how to compute 'scalePower'. Inside of the image pyramid sub-sampling of the image causes the image
+ * gradient to be a factor of 'scale' larger than it would be without sub-sampling. In some situations this can negate
  * the need to adjust feature intensity further.
  * </p>
  * <p>
@@ -57,7 +57,7 @@ public class FeatureLaplacePyramid<T extends ImageGray<T>, D extends ImageGray<D
 	// used to compute feature intensity across scale space
 	private ImageFunctionSparse<T> sparseLaplace;
 
-	// generalized feature detector.  Used to find candidate features in each scale's image
+	// generalized feature detector. Used to find candidate features in each scale's image
 	private GeneralFeatureDetector<T, D> detector;
 	private float baseThreshold;
 	// location of recently computed features in layers
@@ -79,7 +79,7 @@ public class FeatureLaplacePyramid<T extends ImageGray<T>, D extends ImageGray<D
 	 * @param detector Point feature detector which is used to find candidates in each scale level
 	 * @param sparseLaplace Used to compute the Laplacian at each candidates
 	 * @param computeDerivative Used to compute image derivatives
-	 * @param scalePower Used to normalize features intensity across scale space.  For many features this value should be one.
+	 * @param scalePower Used to normalize features intensity across scale space. For many features this value should be one.
 	 */
 	public FeatureLaplacePyramid( GeneralFeatureDetector<T, D> detector,
 								  ImageFunctionSparse<T> sparseLaplace,
@@ -104,7 +104,7 @@ public class FeatureLaplacePyramid<T extends ImageGray<T>, D extends ImageGray<D
 
 		// compute feature intensity in each level
 		for (int i = 1; i < ss.getNumLayers() - 1; i++) {
-			// detect features in 2D space.  Don't need to compute features at the tail ends of scale-space
+			// detect features in 2D space. Don't need to compute features at the tail ends of scale-space
 //			if (i > 0 && i < ss.getNumLayers() - 1)
 //				detectCandidateFeatures(ss.getLayer(i), ss.getSigma(i));
 
@@ -126,7 +126,7 @@ public class FeatureLaplacePyramid<T extends ImageGray<T>, D extends ImageGray<D
 	}
 
 	/**
-	 * Use the feature detector to find candidate features in each level.  Only compute the needed image derivatives.
+	 * Use the feature detector to find candidate features in each level. Only compute the needed image derivatives.
 	 */
 	private void detectCandidateFeatures( T image, double sigma ) {
 

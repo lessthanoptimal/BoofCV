@@ -33,8 +33,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
  * @author Peter Abeles
  */
 public class TestNonMaxLimiter extends BoofStandardJUnit {
-	@Test
-	public void checkNoLimit() {
+	@Test void checkNoLimit() {
 		GrayF32 intensity = new GrayF32(30,25);
 		intensity.set(10,15,20);
 		intensity.set(12,20,25);
@@ -62,8 +61,7 @@ public class TestNonMaxLimiter extends BoofStandardJUnit {
 	/**
 	 * 4 features, but a max of 2 is requested.
 	 */
-	@Test
-	public void checkLimit() {
+	@Test void checkLimit() {
 		GrayF32 intensity = new GrayF32(30,25);
 		intensity.set(10,15,20);
 		intensity.set(12,20,25);

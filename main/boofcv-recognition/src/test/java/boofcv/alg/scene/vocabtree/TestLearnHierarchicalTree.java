@@ -139,7 +139,7 @@ class TestLearnHierarchicalTree extends BoofStandardJUnit {
 		tree.maximumLevel = 5;
 
 		LearnHierarchicalTree<Point2D_F64> alg = createAlg();
-		// 100/4 = 25.  25/4 = 6.25,  This it should not get past the first level
+		// 100/4 = 25. 25/4 = 6.25,  This it should not get past the first level
 		alg.minimumPointsForChildren.setFixed(20);
 		alg.process(points, tree);
 

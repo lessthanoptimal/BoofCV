@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -29,11 +29,11 @@ import lombok.Getter;
 
 /**
  * <p>Adds a pyramidal implementation on top of {@link VisOdomDirectColorDepth} to enable it to handle larger motions
- * which its local approach couldn't handle in a single layer.  Highest layers (lowest resolution) are processed
- * first.  Their estimated motion is then passed into the next layers for its initial guess.</p>
+ * which its local approach couldn't handle in a single layer. Highest layers (lowest resolution) are processed
+ * first. Their estimated motion is then passed into the next layers for its initial guess.</p>
  *
- * <p>Selection of keyframes is a critical problem.  A global keyframe is used for all pixels.  if Keyframes are selected
- * too often then performance will be degraded and not often enough can cause it to fail completely.  A new keyframe
+ * <p>Selection of keyframes is a critical problem. A global keyframe is used for all pixels. if Keyframes are selected
+ * too often then performance will be degraded and not often enough can cause it to fail completely. A new keyframe
  * is selected when the number of trackable pixels drops below a threshold or the it's spatial diversity has dropped
  * too low</p>
  *
@@ -168,7 +168,7 @@ public class PyramidDirectColorDepth<T extends ImageGray<T>> {
 			keyToCurrent.setTo(work);
 			worldToKey.concat(keyToCurrent, worldToCurrent);
 
-			// compute diversity in the smallest image.  Should be about the same in all the layers
+			// compute diversity in the smallest image. Should be about the same in all the layers
 			diversity = layersOdom[layersOdom.length - 1].computeFeatureDiversity(keyToCurrent);
 		}
 

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -72,7 +72,7 @@ public class UtilImageIO {
 	}
 
 	/**
-	 * A function that load the specified image.  If anything goes wrong it returns a
+	 * A function that load the specified image. If anything goes wrong it returns a
 	 * null.
 	 */
 	public static BufferedImage loadImage(String fileName) {
@@ -112,7 +112,7 @@ public class UtilImageIO {
 	}
 
 	/**
-	 * A function that load the specified image.  If anything goes wrong it returns a
+	 * A function that load the specified image. If anything goes wrong it returns a
 	 * null.
 	 */
 	public static BufferedImage loadImage(URL url) {
@@ -185,12 +185,12 @@ public class UtilImageIO {
 
 
 	/**
-	 * Saves the {@link BufferedImage} to the specified file.  The image type of the output is determined by
-	 * the name's extension.  By default the file is saved using {@link ImageIO#write(RenderedImage, String, File)}}
+	 * Saves the {@link BufferedImage} to the specified file. The image type of the output is determined by
+	 * the name's extension. By default the file is saved using {@link ImageIO#write(RenderedImage, String, File)}}
 	 * but if that fails then it will see if it can save it using BoofCV native code for PPM and PGM.
 	 *
 	 * @param img Image which is to be saved.
-	 * @param fileName Name of the output file.  The type is determined by the extension.
+	 * @param fileName Name of the output file. The type is determined by the extension.
 	 */
 	public static void saveImage(BufferedImage img, String fileName) {
 		try {
@@ -219,7 +219,7 @@ public class UtilImageIO {
 
 	/**
 	 *
-	 * <p>Saves the BoofCV formatted image.  This is identical to the following code:</p>
+	 * <p>Saves the BoofCV formatted image. This is identical to the following code:</p>
 	 *
 	 * <pre>
 	 * BufferedImage out = ConvertBufferedImage.convertTo(image,null,true);
@@ -227,7 +227,7 @@ public class UtilImageIO {
 	 * </pre>
 	 *
 	 * @param image Image which is to be saved.
-	 * @param fileName Name of the output file.  The type is determined by the extension.
+	 * @param fileName Name of the output file. The type is determined by the extension.
 	 */
 	public static void saveImage( ImageBase<?> image , String fileName ) {
 		BufferedImage out = ConvertBufferedImage.convertTo(image,null,true);
@@ -238,8 +238,8 @@ public class UtilImageIO {
 	 * Loads a PPM image from a file.
 	 *
 	 * @param fileName Location of PPM image
-	 * @param storage (Optional) Storage for output image.  Must be the width and height of the image being read.
-	 *                Better performance of type BufferedImage.TYPE_INT_RGB.  If null or width/height incorrect a new image
+	 * @param storage (Optional) Storage for output image. Must be the width and height of the image being read.
+	 *                Better performance of type BufferedImage.TYPE_INT_RGB. If null or width/height incorrect a new image
 	 *                will be declared.
 	 * @return The read in image
 	 * @throws IOException Thrown if there is a problem reading the image
@@ -252,8 +252,8 @@ public class UtilImageIO {
 	 * Loads a PGM image from a file.
 	 *
 	 * @param fileName Location of PGM image
-	 * @param storage (Optional) Storage for output image.  Must be the width and height of the image being read.
-	 *                Better performance of type BufferedImage.TYPE_BYTE_GRAY.  If null or width/height incorrect a new image
+	 * @param storage (Optional) Storage for output image. Must be the width and height of the image being read.
+	 *                Better performance of type BufferedImage.TYPE_BYTE_GRAY. If null or width/height incorrect a new image
 	 *                will be declared.
 	 * @return The image
 	 * @throws IOException Thrown if there is a problem reading the image
@@ -266,8 +266,8 @@ public class UtilImageIO {
 	 * Loads a PPM image from an {@link InputStream}.
 	 *
 	 * @param inputStream InputStream for PPM image
-	 * @param storage (Optional) Storage for output image.  Must be the width and height of the image being read.
-	 *                Better performance of type BufferedImage.TYPE_INT_RGB.  If null or width/height incorrect a new image
+	 * @param storage (Optional) Storage for output image. Must be the width and height of the image being read.
+	 *                Better performance of type BufferedImage.TYPE_INT_RGB. If null or width/height incorrect a new image
 	 *                will be declared.
 	 * @return The read in image
 	 * @throws IOException Thrown if there is a problem reading the image
@@ -325,8 +325,8 @@ public class UtilImageIO {
 	 * Loads a PGM image from an {@link InputStream}.
 	 *
 	 * @param inputStream InputStream for PGM image
-	 * @param storage (Optional) Storage for output image.  Must be the width and height of the image being read.
-	 *                Better performance of type BufferedImage.TYPE_BYTE_GRAY.  If null or width/height incorrect a new image
+	 * @param storage (Optional) Storage for output image. Must be the width and height of the image being read.
+	 *                Better performance of type BufferedImage.TYPE_BYTE_GRAY. If null or width/height incorrect a new image
 	 *                will be declared.
 	 * @return The read in image
 	 */
@@ -379,13 +379,13 @@ public class UtilImageIO {
 	}
 
 	/**
-	 * Reads a PPM image file directly into a Planar<GrayU8> image.   To improve performance when reading
+	 * Reads a PPM image file directly into a Planar<GrayU8> image.  To improve performance when reading
 	 * many images, the user can provide work space memory in the optional parameters
 	 *
 	 * @param fileName Location of PPM file
-	 * @param storage (Optional) Where the image is written in to.  Will be resized if needed.
+	 * @param storage (Optional) Where the image is written in to. Will be resized if needed.
 	 *                   If null or the number of bands isn't 3, a new instance is declared.
-	 * @param temp (Optional) Used internally to store the image.  Can be null.
+	 * @param temp (Optional) Used internally to store the image. Can be null.
 	 * @return The image.
 	 * @throws IOException Thrown if there is a problem reading the image
 	 */
@@ -396,13 +396,13 @@ public class UtilImageIO {
 	}
 
 	/**
-	 * Reads a PPM image file directly into a Planar<GrayU8> image.   To improve performance when reading
+	 * Reads a PPM image file directly into a Planar<GrayU8> image.  To improve performance when reading
 	 * many images, the user can provide work space memory in the optional parameters
 	 *
 	 * @param inputStream InputStream for PPM image
-	 * @param storage (Optional) Where the image is written in to.  Will be resized if needed.
+	 * @param storage (Optional) Where the image is written in to. Will be resized if needed.
 	 *                   If null or the number of bands isn't 3, a new instance is declared.
-	 * @param temp (Optional) Used internally to store the image.  Can be null.
+	 * @param temp (Optional) Used internally to store the image. Can be null.
 	 * @return The image.
 	 * @throws IOException Thrown if there is a problem reading the image
 	 */
@@ -454,7 +454,7 @@ public class UtilImageIO {
 	 * Loads a PGM image from an {@link InputStream}.
 	 *
 	 * @param fileName InputStream for PGM image
-	 * @param storage (Optional) Storage for output image.  Must be the width and height of the image being read.
+	 * @param storage (Optional) Storage for output image. Must be the width and height of the image being read.
 	 *                If null a new image will be declared.
 	 * @return The read in image
 	 * @throws IOException Thrown if there is a problem reading the image
@@ -469,7 +469,7 @@ public class UtilImageIO {
 	 * Loads a PGM image from an {@link InputStream}.
 	 *
 	 * @param inputStream InputStream for PGM image
-	 * @param storage (Optional) Storage for output image.  Must be the width and height of the image being read.
+	 * @param storage (Optional) Storage for output image. Must be the width and height of the image being read.
 	 *                If null a new image will be declared.
 	 * @return The read in image
 	 * @throws IOException Thrown if there is a problem reading the image
@@ -499,7 +499,7 @@ public class UtilImageIO {
 	 *
 	 * @param rgb 3-band RGB image
 	 * @param fileName Location where the image is to be written to.
-	 * @param temp (Optional) Used internally to store the image.  Can be null.
+	 * @param temp (Optional) Used internally to store the image. Can be null.
 	 * @throws IOException Thrown if there is a problem reading the image
 	 */
 	public static void savePPM(Planar<GrayU8> rgb , String fileName , DogArray_I8 temp ) throws IOException {

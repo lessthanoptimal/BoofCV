@@ -32,7 +32,7 @@ import lombok.Getter;
  * <p>
  * Base class for all dense stereo disparity score algorithms whose score's can be processed by
  * {@link DisparitySelect}. The scores for all possible disparities at each pixel is computed for
- * an entire row at once.  Then {@link DisparitySelect} is called to process this score.
+ * an entire row at once. Then {@link DisparitySelect} is called to process this score.
  * </p>
  *
  * <p>
@@ -40,7 +40,7 @@ import lombok.Getter;
  * index = imgWidth*(d-minDisparity-radiusX) + i - minDisparity-radiusX<br>
  * Format Comment:<br>
  * This ordering is a bit unnatural when searching for the best disparity, but reduces cache misses
- * when writing.  Performance boost is about 20%-30% depending on max disparity and image size.
+ * when writing. Performance boost is about 20%-30% depending on max disparity and image size.
  * </p>
  *
  * @author Peter Abeles

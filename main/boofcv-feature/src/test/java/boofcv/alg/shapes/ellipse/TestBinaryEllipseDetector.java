@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -45,8 +45,7 @@ public class TestBinaryEllipseDetector extends BoofStandardJUnit {
 	/**
 	 * Simple test case with unambiguous detections
 	 */
-	@Test
-	public void simpleCase() {
+	@Test void simpleCase() {
 		List<EllipseRotated_F64> expected = new ArrayList<>();
 
 		expected.add( new EllipseRotated_F64(50,65,20,10,0.5));
@@ -68,8 +67,7 @@ public class TestBinaryEllipseDetector extends BoofStandardJUnit {
 	/**
 	 * Handle a situation where a shape should be filtered out based on its edge intensity
 	 */
-	@Test
-	public void filterByEdge() {
+	@Test void filterByEdge() {
 		List<EllipseRotated_F64> expected = new ArrayList<>();
 
 		expected.add( new EllipseRotated_F64(50,65,20,10,0.5));
@@ -94,8 +92,7 @@ public class TestBinaryEllipseDetector extends BoofStandardJUnit {
 	/**
 	 * Input image is distorted
 	 */
-	@Test
-	public void distortedImage() {
+	@Test void distortedImage() {
 		List<EllipseRotated_F64> original = new ArrayList<>();
 
 		original.add( new EllipseRotated_F64(50,65,20,10,0.5));
@@ -128,8 +125,7 @@ public class TestBinaryEllipseDetector extends BoofStandardJUnit {
 	/**
 	 * Turn off refinement and manually invoke it
 	 */
-	@Test
-	public void autoRefineToggle() {
+	@Test void autoRefineToggle() {
 		List<EllipseRotated_F64> expected = new ArrayList<>();
 
 		expected.add( new EllipseRotated_F64(50,65,20,10,0.5));

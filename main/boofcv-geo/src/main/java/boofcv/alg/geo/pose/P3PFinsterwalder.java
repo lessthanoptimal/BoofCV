@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -32,7 +32,7 @@ import static boofcv.alg.geo.pose.P3PGrunert.pow2;
 /**
  * <p>
  * Solves for the 3 unknown distances between camera center and 3 observed points by finding a root of a cubic
- * polynomial and the roots of two quadratic polynomials.  Proposed by Finsterwalder in 1903, this implementation
+ * polynomial and the roots of two quadratic polynomials. Proposed by Finsterwalder in 1903, this implementation
  * is based off the discussion in [1]. There are up to four solutions.
  * </p>
  *
@@ -97,7 +97,7 @@ public class P3PFinsterwalder implements P3PLineDistance {
 //		poly.c[2] = b2*(b2-a2)*pow2(sin12) + c2*(c2 + 2*a2)*pow2(sin13) + 2*b2*c2*(-1 + cos23*cos13*cos12);
 //		poly.c[3] = c2*(c2*pow2(sin13) - b2*pow2(sin12) );
 
-		// Auto generated code + hand simplification.  See P3PFinsterwalder.py  I prefer it over the equations found
+		// Auto generated code + hand simplification. See P3PFinsterwalder.py  I prefer it over the equations found
 		// in the paper (commented out above) since it does not require sin(theta).
 		poly.c[0] = a2*(a2*(1 - pow2(cos13)) + b2*(pow2(cos23) - 1));
 		poly.c[1] = 2*a2*b2*(cos12*cos13*cos23 - 1) + a2*(a2 + 2*c2)*(1 - pow2(cos13)) + b2*(b2 - c2)*( 1 - pow2(cos23));

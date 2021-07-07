@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -31,8 +31,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
  */
 public class TestEnsureUniqueAssociation extends BoofStandardJUnit {
 
-	@Test
-	public void basicTest() {
+	@Test void basicTest() {
 
 		DogArray<AssociatedIndex> matches = new DogArray<>(10, AssociatedIndex::new);
 

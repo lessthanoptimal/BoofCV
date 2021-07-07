@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -46,8 +46,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  */
 public class TestDetectCircleRegularGrid extends BoofStandardJUnit {
 
-	@Test
-	public void process_easy() {
+	@Test void process_easy() {
 
 		Affine2D_F64 affine = new Affine2D_F64(1,0,0,1,100,100);
 
@@ -58,8 +57,7 @@ public class TestDetectCircleRegularGrid extends BoofStandardJUnit {
 		performDetectionCheck(4, 3, 4, 3, affine);
 	}
 
-	@Test
-	public void process_rotated() {
+	@Test void process_rotated() {
 		double c = Math.cos(0.4);
 		double s = Math.sin(0.4);
 		Affine2D_F64 affine = new Affine2D_F64(c,-s,s,c,140,100);
@@ -67,8 +65,7 @@ public class TestDetectCircleRegularGrid extends BoofStandardJUnit {
 		performDetectionCheck(5, 6, 5, 6, affine);
 	}
 
-	@Test
-	public void process_negative() {
+	@Test void process_negative() {
 		Affine2D_F64 affine = new Affine2D_F64(1,0,0,1,100,100);
 
 		performDetectionCheck(4, 6, 5, 6, affine);
@@ -128,8 +125,7 @@ public class TestDetectCircleRegularGrid extends BoofStandardJUnit {
 	/**
 	 * A flip is needed to get it into canonical
 	 */
-	@Test
-	public void putGridIntoCanonical_flip() {
+	@Test void putGridIntoCanonical_flip() {
 		putGridIntoCanonical_flip(2,5);
 		putGridIntoCanonical_flip(6,5);
 		putGridIntoCanonical_flip(2,2);

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -28,14 +28,12 @@ import static org.junit.jupiter.api.Assertions.*;
  */
 public class TestTldFernManager extends BoofStandardJUnit {
 
-	@Test
-	public void constructor() {
+	@Test void constructor() {
 		TldFernManager alg = new TldFernManager(10);
 		assertEquals(1024,alg.table.length);
 	}
 
-	@Test
-	public void lookupFern() {
+	@Test void lookupFern() {
 		TldFernManager alg = new TldFernManager(10);
 
 		TldFernFeature a = alg.lookupFern(345);
@@ -46,8 +44,7 @@ public class TestTldFernManager extends BoofStandardJUnit {
 		assertEquals(345,a.value);
 	}
 
-	@Test
-	public void lookupPosterior() {
+	@Test void lookupPosterior() {
 		TldFernManager alg = new TldFernManager(10);
 
 		assertEquals(0,alg.lookupPosterior(234),1e-8);
@@ -61,8 +58,7 @@ public class TestTldFernManager extends BoofStandardJUnit {
 		assertEquals(expected,alg.lookupPosterior(234),1e-8);
 	}
 
-	@Test
-	public void reset() {
+	@Test void reset() {
 		TldFernManager alg = new TldFernManager(10);
 
 		alg.table[10] = new TldFernFeature();
@@ -77,8 +73,7 @@ public class TestTldFernManager extends BoofStandardJUnit {
 		assertEquals(2,alg.unusedFern.size());
 
 	}
-	@Test
-	public void createFern() {
+	@Test void createFern() {
 		TldFernManager alg = new TldFernManager(3);
 
 		assertNotNull(alg.createFern());

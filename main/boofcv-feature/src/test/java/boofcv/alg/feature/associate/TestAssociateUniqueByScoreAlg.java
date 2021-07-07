@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -33,8 +33,7 @@ public class TestAssociateUniqueByScoreAlg extends BoofStandardJUnit {
 
 	DogArray<AssociatedIndex> matches = new DogArray<>(AssociatedIndex::new);
 
-	@Test
-	public void checkSource() {
+	@Test void checkSource() {
 		AssociateUniqueByScoreAlg alg = new AssociateUniqueByScoreAlg(MatchScoreType.NORM_ERROR,true,false);
 
 		// all unique matches, no change
@@ -61,8 +60,7 @@ public class TestAssociateUniqueByScoreAlg extends BoofStandardJUnit {
 		assertEquals(0, alg.getMatches().size);
 	}
 
-	@Test
-	public void checkDestination() {
+	@Test void checkDestination() {
 		AssociateUniqueByScoreAlg alg = new AssociateUniqueByScoreAlg(MatchScoreType.NORM_ERROR,false,true);
 
 		// all unique matches, no change
@@ -89,8 +87,7 @@ public class TestAssociateUniqueByScoreAlg extends BoofStandardJUnit {
 		assertEquals(0,alg.getMatches().size);
 	}
 
-	@Test
-	public void checkBoth() {
+	@Test void checkBoth() {
 		AssociateUniqueByScoreAlg alg = new AssociateUniqueByScoreAlg(MatchScoreType.NORM_ERROR,true,true);
 
 		// all unique matches, no change

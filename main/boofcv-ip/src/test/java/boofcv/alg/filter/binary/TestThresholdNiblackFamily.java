@@ -32,7 +32,7 @@ import org.junit.jupiter.api.Test;
  */
 public class TestThresholdNiblackFamily extends BoofStandardJUnit {
 	/**
-	 * Provide it a simple input image with obvious thresholding.  There will be regions of white space
+	 * Provide it a simple input image with obvious thresholding. There will be regions of white space
 	 * which exceed its radius.
 	 */
 	@Test void simple() {

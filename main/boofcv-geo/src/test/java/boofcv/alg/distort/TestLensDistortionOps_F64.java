@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -42,8 +42,7 @@ public class TestLensDistortionOps_F64 extends BoofStandardJUnit {
 	int width = 300;
 	int height = 350;
 
-	@Test
-	public void transformChangeModel_NONE_modified() {
+	@Test void transformChangeModel_NONE_modified() {
 		// distorted pixel in original image
 		double pixelX = 12.5,pixelY = height-3;
 
@@ -72,11 +71,10 @@ public class TestLensDistortionOps_F64 extends BoofStandardJUnit {
 	}
 
 	/**
-	 * Checks the border of the returned transform.  Makes sure that the entire original image is visible.
+	 * Checks the border of the returned transform. Makes sure that the entire original image is visible.
 	 * Also makes sure that the requested inverse transform is actually the inverse.
 	 */
-	@Test
-	public void transformChangeModel_FULLVIEW() {
+	@Test void transformChangeModel_FULLVIEW() {
 		CameraPinholeBrown param = new CameraPinholeBrown().
 				fsetK(300, 320, 0, 150, 130, width, height).fsetRadial(0.1, 0.05);
 		CameraPinhole desired = new CameraPinhole(param);
@@ -99,8 +97,7 @@ public class TestLensDistortionOps_F64 extends BoofStandardJUnit {
 	/**
 	 * Checks to see if the returned modified model is correct
 	 */
-	@Test
-	public void transformChangeModel_FULLVIEW_modified() {
+	@Test void transformChangeModel_FULLVIEW_modified() {
 		// distorted pixel in original image
 		double pixelX = 12.5 ,pixelY = height-3;
 
@@ -129,11 +126,10 @@ public class TestLensDistortionOps_F64 extends BoofStandardJUnit {
 	}
 
 	/**
-	 * Checks the border of the returned transform.  Makes sure that no none-visible portion is visible.
+	 * Checks the border of the returned transform. Makes sure that no none-visible portion is visible.
 	 * Also makes sure that the requested inverse transform is actually the inverse.
 	 */
-	@Test
-	public void transformChangeModel_EXPAND() {
+	@Test void transformChangeModel_EXPAND() {
 		CameraPinholeBrown param;
 		param = new CameraPinholeBrown().fsetK(300, 320, 0, 150, 130, width, height).fsetRadial(0.1, 1e-4);
 		CameraPinhole desired = new CameraPinhole(param);
@@ -155,8 +151,7 @@ public class TestLensDistortionOps_F64 extends BoofStandardJUnit {
 	 * Sees if the adjusted intrinsic parameters is correct but computing normalized image coordinates first
 	 * with the original distorted image and then with the adjusted undistorted image.
 	 */
-	@Test
-	public void transformChangeModel_EXPAND_modified() {
+	@Test void transformChangeModel_EXPAND_modified() {
 
 		// distorted pixel in original image
 		double pixelX = 12.5,pixelY = height-3;
@@ -272,8 +267,7 @@ public class TestLensDistortionOps_F64 extends BoofStandardJUnit {
 		return min;
 	}
 
-	@Test
-	public void boundBoxInside() {
+	@Test void boundBoxInside() {
 
 		// easy cases
 		checkInsideBorder(new Affine2D_F64(1,0,0,1,1,2),true);
@@ -290,8 +284,7 @@ public class TestLensDistortionOps_F64 extends BoofStandardJUnit {
 	/**
 	 * Tests to see if it correctly centers in a simple rectangular situations0
 	 */
-	@Test
-	public void centerBoxInside() {
+	@Test void centerBoxInside() {
 
 		// easy cases
 		checkInsideBorder(new Affine2D_F64(1,0,0,1,1,2),false);

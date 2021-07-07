@@ -70,7 +70,7 @@ public class CreateFiducialRandomDot extends BaseFiducialSquare {
 	@Option(name = "--MarkerBorder", usage = "Draws a black line at the marker's border.")
 	public boolean drawLineBorder = false;
 
-	@Option(name = "-h", aliases = {"--MarkerHeight"}, usage = "Height of each marker.  In document units. If -1 then square")
+	@Option(name = "-h", aliases = {"--MarkerHeight"}, usage = "Height of each marker. In document units. If -1 then square")
 	public float markerHeight = -1; // when parsed it will be set to a non-negative value
 
 	List<List<Point2D_F64>> markers = new ArrayList<>();

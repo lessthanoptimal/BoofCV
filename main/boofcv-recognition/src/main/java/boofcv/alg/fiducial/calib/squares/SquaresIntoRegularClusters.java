@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -33,8 +33,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Processes the detected squares in the image and connects them into clusters.  Squares can be connected to each
- * other if two equivalent sides are parallel and their distance apart is "reasonable".  The parallel requirement
+ * Processes the detected squares in the image and connects them into clusters. Squares can be connected to each
+ * other if two equivalent sides are parallel and their distance apart is "reasonable". The parallel requirement
  * take advantage of line under perspective distortion remaining parallel.
  *
  * @author Peter Abeles
@@ -73,8 +73,8 @@ public class SquaresIntoRegularClusters extends SquaresIntoClusters {
 	 *
 	 * @param spaceToSquareRatio Ratio of space between squares to square lengths
 	 * @param maxNeighbors The maximum number of neighbors it will look at when connecting a node
-	 * @param maxNeighborDistanceRatio Maximum distance away a neighbor can be from a square to be connected.  Relative
-	 * to the size of the square.  Try 1.35
+	 * @param maxNeighborDistanceRatio Maximum distance away a neighbor can be from a square to be connected. Relative
+	 * to the size of the square. Try 1.35
 	 */
 	public SquaresIntoRegularClusters( double spaceToSquareRatio, int maxNeighbors, double maxNeighborDistanceRatio ) {
 		this.spaceToSquareRatio = spaceToSquareRatio;
@@ -91,7 +91,7 @@ public class SquaresIntoRegularClusters extends SquaresIntoClusters {
 	 * constraints.
 	 *
 	 * @param squares Set of squares
-	 * @return List of graphs.  All data structures are recycled on the next call to process().
+	 * @return List of graphs. All data structures are recycled on the next call to process().
 	 */
 	public List<List<SquareNode>> process( List<Polygon2D_F64> squares ) {
 		recycleData();
@@ -232,7 +232,7 @@ public class SquaresIntoRegularClusters extends SquaresIntoClusters {
 	}
 
 	/**
-	 * Connects the 'candidate' node to node 'n' if they meet several criteria.  See code for details.
+	 * Connects the 'candidate' node to node 'n' if they meet several criteria. See code for details.
 	 */
 	void considerConnect( SquareNode node0, SquareNode node1 ) {
 

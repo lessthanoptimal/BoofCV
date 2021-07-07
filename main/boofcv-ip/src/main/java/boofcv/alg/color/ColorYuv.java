@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -28,15 +28,15 @@ import boofcv.struct.image.Planar;
 
 /**
  * <p>
- * Color conversion between YUV and RGB, and YCbCr and RGB.  YUV is color encoding which takes in account a human
+ * Color conversion between YUV and RGB, and YCbCr and RGB. YUV is color encoding which takes in account a human
  * perception model and is commonly used in cameras/video with analog signals. YCbCr is the digital equivalent
- * color space of YUV that is scaled and offset.  YCbCr is also commonly referred to as YUV, even though it is a
+ * color space of YUV that is scaled and offset. YCbCr is also commonly referred to as YUV, even though it is a
  * different format.
  * </p>
  *
  * <p>
  * Y component encodes luma (B&W gray scale) and U,V encodes color. The same is true for Y,Cb,Cr, respectively.
- * In the functions below, if the input is floating point then YUV is used, otherwise YCbCr is used.  How
+ * In the functions below, if the input is floating point then YUV is used, otherwise YCbCr is used. How
  * these color formats are encoded varies widely. For YCbCr, Y is "defined to have a nominal 8-bit range of 16-235,
  * Cb and Cr are defined to have a nominal range of 16-240", see [2].
  * </p>
@@ -106,7 +106,7 @@ public class ColorYuv {
 		rgb[2] = y + 2.032f*u;
 	}
 	/**
-	 * Conversion from RGB to YCbCr.  See [Jack07].
+	 * Conversion from RGB to YCbCr. See [Jack07].
 	 *
 	 * @param r Red [0 to 255]
 	 * @param g Green [0 to 255]
@@ -120,7 +120,7 @@ public class ColorYuv {
 	}
 
 	/**
-	 * Conversion from YCbCr to 32-bit RGB.  See [Jack07].
+	 * Conversion from YCbCr to 32-bit RGB. See [Jack07].
 	 *
 	 * @param y Y [0 to 255]
 	 * @param cb Cb [0 to 255]
@@ -148,7 +148,7 @@ public class ColorYuv {
 	}
 
 	/**
-	 * Conversion from YCbCr to RGB.  See [Jack07].
+	 * Conversion from YCbCr to RGB. See [Jack07].
 	 *
 	 * @param y Y [0 to 255]
 	 * @param cb Cb [0 to 255]

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -25,7 +25,7 @@ import org.ejml.data.DMatrixRMaj;
 /**
  * <p>
  * Refines a Fundamental, Essential, or Homography matrix such that it is a better fit to the provided
- * observations.  Input and output matrices are assumed to follow the constraint conventions defined in
+ * observations. Input and output matrices are assumed to follow the constraint conventions defined in
  * {@link boofcv.alg.geo.MultiViewOps#constraint(org.ejml.data.DMatrixRMaj,
  * georegression.struct.point.Point2D_F64, georegression.struct.point.Point2D_F64) constraint Fundamental}
  * and {@link boofcv.alg.geo.MultiViewOps#constraintHomography(org.ejml.data.DMatrixRMaj,

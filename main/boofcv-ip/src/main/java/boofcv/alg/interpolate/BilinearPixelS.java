@@ -23,7 +23,7 @@ import boofcv.struct.image.ImageGray;
 
 /**
  * <p>
- * Performs bilinear interpolation to extract values between pixels in an image.  When a boundary is encountered
+ * Performs bilinear interpolation to extract values between pixels in an image. When a boundary is encountered
  * the number of pixels used to interpolate is automatically reduced.
  * </p>
  *

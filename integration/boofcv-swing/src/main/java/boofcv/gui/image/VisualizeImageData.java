@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -78,12 +78,12 @@ public class VisualizeImageData {
 
 	/**
 	 * <p>
-	 * Renders a colored image where the color indicates the sign and intensity its magnitude.   The input is divided
+	 * Renders a colored image where the color indicates the sign and intensity its magnitude.  The input is divided
 	 * by normalize to render it in the appropriate scale.
 	 * </p>
 	 *
 	 * @param src       Input single band image.
-	 * @param dst       Where the image is rendered into.  If null a new BufferedImage will be created and return.
+	 * @param dst       Where the image is rendered into. If null a new BufferedImage will be created and return.
 	 * @param normalize Used to normalize the input image. If &le; 0 then the max value will be used
 	 * @return Rendered image.
 	 */
@@ -152,7 +152,7 @@ public class VisualizeImageData {
 	 * </p>
 	 *
 	 * @param src       Input single band image.
-	 * @param dst       Where the image is rendered into.  If null a new BufferedImage will be created and return.
+	 * @param dst       Where the image is rendered into. If null a new BufferedImage will be created and return.
 	 * @param normalize Used to normalize the input image. If < 0 then this value is automatically computed.
 	 * @return Rendered image.
 	 */
@@ -181,7 +181,7 @@ public class VisualizeImageData {
 	 * </p>
 	 *
 	 * @param src       Input single band image.
-	 * @param dst       Where the image is rendered into.  If null a new BufferedImage will be created and return.
+	 * @param dst       Where the image is rendered into. If null a new BufferedImage will be created and return.
 	 * @param normalize Used to normalize the input image.
 	 */
 	public static void grayMagnitudeTemp(ImageGray src, BufferedImage dst, double normalize) {
@@ -236,9 +236,9 @@ public class VisualizeImageData {
 	 * </p>
 	 *
 	 * @param disparity    Input disparity image
-	 * @param dst          Where the image is rendered into.  If null a new BufferedImage will be created and return.
+	 * @param dst          Where the image is rendered into. If null a new BufferedImage will be created and return.
 	 * @param disparityRange Number of possible disparity values
-	 * @param invalidColor RGB value for invalid pixels.  Try 0xFF << 8 for green
+	 * @param invalidColor RGB value for invalid pixels. Try 0xFF << 8 for green
 	 * @return Rendered image.
 	 */
 	public static BufferedImage disparity(ImageGray disparity, BufferedImage dst,
@@ -416,7 +416,7 @@ public class VisualizeImageData {
 	 *
 	 * @param derivX (Input) Image with positive and negative values.
 	 * @param derivY (Input) Image with positive and negative values.
-	 * @param maxAbsValue  The largest absolute value of any pixel in the image.  Set to < 0 if not known.
+	 * @param maxAbsValue  The largest absolute value of any pixel in the image. Set to < 0 if not known.
 	 * @param output
 	 * @return visualized gradient
 	 */
@@ -436,7 +436,7 @@ public class VisualizeImageData {
 	 *
 	 * @param derivX (Input) Image with positive and negative values.
 	 * @param derivY (Input) Image with positive and negative values.
-	 * @param maxAbsValue  The largest absolute value of any pixel in the image.  Set to < 0 if not known.
+	 * @param maxAbsValue  The largest absolute value of any pixel in the image. Set to < 0 if not known.
 	 * @param output
 	 * @return visualized gradient
 	 */
@@ -497,7 +497,7 @@ public class VisualizeImageData {
 	 *
 	 * @param derivX (Input) Image with positive and negative values.
 	 * @param derivY (Input) Image with positive and negative values.
-	 * @param maxAbsValue  The largest absolute value of any pixel in the image.  Set to < 0 if not known.
+	 * @param maxAbsValue  The largest absolute value of any pixel in the image. Set to < 0 if not known.
 	 * @param output
 	 * @return visualized gradient
 	 */

@@ -34,8 +34,7 @@ import static org.junit.jupiter.api.Assertions.*;
  */
 public class TestAssociateDescTo2D extends BoofStandardJUnit {
 
-	@Test
-	public void basic() {
+	@Test void basic() {
 		Dummy dummy = new Dummy();
 
 		AssociateDescTo2D<TupleDesc_F64> alg = new AssociateDescTo2D<>(dummy);

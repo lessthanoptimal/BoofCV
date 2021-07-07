@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -19,7 +19,7 @@
 package boofcv.alg.weights;
 
 /**
- * Weights from a uniform distribution within a symmetric square region.  All samples within the region return
+ * Weights from a uniform distribution within a symmetric square region. All samples within the region return
  * a constant value, which is 1.0/w^2, where w = radius*2+1. For performance reasons, no checks are done to see if the
  * sample point is outside the radius and should be zero.
  *

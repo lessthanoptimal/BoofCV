@@ -92,7 +92,7 @@ public class FactoryDetectLineAlgs {
 	 * Detects lines using a foot of norm parametrization and sub images to reduce degenerate
 	 * configurations, see {@link DetectLineHoughFootSubimage} for details.
 	 *
-	 * @param config Configuration for line detector.  If null then default will be used.
+	 * @param config Configuration for line detector. If null then default will be used.
 	 * @param derivType Image derivative type.
 	 * @param <D> Image derivative type.
 	 * @return Line detector.

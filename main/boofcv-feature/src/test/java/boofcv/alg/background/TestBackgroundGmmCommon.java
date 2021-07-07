@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -36,8 +36,7 @@ public class TestBackgroundGmmCommon extends BoofStandardJUnit {
 	/**
 	 * Alternates between two values and see if two stable gaussians form
 	 */
-	@Test
-	public void createTwoModels() {
+	@Test void createTwoModels() {
 		int maxGaussians = 2;
 
 		BackgroundGmmCommon alg = new BackgroundGmmCommon(1000,0.0f,maxGaussians,imageType);
@@ -88,8 +87,7 @@ public class TestBackgroundGmmCommon extends BoofStandardJUnit {
 
 	}
 
-	@Test
-	public void updateMixture() {
+	@Test void updateMixture() {
 		int maxGaussians = 5;
 
 		BackgroundGmmCommon alg = new BackgroundGmmCommon(1000,0.001f,maxGaussians,imageType);
@@ -123,8 +121,7 @@ public class TestBackgroundGmmCommon extends BoofStandardJUnit {
 		assertEquals(0,data[startIndex+6],1e-4f);
 	}
 
-	@Test
-	public void updateWeightAndPrune() {
+	@Test void updateWeightAndPrune() {
 		int maxGaussians = 5;
 
 		BackgroundGmmCommon alg = new BackgroundGmmCommon(1000,0.001f,maxGaussians,imageType);
@@ -171,8 +168,7 @@ public class TestBackgroundGmmCommon extends BoofStandardJUnit {
 		assertEquals(1f,sum,1e-4f);
 	}
 
-	@Test
-	public void checkBackground() {
+	@Test void checkBackground() {
 		int maxGaussians = 5;
 
 		BackgroundGmmCommon alg = new BackgroundGmmCommon(1000,0.001f,maxGaussians,imageType);

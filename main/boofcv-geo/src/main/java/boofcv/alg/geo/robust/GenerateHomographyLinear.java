@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -31,7 +31,7 @@ import org.ejml.data.DMatrixRMaj;
 import java.util.List;
 
 /**
- * Fits a homography to the observed points using linear algebra.  This provides an approximate solution.
+ * Fits a homography to the observed points using linear algebra. This provides an approximate solution.
  *
  * @author Peter Abeles
  */

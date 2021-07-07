@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -34,15 +34,13 @@ public abstract class GenericBackgroundStationaryGmmChecks extends GenericBackgr
 	}
 
 	// The two tests below should be implemented similar to how they are implemented with Gaussian
-	@Test
-	public void initialVariance() {
+	@Test public void initialVariance() {
 //		for (ImageType type : imageTypes) {
 //			initialVariance(type);
 //		}
 	}
 
-	@Test
-	public void learnRate() {
+	@Test public void learnRate() {
 //		for (ImageType type : imageTypes) {
 //			checkLearnRate_slow(type);
 //			checkLearnRate_fast(type);

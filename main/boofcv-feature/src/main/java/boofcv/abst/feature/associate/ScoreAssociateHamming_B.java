@@ -23,7 +23,7 @@ import boofcv.struct.feature.MatchScoreType;
 import boofcv.struct.feature.TupleDesc_B;
 
 /**
- * Score association between two BRIEF features.  Scoring is done using the Hamming distance.
+ * Score association between two BRIEF features. Scoring is done using the Hamming distance.
  * Hamming distance is the number of bits in the descriptor which do not have the same value.
  *
  * @author Peter Abeles

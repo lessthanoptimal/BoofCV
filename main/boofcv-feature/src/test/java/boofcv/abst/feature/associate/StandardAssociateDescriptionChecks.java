@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -127,8 +127,7 @@ public abstract class StandardAssociateDescriptionChecks<Desc> extends BoofStand
 	/**
 	 * The default threshold should allow for all matches to work
 	 */
-	@Test
-	public void checkDefaultThreshold() {
+	@Test void checkDefaultThreshold() {
 		init();
 
 		listSrc.add( c(1) );
@@ -144,8 +143,7 @@ public abstract class StandardAssociateDescriptionChecks<Desc> extends BoofStand
 	/**
 	 * Checks to see if changing the threshold increases or reduces the number of associations
 	 */
-	@Test
-	public void checkSetThreshold() {
+	@Test void checkSetThreshold() {
 		init();
 
 		listSrc.add( c(1) );
@@ -160,7 +158,7 @@ public abstract class StandardAssociateDescriptionChecks<Desc> extends BoofStand
 		alg.associate();
 		assertEquals(0,alg.getMatches().size);
 
-		// Test edge case for threshold.  If it is exactly the distance away then should be included
+		// Test edge case for threshold. If it is exactly the distance away then should be included
 		alg.setMaxScoreThreshold(1.1-1);
 		alg.associate();
 		assertEquals(1,alg.getMatches().size);

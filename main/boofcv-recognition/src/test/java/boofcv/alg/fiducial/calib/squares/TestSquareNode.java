@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -30,8 +30,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
  */
 public class TestSquareNode extends BoofStandardJUnit {
 
-	@Test
-	public void distanceSqCorner() {
+	@Test void distanceSqCorner() {
 		SquareNode a = new SquareNode();
 		a.square = new Polygon2D_F64(4);
 		a.square.get(0).setTo(-2,-2);
@@ -45,8 +44,7 @@ public class TestSquareNode extends BoofStandardJUnit {
 		assertEquals(4, a.distanceSqCorner(new Point2D_F64(-4, 2)),1e-8);
 	}
 
-	@Test
-	public void getNumberOfConnections() {
+	@Test void getNumberOfConnections() {
 		SquareNode a = new SquareNode();
 		a.square = new Polygon2D_F64(4);
 

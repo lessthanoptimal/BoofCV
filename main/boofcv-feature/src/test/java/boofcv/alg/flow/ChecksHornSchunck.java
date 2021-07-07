@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -49,8 +49,7 @@ public abstract class ChecksHornSchunck<T extends ImageGray<T>, D extends ImageG
 	/**
 	 * Manually construct the input so that it has a known and easily understood output
 	 */
-	@Test
-	public void process() {
+	@Test void process() {
 		HornSchunck<T,D> alg = createAlg();
 
 		T image1 = GeneralizedImageOps.createSingleBand(imageType, width, height);
@@ -71,8 +70,7 @@ public abstract class ChecksHornSchunck<T extends ImageGray<T>, D extends ImageG
 		}
 	}
 
-	@Test
-	public void computeDerivX() {
+	@Test void computeDerivX() {
 		Point[] samples = new Point[8];
 		float signs[] = new float[]{1,-1,1,-1,1,-1,1,-1};
 		samples[0] = new Point(1,0,0);
@@ -99,8 +97,7 @@ public abstract class ChecksHornSchunck<T extends ImageGray<T>, D extends ImageG
 		BoofTesting.assertEquals(expected, found, 1);
 	}
 
-	@Test
-	public void computeDerivY() {
+	@Test void computeDerivY() {
 		Point[] samples = new Point[8];
 		float signs[] = new float[]{1,-1,1,-1,1,-1,1,-1};
 		samples[0] = new Point(0,1,0);
@@ -127,8 +124,7 @@ public abstract class ChecksHornSchunck<T extends ImageGray<T>, D extends ImageG
 		BoofTesting.assertEquals(expected,found,1);
 	}
 
-	@Test
-	public void computeDerivT() {
+	@Test void computeDerivT() {
 		Point[] samples = new Point[8];
 		float signs[] = new float[]{1,-1,1,-1,1,-1,1,-1};
 		samples[0] = new Point(0,0,1);

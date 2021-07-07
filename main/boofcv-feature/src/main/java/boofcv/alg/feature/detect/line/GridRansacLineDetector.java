@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -38,16 +38,16 @@ import java.util.List;
  * <p>
  * Line segment feature detector. The image is broken up into several regions of constant size.
  * Inside each region pixels that have been flaged as belonging to edges are connected into lines using RANSAC or
- * another {@link ModelMatcher}.  The output is a list of detected lines in a grid of lists.  This algorithm
+ * another {@link ModelMatcher}. The output is a list of detected lines in a grid of lists. This algorithm
  * is inspired by [1], but has several differences in how the image is processed and how the output is produced.
  * </p>
  *
  * <p>
- * The image is segmented into square regions of homogeneous size.  Inside each region pixels which have been
- * flagged as belonging to an edge are identified.  Flagged edge pixels are referred to as "edgels" and have
- * the image gradient at that point stored in their data structure.  Gradient information is used
- * to prune incompatible points from each other.  RANSAC or similar algorithms are used to estimate and detect
- * lines inside each region.  Ones a line has been identified it is removed from the list of candidate points and
+ * The image is segmented into square regions of homogeneous size. Inside each region pixels which have been
+ * flagged as belonging to an edge are identified. Flagged edge pixels are referred to as "edgels" and have
+ * the image gradient at that point stored in their data structure. Gradient information is used
+ * to prune incompatible points from each other. RANSAC or similar algorithms are used to estimate and detect
+ * lines inside each region. Ones a line has been identified it is removed from the list of candidate points and
  * more lines are searched for.
  * </p>
  *
@@ -79,8 +79,8 @@ public abstract class GridRansacLineDetector<D extends ImageGray<D>> {
 	/**
 	 * Specifies major configuration parameters.
 	 *
-	 * @param regionSize Length of each side in a square region.  Try 40.
-	 * @param maxDetectLines Maximum number of lines which can be detected in a region.  Try 10.
+	 * @param regionSize Length of each side in a square region. Try 40.
+	 * @param maxDetectLines Maximum number of lines which can be detected in a region. Try 10.
 	 * @param robustMatcher Robust model matcher for line detection.
 	 */
 	protected GridRansacLineDetector( int regionSize, int maxDetectLines,

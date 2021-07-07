@@ -113,7 +113,7 @@ public class GGradientToEdgeFeatures {
 	/**
 	 * <p>
 	 * Sets edge intensities to zero if the pixel has an intensity which is less than any of
-	 * the two adjacent pixels.  Pixel adjacency is determined based upon the sign of the image gradient.  Less precise
+	 * the two adjacent pixels. Pixel adjacency is determined based upon the sign of the image gradient. Less precise
 	 * than other methods, but faster.
 	 * </p>
 	 *

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -27,8 +27,7 @@ import org.junit.jupiter.api.Test;
  */
 public class TestWrapperNonMaximumNaive extends BoofStandardJUnit {
 
-	@Test
-	public void checkStrict() {
+	@Test void checkStrict() {
 		GeneralNonMaxSuppressionChecks checks = new GeneralNonMaxSuppressionChecks() {
 
 			@Override
@@ -39,8 +38,7 @@ public class TestWrapperNonMaximumNaive extends BoofStandardJUnit {
 		checks.testAll();
 	}
 
-	@Test
-	public void checkRelaxed() {
+	@Test void checkRelaxed() {
 		GeneralNonMaxSuppressionChecks checks = new GeneralNonMaxSuppressionChecks() {
 
 			@Override

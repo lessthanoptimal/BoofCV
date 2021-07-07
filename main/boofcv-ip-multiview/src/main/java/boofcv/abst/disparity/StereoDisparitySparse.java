@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -26,7 +26,7 @@ import boofcv.struct.image.ImageGray;
  * </p>
  *
  * <p>
- * NOTE: Unlike for dense images, the returned disparity is the actual disparity.  No need to add minDisparity
+ * NOTE: Unlike for dense images, the returned disparity is the actual disparity. No need to add minDisparity
  * to the returned value.
  * </p>
  *
@@ -45,7 +45,7 @@ public interface StereoDisparitySparse<Image extends ImageGray> {
 	public void setImages( Image imageLeft , Image imageRight );
 
 	/**
-	 * Calculates the disparity at the specified point.  Returns true if a valid
+	 * Calculates the disparity at the specified point. Returns true if a valid
 	 * correspondence was found between the two images.
 	 *
 	 * @param x center of region x-axis

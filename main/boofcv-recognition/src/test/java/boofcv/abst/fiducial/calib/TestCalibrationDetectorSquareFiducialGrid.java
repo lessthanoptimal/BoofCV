@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -86,8 +86,7 @@ public class TestCalibrationDetectorSquareFiducialGrid extends GenericPlanarCali
 //		fisheye_poses.add(markerToWorld.copy());
 	}
 
-	@Test
-	public void createLayout() {
+	@Test void createLayout() {
 		ConfigGridDimen config = new ConfigGridDimen(3,4,30,20);
 
 		List<Point2D_F64> l = createDetector(config).getLayout();

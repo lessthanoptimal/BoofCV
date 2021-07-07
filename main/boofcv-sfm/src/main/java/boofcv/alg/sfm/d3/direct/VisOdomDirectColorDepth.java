@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -49,7 +49,7 @@ import org.ejml.interfaces.linsol.LinearSolverDense;
  * @author Peter Abeles
  */
 // TODO Handle pathological situations that will basically never happen in real life
-// anything that makes the A matrix singular.  dx or dy being zero will do the trick
+// anything that makes the A matrix singular. dx or dy being zero will do the trick
 @SuppressWarnings("unchecked")
 public class VisOdomDirectColorDepth<I extends ImageGray<I>, D extends ImageGray<D>> {
 	// Type of input images
@@ -127,7 +127,7 @@ public class VisOdomDirectColorDepth<I extends ImageGray<I>, D extends ImageGray
 	}
 
 	/**
-	 * Specifies intrinsic camera parameters.  Must be called.
+	 * Specifies intrinsic camera parameters. Must be called.
 	 *
 	 * @param fx focal length x (pixels)
 	 * @param fy focal length y (pixels)
@@ -153,7 +153,7 @@ public class VisOdomDirectColorDepth<I extends ImageGray<I>, D extends ImageGray
 	}
 
 	/**
-	 * Used to change interpolation method.  Probably don't want to do this.
+	 * Used to change interpolation method. Probably don't want to do this.
 	 *
 	 * @param inputMin min value for input pixels. 0 is typical
 	 * @param inputMax max value for input pixels. 255 is typical
@@ -171,8 +171,8 @@ public class VisOdomDirectColorDepth<I extends ImageGray<I>, D extends ImageGray
 	/**
 	 * Specifies convergence parameters
 	 *
-	 * @param convergenceTol When change in error is less than this fraction stop.  Try 1e-6
-	 * @param maxIterations When this number of iterations has been exceeded stop.  Try 10
+	 * @param convergenceTol When change in error is less than this fraction stop. Try 1e-6
+	 * @param maxIterations When this number of iterations has been exceeded stop. Try 10
 	 */
 	public void setConvergence( float convergenceTol, int maxIterations ) {
 		this.convergeTol = convergenceTol;
@@ -180,7 +180,7 @@ public class VisOdomDirectColorDepth<I extends ImageGray<I>, D extends ImageGray
 	}
 
 	/**
-	 * Set's the keyframe.  This is the image which motion is estimated relative to.  The 3D location of points in
+	 * Set's the keyframe. This is the image which motion is estimated relative to. The 3D location of points in
 	 * the keyframe must be known.
 	 *
 	 * @param input Image which is to be used as the key frame
@@ -289,7 +289,7 @@ public class VisOdomDirectColorDepth<I extends ImageGray<I>, D extends ImageGray
 	/**
 	 * Given the set of points in the key frame and their current observations
 	 *
-	 * @param g initial transform applied to pixel locations.  keyframe to current frame
+	 * @param g initial transform applied to pixel locations. keyframe to current frame
 	 */
 	void constructLinearSystem( Planar<I> input, Se3_F32 g ) {
 		int numBands = imageType.getNumBands();
@@ -348,7 +348,7 @@ public class VisOdomDirectColorDepth<I extends ImageGray<I>, D extends ImageGray
 				SePointOps_F32.transform(g, p.p3, S);
 
 				// sample pixel values at warped location in I_1
-				// NOTE: This could be highly optimized.  Compute and save interpolation weights once per input
+				// NOTE: This could be highly optimized. Compute and save interpolation weights once per input
 				//       instead of for each band and image (current,dx,dy)
 				// TODO create a special bilinear class for this?
 				float current = interpI.get(p.proj.x, p.proj.y);
@@ -391,7 +391,7 @@ public class VisOdomDirectColorDepth<I extends ImageGray<I>, D extends ImageGray
 		twist.set((float)twistMatrix.data[0], (float)twistMatrix.data[1], (float)twistMatrix.data[2],
 				(float)twistMatrix.data[3], (float)twistMatrix.data[4], (float)twistMatrix.data[5]);
 
-		// theta is 1 because of how this solution was formulated.  See derivation
+		// theta is 1 because of how this solution was formulated. See derivation
 		TwistOps_F32.exponential(twist, 1.0f, motionTwist);
 
 		return true;

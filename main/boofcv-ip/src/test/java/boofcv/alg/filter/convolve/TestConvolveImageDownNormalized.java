@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -28,8 +28,7 @@ import org.junit.jupiter.api.Test;
  */
 public class TestConvolveImageDownNormalized extends BoofStandardJUnit {
 
-	@Test
-	public void compareToStandard() {
+	@Test void compareToStandard() {
 		CompareToStandardConvolveDownNormalized test = new CompareToStandardConvolveDownNormalized(ConvolveImageDownNormalized.class);
 
 		test.setSkip(2);

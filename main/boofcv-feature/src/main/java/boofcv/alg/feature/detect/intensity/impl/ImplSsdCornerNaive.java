@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -27,7 +27,7 @@ import boofcv.struct.image.ImageGray;
 
 /**
  * Naive implementation of {@link boofcv.alg.feature.detect.intensity.ShiTomasiCornerIntensity} which performs computations in a straight
- * forward but inefficient manor.  This class is used to validate the correctness of more complex but efficient
+ * forward but inefficient manor. This class is used to validate the correctness of more complex but efficient
  * implementations.
  *
  * @author Peter Abeles

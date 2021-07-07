@@ -35,8 +35,7 @@ import java.lang.reflect.Method;
 public class TestConvolveImageUnrolled_SB_U8_I8_Div extends BoofStandardJUnit {
 	CompareToStandardConvolution compareToStandard = new CompareToStandardConvolution(ConvolveImageUnrolled_SB_U8_I8_Div.class);
 
-	@Test
-	public void convolve() throws NoSuchMethodException {
+	@Test void convolve() throws NoSuchMethodException {
 		for (int i = 0; i < GenerateConvolvedUnrolled_SB.numUnrolled; i++) {
 			Method m = ConvolveImageUnrolled_SB_U8_I8_Div.class.getMethod("convolve",
 					Kernel2D_S32.class, GrayU8.class, GrayI8.class , int.class, GrowArray.class);
@@ -45,8 +44,7 @@ public class TestConvolveImageUnrolled_SB_U8_I8_Div extends BoofStandardJUnit {
 		}
 	}
 
-	@Test
-	public void horizontal_divide() throws NoSuchMethodException {
+	@Test void horizontal_divide() throws NoSuchMethodException {
 		for (int i = 0; i < GenerateConvolvedUnrolled_SB.numUnrolled; i++) {
 			Method m = ConvolveImageUnrolled_SB_U8_I8_Div.class.getMethod("horizontal",
 					Kernel1D_S32.class, GrayU8.class, GrayI8.class, int.class);
@@ -55,8 +53,7 @@ public class TestConvolveImageUnrolled_SB_U8_I8_Div extends BoofStandardJUnit {
 		}
 	}
 
-	@Test
-	public void vertical_divide() throws NoSuchMethodException {
+	@Test void vertical_divide() throws NoSuchMethodException {
 		for (int i = 0; i < GenerateConvolvedUnrolled_SB.numUnrolled; i++) {
 			Method m = ConvolveImageUnrolled_SB_U8_I8_Div.class.getMethod("vertical",
 					Kernel1D_S32.class, GrayU8.class, GrayI8.class, int.class, GrowArray.class);

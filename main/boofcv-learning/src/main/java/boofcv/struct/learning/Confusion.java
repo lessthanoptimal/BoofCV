@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -21,7 +21,7 @@ package boofcv.struct.learning;
 import org.ejml.data.DMatrixRMaj;
 
 /**
- * Storage for a confusion matrix.  Rows represent the actual type and the columns the predicted type.  All the rows
+ * Storage for a confusion matrix. Rows represent the actual type and the columns the predicted type. All the rows
  * sum up to 1.
  *
  * @author Peter Abeles
@@ -40,8 +40,8 @@ public class Confusion {
 	}
 
 	/**
-	 * Computes accuracy from the confusion matrix.  This is the sum of the fraction correct divide by total number
-	 * of types.  The number of each sample for each type is not taken in account.
+	 * Computes accuracy from the confusion matrix. This is the sum of the fraction correct divide by total number
+	 * of types. The number of each sample for each type is not taken in account.
 	 *
 	 * @return overall accuracy
 	 */

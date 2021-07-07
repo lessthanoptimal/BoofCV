@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -64,8 +64,7 @@ public class TestMultiCameraToEquirectangular extends BoofStandardJUnit {
 	private int equiHeight = 200;
 	private int equiWidth = 250;
 
-	@Test
-	public void all() {
+	@Test void all() {
 		MultiCameraToEquirectangular<GrayF32> alg = createAlgorithm();
 
 		alg.addCamera(new Se3_F32(),new HelperDistortion(),inputWidth,inputHeight);
@@ -103,8 +102,7 @@ public class TestMultiCameraToEquirectangular extends BoofStandardJUnit {
 		assertTrue(errorFraction<0.05);
 	}
 
-	@Test
-	public void addCamera_implicit_mask() {
+	@Test void addCamera_implicit_mask() {
 		MultiCameraToEquirectangular<GrayF32> alg = createAlgorithm();
 
 		alg.addCamera(new Se3_F32(),new HelperDistortion(),inputWidth,inputHeight);
@@ -127,8 +125,7 @@ public class TestMultiCameraToEquirectangular extends BoofStandardJUnit {
 		assertTrue(found <= 0.05 );
 	}
 
-	@Test
-	public void addCamera_explicit_mask() {
+	@Test void addCamera_explicit_mask() {
 		MultiCameraToEquirectangular<GrayF32> alg = createAlgorithm();
 
 		// mask out the right part of the image
@@ -202,8 +199,8 @@ public class TestMultiCameraToEquirectangular extends BoofStandardJUnit {
 
 		@Override
 		public void compute(float x, float y, float z, Point2D_F32 out) {
-			// multiple normal angles map to the same pixel.  This will effectively make the top and bottom
-			// half of the image map to the same pixels.  This should cause it to get masked out
+			// multiple normal angles map to the same pixel. This will effectively make the top and bottom
+			// half of the image map to the same pixels. This should cause it to get masked out
 			tools.normToEquiFV(x,y,-Math.abs(z),out);
 		}
 

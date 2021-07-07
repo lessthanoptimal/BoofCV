@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -26,7 +26,7 @@ import org.jetbrains.annotations.Nullable;
 /**
  * <p>
  * In this implementation the scale factor between each layer is limited to being a positive integer that is evenly
- * divisible by the previous layer.  This added constraint allows further optimization to be performed.
+ * divisible by the previous layer. This added constraint allows further optimization to be performed.
  * </p>
  *
  * @author Peter Abeles
@@ -75,7 +75,7 @@ public abstract class PyramidDiscrete<T extends ImageBase<T>> extends ImagePyram
 	}
 
 //	/**
-//	 * Specifies the pyramid's structure.  Scale factors are in relative to the input image.
+//	 * Specifies the pyramid's structure. Scale factors are in relative to the input image.
 //	 *
 //	 * @param scaleFactors Change in scale factor for each layer in the pyramid.
 //	 */

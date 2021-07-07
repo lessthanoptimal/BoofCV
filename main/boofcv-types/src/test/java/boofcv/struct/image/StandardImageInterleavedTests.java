@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -31,8 +31,8 @@ import java.util.Random;
 import static org.junit.jupiter.api.Assertions.*;
 
 /**
- * Standard tests for children of {@link ImageGray}.  Ensures that they contain
- * all the expected functions and that they have the expected behavior.  This is done
+ * Standard tests for children of {@link ImageGray}. Ensures that they contain
+ * all the expected functions and that they have the expected behavior. This is done
  * through extensive use of reflections.
  *
  * @author Peter Abeles
@@ -65,8 +65,7 @@ import static org.junit.jupiter.api.Assertions.*;
 	 * Checks to see if the implementation specific to ImageInterleavedTests
 	 * works
 	 */
-	@Test
-	public void isSubimage() {
+	@Test void isSubimage() {
 		T a = createImage(10, 20, 3);
 
 		assertFalse(a.isSubimage());
@@ -78,8 +77,7 @@ import static org.junit.jupiter.api.Assertions.*;
 	/**
 	 * Check for a positive case of get() and set()
 	 */
-	@Test
-	public void get_set() {
+	@Test void get_set() {
 		T img = createImage(10, 20, 3);
 		setRandom(img);
 
@@ -102,8 +100,7 @@ import static org.junit.jupiter.api.Assertions.*;
 	/**
 	 * Check for a positive case of get() and set()
 	 */
-	@Test
-	public void getBand_setBand() {
+	@Test void getBand_setBand() {
 		T img = createImage(10, 20, 2);
 		setRandom(img);
 
@@ -128,8 +125,7 @@ import static org.junit.jupiter.api.Assertions.*;
 	/**
 	 * Makes sure all the accessors do proper bounds checking
 	 */
-	@Test
-	public void accessorBounds() {
+	@Test void accessorBounds() {
 		T img = createImage(10, 20, 3);
 
 		checkBound(img, "get", 2, null);
@@ -225,8 +221,7 @@ import static org.junit.jupiter.api.Assertions.*;
 		return true;
 	}
 
-	@Test
-	public void setNumberOfBands() {
+	@Test void setNumberOfBands() {
 		T a = createImage(10, 20, 3);
 
 		a.setNumberOfBands(2);
@@ -245,16 +240,14 @@ import static org.junit.jupiter.api.Assertions.*;
 		assertTrue(Array.getLength(a._getData()) >= 10*20*4);
 	}
 
-	@Test
-	public void checkImageTypeSet() {
+	@Test void checkImageTypeSet() {
 		T a = createImage(10, 20, 3);
 
 		assertNotNull(a.getImageType());
 		assertEquals(3, a.getImageType().getNumBands());
 	}
 
-	@Test
-	public void checkNoArgumentConstructor() {
+	@Test void checkNoArgumentConstructor() {
 		T a = createImage();
 
 		assertNull(a._getData());
@@ -262,8 +255,7 @@ import static org.junit.jupiter.api.Assertions.*;
 		assertNotNull(a.getImageType());
 	}
 
-	@Test
-	public void copyRow() {
+	@Test void copyRow() {
 		T img = createImage(10, 20, 3);
 		setRandom(img);
 
@@ -289,8 +281,7 @@ import static org.junit.jupiter.api.Assertions.*;
 		}
 	}
 
-	@Test
-	public void copyCol() {
+	@Test void copyCol() {
 		T img = createImage(10, 20, 3);
 		setRandom(img);
 

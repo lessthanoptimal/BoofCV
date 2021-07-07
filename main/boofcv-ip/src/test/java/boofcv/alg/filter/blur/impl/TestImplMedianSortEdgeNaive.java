@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -45,8 +45,7 @@ public class TestImplMedianSortEdgeNaive extends CompareEquivalentFunctions {
 		super(ImplMedianSortEdgeNaive.class, ImplMedianSortNaive.class);
 	}
 
-	@Test
-	public void compareToFullNaive() {
+	@Test void compareToFullNaive() {
 
 		performTests(2);
 	}

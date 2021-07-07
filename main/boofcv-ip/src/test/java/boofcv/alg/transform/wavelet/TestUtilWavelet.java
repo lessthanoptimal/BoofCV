@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -39,8 +39,7 @@ import static org.junit.jupiter.api.Assertions.fail;
  */
 public class TestUtilWavelet extends BoofStandardJUnit {
 
-	@Test
-	public void checkShape_positive() {
+	@Test void checkShape_positive() {
 		GrayF32 orig = new GrayF32(10, 20);
 		GrayF32 transformed = new GrayF32(10, 20);
 
@@ -50,8 +49,7 @@ public class TestUtilWavelet extends BoofStandardJUnit {
 		UtilWavelet.checkShape(orig, transformed);
 	}
 
-	@Test
-	public void checkShape_negative() {
+	@Test void checkShape_negative() {
 		GrayF32 orig = new GrayF32(9, 19);
 		GrayF32 transformed = new GrayF32(19, 19);
 
@@ -71,29 +69,25 @@ public class TestUtilWavelet extends BoofStandardJUnit {
 		}
 	}
 
-	@Test
-	public void computeEnergy_F32() {
+	@Test void computeEnergy_F32() {
 		float[] a = new float[]{-2, 3, 4.67f, 7, -10.2f};
 
 		assertEquals(187.8489f, UtilWavelet.computeEnergy(a), 1e-4f);
 	}
 
-	@Test
-	public void computeEnergy_I32() {
+	@Test void computeEnergy_I32() {
 		int[] a = new int[]{-2, 3, 4, 7, -10};
 
 		assertEquals(11.125f, UtilWavelet.computeEnergy(a, 4), 1e-4f);
 	}
 
-	@Test
-	public void sumCoefficients_F32() {
+	@Test void sumCoefficients_F32() {
 		float[] a = new float[]{-2, 3, 4, 7, -10};
 
 		assertEquals(2f, UtilWavelet.sumCoefficients(a), 1e-4f);
 	}
 
-	@Test
-	public void borderForwardUpper() {
+	@Test void borderForwardUpper() {
 		checkForwardUpper(0, 0, 2, 2, 10, 0);
 		checkForwardUpper(0, 0, 3, 3, 10, 2);
 		checkForwardUpper(0, 0, 4, 4, 10, 2);
@@ -119,8 +113,7 @@ public class TestUtilWavelet extends BoofStandardJUnit {
 		assertEquals(expected, UtilWavelet.borderForwardUpper(desc, dataLength));
 	}
 
-	@Test
-	public void borderForwardLower() {
+	@Test void borderForwardLower() {
 		checkForwardLower(0, 0, 0);
 		checkForwardLower(-1, 0, 2);
 		checkForwardLower(0, -1, 2);
@@ -141,8 +134,7 @@ public class TestUtilWavelet extends BoofStandardJUnit {
 		assertEquals(expected, UtilWavelet.borderForwardLower(desc));
 	}
 
-	@Test
-	public void convertToType() {
+	@Test void convertToType() {
 		assertEquals(BorderType.REFLECT, UtilWavelet.convertToType(new BorderIndex1D_Reflect()));
 		assertEquals(BorderType.WRAP, UtilWavelet.convertToType(new BorderIndex1D_Wrap()));
 	}
@@ -150,8 +142,7 @@ public class TestUtilWavelet extends BoofStandardJUnit {
 	/**
 	 * Just see if it blows up
 	 */
-	@Test
-	public void adjustForDisplay() {
+	@Test void adjustForDisplay() {
 		adjustForDisplay(GrayF32.class);
 		adjustForDisplay(GrayS32.class);
 	}

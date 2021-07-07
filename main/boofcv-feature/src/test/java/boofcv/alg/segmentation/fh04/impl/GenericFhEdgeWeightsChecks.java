@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -49,8 +49,7 @@ public abstract class GenericFhEdgeWeightsChecks<T extends ImageBase<T>>
 
 	public abstract float weight( T input , int indexA , int indexB );
 
-	@Test
-	public void basicTest() {
+	@Test void basicTest() {
 		T input = imageType.createImage(10,12);
 
 		GImageMiscOps.fillUniform(input, rand, 0, 200);
@@ -117,8 +116,7 @@ public abstract class GenericFhEdgeWeightsChecks<T extends ImageBase<T>>
 		}
 	}
 
-	@Test
-	public void subimage() {
+	@Test void subimage() {
 
 		T input = imageType.createImage(10,12);
 		GImageMiscOps.fillUniform(input, rand, 0, 200);

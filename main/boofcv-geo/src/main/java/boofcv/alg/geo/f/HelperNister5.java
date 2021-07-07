@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -21,7 +21,7 @@ package boofcv.alg.geo.f;
 import org.ejml.data.DMatrixRMaj;
 
 /**
- * Helper class for {@link EssentialNister5}.  Contains ugly unrolled linear systems.  See generate/python/nister5.py
+ * Helper class for {@link EssentialNister5}. Contains ugly unrolled linear systems. See generate/python/nister5.py
  * for code which created the mess you see below.
  *
  * @author Peter Abeles

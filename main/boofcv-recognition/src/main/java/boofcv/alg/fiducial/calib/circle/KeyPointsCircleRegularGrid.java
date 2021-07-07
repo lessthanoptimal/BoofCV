@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -27,10 +27,10 @@ import georegression.struct.point.Point2D_F64;
 import org.ddogleg.struct.DogArray;
 
 /**
- * <p>Computes key points from an observed regular circular grid.  Each circle has 4 key points at the grid aligned
- * top, bottom, left, and right side of the circle.  These key points are found using tangent points between
- * adjacent circles.  Tangent points are the same under perspective
- * distortion and the same can be said for the intersection of their lines.  When more than one intersection
+ * <p>Computes key points from an observed regular circular grid. Each circle has 4 key points at the grid aligned
+ * top, bottom, left, and right side of the circle. These key points are found using tangent points between
+ * adjacent circles. Tangent points are the same under perspective
+ * distortion and the same can be said for the intersection of their lines. When more than one intersection
  * is at the same location the average is found</p>
  *
  * <center>
@@ -130,7 +130,7 @@ public class KeyPointsCircleRegularGrid {
 		Tangents ta = tangents.get(grid.getIndexOfRegEllipse(rowA, colA));
 		Tangents tb = tangents.get(grid.getIndexOfRegEllipse(rowB, colB));
 
-		// Which point is 0 or 3 is not defined and can swap arbitrarily.  To fix this problem
+		// Which point is 0 or 3 is not defined and can swap arbitrarily. To fix this problem
 		// 0 will be defined as on the 'positive side' of the line connecting the ellipse centers
 
 		double slopeX = b.center.x - a.center.x;

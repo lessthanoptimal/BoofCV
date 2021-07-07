@@ -33,14 +33,14 @@ import org.jetbrains.annotations.Nullable;
 /**
  * <p>
  * Detects features which are local maximums and/or local minimums in the feature intensity image.
- * A list of pixels to exclude as candidates can be provided.  Image derivatives need to be computed
+ * A list of pixels to exclude as candidates can be provided. Image derivatives need to be computed
  * externally and provided as needed. The passed in {@link GeneralFeatureIntensity} is used to determine if local
  * maximums or minimums should be detected.
  * </p>
  *
  * <p>
- * If a maximum number of features is specified then the N most intense features are returned.  By default all
- * found features are returned.  Set to a value &le; 0 to detect all features.
+ * If a maximum number of features is specified then the N most intense features are returned. By default all
+ * found features are returned. Set to a value &le; 0 to detect all features.
  * </p>
  *
  * @param <I> Input image type.
@@ -125,9 +125,9 @@ public class GeneralFeatureDetector<I extends ImageGray<I>, D extends ImageGray<
 	 * @param image Original image.
 	 * @param derivX image derivative in along the x-axis. Only needed if {@link #getRequiresGradient()} is true.
 	 * @param derivY image derivative in along the y-axis. Only needed if {@link #getRequiresGradient()} is true.
-	 * @param derivXX Second derivative.  Only needed if {@link #getRequiresHessian()} ()} is true.
-	 * @param derivXY Second derivative.  Only needed if {@link #getRequiresHessian()} ()} is true.
-	 * @param derivYY Second derivative.  Only needed if {@link #getRequiresHessian()} ()} is true.
+	 * @param derivXX Second derivative. Only needed if {@link #getRequiresHessian()} ()} is true.
+	 * @param derivXY Second derivative. Only needed if {@link #getRequiresHessian()} ()} is true.
+	 * @param derivYY Second derivative. Only needed if {@link #getRequiresHessian()} ()} is true.
 	 */
 	public void process( I image, D derivX, D derivY, D derivXX, D derivYY, D derivXY ) {
 		minimums.reset();

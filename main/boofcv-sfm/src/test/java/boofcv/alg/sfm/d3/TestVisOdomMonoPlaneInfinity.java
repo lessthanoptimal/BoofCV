@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -27,16 +27,14 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
  * @author Peter Abeles
  */
 public class TestVisOdomMonoPlaneInfinity extends BoofStandardJUnit {
-	@Test
-	public void stuff() {
-		// This is intentionally left blank.  Tests are performed inside the abstract package
+	@Test void stuff() {
+		// This is intentionally left blank. Tests are performed inside the abstract package
 	}
 
 	/**
 	 * Look for the largest inlier in the center
 	 */
-	@Test
-	public void maximizeCountInSpread_nominal() {
+	@Test void maximizeCountInSpread_nominal() {
 
 		double[] data = new double[23];
 
@@ -68,8 +66,7 @@ public class TestVisOdomMonoPlaneInfinity extends BoofStandardJUnit {
 	/**
 	 * See if it finds the largest inlier set when it requires the angle to wrap around
 	 */
-	@Test
-	public void maximizeCountInSpread_edge() {
+	@Test void maximizeCountInSpread_edge() {
 		double[] data = new double[23];
 
 		data[0] = 1;

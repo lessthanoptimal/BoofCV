@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -46,13 +46,13 @@ import java.util.List;
 
 /**
  * Full 6-DOF visual odometry where a ranging device is assumed for pixels in the primary view and the motion is estimated
- * using a {@link boofcv.abst.geo.Estimate1ofPnP}.  Range is usually estimated using stereo cameras, structured
- * light or time of flight sensors.  New features are added and removed as needed.  Features are removed
- * if they are not part of the inlier feature set for some number of consecutive frames.  New features are detected
+ * using a {@link boofcv.abst.geo.Estimate1ofPnP}. Range is usually estimated using stereo cameras, structured
+ * light or time of flight sensors. New features are added and removed as needed. Features are removed
+ * if they are not part of the inlier feature set for some number of consecutive frames. New features are detected
  * and added if the inlier set falls below a threshold or every turn.
  *
- * Non-linear refinement is optional and appears to provide a very modest improvement in performance.  It is recommended
- * that motion is estimated using a P3P algorithm, which is the minimal case.  Adding features every frame can be
+ * Non-linear refinement is optional and appears to provide a very modest improvement in performance. It is recommended
+ * that motion is estimated using a P3P algorithm, which is the minimal case. Adding features every frame can be
  * computationally expensive, but having too few features being tracked will degrade accuracy. The algorithm was
  * designed to minimize magic numbers and to be insensitive to small changes in their values.
  *
@@ -91,9 +91,9 @@ public class VisOdomMonoDepthPnP<T extends ImageBase<T>>
 	/**
 	 * Configures magic numbers and estimation algorithms.
 	 *
-	 * @param motionEstimator PnP motion estimator.  P3P algorithm is recommended/
+	 * @param motionEstimator PnP motion estimator. P3P algorithm is recommended/
 	 * @param pixelTo3D Computes the 3D location of pixels.
-	 * @param refine Optional algorithm for refining the pose estimate.  Can be null.
+	 * @param refine Optional algorithm for refining the pose estimate. Can be null.
 	 * @param tracker Point feature tracker.
 	 */
 	public VisOdomMonoDepthPnP( ModelMatcher<Se3_F64, Point2D3D> motionEstimator,
@@ -125,7 +125,7 @@ public class VisOdomMonoDepthPnP<T extends ImageBase<T>>
 	}
 
 	/**
-	 * Estimates the motion given the left camera image.  The latest information required by ImagePixelTo3D
+	 * Estimates the motion given the left camera image. The latest information required by ImagePixelTo3D
 	 * should be passed to the class before invoking this function.
 	 *
 	 * @param image Camera image.

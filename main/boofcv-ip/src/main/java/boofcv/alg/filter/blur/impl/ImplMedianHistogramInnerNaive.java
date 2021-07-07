@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -22,7 +22,7 @@ import boofcv.struct.image.GrayU8;
 
 /**
  * <p>
- * Simple implementation of a histogram based median filter.  Only processes the inner portion of the image.
+ * Simple implementation of a histogram based median filter. Only processes the inner portion of the image.
  * </p>
  *
  * @author Peter Abeles
@@ -37,7 +37,7 @@ public class ImplMedianHistogramInnerNaive {
 	 * @param radiusX Size of the filter region. x-axis
 	 * @param radiusY Size of the filter region. Y-axis
 	 * @param offset Array used to store relative pixel offsets.
-	 * @param histogram Saves the image histogram.  Must be at least 256 elements.
+	 * @param histogram Saves the image histogram. Must be at least 256 elements.
 	 */
 	public static void process( GrayU8 input, GrayU8 output, int radiusX, int radiusY, int offset[], int histogram[] ) {
 		if (histogram == null)

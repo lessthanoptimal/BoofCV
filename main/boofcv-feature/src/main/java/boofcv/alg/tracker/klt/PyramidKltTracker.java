@@ -24,12 +24,12 @@ import boofcv.struct.pyramid.ImagePyramid;
 /**
  * <p>
  * A pyramid Kanade-Lucas-Tomasi (KLT) tracker that allows features to be tracker over a larger region than the basic
- * ({@link KltTracker}) implementation.  A feature is tracked at multiple resolutions, large motions can
+ * ({@link KltTracker}) implementation. A feature is tracked at multiple resolutions, large motions can
  * be detected at low resolution and are refined at higher resolutions.
  * </p>
  *
  * <p>
- * Tracking is allowed along the image border.  A track is dropped if the smallest track is outside the image.
+ * Tracking is allowed along the image border. A track is dropped if the smallest track is outside the image.
  * </p>
  *
  * @author Peter Abeles
@@ -49,7 +49,7 @@ public class PyramidKltTracker<InputImage extends ImageGray<InputImage>, Derivat
 	}
 
 	/**
-	 * Sets the feature's description up.  The feature's (x,y) must have already been set
+	 * Sets the feature's description up. The feature's (x,y) must have already been set
 	 * and {@link #setImage} been called.
 	 *
 	 * @param feature Feature's whose description is being setup.
@@ -88,7 +88,7 @@ public class PyramidKltTracker<InputImage extends ImageGray<InputImage>, Derivat
 	}
 
 	/**
-	 * Only sets the image pyramid.  The derivatives are set to null.  Only use this when tracking.
+	 * Only sets the image pyramid. The derivatives are set to null. Only use this when tracking.
 	 *
 	 * @param image Image pyramid
 	 */

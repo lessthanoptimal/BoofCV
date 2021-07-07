@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -25,7 +25,7 @@ package boofcv.struct.feature;
  */
 public abstract class MatchScoreType {
 	/**
-	 * Correlation scores can be both positive and negative values.  Scores with a larger positive value are considered
+	 * Correlation scores can be both positive and negative values. Scores with a larger positive value are considered
 	 * to be better.
 	 */
 	public static MatchScoreType CORRELATION = new MatchScoreType() {
@@ -45,7 +45,7 @@ public abstract class MatchScoreType {
 		}
 	};
 	/**
-	 * These error metrics have values greater than or equal to zero.  Closer the error is to zero the better
+	 * These error metrics have values greater than or equal to zero. Closer the error is to zero the better
 	 * the match is considered.
 	 */
 	public static MatchScoreType NORM_ERROR = new MatchScoreType() {

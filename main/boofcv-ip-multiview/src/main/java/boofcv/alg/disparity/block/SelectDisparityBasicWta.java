@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -23,8 +23,8 @@ import boofcv.struct.image.ImageGray;
 /**
  * <p>
  * Selects the optimal disparity given a set of scores using a Winner Take All (WTA) strategy
- * without any validation.  In other words, it simply selects the region with the smallest
- * error as the disparity.  Tends to be significantly faster than when validation is employed
+ * without any validation. In other words, it simply selects the region with the smallest
+ * error as the disparity. Tends to be significantly faster than when validation is employed
  * but produces many more poor results.
  * </p>
  *

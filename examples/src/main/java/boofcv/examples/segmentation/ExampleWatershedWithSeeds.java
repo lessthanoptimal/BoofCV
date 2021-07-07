@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -38,9 +38,9 @@ import java.awt.image.BufferedImage;
 
 /**
  * Watershed image segmentation will often produce an excessive number of regions since each local minimum is the
- * seed which creates a new region.  To get around this problem you can provide the seeds manually.  The down side
+ * seed which creates a new region. To get around this problem you can provide the seeds manually. The down side
  * to providing manual seeds is that it is no longer a general purpose algorithm and requires knowledge of the image
- * structure to provide the seeds.  This example demonstrates how to do this.
+ * structure to provide the seeds. This example demonstrates how to do this.
  *
  * @author Peter Abeles
  */
@@ -61,8 +61,8 @@ public class ExampleWatershedWithSeeds {
 		int numRegions = BinaryImageOps.contour(filtered, ConnectRule.EIGHT, label).size() + 1;
 		// +1 to regions because contour only counts blobs and not the background
 
-		// The labeled image can be used as is.  A precondition for seeded watershed is that all seeds have an
-		// ID > 0.  Luckily, a value of 0 was used for background pixels in the contour algorithm.
+		// The labeled image can be used as is. A precondition for seeded watershed is that all seeds have an
+		// ID > 0. Luckily, a value of 0 was used for background pixels in the contour algorithm.
 		WatershedVincentSoille1991 watershed = FactorySegmentationAlg.watershed(ConnectRule.FOUR);
 
 		watershed.process(input, label);

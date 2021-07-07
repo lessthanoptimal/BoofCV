@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -32,8 +32,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  * @author Peter Abeles
  */
 public class TestImageGradientThenReduce extends BoofStandardJUnit {
-	@Test
-	public void stuff() {
+	@Test void stuff() {
 
 		HelperGradient gradient = new HelperGradient();
 		HelperReduce reduce = new HelperReduce();

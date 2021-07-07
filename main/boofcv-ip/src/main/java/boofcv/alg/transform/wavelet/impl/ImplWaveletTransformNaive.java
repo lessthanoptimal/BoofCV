@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -31,7 +31,7 @@ import javax.annotation.Generated;
 /**
  * <p>
  * Unoptimized and simplistic implementation of a forward and inverse wavelet transform across one
- * level.  Primary used for validation testing.
+ * level. Primary used for validation testing.
  * </p>
  *
  * <p>

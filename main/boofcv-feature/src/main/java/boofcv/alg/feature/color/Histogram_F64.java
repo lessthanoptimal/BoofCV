@@ -22,10 +22,10 @@ import boofcv.struct.feature.TupleDesc_F64;
 
 /**
  * <p>
- * A multi dimensional histogram.  This is an extension of {@link TupleDesc_F64} to faciliate comparision of different
- * histograms.  Each dimension in the histogram coverages a range from the minimum to maximum value.  This range is
- * divided by the number of bins in a dimension.  Data is stored in a row major format from lower dimension to upper
- * dimension.  For a 3D histogram a coordinate (a,b,c) would have index = c + b*length[0] + a*length[0]*length[1].
+ * A multi dimensional histogram. This is an extension of {@link TupleDesc_F64} to faciliate comparision of different
+ * histograms. Each dimension in the histogram coverages a range from the minimum to maximum value. This range is
+ * divided by the number of bins in a dimension. Data is stored in a row major format from lower dimension to upper
+ * dimension. For a 3D histogram a coordinate (a,b,c) would have index = c + b*length[0] + a*length[0]*length[1].
  * </p>
  *
  * <p>Usage example for RGB image:</p>
@@ -44,7 +44,7 @@ public class Histogram_F64 extends TupleDesc_F64 {
 
 	// number of elements in each dimension
 	int[] length;
-	// precomputed strides.  strides[n] = strides[n-1]*length[n]
+	// precomputed strides. strides[n] = strides[n-1]*length[n]
 	int[] strides;
 
 	// the range of each dimension
@@ -174,7 +174,7 @@ public class Histogram_F64 extends TupleDesc_F64 {
 	}
 
 	/**
-	 * Given a value it returns the corresponding bin index in this histogram for integer values.  The discretion
+	 * Given a value it returns the corresponding bin index in this histogram for integer values. The discretion
 	 * is taken in account and 1 is added to the range.
 	 *
 	 * @param dimension  Which dimension the value belongs to

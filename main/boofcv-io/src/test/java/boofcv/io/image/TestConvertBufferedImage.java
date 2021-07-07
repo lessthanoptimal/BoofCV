@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -67,7 +67,7 @@ public class TestConvertBufferedImage extends BoofStandardJUnit {
 		found = ConvertBufferedImage.checkInputs(new GrayS16(10,10),null);
 		assertEquals(found.getType(), BufferedImage.TYPE_USHORT_GRAY);
 
-		// not really what to do about floating point images.  No equivalent BufferedImage.  Just assume its a regular
+		// not really what to do about floating point images. No equivalent BufferedImage. Just assume its a regular
 		// gray input image with pixel values from 0 to 255
 		found = ConvertBufferedImage.checkInputs(new GrayF32(10, 10), null);
 		assertEquals(found.getType(), BufferedImage.TYPE_BYTE_GRAY);

@@ -34,14 +34,12 @@ public class TestFeatureToWordHistogram_F64 extends BoofStandardJUnit {
 
 	public static final int NUM_CLUSTERS = 5;
 
-	@Test
-	public void getTotalWords() {
+	@Test void getTotalWords() {
 		FeatureToWordHistogram_F64 alg = new FeatureToWordHistogram_F64(new Assign(),true);
 		assertEquals(NUM_CLUSTERS,alg.getTotalWords());
 	}
 
-	@Test
-	public void simpleTest_hard() {
+	@Test void simpleTest_hard() {
 		FeatureToWordHistogram_F64 alg = new FeatureToWordHistogram_F64(new Assign(),true);
 
 		for (int i = 0; i < 7; i++) {
@@ -69,8 +67,7 @@ public class TestFeatureToWordHistogram_F64 extends BoofStandardJUnit {
 		assertEquals(1.0,total,1e-8);
 	}
 
-	@Test
-	public void simpleTest_soft() {
+	@Test void simpleTest_soft() {
 		FeatureToWordHistogram_F64 alg = new FeatureToWordHistogram_F64(new Assign(),false);
 
 		for (int i = 0; i < 7; i++) {
@@ -90,8 +87,7 @@ public class TestFeatureToWordHistogram_F64 extends BoofStandardJUnit {
 		assertEquals(0,histogram[4], 1e-8);
 	}
 
-	@Test
-	public void reset() {
+	@Test void reset() {
 		FeatureToWordHistogram_F64 alg = new FeatureToWordHistogram_F64(new Assign(),true);
 
 		for (int i = 0; i < 7; i++) {

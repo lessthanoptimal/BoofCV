@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -31,7 +31,7 @@ import java.util.Comparator;
 import java.util.List;
 
 /**
- * Detects if tracks are too close together and discards some of the close ones.  Tracks are projected into
+ * Detects if tracks are too close together and discards some of the close ones. Tracks are projected into
  * a smaller grid (specified by scale) and if more than one lands on the same grid element it is pruned. An ambiguity
  * resolver is used to decide which track to keep if there's a conflict. If the resolver says they are equivalent
  * then featureID is used. Results should be consistent independent of order in tracks list.

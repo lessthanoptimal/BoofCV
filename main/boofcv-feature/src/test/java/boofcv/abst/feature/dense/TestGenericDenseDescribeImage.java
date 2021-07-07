@@ -41,8 +41,7 @@ public class TestGenericDenseDescribeImage extends BoofStandardJUnit {
 	/**
 	 * Give it a known situation and see if it produces the expected results
 	 */
-	@Test
-	public void process() {
+	@Test void process() {
 		DummyFeature sparse = new DummyFeature();
 
 		GenericDenseDescribeImageDense alg = new GenericDenseDescribeImageDense(sparse,1.5,3,4);
@@ -83,8 +82,7 @@ public class TestGenericDenseDescribeImage extends BoofStandardJUnit {
 		}
 	}
 
-	@Test
-	public void checkDescriptorScale() {
+	@Test void checkDescriptorScale() {
 		DummyFeature sparse = new DummyFeature();
 
 		GrayU8 image = new GrayU8(100,110);

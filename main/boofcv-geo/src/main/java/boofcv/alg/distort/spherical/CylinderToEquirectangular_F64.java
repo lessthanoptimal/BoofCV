@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -21,7 +21,7 @@ package boofcv.alg.distort.spherical;
 import georegression.misc.GrlConstants;
 
 /**
- * Renders a cylindrical view from an equirectangular image.  With zero rotation applied to it the image center
+ * Renders a cylindrical view from an equirectangular image. With zero rotation applied to it the image center
  * has the pointing vector = (1,0,0).
  *
  * <pre>

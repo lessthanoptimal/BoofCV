@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -47,8 +47,7 @@ public abstract class CommonBundleAdjustmentMetricSchurJacobian<M extends DMatri
 
 	protected abstract SchurJacobian_to_NtoMxN<M> createJacobian( BundleAdjustmentMetricSchurJacobian<M> alg );
 
-	@Test
-	public void compareToNumerical() {
+	@Test void compareToNumerical() {
 		// this will also test multiple calls and reinitializing
 		var alg = createAlg();
 
@@ -87,8 +86,7 @@ public abstract class CommonBundleAdjustmentMetricSchurJacobian<M extends DMatri
 	/**
 	 * Have a chain of relative views and test with different ones being fixed or not
 	 */
-	@Test
-	public void compareToNumerical_relative() {
+	@Test void compareToNumerical_relative() {
 		compareToNumerical_relative(false);
 		compareToNumerical_relative(true);
 	}
@@ -130,8 +128,7 @@ public abstract class CommonBundleAdjustmentMetricSchurJacobian<M extends DMatri
 	 * Simulate a stereo camera. The baseline between the left and right cameras have a common Motion. Only the left
 	 * camera moves relative to the world frame the right camera is configure to be relative to the left camera.
 	 */
-	@Test
-	public void movingStereo() {
+	@Test void movingStereo() {
 		twoViewsOneMotion(true, false);
 		twoViewsOneMotion(false, false);
 		twoViewsOneMotion(true, true);
@@ -162,8 +159,7 @@ public abstract class CommonBundleAdjustmentMetricSchurJacobian<M extends DMatri
 	/**
 	 * Multiple views that are relative to each other have the same motion
 	 */
-	@Test
-	public void sameMotionInChain() {
+	@Test void sameMotionInChain() {
 		sameMotionInChain(false);
 		sameMotionInChain(true);
 	}

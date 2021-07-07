@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -586,7 +586,7 @@ public class ImplConvertRaster {
 
 		if (src.getType() == BufferedImage.TYPE_BYTE_GRAY) {
 			// If the buffered image is a gray scale image there is a bug where getRGB distorts
-			// the image.  See Bug ID: 5051418 , it has been around since 2004. Fuckers...
+			// the image. See Bug ID: 5051418 , it has been around since 2004. Fuckers...
 			WritableRaster raster = src.getRaster();
 
 			//CONCURRENT_REMOVE_BELOW
@@ -639,7 +639,7 @@ public class ImplConvertRaster {
 
 		if (src.getType() == BufferedImage.TYPE_BYTE_GRAY || src.getType() == BufferedImage.TYPE_USHORT_GRAY ) {
 			// If the buffered image is a gray scale image there is a bug where getRGB distorts
-			// the image.  See Bug ID: 5051418 , it has been around since 2004. Fuckers...
+			// the image. See Bug ID: 5051418 , it has been around since 2004. Fuckers...
 			WritableRaster raster = src.getRaster();
 			//CONCURRENT_REMOVE_BELOW
 			int hack[] = new int[1];
@@ -656,7 +656,7 @@ public class ImplConvertRaster {
 			}
 			//CONCURRENT_ABOVE });
 		} else {
-			// this will be totally garbage.  just here so that some unit test will pass
+			// this will be totally garbage. just here so that some unit test will pass
 
 			//CONCURRENT_BELOW BoofConcurrency.loopFor(0, height, y -> {
 			for (int y = 0; y < height; y++) {
@@ -677,7 +677,7 @@ public class ImplConvertRaster {
 
 		if (src.getType() == BufferedImage.TYPE_BYTE_GRAY) {
 			// If the buffered image is a gray scale image there is a bug where getRGB distorts
-			// the image.  See Bug ID: 5051418 , it has been around since 2004. Fuckers...
+			// the image. See Bug ID: 5051418 , it has been around since 2004. Fuckers...
 			WritableRaster raster = src.getRaster();
 			//CONCURRENT_REMOVE_BELOW
 			float hack[] = new float[1];
@@ -1922,7 +1922,7 @@ public class ImplConvertRaster {
 	}
 
 	/**
-	 * The image the BufferedImage was created from had RGB or RGBA color order.  This swaps the bytes around
+	 * The image the BufferedImage was created from had RGB or RGBA color order. This swaps the bytes around
 	 * to put it into the expected local format
 	 */
 	public static void orderBandsBufferedFromRGB( DataBufferByte buffer , WritableRaster raster , int type ) {
@@ -1965,7 +1965,7 @@ public class ImplConvertRaster {
 	}
 
 	/**
-	 * The image the BufferedImage was created from had RGB or RGBA color order.  This swaps the bytes around
+	 * The image the BufferedImage was created from had RGB or RGBA color order. This swaps the bytes around
 	 * to put it into the expected local format
 	 */
 	public static void orderBandsBufferedFromRGB( DataBufferInt buffer, WritableRaster raster , int type ) {

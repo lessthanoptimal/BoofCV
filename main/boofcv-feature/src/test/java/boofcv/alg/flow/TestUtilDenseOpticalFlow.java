@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -31,8 +31,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  */
 public class TestUtilDenseOpticalFlow extends BoofStandardJUnit {
 
-	@Test
-	public void standardPyramid_sigma_05() {
+	@Test void standardPyramid_sigma_05() {
 		ImagePyramid pyr = UtilDenseOpticalFlow.standardPyramid(100,200,0.5,1.5,25,100, GrayF32.class);
 
 		assertEquals(3,pyr.getNumLayers());
@@ -48,8 +47,7 @@ public class TestUtilDenseOpticalFlow extends BoofStandardJUnit {
 			assertTrue(pyr.getSigma(i)>sigma);
 	}
 
-	@Test
-	public void standardPyramid_sigma_1() {
+	@Test void standardPyramid_sigma_1() {
 		ImagePyramid pyr = UtilDenseOpticalFlow.standardPyramid(100,200,1,1.5,25,100, GrayF32.class);
 
 		assertEquals(1,pyr.getNumLayers());
@@ -58,8 +56,7 @@ public class TestUtilDenseOpticalFlow extends BoofStandardJUnit {
 		assertEquals(0,pyr.getSigma(0),1e-8);
 	}
 
-	@Test
-	public void standardPyramid_sigma_0() {
+	@Test void standardPyramid_sigma_0() {
 		ImagePyramid pyr = UtilDenseOpticalFlow.standardPyramid(100,200,0,1.5,25,30, GrayF32.class);
 
 		assertEquals(30,pyr.getNumLayers());
@@ -68,8 +65,7 @@ public class TestUtilDenseOpticalFlow extends BoofStandardJUnit {
 		assertEquals(100/25,pyr.getScale(29),1e-8);
 	}
 
-	@Test
-	public void standardPyramid_justScale() {
+	@Test void standardPyramid_justScale() {
 		ImagePyramid pyr = UtilDenseOpticalFlow.standardPyramid(100,200,0.5,0,25,100, GrayF32.class);
 
 		assertEquals(3,pyr.getNumLayers());

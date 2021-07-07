@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -43,20 +43,20 @@ import java.util.Set;
 
 /**
  * <p>
- * Full implementation of the Zhang99 camera calibration algorithm using planar calibration targets.  First
+ * Full implementation of the Zhang99 camera calibration algorithm using planar calibration targets. First
  * linear approximations of camera parameters are computed, which are then refined using non-linear estimation.
  * One difference from the original paper is that tangential distortion can be included. No linear estimate
  * if found for tangential, they are estimated by initializing the non-linear estimate with all zero.
  * </p>
  *
  * <p>
- * When processing the results be sure to take in account the coordinate system being left or right handed.  Calibration
+ * When processing the results be sure to take in account the coordinate system being left or right handed. Calibration
  * works just fine with either coordinate system, but most 3D geometric algorithms assume a right handed coordinate
  * system while most images are left handed.
  * </p>
  *
  * <p>
- * A listener can be provide that will give status updates and allows requests for early termination.  If a request
+ * A listener can be provide that will give status updates and allows requests for early termination. If a request
  * for early termination is made then a RuntimeException will be thrown.
  * </p>
  *

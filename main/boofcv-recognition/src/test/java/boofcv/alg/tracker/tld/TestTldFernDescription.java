@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -31,8 +31,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  */
 public class TestTldFernDescription extends BoofStandardJUnit {
 
-	@Test
-	public void sanityTest() {
+	@Test void sanityTest() {
 		TldFernDescription fern = new TldFernDescription(new Random(24),8);
 
 		assertEquals(fern.pairs.length,8);

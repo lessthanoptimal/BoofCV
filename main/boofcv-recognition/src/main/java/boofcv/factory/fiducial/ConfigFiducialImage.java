@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -39,7 +39,7 @@ public class ConfigFiducialImage implements Configuration {
 	public double maxErrorFraction = 0.20;
 
 	/**
-	 * How wide the border is relative to the total fiducial width.  0.25 is standard and is a good compromise
+	 * How wide the border is relative to the total fiducial width. 0.25 is standard and is a good compromise
 	 * between ability to view at extreme angles and area to encode information.
 	 */
 	public double borderWidthFraction = 0.25;

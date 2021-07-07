@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -32,7 +32,7 @@ import java.util.List;
 /**
  * <p>Base class for ordering clusters of ellipses into grids</p>
  *
- * <p>See {@link Grid} for a description of how the output grids are described.  It uses a sparse format.</p>
+ * <p>See {@link Grid} for a description of how the output grids are described. It uses a sparse format.</p>
  * <p>See {@link DetectCircleHexagonalGrid} for an example of an hexagonal grid</p>
  *
  * @author Peter Abeles
@@ -46,7 +46,7 @@ public abstract class EllipseClustersIntoGrid {
 
 	// Information on each ellipse/node in a cluster
 	protected DogArray<NodeInfo> listInfo = new DogArray<>(NodeInfo::new);
-	// Used to sort edges in a node.  used instead of built in sorting algorithm to maximize memory being recycled
+	// Used to sort edges in a node. used instead of built in sorting algorithm to maximize memory being recycled
 	protected QuickSortComparator<Edge> sorter;
 
 	// All ellipses in the contour around the grid
@@ -66,7 +66,7 @@ public abstract class EllipseClustersIntoGrid {
 	}
 
 	/**
-	 * Computes grids from the clusters.  Call {@link #getGrids()} to retrieve the results.
+	 * Computes grids from the clusters. Call {@link #getGrids()} to retrieve the results.
 	 *
 	 * @param ellipses (input) List of all the ellipses
 	 * @param clusters (Input) Description of all the clusters
@@ -164,7 +164,7 @@ public abstract class EllipseClustersIntoGrid {
 
 	/**
 	 * Select the first node (currentSeed) in the next row it finds the next element in the next row by
-	 * looking at the first and second elements in the previous row.  It selects the edge in
+	 * looking at the first and second elements in the previous row. It selects the edge in
 	 * currentSeed which cones closest to matching the angle of 'prevSeed' and 'prevNext'
 	 *
 	 * @param prevSeed First node in the previous row
@@ -302,7 +302,7 @@ public abstract class EllipseClustersIntoGrid {
 	}
 
 	/**
-	 * If there is a nearly perfect line a node farther down the line can come before.  This just selects the closest
+	 * If there is a nearly perfect line a node farther down the line can come before. This just selects the closest
 	 */
 	void pruneNearlyIdenticalAngles() {
 		for (int i = 0; i < listInfo.size(); i++) {
@@ -357,8 +357,8 @@ public abstract class EllipseClustersIntoGrid {
 	}
 
 	/**
-	 * Finds nodes in the outside of the grid.  First the node in the grid with the largest 'angleBetween'
-	 * is selected as a seed.  It is assumed at this node must be on the contour.  Then the graph is traversed
+	 * Finds nodes in the outside of the grid. First the node in the grid with the largest 'angleBetween'
+	 * is selected as a seed. It is assumed at this node must be on the contour. Then the graph is traversed
 	 * in CCW direction until a loop is formed.
 	 *
 	 * @return true if valid and false if invalid
@@ -497,7 +497,7 @@ public abstract class EllipseClustersIntoGrid {
 	}
 
 	/**
-	 * Specifies the grid.  See implementation class for grid details.
+	 * Specifies the grid. See implementation class for grid details.
 	 */
 	public static class Grid {
 		public List<EllipseRotated_F64> ellipses = new ArrayList<>();

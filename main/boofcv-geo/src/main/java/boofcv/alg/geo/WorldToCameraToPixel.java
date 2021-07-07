@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -32,7 +32,7 @@ import lombok.Getter;
 
 /**
  * Convenience class which will take a point in world coordinates, translate it to camera reference frame,
- * then project onto the image plane and compute its pixels.  Supports lens distortion
+ * then project onto the image plane and compute its pixels. Supports lens distortion
  *
  * @author Peter Abeles
  */
@@ -74,7 +74,7 @@ public class WorldToCameraToPixel {
 	}
 
 	/**
-	 * Computes the observed location of the specified point in world coordinates in the camera pixel.  If
+	 * Computes the observed location of the specified point in world coordinates in the camera pixel. If
 	 * the object can't be viewed because it is behind the camera then false is returned.
 	 *
 	 * @param worldPt Location of point in world frame
@@ -107,7 +107,7 @@ public class WorldToCameraToPixel {
 	}
 
 	/**
-	 * Computes location of 3D point in world as observed in the camera.  Point is returned if visible or null
+	 * Computes location of 3D point in world as observed in the camera. Point is returned if visible or null
 	 * if not visible.
 	 *
 	 * @param worldPt Location of point on world reference frame

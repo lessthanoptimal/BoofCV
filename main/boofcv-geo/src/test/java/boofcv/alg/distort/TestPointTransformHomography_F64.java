@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -33,8 +33,7 @@ public class TestPointTransformHomography_F64 extends BoofStandardJUnit {
 	/**
 	 * Directly computes the output
 	 */
-	@Test
-	public void compareToDirect() {
+	@Test void compareToDirect() {
 		Point2D_F64 input = new Point2D_F64(50,60);
 		Point2D_F64 output = new Point2D_F64();
 		Point2D_F64 expected = new Point2D_F64();

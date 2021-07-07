@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -39,8 +39,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
  */
 public class TestImplPyramidOps extends BoofStandardJUnit {
 
-	@Test
-	public void scaleImageUp() {
+	@Test void scaleImageUp() {
 		int numFound = 0;
 		Method[] methods = ImplPyramidOps.class.getMethods();
 		for( Method m : methods ) {
@@ -89,8 +88,7 @@ public class TestImplPyramidOps extends BoofStandardJUnit {
 		}
 	}
 
-	@Test
-	public void scaleDown2() {
+	@Test void scaleDown2() {
 		int numFound = 0;
 		Method[] methods = ImplPyramidOps.class.getMethods();
 		for( Method m : methods ) {

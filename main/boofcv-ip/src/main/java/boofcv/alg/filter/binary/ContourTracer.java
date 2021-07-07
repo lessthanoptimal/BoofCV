@@ -24,8 +24,8 @@ import boofcv.struct.image.GrayS32;
 import boofcv.struct.image.GrayU8;
 
 /**
- * Used to trace the external and internal contours around objects for {@link LinearContourLabelChang2004}.  As it
- * is tracing an object it will modify the binary image by labeling.  The input binary image is assumed to have
+ * Used to trace the external and internal contours around objects for {@link LinearContourLabelChang2004}. As it
+ * is tracing an object it will modify the binary image by labeling. The input binary image is assumed to have
  * a 1-pixel border that needs to be compensated for.
  *
  * @author Peter Abeles
@@ -93,7 +93,7 @@ public class ContourTracer {
 
 	/**
 	 * @param binary Binary image with a border of zeros added to the outside.
-	 * @param labeled Labeled image.  Size is the same as the original binary image without border.
+	 * @param labeled Labeled image. Size is the same as the original binary image without border.
 	 */
 	public void setInputs( GrayU8 binary, GrayS32 labeled, PackedSetsPoint2D_I32 storagePoints ) {
 		this.binary = binary;
@@ -150,7 +150,7 @@ public class ContourTracer {
 		indexLabel = labeled.getIndex(x - 1, y - 1);
 		add(x, y);
 
-		// find the next one pixel.  handle case where its an isolated point
+		// find the next one pixel. handle case where its an isolated point
 		if (!searchOne()) {
 			return;
 		} else {
@@ -236,7 +236,7 @@ public class ContourTracer {
 	}
 
 	/**
-	 * Checks to see if the specified pixel is black (1).  If not the pixel is marked so that it
+	 * Checks to see if the specified pixel is black (1). If not the pixel is marked so that it
 	 * won't be searched again
 	 */
 	private boolean checkOne( int index ) {

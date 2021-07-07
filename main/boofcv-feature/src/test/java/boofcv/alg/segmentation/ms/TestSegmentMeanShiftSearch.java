@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -30,16 +30,14 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
  */
 public class TestSegmentMeanShiftSearch extends BoofStandardJUnit {
 
-	@Test
-	public void constructor() {
+	@Test void constructor() {
 		SegmentMeanShiftSearch alg = new Dummy(1,2,2,3,100);
 
 		assertEquals(5,alg.widthX);
 		assertEquals(7,alg.widthY);
 	}
 
-	@Test
-	public void distanceSq() {
+	@Test void distanceSq() {
 		float a[] = new float[]{2,3,4};
 		float b[] = new float[]{4,3,2};
 
@@ -48,8 +46,7 @@ public class TestSegmentMeanShiftSearch extends BoofStandardJUnit {
 		assertEquals(8,found,1e-4);
 	}
 
-	@Test
-	public void weight() {
+	@Test void weight() {
 		SegmentMeanShiftSearch alg = new Dummy(1,2,2,3,100);
 
 		for( int i = 0; i < 1000; i++ ) {

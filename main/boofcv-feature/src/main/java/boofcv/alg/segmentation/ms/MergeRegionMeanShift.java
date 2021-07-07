@@ -53,10 +53,10 @@ public class MergeRegionMeanShift extends RegionMergeTree {
 	}
 
 	/**
-	 * Merges together similar regions which are in close proximity to each other.  After merging
+	 * Merges together similar regions which are in close proximity to each other. After merging
 	 * most of the input data structures are modified to take in account the  changes.
 	 *
-	 * @param pixelToRegion (Input/output) Image that specifies the segmentation.  Modified.
+	 * @param pixelToRegion (Input/output) Image that specifies the segmentation. Modified.
 	 * @param regionMemberCount (Input/output) Number of pixels in each region. Modified.
 	 * @param regionColor (Input/output) Color of each region. Modified.
 	 * @param modeLocation (Input) Location of each region's mode. Not modified.
@@ -76,8 +76,8 @@ public class MergeRegionMeanShift extends RegionMergeTree {
 	}
 
 	/**
-	 * Takes the mode of a region and searches the local area around it for other regions.  If the region's mode
-	 * is also within the local area its color is checked to see if it's similar enough.  If the color is similar
+	 * Takes the mode of a region and searches the local area around it for other regions. If the region's mode
+	 * is also within the local area its color is checked to see if it's similar enough. If the color is similar
 	 * enough then the two regions are marked for merger.
 	 */
 	protected void markMergeRegions( DogArray<float[]> regionColor,

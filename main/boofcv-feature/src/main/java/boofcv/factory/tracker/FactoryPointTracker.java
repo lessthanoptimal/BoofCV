@@ -72,9 +72,9 @@ import org.jetbrains.annotations.Nullable;
 import java.util.Random;
 
 /**
- * Factory for creating trackers which implement {@link boofcv.abst.tracker.PointTracker}.  These trackers
- * are intended for use in SFM applications.  Some features which individual trackers can provide are lost when
- * using the high level interface {@link PointTracker}.  To create low level tracking algorithms see
+ * Factory for creating trackers which implement {@link boofcv.abst.tracker.PointTracker}. These trackers
+ * are intended for use in SFM applications. Some features which individual trackers can provide are lost when
+ * using the high level interface {@link PointTracker}. To create low level tracking algorithms see
  * {@link FactoryTrackerAlg}
  *
  * @author Peter Abeles
@@ -113,7 +113,7 @@ public class FactoryPointTracker {
 	 *
 	 * @param numLevels Number of levels in the image pyramid
 	 * @param configDetect Configuration for detecting point features
-	 * @param featureRadius Size of the tracked feature.  Try 3 or 5
+	 * @param featureRadius Size of the tracked feature. Try 3 or 5
 	 * @param imageType Input image type.
 	 * @param derivType Image derivative  type.
 	 * @return KLT based tracker.
@@ -233,7 +233,7 @@ public class FactoryPointTracker {
 	/**
 	 * Creates a tracker which detects Shi-Tomasi corner features and describes them with BRIEF.
 	 *
-	 * @param maxAssociationError Maximum allowed association error.  Try 200.
+	 * @param maxAssociationError Maximum allowed association error. Try 200.
 	 * @param configExtract Configuration for extracting features
 	 * @param imageType Type of image being processed.
 	 * @param derivType Type of image used to store the image derivative. null == use default
@@ -274,7 +274,7 @@ public class FactoryPointTracker {
 	 *
 	 * @param configFast Configuration for FAST detector
 	 * @param configExtract Configuration for extracting features
-	 * @param maxAssociationError Maximum allowed association error.  Try 200.
+	 * @param maxAssociationError Maximum allowed association error. Try 200.
 	 * @param imageType Type of image being processed.
 	 * @see FastCornerDetector
 	 * @see DescribePointBrief
@@ -308,7 +308,7 @@ public class FactoryPointTracker {
 	 * Creates a tracker which detects Shi-Tomasi corner features and describes them with NCC.
 	 *
 	 * @param configExtract Configuration for extracting features
-	 * @param describeRadius Radius of the region being described.  Try 2.
+	 * @param describeRadius Radius of the region being described. Try 2.
 	 * @param imageType Type of image being processed.
 	 * @param derivType Type of image used to store the image derivative. null == use default
 	 * @see ShiTomasiCornerIntensity
@@ -410,9 +410,9 @@ public class FactoryPointTracker {
 	 * @param configExtract Configuration for extracting features
 	 * @param kltConfig Configuration for KLT
 	 * @param configDescribe Configuration for SURF descriptor
-	 * @param configOrientation Configuration for region orientation.  If null then orientation isn't estimated
+	 * @param configOrientation Configuration for region orientation. If null then orientation isn't estimated
 	 * @param imageType Type of image the input is.
-	 * @param derivType Image derivative type.        @return SURF based tracker.
+	 * @param derivType Image derivative type.       @return SURF based tracker.
 	 * @see ShiTomasiCornerIntensity
 	 * @see DescribePointSurf
 	 */
@@ -456,11 +456,11 @@ public class FactoryPointTracker {
 	 * Creates a tracker that is a hybrid between KLT and Detect-Describe-Associate (DDA) trackers.
 	 *
 	 * @param detector Feature detector.
-	 * @param orientation Optional feature orientation.  Can be null.
+	 * @param orientation Optional feature orientation. Can be null.
 	 * @param describe Feature description
 	 * @param associate Association algorithm.
 	 * @param kltConfig Configuration for KLT tracker
-	 * @param imageType Input image type.     @return Feature tracker
+	 * @param imageType Input image type.    @return Feature tracker
 	 * @see HybridTrackerScalePoint
 	 */
 	public static <I extends ImageGray<I>, Desc extends TupleDesc<Desc>>
@@ -483,7 +483,7 @@ public class FactoryPointTracker {
 	 * @param detector Feature detector and describer.
 	 * @param associate Association algorithm.
 	 * @param kltConfig Configuration for KLT tracker
-	 * @param imageType Input image type.     @return Feature tracker
+	 * @param imageType Input image type.    @return Feature tracker
 	 * @see HybridTrackerScalePoint
 	 */
 	public static <I extends ImageGray<I>, D extends ImageGray<D>, Desc extends TupleDesc<Desc>>
@@ -526,8 +526,8 @@ public class FactoryPointTracker {
 	}
 
 	/**
-	 * Creates a Shi-Tomasi corner detector specifically designed for SFM.  Smaller feature radius work better.
-	 * Variable detectRadius to control the number of features.  When larger features are used weighting should
+	 * Creates a Shi-Tomasi corner detector specifically designed for SFM. Smaller feature radius work better.
+	 * Variable detectRadius to control the number of features. When larger features are used weighting should
 	 * be set to true, but because this is so small, it is set to false
 	 */
 	@Deprecated

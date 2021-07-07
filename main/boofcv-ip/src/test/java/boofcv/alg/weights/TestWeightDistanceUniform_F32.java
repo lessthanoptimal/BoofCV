@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -28,8 +28,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
  */
 public class TestWeightDistanceUniform_F32 extends BoofStandardJUnit {
 
-	@Test
-	public void basic() {
+	@Test void basic() {
 		WeightDistanceUniform_F32 alg = new WeightDistanceUniform_F32(1.5f);
 
 		float expected = 1.0f/1.5f;

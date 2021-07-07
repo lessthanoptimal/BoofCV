@@ -38,7 +38,7 @@ import static boofcv.abst.tracker.PointTrackerUtils.addAllTracksInList;
 
 /**
  * Wrapper around {@link HybridTrackerScalePoint} for {@link PointTracker}. Features are respawned when the
- * number of active tracks drops below a threshold automatically.  This threshold is realtive to the number
+ * number of active tracks drops below a threshold automatically. This threshold is realtive to the number
  * of tracks spawned previously and is adjusted when the user requests that tracks are dropped.
  *
  * @author Peter Abeles

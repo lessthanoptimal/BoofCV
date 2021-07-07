@@ -38,8 +38,7 @@ public class TestConvolveNormalizedNaive_SB extends BoofStandardJUnit {
 	/**
 	 * Check it against one specific type to see if the core algorithm is correct
 	 */
-	@Test
-	public void horizontal() {
+	@Test void horizontal() {
 		Kernel1D_S32 kernel = new Kernel1D_S32(new int[]{1,2,3,4,5,6}, 6, 4);
 
 		GrayU8 input = new GrayU8(15,16);
@@ -78,8 +77,7 @@ public class TestConvolveNormalizedNaive_SB extends BoofStandardJUnit {
 	/**
 	 * Check it against one specific type to see if the core algorithm is correct
 	 */
-	@Test
-	public void vertical() {
+	@Test void vertical() {
 		Kernel1D_S32 kernel = new Kernel1D_S32(new int[]{1,2,3,4,5,6}, 6, 4);
 
 		GrayU8 input = new GrayU8(15,16);
@@ -118,8 +116,7 @@ public class TestConvolveNormalizedNaive_SB extends BoofStandardJUnit {
 	/**
 	 * Check it against one specific type to see if the core algorithm is correct
 	 */
-	@Test
-	public void vertical2_U16_U8() {
+	@Test void vertical2_U16_U8() {
 		Kernel1D_S32 kernelY = new Kernel1D_S32(new int[]{1,2,3,4,5,6}, 6, 4);
 		Kernel1D_S32 kernelX = new Kernel1D_S32(new int[]{4,2,1,4,3,6}, 5, 2);
 
@@ -174,8 +171,7 @@ public class TestConvolveNormalizedNaive_SB extends BoofStandardJUnit {
 	/**
 	 * Check it against one specific type to see if the core algorithm is correct
 	 */
-	@Test
-	public void convolve() {
+	@Test void convolve() {
 		Kernel2D_S32 kernel = FactoryKernel.random2D_I32(7,3,0,20,rand);
 		kernel.offset = 1;
 

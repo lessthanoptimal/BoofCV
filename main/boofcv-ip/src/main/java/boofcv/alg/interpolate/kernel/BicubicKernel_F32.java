@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -23,7 +23,7 @@ import boofcv.struct.convolve.KernelContinuous1D_F32;
 
 /**
  * <p>
- * A kernel can be used to approximate bicubic interpolation.  Full bicubic interpolation is much more expensive.
+ * A kernel can be used to approximate bicubic interpolation. Full bicubic interpolation is much more expensive.
  * The value of a=-0.5 is the best approximation.
  * </p>
  *
@@ -31,7 +31,7 @@ import boofcv.struct.convolve.KernelContinuous1D_F32;
  * <ul>
  * <li>R. Keys, (1981). "Cubic convolution interpolation for digital image processing".
  * IEEE Transactions on Signal Processing, Acoustics, Speech, and Signal Processing 29: 1153 </li>
- * <li>http://en.wikipedia.org/wiki/Bicubic_interpolation for more information.  July 25, 2011</li>
+ * <li>http://en.wikipedia.org/wiki/Bicubic_interpolation for more information. July 25, 2011</li>
  * </ul>
  * </p>
  *

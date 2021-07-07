@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -34,7 +34,7 @@ public class ConfigEdgeThreshold implements Configuration {
 	public DerivativeType gradient = DerivativeType.PREWITT;
 
 	/**
-	 * Threshold for classifying pixels as edge or not.  Try 30.
+	 * Threshold for classifying pixels as edge or not. Try 30.
 	 */
 	public float threshold = 30;
 

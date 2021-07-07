@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -37,7 +37,7 @@ import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.*;
 
 /**
- * Basic sanity tests for tracking.  Checks for the object's motion are handled by higher level unit tests.
+ * Basic sanity tests for tracking. Checks for the object's motion are handled by higher level unit tests.
  *
  * @author Peter Abeles
  */
@@ -58,7 +58,7 @@ class TestTldRegionTracker extends BoofStandardJUnit {
 	}
 
 	/**
-	 * Very basic test.  Feeds it the same image twice and sees if it does nothing without blowing up.
+	 * Very basic test. Feeds it the same image twice and sees if it does nothing without blowing up.
 	 */
 	@Test
 	void process() {
@@ -99,7 +99,7 @@ class TestTldRegionTracker extends BoofStandardJUnit {
 	}
 
 	/**
-	 * Empty image with no texture.  All spawn points should fail
+	 * Empty image with no texture. All spawn points should fail
 	 */
 	@Test
 	void spawnGrid_fail() {

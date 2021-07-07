@@ -42,8 +42,7 @@ public class TestImageMotionPointTrackerKey extends BoofStandardJUnit {
 	 * Give it a very simple example and see if it computes the correct motion and has the expected behavior
 	 * when processing an image
 	 */
-	@Test
-	public void process() {
+	@Test void process() {
 		// what the initial transform should be
 		Se2_F32 computed = new Se2_F32(4, 5, 6);
 		Se2_F32 model = new Se2_F32();
@@ -92,8 +91,7 @@ public class TestImageMotionPointTrackerKey extends BoofStandardJUnit {
 	/**
 	 * Test the keyframe based on the definition of the keyframe
 	 */
-	@Test
-	public void changeKeyFrame() {
+	@Test void changeKeyFrame() {
 		Se2_F32 computed = new Se2_F32(4, 5, 6);
 		Se2_F32 model = new Se2_F32();
 		DummyTracker tracker = new DummyTracker();
@@ -127,8 +125,7 @@ public class TestImageMotionPointTrackerKey extends BoofStandardJUnit {
 	/**
 	 * See if tracks are pruned after not being in inlier set for X time
 	 */
-	@Test
-	public void testPrune() {
+	@Test void testPrune() {
 		Se2_F32 computed = new Se2_F32(4, 5, 6);
 		Se2_F32 model = new Se2_F32();
 		DummyTracker tracker = new DummyTracker();

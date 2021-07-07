@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -54,9 +54,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Demonstrates how to combine multiple images together into a single view.  A 360 camera was used to generate
- * the two input fisheye images.  Each camera has been calibrated independently and the extrinsics between the two
- * cameras is assume to be known.  Because of how the fisheye image is modeled a mask is required to label pixels
+ * Demonstrates how to combine multiple images together into a single view. A 360 camera was used to generate
+ * the two input fisheye images. Each camera has been calibrated independently and the extrinsics between the two
+ * cameras is assume to be known. Because of how the fisheye image is modeled a mask is required to label pixels
  * outside the FOV that should not be considered.
  *
  * @author Peter Abeles
@@ -64,7 +64,7 @@ import java.util.List;
 public class ExampleFisheyeToEquirectangular {
 
 	/**
-	 * Creates a mask telling the algorithm which pixels are valid and which are not.  The field-of-view (FOV) of the
+	 * Creates a mask telling the algorithm which pixels are valid and which are not. The field-of-view (FOV) of the
 	 * camera is known so we will use that information to do a better job of filtering out invalid pixels than
 	 * it can do alone.
 	 */
@@ -128,7 +128,7 @@ public class ExampleFisheyeToEquirectangular {
 		// Rotate camera axis so that +x is forward and not +z and make it visually pleasing
 		FMatrixRMaj adjR = ConvertRotation3D_F32.eulerToMatrix(EulerType.XYZ, GrlConstants.F_PI/2,0,0,null);
 		// Rotation from the front camera to the back facing camera.
-		// This is only an approximation.  Should be determined through calibration.
+		// This is only an approximation. Should be determined through calibration.
 		FMatrixRMaj f2b = ConvertRotation3D_F32.eulerToMatrix(EulerType.ZYX,GrlConstants.F_PI,0,0,null);
 
 		Se3_F32 frontToFront = new Se3_F32();
@@ -136,7 +136,7 @@ public class ExampleFisheyeToEquirectangular {
 		Se3_F32 frontToBack = new Se3_F32();
 		CommonOps_FDRM.mult(f2b,adjR,frontToBack.R);
 
-		// add the camera and specify which pixels are valid.  These functions precompute the entire transform
+		// add the camera and specify which pixels are valid. These functions precompute the entire transform
 		// and can be relatively slow, but generating the equirectangular image should be much faster
 		alg.addCamera(frontToBack,distort0, mask0 );
 		alg.addCamera(frontToFront,distort1, mask1 );

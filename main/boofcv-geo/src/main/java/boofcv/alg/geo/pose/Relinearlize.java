@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -27,10 +27,10 @@ import org.ejml.interfaces.linsol.LinearSolverDense;
 
 /**
  * <p>
- * Used in case 4 of EPnP.  See [1] for details.  This technique appears to not be all that accurate
- * in practice, but better than nothing.  Or maybe there is a bug in the implementation below
- * since even with perfect data it appears to generate large errors.  One possible source
- * of implementation error is that the entire null space is not being used.  More of
+ * Used in case 4 of EPnP. See [1] for details. This technique appears to not be all that accurate
+ * in practice, but better than nothing. Or maybe there is a bug in the implementation below
+ * since even with perfect data it appears to generate large errors. One possible source
+ * of implementation error is that the entire null space is not being used. More of
  * the null space (particularly in the planar case) could be used if more relinearization
  * was run multiple times.
  * </p>
@@ -43,7 +43,7 @@ import org.ejml.interfaces.linsol.LinearSolverDense;
  */
 public class Relinearlize {
 
-	// number of control points.  4 for general 3 for planar
+	// number of control points. 4 for general 3 for planar
 	int numControl;
 
 	// how much of the null space is sued
@@ -105,7 +105,7 @@ public class Relinearlize {
 	 *
 	 * @param L_full Linear constraint matrix
 	 * @param y distances between world control points
-	 * @param betas Estimated betas.  Output.
+	 * @param betas Estimated betas. Output.
 	 */
 	public void process( DMatrixRMaj L_full , DMatrixRMaj y , double betas[] ) {
 

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -37,8 +37,7 @@ public class TestEasyGeneralFeatureDetector extends BoofStandardJUnit {
 
 	GrayU8 image = new GrayU8(width,height);
 
-	@Test
-	public void requiresGradient() {
+	@Test void requiresGradient() {
 		Helper<GrayU8,GrayS16> detector = new Helper<>(true, false);
 		EasyGeneralFeatureDetector<GrayU8,GrayS16> alg =
 				new EasyGeneralFeatureDetector<>(detector, GrayU8.class, GrayS16.class);
@@ -55,8 +54,7 @@ public class TestEasyGeneralFeatureDetector extends BoofStandardJUnit {
 
 	}
 
-	@Test
-	public void requiresHessian() {
+	@Test void requiresHessian() {
 		Helper<GrayU8,GrayS16> detector = new Helper<>(false, true);
 		EasyGeneralFeatureDetector<GrayU8,GrayS16> alg =
 				new EasyGeneralFeatureDetector<>(detector, GrayU8.class, GrayS16.class);
@@ -73,8 +71,7 @@ public class TestEasyGeneralFeatureDetector extends BoofStandardJUnit {
 		assertTrue(detector.excludeIsNull);
 	}
 
-	@Test
-	public void checkExclude() {
+	@Test void checkExclude() {
 		Helper<GrayU8,GrayS16> detector = new Helper<>(true, true);
 		EasyGeneralFeatureDetector<GrayU8,GrayS16> alg =
 				new EasyGeneralFeatureDetector<>(detector, GrayU8.class, GrayS16.class);

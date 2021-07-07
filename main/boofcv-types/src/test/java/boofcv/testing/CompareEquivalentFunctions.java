@@ -173,13 +173,13 @@ public abstract class CompareEquivalentFunctions extends BoofStandardJUnit {
 	protected abstract boolean isEquivalent( Method candidate, Method validation );
 
 	/**
-	 * Creates the set of input parameters for the functions.  Tests on multiple inputs are
+	 * Creates the set of input parameters for the functions. Tests on multiple inputs are
 	 * handled by returning multiple sets of parameters
 	 */
 	protected abstract Object[][] createInputParam( Method candidate, Method validation );
 
 	/**
-	 * Adjusts the input for the validation method.  Allows methods with different parameter
+	 * Adjusts the input for the validation method. Allows methods with different parameter
 	 * sets to be used.
 	 */
 	protected abstract Object[] reformatForValidation( Method m, Object[] targetParam );

@@ -66,24 +66,24 @@ public class CreateQrCodeDocument {
 	protected String _encoding = "AUTO";
 	public QrCode.Mode encoding;
 
-	@Option(name = "-u", aliases = {"--Units"}, usage = "Name of document units.  default: cm")
+	@Option(name = "-u", aliases = {"--Units"}, usage = "Name of document units. default: cm")
 	protected String _unit = Unit.CENTIMETER.abbreviation;
 	public Unit unit;
 
-	@Option(name = "-p", aliases = {"--PaperSize"}, usage = "Size of paper used.  See below for predefined document sizes.  "
-			+ "You can manually specify any size using the following notation. W:H  where W is the width and H is the height.  "
-			+ "Values of W and H is specified with <number><unit abbreviation>, e.g. 6cm or 6, the unit is optional.  If no unit"
+	@Option(name = "-p", aliases = {"--PaperSize"}, usage = "Size of paper used. See below for predefined document sizes. "
+			+ "You can manually specify any size using the following notation. W:H  where W is the width and H is the height. "
+			+ "Values of W and H is specified with <number><unit abbreviation>, e.g. 6cm or 6, the unit is optional. If no unit"
 			+ " are specified the default document units are used.")
 	protected String _paperSize = PaperSize.LETTER.name;
 	public PaperSize paperSize;
 
-	@Option(name = "-w", aliases = {"--MarkerWidth"}, usage = "Width of the QR Code.  In document units.")
+	@Option(name = "-w", aliases = {"--MarkerWidth"}, usage = "Width of the QR Code. In document units.")
 	public float markerWidth = -1;
 
-	@Option(name = "-mw", aliases = {"--ModuleWidth"}, usage = "Specify size of QR Code by its module/cells.  In document units.")
+	@Option(name = "-mw", aliases = {"--ModuleWidth"}, usage = "Specify size of QR Code by its module/cells. In document units.")
 	public float moduleWidth = -1;
 
-	@Option(name = "-s", aliases = {"--Space"}, usage = "Spacing between the fiducials.  In document units.")
+	@Option(name = "-s", aliases = {"--Space"}, usage = "Spacing between the fiducials. In document units.")
 	public float spaceBetween = 2;
 
 	@Option(name = "-o", aliases = {"--OutputName"}, usage = "Name of output file. Extension determines file type. E.g. qrcode.pdf. " +

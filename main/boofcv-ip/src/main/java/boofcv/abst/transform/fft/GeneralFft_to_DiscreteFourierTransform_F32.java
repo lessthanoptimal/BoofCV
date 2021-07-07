@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -78,7 +78,7 @@ public class GeneralFft_to_DiscreteFourierTransform_F32
 
 		alg.complexInverse(workImage.data, true);
 
-		// copy the real portion.  imaginary should be zeros
+		// copy the real portion. imaginary should be zeros
 		int N = image.width*image.height;
 		for (int i = 0; i < N; i++) {
 			image.data[i] = workImage.data[i*2];

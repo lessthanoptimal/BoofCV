@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -48,8 +48,7 @@ public class TestImplPolynomialPixel_I extends GeneralChecksInterpolationPixelS<
     /**
      * Polynomial interpolation of order one is bilinear interpolation
      */
-    @Test
-	public void compareToBilinear() {
+    @Test void compareToBilinear() {
 		GrayU8 img = new GrayU8(width,height);
 		GrayU8 expected = new GrayU8(width,height);
 		GrayU8 found = new GrayU8(width,height);

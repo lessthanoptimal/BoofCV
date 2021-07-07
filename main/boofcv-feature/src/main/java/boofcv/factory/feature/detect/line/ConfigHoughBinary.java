@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -46,7 +46,7 @@ public class ConfigHoughBinary implements Configuration {
 	public ConfigEdgeThreshold thresholdEdge = new ConfigEdgeThreshold();
 
 	/**
-	 * Radius for local maximum suppression.  Try 2.
+	 * Radius for local maximum suppression. Try 2.
 	 */
 	public int localMaxRadius = 1;
 	/**

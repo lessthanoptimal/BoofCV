@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -50,7 +50,7 @@ import java.util.Random;
  */
 /*
  * DESIGN NOTE: 8-bit integer images ({@link GrayU8}) are used instead of images composed of boolean values because
- * there is no performance advantage.  According to the virtual machines specification binary arrays are stored as
+ * there is no performance advantage. According to the virtual machines specification binary arrays are stored as
  * byte arrays with 1 representing true and 0 representing false.
 
  * DESIGN NOTE: Restricting input values to zero and one was tested was compared against defining true as not zero.
@@ -63,7 +63,7 @@ public class BinaryImageOps {
 	 *
 	 * @param inputA First input image. Not modified.
 	 * @param inputB Second input image. Not modified.
-	 * @param output Output image. Can be same as either input.  If null a new instance will be declared, Modified.
+	 * @param output Output image. Can be same as either input. If null a new instance will be declared, Modified.
 	 * @return Output of logical operation.
 	 */
 	public static GrayU8 logicAnd( GrayU8 inputA, GrayU8 inputB, GrayU8 output ) {
@@ -84,7 +84,7 @@ public class BinaryImageOps {
 	 *
 	 * @param inputA First input image. Not modified.
 	 * @param inputB Second input image. Not modified.
-	 * @param output Output image. Can be same as either input.  If null a new instance will be declared, Modified.
+	 * @param output Output image. Can be same as either input. If null a new instance will be declared, Modified.
 	 * @return Output of logical operation.
 	 */
 	public static GrayU8 logicOr( GrayU8 inputA, GrayU8 inputB, GrayU8 output ) {
@@ -105,7 +105,7 @@ public class BinaryImageOps {
 	 *
 	 * @param inputA First input image. Not modified.
 	 * @param inputB Second input image. Not modified.
-	 * @param output Output image. Can be same as either input.  If null a new instance will be declared, Modified.
+	 * @param output Output image. Can be same as either input. If null a new instance will be declared, Modified.
 	 * @return Output of logical operation.
 	 */
 	public static GrayU8 logicXor( GrayU8 inputA, GrayU8 inputB, GrayU8 output ) {
@@ -125,7 +125,7 @@ public class BinaryImageOps {
 	 * Inverts each pixel from true to false and vis-versa.
 	 *
 	 * @param input Input image. Not modified.
-	 * @param output Output image. Can be same as input.  If null a new instance will be declared, Modified.
+	 * @param output Output image. Can be same as input. If null a new instance will be declared, Modified.
 	 * @return Output of logical operation.
 	 */
 	public static GrayU8 invert( GrayU8 input, GrayU8 output ) {
@@ -142,13 +142,13 @@ public class BinaryImageOps {
 
 	/**
 	 * <p>
-	 * Erodes an image according to a 4-neighborhood.  Unless a pixel is connected to all its neighbors its value
+	 * Erodes an image according to a 4-neighborhood. Unless a pixel is connected to all its neighbors its value
 	 * is set to zero.
 	 * </p>
 	 *
 	 * @param input Input image. Not modified.
 	 * @param numTimes How many times the operation will be applied to the image.
-	 * @param output If not null, the output image.  If null a new image is declared and returned.  Modified.
+	 * @param output If not null, the output image. If null a new image is declared and returned. Modified.
 	 * @return Output image.
 	 */
 	public static GrayU8 erode4( GrayU8 input, int numTimes, GrayU8 output ) {
@@ -192,13 +192,13 @@ public class BinaryImageOps {
 
 	/**
 	 * <p>
-	 * Dilates an image according to a 4-neighborhood.  If a pixel is connected to any other pixel then its output
+	 * Dilates an image according to a 4-neighborhood. If a pixel is connected to any other pixel then its output
 	 * value will be one.
 	 * </p>
 	 *
 	 * @param input Input image. Not modified.
 	 * @param numTimes How many times the operation will be applied to the image.
-	 * @param output If not null, the output image.  If null a new image is declared and returned.  Modified.
+	 * @param output If not null, the output image. If null a new image is declared and returned. Modified.
 	 * @return Output image.
 	 */
 	public static GrayU8 dilate4( GrayU8 input, int numTimes, GrayU8 output ) {
@@ -247,7 +247,7 @@ public class BinaryImageOps {
 	 * </p>
 	 *
 	 * @param input Input image. Not modified.
-	 * @param output If not null, the output image.  If null a new image is declared and returned.  Modified.
+	 * @param output If not null, the output image. If null a new image is declared and returned. Modified.
 	 * @param outsideZero if true then pixels outside the image are treated as zero, otherwise one
 	 * @return Output image.
 	 */
@@ -266,13 +266,13 @@ public class BinaryImageOps {
 
 	/**
 	 * <p>
-	 * Erodes an image according to a 8-neighborhood.  Unless a pixel is connected to all its neighbors its value
+	 * Erodes an image according to a 8-neighborhood. Unless a pixel is connected to all its neighbors its value
 	 * is set to zero.
 	 * </p>
 	 *
 	 * @param input Input image. Not modified.
 	 * @param numTimes How many times the operation will be applied to the image.
-	 * @param output If not null, the output image.  If null a new image is declared and returned.  Modified.
+	 * @param output If not null, the output image. If null a new image is declared and returned. Modified.
 	 * @return Output image.
 	 */
 	public static GrayU8 erode8( GrayU8 input, int numTimes, GrayU8 output ) {
@@ -312,13 +312,13 @@ public class BinaryImageOps {
 
 	/**
 	 * <p>
-	 * Dilates an image according to a 8-neighborhood.  If a pixel is connected to any other pixel then its output
+	 * Dilates an image according to a 8-neighborhood. If a pixel is connected to any other pixel then its output
 	 * value will be one.
 	 * </p>
 	 *
 	 * @param input Input image. Not modified.
 	 * @param numTimes How many times the operation will be applied to the image.
-	 * @param output If not null, the output image.  If null a new image is declared and returned.  Modified.
+	 * @param output If not null, the output image. If null a new image is declared and returned. Modified.
 	 * @return Output image.
 	 */
 	public static GrayU8 dilate8( GrayU8 input, int numTimes, GrayU8 output ) {
@@ -367,7 +367,7 @@ public class BinaryImageOps {
 	 * </p>
 	 *
 	 * @param input Input image. Not modified.
-	 * @param output If not null, the output image.  If null a new image is declared and returned.  Modified.
+	 * @param output If not null, the output image. If null a new image is declared and returned. Modified.
 	 * @param outsideZero if true then pixels outside the image are treated as zero, otherwise one
 	 * @return Output image.
 	 */
@@ -385,12 +385,12 @@ public class BinaryImageOps {
 	}
 
 	/**
-	 * Binary operation which is designed to remove small bits of spurious noise.  An 8-neighborhood is used.
-	 * If a pixel is connected to less than 2 neighbors then its value zero.  If connected to more than 6 then
-	 * its value is one.  Otherwise it retains its original value.
+	 * Binary operation which is designed to remove small bits of spurious noise. An 8-neighborhood is used.
+	 * If a pixel is connected to less than 2 neighbors then its value zero. If connected to more than 6 then
+	 * its value is one. Otherwise it retains its original value.
 	 *
 	 * @param input Input image. Not modified.
-	 * @param output If not null, the output image.  If null a new image is declared and returned.  Modified.
+	 * @param output If not null, the output image. If null a new image is declared and returned. Modified.
 	 * @return Output image.
 	 */
 	public static GrayU8 removePointNoise( GrayU8 input, GrayU8 output ) {
@@ -407,11 +407,11 @@ public class BinaryImageOps {
 	}
 
 	/**
-	 * Applies a morphological thinning operation to the image.  Also known as skeletonization.
+	 * Applies a morphological thinning operation to the image. Also known as skeletonization.
 	 *
-	 * @param input Input image.  Not modified.
-	 * @param maxIterations Maximum number of cycles it will thin for.  -1 for the maximum required
-	 * @param output If not null, the output image.  If null a new image is declared and returned.  Modified.
+	 * @param input Input image. Not modified.
+	 * @param maxIterations Maximum number of cycles it will thin for. -1 for the maximum required
+	 * @param output If not null, the output image. If null a new image is declared and returned. Modified.
 	 * @return Output image.
 	 * @see BinaryThinning
 	 */
@@ -430,21 +430,21 @@ public class BinaryImageOps {
 	/**
 	 * <p>
 	 * Given a binary image, connect together pixels to form blobs/clusters using the specified connectivity rule.
-	 * The found blobs will be labeled in an output image and also described as a set of contours.  Pixels
+	 * The found blobs will be labeled in an output image and also described as a set of contours. Pixels
 	 * in the contours are consecutive order in a clockwise or counter-clockwise direction, depending on the
-	 * implementation.  The labeled image will assign background pixels a label of 0 and each blob will be
+	 * implementation. The labeled image will assign background pixels a label of 0 and each blob will be
 	 * assigned a unique ID starting from 1.
 	 * </p>
 	 *
 	 * <p>
-	 * The returned contours are traces of the object.  The trace of an object can be found by marking a point
-	 * with a pen and then marking every point on the contour without removing the pen.  It is possible to have
+	 * The returned contours are traces of the object. The trace of an object can be found by marking a point
+	 * with a pen and then marking every point on the contour without removing the pen. It is possible to have
 	 * the same point multiple times in the contour.
 	 * </p>
 	 *
-	 * @param input Input binary image.  Not modified.
-	 * @param rule Connectivity rule.  Can be 4 or 8.  8 is more commonly used.
-	 * @param output (Optional) Output labeled image. If null, an image will be declared internally.  Modified.
+	 * @param input Input binary image. Not modified.
+	 * @param rule Connectivity rule. Can be 4 or 8. 8 is more commonly used.
+	 * @param output (Optional) Output labeled image. If null, an image will be declared internally. Modified.
 	 * @return List of found contours for each blob.
 	 * @see LinearContourLabelChang2004
 	 */
@@ -465,8 +465,8 @@ public class BinaryImageOps {
 	/**
 	 * Finds the external contours only in the image
 	 *
-	 * @param input Input binary image.  Not modified.
-	 * @param rule Connectivity rule.  Can be 4 or 8.  8 is more commonly used.
+	 * @param input Input binary image. Not modified.
+	 * @param rule Connectivity rule. Can be 4 or 8. 8 is more commonly used.
 	 * @return List of found contours for each blob.
 	 */
 	public static List<Contour> contourExternal( GrayU8 input, ConnectRule rule ) {
@@ -533,7 +533,7 @@ public class BinaryImageOps {
 	 *
 	 * @param labelImage Input image. Not modified.
 	 * @param binaryImage Output image. If null a new one will be declared. Modified.
-	 * @param selectedBlobs Each index corresponds to a blob and specifies if it is included or not.  Expected
+	 * @param selectedBlobs Each index corresponds to a blob and specifies if it is included or not. Expected
 	 * size is the number of found clusters + 1.
 	 * @return The binary image.
 	 */
@@ -551,12 +551,12 @@ public class BinaryImageOps {
 	}
 
 	/**
-	 * Only converts the specified blobs over into the binary image.  Easier to use version of
+	 * Only converts the specified blobs over into the binary image. Easier to use version of
 	 * {@link #labelToBinary(GrayS32, GrayU8, boolean[])}.
 	 *
 	 * @param labelImage Input image. Not modified.
 	 * @param binaryImage Output image. If null a new one will be declared. Modified.
-	 * @param numLabels Number of labels in the image.  This is the number of found clusters + 1.
+	 * @param numLabels Number of labels in the image. This is the number of found clusters + 1.
 	 * @param selected The index of labels which will be marked as 1 in the output binary image.
 	 * @return The binary image.
 	 */
@@ -576,7 +576,7 @@ public class BinaryImageOps {
 	 *
 	 * @param labelImage The labeled image.
 	 * @param numLabels Number of labeled objects inside the image.
-	 * @param queue (Optional) Storage for pixel coordinates.  Improves runtime performance. Can be null.
+	 * @param queue (Optional) Storage for pixel coordinates. Improves runtime performance. Can be null.
 	 * @return List of pixels in each cluster.
 	 */
 	public static List<List<Point2D_I32>> labelToClusters( GrayS32 labelImage,
@@ -632,7 +632,7 @@ public class BinaryImageOps {
 
 	/**
 	 * Several blob rending functions take in an array of colors so that the random blobs can be drawn
-	 * with the same color each time.  This function selects a random color for each blob and returns it
+	 * with the same color each time. This function selects a random color for each blob and returns it
 	 * in an array.
 	 *
 	 * @param numBlobs Number of blobs found.

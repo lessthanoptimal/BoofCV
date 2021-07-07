@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -42,7 +42,7 @@ public class HoughTransformGradient_MT<D extends ImageGray<D>>
 	/**
 	 * Specifies parameters of transform.
 	 *
-	 * @param extractor Extracts local maxima from transform space.  A set of candidates is provided, but can be ignored.
+	 * @param extractor Extracts local maxima from transform space. A set of candidates is provided, but can be ignored.
 	 */
 	public HoughTransformGradient_MT( NonMaxSuppression extractor, HoughTransformParameters parameters, Class<D> derivType ) {
 		super(extractor, parameters, derivType);

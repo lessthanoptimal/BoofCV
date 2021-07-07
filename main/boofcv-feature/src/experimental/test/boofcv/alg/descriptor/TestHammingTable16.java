@@ -27,8 +27,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
  */
 public class TestHammingTable16 {
 
-	@Test
-	public void exhaustive() {
+	@Test void exhaustive() {
 		HammingTable16 alg = new HammingTable16();
 
 		for( int i = 0; i < 256; i++ ) {

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -32,8 +32,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
  * @author Peter Abeles
  */
 public class TestKeyPointsCircleHexagonalGrid extends BoofStandardJUnit {
-	@Test
-	public void all() {
+	@Test void all() {
 		all(3,3);
 		all(4,4);
 		all(4,5);
@@ -65,8 +64,7 @@ public class TestKeyPointsCircleHexagonalGrid extends BoofStandardJUnit {
 		}
 	}
 
-	@Test
-	public void horizontal() {
+	@Test void horizontal() {
 		horizontal(4,5);
 		horizontal(5,5);
 		horizontal(5,4);
@@ -100,8 +98,7 @@ public class TestKeyPointsCircleHexagonalGrid extends BoofStandardJUnit {
 		}
 	}
 
-	@Test
-	public void vertical() {
+	@Test void vertical() {
 		vertical(4,5);
 		vertical(5,5);
 		vertical(5,4);
@@ -135,8 +132,7 @@ public class TestKeyPointsCircleHexagonalGrid extends BoofStandardJUnit {
 		}
 	}
 
-	@Test
-	public void diagonalLR() {
+	@Test void diagonalLR() {
 		diagonalLR(4,5);
 		diagonalLR(5,5);
 		diagonalLR(5,4);
@@ -172,8 +168,7 @@ public class TestKeyPointsCircleHexagonalGrid extends BoofStandardJUnit {
 		}
 	}
 
-	@Test
-	public void diagonalRL() {
+	@Test void diagonalRL() {
 		diagonalRL(4,5);
 		diagonalRL(5,5);
 		diagonalRL(5,4);
@@ -209,8 +204,7 @@ public class TestKeyPointsCircleHexagonalGrid extends BoofStandardJUnit {
 		}
 	}
 
-	@Test
-	public void computeEllipseCenters() {
+	@Test void computeEllipseCenters() {
 		KeyPointsCircleHexagonalGrid alg = new KeyPointsCircleHexagonalGrid();
 
 		Tangents t = alg.tangents.grow();

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -29,8 +29,7 @@ import static org.junit.jupiter.api.Assertions.assertSame;
  */
 public class TestSquareGrid  extends BoofStandardJUnit {
 
-	@Test
-	public void get() {
+	@Test void get() {
 		SquareGrid grid = TestSquareGridTools.createGrid(3,4);
 
 		assertSame(grid.nodes.get(0), grid.get(0, 0));
@@ -41,8 +40,7 @@ public class TestSquareGrid  extends BoofStandardJUnit {
 
 	}
 
-	@Test
-	public void getCornerByIndex() {
+	@Test void getCornerByIndex() {
 		SquareGrid grid = TestSquareGridTools.createGrid(3,4);
 
 		assertSame(grid.get(0, 0), grid.getCornerByIndex(0));
@@ -51,8 +49,7 @@ public class TestSquareGrid  extends BoofStandardJUnit {
 		assertSame(grid.get(2, 0), grid.getCornerByIndex(3));
 	}
 
-	@Test
-	public void getCornerIndex() {
+	@Test void getCornerIndex() {
 		SquareGrid grid = TestSquareGridTools.createGrid(3,4);
 
 		assertEquals(grid.getCornerIndex(grid.get(0, 0)), 0);

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -114,7 +114,7 @@ public class DenoiseVisualizeApp<T extends ImageGray<T>, D extends ImageGray<D>,
 		waveletList.add(FactoryWaveletCoiflet.generate_F32(6));
 		info.addWaveletName("Haar");
 		waveletList.add(FactoryWaveletHaar.generate(false, 32));
-		// todo something is clearly wrong with biorthogonal.  comment out so it doesn't appear in the applet
+		// todo something is clearly wrong with biorthogonal. comment out so it doesn't appear in the applet
 //		info.addWaveletName("Biorthogonal 5");
 //		waveletList.add(FactoryWaveletDaub.biorthogonal_F32(5, BorderType.WRAP));
 		waveletDesc = waveletList.get(0);

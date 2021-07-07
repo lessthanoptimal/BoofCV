@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -32,9 +32,9 @@ import org.jetbrains.annotations.Nullable;
 import java.util.List;
 
 /**
- * Implementation of canny edge detector.  The canny edge detector detects the edges of objects
- * using a hysteresis threshold.  When scanning the image pixels with edge intensities below
- * the high threshold are ignored.  After a pixel is found that exceeds the high threshold any
+ * Implementation of canny edge detector. The canny edge detector detects the edges of objects
+ * using a hysteresis threshold. When scanning the image pixels with edge intensities below
+ * the high threshold are ignored. After a pixel is found that exceeds the high threshold any
  * pixel that is connect to it directly or indirectly just needs to exceed the low threshold.
  *
  * The output from this class can be configured to output a binary edge image and/or a set of contours
@@ -97,7 +97,7 @@ public class CannyEdge<T extends ImageGray<T>, D extends ImageGray<D>> {
 
 	/**
 	 * <p>
-	 * Runs a canny edge detector on the input image given the provided thresholds.  If configured to save
+	 * Runs a canny edge detector on the input image given the provided thresholds. If configured to save
 	 * a list of trace points then the output image is optional.
 	 * </p>
 	 * <p>
@@ -107,7 +107,7 @@ public class CannyEdge<T extends ImageGray<T>, D extends ImageGray<D>> {
 	 * @param input Input image. Not modified.
 	 * @param threshLow Lower threshold. &ge; 0.
 	 * @param threshHigh Upper threshold. &ge; 0.
-	 * @param output (Might be option) Output binary image.  Edge pixels are marked with 1 and everything else 0.
+	 * @param output (Might be option) Output binary image. Edge pixels are marked with 1 and everything else 0.
 	 */
 	public void process( T input, float threshLow, float threshHigh, @Nullable GrayU8 output ) {
 		if (output != null)

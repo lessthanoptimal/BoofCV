@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -49,8 +49,7 @@ public class TestStereoVisualOdometryScaleInput extends BoofStandardJUnit {
 	boolean result;
 	boolean resetCalled = false;
 
-	@Test
-	public void setCalibration() {
+	@Test void setCalibration() {
 		StereoParameters p = createStereoParam();
 		Dummy dummy = new Dummy();
 
@@ -63,8 +62,7 @@ public class TestStereoVisualOdometryScaleInput extends BoofStandardJUnit {
 		assertEquals(160, parameters.right.height);
 	}
 
-	@Test
-	public void process() {
+	@Test void process() {
 		StereoParameters p = createStereoParam();
 		Dummy dummy = new Dummy();
 
@@ -85,8 +83,7 @@ public class TestStereoVisualOdometryScaleInput extends BoofStandardJUnit {
 		assertEquals(160, rightImage.height);
 	}
 
-	@Test
-	public void getImageType() {
+	@Test void getImageType() {
 		Dummy dummy = new Dummy();
 
 		StereoVisualOdometryScaleInput<GrayF32> alg = new StereoVisualOdometryScaleInput<>(dummy, 0.5);

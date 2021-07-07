@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -39,8 +39,7 @@ public abstract class ChecksGenericPointsToPolyline extends BoofStandardJUnit {
 	/**
 	 * Makes sure that the default values as specified in JavaDoc is true
 	 */
-	@Test
-	public void checkDefaults() {
+	@Test void checkDefaults() {
 		PointsToPolyline alg = createAlg(true);
 
 		assertEquals(3,alg.getMinimumSides());
@@ -59,8 +58,7 @@ public abstract class ChecksGenericPointsToPolyline extends BoofStandardJUnit {
 	/**
 	 * Checks to see if this feature can be changed and is enforced
 	 */
-	@Test
-	public void checkMinVertexes_loop() {
+	@Test void checkMinVertexes_loop() {
 		PointsToPolyline alg = createAlg(true);
 		alg.setConvex(false);
 		alg.setMinimumSides(10);
@@ -85,8 +83,7 @@ public abstract class ChecksGenericPointsToPolyline extends BoofStandardJUnit {
 	/**
 	 * Checks to see if this feature can be changed and is enforced
 	 */
-	@Test
-	public void checkMinVertexes_sequence() {
+	@Test void checkMinVertexes_sequence() {
 		PointsToPolyline alg = createAlg(false);
 		alg.setConvex(false);
 		alg.setMinimumSides(10);
@@ -110,8 +107,7 @@ public abstract class ChecksGenericPointsToPolyline extends BoofStandardJUnit {
 	/**
 	 * Checks to see if this feature can be changed and is enforced
 	 */
-	@Test
-	public void checkMaxVertexes_loop() {
+	@Test void checkMaxVertexes_loop() {
 		PointsToPolyline alg = createAlg(true);
 		alg.setMaximumSides(3);
 
@@ -129,8 +125,7 @@ public abstract class ChecksGenericPointsToPolyline extends BoofStandardJUnit {
 	/**
 	 * Checks to see if this feature can be changed and is enforced
 	 */
-	@Test
-	public void checkIsConvex() {
+	@Test void checkIsConvex() {
 		PointsToPolyline alg = createAlg(true);
 		alg.setConvex(true);
 

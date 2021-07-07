@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -26,9 +26,8 @@ import org.junit.jupiter.api.Test;
  */
 public class TestGrayImageOps extends BoofStandardJUnit {
 
-	@Test
-	public void comment() {
-		// this is intentionally left blank.  The operations are already tested at the
+	@Test void comment() {
+		// this is intentionally left blank. The operations are already tested at the
 		// implementation
 		// If better tests are needed do the following:
 		// 1) Test to see if the output is declared correctly

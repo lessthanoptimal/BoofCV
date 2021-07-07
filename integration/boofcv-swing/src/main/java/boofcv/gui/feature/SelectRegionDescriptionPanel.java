@@ -31,8 +31,8 @@ import java.awt.event.MouseMotionListener;
 import java.awt.image.BufferedImage;
 
 /**
- * Allows the user to select a point, its size, and orientation.  First the user clicks on a point
- * then drags the mouse out.  The distance away from the first point is the size and the vector
+ * Allows the user to select a point, its size, and orientation. First the user clicks on a point
+ * then drags the mouse out. The distance away from the first point is the size and the vector
  * is its orientation.
  *
  * @author Peter Abeles

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -24,7 +24,7 @@ import boofcv.struct.image.ImageType;
 import boofcv.struct.image.Planar;
 
 /**
- * Implementation of {@link ConvolveDown} for {@link Planar} images.  Uses an implementation for {@link ImageGray}
+ * Implementation of {@link ConvolveDown} for {@link Planar} images. Uses an implementation for {@link ImageGray}
  * to apply the down convolution.
  *
  * @author Peter Abeles

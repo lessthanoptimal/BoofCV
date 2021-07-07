@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -25,7 +25,7 @@ import georegression.struct.point.Point2D_F32;
 import org.ejml.UtilEjml;
 
 /**
- * Precomputes transformations for each pixel in the image.  Doesn't check bounds and will give an incorrect result
+ * Precomputes transformations for each pixel in the image. Doesn't check bounds and will give an incorrect result
  * or crash if outside pixels are requested.
  *
  * @author Peter Abeles

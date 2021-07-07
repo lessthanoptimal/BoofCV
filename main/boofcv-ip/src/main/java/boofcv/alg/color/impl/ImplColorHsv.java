@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -95,7 +95,7 @@ public class ImplColorHsv {
 	}
 
 	/**
-	 * Converts an image from RGB into HSV.  Pixels must have a value within the range of [0,1].
+	 * Converts an image from RGB into HSV. Pixels must have a value within the range of [0,1].
 	 *
 	 * @param rgb (Input) Image in RGB format
 	 * @param hsv (Output) Image in HSV format

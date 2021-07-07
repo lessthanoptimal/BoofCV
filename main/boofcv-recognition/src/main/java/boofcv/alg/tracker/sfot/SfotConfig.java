@@ -53,7 +53,7 @@ public class SfotConfig implements Configuration {
 	public double maximumErrorFB = 10;
 
 	/**
-	 * Basic parameters for tracker.  KltConfig.createDefault() with maxIterations = 50 is suggested.
+	 * Basic parameters for tracker. KltConfig.createDefault() with maxIterations = 50 is suggested.
 	 */
 	public final ConfigKlt trackerConfig;
 

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -37,18 +37,18 @@ import java.util.List;
 
 /**
  * <p>
- * Finds the essential matrix given exactly 5 corresponding points.  The approach is described
- * in details in [1] and works by linearlizing the problem then solving for the roots in a polynomial.  It
+ * Finds the essential matrix given exactly 5 corresponding points. The approach is described
+ * in details in [1] and works by linearlizing the problem then solving for the roots in a polynomial. It
  * is considered one of the fastest and most stable solutions for the 5-point problem.
  * </p>
  *
  * <p>
- * THIS IMPLEMENTATION DOES NOT CONTAIN ALL THE OPTIMIZATIONS OUTLIED IN [1].  A full implementation is
+ * THIS IMPLEMENTATION DOES NOT CONTAIN ALL THE OPTIMIZATIONS OUTLIED IN [1]. A full implementation is
  * quite involved. Example: SVD instead of the proposed QR factorization.
  * </p>
  *
  * <p>
- * NOTE: This solution could be generalized for an arbitrary number of points.  However, it would complicate
+ * NOTE: This solution could be generalized for an arbitrary number of points. However, it would complicate
  * the algorithm even more and isn't considered to be worth the effort.
  * </p>
  *
@@ -98,7 +98,7 @@ public class EssentialNister5 {
 	 * Computes the essential matrix from point correspondences.
 	 *
 	 * @param points Input: List of points correspondences in normalized image coordinates
-	 * @param solutions Output: Storage for the found solutions.   .
+	 * @param solutions Output: Storage for the found solutions.  .
 	 * @return true for success or false if a fault has been detected
 	 */
 	public boolean process( List<AssociatedPair> points , DogArray<DMatrixRMaj> solutions ) {
@@ -106,7 +106,7 @@ public class EssentialNister5 {
 			throw new IllegalArgumentException("Exactly 5 points are required, not "+points.size());
 		solutions.reset();
 
-		// Computes the 4-vector span which contains E.  See equations 7-9
+		// Computes the 4-vector span which contains E. See equations 7-9
 		computeSpan(points);
 
 		// Construct a linear system based on the 10 constraint equations. See equations 5,6, and 10 .
@@ -119,7 +119,7 @@ public class EssentialNister5 {
 			return false;
 		solver.solve(A2, C);
 
-		// construct the z-polynomial matrix.  Equations 11-14
+		// construct the z-polynomial matrix. Equations 11-14
 		helper.setDeterminantVectors(C);
 		helper.extractPolynomial(poly.getCoefficients());
 
@@ -161,7 +161,7 @@ public class EssentialNister5 {
 			Point2D_F64 a = p.p2;
 			Point2D_F64 b = p.p1;
 
-			// The points are assumed to be in homogeneous coordinates.  This means z = 1
+			// The points are assumed to be in homogeneous coordinates. This means z = 1
 			Q.data[index++] =  a.x*b.x;
 			Q.data[index++] =  a.x*b.y;
 			Q.data[index++] =  a.x;

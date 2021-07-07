@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -31,8 +31,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
  * @author Peter Abeles
  */
 public class TestPixelDistortAffine_F32 extends BoofStandardJUnit {
-	@Test
-	public void constructor_32() {
+	@Test void constructor_32() {
 		Affine2D_F32 a = new Affine2D_F32(1,2,3,4,5,6);
 
 		PixelTransformAffine_F32 alg = new PixelTransformAffine_F32();

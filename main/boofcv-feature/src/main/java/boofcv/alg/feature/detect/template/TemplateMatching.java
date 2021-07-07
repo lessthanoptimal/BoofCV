@@ -82,7 +82,7 @@ public class TemplateMatching<T extends ImageBase<T>> {
 	/**
 	 * Adjust how close to objects can be found to each other
 	 *
-	 * @param radius Distance in pixels.  Try using the template's radius or 2
+	 * @param radius Distance in pixels. Try using the template's radius or 2
 	 */
 	public void setMinimumSeparation(int radius) {
 		extractor.setSearchRadius(radius);
@@ -92,8 +92,8 @@ public class TemplateMatching<T extends ImageBase<T>> {
 	 * Specifies the template to search for and the maximum number of matches to return.
 	 *
 	 * @param template   Template being searched for
-	 * @param mask       Optional mask.  Same size as template.  0 = pixel is transparent, values larger than zero
-	 *                   determine how influential the pixel is.  Can be null.
+	 * @param mask       Optional mask. Same size as template. 0 = pixel is transparent, values larger than zero
+	 *                   determine how influential the pixel is. Can be null.
 	 * @param maxMatches The maximum number of matches it will return
 	 */
 	public void setTemplate(T template, T mask , int maxMatches) {
@@ -176,8 +176,8 @@ public class TemplateMatching<T extends ImageBase<T>> {
 	}
 
 	/**
-	 * Returns all the found matches.  The location is the location of the top left corner
-	 * of the template.  Score is the first score with higher number being better
+	 * Returns all the found matches. The location is the location of the top left corner
+	 * of the template. Score is the first score with higher number being better
 	 *
 	 * @return List of found templates
 	 */

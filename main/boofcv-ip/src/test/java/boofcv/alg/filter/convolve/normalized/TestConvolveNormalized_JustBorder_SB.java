@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -30,8 +30,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
  * @author Peter Abeles
  */
 public class TestConvolveNormalized_JustBorder_SB extends BoofStandardJUnit {
-	@Test
-	public void compareToNaive() {
+	@Test void compareToNaive() {
 		CompareToNaive test = new CompareToNaive();
 		int numFunctions = 20;
 

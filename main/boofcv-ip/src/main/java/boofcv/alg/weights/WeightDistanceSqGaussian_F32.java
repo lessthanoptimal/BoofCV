@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -19,9 +19,9 @@
 package boofcv.alg.weights;
 
 /**
- * The distribution is a cropped Gaussian distribution with mean at 0.  Note
- * that this matches the shape of the distribution but is not correctly normalized.  Input is assumed to be
- * the distance squared.  Does not check to see if distance is less than zero
+ * The distribution is a cropped Gaussian distribution with mean at 0. Note
+ * that this matches the shape of the distribution but is not correctly normalized. Input is assumed to be
+ * the distance squared. Does not check to see if distance is less than zero
  *
  * @author Peter Abeles
  */

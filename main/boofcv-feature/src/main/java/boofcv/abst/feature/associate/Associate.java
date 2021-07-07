@@ -25,11 +25,11 @@ import org.ddogleg.struct.FastAccess;
 
 /**
  * <p>
- * Common interface for associating features between two images.  Found associations are returned in a list of
- * {@link AssociatedIndex} which specifies the index and score of the matching pair.  Implementing classes can
- * optionally ensure that a unique pairing is found from source to destination and/or the reverse.  See
- * functions {@link #uniqueSource()} and {@link #uniqueDestination()}.  Indexes refer to the index in the input
- * list for source and destination lists.  Inputs are not specified in this interface but are specified in a child
+ * Common interface for associating features between two images. Found associations are returned in a list of
+ * {@link AssociatedIndex} which specifies the index and score of the matching pair. Implementing classes can
+ * optionally ensure that a unique pairing is found from source to destination and/or the reverse. See
+ * functions {@link #uniqueSource()} and {@link #uniqueDestination()}. Indexes refer to the index in the input
+ * list for source and destination lists. Inputs are not specified in this interface but are specified in a child
  * interface.
  * </p>
  *
@@ -37,7 +37,7 @@ import org.ddogleg.struct.FastAccess;
  * DESIGN NOTES:<br>
  * <b>Indexes</b> of matching features are used instead of the descriptions because descriptions are often separated
  * from another more complex data structure and the index can be easily matched to that data.<br>
- * <b>Unassociated feature</b> lists can be easily computed using the returned set of associations.  This functionality
+ * <b>Unassociated feature</b> lists can be easily computed using the returned set of associations. This functionality
  * is provided since in some cases it can be computed at virtually no cost during association.<br>
  * </p>
  *
@@ -51,7 +51,7 @@ public interface Associate<Desc> {
 	void associate();
 
 	/**
-	 * List of associated features.  Indexes refer to the index inside the input lists.
+	 * List of associated features. Indexes refer to the index inside the input lists.
 	 *
 	 * @return List of associated features.
 	 */
@@ -60,7 +60,7 @@ public interface Associate<Desc> {
 	/**
 	 * Indexes of features in the source set which are not associated.
 	 *
-	 * WARNING: In some implementations the unassociated list is recomputed each time this function is invoked.  In
+	 * WARNING: In some implementations the unassociated list is recomputed each time this function is invoked. In
 	 * other implementations it was found virtually for free while the matches are found.
 	 *
 	 * @return List of unassociated source features by index.
@@ -70,7 +70,7 @@ public interface Associate<Desc> {
 	/**
 	 * Indexes of features in the destination set which are not associated.
 	 *
-	 * WARNING: In some implementations the unassociated list is recomputed each time this function is invoked.  In
+	 * WARNING: In some implementations the unassociated list is recomputed each time this function is invoked. In
 	 * other implementations it was found virtually for free while the matches are found.
 	 *
 	 * @return List of unassociated destination features by index.
@@ -78,7 +78,7 @@ public interface Associate<Desc> {
 	DogArray_I32 getUnassociatedDestination();
 
 	/**
-	 * Associations are only considered if their score is less than or equal to the specified threshold.  To remove
+	 * Associations are only considered if their score is less than or equal to the specified threshold. To remove
 	 * any threshold test set this value to Double.MAX_VALUE
 	 *
 	 * @param score The threshold.

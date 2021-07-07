@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -115,8 +115,7 @@ public abstract class GenericPlanarCalibrationDetectorChecks extends BoofStandar
 	/**
 	 * See if it can detect targets distorted by fisheye lens. Entire target is always seen
 	 */
-	@Test
-	public void fisheye_fullview() {
+	@Test void fisheye_fullview() {
 		CameraUniversalOmni model = CalibrationIO.load(getClass().getResource("fisheye.yaml"));
 		SimulatePlanarWorld simulator = new SimulatePlanarWorld();
 		simulator.setCamera(model);
@@ -225,8 +224,7 @@ public abstract class GenericPlanarCalibrationDetectorChecks extends BoofStandar
 	/**
 	 * Simulated scene using a pinhole camera model with radial distortion. Entire target is visible
 	 */
-	@Test
-	public void pinhole_radial_fullview() {
+	@Test void pinhole_radial_fullview() {
 
 		CameraPinholeBrown model = CalibrationIO.load(getClass().getResource("pinhole_radial.yaml"));
 		SimulatePlanarWorld simulator = new SimulatePlanarWorld();
@@ -299,10 +297,9 @@ public abstract class GenericPlanarCalibrationDetectorChecks extends BoofStandar
 	}
 
 	/**
-	 * Nothing was detected.  make sure it doesn't return null.
+	 * Nothing was detected. make sure it doesn't return null.
 	 */
-	@Test
-	public void checkDetectionsNonnull() {
+	@Test void checkDetectionsNonnull() {
 		for (ConfigGridDimen layout : targetConfigs) {
 			DetectorFiducialCalibration detector = createDetector(layout);
 
@@ -314,10 +311,9 @@ public abstract class GenericPlanarCalibrationDetectorChecks extends BoofStandar
 	}
 
 	/**
-	 * First call something was detected, second call nothing was detected.  it should return an empty list
+	 * First call something was detected, second call nothing was detected. it should return an empty list
 	 */
-	@Test
-	public void checkDetectionsResetOnFailure() {
+	@Test void checkDetectionsResetOnFailure() {
 		DetectorFiducialCalibration detector = createDetector(targetConfigs.get(0));
 
 		GrayF32 original = renderEasy(targetConfigs.get(0), null);
@@ -332,14 +328,13 @@ public abstract class GenericPlanarCalibrationDetectorChecks extends BoofStandar
 	}
 
 	/**
-	 * Makes sure origin in the target's physical center.  This is done by seeing that most extreme
-	 * points are all equally distant.  Can't use the mean since the target might not evenly distributed.
+	 * Makes sure origin in the target's physical center. This is done by seeing that most extreme
+	 * points are all equally distant. Can't use the mean since the target might not evenly distributed.
 	 *
 	 * Should this really be a requirement?  There is some mathematical justification for it and make sense
 	 * when using it as a fiducial.
 	 */
-	@Test
-	public void targetIsCentered() {
+	@Test void targetIsCentered() {
 		List<Point2D_F64> layout = createDetector(targetConfigs.get(0)).getLayout();
 
 		double minX = Double.MAX_VALUE, maxX = -Double.MAX_VALUE;
@@ -363,8 +358,7 @@ public abstract class GenericPlanarCalibrationDetectorChecks extends BoofStandar
 	/**
 	 * Make sure new instances of calibration points are returned each time
 	 */
-	@Test
-	public void dataNotRecycled() {
+	@Test void dataNotRecycled() {
 		for (ConfigGridDimen layout : targetConfigs) {
 			DetectorFiducialCalibration detector = createDetector(layout);
 
@@ -391,8 +385,7 @@ public abstract class GenericPlanarCalibrationDetectorChecks extends BoofStandar
 	/**
 	 * Observations points should always be in increasing order
 	 */
-	@Test
-	public void checkPointIndexIncreasingOrder() {
+	@Test void checkPointIndexIncreasingOrder() {
 		for (ConfigGridDimen layout : targetConfigs) {
 			DetectorFiducialCalibration detector = createDetector(layout);
 

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -48,12 +48,12 @@ public class ExampleImageConvert {
 	BufferedImage image;
 	// gray scale image with element values from 0 to 255
 	GrayU8 gray;
-	// Derivative of gray image.  Elements are 16-bit signed integers
+	// Derivative of gray image. Elements are 16-bit signed integers
 	GrayS16 derivX, derivY;
 
 	void convert() {
-		// Converting between BoofCV image types is easy with ConvertImage.  ConvertImage copies
-		// the value of a pixel in one image into another image.  When doing so you need to take
+		// Converting between BoofCV image types is easy with ConvertImage. ConvertImage copies
+		// the value of a pixel in one image into another image. When doing so you need to take
 		// in account the storage capabilities of these different class types.
 
 		// Going from an unsigned 8-bit image to unsigned 16-bit image is no problem

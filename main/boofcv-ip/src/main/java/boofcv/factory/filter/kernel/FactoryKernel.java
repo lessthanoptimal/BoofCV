@@ -29,7 +29,7 @@ import java.util.Random;
 /**
  * <p>
  * Factory used to create standard convolution kernels for floating point and
- * integer images.  The size of a kernel is specified by its radius.  The number of elements in a kernel
+ * integer images. The size of a kernel is specified by its radius. The number of elements in a kernel
  * (or its width) is equal to 2*radius+1.
  * </p>
  * <p/>
@@ -116,7 +116,7 @@ public class FactoryKernel {
 
 	/**
 	 * <p>
-	 * Create an integer table convolution kernel.  All the elements are equal to one.
+	 * Create an integer table convolution kernel. All the elements are equal to one.
 	 * </p>
 	 *
 	 * <p>
@@ -148,7 +148,7 @@ public class FactoryKernel {
 
 	/**
 	 * <p>
-	 * Create an floating point table convolution kernel.  If un-normalized then all
+	 * Create an floating point table convolution kernel. If un-normalized then all
 	 * the elements are equal to one, otherwise they are equal to one over the width.
 	 * </p>
 	 *

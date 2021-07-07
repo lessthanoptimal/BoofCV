@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -36,16 +36,14 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 	ImageType[] types = new ImageType[]{ImageType.single(GrayF32.class), ImageType.pl(3, GrayF32.class)};
 
-	@Test
-	public void massage_clipped() {
+	@Test void massage_clipped() {
 		for (ImageType type : types) {
 			massage_written_to(true, type);
 			massage_distorted(true, type);
 		}
 	}
 
-	@Test
-	public void massage_scaled() {
+	@Test void massage_scaled() {
 		for (ImageType type : types) {
 			massage_written_to(false, type);
 			massage_distorted(false, type);
@@ -73,8 +71,8 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 	}
 
 	/**
-	 * fill the center of the image with a single color.  If clipped correctly the output should be that color
-	 * entirely.  If not only the center
+	 * fill the center of the image with a single color. If clipped correctly the output should be that color
+	 * entirely. If not only the center
 	 */
 	private void massage_distorted( boolean clipped, ImageType type ) {
 		ImageBase input = type.createImage(40, 30);
@@ -97,8 +95,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 		}
 	}
 
-	@Test
-	public void clipInput() {
+	@Test void clipInput() {
 		for (ImageType type : types) {
 			clipInput(type, 30, 40, 50, 30);
 			clipInput(type, 50, 30, 30, 40);

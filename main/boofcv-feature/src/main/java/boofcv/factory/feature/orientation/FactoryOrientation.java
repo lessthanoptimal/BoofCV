@@ -73,7 +73,7 @@ public class FactoryOrientation {
 	/**
 	 * Creates an implementation of the SIFT orientation estimation algorithm
 	 *
-	 * @param configSS Configuration of the scale-space.  null for default
+	 * @param configSS Configuration of the scale-space. null for default
 	 * @param configOri Orientation configuration. null for default
 	 * @param imageType Type of input image
 	 * @return SIFT orientation image

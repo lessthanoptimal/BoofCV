@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -42,10 +42,9 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  */
 public class TestNarrowToWidePtoP_F64 extends BoofStandardJUnit {
 	/**
-	 * With no translation request a point in the center.  Should appear to be in the center in both views.
+	 * With no translation request a point in the center. Should appear to be in the center in both views.
 	 */
-	@Test
-	public void centerIsCenter() {
+	@Test void centerIsCenter() {
 		NarrowToWidePtoP_F64 alg = createAlg();
 
 		Point2D_F64 found = new Point2D_F64();
@@ -58,8 +57,7 @@ public class TestNarrowToWidePtoP_F64 extends BoofStandardJUnit {
 	/**
 	 * Rotate the camera and see if the point moves in the expected way
 	 */
-	@Test
-	public void rotateCamera() {
+	@Test void rotateCamera() {
 		NarrowToWidePtoP_F64 alg = createAlg();
 		Point2D_F64 found = new Point2D_F64();
 
@@ -87,8 +85,7 @@ public class TestNarrowToWidePtoP_F64 extends BoofStandardJUnit {
 	/**
 	 * Request points at the border and see if it has the expected vertical and horizontal FOV
 	 */
-	@Test
-	public void checkFOVBounds() {
+	@Test void checkFOVBounds() {
 		NarrowToWidePtoP_F64 alg = createAlg();
 
 		Point2D_F64 foundA = new Point2D_F64();

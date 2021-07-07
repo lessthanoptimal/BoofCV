@@ -36,8 +36,8 @@ public class ConfigBackgroundGmm extends BaseConfigBackground {
 	public float learningPeriod = 1000f;
 
 	/**
-	 * The initial variance assigned to a new pixel.  Larger values to reduce false positives due to
-	 * under sampling.  Don't set to zero since that can cause divided by zero errors.
+	 * The initial variance assigned to a new pixel. Larger values to reduce false positives due to
+	 * under sampling. Don't set to zero since that can cause divided by zero errors.
 	 */
 	public float initialVariance = 400;
 

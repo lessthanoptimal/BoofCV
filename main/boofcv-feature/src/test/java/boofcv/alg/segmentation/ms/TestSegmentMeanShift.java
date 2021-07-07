@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -36,8 +36,7 @@ public class TestSegmentMeanShift extends BoofStandardJUnit {
 
 	GrayS32 output = new GrayS32(10,15);
 
-	@Test
-	public void uniformRegion() {
+	@Test void uniformRegion() {
 		GrayU8 image = new GrayU8(10,15);
 		ImageMiscOps.fill(image,10);
 
@@ -60,8 +59,7 @@ public class TestSegmentMeanShift extends BoofStandardJUnit {
 		assertEquals(10*15,alg.getRegionSize().get(0));
 	}
 
-	@Test
-	public void obviousSplit() {
+	@Test void obviousSplit() {
 		GrayU8 image = new GrayU8(10,15);
 		ImageMiscOps.fill(image,10);
 		ImageMiscOps.fill(image.subimage(0,0,4,15,null),25);

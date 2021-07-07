@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -34,8 +34,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  */
 public class TestDenseFlowPyramidBase extends BoofStandardJUnit {
 
-	@Test
-	public void interpolateFlow() {
+	@Test void interpolateFlow() {
 		Dummy alg = new Dummy(0.75,1,20);
 
 		GrayF32 input = new GrayF32(5,7);
@@ -45,14 +44,13 @@ public class TestDenseFlowPyramidBase extends BoofStandardJUnit {
 
 		alg.interpolateFlowScale(input, output);
 
-		// there should be no zero values.  This is a very crude test
+		// there should be no zero values. This is a very crude test
 		for( int i = 0; i < output.data.length; i++ ) {
 			assertTrue( output.data[i] != 0 );
 		}
 	}
 
-	@Test
-	public void imageNormalization() {
+	@Test void imageNormalization() {
 		GrayF32 input1 = new GrayF32(5,7);
 		GrayF32 input2 = new GrayF32(5,7);
 

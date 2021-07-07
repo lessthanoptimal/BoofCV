@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -24,7 +24,7 @@ import boofcv.struct.image.ImageType;
 
 
 /**
- * Abstract interface for computing image derivatives.  The default mechanism for handling image borders is
+ * Abstract interface for computing image derivatives. The default mechanism for handling image borders is
  * {@link BorderType#EXTENDED}.
  *
  * @author Peter Abeles
@@ -32,7 +32,7 @@ import boofcv.struct.image.ImageType;
 public interface ImageDerivative<T extends ImageBase<T>, D extends ImageBase<D>> {
 
 	/**
-	 * Overrides using {@link BorderType#EXTENDED} along the image border.  Don't change this behavior unless
+	 * Overrides using {@link BorderType#EXTENDED} along the image border. Don't change this behavior unless
 	 * you know what you're doing.
 	 *
 	 * @param type Specify image border behavior

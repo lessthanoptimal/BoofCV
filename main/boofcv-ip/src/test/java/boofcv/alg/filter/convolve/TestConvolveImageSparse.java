@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -41,8 +41,7 @@ public class TestConvolveImageSparse extends BoofStandardJUnit {
 	int height = 30;
 	int numExpected = 2;
 
-	@Test
-	public void testHorizontal() throws InvocationTargetException, NoSuchMethodException, IllegalAccessException {
+	@Test void testHorizontal() throws InvocationTargetException, NoSuchMethodException, IllegalAccessException {
 		int numFound = 0;
 
 		Method methods[] = ConvolveImageSparse.class.getMethods();
@@ -58,8 +57,7 @@ public class TestConvolveImageSparse extends BoofStandardJUnit {
 		assertEquals(numExpected,numFound);
 	}
 
-	@Test
-	public void testVertical() throws InvocationTargetException, NoSuchMethodException, IllegalAccessException {
+	@Test void testVertical() throws InvocationTargetException, NoSuchMethodException, IllegalAccessException {
 		int numFound = 0;
 
 		Method methods[] = ConvolveImageSparse.class.getMethods();
@@ -75,8 +73,7 @@ public class TestConvolveImageSparse extends BoofStandardJUnit {
 		assertEquals(numExpected,numFound);
 	}
 
-	@Test
-	public void testConvolve() throws InvocationTargetException, NoSuchMethodException, IllegalAccessException {
+	@Test void testConvolve() throws InvocationTargetException, NoSuchMethodException, IllegalAccessException {
 		int numFound = 0;
 
 		Method methods[] = ConvolveImageSparse.class.getMethods();

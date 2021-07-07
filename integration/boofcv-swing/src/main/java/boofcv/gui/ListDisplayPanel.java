@@ -100,7 +100,7 @@ public class ListDisplayPanel extends JPanel implements ListSelectionListener {
 	 * Displays a new image in the list.
 	 *
 	 * @param image The image being displayed
-	 * @param name Name of the image.  Shown in the list.
+	 * @param name Name of the image. Shown in the list.
 	 */
 	public void addImage( BufferedImage image, String name ) {
 		addImage(image, name, ScaleOptions.DOWN);
@@ -119,7 +119,7 @@ public class ListDisplayPanel extends JPanel implements ListSelectionListener {
 	 * Displays a new JPanel in the list.
 	 *
 	 * @param panel The panel being displayed
-	 * @param name Name of the image.  Shown in the list.
+	 * @param name Name of the image. Shown in the list.
 	 */
 	public synchronized void addItem( final JComponent panel, final String name ) {
 

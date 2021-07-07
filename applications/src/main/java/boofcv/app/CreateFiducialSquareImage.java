@@ -83,7 +83,7 @@ public class CreateFiducialSquareImage extends BaseFiducialSquareBorder {
 		GrayU8 image = UtilImageIO.loadImage(imagePaths.get(patternID), GrayU8.class);
 
 		if (image == null) {
-			System.err.println("Can't read image.  Path = " + imagePaths.get(patternID));
+			System.err.println("Can't read image. Path = " + imagePaths.get(patternID));
 			System.exit(1);
 		}
 

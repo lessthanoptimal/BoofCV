@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -41,8 +41,7 @@ public class TestVisualDepthOps extends BoofStandardJUnit {
 
 	CameraPinholeBrown param = new CameraPinholeBrown(200, 201, 0, width/2, height/2, width, height).fsetRadial(0, 0);
 
-	@Test
-	public void depthTo3D() {
+	@Test void depthTo3D() {
 
 		GrayU16 depth = new GrayU16(width, height);
 
@@ -59,8 +58,7 @@ public class TestVisualDepthOps extends BoofStandardJUnit {
 		assertEquals(0, compute(600, 420, 50).distance(pts.get(1)), 1e-8);
 	}
 
-	@Test
-	public void depthTo3D_with_rgb() {
+	@Test void depthTo3D_with_rgb() {
 		GrayU16 depth = new GrayU16(width, height);
 
 		depth.set(200, 80, 3400);

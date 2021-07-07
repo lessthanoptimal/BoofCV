@@ -40,8 +40,7 @@ public abstract class CheckRefineFundamental extends EpipolarTestSimulation {
 
 	DMatrixRMaj found = new DMatrixRMaj(3,3);
 
-	@Test
-	public void perfectInput() {
+	@Test void perfectInput() {
 		init(30,false);
 
 		// compute true essential matrix
@@ -59,8 +58,7 @@ public abstract class CheckRefineFundamental extends EpipolarTestSimulation {
 		assertTrue(MatrixFeatures_DDRM.isEquals(E, found, 1e-8));
 	}
 
-	@Test
-	public void incorrectInput() {
+	@Test void incorrectInput() {
 		init(30,false);
 
 		// compute true essential matrix

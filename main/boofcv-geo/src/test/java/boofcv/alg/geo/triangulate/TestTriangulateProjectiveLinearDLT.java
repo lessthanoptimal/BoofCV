@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -36,8 +36,7 @@ public class TestTriangulateProjectiveLinearDLT extends CommonTriangulationCheck
 	 * Create 3 perfect observations and solve for the position. Everything is in metric instead of an arbtirary
 	 * projective frame for ease of testing.
 	 */
-	@Test
-	public void triangulate_metric_N() {
+	@Test void triangulate_metric_N() {
 		createScene();
 
 		TriangulateProjectiveLinearDLT alg = new TriangulateProjectiveLinearDLT();
@@ -58,8 +57,7 @@ public class TestTriangulateProjectiveLinearDLT extends CommonTriangulationCheck
 	/**
 	 * Test case with a true projective situation
 	 */
-	@Test
-	public void triangulate_projective() {
+	@Test void triangulate_projective() {
 		createScene();
 
 		TriangulateProjectiveLinearDLT alg = new TriangulateProjectiveLinearDLT();
@@ -83,8 +81,7 @@ public class TestTriangulateProjectiveLinearDLT extends CommonTriangulationCheck
 	/**
 	 * Add a tinny bit of noise and see if it blows up
 	 */
-	@Test
-	public void triangulate_projective_noise() {
+	@Test void triangulate_projective_noise() {
 		createScene();
 
 		TriangulateProjectiveLinearDLT alg = new TriangulateProjectiveLinearDLT();

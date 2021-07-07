@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -303,7 +303,7 @@ public class ConvertRaster {
 
 	/**
 	 * If a Planar was created from a BufferedImage its colors might not be in the expected order.
-	 * Invoking this function ensures that the image will have the expected ordering.  For images with
+	 * Invoking this function ensures that the image will have the expected ordering. For images with
 	 * 3 bands it will be RGB and for 4 bands it will be ARGB.
 	 */
 	public static <T extends ImageGray<T>>

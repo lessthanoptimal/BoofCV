@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -47,8 +47,7 @@ public class TestShapeFittingOps extends BoofStandardJUnit {
 	/**
 	 * Fit a polygon to a simple rectangle, loop assumed
 	 */
-	@Test
-	public void fitPolygon_loop() {
+	@Test void fitPolygon_loop() {
 		List<Point2D_I32> sequence = createRectangle();
 
 		List<PointIndex_I32> result = ShapeFittingOps.fitPolygon(sequence,true, minSideLength,cornerPenalty);
@@ -60,8 +59,7 @@ public class TestShapeFittingOps extends BoofStandardJUnit {
 	/**
 	 * Fit a polygon to a simple rectangle, not looped
 	 */
-	@Test
-	public void fitPolygon_regular() {
+	@Test void fitPolygon_regular() {
 		List<Point2D_I32> sequence = createRectangle();
 
 		List<PointIndex_I32> result = ShapeFittingOps.fitPolygon(sequence,false, minSideLength,cornerPenalty);
@@ -97,8 +95,7 @@ public class TestShapeFittingOps extends BoofStandardJUnit {
 	/**
 	 * Check the found solution
 	 */
-	@Test
-	public void fitEllipse_F64() {
+	@Test void fitEllipse_F64() {
 		EllipseRotated_F64 rotated = new EllipseRotated_F64(1,2,3,2,-0.05);
 
 		List<Point2D_F64> points = new ArrayList<>();
@@ -128,8 +125,7 @@ public class TestShapeFittingOps extends BoofStandardJUnit {
 	/**
 	 * Request that error be computed
 	 */
-	@Test
-	public void fitEllipse_F64_error() {
+	@Test void fitEllipse_F64_error() {
 		EllipseRotated_F64 rotated = new EllipseRotated_F64(1,2,3,2,-0.05);
 
 		List<Point2D_F64> points = new ArrayList<>();
@@ -163,8 +159,7 @@ public class TestShapeFittingOps extends BoofStandardJUnit {
 	/**
 	 * Checks to see if they produce the same solution
 	 */
-	@Test
-	public void fitEllipse_I32() {
+	@Test void fitEllipse_I32() {
 		EllipseRotated_F64 rotated = new EllipseRotated_F64(1,2,3,2,-0.05);
 
 		List<Point2D_F64> pointsF = new ArrayList<>();
@@ -188,8 +183,7 @@ public class TestShapeFittingOps extends BoofStandardJUnit {
 		assertEquals(expected.phi, found.phi,1e-8);
 	}
 
-	@Test
-	public void averageCircle_I32() {
+	@Test void averageCircle_I32() {
 		List<Point2D_I32> points = new ArrayList<>();
 		points.add( new Point2D_I32(0,0));
 		points.add( new Point2D_I32(10,0));
@@ -225,8 +219,7 @@ public class TestShapeFittingOps extends BoofStandardJUnit {
 		return index == found.index;
 	}
 
-	@Test
-	public void averageCircle_F64() {
+	@Test void averageCircle_F64() {
 		List<Point2D_F64> points = new ArrayList<>();
 		points.add( new Point2D_F64(0,0));
 		points.add( new Point2D_F64(10,0));

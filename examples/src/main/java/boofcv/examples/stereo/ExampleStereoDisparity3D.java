@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -42,7 +42,7 @@ import java.io.File;
 
 /**
  * Expanding upon ExampleStereoDisparity, this example demonstrates how to rescale an image for stereo processing and
- * then compute its 3D point cloud.  Images are often rescaled to improve speed and some times quality.  Creating
+ * then compute its 3D point cloud. Images are often rescaled to improve speed and some times quality. Creating
  * 3D point clouds from disparity images is easy and well documented in the literature, but there are some nuances
  * to it.
  *
@@ -130,7 +130,7 @@ public class ExampleStereoDisparity3D {
 
 		JComponent viewer = computeAndShowCloud(param, rectLeft, rectAlg, disparity);
 
-		// display the results.  Click and drag to change point cloud camera
+		// display the results. Click and drag to change point cloud camera
 		BufferedImage visualized = VisualizeImageData.disparity(disparity, null, disparityRange, 0);
 		ShowImages.showWindow(visualized, "Disparity", true);
 		ShowImages.showWindow(viewer, "Point Cloud", true);

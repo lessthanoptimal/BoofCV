@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -49,8 +49,7 @@ public class TestImplIntegralImageOps extends BoofStandardJUnit {
 	int width = 20;
 	int height = 30;
 
-	@Test
-	public void transform() {
+	@Test void transform() {
 		int numFound = BoofTesting.findMethodThenCall(this,"transform",ImplIntegralImageOps.class,"transform");
 		assertEquals(5, numFound);
 	}
@@ -90,8 +89,7 @@ public class TestImplIntegralImageOps extends BoofStandardJUnit {
 		}
 	}
 
-	@Test
-	public void convolveSparse() {
+	@Test void convolveSparse() {
 		int numFound = BoofTesting.findMethodThenCall(this,"convolveSparse",ImplIntegralImageOps.class,"convolveSparse");
 		assertEquals(4,numFound);
 	}
@@ -124,8 +122,7 @@ public class TestImplIntegralImageOps extends BoofStandardJUnit {
 		assertEquals(e.get(19,29).doubleValue(),found2,1e-4f);
 	}
 
-	@Test
-	public void block_unsafe() {
+	@Test void block_unsafe() {
 		int numFound = BoofTesting.findMethodThenCall(this,"block_unsafe",ImplIntegralImageOps.class,"block_unsafe");
 		assertEquals(4,numFound);
 	}
@@ -146,8 +143,7 @@ public class TestImplIntegralImageOps extends BoofStandardJUnit {
 		assertEquals(12, found0, 1e-4f);
 	}
 
-	@Test
-	public void block_zero() {
+	@Test void block_zero() {
 		int numFound = BoofTesting.findMethodThenCall(this,"block_zero",ImplIntegralImageOps.class,"block_zero");
 		assertEquals(4, numFound);
 	}

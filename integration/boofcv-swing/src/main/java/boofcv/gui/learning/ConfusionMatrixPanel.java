@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -32,7 +32,7 @@ import java.util.List;
 import java.util.Random;
 
 /**
- * Visualizes a confusion matrix.  Each element is assumed to have a value from 0 to 1.0
+ * Visualizes a confusion matrix. Each element is assumed to have a value from 0 to 1.0
  *
  * @author Peter Abeles
  */
@@ -236,7 +236,7 @@ public class ConfusionMatrixPanel extends JPanel {
 
 				g2.fillRect(x0, y0, x1 - x0, y1 - y0);
 
-				// Render numbers inside the squares.  Pick a color so that the number is visible no matter what
+				// Render numbers inside the squares. Pick a color so that the number is visible no matter what
 				// the color of the square is
 				if (showNumbers && (showZeros || value != 0)) {
 					int a = (red + green + blue)/3;
@@ -260,7 +260,7 @@ public class ConfusionMatrixPanel extends JPanel {
 	}
 
 	/**
-	 * Use to sample the panel to see what is being displayed at the location clicked.  All coordinates
+	 * Use to sample the panel to see what is being displayed at the location clicked. All coordinates
 	 * are in panel coordinates.
 	 *
 	 * @param pixelX x-axis in panel coordinates

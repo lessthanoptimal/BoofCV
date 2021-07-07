@@ -44,8 +44,7 @@ public class TestDetectDescribeFusion extends BoofStandardJUnit {
 	/**
 	 * If a feature is not in bounds make sure everything is handled correctly
 	 */
-	@Test
-	public void checkFeatureNotInBounds() {
+	@Test void checkFeatureNotInBounds() {
 
 		InterestPointDetector detector = new DummyDetector();
 		DescribePointRadiusAngle describe = new DummyRegionPoint();
@@ -65,8 +64,7 @@ public class TestDetectDescribeFusion extends BoofStandardJUnit {
 		}
 	}
 
-	@Test
-	public void checkWithOrientation() {
+	@Test void checkWithOrientation() {
 		new GenericTestsDetectDescribePoint(true,true, ImageType.single(GrayF32.class),TupleDesc_F64.class) {
 
 			@Override
@@ -80,8 +78,7 @@ public class TestDetectDescribeFusion extends BoofStandardJUnit {
 		}.allTests();
 	}
 
-	@Test
-	public void checkWithoutOrientation() {
+	@Test void checkWithoutOrientation() {
 
 		new GenericTestsDetectDescribePoint(true,false, ImageType.single(GrayF32.class),TupleDesc_F64.class) {
 			@Override

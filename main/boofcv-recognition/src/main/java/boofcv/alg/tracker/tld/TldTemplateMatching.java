@@ -29,8 +29,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Created {@link NccFeature NCC} templates to describe the target region.  Each template is composed of a 15x15
- * area.  The descriptor is computed by sampling evenly spaced points through out the rectangular region. Confidence
+ * Created {@link NccFeature NCC} templates to describe the target region. Each template is composed of a 15x15
+ * area. The descriptor is computed by sampling evenly spaced points through out the rectangular region. Confidence
  * values are computed based in the distance a point is from the closest positive and negative template.
  *
  * @author Peter Abeles
@@ -93,8 +93,8 @@ public class TldTemplateMatching<T extends ImageGray<T>> {
 	}
 
 	/**
-	 * Adds a descriptor to the positive or negative list.  If it is very similar to an existing one it is not
-	 * added.   Look at code for details
+	 * Adds a descriptor to the positive or negative list. If it is very similar to an existing one it is not
+	 * added.  Look at code for details
 	 *
 	 * @param positive true for positive list and false for negative list
 	 * @param f The feature which is to be added
@@ -168,9 +168,9 @@ public class TldTemplateMatching<T extends ImageGray<T>> {
 
 	/**
 	 * Compute a value which indicates how confident the specified region is to be a member of the positive set.
-	 * The confidence value is from 0 to 1.  1 indicates 100% confidence.
+	 * The confidence value is from 0 to 1. 1 indicates 100% confidence.
 	 *
-	 * Positive and negative templates are used to compute the confidence value.  Only the point in each set
+	 * Positive and negative templates are used to compute the confidence value. Only the point in each set
 	 * which is closest to the specified region are used in the calculation.
 	 *
 	 * @return value from 0 to 1, where higher values are more confident

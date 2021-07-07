@@ -110,7 +110,7 @@ public class LoadFileImageSequence2<T extends ImageBase<T>> implements SimpleIma
 
 	/**
 	 * Loads the next image into a BufferedImage and returns it. The same instance
-	 * or a new instance of a BufferedImage might be returned each time.  Don't rely
+	 * or a new instance of a BufferedImage might be returned each time. Don't rely
 	 * on either behavior being consistent.
 	 */
 	@Override

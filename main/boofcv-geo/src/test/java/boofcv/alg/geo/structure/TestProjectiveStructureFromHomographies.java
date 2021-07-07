@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -42,8 +42,7 @@ public class TestProjectiveStructureFromHomographies extends CommonStructure {
 	/**
 	 * Given perfect input see if it can create camera matrices which will return the original observations
 	 */
-	@Test
-	public void perfect_input() {
+	@Test void perfect_input() {
 		int numViews = 8;
 		int numFeatures = 20;
 		simulate(numViews,numFeatures,true);
@@ -71,8 +70,7 @@ public class TestProjectiveStructureFromHomographies extends CommonStructure {
 	/**
 	 * See if it correctly detects points on plane at infinity.
 	 */
-	@Test
-	public void filterPointsOnPlaneAtInfinity() {
+	@Test void filterPointsOnPlaneAtInfinity() {
 		// hand construct a 3x3 matrix to make the z for a specific point zero
 
 		DMatrixRMaj H = new DMatrixRMaj(new double[][]{{1,2,3},{4,5,6},{2,-1,-1}});
@@ -106,8 +104,7 @@ public class TestProjectiveStructureFromHomographies extends CommonStructure {
 	 * Tests linear system by seeing if zero is returned when truth is passed in. Input camera matrix is
 	 * K*[R,T] to make the match much easier.
 	 */
-	@Test
-	public void constructLinearSystem() {
+	@Test void constructLinearSystem() {
 		int numViews = 4;
 		int numFeatures = 7;
 		simulate(numViews,numFeatures,true);

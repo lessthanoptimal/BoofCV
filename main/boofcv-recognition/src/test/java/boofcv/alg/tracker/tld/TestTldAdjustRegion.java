@@ -33,8 +33,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  */
 public class TestTldAdjustRegion extends BoofStandardJUnit {
 
-	@Test
-	public void process() {
+	@Test void process() {
 		ScaleTranslate2D motion = new ScaleTranslate2D(1.5,2,3);
 
 		DogArray<AssociatedPair> pairs = new DogArray<>(AssociatedPair::new);
@@ -61,8 +60,7 @@ public class TestTldAdjustRegion extends BoofStandardJUnit {
 		assertEquals(63, rect.p1.y, 1e-8);
 	}
 
-	@Test
-	public void adjustRectangle() {
+	@Test void adjustRectangle() {
 		TldAdjustRegion alg = new TldAdjustRegion(50);
 
 		Rectangle2D_F64 rect = new Rectangle2D_F64(10,20,30,40);

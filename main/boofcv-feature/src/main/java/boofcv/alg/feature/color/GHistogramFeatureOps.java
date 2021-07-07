@@ -52,12 +52,12 @@ public class GHistogramFeatureOps {
 	}
 
 	/**
-	 * Computes a joint histogram for a planar image.  Since it's a joint distribution the histogram
-	 * can become huge (and too sparse) if bin sizes are used that are too big.  Also consider computing the
+	 * Computes a joint histogram for a planar image. Since it's a joint distribution the histogram
+	 * can become huge (and too sparse) if bin sizes are used that are too big. Also consider computing the
 	 * histogram independently in each band.
 	 *
 	 * @param image Input image. Not modified.
-	 * @param histogram Output for the histogram.  Must be correctly configured first.
+	 * @param histogram Output for the histogram. Must be correctly configured first.
 	 */
 	public static<T extends ImageGray<T>>
 	void histogram(Planar<T> image , Histogram_F64 histogram ) {
@@ -74,8 +74,8 @@ public class GHistogramFeatureOps {
 	}
 
 	/**
-	 * Computes a coupled histogram from a list of colors.  If the input is for integer values then add one
-	 * to the maximum value.  For example if the range of values is 0 to 255, then make it 0 to 256.
+	 * Computes a coupled histogram from a list of colors. If the input is for integer values then add one
+	 * to the maximum value. For example if the range of values is 0 to 255, then make it 0 to 256.
 	 *
 	 * @param colors List of colors stored in an interleaved format
 	 * @param length Length of usable portion of colors

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -68,9 +68,9 @@ public class GenerateImplAverageDownSample extends CodeGeneratorBase {
 		String bitwise = input.getBitWise();
 
 		out.print("\t/**\n" +
-				"\t * Down samples the image along the x-axis only.  Image height's must be the same.\n" +
-				"\t * @param src Input image.  Not modified.\n" +
-				"\t * @param dst Output image.  Modified.\n" +
+				"\t * Down samples the image along the x-axis only. Image height's must be the same.\n" +
+				"\t * @param src Input image. Not modified.\n" +
+				"\t * @param dst Output image. Modified.\n" +
 				"\t */\n" +
 				"\tpublic static void horizontal( "+input.getSingleBandName()+" src , "+output.getSingleBandName()+" dst ) {\n" +
 				"\n" +
@@ -139,9 +139,9 @@ public class GenerateImplAverageDownSample extends CodeGeneratorBase {
 		String round = output.isInteger() ? "+ 0.5f" : "";
 
 		out.print("\t/**\n" +
-				"\t * Down samples the image along the y-axis only.  Image width's must be the same.\n" +
-				"\t * @param src Input image.  Not modified.\n" +
-				"\t * @param dst Output image.  Modified.\n" +
+				"\t * Down samples the image along the y-axis only. Image width's must be the same.\n" +
+				"\t * @param src Input image. Not modified.\n" +
+				"\t * @param dst Output image. Modified.\n" +
 				"\t */\n" +
 				"\tpublic static void vertical( "+input.getSingleBandName()+" src , "+output.getSingleBandName()+" dst ) {\n" +
 				"\n" +

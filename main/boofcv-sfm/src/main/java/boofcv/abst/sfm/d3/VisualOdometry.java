@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -21,9 +21,9 @@ package boofcv.abst.sfm.d3;
 import org.ddogleg.struct.VerbosePrint;
 
 /**
- * Interface for Visual Odometry (VO) algorithms.  VO estimates the camera's motion (egomotion) by tracking
- * the locations of image features and by applying geometric constraints.   The motion estimate is relative
- * to the camera's reference frame.  In a multi-camera system the specific implementation specifies which
+ * Interface for Visual Odometry (VO) algorithms. VO estimates the camera's motion (egomotion) by tracking
+ * the locations of image features and by applying geometric constraints.  The motion estimate is relative
+ * to the camera's reference frame. In a multi-camera system the specific implementation specifies which
  * camera the motion is relative to.
  *
  * @author Peter Abeles
@@ -41,7 +41,7 @@ public interface VisualOdometry<M> extends VerbosePrint {
 
 	/**
 	 * If a fatal error occurred while updating its state then this function will return true.
-	 * Before more images can be processed {@link #reset()} must be called.  Only needs to be
+	 * Before more images can be processed {@link #reset()} must be called. Only needs to be
 	 * called if process returns false.
 	 *
 	 * @return true if a fatal error has occurred.

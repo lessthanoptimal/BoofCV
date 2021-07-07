@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -60,7 +60,7 @@ public class SquaresIntoCrossClusters extends SquaresIntoClusters {
 	/**
 	 * Declares data structures and configures algorithm
 	 * @param maxCornerDistance Maximum distance two corners can be in pixels.
-	 * @param maxNeighbors Max number of neighbors it will consider.  Try 4 or -1 for all
+	 * @param maxNeighbors Max number of neighbors it will consider. Try 4 or -1 for all
 	 */
 	public SquaresIntoCrossClusters(double maxCornerDistance, int maxNeighbors) {
 		this.maxCornerDistance = maxCornerDistance;
@@ -76,7 +76,7 @@ public class SquaresIntoCrossClusters extends SquaresIntoClusters {
 	 * Processes the unordered set of squares and creates a graph out of them using prior knowledge and geometric
 	 * constraints.
 	 * @param squares Set of squares
-	 * @return List of graphs.  All data structures are recycled on the next call to process().
+	 * @return List of graphs. All data structures are recycled on the next call to process().
 	 */
 	public List<List<SquareNode>> process(List<DetectPolygonFromContour.Info> squares ) {
 		recycleData();

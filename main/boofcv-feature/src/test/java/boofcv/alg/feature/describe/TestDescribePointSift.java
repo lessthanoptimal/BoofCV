@@ -39,7 +39,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 public class TestDescribePointSift extends BoofStandardJUnit {
 
 	/**
-	 * Tests to see if it blows up and not much more.  Random image.  Compute descriptor along border and image
+	 * Tests to see if it blows up and not much more. Random image. Compute descriptor along border and image
 	 * center.
 	 */
 	@Test void process() {
@@ -67,7 +67,7 @@ public class TestDescribePointSift extends BoofStandardJUnit {
 	}
 
 	/**
-	 * Only put gradient inside a small area that fills the descriptor.  Then double the scale and see if
+	 * Only put gradient inside a small area that fills the descriptor. Then double the scale and see if
 	 * only a 1/4 of the original image is inside
 	 */
 	@Test void computeRawDescriptor_scale() {

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -227,7 +227,7 @@ public class ImageStatistics {
 	/**
 	 * Returns the mean pixel intensity value.
 	 *
-	 * @param img Input image.  Not modified.
+	 * @param img Input image. Not modified.
 	 * @return Mean pixel intensity value
 	 */
 	public static double mean( GrayU8 img ) {
@@ -265,7 +265,7 @@ public class ImageStatistics {
 	/**
 	 * Returns the mean pixel intensity value.
 	 *
-	 * @param img Input image.  Not modified.
+	 * @param img Input image. Not modified.
 	 * @return Mean pixel intensity value
 	 */
 	public static double mean( InterleavedU8 img ) {
@@ -516,7 +516,7 @@ public class ImageStatistics {
 	/**
 	 * Returns the mean pixel intensity value.
 	 *
-	 * @param img Input image.  Not modified.
+	 * @param img Input image. Not modified.
 	 * @return Mean pixel intensity value
 	 */
 	public static double mean( GrayS8 img ) {
@@ -560,7 +560,7 @@ public class ImageStatistics {
 	/**
 	 * Returns the mean pixel intensity value.
 	 *
-	 * @param img Input image.  Not modified.
+	 * @param img Input image. Not modified.
 	 * @return Mean pixel intensity value
 	 */
 	public static double mean( InterleavedS8 img ) {
@@ -805,7 +805,7 @@ public class ImageStatistics {
 	/**
 	 * Returns the mean pixel intensity value.
 	 *
-	 * @param img Input image.  Not modified.
+	 * @param img Input image. Not modified.
 	 * @return Mean pixel intensity value
 	 */
 	public static double mean( GrayU16 img ) {
@@ -843,7 +843,7 @@ public class ImageStatistics {
 	/**
 	 * Returns the mean pixel intensity value.
 	 *
-	 * @param img Input image.  Not modified.
+	 * @param img Input image. Not modified.
 	 * @return Mean pixel intensity value
 	 */
 	public static double mean( InterleavedU16 img ) {
@@ -1094,7 +1094,7 @@ public class ImageStatistics {
 	/**
 	 * Returns the mean pixel intensity value.
 	 *
-	 * @param img Input image.  Not modified.
+	 * @param img Input image. Not modified.
 	 * @return Mean pixel intensity value
 	 */
 	public static double mean( GrayS16 img ) {
@@ -1138,7 +1138,7 @@ public class ImageStatistics {
 	/**
 	 * Returns the mean pixel intensity value.
 	 *
-	 * @param img Input image.  Not modified.
+	 * @param img Input image. Not modified.
 	 * @return Mean pixel intensity value
 	 */
 	public static double mean( InterleavedS16 img ) {
@@ -1389,7 +1389,7 @@ public class ImageStatistics {
 	/**
 	 * Returns the mean pixel intensity value.
 	 *
-	 * @param img Input image.  Not modified.
+	 * @param img Input image. Not modified.
 	 * @return Mean pixel intensity value
 	 */
 	public static double mean( GrayS32 img ) {
@@ -1433,7 +1433,7 @@ public class ImageStatistics {
 	/**
 	 * Returns the mean pixel intensity value.
 	 *
-	 * @param img Input image.  Not modified.
+	 * @param img Input image. Not modified.
 	 * @return Mean pixel intensity value
 	 */
 	public static double mean( InterleavedS32 img ) {
@@ -1684,7 +1684,7 @@ public class ImageStatistics {
 	/**
 	 * Returns the mean pixel intensity value.
 	 *
-	 * @param img Input image.  Not modified.
+	 * @param img Input image. Not modified.
 	 * @return Mean pixel intensity value
 	 */
 	public static double mean( GrayS64 img ) {
@@ -1728,7 +1728,7 @@ public class ImageStatistics {
 	/**
 	 * Returns the mean pixel intensity value.
 	 *
-	 * @param img Input image.  Not modified.
+	 * @param img Input image. Not modified.
 	 * @return Mean pixel intensity value
 	 */
 	public static double mean( InterleavedS64 img ) {
@@ -1979,7 +1979,7 @@ public class ImageStatistics {
 	/**
 	 * Returns the mean pixel intensity value.
 	 *
-	 * @param img Input image.  Not modified.
+	 * @param img Input image. Not modified.
 	 * @return Mean pixel intensity value
 	 */
 	public static float mean( GrayF32 img ) {
@@ -2023,7 +2023,7 @@ public class ImageStatistics {
 	/**
 	 * Returns the mean pixel intensity value.
 	 *
-	 * @param img Input image.  Not modified.
+	 * @param img Input image. Not modified.
 	 * @return Mean pixel intensity value
 	 */
 	public static float mean( InterleavedF32 img ) {
@@ -2274,7 +2274,7 @@ public class ImageStatistics {
 	/**
 	 * Returns the mean pixel intensity value.
 	 *
-	 * @param img Input image.  Not modified.
+	 * @param img Input image. Not modified.
 	 * @return Mean pixel intensity value
 	 */
 	public static double mean( GrayF64 img ) {
@@ -2318,7 +2318,7 @@ public class ImageStatistics {
 	/**
 	 * Returns the mean pixel intensity value.
 	 *
-	 * @param img Input image.  Not modified.
+	 * @param img Input image. Not modified.
 	 * @return Mean pixel intensity value
 	 */
 	public static double mean( InterleavedF64 img ) {

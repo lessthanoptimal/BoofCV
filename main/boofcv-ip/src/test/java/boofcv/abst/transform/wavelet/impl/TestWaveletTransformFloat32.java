@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -40,8 +40,7 @@ public class TestWaveletTransformFloat32 extends BoofStandardJUnit {
 	int width = 30;
 	int height = 40;
 
-	@Test
-	public void compareToWaveletTransformOps() {
+	@Test void compareToWaveletTransformOps() {
 		GrayF32 orig = new GrayF32(width,height);
 		GImageMiscOps.fillUniform(orig, rand, 0, 20);
 		GrayF32 origCopy = orig.clone();

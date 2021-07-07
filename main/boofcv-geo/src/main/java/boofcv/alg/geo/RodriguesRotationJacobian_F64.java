@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -22,7 +22,7 @@ import org.ejml.data.DMatrixRMaj;
 
 /**
  * Computes the rotation matrix derivative for Rodrigues coordinates
- * which have been parameterized by a 3 vector.  The rotation is equal to
+ * which have been parameterized by a 3 vector. The rotation is equal to
  * the vector's magnitude and the rotation vector is the unit vector.
  *
  * @author Peter Abeles

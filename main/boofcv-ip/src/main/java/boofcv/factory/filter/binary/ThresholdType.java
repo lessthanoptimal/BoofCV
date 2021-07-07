@@ -73,7 +73,7 @@ public enum ThresholdType {
 	 */
 	LOCAL_OTSU(true, false),
 	/**
-	 * Breaks the image into blocks and computes the min and max inside each block.  Then thresholds
+	 * Breaks the image into blocks and computes the min and max inside each block. Then thresholds
 	 * each pixel using interpolated min/max values.
 	 *
 	 * @see ThresholdBlockMinMax

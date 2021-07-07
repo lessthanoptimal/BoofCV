@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -49,8 +49,7 @@ public class TestQuadPoseEstimator extends BoofStandardJUnit {
 		return new LensDistortionBrown(intrinsic);
 	}
 
-	@Test
-	public void basicTest() {
+	@Test void basicTest() {
 		LensDistortionNarrowFOV distortion = createDistortion();
 
 		Se3_F64 expectedW2C = new Se3_F64();
@@ -101,8 +100,7 @@ public class TestQuadPoseEstimator extends BoofStandardJUnit {
 		v.y = b.y/b.z;
 	}
 
-	@Test
-	public void estimateP3P() {
+	@Test void estimateP3P() {
 		LensDistortionNarrowFOV distortion = createDistortion();
 
 		Se3_F64 fiducialToCamera = new Se3_F64();
@@ -138,8 +136,7 @@ public class TestQuadPoseEstimator extends BoofStandardJUnit {
 		}
 	}
 
-	@Test
-	public void computeErrors() {
+	@Test void computeErrors() {
 		LensDistortionNarrowFOV distortion = createDistortion();
 
 		Se3_F64 fiducialToCamera = new Se3_F64();

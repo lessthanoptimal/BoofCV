@@ -24,25 +24,25 @@ import boofcv.struct.image.ImageInterleaved;
 /**
  * <p>
  * Applies a threshold to an image by computing the min and max values in a regular grid across
- * the image.  When thresholding all the pixels inside a box (grid element) the min max values is found
- * in the surrounding 3x3 grid region.  If the difference between min and max is &le; textureThreshold then
- * it will be marked as one, since it is considered a textureless region.  Otherwise the pixel threshold
+ * the image. When thresholding all the pixels inside a box (grid element) the min max values is found
+ * in the surrounding 3x3 grid region. If the difference between min and max is &le; textureThreshold then
+ * it will be marked as one, since it is considered a textureless region. Otherwise the pixel threshold
  * is set to (min+max)/2.
  * </p>
  *
  * <p>This thresholding strategy is designed to quickly detect shapes with nearly uniform values both inside
- * the image and along the image border, with locally variable intensity values.  The image border is
+ * the image and along the image border, with locally variable intensity values. The image border is
  * particularly problematic since there are no neighboring pixels outside the image from which to compute
- * a local threshold.  This is why if a region is considered textureless it is marked as 1.</p>
+ * a local threshold. This is why if a region is considered textureless it is marked as 1.</p>
  *
  * <p>The min-max values inside a local 3x3 grid region is used to reduce the adverse affects of using a grid.
- * Ideally a local region around each pixel would be used, but this is expensive to compute.  Since a grid is
- * used instead of a pixel local region boundary conditions can be an issue.  For example, consider a black square
+ * Ideally a local region around each pixel would be used, but this is expensive to compute. Since a grid is
+ * used instead of a pixel local region boundary conditions can be an issue. For example, consider a black square
  * in the image, if the grid just happens to lie on this black square perfectly then if you look at only a single
- * grid element it will be considered textureless and the edge lost.  This problem isn't an issue if you consder
+ * grid element it will be considered textureless and the edge lost. This problem isn't an issue if you consder
  * a local 3x3 region of blocks.</p>
  *
- * <p>The size each block in the grid in pixels is adjusted depending on image size.  This is done to minimize
+ * <p>The size each block in the grid in pixels is adjusted depending on image size. This is done to minimize
  * "squares" in the upper image boundaries from having many more pixels than other blocks.</p>
  *
  * <p>The block based approach used here was inspired by a high level description found in AprilTags.</p>
@@ -63,7 +63,7 @@ public abstract class ThresholdBlockMinMax<T extends ImageGray<T>, I extends Ima
 	 * Configures the detector
 	 *
 	 * @param minimumSpread If the difference between min max is less than or equal to this
-	 * value then it is considered textureless.  Set to &le; -1 to disable.
+	 * value then it is considered textureless. Set to &le; -1 to disable.
 	 */
 	protected ThresholdBlockMinMax( double minimumSpread, boolean down ) {
 		this.minimumSpread = minimumSpread;

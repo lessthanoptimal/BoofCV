@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -21,8 +21,8 @@ package boofcv.struct.geo;
 import georegression.struct.point.Vector3D_F64;
 
 /**
- * A pair of line observations found in two different images.  The line is described by a vector, which is the normal
- * of the plane defined by the line on the image plane and the camera's origin.  The cross product of the two end
+ * A pair of line observations found in two different images. The line is described by a vector, which is the normal
+ * of the plane defined by the line on the image plane and the camera's origin. The cross product of the two end
  * points (in homogeneous pixels) would define a line in this manor.
  * 
  * @author Peter Abeles

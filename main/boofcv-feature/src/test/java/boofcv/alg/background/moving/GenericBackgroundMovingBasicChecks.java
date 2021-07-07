@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -35,8 +35,7 @@ import org.junit.jupiter.api.Test;
 public abstract class GenericBackgroundMovingBasicChecks extends GenericBackgroundModelMovingChecks {
 
 
-	@Test
-	public void performStationaryTests() {
+	@Test void performStationaryTests() {
 		GenericBackgroundStationaryBasicChecks stationary = new GenericBackgroundStationaryBasicChecks() {
 			@Override
 			public BackgroundModelStationary create(ImageType imageType) {

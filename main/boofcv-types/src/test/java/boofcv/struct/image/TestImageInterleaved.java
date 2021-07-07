@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -28,8 +28,7 @@ import static org.junit.jupiter.api.Assertions.*;
  */
 public class TestImageInterleaved extends BoofStandardJUnit {
 
-	@Test
-	public void setTo() {
+	@Test void setTo() {
 		DummyImage a = new DummyImage(10, 20, 3);
 
 		// test it against a regular matrix
@@ -51,8 +50,7 @@ public class TestImageInterleaved extends BoofStandardJUnit {
 	/**
 	 * The two matrices do not have the same shape
 	 */
-	@Test
-	public void setTo_mismatch() {
+	@Test void setTo_mismatch() {
 		DummyImage a = new DummyImage(10, 20 , 3);
 		DummyImage b = new DummyImage(11, 21 , 3);
 
@@ -62,8 +60,7 @@ public class TestImageInterleaved extends BoofStandardJUnit {
 		assertEquals(b.height, 21);
 	}
 
-	@Test
-	public void reshape_wh() {
+	@Test void reshape_wh() {
 		DummyImage a = new DummyImage(10, 20, 3);
 
 		a.reshape(5,10);
@@ -81,8 +78,7 @@ public class TestImageInterleaved extends BoofStandardJUnit {
 		assertEquals(30*3,a.stride);
 	}
 
-	@Test
-	public void reshape_whb() {
+	@Test void reshape_whb() {
 		DummyImage a = new DummyImage(10, 20, 3);
 
 		a.reshape(5,10,3);
@@ -108,8 +104,7 @@ public class TestImageInterleaved extends BoofStandardJUnit {
 		assertEquals(30*3,a.stride);
 	}
 
-	@Test
-	public void reshape_subimage() {
+	@Test void reshape_subimage() {
 		DummyImage img = new DummyImage(10, 20, 3);
 		img = img.subimage(0,0,2,2, null);
 
@@ -122,8 +117,7 @@ public class TestImageInterleaved extends BoofStandardJUnit {
 	/**
 	 * The two matrices do not have the same shape
 	 */
-	@Test
-	public void setTo_mismatch_Shape() {
+	@Test void setTo_mismatch_Shape() {
 		DummyImage a = new DummyImage(10, 20, 3);
 		DummyImage b = new DummyImage(11, 21, 3);
 
@@ -136,8 +130,7 @@ public class TestImageInterleaved extends BoofStandardJUnit {
 	/**
 	 * The two matrices do not have the same shape
 	 */
-	@Test
-	public void setTo_mismatch_bands() {
+	@Test void setTo_mismatch_bands() {
 		DummyImage a = new DummyImage(11, 21, 3);
 		DummyImage b = new DummyImage(10, 20, 4);
 		a.setTo(b);
@@ -150,8 +143,7 @@ public class TestImageInterleaved extends BoofStandardJUnit {
 	/**
 	 * Test the constructor where the width,height and number of bands is specified.
 	 */
-	@Test
-	public void constructor_w_h_n() {
+	@Test void constructor_w_h_n() {
 		DummyImage a = new DummyImage(10, 20, 3);
 
 		assertEquals(10 * 20 * 3, a.data.length);
@@ -162,8 +154,7 @@ public class TestImageInterleaved extends BoofStandardJUnit {
 		assertEquals(0, a.getStartIndex());
 	}
 
-	@Test
-	public void createSubImage() {
+	@Test void createSubImage() {
 		DummyImage a = new DummyImage(10, 20, 3);
 		assertFalse(a.isSubimage());
 
@@ -180,8 +171,7 @@ public class TestImageInterleaved extends BoofStandardJUnit {
 		assertEquals(3 * 30 + 2 * 3, b.getStartIndex());
 	}
 
-	@Test
-	public void isInBounds() {
+	@Test void isInBounds() {
 		DummyImage a = new DummyImage(10, 20, 3);
 
 		assertTrue(a.isInBounds(0, 0));
@@ -193,8 +183,7 @@ public class TestImageInterleaved extends BoofStandardJUnit {
 		assertFalse(a.isInBounds(0, 20));
 	}
 
-	@Test
-	public void getIndex() {
+	@Test void getIndex() {
 		DummyImage a = new DummyImage(10, 20, 3);
 
 		assertEquals(4 * 30 + 3 * 3 + 1, a.getIndex(3, 4, 1));

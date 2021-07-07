@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -25,7 +25,7 @@ import java.util.List;
 
 /**
  * Reads one or more lines of pure numbers while skipping over lines which begin with the
- * comment character.  Intended for use with simple config files.
+ * comment character. Intended for use with simple config files.
  *
  * @author Peter Abeles
  */

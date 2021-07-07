@@ -47,8 +47,8 @@ public class GThresholdImageOps {
 	 * </p>
 	 *
 	 * @param input Input gray-scale image
-	 * @param minValue The minimum value of a pixel in the image.  (inclusive)
-	 * @param maxValue The maximum value of a pixel in the image.  (inclusive)
+	 * @param minValue The minimum value of a pixel in the image. (inclusive)
+	 * @param maxValue The maximum value of a pixel in the image. (inclusive)
 	 * @return Selected threshold.
 	 */
 	public static double computeOtsu( ImageGray input, double minValue, double maxValue ) {
@@ -71,8 +71,8 @@ public class GThresholdImageOps {
 	 * </p>
 	 *
 	 * @param input Input gray-scale image
-	 * @param minValue The minimum value of a pixel in the image.  (inclusive)
-	 * @param maxValue The maximum value of a pixel in the image.  (inclusive)
+	 * @param minValue The minimum value of a pixel in the image. (inclusive)
+	 * @param maxValue The maximum value of a pixel in the image. (inclusive)
 	 * @return Selected threshold.
 	 */
 	public static int computeOtsu2( ImageGray input, int minValue, int maxValue ) {
@@ -205,8 +205,8 @@ public class GThresholdImageOps {
 	 * </p>
 	 *
 	 * @param input Input gray-scale image
-	 * @param minValue The minimum value of a pixel in the image.  (inclusive)
-	 * @param maxValue The maximum value of a pixel in the image.  (inclusive)
+	 * @param minValue The minimum value of a pixel in the image. (inclusive)
+	 * @param maxValue The maximum value of a pixel in the image. (inclusive)
 	 * @return Selected threshold.
 	 */
 	public static double computeLi( ImageGray input, double minValue, double maxValue ) {
@@ -303,8 +303,8 @@ public class GThresholdImageOps {
 	 * </p>
 	 *
 	 * @param input Input gray-scale image
-	 * @param minValue The minimum value of a pixel in the image.  (inclusive)
-	 * @param maxValue The maximum value of a pixel in the image.  (inclusive)
+	 * @param minValue The minimum value of a pixel in the image. (inclusive)
+	 * @param maxValue The maximum value of a pixel in the image. (inclusive)
 	 * @return Selected threshold.
 	 */
 	public static double computeHuang( ImageGray input, double minValue, double maxValue ) {
@@ -407,13 +407,13 @@ public class GThresholdImageOps {
 
 	/**
 	 * <p>
-	 * Computes a threshold which maximizes the entropy between the foreground and background regions.  See
+	 * Computes a threshold which maximizes the entropy between the foreground and background regions. See
 	 * {@link #computeEntropy(int[], int, int)} for more details.
 	 * </p>
 	 *
 	 * @param input Input gray-scale image
-	 * @param minValue The minimum value of a pixel in the image.  (inclusive)
-	 * @param maxValue The maximum value of a pixel in the image.  (inclusive)
+	 * @param minValue The minimum value of a pixel in the image. (inclusive)
+	 * @param maxValue The maximum value of a pixel in the image. (inclusive)
 	 * @return Selected threshold.
 	 * @see boofcv.alg.misc.GImageStatistics#histogram(ImageGray, double, int[])
 	 */
@@ -432,7 +432,7 @@ public class GThresholdImageOps {
 
 	/**
 	 * <p>
-	 * Computes a threshold which maximizes the entropy between the foreground and background regions.  See [1]
+	 * Computes a threshold which maximizes the entropy between the foreground and background regions. See [1]
 	 * for algorithmic details, which cites [2].
 	 * </p>
 	 *
@@ -497,8 +497,8 @@ public class GThresholdImageOps {
 	}
 
 	/**
-	 * Applies a global threshold across the whole image.  If 'down' is true, then pixels with values &le;
-	 * to 'threshold' are set to 1 and the others set to 0.  If 'down' is false, then pixels with values &gt;
+	 * Applies a global threshold across the whole image. If 'down' is true, then pixels with values &le;
+	 * to 'threshold' are set to 1 and the others set to 0. If 'down' is false, then pixels with values &gt;
 	 * to 'threshold' are set to 1 and the others set to 0.
 	 *
 	 * @param input Input image. Not modified.
@@ -530,23 +530,23 @@ public class GThresholdImageOps {
 	/**
 	 * <p>
 	 * Thresholds the image using a locally adaptive threshold that is computed using a local square region centered
-	 * on each pixel.  The threshold is equal to the average value of the surrounding pixels times the scale.
-	 * If down is true then b(x,y) = I(x,y) &le; T(x,y) * scale ? 1 : 0.  Otherwise
+	 * on each pixel. The threshold is equal to the average value of the surrounding pixels times the scale.
+	 * If down is true then b(x,y) = I(x,y) &le; T(x,y) * scale ? 1 : 0. Otherwise
 	 * b(x,y) = I(x,y) &gt; T(x,y) * scale ? 0 : 1
 	 * </p>
 	 *
 	 * <p>
-	 * NOTE: Internally, images are declared to store intermediate results.  If more control is needed over memory
+	 * NOTE: Internally, images are declared to store intermediate results. If more control is needed over memory
 	 * call the type specific function.
 	 * </p>
 	 *
 	 * @param input Input image.
-	 * @param output (optional) Output binary image.  If null it will be declared internally.
+	 * @param output (optional) Output binary image. If null it will be declared internally.
 	 * @param width Width of square region.
 	 * @param scale Scale factor used to adjust threshold
 	 * @param down Should it threshold up or down.
-	 * @param work1 (Optional) Internal workspace.  Can be null
-	 * @param work2 (Optional) Internal workspace.  Can be null
+	 * @param work1 (Optional) Internal workspace. Can be null
+	 * @param work2 (Optional) Internal workspace. Can be null
 	 * @return binary image.
 	 */
 	public static <T extends ImageGray<T>>
@@ -570,23 +570,23 @@ public class GThresholdImageOps {
 	/**
 	 * <p>
 	 * Thresholds the image using a locally adaptive threshold that is computed using a local square region centered
-	 * on each pixel.  The threshold is equal to the gaussian weighted sum of the surrounding pixels times the scale.
-	 * If down is true then b(x,y) = I(x,y) &le; T(x,y) * scale ? 1 : 0.  Otherwise
+	 * on each pixel. The threshold is equal to the gaussian weighted sum of the surrounding pixels times the scale.
+	 * If down is true then b(x,y) = I(x,y) &le; T(x,y) * scale ? 1 : 0. Otherwise
 	 * b(x,y) = I(x,y) &gt; T(x,y) * scale ? 0 : 1
 	 * </p>
 	 *
 	 * <p>
-	 * NOTE: Internally, images are declared to store intermediate results.  If more control is needed over memory
+	 * NOTE: Internally, images are declared to store intermediate results. If more control is needed over memory
 	 * call the type specific function.
 	 * </p>
 	 *
 	 * @param input Input image.
-	 * @param output (optional) Output binary image.  If null it will be declared internally.
+	 * @param output (optional) Output binary image. If null it will be declared internally.
 	 * @param width Width of square region.
 	 * @param scale Scale factor used to adjust threshold
 	 * @param down Should it threshold up or down.
-	 * @param work1 (Optional) Internal workspace.  Can be null
-	 * @param work2 (Optional) Internal workspace.  Can be null
+	 * @param work1 (Optional) Internal workspace. Can be null
+	 * @param work2 (Optional) Internal workspace. Can be null
 	 * @return binary image.
 	 */
 	public static <T extends ImageGray<T>>
@@ -627,9 +627,9 @@ public class GThresholdImageOps {
 	 * Intended for use with text image.
 	 *
 	 * @param input Input image.
-	 * @param output (optional) Output binary image.  If null it will be declared internally.
+	 * @param output (optional) Output binary image. If null it will be declared internally.
 	 * @param width Width of square region.
-	 * @param k Positive parameter used to tune threshold.  Try 0.3
+	 * @param k Positive parameter used to tune threshold. Try 0.3
 	 * @param down Should it threshold up or down.
 	 * @return binary image
 	 * @see ThresholdNiblackFamily
@@ -644,9 +644,9 @@ public class GThresholdImageOps {
 	 * Intended for use with text image.
 	 *
 	 * @param input Input image.
-	 * @param output (optional) Output binary image.  If null it will be declared internally.
+	 * @param output (optional) Output binary image. If null it will be declared internally.
 	 * @param width Width of square region.
-	 * @param k Positive parameter used to tune threshold.  Try 0.3
+	 * @param k Positive parameter used to tune threshold. Try 0.3
 	 * @param down Should it threshold up or down.
 	 * @return binary image
 	 * @see ThresholdNiblackFamily
@@ -661,9 +661,9 @@ public class GThresholdImageOps {
 	 * Intended for use with text image.
 	 *
 	 * @param input Input image.
-	 * @param output (optional) Output binary image.  If null it will be declared internally.
+	 * @param output (optional) Output binary image. If null it will be declared internally.
 	 * @param width Width of square region.
-	 * @param k Positive parameter used to tune threshold.  Try 0.3
+	 * @param k Positive parameter used to tune threshold. Try 0.3
 	 * @param down Should it threshold up or down.
 	 * @return binary image
 	 * @see ThresholdNiblackFamily
@@ -703,9 +703,9 @@ public class GThresholdImageOps {
 	 * Intended for use with text image.
 	 *
 	 * @param input Input image.
-	 * @param output (optional) Output binary image.  If null it will be declared internally.
+	 * @param output (optional) Output binary image. If null it will be declared internally.
 	 * @param width Width of square region.
-	 * @param k Positive parameter used to tune threshold.  Try -0.1 to -0.2
+	 * @param k Positive parameter used to tune threshold. Try -0.1 to -0.2
 	 * @param down Should it threshold up or down.
 	 * @return binary image
 	 * @see boofcv.alg.filter.binary.ThresholdNick
@@ -732,10 +732,10 @@ public class GThresholdImageOps {
 
 	/**
 	 * Applies a threshold to an image by computing the min and max values in a regular grid across
-	 * the input image.  See {@link ThresholdBlockMinMax} for the details.
+	 * the input image. See {@link ThresholdBlockMinMax} for the details.
 	 *
 	 * @param input Input image.
-	 * @param output (optional) Output binary image.  If null it will be declared internally.
+	 * @param output (optional) Output binary image. If null it will be declared internally.
 	 * @param width Width of square region.
 	 * @param scale Scale factor used to adjust threshold
 	 * @param down Should it threshold up or down.
@@ -757,10 +757,10 @@ public class GThresholdImageOps {
 
 	/**
 	 * Applies a threshold to an image by computing the mean values in a regular grid across
-	 * the input image.  See {@link ThresholdBlockMean} for the details.
+	 * the input image. See {@link ThresholdBlockMean} for the details.
 	 *
 	 * @param input Input image.
-	 * @param output (optional) Output binary image.  If null it will be declared internally.
+	 * @param output (optional) Output binary image. If null it will be declared internally.
 	 * @param width Width of square region.
 	 * @param scale Scale factor used to adjust threshold
 	 * @param down Should it threshold up or down.
@@ -781,10 +781,10 @@ public class GThresholdImageOps {
 
 	/**
 	 * Applies a threshold to an image by computing the Otsu threshold in a regular grid across
-	 * the input image.  See {@link ThresholdBlockOtsu} for the details.
+	 * the input image. See {@link ThresholdBlockOtsu} for the details.
 	 *
 	 * @param input Input image.
-	 * @param output (optional) Output binary image.  If null it will be declared internally.
+	 * @param output (optional) Output binary image. If null it will be declared internally.
 	 * @param width Width of square region.
 	 * @param tuning Tuning parameter. 0 = regular Otsu
 	 * @param down Should it threshold up or down.

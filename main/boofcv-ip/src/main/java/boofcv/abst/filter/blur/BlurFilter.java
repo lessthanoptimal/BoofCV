@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -30,7 +30,7 @@ import boofcv.struct.image.ImageBase;
 public interface BlurFilter<T extends ImageBase<T>> extends FilterImageInterface<T,T> {
 
 	/**
-	 * Radius of the square region.  The width is defined as the radius*2 + 1.
+	 * Radius of the square region. The width is defined as the radius*2 + 1.
 	 *
 	 * @return Blur region's radius.
 	 */

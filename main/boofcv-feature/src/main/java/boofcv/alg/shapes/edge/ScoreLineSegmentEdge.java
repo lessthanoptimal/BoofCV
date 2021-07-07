@@ -24,7 +24,7 @@ import georegression.struct.point.Point2D_F64;
 
 /**
  * Looks at the difference in pixel values along the edge of a polygon and decides if its a false positive or not.
- * The average difference along the polygons edge is the score.  Note that the abs is only taken after the sum
+ * The average difference along the polygons edge is the score. Note that the abs is only taken after the sum
  * is finished, so objects which are entirely dark/light along the edge will have an advantage.
  *
  * @author Peter Abeles
@@ -63,13 +63,13 @@ public class ScoreLineSegmentEdge<T extends ImageGray<T>> extends BaseIntegralEd
 	}
 
 	/**
-	 * Returns average tangential derivative along the line segment.  Derivative is computed in direction
-	 * of tangent.  A positive step in the tangent direction will have a positive value.  If all samples
+	 * Returns average tangential derivative along the line segment. Derivative is computed in direction
+	 * of tangent. A positive step in the tangent direction will have a positive value. If all samples
 	 * go outside the image then zero is returned.
 	 *
 	 * @param a start point
 	 * @param b end point
-	 * @param tanX unit tangent x-axis.  determines length of line integral
+	 * @param tanX unit tangent x-axis. determines length of line integral
 	 * @param tanY unit tangent y-axis   determines length of line integral
 	 * @return average derivative
 	 */
@@ -97,7 +97,7 @@ public class ScoreLineSegmentEdge<T extends ImageGray<T>> extends BaseIntegralEd
 			double down = integral.compute(x, y, x1, y1);
 
 			// don't take the abs here and require that a high score involves it being entirely black or white around
-			// the edge.  Otherwise a random image would score high
+			// the edge. Otherwise a random image would score high
 			averageUp += up;
 			averageDown += down;
 		}

@@ -24,7 +24,7 @@ import boofcv.struct.image.ImageGray;
 /**
  * <p>
  * Base interface for classes which extract intensity images for image feature detection. In the
- * intensity image higher values indicate that a pixel is more "feature like".  All intensity
+ * intensity image higher values indicate that a pixel is more "feature like". All intensity
  * images are {@link GrayF32}.
  * </p>
  *
@@ -32,7 +32,7 @@ import boofcv.struct.image.ImageGray;
  */
 public interface FeatureIntensity<T extends ImageGray<T>> {
 	/**
-	 * Returns the radius of the feature being computed.  Features are square in shape with a width = 2*radius+1.
+	 * Returns the radius of the feature being computed. Features are square in shape with a width = 2*radius+1.
 	 *
 	 * @return Radius of detected features.
 	 */

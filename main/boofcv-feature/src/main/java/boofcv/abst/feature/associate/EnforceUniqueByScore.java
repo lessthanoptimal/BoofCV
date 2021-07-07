@@ -33,7 +33,7 @@ import org.ddogleg.struct.FastAccess;
  * </p>
  *
  * <p>
- * NOTE: Unassociated matches are recomputed from scratch.  It could potentially add to the list created by
+ * NOTE: Unassociated matches are recomputed from scratch. It could potentially add to the list created by
  * the original algorithm for a bit more efficiency.
  * </p>
  *
@@ -55,7 +55,7 @@ public class EnforceUniqueByScore<Desc, A extends Associate<Desc>> implements As
 	protected int numDestination;
 
 	/**
-	 * Configures the algorithm to ensure source and/or destination features are unique.  The uniqueness of
+	 * Configures the algorithm to ensure source and/or destination features are unique. The uniqueness of
 	 * the input algorithm is checked and if it is already unique it that processing step will be skipped.
 	 *
 	 * @param association The association algorithm which is being wrapped

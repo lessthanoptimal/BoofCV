@@ -34,10 +34,9 @@ import static org.junit.jupiter.api.Assertions.*;
 public class TestSquaresIntoCrossClusters extends BoofStandardJUnit {
 
 	/**
-	 * Create a simple perfect cluster.  Do a crude test based on number of edge histogram
+	 * Create a simple perfect cluster. Do a crude test based on number of edge histogram
 	 */
-	@Test
-	public void process_simple() {
+	@Test void process_simple() {
 		SquaresIntoCrossClusters alg = new SquaresIntoCrossClusters(0.05, -1);
 
 		List<DetectPolygonFromContour.Info> squares = new ArrayList<>();
@@ -68,8 +67,7 @@ public class TestSquaresIntoCrossClusters extends BoofStandardJUnit {
 	/**
 	 * Tests shapes with corners that touch the image border
 	 */
-	@Test
-	public void shapesOnBorder() {
+	@Test void shapesOnBorder() {
 		SquaresIntoCrossClusters alg = new SquaresIntoCrossClusters(0.05, -1);
 
 		List<DetectPolygonFromContour.Info> squares = new ArrayList<>();
@@ -96,11 +94,10 @@ public class TestSquaresIntoCrossClusters extends BoofStandardJUnit {
 	}
 
 	/**
-	 * Tests the corner distance threshold.  two nodes should be barely within tolerance of each other with the 3rd
+	 * Tests the corner distance threshold. two nodes should be barely within tolerance of each other with the 3rd
 	 * barely not in tolerance
 	 */
-	@Test
-	public void process_connect_threshold() {
+	@Test void process_connect_threshold() {
 		SquaresIntoCrossClusters alg = new SquaresIntoCrossClusters(0.2, -1);
 
 		List<DetectPolygonFromContour.Info> squares = new ArrayList<>();
@@ -126,8 +123,7 @@ public class TestSquaresIntoCrossClusters extends BoofStandardJUnit {
 		return info;
 	}
 
-	@Test
-	public void getCornerIndex() {
+	@Test void getCornerIndex() {
 		SquareNode node = new SquareNode();
 		node.square = new Polygon2D_F64(4);
 		node.square.get(0).setTo(5, 6);
@@ -143,8 +139,7 @@ public class TestSquaresIntoCrossClusters extends BoofStandardJUnit {
 		assertEquals(3, alg.getCornerIndex(node, 8, 9));
 	}
 
-	@Test
-	public void candidateIsMuchCloser() {
+	@Test void candidateIsMuchCloser() {
 		SquareNode node0 = new SquareNode();
 		SquareNode node1 = new SquareNode();
 

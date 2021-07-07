@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -35,10 +35,10 @@ import javax.annotation.Generated;
  *
  * <p>
  * radius: size of the filter's box.<br>
- * storage:  Used to store local values.  If null an array will be declared.
+ * storage:  Used to store local values. If null an array will be declared.
  * </p>
  *
- * <p>DO NOT MODIFY.  Automatically generated code created by GenerateImplMedianSortEdgeNaive</p>
+ * <p>DO NOT MODIFY. Automatically generated code created by GenerateImplMedianSortEdgeNaive</p>
  *
  * @author Peter Abeles
  */

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -44,7 +44,7 @@ public class DenoiseVisuShrink_F32 implements DenoiseWavelet<GrayF32> {
 	 * Applies VisuShrink denoising to the provided multilevel wavelet transform using
 	 * the provided threshold.
 	 *
-	 * @param transform Mult-level wavelet transform.  Modified.
+	 * @param transform Mult-level wavelet transform. Modified.
 	 * @param numLevels Number of levels in the transform.
 	 */
 	@Override

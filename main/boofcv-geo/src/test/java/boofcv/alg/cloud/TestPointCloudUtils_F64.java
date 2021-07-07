@@ -36,8 +36,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
  */
 public class TestPointCloudUtils_F64 extends BoofStandardJUnit {
 
-	@Test
-	public void filter() {
+	@Test void filter() {
 		DogArray<Point3dRgbI_F64> input = new DogArray<>(Point3dRgbI_F64::new);
 		for (int i = 0; i < 20; i++) {
 			input.grow().setTo(i,i,i);
@@ -49,8 +48,7 @@ public class TestPointCloudUtils_F64 extends BoofStandardJUnit {
 		assertEquals(9, output.size);
 	}
 
-	@Test
-	public void autoScale() {
+	@Test void autoScale() {
 		Point3D_F64 mean = new Point3D_F64(1, 2, 3);
 		Point3D_F64 stdev = new Point3D_F64(2, 0.5, 0.1);
 
@@ -80,8 +78,7 @@ public class TestPointCloudUtils_F64 extends BoofStandardJUnit {
 		assertEquals(10, maxStdev, tol);
 	}
 
-	@Test
-	public void statistics() {
+	@Test void statistics() {
 		Point3D_F64 mean = new Point3D_F64(1, 2, 3);
 		Point3D_F64 stdev = new Point3D_F64(2, 0.5, 0.1);
 
@@ -105,8 +102,7 @@ public class TestPointCloudUtils_F64 extends BoofStandardJUnit {
 		assertEquals(0, foundStdev.distance(stdev), tol);
 	}
 
-	@Test
-	public void prune() {
+	@Test void prune() {
 		List<Point3D_F64> list = new ArrayList<>();
 		for (int i = 0; i < 100; i++) {
 			list.add(new Point3D_F64(i*0.1, 0, 0));
@@ -120,8 +116,7 @@ public class TestPointCloudUtils_F64 extends BoofStandardJUnit {
 		assertEquals(98, list.size());
 	}
 
-	@Test
-	public void prune_color() {
+	@Test void prune_color() {
 		List<Point3D_F64> list = new ArrayList<>();
 		DogArray_I32 rgb = new DogArray_I32();
 		for (int i = 0; i < 100; i++) {

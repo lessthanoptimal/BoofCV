@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -39,8 +39,7 @@ public class TestGradientSobel_UnrolledOuter extends BoofStandardJUnit {
 	/**
 	 * See if the same results are returned by ImageByte2D equivalent
 	 */
-	@Test
-	public void process_I8_naive() {
+	@Test void process_I8_naive() {
 		for( int offY = 0; offY < 3; offY++ ) {
 			for( int offX = 0; offX < 3; offX++ ) {
 				int w = width+offX; int h = height+offY;
@@ -65,8 +64,7 @@ public class TestGradientSobel_UnrolledOuter extends BoofStandardJUnit {
 	/**
 	 * See if the same results are returned by ImageByte2D equivalent
 	 */
-	@Test
-	public void process_F32_naive() {
+	@Test void process_F32_naive() {
 		for( int offY = 0; offY < 3; offY++ ) {
 			for( int offX = 0; offX < 3; offX++ ) {
 				int w = width+offX; int h = height+offY;
@@ -89,8 +87,7 @@ public class TestGradientSobel_UnrolledOuter extends BoofStandardJUnit {
 		}
 	}
 
-	@Test
-	public void process_F32_sub_naive() {
+	@Test void process_F32_sub_naive() {
 		for( int offY = 0; offY < 3; offY++ ) {
 			for( int offX = 0; offX < 3; offX++ ) {
 				int w = width+offX; int h = height+offY;

@@ -29,10 +29,10 @@ import boofcv.struct.pyramid.ImagePyramid;
 import java.util.Arrays;
 
 /**
- * Computes the dense optical flow using {@link KltTracker}.  A feature is computed from each pixel in the prev
+ * Computes the dense optical flow using {@link KltTracker}. A feature is computed from each pixel in the prev
  * image and it is tracked into the curr image. The flow assigned to a pixel is the template with the lowest error
- * which overlaps it.  In other words, a pixel is assigned the flow with the lowest error with in 'radius' pixels
- * of it.  A pixel is marked as invalid if all tracks around the pixel fail.
+ * which overlaps it. In other words, a pixel is assigned the flow with the lowest error with in 'radius' pixels
+ * of it. A pixel is marked as invalid if all tracks around the pixel fail.
  *
  * @author Peter Abeles
  */

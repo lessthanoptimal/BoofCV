@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -30,8 +30,7 @@ import static org.junit.jupiter.api.Assertions.assertSame;
  * @author Peter Abeles
  */
 public class TestTransformThenPixel_F64 extends BoofStandardJUnit {
-	@Test
-	public void set() {
+	@Test void set() {
 		Transform2ThenPixel_F64 alg = new Transform2ThenPixel_F64(null);
 
 		assertSame(alg, alg.set(1, 2, 3, 4, 5));
@@ -43,8 +42,7 @@ public class TestTransformThenPixel_F64 extends BoofStandardJUnit {
 		
 	}
 
-	@Test
-	public void compute() {
+	@Test void compute() {
 		Transform2ThenPixel_F64 alg = new Transform2ThenPixel_F64(new Dummy());
 		alg.set(1, 2, 3, 4, 5);
 

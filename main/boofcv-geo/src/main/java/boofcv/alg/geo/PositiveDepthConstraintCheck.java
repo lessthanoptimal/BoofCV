@@ -29,9 +29,9 @@ import georegression.transform.se.SePointOps_F64;
 /**
  * <p>
  * Given two views of the same point and a known 3D transform checks to see if the point is in front
- * of both cameras.  This is the positive depth constraint.  A class is provided instead of a function
- * to reduce computational overhead each time the function is called.  Memory only needs to be
- * declared once.   Also less chance of messing up and only checking one view instead of two views
+ * of both cameras. This is the positive depth constraint. A class is provided instead of a function
+ * to reduce computational overhead each time the function is called. Memory only needs to be
+ * declared once.  Also less chance of messing up and only checking one view instead of two views
  * if you use this class.
  * </p>
  *
@@ -59,8 +59,8 @@ public class PositiveDepthConstraintCheck {
 	/**
 	 * Checks to see if a single point meets the constraint.
 	 *
-	 * @param viewA View of the 3D point from the first camera.  Calibrated coordinates.
-	 * @param viewB View of the 3D point from the second camera.  Calibrated coordinates.
+	 * @param viewA View of the 3D point from the first camera. Calibrated coordinates.
+	 * @param viewB View of the 3D point from the second camera. Calibrated coordinates.
 	 * @param fromAtoB Transform from the B to A camera frame.
 	 * @return If the triangulated point appears in front of both cameras.
 	 */

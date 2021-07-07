@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -31,8 +31,7 @@ public class TestTriangulate2ViewsGeometricMetric extends CommonTriangulationChe
 	/**
 	 * Create 2 perfect observations and solve for the position
 	 */
-	@Test
-	public void triangulate_two() {
+	@Test void triangulate_two() {
 		createScene();
 
 		Triangulate2ViewsGeometricMetric alg = new Triangulate2ViewsGeometricMetric();

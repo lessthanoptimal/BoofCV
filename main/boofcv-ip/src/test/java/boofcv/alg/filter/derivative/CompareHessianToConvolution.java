@@ -141,7 +141,7 @@ public class CompareHessianToConvolution {
 			throw new RuntimeException(e);
 		}
 
-		// sanity check.  The derivatives should be the same
+		// sanity check. The derivatives should be the same
 
 		// compare the results
 		for( int i = 0; i < expectedOutput.length; i++ ) {

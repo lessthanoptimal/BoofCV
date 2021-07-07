@@ -26,7 +26,7 @@ import boofcv.struct.feature.TupleDesc_F64;
 import georegression.metric.UtilAngle;
 
 /**
- * Base class for {@link DescribePointSift SIFT} descriptors.  Provides common functionality between sparse and
+ * Base class for {@link DescribePointSift SIFT} descriptors. Provides common functionality between sparse and
  * dense computations.
  *
  * @author Peter Abeles
@@ -51,11 +51,11 @@ public class DescribeSiftCommon {
 	/**
 	 * Configures the descriptor.
 	 *
-	 * @param widthSubregion Width of sub-region in samples.  Try 4
-	 * @param widthGrid Width of grid in subregions.  Try 4.
-	 * @param numHistogramBins Number of bins in histogram.  Try 8
-	 * @param weightingSigmaFraction Sigma for Gaussian weighting function is set to this value * region width.  Try 0.5
-	 * @param maxDescriptorElementValue Helps with non-affine changes in lighting. See paper.  Try 0.2
+	 * @param widthSubregion Width of sub-region in samples. Try 4
+	 * @param widthGrid Width of grid in subregions. Try 4.
+	 * @param numHistogramBins Number of bins in histogram. Try 8
+	 * @param weightingSigmaFraction Sigma for Gaussian weighting function is set to this value * region width. Try 0.5
+	 * @param maxDescriptorElementValue Helps with non-affine changes in lighting. See paper. Try 0.2
 	 */
 	public DescribeSiftCommon( int widthSubregion, int widthGrid,
 							   int numHistogramBins, double weightingSigmaFraction, double maxDescriptorElementValue ) {
@@ -73,7 +73,7 @@ public class DescribeSiftCommon {
 	}
 
 	/**
-	 * Adjusts the descriptor.  This adds lighting invariance and reduces the affects of none-affine changes
+	 * Adjusts the descriptor. This adds lighting invariance and reduces the affects of none-affine changes
 	 * in lighting.
 	 *
 	 * 1) Apply L2 normalization
@@ -136,7 +136,7 @@ public class DescribeSiftCommon {
 	}
 
 	/**
-	 * Radius of descriptor in pixels.  Width is radius*2
+	 * Radius of descriptor in pixels. Width is radius*2
 	 */
 	public int getCanonicalRadius() {
 		return widthGrid*widthSubregion/2;

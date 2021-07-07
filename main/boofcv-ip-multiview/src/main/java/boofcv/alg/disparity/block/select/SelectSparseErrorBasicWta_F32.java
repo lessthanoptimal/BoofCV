@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -23,8 +23,8 @@ import boofcv.alg.disparity.block.score.DisparitySparseRectifiedScoreBM;
 
 /**
  * <p>
- * Selects the disparity with the lowest score with no additional validation.  Lack
- * of validation speeds up the code at the cost of reduced signal to noise ratio.  This
+ * Selects the disparity with the lowest score with no additional validation. Lack
+ * of validation speeds up the code at the cost of reduced signal to noise ratio. This
  * strategy of selecting the lowest score is also known as Winner Take All (WTA).
  * </p>
  *

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -34,8 +34,7 @@ public class TestHessianFromGradient extends BoofStandardJUnit {
 	int width = 20;
 	int height = 25;
 
-	@Test
-	public void hessianPrewitt_I8() throws NoSuchMethodException {
+	@Test void hessianPrewitt_I8() throws NoSuchMethodException {
 		CompareHessianToConvolution validator = new CompareHessianToConvolution();
 		validator.setTarget(HessianFromGradient.class.getMethod("hessianPrewitt",
 				GrayS16.class,GrayS16.class, GrayS16.class, GrayS16.class, GrayS16.class, ImageBorder_S32.class ));
@@ -54,8 +53,7 @@ public class TestHessianFromGradient extends BoofStandardJUnit {
 		validator.compare(derivX,derivY,derivXX,derivYY,derivXY);
 	}
 
-	@Test
-	public void hessianPrewitt_F32() throws NoSuchMethodException {
+	@Test void hessianPrewitt_F32() throws NoSuchMethodException {
 		CompareHessianToConvolution validator = new CompareHessianToConvolution();
 		validator.setTarget(HessianFromGradient.class.getMethod("hessianPrewitt",
 				GrayF32.class,GrayF32.class, GrayF32.class, GrayF32.class, GrayF32.class, ImageBorder_F32.class ));
@@ -74,8 +72,7 @@ public class TestHessianFromGradient extends BoofStandardJUnit {
 		validator.compare(derivX,derivY,derivXX,derivYY,derivXY);
 	}
 
-	@Test
-	public void hessianSobel_I8() throws NoSuchMethodException {
+	@Test void hessianSobel_I8() throws NoSuchMethodException {
 		CompareHessianToConvolution validator = new CompareHessianToConvolution();
 		validator.setTarget(HessianFromGradient.class.getMethod("hessianSobel",
 				GrayS16.class,GrayS16.class, GrayS16.class, GrayS16.class, GrayS16.class,ImageBorder_S32.class ));
@@ -94,8 +91,7 @@ public class TestHessianFromGradient extends BoofStandardJUnit {
 		validator.compare(derivX,derivY,derivXX,derivYY,derivXY);
 	}
 
-	@Test
-	public void hessianSobel_F32() throws NoSuchMethodException {
+	@Test void hessianSobel_F32() throws NoSuchMethodException {
 		CompareHessianToConvolution validator = new CompareHessianToConvolution();
 		validator.setTarget(HessianFromGradient.class.getMethod("hessianSobel",
 				GrayF32.class,GrayF32.class, GrayF32.class, GrayF32.class, GrayF32.class,ImageBorder_F32.class ));
@@ -114,8 +110,7 @@ public class TestHessianFromGradient extends BoofStandardJUnit {
 		validator.compare(derivX,derivY,derivXX,derivYY,derivXY);
 	}
 
-	@Test
-	public void hessianThree_I8() throws NoSuchMethodException {
+	@Test void hessianThree_I8() throws NoSuchMethodException {
 		CompareHessianToConvolution validator = new CompareHessianToConvolution();
 		validator.setTarget(HessianFromGradient.class.getMethod("hessianThree",
 				GrayS16.class,GrayS16.class, GrayS16.class, GrayS16.class, GrayS16.class,ImageBorder_S32.class ));
@@ -134,8 +129,7 @@ public class TestHessianFromGradient extends BoofStandardJUnit {
 		validator.compare(derivX,derivY,derivXX,derivYY,derivXY);
 	}
 
-	@Test
-	public void hessianThree_F32() throws NoSuchMethodException {
+	@Test void hessianThree_F32() throws NoSuchMethodException {
 		CompareHessianToConvolution validator = new CompareHessianToConvolution();
 		validator.setTarget(HessianFromGradient.class.getMethod("hessianThree",
 				GrayF32.class,GrayF32.class, GrayF32.class, GrayF32.class, GrayF32.class,ImageBorder_F32.class ));

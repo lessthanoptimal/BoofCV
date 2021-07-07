@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -25,7 +25,7 @@ import boofcv.struct.image.ImageType;
 import org.ddogleg.struct.DogArray_I8;
 
 /**
- * Visualizes a process where the output is simply a rendered Bitmap image.  Provides an input image
+ * Visualizes a process where the output is simply a rendered Bitmap image. Provides an input image
  * in a BoofCV image and a Bitmap to render the output to.
  *
  * @author Peter Abeles

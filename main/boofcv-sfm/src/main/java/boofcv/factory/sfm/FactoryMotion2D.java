@@ -45,7 +45,7 @@ import org.ddogleg.fitting.modelset.ransac.Ransac;
 import org.ddogleg.struct.Factory;
 
 /**
- * Factory for creating algorithms related to 2D image motion.  Typically used for image stabilization, mosaic, and
+ * Factory for creating algorithms related to 2D image motion. Typically used for image stabilization, mosaic, and
  * motion detection in video feeds.
  *
  * @author Peter Abeles
@@ -60,8 +60,8 @@ public class FactoryMotion2D {
 	 * @param outlierPrune If a feature is an outlier for this many turns in a row it is dropped. Try 2
 	 * @param absoluteMinimumTracks New features will be respawned if the number of inliers drop below this number.
 	 * @param respawnTrackFraction If the fraction of current inliers to the original number of inliers drops below
-	 * this fraction then new features are spawned.  Try 0.3
-	 * @param respawnCoverageFraction If the area covered drops by this fraction then spawn more features.  Try 0.8
+	 * this fraction then new features are spawned. Try 0.3
+	 * @param respawnCoverageFraction If the area covered drops by this fraction then spawn more features. Try 0.8
 	 * @param refineEstimate Should it refine the model estimate using all inliers.
 	 * @param tracker Point feature tracker.
 	 * @param motionModel Instance of the model model used. Affine2D_F64 or Homography2D_F64
@@ -118,7 +118,7 @@ public class FactoryMotion2D {
 	}
 
 	/**
-	 * Estimates the image motion then combines images together.  Typically used for mosaics and stabilization.
+	 * Estimates the image motion then combines images together. Typically used for mosaics and stabilization.
 	 *
 	 * @param maxJumpFraction If the area changes by this much between two consecuative frames then the transform
 	 * is reset.

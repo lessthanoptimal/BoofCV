@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -38,8 +38,7 @@ public abstract class ResidualTriangulateMetricChecks extends CommonTriangulatio
 	/**
 	 * Give it perfect parameters and no noise in observations then try introducing some errors
 	 */
-	@Test
-	public void perfect() {
+	@Test void perfect() {
 		createScene();
 		FunctionNtoM alg = createAlg(obsNorm, motionWorldToCamera);
 

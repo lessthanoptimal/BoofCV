@@ -51,8 +51,8 @@ import java.util.List;
 
 /**
  * <p>
- * Example of how to train a K-NN bow-of-word classifier for scene recognition.  The resulting classifier
- * produces results which are correct 52.2% of the time.  To provide a point of comparison, randomly selecting
+ * Example of how to train a K-NN bow-of-word classifier for scene recognition. The resulting classifier
+ * produces results which are correct 52.2% of the time. To provide a point of comparison, randomly selecting
  * a scene is about 6.7% accurate, SVM One vs One RBF classifier can produce accuracy of around 74% and
  * other people using different techniques claim to have achieved around 85% accurate with more advanced
  * techniques.
@@ -106,7 +106,7 @@ public class ExampleClassifySceneKnn extends LearnSceneFromFiles {
 	}
 
 	/**
-	 * Process all the data in the training data set to learn the classifications.  See code for details.
+	 * Process all the data in the training data set to learn the classifications. See code for details.
 	 */
 	public void learnAndSave() {
 		System.out.println("======== Learning Classifier");
@@ -134,7 +134,7 @@ public class ExampleClassifySceneKnn extends LearnSceneFromFiles {
 	}
 
 	/**
-	 * Extract dense features across the training set.  Then clusters are found within those features.
+	 * Extract dense features across the training set. Then clusters are found within those features.
 	 */
 	private AssignCluster<double[]> computeClusters() {
 		System.out.println("Image Features");
@@ -161,7 +161,7 @@ public class ExampleClassifySceneKnn extends LearnSceneFromFiles {
 		}
 
 		System.out.println("Clustering");
-		// Find the clusters.  This can take a bit
+		// Find the clusters. This can take a bit
 		cluster.process(NUMBER_OF_WORDS);
 
 		UtilIO.save(cluster.getAssignment(), CLUSTER_FILE_NAME);
@@ -186,7 +186,7 @@ public class ExampleClassifySceneKnn extends LearnSceneFromFiles {
 	}
 
 	/**
-	 * For all the images in the training data set it computes a {@link HistogramScene}.  That data structure
+	 * For all the images in the training data set it computes a {@link HistogramScene}. That data structure
 	 * contains the word histogram and the scene that the histogram belongs to.
 	 */
 	private List<HistogramScene> computeHistograms( FeatureToWordHistogram_F64 featuresToHistogram ) {
@@ -212,7 +212,7 @@ public class ExampleClassifySceneKnn extends LearnSceneFromFiles {
 				}
 				featuresToHistogram.process();
 
-				// The histogram is already normalized so that it sums up to 1.  This provides invariance
+				// The histogram is already normalized so that it sums up to 1. This provides invariance
 				// against the overall number of features changing.
 				double[] histogram = featuresToHistogram.getHistogram();
 
@@ -289,7 +289,7 @@ public class ExampleClassifySceneKnn extends LearnSceneFromFiles {
 		System.out.println("Accuracy = " + confusion.computeAccuracy());
 
 		// Show confusion matrix
-		// Not the best coloration scheme...  perfect = red diagonal and blue elsewhere.
+		// Not the best coloration scheme... perfect = red diagonal and blue elsewhere.
 		ShowImages.showWindow(new ConfusionMatrixPanel(
 				confusion.getMatrix(), example.getScenes(), 400, true), "Confusion Matrix", true);
 
@@ -300,7 +300,7 @@ public class ExampleClassifySceneKnn extends LearnSceneFromFiles {
 
 		// SURF results are interesting. "Stable" is significantly better than "fast"!
 		// One explanation is that the descriptor for "fast" samples a smaller region than "stable", by a
-		// couple of pixels at scale of 1.  Thus there is less overlap between the features.
+		// couple of pixels at scale of 1. Thus there is less overlap between the features.
 
 		// Reducing the size of "stable" to 0.95 does slightly improve performance to 50.5%, can't scale it down
 		// much more without performance going down

@@ -43,8 +43,7 @@ public class TestImplConvolveMean extends CompareEquivalentFunctions {
 		super(ImplConvolveMean.class, ConvolveImageStandard_SB.class);
 	}
 
-	@Test
-	public void compareToStandard() {
+	@Test void compareToStandard() {
 		performTests(10);
 	}
 

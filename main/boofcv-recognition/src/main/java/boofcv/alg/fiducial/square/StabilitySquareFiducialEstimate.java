@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -26,9 +26,9 @@ import georegression.struct.so.Rodrigues_F64;
 import org.ddogleg.struct.DogArray;
 
 /**
- * Used to estimate the stability of {@link BaseDetectFiducialSquare} fiducials.  Each corner point is disturbed by
+ * Used to estimate the stability of {@link BaseDetectFiducialSquare} fiducials. Each corner point is disturbed by
  * adding the user provided "disturbance" independently to the x and y axis in the positive and negative direction.
- * The maximum resulting delta is then reported.  Maximum change in angle and orientation is computed.
+ * The maximum resulting delta is then reported. Maximum change in angle and orientation is computed.
  *
  * @author Peter Abeles
  */
@@ -62,7 +62,7 @@ public class StabilitySquareFiducialEstimate {
 	 * Processes the observation and generates a stability estimate
 	 *
 	 * @param sampleRadius Radius around the corner pixels it will sample
-	 * @param input Observed corner location of the fiducial in distorted pixels.  Must be in correct order.
+	 * @param input Observed corner location of the fiducial in distorted pixels. Must be in correct order.
 	 * @return true if successful or false if it failed
 	 */
 	public boolean process( double sampleRadius, Quadrilateral_F64 input ) {

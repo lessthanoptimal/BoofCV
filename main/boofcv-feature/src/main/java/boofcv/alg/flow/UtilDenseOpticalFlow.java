@@ -35,22 +35,22 @@ public class UtilDenseOpticalFlow {
 
 	/**
 	 * <p>
-	 * Create a standard image pyramid used by dense optical flow parameters.  The first layer is the size
-	 * of the input image and the last layer is &ge; the minSize.  The sigma for each layer is computed
+	 * Create a standard image pyramid used by dense optical flow parameters. The first layer is the size
+	 * of the input image and the last layer is &ge; the minSize. The sigma for each layer is computed
 	 * using the following formula:<br>
 	 * <br>
 	 * sigmaLayer = sigma*sqrt( scale^-2 - 1 )
 	 * </p>
 	 *
 	 * <p>
-	 * If the scale is 1 then a single layer pyramid will be created.  If the scale is 0 then the scale will
+	 * If the scale is 1 then a single layer pyramid will be created. If the scale is 0 then the scale will
 	 * be determined by the maxLayers parameter.
 	 * </p>
 	 *
 	 * @param width Width of input image.
 	 * @param height Height of input image.
-	 * @param scale Scale between layers.  0 &le; scale &le; 1.  Try 0.7
-	 * @param sigma Adjusts the amount of blur applied to each layer.  If sigma &le; 0 then no blur is applied.
+	 * @param scale Scale between layers. 0 &le; scale &le; 1. Try 0.7
+	 * @param sigma Adjusts the amount of blur applied to each layer. If sigma &le; 0 then no blur is applied.
 	 * @param minSize The minimum desired image size in the pyramid
 	 * @param maxLayers The maximum number of layers in the pyramid.
 	 * @param imageType Type of image for each layer

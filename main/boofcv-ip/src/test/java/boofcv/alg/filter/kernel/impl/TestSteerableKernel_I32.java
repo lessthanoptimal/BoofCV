@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -37,8 +37,7 @@ public class TestSteerableKernel_I32 extends BoofStandardJUnit {
 	/**
 	 * Checks to see if the basis kernels are correctly combined together.
 	 */
-	@Test
-	public void checkCombining() {
+	@Test void checkCombining() {
 		double c[] = new double[]{0.1, 0.2, 0.8};
 		DummySteerableCoefficients coef = new DummySteerableCoefficients(c);
 		Kernel2D basis[] = new Kernel2D[3];

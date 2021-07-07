@@ -21,9 +21,9 @@ package boofcv.abst.feature.associate;
 import boofcv.struct.feature.MatchScoreType;
 
 /**
- * Scores the fit quality between two feature descriptions.  A lower score always indicate a better match a larger one.
+ * Scores the fit quality between two feature descriptions. A lower score always indicate a better match a larger one.
  * Thus scoreA &lt; scoreB will return true if scoreA is a better score than scoreB.
- * The range of possible scores is not specified by this interface.  For example, correlation based scores can
+ * The range of possible scores is not specified by this interface. For example, correlation based scores can
  * take on both positive and negative values while Euclidean will always be positive or zero.
  *
  * NOTES: To ensure that lower is better, correlation scores undergo a sign flip.
@@ -34,11 +34,11 @@ import boofcv.struct.feature.MatchScoreType;
 public interface ScoreAssociation<Desc> {
 
 	/**
-	 * Compute the fit score between the two features.  A better fit score will have a lower value.
+	 * Compute the fit score between the two features. A better fit score will have a lower value.
 	 *
 	 * @param a first feature
 	 * @param b second feature
-	 * @return Quality of fit score.  Lower is better.
+	 * @return Quality of fit score. Lower is better.
 	 */
 	double score( Desc a, Desc b );
 

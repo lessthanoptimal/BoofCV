@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -24,7 +24,7 @@ import org.ejml.data.DMatrixRMaj;
 
 /**
  * <p>
- * Interface for computing multiple solution to the Projective N-Point (PrNP) problem.  Given a set of
+ * Interface for computing multiple solution to the Projective N-Point (PrNP) problem. Given a set of
  * observations from a single view and the known 3D homogenous location of the points being observed, estimate
  * the projective camera transform.
  * </p>

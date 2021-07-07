@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -88,7 +88,7 @@ public class BackgroundMovingGmm_MB<T extends ImageMultiBand<T>, Motion extends 
 
 					segmented.data[indexOut] = (byte)common.checkBackground(common.inputPixel, modelRow, indexModel);
 				}else {
-					// there is no background here.  Just mark it as not moving to avoid false positives
+					// there is no background here. Just mark it as not moving to avoid false positives
 					segmented.data[indexOut] = unknownValue;
 				}
 			}

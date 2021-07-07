@@ -27,7 +27,7 @@ import java.util.List;
 
 /**
  * <p>
- * Given a set of 8 or more points this class computes the essential or fundamental matrix.  The result is
+ * Given a set of 8 or more points this class computes the essential or fundamental matrix. The result is
  * often used as an initial guess for more accurate non-linear approaches.
  * </p>
  *

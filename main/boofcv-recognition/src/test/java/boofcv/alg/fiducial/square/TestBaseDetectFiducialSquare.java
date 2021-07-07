@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -48,15 +48,13 @@ public class TestBaseDetectFiducialSquare extends BoofStandardJUnit {
 	/**
 	 * Apply heavy lens distortion. This test will only pass if it's correctly removed.
 	 */
-	@Test
-	public void heavyLensRemoval() {
+	@Test void heavyLensRemoval() {
 		int width = 640,height=640;
 		CameraPinholeBrown intrinsic = new CameraPinholeBrown(500,500,0,width/2,height/2,width,height).fsetRadial(-0.01,-0.15);
 		checkDetectRender(width, height, intrinsic,true);
 	}
 
-	@Test
-	public void noLensSpecified() {
+	@Test void noLensSpecified() {
 		int width = 640,height=640;
 		CameraPinholeBrown intrinsic = new CameraPinholeBrown(500,500,0,width/2,height/2,width,height);
 		checkDetectRender(width, height, intrinsic,false);
@@ -92,8 +90,7 @@ public class TestBaseDetectFiducialSquare extends BoofStandardJUnit {
 		assertEquals(1,detector.getFound().size);
 	}
 
-	@Test
-	public void computeFractionBoundary() {
+	@Test void computeFractionBoundary() {
 		Dummy alg = new Dummy();
 
 		alg.borderWidthFraction = 0.25;

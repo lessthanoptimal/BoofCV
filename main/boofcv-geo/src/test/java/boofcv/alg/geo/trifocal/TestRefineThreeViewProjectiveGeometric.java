@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -34,8 +34,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  * @author Peter Abeles
  */
 public class TestRefineThreeViewProjectiveGeometric extends CommonTrifocalChecks{
-	@Test
-	public void perfect() {
+	@Test void perfect() {
 		RefineThreeViewProjectiveGeometric alg = new RefineThreeViewProjectiveGeometric();
 
 		List<AssociatedTriple> originalPixels = new ArrayList<>();
@@ -59,8 +58,7 @@ public class TestRefineThreeViewProjectiveGeometric extends CommonTrifocalChecks
 	/**
 	 * Small error in initial parameters
 	 */
-	@Test
-	public void incorrectInitial() {
+	@Test void incorrectInitial() {
 		RefineThreeViewProjectiveGeometric alg = new RefineThreeViewProjectiveGeometric();
 
 		List<AssociatedTriple> originalPixels = new ArrayList<>();

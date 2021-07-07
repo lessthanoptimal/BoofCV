@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -156,7 +156,7 @@ public abstract class SelectAlgorithmAndInputPanel extends JPanel
 	}
 
 	/**
-	 * Used to add the main GUI to this panel.   Must use this function.
+	 * Used to add the main GUI to this panel.  Must use this function.
 	 * Algorithm change events will not be posted until this function has been set.
 	 *
 	 * @param gui The main GUI being displayed.
@@ -168,9 +168,9 @@ public abstract class SelectAlgorithmAndInputPanel extends JPanel
 	}
 
 	/**
-	 * Specifies an image which contains the original input image.  After this has been called the
+	 * Specifies an image which contains the original input image. After this has been called the
 	 * view input image widget is activated and when selected this image will be displayed instead
-	 * of the main GUI.  This functionality is optional.
+	 * of the main GUI. This functionality is optional.
 	 *
 	 * @param image Original input image.
 	 */
@@ -210,7 +210,7 @@ public abstract class SelectAlgorithmAndInputPanel extends JPanel
 
 	/**
 	 * Grabs the currently selected algorithm, passes information to GUI for updating, toggles GUI
-	 * being active/not.  refreshAll() is called in a new thread.
+	 * being active/not. refreshAll() is called in a new thread.
 	 */
 	public void doRefreshAll() {
 		SwingUtilities.invokeLater(() -> {
@@ -313,7 +313,7 @@ public abstract class SelectAlgorithmAndInputPanel extends JPanel
 	public abstract void refreshAll( Object[] cookies );
 
 	/**
-	 * A request has been made to change the processing algorithm.  NOT called from a GUI thread.
+	 * A request has been made to change the processing algorithm. NOT called from a GUI thread.
 	 *
 	 * @param name Display name of the algorithm.
 	 * @param cookie Reference to user defined data.
@@ -321,7 +321,7 @@ public abstract class SelectAlgorithmAndInputPanel extends JPanel
 	public abstract void setActiveAlgorithm( int indexFamily, String name, Object cookie );
 
 	/**
-	 * A request to change the input image has been made.  The input image's label and its index in the
+	 * A request to change the input image has been made. The input image's label and its index in the
 	 * manager are returned.
 	 *
 	 * @param name Display name of the image.

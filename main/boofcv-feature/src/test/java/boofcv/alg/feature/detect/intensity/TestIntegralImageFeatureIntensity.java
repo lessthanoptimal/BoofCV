@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -39,8 +39,7 @@ public class TestIntegralImageFeatureIntensity extends BoofStandardJUnit {
 	/**
 	 * Compares hessian intensity against a naive implementation
 	 */
-	@Test
-	public void hessian_F32() {
+	@Test void hessian_F32() {
 		GrayF32 original = new GrayF32(width,height);
 		GrayF32 integral = new GrayF32(width,height);
 		GrayF32 found = new GrayF32(width,height);
@@ -64,8 +63,7 @@ public class TestIntegralImageFeatureIntensity extends BoofStandardJUnit {
 	/**
 	 * Compares hessian intensity against a naive implementation
 	 */
-	@Test
-	public void hessian_S32() {
+	@Test void hessian_S32() {
 		GrayS32 original = new GrayS32(width,height);
 		GrayS32 integral = new GrayS32(width,height);
 		GrayF32 found = new GrayF32(width,height);

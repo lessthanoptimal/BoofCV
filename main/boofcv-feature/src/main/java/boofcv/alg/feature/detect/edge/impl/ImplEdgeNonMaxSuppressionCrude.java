@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -30,7 +30,7 @@ import boofcv.struct.image.GrayS32;
 
 /**
  * <p>
- * Implementations of the crude version of non-maximum edge suppression.  If the gradient is positive or negative
+ * Implementations of the crude version of non-maximum edge suppression. If the gradient is positive or negative
  * is used to determine the direction of suppression. This is faster since an expensive orientation calculation
  * is avoided.
  * </p>
@@ -45,7 +45,7 @@ import boofcv.struct.image.GrayS32;
 public class ImplEdgeNonMaxSuppressionCrude {
 
 	/**
-	 * Only processes the inner image.  Ignoring the border.
+	 * Only processes the inner image. Ignoring the border.
 	 */
 	static public void inner4( GrayF32 intensity , GrayF32 derivX , GrayF32 derivY, GrayF32 output )
 	{
@@ -80,7 +80,7 @@ public class ImplEdgeNonMaxSuppressionCrude {
 	}
 
 	/**
-	 * Only processes the inner image.  Ignoring the border.
+	 * Only processes the inner image. Ignoring the border.
 	 */
 	static public void inner4( GrayF32 intensity , GrayS16 derivX , GrayS16 derivY, GrayF32 output )
 	{
@@ -115,7 +115,7 @@ public class ImplEdgeNonMaxSuppressionCrude {
 	}
 
 	/**
-	 * Only processes the inner image.  Ignoring the border.
+	 * Only processes the inner image. Ignoring the border.
 	 */
 	static public void inner4( GrayF32 intensity , GrayS32 derivX , GrayS32 derivY, GrayF32 output )
 	{

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -31,8 +31,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
  */
 public class TestFourierTransformNaive_F32 extends BoofStandardJUnit {
 
-	@Test
-	public void forwardsRRI_inverseRIR() {
+	@Test void forwardsRRI_inverseRIR() {
 		float[] original = new float[]{0.5f,2f,-0.34f,5f,6f,2f,10f,10f,10f,0f,-0.4f,-6f};
 		float[] tranImag = new float[original.length];
 		float[] tranReal = new float[original.length];
@@ -46,8 +45,7 @@ public class TestFourierTransformNaive_F32 extends BoofStandardJUnit {
 		}
 	}
 
-	@Test
-	public void transform_RIRI_RIRI() {
+	@Test void transform_RIRI_RIRI() {
 		float[] originalR = new float[]{0.5f,2f,-0.34f,5f,6f,2f,10f,10f,10f,0f,-0.4f,-6f};
 		float[] originalI = new float[]{-0.5f,1.5f,-3f,1.5f,3.5f,-0.6f,-4f,4f,3f,-2f,-3f,2.5f};
 		float[] tranImag = new float[originalR.length];
@@ -64,8 +62,7 @@ public class TestFourierTransformNaive_F32 extends BoofStandardJUnit {
 		}
 	}
 
-	@Test
-	public void forward_reverse_image() {
+	@Test void forward_reverse_image() {
 		GrayF32 input = new GrayF32(30,40);
 		GrayF32 tranR = new GrayF32(30,40);
 		GrayF32 tranI = new GrayF32(30,40);

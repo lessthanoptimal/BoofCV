@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -34,7 +34,7 @@ import java.net.URL;
 import java.util.List;
 
 /**
- * This video interface attempts to load a native reader.  If that fails, jcodec, if that fails it just
+ * This video interface attempts to load a native reader. If that fails, jcodec, if that fails it just
  * uses the built in video types.
  *
  * @author Peter Abeles
@@ -131,7 +131,7 @@ public class DynamicVideoInterface implements VideoInterface {
 			Class c = Class.forName(pathToManager);
 			return (VideoInterface)c.getConstructor().newInstance();
 		} catch (ClassNotFoundException e) {
-			throw new RuntimeException("Class not found.  Is it included in the class path?");
+			throw new RuntimeException("Class not found. Is it included in the class path?");
 		} catch (InstantiationException | IllegalAccessException | NoSuchMethodException | InvocationTargetException e) {
 			throw new RuntimeException(e);
 		}

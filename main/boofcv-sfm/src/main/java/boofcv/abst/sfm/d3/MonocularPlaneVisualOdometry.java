@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -24,9 +24,9 @@ import boofcv.struct.image.ImageType;
 import georegression.struct.se.Se3_F64;
 
 /**
- * Estimates the camera's motion relative to the ground plane.  The world being viewed is assumed to be planar.
- * The transform from the ground plane to the camera view is assumed to be known.   Both the intrinsic and
- * extrinsic parameters are allowed to change between image frames.  Since the transform between the ground and
+ * Estimates the camera's motion relative to the ground plane. The world being viewed is assumed to be planar.
+ * The transform from the ground plane to the camera view is assumed to be known.  Both the intrinsic and
+ * extrinsic parameters are allowed to change between image frames. Since the transform between the ground and
  * camera is known, there is no scale ambiguity.
  *
  * @author Peter Abeles
@@ -34,15 +34,15 @@ import georegression.struct.se.Se3_F64;
 public interface MonocularPlaneVisualOdometry<T extends ImageBase<T>> extends VisualOdometry<Se3_F64> {
 
 	/**
-	 * Specifies the camera's intrinsic and extrinsic parameters.  Can be changed at any time.
+	 * Specifies the camera's intrinsic and extrinsic parameters. Can be changed at any time.
 	 *
 	 * @param param Camera calibration parameters
 	 */
 	void setCalibration( MonoPlaneParameters param );
 
 	/**
-	 * Process the new image and update the motion estimate.  The return value must be checked
-	 * to see if the estimate was actually updated.  If false is returned then {@link #isFault}
+	 * Process the new image and update the motion estimate. The return value must be checked
+	 * to see if the estimate was actually updated. If false is returned then {@link #isFault}
 	 * also needs to be checked to see if the pose estimate has been reset.
 	 *
 	 * @param input Next image in the sequence.

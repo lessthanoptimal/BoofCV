@@ -47,7 +47,7 @@ public class AssociatedTriplePanel extends JPanel {
 	BufferedImage image1, image2, image3;
 	DGrowArray points = new DGrowArray();
 
-	// color of each points.  Randomly select at runtime
+	// color of each points. Randomly select at runtime
 	Color[] colors;
 
 	// separation between images

@@ -38,8 +38,7 @@ public class TestImplDescribePointPixelRegionNCC_F32  extends BoofStandardJUnit 
 		GImageMiscOps.fillUniform(img, rand, 0, 30);
 	}
 
-	@Test
-	public void inner() {
+	@Test void inner() {
 		BoofTesting.checkSubImage(this, "checkInner", false, img, 4, 6, 7, 5);
 		BoofTesting.checkSubImage(this, "checkInner", false, img, 7,3,4,5);
 		BoofTesting.checkSubImage(this, "checkInner", false, img, 4,6,2,4);
@@ -81,8 +80,7 @@ public class TestImplDescribePointPixelRegionNCC_F32  extends BoofStandardJUnit 
 		}
 	}
 
-	@Test
-	public void border() {
+	@Test void border() {
 		BoofTesting.checkSubImage(this, "checkBorder", false, img, 0,0,5,7);
 		BoofTesting.checkSubImage(this, "checkBorder", false, img, img.width-1,img.height-1,5,7);
 		BoofTesting.checkSubImage(this, "checkBorder", false, img, 100,200,5,7);

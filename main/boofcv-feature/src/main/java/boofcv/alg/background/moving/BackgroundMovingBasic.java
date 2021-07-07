@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -36,12 +36,12 @@ public abstract class BackgroundMovingBasic<T extends ImageBase<T>, Motion exten
 		extends BackgroundModelMoving<T, Motion> implements BackgroundAlgorithmBasic {
 
 	/**
-	 * Specifies how fast it will adapt. 0 to 1, inclusive.  0 = static  1.0 = instant.
+	 * Specifies how fast it will adapt. 0 to 1, inclusive. 0 = static  1.0 = instant.
 	 */
 	protected float learnRate;
 
 	/**
-	 * Threshold for classifying a pixel as background or not.  If euclidean distance less than or equal to this value
+	 * Threshold for classifying a pixel as background or not. If euclidean distance less than or equal to this value
 	 * it is background.
 	 */
 	protected float threshold;
@@ -49,8 +49,8 @@ public abstract class BackgroundMovingBasic<T extends ImageBase<T>, Motion exten
 	/**
 	 * Configures background model
 	 *
-	 * @param learnRate learning rate, 0 to 1.  0 = fastest and 1 = slowest.
-	 * @param threshold Euclidean distance threshold.  Background is &le; this value
+	 * @param learnRate learning rate, 0 to 1. 0 = fastest and 1 = slowest.
+	 * @param threshold Euclidean distance threshold. Background is &le; this value
 	 * @param transform Point transform
 	 * @param imageType Type of input image
 	 */

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -37,8 +37,8 @@ public class FactoryInterpolation {
 	/**
 	 * Returns {@link InterpolatePixelS} of the specified type.
 	 *
-	 * @param min Minimum possible pixel value.  Inclusive.
-	 * @param max Maximum possible pixel value.  Inclusive.
+	 * @param min Minimum possible pixel value. Inclusive.
+	 * @param max Maximum possible pixel value. Inclusive.
 	 * @param type Type of interpolation.
 	 * @param dataType Type of gray-scale image
 	 * @return Interpolation for single band image
@@ -70,8 +70,8 @@ public class FactoryInterpolation {
 	/**
 	 * Creates an interpolation class of the specified type for the specified image type.
 	 *
-	 * @param min Minimum possible pixel value.  Inclusive.
-	 * @param max Maximum possible pixel value.  Inclusive.
+	 * @param min Minimum possible pixel value. Inclusive.
+	 * @param max Maximum possible pixel value. Inclusive.
 	 * @param type Interpolation type
 	 * @param borderType Border type. If null then it will not be set here.
 	 * @param imageType Type of input image
@@ -110,8 +110,8 @@ public class FactoryInterpolation {
 	/**
 	 * Pixel based interpolation on multi-band image
 	 *
-	 * @param min Minimum possible pixel value.  Inclusive.
-	 * @param max Maximum possible pixel value.  Inclusive.
+	 * @param min Minimum possible pixel value. Inclusive.
+	 * @param max Maximum possible pixel value. Inclusive.
 	 * @param type Interpolation type
 	 * @param imageType Type of input image
 	 */

@@ -106,7 +106,7 @@ public class Polygon3DSequenceViewer extends JPanel implements KeyListener, Mous
 	}
 
 	/**
-	 * Adds a polygon to the viewer.  GUI Thread safe.
+	 * Adds a polygon to the viewer. GUI Thread safe.
 	 *
 	 * @param polygon shape being added
 	 */
@@ -123,7 +123,7 @@ public class Polygon3DSequenceViewer extends JPanel implements KeyListener, Mous
 	}
 
 	/**
-	 * Adds a polygon to the viewer.  GUI Thread safe.
+	 * Adds a polygon to the viewer. GUI Thread safe.
 	 *
 	 * @param polygon shape being added
 	 */

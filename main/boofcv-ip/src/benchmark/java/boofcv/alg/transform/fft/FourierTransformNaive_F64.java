@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -21,7 +21,7 @@ package boofcv.alg.transform.fft;
 import boofcv.struct.image.GrayF64;
 
 /**
- * Direct implementation of a Fourier transform.  Horribly inefficient.
+ * Direct implementation of a Fourier transform. Horribly inefficient.
  *
  * @author Peter Abeles
  */

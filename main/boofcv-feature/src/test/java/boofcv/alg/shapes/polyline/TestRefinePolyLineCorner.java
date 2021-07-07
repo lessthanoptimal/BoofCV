@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -40,8 +40,7 @@ public class TestRefinePolyLineCorner extends BoofStandardJUnit {
 	/**
 	 * Fit to a square
 	 */
-	@Test
-	public void fit_quad() {
+	@Test void fit_quad() {
 		int x0 = 10,y0 = 15;
 		int x1 = 60,y1 = 99;
 
@@ -70,8 +69,7 @@ public class TestRefinePolyLineCorner extends BoofStandardJUnit {
 	/**
 	 * Fit to a square, but only a disconnected polyline on 3 sides
 	 */
-	@Test
-	public void fit_quad_segment() {
+	@Test void fit_quad_segment() {
 		int x0 = 10,y0 = 15;
 		int x1 = 60,y1 = 99;
 
@@ -101,8 +99,7 @@ public class TestRefinePolyLineCorner extends BoofStandardJUnit {
 	/**
 	 * Fit six sided shape
 	 */
-	@Test
-	public void fit_six_sides() {
+	@Test void fit_six_sides() {
 		List<Point2D_I32> points = new ArrayList<>();
 		addPoints(0,0,20,0,points);
 		addPoints(20,0,20,20,points);
@@ -140,8 +137,7 @@ public class TestRefinePolyLineCorner extends BoofStandardJUnit {
 	/**
 	 * easy straight forward case
 	 */
-	@Test
-	public void optimize_easy() {
+	@Test void optimize_easy() {
 		List<Point2D_I32> contour = new ArrayList<>();
 		addPoints(0, 0, 20, 0, contour);
 		addPoints(20, 0, 20, 20, contour);
@@ -155,8 +151,7 @@ public class TestRefinePolyLineCorner extends BoofStandardJUnit {
 	/**
 	 * Test case where a local minimum will cause it to get stuck if a local search is performed
 	 */
-	@Test
-	public void optimize_kinky() {
+	@Test void optimize_kinky() {
 		List<Point2D_I32> contour = new ArrayList<>();
 		addPoints(0, 0, 20, 0, contour);
 		addPoints(20, 0, 20, 20, contour);
@@ -171,8 +166,7 @@ public class TestRefinePolyLineCorner extends BoofStandardJUnit {
 		assertEquals(20,found);
 	}
 
-	@Test
-	public void distanceSum() {
+	@Test void distanceSum() {
 		RefinePolyLineCorner alg = new RefinePolyLineCorner(true);
 
 		List<Point2D_I32> contour = new ArrayList<>();
@@ -207,8 +201,7 @@ public class TestRefinePolyLineCorner extends BoofStandardJUnit {
 	/**
 	 * Test to see if it gracefully handles the case where there are too few points
 	 */
-	@Test
-	public void tooFewPoints() {
+	@Test void tooFewPoints() {
 		RefinePolyLineCorner alg = new RefinePolyLineCorner(true);
 
 		DogArray_I32 corners = new DogArray_I32();

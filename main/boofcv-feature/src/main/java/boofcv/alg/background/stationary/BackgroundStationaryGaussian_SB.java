@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -38,14 +38,14 @@ public class BackgroundStationaryGaussian_SB<T extends ImageGray<T>>
 	// wrappers which provide abstraction across image types
 	protected GImageGray inputWrapper;
 
-	// background is composed of two channels.  0 = mean, 1 = variance
+	// background is composed of two channels. 0 = mean, 1 = variance
 	Planar<GrayF32> background = new Planar<>(GrayF32.class,1,1,2);
 
 	/**
 	 * Configurations background removal.
 	 *
-	 * @param learnRate Specifies how quickly the background is updated.  0 = static  1.0 = instant.  Try 0.05
-	 * @param threshold Threshold for background.  Try 10.
+	 * @param learnRate Specifies how quickly the background is updated. 0 = static  1.0 = instant. Try 0.05
+	 * @param threshold Threshold for background. Try 10.
 	 * @param imageType Type of input image.
 	 */
 	public BackgroundStationaryGaussian_SB(float learnRate, float threshold, Class<T> imageType)

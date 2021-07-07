@@ -59,7 +59,7 @@ import java.util.List;
  * <p>
  * [1] Chapter 4, "Multiple View Geometry in Computer Vision"  2nd Ed. but uses normalization
  * from "An Invitation to 3-D Vision" 2004.<br>
- * [2] Kannala, Juho, Mikko Salo, and Janne Heikkilä.  "Algorithms for Computing a Planar Homography from
+ * [2] Kannala, Juho, Mikko Salo, and Janne Heikkilä. "Algorithms for Computing a Planar Homography from
  * Conics in Correspondence." BMVC. 2006.
  * </p>
  *
@@ -110,13 +110,13 @@ public class HomographyDirectLinearTransform {
 
 	/**
 	 * <p>
-	 * Computes the homography matrix given a set of observed points in two images.  A set of {@link AssociatedPair}
-	 * is passed in.  The computed homography 'H' is found such that the attributes 'p1' and 'p2' in {@link AssociatedPair}
+	 * Computes the homography matrix given a set of observed points in two images. A set of {@link AssociatedPair}
+	 * is passed in. The computed homography 'H' is found such that the attributes 'p1' and 'p2' in {@link AssociatedPair}
 	 * refers to x1 and x2, respectively, in the equation  below:<br>
 	 * x<sub>2</sub> = H*x<sub>1</sub>
 	 * </p>
 	 *
-	 * @param points A set of observed image points that are generated from a planar object.  Minimum of 4 pairs required.
+	 * @param points A set of observed image points that are generated from a planar object. Minimum of 4 pairs required.
 	 * @param foundH Output: Storage for the found solution. 3x3 matrix.
 	 * @return True if successful. False if it failed.
 	 */
@@ -295,7 +295,7 @@ public class HomographyDirectLinearTransform {
 	}
 
 	/**
-	 * <p>Adds the 9x9 matrix constraint for each pair of conics.  To avoid O(N^2) growth the default option only
+	 * <p>Adds the 9x9 matrix constraint for each pair of conics. To avoid O(N^2) growth the default option only
 	 * adds O(N) pairs. if only conics are used then a minimum of 3 is required. See [2].</p>
 	 *
 	 * inv(C[1]')*(C[2]')*H - H*invC[1]*C[2] == 0
@@ -329,7 +329,7 @@ public class HomographyDirectLinearTransform {
 	protected int addConicPairConstraints( AssociatedPairConic a, AssociatedPairConic b, DMatrixRMaj A, int rowA ) {
 		// s*C[i] = H^T*V[i]*H
 		// C[i] = a, C[j] = b
-		// Conic in view 1 is C and view 2 is V, e.g. x' = H*x.  x' is in view 2 and x in view 1
+		// Conic in view 1 is C and view 2 is V, e.g. x' = H*x. x' is in view 2 and x in view 1
 		UtilCurves_F64.convert(a.p1, C1);
 		UtilCurves_F64.convert(a.p2, V1);
 		CommonOps_DDF3.invert(C1, C1_inv);

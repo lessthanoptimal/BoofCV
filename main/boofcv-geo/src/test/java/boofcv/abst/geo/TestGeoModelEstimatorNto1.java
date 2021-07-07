@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -59,24 +59,21 @@ public class TestGeoModelEstimatorNto1 extends BoofStandardJUnit {
 		}
 	}
 
-	@Test
-	public void successButNoSolutions() {
+	@Test void successButNoSolutions() {
 		GeoModelEstimatorNto1<DMatrixRMaj,AssociatedPair> alg =
 				new DummyEstimator(new Dummy(0, true),distance,2);
 
 		assertFalse(alg.process(obs,found));
 	}
 
-	@Test
-	public void checkFailed() {
+	@Test void checkFailed() {
 		GeoModelEstimatorNto1<DMatrixRMaj,AssociatedPair>  alg =
 				new DummyEstimator(new Dummy(0, false), distance,2);
 
 		assertFalse(alg.process(obs,found));
 	}
 
-	@Test
-	public void checkOneSolution() {
+	@Test void checkOneSolution() {
 		GeoModelEstimatorNto1<DMatrixRMaj,AssociatedPair>  alg =
 				new DummyEstimator(new Dummy(1, true), distance,2);
 
@@ -85,10 +82,9 @@ public class TestGeoModelEstimatorNto1 extends BoofStandardJUnit {
 
 	/**
 	 * Generate one matrix which should match the epipolar constraint and a bunch of random
-	 * ones.  See if it selects the correct matrix
+	 * ones. See if it selects the correct matrix
 	 */
-	@Test
-	public void checkSelectBestSolution() {
+	@Test void checkSelectBestSolution() {
 		DMatrixRMaj correct = createSolution();
 
 		GeoModelEstimatorNto1<DMatrixRMaj,AssociatedPair>  alg =

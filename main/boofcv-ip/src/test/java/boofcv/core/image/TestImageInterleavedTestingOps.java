@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -33,8 +33,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  */
 public class TestImageInterleavedTestingOps extends BoofStandardJUnit {
 
-	@Test
-	public void fill() {
+	@Test void fill() {
 		InterleavedU8 image = new InterleavedU8(10, 20, 3);
 
 		BoofTesting.checkSubImage(this, "checkFill", true, image);
@@ -52,8 +51,7 @@ public class TestImageInterleavedTestingOps extends BoofStandardJUnit {
 		}
 	}
 
-	@Test
-	public void randomize() {
+	@Test void randomize() {
 		InterleavedU8 image = new InterleavedU8(10, 20, 3);
 
 		BoofTesting.checkSubImage(this, "checkRandomize", false, image);

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -59,8 +59,7 @@ public abstract class GeneralImageDistortTests<T extends ImageBase<T>> extends B
 	/**
 	 * Makes sure it renders all by default
 	 */
-	@Test
-	public void defaultRenderAllIsTrue() {
+	@Test void defaultRenderAllIsTrue() {
 		T src = imageType.createImage(width, height);
 		T dst = imageType.createImage(width, height);
 
@@ -86,8 +85,7 @@ public abstract class GeneralImageDistortTests<T extends ImageBase<T>> extends B
 		}
 	}
 
-	@Test
-	public void checkRenderAll() {
+	@Test void checkRenderAll() {
 		testDefaultValue(true);
 		testDefaultValue(false);
 	}
@@ -126,8 +124,7 @@ public abstract class GeneralImageDistortTests<T extends ImageBase<T>> extends B
 		}
 	}
 
-	@Test
-	public void testCrop() {
+	@Test void testCrop() {
 		testCrop(true);
 		testCrop(false);
 	}
@@ -173,8 +170,7 @@ public abstract class GeneralImageDistortTests<T extends ImageBase<T>> extends B
 	/**
 	 * Request a pixel outside the image border
 	 */
-	@Test
-	public void testOutsideCrop() {
+	@Test void testOutsideCrop() {
 		testOutsideCrop(true);
 		testOutsideCrop(false);
 	}

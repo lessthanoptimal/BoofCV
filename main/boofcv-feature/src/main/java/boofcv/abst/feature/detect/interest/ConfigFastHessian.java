@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -51,7 +51,7 @@ public class ConfigFastHessian implements Configuration {
 	public ConfigSelectLimit selector = ConfigSelectLimit.selectBestN();
 
 	/**
-	 * How often pixels are sampled in the first octave.  Typically 1 or 2.
+	 * How often pixels are sampled in the first octave. Typically 1 or 2.
 	 */
 	public int initialSampleStep = 1;
 
@@ -71,8 +71,8 @@ public class ConfigFastHessian implements Configuration {
 	public int numberOfOctaves = 4;
 
 	/**
-	 * Increment between kernel sizes as it goes up in scale.  In some data sets, increasing this value beyound
-	 * the default value results in an improvement in stability.  Default 6
+	 * Increment between kernel sizes as it goes up in scale. In some data sets, increasing this value beyound
+	 * the default value results in an improvement in stability. Default 6
 	 */
 	public int scaleStepSize = 6;
 

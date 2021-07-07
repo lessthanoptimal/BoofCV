@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -31,7 +31,7 @@ import java.util.Random;
 
 
 /**
- * Displays labeled binary images.  In these images each detected object is given a unique number.  Each
+ * Displays labeled binary images. In these images each detected object is given a unique number. Each
  * of those numbers is given a unique color.
  *
  * @author Peter Abeles

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -34,10 +34,9 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 public class TestPnPStereoRefineRodrigues extends CommonStereoMotionNPoint {
 
 	/**
-	 * Perfect input.  Shouldn't change anything
+	 * Perfect input. Shouldn't change anything
 	 */
-	@Test
-	public void perfect() {
+	@Test void perfect() {
 		generateScene(10, null, false);
 
 		PnPStereoRefineRodrigues alg = new PnPStereoRefineRodrigues(1e-12, 200);
@@ -53,10 +52,9 @@ public class TestPnPStereoRefineRodrigues extends CommonStereoMotionNPoint {
 	}
 
 	/**
-	 * Noisy input.  Should generate something close to the actual solution
+	 * Noisy input. Should generate something close to the actual solution
 	 */
-	@Test
-	public void noisy() {
+	@Test void noisy() {
 		generateScene(30, null, false);
 
 		PnPStereoRefineRodrigues alg = new PnPStereoRefineRodrigues(1e-12, 200);

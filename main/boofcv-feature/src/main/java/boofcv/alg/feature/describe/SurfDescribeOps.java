@@ -34,8 +34,8 @@ public class SurfDescribeOps {
 
 	/**
 	 * <p>
-	 * Computes the of a square region.  The region considered has a radius
-	 * of ceil(radius*s) pixels.  The derivative is computed every 's' pixels.
+	 * Computes the of a square region. The region considered has a radius
+	 * of ceil(radius*s) pixels. The derivative is computed every 's' pixels.
 	 * </p>
 	 *
 	 * <p>
@@ -62,7 +62,7 @@ public class SurfDescribeOps {
 
 	/**
 	 * Faster version of {@link #gradient} which assumes the region is entirely contained inside the
-	 * of the image.  This includes the convolution kernel's radius.
+	 * of the image. This includes the convolution kernel's radius.
 	 */
 	public static void gradient_noborder( GrayF32 ii, double tl_x, double tl_y, double samplePeriod,
 										  int regionSize, double kernelWidth,
@@ -72,7 +72,7 @@ public class SurfDescribeOps {
 
 	/**
 	 * Faster version of {@link #gradient} which assumes the region is entirely contained inside the
-	 * of the image.  This includes the convolution kernel's radius.
+	 * of the image. This includes the convolution kernel's radius.
 	 */
 	public static void gradient_noborder( GrayS32 ii, double tl_x, double tl_y, double samplePeriod,
 										  int regionSize, double kernelWidth,
@@ -97,8 +97,8 @@ public class SurfDescribeOps {
 	}
 
 	/**
-	 * Checks to see if the region is contained inside the image.  This includes convolution
-	 * kernel.  Take in account the orientation of the region.
+	 * Checks to see if the region is contained inside the image. This includes convolution
+	 * kernel. Take in account the orientation of the region.
 	 *
 	 * @param X Center of the interest point.
 	 * @param Y Center of the interest point.
@@ -151,15 +151,15 @@ public class SurfDescribeOps {
 
 	/**
 	 * <p>
-	 * Tests to see if the rectangular region being sampled is contained inside the image.  Sampling
+	 * Tests to see if the rectangular region being sampled is contained inside the image. Sampling
 	 * is done using a square region with the specified size, where size corresponds to the length
-	 * of each side.  The sample region's size is discretized and rounded up, making this a conservative
+	 * of each side. The sample region's size is discretized and rounded up, making this a conservative
 	 * estimate for containment.
 	 * </p>
 	 * <p>
-	 * This takes in account how integral images are read.  To read in a rectangular region the pixel
+	 * This takes in account how integral images are read. To read in a rectangular region the pixel
 	 * below the lower left corner is read, which results in an extra minus along enough axis for the
-	 * lower bound.  It is also assumed that points are discretized by rounding.
+	 * lower bound. It is also assumed that points are discretized by rounding.
 	 * </p>
 	 *
 	 * @param width Image's width.
@@ -167,7 +167,7 @@ public class SurfDescribeOps {
 	 * @param tl_x Top left corner of region being sampled.
 	 * @param tl_y Top left corner of region being sampled.
 	 * @param regionSize Size of the region being sampled.
-	 * @param sampleSize Length of each side in the sample region.  See comment above.
+	 * @param sampleSize Length of each side in the sample region. See comment above.
 	 * @return If all samples are contained inside the image.
 	 */
 	public static boolean isInside( int width, int height,

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -44,14 +44,14 @@ public class BackgroundStationaryGaussian_IL<T extends ImageInterleaved<T>>
 	protected float[] inputPixel;
 	protected float[] bgPixel;
 
-	// background is composed of bands*2 channels.  even = mean, odd = variance
+	// background is composed of bands*2 channels. even = mean, odd = variance
 	InterleavedF32 background;
 
 	/**
 	 * Configurations background removal.
 	 *
-	 * @param learnRate Specifies how quickly the background is updated.  0 = static  1.0 = instant.  Try 0.05
-	 * @param threshold Threshold for background.  Consult a chi-square table for reasonably values.
+	 * @param learnRate Specifies how quickly the background is updated. 0 = static  1.0 = instant. Try 0.05
+	 * @param threshold Threshold for background. Consult a chi-square table for reasonably values.
 	 *                  10 to 16 for 1 to 3 bands.
 	 * @param imageType Type of input image.
 	 */

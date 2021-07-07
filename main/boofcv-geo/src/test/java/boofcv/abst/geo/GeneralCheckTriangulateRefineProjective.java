@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -38,8 +38,7 @@ public abstract class GeneralCheckTriangulateRefineProjective extends CommonTria
 									  List<DMatrixRMaj> cameraMatrices,
 									  Point4D_F64 initial, Point4D_F64 found );
 
-	@Test
-	public void perfectInput() {
+	@Test void perfectInput() {
 		createScene();
 
 		Point4D_F64 initial = convertH(worldPoint);
@@ -50,8 +49,7 @@ public abstract class GeneralCheckTriangulateRefineProjective extends CommonTria
 		assertEquals(worldPoint.x, convertH(found).x, 1e-8);
 	}
 
-	@Test
-	public void incorrectInput() {
+	@Test void incorrectInput() {
 		createScene();
 
 		Point4D_F64 initial = convertH(worldPoint);

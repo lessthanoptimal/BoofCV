@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -21,7 +21,7 @@ package boofcv.struct.distort;
 import georegression.struct.point.Point2D_F64;
 
 /**
- * A transform which applies no transform.  Can be used to avoid checking for null
+ * A transform which applies no transform. Can be used to avoid checking for null
  *
  * @author Peter Abeles
  */

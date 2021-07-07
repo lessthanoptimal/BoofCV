@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -39,7 +39,7 @@ public class FactoryImageSegmentation {
 	 *
 	 * @see SegmentMeanShift
 	 *
-	 * @param config Configuration.  If null then defaults are used.
+	 * @param config Configuration. If null then defaults are used.
 	 * @param imageType Type of input image.
 	 * @param <T> Image type
 	 * @return new instance of {@link ImageSuperpixels}
@@ -78,7 +78,7 @@ public class FactoryImageSegmentation {
 	 *
 	 * @see SegmentFelzenszwalbHuttenlocher04
 	 *
-	 * @param config Configuration.  If null defaults are used.
+	 * @param config Configuration. If null defaults are used.
 	 * @param imageType Type of input image.
 	 * @param <T> Image type
 	 * @return new instance of {@link ImageSuperpixels}
@@ -95,14 +95,14 @@ public class FactoryImageSegmentation {
 	}
 
 	/**
-	 * Creates an instance of {@link WatershedVincentSoille1991}.  Watershed works better when initial seeds
-	 * are provided.  In this adaptation of watershed to {@link boofcv.abst.segmentation.ImageSuperpixels} only the more basic algorithm
-	 * is used where each local minima is a region, which causes over segmentation.  Watershed also only can process
-	 * gray scale U8 images.  All other image types are converted into that format.
+	 * Creates an instance of {@link WatershedVincentSoille1991}. Watershed works better when initial seeds
+	 * are provided. In this adaptation of watershed to {@link boofcv.abst.segmentation.ImageSuperpixels} only the more basic algorithm
+	 * is used where each local minima is a region, which causes over segmentation. Watershed also only can process
+	 * gray scale U8 images. All other image types are converted into that format.
 	 *
 	 * @see WatershedVincentSoille1991
 	 *
-	 * @param config Configuration.  If null default is used.
+	 * @param config Configuration. If null default is used.
 	 * @param <T> Image type
 	 * @return new instance of {@link ImageSuperpixels}
 	 */

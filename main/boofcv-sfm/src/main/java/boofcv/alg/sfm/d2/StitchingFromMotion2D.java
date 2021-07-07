@@ -34,14 +34,14 @@ import org.jetbrains.annotations.Nullable;
 
 /**
  * Stitches together sequences of images using {@link ImageMotion2D}, typically used for image stabilization
- * and creating mosaics.  Internally any motion model in the Homogeneous family can be used.  For convenience,
+ * and creating mosaics. Internally any motion model in the Homogeneous family can be used. For convenience,
  * those models are converted into a {@link Homography2D_F64} on output.
  *
  * The size of the stitch region is specified using {@link #configure(int, int, georegression.struct.InvertibleTransform)}
- * which must be called before any images are processed.  One of the parameters include an initial transform.  The
+ * which must be called before any images are processed. One of the parameters include an initial transform. The
  * initial transform can be used to scale/translate/other the input image.
  *
- * A sudden change or jump in the shape of the view area can be an indication of a bad motion estimate.  If a large
+ * A sudden change or jump in the shape of the view area can be an indication of a bad motion estimate. If a large
  * jump larger than the user specified threshold is detected then {@link #process(boofcv.struct.image.ImageBase)}
  * will return false.
  *
@@ -125,7 +125,7 @@ public class StitchingFromMotion2D<I extends ImageBase<I>, IT extends Invertible
 	}
 
 	/**
-	 * Estimates the image motion and updates stitched image.  If it is unable to estimate the motion then false
+	 * Estimates the image motion and updates stitched image. If it is unable to estimate the motion then false
 	 * is returned and the stitched image is left unmodified. If false is returned then in most situations it is
 	 * best to call {@link #reset()} and start over.
 	 *
@@ -217,7 +217,7 @@ public class StitchingFromMotion2D<I extends ImageBase<I>, IT extends Invertible
 	}
 
 	/**
-	 * Sets the current image to be the origin of the stitched coordinate system.  The background is filled
+	 * Sets the current image to be the origin of the stitched coordinate system. The background is filled
 	 * with a value of 0.
 	 * Must be called after {@link #process(boofcv.struct.image.ImageBase)}.
 	 */
@@ -246,12 +246,12 @@ public class StitchingFromMotion2D<I extends ImageBase<I>, IT extends Invertible
 	}
 
 	/**
-	 * Resizes the stitch image.  If no transform is provided then the old stitch region is simply
-	 * places on top of the new one and copied.  Pixels which do not exist in the old image are filled with zero.
+	 * Resizes the stitch image. If no transform is provided then the old stitch region is simply
+	 * places on top of the new one and copied. Pixels which do not exist in the old image are filled with zero.
 	 *
 	 * @param widthStitch The new width of the stitch image.
 	 * @param heightStitch The new height of the stitch image.
-	 * @param newToOldStitch (Optional) Transform from new stitch image pixels to old stick pixels.  Can be null.
+	 * @param newToOldStitch (Optional) Transform from new stitch image pixels to old stick pixels. Can be null.
 	 */
 	public void resizeStitchImage( int widthStitch, int heightStitch, IT newToOldStitch ) {
 

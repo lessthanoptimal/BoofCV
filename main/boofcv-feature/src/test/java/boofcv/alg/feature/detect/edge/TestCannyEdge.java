@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -44,11 +44,10 @@ public class TestCannyEdge extends BoofStandardJUnit {
 	int height = 200;
 
 	/**
-	 * Image has no texture and the sadistic user and specified a threshold of zero.  Everything should
+	 * Image has no texture and the sadistic user and specified a threshold of zero. Everything should
 	 * be an edge.
 	 */
-	@Test
-	public void canHandleNoTexture_and_zeroThresh() {
+	@Test void canHandleNoTexture_and_zeroThresh() {
 		GrayU8 input = new GrayU8(width,height);
 		GrayU8 output = new GrayU8(width,height);
 
@@ -74,8 +73,7 @@ public class TestCannyEdge extends BoofStandardJUnit {
 	/**
 	 * Test a pathological case. The input image has a constant gradient
 	 */
-	@Test
-	public void constantGradient() {
+	@Test void constantGradient() {
 		GrayU8 input = new GrayU8(width,height);
 		GrayU8 output = new GrayU8(width,height);
 
@@ -93,8 +91,7 @@ public class TestCannyEdge extends BoofStandardJUnit {
 		// just see if it blows up or freezes
 	}
 
-	@Test
-	public void basicTestPoints() {
+	@Test void basicTestPoints() {
 
 		GrayU8 input = new GrayU8(width,height);
 
@@ -117,8 +114,7 @@ public class TestCannyEdge extends BoofStandardJUnit {
 		}
 	}
 
-	@Test
-	public void basicTestMarks() {
+	@Test void basicTestMarks() {
 		GrayU8 input = new GrayU8(width,height);
 		GrayU8 binary = new GrayU8(width,height);
 
@@ -146,8 +142,7 @@ public class TestCannyEdge extends BoofStandardJUnit {
 		assertTrue( totalHits >= 2*50+2*38 );
 	}
 
-	@Test
-	public void checkThresholds() {
+	@Test void checkThresholds() {
 		GrayU8 input = new GrayU8(15,20);
 
 		input.set(5,0,50);
@@ -175,8 +170,7 @@ public class TestCannyEdge extends BoofStandardJUnit {
 	/**
 	 * Makes sure the two output modes are equivalent
 	 */
-	@Test
-	public void checkEquivalentOutput() {
+	@Test void checkEquivalentOutput() {
 		GrayU8 input = new GrayU8(width,height);
 		GrayU8 output0 = new GrayU8(width,height);
 		GrayU8 output1 = new GrayU8(width,height);
@@ -196,8 +190,7 @@ public class TestCannyEdge extends BoofStandardJUnit {
 	/**
 	 * Make sure it can handle sub-images
 	 */
-	@Test
-	public void checkSubImage() {
+	@Test void checkSubImage() {
 		GrayU8 input = new GrayU8(width,height);
 		GrayU8 output = new GrayU8(width,height);
 		ImageMiscOps.fillUniform(input,rand,0,200);

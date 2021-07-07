@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -56,7 +56,7 @@ public class NonMaxCandidate {
 	}
 
 	/**
-	 * Checks to see if the specified candidates are local minimums or maximums.  If a candidate list is
+	 * Checks to see if the specified candidates are local minimums or maximums. If a candidate list is
 	 * null then that test is skipped.
 	 */
 	public void process( GrayF32 intensityImage,

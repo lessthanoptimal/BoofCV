@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -37,8 +37,7 @@ public class TestGradientMultiToSingleBand_Reflection extends BoofStandardJUnit 
 	/**
 	 * Pass in a simple method and see if it is invoked correctly
 	 */
-	@Test
-	public void expected() {
+	@Test void expected() {
 		try {
 			Method m = getClass().getMethod("helper",Planar.class,Planar.class,GrayF32.class,GrayF32.class);
 

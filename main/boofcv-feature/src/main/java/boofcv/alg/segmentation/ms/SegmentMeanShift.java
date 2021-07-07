@@ -30,11 +30,11 @@ import org.ddogleg.struct.Stoppable;
 
 /**
  * <p>
- * Performs mean-shift segmentation on an image.  Primary based upon the description provided in [1], it first
- * uses mean-shift to find the mode of each pixel in the image.  The mode is the location mean-shift converges to
- * when initialized at a particular pixel.  All the pixels which have the same mode, to within tolerance, are combined
- * into one region.  Since mean-shift does not guarantee that pixels which have the same label are connected
- * to each other the labeled image is now segmented to ensure connectivity between labels.  If a minimum size is
+ * Performs mean-shift segmentation on an image. Primary based upon the description provided in [1], it first
+ * uses mean-shift to find the mode of each pixel in the image. The mode is the location mean-shift converges to
+ * when initialized at a particular pixel. All the pixels which have the same mode, to within tolerance, are combined
+ * into one region. Since mean-shift does not guarantee that pixels which have the same label are connected
+ * to each other the labeled image is now segmented to ensure connectivity between labels. If a minimum size is
  * specified for a segment then small regions are pruned and their pixels combined into the adjacent region which has
  * the most similar color.
  * </p>
@@ -92,11 +92,11 @@ public class SegmentMeanShift<T extends ImageBase<T>>
 	}
 
 	/**
-	 * Performs mean-shift segmentation on the input image.   The
+	 * Performs mean-shift segmentation on the input image.  The
 	 * total number of regions can be found by calling {@link #getNumberOfRegions()}.
 	 *
 	 * @param image Image
-	 * @param output Storage for output image.  Each pixel is set to the region it belongs to.
+	 * @param output Storage for output image. Each pixel is set to the region it belongs to.
 	 */
 	public void process( T image, GrayS32 output ) {
 		InputSanityCheck.checkSameShape(image, output);

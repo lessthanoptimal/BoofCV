@@ -31,9 +31,9 @@ import org.ddogleg.struct.FastArray;
 import org.jetbrains.annotations.Nullable;
 
 /**
- * Adds the ability to specify the maximum number of points that you wish to return.  The selected
- * points will be sorted by feature intensity.  If maximums and minimums are found then the total
- * number refers to the total combined number of features.  The intensity that it sorts by is the absolute value.
+ * Adds the ability to specify the maximum number of points that you wish to return. The selected
+ * points will be sorted by feature intensity. If maximums and minimums are found then the total
+ * number refers to the total combined number of features. The intensity that it sorts by is the absolute value.
  *
  * @author Peter Abeles
  */
@@ -58,7 +58,7 @@ public class NonMaxLimiter {
 	 * Configures the limiter
 	 *
 	 * @param nonmax Non-maximum suppression algorithm
-	 * @param maxTotalFeatures The total number of allowed features it can return.  Set to a value &le; 0 to disable.
+	 * @param maxTotalFeatures The total number of allowed features it can return. Set to a value &le; 0 to disable.
 	 */
 	public NonMaxLimiter( NonMaxSuppression nonmax,
 						  FeatureSelectLimitIntensity<LocalExtreme> selector,
@@ -78,7 +78,7 @@ public class NonMaxLimiter {
 	}
 
 	/**
-	 * Extracts local max and/or min from the intensity image.  If more than the maximum features are found then
+	 * Extracts local max and/or min from the intensity image. If more than the maximum features are found then
 	 * only the most intense ones will be returned
 	 *
 	 * @param intensity Feature image intensity
@@ -134,7 +134,7 @@ public class NonMaxLimiter {
 		}
 
 		/**
-		 * Returns the value of the feature in the intensity image.  Adds the sign back
+		 * Returns the value of the feature in the intensity image. Adds the sign back
 		 */
 		public float getIntensitySigned() {
 			if (max)

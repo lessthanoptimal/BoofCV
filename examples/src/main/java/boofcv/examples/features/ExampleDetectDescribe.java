@@ -45,7 +45,7 @@ import java.awt.image.BufferedImage;
 /**
  * {@link DetectDescribePoint} provides a single unified interface for detecting interest points inside of images
  * and describing the features. For some features (e.g. SIFT) it can be much faster than the alternative approach
- * where individual algorithms are used for feature detection, orientation estimation, and describe.  It also
+ * where individual algorithms are used for feature detection, orientation estimation, and describe. It also
  * simplifies the code.
  *
  * This example demonstrates how to create instances, but the {@link ExampleAssociatePoints} demonstrates how
@@ -56,7 +56,7 @@ import java.awt.image.BufferedImage;
 public class ExampleDetectDescribe {
 
 	/**
-	 * For some features, there are pre-made implementations of DetectDescribePoint.  This has only been done
+	 * For some features, there are pre-made implementations of DetectDescribePoint. This has only been done
 	 * in situations where there was a performance advantage or that it was a very common combination.
 	 */
 	public static <T extends ImageGray<T>, TD extends TupleDesc<TD>>
@@ -71,7 +71,7 @@ public class ExampleDetectDescribe {
 
 	/**
 	 * Any arbitrary implementation of InterestPointDetector, OrientationImage, DescribeRegionPoint
-	 * can be combined into DetectDescribePoint.  The syntax is more complex, but the end result is more flexible.
+	 * can be combined into DetectDescribePoint. The syntax is more complex, but the end result is more flexible.
 	 * This should only be done if there isn't a pre-made DetectDescribePoint.
 	 */
 	public static <T extends ImageGray<T>, TD extends TupleDesc<TD>>

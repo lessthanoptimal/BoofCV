@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -53,8 +53,7 @@ public class TestWorldToCameraToPixel extends BoofStandardJUnit {
 		normToPixel.compute(tmp.x/tmp.z,tmp.y/tmp.z,expectedInFront);
 	}
 
-	@Test
-	public void transform_two() {
+	@Test void transform_two() {
 
 		WorldToCameraToPixel worldToPixel = new WorldToCameraToPixel();
 		worldToPixel.configure(intrinsic,worldToCamera);
@@ -66,8 +65,7 @@ public class TestWorldToCameraToPixel extends BoofStandardJUnit {
 		assertFalse(worldToPixel.transform(behind, found));
 	}
 
-	@Test
-	public void transform_one() {
+	@Test void transform_one() {
 		WorldToCameraToPixel worldToPixel = new WorldToCameraToPixel();
 		worldToPixel.configure(intrinsic,worldToCamera);
 

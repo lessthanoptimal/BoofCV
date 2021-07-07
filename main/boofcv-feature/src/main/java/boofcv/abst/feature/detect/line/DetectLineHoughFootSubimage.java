@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -37,7 +37,7 @@ import java.util.List;
 
 /**
  * <p>
- * Detects lines inside the image by breaking it up into subimages for improved precision.  Inside
+ * Detects lines inside the image by breaking it up into subimages for improved precision. Inside
  * each subimage a hough transform is independently computed. See [1] for more details.
  * </p>
  *
@@ -84,14 +84,14 @@ public class DetectLineHoughFootSubimage<D extends ImageGray<D>>
 	List<LineParametric2D_F32> foundLines;
 
 	/**
-	 * Specifies detection parameters.  The suggested parameters should be used as a starting point and will
+	 * Specifies detection parameters. The suggested parameters should be used as a starting point and will
 	 * likely need to be tuned significantly for each different scene.
 	 *
 	 * @param localMaxRadius Lines in transform space must be a local max in a region with this radius. Try 5;
 	 * @param minCounts Minimum number of counts/votes inside the transformed image. Try 5.
-	 * @param minDistanceFromOrigin Lines which are this close to the origin of the transformed image are ignored.  Try 5.
-	 * @param thresholdEdge Threshold for classifying pixels as edge or not.  Try 30.
-	 * @param maxLines Maximum number of lines it will detect.  Try 10.
+	 * @param minDistanceFromOrigin Lines which are this close to the origin of the transformed image are ignored. Try 5.
+	 * @param thresholdEdge Threshold for classifying pixels as edge or not. Try 30.
+	 * @param maxLines Maximum number of lines it will detect. Try 10.
 	 */
 	public DetectLineHoughFootSubimage( int localMaxRadius,
 										int minCounts,
@@ -151,8 +151,8 @@ public class DetectLineHoughFootSubimage<D extends ImageGray<D>>
 	}
 
 	private List<LineParametric2D_F32> pruneLines( int width, int height ) {
-		// NOTE: angular accuracy is a function of range from sub image center.  This pruning
-		// function uses a constant value for range accuracy.  A custom algorithm should really
+		// NOTE: angular accuracy is a function of range from sub image center. This pruning
+		// function uses a constant value for range accuracy. A custom algorithm should really
 		// be used here.
 		// NOTE: Thresholds should not be hardcoded...
 		post.pruneSimilar((float)(Math.PI*0.04), 10, width, height);

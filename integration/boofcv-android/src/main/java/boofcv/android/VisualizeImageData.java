@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -90,7 +90,7 @@ public class VisualizeImageData {
 	 * Renders positive and negative values as two different colors.
 	 *
 	 * @param input (Input) Image with positive and negative values.
-	 * @param maxAbsValue The largest absolute value of any pixel in the image.  Set to < 0 if not known.
+	 * @param maxAbsValue The largest absolute value of any pixel in the image. Set to < 0 if not known.
 	 * @param output (Output) Bitmap ARGB_8888 image.
 	 * @param _storage Optional working buffer for Bitmap image.
 	 */
@@ -129,7 +129,7 @@ public class VisualizeImageData {
 	 * Renders positive and negative values as two different colors.
 	 *
 	 * @param input (Input) Image with positive and negative values.
-	 * @param maxAbsValue The largest absolute value of any pixel in the image.  Set to < 0 if not known.
+	 * @param maxAbsValue The largest absolute value of any pixel in the image. Set to < 0 if not known.
 	 * @param output (Output) Bitmap ARGB_8888 image.
 	 * @param _storage Optional working buffer for Bitmap image.
 	 */
@@ -235,7 +235,7 @@ public class VisualizeImageData {
 	 *
 	 * @param derivX (Input) Image with positive and negative values.
 	 * @param derivY (Input) Image with positive and negative values.
-	 * @param maxAbsValue The largest absolute value of any pixel in the image.  Set to < 0 if not known.
+	 * @param maxAbsValue The largest absolute value of any pixel in the image. Set to < 0 if not known.
 	 * @param output (Output) Bitmap ARGB_8888 image.
 	 * @param _storage Optional working buffer for Bitmap image.
 	 */
@@ -294,7 +294,7 @@ public class VisualizeImageData {
 	 *
 	 * @param derivX (Input) Image with positive and negative values.
 	 * @param derivY (Input) Image with positive and negative values.
-	 * @param maxAbsValue The largest absolute value of any pixel in the image.  Set to < 0 if not known.
+	 * @param maxAbsValue The largest absolute value of any pixel in the image. Set to < 0 if not known.
 	 * @param output (Output) Bitmap ARGB_8888 image.
 	 * @param _storage Optional working buffer for Bitmap image.
 	 */
@@ -443,7 +443,7 @@ public class VisualizeImageData {
 	}
 
 	/**
-	 * Draws each contour using a unique color.  Each segment of each edge is drawn using the same colors.
+	 * Draws each contour using a unique color. Each segment of each edge is drawn using the same colors.
 	 *
 	 * @param contours List of edge contours
 	 * @param colors RGB color for each edge

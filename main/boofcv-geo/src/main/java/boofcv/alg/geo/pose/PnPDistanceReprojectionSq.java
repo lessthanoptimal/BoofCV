@@ -31,7 +31,7 @@ import java.util.List;
 
 /**
  * <p>Computes the reprojection error squared for a given motion and {@link boofcv.struct.geo.Point2D3D}.
- * If the intrinsic parameters are provided then the error will be computed in pixels.   Observations are
+ * If the intrinsic parameters are provided then the error will be computed in pixels.  Observations are
  * assumed to be in normalized image coordinates.</p>
  *
  * <center>error = (x'-x)^2 + (y' - y)^2</center>

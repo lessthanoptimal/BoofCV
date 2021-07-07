@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -58,8 +58,7 @@ public abstract class GeneralDetectLineGradientTests extends BoofStandardJUnit {
 	/**
 	 * See if it can detect an obvious line in an image.
 	 */
-	@Test
-	public void obviousLine() {
+	@Test void obviousLine() {
 		for( Class c : imageTypes ) {
 			obviousLine(c);
 		}
@@ -68,8 +67,7 @@ public abstract class GeneralDetectLineGradientTests extends BoofStandardJUnit {
 	/**
 	 * Check to see if an subimage produces the same result as a regular image.
 	 */
-	@Test
-	public void subImages() {
+	@Test void subImages() {
 		for( Class c : imageTypes ) {
 			subImages(c);
 		}

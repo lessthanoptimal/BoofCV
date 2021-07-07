@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -39,7 +39,7 @@ public class SquareImage_to_FiducialDetector<T extends ImageGray<T>>
 	}
 
 	/**
-	 * Add a new pattern to be detected.  This function takes in a raw gray scale image and thresholds it.
+	 * Add a new pattern to be detected. This function takes in a raw gray scale image and thresholds it.
 	 *
 	 * @param pattern Gray scale image of the pattern
 	 * @param threshold Threshold used to convert it into a binary image
@@ -64,7 +64,7 @@ public class SquareImage_to_FiducialDetector<T extends ImageGray<T>>
 	/**
 	 * Add a new pattern to be detected.
 	 *
-	 * @param binary Binary image of the pattern.  0 = black, 1 = white.
+	 * @param binary Binary image of the pattern. 0 = black, 1 = white.
 	 * @param lengthSide Length of a side on the square in world units.
 	 */
 	public void addPatternBinary(GrayU8 binary, double lengthSide) {

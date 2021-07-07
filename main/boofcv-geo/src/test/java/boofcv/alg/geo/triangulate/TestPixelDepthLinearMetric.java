@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -37,8 +37,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
  */
 public class TestPixelDepthLinearMetric extends BoofStandardJUnit {
 
-	@Test
-	public void depthNView() {
+	@Test void depthNView() {
 		// define the camera's motion
 		Se3_F64 motion1 = new Se3_F64();
 		motion1.getR().setTo(ConvertRotation3D_F64.eulerToMatrix(EulerType.XYZ, 0.05, -0.03, 0.02, null));
@@ -78,8 +77,7 @@ public class TestPixelDepthLinearMetric extends BoofStandardJUnit {
 		assertEquals(depth,A.z,1e-8);
 	}
 
-	@Test
-	public void depth2View() {
+	@Test void depth2View() {
 		// define the camera's motion
 		Se3_F64 motion1 = new Se3_F64();
 		motion1.getR().setTo(ConvertRotation3D_F64.eulerToMatrix(EulerType.XYZ, 0.05, -0.03, 0.02, null));

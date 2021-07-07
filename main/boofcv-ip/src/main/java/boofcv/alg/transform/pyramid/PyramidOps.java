@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -40,7 +40,7 @@ import boofcv.struct.pyramid.ImagePyramid;
 public class PyramidOps {
 
 	/**
-	 * Creates an array of single band images for each layer in the provided pyramid.  Each image will
+	 * Creates an array of single band images for each layer in the provided pyramid. Each image will
 	 * be the same size as the corresponding layer in the pyramid.
 	 *
 	 * @param pyramid (Input) Image pyramid
@@ -86,8 +86,8 @@ public class PyramidOps {
 	 * </p>
 	 *
 	 * <p>
-	 * It is assumed that the output has the same scales as the input.  If not
-	 * initialized then it will be initialized.  If already initialized it is
+	 * It is assumed that the output has the same scales as the input. If not
+	 * initialized then it will be initialized. If already initialized it is
 	 * assumed to be setup for the same input image size.
 	 * </p>
 	 *
@@ -110,8 +110,8 @@ public class PyramidOps {
 	 * </p>
 	 *
 	 * <p>
-	 * It is assumed that the gradient has the same scales as the input.  If not
-	 * initialized then it will be initialized.  If already initialized it is
+	 * It is assumed that the gradient has the same scales as the input. If not
+	 * initialized then it will be initialized. If already initialized it is
 	 * assumed to be setup for the same input image size.
 	 * </p>
 	 * 
@@ -150,7 +150,7 @@ public class PyramidOps {
 	}
 
 	/**
-	 * Scales down the input by a factor of 2.  Every other pixel along both axises is skipped.
+	 * Scales down the input by a factor of 2. Every other pixel along both axises is skipped.
 	 */
 	public static <T extends ImageGray<T>>
 	void scaleDown2(T input , T output ) {

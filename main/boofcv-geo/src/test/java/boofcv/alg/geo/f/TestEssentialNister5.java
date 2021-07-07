@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -32,8 +32,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  */
 public class TestEssentialNister5 extends EpipolarTestSimulation {
 
-	@Test
-	public void perfectEssential() {
+	@Test void perfectEssential() {
 		createCommonChecks().checkEpipolarMatrix(5, false);
 	}
 
@@ -43,7 +42,7 @@ public class TestEssentialNister5 extends EpipolarTestSimulation {
 
 			{
 				// use a more relaxed tolerance
-				// in practice the bad hypotheses seem to get thrown out.  The robustness benchmark
+				// in practice the bad hypotheses seem to get thrown out. The robustness benchmark
 				// also provides a better idea of what's going on and seems to be similar to what
 				// papers show
 				zeroTol = 0.0001;

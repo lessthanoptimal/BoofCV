@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -25,14 +25,14 @@ import java.util.Arrays;
  * Computes 1D Discrete Fourier Transform (DFT) of complex and real, double
  * precision data. The size of the data can be an arbitrary number. The code originally comes from
  * General Purpose FFT Package written by Takuya Ooura
- * (http://www.kurims.kyoto-u.ac.jp/~ooura/fft.html).  See below for the full history.
+ * (http://www.kurims.kyoto-u.ac.jp/~ooura/fft.html). See below for the full history.
  * <p></p>
- * This code has a bit of a history.  Originally from General Purpose FFT.  Which was then ported into
+ * This code has a bit of a history. Originally from General Purpose FFT. Which was then ported into
  * JFFTPack written by Baoshe Zhang (http://jfftpack.sourceforge.net/), and then into JTransforms by Piotr Wendykier.
- * The major modification from JTransforms is that the SMP code has been stripped out.  It might be added back in
+ * The major modification from JTransforms is that the SMP code has been stripped out. It might be added back in
  * once an SMP strategy has been finalized in BoofCV.
  * <p></p>
- * Code License:  The original license of General Purpose FFT Package is shown below.  This file will fall
+ * Code License:  The original license of General Purpose FFT Package is shown below. This file will fall
  * under the same license:
  * <pre>
  * Copyright Takuya OOURA, 1996-2001

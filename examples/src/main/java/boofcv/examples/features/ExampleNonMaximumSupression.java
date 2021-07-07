@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -41,9 +41,9 @@ import java.awt.*;
 import java.awt.image.BufferedImage;
 
 /**
- * Non-maximum suppression is used to identify local maximums and/or minimums in an image feature intensity map.  This
- * is a common step in feature detection.  BoofCV includes an implementation of non-maximum suppression which is much
- * faster than the naive algorithm that is often used because of its ease of implementation.  The following code
+ * Non-maximum suppression is used to identify local maximums and/or minimums in an image feature intensity map. This
+ * is a common step in feature detection. BoofCV includes an implementation of non-maximum suppression which is much
+ * faster than the naive algorithm that is often used because of its ease of implementation. The following code
  * demonstrates how some of the tuning parameters affects the final output.
  *
  * @author Peter Abeles
@@ -54,7 +54,7 @@ public class ExampleNonMaximumSupression {
 		// Create and configure the feature detector
 		NonMaxSuppression nonmax = FactoryFeatureExtractor.nonmax(new ConfigExtract(radius, threshold ));
 
-		// We will only searching for the maximums.  Other variants will look for minimums or will exclude previous
+		// We will only searching for the maximums. Other variants will look for minimums or will exclude previous
 		// candidate detections from being detected twice
 		QueueCorner maximums = new QueueCorner();
 		nonmax.process(intensity, null, null, null, maximums );

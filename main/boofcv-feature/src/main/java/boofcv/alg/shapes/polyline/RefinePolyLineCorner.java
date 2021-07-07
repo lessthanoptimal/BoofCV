@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -31,14 +31,14 @@ import java.util.List;
 /**
  * <p>
  * Optimizing corner placements to a pixel level when given a contour and integer list of approximate
- * corner locations which define set of line segments.    Corners are optimized by searching for another near by
- * pixel in the provided contour which reduces the distance of the contour from the line segments.  This
- * is intended to optimize the output from {@link SplitMergeLineFit}.  Can be configured to
+ * corner locations which define set of line segments.   Corners are optimized by searching for another near by
+ * pixel in the provided contour which reduces the distance of the contour from the line segments. This
+ * is intended to optimize the output from {@link SplitMergeLineFit}. Can be configured to
  * handle case where line segments form a loop or have disconnected end points.
  * </p>
  *
  * <p>
- * Each corner is individually optimized once per iteration.  The process is repeated until the maximum number of
+ * Each corner is individually optimized once per iteration. The process is repeated until the maximum number of
  * iterations has been reached or there is no change in corner placements.
  * </p>
  *
@@ -83,11 +83,11 @@ public class RefinePolyLineCorner {
 	}
 
 	/**
-	 * Fits a polygon to the contour given an initial set of candidate corners.  If not looping the corners
-	 * must include the end points still.  Minimum of 3 points required.  Otherwise there's no corner!.
+	 * Fits a polygon to the contour given an initial set of candidate corners. If not looping the corners
+	 * must include the end points still. Minimum of 3 points required. Otherwise there's no corner!.
 	 *
 	 * @param contour Contours around the shape
-	 * @param corners (Input) initial set of corners.  (output) refined set of corners
+	 * @param corners (Input) initial set of corners. (output) refined set of corners
 	 */
 	public boolean fit( List<Point2D_I32> contour, DogArray_I32 corners ) {
 		if (corners.size() < 3) {
@@ -135,7 +135,7 @@ public class RefinePolyLineCorner {
 		for (int i = -searchRadius; i <= searchRadius; i++) {
 			if (i == 0) {
 				// if it found a better point in the first half stop the search since that's probably the correct
-				// direction.  Could be improved by remember past search direction
+				// direction. Could be improved by remember past search direction
 				if (bestIndex != 0)
 					break;
 			} else {

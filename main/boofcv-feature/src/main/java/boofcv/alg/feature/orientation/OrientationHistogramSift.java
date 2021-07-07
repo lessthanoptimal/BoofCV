@@ -34,14 +34,14 @@ import java.util.Arrays;
 
 /**
  * <p>
- * Computes the orientation of a region around a point in scale-space as specified in the SIFT [1] paper.  A histogram
- * of angles is computed using a weighted sum of image derivatives.  The size of the region is specified by the
- * scale function parameter.  Every pixel inside the sample region is read and contributes to the angle estimation.
+ * Computes the orientation of a region around a point in scale-space as specified in the SIFT [1] paper. A histogram
+ * of angles is computed using a weighted sum of image derivatives. The size of the region is specified by the
+ * scale function parameter. Every pixel inside the sample region is read and contributes to the angle estimation.
  * If the image border is encountered the sample return is truncated.
  * </p>
  *
  * <p>
- * To get the orientation for the largest peak invoke {@link #getPeakOrientation()}.  Other
+ * To get the orientation for the largest peak invoke {@link #getPeakOrientation()}. Other
  * </p>
  *
  * Differences from paper:
@@ -65,7 +65,7 @@ public class OrientationHistogramSift<Deriv extends ImageGray<Deriv>> {
 	// histograms containing the sum of each derivative
 	double[] histogramX;
 	double[] histogramY;
-	// Number of radians each bin corresponds to.  histAngleBin = 2*PI/histogram.length
+	// Number of radians each bin corresponds to. histAngleBin = 2*PI/histogram.length
 	private final double histAngleBin;
 
 	// peaks in histogram
@@ -89,8 +89,8 @@ public class OrientationHistogramSift<Deriv extends ImageGray<Deriv>> {
 	/**
 	 * Configures orientation estimation
 	 *
-	 * @param histogramSize Number of elements in the histogram.  Standard is 36
-	 * @param sigmaEnlarge How much the scale is enlarged by.  Standard is 1.5
+	 * @param histogramSize Number of elements in the histogram. Standard is 36
+	 * @param sigmaEnlarge How much the scale is enlarged by. Standard is 1.5
 	 */
 	public OrientationHistogramSift( int histogramSize,
 									 double sigmaEnlarge,
@@ -128,7 +128,7 @@ public class OrientationHistogramSift<Deriv extends ImageGray<Deriv>> {
 	 *
 	 * @param c_x Location x-axis
 	 * @param c_y Location y-axis
-	 * @param sigma blur standard deviations of detected feature.  Also referred to as scale.
+	 * @param sigma blur standard deviations of detected feature. Also referred to as scale.
 	 */
 	public void process( double c_x, double c_y, double sigma ) {
 		// convert to image coordinates
@@ -198,7 +198,7 @@ public class OrientationHistogramSift<Deriv extends ImageGray<Deriv>> {
 	}
 
 	/**
-	 * Finds local peaks in histogram and selects orientations.  Location of peaks is interpolated.
+	 * Finds local peaks in histogram and selects orientations. Location of peaks is interpolated.
 	 */
 	void findHistogramPeaks() {
 		// reset data structures
@@ -246,8 +246,8 @@ public class OrientationHistogramSift<Deriv extends ImageGray<Deriv>> {
 	}
 
 	/**
-	 * Compute the angle.  The angle for each neighbor bin is found using the weighted sum
-	 * of the derivative.  Then the peak index is found by 2nd order polygon interpolation.  These two bits of
+	 * Compute the angle. The angle for each neighbor bin is found using the weighted sum
+	 * of the derivative. Then the peak index is found by 2nd order polygon interpolation. These two bits of
 	 * information are combined and used to return the final angle output.
 	 *
 	 * @param index1 Histogram index of the peak
@@ -270,10 +270,10 @@ public class OrientationHistogramSift<Deriv extends ImageGray<Deriv>> {
 	}
 
 	/**
-	 * Given the interpolated index, compute the angle from the 3 indexes.  The angle for each index
+	 * Given the interpolated index, compute the angle from the 3 indexes. The angle for each index
 	 * is computed from the weighted gradients.
 	 *
-	 * @param offset Interpolated index offset relative to index0.  range -1 to 1
+	 * @param offset Interpolated index offset relative to index0. range -1 to 1
 	 * @return Interpolated angle.
 	 */
 	double interpolateAngle( int index0, int index1, int index2, double offset ) {
@@ -290,13 +290,13 @@ public class OrientationHistogramSift<Deriv extends ImageGray<Deriv>> {
 	}
 
 	/**
-	 * Computes the weight based on a centered Gaussian shaped function.  Interpolation is used to speed up the process
+	 * Computes the weight based on a centered Gaussian shaped function. Interpolation is used to speed up the process
 	 */
 	double computeWeight( double deltaX, double deltaY, double sigma ) {
 		// the exact equation
 //		return Math.exp(-0.5 * ((deltaX * deltaX + deltaY * deltaY) / (sigma * sigma)));
 
-		// approximation below.  when validating this approach it produced results that were within
+		// approximation below. when validating this approach it produced results that were within
 		// floating point tolerance of the exact solution, but much faster
 		double d = ((deltaX*deltaX + deltaY*deltaY)/(sigma*sigma))/approximateStep;
 		if (approximateGauss.interpolate(d)) {

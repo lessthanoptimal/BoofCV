@@ -31,7 +31,7 @@ public class ConfigKlt implements Configuration {
 	 * Due to how the image derivative and interpolation is performed outer most pixels. Features are
 	 * not allowed to overlap this close to the image's edge.
 	 *
-	 * WARNING: currently not used.  will probably be removed.
+	 * WARNING: currently not used. will probably be removed.
 	 */
 	public int forbiddenBorder;
 

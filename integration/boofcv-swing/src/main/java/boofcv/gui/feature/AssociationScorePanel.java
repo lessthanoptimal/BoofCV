@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -26,7 +26,7 @@ import java.awt.event.MouseListener;
 import java.util.List;
 
 /**
- * Displays relative association scores for different features.  When a feature is clicked on in
+ * Displays relative association scores for different features. When a feature is clicked on in
  * an image the best fit scores are show in the other image.
  *
  * @author Peter Abeles
@@ -113,7 +113,7 @@ public class AssociationScorePanel<D>
 		// compute association score
 		computeScore(selectedIsLeft, selectedIndex);
 
-		// a feature has been selected.  In the image it was selected draw an X
+		// a feature has been selected. In the image it was selected draw an X
 		if (selectedIsLeft) {
 			drawCrossHair(g2, leftPts.get(selectedIndex), leftX, leftY, scaleLeft);
 		} else {
@@ -129,7 +129,7 @@ public class AssociationScorePanel<D>
 	}
 
 	/**
-	 * Visualizes score distribution.  Larger circles mean its closer to the best
+	 * Visualizes score distribution. Larger circles mean its closer to the best
 	 * fit score.
 	 */
 	private void drawDistribution( Graphics2D g2, List<Point2D_F64> candidates,

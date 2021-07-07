@@ -185,7 +185,7 @@ public class VisualizeAssociationMatchesApp
 				"Associating Features",
 				"Detecting Left", 0, 3);
 
-		// show a progress dialog if it is slow.  Needs to be in its own thread so if this stalls
+		// show a progress dialog if it is slow. Needs to be in its own thread so if this stalls
 		// the window will pop up
 		progress = 0;
 		new Thread(() -> {

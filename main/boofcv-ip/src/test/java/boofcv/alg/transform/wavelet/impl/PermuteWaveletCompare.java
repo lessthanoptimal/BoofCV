@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -88,7 +88,7 @@ public abstract class PermuteWaveletCompare extends BoofStandardJUnit {
 //					System.out.println("type "+type+" o = "+o+" l = "+l);
 					GImageMiscOps.fill(found, 0);
 					GImageMiscOps.fill(expected,0);
-					// create a random wavelet.  does not have to be a real once
+					// create a random wavelet. does not have to be a real once
 					// since it just is checking that two functions produce the same output
 					WaveletDescription<?> desc = createDesc(-o,l,type);
 					applyValidation(desc,input,expected);

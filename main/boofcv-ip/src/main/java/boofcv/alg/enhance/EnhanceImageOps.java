@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -55,8 +55,8 @@ public class EnhanceImageOps {
 	public static Kernel2D_F32 kernelEnhance8_F32 = new Kernel2D_F32(3, new float[]{-1, -1, -1, -1, 9, -1, -1, -1, -1});
 
 	/**
-	 * Computes a transformation table which will equalize the provided histogram.  An equalized histogram spreads
-	 * the 'weight' across the whole spectrum of values.  Often used to make dim images easier for people to see.
+	 * Computes a transformation table which will equalize the provided histogram. An equalized histogram spreads
+	 * the 'weight' across the whole spectrum of values. Often used to make dim images easier for people to see.
 	 *
 	 * @param histogram Input image histogram.
 	 * @param transform Output transformation table.
@@ -208,7 +208,7 @@ public class EnhanceImageOps {
 				ImplEnhanceHistogram.equalizeLocalCol(input, radius, histogramLength, input.width - radius, output, workspaces);
 			}
 		} else if (input.width < width && input.height < width) {
-			// the local region is larger than the image.  just use the full image algorithm
+			// the local region is larger than the image. just use the full image algorithm
 			workspaces.reset();
 			int[] histogram = BoofMiscOps.checkDeclare(workspaces.grow(), histogramLength, false);
 			int[] transform = BoofMiscOps.checkDeclare(workspaces.grow(), histogramLength, false);
@@ -270,7 +270,7 @@ public class EnhanceImageOps {
 				ImplEnhanceHistogram.equalizeLocalCol(input, radius, histogramLength, input.width - radius, output, workspaces);
 			}
 		} else if (input.width < width && input.height < width) {
-			// the local region is larger than the image.  just use the full image algorithm
+			// the local region is larger than the image. just use the full image algorithm
 			workspaces.reset();
 			int[] histogram = BoofMiscOps.checkDeclare(workspaces.grow(), histogramLength, false);
 			int[] transform = BoofMiscOps.checkDeclare(workspaces.grow(), histogramLength, false);

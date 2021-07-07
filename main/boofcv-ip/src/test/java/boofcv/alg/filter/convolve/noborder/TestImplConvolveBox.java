@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -42,8 +42,7 @@ public class TestImplConvolveBox extends CompareEquivalentFunctions {
 		super(ImplConvolveBox.class, ConvolveImageStandard_SB.class);
 	}
 
-	@Test
-	public void compareToStandard() {
+	@Test void compareToStandard() {
 		performTests(14);
 	}
 

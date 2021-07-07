@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -67,7 +67,7 @@ public class ExampleEquirectangularToPinhole {
 		ImageDistort<Planar<GrayU8>,Planar<GrayU8>> distorter =
 				FactoryDistort.distort(false,interp,equiImage.getImageType());
 
-		// This is where the magic is done.  It defines the transform rfom equirectangular to pinhole
+		// This is where the magic is done. It defines the transform rfom equirectangular to pinhole
 		CameraToEquirectangular_F32 pinholeToEqui = new CameraToEquirectangular_F32();
 		pinholeToEqui.setEquirectangularShape(equiImage.width,equiImage.height);
 		pinholeToEqui.setCameraModel(pinholeModel);

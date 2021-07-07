@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -50,10 +50,10 @@ public class FactoryDenseOpticalFlow {
 	 *
 	 * @see DenseOpticalFlowKlt
 	 *
-	 * @param configKlt Configuration for KLT.  If null then default values are used.
+	 * @param configKlt Configuration for KLT. If null then default values are used.
 	 * @param radius Radius of square region.
 	 * @param inputType Type of input image.
-	 * @param derivType Type of derivative image.  If null then default is used.
+	 * @param derivType Type of derivative image. If null then default is used.
 	 * @param <I> Input image type.
 	 * @param <D> Derivative image type.
 	 * @return DenseOpticalFlow
@@ -111,11 +111,11 @@ public class FactoryDenseOpticalFlow {
 	}
 
 	/**
-	 * The original Horn-Schunck algorithm.  Only good for very small motions.
+	 * The original Horn-Schunck algorithm. Only good for very small motions.
 	 *
 	 * @see HornSchunck
 	 *
-	 * @param config Configuration parameters.  If null then default is used.
+	 * @param config Configuration parameters. If null then default is used.
 	 * @param imageType Type of input gray scale image
 	 * @return dense optical flow
 	 */
@@ -142,7 +142,7 @@ public class FactoryDenseOpticalFlow {
 	 *
 	 * @see HornSchunckPyramid
 	 *
-	 * @param config Configuration parameters.  If null defaults will be used.
+	 * @param config Configuration parameters. If null defaults will be used.
 	 * @return Dense optical flow implementation of HornSchunckPyramid
 	 */
 	public static <T extends ImageGray<T>>

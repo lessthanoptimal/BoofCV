@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -20,7 +20,7 @@ package boofcv.struct;
 
 /**
  * <p>
- * A rectangle which can be rotated.  Angle of rotation is relative to +x axis, which is along the rectangle's
+ * A rectangle which can be rotated. Angle of rotation is relative to +x axis, which is along the rectangle's
  * width. +y is along its height. Point of rotation is the rectangle's center.
  * </p>
  * <p>

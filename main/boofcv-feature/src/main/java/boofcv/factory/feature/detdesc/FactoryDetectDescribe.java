@@ -150,13 +150,13 @@ public class FactoryDetectDescribe {
 
 	/**
 	 * <p>
-	 * Creates a SURF descriptor.  SURF descriptors are invariant to illumination, orientation, and scale.
+	 * Creates a SURF descriptor. SURF descriptors are invariant to illumination, orientation, and scale.
 	 * BoofCV provides two variants. Creates a variant which is designed for speed at the cost of some stability.
 	 * Different descriptors are created for color and gray-scale images.
 	 * </p>
 	 *
 	 * <p>
-	 * [1] Add tech report when its finished.  See SURF performance web page for now.
+	 * [1] Add tech report when its finished. See SURF performance web page for now.
 	 * </p>
 	 *
 	 * @param configDetector Configuration for SURF detector
@@ -188,8 +188,8 @@ public class FactoryDetectDescribe {
 
 	/**
 	 * <p>
-	 * Color version of SURF stable.  Features are detected in a gray scale image, but the descriptors are
-	 * computed using a color image.  Each band in the page adds to the descriptor length.  See
+	 * Color version of SURF stable. Features are detected in a gray scale image, but the descriptors are
+	 * computed using a color image. Each band in the page adds to the descriptor length. See
 	 * {@link DetectDescribeSurfPlanar} for details.
 	 * </p>
 	 *
@@ -240,18 +240,18 @@ public class FactoryDetectDescribe {
 
 	/**
 	 * <p>
-	 * Creates a SURF descriptor.  SURF descriptors are invariant to illumination, orientation, and scale.
+	 * Creates a SURF descriptor. SURF descriptors are invariant to illumination, orientation, and scale.
 	 * BoofCV provides two variants. Creates a variant which is designed for stability. Different descriptors are
 	 * created for color and gray-scale images.
 	 * </p>
 	 *
 	 * <p>
-	 * [1] Add tech report when its finished.  See SURF performance web page for now.
+	 * [1] Add tech report when its finished. See SURF performance web page for now.
 	 * </p>
 	 *
-	 * @param configDetector Configuration for SURF detector.  Null for default.
-	 * @param configDescribe Configuration for SURF descriptor.  Null for default.
-	 * @param configOrientation Configuration for region orientation.  Null for default.
+	 * @param configDetector Configuration for SURF detector. Null for default.
+	 * @param configDescribe Configuration for SURF descriptor. Null for default.
+	 * @param configOrientation Configuration for region orientation. Null for default.
 	 * @param imageType Specify type of input image.
 	 * @return SURF detector and descriptor
 	 * @see DescribePointSurfPlanar
@@ -279,14 +279,14 @@ public class FactoryDetectDescribe {
 
 	/**
 	 * <p>
-	 * Color version of SURF stable feature.  Features are detected in a gray scale image, but the descriptors are
-	 * computed using a color image.  Each band in the page adds to the descriptor length.  See
+	 * Color version of SURF stable feature. Features are detected in a gray scale image, but the descriptors are
+	 * computed using a color image. Each band in the page adds to the descriptor length. See
 	 * {@link DetectDescribeSurfPlanar} for details.
 	 * </p>
 	 *
-	 * @param configDetector Configuration for SURF detector.  Null for default.
-	 * @param configDescribe Configuration for SURF descriptor.  Null for default.
-	 * @param configOrientation Configuration for region orientation.  Null for default.
+	 * @param configDetector Configuration for SURF detector. Null for default.
+	 * @param configDescribe Configuration for SURF descriptor. Null for default.
+	 * @param configOrientation Configuration for region orientation. Null for default.
 	 * @param imageType Specify type of color input image.
 	 * @return SURF detector and descriptor
 	 * @see DescribePointSurfPlanar
@@ -323,7 +323,7 @@ public class FactoryDetectDescribe {
 	 * {@link DetectDescribePoint}.
 	 *
 	 * @param detector Feature detector
-	 * @param orientation Orientation estimation.  Optionally, can be null.
+	 * @param orientation Orientation estimation. Optionally, can be null.
 	 * @param describe Feature descriptor
 	 * @return {@link DetectDescribePoint}.
 	 */

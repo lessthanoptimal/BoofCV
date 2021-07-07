@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -31,8 +31,7 @@ public class TestPolynomialNeville_F32 extends BoofStandardJUnit {
 
 	int num = 30;
 
-	@Test
-	public void compareToLagrange() {
+	@Test void compareToLagrange() {
 		// create some random data
 		float x[] = new float[num];
 		float y[] = new float[num];

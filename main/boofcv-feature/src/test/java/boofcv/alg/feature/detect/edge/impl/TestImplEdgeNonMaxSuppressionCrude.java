@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -43,8 +43,7 @@ public class TestImplEdgeNonMaxSuppressionCrude extends BoofStandardJUnit {
 	static int width = 20;
 	static int height = 30;
 
-	@Test
-	public void inner() {
+	@Test void inner() {
 
 		int numFound = BoofTesting.findMethodThenCall(this, "inner",
 				ImplEdgeNonMaxSuppressionCrude.class,"inner4");
@@ -124,8 +123,7 @@ public class TestImplEdgeNonMaxSuppressionCrude extends BoofStandardJUnit {
 		}
 	}
 
-	@Test
-	public void border() {
+	@Test void border() {
 
 		int numFound = BoofTesting.findMethodThenCall(this, "border",
 				ImplEdgeNonMaxSuppressionCrude.class,"border4");

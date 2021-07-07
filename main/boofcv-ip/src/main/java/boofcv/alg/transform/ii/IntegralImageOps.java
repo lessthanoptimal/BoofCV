@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -345,15 +345,15 @@ public class IntegralImageOps {
 
 	/**
 	 * <p>
-	 * Computes the value of a block inside an integral image without bounds checking.  The block is
+	 * Computes the value of a block inside an integral image without bounds checking. The block is
 	 * defined as follows: x0 &lt; x &le; x1 and y0 &lt; y &le; y1.
 	 * </p>
 	 *
 	 * @param integral Integral image.
-	 * @param x0 Lower bound of the block.  Exclusive.
-	 * @param y0 Lower bound of the block.  Exclusive.
-	 * @param x1 Upper bound of the block.  Inclusive.
-	 * @param y1 Upper bound of the block.  Inclusive.
+	 * @param x0 Lower bound of the block. Exclusive.
+	 * @param y0 Lower bound of the block. Exclusive.
+	 * @param x1 Upper bound of the block. Inclusive.
+	 * @param y1 Upper bound of the block. Inclusive.
 	 * @return Value inside the block.
 	 */
 	public static double block_unsafe( GrayF64 integral, int x0, int y0, int x1, int y1 ) {
@@ -362,15 +362,15 @@ public class IntegralImageOps {
 
 	/**
 	 * <p>
-	 * Computes the value of a block inside an integral image without bounds checking.  The block is
+	 * Computes the value of a block inside an integral image without bounds checking. The block is
 	 * defined as follows: x0 &lt; x &le; x1 and y0 &lt; y &le; y1.
 	 * </p>
 	 *
 	 * @param integral Integral image.
-	 * @param x0 Lower bound of the block.  Exclusive.
-	 * @param y0 Lower bound of the block.  Exclusive.
-	 * @param x1 Upper bound of the block.  Inclusive.
-	 * @param y1 Upper bound of the block.  Inclusive.
+	 * @param x0 Lower bound of the block. Exclusive.
+	 * @param y0 Lower bound of the block. Exclusive.
+	 * @param x1 Upper bound of the block. Inclusive.
+	 * @param y1 Upper bound of the block. Inclusive.
 	 * @return Value inside the block.
 	 */
 	public static float block_unsafe( GrayF32 integral, int x0, int y0, int x1, int y1 ) {
@@ -379,15 +379,15 @@ public class IntegralImageOps {
 
 	/**
 	 * <p>
-	 * Computes the value of a block inside an integral image without bounds checking.  The block is
+	 * Computes the value of a block inside an integral image without bounds checking. The block is
 	 * defined as follows: x0 &lt; x &le; x1 and y0 &lt; y &le; y1.
 	 * </p>
 	 *
 	 * @param integral Integral image.
-	 * @param x0 Lower bound of the block.  Exclusive.
-	 * @param y0 Lower bound of the block.  Exclusive.
-	 * @param x1 Upper bound of the block.  Inclusive.
-	 * @param y1 Upper bound of the block.  Inclusive.
+	 * @param x0 Lower bound of the block. Exclusive.
+	 * @param y0 Lower bound of the block. Exclusive.
+	 * @param x1 Upper bound of the block. Inclusive.
+	 * @param y1 Upper bound of the block. Inclusive.
 	 * @return Value inside the block.
 	 */
 	public static int block_unsafe( GrayS32 integral, int x0, int y0, int x1, int y1 ) {
@@ -396,15 +396,15 @@ public class IntegralImageOps {
 
 	/**
 	 * <p>
-	 * Computes the value of a block inside an integral image without bounds checking.  The block is
+	 * Computes the value of a block inside an integral image without bounds checking. The block is
 	 * defined as follows: x0 &lt; x &le; x1 and y0 &lt; y &le; y1.
 	 * </p>
 	 *
 	 * @param integral Integral image.
-	 * @param x0 Lower bound of the block.  Exclusive.
-	 * @param y0 Lower bound of the block.  Exclusive.
-	 * @param x1 Upper bound of the block.  Inclusive.
-	 * @param y1 Upper bound of the block.  Inclusive.
+	 * @param x0 Lower bound of the block. Exclusive.
+	 * @param y0 Lower bound of the block. Exclusive.
+	 * @param x1 Upper bound of the block. Inclusive.
+	 * @param y1 Upper bound of the block. Inclusive.
 	 * @return Value inside the block.
 	 */
 	public static long block_unsafe( GrayS64 integral, int x0, int y0, int x1, int y1 ) {
@@ -414,14 +414,14 @@ public class IntegralImageOps {
 	/**
 	 * <p>
 	 * Computes the value of a block inside an integral image and treats pixels outside of the
-	 * image as zero.  The block is defined as follows: x0 &lt; x &le; x1 and y0 &lt; y &le; y1.
+	 * image as zero. The block is defined as follows: x0 &lt; x &le; x1 and y0 &lt; y &le; y1.
 	 * </p>
 	 *
 	 * @param integral Integral image.
-	 * @param x0 Lower bound of the block.  Exclusive.
-	 * @param y0 Lower bound of the block.  Exclusive.
-	 * @param x1 Upper bound of the block.  Inclusive.
-	 * @param y1 Upper bound of the block.  Inclusive.
+	 * @param x0 Lower bound of the block. Exclusive.
+	 * @param y0 Lower bound of the block. Exclusive.
+	 * @param x1 Upper bound of the block. Inclusive.
+	 * @param y1 Upper bound of the block. Inclusive.
 	 * @return Value inside the block.
 	 */
 	public static float block_zero( GrayF32 integral, int x0, int y0, int x1, int y1 ) {
@@ -431,14 +431,14 @@ public class IntegralImageOps {
 	/**
 	 * <p>
 	 * Computes the value of a block inside an integral image and treats pixels outside of the
-	 * image as zero.  The block is defined as follows: x0 &lt; x &le; x1 and y0 &lt; y &le; y1.
+	 * image as zero. The block is defined as follows: x0 &lt; x &le; x1 and y0 &lt; y &le; y1.
 	 * </p>
 	 *
 	 * @param integral Integral image.
-	 * @param x0 Lower bound of the block.  Exclusive.
-	 * @param y0 Lower bound of the block.  Exclusive.
-	 * @param x1 Upper bound of the block.  Inclusive.
-	 * @param y1 Upper bound of the block.  Inclusive.
+	 * @param x0 Lower bound of the block. Exclusive.
+	 * @param y0 Lower bound of the block. Exclusive.
+	 * @param x1 Upper bound of the block. Inclusive.
+	 * @param y1 Upper bound of the block. Inclusive.
 	 * @return Value inside the block.
 	 */
 	public static double block_zero( GrayF64 integral, int x0, int y0, int x1, int y1 ) {
@@ -448,14 +448,14 @@ public class IntegralImageOps {
 	/**
 	 * <p>
 	 * Computes the value of a block inside an integral image and treats pixels outside of the
-	 * image as zero.  The block is defined as follows: x0 &lt; x &le; x1 and y0 &lt; y &le; y1.
+	 * image as zero. The block is defined as follows: x0 &lt; x &le; x1 and y0 &lt; y &le; y1.
 	 * </p>
 	 *
 	 * @param integral Integral image.
-	 * @param x0 Lower bound of the block.  Exclusive.
-	 * @param y0 Lower bound of the block.  Exclusive.
-	 * @param x1 Upper bound of the block.  Inclusive.
-	 * @param y1 Upper bound of the block.  Inclusive.
+	 * @param x0 Lower bound of the block. Exclusive.
+	 * @param y0 Lower bound of the block. Exclusive.
+	 * @param x1 Upper bound of the block. Inclusive.
+	 * @param y1 Upper bound of the block. Inclusive.
 	 * @return Value inside the block.
 	 */
 	public static int block_zero( GrayS32 integral, int x0, int y0, int x1, int y1 ) {
@@ -465,14 +465,14 @@ public class IntegralImageOps {
 	/**
 	 * <p>
 	 * Computes the value of a block inside an integral image and treats pixels outside of the
-	 * image as zero.  The block is defined as follows: x0 &lt; x &le; x1 and y0 &lt; y &le; y1.
+	 * image as zero. The block is defined as follows: x0 &lt; x &le; x1 and y0 &lt; y &le; y1.
 	 * </p>
 	 *
 	 * @param integral Integral image.
-	 * @param x0 Lower bound of the block.  Exclusive.
-	 * @param y0 Lower bound of the block.  Exclusive.
-	 * @param x1 Upper bound of the block.  Inclusive.
-	 * @param y1 Upper bound of the block.  Inclusive.
+	 * @param x0 Lower bound of the block. Exclusive.
+	 * @param y0 Lower bound of the block. Exclusive.
+	 * @param x1 Upper bound of the block. Inclusive.
+	 * @param y1 Upper bound of the block. Inclusive.
 	 * @return Value inside the block.
 	 */
 	public static long block_zero( GrayS64 integral, int x0, int y0, int x1, int y1 ) {

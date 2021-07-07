@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -28,8 +28,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
  */
 public class TestUtilDownConvolve extends BoofStandardJUnit {
 
-	@Test
-	public void computeMaxSide() {
+	@Test void computeMaxSide() {
 		assertEquals(8,UtilDownConvolve.computeMaxSide(10,1,1));
 		assertEquals(7,UtilDownConvolve.computeMaxSide(10,1,2));
 		assertEquals(8,UtilDownConvolve.computeMaxSide(10,2,1));
@@ -43,8 +42,7 @@ public class TestUtilDownConvolve extends BoofStandardJUnit {
 		assertEquals(4,UtilDownConvolve.computeMaxSide(11,4,2));
 	}
 
-	@Test
-	public void computeOffset() {
+	@Test void computeOffset() {
 		assertEquals(1,UtilDownConvolve.computeOffset(1,1));
 		assertEquals(2,UtilDownConvolve.computeOffset(1,2));
 		assertEquals(3,UtilDownConvolve.computeOffset(1,3));

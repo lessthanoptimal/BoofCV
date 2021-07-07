@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -36,8 +36,7 @@ public class TestImageGradient_PL extends BoofStandardJUnit {
 
 	int width = 50,height=60;
 
-	@Test
-	public void compareToSingleBand() {
+	@Test void compareToSingleBand() {
 		for( Class inputType : types ) {
 
 			ImageGradient gradientSB = FactoryDerivative.gradient(DerivativeType.PREWITT, ImageType.single(inputType),null);

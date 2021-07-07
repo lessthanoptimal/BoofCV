@@ -40,9 +40,9 @@ import java.util.Random;
 
 /**
  * <p>
- * Combines a KLT tracker with Detect-Describe-Associate type trackers.  Features are nominally tracked
- * using KLT, but after KLT drops a track it is deactivated and made dormant.  Upon request, it will
- * attempt to reactivate a dormant track by associating it with newly detected features.  After a
+ * Combines a KLT tracker with Detect-Describe-Associate type trackers. Features are nominally tracked
+ * using KLT, but after KLT drops a track it is deactivated and made dormant. Upon request, it will
+ * attempt to reactivate a dormant track by associating it with newly detected features. After a
  * track has been reactivated it will be tracked normally.
  * </p>
  *
@@ -143,7 +143,7 @@ public class HybridTrackerScalePoint
 	}
 
 	/**
-	 * Sets the tracker into its initial state.  Previously declared track data structures are saved
+	 * Sets the tracker into its initial state. Previously declared track data structures are saved
 	 * for re-use.
 	 */
 	public void reset() {
@@ -153,8 +153,8 @@ public class HybridTrackerScalePoint
 	}
 
 	/**
-	 * Updates the location and description of tracks using KLT.  Saves a reference
-	 * to the input image for future processing.  Also updates the `totalPureKlt` count.
+	 * Updates the location and description of tracks using KLT. Saves a reference
+	 * to the input image for future processing. Also updates the `totalPureKlt` count.
 	 *
 	 * @param pyramid Image pyramid of input.
 	 * @param derivX Derivative pyramid of input x-axis

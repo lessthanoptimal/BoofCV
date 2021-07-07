@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -50,8 +50,7 @@ public class TestBinaryEllipseDetectorPixel extends BoofStandardJUnit {
 	/**
 	 * Test the whole pipeline with a rendered image
 	 */
-	@Test
-	public void basicOnImage() {
+	@Test void basicOnImage() {
 
 		List<EllipseRotated_F64> expected = new ArrayList<>();
 		expected.add( new EllipseRotated_F64(30,38,10,8,0));
@@ -82,8 +81,7 @@ public class TestBinaryEllipseDetectorPixel extends BoofStandardJUnit {
 	/**
 	 * Undistort the image when no distoriton is provided
 	 */
-	@Test
-	public void undistortContour() {
+	@Test void undistortContour() {
 		List<Point2D_I32> input = new ArrayList<>();
 		DogArray<Point2D_F64> output = new DogArray<>(Point2D_F64::new);
 
@@ -106,8 +104,7 @@ public class TestBinaryEllipseDetectorPixel extends BoofStandardJUnit {
 	/**
 	 * Undistort the image when distortion model is provided
 	 */
-	@Test
-	public void undistortContour_WithDistortion() {
+	@Test void undistortContour_WithDistortion() {
 
 
 		List<Point2D_I32> input = new ArrayList<>();
@@ -134,8 +131,7 @@ public class TestBinaryEllipseDetectorPixel extends BoofStandardJUnit {
 	 * Test to see if it is approximately elliptical when the number of pixels is smaller
 	 * than the threshold
 	 */
-	@Test
-	public void isApproximatelyElliptical_small() {
+	@Test void isApproximatelyElliptical_small() {
 		EllipseRotated_F64 ellipse = new EllipseRotated_F64(5,3,10,6,0);
 
 		List<Point2D_F64> negative = TestShapeFittingOps.createRectangle_F64(20,10,60-4);
@@ -152,8 +148,7 @@ public class TestBinaryEllipseDetectorPixel extends BoofStandardJUnit {
 	 * Test to see if it is approximately elliptical when the number of pixels is larger
 	 * than the threshold
 	 */
-	@Test
-	public void isApproximatelyElliptical_large() {
+	@Test void isApproximatelyElliptical_large() {
 		EllipseRotated_F64 ellipse = new EllipseRotated_F64(5,3,10,6,0);
 
 		List<Point2D_F64> negative = TestShapeFittingOps.createRectangle_F64(20,10,60-4);

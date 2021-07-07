@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -44,8 +44,7 @@ public class TestConvolveImageNormalizedSparse extends BoofStandardJUnit {
 	int testX = 0;
 	int testY = 3;
 
-	@Test
-	public void compareToStandard() {
+	@Test void compareToStandard() {
 		CompareToStandard a = new CompareToStandard();
 		testX = 0; testY = 3;
 		a.performTests(3);

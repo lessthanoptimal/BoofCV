@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -38,8 +38,7 @@ public class TestImplIntegralImageFeatureIntensity extends BoofStandardJUnit {
 	/**
 	 * Compares the inner() function against the output from the naive function.
 	 */
-	@Test
-	public void inner_F32() {
+	@Test void inner_F32() {
 		GrayF32 original = new GrayF32(width,height);
 		GrayF32 integral = new GrayF32(width,height);
 		GrayF32 found = new GrayF32(width,height);
@@ -69,8 +68,7 @@ public class TestImplIntegralImageFeatureIntensity extends BoofStandardJUnit {
 	/**
 	 * Compares the inner() function against the output from the naive function.
 	 */
-	@Test
-	public void inner_S32() {
+	@Test void inner_S32() {
 		GrayS32 original = new GrayS32(width,height);
 		GrayS32 integral = new GrayS32(width,height);
 		GrayF32 found = new GrayF32(width,height);

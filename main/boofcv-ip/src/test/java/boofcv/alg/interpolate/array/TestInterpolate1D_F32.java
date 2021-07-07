@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -29,8 +29,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
  */
 public class TestInterpolate1D_F32 extends BoofStandardJUnit {
 
-	@Test
-	public void bisectionSearch() {
+	@Test void bisectionSearch() {
 		Debug debug = new Debug(3, 20);
 
 		debug.bisectionSearch(0, 0, 20);
@@ -46,8 +45,7 @@ public class TestInterpolate1D_F32 extends BoofStandardJUnit {
 		assertEquals(16, debug.index0);
 	}
 
-	@Test
-	public void hunt() {
+	@Test void hunt() {
 		Debug debug = new Debug(3, 20);
 		debug.bisectionSearch(0, 0, 20);
 		debug.hunt(16.5f);
@@ -58,8 +56,7 @@ public class TestInterpolate1D_F32 extends BoofStandardJUnit {
 		assertEquals(16, debug.index0);
 	}
 
-	@Test
-	public void changeDegree() {
+	@Test void changeDegree() {
 		Debug debug = new Debug(3, 20);
 		assertEquals(4, debug.M);
 		debug.changeDegree(2);

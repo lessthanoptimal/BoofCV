@@ -239,7 +239,7 @@ public class DescriptorDistance {
 	}
 
 	/**
-	 * <p>Computes the hamming distance.  A bit = 0 is a match and 1 is not match<p>
+	 * <p>Computes the hamming distance. A bit = 0 is a match and 1 is not match<p>
 	 *
 	 * Based on code snippet from <a href="http://graphics.stanford.edu/~seander/bithacks.html">Sean Eron Anderson Bit Twiddling Hacks</a>.
 	 *

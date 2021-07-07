@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -29,7 +29,7 @@ import java.awt.image.BufferedImage;
 import java.io.File;
 
 /**
- * Renders what's currently visible in the component and saves to disk.  Opens a dialog to let the user know what's going
+ * Renders what's currently visible in the component and saves to disk. Opens a dialog to let the user know what's going
  * on and provides the open to silently save in the future.
  *
  * @author Peter Abeles

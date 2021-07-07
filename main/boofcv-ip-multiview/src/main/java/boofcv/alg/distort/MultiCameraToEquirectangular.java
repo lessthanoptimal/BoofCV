@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -40,8 +40,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Fuses information from multiple camera to create a single equirectangular image.  Each image
- * is rendered independently and added to the output image, but weighted by the mask.  The mask
+ * Fuses information from multiple camera to create a single equirectangular image. Each image
+ * is rendered independently and added to the output image, but weighted by the mask. The mask
  * describes the region of pixels in the equirectangular image which it represents.
  *
  * @author Peter Abeles
@@ -71,7 +71,7 @@ public class MultiCameraToEquirectangular<T extends ImageBase<T>> {
 	 * @param distort Used to apply image distortion from different input images
 	 * @param equiWidth Width of output equirectangular image
 	 * @param equiHeight Height of output equirectangular image
-	 * @param imageType Type of image it processes and outputs.  Must be floating point.  Hmm why isn't this fixed?
+	 * @param imageType Type of image it processes and outputs. Must be floating point. Hmm why isn't this fixed?
 	 */
 	public MultiCameraToEquirectangular( ImageDistort<T, T> distort, int equiWidth, int equiHeight, ImageType<T> imageType ) {
 
@@ -91,8 +91,8 @@ public class MultiCameraToEquirectangular<T extends ImageBase<T>> {
 	}
 
 	/**
-	 * Adds a camera and attempts to compute the mask from the provided distortion model.  if a pixel is rendered
-	 * outside the bounds in the input image then it is masked out.  If the forwards/backwards transform is too
+	 * Adds a camera and attempts to compute the mask from the provided distortion model. if a pixel is rendered
+	 * outside the bounds in the input image then it is masked out. If the forwards/backwards transform is too
 	 * different then it is masked out.
 	 *
 	 * @param cameraToCommon Rigid body transform from this camera to the common frame the equirectangular image
@@ -142,14 +142,14 @@ public class MultiCameraToEquirectangular<T extends ImageBase<T>> {
 	}
 
 	/**
-	 * Adds a camera and attempts to compute the mask from the provided distortion model.  if a pixel is rendered
-	 * outside the bounds in the input image then it is masked out.  If the forwards/backwards transform is too
+	 * Adds a camera and attempts to compute the mask from the provided distortion model. if a pixel is rendered
+	 * outside the bounds in the input image then it is masked out. If the forwards/backwards transform is too
 	 * different then it is masked out.
 	 *
 	 * @param cameraToCommon Rigid body transform from this camera to the common frame the equirectangular image
 	 * is in
 	 * @param factory Distortion model
-	 * @param camMask Binary mask with invalid pixels marked as not zero.  Pixels are in camera image frame.
+	 * @param camMask Binary mask with invalid pixels marked as not zero. Pixels are in camera image frame.
 	 */
 	public void addCamera( Se3_F32 cameraToCommon, LensDistortionWideFOV factory, GrayU8 camMask ) {
 
@@ -174,7 +174,7 @@ public class MultiCameraToEquirectangular<T extends ImageBase<T>> {
 
 				if (UtilEjml.isUncountable(p2.x) || UtilEjml.isUncountable(p2.y)) {
 					// can't have it be an invalid number in the cache, but had to be invalid so that the mask
-					// could be set to zero.  So set it to some valid value that won't cause it to blow up
+					// could be set to zero. So set it to some valid value that won't cause it to blow up
 					transformEquiToCam.getPixel(col, row).setTo(-1, -1);
 					continue;
 				}
@@ -205,7 +205,7 @@ public class MultiCameraToEquirectangular<T extends ImageBase<T>> {
 
 	/**
 	 * Provides recent images from all the cameras (should be time and lighting synchronized) and renders them
-	 * into an equirectangular image.  The images must be in the same order that the cameras were added.
+	 * into an equirectangular image. The images must be in the same order that the cameras were added.
 	 *
 	 * @param cameraImages List of camera images
 	 */
@@ -246,7 +246,7 @@ public class MultiCameraToEquirectangular<T extends ImageBase<T>> {
 	 * Returns the mask for a specific camera
 	 *
 	 * @param which index of the camera
-	 * @return Mask image.  pixel values from 0 to 1
+	 * @return Mask image. pixel values from 0 to 1
 	 */
 	public GrayF32 getMask( int which ) {
 		return cameras.get(which).mask;
@@ -266,7 +266,7 @@ public class MultiCameraToEquirectangular<T extends ImageBase<T>> {
 	}
 
 	static class Camera {
-		// weighted pixel mask in equi image.  0 = ignore pixel.  1 = 100% contribution
+		// weighted pixel mask in equi image. 0 = ignore pixel. 1 = 100% contribution
 		GrayF32 mask;
 
 		PixelTransform<Point2D_F32> equiToCamera;

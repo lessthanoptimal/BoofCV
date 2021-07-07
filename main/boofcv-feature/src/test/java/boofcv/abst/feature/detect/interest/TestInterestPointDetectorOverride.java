@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -33,8 +33,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  */
 public class TestInterestPointDetectorOverride extends BoofStandardJUnit {
 
-	@Test
-	public void checkNoOverride_flags() {
+	@Test void checkNoOverride_flags() {
 		DummyPoint p = new DummyPoint(true,true);
 
 		InterestPointDetectorOverride alg = new InterestPointDetectorOverride(p,null);
@@ -55,8 +54,7 @@ public class TestInterestPointDetectorOverride extends BoofStandardJUnit {
 		assertTrue(alg.hasScale());
 	}
 
-	@Test
-	public void checkOrientation_flags() {
+	@Test void checkOrientation_flags() {
 		DummyPoint p = new DummyPoint(true,true);
 		DummyOrientation o = new DummyOrientation();
 
@@ -78,8 +76,7 @@ public class TestInterestPointDetectorOverride extends BoofStandardJUnit {
 		assertTrue(alg.hasScale());
 	}
 
-	@Test
-	public void checkOrientation_process() {
+	@Test void checkOrientation_process() {
 		DummyPoint p = new DummyPoint(true,true);
 		DummyOrientation o = new DummyOrientation();
 

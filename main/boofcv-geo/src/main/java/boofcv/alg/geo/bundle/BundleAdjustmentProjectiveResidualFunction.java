@@ -50,7 +50,7 @@ public class BundleAdjustmentProjectiveResidualFunction
 
 	// number of parameters being optimised
 	private int numParameters;
-	// number of observations.  2 for each point in each view
+	// number of observations. 2 for each point in each view
 	private int numObservations;
 
 	// Storage for rendered output

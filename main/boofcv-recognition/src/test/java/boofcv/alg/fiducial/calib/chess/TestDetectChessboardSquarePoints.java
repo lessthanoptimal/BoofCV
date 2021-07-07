@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -69,8 +69,7 @@ public class TestDetectChessboardSquarePoints extends BoofStandardJUnit {
 	/**
 	 * Give it a simple target and see if it finds the expected number of squares
 	 */
-	@Test
-	public void basicTest() {
+	@Test void basicTest() {
 
 		basicTest(3, 3);
 		basicTest(5, 5);
@@ -169,10 +168,9 @@ public class TestDetectChessboardSquarePoints extends BoofStandardJUnit {
 	}
 
 	/**
-	 * Crash case.  The outer grid touches the image edge but not the inner.
+	 * Crash case. The outer grid touches the image edge but not the inner.
 	 */
-	@Test
-	public void touchImageEdge() {
+	@Test void touchImageEdge() {
 		offsetX = -10;
 		offsetY = -15;
 
@@ -198,8 +196,7 @@ public class TestDetectChessboardSquarePoints extends BoofStandardJUnit {
 		assertFalse(alg.process(gray, binary));
 	}
 
-	@Test
-	public void putIntoCanonical() {
+	@Test void putIntoCanonical() {
 		SquareGridTools tools = new SquareGridTools();
 
 		DetectChessboardSquarePoints alg = new DetectChessboardSquarePoints(2, 2, ConfigLength.fixed(10), null);
@@ -239,8 +236,7 @@ public class TestDetectChessboardSquarePoints extends BoofStandardJUnit {
 		}
 	}
 
-	@Test
-	public void ensureCCW() {
+	@Test void ensureCCW() {
 
 		int shapes[][] = new int[][]{{4, 5}, {2, 3}, {3, 2}, {2, 2}};
 
@@ -313,8 +309,7 @@ public class TestDetectChessboardSquarePoints extends BoofStandardJUnit {
 		return UtilAngle.distanceCCW(angle0, angle1) < Math.PI;
 	}
 
-	@Test
-	public void computeCalibrationPoints() {
+	@Test void computeCalibrationPoints() {
 
 		DetectChessboardSquarePoints<GrayU8> alg = new DetectChessboardSquarePoints<>(2, 2, ConfigLength.fixed(0.01), null);
 
@@ -347,8 +342,7 @@ public class TestDetectChessboardSquarePoints extends BoofStandardJUnit {
 		}
 	}
 
-	@Test
-	public void adjustBeforeOptimize() {
+	@Test void adjustBeforeOptimize() {
 
 		DetectChessboardSquarePoints<GrayU8> alg = new DetectChessboardSquarePoints<>(2, 2, ConfigLength.fixed(0.01), null);
 
@@ -385,8 +379,7 @@ public class TestDetectChessboardSquarePoints extends BoofStandardJUnit {
 		assertEquals(41.5, polygon.get(1).y, UtilEjml.TEST_F64);
 	}
 
-	@Test
-	public void adjustBeforeOptimize_touchesBorder() {
+	@Test void adjustBeforeOptimize_touchesBorder() {
 		DetectChessboardSquarePoints<GrayU8> alg = new DetectChessboardSquarePoints<>(2, 2, ConfigLength.fixed(0.01), null);
 
 

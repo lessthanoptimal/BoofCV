@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -24,15 +24,15 @@ import org.jetbrains.annotations.Nullable;
 
 /**
  * <p>
- * Non-maximum extractor based on the block algorithm in [1].  The worst case complexity per
- * pixel is 4 - 4/(n+1) where n is the region size.  The algorithm works by breaking up the
- * image into a set of evenly spaced blocks with their sides touching.  The local maximum is
+ * Non-maximum extractor based on the block algorithm in [1]. The worst case complexity per
+ * pixel is 4 - 4/(n+1) where n is the region size. The algorithm works by breaking up the
+ * image into a set of evenly spaced blocks with their sides touching. The local maximum is
  * found inside a block and then the region around that maximum is examined to see if it is
  * truly a local max.
  * </p>
  *
  * <p>
- * Each block check is independent of all the others and no information is exchanged.  This
+ * Each block check is independent of all the others and no information is exchanged. This
  * algorithm could be paralyzed easily and has no memory overhead.
  * </p>
  *

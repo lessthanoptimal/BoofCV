@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -77,7 +77,7 @@ public class ExamplePoseOfCalibrationTarget {
 //				DefaultMediaManager.INSTANCE.openCamera(null, 640, 480, ImageType.single(GrayF32.class));
 
 		// Let's use the FiducialDetector interface since it is much easier than coding up
-		// the entire thing ourselves.  Look at FiducialDetector's code if you want to understand how it works.
+		// the entire thing ourselves. Look at FiducialDetector's code if you want to understand how it works.
 		CalibrationFiducialDetector<GrayF32> detector =
 				FactoryFiducial.calibChessboardX(null, new ConfigGridDimen(4, 5, 0.03), GrayF32.class);
 
@@ -91,7 +91,7 @@ public class ExamplePoseOfCalibrationTarget {
 		viewer.setCameraHFov(PerspectiveOps.computeHFov(intrinsic));
 		viewer.setTranslationStep(0.01);
 		viewer.setBackgroundColor(0xFFFFFF); // white background
-		// make the view more interest.  From the side.
+		// make the view more interest. From the side.
 		DMatrixRMaj rotY = ConvertRotation3D_F64.rotY(-Math.PI/2.0, null);
 		viewer.setCameraToWorld(new Se3_F64(rotY, new Vector3D_F64(0.75, 0, 1.25)).invert(null));
 		ImagePanel imagePanel = new ImagePanel(intrinsic.width, intrinsic.height);
@@ -116,7 +116,7 @@ public class ExamplePoseOfCalibrationTarget {
 			if (detector.totalFound() == 1) {
 				detector.getFiducialToCamera(0, targetToCamera);
 
-				// Visualization.  Show a path with green points and the calibration points in black
+				// Visualization. Show a path with green points and the calibration points in black
 				viewer.clearPoints();
 
 				Point3D_F64 center = new Point3D_F64();

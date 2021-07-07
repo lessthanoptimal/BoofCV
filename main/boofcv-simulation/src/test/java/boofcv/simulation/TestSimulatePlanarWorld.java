@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -41,8 +41,7 @@ public class TestSimulatePlanarWorld extends BoofStandardJUnit {
 	/**
 	 * Sees if a box appears to be the correct size using pinhole distortion
 	 */
-	@Test
-	public void checkApparentSize() {
+	@Test void checkApparentSize() {
 		double markerZ = 2;
 		double markerWidth = 0.5;
 		CameraPinhole pinhole = new CameraPinhole(400,400,0,300,250,600,500);
@@ -124,8 +123,7 @@ public class TestSimulatePlanarWorld extends BoofStandardJUnit {
 	/**
 	 * Do features appear at the right location or are they mirrors/flipped?
 	 */
-	@Test
-	public void checkOrientation() {
+	@Test void checkOrientation() {
 		checkOrientation(100, 255, 255, 255, 0);
 		checkOrientation(255, 255, 255, 100, Math.PI/2);
 		checkOrientation(255, 255, 100, 255, Math.PI);
@@ -187,8 +185,7 @@ public class TestSimulatePlanarWorld extends BoofStandardJUnit {
 		assertEquals(expectedBA,regionBA,5);
 	}
 
-	@Test
-	public void computePixel() {
+	@Test void computePixel() {
 		double markerZ = 2;
 		double markerWidth = 0.5;
 		CameraPinhole pinhole = new CameraPinhole(400,400,0,300,250,600,500);
@@ -223,8 +220,7 @@ public class TestSimulatePlanarWorld extends BoofStandardJUnit {
 		assertTrue( p.y < pinhole.height/2);
 	}
 
-	@Test
-	public void computeProjectionTable() {
+	@Test void computeProjectionTable() {
 		CameraPinhole pinhole = new CameraPinhole(400,400,0,300,250,600,500);
 
 		SimulatePlanarWorld alg = new SimulatePlanarWorld();

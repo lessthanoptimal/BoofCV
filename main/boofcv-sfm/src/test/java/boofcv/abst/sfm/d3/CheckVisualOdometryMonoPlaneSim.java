@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -36,7 +36,7 @@ import java.util.Comparator;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
- * Performs empirical validation of depth visual odometry algorithms using synthetic images.  Only a crude test
+ * Performs empirical validation of depth visual odometry algorithms using synthetic images. Only a crude test
  *
  * @author Peter Abeles
  */
@@ -128,13 +128,11 @@ public abstract class CheckVisualOdometryMonoPlaneSim<I extends ImageGray<I>>
 		Collections.sort(squares, Comparator.comparingDouble(o -> o.a.z));
 	}
 
-	@Test
-	public void moveForward() {
+	@Test void moveForward() {
 		motionCheck(0, 0.1);
 	}
 
-	@Test
-	public void moveTurning() {
+	@Test void moveTurning() {
 		motionCheck(0.02, 0.1);
 	}
 
@@ -167,7 +165,7 @@ public abstract class CheckVisualOdometryMonoPlaneSim<I extends ImageGray<I>>
 			// process the images
 			assertTrue(algorithm.process(left));
 
-			// Compare to truth.  Only go for a crude approximation
+			// Compare to truth. Only go for a crude approximation
 			Se3_F64 foundWorldToCamera = algorithm.getCameraToWorld().invert(null);
 			Se3_F64 foundWorldToCurr = foundWorldToCamera.concat(cameraToPlane, null);
 

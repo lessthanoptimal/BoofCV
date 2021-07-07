@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -35,7 +35,7 @@ import java.awt.image.BufferedImage;
 
 /**
  * This example shows you can can apply different standard image blur filters to an input image using different
- * interface.  For repeat calls using the filter interface has some advantages, but the procedural can be
+ * interface. For repeat calls using the filter interface has some advantages, but the procedural can be
  * simple to code up.
  *
  * @author Peter Abeles
@@ -57,13 +57,13 @@ public class ExampleImageBlur {
 		GBlurImageOps.gaussian(input, blurred, -1, radius, null);
 		panel.addImage(ConvertBufferedImage.convertTo(blurred, null, true), "Gaussian");
 
-		// Apply a mean filter using an object oriented interface.  This has the advantage of automatically
+		// Apply a mean filter using an object oriented interface. This has the advantage of automatically
 		// recycling memory used in intermediate steps
 		BlurFilter<Planar<GrayU8>> filterMean = FactoryBlurFilter.mean(input.getImageType(), radius);
 		filterMean.process(input, blurred);
 		panel.addImage(ConvertBufferedImage.convertTo(blurred, null, true), "Mean");
 
-		// Apply a median filter using image type specific procedural interface.  Won't work if the type
+		// Apply a median filter using image type specific procedural interface. Won't work if the type
 		// isn't known at compile time
 		BlurImageOps.median(input, blurred, radius, radius, null);
 		panel.addImage(ConvertBufferedImage.convertTo(blurred, null, true), "Median");

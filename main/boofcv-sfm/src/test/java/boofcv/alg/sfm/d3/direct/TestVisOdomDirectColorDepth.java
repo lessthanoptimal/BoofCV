@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -47,11 +47,10 @@ public class TestVisOdomDirectColorDepth extends BoofStandardJUnit {
 	float cy = height/2;
 
 	/**
-	 * Generate low level synthetic data that should simulate a translation along one axis.  Then check to see if
+	 * Generate low level synthetic data that should simulate a translation along one axis. Then check to see if
 	 * has the expected behavior at a high level
 	 */
-	@Test
-	public void singleStepArtificialTranslation() {
+	@Test void singleStepArtificialTranslation() {
 		// it wants to declares the color of each pixel, the gradient says it increases to the right
 		// so it will move in the negative x direction
 		Se3_F32 a = computeMotion(10, 20, 6, 0);
@@ -95,7 +94,7 @@ public class TestVisOdomDirectColorDepth extends BoofStandardJUnit {
 		GImageMiscOps.addUniform(alg.derivX, rand, 0f, 0.1f);
 		GImageMiscOps.addUniform(alg.derivY, rand, 0f, 0.1f);
 
-		// generate some synthetic data.  This will be composed of random points in front of the camera
+		// generate some synthetic data. This will be composed of random points in front of the camera
 		for (int i = 0; i < 100; i++) {
 			VisOdomDirectColorDepth.Pixel p = alg.keypixels.grow();
 

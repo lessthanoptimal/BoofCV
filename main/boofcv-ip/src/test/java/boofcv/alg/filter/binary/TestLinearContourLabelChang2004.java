@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -93,8 +93,7 @@ public class TestLinearContourLabelChang2004 extends BoofStandardJUnit {
 		local.add(new Point2D_I32(-1, -1));
 	}
 
-	@Test
-	public void test1_4() {
+	@Test void test1_4() {
 		GrayU8 input = TEST1.clone();
 
 		GrayS32 labeled = new GrayS32(input.width, input.height);
@@ -105,8 +104,7 @@ public class TestLinearContourLabelChang2004 extends BoofStandardJUnit {
 		checkContour(alg, labeled, 4);
 	}
 
-	@Test
-	public void test1_8() {
+	@Test void test1_8() {
 		GrayU8 input = TEST1.clone();
 
 		GrayS32 labeled = new GrayS32(input.width, input.height);
@@ -117,8 +115,7 @@ public class TestLinearContourLabelChang2004 extends BoofStandardJUnit {
 		checkContour(alg, labeled, 8);
 	}
 
-	@Test
-	public void test2_4() {
+	@Test void test2_4() {
 		GrayU8 input = TEST2.clone();
 
 		GrayS32 labeled = new GrayS32(input.width, input.height);
@@ -129,8 +126,7 @@ public class TestLinearContourLabelChang2004 extends BoofStandardJUnit {
 		checkContour(alg, labeled, 4);
 	}
 
-	@Test
-	public void test2_8() {
+	@Test void test2_8() {
 		GrayU8 input = TEST2.clone();
 
 		GrayS32 labeled = new GrayS32(input.width, input.height);
@@ -141,8 +137,7 @@ public class TestLinearContourLabelChang2004 extends BoofStandardJUnit {
 		checkContour(alg, labeled, 8);
 	}
 
-	@Test
-	public void test3_4() {
+	@Test void test3_4() {
 		GrayU8 input = TEST4.clone();
 
 		GrayS32 labeled = new GrayS32(input.width, input.height);
@@ -153,8 +148,7 @@ public class TestLinearContourLabelChang2004 extends BoofStandardJUnit {
 		checkContour(alg, labeled, 4);
 	}
 
-	@Test
-	public void test3_8() {
+	@Test void test3_8() {
 		GrayU8 input = TEST4.clone();
 
 		GrayS32 labeled = new GrayS32(input.width, input.height);
@@ -168,8 +162,7 @@ public class TestLinearContourLabelChang2004 extends BoofStandardJUnit {
 	/**
 	 * Check to see if inner and outer contours are being computed correctly
 	 */
-	@Test
-	public void checkInnerOuterContour() {
+	@Test void checkInnerOuterContour() {
 		GrayU8 input = TEST3.clone();
 
 		GrayS32 labeled = new GrayS32(input.width, input.height);
@@ -186,8 +179,8 @@ public class TestLinearContourLabelChang2004 extends BoofStandardJUnit {
 	}
 
 	/**
-	 * Creates a list of every pixel with the specified label that is on the contour.  Removes duplicate points
-	 * in the found contour.  Sees if the two lists are equivalent.
+	 * Creates a list of every pixel with the specified label that is on the contour. Removes duplicate points
+	 * in the found contour. Sees if the two lists are equivalent.
 	 *
 	 * @param rule Which connectivity rule is being tested
 	 */

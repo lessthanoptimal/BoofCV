@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -24,7 +24,7 @@ import boofcv.struct.image.Planar;
 import deepboof.tensors.Tensor_F32;
 
 /**
- * Functions for manipulating data by transforming it or converting its format.  For use with DeepBoof
+ * Functions for manipulating data by transforming it or converting its format. For use with DeepBoof
  *
  * @author Peter Abeles
  */
@@ -73,7 +73,7 @@ public class DataManipulationOps {
 		if (input.isSubimage())
 			throw new RuntimeException("Subimages not accepted");
 		if (output.getDimension() != 4)
-			throw new IllegalArgumentException("Output should be 4-DOF.  batch + spatial (channel,height,width)");
+			throw new IllegalArgumentException("Output should be 4-DOF. batch + spatial (channel,height,width)");
 		if (output.length(1) != input.getNumBands())
 			throw new IllegalArgumentException("Number of bands don't match");
 		if (output.length(2) != input.getHeight())
@@ -92,7 +92,7 @@ public class DataManipulationOps {
 
 	public static Planar<GrayF32> tensorToImage( Tensor_F32 input, Planar<GrayF32> output, int miniBatch ) {
 		if (input.getDimension() != 4)
-			throw new IllegalArgumentException("Input should be 4-DOF.  batch + spatial (channel,height,width)");
+			throw new IllegalArgumentException("Input should be 4-DOF. batch + spatial (channel,height,width)");
 
 		int bands = input.length(1);
 		int height = input.length(2);

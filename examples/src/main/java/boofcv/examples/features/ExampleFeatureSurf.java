@@ -49,7 +49,7 @@ import java.util.List;
  */
 public class ExampleFeatureSurf {
 	/**
-	 * Use generalized interfaces for working with SURF.  This removes much of the drudgery, but also reduces flexibility
+	 * Use generalized interfaces for working with SURF. This removes much of the drudgery, but also reduces flexibility
 	 * and slightly increases memory and computational requirements.
 	 * 
 	 *  @param image Input image type. DOES NOT NEED TO BE GrayF32, GrayU8 works too
@@ -73,7 +73,7 @@ public class ExampleFeatureSurf {
 
 	/**
 	 * Configured exactly the same as the easy example above, but require a lot more code and a more in depth
-	 * understanding of how SURF works and is configured.  Each sub-problem which composes "SURF" is now explicitly
+	 * understanding of how SURF works and is configured. Each sub-problem which composes "SURF" is now explicitly
 	 * created and configured independently. This allows an advance user to tune it for a specific problem.
 	 *
 	 * @param image Input image type. DOES NOT NEED TO BE GrayF32, GrayU8 works too

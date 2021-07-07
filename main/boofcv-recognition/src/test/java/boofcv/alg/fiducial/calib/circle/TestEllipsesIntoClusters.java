@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -36,8 +36,7 @@ public class TestEllipsesIntoClusters extends BoofStandardJUnit {
 	/**
 	 * Just make sure it doesn't blow up with an empty input
 	 */
-	@Test
-	public void emptyInput() {
+	@Test void emptyInput() {
 		EllipsesIntoClusters alg = new EllipsesIntoClusters(2.0,0.5,0.5);
 
 		List<EllipseInfo> input = new ArrayList<>();
@@ -51,8 +50,7 @@ public class TestEllipsesIntoClusters extends BoofStandardJUnit {
 	/**
 	 * Makes sure the output is cleared
 	 */
-	@Test
-	public void outputCleared() {
+	@Test void outputCleared() {
 		EllipsesIntoClusters alg = new EllipsesIntoClusters(2.0,0.5,0.5);
 
 		List<EllipseInfo> input = new ArrayList<>();
@@ -68,8 +66,7 @@ public class TestEllipsesIntoClusters extends BoofStandardJUnit {
 	/**
 	 * Provide it a simple case to cluster and make sure everything is connected properly
 	 */
-	@Test
-	public void checkConnections() {
+	@Test void checkConnections() {
 		EllipsesIntoClusters alg = new EllipsesIntoClusters(2.1,0.5,0.5);
 
 		List<EllipseInfo> input = new ArrayList<>();
@@ -111,8 +108,7 @@ public class TestEllipsesIntoClusters extends BoofStandardJUnit {
 	/**
 	 * Points should not be clustered together due to distance apart
 	 */
-	@Test
-	public void noCluster_distance() {
+	@Test void noCluster_distance() {
 		EllipsesIntoClusters alg = new EllipsesIntoClusters(2.0,0.5,0.5);
 
 		List<EllipseInfo> input = new ArrayList<>();
@@ -133,8 +129,7 @@ public class TestEllipsesIntoClusters extends BoofStandardJUnit {
 	/**
 	 * Points should not be clustered together due difference in side lengths
 	 */
-	@Test
-	public void noCluster_size() {
+	@Test void noCluster_size() {
 		EllipsesIntoClusters alg = new EllipsesIntoClusters(2.0,0.5,0.5);
 
 		List<EllipseInfo> input = new ArrayList<>();
@@ -152,8 +147,7 @@ public class TestEllipsesIntoClusters extends BoofStandardJUnit {
 		assertEquals( 1 , alg.clusters.size());
 	}
 
-	@Test
-	public void multipleClusters() {
+	@Test void multipleClusters() {
 		EllipsesIntoClusters alg = new EllipsesIntoClusters(2.0,0.5,0.5);
 
 		// two clusters differentiated by size
@@ -179,8 +173,7 @@ public class TestEllipsesIntoClusters extends BoofStandardJUnit {
 		}
 	}
 
-	@Test
-	public void multipleCalls() {
+	@Test void multipleCalls() {
 		EllipsesIntoClusters alg = new EllipsesIntoClusters(2.0,0.5,0.5);
 
 		// two clusters differentiated by size
@@ -205,8 +198,7 @@ public class TestEllipsesIntoClusters extends BoofStandardJUnit {
 		}
 	}
 
-	@Test
-	public void joinClusters() {
+	@Test void joinClusters() {
 
 		EllipsesIntoClusters alg = new EllipsesIntoClusters(0.5,0.5,0.5);
 
@@ -227,8 +219,7 @@ public class TestEllipsesIntoClusters extends BoofStandardJUnit {
 
 	}
 
-	@Test
-	public void axisAdjustedDistance() {
+	@Test void axisAdjustedDistance() {
 
 		EllipseRotated_F64 a = new EllipseRotated_F64(2,3,3,3,0);
 		EllipseRotated_F64 b = new EllipseRotated_F64(6,3,3,3,0);
@@ -238,10 +229,10 @@ public class TestEllipsesIntoClusters extends BoofStandardJUnit {
 		a.phi = Math.PI/2.0;
 		assertEquals(4*4, EllipsesIntoClusters.axisAdjustedDistanceSq(a,b), 1e-6);
 
-		// not a circle any more.  First test it lies along the major axis, should still be euclidean
+		// not a circle any more. First test it lies along the major axis, should still be euclidean
 		a.a=6;a.phi = 0;
 		assertEquals(4*4, EllipsesIntoClusters.axisAdjustedDistanceSq(a,b), 1e-6);
-		// now rotate it.  Distance should double
+		// now rotate it. Distance should double
 		a.phi = Math.PI/2.0;
 		assertEquals(8*8, EllipsesIntoClusters.axisAdjustedDistanceSq(a,b), 1e-6);
 
@@ -253,8 +244,7 @@ public class TestEllipsesIntoClusters extends BoofStandardJUnit {
 		}
 	}
 
-	@Test
-	public void removeSingleConnections() {
+	@Test void removeSingleConnections() {
 		List<EllipsesIntoClusters.Node> cluster = new ArrayList<>();
 
 		for (int i = 0; i < 5; i++) {
@@ -276,8 +266,7 @@ public class TestEllipsesIntoClusters extends BoofStandardJUnit {
 		assertEquals(-1,EllipsesIntoClusters.findNode(4,cluster));
 	}
 
-	@Test
-	public void findNode() {
+	@Test void findNode() {
 		List<EllipsesIntoClusters.Node> cluster = new ArrayList<>();
 
 		for (int i = 0; i < 6; i++) {

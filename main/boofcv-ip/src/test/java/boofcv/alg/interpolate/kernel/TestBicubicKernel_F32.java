@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -27,8 +27,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
  * @author Peter Abeles
  */
 public class TestBicubicKernel_F32 extends BoofStandardJUnit {
-	@Test
-	public void checkSumToOne() {
+	@Test void checkSumToOne() {
 		BicubicKernel_F32 kernel = new BicubicKernel_F32(-0.5f);
 
 		// should sum to one for different offsets

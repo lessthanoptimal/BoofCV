@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -64,13 +64,13 @@ public class HomographyTotalLeastSquares {
 
 	/**
 	 * <p>
-	 * Computes the homography matrix given a set of observed points in two images.  A set of {@link AssociatedPair}
-	 * is passed in.  The computed homography 'H' is found such that the attributes 'p1' and 'p2' in {@link AssociatedPair}
+	 * Computes the homography matrix given a set of observed points in two images. A set of {@link AssociatedPair}
+	 * is passed in. The computed homography 'H' is found such that the attributes 'p1' and 'p2' in {@link AssociatedPair}
 	 * refers to x1 and x2, respectively, in the equation  below:<br>
 	 * x<sub>2</sub> = H*x<sub>1</sub>
 	 * </p>
 	 *
-	 * @param points A set of observed image points that are generated from a planar object.  Minimum of 4 pairs required.
+	 * @param points A set of observed image points that are generated from a planar object. Minimum of 4 pairs required.
 	 * @param foundH Output: Storage for the found solution. 3x3 matrix.
 	 * @return true if the calculation was a success.
 	 */

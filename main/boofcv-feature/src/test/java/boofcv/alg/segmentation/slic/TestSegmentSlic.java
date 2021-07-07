@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -36,8 +36,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  */
 public class TestSegmentSlic extends BoofStandardJUnit {
 
-	@Test
-	public void initializeClusters() {
+	@Test void initializeClusters() {
 
 		DummySlic alg = new DummySlic(4,1,10) {
 			@Override
@@ -66,11 +65,10 @@ public class TestSegmentSlic extends BoofStandardJUnit {
 	}
 
 	/**
-	 * Makes sure bounds checking is properly done.  places a cluster at each corner and sees if the pixels around
+	 * Makes sure bounds checking is properly done. places a cluster at each corner and sees if the pixels around
 	 * the corner has that specific cluster
 	 */
-	@Test
-	public void computeClusterDistance() {
+	@Test void computeClusterDistance() {
 		DummySlic alg = new DummySlic(4,1,10);
 
 		GrayU8 input = new GrayU8(7,9);
@@ -114,8 +112,7 @@ public class TestSegmentSlic extends BoofStandardJUnit {
 		}
 	}
 
-	@Test
-	public void updateClusters() {
+	@Test void updateClusters() {
 		DummySlic alg = new DummySlic(4,1,10);
 
 		SegmentSlic.Cluster c0 = alg.clusters.grow();
@@ -148,8 +145,7 @@ public class TestSegmentSlic extends BoofStandardJUnit {
 		assertEquals(1.5,c2.y,1e-4);
 	}
 
-	@Test
-	public void assignLabelsToPixels() {
+	@Test void assignLabelsToPixels() {
 		DummySlic alg = new DummySlic(4,1,10);
 
 		SegmentSlic.Cluster c0 = alg.clusters.grow();
@@ -191,8 +187,7 @@ public class TestSegmentSlic extends BoofStandardJUnit {
 
 	}
 
-	@Test
-	public void Pixel_add()
+	@Test void Pixel_add()
 	{
 		SegmentSlic.Cluster c0 = new SegmentSlic.Cluster();
 		SegmentSlic.Cluster c1 = new SegmentSlic.Cluster();
@@ -213,8 +208,7 @@ public class TestSegmentSlic extends BoofStandardJUnit {
 	}
 
 
-	@Test
-	public void Pixel_computeWeights() {
+	@Test void Pixel_computeWeights() {
 		SegmentSlic.Pixel p = new SegmentSlic.Pixel();
 
 		p.clusters.grow().distance = 2;
@@ -225,7 +219,7 @@ public class TestSegmentSlic extends BoofStandardJUnit {
 		assertEquals(1.0f - 2f/2.3f,p.clusters.data[0].distance,1e-4f);
 		assertEquals(1.0f - 0.3f/2.3f,p.clusters.data[1].distance,1e-4f);
 
-		// check special case of 1 item.  The weight will be 1 since it is the only one
+		// check special case of 1 item. The weight will be 1 since it is the only one
 		p.clusters.size = 1;
 		p.clusters.data[0].distance = 2;
 
@@ -234,8 +228,7 @@ public class TestSegmentSlic extends BoofStandardJUnit {
 		assertEquals(1.0f,p.clusters.data[0].distance,1e-4f);
 	}
 
-	@Test
-	public void Cluster_update() {
+	@Test void Cluster_update() {
 		SegmentSlic.Cluster c = new SegmentSlic.Cluster();
 
 		float x = 6.1f;

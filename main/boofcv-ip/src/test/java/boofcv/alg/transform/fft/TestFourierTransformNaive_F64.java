@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -31,8 +31,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
  */
 public class TestFourierTransformNaive_F64 extends BoofStandardJUnit {
 
-	@Test
-	public void forwardsRRI_inverseRIR() {
+	@Test void forwardsRRI_inverseRIR() {
 		double[] original = new double[]{0.5,2,-0.34,5,6,2,10,10,10,0f,-0.4,-6};
 		double[] tranImag = new double[original.length];
 		double[] tranReal = new double[original.length];
@@ -46,8 +45,7 @@ public class TestFourierTransformNaive_F64 extends BoofStandardJUnit {
 		}
 	}
 
-	@Test
-	public void transform_RIRI_RIRI() {
+	@Test void transform_RIRI_RIRI() {
 		double[] originalR = new double[]{0.5,2,-0.34,5,6,2,10,10,10,0,-0.4,-6};
 		double[] originalI = new double[]{-0.5,1.5,-3,1.5,3.5,-0.6,-4,4,3,-2,-3,2.5};
 		double[] tranImag = new double[originalR.length];
@@ -64,8 +62,7 @@ public class TestFourierTransformNaive_F64 extends BoofStandardJUnit {
 		}
 	}
 
-	@Test
-	public void forward_reverse_image() {
+	@Test void forward_reverse_image() {
 		GrayF64 input = new GrayF64(30,40);
 		GrayF64 tranR = new GrayF64(30,40);
 		GrayF64 tranI = new GrayF64(30,40);

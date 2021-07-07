@@ -34,8 +34,7 @@ import static org.junit.jupiter.api.Assertions.*;
  */
 public class TestEnforceUniqueByScore extends BoofStandardJUnit {
 
-	@Test
-	public void generic() {
+	@Test void generic() {
 		generic(true,false);
 		generic(false,true);
 		generic(true,true);
@@ -60,8 +59,7 @@ public class TestEnforceUniqueByScore extends BoofStandardJUnit {
 		assertEquals(checkDestination,alg.uniqueDestination());
 	}
 
-	@Test
-	public void checkUniqueFlags() {
+	@Test void checkUniqueFlags() {
 		DummyAssociate associate = new DummyAssociate();
 
 		associate.uniqueSource=true;associate.uniqueDestination=false;

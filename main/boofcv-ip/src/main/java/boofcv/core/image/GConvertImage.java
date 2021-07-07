@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -37,19 +37,19 @@ public class GConvertImage {
 
 	/**
 	 * <p>
-	 * Converts one type of between two types of images using a default method.  Both are the same image type
-	 * then a simple type cast if performed at the pixel level.  If the input is multi-band and the output
-	 * is single band then it will average the bands.  If input is single band and output is multi-band
+	 * Converts one type of between two types of images using a default method. Both are the same image type
+	 * then a simple type cast if performed at the pixel level. If the input is multi-band and the output
+	 * is single band then it will average the bands. If input is single band and output is multi-band
 	 * then the single band is copied into each of the other bands.
 	 * </p>
 	 *
 	 * <p>
-	 * In some cases a temporary image will be created to store intermediate results.  If this is an issue
+	 * In some cases a temporary image will be created to store intermediate results. If this is an issue
 	 * you will need to create a specialized conversion algorithm.
 	 * </p>
 	 *
 	 * @param input Input image which is being converted. Not modified.
-	 * @param output (Optional) The output image.  If null a new image is created. Modified.
+	 * @param output (Optional) The output image. If null a new image is created. Modified.
 	 */
 	public static void convert( ImageBase input , ImageBase output ) {
 
@@ -170,7 +170,7 @@ public class GConvertImage {
 	 * across all the bands.
 	 *
 	 * @param input ImageMultiBand that is being converted. Not modified.
-	 * @param output (Optional) The single band output image.  If null a new image is created. Modified.
+	 * @param output (Optional) The single band output image. If null a new image is created. Modified.
 	 * @return Converted image.
 	 */
 	public static <T extends ImageGray<T>>T average( ImageMultiBand input , T output ) {
@@ -188,7 +188,7 @@ public class GConvertImage {
 	 * across all the bands.
 	 *
 	 * @param input Input Planar image that is being converted. Not modified.
-	 * @param output (Optional) The single band output image.  If null a new image is created. Modified.
+	 * @param output (Optional) The single band output image. If null a new image is created. Modified.
 	 * @return Converted image.
 	 */
 	public static <T extends ImageGray<T>>T average(Planar<T> input , T output ) {
@@ -219,7 +219,7 @@ public class GConvertImage {
 	 * across all the bands.
 	 *
 	 * @param input Input Planar image that is being converted. Not modified.
-	 * @param output (Optional) The single band output image.  If null a new image is created. Modified.
+	 * @param output (Optional) The single band output image. If null a new image is created. Modified.
 	 * @return Converted image.
 	 */
 	public static <T extends ImageGray<T>>T average(ImageInterleaved input , T output ) {
@@ -251,7 +251,7 @@ public class GConvertImage {
 	 * @param min minimum input pixel value, inclusive
 	 * @param max maximum input pixel value, inclusive
 	 * @param numValues Number of possible pixel values in output image
-	 * @param output (Optional) Storage for the output image.  Can be null.
+	 * @param output (Optional) Storage for the output image. Can be null.
 	 * @return The converted output image.
 	 */
 	public static GrayU8 convert(ImageGray input , double min , double max , int numValues , GrayU8 output )
@@ -287,7 +287,7 @@ public class GConvertImage {
 	}
 
 	/**
-	 * Converts an image from one type to another type.  Creates a new image instance if
+	 * Converts an image from one type to another type. Creates a new image instance if
 	 * an output is not provided.
 	 *
 	 * @param src Input image. Not modified.

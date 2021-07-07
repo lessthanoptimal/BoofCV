@@ -29,11 +29,11 @@ import org.ddogleg.struct.DogArray;
 
 /**
  * <p>
- * Finds objects in a binary image by tracing their contours.  The output is labeled binary image, set of external
- * and internal contours for each object/blob.  Blobs can be defined using a 4 or 8 connect rule.  The algorithm
- * works by processing the image in a single pass.  When a new object is encountered its contour is traced.  Then
- * the inner pixels are labeled.  If an internal contour is found it will also be traced.  See [1] for all
- * the details.  The original algorithm has been modified to use different connectivity rules.
+ * Finds objects in a binary image by tracing their contours. The output is labeled binary image, set of external
+ * and internal contours for each object/blob. Blobs can be defined using a 4 or 8 connect rule. The algorithm
+ * works by processing the image in a single pass. When a new object is encountered its contour is traced. Then
+ * the inner pixels are labeled. If an internal contour is found it will also be traced. See [1] for all
+ * the details. The original algorithm has been modified to use different connectivity rules.
  * </p>
  *
  * <p>
@@ -48,7 +48,7 @@ import org.ddogleg.struct.DogArray;
  *
  * <p>
  * Internally, the input binary image is copied into another image which will have a 1 pixel border of all zeros
- * around it.  This ensures that boundary checks will not need to be done, speeding up the algorithm by about 25%.
+ * around it. This ensures that boundary checks will not need to be done, speeding up the algorithm by about 25%.
  * </p>
  *
  * <p>
@@ -83,7 +83,7 @@ public class LinearContourLabelChang2004 {
 	/**
 	 * Configures the algorithm.
 	 *
-	 * @param rule Connectivity rule.  4 or 8
+	 * @param rule Connectivity rule. 4 or 8
 	 */
 	public LinearContourLabelChang2004( ConnectRule rule ) {
 		tracer = new ContourTracer(rule);
@@ -93,7 +93,7 @@ public class LinearContourLabelChang2004 {
 	 * Processes the binary image to find the contour of and label blobs.
 	 *
 	 * @param binary Input binary image. Not modified.
-	 * @param labeled Output. Labeled image.  Modified.
+	 * @param labeled Output. Labeled image. Modified.
 	 */
 	public void process( GrayU8 binary, GrayS32 labeled ) {
 		// initialize data structures

@@ -35,8 +35,8 @@ import java.util.List;
 
 /**
  * <p>
- * Computes the essential or fundamental matrix using exactly 7 points with linear algebra.  The number of required points
- * is reduced from 8 to 7 by enforcing the singularity constraint, det(F) = 0.  The number of solutions found is
+ * Computes the essential or fundamental matrix using exactly 7 points with linear algebra. The number of required points
+ * is reduced from 8 to 7 by enforcing the singularity constraint, det(F) = 0. The number of solutions found is
  * either one or three depending on the number of real roots found in the quadratic.
  * </p>
  *

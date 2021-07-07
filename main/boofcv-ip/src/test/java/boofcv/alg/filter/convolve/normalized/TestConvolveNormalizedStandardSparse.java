@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -55,8 +55,7 @@ public class TestConvolveNormalizedStandardSparse extends BoofStandardJUnit {
 	/**
 	 * Automatically compares all the box filters against a generalize convolution
 	 */
-	@Test
-	public void compareToGeneral() {
+	@Test void compareToGeneral() {
 		// try different edges in the image as test points
 		for( int i = 0; i < 2; i++ ) {
 			targetX = i; targetY = 5;

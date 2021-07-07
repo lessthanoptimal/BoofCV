@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -38,8 +38,7 @@ class TestDecomposeAbsoluteDualQuadratic extends BoofStandardJUnit {
 
 	DMatrixRMaj K = new DMatrixRMaj(new double[][]{{400,1.1,450},{0,420,460},{0,0,1}});
 
-	@Test
-	public void decompose() {
+	@Test void decompose() {
 
 		Equation eq =  new Equation(K,"K");
 		DMatrixRMaj Q = eq.process("I=diag([1,1,1,0])").
@@ -65,8 +64,7 @@ class TestDecomposeAbsoluteDualQuadratic extends BoofStandardJUnit {
 		assertTrue(MatrixFeatures_D.isIdentical(p,alg.getP(), UtilEjml.TEST_F64));
 	}
 
-	@Test
-	public void recomputeQ() {
+	@Test void recomputeQ() {
 		Equation eq = new Equation();
 		eq.process("k = [300 3, 204;0 230 400; 0 0 1]").
 				process("w = k*k'").
@@ -88,8 +86,7 @@ class TestDecomposeAbsoluteDualQuadratic extends BoofStandardJUnit {
 	/**
 	 * Create a dual quadratic from its definition and see if its correctly decomposed
 	 */
-	@Test
-	public void computeRectifyingHomography() {
+	@Test void computeRectifyingHomography() {
 		Equation eq =  new Equation(K,"K");
 		DMatrixRMaj Q = eq.process("I=diag([1,1,1,0])").
 				process("p=[2.1;0.4;-0.3]").

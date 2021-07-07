@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -23,8 +23,8 @@ import boofcv.struct.image.ImageType;
 
 /**
  * <p>
- * An image pyramid where each level can be an arbitrary scale.  Higher levels in the pyramid
- * are sub-sampled from lower levels in the pyramid allowing fractions of a pixel change.  This
+ * An image pyramid where each level can be an arbitrary scale. Higher levels in the pyramid
+ * are sub-sampled from lower levels in the pyramid allowing fractions of a pixel change. This
  * added flexibility comes at the cost of some performance relative to {@link PyramidDiscrete}.
  * </p>
  *
@@ -44,7 +44,7 @@ public abstract class PyramidFloat<T extends ImageBase<T>> extends ImagePyramidB
 	 * Defines the image pyramid.
 	 *
 	 * @param imageType Type of image
-	 * @param scaleFactors (optional) Specifies the scale of each layer in the pyramid.  See restrictions
+	 * @param scaleFactors (optional) Specifies the scale of each layer in the pyramid. See restrictions
 	 * on scaleFactor in {@link #setScaleFactors(double...)}.
 	 */
 	protected PyramidFloat( ImageType<T> imageType, double... scaleFactors ) {

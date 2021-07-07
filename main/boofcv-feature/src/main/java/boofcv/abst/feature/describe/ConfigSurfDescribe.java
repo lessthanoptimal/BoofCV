@@ -21,7 +21,7 @@ package boofcv.abst.feature.describe;
 import boofcv.struct.Configuration;
 
 /**
- * Abstract base class for SURF implementations.  Use child classes to specify a specific implementation.
+ * Abstract base class for SURF implementations. Use child classes to specify a specific implementation.
  *
  * @see boofcv.alg.feature.describe.DescribePointSurf
  *
@@ -41,7 +41,7 @@ public abstract class ConfigSurfDescribe implements Configuration {
 	 */
 	public double widthSample = 3;
 	/**
-	 * If true the Haar wavelet will be used.  If false means image gradient.
+	 * If true the Haar wavelet will be used. If false means image gradient.
 	 */
 	public boolean useHaar = false;
 
@@ -53,7 +53,7 @@ public abstract class ConfigSurfDescribe implements Configuration {
 	 */
 	public static class Fast extends ConfigSurfDescribe {
 		/**
-		 * Weighting factor's sigma.  Try 4.5
+		 * Weighting factor's sigma. Try 4.5
 		 */
 		public double weightSigma = 4.5;
 

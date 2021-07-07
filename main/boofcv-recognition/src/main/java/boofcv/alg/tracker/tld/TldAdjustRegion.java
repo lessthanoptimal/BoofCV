@@ -42,7 +42,7 @@ public class TldAdjustRegion {
 	int imageHeight;
 
 	/**
-	 * @param numCycles Number of iterations in robust motion estimation.  Try 50.
+	 * @param numCycles Number of iterations in robust motion estimation. Try 50.
 	 */
 	public TldAdjustRegion( int numCycles ) {
 		ModelManager<ScaleTranslate2D> manager = new ModelManagerScaleTranslate2D();
@@ -61,7 +61,7 @@ public class TldAdjustRegion {
 	 * Adjusts target rectangle using track information
 	 *
 	 * @param pairs List of feature location in previous and current frame.
-	 * @param targetRectangle (Input) current location of rectangle.  (output) adjusted location
+	 * @param targetRectangle (Input) current location of rectangle. (output) adjusted location
 	 * @return true if successful
 	 */
 	public boolean process( DogArray<AssociatedPair> pairs, Rectangle2D_F64 targetRectangle ) {

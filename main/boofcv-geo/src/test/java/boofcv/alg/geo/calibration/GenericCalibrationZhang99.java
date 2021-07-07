@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -249,8 +249,7 @@ public abstract class GenericCalibrationZhang99<CM extends CameraModel> extends 
 	 */
 	public abstract List<CameraConfig> createCameraForLinearTests(Random rand);
 
-	@Test
-	public void applyDistortion() {
+	@Test void applyDistortion() {
 		Point2D_F64 n = new Point2D_F64(0.05,-0.1);
 		double radial[] = new double[]{0.1};
 		double t1 = 0.034,t2 = 0.34;

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -22,7 +22,7 @@ import boofcv.struct.image.ImageGray;
 
 
 /**
- * Interface for algorithms which "denoise" the wavelet transform of an image.  Typically
+ * Interface for algorithms which "denoise" the wavelet transform of an image. Typically
  * this is done by setting insignificant coefficients to zero.
  *
  * @author Peter Abeles

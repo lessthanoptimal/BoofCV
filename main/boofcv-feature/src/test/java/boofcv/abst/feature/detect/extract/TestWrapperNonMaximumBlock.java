@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -29,8 +29,7 @@ import org.junit.jupiter.api.Test;
  */
 public class TestWrapperNonMaximumBlock extends BoofStandardJUnit {
 
-	@Test
-	public void checkStrict_Max() {
+	@Test void checkStrict_Max() {
 		GeneralNonMaxSuppressionChecks checks = new GeneralNonMaxSuppressionChecks() {
 
 			@Override
@@ -42,8 +41,7 @@ public class TestWrapperNonMaximumBlock extends BoofStandardJUnit {
 		checks.testAll();
 	}
 
-	@Test
-	public void checkStrict_Min() {
+	@Test void checkStrict_Min() {
 		GeneralNonMaxSuppressionChecks checks = new GeneralNonMaxSuppressionChecks() {
 
 			@Override
@@ -55,8 +53,7 @@ public class TestWrapperNonMaximumBlock extends BoofStandardJUnit {
 		checks.testAll();
 	}
 
-	@Test
-	public void checkStrict_MinMax() {
+	@Test void checkStrict_MinMax() {
 		GeneralNonMaxSuppressionChecks checks = new GeneralNonMaxSuppressionChecks() {
 
 			@Override
@@ -68,8 +65,7 @@ public class TestWrapperNonMaximumBlock extends BoofStandardJUnit {
 		checks.testAll();
 	}
 
-	@Test
-	public void checkRelaxed_Max() {
+	@Test void checkRelaxed_Max() {
 		GeneralNonMaxSuppressionChecks checks = new GeneralNonMaxSuppressionChecks() {
 
 			@Override
@@ -81,8 +77,7 @@ public class TestWrapperNonMaximumBlock extends BoofStandardJUnit {
 		checks.testAll();
 	}
 
-	@Test
-	public void checkRelaxed_Min() {
+	@Test void checkRelaxed_Min() {
 		GeneralNonMaxSuppressionChecks checks = new GeneralNonMaxSuppressionChecks() {
 
 			@Override
@@ -94,8 +89,7 @@ public class TestWrapperNonMaximumBlock extends BoofStandardJUnit {
 		checks.testAll();
 	}
 
-	@Test
-	public void checkRelaxed_MinMax() {
+	@Test void checkRelaxed_MinMax() {
 		GeneralNonMaxSuppressionChecks checks = new GeneralNonMaxSuppressionChecks() {
 
 			@Override

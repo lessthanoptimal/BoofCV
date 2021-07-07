@@ -30,7 +30,7 @@ import org.ddogleg.fitting.modelset.DistanceFromModel;
 import java.util.List;
 
 /**
- * Computes the difference between a predicted observation and the actual observation.  The prediction is done
+ * Computes the difference between a predicted observation and the actual observation. The prediction is done
  * by applying a transform on a point in on a 2D plane then rendering it onto the camera.
  *
  * @author Peter Abeles

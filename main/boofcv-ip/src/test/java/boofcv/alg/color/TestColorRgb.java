@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -30,8 +30,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
  */
 public class TestColorRgb extends BoofStandardJUnit {
 
-	@Test
-	public void scalar_U8() {
+	@Test void scalar_U8() {
 		assertEquals(0,ColorRgb.rgbToGray_Weighted(0,0,0));
 		assertEquals(255,ColorRgb.rgbToGray_Weighted(255,255,255));
 
@@ -46,8 +45,7 @@ public class TestColorRgb extends BoofStandardJUnit {
 		}
 	}
 
-	@Test
-	public void scalar_F32() {
+	@Test void scalar_F32() {
 		assertEquals(0f,ColorRgb.rgbToGray_Weighted(0f,0f,0f),1e-4f);
 		assertEquals(255f,ColorRgb.rgbToGray_Weighted(255f,255f,255f),1e-4f);
 
@@ -62,8 +60,7 @@ public class TestColorRgb extends BoofStandardJUnit {
 		};
 	}
 
-	@Test
-	public void scalar_F64() {
+	@Test void scalar_F64() {
 		assertEquals(0.0,ColorRgb.rgbToGray_Weighted(0.0,0.0,0.0),1e-8);
 		assertEquals(255.0,ColorRgb.rgbToGray_Weighted(255.0,255.0,255.0),1e-8);
 
@@ -78,8 +75,7 @@ public class TestColorRgb extends BoofStandardJUnit {
 		};
 	}
 
-	@Test
-	public void planar_U8() {
+	@Test void planar_U8() {
 		Planar<GrayU8> rgb = new Planar<>(GrayU8.class,20,30,3);
 		GrayU8 gray = new GrayU8(20,30);
 
@@ -101,8 +97,7 @@ public class TestColorRgb extends BoofStandardJUnit {
 		}
 	}
 
-	@Test
-	public void planar_F32() {
+	@Test void planar_F32() {
 		Planar<GrayF32> rgb = new Planar<>(GrayF32.class, 20, 30, 3);
 		GrayF32 gray = new GrayF32(20, 30);
 
@@ -124,8 +119,7 @@ public class TestColorRgb extends BoofStandardJUnit {
 		}
 	}
 
-	@Test
-	public void planar_F64() {
+	@Test void planar_F64() {
 		Planar<GrayF64> rgb = new Planar<>(GrayF64.class, 20, 30, 3);
 		GrayF64 gray = new GrayF64(20, 30);
 
@@ -148,8 +142,7 @@ public class TestColorRgb extends BoofStandardJUnit {
 		}
 	}
 
-	@Test
-	public void interleaved_U8() {
+	@Test void interleaved_U8() {
 		InterleavedU8 rgb = new InterleavedU8(20,30,3);
 		GrayU8 gray = new GrayU8(20,30);
 
@@ -171,8 +164,7 @@ public class TestColorRgb extends BoofStandardJUnit {
 		}
 	}
 
-	@Test
-	public void interleaved_F32() {
+	@Test void interleaved_F32() {
 		InterleavedF32 rgb = new InterleavedF32(20,30,3);
 		GrayF32 gray = new GrayF32(20,30);
 
@@ -194,8 +186,7 @@ public class TestColorRgb extends BoofStandardJUnit {
 		}
 	}
 
-	@Test
-	public void interleaved_F64() {
+	@Test void interleaved_F64() {
 		InterleavedF64 rgb = new InterleavedF64(20,30,3);
 		GrayF64 gray = new GrayF64(20,30);
 

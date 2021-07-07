@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -31,7 +31,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Given an unordered list of ellipses found in the image connect them into clusters.  A cluster of
+ * Given an unordered list of ellipses found in the image connect them into clusters. A cluster of
  * ellipses will be composed of ellipses which are spatially close to each other and have major
  * axises which are of similar size.
  *
@@ -64,10 +64,10 @@ public class EllipsesIntoClusters {
 	 *
 	 * @param maxDistanceToMajorAxisRatio The maximum distance away the center of another ellipse that will be
 	 *                                   considered specifies as a multiple of the ellipse's major axis
-	 * @param sizeSimilarityTolerance How similar two ellipses must be to be connected.  0 to 1.0.  1.0 = perfect
+	 * @param sizeSimilarityTolerance How similar two ellipses must be to be connected. 0 to 1.0. 1.0 = perfect
 	 *                                match and 0.0 = infinite difference in size
 	 * @param edgeIntensitySimilarityTolerance How similar the intensity of the ellipses edges need to be.
-	 *                                         0 to 1.0.  1.0 = perfect
+	 *                                         0 to 1.0. 1.0 = perfect
 	 */
 	public EllipsesIntoClusters( double maxDistanceToMajorAxisRatio,
 								 double sizeSimilarityTolerance ,
@@ -83,7 +83,7 @@ public class EllipsesIntoClusters {
 	 * Processes the ellipses and creates clusters.
 	 *
 	 * @param ellipses Set of unordered ellipses
-	 * @param output Resulting found clusters.  Cleared automatically.  Returned lists are recycled on next call.
+	 * @param output Resulting found clusters. Cleared automatically. Returned lists are recycled on next call.
 	 */
 	public void process(List<EllipseInfo> ellipses , List<List<Node>> output ) {
 
@@ -114,7 +114,7 @@ public class EllipsesIntoClusters {
 			Node node1 = nodes.get(i);
 
 			// Only search the maximum of the major axis times two
-			// add a fudge factor.  won't ever be perfect
+			// add a fudge factor. won't ever be perfect
 			double maxDistance = e1.a * maxDistanceToMajorAxisRatio;
 			maxDistance *= maxDistance;
 
@@ -155,7 +155,7 @@ public class EllipsesIntoClusters {
 				if( intensityRatio > edgeIntensitySimilarityTolerance)
 					continue;
 
-				// the initial search was based on size of major axis.  Now prune and take in account the distance
+				// the initial search was based on size of major axis. Now prune and take in account the distance
 				// from the minor axis
 				if( axisAdjustedDistanceSq(e1,e2) > maxDistance ) {
 					continue;
@@ -188,14 +188,14 @@ public class EllipsesIntoClusters {
 				int indexNode2 = d.index;
 				Node node2 = nodes.get(indexNode2);
 
-				// node2 isn't in a cluster already.  Add it to this one
+				// node2 isn't in a cluster already. Add it to this one
 				if( node2.cluster == -1 ) {
 					node2.cluster = node1.cluster;
 					cluster1.add( node2 );
 					node1.connections.add( indexNode2 );
 					node2.connections.add( i );
 				} else if( node2.cluster != node1.cluster ) {
-					// Node2 is in a different cluster.  Merge the clusters
+					// Node2 is in a different cluster. Merge the clusters
 					joinClusters( node1.cluster , node2.cluster );
 					node1.connections.add( indexNode2 );
 					node2.connections.add( i );
@@ -258,8 +258,8 @@ public class EllipsesIntoClusters {
 	}
 
 	/**
-	 * Compute a new distance that two ellipses are apart using major/minor axis size.  If the axises are the
-	 * same size then there is no change.  If the minor axis is much smaller and ellipse b lies along that
+	 * Compute a new distance that two ellipses are apart using major/minor axis size. If the axises are the
+	 * same size then there is no change. If the minor axis is much smaller and ellipse b lies along that
 	 * axis then the returned distance will be greater.
 	 */
 	static double axisAdjustedDistanceSq(EllipseRotated_F64 a , EllipseRotated_F64 b ) {
@@ -349,7 +349,7 @@ public class EllipsesIntoClusters {
 		 */
 		public int cluster;
 		/**
-		 * Index of all the ellipses which it is connected to.  Both node should be
+		 * Index of all the ellipses which it is connected to. Both node should be
 		 * connected to each other
 		 */
 		public DogArray_I32 connections = new DogArray_I32();

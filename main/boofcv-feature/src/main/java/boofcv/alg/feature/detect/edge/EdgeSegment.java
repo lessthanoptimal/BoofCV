@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -24,12 +24,12 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * A list of connected points along an edge.  Points are in consecutive order.
+ * A list of connected points along an edge. Points are in consecutive order.
  *
  * @author Peter Abeles
  */
 public class EdgeSegment {
-	/** index of this segment in the list.  used for book keeping during construction */
+	/** index of this segment in the list. used for book keeping during construction */
 	public int index;
 
 	/** which segment did this spawn from */

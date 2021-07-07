@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -105,7 +105,7 @@ public class ConvertYuv420_888
 	/**
 	 * Converts an YUV 420 888 into gray
 	 *
-	 * @param output Output: Optional storage for output image.  Can be null.
+	 * @param output Output: Optional storage for output image. Can be null.
 	 * @param outputType  Output: Type of output image
 	 * @param <T> Output image type
 	 * @return Gray scale image
@@ -126,7 +126,7 @@ public class ConvertYuv420_888
 
 	/**
 	 *
-	 * @param output Output: Optional storage for output image.  Can be null.
+	 * @param output Output: Optional storage for output image. Can be null.
 	 * @return Gray scale image
 	 */
 	public static GrayF32 yuvToGray( ByteBuffer bufferY , int width , int height, int strideRow, GrayF32 output,

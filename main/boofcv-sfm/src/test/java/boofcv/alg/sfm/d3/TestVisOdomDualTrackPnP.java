@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -25,8 +25,7 @@ import org.junit.jupiter.api.Test;
  * @author Peter Abeles
  */
 public class TestVisOdomDualTrackPnP extends BoofStandardJUnit {
-	@Test
-	public void stuff() {
-		// This is intentionally left blank.  Tests are performed inside the abstract package
+	@Test void stuff() {
+		// This is intentionally left blank. Tests are performed inside the abstract package
 	}
 }

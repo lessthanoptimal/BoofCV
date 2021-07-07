@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -30,8 +30,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
  * @author Peter Abeles
  */
 public class TestTldHelperFunctions extends BoofStandardJUnit {
-	@Test
-	public void convertRegion_F64_I32() {
+	@Test void convertRegion_F64_I32() {
 		Rectangle2D_F64 a = new Rectangle2D_F64();
 		Rectangle2D_I32 b = new Rectangle2D_I32();
 
@@ -45,8 +44,7 @@ public class TestTldHelperFunctions extends BoofStandardJUnit {
 		assertEquals(61,b.y1);
 	}
 
-	@Test
-	public void convertRegion_I32_F32() {
+	@Test void convertRegion_I32_F32() {
 		Rectangle2D_F64 a = new Rectangle2D_F64();
 		Rectangle2D_I32 b = new Rectangle2D_I32();
 
@@ -60,8 +58,7 @@ public class TestTldHelperFunctions extends BoofStandardJUnit {
 		assertEquals(61,a.p1.y,1e-8);
 	}
 
-	@Test
-	public void computeOverlap() {
+	@Test void computeOverlap() {
 		TldHelperFunctions alg = new TldHelperFunctions();
 
 		ImageRectangle a = new ImageRectangle(0,100,10,120);

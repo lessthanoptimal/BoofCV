@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -40,8 +40,7 @@ public abstract class GeneralCheckNViewsTriangulateProjective extends CommonTria
 										 List<DMatrixRMaj> essential,
 										 Point4D_F64 found );
 
-	@Test
-	public void perfectInput() {
+	@Test void perfectInput() {
 		createScene();
 
 		Point4D_F64 found = new Point4D_F64();
@@ -50,8 +49,7 @@ public abstract class GeneralCheckNViewsTriangulateProjective extends CommonTria
 		assertEquals(0.0, worldPoint.distance(convertH(found)), UtilEjml.TEST_F64_SQ);
 	}
 
-	@Test
-	public void pointAtInfinity() {
+	@Test void pointAtInfinity() {
 		this.createScene(new Point4D_F64(0.1, -0.2, 4.0, 0.0));
 
 		Point4D_F64 found = new Point4D_F64();

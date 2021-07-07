@@ -45,13 +45,11 @@ public class TestDescribeDenseHogFastAlg extends BoofStandardJUnit {
 	int imgWidth = 60;
 	int imgHeight = 80;
 
-	@Test
-	public void process() {
-		// intentionally left blank.  This is handled by image type specific checks
+	@Test void process() {
+		// intentionally left blank. This is handled by image type specific checks
 	}
 
-	@Test
-	public void growCellArray() {
+	@Test void growCellArray() {
 		DescribeDenseHogFastAlg<GrayF32> helper = new DescribeDenseHogFastAlg<>(10,8,2,2,1,imageType);
 
 		helper.growCellArray(64,32);
@@ -70,8 +68,7 @@ public class TestDescribeDenseHogFastAlg extends BoofStandardJUnit {
 		assertEquals(5,helper.cellRows);
 	}
 
-	@Test
-	public void getDescriptorsInRegion() {
+	@Test void getDescriptorsInRegion() {
 
 		int x0 = 5, x1 = 67;
 		int y0 = 9, y1 = 89;
@@ -108,8 +105,7 @@ public class TestDescribeDenseHogFastAlg extends BoofStandardJUnit {
 		}
 	}
 
-	@Test
-	public void computeDescriptor() {
+	@Test void computeDescriptor() {
 		DescribeDenseHogFastAlg<GrayF32> helper = new DescribeDenseHogFastAlg<>(10,8,2,2,1,imageType);
 
 		helper.growCellArray(imgWidth, imgHeight);
@@ -147,8 +143,7 @@ public class TestDescribeDenseHogFastAlg extends BoofStandardJUnit {
 		expected[index0+b] = 1.2f;
 	}
 
-	@Test
-	public void computeCells() {
+	@Test void computeCells() {
 
 		int cellWidth = 8;
 
@@ -188,8 +183,7 @@ public class TestDescribeDenseHogFastAlg extends BoofStandardJUnit {
 		}
 	}
 
-	@Test
-	public void getRegionWidthPixel() {
+	@Test void getRegionWidthPixel() {
 		DescribeDenseHogFastAlg helper = new DescribeDenseHogFastAlg(10,8,3,2,1,imageType);
 		assertEquals(3*8,helper.getRegionWidthPixelX());
 		assertEquals(2*8,helper.getRegionWidthPixelY());

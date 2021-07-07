@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -29,7 +29,7 @@ import org.ddogleg.struct.DogArray;
 import java.util.List;
 
 /**
- * Computes the left camera pose from a fully calibrated stereo camera system using a PnP algorithm.  Observations
+ * Computes the left camera pose from a fully calibrated stereo camera system using a PnP algorithm. Observations
  * from the left camera are used to solve the PnP problem while observations from the right camera are used to
  * select the best solution if its ambiguous.
  *

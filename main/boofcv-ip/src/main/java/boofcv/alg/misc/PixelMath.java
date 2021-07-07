@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -7595,7 +7595,7 @@ public class PixelMath {
 	 *
 	 * @param mean (Input) Image with local mean
 	 * @param pow2 (Input) Image with local mean pixel-wise power of 2 
-	 * @param stdev (Output) standard deviation of each pixel. Can be same instance as either input.  
+	 * @param stdev (Output) standard deviation of each pixel. Can be same instance as either input.
 	 */
 	public static void stdev( GrayU8 mean , GrayU16 pow2 , GrayU8 stdev) {
 
@@ -7666,7 +7666,7 @@ public class PixelMath {
 	 *
 	 * @param mean (Input) Image with local mean
 	 * @param pow2 (Input) Image with local mean pixel-wise power of 2 
-	 * @param stdev (Output) standard deviation of each pixel. Can be same instance as either input.  
+	 * @param stdev (Output) standard deviation of each pixel. Can be same instance as either input.
 	 */
 	public static void stdev( GrayU16 mean , GrayS32 pow2 , GrayU16 stdev) {
 
@@ -7737,7 +7737,7 @@ public class PixelMath {
 	 *
 	 * @param mean (Input) Image with local mean
 	 * @param pow2 (Input) Image with local mean pixel-wise power of 2 
-	 * @param stdev (Output) standard deviation of each pixel. Can be same instance as either input.  
+	 * @param stdev (Output) standard deviation of each pixel. Can be same instance as either input.
 	 */
 	public static void stdev( GrayF32 mean , GrayF32 pow2 , GrayF32 stdev) {
 
@@ -7808,7 +7808,7 @@ public class PixelMath {
 	 *
 	 * @param mean (Input) Image with local mean
 	 * @param pow2 (Input) Image with local mean pixel-wise power of 2 
-	 * @param stdev (Output) standard deviation of each pixel. Can be same instance as either input.  
+	 * @param stdev (Output) standard deviation of each pixel. Can be same instance as either input.
 	 */
 	public static void stdev( GrayF64 mean , GrayF64 pow2 , GrayF64 stdev) {
 

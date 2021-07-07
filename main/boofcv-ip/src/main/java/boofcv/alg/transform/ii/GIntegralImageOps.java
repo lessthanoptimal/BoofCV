@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -149,14 +149,14 @@ public class GIntegralImageOps {
 	/**
 	 * <p>
 	 * Computes the value of a block inside an integral image and treats pixels outside of the
-	 * image as zero.  The block is defined as follows: x0 &lt; x &le; x1 and y0 &lt; y &le; y1.
+	 * image as zero. The block is defined as follows: x0 &lt; x &le; x1 and y0 &lt; y &le; y1.
 	 * </p>
 	 *
 	 * @param integral Integral image.
-	 * @param x0 Lower bound of the block.  Exclusive.
-	 * @param y0 Lower bound of the block.  Exclusive.
-	 * @param x1 Upper bound of the block.  Inclusive.
-	 * @param y1 Upper bound of the block.  Inclusive.
+	 * @param x0 Lower bound of the block. Exclusive.
+	 * @param y0 Lower bound of the block. Exclusive.
+	 * @param x1 Upper bound of the block. Inclusive.
+	 * @param y1 Upper bound of the block. Inclusive.
 	 * @return Value inside the block.
 	 */
 	public static <T extends ImageGray<T>>
@@ -177,15 +177,15 @@ public class GIntegralImageOps {
 
 	/**
 	 * <p>
-	 * Computes the value of a block inside an integral image without bounds checking.  The block is
+	 * Computes the value of a block inside an integral image without bounds checking. The block is
 	 * defined as follows: x0 &lt; x &le; x1 and y0 &lt; y &le; y1.
 	 * </p>
 	 *
 	 * @param integral Integral image.
-	 * @param x0 Lower bound of the block.  Exclusive.
-	 * @param y0 Lower bound of the block.  Exclusive.
-	 * @param x1 Upper bound of the block.  Inclusive.
-	 * @param y1 Upper bound of the block.  Inclusive.
+	 * @param x0 Lower bound of the block. Exclusive.
+	 * @param y0 Lower bound of the block. Exclusive.
+	 * @param x1 Upper bound of the block. Inclusive.
+	 * @param y1 Upper bound of the block. Inclusive.
 	 * @return Value inside the block.
 	 */
 	public static <T extends ImageGray<T>>

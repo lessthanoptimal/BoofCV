@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -34,8 +34,7 @@ public class TestSe3ToStereoPoseCodec extends BoofStandardJUnit {
 
 	StereoPose model = new StereoPose();
 
-	@Test
-	public void basic() {
+	@Test void basic() {
 		Helper helper = new Helper();
 		Se3ToStereoPoseCodec alg = new Se3ToStereoPoseCodec(helper);
 

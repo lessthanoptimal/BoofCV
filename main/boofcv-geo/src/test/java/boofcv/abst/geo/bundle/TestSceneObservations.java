@@ -30,8 +30,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  * @author Peter Abeles
  */
 public class TestSceneObservations extends BoofStandardJUnit {
-	@Test
-	public void View_remove() {
+	@Test void View_remove() {
 		View v = new View();
 
 		v.add(5,1,2);
@@ -55,8 +54,7 @@ public class TestSceneObservations extends BoofStandardJUnit {
 		assertTrue(p.distance2(4,2) < 1e-7);
 	}
 
-	@Test
-	public void View_set() {
+	@Test void View_set() {
 		View v = new View();
 
 		v.add(5,1,2);
@@ -71,8 +69,7 @@ public class TestSceneObservations extends BoofStandardJUnit {
 		assertTrue(p.distance2(-1,-2) < 1e-7);
 	}
 
-	@Test
-	public void View_setPixel() {
+	@Test void View_setPixel() {
 		View v = new View();
 
 		v.add(5,1,2);

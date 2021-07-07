@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -34,8 +34,8 @@ import org.ddogleg.struct.DogArray;
 import org.ddogleg.struct.DogArray_I32;
 
 /**
- * Wrapper around {@link WatershedVincentSoille1991} for {@link ImageSuperpixels}.  Watershed regions
- * and small regions are merged together.  When merging regions a preference is given to regions which are the
+ * Wrapper around {@link WatershedVincentSoille1991} for {@link ImageSuperpixels}. Watershed regions
+ * and small regions are merged together. When merging regions a preference is given to regions which are the
  * most similar in color intensity.
  *
  * @author Peter Abeles

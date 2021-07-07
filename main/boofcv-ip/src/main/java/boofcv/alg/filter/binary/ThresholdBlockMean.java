@@ -23,7 +23,7 @@ import boofcv.struct.image.ImageGray;
 /**
  * <p>
  * Applies a threshold to an image by computing the mean values in a regular grid across
- * the image.  When thresholding all the pixels inside a box (grid element) the mean values is found
+ * the image. When thresholding all the pixels inside a box (grid element) the mean values is found
  * in the surrounding 3x3 grid region.\
  * </p>
  *

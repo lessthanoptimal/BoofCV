@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -31,12 +31,12 @@ import java.util.List;
  */
 public interface GeoModelEstimatorN<Model,Sample> {
 	/**
-	 * Estimates a set of models which fit the given a set of observations.  A DogArray is used to store
-	 * the found models.  Each time this function is invoked 'estimatedModels' is reset and new models are
+	 * Estimates a set of models which fit the given a set of observations. A DogArray is used to store
+	 * the found models. Each time this function is invoked 'estimatedModels' is reset and new models are
 	 * requested using the DogArray.pop() function.
 	 *
 	 * @param points Input: Set of observations. Not modified.
-	 * @param estimatedModels Output: Storage for the set of estimated models.  Modified.
+	 * @param estimatedModels Output: Storage for the set of estimated models. Modified.
 	 * @return true if successful
 	 */
 	public boolean process(List<Sample> points , DogArray<Model> estimatedModels );

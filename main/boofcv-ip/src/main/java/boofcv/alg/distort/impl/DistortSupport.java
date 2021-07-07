@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -39,7 +39,7 @@ import georegression.transform.InvertibleTransformSequence;
  */
 public class DistortSupport {
 	/**
-	 * Computes a transform which is used to rescale an image.  The scale is computed
+	 * Computes a transform which is used to rescale an image. The scale is computed
 	 * directly from the size of the two input images and independently scales
 	 * the x and y axises.
 	 */

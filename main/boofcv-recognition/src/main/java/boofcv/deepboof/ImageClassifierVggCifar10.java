@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -38,8 +38,8 @@ import java.io.IOException;
 import static deepboof.misc.TensorOps.WI;
 
 /**
- * Image classification using VGG network trained in CIFAR 10 data.  On the CIFAR 10 training set it get has
- * 89.9% accuracy.  This dataset contains images in 10 categories and 32x32 images.
+ * Image classification using VGG network trained in CIFAR 10 data. On the CIFAR 10 training set it get has
+ * 89.9% accuracy. This dataset contains images in 10 categories and 32x32 images.
  *
  * @author Peter Abeles
  * @see <a href="https://github.com/szagoruyko/cifar.torch">szagoruyko/cifar.torch</a>

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -41,7 +41,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Wrapper which allows a calibration target to be used like a fiducial for pose estimation.  The
+ * Wrapper which allows a calibration target to be used like a fiducial for pose estimation. The
  * origin of the coordinate system depends on the default for the calibration target.
  *
  * @author Peter Abeles
@@ -54,7 +54,7 @@ public class CalibrationFiducialDetector<T extends ImageGray<T>>
 	// indicates if a target was detected and the found transform
 	private boolean targetDetected;
 
-	// storage for converted input image.  Detector only can process GrayF32
+	// storage for converted input image. Detector only can process GrayF32
 	private GrayF32 converted;
 
 	// Expected type of input image
@@ -269,7 +269,7 @@ public class CalibrationFiducialDetector<T extends ImageGray<T>>
 	}
 
 	/**
-	 * Returns the detection point average location.  This will NOT be the same as the geometric center.
+	 * Returns the detection point average location. This will NOT be the same as the geometric center.
 	 *
 	 * @param which Fiducial's index
 	 * @param location (output) Storage for the transform. modified.

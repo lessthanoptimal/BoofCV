@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -46,8 +46,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  * @author Peter Abeles
  */
 public class TestPnPInfinitesimalPlanePoseEstimation extends BoofStandardJUnit {
-	@Test
-	public void perfectObservations() {
+	@Test void perfectObservations() {
 		Se3_F64 actual = new Se3_F64();
 
 		for (int i = 0; i < 100; i++) {
@@ -85,8 +84,7 @@ public class TestPnPInfinitesimalPlanePoseEstimation extends BoofStandardJUnit {
 		return NormOps_DDRM.normF(d.R)/9 + d.T.norm()/3;
 	}
 
-	@Test
-	public void estimateTranslation() {
+	@Test void estimateTranslation() {
 		Se3_F64 actual = new Se3_F64();
 		ConvertRotation3D_F64.eulerToMatrix(EulerType.XYZ,0.1,0.05,0,actual.R);
 		actual.T.setTo(0.1,0,3);
@@ -122,8 +120,7 @@ public class TestPnPInfinitesimalPlanePoseEstimation extends BoofStandardJUnit {
 		return list;
 	}
 
-	@Test
-	public void constructR() {
+	@Test void constructR() {
 		Equation eq = new Equation();
 
 		eq.process("R_v=randn(3,3)");
@@ -147,8 +144,7 @@ public class TestPnPInfinitesimalPlanePoseEstimation extends BoofStandardJUnit {
 		assertTrue(MatrixFeatures_DDRM.isIdentical(eq.lookupDDRM("R2"),found,UtilEjml.TEST_F64));
 	}
 
-	@Test
-	public void compute_B() {
+	@Test void compute_B() {
 		Equation eq = new Equation();
 		eq.process("v=[1.1,0.5]'");
 		eq.process("R_v=[1,2,3;4,5,6;7,8,9]'");
@@ -169,8 +165,7 @@ public class TestPnPInfinitesimalPlanePoseEstimation extends BoofStandardJUnit {
 		assertEquals(expected.get(1,1),B.a22, UtilEjml.TEST_F64);
 	}
 
-	@Test
-	public void largestSingularValue2x2() {
+	@Test void largestSingularValue2x2() {
 		DMatrix2x2 M = new DMatrix2x2(1,-1.5,0.5,1.8);
 
 		SimpleMatrix A = new SimpleMatrix(new double[][]{{M.a11,M.a12},{M.a21,M.a22}});
@@ -183,8 +178,7 @@ public class TestPnPInfinitesimalPlanePoseEstimation extends BoofStandardJUnit {
 		assertEquals(s[0],found,UtilEjml.TEST_F64);
 	}
 
-	@Test
-	public void compute_Rv() {
+	@Test void compute_Rv() {
 		Equation eq = new Equation();
 		eq.process("v=[1.1,0.5]'");
 		eq.process("t=normF(v)");

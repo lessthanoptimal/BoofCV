@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -31,7 +31,7 @@ import java.io.IOException;
  */
 public interface ImageModelBase<T extends ImageBase<T>> {
 	/**
-	 * Loads the model at the specified location.  See documentation of the classifier for what needs to be
+	 * Loads the model at the specified location. See documentation of the classifier for what needs to be
 	 * passed in here.
 	 *
 	 * @param path Path to directory or file containing the model

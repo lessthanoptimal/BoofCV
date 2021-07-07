@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -28,7 +28,7 @@ import org.ejml.UtilEjml;
 import java.lang.reflect.Method;
 
 /**
- * Provides common implementations of functions in CompareEquivalentFunctions.  Assumes only
+ * Provides common implementations of functions in CompareEquivalentFunctions. Assumes only
  * images are modified and tests those.
  *
  * @author Peter Abeles

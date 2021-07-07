@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -45,7 +45,7 @@ public class ResidualsCodecToMatrix<Model,Observation> implements FunctionNtoM {
 	 *
 	 * @param param Converts parameters into epipolar matrix
 	 * @param residual Function for computing the residuals
-	 * @param storage Storage for converted model.  Will be modified.
+	 * @param storage Storage for converted model. Will be modified.
 	 */
 	public ResidualsCodecToMatrix(ModelCodec<Model> param,
 								  ModelObservationResidualN<Model, Observation> residual,

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -43,8 +43,7 @@ public class TestCalibrationDetectorChessboardOld extends GenericPlanarCalibrati
 		fisheyeAllowedFails = 1;
 	}
 
-	@Test
-	public void createLayout() {
+	@Test void createLayout() {
 		List<Point2D_F64> layout = createDetector(new ConfigGridDimen(5, 4, 30) ).getLayout();
 
 		// first control points should be the top left corner then work it's way down in a

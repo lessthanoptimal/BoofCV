@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -39,18 +39,18 @@ public class ConfigFiducialBinary implements Configuration {
 	public double targetWidth;
 
 	/**
-	 * Value from 0 to 1.  0 is very strict and 1 is very relaxed.  Used when classifying a require block
-	 * as black or white.  If it can't be classified then the shape is discarded
+	 * Value from 0 to 1. 0 is very strict and 1 is very relaxed. Used when classifying a require block
+	 * as black or white. If it can't be classified then the shape is discarded
 	 */
 	public double ambiguousThreshold = 0.75;
 
 	/**
-	 * Number of elements wide the encoded grid is. Grids widths of 3, 4, or 5 are common.  4 is the standard.
+	 * Number of elements wide the encoded grid is. Grids widths of 3, 4, or 5 are common. 4 is the standard.
 	 */
 	public int gridWidth = 4;
 
 	/**
-	 * How wide the border is relative to the total fiducial width.  0.25 is standard and is a good compromise
+	 * How wide the border is relative to the total fiducial width. 0.25 is standard and is a good compromise
 	 * between ability to view at extreme angles and area to encode information.
 	 */
 	public double borderWidthFraction = 0.25;

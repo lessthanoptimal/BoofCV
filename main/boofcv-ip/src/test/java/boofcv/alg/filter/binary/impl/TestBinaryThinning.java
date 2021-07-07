@@ -45,7 +45,7 @@ public class TestBinaryThinning extends BoofStandardJUnit {
 
 		alg.apply(img, -1);
 
-		// the tests below aren't really that great.  really just checks to see if the algorithm has changed
+		// the tests below aren't really that great. really just checks to see if the algorithm has changed
 		assertEquals(24, ImageStatistics.sum(img));
 
 		for (int i = 2; i < 18; i++) {
@@ -54,7 +54,7 @@ public class TestBinaryThinning extends BoofStandardJUnit {
 	}
 
 	/**
-	 * A line 2 pixels thick.  Should be left with a line 1 pixel thick
+	 * A line 2 pixels thick. Should be left with a line 1 pixel thick
 	 */
 	@Test void thinning_line2pixel() {
 		GrayU8 img = new GrayU8(20, 25);

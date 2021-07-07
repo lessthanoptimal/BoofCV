@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -87,7 +87,7 @@ public class ExampleConvolution {
 		kernel.set(0,1,-2);
 		kernel.set(1,2,-2);
 
-		// Output needs to handle the increased domain after convolution.  Can't be 8bit
+		// Output needs to handle the increased domain after convolution. Can't be 8bit
 		GrayS16 output = new GrayS16(gray.width,gray.height);
 		ImageBorder<GrayU8> border = FactoryImageBorder.wrap( BorderType.EXTENDED,gray);
 
@@ -96,7 +96,7 @@ public class ExampleConvolution {
 	}
 
 	/**
-	 * Convolves a 2D normalized kernel.  This kernel is divided by its sum after computation.
+	 * Convolves a 2D normalized kernel. This kernel is divided by its sum after computation.
 	 */
 	private static void normalize2D(GrayU8 gray) {
 		// Create a Gaussian kernel with radius of 3

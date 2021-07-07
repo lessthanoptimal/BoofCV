@@ -29,14 +29,14 @@ import org.ddogleg.struct.DogArray_F64;
 
 /**
  * <p>
- * Snaps a line to an edge of an object.  The refined line attempts to maximize the absolute value of the
+ * Snaps a line to an edge of an object. The refined line attempts to maximize the absolute value of the
  * difference between the left and right sides of the line.
  * </p>
  *
  * <p>
- * The algorithm works by sampling along the provided line segment.  For each point along the line it also
- * samples points tangential to it in the left and right direction.  When a point is sampled it is actually
- * the line integral between two points which are one pixel apart.  The weight is found as the absolute value of
+ * The algorithm works by sampling along the provided line segment. For each point along the line it also
+ * samples points tangential to it in the left and right direction. When a point is sampled it is actually
+ * the line integral between two points which are one pixel apart. The weight is found as the absolute value of
  * difference the between two adjacent line integrals along the tangent.
  * </p>
  * <p>
@@ -45,13 +45,13 @@ import org.ddogleg.struct.DogArray_F64;
  *
  * <p>
  * DISTORTED INPUT IMAGE:  If the distortion is known it is possible to sample along a straight line in distorted
- * image space.  This can be accomplished through the use of {@link #setTransform} where the provided transform
+ * image space. This can be accomplished through the use of {@link #setTransform} where the provided transform
  * goes from undistorted pixel coordinates into the distorted input image.
  * </p>
  *
  * @author Peter Abeles
  */
-// TODO specify weight function.  close to A, close to B, even
+// TODO specify weight function. close to A, close to B, even
 public class SnapToLineEdge<T extends ImageGray<T>> extends BaseIntegralEdge<T> {
 
 	// maximum number of times it will sample along the line
@@ -69,7 +69,7 @@ public class SnapToLineEdge<T extends ImageGray<T>> extends BaseIntegralEdge<T> 
 	// storage for where the points that are sampled along the line
 	protected DogArray<Point2D_F64> samplePts = new DogArray<>(Point2D_F64::new);
 
-	// storage for the line's center.  used to reduce numerical problems.
+	// storage for the line's center. used to reduce numerical problems.
 	protected Point2D_F64 center = new Point2D_F64();
 	protected double localScale;
 
@@ -77,7 +77,7 @@ public class SnapToLineEdge<T extends ImageGray<T>> extends BaseIntegralEdge<T> 
 	 * Configures the algorithm.
 	 *
 	 * @param lineSamples Number of times it will sample along the line's axis. Try 19
-	 * @param tangentialSamples Radius along the tangent of what it will sample.  Must be &ge; 1.  Try 2.
+	 * @param tangentialSamples Radius along the tangent of what it will sample. Must be &ge; 1. Try 2.
 	 * @param imageType Type of image it's going to process
 	 */
 	public SnapToLineEdge( int lineSamples, int tangentialSamples, Class<T> imageType ) {
@@ -92,7 +92,7 @@ public class SnapToLineEdge<T extends ImageGray<T>> extends BaseIntegralEdge<T> 
 
 	/**
 	 * Fits a line defined by the two points. When fitting the line the weight of the edge is used to determine.
-	 * how influential the point is.  Multiple calls might be required to get a perfect fit.
+	 * how influential the point is. Multiple calls might be required to get a perfect fit.
 	 *
 	 * @param a Start of line
 	 * @param b End of line..
@@ -112,7 +112,7 @@ public class SnapToLineEdge<T extends ImageGray<T>> extends BaseIntegralEdge<T> 
 		double r = Math.sqrt(slopeX*slopeX + slopeY*slopeY);
 
 		// tangent of unit length that radial sample samples are going to be along
-		// Two choices for tangent here.  Select the one which points to the "right" of the line,
+		// Two choices for tangent here. Select the one which points to the "right" of the line,
 		// which is inside of the edge
 		double tanX = slopeY/r;
 		double tanY = -slopeX/r;

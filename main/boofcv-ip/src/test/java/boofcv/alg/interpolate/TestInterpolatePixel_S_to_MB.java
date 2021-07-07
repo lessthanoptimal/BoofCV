@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -31,8 +31,7 @@ import static org.junit.jupiter.api.Assertions.*;
  * @author Peter Abeles
  */
 public class TestInterpolatePixel_S_to_MB extends BoofStandardJUnit {
-	@Test
-	public void checkFunctions() {
+	@Test void checkFunctions() {
 		Helper helper = new Helper();
 
 		InterpolatePixelMB alg = new InterpolatePixel_S_to_MB(helper);

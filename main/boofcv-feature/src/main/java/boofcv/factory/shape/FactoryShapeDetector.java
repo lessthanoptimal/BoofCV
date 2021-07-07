@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -41,7 +41,7 @@ public class FactoryShapeDetector {
 	 * Creates an ellipse detector which will detect all ellipses in the image initially using a binary image and
 	 * then refine the estimate using a subpixel algorithm in the gray scale image.
 	 *
-	 * @param config Configuration for ellipse detector.  null == default
+	 * @param config Configuration for ellipse detector. null == default
 	 * @param imageType Input image type
 	 * @return Detecto
 	 */
@@ -78,7 +78,7 @@ public class FactoryShapeDetector {
 	}
 
 	/**
-	 * Creates a polygon detector.  The polygon is assumed to be a black shape with a much lighter background.
+	 * Creates a polygon detector. The polygon is assumed to be a black shape with a much lighter background.
 	 * The polygon can be found to sub-pixel accuracy, if configured to do so.
 	 *
 	 * @param config Configuration for polygon detector

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -56,16 +56,14 @@ public abstract class CheckEstimateNofEpipolar extends EpipolarTestSimulation {
 	/**
 	 * Makes sure the minimum number of points has been set
 	 */
-	@Test
-	public void checkMinimumPoints() {
+	@Test void checkMinimumPoints() {
 		assertTrue(alg.getMinimumPoints()>0);
 	}
 
 	/**
 	 * Make sure the ordering of the epipolar constraint is computed correctly
 	 */
-	@Test
-	public void checkConstraint() {
+	@Test void checkConstraint() {
 		init(50,isPixels);
 
 		boolean workedOnce = false;

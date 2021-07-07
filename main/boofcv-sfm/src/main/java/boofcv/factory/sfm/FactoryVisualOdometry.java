@@ -86,9 +86,9 @@ public class FactoryVisualOdometry {
 	 *
 	 * @param thresholdAdd New points are spawned when the number of on plane inliers drops below this value.
 	 * @param thresholdRetire Tracks are dropped when they are not contained in the inlier set for this many frames
-	 * in a row.  Try 2
-	 * @param inlierPixelTol Threshold used to determine inliers in pixels.  Try 1.5
-	 * @param ransacIterations Number of RANSAC iterations.  Try 200
+	 * in a row. Try 2
+	 * @param inlierPixelTol Threshold used to determine inliers in pixels. Try 1.5
+	 * @param ransacIterations Number of RANSAC iterations. Try 200
 	 * @param tracker Image feature tracker
 	 * @param imageType Type of input image it processes
 	 * @return New instance of
@@ -125,9 +125,9 @@ public class FactoryVisualOdometry {
 	 * features inside this synthetic view.
 	 *
 	 * @param cellSize (Overhead) size of ground cells in overhead image in world units
-	 * @param maxCellsPerPixel (Overhead) Specifies the minimum resolution.  Higher values allow lower resolutions.
+	 * @param maxCellsPerPixel (Overhead) Specifies the minimum resolution. Higher values allow lower resolutions.
 	 * Try 20
-	 * @param mapHeightFraction (Overhead)  Truncates the overhead view.  Must be from 0 to 1.0.  1.0 includes
+	 * @param mapHeightFraction (Overhead)  Truncates the overhead view. Must be from 0 to 1.0. 1.0 includes
 	 * the entire image.
 	 * @param inlierGroundTol (RANSAC) RANSAC tolerance in overhead image pixels
 	 * @param ransacIterations (RANSAC) Number of iterations used when estimating motion
@@ -227,9 +227,9 @@ public class FactoryVisualOdometry {
 	 * Depth sensor based visual odometry algorithm which runs a sparse feature tracker in the visual camera and
 	 * estimates the range of tracks once when first detected using the depth sensor.
 	 *
-	 * @param thresholdAdd Add new tracks when less than this number are in the inlier set.  Tracker dependent. Set to
+	 * @param thresholdAdd Add new tracks when less than this number are in the inlier set. Tracker dependent. Set to
 	 * a value &le; 0 to add features every frame.
-	 * @param thresholdRetire Discard a track if it is not in the inlier set after this many updates.  Try 2
+	 * @param thresholdRetire Discard a track if it is not in the inlier set after this many updates. Try 2
 	 * @param sparseDepth Extracts depth of pixels from a depth sensor.
 	 * @param visualType Type of visual image being processed.
 	 * @param depthType Type of depth image being processed.
@@ -470,7 +470,7 @@ public class FactoryVisualOdometry {
 
 	/**
 	 * Wraps around a {@link StereoVisualOdometry} instance and will rescale the input images and adjust the cameras
-	 * intrinsic parameters automatically.  Rescaling input images is often an easy way to improve runtime performance
+	 * intrinsic parameters automatically. Rescaling input images is often an easy way to improve runtime performance
 	 * with a minimal hit on pose accuracy.
 	 *
 	 * @param vo Visual odometry algorithm which is being wrapped
@@ -484,7 +484,7 @@ public class FactoryVisualOdometry {
 
 	/**
 	 * Wraps around a {@link MonocularPlaneVisualOdometry} instance and will rescale the input images and adjust the cameras
-	 * intrinsic parameters automatically.  Rescaling input images is often an easy way to improve runtime performance
+	 * intrinsic parameters automatically. Rescaling input images is often an easy way to improve runtime performance
 	 * with a minimal hit on pose accuracy.
 	 *
 	 * @param vo Visual odometry algorithm which is being wrapped

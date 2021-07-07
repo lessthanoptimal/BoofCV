@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -24,7 +24,7 @@ import georegression.struct.point.Point3D_F64;
 import georegression.struct.se.Se3_F64;
 
 /**
- * Computes the acute angle between two observations.  The acute angle can be used to determine if two
+ * Computes the acute angle between two observations. The acute angle can be used to determine if two
  * observations have a favorable geometry for triangulation.
  *
  * @author Peter Abeles

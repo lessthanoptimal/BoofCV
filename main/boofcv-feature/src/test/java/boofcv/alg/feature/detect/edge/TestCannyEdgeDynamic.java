@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -44,11 +44,10 @@ public class TestCannyEdgeDynamic extends BoofStandardJUnit {
 	int height = 200;
 
 	/**
-	 * Test the pathological case where the input image has no texture.  The threshold will be zero and the
+	 * Test the pathological case where the input image has no texture. The threshold will be zero and the
 	 * edge intensity will be zero everywhere.
 	 */
-	@Test
-	public void canHandleNoTexture() {
+	@Test void canHandleNoTexture() {
 		GrayU8 input = new GrayU8(width,height);
 		GrayU8 output = new GrayU8(width,height);
 
@@ -78,8 +77,7 @@ public class TestCannyEdgeDynamic extends BoofStandardJUnit {
 	/**
 	 * Just checks to see if it computes a reasonable threshold given fractional parameters
 	 */
-	@Test
-	public void basicTestPoints() {
+	@Test void basicTestPoints() {
 
 		GrayU8 input = new GrayU8(width,height);
 

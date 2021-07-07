@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -30,7 +30,7 @@ import lombok.Setter;
 public class ScalePoint {
 	/** location of interest point */
 	public final Point2D_F64 pixel = new Point2D_F64();
-	/** The scale the feature was detected at.  Exact meaning of "scale" is implementation dependent */
+	/** The scale the feature was detected at. Exact meaning of "scale" is implementation dependent */
 	public @Getter @Setter double scale;
 	/** does the blob correspond to a black or white region */
 	public @Getter @Setter boolean white;

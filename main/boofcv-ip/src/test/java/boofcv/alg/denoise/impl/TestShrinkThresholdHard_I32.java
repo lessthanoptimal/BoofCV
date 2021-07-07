@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -38,8 +38,7 @@ public class TestShrinkThresholdHard_I32 extends BoofStandardJUnit {
 	int width = 10;
 	int height = 20;
 
-	@Test
-	public void basicTest() {
+	@Test void basicTest() {
 		performBasicSoftTest(new GrayS32(width,height),new ShrinkThresholdHard_I32());
 	}
 

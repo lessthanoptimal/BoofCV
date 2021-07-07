@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -42,8 +42,7 @@ public class TestImplGrayImageOps extends BoofStandardJUnit {
 
 	int numExpected = 5;
 
-	@Test
-	public void invert() {
+	@Test void invert() {
 		int numFound = BoofTesting.findMethodThenCall(this,"invert",ImplGrayImageOps.class,"invert");
 		assertEquals(numExpected,numFound);
 	}
@@ -66,8 +65,7 @@ public class TestImplGrayImageOps extends BoofStandardJUnit {
 		}
 	}
 
-	@Test
-	public void brighten() {
+	@Test void brighten() {
 		int numFound = BoofTesting.findMethodThenCall(this,"brighten",ImplGrayImageOps.class,"brighten");
 		assertEquals(numExpected,numFound);
 	}
@@ -97,8 +95,7 @@ public class TestImplGrayImageOps extends BoofStandardJUnit {
 		assertEquals(0, b.get(5, 6).doubleValue(),1e-4);
 	}
 
-	@Test
-	public void stretch() {
+	@Test void stretch() {
 		int numFound = BoofTesting.findMethodThenCall(this,"stretch",ImplGrayImageOps.class,"stretch");
 		assertEquals(numExpected,numFound);
 	}

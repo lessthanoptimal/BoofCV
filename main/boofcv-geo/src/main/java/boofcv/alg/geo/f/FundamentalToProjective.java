@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -96,8 +96,8 @@ public class FundamentalToProjective {
 	 *
 	 * @param F (Input) A fundamental matrix
 	 * @param e2 (Input) Left epipole of fundamental matrix, F<sup>T</sup>*e2 = 0.
-	 * @param v (Input) Arbitrary 3-vector.  Just pick some value, say (0,0,0).
-	 * @param lambda (Input) A non zero scalar.  Try one.
+	 * @param v (Input) Arbitrary 3-vector. Just pick some value, say (0,0,0).
+	 * @param lambda (Input) A non zero scalar. Try one.
 	 * @param cameraMatrix (Output) resulting projective camera matrix P'. (3 by 4) Known up to a projective transform.
 	 */
 	public void twoView(DMatrixRMaj F , Point3D_F64 e2, Vector3D_F64 v , double lambda ,

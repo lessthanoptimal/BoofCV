@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -29,7 +29,7 @@ import java.util.Arrays;
 
 /**
  * <p>
- * A faster version of the histogram median filter that only processes the inner portion of the image.  Instead of
+ * A faster version of the histogram median filter that only processes the inner portion of the image. Instead of
  * rebuilding the histogram from scratch for each pixel the histogram is updated using results from the previous pixel.
  * When computing the histogram the previous median is used as a hint to the new median. The original implementation
  * is similar to the algorithm proposed in [1]. If you need to cite something cite this library and mention that paper.

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -29,7 +29,7 @@ import java.util.List;
 /**
  * <p>
  * Applies an affine transformation to the associated pair and computes the euclidean distance
- * squared between their locations.  This reduces computations by avoiding the square root
+ * squared between their locations. This reduces computations by avoiding the square root
  * functions, which is computationally expensive. While both this error metric and euclidean
  * distance have the same minimum, this exaggerates the magnitude of outliers.
  * The transform is applied to the "keyLoc".

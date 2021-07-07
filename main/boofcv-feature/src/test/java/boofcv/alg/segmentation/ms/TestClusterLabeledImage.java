@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -48,10 +48,9 @@ public class TestClusterLabeledImage extends BoofStandardJUnit {
 	DogArray_I32 counts = new DogArray_I32();
 
 	/**
-	 * Uniform image given different values.  Should produce an output image of all zeros.
+	 * Uniform image given different values. Should produce an output image of all zeros.
 	 */
-	@Test
-	public void uniform() {
+	@Test void uniform() {
 
 		GrayS32 input = new GrayS32(5,7);
 		GrayS32 output = new GrayS32(5,7);
@@ -76,10 +75,9 @@ public class TestClusterLabeledImage extends BoofStandardJUnit {
 	}
 
 	/**
-	 * Same color used on separate islands.  Each island should have its own color on output
+	 * Same color used on separate islands. Each island should have its own color on output
 	 */
-	@Test
-	public void sameColorIslands() {
+	@Test void sameColorIslands() {
 		GrayS32 input = new GrayS32(5,5);
 
 		input.data = new int[]{
@@ -118,8 +116,7 @@ public class TestClusterLabeledImage extends BoofStandardJUnit {
 		}
 	}
 
-	@Test
-	public void case0_connect4() {
+	@Test void case0_connect4() {
 
 		GrayS32 input = new GrayS32(5,5);
 		input.data = case0;
@@ -158,8 +155,7 @@ public class TestClusterLabeledImage extends BoofStandardJUnit {
 		}
 	}
 
-	@Test
-	public void case0_connect8() {
+	@Test void case0_connect8() {
 
 		GrayS32 input = new GrayS32(5,5);
 		input.data = case0;

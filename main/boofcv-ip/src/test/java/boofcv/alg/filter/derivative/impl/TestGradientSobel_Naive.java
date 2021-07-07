@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -40,8 +40,7 @@ public class TestGradientSobel_Naive extends BoofStandardJUnit {
 	/**
 	 * Compare the results to a hand computed value
 	 */
-	@Test
-	public void compareToKnown_I8() {
+	@Test void compareToKnown_I8() {
 		GrayU8 img = new GrayU8(width, height);
 		ImageMiscOps.fillUniform(img, rand, 0, 100);
 
@@ -67,8 +66,7 @@ public class TestGradientSobel_Naive extends BoofStandardJUnit {
 	/**
 	 * Compare the results to a hand computed value
 	 */
-	@Test
-	public void compareToKnown_F32() {
+	@Test void compareToKnown_F32() {
 		GrayF32 img = new GrayF32(width, height);
 		ImageMiscOps.fillUniform(img, rand, 0, 255);
 

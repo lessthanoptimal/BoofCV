@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -31,8 +31,7 @@ import static org.junit.jupiter.api.Assertions.*;
  */
 public class TestSimpleStringNumberReader extends BoofStandardJUnit {
 
-	@Test
-	public void nocomments() throws IOException {
+	@Test void nocomments() throws IOException {
 		String input = "  12384 342.123  233e-1 sdf  23\n424 94";
 
 		StringReader reader = new StringReader(input);
@@ -69,8 +68,7 @@ public class TestSimpleStringNumberReader extends BoofStandardJUnit {
 		assertEquals(0,alg.remainingTokens());
 	}
 
-	@Test
-	public void withComments() throws IOException {
+	@Test void withComments() throws IOException {
 		String input = "#  12384 342.123  233e-1   23\n424 sdf\n# sdfsdf \n4   ";
 
 		StringReader reader = new StringReader(input);

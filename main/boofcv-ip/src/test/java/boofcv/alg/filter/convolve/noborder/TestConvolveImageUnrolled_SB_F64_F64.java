@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -33,8 +33,7 @@ import java.lang.reflect.Method;
 public class TestConvolveImageUnrolled_SB_F64_F64 extends BoofStandardJUnit {
 	CompareToStandardConvolution compareToStandard = new CompareToStandardConvolution(ConvolveImageUnrolled_SB_F64_F64.class);
 
-	@Test
-	public void convolve() throws NoSuchMethodException {
+	@Test void convolve() throws NoSuchMethodException {
 		for (int i = 0; i < GenerateConvolvedUnrolled_SB.numUnrolled; i++) {
 			Method m = ConvolveImageUnrolled_SB_F64_F64.class.getMethod("convolve",
 					Kernel2D_F64.class, GrayF64.class, GrayF64.class );
@@ -43,8 +42,7 @@ public class TestConvolveImageUnrolled_SB_F64_F64 extends BoofStandardJUnit {
 		}
 	}
 
-	@Test
-	public void horizontal() throws NoSuchMethodException {
+	@Test void horizontal() throws NoSuchMethodException {
 		for (int i = 0; i < GenerateConvolvedUnrolled_SB.numUnrolled; i++) {
 			Method m = ConvolveImageUnrolled_SB_F64_F64.class.getMethod("horizontal",
 					Kernel1D_F64.class, GrayF64.class, GrayF64.class);
@@ -53,8 +51,7 @@ public class TestConvolveImageUnrolled_SB_F64_F64 extends BoofStandardJUnit {
 		}
 	}
 
-	@Test
-	public void vertical() throws NoSuchMethodException {
+	@Test void vertical() throws NoSuchMethodException {
 		for (int i = 0; i < GenerateConvolvedUnrolled_SB.numUnrolled; i++) {
 			Method m = ConvolveImageUnrolled_SB_F64_F64.class.getMethod("vertical",
 					Kernel1D_F64.class, GrayF64.class, GrayF64.class);

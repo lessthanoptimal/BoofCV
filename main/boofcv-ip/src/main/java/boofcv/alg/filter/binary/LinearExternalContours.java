@@ -205,7 +205,7 @@ public class LinearExternalContours {
 			storagePoints.addPointToTail(x - adjustX, y - adjustY);
 			binary.data[indexBinary] = -2;
 
-			// find the next one pixel.  handle case where its an isolated point
+			// find the next one pixel. handle case where its an isolated point
 			if (!searchNotZero()) {
 				return true;
 			}

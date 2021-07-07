@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -20,7 +20,7 @@ package boofcv.alg.interpolate.array;
 
 /**
  * <p>
- * Neville's algorithm for polynomial interpolation and extrapolation.  Neville's algorithm improves upon
+ * Neville's algorithm for polynomial interpolation and extrapolation. Neville's algorithm improves upon
  * Lagrange's formula by avoiding repetitive calculations.
  * </p>
  * <p>

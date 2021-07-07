@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -32,8 +32,7 @@ public class TestImplMedianCorner_F32 extends GenericCornerIntensityTests
 {
 	GrayF32 median = new GrayF32(width,height);
 
-	@Test
-	public void genericTests() {
+	@Test void genericTests() {
 		performAllTests();
 	}
 

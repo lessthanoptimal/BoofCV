@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -44,13 +44,12 @@ public abstract class CheckBaseImageClassifier extends BoofStandardJUnit {
 	protected int numCategories = 8;
 
 	/**
-	 * Basic test which sees if it blows up.  Does not validate quality of results since a fake network
-	 * is provided.  Regression test is required to validate correctness.
+	 * Basic test which sees if it blows up. Does not validate quality of results since a fake network
+	 * is provided. Regression test is required to validate correctness.
 	 *
 	 * The real network is not used because it requires downloading external data and can be slow.
 	 */
-	@Test
-	public void checkForBlowUp() {
+	@Test void checkForBlowUp() {
 		Planar<GrayF32> input = createImage();
 		GImageMiscOps.fillUniform(input, rand, 0, 255);
 		BaseImageClassifier classifier = createClassifier();
