@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -30,8 +30,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
  */
 public class TestFlipVerticalNorm_F64 extends BoofStandardJUnit {
 
-	@Test
-	public void theSuperDuperTest() {
+	@Test void theSuperDuperTest() {
 		
 		FlipVerticalNorm2_F64 alg = new FlipVerticalNorm2_F64(new Dummy(),1);
 		

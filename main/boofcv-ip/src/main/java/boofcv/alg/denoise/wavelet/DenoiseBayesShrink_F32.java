@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -28,7 +28,7 @@ import boofcv.struct.image.GrayF32;
  * </p>
  *
  * <p>
- * Wavelet coefficients are modified using a standard soft-thresholding technique.  The threshold
+ * Wavelet coefficients are modified using a standard soft-thresholding technique. The threshold
  * is computing using an adaptively for each sub-band, as follows:<br>
  * T = &sigma;<sup>2</sup>/&sigma;<sub>X</sub><br>
  * where &sigma; is the noise standard deviation and &sigma;<sub>X</sub> is the signal standard deviation.

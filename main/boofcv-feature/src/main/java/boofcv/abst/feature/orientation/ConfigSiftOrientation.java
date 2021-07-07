@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -29,11 +29,11 @@ import boofcv.struct.Configuration;
 public class ConfigSiftOrientation implements Configuration {
 
 	/**
-	 * Number of elements in the histogram.  Standard is 36
+	 * Number of elements in the histogram. Standard is 36
 	 */
 	public int histogramSize = 36;
 	/**
-	 * How much the scale is enlarged by.  Standard is 2.0
+	 * How much the scale is enlarged by. Standard is 2.0
 	 */
 	public double sigmaEnlarge = 2.0;
 

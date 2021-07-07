@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -34,8 +34,7 @@ public class TestConvertNV21 extends BoofStandardJUnit {
 	int width = 20;
 	int height = 30;
 
-	@Test
-	public void testGray() {
+	@Test void testGray() {
 		Class[] types = new Class[]{GrayU8.class, GrayF32.class};
 
 		byte[] data = random(width,height);
@@ -55,8 +54,7 @@ public class TestConvertNV21 extends BoofStandardJUnit {
 		}
 	}
 
-	@Test
-	public void testColor() {
+	@Test void testColor() {
 		ImageType[] types = new ImageType[]{ImageType.pl(3, ImageDataType.U8),ImageType.pl(3,ImageDataType.F32),
 				ImageType.il(3, ImageDataType.U8),ImageType.il(3, ImageDataType.F32)};
 

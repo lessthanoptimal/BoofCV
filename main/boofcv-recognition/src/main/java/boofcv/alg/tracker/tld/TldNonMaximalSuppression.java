@@ -21,12 +21,12 @@ package boofcv.alg.tracker.tld;
 import org.ddogleg.struct.DogArray;
 
 /**
- * Performs non-maximum suppression on high confidence detected regions.  A graph of connected regions is constructed.
- * Two regions are considered connected if their overlap is above a threshold.  A region is considered a local maximum
- * if it has a score higher than all its neighbors.  A weighted average is computed using all regions connected to
+ * Performs non-maximum suppression on high confidence detected regions. A graph of connected regions is constructed.
+ * Two regions are considered connected if their overlap is above a threshold. A region is considered a local maximum
+ * if it has a score higher than all its neighbors. A weighted average is computed using all regions connected to
  * the local maximum.
  *
- * NOTE: This is a completely different non-maximum algorithm from what was described in the paper.  The algorithm
+ * NOTE: This is a completely different non-maximum algorithm from what was described in the paper. The algorithm
  * described in the paper only approximates non-maximum suppression.
  *
  * @author Peter Abeles

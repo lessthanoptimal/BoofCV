@@ -34,8 +34,7 @@ import java.lang.reflect.Method;
 public class TestConvolveImageUnrolled_SB_S32_S32_Div extends BoofStandardJUnit {
 	CompareToStandardConvolution compareToStandard = new CompareToStandardConvolution(ConvolveImageUnrolled_SB_S32_S32_Div.class);
 
-	@Test
-	public void convolve() throws NoSuchMethodException {
+	@Test void convolve() throws NoSuchMethodException {
 		for (int i = 0; i < GenerateConvolvedUnrolled_SB.numUnrolled; i++) {
 			Method m = ConvolveImageUnrolled_SB_S32_S32_Div.class.getMethod("convolve",
 					Kernel2D_S32.class, GrayS32.class, GrayS32.class , int.class, GrowArray.class);
@@ -44,8 +43,7 @@ public class TestConvolveImageUnrolled_SB_S32_S32_Div extends BoofStandardJUnit 
 		}
 	}
 
-	@Test
-	public void horizontal() throws NoSuchMethodException {
+	@Test void horizontal() throws NoSuchMethodException {
 
 		for (int i = 0; i < GenerateConvolvedUnrolled_SB.numUnrolled; i++) {
 			Method m = ConvolveImageUnrolled_SB_S32_S32_Div.class.getMethod("horizontal",
@@ -55,8 +53,7 @@ public class TestConvolveImageUnrolled_SB_S32_S32_Div extends BoofStandardJUnit 
 		}
 	}
 
-	@Test
-	public void vertical() throws NoSuchMethodException {
+	@Test void vertical() throws NoSuchMethodException {
 
 		for (int i = 0; i < GenerateConvolvedUnrolled_SB.numUnrolled; i++) {
 			Method m = ConvolveImageUnrolled_SB_S32_S32_Div.class.getMethod("vertical",

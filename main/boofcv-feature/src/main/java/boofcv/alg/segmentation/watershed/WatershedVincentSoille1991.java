@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -27,35 +27,35 @@ import org.ddogleg.struct.DogArray_I32;
 
 /**
  * <p>
- * Fast watershed based upon Vincient and Soille's 1991 paper [1].  Watershed segments an image using the idea
- * of immersion simulation.  For example, the image is treated as a topological map and if you let a droplet
- * of water flow down from each pixel the location the droplets cluster in defines a region.  Two different
+ * Fast watershed based upon Vincient and Soille's 1991 paper [1]. Watershed segments an image using the idea
+ * of immersion simulation. For example, the image is treated as a topological map and if you let a droplet
+ * of water flow down from each pixel the location the droplets cluster in defines a region. Two different
  * methods are provided for processing the image, a new region is created at each local minima or the user
- * provides an initial seed for each region for it to grow from.  The output will be a segmented image
- * with watersheds being assign a value of 0 and each region a value &gt; 0.  Watersheds are assigned to pixels
+ * provides an initial seed for each region for it to grow from. The output will be a segmented image
+ * with watersheds being assign a value of 0 and each region a value &gt; 0. Watersheds are assigned to pixels
  * which are exactly the same distance from multiple regions, thus it is ambiguous which one it is a member of.
  * </p>
  *
  * <p>
  * If the image is processed with {@link #process(GrayU8)} then a new region is
  * created at each local minima and assigned a unique ID &gt; 0. The total number of regions found is returned
- * by {@link #getTotalRegions()}.  This technique will lead to over segmentation on many images.
+ * by {@link #getTotalRegions()}. This technique will lead to over segmentation on many images.
  * </p>
  *
  * <p>
  * Initial seeds are provided with a call to {@link #process(GrayU8, GrayS32)}.
- * No new regions will be created.  By providing an initial set of seeds over segmentation can be avoided, but
+ * No new regions will be created. By providing an initial set of seeds over segmentation can be avoided, but
  * prior knowledge of the image is typically needed to create the seeds.
  * </p>
  *
  * <p>
  * NOTES:<br>
  * <ul>
- * <li>For faster processing, the internal labeled image has a 1 pixel border around it.  If you call
+ * <li>For faster processing, the internal labeled image has a 1 pixel border around it. If you call
  * {@link #getOutput()} this border is removed automatically by creating a sub-image.</li>
- * <li>Connectivity is handled by child sub-classes.  An index of neighbors could have been used, but the
+ * <li>Connectivity is handled by child sub-classes. An index of neighbors could have been used, but the
  * additional additional array access/loop slows things down a little bit.</li>
- * <li>Watersheds are included.  To remove them using {@link RemoveWatersheds}</li>
+ * <li>Watersheds are included. To remove them using {@link RemoveWatersheds}</li>
  * <li>Pixel values are assumed to range from 0 to 255, inclusive.</li>
  * </ul>
  * </p>
@@ -76,14 +76,14 @@ public abstract class WatershedVincentSoille1991 {
 	// Initial value of a threshold level
 	public static final int MASK = -2;
 
-	// index of the marker pixel.  Fictitious
+	// index of the marker pixel. Fictitious
 	public static final int MARKER_PIXEL = -1;
 
-	// histogram for sorting the image.  8-bits so 256 possible values
+	// histogram for sorting the image. 8-bits so 256 possible values
 	// each element refers to a pixel in the input image
 	protected DogArray_I32[] histogram = new DogArray_I32[256];
 
-	// Output image.  This is im_o in the paper.
+	// Output image. This is im_o in the paper.
 	// The output image has a 1-pixel wide border which means that bound checks don't need
 	// to happen when examining a pixel's neighbor.
 	protected GrayS32 output = new GrayS32(1, 1);
@@ -112,7 +112,7 @@ public abstract class WatershedVincentSoille1991 {
 	}
 
 	/**
-	 * Perform watershed segmentation on the provided input image.  New basins are created at each local minima.
+	 * Perform watershed segmentation on the provided input image. New basins are created at each local minima.
 	 *
 	 * @param input Input gray-scale image.
 	 */
@@ -152,7 +152,7 @@ public abstract class WatershedVincentSoille1991 {
 			while (true) {
 				int p = fifo.popHead();
 
-				// end of a cycle.  Exit the loop if it is done or increase the distance and continue processing
+				// end of a cycle. Exit the loop if it is done or increase the distance and continue processing
 				if (p == MARKER_PIXEL) {
 					if (fifo.isEmpty())
 						break;
@@ -190,10 +190,10 @@ public abstract class WatershedVincentSoille1991 {
 
 	/**
 	 * <p>
-	 * Segments the image using initial seeds for each region.  This is often done to avoid
-	 * over segmentation but requires additional preprocessing and/or knowledge on the image structure.  Initial
-	 * seeds are specified in the input image 'seeds'.  A seed is any pixel with a value &gt; 0.  New new regions
-	 * will be created beyond those seeds.  The final segmented image is provided by {@link #getOutput()}.
+	 * Segments the image using initial seeds for each region. This is often done to avoid
+	 * over segmentation but requires additional preprocessing and/or knowledge on the image structure. Initial
+	 * seeds are specified in the input image 'seeds'. A seed is any pixel with a value &gt; 0. New new regions
+	 * will be created beyond those seeds. The final segmented image is provided by {@link #getOutput()}.
 	 * </p>
 	 *
 	 * <p>
@@ -201,7 +201,7 @@ public abstract class WatershedVincentSoille1991 {
 	 * </p>
 	 *
 	 * @param input (Input) Input image
-	 * @param seeds (Output) Segmented image containing seeds.  Note that all seeds should have a value &gt; 0 and have a
+	 * @param seeds (Output) Segmented image containing seeds. Note that all seeds should have a value &gt; 0 and have a
 	 * value &le; numRegions.
 	 */
 	public void process( GrayU8 input, GrayS32 seeds ) {
@@ -254,7 +254,7 @@ public abstract class WatershedVincentSoille1991 {
 			while (true) {
 				int p = fifo.popHead();
 
-				// end of a cycle.  Exit the loop if it is done or increase the distance and continue processing
+				// end of a cycle. Exit the loop if it is done or increase the distance and continue processing
 				if (p == MARKER_PIXEL) {
 					if (fifo.isEmpty())
 						break;
@@ -277,7 +277,7 @@ public abstract class WatershedVincentSoille1991 {
 	}
 
 	/**
-	 * See if a neighbor has a label ( &gt; 0 ) or has been assigned WSHED ( == 0 ).  If so
+	 * See if a neighbor has a label ( &gt; 0 ) or has been assigned WSHED ( == 0 ). If so
 	 * set distance of pixel index to 1 and add it to fifo.
 	 *
 	 * @param index Pixel whose neighbors are being examined
@@ -305,7 +305,7 @@ public abstract class WatershedVincentSoille1991 {
 					output.data[indexTarget] = regionNeighbor;
 				} else if (regionTarget == 0) {
 					// if it is a watershed only assign to the neighbor value if it would be closer
-					// this is a deviation from what's in the paper.  There might be a type-o there or I miss read it
+					// this is a deviation from what's in the paper. There might be a type-o there or I miss read it
 					if (distanceNeighbor + 1 < currentDistance) {
 						output.data[indexTarget] = regionNeighbor;
 					}
@@ -337,7 +337,7 @@ public abstract class WatershedVincentSoille1991 {
 	}
 
 	/**
-	 * Very fast histogram based sorting.  Index of each pixel is placed inside a list for its intensity level.
+	 * Very fast histogram based sorting. Index of each pixel is placed inside a list for its intensity level.
 	 */
 	protected void sortPixels( GrayU8 input ) {
 		// initialize histogram
@@ -356,7 +356,7 @@ public abstract class WatershedVincentSoille1991 {
 	}
 
 	/**
-	 * Segmented output image with watersheds.  This is a sub-image of {@link #getOutputBorder()} to remove
+	 * Segmented output image with watersheds. This is a sub-image of {@link #getOutputBorder()} to remove
 	 * the outside border of -1 valued pixels.
 	 */
 	public GrayS32 getOutput() {
@@ -365,7 +365,7 @@ public abstract class WatershedVincentSoille1991 {
 	}
 
 	/**
-	 * The entire segmented image used internally.  This contains a 1-pixel border around the entire
+	 * The entire segmented image used internally. This contains a 1-pixel border around the entire
 	 * image filled with pixels of value -1.
 	 */
 	public GrayS32 getOutputBorder() {
@@ -381,7 +381,7 @@ public abstract class WatershedVincentSoille1991 {
 	}
 
 	/**
-	 * Returns the total number of regions labeled.  If watersheds have not
+	 * Returns the total number of regions labeled. If watersheds have not
 	 * been removed then this will including the watershed.
 	 *
 	 * <p>THIS IS NOT VALID IF SEEDS ARE USED!!!</p>

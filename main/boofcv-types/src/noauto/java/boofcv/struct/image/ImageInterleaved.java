@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -28,7 +28,7 @@ import java.lang.reflect.Array;
  * a different color or frequency of light detected in the imaging sensor.
  * </p>
  * <p>
- * Each pixel is composed of N bands.  In an RGB image each pixel would be composed of 3 elements, [red][green][blue].
+ * Each pixel is composed of N bands. In an RGB image each pixel would be composed of 3 elements, [red][green][blue].
  * The index of the green band at pixel (3,10) would be:<br>
  * index of green at (3,10) = startIndex + 10*stride + 3*numBands + 1
  * </p>
@@ -66,7 +66,7 @@ public abstract class ImageInterleaved<T extends ImageInterleaved<T>> extends Im
 	protected ImageInterleaved() {}
 
 	/**
-	 * Creates a sub-image from 'this' image.  The subimage will share the same internal array
+	 * Creates a sub-image from 'this' image. The subimage will share the same internal array
 	 * that stores each pixel's value, but will only pertain to an axis-aligned rectangular segment
 	 * of the original.
 	 *

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -47,7 +47,7 @@ import java.io.FileNotFoundException;
  * <p>
  * Example of how to use the {@link boofcv.abst.tracker.PointTracker} to track different types of point features.
  * ImagePointTracker hides much of the complexity involved in tracking point features and masks
- * the very different underlying structures used by these different trackers.  The default trackers
+ * the very different underlying structures used by these different trackers. The default trackers
  * provided in BoofCV are general purpose trackers, that might not be the best tracker or utility
  * the underlying image features the best in all situations.
  * </p>

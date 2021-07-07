@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -40,7 +40,7 @@ import java.awt.event.MouseMotionListener;
 import java.awt.image.BufferedImage;
 
 /**
- * Example of how to open a webcam and track a user selected object.  Click and drag the mouse
+ * Example of how to open a webcam and track a user selected object. Click and drag the mouse
  * to select an object to track.
  *
  * @author Peter Abeles

@@ -30,8 +30,8 @@ import java.util.List;
 // TODO easy way to know coordinate for grid image
 
 /**
- * Computes feature descriptors across the whole image.  No feature detection is performed.  Descriptions are typically
- * computed at regular intervals.  Scale, orientation, and other local geometric information is typically not computed
+ * Computes feature descriptors across the whole image. No feature detection is performed. Descriptions are typically
+ * computed at regular intervals. Scale, orientation, and other local geometric information is typically not computed
  * or returned to the user.
  *
  * @author Peter Abeles

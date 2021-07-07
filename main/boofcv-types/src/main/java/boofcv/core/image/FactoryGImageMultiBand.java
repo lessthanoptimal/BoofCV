@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -161,7 +161,7 @@ public class FactoryGImageMultiBand {
 
 		@Override
 		public float getF( int index ) {
-			throw new RuntimeException("Not supported for Planar images.  Would be slow.");
+			throw new RuntimeException("Not supported for Planar images. Would be slow.");
 		}
 
 		@Override

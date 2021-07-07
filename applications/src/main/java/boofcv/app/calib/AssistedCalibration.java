@@ -44,34 +44,34 @@ import java.util.List;
 
 /**
  * <p>GUI which guides a person along to help ensure sufficient geometry variation and that they cover the entire screen,
- * including the edges, sufficiently.  The calibration process is broken up into three steps.</p>
+ * including the edges, sufficiently. The calibration process is broken up into three steps.</p>
  * <ol>
  * <li>Scale determination</li>
  * <li>Remove the dot<li>
  * <li>Fill the image<li>
  * </ol>
  *
- * <p>1) Scale Determination.  In this step user holds up the target approximately perpendicular to the camera and
- * it determines its visual size.  This information is then used to select the outer boundary that it's going
- * to attempt to fill.  That boundary is filled with a blue rectangle.  The canonical target is also found.  This
+ * <p>1) Scale Determination. In this step user holds up the target approximately perpendicular to the camera and
+ * it determines its visual size. This information is then used to select the outer boundary that it's going
+ * to attempt to fill. That boundary is filled with a blue rectangle. The canonical target is also found. This
  * target is used to estimation how blurred the target is later on.
  * </p>
  *
- * <p>2) Remove The Dots.  Here the user is directed to move dots from the border of the image.  This is done to ensure
- * that the edges are sufficiently sampled to produce a good estimate of lens distortion.  Circles are drawn to
+ * <p>2) Remove The Dots. Here the user is directed to move dots from the border of the image. This is done to ensure
+ * that the edges are sufficiently sampled to produce a good estimate of lens distortion. Circles are drawn to
  * each location the fiducial should be moved to and are refered to as magnets.</p>
  *
- * <p>3) Fill The Image.  The location of previously sampled location is tinted blue and here the user can sample
- * more locations in an attempt to cover the image with blue.  A percentage of the image is not enforced and the
+ * <p>3) Fill The Image. The location of previously sampled location is tinted blue and here the user can sample
+ * more locations in an attempt to cover the image with blue. A percentage of the image is not enforced and the
  * user can click finish at any point, as long as the geometric requirement is meet.</p>
  *
  * <p>Motion blue or other sources of distortion are minimized by requiring the user keep the fiducial still before
- * a picture is taken.  Then it selects the most in focus image from the period of time it has being held still. The
+ * a picture is taken. Then it selects the most in focus image from the period of time it has being held still. The
  * user is shown visually how blurred the image with a "preview" and a meter showing the blur error magnitude.</p>
  *
- * <p>For the initial linear estimate to work the fiducial needs to be seen at different orientations.  Feedback is
- * provided to the user through progress bar.  The percent filled is set by solving the linear system at looking at
- * the second smallest singular value.  One its hits the minimum number at least once the requirement has been meet.</p>
+ * <p>For the initial linear estimate to work the fiducial needs to be seen at different orientations. Feedback is
+ * provided to the user through progress bar. The percent filled is set by solving the linear system at looking at
+ * the second smallest singular value. One its hits the minimum number at least once the requirement has been meet.</p>
  *
  * @author Peter Abeles
  */
@@ -90,7 +90,7 @@ public class AssistedCalibration {
 	// visual size of a magnet in pixels
 	int MAGNET_RADIUS;
 
-	// how far from the image border should the rectangle be drawn.  This limited by how close to the border
+	// how far from the image border should the rectangle be drawn. This limited by how close to the border
 	// the fiducial is allowed to go
 	int padding;
 
@@ -141,7 +141,7 @@ public class AssistedCalibration {
 	 * @param quality Used to compute geometry score
 	 * @param gui Visualization
 	 * @param outputDirectory Root directory for where all output will be stored
-	 * @param imageDirectory Where images will be stored.  Relative to outputDirectory
+	 * @param imageDirectory Where images will be stored. Relative to outputDirectory
 	 */
 	public AssistedCalibration( DetectorFiducialCalibration detector,
 								ComputeGeometryScore quality,
@@ -244,7 +244,7 @@ public class AssistedCalibration {
 				ratioHorizontal *= 100.0;
 				ratioVertical *= 100.0;
 
-				message = String.format("Straighten out.  H %3d   V %3d", (int)ratioHorizontal, (int)ratioVertical);
+				message = String.format("Straighten out. H %3d   V %3d", (int)ratioHorizontal, (int)ratioVertical);
 			} else {
 				if (stationaryTime > STILL_THRESHOLD) {
 					actions.resetStationary();

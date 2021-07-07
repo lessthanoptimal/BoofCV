@@ -23,7 +23,7 @@ import boofcv.struct.feature.MatchScoreType;
 import boofcv.struct.feature.NccFeature;
 
 /**
- * Association scorer for NccFeatures.  Computes the normalized cross correlation score.
+ * Association scorer for NccFeatures. Computes the normalized cross correlation score.
  *
  * NOTE: The score's sign is flipped in order to comply with {@link ScoreAssociation}'s requirements that lower
  * values be preferred.

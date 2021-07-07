@@ -41,8 +41,7 @@ public class TestDescribePlanar extends BoofStandardJUnit {
 	/**
 	 * Sanity check to see if input image and number of descriptors is the same
 	 */
-	@Test
-	public void checkNumBands() {
+	@Test void checkNumBands() {
 
 		DescribePointRadiusAngle[] descs = new DummyDesc[3];
 		descs[0] = new DummyDesc();
@@ -54,8 +53,7 @@ public class TestDescribePlanar extends BoofStandardJUnit {
 		assertThrows(IllegalArgumentException.class, () -> alg.setImage(new Planar(GrayS8.class, 1, 1, 2)));
 	}
 
-	@Test
-	public void checkRequires() {
+	@Test void checkRequires() {
 		DescribePointRadiusAngle[] descs = new DummyDesc[3];
 		descs[0] = new DummyDesc();
 		descs[1] = new DummyDesc();
@@ -73,8 +71,7 @@ public class TestDescribePlanar extends BoofStandardJUnit {
 		assertTrue(alg.isOriented());
 	}
 
-	@Test
-	public void various() {
+	@Test void various() {
 		DescribePointRadiusAngle[] descs = new DummyDesc[3];
 		descs[0] = new DummyDesc();
 		descs[1] = new DummyDesc();

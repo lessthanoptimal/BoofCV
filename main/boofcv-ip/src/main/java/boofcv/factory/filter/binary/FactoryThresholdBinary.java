@@ -58,7 +58,7 @@ public class FactoryThresholdBinary {
 	/**
 	 * @param width Width of square region.
 	 * @param down Should it threshold up or down.
-	 * @param k User specified threshold adjustment factor.  Must be positive. Try 0.3
+	 * @param k User specified threshold adjustment factor. Must be positive. Try 0.3
 	 * @param inputType Type of input image
 	 * @return Filter to binary
 	 * @see ThresholdNiblackFamily
@@ -71,7 +71,7 @@ public class FactoryThresholdBinary {
 	/**
 	 * @param width Width of square region.
 	 * @param down Should it threshold up or down.
-	 * @param k User specified threshold adjustment factor.  Must be positive. Try 0.3
+	 * @param k User specified threshold adjustment factor. Must be positive. Try 0.3
 	 * @param inputType Type of input image
 	 * @return Filter to binary
 	 * @see ThresholdNiblackFamily
@@ -84,7 +84,7 @@ public class FactoryThresholdBinary {
 	/**
 	 * @param width Width of square region.
 	 * @param down Should it threshold up or down.
-	 * @param k User specified threshold adjustment factor.  Must be positive. Try 0.3
+	 * @param k User specified threshold adjustment factor. Must be positive. Try 0.3
 	 * @param inputType Type of input image
 	 * @return Filter to binary
 	 * @see ThresholdNiblackFamily
@@ -98,7 +98,7 @@ public class FactoryThresholdBinary {
 	 * @param variant Which variant in the family
 	 * @param width Width of square region.
 	 * @param down Should it threshold up or down.
-	 * @param k User specified threshold adjustment factor.  Must be positive. Try 0.3
+	 * @param k User specified threshold adjustment factor. Must be positive. Try 0.3
 	 * @param inputType Type of input image
 	 * @return Filter to binary
 	 * @see ThresholdNiblackFamily
@@ -119,7 +119,7 @@ public class FactoryThresholdBinary {
 	}
 
 	/**
-	 * @param width size of local region.  Try 31
+	 * @param width size of local region. Try 31
 	 * @param down Should it threshold up or down.
 	 * @param k The Niblack factor. Recommend -0.1 to -0.2
 	 * @param inputType Type of input image
@@ -135,7 +135,7 @@ public class FactoryThresholdBinary {
 
 	/**
 	 * @param width Width of square region.
-	 * @param scale Scale factor adjust for threshold.  1.0 means no change.
+	 * @param scale Scale factor adjust for threshold. 1.0 means no change.
 	 * @param down Should it threshold up or down.
 	 * @param inputType Type of input image
 	 * @return Filter to binary
@@ -152,7 +152,7 @@ public class FactoryThresholdBinary {
 	 * Applies a local Otsu threshold
 	 *
 	 * @param regionWidth About how wide and tall you wish a block to be in pixels.
-	 * @param scale Scale factor adjust for threshold.  1.0 means no change.
+	 * @param scale Scale factor adjust for threshold. 1.0 means no change.
 	 * @param down Should it threshold up or down.
 	 * @param tuning Tuning parameter. 0 = standard Otsu. Greater than 0 will penalize zero texture.
 	 * @param inputType Type of input image
@@ -177,10 +177,10 @@ public class FactoryThresholdBinary {
 	 * Applies a very fast non-overlapping block thresholding algorithm which uses min/max statistics.
 	 *
 	 * @param regionWidth Approximate size of block region
-	 * @param scale Scale factor adjust for threshold.  1.0 means no change.
+	 * @param scale Scale factor adjust for threshold. 1.0 means no change.
 	 * @param down Should it threshold up or down.
 	 * @param minimumSpread If the difference between min max is less than or equal to this
-	 * value then it is considered textureless.  Set to &le; -1 to disable.
+	 * value then it is considered textureless. Set to &le; -1 to disable.
 	 * @param inputType Type of input image
 	 * @return Filter to binary
 	 * @see ThresholdBlockMinMax
@@ -208,7 +208,7 @@ public class FactoryThresholdBinary {
 	/**
 	 * Applies a non-overlapping block mean threshold
 	 *
-	 * @param scale Scale factor adjust for threshold.  1.0 means no change.
+	 * @param scale Scale factor adjust for threshold. 1.0 means no change.
 	 * @param down Should it threshold up or down.
 	 * @param regionWidth Approximate size of block region
 	 * @param inputType Type of input image
@@ -239,7 +239,7 @@ public class FactoryThresholdBinary {
 	 * Applies a non-overlapping block Otsu threshold
 	 *
 	 * @param regionWidth Approximate size of block region
-	 * @param scale Scale factor adjust for threshold.  1.0 means no change.
+	 * @param scale Scale factor adjust for threshold. 1.0 means no change.
 	 * @param down Should it threshold up or down.
 	 * @param inputType Type of input image
 	 * @return Filter to binary
@@ -265,8 +265,8 @@ public class FactoryThresholdBinary {
 	}
 
 	/**
-	 * @param minValue The minimum value of a pixel in the image.  (inclusive)
-	 * @param maxValue The maximum value of a pixel in the image.  (inclusive)
+	 * @param minValue The minimum value of a pixel in the image. (inclusive)
+	 * @param maxValue The maximum value of a pixel in the image. (inclusive)
 	 * @param down Should it threshold up or down.
 	 * @param inputType Type of input image
 	 * @return Filter to binary
@@ -294,8 +294,8 @@ public class FactoryThresholdBinary {
 	}
 
 	/**
-	 * @param minValue The minimum value of a pixel in the image.  (inclusive)
-	 * @param maxValue The maximum value of a pixel in the image.  (inclusive)
+	 * @param minValue The minimum value of a pixel in the image. (inclusive)
+	 * @param maxValue The maximum value of a pixel in the image. (inclusive)
 	 * @param down Should it threshold up or down.
 	 * @param inputType Type of input image
 	 * @return Filter to binary
@@ -309,8 +309,8 @@ public class FactoryThresholdBinary {
 	}
 
 	/**
-	 * @param minValue The minimum value of a pixel in the image.  (inclusive)
-	 * @param maxValue The maximum value of a pixel in the image.  (inclusive)
+	 * @param minValue The minimum value of a pixel in the image. (inclusive)
+	 * @param maxValue The maximum value of a pixel in the image. (inclusive)
 	 * @param down Should it threshold up or down.
 	 * @param inputType Type of input image
 	 * @return Filter to binary
@@ -322,8 +322,8 @@ public class FactoryThresholdBinary {
 	}
 
 	/**
-	 * @param minValue The minimum value of a pixel in the image.  (inclusive)
-	 * @param maxValue The maximum value of a pixel in the image.  (inclusive)
+	 * @param minValue The minimum value of a pixel in the image. (inclusive)
+	 * @param maxValue The maximum value of a pixel in the image. (inclusive)
 	 * @param down Should it threshold up or down.
 	 * @param inputType Type of input image
 	 * @return Filter to binary

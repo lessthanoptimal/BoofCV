@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -25,21 +25,21 @@ import boofcv.struct.image.ImageType;
 /**
  * <p>
  * Scores the disparity for a point using multiple rectangular regions in an effort to reduce errors at object borders,
- * based off te 5 region algorithm described in [1].  Five overlapping regions are considered and the error at each
- * disparity is the center region plus the two regions with the smallest error.  The idea is that only errors for
+ * based off te 5 region algorithm described in [1]. Five overlapping regions are considered and the error at each
+ * disparity is the center region plus the two regions with the smallest error. The idea is that only errors for
  * common elements in each image are considered.
  * </p>
  *
  * <p>
  * Scores for individual subregions that the score is computed from are calculated in the same manor as
- * {@link DisparityBlockMatch}.  Unlike those classes, a rolling window of scores for rectangular regions
- * is saved.  From this rolling window of scores for the smaller rectangles the final score is computed by
- * sampling five regions as specified in [1].  The sum of the two best outer regions are added to the center region.
+ * {@link DisparityBlockMatch}. Unlike those classes, a rolling window of scores for rectangular regions
+ * is saved. From this rolling window of scores for the smaller rectangles the final score is computed by
+ * sampling five regions as specified in [1]. The sum of the two best outer regions are added to the center region.
  * </p>
  *
  * <p>
  * Since five regions are being sampled to compute the score the overall sample region is larger than the
- * individual sub regions.  The border radius is thus twice the radius of the sub-regions.
+ * individual sub regions. The border radius is thus twice the radius of the sub-regions.
  * </p>
  *
  * <p>

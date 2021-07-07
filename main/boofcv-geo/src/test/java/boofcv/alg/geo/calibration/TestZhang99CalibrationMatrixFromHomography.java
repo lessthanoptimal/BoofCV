@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -33,8 +33,7 @@ public class TestZhang99CalibrationMatrixFromHomography extends BoofStandardJUni
 
 	List<DMatrixRMaj> homographies;
 
-	@Test
-	public void withSkew() {
+	@Test void withSkew() {
 
 		DMatrixRMaj K = GenericCalibrationGrid.createStandardCalibration();
 
@@ -53,8 +52,7 @@ public class TestZhang99CalibrationMatrixFromHomography extends BoofStandardJUni
 		}
 	}
 
-	@Test
-	public void withNoSkew() {
+	@Test void withNoSkew() {
 
 		// try different sizes
 		for( int N = 2; N <= 5; N++ ) {

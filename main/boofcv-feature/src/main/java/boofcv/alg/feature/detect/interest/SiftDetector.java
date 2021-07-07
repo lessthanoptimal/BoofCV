@@ -42,13 +42,13 @@ import static boofcv.alg.feature.detect.interest.FastHessianFeatureDetector.poly
 
 /**
  * <p>Implementation of SIFT [1] feature detector. Feature detection is first done by creating the first octave in
- * a {@link SiftScaleSpace scale space}.  Then the Difference-of-Gaussian (DoG) is computed from sequential
- * scales inside the scale-space.  From the DoG images, pixels which are maximums and minimums spatially and with
- * in scale are found.  Edges of objects can cause false positives so those are suppressed.  The remaining
+ * a {@link SiftScaleSpace scale space}. Then the Difference-of-Gaussian (DoG) is computed from sequential
+ * scales inside the scale-space. From the DoG images, pixels which are maximums and minimums spatially and with
+ * in scale are found. Edges of objects can cause false positives so those are suppressed. The remaining
  * features are interpolated spatially and across scale.</p>
  *
  * <p>This class is designed so that it can operate as a stand alone feature detector or so that it can be
- * extended to compute feature descriptors too.  The advantage of the former is that the scale-space only
+ * extended to compute feature descriptors too. The advantage of the former is that the scale-space only
  * needs to be constructed once.</p>
  *
  * <h2>Processing Steps</h2>
@@ -62,11 +62,11 @@ import static boofcv.alg.feature.detect.interest.FastHessianFeatureDetector.poly
  * <li>Interpolate feature's (x,y,sigma) coordinate using the peak of a 2nd order polynomial (quadratic).
  * {@link #createDetection}</li>
  * </ol>
- * <p>Where N is the number of scale parameters.  There are N+3 scale images and N+2 DoG images in an octave.
+ * <p>Where N is the number of scale parameters. There are N+3 scale images and N+2 DoG images in an octave.
  *
  * <h2>Edge Detection</h2>
- * <p>Edges can also cause local extremes (false positives) in the DoG image.  To remove those false positives an
- * edge detector is proposed by Lowe.  The edge detector is turned with the parameter 'r' and a point is considered
+ * <p>Edges can also cause local extremes (false positives) in the DoG image. To remove those false positives an
+ * edge detector is proposed by Lowe. The edge detector is turned with the parameter 'r' and a point is considered
  * an edge if the following is true:<br>
  * Tr<sup>2</sup>/Det < (r+1)<sup>2</sup>/r<br>
  * where Tr and Det are the trace an determinant of a 2x2 hessian matrix computed from the DoG hessian at that point,
@@ -74,14 +74,14 @@ import static boofcv.alg.feature.detect.interest.FastHessianFeatureDetector.poly
  *
  * <h2>Deviations from standard SIFT</h2>
  * <ol>
- * <li>Spatial maximums are not limited to a 3x3 region like they are in the paper.  User configurable.</li>
+ * <li>Spatial maximums are not limited to a 3x3 region like they are in the paper. User configurable.</li>
  * <li>Quadratic interpolation is used independently on x,y, and scale axis.</li>
- * <li>What the scale of a DoG image is isn't specified in the paper.  Assumed to be the same as the lower indexed
+ * <li>What the scale of a DoG image is isn't specified in the paper. Assumed to be the same as the lower indexed
  * scale image it was computed from.</li>
  * </ol>
  *
  * <p>
- * [1] Lowe, D. "Distinctive image features from scale-invariant keypoints".  International Journal of
+ * [1] Lowe, D. "Distinctive image features from scale-invariant keypoints". International Journal of
  * Computer Vision, 60, 2 (2004), pp.91--110.
  * </p>
  *
@@ -123,7 +123,7 @@ public class SiftDetector {
 	/**
 	 * Configures SIFT detector
 	 *
-	 * @param edgeR Threshold used to remove edge responses.  Larger values means its less strict.  Try 10
+	 * @param edgeR Threshold used to remove edge responses. Larger values means its less strict. Try 10
 	 * @param extractor Spatial feature detector that can be configured to limit the number of detected features in each scale.
 	 */
 	public SiftDetector( FeatureSelectLimitIntensity<ScalePoint> selectFeaturesAll,
@@ -266,9 +266,9 @@ public class SiftDetector {
 	}
 
 	/**
-	 * Examines a local spatial extremum and interpolates its coordinates using a quadratic function.  Very first
-	 * thing it does is check to see if the feature is really an edge/false positive.  After that interpolates
-	 * the coordinate independently using a quadratic function along each axis.  Resulting coordinate will be
+	 * Examines a local spatial extremum and interpolates its coordinates using a quadratic function. Very first
+	 * thing it does is check to see if the feature is really an edge/false positive. After that interpolates
+	 * the coordinate independently using a quadratic function along each axis. Resulting coordinate will be
 	 * in the image image's coordinate system.
 	 *
 	 * @param x x-coordinate of extremum
@@ -313,7 +313,7 @@ public class SiftDetector {
 	}
 
 	/**
-	 * Performs an edge test to remove false positives.  See 4.1 in [1].
+	 * Performs an edge test to remove false positives. See 4.1 in [1].
 	 */
 	boolean isEdge( int x, int y ) {
 		if (edgeThreshold <= 0)

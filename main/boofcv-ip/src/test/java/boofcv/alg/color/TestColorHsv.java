@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -49,8 +49,7 @@ public class TestColorHsv extends BoofStandardJUnit {
 		assertEquals(130, (found   )&0xFF );
 	}
 
-	@Test
-	public void backAndForth_F64_and_F32() {
+	@Test void backAndForth_F64_and_F32() {
 
 		check(0.5, 0.3, 0.2);
 		check(0, 0, 0);
@@ -98,8 +97,7 @@ public class TestColorHsv extends BoofStandardJUnit {
 	}
 
 
-	@Test
-	public void Planar_F32() {
+	@Test void Planar_F32() {
 		Planar<GrayF32> rgb = new Planar<>(GrayF32.class,10,15,3);
 		Planar<GrayF32> hsv = new Planar<>(GrayF32.class,10,15,3);
 		Planar<GrayF32> found = new Planar<>(GrayF32.class,10,15,3);

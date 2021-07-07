@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -40,11 +40,11 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Estimates the pose using P3P and iterative refinement from 4 points on a plane with known locations.  While
+ * Estimates the pose using P3P and iterative refinement from 4 points on a plane with known locations. While
  * this seems like it would be a trivial problem it actually takes several techniques to ensure accurate results.
- * At a high level it uses P3P to provide an estimate.  If the error is large it then uses EPNP.  Which ever
- * is better it then refines.  If the target is small and directly facing the camera it will enlarge the target
- * to estimate it's orientation.  Otherwise it will over fit location since it takes a large change in orientation
+ * At a high level it uses P3P to provide an estimate. If the error is large it then uses EPNP. Which ever
+ * is better it then refines. If the target is small and directly facing the camera it will enlarge the target
+ * to estimate it's orientation. Otherwise it will over fit location since it takes a large change in orientation
  * to influence the result.
  *
  * @author Peter Abeles
@@ -53,7 +53,7 @@ public class QuadPoseEstimator {
 
 	// if the target is less than or equals to this number of pixels along a side then it is considered small
 	// and a special case will be handled.
-	// I think this threshold should be valid across different resolution images.  Corner accuracy should be
+	// I think this threshold should be valid across different resolution images. Corner accuracy should be
 	// less than a pixel and it becomes unstable because changes in hangle result in an error of less than a pixel
 	// when the target is small
 	public static final double SMALL_PIXELS = 60.0;
@@ -94,7 +94,7 @@ public class QuadPoseEstimator {
 	protected double bestError;
 	protected Se3_F64 bestPose = new Se3_F64();
 
-	// predeclared internal work space.  Minimizing new memory
+	// predeclared internal work space. Minimizing new memory
 	Quadrilateral_F64 pixelCorners = new Quadrilateral_F64();
 	Quadrilateral_F64 normCorners = new Quadrilateral_F64();
 
@@ -106,8 +106,8 @@ public class QuadPoseEstimator {
 	/**
 	 * Constructor which picks reasonable and generally good algorithms for pose estimation.
 	 *
-	 * @param refineTol Convergence tolerance.  Try 1e-8
-	 * @param refineIterations Number of refinement iterations.  Try 200
+	 * @param refineTol Convergence tolerance. Try 1e-8
+	 * @param refineIterations Number of refinement iterations. Try 200
 	 */
 	public QuadPoseEstimator( double refineTol, int refineIterations ) {
 		this(FactoryMultiView.pnp_N(EnumPNP.P3P_GRUNERT, -1),
@@ -137,7 +137,7 @@ public class QuadPoseEstimator {
 	}
 
 	/**
-	 * Specify the location of points on the 2D fiducial.  These should be in "world coordinates"
+	 * Specify the location of points on the 2D fiducial. These should be in "world coordinates"
 	 */
 	public void setFiducial( double x0, double y0, double x1, double y1,
 							 double x2, double y2, double x3, double y3 ) {
@@ -265,7 +265,7 @@ public class QuadPoseEstimator {
 	}
 
 	/**
-	 * Estimates the pose using P3P from 3 out of 4 points.  Then use all 4 to pick the best solution
+	 * Estimates the pose using P3P from 3 out of 4 points. Then use all 4 to pick the best solution
 	 *
 	 * @param excluded which corner to exclude and use to check the answers from the others
 	 */

@@ -46,8 +46,7 @@ public class TestCreateFiducialSquareBinary extends CommonFiducialPdfChecks {
 		err.used = false;
 	}
 
-	@Test
-	public void single_pdf() throws IOException, InterruptedException {
+	@Test void single_pdf() throws IOException, InterruptedException {
 		// don't need to specif spacing
 		int expected = 234;
 		createDocument(String.format("--PaperSize letter --OutputFile %s -w 3 -n %d",
@@ -63,8 +62,7 @@ public class TestCreateFiducialSquareBinary extends CommonFiducialPdfChecks {
 		assertEquals(expected, detector.getId(0));
 	}
 
-	@Test
-	public void grid() throws IOException, InterruptedException {
+	@Test void grid() throws IOException, InterruptedException {
 		int[] expected = new int[]{234, 123};
 		createDocument(String.format("--GridFill --DrawGrid --PaperSize letter --OutputFile %s -w 5 -s 2 -n %d -n %d",
 				document_name + ".pdf", expected[0], expected[1]));
@@ -84,8 +82,7 @@ public class TestCreateFiducialSquareBinary extends CommonFiducialPdfChecks {
 	/**
 	 * Adjust the border and the number of grid elements
 	 */
-	@Test
-	public void customized_pdf() throws IOException, InterruptedException {
+	@Test void customized_pdf() throws IOException, InterruptedException {
 		int[] expected = new int[]{234, 23233};
 		double border = 0.1;
 		int gridWidth = 5;
@@ -109,8 +106,7 @@ public class TestCreateFiducialSquareBinary extends CommonFiducialPdfChecks {
 	/**
 	 * Create two images
 	 */
-	@Test
-	public void create_png() throws InterruptedException {
+	@Test void create_png() throws InterruptedException {
 		int[] expected = new int[]{0, 234, 678};
 		createDocument(String.format("--OutputFile %s -w 200 -s 20 -n %d -n %d -n %d",
 				document_name + ".png", expected[0], expected[1], expected[2]));

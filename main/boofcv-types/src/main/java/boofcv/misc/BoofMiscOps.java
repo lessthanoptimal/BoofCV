@@ -443,7 +443,7 @@ public class BoofMiscOps {
 	}
 
 	/**
-	 * Invokes wait until the elapsed time has passed.  In the thread is interrupted, the interrupt is ignored.
+	 * Invokes wait until the elapsed time has passed. In the thread is interrupted, the interrupt is ignored.
 	 *
 	 * @param milli Length of desired pause in milliseconds.
 	 */

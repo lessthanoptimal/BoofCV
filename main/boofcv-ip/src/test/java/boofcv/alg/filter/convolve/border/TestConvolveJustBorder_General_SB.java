@@ -62,8 +62,7 @@ public class TestConvolveJustBorder_General_SB extends CompareImageBorder {
 	 * Compare the results along the border to the results obtained by convolving a larger image with the noborder algorithm
 	 * whose border has been filled with the fillValue.
 	 */
-	@Test
-	public void compareToNoBorder() {
+	@Test void compareToNoBorder() {
 		performTests(18);
 	}
 

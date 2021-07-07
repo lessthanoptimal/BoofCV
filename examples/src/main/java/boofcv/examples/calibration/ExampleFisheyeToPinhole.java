@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -49,8 +49,8 @@ import java.awt.image.BufferedImage;
 import java.io.File;
 
 /**
- * Demonstration for how to project a fisheye camera onto a synthetic pinhole camera view.  Internally NarrowToWide
- * has the following steps.  1) compute normalized image coordinates for each pixel. 2) convert into unit circle
+ * Demonstration for how to project a fisheye camera onto a synthetic pinhole camera view. Internally NarrowToWide
+ * has the following steps. 1) compute normalized image coordinates for each pixel. 2) convert into unit circle
  * coordinates, and 3) compute pixe location in fisheye camera.
  *
  * @author Peter Abeles
@@ -85,7 +85,7 @@ public class ExampleFisheyeToPinhole {
 		// Pass in the transform created above
 		distorter.setModel(new PointToPixelTransform_F32(transform));
 
-		// Render the image.  The camera will have a rotation of 0 and will thus be looking straight forward
+		// Render the image. The camera will have a rotation of 0 and will thus be looking straight forward
 		Planar<GrayU8> pinholeImage = fisheyeImage.createNew(pinholeModel.width, pinholeModel.height);
 
 		distorter.apply(fisheyeImage,pinholeImage);

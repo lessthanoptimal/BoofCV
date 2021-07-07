@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -36,8 +36,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  */
 public class TestRodriguesRotationGradient extends BoofStandardJUnit {
 
-	@Test
-	public void checkUsingNumerical() {
+	@Test void checkUsingNumerical() {
 		RodToMatrix f = new RodToMatrix();
 		RodToGradient g = new RodToGradient();
 		

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -68,7 +68,7 @@ public class CreateSyntheticOverheadViewPL<T extends ImageGray<T>>
 	}
 
 	/**
-	 * Computes overhead view of input image.  All pixels in input image are assumed to be on the ground plane.
+	 * Computes overhead view of input image. All pixels in input image are assumed to be on the ground plane.
 	 *
 	 * @param input (Input) Camera image.
 	 * @param output (Output) Image containing overhead view.

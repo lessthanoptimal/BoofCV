@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -27,8 +27,8 @@ import boofcv.struct.image.GrayS8;
 
 
 /**
- * Algorithms for performing non-max suppression.  Edge intensities are set to zero if adjacent pixels
- * have a value greater than the current value.  Adjacency is determined by the gradients
+ * Algorithms for performing non-max suppression. Edge intensities are set to zero if adjacent pixels
+ * have a value greater than the current value. Adjacency is determined by the gradients
  * discretized direction.
  *
  * NOTE: This is technically not true non-maximum suppression because equal values are allowed.
@@ -39,7 +39,7 @@ import boofcv.struct.image.GrayS8;
 public class ImplEdgeNonMaxSuppression {
 
 	/**
-	 * Only processes the inner image.  Ignoring the border.
+	 * Only processes the inner image. Ignoring the border.
 	 */
 	static public void inner4(GrayF32 intensity , GrayS8 direction , GrayF32 output )
 	{
@@ -247,7 +247,7 @@ public class ImplEdgeNonMaxSuppression {
 	}
 
 	/**
-	 * Only processes the inner image.  Ignoring the border.
+	 * Only processes the inner image. Ignoring the border.
 	 */
 	static public void inner8(GrayF32 intensity , GrayS8 direction , GrayF32 output )
 	{

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -24,20 +24,20 @@ import org.ddogleg.struct.FastAccess;
 import org.ddogleg.struct.FastArray;
 
 /**
- * Removes any ambiguous associations.  If multiple features from the 'src' match the same feature
+ * Removes any ambiguous associations. If multiple features from the 'src' match the same feature
  * in the 'dst' then only the association with the lowest 'fitScore' is saved.
  *
  * @author Peter Abeles
  */
 public class EnsureUniqueAssociation {
 
-	// An element for each 'dst' feature.  Only the best association with the lowest score is saved here.
+	// An element for each 'dst' feature. Only the best association with the lowest score is saved here.
 	AssociatedIndex[] bestScores = new AssociatedIndex[1];
 	// The final output list with the best associations
 	FastArray<AssociatedIndex> unambiguous = new FastArray<>(AssociatedIndex.class);
 
 	/**
-	 * Removes ambiguous associations.  Call {@link #getMatches()} to get the list of unambiguous
+	 * Removes ambiguous associations. Call {@link #getMatches()} to get the list of unambiguous
 	 * matches.
 	 *
 	 * @param matches List of candidate associations

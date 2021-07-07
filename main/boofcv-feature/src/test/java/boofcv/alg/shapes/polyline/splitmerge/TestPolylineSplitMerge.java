@@ -41,8 +41,7 @@ import static org.junit.jupiter.api.Assertions.*;
 @SuppressWarnings("ConstantConditions")
 public class TestPolylineSplitMerge extends BoofStandardJUnit {
 
-	@Test
-	public void process_line() {
+	@Test void process_line() {
 		PolylineSplitMerge alg = new PolylineSplitMerge();
 		alg.setCornerScorePenalty(0.1);
 		alg.setMinimumSideLength(5);
@@ -69,8 +68,7 @@ public class TestPolylineSplitMerge extends BoofStandardJUnit {
 		assertEquals(0.1*1,result.score, 1e-8);
 	}
 
-	@Test
-	public void process_twoSegments() {
+	@Test void process_twoSegments() {
 		PolylineSplitMerge alg = new PolylineSplitMerge();
 		alg.setCornerScorePenalty(0.1);
 		alg.setMinimumSideLength(5);
@@ -99,8 +97,7 @@ public class TestPolylineSplitMerge extends BoofStandardJUnit {
 		assertEquals(0.1*2,result.score, 1e-8);
 	}
 
-	@Test
-	public void process_perfectSquare() {
+	@Test void process_perfectSquare() {
 		PolylineSplitMerge alg = new PolylineSplitMerge();
 		alg.setCornerScorePenalty(0.1);
 		alg.setMinimumSideLength(5);
@@ -128,8 +125,7 @@ public class TestPolylineSplitMerge extends BoofStandardJUnit {
 	/**
 	 * Data is a square but force it to match a triangle
 	 */
-	@Test
-	public void process_perfectSquare_forcedTriangle() {
+	@Test void process_perfectSquare_forcedTriangle() {
 		PolylineSplitMerge alg = new PolylineSplitMerge();
 		alg.setCornerScorePenalty(0.1);
 		alg.setMinimumSideLength(5);
@@ -151,8 +147,7 @@ public class TestPolylineSplitMerge extends BoofStandardJUnit {
 		assertNull(alg.getBestPolyline());
 	}
 
-	@Test
-	public void savePolyline() {
+	@Test void savePolyline() {
 		PolylineSplitMerge alg = new PolylineSplitMerge();
 		alg.setCornerScorePenalty(0.5);
 		alg.addCorner(0);
@@ -178,8 +173,7 @@ public class TestPolylineSplitMerge extends BoofStandardJUnit {
 		assertFalse(alg.savePolyline());
 	}
 
-	@Test
-	public void computeScore_loops() {
+	@Test void computeScore_loops() {
 		PolylineSplitMerge alg = new PolylineSplitMerge();
 		alg.addCorner(0).object.sideError = 5;
 		alg.addCorner(0).object.sideError = 6;
@@ -191,8 +185,7 @@ public class TestPolylineSplitMerge extends BoofStandardJUnit {
 		assertEquals(expected,found,1e-8);
 	}
 
-	@Test
-	public void computeScore_sequence() {
+	@Test void computeScore_sequence() {
 		PolylineSplitMerge alg = new PolylineSplitMerge();
 		alg.addCorner(0).object.sideError = 5;
 		alg.addCorner(0).object.sideError = 6;
@@ -207,8 +200,7 @@ public class TestPolylineSplitMerge extends BoofStandardJUnit {
 	/**
 	 * Give it an obvious triangle and see if it finds it
 	 */
-	@Test
-	public void findInitialTriangle() {
+	@Test void findInitialTriangle() {
 		List<Point2D_I32> contour = new ArrayList<>();
 		for (int i = 0; i < 10; i++) {
 			contour.add(new Point2D_I32(i,i));
@@ -234,8 +226,7 @@ public class TestPolylineSplitMerge extends BoofStandardJUnit {
 		assertEquals(0,e.object.index);
 	}
 
-	@Test
-	public void ensureTriangleOrder() {
+	@Test void ensureTriangleOrder() {
 		List<Point2D_I32> contour = rect(10,12,20,22);
 
 		// no change needed
@@ -261,8 +252,7 @@ public class TestPolylineSplitMerge extends BoofStandardJUnit {
 	/**
 	 * Case where it should add a corner and then remove a corner
 	 */
-	@Test
-	public void increaseNumberOfSidesByOne_loops() {
+	@Test void increaseNumberOfSidesByOne_loops() {
 		List<Point2D_I32> contour = rect(10,12,20,22);
 
 		PolylineSplitMerge alg = new PolylineSplitMerge();
@@ -298,8 +288,7 @@ public class TestPolylineSplitMerge extends BoofStandardJUnit {
 		assertEquals(34,e.object.index);
 	}
 
-	@Test
-	public void increaseNumberOfSidesByOne_sequence() {
+	@Test void increaseNumberOfSidesByOne_sequence() {
 		List<Point2D_I32> contour = rect(10,12,20,22);
 
 		PolylineSplitMerge alg = new PolylineSplitMerge();
@@ -345,8 +334,7 @@ public class TestPolylineSplitMerge extends BoofStandardJUnit {
 		assertEquals(30,e.object.index);
 	}
 
-	@Test
-	public void isSideConvex() {
+	@Test void isSideConvex() {
 		List<Point2D_I32> contour = rect(10,12,20,22);
 
 		// staight line on a perfect side
@@ -362,8 +350,7 @@ public class TestPolylineSplitMerge extends BoofStandardJUnit {
 		assertFalse(alg.isSideConvex(contour,alg.list.getHead()));
 	}
 
-	@Test
-	public void selectCornerToSplit_loop() {
+	@Test void selectCornerToSplit_loop() {
 		PolylineSplitMerge alg = new PolylineSplitMerge();
 		Element<Corner> c1 = alg.addCorner(10);
 		Element<Corner> c2 = alg.addCorner(20);
@@ -393,8 +380,7 @@ public class TestPolylineSplitMerge extends BoofStandardJUnit {
 		assertSame(c2, alg.selectCornerToSplit(true));
 	}
 
-	@Test
-	public void selectCornerToSplit_sequence() {
+	@Test void selectCornerToSplit_sequence() {
 		PolylineSplitMerge alg = new PolylineSplitMerge();
 		Element<Corner> c0 = alg.addCorner(0);
 		Element<Corner> c1 = alg.addCorner(10);
@@ -435,8 +421,7 @@ public class TestPolylineSplitMerge extends BoofStandardJUnit {
 	/**
 	 * Case where a corner is removed and the polyline saved
 	 */
-	@Test
-	public void removeAndSaveCorner_positive() {
+	@Test void removeAndSaveCorner_positive() {
 		PolylineSplitMerge alg = new PolylineSplitMerge();
 		alg.setCornerScorePenalty(0.5);
 		alg.addCorner(0);
@@ -468,8 +453,7 @@ public class TestPolylineSplitMerge extends BoofStandardJUnit {
 	/**
 	 * Case where a corner is removed and the polyline NOT saved
 	 */
-	@Test
-	public void removeAndSaveCorner_negative() {
+	@Test void removeAndSaveCorner_negative() {
 		PolylineSplitMerge alg = new PolylineSplitMerge();
 		alg.setCornerScorePenalty(0.5);
 		alg.addCorner(0);
@@ -492,8 +476,7 @@ public class TestPolylineSplitMerge extends BoofStandardJUnit {
 	/**
 	 * Test case where the corner is removed
 	 */
-	@Test
-	public void selectCornerToRemove() {
+	@Test void selectCornerToRemove() {
 		List<Point2D_I32> contour = rect(10,12,20,18);
 
 		PolylineSplitMerge alg = new PolylineSplitMerge();
@@ -516,8 +499,7 @@ public class TestPolylineSplitMerge extends BoofStandardJUnit {
 	/**
 	 * Test case where the corner is NOT removed
 	 */
-	@Test
-	public void selectCornerToRemove_null() {
+	@Test void selectCornerToRemove_null() {
 		List<Point2D_I32> contour = rect(10,12,20,18);
 
 		PolylineSplitMerge alg = new PolylineSplitMerge();
@@ -536,8 +518,7 @@ public class TestPolylineSplitMerge extends BoofStandardJUnit {
 		assertTrue(foundError.value>1);
 	}
 
-	@Test
-	public void findCornerSeed() {
+	@Test void findCornerSeed() {
 		List<Point2D_I32> contour = new ArrayList<>();
 		for (int i = 0; i < 20; i++) {
 			contour.add( new Point2D_I32(i,0));
@@ -548,8 +529,7 @@ public class TestPolylineSplitMerge extends BoofStandardJUnit {
 		assertEquals(19,PolylineSplitMerge.findCornerSeed(contour));
 	}
 
-	@Test
-	public void maximumDistance() {
+	@Test void maximumDistance() {
 		List<Point2D_I32> contour = new ArrayList<>();
 		for (int i = 0; i < 20; i++) {
 			contour.add( new Point2D_I32(i,0));
@@ -560,8 +540,7 @@ public class TestPolylineSplitMerge extends BoofStandardJUnit {
 		assertEquals(8,PolylineSplitMerge.maximumDistance(contour,19,3));
 	}
 
-	@Test
-	public void computePotentialSplitScore() {
+	@Test void computePotentialSplitScore() {
 		PolylineSplitMerge alg = new PolylineSplitMerge();
 		alg.setMinimumSideLength(5);
 		alg.setThresholdSideSplitScore(0);
@@ -589,8 +568,7 @@ public class TestPolylineSplitMerge extends BoofStandardJUnit {
 		assertEquals(10,e.object.splitLocation);
 	}
 
-	@Test
-	public void computeSideError_exhaustive() {
+	@Test void computeSideError_exhaustive() {
 
 		PolylineSplitMerge alg = new PolylineSplitMerge();
 		alg.maxNumberOfSideSamples = 300; // have it exhaustively sample all pixels
@@ -621,8 +599,7 @@ public class TestPolylineSplitMerge extends BoofStandardJUnit {
 		assertEquals(expected,alg.computeSideError(contour2,10,0), GrlConstants.TEST_F64);
 	}
 
-	@Test
-	public void computeSideError_skip() {
+	@Test void computeSideError_skip() {
 		PolylineSplitMerge alg = new PolylineSplitMerge();
 		alg.maxNumberOfSideSamples = 5; // it will sub sample
 
@@ -649,8 +626,7 @@ public class TestPolylineSplitMerge extends BoofStandardJUnit {
 		assertEquals(expected,alg.computeSideError(contour2,10,0), GrlConstants.TEST_F64);
 	}
 
-	@Test
-	public void addCorner() {
+	@Test void addCorner() {
 		PolylineSplitMerge alg = new PolylineSplitMerge();
 
 		assertEquals(0,alg.list.size());
@@ -662,8 +638,7 @@ public class TestPolylineSplitMerge extends BoofStandardJUnit {
 		assertEquals(4,alg.list.getElement(1,true).object.index);
 	}
 
-	@Test
-	public void setSplitVariables() {
+	@Test void setSplitVariables() {
 		List<Point2D_I32> contour = rect(5,6,12,20);
 
 		PolylineSplitMerge alg = new PolylineSplitMerge();
@@ -702,8 +677,7 @@ public class TestPolylineSplitMerge extends BoofStandardJUnit {
 	/**
 	 * The convex check is now enabled and should failed the split
 	 */
-	@Test
-	public void setSplitVariables_withConvexCheck() {
+	@Test void setSplitVariables_withConvexCheck() {
 		List<Point2D_I32> contour = rect(5,6,12,20);
 		PolylineSplitMerge alg = new PolylineSplitMerge();
 		alg.setConvex(true);
@@ -724,8 +698,7 @@ public class TestPolylineSplitMerge extends BoofStandardJUnit {
 		assertFalse(e0.object.splitable);
 	}
 
-	@Test
-	public void canBeSplit() {
+	@Test void canBeSplit() {
 		PolylineSplitMerge alg = new PolylineSplitMerge();
 
 		// only the contour's size matters
@@ -785,8 +758,7 @@ public class TestPolylineSplitMerge extends BoofStandardJUnit {
 	/**
 	 * Special case that requires wrapping around to compute the correct length
 	 */
-	@Test
-	public void canBeSplit_special_case() {
+	@Test void canBeSplit_special_case() {
 		// only the contour's size matters
 		List<Point2D_I32> contour = new ArrayList<>();
 		for (int i = 0; i < 12; i++) {
@@ -808,8 +780,7 @@ public class TestPolylineSplitMerge extends BoofStandardJUnit {
 		assertFalse(alg.canBeSplit(contour,alg.list.getTail(),false));
 	}
 
-	@Test
-	public void next() {
+	@Test void next() {
 		PolylineSplitMerge alg = new PolylineSplitMerge();
 
 		Corner a = alg.corners.grow();
@@ -824,8 +795,7 @@ public class TestPolylineSplitMerge extends BoofStandardJUnit {
 		assertSame(a, alg.next(alg.list.find(c)).object);
 	}
 
-	@Test
-	public void previous() {
+	@Test void previous() {
 		PolylineSplitMerge alg = new PolylineSplitMerge();
 
 		Corner a = alg.corners.grow();
@@ -843,8 +813,7 @@ public class TestPolylineSplitMerge extends BoofStandardJUnit {
 	/**
 	 * Create a rectangle and feed it every point in the rectangle and see if it has the expected response
 	 */
-	@Test
-	public void isConvexUsingMaxDistantPoints_positive() {
+	@Test void isConvexUsingMaxDistantPoints_positive() {
 		List<Point2D_I32> contour = rect(5,6,12,20);
 
 		for (int i = 0; i < contour.size(); i++) {
@@ -866,15 +835,13 @@ public class TestPolylineSplitMerge extends BoofStandardJUnit {
 	/**
 	 * Give it a scenario where it should fail
 	 */
-	@Test
-	public void isConvexUsingMaxDistantPoints_negative() {
+	@Test void isConvexUsingMaxDistantPoints_negative() {
 		List<Point2D_I32> contour = rect(5,6,12,20);
 		// have the line segment it';s
 		assertFalse( PolylineSplitMerge.isConvexUsingMaxDistantPoints(contour,2,3));
 	}
 
-	@Test
-	public void distanceSq() {
+	@Test void distanceSq() {
 		Point2D_I32 a = new Point2D_I32(2,4);
 		Point2D_I32 b = new Point2D_I32( 10,-3);
 
@@ -884,8 +851,7 @@ public class TestPolylineSplitMerge extends BoofStandardJUnit {
 		assertEquals(expected,found,GrlConstants.TEST_F64);
 	}
 
-	@Test
-	public void distanceAbs() {
+	@Test void distanceAbs() {
 		Point2D_I32 a = new Point2D_I32(2,4);
 		Point2D_I32 b = new Point2D_I32( 10,-3);
 
@@ -896,8 +862,7 @@ public class TestPolylineSplitMerge extends BoofStandardJUnit {
 	}
 
 
-	@Test
-	public void assignLine_parametric() {
+	@Test void assignLine_parametric() {
 		List<Point2D_I32> contour = new ArrayList<>();
 
 		for (int i = 0; i < 20; i++) {
@@ -918,8 +883,7 @@ public class TestPolylineSplitMerge extends BoofStandardJUnit {
 
 	}
 
-	@Test
-	public void assignLine_segment() {
+	@Test void assignLine_segment() {
 		List<Point2D_I32> contour = new ArrayList<>();
 
 		for (int i = 0; i < 20; i++) {

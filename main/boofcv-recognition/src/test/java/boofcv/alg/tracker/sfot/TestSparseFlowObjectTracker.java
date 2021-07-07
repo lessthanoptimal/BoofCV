@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -37,25 +37,21 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  */
 public class TestSparseFlowObjectTracker extends BoofStandardJUnit {
 
-	@Test
-	public void noMotion() {
+	@Test void noMotion() {
 		checkMotion(0,0,0);
 	}
 
-	@Test
-	public void translation() {
+	@Test void translation() {
 		checkMotion(0, 0, 0);
 		checkMotion(0,-7.6,0);
 	}
 
-	@Test
-	public void rotation() {
+	@Test void rotation() {
 		checkMotion(0, 0, 0.05);
 		checkMotion(0,0,-0.05);
 	}
 
-	@Test
-	public void both() {
+	@Test void both() {
 		checkMotion(10, -7.6, 0.05);
 	}
 

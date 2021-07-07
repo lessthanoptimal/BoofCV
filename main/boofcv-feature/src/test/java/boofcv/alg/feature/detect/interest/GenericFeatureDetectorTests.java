@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -46,8 +46,7 @@ public abstract class GenericFeatureDetectorTests extends BoofStandardJUnit {
 	 * If the maximum number of features is set to a negative number or zero then
 	 * it should return the maximum number of features possible
 	 */
-	@Test
-	public void checkNegativeMaxFeatures() {
+	@Test void checkNegativeMaxFeatures() {
 		GrayF32 input = new GrayF32(width,height);
 
 		// give it a bunch of features that any of the detectors should be able to see
@@ -70,8 +69,7 @@ public abstract class GenericFeatureDetectorTests extends BoofStandardJUnit {
 	/**
 	 * Checks to see if features are flushed after multiple calls
 	 */
-	@Test
-	public void checkFlushFeatures() {
+	@Test void checkFlushFeatures() {
 		GrayF32 input = new GrayF32(width,height);
 
 		// provide a rectangle and circular feature
@@ -89,10 +87,9 @@ public abstract class GenericFeatureDetectorTests extends BoofStandardJUnit {
 	}
 
 	/**
-	 * Give it a blank image and one with random noise.  The blank image should have very very few features
+	 * Give it a blank image and one with random noise. The blank image should have very very few features
 	 */
-	@Test
-	public void compareBlankImage() {
+	@Test void compareBlankImage() {
 		GrayF32 input = new GrayF32(width,height);
 
 		Object alg = createDetector(-1);
@@ -108,8 +105,7 @@ public abstract class GenericFeatureDetectorTests extends BoofStandardJUnit {
 	/**
 	 * Multiple calls to the same input should return the same results
 	 */
-	@Test
-	public void checkMultipleCalls() {
+	@Test void checkMultipleCalls() {
 		GrayF32 input = new GrayF32(width,height);
 		renderCheckered(input);
 
@@ -122,9 +118,9 @@ public abstract class GenericFeatureDetectorTests extends BoofStandardJUnit {
 	}
 
 	/**
-	 * Creates a new feature detector.  Max feature detector isn't a hard max.
+	 * Creates a new feature detector. Max feature detector isn't a hard max.
 	 *
-	 * @param maxFeatures Used to adjust the number of detected features.  -1 indicates all.
+	 * @param maxFeatures Used to adjust the number of detected features. -1 indicates all.
 	 * @return New feature detector
 	 */
 	protected abstract Object createDetector( int maxFeatures );

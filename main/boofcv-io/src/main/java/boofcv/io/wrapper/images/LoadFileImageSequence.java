@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -35,7 +35,7 @@ import java.util.Collections;
 
 /**
  * Loads all the images in a directory that have the specified suffix. If requested it can
- * scale the images down.  The order in which the images are returned is determined by
+ * scale the images down. The order in which the images are returned is determined by
  * Collections.sort() by file name.
  *
  * @author Peter Abeles
@@ -103,7 +103,7 @@ public class LoadFileImageSequence<T extends ImageBase<T>> implements SimpleImag
 		File dir = new File(directoryName);
 
 		if (!dir.isDirectory())
-			throw new IllegalArgumentException("directory must specify a directory.  path = "+directoryName);
+			throw new IllegalArgumentException("directory must specify a directory. path = "+directoryName);
 
 		fileNames.clear();
 
@@ -147,7 +147,7 @@ public class LoadFileImageSequence<T extends ImageBase<T>> implements SimpleImag
 
 	/**
 	 * Loads the next image into a BufferedImage and returns it. The same instance
-	 * or a new instance of a BufferedImage might be returned each time.  Don't rely
+	 * or a new instance of a BufferedImage might be returned each time. Don't rely
 	 * on either behavior being consistent.
 	 */
 	@Override

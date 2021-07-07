@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -41,8 +41,7 @@ public class TestZhang99ComputeTargetHomography extends BoofStandardJUnit {
 	/**
 	 * Give it a grid and see if it computed a legitimate homography
 	 */
-	@Test
-	public void basicTest() {
+	@Test void basicTest() {
 		basicTest(false);
 		basicTest(true);
 	}

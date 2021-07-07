@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -38,14 +38,14 @@ public class ConfigDisparityBM implements Configuration {
 	/** Radius of the rectangular region along y-axis. */
 	public int regionRadiusY = 3;
 	/**
-	 * Maximum allowed error in a region per pixel.  Only used by "error" based measures, e.g. NCC does not
+	 * Maximum allowed error in a region per pixel. Only used by "error" based measures, e.g. NCC does not
 	 * use this value. Set to &lt; 0 to disable.
 	 */
 	public double maxPerPixelError = 0;
-	/** Tolerance for how difference the left to right associated values can be.  Try 1. Disable with -1 */
+	/** Tolerance for how difference the left to right associated values can be. Try 1. Disable with -1 */
 	public int validateRtoL = 1;
 	/**
-	 * Tolerance for how similar optimal region is to other region.  Closer to zero is more tolerant.
+	 * Tolerance for how similar optimal region is to other region. Closer to zero is more tolerant.
 	 * Try 0.15 unless NCC then 0.005. Disable with a value &le; 0
 	 */
 	public double texture = 0.15;

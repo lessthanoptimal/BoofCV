@@ -75,8 +75,7 @@ public class TestAssociateStereo2D extends BoofStandardJUnit {
 	/**
 	 * Very simple positive case with only a perfect observation and descriptor
 	 */
-	@Test
-	public void positive() {
+	@Test void positive() {
 		Point3D_F64 X = new Point3D_F64(0.02, -0.5, 3);
 
 		SfmTestHelper.renderPointPixel(param, X, leftP, rightP);
@@ -103,8 +102,7 @@ public class TestAssociateStereo2D extends BoofStandardJUnit {
 	/**
 	 * Makes the observation in the left image &gt; right image along x-axis
 	 */
-	@Test
-	public void constraintX() {
+	@Test void constraintX() {
 		// zap the rotation so that no adjustment should need to be done
 		CommonOps_DDRM.setIdentity(param.right_to_left.getR());
 		Point3D_F64 X = new Point3D_F64(0.02, -0.5, 3);
@@ -144,8 +142,7 @@ public class TestAssociateStereo2D extends BoofStandardJUnit {
 	/**
 	 * Makes sure observations have the same y-axis
 	 */
-	@Test
-	public void constraintY() {
+	@Test void constraintY() {
 		// zap the rotation so that no adjustment should need to be done
 		Point3D_F64 X = new Point3D_F64(0.02, -0.5, 3);
 

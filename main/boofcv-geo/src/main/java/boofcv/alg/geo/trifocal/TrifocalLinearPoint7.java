@@ -35,8 +35,8 @@ import java.util.List;
 /**
  * <p>
  * Estimates the {@link TrifocalTensor} using a linear algorithm from 7 or more image points correspondences
- * from three views, see page 394 of [1] for details.  After an initial linear solution has been computed
- * it is improved upon by applying geometric constraints.  Note that the solution will not be optimal in a geometric
+ * from three views, see page 394 of [1] for details. After an initial linear solution has been computed
+ * it is improved upon by applying geometric constraints. Note that the solution will not be optimal in a geometric
  * or algebraic sense, but can be used as an initial estimate for refinement algorithms.
  * </p>
  *

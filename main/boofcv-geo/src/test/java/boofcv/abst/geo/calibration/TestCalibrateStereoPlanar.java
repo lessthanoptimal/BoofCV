@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -72,8 +72,7 @@ public class TestCalibrateStereoPlanar extends BoofStandardJUnit {
 	 * Give it a fake feature detector and a fairly benign scenario and see if it can correctly
 	 * estimate the camera parameters.
 	 */
-	@Test
-	public void fullBasic() {
+	@Test void fullBasic() {
 
 		CalibrateStereoPlanar alg = new CalibrateStereoPlanar(layout);
 		alg.configure(true, 2, true);

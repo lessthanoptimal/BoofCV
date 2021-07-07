@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -47,8 +47,7 @@ public class TestDecomposeHomography extends BoofStandardJUnit {
 		N.normalize();
 	}
 
-	@Test
-	public void checkAgainstKnown() {
+	@Test void checkAgainstKnown() {
 		DMatrixRMaj H = MultiViewOps.createHomography(R, T, d, N);
 
 		DecomposeHomography alg = new DecomposeHomography();
@@ -71,8 +70,7 @@ public class TestDecomposeHomography extends BoofStandardJUnit {
 	/**
 	 * Checks to see if the same solution is returned when invoked multiple times
 	 */
-	@Test
-	public void multipleCalls() {
+	@Test void multipleCalls() {
 		DMatrixRMaj H = MultiViewOps.createHomography(R, T, d, N);
 
 		DecomposeHomography alg = new DecomposeHomography();

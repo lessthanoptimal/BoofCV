@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -43,8 +43,7 @@ public abstract class StandardDistanceTest<Model, Data>
 
 	public abstract double distance( Model model, Data data );
 
-	@Test
-	public void testSingle() {
+	@Test void testSingle() {
 		DistanceFromModel<Model, Data> alg = create();
 
 		Model m = createRandomModel();
@@ -57,8 +56,7 @@ public abstract class StandardDistanceTest<Model, Data>
 		}
 	}
 
-	@Test
-	public void testMultiple() {
+	@Test void testMultiple() {
 		DistanceFromModel<Model, Data> alg = create();
 
 		Model m = createRandomModel();

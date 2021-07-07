@@ -30,8 +30,8 @@ import org.ddogleg.struct.FastAccess;
 
 /**
  * Finds regions which are too small and merges them with a neighbor that is the most similar to it and connected.
- * The process is repeated until there are no more regions below the size threshold.  How similar two neighbors are
- * is determined using each region's average color.  Connectivity is determined using a 4-connect rule.
+ * The process is repeated until there are no more regions below the size threshold. How similar two neighbors are
+ * is determined using each region's average color. Connectivity is determined using a 4-connect rule.
  *
  * @author Peter Abeles
  */
@@ -91,10 +91,10 @@ public class MergeSmallRegions<T extends ImageBase<T>> extends RegionMergeTree {
 	}
 
 	/**
-	 * Merges together smaller regions.  Segmented image, region member count, and region color are all updated.
+	 * Merges together smaller regions. Segmented image, region member count, and region color are all updated.
 	 *
-	 * @param image Input image.  Used to compute color of each region
-	 * @param pixelToRegion (input/output) Segmented image with the ID of each region.  Modified.
+	 * @param image Input image. Used to compute color of each region
+	 * @param pixelToRegion (input/output) Segmented image with the ID of each region. Modified.
 	 * @param regionMemberCount (input/output) Number of members in each region  Modified.
 	 * @param regionColor (Output) Storage for colors of each region. Will contains the color of each region on output.
 	 */
@@ -155,7 +155,7 @@ public class MergeSmallRegions<T extends ImageBase<T>> extends RegionMergeTree {
 	}
 
 	/**
-	 * Go through each pixel in the image and examine its neighbors according to a 4-connect rule.  If one of
+	 * Go through each pixel in the image and examine its neighbors according to a 4-connect rule. If one of
 	 * the pixels is in a region that is to be pruned mark them as neighbors. The image is traversed such that
 	 * the number of comparisons is minimized.
 	 */
@@ -369,7 +369,7 @@ public class MergeSmallRegions<T extends ImageBase<T>> extends RegionMergeTree {
 	}
 
 	/**
-	 * Node in a graph.  Specifies which segments are adjacent to a segment which is to be pruned.
+	 * Node in a graph. Specifies which segments are adjacent to a segment which is to be pruned.
 	 */
 	public static class Node {
 		public int segment;

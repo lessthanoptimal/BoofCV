@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -48,8 +48,7 @@ public class TestPyramidOps extends BoofStandardJUnit {
 
 	ConfigDiscreteLevels configLevels = ConfigDiscreteLevels.levels(3);
 
-	@Test
-	public void declareOutput() {
+	@Test void declareOutput() {
 		DummyDiscrete<GrayF32> in = new DummyDiscrete<>(GrayF32.class,false,configLevels);
 		in.initialize(width,height);
 		GrayF32[] out = PyramidOps.declareOutput(in,ImageType.SB_F32);
@@ -62,8 +61,7 @@ public class TestPyramidOps extends BoofStandardJUnit {
 		}
 	}
 
-	@Test
-	public void filter() {
+	@Test void filter() {
 		FilterImageInterface<GrayF32,GrayF32> filter = FactoryBlurFilter.gaussian(ImageType.single(GrayF32.class),-1,1);
 
 		DummyDiscrete<GrayF32> in = new DummyDiscrete<>(GrayF32.class,false,configLevels);
@@ -83,8 +81,7 @@ public class TestPyramidOps extends BoofStandardJUnit {
 		}
 	}
 
-	@Test
-	public void gradient() {
+	@Test void gradient() {
 		ImageGradient<GrayF32,GrayF32> gradient = FactoryDerivative.sobel(GrayF32.class,null);
 
 		DummyDiscrete<GrayF32> in = new DummyDiscrete<>(GrayF32.class,false,configLevels);
@@ -107,8 +104,7 @@ public class TestPyramidOps extends BoofStandardJUnit {
 		}
 	}
 
-	@Test
-	public void hessian() {
+	@Test void hessian() {
 		ImageHessian<GrayF32> gradient = FactoryDerivative.hessianThree(GrayF32.class);
 
 		GrayF32[] derivX = new GrayF32[5];

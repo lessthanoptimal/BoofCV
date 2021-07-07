@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -29,7 +29,7 @@ import static boofcv.misc.BoofMiscOps.timeStr;
 import static java.nio.charset.StandardCharsets.UTF_8;
 
 /**
- * Class for launching JVMs.  Monitors the status and kills frozen threads.  Keeps track of execution time and
+ * Class for launching JVMs. Monitors the status and kills frozen threads. Keeps track of execution time and
  * sets up class path.
  *
  * Output and error stream can be changed at any time and is designed to be thread safe.
@@ -59,7 +59,7 @@ public class JavaRuntimeLauncher {
 	private final Object streamLock = new Object();
 
 	/**
-	 * Constructor.  Configures which library it is to be launching a class from/related to
+	 * Constructor. Configures which library it is to be launching a class from/related to
 	 *
 	 * @param pathJars List of paths to all the jars
 	 */
@@ -77,7 +77,7 @@ public class JavaRuntimeLauncher {
 	}
 
 	/**
-	 * Specifies the amount of time the process has to complete.  After which it is considered frozen and
+	 * Specifies the amount of time the process has to complete. After which it is considered frozen and
 	 * will be killed
 	 *
 	 * @param frozenTime time in milliseconds
@@ -103,7 +103,7 @@ public class JavaRuntimeLauncher {
 	}
 
 	/**
-	 * Launches the class with the provided arguments.  Blocks until the process stops.
+	 * Launches the class with the provided arguments. Blocks until the process stops.
 	 *
 	 * @param mainClass Class
 	 * @param args it's arguments
@@ -143,7 +143,7 @@ public class JavaRuntimeLauncher {
 	}
 
 	/**
-	 * Prints printOut the standard printOut and error from the slave and checks its health.  Exits if
+	 * Prints printOut the standard printOut and error from the slave and checks its health. Exits if
 	 * the slave has finished or is declared frozen.
 	 *
 	 * @return true if successful or false if it was forced to kill the slave because it was frozen

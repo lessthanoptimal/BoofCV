@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -31,8 +31,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  */
 public class TestUtilShapePolygon extends BoofStandardJUnit {
 
-	@Test
-	public void convert() {
+	@Test void convert() {
 		Polygon2D_F64 orig = new Polygon2D_F64(10, 20, 30, 21, 19.5, -10, 8, -8);
 
 		LineGeneral2D_F64[] lines = new LineGeneral2D_F64[4];

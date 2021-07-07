@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -34,12 +34,12 @@ import java.awt.image.BufferedImage;
 
 /**
  * {@link Planar} images are one way in which color images can be stored and manipulated inside
- * of BoofCV.  Inside of a Planar image each color band is stored as an independent {@link ImageGray}.
+ * of BoofCV. Inside of a Planar image each color band is stored as an independent {@link ImageGray}.
  * This is unlike the more common interleaved format where color information is stored in adjacent bytes in
  * the same image.
  *
  * The main advantage of {@link Planar} is the ease at which gray scale operations can be applied to each
- * band independently with no additional code.  This is particularly useful in a library,
+ * band independently with no additional code. This is particularly useful in a library,
  * such as BoofCV, which is heavily focused on gray scale image processing and computer vision. The are also
  * situations for some scientific applications where processing each band independently makes more sense.
  *
@@ -100,7 +100,7 @@ public class ExamplePlanarImages {
 
 	/**
 	 * There is no real perfect way that everyone agrees on for converting color images into gray scale
-	 * images.  Two examples of how to convert a Planar image into a gray scale image are shown
+	 * images. Two examples of how to convert a Planar image into a gray scale image are shown
 	 * in this example.
 	 */
 	public static void convertToGray( BufferedImage input ) {

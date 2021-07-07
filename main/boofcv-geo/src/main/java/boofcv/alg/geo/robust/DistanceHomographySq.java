@@ -30,7 +30,7 @@ import java.util.List;
 
 /**
  * <p>
- * Computes the Euclidean error squared between 'p1' and 'p2' after projecting 'p1' into image 2.  Input
+ * Computes the Euclidean error squared between 'p1' and 'p2' after projecting 'p1' into image 2. Input
  * can be in pixels or normalized image coordinates, but the error for normalized image coordinates doesn't
  * have a physical meaning.
  * </p>

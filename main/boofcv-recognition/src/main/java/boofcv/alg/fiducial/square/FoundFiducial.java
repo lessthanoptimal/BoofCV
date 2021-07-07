@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -32,7 +32,7 @@ public class FoundFiducial {
 	public long id;
 
 	/**
-	 * <p>Where the fiducial was found in the input image.  pixel coordinates.  Lens distortion has not been removed.</p>
+	 * <p>Where the fiducial was found in the input image. pixel coordinates. Lens distortion has not been removed.</p>
 	 *
 	 * <p>For the meaning of each corner see {@link BaseDetectFiducialSquare}. corner a = 0, b = 1, c = 2, d = 3</p>
 	 */

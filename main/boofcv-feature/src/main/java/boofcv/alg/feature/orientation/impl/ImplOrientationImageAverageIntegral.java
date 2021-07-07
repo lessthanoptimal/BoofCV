@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -29,7 +29,7 @@ import boofcv.struct.sparse.SparseScaleSample_F64;
 
 /**
  * <p>
- * Estimates the orientation of a region using a "derivative free" method.  Points are sampled using
+ * Estimates the orientation of a region using a "derivative free" method. Points are sampled using
  * an integral image.
  * </p>
  *
@@ -48,7 +48,7 @@ public class ImplOrientationImageAverageIntegral<T extends ImageGray<T>,G extend
 	/**
 	 *
 	 * @param sampleRadius Radius of the region being considered in terms of Wavelet samples. Typically 6.
-	 * @param weightSigma Sigma for weighting distribution.  Zero for unweighted.
+	 * @param weightSigma Sigma for weighting distribution. Zero for unweighted.
 	 */
 	public ImplOrientationImageAverageIntegral(double radiusToScale,
 											   int sampleRadius, double period,

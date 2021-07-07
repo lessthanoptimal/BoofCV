@@ -29,9 +29,9 @@ import java.util.List;
 
 /**
  * <p>
- * Prunes corners from a pixel level accuracy contour by minizing a penalized energy function.  The energy of a line
+ * Prunes corners from a pixel level accuracy contour by minizing a penalized energy function. The energy of a line
  * segment is defined as Euclidean distance squared of each point from the line summed plus a penalty divided by the
- * distance between two end points of the line.  When a corner is removed the location of its neighbors are optimized
+ * distance between two end points of the line. When a corner is removed the location of its neighbors are optimized
  * again.
  * </p>
  * <p>
@@ -156,7 +156,7 @@ public class MinimizeEnergyPrune {
 				Point2D_I32 b = contour.get(corners.get(j));
 
 				if (a.x == b.x && a.y == b.y) {
-					// this is still ok if j == 0 because it wrapped around.  'i' will now be > size
+					// this is still ok if j == 0 because it wrapped around. 'i' will now be > size
 					corners.remove(j);
 				}
 			}

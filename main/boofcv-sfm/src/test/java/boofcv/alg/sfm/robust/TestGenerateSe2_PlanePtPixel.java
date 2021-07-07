@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -60,8 +60,7 @@ public class TestGenerateSe2_PlanePtPixel extends BoofStandardJUnit {
 		motion2D = new Se2_F64(0.5, -0.05, 0.15);
 	}
 
-	@Test
-	public void perfect() {
+	@Test void perfect() {
 		alg.setExtrinsic(planeToCamera);
 
 		CameraPlaneProjection planeProjection = new CameraPlaneProjection();

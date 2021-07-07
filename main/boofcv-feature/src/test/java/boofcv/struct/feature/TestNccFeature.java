@@ -29,8 +29,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  */
 public class TestNccFeature extends BoofStandardJUnit {
 
-	@Test
-	public void setTo() {
+	@Test void setTo() {
 		NccFeature a = new NccFeature(4);
 		a.mean = 0.5;
 		a.sigma = 1.5;
@@ -45,8 +44,7 @@ public class TestNccFeature extends BoofStandardJUnit {
 		checkIdentical(a, b);
 	}
 
-	@Test
-	public void copy() {
+	@Test void copy() {
 		NccFeature a = new NccFeature(4);
 		a.mean = 0.5;
 		a.sigma = 1.5;

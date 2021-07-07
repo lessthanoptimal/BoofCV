@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -57,11 +57,11 @@ public class ImplOrientationSlidingWindowIntegral
 	/**
 	 * Specifies configuration parameters and initializes data structures
 	 *
-	 * @param samplePeriod How often the image is sampled.  This number is scaled.  Typically 1.
+	 * @param samplePeriod How often the image is sampled. This number is scaled. Typically 1.
 	 * @param windowSize Angular window that is slide across
 	 * @param sampleRadius Radius of the region being considered in terms of samples. Typically 6.
-	 * @param weightSigma Sigma for weighting distribution.  Zero for unweighted.
-	 * @param sampleKernelWidth Size of kernel doing the sampling.  Typically 4.
+	 * @param weightSigma Sigma for weighting distribution. Zero for unweighted.
+	 * @param sampleKernelWidth Size of kernel doing the sampling. Typically 4.
 	 * @param integralType Type of integral image being processed.
 	 */
 	public ImplOrientationSlidingWindowIntegral(double radiusToScale , double samplePeriod, double windowSize,

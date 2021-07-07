@@ -150,7 +150,7 @@ public class SegmentMeanShiftSearchColor<T extends ImageMultiBand<T>> extends Se
 	}
 
 	/**
-	 * Uses mean-shift to find the peak.  Returns the peak as an index in the image data array.
+	 * Uses mean-shift to find the peak. Returns the peak as an index in the image data array.
 	 *
 	 * @param meanColor The color value which mean-shift is trying to find a region which minimises it
 	 */
@@ -186,7 +186,7 @@ public class SegmentMeanShiftSearchColor<T extends ImageMultiBand<T>> extends Se
 					}
 				}
 			} else {
-				// Perform more sanity checks here for the image edge.  Edge pixels are handled by skipping them
+				// Perform more sanity checks here for the image edge. Edge pixels are handled by skipping them
 				for (int yy = 0; yy < widthY; yy++) {
 					float sampleY = y0 + yy;
 					// make sure it is inside the image

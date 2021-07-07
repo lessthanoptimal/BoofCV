@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -35,18 +35,15 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
  */
 public class TestHysteresisEdgeTracePoints extends CommonHysteresisEdgeTrace {
 
-	@Test
-	public void test0() {
+	@Test void test0() {
 		standardTest(0);
 	}
 
-	@Test
-	public void test1() {
+	@Test void test1() {
 		standardTest(1);
 	}
 
-	@Test
-	public void test2() {
+	@Test void test2() {
 		GrayS8 dir = direction(2);
 
 		HysteresisEdgeTracePoints alg = new HysteresisEdgeTracePoints();
@@ -58,13 +55,11 @@ public class TestHysteresisEdgeTracePoints extends CommonHysteresisEdgeTrace {
 		assertEquals(4, ImageStatistics.sum(convert(alg.getContours(),dir.width,dir.height)));
 	}
 
-	@Test
-	public void test3() {
+	@Test void test3() {
 		standardTest(3);
 	}
 
-	@Test
-	public void test4() {
+	@Test void test4() {
 		standardTest(4);
 	}
 

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -44,7 +44,7 @@ public abstract class CommonDisparityBlockMatch<I extends ImageGray<I>> {
 	int minDisparity;
 	int maxDisparity;
 	int rangeDisparity;
-	// where the match scores are stored.  Length is max disparity
+	// where the match scores are stored. Length is max disparity
 	double[] score;
 
 	// comparison region's radius
@@ -82,7 +82,7 @@ public abstract class CommonDisparityBlockMatch<I extends ImageGray<I>> {
 	}
 
 	/**
-	 * Computes the disparity for two stereo images along the image's right axis.  Both
+	 * Computes the disparity for two stereo images along the image's right axis. Both
 	 * image must be rectified.
 	 *
 	 * @param left Left camera image.

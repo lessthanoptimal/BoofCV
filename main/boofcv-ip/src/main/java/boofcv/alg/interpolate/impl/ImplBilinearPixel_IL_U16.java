@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -31,7 +31,7 @@ import javax.annotation.Generated;
  * Implementation of {@link BilinearPixelMB} for a specific image type.
  * </p>
  *
- * <p>DO NOT MODIFY.  Automatically generated code created by GenerateImplBilinearPixel_IL</p>
+ * <p>DO NOT MODIFY. Automatically generated code created by GenerateImplBilinearPixel_IL</p>
  *
  * @author Peter Abeles
  */
@@ -72,7 +72,7 @@ public class ImplBilinearPixel_IL_U16 extends BilinearPixelMB<InterleavedU16> {
 
 		short[] data = orig.data;
 
-		// computing this just once doesn't seem to change speed very much.  Keeping it here to avoid trying
+		// computing this just once doesn't seem to change speed very much. Keeping it here to avoid trying
 		// it again in the future
 		float a00 = (1.0f - ax) * (1.0f - ay);
 		float a10 = ax * (1.0f - ay);

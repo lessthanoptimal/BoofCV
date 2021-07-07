@@ -28,14 +28,14 @@ import georegression.struct.shapes.RectangleLength2D_I32;
 /**
  * <p>
  * Mean-shift [1] based tracker which tracks the target inside a likelihood image using a flat rectangular kernel
- * of fixed size. The likelihood for each pixel is computed using {@link SparseImageSample_F32}.  How that
- * model is computed is not specified by this class, but is often based on color.  For sake of efficiency, the
+ * of fixed size. The likelihood for each pixel is computed using {@link SparseImageSample_F32}. How that
+ * model is computed is not specified by this class, but is often based on color. For sake of efficiency, the
  * likelihood for a pixel is only computed as needed.
  * </p>
  *
  * <p>
  * This algorithm can run very fast and works well when the target being tracked is visually distinctive from
- * the background and largely composed of one color.  It can't handle changes in scale or shape of the target,
+ * the background and largely composed of one color. It can't handle changes in scale or shape of the target,
  * which does limit its applications.
  * </p>
  *
@@ -56,7 +56,7 @@ public class TrackerMeanShiftLikelihood<T extends ImageBase<T>> {
 	// current location of the target
 	private RectangleLength2D_I32 location = new RectangleLength2D_I32();
 
-	// rectangle inside of PDF which has been modified.  Used to minimize writing to the image.  probably
+	// rectangle inside of PDF which has been modified. Used to minimize writing to the image. probably
 	// premature optimization
 	private Rectangle2D_I32 dirty = new Rectangle2D_I32();
 
@@ -75,7 +75,7 @@ public class TrackerMeanShiftLikelihood<T extends ImageBase<T>> {
 	 * Configures tracker
 	 *
 	 * @param targetModel Target used to model the target's likelihood
-	 * @param maxIterations Maximum number of iterations.  try 20
+	 * @param maxIterations Maximum number of iterations. try 20
 	 * @param minFractionDrop If the likelihood drops below its initial value by this fraction the track is
 	 * assumed to be lost
 	 */
@@ -134,8 +134,8 @@ public class TrackerMeanShiftLikelihood<T extends ImageBase<T>> {
 	}
 
 	/**
-	 * Updates the target's location in the image by performing a mean-shift search.  Returns if it was
-	 * successful at finding the target or not.  If it fails once it will need to be re-initialized
+	 * Updates the target's location in the image by performing a mean-shift search. Returns if it was
+	 * successful at finding the target or not. If it fails once it will need to be re-initialized
 	 *
 	 * @param image Most recent image in the sequence
 	 * @return true for success or false if it failed

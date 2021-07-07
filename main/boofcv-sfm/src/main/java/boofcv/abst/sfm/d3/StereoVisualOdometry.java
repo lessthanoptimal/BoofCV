@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -26,7 +26,7 @@ import georegression.struct.se.Se3_F64;
 /**
  * <p>
  * Stereo visual odometry algorithms that estimate the camera's ego-motion in Euclidean space using a pair of
- * stereo images.  Camera motion is estimated relative to the first frame in the left camera's point of view.
+ * stereo images. Camera motion is estimated relative to the first frame in the left camera's point of view.
  * </p>
  * <p>
  * The following is a set of assumptions and behaviors that all implementations of this interface must follow:
@@ -59,8 +59,8 @@ public interface StereoVisualOdometry<T extends ImageBase<T>> extends VisualOdom
 	void setCalibration( StereoParameters parameters );
 
 	/**
-	 * Process the new image and update the motion estimate.  The return value must be checked
-	 * to see if the estimate was actually updated.  If false is returned then {@link #isFault()}
+	 * Process the new image and update the motion estimate. The return value must be checked
+	 * to see if the estimate was actually updated. If false is returned then {@link #isFault()}
 	 * also needs to be checked to see if the pose estimate has been reset.
 	 *
 	 * @return true if the motion estimate has been updated and false if not

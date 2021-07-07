@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -57,17 +57,15 @@ public abstract class StandardModelFitterTests<Model, Point> extends BoofStandar
 	}
 
 	/**
-	 * Give it points which have been transform by the true affine model.  See
+	 * Give it points which have been transform by the true affine model. See
 	 * if the transform is correctly estimated
 	 */
-	@Test
-	public void simpleTest() {
+	@Test void simpleTest() {
 		testWithN(minPoints);
 	}
 
 
-	@Test
-	public void testMoreThanMinimum() {
+	@Test void testMoreThanMinimum() {
 		testWithN(minPoints+2);
 	}
 

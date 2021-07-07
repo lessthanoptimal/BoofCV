@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -36,8 +36,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  */
 public class TestPnPStereoEstimator extends CommonStereoMotionNPoint {
 
-	@Test
-	public void perfectData() {
+	@Test void perfectData() {
 		perfectData(0);
 		perfectData(1);
 		perfectData(2);

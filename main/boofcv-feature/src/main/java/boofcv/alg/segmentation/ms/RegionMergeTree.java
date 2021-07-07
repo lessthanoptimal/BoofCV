@@ -24,13 +24,13 @@ import org.ddogleg.struct.DogArray_I32;
 import org.ddogleg.struct.Stoppable;
 
 /**
- * Merges regions together quickly and efficiently using a directed tree graph.  To merge two segments together
+ * Merges regions together quickly and efficiently using a directed tree graph. To merge two segments together
  * first call {@link #markMerge}. Then after all the regions which are to be merged are marked call
  * {@link #performMerge}.
  *
- * Internally a disjoint-set forest tree graph is maintained using an array.  When two regions are marked to be merged
- * (set-union) path-compression is done.  After merging hsa finished, the graph is fully compressed so that all nodes
- * point to their root directly.  Then the output is computed.
+ * Internally a disjoint-set forest tree graph is maintained using an array. When two regions are marked to be merged
+ * (set-union) path-compression is done. After merging hsa finished, the graph is fully compressed so that all nodes
+ * point to their root directly. Then the output is computed.
  *
  * @author Peter Abeles
  */
@@ -64,8 +64,8 @@ public class RegionMergeTree implements Stoppable {
 	/**
 	 * Merges regions together and updates the provided data structures for said changes.
 	 *
-	 * @param pixelToRegion (Input/Output) Image used to convert pixel location in region ID.  Modified.
-	 * @param regionMemberCount (Input/Output) List containing how many pixels belong to each region.  Modified.
+	 * @param pixelToRegion (Input/Output) Image used to convert pixel location in region ID. Modified.
+	 * @param regionMemberCount (Input/Output) List containing how many pixels belong to each region. Modified.
 	 */
 	public void performMerge( GrayS32 pixelToRegion,
 							  DogArray_I32 regionMemberCount ) {
@@ -81,7 +81,7 @@ public class RegionMergeTree implements Stoppable {
 
 	/**
 	 * For each region in the merge list which is not a root node, find its root node and add to the root node
-	 * its member count and set the index  in mergeList to the root node.  If a node is a root node just note
+	 * its member count and set the index  in mergeList to the root node. If a node is a root node just note
 	 * what its new ID will be after all the other segments are removed.
 	 */
 	protected void flowIntoRootNode( DogArray_I32 regionMemberCount ) {
@@ -113,7 +113,7 @@ public class RegionMergeTree implements Stoppable {
 
 	/**
 	 * Does much of the work needed to remove the redundant segments that are being merged into their root node.
-	 * The list of member count is updated.  mergeList is updated with the new segment IDs.
+	 * The list of member count is updated. mergeList is updated with the new segment IDs.
 	 */
 	protected void setToRootNodeNewID( DogArray_I32 regionMemberCount ) {
 
@@ -135,13 +135,13 @@ public class RegionMergeTree implements Stoppable {
 	}
 
 	/**
-	 * <p>This function will mark two regions for merger.  Equivalent to set-union operation.</p>
+	 * <p>This function will mark two regions for merger. Equivalent to set-union operation.</p>
 	 *
 	 * <p>
 	 * If the two regions have yet to be merged into any others then regionB will become a member of regionA.
-	 * Otherwise a quick heck is done to see if they are already marked for merging.  If that fails it will
-	 * traverse down the tree for each region until it gets to their roots.  If the roots are not the same then
-	 * they are merged.  Either way the path is updated such that the quick check will pass.
+	 * Otherwise a quick heck is done to see if they are already marked for merging. If that fails it will
+	 * traverse down the tree for each region until it gets to their roots. If the roots are not the same then
+	 * they are merged. Either way the path is updated such that the quick check will pass.
 	 * </p>
 	 */
 	protected void markMerge( int regionA, int regionB ) {
@@ -167,7 +167,7 @@ public class RegionMergeTree implements Stoppable {
 			dB = mergeList.data[rootB];
 		}
 
-		// make rootA the parent.  This allows the quick test to pass in the future
+		// make rootA the parent. This allows the quick test to pass in the future
 		mergeList.data[regionA] = rootA;
 		mergeList.data[regionB] = rootA;
 		mergeList.data[rootB] = rootA;

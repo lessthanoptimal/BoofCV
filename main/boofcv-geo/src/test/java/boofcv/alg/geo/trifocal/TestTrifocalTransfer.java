@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -31,8 +31,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
  * @author Peter Abeles
  */
 public class TestTrifocalTransfer extends CommonTrifocalChecks {
-	@Test
-	public void transfer13() {
+	@Test void transfer13() {
 		Point3D_F64 X = new Point3D_F64(0.1,-0.05,2);
 
 		// When the tensor was constructed the first view was assumed to be [I|0], which
@@ -53,8 +52,7 @@ public class TestTrifocalTransfer extends CommonTrifocalChecks {
 		assertEquals(x2.y,found.y, UtilEjml.TEST_F64);
 	}
 
-	@Test
-	public void transfer12() {
+	@Test void transfer12() {
 		Point3D_F64 X = new Point3D_F64(0.1,-0.05,2);
 
 		// When the tensor was constructed the first view was assumed to be [I|0], which

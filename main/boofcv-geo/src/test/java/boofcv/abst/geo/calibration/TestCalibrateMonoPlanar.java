@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -64,8 +64,7 @@ public class TestCalibrateMonoPlanar extends BoofStandardJUnit {
 	 * Give it a fake feature detector and a fairly benign scenario and see if it can correctly
 	 * estimate the camera parameters.
 	 */
-	@Test
-	public void fullBasic() {
+	@Test void fullBasic() {
 
 		CalibrateMonoPlanar alg = new CalibrateMonoPlanar(layout);
 //		alg.setVerbose(System.out,0);

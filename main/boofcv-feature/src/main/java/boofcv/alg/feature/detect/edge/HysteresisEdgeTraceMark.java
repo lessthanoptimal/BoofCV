@@ -28,8 +28,8 @@ import org.ddogleg.struct.DogArray;
 
 /**
  * Given the output from edge non-maximum suppression, perform hysteresis threshold along the edge and mark selected
- * pixels in a binary image.  Points are first marked in direction tangential to the edge's
- * direction, if no matches are found then a match is searched for using an 8-connect rule.  The direction
+ * pixels in a binary image. Points are first marked in direction tangential to the edge's
+ * direction, if no matches are found then a match is searched for using an 8-connect rule. The direction
  * image must be the 4-direction type.
  *
  * @author Peter Abeles
@@ -57,8 +57,8 @@ public class HysteresisEdgeTraceMark {
 	/**
 	 * Performs hysteresis thresholding using the provided lower and upper thresholds.
 	 *
-	 * @param intensity Intensity image after edge non-maximum suppression has been applied.  Modified.
-	 * @param direction 4-direction image.  Not modified.
+	 * @param intensity Intensity image after edge non-maximum suppression has been applied. Modified.
+	 * @param direction 4-direction image. Not modified.
 	 * @param lower Lower threshold.
 	 * @param upper Upper threshold.
 	 * @param output Output binary image. Modified.
@@ -90,7 +90,7 @@ public class HysteresisEdgeTraceMark {
 	}
 
 	/**
-	 * Traces along object's contour starting at the specified seed.  As it does so it will set the intensity of
+	 * Traces along object's contour starting at the specified seed. As it does so it will set the intensity of
 	 * points which are below the lower threshold to zero and add points to contour.
 	 */
 	protected void trace( int x, int y, int indexInten ) {
@@ -110,7 +110,7 @@ public class HysteresisEdgeTraceMark {
 			boolean first = true;
 
 			while (true) {
-				//----- First check along the direction of the edge.  Only need to check 2 points this way
+				//----- First check along the direction of the edge. Only need to check 2 points this way
 				switch (direction.data[indexDir]) {
 					case 0 -> {
 						dx = 0;
@@ -203,7 +203,7 @@ public class HysteresisEdgeTraceMark {
 	}
 
 	/**
-	 * Checks to see if the given coordinate is above the lower threshold.  If it is the point will be
+	 * Checks to see if the given coordinate is above the lower threshold. If it is the point will be
 	 * added to the current segment or be the start of a new segment.
 	 *
 	 * @param match Has a match to the current segment already been found?

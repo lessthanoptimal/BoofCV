@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -41,8 +41,7 @@ public class TestTrifocalExtractGeometries extends CommonTrifocalChecks {
 	/**
 	 * Randomly general several scenarios and see if it produces the correct solution
 	 */
-	@Test
-	public void extractEpipoles() {
+	@Test void extractEpipoles() {
 		TrifocalExtractGeometries alg = new TrifocalExtractGeometries();
 
 		for( int i = 0; i < 5; i++ ) {
@@ -71,8 +70,7 @@ public class TestTrifocalExtractGeometries extends CommonTrifocalChecks {
 		}
 	}
 
-	@Test
-	public void extractCamera() {
+	@Test void extractCamera() {
 		TrifocalLinearPoint7 linear = new TrifocalLinearPoint7();
 
 		TrifocalExtractGeometries alg = new TrifocalExtractGeometries();
@@ -107,8 +105,7 @@ public class TestTrifocalExtractGeometries extends CommonTrifocalChecks {
 		}
 	}
 
-	@Test
-	public void extractFundmental() {
+	@Test void extractFundmental() {
 		TrifocalExtractGeometries alg = new TrifocalExtractGeometries();
 
 		DMatrixRMaj found2 = new DMatrixRMaj(3,3);

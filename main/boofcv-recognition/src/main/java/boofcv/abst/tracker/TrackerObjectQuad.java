@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -26,13 +26,13 @@ import georegression.struct.shapes.Quadrilateral_F64;
  * <p>
  * High level interface for an object tracker where the object being tracked is specified using a quadrilateral. The
  * input is assumed to be a sequence of consecutive video images. When initialize is called the tracker is put
- * into its initial state ago and its past history is discarded.   The vertices in the quadrilateral are specified
+ * into its initial state ago and its past history is discarded.  The vertices in the quadrilateral are specified
  * in a clock-wise direction (a,b,c,d).
  * </p>
  * <p>
- * The motion/distortion model used by the trackers will vary.  Typical models are (scale,translation),
- * (scale,translation,rotation), and affine.  For maximum abstraction, access to the underlying model is not provided
- * through this interface.  To access that model invoke the lower level algorithm directly.
+ * The motion/distortion model used by the trackers will vary. Typical models are (scale,translation),
+ * (scale,translation,rotation), and affine. For maximum abstraction, access to the underlying model is not provided
+ * through this interface. To access that model invoke the lower level algorithm directly.
  * </p>
  *
  * @author Peter Abeles
@@ -42,7 +42,7 @@ public interface TrackerObjectQuad<T extends ImageBase<T>> {
 
 	/**
 	 * Initializes tracking by specifying the object's location using a quadrilateral. Some implementations can
-	 * fail if there is insufficient visual information for it to track.  All previous tracking information
+	 * fail if there is insufficient visual information for it to track. All previous tracking information
 	 * is discarded when this function is called.
 	 *
 	 * @param image Initial image in the sequence
@@ -63,7 +63,7 @@ public interface TrackerObjectQuad<T extends ImageBase<T>> {
 	void hint( Quadrilateral_F64 hint );
 
 	/**
-	 * Updates the tracks location using the latest video frame.  {@link #initialize(boofcv.struct.image.ImageBase, Quadrilateral_F64)}
+	 * Updates the tracks location using the latest video frame. {@link #initialize(boofcv.struct.image.ImageBase, Quadrilateral_F64)}
 	 * must be called once before this function can be called.
 	 *
 	 * @param image (Input) The next image in the video sequence.

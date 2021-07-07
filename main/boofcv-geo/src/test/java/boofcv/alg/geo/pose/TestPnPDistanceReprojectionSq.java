@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -40,8 +40,7 @@ public class TestPnPDistanceReprojectionSq extends BoofStandardJUnit {
 	/**
 	 * Provide an observation with a known solution and see if it is computed correctly
 	 */
-	@Test
-	public void checkErrorSingle() {
+	@Test void checkErrorSingle() {
 		DMatrixRMaj K = new DMatrixRMaj(3, 3, true, 100, 0.01, 200, 0, 150, 200, 0, 0, 1);
 
 		Se3_F64 worldToCamera = new Se3_F64();
@@ -75,8 +74,7 @@ public class TestPnPDistanceReprojectionSq extends BoofStandardJUnit {
 	/**
 	 * A very large error should be returned if the point appears behind the second camera
 	 */
-	@Test
-	public void checkBehindCamera() {
+	@Test void checkBehindCamera() {
 		DMatrixRMaj K = new DMatrixRMaj(3, 3, true, 100, 0.01, 200, 0, 150, 200, 0, 0, 1);
 
 		Se3_F64 worldToCamera = new Se3_F64();
@@ -99,8 +97,7 @@ public class TestPnPDistanceReprojectionSq extends BoofStandardJUnit {
 	/**
 	 * Check the array error function for accuracy
 	 */
-	@Test
-	public void checkErrorArray() {
+	@Test void checkErrorArray() {
 		double[] expected = new double[5];
 
 		DMatrixRMaj K = new DMatrixRMaj(3, 3, true, 100, 0.01, 200, 0, 150, 200, 0, 0, 1);

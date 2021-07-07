@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -44,8 +44,7 @@ public class TestImplWaveletTransformNaive extends BoofStandardJUnit {
 	/**
 	 * See if it can handle odd image sizes and output with extra padding
 	 */
-	@Test
-	public void encodeDecode_F32() {
+	@Test void encodeDecode_F32() {
 		testEncodeDecode_F32(20,30,20,30);
 		testEncodeDecode_F32(19,29,20,30);
 		testEncodeDecode_F32(19,29,22,32);
@@ -57,8 +56,7 @@ public class TestImplWaveletTransformNaive extends BoofStandardJUnit {
 	/**
 	 * See if it can handle odd image sizes and output with extra padding
 	 */
-	@Test
-	public void encodeDecode_I32() {
+	@Test void encodeDecode_I32() {
 		testEncodeDecode_I32(20,30,20,30);
 		testEncodeDecode_I32(19,29,20,30);
 		testEncodeDecode_I32(19,29,22,32);

@@ -38,11 +38,10 @@ public class TestDescribePointSurfPlanar extends BoofStandardJUnit {
 	int height = 250;
 
 	/**
-	 * Computes the descriptor inside a random image.  Sees if it has the expected results by comparing it to
+	 * Computes the descriptor inside a random image. Sees if it has the expected results by comparing it to
 	 * the single band algorithm which it uses internally.
 	 */
-	@Test
-	public void compareToSingleBand() {
+	@Test void compareToSingleBand() {
 		Planar<GrayF32> input = new Planar<>(GrayF32.class, width, height, 3);
 
 		GImageMiscOps.addUniform(input, rand, 0, 200);
@@ -87,8 +86,7 @@ public class TestDescribePointSurfPlanar extends BoofStandardJUnit {
 		}
 	}
 
-	@Test
-	public void failNumBandMissMatch() {
+	@Test void failNumBandMissMatch() {
 		Planar<GrayF32> input = new Planar<>(GrayF32.class, width, height, 3);
 
 		GImageMiscOps.addUniform(input, rand, 0, 200);
@@ -102,8 +100,7 @@ public class TestDescribePointSurfPlanar extends BoofStandardJUnit {
 				() -> alg.setImage(gray, input));
 	}
 
-	@Test
-	public void failShape() {
+	@Test void failShape() {
 		Planar<GrayF32> input = new Planar<>(GrayF32.class, width, height, 3);
 
 		GImageMiscOps.addUniform(input, rand, 0, 200);

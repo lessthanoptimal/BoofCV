@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -39,16 +39,14 @@ public class TestDescribeDenseHogAlg extends BoofStandardJUnit {
 	int widthCellsX = 3;
 	int widthCellsY = 4;
 
-	@Test
-	public void process() {
-		// intentionally left blank.  This is handled by image type specific checks
+	@Test void process() {
+		// intentionally left blank. This is handled by image type specific checks
 	}
 
 	/**
 	 * Tests to see if the weight has the expected shape or at least some of the expected characteristics.
 	 */
-	@Test
-	public void computeWeightBlockPixels() {
+	@Test void computeWeightBlockPixels() {
 		int pixelsPerCell = 3;
 		int cases[] = new int[]{3,4};
 
@@ -92,8 +90,7 @@ public class TestDescribeDenseHogAlg extends BoofStandardJUnit {
 	/**
 	 * Checks to see if the expected cells are modified in the descriptor
 	 */
-	@Test
-	public void computeCellHistogram() {
+	@Test void computeCellHistogram() {
 
 		DescribeDenseHogAlg<GrayF32> helper = new DescribeDenseHogAlg<>(
 				10,pixelsPerCell, widthCellsX, widthCellsY,1,imageType);
@@ -113,7 +110,7 @@ public class TestDescribeDenseHogAlg extends BoofStandardJUnit {
 				checkCellModified(helper.histogram,cellX+j,cellY+i, true);
 			}
 		}
-		// sanity check.  Shouldn't be modified
+		// sanity check. Shouldn't be modified
 		checkCellModified(helper.histogram,0,0, false);
 	}
 
@@ -128,8 +125,7 @@ public class TestDescribeDenseHogAlg extends BoofStandardJUnit {
 		fail("Not modified = "+modified);
 	}
 
-	@Test
-	public void addToHistogram() {
+	@Test void addToHistogram() {
 		DescribeDenseHogAlg<GrayF32> helper = new DescribeDenseHogAlg<>(
 				10,pixelsPerCell, widthCellsX, widthCellsX +1,1,imageType);
 

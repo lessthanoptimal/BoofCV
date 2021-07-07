@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -41,8 +41,7 @@ public class TestDistanceTranGivenRotSq extends BoofStandardJUnit {
 		alg = new DistanceTranGivenRotSq();
 	}
 
-	@Test
-	public void testPerfect() {
+	@Test void testPerfect() {
 		Se3_F64 keyToCurr = new Se3_F64();
 		keyToCurr.getR().setTo(ConvertRotation3D_F64.eulerToMatrix(EulerType.XYZ, 0.05, -0.03, 0.02, null));
 		keyToCurr.getT().setTo(0.1, -0.1, 0.01);
@@ -62,8 +61,7 @@ public class TestDistanceTranGivenRotSq extends BoofStandardJUnit {
 		assertEquals(0, alg.distance(obs), 1e-8);
 	}
 
-	@Test
-	public void testNoisy() {
+	@Test void testNoisy() {
 		Se3_F64 keyToCurr = new Se3_F64();
 		keyToCurr.getR().setTo(ConvertRotation3D_F64.eulerToMatrix(EulerType.XYZ, 0.05, -0.03, 0.02, null));
 		keyToCurr.getT().setTo(0.1, -0.1, 0.01);

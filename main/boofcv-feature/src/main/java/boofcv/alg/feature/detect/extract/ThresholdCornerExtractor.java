@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -23,7 +23,7 @@ import boofcv.struct.image.GrayF32;
 
 
 /**
- * All pixels which have an intensity above the specified threshold are considered to be features.  This will tend
+ * All pixels which have an intensity above the specified threshold are considered to be features. This will tend
  * to produce poor results because clusters are values will be above threshold.
  *
  * @author Peter Abeles

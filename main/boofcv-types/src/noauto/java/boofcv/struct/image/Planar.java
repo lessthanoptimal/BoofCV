@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -22,14 +22,14 @@ import java.lang.reflect.Array;
 
 /**
  * <p>
- * Multi-band image composed of discontinuous planar images for each band.  The bands are discontinuous in that
- * each one is an independent memory and are of type {@link ImageGray}.  Planar images fully supports all
+ * Multi-band image composed of discontinuous planar images for each band. The bands are discontinuous in that
+ * each one is an independent memory and are of type {@link ImageGray}. Planar images fully supports all
  * functions inside of {@link ImageBase}. Each internal image has the same width, height, startIndex, and stride.
  * </p>
  * 
  * <p>
  * For example, in a RGB image there would be three bands one for each color,
- * and each color would be stored in its own gray scale image.  To access the image for a particular
+ * and each color would be stored in its own gray scale image. To access the image for a particular
  * band call {@link #getBand(int)}. To get the RGB value for a pixel (x,y) one would need to:
  * <pre>
  * int red = image.getBand(0).get(x,y);
@@ -135,7 +135,7 @@ public class Planar<T extends ImageGray<T>> extends ImageMultiBand<Planar<T>>{
 	}
 
 	/**
-	 * Creates a sub-image from 'this' image.  The subimage will share the same internal array
+	 * Creates a sub-image from 'this' image. The subimage will share the same internal array
 	 * that stores each pixel's value, but will only pertain to an axis-aligned rectangular segment
 	 * of the original.
 	 *
@@ -194,7 +194,7 @@ public class Planar<T extends ImageGray<T>> extends ImageMultiBand<Planar<T>>{
 	}
 
 	/**
-	 * Changes the image's width and height without declaring new memory.  If the internal array
+	 * Changes the image's width and height without declaring new memory. If the internal array
 	 * is not large enough to store the new image an IllegalArgumentException is thrown.
 	 *
 	 * @param width The new width.
@@ -300,7 +300,7 @@ public class Planar<T extends ImageGray<T>> extends ImageMultiBand<Planar<T>>{
 	}
 
 	/**
-	 * Changes the number of bands in the image.  A new array is declared and individual bands are recycled
+	 * Changes the number of bands in the image. A new array is declared and individual bands are recycled
 	 * if possible
 	 * @param numberOfBands New number of bands in the image.
 	 */

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -35,10 +35,10 @@ import georegression.struct.curve.EllipseRotated_F64;
  * and if there is still ambiguity the ellipse closest to the image origin will be selected as (0,0).</p>
  *
  * <p>
- * For each circle there is one control point.  The control point is first found by detecting all the ellipses, which
- * is what a circle appears to be under perspective distortion.  The center the ellipse might not match the physical
- * center of the circle.  The intersection of lines does not change under perspective distortion.  The outer common
- * tangent lines between neighboring ellipses are found.  Then the intersection of two such lines is found.  This
+ * For each circle there is one control point. The control point is first found by detecting all the ellipses, which
+ * is what a circle appears to be under perspective distortion. The center the ellipse might not match the physical
+ * center of the circle. The intersection of lines does not change under perspective distortion. The outer common
+ * tangent lines between neighboring ellipses are found. Then the intersection of two such lines is found. This
  * intersection will be the physical center of the circle.
  * </p>
  *
@@ -113,17 +113,17 @@ public class DetectCircleHexagonalGrid<T extends ImageGray<T>> extends DetectCir
 					rotateGridCCW(g);
 				}
 			} else if( numRotationsCCW == 2 ){
-				// only two valid solutions.  rotate only if the other valid solution is better
+				// only two valid solutions. rotate only if the other valid solution is better
 				rotateGridCCW(g);
 				rotateGridCCW(g);
 			}
 		} else if( g.columns%2 == 1 ) {
-			// only two solutions.  Go with the one which maintains orientation constraint
+			// only two solutions. Go with the one which maintains orientation constraint
 			if( isClockWise(g)) {
 				flipHorizontal(g);
 			}
 		} else if( g.rows%2 == 1 ) {
-			// only two solutions.  Go with the one which maintains orientation constraint
+			// only two solutions. Go with the one which maintains orientation constraint
 			if( isClockWise(g)) {
 				flipVertical(g);
 			}

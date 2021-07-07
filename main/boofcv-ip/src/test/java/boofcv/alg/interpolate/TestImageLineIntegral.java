@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -44,8 +44,7 @@ public class TestImageLineIntegral extends BoofStandardJUnit {
 	/**
 	 * The same two points are passed in for the end points
 	 */
-	@Test
-	public void zeroLengthLine() {
+	@Test void zeroLengthLine() {
 		GrayU8 img = new GrayU8(10,15);
 		img.set(6,6,100);
 
@@ -58,8 +57,7 @@ public class TestImageLineIntegral extends BoofStandardJUnit {
 	/**
 	 * Tests an integral inside a single pixel where x or y slope is zero
 	 */
-	@Test
-	public void inside_SlopeZero() {
+	@Test void inside_SlopeZero() {
 		GrayU8 img = new GrayU8(10,15);
 		img.set(6,6,100);
 
@@ -77,8 +75,7 @@ public class TestImageLineIntegral extends BoofStandardJUnit {
 	/**
 	 * Test cases where the slope for x or y is zero across multiple pixels
 	 */
-	@Test
-	public void across_SlopeZero() {
+	@Test void across_SlopeZero() {
 		GrayU8 img = new GrayU8(10,15);
 		img.set(6,6,100);
 		img.set(6,7,50);
@@ -105,8 +102,7 @@ public class TestImageLineIntegral extends BoofStandardJUnit {
 	 * Test cases where the slope for x or y is zero across multiple pixels and sampling is done near the image
 	 * border
 	 */
-	@Test
-	public void nearBorder_SlopeZero() {
+	@Test void nearBorder_SlopeZero() {
 		GrayU8 img = new GrayU8(10,15);
 		img.set(0,0,100);
 		img.set(9,14,120);
@@ -123,8 +119,7 @@ public class TestImageLineIntegral extends BoofStandardJUnit {
 	/**
 	 * See if it calculates the integral correctly inside a single pixel
 	 */
-	@Test
-	public void inside_nonZero() {
+	@Test void inside_nonZero() {
 		GrayU8 img = new GrayU8(10,15);
 		ImageMiscOps.fill(img,255);
 		img.set(6,6,100);
@@ -144,8 +139,7 @@ public class TestImageLineIntegral extends BoofStandardJUnit {
 	/**
 	 * Move across multiple squares
 	 */
-	@Test
-	public void across_nonZero() {
+	@Test void across_nonZero() {
 		GrayU8 img = new GrayU8(10,15);
 		ImageMiscOps.fill(img, 255);
 		img.set(6,6,100);
@@ -182,8 +176,7 @@ public class TestImageLineIntegral extends BoofStandardJUnit {
 	/**
 	 * See if it handles borders correctly with both slopes are not zero
 	 */
-	@Test
-	public void nearBorder_nonZero() {
+	@Test void nearBorder_nonZero() {
 		GrayU8 img = new GrayU8(2,2);
 		img.set(0,0,100);
 		img.set(0,1,200);
@@ -201,8 +194,7 @@ public class TestImageLineIntegral extends BoofStandardJUnit {
 		checkSolution(0, 0, 1, 2, r * (100+200));
 	}
 
-	@Test
-	public void isInside() {
+	@Test void isInside() {
 		GrayU8 img = new GrayU8(12,14);
 		alg.setImage(FactoryGImageGray.wrap(img));
 		assertTrue(alg.isInside(0,0));

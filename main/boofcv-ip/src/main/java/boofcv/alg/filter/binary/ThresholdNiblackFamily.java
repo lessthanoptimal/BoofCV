@@ -98,8 +98,8 @@ public class ThresholdNiblackFamily implements InputToBinary<GrayF32> {
 	/**
 	 * Configures the algorithm.
 	 *
-	 * @param width size of local region.  Try 31
-	 * @param k User specified threshold adjustment factor.  Must be positive. Try 0.3
+	 * @param width size of local region. Try 31
+	 * @param k User specified threshold adjustment factor. Must be positive. Try 0.3
 	 * @param down Threshold down or up
 	 */
 	public ThresholdNiblackFamily( ConfigLength width, float k, boolean down, Variant variant ) {
@@ -118,8 +118,8 @@ public class ThresholdNiblackFamily implements InputToBinary<GrayF32> {
 	/**
 	 * Converts the input image into a binary image.
 	 *
-	 * @param input Input image.  Not modified.
-	 * @param output Output binary image.  Modified.
+	 * @param input Input image. Not modified.
+	 * @param output Output binary image. Modified.
 	 */
 	@Override
 	public void process( GrayF32 input, GrayU8 output ) {

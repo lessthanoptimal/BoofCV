@@ -27,21 +27,21 @@ import java.util.List;
 /**
  * <p>
  * Mean shift tracker which adjusts the scale (or bandwidth) to account for changes in scale of the target
- * and is based off of [1].  The tracker seeks to minimize the histogram error within the sampled region.
- * The mean-shift region is sampled using an oriented rectangle and weighted using a 2D gaussian.  The target
+ * and is based off of [1]. The tracker seeks to minimize the histogram error within the sampled region.
+ * The mean-shift region is sampled using an oriented rectangle and weighted using a 2D gaussian. The target
  * is modeled using a color histogram of the input image, which can be optionally updated after each frame
  * is processed. It can also be configured to not allow scale changes, which can improve stability.
  * </p>
  *
  * <p>
  * Scale selection is done using sum-of-absolute-difference (SAD) error instead of Bhattacharyya as the paper
- * suggests.  Situations where found that two errors counteracted each other when using Bhattacharyya
+ * suggests. Situations where found that two errors counteracted each other when using Bhattacharyya
  * and the incorrect scale would be selected even with perfect data.
  * </p>
  *
  * <p>
- * Another difference from the paper is that mean shift records which hypothesis has the best SAD error.  After
- * mean-shift stops iterating it selects the best solution.  This is primarily helpful in situations where mean-shift
+ * Another difference from the paper is that mean shift records which hypothesis has the best SAD error. After
+ * mean-shift stops iterating it selects the best solution. This is primarily helpful in situations where mean-shift
  * doesn't converge in time and jumped away from the solution.
  * </p>
  *
@@ -79,7 +79,7 @@ public class TrackerMeanShiftComaniciu2003<T extends ImageBase<T>> {
 	private float[] histogram1;
 	private float[] histogram2;
 
-	// weighting factor for change in scale. 0 to 1.  0 is 100% selected region
+	// weighting factor for change in scale. 0 to 1. 0 is 100% selected region
 	private float gamma;
 
 	// should it update the histogram after tracking?
@@ -97,13 +97,13 @@ public class TrackerMeanShiftComaniciu2003<T extends ImageBase<T>> {
 	 * Configures tracker.
 	 *
 	 * @param updateHistogram If true the histogram will be updated using the most recent image. Try true.
-	 * @param maxIterations Maximum number of mean-shift iterations.  Try 30
-	 * @param minimumChange Mean-shift will stop when the change is below this threshold.  Try 1e-4f
-	 * @param gamma Scale weighting factor.  Value from 0 to 1. Closer to 0 the more it will prefer
-	 * the most recent estimate.  Try 0.1
-	 * @param minimumSizeRatio Fraction of the original region that the track is allowed to shrink to.  Try 0.25
-	 * @param scaleChange The scale can be changed by this much between frames.  0 to 1.  0 = no scale change. 0.1 is
-	 * recommended value in paper.  no scale change is more stable.
+	 * @param maxIterations Maximum number of mean-shift iterations. Try 30
+	 * @param minimumChange Mean-shift will stop when the change is below this threshold. Try 1e-4f
+	 * @param gamma Scale weighting factor. Value from 0 to 1. Closer to 0 the more it will prefer
+	 * the most recent estimate. Try 0.1
+	 * @param minimumSizeRatio Fraction of the original region that the track is allowed to shrink to. Try 0.25
+	 * @param scaleChange The scale can be changed by this much between frames. 0 to 1. 0 = no scale change. 0.1 is
+	 * recommended value in paper. no scale change is more stable.
 	 * @param calcHistogram Calculates the histogram
 	 */
 	public TrackerMeanShiftComaniciu2003( boolean updateHistogram,
@@ -286,7 +286,7 @@ public class TrackerMeanShiftComaniciu2003<T extends ImageBase<T>> {
 				if (histIndex < 0)
 					continue;
 
-				// compute the weight derived from the Bhattacharyya coefficient.  Equation 10.
+				// compute the weight derived from the Bhattacharyya coefficient. Equation 10.
 				float w = weightHistogram[histIndex];
 
 				meanX += w*samplePt.x;
@@ -317,7 +317,7 @@ public class TrackerMeanShiftComaniciu2003<T extends ImageBase<T>> {
 	}
 
 	/**
-	 * Update the weights for each element in the histogram.  Weights are used to favor colors which are
+	 * Update the weights for each element in the histogram. Weights are used to favor colors which are
 	 * less than expected.
 	 */
 	private void updateWeights( float[] histogram ) {
@@ -332,8 +332,8 @@ public class TrackerMeanShiftComaniciu2003<T extends ImageBase<T>> {
 	/**
 	 * Computes the difference between two histograms using SAD.
 	 *
-	 * This is a change from the paper, which uses Bhattacharyya.  Bhattacharyya could give poor performance
-	 * even with perfect data since two errors can cancel each other out.  For example, part of the histogram
+	 * This is a change from the paper, which uses Bhattacharyya. Bhattacharyya could give poor performance
+	 * even with perfect data since two errors can cancel each other out. For example, part of the histogram
 	 * is too small and another part is too large.
 	 */
 	protected double distanceHistogram( float[] histogramA, float[] histogramB ) {

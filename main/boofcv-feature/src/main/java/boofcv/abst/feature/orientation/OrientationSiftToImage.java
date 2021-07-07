@@ -27,7 +27,7 @@ import boofcv.struct.image.GrayF32;
 import boofcv.struct.image.ImageGray;
 
 /**
- * Wrapper around {@link OrientationHistogramSift} for {@link OrientationImage}.  Selects
+ * Wrapper around {@link OrientationHistogramSift} for {@link OrientationImage}. Selects
  * the best solution from the multiple solutions.
  *
  * @author Peter Abeles

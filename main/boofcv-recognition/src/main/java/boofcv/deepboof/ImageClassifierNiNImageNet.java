@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -36,7 +36,7 @@ import java.util.List;
 import static deepboof.misc.TensorOps.WI;
 
 /**
- * <p>Pretrained Network-in-Network (NiN) image classifier using imagenet data.  Trained by szagoruyko [1,2] and
+ * <p>Pretrained Network-in-Network (NiN) image classifier using imagenet data. Trained by szagoruyko [1,2] and
  * achieves 62.6% top1 center crop accuracy on validation set.</p>
  *
  * <p>

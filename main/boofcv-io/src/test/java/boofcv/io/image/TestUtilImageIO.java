@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -41,8 +41,7 @@ public class TestUtilImageIO extends BoofStandardJUnit {
 	int width = 20;
 	int height = 30;
 
-	@Test
-	public void loadImage_saveImage() throws IOException {
+	@Test void loadImage_saveImage() throws IOException {
 		BufferedImage orig = new BufferedImage(width,height,BufferedImage.TYPE_BYTE_GRAY);
 		for( int i = 0; i < height; i++ ) {
 			for( int j = 0; j < width; j++ ) {
@@ -71,8 +70,7 @@ public class TestUtilImageIO extends BoofStandardJUnit {
 		assertTrue(temp.delete());
 	}
 
-	@Test
-	public void loadImage_saveImage_PPM() throws IOException {
+	@Test void loadImage_saveImage_PPM() throws IOException {
 
 		Planar<GrayU8> orig = new Planar<>(GrayU8.class,width,height,3);
 		GImageMiscOps.fillUniform(orig,rand,0,256);
@@ -92,8 +90,7 @@ public class TestUtilImageIO extends BoofStandardJUnit {
 		temp.delete();// no assertTrue() here because in windows it will fail
 	}
 
-	@Test
-	public void loadImage_saveImage_PGM() throws IOException {
+	@Test void loadImage_saveImage_PGM() throws IOException {
 		GrayU8 orig = new GrayU8(width,height);
 		GImageMiscOps.fillUniform(orig,rand,0,256);
 
@@ -114,8 +111,7 @@ public class TestUtilImageIO extends BoofStandardJUnit {
 	/**
 	 * See if load image fails gracefully if an image is not present
 	 */
-	@Test
-	public void loadImage_negative() {
+	@Test void loadImage_negative() {
 		assertTrue( UtilImageIO.loadImage("asdasdasdasd") == null );
 	}
 

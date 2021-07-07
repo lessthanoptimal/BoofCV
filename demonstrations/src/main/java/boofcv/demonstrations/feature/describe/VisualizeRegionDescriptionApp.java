@@ -60,7 +60,7 @@ public class VisualizeRegionDescriptionApp<T extends ImageGray<T>>
 
 	private TupleDescPanel tuplePanel = new TupleDescPanel();
 
-	// most recently requested pixel description.  Used when the algorithm is changed
+	// most recently requested pixel description. Used when the algorithm is changed
 	private Point2D_I32 targetPt;
 	private double targetRadius;
 	private double targetOrientation;
@@ -123,7 +123,7 @@ public class VisualizeRegionDescriptionApp<T extends ImageGray<T>>
 	}
 
 	/**
-	 * Extracts the target description and updates the panel.  Should only be called from a swing thread
+	 * Extracts the target description and updates the panel. Should only be called from a swing thread
 	 */
 	private void updateTargetDescription() {
 		synchronized (lock) {

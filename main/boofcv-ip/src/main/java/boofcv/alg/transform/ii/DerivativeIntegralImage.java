@@ -30,7 +30,7 @@ public class DerivativeIntegralImage {
 	/**
 	 * Creates a kernel for a symmetric box derivative.
 	 *
-	 * @param r Radius of the box.  width is 2*r+1
+	 * @param r Radius of the box. width is 2*r+1
 	 * @return Kernel Kernel for derivative.
 	 */
 	public static IntegralKernel kernelDerivX( int r, @Nullable IntegralKernel ret ) {
@@ -55,7 +55,7 @@ public class DerivativeIntegralImage {
 	/**
 	 * Creates a kernel for a symmetric box derivative.
 	 *
-	 * @param r Radius of the box.  width is 2*r+1
+	 * @param r Radius of the box. width is 2*r+1
 	 * @return Kernel Kernel for derivative.
 	 */
 	public static IntegralKernel kernelDerivY( int r, @Nullable IntegralKernel ret ) {
@@ -72,7 +72,7 @@ public class DerivativeIntegralImage {
 	/**
 	 * Creates a kernel for the Haar wavelet "centered" around the target pixel.
 	 *
-	 * @param r Radius of the box.  width is 2*r
+	 * @param r Radius of the box. width is 2*r
 	 * @return Kernel for a Haar x-axis wavelet.
 	 */
 	public static IntegralKernel kernelHaarX( int r, @Nullable IntegralKernel ret ) {
@@ -89,7 +89,7 @@ public class DerivativeIntegralImage {
 	/**
 	 * Creates a kernel for the Haar wavelet "centered" around the target pixel.
 	 *
-	 * @param r Radius of the box.  width is 2*r
+	 * @param r Radius of the box. width is 2*r
 	 * @return Kernel for a Haar y-axis wavelet.
 	 */
 	public static IntegralKernel kernelHaarY( int r, @Nullable IntegralKernel ret ) {

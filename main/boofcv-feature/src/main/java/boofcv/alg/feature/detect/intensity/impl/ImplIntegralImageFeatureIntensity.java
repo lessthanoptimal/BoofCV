@@ -136,7 +136,7 @@ public class ImplIntegralImageFeatureIntensity {
 //CONCURRENT_OMIT_END
 
 	/**
-	 * Optimizes intensity for the inner image.  
+	 * Optimizes intensity for the inner image.
 	 */
 	public static void hessianInner( GrayF32 integral, int skip , int size ,
 									 GrayF32 intensity) {
@@ -319,7 +319,7 @@ public class ImplIntegralImageFeatureIntensity {
 //CONCURRENT_OMIT_END
 
 	/**
-	 * Optimizes intensity for the inner image.  
+	 * Optimizes intensity for the inner image.
 	 */
 	public static void hessianInner( GrayS32 integral, int skip , int size ,
 									 GrayF32 intensity) {

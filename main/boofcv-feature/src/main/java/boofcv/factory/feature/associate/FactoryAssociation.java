@@ -180,9 +180,9 @@ public class FactoryAssociation {
 	 * freedom, e.g. &gt; 20
 	 *
 	 * @param dimension Number of elements in the feature vector
-	 * @param numTrees Number of trees that are considered.  Try 10 and tune.
-	 * @param numConsiderSplit Number of nodes that are considered when generating a tree.  Must be less than the
-	 * point's dimension.  Try 5
+	 * @param numTrees Number of trees that are considered. Try 10 and tune.
+	 * @param numConsiderSplit Number of nodes that are considered when generating a tree. Must be less than the
+	 * point's dimension. Try 5
 	 * @param randomSeed Seed used by random number generator
 	 * @return Association using approximate nearest neighbor
 	 * @see AssociateNearestNeighbor_ST
@@ -285,11 +285,11 @@ public class FactoryAssociation {
 	}
 
 	/**
-	 * Scores features based on the Euclidean distance between them.  The square is often used instead
+	 * Scores features based on the Euclidean distance between them. The square is often used instead
 	 * of the Euclidean distance since it is much faster to compute.
 	 *
 	 * @param tupleType Type of descriptor being scored
-	 * @param squared IF true the distance squared is returned.  Usually true
+	 * @param squared IF true the distance squared is returned. Usually true
 	 * @return Euclidean distance measure
 	 */
 	public static <D>

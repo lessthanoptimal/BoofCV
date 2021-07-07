@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -104,8 +104,7 @@ public abstract class GenericBinaryContourInterface extends BoofStandardJUnit {
 
 	protected abstract BinaryContourInterface create();
 
-	@Test
-	public void checkDefaults() {
+	@Test void checkDefaults() {
 		BinaryContourInterface alg = create();
 
 		assertEquals(ConnectRule.FOUR,alg.getConnectRule());

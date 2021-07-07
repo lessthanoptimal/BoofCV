@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -32,8 +32,7 @@ public class TestTriangulateMetricLinearDLT extends CommonTriangulationChecks {
 	/**
 	 * Create 3 perfect observations and solve for the position
 	 */
-	@Test
-	public void triangulate_N() {
+	@Test void triangulate_N() {
 		createScene();
 
 		TriangulateMetricLinearDLT alg = new TriangulateMetricLinearDLT();
@@ -50,8 +49,7 @@ public class TestTriangulateMetricLinearDLT extends CommonTriangulationChecks {
 	/**
 	 * Create 2 perfect observations and solve for the position
 	 */
-	@Test
-	public void triangulate_two() {
+	@Test void triangulate_two() {
 		createScene();
 
 		TriangulateMetricLinearDLT alg = new TriangulateMetricLinearDLT();

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -26,8 +26,8 @@ import boofcv.struct.image.GrayS16;
 import boofcv.struct.image.GrayU8;
 
 /**
- * Performs a convolution around a single pixel only.  The whole kernel must be contained inside the image, border
- * cases are not handled.  Sparse convolutions are useful when sub-sampling an image.
+ * Performs a convolution around a single pixel only. The whole kernel must be contained inside the image, border
+ * cases are not handled. Sparse convolutions are useful when sub-sampling an image.
  *
  * @author Peter Abeles
  */

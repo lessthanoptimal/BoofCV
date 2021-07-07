@@ -53,8 +53,7 @@ public class TestTldTemplateMatching extends BoofStandardJUnit {
 		interpolate.setImage(input);
 	}
 
-	@Test
-	public void addDescriptor() {
+	@Test void addDescriptor() {
 		TldTemplateMatching alg = new TldTemplateMatching(interpolate);
 		alg.setImage(input);
 
@@ -83,8 +82,7 @@ public class TestTldTemplateMatching extends BoofStandardJUnit {
 		assertEquals(1,alg.getTemplateNegative().size());
 	}
 
-	@Test
-	public void computeNccDescriptor() {
+	@Test void computeNccDescriptor() {
 		TldTemplateMatching alg = new TldTemplateMatching(interpolate);
 		alg.setImage(input);
 
@@ -99,8 +97,7 @@ public class TestTldTemplateMatching extends BoofStandardJUnit {
 		assertEquals(expected.mean, found.mean, 1e-8);
 	}
 
-	@Test
-	public void reset() {
+	@Test void reset() {
 		TldTemplateMatching alg = new TldTemplateMatching(interpolate);
 		alg.setImage(input);
 
@@ -116,8 +113,7 @@ public class TestTldTemplateMatching extends BoofStandardJUnit {
 		assertEquals(2,alg.unused.size());
 	}
 
-	@Test
-	public void createDescriptor() {
+	@Test void createDescriptor() {
 		TldTemplateMatching alg = new TldTemplateMatching(interpolate);
 
 		assertTrue(alg.createDescriptor() != null);
@@ -127,8 +123,7 @@ public class TestTldTemplateMatching extends BoofStandardJUnit {
 		assertEquals(0, alg.unused.size());
 	}
 
-	@Test
-	public void computeConfidence() {
+	@Test void computeConfidence() {
 		TldTemplateMatching alg = new TldTemplateMatching(interpolate);
 		alg.setImage(input);
 
@@ -142,8 +137,7 @@ public class TestTldTemplateMatching extends BoofStandardJUnit {
 		assertTrue(found >= 0 && found <= 1);
 	}
 
-	@Test
-	public void distance() {
+	@Test void distance() {
 		TldTemplateMatching alg = new TldTemplateMatching(interpolate);
 		alg.setImage(input);
 

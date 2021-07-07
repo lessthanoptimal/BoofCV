@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -19,8 +19,8 @@
 package boofcv.struct.convolve;
 
 /**
- * This is a kernel in a 1D convolution.  The kernel's width is the number of elements in it
- * and must be an odd number.  A kernel's radius is defined as the width divided by two.
+ * This is a kernel in a 1D convolution. The kernel's width is the number of elements in it
+ * and must be an odd number. A kernel's radius is defined as the width divided by two.
  *
  * @author Peter Abeles
  */

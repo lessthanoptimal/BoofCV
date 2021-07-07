@@ -22,8 +22,8 @@ import georegression.struct.point.Point2D_F64;
 import org.ddogleg.struct.FastAccess;
 
 /**
- * Associates features from two images together using both 2D location and descriptor information.  Each
- * source feature is paired up with a single feature in the destination.  If a match is not found then it
+ * Associates features from two images together using both 2D location and descriptor information. Each
+ * source feature is paired up with a single feature in the destination. If a match is not found then it
  * is added to the unassociated list.
  *
  * @param <Desc> Feature description type.

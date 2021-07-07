@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -53,8 +53,7 @@ public abstract class GenericTestDiscreteFourierTransform<T extends ImageGray<T>
 	/**
 	 * Check correctness by having it convert an image to and from
 	 */
-	@Test
-	public void forwardsBackwards() {
+	@Test void forwardsBackwards() {
 
 		for( int h = 2; h < 10; h++ ) {
 			for( int w = 1; w < 10; w++ ) {
@@ -84,14 +83,13 @@ public abstract class GenericTestDiscreteFourierTransform<T extends ImageGray<T>
 	/**
 	 * The zero frequency should be the average image intensity
 	 */
-	@Test
-	public void zeroFrequency() {
+	@Test void zeroFrequency() {
 		T input = createImage(20,25);
 		I transform = createTransform(20,25);
 
 		GImageMiscOps.fillUniform(input,rand,-20,20);
 		double value = GImageStatistics.sum(input);
-		// NOTE: the value probably depends on when the scaling is invoked.  Must need to be more robust here
+		// NOTE: the value probably depends on when the scaling is invoked. Must need to be more robust here
 
 		DiscreteFourierTransform<T,I> alg = createAlgorithm();
 
@@ -106,16 +104,14 @@ public abstract class GenericTestDiscreteFourierTransform<T extends ImageGray<T>
 	/**
 	 * Call the same instance multiples times with images of the same size
 	 */
-	@Test
-	public void multipleCalls_sameSize() {
+	@Test void multipleCalls_sameSize() {
 		checkMultipleCalls(new int[]{52, 52, 52});
 	}
 
 	/**
 	 * Call the same instance multiple times with images of different sizes
 	 */
-	@Test
-	public void multipleCalls_differentSizes() {
+	@Test void multipleCalls_differentSizes() {
 		checkMultipleCalls(new int[]{1,10,100});
 	}
 
@@ -139,8 +135,7 @@ public abstract class GenericTestDiscreteFourierTransform<T extends ImageGray<T>
 	/**
 	 * See if the fourier transform is the expected one for even sizes images
 	 */
-	@Test
-	public void format_even() {
+	@Test void format_even() {
 		T input = createImage(10,1);
 		I transform = createTransform(10,1);
 		GImageMiscOps.fillUniform(input,rand,-20,20);
@@ -155,8 +150,7 @@ public abstract class GenericTestDiscreteFourierTransform<T extends ImageGray<T>
 	/**
 	 * See if the fourier transform is the expected one for odd sizes images
 	 */
-	@Test
-	public void format_odd() {
+	@Test void format_odd() {
 		T input = createImage(7,1);
 		I transform = createTransform(7,1);
 		GImageMiscOps.fillUniform(input,rand,-20,20);
@@ -168,8 +162,7 @@ public abstract class GenericTestDiscreteFourierTransform<T extends ImageGray<T>
 		assertEquals( GeneralizedImageOps.get(transform,3,0,1),-GeneralizedImageOps.get(transform,4,0,1),tolerance);
 	}
 
-	@Test
-	public void subimage() {
+	@Test void subimage() {
 		int w = 20;
 		int h = 32;
 		T input = createImage(w,h);
@@ -207,8 +200,7 @@ public abstract class GenericTestDiscreteFourierTransform<T extends ImageGray<T>
 		}
 	}
 
-	@Test
-	public void checkDoNotModifyInputs() {
+	@Test void checkDoNotModifyInputs() {
 		int w = 20;
 		int h = 32;
 		T input = createImage(w,h);
@@ -232,8 +224,7 @@ public abstract class GenericTestDiscreteFourierTransform<T extends ImageGray<T>
 	/**
 	 * It should produce identical results with the modify flag set to true
 	 */
-	@Test
-	public void checkSameResultsWithModify() {
+	@Test void checkSameResultsWithModify() {
 		for( int h = 1; h < 10; h++ ) {
 			for( int w = 1; w < 10; w++ ) {
 				checkSameResultsWithModify(w, h);
@@ -272,8 +263,7 @@ public abstract class GenericTestDiscreteFourierTransform<T extends ImageGray<T>
 	/**
 	 * Makes sure it only accepts images which are the correct size
 	 */
-	@Test
-	public void inputImageSize() {
+	@Test void inputImageSize() {
 		int width = 20;
 		int height = 25;
 		T input = createImage(width,height);

@@ -26,7 +26,7 @@ import boofcv.struct.image.*;
  * <p>
  * Operations related to down sampling image by computing the average within square regions. The first square region is
  * from (0,0) to
- * (w-1,w-1), inclusive.  Each square region after that is found by skipping over 'w' pixels in x and y directions.
+ * (w-1,w-1), inclusive. Each square region after that is found by skipping over 'w' pixels in x and y directions.
  * partial regions along the right and bottom borders are handled by computing the average with the rectangle defined
  * by the intersection of the image and the square region.
  * </p>
@@ -98,7 +98,7 @@ public class AverageDownSampleOps {
 	}
 
 	/**
-	 * Down samples image.  Type checking is done at runtime.
+	 * Down samples image. Type checking is done at runtime.
 	 *
 	 * @param input Input image. Not modified.
 	 * @param sampleWidth Width of square region.
@@ -125,7 +125,7 @@ public class AverageDownSampleOps {
 	}
 
 	/**
-	 * Down samples image.  Type checking is done at runtime.
+	 * Down samples image. Type checking is done at runtime.
 	 *
 	 * @param input Input image. Not modified.
 	 * @param output Output image. Modified.
@@ -180,7 +180,7 @@ public class AverageDownSampleOps {
 	}
 
 	/**
-	 * Down samples a planar image.  Type checking is done at runtime.
+	 * Down samples a planar image. Type checking is done at runtime.
 	 *
 	 * @param input Input image. Not modified.
 	 * @param sampleWidth Width of square region.
@@ -194,7 +194,7 @@ public class AverageDownSampleOps {
 	}
 
 	/**
-	 * Down samples a planar image.  Type checking is done at runtime.
+	 * Down samples a planar image. Type checking is done at runtime.
 	 *
 	 * @param input Input image. Not modified.
 	 * @param output Output image. Modified.

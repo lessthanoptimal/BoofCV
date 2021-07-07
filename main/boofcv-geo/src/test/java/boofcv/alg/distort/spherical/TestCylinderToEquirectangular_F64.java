@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -77,7 +77,7 @@ class TestCylinderToEquirectangular_F64 extends TestEquirectangularDistortBase_F
 	}
 
 	/**
-	 * Crude vector check.  Make sure it's pointing -z at top of image and +z at bottom
+	 * Crude vector check. Make sure it's pointing -z at top of image and +z at bottom
 	 */
 	@Test
 	void checkVectors() {

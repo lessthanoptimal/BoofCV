@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -60,8 +60,7 @@ public abstract class GenericBackgroundModelMovingChecks extends BoofStandardJUn
 	 * Basic check were multiple images are feed into the algorithm and another image,
 	 * which has a region which is clearly different is then segmented.
 	 */
-	@Test
-	public void basicCheck() {
+	@Test void basicCheck() {
 		for( ImageType type : imageTypes ) {
 			basicCheck(type);
 		}
@@ -110,11 +109,10 @@ public abstract class GenericBackgroundModelMovingChecks extends BoofStandardJUn
 	}
 
 	/**
-	 * The current image is partially outside of the background image.  Check to see if it blows up
+	 * The current image is partially outside of the background image. Check to see if it blows up
 	 * and that segmented pixels are correctly marked as inside or outside
 	 */
-	@Test
-	public void currentOutsideBackground() {
+	@Test void currentOutsideBackground() {
 		for( ImageType type : imageTypes ) {
 			currentOutsideBackground(type);
 		}
@@ -196,8 +194,7 @@ public abstract class GenericBackgroundModelMovingChecks extends BoofStandardJUn
 	/**
 	 * If a pixel in the current frame goes outside the background it should be marked as background
 	 */
-	@Test
-	public void markNoBackgroundAsBackground() {
+	@Test void markNoBackgroundAsBackground() {
 		for( ImageType type : imageTypes ) {
 			markNoBackgroundAsBackground(type);
 		}
@@ -231,8 +228,7 @@ public abstract class GenericBackgroundModelMovingChecks extends BoofStandardJUn
 	/**
 	 * Mark pixels which haven't been observed as unknown
 	 */
-	@Test
-	public void markUnobservedAsUnknown() {
+	@Test void markUnobservedAsUnknown() {
 		for( ImageType type : imageTypes ) {
 			markUnobservedAsUnknown(type);
 		}
@@ -262,8 +258,7 @@ public abstract class GenericBackgroundModelMovingChecks extends BoofStandardJUn
 	/**
 	 * Sees if reset discard the previous history in the background image
 	 */
-	@Test
-	public void reset() {
+	@Test void reset() {
 		for( ImageType type : imageTypes ) {
 			reset(type);
 		}
@@ -295,13 +290,12 @@ public abstract class GenericBackgroundModelMovingChecks extends BoofStandardJUn
 		GImageMiscOps.fill(frame,100);
 		ImageMiscOps.fill(expected,1);
 
-		// it should be all changed.  really just a sanity check
+		// it should be all changed. really just a sanity check
 		alg.segment(homeToCurrent,frame,segmented);
 		BoofTesting.assertEquals(expected,segmented,1e-8);
 	}
 
-	@Test
-	public void checkSubImage() {
+	@Test void checkSubImage() {
 		for( ImageType type : imageTypes ) {
 			checkSubImage(type);
 		}

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -29,7 +29,7 @@ import org.ejml.interfaces.decomposition.SingularValueDecomposition_F64;
 
 /**
  * <p>
- * Applies geometric constraints to an estimated trifocal tensor.  See page 394 in [1].
+ * Applies geometric constraints to an estimated trifocal tensor. See page 394 in [1].
  * </p>
  *
  * <p>References:</p>
@@ -63,7 +63,7 @@ public class EnforceTrifocalGeometry {
 
 	// From the definition of the trifocal tensor: T_i = a_i*b_4^T + a_4*b_i^T
 	// Columns of E are multiplied by the following unknowns:
-	// [a(0,0) , a(0,1) , a(0,2) , a(1,0) ....  b(0,0) , b(0,1) , b(0,2) , b(1,0) ]
+	// [a(0,0) , a(0,1) , a(0,2) , a(1,0) .... b(0,0) , b(0,1) , b(0,2) , b(1,0) ]
 	// Where a and b are elements of 3x3 matrices A and B in the P2 = [A|e2] P3=[B|e3]
 	protected DMatrixRMaj E = new DMatrixRMaj(27,18);
 
@@ -75,7 +75,7 @@ public class EnforceTrifocalGeometry {
 
 	/**
 	 * Computes a trifocal tensor which minimizes the algebraic error given the
-	 * two epipoles and the linear constraint matrix.  The epipoles are from a previously
+	 * two epipoles and the linear constraint matrix. The epipoles are from a previously
 	 * computed trifocal tensor.
 	 *
 	 * @param e2 Epipole of first image in the second image
@@ -117,7 +117,7 @@ public class EnforceTrifocalGeometry {
 	}
 
 	/**
-	 * Returns the algebraic error vector. error = A*U*x.  length = number
+	 * Returns the algebraic error vector. error = A*U*x. length = number
 	 * of observations
 	 */
 	public void computeErrorVector( DMatrixRMaj A , DMatrixRMaj errors ) {
@@ -133,8 +133,8 @@ public class EnforceTrifocalGeometry {
 	}
 
 	/**
-	 * The matrix E is a linear system for computing the trifocal tensor.  The columns
-	 * are the unknown square matrices from view 2 and 3.  The right most column in
+	 * The matrix E is a linear system for computing the trifocal tensor. The columns
+	 * are the unknown square matrices from view 2 and 3. The right most column in
 	 * both projection matrices are the provided epipoles, whose values are inserted into E
 	 */
 	protected void constructE( Point3D_F64 e2 , Point3D_F64 e3 ) {

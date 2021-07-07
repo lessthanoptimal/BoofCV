@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -29,7 +29,7 @@ import java.util.List;
 /**
  * <p>
  * Solves for the 3 unknown distances between camera center and 3 observed points by finding the roots of a 4th order
- * polynomial,  This is probably the first solution to the P3P problem and first proposed in 1841 by Grunert.  This
+ * polynomial,  This is probably the first solution to the P3P problem and first proposed in 1841 by Grunert. This
  * implementation is based off the discussion in [1]. There are up to four solutions.
  * </p>
  *
@@ -73,7 +73,7 @@ public class P3PGrunert implements P3PLineDistance {
 
 		double a = length23, b = length13, c = length12;
 
-		// divide out numbers before multiplying them.  less overflow/underflow that way
+		// divide out numbers before multiplying them. less overflow/underflow that way
 		double a2_div_b2 = (a/b)*(a/b);
 		double c2_div_b2 = (c/b)*(c/b);
 		double a2_m_c2_div_b2 = a2_div_b2 - c2_div_b2;

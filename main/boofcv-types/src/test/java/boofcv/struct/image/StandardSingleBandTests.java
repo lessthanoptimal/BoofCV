@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -34,8 +34,8 @@ import java.util.Random;
 import static org.junit.jupiter.api.Assertions.*;
 
 /**
- * Standard tests for children of {@link ImageGray}.  Ensures that they contain
- * all the expected functions and that they have the expected behavior.  This is done
+ * Standard tests for children of {@link ImageGray}. Ensures that they contain
+ * all the expected functions and that they have the expected behavior. This is done
  * through extensive use of reflections.
  *
  * @author Peter Abeles
@@ -65,8 +65,7 @@ public abstract class StandardSingleBandTests<T extends ImageGray<T>> extends Bo
 	/**
 	 * Check for a positive case of get() and set()
 	 */
-	@Test
-	public void get_set() {
+	@Test void get_set() {
 		T img = createImage(10, 20);
 		setRandom(img);
 
@@ -92,8 +91,7 @@ public abstract class StandardSingleBandTests<T extends ImageGray<T>> extends Bo
 	/**
 	 * Check for a positive case of get() and set()
 	 */
-	@Test
-	public void unsafe_get_set() {
+	@Test void unsafe_get_set() {
 		T img = createImage(10, 20);
 		setRandom(img);
 
@@ -119,8 +117,7 @@ public abstract class StandardSingleBandTests<T extends ImageGray<T>> extends Bo
 	/**
 	 * Makes sure all the accessors do proper bounds checking
 	 */
-	@Test
-	public void accessorBounds() {
+	@Test void accessorBounds() {
 		ImageGray img = createImage(10, 20);
 
 		checkBound(img, "get", 0, null);
@@ -182,8 +179,7 @@ public abstract class StandardSingleBandTests<T extends ImageGray<T>> extends Bo
 		throw new RuntimeException("Shouldn't be here");
 	}
 
-	@Test
-	public void subimage() {
+	@Test void subimage() {
 		T img = createImage(10, 20);
 		setRandom(img);
 
@@ -200,8 +196,7 @@ public abstract class StandardSingleBandTests<T extends ImageGray<T>> extends Bo
 		assertEquals(a.get(2, 4), b.get(0, 1));
 	}
 
-	@Test
-	public void reshape() {
+	@Test void reshape() {
 		ImageGray img = createImage(10, 20);
 
 		// reshape to something smaller
@@ -215,8 +210,7 @@ public abstract class StandardSingleBandTests<T extends ImageGray<T>> extends Bo
 		assertEquals(21, img.getHeight());
 	}
 
-	@Test
-	public void serialize() throws IOException, ClassNotFoundException {
+	@Test void serialize() throws IOException, ClassNotFoundException {
 
 		// randomly fill the image
 		ImageGray imgA = createImage(10, 20);
@@ -262,16 +256,14 @@ public abstract class StandardSingleBandTests<T extends ImageGray<T>> extends Bo
 		}
 	}
 
-	@Test
-	public void checkNoArgumentConstructor() {
+	@Test void checkNoArgumentConstructor() {
 		ImageGray a = createImage();
 
 		assertTrue(a._getData() == null);
 		assertTrue(a.getImageType() != null);
 	}
 
-	@Test
-	public void copyRow() {
+	@Test void copyRow() {
 		ImageGray img = createImage(10, 20);
 		GImageGray a = FactoryGImageGray.wrap(img);
 		randomFill(img, a);
@@ -295,8 +287,7 @@ public abstract class StandardSingleBandTests<T extends ImageGray<T>> extends Bo
 		}
 	}
 
-	@Test
-	public void copyCol() {
+	@Test void copyCol() {
 		ImageGray img = createImage(10, 20);
 		GImageGray a = FactoryGImageGray.wrap(img);
 		randomFill(img, a);

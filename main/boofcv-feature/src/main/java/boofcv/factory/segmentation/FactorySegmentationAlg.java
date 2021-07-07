@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -68,7 +68,7 @@ public class FactorySegmentationAlg {
 	}
 
 	/**
-	 * Creates an instance of {@link boofcv.alg.segmentation.ms.SegmentMeanShift}.  Uniform distributions are used for spacial and color
+	 * Creates an instance of {@link boofcv.alg.segmentation.ms.SegmentMeanShift}. Uniform distributions are used for spacial and color
 	 * weights.
 	 *
 	 * @param config Specify configuration for mean-shift

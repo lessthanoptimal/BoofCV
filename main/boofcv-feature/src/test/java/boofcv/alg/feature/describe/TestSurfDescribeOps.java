@@ -48,8 +48,7 @@ public class TestSurfDescribeOps extends BoofStandardJUnit {
 		GImageMiscOps.fillUniform(inputI32, rand, 0, 100);
 	}
 
-	@Test
-	public void gradient() {
+	@Test void gradient() {
 		int radiusRegions = 4;
 		int w = radiusRegions*2 + 1;
 		double[] expectedX = new double[w*w];
@@ -72,8 +71,7 @@ public class TestSurfDescribeOps extends BoofStandardJUnit {
 		BoofTesting.assertEquals(foundY, expectedY, 1e-4);
 	}
 
-	@Test
-	public void gradient_noborder_F32() {
+	@Test void gradient_noborder_F32() {
 		int radiusRegions = 4;
 		int w = radiusRegions*2 + 1;
 		double[] expectedX = new double[w*w];
@@ -89,8 +87,7 @@ public class TestSurfDescribeOps extends BoofStandardJUnit {
 		BoofTesting.assertEquals(expectedY, foundY, 1e-4);
 	}
 
-	@Test
-	public void gradient_noborder_I32() {
+	@Test void gradient_noborder_I32() {
 		int radiusRegions = 4;
 		int w = radiusRegions*2 + 1;
 		double[] expectedX = new double[w*w];
@@ -106,8 +103,7 @@ public class TestSurfDescribeOps extends BoofStandardJUnit {
 		BoofTesting.assertEquals(expectedY, foundY);
 	}
 
-	@Test
-	public void isInside_aligned() {
+	@Test void isInside_aligned() {
 		int regionRadius = 10;
 		int kernelSize = 2;
 
@@ -138,8 +134,7 @@ public class TestSurfDescribeOps extends BoofStandardJUnit {
 		assertTrue(result == SurfDescribeOps.isInside(inputF32, x, y, regionRadius, kernelSize, scale, 0, 0));
 	}
 
-	@Test
-	public void isInside_rotated() {
+	@Test void isInside_rotated() {
 		int regionRadius = 10;
 		int kernelSize = 3;
 		double d90 = Math.PI/2.0;
@@ -184,8 +179,7 @@ public class TestSurfDescribeOps extends BoofStandardJUnit {
 		assertTrue(SurfDescribeOps.isInside(inputF32, c_x, regionRadius + 2 + 1 + e, regionRadius, kernelSize, 1, c45, s45));
 	}
 
-	@Test
-	public void isInside_rect() {
+	@Test void isInside_rect() {
 		// test a positive example
 		assertTrue(SurfDescribeOps.isInside(20, 30, 2.3, 4.5, 8.7, 2.0));
 
@@ -198,8 +192,7 @@ public class TestSurfDescribeOps extends BoofStandardJUnit {
 		assertFalse(SurfDescribeOps.isInside(20, 30, 9, 19, 10, 2.0));
 	}
 
-	@Test
-	public void rotatedWidth() {
+	@Test void rotatedWidth() {
 		// test rotations by 90 degrees because these cases are simple
 		assertEquals(10, SurfDescribeOps.rotatedWidth(10, 1, 0), 1e-8);
 		assertEquals(10, SurfDescribeOps.rotatedWidth(10, 0, 1), 1e-8);

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -32,8 +32,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  */
 public class TestWatershedVincentSoille1991_Connect8 extends BoofStandardJUnit {
 
-	@Test
-	public void basic() {
+	@Test void basic() {
 		GrayU8 image = new GrayU8(300,320);
 		ImageMiscOps.fill(image, 255);
 		image.set(10, 15, 10);
@@ -48,8 +47,7 @@ public class TestWatershedVincentSoille1991_Connect8 extends BoofStandardJUnit {
 		assertEquals(4,alg.getTotalRegions());
 	}
 
-	@Test
-	public void example0() {
+	@Test void example0() {
 		GrayU8 image = new GrayU8(3,4);
 		image.data = new byte[]
 				{1,5,1,
@@ -78,8 +76,7 @@ public class TestWatershedVincentSoille1991_Connect8 extends BoofStandardJUnit {
 		}
 	}
 
-	@Test
-	public void example1() {
+	@Test void example1() {
 		GrayU8 image = new GrayU8(4,4);
 		image.data = new byte[]
 				{1,5,5,1,
@@ -109,8 +106,7 @@ public class TestWatershedVincentSoille1991_Connect8 extends BoofStandardJUnit {
 		}
 	}
 
-	@Test
-	public void example2() {
+	@Test void example2() {
 		GrayU8 image = new GrayU8(5,4);
 		image.data = new byte[]
 				{5,5,5,5,5,
@@ -141,8 +137,7 @@ public class TestWatershedVincentSoille1991_Connect8 extends BoofStandardJUnit {
 		}
 	}
 
-	@Test
-	public void example4() {
+	@Test void example4() {
 		GrayU8 image = new GrayU8(5,4);
 		image.data = new byte[]
 				{5,5,5,5,5,
@@ -173,8 +168,7 @@ public class TestWatershedVincentSoille1991_Connect8 extends BoofStandardJUnit {
 		}
 	}
 
-	@Test
-	public void example5() {
+	@Test void example5() {
 		GrayU8 image = new GrayU8(5,4);
 		image.data = new byte[] {
 				1,1,1,5,5,
@@ -199,8 +193,7 @@ public class TestWatershedVincentSoille1991_Connect8 extends BoofStandardJUnit {
 		}
 	}
 
-	@Test
-	public void exampleSeeds0() {
+	@Test void exampleSeeds0() {
 		GrayU8 image = new GrayU8(4,4);
 		image.data = new byte[] {
 				1,5,5,1,
@@ -230,8 +223,7 @@ public class TestWatershedVincentSoille1991_Connect8 extends BoofStandardJUnit {
 		}
 	}
 
-	@Test
-	public void exampleSeeds1() {
+	@Test void exampleSeeds1() {
 		GrayU8 image = new GrayU8(4,4);
 		image.data = new byte[] {
 				1,5,5,1,
@@ -262,8 +254,7 @@ public class TestWatershedVincentSoille1991_Connect8 extends BoofStandardJUnit {
 		}
 	}
 
-	@Test
-	public void exampleSeeds2() {
+	@Test void exampleSeeds2() {
 		GrayU8 image = new GrayU8(4,4);
 		image.data = new byte[] {
 				5,5,5,5,

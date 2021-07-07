@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -28,7 +28,7 @@ import boofcv.struct.Configuration;
 public class ConfigHomography implements Configuration {
 
 	/**
-	 * If the input is in pixel coordinates then this should be true.  If in normalized image coordinates
+	 * If the input is in pixel coordinates then this should be true. If in normalized image coordinates
 	 * then it can be false.
 	 */
 	public boolean normalize = true;

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -39,7 +39,7 @@ public interface RefineTriangulateEpipolar {
 	 * observation in the world frame and x2 in the camera frame.
 	 *
 	 * @param observations Observations of feature in N views. Pixel or Normalized image coordinates.
-	 * @param fundamentalWorldToCam Fundamental or essential matrix for each view.  World to Camera.
+	 * @param fundamentalWorldToCam Fundamental or essential matrix for each view. World to Camera.
 	 * @param worldPt Initial estimate of point in world coordinates.
 	 * @param refinedPt The refined estimated point position.
 	 * @return if successful or not

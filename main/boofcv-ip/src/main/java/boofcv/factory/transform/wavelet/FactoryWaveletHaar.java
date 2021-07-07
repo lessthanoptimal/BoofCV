@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -61,7 +61,7 @@ public class FactoryWaveletHaar {
 	}
 
 	/**
-	 * Create a description for the inverse transform.  Note that this will NOT produce
+	 * Create a description for the inverse transform. Note that this will NOT produce
 	 * an exact copy of the original due to rounding error.
 	 *
 	 * @return Wavelet inverse coefficient description.

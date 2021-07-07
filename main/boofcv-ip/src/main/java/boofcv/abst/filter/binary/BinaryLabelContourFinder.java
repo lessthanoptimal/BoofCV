@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -50,7 +50,7 @@ public interface BinaryLabelContourFinder extends BinaryContourInterface {
 	 * Processes the binary image to find the contour of and label blobs.
 	 *
 	 * @param binary Input binary image. Not modified.
-	 * @param labeled Output. Labeled image.  Modified.
+	 * @param labeled Output. Labeled image. Modified.
 	 */
 	void process(GrayU8 binary , GrayS32 labeled );
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -30,8 +30,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
  */
 public class TestRemoveRadialNtoN_F64 extends BoofStandardJUnit {
 
-	@Test
-	public void checkManual() {
+	@Test void checkManual() {
 		checkManual(0, 0);
 		checkManual(0.1, -0.05);
 	}

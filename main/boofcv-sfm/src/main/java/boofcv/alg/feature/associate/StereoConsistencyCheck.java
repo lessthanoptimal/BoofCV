@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -29,8 +29,8 @@ import georegression.struct.se.Se3_F64;
 import org.ejml.data.DMatrixRMaj;
 
 /**
- * Checks to see if two observations from a left to right stereo camera are consistent.  Observations are converted
- * to rectified coordinates.  They are then checked to see if their y-axis are the same to within tolerance and that
+ * Checks to see if two observations from a left to right stereo camera are consistent. Observations are converted
+ * to rectified coordinates. They are then checked to see if their y-axis are the same to within tolerance and that
  * the left x-coordinate is larger than the right x-coordinate, to within tolerance.
  *
  * @author Peter Abeles
@@ -77,7 +77,7 @@ public class StereoConsistencyCheck {
 	}
 
 	/**
-	 * Checks to see if the observations from the left and right camera are consistent.  Observations
+	 * Checks to see if the observations from the left and right camera are consistent. Observations
 	 * are assumed to be in the original image pixel coordinates.
 	 *
 	 * @param left Left camera observation in original pixels
@@ -92,7 +92,7 @@ public class StereoConsistencyCheck {
 	}
 
 	/**
-	 * Checks to see if the observations from the left and right camera are consistent.  Observations
+	 * Checks to see if the observations from the left and right camera are consistent. Observations
 	 * are assumed to be in the rectified image pixel coordinates.
 	 *
 	 * @param left Left camera observation in rectified pixels

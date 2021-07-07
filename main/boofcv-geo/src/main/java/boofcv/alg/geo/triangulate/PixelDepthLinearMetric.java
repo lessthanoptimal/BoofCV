@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -29,8 +29,8 @@ import java.util.List;
 /**
  * <p>
  * Computes the depth (value of z-axis in frame A) for a single point feature given N observations
- * and N-1 rigid camera transforms.  The estimate will be optimal an algebraic sense, but not in
- * a Euclidean sense.  Two variants are provided in this class, for 2 views and N>1 views. All pixel
+ * and N-1 rigid camera transforms. The estimate will be optimal an algebraic sense, but not in
+ * a Euclidean sense. Two variants are provided in this class, for 2 views and N>1 views. All pixel
  * coordinates are in calibrated units.
  * </p>
  *
@@ -38,7 +38,7 @@ import java.util.List;
  * This linear estimation of pixel depth is done using the following equation:<br>
  * &lambda;<sub>1</sub>*hat(x<sub>2</sub>)*R*x<sub>1</sub> + hat(x<sub>2</sub>)*T = 0<br>
  * where &lambda;<sub>1</sub> is the pixel depth in the first image, x is an observation in calibrated
- * homogeneous coordinates, and (R,T) is a rigid body transformation.  Modified implementation of the algorithm
+ * homogeneous coordinates, and (R,T) is a rigid body transformation. Modified implementation of the algorithm
  * described in [1].
  * </p>
  *
@@ -61,10 +61,10 @@ public class PixelDepthLinearMetric {
 	private final Vector3D_F64 temp2 = new Vector3D_F64();
 
 	/**
-	 * Computes the pixel depth from N views of the same object.  Pixel depth in the first frame.
+	 * Computes the pixel depth from N views of the same object. Pixel depth in the first frame.
 	 *
 	 * @param obs List of observations on a single feature in normalized coordinates
-	 * @param motion List of camera motions.  Each index 'i' is the motion from view 0 to view i+1.
+	 * @param motion List of camera motions. Each index 'i' is the motion from view 0 to view i+1.
 	 * @return depth of the pixels
 	 */
 	public double depthNView( List<Point2D_F64> obs,
@@ -92,8 +92,8 @@ public class PixelDepthLinearMetric {
 	/**
 	 * Computes pixel depth in image 'a' from two observations.
 	 *
-	 * @param a Observation in first frame.  In calibrated coordinates. Not modified.
-	 * @param b Observation in second frame.  In calibrated coordinates. Not modified.
+	 * @param a Observation in first frame. In calibrated coordinates. Not modified.
+	 * @param b Observation in second frame. In calibrated coordinates. Not modified.
 	 * @param fromAtoB Transform from frame a to frame b.
 	 * @return Pixel depth in first frame. In same units as T inside of fromAtoB.
 	 */

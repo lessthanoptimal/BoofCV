@@ -43,27 +43,27 @@ public class CreateCalibrationTarget {
 	@Option(name = "-c", aliases = {"--Columns"}, usage = "Number of columns")
 	int columns = -1;
 
-	@Option(name = "-u", aliases = {"--Units"}, usage = "Name of document units.  default: cm")
+	@Option(name = "-u", aliases = {"--Units"}, usage = "Name of document units. default: cm")
 	String _unit = Unit.CENTIMETER.abbreviation;
 	Unit unit;
 
-	@Option(name = "-p", aliases = {"--PaperSize"}, usage = "Size of paper used.  See below for predefined document sizes.  "
-			+ "You can manually specify any size using the following notation. W:H  where W is the width and H is the height.  "
-			+ "Values of W and H is specified with <number><unit abbreviation>, e.g. 6cm or 6, the unit is optional.  If no unit"
+	@Option(name = "-p", aliases = {"--PaperSize"}, usage = "Size of paper used. See below for predefined document sizes. "
+			+ "You can manually specify any size using the following notation. W:H  where W is the width and H is the height. "
+			+ "Values of W and H is specified with <number><unit abbreviation>, e.g. 6cm or 6, the unit is optional. If no unit"
 			+ " are specified the default document units are used.")
 	String _paperSize = PaperSize.LETTER.name;
 	PaperSize paperSize;
 
-	@Option(name = "-w", aliases = {"--ShapeWidth"}, usage = "Width of the shape or diameter if a circle.  In document units.")
+	@Option(name = "-w", aliases = {"--ShapeWidth"}, usage = "Width of the shape or diameter if a circle. In document units.")
 	float shapeWidth = -1;
 
-	@Option(name = "-s", aliases = {"--Space"}, usage = "Spacing between the shapes.  In document units.")
+	@Option(name = "-s", aliases = {"--Space"}, usage = "Spacing between the shapes. In document units.")
 	float shapeSpace = -1;
 
-	@Option(name = "-d", aliases = {"--CenterDistance"}, usage = "Distance between circle centers.  In document units.")
+	@Option(name = "-d", aliases = {"--CenterDistance"}, usage = "Distance between circle centers. In document units.")
 	float centerDistance = -1;
 
-	@Option(name = "-o", aliases = {"--OutputName"}, usage = "Name of output file.  E.g. chessboard for chessboard.pdf")
+	@Option(name = "-o", aliases = {"--OutputName"}, usage = "Name of output file. E.g. chessboard for chessboard.pdf")
 	String fileName = "target";
 
 	@Option(name = "-i", aliases = {"--DisablePrintInfo"}, usage = "Disable printing information about the calibration target")

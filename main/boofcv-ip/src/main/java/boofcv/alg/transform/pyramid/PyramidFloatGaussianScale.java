@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -35,7 +35,7 @@ import boofcv.struct.pyramid.PyramidFloat;
  * {@link PyramidFloat} in which each layer is constructed by 1) applying Gaussian blur to the previous layer, and then
  * 2) re-sampling the blurred previous layer. The scaling factor between each level are floating point number.
  * Unlike {@link PyramidDiscreteSampleBlur } the scale factors can be arbitrary and are not limited to certain integer
- * values.  The specified sigmas are the sigmas which are applied to each layer.
+ * values. The specified sigmas are the sigmas which are applied to each layer.
  * </p>
  *
  * <p>

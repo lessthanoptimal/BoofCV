@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -28,7 +28,7 @@ import boofcv.struct.image.*;
 public class GConvolveImageOps {
 
 	/**
-	 * Performs a horizontal 1D convolution across the image.  Borders are handled as specified by the 'border'
+	 * Performs a horizontal 1D convolution across the image. Borders are handled as specified by the 'border'
 	 * parameter.
 	 *
 	 * @param input The original image. Not modified.
@@ -81,7 +81,7 @@ public class GConvolveImageOps {
 	}
 
 	/**
-	 * Performs a vertical 1D convolution across the image.  Borders are handled as specified by the 'border'
+	 * Performs a vertical 1D convolution across the image. Borders are handled as specified by the 'border'
 	 * parameter.
 	 *
 	 * @param input The original image. Not modified.
@@ -134,7 +134,7 @@ public class GConvolveImageOps {
 	}
 
 	/**
-	 * Performs a 2D convolution across the image.  Borders are handled as specified by the 'border'
+	 * Performs a 2D convolution across the image. Borders are handled as specified by the 'border'
 	 * parameter.
 	 *
 	 * @param input The original image. Not modified.
@@ -187,7 +187,7 @@ public class GConvolveImageOps {
 	}
 
 	/**
-	 * Performs a horizontal 1D convolution across the image.  The horizontal border is not processed.
+	 * Performs a horizontal 1D convolution across the image. The horizontal border is not processed.
 	 *
 	 * @param input	 The original image. Not modified.
 	 * @param output Where the resulting image is written to. Modified.
@@ -239,7 +239,7 @@ public class GConvolveImageOps {
 		}
 	}
 	/**
-	 * Performs a horizontal 1D convolution across the image.  The horizontal border is not processed.
+	 * Performs a horizontal 1D convolution across the image. The horizontal border is not processed.
 	 *
 	 * @param input	 The original image. Not modified.
 	 * @param output Where the resulting image is written to. Modified.
@@ -292,7 +292,7 @@ public class GConvolveImageOps {
 	}
 
 	/**
-	 * Performs a 2D convolution across the image.  The image's borders are not processed.
+	 * Performs a 2D convolution across the image. The image's borders are not processed.
 	 *
 	 * @param kernel A square kernel that will be convolved across the source image
 	 * @param input  The source image that is to be convolved

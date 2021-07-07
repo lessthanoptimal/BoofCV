@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -24,13 +24,13 @@ import java.lang.reflect.Array;
 
 /**
  * <p>
- * A base class for a single band intensity image.  The image is an rectangular array where each pixel represents
- * an intensity measurement from an imaging sensor.  Internally the pixels are stored a 1D array in a row-major format.
+ * A base class for a single band intensity image. The image is an rectangular array where each pixel represents
+ * an intensity measurement from an imaging sensor. Internally the pixels are stored a 1D array in a row-major format.
  * Different primitive types (e.g. byte, short, float, double) are implemented by children of this class.
  * This image format is designed to allow quick and easy read/write access to each pixel and automatically supports sub-images.
  * </p>
  * <p>
- * Most image operations work off of direct children of this class.  For operations which support images with
+ * Most image operations work off of direct children of this class. For operations which support images with
  * multiple bands or colors (e.g. RGB or planar cameras) there is the {@link ImageInterleaved} class and others.
  * </p>
  * <p>
@@ -47,9 +47,9 @@ import java.lang.reflect.Array;
  * </dl>
  * </p>
  * <p>
- * Sub-images are images that are a rectangular image inside of a larger image.  The original image and the sub-image
- * share the same data array, so an operation in one will affect the other.   They are useful when only part of
- * the image needs to be processed.  All image processing operations support sub-images.
+ * Sub-images are images that are a rectangular image inside of a larger image. The original image and the sub-image
+ * share the same data array, so an operation in one will affect the other.  They are useful when only part of
+ * the image needs to be processed. All image processing operations support sub-images.
  * </p>
  * <p>
  * Pixels can be directly accessed by elements. For example, to access the pixel at (x = 3, y = 10) one would do:<br>
@@ -88,14 +88,14 @@ public abstract class ImageGray<T extends ImageGray<T>> extends ImageBase<T> {
 
 	/**
 	 * <p>
-	 * Creates a rectangular sub-image from 'this' image.  The subimage will share the same internal array
-	 * that stores each pixel's value.  Any changes to pixel values in the original image or the sub-image will
+	 * Creates a rectangular sub-image from 'this' image. The subimage will share the same internal array
+	 * that stores each pixel's value. Any changes to pixel values in the original image or the sub-image will
 	 * affect the other. A sub-image must be a sub-set of the original image and cannot specify a bounds larger
 	 * than the original.
 	 * </p>
 	 *
 	 * <p>
-	 * When specifying the sub-image, the top-left corner is inclusive and the bottom right corner exclusive.  Thus,
+	 * When specifying the sub-image, the top-left corner is inclusive and the bottom right corner exclusive. Thus,
 	 * a sub-image will contain all the original pixels if the following is used: subimage(0,0,width,height,null).
 	 * </p>
 	 *
@@ -103,7 +103,7 @@ public abstract class ImageGray<T extends ImageGray<T>> extends ImageBase<T> {
 	 * @param y0 y-coordinate of top-left corner of the sub-image, inclusive.
 	 * @param x1 x-coordinate of bottom-right corner of the sub-image, exclusive.
 	 * @param y1 y-coordinate of bottom-right corner of the sub-image, exclusive.
-	 * @param subimage Optional output for sub-image.  If not null the subimage will be written into this image.
+	 * @param subimage Optional output for sub-image. If not null the subimage will be written into this image.
 	 * @return A sub-image of 'this' image.
 	 */
 	@Override
@@ -131,7 +131,7 @@ public abstract class ImageGray<T extends ImageGray<T>> extends ImageBase<T> {
 	}
 
 	/**
-	 * Changes the image's width and height without declaring new memory.  If the internal array
+	 * Changes the image's width and height without declaring new memory. If the internal array
 	 * is not large enough to store the new image an IllegalArgumentException is thrown.
 	 *
 	 * @param width The new width.

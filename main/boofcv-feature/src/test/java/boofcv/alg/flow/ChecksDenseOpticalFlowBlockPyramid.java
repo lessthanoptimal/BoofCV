@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -50,8 +50,7 @@ public abstract class ChecksDenseOpticalFlowBlockPyramid<T extends ImageGray<T>>
 
 	public abstract DenseOpticalFlowBlockPyramid<T> createAlg( int searchRadius, int regionRadius, int maxPerPixelError);
 
-	@Test
-	public void processImageDontBlowUp() {
+	@Test void processImageDontBlowUp() {
 		DenseOpticalFlowBlockPyramid<T> alg = createAlg(2,3,10);
 
 		ImagePyramid<T> pyramid = FactoryPyramid.discreteGaussian(
@@ -71,8 +70,7 @@ public abstract class ChecksDenseOpticalFlowBlockPyramid<T extends ImageGray<T>>
 		}
 	}
 
-	@Test
-	public void extractTemplate() {
+	@Test void extractTemplate() {
 
 		int r = 2;
 		DenseOpticalFlowBlockPyramid<T> alg = createAlg(1,r,10);
@@ -92,8 +90,7 @@ public abstract class ChecksDenseOpticalFlowBlockPyramid<T extends ImageGray<T>>
 		}
 	}
 
-	@Test
-	public void computeError() {
+	@Test void computeError() {
 		int r = 2;
 //		int w = r*2+1;
 		DenseOpticalFlowBlockPyramid<T> alg = createAlg(1,r,10);

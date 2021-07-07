@@ -46,8 +46,7 @@ public class TestRefinePolygonToGrayLine extends CommonFitPolygonChecks {
 	/**
 	 * Give it a shape which is too small and see if it fails
 	 */
-	@Test
-	public void fit_tooSmall() {
+	@Test void fit_tooSmall() {
 		final boolean black = true;
 
 		Polygon2D_F64 input = new Polygon2D_F64(5,5, 5,6, 6,6, 6,5);
@@ -67,8 +66,7 @@ public class TestRefinePolygonToGrayLine extends CommonFitPolygonChecks {
 	/**
 	 * Makes sure it can handle sub-images
 	 */
-	@Test
-	public void fit_subimage() {
+	@Test void fit_subimage() {
 		final boolean black = true;
 
 		rectangles.add(new Rectangle2D_I32(x0,y0,x1,y1));
@@ -94,11 +92,10 @@ public class TestRefinePolygonToGrayLine extends CommonFitPolygonChecks {
 	}
 
 	/**
-	 * Fit a square which is alligned to the image axis.  It should get a nearly perfect fit.
+	 * Fit a square which is alligned to the image axis. It should get a nearly perfect fit.
 	 * Initial conditions are be a bit off.
 	 */
-	@Test
-	public void alignedSquare() {
+	@Test void alignedSquare() {
 		rectangles.add(new Rectangle2D_I32(x0,y0,x1,y1));
 		Polygon2D_F64 original = new Polygon2D_F64(x0,y0 , x0,y1, x1,y1, x1,y0);
 
@@ -127,8 +124,7 @@ public class TestRefinePolygonToGrayLine extends CommonFitPolygonChecks {
 	/**
 	 * See if it handles lines along the image border correctly
 	 */
-	@Test
-	public void fitWithEdgeOnBorder() {
+	@Test void fitWithEdgeOnBorder() {
 		x0 = 0; x1 = 100;
 		y0 = 100; y1 = 200;
 		rectangles.add(new Rectangle2D_I32(x0,y0,x1,y1));
@@ -157,8 +153,7 @@ public class TestRefinePolygonToGrayLine extends CommonFitPolygonChecks {
 	/**
 	 * Perfect initial guess.
 	 */
-	@Test
-	public void fit_perfect_affine() {
+	@Test void fit_perfect_affine() {
 		// distorted and undistorted views
 		Affine2D_F64 affines[] = new Affine2D_F64[2];
 		affines[0] = new Affine2D_F64();
@@ -206,8 +201,7 @@ public class TestRefinePolygonToGrayLine extends CommonFitPolygonChecks {
 	/**
 	 * Perfect initial guess. But provide a transform which will undo the affine transform
 	 */
-	@Test
-	public void fit_perfect_transform() {
+	@Test void fit_perfect_transform() {
 		// distorted and undistorted views
 		Affine2D_F64 affines[] = new Affine2D_F64[1];
 		affines[0] = new Affine2D_F64(0.8,0,0,0.8,0,0);
@@ -253,8 +247,7 @@ public class TestRefinePolygonToGrayLine extends CommonFitPolygonChecks {
 	/**
 	 * Fit the quad with a noisy initial guess
 	 */
-	@Test
-	public void fit_noisy_affine() {
+	@Test void fit_noisy_affine() {
 		// distorted and undistorted views
 		Affine2D_F64 affines[] = new Affine2D_F64[2];
 		affines[0] = new Affine2D_F64();
@@ -315,8 +308,7 @@ public class TestRefinePolygonToGrayLine extends CommonFitPolygonChecks {
 	/**
 	 * Optimize a line with a perfect initial guess
 	 */
-	@Test
-	public void optimize_line_perfect() {
+	@Test void optimize_line_perfect() {
 		rectangles.add(new Rectangle2D_I32(x0,y0,x1,y1));
 		for (Class imageType : imageTypes) {
 			optimize_line_perfect(true, imageType);

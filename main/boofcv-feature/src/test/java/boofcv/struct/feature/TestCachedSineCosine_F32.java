@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -32,8 +32,7 @@ public class TestCachedSineCosine_F32 extends BoofStandardJUnit {
 	/**
 	 * Compare solution against a hand generated one
 	 */
-	@Test
-	public void knowCase() {
+	@Test void knowCase() {
 		CachedSineCosine_F32 alg = new CachedSineCosine_F32(-2,1,5);
 
 		assertEquals(-2,alg.minAngle,1e-4);

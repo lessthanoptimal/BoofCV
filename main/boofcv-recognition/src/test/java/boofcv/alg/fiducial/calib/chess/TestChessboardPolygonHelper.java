@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -31,8 +31,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  */
 public class TestChessboardPolygonHelper extends BoofStandardJUnit {
 
-	@Test
-	public void filterPixelPolygon_noborder() {
+	@Test void filterPixelPolygon_noborder() {
 		ChessboardPolygonHelper alg = new ChessboardPolygonHelper();
 
 		assertFalse(alg.filterPixelPolygon(null,new Polygon2D_F64(3),null,false));
@@ -40,8 +39,7 @@ public class TestChessboardPolygonHelper extends BoofStandardJUnit {
 		assertFalse(alg.filterPixelPolygon(null,new Polygon2D_F64(5),null,false));
 	}
 
-	@Test
-	public void filterPixelPolygon_border() {
+	@Test void filterPixelPolygon_border() {
 		ChessboardPolygonHelper alg = new ChessboardPolygonHelper();
 
 		Polygon2D_F64 distorted = new Polygon2D_F64(2);
@@ -68,8 +66,7 @@ public class TestChessboardPolygonHelper extends BoofStandardJUnit {
 		}
 	}
 
-	@Test
-	public void filterPixelPolygon_AllBorder() {
+	@Test void filterPixelPolygon_AllBorder() {
 		ChessboardPolygonHelper alg = new ChessboardPolygonHelper();
 
 		Polygon2D_F64 distorted = new Polygon2D_F64(3);

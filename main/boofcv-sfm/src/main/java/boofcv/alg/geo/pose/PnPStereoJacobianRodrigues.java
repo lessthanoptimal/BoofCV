@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -32,8 +32,8 @@ import org.ejml.dense.row.CommonOps_DDRM;
 import java.util.List;
 
 /**
- * Computes the Jacobian of the error function in {@link boofcv.alg.geo.pose.PnPResidualReprojection}.  For a calibrated
- * camera given observations in normalized image coordinates.  The rotation matrix is assumed to be
+ * Computes the Jacobian of the error function in {@link boofcv.alg.geo.pose.PnPResidualReprojection}. For a calibrated
+ * camera given observations in normalized image coordinates. The rotation matrix is assumed to be
  * parameterized using {@link georegression.struct.so.Rodrigues_F64} coordinates.
  *
  * @author Peter Abeles
@@ -187,7 +187,7 @@ public class PnPStereoJacobianRodrigues implements FunctionNtoMxN<DMatrixRMaj> {
 	}
 
 	/**
-	 * The translation vector is now multiplied by 3x3 matrix R.  The components of T are no longer decoupled.
+	 * The translation vector is now multiplied by 3x3 matrix R. The components of T are no longer decoupled.
 	 *
 	 * deriv [x,y] = R*dot(T)/z - (dot(z)/(z^2))(R*T)
 	 */

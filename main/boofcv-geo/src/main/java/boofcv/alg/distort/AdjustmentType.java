@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -34,8 +34,8 @@ public enum AdjustmentType {
 	 */
 	FULL_VIEW,
 	/**
-	 * The undistorted view will be entirely filled with pixels from the distorted view.  There will be no black
-	 * regions around the border.  This is accomplished by expanding the image.  The advantage is that there are no
+	 * The undistorted view will be entirely filled with pixels from the distorted view. There will be no black
+	 * regions around the border. This is accomplished by expanding the image. The advantage is that there are no
 	 * edge conditions when image processing due to the black border, but you will discard information.
 	 */
 	EXPAND,

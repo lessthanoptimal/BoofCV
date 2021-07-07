@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -36,11 +36,11 @@ public class ConfigHoughFootSubimage implements Configuration {
 	 */
 	public int minCounts = 5;
 	/**
-	 * Lines which are this close to the origin of the transformed image are ignored.  Try 5.
+	 * Lines which are this close to the origin of the transformed image are ignored. Try 5.
 	 */
 	public int minDistanceFromOrigin = 5;
 	/**
-	 * Threshold for classifying pixels as edge or not.  Try 30.
+	 * Threshold for classifying pixels as edge or not. Try 30.
 	 */
 	public float thresholdEdge = 30;
 	/**
@@ -52,7 +52,7 @@ public class ConfigHoughFootSubimage implements Configuration {
 	 */
 	public int totalHorizontalDivisions = 2;
 	/**
-	 * Number of sub images in vertical direction.  Try 2
+	 * Number of sub images in vertical direction. Try 2
 	 */
 	public int totalVerticalDivisions = 2;
 

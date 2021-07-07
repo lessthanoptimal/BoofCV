@@ -32,13 +32,13 @@ import java.util.Arrays;
 
 /**
  * <p>
- * Implementation of the Histogram of Oriented Gradients (HOG) [1] dense feature descriptor.  Several variants
- * are described in the paper.  The algorithm used here is the "R-HOG unsigned orientation" variant.  The descriptor
- * is computed from a regular grid of cells and an unsigned histogram is computed.  Unsigned as in the angle is
+ * Implementation of the Histogram of Oriented Gradients (HOG) [1] dense feature descriptor. Several variants
+ * are described in the paper. The algorithm used here is the "R-HOG unsigned orientation" variant. The descriptor
+ * is computed from a regular grid of cells and an unsigned histogram is computed. Unsigned as in the angle is
  * from 0 to 180 degrees instead of 0 to 360.
  * </p>
  *
- * This is a (hopefully) faithful implementation to the algorithm described in the paper.  The descriptors are
+ * This is a (hopefully) faithful implementation to the algorithm described in the paper. The descriptors are
  * computed with the following steps.
  * <ol>
  * <li>Compute image gradient using [-1,0,1] kernel</li>
@@ -48,34 +48,34 @@ import java.util.Arrays;
  * </ol>
  *
  * <h3>Cells and Blocks</h3>
- * The image is broken up into a regular grid of "cells".  Every cell is square with a width of N pixels, where N
- * is a user specified parameter.  A block is a region composed of cells and is M by M cells in size. The size of
+ * The image is broken up into a regular grid of "cells". Every cell is square with a width of N pixels, where N
+ * is a user specified parameter. A block is a region composed of cells and is M by M cells in size. The size of
  * the descriptor will be M by M by O, where O is the number of orientation histogram bins.
  *
  * <h3>Orientation Histogram</h3>
- * A histogram for each cell is computed.  Ignoring interpolation, it would be computed by finding the magnitude
- * and unsigned orientation of each pixel in the cell.  Magnitude is defined as the Euclidean norm of the gradient
- * and orientation is found to be 0 to PI radians.  The bin for the orientation is found and the magnitude added to it.
+ * A histogram for each cell is computed. Ignoring interpolation, it would be computed by finding the magnitude
+ * and unsigned orientation of each pixel in the cell. Magnitude is defined as the Euclidean norm of the gradient
+ * and orientation is found to be 0 to PI radians. The bin for the orientation is found and the magnitude added to it.
  * However, because of interpolation, each pixel contributes to multiple cells and orientation bins.
  *
  * <h3>Interpolation and Weighting</h3>
  * Per-pixel interpolation and weighting is applied when assigning a value to each orientation bin and
- * cell.  Linear interpolation is used for orientation.  Bilinear interpolation for assigning values to each cell
- * using the cell's center.  Gaussian weighting is applied to each pixel with the center at each block.  Each
+ * cell. Linear interpolation is used for orientation. Bilinear interpolation for assigning values to each cell
+ * using the cell's center. Gaussian weighting is applied to each pixel with the center at each block. Each
  * pixel can contribute up to 4 different histogram bins, and the all the pixels in a cell can contribute to
  * the histogram of 9 cells.
  *
  * <h3>Descriptor Normalization</h3>
- * First L2-normalization is applied to the descriptor.  Then min(0.2,desc[i]) is applied to all elements in the
- * descriptor.  After which L2-normalization is applied again.
+ * First L2-normalization is applied to the descriptor. Then min(0.2,desc[i]) is applied to all elements in the
+ * descriptor. After which L2-normalization is applied again.
  *
  * <h3>Accessing Results</h3>
  * A list of descriptor and their locations is available. The location refers to the top-left most pixel in
- * the region the descriptor is computed from.  These lists are computed in a regular grid with row-major ordering.
+ * the region the descriptor is computed from. These lists are computed in a regular grid with row-major ordering.
  * A request can be made for all descriptors computed from inside a rectangular region.
  *
  * <h3>Multi-Band Images</h3>
- * The gradient is computed for each band individually.  The band with the largest magnitude at that specific
+ * The gradient is computed for each band individually. The band with the largest magnitude at that specific
  * pixel is used as the gradient for the pixel.
  *
  * <p>[1] Dalal, Navneet, and Bill Triggs. "Histograms of oriented gradients for human detection." Computer
@@ -99,8 +99,8 @@ public class DescribeDenseHogAlg<Input extends ImageBase<Input>> extends BaseDen
 	/**
 	 * Configures HOG descriptor computation
 	 *
-	 * @param orientationBins Number of bins in a cell's histogram.  9 recommended
-	 * @param pixelsPerCell Number of pixel's wide a cell is.  8 recommended
+	 * @param orientationBins Number of bins in a cell's histogram. 9 recommended
+	 * @param pixelsPerCell Number of pixel's wide a cell is. 8 recommended
 	 * @param cellsPerBlockX Number of cells's wide a block is. x-axis 3 recommended
 	 * @param cellsPerBlockY Number of cells's wide a block is. x-axis 3 recommended
 	 * @param stepBlock Number of cells which are skipped between each block
@@ -160,7 +160,7 @@ public class DescribeDenseHogAlg<Input extends ImageBase<Input>> extends BaseDen
 	}
 
 	/**
-	 * Specifies input image.  Gradient is computed immediately
+	 * Specifies input image. Gradient is computed immediately
 	 *
 	 * @param input input image
 	 */

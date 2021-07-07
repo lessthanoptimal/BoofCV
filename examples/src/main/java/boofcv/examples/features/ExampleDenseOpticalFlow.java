@@ -35,8 +35,8 @@ import boofcv.struct.image.GrayF32;
 import java.awt.image.BufferedImage;
 
 /**
- * Demonstration of how to compute the dense optical flow between two images.  Dense optical flow of an image
- * describes how each pixel moves from one image to the next.  The results is visualized in a color image.  The
+ * Demonstration of how to compute the dense optical flow between two images. Dense optical flow of an image
+ * describes how each pixel moves from one image to the next. The results is visualized in a color image. The
  * color indicates the direction of motion and the intensity the magnitude.
  *
  * @author Peter Abeles
@@ -67,7 +67,7 @@ public class ExampleDenseOpticalFlow {
 
 		GrayF32 full = new GrayF32(buff0.getWidth(), buff0.getHeight());
 
-		// Dense optical flow is very computationally expensive.  Just process the image at 1/2 resolution
+		// Dense optical flow is very computationally expensive. Just process the image at 1/2 resolution
 		GrayF32 previous = new GrayF32(full.width/2, full.height/2);
 		GrayF32 current = previous.createSameShape();
 		ImageFlow flow = new ImageFlow(previous.width, previous.height);

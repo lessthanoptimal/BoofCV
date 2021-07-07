@@ -119,8 +119,8 @@ public class FactoryImageBorder {
 	}
 
 	/**
-	 * Creates an instance of the requested algorithms for handling borders pixels on {@link ImageGray}.  If type
-	 * {@link BorderType#ZERO} is passed in then the value will be set to 0.  Alternatively you could
+	 * Creates an instance of the requested algorithms for handling borders pixels on {@link ImageGray}. If type
+	 * {@link BorderType#ZERO} is passed in then the value will be set to 0. Alternatively you could
 	 * use {@link #singleValue(double, Class)} instead.
 	 *
 	 * @param borderType Which border algorithm should it use.
@@ -173,8 +173,8 @@ public class FactoryImageBorder {
 	}
 
 	/**
-	 * Creates an instance of the requested algorithms for handling borders pixels on {@link ImageInterleaved}.  If type
-	 * {@link BorderType#ZERO} is passed in then the value will be set to 0.  Alternatively you could
+	 * Creates an instance of the requested algorithms for handling borders pixels on {@link ImageInterleaved}. If type
+	 * {@link BorderType#ZERO} is passed in then the value will be set to 0. Alternatively you could
 	 * use {@link #singleValue(double, Class)} instead.
 	 *
 	 * @param borderType Which border algorithm should it use.
@@ -188,7 +188,7 @@ public class FactoryImageBorder {
 		switch(borderType) {
 			case SKIP:
 				throw new IllegalArgumentException("Skip border can't be implemented here and has to be done " +
-						"externally.  Call this might be a bug. Instead pass in EXTENDED and manually skip over the " +
+						"externally. Call this might be a bug. Instead pass in EXTENDED and manually skip over the " +
 						"pixel in a loop some place.");
 //				borderClass = BorderIndex1D_Exception.class;
 //				break;

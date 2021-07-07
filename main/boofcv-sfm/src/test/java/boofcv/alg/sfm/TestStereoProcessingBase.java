@@ -43,11 +43,10 @@ public class TestStereoProcessingBase extends BoofStandardJUnit {
 	int height = 240;
 
 	/**
-	 * Center a point in the left and right images.  Search for the point and see if after rectification
+	 * Center a point in the left and right images. Search for the point and see if after rectification
 	 * the point can be found on the same row in both images.
 	 */
-	@Test
-	public void checkRectification() {
+	@Test void checkRectification() {
 		// point being viewed
 		Point3D_F64 X = new Point3D_F64(-0.01, 0.1, 3);
 
@@ -85,8 +84,7 @@ public class TestStereoProcessingBase extends BoofStandardJUnit {
 		assertTrue(foundRight.x < foundLeft.x);
 	}
 
-	@Test
-	public void compute3D() {
+	@Test void compute3D() {
 		// point being viewed
 		Point3D_F64 X = new Point3D_F64(-0.01, 0.1, 3);
 

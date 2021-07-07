@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -30,8 +30,7 @@ import static org.junit.jupiter.api.Assertions.*;
  * @author Peter Abeles
  */
 public class TestMatrixOfList extends BoofStandardJUnit {
-	@Test
-	public void reshape() {
+	@Test void reshape() {
 		MatrixOfList a = new MatrixOfList(1,1);
 		a.reshape(5,3);
 		assertEquals(5,a.width);
@@ -41,8 +40,7 @@ public class TestMatrixOfList extends BoofStandardJUnit {
 			assertTrue(l!=null);
 	}
 
-	@Test
-	public void reset() {
+	@Test void reset() {
 		MatrixOfList a = new MatrixOfList(2,3);
 		for(List l : a.grid )
 			l.add(1);
@@ -51,15 +49,13 @@ public class TestMatrixOfList extends BoofStandardJUnit {
 			assertEquals(0,l.size());
 	}
 
-	@Test
-	public void getWidth_getHeight() {
+	@Test void getWidth_getHeight() {
 		MatrixOfList a = new MatrixOfList(2,3);
 		assertEquals(2,a.getWidth());
 		assertEquals(3,a.getHeight());
 	}
 
-	@Test
-	public void createSingleList() {
+	@Test void createSingleList() {
 		MatrixOfList a = new MatrixOfList(2,3);
 		a.reshape(3,4);
 		for(List l : a.grid )
@@ -69,8 +65,7 @@ public class TestMatrixOfList extends BoofStandardJUnit {
 		assertEquals(12,b.size());
 	}
 
-	@Test
-	public void isInBounds() {
+	@Test void isInBounds() {
 		MatrixOfList a = new MatrixOfList(2,3);
 		assertFalse(a.isInBounds(-1,0));
 		assertFalse(a.isInBounds(0,-1));

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -100,7 +100,7 @@ public abstract class GeneralChecksInterpolationPixelS<T extends ImageGray<T>> e
 
 
 	/**
-	 * Compute the interpolation manually using independently written code.  For
+	 * Compute the interpolation manually using independently written code. For
 	 * example, easy to write but inefficient.
 	 */
 	protected abstract float compute(T img, float x, float y);

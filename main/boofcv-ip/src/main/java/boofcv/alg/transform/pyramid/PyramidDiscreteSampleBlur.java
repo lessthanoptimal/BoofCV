@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -31,12 +31,12 @@ import org.jetbrains.annotations.Nullable;
 
 /**
  * <p>
- * Convolves a re-normalizable blur kernel across the image before down sampling.  This is useful for creating
+ * Convolves a re-normalizable blur kernel across the image before down sampling. This is useful for creating
  * a Gaussian pyramid as well as other standard pyramids.
  * </p>
  *
  * <p>
- * NOTE: This pyramid cannot be configured such that blur will be applied to the input image.  It can be done by
+ * NOTE: This pyramid cannot be configured such that blur will be applied to the input image. It can be done by
  * the user before the image is passed in.
  * </p>
  *

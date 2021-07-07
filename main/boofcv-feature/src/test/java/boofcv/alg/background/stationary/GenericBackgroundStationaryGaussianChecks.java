@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -39,8 +39,7 @@ public abstract class GenericBackgroundStationaryGaussianChecks extends GenericB
 		initialVariance = 12;
 	}
 
-	@Test
-	public void initialVariance() {
+	@Test public void initialVariance() {
 		for( ImageType type : imageTypes ) {
 			initialVariance(type);
 		}
@@ -85,8 +84,7 @@ public abstract class GenericBackgroundStationaryGaussianChecks extends GenericB
 		BoofTesting.assertEquals(expected, segmented, 1e-5f);
 	}
 
-	@Test
-	public void learnRate() {
+	@Test public void learnRate() {
 		for( ImageType type : imageTypes ) {
 			checkLearnRate_slow(type);
 			checkLearnRate_fast(type);
@@ -100,7 +98,7 @@ public abstract class GenericBackgroundStationaryGaussianChecks extends GenericB
 
 		T frame = imageType.createImage(width,height);
 
-		// learn very slow.  Should virtually ignore new images with different model
+		// learn very slow. Should virtually ignore new images with different model
 		alg.setLearnRate(0.01f);
 		for (int i = 0; i < 30; i++) {
 			noise(100, 2, frame);
@@ -126,7 +124,7 @@ public abstract class GenericBackgroundStationaryGaussianChecks extends GenericB
 
 		T frame = imageType.createImage(width,height);
 
-		// learn very fast.  will quickly discard old images and use the new ones
+		// learn very fast. will quickly discard old images and use the new ones
 		alg.setLearnRate(0.99f);
 		for (int i = 0; i < 30; i++) {
 			noise(100, 2, frame);
@@ -145,8 +143,7 @@ public abstract class GenericBackgroundStationaryGaussianChecks extends GenericB
 		BoofTesting.assertEquals(expected,segmented,1e-5f);
 	}
 
-	@Test
-	public void minimumDifference() {
+	@Test public void minimumDifference() {
 		for( ImageType type : imageTypes ) {
 			minimumDifference(type);
 		}

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -66,7 +66,7 @@ public abstract class ChecksSelectDisparity<ArrayData, D extends ImageGray<D>> e
 	}
 
 	/**
-	 * Give it a hand crafted score with known results for WTA.  See if it produces those results
+	 * Give it a hand crafted score with known results for WTA. See if it produces those results
 	 */
 	@Test
 	void simpleTest() {

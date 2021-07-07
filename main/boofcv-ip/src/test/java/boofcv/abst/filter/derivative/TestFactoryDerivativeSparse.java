@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -38,8 +38,7 @@ public class TestFactoryDerivativeSparse extends BoofStandardJUnit {
 	int width = 20;
 	int height = 30;
 
-	@Test
-	public void laplacian_F32() {
+	@Test void laplacian_F32() {
 		GrayF32 input = new GrayF32(width,height);
 		GrayF32 expected = new GrayF32(width,height);
 		GImageMiscOps.fillUniform(input, rand, 0, 20);
@@ -54,8 +53,7 @@ public class TestFactoryDerivativeSparse extends BoofStandardJUnit {
 		assertEquals(expected.get(6,8),found,1e-4);
 	}
 
-	@Test
-	public void laplacian_I() {
+	@Test void laplacian_I() {
 		GrayU8 input = new GrayU8(width,height);
 		GrayS16 expected = new GrayS16(width,height);
 		GImageMiscOps.fillUniform(input, rand, 0, 20);

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -35,10 +35,9 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 public class TestMinimizeEnergyPrune extends BoofStandardJUnit {
 
 	/**
-	 * Perfect case.  See if it does nothing
+	 * Perfect case. See if it does nothing
 	 */
-	@Test
-	public void prine_no_change() {
+	@Test void prine_no_change() {
 		List<Point2D_I32> contours = createSquare(10,12,20,30);
 		DogArray_I32 corners = createSquareCorners(10, 12, 20, 30);
 
@@ -56,8 +55,7 @@ public class TestMinimizeEnergyPrune extends BoofStandardJUnit {
 	/**
 	 * Adds an obviously redundant corner and see if it gets removed
 	 */
-	@Test
-	public void prune_obvious() {
+	@Test void prune_obvious() {
 		List<Point2D_I32> contours = createSquare(10,12,20,30);
 		DogArray_I32 corners = createSquareCorners(10, 12, 20, 30);
 		corners.add(corners.get(3)+4);
@@ -74,8 +72,7 @@ public class TestMinimizeEnergyPrune extends BoofStandardJUnit {
 
 	}
 
-	@Test
-	public void energyRemoveCorner() {
+	@Test void energyRemoveCorner() {
 		List<Point2D_I32> contours = createSquare(10,12,20,30);
 		DogArray_I32 corners = createSquareCorners(10, 12, 20, 30);
 
@@ -111,8 +108,7 @@ public class TestMinimizeEnergyPrune extends BoofStandardJUnit {
 		}
 	}
 
-	@Test
-	public void computeSegmentEnergy() {
+	@Test void computeSegmentEnergy() {
 
 		List<Point2D_I32> contours = createSquare(10,12,20,30);
 		DogArray_I32 corners = createSquareCorners(10, 12, 20, 30);
@@ -140,8 +136,7 @@ public class TestMinimizeEnergyPrune extends BoofStandardJUnit {
 		}
 	}
 
-	@Test
-	public void removeDuplicates() {
+	@Test void removeDuplicates() {
 		List<Point2D_I32> contours = createSquare(10,12,20,30);
 
 		DogArray_I32 corners = createSquareCorners(10, 12, 20, 30);

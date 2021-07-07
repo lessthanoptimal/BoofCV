@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -31,8 +31,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  */
 public class TestTldDetection extends BoofStandardJUnit {
 
-	@Test
-	public void computeTemplateConfidence() {
+	@Test void computeTemplateConfidence() {
 		TldDetection<GrayU8> alg = new TldDetection<>();
 		alg.config = new ConfigTld();
 		alg.config.confidenceThresholdUpper = 0.6;
@@ -57,8 +56,7 @@ public class TestTldDetection extends BoofStandardJUnit {
 	/**
 	 * See if regions with larger N than P are filtered out
 	 */
-	@Test
-	public void selectBestRegionsFern_largerN() {
+	@Test void selectBestRegionsFern_largerN() {
 		TldDetection<GrayU8> alg = new TldDetection<>();
 		alg.config = new ConfigTld();
 		alg.config.maximumCascadeConsider = 20;
@@ -79,8 +77,7 @@ public class TestTldDetection extends BoofStandardJUnit {
 	/**
 	 * See if the case where there are fewer than the maximum number of regions is handled correctly
 	 */
-	@Test
-	public void selectBestRegionsFern_smaller() {
+	@Test void selectBestRegionsFern_smaller() {
 		TldDetection<GrayU8> alg = new TldDetection<>();
 		alg.config = new ConfigTld();
 		alg.config.maximumCascadeConsider = 20;
@@ -100,8 +97,7 @@ public class TestTldDetection extends BoofStandardJUnit {
 	/**
 	 * See if the case where there are more than the maximum number of regions is handled correctly
 	 */
-	@Test
-	public void selectBestRegionsFern_larger() {
+	@Test void selectBestRegionsFern_larger() {
 		TldDetection<GrayU8> alg = new TldDetection<>();
 		alg.config = new ConfigTld();
 		alg.config.maximumCascadeConsider = 20;

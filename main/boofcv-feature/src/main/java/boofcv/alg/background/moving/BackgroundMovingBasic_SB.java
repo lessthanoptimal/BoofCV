@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -66,7 +66,7 @@ public class BackgroundMovingBasic_SB<T extends ImageGray<T>, Motion extends Inv
 	}
 
 	/**
-	 * Returns the background image.  Pixels which haven't been assigned yet are marked with {@link Float#MAX_VALUE}.
+	 * Returns the background image. Pixels which haven't been assigned yet are marked with {@link Float#MAX_VALUE}.
 	 *
 	 * @return background image.
 	 */
@@ -146,7 +146,7 @@ public class BackgroundMovingBasic_SB<T extends ImageGray<T>, Motion extends Inv
 						}
 					}
 				} else {
-					// there is no background here.  Just mark it as not moving to avoid false positives
+					// there is no background here. Just mark it as not moving to avoid false positives
 					segmented.data[indexSegmented] = unknownValue;
 				}
 			}

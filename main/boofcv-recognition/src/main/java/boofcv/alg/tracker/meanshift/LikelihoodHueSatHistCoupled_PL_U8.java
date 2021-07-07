@@ -25,9 +25,9 @@ import georegression.struct.shapes.RectangleLength2D_I32;
 
 /**
  * TODO redo comments
- * Converts an RGB image into HSV image to add invariance to changes in lighting conditions.  Creates independent
+ * Converts an RGB image into HSV image to add invariance to changes in lighting conditions. Creates independent
  * histograms for the target's Hue and Saturation, which are then normalized such that
- * their sums are equal to one.  Likelihood is computed multiply the value of the histograms together.
+ * their sums are equal to one. Likelihood is computed multiply the value of the histograms together.
  *
  * Colors with a very small "Value" are ignored since their hue and saturation are not reliable.
  *
@@ -44,10 +44,10 @@ public class LikelihoodHueSatHistCoupled_PL_U8 implements PixelLikelihood<Planar
 
 	// number of bins for Hue and Saturation bands
 	protected int numHistogramBins;
-	// largest element index in a histogram bin.  numBins-1
+	// largest element index in a histogram bin. numBins-1
 	protected int maxElementInBin;
 
-	// the minimum value allowed.  used to avoid pathological case in HSV color space
+	// the minimum value allowed. used to avoid pathological case in HSV color space
 	protected float minimumValue;
 
 	// Hue has a range of 0 to 2*pi and this is a discretized histogram

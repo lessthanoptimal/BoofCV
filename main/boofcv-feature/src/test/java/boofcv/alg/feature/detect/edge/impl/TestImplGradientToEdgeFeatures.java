@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -42,8 +42,7 @@ public class TestImplGradientToEdgeFeatures extends BoofStandardJUnit {
 
 	int NUM_FUNCTIONS = 3;
 	
-	@Test
-	public void intensityE() {
+	@Test void intensityE() {
 		int numFound = BoofTesting.findMethodThenCall(this,"intensityE",ImplGradientToEdgeFeatures.class,"intensityE");
 		assertEquals(NUM_FUNCTIONS,numFound);
 	}
@@ -73,8 +72,7 @@ public class TestImplGradientToEdgeFeatures extends BoofStandardJUnit {
 		assertEquals(expected,found,1);
 	}
 
-	@Test
-	public void intensityAbs() {
+	@Test void intensityAbs() {
 		int numFound = BoofTesting.findMethodThenCall(this,"intensityAbs",ImplGradientToEdgeFeatures.class,"intensityAbs");
 		assertEquals(NUM_FUNCTIONS,numFound);
 	}
@@ -104,8 +102,7 @@ public class TestImplGradientToEdgeFeatures extends BoofStandardJUnit {
 		assertEquals(expected,found,1);
 	}
 
-	@Test
-	public void direction() {
+	@Test void direction() {
 		int numFound = BoofTesting.findMethodThenCall(this,"direction",ImplGradientToEdgeFeatures.class,"direction");
 		assertEquals(NUM_FUNCTIONS,numFound);
 	}
@@ -135,8 +132,7 @@ public class TestImplGradientToEdgeFeatures extends BoofStandardJUnit {
 		assertEquals(expected,found,0.01);
 	}
 
-	@Test
-	public void direction2() {
+	@Test void direction2() {
 		int numFound = BoofTesting.findMethodThenCall(this,"direction2",ImplGradientToEdgeFeatures.class,"direction2");
 		assertEquals(NUM_FUNCTIONS,numFound);
 	}

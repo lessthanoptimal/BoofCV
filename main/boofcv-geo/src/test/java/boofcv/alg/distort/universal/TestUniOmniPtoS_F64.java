@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -35,11 +35,10 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
  */
 public class TestUniOmniPtoS_F64 extends BoofStandardJUnit {
 	/**
-	 * Tell it to project the center pixel forwards.  All the distortion shouldn't affect it there and it should
+	 * Tell it to project the center pixel forwards. All the distortion shouldn't affect it there and it should
 	 * appear to be image center exactly.
 	 */
-	@Test
-	public void centerIsCenter() {
+	@Test void centerIsCenter() {
 		centerIsCenter(1.0);
 		centerIsCenter(0.5);
 		centerIsCenter(3.5);
@@ -59,8 +58,7 @@ public class TestUniOmniPtoS_F64 extends BoofStandardJUnit {
 		assertEquals(1,found.z, GrlConstants.TEST_F64);
 	}
 
-	@Test
-	public void back_and_forth() {
+	@Test void back_and_forth() {
 		back_and_forth(1.0);
 		back_and_forth(0.5);
 		back_and_forth(3.5);

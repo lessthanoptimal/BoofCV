@@ -23,9 +23,9 @@ import boofcv.struct.feature.TupleDesc;
 import boofcv.struct.image.ImageGray;
 
 /**
- * Detects and describes different types of features inside an image.  All detected features are described using the
- * same type of descriptor.  Each type of detected feature is a member of a set and the found features
- * for a set are returned inside of a {@link PointDescSet}.  The order and number of sets remains constant.
+ * Detects and describes different types of features inside an image. All detected features are described using the
+ * same type of descriptor. Each type of detected feature is a member of a set and the found features
+ * for a set are returned inside of a {@link PointDescSet}. The order and number of sets remains constant.
  *
  * <TD> Type of feature descriptor
  *
@@ -49,11 +49,11 @@ public interface DetectDescribeMulti<T extends ImageGray<T>, Desc extends TupleD
 	int getNumberOfSets();
 
 	/**
-	 * Returns the most recently detected features for a specific set.  Each time
+	 * Returns the most recently detected features for a specific set. Each time
 	 * {@link #process(ImageGray)} is called the results are modified.
 	 * </p>
 	 * WARNING: The returned data structure is recycled each time {@link #process(ImageGray)}
-	 * is called.  Create a copy if this is a problem.
+	 * is called. Create a copy if this is a problem.
 	 *
 	 * @param set Which set of detected features.
 	 * @return Results for a set.

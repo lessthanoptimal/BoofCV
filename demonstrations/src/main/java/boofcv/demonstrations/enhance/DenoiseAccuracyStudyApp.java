@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -47,7 +47,7 @@ import java.util.Random;
 
 
 /**
- * Loads a sequence of tests images and runs a variety of filters through them.  Prints
+ * Loads a sequence of tests images and runs a variety of filters through them. Prints
  * out the denoising error for each filter and selects the best one for each image.
  *
  * @author Peter Abeles

@@ -70,7 +70,7 @@ public class DetectDescribeAssociateTracker<I extends ImageGray<I>, TD extends T
 	// ID of the most recently processed frame
 	protected @Getter long frameID = -1;
 
-	// number of features created.  Used to assign unique IDs
+	// number of features created. Used to assign unique IDs
 	protected long featureID = 0;
 
 	// should it update the feature description after each association?

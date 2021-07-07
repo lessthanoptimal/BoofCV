@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -37,7 +37,7 @@ public class PathLabel {
 	}
 
 	/**
-	 * Specifies a label with multiple paths.  If only a label is passed in it is assumed to be a file path
+	 * Specifies a label with multiple paths. If only a label is passed in it is assumed to be a file path
 	 * and the label is extracted from the file's name.
 	 * @param label
 	 * @param path

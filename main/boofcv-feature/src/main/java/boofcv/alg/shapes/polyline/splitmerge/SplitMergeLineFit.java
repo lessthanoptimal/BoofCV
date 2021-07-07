@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -29,17 +29,17 @@ import java.util.List;
 
 /**
  * Base class for algorithm which employ a split and merge strategy to fitting a set of line segments onto an
- * ordered set of points.  The lines are an approximation of the original shape described by the point list.
- * This list can either be connected at the end (looped) or not, depending on the implementation.  The points
- * in the list are assumed to be ordered with each consecutive point connected to its neighbors.  The output is
- * a set of indexes which correspond to points in the original list that compose the line segments.  A minimum
+ * ordered set of points. The lines are an approximation of the original shape described by the point list.
+ * This list can either be connected at the end (looped) or not, depending on the implementation. The points
+ * in the list are assumed to be ordered with each consecutive point connected to its neighbors. The output is
+ * a set of indexes which correspond to points in the original list that compose the line segments. A minimum
  * of two indexes will be returned.
  *
  * The returned set of line segments is guaranteed to match the original set of points to within a user
- * specified tolerance.  That is, no point in the list will be more than 'tol' distance away from a line segment.
- * A line is split when a point between two end points is greater than the split distance.  A corner is removed (two
+ * specified tolerance. That is, no point in the list will be more than 'tol' distance away from a line segment.
+ * A line is split when a point between two end points is greater than the split distance. A corner is removed (two
  * lines merged) if the corner is less than the split distance away from two of its adjacent neighbors. The split
- * threshold is specified as a fraction of line distance to maximize scale invariance.  The minimum split threshold
+ * threshold is specified as a fraction of line distance to maximize scale invariance. The minimum split threshold
  * is specified in units of pixels because a simple ratio doesn't work well for small objects.
  *
  * Split and merge is repeated until there is no more change or the maximum number of iterations has been reached.
@@ -51,7 +51,7 @@ public abstract class SplitMergeLineFit {
 	// maximum number of split and merge iterations
 	protected int maxIterations;
 
-	// How far away a point is from the line before it is split.  In fractions of a line segment's length squared.
+	// How far away a point is from the line before it is split. In fractions of a line segment's length squared.
 	protected double toleranceFractionSq;
 
 	// The maximum allowed distance a point can be from a line as a function of the overall
@@ -73,7 +73,7 @@ public abstract class SplitMergeLineFit {
 	// indicates which line segments need to be checked for splits
 	protected DogArray_B changed = new DogArray_B();
 
-	// if there are more splits than this amount just give up.  It's probably noise
+	// if there are more splits than this amount just give up. It's probably noise
 	protected int abortSplits = Integer.MAX_VALUE;
 
 	/**

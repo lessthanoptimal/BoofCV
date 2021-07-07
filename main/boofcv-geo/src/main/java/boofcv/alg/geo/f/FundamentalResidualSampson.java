@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -26,7 +26,7 @@ import org.ejml.data.DMatrixRMaj;
 
 /**
  * <p>
- * Computes the Sampson distance residual for a set of observations given a fundamental matrix.  For use
+ * Computes the Sampson distance residual for a set of observations given a fundamental matrix. For use
  * in least-squares non-linear optimization algorithms.
  * </p>
  *

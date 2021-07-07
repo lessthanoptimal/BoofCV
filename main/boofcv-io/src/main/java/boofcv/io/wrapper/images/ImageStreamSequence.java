@@ -33,7 +33,7 @@ import java.io.*;
 
 /**
  * Given a sequence of images encoded with {@link CombineFilesTogether}, it will read the files from
- * the stream and decode them.  Only one image is read at a time and if it is initialized from a file
+ * the stream and decode them. Only one image is read at a time and if it is initialized from a file
  * the sequence can be restarted.
  *
  * @author Peter Abeles

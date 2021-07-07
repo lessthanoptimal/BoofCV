@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -22,13 +22,13 @@ import boofcv.struct.image.ImageBase;
 
 /**
  * <p>
- * High level interface for applying the forward and inverse Discrete Fourier Transform to an image.  Images of any
- * size can be processed by this interface.  Images can typically be processed must faster when their size is a power
+ * High level interface for applying the forward and inverse Discrete Fourier Transform to an image. Images of any
+ * size can be processed by this interface. Images can typically be processed must faster when their size is a power
  * of two, see Fast Fourier Transform. The size of the input image can also be changed between called.
  * </p>
  * <p>
  * The Fourier transform of an image contains both real an imaginary components. These are stored in the output
- * image in an interleaved format.  As a result the output image will have twice the width and height as the input
+ * image in an interleaved format. As a result the output image will have twice the width and height as the input
  * image. This format is shown below:</p>
  * <pre>
  * a[i*2*width+2*j] = Re[i][j],
@@ -36,8 +36,8 @@ import boofcv.struct.image.ImageBase;
  * </pre>
  *
  * <p>
- * INPUT MODIFICATION: By default none of the inputs are modified.  However, in some implementations, memory can be
- * saved by allowing inputs to be modified.  To allow the class to modify its inputs use the following function,
+ * INPUT MODIFICATION: By default none of the inputs are modified. However, in some implementations, memory can be
+ * saved by allowing inputs to be modified. To allow the class to modify its inputs use the following function,
  * {@link #setModifyInputs(boolean)}.
  * </p>
  *
@@ -48,16 +48,16 @@ public interface DiscreteFourierTransform<I extends ImageBase<I>, T extends Imag
 	/**
 	 * Applies forward transform to the input image.
 	 *
-	 * @param image (Input) Input image.  Default: Not modified.
-	 * @param transform (Output) Fourier transform, twice width and same height of input.  Modified.
+	 * @param image (Input) Input image. Default: Not modified.
+	 * @param transform (Output) Fourier transform, twice width and same height of input. Modified.
 	 */
 	public void forward( I image, T transform );
 
 	/**
 	 * Applies the inverse transform to a fourier transformed image to recover the original image
 	 *
-	 * @param transform (Input) Fourier transform. twice width and same height of output.  Default: Not modified.
-	 * @param image (Output) reconstructed image.  Modified.
+	 * @param transform (Input) Fourier transform. twice width and same height of output. Default: Not modified.
+	 * @param image (Output) reconstructed image. Modified.
 	 */
 	public void inverse( T transform, I image );
 

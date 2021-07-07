@@ -24,12 +24,12 @@ import boofcv.struct.image.GrayU8;
 import org.ddogleg.struct.DogArray_I32;
 
 /**
- * Applies binary thinning operators to the input image.  Thinning discards most of objects foreground
+ * Applies binary thinning operators to the input image. Thinning discards most of objects foreground
  * (value one) pixels and leaves behind a "skinny" object which still mostly describes the original object's shape.
  *
- * This implementation is known as the morphological thinning.  It works by applying 8 masks to the image sequence.
- * When a mask is applied pixels which need to be set to zero are recorded in a list.  After the mask as been
- * applied the pixels are modified, then the next mask is applied.  This cycle is repeated until the image
+ * This implementation is known as the morphological thinning. It works by applying 8 masks to the image sequence.
+ * When a mask is applied pixels which need to be set to zero are recorded in a list. After the mask as been
+ * applied the pixels are modified, then the next mask is applied. This cycle is repeated until the image
  * no longer changes.
  *
  * Based off the description in [1] using masks from [2]. The masks in those two sources are very similar but
@@ -93,10 +93,10 @@ public class BinaryThinning {
 	DogArray_I32 zerosOut = new DogArray_I32();
 
 	/**
-	 * Applies the thinning algorithm.  Runs for the specified number of loops or until no change is detected.
+	 * Applies the thinning algorithm. Runs for the specified number of loops or until no change is detected.
 	 *
-	 * @param binary Input binary image which is to be thinned.  This is modified
-	 * @param maxLoops Maximum number of thinning loops.  Set to -1 to run until the image is no longer modified.
+	 * @param binary Input binary image which is to be thinned. This is modified
+	 * @param maxLoops Maximum number of thinning loops. Set to -1 to run until the image is no longer modified.
 	 */
 	public void apply( GrayU8 binary, int maxLoops ) {
 		this.binary = binary;
@@ -151,8 +151,8 @@ public class BinaryThinning {
 	}
 
 	/**
-	 * Abstract class for applying the mask.  Uses sparse list of black pixels.  Determines if the pixel is along
-	 * the border or not.  If border then generic code is code, otherwise optimized code is called.
+	 * Abstract class for applying the mask. Uses sparse list of black pixels. Determines if the pixel is along
+	 * the border or not. If border then generic code is code, otherwise optimized code is called.
 	 */
 	protected abstract class Mask {
 

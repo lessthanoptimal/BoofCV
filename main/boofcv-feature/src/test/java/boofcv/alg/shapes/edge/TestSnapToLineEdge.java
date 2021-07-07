@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -67,8 +67,7 @@ public class TestSnapToLineEdge extends BoofStandardJUnit {
 	/**
 	 * Edges which are aligned with the x and y axises
 	 */
-	@Test
-	public void easy_aligned() {
+	@Test void easy_aligned() {
 		for (Class imageType : imageTypes) {
 			easy_aligned(imageType);
 		}
@@ -100,7 +99,7 @@ public class TestSnapToLineEdge extends BoofStandardJUnit {
 
 		LineGeneral2D_F64 found = new LineGeneral2D_F64();
 
-		// give it an offset from truth.  still simple enough that it should nail the correct solution on the first
+		// give it an offset from truth. still simple enough that it should nail the correct solution on the first
 		// try
 		for (int i = -1; i <= 1; i++) {
 			LineSegment2D_F64 work = segment.copy();
@@ -137,8 +136,7 @@ public class TestSnapToLineEdge extends BoofStandardJUnit {
 	/**
 	 * Make sure it can process a sub-image just fine
 	 */
-	@Test
-	public void subimage() {
+	@Test void subimage() {
 		for (Class imageType : imageTypes) {
 			subimage(imageType);
 		}
@@ -165,8 +163,7 @@ public class TestSnapToLineEdge extends BoofStandardJUnit {
 	/**
 	 * Fit the quad with a noisy initial guess
 	 */
-	@Test
-	public void fit_noisy_affine() {
+	@Test void fit_noisy_affine() {
 		// distorted and undistorted views
 		Affine2D_F64[] affines = new Affine2D_F64[2];
 		affines[0] = new Affine2D_F64();
@@ -252,8 +249,7 @@ public class TestSnapToLineEdge extends BoofStandardJUnit {
 	/**
 	 * Simple case where it samples along a line on a perfect rectangle
 	 */
-	@Test
-	public void computePointsAndWeights() {
+	@Test void computePointsAndWeights() {
 		for (Class imageType : imageTypes) {
 			computePointsAndWeights(imageType);
 		}
@@ -272,7 +268,7 @@ public class TestSnapToLineEdge extends BoofStandardJUnit {
 		alg.computePointsAndWeights(0, H, x0, y0 + 5, 1, 0);
 
 		// sample points on the outside of the line will be zero since the image has no gradient
-		// there.  Thus the weight is zero and the point skipped
+		// there. Thus the weight is zero and the point skipped
 		assertEquals(alg.lineSamples,alg.samplePts.size());
 
 		for (int i = 0; i < alg.lineSamples; i++) {
@@ -292,8 +288,7 @@ public class TestSnapToLineEdge extends BoofStandardJUnit {
 	/**
 	 * Checks to see if it blows up along the image border
 	 */
-	@Test
-	public void computePointsAndWeights_border() {
+	@Test void computePointsAndWeights_border() {
 		for (Class imageType : imageTypes) {
 			computePointsAndWeights_border(imageType);
 		}
@@ -315,8 +310,7 @@ public class TestSnapToLineEdge extends BoofStandardJUnit {
 		assertEquals(0, alg.samplePts.size());
 	}
 
-	@Test
-	public void localToGlobal() {
+	@Test void localToGlobal() {
 
 		LineSegment2D_F64 segment = new LineSegment2D_F64(10,20,50,-10);
 

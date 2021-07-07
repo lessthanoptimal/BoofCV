@@ -28,13 +28,13 @@ import boofcv.struct.Configuration;
  */
 public class ConfigDenseSift implements Configuration {
 	/**
-	 * Specifies how the SIFT descriptor is computed.   All parameters are used but
+	 * Specifies how the SIFT descriptor is computed.  All parameters are used but
 	 * {@link ConfigSiftDescribe#sigmaToPixels}
 	 */
 	public ConfigSiftDescribe sift = new ConfigSiftDescribe();
 
 	/**
-	 * Specifies the frequency it will sample across the image in pixels.  Default ix period X = 6, period Y = 6.
+	 * Specifies the frequency it will sample across the image in pixels. Default ix period X = 6, period Y = 6.
 	 */
 	public DenseSampling sampling = new DenseSampling(6, 6);
 

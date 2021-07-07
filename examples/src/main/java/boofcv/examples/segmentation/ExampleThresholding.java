@@ -33,9 +33,9 @@ import boofcv.struct.image.GrayU8;
 import java.awt.image.BufferedImage;
 
 /**
- * Demonstration of different techniques for automatic thresholding an image to create a binary image.  The binary
- * image can then be used for shape analysis and other applications.  Global methods apply the same threshold
- * to the entire image.  Local methods compute a local threshold around each pixel and can handle uneven
+ * Demonstration of different techniques for automatic thresholding an image to create a binary image. The binary
+ * image can then be used for shape analysis and other applications. Global methods apply the same threshold
+ * to the entire image. Local methods compute a local threshold around each pixel and can handle uneven
  * lighting, but produce noisy results in regions with uniform lighting.
  *
  * @see boofcv.examples.imageprocessing.ExampleBinaryOps
@@ -82,7 +82,7 @@ public class ExampleThresholding {
 		GThresholdImageOps.blockOtsu(input, binary, false,ConfigLength.fixed(21),0.5, 1.0, true );
 		gui.addImage(VisualizeBinaryData.renderBinary(binary, false, null),"Block: Otsu");
 
-		// Sauvola is tuned for text image.  Change radius to make it run better in others.
+		// Sauvola is tuned for text image. Change radius to make it run better in others.
 
 		// Show the image image for reference
 		gui.addImage(ConvertBufferedImage.convertTo(input,null),"Input Image");

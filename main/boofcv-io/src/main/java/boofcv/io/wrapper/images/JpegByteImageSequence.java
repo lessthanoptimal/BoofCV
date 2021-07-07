@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -33,7 +33,7 @@ import java.util.List;
 
 
 /**
- * Create a sequence from an array of jpeg images in byte[] array format.  Each image is decompressed
+ * Create a sequence from an array of jpeg images in byte[] array format. Each image is decompressed
  * as need
  *
  * @author Peter Abeles

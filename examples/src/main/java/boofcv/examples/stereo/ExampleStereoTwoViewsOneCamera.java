@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -156,7 +156,7 @@ public class ExampleStereoTwoViewsOneCamera {
 	 * @param intrinsic Intrinsic camera parameters
 	 * @param matchedNorm set of matched point features in normalized image coordinates
 	 * @param inliers OUTPUT: Set of inlier features from RANSAC
-	 * @return Found camera motion.  Note translation has an arbitrary scale
+	 * @return Found camera motion. Note translation has an arbitrary scale
 	 */
 	public static Se3_F64 estimateCameraMotion( CameraPinholeBrown intrinsic,
 												List<AssociatedPair> matchedNorm, List<AssociatedPair> inliers ) {
@@ -262,7 +262,7 @@ public class ExampleStereoTwoViewsOneCamera {
 	}
 
 	/**
-	 * Draw inliers for debugging purposes.  Need to convert from normalized to pixel coordinates.
+	 * Draw inliers for debugging purposes. Need to convert from normalized to pixel coordinates.
 	 */
 	public static void drawInliers( BufferedImage left, BufferedImage right, CameraPinholeBrown intrinsic,
 									List<AssociatedPair> normalized ) {

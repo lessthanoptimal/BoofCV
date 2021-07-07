@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -127,7 +127,7 @@ public class LowLevelMultiViewOps {
 	/**
 	 * <p>
 	 * Computes two normalization matrices for each set of point correspondences in the list of
-	 * {@link boofcv.struct.geo.AssociatedPair}.  Same as {@link #computeNormalization(java.util.List, NormalizationPoint2D)},
+	 * {@link boofcv.struct.geo.AssociatedPair}. Same as {@link #computeNormalization(java.util.List, NormalizationPoint2D)},
 	 * but for two views.
 	 * </p>
 	 *
@@ -186,7 +186,7 @@ public class LowLevelMultiViewOps {
 	/**
 	 * <p>
 	 * Computes three normalization matrices for each set of point correspondences in the list of
-	 * {@link boofcv.struct.geo.AssociatedTriple}.  Same as {@link #computeNormalization(java.util.List, NormalizationPoint2D)},
+	 * {@link boofcv.struct.geo.AssociatedTriple}. Same as {@link #computeNormalization(java.util.List, NormalizationPoint2D)},
 	 * but for three views.
 	 * </p>
 	 *

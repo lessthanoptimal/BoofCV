@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -256,7 +256,7 @@ public abstract class GeneralTemplateMatchTests<T extends ImageGray<T>> extends 
 	}
 
 	/**
-	 * If the mask is correctly applied then two matches will be found inside the image.  Otherwise just one.
+	 * If the mask is correctly applied then two matches will be found inside the image. Otherwise just one.
 	 */
 	@Test
 	void maskDifferentiate() {

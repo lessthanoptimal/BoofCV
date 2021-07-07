@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -35,7 +35,7 @@ public class FlowBlock_to_DenseOpticalFlow<T extends ImageGray<T>>
 {
 	DenseOpticalFlowBlockPyramid<T> flowAlg;
 
-	// width and height of input image.  used to see if anything changes
+	// width and height of input image. used to see if anything changes
 	int width = -1;
 	int height = -1;
 
@@ -69,7 +69,7 @@ public class FlowBlock_to_DenseOpticalFlow<T extends ImageGray<T>>
 
 			int minSize = (2*(flowAlg.getRegionRadius() + flowAlg.getRegionRadius()+1) + 1);
 
-			// apply no blur to the layers.  If the user wants a blurred image they can blur it themselves
+			// apply no blur to the layers. If the user wants a blurred image they can blur it themselves
 			pyramidSrc = UtilDenseOpticalFlow.standardPyramid(source.width,source.height,scale,0,
 					minSize,maxLayers,source.getImageType().getImageClass());
 			pyramidDst = UtilDenseOpticalFlow.standardPyramid(source.width,source.height,scale,0,

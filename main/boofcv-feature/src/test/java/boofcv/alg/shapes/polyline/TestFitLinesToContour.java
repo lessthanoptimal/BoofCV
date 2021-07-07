@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -38,10 +38,9 @@ import static org.junit.jupiter.api.Assertions.*;
 public class TestFitLinesToContour extends BoofStandardJUnit {
 
 	/**
-	 * Easy case were the corners are all in perfect location.  Try all permutations of first anchor and second anchor.
+	 * Easy case were the corners are all in perfect location. Try all permutations of first anchor and second anchor.
 	 */
-	@Test
-	public void fitAnchored_perfect_input() {
+	@Test void fitAnchored_perfect_input() {
 		FitLinesToContour alg = new FitLinesToContour();
 
 		alg.setContour(createSquare( 10,12 , 30,40));
@@ -65,8 +64,7 @@ public class TestFitLinesToContour extends BoofStandardJUnit {
 	/**
 	 * Have only one corner off by a few pixels with extremely clean input data
 	 */
-	@Test
-	public void fitAnchored_easy_optimization() {
+	@Test void fitAnchored_easy_optimization() {
 		FitLinesToContour alg = new FitLinesToContour();
 
 		alg.setContour(createSquare( 10,12 , 30,40));
@@ -83,8 +81,7 @@ public class TestFitLinesToContour extends BoofStandardJUnit {
 		}
 	}
 
-	@Test
-	public void sanityCheckCornerOrder() {
+	@Test void sanityCheckCornerOrder() {
 		FitLinesToContour alg = new FitLinesToContour();
 		alg.contour = createSquare( 10,12 , 30,40);
 		DogArray_I32 corners = new DogArray_I32();
@@ -108,8 +105,7 @@ public class TestFitLinesToContour extends BoofStandardJUnit {
 		assertFalse(alg.sanityCheckCornerOrder(4, corners));
 	}
 
-	@Test
-	public void linesIntoCorners() {
+	@Test void linesIntoCorners() {
 		FitLinesToContour alg = new FitLinesToContour();
 
 		alg.contour = createSquare( 10,12 , 30,40);
@@ -133,8 +129,7 @@ public class TestFitLinesToContour extends BoofStandardJUnit {
 
 	}
 
-	@Test
-	public void fitLinesUsingCorners() {
+	@Test void fitLinesUsingCorners() {
 		FitLinesToContour alg = new FitLinesToContour();
 
 		alg.contour = createSquare( 10,12 , 30,40);
@@ -156,8 +151,7 @@ public class TestFitLinesToContour extends BoofStandardJUnit {
 		}
 	}
 
-	@Test
-	public void fitLine() {
+	@Test void fitLine() {
 		FitLinesToContour alg = new FitLinesToContour();
 
 		// create the rectangle so that two sizes are less than max samples and the other two more
@@ -184,8 +178,7 @@ public class TestFitLinesToContour extends BoofStandardJUnit {
 		}
 	}
 
-	@Test
-	public void closestPoint() {
+	@Test void closestPoint() {
 		FitLinesToContour alg = new FitLinesToContour();
 
 		alg.contour = createSquare( 10,12 , 30,40);

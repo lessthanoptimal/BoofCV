@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -64,8 +64,7 @@ public abstract class GeneralGradientSparse extends BoofStandardJUnit {
 	}
 
 
-	@Test
-	public void compareToFullImage_noBorder() {
+	@Test void compareToFullImage_noBorder() {
 
 		createGradient().process(image,derivX,derivY);
 		SparseImageGradient alg = createAlg(null);
@@ -89,8 +88,7 @@ public abstract class GeneralGradientSparse extends BoofStandardJUnit {
 		}
 	}
 
-	@Test
-	public void compareToFullImage_Border() {
+	@Test void compareToFullImage_Border() {
 
 		ImageBorder border = FactoryImageBorder.single(BorderType.EXTENDED, imageType);
 

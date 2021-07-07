@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -39,7 +39,7 @@ public class VisualDepthOps {
 	 * Creates a point cloud from a depth image.
 	 *
 	 * @param param Intrinsic camera parameters for depth image
-	 * @param depth depth image.  each value is in millimeters.
+	 * @param depth depth image. each value is in millimeters.
 	 * @param cloud Output point cloud
 	 */
 	public static void depthTo3D( CameraPinholeBrown param, GrayU16 depth, DogArray<Point3D_F64> cloud ) {
@@ -70,11 +70,11 @@ public class VisualDepthOps {
 	}
 
 	/**
-	 * Creates a point cloud from a depth image and saves the color information.  The depth and color images are
+	 * Creates a point cloud from a depth image and saves the color information. The depth and color images are
 	 * assumed to be aligned.
 	 *
 	 * @param param Intrinsic camera parameters for depth image
-	 * @param depth depth image.  each value is in millimeters.
+	 * @param depth depth image. each value is in millimeters.
 	 * @param rgb Color image that's aligned to the depth.
 	 * @param cloud Output point cloud
 	 * @param cloudColor Output color for each point in the cloud

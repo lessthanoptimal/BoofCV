@@ -35,22 +35,22 @@ import java.util.Arrays;
 
 /**
  * <p>
- * K-means based superpixel image segmentation, see [1].  The image is broken up into superpixels (clusters of
- * connected pixels) in a grid like pattern.  A connectivity rule of 4 or 8 is enforced across all the clusters.
+ * K-means based superpixel image segmentation, see [1]. The image is broken up into superpixels (clusters of
+ * connected pixels) in a grid like pattern. A connectivity rule of 4 or 8 is enforced across all the clusters.
  * Clustering is done using k-means, where each point is composed on the 2D image coordinate and an intensity
- * value in each color band, thus K = 2+numBands.  Instead of computing the distance of each cluster's center
- * from each point only points within a distance of S si considered.  The difference in scale difference between
+ * value in each color band, thus K = 2+numBands. Instead of computing the distance of each cluster's center
+ * from each point only points within a distance of S si considered. The difference in scale difference between
  * pixels and image intensity is handled through a user configurable tuning parameter.
  * </p>
  *
  * <p>
  * Deviations from paper:
  * <ul>
- * <li>In the paper a LAB color space is always used.  In this implementation a general purpose N-dimensional
+ * <li>In the paper a LAB color space is always used. In this implementation a general purpose N-dimensional
  * color space is used.</li>
  * <li>To correctly support LAB or other color spaces a specialized implementation might be needed to ensure
  * the intensity of a pixel is computed correctly.</li>
- * <li>Small regions are merged into other regions based on how similar their color is.  In the paper
+ * <li>Small regions are merged into other regions based on how similar their color is. In the paper
  * a small region is merged into the largest region it is connected to.</li>
  * </ul>
  * </p>
@@ -71,7 +71,7 @@ public abstract class SegmentSlic<T extends ImageBase<T>>
 	// number of bands in the input image
 	private final int numBands;
 
-	// the number of regions/superpixels.  K in the paper
+	// the number of regions/superpixels. K in the paper
 	private final int numberOfRegions;
 
 	// spacial weighting tuning parameter  Is also m in the paper.
@@ -80,9 +80,9 @@ public abstract class SegmentSlic<T extends ImageBase<T>>
 	// Number of iterations
 	private final int totalIterations;
 
-	// Space between superpixel centers.  S in the paper
+	// Space between superpixel centers. S in the paper
 	protected int gridInterval;
-	// Adjustment to spacial distance.  Computed from m and gridInterval
+	// Adjustment to spacial distance. Computed from m and gridInterval
 	private float adjustSpacial;
 
 	// The image being processed
@@ -139,7 +139,7 @@ public abstract class SegmentSlic<T extends ImageBase<T>>
 		stopRequested = false;
 		if (input.width < 2*BORDER || input.height < 2*BORDER)
 			throw new IllegalArgumentException(
-					"Image is too small to process.  Must have a width and height of at least " + (2*BORDER));
+					"Image is too small to process. Must have a width and height of at least " + (2*BORDER));
 
 		// initialize all the data structures
 		initalize(input);
@@ -186,8 +186,8 @@ public abstract class SegmentSlic<T extends ImageBase<T>>
 	}
 
 	/**
-	 * initialize all the clusters at regularly spaced intervals.  Their locations are perturbed a bit to reduce
-	 * the likelihood of a bad location.  Initial color is set to the image color at the location
+	 * initialize all the clusters at regularly spaced intervals. Their locations are perturbed a bit to reduce
+	 * the likelihood of a bad location. Initial color is set to the image color at the location
 	 */
 	protected void initializeClusters() {
 
@@ -263,7 +263,7 @@ public abstract class SegmentSlic<T extends ImageBase<T>>
 	public abstract float getIntensity( int x, int y );
 
 	/**
-	 * Computes how far away each cluster is from each pixel.  Expectation step.
+	 * Computes how far away each cluster is from each pixel. Expectation step.
 	 */
 	protected void computeClusterDistance() {
 		for (int i = 0; i < pixels.size; i++) {
@@ -395,14 +395,14 @@ public abstract class SegmentSlic<T extends ImageBase<T>>
 	}
 
 	/**
-	 * K-means clustering information for each pixel.  Stores distance from each cluster mean.
+	 * K-means clustering information for each pixel. Stores distance from each cluster mean.
 	 */
 	public static class Pixel {
 		// list of clusters it is interacting with
 		public DogArray<ClusterDistance> clusters = new DogArray<>(12, ClusterDistance::new);
 
 		public void add( Cluster c, float distance ) {
-			// make sure it isn't already full.  THis should almost never happen
+			// make sure it isn't already full. THis should almost never happen
 			ClusterDistance d = clusters.grow();
 
 			d.cluster = c;
@@ -439,7 +439,7 @@ public abstract class SegmentSlic<T extends ImageBase<T>>
 	}
 
 	/**
-	 * The mean in k-means.  Point in image (x,y) and color space.
+	 * The mean in k-means. Point in image (x,y) and color space.
 	 */
 	public static class Cluster {
 		// unique ID for the cluster
@@ -450,7 +450,7 @@ public abstract class SegmentSlic<T extends ImageBase<T>>
 		public float y;
 		public float color[];
 
-		// the total.  Used when being updated
+		// the total. Used when being updated
 		public float totalWeight;
 
 		public void reset() {

@@ -34,8 +34,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  */
 public class TestGenerateScaleTranslateRotate2D extends BoofStandardJUnit {
 
-	@Test
-	public void perfect() {
+	@Test void perfect() {
 		for (int i = 0; i < 100; i++) {
 			double theta = rand.nextDouble()*Math.PI*2 - Math.PI;
 			double scale = rand.nextDouble()*5 + 0.1;
@@ -62,8 +61,7 @@ public class TestGenerateScaleTranslateRotate2D extends BoofStandardJUnit {
 		}
 	}
 
-	@Test
-	public void getMinimumPoints() {
+	@Test void getMinimumPoints() {
 		GenerateScaleTranslateRotate2D alg = new GenerateScaleTranslateRotate2D();
 		assertEquals(3, alg.getMinimumPoints());
 	}

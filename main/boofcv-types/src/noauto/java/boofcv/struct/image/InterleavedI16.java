@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -59,7 +59,7 @@ public abstract class InterleavedI16<T extends InterleavedI16<T>> extends Interl
 	 *
 	 * @param x pixel coordinate.
 	 * @param y pixel coordinate.
-	 * @param storage If not null then the pixel's value is written here.  If null a new array is created.
+	 * @param storage If not null then the pixel's value is written here. If null a new array is created.
 	 * @return The pixel's value.
 	 */
 	public short[] get( int x, int y, @Nullable short[] storage ) {

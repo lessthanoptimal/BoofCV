@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -37,7 +37,7 @@ class TestCameraToEquirectangular_F64 extends TestEquirectangularDistortBase_F64
 	private int imgHeight = 240;
 
 	/**
-	 * Makes sure the canonical orientation is pointed along the positive z axis.  This is done by projecting
+	 * Makes sure the canonical orientation is pointed along the positive z axis. This is done by projecting
 	 * the center of the pinhole at default orientation.
 	 */
 	@Test

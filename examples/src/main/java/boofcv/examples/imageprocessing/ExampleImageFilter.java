@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -41,7 +41,7 @@ import boofcv.struct.image.*;
 import java.awt.image.BufferedImage;
 
 /**
- * An introductory example designed to introduce basic BoofCV concepts.  Each function
+ * An introductory example designed to introduce basic BoofCV concepts. Each function
  * shows how to perform basic filtering and display operations using different techniques.
  *
  * @author Peter Abeles

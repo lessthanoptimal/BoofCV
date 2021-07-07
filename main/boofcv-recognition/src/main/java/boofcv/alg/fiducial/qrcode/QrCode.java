@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -512,7 +512,7 @@ public class QrCode implements Cloneable {
 	}
 
 	/**
-	 * Information related to a specific alignment pattern.  The center coordinate is stored.
+	 * Information related to a specific alignment pattern. The center coordinate is stored.
 	 */
 	public static class Alignment {
 		/**

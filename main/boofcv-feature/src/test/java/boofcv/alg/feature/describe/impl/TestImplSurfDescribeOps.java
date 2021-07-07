@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -102,7 +102,7 @@ public class TestImplSurfDescribeOps extends BoofStandardJUnit {
 	}
 
 	/**
-	 * Create an image which has a constant slope.  See if
+	 * Create an image which has a constant slope. See if
 	 * the wavelet correctly computes that slope.
 	 */
 	@Test void naiveGradient() {
@@ -114,8 +114,7 @@ public class TestImplSurfDescribeOps extends BoofStandardJUnit {
 	/**
 	 * Give it a scale factor which is a fraction and see if it blows up
 	 */
-	@Test
-	public void naiveGradient_fraction() {
+	@Test void naiveGradient_fraction() {
 		double scale = 1.5;
 		int r = 6;
 		checkNaiveGradient(scale, r);

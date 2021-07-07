@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -224,21 +224,21 @@ public class FileBrowser extends JSpringPanel {
 	}
 
 	/**
-	 * The selected file/directory has changed.  Just update the text
+	 * The selected file/directory has changed. Just update the text
 	 */
 	private void setSelectedName( File file ) {
 		textFileName.setText(file.getName());
 	}
 
 	/**
-	 * The parent directory has changed.  Update the file list.   If file is null then it's assumed to be
+	 * The parent directory has changed. Update the file list.  If file is null then it's assumed to be
 	 * the list of all devices. On unix there's only one which is / but on windows there can be multiple
 	 */
 	public void setDirectory( File file ) {
 
 		List<File> roots = null;
 		if( file == null ) {
-			// Create a list of roots with something in them.  Windows list to list non-existant devices
+			// Create a list of roots with something in them. Windows list to list non-existant devices
 			roots = new ArrayList<>(Arrays.asList(File.listRoots()));
 			for (int i = roots.size()-1; i >= 0; i--) {
 				File[]files = roots.get(i).listFiles();

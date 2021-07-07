@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -31,8 +31,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
  * @author Peter Abeles
  */
 public class TestBundleCameraNumericJacobian extends BoofStandardJUnit {
-	@Test
-	public void jacobianIntrinsics() {
+	@Test void jacobianIntrinsics() {
 		BundleCameraNumericJacobian alg = new BundleCameraNumericJacobian();
 		double[] params = new double[]{2.1, 3.1};
 		SimpleCamera camera = new SimpleCamera();
@@ -55,8 +54,7 @@ public class TestBundleCameraNumericJacobian extends BoofStandardJUnit {
 		}
 	}
 
-	@Test
-	public void jacobianPoint() {
+	@Test void jacobianPoint() {
 		BundleCameraNumericJacobian alg = new BundleCameraNumericJacobian();
 		double[] params = new double[]{2.1, 3.1};
 		SimpleCamera camera = new SimpleCamera();

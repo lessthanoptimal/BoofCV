@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -87,8 +87,7 @@ public class TestConvertYuv420_888 extends BoofStandardJUnit {
 		bufferV = ByteBuffer.wrap(bandUV,1,bandUV.length-1);
 	}
 
-	@Test
-	public void yuvToGray_U8() {
+	@Test void yuvToGray_U8() {
 		GrayU8 output = new GrayU8(width,height);
 
 		for (int i = 0; i < inputs.length; i++) {
@@ -98,8 +97,7 @@ public class TestConvertYuv420_888 extends BoofStandardJUnit {
 		}
 	}
 
-	@Test
-	public void yuvToGray_F32() {
+	@Test void yuvToGray_F32() {
 		GrayF32 output = new GrayF32(width,height);
 
 		for (int i = 0; i < inputs.length; i++) {
@@ -109,8 +107,7 @@ public class TestConvertYuv420_888 extends BoofStandardJUnit {
 		}
 	}
 
-	@Test
-	public void yuvToInterleavedRgbU8() {
+	@Test void yuvToInterleavedRgbU8() {
 		InterleavedU8 output = new InterleavedU8(width,height,3);
 
 		for (int i = 0; i < inputs.length; i++) {
@@ -121,8 +118,7 @@ public class TestConvertYuv420_888 extends BoofStandardJUnit {
 	}
 
 
-	@Test
-	public void yuvToInterleavedRgbF32() {
+	@Test void yuvToInterleavedRgbF32() {
 		InterleavedF32 output = new InterleavedF32(width,height,3);
 
 		for (int i = 0; i < inputs.length; i++) {
@@ -132,8 +128,7 @@ public class TestConvertYuv420_888 extends BoofStandardJUnit {
 		}
 	}
 
-	@Test
-	public void yuvToPlanarRgbU8() {
+	@Test void yuvToPlanarRgbU8() {
 		Planar<GrayU8> output = new Planar<>(GrayU8.class,width,height,3);
 
 		for (int i = 0; i < inputs.length; i++) {
@@ -143,8 +138,7 @@ public class TestConvertYuv420_888 extends BoofStandardJUnit {
 		}
 	}
 
-	@Test
-	public void yuvToPlanarRgbF32() {
+	@Test void yuvToPlanarRgbF32() {
 		Planar<GrayF32> output = new Planar<>(GrayF32.class,width,height,3);
 
 		for (int i = 0; i < inputs.length; i++) {

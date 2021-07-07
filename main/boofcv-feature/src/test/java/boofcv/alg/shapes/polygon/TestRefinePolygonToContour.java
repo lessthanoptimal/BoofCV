@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -36,8 +36,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  * @author Peter Abeles
  */
 public class TestRefinePolygonToContour extends BoofStandardJUnit {
-	@Test
-	public void basic() {
+	@Test void basic() {
 		RectangleLength2D_I32 rect = new RectangleLength2D_I32(0,0,10,5);
 		List<Point2D_I32> contour = rectToContour(rect);
 		DogArray_I32 vertexes = computeContourVertexes(rect);
@@ -48,8 +47,7 @@ public class TestRefinePolygonToContour extends BoofStandardJUnit {
 		assertTrue(checkPolygon(new double[]{0,0, 9,0, 9,4, 0,4},found));
 	}
 
-	@Test
-	public void reverseOrder() {
+	@Test void reverseOrder() {
 		RectangleLength2D_I32 rect = new RectangleLength2D_I32(0,0,10,5);
 		List<Point2D_I32> contour = rectToContour(rect);
 		DogArray_I32 vertexes = computeContourVertexes(rect);

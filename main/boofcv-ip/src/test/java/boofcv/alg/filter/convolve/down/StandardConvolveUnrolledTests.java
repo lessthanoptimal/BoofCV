@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -39,18 +39,15 @@ public abstract class StandardConvolveUnrolledTests extends BoofStandardJUnit {
 
 	CompareToStandardConvolveDownNoBorder compareToStandard = new CompareToStandardConvolveDownNoBorder(target);
 
-	@Test
-	public void convolve() throws NoSuchMethodException {
+	@Test void convolve() throws NoSuchMethodException {
 		testMethod("convolve",param2D);
 	}
 
-	@Test
-	public void horizontal() throws NoSuchMethodException {
+	@Test void horizontal() throws NoSuchMethodException {
 		testMethod("horizontal",param1D);
 	}
 
-	@Test
-	public void vertical() throws NoSuchMethodException {
+	@Test void vertical() throws NoSuchMethodException {
 		testMethod("vertical",param1D);
 	}
 

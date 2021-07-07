@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -38,8 +38,7 @@ import static org.junit.jupiter.api.Assertions.*;
  */
 public class TestEllipseClustersIntoRegularGrid extends BoofStandardJUnit {
 
-	@Test
-	public void process_various() {
+	@Test void process_various() {
 		process(4,3, false);
 		process(3,3, false);
 		process(4,1, true);
@@ -71,8 +70,7 @@ public class TestEllipseClustersIntoRegularGrid extends BoofStandardJUnit {
 		}
 	}
 
-	@Test
-	public void checkGridSize() {
+	@Test void checkGridSize() {
 		// create a grid in the expected format
 		int rows = 4, cols = 3;
 		Tuple2<List<Node>,List<EllipseRotated_F64>> grid = TestEllipseClustersIntoGrid.createRegularGrid(rows, cols);
@@ -87,8 +85,7 @@ public class TestEllipseClustersIntoRegularGrid extends BoofStandardJUnit {
 		assertFalse(EllipseClustersIntoRegularGrid.checkGridSize(input,rows*cols+1));
 	}
 
-	@Test
-	public void createRegularGrid() {
+	@Test void createRegularGrid() {
 		// create a grid in the expected format
 		int rows = 4;
 		int cols = 3;

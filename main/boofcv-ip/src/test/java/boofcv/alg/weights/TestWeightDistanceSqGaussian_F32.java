@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -32,8 +32,7 @@ public class TestWeightDistanceSqGaussian_F32 extends BoofStandardJUnit {
 	/**
 	 * See if it has some of the features of a gaussian
 	 */
-	@Test
-	public void basic() {
+	@Test void basic() {
 		WeightDistanceSqGaussian_F32 alg = new WeightDistanceSqGaussian_F32(2);
 
 		// should always decrease in value

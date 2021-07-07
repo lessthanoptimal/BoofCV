@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -31,16 +31,14 @@ import static org.junit.jupiter.api.Assertions.assertSame;
  */
 public class TestTrifocalTensor extends BoofStandardJUnit {
 
-	@Test
-	public void getT() {
+	@Test void getT() {
 		TrifocalTensor t = new TrifocalTensor();
 		assertSame(t.T1, t.getT(0));
 		assertSame(t.T2, t.getT(1));
 		assertSame(t.T3, t.getT(2));
 	}
 
-	@Test
-	public void set() {
+	@Test void set() {
 		TrifocalTensor t = new TrifocalTensor();
 		t.T1.set(0,0,1);
 		t.T2.set(0,0,2);
@@ -54,8 +52,7 @@ public class TestTrifocalTensor extends BoofStandardJUnit {
 		assertEquals(a.T3.get(0, 0), 3);
 	}
 
-	@Test
-	public void convertFrom() {
+	@Test void convertFrom() {
 		DMatrixRMaj A = new DMatrixRMaj(27,1);
 		for( int i = 0; i < 27; i++ )
 			A.set(i,i);
@@ -67,8 +64,7 @@ public class TestTrifocalTensor extends BoofStandardJUnit {
 			assertEquals(t.getT(i/9).get(i%9), i);
 	}
 
-	@Test
-	public void convertTo() {
+	@Test void convertTo() {
 		TrifocalTensor t = new TrifocalTensor();
 
 		for( int i = 0; i < 27; i++ )
@@ -81,8 +77,7 @@ public class TestTrifocalTensor extends BoofStandardJUnit {
 
 	}
 
-	@Test
-	public void normalizeScale() {
+	@Test void normalizeScale() {
 		TrifocalTensor t = new TrifocalTensor();
 
 		for( int i = 0; i < 27; i++ )

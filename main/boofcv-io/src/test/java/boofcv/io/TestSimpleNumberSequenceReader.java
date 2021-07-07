@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -32,8 +32,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
  */
 public class TestSimpleNumberSequenceReader extends BoofStandardJUnit {
 
-	@Test
-	public void nocomments() throws IOException {
+	@Test void nocomments() throws IOException {
 		String input = "  12384 342.123  233e-1   23\n424 94";
 
 		StringReader reader = new StringReader(input);
@@ -51,8 +50,7 @@ public class TestSimpleNumberSequenceReader extends BoofStandardJUnit {
 		assertEquals(94.0,found.get(5),1e-8);
 	}
 
-	@Test
-	public void withComments() throws IOException {
+	@Test void withComments() throws IOException {
 		String input = "#  12384 342.123  233e-1   23\n424 94\n# sdfsdf \n4   ";
 
 		StringReader reader = new StringReader(input);

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -26,8 +26,8 @@ import org.ddogleg.struct.Tuple2;
 import java.util.List;
 
 /**
- * Contains a classifier and where to download its models.  Each string in source is
- * an address where the model can be downloaded from.  If one fails then another
+ * Contains a classifier and where to download its models. Each string in source is
+ * an address where the model can be downloaded from. If one fails then another
  * should be attempted.
  *
  * @author Peter Abeles

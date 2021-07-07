@@ -41,8 +41,7 @@ import static org.junit.jupiter.api.Assertions.*;
  */
 public class TestEllipseClustersIntoGrid extends BoofStandardJUnit {
 
-	@Test
-	public void checkDuplicates() {
+	@Test void checkDuplicates() {
 		// create a grid in the expected format
 		int rows = 4;
 		int cols = 3;
@@ -75,8 +74,7 @@ public class TestEllipseClustersIntoGrid extends BoofStandardJUnit {
 		return gridLists;
 	}
 
-	@Test
-	public void findClosestEdge_() {
+	@Test void findClosestEdge_() {
 		NodeInfo n = setNodeInfo(null,-2,0);
 		n.edges.grow().target = setNodeInfo(null,2,2);
 		n.edges.grow().target = setNodeInfo(null,2,0);
@@ -87,8 +85,7 @@ public class TestEllipseClustersIntoGrid extends BoofStandardJUnit {
 		assertTrue( n.edges.get(2).target == findClosestEdge(n,new Point2D_F64(-2,-1)));
 	}
 
-	@Test
-	public void selectSeedNext() {
+	@Test void selectSeedNext() {
 		// create a grid from which a known solution can be easily extracted
 		int rows = 5; int cols = 4;
 		Tuple2<List<Node>,List<EllipseRotated_F64>> grid = createRegularGrid(rows,cols);
@@ -104,8 +101,7 @@ public class TestEllipseClustersIntoGrid extends BoofStandardJUnit {
 		assertTrue( found == alg.listInfo.get(cols+1));
 	}
 
-	@Test
-	public void findLine() {
+	@Test void findLine() {
 		// create a grid from which a known solution can be easily extracted
 		int rows = 5; int cols = 4;
 		Tuple2<List<Node>,List<EllipseRotated_F64>> grid = createRegularGrid(rows,cols);
@@ -125,8 +121,7 @@ public class TestEllipseClustersIntoGrid extends BoofStandardJUnit {
 		}
 	}
 
-	@Test
-	public void selectSeedCorner() {
+	@Test void selectSeedCorner() {
 		EllipseClustersIntoGrid alg = new HelperAlg();
 
 		NodeInfo best = new NodeInfo();
@@ -146,8 +141,7 @@ public class TestEllipseClustersIntoGrid extends BoofStandardJUnit {
 		assertTrue(found == best);
 	}
 
-	@Test
-	public void findContour() {
+	@Test void findContour() {
 		// create a grid from which a known solution can be easily extracted
 		int rows = 5;
 		int cols = 4;
@@ -155,7 +149,7 @@ public class TestEllipseClustersIntoGrid extends BoofStandardJUnit {
 
 		EllipseClustersIntoGrid alg = new HelperAlg();
 
-		// use internal algorithm to set up its data structure.  Correct of this function is
+		// use internal algorithm to set up its data structure. Correct of this function is
 		// directly tested elsewhere
 		alg.computeNodeInfo(grid.d1,grid.d0);
 
@@ -208,10 +202,9 @@ public class TestEllipseClustersIntoGrid extends BoofStandardJUnit {
 
 	/**
 	 * This test just checks to see if a node info is created for each node passed in and that
-	 * the ellipse is assinged to it.  The inner functions are tested elsewhere
+	 * the ellipse is assinged to it. The inner functions are tested elsewhere
 	 */
-	@Test
-	public void computeNodeInfo() {
+	@Test void computeNodeInfo() {
 		List<Node> nodes = new ArrayList<>();
 		nodes.add( createNode(0, 1,2,3));
 		nodes.add( createNode(1, 0,2,4));
@@ -235,11 +228,10 @@ public class TestEllipseClustersIntoGrid extends BoofStandardJUnit {
 	}
 
 	/**
-	 * Combines these two functions into a single test.  This was done to ensure that their behavior is consistent
+	 * Combines these two functions into a single test. This was done to ensure that their behavior is consistent
 	 * with each other.
 	 */
-	@Test
-	public void addEdgesToInfo_AND_findLargestAnglesForAllNodes() {
+	@Test void addEdgesToInfo_AND_findLargestAnglesForAllNodes() {
 		EllipseClustersIntoGrid alg = new HelperAlg();
 
 		setNodeInfo(alg.listInfo.grow(), 0 , 0);
@@ -273,8 +265,7 @@ public class TestEllipseClustersIntoGrid extends BoofStandardJUnit {
 		checkLargestAngle(alg.listInfo.get(4),null,null);
 	}
 
-	@Test
-	public void grid_getIndexOfHexEllipse() {
+	@Test void grid_getIndexOfHexEllipse() {
 		grid_getIndexOfHexEllipse(1,1);
 		grid_getIndexOfHexEllipse(1,4);
 		grid_getIndexOfHexEllipse(4,1);

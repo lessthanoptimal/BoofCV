@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -22,7 +22,7 @@ import boofcv.struct.image.ImageBase;
 import boofcv.struct.image.ImageType;
 
 /**
- * Interface for automatic interest point detection in an image.  Optional support is
+ * Interface for automatic interest point detection in an image. Optional support is
  * provided for scale and orientation.
  *
  * Features can belong to multiple set. A feature set indicates that the features were some how detected using

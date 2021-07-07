@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -57,10 +57,9 @@ public class TestDistanceEpipolarConstraint extends BoofStandardJUnit {
 	}
 
 	/**
-	 * Give it a perfect observation and a noisy one.  Perfect should have a smaller distance
+	 * Give it a perfect observation and a noisy one. Perfect should have a smaller distance
 	 */
-	@Test
-	public void basicCheck() {
+	@Test void basicCheck() {
 
 
 		DistanceEpipolarConstraint alg = new DistanceEpipolarConstraint();
@@ -79,8 +78,7 @@ public class TestDistanceEpipolarConstraint extends BoofStandardJUnit {
 	/**
 	 * Scale the input and see if that changes the error
 	 */
-	@Test
-	public void checkScaleInvariance() {
+	@Test void checkScaleInvariance() {
 		DistanceEpipolarConstraint alg = new DistanceEpipolarConstraint();
 		alg.setModel(F);
 

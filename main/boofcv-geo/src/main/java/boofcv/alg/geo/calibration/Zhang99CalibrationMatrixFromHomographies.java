@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -27,9 +27,9 @@ import java.util.List;
 
 /**
  * <p>
- * Estimates camera calibration matrix from a set of homographies using linear algebra.  Based upon the
- * description found in [1], but has been modified to improve stability and flexibility.  Two
- * variants are implemented inside this class.  One variant assumes that the skew is zero and requires two or
+ * Estimates camera calibration matrix from a set of homographies using linear algebra. Based upon the
+ * description found in [1], but has been modified to improve stability and flexibility. Two
+ * variants are implemented inside this class. One variant assumes that the skew is zero and requires two or
  * more homographies and the other variant does not assume the skew is zero and requires three or more
  * homographies. The calibration matrix structure is shown below.
  * </p>
@@ -43,7 +43,7 @@ import java.util.List;
  * </p>
  *
  * <p>
- * The zero skew variant is a modification of what was described in [1].  Instead of simply adding another row
+ * The zero skew variant is a modification of what was described in [1]. Instead of simply adding another row
  * to force the skew to be zero that entire part of the equation has been omitted. The algorithm described in
  * [1] was numerically unstable and did not produce meaningful results.
  * </p>
@@ -115,8 +115,8 @@ public class Zhang99CalibrationMatrixFromHomographies {
 	}
 
 	/**
-	 * Sets up the system of equations which are to be solved.  This equation is derived from
-	 * constraints (3) and (4) in the paper.   See section 3.1.
+	 * Sets up the system of equations which are to be solved. This equation is derived from
+	 * constraints (3) and (4) in the paper.  See section 3.1.
 	 *
 	 * @param homographies set of observed homographies.
 	 */
@@ -226,7 +226,7 @@ public class Zhang99CalibrationMatrixFromHomographies {
 	}
 
 	/**
-	 * This computes the v_ij vector found in the paper.  Leaving out components that would
+	 * This computes the v_ij vector found in the paper. Leaving out components that would
 	 * interact with B12, since that is known to be zero.
 	 */
 	private void computeV_NoSkew( DMatrixRMaj h1 ,DMatrixRMaj h2 , DMatrixRMaj v )
@@ -266,7 +266,7 @@ public class Zhang99CalibrationMatrixFromHomographies {
 		double v0 = temp0/temp1;
 		double lambda = B33-(B13*B13 + v0*temp0)/B11;
 		// Using abs() inside is an adhoc modification to make it more stable
-		// If there is any good theoretical reason for it, that's a pure accident.  Seems
+		// If there is any good theoretical reason for it, that's a pure accident. Seems
 		// to work well in practice
 		double a = Math.sqrt(Math.abs(lambda / B11));
 		double b = Math.sqrt(Math.abs(lambda * B11 / temp1));
@@ -300,7 +300,7 @@ public class Zhang99CalibrationMatrixFromHomographies {
 		double v0 = temp0/temp1;
 		double lambda = B33-(B13*B13 + v0*temp0)/B11;
 		// Using abs() inside is an adhoc modification to make it more stable
-		// If there is any good theoretical reason for it, that's a pure accident.  Seems
+		// If there is any good theoretical reason for it, that's a pure accident. Seems
 		// to work well in practice
 		double a = Math.sqrt(Math.abs(lambda / B11));
 		double b = Math.sqrt(Math.abs(lambda*B11/temp1));

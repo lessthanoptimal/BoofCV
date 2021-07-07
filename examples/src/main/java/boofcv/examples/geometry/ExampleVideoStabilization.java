@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -42,7 +42,7 @@ import georegression.struct.homography.Homography2D_F64;
 import java.awt.image.BufferedImage;
 
 /**
- * Example of how to stabilizing a video sequence using StitchingFromMotion2D.  Video stabilization is almost
+ * Example of how to stabilizing a video sequence using StitchingFromMotion2D. Video stabilization is almost
  * the same as creating a video mosaic and the code in this example is a tweaked version of the mosaic example.
  * The differences are that the output size is the same as the input image size and that the origin is never changed.
  *

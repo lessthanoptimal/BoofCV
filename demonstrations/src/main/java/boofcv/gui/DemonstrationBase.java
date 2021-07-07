@@ -81,7 +81,7 @@ public abstract class DemonstrationBase extends JPanel {
 	protected String inputFilePath;
 	protected String[] inputFileSet;
 
-	// Storage for input list of input streams.  always synchronize before manipulating
+	// Storage for input list of input streams. always synchronize before manipulating
 	private final List<CacheSequenceStream> inputStreams = new ArrayList<>();
 
 	private ProcessThread threadProcess; // controls by synchronized(inputStreams)
@@ -100,7 +100,7 @@ public abstract class DemonstrationBase extends JPanel {
 	protected boolean allowVideos = true;
 	protected boolean allowImages = true;
 
-	// If true then any stream will be paused.  If a webcam is running it will skip new images
+	// If true then any stream will be paused. If a webcam is running it will skip new images
 	// if a video it will stop processing the input
 	protected volatile boolean streamPaused = false;
 
@@ -143,7 +143,7 @@ public abstract class DemonstrationBase extends JPanel {
 	/**
 	 * Constructor that specifies examples and input image type
 	 *
-	 * @param exampleInputs List of paths to examples.  Either a String file path or {@link PathLabel}.
+	 * @param exampleInputs List of paths to examples. Either a String file path or {@link PathLabel}.
 	 * @param defaultTypes Type of image in each stream
 	 */
 	protected DemonstrationBase( List<?> exampleInputs, ImageType... defaultTypes ) {
@@ -331,7 +331,7 @@ public abstract class DemonstrationBase extends JPanel {
 			String path = massageExampleFilePath((String)o);
 			openFile(new File(path), false);
 		} else {
-			throw new IllegalArgumentException("Unknown example object type.  Please override openExample()");
+			throw new IllegalArgumentException("Unknown example object type. Please override openExample()");
 		}
 	}
 
@@ -375,8 +375,8 @@ public abstract class DemonstrationBase extends JPanel {
 	}
 
 	/**
-	 * Override to be notified when the input has changed.  This is also a good location to change the default
-	 * max FPS for streaming data.  It will be 0 for webcam and 30 FPS for videos.
+	 * Override to be notified when the input has changed. This is also a good location to change the default
+	 * max FPS for streaming data. It will be 0 for webcam and 30 FPS for videos.
 	 *
 	 * If overloaded you don't need to call the super
 	 *
@@ -403,7 +403,7 @@ public abstract class DemonstrationBase extends JPanel {
 	}
 
 	/**
-	 * Process the image.  Will be called in its own thread, but doesn't need to be re-entrant.  If image
+	 * Process the image. Will be called in its own thread, but doesn't need to be re-entrant. If image
 	 * is null then reprocess the previous image.
 	 */
 	public abstract void processImage( int sourceID, long frameID, final BufferedImage buffered, final ImageBase input );
@@ -414,8 +414,8 @@ public abstract class DemonstrationBase extends JPanel {
 	public void processFiles( String[] filePaths ) {}
 
 	/**
-	 * Opens a file.  First it will attempt to open it as an image.  If that fails it will try opening it as a
-	 * video.  If all else fails tell the user it has failed.  If a streaming source was running before it will
+	 * Opens a file. First it will attempt to open it as an image. If that fails it will try opening it as a
+	 * video. If all else fails tell the user it has failed. If a streaming source was running before it will
 	 * be stopped.
 	 */
 	public void openFile( File file ) {
@@ -423,8 +423,8 @@ public abstract class DemonstrationBase extends JPanel {
 	}
 
 	/**
-	 * Opens a file.  First it will attempt to open it as an image.  If that fails it will try opening it as a
-	 * video.  If all else fails tell the user it has failed.  If a streaming source was running before it will
+	 * Opens a file. First it will attempt to open it as an image. If that fails it will try opening it as a
+	 * video. If all else fails tell the user it has failed. If a streaming source was running before it will
 	 * be stopped.
 	 */
 	public void openFile( File file, boolean addToRecent ) {
@@ -488,7 +488,7 @@ public abstract class DemonstrationBase extends JPanel {
 	public void openImageSet( boolean reopen, String... files ) {
 		synchronized (lockStartingProcess) {
 			if (startingProcess) {
-				System.out.println("Ignoring openImageSet() request.  Detected spamming");
+				System.out.println("Ignoring openImageSet() request. Detected spamming");
 				return;
 			}
 			startingProcess = true;
@@ -644,7 +644,7 @@ public abstract class DemonstrationBase extends JPanel {
 	protected void openVideo( boolean reopen, String... filePaths ) {
 		synchronized (lockStartingProcess) {
 			if (startingProcess) {
-				System.out.println("Ignoring video request.  Detected spamming");
+				System.out.println("Ignoring video request. Detected spamming");
 				return;
 			}
 			startingProcess = true;
@@ -717,7 +717,7 @@ public abstract class DemonstrationBase extends JPanel {
 	protected void openImage( boolean reopen, String name, BufferedImage buffered ) {
 		synchronized (lockStartingProcess) {
 			if (startingProcess) {
-				System.out.println("Ignoring image request.  Detected spamming");
+				System.out.println("Ignoring image request. Detected spamming");
 				return;
 			}
 			startingProcess = true;
@@ -725,7 +725,7 @@ public abstract class DemonstrationBase extends JPanel {
 
 		synchronized (inputStreams) {
 			if (inputStreams.size() != 1)
-				throw new IllegalArgumentException("Input streams not equal to 1.  Override openImage()");
+				throw new IllegalArgumentException("Input streams not equal to 1. Override openImage()");
 		}
 
 		stopAllInputProcessing();
@@ -755,7 +755,7 @@ public abstract class DemonstrationBase extends JPanel {
 	public void openWebcam() {
 		synchronized (lockStartingProcess) {
 			if (startingProcess) {
-				System.out.println("Ignoring webcam request.  Detected spamming");
+				System.out.println("Ignoring webcam request. Detected spamming");
 				return;
 			}
 			startingProcess = true;
@@ -763,7 +763,7 @@ public abstract class DemonstrationBase extends JPanel {
 
 		synchronized (inputStreams) {
 			if (inputStreams.size() != 1)
-				throw new IllegalArgumentException("Input streams not equal to 1.  Override openImage()");
+				throw new IllegalArgumentException("Input streams not equal to 1. Override openImage()");
 		}
 
 		stopAllInputProcessing();
@@ -971,7 +971,7 @@ public abstract class DemonstrationBase extends JPanel {
 				e.printStackTrace();
 			}
 
-			// Request spam prevention.  Must complete the request before it will accept the new one
+			// Request spam prevention. Must complete the request before it will accept the new one
 			synchronized (lockStartingProcess) {
 				startingProcess = false;
 			}
@@ -1065,7 +1065,7 @@ public abstract class DemonstrationBase extends JPanel {
 	protected void enterPausedState() {}
 
 	/**
-	 * If just a single image was processed it will process it again.  If it's a stream
+	 * If just a single image was processed it will process it again. If it's a stream
 	 * there is no need to reprocess, the next image will be handled soon enough.
 	 */
 	public void reprocessInput() {

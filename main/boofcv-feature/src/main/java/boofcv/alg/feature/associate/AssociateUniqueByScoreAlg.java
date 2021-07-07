@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -27,7 +27,7 @@ import org.ddogleg.struct.FastArray;
 
 /**
  * If multiple associations are found for a single source and/or destination feature then this ambiguity is
- * removed by selecting the association with the best score.  If there are multiple best scores for a single
+ * removed by selecting the association with the best score. If there are multiple best scores for a single
  * feature index then there are no associations for that feature.
  *
  * @author Peter Abeles

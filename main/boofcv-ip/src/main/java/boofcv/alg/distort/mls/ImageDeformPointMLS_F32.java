@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -37,18 +37,18 @@ import java.util.Arrays;
  *     <li>Invoke {@link #fixate()} when all control points have been added and after you are done changing distorted locations</li>
  * </ol>
  *
- * <p>Each control point has an undistorted and distorted location.  The fixate functions are used to precompute
+ * <p>Each control point has an undistorted and distorted location. The fixate functions are used to precompute
  * different portions of the deformation to maximize speed by avoiding duplicate computations. Instead of computing
- * a distortion for each pixel a regular grid is used instead.  Pixel points are interpolated between grid points
+ * a distortion for each pixel a regular grid is used instead. Pixel points are interpolated between grid points
  * using bilinear interpolation.
  * </p>
  *
- * <p>This should be a faithful implementation of MLS.  Potential deviations listed below:</p>
+ * <p>This should be a faithful implementation of MLS. Potential deviations listed below:</p>
  * <ol>
  * <li>Pixels should be adjusted when converting to grid coordinates to maintain the same
- * aspect ratio as the input image.  This way the results is "independent" of the internal grids shape/size.
+ * aspect ratio as the input image. This way the results is "independent" of the internal grids shape/size.
  * [1] does not mention this issue.</li>
- * <li>When compared against images published in [1] the rigid transform appears slightly different.  However,
+ * <li>When compared against images published in [1] the rigid transform appears slightly different. However,
  * when compared against other implementations those appear to produce nearly identical results to this
  * implementation.</li>
  * </ol>
@@ -139,7 +139,7 @@ public class ImageDeformPointMLS_F32 implements Point2Transform2_F32 {
 	}
 
 	/**
-	 * Adds a new control point at the specified location.  Initially the distorted and undistorted location will be
+	 * Adds a new control point at the specified location. Initially the distorted and undistorted location will be
 	 * set to the same
 	 *
 	 * @param x coordinate x-axis in image pixels
@@ -199,7 +199,7 @@ public class ImageDeformPointMLS_F32 implements Point2Transform2_F32 {
 	 */
 	public void fixate() {
 		if( controls.size < 2 )
-			throw new RuntimeException("Not enough control points specified.  Found "+controls.size);
+			throw new RuntimeException("Not enough control points specified. Found "+controls.size);
 		model.allocate(weights,A,matrices);
 		for (int row = 0; row < gridRows; row++) {
 			for (int col = 0; col < gridCols; col++) {

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -27,8 +27,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
  * @author Peter Abeles
  */
 public class TestConfusion extends BoofStandardJUnit {
-	@Test
-	public void computeAccuracy() {
+	@Test void computeAccuracy() {
 		Confusion c = new Confusion(2);
 
 		c.matrix.set(0,0,0.25);

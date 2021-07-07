@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -29,7 +29,7 @@ import java.awt.image.BufferedImage;
 
 
 /**
- * Displays the entire image pyramid in a single panel.  With discrete pyramids it is possible
+ * Displays the entire image pyramid in a single panel. With discrete pyramids it is possible
  * to show the whole pyramid inside a single window of a reasonable size.
  *
  * @author Peter Abeles

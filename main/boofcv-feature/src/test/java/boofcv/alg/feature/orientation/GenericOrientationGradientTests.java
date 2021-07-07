@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -68,7 +68,7 @@ public abstract class GenericOrientationGradientTests<D extends ImageGray<D>> ex
 	}
 
 	/**
-	 * Points all pixels in the surrounding region in same direction.  Then sees if the found
+	 * Points all pixels in the surrounding region in same direction. Then sees if the found
 	 * direction for the region is in the expected direction.
 	 */
 	@Test
@@ -103,8 +103,7 @@ public abstract class GenericOrientationGradientTests<D extends ImageGray<D>> ex
 	/**
 	 * See if it can handle sub-images correctly
 	 */
-	@Test
-	public void checkSubImages() {
+	@Test void checkSubImages() {
 		double angle = 0.5;
 		double c = Math.cos(angle);
 		double s = Math.sin(angle);
@@ -126,8 +125,7 @@ public abstract class GenericOrientationGradientTests<D extends ImageGray<D>> ex
 	/**
 	 * Estimate the direction at a couple of different scales and see if it produces the expected results.
 	 */
-	@Test
-	public void setScale() {
+	@Test void setScale() {
 		int x = width/2;
 		int y = height/2;
 

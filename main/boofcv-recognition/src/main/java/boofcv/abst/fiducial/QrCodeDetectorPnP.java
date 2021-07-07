@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -37,7 +37,7 @@ import java.util.List;
 
 /**
  * Wrapper around {@link QrCodeDetector} which allows the 3D pose of a QR Code to be detected using
- * {@link FiducialDetectorPnP}. The marker width defaults to 1.  If all your qr codes have a width of one
+ * {@link FiducialDetectorPnP}. The marker width defaults to 1. If all your qr codes have a width of one
  * and it's up to the user to multiply the translation vector by the actual width.
  *
  * The 3D coordinate system of a QR Code is shown below. +x right, +y up, and +z up.

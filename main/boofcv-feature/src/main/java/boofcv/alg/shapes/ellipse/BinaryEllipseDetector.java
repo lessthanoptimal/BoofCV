@@ -31,9 +31,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Detects ellipses inside gray scale images.  The first step is to detect them in a binary image and then
- * refine the fit using the gray scale image.  Optionally the refinement step can be turned off or postponed
- * until the user invokes it directly.  False positives are pruned using the edge intensity check.  This check removes
+ * Detects ellipses inside gray scale images. The first step is to detect them in a binary image and then
+ * refine the fit using the gray scale image. Optionally the refinement step can be turned off or postponed
+ * until the user invokes it directly. False positives are pruned using the edge intensity check. This check removes
  * ellipses with edges that are low intensity sicne they are most likely generated from noise.
  *
  * @author Peter Abeles
@@ -51,14 +51,14 @@ public class BinaryEllipseDetector<T extends ImageGray<T>> {
 
 	boolean verbose = false;
 
-	// toggled the refinement step.  If false an ellise can still be refined after the fact
+	// toggled the refinement step. If false an ellise can still be refined after the fact
 	boolean autoRefine = true;
 
 	/**
 	 * Configures the detector
 	 *
 	 * @param ellipseDetector Detector which uses pixel precise edges
-	 * @param ellipseRefiner Sub pixel edge refinement.  If null the refinement step is skipped
+	 * @param ellipseRefiner Sub pixel edge refinement. If null the refinement step is skipped
 	 * @param intensityCheck Computes the intensity of the edge to remove false positives
 	 * @param inputType Input image type
 	 */
@@ -77,8 +77,8 @@ public class BinaryEllipseDetector<T extends ImageGray<T>> {
 	 * The undistorted image is never explicitly created.</p>
 	 *
 	 * <p>
-	 * WARNING: The undistorted image must have the same bounds as the distorted input image.  This is because
-	 * several of the bounds checks use the image shape.  This are simplified greatly by this assumption.
+	 * WARNING: The undistorted image must have the same bounds as the distorted input image. This is because
+	 * several of the bounds checks use the image shape. This are simplified greatly by this assumption.
 	 * </p>
 	 *
 	 * @param distToUndist Transform from distorted to undistorted image.

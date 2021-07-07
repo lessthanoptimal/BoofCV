@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -26,7 +26,7 @@ import georegression.struct.point.Point2D_F32;
 
 /**
  * Most basic implementation of {@link ImageDistort}. Computes the distortion from the dst to src image
- * for each pixel.  The dst pixel value is then set to the interpolated value of the src image.
+ * for each pixel. The dst pixel value is then set to the interpolated value of the src image.
  *
  * @author Peter Abeles
  */

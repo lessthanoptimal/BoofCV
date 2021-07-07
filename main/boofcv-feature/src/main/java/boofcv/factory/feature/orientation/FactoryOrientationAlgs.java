@@ -129,9 +129,9 @@ public class FactoryOrientationAlgs {
 	 * Estimates the orientation without calculating the image derivative.
 	 *
 	 * @param sampleRadius Radius of the region being considered in terms of samples. Typically 6.
-	 * @param samplePeriod How often the image is sampled.  This number is scaled.  Typically 1.
+	 * @param samplePeriod How often the image is sampled. This number is scaled. Typically 1.
 	 * @param sampleWidth How wide of a kernel should be used to sample. Try 4
-	 * @param weightSigma Sigma for weighting.  zero for unweighted.
+	 * @param weightSigma Sigma for weighting. zero for unweighted.
 	 * @param integralImage Type of image being processed.
 	 * @return OrientationIntegral
 	 * @see ImplOrientationImageAverageIntegral
@@ -149,7 +149,7 @@ public class FactoryOrientationAlgs {
 	 * Estimates the orientation of a region by using a sliding window across the different potential
 	 * angles.
 	 *
-	 * @param config Configuration for algorithm.  If null defaults will be used.
+	 * @param config Configuration for algorithm. If null defaults will be used.
 	 * @param integralType Type of integral image being processed.
 	 * @return OrientationIntegral
 	 * @see OrientationSlidingWindow
@@ -168,7 +168,7 @@ public class FactoryOrientationAlgs {
 	/**
 	 * Estimates multiple orientations as specified in SIFT paper.
 	 *
-	 * @param config Configuration for algorithm.  If null defaults will be used.
+	 * @param config Configuration for algorithm. If null defaults will be used.
 	 * @param derivType Type of derivative image it takes as input
 	 * @return OrientationHistogramSift
 	 */

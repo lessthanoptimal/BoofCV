@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -24,7 +24,7 @@ import org.ddogleg.nn.alg.KdTreeDistance;
 import org.ddogleg.struct.DogArray_B;
 
 /**
- * Graph representation of square blobs.  Each blob can be connected to at most 4 other shapes which are directly
+ * Graph representation of square blobs. Each blob can be connected to at most 4 other shapes which are directly
  * adjacent of one of the sides. If lens distortion is known then all coordinates and lengths are in undistorted
  * coordinates. This also means that in the undistorted cases pixels can be outside the image
  *
@@ -50,7 +50,7 @@ public class SquareNode {
 	// marker used to indicate that this has been traversed by different algorithms
 	public int graph;
 
-	// edges in the graph.  One for each side in the shape
+	// edges in the graph. One for each side in the shape
 	public SquareEdge edges[] = new SquareEdge[4];
 
 	/**

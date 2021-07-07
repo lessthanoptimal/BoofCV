@@ -100,7 +100,7 @@ public class DetectChessboardSquarePoints<T extends ImageGray<T>> {
 	}
 
 	/**
-	 * Detects chessboard in the binary image.  Square corners must be disconnected.
+	 * Detects chessboard in the binary image. Square corners must be disconnected.
 	 * Returns true if a chessboard was found, false otherwise.
 	 *
 	 * @param input Original input image.
@@ -242,7 +242,7 @@ public class DetectChessboardSquarePoints<T extends ImageGray<T>> {
 	}
 
 	/**
-	 * Ensures that the grid is in a CCW order.  It is assumed that (0,0) is a square.
+	 * Ensures that the grid is in a CCW order. It is assumed that (0,0) is a square.
 	 *
 	 * @return true if it was able to make it CCW or false if it failed to
 	 */
@@ -292,7 +292,7 @@ public class DetectChessboardSquarePoints<T extends ImageGray<T>> {
 		boolean colOdd = grid.columns%2 == 1;
 
 		if (colOdd == rowOdd) {
-			// if odd and square then 4 solutions.  Otherwise just two solution that are on
+			// if odd and square then 4 solutions. Otherwise just two solution that are on
 			// opposite sides on the grid
 			if (rowOdd && grid.rows == grid.columns) {
 				int best = -1;
@@ -318,12 +318,12 @@ public class DetectChessboardSquarePoints<T extends ImageGray<T>> {
 				}
 			}
 		}
-		// if only one is odd then there is a unique solution.  Since uber is already in a legit
+		// if only one is odd then there is a unique solution. Since uber is already in a legit
 		// configuration nothing needs ot be done
 	}
 
 	/**
-	 * Find inner corner points across the grid.  Start from the "top" row and work its way down.  Corners
+	 * Find inner corner points across the grid. Start from the "top" row and work its way down. Corners
 	 * are found by finding the average point between two adjacent corners on adjacent squares.
 	 */
 	boolean computeCalibrationPoints( SquareGrid grid ) {

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -240,7 +240,7 @@ public abstract class ApplicationLauncherApp extends JPanel implements ActionLis
 		add(horizontalSplitPane, BorderLayout.CENTER);
 		new ProcessStatusThread().start();
 
-		// get the width of the monitor.  This should work in multi-monitor systems
+		// get the width of the monitor. This should work in multi-monitor systems
 		GraphicsDevice gd = GraphicsEnvironment.getLocalGraphicsEnvironment().getDefaultScreenDevice();
 		// have it be a reasonable size of fill the display
 		int width = Math.min(1200, gd.getDisplayMode().getWidth());

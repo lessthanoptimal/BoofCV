@@ -39,8 +39,8 @@ import static boofcv.core.image.GeneralizedImageOps.get;
 import static org.junit.jupiter.api.Assertions.*;
 
 /**
- * To reduce the amount of code reflects are heavily used.  If any more functions are added reflections should be
- * used to extract them and the appropriate unit test called.  That way its unlikely that anything would be left out.
+ * To reduce the amount of code reflects are heavily used. If any more functions are added reflections should be
+ * used to extract them and the appropriate unit test called. That way its unlikely that anything would be left out.
  *
  * @author Peter Abeles
  */
@@ -58,8 +58,7 @@ public class TestConvolveImageStandard_SB extends BoofStandardJUnit {
 	/**
 	 * Using reflections get a list of all the functions and test each of them
 	 */
-	@Test
-	public void checkAll() {
+	@Test void checkAll() {
 		int numExpected = 35;
 		Method[] methods = ConvolveImageStandard_SB.class.getMethods();
 

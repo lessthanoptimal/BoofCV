@@ -50,7 +50,7 @@ public class CameraPinholeBrown extends CameraPinhole implements Serializable {
 	public @Getter @Setter double t1, t2;
 
 	/**
-	 * Default constructor.  flipY is false and everything else is zero or null.
+	 * Default constructor. flipY is false and everything else is zero or null.
 	 */
 	public CameraPinholeBrown() {
 	}

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -28,7 +28,7 @@ import org.ddogleg.struct.DogArray_B;
 import java.util.List;
 
 /**
- * Helper which expands polygons prior to optimization.  This is done to counter act the erosion step which shrunk
+ * Helper which expands polygons prior to optimization. This is done to counter act the erosion step which shrunk
  * the polygon
  *
  * @author Peter Abeles
@@ -49,9 +49,9 @@ public class ChessboardPolygonHelper<T extends ImageGray<T>> implements PolygonH
 	}
 
 	/**
-	 * If not touching the border then the number of corners must be 4.  If touching the border there must be
-	 * at least 3 corners not touching the border.  7 corners at most.  If there were 8 then all sides of a square
-	 * would be touching the border.    No more than 3 corners since that's the most number of non-border corners
+	 * If not touching the border then the number of corners must be 4. If touching the border there must be
+	 * at least 3 corners not touching the border. 7 corners at most. If there were 8 then all sides of a square
+	 * would be touching the border.   No more than 3 corners since that's the most number of non-border corners
 	 * a square can have.
 	 */
 	@Override

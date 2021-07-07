@@ -246,8 +246,8 @@ public class DisparityScoreBMBestFive_F32<DI extends ImageGray<DI>>
 	}
 
 	/**
-	 * Compute the final score by sampling the 5 regions.  Four regions are sampled around the center
-	 * region.  Out of those four only the two with the smallest score are used.
+	 * Compute the final score by sampling the 5 regions. Four regions are sampled around the center
+	 * region. Out of those four only the two with the smallest score are used.
 	 */
 	protected void computeScoreFive( float[] top, float[] middle, float[] bottom, float[] score, int width,
 									 Compare_F32 compare ) {

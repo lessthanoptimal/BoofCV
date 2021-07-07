@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -36,8 +36,7 @@ import java.util.List;
 public class TestGenerateAffine2D extends BoofStandardJUnit
 		implements ModelTestingInterface<Affine2D_F64,AssociatedPair>
 {
-	@Test
-	public void fitModel() {
+	@Test void fitModel() {
 		StandardModelFitterTests<Affine2D_F64,AssociatedPair> alg =
 				new StandardModelFitterTests<Affine2D_F64,AssociatedPair>(this,3) {
 					@Override
@@ -49,8 +48,7 @@ public class TestGenerateAffine2D extends BoofStandardJUnit
 		alg.simpleTest();
 	}
 
-	@Test
-	public void modelGenerator() {
+	@Test void modelGenerator() {
 		StandardModelGeneratorTests<Affine2D_F64,AssociatedPair> alg =
 				new StandardModelGeneratorTests<Affine2D_F64,AssociatedPair>(this,3) {
 					@Override

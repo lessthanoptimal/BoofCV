@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -31,7 +31,7 @@ public class FactoryWeights {
 	 * Creates a weight function for the provided distributions.
 	 *
 	 * @param type Which type of distribution should be used
-	 * @param param Distribution parameters.  For uniform this is the maximum distance.
+	 * @param param Distribution parameters. For uniform this is the maximum distance.
 	 *              Guassian its the standard deviation.
 	 * @param safe If true it will then check the input distance to see if it matches.
 	 * @return WeightDistance_F32

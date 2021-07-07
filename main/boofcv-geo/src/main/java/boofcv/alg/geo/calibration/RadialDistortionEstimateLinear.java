@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -30,7 +30,7 @@ import java.util.List;
  * <p>
  * Estimates radial lens distortion by solving a linear equation with observed features on a calibration grid.
  * Typically used as an initial estimate for use in non-linear optimization. An arbitrary number of distortion
- * parameters can be solved for, but typically only two are found.  The estimated is computed using a
+ * parameters can be solved for, but typically only two are found. The estimated is computed using a
  * known intrinsic camera matrix,and homographies relating grid to camera coordinates.
  * Based upon the description found in Section 3.3 in [1].
  * </p>
@@ -87,7 +87,7 @@ public class RadialDistortionEstimateLinear {
 	/**
 	 * Computes radial distortion using a linear method.
 	 *
-	 * @param cameraCalibration Camera calibration matrix.  Not modified.
+	 * @param cameraCalibration Camera calibration matrix. Not modified.
 	 * @param observations Observations of calibration grid. Not modified.
 	 */
 	public void process( DMatrixRMaj cameraCalibration,

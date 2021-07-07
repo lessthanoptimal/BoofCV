@@ -31,7 +31,7 @@ public class InputSanityCheck {
 
 	/**
 	 * Checks to see if the target image is null or if it is a different size than
-	 * the test image.  If it is null then a new image is returned, otherwise
+	 * the test image. If it is null then a new image is returned, otherwise
 	 * target is reshaped and returned.
 	 */
 	public static <T extends ImageGray<T>> T checkReshape( T target, ImageGray testImage, Class<T> targetType ) {
@@ -44,7 +44,7 @@ public class InputSanityCheck {
 	}
 
 	/**
-	 * If the output has not been declared a new instance is declared.  If an instance of the output
+	 * If the output has not been declared a new instance is declared. If an instance of the output
 	 * is provided its bounds are checked.
 	 */
 	public static <T extends ImageBase<T>> T checkDeclare( T input, @Nullable T output ) {
@@ -85,7 +85,7 @@ public class InputSanityCheck {
 	}
 
 	/**
-	 * If the output has not been declared a new instance is declared.  If an instance of the output
+	 * If the output has not been declared a new instance is declared. If an instance of the output
 	 * is provided its bounds are checked.
 	 */
 	public static <In extends ImageGray, Out extends ImageGray>

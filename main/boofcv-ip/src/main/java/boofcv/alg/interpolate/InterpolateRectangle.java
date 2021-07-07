@@ -22,7 +22,7 @@ import boofcv.struct.image.GrayF32;
 import boofcv.struct.image.ImageGray;
 
 /**
- * Performs interpolation across a whole rectangular region inside the image.  This can be significantly faster than
+ * Performs interpolation across a whole rectangular region inside the image. This can be significantly faster than
  * interpolating on a per-pixel basis.
  *
  * @author Peter Abeles
@@ -45,7 +45,7 @@ public interface InterpolateRectangle<T extends ImageGray<T>> {
 
 	/**
 	 * Copies a grid from the source image starting at the specified coordinate
-	 * into the destination image.  The 'dest' image must be within the original image.
+	 * into the destination image. The 'dest' image must be within the original image.
 	 *
 	 * @param tl_x upper left corner of the region in the image.
 	 * @param tl_y upper left corner of the region in the image.

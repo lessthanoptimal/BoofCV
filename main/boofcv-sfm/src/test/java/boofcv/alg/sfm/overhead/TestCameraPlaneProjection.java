@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -63,8 +63,7 @@ public class TestCameraPlaneProjection extends BoofStandardJUnit {
 		normToPixel.compute(normalizedPt.x, normalizedPt.y, pixelPt);
 	}
 
-	@Test
-	public void planeToPixel() {
+	@Test void planeToPixel() {
 
 		CameraPlaneProjection alg = new CameraPlaneProjection();
 		alg.setConfiguration(planeToCamera, param);
@@ -80,8 +79,7 @@ public class TestCameraPlaneProjection extends BoofStandardJUnit {
 		assertFalse(alg.planeToPixel(-50, -worldPt.x, found));
 	}
 
-	@Test
-	public void planeToNormalized() {
+	@Test void planeToNormalized() {
 
 		CameraPlaneProjection alg = new CameraPlaneProjection();
 		alg.setConfiguration(planeToCamera, param);
@@ -97,8 +95,7 @@ public class TestCameraPlaneProjection extends BoofStandardJUnit {
 		assertFalse(alg.planeToNormalized(-50, -worldPt.x, found));
 	}
 
-	@Test
-	public void pixelToPlane() {
+	@Test void pixelToPlane() {
 		CameraPlaneProjection alg = new CameraPlaneProjection();
 		alg.setConfiguration(planeToCamera, param);
 
@@ -113,8 +110,7 @@ public class TestCameraPlaneProjection extends BoofStandardJUnit {
 		assertFalse(alg.pixelToPlane(-10000, 0, found));
 	}
 
-	@Test
-	public void normalToPlane() {
+	@Test void normalToPlane() {
 		CameraPlaneProjection alg = new CameraPlaneProjection();
 		alg.setConfiguration(planeToCamera, param);
 

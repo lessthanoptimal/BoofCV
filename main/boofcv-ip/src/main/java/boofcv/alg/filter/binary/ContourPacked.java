@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -22,14 +22,14 @@ import org.ddogleg.struct.DogArray_I32;
 
 /**
  * Internal and externals contours for a binary blob with the actual points stored in a
- * {@link boofcv.struct.PackedSetsPoint2D_I32}.  The set of points in each contour list are ordered in
+ * {@link boofcv.struct.PackedSetsPoint2D_I32}. The set of points in each contour list are ordered in
  * CW or CCW directions.
  *
  * @author Peter Abeles
  */
 public class ContourPacked {
 	/**
-	 * ID of blob in the image.  Pixels belonging to this blob in the labeled image will have this pixel value.
+	 * ID of blob in the image. Pixels belonging to this blob in the labeled image will have this pixel value.
 	 */
 	public int id;
 

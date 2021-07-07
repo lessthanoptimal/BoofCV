@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -29,9 +29,9 @@ import org.ejml.interfaces.linsol.LinearSolverDense;
 
 /**
  * <p>
- * Computes the Sampson distance residual for a set of observations given a homography matrix.  For use
+ * Computes the Sampson distance residual for a set of observations given a homography matrix. For use
  * in least-squares non-linear optimization algorithms. The full 9 elements of the 3x3 matrix are used
- * to parameterize.  This has an extra redundant parameter, but is much simpler and should not affect
+ * to parameterize. This has an extra redundant parameter, but is much simpler and should not affect
  * the final result.
  * </p>
  *

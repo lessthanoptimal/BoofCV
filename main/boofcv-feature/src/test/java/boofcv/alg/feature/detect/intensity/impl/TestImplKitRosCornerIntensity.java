@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -28,14 +28,12 @@ import org.junit.jupiter.api.Test;
  */
 public class TestImplKitRosCornerIntensity extends BoofStandardJUnit
 {
-	@Test
-	public void test_F32() {
+	@Test void test_F32() {
 		Test_F32 a = new Test_F32();
 		a.genericTests();
 	}
 
-	@Test
-	public void test_S16() {
+	@Test void test_S16() {
 		Test_S16 a = new Test_S16();
 		a.genericTests();
 	}

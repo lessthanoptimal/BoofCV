@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -36,8 +36,7 @@ public class TestEpipolarMinimizeGeometricError extends EpipolarTestSimulation {
 	/**
 	 * The perfect solution is passed in. it should no change
 	 */
-	@Test
-	public void perfect() {
+	@Test void perfect() {
 		init(50,true);
 
 		DMatrixRMaj E = MultiViewOps.createEssential(a_to_b.R, a_to_b.T, null);
@@ -62,8 +61,7 @@ public class TestEpipolarMinimizeGeometricError extends EpipolarTestSimulation {
 	 * Checks the solution given noisy pixel inputs. It should produce a solution which lies on the epipolar
 	 * line perfectly and is close to the input
 	 */
-	@Test
-	public void noisy() {
+	@Test void noisy() {
 		init(50,true);
 
 		DMatrixRMaj E = MultiViewOps.createEssential(a_to_b.R, a_to_b.T, null);

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -48,8 +48,7 @@ public class TestEllipseClustersIntoHexagonalGrid extends BoofStandardJUnit {
 	/**
 	 * See if it can handle a very easy case
 	 */
-	@Test
-	public void process() {
+	@Test void process() {
 
 		EllipseClustersIntoHexagonalGrid alg = new EllipseClustersIntoHexagonalGrid();
 
@@ -83,8 +82,7 @@ public class TestEllipseClustersIntoHexagonalGrid extends BoofStandardJUnit {
 	/**
 	 * Apply some affine distortion so that the grid isn't perfect
 	 */
-	@Test
-	public void process_affine() {
+	@Test void process_affine() {
 		// scale different amounts along each axis and translate for fun
 		Affine2D_F64 affine0 = new Affine2D_F64(1.05,0,0,0.95,1,2);
 		// rotate a bit
@@ -131,8 +129,7 @@ public class TestEllipseClustersIntoHexagonalGrid extends BoofStandardJUnit {
 	/**
 	 * Multiple grids in view at the same time
 	 */
-	@Test
-	public void process_multiple_grids() {
+	@Test void process_multiple_grids() {
 		// create two grids
 		int rows = 4; int cols = 3;
 		Tuple2<List<Node>,List<EllipseRotated_F64>> grid0 = createHexagonalGrid(rows, cols, 0.5, 1);
@@ -169,8 +166,7 @@ public class TestEllipseClustersIntoHexagonalGrid extends BoofStandardJUnit {
 	/**
 	 * Call process multiple times and see if it blows up
 	 */
-	@Test
-	public void process_multiple_calls() {
+	@Test void process_multiple_calls() {
 		// create a grid in the expected format
 		int rows = 4; int cols = 3;
 		Tuple2<List<Node>,List<EllipseRotated_F64>> grid = createHexagonalGrid(rows, cols, 0.5, 1);
@@ -195,8 +191,7 @@ public class TestEllipseClustersIntoHexagonalGrid extends BoofStandardJUnit {
 	/**
 	 * Give it input with a grid that's too small and see if it blows up
 	 */
-	@Test
-	public void process_too_small() {
+	@Test void process_too_small() {
 		Tuple2<List<Node>,List<EllipseRotated_F64>> grid = TestEllipseClustersIntoGrid.createRegularGrid(2, 1);
 
 		EllipseClustersIntoHexagonalGrid alg = new EllipseClustersIntoHexagonalGrid();
@@ -212,8 +207,7 @@ public class TestEllipseClustersIntoHexagonalGrid extends BoofStandardJUnit {
 	/**
 	 * There's a longer row to add
 	 */
-	@Test
-	public void bottomTwoColumns_case0() {
+	@Test void bottomTwoColumns_case0() {
 		List<EllipseRotated_F64> ellipses = new ArrayList<>();
 
 		for (int i = 0; i < 3; i++) {
@@ -252,8 +246,7 @@ public class TestEllipseClustersIntoHexagonalGrid extends BoofStandardJUnit {
 	/**
 	 * The second column has only one element
 	 */
-	@Test
-	public void bottomTwoColumns_case1() {
+	@Test void bottomTwoColumns_case1() {
 		List<EllipseRotated_F64> ellipses = new ArrayList<>();
 
 		for (int i = 0; i < 2; i++) {
@@ -288,8 +281,7 @@ public class TestEllipseClustersIntoHexagonalGrid extends BoofStandardJUnit {
 		assertTrue(column1.get(0).ellipse.center.distance(0.5,hexY) < 1e-4);
 	}
 
-	@Test
-	public void selectClosest() {
+	@Test void selectClosest() {
 
 		List<EllipseRotated_F64> ellipses = new ArrayList<>();
 
@@ -319,8 +311,7 @@ public class TestEllipseClustersIntoHexagonalGrid extends BoofStandardJUnit {
 
 	}
 
-	@Test
-	public void selectClosestSide() {
+	@Test void selectClosestSide() {
 		List<EllipseRotated_F64> ellipses = new ArrayList<>();
 
 		ellipses.add( new EllipseRotated_F64(0,0,1,1,0) );
@@ -349,8 +340,7 @@ public class TestEllipseClustersIntoHexagonalGrid extends BoofStandardJUnit {
 		assertTrue(found == null);
 	}
 
-	@Test
-	public void saveResults() {
+	@Test void saveResults() {
 		// construct a dummy graph
 		List<List<NodeInfo>> graph = new ArrayList<>();
 		for (int i = 0; i < 3; i++) {

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -26,12 +26,12 @@ import boofcv.struct.image.ImageGray;
 import georegression.struct.curve.EllipseRotated_F64;
 
 /**
- * <p>Detects regular grids of circles, see below.  A valid grid is in counter-clockwise order and if there are
+ * <p>Detects regular grids of circles, see below. A valid grid is in counter-clockwise order and if there are
  * multiple possible solution the solution with corner (0,0) closest to the pixel coordinate (0,0) is selected</p>
  *
  * <p>
- * For each circle there is are four control points.  Each control point corresponds to the tangent line connecting
- * the vertical and horizontal neigbors.  Tangent points are used since they are invariant under
+ * For each circle there is are four control points. Each control point corresponds to the tangent line connecting
+ * the vertical and horizontal neigbors. Tangent points are used since they are invariant under
  * perspective distortion.
  * </p>
  *

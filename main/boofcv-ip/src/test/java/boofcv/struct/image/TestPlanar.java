@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -35,8 +35,7 @@ public class TestPlanar extends BoofStandardJUnit {
 	int imgWidth = 10;
 	int imgHeight = 20;
 
-	@Test
-	public void constructor() {
+	@Test void constructor() {
 		Planar<GrayU8> img = new Planar<>(GrayU8.class,imgWidth, imgHeight, 3);
 
 		assertSame(GrayU8.class, img.getBandType());
@@ -49,8 +48,7 @@ public class TestPlanar extends BoofStandardJUnit {
 		}
 	}
 
-	@Test
-	public void getBand() {
+	@Test void getBand() {
 		Planar<GrayU8> img = new Planar<>(GrayU8.class,imgWidth, imgHeight, 3);
 
 		assertNotNull(img.getBand(0));
@@ -69,8 +67,7 @@ public class TestPlanar extends BoofStandardJUnit {
 		}
 	}
 
-	@Test
-	public void subimage() {
+	@Test void subimage() {
 		Planar<GrayU8> img = new Planar<>(GrayU8.class,5, 10, 3);
 		assertFalse(img.isSubimage());
 
@@ -85,8 +82,7 @@ public class TestPlanar extends BoofStandardJUnit {
 			assertEquals(img.getBand(i).get(2,3),sub.getBand(i).get(0,0));
 	}
 
-	@Test
-	public void reshape_wh() {
+	@Test void reshape_wh() {
 		Planar<GrayU8> img = new Planar<>(GrayU8.class,5, 10, 3);
 
 		// reshape to something smaller
@@ -100,8 +96,7 @@ public class TestPlanar extends BoofStandardJUnit {
 		assertEquals(21, img.getHeight());
 	}
 
-	@Test
-	public void reshape_whb() {
+	@Test void reshape_whb() {
 		Planar<GrayU8> img = new Planar<>(GrayU8.class,5, 10, 3);
 
 		// reshape to something smaller
@@ -142,8 +137,7 @@ public class TestPlanar extends BoofStandardJUnit {
 
 	}
 
-	@Test
-	public void reshape_subimage() {
+	@Test void reshape_subimage() {
 		Planar<GrayU8> img = new Planar<>(GrayU8.class,5, 10, 3);
 		img = img.subimage(0,0,2,2, null);
 
@@ -153,8 +147,7 @@ public class TestPlanar extends BoofStandardJUnit {
 		} catch( IllegalArgumentException ignore ) {}
 	}
 
-	@Test
-	public void setTo() {
+	@Test void setTo() {
 		Planar<GrayU8> a = new Planar<>(GrayU8.class,5, 10, 3);
 		a.getBand(0).set(1,2,3);
 		a.getBand(1).set(2,1,4);
@@ -176,8 +169,7 @@ public class TestPlanar extends BoofStandardJUnit {
 	/**
 	 * The two matrices do not have the same shape
 	 */
-	@Test
-	public void setTo_mismatch() {
+	@Test void setTo_mismatch() {
 		Planar<GrayU8> a = new Planar<>(GrayU8.class,5, 10, 3);
 		Planar<GrayU8> b = new Planar<>(GrayU8.class,6, 11, 3);
 
@@ -187,8 +179,7 @@ public class TestPlanar extends BoofStandardJUnit {
 		assertEquals(b.height, 11);
 	}
 
-	@Test
-	public void serialize() throws IOException, ClassNotFoundException {
+	@Test void serialize() throws IOException, ClassNotFoundException {
 
 		// randomly fill the image
 		Planar<GrayU8> imgA = new Planar<>(GrayU8.class,5, 10, 3);
@@ -214,8 +205,7 @@ public class TestPlanar extends BoofStandardJUnit {
 		BoofTesting.assertEquals(imgA, found, 1e-8);
 	}
 
-	@Test
-	public void reorderBands() {
+	@Test void reorderBands() {
 		Planar<GrayU8> img = new Planar<>(GrayU8.class,5, 10, 3);
 
 		GrayU8 band0 = img.getBand(0);
@@ -229,8 +219,7 @@ public class TestPlanar extends BoofStandardJUnit {
 		assertSame(band2, img.getBand(0));
 	}
 
-	@Test
-	public void setNumberOfBands() {
+	@Test void setNumberOfBands() {
 		Planar<GrayU8> img = new Planar<>(GrayU8.class,5, 10, 2);
 
 		assertEquals(2, img.getNumBands());
@@ -253,8 +242,7 @@ public class TestPlanar extends BoofStandardJUnit {
 		}
 	}
 
-	@Test
-	public void get24u8() {
+	@Test void get24u8() {
 		Planar<GrayU8> img = new Planar<>(GrayU8.class,2,3,3);
 		img.getBand(0).set(0,1,233);
 		img.getBand(1).set(0,1,16);
@@ -270,8 +258,7 @@ public class TestPlanar extends BoofStandardJUnit {
 		assertEquals(expected1,img.get24u8(1,1));
 	}
 
-	@Test
-	public void get32u8() {
+	@Test void get32u8() {
 		Planar<GrayU8> img = new Planar<>(GrayU8.class,2,3,4);
 		img.getBand(0).set(0,1,208);
 		img.getBand(1).set(0,1,233);
@@ -290,8 +277,7 @@ public class TestPlanar extends BoofStandardJUnit {
 		assertEquals(expected1,img.get32u8(1,1));
 	}
 
-	@Test
-	public void set32u8() {
+	@Test void set32u8() {
 		Planar<GrayU8> img = new Planar<>(GrayU8.class,2,3,5);
 
 		int expected0 = (208<<24) | (233<<16) | (16<<8) | (128);
@@ -312,8 +298,7 @@ public class TestPlanar extends BoofStandardJUnit {
 		assertEquals(200,img.getBand(3).get(1,1));
 	}
 
-	@Test
-	public void set24u8() {
+	@Test void set24u8() {
 		Planar<GrayU8> img = new Planar<>(GrayU8.class,2,3,3);
 
 		int expected0 = (233<<16) | (16<<8) | (128);

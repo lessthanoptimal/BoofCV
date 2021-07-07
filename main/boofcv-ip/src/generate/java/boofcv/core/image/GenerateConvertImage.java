@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -87,7 +87,7 @@ public class GenerateConvertImage extends CodeGeneratorBase {
 				"\t * </p>\n" +
 				"\t *\n" +
 				"\t * @param input Input image which is being converted. Not modified.\n" +
-				"\t * @param output (Optional) The output image.  If null a new image is created. Modified.\n" +
+				"\t * @param output (Optional) The output image. If null a new image is created. Modified.\n" +
 				"\t * @return Converted image.\n" +
 				"\t */\n" +
 				"\tpublic static "+imageOut.getSingleBandName()+" convert("+imageIn.getSingleBandName()+" input, "+imageOut.getSingleBandName()+" output) {\n" +
@@ -112,7 +112,7 @@ public class GenerateConvertImage extends CodeGeneratorBase {
 				"\t * </p>\n" +
 				"\t *\n" +
 				"\t * @param input Input image which is being converted. Not modified.\n" +
-				"\t * @param output (Optional) The output image.  If null a new image is created. Modified.\n" +
+				"\t * @param output (Optional) The output image. If null a new image is created. Modified.\n" +
 				"\t * @return Converted image.\n" +
 				"\t */\n" +
 				"\tpublic static "+imageOut.getInterleavedName()+" convert("+imageIn.getInterleavedName()+" input, "+imageOut.getInterleavedName()+" output) {\n" +
@@ -138,7 +138,7 @@ public class GenerateConvertImage extends CodeGeneratorBase {
 				"\t * across all the bands.\n" +
 				"\t * \n" +
 				"\t * @param input Input Planar image that is being converted. Not modified.\n" +
-				"\t * @param output (Optional) The single band output image.  If null a new image is created. Modified.\n" +
+				"\t * @param output (Optional) The single band output image. If null a new image is created. Modified.\n" +
 				"\t * @return Converted image.\n" +
 				"\t */\n" +
 				"\tpublic static "+imageName+" average( Planar<"+imageName+"> input , "+imageName+" output ) {\n" +
@@ -168,7 +168,7 @@ public class GenerateConvertImage extends CodeGeneratorBase {
 				"\t * across all the bands.\n" +
 				"\t * \n" +
 				"\t * @param input (Input) The ImageInterleaved that is being converted. Not modified.\n" +
-				"\t * @param output (Optional) The single band output image.  If null a new image is created. Modified.\n" +
+				"\t * @param output (Optional) The single band output image. If null a new image is created. Modified.\n" +
 				"\t * @return Converted image.\n" +
 				"\t */\n" +
 				"\tpublic static "+outputName+" average( "+inputName+" input , "+outputName+" output ) {\n" +
@@ -196,7 +196,7 @@ public class GenerateConvertImage extends CodeGeneratorBase {
 				"\t * Converts a {@link "+inputName+"} into the equivalent {@link Planar}\n" +
 				"\t * \n" +
 				"\t * @param input (Input) ImageInterleaved that is being converted. Not modified.\n" +
-				"\t * @param output (Optional) The output image.  If null a new image is created. Modified.\n" +
+				"\t * @param output (Optional) The output image. If null a new image is created. Modified.\n" +
 				"\t * @return Converted image.\n" +
 				"\t */\n" +
 				"\tpublic static Planar<"+bandName+"> convert( "+inputName+" input , Planar<"+bandName+"> output ) {\n" +
@@ -226,7 +226,7 @@ public class GenerateConvertImage extends CodeGeneratorBase {
 				"\t * Converts a {@link "+inputName+"} into the equivalent {@link Planar}\n" +
 				"\t * \n" +
 				"\t * @param input (Input) ImageInterleaved that is being converted. Not modified.\n" +
-				"\t * @param output (Optional) The output image.  If null a new image is created. Modified.\n" +
+				"\t * @param output (Optional) The output image. If null a new image is created. Modified.\n" +
 				"\t * @return Converted image.\n" +
 				"\t */\n" +
 				"\tpublic static Planar<"+bandName+"> convert"+type+"( "+inputName+" input , Planar<"+bandName+"> output ) {\n" +
@@ -254,7 +254,7 @@ public class GenerateConvertImage extends CodeGeneratorBase {
 				"\t * Converts a {@link Planar} into the equivalent {@link "+outputName+"}\n" +
 				"\t *\n" +
 				"\t * @param input (Input) Planar image that is being converted. Not modified.\n" +
-				"\t * @param output (Optional) The output image.  If null a new image is created. Modified.\n" +
+				"\t * @param output (Optional) The output image. If null a new image is created. Modified.\n" +
 				"\t * @return Converted image.\n" +
 				"\t */\n" +
 				"\tpublic static "+outputName+" convert( Planar<"+bandName+"> input , "+outputName+" output ) {\n" +
@@ -284,7 +284,7 @@ public class GenerateConvertImage extends CodeGeneratorBase {
 				"\t * Converts a {@link Planar} into the equivalent {@link "+outputName+"}\n" +
 				"\t *\n" +
 				"\t * @param input (Input) Planar image that is being converted. Not modified.\n" +
-				"\t * @param output (Optional) The output image.  If null a new image is created. Modified.\n" +
+				"\t * @param output (Optional) The output image. If null a new image is created. Modified.\n" +
 				"\t * @return Converted image.\n" +
 				"\t */\n" +
 				"\tpublic static "+outputName+" convert"+type+"( Planar<"+bandName+"> input , "+outputName+" output ) {\n" +
@@ -316,7 +316,7 @@ public class GenerateConvertImage extends CodeGeneratorBase {
 				"\t * @param min minimum input pixel value, inclusive\n" +
 				"\t * @param max maximum input pixel value, inclusive\n" +
 				"\t * @param numValues Number of possible pixel values in output image\n" +
-				"\t * @param output (Optional) Storage for the output image.  Can be null.\n" +
+				"\t * @param output (Optional) Storage for the output image. Can be null.\n" +
 				"\t * @return The converted output image.\n" +
 				"\t */\n" +
 				"\tpublic static GrayU8 convert("+imageIn.getSingleBandName()+" input , "+sumType+" min , "+sumType+" max , int numValues , GrayU8 output )\n" +

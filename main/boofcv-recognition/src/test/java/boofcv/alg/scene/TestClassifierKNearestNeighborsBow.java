@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -45,8 +45,7 @@ public class TestClassifierKNearestNeighborsBow extends BoofStandardJUnit {
 	public final static int NUM_WORDS = 3;
 	public final static int FEATURES_IN_IMAGE = 46;
 
-	@Test
-	public void basicTest() {
+	@Test void basicTest() {
 		DummyNN nn = new DummyNN();
 		DummyDense features = new DummyDense();
 		DummyToWord toWords = new DummyToWord();

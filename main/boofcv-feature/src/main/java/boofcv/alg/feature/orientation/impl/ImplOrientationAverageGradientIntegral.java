@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -41,7 +41,7 @@ public class ImplOrientationAverageGradientIntegral<T extends ImageGray<T>,G ext
 	/**
 	 *
 	 * @param sampleRadius Radius of the region being considered in terms of Wavelet samples. Typically 6.
-	 * @param weightSigma Sigma for weighting distribution.  Zero for unweighted.
+	 * @param weightSigma Sigma for weighting distribution. Zero for unweighted.
 	 */
 	public ImplOrientationAverageGradientIntegral(double radiusToScale,
 												  int sampleRadius, double period,

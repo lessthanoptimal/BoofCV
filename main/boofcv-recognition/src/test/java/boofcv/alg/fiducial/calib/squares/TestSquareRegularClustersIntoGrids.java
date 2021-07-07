@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -37,8 +37,7 @@ public class TestSquareRegularClustersIntoGrids extends BoofStandardJUnit {
 	public static double DEFAULT_WIDTH = 1.2;
 	Random rand = new Random(23423);
 
-	@Test
-	public void highLevelCheck() {
+	@Test void highLevelCheck() {
 		List<List<SquareNode>> clusters = new ArrayList<>();
 
 		for (int length = 1; length <= 4; length++) {
@@ -55,8 +54,7 @@ public class TestSquareRegularClustersIntoGrids extends BoofStandardJUnit {
 		assertEquals(4, alg.getGrids().size());
 	}
 
-	@Test
-	public void checkNumberOfConnections_positive() {
+	@Test void checkNumberOfConnections_positive() {
 		SquareRegularClustersIntoGrids alg = new SquareRegularClustersIntoGrids(1);
 
 		for (int numRows = 1; numRows <= 4; numRows++) {
@@ -72,8 +70,7 @@ public class TestSquareRegularClustersIntoGrids extends BoofStandardJUnit {
 		}
 	}
 
-	@Test
-	public void checkNumberOfConnections_negative() {
+	@Test void checkNumberOfConnections_negative() {
 		List<SquareNode> nodes = createGrid(1, 2);
 		nodes.addAll(createGrid(2, 3));
 
@@ -81,8 +78,7 @@ public class TestSquareRegularClustersIntoGrids extends BoofStandardJUnit {
 		assertEquals(0, alg.checkNumberOfConnections(nodes));
 	}
 
-	@Test
-	public void orderInfoLine() {
+	@Test void orderInfoLine() {
 		for (int length = 1; length < 4; length++) {
 			for (int i = 0; i < 2; i++) {
 				int numRows, numCols;
@@ -114,8 +110,7 @@ public class TestSquareRegularClustersIntoGrids extends BoofStandardJUnit {
 		}
 	}
 
-	@Test
-	public void orderIntoGrid() {
+	@Test void orderIntoGrid() {
 
 		for (int numRows = 2; numRows <= 4; numRows++) {
 			for (int numCols = 2; numCols <= 4; numCols++) {
@@ -138,8 +133,7 @@ public class TestSquareRegularClustersIntoGrids extends BoofStandardJUnit {
 		}
 	}
 
-	@Test
-	public void addRows() {
+	@Test void addRows() {
 		int numRows = 3;
 		int numCols = 4;
 		List<SquareNode> nodes = createGrid(numRows, numCols);
@@ -160,8 +154,7 @@ public class TestSquareRegularClustersIntoGrids extends BoofStandardJUnit {
 		}
 	}
 
-	@Test
-	public void addLineToGrid() {
+	@Test void addLineToGrid() {
 		int numRows = 3;
 		int numCols = 4;
 		List<SquareNode> nodes = createGrid(numRows, numCols);
@@ -195,8 +188,7 @@ public class TestSquareRegularClustersIntoGrids extends BoofStandardJUnit {
 		alg.addLineToGrid(a, b, list);
 	}
 
-	@Test
-	public void pickNot_1() {
+	@Test void pickNot_1() {
 		SquareNode a = new SquareNode();
 		SquareNode b = new SquareNode();
 		SquareNode c = new SquareNode();
@@ -208,8 +200,7 @@ public class TestSquareRegularClustersIntoGrids extends BoofStandardJUnit {
 		assertTrue(b == SquareRegularClustersIntoGrids.pickNot(a, c));
 	}
 
-	@Test
-	public void pickNot_2() {
+	@Test void pickNot_2() {
 		SquareNode a = new SquareNode();
 		SquareNode b = new SquareNode();
 		SquareNode c = new SquareNode();

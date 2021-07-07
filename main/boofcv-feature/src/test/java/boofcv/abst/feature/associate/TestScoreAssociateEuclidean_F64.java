@@ -48,8 +48,7 @@ public class TestScoreAssociateEuclidean_F64 extends StandardScoreAssociationChe
 		return a;
 	}
 
-	@Test
-	public void compareToExpected() {
+	@Test void compareToExpected() {
 		ScoreAssociateEuclidean_F64 score = new ScoreAssociateEuclidean_F64();
 
 		TupleDesc_F64 a = new TupleDesc_F64(5);

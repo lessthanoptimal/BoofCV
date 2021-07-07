@@ -115,7 +115,7 @@ public class EasyGeneralFeatureDetector<T extends ImageGray<T>, D extends ImageG
 	}
 
 	/**
-	 * Detect features inside the image.  Excluding points in the exclude list.
+	 * Detect features inside the image. Excluding points in the exclude list.
 	 *
 	 * @param input Image being processed.
 	 * @param exclude List of points that should not be returned. Null if there are no excluded points.

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -19,7 +19,7 @@
 package boofcv.struct.flow;
 
 /**
- * The dense optical flow of an image.  Each pixel contains a data structure that indicates optical flow at the pixel
+ * The dense optical flow of an image. Each pixel contains a data structure that indicates optical flow at the pixel
  * and if the optical flow could be found.
  *
  * @author Peter Abeles
@@ -103,13 +103,13 @@ public class ImageFlow {
 	}
 
 	/**
-	 * Specifies the optical flow for a single pixel.  Pixels for which no optical flow could be found are marked
+	 * Specifies the optical flow for a single pixel. Pixels for which no optical flow could be found are marked
 	 * by setting x to Float.NaN.
 	 */
 	public static class D
 	{
 		/**
-		 * Optical flow.  If no valid flow could be found then x = Float.NaN
+		 * Optical flow. If no valid flow could be found then x = Float.NaN
 		 */
 		public float x,y;
 

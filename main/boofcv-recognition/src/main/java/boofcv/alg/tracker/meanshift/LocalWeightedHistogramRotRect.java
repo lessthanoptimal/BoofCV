@@ -29,8 +29,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Computes a local histogram weighted using a Gaussian function.  The weighting function is shaped using a rotated
- * rectangle, where the sigma along each axis is set by the rectangle's width and height.    For use with
+ * Computes a local histogram weighted using a Gaussian function. The weighting function is shaped using a rotated
+ * rectangle, where the sigma along each axis is set by the rectangle's width and height.   For use with
  * {@link TrackerMeanShiftComaniciu2003}.
  *
  * The histogram is stored in a row major format.
@@ -62,14 +62,14 @@ public class LocalWeightedHistogramRotRect<T extends ImageBase<T>> {
 	protected float[] weights;
 	protected float[] histogram;
 
-	// list of sample points.  in square coordinates.  where 0.5 is 1/2 the width or height
+	// list of sample points. in square coordinates. where 0.5 is 1/2 the width or height
 	protected List<Point2D_F32> samplePts = new ArrayList<>();
 
 	/**
 	 * Configures histogram calculation.
 	 *
 	 * @param numSamples Number of points it samples along each axis of the rectangle.
-	 * @param numSigmas Number of standard deviations away the sides will be from the center.  Try 3
+	 * @param numSigmas Number of standard deviations away the sides will be from the center. Try 3
 	 * @param numHistogramBins Number of bins in the histogram
 	 * @param numBands Number of bands in the input image
 	 * @param maxPixelValue Maximum value of a pixel across all bands
@@ -111,7 +111,7 @@ public class LocalWeightedHistogramRotRect<T extends ImageBase<T>> {
 	}
 
 	/**
-	 * create the list of points in square coordinates that it will sample.  values will range
+	 * create the list of points in square coordinates that it will sample. values will range
 	 * from -0.5 to 0.5 along each axis.
 	 */
 	protected void createSamplePoints( int numSamples ) {
@@ -126,7 +126,7 @@ public class LocalWeightedHistogramRotRect<T extends ImageBase<T>> {
 	}
 
 	/**
-	 * Computes the histogram inside the specified region.  Results are returned by calling {@link #getHistogram()}.
+	 * Computes the histogram inside the specified region. Results are returned by calling {@link #getHistogram()}.
 	 *
 	 * @param image Input image
 	 * @param region Region which is to be sampled
@@ -244,7 +244,7 @@ public class LocalWeightedHistogramRotRect<T extends ImageBase<T>> {
 	 * Converts a point from square coordinates into image coordinates
 	 */
 	protected void squareToImageSample( float x, float y, RectangleRotate_F32 region ) {
-		// -1 because it starts counting at 0.  otherwise width+1 samples are made
+		// -1 because it starts counting at 0. otherwise width+1 samples are made
 		x *= region.width - 1;
 		y *= region.height - 1;
 

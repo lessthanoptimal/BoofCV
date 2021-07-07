@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -21,7 +21,7 @@ package boofcv.alg.disparity.block;
 /**
  * <p>
  * Selects the disparity the smallest error and optionally applies several different types of validation to remove false
- * positives.  The two validations it can apply are maxError and texture based.
+ * positives. The two validations it can apply are maxError and texture based.
  * See {@link SelectDisparityWithChecksWta} for more details on validation checks.
  * </p>
  *
@@ -41,8 +41,8 @@ public abstract class SelectSparseStandardWta<ArrayType>
 
 	/**
 	 *
-	 * @param maxError Maximum allowed error.  See comments above.
-	 * @param texture Texture threshold.  See comments above.
+	 * @param maxError Maximum allowed error. See comments above.
+	 * @param texture Texture threshold. See comments above.
 	 */
 	protected SelectSparseStandardWta(int maxError, double texture, int tolRightToLeft) {
 		this.maxError = maxError <= 0 ? Integer.MAX_VALUE : maxError;

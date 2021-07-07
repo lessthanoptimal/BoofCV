@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -73,7 +73,7 @@ public class SquareGraph {
 	}
 
 	/**
-	 * Finds the side which intersects the line on the shape.  The line is assumed to pass through the shape
+	 * Finds the side which intersects the line on the shape. The line is assumed to pass through the shape
 	 * so if there is no intersection it is considered a bug
 	 */
 	public int findSideIntersect(SquareNode n , LineSegment2D_F64 line , Point2D_F64 intersection, LineSegment2D_F64 storage ) {
@@ -91,9 +91,9 @@ public class SquareGraph {
 	}
 
 	/**
-	 * Checks to see if the two nodes can be connected.  If one of the nodes is already connected to
-	 * another it then checks to see if the proposed connection is more desirable.  If it is the old
-	 * connection is removed and a new one created.  Otherwise nothing happens.
+	 * Checks to see if the two nodes can be connected. If one of the nodes is already connected to
+	 * another it then checks to see if the proposed connection is more desirable. If it is the old
+	 * connection is removed and a new one created. Otherwise nothing happens.
 	 */
 	public void checkConnect( SquareNode a , int indexA , SquareNode b , int indexB , double distance ) {
 		if( a.edges[indexA] != null && a.edges[indexA].distance > distance ) {
@@ -110,7 +110,7 @@ public class SquareGraph {
 	}
 
 	/**
-	 * Creates a new edge which will connect the two nodes.  The side on each node which is connected
+	 * Creates a new edge which will connect the two nodes. The side on each node which is connected
 	 * is specified by the indexes.
 	 * @param a First node
 	 * @param indexA side on node 'a'

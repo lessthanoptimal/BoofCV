@@ -32,9 +32,9 @@ import org.ejml.interfaces.linsol.LinearSolverDense;
 
 /**
  * <p>
- * Computes the homography induced by a plane from 3 point correspondences.  Works with both calibrated and
- * uncalibrated cameras.  The Fundamental/Essential matrix must be known.  The found homography will be from view 1
- * to view 2.  The passed in Fundamental matrix must have the following properties for each set of
+ * Computes the homography induced by a plane from 3 point correspondences. Works with both calibrated and
+ * uncalibrated cameras. The Fundamental/Essential matrix must be known. The found homography will be from view 1
+ * to view 2. The passed in Fundamental matrix must have the following properties for each set of
  * point correspondences: x2*F*x1 = 0, where x1 and x2 are views of the point in image 1 and image 2 respectively.
  * For more information see [1].
  * </p>
@@ -89,7 +89,7 @@ public class HomographyInducedStereo3Pts {
 	 * Specify the fundamental matrix and the camera 2 epipole.
 	 *
 	 * @param F Fundamental matrix.
-	 * @param e2 Epipole for camera 2.  If null it will be computed internally.
+	 * @param e2 Epipole for camera 2. If null it will be computed internally.
 	 */
 	public void setFundamental( DMatrixRMaj F, Point3D_F64 e2 ) {
 		if (e2 != null)
@@ -103,7 +103,7 @@ public class HomographyInducedStereo3Pts {
 
 	/**
 	 * Estimates the homography from view 1 to view 2 induced by a plane from 3 point associations.
-	 * Each pair must pass the epipolar constraint.  This can fail if the points are colinear.
+	 * Each pair must pass the epipolar constraint. This can fail if the points are colinear.
 	 *
 	 * @param p1 Associated point observation
 	 * @param p2 Associated point observation

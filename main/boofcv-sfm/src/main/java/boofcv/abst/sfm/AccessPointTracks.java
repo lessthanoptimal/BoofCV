@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -24,7 +24,7 @@ import org.jetbrains.annotations.Nullable;
 import java.util.List;
 
 /**
- * Provides access to the location of point tracks.  Location of tracks are provided in terms
+ * Provides access to the location of point tracks. Location of tracks are provided in terms
  * of pixel coordinates.
  *
  * @author Peter Abeles

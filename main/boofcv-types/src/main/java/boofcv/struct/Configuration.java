@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -21,7 +21,7 @@ package boofcv.struct;
 import java.io.Serializable;
 
 /**
- * Complex algorithms with several parameters can specify their parameters using a separate class.  This interface
+ * Complex algorithms with several parameters can specify their parameters using a separate class. This interface
  * is intended to provide a common interface for all such configuration classes.
  *
  * @author Peter Abeles

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -37,8 +37,7 @@ public class TestImplEdgeNonMaxSuppression extends BoofStandardJUnit {
 	int width = 20;
 	int height = 30;
 
-	@Test
-	public void naive4() {
+	@Test void naive4() {
 		GrayF32 intensity = new GrayF32(3,3);
 		GrayF32 output = new GrayF32(3,3);
 		GrayS8 direction = new GrayS8(3,3);
@@ -83,8 +82,7 @@ public class TestImplEdgeNonMaxSuppression extends BoofStandardJUnit {
 	/**
 	 * Make sure it suppresses values of equal intensity
 	 */
-	@Test
-	public void naive4_equal() {
+	@Test void naive4_equal() {
 		GrayF32 intensity = new GrayF32(3,3);
 		GrayF32 output = new GrayF32(3,3);
 		GrayS8 direction = new GrayS8(3,3);
@@ -97,8 +95,7 @@ public class TestImplEdgeNonMaxSuppression extends BoofStandardJUnit {
 			assertEquals(2,output.data[i],1e-4f);
 	}
 
-	@Test
-	public void naive8() {
+	@Test void naive8() {
 		GrayF32 intensity = new GrayF32(3,3);
 		GrayF32 output = new GrayF32(3,3);
 		GrayS8 direction = new GrayS8(3,3);
@@ -143,8 +140,7 @@ public class TestImplEdgeNonMaxSuppression extends BoofStandardJUnit {
 	/**
 	 * Make sure it suppresses values of equal intensity
 	 */
-	@Test
-	public void naive8_equal() {
+	@Test void naive8_equal() {
 		GrayF32 intensity = new GrayF32(3,3);
 		GrayF32 output = new GrayF32(3,3);
 		GrayS8 direction = new GrayS8(3,3);
@@ -157,8 +153,7 @@ public class TestImplEdgeNonMaxSuppression extends BoofStandardJUnit {
 			assertEquals(2,output.data[i],1e-4f);
 	}
 
-	@Test
-	public void inner4() {
+	@Test void inner4() {
 		GrayF32 intensity = new GrayF32(width,height);
 		GrayS8 direction = new GrayS8(width,height);
 		GrayF32 expected = new GrayF32(width,height);
@@ -189,8 +184,7 @@ public class TestImplEdgeNonMaxSuppression extends BoofStandardJUnit {
 				found.subimage(1,1,width-1,height-1, null), 1e-4);
 	}
 
-	@Test
-	public void inner8() {
+	@Test void inner8() {
 		GrayF32 intensity = new GrayF32(width,height);
 		GrayS8 direction = new GrayS8(width,height);
 		GrayF32 expected = new GrayF32(width,height);
@@ -220,8 +214,7 @@ public class TestImplEdgeNonMaxSuppression extends BoofStandardJUnit {
 				found.subimage(1,1,width-1,height-1, null), 1e-4);
 	}
 
-	@Test
-	public void border4() {
+	@Test void border4() {
 		GrayF32 intensity = new GrayF32(width,height);
 		GrayS8 direction = new GrayS8(width,height);
 		GrayF32 expected = new GrayF32(width,height);
@@ -251,8 +244,7 @@ public class TestImplEdgeNonMaxSuppression extends BoofStandardJUnit {
 
 	}
 
-@Test
-	public void border8() {
+@Test void border8() {
 		GrayF32 intensity = new GrayF32(width,height);
 		GrayS8 direction = new GrayS8(width,height);
 		GrayF32 expected = new GrayF32(width,height);

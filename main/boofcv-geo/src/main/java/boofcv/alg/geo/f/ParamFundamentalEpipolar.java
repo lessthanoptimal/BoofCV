@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -28,8 +28,8 @@ import org.ejml.simple.SimpleMatrix;
 /**
  * <p>
  * Parameterizes F by specifying the first two columns and the third being a linear combination of
- * the first two.  By setting one of the elements in f1 or f2 to be one, it can achieve the minimum
- * possible parameter size of 7.  Care is taken to avoid the degenerate case when f1 and f2
+ * the first two. By setting one of the elements in f1 or f2 to be one, it can achieve the minimum
+ * possible parameter size of 7. Care is taken to avoid the degenerate case when f1 and f2
  * are linearly dependent.
  * </p>
  * <p>
@@ -56,7 +56,7 @@ public class ParamFundamentalEpipolar implements ModelCodec<DMatrixRMaj> {
 	}
 
 	/**
-	 * Examines the matrix structure to determine how to parameterize F.  
+	 * Examines the matrix structure to determine how to parameterize F.
 	 */
 	@Override
 	public void encode(DMatrixRMaj F, double[] param) {

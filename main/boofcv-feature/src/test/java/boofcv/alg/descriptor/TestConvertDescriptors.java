@@ -35,8 +35,7 @@ public class TestConvertDescriptors extends BoofStandardJUnit {
 	/**
 	 * General test with a known output
 	 */
-	@Test
-	public void positive_F64() {
+	@Test void positive_F64() {
 		TupleDesc_F64 input = new TupleDesc_F64(4);
 		input.data = new double[]{1,2,3,4};
 
@@ -53,8 +52,7 @@ public class TestConvertDescriptors extends BoofStandardJUnit {
 	/**
 	 * Test pathological case where the input is all zeros
 	 */
-	@Test
-	public void positive_F64_zeros() {
+	@Test void positive_F64_zeros() {
 		TupleDesc_F64 input = new TupleDesc_F64(4);
 
 		TupleDesc_U8 output = new TupleDesc_U8(4);
@@ -68,8 +66,7 @@ public class TestConvertDescriptors extends BoofStandardJUnit {
 	/**
 	 * General test with a known output
 	 */
-	@Test
-	public void signed_F64() {
+	@Test void signed_F64() {
 		TupleDesc_F64 input = new TupleDesc_F64(4);
 		input.data = new double[]{1,-2,3,-4};
 
@@ -86,8 +83,7 @@ public class TestConvertDescriptors extends BoofStandardJUnit {
 	/**
 	 * Test pathological case where the input is all zeros
 	 */
-	@Test
-	public void signed_F64_zeros() {
+	@Test void signed_F64_zeros() {
 		TupleDesc_F64 input = new TupleDesc_F64(4);
 
 		TupleDesc_S8 output = new TupleDesc_S8(4);
@@ -111,8 +107,7 @@ public class TestConvertDescriptors extends BoofStandardJUnit {
 		}
 	}
 
-	@Test
-	public void convertNcc_F64() {
+	@Test void convertNcc_F64() {
 		TupleDesc_F64 desc = new TupleDesc_F64(100);
 
 		for (int i = 0; i < desc.size(); i++) {
@@ -126,7 +121,7 @@ public class TestConvertDescriptors extends BoofStandardJUnit {
 			assertEquals(desc.data[i],found.data[i]+found.mean,1e-8);
 		}
 
-		// crude test.  just makes sure signa has been set really.
+		// crude test. just makes sure signa has been set really.
 		assertTrue(found.sigma>0);
 	}
 }

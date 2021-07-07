@@ -84,7 +84,7 @@ public abstract class CompareTwoImagePanel extends JPanel implements MouseListen
 	}
 
 	/**
-	 * Sets the internal images.  Not thread safe.
+	 * Sets the internal images. Not thread safe.
 	 */
 	public synchronized void setImages( BufferedImage leftImage, BufferedImage rightImage ) {
 		this.leftImage = leftImage;

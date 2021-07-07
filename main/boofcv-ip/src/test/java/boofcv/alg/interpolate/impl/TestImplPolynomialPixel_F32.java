@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -47,8 +47,7 @@ public class TestImplPolynomialPixel_F32 extends GeneralChecksInterpolationPixel
     /**
 	 * Polynomial interpolation of order one is bilinear interpolation
 	 */
-	@Test
-	public void compareToBilinear() {
+	@Test void compareToBilinear() {
 		GrayF32 img = new GrayF32(width,height);
 		GrayF32 expected = new GrayF32(width,height);
 		GrayF32 found = new GrayF32(width,height);

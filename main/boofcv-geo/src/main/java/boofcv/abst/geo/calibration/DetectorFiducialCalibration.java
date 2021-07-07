@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -41,8 +41,8 @@ public interface DetectorFiducialCalibration {
 	boolean process( GrayF32 input );
 
 	/**
-	 * Returns the set of detected points from the most recent call to {@link #process(GrayF32)}.  Each
-	 * time this function is invoked a new instance of the list and points is returned.  No data reuse here.
+	 * Returns the set of detected points from the most recent call to {@link #process(GrayF32)}. Each
+	 * time this function is invoked a new instance of the list and points is returned. No data reuse here.
 	 *
 	 * @return List of detected points in row major grid order.
 	 */

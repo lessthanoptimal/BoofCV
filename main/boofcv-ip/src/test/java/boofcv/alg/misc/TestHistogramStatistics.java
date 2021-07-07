@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -28,8 +28,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
  * @author Peter Abeles
  */
 public class TestHistogramStatistics extends BoofStandardJUnit {
-	@Test
-	public void variance() {
+	@Test void variance() {
 		int[] histogram = new int[]{0,3,10,3,6};
 
 		double mean = HistogramStatistics.mean(histogram,4);
@@ -37,24 +36,21 @@ public class TestHistogramStatistics extends BoofStandardJUnit {
 		assertEquals(0.375,found, UtilEjml.TEST_F64);
 	}
 
-	@Test
-	public void count() {
+	@Test void count() {
 		int[] histogram = new int[]{0,3,10,3,6};
 
 		int found = HistogramStatistics.count(histogram,4);
 		assertEquals(16,found);
 	}
 
-	@Test
-	public void mean() {
+	@Test void mean() {
 		int[] histogram = new int[]{0,3,10,3,6};
 
 		double found = HistogramStatistics.mean(histogram,4);
 		assertEquals((3+10*2+3*3)/(16.0),found, UtilEjml.TEST_F64);
 	}
 
-	@Test
-	public void percentile() {
+	@Test void percentile() {
 		int[] histogram = new int[]{0,3,10,3,6};
 
 		int found = HistogramStatistics.percentile(histogram,0,4);

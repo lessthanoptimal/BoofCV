@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -39,9 +39,9 @@ import javax.annotation.Generated;
 @Generated("boofcv.alg.filter.misc.GenerateImplAverageDownSample")
 public class ImplAverageDownSample {
 	/**
-	 * Down samples the image along the x-axis only.  Image height's must be the same.
-	 * @param src Input image.  Not modified.
-	 * @param dst Output image.  Modified.
+	 * Down samples the image along the x-axis only. Image height's must be the same.
+	 * @param src Input image. Not modified.
+	 * @param dst Output image. Modified.
 	 */
 	public static void horizontal( GrayU8 src , GrayF32 dst ) {
 
@@ -103,9 +103,9 @@ public class ImplAverageDownSample {
 	}
 
 	/**
-	 * Down samples the image along the y-axis only.  Image width's must be the same.
-	 * @param src Input image.  Not modified.
-	 * @param dst Output image.  Modified.
+	 * Down samples the image along the y-axis only. Image width's must be the same.
+	 * @param src Input image. Not modified.
+	 * @param dst Output image. Modified.
 	 */
 	public static void vertical( GrayF32 src , GrayI8 dst ) {
 
@@ -173,9 +173,9 @@ public class ImplAverageDownSample {
 	}
 
 	/**
-	 * Down samples the image along the x-axis only.  Image height's must be the same.
-	 * @param src Input image.  Not modified.
-	 * @param dst Output image.  Modified.
+	 * Down samples the image along the x-axis only. Image height's must be the same.
+	 * @param src Input image. Not modified.
+	 * @param dst Output image. Modified.
 	 */
 	public static void horizontal( GrayU16 src , GrayF32 dst ) {
 
@@ -237,9 +237,9 @@ public class ImplAverageDownSample {
 	}
 
 	/**
-	 * Down samples the image along the y-axis only.  Image width's must be the same.
-	 * @param src Input image.  Not modified.
-	 * @param dst Output image.  Modified.
+	 * Down samples the image along the y-axis only. Image width's must be the same.
+	 * @param src Input image. Not modified.
+	 * @param dst Output image. Modified.
 	 */
 	public static void vertical( GrayF32 src , GrayI16 dst ) {
 
@@ -307,9 +307,9 @@ public class ImplAverageDownSample {
 	}
 
 	/**
-	 * Down samples the image along the x-axis only.  Image height's must be the same.
-	 * @param src Input image.  Not modified.
-	 * @param dst Output image.  Modified.
+	 * Down samples the image along the x-axis only. Image height's must be the same.
+	 * @param src Input image. Not modified.
+	 * @param dst Output image. Modified.
 	 */
 	public static void horizontal( GrayF32 src , GrayF32 dst ) {
 
@@ -371,9 +371,9 @@ public class ImplAverageDownSample {
 	}
 
 	/**
-	 * Down samples the image along the y-axis only.  Image width's must be the same.
-	 * @param src Input image.  Not modified.
-	 * @param dst Output image.  Modified.
+	 * Down samples the image along the y-axis only. Image width's must be the same.
+	 * @param src Input image. Not modified.
+	 * @param dst Output image. Modified.
 	 */
 	public static void vertical( GrayF32 src , GrayF32 dst ) {
 
@@ -441,9 +441,9 @@ public class ImplAverageDownSample {
 	}
 
 	/**
-	 * Down samples the image along the x-axis only.  Image height's must be the same.
-	 * @param src Input image.  Not modified.
-	 * @param dst Output image.  Modified.
+	 * Down samples the image along the x-axis only. Image height's must be the same.
+	 * @param src Input image. Not modified.
+	 * @param dst Output image. Modified.
 	 */
 	public static void horizontal( GrayF64 src , GrayF64 dst ) {
 
@@ -505,9 +505,9 @@ public class ImplAverageDownSample {
 	}
 
 	/**
-	 * Down samples the image along the y-axis only.  Image width's must be the same.
-	 * @param src Input image.  Not modified.
-	 * @param dst Output image.  Modified.
+	 * Down samples the image along the y-axis only. Image width's must be the same.
+	 * @param src Input image. Not modified.
+	 * @param dst Output image. Modified.
 	 */
 	public static void vertical( GrayF64 src , GrayF64 dst ) {
 

@@ -26,15 +26,15 @@ import boofcv.struct.image.Planar;
 
 /**
  * <p>
- * Type specific operations for creating histgrams of image pixel values.  The histogram
+ * Type specific operations for creating histgrams of image pixel values. The histogram
  * is a feature descriptor and all the feature descriptor operations can be used on these
  * histograms.
  * <p>
  *
  * <p>
  * Unlike histogram operations in {@link boofcv.alg.misc.ImageStatistics} the initial scale of
- * the image doesn't matter.  More specifically, {@link boofcv.alg.misc.ImageStatistics} simply
- * rounds the value to the nearest one and adds it to the element in a histogram.  While these
+ * the image doesn't matter. More specifically, {@link boofcv.alg.misc.ImageStatistics} simply
+ * rounds the value to the nearest one and adds it to the element in a histogram. While these
  * operations use the image's max values and the number of elements in the histogram to compute
  * the bin period.
  * </p>
@@ -47,7 +47,7 @@ public class HistogramFeatureOps {
 	 *
 	 * @param image Input image. Not modified.
 	 * @param maxPixelValue Maximum possible value for a pixel for all bands.
-	 * @param histogram Output histogram.  Must have same number of bands as input image. Modified.
+	 * @param histogram Output histogram. Must have same number of bands as input image. Modified.
 	 */
 	public static void histogram(GrayU8 image , int maxPixelValue , TupleDesc_F64 histogram )
 	{
@@ -73,7 +73,7 @@ public class HistogramFeatureOps {
 	 *
 	 * @param image Input image. Not modified.
 	 * @param maxPixelValue Maximum possible value for a pixel
-	 * @param histogram Output histogram.  Must have same number of bands as input image. Modified.
+	 * @param histogram Output histogram. Must have same number of bands as input image. Modified.
 	 */
 	public static void histogram(GrayU16 image , int maxPixelValue , TupleDesc_F64 histogram )
 	{

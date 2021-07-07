@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -47,8 +47,7 @@ public class TestCreateSyntheticOverheadViewPL extends BoofStandardJUnit {
 	double centerX = 1;
 	double centerY = overheadH*cellSize/2.0;
 
-	@Test
-	public void checkRender() {
+	@Test void checkRender() {
 		// Easier to make up a plane in this direction
 		Se3_F64 cameraToPlane = new Se3_F64();
 		ConvertRotation3D_F64.eulerToMatrix(EulerType.XYZ, UtilAngle.degreeToRadian(0), 0, 0, cameraToPlane.getR());

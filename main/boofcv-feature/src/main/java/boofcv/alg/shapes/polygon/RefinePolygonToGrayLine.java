@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -32,18 +32,18 @@ import lombok.Getter;
 /**
  * <p>
  * Improves the fits of a polygon's which is darker or lighter than the background. Info's edges are
- * assumed to be perfectly straight lines.  The edges are processed individually and fit to a line using weighted
+ * assumed to be perfectly straight lines. The edges are processed individually and fit to a line using weighted
  * regression. Both black squares with white backgrounds and white shapes with black backgrounds can be found.
  * The edges are selected to maximize the difference between light and dark regions.
  * </p>
  * <p>
  * For example, assume an image axis aligned rectangle has a lower extent of 1,2 and a upper extent of 12,15, is
- * entirely filled, excluding the upper extent pixels (as is typical).  Then the found lower and upper extends of the
+ * entirely filled, excluding the upper extent pixels (as is typical). Then the found lower and upper extends of the
  * found polygon will also be 1,2 and 12,15.
  * </p>
  *
  * <p>
- * If a line lies entirely along the image border it is not modified.  If part of it lies along the image then only
+ * If a line lies entirely along the image border it is not modified. If part of it lies along the image then only
  * points not near the border are used to optimize its location.
  * </p>
  *
@@ -86,7 +86,7 @@ public class RefinePolygonToGrayLine<T extends ImageGray<T>> implements RefinePo
 	private final LineGeneral2D_F64 before = new LineGeneral2D_F64();
 
 	/**
-	 * Constructor which provides full access to all parameters.  See code documents
+	 * Constructor which provides full access to all parameters. See code documents
 	 * value a description of these variables.
 	 */
 	public RefinePolygonToGrayLine( double cornerOffset, int lineSamples, int sampleRadius,
@@ -117,7 +117,7 @@ public class RefinePolygonToGrayLine<T extends ImageGray<T>> implements RefinePo
 	}
 
 	/**
-	 * Sets the image which is going to be processed.  If a transform is to be used
+	 * Sets the image which is going to be processed. If a transform is to be used
 	 * {@link SnapToLineEdge#setTransform} should be called before this.
 	 */
 	@Override
@@ -139,7 +139,7 @@ public class RefinePolygonToGrayLine<T extends ImageGray<T>> implements RefinePo
 	/**
 	 * Refines the fit a polygon by snapping it to the edges.
 	 *
-	 * @param input (input) Initial estimate for the polygon.  CW or CCW ordering doesn't matter.
+	 * @param input (input) Initial estimate for the polygon. CW or CCW ordering doesn't matter.
 	 * @param output (output) the fitted polygon
 	 */
 	@Override
@@ -147,7 +147,7 @@ public class RefinePolygonToGrayLine<T extends ImageGray<T>> implements RefinePo
 		if (input.size() != output.size())
 			throw new IllegalArgumentException("Input and output sides do not match. " + input.size() + " " + output.size());
 
-		// sanity check input.  If it's too small this algorithm won't work
+		// sanity check input. If it's too small this algorithm won't work
 		if (checkShapeTooSmall(input))
 			return false;
 
@@ -164,7 +164,7 @@ public class RefinePolygonToGrayLine<T extends ImageGray<T>> implements RefinePo
 	}
 
 	/**
-	 * Looks at the distance between each vertex.  If that distance is so small the edge can't be measured the
+	 * Looks at the distance between each vertex. If that distance is so small the edge can't be measured the
 	 * return true.
 	 *
 	 * @param input polygon
@@ -185,7 +185,7 @@ public class RefinePolygonToGrayLine<T extends ImageGray<T>> implements RefinePo
 	}
 
 	/**
-	 * Refines the initial line estimates using EM.  The number of iterations is fixed.
+	 * Refines the initial line estimates using EM. The number of iterations is fixed.
 	 */
 	protected boolean optimize( Polygon2D_F64 seed, Polygon2D_F64 current ) {
 		previous.setTo(seed);
@@ -203,7 +203,7 @@ public class RefinePolygonToGrayLine<T extends ImageGray<T>> implements RefinePo
 
 		boolean changed = false;
 		for (int iteration = 0; iteration < maxIterations; iteration++) {
-			// snap each line to the edge independently.  Lines will be in local coordinates
+			// snap each line to the edge independently. Lines will be in local coordinates
 			for (int i = 0; i < previous.size(); i++) {
 				int j = (i + 1)%previous.size();
 				Point2D_F64 a = previous.get(i);
@@ -229,7 +229,7 @@ public class RefinePolygonToGrayLine<T extends ImageGray<T>> implements RefinePo
 					}
 				}
 
-				// The line fit failed.  Probably because its along the image border.  Revert it
+				// The line fit failed. Probably because its along the image border. Revert it
 				if (failed) {
 					general[i].setTo(before);
 				} else {
@@ -278,7 +278,7 @@ public class RefinePolygonToGrayLine<T extends ImageGray<T>> implements RefinePo
 
 	/**
 	 * Used to specify a transform that is applied to pixel coordinates to bring them back into original input
-	 * image coordinates.  For example if the input image has lens distortion but the edge were found
+	 * image coordinates. For example if the input image has lens distortion but the edge were found
 	 * in undistorted coordinates this code needs to know how to go from undistorted back into distorted
 	 * image coordinates in order to read the pixel's value.
 	 *

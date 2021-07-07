@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -34,10 +34,10 @@ import java.util.Arrays;
  * Flow estimates from higher layers in the pyramid are used to provide an initial estimate flow lower layers.
  * For each pixel in the 'prev' image, a square region centered around it is compared against
  * all other regions within the specified search radius of it
- * in image 'curr'.  For each candidate flow the error is computed.  After the best score has been found each local
- * pixel which contributed to that square region is checked.  When a pixel is checked its current score compared
+ * in image 'curr'. For each candidate flow the error is computed. After the best score has been found each local
+ * pixel which contributed to that square region is checked. When a pixel is checked its current score compared
  * to see if it's better than the score it was previously assigned (if any) then its flow and score will be set to
- * the current.  This improves the handled along object edges.  If only the flow is considered when a pixel is the
+ * the current. This improves the handled along object edges. If only the flow is considered when a pixel is the
  * center then it almost always fails at edges.
  * </p>
  *
@@ -181,7 +181,7 @@ public abstract class DenseOpticalFlowBlockPyramid<T extends ImageGray<T>> {
 
 	/**
 	 * Performs an exhaustive search centered around (cx,cy) for the region in 'curr' which is the best
-	 * match for the template.  Results are written into 'flow'
+	 * match for the template. Results are written into 'flow'
 	 */
 	protected float findFlow( int cx, int cy, T curr, ImageFlow.D flow ) {
 		float bestScore = Float.MAX_VALUE;

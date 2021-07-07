@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -37,7 +37,7 @@ import java.awt.image.BufferedImage;
 import java.util.List;
 
 /**
- * Demonstration of the Canny edge detection algorithm.  In this implementation the output can be a binary image and/or
+ * Demonstration of the Canny edge detection algorithm. In this implementation the output can be a binary image and/or
  * a graph describing each contour.
  *
  * @author Peter Abeles
@@ -51,16 +51,16 @@ public class ExampleCannyEdge {
 		GrayU8 edgeImage = gray.createSameShape();
 
 		// Create a canny edge detector which will dynamically compute the threshold based on maximum edge intensity
-		// It has also been configured to save the trace as a graph.  This is the graph created while performing
+		// It has also been configured to save the trace as a graph. This is the graph created while performing
 		// hysteresis thresholding.
 		CannyEdge<GrayU8,GrayS16> canny = FactoryEdgeDetectors.canny(2,true, true, GrayU8.class, GrayS16.class);
 
-		// The edge image is actually an optional parameter.  If you don't need it just pass in null
+		// The edge image is actually an optional parameter. If you don't need it just pass in null
 		canny.process(gray,0.1f,0.3f,edgeImage);
 
 		// First get the contour created by canny
 		List<EdgeContour> edgeContours = canny.getContours();
-		// The 'edgeContours' is a tree graph that can be difficult to process.  An alternative is to extract
+		// The 'edgeContours' is a tree graph that can be difficult to process. An alternative is to extract
 		// the contours from the binary image, which will produce a single loop for each connected cluster of pixels.
 		// Note that you are only interested in external contours.
 		List<Contour> contours = BinaryImageOps.contourExternal(edgeImage, ConnectRule.EIGHT);

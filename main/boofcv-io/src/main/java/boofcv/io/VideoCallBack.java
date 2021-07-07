@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -34,7 +34,7 @@ public interface VideoCallBack<T extends ImageBase<T>> {
 	public void init( int width , int height , ImageType<T> imageType );
 
 	/**
-	 * Passes in the next frame in the sequence.  Time in this function should be minimized to avoid causing a
+	 * Passes in the next frame in the sequence. Time in this function should be minimized to avoid causing a
 	 * back log in the video image buffer.
 	 *
 	 * @param frame New image frame in BoofCV image format.

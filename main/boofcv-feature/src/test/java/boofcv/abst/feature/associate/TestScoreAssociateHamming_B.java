@@ -37,8 +37,7 @@ public class TestScoreAssociateHamming_B extends StandardScoreAssociationChecks<
 	/**
 	 * Generate random descriptions and see two hamming distance calculations return the same result.
 	 */
-	@Test
-	public void testRandom() {
+	@Test void testRandom() {
 		ScoreAssociateHamming_B scorer = new ScoreAssociateHamming_B();
 
 		TupleDesc_B a = new TupleDesc_B(512);

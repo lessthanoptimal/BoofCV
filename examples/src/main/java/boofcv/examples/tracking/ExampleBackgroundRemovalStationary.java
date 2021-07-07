@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -36,7 +36,7 @@ import boofcv.struct.image.ImageType;
 import java.awt.image.BufferedImage;
 
 /**
- * Example showing how to perform background modeling when the camera is assumed to be stationary.  This scenario
+ * Example showing how to perform background modeling when the camera is assumed to be stationary. This scenario
  * can be computed much faster than the moving camera case and depending on the background model can some times produce
  * reasonable results when the camera has a little bit of jitter.
  *
@@ -47,7 +47,7 @@ public class ExampleBackgroundRemovalStationary {
 		String fileName = UtilIO.pathExample("background/street_intersection.mp4");
 //		String fileName = UtilIO.pathExample("background/rubixfire.mp4"); // dynamic background
 //		String fileName = UtilIO.pathExample("background/horse_jitter.mp4"); // degraded performance because of jitter
-//		String fileName = UtilIO.pathExample("tracking/chipmunk.mjpeg"); // Camera moves.  Stationary will fail here
+//		String fileName = UtilIO.pathExample("tracking/chipmunk.mjpeg"); // Camera moves. Stationary will fail here
 
 		// Comment/Uncomment to switch input image type
 		ImageType imageType = ImageType.single(GrayF32.class);
@@ -66,7 +66,7 @@ public class ExampleBackgroundRemovalStationary {
 				media.openVideo(fileName, background.getImageType());
 //				media.openCamera(null,640,480,background.getImageType());
 
-		// Declare storage for segmented image.  1 = moving foreground and 0 = background
+		// Declare storage for segmented image. 1 = moving foreground and 0 = background
 		GrayU8 segmented = new GrayU8(video.getWidth(),video.getHeight());
 
 		BufferedImage visualized = new BufferedImage(segmented.width,segmented.height,BufferedImage.TYPE_INT_RGB);

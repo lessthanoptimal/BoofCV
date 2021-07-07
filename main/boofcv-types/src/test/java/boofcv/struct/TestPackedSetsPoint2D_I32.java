@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -33,8 +33,7 @@ import static org.junit.jupiter.api.Assertions.*;
  */
 public class TestPackedSetsPoint2D_I32 extends BoofStandardJUnit {
 
-	@Test
-	public void grow() {
+	@Test void grow() {
 		PackedSetsPoint2D_I32 alg = new PackedSetsPoint2D_I32(20);
 
 		assertEquals(0,alg.totalPoints());
@@ -56,8 +55,7 @@ public class TestPackedSetsPoint2D_I32 extends BoofStandardJUnit {
 		assertEquals(0,alg.sizeOfSet(1));
 	}
 
-	@Test
-	public void removeTail_zero() {
+	@Test void removeTail_zero() {
 		PackedSetsPoint2D_I32 alg = new PackedSetsPoint2D_I32(6);
 
 		try {
@@ -66,8 +64,7 @@ public class TestPackedSetsPoint2D_I32 extends BoofStandardJUnit {
 		} catch( RuntimeException ignore ){}
 	}
 
-	@Test
-	public void removeTail_one() {
+	@Test void removeTail_one() {
 		PackedSetsPoint2D_I32 alg = new PackedSetsPoint2D_I32(6);
 
 		alg.grow();
@@ -79,8 +76,7 @@ public class TestPackedSetsPoint2D_I32 extends BoofStandardJUnit {
 		assertEquals(0,alg.size());
 	}
 
-	@Test
-	public void removeTail_two() {
+	@Test void removeTail_two() {
 		PackedSetsPoint2D_I32 alg = new PackedSetsPoint2D_I32(6);
 
 		alg.grow();
@@ -103,8 +99,7 @@ public class TestPackedSetsPoint2D_I32 extends BoofStandardJUnit {
 		checkPoint(0,2,4,3, alg);
 	}
 
-	@Test
-	public void addPointToTail() {
+	@Test void addPointToTail() {
 		PackedSetsPoint2D_I32 alg = new PackedSetsPoint2D_I32(6);
 
 		alg.grow();
@@ -148,8 +143,7 @@ public class TestPackedSetsPoint2D_I32 extends BoofStandardJUnit {
 		assertEquals(y,list.get(point).y);
 	}
 
-	@Test
-	public void writeOverSet() {
+	@Test void writeOverSet() {
 		PackedSetsPoint2D_I32 alg = new PackedSetsPoint2D_I32(6);
 
 		alg.grow();
@@ -178,8 +172,7 @@ public class TestPackedSetsPoint2D_I32 extends BoofStandardJUnit {
 		}
 	}
 
-	@Test
-	public void writeOverSet_badsize() {
+	@Test void writeOverSet_badsize() {
 		PackedSetsPoint2D_I32 alg = new PackedSetsPoint2D_I32(6);
 
 		alg.grow();
@@ -198,8 +191,7 @@ public class TestPackedSetsPoint2D_I32 extends BoofStandardJUnit {
 		} catch( RuntimeException ignore){}
 	}
 
-	@Test
-	public void iterator() {
+	@Test void iterator() {
 		PackedSetsPoint2D_I32 alg = new PackedSetsPoint2D_I32(6);
 
 		alg.grow();

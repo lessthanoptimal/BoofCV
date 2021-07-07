@@ -41,8 +41,7 @@ public class TestHistogramFeatureOps extends BoofStandardJUnit {
 	int height = 40;
 	Random rand = new Random(345345);
 
-	@Test
-	public void histogram_U8() {
+	@Test void histogram_U8() {
 
 		GrayU8 image = new GrayU8(width,height);
 
@@ -80,8 +79,7 @@ public class TestHistogramFeatureOps extends BoofStandardJUnit {
 		checkEquals(histogram, expected);
 	}
 
-	@Test
-	public void histogram_U16() {
+	@Test void histogram_U16() {
 		GrayU16 image = new GrayU16(width,height);
 
 		image.set(2, 3, 40000);
@@ -103,8 +101,7 @@ public class TestHistogramFeatureOps extends BoofStandardJUnit {
 		checkEquals(histogram, expected);
 	}
 
-	@Test
-	public void histogram_F32() {
+	@Test void histogram_F32() {
 		GrayF32 image = new GrayF32(width,height);
 
 		image.set(2, 3, 40);
@@ -142,8 +139,7 @@ public class TestHistogramFeatureOps extends BoofStandardJUnit {
 		checkEquals(histogram, expected);
 	}
 
-	@Test
-	public void histogram_PL_U8() {
+	@Test void histogram_PL_U8() {
 		Planar<GrayU8> image = new Planar<>(GrayU8.class,width,height,2);
 
 		GeneralizedImageOps.setM(image, 2, 3, 20, 30);
@@ -167,10 +163,9 @@ public class TestHistogramFeatureOps extends BoofStandardJUnit {
 	}
 
 	/**
-	 * Compare to single band image.  Results should be identical
+	 * Compare to single band image. Results should be identical
 	 */
-	@Test
-	public void histogram_PL_U8_compareToSingle() {
+	@Test void histogram_PL_U8_compareToSingle() {
 		GrayU8 image = new GrayU8(width,height);
 		ImageMiscOps.fillUniform(image,rand,0,255);
 
@@ -189,8 +184,7 @@ public class TestHistogramFeatureOps extends BoofStandardJUnit {
 		}
 	}
 
-	@Test
-	public void histogram_PL_F32() {
+	@Test void histogram_PL_F32() {
 		Planar<GrayF32> image = new Planar<>(GrayF32.class,width,height,2);
 
 		GeneralizedImageOps.setM(image, 2, 3, 20, 30);
@@ -214,10 +208,9 @@ public class TestHistogramFeatureOps extends BoofStandardJUnit {
 	}
 
 	/**
-	 * Compare to single band image.  Results should be identical
+	 * Compare to single band image. Results should be identical
 	 */
-	@Test
-	public void histogram_PL_F32_compareToSingle() {
+	@Test void histogram_PL_F32_compareToSingle() {
 		GrayF32 image = new GrayF32(width,height);
 		ImageMiscOps.fillUniform(image,rand,-100,100);
 

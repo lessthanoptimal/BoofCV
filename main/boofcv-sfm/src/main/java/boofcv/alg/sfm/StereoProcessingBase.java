@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -37,7 +37,7 @@ import org.ejml.data.FMatrixRMaj;
 import org.ejml.ops.ConvertMatrixData;
 
 /**
- * Base class that configures stereo processing.  Created distortion for converting image from its input image
+ * Base class that configures stereo processing. Created distortion for converting image from its input image
  * into an undistorted rectified image ready for stereo processing.
  *
  * @author Peter Abeles
@@ -143,7 +143,7 @@ public class StereoProcessingBase<T extends ImageGray<T>> {
 	 *
 	 * @param x x-coordinate of pixel in rectified left image
 	 * @param y y-coordinate of pixel in rectified left image
-	 * @param pointLeft Storage for 3D coordinate of point in homogeneous coordinates.  w = disparity
+	 * @param pointLeft Storage for 3D coordinate of point in homogeneous coordinates. w = disparity
 	 */
 	public void computeHomo3D( double x, double y, Point3D_F64 pointLeft ) {
 		// Coordinate in rectified camera frame
@@ -156,7 +156,7 @@ public class StereoProcessingBase<T extends ImageGray<T>> {
 	}
 
 	/**
-	 * Sets the input images.  Processing is delayed until {@link #initialize()} has been called.
+	 * Sets the input images. Processing is delayed until {@link #initialize()} has been called.
 	 *
 	 * @param leftImage Left image
 	 * @param rightImage Right image

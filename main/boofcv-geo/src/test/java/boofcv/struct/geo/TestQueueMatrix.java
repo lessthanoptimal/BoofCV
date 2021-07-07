@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -29,8 +29,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
  */
 public class TestQueueMatrix extends BoofStandardJUnit {
 
-	@Test
-	public void constructor_regular() {
+	@Test void constructor_regular() {
 		QueueMatrix alg = new QueueMatrix(3,4);
 
 		assertEquals(0,alg.size);

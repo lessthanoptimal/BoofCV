@@ -28,7 +28,7 @@ import org.jetbrains.annotations.Nullable;
 
 /**
  * Describes how to normalize a set of points such that they have zero mean and variance. This is equivalent
- * to applying the matrix below.  Normalization is often needed as a preprocessing step for solving linear equations.
+ * to applying the matrix below. Normalization is often needed as a preprocessing step for solving linear equations.
  * Greatly reduces bias and numerical errors.
  *
  * <pre>

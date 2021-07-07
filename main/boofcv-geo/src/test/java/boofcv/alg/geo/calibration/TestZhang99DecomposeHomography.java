@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -38,8 +38,7 @@ public class TestZhang99DecomposeHomography extends BoofStandardJUnit {
 	/**
 	 * Test against a simple known case
 	 */
-	@Test
-	public void knownCase() {
+	@Test void knownCase() {
 		DMatrixRMaj R = ConvertRotation3D_F64.eulerToMatrix(EulerType.XYZ,0.02, -0.05, 0.01, null);
 		Vector3D_F64 T = new Vector3D_F64(100,50,-1000);
 		DMatrixRMaj K = GenericCalibrationGrid.createStandardCalibration();

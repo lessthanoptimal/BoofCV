@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -67,8 +67,7 @@ public abstract class GenericQrCodeDetectorChecks extends BoofStandardJUnit {
 	/**
 	 * See if a clear well defined qr code can be detected while rating
 	 */
-	@Test
-	public void rotation() {
+	@Test void rotation() {
 		QrCodeDetector<GrayF32> detector = createDetector();
 
 		CameraPinholeBrown model = CalibrationIO.load(getClass().getResource("calib/pinhole_radial.yaml"));
@@ -91,8 +90,7 @@ public abstract class GenericQrCodeDetectorChecks extends BoofStandardJUnit {
 	/**
 	 * The marker is at a skewed angle and rotating
 	 */
-	@Test
-	public void skewed() {
+	@Test void skewed() {
 		QrCodeDetector<GrayF32> detector = createDetector();
 
 		CameraPinholeBrown model = CalibrationIO.load(getClass().getResource("calib/pinhole_radial.yaml"));
@@ -116,8 +114,7 @@ public abstract class GenericQrCodeDetectorChecks extends BoofStandardJUnit {
 	/**
 	 * The marker zooming in and out of the frame
 	 */
-	@Test
-	public void scale() {
+	@Test void scale() {
 		QrCodeDetector<GrayF32> detector = createDetector();
 
 		CameraPinholeBrown model = CalibrationIO.load(getClass().getResource("calib/pinhole_radial.yaml"));
@@ -140,8 +137,7 @@ public abstract class GenericQrCodeDetectorChecks extends BoofStandardJUnit {
 	/**
 	 * See if it can detect multiple fiducials in the image at the same time
 	 */
-	@Test
-	public void multipleMarkers() {
+	@Test void multipleMarkers() {
 		QrCodeDetector<GrayF32> detector = createDetector();
 
 		CameraPinholeBrown model = CalibrationIO.load(getClass().getResource("calib/pinhole_radial.yaml"));

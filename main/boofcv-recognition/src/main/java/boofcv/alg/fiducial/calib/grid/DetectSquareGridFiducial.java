@@ -31,12 +31,12 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Detect a square grid calibration target and returns the corner points of each square.  This calibration grid is
- * specified by a set of squares which are organized in a grid pattern.  All squares are the same size.  The entire
- * grid must be visible.  Space between the squares is specified as a ratio of the square size. The grid will be
+ * Detect a square grid calibration target and returns the corner points of each square. This calibration grid is
+ * specified by a set of squares which are organized in a grid pattern. All squares are the same size. The entire
+ * grid must be visible. Space between the squares is specified as a ratio of the square size. The grid will be
  * oriented so that returned points are in counter clockwise (CCW) ordering, which appears to be CW in the image.
  *
- * <p>There is also always at least two solutions to the ordering.  For sake of consistency it will select
+ * <p>There is also always at least two solutions to the ordering. For sake of consistency it will select
  * the orientation where index 0 is the closest to the origin.</p>
  *
  * </p>
@@ -50,7 +50,7 @@ import java.util.List;
  */
 public class DetectSquareGridFiducial<T extends ImageGray<T>> {
 
-	// dimension of square grid.  This only refers to black squares and not the white space
+	// dimension of square grid. This only refers to black squares and not the white space
 	int numCols;
 	int numRows;
 
@@ -64,7 +64,7 @@ public class DetectSquareGridFiducial<T extends ImageGray<T>> {
 	SquaresIntoRegularClusters s2c;
 	SquareRegularClustersIntoGrids c2g;
 
-	// output results.  Grid of calibration points in row-major order
+	// output results. Grid of calibration points in row-major order
 	List<PointIndex2D_F64> calibrationPoints = new ArrayList<>();
 	int calibRows;
 	int calibCols;
@@ -85,7 +85,7 @@ public class DetectSquareGridFiducial<T extends ImageGray<T>> {
 	 * @param numCols Number of black squares in the grid columns
 	 * @param spaceToSquareRatio Ratio of spacing between the squares and the squares width
 	 * @param inputToBinary Converts input image into a binary image
-	 * @param detectorSquare Detects the squares in the image.  Must be configured to detect squares
+	 * @param detectorSquare Detects the squares in the image. Must be configured to detect squares
 	 */
 	public DetectSquareGridFiducial( int numRows, int numCols, double spaceToSquareRatio,
 									 InputToBinary<T> inputToBinary,

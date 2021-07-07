@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -229,7 +229,7 @@ public class ImplEnhanceHistogram {
 	}
 
 	/**
-	 * Local equalization along a row.  Image must be at least the histogram's width (2*r+1) in width and height.
+	 * Local equalization along a row. Image must be at least the histogram's width (2*r+1) in width and height.
 	 */
 	public static void equalizeLocalRow( GrayU8 input, int radius, int histogramLength, int startY, GrayU8 output,
 										 GrowArray<DogArray_I32> workspaces ) {
@@ -329,7 +329,7 @@ public class ImplEnhanceHistogram {
 
 
 	/**
-	 * Local equalization along a column.  Image must be at least the histogram's width (2*r+1) in width and height.
+	 * Local equalization along a column. Image must be at least the histogram's width (2*r+1) in width and height.
 	 */
 	public static void equalizeLocalCol( GrayU8 input, int radius, int histogramLength, int startX, GrayU8 output,
 										 GrowArray<DogArray_I32> workspaces ) {
@@ -350,7 +350,7 @@ public class ImplEnhanceHistogram {
 			hist0 = hist1 - width;
 		}
 
-		// initialize the histogram.  ignore top border
+		// initialize the histogram. ignore top border
 		localHistogram(input,hist0,0,hist1,width,histogram);
 
 		// compute transformation table
@@ -540,7 +540,7 @@ public class ImplEnhanceHistogram {
 	}
 
 	/**
-	 * Local equalization along a row.  Image must be at least the histogram's width (2*r+1) in width and height.
+	 * Local equalization along a row. Image must be at least the histogram's width (2*r+1) in width and height.
 	 */
 	public static void equalizeLocalRow( GrayU16 input, int radius, int histogramLength, int startY, GrayU16 output,
 										 GrowArray<DogArray_I32> workspaces ) {
@@ -640,7 +640,7 @@ public class ImplEnhanceHistogram {
 
 
 	/**
-	 * Local equalization along a column.  Image must be at least the histogram's width (2*r+1) in width and height.
+	 * Local equalization along a column. Image must be at least the histogram's width (2*r+1) in width and height.
 	 */
 	public static void equalizeLocalCol( GrayU16 input, int radius, int histogramLength, int startX, GrayU16 output,
 										 GrowArray<DogArray_I32> workspaces ) {
@@ -661,7 +661,7 @@ public class ImplEnhanceHistogram {
 			hist0 = hist1 - width;
 		}
 
-		// initialize the histogram.  ignore top border
+		// initialize the histogram. ignore top border
 		localHistogram(input,hist0,0,hist1,width,histogram);
 
 		// compute transformation table

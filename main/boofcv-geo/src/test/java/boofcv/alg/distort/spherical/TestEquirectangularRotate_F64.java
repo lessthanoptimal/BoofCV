@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -50,16 +50,16 @@ class TestEquirectangularRotate_F64 extends TestEquirectangularDistortBase_F64 {
 
 		alg.setDirection(0, Math.PI/2,0);
 		alg.compute((int)(300.0*0.5), 250/2, p);
-		assertEquals( 0 , p.y, GrlConstants.TEST_F64); //pathological.  only check y
+		assertEquals( 0 , p.y, GrlConstants.TEST_F64); //pathological. only check y
 
 		alg.setDirection(0, -Math.PI/2,0);
 		alg.compute((int)(300.0*0.5), 250/2, p);
-		assertEquals( 250 , p.y, GrlConstants.TEST_F64); //pathological.  only check y
+		assertEquals( 250 , p.y, GrlConstants.TEST_F64); //pathological. only check y
 
 		alg.setDirection(0, Math.PI/4.0,0);
 		alg.compute((int)(300.0*0.5), 250/2, p);
 		assertMatch( p, 300.0*0.5, 250/4+0.5);
-		// 0.5 is fudge to make the test pass.  I *think* it's just discretation error
+		// 0.5 is fudge to make the test pass. I *think* it's just discretation error
 	}
 
 	private void assertMatch(Point2D_F64 tran , double x , double y ) {

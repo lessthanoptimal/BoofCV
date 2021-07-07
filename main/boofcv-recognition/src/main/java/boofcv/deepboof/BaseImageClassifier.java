@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -84,10 +84,10 @@ public abstract class BaseImageClassifier implements ImageClassifier<Planar<Gray
 	}
 
 	/**
-	 * The original implementation takes in an image then crops it randomly.  This is primarily for training but is
+	 * The original implementation takes in an image then crops it randomly. This is primarily for training but is
 	 * replicated here to reduce the number of differences
 	 *
-	 * @param image Image being processed.  Must be RGB image.  Pixel values must have values from 0 to 255.
+	 * @param image Image being processed. Must be RGB image. Pixel values must have values from 0 to 255.
 	 */
 	@Override
 	public void classify( Planar<GrayF32> image ) {

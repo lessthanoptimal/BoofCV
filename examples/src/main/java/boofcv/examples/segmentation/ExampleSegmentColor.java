@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -33,9 +33,9 @@ import java.awt.event.MouseEvent;
 import java.awt.image.BufferedImage;
 
 /**
- * Example which demonstrates how color can be used to segment an image.  The color space is converted from RGB into
- * HSV.  HSV separates intensity from color and allows you to search for a specific color based on two values
- * independent of lighting conditions.  Other color spaces are supported, such as YUV, XYZ, and LAB.
+ * Example which demonstrates how color can be used to segment an image. The color space is converted from RGB into
+ * HSV. HSV separates intensity from color and allows you to search for a specific color based on two values
+ * independent of lighting conditions. Other color spaces are supported, such as YUV, XYZ, and LAB.
  *
  * @author Peter Abeles
  */
@@ -62,8 +62,8 @@ public class ExampleSegmentColor {
 
 	/**
 	 * Selectively displays only pixels which have a similar hue and saturation values to what is provided.
-	 * This is intended to be a simple example of color based segmentation.  Color based segmentation can be done
-	 * in RGB color, but is more problematic due to it not being intensity invariant.  More robust techniques
+	 * This is intended to be a simple example of color based segmentation. Color based segmentation can be done
+	 * in RGB color, but is more problematic due to it not being intensity invariant. More robust techniques
 	 * can use Gaussian models instead of a uniform distribution, as is done below.
 	 */
 	public static void showSelectedColor( String name , BufferedImage image , float hue , float saturation ) {

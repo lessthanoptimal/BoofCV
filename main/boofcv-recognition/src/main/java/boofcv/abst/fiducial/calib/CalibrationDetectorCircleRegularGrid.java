@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -134,7 +134,7 @@ public class CalibrationDetectorCircleRegularGrid implements DetectorFiducialCal
 	}
 
 	/**
-	 * Specifies the physical location of each point on the 2D calibration plane.  The fiducial is centered on the
+	 * Specifies the physical location of each point on the 2D calibration plane. The fiducial is centered on the
 	 * coordinate system
 	 * @param numRows Number of rows
 	 * @param numCols Number of columns

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -32,7 +32,7 @@ import boofcv.struct.image.ImageType;
 /**
  * <p>
  * A helpful class which allows a derivative of any order to be computed from an input image using a simple to use
- * interface.  Higher order derivatives are computed from lower order derivatives.  Derivatives are computed
+ * interface. Higher order derivatives are computed from lower order derivatives. Derivatives are computed
  * using convolution kernels and thus might not be as efficient as when using functions from
  * {@link boofcv.factory.filter.derivative.FactoryDerivative}.
  * </p>
@@ -143,7 +143,7 @@ public class AnyImageDerivative<I extends ImageGray<I>, D extends ImageGray<D>> 
 	}
 
 	/**
-	 * Computes derivative images using previously computed lower level derivatives.  Only
+	 * Computes derivative images using previously computed lower level derivatives. Only
 	 * computes/declares images as needed.
 	 */
 	public D getDerivative(boolean... isX) {

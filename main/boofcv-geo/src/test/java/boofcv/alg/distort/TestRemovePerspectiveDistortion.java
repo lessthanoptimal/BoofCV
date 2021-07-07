@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -49,8 +49,7 @@ public class TestRemovePerspectiveDistortion extends BoofStandardJUnit {
 	/**
 	 * The transform should not scale and produce a simple transform from input to output
 	 */
-	@Test
-	public void identity() {
+	@Test void identity() {
 		RemovePerspectiveDistortion<GrayF32> alg =
 				new RemovePerspectiveDistortion<>(30,40, ImageType.single(GrayF32.class));
 
@@ -68,8 +67,7 @@ public class TestRemovePerspectiveDistortion extends BoofStandardJUnit {
 		assertTrue(p.distance(50,70)< UtilEjml.TEST_F64);
 	}
 
-	@Test
-	public void undoDistortion() {
+	@Test void undoDistortion() {
 		GrayF32 expected = new GrayF32(30,40);
 		GrayF32 input = new GrayF32(200,150);
 

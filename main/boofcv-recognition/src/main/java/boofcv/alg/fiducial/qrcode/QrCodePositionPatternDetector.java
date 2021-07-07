@@ -151,10 +151,10 @@ public class QrCodePositionPatternDetector<T extends ImageGray<T>> {
 
 	/**
 	 * <p>Specifies transforms which can be used to change coordinates from distorted to undistorted and the opposite
-	 * coordinates.  The undistorted image is never explicitly created.</p>
+	 * coordinates. The undistorted image is never explicitly created.</p>
 	 *
-	 * @param width Input image width.  Used in sanity check only.
-	 * @param height Input image height.  Used in sanity check only.
+	 * @param width Input image width. Used in sanity check only.
+	 * @param height Input image height. Used in sanity check only.
 	 * @param model distortion model. Null to remove a distortion model.
 	 */
 	public void setLensDistortion( int width, int height,
@@ -269,7 +269,7 @@ public class QrCodePositionPatternDetector<T extends ImageGray<T>> {
 	}
 
 	/**
-	 * Connects the 'candidate' node to node 'n' if they meet several criteria.  See code for details.
+	 * Connects the 'candidate' node to node 'n' if they meet several criteria. See code for details.
 	 */
 	void considerConnect( SquareNode node0, SquareNode node1 ) {
 		// Find the side on each line which intersects the line connecting the two centers

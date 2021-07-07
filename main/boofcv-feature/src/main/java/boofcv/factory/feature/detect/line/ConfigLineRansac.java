@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -26,7 +26,7 @@ import boofcv.struct.Configuration;
 public class ConfigLineRansac implements Configuration {
 
 	/**
-	 * Size of the region considered.  Try 40 and tune.
+	 * Size of the region considered. Try 40 and tune.
 	 */
 	public int regionSize=40;
 	/**
@@ -34,7 +34,7 @@ public class ConfigLineRansac implements Configuration {
 	 */
 	public double thresholdEdge=30;
 	/**
-	 * Tolerance in angle for allowing two edgels to be paired up, in radians.  Try 2.36
+	 * Tolerance in angle for allowing two edgels to be paired up, in radians. Try 2.36
 	 */
 	public double thresholdAngle=2.36;
 	/**

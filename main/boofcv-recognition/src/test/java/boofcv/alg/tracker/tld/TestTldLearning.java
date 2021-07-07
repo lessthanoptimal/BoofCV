@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -36,8 +36,7 @@ public class TestTldLearning extends BoofStandardJUnit {
 
 	ConfigTld config = new ConfigTld();
 
-	@Test
-	public void initialLearning() {
+	@Test void initialLearning() {
 
 		DummyVariance variance = new DummyVariance();
 		DummyFern fern = new DummyFern();
@@ -67,8 +66,7 @@ public class TestTldLearning extends BoofStandardJUnit {
 		assertEquals(1,detection.calledDetection);
 	}
 
-	@Test
-	public void updateLearning() {
+	@Test void updateLearning() {
 
 		DummyVariance variance = new DummyVariance();
 		DummyFern fern = new DummyFern();

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -22,8 +22,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Data structure which describes a set of {@link SquareNode} as a grid.  Must be a complete grid with no
- * missing elements.  CW or CCW orientation is not specified.
+ * Data structure which describes a set of {@link SquareNode} as a grid. Must be a complete grid with no
+ * missing elements. CW or CCW orientation is not specified.
  *
  * @author Peter Abeles
  */
@@ -39,7 +39,7 @@ public class SquareGrid {
 	}
 
 	/**
-	 * Looks up the node based on its coordinate.  negative values wrap
+	 * Looks up the node based on its coordinate. negative values wrap
 	 */
 	public SquareNode get( int row , int col ) {
 		return nodes.get( indexOf(row,col) );
@@ -72,7 +72,7 @@ public class SquareGrid {
 	}
 
 	/**
-	 * Returns the index of the corner.  0 = (0,0), 1 = (0,w-1), 2 = (h-1,w-1), 3 = (h-1,0)
+	 * Returns the index of the corner. 0 = (0,0), 1 = (0,w-1), 2 = (h-1,w-1), 3 = (h-1,0)
 	 */
 	public int getCornerIndex( SquareNode node ) {
 		int index = nodes.indexOf(node);

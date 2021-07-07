@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -20,7 +20,7 @@ package boofcv.alg.interpolate.array;
 
 
 /**
- * Langrange's formula is a straight forward way to perform polynomial interpolation.  It is
+ * Langrange's formula is a straight forward way to perform polynomial interpolation. It is
  * not the most computationally efficient approach and does not provide any estimate of its accuracy.
  * The order of the polynomial refers to the number of points used in the interpolation minus one.
  *
@@ -30,7 +30,7 @@ public class LagrangeFormula {
 
 	/**
 	 * UsingLlangrange's formula it interpulates the value of a function at the specified sample
-	 * point given discrete samples.  Which samples are used and the order of the approximation are
+	 * point given discrete samples. Which samples are used and the order of the approximation are
 	 * given by i0 and i1.
 	 *
 	 * @param sample Where the estimate is done.
@@ -68,8 +68,8 @@ public class LagrangeFormula {
 
 	/**
 	 * UsingLlangrange's formula it interpulates the value of a function at the specified sample
-	 * point given discrete samples.  Which samples are used and the order of the approximation are
-	 * given by i0 and i1.  The order is = i1-i0+1.
+	 * point given discrete samples. Which samples are used and the order of the approximation are
+	 * given by i0 and i1. The order is = i1-i0+1.
 	 *
 	 * @param sample Where the estimate is done.
 	 * @param x	  Where the function was sampled.

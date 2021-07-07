@@ -61,8 +61,7 @@ public class TestAssociateNearestNeighbor_ST extends StandardAssociateDescriptio
 	/**
 	 * See if associations are skipped if the ratio is too low
 	 */
-	@Test
-	public void scoreRatio() {
+	@Test void scoreRatio() {
 		Dummy<TupleDesc_F64> nn = new Dummy<>();
 		// src = assoc[i] where src is the index of the source feature and i is the index of the dst feature
 		nn.assoc = new int[]{2,0,1,-1,4,-1,-1,2,2,1};
@@ -107,8 +106,7 @@ public class TestAssociateNearestNeighbor_ST extends StandardAssociateDescriptio
 	/**
 	 * Several tests combined into one
 	 */
-	@Test
-	public void various() {
+	@Test void various() {
 
 		Dummy<TupleDesc_F64> nn = new Dummy<>();
 		// src = assoc[i] where src is the index of the source feature and i is the index of the dst feature

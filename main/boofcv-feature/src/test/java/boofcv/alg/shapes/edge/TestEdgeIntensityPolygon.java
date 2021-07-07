@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -32,8 +32,7 @@ import static org.junit.jupiter.api.Assertions.*;
  * @author Peter Abeles
  */
 public class TestEdgeIntensityPolygon extends BoofStandardJUnit {
-	@Test
-	public void computeEdge() {
+	@Test void computeEdge() {
 		GrayU8 image = new GrayU8(400,500);
 
 		int value = 200;
@@ -57,8 +56,7 @@ public class TestEdgeIntensityPolygon extends BoofStandardJUnit {
 		assertEquals(200,alg.getAverageOutside(),1e-8);
 	}
 
-	@Test
-	public void checkIntensity() {
+	@Test void checkIntensity() {
 		GrayU8 image = new GrayU8(400,500);
 
 		int value = 200;

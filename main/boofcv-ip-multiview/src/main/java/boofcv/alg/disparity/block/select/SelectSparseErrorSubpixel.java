@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -22,7 +22,7 @@ import boofcv.alg.disparity.block.score.DisparitySparseRectifiedScoreBM;
 
 /**
  * <p>
- * Subpixel accuracy for disparity.  See {@link SelectErrorSubpixel} for more details on the
+ * Subpixel accuracy for disparity. See {@link SelectErrorSubpixel} for more details on the
  * mathematics.
  * </p>
  *

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -58,8 +58,7 @@ public abstract class GenericTrackerObjectRectangleChecks<T extends ImageBase<T>
 
 	public abstract TrackerObjectQuad<T> create( ImageType<T> imageType );
 
-	@Test
-	public void changeInputImageSize() {
+	@Test void changeInputImageSize() {
 		TrackerObjectQuad<T> tracker = create(imageType);
 		render(1, 0, 0);
 
@@ -74,8 +73,7 @@ public abstract class GenericTrackerObjectRectangleChecks<T extends ImageBase<T>
 		assertTrue(tracker.process(input, where));
 	}
 
-	@Test
-	public void stationary() {
+	@Test void stationary() {
 		TrackerObjectQuad<T> tracker = create(imageType);
 		render(1, 0, 0);
 		assertTrue(tracker.initialize(input, initRegion));
@@ -87,8 +85,7 @@ public abstract class GenericTrackerObjectRectangleChecks<T extends ImageBase<T>
 		assertEquals(initRegion.c.y, where.c.y, tolStationary);
 	}
 
-	@Test
-	public void hint() {
+	@Test void hint() {
 		if (!usesHint)
 			return;
 
@@ -109,8 +106,7 @@ public abstract class GenericTrackerObjectRectangleChecks<T extends ImageBase<T>
 		checkSolution(20 + 100, 25 + 110, 90 + 100, 100 + 110, tolTranslateSmall);
 	}
 
-	@Test
-	public void translation_small() {
+	@Test void translation_small() {
 		TrackerObjectQuad<T> tracker = create(imageType);
 		render(1, 0, 0);
 		assertTrue(tracker.initialize(input, initRegion));
@@ -134,8 +130,7 @@ public abstract class GenericTrackerObjectRectangleChecks<T extends ImageBase<T>
 		assertEquals(-2*9, totalY, 4);
 	}
 
-	@Test
-	public void translation_large() {
+	@Test void translation_large() {
 		TrackerObjectQuad<T> tracker = create(imageType);
 		render(1, 0, 0);
 		assertTrue(tracker.initialize(input, initRegion));
@@ -149,18 +144,16 @@ public abstract class GenericTrackerObjectRectangleChecks<T extends ImageBase<T>
 		checkSolution(20 + tranX, 25 + tranY, 120 + tranX, 160 + tranY, 0.05);
 	}
 
-	@Test
-	public void zooming_in() {
+	@Test void zooming_in() {
 		zoom(-1);
 	}
 
-	@Test
-	public void zooming_out() {
+	@Test void zooming_out() {
 		zoom(1);
 	}
 
 	/**
-	 * Zoom in and out without any visual translation of the object.  e.g. the center is constant
+	 * Zoom in and out without any visual translation of the object. e.g. the center is constant
 	 */
 	protected void zoom( double dir ) {
 		TrackerObjectQuad<T> tracker = create(imageType);
@@ -188,11 +181,10 @@ public abstract class GenericTrackerObjectRectangleChecks<T extends ImageBase<T>
 	}
 
 	/**
-	 * See if it correctly reinitializes.  Should produce identical results when given the same inputs after
+	 * See if it correctly reinitializes. Should produce identical results when given the same inputs after
 	 * being reinitialized.
 	 */
-	@Test
-	public void reinitialize() {
+	@Test void reinitialize() {
 		Quadrilateral_F64 where1 = new Quadrilateral_F64();
 
 		TrackerObjectQuad<T> tracker = create(imageType);

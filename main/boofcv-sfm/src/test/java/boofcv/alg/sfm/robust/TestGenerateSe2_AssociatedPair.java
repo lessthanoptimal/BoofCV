@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -39,8 +39,7 @@ import java.util.List;
 public class TestGenerateSe2_AssociatedPair extends BoofStandardJUnit
 		implements ModelTestingInterface<Se2_F64, AssociatedPair> {
 
-	@Test
-	public void modelGenerator() {
+	@Test void modelGenerator() {
 		StandardModelGeneratorTests<Se2_F64, AssociatedPair> alg =
 				new StandardModelGeneratorTests<Se2_F64, AssociatedPair>(this, 3) {
 					@Override

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -45,8 +45,7 @@ public abstract class GenericSgmStereoDisparityChecks<T extends ImageGray<T>, C 
 	/**
 	 * Input images are identical. Disparity should be zero
 	 */
-	@Test
-	public void identicalImages() {
+	@Test void identicalImages() {
 		int rangeD = 10;
 		renderStereoRandom(0, 255, 0, rangeD);
 
@@ -67,8 +66,7 @@ public abstract class GenericSgmStereoDisparityChecks<T extends ImageGray<T>, C 
 	/**
 	 * Adjust the disparity search and see if it succeeds and fails when it should
 	 */
-	@Test
-	public void disparitySearch() {
+	@Test void disparitySearch() {
 		SgmStereoDisparity<T, C> alg = createAlgorithm();
 		// When you include the diagonal paths it's harder to predict what's going on
 		alg.getAggregation().setPathsConsidered(4);

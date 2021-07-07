@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -37,7 +37,7 @@ import java.awt.image.BufferedImage;
 public class ShowImages {
 
 	/**
-	 * Creates a dialog window showing the specified image.  The function will not
+	 * Creates a dialog window showing the specified image. The function will not
 	 * exit until the user clicks ok
 	 */
 	public static void showDialog(BufferedImage img) {

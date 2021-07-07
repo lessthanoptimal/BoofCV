@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -46,7 +46,7 @@ import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 
 /**
- * Displays the feature intensity for each layer in a scale-space.  The scale-space can be represented as a
+ * Displays the feature intensity for each layer in a scale-space. The scale-space can be represented as a
  * pyramid of set of blurred images.
  *
  * @author Peter Abeles

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -55,8 +55,7 @@ public abstract class CommonImageDistort_SB extends BoofStandardJUnit {
 		}
 	};
 
-	@Test
-	public void applyRenderAll_true() {
+	@Test void applyRenderAll_true() {
 		ImageDistortHelper alg = createAlg(interp);
 		alg.setRenderAll(true);
 
@@ -79,8 +78,7 @@ public abstract class CommonImageDistort_SB extends BoofStandardJUnit {
 		assertEquals(150,alg.getTotal());
 	}
 
-	@Test
-	public void applyRenderAll_False() {
+	@Test void applyRenderAll_False() {
 		ImageDistortHelper alg = createAlg(interp);
 		alg.setRenderAll(false);
 
@@ -106,8 +104,7 @@ public abstract class CommonImageDistort_SB extends BoofStandardJUnit {
 	/**
 	 * Makes sure the mask is resized to match the input image
 	 */
-	@Test
-	public void resize_mask_fit_dst() {
+	@Test void resize_mask_fit_dst() {
 		GrayF32 src = new GrayF32(10,15);
 		ImageMiscOps.fillUniform(src,rand,0,2);
 		GrayF32 dst = new GrayF32(14,18);
@@ -123,21 +120,18 @@ public abstract class CommonImageDistort_SB extends BoofStandardJUnit {
 		assertEquals(dst.height,mask.height);
 	}
 
-	@Test
-	public void renderAll_mask() {
+	@Test void renderAll_mask() {
 		checkMask(true);
 	}
 
-	@Test
-	public void applyOnlyInside_mask() {
+	@Test void applyOnlyInside_mask() {
 		checkMask(false);
 	}
 
 	/**
 	 * Give it an invalid region and see if it does nothing
 	 */
-	@Test
-	public void invalidRegion() {
+	@Test void invalidRegion() {
 		GrayF32 src = new GrayF32(10,15);
 		ImageMiscOps.fillUniform(src,rand,0,2);
 		GrayF32 dst = new GrayF32(14,18);

@@ -30,8 +30,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  */
 public class TestDescribeSiftCommon extends BoofStandardJUnit {
 
-	@Test
-	public void normalizeDescriptor() {
+	@Test void normalizeDescriptor() {
 		TupleDesc_F64 descriptor = new TupleDesc_F64(128);
 		descriptor.data[5] = 100;
 		descriptor.data[20] = 120;
@@ -58,8 +57,7 @@ public class TestDescribeSiftCommon extends BoofStandardJUnit {
 	 * Tests trilinear interpolation by checking out some of its properties instead of its value
 	 * exactly
 	 */
-	@Test
-	public void trilinearInterpolation() {
+	@Test void trilinearInterpolation() {
 		DescribeSiftCommon alg = new DescribeSiftCommon(4, 4, 8, 0.5, 0.2);
 
 		TupleDesc_F64 descriptor = new TupleDesc_F64(128);
@@ -87,7 +85,7 @@ public class TestDescribeSiftCommon extends BoofStandardJUnit {
 		}
 		assertEquals(2.0*0.75*0.75*1.0, sum, 1e-8);
 
-		// now have something exactly at the start of a bin.  all the weight should be in one location
+		// now have something exactly at the start of a bin. all the weight should be in one location
 		descriptor.fill(0);
 		alg.trilinearInterpolation(2.0f, 3f, 3f, 2*Math.PI/8, descriptor);
 		count = 0;

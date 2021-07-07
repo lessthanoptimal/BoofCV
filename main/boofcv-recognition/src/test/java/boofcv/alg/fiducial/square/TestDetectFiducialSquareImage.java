@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -48,8 +48,7 @@ public class TestDetectFiducialSquareImage extends BoofStandardJUnit {
 			polygon(new ConfigPolygonDetector(false, 4,4), GrayU8.class);
 	private InputToBinary<GrayU8> inputToBinary = FactoryThresholdBinary.globalFixed(50, true, GrayU8.class);
 
-	@Test
-	public void processSquare() {
+	@Test void processSquare() {
 		// randomly create a pattern
 		GrayU8 pattern = new GrayU8(16*4,16*4);
 		ImageMiscOps.fillUniform(pattern, rand, 0, 2);
@@ -105,8 +104,7 @@ public class TestDetectFiducialSquareImage extends BoofStandardJUnit {
 		return render.getGrayF32();
 	}
 
-	@Test
-	public void addPattern() {
+	@Test void addPattern() {
 		GrayU8 image = new GrayU8(16*8,16*4);
 
 		// fill just one square
@@ -149,8 +147,7 @@ public class TestDetectFiducialSquareImage extends BoofStandardJUnit {
 		}
 	}
 
-	@Test
-	public void binaryToDef() {
+	@Test void binaryToDef() {
 		GrayU8 image = new GrayU8(8,4);
 
 		ImageMiscOps.fillUniform(image,rand,0,2);
@@ -167,8 +164,7 @@ public class TestDetectFiducialSquareImage extends BoofStandardJUnit {
 		}
 	}
 
-	@Test
-	public void hamming() {
+	@Test void hamming() {
 		short[] a = new short[3];
 		short[] b = new short[3];
 
@@ -194,8 +190,7 @@ public class TestDetectFiducialSquareImage extends BoofStandardJUnit {
 	/**
 	 * See if it can process a border that isn't 0.25
 	 */
-	@Test
-	public void checkDifferentBorder() {
+	@Test void checkDifferentBorder() {
 		double borderWidths[] = new double[]{0.1,0.2,0.3};
 
 		for( double border : borderWidths ) {

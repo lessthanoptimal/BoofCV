@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -52,8 +52,7 @@ public class TestTldFernClassifier extends BoofStandardJUnit {
 		interpolate.setImage(input);
 	}
 
-	@Test
-	public void learnFern() {
+	@Test void learnFern() {
 		TldFernClassifier<GrayU8> alg = createAlg();
 
 		alg.setImage(input);
@@ -76,8 +75,7 @@ public class TestTldFernClassifier extends BoofStandardJUnit {
 		assertTrue(alg.getMaxN() > 0 );
 	}
 
-	@Test
-	public void learnFernNoise() {
+	@Test void learnFernNoise() {
 		TldFernClassifier<GrayU8> alg = createAlg();
 
 		alg.setImage(input);
@@ -101,8 +99,7 @@ public class TestTldFernClassifier extends BoofStandardJUnit {
 		assertTrue(alg.getMaxN() > 0 );
 	}
 
-	@Test
-	public void computeFernValue() {
+	@Test void computeFernValue() {
 
 		TldFernDescription fern = new TldFernDescription(rand,10);
 
@@ -134,8 +131,7 @@ public class TestTldFernClassifier extends BoofStandardJUnit {
 		}
 	}
 
-	@Test
-	public void computeFernValueRand() {
+	@Test void computeFernValueRand() {
 		TldFernDescription fern = new TldFernDescription(rand,10);
 
 		ImageRectangle r = new ImageRectangle(2,20,12,28);
@@ -172,8 +168,7 @@ public class TestTldFernClassifier extends BoofStandardJUnit {
 		assertTrue( numDiff < 10 );
 	}
 
-		@Test
-	public void renormalizeP() {
+		@Test void renormalizeP() {
 			TldFernClassifier<GrayU8> alg = createAlg();
 
 			alg.maxP = 1000;
@@ -187,8 +182,7 @@ public class TestTldFernClassifier extends BoofStandardJUnit {
 			assertEquals(expected,alg.managers[2].table[1].numP);
 	}
 
-	@Test
-	public void renormalizeN() {
+	@Test void renormalizeN() {
 		TldFernClassifier<GrayU8> alg = createAlg();
 
 		alg.maxN = 1000;

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -125,7 +125,7 @@ public class BufferedFileImageSequence<T extends ImageBase<T>> implements Simple
 
 	/**
 	 * Loads the next image into a BufferedImage and returns it. The same instance
-	 * or a new instance of a BufferedImage might be returned each time.  Don't rely
+	 * or a new instance of a BufferedImage might be returned each time. Don't rely
 	 * on either behavior being consistent.
 	 */
 	@Override

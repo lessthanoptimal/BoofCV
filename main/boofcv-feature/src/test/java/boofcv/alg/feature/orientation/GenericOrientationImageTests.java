@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -66,7 +66,7 @@ public abstract class GenericOrientationImageTests<T extends ImageGray<T>> exten
 	}
 
 	/**
-	 * Points all pixels in the surrounding region in same direction.  Then sees if the found
+	 * Points all pixels in the surrounding region in same direction. Then sees if the found
 	 * direction for the region is in the expected direction.
 	 */
 	@Test

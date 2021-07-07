@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -132,7 +132,7 @@ public class GenerateWaveletTransformOps extends CodeGeneratorBase {
 				"\t * @param desc Description of the wavelet.\n" +
 				"\t * @param input Input image. Not modified.\n" +
 				"\t * @param output Where the wavelet transform is written to. Modified.\n" +
-				"\t * @param storage Optional storage image.  Should be the same size as output image. If null then\n" +
+				"\t * @param storage Optional storage image. Should be the same size as output image. If null then\n" +
 				"\t * an image is declared internally.\n" +
 				"\t */\n" +
 				"\tpublic static void transform1( WaveletDescription<WlCoef_"+genName+"> desc ,\n" +
@@ -175,7 +175,7 @@ public class GenerateWaveletTransformOps extends CodeGeneratorBase {
 				"\t * @param desc Description of the wavelet.\n" +
 				"\t * @param input Input image and is used as internal workspace. Modified.\n" +
 				"\t * @param output Where the multilevel wavelet transform is written to. Modified.\n" +
-				"\t * @param storage Optional storage image.  Should be the same size as output image. If null then\n" +
+				"\t * @param storage Optional storage image. Should be the same size as output image. If null then\n" +
 				"\t * an image is declared internally.\n" +
 				"\t * @param numLevels Number of levels which should be computed in the transform.\n" +
 				"\t */\n" +
@@ -220,13 +220,13 @@ public class GenerateWaveletTransformOps extends CodeGeneratorBase {
 		out.print("\t/**\n" +
 				"\t * <p>\n" +
 				"\t * Performs a single level inverse wavelet transform. Do not pass in a whole image which has been\n" +
-				"\t * transformed by a multilevel transform.  Just the relevant sub-image.\n" +
+				"\t * transformed by a multilevel transform. Just the relevant sub-image.\n" +
 				"\t * </p>\n" +
 				"\t *\n" +
 				"\t * @param desc Description of the inverse wavelet.\n" +
 				"\t * @param input Input wavelet transform. Not modified.\n" +
 				"\t * @param output Reconstruction of original image. Modified.\n" +
-				"\t * @param storage Optional storage image.  Should be the same size as the input image. If null then\n" +
+				"\t * @param storage Optional storage image. Should be the same size as the input image. If null then\n" +
 				"\t * an image is declared internally.\n" +
 				"\t * @param minValue Minimum allowed pixel value\n" +
 				"\t * @param maxValue Maximum allowed pixel value\n" +
@@ -272,7 +272,7 @@ public class GenerateWaveletTransformOps extends CodeGeneratorBase {
 				"\t * @param desc Description of the inverse wavelet.\n" +
 				"\t * @param input Input wavelet transform and is used as internal workspace. Modified.\n" +
 				"\t * @param output Reconstruction of original image. Modified.\n" +
-				"\t * @param storage Optional storage image.  Should be the same size as the input image. If null then\n" +
+				"\t * @param storage Optional storage image. Should be the same size as the input image. If null then\n" +
 				"\t * an image is declared internally.\n" +
 				"\t * @param numLevels Number of levels in the transform.\n" +
 				"\t * @param minValue Minimum allowed pixel value\n" +

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -36,7 +36,7 @@ import java.util.List;
  */
 public class SquareGridTools {
 	/**
-	 * There can be 2 or 4 possible orientations which are equally valid solutions.  For
+	 * There can be 2 or 4 possible orientations which are equally valid solutions. For
 	 * sake of consistency it will make the (0,0) coordinate be closest to the origin
 	 * of the image coordinate system.
 	 */
@@ -88,7 +88,7 @@ public class SquareGridTools {
 	}
 
 	/**
-	 * Checks to see if it needs to be flipped.  Flipping is required if X and Y axis in 2D grid
+	 * Checks to see if it needs to be flipped. Flipping is required if X and Y axis in 2D grid
 	 * are not CCW.
 	 */
 	public boolean checkFlip( SquareGrid grid ) {
@@ -179,7 +179,7 @@ public class SquareGridTools {
 	}
 
 	/**
-	 * Get outside corner polygon around the grid.  The grid is assumed to be in CCW orientation.
+	 * Get outside corner polygon around the grid. The grid is assumed to be in CCW orientation.
 	 */
 	public void boundingPolygonCCW( SquareGrid grid, Polygon2D_F64 bounding ) {
 		int w = grid.columns;
@@ -218,7 +218,7 @@ public class SquareGridTools {
 	}
 
 	/**
-	 * Given the grid coordinate, order the corners for the node at that location.  Takes in handles situations
+	 * Given the grid coordinate, order the corners for the node at that location. Takes in handles situations
 	 * where there are no neighbors.
 	 */
 	protected void orderNodeGrid( SquareGrid grid, int row, int col ) {
@@ -270,7 +270,7 @@ public class SquareGridTools {
 	/**
 	 * Fills the ordered list with the corners in target node in canonical order.
 	 *
-	 * @param pointingX true if 'node' is pointing along the x-axis from target.  false for point along y-axis
+	 * @param pointingX true if 'node' is pointing along the x-axis from target. false for point along y-axis
 	 */
 	protected void orderNode( SquareNode target, SquareNode node, boolean pointingX ) {
 
@@ -281,7 +281,7 @@ public class SquareGridTools {
 		int index3 = (index0 + 3)%4;
 
 		if (index0 < 0)
-			throw new RuntimeException("Couldn't find intersection.  Probable bug");
+			throw new RuntimeException("Couldn't find intersection. Probable bug");
 
 		lineCenters.a = target.center;
 		lineCenters.b = node.center;

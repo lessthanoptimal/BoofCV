@@ -54,7 +54,7 @@ public class TestAverageDownSampleOps extends BoofStandardJUnit {
 	}
 
 	/**
-	 * Down sample with just two inputs.  Compare to results from raw implementation.
+	 * Down sample with just two inputs. Compare to results from raw implementation.
 	 */
 	@Test void down_2inputs() throws NoSuchMethodException, InvocationTargetException, IllegalAccessException {
 		Class[] input = new Class[]{GrayU8.class, GrayU16.class, GrayF32.class, GrayF64.class};

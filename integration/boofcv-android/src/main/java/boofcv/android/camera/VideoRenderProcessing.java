@@ -29,16 +29,16 @@ import georegression.struct.point.Point2D_F64;
 
 /**
  * <p>
- * Processing class for displaying more complex visualizations data.  Children of this class must properly lock
- * down the GUI when processing data that can be read/written to when updating GUI.  This is done by synchronizing
+ * Processing class for displaying more complex visualizations data. Children of this class must properly lock
+ * down the GUI when processing data that can be read/written to when updating GUI. This is done by synchronizing
  * around the class variable {@link #lockGui}.
  * </p>
  *
  * <p>
- * The canvas is resized and centered for display purposes.  The scale and translation factors applied to the
+ * The canvas is resized and centered for display purposes. The scale and translation factors applied to the
  * canvas prior to it being passed in to the child of this class can be access through the class parameters or
  * getter functions. The size of the output image can be accessed in a similar manor, see outputWidth and
- * outputHeight.  The just mentioned output size is used to compute the scale and translation and can be
+ * outputHeight. The just mentioned output size is used to compute the scale and translation and can be
  * overridden inside {@link #init} or {@link #declareImages(int, int)}.
  * </p>
  *
@@ -49,7 +49,7 @@ public abstract class VideoRenderProcessing<T extends ImageBase<T>> extends Thre
 	// Type of BoofCV iamge
 	ImageType<T> imageType;
 
-	// BoofCV images which the video stream is converted into.  At any given time one is continuously being
+	// BoofCV images which the video stream is converted into. At any given time one is continuously being
 	// written to while the other is being processed by the image processing routine
 	T image;
 	T image2;
@@ -57,7 +57,7 @@ public abstract class VideoRenderProcessing<T extends ImageBase<T>> extends Thre
 	volatile boolean requestStop = false;
 	volatile boolean running = false;
 
-	// size of the area being down for output.  defaults to image size
+	// size of the area being down for output. defaults to image size
 	// used to compute the transform (scale and translation) to center the image in the displau
 	protected int outputWidth;
 	protected int outputHeight;
@@ -68,12 +68,12 @@ public abstract class VideoRenderProcessing<T extends ImageBase<T>> extends Thre
 	protected final Object lockThread = new Object();
 
 	/**
-	 * Lock used ever reading or writing to display related data.  User should use this to ensure
+	 * Lock used ever reading or writing to display related data. User should use this to ensure
 	 * that the processing() function and render() function's don't stead on each other's feet.
 	 */
 	protected final Object lockGui = new Object();
 	/**
-	 * Lock used when converting the video stream.  Should not need to be used by the user.
+	 * Lock used when converting the video stream. Should not need to be used by the user.
 	 */
 	protected final Object lockConvert = new Object();
 
@@ -254,18 +254,18 @@ public abstract class VideoRenderProcessing<T extends ImageBase<T>> extends Thre
 	/**
 	 * <p>Image processing is done here and is invoked in its own thread, removing any hard time constraints.
 	 * When modifying data structures that are read inside of {@link #render} be sure to use synchronize with
-	 * {@link #lockGui} to avoid crashes or weird visual artifacts.  Use of lockGui should be minimized to
+	 * {@link #lockGui} to avoid crashes or weird visual artifacts. Use of lockGui should be minimized to
 	 * ensure a fast and responsive GUI</p>
 	 */
 	protected abstract void process( T gray );
 
 	/**
-	 * Results computed by {@link #process} are visualized here.  This function is called inside a
-	 * synchronize(lockGui) block.  The provided canvas has been adjusted to be centered in the view and to account
+	 * Results computed by {@link #process} are visualized here. This function is called inside a
+	 * synchronize(lockGui) block. The provided canvas has been adjusted to be centered in the view and to account
 	 * for the resolution difference of the preview image and the display.
 	 *
 	 * @param canvas Canvas which is to be displayed.
-	 * @param imageToOutput Scale factor from input image to output display.  Can also be accessed via {@link #getScale}
+	 * @param imageToOutput Scale factor from input image to output display. Can also be accessed via {@link #getScale}
 	 */
 	protected abstract void render( Canvas canvas, double imageToOutput );
 

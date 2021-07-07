@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -35,23 +35,23 @@ import java.util.List;
 public interface PointDeformKeyPoints extends Point2Transform2_F32 {
 
 	/**
-	 * Must be called first.  Specifies the shape of the image this transform will be applied to
+	 * Must be called first. Specifies the shape of the image this transform will be applied to
 	 * @param width image width
 	 * @param height image height
 	 */
 	void setImageShape( int width , int height );
 
 	/**
-	 * Specifies the location of all the key points.  The initial distorted location of each keypoint will be set to
+	 * Specifies the location of all the key points. The initial distorted location of each keypoint will be set to
 	 * the same location.
-	 * @param locations Location of key points in undistorted image.  Local copy of points is saved.
+	 * @param locations Location of key points in undistorted image. Local copy of points is saved.
 	 */
 	void setSource(List<Point2D_F32> locations );
 
 	/**
 	 * Specifies the distorted location of all the key points.
 	 *
-	 * @param locations location of key points in distorted image.   Local copy of points is saved.
+	 * @param locations location of key points in distorted image.  Local copy of points is saved.
 	 */
 	void setDestination(List<Point2D_F32> locations );
 

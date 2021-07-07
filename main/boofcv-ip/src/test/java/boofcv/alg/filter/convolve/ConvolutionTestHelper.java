@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -64,7 +64,7 @@ public class ConvolutionTestHelper extends BoofStandardJUnit {
 	}
 
 	/**
-	 * Searches for images and creates copies.  The same instance of all other variables is returned
+	 * Searches for images and creates copies. The same instance of all other variables is returned
 	 */
 	public static Object[] copyImgs(Object... input ) {
 		Object[] output = new Object[input.length];

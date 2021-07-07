@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -67,8 +67,7 @@ public class TestDetectCircleGrid extends BoofStandardJUnit {
 		return out;
 	}
 
-	@Test
-	public void closestCorner4() {
+	@Test void closestCorner4() {
 		Grid g = new Grid();
 
 		g.rows = 3;
@@ -107,8 +106,7 @@ public class TestDetectCircleGrid extends BoofStandardJUnit {
 		assertEquals(3, DetectCircleGrid.closestCorner4(g));
 	}
 
-	@Test
-	public void pruneIncorrectSize() {
+	@Test void pruneIncorrectSize() {
 		List<List<EllipsesIntoClusters.Node>> clusters = new ArrayList<>();
 		clusters.add( createListNodes(4));
 		clusters.add( createListNodes(10));
@@ -130,8 +128,7 @@ public class TestDetectCircleGrid extends BoofStandardJUnit {
 		return list;
 	}
 
-	@Test
-	public void pruneIncorrectShape() {
+	@Test void pruneIncorrectShape() {
 		DogArray<Grid> grids = new DogArray<>(Grid::new);
 		grids.grow().setShape(4,5);
 		grids.grow().setShape(5,4);
@@ -143,8 +140,7 @@ public class TestDetectCircleGrid extends BoofStandardJUnit {
 		assertEquals( 2 , grids.size );
 	}
 
-	@Test
-	public void rotateGridCCW() {
+	@Test void rotateGridCCW() {
 		Grid g = createGrid(3,3);
 		List<EllipseRotated_F64> original = new ArrayList<>();
 		original.addAll(g.ellipses);

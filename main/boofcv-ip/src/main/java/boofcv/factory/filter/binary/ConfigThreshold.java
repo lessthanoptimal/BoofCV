@@ -37,13 +37,13 @@ public class ConfigThreshold implements Configuration {
 	public ThresholdType type;
 
 	/**
-	 * The threshold to apply to the image.  Only valid for fixed threshold.
+	 * The threshold to apply to the image. Only valid for fixed threshold.
 	 */
 	public double fixedThreshold;
 
 	/**
-	 * Scale factor applied to computed threshold.  Only used with adaptive techniques.  0.95 is a good starting value
-	 * when tuning.  It will remove much of the noise in nearly uniform regions without degrading interesting features
+	 * Scale factor applied to computed threshold. Only used with adaptive techniques. 0.95 is a good starting value
+	 * when tuning. It will remove much of the noise in nearly uniform regions without degrading interesting features
 	 * by much.
 	 */
 	public double scale = 1.0;
@@ -59,7 +59,7 @@ public class ConfigThreshold implements Configuration {
 	public ConfigLength width = ConfigLength.fixed(11);
 
 	/**
-	 * Positive parameter used to tune threshold in members of the Niblack family.  Try 0.3 or 0.5
+	 * Positive parameter used to tune threshold in members of the Niblack family. Try 0.3 or 0.5
 	 *
 	 * @see ThresholdType#LOCAL_NIBLACK
 	 * @see ThresholdType#LOCAL_SAVOLA
@@ -75,11 +75,11 @@ public class ConfigThreshold implements Configuration {
 	public float nickK = -0.2f;
 
 	/**
-	 * Minimum pixel value.  Only used for some algorithms.
+	 * Minimum pixel value. Only used for some algorithms.
 	 */
 	public int minPixelValue = 0;
 	/**
-	 * Maximum pixel value.  Only used for some algorithms.
+	 * Maximum pixel value. Only used for some algorithms.
 	 */
 	public int maxPixelValue = 255;
 

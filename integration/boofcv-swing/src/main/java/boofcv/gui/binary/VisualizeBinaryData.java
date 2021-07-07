@@ -141,10 +141,10 @@ public class VisualizeBinaryData {
 	}
 
 	/**
-	 * Renders only the external contours.  Each contour is individually colored as specified by 'colors'
+	 * Renders only the external contours. Each contour is individually colored as specified by 'colors'
 	 *
 	 * @param contours List of contours
-	 * @param colors List of RGB colors for each element in contours.  If null then random colors will be used.
+	 * @param colors List of RGB colors for each element in contours. If null then random colors will be used.
 	 * @param out (Optional) Storage for output
 	 */
 	public static void render( List<Contour> contours, int[] colors, BufferedImage out ) {
@@ -301,12 +301,12 @@ public class VisualizeBinaryData {
 	}
 
 	/**
-	 * Renders a labeled image where label=0 is assumed to be the background and is always set to black.  All
+	 * Renders a labeled image where label=0 is assumed to be the background and is always set to black. All
 	 * other labels are assigned a random color.
 	 *
 	 * @param labelImage Labeled image with background having a value of 0
 	 * @param numRegions Number of labeled in the image, excluding the background.
-	 * @param out Output image.  If null a new image is declared
+	 * @param out Output image. If null a new image is declared
 	 * @return Colorized labeled image
 	 */
 	public static BufferedImage renderLabeledBG( GrayS32 labelImage, int numRegions, BufferedImage out ) {
@@ -327,7 +327,7 @@ public class VisualizeBinaryData {
 	 *
 	 * @param labelImage Labeled image with labels from 0 to numRegions-1
 	 * @param numRegions Number of labeled in the image
-	 * @param out Output image.  If null a new image is declared
+	 * @param out Output image. If null a new image is declared
 	 * @return Colorized labeled image
 	 */
 	public static BufferedImage renderLabeled( GrayS32 labelImage, int numRegions, BufferedImage out ) {
@@ -371,7 +371,7 @@ public class VisualizeBinaryData {
 	}
 
 	/**
-	 * Renders a binary image.  0 = black and 1 = white.
+	 * Renders a binary image. 0 = black and 1 = white.
 	 *
 	 * @param binaryImage (Input) Input binary image.
 	 * @param invert (Input) if true it will invert the image on output

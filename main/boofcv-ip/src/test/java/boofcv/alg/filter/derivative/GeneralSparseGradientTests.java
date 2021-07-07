@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -39,7 +39,7 @@ public abstract class GeneralSparseGradientTests
 
 	public Class<D> derivType;
 
-	// "true" derivative.  Used to validate results
+	// "true" derivative. Used to validate results
 	D derivX;
 	D derivY;
 
@@ -136,7 +136,7 @@ public abstract class GeneralSparseGradientTests
 	}
 
 	/**
-	 * Compute the image gradient.  Should not be computed using the exact same code as
+	 * Compute the image gradient. Should not be computed using the exact same code as
 	 *  the gradient operator
 	 */
 	protected abstract void imageGradient( T input , D derivX , D derivY);

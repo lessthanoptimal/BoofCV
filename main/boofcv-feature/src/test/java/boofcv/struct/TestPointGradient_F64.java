@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -27,8 +27,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
  * @author Peter Abeles
  */
 public class TestPointGradient_F64 extends BoofStandardJUnit {
-	@Test
-	public void set_object() {
+	@Test void set_object() {
 		PointGradient_F64 a = new PointGradient_F64(1,2,3,4);
 		PointGradient_F64 b = new PointGradient_F64();
 		b.setTo(a);
@@ -39,8 +38,7 @@ public class TestPointGradient_F64 extends BoofStandardJUnit {
 		assertEquals(a.dy,b.dy,1e-8);
 	}
 
-	@Test
-	public void set_values() {
+	@Test void set_values() {
 		PointGradient_F64 b = new PointGradient_F64();
 		b.setTo(1,2,3,4);
 
@@ -50,8 +48,7 @@ public class TestPointGradient_F64 extends BoofStandardJUnit {
 		assertEquals(4,b.dy,1e-8);
 	}
 
-	@Test
-	public void copy() {
+	@Test void copy() {
 		PointGradient_F64 a = new PointGradient_F64(1,2,3,4);
 		PointGradient_F64 b = a.copy();
 

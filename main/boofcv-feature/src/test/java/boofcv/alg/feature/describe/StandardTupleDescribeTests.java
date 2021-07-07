@@ -54,8 +54,7 @@ public abstract class StandardTupleDescribeTests extends BoofStandardJUnit {
 	/**
 	 * Does it produce a the same features when given a subimage?
 	 */
-	@Test
-	public void checkSubImage()
+	@Test void checkSubImage()
 	{
 		TupleDesc_F64 expected = describe(c_x,c_y,0,image);
 		GrayF32 sub = BoofTesting.createSubImageOf(image);
@@ -67,8 +66,7 @@ public abstract class StandardTupleDescribeTests extends BoofStandardJUnit {
 	/**
 	 * Does it produce a different feature when rotated?
 	 */
-	@Test
-	public void changeRotation() {
+	@Test void changeRotation() {
 		TupleDesc_F64 a = describe(c_x,c_y,0,image);
 		TupleDesc_F64 b = describe(c_x,c_y,1,image);
 

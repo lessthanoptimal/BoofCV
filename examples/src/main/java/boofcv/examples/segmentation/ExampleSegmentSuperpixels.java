@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -39,9 +39,9 @@ import org.ddogleg.struct.DogArray_I32;
 import java.awt.image.BufferedImage;
 
 /**
- * Example demonstrating high level image segmentation interface.  An image segmented using this
+ * Example demonstrating high level image segmentation interface. An image segmented using this
  * interface will have each pixel assigned a unique label from 0 to N-1, where N is the number of regions.
- * All pixels which belong to the same region are connected.  These regions are also known as superpixels.
+ * All pixels which belong to the same region are connected. These regions are also known as superpixels.
  *
  * @author Peter Abeles
  */
@@ -51,11 +51,11 @@ public class ExampleSegmentSuperpixels {
 	 */
 	public static <T extends ImageBase<T>>
 	void performSegmentation( ImageSuperpixels<T> alg, T color ) {
-		// Segmentation often works better after blurring the image.  Reduces high frequency image components which
+		// Segmentation often works better after blurring the image. Reduces high frequency image components which
 		// can cause over segmentation
 		GBlurImageOps.gaussian(color, color, 0.5, -1, null);
 
-		// Storage for segmented image.  Each pixel will be assigned a label from 0 to N-1, where N is the number
+		// Storage for segmented image. Each pixel will be assigned a label from 0 to N-1, where N is the number
 		// of segments in the image
 		GrayS32 pixelToSegment = new GrayS32(color.width, color.height);
 
@@ -67,7 +67,7 @@ public class ExampleSegmentSuperpixels {
 	}
 
 	/**
-	 * Visualizes results three ways.  1) Colorized segmented image where each region is given a random color.
+	 * Visualizes results three ways. 1) Colorized segmented image where each region is given a random color.
 	 * 2) Each pixel is assigned the mean color through out the region. 3) Black pixels represent the border
 	 * between regions.
 	 */
@@ -114,7 +114,7 @@ public class ExampleSegmentSuperpixels {
 		// you probably don't want to segment along the image's alpha channel and the code below assumes 3 channels
 		image = ConvertBufferedImage.stripAlphaChannel(image);
 
-		// Select input image type.  Some algorithms behave different depending on image type
+		// Select input image type. Some algorithms behave different depending on image type
 		ImageType<Planar<GrayF32>> imageType = ImageType.pl(3, GrayF32.class);
 //		ImageType<Planar<GrayU8>> imageType = ImageType.pl(3, GrayU8.class);
 //		ImageType<GrayF32> imageType = ImageType.single(GrayF32.class);

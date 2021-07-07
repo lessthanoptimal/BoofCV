@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -28,7 +28,7 @@ import boofcv.struct.Configuration;
 public class ConfigPnP implements Configuration {
 
 	/**
-	 * Which algorithm should it use.  Only use essential matrix ones.
+	 * Which algorithm should it use. Only use essential matrix ones.
 	 */
 	public EnumPNP which = EnumPNP.P3P_FINSTERWALDER;
 

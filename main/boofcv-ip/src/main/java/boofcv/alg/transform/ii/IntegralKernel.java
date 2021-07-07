@@ -22,8 +22,8 @@ import boofcv.struct.ImageRectangle;
 
 
 /**
- * Convolution kernel for an integral image.  Note that the bounds in the specified
- * rectangle are inclusive.  Normally the upper bounds are exclusive.
+ * Convolution kernel for an integral image. Note that the bounds in the specified
+ * rectangle are inclusive. Normally the upper bounds are exclusive.
  *
  * @author Peter Abeles
  */

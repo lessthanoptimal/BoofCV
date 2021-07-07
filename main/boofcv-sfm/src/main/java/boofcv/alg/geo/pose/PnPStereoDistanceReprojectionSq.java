@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -32,7 +32,7 @@ import java.util.List;
 
 /**
  * <p>
- * Computes sum of reprojection error squared in pixels for a pair of stereo observations.  If the point
+ * Computes sum of reprojection error squared in pixels for a pair of stereo observations. If the point
  * is behind either the left or right camera and can't be viewed then Double.MAX_VALUE is returned.<br>
  * <br>
  * error = dx0^2 + dy0^2 + dx1^2 + dy1^2<br>

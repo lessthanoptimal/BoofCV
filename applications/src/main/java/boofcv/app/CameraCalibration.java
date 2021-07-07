@@ -249,7 +249,7 @@ public class CameraCalibration extends BaseStandardInputApp {
 			String arg = args[index];
 
 			if (!arg.startsWith("--")) {
-				throw new RuntimeException("Expected flags for chessboard.  Should start with '--'");
+				throw new RuntimeException("Expected flags for chessboard. Should start with '--'");
 			}
 
 			splitFlag(arg);
@@ -637,7 +637,7 @@ public class CameraCalibration extends BaseStandardInputApp {
 
 		if (desiredWidth > 0 && desiredHeight > 0) {
 			if (gray.width != desiredWidth || gray.height != desiredHeight)
-				System.err.println("Actual camera resolution does not match desired.  Actual: " + gray.width + " " + gray.height +
+				System.err.println("Actual camera resolution does not match desired. Actual: " + gray.width + " " + gray.height +
 						"  Desired: " + desiredWidth + " " + desiredHeight);
 		}
 

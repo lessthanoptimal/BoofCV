@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -56,8 +56,7 @@ public abstract class CheckGrowBodersSB<T extends ImageGray<T>> extends BoofStan
 
 	protected abstract GrowBorderSB<T, ?> createAlg();
 
-	@Test
-	public void rows() {
+	@Test void rows() {
 		GrowBorderSB alg = createAlg();
 		int length = width + borderLower + borderUpper;
 		Object data = image.getDataType().newArray(length);
@@ -78,8 +77,7 @@ public abstract class CheckGrowBodersSB<T extends ImageGray<T>> extends BoofStan
 		}
 	}
 
-	@Test
-	public void columns() {
+	@Test void columns() {
 		GrowBorderSB alg = createAlg();
 		int length = height + borderLower + borderUpper;
 		Object data = image.getDataType().newArray(length);

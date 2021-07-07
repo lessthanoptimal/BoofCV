@@ -25,15 +25,15 @@ import org.ejml.UtilEjml;
 
 /**
  * <p>
- * Computes the line integral of a line segment across the image.  A line is laid over the image
- * and the fraction of the line which is over a pixel is multiplied by the pixel's value.  This is done
+ * Computes the line integral of a line segment across the image. A line is laid over the image
+ * and the fraction of the line which is over a pixel is multiplied by the pixel's value. This is done
  * for each pixel it overlaps.
  * </p>
  *
  * <p>
  * Two different functions are provided below for handling pixels lines which are either contained entirely
- * inside the image or may contain elements which extend outside the image.  If a pixel extends outside the
- * image then {@link ImageBorder} is used to handle the pixels outside the image.  If the border is not
+ * inside the image or may contain elements which extend outside the image. If a pixel extends outside the
+ * image then {@link ImageBorder} is used to handle the pixels outside the image. If the border is not
  * specified then it will likely crash.
  * </p>
  * <p>

@@ -29,8 +29,8 @@ import boofcv.struct.pyramid.ImagePyramid;
 
 /**
  * <p>
- * Pyramidal implementation of Horn-Schunck [2] based on the discussion in [1].  The problem formulation has been
- * modified from the original found in [2] to account for larger displacements.  The Euler-Lagrange equations
+ * Pyramidal implementation of Horn-Schunck [2] based on the discussion in [1]. The problem formulation has been
+ * modified from the original found in [2] to account for larger displacements. The Euler-Lagrange equations
  * are solved using Successive Over-Relaxation (SOR).
  * </p>
  *
@@ -48,7 +48,7 @@ public class HornSchunckPyramid<T extends ImageGray<T>>
 	// used to weight the error of image brightness and smoothness of velocity flow
 	private final float alpha2;
 
-	// relaxation parameter for SOR  0 < w < 2.  Recommended default is 1.9
+	// relaxation parameter for SOR  0 < w < 2. Recommended default is 1.9
 	private final float SOR_RELAXATION;
 
 	// number of warps for outer loop
@@ -65,7 +65,7 @@ public class HornSchunckPyramid<T extends ImageGray<T>>
 	private final GrayF32 deriv2X = new GrayF32(1, 1);
 	private final GrayF32 deriv2Y = new GrayF32(1, 1);
 
-	// found flow for the most recently processed layer.  Final output is stored here
+	// found flow for the most recently processed layer. Final output is stored here
 	protected GrayF32 flowX = new GrayF32(1, 1);
 	protected GrayF32 flowY = new GrayF32(1, 1);
 
@@ -82,7 +82,7 @@ public class HornSchunckPyramid<T extends ImageGray<T>>
 	 * Configures flow estimation
 	 *
 	 * @param config Configuration parameters
-	 * @param interp Interpolation for image flow between image layers and warping.  Overrides selection in config.
+	 * @param interp Interpolation for image flow between image layers and warping. Overrides selection in config.
 	 */
 	public HornSchunckPyramid( ConfigHornSchunckPyramid config, InterpolatePixelS<GrayF32> interp ) {
 		super(config.pyrScale, config.pyrSigma, config.pyrMaxLayers, interp);
@@ -96,7 +96,7 @@ public class HornSchunckPyramid<T extends ImageGray<T>>
 	}
 
 	/**
-	 * Computes dense optical flow from the provided image pyramid.  Image gradient for each layer should be
+	 * Computes dense optical flow from the provided image pyramid. Image gradient for each layer should be
 	 * computed directly from the layer images.
 	 *
 	 * @param image1 Pyramid of first image
@@ -167,7 +167,7 @@ public class HornSchunckPyramid<T extends ImageGray<T>>
 
 	/**
 	 * Takes the flow from the previous lower resolution layer and uses it to initialize the flow
-	 * in the current layer.  Adjusts for change in image scale.
+	 * in the current layer. Adjusts for change in image scale.
 	 */
 	@Override
 	protected void interpolateFlowScale( GrayF32 prev, GrayF32 curr ) {
@@ -188,7 +188,7 @@ public class HornSchunckPyramid<T extends ImageGray<T>>
 
 	/**
 	 * Takes the flow from the previous lower resolution layer and uses it to initialize the flow
-	 * in the current layer.  Adjusts for change in image scale.
+	 * in the current layer. Adjusts for change in image scale.
 	 */
 	@Override
 	protected void warpImageTaylor( GrayF32 before, GrayF32 flowX, GrayF32 flowY, GrayF32 after ) {
@@ -317,7 +317,7 @@ public class HornSchunckPyramid<T extends ImageGray<T>>
 	}
 
 	/**
-	 * See equation 25.  Safe version
+	 * See equation 25. Safe version
 	 */
 	protected static float A_safe( int x, int y, GrayF32 flow ) {
 		float u0 = safe(x - 1, y, flow);
@@ -334,7 +334,7 @@ public class HornSchunckPyramid<T extends ImageGray<T>>
 	}
 
 	/**
-	 * See equation 25.  Fast unsafe version
+	 * See equation 25. Fast unsafe version
 	 */
 	protected static float A( int x, int y, GrayF32 flow ) {
 		int index = flow.getIndex(x, y);
@@ -353,7 +353,7 @@ public class HornSchunckPyramid<T extends ImageGray<T>>
 	}
 
 	/**
-	 * Ensures pixel values are inside the image.  If output it is assigned to the nearest pixel inside the image
+	 * Ensures pixel values are inside the image. If output it is assigned to the nearest pixel inside the image
 	 */
 	protected static float safe( int x, int y, GrayF32 image ) {
 		if (x < 0) x = 0;

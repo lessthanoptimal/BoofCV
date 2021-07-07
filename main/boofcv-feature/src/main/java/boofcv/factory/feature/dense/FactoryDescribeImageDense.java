@@ -44,7 +44,7 @@ import org.jetbrains.annotations.Nullable;
 public class FactoryDescribeImageDense {
 	/**
 	 * <p>
-	 * Creates a SURF descriptor.  SURF descriptors are invariant to illumination, orientation, and scale.
+	 * Creates a SURF descriptor. SURF descriptors are invariant to illumination, orientation, and scale.
 	 * BoofCV provides two variants. This SURF variant created here is designed for speed and sacrifices some stability.
 	 * Different descriptors are produced for gray-scale and color images.
 	 * </p>
@@ -67,8 +67,8 @@ public class FactoryDescribeImageDense {
 
 	/**
 	 * <p>
-	 * Creates a SURF descriptor.  SURF descriptors are invariant to illumination, orientation, and scale.
-	 * BoofCV provides two variants. The SURF variant created here is designed for stability.  Different
+	 * Creates a SURF descriptor. SURF descriptors are invariant to illumination, orientation, and scale.
+	 * BoofCV provides two variants. The SURF variant created here is designed for stability. Different
 	 * descriptors are produced for gray-scale and color images.
 	 * </p>
 	 *
@@ -120,8 +120,8 @@ public class FactoryDescribeImageDense {
 	/**
 	 * Creates a dense HOG descriptor.
 	 *
-	 * @param config Configuration for HOG descriptor.  Can't be null.
-	 * @param imageType Type of input image.  Can be single band or planar
+	 * @param config Configuration for HOG descriptor. Can't be null.
+	 * @param imageType Type of input image. Can be single band or planar
 	 * @return Dense HOG extractor
 	 * @see DescribeDenseHogFastAlg
 	 * @see DescribeDenseHogAlg

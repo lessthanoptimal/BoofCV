@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -34,8 +34,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
  */
 public class TestTldVarianceFilter extends BoofStandardJUnit {
 
-	@Test
-	public void selectThreshold() {
+	@Test void selectThreshold() {
 		GrayU8 image = new GrayU8(50,80);
 		ImageMiscOps.fillUniform(image, rand, 0, 200);
 
@@ -50,8 +49,7 @@ public class TestTldVarianceFilter extends BoofStandardJUnit {
 		assertEquals(expected, found, 1e-8);
 	}
 
-	@Test
-	public void computeVariance() {
+	@Test void computeVariance() {
 		GrayU8 image = new GrayU8(50,80);
 		ImageMiscOps.fillUniform(image, rand, 0, 200);
 
@@ -65,8 +63,7 @@ public class TestTldVarianceFilter extends BoofStandardJUnit {
 	}
 
 
-	@Test
-	public void transformSq_U8() {
+	@Test void transformSq_U8() {
 		GrayU8 image = new GrayU8(50,80);
 		ImageMiscOps.fillUniform(image,rand,0,200);
 
@@ -86,8 +83,7 @@ public class TestTldVarianceFilter extends BoofStandardJUnit {
 		assertEquals(expected, found);
 	}
 
-	@Test
-	public void transformSq_F32() {
+	@Test void transformSq_F32() {
 		GrayF32 image = new GrayF32(50,80);
 		ImageMiscOps.fillUniform(image,rand,0,100);
 

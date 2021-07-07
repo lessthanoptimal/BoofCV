@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -94,8 +94,7 @@ class TestColorYuv extends BoofStandardJUnit {
 		check(rgb_F32,fr,fg,fb);
 	}
 
-	@Test
-	public void backAndForth_U8() {
+	@Test void backAndForth_U8() {
 		for( int i = 0; i < 1000; i++ ) {
 			byte[] yuv = new byte[3];
 			byte[] rgb = new byte[3];
@@ -113,8 +112,7 @@ class TestColorYuv extends BoofStandardJUnit {
 		}
 	}
 
-	@Test
-	public void yuvToRgb_F32_Planar() {
+	@Test void yuvToRgb_F32_Planar() {
 		Planar<GrayF32> yuv = new Planar<>(GrayF32.class,10,15,3);
 		Planar<GrayF32> rgb = new Planar<>(GrayF32.class,10,15,3);
 		Planar<GrayF32> found = new Planar<>(GrayF32.class,10,15,3);
@@ -137,8 +135,7 @@ class TestColorYuv extends BoofStandardJUnit {
 		}
 	}
 
-	@Test
-	public void ycbcrToRgb_U8_Planar() {
+	@Test void ycbcrToRgb_U8_Planar() {
 		Planar<GrayU8> yuv = new Planar<>(GrayU8.class,10,15,3);
 		Planar<GrayU8> rgb = new Planar<>(GrayU8.class,10,15,3);
 

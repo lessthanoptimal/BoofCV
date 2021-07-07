@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -27,7 +27,7 @@ import boofcv.struct.image.Planar;
 
 /**
  * Wrapper around {@link InterpolatePixelS} which allows it to interpolate {@link Planar} inside
- * a {@link InterpolatePixelMB}.  Performs the same calculations multiple times compared to a custom solution.
+ * a {@link InterpolatePixelMB}. Performs the same calculations multiple times compared to a custom solution.
  *
  * @author Peter Abeles
  */

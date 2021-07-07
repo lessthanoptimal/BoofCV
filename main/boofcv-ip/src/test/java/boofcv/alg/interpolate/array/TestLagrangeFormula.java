@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -32,8 +32,7 @@ public class TestLagrangeFormula extends BoofStandardJUnit {
 	/**
 	 * See if it can interpolate a linear function
 	 */
-	@Test
-	public void linear_F64() {
+	@Test void linear_F64() {
 		int length = 10;
 		double a = 2.5;
 		double y0 = 4;
@@ -58,8 +57,7 @@ public class TestLagrangeFormula extends BoofStandardJUnit {
 	/**
 	 * See if it can interpolate a linear function
 	 */
-	@Test
-	public void linear_F32() {
+	@Test void linear_F32() {
 		int length = 10;
 		float a = 2.5f;
 		float y0 = 4f;

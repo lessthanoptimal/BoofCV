@@ -142,7 +142,7 @@ public class PerspectiveOps {
 	}
 
 	/**
-	 * Multiplies each element of the intrinsic parameters by the provided scale factor.  Useful
+	 * Multiplies each element of the intrinsic parameters by the provided scale factor. Useful
 	 * if the image has been rescaled.
 	 *
 	 * @param param Intrinsic parameters
@@ -266,7 +266,7 @@ public class PerspectiveOps {
 	 * Given the intrinsic parameters create a calibration matrix
 	 *
 	 * @param param Intrinsic parameters structure that is to be converted into a matrix
-	 * @param K Storage for calibration matrix, must be 3x3.  If null then a new matrix is declared
+	 * @param K Storage for calibration matrix, must be 3x3. If null then a new matrix is declared
 	 * @return Calibration matrix 3x3
 	 */
 	public static DMatrixRMaj pinholeToMatrix( CameraPinhole param, @Nullable DMatrixRMaj K ) {
@@ -277,7 +277,7 @@ public class PerspectiveOps {
 	 * Given the intrinsic parameters create a calibration matrix
 	 *
 	 * @param param Intrinsic parameters structure that is to be converted into a matrix
-	 * @param K Storage for calibration matrix, must be 3x3.  If null then a new matrix is declared
+	 * @param K Storage for calibration matrix, must be 3x3. If null then a new matrix is declared
 	 * @return Calibration matrix 3x3
 	 */
 	public static FMatrixRMaj pinholeToMatrix( CameraPinhole param, @Nullable FMatrixRMaj K ) {
@@ -288,7 +288,7 @@ public class PerspectiveOps {
 	 * Given the intrinsic parameters create a calibration matrix
 	 *
 	 * @param param Intrinsic parameters structure that is to be converted into a matrix
-	 * @param K Storage for calibration matrix, must be 3x3.  If null then a new matrix is declared
+	 * @param K Storage for calibration matrix, must be 3x3. If null then a new matrix is declared
 	 * @return Calibration matrix 3x3
 	 */
 	public static DMatrix3x3 pinholeToMatrix( CameraPinhole param, @Nullable DMatrix3x3 K ) {
@@ -301,7 +301,7 @@ public class PerspectiveOps {
 	 * @param K Camera calibration matrix.
 	 * @param width Image width in pixels
 	 * @param height Image height in pixels
-	 * @param output (Output) Where the intrinsic parameter are written to.  If null then a new instance is declared.
+	 * @param output (Output) Where the intrinsic parameter are written to. If null then a new instance is declared.
 	 * @return camera parameters
 	 */
 	@SuppressWarnings("unchecked")
@@ -315,7 +315,7 @@ public class PerspectiveOps {
 	 * @param K Camera calibration matrix.
 	 * @param width Image width in pixels
 	 * @param height Image height in pixels
-	 * @param output (Output) Where the intrinsic parameter are written to.  If null then a new instance is declared.
+	 * @param output (Output) Where the intrinsic parameter are written to. If null then a new instance is declared.
 	 * @return camera parameters
 	 */
 	@SuppressWarnings("unchecked")
@@ -372,7 +372,7 @@ public class PerspectiveOps {
 	 * @param param Intrinsic camera parameters
 	 * @param x X-coordinate of normalized.
 	 * @param y Y-coordinate of normalized.
-	 * @param pixel Optional storage for output.  If null a new instance will be declared.
+	 * @param pixel Optional storage for output. If null a new instance will be declared.
 	 * @return pixel image coordinate
 	 */
 	public static Point2D_F64 convertNormToPixel( CameraModel param, double x, double y, @Nullable Point2D_F64 pixel ) {
@@ -397,7 +397,7 @@ public class PerspectiveOps {
 	 * @param param Intrinsic camera parameters
 	 * @param x X-coordinate of normalized.
 	 * @param y Y-coordinate of normalized.
-	 * @param pixel Optional storage for output.  If null a new instance will be declared.
+	 * @param pixel Optional storage for output. If null a new instance will be declared.
 	 * @return pixel image coordinate
 	 */
 	public static Point2D_F32 convertNormToPixel( CameraModel param, float x, float y, @Nullable Point2D_F32 pixel ) {
@@ -414,7 +414,7 @@ public class PerspectiveOps {
 	 *
 	 * @param param Intrinsic camera parameters
 	 * @param norm Normalized image coordinate.
-	 * @param pixel Optional storage for output.  If null a new instance will be declared.
+	 * @param pixel Optional storage for output. If null a new instance will be declared.
 	 * @return pixel image coordinate
 	 */
 	public static Point2D_F64 convertNormToPixel( CameraModel param, Point2D_F64 norm, @Nullable Point2D_F64 pixel ) {
@@ -431,7 +431,7 @@ public class PerspectiveOps {
 	 *
 	 * @param K Intrinsic camera calibration matrix
 	 * @param norm Normalized image coordinate.
-	 * @param pixel Optional storage for output.  If null a new instance will be declared.
+	 * @param pixel Optional storage for output. If null a new instance will be declared.
 	 * @return pixel image coordinate
 	 */
 	public static Point2D_F64 convertNormToPixel( DMatrixRMaj K, Point2D_F64 norm, @Nullable Point2D_F64 pixel ) {
@@ -448,7 +448,7 @@ public class PerspectiveOps {
 	 *
 	 * @param param Intrinsic camera parameters
 	 * @param pixel Pixel coordinate
-	 * @param norm Optional storage for output.  If null a new instance will be declared.
+	 * @param norm Optional storage for output. If null a new instance will be declared.
 	 * @return normalized image coordinate
 	 */
 	public static Point2D_F64 convertPixelToNorm( CameraModel param, Point2D_F64 pixel, @Nullable Point2D_F64 norm ) {
@@ -465,7 +465,7 @@ public class PerspectiveOps {
 	 *
 	 * @param param Intrinsic camera parameters
 	 * @param pixel Pixel coordinate
-	 * @param norm Optional storage for output.  If null a new instance will be declared.
+	 * @param norm Optional storage for output. If null a new instance will be declared.
 	 * @return normalized image coordinate
 	 */
 	public static Point2D_F32 convertPixelToNorm( CameraModel param, Point2D_F32 pixel, @Nullable Point2D_F32 norm ) {
@@ -482,7 +482,7 @@ public class PerspectiveOps {
 	 *
 	 * @param K Intrinsic camera calibration matrix
 	 * @param pixel Pixel coordinate.
-	 * @param norm Optional storage for output.  If null a new instance will be declared.
+	 * @param norm Optional storage for output. If null a new instance will be declared.
 	 * @return normalized image coordinate
 	 */
 	public static Point2D_F64 convertPixelToNorm( DMatrixRMaj K, Point2D_F64 pixel, @Nullable Point2D_F64 norm ) {
@@ -499,7 +499,7 @@ public class PerspectiveOps {
 	 *
 	 * @param K Intrinsic camera calibration matrix
 	 * @param pixel Pixel coordinate.
-	 * @param norm Optional storage for output.  If null a new instance will be declared.
+	 * @param norm Optional storage for output. If null a new instance will be declared.
 	 * @return normalized image coordinate
 	 */
 	public static Point2D_F32 convertPixelToNorm( FMatrixRMaj K, Point2D_F32 pixel, @Nullable Point2D_F32 norm ) {
@@ -517,7 +517,7 @@ public class PerspectiveOps {
 	 * coordinates.
 	 *
 	 * @param worldToCamera Transform from world to camera frame
-	 * @param K Optional.  Intrinsic camera calibration matrix.  If null then normalized image coordinates are returned.
+	 * @param K Optional. Intrinsic camera calibration matrix. If null then normalized image coordinates are returned.
 	 * @param X 3D Point in world reference frame..
 	 * @param pixel (Output) storage for the rendered pixel
 	 * @return 2D Render point on image plane or null if it's behind the camera
@@ -649,7 +649,7 @@ public class PerspectiveOps {
 	}
 
 	/**
-	 * Create a 3x4 camera matrix. For calibrated camera P = [R|T].  For uncalibrated camera it is P = K*[R|T].
+	 * Create a 3x4 camera matrix. For calibrated camera P = [R|T]. For uncalibrated camera it is P = K*[R|T].
 	 *
 	 * @param R Rotation matrix. 3x3
 	 * @param T Translation vector.
@@ -714,7 +714,7 @@ public class PerspectiveOps {
 	}
 
 	/**
-	 * Creates a transform from world coordinates into pixel coordinates.  can handle lens distortion
+	 * Creates a transform from world coordinates into pixel coordinates. can handle lens distortion
 	 */
 	public static WorldToCameraToPixel createWorldToPixel( CameraPinholeBrown intrinsic, Se3_F64 worldToCamera ) {
 		WorldToCameraToPixel alg = new WorldToCameraToPixel();
@@ -723,7 +723,7 @@ public class PerspectiveOps {
 	}
 
 	/**
-	 * Creates a transform from world coordinates into pixel coordinates.  can handle lens distortion
+	 * Creates a transform from world coordinates into pixel coordinates. can handle lens distortion
 	 */
 	public static WorldToCameraToPixel createWorldToPixel( LensDistortionNarrowFOV distortion, Se3_F64 worldToCamera ) {
 		WorldToCameraToPixel alg = new WorldToCameraToPixel();

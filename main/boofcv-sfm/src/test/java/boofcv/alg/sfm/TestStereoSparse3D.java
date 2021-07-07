@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -64,8 +64,7 @@ public class TestStereoSparse3D extends BoofStandardJUnit {
 	/**
 	 * Provide perfect image processing and validate the geometry
 	 */
-	@Test
-	public void checkGeometry() {
+	@Test void checkGeometry() {
 		Dummy disparity = new Dummy();
 		StereoSparse3D<GrayF32> alg = new StereoSparse3D<>(disparity, GrayF32.class);
 

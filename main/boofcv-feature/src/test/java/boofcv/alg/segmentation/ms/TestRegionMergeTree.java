@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -29,8 +29,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
  */
 public class TestRegionMergeTree extends BoofStandardJUnit {
 
-	@Test
-	public void flowIntoRootNode() {
+	@Test void flowIntoRootNode() {
 		RegionMergeTree alg = new RegionMergeTree();
 		alg.mergeList.resize(7);
 		alg.mergeList.data = new int[]{1,1,2,2,2,3,5};
@@ -56,8 +55,7 @@ public class TestRegionMergeTree extends BoofStandardJUnit {
 		assertEquals(1,alg.rootID.get(2));
 	}
 
-	@Test
-	public void setToRootNodeNewID() {
+	@Test void setToRootNodeNewID() {
 		DogArray_I32 regionMemberCount = new DogArray_I32(7);
 		regionMemberCount.size = 7;
 		regionMemberCount.data = new int[]{1,2,3,4,5,6,7};
@@ -86,10 +84,9 @@ public class TestRegionMergeTree extends BoofStandardJUnit {
 	}
 
 	/**
-	 * Tests focused on the quick test.  All these cases should result in no change
+	 * Tests focused on the quick test. All these cases should result in no change
 	 */
-	@Test
-	public void markMerge_quick() {
+	@Test void markMerge_quick() {
 
 		int expected[] = new int[]{1,1,2,2,2,3,5};
 
@@ -116,8 +113,7 @@ public class TestRegionMergeTree extends BoofStandardJUnit {
 	/**
 	 * These cases result in an actual merge
 	 */
-	@Test
-	public void markMergee_merge() {
+	@Test void markMergee_merge() {
 
 		int original[] = new int[]{1,1,2,2,2,3,5};
 

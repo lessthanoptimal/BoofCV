@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -33,8 +33,7 @@ import static org.junit.jupiter.api.Assertions.*;
  * @author Peter Abeles
  */
 public class TestSquareGridTools extends BoofStandardJUnit {
-	@Test
-	public void computeSize() {
+	@Test void computeSize() {
 		SquareGridTools alg = new SquareGridTools();
 
 		SquareGrid grid = createGrid(2,3);
@@ -45,11 +44,10 @@ public class TestSquareGridTools extends BoofStandardJUnit {
 		assertEquals(expected, alg.computeSize(grid), 1e-8);
 	}
 
-	@Test
-	public void putIntoCanonical_square() {
+	@Test void putIntoCanonical_square() {
 		SquareGridTools alg = new SquareGridTools();
 
-		// grids of different sizes.  smallest is 4x4 since that's one square
+		// grids of different sizes. smallest is 4x4 since that's one square
 		for (int i = 4; i <= 8; i++) {
 			// try different initial orientations
 			for (int j = 0; j < 4; j++) {
@@ -63,8 +61,7 @@ public class TestSquareGridTools extends BoofStandardJUnit {
 		}
 	}
 
-	@Test
-	public void putIntoCanonical_rectangle() {
+	@Test void putIntoCanonical_rectangle() {
 		SquareGridTools alg = new SquareGridTools();
 
 		SquareGrid grid = createGrid(2,5);
@@ -91,8 +88,7 @@ public class TestSquareGridTools extends BoofStandardJUnit {
 //		return list;
 //	}
 
-	@Test
-	public void checkFlip() {
+	@Test void checkFlip() {
 		SquareGridTools alg = new SquareGridTools();
 
 		SquareGrid grid = createGrid(2,3);
@@ -118,8 +114,7 @@ public class TestSquareGridTools extends BoofStandardJUnit {
 		grid.nodes.addAll(tmp);
 	}
 
-	@Test
-	public void transpose() {
+	@Test void transpose() {
 		SquareGridTools alg = new SquareGridTools();
 
 		SquareGrid grid = createGrid(2,3);
@@ -137,8 +132,7 @@ public class TestSquareGridTools extends BoofStandardJUnit {
 		}
 	}
 
-	@Test
-	public void flipRows() {
+	@Test void flipRows() {
 		SquareGridTools alg = new SquareGridTools();
 
 		SquareGrid grid = createGrid(2,3);
@@ -153,8 +147,7 @@ public class TestSquareGridTools extends BoofStandardJUnit {
 		}
 	}
 
-		@Test
-	public void flipColumns() {
+		@Test void flipColumns() {
 		SquareGridTools alg = new SquareGridTools();
 
 		SquareGrid grid = createGrid(2,3);
@@ -169,8 +162,7 @@ public class TestSquareGridTools extends BoofStandardJUnit {
 		}
 	}
 
-	@Test
-	public void boundingPolygonCCW_rect() {
+	@Test void boundingPolygonCCW_rect() {
 		SquareGridTools alg = new SquareGridTools();
 
 		double w = TestSquareRegularClustersIntoGrids.DEFAULT_WIDTH;
@@ -209,8 +201,7 @@ public class TestSquareGridTools extends BoofStandardJUnit {
 		}
 	}
 
-	@Test
-	public void boundingPolygonCCW_column() {
+	@Test void boundingPolygonCCW_column() {
 		SquareGridTools alg = new SquareGridTools();
 
 		SquareGrid grid = createGrid(3,1);
@@ -225,8 +216,7 @@ public class TestSquareGridTools extends BoofStandardJUnit {
 		assertTrue(poly.get(3).distance(- w/2 , w*4 + w / 2) <= 1e-8);
 	}
 
-	@Test
-	public void boundingPolygonCCW_row() {
+	@Test void boundingPolygonCCW_row() {
 		SquareGridTools alg = new SquareGridTools();
 
 		SquareGrid grid = createGrid(1,3);
@@ -241,8 +231,7 @@ public class TestSquareGridTools extends BoofStandardJUnit {
 		assertTrue(poly.get(3).distance( -w/2      ,  w/2) <= 1e-8);
 	}
 
-	@Test
-	public void extractCalibrationPoints() {
+	@Test void extractCalibrationPoints() {
 		SquareGridTools alg = new SquareGridTools();
 
 		SquareGrid grid = createGrid(2,3);
@@ -280,8 +269,7 @@ public class TestSquareGridTools extends BoofStandardJUnit {
 	/**
 	 * Exhaustively checks all situations it might encounter
 	 */
-	@Test
-	public void orderNodeGrid() {
+	@Test void orderNodeGrid() {
 		SquareGridTools alg = new SquareGridTools();
 
 		for( int rows = 1; rows <= 4; rows++ ) {
@@ -338,8 +326,7 @@ public class TestSquareGridTools extends BoofStandardJUnit {
 		assertTrue(ordered[3].y-c.y > 0 );
 	}
 
-	@Test
-	public void orderNode() {
+	@Test void orderNode() {
 		SquareNode target = new SquareNode();
 		target.square = new Polygon2D_F64(4);
 		target.square.get(0).setTo(-1,-1);
@@ -384,8 +371,7 @@ public class TestSquareGridTools extends BoofStandardJUnit {
 		}
 	}
 
-	@Test
-	public void findIntersection() {
+	@Test void findIntersection() {
 		SquareGrid grid = createGrid(3,3);
 
 		SquareNode center = grid.get(1, 1);

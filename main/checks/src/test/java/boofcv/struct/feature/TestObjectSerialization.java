@@ -36,7 +36,7 @@ import static org.junit.jupiter.api.Assertions.*;
 /**
  * Tests which check to see if specific objects can be serialized or not
  *
- * WARNING: This will fail if the android module is loaded into memory at the same time.  It has a version of xml 
+ * WARNING: This will fail if the android module is loaded into memory at the same time. It has a version of xml 
  * stream which isn't compatible and can't be excluded since Android is a massive jar.
  *
  * @author Peter Abeles

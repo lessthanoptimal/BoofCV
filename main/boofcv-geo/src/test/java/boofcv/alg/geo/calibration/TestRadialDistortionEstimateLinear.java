@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -37,8 +37,7 @@ public class TestRadialDistortionEstimateLinear extends BoofStandardJUnit {
 	/**
 	 * Given perfect observations and a random scenario see if it can compute the distortion parameters
 	 */
-	@Test
-	public void perfect() {
+	@Test void perfect() {
 		perfect(false);
 		perfect(true);
 	}

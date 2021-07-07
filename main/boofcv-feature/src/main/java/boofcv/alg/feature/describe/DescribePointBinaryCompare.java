@@ -26,8 +26,8 @@ import georegression.struct.point.Point2D_I32;
 
 /**
  * <p>
- * For each bit in the descriptor it samples two points inside an image patch and compares their values.  A value of
- * 1 or 0 is assigned depending on their relative values.  This type of descriptor is referred to as a random tree [1],
+ * For each bit in the descriptor it samples two points inside an image patch and compares their values. A value of
+ * 1 or 0 is assigned depending on their relative values. This type of descriptor is referred to as a random tree [1],
  * random fern, and is used in BRIEF.
  * </p>
  *
@@ -82,7 +82,7 @@ public abstract class DescribePointBinaryCompare<T extends ImageGray<T>> {
 	}
 
 	/**
-	 * Computes the descriptor at the specified point.  If the region go outside of the image then a description
+	 * Computes the descriptor at the specified point. If the region go outside of the image then a description
 	 * will not be made.
 	 *
 	 * @param c_x Center of region being described.

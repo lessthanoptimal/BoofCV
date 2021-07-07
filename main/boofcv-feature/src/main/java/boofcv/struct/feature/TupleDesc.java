@@ -34,7 +34,7 @@ public interface TupleDesc<T extends TupleDesc> extends Serializable {
 	void setTo( T source );
 
 	/**
-	 * Returns the value of a tuple's element as a double.  In general this function should not be used
+	 * Returns the value of a tuple's element as a double. In general this function should not be used
 	 * because of how inefficient it is.
 	 *
 	 * @param index Which element

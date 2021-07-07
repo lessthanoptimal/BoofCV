@@ -23,7 +23,7 @@ import org.ddogleg.struct.DogArray_I32;
 
 /**
  * Examines a segmented image created by {@link WatershedVincentSoille1991} and merged watershed pixels
- * into neighboring regions.  Since there is no good rule for which region the pixel should be
+ * into neighboring regions. Since there is no good rule for which region the pixel should be
  * merged into, it is merged into the first valid one.
  *
  * @author Peter Abeles
@@ -38,11 +38,11 @@ public class RemoveWatersheds {
 	private DogArray_I32 open2 = new DogArray_I32();
 
 	/**
-	 * Removes watersheds from the segmented image.  The input image must be the entire original
-	 * segmented image and assumes the outside border is filled with values < 0.  To access
+	 * Removes watersheds from the segmented image. The input image must be the entire original
+	 * segmented image and assumes the outside border is filled with values < 0. To access
 	 * this image call {@link boofcv.alg.segmentation.watershed.WatershedVincentSoille1991#getOutputBorder()}.
-	 * Each watershed is assigned the value of an arbitrary neighbor.  4-connect rule is used for neighbors.
-	 * Doesn't matter if initial segmented was done using another connectivity rule.  The value of each region i
+	 * Each watershed is assigned the value of an arbitrary neighbor. 4-connect rule is used for neighbors.
+	 * Doesn't matter if initial segmented was done using another connectivity rule. The value of each region i
 	 * s reduced by one at the very end.
 	 *
 	 * @param segmented Entire segmented image (including border of -1 values) with watersheds
@@ -50,7 +50,7 @@ public class RemoveWatersheds {
 	public void remove( GrayS32 segmented ) {
 		// very quick sanity check
 		if (segmented.get(0, 0) >= 0)
-			throw new IllegalArgumentException("The segmented image must contain a border of -1 valued pixels.  See" +
+			throw new IllegalArgumentException("The segmented image must contain a border of -1 valued pixels. See" +
 					" JavaDoc for important details you didn't bother to read about.");
 
 		open.reset();

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -33,7 +33,7 @@ import java.awt.image.BufferedImage;
 import java.io.File;
 
 /**
- * Simple example showing you how to thin a binary image.  This is also known as skeletonalization.  Thinning
+ * Simple example showing you how to thin a binary image. This is also known as skeletonalization. Thinning
  * discards most of objects foreground (value one) pixels are leaves behind a "skinny" object which still
  * mostly describes the original objects shape.
  *

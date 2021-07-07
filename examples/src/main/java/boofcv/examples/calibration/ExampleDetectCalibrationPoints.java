@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -34,9 +34,9 @@ import java.awt.*;
 import java.awt.image.BufferedImage;
 
 /**
- * Example that demonstrates how to detect calibration targets.  Calibration points are found on the
- * targets to a high level of precision.  It is assumed that a single image only shows a single target
- * and that the entire target is visible.  If these conditions are not meet then the target is likely
+ * Example that demonstrates how to detect calibration targets. Calibration points are found on the
+ * targets to a high level of precision. It is assumed that a single image only shows a single target
+ * and that the entire target is visible. If these conditions are not meet then the target is likely
  * to not be detected.
  *
  * @author Peter Abeles

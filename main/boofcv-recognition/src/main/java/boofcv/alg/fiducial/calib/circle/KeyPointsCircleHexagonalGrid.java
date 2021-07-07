@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -31,8 +31,8 @@ import georegression.struct.point.Point2D_F64;
 import org.ddogleg.struct.DogArray;
 
 /**
- * <p>Computes key points from an observed hexagonal circular grid.  Each key point is defined as the circle's true
- * geometric center.  The center (green dot) is found by detecting tangent points between two neighboring
+ * <p>Computes key points from an observed hexagonal circular grid. Each key point is defined as the circle's true
+ * geometric center. The center (green dot) is found by detecting tangent points between two neighboring
  * circles (yellow dots) and
  * then finding the intersection of all the lines created by connecting adjacent tangent points.
  * Tangent points are the same under perspective distortion and the same can be said for the
@@ -185,7 +185,7 @@ public class KeyPointsCircleHexagonalGrid {
 
 	/**
 	 * Finds the intersection of all the tangent lines with each other the computes the average of those points.
-	 * That location is where the center is set to.  Each intersection of lines is weighted by the acute angle.
+	 * That location is where the center is set to. Each intersection of lines is weighted by the acute angle.
 	 * lines which are 90 degrees to each other are less sensitive to noise
 	 */
 	boolean computeEllipseCenters() {
@@ -205,13 +205,13 @@ public class KeyPointsCircleHexagonalGrid {
 				for (int j = i+2; j < t.size(); j += 2) {
 					UtilLine2D_F64.convert(t.get(j),t.get(j+1),lineB);
 
-					// way each intersection based on the acute angle.  lines which are nearly parallel will
+					// way each intersection based on the acute angle. lines which are nearly parallel will
 					// be unstable estimates
 					double w = UtilVector2D_F64.acute(lineA.A,lineA.B,lineB.A,lineB.B);
 					if( w > Math.PI/2.0 )
 						w = Math.PI-w;
 
-					// If there is perfect data and no noise there will be duplicated lines.  With noise there will
+					// If there is perfect data and no noise there will be duplicated lines. With noise there will
 					// be very similar lines
 					if( w <= 0.02 )
 						continue;

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -26,7 +26,7 @@ import georegression.struct.shapes.Polygon2D_F64;
 
 /**
  * Looks at the difference in pixel values along the edge of a polygon and decides if its a false positive or not.
- * The average difference along the polygons edge is the score.  Note that the abs is only taken after the sum
+ * The average difference along the polygons edge is the score. Note that the abs is only taken after the sum
  * is finished, so objects which are entirely dark/light along the edge will have an advantage.
  *
  * @author Peter Abeles
@@ -68,7 +68,7 @@ public class EdgeIntensityPolygon<T extends ImageGray<T>> {
 
 	/**
 	 * Used to specify a transform that is applied to pixel coordinates to bring them back into original input
-	 * image coordinates.  For example if the input image has lens distortion but the edge were found
+	 * image coordinates. For example if the input image has lens distortion but the edge were found
 	 * in undistorted coordinates this code needs to know how to go from undistorted back into distorted
 	 * image coordinates in order to read the pixel's value.
 	 *

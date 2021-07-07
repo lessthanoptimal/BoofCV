@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -40,8 +40,7 @@ public class TestAnyImageDerivative extends BoofStandardJUnit {
 	/**
 	 * See if changing the input image size causes an exception to be thrown.
 	 */
-	@Test
-	public void changeInputImageSize() {
+	@Test void changeInputImageSize() {
 		Kernel1D_F32 kernelX = (Kernel1D_F32)GradientThree.getKernelX(false);
 		AnyImageDerivative<GrayF32, GrayF32> alg = new AnyImageDerivative<>(kernelX, GrayF32.class, GrayF32.class);
 		alg.setInput(original);
@@ -55,8 +54,7 @@ public class TestAnyImageDerivative extends BoofStandardJUnit {
 		alg.getDerivative(true);
 	}
 
-	@Test
-	public void test() {
+	@Test void test() {
 		ImageGradient<GrayF32, GrayF32> g = FactoryDerivative.three(GrayF32.class, null);
 
 		GrayF32 derivX = new GrayF32(width, height);

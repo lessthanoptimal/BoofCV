@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -63,8 +63,7 @@ public abstract class GeneralChecksInterpolationPixelMB<T extends ImageMultiBand
 	 * Checks value returned by get() against values computed using
 	 * an alternative approach.
 	 */
-	@Test
-	public void get() {
+	@Test void get() {
 		T img = createImage(width, height, numBands);
 		GImageMiscOps.fillUniform(img, rand, 0, 100);
 
@@ -99,8 +98,7 @@ public abstract class GeneralChecksInterpolationPixelMB<T extends ImageMultiBand
 	/**
 	 * See if accessing the image edge causes it to blow up.
 	 */
-	@Test
-	public void get_edges() {
+	@Test void get_edges() {
 		T img = createImage(width, height, numBands);
 		GImageMiscOps.fillUniform(img, rand, 0, 100);
 
@@ -124,7 +122,7 @@ public abstract class GeneralChecksInterpolationPixelMB<T extends ImageMultiBand
 	}
 
 	/**
-	 * Compute the interpolation manually using independently written code.  For
+	 * Compute the interpolation manually using independently written code. For
 	 * example, easy to write but inefficient.
 	 */
 	protected abstract void compute( T img, float x, float y, float[] pixel );
@@ -132,8 +130,7 @@ public abstract class GeneralChecksInterpolationPixelMB<T extends ImageMultiBand
 	/**
 	 * Sees if get throws an exception if it is out of bounds
 	 */
-	@Test
-	public void get_outside_noborder() {
+	@Test void get_outside_noborder() {
 		T img = createImage(width, height, numBands);
 
 		InterpolatePixelMB<T> interp = wrap(img, 0, 100);
@@ -156,8 +153,7 @@ public abstract class GeneralChecksInterpolationPixelMB<T extends ImageMultiBand
 	/**
 	 * Compare get_fast against the value returned by get()
 	 */
-	@Test
-	public void get_fast() {
+	@Test void get_fast() {
 		T img = createImage(width, height, numBands);
 		GImageMiscOps.fillUniform(img, rand, 0, 100);
 
@@ -176,8 +172,7 @@ public abstract class GeneralChecksInterpolationPixelMB<T extends ImageMultiBand
 	/**
 	 * If a border is specified it should handle everything just fine
 	 */
-	@Test
-	public void get_outside_border() {
+	@Test void get_outside_border() {
 		T img = createImage(width, height, numBands);
 		GImageMiscOps.fillUniform(img, rand, 0, 100);
 
@@ -205,8 +200,7 @@ public abstract class GeneralChecksInterpolationPixelMB<T extends ImageMultiBand
 		}
 	}
 
-	@Test
-	public void getImage() {
+	@Test void getImage() {
 		T img = createImage(width, height, numBands);
 		InterpolatePixelMB<T> interp = wrap(img, 0, 100);
 		assertTrue(img == interp.getImage());
@@ -216,8 +210,7 @@ public abstract class GeneralChecksInterpolationPixelMB<T extends ImageMultiBand
 	 * Scans through the whole image and for each pixel which is "safe" it compares the safe
 	 * value to the unsafe value.
 	 */
-	@Test
-	public void isInFastBounds() {
+	@Test void isInFastBounds() {
 		T img = createImage(width, height, numBands);
 		GImageMiscOps.fillUniform(img, rand, 0, 100);
 		InterpolatePixelMB<T> interp = wrap(img, 0, 100);
@@ -238,8 +231,7 @@ public abstract class GeneralChecksInterpolationPixelMB<T extends ImageMultiBand
 	/**
 	 * Pixels out of the image are clearly not in the fast bounds
 	 */
-	@Test
-	public void isInFastBounds_outOfBounds() {
+	@Test void isInFastBounds_outOfBounds() {
 		T img = createImage(width, height, numBands);
 		InterpolatePixelMB<T> interp = wrap(img, 0, 100);
 
@@ -249,8 +241,7 @@ public abstract class GeneralChecksInterpolationPixelMB<T extends ImageMultiBand
 		assertFalse(interp.isInFastBounds(0, height - 0.99f));
 	}
 
-	@Test
-	public void getFastBorder() {
+	@Test void getFastBorder() {
 		T img = createImage(width, height, numBands);
 		InterpolatePixelMB<T> interp = wrap(img, 0, 100);
 
@@ -276,8 +267,7 @@ public abstract class GeneralChecksInterpolationPixelMB<T extends ImageMultiBand
 	/**
 	 * Interpolates the whole image and sees if the values returned are within the specified bounds
 	 */
-	@Test
-	public void checkPixelValueBoundsHonored() {
+	@Test void checkPixelValueBoundsHonored() {
 		T img = createImage(20, 30, numBands);
 		GImageMiscOps.fillUniform(img, rand, 0, 100);
 		InterpolatePixelMB<T> interp = wrap(img, 0, 100);
@@ -300,8 +290,7 @@ public abstract class GeneralChecksInterpolationPixelMB<T extends ImageMultiBand
 	/**
 	 * Should produce identical results when given a sub-image.
 	 */
-	@Test
-	public void checkSubImage() {
+	@Test void checkSubImage() {
 		T imgA = createImage(30, 40, numBands);
 		GImageMiscOps.fillUniform(imgA, rand, 0, 100);
 
@@ -341,8 +330,7 @@ public abstract class GeneralChecksInterpolationPixelMB<T extends ImageMultiBand
 	/**
 	 * Compares interpolation to two single band images and sees if they produce nearly identical results
 	 */
-	@Test
-	public void compareToSingleBand() {
+	@Test void compareToSingleBand() {
 
 		T origMB = createImage(30, 40, 2);
 		GImageMiscOps.fillUniform(origMB, rand, 0, 100);

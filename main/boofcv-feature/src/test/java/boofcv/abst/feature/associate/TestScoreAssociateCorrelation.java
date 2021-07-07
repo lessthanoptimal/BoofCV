@@ -48,8 +48,7 @@ public class TestScoreAssociateCorrelation extends StandardScoreAssociationCheck
 		return a;
 	}
 
-	@Test
-	public void compareToExpected() {
+	@Test void compareToExpected() {
 		ScoreAssociateCorrelation score = new ScoreAssociateCorrelation();
 
 		TupleDesc_F64 a = new TupleDesc_F64(5);

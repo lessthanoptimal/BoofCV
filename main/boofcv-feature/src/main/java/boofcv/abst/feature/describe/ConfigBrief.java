@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -30,23 +30,23 @@ import boofcv.struct.Configuration;
  */
 public class ConfigBrief implements Configuration {
 	/**
-	 * Region's radius.  Typical value is 16.
+	 * Region's radius. Typical value is 16.
 	 */
 	public int radius = 16;
 	/**
-	 * Number of points sampled.  Typical value is 512.
+	 * Number of points sampled. Typical value is 512.
 	 */
 	public int numPoints = 512;
 	/**
-	 * Amount of blur applied to the image before sampling.  Typical value is -1
+	 * Amount of blur applied to the image before sampling. Typical value is -1
 	 */
 	public double blurSigma = -1;
 	/**
-	 * Amount of blur applied to the image before sampling.  Typical value is 4
+	 * Amount of blur applied to the image before sampling. Typical value is 4
 	 */
 	public int blurRadius = 4;
 	/**
-	 * If true then a fixed sized descriptor is used.  If false then orientation and scale information
+	 * If true then a fixed sized descriptor is used. If false then orientation and scale information
 	 * is used, if available. By default this is true.
 	 */
 	public boolean fixed = true;

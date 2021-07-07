@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -31,8 +31,7 @@ public class TestAddRadialNtoN_F64 extends BoofStandardJUnit {
 	/**
 	 * Manually compute the distorted coordinate for a point and see if it matches
 	 */
-	@Test
-	public void againstManual() {
+	@Test void againstManual() {
 		/**/double[] radial= new /**/double[]{0.01,-0.03};
 		double t1 = 0.1, t2 = -0.05;
 

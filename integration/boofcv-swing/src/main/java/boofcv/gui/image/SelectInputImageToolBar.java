@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -25,8 +25,8 @@ import java.awt.event.ActionListener;
 import java.util.ArrayList;
 
 /**
- * Provides a list of input images which can be selected by the user.  When a new image
- * is selected the listener will be notified.  The notification will spawn a new thread
+ * Provides a list of input images which can be selected by the user. When a new image
+ * is selected the listener will be notified. The notification will spawn a new thread
  * automatically.
  *
  * @author Peter Abeles

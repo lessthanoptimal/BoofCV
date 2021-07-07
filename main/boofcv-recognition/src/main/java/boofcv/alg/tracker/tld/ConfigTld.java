@@ -30,8 +30,8 @@ import boofcv.struct.Configuration;
 public class ConfigTld implements Configuration {
 
 	/**
-	 * Maximum number of NCC templates it will examine inside the detection cascade.  Used to limit the amount
-	 * of processing used during detection.  To disable set to Integer.MAX_VALUE
+	 * Maximum number of NCC templates it will examine inside the detection cascade. Used to limit the amount
+	 * of processing used during detection. To disable set to Integer.MAX_VALUE
 	 */
 	public int maximumCascadeConsider = 500;
 
@@ -41,18 +41,18 @@ public class ConfigTld implements Configuration {
 	public int numNegativeFerns = 1000;
 
 	/**
-	 * The maximum allowed forwards-backwards error (pixels) for a track.  Suggested value is 10.
+	 * The maximum allowed forwards-backwards error (pixels) for a track. Suggested value is 10.
 	 */
 	public double maximumErrorFB = 10;
 
 	/**
-	 * Tracks are spawned in an evenly spaced grid inside the previous region.  This value specifies the
+	 * Tracks are spawned in an evenly spaced grid inside the previous region. This value specifies the
 	 * number of rows and columns in the grid.
 	 */
 	public int trackerGridWidth = 10;
 
 	/**
-	 * Radius of KLT tracks.  A radius of 5 is recommended.
+	 * Radius of KLT tracks. A radius of 5 is recommended.
 	 */
 	public int trackerFeatureRadius = 5;
 
@@ -95,46 +95,46 @@ public class ConfigTld implements Configuration {
 	public double confidenceThresholdStrong = 0.75;
 
 	/**
-	 * Upper acceptance threshold for confidence.  Suggested value is 0.65
+	 * Upper acceptance threshold for confidence. Suggested value is 0.65
 	 */
 	public double confidenceThresholdUpper = 0.65;
 
 	/**
-	 * Lower acceptance threshold for confidence.  Used during hypothesis fusion.
+	 * Lower acceptance threshold for confidence. Used during hypothesis fusion.
 	 *
 	 * Suggested value is 0.5
 	 */
 	public double confidenceThresholdLower = 0.5;
 
 	/**
-	 * Random number seed.  Used to create ferns and perform robust model fitting.
+	 * Random number seed. Used to create ferns and perform robust model fitting.
 	 */
 	public long randomSeed = 0xDEADBEE;
 
 	/**
-	 * Number of fern descriptors.  A value of 10 is recommended.
+	 * Number of fern descriptors. A value of 10 is recommended.
 	 */
 	public int numFerns = 10;
 
 	/**
-	 * Number of sample points pairs.  0 &lt; N &le; 32.  A value of 10 is recommended.
+	 * Number of sample points pairs. 0 &lt; N &le; 32. A value of 10 is recommended.
 	 */
 	public int fernSize = 10;
 
 	/**
-	 * The minimum value for a region's confidence that will be accepted.  When the tracking hypothesis is
+	 * The minimum value for a region's confidence that will be accepted. When the tracking hypothesis is
 	 * accepted its value can dip very low.
 	 */
 	public double confidenceAccept = 0.4;
 
 	/**
-	 * Determines the number of scales it will search in increments of powers of 1.2.  All scales from
+	 * Determines the number of scales it will search in increments of powers of 1.2. All scales from
 	 * 1.2^(-scaleSpread) to 1.2^scaleSpread are checked.
 	 */
 	public int scaleSpread = 10;
 
 	/**
-	 * Basic parameters for tracker.  KltConfig.createDefault() with maxIterations = 50 is suggested.
+	 * Basic parameters for tracker. KltConfig.createDefault() with maxIterations = 50 is suggested.
 	 */
 	public ConfigKlt trackerConfig;
 

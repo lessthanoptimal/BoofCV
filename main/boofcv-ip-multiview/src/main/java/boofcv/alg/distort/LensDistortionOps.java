@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -40,14 +40,14 @@ import boofcv.struct.image.ImageType;
  */
 public class LensDistortionOps {
 	/**
-	 * Creates a distortion for modifying the input image from one camera model into another camera model.  If
+	 * Creates a distortion for modifying the input image from one camera model into another camera model. If
 	 * requested the camera model can be further modified to ensure certain visibility requirements are meet
 	 * and the adjusted camera model will be returned.
 	 * @param type How it should modify the image model to ensure visibility of pixels.
 	 * @param borderType How the image border is handled
 	 * @param original The original camera model
 	 * @param desired The desired camera model
-	 * @param modified (Optional) The desired camera model after being rescaled.  Can be null.
+	 * @param modified (Optional) The desired camera model after being rescaled. Can be null.
 	 * @param imageType Type of image.
 	 * @return Image distortion from original camera model to the modified one.
 	 */

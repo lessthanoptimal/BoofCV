@@ -66,7 +66,7 @@ public abstract class DescribePlanar<T extends ImageGray<T>, Desc extends TupleD
 	@Override
 	public void setImage( Planar<T> image ) {
 		if (image.getNumBands() != describers.length) {
-			throw new IllegalArgumentException("Unexpected number of bands in input image.  Found " +
+			throw new IllegalArgumentException("Unexpected number of bands in input image. Found " +
 					image.getNumBands() + " expected " + describers.length);
 		}
 

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -34,11 +34,10 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 public class TestEssentialResidualSampson extends EpipolarTestSimulation {
 
 	/**
-	 * First check to see if the error is very low for perfect parameters.  Then
+	 * First check to see if the error is very low for perfect parameters. Then
 	 * give it incorrect parameters and make sure it is not zero.
 	 */
-	@Test
-	public void checkChangeInCost() {
+	@Test void checkChangeInCost() {
 		init(30,false);
 
 		// compute true essential matrix

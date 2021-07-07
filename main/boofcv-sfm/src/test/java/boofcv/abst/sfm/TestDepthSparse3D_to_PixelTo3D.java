@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -30,8 +30,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  * @author Peter Abeles
  */
 public class TestDepthSparse3D_to_PixelTo3D extends BoofStandardJUnit {
-	@Test
-	public void checkInputs() {
+	@Test void checkInputs() {
 		Dummy depthSparse = new Dummy();
 
 		DepthSparse3D_to_PixelTo3D alg = new DepthSparse3D_to_PixelTo3D(depthSparse);

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -62,7 +62,7 @@ public class SplitMergeLineFitSegment extends SplitMergeLineFit {
 	}
 
 	/**
-	 * Recursively splits pixels.  Used in the initial segmentation.  Only split points between
+	 * Recursively splits pixels. Used in the initial segmentation. Only split points between
 	 * the two ends are added
 	 */
 	protected void splitPixels( int indexStart, int indexStop ) {
@@ -113,7 +113,7 @@ public class SplitMergeLineFitSegment extends SplitMergeLineFit {
 
 	/**
 	 * Finds the point between indexStart and the end point which is the greater distance from the line
-	 * (set up prior to calling).  Returns the index if the distance is less than tolerance, otherwise -1
+	 * (set up prior to calling). Returns the index if the distance is less than tolerance, otherwise -1
 	 */
 	protected int selectSplitBetween( int indexStart, int indexEnd ) {
 

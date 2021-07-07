@@ -38,8 +38,7 @@ public class TestConvertImage extends BoofStandardJUnit {
 	int imgWidth = 10;
 	int imgHeight = 20;
 
-	@Test
-	public void checkAllConvert() {
+	@Test void checkAllConvert() {
 		int count = 0;
 		Method[] methods = ConvertImage.class.getMethods();
 

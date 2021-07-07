@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -32,8 +32,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  */
 public class TestScoreLineSegmentEdge extends BoofStandardJUnit {
 
-	@Test
-	public void checkIsAverage() {
+	@Test void checkIsAverage() {
 		int value = 200;
 		GrayU8 image = new GrayU8(400,500);
 
@@ -57,8 +56,7 @@ public class TestScoreLineSegmentEdge extends BoofStandardJUnit {
 	/**
 	 * makes sure it handles the image border correctly and doens't blow up
 	 */
-	@Test
-	public void checkImageBorder() {
+	@Test void checkImageBorder() {
 		GrayU8 image = new GrayU8(400,500);
 
 		ImageMiscOps.fillUniform(image,rand,0,255);

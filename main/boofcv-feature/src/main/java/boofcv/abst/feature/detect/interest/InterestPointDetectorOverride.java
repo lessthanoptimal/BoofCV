@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -35,7 +35,7 @@ public class InterestPointDetectorOverride<T extends ImageGray<T>>
 	OrientationImage<T> orientation;
 
 	/**
-	 * Specifies which algorithms are to be used.  If orientation is specified then it will override the orientation
+	 * Specifies which algorithms are to be used. If orientation is specified then it will override the orientation
 	 * provided by 'detector'
 	 *
 	 * @param detector Interest point detector and default scale and orientation.

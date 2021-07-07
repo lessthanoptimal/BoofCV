@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -58,8 +58,7 @@ public class TestComputeRegionMeanColor extends BoofStandardJUnit {
 		regionColor.resize(4);
 	}
 
-	@Test
-	public void process() {
+	@Test void process() {
 		createRegionColor(2);
 		Dummy alg = new Dummy(2);
 
@@ -76,8 +75,7 @@ public class TestComputeRegionMeanColor extends BoofStandardJUnit {
 		}
 	}
 
-	@Test
-	public void specific_U8() {
+	@Test void specific_U8() {
 		createRegionColor(1);
 		GrayU8 image = new GrayU8(w,h);
 		byte a = 1,b=2,c=3,d=10;
@@ -97,8 +95,7 @@ public class TestComputeRegionMeanColor extends BoofStandardJUnit {
 		}
 	}
 
-	@Test
-	public void specific_F32() {
+	@Test void specific_F32() {
 		createRegionColor(1);
 		GrayF32 image = new GrayF32(w,h);
 		float a = 1.1f,b=2.2f,c=3.3f,d=10.7f;
@@ -118,8 +115,7 @@ public class TestComputeRegionMeanColor extends BoofStandardJUnit {
 		}
 	}
 
-	@Test
-	public void specific_PL_U8() {
+	@Test void specific_PL_U8() {
 		createRegionColor(2);
 		GrayU8 band = new GrayU8(w,h);
 		byte a = 1,b=2,c=3,d=10;
@@ -145,8 +141,7 @@ public class TestComputeRegionMeanColor extends BoofStandardJUnit {
 		}
 	}
 
-	@Test
-	public void specific_PL_F32() {
+	@Test void specific_PL_F32() {
 		createRegionColor(2);
 		GrayF32 band = new GrayF32(w,h);
 		float a = 1.1f,b=2.2f,c=3.3f,d=10.7f;

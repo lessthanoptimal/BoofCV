@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -63,23 +63,20 @@ public abstract class GeneralBilinearRectangleChecks<T extends ImageGray<T>> ext
 	/**
 	 * Tell it to copy a region in the center
 	 */
-	@Test
-	public void checkCenter() {
+	@Test void checkCenter() {
 		checkRegion(10, 15, 2.11f, 5.23f);
 	}
 
 	/**
-	 * See if it handles edge conditions gracefully.  should be barely inside
+	 * See if it handles edge conditions gracefully. should be barely inside
 	 */
-	@Test
-	public void checkBottomRightEdge() {
+	@Test void checkBottomRightEdge() {
 		checkRegion(10, 15, 0, 0);
 		checkRegion(10, 15, width - 10 - 1, height - 15 - 1);
 	}
 
 
-	@Test
-	public void outsideImageBorder() {
+	@Test void outsideImageBorder() {
 		T img = createImage(width, height);
 		InterpolateRectangle<T> interp = createRectangleInterpolate();
 		interp.setImage(img);
@@ -89,8 +86,7 @@ public abstract class GeneralBilinearRectangleChecks<T extends ImageGray<T>> ext
 				()->interp.region(width-1, height-1, out ));
 	}
 
-	@Test
-	public void outsideImageBorder1_barely() {
+	@Test void outsideImageBorder1_barely() {
 		T img = createImage(20, 25);
 		InterpolateRectangle<T> interp = createRectangleInterpolate();
 		interp.setImage(img);
@@ -100,8 +96,7 @@ public abstract class GeneralBilinearRectangleChecks<T extends ImageGray<T>> ext
 				()->interp.region(-0.1f, -0.1f, out ));
 	}
 
-	@Test
-	public void outsideImageBorder2_barely() {
+	@Test void outsideImageBorder2_barely() {
 		T img = createImage(20, 25);
 		InterpolateRectangle<T> interp = createRectangleInterpolate();
 		interp.setImage(img);
@@ -115,8 +110,7 @@ public abstract class GeneralBilinearRectangleChecks<T extends ImageGray<T>> ext
 	/**
 	 * Should produce identical results when given a sub-image.
 	 */
-	@Test
-	public void checkSubImage() {
+	@Test void checkSubImage() {
 		T imgA = createImage(width, height);
 		GImageMiscOps.fillUniform(imgA, rand, 0, 200);
 

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -38,8 +38,7 @@ public class TestInterpolatePixel_PL_using_SB extends BoofStandardJUnit {
 	int width = 30;
 	int height = 40;
 
-	@Test
-	public void compareToIndividual() {
+	@Test void compareToIndividual() {
 		GrayF32 image0 = new GrayF32(width,height);
 		GrayF32 image1 = new GrayF32(width,height);
 

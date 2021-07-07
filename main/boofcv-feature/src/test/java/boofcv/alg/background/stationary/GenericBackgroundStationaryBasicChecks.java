@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -36,8 +36,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 public abstract class GenericBackgroundStationaryBasicChecks extends GenericBackgroundModelStationaryChecks {
 
 
-	@Test
-	public void checkLearnRate() {
+	@Test public void checkLearnRate() {
 		for( ImageType type : imageTypes ) {
 			checkLearnRate_slow(type);
 			checkLearnRate_fast(type);
@@ -50,7 +49,7 @@ public abstract class GenericBackgroundStationaryBasicChecks extends GenericBack
 
 		T frame = imageType.createImage(width,height);
 
-		// learn very slow.  Should virtually ignore new images with different model
+		// learn very slow. Should virtually ignore new images with different model
 		alg.setLearnRate(0.01f);
 		for (int i = 0; i < 30; i++) {
 			noise(100, 2, frame);
@@ -75,7 +74,7 @@ public abstract class GenericBackgroundStationaryBasicChecks extends GenericBack
 
 		T frame = imageType.createImage(width,height);
 
-		// learn very fast.  will quickly discard old images and use the new ones
+		// learn very fast. will quickly discard old images and use the new ones
 		alg.setLearnRate(0.99f);
 		for (int i = 0; i < 30; i++) {
 			noise(100, 2, frame);
@@ -94,8 +93,7 @@ public abstract class GenericBackgroundStationaryBasicChecks extends GenericBack
 		BoofTesting.assertEquals(expected,segmented,1e-5f);
 	}
 
-	@Test
-	public void checkThreshold() {
+	@Test public void checkThreshold() {
 		for( ImageType type : imageTypes ) {
 			checkThreshold(type);
 		}
@@ -128,8 +126,7 @@ public abstract class GenericBackgroundStationaryBasicChecks extends GenericBack
 	/**
 	 * See if it runs correctly when a 1x1 pixel image is passed in
 	 */
-	@Test
-	public void image1x1() {
+	@Test void image1x1() {
 		for( ImageType type : imageTypes ) {
 			image1x1(type);
 		}

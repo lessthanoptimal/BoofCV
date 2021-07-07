@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -37,8 +37,7 @@ public class TestConnectLinesGrid extends BoofStandardJUnit {
 	/**
 	 * Very basic check which sees if lines are being connected in the same region
 	 */
-	@Test
-	public void connectInSameRegion() {
+	@Test void connectInSameRegion() {
 		MatrixOfList<LineSegment2D_F32> grid = new MatrixOfList<>(1, 1);
 
 		grid.get(0,0).add(new LineSegment2D_F32(0,0,2,3));
@@ -63,8 +62,7 @@ public class TestConnectLinesGrid extends BoofStandardJUnit {
 	 * The test is designed to test that both angles are computed using atan() and compared
 	 * between 0 and 180 degrees
 	 */
-	@Test
-	public void checkHalfCircleAngle() {
+	@Test void checkHalfCircleAngle() {
 		MatrixOfList<LineSegment2D_F32> grid = new MatrixOfList<>(1, 1);
 
 		grid.get(0,0).add(new LineSegment2D_F32(0,0,0,2));
@@ -80,8 +78,7 @@ public class TestConnectLinesGrid extends BoofStandardJUnit {
 	/**
 	 * Very basic check to see if lines are connected between regions.
 	 */
-	@Test
-	public void connectToNeighborRegion() {
+	@Test void connectToNeighborRegion() {
 		// check all the neighbors around 1,1 and see if they get connected
 		checkConnectNeighbor(0,0);
 		checkConnectNeighbor(1,0);
@@ -96,8 +93,7 @@ public class TestConnectLinesGrid extends BoofStandardJUnit {
 	/**
 	 * Makes sure the angle tolerance parameter is correctly set and processed
 	 */
-	@Test
-	public void checkAngleTolerance() {
+	@Test void checkAngleTolerance() {
 		MatrixOfList<LineSegment2D_F32> grid = new MatrixOfList<>(1, 1);
 
 		grid.get(0,0).add(new LineSegment2D_F32(0,0,2,0));
@@ -118,8 +114,7 @@ public class TestConnectLinesGrid extends BoofStandardJUnit {
 	/**
 	 * Makes sure the tangent distance tolerance parameter is correctly set and processed
 	 */
-	@Test
-	public void checkTangentTolerance() {
+	@Test void checkTangentTolerance() {
 		MatrixOfList<LineSegment2D_F32> grid = new MatrixOfList<>(1, 1);
 
 		grid.get(0,0).add(new LineSegment2D_F32(0,0,2,0));
@@ -139,8 +134,7 @@ public class TestConnectLinesGrid extends BoofStandardJUnit {
 	/**
 	 * Makes sure the parallel distance tolerance parameter is correctly set and processed
 	 */
-	@Test
-	public void checkParallelTolerance() {
+	@Test void checkParallelTolerance() {
 		MatrixOfList<LineSegment2D_F32> grid = new MatrixOfList<>(1, 1);
 
 		grid.get(0,0).add(new LineSegment2D_F32(0,0,2,0));

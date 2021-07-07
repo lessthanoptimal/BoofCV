@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -39,7 +39,7 @@ public interface RegionOrientation {
 	 * @param c_x Center of the region in image pixels.
 	 * @param c_y Center of the region in image pixels.
 	 *
-	 * @return Orientation in radians.  Angle zero points along x-axis and pi/2 along y-axis.
+	 * @return Orientation in radians. Angle zero points along x-axis and pi/2 along y-axis.
 	 */
 	double compute( double c_x , double c_y );
 

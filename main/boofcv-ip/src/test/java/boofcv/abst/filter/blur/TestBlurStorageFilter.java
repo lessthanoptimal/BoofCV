@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -40,8 +40,7 @@ public class TestBlurStorageFilter extends BoofStandardJUnit {
 
 	ImageType[] imageTypes = new ImageType[]{ImageType.single(GrayU8.class), ImageType.single(GrayF32.class)};
 
-	@Test
-	public void gaussian() {
+	@Test void gaussian() {
 		for( ImageType c : imageTypes ) {
 			ImageBase input = c.createImage(width,height);
 			ImageBase found = c.createImage(width,height);
@@ -60,8 +59,7 @@ public class TestBlurStorageFilter extends BoofStandardJUnit {
 		}
 	}
 
-	@Test
-	public void mean() {
+	@Test void mean() {
 		for( ImageType c : imageTypes ) {
 			ImageBase input = c.createImage(width,height);
 			ImageBase found = c.createImage(width,height);
@@ -80,8 +78,7 @@ public class TestBlurStorageFilter extends BoofStandardJUnit {
 		}
 	}
 
-	@Test
-	public void median() {
+	@Test void median() {
 		for( ImageType c : imageTypes ) {
 			ImageBase input = c.createImage(width,height);
 			ImageBase found = c.createImage(width,height);

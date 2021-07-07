@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -70,7 +70,7 @@ public class TestConvertRaster extends CompareIdenticalFunctions {
 	}
 
 	/**
-	 * There is a bug where gray scale images are mangled by getRGB().  There is a work around in
+	 * There is a bug where gray scale images are mangled by getRGB(). There is a work around in
 	 * the code.
 	 * <p/>
 	 * Java Bug ID: 5051418
@@ -312,8 +312,7 @@ public class TestConvertRaster extends CompareIdenticalFunctions {
 	}
 
 
-	@Test
-	public void orderBandsIntoRGB() {
+	@Test void orderBandsIntoRGB() {
 		Planar<GrayU8> input = new Planar<>(GrayU8.class, 10, 10, 3);
 
 		GrayU8 band0 = input.getBand(0);

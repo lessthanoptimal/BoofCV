@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -22,23 +22,23 @@ import boofcv.struct.image.GrayF32;
 
 /**
  * <p>
- * Background model in which each pixel is modeled as an independent Guassian distribution.  For computational
+ * Background model in which each pixel is modeled as an independent Guassian distribution. For computational
  * efficiency each band is modeled as having a diagonal covariance matrix with off diagonal terms set to zero,
- * i.e. each band is independent. See [1] for a summary.  This is an approximation but according to several
+ * i.e. each band is independent. See [1] for a summary. This is an approximation but according to several
  * papers it doesn't hurt performance much but simplifies computations significantly.
  * </p>
  * <p>
  * Internally background model is represented by two images; mean and variance, which are stored in
- * {@link GrayF32} images.  This allows for the mean and variance of each pixel to be interpolated,
+ * {@link GrayF32} images. This allows for the mean and variance of each pixel to be interpolated,
  * reducing artifacts along the border of objects.
  * </p>
  *
  * <p>Tuning Parameters:</p>
  * <ul>
- * <li><b>learnRate:</b>  Specifies how fast it will adapt. 0 to 1, inclusive.  0 = static  1.0 = instant. Try 0.05</li>
+ * <li><b>learnRate:</b>  Specifies how fast it will adapt. 0 to 1, inclusive. 0 = static  1.0 = instant. Try 0.05</li>
  * <li><b>threshold:</b>  Pixel's with a Mahalanobis distance &le; threshold are assumed to be background. Consult
- * a Chi-Squared table for theoretical values.  1-band try 10.  3-bands try 20. </li>
- * <li><b>initial variance</b> The initial variance assigned to pixels when they are first observed.  By default this is
+ * a Chi-Squared table for theoretical values. 1-band try 10. 3-bands try 20. </li>
+ * <li><b>initial variance</b> The initial variance assigned to pixels when they are first observed. By default this is
  * Float.MIN_VALUE.
  * </ul>
  *

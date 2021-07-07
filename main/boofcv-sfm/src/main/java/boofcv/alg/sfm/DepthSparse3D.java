@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -29,8 +29,8 @@ import georegression.struct.point.Point2D_F64;
 import georegression.struct.point.Point3D_F64;
 
 /**
- * Computes the 3D coordinate a point in a visual camera given a depth image.  The visual camera is a standard camera
- * while the depth camera contains the depth (value along z-axis) of objects inside its field of view.  The
+ * Computes the 3D coordinate a point in a visual camera given a depth image. The visual camera is a standard camera
+ * while the depth camera contains the depth (value along z-axis) of objects inside its field of view. The
  * Kinect (structured light) and flash ladar (time of flight) are examples of sensors which could use this class.
  * The z-axis is defined to be pointing straight out of the visual camera and both depth and visual cameras are
  * assumed to be parallel with identical pointing vectors for the z-axis.
@@ -82,7 +82,7 @@ public abstract class DepthSparse3D<T extends ImageGray<T>> {
 	}
 
 	/**
-	 * Sets the depth image.  A reference is saved internally.
+	 * Sets the depth image. A reference is saved internally.
 	 *
 	 * @param depthImage Image containing depth information.
 	 */
@@ -126,7 +126,7 @@ public abstract class DepthSparse3D<T extends ImageGray<T>> {
 	}
 
 	/**
-	 * The found 3D coordinate of the point in the visual camera coordinate system.  Is only valid when
+	 * The found 3D coordinate of the point in the visual camera coordinate system. Is only valid when
 	 * {@link #process(int, int)} returns true.
 	 *
 	 * @return 3D coordinate of point in visual camera coordinate system
@@ -136,8 +136,8 @@ public abstract class DepthSparse3D<T extends ImageGray<T>> {
 	}
 
 	/**
-	 * Internal function which looks up the pixel's depth.  Depth is defined as the value of the z-coordinate which
-	 * is pointing out of the camera.  If there is no depth measurement at this location return 0.
+	 * Internal function which looks up the pixel's depth. Depth is defined as the value of the z-coordinate which
+	 * is pointing out of the camera. If there is no depth measurement at this location return 0.
 	 *
 	 * @param depthX x-coordinate of pixel in depth camera
 	 * @param depthY y-coordinate of pixel in depth camera

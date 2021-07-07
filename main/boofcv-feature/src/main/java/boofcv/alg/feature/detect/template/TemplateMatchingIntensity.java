@@ -24,18 +24,18 @@ import boofcv.struct.image.ImageBase;
 /**
  * <p>
  * Moves an image template over the image and for each pixel computes a metric for how similar
- * that region is to template.  An intensity image is thus computed for the entire image.  Better
- * matches always have a more positive value.  If a metric inheritally has a small value for
+ * that region is to template. An intensity image is thus computed for the entire image. Better
+ * matches always have a more positive value. If a metric inheritally has a small value for
  * better matches then its sign will be adjusted so that poor matches have a negative value.
  * </p>
  * <p>
  * A pixel in the intensity image is the result of evaluating the template with its center over
- * that pixel.  Given pixel (x,y) in the intensity image the template's top left corner (x',y') can be
+ * that pixel. Given pixel (x,y) in the intensity image the template's top left corner (x',y') can be
  * found at: x' = x - getOffsetX() and y' = y - getOffsetY().
  * </p>
  * <p>
- * IMAGE BORDER: If the image border is processed or not depends on the implementation.  If the border
- * is processed then partial templates are considered.  If the border is not processed then the
+ * IMAGE BORDER: If the image border is processed or not depends on the implementation. If the border
+ * is processed then partial templates are considered. If the border is not processed then the
  * value of the intensity along the border is not defined and should not be processed.
  * </p>
  *
@@ -51,26 +51,26 @@ public interface TemplateMatchingIntensity<T extends ImageBase<T>> {
 	void setInputImage( T image );
 
 	/**
-	 * Matches the template to the image and computes an intensity image.  Must call
+	 * Matches the template to the image and computes an intensity image. Must call
 	 * {@link #setInputImage(ImageBase)} first
 	 *
-	 * @param template Template image.  Must be equal to or smaller than the input image. Not modified.
+	 * @param template Template image. Must be equal to or smaller than the input image. Not modified.
 	 */
 	void process( T template );
 
 	/**
-	 * Matches the template with a mask to the image and computes an intensity image.  Must call
+	 * Matches the template with a mask to the image and computes an intensity image. Must call
 	 * {@link #setInputImage(ImageBase)} first
 	 *
 	 * @param mask Mask that identifies how translucent pixels. 0 = 100% transparent and all values above
-	 * increase its importance.  Typical values are 0 to 255 for integer images and 0.0 to 1.0 for
+	 * increase its importance. Typical values are 0 to 255 for integer images and 0.0 to 1.0 for
 	 * floating point.
-	 * @param template Template image.  Must be equal to or smaller than the input image. Not modified.
+	 * @param template Template image. Must be equal to or smaller than the input image. Not modified.
 	 */
 	void process( T template, T mask );
 
 	/**
-	 * Contains results of template matching.  Higher intensity values correspond to a better match.
+	 * Contains results of template matching. Higher intensity values correspond to a better match.
 	 * Local matches can be found using {@link boofcv.abst.feature.detect.extract.NonMaxSuppression}.
 	 * See comment about processing the image border.
 	 *
@@ -79,7 +79,7 @@ public interface TemplateMatchingIntensity<T extends ImageBase<T>> {
 	GrayF32 getIntensity();
 
 	/**
-	 * Does this algorithm process the image's border.  If it does not process the border
+	 * Does this algorithm process the image's border. If it does not process the border
 	 *
 	 * @return true if the border is processed and false otherwise.
 	 */

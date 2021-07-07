@@ -31,15 +31,15 @@ import java.io.IOException;
 
 /**
  * <p>
- * Base class for generating square fiducial PDF documents for printing.  Fiducials are placed in a regular grid.
- * The width of each element in the grid is the fiducial's width and a white border.  The  * grid starts in the
+ * Base class for generating square fiducial PDF documents for printing. Fiducials are placed in a regular grid.
+ * The width of each element in the grid is the fiducial's width and a white border. The  * grid starts in the
  * page's lower left and corner.
  * </p>
  *
  * <pre>
- * Border:  The border is a no-go zone where the fiducial can't be printed inside of.  This is only taken in account
+ * Border:  The border is a no-go zone where the fiducial can't be printed inside of. This is only taken in account
  *          when automatic centering or layout of the grid on the page is requested.
- * Offset: Where the fiducial is offset inside the page.  Always used.  If centering is requested then the offset
+ * Offset: Where the fiducial is offset inside the page. Always used. If centering is requested then the offset
  *         is automatically computed and any user provided value ignored.
  * PrintInfo: If true it will draw a string above the fiducial with the fiducial's  name and it's size
  * </pre>
@@ -48,21 +48,21 @@ import java.io.IOException;
  */
 public abstract class BaseFiducialSquare {
 
-	@Option(name = "-u", aliases = {"--Units"}, usage = "Name of document units.  default: cm")
+	@Option(name = "-u", aliases = {"--Units"}, usage = "Name of document units. default: cm")
 	protected String _unit = Unit.CENTIMETER.abbreviation;
 	public Unit unit;
 
-	@Option(name = "-p", aliases = {"--PaperSize"}, usage = "Size of paper used.  See below for predefined document sizes.  "
-			+ "You can manually specify any size using the following notation. W:H  where W is the width and H is the height.  "
-			+ "Values of W and H is specified with <number><unit abbreviation>, e.g. 6cm or 6, the unit is optional.  If no unit"
+	@Option(name = "-p", aliases = {"--PaperSize"}, usage = "Size of paper used. See below for predefined document sizes. "
+			+ "You can manually specify any size using the following notation. W:H  where W is the width and H is the height. "
+			+ "Values of W and H is specified with <number><unit abbreviation>, e.g. 6cm or 6, the unit is optional. If no unit"
 			+ " are specified the default document units are used.")
 	protected String _paperSize = PaperSize.LETTER.name;
 	public PaperSize paperSize;
 
-	@Option(name = "-w", aliases = {"--MarkerWidth"}, usage = "Width of each marker.  In document units.")
+	@Option(name = "-w", aliases = {"--MarkerWidth"}, usage = "Width of each marker. In document units.")
 	public float markerWidth = -1;
 
-	@Option(name = "-s", aliases = {"--Space"}, usage = "Spacing between the fiducials.  In document units.")
+	@Option(name = "-s", aliases = {"--Space"}, usage = "Spacing between the fiducials. In document units.")
 	public float spaceBetween = 0;
 
 	@Option(name = "-o", aliases = {"--OutputFile"}, usage = "Name of output file. Extension determines file type. E.g. qrcode.pdf. " +

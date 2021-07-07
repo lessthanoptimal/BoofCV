@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -42,8 +42,7 @@ public class TestWaveletTransformInt extends BoofStandardJUnit {
 	int width = 30;
 	int height = 40;
 
-	@Test
-	public void compareToWaveletTransformOps() {
+	@Test void compareToWaveletTransformOps() {
 		GrayS32 orig = new GrayS32(width,height);
 		GImageMiscOps.fillUniform(orig, rand, 0, 20);
 		GrayS32 origCopy = orig.clone();
@@ -78,8 +77,7 @@ public class TestWaveletTransformInt extends BoofStandardJUnit {
 	/**
 	 * See how well it processes an image which is not an GrayS32
 	 */
-	@Test
-	public void checkOtherType() {
+	@Test void checkOtherType() {
 		GrayS32 orig = new GrayS32(width,height);
 		GImageMiscOps.fillUniform(orig, rand, 0, 20);
 		GrayU8 orig8 = ConvertImage.convert(orig,(GrayU8)null);

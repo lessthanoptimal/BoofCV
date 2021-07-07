@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -63,8 +63,7 @@ public class TestConvolveImage extends CompareImageBorder {
 		return false;
 	}
 
-	@Test
-	public void compareToNoBorder() {
+	@Test void compareToNoBorder() {
 		kernelWidth = 5; kernelOffset = 2;
 		performTests(30);
 		kernelWidth = 5; kernelOffset = 0;
@@ -76,7 +75,7 @@ public class TestConvolveImage extends CompareImageBorder {
 	}
 
 	/**
-	 * Fillers the border in the larger image with an extended version of the smaller image.  A duplicate
+	 * Fillers the border in the larger image with an extended version of the smaller image. A duplicate
 	 * of the smaller image is contained in the center of the larger image.
 	 */
 	protected void fillTestImage(ImageBase smaller, ImageBase larger,

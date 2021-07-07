@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -72,8 +72,7 @@ public abstract class GeneralInterestPointDetectorChecks<T extends ImageGray<T>>
 		checkSubImage();
 	}
 
-	@Test
-	public void checkExpectedCharacteristics() {
+	@Test void checkExpectedCharacteristics() {
 		assertEquals(hasOrientation, detector.hasOrientation());
 		assertEquals(hasRadius, detector.hasScale());
 	}
@@ -81,8 +80,7 @@ public abstract class GeneralInterestPointDetectorChecks<T extends ImageGray<T>>
 	/**
 	 * Detect features and see if all the expected parameters have been set
 	 */
-	@Test
-	public void checkDetect() {
+	@Test void checkDetect() {
 		detector.detect(image);
 
 		assertTrue(detector.getNumberOfFeatures() > 0);
@@ -123,8 +121,7 @@ public abstract class GeneralInterestPointDetectorChecks<T extends ImageGray<T>>
 	/**
 	 * Does it handle sub-images correctly?
 	 */
-	@Test
-	public void checkSubImage() {
+	@Test void checkSubImage() {
 		List<Point2D_F64> original = new ArrayList<>();
 		List<Point2D_F64> found = new ArrayList<>();
 

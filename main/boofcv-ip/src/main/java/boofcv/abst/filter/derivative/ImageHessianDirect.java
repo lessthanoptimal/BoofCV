@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -22,7 +22,7 @@ import boofcv.struct.image.ImageGray;
 
 
 /**
- * A generic interface for computing image's second derivatives directly from the source image.  This is typically
+ * A generic interface for computing image's second derivatives directly from the source image. This is typically
  * slower than computing it from the image's gradient {@link ImageHessian}, even when the time to compute the image's
  * gradient is taken in account.
  *

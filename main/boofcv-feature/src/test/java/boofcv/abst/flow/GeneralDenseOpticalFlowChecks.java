@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -73,11 +73,10 @@ public abstract class GeneralDenseOpticalFlowChecks<T extends ImageGray<T>> exte
 	public abstract DenseOpticalFlow<T> createAlg( Class<T> imageType );
 
 	/**
-	 * Makes sure it attempts to compute flow through out the whole image.  Specially checks the image border
+	 * Makes sure it attempts to compute flow through out the whole image. Specially checks the image border
 	 * to see if those are skipped
 	 */
-	@Test
-	public void processEdges() {
+	@Test void processEdges() {
 		shift(orig,1,0,shifted);
 
 		DenseOpticalFlow<T> alg = createAlg( imageType );
@@ -117,8 +116,7 @@ public abstract class GeneralDenseOpticalFlowChecks<T extends ImageGray<T>> exte
 	/**
 	 * Very simple test where every pixel moves at the same speed along x and or y direction
 	 */
-	@Test
-	public void checkPlanarMotion() {
+	@Test void checkPlanarMotion() {
 
 		for( int dy = -1; dy <= 1; dy++ ){
 			for( int dx = -1; dx <= 1; dx++ ){
@@ -152,8 +150,7 @@ public abstract class GeneralDenseOpticalFlowChecks<T extends ImageGray<T>> exte
 	/**
 	 * Does it handle the input image size being changed after the first image?
 	 */
-	@Test
-	public void checkChangeInputSize() {
+	@Test void checkChangeInputSize() {
 		DenseOpticalFlow<T> alg = createAlg( imageType );
 
 		alg.process(orig,shifted,found);
@@ -165,8 +162,7 @@ public abstract class GeneralDenseOpticalFlowChecks<T extends ImageGray<T>> exte
 		alg.process(larger0,larger1,new ImageFlow(40,35));
 	}
 
-	@Test
-	public void checkSubImage() {
+	@Test void checkSubImage() {
 		DenseOpticalFlow<T> alg = createAlg( imageType );
 
 		shift(orig,1,-1,shifted);

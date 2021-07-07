@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -30,7 +30,7 @@ import java.util.Arrays;
 
 /**
  * <p>
- * Square fiducial that encodes numerical values in a binary N by N grids, where N &ge; 3.  The outer border
+ * Square fiducial that encodes numerical values in a binary N by N grids, where N &ge; 3. The outer border
  * is entirely black while the inner portion is divided into a grid of equally sized back and white squares.
  * Typical grid sizes are 3x3, 4x4, and 5x5, which can encode up to 32, 4096, and 2,097,152 unique values respectively.
  * In other words, a grid of size N can encode N*N-4 bits, or a number with 2<sup>N*N-4</sup> values.
@@ -43,7 +43,7 @@ import java.util.Arrays;
  * <p>
  * The above image is an example of a 4x4 grid and visually shows the fiducials internal coordinate system.
  * The center of the fiducial is the origin  of the coordinate system, e.g. all sides are width/2 distance
- * away from the origin.  +x is to the right, +y is up, and +z out of the paper towards the viewer.
+ * away from the origin. +x is to the right, +y is up, and +z out of the paper towards the viewer.
  * The black orientation corner is pointed out in the above image.
  * The fiducial's width refers to the width of each side along the black border NOT the internal encoded image.
  * The size of each square is the same and has a width of (fiducal width)*(1.0 - 2.0*(border fractional width))/N.
@@ -51,8 +51,8 @@ import java.util.Arrays;
  * <p>
  * NOTE: While a larger grid size will allow you to encode more numbers it will increase the rate at which ID numbers
  * are incorrectly identified.<br>
- * NOTE: The size of the border can be adjusted, but 0.25 is recommended.  The thinner the black border is the worse
- * it will perform when viewed at an angle.  However, the closer the fiducial is the less this is an issue allowing
+ * NOTE: The size of the border can be adjusted, but 0.25 is recommended. The thinner the black border is the worse
+ * it will perform when viewed at an angle. However, the closer the fiducial is the less this is an issue allowing
  * for thinner borders.
  * <p>
  *
@@ -75,13 +75,13 @@ public class DetectFiducialSquareBinary<T extends ImageGray<T>>
 
 	// width of a square in the inner undistorted image.
 	protected final static int w=10;
-	// total number of pixels in a square.  Outer pixels are ignored, hence -2 for each axis
+	// total number of pixels in a square. Outer pixels are ignored, hence -2 for each axis
 	protected final static int N=(w-4)*(w-4);
 
 	// length of a side for the fiducial's black border in world units.
 	private double lengthSide = 1;
 
-	// ambiguity threshold. 0 to 1.  0 = very strict and 1 = anything goes
+	// ambiguity threshold. 0 to 1. 0 = very strict and 1 = anything goes
 	// Sets how strict a square must be black or white for it to be accepted.
 	double ambiguityThreshold = 0.4;
 
@@ -182,11 +182,11 @@ public class DetectFiducialSquareBinary<T extends ImageGray<T>>
 	}
 
 	/**
-	 * Rotate the pattern until the black corner is in the lower right.  Sanity check to make
+	 * Rotate the pattern until the black corner is in the lower right. Sanity check to make
 	 * sure there is only one black corner
 	 */
 	private boolean rotateUntilInLowerCorner(Result result) {
-		// sanity check corners.  There should only be one exactly one black
+		// sanity check corners. There should only be one exactly one black
 		final int topLeft = getTotalGridElements() - gridWidth;
 		final int topRight = getTotalGridElements() - 1;
 		final int bottomLeft = 0;
@@ -223,7 +223,7 @@ public class DetectFiducialSquareBinary<T extends ImageGray<T>>
 
 
 	/**
-	 * Sees how many pixels were positive and negative in each square region.  Then decides if they
+	 * Sees how many pixels were positive and negative in each square region. Then decides if they
 	 * should be 0 or 1 or unknown
 	 */
 	protected boolean thresholdBinaryNumber() {
@@ -246,7 +246,7 @@ public class DetectFiducialSquareBinary<T extends ImageGray<T>>
 	}
 
 	/**
-	 * Converts the gray scale image into a binary number.  Skip the outer 1 pixel of each inner square.  These
+	 * Converts the gray scale image into a binary number. Skip the outer 1 pixel of each inner square. These
 	 * tend to be incorrectly classified due to distortion.
 	 */
 	protected void findBitCounts(GrayF32 gray , double threshold ) {

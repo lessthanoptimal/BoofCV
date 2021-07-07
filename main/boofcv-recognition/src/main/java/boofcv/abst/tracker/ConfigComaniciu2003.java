@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -28,20 +28,20 @@ import boofcv.struct.Configuration;
  */
 public class ConfigComaniciu2003 implements Configuration {
 	/**
-	 * Number of points it samples along each axis of the rectangle.  Default is 30.
+	 * Number of points it samples along each axis of the rectangle. Default is 30.
 	 */
 	public int numSamples = 30;
 	/**
 	 * Used to compute weights. Number of standard deviations away the sides will be from the center. Shouldn't
-	 * need to tune this.  Try 3.
+	 * need to tune this. Try 3.
 	 */
 	public double numSigmas = 3;
 	/**
-	 * Number of histogram bins for each band.  Try 5
+	 * Number of histogram bins for each band. Try 5
 	 */
 	public int numHistogramBins = 5;
 	/**
-	 * Largest value a pixel can have.  For 8-bit images this is 255. Floating point images are some times normalized
+	 * Largest value a pixel can have. For 8-bit images this is 255. Floating point images are some times normalized
 	 * to 1.
 	 */
 	public float maxPixelValue = 255f;
@@ -50,29 +50,29 @@ public class ConfigComaniciu2003 implements Configuration {
 	 */
 	public boolean updateHistogram = false;
 	/**
-	 * Maximum number of mean-shift iterations.  Try 30
+	 * Maximum number of mean-shift iterations. Try 30
 	 */
 	public int meanShiftMaxIterations = 15;
 	/**
-	 * Mean-shift will stop when the change is below this threshold.  Try 1e-4f
+	 * Mean-shift will stop when the change is below this threshold. Try 1e-4f
 	 */
 	public float meanShiftMinimumChange = 1e-3f;
 	/**
-	 * Weighting factor which limits the amount it will change the scale.  Value from 0 to 1.
-	 * Closer to 0 the more it will prefer the most recent estimate.  Try 0.1
+	 * Weighting factor which limits the amount it will change the scale. Value from 0 to 1.
+	 * Closer to 0 the more it will prefer the most recent estimate. Try 0.1
 	 */
 	public float scaleWeight = 0.1f;
 	/**
-	 * Specifies how much it will scale the region up and down by when testing for a scale change.  Allowed
-	 * values are from 0 to 1, inclusive.  0 means no scale change and 1 is 100% increase and decrease.
+	 * Specifies how much it will scale the region up and down by when testing for a scale change. Allowed
+	 * values are from 0 to 1, inclusive. 0 means no scale change and 1 is 100% increase and decrease.
 	 *
 	 * If no scale change is considered it can run 3x faster. If the target doesn't change scale then the tracker
-	 * is much more robust.  The paper recommends 0.1.  By default scale change is set to 0.
+	 * is much more robust. The paper recommends 0.1. By default scale change is set to 0.
 	 */
 	public float scaleChange = 0;
 
 	/**
-	 * The scale is allowed to be reduced by this much from the original region which is selected.  Default
+	 * The scale is allowed to be reduced by this much from the original region which is selected. Default
 	 * is 0.25
 	 */
 	public float minimumSizeRatio = 0.25f;

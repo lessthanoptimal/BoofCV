@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -32,9 +32,9 @@ import boofcv.struct.image.Planar;
 import java.awt.image.BufferedImage;
 
 /**
- * Example which demonstrates two different ways to convert RGB images to gray scale images.  The two methods
- * are weighted and unweighted.  The weighted method mimics how human vision works, while the unweighted is
- * much faster.  Typically the unweighted method appears more washed out than the weighted method, but still works
+ * Example which demonstrates two different ways to convert RGB images to gray scale images. The two methods
+ * are weighted and unweighted. The weighted method mimics how human vision works, while the unweighted is
+ * much faster. Typically the unweighted method appears more washed out than the weighted method, but still works
  * very well when passed to other computer vision algorithms.
  *
  * @author Peter Abeles
@@ -49,8 +49,8 @@ public class ExampleRgbToGray {
 		GrayU8 weighted = new GrayU8(color.width, color.height);
 		GrayU8 unweighted = new GrayU8(color.width, color.height);
 
-		// Now run a benchmark to demonstrate the speed differences between the two approaches.  Both are very fast...
-		System.out.println("Running benchmark.  Should take a few seconds on a modern computer.\n");
+		// Now run a benchmark to demonstrate the speed differences between the two approaches. Both are very fast...
+		System.out.println("Running benchmark. Should take a few seconds on a modern computer.\n");
 		long startTime;
 		int N = 2000;
 		startTime = System.nanoTime();

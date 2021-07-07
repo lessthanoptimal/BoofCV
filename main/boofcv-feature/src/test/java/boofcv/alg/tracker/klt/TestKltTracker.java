@@ -44,7 +44,7 @@ public class TestKltTracker extends BoofStandardJUnit {
 	GrayF32 derivY = new GrayF32(imageWidth, imageHeight);
 
 	/**
-	 * Process the same features in two different sets of image.  only difference is that one is a sub image
+	 * Process the same features in two different sets of image. only difference is that one is a sub image
 	 * results should be identical
 	 */
 	@Test void testSubImages() {
@@ -128,7 +128,7 @@ public class TestKltTracker extends BoofStandardJUnit {
 	}
 
 	/**
-	 * Place a feature on the border then put it inside the image.  See if it moves towards the border
+	 * Place a feature on the border then put it inside the image. See if it moves towards the border
 	 */
 	@Test void testTracking_border2() {
 		ImageMiscOps.fillUniform(image, rand, 1, 100);

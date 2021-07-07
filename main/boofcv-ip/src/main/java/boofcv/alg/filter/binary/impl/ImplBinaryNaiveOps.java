@@ -146,12 +146,12 @@ public class ImplBinaryNaiveOps {
 	}
 
 	/**
-	 * Binary operation which is designed to remove small bits of spurious noise.  An 8-neighborhood is used.
-	 * If a pixel is connected to less than 2 neighbors then its value zero.  If connected to more than 6 then
-	 * its value is one.  Otherwise it retains its original value.
+	 * Binary operation which is designed to remove small bits of spurious noise. An 8-neighborhood is used.
+	 * If a pixel is connected to less than 2 neighbors then its value zero. If connected to more than 6 then
+	 * its value is one. Otherwise it retains its original value.
 	 *
 	 * @param input Input image. Not modified.
-	 * @param output If not null, the output image.  If null a new image is declared and returned.  Modified.
+	 * @param output If not null, the output image. If null a new image is declared and returned. Modified.
 	 */
 	public static void removePointNoise( GrayU8 input, GrayU8 output ) {
 		for (int y = 0; y < input.height; y++) {

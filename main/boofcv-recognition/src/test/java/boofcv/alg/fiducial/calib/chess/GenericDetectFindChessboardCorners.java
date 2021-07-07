@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -67,8 +67,7 @@ public abstract class GenericDetectFindChessboardCorners extends BoofStandardJUn
 	/**
 	 * Give it a simple target and see if it finds the expected number of squares
 	 */
-	@Test
-	public void basicTest() {
+	@Test void basicTest() {
 		for( int numRows = 3; numRows <= 7; numRows++ ) {
 			for( int numCols = 3; numCols <= 7; numCols++ ) {
 //				System.out.println("shape "+numCols+"  "+numRows);
@@ -181,8 +180,7 @@ public abstract class GenericDetectFindChessboardCorners extends BoofStandardJUn
 	 *
 	 * This doesn't test all possible cases.
 	 */
-	@Test
-	public void touchesBorder_translate() {
+	@Test void touchesBorder_translate() {
 		for (int i = 0; i < 4; i++) {
 			if( i%2 == 0 )
 				offsetX = 0;

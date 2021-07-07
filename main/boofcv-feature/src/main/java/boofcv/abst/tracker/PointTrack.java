@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -48,7 +48,7 @@ public class PointTrack {
 	/** The last frame the track was seen at */
 	public long lastSeenFrameID;
 
-	/** Description of this feature that is used internally.  Don't mess with this */
+	/** Description of this feature that is used internally. Don't mess with this */
 	private Object description;
 
 	public PointTrack( double x, double y, long featureId ) {

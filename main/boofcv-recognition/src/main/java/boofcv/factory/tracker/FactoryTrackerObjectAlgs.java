@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -34,8 +34,8 @@ import boofcv.struct.border.BorderType;
 import boofcv.struct.image.*;
 
 /**
- * Factory for creating low level implementations of object tracking algorithms.  These algorithms allow
- * the user to specify an object in a video stream and then track it.  For a high level and user to use
+ * Factory for creating low level implementations of object tracking algorithms. These algorithms allow
+ * the user to specify an object in a video stream and then track it. For a high level and user to use
  * common interface see {@link FactoryTrackerObjectQuad}
  *
  * @author Peter Abeles
@@ -105,7 +105,7 @@ public class FactoryTrackerObjectAlgs {
 				}
 
 			default:
-				throw new IllegalArgumentException("Image family not yet supported.  Try Planar");
+				throw new IllegalArgumentException("Image family not yet supported. Try Planar");
 		}
 	}
 

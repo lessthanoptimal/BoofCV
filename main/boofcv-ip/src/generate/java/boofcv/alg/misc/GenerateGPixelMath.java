@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -78,7 +78,7 @@ public class GenerateGPixelMath extends CodeGeneratorBase {
 				"import javax.annotation.Generated;\n" +
 				"\n" +
 				"/**\n" +
-				" * Generalized version of {@link PixelMath}.  Type checking is performed at runtime instead of at compile type.\n" +
+				" * Generalized version of {@link PixelMath}. Type checking is performed at runtime instead of at compile type.\n" +
 				generateDocString("Peter Abeles") +
 				"public class " + className + " {\n" +
 				"\n");
@@ -601,7 +601,7 @@ public class GenerateGPixelMath extends CodeGeneratorBase {
 				"\t * Performs pixel-wise division<br>\n" +
 				"\t * output(x,y) = imgA(x,y) / imgB(x,y)\n" +
 				"\t * </p>\n" +
-				"\t * Only floating point images are supported.  If the numerator has multiple bands and the denominator is a single\n" +
+				"\t * Only floating point images are supported. If the numerator has multiple bands and the denominator is a single\n" +
 				"\t * band then the denominator will divide each band.\n" +
 				"\t *\n" +
 				"\t * @param imgA Input image. Not modified.\n" +
@@ -644,7 +644,7 @@ public class GenerateGPixelMath extends CodeGeneratorBase {
 				"\t * Performs pixel-wise multiplication<br>\n" +
 				"\t * output(x,y) = imgA(x,y) * imgB(x,y)\n" +
 				"\t * </p>\n" +
-				"\t * Only floating point images are supported.  If one image has multiple bands and the other is gray then\n" +
+				"\t * Only floating point images are supported. If one image has multiple bands and the other is gray then\n" +
 				"\t * the gray image will be multiplied by each band in the multiple band image.\n" +
 				"\t *\n" +
 				"\t * @param imgA Input image. Not modified.\n" +

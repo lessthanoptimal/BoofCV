@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -28,8 +28,7 @@ import static org.junit.jupiter.api.Assertions.*;
  */
 public class TestImageFlow extends BoofStandardJUnit {
 
-	@Test
-	public void constructor() {
+	@Test void constructor() {
 		ImageFlow a = new ImageFlow(3,4);
 
 		assertEquals(3,a.getWidth());
@@ -37,8 +36,7 @@ public class TestImageFlow extends BoofStandardJUnit {
 		assertEquals(3*4,a.data.length);
 	}
 
-	@Test
-	public void reshape() {
+	@Test void reshape() {
 		ImageFlow a = new ImageFlow(3,4);
 
 		a.reshape(2,3);
@@ -52,8 +50,7 @@ public class TestImageFlow extends BoofStandardJUnit {
 		assertEquals(4*5,a.data.length);
 	}
 
-	@Test
-	public void invalidateAll() {
+	@Test void invalidateAll() {
 		ImageFlow a = new ImageFlow(3,4);
 		for( int i = 0; i < a.data.length; i++ )
 			a.data[i].markInvalid();
@@ -64,8 +61,7 @@ public class TestImageFlow extends BoofStandardJUnit {
 			assertFalse(a.data[i].isValid());
 	}
 
-	@Test
-	public void get() {
+	@Test void get() {
 		ImageFlow a = new ImageFlow(3,4);
 
 		assertTrue(a.data[0] == a.get(0,0));
@@ -73,8 +69,7 @@ public class TestImageFlow extends BoofStandardJUnit {
 		assertTrue(a.data[3] == a.get(0,1));
 	}
 
-	@Test
-	public void isInBounds() {
+	@Test void isInBounds() {
 		ImageFlow a = new ImageFlow(10,11);
 
 		assertTrue(a.isInBounds(0,0));

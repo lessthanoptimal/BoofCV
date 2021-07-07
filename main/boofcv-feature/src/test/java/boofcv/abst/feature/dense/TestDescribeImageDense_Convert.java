@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -41,8 +41,7 @@ public class TestDescribeImageDense_Convert extends BoofStandardJUnit {
 	 * Checks to see if it converts the input image and that other functions are correctly
 	 * implemented
 	 */
-	@Test
-	public void basic() {
+	@Test void basic() {
 		Dummy dummy = new Dummy();
 
 		DescribeImageDense<GrayU8,TupleDesc_F64> alg =

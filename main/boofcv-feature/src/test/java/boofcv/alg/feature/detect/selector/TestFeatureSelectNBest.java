@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -40,8 +40,7 @@ class TestFeatureSelectNBest extends ChecksFeatureSelectLimitIntensity.I16 {
 	/**
 	 * The size of N is less than the number of points
 	 */
-	@Test
-	public void tooFewFeatures() {
+	@Test void tooFewFeatures() {
 		GrayF32 intensity = new GrayF32(10, 20);
 		intensity.set(5, 10, -3);
 		intensity.set(4, 10, -3.5f);

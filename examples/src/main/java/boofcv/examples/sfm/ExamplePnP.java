@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -41,8 +41,8 @@ import java.util.Random;
 
 /**
  * The Perspective-n-Point problem or PnP for short, is a problem where there are N observations of points with
- * known 3D coordinates.  The output is the pose of the camera observing the points.  The minimal solution requires
- * 3-points but produces multiple solutions.  BoofCV provide several solutions to the PnP problem and the example
+ * known 3D coordinates. The output is the pose of the camera observing the points. The minimal solution requires
+ * 3-points but produces multiple solutions. BoofCV provide several solutions to the PnP problem and the example
  * below demonstrates how to use them.
  *
  * @author Peter Abeles
@@ -94,7 +94,7 @@ public class ExamplePnP {
 
 		// Compute a single solution using EPNP
 		// 10 iterations is what JavaDoc recommends, but might need to be tuned.
-		// 0 test points.  This parameters is actually ignored because EPNP only returns a single solution
+		// 0 test points. This parameters is actually ignored because EPNP only returns a single solution
 		Estimate1ofPnP pnp = FactoryMultiView.pnp_1(EnumPNP.EPNP, 10, 0);
 
 		Se3_F64 worldToCamera = new Se3_F64();
@@ -115,7 +115,7 @@ public class ExamplePnP {
 	 * Uses robust techniques to remove outliers
 	 */
 	public Se3_F64 estimateOutliers( List<Point2D3D> observations ) {
-		// We can no longer trust that each point is a real observation.  Let's use RANSAC to separate the points
+		// We can no longer trust that each point is a real observation. Let's use RANSAC to separate the points
 		// You will need to tune the number of iterations and inlier threshold!!!
 		ModelMatcherMultiview<Se3_F64,Point2D3D> ransac =
 				FactoryMultiViewRobust.pnpRansac(new ConfigPnP(),new ConfigRansac(300,1.0));
@@ -128,7 +128,7 @@ public class ExamplePnP {
 		System.out.println("Inlier size "+ransac.getMatchSet().size());
 		Se3_F64 worldToCamera = ransac.getModelParameters();
 
-		// You will most likely want to refine this solution too.  Can make a difference with real world data
+		// You will most likely want to refine this solution too. Can make a difference with real world data
 		RefinePnP refine = FactoryMultiView.pnpRefine(1e-8,200);
 
 		Se3_F64 refinedWorldToCamera = new Se3_F64();
@@ -141,7 +141,7 @@ public class ExamplePnP {
 	}
 
 	/**
-	 * Generates synthetic observations randomly in front of the camera.  Observations are in normalized image
+	 * Generates synthetic observations randomly in front of the camera. Observations are in normalized image
 	 * coordinates and not pixels!  See {@link PerspectiveOps#convertPixelToNorm} for how to go from pixels
 	 * to normalized image coordinates.
 	 */

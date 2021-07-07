@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -76,7 +76,7 @@ public class ExampleVisualOdometryMonocularPlane {
 		MonocularPlaneVisualOdometry<GrayU8> visualOdometry =
 				FactoryVisualOdometry.monoPlaneInfinity(75, 2, 1.5, 200, tracker, ImageType.single(GrayU8.class));
 
-		// Pass in intrinsic/extrinsic calibration.  This can be changed in the future.
+		// Pass in intrinsic/extrinsic calibration. This can be changed in the future.
 		visualOdometry.setCalibration(calibration);
 
 		// Process the video sequence and output the location plus number of inliers

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -57,8 +57,7 @@ public abstract class CompareCornerIntensity<D extends ImageGray<D>> extends Boo
 		this.algB = algB;
 	}
 
-	@Test
-	public void compare() {
+	@Test void compare() {
 		GrayF32 outputA = new GrayF32(derivX.width,derivX.height);
 		GrayF32 outputB = new GrayF32(derivX.width,derivX.height);
 

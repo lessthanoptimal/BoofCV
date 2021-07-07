@@ -40,8 +40,8 @@ import java.util.List;
 import static boofcv.abst.tracker.PointTrackerUtils.declareTrackStorage;
 
 /**
- * Wrapper around {@link boofcv.alg.tracker.klt.PyramidKltTracker} for {@link PointTracker}.  Every track
- * will have the same size and shaped descriptor.  If any fault is encountered the track will be dropped.
+ * Wrapper around {@link boofcv.alg.tracker.klt.PyramidKltTracker} for {@link PointTracker}. Every track
+ * will have the same size and shaped descriptor. If any fault is encountered the track will be dropped.
  *
  * @author Peter Abeles
  */
@@ -106,7 +106,7 @@ public class PointTrackerKltPyramid<I extends ImageGray<I>, D extends ImageGray<
 	 * @param templateRadius Radius of square templates that are tracked
 	 * @param performPruneClose If true it will prune tracks that are within the detection radius
 	 * @param pyramid The image pyramid which KLT is tracking inside of
-	 * @param detector Feature detector.   If null then no feature detector will be available and spawn won't work.
+	 * @param detector Feature detector.  If null then no feature detector will be available and spawn won't work.
 	 * @param gradient Computes gradient image pyramid.
 	 * @param interpInput Interpolation used on input image
 	 * @param interpDeriv Interpolation used on gradient images
@@ -179,7 +179,7 @@ public class PointTrackerKltPyramid<I extends ImageGray<I>, D extends ImageGray<
 
 	/**
 	 * Creates a new feature track at the specified location. Must only be called after
-	 * {@link #process(ImageGray)} has been called.  It can fail if there
+	 * {@link #process(ImageGray)} has been called. It can fail if there
 	 * is insufficient texture
 	 *
 	 * @param x x-coordinate
@@ -290,7 +290,7 @@ public class PointTrackerKltPyramid<I extends ImageGray<I>, D extends ImageGray<
 	}
 
 	/**
-	 * Returns true if a new track can be spawned here.  Intended to be overloaded
+	 * Returns true if a new track can be spawned here. Intended to be overloaded
 	 */
 	protected boolean checkValidSpawn( PointTrack p ) {
 		return true;
@@ -408,7 +408,7 @@ public class PointTrackerKltPyramid<I extends ImageGray<I>, D extends ImageGray<
 	@Override
 	public boolean dropTrack( PointTrack track ) {
 		if (active.remove((PyramidKltFeature)track.getDescription())) {
-			// only recycle the description if it is in the active list.  This avoids the problem of adding the
+			// only recycle the description if it is in the active list. This avoids the problem of adding the
 			// same description multiple times
 			unused.add((PyramidKltFeature)track.getDescription());
 			return true;

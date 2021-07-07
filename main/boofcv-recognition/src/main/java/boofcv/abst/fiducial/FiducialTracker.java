@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -32,7 +32,7 @@ public interface FiducialTracker<T extends ImageBase<T>> extends FiducialDetecto
 	 * Detects and tracks fiducials inside the image. Since it is a tracker it is assumed that a sequence
 	 * of images is being processed. Order of images will matter.
 	 *
-	 * @param input Input image.  Not modified.
+	 * @param input Input image. Not modified.
 	 */
 	@Override
 	void detect( T input );

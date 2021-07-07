@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -49,7 +49,7 @@ public abstract class ColorTrackerObjectRectangleChecks extends GenericTrackerOb
 
 	@Override
 	protected void render( double scale, double tranX, double tranY ) {
-		// each region in the target region will have a different color.  Allowing scale, translation, and rotation
+		// each region in the target region will have a different color. Allowing scale, translation, and rotation
 		// to be estimated using color information alone
 
 		Quadrilateral_F64 q = initRegion.copy();

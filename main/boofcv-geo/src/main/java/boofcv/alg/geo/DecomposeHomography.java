@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -33,19 +33,19 @@ import java.util.List;
 
 /**
  * <p>
- * Decomposes a homography matrix to extract its internal geometric structure.  There are four possible solutions,
- * with two that are physically possible.  The physically possible solution can be found by imposing a positive
- * depth constraint.  See {@link PositiveDepthConstraintCheck} for details on how to do that.
+ * Decomposes a homography matrix to extract its internal geometric structure. There are four possible solutions,
+ * with two that are physically possible. The physically possible solution can be found by imposing a positive
+ * depth constraint. See {@link PositiveDepthConstraintCheck} for details on how to do that.
  * </p>
  *
  * <p>
  * A homography matrix is defined as H = (R + (1/d)*T*N<sup>T</sup>), where R is a 3x3 rotation matrix,
- * d is the distance of the plane, N is the plane's normal, T is the translation vector.  The decomposition
+ * d is the distance of the plane, N is the plane's normal, T is the translation vector. The decomposition
  * works by computing the SVD of H<sup>T</sup>H and the following the procedure outlines in [1].
  * </p>
  *
  * <p>
- * The input homography is assumed to be from view 'a' to view 'b'.  Then the resulting transform (R,T) is the
+ * The input homography is assumed to be from view 'a' to view 'b'. Then the resulting transform (R,T) is the
  * transform from view 'a' to view 'b'. The values of d and N are all from the view 'a' perspective. Since there's a
  * scale ambiguity the value of d is assumed to be 1 and T is scaled appropriately.
  * </p>
@@ -98,7 +98,7 @@ public class DecomposeHomography {
 	 * solutions will be produced and can be accessed with {@link #getSolutionsN()} and
 	 * {@link #getSolutionsSE()}.
 	 *
-	 * @param homography Homography matrix.  Not modified.
+	 * @param homography Homography matrix. Not modified.
 	 */
 	public void decompose( DMatrixRMaj homography ) {
 		if (!svd.decompose(homography))

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -40,9 +40,9 @@ import georegression.struct.point.Point2D_F32;
  * </ol>
  *
  * <p>
- * The background model is composed of a single fixed sized image.  The background image size is specified in
- * the {@link #initialize(int, int, InvertibleTransform)} function.  After that the background model is updated
- * by calling {@link #updateBackground(InvertibleTransform, ImageBase)}.  To flag pixels as background/motion
+ * The background model is composed of a single fixed sized image. The background image size is specified in
+ * the {@link #initialize(int, int, InvertibleTransform)} function. After that the background model is updated
+ * by calling {@link #updateBackground(InvertibleTransform, ImageBase)}. To flag pixels as background/motion
  * call {@link #segment(InvertibleTransform, ImageBase, GrayU8)}.
  * </p>
  *
@@ -67,7 +67,7 @@ public abstract class BackgroundModelMoving<T extends ImageBase<T>, MotionModel 
 	protected MotionModel currentToWorld;
 	protected MotionModel worldToCurrent;
 
-	// width and height of background image.  must be set by child
+	// width and height of background image. must be set by child
 	protected int backgroundWidth;
 	protected int backgroundHeight;
 
@@ -97,7 +97,7 @@ public abstract class BackgroundModelMoving<T extends ImageBase<T>, MotionModel 
 	}
 
 	/**
-	 * Initializes background model.  Specifies the size of the background image and transform from the "home" image
+	 * Initializes background model. Specifies the size of the background image and transform from the "home" image
 	 * to the background "world"
 	 *
 	 * @param backgroundWidth Width of background
@@ -151,7 +151,7 @@ public abstract class BackgroundModelMoving<T extends ImageBase<T>, MotionModel 
 	}
 
 	/**
-	 * Call to update the background with the frame inside the bounding box.  Implementing class needs to
+	 * Call to update the background with the frame inside the bounding box. Implementing class needs to
 	 * make sure the rectangle is inside the background.
 	 */
 	protected abstract void updateBackground( int x0, int y0, int x1, int y1, T frame );

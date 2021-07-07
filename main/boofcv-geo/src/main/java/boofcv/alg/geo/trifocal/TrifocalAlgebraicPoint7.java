@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -64,8 +64,8 @@ public class TrifocalAlgebraicPoint7 extends TrifocalLinearPoint7 {
 	 *
 	 * @param optimizer Which least squares minimizer should be used.
 	 * @param maxIterations Maximum number of iterations it will optimize for
-	 * @param ftol Convergence tolerance.  See {@link UnconstrainedLeastSquares} for details.
-	 * @param gtol Convergence tolerance.  See {@link UnconstrainedLeastSquares} for details.
+	 * @param ftol Convergence tolerance. See {@link UnconstrainedLeastSquares} for details.
+	 * @param gtol Convergence tolerance. See {@link UnconstrainedLeastSquares} for details.
 	 */
 	public TrifocalAlgebraicPoint7(UnconstrainedLeastSquares optimizer,
 								   int maxIterations, double ftol,
@@ -100,7 +100,7 @@ public class TrifocalAlgebraicPoint7 extends TrifocalLinearPoint7 {
 	}
 
 	/**
-	 * Minimize the algebraic error using LM.  The two epipoles are the parameters being optimized.
+	 * Minimize the algebraic error using LM. The two epipoles are the parameters being optimized.
 	 */
 	private void minimizeWithGeometricConstraints() {
 		extractEpipoles.setTensor(solutionN);

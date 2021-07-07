@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -31,7 +31,7 @@ import java.util.List;
 
 /**
  * Computes the transform from the first image in a sequence to the current frame. Keyframe based algorithm.
- * Whenever a new keyframe is selected by the user all tracks are dropped and new ones spawned.  No logic is
+ * Whenever a new keyframe is selected by the user all tracks are dropped and new ones spawned. No logic is
  * contained for selecting key frames and relies on the user for selecting them.
  *
  * @param <I> Input image type
@@ -61,7 +61,7 @@ public class ImageMotionPointTrackerKey<I extends ImageBase<I>, IT extends Inver
 	protected boolean keyFrame;
 
 	/**
-	 * Specify algorithms to use internally.  Each of these classes must work with
+	 * Specify algorithms to use internally. Each of these classes must work with
 	 * compatible data structures.
 	 *
 	 * @param tracker feature tracker
@@ -158,7 +158,7 @@ public class ImageMotionPointTrackerKey<I extends ImageBase<I>, IT extends Inver
 
 	/**
 	 * Change the current frame into the keyframe. p1 location of existing tracks is set to
-	 * their current location and new tracks are spawned.  Reference frame transformations are also updated
+	 * their current location and new tracks are spawned. Reference frame transformations are also updated
 	 */
 	public void changeKeyFrame() {
 		final long frameID = tracker.getFrameID();
@@ -183,7 +183,7 @@ public class ImageMotionPointTrackerKey<I extends ImageBase<I>, IT extends Inver
 			AssociatedPairTrack p = l.getCookie();
 			if (p == null) {
 				l.cookie = p = new AssociatedPairTrack();
-				// little bit of trickery here.  Save the reference so that the point
+				// little bit of trickery here. Save the reference so that the point
 				// in the current frame is updated for free as PointTrack is
 				p.p2 = l.pixel;
 			}

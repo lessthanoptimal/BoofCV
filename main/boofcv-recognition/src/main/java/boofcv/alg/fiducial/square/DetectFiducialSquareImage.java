@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -37,7 +37,7 @@ import java.util.List;
 
 /**
  * <p>
- * Fiducial which uses images to describe arbitrary binary patterns.  When useing this fiducial it's up to the user to
+ * Fiducial which uses images to describe arbitrary binary patterns. When useing this fiducial it's up to the user to
  * select good images which will provide unique orientation and are easily distinguished against other patterns and
  * noise insensitive.
  * </p>
@@ -45,14 +45,14 @@ import java.util.List;
  * <img src="doc-files/square_image.png"/>
  * </center>
  * <p>
- * The above image visually shows the fiducials internal coordinate system.  The center of the fiducial is the origin
- * of the coordinate system, e.g. all sides are width/2 distance away from the origin.  +x is to the right, +y is up
+ * The above image visually shows the fiducials internal coordinate system. The center of the fiducial is the origin
+ * of the coordinate system, e.g. all sides are width/2 distance away from the origin. +x is to the right, +y is up
  * , and +z out of the paper towards the viewer.
  * </p>
  * <p>
- * A good pattern will have thick lines or thick shapes.  When detecting the image it's not uncommon for the distortion
- * removal to be off by one or two pixels.  So think lines are be completely out of synch.  The image should also
- * be chosen so that there is to rotational ambiguity.  A perfect circle in the center is an example of a bad fiducial
+ * A good pattern will have thick lines or thick shapes. When detecting the image it's not uncommon for the distortion
+ * removal to be off by one or two pixels. So think lines are be completely out of synch. The image should also
+ * be chosen so that there is to rotational ambiguity. A perfect circle in the center is an example of a bad fiducial
  * in which orientation can't be uniquely determined.
  * </p>
  * @author Peter Abeles
@@ -102,12 +102,12 @@ public class DetectFiducialSquareImage<T extends ImageGray<T>>
 	}
 
 	/**
-	 * Adds a new image to the detector.  Image must be gray-scale and is converted into
-	 * a binary image using the specified threshold.  All input images are rescaled to be
-	 * square and of the appropriate size.  Thus the original shape of the image doesn't
-	 * matter.  Square shapes are highly recommended since that's what the target looks like.
+	 * Adds a new image to the detector. Image must be gray-scale and is converted into
+	 * a binary image using the specified threshold. All input images are rescaled to be
+	 * square and of the appropriate size. Thus the original shape of the image doesn't
+	 * matter. Square shapes are highly recommended since that's what the target looks like.
 	 *
-	 * @param inputBinary Binary input image pattern.  0 = black, 1 = white.
+	 * @param inputBinary Binary input image pattern. 0 = black, 1 = white.
 	 * @param lengthSide How long one of the sides of the target is in world units.
 	 * @return The ID of the provided image
 	 */
@@ -117,7 +117,7 @@ public class DetectFiducialSquareImage<T extends ImageGray<T>>
 		} else if( lengthSide <= 0 ) {
 			throw new IllegalArgumentException("Parameter lengthSide must be more than zero");
 		} else if(ImageStatistics.max(inputBinary) > 1 )
-			throw new IllegalArgumentException("A binary image is composed on 0 and 1 pixels.  This isn't binary!");
+			throw new IllegalArgumentException("A binary image is composed on 0 and 1 pixels. This isn't binary!");
 
 		// see if it needs to be resized
 		if ( inputBinary.width != squareLength || inputBinary.height != squareLength ) {
@@ -206,7 +206,7 @@ public class DetectFiducialSquareImage<T extends ImageGray<T>>
 	}
 
 	/**
-	 * Computes the hamming score between two descriptions.  Larger the number better the fit
+	 * Computes the hamming score between two descriptions. Larger the number better the fit
 	 */
 	protected int hamming(short[] a, short[] b) {
 		int distance = 0;

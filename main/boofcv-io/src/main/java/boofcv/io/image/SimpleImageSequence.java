@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -22,7 +22,7 @@ import boofcv.struct.image.ImageBase;
 import boofcv.struct.image.ImageType;
 
 /**
- * Simplified interface for reading in a sequence of images.  This interface hides the complexities of reading
+ * Simplified interface for reading in a sequence of images. This interface hides the complexities of reading
  * from different file formats and from live video streams.
  *
  * @author Peter Abeles
@@ -58,8 +58,8 @@ public interface SimpleImageSequence<T extends ImageBase<T>> {
 	T getImage();
 
 	/**
-	 * Returns the image in the original format that it was read in as.  When dealing with swing or any standard
-	 * Java SE environment this will almost always be BufferedImage.  The type has been abstracted out
+	 * Returns the image in the original format that it was read in as. When dealing with swing or any standard
+	 * Java SE environment this will almost always be BufferedImage. The type has been abstracted out
 	 * to provide better Android support.
 	 */
 	<InternalImage> InternalImage getGuiImage();

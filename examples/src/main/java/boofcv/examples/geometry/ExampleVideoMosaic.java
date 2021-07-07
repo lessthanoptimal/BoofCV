@@ -45,10 +45,10 @@ import java.awt.*;
 import java.awt.image.BufferedImage;
 
 /**
- * Example of how to create a mosaic from a video sequence using StitchingFromMotion2D.  Mosaics work best
- * when the scene being observed is far away or a flat surface.  The camera motion should typically be rotational only,
- * but translation can work depending on the scene's geometry.  Motion blur and cheap cameras in general will degrade
- * performance significantly with the current algorithm.  This example just demonstrates a gray scale image, but
+ * Example of how to create a mosaic from a video sequence using StitchingFromMotion2D. Mosaics work best
+ * when the scene being observed is far away or a flat surface. The camera motion should typically be rotational only,
+ * but translation can work depending on the scene's geometry. Motion blur and cheap cameras in general will degrade
+ * performance significantly with the current algorithm. This example just demonstrates a gray scale image, but
  * with additional work color images can also be processed.
  *
  * @author Peter Abeles

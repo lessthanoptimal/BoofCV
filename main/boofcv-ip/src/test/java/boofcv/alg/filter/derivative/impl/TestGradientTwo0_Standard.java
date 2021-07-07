@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -35,8 +35,7 @@ public class TestGradientTwo0_Standard extends BoofStandardJUnit {
 	int width = 20;
 	int height = 25;
 
-	@Test
-	public void compareToConvolve_I8() throws NoSuchMethodException {
+	@Test void compareToConvolve_I8() throws NoSuchMethodException {
 		CompareDerivativeToConvolution validator = new CompareDerivativeToConvolution();
 		validator.setTarget(GradientTwo0_Standard.class.getMethod("process",
 				GrayU8.class, GrayS16.class, GrayS16.class ));
@@ -52,8 +51,7 @@ public class TestGradientTwo0_Standard extends BoofStandardJUnit {
 		validator.compare(false,input,derivX,derivY);
 	}
 
-	@Test
-	public void compareToConvolve_F32() throws NoSuchMethodException {
+	@Test void compareToConvolve_F32() throws NoSuchMethodException {
 		CompareDerivativeToConvolution validator = new CompareDerivativeToConvolution();
 		validator.setTarget(GradientTwo0_Standard.class.getMethod("process",
 				GrayF32.class, GrayF32.class, GrayF32.class ));

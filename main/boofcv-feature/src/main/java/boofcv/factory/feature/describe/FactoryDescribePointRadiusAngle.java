@@ -77,7 +77,7 @@ public class FactoryDescribePointRadiusAngle {
 
 	/**
 	 * <p>
-	 * Creates a SURF descriptor.  SURF descriptors are invariant to illumination, orientation, and scale.
+	 * Creates a SURF descriptor. SURF descriptors are invariant to illumination, orientation, and scale.
 	 * BoofCV provides two variants. This SURF variant created here is designed for speed and sacrifices some stability.
 	 * Different descriptors are produced for gray-scale and color images.
 	 * </p>
@@ -123,8 +123,8 @@ public class FactoryDescribePointRadiusAngle {
 
 	/**
 	 * <p>
-	 * Creates a SURF descriptor.  SURF descriptors are invariant to illumination, orientation, and scale.
-	 * BoofCV provides two variants. The SURF variant created here is designed for stability.  Different
+	 * Creates a SURF descriptor. SURF descriptors are invariant to illumination, orientation, and scale.
+	 * BoofCV provides two variants. The SURF variant created here is designed for stability. Different
 	 * descriptors are produced for gray-scale and color images.
 	 * </p>
 	 *
@@ -179,7 +179,7 @@ public class FactoryDescribePointRadiusAngle {
 	 * </p>
 	 *
 	 * @param configSS SIFT scale-space configuration. Pass in null for default options.
-	 * @param configDescribe SIFT descriptor configuration.  Pass in null for default options.
+	 * @param configDescribe SIFT descriptor configuration. Pass in null for default options.
 	 * @return SIFT descriptor
 	 */
 	public static <T extends ImageGray<T>>
@@ -202,7 +202,7 @@ public class FactoryDescribePointRadiusAngle {
 	 * Creates a BRIEF descriptor.
 	 * </p>
 	 *
-	 * @param config Configuration for BRIEF descriptor.  If null then default is used.
+	 * @param config Configuration for BRIEF descriptor. If null then default is used.
 	 * @param imageType Type of gray scale image it processes.
 	 * @return BRIEF descriptor
 	 * @see boofcv.alg.feature.describe.DescribePointBrief
@@ -247,7 +247,7 @@ public class FactoryDescribePointRadiusAngle {
 	}
 
 	/**
-	 * Creates a region descriptor based on pixel intensity values alone.  A classic and fast to compute
+	 * Creates a region descriptor based on pixel intensity values alone. A classic and fast to compute
 	 * descriptor, but much less stable than more modern ones.
 	 *
 	 * @param regionWidth How wide the pixel region is.
@@ -264,7 +264,7 @@ public class FactoryDescribePointRadiusAngle {
 	}
 
 	/**
-	 * Creates a region descriptor based on normalized pixel intensity values alone.  This descriptor
+	 * Creates a region descriptor based on normalized pixel intensity values alone. This descriptor
 	 * is designed to be light invariance, but is still less stable than more modern ones.
 	 *
 	 * @param regionWidth How wide the pixel region is.

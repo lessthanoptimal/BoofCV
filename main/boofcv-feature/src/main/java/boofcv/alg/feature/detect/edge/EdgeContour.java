@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -22,7 +22,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Data structure containing the contour along an edge.  Multiple paths along the edge are handled by creating
+ * Data structure containing the contour along an edge. Multiple paths along the edge are handled by creating
  * multiple segments at decision points.
  *
  * @author Peter Abeles

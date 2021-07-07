@@ -18,16 +18,15 @@
 
 package boofcv.alg.feature.detect.intensity.impl;
 
-import javax.annotation.Generated;
 import boofcv.alg.transform.ii.DerivativeIntegralImage;
-import boofcv.alg.transform.ii.IntegralImageOps;
 import boofcv.alg.transform.ii.IntegralKernel;
+import boofcv.concurrency.BoofConcurrency;
 import boofcv.struct.image.GrayF32;
 import boofcv.struct.image.GrayS32;
 import org.jetbrains.annotations.Nullable;
 
 import javax.annotation.Generated;
-import boofcv.concurrency.BoofConcurrency;
+
 import static boofcv.alg.feature.detect.intensity.impl.ImplIntegralImageFeatureIntensity.computeHessian;
 
 /**
@@ -91,7 +90,7 @@ public class ImplIntegralImageFeatureIntensity_MT {
 
 
 	/**
-	 * Optimizes intensity for the inner image.  
+	 * Optimizes intensity for the inner image.
 	 */
 	public static void hessianInner( GrayF32 integral, int skip , int size ,
 									 GrayF32 intensity) {
@@ -226,7 +225,7 @@ public class ImplIntegralImageFeatureIntensity_MT {
 
 
 	/**
-	 * Optimizes intensity for the inner image.  
+	 * Optimizes intensity for the inner image.
 	 */
 	public static void hessianInner( GrayS32 integral, int skip , int size ,
 									 GrayF32 intensity) {

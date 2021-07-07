@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -250,7 +250,7 @@ public class GenerateImplEnhanceHistogram extends CodeGeneratorBase {
 		String bitwise = image.getBitWise();
 
 		out.println("\t/**\n" +
-				"\t * Local equalization along a row.  Image must be at least the histogram's width (2*r+1) in width and height.\n" +
+				"\t * Local equalization along a row. Image must be at least the histogram's width (2*r+1) in width and height.\n" +
 				"\t */\n" +
 				"\tpublic static void equalizeLocalRow( "+name+" input, int radius, int histogramLength, int startY, "+name+" output,\n" +
 				"\t\t\t\t\t\t\t\t\t\t GrowArray<DogArray_I32> workspaces ) {\n" +
@@ -356,7 +356,7 @@ public class GenerateImplEnhanceHistogram extends CodeGeneratorBase {
 		String bitwise = image.getBitWise();
 
 		out.print("\t/**\n" +
-				"\t * Local equalization along a column.  Image must be at least the histogram's width (2*r+1) in width and height.\n" +
+				"\t * Local equalization along a column. Image must be at least the histogram's width (2*r+1) in width and height.\n" +
 				"\t */\n" +
 				"\tpublic static void equalizeLocalCol( "+name+" input, int radius, int histogramLength, int startX, "+name+" output,\n" +
 				"\t\t\t\t\t\t\t\t\t\t GrowArray<DogArray_I32> workspaces ) {\n" +
@@ -377,7 +377,7 @@ public class GenerateImplEnhanceHistogram extends CodeGeneratorBase {
 				"\t\t\thist0 = hist1 - width;\n" +
 				"\t\t}\n" +
 				"\n" +
-				"\t\t// initialize the histogram.  ignore top border\n" +
+				"\t\t// initialize the histogram. ignore top border\n" +
 				"\t\tlocalHistogram(input,hist0,0,hist1,width,histogram);\n" +
 				"\n" +
 				"\t\t// compute transformation table\n" +

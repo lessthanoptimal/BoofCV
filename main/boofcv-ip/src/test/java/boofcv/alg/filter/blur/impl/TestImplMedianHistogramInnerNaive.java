@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -32,8 +32,7 @@ import java.util.Random;
  */
 public class TestImplMedianHistogramInnerNaive extends BoofStandardJUnit {
 
-	@Test
-	public void compareToSort() {
+	@Test void compareToSort() {
 		GrayU8 image = new GrayU8(20,30);
 		ImageMiscOps.fillUniform(image,new Random(234), 0, 100);
 

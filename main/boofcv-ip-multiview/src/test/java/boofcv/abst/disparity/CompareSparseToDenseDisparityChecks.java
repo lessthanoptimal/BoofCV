@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -71,15 +71,13 @@ public abstract class CompareSparseToDenseDisparityChecks<T extends ImageGray<T>
 		return FactoryStereoDisparity.sparseRectifiedBM(config, imageType.getImageClass());
 	}
 
-	@Test
-	public void checkSubpixel() {
+	@Test void checkSubpixel() {
 		ConfigDisparityBM config = createConfig();
 		config.subpixel = false;
 		compareResults(config);
 	}
 
-	@Test
-	public void checkTexture() {
+	@Test void checkTexture() {
 		ConfigDisparityBM config = createConfig();
 		config.subpixel = true;
 		config.texture = 0.0; // disable
@@ -88,8 +86,7 @@ public abstract class CompareSparseToDenseDisparityChecks<T extends ImageGray<T>
 		compareResults(config);
 	}
 
-	@Test
-	public void checkRtoL() {
+	@Test void checkRtoL() {
 		ConfigDisparityBM config = createConfig();
 		// Set the min to be not zero as a way to make sure it's handled correctly
 		config.disparityMin = 2;
@@ -105,8 +102,7 @@ public abstract class CompareSparseToDenseDisparityChecks<T extends ImageGray<T>
 		}
 	}
 
-	@Test
-	public void checkDisparityMin() {
+	@Test void checkDisparityMin() {
 		ConfigDisparityBM config = createConfig();
 		config.subpixel = true;
 		config.disparityMin = 2;
@@ -116,8 +112,7 @@ public abstract class CompareSparseToDenseDisparityChecks<T extends ImageGray<T>
 		compareResults(config);
 	}
 
-	@Test
-	public void checkRegion() {
+	@Test void checkRegion() {
 		ConfigDisparityBM config = createConfig();
 		config.regionRadiusX = 5;
 		config.regionRadiusY = 2;

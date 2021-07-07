@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -49,8 +49,7 @@ public class TestSegmentMeanShiftSearchColor extends BoofStandardJUnit {
 	/**
 	 * Process a random image and do a basic sanity check on the output
 	 */
-	@Test
-	public void simpleTest() {
+	@Test void simpleTest() {
 		Planar<GrayF32> image = new Planar<>(GrayF32.class,20,25,2);
 
 		GImageMiscOps.fillUniform(image, rand, 0, 256);
@@ -93,8 +92,7 @@ public class TestSegmentMeanShiftSearchColor extends BoofStandardJUnit {
 		}
 	}
 
-	@Test
-	public void findPeak_inside() {
+	@Test void findPeak_inside() {
 		Planar<GrayF32> image = new Planar<>(GrayF32.class,20,25,2);
 
 		GImageMiscOps.fillRectangle(image, 20, 4, 2, 5, 5);
@@ -112,8 +110,7 @@ public class TestSegmentMeanShiftSearchColor extends BoofStandardJUnit {
 		assertEquals(4, alg.modeY, 0.5f);
 	}
 
-	@Test
-	public void findPeak_border() {
+	@Test void findPeak_border() {
 		findPeak_border(2, 2, 0, 0);
 		findPeak_border(17, 22, 19, 24);
 	}
@@ -138,8 +135,7 @@ public class TestSegmentMeanShiftSearchColor extends BoofStandardJUnit {
 	/**
 	 * Identical results should be produced for gray scale algorithm and color algorithm when there is a single band
 	 */
-	@Test
-	public void compareToGray() {
+	@Test void compareToGray() {
 		compareToGray(false);
 		compareToGray(true);
 	}

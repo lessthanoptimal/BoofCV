@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -51,8 +51,7 @@ public class TestRectifyFundamental extends BoofStandardJUnit {
 	Se3_F64 motion;
 	DMatrixRMaj F;
 
-	@Test
-	public void rotateEpipole() {
+	@Test void rotateEpipole() {
 		Point3D_F64 epipole = new Point3D_F64(1250,210,0.5);
 
 		int cx = 400,cy=350;
@@ -72,8 +71,7 @@ public class TestRectifyFundamental extends BoofStandardJUnit {
 	/**
 	 * Checks to see that the epipoles go to infinity after applying the transforms
 	 */
-	@Test
-	public void checkEpipoles() {
+	@Test void checkEpipoles() {
 		createScene();
 
 		// extract eipoles
@@ -105,8 +103,7 @@ public class TestRectifyFundamental extends BoofStandardJUnit {
 	/**
 	 * See if the transform align an observation to the same y-axis
 	 */
-	@Test
-	public void alignY() {
+	@Test void alignY() {
 		createScene();
 
 		RectifyFundamental alg = new RectifyFundamental();

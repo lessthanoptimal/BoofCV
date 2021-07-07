@@ -48,8 +48,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  */
 public class TestSelfCalibrationLinearDualQuadratic extends CommonAutoCalibrationChecks {
 
-	@Test
-	public void solve_ZeroCP() {
+	@Test void solve_ZeroCP() {
 		List<CameraPinhole> intrinsics = new ArrayList<>();
 		for (int i = 0; i < 5; i++) {
 			intrinsics.add(new CameraPinhole(400 + i*5, 420, 0.1, 0, 0, 0, 0));
@@ -58,8 +57,7 @@ public class TestSelfCalibrationLinearDualQuadratic extends CommonAutoCalibratio
 		checkSolve(intrinsics, false, false, 5);
 	}
 
-	@Test
-	public void solve_ZeroCP_ZSkew() {
+	@Test void solve_ZeroCP_ZSkew() {
 		List<CameraPinhole> intrinsics = new ArrayList<>();
 		for (int i = 0; i < 4; i++) {
 			intrinsics.add(new CameraPinhole(400 + i*5, 420, 0, 0, 0, 0, 0));
@@ -68,8 +66,7 @@ public class TestSelfCalibrationLinearDualQuadratic extends CommonAutoCalibratio
 		checkSolve(intrinsics, false, true, 4);
 	}
 
-	@Test
-	public void solve_ZeroCP_ZSkew_Aspect() {
+	@Test void solve_ZeroCP_ZSkew_Aspect() {
 		List<CameraPinhole> intrinsics = new ArrayList<>();
 		for (int i = 0; i < 3; i++) {
 			intrinsics.add(new CameraPinhole((400 + i*5)*1.05, 400 + i*5, 0, 0, 0, 0, 0));
@@ -80,8 +77,7 @@ public class TestSelfCalibrationLinearDualQuadratic extends CommonAutoCalibratio
 	/**
 	 * Create a trifocal tensor, extract camera matrices, and see if it can find the solution
 	 */
-	@Test
-	public void solveWithTrificalInput() {
+	@Test void solveWithTrificalInput() {
 		CameraPinhole intrinsic = new CameraPinhole(500, 500, 0, 0, 0, 0, 0);
 
 		List<CameraPinhole> intrinsics = new ArrayList<>();
@@ -165,8 +161,7 @@ public class TestSelfCalibrationLinearDualQuadratic extends CommonAutoCalibratio
 		}
 	}
 
-	@Test
-	public void geometry_no_rotation() {
+	@Test void geometry_no_rotation() {
 		CameraPinhole intrinsic = new CameraPinhole(400, 420, 0.1, 0, 0, 0, 0);
 		renderTranslationOnly(intrinsic);
 
@@ -176,8 +171,7 @@ public class TestSelfCalibrationLinearDualQuadratic extends CommonAutoCalibratio
 		assertEquals(GeometricResult.GEOMETRY_POOR, alg.solve());
 	}
 
-	@Test
-	public void geometry_no_translation() {
+	@Test void geometry_no_translation() {
 		CameraPinhole intrinsic = new CameraPinhole(400, 420, 0.1, 0, 0, 0, 0);
 		renderRotationOnly(intrinsic);
 
@@ -187,8 +181,7 @@ public class TestSelfCalibrationLinearDualQuadratic extends CommonAutoCalibratio
 		assertEquals(GeometricResult.GEOMETRY_POOR, alg.solve());
 	}
 
-	@Test
-	public void constructMatrix() {
+	@Test void constructMatrix() {
 		List<CameraPinhole> intrinsics = new ArrayList<>();
 		for (int i = 0; i < 10; i++) {
 			intrinsics.add(new CameraPinhole(400 + i*5, 420, 0.1, 0, 0, 0, 0));

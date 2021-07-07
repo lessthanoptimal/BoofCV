@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -40,8 +40,7 @@ public class TestSelectOverheadParameters extends BoofStandardJUnit {
 
 	double cellSize = 0.05;
 
-	@Test
-	public void pointedStraightDown() {
+	@Test void pointedStraightDown() {
 		createExtrinsic(-2, -Math.PI/2, 0);
 
 		SelectOverheadParameters alg = new SelectOverheadParameters(cellSize, 5, 1);
@@ -65,8 +64,7 @@ public class TestSelectOverheadParameters extends BoofStandardJUnit {
 		assertEquals(alg.getCenterY(), mapHeight/2.0, cellSize);
 	}
 
-	@Test
-	public void checkFailure() {
+	@Test void checkFailure() {
 		SelectOverheadParameters alg = new SelectOverheadParameters(cellSize, 5, 1);
 
 		// look up away from the map, should fail
@@ -78,8 +76,7 @@ public class TestSelectOverheadParameters extends BoofStandardJUnit {
 		assertTrue(alg.process(param, planeToCamera));
 	}
 
-	@Test
-	public void pointedAngle() {
+	@Test void pointedAngle() {
 		createExtrinsic(-2, UtilAngle.degreeToRadian(-45), 0);
 
 		SelectOverheadParameters alg = new SelectOverheadParameters(cellSize, 5, 1);

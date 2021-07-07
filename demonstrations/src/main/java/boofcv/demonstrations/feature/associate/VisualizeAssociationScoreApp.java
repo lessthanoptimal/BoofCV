@@ -55,7 +55,7 @@ import java.util.List;
 
 /**
  * Shows how tightly focused the score is around the best figure by showing the relative
- * size and number of features which have a similar score visually in the image.  For example,
+ * size and number of features which have a similar score visually in the image. For example,
  * lots of other features with similar sized circles means the distribution is spread widely
  * while only one or two small figures means it is very narrow.
  *
@@ -158,7 +158,7 @@ public class VisualizeAssociationScoreApp<T extends ImageGray<T>, D extends Imag
 	}
 
 	/**
-	 * Extracts image information and then passes that info onto scorePanel for display.  Data is not
+	 * Extracts image information and then passes that info onto scorePanel for display. Data is not
 	 * recycled to avoid threading issues.
 	 */
 	private void processImage() {

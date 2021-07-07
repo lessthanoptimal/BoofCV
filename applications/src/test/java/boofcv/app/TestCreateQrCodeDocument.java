@@ -50,8 +50,7 @@ public class TestCreateQrCodeDocument extends CommonFiducialPdfChecks {
 		err.used = false;
 	}
 
-	@Test
-	public void single() throws IOException {
+	@Test void single() throws IOException {
 		createDocument("-t http://boofcv.org -p LETTER -w 5 -o target.pdf");
 		BufferedImage image = loadPDF();
 
@@ -70,8 +69,7 @@ public class TestCreateQrCodeDocument extends CommonFiducialPdfChecks {
 		checkFound(found, "http://boofcv.org");
 	}
 
-	@Test
-	public void two() throws IOException {
+	@Test void two() throws IOException {
 		createDocument("-t http://boofcv.org -t second -p LETTER -w 5 -o target.pdf");
 		BufferedImage image = loadPDF();
 
@@ -91,8 +89,7 @@ public class TestCreateQrCodeDocument extends CommonFiducialPdfChecks {
 		checkFound(found, "http://boofcv.org", "second");
 	}
 
-	@Test
-	public void gridAndCustomDocument() throws IOException {
+	@Test void gridAndCustomDocument() throws IOException {
 		createDocument("-t http://boofcv.org -t second -p 14cm:14cm --GridFill -w 5 -o target.pdf");
 		BufferedImage image = loadPDF();
 

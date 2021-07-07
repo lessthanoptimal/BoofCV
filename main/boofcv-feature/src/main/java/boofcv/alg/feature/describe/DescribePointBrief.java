@@ -26,8 +26,8 @@ import boofcv.struct.image.ImageGray;
 
 /**
  * <p>
- * BRIEF: Binary Robust Independent Elementary Features. [1] Invariance: light.  Fast to compute
- * and to compare feature descriptions.  A variant on {@link DescribePointBinaryCompare} where the descriptor
+ * BRIEF: Binary Robust Independent Elementary Features. [1] Invariance: light. Fast to compute
+ * and to compare feature descriptions. A variant on {@link DescribePointBinaryCompare} where the descriptor
  * is computed from a single, randomly generated {@link BinaryCompareDefinition_I32 definition} after the image
  * has been blurred.
  * </p>
@@ -77,7 +77,7 @@ public class DescribePointBrief<T extends ImageGray<T>> {
 	}
 
 	/**
-	 * Computes the descriptor at the specified point.  If the region go outside of the image then a description
+	 * Computes the descriptor at the specified point. If the region go outside of the image then a description
 	 * will not be made.
 	 *
 	 * @param c_x Center of region being described.

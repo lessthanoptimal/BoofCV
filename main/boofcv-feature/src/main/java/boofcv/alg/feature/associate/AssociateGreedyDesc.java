@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -26,15 +26,15 @@ import org.ddogleg.struct.FastAccess;
 
 /**
  * <p>
- * Brute force greedy association for objects described by a {@link TupleDesc_F64}.  An
+ * Brute force greedy association for objects described by a {@link TupleDesc_F64}. An
  * object is associated with whichever object has the best fit score and every possible combination
- * is examined.  If there are a large number of features this can be quite slow.
+ * is examined. If there are a large number of features this can be quite slow.
  * </p>
  *
  * <p>
  * Optionally, backwards validation can be used to reduce the number of false associations.
  * Backwards validation works by checking to see if two objects are mutually the best association
- * for each other.  First an association is found from src to dst, then the best fit in dst is
+ * for each other. First an association is found from src to dst, then the best fit in dst is
  * associated with feature in src.
  * </p>
  *

@@ -39,7 +39,7 @@ import java.util.List;
 public class UtilFeature {
 	/**
 	 * Creates a DogArray and declares new instances of the descriptor using the provided
-	 * {@link DetectDescribePoint}.  The array will have declareInstance set to true, otherwise
+	 * {@link DetectDescribePoint}. The array will have declareInstance set to true, otherwise
 	 * why would you be using this function?
 	 */
 	public static <TD extends TupleDesc<TD>>
@@ -54,11 +54,11 @@ public class UtilFeature {
 	}
 
 	/**
-	 * Concats the list of tuples together into one big feature.  The combined feature must be large
+	 * Concats the list of tuples together into one big feature. The combined feature must be large
 	 * enough to store all the inputs.
 	 *
 	 * @param inputs List of tuples.
-	 * @param combined Storage for combined output.  If null a new instance will be declared.
+	 * @param combined Storage for combined output. If null a new instance will be declared.
 	 * @return Resulting combined.
 	 */
 	public static TupleDesc_F64 combine( List<TupleDesc_F64> inputs , TupleDesc_F64 combined ) {
@@ -85,7 +85,7 @@ public class UtilFeature {
 
 	/**
 	 * <p>
-	 * Normalized the tuple such that the L2-norm is equal to 1.  This is also often referred to as
+	 * Normalized the tuple such that the L2-norm is equal to 1. This is also often referred to as
 	 * the Euclidean or frobenius (all though that's a matrix norm).
 	 * </p>
 	 *

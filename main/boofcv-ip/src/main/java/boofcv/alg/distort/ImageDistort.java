@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -26,8 +26,8 @@ import georegression.struct.point.Point2D_F32;
 
 /**
  * Copies an image onto another image while applying a transform to the pixel coordinates.
- * Pixels outside the source image can be handled using the interpolations border or by simply skipping them.  This
- * behavior is set by calling the {@link #setRenderAll(boolean)} flag.  By Default it will render the entire image,
+ * Pixels outside the source image can be handled using the interpolations border or by simply skipping them. This
+ * behavior is set by calling the {@link #setRenderAll(boolean)} flag. By Default it will render the entire image,
  * even if pixel is outside the source image.
  *
  * @author Peter Abeles

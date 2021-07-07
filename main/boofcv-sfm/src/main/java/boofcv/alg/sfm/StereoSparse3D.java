@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -44,7 +44,7 @@ public class StereoSparse3D<T extends ImageGray<T>>
 	// storage for rectified pixel coordinate
 	private final Point2D_F64 pixelRect = new Point2D_F64();
 
-	// 3D coordinate in the left camera: in homogeneous coordinates.  w = disparity
+	// 3D coordinate in the left camera: in homogeneous coordinates. w = disparity
 	private final Point3D_F64 pointLeft = new Point3D_F64();
 	// Found disparity or the 4th-axis in homogeneous coordinates
 	private double w;

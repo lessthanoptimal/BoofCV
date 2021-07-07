@@ -75,8 +75,8 @@ import static boofcv.gui.BoofSwingUtil.KEY_PREVIOUS_DIRECTORY;
 import static boofcv.gui.BoofSwingUtil.saveDisparityDialog;
 
 /**
- * Computes and displays disparity from still disparity images.  The disparity can be viewed
- * as a color surface plot or as a 3D point cloud.  Different tuning parameters can be adjusted
+ * Computes and displays disparity from still disparity images. The disparity can be viewed
+ * as a color surface plot or as a 3D point cloud. Different tuning parameters can be adjusted
  * use a side control panel.
  *
  * @author Peter Abeles

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -36,9 +36,9 @@ import java.awt.image.BufferedImage;
 
 /**
  * Demonstration on how to use the high level {@link TrackerObjectQuad} interface for tracking objects in a
- * video sequence.  This interface allows the target to be specified using an arbitrary quadrilateral.  Specific
- * implementations might not support that shape, so they instead will track an approximation of it.  The
- * interface also allows information on target visibility to be returned.  As is usually the case, tracker
+ * video sequence. This interface allows the target to be specified using an arbitrary quadrilateral. Specific
+ * implementations might not support that shape, so they instead will track an approximation of it. The
+ * interface also allows information on target visibility to be returned. As is usually the case, tracker
  * specific information is lost in the high level interface and you should consider using the trackers
  * directly if more control is needed.
  *
@@ -51,7 +51,7 @@ public class ExampleTrackerObjectQuad {
 		MediaManager media = DefaultMediaManager.INSTANCE;
 		String fileName = UtilIO.pathExample("tracking/wildcat_robot.mjpeg");
 
-		// Create the tracker.  Comment/Uncomment to change the tracker.
+		// Create the tracker. Comment/Uncomment to change the tracker.
 		TrackerObjectQuad tracker =
 				FactoryTrackerObjectQuad.circulant(null, GrayU8.class);
 //				FactoryTrackerObjectQuad.sparseFlow(null,GrayU8.class,null);
@@ -60,7 +60,7 @@ public class ExampleTrackerObjectQuad {
 //				FactoryTrackerObjectQuad.meanShiftComaniciu2003(new ConfigComaniciu2003(true),ImageType.pl(3,GrayU8.class));
 
 				// Mean-shift likelihood will fail in this video, but is excellent at tracking objects with
-				// a single unique color.  See ExampleTrackerMeanShiftLikelihood
+				// a single unique color. See ExampleTrackerMeanShiftLikelihood
 //				FactoryTrackerObjectQuad.meanShiftLikelihood(30,5,255, MeanShiftLikelihoodType.HISTOGRAM,ImageType.pl(3,GrayU8.class));
 
 		SimpleImageSequence video = media.openVideo(fileName, tracker.getImageType());

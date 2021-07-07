@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -39,8 +39,7 @@ public abstract class GeneralCheckTriangulate2ViewsMetric extends BoofStandardJU
 	/**
 	 * See if it can triangulate perfect observations
 	 */
-	@Test
-	public void triangulate() {
+	@Test void triangulate() {
 		Point3D_F64 world = new Point3D_F64(0.5, -0.1, 4);
 
 		Se3_F64 worldToA = new Se3_F64();

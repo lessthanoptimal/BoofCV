@@ -22,7 +22,7 @@ import boofcv.struct.image.ImageBase;
 
 /**
  * A wrapper around a normal image that returns a numeric value if a pixel is requested that is outside of the image
- * boundary.  The additional sanity checks can significantly slow down algorithms and should only be used when needed.
+ * boundary. The additional sanity checks can significantly slow down algorithms and should only be used when needed.
  *
  * @author Peter Abeles
  */

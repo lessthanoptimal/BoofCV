@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -75,12 +75,12 @@ public class ConvertNV21 {
 	}
 
 	/**
-	 * Converts an NV21 image into a gray scale image.  Image type is determined at runtime.
+	 * Converts an NV21 image into a gray scale image. Image type is determined at runtime.
 	 *
 	 * @param data Input: NV21 image data
 	 * @param width Input: NV21 image width
 	 * @param height Input: NV21 image height
-	 * @param output Output: Optional storage for output image.  Can be null.
+	 * @param output Output: Optional storage for output image. Can be null.
 	 * @param outputType  Output: Type of output image
 	 * @param <T> Output image type
 	 * @return Gray scale image
@@ -104,7 +104,7 @@ public class ConvertNV21 {
 	 * @param data Input: NV21 image data
 	 * @param width Input: NV21 image width
 	 * @param height Input: NV21 image height
-	 * @param output Output: Optional storage for output image.  Can be null.
+	 * @param output Output: Optional storage for output image. Can be null.
 	 * @return Gray scale image
 	 */
 	public static GrayU8 nv21ToGray(byte[] data , int width , int height , GrayU8 output ) {
@@ -129,7 +129,7 @@ public class ConvertNV21 {
 	 * @param data Input: NV21 image data
 	 * @param width Input: NV21 image width
 	 * @param height Input: NV21 image height
-	 * @param output Output: Optional storage for output image.  Can be null.
+	 * @param output Output: Optional storage for output image. Can be null.
 	 * @return Gray scale image
 	 */
 	public static GrayF32 nv21ToGray(byte[] data , int width , int height , GrayF32 output ) {
@@ -154,7 +154,7 @@ public class ConvertNV21 {
 	 * @param data Input: NV21 image data
 	 * @param width Input: NV21 image width
 	 * @param height Input: NV21 image height
-	 * @param output Output: Optional storage for output image.  Can be null.
+	 * @param output Output: Optional storage for output image. Can be null.
 	 * @param outputType  Output: Type of output image
 	 * @param <T> Output image type
 	 */
@@ -177,7 +177,7 @@ public class ConvertNV21 {
 	 * @param data Input: NV21 image data
 	 * @param width Input: NV21 image width
 	 * @param height Input: NV21 image height
-	 * @param output Output: Optional storage for output image.  Can be null.
+	 * @param output Output: Optional storage for output image. Can be null.
 	 */
 	public static Planar<GrayU8> nv21ToPlanarYuv_U8(byte[] data , int width , int height ,
 													Planar<GrayU8> output ) {
@@ -201,7 +201,7 @@ public class ConvertNV21 {
 	 * @param data Input: NV21 image data
 	 * @param width Input: NV21 image width
 	 * @param height Input: NV21 image height
-	 * @param output Output: Optional storage for output image.  Can be null.
+	 * @param output Output: Optional storage for output image. Can be null.
 	 */
 	public static Planar<GrayU8> nv21TPlanarRgb_U8(byte[] data , int width , int height ,
 												   Planar<GrayU8> output ) {
@@ -226,7 +226,7 @@ public class ConvertNV21 {
 	 * @param data Input: NV21 image data
 	 * @param width Input: NV21 image width
 	 * @param height Input: NV21 image height
-	 * @param output Output: Optional storage for output image.  Can be null.
+	 * @param output Output: Optional storage for output image. Can be null.
 	 */
 	public static InterleavedU8 nv21ToInterleaved( byte[] data , int width , int height ,
 												   InterleavedU8 output ) {
@@ -250,7 +250,7 @@ public class ConvertNV21 {
 	 * @param data Input: NV21 image data
 	 * @param width Input: NV21 image width
 	 * @param height Input: NV21 image height
-	 * @param output Output: Optional storage for output image.  Can be null.
+	 * @param output Output: Optional storage for output image. Can be null.
 	 */
 	public static Planar<GrayF32> nv21TPlanarYuv_F32(byte[] data , int width , int height ,
 													 Planar<GrayF32> output ) {
@@ -275,7 +275,7 @@ public class ConvertNV21 {
 	 * @param data Input: NV21 image data
 	 * @param width Input: NV21 image width
 	 * @param height Input: NV21 image height
-	 * @param output Output: Optional storage for output image.  Can be null.
+	 * @param output Output: Optional storage for output image. Can be null.
 	 */
 	public static Planar<GrayF32> nv21ToPlanarRgb_F32(byte[] data , int width , int height ,
 													  Planar<GrayF32> output ) {
@@ -300,7 +300,7 @@ public class ConvertNV21 {
 	 * @param data Input: NV21 image data
 	 * @param width Input: NV21 image width
 	 * @param height Input: NV21 image height
-	 * @param output Output: Optional storage for output image.  Can be null.
+	 * @param output Output: Optional storage for output image. Can be null.
 	 */
 	public static InterleavedF32 nv21ToInterleaved( byte[] data , int width , int height ,
 															   InterleavedF32 output ) {

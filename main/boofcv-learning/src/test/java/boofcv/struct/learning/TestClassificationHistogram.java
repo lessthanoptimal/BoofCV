@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -27,8 +27,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
  * @author Peter Abeles
  */
 public class TestClassificationHistogram extends BoofStandardJUnit {
-	@Test
-	public void reset() {
+	@Test void reset() {
 		ClassificationHistogram alg = new ClassificationHistogram(3);
 		batch(alg,0,0,4);
 		batch(alg,0,1,8);
@@ -45,8 +44,7 @@ public class TestClassificationHistogram extends BoofStandardJUnit {
 	/**
 	 * Tests create confusion and increment.
 	 */
-	@Test
-	public void createConfusion() {
+	@Test void createConfusion() {
 
 		ClassificationHistogram alg = new ClassificationHistogram(3);
 		batch(alg,0,0,4);
@@ -81,8 +79,7 @@ public class TestClassificationHistogram extends BoofStandardJUnit {
 		}
 	}
 
-	@Test
-	public void get() {
+	@Test void get() {
 		ClassificationHistogram alg = new ClassificationHistogram(3);
 		batch(alg,0,0,4);
 		batch(alg,0,1,8);

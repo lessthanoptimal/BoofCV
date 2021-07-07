@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -36,14 +36,12 @@ public class TestPositionFromPairLinear2 extends ChecksMotionNPoint {
 
 	PositionFromPairLinear2 alg = new PositionFromPairLinear2();
 
-	@Test
-	public void minimalObservationTest() {
+	@Test void minimalObservationTest() {
 		standardTest(2);
 		planarTest(2);
 	}
 
-	@Test
-	public void overdetermined() {
+	@Test void overdetermined() {
 		standardTest(6);
 		planarTest(6);
 	}

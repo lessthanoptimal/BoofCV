@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -78,8 +78,7 @@ public class TestDistancePlane2DToPixelSq extends BoofStandardJUnit {
 		planeProjection.planeToPixel(planePtB.x, planePtB.y, pixelPtB);
 	}
 
-	@Test
-	public void perfect() {
+	@Test void perfect() {
 
 		pixelToNorm.compute(pixelPtB.x, pixelPtB.y, normPt);
 
@@ -88,8 +87,7 @@ public class TestDistancePlane2DToPixelSq extends BoofStandardJUnit {
 		assertEquals(0, error, 1e-8);
 	}
 
-	@Test
-	public void noisy() {
+	@Test void noisy() {
 
 		pixelToNorm.compute(pixelPtB.x + 2, pixelPtB.y, normPt);
 

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -27,7 +27,7 @@ import boofcv.struct.Configuration;
  */
 public class ConfigParamPolar implements Configuration {
 	/**
-	 * Resolution of line range in pixels.  Try 2
+	 * Resolution of line range in pixels. Try 2
 	 */
 	public double resolutionRange = 2;
 	/**

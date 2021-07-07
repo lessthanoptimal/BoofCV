@@ -55,9 +55,9 @@ import java.util.List;
 
 /**
  * Stereo visual odometry algorithm which relies on tracking features independently in the left and right images
- * and then matching those tracks together.  The idea behind this tracker is that the expensive task of association
- * features between left and right cameras only needs to be done once when track is spawned.  Triangulation
- * is used to estimate each feature's 3D location.  Motion is estimated robustly using a RANSAC type algorithm
+ * and then matching those tracks together. The idea behind this tracker is that the expensive task of association
+ * features between left and right cameras only needs to be done once when track is spawned. Triangulation
+ * is used to estimate each feature's 3D location. Motion is estimated robustly using a RANSAC type algorithm
  * provided by the user which internally uses {@link boofcv.abst.geo.Estimate1ofPnP PnP} type algorithm.
  *
  * Estimated motion is relative to left camera.
@@ -590,7 +590,7 @@ public class VisOdomDualTrackPnP<T extends ImageBase<T>, TD extends TupleDesc<TD
 
 		for (int i = 0; i < tracks.size(); i++) {
 			PointTrack t = tracks.get(i);
-			// ignoring the return value.  most descriptors never return false and the ones that due will rarely do so
+			// ignoring the return value. most descriptors never return false and the ones that due will rarely do so
 			describe.process(t.pixel.x, t.pixel.y, 0, describeRadius, descs.grow());
 
 			points.add(t.pixel);
@@ -605,7 +605,7 @@ public class VisOdomDualTrackPnP<T extends ImageBase<T>, TD extends TupleDesc<TD
 	/**
 	 * If there are no candidates then a fault happened.
 	 *
-	 * @return true if fault.  false is no fault
+	 * @return true if fault. false is no fault
 	 */
 	public boolean isFault() {
 		return candidates.isEmpty();

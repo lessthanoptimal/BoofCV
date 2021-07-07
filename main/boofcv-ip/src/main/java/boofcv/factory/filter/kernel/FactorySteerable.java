@@ -31,7 +31,7 @@ import boofcv.struct.image.ImageGray;
 
 /**
  * <p>
- * Creates different steerable kernels.  Steerable kernels are kernels which can be computed at an arbitrary angle easily
+ * Creates different steerable kernels. Steerable kernels are kernels which can be computed at an arbitrary angle easily
  * and efficiently using a set of bases.
  * </p>
  *
@@ -41,12 +41,12 @@ import boofcv.struct.image.ImageGray;
 public class FactorySteerable {
 
 	/**
-	 * Steerable filter for 2D Gaussian derivatives.  The basis is composed of a set of rotated kernels.
+	 * Steerable filter for 2D Gaussian derivatives. The basis is composed of a set of rotated kernels.
 	 *
 	 * @param kernelType Specifies which type of 2D kernel should be generated.
 	 * @param orderX Order of the derivative in the x-axis.
 	 * @param orderY Order of the derivative in the y-axis.
-	 * @param radius Radius of the kernel.  @return Steerable kernel generator for the specified gaussian derivative.
+	 * @param radius Radius of the kernel. @return Steerable kernel generator for the specified gaussian derivative.
 	 */
 	public static <K extends Kernel2D> SteerableKernel<K> gaussian( Class<K> kernelType, int orderX, int orderY, double sigma, int radius ) {
 		if (orderX < 0 || orderX > 4)

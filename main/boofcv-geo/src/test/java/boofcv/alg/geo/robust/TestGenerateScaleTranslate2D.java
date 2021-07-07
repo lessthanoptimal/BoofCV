@@ -32,8 +32,7 @@ import static org.junit.jupiter.api.Assertions.*;
  * @author Peter Abeles
  */
 public class TestGenerateScaleTranslate2D extends BoofStandardJUnit {
-	@Test
-	public void perfect() {
+	@Test void perfect() {
 		ScaleTranslate2D model = new ScaleTranslate2D(1.5, -2, 3);
 
 		AssociatedPair a = TestDistanceScaleTranslate2DSq.apply(-5, 4, model);
@@ -53,10 +52,9 @@ public class TestGenerateScaleTranslate2D extends BoofStandardJUnit {
 	}
 
 	/**
-	 * Both points are at 0,0.  Scale can't be resolved
+	 * Both points are at 0,0. Scale can't be resolved
 	 */
-	@Test
-	public void pathological_noscale() {
+	@Test void pathological_noscale() {
 		ScaleTranslate2D model = new ScaleTranslate2D(1.5, -2, 3);
 
 		AssociatedPair a = TestDistanceScaleTranslate2DSq.apply(0, 0, model);
@@ -72,10 +70,9 @@ public class TestGenerateScaleTranslate2D extends BoofStandardJUnit {
 	}
 
 	/**
-	 * Possible pathological case.  One point is at zero.
+	 * Possible pathological case. One point is at zero.
 	 */
-	@Test
-	public void onePointAtZero_a() {
+	@Test void onePointAtZero_a() {
 		ScaleTranslate2D model = new ScaleTranslate2D(1.5, -2, 3);
 
 		AssociatedPair a = TestDistanceScaleTranslate2DSq.apply(0, 0, model);
@@ -94,8 +91,7 @@ public class TestGenerateScaleTranslate2D extends BoofStandardJUnit {
 		assertEquals(model.scale, found.scale, 1e-8);
 	}
 
-	@Test
-	public void getMinimumPoints() {
+	@Test void getMinimumPoints() {
 		GenerateScaleTranslate2D alg = new GenerateScaleTranslate2D();
 		assertEquals(2, alg.getMinimumPoints());
 	}

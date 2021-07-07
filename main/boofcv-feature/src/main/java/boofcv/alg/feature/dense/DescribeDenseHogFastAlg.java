@@ -32,11 +32,11 @@ import java.util.List;
 /**
  * <p>
  * A variant on the original Histogram of Oriented Gradients (HOG) [1] in which spatial Gaussian weighting
- * has been omitted, allowing for cell histograms to be computed only once.  This results in about a
+ * has been omitted, allowing for cell histograms to be computed only once. This results in about a
  * two times speed up.
  * </p>
  *
- * <p>For a description of standard HOG see {@link DescribeImageDenseHoG}.  Difference from standard HOG</p>
+ * <p>For a description of standard HOG see {@link DescribeImageDenseHoG}. Difference from standard HOG</p>
  * <ul>
  *     <li>No gaussian spatial weighting for each pixel inside a block</li>
  *     <li>No bilinear interpolation between cell centers</li>
@@ -59,8 +59,8 @@ public class DescribeDenseHogFastAlg<Input extends ImageBase<Input>> extends Bas
 	/**
 	 * Configures HOG descriptor computation
 	 *
-	 * @param orientationBins Number of bins in a cell's histogram.  9 recommended
-	 * @param pixelsPerCell Number of pixel's wide a cell is.  8 recommended
+	 * @param orientationBins Number of bins in a cell's histogram. 9 recommended
+	 * @param pixelsPerCell Number of pixel's wide a cell is. 8 recommended
 	 * @param cellsPerBlockX Number of cells's wide a block is. 3 recommended
 	 * @param cellsPerBlockY Number of cells's wide a block is. 3 recommended
 	 * @param stepBlock Number of cells which are skipped between each block
@@ -79,7 +79,7 @@ public class DescribeDenseHogFastAlg<Input extends ImageBase<Input>> extends Bas
 		locations.reset();
 		descriptions.reset();
 
-		// see if the cell array needs to grow for this image.  Recycle data when growing
+		// see if the cell array needs to grow for this image. Recycle data when growing
 		growCellArray(derivX.width, derivX.height);
 
 		computeCellHistograms();
@@ -95,7 +95,7 @@ public class DescribeDenseHogFastAlg<Input extends ImageBase<Input>> extends Bas
 	}
 
 	/**
-	 * Determines if the cell array needs to grow.  If it does a new array is declared.  Old data is recycled when
+	 * Determines if the cell array needs to grow. If it does a new array is declared. Old data is recycled when
 	 * possible
 	 */
 	void growCellArray( int imageWidth, int imageHeight ) {
@@ -140,7 +140,7 @@ public class DescribeDenseHogFastAlg<Input extends ImageBase<Input>> extends Bas
 	}
 
 	/**
-	 * Compute the descriptor from the specified cells.  (row,col) to (row+w,col+w)
+	 * Compute the descriptor from the specified cells. (row,col) to (row+w,col+w)
 	 *
 	 * @param row Lower extent of cell rows
 	 * @param col Lower extent of cell columns

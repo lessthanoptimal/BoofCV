@@ -36,21 +36,21 @@ import java.util.Random;
 /**
  * <p>
  * Tracker that uses the theory of Circulant matrices, Discrete Fourier Transform (DCF), and linear classifiers to track
- * a target and learn its changes in appearance [1].  The target is assumed to be rectangular and has fixed size and
- * location.  A dense local search is performed around the most recent target location.  The search is done quickly
+ * a target and learn its changes in appearance [1]. The target is assumed to be rectangular and has fixed size and
+ * location. A dense local search is performed around the most recent target location. The search is done quickly
  * using the DCF.
  * </p>
  *
  * <p>
- * Tracking is performed using texture information.  Since only one description of the target is saved, tracks can
- * drift over time.  Tracking performance seems to improve if the object has distinctive edges.
+ * Tracking is performed using texture information. Since only one description of the target is saved, tracks can
+ * drift over time. Tracking performance seems to improve if the object has distinctive edges.
  * </p>
  *
  * <p>
  * CHANGES FROM PAPER:<br>
  * <ul>
  * <li>Input image is sampled into a square work region of constant size to improve runtime speed of FFT.</li>
- * <li>Peak of response is found using mean-shift.  Provides sub-pixel precision.</li>
+ * <li>Peak of response is found using mean-shift. Provides sub-pixel precision.</li>
  * <li>Pixels outside the image are assigned random values to avoid the tracker from fitting to them. Ideally they
  * wouldn't be processed, but that is complex to implement </li>
  * </ul>
@@ -74,7 +74,7 @@ public class CirculantTracker<T extends ImageGray<T>> {
 
 	// regularization term
 	private final double lambda;
-	// linear interpolation term.  Adjusts how fast it can learn
+	// linear interpolation term. Adjusts how fast it can learn
 	private final double interp_factor;
 
 	// the maximum pixel value
@@ -102,7 +102,7 @@ public class CirculantTracker<T extends ImageGray<T>> {
 	private final GrayF64 k = new GrayF64(1, 1);
 	private final InterleavedF64 kf = new InterleavedF64(1, 1, 2);
 
-	// Learn values.  used to compute weight in linear classifier
+	// Learn values. used to compute weight in linear classifier
 	private final InterleavedF64 alphaf = new InterleavedF64(1, 1, 2);
 	private final InterleavedF64 newAlphaf = new InterleavedF64(1, 1, 2);
 
@@ -147,12 +147,12 @@ public class CirculantTracker<T extends ImageGray<T>> {
 	 * Configure tracker
 	 *
 	 * @param output_sigma_factor spatial bandwidth (proportional to target) Try 1.0/16.0
-	 * @param sigma Sigma for Gaussian kernel in linear classifier.  Try 0.2
+	 * @param sigma Sigma for Gaussian kernel in linear classifier. Try 0.2
 	 * @param lambda Try 1e-2
 	 * @param interp_factor Try 0.075
-	 * @param padding Padding added around the selected target.  Try 1
-	 * @param workRegionSize Size of work region. Best if power of 2.  Try 64
-	 * @param maxPixelValue Maximum pixel value.  Typically 255
+	 * @param padding Padding added around the selected target. Try 1
+	 * @param workRegionSize Size of work region. Best if power of 2. Try 64
+	 * @param maxPixelValue Maximum pixel value. Typically 255
 	 */
 	public CirculantTracker( double output_sigma_factor, double sigma, double lambda, double interp_factor,
 							 double padding,
@@ -268,8 +268,8 @@ public class CirculantTracker<T extends ImageGray<T>> {
 	/**
 	 * Computes the weights used in the gaussian kernel
 	 *
-	 * This isn't actually symmetric for even widths.  These weights are used has label in the learning phase.  Closer
-	 * to one the more likely it is the true target.  It should be a peak in the image center.  If it is not then
+	 * This isn't actually symmetric for even widths. These weights are used has label in the learning phase. Closer
+	 * to one the more likely it is the true target. It should be a peak in the image center. If it is not then
 	 * it will learn an incorrect model.
 	 */
 	protected void computeGaussianWeights( int width ) {
@@ -591,7 +591,7 @@ public class CirculantTracker<T extends ImageGray<T>> {
 				else if (BoofMiscOps.isInside(image, xx, yy))
 					output.data[index++] = interp.get(xx, yy);
 				else {
-					// randomize to make pixels outside the image poorly correlate.  It will then focus on matching
+					// randomize to make pixels outside the image poorly correlate. It will then focus on matching
 					// what's inside the image since it has structure
 					output.data[index++] = rand.nextFloat()*maxPixelValue;
 				}

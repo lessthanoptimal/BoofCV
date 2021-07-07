@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -20,7 +20,7 @@ package boofcv.alg.distort.spherical;
 
 /**
  * Transforms the equirectangular image as if the input image was taken by the camera at the same location but with
- * a rotation.    Includes a built in function to center the camera at a particular location to minimize the distortion.
+ * a rotation.   Includes a built in function to center the camera at a particular location to minimize the distortion.
  *
  * @author Peter Abeles
  */

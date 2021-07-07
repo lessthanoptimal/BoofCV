@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -22,7 +22,7 @@ import boofcv.struct.convolve.Kernel2D_F32;
 
 /**
  * Weight which uses the values contained in a {@link Kernel2D_F32}. For performance reasons no checks are
- * done to see if a request has been made outside the kernel's radius.  Those values should be zero.
+ * done to see if a request has been made outside the kernel's radius. Those values should be zero.
  *
  * @author Peter Abeles
  */

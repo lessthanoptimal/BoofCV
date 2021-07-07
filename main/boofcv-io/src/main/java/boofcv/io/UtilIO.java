@@ -407,7 +407,7 @@ public class UtilIO {
 	}
 
 	/**
-	 * Opens up a dialog box asking the user to select a file.  If the user cancels
+	 * Opens up a dialog box asking the user to select a file. If the user cancels
 	 * it either returns null or quits the program.
 	 *
 	 * @param exitOnCancel If it should quit on cancel or not.
@@ -634,8 +634,8 @@ public class UtilIO {
 
 	/**
 	 * Finds the first javadoc OR the start of the class, which ever comes first.
-	 * This does require some thought.  The word class can easily be inside a comment.
-	 * Comments may or may not be there.  Always the potential for stray //
+	 * This does require some thought. The word class can easily be inside a comment.
+	 * Comments may or may not be there. Always the potential for stray //
 	 */
 	public static int indexOfSourceStart( String code ) {
 		int state = 0;

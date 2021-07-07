@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -32,17 +32,17 @@ import georegression.struct.se.Se3_F64;
 import org.ejml.data.DMatrixRMaj;
 
 /**
- * Estimates the motion of a monocular camera using the known transform between the camera and the ground plane.  The
- * camera's image is converted into an orthogonal overhead view.  Features are tracked inside the overhead image and
- * the 2D rigid body motion found.  The output can be either the 2D motion or the 3D motion of the camera. There is
+ * Estimates the motion of a monocular camera using the known transform between the camera and the ground plane. The
+ * camera's image is converted into an orthogonal overhead view. Features are tracked inside the overhead image and
+ * the 2D rigid body motion found. The output can be either the 2D motion or the 3D motion of the camera. There is
  * no scale ambiguity since the transform from the plane to camera is known.
  *
  * The advantage of tracking inside the overhead view instead of the camera image is that the overhead view lacks
- * perspective distortion and is crops the image which does not contain the plane.  Features without perspective
+ * perspective distortion and is crops the image which does not contain the plane. Features without perspective
  * distortion are easier to track and many false positives are removed by removing many features not on the plane.
  *
- * The plane which is being viewed is defined by the 'planeToCamera' transform.  In the plane's reference frame the
- * plane lies along the x-z axis and contains point (0,0,0).  See {@link CreateSyntheticOverheadView} for more
+ * The plane which is being viewed is defined by the 'planeToCamera' transform. In the plane's reference frame the
+ * plane lies along the x-z axis and contains point (0,0,0). See {@link CreateSyntheticOverheadView} for more
  * information about the ground plane coordinates and overhead image..
  *
  * @author Peter Abeles
@@ -77,9 +77,9 @@ public class VisOdomMonoOverheadMotion2D<T extends ImageBase<T>> {
 	 *
 	 * @param cellSize Size of cells in plane in world units
 	 * @param maxCellsPerPixel Specifies minimum resolution of a region in overhead image. A pixel in the camera
-	 * can't overlap more than this number of map cells.   Higher values allow lower
-	 * resolution regions.  Try 4.
-	 * @param mapHeightFraction Reduce the map height by this fraction to avoid excessive unusable image space.  Set to
+	 * can't overlap more than this number of map cells.  Higher values allow lower
+	 * resolution regions. Try 4.
+	 * @param mapHeightFraction Reduce the map height by this fraction to avoid excessive unusable image space. Set to
 	 * 1.0 to maximize the viewing area and any value less than one to crop it.
 	 * @param motion2D Estimates motion inside the overhead image.
 	 */
@@ -96,7 +96,7 @@ public class VisOdomMonoOverheadMotion2D<T extends ImageBase<T>> {
 	}
 
 	/**
-	 * Camera the camera's intrinsic and extrinsic parameters.  Can be called at any time.
+	 * Camera the camera's intrinsic and extrinsic parameters. Can be called at any time.
 	 *
 	 * @param intrinsic Intrinsic camera parameters
 	 * @param planeToCamera Transform from the plane to camera.
@@ -106,7 +106,7 @@ public class VisOdomMonoOverheadMotion2D<T extends ImageBase<T>> {
 		this.planeToCamera = planeToCamera;
 
 		if (!selectOverhead.process(intrinsic, planeToCamera))
-			throw new IllegalArgumentException("Can't find a reasonable overhead map.  Can the camera view the plane?");
+			throw new IllegalArgumentException("Can't find a reasonable overhead map. Can the camera view the plane?");
 
 		overhead.centerX = selectOverhead.getCenterX();
 		overhead.centerY = selectOverhead.getCenterY();
@@ -134,7 +134,7 @@ public class VisOdomMonoOverheadMotion2D<T extends ImageBase<T>> {
 	 * Estimates the motion which the camera undergoes relative to the first frame processed.
 	 *
 	 * @param image Most recent camera image.
-	 * @return true if motion was estimated or false if a fault occurred.  Should reset after a fault.
+	 * @return true if motion was estimated or false if a fault occurred. Should reset after a fault.
 	 */
 	public boolean process( T image ) {
 		createOverhead.process(image, overhead.image);

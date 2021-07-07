@@ -63,7 +63,7 @@ class TestUtilFeature extends BoofStandardJUnit {
 	}
 
 	/**
-	 * The descriptor is all zeros.  See if it handles this special case.
+	 * The descriptor is all zeros. See if it handles this special case.
 	 */
 	@Test void normalizeL2_zeros_F64() {
 		TupleDesc_F64 feature = new TupleDesc_F64(64);
@@ -86,7 +86,7 @@ class TestUtilFeature extends BoofStandardJUnit {
 	}
 
 	/**
-	 * The descriptor is all zeros.  See if it handles this special case.
+	 * The descriptor is all zeros. See if it handles this special case.
 	 */
 	@Test void normalizeSumOne_zeros_F64() {
 		TupleDesc_F64 feature = new TupleDesc_F64(64);

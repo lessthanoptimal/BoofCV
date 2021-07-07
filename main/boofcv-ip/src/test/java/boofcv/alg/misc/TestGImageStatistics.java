@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -41,8 +41,7 @@ public class TestGImageStatistics extends BaseGClassChecksInMisc {
 		super(GImageStatistics.class, ImageStatistics.class);
 	}
 
-	@Test
-	public void compareToPixelMath() {
+	@Test void compareToPixelMath() {
 		performTests(10);
 	}
 

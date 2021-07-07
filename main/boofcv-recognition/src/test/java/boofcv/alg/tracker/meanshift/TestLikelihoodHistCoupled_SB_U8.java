@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -31,8 +31,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  */
 public class TestLikelihoodHistCoupled_SB_U8 extends BoofStandardJUnit {
 
-	@Test
-	public void singleColor() {
+	@Test void singleColor() {
 		LikelihoodHistCoupled_SB_U8 alg = new LikelihoodHistCoupled_SB_U8(255,11);
 
 		GrayU8 image = new GrayU8(30,40);
@@ -49,8 +48,7 @@ public class TestLikelihoodHistCoupled_SB_U8 extends BoofStandardJUnit {
 
 	}
 
-	@Test
-	public void multipleColors() {
+	@Test void multipleColors() {
 		LikelihoodHistCoupled_SB_U8 alg = new LikelihoodHistCoupled_SB_U8(255,11);
 
 		GrayU8 image = new GrayU8(30,40);

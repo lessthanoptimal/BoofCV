@@ -26,12 +26,12 @@ import java.util.Arrays;
 /**
  * <p>
  * Creates a normalized histogram which represents the frequency of different visual words from the set of features.
- * Both hard and soft assignment can be used.  For hard assignment all the weight is given to the word which is the
- * best fit to the feature.  In soft the relative similarity between the words is used to assign values to the histogram.
+ * Both hard and soft assignment can be used. For hard assignment all the weight is given to the word which is the
+ * best fit to the feature. In soft the relative similarity between the words is used to assign values to the histogram.
  * </p>
  * <p>
- * With hard assignment a single word is selected.  With soft a fraction is assigned to each word based on
- * a distance metric.  See {@link AssignCluster} for the details.
+ * With hard assignment a single word is selected. With soft a fraction is assigned to each word based on
+ * a distance metric. See {@link AssignCluster} for the details.
  * </p>
  * @author Peter Abeles
  */
@@ -86,13 +86,13 @@ public class FeatureToWordHistogram_F64
 			for (int i = 0; i < histogram.length; i++) {
 				histogram[i] += temp[i];
 			}
-			// temp is already normalized such that the sum is equal to 1.  so total is also += 1
+			// temp is already normalized such that the sum is equal to 1. so total is also += 1
 		}
 		total += 1;
 	}
 
 	/**
-	 * No more features are being added.  Normalized the computed histogram.
+	 * No more features are being added. Normalized the computed histogram.
 	 */
 	@Override
 	public void process() {
@@ -103,7 +103,7 @@ public class FeatureToWordHistogram_F64
 	}
 
 	/**
-	 * Histogram of word frequencies.  Normalized such that the sum is equal to 1.
+	 * Histogram of word frequencies. Normalized such that the sum is equal to 1.
 	 * @return histogram
 	 */
 	@Override

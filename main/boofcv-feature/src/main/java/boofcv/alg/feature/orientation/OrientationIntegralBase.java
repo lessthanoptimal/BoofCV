@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -65,11 +65,11 @@ public abstract class OrientationIntegralBase<II extends ImageGray<II>, G extend
 	/**
 	 * Configure orientation estimation.
 	 *
-	 * @param sampleRadius The radius of samples that it will do.  Typically 6.
+	 * @param sampleRadius The radius of samples that it will do. Typically 6.
 	 * @param period How often the image is sampled in pixels at canonical size. Internally, this value
-	 * is scaled by scaledPeriod = period*objectRadius/sampleRadius.  Typically 1.
+	 * is scaled by scaledPeriod = period*objectRadius/sampleRadius. Typically 1.
 	 * @param kernelWidth How wide of a kernel should be used to sample. Try 4
-	 * @param weightSigma Sigma for weighting.  Set to zero for unweighted, negative to use sampleRadius.
+	 * @param weightSigma Sigma for weighting. Set to zero for unweighted, negative to use sampleRadius.
 	 * @param assignDefaultRadius If true it will set the object's radius to a scale of 1
 	 */
 	protected OrientationIntegralBase( double objectRadiusToScale, int sampleRadius, double period,

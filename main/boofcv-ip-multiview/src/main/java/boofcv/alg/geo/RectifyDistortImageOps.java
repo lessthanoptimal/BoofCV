@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -43,7 +43,7 @@ import org.ejml.dense.row.CommonOps_FDRM;
  * Definition of transformed coordinate systems:
  * <dl>
  *     <dt>Pixel<dd>Original image coordinates in pixels.
- *     <dt>Rect<dd>Rectified image coordinates in pixels.  Lens distortion has been removed.
+ *     <dt>Rect<dd>Rectified image coordinates in pixels. Lens distortion has been removed.
  *     <dt>RectNorm<dd>Rectified image coordinates in normalized coordinates.
  * </dl>
  * </p>

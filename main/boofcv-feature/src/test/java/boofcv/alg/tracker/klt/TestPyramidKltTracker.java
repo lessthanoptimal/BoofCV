@@ -51,8 +51,7 @@ public class TestPyramidKltTracker extends PyramidKltTestBase {
 	/**
 	 * Test set description when the image is fully inside the image for all the pyramid layers
 	 */
-	@Test
-	public void setDescription() {
+	@Test void setDescription() {
 		// tell it to generate a feature inside directly on a pixel
 		PyramidKltFeature feature = new PyramidKltFeature(pyramid.getNumLayers(),featureReadius);
 		feature.setPosition(25,20);
@@ -68,8 +67,7 @@ public class TestPyramidKltTracker extends PyramidKltTestBase {
 	/**
 	 * Test set description when a feature partially inside and outside of the image at all levels
 	 */
-	@Test
-	public void setDescription_border() {
+	@Test void setDescription_border() {
 		// now tell it to set a description near the edge
 		// only the first layer should be set
 		PyramidKltFeature feature = new PyramidKltFeature(pyramid.getNumLayers(),featureReadius);
@@ -86,8 +84,7 @@ public class TestPyramidKltTracker extends PyramidKltTestBase {
 	/**
 	 * Test set description when a feature is completely outside the image
 	 */
-	@Test
-	public void setDescription_outside() {
+	@Test void setDescription_outside() {
 		// now tell it to set a description near the edge
 		// only the first layer should be set
 		PyramidKltFeature feature = new PyramidKltFeature(pyramid.getNumLayers(),featureReadius);
@@ -101,8 +98,7 @@ public class TestPyramidKltTracker extends PyramidKltTestBase {
 	 *
 	 * Only a small offset easily done with a single layer tracker
 	 */
-	@Test
-	public void track_smallOffset() {
+	@Test void track_smallOffset() {
 		// set the feature right on the corner
 		PyramidKltFeature feature = new PyramidKltFeature(pyramid.getNumLayers(),featureReadius);
 		feature.setPosition(cornerX,cornerY);
@@ -124,8 +120,7 @@ public class TestPyramidKltTracker extends PyramidKltTestBase {
 	 *
 	 * Larger offset which will require the pyramid approach
 	 */
-	@Test
-	public void track_largeOffset() {
+	@Test void track_largeOffset() {
 		// set the feature right on the corner
 		PyramidKltFeature feature = new PyramidKltFeature(pyramid.getNumLayers(),featureReadius);
 		feature.setPosition(cornerX,cornerY);
@@ -145,8 +140,7 @@ public class TestPyramidKltTracker extends PyramidKltTestBase {
 	/**
 	 *
 	 */
-	@Test
-	public void track_border() {
+	@Test void track_border() {
 		float targetX = width-featureReadius;
 		float targetY = height-featureReadius-3;
 
@@ -167,8 +161,7 @@ public class TestPyramidKltTracker extends PyramidKltTestBase {
 	/**
 	 * See if a track out of bounds error is returned
 	 */
-	@Test
-	public void track_OOB() {
+	@Test void track_OOB() {
 		setTargetLocation(5*4+1,22);
 
 		// set the feature right on the corner
@@ -186,8 +179,7 @@ public class TestPyramidKltTracker extends PyramidKltTestBase {
 	/**
 	 * See if a track out of bounds error is returned
 	 */
-	@Test
-	public void track_LargeError() {
+	@Test void track_LargeError() {
 		setTargetLocation(5*4+1,22);
 
 		// set the feature right on the corner

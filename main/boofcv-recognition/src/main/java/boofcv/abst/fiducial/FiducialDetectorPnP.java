@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -36,10 +36,10 @@ import java.util.List;
 
 /**
  * <p>Provides everything you need to convert a image based fiducial detector into one which can estimate
- * the fiducial's pose given control points.  The camera pose is found using a solution to the Pose-N-Point (PnP)
+ * the fiducial's pose given control points. The camera pose is found using a solution to the Pose-N-Point (PnP)
  * problem.</p>
  *
- * <p>Stability is computed by perturbing each control point by the user provided amount of disturbance.  The largest
+ * <p>Stability is computed by perturbing each control point by the user provided amount of disturbance. The largest
  * delta for location and orientation is then found and saved.</p>
  *
  * @author Peter Abeles
@@ -210,7 +210,7 @@ public abstract class FiducialDetectorPnP<T extends ImageBase<T>>
 	}
 
 	/**
-	 * Returns a list of detected control points in the image for the specified fiducial.  Observations
+	 * Returns a list of detected control points in the image for the specified fiducial. Observations
 	 * will be in distorted image pixels.
 	 */
 	public abstract List<PointIndex2D_F64> getDetectedControl(int which );

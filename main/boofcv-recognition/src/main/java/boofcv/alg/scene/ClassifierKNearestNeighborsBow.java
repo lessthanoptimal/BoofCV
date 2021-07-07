@@ -30,15 +30,15 @@ import java.util.List;
 
 /**
  * <p>
- * Scene classification which uses bag-of-word model and K-Nearest Neighbors.  Classification data consists of a labeled
- * set of word histograms.  Each word histogram was created by 1) extracting all the features inside an image which
+ * Scene classification which uses bag-of-word model and K-Nearest Neighbors. Classification data consists of a labeled
+ * set of word histograms. Each word histogram was created by 1) extracting all the features inside an image which
  * was known to belong to a specific scene, 2) the word which best matches each feature is found and added to the
  * histogram, and 3) the histogram is then normalized so that it adds up to one.
  * </p>
  *
  * <p>
- * When classifying an image its word histogram is computed the same way.  Using the just computed histogram the
- * K-nearest neighbors to its word histogram are found in the classification data.  The most frequent scene
+ * When classifying an image its word histogram is computed the same way. Using the just computed histogram the
+ * K-nearest neighbors to its word histogram are found in the classification data. The most frequent scene
  * (the mode) of the k-neighbors is the selected scene type of the image being considered.
  * </p>
  *

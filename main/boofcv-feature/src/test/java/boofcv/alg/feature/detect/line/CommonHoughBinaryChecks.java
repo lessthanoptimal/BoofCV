@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -40,8 +40,7 @@ public abstract class CommonHoughBinaryChecks extends BoofStandardJUnit {
 	/**
 	 * See if it can detect an obvious line in the image
 	 */
-	@Test
-	public void obviousLines() {
+	@Test void obviousLines() {
 		GrayU8 image = new GrayU8(width,height);
 
 		for( int i = 0; i < height; i++ ) {

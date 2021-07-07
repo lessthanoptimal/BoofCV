@@ -35,7 +35,7 @@ public interface DetectDescribePoint<T extends ImageBase<T>, Desc extends TupleD
 	 * <p>Returns the feature descriptor at the specified index.</p>
 	 * <p>
 	 * WARNING: The returned data structure is recycled each time {@link #detect(boofcv.struct.image.ImageBase)}
-	 * is called.  Create a copy if this is a problem.
+	 * is called. Create a copy if this is a problem.
 	 * </p>
 	 *
 	 * @param index Which feature

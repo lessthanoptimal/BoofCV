@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -24,7 +24,7 @@ import boofcv.struct.convolve.KernelBase;
 import boofcv.struct.image.ImageGray;
 
 /**
- * Abstract class for sparse image convolution.  A convolution is performed at the specified point.
+ * Abstract class for sparse image convolution. A convolution is performed at the specified point.
  *
  * @author Peter Abeles
  */

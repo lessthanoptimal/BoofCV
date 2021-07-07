@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -36,8 +36,7 @@ public class TestPnPRefineRodrigues extends CommonMotionNPoint {
 
 	Se3_F64 found = new Se3_F64();
 
-	@Test
-	public void perfect() {
+	@Test void perfect() {
 
 		Se3_F64 motion = new Se3_F64();
 		motion.getR().setTo(ConvertRotation3D_F64.eulerToMatrix(EulerType.XYZ, 0.05, -0.03, 0.02,null));
@@ -54,8 +53,7 @@ public class TestPnPRefineRodrigues extends CommonMotionNPoint {
 		assertEquals(motion.getT().getZ(),found.getZ(),1e-8);
 	}
 
-	@Test
-	public void noisy() {
+	@Test void noisy() {
 
 		Se3_F64 motion = new Se3_F64();
 		motion.getR().setTo(ConvertRotation3D_F64.eulerToMatrix(EulerType.XYZ, 0.05, -0.03, 0.02,null));

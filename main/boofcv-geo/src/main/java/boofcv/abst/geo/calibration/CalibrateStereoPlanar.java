@@ -45,14 +45,14 @@ import java.util.Set;
 /**
  * <p>
  * Given a sequence of observations from a stereo camera compute the intrinsic calibration
- * of each camera and the extrinsic calibration between the two cameras.  A Planar calibration
+ * of each camera and the extrinsic calibration between the two cameras. A Planar calibration
  * grid is used, which must be completely visible in all images.
  * </p>
  *
  * <p>
  * Calibration is performed by first independently determining the intrinsic parameters of each camera as well as
- * their extrinsic parameters relative to the calibration grid.  Then the extrinsic parameters between the two cameras
- * is found by creating two point clouds composed of the calibration points in each camera's view.  Then the rigid
+ * their extrinsic parameters relative to the calibration grid. Then the extrinsic parameters between the two cameras
+ * is found by creating two point clouds composed of the calibration points in each camera's view. Then the rigid
  * body motion is found which transforms one point cloud into the other.
  * </p>
  *
@@ -163,7 +163,7 @@ public class CalibrateStereoPlanar implements VerbosePrint {
 
 	/**
 	 * Creates two 3D point clouds for the left and right camera using the known calibration points and camera
-	 * calibration.  Then find the optimal rigid body transform going from the right to left views.
+	 * calibration. Then find the optimal rigid body transform going from the right to left views.
 	 *
 	 * @return Transform from right to left view.
 	 */

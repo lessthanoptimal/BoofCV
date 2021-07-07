@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -33,8 +33,7 @@ import static org.junit.jupiter.api.Assertions.*;
  */
 public class TestSquareGraph extends BoofStandardJUnit {
 
-	@Test
-	public void computeNodeInfo() {
+	@Test void computeNodeInfo() {
 		SquareNode a = new SquareNode();
 		a.square = new Polygon2D_F64(-1,1,  2,1,  2,-1,  -1,-1);
 
@@ -54,8 +53,7 @@ public class TestSquareGraph extends BoofStandardJUnit {
 
 	}
 
-	@Test
-	public void findSideIntersect() {
+	@Test void findSideIntersect() {
 		LineSegment2D_F64 line = new LineSegment2D_F64();
 		LineSegment2D_F64 storage = new LineSegment2D_F64();
 		SquareNode a = new SquareNode();
@@ -74,8 +72,7 @@ public class TestSquareGraph extends BoofStandardJUnit {
 		assertEquals(3, alg.findSideIntersect(a, line, intersection,storage));
 	}
 
-	@Test
-	public void almostParallel() {
+	@Test void almostParallel() {
 		almostParallel(false);
 		almostParallel(true);
 	}
@@ -116,8 +113,7 @@ public class TestSquareGraph extends BoofStandardJUnit {
 		assertFalse(alg.almostParallel(a, 1, b, 0));
 	}
 
-	@Test
-	public void acuteAngle() {
+	@Test void acuteAngle() {
 		acuteAngle(true);
 		acuteAngle(false);
 	}
@@ -156,8 +152,7 @@ public class TestSquareGraph extends BoofStandardJUnit {
 		assertEquals(Math.PI/2,alg.acuteAngle(a,3,b,2),1e-8);
 	}
 
-	@Test
-	public void detachEdge() {
+	@Test void detachEdge() {
 		SquareNode a = new SquareNode();
 		SquareNode b = new SquareNode();
 
@@ -173,8 +168,7 @@ public class TestSquareGraph extends BoofStandardJUnit {
 		assertNull(b.edges[2]);
 	}
 
-	@Test
-	public void connect() {
+	@Test void connect() {
 		SquareNode a = new SquareNode();
 		SquareNode b = new SquareNode();
 
@@ -189,8 +183,7 @@ public class TestSquareGraph extends BoofStandardJUnit {
 		assertEquals(2, e.sideB);
 	}
 
-	@Test
-	public void checkConnect() {
+	@Test void checkConnect() {
 		SquareNode a = new SquareNode();
 		SquareNode b = new SquareNode();
 		SquareNode c = new SquareNode();

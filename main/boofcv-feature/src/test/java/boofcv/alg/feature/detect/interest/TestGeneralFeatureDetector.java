@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -142,8 +142,7 @@ class TestGeneralFeatureDetector extends BoofStandardJUnit {
 		assertEquals(1, extractor.numTimesProcessed);
 	}
 
-	@Test
-	public void testPositiveCandidates() {
+	@Test void testPositiveCandidates() {
 		testPositiveCandidates(true,false);
 		testPositiveCandidates(false,true);
 		testPositiveCandidates(true,true);
@@ -185,8 +184,7 @@ class TestGeneralFeatureDetector extends BoofStandardJUnit {
 	/**
 	 * If an extractor requires candidates the intensity image needs to provide them.
 	 */
-	@Test
-	public void candidatesMissMatch() {
+	@Test void candidatesMissMatch() {
 		HelperIntensity intensity = new HelperIntensity(false, false, false);
 		HelperExtractor extractor = new HelperExtractor(true, true);
 
@@ -197,8 +195,7 @@ class TestGeneralFeatureDetector extends BoofStandardJUnit {
 	/**
 	 * If n-best is not used then the corner list from the extractor should be returned.
 	 */
-	@Test
-	public void testNoNBestSelect() {
+	@Test void testNoNBestSelect() {
 		HelperIntensity intensity = new HelperIntensity(false, false, true);
 		HelperExtractor extractor = new HelperExtractor(true, true);
 
@@ -214,8 +211,7 @@ class TestGeneralFeatureDetector extends BoofStandardJUnit {
 	/**
 	 * See if n-best is used to prune features.
 	 */
-	@Test
-	public void testWithNBestSelect() {
+	@Test void testWithNBestSelect() {
 		HelperIntensity intensity = new HelperIntensity(false, false, true);
 		HelperExtractor extractor = new HelperExtractor(true, true);
 
@@ -232,8 +228,7 @@ class TestGeneralFeatureDetector extends BoofStandardJUnit {
 	/**
 	 * If n-best wasn't initially being used it should now be used
 	 */
-	@Test
-	public void setBestNumber() {
+	@Test void setBestNumber() {
 		HelperIntensity intensity = new HelperIntensity(false, false, true);
 		HelperExtractor extractor = new HelperExtractor(true, true);
 
@@ -257,8 +252,7 @@ class TestGeneralFeatureDetector extends BoofStandardJUnit {
 	/**
 	 * Makes sure flags that indicate the presence of local minimums and maximums are handled correctly
 	 */
-	@Test
-	public void handleLocalMinMaxFlags() {
+	@Test void handleLocalMinMaxFlags() {
 		HelperIntensity intensity = new HelperIntensity(false, false, true);
 		HelperExtractor extractorMin = new HelperExtractor(true, true);
 		extractorMin.minimums = true;

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -30,7 +30,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
- * Compares the results against a naive algorithm and other basic tests.  More rigorous tests are part of the abstracted
+ * Compares the results against a naive algorithm and other basic tests. More rigorous tests are part of the abstracted
  * {@link boofcv.abst.feature.detect.extract.NonMaxSuppression} compliance tests.
  *
  * @author Peter Abeles
@@ -83,11 +83,10 @@ public abstract class GenericNonMaxTests extends BoofStandardJUnit {
 	}
 
 	/**
-	 * Makes sure that the border just defines the region in which an exteme can be found.  If a pixel is within
+	 * Makes sure that the border just defines the region in which an exteme can be found. If a pixel is within
 	 * the exclusion zone and larger magnitude than a near by pixel inside, the inside pixel can't be an exteme
 	 */
-	@Test
-	public void checkBorderMaximum() {
+	@Test void checkBorderMaximum() {
 		if (canDetectMax)
 			checkBorderMaximum(1);
 		if( canDetectMin)
@@ -109,7 +108,7 @@ public abstract class GenericNonMaxTests extends BoofStandardJUnit {
 			assertEquals(0, foundMaximum.size);
 		}
 
-		// now with a border there should be no maximum.  30 gets knocked out because 90 is next to it
+		// now with a border there should be no maximum. 30 gets knocked out because 90 is next to it
 		findLocalPeaks(intensity, 5, 1, 1);
 		assertEquals(0, foundMinimum.size);
 		assertEquals(0, foundMaximum.size);
@@ -118,8 +117,7 @@ public abstract class GenericNonMaxTests extends BoofStandardJUnit {
 	/**
 	 * Makes sure that features along the image border can be detected as an extreme
 	 */
-	@Test
-	public void checkCanDetectAlongImageBorder() {
+	@Test void checkCanDetectAlongImageBorder() {
 		if (canDetectMax)
 			checkCanDetectAlongImageBorder(1);
 		if( canDetectMin)
@@ -144,8 +142,7 @@ public abstract class GenericNonMaxTests extends BoofStandardJUnit {
 		}
 	}
 
-	@Test
-	public void checkDetectionRule() {
+	@Test void checkDetectionRule() {
 		if (strict)
 			testStrictRule();
 		else
@@ -190,10 +187,9 @@ public abstract class GenericNonMaxTests extends BoofStandardJUnit {
 	}
 
 	/**
-	 * Compares output against naive algorithm.  Checks for compliance with sub-images
+	 * Compares output against naive algorithm. Checks for compliance with sub-images
 	 */
-	@Test
-	public void compareToNaive() {
+	@Test void compareToNaive() {
 		GrayF32 inten = new GrayF32(width, height);
 
 		QueueCorner naiveMin = new QueueCorner(inten.getWidth() * inten.getHeight());

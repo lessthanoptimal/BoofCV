@@ -34,11 +34,11 @@ import java.awt.image.BufferedImage;
 public class VisualizeRegions {
 
 	/**
-	 * Sets the pixels of each watershed as red in the output image.  Watersheds have a value of 0
+	 * Sets the pixels of each watershed as red in the output image. Watersheds have a value of 0
 	 *
 	 * @param segments Conversion from pixel to region
-	 * @param output Storage for output image.  Can be null.
-	 * @param radius Thickness of watershed.  0 is 1 pixel wide. 1 is 3 pixels wide.
+	 * @param output Storage for output image. Can be null.
+	 * @param radius Thickness of watershed. 0 is 1 pixel wide. 1 is 3 pixels wide.
 	 * @return Output image.
 	 */
 	public static BufferedImage watersheds( GrayS32 segments, BufferedImage output, int radius ) {
@@ -81,7 +81,7 @@ public class VisualizeRegions {
 	 *
 	 * @param pixelToRegion Conversion from pixel to region
 	 * @param numRegions Total number of regions.
-	 * @param output Storage for output image.  Can be null.
+	 * @param output Storage for output image. Can be null.
 	 * @return Output image.
 	 */
 	public static BufferedImage regions( GrayS32 pixelToRegion, int numRegions, BufferedImage output ) {
@@ -93,7 +93,7 @@ public class VisualizeRegions {
 	 *
 	 * @param pixelToRegion Conversion from pixel to region
 	 * @param segmentColor Color of each region
-	 * @param output Storage for output image.  Can be null.
+	 * @param output Storage for output image. Can be null.
 	 * @return Output image.
 	 */
 	public static BufferedImage regionsColor( GrayS32 pixelToRegion,
@@ -131,7 +131,7 @@ public class VisualizeRegions {
 	 *
 	 * @param pixelToRegion Conversion from pixel to region
 	 * @param borderColor RGB value of border pixel
-	 * @param output Storage for output image.  Can be null.
+	 * @param output Storage for output image. Can be null.
 	 * @return Output image.
 	 */
 	public static BufferedImage regionBorders( GrayS32 pixelToRegion,

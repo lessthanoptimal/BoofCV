@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -145,7 +145,7 @@ public abstract class DisparitySparseRectifiedScoreBM<ArrayData, Input extends I
 	}
 
 	/**
-	 * Compute disparity scores for the specified pixel in left to right direction.  Be sure that its not too close to
+	 * Compute disparity scores for the specified pixel in left to right direction. Be sure that its not too close to
 	 * the image border.
 	 *
 	 * @param x x-coordinate of point
@@ -174,7 +174,7 @@ public abstract class DisparitySparseRectifiedScoreBM<ArrayData, Input extends I
 	}
 
 	/**
-	 * Compute disparity scores for the specified pixel in right to left direction.  Be sure that its not too close to
+	 * Compute disparity scores for the specified pixel in right to left direction. Be sure that its not too close to
 	 * the image border.
 	 *
 	 * @param x x-coordinate of point

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -33,7 +33,7 @@ import pabeles.concurrency.GrowArray;
 
 /**
  * <p>
- * Median filter which uses quick select to find the local median value.  It is naive because the sort operation is started
+ * Median filter which uses quick select to find the local median value. It is naive because the sort operation is started
  * from scratch for each pixel, discarding any information learned previously.
  * </p>
  *

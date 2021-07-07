@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -29,7 +29,7 @@ import org.ddogleg.struct.DogArray;
 import java.util.List;
 
 /**
- * Implementation of {@link DescribeImageDense} for {@link DescribeDenseHogFastAlg}.  This adds the capability to scale
+ * Implementation of {@link DescribeImageDense} for {@link DescribeDenseHogFastAlg}. This adds the capability to scale
  * the
  *
  * @author Peter Abeles

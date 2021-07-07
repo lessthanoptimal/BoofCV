@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -25,7 +25,7 @@ import java.util.Arrays;
 /**
  * <p>
  * SureShrink denoises wavelets using a threshold computed by minimizing Stein's Unbiased Risk
- * Estimate (SURE).  In practice a hybrid approach was found to work best where either the Stein
+ * Estimate (SURE). In practice a hybrid approach was found to work best where either the Stein
  * threshold or the universal threshold proposed by VisuShrink is used.
  * </p>
  *

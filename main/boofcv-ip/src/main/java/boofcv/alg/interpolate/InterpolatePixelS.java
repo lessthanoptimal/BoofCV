@@ -29,7 +29,7 @@ public interface InterpolatePixelS<T extends ImageGray<T>> extends InterpolatePi
 
 	/**
 	 * Returns the interpolated pixel value at the specified location while checking to see if
-	 * border conditions apply.  If the requested pixel is outside the image border it will attempt
+	 * border conditions apply. If the requested pixel is outside the image border it will attempt
 	 * to process it using or throw a null pointer exception of a border handler has not been specified.
 	 *
 	 * @param x Point's x-coordinate. x &ge; 0 && x < image.width or all values if border specified
@@ -40,7 +40,7 @@ public interface InterpolatePixelS<T extends ImageGray<T>> extends InterpolatePi
 
 	/**
 	 * Returns the interpolated pixel value at the specified location while assuming it is inside
-	 * the image far away from the border.  For any input point {@link #isInFastBounds} should return true.
+	 * the image far away from the border. For any input point {@link #isInFastBounds} should return true.
 	 *
 	 * @param x Point's x-coordinate.
 	 * @param y Point's y-coordinate.

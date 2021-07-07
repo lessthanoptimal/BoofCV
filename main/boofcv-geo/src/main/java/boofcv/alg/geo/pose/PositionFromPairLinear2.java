@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -31,8 +31,8 @@ import java.util.List;
 /**
  * <p>
  * Given two views of N objects and the known rotation, estimate the translation. A linear system
- * is constructed from the equations below and solved for.  A minimum of two point observations is required
- * since rotation is already known.  This high level characteristics of this algorithm was
+ * is constructed from the equations below and solved for. A minimum of two point observations is required
+ * since rotation is already known. This high level characteristics of this algorithm was
  * stated in [1], but the mathematics were not described or sketched.
  * </p>
  *
@@ -72,7 +72,7 @@ public class PositionFromPairLinear2 {
 	 *
 	 * @param R Rotation matrix. World to view.
 	 * @param worldPts Location of features in world coordinates.
-	 * @param observed Observations of point in current view.  Normalized coordinates.
+	 * @param observed Observations of point in current view. Normalized coordinates.
 	 * @return true if it succeeded.
 	 */
 	public boolean process( DMatrixRMaj R , List<Point3D_F64> worldPts , List<Point2D_F64> observed )

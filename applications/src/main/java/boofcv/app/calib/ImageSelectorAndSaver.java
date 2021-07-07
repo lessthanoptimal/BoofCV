@@ -72,7 +72,7 @@ public class ImageSelectorAndSaver {
 				throw new RuntimeException("Can't create output directory. " + this.outputDirectory.getPath());
 			}
 		}
-		// TODO see if there are images in the output directory.  Ask if it should delete it
+		// TODO see if there are images in the output directory. Ask if it should delete it
 	}
 
 	/**
@@ -102,7 +102,7 @@ public class ImageSelectorAndSaver {
 
 		totalWeight = ImageStatistics.sum(weights);
 
-		// compute a normalized template for later use.  Divide by the mean to add some lighting invariance
+		// compute a normalized template for later use. Divide by the mean to add some lighting invariance
 		template.setTo(removePerspective.getOutput());
 		float mean = ImageStatistics.mean(template);
 		PixelMath.divide(template, mean, template);

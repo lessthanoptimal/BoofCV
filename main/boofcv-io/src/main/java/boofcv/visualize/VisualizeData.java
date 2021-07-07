@@ -53,7 +53,7 @@ public class VisualizeData {
 			Class c = Class.forName(pathToGenerator);
 			return (T) c.getConstructor().newInstance();
 		} catch (ClassNotFoundException e) {
-			throw new RuntimeException("Class not found.  Is it included in the class path?");
+			throw new RuntimeException("Class not found. Is it included in the class path?");
 		} catch (InstantiationException | IllegalAccessException |
 				NoSuchMethodException | InvocationTargetException e) {
 			throw new RuntimeException(e);

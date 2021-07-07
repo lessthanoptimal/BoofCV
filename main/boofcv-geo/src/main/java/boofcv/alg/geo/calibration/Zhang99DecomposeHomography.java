@@ -42,7 +42,7 @@ import org.ejml.dense.row.SpecializedOps_DDRM;
  * r<sub>2</sub> = &lambda;*inv(K)*h<sub>2</sub><br>
  * r<sub>3</sub> = cross(r<sub>1</sub>,r<sub>2</sub>)<br>
  * t =  &lambda;*inv(K)*h<sub>3</sub><br>
- * t is the translation vector.  The R computed above is only approximate and needs to be turned into
+ * t is the translation vector. The R computed above is only approximate and needs to be turned into
  * a real rotation matrix.
  * </p>
  *
@@ -79,7 +79,7 @@ public class Zhang99DecomposeHomography {
 	}
 
 	/**
-	 * Compute the rigid body motion that composes the homography matrix H.  It is assumed
+	 * Compute the rigid body motion that composes the homography matrix H. It is assumed
 	 * that H was computed using {@link Zhang99ComputeTargetHomography}.
 	 *
 	 * @param H homography matrix.
@@ -110,7 +110,7 @@ public class Zhang99DecomposeHomography {
 		UtilVector3D_F64.createMatrix(R, v1, v2, v3);
 
 		Se3_F64 ret = new Se3_F64();
-		// the R matrix is probably not a real rotation matrix.  So find
+		// the R matrix is probably not a real rotation matrix. So find
 		// the closest real rotation matrix
 		ConvertRotation3D_F64.approximateRotationMatrix(R,ret.getR());
 		ret.getT().setTo(t.data[0],t.data[1],t.data[2]);

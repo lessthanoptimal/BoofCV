@@ -24,7 +24,7 @@ import boofcv.generate.CodeGeneratorBase;
 import java.io.FileNotFoundException;
 
 /**
- * NOTE: There is a tinny bit of manual work required.  need to comment out a few lines to unroll
+ * NOTE: There is a tinny bit of manual work required. need to comment out a few lines to unroll
  *
  * @author Peter Abeles
  */

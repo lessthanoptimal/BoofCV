@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -48,8 +48,7 @@ public class TestDetectFiducialSquareBinary extends BoofStandardJUnit {
 	/**
 	 * Give it easy positive examples
 	 */
-	@Test
-	public void processSquare() {
+	@Test void processSquare() {
 		for (int i = 0; i < 4; i++) {
 			GrayF32 input = create(DetectFiducialSquareBinary.w, 314);
 
@@ -69,10 +68,9 @@ public class TestDetectFiducialSquareBinary extends BoofStandardJUnit {
 	}
 
 	/**
-	 * Give it random noise.  It should fail
+	 * Give it random noise. It should fail
 	 */
-	@Test
-	public void processSquare_negative() {
+	@Test void processSquare_negative() {
 		GrayF32 input = create(DetectFiducialSquareBinary.w, 314);
 		ImageMiscOps.fillUniform(input, rand, 0, 255);
 
@@ -84,8 +82,7 @@ public class TestDetectFiducialSquareBinary extends BoofStandardJUnit {
 		assertFalse(alg.processSquare(input, result, 0, 0));
 	}
 
-	@Test
-	public void getNumberOfDistinctFiducials() {
+	@Test void getNumberOfDistinctFiducials() {
 		DetectFiducialSquareBinary alg =
 				new DetectFiducialSquareBinary<>(3, borderWidth, blackBorderFraction,
 						inputToBinary, squareDetector, GrayU8.class);
@@ -105,8 +102,7 @@ public class TestDetectFiducialSquareBinary extends BoofStandardJUnit {
 	/**
 	 * See if it can detect a 3x3 grid
 	 */
-	@Test
-	public void checkGrid3x3() {
+	@Test void checkGrid3x3() {
 		int number = 9;
 		GrayF32 input = create(DetectFiducialSquareBinary.w, number, 3, borderWidth);
 
@@ -123,8 +119,7 @@ public class TestDetectFiducialSquareBinary extends BoofStandardJUnit {
 	/**
 	 * See if it can detect a 3x3 grid
 	 */
-	@Test
-	public void checkGrid5x5() {
+	@Test void checkGrid5x5() {
 		int number = 299382;
 		GrayF32 input = create(DetectFiducialSquareBinary.w, number, 5, borderWidth);
 
@@ -141,8 +136,7 @@ public class TestDetectFiducialSquareBinary extends BoofStandardJUnit {
 	/**
 	 * See if it can process a border that isn't 0.25
 	 */
-	@Test
-	public void differentBorderSizes() {
+	@Test void differentBorderSizes() {
 
 		int number = 128;
 		double[] borders = new double[]{0.1, 0.15, 0.3};

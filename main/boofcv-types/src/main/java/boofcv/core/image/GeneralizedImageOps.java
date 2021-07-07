@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -266,7 +266,7 @@ import pabeles.concurrency.GrowArray;
 	}
 
 	/**
-	 * If an image is to be created then the generic type can't be used a specific one needs to be.  An arbitrary
+	 * If an image is to be created then the generic type can't be used a specific one needs to be. An arbitrary
 	 * specific image type is returned here.
 	 */
 	public static <T> T convertGenericToSpecificType( Class<?> type ) {

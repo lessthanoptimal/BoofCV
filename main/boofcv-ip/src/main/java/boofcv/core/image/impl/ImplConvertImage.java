@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -26,7 +26,7 @@ import javax.annotation.Generated;
 /**
  * <p>
  * Functions for converting between different primitive image types. Numerical values do not change or are closely approximated
- * in these functions.  
+ * in these functions.
  * </p>
  *
  * <p>

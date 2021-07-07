@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -31,7 +31,7 @@ import java.io.Serializable;
 
 /**
  * <p>
- * Calibration parameters for a stereo camera pair.  Includes intrinsic and extrinsic. The baseline between
+ * Calibration parameters for a stereo camera pair. Includes intrinsic and extrinsic. The baseline between
  * the two cameras is specified as a rigid body {@link Se3_F64} transform from the right to left camera.
  * </p>
  *

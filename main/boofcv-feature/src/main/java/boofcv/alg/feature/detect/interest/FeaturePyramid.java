@@ -37,7 +37,7 @@ import java.util.List;
  * <p>
  * Detects scale invariant interest/corner points by computing the feature intensities across a pyramid of different scales.
  * Features which are maximums with in a local 2D neighborhood and within the local scale neighbourhood are declared to
- * be features.  Maximums are checked for in scale space by comparing the feature intensity against features in the
+ * be features. Maximums are checked for in scale space by comparing the feature intensity against features in the
  * upper and lower layers.
  * </p>
  * <p/>
@@ -58,7 +58,7 @@ import java.util.List;
 public class FeaturePyramid<T extends ImageGray<T>, D extends ImageGray<D>>
 		implements InterestPointScaleSpacePyramid<T> {
 
-	// generalized feature detector.  Used to find candidate features in each scale's image
+	// generalized feature detector. Used to find candidate features in each scale's image
 	private @Getter final GeneralFeatureDetector<T, D> detector;
 	private final float baseThreshold;
 	// feature intensity in the pyramid
@@ -80,7 +80,7 @@ public class FeaturePyramid<T extends ImageGray<T>, D extends ImageGray<D>>
 	 * Create a feature detector.
 	 *
 	 * @param detector Point feature detector which is used to find candidates in each scale level
-	 * @param scalePower Used to normalize feature intensity at different scales.  For many features this should be one.
+	 * @param scalePower Used to normalize feature intensity at different scales. For many features this should be one.
 	 */
 	public FeaturePyramid( GeneralFeatureDetector<T, D> detector, AnyImageDerivative<T, D> computeDerivative,
 						   double scalePower ) {
@@ -124,7 +124,7 @@ public class FeaturePyramid<T extends ImageGray<T>, D extends ImageGray<D>>
 	}
 
 	/**
-	 * Use the feature detector to find candidate features in each level.  Only compute the needed image derivatives.
+	 * Use the feature detector to find candidate features in each level. Only compute the needed image derivatives.
 	 */
 	private void detectCandidateFeatures( T image, double sigma ) {
 		// adjust corner intensity threshold based upon the current scale factor

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -34,8 +34,7 @@ public class TestSparseIntegralSample_I32 extends GeneralSparseSampleTests<GrayS
 		((SparseIntegralSample_I32)alg).setWidth(baseR*2+1);
 	}
 
-	@Test
-	public void testAll() {
+	@Test void testAll() {
 		super.performAllTests();
 	}
 }

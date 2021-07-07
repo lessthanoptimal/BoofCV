@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -50,8 +50,7 @@ public abstract class GeneralSegmentSlicColorChecks<T extends ImageBase<T>> exte
 	/**
 	 * Give it an easy image to segment and see how well it does.
 	 */
-	@Test
-	public void easyTest() {
+	@Test void easyTest() {
 		T input = imageType.createImage(30, 40);
 		GrayS32 output = new GrayS32(30, 40);
 
@@ -73,8 +72,7 @@ public abstract class GeneralSegmentSlicColorChecks<T extends ImageBase<T>> exte
 		}
 	}
 
-	@Test
-	public void setColor() {
+	@Test void setColor() {
 		T input = imageType.createImage(30, 40);
 		GImageMiscOps.fillUniform(input, rand, 0, 200);
 
@@ -96,8 +94,7 @@ public abstract class GeneralSegmentSlicColorChecks<T extends ImageBase<T>> exte
 		}
 	}
 
-	@Test
-	public void addColor() {
+	@Test void addColor() {
 		T input = imageType.createImage(30, 40);
 		GImageMiscOps.fillUniform(input, rand, 0, 200);
 
@@ -125,8 +122,7 @@ public abstract class GeneralSegmentSlicColorChecks<T extends ImageBase<T>> exte
 		}
 	}
 
-	@Test
-	public void colorDistance() {
+	@Test void colorDistance() {
 		T input = imageType.createImage(30, 40);
 		GImageMiscOps.fillUniform(input, rand, 0, 200);
 
@@ -150,8 +146,7 @@ public abstract class GeneralSegmentSlicColorChecks<T extends ImageBase<T>> exte
 		assertEquals(expected, alg.colorDistance(color, input.getIndex(6, 8)), 1e-4);
 	}
 
-	@Test
-	public void getIntensity() {
+	@Test void getIntensity() {
 		T input = imageType.createImage(30, 40);
 		GImageMiscOps.fillUniform(input, rand, 0, 200);
 

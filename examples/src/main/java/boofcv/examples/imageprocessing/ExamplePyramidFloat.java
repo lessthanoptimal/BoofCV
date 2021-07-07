@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -32,9 +32,9 @@ import boofcv.struct.pyramid.PyramidFloat;
 import java.awt.image.BufferedImage;
 
 /**
- * Demonstrates how to construct and display a {@link PyramidFloat}.  Float pyramids require only require
+ * Demonstrates how to construct and display a {@link PyramidFloat}. Float pyramids require only require
  * that each layer's scale be larger than the scale of the previous layer. Interpolation is used to allow
- * sub-sampling at arbitrary scales.  All of this additional flexibility comes at the cost of speed
+ * sub-sampling at arbitrary scales. All of this additional flexibility comes at the cost of speed
  * when compared to a {@link PyramidDiscrete}.
  *
  * @author Peter Abeles

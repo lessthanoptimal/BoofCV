@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -31,8 +31,7 @@ public class TestTldTracker extends BoofStandardJUnit {
 	/**
 	 * Basic sanity check on the pyramid it selects
 	 */
-	@Test
-	public void selectPyramidScale() {
+	@Test void selectPyramidScale() {
 		int minSize = (5*2+1)*5;
 		int[] scales = TldTracker.selectPyramidScale(640,480,minSize);
 

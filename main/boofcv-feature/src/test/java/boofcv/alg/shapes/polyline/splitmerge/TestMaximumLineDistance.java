@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -33,8 +33,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  */
 public class TestMaximumLineDistance extends BoofStandardJUnit {
 
-	@Test
-	public void selectSplitPoint() {
+	@Test void selectSplitPoint() {
 		List<Point2D_I32> contour = rect(10,12,20,22);
 
 		MaximumLineDistance alg = new MaximumLineDistance();
@@ -53,8 +52,7 @@ public class TestMaximumLineDistance extends BoofStandardJUnit {
 		assertTrue(results.score > 1);
 	}
 
-	@Test
-	public void compareScore() {
+	@Test void compareScore() {
 
 		MaximumLineDistance alg = new MaximumLineDistance();
 

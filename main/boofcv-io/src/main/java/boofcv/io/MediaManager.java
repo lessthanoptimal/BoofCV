@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -26,7 +26,7 @@ import java.awt.image.BufferedImage;
 import java.io.Reader;
 
 /**
- * Abstract interface for accessing files, images, and videos.  Intended to help
+ * Abstract interface for accessing files, images, and videos. Intended to help
  * handle regular applications and applets
  * 
  * @author Peter Abeles
@@ -42,7 +42,7 @@ public interface MediaManager {
 
 	/**
 	 * Opens the specified webcam.
-	 * @param device Reference to the webcam device.  null if you just want to open the default
+	 * @param device Reference to the webcam device. null if you just want to open the default
 	 * @param width requested image width. Default resolution is any value less than 0
 	 * @param height requested image height. Default resolution is any value less than 0
 	 * @param imageType Type of input image

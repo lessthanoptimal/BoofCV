@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -23,7 +23,7 @@ import lombok.Data;
 /**
  * <p>
  * Calibration parameters for depth sensors (e.g. Kinect) which provide depth information for pixels inside an RGB
- * image via a depth image.  The depth and visual images are assumed to be already aligned.  As such, both images
+ * image via a depth image. The depth and visual images are assumed to be already aligned. As such, both images
  * will have the same size.
  * </p>
  *

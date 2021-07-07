@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -30,8 +30,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  * @author Peter Abeles
  */
 public class TestAdjustPolygonForThresholdBias extends BoofStandardJUnit {
-	@Test
-	public void adjustForThresholdBias() {
+	@Test void adjustForThresholdBias() {
 		AdjustPolygonForThresholdBias alg = new AdjustPolygonForThresholdBias();
 
 		Polygon2D_F64 original = new Polygon2D_F64(10,10, 10,40, 35,40, 35,10);
@@ -57,8 +56,7 @@ public class TestAdjustPolygonForThresholdBias extends BoofStandardJUnit {
 	 * Create a situation where a point will be shifted on top of an existing one. See if that is caught
 	 * and removed. Not trivial to reproduce with real data but does happen.
 	 */
-	@Test
-	public void removeDuplicatePoint() {
+	@Test void removeDuplicatePoint() {
 
 		AdjustPolygonForThresholdBias alg = new AdjustPolygonForThresholdBias();
 

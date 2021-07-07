@@ -39,10 +39,10 @@ import boofcv.struct.image.ImageType;
 public class FactoryIntensityPoint {
 
 	/**
-	 * Feature intensity for Fast corner detector.  See {@link FastCornerDetector} for more details.
+	 * Feature intensity for Fast corner detector. See {@link FastCornerDetector} for more details.
 	 *
-	 * @param pixelTol How different pixels need to be to be considered part of a corner. Image dependent.  Try 20 to start.
-	 * @param minCont Minimum number of continue pixels in a circle for it ot be a corner.  Can be 9,10,11 or 12.
+	 * @param pixelTol How different pixels need to be to be considered part of a corner. Image dependent. Try 20 to start.
+	 * @param minCont Minimum number of continue pixels in a circle for it ot be a corner. Can be 9,10,11 or 12.
 	 * @param imageType Type of input image it is computed form.
 	 * @param <I> Input image type.
 	 * @param <D> Derivative type.
@@ -55,12 +55,12 @@ public class FactoryIntensityPoint {
 	}
 
 	/**
-	 * Feature intensity for Harris corner detector.  See {@link HarrisCornerIntensity} for more details.
+	 * Feature intensity for Harris corner detector. See {@link HarrisCornerIntensity} for more details.
 	 *
 	 * @param windowRadius Size of the feature it is detects, Try 2.
 	 * @param kappa Tuning parameter, typically a small number around 0.04
 	 * @param weighted Is the gradient weighted using a Gaussian distribution?  Weighted is much slower than unweighted.
-	 * @param derivType Image derivative type it is computed from.  @return Harris corner
+	 * @param derivType Image derivative type it is computed from. @return Harris corner
 	 * @param <I> Input image type.
 	 * @param <D> Derivative type.
 	 * @return Harris feature intensity
@@ -73,7 +73,7 @@ public class FactoryIntensityPoint {
 	}
 
 	/**
-	 * Feature intensity for KLT corner detector.  See {@link boofcv.alg.feature.detect.intensity.ShiTomasiCornerIntensity} for more details.
+	 * Feature intensity for KLT corner detector. See {@link boofcv.alg.feature.detect.intensity.ShiTomasiCornerIntensity} for more details.
 	 *
 	 * @param windowRadius Size of the feature it detects, Try 2.
 	 * @param weighted Should the it be weighted by a Gaussian kernel?  Unweighted is much faster.
@@ -89,7 +89,7 @@ public class FactoryIntensityPoint {
 	}
 
 	/**
-	 * Feature intensity for Kitchen and Rosenfeld corner detector.  See {@link boofcv.alg.feature.detect.intensity.KitRosCornerIntensity} for more details.
+	 * Feature intensity for Kitchen and Rosenfeld corner detector. See {@link boofcv.alg.feature.detect.intensity.KitRosCornerIntensity} for more details.
 	 *
 	 * @param derivType Image derivative type it is computed from.
 	 * @param <I> Input image type.

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -23,7 +23,7 @@ import boofcv.struct.border.BorderIndex1D;
 
 /**
  * <p>
- * Access to outside the array are reflected back into the array around the closest border.  This
+ * Access to outside the array are reflected back into the array around the closest border. This
  * is an even symmetric function, e.g. f(-1) = f(1) = 1, f(-2) = f(2) = 2.
  * </p>
  *

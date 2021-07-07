@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -29,8 +29,7 @@ import static org.junit.jupiter.api.Assertions.*;
  */
 public class TestAssociatedTriple extends BoofStandardJUnit {
 
-	@Test
-	public void constructor_ThreePts() {
+	@Test void constructor_ThreePts() {
 		Point2D_F64 p1 = new Point2D_F64(1,2);
 		Point2D_F64 p2 = new Point2D_F64(3,4);
 		Point2D_F64 p3 = new Point2D_F64(5,6);
@@ -48,8 +47,7 @@ public class TestAssociatedTriple extends BoofStandardJUnit {
 		assertTrue(p3.isIdentical(a.p3,1e-8));
 	}
 
-	@Test
-	public void constructor_ThreePts_flag() {
+	@Test void constructor_ThreePts_flag() {
 		Point2D_F64 p1 = new Point2D_F64(1,2);
 		Point2D_F64 p2 = new Point2D_F64(3,4);
 		Point2D_F64 p3 = new Point2D_F64(5,6);
@@ -73,8 +71,7 @@ public class TestAssociatedTriple extends BoofStandardJUnit {
 		assertTrue(p3.isIdentical(a.p3,1e-8));
 	}
 
-	@Test
-	public void set_AssociatedTriple() {
+	@Test void set_AssociatedTriple() {
 		Point2D_F64 p1 = new Point2D_F64(1,2);
 		Point2D_F64 p2 = new Point2D_F64(3,4);
 		Point2D_F64 p3 = new Point2D_F64(5,6);
@@ -89,8 +86,7 @@ public class TestAssociatedTriple extends BoofStandardJUnit {
 		assertTrue(b.p3.isIdentical(a.p3,1e-8));
 	}
 
-	@Test
-	public void set_ThreePts() {
+	@Test void set_ThreePts() {
 		Point2D_F64 p1 = new Point2D_F64(1,2);
 		Point2D_F64 p2 = new Point2D_F64(3,4);
 		Point2D_F64 p3 = new Point2D_F64(5,6);
@@ -109,8 +105,7 @@ public class TestAssociatedTriple extends BoofStandardJUnit {
 		assertTrue(p3.isIdentical(a.p3,1e-8));
 	}
 
-	@Test
-	public void copy() {
+	@Test void copy() {
 		Point2D_F64 p1 = new Point2D_F64(1,2);
 		Point2D_F64 p2 = new Point2D_F64(3,4);
 		Point2D_F64 p3 = new Point2D_F64(5,6);

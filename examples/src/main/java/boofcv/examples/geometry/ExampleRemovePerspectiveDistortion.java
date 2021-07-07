@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -32,9 +32,9 @@ import java.awt.image.BufferedImage;
 
 /**
  * Certain image processing techniques, such as Optical Character Recognition (OCR), can be performed better if
- * perspective distortion is remove from an image.  In this example a homography is computed from the four corners
- * of a bulletin board and the image is projected into a square image without perspective distortion.  The
- * {@link RemovePerspectiveDistortion} class is used to perform the distortion.  The class is easy to understand
+ * perspective distortion is remove from an image. In this example a homography is computed from the four corners
+ * of a bulletin board and the image is projected into a square image without perspective distortion. The
+ * {@link RemovePerspectiveDistortion} class is used to perform the distortion. The class is easy to understand
  * if you know what a homography is, you should look at it!
  *
  * @author Peter Abeles

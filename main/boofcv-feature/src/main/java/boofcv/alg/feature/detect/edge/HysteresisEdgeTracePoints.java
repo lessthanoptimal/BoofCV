@@ -29,9 +29,9 @@ import java.util.List;
 
 /**
  * Given the output from edge non-maximum suppression, perform hysteresis threshold along the edge and constructs
- * a list of pixels belonging to each contour.  Points are first connected in direction tangential to the edge's
- * direction, if no matches are found then a match is searched for using an 8-connect rule.  The direction
- * image must be the 4-direction type.  If multiple points in the local neighborhood can be added to edge then
+ * a list of pixels belonging to each contour. Points are first connected in direction tangential to the edge's
+ * direction, if no matches are found then a match is searched for using an 8-connect rule. The direction
+ * image must be the 4-direction type. If multiple points in the local neighborhood can be added to edge then
  * a new edge segment is created.
  *
  * @author Peter Abeles
@@ -39,11 +39,11 @@ import java.util.List;
 /*
  * DESIGN NOTE: EdgeContour and EdgeSegment are not recycled because the internal arrays of their members can
  * grow to be quite large, but there is no way to assign objects with large internal arrays to newly found
- * lists which require large arrays.  That was a long sentence.
+ * lists which require large arrays. That was a long sentence.
  */
 public class HysteresisEdgeTracePoints {
 
-	// after an edge has been traversed it is set to this value.  This is also why the lower threshold
+	// after an edge has been traversed it is set to this value. This is also why the lower threshold
 	// must be >= 0
 	public static final float MARK_TRAVERSED = -1;
 
@@ -68,8 +68,8 @@ public class HysteresisEdgeTracePoints {
 	/**
 	 * Performs hysteresis thresholding using the provided lower and upper thresholds.
 	 *
-	 * @param intensity Intensity image after edge non-maximum suppression has been applied.  Modified.
-	 * @param direction 4-direction image.  Not modified.
+	 * @param intensity Intensity image after edge non-maximum suppression has been applied. Modified.
+	 * @param direction 4-direction image. Not modified.
 	 * @param lower Lower threshold.
 	 * @param upper Upper threshold.
 	 */
@@ -99,7 +99,7 @@ public class HysteresisEdgeTracePoints {
 	}
 
 	/**
-	 * Traces along object's contour starting at the specified seed.  As it does so it will set the intensity of
+	 * Traces along object's contour starting at the specified seed. As it does so it will set the intensity of
 	 * points which are below the lower threshold to zero and add points to contour.
 	 *
 	 * @param x x-coordinate of seed pixel above threshold
@@ -125,7 +125,7 @@ public class HysteresisEdgeTracePoints {
 			boolean first = true;
 
 			while (true) {
-				//----- First check along the direction of the edge.  Only need to check 2 points this way
+				//----- First check along the direction of the edge. Only need to check 2 points this way
 				switch (direction.data[indexDir]) {
 					case 0 -> {
 						dx = 0;
@@ -226,7 +226,7 @@ public class HysteresisEdgeTracePoints {
 	}
 
 	/**
-	 * Checks to see if the given coordinate is above the lower threshold.  If it is the point will be
+	 * Checks to see if the given coordinate is above the lower threshold. If it is the point will be
 	 * added to the current segment or be the start of a new segment.
 	 *
 	 * @param parent The edge segment which is being checked
@@ -286,7 +286,7 @@ public class HysteresisEdgeTracePoints {
 	}
 
 	/**
-	 * Returns the found contours.  Returned data structures are subject to modification next time process is called.
+	 * Returns the found contours. Returned data structures are subject to modification next time process is called.
 	 *
 	 * @return List of found contours.
 	 */

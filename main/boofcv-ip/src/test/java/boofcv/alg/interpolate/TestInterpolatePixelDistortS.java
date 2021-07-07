@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -34,8 +34,7 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
  * @author Peter Abeles
  */
 public class TestInterpolatePixelDistortS extends BoofStandardJUnit {
-	@Test
-	public void simple() {
+	@Test void simple() {
 		MockTransform transform = new MockTransform(1,2);
 		MockInterp interp = new MockInterp();
 

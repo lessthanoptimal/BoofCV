@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -51,7 +51,7 @@ public class BoofVideoManager {
 			Class c = Class.forName(pathToManager);
 			return (VideoInterface) c.getConstructor().newInstance();
 		} catch (ClassNotFoundException e) {
-			throw new RuntimeException("Class not found.  Is it included in the class path?");
+			throw new RuntimeException("Class not found. Is it included in the class path?");
 		} catch (InstantiationException | IllegalAccessException | NoSuchMethodException | InvocationTargetException e) {
 			throw new RuntimeException(e);
 		}

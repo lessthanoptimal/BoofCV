@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -36,8 +36,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  */
 public class TestLowLevelMultiViewOps extends BoofStandardJUnit {
 
-	@Test
-	public void computeNormalization() {
+	@Test void computeNormalization() {
 		List<Point2D_F64> list = new ArrayList<>();
 		for (int i = 0; i < 12; i++) {
 			Point2D_F64 p = new Point2D_F64();
@@ -87,8 +86,7 @@ public class TestLowLevelMultiViewOps extends BoofStandardJUnit {
 		assertEquals(1, sigmaY0, 1e-8);
 	}
 
-	@Test
-	public void computeNormalizationLL() {
+	@Test void computeNormalizationLL() {
 		List<List<Point2D_F64>> LL = new ArrayList<>();
 		List<Point2D_F64> list = new ArrayList<>();
 
@@ -115,8 +113,7 @@ public class TestLowLevelMultiViewOps extends BoofStandardJUnit {
 	/**
 	 * Compare to single list function
 	 */
-	@Test
-	public void computeNormalization_two() {
+	@Test void computeNormalization_two() {
 
 		List<AssociatedPair> list = new ArrayList<>();
 		for (int i = 0; i < 12; i++) {
@@ -151,8 +148,7 @@ public class TestLowLevelMultiViewOps extends BoofStandardJUnit {
 	/**
 	 * Compare to single list function
 	 */
-	@Test
-	public void computeNormalization_three() {
+	@Test void computeNormalization_three() {
 
 		List<AssociatedTriple> list = new ArrayList<>();
 		for (int i = 0; i < 12; i++) {

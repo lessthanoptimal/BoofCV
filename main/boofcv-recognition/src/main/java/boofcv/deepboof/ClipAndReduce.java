@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -30,7 +30,7 @@ import boofcv.struct.image.ImageType;
 
 /**
  * Transforms an image in an attempt to not change the information contained inside of it for processing by
- * a classification algorithm that requires an image of fixed size.  This is done by clipping the image to
+ * a classification algorithm that requires an image of fixed size. This is done by clipping the image to
  * ensure that it has the same aspect ratio then scales it using bilinear interpolation.
  *
  * @author Peter Abeles
@@ -50,7 +50,7 @@ public class ClipAndReduce<T extends ImageBase<T>> {
 	/**
 	 * Configuration constructor
 	 *
-	 * @param clip If true it will first clip the image to make it square before reducing it's size.  Otherwise both
+	 * @param clip If true it will first clip the image to make it square before reducing it's size. Otherwise both
 	 * sides are scaled independently to make it square
 	 * @param imageType Type of image it iwll be processing
 	 */
@@ -65,7 +65,7 @@ public class ClipAndReduce<T extends ImageBase<T>> {
 	/**
 	 * Clipps and scales the input image as necessary
 	 *
-	 * @param input Input image.  Typically larger than output
+	 * @param input Input image. Typically larger than output
 	 * @param output Output image
 	 */
 	public void massage( T input, T output ) {
@@ -75,11 +75,11 @@ public class ClipAndReduce<T extends ImageBase<T>> {
 			// configure a simple change in scale for both axises
 			transform.getModel().a11 = input.width/(float)output.width;
 			transform.getModel().a22 = input.height/(float)output.height;
-			// this change is automatically reflected in the distortion class.  It is configured to cache nothing
+			// this change is automatically reflected in the distortion class. It is configured to cache nothing
 
 			distort.apply(inputAdjusted, output);
 		} else {
-			// scale each axis independently.  It will have the whole image but it will be distorted
+			// scale each axis independently. It will have the whole image but it will be distorted
 			transform.getModel().a11 = input.width/(float)output.width;
 			transform.getModel().a22 = input.height/(float)output.height;
 

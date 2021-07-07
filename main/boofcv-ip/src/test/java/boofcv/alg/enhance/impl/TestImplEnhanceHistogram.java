@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -45,8 +45,7 @@ public class TestImplEnhanceHistogram extends BoofStandardJUnit {
 	int height = 20;
 	int histogramLength = 10;
 
-	@Test
-	public void applyTransform() {
+	@Test void applyTransform() {
 		int numFound = 0;
 
 		Method[] methods = ImplEnhanceHistogram.class.getMethods();
@@ -98,8 +97,7 @@ public class TestImplEnhanceHistogram extends BoofStandardJUnit {
 	 * Validate naive algorithm by comparing it against to the full image equalization that has been passed
 	 * sub-images.
 	 */
-	@Test
-	public void equalizeLocalNaive() {
+	@Test void equalizeLocalNaive() {
 		int numFound = 0;
 
 		Method[] methods = ImplEnhanceHistogram.class.getMethods();
@@ -172,8 +170,7 @@ public class TestImplEnhanceHistogram extends BoofStandardJUnit {
 		}
 	}
 
-	@Test
-	public void equalizeLocalInner() {
+	@Test void equalizeLocalInner() {
 		int numFound = 0;
 
 		Method[] methods = ImplEnhanceHistogram.class.getMethods();
@@ -212,8 +209,7 @@ public class TestImplEnhanceHistogram extends BoofStandardJUnit {
 		}
 	}
 
-	@Test
-	public void equalizeLocalRow() {
+	@Test void equalizeLocalRow() {
 		int numFound = 0;
 
 		Method[] methods = ImplEnhanceHistogram.class.getMethods();
@@ -289,8 +285,7 @@ public class TestImplEnhanceHistogram extends BoofStandardJUnit {
 		}
 	}
 
-	@Test
-	public void equalizeLocalCol() {
+	@Test void equalizeLocalCol() {
 		int numFound = 0;
 
 		Method[] methods = ImplEnhanceHistogram.class.getMethods();

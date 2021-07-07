@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -34,8 +34,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  * @author Peter Abeles
  */
 class TestGenerateTrifocalTensor extends BoofStandardJUnit {
-	@Test
-	public void generate() {
+	@Test void generate() {
 		Estimator estimator = new Estimator();
 		GenerateTrifocalTensor alg = new GenerateTrifocalTensor(estimator);
 
@@ -44,8 +43,7 @@ class TestGenerateTrifocalTensor extends BoofStandardJUnit {
 		assertTrue(estimator.called);
 	}
 
-	@Test
-	public void getMinimumPoints() {
+	@Test void getMinimumPoints() {
 		Estimator estimator = new Estimator();
 		GenerateTrifocalTensor alg = new GenerateTrifocalTensor(estimator);
 		assertEquals(9,alg.getMinimumPoints());

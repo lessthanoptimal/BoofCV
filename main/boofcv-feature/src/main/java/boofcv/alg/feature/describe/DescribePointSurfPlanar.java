@@ -25,10 +25,10 @@ import boofcv.struct.image.ImageGray;
 import boofcv.struct.image.Planar;
 
 /**
- * Computes a color SURF descriptor from a {@link Planar} image.  Each band in the
+ * Computes a color SURF descriptor from a {@link Planar} image. Each band in the
  * input image is used to compute its own descriptor, which are then combined together into a single one. The
- * laplacian sign is computed from a gray-scale image.  The descriptor from each band are not individually
- * normalized.  The whole combined descriptor is normalized.
+ * laplacian sign is computed from a gray-scale image. The descriptor from each band are not individually
+ * normalized. The whole combined descriptor is normalized.
  *
  * @param <II> Type of integral image
  * @author Peter Abeles

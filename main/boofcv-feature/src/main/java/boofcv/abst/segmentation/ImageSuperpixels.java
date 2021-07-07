@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -24,10 +24,10 @@ import boofcv.struct.image.ImageBase;
 import boofcv.struct.image.ImageType;
 
 /**
- * High level interface for computing superpixels.  Superpixels are sets of connected adjacent pixels which belong.
+ * High level interface for computing superpixels. Superpixels are sets of connected adjacent pixels which belong.
  * They are intended to break the image up intelligently along object boundaries allowing for easier processing.
  * Each pixel in the output segmented image is assigned an integer label to identify which region in the image it
- * belongs to.  A region is a continuous connected set of pixels.
+ * belongs to. A region is a continuous connected set of pixels.
  *
  * @author Peter Abeles
  */

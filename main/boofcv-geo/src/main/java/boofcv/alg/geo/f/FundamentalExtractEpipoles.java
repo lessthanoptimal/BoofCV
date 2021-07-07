@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -27,9 +27,9 @@ import org.jetbrains.annotations.Nullable;
 
 /**
  * <p>
- * Extracts the epipoles from an essential or fundamental matrix.  The epipoles are extracted
- * from the left and right null space of the provided matrix.  Note that the found epipoles are
- * in homogeneous coordinates.  If the epipole is at infinity then z=0
+ * Extracts the epipoles from an essential or fundamental matrix. The epipoles are extracted
+ * from the left and right null space of the provided matrix. Note that the found epipoles are
+ * in homogeneous coordinates. If the epipole is at infinity then z=0
  * </p>
  *
  * <p>

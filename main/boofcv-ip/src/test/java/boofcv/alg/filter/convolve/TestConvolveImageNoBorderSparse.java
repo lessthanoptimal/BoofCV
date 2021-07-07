@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -45,8 +45,7 @@ public class TestConvolveImageNoBorderSparse extends BoofStandardJUnit {
 	int testX = 5;
 	int testY = 6;
 
-	@Test
-	public void compareToStandard() {
+	@Test void compareToStandard() {
 		CompareToStandard a = new CompareToStandard();
 		a.performTests(5);
 	}

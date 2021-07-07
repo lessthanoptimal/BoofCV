@@ -159,7 +159,7 @@ public abstract class GenericChecksPointTracker<T extends ImageGray<T>> extends 
 		assertEquals(0, tracker.getNewTracks(null).size());
 		checkInside(tracker.getAllTracks(null));
 
-		// Call spawn again.  There should be more tracks now
+		// Call spawn again. There should be more tracks now
 		tracker.spawnTracks();
 
 		assertTrue(beforeEach < tracker.getAllTracks(null).size());

@@ -47,7 +47,7 @@ public interface SteerableKernel<K extends Kernel2D> {
 	 * Computes the kernel at the specified angle.
 	 *
 	 * @param angle Angle the kernel should be pointed at.
-	 * @return The computed kernel.  Data is recycled each time compute is called.
+	 * @return The computed kernel. Data is recycled each time compute is called.
 	 */
 	K compute( double angle );
 

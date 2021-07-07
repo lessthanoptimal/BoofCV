@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -29,12 +29,12 @@ import javax.annotation.Generated;
 
 /**
  * <p>
- * Performs interpolation by convolving a continuous-discrete function across the image.  Borders are handled by
- * re-normalizing.  It is assumed that the kernel will sum up to one.  This is particularly
+ * Performs interpolation by convolving a continuous-discrete function across the image. Borders are handled by
+ * re-normalizing. It is assumed that the kernel will sum up to one. This is particularly
  * important for the unsafe_get() function which does not re-normalize.
  * </p>
  *
- * <p>DO NOT MODIFY.  Automatically generated code created by GenerateImplInterpolatePixelConvolution</p>
+ * <p>DO NOT MODIFY. Automatically generated code created by GenerateImplInterpolatePixelConvolution</p>
  *
  * @author Peter Abeles
  */

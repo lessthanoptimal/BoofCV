@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -49,14 +49,14 @@ public abstract class ImageBase<T extends ImageBase> implements Serializable, Cl
 
 	/**
 	 * <p>
-	 * Creates a rectangular sub-image from 'this' image.  The subimage will share the same internal array
-	 * that stores each pixel's value.  Any changes to pixel values in the original image or the sub-image will
+	 * Creates a rectangular sub-image from 'this' image. The subimage will share the same internal array
+	 * that stores each pixel's value. Any changes to pixel values in the original image or the sub-image will
 	 * affect the other. A sub-image must be a sub-set of the original image and cannot specify a bounds larger
 	 * than the original.
 	 *</p>
 	 *
 	 * <p>
-	 * When specifying the sub-image, the top-left corner is inclusive and the bottom right corner exclusive.  Thus,
+	 * When specifying the sub-image, the top-left corner is inclusive and the bottom right corner exclusive. Thus,
 	 * a sub-image will contain all the original pixels if the following is used: subimage(0,0,width,height,null).
 	 * </p>
 	 *
@@ -64,7 +64,7 @@ public abstract class ImageBase<T extends ImageBase> implements Serializable, Cl
 	 * @param y0 y-coordinate of top-left corner of the sub-image, inclusive.
 	 * @param x1 x-coordinate of bottom-right corner of the sub-image, exclusive.
 	 * @param y1 y-coordinate of bottom-right corner of the sub-image, exclusive.
-	 * @param subimage Optional output for sub-image.  If not null the subimage will be written into this image.
+	 * @param subimage Optional output for sub-image. If not null the subimage will be written into this image.
 	 * @return A sub-image of 'this' image.
 	 */
 	public abstract T subimage(int x0, int y0, int x1, int y1, @Nullable T subimage);
@@ -84,8 +84,8 @@ public abstract class ImageBase<T extends ImageBase> implements Serializable, Cl
 	}
 
 	/**
-	 * Changes the width and height of the image.  If the image data array isn't large enough to hold an
-	 * image of this size then a new array is declared.  Otherwise the image data array is left unchanged
+	 * Changes the width and height of the image. If the image data array isn't large enough to hold an
+	 * image of this size then a new array is declared. Otherwise the image data array is left unchanged
 	 * and only the width and height variables are modified.
 	 *
 	 * @param width Desired image width
@@ -102,7 +102,7 @@ public abstract class ImageBase<T extends ImageBase> implements Serializable, Cl
 	}
 
 	/**
-	 * Sets the value of 'this' image to be identical to the passed in image.  All structural
+	 * Sets the value of 'this' image to be identical to the passed in image. All structural
 	 * attributes of the images must be the same.
 	 *
 	 * @param orig Image for which 'this' is to be a copy of.
@@ -141,7 +141,7 @@ public abstract class ImageBase<T extends ImageBase> implements Serializable, Cl
 	}
 
 	/**
-	 * Returns a new image.  If either width or height are
+	 * Returns a new image. If either width or height are
 	 * set to -1 then none of the class parameters set. Otherwise
 	 * a new image is created with the specified dimensions which has all
 	 * other parameters the same as the original matrix.
@@ -162,7 +162,7 @@ public abstract class ImageBase<T extends ImageBase> implements Serializable, Cl
 	}
 
 	/**
-	 * Creates a new image of the same type which also has the same shape.  This is the same as calling
+	 * Creates a new image of the same type which also has the same shape. This is the same as calling
 	 * {@link #createNew(int, int)} with this image's width and height.
 	 *
 	 * @return new image with the same shape as this.
@@ -210,7 +210,7 @@ public abstract class ImageBase<T extends ImageBase> implements Serializable, Cl
 	public abstract void copyCol(int col , int row0 , int row1 , int offset , Object array );
 
 	/**
-	 * Creates an identical image.  Note that if this image is a sub-image portions of hte image which are not part
+	 * Creates an identical image. Note that if this image is a sub-image portions of hte image which are not part
 	 * of the sub-image are not copied.
 	 *
 	 * @return Clone of this image.

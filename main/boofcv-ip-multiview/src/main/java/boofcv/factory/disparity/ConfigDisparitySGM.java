@@ -40,10 +40,10 @@ public class ConfigDisparitySGM implements Configuration {
 	 * 0 to {@link SgmDisparityCost#MAX_COST}
 	 */
 	public int maxError = -1;
-	/** Tolerance for how difference the left to right associated values can be.  Try 1. Disable with -1 */
+	/** Tolerance for how difference the left to right associated values can be. Try 1. Disable with -1 */
 	public int validateRtoL = 1;
 	/**
-	 * Tolerance for how similar optimal region is to other region.  Closer to zero is more tolerant.
+	 * Tolerance for how similar optimal region is to other region. Closer to zero is more tolerant.
 	 * Try 0.1 for SAD or 0.7 for NCC. Disable with a value &le; 0
 	 */
 	public double texture = 0.15;

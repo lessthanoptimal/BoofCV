@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -29,16 +29,16 @@ import boofcv.struct.ConnectRule;
  */
 public class ConfigSlic implements Configuration {
 	/**
-	 * Number of regions which will be initially seeded.  The actually number of regions at the end will
+	 * Number of regions which will be initially seeded. The actually number of regions at the end will
 	 * vary a bit due to merging of small regions and the image border.
 	 */
 	public int numberOfRegions;
 	/**
-	 * Larger values place more weight on the spacial component.  For 8-bit RGB a value of 200 works well.
+	 * Larger values place more weight on the spacial component. For 8-bit RGB a value of 200 works well.
 	 */
 	public float spacialWeight = 200;
 	/**
-	 * Number of mean-shift iterations.  Typically has converged by 10 iterations.
+	 * Number of mean-shift iterations. Typically has converged by 10 iterations.
 	 */
 	public int totalIterations = 10;
 	/**

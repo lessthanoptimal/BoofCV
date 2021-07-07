@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -36,7 +36,7 @@ import boofcv.struct.image.ImageType;
  * <p>
  * Implementation of {@link boofcv.struct.gss.GaussianScaleSpace} that focuses on one scale space at a time.
  * When the scale space is changed the scaled image is recomputed and previously computed derivatives
- * are marked as stale.  Then the derivatives are recomputed as needed.
+ * are marked as stale. Then the derivatives are recomputed as needed.
  * </p>
  *
  * @author Peter Abeles
@@ -145,7 +145,7 @@ public class NoCacheScaleSpace<I extends ImageGray<I>, D extends ImageGray<D>>
 	}
 
 	/**
-	 * Computes derivative images using previously computed lower level derivatives.  Only
+	 * Computes derivative images using previously computed lower level derivatives. Only
 	 * computes/declares images as needed.
 	 */
 	@Override

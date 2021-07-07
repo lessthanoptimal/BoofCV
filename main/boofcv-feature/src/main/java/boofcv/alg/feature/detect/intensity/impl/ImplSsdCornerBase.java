@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -25,13 +25,13 @@ import boofcv.struct.image.ImageGray;
 /**
  * <p>
  * Several corner detector algorithms work by computing a symmetric matrix whose elements are composed of the convolution
- * of the image's gradient squared.  This is done for X*X, X*Y, and X*X.  Once the matrix has been constructed
- * it is used to estimate how corner like the pixel under consideration is.  This class provides a generalized
+ * of the image's gradient squared. This is done for X*X, X*Y, and X*X. Once the matrix has been constructed
+ * it is used to estimate how corner like the pixel under consideration is. This class provides a generalized
  * interface for performing these calculations in an optimized manor.
  * </p>
  *
  * <p>
- * NOTE: Image borders are not processed.  The zeros in the image border need to be taken in account when
+ * NOTE: Image borders are not processed. The zeros in the image border need to be taken in account when
  * extract features using algorithms such as non-max suppression.
  * </p>
  *

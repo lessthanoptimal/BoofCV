@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -32,7 +32,7 @@ public interface GeoModelEstimator1<Model,Sample> {
 	 * Estimates the model given a set of observations.
 	 *
 	 * @param points Input: Set of observations. Not modified.
-	 * @param estimatedModel Output: Storage for the estimated model.  Modified.
+	 * @param estimatedModel Output: Storage for the estimated model. Modified.
 	 * @return true if successful
 	 */
 	boolean process( List<Sample> points , Model estimatedModel );

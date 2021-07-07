@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -27,7 +27,7 @@ import org.ejml.data.DMatrixRMaj;
 import org.ejml.dense.row.CommonOps_DDRM;
 
 /**
- * Projects a synthetic view of a narrow FOV camera from a wide FOV camera.  The synthetic camera
+ * Projects a synthetic view of a narrow FOV camera from a wide FOV camera. The synthetic camera
  * can be rotated.
  *
  * @author Peter Abeles
@@ -68,8 +68,8 @@ public class NarrowToWidePtoP_F64 implements Point2Transform2_F64 {
 	/**
 	 * Apply the transformation
 	 *
-	 * @param x x-coordinate of point in pixels.  Synthetic narrow FOV camera
-	 * @param y y-coordinate of point in pixels.  Synthetic narrow FOV camera
+	 * @param x x-coordinate of point in pixels. Synthetic narrow FOV camera
+	 * @param y y-coordinate of point in pixels. Synthetic narrow FOV camera
 	 * @param out Pixel location of point in wide FOV camera.
 	 */
 	@Override

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -26,8 +26,7 @@ import org.junit.jupiter.api.Test;
  */
 public class TestGridRansacLineDetector extends BoofStandardJUnit {
 
-	@Test
-	public void seeComment() {
+	@Test void seeComment() {
 		// intentionally empty since all tests are handled by implementations
 	}
 }

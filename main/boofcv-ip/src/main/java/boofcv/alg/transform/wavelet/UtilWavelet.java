@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -35,8 +35,8 @@ import boofcv.struct.wavelet.WlCoef;
 public class UtilWavelet {
 
 	/**
-	 * The original image can have an even or odd number of width/height.  While the transformed
-	 * image must have an even number of pixels.  If the original image is even then the sames
+	 * The original image can have an even or odd number of width/height. While the transformed
+	 * image must have an even number of pixels. If the original image is even then the sames
 	 * are the same, otherwise the transformed image's shape is rounded up.
 	 *
 	 * @param original Original input image.

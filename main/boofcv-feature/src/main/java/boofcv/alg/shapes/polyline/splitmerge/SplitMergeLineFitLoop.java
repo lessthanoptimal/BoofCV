@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -27,8 +27,8 @@ import org.ddogleg.struct.DogArray_I32;
 import java.util.List;
 
 /**
- * Implementation of {@link SplitMergeLineFit} for looped lists of points.  The beginning and end of the list are
- * assumed to be connected.  An additional check is done in the start to find two points which are far apart.
+ * Implementation of {@link SplitMergeLineFit} for looped lists of points. The beginning and end of the list are
+ * assumed to be connected. An additional check is done in the start to find two points which are far apart.
  *
  * @author Peter Abeles
  */
@@ -90,7 +90,7 @@ public class SplitMergeLineFitLoop extends SplitMergeLineFit {
 	}
 
 	/**
-	 * Recursively splits pixels between indexStart to indexStart+length.  A split happens if there is a pixel
+	 * Recursively splits pixels between indexStart to indexStart+length. A split happens if there is a pixel
 	 * more than the desired distance away from the two end points. Results are placed into 'splits'
 	 */
 	protected void splitPixels( int indexStart, int length ) {
@@ -116,7 +116,7 @@ public class SplitMergeLineFitLoop extends SplitMergeLineFit {
 	 * Computes the distance between pairs of points which are separated by 1/2 the contour list. The index of the
 	 * first pixel in the pair with the greatest distance is returned
 	 *
-	 * @return Index of the first pixel which should be used to split the list.  The other end is ret + N/2
+	 * @return Index of the first pixel which should be used to split the list. The other end is ret + N/2
 	 */
 	protected int selectFarthest( List<Point2D_I32> contour ) {
 		int bestIndex = -1;
@@ -220,7 +220,7 @@ public class SplitMergeLineFitLoop extends SplitMergeLineFit {
 
 	/**
 	 * Finds the point between indexStart and the end point which is the greater distance from the line
-	 * (set up prior to calling).  Returns the index of the element with a distances greater than tolerance, otherwise -1
+	 * (set up prior to calling). Returns the index of the element with a distances greater than tolerance, otherwise -1
 	 *
 	 * @return Selected offset from start of the split. -1 if no split was selected
 	 */

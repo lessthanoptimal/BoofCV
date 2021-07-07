@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -30,7 +30,7 @@ import org.ejml.interfaces.decomposition.SingularValueDecomposition_F64;
 /**
  * <p>
  * Extracts the epipoles, camera matrices, and fundamental matrices for views 2 and 3 with respect
- * to view 1 from the trifocal tensor. Epipoles are found in homogeneous coordinates.  Singular value
+ * to view 1 from the trifocal tensor. Epipoles are found in homogeneous coordinates. Singular value
  * decomposition is used to compute each vector and is robust to noise and epipoles will have a norm of one..
  * </p>
  *
@@ -135,7 +135,7 @@ public class TrifocalExtractGeometries {
 	}
 
 	/**
-	 * Extracts the epipoles from the trifocal tensor.  Extracted epipoles will have a norm of 1
+	 * Extracts the epipoles from the trifocal tensor. Extracted epipoles will have a norm of 1
 	 * as an artifact of using SVD.
 	 *
 	 * @param e2  Output: Epipole in image 2. Homogeneous coordinates. Modified
@@ -191,12 +191,12 @@ public class TrifocalExtractGeometries {
 
 	/**
 	 * <p>
-	 * Extract the fundamental matrices between views 1 + 2 and views 1 + 3.  The returned Fundamental
+	 * Extract the fundamental matrices between views 1 + 2 and views 1 + 3. The returned Fundamental
 	 * matrices will have the following properties: x<sub>i</sub><sup>T</sup>*Fi*x<sub>1</sub> = 0, where i is view 2 or 3.
 	 * </p>
 	 *
 	 * <p>
-	 * NOTE: The first camera is assumed to have the camera matrix of P1 = [I|0].  Thus observations in pixels for
+	 * NOTE: The first camera is assumed to have the camera matrix of P1 = [I|0]. Thus observations in pixels for
 	 * the first camera will not meet the epipolar constraint when applied to the returned fundamental matrices.
 	 * </p>
 	 *

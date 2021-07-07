@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -24,17 +24,17 @@ import boofcv.struct.image.ImageType;
 
 /**
  * <p>
- * Given two rectified images compute the corresponding dense disparity image.  Input images are assumed
- * to be rectified along the x-axis.  Disparity goes from left to right image, thus the x coordinates of pixels
+ * Given two rectified images compute the corresponding dense disparity image. Input images are assumed
+ * to be rectified along the x-axis. Disparity goes from left to right image, thus the x coordinates of pixels
  * in the left and right images have the following relationship x_right = x_left + disparity, and y_right = y_left..
  * To speed up calculations only a limited range of disparities are considered from minDisparity to maxDisparity.
  * Image borders are not processed and the border size is specified by functions below.
  * </p>
  *
  * <p>
- * DISPARITY IMAGE FORMAT: Returned disparity image is offset from the true value by minDisparity.  This
- * is done to maximize storage efficiency.  To get the actual disparity value simply extract the value
- * of a pixel and add minDisparity to it.  Invalid pixels are indicated by having a value greater than
+ * DISPARITY IMAGE FORMAT: Returned disparity image is offset from the true value by minDisparity. This
+ * is done to maximize storage efficiency. To get the actual disparity value simply extract the value
+ * of a pixel and add minDisparity to it. Invalid pixels are indicated by having a value greater than
  * (maxDisparity - minDisparity).
  * </p>
  *
@@ -53,7 +53,7 @@ public interface StereoDisparity<Image extends ImageBase<Image>, Disparity exten
 	void process( Image imageLeft , Image imageRight );
 
 	/**
-	 * Return the computed disparity image.  See comments in class description on disparity image format.
+	 * Return the computed disparity image. See comments in class description on disparity image format.
 	 *
 	 * @return Output disparity from left to right image.
 	 */

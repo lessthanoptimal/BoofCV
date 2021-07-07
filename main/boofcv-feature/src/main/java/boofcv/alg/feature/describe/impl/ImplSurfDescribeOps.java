@@ -152,7 +152,7 @@ public class ImplSurfDescribeOps {
 	}
 
 	/**
-	 * Simple algorithm for computing the gradient of a region.  Can handle image borders
+	 * Simple algorithm for computing the gradient of a region. Can handle image borders
 	 */
 	public static <T extends ImageGray<T>>
 	void naiveGradient( T ii, double tl_x, double tl_y, double samplePeriod,

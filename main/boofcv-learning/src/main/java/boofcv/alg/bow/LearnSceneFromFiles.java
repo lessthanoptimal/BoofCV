@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -158,7 +158,7 @@ public abstract class LearnSceneFromFiles {
 	}
 
 	/**
-	 * Loads the paths to image files contained in subdirectories of the root directory.  Each sub directory
+	 * Loads the paths to image files contained in subdirectories of the root directory. Each sub directory
 	 * is assumed to be a different category of images.
 	 */
 	public static Map<String,List<String>> findImages( File rootDir ) {

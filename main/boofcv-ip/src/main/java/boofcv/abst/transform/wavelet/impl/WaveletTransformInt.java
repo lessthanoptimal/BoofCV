@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -37,7 +37,7 @@ import boofcv.struct.wavelet.WlCoef_I32;
  *
  * <p>
  * Wavelet transforms are only provided for 32-bit integer images, so if the input image is not 32-bit
- * then it is first copied into a 32-bit image and then transformed.  This is all done internally
+ * then it is first copied into a 32-bit image and then transformed. This is all done internally
  * and is transparent to the user.
  * </p>
  * @author Peter Abeles

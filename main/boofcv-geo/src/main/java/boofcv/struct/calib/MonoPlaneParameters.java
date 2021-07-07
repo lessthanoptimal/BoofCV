@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -22,7 +22,7 @@ import georegression.struct.se.Se3_F64;
 
 /**
  * Calibration parameters when the intrinsic parameters for a single camera is known and the location
- * of the camera relative to the ground plane.  In the plane's reference frame, the plane is parallel
+ * of the camera relative to the ground plane. In the plane's reference frame, the plane is parallel
  * to the x-z plane and contains point (0,0,0).
  *
  * @author Peter Abeles
@@ -33,8 +33,8 @@ public class MonoPlaneParameters {
 	 */
 	public CameraPinholeBrown intrinsic;
 	/**
-	 * Extrinsic parameters for the camera.  Transform from plane to camera coordinate system.  This is technically
-	 * over specified since only orientation (3-DOF) and distance from plane (1-DOF) is needed.  The extra
+	 * Extrinsic parameters for the camera. Transform from plane to camera coordinate system. This is technically
+	 * over specified since only orientation (3-DOF) and distance from plane (1-DOF) is needed. The extra
 	 * degrees of freedom can be used to specify the local coordinate (e.g. robot) completely and simplify
 	 * various camera transforms.
 	 */

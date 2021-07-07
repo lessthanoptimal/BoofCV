@@ -31,7 +31,7 @@ import lombok.Setter;
 public class ConfigThresholdBlockMinMax extends ConfigThreshold {
 	/**
 	 * If the lower and upper histogram values are different by less than or equal to this amount it is considered
-	 * a textureless region.  Set to a value <= -1 to disable.
+	 * a textureless region. Set to a value <= -1 to disable.
 	 */
 	public double minimumSpread = 10;
 

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -70,7 +70,7 @@ public class GenerateImplWaveletTransformNaive extends CodeGeneratorBase {
 				"/**\n" +
 				" * <p>\n" +
 				" * Unoptimized and simplistic implementation of a forward and inverse wavelet transform across one\n" +
-				" * level.  Primary used for validation testing.\n" +
+				" * level. Primary used for validation testing.\n" +
 				" * </p>\n" +
 				" *\n" +
 				" * <p>\n" +

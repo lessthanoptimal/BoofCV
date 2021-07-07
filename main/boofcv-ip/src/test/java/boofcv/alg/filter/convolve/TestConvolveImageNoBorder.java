@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -26,24 +26,21 @@ import org.junit.jupiter.api.Test;
  */
 public class TestConvolveImageNoBorder extends BoofStandardJUnit {
 
-	@Test
-	public void compareToStandard_symmetric() {
+	@Test void compareToStandard_symmetric() {
 		CompareToStandardConvolution a = new CompareToStandardConvolution(ConvolveImageNoBorder.class);
 		a.setKernelWidth(5);
 		a.setOffset(2);
 		a.performTests(64);
 	}
 
-	@Test
-	public void compareToStandard_UNsymmetric() {
+	@Test void compareToStandard_UNsymmetric() {
 		CompareToStandardConvolution a = new CompareToStandardConvolution(ConvolveImageNoBorder.class);
 		a.setKernelWidth(5);
 		a.setOffset(1);
 		a.performTests(64);
 	}
 
-	@Test
-	public void compareToStandard_even() {
+	@Test void compareToStandard_even() {
 		CompareToStandardConvolution a = new CompareToStandardConvolution(ConvolveImageNoBorder.class);
 		a.setKernelWidth(4);
 		a.setOffset(3);

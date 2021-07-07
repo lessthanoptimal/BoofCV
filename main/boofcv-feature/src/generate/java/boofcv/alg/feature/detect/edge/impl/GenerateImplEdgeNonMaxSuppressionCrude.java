@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -55,7 +55,7 @@ public class GenerateImplEdgeNonMaxSuppressionCrude extends CodeGeneratorBase {
 				"\n" +
 				"/**\n" +
 				" * <p>\n" +
-				" * Implementations of the crude version of non-maximum edge suppression.  If the gradient is positive or negative\n" +
+				" * Implementations of the crude version of non-maximum edge suppression. If the gradient is positive or negative\n" +
 				" * is used to determine the direction of suppression. This is faster since an expensive orientation calculation\n" +
 				" * is avoided.\n" +
 				" * </p>\n" +
@@ -75,7 +75,7 @@ public class GenerateImplEdgeNonMaxSuppressionCrude extends CodeGeneratorBase {
 		String bitWise = derivType.getBitWise();
 
 		out.print("\t/**\n" +
-				"\t * Only processes the inner image.  Ignoring the border.\n" +
+				"\t * Only processes the inner image. Ignoring the border.\n" +
 				"\t */\n" +
 				"\tstatic public void inner4( GrayF32 intensity , "+derivType.getSingleBandName()+" derivX , "+derivType.getSingleBandName()+" derivY, GrayF32 output )\n" +
 				"\t{\n" +

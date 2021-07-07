@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -34,7 +34,7 @@ import java.awt.*;
 import java.awt.image.BufferedImage;
 
 /**
- * Demonstration of various ways an image can be "enhanced".  Image enhancement typically refers to making it easier
+ * Demonstration of various ways an image can be "enhanced". Image enhancement typically refers to making it easier
  * for people to view the image and pick out its details.
  *
  * @author Peter Abeles

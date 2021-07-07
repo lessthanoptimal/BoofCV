@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -40,7 +40,7 @@ public class LensDistortionOps_F64 {
 
 	/**
 	 * Creates a {@link Point2Transform2_F32} for converting pixels from original camera model into a new synthetic
-	 * model.  The scaling of the image can be adjusted to ensure certain visibility requirements.
+	 * model. The scaling of the image can be adjusted to ensure certain visibility requirements.
 	 *
 	 * @param type The type of adjustment it will apply to the transform
 	 * @param paramOriginal Camera model for the current image
@@ -48,7 +48,7 @@ public class LensDistortionOps_F64 {
 	 * @param desiredToOriginal If true then the transform's input is assumed to be pixels in the desired
 	 * image and the output will be in original image, if false then the reverse transform
 	 * is returned.
-	 * @param paramMod The modified camera model to meet the requested visibility requirements.  Null if you don't want it.
+	 * @param paramMod The modified camera model to meet the requested visibility requirements. Null if you don't want it.
 	 * @return The requested transform
 	 */
 	public static <O extends CameraPinhole, D extends CameraPinhole>
@@ -106,7 +106,7 @@ public class LensDistortionOps_F64 {
 		DMatrixRMaj A = new DMatrixRMaj(3, 3, true, scale, 0, deltaX, 0, scale, deltaY, 0, 0, 1);
 		DMatrixRMaj A_inv = new DMatrixRMaj(3, 3);
 		if (!CommonOps_DDRM.invert(A, A_inv)) {
-			throw new RuntimeException("Failed to invert adjustment matrix.  Probably bad.");
+			throw new RuntimeException("Failed to invert adjustment matrix. Probably bad.");
 		}
 
 		if (paramMod != null) {

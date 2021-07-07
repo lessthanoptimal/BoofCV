@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -31,7 +31,7 @@ import javax.annotation.Generated;
  * Implementation of {@link BilinearPixelS} for a specific image type.
  * </p>
  *
- * <p>DO NOT MODIFY.  Automatically generated code created by GenerateImplBilinearPixel</p>
+ * <p>DO NOT MODIFY. Automatically generated code created by GenerateImplBilinearPixel</p>
  *
  * @author Peter Abeles
  */

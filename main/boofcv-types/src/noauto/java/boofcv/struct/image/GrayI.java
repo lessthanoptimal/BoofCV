@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -20,18 +20,18 @@ package boofcv.struct.image;
 
 /**
  * <p>
- * Base class for all integer images.  An integer image can either be signed or unsigned.  Since all integers in
+ * Base class for all integer images. An integer image can either be signed or unsigned. Since all integers in
  * Java are signed (which is really f*ing annoying) a boolean variable is used to differentiate these image types.
  * </p>
  *
  * <p>
- * DESIGN NOTE: No performance or generality is lost by using the 'int' type for setters and getters.  At a low level
+ * DESIGN NOTE: No performance or generality is lost by using the 'int' type for setters and getters. At a low level
  * the JavaVM converts all integer types into an int when not in an array.
  * </p>
  *
  * <p>
- * DESIGN NOTE: Java does not support unsigned data.  If an image is unsigned this is only directly enforced by the get()
- * function.  When directly accessing the data array the data's unsigned nature must be enforced manually using the
+ * DESIGN NOTE: Java does not support unsigned data. If an image is unsigned this is only directly enforced by the get()
+ * function. When directly accessing the data array the data's unsigned nature must be enforced manually using the
  * bitwise and operator.
  * </p>
  *

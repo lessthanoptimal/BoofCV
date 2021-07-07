@@ -24,8 +24,8 @@ import boofcv.struct.feature.NccFeature;
 import boofcv.struct.image.ImageGray;
 
 /**
- * Describes a rectangular region using its raw pixel intensities which have been normalized for intensity.  This
- * allows the descriptor to be light invariant.  The entire region must be inside the image for a descriptor to be computed
+ * Describes a rectangular region using its raw pixel intensities which have been normalized for intensity. This
+ * allows the descriptor to be light invariant. The entire region must be inside the image for a descriptor to be computed
  * because any outside values will change its intensity normalization.
  *
  * @author Peter Abeles

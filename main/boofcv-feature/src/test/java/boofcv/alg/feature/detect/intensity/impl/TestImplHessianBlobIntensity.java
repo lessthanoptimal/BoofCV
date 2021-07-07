@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -43,8 +43,7 @@ public class TestImplHessianBlobIntensity extends BoofStandardJUnit {
 
 	int numExpected = 2;
 
-	@Test
-	public void testDeterminant() {
+	@Test void testDeterminant() {
 
 		int total = 0;
 		Method[] list = ImplHessianBlobIntensity.class.getMethods();
@@ -85,8 +84,7 @@ public class TestImplHessianBlobIntensity extends BoofStandardJUnit {
 		assertEquals(expected,intensity.get(5,6),1e-4);
 	}
 
-	@Test
-	public void testTrace() {
+	@Test void testTrace() {
 
 		int total = 0;
 		Method[] list = ImplHessianBlobIntensity.class.getMethods();

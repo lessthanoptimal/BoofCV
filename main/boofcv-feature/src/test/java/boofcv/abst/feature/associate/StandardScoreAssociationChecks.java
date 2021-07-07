@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -39,8 +39,7 @@ public abstract class StandardScoreAssociationChecks<T> extends BoofStandardJUni
 
 	public abstract ScoreAssociation<T> createScore();
 
-	@Test
-	public void checkScoreType() {
+	@Test void checkScoreType() {
 		ScoreAssociation<T> alg = createScore();
 
 		assertTrue(expectedType == alg.getScoreType());
@@ -51,8 +50,7 @@ public abstract class StandardScoreAssociationChecks<T> extends BoofStandardJUni
 	 */
 	public abstract T createDescription();
 
-	@Test
-	public void empiricalCheckOnType() {
+	@Test void empiricalCheckOnType() {
 		ScoreAssociation<T> alg = createScore();
 
 		T descA = createDescription();

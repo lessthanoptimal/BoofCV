@@ -86,7 +86,7 @@ public class FiducialDetection extends BaseStandardInputApp {
 		System.out.println();
 		System.out.println("----------------------------------- Other Flags -----------------------------------------");
 		System.out.println();
-		System.out.println("These flags are common for all input methods.  They can be specified any time before the");
+		System.out.println("These flags are common for all input methods. They can be specified any time before the");
 		System.out.println("fidcuial flags are specified");
 		System.out.println();
 		System.out.println("  --Intrinsic=<path>                 Specifies location of the intrinsic parameters file.");
@@ -378,7 +378,7 @@ public class FiducialDetection extends BaseStandardInputApp {
 			if (intrinsic.width != width || intrinsic.height != height) {
 				System.out.println();
 				System.out.println("The image resolution in the intrinsics file doesn't match the input.");
-				System.out.println("Massaging the intrinsic for this input.  If the results are poor calibrate");
+				System.out.println("Massaging the intrinsic for this input. If the results are poor calibrate");
 				System.out.println("your camera at the correct resolution!");
 				System.out.println();
 
@@ -544,7 +544,7 @@ public class FiducialDetection extends BaseStandardInputApp {
 				String device = getCameraDeviceString();
 				sequence = media.openCamera(device, desiredWidth, desiredHeight, ImageType.single(GrayU8.class));
 			} else {
-				// just assume 30ms is appropriate.  Should let the use specify this number
+				// just assume 30ms is appropriate. Should let the use specify this number
 				pause = 30;
 				sequence = media.openVideo(filePath, ImageType.single(GrayU8.class));
 				sequence.setLoop(true);
@@ -553,7 +553,7 @@ public class FiducialDetection extends BaseStandardInputApp {
 		} else {
 			buffered = UtilImageIO.loadImage(filePath);
 			if (buffered == null) {
-				System.err.println("Can't find image or it can't be read.  " + filePath);
+				System.err.println("Can't find image or it can't be read. " + filePath);
 				System.exit(1);
 			}
 			intrinsic = handleIntrinsic(intrinsic, buffered.getWidth(), buffered.getHeight());

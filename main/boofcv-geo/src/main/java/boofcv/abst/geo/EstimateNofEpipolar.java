@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -25,7 +25,7 @@ import org.ejml.data.DMatrixRMaj;
 /**
  * <p>
  * Marker interface for estimating several fundamental, essential, or homography matrices given a set of
- * associated pairs.  Each of these matrices describes the relationship between two views.
+ * associated pairs. Each of these matrices describes the relationship between two views.
  * </p>
  *
  * <p>

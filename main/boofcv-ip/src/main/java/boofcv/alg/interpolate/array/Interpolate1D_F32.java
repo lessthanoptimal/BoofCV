@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -19,7 +19,7 @@
 package boofcv.alg.interpolate.array;
 
 /**
- * Provides much of the basic house keeping needed for interpolating 1D data.  Interpolation
+ * Provides much of the basic house keeping needed for interpolating 1D data. Interpolation
  * is done using sample points y[i] = f(x[i]) where x is a monotonically increasing or decreasing
  * function.
  *
@@ -108,8 +108,8 @@ public abstract class Interpolate1D_F32 {
 	}
 
 	/**
-	 * Performs an interpolation using sample data starting at index0.  Little checking
-	 * is done and it is assumed the user knows what he is doing.  Interpolation is done
+	 * Performs an interpolation using sample data starting at index0. Little checking
+	 * is done and it is assumed the user knows what he is doing. Interpolation is done
 	 * using points from index0 to index0 + M - 1
 	 *
 	 * @param index0 first sample point used in the interpolation.
@@ -122,7 +122,7 @@ public abstract class Interpolate1D_F32 {
 	}
 
 	/**
-	 * This is where the specific implementation of the interpolation is done.  It should
+	 * This is where the specific implementation of the interpolation is done. It should
 	 * use points index0 to index0 + M - 1 in its interpolation
 	 *
 	 * @param testX Where the interpolated value is done at.
@@ -187,8 +187,8 @@ public abstract class Interpolate1D_F32 {
 	}
 
 	/**
-	 * Searches the x array by bisecting it.  This takes advantage of the data being
-	 * monotonic.  This finds a center index which has the following property:
+	 * Searches the x array by bisecting it. This takes advantage of the data being
+	 * monotonic. This finds a center index which has the following property:
 	 * x[center] &le; val &lt; x[center+1]
 	 * From that it selects index0 which is center - M/2.
 	 *

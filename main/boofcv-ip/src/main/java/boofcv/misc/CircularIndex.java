@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -56,7 +56,7 @@ public class CircularIndex {
 	/**
 	 * Adds offset (positive or negative) to index in a circular buffer.
 	 * @param index element in circular buffer
-	 * @param offset offset.  |offset| < size
+	 * @param offset offset. |offset| < size
 	 * @param size size of the circular buffer
 	 * @return new index
 	 */
@@ -111,7 +111,7 @@ public class CircularIndex {
 
 	/**
 	 * Subtracts index1 from index0. positive number if its closer in the positive
-	 * direction or negative if closer in the negative direction.  if equal distance then
+	 * direction or negative if closer in the negative direction. if equal distance then
 	 * it will return a negative number.
 	 *
 	 * @param index0 element in circular buffer

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -30,7 +30,7 @@ package boofcv.alg.background;
  * <li><b>learningPeriod:</b> Specifies how fast a Gaussian changes. Larger values is slower learning. Try 100</li>
  * <li><b>decayCoef:</b> Adjusts how quickly a Gaussian's weight is reduced. Try 0.001</li>
  * <li><b>maxGaussian:</b> Maximum number of Gaussian models. Try 10</li>
- * <li><b>initial variance</b> The initial variance assigned to pixels when they are first observed.  By default this is
+ * <li><b>initial variance</b> The initial variance assigned to pixels when they are first observed. By default this is
  * Float.MIN_VALUE.
  * </ul>
  *

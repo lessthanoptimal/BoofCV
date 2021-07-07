@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -42,7 +42,7 @@ public class GGrayImageOps {
 	 * </p>
 	 *
 	 * @param input  Input image. Not modified.
-	 * @param output If not null, the output image.  If null a new image is declared and returned.  Modified.
+	 * @param output If not null, the output image. If null a new image is declared and returned. Modified.
 	 * @return Output image.
 	 */
 	public static <T extends ImageGray<T>> T stretch(T input, double gamma, double beta, double max , T output) {
@@ -68,7 +68,7 @@ public class GGrayImageOps {
 	 *
 	 * @param input  Input image. Not modified.
 	 * @param beta   How much the image is brightened by.
-	 * @param output If not null, the output image.  If null a new image is declared and returned.  Modified.
+	 * @param output If not null, the output image. If null a new image is declared and returned. Modified.
 	 * @return Output image.
 	 */
 	public static <T extends ImageGray<T>> T brighten(T input , double beta, double max , T output )

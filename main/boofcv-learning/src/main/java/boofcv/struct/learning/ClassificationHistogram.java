@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -21,8 +21,8 @@ package boofcv.struct.learning;
 import java.util.Arrays;
 
 /**
- * Used create a histogram of actual to predicted classification.  This will be a NxN matrix.  This can
- * then be converted into a confusion matrix.  Rows are actual type and columns is the predicted type.
+ * Used create a histogram of actual to predicted classification. This will be a NxN matrix. This can
+ * then be converted into a confusion matrix. Rows are actual type and columns is the predicted type.
  *
  * @author Peter Abeles
  */

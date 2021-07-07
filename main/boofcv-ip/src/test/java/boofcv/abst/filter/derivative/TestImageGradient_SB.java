@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -33,8 +33,7 @@ public class TestImageGradient_SB extends BoofStandardJUnit {
 	/**
 	 * See if it throws an exception or not
 	 */
-	@Test
-	public void testNoException() {
+	@Test void testNoException() {
 		GrayF32 input = new GrayF32(width, height);
 		GrayF32 derivX = new GrayF32(width, height);
 		GrayF32 derivY = new GrayF32(width, height);

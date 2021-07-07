@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -33,7 +33,7 @@ import org.ejml.ops.ConvertMatrixData;
 import java.util.ArrayList;
 
 /**
- * Class which simplifies the removal of perspective distortion from a region inside an image.  Given the ordered
+ * Class which simplifies the removal of perspective distortion from a region inside an image. Given the ordered
  * corners of a quadrilateral in the input image it applies a homography transform which reprojects the region
  * into the input image into a rectangular output image.
  *
@@ -93,7 +93,7 @@ public class RemovePerspectiveDistortion<T extends ImageBase<T>> {
 	}
 
 	/**
-	 * Applies distortion removal to the specified region in the input image.  The undistorted image is returned.
+	 * Applies distortion removal to the specified region in the input image. The undistorted image is returned.
 	 *
 	 * @param input Input image
 	 * @param corner0 Top left corner

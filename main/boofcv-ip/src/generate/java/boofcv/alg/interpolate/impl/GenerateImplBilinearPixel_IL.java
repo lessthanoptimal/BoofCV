@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -136,7 +136,7 @@ public class GenerateImplBilinearPixel_IL extends CodeGeneratorBase {
 				"\n" +
 				"\t\t" + image.getDataType() + "[] data = orig.data;\n" +
 				"\n" +
-				"\t\t// computing this just once doesn't seem to change speed very much.  Keeping it here to avoid trying\n" +
+				"\t\t// computing this just once doesn't seem to change speed very much. Keeping it here to avoid trying\n" +
 				"\t\t// it again in the future\n" +
 				"\t\t" + floatType + " a00 = (1.0f - ax) * (1.0f - ay);\n" +
 				"\t\t" + floatType + " a10 = ax * (1.0f - ay);\n" +

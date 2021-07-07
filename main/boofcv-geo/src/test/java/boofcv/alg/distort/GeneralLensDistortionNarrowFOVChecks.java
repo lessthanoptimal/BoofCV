@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -39,8 +39,7 @@ public abstract class GeneralLensDistortionNarrowFOVChecks extends BoofStandardJ
 
 	public abstract LensDistortionNarrowFOV create();
 
-	@Test
-	public void forwardsBackwards_F32() {
+	@Test void forwardsBackwards_F32() {
 		LensDistortionNarrowFOV alg = create();
 
 		for (int i = 0; i < 4; i++) {
@@ -72,8 +71,7 @@ public abstract class GeneralLensDistortionNarrowFOVChecks extends BoofStandardJ
 		}
 	}
 
-	@Test
-	public void forwardsBackwards_F64() {
+	@Test void forwardsBackwards_F64() {
 		LensDistortionNarrowFOV alg = create();
 
 		for (int i = 0; i < 4; i++) {

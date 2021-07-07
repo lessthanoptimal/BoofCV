@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -23,14 +23,14 @@ import boofcv.struct.image.ImageType;
 
 /**
  * <p>
- * Base class for image pyramids.  Provides common functionality and data structures.  The scale
- * is defined in its children {@link PyramidDiscrete} and {@link PyramidFloat}.  This allows
+ * Base class for image pyramids. Provides common functionality and data structures. The scale
+ * is defined in its children {@link PyramidDiscrete} and {@link PyramidFloat}. This allows
  * it to be either integer or floating point and strongly typed.
  * </p>
  *
  * <p>
  * When updating the pyramid, if the top most layer is at the same resolution as the original image then a reference
- * can optionally be saved, avoiding an unnecessary image copy.  This is done by setting the saveOriginalReference
+ * can optionally be saved, avoiding an unnecessary image copy. This is done by setting the saveOriginalReference
  * to true.
  * </p>
  *
@@ -43,7 +43,7 @@ public abstract class ImagePyramidBase<T extends ImageBase<T>>
 	protected int bottomWidth;
 	protected int bottomHeight;
 
-	// The image at different resolutions.  Larger indexes for lower resolutions
+	// The image at different resolutions. Larger indexes for lower resolutions
 	public T[] layers;
 
 	// if the top layer is full resolution, should a copy be made or a reference to the original be saved?i
@@ -77,7 +77,7 @@ public abstract class ImagePyramidBase<T extends ImageBase<T>>
 	}
 
 	/**
-	 * Initializes internal data structures based on the input image's size.  Should be called each time a new image
+	 * Initializes internal data structures based on the input image's size. Should be called each time a new image
 	 * is processed.
 	 *
 	 * @param width Image width

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -28,7 +28,7 @@ import javax.annotation.Generated;
 /**
  * Implementations of Census transform.
  *
- * <p>DO NOT MODIFY.  Automatically generated code created by GenerateImplCensusTransformInner</p>
+ * <p>DO NOT MODIFY. Automatically generated code created by GenerateImplCensusTransformInner</p>
  *
  * @author Peter Abeles
  */

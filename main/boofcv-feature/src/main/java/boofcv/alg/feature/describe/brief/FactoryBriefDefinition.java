@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -23,7 +23,7 @@ import georegression.struct.point.Point2D_I32;
 import java.util.Random;
 
 /**
- * Creates different brief descriptors.  The original paper proposed several different configurations.  The
+ * Creates different brief descriptors. The original paper proposed several different configurations. The
  * best one were randomly generated with a gaussian distribution.
  *
  * @author Peter Abeles
@@ -32,11 +32,11 @@ public class FactoryBriefDefinition {
 
 	/**
 	 * Creates a descriptor by randomly selecting points inside a square region using a Gaussian distribution
-	 * with a sigma of (5/2)*radius.  This is done exactly as is described in the paper where twice
+	 * with a sigma of (5/2)*radius. This is done exactly as is described in the paper where twice
 	 * as many points are sampled as are compared..
 	 *
 	 * @param rand Random number generator.
-	 * @param radius Radius of the square region.  width = 2*radius+1.
+	 * @param radius Radius of the square region. width = 2*radius+1.
 	 * @param numPairs Number of sample point pairs.
 	 * @return Definition of a BRIEF feature.
 	 */

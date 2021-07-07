@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -32,8 +32,8 @@ import java.util.List;
 
 /**
  * <p>
- * Decomposed the essential matrix into a rigid body motion; rotation and translation.  This is the rigid body
- * transformation from the first camera frame into the second camera frame.  A total f four possible motions
+ * Decomposed the essential matrix into a rigid body motion; rotation and translation. This is the rigid body
+ * transformation from the first camera frame into the second camera frame. A total f four possible motions
  * will be found and the ambiguity can be removed by calling {@link PositiveDepthConstraintCheck} on each hypothesis.
  * </p>
  *
@@ -131,12 +131,12 @@ public class DecomposeEssential {
 
 	/**
 	 * <p>
-	 * Returns the four possible solutions found in the decomposition.  The returned motions go from the
+	 * Returns the four possible solutions found in the decomposition. The returned motions go from the
 	 * first into the second camera frame.
 	 * </p>
 	 *
 	 * <p>
-	 * WARNING: This list is modified on each call to decompose.  Create a copy of any
+	 * WARNING: This list is modified on each call to decompose. Create a copy of any
 	 * solution that needs to be saved.
 	 * </p>
 	 *
@@ -147,7 +147,7 @@ public class DecomposeEssential {
 	}
 
 	/**
-	 * There are four possible reconstructions from an essential matrix.  This function will compute different
+	 * There are four possible reconstructions from an essential matrix. This function will compute different
 	 * permutations depending on optionA and optionB being true or false.
 	 */
 	private void extractTransform( DMatrixRMaj U, DMatrixRMaj V,

@@ -73,7 +73,7 @@ public abstract class FundamentalLinear {
 		opEssential = (W)-> {
 			// project it into essential space
 			// the scale factor is arbitrary, but the first two singular values need
-			// to be the same.  so just set them to one
+			// to be the same. so just set them to one
 			W.unsafe_set(0, 0, 1);
 			W.unsafe_set(1, 1, 1);
 			W.unsafe_set(2, 2, 0);
@@ -105,7 +105,7 @@ public abstract class FundamentalLinear {
 
 	/**
 	 * Reorganizes the epipolar constraint equation (x<sup>T</sup><sub>2</sub>*F*x<sub>1</sub> = 0) such that it
-	 * is formulated as a standard linear system of the form Ax=0.  Where A contains the pixel locations and x is
+	 * is formulated as a standard linear system of the form Ax=0. Where A contains the pixel locations and x is
 	 * the reformatted fundamental matrix.
 	 *
 	 * @param points Set of associated points in left and right images.

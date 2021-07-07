@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -26,7 +26,7 @@ import java.util.List;
 
 /**
  * <p>Given a cluster of ellipses (created with {@link EllipsesIntoClusters}) order the ellipses into an regular
- * grid.  Must be a proper grid too.  That means number of rows and columns both need to be 2 or more.</p>
+ * grid. Must be a proper grid too. That means number of rows and columns both need to be 2 or more.</p>
  * 
  * <p>Unlike the {@link EllipseClustersIntoHexagonalGrid asymmetric} grid the return grid object will be dense
  * with every element filled as expected.</p>
@@ -113,8 +113,8 @@ public class EllipseClustersIntoRegularGrid extends EllipseClustersIntoGrid {
 	}
 
 	/**
-	 * Makes sure the found grid is the same size as the original cluster.  If it's not then.
-	 * not all the nodes were used.  All lists must have he same size too.
+	 * Makes sure the found grid is the same size as the original cluster. If it's not then.
+	 * not all the nodes were used. All lists must have he same size too.
 	 */
 	static boolean checkGridSize(List<List<NodeInfo>> grid ,
 								 int clusterSize ) {
@@ -130,7 +130,7 @@ public class EllipseClustersIntoRegularGrid extends EllipseClustersIntoGrid {
 	}
 
 	/**
-	 * Combines the inner and outer grid into one grid for output.  See {@link Grid} for a discussion
+	 * Combines the inner and outer grid into one grid for output. See {@link Grid} for a discussion
 	 * on how elements are ordered internally.
 	 */
 	static void createRegularGrid( List<List<NodeInfo>> gridByRows , Grid g) {

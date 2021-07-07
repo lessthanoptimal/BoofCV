@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -19,7 +19,7 @@
 package boofcv.struct.sparse;
 
 /**
- * Image gradient at a specific pixel.  Output of sparse gradient algorithms.
+ * Image gradient at a specific pixel. Output of sparse gradient algorithms.
  *
  * @author Peter Abeles
  */

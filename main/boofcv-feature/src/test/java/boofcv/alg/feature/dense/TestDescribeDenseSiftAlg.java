@@ -44,8 +44,7 @@ public class TestDescribeDenseSiftAlg extends BoofStandardJUnit {
 	 * Checks the adjustment done to the sample period and to see if the descriptions are computed
 	 * at the correct coordinate
 	 */
-	@Test
-	public void process() {
+	@Test void process() {
 		GrayF32 derivX = new GrayF32(100,102);
 		GrayF32 derivY = new GrayF32(100,102);
 
@@ -93,8 +92,7 @@ public class TestDescribeDenseSiftAlg extends BoofStandardJUnit {
 		}
 	}
 
-	@Test
-	public void precomputeAngles() {
+	@Test void precomputeAngles() {
 		GrayF32 derivX = new GrayF32(width,height);
 		GrayF32 derivY = new GrayF32(width,height);
 
@@ -120,10 +118,9 @@ public class TestDescribeDenseSiftAlg extends BoofStandardJUnit {
 	}
 
 	/**
-	 * Compute to the general descriptor algorithm.  They should produce the same results
+	 * Compute to the general descriptor algorithm. They should produce the same results
 	 */
-	@Test
-	public void computeDescriptor() {
+	@Test void computeDescriptor() {
 		GrayF32 derivX = new GrayF32(100,102);
 		GrayF32 derivY = new GrayF32(100,102);
 

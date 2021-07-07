@@ -45,7 +45,7 @@ public enum TemplateScoreType {
 	SUM_SQUARE_ERROR,
 	/**
 	 * <p>
-	 * Normalized Cross Correlation (NCC) error metric.  Adds invariance to lighting conditions
+	 * Normalized Cross Correlation (NCC) error metric. Adds invariance to lighting conditions
 	 * but is more expensive to compute.
 	 * </p>
 	 *
@@ -55,7 +55,7 @@ public enum TemplateScoreType {
 
 	/**
 	 * <p>
-	 * Correlation error metric.  On large images this can be much faster than the other techniques.
+	 * Correlation error metric. On large images this can be much faster than the other techniques.
 	 * </p>
 	 *
 	 * @see boofcv.alg.feature.detect.template.TemplateCorrelationFFT

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -32,8 +32,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
  */
 public class TestComputeObservationAcuteAngle extends BoofStandardJUnit {
 
-	@Test
-	public void simpleNoRotation() {
+	@Test void simpleNoRotation() {
 		ComputeObservationAcuteAngle alg = new ComputeObservationAcuteAngle();
 
 		Se3_F64 fromAtoB = new Se3_F64();
@@ -51,8 +50,7 @@ public class TestComputeObservationAcuteAngle extends BoofStandardJUnit {
 		assertEquals(Math.PI/4.0, alg.computeAcuteAngle(a, b), 1e-8);
 	}
 
-	@Test
-	public void simpleWithRotation() {
+	@Test void simpleWithRotation() {
 		ComputeObservationAcuteAngle alg = new ComputeObservationAcuteAngle();
 
 		Se3_F64 fromAtoB = new Se3_F64();

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -32,8 +32,7 @@ class TestDerivativeLaplacian_Inner_MT extends BoofStandardJUnit {
 	private final int width = 100;
 	private final int height = 120;
 
-	@Test
-	public void U8_S16() {
+	@Test void U8_S16() {
 		GrayU8 input = new GrayU8(width, height);
 		ImageMiscOps.fillUniform(input, rand, 0, 100);
 
@@ -46,8 +45,7 @@ class TestDerivativeLaplacian_Inner_MT extends BoofStandardJUnit {
 		BoofTesting.assertEqualsInner(expected,found,0,1,1,false);
 	}
 
-	@Test
-	public void F32_F32() {
+	@Test void F32_F32() {
 		GrayF32 input = new GrayF32(width, height);
 		ImageMiscOps.fillUniform(input, rand, 0, 100);
 
@@ -60,8 +58,7 @@ class TestDerivativeLaplacian_Inner_MT extends BoofStandardJUnit {
 		BoofTesting.assertEqualsInner(expected,found, UtilEjml.TEST_F32,1,1,false);
 	}
 
-	@Test
-	public void U8_F32() {
+	@Test void U8_F32() {
 		GrayU8 input = new GrayU8(width, height);
 		ImageMiscOps.fillUniform(input, rand, 0, 100);
 

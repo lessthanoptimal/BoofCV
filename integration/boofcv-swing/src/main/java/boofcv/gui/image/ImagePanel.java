@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -66,8 +66,8 @@ public class ImagePanel extends JPanel {
 	}
 
 	/**
-	 * Adds the ability to save an image using the middle mouse button.  A dialog is shown to the user
-	 * so that they know what has happened.  They can hide it in the future if they wish.
+	 * Adds the ability to save an image using the middle mouse button. A dialog is shown to the user
+	 * so that they know what has happened. They can hide it in the future if they wish.
 	 */
 
 	public ImagePanel( boolean addMouseListener ) {
@@ -81,8 +81,8 @@ public class ImagePanel extends JPanel {
 	}
 
 	/**
-	 * Adds the ability to save an image using the middle mouse button.  A dialog is shown to the user
-	 * so that they know what has happened.  They can hide it in the future if they wish.
+	 * Adds the ability to save an image using the middle mouse button. A dialog is shown to the user
+	 * so that they know what has happened. They can hide it in the future if they wish.
 	 */
 	public void addClickToSaveListener() {
 		mouseListener = new SaveImageOnClick(this);
@@ -157,7 +157,7 @@ public class ImagePanel extends JPanel {
 	}
 
 	/**
-	 * Change the image being displayed. If panel is active then don't call unless inside the GUI thread.  Repaint()
+	 * Change the image being displayed. If panel is active then don't call unless inside the GUI thread. Repaint()
 	 * is not automatically called.
 	 *
 	 * @param image The new image which will be displayed.
@@ -167,7 +167,7 @@ public class ImagePanel extends JPanel {
 	}
 
 	/**
-	 * Changes the buffered image and calls repaint.  Does not need to be called in the UI thread.
+	 * Changes the buffered image and calls repaint. Does not need to be called in the UI thread.
 	 */
 	public void setImageRepaint( BufferedImage image ) {
 		// if image is larger before  than the new image then you need to make sure you repaint
@@ -188,7 +188,7 @@ public class ImagePanel extends JPanel {
 	}
 
 	/**
-	 * Changes the image and will be invoked inside the UI thread at a later time.  repaint() is automatically
+	 * Changes the image and will be invoked inside the UI thread at a later time. repaint() is automatically
 	 * called.
 	 *
 	 * @param image The new image which will be displayed.

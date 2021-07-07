@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -31,8 +31,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
  * @author Peter Abeles
  */
 public class TestDistortSupport extends BoofStandardJUnit {
-	@Test
-	public void distortScale() {
+	@Test void distortScale() {
 		GrayF32 a = new GrayF32(25,30);
 		GrayF32 b = new GrayF32(15,25);
 		Point2D_F32 distorted = new Point2D_F32();
@@ -55,8 +54,7 @@ public class TestDistortSupport extends BoofStandardJUnit {
 		assertEquals(6.0*25.0/30.0,distorted.y,1e-4);
 	}
 
-	@Test
-	public void distortRotate() {
+	@Test void distortRotate() {
 		Point2D_F32 distorted = new Point2D_F32();
 		PixelTransform<Point2D_F32> tran = DistortSupport.transformRotate(13f,15.0f,13f,15f,(float)(-Math.PI/2.0));
 

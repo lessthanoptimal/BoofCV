@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -20,7 +20,7 @@ package boofcv.struct.feature;
 
 
 /**
- * Precomputes the output of sine/cosine operations.  Given an angle it will
+ * Precomputes the output of sine/cosine operations. Given an angle it will
  * return an approximation much faster than computing it from scratch.
  *
  * @author Peter Abeles

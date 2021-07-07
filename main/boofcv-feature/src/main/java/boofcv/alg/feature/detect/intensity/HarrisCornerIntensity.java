@@ -21,7 +21,7 @@ package boofcv.alg.feature.detect.intensity;
 /**
  * <p>
  * The Harris corner detector [1] is similar to the {@link ShiTomasiCornerIntensity} but avoids computing the eigenvalues
- * directly.  In theory this should be more computationally efficient.
+ * directly. In theory this should be more computationally efficient.
  * </p>
  *
  * <p>

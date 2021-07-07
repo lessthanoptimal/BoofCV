@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -30,8 +30,7 @@ import static org.junit.jupiter.api.Assertions.assertNotSame;
  * @author Peter Abeles
  */
 class TestManagerTrifocalTensor extends BoofStandardJUnit {
-	@Test
-	public void newInstance() {
+	@Test void newInstance() {
 		ManagerTrifocalTensor alg = new ManagerTrifocalTensor();
 		TrifocalTensor a = alg.createModelInstance();
 		TrifocalTensor b = alg.createModelInstance();
@@ -39,8 +38,7 @@ class TestManagerTrifocalTensor extends BoofStandardJUnit {
 		assertNotSame(a, b);
 	}
 
-	@Test
-	public void copy() {
+	@Test void copy() {
 		ManagerTrifocalTensor alg = new ManagerTrifocalTensor();
 
 		TrifocalTensor a = new TrifocalTensor();

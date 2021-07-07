@@ -19,7 +19,7 @@
 package boofcv.alg.tracker.klt;
 
 /**
- * Feature which is tracked by the {@link PyramidKltTracker}.  Each layer has its own feature description.
+ * Feature which is tracked by the {@link PyramidKltTracker}. Each layer has its own feature description.
  *
  * @author Peter Abeles
  */

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -50,8 +50,7 @@ public class TestCirculantTracker extends BoofStandardJUnit {
 		interp = FactoryInterpolation.bilinearPixelS(GrayF32.class, BorderType.EXTENDED);
 	}
 
-	@Test
-	public void meanShift() {
+	@Test void meanShift() {
 		int w = 32;
 
 		CirculantTracker<GrayF32> alg = new CirculantTracker<>(1f/16,0.2,1e-2,0.075,1.0,w,255,interp);
@@ -75,8 +74,7 @@ public class TestCirculantTracker extends BoofStandardJUnit {
 		assertEquals(-1,alg.offY,0.3);
 	}
 
-	@Test
-	public void basicTrackingCheck() {
+	@Test void basicTrackingCheck() {
 		GrayF32 a = new GrayF32(30,35);
 		GrayF32 b = new GrayF32(30,35);
 
@@ -97,8 +95,7 @@ public class TestCirculantTracker extends BoofStandardJUnit {
 		assertEquals(6 + 4, r.y0, tolerance);
 	}
 
-	@Test
-	public void computeCosineWindow() {
+	@Test void computeCosineWindow() {
 		GrayF64 found = new GrayF64(20,25);
 
 		CirculantTracker.computeCosineWindow(found);
@@ -111,8 +108,7 @@ public class TestCirculantTracker extends BoofStandardJUnit {
 		centeredSymmetricChecks(found,false);
 	}
 
-	@Test
-	public void computeGaussianWeights() {
+	@Test void computeGaussianWeights() {
 		int w = 16;
 		CirculantTracker<GrayF32> alg = new CirculantTracker<>(1f/16,0.2,1e-2,0.075,1.0,w,255,interp);
 
@@ -157,10 +153,9 @@ public class TestCirculantTracker extends BoofStandardJUnit {
 	}
 
 	/**
-	 * Check a few simple motions.  It seems to be accurate to within 1 pixel.  Considering alphas seems to be the issue
+	 * Check a few simple motions. It seems to be accurate to within 1 pixel. Considering alphas seems to be the issue
 	 */
-	@Test
-	public void updateTrackLocation() {
+	@Test void updateTrackLocation() {
 		GrayF32 a = new GrayF32(100,100);
 		GrayF32 b = new GrayF32(100,100);
 
@@ -198,8 +193,7 @@ public class TestCirculantTracker extends BoofStandardJUnit {
 		assertEquals(6,r.y0,tolerance);
 	}
 
-	@Test
-	public void performLearning() {
+	@Test void performLearning() {
 		float interp_factor = 0.075f;
 
 		GrayF32 a = new GrayF32(20,25);
@@ -239,8 +233,7 @@ public class TestCirculantTracker extends BoofStandardJUnit {
 		assertTrue(numNotSame>100);
 	}
 
-	@Test
-	public void dense_gauss_kernel() {
+	@Test void dense_gauss_kernel() {
 		// try several different shifts
 		dense_gauss_kernel(0,0);
 		dense_gauss_kernel(5,0);
@@ -310,8 +303,7 @@ public class TestCirculantTracker extends BoofStandardJUnit {
 		}
 	}
 
-	@Test
-	public void imageDotProduct() {
+	@Test void imageDotProduct() {
 		GrayF64 a = new GrayF64(width,height);
 		ImageMiscOps.fillUniform(a,rand,0,10);
 
@@ -325,8 +317,7 @@ public class TestCirculantTracker extends BoofStandardJUnit {
 		assertEquals(total,found,1e-8);
 	}
 
-	@Test
-	public void elementMultConjB() {
+	@Test void elementMultConjB() {
 		InterleavedF64 a = new InterleavedF64(width,height,2);
 		InterleavedF64 b = new InterleavedF64(width,height,2);
 		InterleavedF64 c = new InterleavedF64(width,height,2);
@@ -355,8 +346,7 @@ public class TestCirculantTracker extends BoofStandardJUnit {
 		}
 	}
 
-	@Test
-	public void computeAlphas() {
+	@Test void computeAlphas() {
 		InterleavedF64 yf = new InterleavedF64(width,height,2);
 		InterleavedF64 kf = new InterleavedF64(width,height,2);
 		InterleavedF64 alphaf = new InterleavedF64(width,height,2);

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -34,8 +34,7 @@ public class TestUniOmniStoP_F64 extends BoofStandardJUnit {
 	/**
 	 * A point in the world center should appear in the image center
 	 */
-	@Test
-	public void worldIsImageCenter() {
+	@Test void worldIsImageCenter() {
 		CameraUniversalOmni model = createModel(0.5);
 
 		UniOmniStoP_F64 alg = new UniOmniStoP_F64();

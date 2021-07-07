@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -88,8 +88,7 @@ public class TestPyramidFloatScale extends GenericPyramidTests<GrayF32> {
 	/**
 	 * Well no blur is applied at any level so this should all be zero
 	 */
-	@Test
-	public void checkSigmas() {
+	@Test void checkSigmas() {
 		InterpolatePixelS<GrayF32> interp = FactoryInterpolation.bilinearPixelS(GrayF32.class, BorderType.EXTENDED);
 		PyramidFloatScale<GrayF32> alg = new PyramidFloatScale<>(interp,new double[]{3,5},imageType);
 

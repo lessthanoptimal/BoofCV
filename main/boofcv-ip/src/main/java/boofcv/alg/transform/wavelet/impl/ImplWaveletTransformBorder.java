@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -31,15 +31,15 @@ import javax.annotation.Generated;
 
 /**
  * <p>
- * Performs the wavelet transform just around the image border.  Should be called in conjunction
- * with {@link ImplWaveletTransformInner} or similar functions.  Must be called after the inner
+ * Performs the wavelet transform just around the image border. Should be called in conjunction
+ * with {@link ImplWaveletTransformInner} or similar functions. Must be called after the inner
  * portion has been computed because the "inner" functions modify the border during the inverse
  * transform.
  * </p>
  *
  * <p>
  * For the inverse transform the inner transform must be called before the border is computed.
- * Due to how the inverse is computed some of the output values will be added to border.  The values
+ * Due to how the inverse is computed some of the output values will be added to border. The values
  * computed in these inverse functions add to that.
  * </p>
  * 

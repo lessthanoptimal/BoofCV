@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -42,8 +42,7 @@ public class TestSplitMergeLineFitSegment extends BoofStandardJUnit {
 	/**
 	 * Tests contours with zero and one points in them
 	 */
-	@Test
-	public void checkZeroOne() {
+	@Test void checkZeroOne() {
 		List<Point2D_I32> contour = new ArrayList<>();
 		SplitMergeLineFitSegment alg = new SplitMergeLineFitSegment(0.15,MIN_SPLIT,100);
 		alg.process(contour,splits);
@@ -57,8 +56,7 @@ public class TestSplitMergeLineFitSegment extends BoofStandardJUnit {
 	/**
 	 * Simple case with a zig-zag pattern
 	 */
-	@Test
-	public void simpleCase() {
+	@Test void simpleCase() {
 		List<Point2D_I32> contour = new ArrayList<>();
 		for( int i = 0; i < 10; i++ )
 			contour.add( new Point2D_I32(i,0));
@@ -80,8 +78,7 @@ public class TestSplitMergeLineFitSegment extends BoofStandardJUnit {
 		assertEquals(25,alg.splits.data[4]);
 	}
 
-	@Test
-	public void splitSegments() {
+	@Test void splitSegments() {
 		SplitMergeLineFitSegment alg = new SplitMergeLineFitSegment(0.15,MIN_SPLIT,100);
 		alg.contour = new ArrayList<>();
 		for( int i = 0; i < 10; i++ )
@@ -100,8 +97,7 @@ public class TestSplitMergeLineFitSegment extends BoofStandardJUnit {
 
 	}
 
-	@Test
-	public void selectSplitOffset() {
+	@Test void selectSplitOffset() {
 		SplitMergeLineFitSegment alg = new SplitMergeLineFitSegment(0.15,MIN_SPLIT,100);
 
 		alg.contour = new ArrayList<>();
@@ -125,8 +121,7 @@ public class TestSplitMergeLineFitSegment extends BoofStandardJUnit {
 		assertEquals(4, found);
 	}
 
-	@Test
-	public void mergeSegments() {
+	@Test void mergeSegments() {
 		SplitMergeLineFitSegment alg = new SplitMergeLineFitSegment(0.001,MIN_SPLIT,100);
 		alg.contour = new ArrayList<>();
 		alg.contour.add(new Point2D_I32(0,0));
@@ -151,8 +146,7 @@ public class TestSplitMergeLineFitSegment extends BoofStandardJUnit {
 	/**
 	 * Makes sure the selectSplitOffset is obeying the minimumSideLengthPixel parameter
 	 */
-	@Test
-	public void selectSplitBetween_minimumSideLengthPixel() {
+	@Test void selectSplitBetween_minimumSideLengthPixel() {
 		SplitMergeLineFitSegment alg = new SplitMergeLineFitSegment(0.001,MIN_SPLIT,100);
 		alg.contour = new ArrayList<>();
 
@@ -182,8 +176,7 @@ public class TestSplitMergeLineFitSegment extends BoofStandardJUnit {
 	/**
 	 * Checks to make sure the minimum side length is correctly set
 	 */
-	@Test
-	public void set_minimumSideLengthPixel() {
+	@Test void set_minimumSideLengthPixel() {
 		List<Point2D_I32> contour = new ArrayList<>();
 
 		for (int i = 0; i < 30; i++) {

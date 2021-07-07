@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -34,8 +34,7 @@ public abstract class GenericBinaryLabelContourFinder extends GenericBinaryConto
 	@Override
 	protected abstract BinaryLabelContourFinder create();
 
-	@Test
-	public void inputNotModified() {
+	@Test void inputNotModified() {
 		GrayU8 input = TEST2.clone();
 		GrayS32 labeled = input.createSameShape(GrayS32.class);
 
@@ -46,8 +45,7 @@ public abstract class GenericBinaryLabelContourFinder extends GenericBinaryConto
 		assertEquals(0, ImageStatistics.meanDiffSq(TEST2, input), 1e-8);
 	}
 
-	@Test
-	public void minContour() {
+	@Test void minContour() {
 		GrayU8 input = TEST3.clone();
 		GrayS32 labeled = input.createSameShape(GrayS32.class);
 
@@ -59,8 +57,7 @@ public abstract class GenericBinaryLabelContourFinder extends GenericBinaryConto
 		checkExternalSize(alg, 0, 0);
 	}
 
-	@Test
-	public void maxContour() {
+	@Test void maxContour() {
 		GrayU8 input = TEST3.clone();
 		GrayS32 labeled = input.createSameShape(GrayS32.class);
 
@@ -73,8 +70,7 @@ public abstract class GenericBinaryLabelContourFinder extends GenericBinaryConto
 		checkExternalSize(alg, 0, 0);
 	}
 
-	@Test
-	public void connectRule() {
+	@Test void connectRule() {
 		GrayU8 input = TEST3.clone();
 		GrayS32 labeled = input.createSameShape(GrayS32.class);
 
@@ -88,8 +84,7 @@ public abstract class GenericBinaryLabelContourFinder extends GenericBinaryConto
 		checkExternalSize(alg, 0, 8);
 	}
 
-	@Test
-	public void saveInternal() {
+	@Test void saveInternal() {
 		GrayU8 input = TEST3.clone();
 		GrayS32 labeled = input.createSameShape(GrayS32.class);
 
@@ -103,8 +98,7 @@ public abstract class GenericBinaryLabelContourFinder extends GenericBinaryConto
 		checkInternalSize(alg, 0, 0, 0);
 	}
 
-	@Test
-	public void testCase1() {
+	@Test void testCase1() {
 		GrayU8 input = TEST1.clone();
 		GrayS32 labeled = input.createSameShape(GrayS32.class);
 
@@ -119,8 +113,7 @@ public abstract class GenericBinaryLabelContourFinder extends GenericBinaryConto
 		checkExpectedExternal(new int[]{37}, alg);
 	}
 
-	@Test
-	public void testCase2() {
+	@Test void testCase2() {
 		GrayU8 input = TEST2.clone();
 		GrayS32 labeled = input.createSameShape(GrayS32.class);
 
@@ -135,8 +128,7 @@ public abstract class GenericBinaryLabelContourFinder extends GenericBinaryConto
 		checkExpectedExternal(new int[]{1, 3, 4, 32}, alg);
 	}
 
-	@Test
-	public void testCase4() {
+	@Test void testCase4() {
 		GrayU8 input = TEST4.clone();
 		GrayS32 labeled = input.createSameShape(GrayS32.class);
 
@@ -151,8 +143,7 @@ public abstract class GenericBinaryLabelContourFinder extends GenericBinaryConto
 		checkExpectedExternal(new int[]{19}, alg);
 	}
 
-	@Test
-	public void testCase5() {
+	@Test void testCase5() {
 		BinaryLabelContourFinder alg = create();
 		GrayS32 labeled = TEST7.createSameShape(GrayS32.class);
 
@@ -165,8 +156,7 @@ public abstract class GenericBinaryLabelContourFinder extends GenericBinaryConto
 		checkExpectedExternal(new int[]{20}, alg);
 	}
 
-	@Test
-	public void test6() {
+	@Test void test6() {
 		BinaryLabelContourFinder alg = create();
 		GrayS32 labeled = TEST7.createSameShape(GrayS32.class);
 
@@ -179,8 +169,7 @@ public abstract class GenericBinaryLabelContourFinder extends GenericBinaryConto
 		checkExpectedExternal(new int[]{20}, alg);
 	}
 
-	@Test
-	public void test7() {
+	@Test void test7() {
 		BinaryLabelContourFinder alg = create();
 		GrayS32 labeled = TEST7.createSameShape(GrayS32.class);
 

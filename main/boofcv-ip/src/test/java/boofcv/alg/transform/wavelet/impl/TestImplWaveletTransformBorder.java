@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -39,23 +39,19 @@ public class TestImplWaveletTransformBorder extends CompareToNaiveWavelet {
 		super(2,ImplWaveletTransformBorder.class);
 	}
 
-	@Test
-	public void checkAllHorizontal() {
+	@Test void checkAllHorizontal() {
 		checkAll("horizontal","checkHorizontal");
 	}
 
-	@Test
-	public void checkAllVertical() {
+	@Test void checkAllVertical() {
 		checkAll("vertical","checkVertical");
 	}
 
-	@Test
-	public void checkAllHorizontalInverse() {
+	@Test void checkAllHorizontalInverse() {
 		checkAll("horizontalInverse","checkHorizontalInverse");
 	}
 
-	@Test
-	public void checkAllVerticalInverse() {
+	@Test void checkAllVerticalInverse() {
 		checkAll("verticalInverse","checkVerticalInverse");
 	}
 

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -33,8 +33,7 @@ import static org.junit.jupiter.api.Assertions.*;
  */
 public class TestMsToGrayMotion2D extends BoofStandardJUnit {
 
-	@Test
-	public void basicTests() {
+	@Test void basicTests() {
 		Dummy child = new Dummy();
 		PlToGrayMotion2D alg = new PlToGrayMotion2D(child, GrayF32.class);
 

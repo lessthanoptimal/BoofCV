@@ -28,7 +28,7 @@ import boofcv.struct.image.ImageGray;
 /**
  * <p>
  * Computes the orientation of a region by summing up the derivative along each axis independently
- * then computing the direction fom the sum.  If weighted a Gaussian kernel centered around the targeted
+ * then computing the direction fom the sum. If weighted a Gaussian kernel centered around the targeted
  * pixel is used.
  * </p>
  *

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -188,7 +188,7 @@ public class FactoryWaveletDaub {
 		border.setLength(N);
 
 		// Because the wavelet transform is a linear invertible system the inverse coefficients
-		// can be found by creating a matrix and inverting the matrix.  Boundary conditions are then
+		// can be found by creating a matrix and inverting the matrix. Boundary conditions are then
 		// extracted from this inverted matrix.
 		DMatrixRMaj A = new DMatrixRMaj(N,N);
 		for( int i = 0; i < N; i += 2 ) {

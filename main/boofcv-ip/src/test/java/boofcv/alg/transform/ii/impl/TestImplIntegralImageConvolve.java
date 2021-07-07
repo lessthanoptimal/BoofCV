@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -50,8 +50,7 @@ public class TestImplIntegralImageConvolve extends BoofStandardJUnit {
 	int width = 20;
 	int height = 30;
 
-	@Test
-	public void convolve() {
+	@Test void convolve() {
 		int numFound = BoofTesting.findMethodThenCall(this,"convolve",ImplIntegralImageConvolve.class,"convolve");
 		assertEquals(4, numFound);
 	}
@@ -89,8 +88,7 @@ public class TestImplIntegralImageConvolve extends BoofStandardJUnit {
 	}
 
 
-	@Test
-	public void convolveBorder() {
+	@Test void convolveBorder() {
 		int numFound = BoofTesting.findMethodThenCall(this,"convolveBorder",ImplIntegralImageConvolve.class,"convolveBorder");
 		assertEquals(4,numFound);
 	}

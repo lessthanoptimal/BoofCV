@@ -32,10 +32,10 @@ import org.ddogleg.struct.DogArray_F64;
 import java.util.List;
 
 /**
- * Computes a color SURF descriptor from a {@link Planar} image.  Features are detected,
- * orientation estimated, and laplacian sign computed using a gray scale image.  The gray scale image is found by
- * computing the average across all bands for each pixel.  A descriptor is computed inside band individually
- * and stored in a descriptor which is N*length long.  N = number of bands and length = number of
+ * Computes a color SURF descriptor from a {@link Planar} image. Features are detected,
+ * orientation estimated, and laplacian sign computed using a gray scale image. The gray scale image is found by
+ * computing the average across all bands for each pixel. A descriptor is computed inside band individually
+ * and stored in a descriptor which is N*length long. N = number of bands and length = number of
  * elements in normal descriptor.
  *
  * @param <II> Type of integral image
@@ -78,7 +78,7 @@ public class DetectDescribeSurfPlanar<II extends ImageGray<II>> {
 	}
 
 	/**
-	 * Detects and describes features inside provide images.  All images are integral images.
+	 * Detects and describes features inside provide images. All images are integral images.
 	 *
 	 * @param grayII Gray-scale integral image
 	 * @param colorII Color integral image

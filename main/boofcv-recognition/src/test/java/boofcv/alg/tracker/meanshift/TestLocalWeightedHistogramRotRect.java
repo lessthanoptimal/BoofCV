@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -43,8 +43,7 @@ public class TestLocalWeightedHistogramRotRect extends BoofStandardJUnit {
 	/**
 	 * Crudely checks to see that the center has the most weight
 	 */
-	@Test
-	public void computeWeights() {
+	@Test void computeWeights() {
 
 		int w = 9;
 
@@ -58,8 +57,7 @@ public class TestLocalWeightedHistogramRotRect extends BoofStandardJUnit {
 		assertTrue(alg.weights[(w-1)*w] < maxW);
 	}
 
-	@Test
-	public void createSamplePoints() {
+	@Test void createSamplePoints() {
 		int w = 9;
 
 		LocalWeightedHistogramRotRect alg = new LocalWeightedHistogramRotRect(w,3,12,3,255,null);
@@ -77,8 +75,7 @@ public class TestLocalWeightedHistogramRotRect extends BoofStandardJUnit {
 		}
 	}
 
-	@Test
-	public void computeHistogram() {
+	@Test void computeHistogram() {
 		Planar<GrayF32> image = new Planar<>(GrayF32.class,40,50,3);
 		InterpolatePixelMB interp = FactoryInterpolation.createPixelPL(FactoryInterpolation.bilinearPixelS(
 				GrayF32.class, BorderType.EXTENDED));
@@ -113,8 +110,7 @@ public class TestLocalWeightedHistogramRotRect extends BoofStandardJUnit {
 	/**
 	 * When given a region entirely inside, both inside and outside should produce identical solutions
 	 */
-	@Test
-	public void computeHistogramBorder_compare() {
+	@Test void computeHistogramBorder_compare() {
 		Planar<GrayF32> image = new Planar<>(GrayF32.class,40,50,3);
 		InterpolatePixelMB interp = FactoryInterpolation.createPixelPL(FactoryInterpolation.bilinearPixelS(
 				GrayF32.class, BorderType.EXTENDED));
@@ -144,8 +140,7 @@ public class TestLocalWeightedHistogramRotRect extends BoofStandardJUnit {
 	/**
 	 * Make sure it handles pixels outside the image correctly
 	 */
-	@Test
-	public void computeHistogramBorder_outside() {
+	@Test void computeHistogramBorder_outside() {
 		int numSamples = 10;
 
 		InterleavedF32 image = new InterleavedF32(40,50,3);
@@ -179,8 +174,7 @@ public class TestLocalWeightedHistogramRotRect extends BoofStandardJUnit {
 
 	}
 
-	@Test
-	public void computeHistogramBin() {
+	@Test void computeHistogramBin() {
 		LocalWeightedHistogramRotRect alg = new LocalWeightedHistogramRotRect(10,3,12,3,255,null);
 
 		float div = alg.maxPixelValue/12;
@@ -190,8 +184,7 @@ public class TestLocalWeightedHistogramRotRect extends BoofStandardJUnit {
 
 	}
 
-	@Test
-	public void isInFastBounds() {
+	@Test void isInFastBounds() {
 		DummyInterpolate interp = new DummyInterpolate();
 		RectangleRotate_F32 rect = new RectangleRotate_F32(4,5,10,20,0);
 		LocalWeightedHistogramRotRect alg = new LocalWeightedHistogramRotRect(10,3,12,3,255,interp);
@@ -220,8 +213,7 @@ public class TestLocalWeightedHistogramRotRect extends BoofStandardJUnit {
 		assertEquals(5f-9.5f,p3.y,1e-4f);
 	}
 
-	@Test
-	public void normalizeHistogram() {
+	@Test void normalizeHistogram() {
 		LocalWeightedHistogramRotRect alg = new LocalWeightedHistogramRotRect(10,3,12,3,255,null);
 
 		float total = 0;
@@ -237,8 +229,7 @@ public class TestLocalWeightedHistogramRotRect extends BoofStandardJUnit {
 		}
 	}
 
-	@Test
-	public void squareToImage() {
+	@Test void squareToImage() {
 		RectangleRotate_F32 rect = new RectangleRotate_F32(4,5,10,20,0);
 		LocalWeightedHistogramRotRect alg = new LocalWeightedHistogramRotRect(10,3,12,3,255,null);
 

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -35,8 +35,7 @@ public class TestUtilDenoiseWavelet extends BoofStandardJUnit {
 	int width = 20;
 	int height = 30;
 
-	@Test
-	public void estimateNoiseStdDev() {
+	@Test void estimateNoiseStdDev() {
 		GrayF32 image = new GrayF32(width,height);
 
 		double sigma = 12;
@@ -47,8 +46,7 @@ public class TestUtilDenoiseWavelet extends BoofStandardJUnit {
 		assertEquals(sigma,found,1);
 	}
 
-	@Test
-	public void universalThreshold() {
+	@Test void universalThreshold() {
 
 		GrayF32 image = new GrayF32(width,height);
 

@@ -381,7 +381,7 @@ public class PairwiseGraphUtils {
 		cameraMatrices.add(P2);
 		cameraMatrices.add(P3);
 
-		// need elements to be non-empty so that it can use set().  probably over optimization
+		// need elements to be non-empty so that it can use set(). probably over optimization
 		List<Point2D_F64> triangObs = new ArrayList<>();
 		triangObs.add(null);
 		triangObs.add(null);

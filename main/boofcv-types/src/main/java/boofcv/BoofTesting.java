@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -188,8 +188,8 @@ public class BoofTesting {
 
 	/**
 	 * <p>
-	 * Returns an image which is a sub-image but contains the same values of the input image.  Use for
-	 * testing compliance with sub-images.  The subimage is created by creating a larger image,
+	 * Returns an image which is a sub-image but contains the same values of the input image. Use for
+	 * testing compliance with sub-images. The subimage is created by creating a larger image,
 	 * copying over the input image into the inner portion, then creating a subimage of the copied part.
 	 * </p>
 	 */
@@ -368,7 +368,7 @@ public class BoofTesting {
 
 	/**
 	 * Tests the specified function with the original image provided and with an equivalent
-	 * sub-image.  The two results are then compared. The function being tested must only
+	 * sub-image. The two results are then compared. The function being tested must only
 	 * have one input parameter of type {@link GrayU8}.
 	 *
 	 * @param testClass Instance of the class that contains the function being tested.
@@ -430,8 +430,8 @@ public class BoofTesting {
 	}
 
 	/**
-	 * Searches for a function which is a perfect match.  if none it exists it checks
-	 * to see if any matches that could accept an input of the specified type.  If there
+	 * Searches for a function which is a perfect match. if none it exists it checks
+	 * to see if any matches that could accept an input of the specified type. If there
 	 * is only one such match that is returned.
 	 */
 	public static Method findMethod( Class<?> type, String name, Class<?>... params ) {
@@ -533,9 +533,9 @@ public class BoofTesting {
 	}
 
 	/**
-	 * Searches for all functions with the specified name in the target class.  Once it finds
+	 * Searches for all functions with the specified name in the target class. Once it finds
 	 * that function it invokes the specified function in the owner class. That function must
-	 * take in a Method as its one and only parameter.  The method will be one of the matching
+	 * take in a Method as its one and only parameter. The method will be one of the matching
 	 * ones in the target class.
 	 *
 	 * @return The number of times 'targetMethod' was found and called.

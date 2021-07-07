@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -85,7 +85,7 @@ public class CameraPlaneProjection {
 	 * Specifies camera's extrinsic parameters.
 	 *
 	 * @param planeToCamera Transform from plane to camera reference frame
-	 * @param computeInverse Set to true if pixelToPlane is going to be called.  performs extra calculation
+	 * @param computeInverse Set to true if pixelToPlane is going to be called. performs extra calculation
 	 */
 	public void setPlaneToCamera( Se3_F64 planeToCamera, boolean computeInverse ) {
 		this.planeToCamera = planeToCamera;
@@ -100,7 +100,7 @@ public class CameraPlaneProjection {
 	 * @param pointX (input) Point on the plane, x-axis
 	 * @param pointY (input) Point on the plane, y-axis
 	 * @param pixel (output) Pixel in the image
-	 * @return true if the point is in front of the camera.  False if not.
+	 * @return true if the point is in front of the camera. False if not.
 	 */
 	public boolean planeToPixel( double pointX, double pointY, Point2D_F64 pixel ) {
 		// convert it into a 3D coordinate and transform into camera reference frame
@@ -125,7 +125,7 @@ public class CameraPlaneProjection {
 	 * @param pointX (input) Point on the plane, x-axis
 	 * @param pointY (input) Point on the plane, y-axis
 	 * @param normalized (output) Normalized image coordinate of pixel
-	 * @return true if the point is in front of the camera.  False if not.
+	 * @return true if the point is in front of the camera. False if not.
 	 */
 	public boolean planeToNormalized( double pointX, double pointY, Point2D_F64 normalized ) {
 		// convert it into a 3D coordinate and transform into camera reference frame
@@ -144,7 +144,7 @@ public class CameraPlaneProjection {
 	}
 
 	/**
-	 * Given a pixel, find the point on the plane.  Be sure computeInverse was set to true in
+	 * Given a pixel, find the point on the plane. Be sure computeInverse was set to true in
 	 * {@link #setPlaneToCamera(georegression.struct.se.Se3_F64, boolean)}
 	 *
 	 * @param pixelX (input) Pixel in the image, x-axis
@@ -177,7 +177,7 @@ public class CameraPlaneProjection {
 	}
 
 	/**
-	 * Given a pixel in normalized coordinates, find the point on the plane.  Make sure invert was set to true in
+	 * Given a pixel in normalized coordinates, find the point on the plane. Make sure invert was set to true in
 	 * {@link #setPlaneToCamera(georegression.struct.se.Se3_F64, boolean)}
 	 *
 	 * @param normX (input) Image pixel in normalized coordinates, x-axis

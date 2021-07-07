@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -33,8 +33,7 @@ public class TestImplMedianCorner_U8 extends GenericCornerIntensityTests {
 
 	GrayU8 median = new GrayU8(width,height);
 
-	@Test
-	public void genericTests() {
+	@Test void genericTests() {
 		performAllTests();
 	}
 

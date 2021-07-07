@@ -28,13 +28,13 @@ import boofcv.alg.interpolate.InterpolationType;
 public class ConfigBackgroundGaussian extends BaseConfigBackground {
 
 	/**
-	 * Specifies how fast it will adapt to changes in the background. From 0 to 1, inclusive.  0 = static  1.0 = instant.
+	 * Specifies how fast it will adapt to changes in the background. From 0 to 1, inclusive. 0 = static  1.0 = instant.
 	 */
 	public float learnRate = 0.05f;
 
 	/**
 	 * Threshold for classifying a pixel as background or not. This threshold is applied to the
-	 * computed Mahalanobis from the distribution.  An appropriate threshold will vary depending on the number
+	 * computed Mahalanobis from the distribution. An appropriate threshold will vary depending on the number
 	 * of bands in the image.
 	 *
 	 * Start tuning at 12.
@@ -42,8 +42,8 @@ public class ConfigBackgroundGaussian extends BaseConfigBackground {
 	public float threshold;
 
 	/**
-	 * The initial variance assigned to a new pixel.  Larger values to reduce false positives due to
-	 * under sampling.  Don't set to zero since that can cause divided by zero errors.
+	 * The initial variance assigned to a new pixel. Larger values to reduce false positives due to
+	 * under sampling. Don't set to zero since that can cause divided by zero errors.
 	 */
 	public float initialVariance = Float.MIN_VALUE;
 
@@ -54,7 +54,7 @@ public class ConfigBackgroundGaussian extends BaseConfigBackground {
 	public float minimumDifference = 0;
 
 	/**
-	 * Specifies which interpolation it will use.  {@link InterpolationType#BILINEAR} or
+	 * Specifies which interpolation it will use. {@link InterpolationType#BILINEAR} or
 	 * {@link InterpolationType#NEAREST_NEIGHBOR} recommended.
 	 *
 	 * <p>ONLY USED FOR MOVING BACKGROUNDS!</p>

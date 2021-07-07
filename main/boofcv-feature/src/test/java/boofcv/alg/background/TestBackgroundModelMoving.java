@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -33,8 +33,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  */
 public class TestBackgroundModelMoving extends BoofStandardJUnit
 {
-	@Test
-	public void updateBackground() {
+	@Test void updateBackground() {
 		Helper helper = new Helper();
 
 		helper.initialize(400,600,new Homography2D_F32(1,0,100,0,1,150,0,0,1));
@@ -42,8 +41,7 @@ public class TestBackgroundModelMoving extends BoofStandardJUnit
 		// tests are contained in helper
 	}
 
-	@Test
-	public void segment() {
+	@Test void segment() {
 		Helper helper = new Helper();
 
 		helper.initialize(400, 600, new Homography2D_F32(1, 0, 100, 0, 1, 150, 0, 0, 1));

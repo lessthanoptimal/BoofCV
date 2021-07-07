@@ -25,8 +25,8 @@ import boofcv.struct.image.GrayS16;
 
 /**
  * <p>
- * Implementation of the Kitchen and Rosenfeld corner detector as described in [1].  Unlike the KLT or Harris corner
- * detectors this corner detector is designed to detect corners on the actual corner.  Because it uses requires the
+ * Implementation of the Kitchen and Rosenfeld corner detector as described in [1]. Unlike the KLT or Harris corner
+ * detectors this corner detector is designed to detect corners on the actual corner. Because it uses requires the
  * image's local curvature it uses the second derivative, also known as the Hessian.
  * </p>
  *

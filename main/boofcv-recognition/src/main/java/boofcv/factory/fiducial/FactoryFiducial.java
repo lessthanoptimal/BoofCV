@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -56,8 +56,8 @@ public class FactoryFiducial {
 	 *
 	 * @see DetectFiducialSquareBinary DetectFiducialSquareBinary for a description of this fiducial type.
 	 *
-	 * @param configFiducial Description of the fiducial.  Can't be null.
-	 * @param configThreshold Threshold for binary image.  null for default.
+	 * @param configFiducial Description of the fiducial. Can't be null.
+	 * @param configThreshold Threshold for binary image. null for default.
 	 * @param imageType Type of image it's processing
 	 * @return FiducialDetector
 	 */
@@ -87,7 +87,7 @@ public class FactoryFiducial {
 	/**
 	 * <p>Detector for square image based fiducials. </p>
 	 *
-	 * <p>For this fiducial to work images need to be added to it.  Which is why {@link SquareImage_to_FiducialDetector}
+	 * <p>For this fiducial to work images need to be added to it. Which is why {@link SquareImage_to_FiducialDetector}
 	 * is returned instead of the more generic {@link FiducialDetector}.</p>
 	 *
 	 * @see DetectFiducialSquareImage DetectFiducialSquareImage for a description of this fiducial type.
@@ -152,7 +152,7 @@ public class FactoryFiducial {
 	}
 
 	/**
-	 * Wrapper around square-grid calibration detector.  Refine with lines is set to true automatically.  This
+	 * Wrapper around square-grid calibration detector. Refine with lines is set to true automatically. This
 	 * isn't being used for calibration and its better to use the whole line.
 	 *
 	 * @param config Description of the chessboard.

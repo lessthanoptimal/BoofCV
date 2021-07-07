@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -27,7 +27,7 @@ import static boofcv.misc.CircularIndex.addOffset;
 
 /**
  * Takes as input a set of unordered cross connected clusters and converts them into ordered grids with known numbers
- * of rows and columns.  The output will be valid "chessboard" pattern. When rows and columns are discussed in the
+ * of rows and columns. The output will be valid "chessboard" pattern. When rows and columns are discussed in the
  * code below it refers to both white and black squares in the chessboard. A row that starts with a white square
  * is referred to as white and one which starts with a black square as black.
  *
@@ -78,7 +78,7 @@ public class SquareCrossClustersIntoGrids {
 	}
 
 	/**
-	 * Converts the cluster into a grid data structure.  If its not a grid then
+	 * Converts the cluster into a grid data structure. If its not a grid then
 	 * nothing happens
 	 */
 	protected void processCluster( List<SquareNode> cluster ) {
@@ -139,7 +139,7 @@ public class SquareCrossClustersIntoGrids {
 	}
 
 	/**
-	 * Converts the list of rows into a grid.  Since it is a chessboard pattern some of the grid
+	 * Converts the list of rows into a grid. Since it is a chessboard pattern some of the grid
 	 * elements will be null.
 	 */
 	private SquareGrid assembleGrid( List<List<SquareNode>> listRows ) {
@@ -225,7 +225,7 @@ public class SquareCrossClustersIntoGrids {
 				List<SquareNode> list = new ArrayList<>();
 				seed.graph = 0;
 
-				// Doesn't know which direction it can traverse along.  See figure that out
+				// Doesn't know which direction it can traverse along. See figure that out
 				// by looking at the node its linked to
 				int corner = seed.edges[i].destinationSide(seed);
 				SquareNode dst = seed.edges[i].destination(seed);
@@ -271,7 +271,7 @@ public class SquareCrossClustersIntoGrids {
 	}
 
 	/**
-	 * Given a node, add all the squares in the row directly below it.  They will be ordered from "left" to "right".  The
+	 * Given a node, add all the squares in the row directly below it. They will be ordered from "left" to "right". The
 	 * seed node can be anywhere in the row, e.g. middle, start, end.
 	 *
 	 * @return true if a row was added to grid and false if not
@@ -332,7 +332,7 @@ public class SquareCrossClustersIntoGrids {
 	}
 
 	/**
-	 * Returns the open corner index which is first.  Assuming that there are two adjacent corners.
+	 * Returns the open corner index which is first. Assuming that there are two adjacent corners.
 	 */
 	static int lowerEdgeIndex( SquareNode node ) {
 		for (int i = 0; i < node.square.size(); i++) {
@@ -390,7 +390,7 @@ public class SquareCrossClustersIntoGrids {
 	 *
 	 * @param n Initial node
 	 * @param corner Which corner points to the next node
-	 * @param sign Determines the direction it will traverse.  -1 or 1
+	 * @param sign Determines the direction it will traverse. -1 or 1
 	 * @param skip true = start adding nodes at second, false = start first.
 	 * @param row List that the nodes are placed into
 	 */
@@ -407,8 +407,8 @@ public class SquareCrossClustersIntoGrids {
 			}
 			if (!skip) {
 				if (n.graph != SquareNode.RESET_GRAPH) {
-					// This should never happen in a valid grid.  It can happen if two nodes link to each other multiple
-					// times.  Other situations as well
+					// This should never happen in a valid grid. It can happen if two nodes link to each other multiple
+					// times. Other situations as well
 					invalid = true;
 					return false;
 				}

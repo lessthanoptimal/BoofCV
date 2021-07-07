@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -48,16 +48,16 @@ public class BackgroundMovingGaussian_SB<T extends ImageGray<T>, Motion extends 
 	// storage for multi-band pixel values
 	protected float[] pixelBG = new float[2];
 
-	// background is composed of two channels.  0 = mean, 1 = variance
+	// background is composed of two channels. 0 = mean, 1 = variance
 	Planar<GrayF32> background = new Planar<>(GrayF32.class, 1, 1, 2);
 
 	/**
 	 * Configurations background removal.
 	 *
-	 * @param learnRate Specifies how quickly the background is updated.  0 = static  1.0 = instant.  Try 0.05
-	 * @param threshold Threshold for background.  Try 10.
+	 * @param learnRate Specifies how quickly the background is updated. 0 = static  1.0 = instant. Try 0.05
+	 * @param threshold Threshold for background. Try 10.
 	 * @param transform Used to apply motion model
-	 * @param interpType Type of interpolation.  BILINEAR recommended for accuracy. NEAREST_NEIGHBOR for speed. .
+	 * @param interpType Type of interpolation. BILINEAR recommended for accuracy. NEAREST_NEIGHBOR for speed. .
 	 * @param imageType Type of input image.
 	 */
 	public BackgroundMovingGaussian_SB( float learnRate, float threshold,
@@ -161,7 +161,7 @@ public class BackgroundMovingGaussian_SB<T extends ImageGray<T>, Motion extends 
 						}
 					}
 				} else {
-					// there is no background here.  Just mark it as not moving to avoid false positives
+					// there is no background here. Just mark it as not moving to avoid false positives
 					segmented.data[indexSegmented] = unknownValue;
 				}
 			}

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -41,8 +41,7 @@ public class TestBroxWarpingSpacial extends BoofStandardJUnit {
 
 	InterpolatePixelS<GrayF32> interpolate = FactoryInterpolation.bilinearPixelS(GrayF32.class, BorderType.EXTENDED);
 
-	@Test
-	public void process() {
+	@Test void process() {
 		int width = 30;
 		int height = 40;
 
@@ -70,8 +69,7 @@ public class TestBroxWarpingSpacial extends BoofStandardJUnit {
 
 	}
 
-	@Test
-	public void computePsiDataPsiGradient() {
+	@Test void computePsiDataPsiGradient() {
 		BroxWarpingSpacial<GrayF32> alg = new BroxWarpingSpacial<>(new ConfigBroxWarping(),interpolate);
 		alg.resizeForLayer(width, height);
 
@@ -140,8 +138,7 @@ public class TestBroxWarpingSpacial extends BoofStandardJUnit {
 		return (float)(1.0/(2.0*Math.sqrt(dx*dx + dy*dy + epsilon*epsilon)));   // in the paper it is 1/2 but not their code
 	}
 
-	@Test
-	public void computeDivUVD_safe() {
+	@Test void computeDivUVD_safe() {
 		GrayF32 u = new GrayF32(width,height);
 		GrayF32 v = new GrayF32(width,height);
 		GrayF32 psi = new GrayF32(width,height);
@@ -192,8 +189,7 @@ public class TestBroxWarpingSpacial extends BoofStandardJUnit {
 		return coef0 + coef1 + coef2 + coef3;
 	}
 
-	@Test
-	public void s() {
+	@Test void s() {
 		BroxWarpingSpacial<GrayF32> alg = new BroxWarpingSpacial<>(new ConfigBroxWarping(),interpolate);
 
 		alg.resizeForLayer(10,13);

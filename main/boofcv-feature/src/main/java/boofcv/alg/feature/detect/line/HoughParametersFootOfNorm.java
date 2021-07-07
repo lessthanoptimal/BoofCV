@@ -34,7 +34,7 @@ public class HoughParametersFootOfNorm implements HoughTransformParameters {
 	int minDistanceFromOrigin;
 
 	/**
-	 * @param minDistanceFromOrigin Distance from the origin in which lines will not be estimated.  In transform space.  Try 5.
+	 * @param minDistanceFromOrigin Distance from the origin in which lines will not be estimated. In transform space. Try 5.
 	 */
 	public HoughParametersFootOfNorm( int minDistanceFromOrigin ) {
 		this.minDistanceFromOrigin = minDistanceFromOrigin;

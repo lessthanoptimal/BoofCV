@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -97,7 +97,7 @@ public class GenerateImplPyramidOps extends CodeGeneratorBase {
 		String imageName = imageIn.getSingleBandName();
 
 		out.print("\t/**\n" +
-				"\t * Scales down the input by a factor of 2.  Every other pixel along both axises is skipped.\n" +
+				"\t * Scales down the input by a factor of 2. Every other pixel along both axises is skipped.\n" +
 				"\t */\n" +
 				"\tpublic static void scaleDown2( "+imageName+" input , "+imageName+" output ) {\n" +
 				"\t\t\n" +

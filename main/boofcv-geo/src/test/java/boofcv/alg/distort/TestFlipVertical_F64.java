@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -29,8 +29,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
  */
 public class TestFlipVertical_F64 extends BoofStandardJUnit {
 
-	@Test
-	public void basicTest() {
+	@Test void basicTest() {
 		FlipVertical_F64 alg = new FlipVertical_F64(100);
 
 		Point2D_F64 found = new Point2D_F64();

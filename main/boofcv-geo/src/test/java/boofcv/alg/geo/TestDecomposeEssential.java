@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -40,11 +40,10 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 public class TestDecomposeEssential extends BoofStandardJUnit {
 
 	/**
-	 * Check the decomposition against a known input.  See if the solutions have the expected
+	 * Check the decomposition against a known input. See if the solutions have the expected
 	 * properties and at least one matches the input.
 	 */
-	@Test
-	public void checkAgainstKnown() {
+	@Test void checkAgainstKnown() {
 		List<Se3_F64> testCases = new ArrayList<>();
 		testCases.add(SpecialEuclideanOps_F64.eulerXyz(0.1,-0.4,0.5,2,1,-3,null));
 		testCases.add(SpecialEuclideanOps_F64.eulerXyz(-0.1,0.4,-0.5,2,1,-3,null));

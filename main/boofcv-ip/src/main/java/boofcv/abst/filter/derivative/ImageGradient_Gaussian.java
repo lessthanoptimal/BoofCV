@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -31,7 +31,7 @@ import static boofcv.factory.filter.kernel.FactoryKernelGaussian.sigmaForRadius;
 
 
 /**
- * Finds the derivative using a Gaussian kernel.  This is the same as convolving the image
+ * Finds the derivative using a Gaussian kernel. This is the same as convolving the image
  * and then computing the derivative
  *
  * @author Peter Abeles

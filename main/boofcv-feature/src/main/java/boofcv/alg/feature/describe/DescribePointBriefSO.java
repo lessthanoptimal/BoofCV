@@ -32,7 +32,7 @@ import java.util.Arrays;
 
 /**
  * <p>
- * Extension of {@link DescribePointBrief} which adds invariance to orientation and scale.  Invariance is added by simply
+ * Extension of {@link DescribePointBrief} which adds invariance to orientation and scale. Invariance is added by simply
  * applying an orientation/scale transform to the sample points and then applying interpolation to the point at which
  * it has been sampled.
  * </p>
@@ -82,7 +82,7 @@ public class DescribePointBriefSO<T extends ImageGray<T>> {
 
 	public void process( float c_x, float c_y, float orientation, float radius, TupleDesc_B feature ) {
 		float scale = (float)(radius/BoofDefaults.BRIEF_SCALE_TO_RADIUS);
-		// NOTE: This doesn't seem to take in account the interpolation border.  Might not work algs
+		// NOTE: This doesn't seem to take in account the interpolation border. Might not work algs
 		// other than bilinear interpolation
 		boolean isInside = BoofMiscOps.isInside(blur, c_x, c_y, definition.radius*scale);
 

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -31,7 +31,7 @@ import java.util.List;
 import static org.junit.jupiter.api.Assertions.*;
 
 /**
- * General tests for implementations of EstimateNofPnP.  Ensures that the returned motion estimate is in
+ * General tests for implementations of EstimateNofPnP. Ensures that the returned motion estimate is in
  * the correct direction and works under nominal conditions
  *
  *
@@ -60,8 +60,7 @@ public abstract class CheckEstimateNofPnP extends BaseChecksPnP {
 	/**
 	 * Feed it perfect observations and see if it returns nearly perfect results
 	 */
-	@Test
-	public void perfectObservations() {
+	@Test void perfectObservations() {
 		if( !onlyMinimum ) {
 			// test it with extra observations
 			perfectObservations(alg.getMinimumPoints()+20);
@@ -95,19 +94,17 @@ public abstract class CheckEstimateNofPnP extends BaseChecksPnP {
 	}
 
 	/**
-	 * All observations are behind the camera.  It should reject these
+	 * All observations are behind the camera. It should reject these
 	 */
-	@Test
-	public void checkAllObservationsBehindCamera() {
-		// This test is intentionally left blank.  If the point is behind the camera it shouldn't be observable so
+	@Test void checkAllObservationsBehindCamera() {
+		// This test is intentionally left blank. If the point is behind the camera it shouldn't be observable so
 		// it is reasonable for the PnP solution to come up with something crazy
 	}
 
 	/**
 	 * Call it multiple times and make sure the same solutions are returned.
 	 */
-	@Test
-	public void checkMultipleCalls() {
+	@Test void checkMultipleCalls() {
 		List<Point2D3D> inputs = createObservations(worldToCamera0,alg.getMinimumPoints());
 
 		assertTrue(alg.process(inputs,solutions));
@@ -135,13 +132,11 @@ public abstract class CheckEstimateNofPnP extends BaseChecksPnP {
 	/**
 	 * Sanity check to see if the minimum number of observations has been set.
 	 */
-	@Test
-	public void checkMinimumPoints() {
+	@Test void checkMinimumPoints() {
 		assertTrue(alg.getMinimumPoints() != 0);
 	}
 
-	@Test
-	public void checkZerosInput() {
+	@Test void checkZerosInput() {
 		List<Point2D3D> inputs = new ArrayList<>();
 
 		for( int i = 0; i < 3; i++ ) {

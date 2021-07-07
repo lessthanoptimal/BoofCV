@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -49,8 +49,7 @@ public class TestHelperNister5 extends BoofStandardJUnit {
 	/**
 	 * Validates A and B by computing solutions to constraint equations for a specific instance of x,y,z
 	 */
-	@Test
-	public void setupA1_setupA2() {
+	@Test void setupA1_setupA2() {
 		double x = 0.5, y = 2, z = -0.2, w = 1;
 
 		SimpleMatrix E = SimpleMatrix.wrap(constructE(x,y,z,w));
@@ -92,8 +91,7 @@ public class TestHelperNister5 extends BoofStandardJUnit {
 		assertEquals(eq2.data[8],Y.data[9],1e-8);
 	}
 
-	@Test
-	public void setDeterminantVectors() {
+	@Test void setDeterminantVectors() {
 		DMatrixRMaj A = RandomMatrices_DDRM.rectangle(10,10,-1,1,rand);
 
 		HelperNister5 alg = new HelperNister5();
@@ -142,8 +140,7 @@ public class TestHelperNister5 extends BoofStandardJUnit {
 		assertEquals(A.get(8,9)           ,alg.M12,1e-8);
 	}
 
-	@Test
-	public void extractPolynomial() {
+	@Test void extractPolynomial() {
 		DMatrixRMaj A = RandomMatrices_DDRM.rectangle(10,10,-1,1,rand);
 
 		HelperNister5 alg = new HelperNister5();

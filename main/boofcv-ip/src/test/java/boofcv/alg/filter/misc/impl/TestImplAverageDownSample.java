@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -53,8 +53,7 @@ public class TestImplAverageDownSample extends BoofStandardJUnit {
 	/**
 	 * easy case, should be a perfect copy
 	 */
-	@Test
-	public void horizontal_1_to_1() throws InvocationTargetException, IllegalAccessException {
+	@Test void horizontal_1_to_1() throws InvocationTargetException, IllegalAccessException {
 
 		List<Method> methods = find("horizontal");
 
@@ -82,8 +81,7 @@ public class TestImplAverageDownSample extends BoofStandardJUnit {
 	/**
 	 * Two pixels should be averaged together at a time
 	 */
-	@Test
-	public void horizontal_2_to_1() throws InvocationTargetException, IllegalAccessException {
+	@Test void horizontal_2_to_1() throws InvocationTargetException, IllegalAccessException {
 		List<Method> methods = find("horizontal");
 
 		for( Method m : methods ) {
@@ -109,8 +107,7 @@ public class TestImplAverageDownSample extends BoofStandardJUnit {
 	/**
 	 * The division will not be along pixels and symmetries are avoided
 	 */
-	@Test
-	public void horizontal_3_to_2() throws InvocationTargetException, IllegalAccessException {
+	@Test void horizontal_3_to_2() throws InvocationTargetException, IllegalAccessException {
 		List<Method> methods = find("horizontal");
 
 		for( Method m : methods ) {
@@ -144,8 +141,7 @@ public class TestImplAverageDownSample extends BoofStandardJUnit {
 		}
 	}
 
-	@Test
-	public void vertical_1_to_1() throws InvocationTargetException, IllegalAccessException {
+	@Test void vertical_1_to_1() throws InvocationTargetException, IllegalAccessException {
 		List<Method> methods = find("vertical");
 
 		for( Method m : methods ) {
@@ -168,8 +164,7 @@ public class TestImplAverageDownSample extends BoofStandardJUnit {
 		assertEquals(4,methods.size());
 	}
 
-	@Test
-	public void vertical_2_to_1() throws InvocationTargetException, IllegalAccessException {
+	@Test void vertical_2_to_1() throws InvocationTargetException, IllegalAccessException {
 		List<Method> methods = find("vertical");
 
 		for( Method m : methods ) {
@@ -201,8 +196,7 @@ public class TestImplAverageDownSample extends BoofStandardJUnit {
 		assertEquals(4,methods.size());
 	}
 
-	@Test
-	public void vertical_3_to_2() throws InvocationTargetException, IllegalAccessException {
+	@Test void vertical_3_to_2() throws InvocationTargetException, IllegalAccessException {
 		List<Method> methods = find("vertical");
 
 		for( Method m : methods ) {

@@ -33,22 +33,22 @@ import org.ddogleg.struct.FastArray;
 /**
  * <p>
  * Implementation of Felzenszwalb-Huttenlocher [1] image segmentation algorithm. It is fast and uses a graph based
- * heuristic with a tuning parameter that can be used to adjust region size.  Regions are irregularly shaped.
+ * heuristic with a tuning parameter that can be used to adjust region size. Regions are irregularly shaped.
  * </p>
  *
  * <p>
  * It works by constructing a graph in which pixels are the nodes and edges describe the relationship between
- * adjacent pixels.  Each pixel has a weight that is determined from the difference in pixel values using the F-norm.
- * The weights for all the edges are computed first and sorted from smallest to largest.  In the next step
- * the first edge in the list is selected and is tested to see if the nodes should be connected or not.  This
- * process is repeated for all edges.  Small regions are then merged into large ones. For more details
+ * adjacent pixels. Each pixel has a weight that is determined from the difference in pixel values using the F-norm.
+ * The weights for all the edges are computed first and sorted from smallest to largest. In the next step
+ * the first edge in the list is selected and is tested to see if the nodes should be connected or not. This
+ * process is repeated for all edges. Small regions are then merged into large ones. For more details
  * see [1].
  * </p>
  *
  * <p>
  * NOTE:
  * <ul>
- * <li>Region ID's in output image will NOT be sequential.  You need to call {@link #getRegionId()} to find
+ * <li>Region ID's in output image will NOT be sequential. You need to call {@link #getRegionId()} to find
  * out what the ID's are.</li>
  * <li>The output image can't be a sub-image because it is used internally and needs to be a continuous
  * block of memory.</li>
@@ -61,15 +61,15 @@ import org.ddogleg.struct.FastArray;
  * <p>
  * Algorithmic Changes:<br>
  * This implementation is a faithful of the original and has been compared against the authors
- * reference source code.  It does produce different results from the reference, some times significant, due to the
- * sensitivity of the algorithm to minor differences.  The sensitivity arises from it being a greedy algorithm.</p>
+ * reference source code. It does produce different results from the reference, some times significant, due to the
+ * sensitivity of the algorithm to minor differences. The sensitivity arises from it being a greedy algorithm.</p>
  *
- * <p>Here is a list of minor differences that cause different regions due to its sensitivity.  The order in which
- * edges with identical weights are sorted is arbitrary.  The order that edges are computed is arbitrary.  Floating
+ * <p>Here is a list of minor differences that cause different regions due to its sensitivity. The order in which
+ * edges with identical weights are sorted is arbitrary. The order that edges are computed is arbitrary. Floating
  * point error in weight calculation gradually causes segmentation to diverge to a different solution even
  * when given the same input.</p>
  *
- * <p>One difference from the original is that Gaussian blur is not applied to the input image by default.  That
+ * <p>One difference from the original is that Gaussian blur is not applied to the input image by default. That
  * should be done prior to the image being passed in.</p>
  *
  * <p>
@@ -81,14 +81,14 @@ import org.ddogleg.struct.FastArray;
  */
 public class SegmentFelzenszwalbHuttenlocher04<T extends ImageBase<T>> {
 
-	// tuning parameter.  Determines the number of segments.  Larger number means larger regions
+	// tuning parameter. Determines the number of segments. Larger number means larger regions
 	private final float K;
 
-	// the minimum region size.  Regions smaller than this are merged into larger ones
+	// the minimum region size. Regions smaller than this are merged into larger ones
 	private final int minimumSize;
 
-	// Storage for the disjoint-set forest.  Same data structure as 'output', but renamed for convenience.
-	// Value stored in each pixel refers to the parent vertex.  A root vertex contains a reference to itself
+	// Storage for the disjoint-set forest. Same data structure as 'output', but renamed for convenience.
+	// Value stored in each pixel refers to the parent vertex. A root vertex contains a reference to itself
 	protected GrayS32 graph;
 
 	// Function that computes the weight for each edge
@@ -98,7 +98,7 @@ public class SegmentFelzenszwalbHuttenlocher04<T extends ImageBase<T>> {
 	private ApproximateSort_F32 sorterApprox = null;
 	// storage for edges so that they can be recycled on the next call
 	protected DogArray<Edge> edges = new DogArray<>(Edge::new);
-	// list of edges which were not matched to anything.  used to merge small regions
+	// list of edges which were not matched to anything. used to merge small regions
 	protected FastArray<Edge> edgesNotMatched = new FastArray<>(Edge.class);
 	// Size of each region
 	protected DogArray_I32 regionSize = new DogArray_I32();
@@ -114,7 +114,7 @@ public class SegmentFelzenszwalbHuttenlocher04<T extends ImageBase<T>> {
 	/**
 	 * Specifies tuning parameter
 	 *
-	 * @param k Tuning parameter.  Larger regions are preferred for larger values of K.  Try 300
+	 * @param k Tuning parameter. Larger regions are preferred for larger values of K. Try 300
 	 * @param minimumSize Regions smaller than this are merged into larger regions
 	 * @param computeWeights Function used to compute the weight for all the edges.
 	 */
@@ -127,19 +127,19 @@ public class SegmentFelzenszwalbHuttenlocher04<T extends ImageBase<T>> {
 	/**
 	 * If this function is called the exact sort routine will not be used and instead an approximate routine will
 	 * be used.
-	 * @param numBins Number of bins.  Try 2000.  More bins the more accurate it will be
+	 * @param numBins Number of bins. Try 2000. More bins the more accurate it will be
 	 */
 	public void configureApproximateSort( int numBins ) {
 		sorterApprox = new ApproximateSort_F32(numBins);
 	}
 
 	/**
-	 * Segments the image.  Each region in the output image is given a unique ID.  To find out what the ID
-	 * of each region is call {@link #getRegionId()}.  To get a list of number of pixels in each region call
+	 * Segments the image. Each region in the output image is given a unique ID. To find out what the ID
+	 * of each region is call {@link #getRegionId()}. To get a list of number of pixels in each region call
 	 * {@link #getRegionSizes()}.
 	 *
-	 * @param input Input image.  Not modified.
-	 * @param output Output segmented image.  Modified.
+	 * @param input Input image. Not modified.
+	 * @param output Output segmented image. Modified.
 	 */
 	public void process( T input , GrayS32 output ) {
 		if( output.isSubimage() )
@@ -185,7 +185,7 @@ public class SegmentFelzenszwalbHuttenlocher04<T extends ImageBase<T>> {
 	}
 
 	/**
-	 * Follows the merge procedure output in [1].  Two regions are merged together if the edge linking them
+	 * Follows the merge procedure output in [1]. Two regions are merged together if the edge linking them
 	 * has a weight which is &le; the minimum of the heaviest edges in the two regions.
 	 */
 	protected void mergeRegions() {
@@ -270,7 +270,7 @@ public class SegmentFelzenszwalbHuttenlocher04<T extends ImageBase<T>> {
 	}
 
 	/**
-	 * Finds the root given child.  If the child does not point directly to the parent find the parent and make
+	 * Finds the root given child. If the child does not point directly to the parent find the parent and make
 	 * the child point directly towards it.
 	 */
 	protected int find( int child ) {
@@ -290,7 +290,7 @@ public class SegmentFelzenszwalbHuttenlocher04<T extends ImageBase<T>> {
 	}
 
 	/**
-	 * Searches for root nodes in the graph and adds their size to the list of region sizes.  Makes sure all
+	 * Searches for root nodes in the graph and adds their size to the list of region sizes. Makes sure all
 	 * other nodes in the graph point directly at their root.
 	 */
 	protected void computeOutput() {
@@ -340,7 +340,7 @@ public class SegmentFelzenszwalbHuttenlocher04<T extends ImageBase<T>> {
 	 * The weight is saved in 'sortValue'
 	 */
 	public static class Edge extends SortableParameter_F32 {
-		// indexes of connected pixels in output image.  The index for pixel (x,y) is: index = y*width + x
+		// indexes of connected pixels in output image. The index for pixel (x,y) is: index = y*width + x
 		public int indexA;
 		public int indexB;
 

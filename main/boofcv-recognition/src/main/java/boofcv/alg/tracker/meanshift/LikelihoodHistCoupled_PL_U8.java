@@ -25,8 +25,8 @@ import georegression.struct.shapes.RectangleLength2D_I32;
 /**
  * <p>
  * Creates a histogram in a color image and is used to identify the likelihood of an color being a member
- * of the original distribution.  The histogram is computed in N-dimensional space, where N is the number
- * of bands in the color image.  The number of bins for each band is specified in the constructor.  There
+ * of the original distribution. The histogram is computed in N-dimensional space, where N is the number
+ * of bands in the color image. The number of bins for each band is specified in the constructor. There
  * is a total of N*numBins elements in the histogram.
  * </p>
  *

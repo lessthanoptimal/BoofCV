@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -62,7 +62,7 @@ public class WaveletTransformOps {
 	 * @param desc Description of the wavelet.
 	 * @param input Input image. Not modified.
 	 * @param output Where the wavelet transform is written to. Modified.
-	 * @param storage Optional storage image.  Should be the same size as output image. If null then
+	 * @param storage Optional storage image. Should be the same size as output image. If null then
 	 * an image is declared internally.
 	 */
 	public static void transform1(WaveletDescription<WlCoef_F32> desc ,
@@ -103,7 +103,7 @@ public class WaveletTransformOps {
 	 * @param desc Description of the wavelet.
 	 * @param input Input image and is used as internal workspace. Modified.
 	 * @param output Where the multilevel wavelet transform is written to. Modified.
-	 * @param storage Optional storage image.  Should be the same size as output image. If null then
+	 * @param storage Optional storage image. Should be the same size as output image. If null then
 	 * an image is declared internally.
 	 * @param numLevels Number of levels which should be computed in the transform.
 	 */
@@ -144,13 +144,13 @@ public class WaveletTransformOps {
 	/**
 	 * <p>
 	 * Performs a single level inverse wavelet transform. Do not pass in a whole image which has been
-	 * transformed by a multilevel transform.  Just the relevant sub-image.
+	 * transformed by a multilevel transform. Just the relevant sub-image.
 	 * </p>
 	 *
 	 * @param desc Description of the inverse wavelet.
 	 * @param input Input wavelet transform. Not modified.
 	 * @param output Reconstruction of original image. Modified.
-	 * @param storage Optional storage image.  Should be the same size as the input image. If null then
+	 * @param storage Optional storage image. Should be the same size as the input image. If null then
 	 * an image is declared internally.
 	 * @param minValue Minimum allowed pixel value
 	 * @param maxValue Maximum allowed pixel value
@@ -192,7 +192,7 @@ public class WaveletTransformOps {
 	 * @param desc Description of the inverse wavelet.
 	 * @param input Input wavelet transform and is used as internal workspace. Modified.
 	 * @param output Reconstruction of original image. Modified.
-	 * @param storage Optional storage image.  Should be the same size as the input image. If null then
+	 * @param storage Optional storage image. Should be the same size as the input image. If null then
 	 * an image is declared internally.
 	 * @param numLevels Number of levels in the transform.
 	 * @param minValue Minimum allowed pixel value
@@ -263,7 +263,7 @@ public class WaveletTransformOps {
 	 * @param desc Description of the wavelet.
 	 * @param input Input image. Not modified.
 	 * @param output Where the wavelet transform is written to. Modified.
-	 * @param storage Optional storage image.  Should be the same size as output image. If null then
+	 * @param storage Optional storage image. Should be the same size as output image. If null then
 	 * an image is declared internally.
 	 */
 	public static void transform1(WaveletDescription<WlCoef_I32> desc ,
@@ -304,7 +304,7 @@ public class WaveletTransformOps {
 	 * @param desc Description of the wavelet.
 	 * @param input Input image and is used as internal workspace. Modified.
 	 * @param output Where the multilevel wavelet transform is written to. Modified.
-	 * @param storage Optional storage image.  Should be the same size as output image. If null then
+	 * @param storage Optional storage image. Should be the same size as output image. If null then
 	 * an image is declared internally.
 	 * @param numLevels Number of levels which should be computed in the transform.
 	 */
@@ -345,13 +345,13 @@ public class WaveletTransformOps {
 	/**
 	 * <p>
 	 * Performs a single level inverse wavelet transform. Do not pass in a whole image which has been
-	 * transformed by a multilevel transform.  Just the relevant sub-image.
+	 * transformed by a multilevel transform. Just the relevant sub-image.
 	 * </p>
 	 *
 	 * @param desc Description of the inverse wavelet.
 	 * @param input Input wavelet transform. Not modified.
 	 * @param output Reconstruction of original image. Modified.
-	 * @param storage Optional storage image.  Should be the same size as the input image. If null then
+	 * @param storage Optional storage image. Should be the same size as the input image. If null then
 	 * an image is declared internally.
 	 * @param minValue Minimum allowed pixel value
 	 * @param maxValue Maximum allowed pixel value
@@ -393,7 +393,7 @@ public class WaveletTransformOps {
 	 * @param desc Description of the inverse wavelet.
 	 * @param input Input wavelet transform and is used as internal workspace. Modified.
 	 * @param output Reconstruction of original image. Modified.
-	 * @param storage Optional storage image.  Should be the same size as the input image. If null then
+	 * @param storage Optional storage image. Should be the same size as the input image. If null then
 	 * an image is declared internally.
 	 * @param numLevels Number of levels in the transform.
 	 * @param minValue Minimum allowed pixel value

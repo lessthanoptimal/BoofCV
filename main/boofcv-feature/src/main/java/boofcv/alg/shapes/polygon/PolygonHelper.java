@@ -41,10 +41,10 @@ public interface PolygonHelper {
 	void setImageShape( int width, int height );
 
 	/**
-	 * User defined filter to accept/reject or modify the contour of a shape.  Called at most twice. First
+	 * User defined filter to accept/reject or modify the contour of a shape. Called at most twice. First
 	 * with distorted pixels and after distortion has been removed.
 	 *
-	 * @param contour External contour around a shape.  Can be modified
+	 * @param contour External contour around a shape. Can be modified
 	 * @param touchesBorder true if the contour touches the image border or false if it doesnt
 	 * @param distorted True if pixels are distorted or false for undistorted pixel coordinates
 	 * @return true to keep the contour for further processing or false to reject it

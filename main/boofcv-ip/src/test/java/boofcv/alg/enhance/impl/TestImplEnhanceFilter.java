@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -50,8 +50,7 @@ public class TestImplEnhanceFilter extends BoofStandardJUnit {
 	/**
 	 * Compare the sharpen filter to a bounded convolution
 	 */
-	@Test
-	public void sharpenInner4() {
+	@Test void sharpenInner4() {
 		int numFound = 0;
 
 		Method methods[] = ImplEnhanceFilter.class.getMethods();
@@ -99,8 +98,7 @@ public class TestImplEnhanceFilter extends BoofStandardJUnit {
 	/**
 	 * Compare the sharpen filter to a bounded convolution
 	 */
-	@Test
-	public void sharpenBorder4() {
+	@Test void sharpenBorder4() {
 		int numFound = 0;
 
 		Method methods[] = ImplEnhanceFilter.class.getMethods();
@@ -151,8 +149,7 @@ public class TestImplEnhanceFilter extends BoofStandardJUnit {
 	/**
 	 * Compare the sharpen filter to a bounded convolution
 	 */
-	@Test
-	public void sharpenInner8() {
+	@Test void sharpenInner8() {
 		int numFound = 0;
 
 		Method methods[] = ImplEnhanceFilter.class.getMethods();
@@ -200,8 +197,7 @@ public class TestImplEnhanceFilter extends BoofStandardJUnit {
 	/**
 	 * Compare the sharpen filter to a bounded convolution
 	 */
-	@Test
-	public void sharpenBorder8() {
+	@Test void sharpenBorder8() {
 		int numFound = 0;
 
 		Method methods[] = ImplEnhanceFilter.class.getMethods();

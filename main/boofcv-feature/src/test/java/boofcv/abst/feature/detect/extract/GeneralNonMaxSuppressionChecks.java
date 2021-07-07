@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -77,8 +77,7 @@ public abstract class GeneralNonMaxSuppressionChecks extends BoofStandardJUnit {
 		}
 	}
 
-	@Test
-	public void getUsesCandidates() {
+	@Test void getUsesCandidates() {
 		init();
 
 		if( !alg.getUsesCandidates() )
@@ -113,11 +112,10 @@ public abstract class GeneralNonMaxSuppressionChecks extends BoofStandardJUnit {
 	}
 
 	/**
-	 * Makes sure that the border just defines the region in which an exteme can be found.  If a pixel is within
+	 * Makes sure that the border just defines the region in which an exteme can be found. If a pixel is within
 	 * the exclusion zone and larger magnitude than a near by pixel inside, the inside pixel can't be an exteme
 	 */
-	@Test
-	public void setIgnoreBorder_conflict() {
+	@Test void setIgnoreBorder_conflict() {
 		if( alg.canDetectMaximums() )
 			setIgnoreBorder_conflict(true);
 		if( alg.canDetectMinimums() )
@@ -144,7 +142,7 @@ public abstract class GeneralNonMaxSuppressionChecks extends BoofStandardJUnit {
 			assertEquals(0, foundMax.size);
 		}
 
-		// now with a border there should be no maximum.  30 gets knocked out because 90 is next to it
+		// now with a border there should be no maximum. 30 gets knocked out because 90 is next to it
 		foundMin.reset();foundMax.reset();
 		alg.setIgnoreBorder(1);
 		alg.process(image,candidatesMin, candidatesMax,foundMin,foundMax);
@@ -152,8 +150,7 @@ public abstract class GeneralNonMaxSuppressionChecks extends BoofStandardJUnit {
 		assertEquals(0, foundMax.size);
 	}
 
-	@Test
-	public void setIgnoreBorder_basic() {
+	@Test void setIgnoreBorder_basic() {
 		setIgnoreBorder_basic( true );
 		setIgnoreBorder_basic( false );
 	}
@@ -184,8 +181,7 @@ public abstract class GeneralNonMaxSuppressionChecks extends BoofStandardJUnit {
 		assertEquals(0, foundMax.size);
 	}
 
-	@Test
-	public void setThreshold() {
+	@Test void setThreshold() {
 		init();
 
 		setPixel(5,6, true, 10);
@@ -203,8 +199,7 @@ public abstract class GeneralNonMaxSuppressionChecks extends BoofStandardJUnit {
 	}
 
 
-	@Test
-	public void setSearchRadius() {
+	@Test void setSearchRadius() {
 		init();
 
 		setPixel(5, 6, true, 9);
@@ -225,8 +220,7 @@ public abstract class GeneralNonMaxSuppressionChecks extends BoofStandardJUnit {
 		checkDetectedSize(1, 1);
 	}
 
-	@Test
-	public void ignoreMAX_VALUE() {
+	@Test void ignoreMAX_VALUE() {
 		init();
 
 		setPixel(4,5, true, Float.MAX_VALUE);
@@ -255,8 +249,7 @@ public abstract class GeneralNonMaxSuppressionChecks extends BoofStandardJUnit {
 	/**
 	 * When processing a sub-image it should produce the same results as when processing a regular image
 	 */
-	@Test
-	public void checkSubImage() {
+	@Test void checkSubImage() {
 		init();
 
 		ImageMiscOps.fillGaussian(image,rand,0,2,-100,100);

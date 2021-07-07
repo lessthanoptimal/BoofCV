@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -26,7 +26,7 @@ import georegression.struct.point.Point2D_F32;
 
 /**
  * Except for very simple functions, computing the per pixel distortion is an expensive operation.
- * To overcome this problem the distortion is computed once and cached.  Then when the image is distorted
+ * To overcome this problem the distortion is computed once and cached. Then when the image is distorted
  * again the save results are simply recalled and not computed again.
  *
  * @author Peter Abeles

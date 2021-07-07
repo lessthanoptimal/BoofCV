@@ -57,7 +57,7 @@ public class ExampleLauncherApp extends ApplicationLauncherApp {
 		packages.add("boofcv.examples.stereo");
 		packages.add("boofcv.examples.tracking");
 
-		// Reflections is a weird package that does not behave the way one would expect.  Several hacks below
+		// Reflections is a weird package that does not behave the way one would expect. Several hacks below
 		for( String p : packages ) {
 			Reflections reflections = new Reflections(p,
 					new SubTypesScanner(false));

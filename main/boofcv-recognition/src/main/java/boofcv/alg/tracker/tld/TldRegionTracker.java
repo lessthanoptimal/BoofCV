@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -38,11 +38,11 @@ import java.lang.reflect.Array;
 
 /**
  * Tracks features inside target's rectangle using pyramidal KLT and updates the rectangle using found motion.
- * A scale and translation model model is used.  A major departure from the paper is that KLT forward-backward (FB)
+ * A scale and translation model model is used. A major departure from the paper is that KLT forward-backward (FB)
  * error and robust model fitting is used to prune tracks and estimate motion.
  * In the paper FB and NCC error is used to prune tracks and a (in my opinion) hack is used by computing
- * median error values.  The way the motion is computed is more
- * mathematically sound this way.  NCC would provide a good sanity check, but is probably not needed.
+ * median error values. The way the motion is computed is more
+ * mathematically sound this way. NCC would provide a good sanity check, but is probably not needed.
  *
  * @author Peter Abeles
  */
@@ -92,8 +92,8 @@ public class TldRegionTracker<I extends ImageGray<I>, D extends ImageGray<D>> {
 	/**
 	 * Configures tracker
 	 *
-	 * @param gridWidth Number of tracks spawned along a side in the grid.  Try 10
-	 * @param featureRadius Radius of KLT features being tracked.  Try 5
+	 * @param gridWidth Number of tracks spawned along a side in the grid. Try 10
+	 * @param featureRadius Radius of KLT features being tracked. Try 5
 	 * @param maxErrorFB Maximum allowed forwards-backwards error
 	 * @param gradient Computes image gradient used by KLT tracker
 	 * @param tracker Feature tracker

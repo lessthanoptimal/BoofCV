@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -33,8 +33,8 @@ public interface BundleAdjustment<Structure extends SceneStructure> extends Stop
 	 * Configures optimization parameters. meaning of all of these parameters is implementation dependent. They
 	 * might even be ignored.
 	 *
-	 * @param ftol Relative threshold for change in function value between iterations. 0 &le; ftol &le; 1.  Try 1e-12
-	 * @param gtol Absolute threshold for convergence based on the gradient's norm. 0 disables test.  0 &le; gtol.
+	 * @param ftol Relative threshold for change in function value between iterations. 0 &le; ftol &le; 1. Try 1e-12
+	 * @param gtol Absolute threshold for convergence based on the gradient's norm. 0 disables test. 0 &le; gtol.
 	 * Try 1e-12
 	 * @param maxIterations Maximum number of iterations.
 	 */

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -25,7 +25,7 @@ import boofcv.struct.image.ImageGray;
  * <p>
  * Selects the best disparity given the set of scores calculated by
  * {@link DisparityBlockMatch}. The scores
- * are provided as an array of integers or floats.  A disparity of zero either means
+ * are provided as an array of integers or floats. A disparity of zero either means
  * no match was found or the disparity was in fact zero.
  * </p>
  *
@@ -51,7 +51,7 @@ public interface DisparitySelect<Array , T extends ImageGray> {
 
 	/**
 	 * Processes the array of scores. The score format is described in
-	 * {@link DisparityBlockMatch}.  The results are written directly into the
+	 * {@link DisparityBlockMatch}. The results are written directly into the
 	 * disparity image passed to it in {@link #configure(ImageGray, int, int, int)}.
 	 *
 	 * @param row Image row the scores are from.

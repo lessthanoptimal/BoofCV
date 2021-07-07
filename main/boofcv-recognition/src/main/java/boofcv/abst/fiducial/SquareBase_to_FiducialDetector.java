@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -66,8 +66,8 @@ public abstract class SquareBase_to_FiducialDetector<T extends ImageGray<T>, Det
 		this.alg = alg;
 		this.type = ImageType.single(alg.getInputType());
 
-		// add corner points in target frame.  Used to compute homography.  Target's center is at its origin
-		// see comment in class JavaDoc above.  Note that the target's length is one below.  The scale factor
+		// add corner points in target frame. Used to compute homography. Target's center is at its origin
+		// see comment in class JavaDoc above. Note that the target's length is one below. The scale factor
 		// will be provided later one
 		poseEstimator.setFiducial(-0.5, 0.5, 0.5, 0.5, 0.5, -0.5, -0.5, -0.5);
 		points2D3D = poseEstimator.createCopyPoints2D3D();
@@ -84,7 +84,7 @@ public abstract class SquareBase_to_FiducialDetector<T extends ImageGray<T>, Det
 	}
 
 	/**
-	 * Return the intersection of two lines defined by opposing corners.  This should also be the geometric center
+	 * Return the intersection of two lines defined by opposing corners. This should also be the geometric center
 	 *
 	 * @param which Fiducial's index
 	 * @param location (output) Storage for the transform. modified.

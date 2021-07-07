@@ -136,7 +136,7 @@ public class SegmentMeanShiftSearchGray<T extends ImageGray<T>> extends SegmentM
 	}
 
 	/**
-	 * Uses mean-shift to find the peak.  Returns the peak as an index in the image data array.
+	 * Uses mean-shift to find the peak. Returns the peak as an index in the image data array.
 	 *
 	 * @param gray The color value which mean-shift is trying to find a region which minimises it
 	 */
@@ -171,7 +171,7 @@ public class SegmentMeanShiftSearchGray<T extends ImageGray<T>> extends SegmentM
 					}
 				}
 			} else {
-				// Perform more sanity checks here for the image edge.  Edge pixels are handled by skipping them
+				// Perform more sanity checks here for the image edge. Edge pixels are handled by skipping them
 				for (int yy = 0; yy < widthY; yy++) {
 					float sampleY = y0 + yy;
 					// make sure it is inside the image

@@ -30,13 +30,13 @@ import boofcv.struct.lists.RecycleStack;
  * <p>Computes image statistics in regularly spaced blocks across the image. Then computes an average
  * of the statistics in a block within a local 3x3 grid region. The average statistics in a local 3x3 grid
  * region is used to reduce the adverse affects of using a grid.
- * Ideally a local region around each pixel would be used, but this is expensive to compute.  Since a grid is
- * used instead of a pixel local region boundary conditions can be an issue.  For example, consider a black square
+ * Ideally a local region around each pixel would be used, but this is expensive to compute. Since a grid is
+ * used instead of a pixel local region boundary conditions can be an issue. For example, consider a black square
  * in the image, if the grid just happens to lie on this black square perfectly then if you look at only a single
- * grid element it will be considered textureless and the edge lost.  This problem isn't an issue if you consder
+ * grid element it will be considered textureless and the edge lost. This problem isn't an issue if you consder
  * a local 3x3 region of blocks.</p>
  *
- * <p>The size each block in the grid in pixels is adjusted depending on image size.  This is done to minimize
+ * <p>The size each block in the grid in pixels is adjusted depending on image size. This is done to minimize
  * "squares" in the upper image boundaries from having many more pixels than other blocks.</p>
  *
  * <p>The block based approach used here was inspired by a high level description found in AprilTags.</p>

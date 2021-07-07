@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -118,9 +118,9 @@ public class CommonFactoryWavelet extends BoofStandardJUnit {
 	}
 
 	/**
-	 * Computes the dot product of two wavelets separated by different offsets.  If
+	 * Computes the dot product of two wavelets separated by different offsets. If
 	 * the offset is zero and they have an orthogonal/biorothogonal relationship then
-	 * the dot product should be one.  Otherwise it will be zero.
+	 * the dot product should be one. Otherwise it will be zero.
 	 */
 	public static void checkBiorthogonal_F32( WaveletDescription<WlCoef_F32> desc )
 	{

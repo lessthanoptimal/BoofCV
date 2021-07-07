@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -23,8 +23,8 @@ import georegression.struct.point.Point2D_F32;
 import java.util.Random;
 
 /**
- * Fern descriptor used in {@link TldTracker}.  The number of features can be at most 32, enough to fit inside
- * an integer. The location of each point is from -0.5 to 0.5 and randomly selected.  When computed it is scaled
+ * Fern descriptor used in {@link TldTracker}. The number of features can be at most 32, enough to fit inside
+ * an integer. The location of each point is from -0.5 to 0.5 and randomly selected. When computed it is scaled
  * independently along x and y axis to the region's width and height, respectively.
  *
  * @author Peter Abeles
@@ -32,7 +32,7 @@ import java.util.Random;
 public class TldFernDescription {
 
 	/**
-	 * Pairs used to compute fern.  Must be &le; 32 to fit inside an integer
+	 * Pairs used to compute fern. Must be &le; 32 to fit inside an integer
 	 */
 	SamplePair[] pairs;
 

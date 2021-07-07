@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -41,8 +41,7 @@ public class TestDetectDescribeSurfPlanar extends BoofStandardJUnit {
 	int width = 200;
 	int height = 250;
 
-	@Test
-	public void basicTest() {
+	@Test void basicTest() {
 		Planar<GrayF32> input = new Planar<>(GrayF32.class,width,height,3);
 
 		GImageMiscOps.addUniform(input, rand, 0, 200);

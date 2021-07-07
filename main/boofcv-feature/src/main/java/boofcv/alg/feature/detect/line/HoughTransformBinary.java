@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -35,14 +35,14 @@ import java.util.List;
 /**
  * <p>
  * Hough transform which uses a polar line representation, distance from origin and angle (0 to 180 degrees).
- * Standard implementation of a hough transform.  1) Gradient intensity image is used to find edge pixels.
+ * Standard implementation of a hough transform. 1) Gradient intensity image is used to find edge pixels.
  * 2) All possible lines passing through that point are found. 3) Line parameters are summed up in the line image,
  * in which each pixel represents a coordinate in parameter space.
  * 3) Local maximums are found.
  * </p>
- * <p> By the nature of this algorithms, lines are forced to be discretized into parameter space.  The range
- * can vary from +- the maximum range inside the image and the angle from 0 to PI radians.  How
- * finely discretized an image is effects line detection accuracy.  If too fine lines might not be detected
+ * <p> By the nature of this algorithms, lines are forced to be discretized into parameter space. The range
+ * can vary from +- the maximum range inside the image and the angle from 0 to PI radians. How
+ * finely discretized an image is effects line detection accuracy. If too fine lines might not be detected
  * or it will be too noisy.
  * </p>
  * <p>
@@ -52,9 +52,9 @@ import java.util.List;
  * </p>
  *
  * <p>
- * USAGE NOTE: Duplicate/very similar lines are possible due to angles being cyclical.  What happens is that if
+ * USAGE NOTE: Duplicate/very similar lines are possible due to angles being cyclical. What happens is that if
  * a line's orientation lies along a boundary point its angles will be split up between top and bottom
- * of the transform.  When lines are extracted using non-maximum it will detects peaks at the top
+ * of the transform. When lines are extracted using non-maximum it will detects peaks at the top
  * and bottom.
  * </p>
  *
@@ -89,7 +89,7 @@ public class HoughTransformBinary {
 	ConfigLength thresholdCounts = ConfigLength.relative(0.001, 1);
 
 	/**
-	 * Specifies parameters of transform.  The minimum number of points specified in the extractor
+	 * Specifies parameters of transform. The minimum number of points specified in the extractor
 	 * is an important tuning parameter.
 	 *
 	 * @param extractor Extracts local maxima from transform space.
@@ -160,8 +160,8 @@ public class HoughTransformBinary {
 			post.add(linesAll.get(i), foundIntensity.get(i));
 		}
 
-		// NOTE: angular accuracy is a function of range from sub image center.  This pruning
-		// function uses a constant value for range accuracy.  A custom algorithm should really
+		// NOTE: angular accuracy is a function of range from sub image center. This pruning
+		// function uses a constant value for range accuracy. A custom algorithm should really
 		// be used here.
 		post.pruneSimilar((float)mergeAngle, (float)mergeDistance, width, height);
 		post.pruneNBest(maxLines);
@@ -179,7 +179,7 @@ public class HoughTransformBinary {
 	}
 
 	/**
-	 * Returns the intensity/edge count for each returned line.  Useful when doing
+	 * Returns the intensity/edge count for each returned line. Useful when doing
 	 * post processing pruning.
 	 *
 	 * @return Array containing line intensities.

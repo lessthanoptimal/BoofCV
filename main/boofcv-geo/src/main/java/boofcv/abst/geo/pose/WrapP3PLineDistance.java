@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -71,7 +71,7 @@ public class WrapP3PLineDistance implements EstimateNofPnP {
 	@Override
 	public boolean process( List<Point2D3D> inputs, DogArray<Se3_F64> solutions ) {
 		if (inputs.size() != 3)
-			throw new IllegalArgumentException("Three and only three inputs are required.  Not " + inputs.size());
+			throw new IllegalArgumentException("Three and only three inputs are required. Not " + inputs.size());
 
 		solutions.reset();
 

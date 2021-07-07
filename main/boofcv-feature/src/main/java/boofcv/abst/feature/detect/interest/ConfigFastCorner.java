@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -31,12 +31,12 @@ import boofcv.struct.Configuration;
 public class ConfigFastCorner implements Configuration {
 
 	/**
-	 * How different pixels need to be to be considered part of a corner. Image dependent.  Try 20 to start.
+	 * How different pixels need to be to be considered part of a corner. Image dependent. Try 20 to start.
 	 */
 	public int pixelTol = 20;
 
 	/**
-	 * Minimum number of pixels around the circle that are required to be a corner.  Can be 9 to 12
+	 * Minimum number of pixels around the circle that are required to be a corner. Can be 9 to 12
 	 */
 	public int minContinuous=9;
 

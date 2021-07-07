@@ -29,7 +29,7 @@ import boofcv.struct.Configuration;
 public class ConfigEssential implements Configuration {
 
 	/**
-	 * Which algorithm should it use.  Only use essential matrix ones.
+	 * Which algorithm should it use. Only use essential matrix ones.
 	 */
 	public EnumEssential which = EnumEssential.NISTER_5;
 

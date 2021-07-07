@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -30,15 +30,15 @@ import java.util.List;
 
 /**
  * <p>
- * Detects calibration points inside a chessboard calibration target.  First the image
+ * Detects calibration points inside a chessboard calibration target. First the image
  * is thresholded to create a binary image for square detection, then the binary image is eroded to make sure
- * the squares don't touch.  After that {@link DetectChessboardSquarePoints} is called and it detects and sorts
+ * the squares don't touch. After that {@link DetectChessboardSquarePoints} is called and it detects and sorts
  * the squares.
  * </p>
  * <p>
  * The found control points are ensured to be returned in a row-major format with the correct number of rows and columns,
- * with a counter clockwise ordering.  Note that when viewed on the monitor this will appear to be clockwise because
- * the y-axis points down.  If there are multiple valid solution then the solution with the (0,0) grid point closest
+ * with a counter clockwise ordering. Note that when viewed on the monitor this will appear to be clockwise because
+ * the y-axis points down. If there are multiple valid solution then the solution with the (0,0) grid point closest
  * top the origin is selected.
  * </p>
  * <center>
@@ -63,8 +63,8 @@ public class DetectChessboardBinaryPattern<T extends ImageGray<T>> {
 
 	/**
 	 * Configures detection parameters
-	 * @param numRows Number of rows in the grid.  Target dependent.
-	 * @param numCols Number of columns in the grid.  Target dependent.
+	 * @param numRows Number of rows in the grid. Target dependent.
+	 * @param numCols Number of columns in the grid. Target dependent.
 	 * @param maxCornerDistance The maximum distance two square corners can be from each other in pixels
 	 */
 	public DetectChessboardBinaryPattern(int numRows, int numCols, ConfigLength maxCornerDistance,

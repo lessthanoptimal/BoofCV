@@ -99,7 +99,7 @@ public class ConfigEpipolarScore3D implements Configuration {
 		/** Configuration for computing Homography matrix */
 		public final ConfigHomography homography = new ConfigHomography();
 
-		/** The minimum number of inliers for an edge to be accepted. If relative, then relative to pairs.  */
+		/** The minimum number of inliers for an edge to be accepted. If relative, then relative to pairs. */
 		public final ConfigLength minimumInliers = ConfigLength.fixed(30);
 
 		/**
@@ -146,7 +146,7 @@ public class ConfigEpipolarScore3D implements Configuration {
 		 */
 		public double maxRatioScore = 10.0;
 
-		/** The minimum number of inliers for an edge to be accepted. If relative, then relative to pairs.  */
+		/** The minimum number of inliers for an edge to be accepted. If relative, then relative to pairs. */
 		public final ConfigLength minimumInliers = ConfigLength.relative(0.2, 40);
 
 		@Override public void checkValidity() {
@@ -179,7 +179,7 @@ public class ConfigEpipolarScore3D implements Configuration {
 		 */
 		public double maxRatioScore = 10.0;
 
-		/** The minimum number of inliers for an edge to be accepted. If relative, then relative to pairs.  */
+		/** The minimum number of inliers for an edge to be accepted. If relative, then relative to pairs. */
 		public final ConfigLength minimumInliers = ConfigLength.relative(0.2, 40);
 
 		@Override public void checkValidity() {

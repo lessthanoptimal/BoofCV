@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -41,8 +41,7 @@ public class TestMergeSmallRegions extends BoofStandardJUnit {
 	 * Runs everything to remove the small patches. This test hsa been designed to take multiple
 	 * passes to complete.
 	 */
-	@Test
-	public void process() {
+	@Test void process() {
 		GrayU8 image = new GrayU8(10,9);
 		image.data = new byte[]{
 				0,0,0,5,5,5,0,0,0,0,
@@ -84,7 +83,7 @@ public class TestMergeSmallRegions extends BoofStandardJUnit {
 
 		alg.process(image, pixelToRegion, memberCount, regionColor);
 
-		// check the results.  Should only be three regions
+		// check the results. Should only be three regions
 		assertEquals(3,memberCount.size);
 		assertEquals(3,regionColor.size);
 
@@ -101,8 +100,7 @@ public class TestMergeSmallRegions extends BoofStandardJUnit {
 		assertTrue(memberExpected.get(0)>memberExpected.get(1));
 	}
 
-	@Test
-	public void setupPruneList() {
+	@Test void setupPruneList() {
 		DogArray_I32 regionMemberCount = new DogArray_I32();
 		regionMemberCount.size = 6;
 		regionMemberCount.data = new int[]{10,11,20,20,10,20};
@@ -124,8 +122,7 @@ public class TestMergeSmallRegions extends BoofStandardJUnit {
 		assertEquals(1,alg.segmentToPruneID.get(4));
 	}
 
-	@Test
-	public void findAdjacentRegions_center() {
+	@Test void findAdjacentRegions_center() {
 		int N = 9;
 		GrayS32 pixelToRegion = new GrayS32(5,4);
 		pixelToRegion.data = new int[]
@@ -160,8 +157,7 @@ public class TestMergeSmallRegions extends BoofStandardJUnit {
 		checkNode(alg, edges5,1);
 	}
 
-	@Test
-	public void findAdjacentRegions_right() {
+	@Test void findAdjacentRegions_right() {
 		int N = 9;
 		GrayS32 pixelToRegion = new GrayS32(5,4);
 		pixelToRegion.data = new int[]
@@ -201,8 +197,7 @@ public class TestMergeSmallRegions extends BoofStandardJUnit {
 		checkNode(alg, edges5,2);
 	}
 
-	@Test
-	public void findAdjacentRegions_bottom() {
+	@Test void findAdjacentRegions_bottom() {
 		int N = 9;
 		GrayS32 pixelToRegion = new GrayS32(5,4);
 		pixelToRegion.data = new int[]
@@ -242,8 +237,7 @@ public class TestMergeSmallRegions extends BoofStandardJUnit {
 		checkNode(alg, edges5,2);
 	}
 
-	@Test
-	public void selectMerge() {
+	@Test void selectMerge() {
 		int N = 10;
 
 		MergeSmallRegions alg = new MergeSmallRegions(10,ConnectRule.FOUR,null);
@@ -289,8 +283,7 @@ public class TestMergeSmallRegions extends BoofStandardJUnit {
 	/**
 	 * Make sure a connect-4 rule is correctly enforced
 	 */
-	@Test
-	public void adjacentInner4() {
+	@Test void adjacentInner4() {
 		int N = 9;
 		GrayS32 pixelToRegion = new GrayS32(5,4);
 		pixelToRegion.data = new int[]
@@ -325,8 +318,7 @@ public class TestMergeSmallRegions extends BoofStandardJUnit {
 		checkNode(alg, edges9,1);
 	}
 
-	@Test
-	public void adjacentInner8() {
+	@Test void adjacentInner8() {
 		int N = 13;
 		GrayS32 pixelToRegion = new GrayS32(5,4);
 		pixelToRegion.data = new int[]
@@ -366,8 +358,7 @@ public class TestMergeSmallRegions extends BoofStandardJUnit {
 		checkNode(alg, edges4,2);
 	}
 
-	@Test
-	public void adjacentBorder8() {
+	@Test void adjacentBorder8() {
 		int N = 13;
 		GrayS32 pixelToRegion = new GrayS32(5,4);
 		pixelToRegion.data = new int[]
@@ -407,8 +398,7 @@ public class TestMergeSmallRegions extends BoofStandardJUnit {
 		checkNode(alg, edges12,2);
 	}
 
-	@Test
-	public void adjacentBorder4() {
+	@Test void adjacentBorder4() {
 		int N = 13;
 		GrayS32 pixelToRegion = new GrayS32(5,4);
 		pixelToRegion.data = new int[]

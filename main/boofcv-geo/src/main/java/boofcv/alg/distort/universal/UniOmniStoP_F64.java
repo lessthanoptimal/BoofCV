@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -24,8 +24,8 @@ import boofcv.struct.distort.Point3Transform2_F64;
 import georegression.struct.point.Point2D_F64;
 
 /**
- * Forward projection model for {@link CameraUniversalOmni}.  Takes a 3D point in camera unit sphere
- * coordinates and converts it into a distorted pixel coordinate.  There are no checks to see if
+ * Forward projection model for {@link CameraUniversalOmni}. Takes a 3D point in camera unit sphere
+ * coordinates and converts it into a distorted pixel coordinate. There are no checks to see if
  * it is physically possible to perform the forward projection, e.g. point could be outside the FOV.
  *
  * @author Peter Abeles

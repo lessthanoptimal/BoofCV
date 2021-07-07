@@ -33,7 +33,7 @@ import java.util.Arrays;
 /**
  * <p>
  * Dense optical flow which adheres to a brightness constancy assumption, a gradient constancy
- * assumption, and a discontinuity-preserving spatio-temporal smoothness constraint.  Based on the
+ * assumption, and a discontinuity-preserving spatio-temporal smoothness constraint. Based on the
  * work of Brox [2] with implementation details taken from [1].
  * </p>
  *
@@ -61,7 +61,7 @@ public class BroxWarpingSpacial<T extends ImageGray<T>> extends DenseFlowPyramid
 	// gradient error weighting factor
 	protected float gamma;
 
-	// relaxation parameter for SOR  0 < w < 2.  Recommended default is 1.9
+	// relaxation parameter for SOR  0 < w < 2. Recommended default is 1.9
 	private float SOR_RELAXATION;
 
 	// number of iterations for inner and outer loops
@@ -121,7 +121,7 @@ public class BroxWarpingSpacial<T extends ImageGray<T>> extends DenseFlowPyramid
 	 * Configures flow estimation
 	 *
 	 * @param config Configuration parameters
-	 * @param interp Interpolation for image flow between image layers and warping.  Overrides selection in config.
+	 * @param interp Interpolation for image flow between image layers and warping. Overrides selection in config.
 	 */
 	public BroxWarpingSpacial( ConfigBroxWarping config, InterpolatePixelS<GrayF32> interp ) {
 		super(config.pyrScale, config.pyrSigma, config.pyrMaxLayers, interp);
@@ -135,7 +135,7 @@ public class BroxWarpingSpacial<T extends ImageGray<T>> extends DenseFlowPyramid
 	}
 
 	/**
-	 * Computes dense optical flow from the provided image pyramid.  Image gradient for each layer should be
+	 * Computes dense optical flow from the provided image pyramid. Image gradient for each layer should be
 	 * computed directly from the layer images.
 	 *
 	 * @param image1 Pyramid of first image
@@ -330,7 +330,7 @@ public class BroxWarpingSpacial<T extends ImageGray<T>> extends DenseFlowPyramid
 								int i, int ipx, int imx, int ipy, int imy ) {
 		float w = SOR_RELAXATION;
 
-		// these variables could be precomputed once.  See equation 11
+		// these variables could be precomputed once. See equation 11
 		float psid = psiData.data[i];
 		float psig = gamma*psiGradient.data[i];
 
@@ -371,7 +371,7 @@ public class BroxWarpingSpacial<T extends ImageGray<T>> extends DenseFlowPyramid
 	}
 
 	/**
-	 * Equation 5.  Psi_s
+	 * Equation 5. Psi_s
 	 */
 	private void computePsiSmooth( GrayF32 ux, GrayF32 uy, GrayF32 vx, GrayF32 vy,
 								   GrayF32 psiSmooth ) {

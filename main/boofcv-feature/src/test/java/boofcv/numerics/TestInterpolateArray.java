@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -28,8 +28,7 @@ import static org.junit.jupiter.api.Assertions.*;
  */
 public class TestInterpolateArray extends BoofStandardJUnit {
 
-	@Test
-	public void linearCase() {
+	@Test void linearCase() {
 		double[] d = new double[]{1,3,5,7};
 
 		InterpolateArray alg = new InterpolateArray(d);
@@ -41,8 +40,7 @@ public class TestInterpolateArray extends BoofStandardJUnit {
 		assertEquals(3.2,alg.value,1e-8);
 	}
 
-	@Test
-	public void checkBounds() {
+	@Test void checkBounds() {
 		double[] d = new double[]{1,3,5,7};
 
 		InterpolateArray alg = new InterpolateArray(d);

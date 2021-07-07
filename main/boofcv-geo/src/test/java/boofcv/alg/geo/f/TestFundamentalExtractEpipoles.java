@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -37,8 +37,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  * @author Peter Abeles
  */
 public class TestFundamentalExtractEpipoles extends BoofStandardJUnit {
-	@Test
-	public void process() {
+	@Test void process() {
 		FundamentalExtractEpipoles alg = new FundamentalExtractEpipoles();
 
 		DMatrixRMaj K = PerspectiveOps.pinholeToMatrix(400,400,0.1,410,399);

@@ -234,11 +234,11 @@ public class TestDescribePointBriefSO extends BoofStandardJUnit {
 		// part of sanity check
 		assertEquals(desc.data[0], 0);
 
-		// just see if it blows up for now.  a more rigorous test would be better
+		// just see if it blows up for now. a more rigorous test would be better
 		alg.process(0, 0, 0.1f, briefRadius*1.2f, desc);
 		alg.process(width - 1, height - 1, 0.1f, briefRadius*1.2f, desc);
 
-		// sanity check.  the description should not be zero
+		// sanity check. the description should not be zero
 		assertTrue(desc.data[0] != 0);
 	}
 }

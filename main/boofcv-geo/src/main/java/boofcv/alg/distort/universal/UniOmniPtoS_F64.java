@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -98,7 +98,7 @@ public class UniOmniPtoS_F64 implements Point2Transform3_F64 {
 		// X = (u, v , 1)
 		// P = (t*u, t*v, t)  and ||P-C|| = 1
 		// C = (0, 0, xi)
-		// There will be two solutions.  It selects the one farther down the line (top of the
+		// There will be two solutions. It selects the one farther down the line (top of the
 		// sphere)  If xi is > 1 then it's possible for two pixels to have the same value slope
 		double xi = mirrorOffset;
 

@@ -27,15 +27,15 @@ import org.kohsuke.args4j.Option;
 
 /**
  * <p>
- * Base class for generating square fiducial PDF documents for printing.  Fiducials are placed in a regular grid.
- * The width of each element in the grid is the fiducial's width (pattern + black border) and a white border.  The
+ * Base class for generating square fiducial PDF documents for printing. Fiducials are placed in a regular grid.
+ * The width of each element in the grid is the fiducial's width (pattern + black border) and a white border. The
  * grid starts in the page's lower left and corner.
  * </p>
  *
  * <pre>
- * Border:  The border is a no-go zone where the fiducial can't be printed inside of.  This is only taken in account
+ * Border:  The border is a no-go zone where the fiducial can't be printed inside of. This is only taken in account
  *          when automatic centering or layout of the grid on the page is requested.
- * Offset: Where the fiducial is offset inside the page.  Always used.  If centering is requested then the offset
+ * Offset: Where the fiducial is offset inside the page. Always used. If centering is requested then the offset
  *         is automatically computed and any user provided value ignored.
  * PrintInfo: If true it will draw a string above the fiducial with the fiducial's  name and it's size
  * </pre>

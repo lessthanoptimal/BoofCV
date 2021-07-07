@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -28,12 +28,12 @@ import boofcv.struct.Configuration;
 public class ConfigHornSchunck implements Configuration {
 
 	/**
-	 * Larger values place more importance on flow smoothness consistency over brightness consistency.  Try 20
+	 * Larger values place more importance on flow smoothness consistency over brightness consistency. Try 20
 	 */
 	public float alpha = 20;
 
 	/**
-	 * Number of iterations.  Try 1000
+	 * Number of iterations. Try 1000
 	 */
 	public int numIterations = 1000;
 

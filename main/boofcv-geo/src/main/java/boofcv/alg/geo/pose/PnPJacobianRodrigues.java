@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -31,8 +31,8 @@ import org.ejml.data.DMatrixRMaj;
 import java.util.List;
 
 /**
- * Computes the Jacobian of the error function in {@link PnPResidualReprojection}.  For a calibrated
- * camera given observations in normalized image coordinates.  The rotation matrix is assumed to be
+ * Computes the Jacobian of the error function in {@link PnPResidualReprojection}. For a calibrated
+ * camera given observations in normalized image coordinates. The rotation matrix is assumed to be
  * parameterized using {@link georegression.struct.so.Rodrigues_F64} coordinates.
  *
  * @author Peter Abeles

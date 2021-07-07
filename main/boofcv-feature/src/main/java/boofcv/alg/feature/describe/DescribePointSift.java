@@ -26,22 +26,22 @@ import georegression.metric.UtilAngle;
 
 /**
  * <p>A faithful implementation of the SIFT descriptor.</p>
- * <p>The descriptor is computed inside of a square grid which is scaled and rotated.  Each grid cell is composed
- * of a square sub-region.  If the sub-region is 4x4 and the outer grid is 5x5 then a total area of size 20x20
- * is sampled.  For each sub-region a histogram with N bins of orientations is computed. Orientation from each
- * sample point comes from the image's spacial derivative.  If the outer grid is 4x4 and the histogram N=8, then
+ * <p>The descriptor is computed inside of a square grid which is scaled and rotated. Each grid cell is composed
+ * of a square sub-region. If the sub-region is 4x4 and the outer grid is 5x5 then a total area of size 20x20
+ * is sampled. For each sub-region a histogram with N bins of orientations is computed. Orientation from each
+ * sample point comes from the image's spacial derivative. If the outer grid is 4x4 and the histogram N=8, then
  * the total descriptor will be 128 elements.</p>
  *
- * <p>When a point is sample, its orientation (-pi to pi) and magnitude sqrt(dx**2 + dy**2) are both computed.  A
+ * <p>When a point is sample, its orientation (-pi to pi) and magnitude sqrt(dx**2 + dy**2) are both computed. A
  * contribution from this sample point is added to the entire descriptor and weighted using trilinear interpolation
  * (outer grid x-y coordinate, and orientation bin), Gaussian distribution centered at key point location, and the
  * magnitude.</p>
  *
  * <p>There are no intentional differences from the paper. However the paper is ambiguous in some places.</p>
  * <ul>
- *     <li>Interpolation method for sampling image pixels isn't specified.  Nearest-neighbor is assumed and that's what
+ *     <li>Interpolation method for sampling image pixels isn't specified. Nearest-neighbor is assumed and that's what
  *     VLFeat uses too.</li>
- *     <li>Size of sample region.  Oddly enough, I can't find this very important parameter specified anywhere.
+ *     <li>Size of sample region. Oddly enough, I can't find this very important parameter specified anywhere.
  *     The suggested value comes from empirical testing.</li>
  * </ul>
  *
@@ -63,12 +63,12 @@ public class DescribePointSift<Deriv extends ImageGray<Deriv>> extends DescribeS
 	/**
 	 * Configures the descriptor.
 	 *
-	 * @param widthSubregion Width of sub-region in samples.  Try 4
-	 * @param widthGrid Width of grid in subregions.  Try 4.
-	 * @param numHistogramBins Number of bins in histogram.  Try 8
-	 * @param sigmaToPixels Conversion of sigma to pixels.  Used to scale the descriptor region.  Try 1.5 ??????
-	 * @param weightingSigmaFraction Sigma for Gaussian weighting function is set to this value * region width.  Try 0.5
-	 * @param maxDescriptorElementValue Helps with non-affine changes in lighting. See paper.  Try 0.2
+	 * @param widthSubregion Width of sub-region in samples. Try 4
+	 * @param widthGrid Width of grid in subregions. Try 4.
+	 * @param numHistogramBins Number of bins in histogram. Try 8
+	 * @param sigmaToPixels Conversion of sigma to pixels. Used to scale the descriptor region. Try 1.5 ??????
+	 * @param weightingSigmaFraction Sigma for Gaussian weighting function is set to this value * region width. Try 0.5
+	 * @param maxDescriptorElementValue Helps with non-affine changes in lighting. See paper. Try 0.2
 	 */
 	public DescribePointSift( int widthSubregion, int widthGrid, int numHistogramBins,
 							  double sigmaToPixels, double weightingSigmaFraction,
@@ -81,7 +81,7 @@ public class DescribePointSift<Deriv extends ImageGray<Deriv>> extends DescribeS
 	}
 
 	/**
-	 * Sets the image spacial derivatives.  These should be computed from an image at the appropriate scale
+	 * Sets the image spacial derivatives. These should be computed from an image at the appropriate scale
 	 * in scale-space.
 	 *
 	 * @param derivX x-derivative of input image
@@ -95,11 +95,11 @@ public class DescribePointSift<Deriv extends ImageGray<Deriv>> extends DescribeS
 	/**
 	 * Computes the SIFT descriptor for the specified key point
 	 *
-	 * @param c_x center of key point.  x-axis
-	 * @param c_y center of key point.  y-axis
+	 * @param c_x center of key point. x-axis
+	 * @param c_y center of key point. y-axis
 	 * @param sigma Computed sigma in scale-space for this point
 	 * @param orientation Orientation of keypoint in radians
-	 * @param descriptor (output) Storage for computed descriptor.  Make sure it's the appropriate length first
+	 * @param descriptor (output) Storage for computed descriptor. Make sure it's the appropriate length first
 	 */
 	public void process( double c_x, double c_y, double sigma, double orientation, TupleDesc_F64 descriptor ) {
 		descriptor.fill(0);
@@ -110,7 +110,7 @@ public class DescribePointSift<Deriv extends ImageGray<Deriv>> extends DescribeS
 	}
 
 	/**
-	 * Computes the descriptor by sampling the input image.  This is raw because the descriptor hasn't been massaged
+	 * Computes the descriptor by sampling the input image. This is raw because the descriptor hasn't been massaged
 	 * yet.
 	 */
 	void computeRawDescriptor( double c_x, double c_y, double sigma, double orientation, TupleDesc_F64 descriptor ) {
@@ -130,12 +130,12 @@ public class DescribePointSift<Deriv extends ImageGray<Deriv>> extends DescribeS
 			double y = sampleToPixels*(sampleY - sampleRadius);
 
 			for (int sampleX = 0; sampleX < sampleWidth; sampleX++) {
-				// coordinate of samples in terms of sub-region.  Center of sample point, hence + 0.5f
+				// coordinate of samples in terms of sub-region. Center of sample point, hence + 0.5f
 				float subX = sampleX/fwidthSubregion;
 				// recentered local pixel sample coordinate
 				double x = sampleToPixels*(sampleX - sampleRadius);
 
-				// pixel coordinate in the image that is to be sampled.  Note the rounding
+				// pixel coordinate in the image that is to be sampled. Note the rounding
 				// If the pixel coordinate is -1 < x < 0 then it will round to 0 instead of -1, but the rounding
 				// method below is WAY faster than Math.round() so this is a small loss.
 				int pixelX = (int)(x*c - y*s + c_x + 0.5);

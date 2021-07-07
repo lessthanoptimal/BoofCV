@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -24,13 +24,13 @@ import org.ddogleg.struct.DogArray;
 /**
  * <p>
  * A related problem to the full P3P problem is to estimate the distance between the camera center and each of the 3
- * points being viewed.  Once those distances are known the full 3D rigid body transform can be computed.
+ * points being viewed. Once those distances are known the full 3D rigid body transform can be computed.
  * </p>
  *
  * <p>
  * More formally states the problem is: Three points (P1,P2,P3) in 3D space are observed in the image plane in
- * normalized image coordinates (obs1,obs2,obs3).  The distance in 3D space between pairs of points (P1,P3), (P1,P2),
- * and (P2,P3) is known.  Solve for the distance between the camera's origin and each of the three points.
+ * normalized image coordinates (obs1,obs2,obs3). The distance in 3D space between pairs of points (P1,P3), (P1,P2),
+ * and (P2,P3) is known. Solve for the distance between the camera's origin and each of the three points.
  * </p>
  *
  * @author Peter Abeles
@@ -52,7 +52,7 @@ public interface P3PLineDistance {
 							double length23 , double length13 , double length12 );
 
 	/**
-	 * Returns a set of solutions.  Each solution contains the distance to the respective point.
+	 * Returns a set of solutions. Each solution contains the distance to the respective point.
 	 *
 	 * @return List of solutions.
 	 */

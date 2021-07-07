@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -130,7 +130,7 @@ public abstract class ChecksDisparityBM<I extends ImageGray<I>, DI extends Image
 	}
 
 	/**
-	 * Compare to a simplistic implementation of stereo disparity.  Need to turn off special
+	 * Compare to a simplistic implementation of stereo disparity. Need to turn off special
 	 * configurations
 	 */
 	@Test

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -73,10 +73,10 @@ public class SquareRegularClustersIntoGrids {
 	}
 
 	/**
-	 * Does a weak check on the number of edges in the graph.  Since the structure isn't known it can't make
+	 * Does a weak check on the number of edges in the graph. Since the structure isn't known it can't make
 	 * harder checks
 	 *
-	 * @return 0 = not a grid.  1 = line, 2 = grud
+	 * @return 0 = not a grid. 1 = line, 2 = grud
 	 */
 	int checkNumberOfConnections( List<SquareNode> graph ) {
 		int histogram[] = new int[5];
@@ -165,7 +165,7 @@ public class SquareRegularClustersIntoGrids {
 	List<SquareNode> column = new ArrayList<>();
 	List<SquareNode> ordered = new ArrayList<>();
 	/**
-	 * Given an unordered set of nodes, it will order them into a grid with row-major indexes.  This assumes
+	 * Given an unordered set of nodes, it will order them into a grid with row-major indexes. This assumes
 	 * the grid is 2 by 2 or larger.
 	 *
 	 * @param graph unordered nodes in a connected graph
@@ -189,7 +189,7 @@ public class SquareRegularClustersIntoGrids {
 			seed.graph = SEARCHED;
 			column.add(seed);
 
-			// find all the nodes along one side, just pick an edge arbitrarily.  This will be the first column
+			// find all the nodes along one side, just pick an edge arbitrarily. This will be the first column
 			for (int edge = 0; edge < 4; edge++) {
 				if( seed.edges[edge] == null )
 					continue;
@@ -272,8 +272,8 @@ public class SquareRegularClustersIntoGrids {
 	}
 
 	/**
-	 * Add all the nodes into the list which lie along the line defined by a and b.  a is assumed to be
-	 * an end point.  Care is taken to not cycle.
+	 * Add all the nodes into the list which lie along the line defined by a and b. a is assumed to be
+	 * an end point. Care is taken to not cycle.
 	 */
 	int addLineToGrid(SquareNode a, SquareNode b, List<SquareNode> list) {
 
@@ -330,7 +330,7 @@ public class SquareRegularClustersIntoGrids {
 	}
 
 	/**
-	 * There are only two edges on target.  Pick the edge which does not go to the provided child
+	 * There are only two edges on target. Pick the edge which does not go to the provided child
 	 */
 	static SquareNode pickNot( SquareNode target , SquareNode child ) {
 		for (int i = 0; i < 4; i++) {
@@ -345,7 +345,7 @@ public class SquareRegularClustersIntoGrids {
 	}
 
 	/**
-	 * There are only three edges on target and two of them are known.  Pick the one which isn't an inptu child
+	 * There are only three edges on target and two of them are known. Pick the one which isn't an inptu child
 	 */
 	static SquareNode pickNot( SquareNode target , SquareNode child0 , SquareNode child1 ) {
 		for (int i = 0; i < 4; i++) {

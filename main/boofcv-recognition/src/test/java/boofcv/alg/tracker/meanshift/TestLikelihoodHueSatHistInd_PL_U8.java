@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -34,8 +34,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  */
 public class TestLikelihoodHueSatHistInd_PL_U8 extends BoofStandardJUnit {
 
-	@Test
-	public void numBins() {
+	@Test void numBins() {
 		LikelihoodHueSatHistInd_PL_U8 alg = new LikelihoodHueSatHistInd_PL_U8(255,30);
 
 		Planar<GrayU8> image = new Planar<>(GrayU8.class,30,40,3);
@@ -53,8 +52,7 @@ public class TestLikelihoodHueSatHistInd_PL_U8 extends BoofStandardJUnit {
 		assertEquals(1.0,alg.sizeS*30,0.01);
 	}
 
-	@Test
-	public void convertToHueSat() {
+	@Test void convertToHueSat() {
 		LikelihoodHueSatHistInd_PL_U8 alg = new LikelihoodHueSatHistInd_PL_U8(255,30);
 
 		Planar<GrayU8> image = new Planar<>(GrayU8.class,30,40,3);
@@ -72,8 +70,7 @@ public class TestLikelihoodHueSatHistInd_PL_U8 extends BoofStandardJUnit {
 		assertEquals(1.0,alg.binsS[indexS],1e-4);
 	}
 
-	@Test
-	public void singleColor() {
+	@Test void singleColor() {
 		LikelihoodHueSatHistInd_PL_U8 alg = new LikelihoodHueSatHistInd_PL_U8(255,5);
 
 		Planar<GrayU8> image = new Planar<>(GrayU8.class,30,40,3);
@@ -89,8 +86,7 @@ public class TestLikelihoodHueSatHistInd_PL_U8 extends BoofStandardJUnit {
 		assertEquals(0,alg.compute(10, 30),1e-4);
 	}
 
-	@Test
-	public void multipleColors() {
+	@Test void multipleColors() {
 		LikelihoodHueSatHistInd_PL_U8 alg = new LikelihoodHueSatHistInd_PL_U8(255,5);
 
 		Planar<GrayU8> image = new Planar<>(GrayU8.class,30,40,3);

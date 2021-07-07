@@ -47,8 +47,7 @@ public class TestConvolveImageBox extends CompareEquivalentFunctions {
 		super(ConvolveImageBox.class, ConvolveImage.class);
 	}
 
-	@Test
-	public void compareToStandard() {
+	@Test void compareToStandard() {
 		performTests(8);
 	}
 

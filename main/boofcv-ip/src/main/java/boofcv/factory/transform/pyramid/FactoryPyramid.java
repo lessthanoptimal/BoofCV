@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -46,8 +46,8 @@ public class FactoryPyramid {
 	 * prior to sub-sampling.
 	 *
 	 * @param imageType Type of input image.
-	 * @param sigma Gaussian sigma.  If < 0 then a sigma is selected using the radius.  Try -1.
-	 * @param radius Radius of the Gaussian kernel.  If < 0 then the radius is selected using sigma. Try 2.
+	 * @param sigma Gaussian sigma. If < 0 then a sigma is selected using the radius. Try -1.
+	 * @param radius Radius of the Gaussian kernel. If < 0 then the radius is selected using sigma. Try 2.
 	 * @return PyramidDiscrete
 	 */
 	public static <T extends ImageBase<T>>
@@ -63,7 +63,7 @@ public class FactoryPyramid {
 
 	/**
 	 * Creates a float pyramid where each layer is blurred using a Gaussian with the specified
-	 * sigma.  Bilinear interpolation is used when sub-sampling.
+	 * sigma. Bilinear interpolation is used when sub-sampling.
 	 *
 	 * @param scaleFactors The scale factor of each layer relative to the previous layer.
 	 *                     Layer 0 is relative to the input image.
@@ -80,7 +80,7 @@ public class FactoryPyramid {
 	}
 
 	/**
-	 * Constructs an image pyramid which is designed to mimic a {@link boofcv.struct.gss.GaussianScaleSpace}.  Each layer in the pyramid
+	 * Constructs an image pyramid which is designed to mimic a {@link boofcv.struct.gss.GaussianScaleSpace}. Each layer in the pyramid
 	 * should have the equivalent amount of blur that a space-space constructed with the same parameters would have.
 	 *
 	 * @param scaleSpace The scale of each layer and the desired amount of blur relative to the original image
@@ -108,7 +108,7 @@ public class FactoryPyramid {
 	}
 
 	/**
-	 * Constructs a scale-space image pyramid.  Each layer in the pyramid is the same size as the input image but
+	 * Constructs a scale-space image pyramid. Each layer in the pyramid is the same size as the input image but
 	 * has a different amount of blur applied to it.
 	 *
 	 * @param scaleSpace Amount of blur applied to each layer in the pyramid relative to the input image.

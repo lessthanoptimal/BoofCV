@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -33,8 +33,7 @@ public class TestPixelTransformCached_F32 extends BoofStandardJUnit {
 	int width = 20;
 	int height = 25;
 
-	@Test
-	public void compareToOrig() {
+	@Test void compareToOrig() {
 		PixelTransformAffine_F32 orig = new PixelTransformAffine_F32();
 		orig.setTo(new Affine2D_F32(1f, 0.1f, 0.05f, 2f, 5f, 6f));
 

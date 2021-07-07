@@ -28,18 +28,18 @@ import boofcv.alg.interpolate.InterpolationType;
 public class ConfigBackgroundBasic extends BaseConfigBackground {
 
 	/**
-	 * Specifies how fast it will adapt to changes in the background. From 0 to 1, inclusive.  0 = static  1.0 = instant.
+	 * Specifies how fast it will adapt to changes in the background. From 0 to 1, inclusive. 0 = static  1.0 = instant.
 	 */
 	public float learnRate = 0.05f;
 
 	/**
-	 * Threshold for classifying a pixel as background or not.  If euclidean distance less than or equal to this value
+	 * Threshold for classifying a pixel as background or not. If euclidean distance less than or equal to this value
 	 * it is background.
 	 */
 	public float threshold;
 
 	/**
-	 * Specifies which interpolation it will use.  {@link InterpolationType#BILINEAR} or
+	 * Specifies which interpolation it will use. {@link InterpolationType#BILINEAR} or
 	 * {@link InterpolationType#NEAREST_NEIGHBOR} recommended.
 	 *
 	 * <p>ONLY USED FOR MOVING BACKGROUNDS!</p>

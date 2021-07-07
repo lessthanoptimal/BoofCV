@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -40,7 +40,7 @@ import java.awt.*;
 import java.awt.image.BufferedImage;
 
 /**
- * Example of how to create a point cloud from a RGB-D (Kinect) sensor.  Data is loaded from two files, one for the
+ * Example of how to create a point cloud from a RGB-D (Kinect) sensor. Data is loaded from two files, one for the
  * visual image and one for the depth image.
  *
  * @author Peter Abeles

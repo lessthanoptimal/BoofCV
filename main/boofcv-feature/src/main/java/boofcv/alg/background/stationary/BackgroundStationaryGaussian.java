@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -33,7 +33,7 @@ import boofcv.struct.image.ImageType;
 public abstract class BackgroundStationaryGaussian<T extends ImageBase<T>>
 		extends BackgroundModelStationary<T> implements BackgroundAlgorithmGaussian {
 	/**
-	 * Specifies how fast it will adapt. 0 to 1, inclusive.  0 = static  1.0 = instant.
+	 * Specifies how fast it will adapt. 0 to 1, inclusive. 0 = static  1.0 = instant.
 	 */
 	protected float learnRate;
 
@@ -44,7 +44,7 @@ public abstract class BackgroundStationaryGaussian<T extends ImageBase<T>>
 	protected float threshold;
 
 	/**
-	 * The initial variance assigned to a new pixel.  Larger values to reduce false positives due to
+	 * The initial variance assigned to a new pixel. Larger values to reduce false positives due to
 	 * under sampling
 	 */
 	protected float initialVariance = Float.MIN_VALUE;
@@ -55,7 +55,7 @@ public abstract class BackgroundStationaryGaussian<T extends ImageBase<T>>
 	 * See class documentation for parameters definitions.
 	 *
 	 * @param learnRate Specifies how quickly the background is updated Try 0.05
-	 * @param threshold Threshold for background.  &ge; 0.  Try 10
+	 * @param threshold Threshold for background. &ge; 0. Try 10
 	 * @param imageType Type of input image
 	 */
 	protected BackgroundStationaryGaussian( float learnRate, float threshold, ImageType<T> imageType ) {

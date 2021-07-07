@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -25,7 +25,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Factory for creating image classifiers.  The classifier and a location for where to download the model
+ * Factory for creating image classifiers. The classifier and a location for where to download the model
  * data is provided.
  *
  * @author Peter Abeles

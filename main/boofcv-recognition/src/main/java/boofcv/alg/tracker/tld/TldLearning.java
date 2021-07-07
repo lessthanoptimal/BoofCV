@@ -74,7 +74,7 @@ public class TldLearning<T extends ImageGray<T>> {
 	}
 
 	/**
-	 * Select positive and negative examples based on the region the user's initially selected region.  The selected
+	 * Select positive and negative examples based on the region the user's initially selected region. The selected
 	 * region is used as a positive example while all the other regions far away are used as negative examples.
 	 *
 	 * @param targetRegion user selected region
@@ -140,7 +140,7 @@ public class TldLearning<T extends ImageGray<T>> {
 		template.addDescriptor(true, targetRegion_I32);
 		fern.learnFernNoise(true, targetRegion_I32);
 
-		// mark only a few of the far away regions as negative.  Marking all of them as negative is
+		// mark only a few of the far away regions as negative. Marking all of them as negative is
 		// computationally expensive
 		DogArray<TldRegionFernInfo> ferns = detection.getFernInfo();
 		int N = Math.min(config.numNegativeFerns, ferns.size);
@@ -162,7 +162,7 @@ public class TldLearning<T extends ImageGray<T>> {
 	}
 
 	/**
-	 * Mark regions which were local maximums and had high confidence as negative.  These regions were
+	 * Mark regions which were local maximums and had high confidence as negative. These regions were
 	 * candidates for the tracker but were not selected
 	 */
 	protected void learnAmbiguousNegative( Rectangle2D_F64 targetRegion ) {

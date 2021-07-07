@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -40,8 +40,7 @@ public class TestHornSchunckPyramid extends BoofStandardJUnit {
 	int width = 10;
 	int height = 13;
 
-	@Test
-	public void process() {
+	@Test void process() {
 		int width = 30;
 		int height = 40;
 
@@ -71,8 +70,7 @@ public class TestHornSchunckPyramid extends BoofStandardJUnit {
 
 	}
 
-	@Test
-	public void processLayer() {
+	@Test void processLayer() {
 		GrayF32 image1 = new GrayF32(width,height);
 		GrayF32 image2 = new GrayF32(width,height);
 		GrayF32 deriv2X = new GrayF32(width,height);
@@ -108,8 +106,7 @@ public class TestHornSchunckPyramid extends BoofStandardJUnit {
 		}
 	}
 
-	@Test
-	public void A() {
+	@Test void A() {
 		GrayF32 flow = new GrayF32(width,height);
 
 		ImageMiscOps.fillUniform(flow,rand,0,10);
@@ -122,8 +119,7 @@ public class TestHornSchunckPyramid extends BoofStandardJUnit {
 		assertEquals((1.0f/6.0f)*left + (1.0f/12.0f)*right,HornSchunckPyramid.A(x,y,flow),1e-4);
 	}
 
-	@Test
-	public void safe() {
+	@Test void safe() {
 		GrayF32 flow = new GrayF32(width,height);
 
 		ImageMiscOps.fillUniform(flow,rand,0,10);

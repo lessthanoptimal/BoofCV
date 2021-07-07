@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -59,7 +59,7 @@ public class InterleavedF32 extends ImageInterleaved<InterleavedF32> {
 	 *
 	 * @param x pixel coordinate.
 	 * @param y pixel coordinate.
-	 * @param storage If not null then the pixel's value is written here.  If null a new array is created.
+	 * @param storage If not null then the pixel's value is written here. If null a new array is created.
 	 * @return The pixel's value.
 	 */
 	public float[] get( int x, int y, @Nullable float[] storage ) {

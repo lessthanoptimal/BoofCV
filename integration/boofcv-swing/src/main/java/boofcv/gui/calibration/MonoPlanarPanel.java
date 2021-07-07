@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -36,7 +36,7 @@ import java.awt.event.MouseEvent;
 import java.util.List;
 
 /**
- * GUI interface for CalibrateMonoPlanarGuiApp.  Displays results for each calibration
+ * GUI interface for CalibrateMonoPlanarGuiApp. Displays results for each calibration
  * image in a window.
  *
  * @author Peter Abeles

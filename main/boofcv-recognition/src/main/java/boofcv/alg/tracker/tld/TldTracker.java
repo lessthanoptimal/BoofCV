@@ -35,26 +35,26 @@ import java.util.Random;
 /**
  * <p>
  * Main class for Tracking-Learning-Detection (TLD) [1] (a.k.a Predator) object tracker for video sequences.
- * TLD tracks an object which is specified by a user using a rectangle.  The description of the object is
+ * TLD tracks an object which is specified by a user using a rectangle. The description of the object is
  * dynamically updated using P and N constraints.
  * </p>
  *
  * <p>
  * To start tracking {@link #initialize(ImageGray, int, int, int, int)} must first be called
- * to specify the region being tracked.  Then each time a new image in the sequences arrives
- * {@link #track(ImageGray)} is called.  Be sure to check its return value to see if tracking
- * was successful or not.  If tracking fails one frame it can recover.  This is often the case where an object
+ * to specify the region being tracked. Then each time a new image in the sequences arrives
+ * {@link #track(ImageGray)} is called. Be sure to check its return value to see if tracking
+ * was successful or not. If tracking fails one frame it can recover. This is often the case where an object
  * becomes obscured and then visible again.
  * </p>
  *
  * <p>
- * NOTE: This implementation is based the description found in [1].  The spirit of the original algorithm is replicated,
- * but there are a several algorithmic changes.  The most significant modifications are as follow; 1) The KLT tracker
+ * NOTE: This implementation is based the description found in [1]. The spirit of the original algorithm is replicated,
+ * but there are a several algorithmic changes. The most significant modifications are as follow; 1) The KLT tracker
  * used to update the rectangle does not use NCC features to validate a track or the median based outlier removal.
  * Instead a robust model matching algorithm finds the best fit motion. 2) The non-maximum suppression algorithm has
  * been changed so that it computes a more accurate local maximum and only uses local rectangles to
- * compute the average response.  3) Fern selection is done by selecting the N best using a likelihood ratio
- * conditional on the current image.  4) Learning only happens when a track is considered strong.
+ * compute the average response. 3) Fern selection is done by selecting the N best using a likelihood ratio
+ * conditional on the current image. 4) Learning only happens when a track is considered strong.
  * See code for more details. Note, this is not a port of the OpenTLD project.
  * </p>
  * <p>
@@ -71,7 +71,7 @@ public class TldTracker<T extends ImageGray<T>, D extends ImageGray<D>> {
 	private final Rectangle2D_F64 targetRegion = new Rectangle2D_F64();
 
 	// region selected by KLT tracker
-	// NOTE: The tracker updates a pointing point region.  Rounding to the closest integer rectangle introduces errors
+	// NOTE: The tracker updates a pointing point region. Rounding to the closest integer rectangle introduces errors
 	//       which can build up.
 	private final Rectangle2D_F64 trackerRegion = new Rectangle2D_F64();
 	private final ImageRectangle trackerRegion_I32 = new ImageRectangle();
@@ -235,7 +235,7 @@ public class TldTracker<T extends ImageGray<T>, D extends ImageGray<D>> {
 			int maxX = imageWidth - actualWidth;
 			int maxY = imageHeight - actualHeight;
 
-			// start at (1,1).  Otherwise a more complex algorithm needs to be used for integral images
+			// start at (1,1). Otherwise a more complex algorithm needs to be used for integral images
 			for (int y0 = 1; y0 < maxY; y0 += stepHeight) {
 				for (int x0 = 1; x0 < maxX; x0 += stepWidth) {
 					ImageRectangle r = cascadeRegions.grow();

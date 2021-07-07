@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -38,8 +38,7 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
  */
 public class TestPnPStereoDistanceReprojectionSq extends CommonStereoMotionNPoint {
 
-	@Test
-	public void checkErrorSingle() {
+	@Test void checkErrorSingle() {
 		// Point location in world frame
 		Point3D_F64 X = new Point3D_F64(0.1, -0.04, 2.3);
 
@@ -79,16 +78,14 @@ public class TestPnPStereoDistanceReprojectionSq extends CommonStereoMotionNPoin
 	/**
 	 * Have the observation be behind the left camera but not the right
 	 */
-	@Test
-	public void checkBehindCamera_Left() {
+	@Test void checkBehindCamera_Left() {
 		checkBehind(-0.1, -0.05);
 	}
 
 	/**
 	 * Have the observation be behind the right camera but not the left
 	 */
-	@Test
-	public void checkBehindCamera_Right() {
+	@Test void checkBehindCamera_Right() {
 		checkBehind(0.1, 0.05);
 	}
 
@@ -119,8 +116,7 @@ public class TestPnPStereoDistanceReprojectionSq extends CommonStereoMotionNPoin
 		assertEquals(found, Double.MAX_VALUE);
 	}
 
-	@Test
-	public void checkErrorArray() {
+	@Test void checkErrorArray() {
 		DMatrixRMaj K_left = PerspectiveOps.pinholeToMatrix(param.left, (DMatrixRMaj)null);
 		DMatrixRMaj K_right = PerspectiveOps.pinholeToMatrix(param.right, (DMatrixRMaj)null);
 

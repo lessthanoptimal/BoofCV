@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -40,8 +40,7 @@ public class TestSegmentFelzenszwalbHuttenlocher04 extends BoofStandardJUnit {
 	/**
 	 * Test it on a trivial segmentation problem
 	 */
-	@Test
-	public void process() {
+	@Test void process() {
 		GrayU8 image = new GrayU8(20,25);
 		ImageMiscOps.fillRectangle(image,100,0,0,10,25);
 		GrayS32 output = new GrayS32(20,25);
@@ -73,13 +72,12 @@ public class TestSegmentFelzenszwalbHuttenlocher04 extends BoofStandardJUnit {
 		}
 	}
 
-	@Test
-	public void mergeRegions() {
+	@Test void mergeRegions() {
 
 		// K is zero to make it easier to figure out if two edges should be merged or not
 		SegmentFelzenszwalbHuttenlocher04<?> alg = new SegmentFelzenszwalbHuttenlocher04<>(0,10,null);
 
-		// add edges.  Design it such that order is important and to make sure the equality checks
+		// add edges. Design it such that order is important and to make sure the equality checks
 		// are done correctly
 		edge(alg.edges.grow(),1, 0, 20);
 		edge(alg.edges.grow(),2, 0, 25);
@@ -92,7 +90,7 @@ public class TestSegmentFelzenszwalbHuttenlocher04 extends BoofStandardJUnit {
 
 		// randomize their order
 		Collections.shuffle(alg.edges.toList(),rand);
-		// NOTE the order after sorting is undefined.  So the checks below could be incorrect if they are processed
+		// NOTE the order after sorting is undefined. So the checks below could be incorrect if they are processed
 		// in a different order
 
 		alg.graph = new GrayS32(4,5);
@@ -142,8 +140,7 @@ public class TestSegmentFelzenszwalbHuttenlocher04 extends BoofStandardJUnit {
 		assertEquals(14, alg.regionSize.data[14]);
 	}
 
-	@Test
-	public void mergeSmallRegions() {
+	@Test void mergeSmallRegions() {
 		SegmentFelzenszwalbHuttenlocher04 alg = new SegmentFelzenszwalbHuttenlocher04(0,10,null);
 
 		alg.regionSize.resize(20);
@@ -171,8 +168,7 @@ public class TestSegmentFelzenszwalbHuttenlocher04 extends BoofStandardJUnit {
 		assertEquals(5,alg.find(5));
 	}
 
-	@Test
-	public void find() {
+	@Test void find() {
 		SegmentFelzenszwalbHuttenlocher04 alg = new SegmentFelzenszwalbHuttenlocher04(300,20,null);
 
 		alg.graph = new GrayS32(4,5);
@@ -190,8 +186,7 @@ public class TestSegmentFelzenszwalbHuttenlocher04 extends BoofStandardJUnit {
 		assertEquals(2,alg.find(2));
 	}
 
-	@Test
-	public void computeOutput() {
+	@Test void computeOutput() {
 
 		SegmentFelzenszwalbHuttenlocher04 alg = new SegmentFelzenszwalbHuttenlocher04(300,20,null);
 

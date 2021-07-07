@@ -26,7 +26,7 @@ import georegression.struct.curve.EllipseRotated_F64;
  * <p>Computes the edge intensity along the an ellipse.</p>
  *
  * Edge Intensity Definition:<br>
- * The average difference in pixel values.  Maximum value is (max pixel val - min pixel val).
+ * The average difference in pixel values. Maximum value is (max pixel val - min pixel val).
  *
  * @author Peter Abeles
  */
@@ -53,7 +53,7 @@ public class EdgeIntensityEllipse<T extends ImageGray<T>> extends BaseIntegralEd
 	 * Configures edge intensity calculation
 	 *
 	 * @param tangentDistance Distance along tangent it will integrate
-	 * @param numContourPoints Number of points along the contour it will sample.  If &le; 0
+	 * @param numContourPoints Number of points along the contour it will sample. If &le; 0
 	 * the test will always pass
 	 * @param passThreshold Threshold for passing. Value: 0 to (max - min) pixel value.
 	 * @param imageType Type of input image

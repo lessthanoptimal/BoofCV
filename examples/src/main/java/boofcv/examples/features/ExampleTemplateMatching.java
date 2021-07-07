@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -37,8 +37,8 @@ import java.awt.image.BufferedImage;
 import java.util.List;
 
 /**
- * Example of how to find objects inside an image using template matching.  Template matching works
- * well when there is little noise in the image and the object's appearance is known and static.  It can
+ * Example of how to find objects inside an image using template matching. Template matching works
+ * well when there is little noise in the image and the object's appearance is known and static. It can
  * also be very slow to compute, depending on the image and template size.
  *
  * @author Peter Abeles
@@ -111,13 +111,13 @@ public class ExampleTemplateMatching {
 		ConvertBufferedImage.convertTo(image, output);
 		Graphics2D g2 = output.createGraphics();
 
-		// Search for the cursor in the image.  For demonstration purposes it has been pasted 3 times
+		// Search for the cursor in the image. For demonstration purposes it has been pasted 3 times
 		g2.setColor(Color.RED); g2.setStroke(new BasicStroke(5));
 		drawRectangles(g2, image, templateCursor, maskCursor, 3);
 		// show match intensity image for this template
 		showMatchIntensity(image, templateCursor, maskCursor);
 
-		// Now it's try finding the cursor without a mask.  it will get confused when the background is black
+		// Now it's try finding the cursor without a mask. it will get confused when the background is black
 		g2.setColor(Color.BLUE); g2.setStroke(new BasicStroke(2));
 		drawRectangles(g2, image, templateCursor, null, 3);
 

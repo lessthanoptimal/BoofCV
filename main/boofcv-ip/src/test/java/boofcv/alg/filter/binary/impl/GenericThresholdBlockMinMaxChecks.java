@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -58,8 +58,7 @@ public abstract class GenericThresholdBlockMinMaxChecks
 				ConfigLength.fixed(requestedBlockWidth), true, imageType);
 	}
 
-	@Test
-	public void thresholdSquare() {
+	@Test void thresholdSquare() {
 		T input = GeneralizedImageOps.createSingleBand(imageType, 100, 120);
 
 		GImageMiscOps.fill(input, 200);

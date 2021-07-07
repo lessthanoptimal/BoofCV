@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -24,7 +24,7 @@ import georegression.struct.se.Se3_F64;
 
 /**
  * <p>
- * Interface for computing multiple solution to the Perspective N-Point (PnP) problem.  Given a set of
+ * Interface for computing multiple solution to the Perspective N-Point (PnP) problem. Given a set of
  * observations from a single view and the known 3D location of the points being observed, estimate the rigid body
  * transform from <b>world to camera</b> frame.
  * </p>

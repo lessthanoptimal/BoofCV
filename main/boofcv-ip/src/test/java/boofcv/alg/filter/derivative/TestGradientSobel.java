@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -34,14 +34,12 @@ public class TestGradientSobel extends BoofStandardJUnit {
 	int width = 20;
 	int height = 25;
 
-	@Test
-	public void testStandard() {
+	@Test void testStandard() {
 		StandardGradientChecks standard = new StandardGradientChecks();
 		standard.secondDerivativeTest(GradientSobel.class,3);
 	}
 
-	@Test
-	public void compareToConvolve_I8() throws NoSuchMethodException {
+	@Test void compareToConvolve_I8() throws NoSuchMethodException {
 		CompareDerivativeToConvolution validator = new CompareDerivativeToConvolution();
 		validator.setTarget(GradientSobel.class.getMethod("process",
 				GrayU8.class, GrayS16.class, GrayS16.class, ImageBorder_S32.class ));
@@ -57,8 +55,7 @@ public class TestGradientSobel extends BoofStandardJUnit {
 		validator.compare(input,derivX,derivY);
 	}
 
-	@Test
-	public void compareToConvolve_I16() throws NoSuchMethodException {
+	@Test void compareToConvolve_I16() throws NoSuchMethodException {
 		CompareDerivativeToConvolution validator = new CompareDerivativeToConvolution();
 		validator.setTarget(GradientSobel.class.getMethod("process",
 				GrayS16.class, GrayS16.class, GrayS16.class, ImageBorder_S32.class ));

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -38,10 +38,9 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 public class TestDetectFiducialSquareGrid extends BoofStandardJUnit {
 
 	/**
-	 * Generate a fiducial and detect its corners.  Fully visible.
+	 * Generate a fiducial and detect its corners. Fully visible.
 	 */
-	@Test
-	public void simple() {
+	@Test void simple() {
 
 		ConfigFiducialBinary configBinary = new ConfigFiducialBinary(1);
 		configBinary.gridWidth = 3;
@@ -66,7 +65,7 @@ public class TestDetectFiducialSquareGrid extends BoofStandardJUnit {
 
 			foundIds[d.gridIndex]++;
 
-			// see if the corners are in the right location.  Order matters
+			// see if the corners are in the right location. Order matters
 			Quadrilateral_F64 expected = render.expectedCorners.get(d.gridIndex);
 			Quadrilateral_F64 found = d.location;
 

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -86,7 +86,7 @@ public abstract class DetectCircleGrid<T extends ImageGray<T>> {
 	}
 
 	/**
-	 * Processes the image and finds grids.  To retrieve the found grids call {@link #getGrids()}
+	 * Processes the image and finds grids. To retrieve the found grids call {@link #getGrids()}
 	 *
 	 * @param gray Input image
 	 */
@@ -152,7 +152,7 @@ public abstract class DetectCircleGrid<T extends ImageGray<T>> {
 	protected abstract void putGridIntoCanonical( Grid g );
 
 	/**
-	 * Number of CCW rotations to put selected corner into the canonical location.  Only works
+	 * Number of CCW rotations to put selected corner into the canonical location. Only works
 	 * when there are 4 possible solutions
 	 *
 	 * @param g The grid

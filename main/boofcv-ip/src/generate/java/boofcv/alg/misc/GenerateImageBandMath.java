@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -137,7 +137,7 @@ public class GenerateImageBandMath extends CodeGeneratorBase {
 			"\t * image.\n" +
 			"\t * @param input     Planar image - not modified\n" +
 			"\t * @param output    Gray scale image containing average pixel values - modified\n" +
-			"\t * @param avg       Input Gray scale image containing average image.  Can be null\n" +
+			"\t * @param avg       Input Gray scale image containing average image. Can be null\n" +
 			"\t*/\n" +
 			"\tpublic static void stdDev(Planar<"+band+"> input, "+band+" output, @Nullable "+band+" avg) {\n"+
 			"\t\tstdDev(input,output,avg,0,input.getNumBands() - 1);\n" +
@@ -148,7 +148,7 @@ public class GenerateImageBandMath extends CodeGeneratorBase {
 			"\t * image.\n" +
 			"\t * @param input     Planar image - not modified\n" +
 			"\t * @param output    Gray scale image containing average pixel values - modified\n" +
-			"\t * @param avg       Input Gray scale image containing average image.  Can be null\n" +
+			"\t * @param avg       Input Gray scale image containing average image. Can be null\n" +
 			"\t * @param startBand First band to be included in the projection\n" +
 			"\t * @param lastBand  Last band to be included in the projection\n" +
 			"\t*/\n" +

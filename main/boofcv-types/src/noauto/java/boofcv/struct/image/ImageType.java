@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -63,7 +63,7 @@ public class ImageType<T extends ImageBase> implements Serializable {
 	 */
 	ImageDataType dataType;
 	/**
-	 * Number of bands in the image.  Single band images ignore this field.
+	 * Number of bands in the image. Single band images ignore this field.
 	 */
 	public int numBands;
 

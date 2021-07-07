@@ -44,7 +44,7 @@ import org.jetbrains.annotations.Nullable;
  * <p>Factory for creating interest point detectors which conform to the {@link InterestPointDetector}
  * interface </p>
  * <p>
- * NOTE: Higher level interface than {@link GeneralFeatureDetector}.  This will automatically
+ * NOTE: Higher level interface than {@link GeneralFeatureDetector}. This will automatically
  * compute image derivatives across scale space as needed, unlike GeneralFeatureDetector which
  * just detects features at a particular scale and requires image derivatives be passed in.
  * </p>
@@ -176,7 +176,7 @@ public class FactoryInterestPoint {
 	 * Creates a {@link FastHessianFeatureDetector} detector which is wrapped inside
 	 * an {@link InterestPointDetector}
 	 *
-	 * @param config Configuration for detector.  Pass in null for default options.
+	 * @param config Configuration for detector. Pass in null for default options.
 	 * @return The interest point detector.
 	 * @see FastHessianFeatureDetector
 	 */

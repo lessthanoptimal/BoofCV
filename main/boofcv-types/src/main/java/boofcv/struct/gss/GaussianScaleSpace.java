@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -24,9 +24,9 @@ import boofcv.struct.image.ImageGray;
 
 /**
  * <p>
- * Interface for computing the scale space of an image and its derivatives.  The scale space
- * of an image is computed by convolving a Gaussian kernel across the image.  The image's scale
- * is determined by the Gaussian's standard deviation.  See [1] for a summary of scale-space theory.
+ * Interface for computing the scale space of an image and its derivatives. The scale space
+ * of an image is computed by convolving a Gaussian kernel across the image. The image's scale
+ * is determined by the Gaussian's standard deviation. See [1] for a summary of scale-space theory.
  * </p>
  *
  * <p>
@@ -41,12 +41,12 @@ public interface GaussianScaleSpace<T extends ImageGray<T>, D extends ImageGray<
 	/**
 	 * Sets the scales/blur magnitudes for which the scale-space should be computed over.
 	 *
-	 * @param scales All the scales.  These are absolute and not relative to the previous level.
+	 * @param scales All the scales. These are absolute and not relative to the previous level.
 	 */
 	public void setScales( double ... scales);
 
 	/**
-	 * Returns the scale for the specified layer in the pyramid.  This is equivalent to
+	 * Returns the scale for the specified layer in the pyramid. This is equivalent to
 	 * the standard deviation of the Gaussian convolved across the original input image.
 	 */
 	public double getScale( int level );
@@ -59,7 +59,7 @@ public interface GaussianScaleSpace<T extends ImageGray<T>, D extends ImageGray<
 	public void setImage( T input );
 
 	/**
-	 * Sets the active scale.  Must call {@link #setImage(ImageGray)}
+	 * Sets the active scale. Must call {@link #setImage(ImageGray)}
 	 * before this function.
 	 *
 	 * @param index Index of active scale

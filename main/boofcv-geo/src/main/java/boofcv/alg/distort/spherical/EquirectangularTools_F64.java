@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -28,7 +28,7 @@ import georegression.struct.point.Point3D_F64;
 /**
  * Contains common operations for handling coordinates in an equirectangular image.
  * On most globes, a positive latitude corresponds to the north pole, or up, and negative towards the south pole.
- * Images have 0 on the top and increase downwards.  To compensate for this the y-axis can be flipped.  This
+ * Images have 0 on the top and increase downwards. To compensate for this the y-axis can be flipped. This
  * is indicated by functions with FV (flip vertical) on the end of their name.
  *
  * Coordinate System:
@@ -48,7 +48,7 @@ import georegression.struct.point.Point3D_F64;
  * <li>unit sphere of (0,1,0) is pixel (3*width/4,(height-1)/2) and (0,0,-1) is (width/4,(height-1)/2)</li>
  * </ul>
  *
- * <p>Latitude and Longitude shown on a sphere in equirectangular format.  Note that y is NOT flipped and angles
+ * <p>Latitude and Longitude shown on a sphere in equirectangular format. Note that y is NOT flipped and angles
  * are shown in degrees not radians git push.</p>
  * <center>
  * <img src="doc-files/equirectangular_lat_lon.png"/>

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -25,10 +25,10 @@ import georegression.struct.point.Point2D_F64;
 import georegression.struct.se.Se3_F64;
 
 /**
- * Give a camera's intrinsic and extrinsic parameters, selects a reasonable overhead view to render the image onto.  It
- * attempts to maximize viewing area.  The user can crop the height of the overhead view to reduce the amount of
- * unusable image space in the map.  This is particularly useful for cameras at an acute angle relative to the
- * ground plane.  Overhead cameras pointed downward should set it to 1.0
+ * Give a camera's intrinsic and extrinsic parameters, selects a reasonable overhead view to render the image onto. It
+ * attempts to maximize viewing area. The user can crop the height of the overhead view to reduce the amount of
+ * unusable image space in the map. This is particularly useful for cameras at an acute angle relative to the
+ * ground plane. Overhead cameras pointed downward should set it to 1.0
  *
  * @author Peter Abeles
  */
@@ -48,7 +48,7 @@ public class SelectOverheadParameters {
 	double cellSize;
 	// determines the minimum resolution
 	double maxCellsPerPixel;
-	// used to crop the views's height.  Specifies the fraction of the "optimal" height which is actually used.
+	// used to crop the views's height. Specifies the fraction of the "optimal" height which is actually used.
 	double viewHeightFraction;
 
 	// local variables
@@ -60,9 +60,9 @@ public class SelectOverheadParameters {
 	 *
 	 * @param cellSize Size of cells in plane in world units
 	 * @param maxCellsPerPixel Specifies minimum resolution of a region in overhead image. A pixel in the camera
-	 * can't overlap more than this number of cells.   Higher values allow lower
-	 * resolution regions.  Try 4.
-	 * @param viewHeightFraction Reduce the view height by this fraction to avoid excessive unusable image space.  Set to
+	 * can't overlap more than this number of cells.  Higher values allow lower
+	 * resolution regions. Try 4.
+	 * @param viewHeightFraction Reduce the view height by this fraction to avoid excessive unusable image space. Set to
 	 * 1.0 to maximize the viewing area and any value less than one to crop it.
 	 */
 	public SelectOverheadParameters( double cellSize, double maxCellsPerPixel, double viewHeightFraction ) {

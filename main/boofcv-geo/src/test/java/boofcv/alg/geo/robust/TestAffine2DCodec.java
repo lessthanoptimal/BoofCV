@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -30,8 +30,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
  */
 public class TestAffine2DCodec extends BoofStandardJUnit {
 
-	@Test
-	public void encode() {
+	@Test void encode() {
 		Affine2DCodec codec = new Affine2DCodec();
 
 		Affine2D_F64 model = new Affine2D_F64(1,2,3,4,5,6);
@@ -55,8 +54,7 @@ public class TestAffine2DCodec extends BoofStandardJUnit {
 		assertEquals(6,model.ty,1e-4);
 	}
 
-	@Test
-	public void decode() {
+	@Test void decode() {
 		Affine2DCodec codec = new Affine2DCodec();
 
 		Affine2D_F64 model = new Affine2D_F64();

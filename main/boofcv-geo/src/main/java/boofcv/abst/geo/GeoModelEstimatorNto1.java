@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -27,7 +27,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Wrapper that allows {@link GeoModelEstimatorN} to be used as a {@link GeoModelEstimator1}.  If more than one
+ * Wrapper that allows {@link GeoModelEstimatorN} to be used as a {@link GeoModelEstimator1}. If more than one
  * solution is found the ambiguity is resolved by computing the distance each hypothesis is away from a set of points
  * not used to compute the model.
  *

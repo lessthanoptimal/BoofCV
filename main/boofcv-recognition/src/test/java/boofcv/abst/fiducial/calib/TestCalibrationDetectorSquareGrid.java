@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -40,8 +40,7 @@ public class TestCalibrationDetectorSquareGrid extends GenericPlanarCalibrationD
 		fisheyeAllowedFails = 1;
 	}
 
-	@Test
-	public void createLayout() {
+	@Test void createLayout() {
 		List<Point2D_F64> l = CalibrationDetectorSquareGrid.createLayout(3, 2, 0.1, 0.2);
 
 		assertEquals(4*6,l.size());

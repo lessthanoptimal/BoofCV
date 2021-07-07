@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -28,7 +28,7 @@ import lombok.Setter;
 import pabeles.concurrency.GrowArray;
 
 /**
- * Simplified interface for using a blur filter that requires storage.  Reflections are used to look up a function inside
+ * Simplified interface for using a blur filter that requires storage. Reflections are used to look up a function inside
  * of {@link boofcv.alg.filter.blur.BlurImageOps} which is then invoked later on.
  *
  * @author Peter Abeles
@@ -97,7 +97,7 @@ public class BlurStorageFilter<T extends ImageBase<T>> implements BlurFilter<T> 
 	}
 
 	/**
-	 * Radius of the square region.  The width is defined as the radius*2 + 1.
+	 * Radius of the square region. The width is defined as the radius*2 + 1.
 	 *
 	 * @return Blur region's radius.
 	 */

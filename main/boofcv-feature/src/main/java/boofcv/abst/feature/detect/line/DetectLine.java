@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -27,7 +27,7 @@ import java.util.List;
 
 /**
  * <p>
- * Interface for detecting lines inside images.  Lines are returned using
+ * Interface for detecting lines inside images. Lines are returned using
  * {@link LineParametric2D_F32 parametric} line equations and do not indicate the
  * beginning and end points.
  * </p>

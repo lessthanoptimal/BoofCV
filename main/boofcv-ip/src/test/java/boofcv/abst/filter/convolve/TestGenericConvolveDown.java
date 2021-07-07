@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -31,8 +31,7 @@ public class TestGenericConvolveDown extends BoofStandardJUnit {
 	 * No test is provided here since {@link boofcv.abst.filter.convolve.TestFactoryConvolveDown} already does an exhaustive test
 	 * of this class.
 	 */
-	@Test
-	public void emptyTest() {
+	@Test void emptyTest() {
 		// intentionally empty
 	}
 }

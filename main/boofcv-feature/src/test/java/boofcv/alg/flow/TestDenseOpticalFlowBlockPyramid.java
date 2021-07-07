@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -33,8 +33,7 @@ import static org.junit.jupiter.api.Assertions.*;
  */
 public class TestDenseOpticalFlowBlockPyramid extends BoofStandardJUnit {
 
-	@Test
-	public void findFlow() {
+	@Test void findFlow() {
 		Dummy alg = new Dummy(3,2,200,GrayU8.class);
 
 		alg.minScore = 0.1f;
@@ -55,7 +54,7 @@ public class TestDenseOpticalFlowBlockPyramid extends BoofStandardJUnit {
 		alg.findFlow(6, 7, image, flow);
 		assertFalse(flow.isValid());
 
-		// now give it a case where everything has the same score.  See if it picks the one with the least motion
+		// now give it a case where everything has the same score. See if it picks the one with the least motion
 		alg.sameScore = true;
 		alg.minScore = 0.1f;
 		alg.findFlow(6, 7, image, flow);
@@ -64,8 +63,7 @@ public class TestDenseOpticalFlowBlockPyramid extends BoofStandardJUnit {
 		assertEquals(0,flow.y,1e-4);
 	}
 
-	@Test
-	public void checkNeighbors() {
+	@Test void checkNeighbors() {
 		int sr = 3;
 		int rr = 2;
 		Dummy alg = new Dummy(sr,rr,200,GrayU8.class);

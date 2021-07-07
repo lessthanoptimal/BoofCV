@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -30,7 +30,7 @@ import java.util.List;
 /**
  * <p>
  * Given a description of the calibration grid and a set of observations compute the associated Homography.
- * First a linear approximation is computed follow by non-linear refinement.  Part of calibration process
+ * First a linear approximation is computed follow by non-linear refinement. Part of calibration process
  * described in [1].
  * </p>
  *
@@ -55,7 +55,7 @@ public class Zhang99ComputeTargetHomography {
 	}
 
 	/**
-	 * Computes the homography from a list of detected grid points in the image.  The
+	 * Computes the homography from a list of detected grid points in the image. The
 	 * order of the grid points is important and must follow the expected row major
 	 * starting at the top left.
 	 *
@@ -79,7 +79,7 @@ public class Zhang99ComputeTargetHomography {
 		if( !computeHomography.process(pairs,found) )
 			return false;
 
-		// todo do non-linear refinement.  Take advantage of coordinates being fixed
+		// todo do non-linear refinement. Take advantage of coordinates being fixed
 
 		return true;
 	}

@@ -25,8 +25,8 @@ import boofcv.struct.image.GrayU8;
 
 /**
  * <p>
- * Corner detector based on median filter.  First a median filter is run on the input image then the difference
- * between the input image and the median image is computed.  Corners are points of high intensity in the difference
+ * Corner detector based on median filter. First a median filter is run on the input image then the difference
+ * between the input image and the median image is computed. Corners are points of high intensity in the difference
  * image.
  * </p>
  *

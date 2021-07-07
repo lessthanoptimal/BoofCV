@@ -23,10 +23,10 @@ import boofcv.struct.image.ImageGray;
 
 /**
  * <p>
- * Several different types of corner detectors [1,2] all share the same initial processing steps.  First a 2 by 2 deformation
- * matrix D = [ Ixx , Ixy ; Iyx , Iyy] is computed around each pixel.  D is computed by summing up the product of each
- * pixel's gradient inside of a window.  Next how corner like each pixel is computed using the information in the deformation
- * matrix.  In the final step where each of these techniques differ.
+ * Several different types of corner detectors [1,2] all share the same initial processing steps. First a 2 by 2 deformation
+ * matrix D = [ Ixx , Ixy ; Iyx , Iyy] is computed around each pixel. D is computed by summing up the product of each
+ * pixel's gradient inside of a window. Next how corner like each pixel is computed using the information in the deformation
+ * matrix. In the final step where each of these techniques differ.
  * <p>
  *
  * <p>
@@ -37,8 +37,8 @@ import boofcv.struct.image.ImageGray;
  * </p>
  *
  * <p>
- * Alternative implementations can consider a weighted window around the pixel.  By considering only a uniform set of
- * weights several optimizations are possible.  The runtime is independent of the window size and can be very efficiently
+ * Alternative implementations can consider a weighted window around the pixel. By considering only a uniform set of
+ * weights several optimizations are possible. The runtime is independent of the window size and can be very efficiently
  * computed.
  * </p>
  *

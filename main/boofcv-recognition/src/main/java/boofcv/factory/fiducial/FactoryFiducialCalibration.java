@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -23,7 +23,7 @@ import boofcv.alg.fiducial.calib.chess.DetectChessboardBinaryPattern;
 import org.jetbrains.annotations.Nullable;
 
 /**
- * Creates detectors of calibration targets.  These detectors return found key points in the image and
+ * Creates detectors of calibration targets. These detectors return found key points in the image and
  * their known 2D location on the fiducial.
  *
  * @author Peter Abeles
@@ -31,7 +31,7 @@ import org.jetbrains.annotations.Nullable;
 public class FactoryFiducialCalibration {
 
 	/**
-	 * Detector for a grid of square targets.   All squares must be entirely visible inside the image.
+	 * Detector for a grid of square targets.  All squares must be entirely visible inside the image.
 	 *
 	 * @see boofcv.alg.fiducial.calib.grid.DetectSquareGridFiducial
 	 *
@@ -85,7 +85,7 @@ public class FactoryFiducialCalibration {
 	}
 
 	/**
-	 * Detector for a grid of binary targets.  Allows for squares to be obscured or partially outside of the
+	 * Detector for a grid of binary targets. Allows for squares to be obscured or partially outside of the
 	 * image.
 	 *
 	 * @see CalibrationDetectorSquareFiducialGrid
@@ -100,7 +100,7 @@ public class FactoryFiducialCalibration {
 	}
 
 	/**
-	 * Detector for hexagonal grid of circles.  All circles must be entirely inside of the image.
+	 * Detector for hexagonal grid of circles. All circles must be entirely inside of the image.
 	 *
 	 * @param config Configuration for target
 	 * @return The detector
@@ -115,7 +115,7 @@ public class FactoryFiducialCalibration {
 	}
 
 	/**
-	 * Detector for regular grid of circles.  All circles must be entirely inside of the image.
+	 * Detector for regular grid of circles. All circles must be entirely inside of the image.
 	 *
 	 * @param config Configuration for target
 	 * @return The detector

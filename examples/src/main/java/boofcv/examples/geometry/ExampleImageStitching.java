@@ -75,7 +75,7 @@ import java.util.List;
 public class ExampleImageStitching {
 	/**
 	 * Using abstracted code, find a transform which minimizes the difference between corresponding features
-	 * in both images.  This code is completely model independent and is the core algorithms.
+	 * in both images. This code is completely model independent and is the core algorithms.
 	 */
 	public static <T extends ImageGray<T>, TD extends TupleDesc<TD>> Homography2D_F64
 	computeTransform( T imageA, T imageB,
@@ -149,7 +149,7 @@ public class ExampleImageStitching {
 		ScoreAssociation<TupleDesc_F64> scorer = FactoryAssociation.scoreEuclidean(TupleDesc_F64.class, true);
 		AssociateDescription<TupleDesc_F64> associate = FactoryAssociation.greedy(new ConfigAssociateGreedy(true, 2), scorer);
 
-		// fit the images using a homography.  This works well for rotations and distant objects.
+		// fit the images using a homography. This works well for rotations and distant objects.
 		ModelMatcher<Homography2D_F64, AssociatedPair> modelMatcher =
 				FactoryMultiViewRobust.homographyRansac(null, new ConfigRansac(60, 3));
 

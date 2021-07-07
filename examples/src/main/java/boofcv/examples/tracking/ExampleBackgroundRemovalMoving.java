@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -50,8 +50,8 @@ import org.ejml.ops.ConvertMatrixData;
 import java.awt.image.BufferedImage;
 
 /**
- * Example showing how to perform background modeling with a moving camera.  Here the camera's motion is explicitly
- * estimated using a motion model.  That motion model is then used to distort the image and generate background.
+ * Example showing how to perform background modeling with a moving camera. Here the camera's motion is explicitly
+ * estimated using a motion model. That motion model is then used to distort the image and generate background.
  * The net affect is a significant reduction in false positives around the objects of images in oscillating cameras
  * and the ability to detect motion in moving scenes.
  *
@@ -59,9 +59,9 @@ import java.awt.image.BufferedImage;
  */
 public class ExampleBackgroundRemovalMoving {
 	public static void main( String[] args ) {
-		// Example with a moving camera.  Highlights why motion estimation is sometimes required
+		// Example with a moving camera. Highlights why motion estimation is sometimes required
 		String fileName = UtilIO.pathExample("tracking/chipmunk.mjpeg");
-		// Camera has a bit of jitter in it.  Static kinda works but motion reduces false positives
+		// Camera has a bit of jitter in it. Static kinda works but motion reduces false positives
 //		String fileName = UtilIO.pathExample("background/horse_jitter.mp4");
 
 		// Comment/Uncomment to switch input image type
@@ -85,7 +85,7 @@ public class ExampleBackgroundRemovalMoving {
 
 		ConfigBackgroundBasic configBasic = new ConfigBackgroundBasic(30, 0.005f);
 
-		// Configuration for Gaussian model.  Note that the threshold changes depending on the number of image bands
+		// Configuration for Gaussian model. Note that the threshold changes depending on the number of image bands
 		// 12 = gray scale and 40 = color
 		ConfigBackgroundGaussian configGaussian = new ConfigBackgroundGaussian(12, 0.001f);
 		configGaussian.initialVariance = 64;
@@ -112,7 +112,7 @@ public class ExampleBackgroundRemovalMoving {
 
 		//====== Initialize Images
 
-		// storage for segmented image.  Background = 0, Foreground = 1
+		// storage for segmented image. Background = 0, Foreground = 1
 		GrayU8 segmented = new GrayU8(video.getWidth(), video.getHeight());
 		// Grey scale image that's the input for motion estimation
 		GrayF32 grey = new GrayF32(segmented.width, segmented.height);
@@ -123,7 +123,7 @@ public class ExampleBackgroundRemovalMoving {
 		homeToWorld.a13 = grey.width/2;
 		homeToWorld.a23 = grey.height/2;
 
-		// Create a background image twice the size of the input image.  Tell it that the home is in the center
+		// Create a background image twice the size of the input image. Tell it that the home is in the center
 		background.initialize(grey.width*2, grey.height*2, homeToWorld);
 
 		BufferedImage visualized = new BufferedImage(segmented.width, segmented.height, BufferedImage.TYPE_INT_RGB);

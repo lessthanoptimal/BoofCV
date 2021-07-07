@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -26,8 +26,8 @@ import boofcv.struct.image.ImageType;
 import java.awt.image.BufferedImage;
 
 /**
- * Cache for output from {@link SimpleImageSequence}.  Stores both the boofcv image and the associated
- * BufferedImage.  Storage for two sets of images are stored.  One for the IO thread and one for the algorithm.
+ * Cache for output from {@link SimpleImageSequence}. Stores both the boofcv image and the associated
+ * BufferedImage. Storage for two sets of images are stored. One for the IO thread and one for the algorithm.
  *
  *
  *

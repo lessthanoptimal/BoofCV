@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -34,16 +34,14 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  */
 public class TestFundamentalLinear8 extends BoofStandardJUnit {
 
-	@Test
-	public void perfectFundamental() {
+	@Test void perfectFundamental() {
 		CommonFundamentalChecks checks = createCommonChecks(true);
 
 		checks.checkEpipolarMatrix(8,true);
 		checks.checkEpipolarMatrix(15,true);
 	}
 
-	@Test
-	public void perfectEssential() {
+	@Test void perfectEssential() {
 		CommonFundamentalChecks checks = createCommonChecks(true);
 
 		checks.checkEpipolarMatrix(8,false);

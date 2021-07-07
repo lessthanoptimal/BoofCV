@@ -65,7 +65,7 @@ public class ThresholdNick implements InputToBinary<GrayF32> {
 	/**
 	 * Configures the algorithm.
 	 *
-	 * @param width size of local region.  Try 31
+	 * @param width size of local region. Try 31
 	 * @param k The Niblack factor. Recommend -0.1 to -0.2
 	 * @param down Threshold down or up
 	 */
@@ -78,8 +78,8 @@ public class ThresholdNick implements InputToBinary<GrayF32> {
 	/**
 	 * Converts the input image into a binary image.
 	 *
-	 * @param input Input image.  Not modified.
-	 * @param output Output binary image.  Modified.
+	 * @param input Input image. Not modified.
+	 * @param output Output binary image. Modified.
 	 */
 	@Override
 	public void process( GrayF32 input, GrayU8 output ) {

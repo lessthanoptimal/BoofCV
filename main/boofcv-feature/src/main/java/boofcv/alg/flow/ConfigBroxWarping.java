@@ -29,17 +29,17 @@ import boofcv.struct.Configuration;
 public class ConfigBroxWarping implements Configuration {
 
 	/**
-	 * Brightness difference weighting factor.  Larger values which prefer a smooth flow.
+	 * Brightness difference weighting factor. Larger values which prefer a smooth flow.
 	 */
 	public float alpha = 0.04f;
 
 	/**
-	 * Gradient difference weighting factor.  Larger values which prefer a smooth flow.
+	 * Gradient difference weighting factor. Larger values which prefer a smooth flow.
 	 */
 	public float gamma = 0.03f;
 
 	/**
-	 * SOR relaxation parameter.  0 < w < 2.  Recommended default is 1.9
+	 * SOR relaxation parameter. 0 < w < 2. Recommended default is 1.9
 	 */
 	public float SOR_RELAXATION = 1.9f;
 
@@ -58,15 +58,15 @@ public class ConfigBroxWarping implements Configuration {
 	public int maxIterationsSor = 100;
 
 	/**
-	 * Convergence tolerance for SOR loop.  Specified in per pixel error.
+	 * Convergence tolerance for SOR loop. Specified in per pixel error.
 	 */
 	public float convergeToleranceSor = 1e-5f;
 	/**
-	 * Change in scale between each layer.  Try 0.75
+	 * Change in scale between each layer. Try 0.75
 	 */
 	public double pyrScale = 0.75;
 	/**
-	 * Amount of gaussian blur applied to each layer in the pyramid.  If sigma &le; 0 then no blur is applied.
+	 * Amount of gaussian blur applied to each layer in the pyramid. If sigma &le; 0 then no blur is applied.
 	 */
 	public double pyrSigma = 0.5;
 	/**
@@ -75,7 +75,7 @@ public class ConfigBroxWarping implements Configuration {
 	public int pyrMaxLayers = 100;
 
 	/**
-	 * Type of interpolation used.  Bilinear recommended
+	 * Type of interpolation used. Bilinear recommended
 	 */
 	public InterpolationType interpolation = InterpolationType.BILINEAR;
 

@@ -25,11 +25,11 @@ import boofcv.struct.image.GrayS16;
 
 /**
  * <p>
- * Detects "blob" intensity using the image's second derivative.  The Hessian (second derivative)
+ * Detects "blob" intensity using the image's second derivative. The Hessian (second derivative)
  * matrix is defined as [ I<sub>xx</sub> , I<sub>xy</sub> ; I<sub>xy</sub> , I<sub>yy</sub>],
- * where the subscript indicates a partial derivative of the input image.  The trace and determinant of this matrix
- * is commonly used to detect interest point intensities.  These tend to be at a peak for blobs
- * and circular type objects.  The trace is commonly referred to as the Laplacian.
+ * where the subscript indicates a partial derivative of the input image. The trace and determinant of this matrix
+ * is commonly used to detect interest point intensities. These tend to be at a peak for blobs
+ * and circular type objects. The trace is commonly referred to as the Laplacian.
  * </p>
  *
  * <p>
@@ -48,11 +48,11 @@ public class HessianBlobIntensity {
 	 */
 	public static enum Type {
 		/**
-		 * Compute the determinant.  Maximum are features.
+		 * Compute the determinant. Maximum are features.
 		 */
 		DETERMINANT,
 		/**
-		 * Compute the trace (aka Laplacian).  Maximum and Minimums are features.
+		 * Compute the trace (aka Laplacian). Maximum and Minimums are features.
 		 */
 		TRACE
 	}
@@ -72,7 +72,7 @@ public class HessianBlobIntensity {
 	}
 
 	/**
-	 * Feature intensity using the trace of the Hessian matrix.  This is also known as the Laplacian.
+	 * Feature intensity using the trace of the Hessian matrix. This is also known as the Laplacian.
 	 *
 	 * @param featureIntensity Output feature intensity. Modified.
 	 * @param hessianXX Second derivative along x-axis. Not modified.
@@ -99,7 +99,7 @@ public class HessianBlobIntensity {
 	}
 
 	/**
-	 * Feature intensity using the trace of the Hessian matrix.  This is also known as the Laplacian.
+	 * Feature intensity using the trace of the Hessian matrix. This is also known as the Laplacian.
 	 *
 	 * @param featureIntensity Output feature intensity. Modified.
 	 * @param hessianXX Second derivative along x-axis. Not modified.

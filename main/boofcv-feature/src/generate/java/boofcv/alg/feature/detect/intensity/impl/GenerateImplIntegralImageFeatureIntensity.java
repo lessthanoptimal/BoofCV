@@ -166,7 +166,7 @@ public class GenerateImplIntegralImageFeatureIntensity extends CodeGeneratorBase
 	private void inner( AutoTypeImage input ) {
 
 		out.print("\t/**\n" +
-				"\t * Optimizes intensity for the inner image.  \n" +
+				"\t * Optimizes intensity for the inner image. \n" +
 				"\t */\n" +
 				"\tpublic static void hessianInner( "+input.getSingleBandName()+" integral, int skip , int size ,\n" +
 				"\t\t\t\t\t\t\t\t\t GrayF32 intensity) {\n" +

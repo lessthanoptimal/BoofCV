@@ -25,8 +25,8 @@ import org.ddogleg.fitting.modelset.ModelGenerator;
 import java.util.List;
 
 /**
- * Estimates a {@link ScaleTranslate2D} from two 2D point correspondences.  The transform will take a point from
- * p1 to p2.  The algorithm works by finding the centroid of p1 and p2.
+ * Estimates a {@link ScaleTranslate2D} from two 2D point correspondences. The transform will take a point from
+ * p1 to p2. The algorithm works by finding the centroid of p1 and p2.
  * Scale is found by finding the average change in vector length between p1 and p2 and the centroids. Translation
  * is found by the translation between the two centroids, adjusted for change in scale.
  *

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -40,8 +40,7 @@ public class TestDepthSparse3D extends BoofStandardJUnit {
 	int w = 10;
 	int h = 20;
 
-	@Test
-	public void basicTest() {
+	@Test void basicTest() {
 		GrayU16 depth = new GrayU16(w, h);
 		depth.set(5, 6, 1000);
 

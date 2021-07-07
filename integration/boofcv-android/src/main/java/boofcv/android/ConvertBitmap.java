@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -27,9 +27,9 @@ import org.jetbrains.annotations.Nullable;
 import java.nio.ByteBuffer;
 
 /**
- * Functions for converting Android Bitmap images into BoofCV formats.  In earlier versions of Android
- * there is no way to directly access the internal array used by Bitmap.  You have to provide an array for it to
- * be copied into.  This is why the storage array is provided.
+ * Functions for converting Android Bitmap images into BoofCV formats. In earlier versions of Android
+ * there is no way to directly access the internal array used by Bitmap. You have to provide an array for it to
+ * be copied into. This is why the storage array is provided.
  *
  * @author Peter Abeles
  */
@@ -62,10 +62,10 @@ public class ConvertBitmap {
 	}
 
 	/**
-	 * Converts a {@link Bitmap} into a BoofCV image.  Type is determined at runtime.
+	 * Converts a {@link Bitmap} into a BoofCV image. Type is determined at runtime.
 	 *
 	 * @param input Bitmap image.
-	 * @param output Output image.  Automatically resized to match input shape.
+	 * @param output Output image. Automatically resized to match input shape.
 	 * @param storage Byte array used for internal storage. If null it will be declared internally.
 	 */
 	public static <T extends ImageBase<T>>
@@ -108,7 +108,7 @@ public class ConvertBitmap {
 	 * Converts Bitmap image into a single band image of arbitrary type.
 	 *
 	 * @param input Input Bitmap image.
-	 * @param output Output single band image.  If null a new one will be declared.
+	 * @param output Output single band image. If null a new one will be declared.
 	 * @param imageType Type of single band image.
 	 * @param storage Byte array used for internal storage. If null it will be declared internally.
 	 * @return The converted gray scale image.
@@ -128,7 +128,7 @@ public class ConvertBitmap {
 	 * Converts Bitmap image into GrayU8.
 	 *
 	 * @param input Input Bitmap image.
-	 * @param output Output image.  If null a new one will be declared.
+	 * @param output Output image. If null a new one will be declared.
 	 * @param storage Byte array used for internal storage. If null it will be declared internally.
 	 * @return The converted gray scale image.
 	 */
@@ -151,7 +151,7 @@ public class ConvertBitmap {
 	 * Converts Bitmap image into GrayF32.
 	 *
 	 * @param input Input Bitmap image.
-	 * @param output Output image.  If null a new one will be declared.
+	 * @param output Output image. If null a new one will be declared.
 	 * @param storage Byte array used for internal storage. If null it will be declared internally.
 	 * @return The converted gray scale image.
 	 */
@@ -174,7 +174,7 @@ public class ConvertBitmap {
 	 * Converts Bitmap image into Planar image of the appropriate type.
 	 *
 	 * @param input Input Bitmap image.
-	 * @param output Output image.  If null a new one will be declared.
+	 * @param output Output image. If null a new one will be declared.
 	 * @param type The type of internal single band image used in the Planar image.
 	 * @param storage Byte array used for internal storage. If null it will be declared internally.
 	 * @return The converted Planar image.
@@ -205,7 +205,7 @@ public class ConvertBitmap {
 	 * Converts Bitmap image into InterleavedU8.
 	 *
 	 * @param input Input Bitmap image.
-	 * @param output Output image.  If null a new one will be declared.
+	 * @param output Output image. If null a new one will be declared.
 	 * @param storage Byte array used for internal storage. If null it will be declared internally.
 	 * @return The converted gray scale image.
 	 */
@@ -231,7 +231,7 @@ public class ConvertBitmap {
 	 * Converts Bitmap image into 	public static InterleavedF32 bitmapToInterleaved( Bitmap input, InterleavedU8 output, @Nullable DogArray_I8 storage ) {.
 	 *
 	 * @param input Input Bitmap image.
-	 * @param output Output image.  If null a new one will be declared.
+	 * @param output Output image. If null a new one will be declared.
 	 * @param storage Byte array used for internal storage. If null it will be declared internally.
 	 * @return The converted gray scale image.
 	 */

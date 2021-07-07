@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -63,7 +63,7 @@ import java.util.List;
 public class ExampleBundleAdjustment {
 	public static void main( String[] args ) throws IOException {
 		// Because the Bundle Adjustment in the Large data set is popular, a file reader and writer is included
-		// with BoofCV.  BoofCV uses two data types to describe the parameters in a bundle adjustment problem
+		// with BoofCV. BoofCV uses two data types to describe the parameters in a bundle adjustment problem
 		// BundleAdjustmentSceneStructure is used for camera parameters, camera locations, and 3D points
 		// BundleAdjustmentObservations for image observations of 3D points
 		// ExampleMultiViewSceneReconstruction gives a better feel for these data structures or you can look

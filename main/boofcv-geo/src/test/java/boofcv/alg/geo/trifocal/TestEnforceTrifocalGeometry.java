@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -36,11 +36,10 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 public class TestEnforceTrifocalGeometry extends CommonTrifocalChecks {
 
 	/**
-	 * Construct a tensor from two arbitrary camera matrices.  Then provide the same inputs
+	 * Construct a tensor from two arbitrary camera matrices. Then provide the same inputs
 	 * to the algorithm and see if the matrix is constructed correctly.
 	 */
-	@Test
-	public void checkMatrixE() {
+	@Test void checkMatrixE() {
 		DMatrixRMaj P2 = new DMatrixRMaj(3,4,true,1,2,3,4,5,6,7,8,9,10,11,12);
 		DMatrixRMaj P3 = new DMatrixRMaj(3,4,true,10,20,30,40,50,60,70,80,90,100,110,120);
 
@@ -75,8 +74,7 @@ public class TestEnforceTrifocalGeometry extends CommonTrifocalChecks {
 	/**
 	 * Give it a set of perfect inputs and see if it computes a valid trifocal tensor
 	 */
-	@Test
-	public void perfectInput() {
+	@Test void perfectInput() {
 
 		// create linear constraint matrix
 		TrifocalLinearPoint7 constructA = new TrifocalLinearPoint7();

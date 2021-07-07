@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -45,8 +45,8 @@ import org.jetbrains.annotations.Nullable;
  * </p>
  *
  * <p>
- * NOTE: Sometimes the image border is ignored and some times it is not.  If feature intensities are not
- * computed along the image border then it will be full of zeros.  In that case the ignore border region
+ * NOTE: Sometimes the image border is ignored and some times it is not. If feature intensities are not
+ * computed along the image border then it will be full of zeros. In that case the ignore border region
  * needs to be increased for non-max suppression or else it might generate a false positive.
  * </p>
  *
