@@ -53,6 +53,9 @@ subprojects {
     // Creates Java 8 byte code
     tasks.withType(JavaCompile).configureEach { options.release = 8 }
 
+    // Enable incremental compile. Should make single file changes faster
+    tasks.withType(JavaCompile) { options.incremental = true }
+
     // To make ErrorProne and Kotlin plugins happy
     configurations.configureEach {
         resolutionStrategy {
@@ -66,9 +69,6 @@ subprojects {
 
     // Fail on jar conflict
     configurations.configureEach { resolutionStrategy { failOnVersionConflict() } }
-
-    // Enable incremental compile. Should make single file changes faster
-    tasks.withType(JavaCompile) { options.incremental = true }
 
     repositories {
         mavenCentral()

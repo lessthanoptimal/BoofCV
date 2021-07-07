@@ -16,7 +16,7 @@
 ------------------------------------------------------
 ## Introduction
 
-BoofCV is an open source real-time computer vision library written entirely in Java and released under the Apache License 2.0.  Functionality includes low-level image processing, camera calibration, feature detection/tracking, structure-from-motion, classification, and recognition.
+BoofCV is an open source real-time computer vision library written entirely in Java and released under the Apache License 2.0. Functionality includes low-level image processing, camera calibration, feature detection/tracking, structure-from-motion, classification, and recognition.
 
 - [ Project Webpage ]( http://boofcv.org                                  )
 - [ Message Board   ]( https://groups.google.com/group/boofcv             )
@@ -31,21 +31,14 @@ The bleeding edge source code can be obtained by cloning the git repository.
 git clone -b SNAPSHOT --recursive https://github.com/lessthanoptimal/BoofCV.git boofcv
 ```
 
-Is the data directory empty?  That's because you didn't follow instructions and skipped --recursive.  Fix that by doing the following.
+Is the data directory empty?  That's because you didn't follow instructions and skipped --recursive. Fix that by doing the following.
 ```
 cd boofcv
 git submodule update --init --recursive
 ```
 
 ## Quick Start Examples and Demonstrations
-New to Java? Make sure you have Java 14 or newer installed. In the command line type `java -version` and you should see something like:
-```bash
-java -version
-openjdk version "14" 2020-03-17
-```
-In this case I do have Java 14 installed. If you need to install/upgrade Java there are many options these days, such as [Zulu](https://www.azul.com/downloads/zulu-community/?package=jdk). A quick search should help if you need a more detailed explanation. You should avoid anything with `-ea` in its name since that's a developmental version.
-
-You can now build and run?  Then run the commands below!  Each jar will open a window, then to run an application just double click on its name.
+To run BoofCV you need Java 8 or newer and any free version will work, e.g. [Zulu](https://www.azul.com/downloads/zulu-community/?package=jdk). To build BoofCV, just let the Gradle script handle everything. It will automatically download what it needs and ignore your local JDK if it's not compatible.
 
 ```bash
 cd boofcv
@@ -56,25 +49,25 @@ java -jar examples/examples.jar
 java -jar demonstrations/demonstrations.jar
 ```
 
-All the code for what you see is in boofcv/examples and boofcv/demonstrations.  Example code is designed to be easy to understand so look there first.
+All the code for examples and demonstrations is in boofcv/examples and boofcv/demonstrations. Example code is intended easy to understand, so look there first.
 
 Click [HERE](applications/readme.md) for instruction on building and running Applications.
 There you can calibrate cameras, create QR codes, batch scan for QR codes, batch downsample images, ... etc.
 
 ## Maven Central Repository
 
-BoofCV is on [Maven Central](http://search.maven.org/) and can be easily added to your Maven, Gradle, ...etc projects.  It's divided up into many modules.  The easiest way to include the critical modules is to have your project dependent on 'core'.
+BoofCV is on [Maven Central](http://search.maven.org/) and can be easily added to your Maven, Gradle, ...etc projects. It's divided up into many modules. The easiest way to include the critical modules is to have your project dependent on 'core'.
 
 For Maven projects:
 ```
 <dependency>
   <groupId>org.boofcv</groupId>
   <artifactId>boofcv-core</artifactId>
-  <version>0.37</version>
+  <version>0.38</version>
 </dependency>
 ```
 
-There are also several integration modules which help BoofCV interact with external projects.  A list of those is included below:
+There are also several integration modules which help BoofCV interact with external projects. A list of those is included below:
 
 |     Name             |                 Description
 |----------------------|-------------------------------------------------------------------------------------
@@ -94,7 +87,7 @@ There are also several integration modules which help BoofCV interact with exter
 | data/           | Directory containing optional data used by applets and examples.
 | demonstrations/ | Demonstration code which typically lets experiment by changing parameters in real-time
 | examples/       | Set of example code designed to be easy to read and understand.
-| integration/    | Contains code which allows BoofCV to be easily integrated with 3rd party libraries.  Primary for video input/output.
+| integration/    | Contains code which allows BoofCV to be easily integrated with 3rd party libraries. Primary for video input/output.
 | main/           | Contains the source code for BoofCV
 
 ------------------------------------
@@ -114,11 +107,11 @@ If you wish to have jars instead, the following commands are provided.
 ```
 
 
-[1] A couple of the integration submodules have a custom build process that can't be performed by Gradle.  The script is smart enough to ignore modules and tell you that it is doing so if you haven't configured it yet.
+[1] A couple of the integration submodules have a custom build process that can't be performed by Gradle. The script is smart enough to ignore modules and tell you that it is doing so if you haven't configured it yet.
 
 ## IntelliJ
 
-IntelliJ is the recommended IDE for use with BoofCV.  With IntelliJ you can directly import the Gradle project.  
+IntelliJ is the recommended IDE for use with BoofCV. With IntelliJ you can directly import the Gradle project. 
 
 1. File->Project From Existing Sources
 2. Select your local "boofcv" directory
@@ -132,7 +125,7 @@ The easiest way to import the project is to use Gradle to generate an Eclipse pr
 cd boofcv
 ./gradlew eclipse
 ```
-Then in Eclipse; 1) "import existing projects", 2) Select your BoofCV directory, 3) Click Finish.  You can also install a Gradle plugin to Eclipse and import the project directory.  That's left as an exercise for the reader.
+Then in Eclipse; 1) "import existing projects", 2) Select your BoofCV directory, 3) Click Finish. You can also install a Gradle plugin to Eclipse and import the project directory. That's left as an exercise for the reader.
 
 -----------------------------------------------------------
 # Dependencies
@@ -159,6 +152,6 @@ The optional sub-projects in integration also have several dependencies. See tho
 ------------------------------------
 # Contact
 
-For questions or comments about BoofCV please use the message board.  Only post a bug report after doing some due diligence to make sure it is really a bug and that it has not already been reported.
+For questions or comments about BoofCV please use the message board. Only post a bug report after doing some due diligence to make sure it is really a bug and that it has not already been reported.
 
 [Message Board](http://groups.google.com/group/boofcv)
