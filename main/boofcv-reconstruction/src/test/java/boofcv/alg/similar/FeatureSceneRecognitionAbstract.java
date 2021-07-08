@@ -28,6 +28,7 @@ import org.jetbrains.annotations.Nullable;
 
 import java.io.PrintStream;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Set;
 
 /**
@@ -40,6 +41,7 @@ public class FeatureSceneRecognitionAbstract<TD extends TupleDesc<TD>> implement
 	@Override public void learnModel( Iterator<Features<TD>> images ) {}
 	@Override public void clearDatabase() {}
 	@Override public void addImage( String id, Features<TD> features ) {}
+	@Override public List<String> getImageIds( @Nullable List<String> storage ) {return null;}
 	@Override public boolean query( Features<TD> query, BoofLambdas.Filter<String> filter,
 									int limit, DogArray<SceneRecognition.Match> matches ) {return false;}
 	@Override public int getQueryWord( int featureIdx ) {return 0;}

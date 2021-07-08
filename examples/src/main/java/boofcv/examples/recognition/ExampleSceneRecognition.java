@@ -63,27 +63,43 @@ public class ExampleSceneRecognition {
 
 		// Except for real-time applications or when there are more than a few hundred images, you might want to
 		// just learn the dictionary from scratch
-		File saveDirectory = new File("recognition_model");
+		File saveDirectory = new File("example_recognition");
 
-		var imageIterator = new ImageFileListIterator<>(images, ImageType.SB_U8);
+		// Tell it to process gray U8 images
+		ImageType<GrayU8> imageType = ImageType.SB_U8;
 
-		if (saveDirectory.exists()) {
+		// Used to look up images one at a time from various sources. In this case a list of images.
+		var imageIterator = new ImageFileListIterator<>(images, imageType);
+
+		if (false) {
+			// Set the line above to true and it will download a pre-built model. Useful when you have a lot of images
+			// or simply want to skip the learning step
+			System.out.println("Downloading pre-built model");
+			recognizer = RecognitionIO.downloadDefaultSceneRecognition(new File("downloaded_models"), imageType);
+			recognizer.setVerbose(System.out, BoofMiscOps.hashSet(BoofVerbose.RECURSIVE));
+		} else if (saveDirectory.exists()) {
 			System.out.println("Loading previously generated model");
-			recognizer = RecognitionIO.loadFeatureToScene(saveDirectory, ImageType.SB_U8);
+			recognizer = RecognitionIO.loadFeatureToScene(saveDirectory, imageType);
+			recognizer.setVerbose(System.out, BoofMiscOps.hashSet(BoofVerbose.RECURSIVE));
 		} else {
-			// Learn how to describe images
+			// If many applications, learning a new model is a small fraction of the compute time and since its
+			// fit to the images it will be more accurate than a generic pre-built model
+			System.out.println("Creating a new model");
 			var config = new ConfigFeatureToSceneRecognition();
 			// Use a hierarchical vocabulary tree, which is very fast and also one of the more accurate approaches
 			config.typeRecognize = ConfigFeatureToSceneRecognition.Type.NISTER_2006;
 			config.recognizeNister2006.learningMinimumPointsForChildren.setFixed(20);
 
-			recognizer = FactorySceneRecognition.createFeatureToScene(config, ImageType.SB_U8);
-
+			recognizer = FactorySceneRecognition.createFeatureToScene(config, imageType);
 			// This will print out a lot of debugging information to stdout
 			recognizer.setVerbose(System.out, BoofMiscOps.hashSet(BoofVerbose.RECURSIVE));
 
+			// Learn the model from the initial set of images
 			recognizer.learnModel(imageIterator);
+		}
 
+		// See if the recognition algorithm already has images loaded in to it
+		if (recognizer.getImageIds(null).isEmpty()) {
 			// Add images to the data base
 			System.out.println("Adding images to the database");
 			imageIterator.reset();
@@ -92,7 +108,8 @@ public class ExampleSceneRecognition {
 				recognizer.addImage(images.get(imageIterator.getIndex()), image);
 			}
 
-			System.out.println("Saving tree");
+			// This saves the model with the image database to disk
+			System.out.println("Saving model");
 			BoofMiscOps.profile(() -> RecognitionIO.saveFeatureToScene(
 					(WrapFeatureToSceneRecognition<GrayU8, ?>)recognizer, saveDirectory), "");
 		}

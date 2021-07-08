@@ -26,6 +26,7 @@ import org.ddogleg.struct.VerbosePrint;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.Iterator;
+import java.util.List;
 
 /**
  * Implementations of this interface seek to solve the problem of "have I seen this scene before, but from the
@@ -73,6 +74,14 @@ public interface SceneRecognition<T extends ImageBase<T>> extends VerbosePrint {
 	 * that means matches is empty. This is strictly a convenience.
 	 */
 	boolean query( T queryImage, @Nullable BoofLambdas.Filter<String> filter, int limit, DogArray<Match> matches );
+
+	/**
+	 * Returns a list of image IDs in the database
+	 *
+	 * @param storage (Optional) Storage for the list of images. If null a new instance is created
+	 * @return List of all the image IDs.
+	 */
+	List<String> getImageIds( @Nullable List<String> storage );
 
 	/** The image data type which can be processed */
 	ImageType<T> getImageType();

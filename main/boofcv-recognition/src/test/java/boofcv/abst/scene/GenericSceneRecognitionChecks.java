@@ -106,6 +106,7 @@ public abstract class GenericSceneRecognitionChecks<T extends ImageBase<T>> exte
 		for (int i = 0; i < images.size(); i++) {
 			alg.addImage("" + i, images.get(i));
 		}
+		assertEquals(images.size(), alg.getImageIds(null).size());
 
 		// Look up the images and see if the first result is the original
 		DogArray<Match> matches = new DogArray<>(Match::new);
@@ -116,6 +117,7 @@ public abstract class GenericSceneRecognitionChecks<T extends ImageBase<T>> exte
 
 		// now clear the database
 		alg.clearDatabase();
+		assertEquals(0, alg.getImageIds(null).size());
 		for (int i = 0; i < images.size(); i++) {
 			assertFalse(alg.query(images.get(i), ( id ) -> true, maxMatches, matches));
 			assertEquals(0, matches.size);

@@ -27,6 +27,7 @@ import org.ddogleg.struct.VerbosePrint;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.Iterator;
+import java.util.List;
 
 /**
  * More specialized version of {@link SceneRecognition} where it is assumed the input is composed of image features
@@ -55,6 +56,14 @@ public interface FeatureSceneRecognition<TD extends TupleDesc<TD>> extends Verbo
 	 * @param features All the features in this image
 	 */
 	void addImage( String id, Features<TD> features );
+
+	/**
+	 * Returns a list of image IDs in the database
+	 *
+	 * @param storage (Optional) Storage for the list of images. If null a new instance is created
+	 * @return List of all the image IDs.
+	 */
+	List<String> getImageIds( @Nullable List<String> storage );
 
 	/**
 	 * Finds the best matches in the database to the query image. The filter can (optionally) be used to remove

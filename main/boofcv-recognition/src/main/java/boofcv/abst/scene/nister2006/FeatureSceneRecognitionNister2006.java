@@ -138,7 +138,7 @@ public class FeatureSceneRecognitionNister2006<TD extends TupleDesc<TD>> impleme
 		LearnHierarchicalTree<TD> learnTree = new LearnHierarchicalTree<>(
 				() -> FactoryTupleDesc.createPackedBig(tupleDOF, tupleType), factoryKMeans, config.randSeed);
 		learnTree.minimumPointsForChildren.setTo(config.learningMinimumPointsForChildren);
-		if (verbose!=null)
+		if (verbose != null)
 			BoofMiscOps.verboseChildren(verbose, null, learnTree);
 		learnTree.process(packedFeatures, tree);
 		long time2 = System.currentTimeMillis();
@@ -206,6 +206,16 @@ public class FeatureSceneRecognitionNister2006<TD extends TupleDesc<TD>> impleme
 
 		// Add the image
 		database.addImage(imageIndex, imageFeatures.toList());
+	}
+
+	@Override public List<String> getImageIds( @Nullable List<String> storage ) {
+		if (storage == null)
+			storage = new ArrayList<>();
+		else
+			storage.clear();
+
+		storage.addAll(imageIds);
+		return storage;
 	}
 
 	@Override public boolean query( Features<TD> query, @Nullable BoofLambdas.Filter<String> filter,
