@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -22,12 +22,14 @@ import boofcv.abst.geo.TriangulateNViewsMetric;
 import boofcv.abst.sfm.d3.VisualOdometry;
 import boofcv.abst.tracker.PointTrack;
 import boofcv.abst.tracker.PointTracker;
+import boofcv.alg.geo.PerspectiveOps;
 import boofcv.alg.sfm.d3.structure.MaxGeoKeyFrameManager;
 import boofcv.alg.sfm.d3.structure.VisOdomBundleAdjustment;
 import boofcv.alg.sfm.d3.structure.VisOdomBundleAdjustment.BFrame;
 import boofcv.alg.sfm.d3.structure.VisOdomBundleAdjustment.BObservation;
 import boofcv.alg.sfm.d3.structure.VisOdomBundleAdjustment.BTrack;
 import boofcv.alg.sfm.d3.structure.VisOdomKeyFrameManager;
+import boofcv.misc.BoofMiscOps;
 import boofcv.struct.distort.Point2Transform2_F64;
 import georegression.struct.point.Point2D_F64;
 import georegression.struct.point.Point3D_F64;
@@ -252,6 +254,8 @@ public abstract class VisOdomBundlePnPBase<Track extends VisOdomBundleAdjustment
 	 * Remove tracks with large errors and impossible geometry. For now it just removes tracks behind a camera.
 	 */
 	void dropBadBundleTracks() {
+		int totalBehind = 0;
+
 		// Go through each frame and look for tracks which are bad
 		for (int fidx = 0; fidx < bundleViso.frames.size; fidx++) {
 			BFrame bf = bundleViso.frames.get(fidx);
@@ -267,7 +271,9 @@ public abstract class VisOdomBundlePnPBase<Track extends VisOdomBundleAdjustment
 				// test to see if the feature is behind the camera while avoiding divided by zero errors
 				SePointOps_F64.transform(world_to_frame, bt.worldLoc, cameraLoc);
 
-				if (Math.signum(cameraLoc.z)*Math.signum(cameraLoc.w) < 0) {
+				if (PerspectiveOps.isBehindCamera(cameraLoc)) {
+					totalBehind++;
+
 					// this marks it for removal later on
 					bt.observations.reset();
 //					System.out.println("Dropping bad track. id="+bt.id+" z="+(cameraLoc.z/cameraLoc.w));
@@ -290,6 +296,9 @@ public abstract class VisOdomBundlePnPBase<Track extends VisOdomBundleAdjustment
 			}
 		}
 		totalDroppedTracksBadBundle -= bundleViso.tracks.size; // the delta is the number of dropped tracks
+
+		if (verbose != null)
+			verbose.printf("drop bundle: total=%d {behind=%d}\n", totalBehind, totalDroppedTracksBadBundle);
 
 		// Do a second pass since if it was removed in the first pass it might not be removed from all the frames
 		// if it was good in an earlier one
@@ -316,21 +325,15 @@ public abstract class VisOdomBundlePnPBase<Track extends VisOdomBundleAdjustment
 
 	@Override
 	public void setVerbose( @Nullable PrintStream out, @Nullable Set<String> configuration ) {
-		// Default to no verbosity
+		this.verbose = BoofMiscOps.addPrefix(this, out);
 		this.profileOut = null;
-		this.verbose = null;
 
-		// Update verbosity levels
 		if (configuration == null) {
-			this.verbose = out;
 			return;
 		}
 
 		if (configuration.contains(VisualOdometry.VERBOSE_RUNTIME)) {
-			this.profileOut = out;
-		}
-		if (configuration.contains(VisualOdometry.VERBOSE_TRACKING)) {
-			this.verbose = out;
+			this.profileOut = verbose;
 		}
 	}
 

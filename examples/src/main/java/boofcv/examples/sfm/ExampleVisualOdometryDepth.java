@@ -20,9 +20,7 @@ package boofcv.examples.sfm;
 
 import boofcv.abst.feature.detect.interest.ConfigPointDetector;
 import boofcv.abst.feature.detect.interest.PointDetectorTypes;
-import boofcv.abst.sfm.AccessPointTracks3D;
 import boofcv.abst.sfm.d3.DepthVisualOdometry;
-import boofcv.abst.sfm.d3.VisualOdometry;
 import boofcv.abst.tracker.PointTracker;
 import boofcv.alg.sfm.DepthSparse3D;
 import boofcv.alg.tracker.klt.ConfigPKlt;
@@ -45,6 +43,8 @@ import georegression.struct.se.Se3_F64;
 
 import java.io.File;
 
+import static boofcv.examples.sfm.ExampleVisualOdometryStereo.trackStats;
+
 /**
  * Bare bones example showing how to estimate the camera's ego-motion using a depth camera system, e.g. Kinect.
  * Additional information on the scene can be optionally extracted from the algorithm if it implements AccessPointTracks3D.
@@ -61,7 +61,7 @@ public class ExampleVisualOdometryDepth {
 
 		// load camera description and the video sequence
 		VisualDepthParameters param = CalibrationIO.load(
-				media.openFile(new File(directory , "visualdepth.yaml").getPath()));
+				media.openFile(new File(directory, "visualdepth.yaml").getPath()));
 
 		// specify how the image features are going to be tracked
 		ConfigPKlt configKlt = new ConfigPKlt();
@@ -80,51 +80,31 @@ public class ExampleVisualOdometryDepth {
 		DepthSparse3D<GrayU16> sparseDepth = new DepthSparse3D.I<>(1e-3);
 
 		// declares the algorithm
-		DepthVisualOdometry<GrayU8,GrayU16> visualOdometry =
+		DepthVisualOdometry<GrayU8, GrayU16> visualOdometry =
 				FactoryVisualOdometry.depthDepthPnP(1.5, 120, 2, 200, 50, true,
-				sparseDepth, tracker, GrayU8.class, GrayU16.class);
+						sparseDepth, tracker, GrayU8.class, GrayU16.class);
 
 		// Pass in intrinsic/extrinsic calibration. This can be changed in the future.
-		visualOdometry.setCalibration(param.visualParam,new DoNothing2Transform2_F32());
+		visualOdometry.setCalibration(param.visualParam, new DoNothing2Transform2_F32());
 
 		// Process the video sequence and output the location plus number of inliers
 		SimpleImageSequence<GrayU8> videoVisual = media.openVideo(
-				new File(directory ,"rgb.mjpeg").getPath(), ImageType.single(GrayU8.class));
+				new File(directory, "rgb.mjpeg").getPath(), ImageType.single(GrayU8.class));
 		SimpleImageSequence<GrayU16> videoDepth = media.openVideo(
-				new File(directory , "depth.mpng").getPath(), ImageType.single(GrayU16.class));
+				new File(directory, "depth.mpng").getPath(), ImageType.single(GrayU16.class));
 
-		while( videoVisual.hasNext() ) {
+		while (videoVisual.hasNext()) {
 			GrayU8 visual = videoVisual.next();
 			GrayU16 depth = videoDepth.next();
 
-			if( !visualOdometry.process(visual,depth) ) {
+			if (!visualOdometry.process(visual, depth)) {
 				throw new RuntimeException("VO Failed!");
 			}
 
 			Se3_F64 leftToWorld = visualOdometry.getCameraToWorld();
 			Vector3D_F64 T = leftToWorld.getT();
 
-			System.out.printf("Location %8.2f %8.2f %8.2f      inliers %s\n", T.x, T.y, T.z, inlierPercent(visualOdometry));
+			System.out.printf("Location %8.2f %8.2f %8.2f, %s\n", T.x, T.y, T.z, trackStats(visualOdometry));
 		}
-	}
-
-	/**
-	 * If the algorithm implements AccessPointTracks3D, then count the number of inlier features
-	 * and return a string.
-	 */
-	public static String inlierPercent(VisualOdometry alg) {
-		if( !(alg instanceof AccessPointTracks3D))
-			return "";
-
-		AccessPointTracks3D access = (AccessPointTracks3D)alg;
-
-		int count = 0;
-		int N = access.getTotalTracks();
-		for( int i = 0; i < N; i++ ) {
-			if( access.isTrackInlier(i) )
-				count++;
-		}
-
-		return String.format("%%%5.3f", 100.0 * count / N);
 	}
 }
