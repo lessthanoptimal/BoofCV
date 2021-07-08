@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -21,6 +21,7 @@ package boofcv;
 import boofcv.demonstrations.binary.DemoBinaryBlobLabelOpsApp;
 import boofcv.demonstrations.binary.DemoBinaryImageOpsApp;
 import boofcv.demonstrations.binary.DemoImageThresholdingApp;
+import boofcv.demonstrations.binary.VisualizeBinaryContourApp;
 import boofcv.demonstrations.calibration.*;
 import boofcv.demonstrations.color.ShowColorModelApp;
 import boofcv.demonstrations.distort.*;
@@ -48,6 +49,7 @@ import boofcv.demonstrations.feature.flow.DenseFlowApp;
 import boofcv.demonstrations.feature.orientation.ShowFeatureOrientationApp;
 import boofcv.demonstrations.fiducial.*;
 import boofcv.demonstrations.imageprocessing.*;
+import boofcv.demonstrations.recognition.DemoSceneRecognitionSimilarImagesApp;
 import boofcv.demonstrations.segmentation.VisualizeImageSegmentationApp;
 import boofcv.demonstrations.segmentation.VisualizeWatershedApp;
 import boofcv.demonstrations.sfm.d2.VideoMosaicSequentialPointApp;
@@ -133,6 +135,9 @@ public class DemonstrationLauncherApp extends ApplicationLauncherApp {
 				ShowFeatureOrientationApp.class);
 //				EdgeIntensitiesApp.class);
 
+		createNodes(root,"Recognition",
+				DemoSceneRecognitionSimilarImagesApp.class);
+
 		createNodes(root,"SFM 2D",
 				VideoMosaicSequentialPointApp.class,
 				VideoStabilizeSequentialPointApp.class);
@@ -176,7 +181,8 @@ public class DemonstrationLauncherApp extends ApplicationLauncherApp {
 				DetectLineApp.class,
 				VisualizeHoughGradient.class,
 				VisualizeHoughBinary.class,
-				VisualizeLineRansac.class);
+				VisualizeLineRansac.class,
+				VisualizeBinaryContourApp.class);
 
 		createNodes(root, "Trackers",
 				VideoTrackerObjectQuadApp.class,

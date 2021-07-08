@@ -95,7 +95,7 @@ public class IntensityPointFeatureApp<T extends ImageGray<T>, D extends ImageGra
 	QueueCorner minimums = new QueueCorner();
 	QueueCorner maximums = new QueueCorner();
 
-	String[] names = new String[]{"Harris", "Shi Tomasi", "FAST", "KitRos", "Median", "Laplacian", "Hessian Det", "Chessboard"};
+	String[] names = new String[]{"Harris", "Shi Tomasi", "FAST", "KitRos", "Median", "Laplacian", "Hessian Det"};
 
 	public IntensityPointFeatureApp( List<String> examples, Class<T> imageType ) {
 		super(true, true, examples, ImageType.single(imageType));
