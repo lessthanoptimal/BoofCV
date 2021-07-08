@@ -23,7 +23,7 @@ allprojects {
     createVersionFile.enabled = false // run only once. enabled in types
 }
 
-project.ext.set("deepboof_version", '0.5.1-SNAPSHOT')
+project.ext.set("deepboof_version", '0.5.1')
 project.ext.set("lombok_version", '1.18.18')
 project.ext.set("errorprone_version", '2.7.1')
 
