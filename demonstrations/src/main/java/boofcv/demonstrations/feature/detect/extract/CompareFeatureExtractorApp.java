@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -163,9 +163,23 @@ public class CompareFeatureExtractorApp<T extends ImageGray<T>, D extends ImageG
 
 		FeatureSelectLimitIntensity<Point2D_I16> selector = new FeatureSelectNBest<>(new SampleIntensityImage.I16());
 
-		NonMaxSuppression extractor =
-				FactoryFeatureExtractor.nonmax(new ConfigExtract(minSeparation, threshold, radius, true));
-		GeneralFeatureDetector<T, D> detector = new GeneralFeatureDetector<>(intensityAlg, null, extractor, selector);
+		NonMaxSuppression extractorMin = null;
+		NonMaxSuppression extractorMax = null;
+
+		ConfigExtract configExtract = new ConfigExtract(minSeparation, threshold, radius, true);
+		if (intensityAlg.localMinimums()) {
+			configExtract.detectMinimums = true;
+			configExtract.detectMaximums = false;
+			extractorMin = FactoryFeatureExtractor.nonmax(configExtract);
+		}
+		if (intensityAlg.localMaximums()) {
+			configExtract.detectMinimums = false;
+			configExtract.detectMaximums = true;
+			extractorMax = FactoryFeatureExtractor.nonmax(configExtract);
+		}
+
+		GeneralFeatureDetector<T, D> detector = new GeneralFeatureDetector<>(intensityAlg,
+				extractorMin, extractorMax, selector);
 		detector.setFeatureLimit(numFeatures);
 		detector.process(grayImage, derivX, derivY, derivXX, derivYY, derivXY);
 		QueueCorner foundCorners = detector.getMaximums();

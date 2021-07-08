@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -30,6 +30,7 @@ import boofcv.gui.BoofSwingUtil;
 import boofcv.gui.DemonstrationBase;
 import boofcv.gui.binary.VisualizeBinaryData;
 import boofcv.gui.image.ImageZoomPanel;
+import boofcv.io.UtilIO;
 import boofcv.io.image.ConvertBufferedImage;
 import boofcv.struct.image.*;
 
@@ -46,31 +47,30 @@ import java.util.List;
 /**
  * @author Peter Abeles
  */
-public class VisualizeBinaryContourApp <T extends ImageGray<T>> extends DemonstrationBase
-	implements ThresholdControlPanel.Listener
-{
+public class VisualizeBinaryContourApp<T extends ImageGray<T>> extends DemonstrationBase
+		implements ThresholdControlPanel.Listener {
 	VisualizePanel guiImage;
 	ContourControlPanel controls = new ContourControlPanel(this);
 
 	BinaryLabelContourFinder contourAlg;
 	InputToBinary<T> inputToBinary;
 
-	GrayU8 binary = new GrayU8(1,1);
-	GrayS32 labeled = new GrayS32(1,1);
+	GrayU8 binary = new GrayU8(1, 1);
+	GrayS32 labeled = new GrayS32(1, 1);
 
 	BufferedImage original;
 	BufferedImage work;
 
-	public VisualizeBinaryContourApp(List<String> exampleInputs, ImageType<T> imageType) {
+	public VisualizeBinaryContourApp( List<String> exampleInputs, ImageType<T> imageType ) {
 		super(exampleInputs, imageType);
 
 		guiImage = new VisualizePanel();
-		guiImage.setPreferredSize(new Dimension(800,800));
+		guiImage.setPreferredSize(new Dimension(800, 800));
 
 		guiImage.getImagePanel().addMouseWheelListener(new MouseAdapter() {
 			@Override
-			public void mouseWheelMoved(MouseWheelEvent e) {
-				controls.setZoom(BoofSwingUtil.mouseWheelImageZoom(controls.zoom,e));
+			public void mouseWheelMoved( MouseWheelEvent e ) {
+				controls.setZoom(BoofSwingUtil.mouseWheelImageZoom(controls.zoom, e));
 			}
 		});
 
@@ -78,17 +78,17 @@ public class VisualizeBinaryContourApp <T extends ImageGray<T>> extends Demonstr
 		add(BorderLayout.CENTER, guiImage);
 
 		ConfigThreshold config = controls.getThreshold().createConfig();
-		inputToBinary = FactoryThresholdBinary.threshold(config,imageType.getImageClass());
+		inputToBinary = FactoryThresholdBinary.threshold(config, imageType.getImageClass());
 		contourAlg = FactoryBinaryContourFinder.linearChang2004();
 		contourAlg.setConnectRule(controls.getConnectRule());
 	}
 
 	@Override
-	protected void handleInputChange(int source, InputMethod method, final int width, final int height) {
+	protected void handleInputChange( int source, InputMethod method, final int width, final int height ) {
 		super.handleInputChange(source, method, width, height);
 
-		binary.reshape(width,height);
-		labeled.reshape(width,height);
+		binary.reshape(width, height);
+		labeled.reshape(width, height);
 
 		// reset the scaling and ensure the entire new image is visible
 		BoofSwingUtil.invokeNowOrLater(new Runnable() {
@@ -96,21 +96,21 @@ public class VisualizeBinaryContourApp <T extends ImageGray<T>> extends Demonstr
 			public void run() {
 				int w = guiImage.getWidth();
 				int h = guiImage.getHeight();
-				if( w == 0 ) {
+				if (w == 0) {
 					w = guiImage.getPreferredSize().width;
 					h = guiImage.getPreferredSize().height;
 				}
 
-				double scale = Math.max(width/(double)w,height/(double)h);
-				scale = Math.max(1,scale);
-				System.out.println("scale "+scale);
+				double scale = Math.max(width/(double)w, height/(double)h);
+				scale = Math.max(1, scale);
+				System.out.println("scale " + scale);
 				controls.setZoom(1.0/scale);
 			}
 		});
 	}
 
 	@Override
-	public void processImage(int sourceID, long frameID, final BufferedImage buffered, ImageBase input) {
+	public void processImage( int sourceID, long frameID, final BufferedImage buffered, ImageBase input ) {
 
 		synchronized (this) {
 			original = ConvertBufferedImage.checkCopy(buffered, original);
@@ -127,8 +127,8 @@ public class VisualizeBinaryContourApp <T extends ImageGray<T>> extends Demonstr
 //			}});
 
 		synchronized (this) {
-			inputToBinary.process((T)input,binary);
-			contourAlg.process(binary,labeled);
+			inputToBinary.process((T)input, binary);
+			contourAlg.process(binary, labeled);
 		}
 
 		SwingUtilities.invokeLater(new Runnable() {
@@ -160,16 +160,16 @@ public class VisualizeBinaryContourApp <T extends ImageGray<T>> extends Demonstr
 	 */
 	public void viewUpdated() {
 		BufferedImage active = null;
-		if( controls.selectedView == 0 ) {
+		if (controls.selectedView == 0) {
 			active = original;
-		} else if( controls.selectedView == 1 ) {
-			VisualizeBinaryData.renderBinary(binary,false,work);
+		} else if (controls.selectedView == 1) {
+			VisualizeBinaryData.renderBinary(binary, false, work);
 			active = work;
 			work.setRGB(0, 0, work.getRGB(0, 0));
 		} else {
 			Graphics2D g2 = work.createGraphics();
 			g2.setColor(Color.BLACK);
-			g2.fillRect(0,0,work.getWidth(),work.getHeight());
+			g2.fillRect(0, 0, work.getWidth(), work.getHeight());
 			active = work;
 		}
 
@@ -181,25 +181,24 @@ public class VisualizeBinaryContourApp <T extends ImageGray<T>> extends Demonstr
 	class VisualizePanel extends ImageZoomPanel {
 
 		@Override
-		protected void paintInPanel(AffineTransform tran, Graphics2D g2) {
+		protected void paintInPanel( AffineTransform tran, Graphics2D g2 ) {
 			synchronized (VisualizeBinaryContourApp.this) {
 
 				List<Contour> contours = BinaryImageOps.convertContours(contourAlg);
 
-				VisualizeBinaryData.render(contours,Color.BLUE, Color.RED, 1.0,scale, g2);
+				VisualizeBinaryData.render(contours, Color.BLUE, Color.RED, 1.0, scale, g2);
 			}
 		}
 	}
 
-	public static void main(String[] args) {
-
+	public static void main( String[] args ) {
 		List<String> examples = new ArrayList<>();
-		examples.add("shapes/shapes02.png");
-		examples.add("shapes/concave01.jpg");
-		examples.add("shapes/polygons01.jpg");
+		examples.add(UtilIO.pathExample("shapes/shapes02.png"));
+		examples.add(UtilIO.pathExample("shapes/concave01.jpg"));
+		examples.add(UtilIO.pathExample("shapes/polygons01.jpg"));
 
-		SwingUtilities.invokeLater(()->{
-			VisualizeBinaryContourApp app = new VisualizeBinaryContourApp(examples, ImageType.single(GrayF32.class));
+		SwingUtilities.invokeLater(() -> {
+			var app = new VisualizeBinaryContourApp<>(examples, ImageType.single(GrayF32.class));
 
 			app.openFile(new File(examples.get(0)));
 			app.display("Binary Contour Visualization");

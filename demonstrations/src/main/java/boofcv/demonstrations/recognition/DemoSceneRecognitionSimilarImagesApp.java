@@ -114,7 +114,7 @@ public class DemoSceneRecognitionSimilarImagesApp<Gray extends ImageGray<Gray>, 
 	@Override protected void openFileMenuBar() {
 		List<BoofSwingUtil.FileTypes> types = new ArrayList<>();
 		types.add(BoofSwingUtil.FileTypes.IMAGES);
-		types.add(BoofSwingUtil.FileTypes.VIDEOS);
+//		types.add(BoofSwingUtil.FileTypes.VIDEOS);
 		types.add(BoofSwingUtil.FileTypes.DIRECTORIES);
 		BoofSwingUtil.FileTypes[] array = types.toArray(new BoofSwingUtil.FileTypes[0]);
 
@@ -128,22 +128,21 @@ public class DemoSceneRecognitionSimilarImagesApp<Gray extends ImageGray<Gray>, 
 	 * Specialized open file which makes a list of files
 	 */
 	@Override public void openFile( File file, boolean addToRecent ) {
-		List<String> foundFiles;
+		List<String> foundFiles = new ArrayList<>();
 
-		if (file.isDirectory()) {
-			// If a directory open up all images in the directory
-			foundFiles = UtilIO.listSmartImages(file.getPath(), true);
-		} else if (UtilImageIO.isImage(file)) {
+		// See if it's a list of files
+		try {
+			foundFiles = UtilIO.listAll(file.getPath());
+		} catch (RuntimeException ignore) {}
+
+		if (foundFiles.isEmpty() && UtilImageIO.isImage(file)) {
 			// A bit silly, but include just this one image if the idiot user tells it to
 			foundFiles = new ArrayList<>();
 			foundFiles.add(file.getPath());
-		} else {
-			JOptionPane.showMessageDialog(this, "Doesn't support videos yet");
-			return;
 		}
 
 		if (foundFiles.isEmpty()) {
-			JOptionPane.showMessageDialog(this, "No valid files selected");
+			JOptionPane.showMessageDialog(this, "Failed to load images");
 			return;
 		}
 
@@ -161,11 +160,12 @@ public class DemoSceneRecognitionSimilarImagesApp<Gray extends ImageGray<Gray>, 
 		}
 
 		stopAllInputProcessing();
+		List<String> _foundFiles = foundFiles;
 		threadPool.execute(() -> {
 			setMenuBarEnabled(false);
 			computingFinished = false;
 			try {
-				processImageFiles(foundFiles);
+				processImageFiles(_foundFiles);
 			} catch (RuntimeException e) {
 				e.printStackTrace();
 			}
@@ -178,6 +178,9 @@ public class DemoSceneRecognitionSimilarImagesApp<Gray extends ImageGray<Gray>, 
 	 *
 	 */
 	void processImageFiles( List<String> foundFiles ) {
+		// Sort to ensure the order is constant
+		Collections.sort(foundFiles);
+
 		System.out.println("Processing images.size=" + foundFiles.size());
 		// clean up
 		synchronized (imageLock) {
@@ -209,6 +212,12 @@ public class DemoSceneRecognitionSimilarImagesApp<Gray extends ImageGray<Gray>, 
 		long time0 = System.currentTimeMillis();
 		for (String path : foundFiles) {
 			BufferedImage buffered = UtilImageIO.loadImage(path);
+
+			// There can be non images inside an image directory
+			if (buffered == null) {
+				System.err.println("Failed to load as image: " + path);
+				continue;
+			}
 
 			// create the preview image
 			double scale = Math.sqrt(PREVIEW_PIXELS)/Math.sqrt(buffered.getWidth()*buffered.getHeight());
@@ -535,8 +544,8 @@ public class DemoSceneRecognitionSimilarImagesApp<Gray extends ImageGray<Gray>, 
 			add(labelScore);
 
 			constrainWestNorthEast(image, null, 0, 0);
-			constrainWestSouthEast(labelScore, null, 2, 4 );
-			constrainWestSouthEast(labelID, labelScore, 2, 4 );
+			constrainWestSouthEast(labelScore, null, 2, 4);
+			constrainWestSouthEast(labelID, labelScore, 2, 4);
 			layout.putConstraint(SpringLayout.SOUTH, image, 0, SpringLayout.NORTH, labelID);
 		}
 
@@ -716,10 +725,11 @@ public class DemoSceneRecognitionSimilarImagesApp<Gray extends ImageGray<Gray>, 
 
 	public static void main( String[] args ) {
 		List<String> examples = new ArrayList<>();
+		examples.add(UtilIO.pathExample("recognition/scene"));
 
 		SwingUtilities.invokeLater(() -> {
 			var app = new DemoSceneRecognitionSimilarImagesApp<>(examples, GrayU8.class);
-//			app.openExample(examples.get(0));
+			app.openExample(examples.get(0));
 			app.displayImmediate("FeatureSceneRecognition Demo");
 		});
 	}
