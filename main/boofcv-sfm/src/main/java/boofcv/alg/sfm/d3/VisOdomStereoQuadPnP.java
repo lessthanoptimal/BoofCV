@@ -744,24 +744,15 @@ public class VisOdomStereoQuadPnP<T extends ImageGray<T>, TD extends TupleDesc<T
 
 	@Override
 	public void setVerbose( @Nullable PrintStream out, @Nullable Set<String> configuration ) {
-		// Default to no verbose messages
-		this.verbose = null;
+		this.verbose = BoofMiscOps.addPrefix(this, out);
+		BoofMiscOps.verboseChildren(verbose, configuration, bundle);
 		this.profileOut = null;
 
-		if (out != null) {
-			BoofMiscOps.verboseChildren(out, configuration, bundle);
-			out = BoofMiscOps.addPrefix(this, out);
-		}
-
-		// Update the level of verbosity based on the request
 		if (configuration == null) {
-			this.verbose = out;
 			return;
 		}
 
 		if (configuration.contains(VisualOdometry.VERBOSE_RUNTIME))
-			this.profileOut = out;
-		if (configuration.contains(VisualOdometry.VERBOSE_TRACKING))
-			this.verbose = out;
+			this.profileOut = verbose;
 	}
 }

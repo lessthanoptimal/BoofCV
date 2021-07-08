@@ -20,9 +20,7 @@ package boofcv.examples.sfm;
 
 import boofcv.abst.feature.detect.interest.ConfigPointDetector;
 import boofcv.abst.feature.detect.interest.PointDetectorTypes;
-import boofcv.abst.sfm.AccessPointTracks3D;
 import boofcv.abst.sfm.d3.MonocularPlaneVisualOdometry;
-import boofcv.abst.sfm.d3.VisualOdometry;
 import boofcv.abst.tracker.PointTracker;
 import boofcv.alg.tracker.klt.ConfigPKlt;
 import boofcv.factory.sfm.FactoryVisualOdometry;
@@ -40,6 +38,8 @@ import georegression.struct.point.Vector3D_F64;
 import georegression.struct.se.Se3_F64;
 
 import java.io.File;
+
+import static boofcv.examples.sfm.ExampleVisualOdometryStereo.trackStats;
 
 /**
  * Bare bones example showing how to estimate the camera's ego-motion using a single camera and a known
@@ -91,27 +91,7 @@ public class ExampleVisualOdometryMonocularPlane {
 			Se3_F64 leftToWorld = visualOdometry.getCameraToWorld();
 			Vector3D_F64 T = leftToWorld.getT();
 
-			System.out.printf("Location %8.2f %8.2f %8.2f      inliers %s\n", T.x, T.y, T.z, inlierPercent(visualOdometry));
+			System.out.printf("Location %8.2f %8.2f %8.2f, %s\n", T.x, T.y, T.z, trackStats(visualOdometry));
 		}
-	}
-
-	/**
-	 * If the algorithm implements AccessPointTracks3D, then count the number of inlier features
-	 * and return a string.
-	 */
-	public static String inlierPercent( VisualOdometry<?> alg ) {
-		if (!(alg instanceof AccessPointTracks3D))
-			return "";
-
-		AccessPointTracks3D access = (AccessPointTracks3D)alg;
-
-		int count = 0;
-		int N = access.getTotalTracks();
-		for (int i = 0; i < N; i++) {
-			if (access.isTrackInlier(i))
-				count++;
-		}
-
-		return String.format("%%%5.3f", 100.0*count/N);
 	}
 }

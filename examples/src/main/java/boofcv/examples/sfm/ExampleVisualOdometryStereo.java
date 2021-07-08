@@ -23,6 +23,7 @@ import boofcv.abst.feature.detect.interest.ConfigPointDetector;
 import boofcv.abst.feature.detect.interest.PointDetectorTypes;
 import boofcv.abst.sfm.AccessPointTracks3D;
 import boofcv.abst.sfm.d3.StereoVisualOdometry;
+import boofcv.abst.sfm.d3.VisualOdometry;
 import boofcv.abst.tracker.PointTracker;
 import boofcv.alg.tracker.klt.ConfigPKlt;
 import boofcv.factory.disparity.ConfigDisparityBM;
@@ -123,7 +124,7 @@ public class ExampleVisualOdometryStereo {
 			Se3_F64 leftToWorld = visodom.getCameraToWorld();
 			Vector3D_F64 T = leftToWorld.getT();
 
-			System.out.printf("Location %8.2f %8.2f %8.2f    %s\n", T.x, T.y, T.z, trackStats(visodom));
+			System.out.printf("Location %8.2f %8.2f %8.2f, %s\n", T.x, T.y, T.z, trackStats(visodom));
 		}
 		System.out.printf("FPS %4.2f\n", video1.getFrameNumber()/((System.nanoTime() - startTime)*1e-9));
 	}
@@ -131,23 +132,23 @@ public class ExampleVisualOdometryStereo {
 	/**
 	 * If the algorithm implements AccessPointTracks3D create a string which summarizing different tracking information
 	 */
-	public static String trackStats( StereoVisualOdometry alg ) {
+	public static String trackStats( VisualOdometry alg ) {
 		if (!(alg instanceof AccessPointTracks3D))
 			return "";
 
 		AccessPointTracks3D access = (AccessPointTracks3D)alg;
 
-		int count = 0;
 		int N = access.getTotalTracks();
+		int totalInliers = 0;
 		int totalNew = 0;
 		for (int i = 0; i < N; i++) {
 			if (access.isTrackInlier(i))
-				count++;
-			else if (access.isTrackNew(i)) {
+				totalInliers++;
+
+			if (access.isTrackNew(i))
 				totalNew++;
-			}
 		}
 
-		return String.format("inlier %5.1f%% new %4d total %d", 100.0*count/(N - totalNew), totalNew, N);
+		return String.format("inlier: %5.1f%% new %4d total %d", 100.0*totalInliers/N, totalNew, N);
 	}
 }

@@ -63,6 +63,7 @@ public class VisOdomPixelDepthPnP_to_DepthVisualOdometry<Vis extends ImageBase<V
 	boolean success;
 
 	List<PointTrack> active = new ArrayList<>();
+	long frameID;
 
 	public VisOdomPixelDepthPnP_to_DepthVisualOdometry( DepthSparse3D<Depth> sparse3D, VisOdomMonoDepthPnP<Vis> alg,
 														DistanceFromModelMultiView<Se3_F64, Point2D3D> distance,
@@ -118,8 +119,7 @@ public class VisOdomPixelDepthPnP_to_DepthVisualOdometry<Vis extends ImageBase<V
 
 	@Override
 	public boolean isTrackNew( int index ) {
-		PointTrack t = alg.getTracker().getActiveTracks(null).get(index);
-		return alg.getTracker().getNewTracks(null).contains(t);
+		return active.get(index).spawnFrameID == frameID;
 	}
 
 	@Override
@@ -134,6 +134,7 @@ public class VisOdomPixelDepthPnP_to_DepthVisualOdometry<Vis extends ImageBase<V
 	public boolean process( Vis visual, Depth depth ) {
 		sparse3D.setDepthImage(depth);
 		success = alg.process(visual);
+		frameID = alg.getFrameID();
 
 		active.clear();
 		alg.getTracker().getActiveTracks(active);

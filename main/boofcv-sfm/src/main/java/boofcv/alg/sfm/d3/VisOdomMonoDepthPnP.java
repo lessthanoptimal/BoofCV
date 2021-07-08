@@ -152,7 +152,7 @@ public class VisOdomMonoDepthPnP<T extends ImageBase<T>>
 			spawnNewTracksForNewKeyFrame(visibleTracks);
 			frameManager.initialize(bundleViso.cameras);
 			frameManager.handleSpawnedTracks(tracker, bundleViso.cameras.getTail());
-			if (verbose != null) verbose.println("VO: First Frame. Spawned=" + visibleTracks.size());
+			if (verbose != null) verbose.println("First Frame. Spawned=" + visibleTracks.size());
 			return true;
 		}
 
@@ -165,14 +165,14 @@ public class VisOdomMonoDepthPnP<T extends ImageBase<T>>
 		// Estimate motion
 		List<PointTrack> activeVisualTracks = tracker.getActiveTracks(null);
 		if (!estimateMotion(activeVisualTracks)) {
-			if (verbose != null) verbose.println("VO: estimate motion failed");
+			if (verbose != null) verbose.println("FAILED: estimate motion");
 			// discard the current frame and attempt to jump over it
 			bundleViso.removeFrame(frameCurrent, removedBundleTracks);
 			dropRemovedBundleTracks();
 			updateListOfVisibleTracksForOutput();
 			return false;
 		}
-		if (verbose != null) verbose.println("   Inliers          " + motionEstimator.getMatchSet().size());
+		if (verbose != null) verbose.println("_ Inliers          " + motionEstimator.getMatchSet().size());
 
 		// what the name says and also marks the inliers as inliers
 		addObservationsOfInliersToScene(activeVisualTracks);
@@ -187,8 +187,7 @@ public class VisOdomMonoDepthPnP<T extends ImageBase<T>>
 
 		//=============================================================================================
 		//========== Perform maintenance by dropping elements from the scene
-		dropBadBundleTracks();
-		if (verbose != null) verbose.println("   Bad Bundle Trk   " + totalDroppedTracksBadBundle);
+//		dropBadBundleTracks(); TODO add back in. Idea is good but this implementation is buggy
 		long time4 = System.nanoTime();
 		boolean droppedCurrentFrame = performKeyFrameMaintenance(tracker, 1);
 		long time5 = System.nanoTime();
@@ -199,7 +198,7 @@ public class VisOdomMonoDepthPnP<T extends ImageBase<T>>
 		}
 		long time6 = System.nanoTime();
 		if (verbose != null)
-			verbose.println("   Visible All      " + (tracker.getTotalInactive() + tracker.getTotalActive()));
+			verbose.println("_ Visible All      " + (tracker.getTotalInactive() + tracker.getTotalActive()));
 
 		//=============================================================================================
 		//========== Summarize profiling results
@@ -357,7 +356,7 @@ public class VisOdomMonoDepthPnP<T extends ImageBase<T>>
 //			}
 
 			// discard point if it can't localized
-			if (!pixelTo3D.process(pt.pixel.x, pt.pixel.y) || pixelTo3D.getW() == 0) { // TODO don't drop infinity
+			if (!pixelTo3D.process(pt.pixel.x, pt.pixel.y) ) {
 //				System.out.println("Dropped pixelTo3D  tt="+pt.featureId);
 				totalRejected++;
 				tracker.dropTrack(pt);
@@ -392,7 +391,7 @@ public class VisOdomMonoDepthPnP<T extends ImageBase<T>>
 				visibleTracks.add(btrack);
 			}
 		}
-		if (verbose != null) verbose.println("   Rejected spawned " + totalRejected);
+		if (verbose != null) verbose.printf("spawn: new=%d rejected=%d\n", spawned.size()-totalRejected, totalRejected);
 	}
 
 	/**
