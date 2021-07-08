@@ -31,6 +31,7 @@ import org.jetbrains.annotations.Nullable;
 
 import java.io.PrintStream;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Set;
 
 /**
@@ -90,6 +91,10 @@ public class WrapFeatureToSceneRecognition<Image extends ImageBase<Image>, TD ex
 	public boolean query( Image queryImage, @Nullable BoofLambdas.Filter<String> filter, int limit, DogArray<Match> matches ) {
 		detector.detect(queryImage);
 		return recognizer.query(wrappedDetector, filter, limit, matches);
+	}
+
+	@Override public List<String> getImageIds( @Nullable List<String> storage ) {
+		return recognizer.getImageIds(storage);
 	}
 
 	@Override public ImageType<Image> getImageType() {

@@ -95,6 +95,7 @@ public abstract class GenericFeatureSceneRecognitionChecks<TD extends TupleDesc<
 			// Save the word for testing later on
 			wordZeroInImages.add(word0);
 		}
+		assertEquals(images.size(), alg.getImageIds(null).size());
 
 		// It should have some matches and make sure the limit is respected
 		var matches = new DogArray<>(SceneRecognition.Match::new);
@@ -105,7 +106,7 @@ public abstract class GenericFeatureSceneRecognitionChecks<TD extends TupleDesc<
 		var matchesNull = new DogArray<>(SceneRecognition.Match::new);
 		assertTrue(alg.query(getFeatures(1, images), null, 3, matchesNull));
 		assertEquals(matchesNull.size, matchesNull.size);
-		matches.forIdx((idx,e)->assertEquals(e.id, matchesNull.get(idx).id));
+		matches.forIdx(( idx, e ) -> assertEquals(e.id, matchesNull.get(idx).id));
 
 		// It should always find a word since it was part of the training set
 		for (int imageIdx = 0; imageIdx < images.size(); imageIdx++) {

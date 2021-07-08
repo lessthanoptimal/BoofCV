@@ -20,6 +20,7 @@ package boofcv.io.recognition;
 
 import boofcv.BoofVersion;
 import boofcv.abst.scene.ConfigFeatureToSceneRecognition;
+import boofcv.abst.scene.SceneRecognition;
 import boofcv.abst.scene.WrapFeatureToSceneRecognition;
 import boofcv.abst.scene.ann.FeatureSceneRecognitionNearestNeighbor;
 import boofcv.abst.scene.nister2006.FeatureSceneRecognitionNister2006;
@@ -36,6 +37,7 @@ import boofcv.struct.image.ImageBase;
 import boofcv.struct.image.ImageType;
 import boofcv.struct.kmeans.TuplePointDistanceEuclideanSq;
 import boofcv.struct.kmeans.TuplePointDistanceHamming;
+import deepboof.io.DeepBoofDataBaseOps;
 import org.ddogleg.clustering.PointDistance;
 import org.ddogleg.struct.BigDogArray_I32;
 import org.ddogleg.struct.DogArray;
@@ -64,6 +66,30 @@ public class RecognitionIO {
 	public static final String INVERTED_NAME = "inverted_files.bin";
 
 	/**
+	 * Downloads then loads the pre-built default scene recognition model. The image DB will of course be empty.
+	 * If the decompressed directory already exists then it will skip the download step.
+	 *
+	 * @param destination Where it should download the model to
+	 * @param imageType Type of image the resulting algorithm will process
+	 * @return A new instance of {@link SceneRecognition} with an already built model.
+	 */
+	public static <Image extends ImageBase<Image>, TD extends TupleDesc<TD>>
+	WrapFeatureToSceneRecognition<Image, TD> downloadDefaultSceneRecognition( File destination,
+																			  ImageType<Image> imageType ) {
+		if (!destination.exists()) {
+			BoofMiscOps.checkTrue(destination.mkdirs());
+		} else if (destination.isFile())
+			throw new IllegalArgumentException("Destination must be a directory not a file");
+
+		File modelDir = new File(destination, "scene_recognition");
+		if (!modelDir.exists())
+			DeepBoofDataBaseOps.downloadModel(
+					"http://boofcv.org/notwiki/largefiles/scene_recognition_default38_inria_holidays.zip", destination);
+
+		return loadFeatureToScene(modelDir, imageType);
+	}
+
+	/**
 	 * Saves {@link WrapFeatureToSceneRecognition} to disk inside of the specified directory
 	 *
 	 * @param def What is to be saved
@@ -78,11 +104,13 @@ public class RecognitionIO {
 
 		UtilIO.saveConfig(def.getConfig(), new File(dir, CONFIG_NAME));
 
+		List<String> listImageIds = null;
+
 		switch (def.getConfig().typeRecognize) {
 			case NISTER_2006 -> {
 				FeatureSceneRecognitionNister2006<TD> recognizer = def.getRecognizer();
 				saveTreeBin(recognizer.getDatabase(), new File(dir, DATABASE_NAME));
-				UtilIO.saveListStringYaml(recognizer.getImageIds(), new File(dir, IMAGE_ID_NAME));
+				listImageIds = recognizer.getImageIds();
 			}
 
 			case NEAREST_NEIGHBOR -> {
@@ -92,8 +120,12 @@ public class RecognitionIO {
 						recognizer.getTupleDOF(),
 						recognizer.getDescriptorType(), new File(dir, DICTIONARY_NAME));
 				saveNearestNeighborBin(recognizer.getDatabase(), new File(dir, INVERTED_NAME));
-				UtilIO.saveListStringYaml(recognizer.getImageIds(), new File(dir, IMAGE_ID_NAME));
+				listImageIds = recognizer.getImageIds();
 			}
+		}
+
+		if (!listImageIds.isEmpty()) {
+			UtilIO.saveListStringYaml(listImageIds, new File(dir, IMAGE_ID_NAME));
 		}
 	}
 
@@ -107,12 +139,16 @@ public class RecognitionIO {
 		ConfigFeatureToSceneRecognition config = UtilIO.loadConfig(new File(dir, CONFIG_NAME));
 		WrapFeatureToSceneRecognition<Image, TD> alg = FactorySceneRecognition.createFeatureToScene(config, imageType);
 
+		// If it's just the model and doesn't have image list then don't try to load it
+		boolean loadImagesIDs = new File(dir, IMAGE_ID_NAME).exists();
+
 		switch (config.typeRecognize) {
 			case NISTER_2006 -> {
 				FeatureSceneRecognitionNister2006<TD> recognizer = alg.getRecognizer();
 
 				loadTreeBin(new File(dir, DATABASE_NAME), recognizer.getDatabase());
-				recognizer.getImageIds().addAll(UtilIO.loadListStringYaml(new File(dir, IMAGE_ID_NAME)));
+				if (loadImagesIDs)
+					recognizer.getImageIds().addAll(UtilIO.loadListStringYaml(new File(dir, IMAGE_ID_NAME)));
 
 				// Need to do this so that the tree reference is correctly set up
 				recognizer.setDatabase(recognizer.getDatabase());
@@ -124,10 +160,12 @@ public class RecognitionIO {
 				// Add the dictionary
 				List<TD> dictionary = loadDictionaryBin(new File(dir, DICTIONARY_NAME));
 				recognizer.setDictionary(dictionary);
+				loadNearestNeighborBin(new File(dir, INVERTED_NAME), recognizer.getDatabase());
 
 				// Add the images now
-				recognizer.getImageIds().addAll(UtilIO.loadListStringYaml(new File(dir, IMAGE_ID_NAME)));
-				loadNearestNeighborBin(new File(dir, INVERTED_NAME), recognizer.getDatabase());
+				if (loadImagesIDs) {
+					recognizer.getImageIds().addAll(UtilIO.loadListStringYaml(new File(dir, IMAGE_ID_NAME)));
+				}
 			}
 
 			default -> throw new IllegalArgumentException("Unknown type: " + config.typeRecognize);

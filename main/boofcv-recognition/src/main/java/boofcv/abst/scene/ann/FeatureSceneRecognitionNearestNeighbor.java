@@ -153,6 +153,16 @@ public class FeatureSceneRecognitionNearestNeighbor<TD extends TupleDesc<TD>> im
 		database.addImage(imageIndex, imageFeatures.toList());
 	}
 
+	@Override public List<String> getImageIds( @Nullable List<String> storage ) {
+		if (storage == null)
+			storage = new ArrayList<>();
+		else
+			storage.clear();
+
+		storage.addAll(imageIds);
+		return storage;
+	}
+
 	@Override
 	public boolean query( Features<TD> query,
 						  BoofLambdas.@Nullable Filter<String> filter, int limit,
