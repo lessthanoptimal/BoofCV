@@ -16,7 +16,7 @@
  * limitations under the License.
  */
 
-package boofcv.alg.feature.detect.template;
+package boofcv.alg.template;
 
 import boofcv.concurrency.BoofConcurrency;
 import boofcv.struct.image.ImageBase;

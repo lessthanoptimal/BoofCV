@@ -16,10 +16,10 @@
  * limitations under the License.
  */
 
-package boofcv.factory.feature.detect.template;
+package boofcv.factory.template;
 
-import boofcv.alg.feature.detect.template.TemplateSumAbsoluteDifference;
-import boofcv.alg.feature.detect.template.TemplateSumSquaredError;
+import boofcv.alg.template.TemplateSumAbsoluteDifference;
+import boofcv.alg.template.TemplateSumSquaredError;
 
 /**
  * List of formulas used to score matches in a template.
@@ -49,7 +49,7 @@ public enum TemplateScoreType {
 	 * but is more expensive to compute.
 	 * </p>
 	 *
-	 * @see boofcv.alg.feature.detect.template.TemplateNCC
+	 * @see boofcv.alg.template.TemplateNCC
 	 */
 	NCC,
 
@@ -58,14 +58,14 @@ public enum TemplateScoreType {
 	 * Correlation error metric. On large images this can be much faster than the other techniques.
 	 * </p>
 	 *
-	 * @see boofcv.alg.feature.detect.template.TemplateCorrelationFFT
+	 * @see boofcv.alg.template.TemplateCorrelationFFT
 	 */
 	CORRELATION,
 
 	/**
 	 * Squared Difference normed error
 	 *
-	 * @see boofcv.alg.feature.detect.template.TemplateSqDiffNormed
+	 * @see boofcv.alg.template.TemplateSqDiffNormed
 	 */
 	SQUARED_DIFFERENCE_NORMED,
 }

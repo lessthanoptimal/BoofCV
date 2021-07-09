@@ -16,7 +16,7 @@
  * limitations under the License.
  */
 
-package boofcv.alg.feature.detect.template;
+package boofcv.alg.template;
 
 import boofcv.alg.misc.GImageMiscOps;
 import boofcv.struct.image.GrayF32;

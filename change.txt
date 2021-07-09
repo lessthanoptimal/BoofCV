@@ -9,6 +9,7 @@ Version : 0.38
 - Build
   * Updated to Gradle 6.8.3
   * Now uses Toolchains. This should eliminate problems caused by people using an incompatible JDK.
+  * Move template from feature package into recognition package since recognition is what it does
 - Examples
   * Added an example for computing a trifocal tensor
   * Added an example showing how the trifocal tensor can be used
@@ -39,13 +40,12 @@ Version : 0.38
   * Re-ordered loops to speed up vertical convolution for inner image. 1.2x to 3x faster. Except for U8_I16
   * Added Scharr Gradient 3x3
   * Added Template Squared Difference Normed. Thanks rthaenert for the feature request
+  * Wolf and Niback Binarization
 - Image Features
   * Fast Corners are now concurrent
   * SIFT the entire scale space is computed at once. This might result in a net ~10% increase memory.
   * SIFT fixed bug where it was not respecting maximum feature detections.
   * SIFT concurrent implementation is running. Single thread is about 3% slower.
-- Image Processing
-  * Wolf and Niback Binarization
 - Image Recognition
   * Added: Bag-of-Words Nearest Neighbor search with Inverted Files
   * Added: Nister, Stewenius, "Scalable recognition with a vocabulary tree", CVPR 2006
