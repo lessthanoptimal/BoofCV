@@ -26,6 +26,7 @@ allprojects {
 project.ext.set("deepboof_version", '0.5.1')
 project.ext.set("lombok_version", '1.18.18')
 project.ext.set("errorprone_version", '2.7.1')
+project.ext.set("jabel_version", '0.4.1')
 
 // Which native platforms are supported can be specified in the command line.  Otherwise
 // the default is to support all of them
@@ -113,7 +114,7 @@ subprojects {
     }
 
     dependencies {
-        api(group: 'org.georegression', name: 'georegression', version: '0.24-SNAPSHOT')
+        api(group: 'org.georegression', name: 'georegression', version: '0.24')
         api(group: 'org.ddogleg', name: 'ddogleg', version: '0.20')
 
         api group: 'net.sf.trove4j', name: 'trove4j', version: '3.0.3'
@@ -147,11 +148,11 @@ subprojects {
         }
 
         // needed to use Java 11+ syntax with Java 1.8 byte code
-        annotationProcessor('com.github.bsideup.jabel:jabel-javac-plugin:0.3.0')
-        noautoAnnotationProcessor('com.github.bsideup.jabel:jabel-javac-plugin:0.3.0')
-        testAnnotationProcessor('com.github.bsideup.jabel:jabel-javac-plugin:0.3.0')
-        benchmarkAnnotationProcessor('com.github.bsideup.jabel:jabel-javac-plugin:0.3.0')
-        generateAnnotationProcessor('com.github.bsideup.jabel:jabel-javac-plugin:0.3.0')
+        annotationProcessor("com.github.bsideup.jabel:jabel-javac-plugin:${project.jabel_version}")
+        noautoAnnotationProcessor("com.github.bsideup.jabel:jabel-javac-plugin:${project.jabel_version}")
+        testAnnotationProcessor("com.github.bsideup.jabel:jabel-javac-plugin:${project.jabel_version}")
+        benchmarkAnnotationProcessor("com.github.bsideup.jabel:jabel-javac-plugin:${project.jabel_version}")
+        generateAnnotationProcessor("com.github.bsideup.jabel:jabel-javac-plugin:${project.jabel_version}")
 
         annotationProcessor "org.projectlombok:lombok:${project.lombok_version}"  // @Getter @Setter
         noautoAnnotationProcessor "org.projectlombok:lombok:${project.lombok_version}"  // @Getter @Setter

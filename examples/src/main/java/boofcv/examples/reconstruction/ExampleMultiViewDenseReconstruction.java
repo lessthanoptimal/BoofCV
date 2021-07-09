@@ -104,8 +104,8 @@ public class ExampleMultiViewDenseReconstruction {
 			@Override
 			public void handlePairDisparity( String left, String right, GrayU8 rect0, GrayU8 rect1,
 											 GrayF32 disparity, GrayU8 mask, DisparityParameters parameters ) {
-				// Displaying individual stereo pair results can be very useful for debugging, but this isn't done
-				// because of the amount of information it would show
+				// Uncomment to display individual stereo pairs. Commented out by default because it generates
+				// a LOT of windows
 //				BufferedImage outLeft = ConvertBufferedImage.convertTo(rect0, null);
 //				BufferedImage outRight = ConvertBufferedImage.convertTo(rect1, null);
 //
