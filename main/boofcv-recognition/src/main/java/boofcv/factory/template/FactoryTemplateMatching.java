@@ -16,10 +16,10 @@
  * limitations under the License.
  */
 
-package boofcv.factory.feature.detect.template;
+package boofcv.factory.template;
 
-import boofcv.alg.feature.detect.template.*;
-import boofcv.alg.feature.detect.template.TemplateIntensityImage.EvaluatorMethod;
+import boofcv.alg.template.*;
+import boofcv.alg.template.TemplateIntensityImage.EvaluatorMethod;
 import boofcv.concurrency.BoofConcurrency;
 import boofcv.struct.image.GrayF32;
 import boofcv.struct.image.GrayU8;

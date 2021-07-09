@@ -16,7 +16,7 @@
  * limitations under the License.
  */
 
-package boofcv.alg.feature.detect.template;
+package boofcv.alg.template;
 
 import boofcv.struct.image.GrayF32;
 import boofcv.struct.image.GrayU8;
@@ -24,15 +24,15 @@ import boofcv.struct.image.ImageBase;
 
 /**
  * <p>
- * Scores the difference between the template and the image using sum of absolute difference (SAD) error.
+ * Scores the difference between the template and the image using sum of squared error (SSE).
  * The error is multiplied by -1 to ensure that the best fits are peaks and not minimums.
  * </p>
  *
- * <p> error = -1*Sum<sub>(o,u)</sub> |I(x,y) - T(x-o,y-u)| </p>
+ * <p> error = -1*Sum<sub>(o,u)</sub> [I(x,y) - T(x-o,y-u)]^2 </p>
  *
  * @author Peter Abeles
  */
-public abstract class TemplateSumAbsoluteDifference<T extends ImageBase<T>>
+public abstract class TemplateSumSquaredError<T extends ImageBase<T>>
 		implements TemplateIntensityImage.EvaluatorMethod<T> {
 	TemplateIntensityImage<T> o;
 
@@ -42,11 +42,14 @@ public abstract class TemplateSumAbsoluteDifference<T extends ImageBase<T>>
 	}
 	// IF MORE IMAGE TYPES ARE ADDED CREATE A GENERATOR FOR THIS CLASS
 
-	public static class F32 extends TemplateSumAbsoluteDifference<GrayF32> {
+	public static class F32 extends TemplateSumSquaredError<GrayF32> {
 		@Override
 		public float evaluate( int tl_x, int tl_y ) {
 
 			float total = 0;
+
+			// Reduce chance of numerical overflow and delay conversion to float
+			float div = 255.0f*255.0f;
 
 			for (int y = 0; y < o.template.height; y++) {
 				int imageIndex = o.image.startIndex + (tl_y + y)*o.image.stride + tl_x;
@@ -54,9 +57,10 @@ public abstract class TemplateSumAbsoluteDifference<T extends ImageBase<T>>
 
 				float rowTotal = 0.0f;
 				for (int x = 0; x < o.template.width; x++) {
-					rowTotal += Math.abs(o.image.data[imageIndex++] - o.template.data[templateIndex++]);
+					float error = (o.image.data[imageIndex++] - o.template.data[templateIndex++]);
+					rowTotal += error*error;
 				}
-				total += rowTotal;
+				total += rowTotal/div;
 			}
 
 			return total;
@@ -65,6 +69,9 @@ public abstract class TemplateSumAbsoluteDifference<T extends ImageBase<T>>
 		@Override
 		public float evaluateMask( int tl_x, int tl_y ) {
 			float total = 0;
+
+			// Reduce chance of numerical overflow and delay conversion to float
+			float div = 255.0f*255.0f;
 
 			for (int y = 0; y < o.template.height; y++) {
 				int imageIndex = o.image.startIndex + (tl_y + y)*o.image.stride + tl_x;
@@ -73,20 +80,24 @@ public abstract class TemplateSumAbsoluteDifference<T extends ImageBase<T>>
 
 				float rowTotal = 0.0f;
 				for (int x = 0; x < o.template.width; x++) {
-					rowTotal += o.mask.data[maskIndex++]*Math.abs(o.image.data[imageIndex++] - o.template.data[templateIndex++]);
+					float error = o.image.data[imageIndex++] - o.template.data[templateIndex++];
+					rowTotal += o.mask.data[maskIndex++]*error*error;
 				}
-				total += rowTotal;
+				total += rowTotal/div;
 			}
 
 			return total;
 		}
 	}
 
-	public static class U8 extends TemplateSumAbsoluteDifference<GrayU8> {
+	public static class U8 extends TemplateSumSquaredError<GrayU8> {
 		@Override
 		public float evaluate( int tl_x, int tl_y ) {
 
 			float total = 0;
+
+			// Reduce chance of numerical overflow and delay conversion to float
+			float div = 255.0f*255.0f;
 
 			for (int y = 0; y < o.template.height; y++) {
 				int imageIndex = o.image.startIndex + (tl_y + y)*o.image.stride + tl_x;
@@ -94,10 +105,11 @@ public abstract class TemplateSumAbsoluteDifference<T extends ImageBase<T>>
 
 				int rowTotal = 0;
 				for (int x = 0; x < o.template.width; x++) {
-					rowTotal += Math.abs((o.image.data[imageIndex++] & 0xFF) - (o.template.data[templateIndex++] & 0xFF));
+					int error = (o.image.data[imageIndex++] & 0xFF) - (o.template.data[templateIndex++] & 0xFF);
+					rowTotal += error*error;
 				}
 
-				total += rowTotal;
+				total += rowTotal/div;
 			}
 
 			return total;
@@ -107,6 +119,9 @@ public abstract class TemplateSumAbsoluteDifference<T extends ImageBase<T>>
 		public float evaluateMask( int tl_x, int tl_y ) {
 
 			float total = 0;
+
+			// Reduce chance of numerical overflow and delay conversion to float
+			float div = 255.0f*255.0f;
 
 			for (int y = 0; y < o.template.height; y++) {
 				int imageIndex = o.image.startIndex + (tl_y + y)*o.image.stride + tl_x;
@@ -116,10 +131,11 @@ public abstract class TemplateSumAbsoluteDifference<T extends ImageBase<T>>
 				int rowTotal = 0;
 				for (int x = 0; x < o.template.width; x++) {
 					int m = o.mask.data[maskIndex++] & 0xFF;
-					rowTotal += m*Math.abs((o.image.data[imageIndex++] & 0xFF) - (o.template.data[templateIndex++] & 0xFF));
+					int error = (o.image.data[imageIndex++] & 0xFF) - (o.template.data[templateIndex++] & 0xFF);
+					rowTotal += m*error*error;
 				}
 
-				total += rowTotal;
+				total += rowTotal/div;
 			}
 
 			return total;

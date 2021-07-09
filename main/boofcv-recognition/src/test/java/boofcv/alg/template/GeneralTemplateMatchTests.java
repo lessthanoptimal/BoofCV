@@ -16,7 +16,7 @@
  * limitations under the License.
  */
 
-package boofcv.alg.feature.detect.template;
+package boofcv.alg.template;
 
 import boofcv.BoofTesting;
 import boofcv.abst.feature.detect.extract.ConfigExtract;

@@ -16,14 +16,14 @@
  * limitations under the License.
  */
 
-package boofcv.examples.features;
+package boofcv.examples.recognition;
 
-import boofcv.alg.feature.detect.template.TemplateMatching;
-import boofcv.alg.feature.detect.template.TemplateMatchingIntensity;
 import boofcv.alg.misc.ImageStatistics;
 import boofcv.alg.misc.PixelMath;
-import boofcv.factory.feature.detect.template.FactoryTemplateMatching;
-import boofcv.factory.feature.detect.template.TemplateScoreType;
+import boofcv.alg.template.TemplateMatching;
+import boofcv.alg.template.TemplateMatchingIntensity;
+import boofcv.factory.template.FactoryTemplateMatching;
+import boofcv.factory.template.TemplateScoreType;
 import boofcv.gui.image.ShowImages;
 import boofcv.gui.image.VisualizeImageData;
 import boofcv.io.UtilIO;

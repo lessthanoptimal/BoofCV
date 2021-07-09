@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -16,7 +16,7 @@
  * limitations under the License.
  */
 
-package boofcv.alg.feature.detect.template;
+package boofcv.alg.template;
 
 import boofcv.struct.image.GrayF32;
 import boofcv.struct.image.GrayU8;
@@ -26,19 +26,19 @@ import org.junit.jupiter.api.Nested;
 /**
  * @author Peter Abeles
  */
-class TestTemplateNCC_MT extends BoofStandardJUnit {
+class TestTemplateSumSquaredError_MT extends BoofStandardJUnit {
 
 	@Nested
 	class F32 extends GeneralTemplateIntensityImage_MT<GrayF32> {
 		F32() {
-			super(new TemplateNCC.F32(), GrayF32.class);
+			super(new TemplateSumSquaredError.F32(), GrayF32.class);
 		}
 	}
 
 	@Nested
 	class U8 extends GeneralTemplateIntensityImage_MT<GrayU8> {
 		U8() {
-			super(new TemplateNCC.U8(), GrayU8.class);
+			super(new TemplateSumSquaredError.U8(), GrayU8.class);
 		}
 	}
 }
