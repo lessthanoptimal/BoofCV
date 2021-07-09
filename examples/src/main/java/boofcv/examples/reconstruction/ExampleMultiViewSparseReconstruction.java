@@ -149,8 +149,6 @@ public class ExampleMultiViewSparseReconstruction {
 					imageFiles.add(imageFile.getPath());
 					// This is commented out for what appears to be a JRE bug.
 					// V  [libjvm.so+0xdc4059]  SWPointer::SWPointer(MemNode*, SuperWord*, Node_Stack*, bool)
-//				if (imageFile.exists())
-//					continue;
 					UtilImageIO.saveImage(image, imageFile.getPath());
 				}
 			}, "Video Decoding");
@@ -163,9 +161,6 @@ public class ExampleMultiViewSparseReconstruction {
 			} else {
 				similarImagesFromUnsorted();
 			}
-
-//			var savePath = new File(workDirectory, "similar.yaml");
-//			MultiViewIO.save(similarImages, savePath.getPath());
 		}
 
 		if (pairwise == null)
@@ -198,7 +193,7 @@ public class ExampleMultiViewSparseReconstruction {
 	 */
 	private void similarImagesFromSequence() {
 		System.out.println("----------------------------------------------------------------------------");
-		System.out.println("### Creating Similar Images from an oredered set of images");
+		System.out.println("### Creating Similar Images from an ordered set of images");
 
 		// Configure the KLT tracker
 		ConfigPointTracker configTracker = FactorySceneRecognition.createDefaultTrackerConfig();
@@ -230,7 +225,7 @@ public class ExampleMultiViewSparseReconstruction {
 				tracker.spawnTracks();
 				tracker.getActiveTracks(activeTracks);
 				dbSimilar.processFrame(frame, activeTracks, tracker.getFrameID());
-				String id = frameId + "";//trackerSimilar.frames.getTail().frameID;
+				String id = frameId + "";
 				System.out.println("frame id = " + id + " active=" + activeCount + " dropped=" + droppedCount);
 
 				// Everything maps to the same camera
