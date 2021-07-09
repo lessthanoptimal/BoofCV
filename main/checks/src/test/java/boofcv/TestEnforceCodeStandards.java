@@ -18,23 +18,22 @@
 
 package boofcv;
 
-import boofcv.generate.CodeGeneratorBase;
 import boofcv.io.UtilIO;
 import boofcv.testing.BoofStandardJUnit;
 import org.apache.commons.io.FileUtils;
-import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.io.filefilter.DirectoryFileFilter;
 import org.apache.commons.io.filefilter.RegexFileFilter;
 import org.junit.jupiter.api.Test;
 
-import java.io.*;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
-import java.util.concurrent.TimeUnit;
-import java.util.regex.Pattern;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -243,46 +242,46 @@ public class TestEnforceCodeStandards {
 		assertEquals(0, invalid.size());
 	}
 
-	private void generateDefaultConfigTest( File file ) throws IOException {
-		String[] dirs = file.getAbsolutePath().split(Pattern.quote(File.separator));
-
-		int start = dirs.length - 1;
-		while (start >= 0 && !dirs[start].equals("java")) {
-			start--;
-		}
-		if (start < 0)
-			fail("Couldn't find src");
-
-		String path = dirs[start + 1];
-		for (int i = start + 2; i < dirs.length - 1; i++) {
-			path += "." + dirs[i];
-		}
-
-		String className = FilenameUtils.getBaseName(file.getName());
-
-		if (!file.getParentFile().exists())
-			assertTrue(file.getParentFile().mkdirs());
-		assertTrue(file.createNewFile());
-		var out = new PrintStream(new FileOutputStream(file, false), true, "UTF-8");
-		out.println(CodeGeneratorBase.copyright);
-		out.println();
-		out.println("package " + path + ";");
-		out.println();
-		out.println("import boofcv.struct.StandardConfigurationChecks;");
-		out.println();
-		out.println("public class " + className + " extends StandardConfigurationChecks {}");
-		out.println();
-		out.close();
-
-		Runtime rt = Runtime.getRuntime();
-		try {
-			Process pr = rt.exec("git add " + file.getAbsolutePath());
-			if (!pr.waitFor(10000, TimeUnit.MILLISECONDS)) {
-				fail("Couldn't add new file to git");
-			}
-		} catch (Exception e) {
-			e.printStackTrace();
-			fail(e.getMessage());
-		}
-	}
+//	private void generateDefaultConfigTest( File file ) throws IOException {
+//		String[] dirs = file.getAbsolutePath().split(Pattern.quote(File.separator));
+//
+//		int start = dirs.length - 1;
+//		while (start >= 0 && !dirs[start].equals("java")) {
+//			start--;
+//		}
+//		if (start < 0)
+//			fail("Couldn't find src");
+//
+//		String path = dirs[start + 1];
+//		for (int i = start + 2; i < dirs.length - 1; i++) {
+//			path += "." + dirs[i];
+//		}
+//
+//		String className = FilenameUtils.getBaseName(file.getName());
+//
+//		if (!file.getParentFile().exists())
+//			assertTrue(file.getParentFile().mkdirs());
+//		assertTrue(file.createNewFile());
+//		var out = new PrintStream(new FileOutputStream(file, false), true, "UTF-8");
+//		out.println(CodeGeneratorBase.copyright);
+//		out.println();
+//		out.println("package " + path + ";");
+//		out.println();
+//		out.println("import boofcv.struct.StandardConfigurationChecks;");
+//		out.println();
+//		out.println("public class " + className + " extends StandardConfigurationChecks {}");
+//		out.println();
+//		out.close();
+//
+//		Runtime rt = Runtime.getRuntime();
+//		try {
+//			Process pr = rt.exec("git add " + file.getAbsolutePath());
+//			if (!pr.waitFor(10000, TimeUnit.MILLISECONDS)) {
+//				fail("Couldn't add new file to git");
+//			}
+//		} catch (Exception e) {
+//			e.printStackTrace();
+//			fail(e.getMessage());
+//		}
+//	}
 }

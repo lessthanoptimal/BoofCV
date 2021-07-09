@@ -57,10 +57,12 @@ public class ExampleWebcamObjectTracking<T extends ImageBase<T>> extends JPanel
 	Point2D_I32 point0 = new Point2D_I32();
 	Point2D_I32 point1 = new Point2D_I32();
 
-	int desiredWidth,desiredHeight;
+	int desiredWidth, desiredHeight;
 	volatile int mode = 0;
 
+	final Object lockGUI = new Object();
 	BufferedImage workImage;
+	//----- END owned by locck
 
 	JFrame window;
 
@@ -72,8 +74,7 @@ public class ExampleWebcamObjectTracking<T extends ImageBase<T>> extends JPanel
 	 * @param desiredHeight Desired height of the input stream
 	 */
 	public ExampleWebcamObjectTracking( TrackerObjectQuad<T> tracker,
-										int desiredWidth , int desiredHeight)
-	{
+										int desiredWidth, int desiredHeight ) {
 		this.tracker = tracker;
 		this.desiredWidth = desiredWidth;
 		this.desiredHeight = desiredHeight;
@@ -90,7 +91,7 @@ public class ExampleWebcamObjectTracking<T extends ImageBase<T>> extends JPanel
 	 * Invoke to start the main processing loop.
 	 */
 	public void process() {
-		Webcam webcam = UtilWebcamCapture.openDefault(desiredWidth,desiredHeight);
+		Webcam webcam = UtilWebcamCapture.openDefault(desiredWidth, desiredHeight);
 
 		// adjust the window size and let the GUI know it has changed
 		Dimension actualSize = webcam.getViewSize();
@@ -101,39 +102,39 @@ public class ExampleWebcamObjectTracking<T extends ImageBase<T>> extends JPanel
 		window.setVisible(true);
 
 		// create
-		T input = tracker.getImageType().createImage(actualSize.width,actualSize.height);
+		T input = tracker.getImageType().createImage(actualSize.width, actualSize.height);
 
-		workImage = new BufferedImage(input.getWidth(),input.getHeight(),BufferedImage.TYPE_INT_RGB);
+		workImage = new BufferedImage(input.getWidth(), input.getHeight(), BufferedImage.TYPE_INT_RGB);
 
-		while( true ) {
+		while (true) {
 			BufferedImage buffered = webcam.getImage();
-			if( buffered == null ) break;
-			ConvertBufferedImage.convertFrom(webcam.getImage(),input,true);
+			if (buffered == null) break;
+			ConvertBufferedImage.convertFrom(webcam.getImage(), input, true);
 
 			// mode is read/written to by the GUI also
 			int mode = this.mode;
 
 			boolean success = false;
-			if( mode == 2 ) {
+			if (mode == 2) {
 				Rectangle2D_F64 rect = new Rectangle2D_F64();
 				rect.setTo(point0.x, point0.y, point1.x, point1.y);
 				UtilPolygons2D_F64.convert(rect, target);
-				success = tracker.initialize(input,target);
+				success = tracker.initialize(input, target);
 				this.mode = success ? 3 : 0;
-			} else if( mode == 3 ) {
-				success = tracker.process(input,target);
+			} else if (mode == 3) {
+				success = tracker.process(input, target);
 			}
 
-			synchronized( workImage ) {
+			synchronized (lockGUI) {
 				// copy the latest image into the work buffered
 				Graphics2D g2 = workImage.createGraphics();
-				g2.drawImage(buffered,0,0,null);
+				g2.drawImage(buffered, 0, 0, null);
 
 				// visualize the current results
 				if (mode == 1) {
 					drawSelected(g2);
 				} else if (mode == 3) {
-					if( success ) {
+					if (success) {
 						drawTrack(g2);
 					}
 				}
@@ -144,76 +145,76 @@ public class ExampleWebcamObjectTracking<T extends ImageBase<T>> extends JPanel
 	}
 
 	@Override
-	public void paint (Graphics g) {
-		if( workImage != null ) {
-			// draw the work image and be careful to make sure it isn't being manipulated at the same time
-			synchronized (workImage) {
-				((Graphics2D) g).drawImage(workImage, 0, 0, null);
+	public void paint( Graphics g ) {
+		synchronized (lockGUI) {
+			if (workImage != null) {
+				// draw the work image and be careful to make sure it isn't being manipulated at the same time
+				g.drawImage(workImage, 0, 0, null);
 			}
 		}
 	}
 
 	private void drawSelected( Graphics2D g2 ) {
 		g2.setColor(Color.RED);
-		g2.setStroke( new BasicStroke(3));
-		g2.drawLine(point0.getX(),point0.getY(),point1.getX(),point0.getY());
-		g2.drawLine(point1.getX(),point0.getY(),point1.getX(),point1.getY());
-		g2.drawLine(point1.getX(),point1.getY(),point0.getX(),point1.getY());
-		g2.drawLine(point0.getX(),point1.getY(),point0.getX(),point0.getY());
+		g2.setStroke(new BasicStroke(3));
+		g2.drawLine(point0.getX(), point0.getY(), point1.getX(), point0.getY());
+		g2.drawLine(point1.getX(), point0.getY(), point1.getX(), point1.getY());
+		g2.drawLine(point1.getX(), point1.getY(), point0.getX(), point1.getY());
+		g2.drawLine(point0.getX(), point1.getY(), point0.getX(), point0.getY());
 	}
 
 	private void drawTrack( Graphics2D g2 ) {
 		g2.setStroke(new BasicStroke(3));
 		g2.setColor(Color.RED);
-		g2.drawLine((int)target.a.getX(),(int)target.a.getY(),(int)target.b.getX(),(int)target.b.getY());
+		g2.drawLine((int)target.a.getX(), (int)target.a.getY(), (int)target.b.getX(), (int)target.b.getY());
 		g2.setColor(Color.BLUE);
-		g2.drawLine((int)target.b.getX(),(int)target.b.getY(),(int)target.c.getX(),(int)target.c.getY());
+		g2.drawLine((int)target.b.getX(), (int)target.b.getY(), (int)target.c.getX(), (int)target.c.getY());
 		g2.setColor(Color.GREEN);
-		g2.drawLine((int)target.c.getX(),(int)target.c.getY(),(int)target.d.getX(),(int)target.d.getY());
+		g2.drawLine((int)target.c.getX(), (int)target.c.getY(), (int)target.d.getX(), (int)target.d.getY());
 		g2.setColor(Color.DARK_GRAY);
-		g2.drawLine((int)target.d.getX(),(int)target.d.getY(),(int)target.a.getX(),(int)target.a.getY());
+		g2.drawLine((int)target.d.getX(), (int)target.d.getY(), (int)target.a.getX(), (int)target.a.getY());
 	}
 
 	private void drawTarget( Graphics2D g2 ) {
 		g2.setColor(Color.RED);
-		g2.setStroke( new BasicStroke(2));
-		g2.drawLine(point0.getX(),point0.getY(),point1.getX(),point0.getY());
-		g2.drawLine(point1.getX(),point0.getY(),point1.getX(),point1.getY());
-		g2.drawLine(point1.getX(),point1.getY(),point0.getX(),point1.getY());
-		g2.drawLine(point0.getX(),point1.getY(),point0.getX(),point0.getY());
+		g2.setStroke(new BasicStroke(2));
+		g2.drawLine(point0.getX(), point0.getY(), point1.getX(), point0.getY());
+		g2.drawLine(point1.getX(), point0.getY(), point1.getX(), point1.getY());
+		g2.drawLine(point1.getX(), point1.getY(), point0.getX(), point1.getY());
+		g2.drawLine(point0.getX(), point1.getY(), point0.getX(), point0.getY());
 	}
 
 	@Override
-	public void mousePressed(MouseEvent e) {
-		point0.setTo(e.getX(),e.getY());
-		point1.setTo(e.getX(),e.getY());
+	public void mousePressed( MouseEvent e ) {
+		point0.setTo(e.getX(), e.getY());
+		point1.setTo(e.getX(), e.getY());
 		mode = 1;
 	}
 
 	@Override
-	public void mouseReleased(MouseEvent e) {
-		point1.setTo(e.getX(),e.getY());
+	public void mouseReleased( MouseEvent e ) {
+		point1.setTo(e.getX(), e.getY());
 		mode = 2;
 	}
 
-	@Override public void mouseClicked(MouseEvent e) {mode = 0;}
+	@Override public void mouseClicked( MouseEvent e ) {mode = 0;}
 
-	@Override public void mouseEntered(MouseEvent e) {}
+	@Override public void mouseEntered( MouseEvent e ) {}
 
-	@Override public void mouseExited(MouseEvent e) {}
+	@Override public void mouseExited( MouseEvent e ) {}
 
-	@Override public void mouseDragged(MouseEvent e) {
-		if( mode == 1 ) {
-			point1.setTo(e.getX(),e.getY());
+	@Override public void mouseDragged( MouseEvent e ) {
+		if (mode == 1) {
+			point1.setTo(e.getX(), e.getY());
 		}
 	}
 
 	@Override
-	public void mouseMoved(MouseEvent e) {}
+	public void mouseMoved( MouseEvent e ) {}
 
-	public static void main(String[] args) {
+	public static void main( String[] args ) {
 
-		ImageType<Planar<GrayU8>> colorType = ImageType.pl(3,GrayU8.class);
+		ImageType<Planar<GrayU8>> colorType = ImageType.pl(3, GrayU8.class);
 
 		TrackerObjectQuad tracker =
 				FactoryTrackerObjectQuad.circulant(null, GrayU8.class);
@@ -224,7 +225,7 @@ public class ExampleWebcamObjectTracking<T extends ImageBase<T>> extends JPanel
 //				FactoryTrackerObjectQuad.meanShiftLikelihood(30,5,255, MeanShiftLikelihoodType.HISTOGRAM,colorType);
 
 
-		ExampleWebcamObjectTracking app = new ExampleWebcamObjectTracking(tracker,640,480);
+		ExampleWebcamObjectTracking app = new ExampleWebcamObjectTracking(tracker, 640, 480);
 
 		app.process();
 	}

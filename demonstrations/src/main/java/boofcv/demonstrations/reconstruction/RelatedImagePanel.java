@@ -151,7 +151,7 @@ public class RelatedImagePanel extends JPanel {
 	/**
 	 * Draws the image and the image's name below it.
 	 */
-	class ImageLabeledPanel extends JSpringPanel {
+	static class ImageLabeledPanel extends JSpringPanel {
 		VisualizeImage image = new VisualizeImage();
 		int heightOfLabels;
 

@@ -165,7 +165,7 @@ public class TestSceneMergingOperations extends BoofStandardJUnit {
 			b.id = "" + j; // 2 of the views will have the same ID
 
 			SceneWorkingGraph.View wa = src.addView(a, cameraSrc);
-			SceneWorkingGraph.View wb = dst.addView(b, cameraDst);
+			dst.addView(b, cameraDst);
 
 			wa.world_to_view.T.setTo(i, 0, 0);
 		}

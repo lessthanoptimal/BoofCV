@@ -22,7 +22,6 @@ import boofcv.abst.feature.associate.AssociateDescription2DDefault;
 import boofcv.abst.feature.describe.DescribePointRadiusAngleAbstract;
 import boofcv.abst.tracker.PointTrackerDefault;
 import boofcv.alg.structure.EpipolarScore3D;
-import boofcv.misc.ModelGeneratorDefault;
 import boofcv.struct.calib.CameraPinholeBrown;
 import boofcv.struct.feature.AssociatedIndex;
 import boofcv.struct.feature.TupleDesc_F64;
@@ -30,7 +29,6 @@ import boofcv.struct.geo.AssociatedPair;
 import boofcv.struct.image.GrayF32;
 import boofcv.struct.image.ImageBase;
 import boofcv.testing.BoofStandardJUnit;
-import georegression.struct.homography.Homography2D_F64;
 import org.ddogleg.struct.DogArray;
 import org.ddogleg.struct.DogArray_I32;
 import org.ddogleg.struct.FastAccess;
@@ -208,18 +206,6 @@ class TestSelectFramesForReconstruction3D extends BoofStandardJUnit {
 				ret.grow();
 			}
 			return ret;
-		}
-	}
-
-	private static class MockModelGenerator extends ModelGeneratorDefault<Homography2D_F64, AssociatedPair> {
-		double delta;
-
-		public MockModelGenerator( double delta ) { this.delta = delta; }
-
-		@Override public boolean generate( List<AssociatedPair> dataSet, Homography2D_F64 output ) {
-			output.reset();
-			output.a13 += delta;
-			return true;
 		}
 	}
 
