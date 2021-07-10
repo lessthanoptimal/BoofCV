@@ -571,6 +571,7 @@ public class CameraCalibration extends BaseStandardInputApp {
 						switch (formatType) {
 							case BOOFCV -> CalibrationIO.save(m, outputFilePath);
 							case OPENCV -> CalibrationIO.saveOpencv(m, outputFilePath);
+							default -> throw new IllegalArgumentException("Unknown format");
 						}
 						m.print();
 					}
@@ -582,7 +583,8 @@ public class CameraCalibration extends BaseStandardInputApp {
 					default -> throw new RuntimeException("Unknown model type. " + modeType);
 				}
 				System.out.println();
-				System.out.println("Save file format " + formatType);
+				System.out.println("Save file format: " + formatType);
+				System.out.println("Destination:      " + outputFilePath);
 				System.out.println();
 			}
 		} catch (RuntimeException e) {
