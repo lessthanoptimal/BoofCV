@@ -51,7 +51,7 @@ public class ExampleComputeTrifocalTensor {
 	 * the tensor
 	 */
 	public static List<AssociatedTriple> imagesToTrifocal(
-			GrayU8 gray01, GrayU8 gray02, GrayU8 gray03, TrifocalTensor model) {
+			GrayU8 gray01, GrayU8 gray02, GrayU8 gray03, TrifocalTensor model ) {
 		// Using SURF features. Robust and fairly fast to compute
 		var configDetector = new ConfigFastHessian();
 		configDetector.maxFeaturesAll = 2500; // limit the feature count
@@ -72,7 +72,7 @@ public class ExampleComputeTrifocalTensor {
 
 		// Convert the matched indexes into AssociatedTriple which contain the actual pixel coordinates
 		var associated = new DogArray<>(AssociatedTriple::new);
-		associatedIdx.forEach(p->associated.grow().setTo(
+		associatedIdx.forEach(p -> associated.grow().setTo(
 				associateThree.locations01.get(p.a),
 				associateThree.locations02.get(p.b),
 				associateThree.locations03.get(p.c)));

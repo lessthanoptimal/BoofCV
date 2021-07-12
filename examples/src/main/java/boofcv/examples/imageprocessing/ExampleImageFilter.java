@@ -49,9 +49,9 @@ import java.awt.image.BufferedImage;
 @SuppressWarnings({"unchecked"})
 public class ExampleImageFilter {
 
-	private static int blurRadius = 10;
+	private static final int blurRadius = 10;
 
-	private static ListDisplayPanel panel = new ListDisplayPanel();
+	private static final ListDisplayPanel panel = new ListDisplayPanel();
 
 	public static void procedural( GrayU8 input ) {
 		GrayU8 blurred = new GrayU8(input.width, input.height);
@@ -74,7 +74,7 @@ public class ExampleImageFilter {
 		Class<T> inputType = (Class<T>)input.getClass();
 		Class<D> derivType = GImageDerivativeOps.getDerivativeType(inputType);
 
-		T blurred = (T)input.createSameShape();
+		T blurred = input.createSameShape();
 		D derivX = GeneralizedImageOps.createSingleBand(derivType, input.width, input.height);
 		D derivY = GeneralizedImageOps.createSingleBand(derivType, input.width, input.height);
 
@@ -94,7 +94,7 @@ public class ExampleImageFilter {
 		Class<T> inputType = (Class<T>)input.getClass();
 		Class<D> derivType = GImageDerivativeOps.getDerivativeType(inputType);
 
-		T blurred = (T)input.createSameShape();
+		T blurred = input.createSameShape();
 		D derivX = GeneralizedImageOps.createSingleBand(derivType, input.width, input.height);
 		D derivY = GeneralizedImageOps.createSingleBand(derivType, input.width, input.height);
 

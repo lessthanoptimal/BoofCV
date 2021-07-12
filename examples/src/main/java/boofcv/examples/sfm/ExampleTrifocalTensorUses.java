@@ -54,8 +54,8 @@ public class ExampleTrifocalTensorUses {
 
 		// Trifocal tensor to 3 compatible camera matrices
 		// Camera matrix for view-1, P1, is going to be identity
-		DMatrixRMaj P2 = new DMatrixRMaj(3,4);
-		DMatrixRMaj P3 = new DMatrixRMaj(3,4);
+		DMatrixRMaj P2 = new DMatrixRMaj(3, 4);
+		DMatrixRMaj P3 = new DMatrixRMaj(3, 4);
 		MultiViewOps.trifocalToCameraMatrices(tensor, P2, P3);
 		// These camera matrices are useful if doing a projective reconstruction.
 
@@ -69,8 +69,8 @@ public class ExampleTrifocalTensorUses {
 				predicted3.x/predicted3.z, predicted3.y/predicted3.z, match.p3.x, match.p3.y);
 
 		// You can get two fundamental matrices from the trifocal tensor
-		DMatrixRMaj F21 = new DMatrixRMaj(3,3);
-		DMatrixRMaj F31 = new DMatrixRMaj(3,3);
+		DMatrixRMaj F21 = new DMatrixRMaj(3, 3);
+		DMatrixRMaj F31 = new DMatrixRMaj(3, 3);
 		MultiViewOps.trifocalToFundamental(tensor, F21, F31);
 
 		// Scale is arbitrary so let's make it norm of 1
@@ -78,8 +78,8 @@ public class ExampleTrifocalTensorUses {
 		CommonOps_DDRM.divide(F31, NormOps_DDRM.normF(F31));
 
 		// Demonstration the epipolar constraint works here. This should be close to zero
-		System.out.println("x2'*F21*X1 = "+MultiViewOps.constraint(F21, match.p1, match.p2));
-		System.out.println("x3'*F31*X1 = "+MultiViewOps.constraint(F31, match.p1, match.p3));
+		System.out.println("x2'*F21*X1 = " + MultiViewOps.constraint(F21, match.p1, match.p2));
+		System.out.println("x3'*F31*X1 = " + MultiViewOps.constraint(F31, match.p1, match.p3));
 
 		// For examples of how a trifocal tensor can be used in self calibration see
 		// ExampleTrifocalStereoUncalibrated

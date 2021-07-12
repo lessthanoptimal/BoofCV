@@ -28,6 +28,7 @@ import boofcv.io.MediaManager;
 import boofcv.io.UtilIO;
 import boofcv.io.image.SimpleImageSequence;
 import boofcv.io.wrapper.DefaultMediaManager;
+import boofcv.misc.BoofMiscOps;
 import boofcv.struct.image.GrayF32;
 import boofcv.struct.image.GrayU8;
 import boofcv.struct.image.ImageBase;
@@ -43,7 +44,7 @@ import java.awt.image.BufferedImage;
  * @author Peter Abeles
  */
 public class ExampleBackgroundRemovalStationary {
-	public static void main(String[] args) {
+	public static void main( String[] args ) {
 		String fileName = UtilIO.pathExample("background/street_intersection.mp4");
 //		String fileName = UtilIO.pathExample("background/rubixfire.mp4"); // dynamic background
 //		String fileName = UtilIO.pathExample("background/horse_jitter.mp4"); // degraded performance because of jitter
@@ -67,10 +68,10 @@ public class ExampleBackgroundRemovalStationary {
 //				media.openCamera(null,640,480,background.getImageType());
 
 		// Declare storage for segmented image. 1 = moving foreground and 0 = background
-		GrayU8 segmented = new GrayU8(video.getWidth(),video.getHeight());
+		GrayU8 segmented = new GrayU8(video.getWidth(), video.getHeight());
 
-		BufferedImage visualized = new BufferedImage(segmented.width,segmented.height,BufferedImage.TYPE_INT_RGB);
-		ImageGridPanel gui = new ImageGridPanel(1,2);
+		var visualized = new BufferedImage(segmented.width, segmented.height, BufferedImage.TYPE_INT_RGB);
+		var gui = new ImageGridPanel(1, 2);
 		gui.setImages(visualized, visualized);
 
 		ShowImages.showWindow(gui, "Static Scene: Background Segmentation", true);
@@ -78,22 +79,22 @@ public class ExampleBackgroundRemovalStationary {
 		double fps = 0;
 		double alpha = 0.01; // smoothing factor for FPS
 
-		while( video.hasNext() ) {
+		while (video.hasNext()) {
 			ImageBase input = video.next();
 
 			long before = System.nanoTime();
-			background.updateBackground(input,segmented);
+			background.updateBackground(input, segmented);
 			long after = System.nanoTime();
 
-			fps = (1.0-alpha)*fps + alpha*(1.0/((after-before)/1e9));
+			fps = (1.0 - alpha)*fps + alpha*(1.0/((after - before)/1e9));
 
 			VisualizeBinaryData.renderBinary(segmented, false, visualized);
 			gui.setImage(0, 0, (BufferedImage)video.getGuiImage());
 			gui.setImage(0, 1, visualized);
 			gui.repaint();
-			System.out.println("FPS = "+fps);
+			System.out.println("FPS = " + fps);
 
-			try {Thread.sleep(5);} catch (InterruptedException e) {}
+			BoofMiscOps.sleep(5);
 		}
 		System.out.println("done!");
 	}

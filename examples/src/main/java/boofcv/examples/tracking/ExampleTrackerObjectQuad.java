@@ -47,7 +47,7 @@ import java.awt.image.BufferedImage;
  * @author Peter Abeles
  */
 public class ExampleTrackerObjectQuad {
-	public static void main(String[] args) {
+	public static void main( String[] args ) {
 		MediaManager media = DefaultMediaManager.INSTANCE;
 		String fileName = UtilIO.pathExample("tracking/wildcat_robot.mjpeg");
 
@@ -59,38 +59,38 @@ public class ExampleTrackerObjectQuad {
 //				FactoryTrackerObjectQuad.meanShiftComaniciu2003(new ConfigComaniciu2003(), ImageType.pl(3, GrayU8.class));
 //				FactoryTrackerObjectQuad.meanShiftComaniciu2003(new ConfigComaniciu2003(true),ImageType.pl(3,GrayU8.class));
 
-				// Mean-shift likelihood will fail in this video, but is excellent at tracking objects with
-				// a single unique color. See ExampleTrackerMeanShiftLikelihood
+		// Mean-shift likelihood will fail in this video, but is excellent at tracking objects with
+		// a single unique color. See ExampleTrackerMeanShiftLikelihood
 //				FactoryTrackerObjectQuad.meanShiftLikelihood(30,5,255, MeanShiftLikelihoodType.HISTOGRAM,ImageType.pl(3,GrayU8.class));
 
 		SimpleImageSequence video = media.openVideo(fileName, tracker.getImageType());
 
 		// specify the target's initial location and initialize with the first frame
-		Quadrilateral_F64 location = new Quadrilateral_F64(211.0,162.0,326.0,153.0,335.0,258.0,215.0,249.0);
+		Quadrilateral_F64 location = new Quadrilateral_F64(211.0, 162.0, 326.0, 153.0, 335.0, 258.0, 215.0, 249.0);
 		ImageBase frame = video.next();
-		tracker.initialize(frame,location);
+		tracker.initialize(frame, location);
 
 		// For displaying the results
-		TrackerObjectQuadPanel gui = new TrackerObjectQuadPanel(null);
-		gui.setPreferredSize(new Dimension(frame.getWidth(),frame.getHeight()));
+		var gui = new TrackerObjectQuadPanel(null);
+		gui.setPreferredSize(new Dimension(frame.getWidth(), frame.getHeight()));
 		gui.setImageUI((BufferedImage)video.getGuiImage());
-		gui.setTarget(location,true);
-		ShowImages.showWindow(gui,"Tracking Results", true);
+		gui.setTarget(location, true);
+		ShowImages.showWindow(gui, "Tracking Results", true);
 
 		// Track the object across each video frame and display the results
 		long previous = 0;
-		while( video.hasNext() ) {
+		while (video.hasNext()) {
 			frame = video.next();
 
-			boolean visible = tracker.process(frame,location);
+			boolean visible = tracker.process(frame, location);
 
-			gui.setImageUI((BufferedImage) video.getGuiImage());
+			gui.setImageUI((BufferedImage)video.getGuiImage());
 			gui.setTarget(location, visible);
 			gui.repaint();
 
 			// shoot for a specific frame rate
 			long time = System.currentTimeMillis();
-			BoofMiscOps.pause(Math.max(0,80-(time-previous)));
+			BoofMiscOps.pause(Math.max(0, 80 - (time - previous)));
 			previous = time;
 		}
 	}

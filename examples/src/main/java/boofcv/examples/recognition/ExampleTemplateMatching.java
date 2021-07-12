@@ -47,21 +47,21 @@ public class ExampleTemplateMatching {
 	/**
 	 * Demonstrates how to search for matches of a template inside an image
 	 *
-	 * @param image           Image being searched
-	 * @param template        Template being looked for
-	 * @param mask            Mask which determines the weight of each template pixel in the match score
+	 * @param image Image being searched
+	 * @param template Template being looked for
+	 * @param mask Mask which determines the weight of each template pixel in the match score
 	 * @param expectedMatches Number of expected matches it hopes to find
 	 * @return List of match location and scores
 	 */
-	private static List<Match> findMatches(GrayF32 image, GrayF32 template, GrayF32 mask,
-										   int expectedMatches) {
+	private static List<Match> findMatches( GrayF32 image, GrayF32 template, GrayF32 mask,
+											int expectedMatches ) {
 		// create template matcher.
 		TemplateMatching<GrayF32> matcher =
 				FactoryTemplateMatching.createMatcher(TemplateScoreType.SUM_SQUARE_ERROR, GrayF32.class);
 
 		// Find the points which match the template the best
 		matcher.setImage(image);
-		matcher.setTemplate(template, mask,expectedMatches);
+		matcher.setTemplate(template, mask, expectedMatches);
 		matcher.process();
 
 		return matcher.getResults().toList();
@@ -71,7 +71,7 @@ public class ExampleTemplateMatching {
 	 * Computes the template match intensity image and displays the results. Brighter intensity indicates
 	 * a better match to the template.
 	 */
-	private static void showMatchIntensity(GrayF32 image, GrayF32 template, GrayF32 mask) {
+	private static void showMatchIntensity( GrayF32 image, GrayF32 template, GrayF32 mask ) {
 		// create algorithm for computing intensity image
 		TemplateMatchingIntensity<GrayF32> matchIntensity =
 				FactoryTemplateMatching.createIntensity(TemplateScoreType.SUM_SQUARE_ERROR, GrayF32.class);
@@ -97,14 +97,14 @@ public class ExampleTemplateMatching {
 		ShowImages.showWindow(output, "Match Intensity", true);
 	}
 
-	public static void main(String[] args) {
+	public static void main( String[] args ) {
 		// Load image and templates
 		String directory = UtilIO.pathExample("template");
 
-		GrayF32 image = UtilImageIO.loadImage(directory ,"desktop.png", GrayF32.class);
-		GrayF32 templateCursor = UtilImageIO.loadImage(directory , "cursor.png", GrayF32.class);
-		GrayF32 maskCursor = UtilImageIO.loadImage(directory , "cursor_mask.png", GrayF32.class);
-		GrayF32 templatePaint = UtilImageIO.loadImage(directory , "paint.png", GrayF32.class);
+		GrayF32 image = UtilImageIO.loadImage(directory, "desktop.png", GrayF32.class);
+		GrayF32 templateCursor = UtilImageIO.loadImage(directory, "cursor.png", GrayF32.class);
+		GrayF32 maskCursor = UtilImageIO.loadImage(directory, "cursor_mask.png", GrayF32.class);
+		GrayF32 templatePaint = UtilImageIO.loadImage(directory, "paint.png", GrayF32.class);
 
 		// create output image to show results
 		BufferedImage output = new BufferedImage(image.width, image.height, BufferedImage.TYPE_INT_BGR);
@@ -112,36 +112,39 @@ public class ExampleTemplateMatching {
 		Graphics2D g2 = output.createGraphics();
 
 		// Search for the cursor in the image. For demonstration purposes it has been pasted 3 times
-		g2.setColor(Color.RED); g2.setStroke(new BasicStroke(5));
+		g2.setColor(Color.RED);
+		g2.setStroke(new BasicStroke(5));
 		drawRectangles(g2, image, templateCursor, maskCursor, 3);
 		// show match intensity image for this template
 		showMatchIntensity(image, templateCursor, maskCursor);
 
 		// Now it's try finding the cursor without a mask. it will get confused when the background is black
-		g2.setColor(Color.BLUE); g2.setStroke(new BasicStroke(2));
+		g2.setColor(Color.BLUE);
+		g2.setStroke(new BasicStroke(2));
 		drawRectangles(g2, image, templateCursor, null, 3);
 
 		// Now it searches for a specific icon for which there is only one match
-		g2.setColor(Color.ORANGE); g2.setStroke(new BasicStroke(3));
+		g2.setColor(Color.ORANGE);
+		g2.setStroke(new BasicStroke(3));
 		drawRectangles(g2, image, templatePaint, null, 1);
 
-		ShowImages.showWindow(output, "Found Matches",true);
+		ShowImages.showWindow(output, "Found Matches", true);
 	}
 
 	/**
 	 * Helper function will is finds matches and displays the results as colored rectangles
 	 */
-	private static void drawRectangles(Graphics2D g2,
-									   GrayF32 image, GrayF32 template, GrayF32 mask,
-									   int expectedMatches) {
+	private static void drawRectangles( Graphics2D g2,
+										GrayF32 image, GrayF32 template, GrayF32 mask,
+										int expectedMatches ) {
 		List<Match> found = findMatches(image, template, mask, expectedMatches);
 
 		int r = 2;
-		int w = template.width + 2 * r;
-		int h = template.height + 2 * r;
+		int w = template.width + 2*r;
+		int h = template.height + 2*r;
 
 		for (Match m : found) {
-			System.out.printf("Match %3d %3d    score = %6.2f\n",m.x,m.y,m.score);
+			System.out.printf("Match %3d %3d    score = %6.2f\n", m.x, m.y, m.score);
 			// this demonstrates how to filter out false positives
 			// the meaning of score will depend on the template technique
 //			if( m.score < -5 )  // This line is commented out for demonstration purposes

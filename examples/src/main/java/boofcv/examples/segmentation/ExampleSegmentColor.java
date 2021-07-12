@@ -48,16 +48,16 @@ public class ExampleSegmentColor {
 		ImagePanel gui = new ImagePanel(image);
 		gui.addMouseListener(new MouseAdapter() {
 			@Override
-			public void mouseClicked(MouseEvent e) {
+			public void mouseClicked( MouseEvent e ) {
 				float[] color = new float[3];
-				int rgb = image.getRGB(e.getX(),e.getY());
+				int rgb = image.getRGB(e.getX(), e.getY());
 				ColorHsv.rgbToHsv((rgb >> 16) & 0xFF, (rgb >> 8) & 0xFF, rgb & 0xFF, color);
-				System.out.println("H = " + color[0]+" S = "+color[1]+" V = "+color[2]);
+				System.out.println("H = " + color[0] + " S = " + color[1] + " V = " + color[2]);
 
-				showSelectedColor("Selected",image,color[0],color[1]);
+				showSelectedColor("Selected", image, color[0], color[1]);
 			}
 		});
-		ShowImages.showWindow(gui,"Color Selector");
+		ShowImages.showWindow(gui, "Color Selector");
 	}
 
 	/**
@@ -66,12 +66,12 @@ public class ExampleSegmentColor {
 	 * in RGB color, but is more problematic due to it not being intensity invariant. More robust techniques
 	 * can use Gaussian models instead of a uniform distribution, as is done below.
 	 */
-	public static void showSelectedColor( String name , BufferedImage image , float hue , float saturation ) {
-		Planar<GrayF32> input = ConvertBufferedImage.convertFromPlanar(image,null,true,GrayF32.class);
+	public static void showSelectedColor( String name, BufferedImage image, float hue, float saturation ) {
+		Planar<GrayF32> input = ConvertBufferedImage.convertFromPlanar(image, null, true, GrayF32.class);
 		Planar<GrayF32> hsv = input.createSameShape();
 
 		// Convert into HSV
-		ColorHsv.rgbToHsv(input,hsv);
+		ColorHsv.rgbToHsv(input, hsv);
 
 		// Euclidean distance squared threshold for deciding which pixels are members of the selected set
 		float maxDist2 = 0.4f*0.4f;
@@ -85,22 +85,22 @@ public class ExampleSegmentColor {
 		float adjustUnits = (float)(Math.PI/2.0);
 
 		// step through each pixel and mark how close it is to the selected color
-		BufferedImage output = new BufferedImage(input.width,input.height,BufferedImage.TYPE_INT_RGB);
-		for( int y = 0; y < hsv.height; y++ ) {
-			for( int x = 0; x < hsv.width; x++ ) {
+		BufferedImage output = new BufferedImage(input.width, input.height, BufferedImage.TYPE_INT_RGB);
+		for (int y = 0; y < hsv.height; y++) {
+			for (int x = 0; x < hsv.width; x++) {
 				// Hue is an angle in radians, so simple subtraction doesn't work
-				float dh = UtilAngle.dist(H.unsafe_get(x,y),hue);
-				float ds = (S.unsafe_get(x,y)-saturation)*adjustUnits;
+				float dh = UtilAngle.dist(H.unsafe_get(x, y), hue);
+				float ds = (S.unsafe_get(x, y) - saturation)*adjustUnits;
 
 				// this distance measure is a bit naive, but good enough for to demonstrate the concept
 				float dist2 = dh*dh + ds*ds;
-				if( dist2 <= maxDist2 ) {
-					output.setRGB(x,y,image.getRGB(x,y));
+				if (dist2 <= maxDist2) {
+					output.setRGB(x, y, image.getRGB(x, y));
 				}
 			}
 		}
 
-		ShowImages.showWindow(output,"Showing "+name);
+		ShowImages.showWindow(output, "Showing " + name);
 	}
 
 	public static void main( String[] args ) {
@@ -109,7 +109,7 @@ public class ExampleSegmentColor {
 		// Let the user select a color
 		printClickedColor(image);
 		// Display pre-selected colors
-		showSelectedColor("Yellow",image,1f,1f);
-		showSelectedColor("Green",image,1.5f,0.65f);
+		showSelectedColor("Yellow", image, 1f, 1f);
+		showSelectedColor("Green", image, 1.5f, 0.65f);
 	}
 }

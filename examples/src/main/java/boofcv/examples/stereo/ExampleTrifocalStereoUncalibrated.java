@@ -161,9 +161,9 @@ public class ExampleTrifocalStereoUncalibrated {
 		double cy = height/2;
 
 		// The self calibration step requires that the image coordinate system be in the image center
-		associateThree.locations01.forEach(p->p.setTo(p.x-cx,p.y-cy));
-		associateThree.locations02.forEach(p->p.setTo(p.x-cx,p.y-cy));
-		associateThree.locations03.forEach(p->p.setTo(p.x-cx,p.y-cy));
+		associateThree.locations01.forEach(p -> p.setTo(p.x - cx, p.y - cy));
+		associateThree.locations02.forEach(p -> p.setTo(p.x - cx, p.y - cy));
+		associateThree.locations03.forEach(p -> p.setTo(p.x - cx, p.y - cy));
 
 		// Converting data formats for the found features into what can be processed by SFM algorithms
 		// Notice how the image center is subtracted from the coordinates? In many cases a principle point
@@ -175,7 +175,7 @@ public class ExampleTrifocalStereoUncalibrated {
 
 		// Convert the matched indexes into AssociatedTriple which contain the actual pixel coordinates
 		var associated = new DogArray<>(AssociatedTriple::new);
-		associatedIdx.forEach(p->associated.grow().setTo(
+		associatedIdx.forEach(p -> associated.grow().setTo(
 				associateThree.locations01.get(p.a),
 				associateThree.locations02.get(p.b),
 				associateThree.locations03.get(p.c)));

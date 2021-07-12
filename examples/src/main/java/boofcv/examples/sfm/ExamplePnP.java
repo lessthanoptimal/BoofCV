@@ -50,22 +50,22 @@ import java.util.Random;
 public class ExamplePnP {
 
 	// describes the intrinsic camera parameters.
-	CameraPinholeBrown intrinsic = new CameraPinholeBrown(500,490,0,320,240,640,480).fsetRadial(0.1,-0.05);
+	CameraPinholeBrown intrinsic = new CameraPinholeBrown(500, 490, 0, 320, 240, 640, 480).fsetRadial(0.1, -0.05);
 
 	// Used to generate random observations
 	Random rand = new Random(234);
 
-	public static void main(String[] args) {
+	public static void main( String[] args ) {
 		// create an arbitrary transform from world to camera reference frames
 		Se3_F64 worldToCamera = new Se3_F64();
 		worldToCamera.getT().setTo(5, 10, -7);
-		ConvertRotation3D_F64.eulerToMatrix(EulerType.XYZ,0.1,-0.3,0,worldToCamera.getR());
+		ConvertRotation3D_F64.eulerToMatrix(EulerType.XYZ, 0.1, -0.3, 0, worldToCamera.getR());
 
 		ExamplePnP app = new ExamplePnP();
 
 		// Let's generate observations with no outliers
 		// NOTE: Image observations are in normalized image coordinates NOT pixels
-		List<Point2D3D> observations = app.createObservations(worldToCamera,100);
+		List<Point2D3D> observations = app.createObservations(worldToCamera, 100);
 
 		System.out.println("Truth:");
 		worldToCamera.print();
@@ -98,14 +98,14 @@ public class ExamplePnP {
 		Estimate1ofPnP pnp = FactoryMultiView.pnp_1(EnumPNP.EPNP, 10, 0);
 
 		Se3_F64 worldToCamera = new Se3_F64();
-		pnp.process(observations,worldToCamera);
+		pnp.process(observations, worldToCamera);
 
 		// For some applications the EPNP solution might be good enough, but let's refine it
-		RefinePnP refine = FactoryMultiView.pnpRefine(1e-8,200);
+		RefinePnP refine = FactoryMultiView.pnpRefine(1e-8, 200);
 
 		Se3_F64 refinedWorldToCamera = new Se3_F64();
 
-		if( !refine.fitModel(observations,worldToCamera,refinedWorldToCamera) )
+		if (!refine.fitModel(observations, worldToCamera, refinedWorldToCamera))
 			throw new RuntimeException("Refined failed! Input probably bad...");
 
 		return refinedWorldToCamera;
@@ -117,24 +117,24 @@ public class ExamplePnP {
 	public Se3_F64 estimateOutliers( List<Point2D3D> observations ) {
 		// We can no longer trust that each point is a real observation. Let's use RANSAC to separate the points
 		// You will need to tune the number of iterations and inlier threshold!!!
-		ModelMatcherMultiview<Se3_F64,Point2D3D> ransac =
-				FactoryMultiViewRobust.pnpRansac(new ConfigPnP(),new ConfigRansac(300,1.0));
-		ransac.setIntrinsic(0,intrinsic);
+		ModelMatcherMultiview<Se3_F64, Point2D3D> ransac =
+				FactoryMultiViewRobust.pnpRansac(new ConfigPnP(), new ConfigRansac(300, 1.0));
+		ransac.setIntrinsic(0, intrinsic);
 
 		// Observations must be in normalized image coordinates!  See javadoc of pnpRansac
-		if( !ransac.process(observations) )
+		if (!ransac.process(observations))
 			throw new RuntimeException("Probably got bad input data with NaN inside of it");
 
-		System.out.println("Inlier size "+ransac.getMatchSet().size());
+		System.out.println("Inlier size " + ransac.getMatchSet().size());
 		Se3_F64 worldToCamera = ransac.getModelParameters();
 
 		// You will most likely want to refine this solution too. Can make a difference with real world data
-		RefinePnP refine = FactoryMultiView.pnpRefine(1e-8,200);
+		RefinePnP refine = FactoryMultiView.pnpRefine(1e-8, 200);
 
 		Se3_F64 refinedWorldToCamera = new Se3_F64();
 
 		// notice that only the match set was passed in
-		if( !refine.fitModel(ransac.getMatchSet(),worldToCamera,refinedWorldToCamera) )
+		if (!refine.fitModel(ransac.getMatchSet(), worldToCamera, refinedWorldToCamera))
 			throw new RuntimeException("Refined failed! Input probably bad...");
 
 		return refinedWorldToCamera;
@@ -145,12 +145,12 @@ public class ExamplePnP {
 	 * coordinates and not pixels!  See {@link PerspectiveOps#convertPixelToNorm} for how to go from pixels
 	 * to normalized image coordinates.
 	 */
-	public List<Point2D3D> createObservations( Se3_F64 worldToCamera , int total ) {
+	public List<Point2D3D> createObservations( Se3_F64 worldToCamera, int total ) {
 
 		Se3_F64 cameraToWorld = worldToCamera.invert(null);
 
 		// transform from pixel coordinates to normalized pixel coordinates, which removes lens distortion
-		Point2Transform2_F64 pixelToNorm = LensDistortionFactory.narrow(intrinsic).undistort_F64(true,false);
+		Point2Transform2_F64 pixelToNorm = LensDistortionFactory.narrow(intrinsic).undistort_F64(true, false);
 
 		List<Point2D3D> observations = new ArrayList<>();
 
@@ -162,23 +162,23 @@ public class ExamplePnP {
 
 			// Convert to normalized image coordinates because that's what PNP needs.
 			// it can't process pixel coordinates
-			pixelToNorm.compute(x,y,norm);
+			pixelToNorm.compute(x, y, norm);
 
 			// Randomly pick a depth and compute 3D coordinate
-			double Z = rand.nextDouble()+4;
+			double Z = rand.nextDouble() + 4;
 			double X = norm.x*Z;
 			double Y = norm.y*Z;
 
 			// Change the point's reference frame from camera to world
-			Point3D_F64 cameraPt = new Point3D_F64(X,Y,Z);
+			Point3D_F64 cameraPt = new Point3D_F64(X, Y, Z);
 			Point3D_F64 worldPt = new Point3D_F64();
 
-			SePointOps_F64.transform(cameraToWorld,cameraPt,worldPt);
+			SePointOps_F64.transform(cameraToWorld, cameraPt, worldPt);
 
 			// Save the perfect noise free observation
 			Point2D3D o = new Point2D3D();
 			o.getLocation().setTo(worldPt);
-			o.getObservation().setTo(norm.x,norm.y);
+			o.getObservation().setTo(norm.x, norm.y);
 
 			observations.add(o);
 		}
@@ -189,7 +189,7 @@ public class ExamplePnP {
 	/**
 	 * Adds some really bad observations to the mix
 	 */
-	public void addOutliers( List<Point2D3D> observations , int total ) {
+	public void addOutliers( List<Point2D3D> observations, int total ) {
 
 		int size = observations.size();
 
@@ -207,6 +207,6 @@ public class ExamplePnP {
 		}
 
 		// randomize the order
-		Collections.shuffle(observations,rand);
+		Collections.shuffle(observations, rand);
 	}
 }

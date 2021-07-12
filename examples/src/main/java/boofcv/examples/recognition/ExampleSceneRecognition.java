@@ -53,7 +53,6 @@ import java.util.List;
  * @author Peter Abeles
  */
 public class ExampleSceneRecognition {
-
 	public static void main( String[] args ) {
 		String imagePath = UtilIO.pathExample("recognition/scene");
 		List<String> images = UtilIO.listByPrefix(imagePath, null, ".jpg");

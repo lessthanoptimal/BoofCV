@@ -63,7 +63,10 @@ import org.ddogleg.struct.DogArray_I32;
 
 import javax.swing.*;
 import java.awt.*;
-import java.io.*;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.UncheckedIOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -167,7 +170,7 @@ public class ExampleMultiViewSparseReconstruction {
 			computePairwiseGraph();
 		if (working == null)
 			metricFromPairwise();
-		if (scene == null )
+		if (scene == null)
 			bundleAdjustmentRefine();
 
 		Rodrigues_F64 rod = new Rodrigues_F64();
@@ -396,8 +399,6 @@ public class ExampleMultiViewSparseReconstruction {
 
 			try (FileOutputStream out = new FileOutputStream("saved_cloud.ply")) {
 				PointCloudIO.save3D(PointCloudIO.Format.PLY, PointCloudReader.wrapF64RGB(copy.toList()), true, out);
-			} catch (FileNotFoundException e) {
-				e.printStackTrace();
 			} catch (IOException e) {
 				e.printStackTrace();
 			}

@@ -38,9 +38,8 @@ import java.awt.image.BufferedImage;
  * to the entire image. Local methods compute a local threshold around each pixel and can handle uneven
  * lighting, but produce noisy results in regions with uniform lighting.
  *
- * @see boofcv.examples.imageprocessing.ExampleBinaryOps
- *
  * @author Peter Abeles
+ * @see boofcv.examples.imageprocessing.ExampleBinaryOps
  */
 public class ExampleThresholding {
 
@@ -49,49 +48,49 @@ public class ExampleThresholding {
 
 		// convert into a usable format
 		GrayF32 input = ConvertBufferedImage.convertFromSingle(image, null, GrayF32.class);
-		GrayU8 binary = new GrayU8(input.width,input.height);
+		GrayU8 binary = new GrayU8(input.width, input.height);
 
 		// Display multiple images in the same window
 		ListDisplayPanel gui = new ListDisplayPanel();
 
 		// Global Methods
 		GThresholdImageOps.threshold(input, binary, ImageStatistics.mean(input), true);
-		gui.addImage(VisualizeBinaryData.renderBinary(binary, false, null),"Global: Mean");
+		gui.addImage(VisualizeBinaryData.renderBinary(binary, false, null), "Global: Mean");
 		GThresholdImageOps.threshold(input, binary, GThresholdImageOps.computeOtsu(input, 0, 255), true);
-		gui.addImage(VisualizeBinaryData.renderBinary(binary, false, null),"Global: Otsu");
+		gui.addImage(VisualizeBinaryData.renderBinary(binary, false, null), "Global: Otsu");
 		GThresholdImageOps.threshold(input, binary, GThresholdImageOps.computeEntropy(input, 0, 255), true);
-		gui.addImage(VisualizeBinaryData.renderBinary(binary, false, null),"Global: Entropy");
+		gui.addImage(VisualizeBinaryData.renderBinary(binary, false, null), "Global: Entropy");
 
 		// Local method
-		GThresholdImageOps.localMean(input, binary, ConfigLength.fixed(57), 1.0, true, null, null,null);
-		gui.addImage(VisualizeBinaryData.renderBinary(binary, false, null),"Local: Mean");
-		GThresholdImageOps.localGaussian(input, binary,  ConfigLength.fixed(85), 1.0, true, null, null);
-		gui.addImage(VisualizeBinaryData.renderBinary(binary, false, null),"Local: Gaussian");
-		GThresholdImageOps.localNiblack(input, binary,  ConfigLength.fixed(11), 0.30f, true);
-		gui.addImage(VisualizeBinaryData.renderBinary(binary, false, null),"Local: Niblack");
-		GThresholdImageOps.localSauvola(input, binary,  ConfigLength.fixed(11), 0.30f, true);
-		gui.addImage(VisualizeBinaryData.renderBinary(binary, false, null),"Local: Sauvola");
-		GThresholdImageOps.localWolf(input, binary,  ConfigLength.fixed(11), 0.30f, true);
-		gui.addImage(VisualizeBinaryData.renderBinary(binary, false, null),"Local: Wolf");
-		GThresholdImageOps.localNick(input, binary,  ConfigLength.fixed(11), -0.2f, true);
-		gui.addImage(VisualizeBinaryData.renderBinary(binary, false, null),"Local: NICK");
-		GThresholdImageOps.blockMinMax(input, binary, ConfigLength.fixed(21), 1.0, true, 15 );
-		gui.addImage(VisualizeBinaryData.renderBinary(binary, false, null),"Block: Min-Max");
-		GThresholdImageOps.blockMean(input, binary, ConfigLength.fixed(21), 1.0, true );
-		gui.addImage(VisualizeBinaryData.renderBinary(binary, false, null),"Block: Mean");
-		GThresholdImageOps.blockOtsu(input, binary, false,ConfigLength.fixed(21),0.5, 1.0, true );
-		gui.addImage(VisualizeBinaryData.renderBinary(binary, false, null),"Block: Otsu");
+		GThresholdImageOps.localMean(input, binary, ConfigLength.fixed(57), 1.0, true, null, null, null);
+		gui.addImage(VisualizeBinaryData.renderBinary(binary, false, null), "Local: Mean");
+		GThresholdImageOps.localGaussian(input, binary, ConfigLength.fixed(85), 1.0, true, null, null);
+		gui.addImage(VisualizeBinaryData.renderBinary(binary, false, null), "Local: Gaussian");
+		GThresholdImageOps.localNiblack(input, binary, ConfigLength.fixed(11), 0.30f, true);
+		gui.addImage(VisualizeBinaryData.renderBinary(binary, false, null), "Local: Niblack");
+		GThresholdImageOps.localSauvola(input, binary, ConfigLength.fixed(11), 0.30f, true);
+		gui.addImage(VisualizeBinaryData.renderBinary(binary, false, null), "Local: Sauvola");
+		GThresholdImageOps.localWolf(input, binary, ConfigLength.fixed(11), 0.30f, true);
+		gui.addImage(VisualizeBinaryData.renderBinary(binary, false, null), "Local: Wolf");
+		GThresholdImageOps.localNick(input, binary, ConfigLength.fixed(11), -0.2f, true);
+		gui.addImage(VisualizeBinaryData.renderBinary(binary, false, null), "Local: NICK");
+		GThresholdImageOps.blockMinMax(input, binary, ConfigLength.fixed(21), 1.0, true, 15);
+		gui.addImage(VisualizeBinaryData.renderBinary(binary, false, null), "Block: Min-Max");
+		GThresholdImageOps.blockMean(input, binary, ConfigLength.fixed(21), 1.0, true);
+		gui.addImage(VisualizeBinaryData.renderBinary(binary, false, null), "Block: Mean");
+		GThresholdImageOps.blockOtsu(input, binary, false, ConfigLength.fixed(21), 0.5, 1.0, true);
+		gui.addImage(VisualizeBinaryData.renderBinary(binary, false, null), "Block: Otsu");
 
 		// Sauvola is tuned for text image. Change radius to make it run better in others.
 
 		// Show the image image for reference
-		gui.addImage(ConvertBufferedImage.convertTo(input,null),"Input Image");
+		gui.addImage(ConvertBufferedImage.convertTo(input, null), "Input Image");
 
-		String fileName =  imageName.substring(imageName.lastIndexOf('/')+1);
-		ShowImages.showWindow(gui,fileName);
+		String fileName = imageName.substring(imageName.lastIndexOf('/') + 1);
+		ShowImages.showWindow(gui, fileName);
 	}
 
-	public static void main(String[] args) {
+	public static void main( String[] args ) {
 		// example in which global thresholding works best
 		threshold(UtilIO.pathExample("particles01.jpg"));
 		// example in which adaptive/local thresholding works best

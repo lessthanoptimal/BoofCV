@@ -57,7 +57,7 @@ public class ExamplePyramidDiscrete<T extends ImageGray<T>> {
 				ConfigDiscreteLevels.levels(4), -1, 2, true, ImageType.single(imageType));
 		pyramid.process(input);
 
-		DiscretePyramidPanel gui = new DiscretePyramidPanel();
+		var gui = new DiscretePyramidPanel<T>();
 		gui.setPyramid(pyramid);
 		gui.render();
 
@@ -72,8 +72,8 @@ public class ExamplePyramidDiscrete<T extends ImageGray<T>> {
 	public static void main( String[] args ) {
 		BufferedImage image = UtilImageIO.loadImage(UtilIO.pathExample("standard/barbara.jpg"));
 
-		ExamplePyramidDiscrete<GrayF32> app = new ExamplePyramidDiscrete<>(GrayF32.class);
-//		ExamplePyramidDiscrete<GrayU8> app = new ExamplePyramidDiscrete<>(GrayU8.class);
+		var app = new ExamplePyramidDiscrete<>(GrayF32.class);
+//		var app = new ExamplePyramidDiscrete<>(GrayU8.class);
 
 		app.process(image);
 	}
