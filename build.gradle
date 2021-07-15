@@ -18,7 +18,7 @@ allprojects {
     group = 'org.boofcv'
     version = '0.39-SNAPSHOT'
 
-    ext.COMMONS_IO_VERSION = '2.6'
+    ext.COMMONS_IO_VERSION = '2.11.0'
 
     createVersionFile.enabled = false // run only once. enabled in types
 }
@@ -27,6 +27,7 @@ project.ext.set("deepboof_version", '0.5.1')
 project.ext.set("lombok_version", '1.18.18')
 project.ext.set("errorprone_version", '2.7.1')
 project.ext.set("jabel_version", '0.4.1')
+project.ext.set("guava_version", '30.1.1-jre')
 
 // Which native platforms are supported can be specified in the command line.  Otherwise
 // the default is to support all of them
@@ -61,7 +62,7 @@ subprojects {
     configurations.configureEach {
         resolutionStrategy {
             force 'org.jetbrains:annotations:20.0.0'
-            force 'com.google.guava:guava:30.1-jre'
+            force "com.google.guava:guava:$project.guava_version"
             force "com.google.errorprone:error_prone_annotations:$project.errorprone_version"
             force 'com.google.code.findbugs:jsr305:3.0.2'
             force 'org.checkerframework:checker-qual:2.10.0'
