@@ -3,6 +3,18 @@ Change Log
 Date Format: year/month/day
 
 ---------------------------------------------
+Date    : 2021
+Version : 0.39
+
+TODO New fisheye model
+TODO datta2009
+TODO Generic calibration target for multi cameras, QR Code for first version
+TODO Multi Camera Calibration API
+TODO Monocular VO
+TODO Monocular SLAM
+TODO Stereo SLAM
+
+---------------------------------------------
 Date    : 2021/Jul/12
 Version : 0.38
 
