@@ -69,6 +69,18 @@ public class CameraPinhole extends CameraModel {
 
 	public CameraPinhole fsetK( double fx, double fy,
 								double skew,
+								double cx, double cy ) {
+		this.fx = fx;
+		this.fy = fy;
+		this.skew = skew;
+		this.cx = cx;
+		this.cy = cy;
+
+		return this;
+	}
+
+	public CameraPinhole fsetK( double fx, double fy,
+								double skew,
 								double cx, double cy,
 								int width, int height ) {
 		this.fx = fx;

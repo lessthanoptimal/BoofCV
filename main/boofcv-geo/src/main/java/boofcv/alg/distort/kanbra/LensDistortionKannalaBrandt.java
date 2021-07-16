@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -43,7 +43,7 @@ public class LensDistortionKannalaBrandt implements LensDistortionWideFOV {
 
 	@Override
 	public Point3Transform2_F32 distortStoP_F32() {
-		return null;//new UniOmniStoP_F32(model);
+		return new KannalaBrandtStoP_F32(model);
 	}
 
 	@Override
@@ -53,6 +53,6 @@ public class LensDistortionKannalaBrandt implements LensDistortionWideFOV {
 
 	@Override
 	public Point2Transform3_F32 undistortPtoS_F32() {
-		return null;//new UniOmniPtoS_F32(model);
+		return new KannalaBrandtPtoS_F32(model);
 	}
 }
