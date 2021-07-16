@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -23,9 +23,12 @@ import lombok.Setter;
 
 /**
  * A camera model for pinhole, wide angle, and fisheye cameras up to a FOV of 180 degrees. The full camera model
- * from [1] has been implemented.
+ * from [1] has been implemented. While mathematically very similar to the model presented in [1], this has been
+ * modified to extend a pinhole camera model and has one additional degree of freedom. In the original formulation
+ * skew was implicitly 0. (mu, mv) = (fx, fy). This was done primarily to maximize code reuse and integration with
+ * existing code.
  *
- * <p>[1] Kannala, J., & Brandt, S. S. (2006). A generic camera model and calibration method for conventional,
+ * <p>[1] Kannala, J., and Brandt, S. S. (2006). A generic camera model and calibration method for conventional,
  * wide-angle, and fish-eye lenses. IEEE transactions on pattern analysis and machine intelligence,
  * 28(8), 1335-1340.</p>
  *
@@ -61,7 +64,7 @@ public class CameraKannalaBrandt extends CameraPinhole {
 	 * Copy constructor
 	 */
 	public CameraKannalaBrandt( CameraKannalaBrandt src ) {
-		set(src);
+		setTo(src);
 	}
 
 	/**
@@ -70,6 +73,19 @@ public class CameraKannalaBrandt extends CameraPinhole {
 	public CameraKannalaBrandt()
 	{
 		this(5,3,4);
+	}
+
+	public CameraKannalaBrandt fsetK(double fx, double fy,
+									 double skew,
+									 double cx, double cy) {
+		super.fsetK(fx, fy, skew, cx, cy);
+		return this;
+	}
+
+	public CameraKannalaBrandt fsetShape( int width, int height ) {
+		this.width = width;
+		this.height = height;
+		return this;
 	}
 
 	public CameraKannalaBrandt fsetSymmetric( double... coefs ) {
@@ -108,8 +124,8 @@ public class CameraKannalaBrandt extends CameraPinhole {
 		return noRadial && noTangential;
 	}
 
-	public void set( CameraKannalaBrandt src ) {
-		super.set(src);
+	public void setTo( CameraKannalaBrandt src ) {
+		super.setTo(src);
 
 		this.coefSymm = src.coefSymm.clone();
 		this.coefRad = src.coefRad.clone();

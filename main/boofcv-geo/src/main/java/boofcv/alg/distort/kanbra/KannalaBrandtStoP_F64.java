@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -22,7 +22,6 @@ import boofcv.struct.calib.CameraKannalaBrandt;
 import boofcv.struct.distort.Point3Transform2_F64;
 import georegression.geometry.UtilPoint3D_F64;
 import georegression.struct.point.Point2D_F64;
-import org.ejml.UtilEjml;
 
 /**
  * Forward projection model for {@link CameraKannalaBrandt}.  Takes a 3D point in camera unit sphere
@@ -39,42 +38,42 @@ public class KannalaBrandtStoP_F64 implements Point3Transform2_F64 {
 	}
 
 	@Override
-	public void compute(double x, double y, double z, Point2D_F64 out) {
+	public void compute( double x, double y, double z, Point2D_F64 out ) {
 		// angle between incoming ray and principle axis
 		//    Principle Axis = (0,0,z)
 		//    Incoming Ray   = (x,y,z)
-		double theta = Math.acos(z/UtilPoint3D_F64.norm(x,y,z)); // uses dot product
-
-		// angle on the image plane of the incoming ray
-		double phi_r = Math.max(Math.sqrt(x*x+y*y) , UtilEjml.EPS); // eps = avoid divide by zero
-		double cosphi = x/phi_r;
-		double sinphi = y/phi_r;
+		/**/double theta = Math.acos(z/UtilPoint3D_F64.norm(x, y, z)); // uses dot product
 
 		// compute symmetric projection function
-		double r = polynomial(model.coefSymm,theta);
+		/**/double r = polynomial(model.coefSymm, theta);
+
+		// angle on the image plane of the incoming ray
+		/**/double phi = Math.atan2(y, x);
+		/**/double cosphi = Math.cos(phi);
+		/**/double sinphi = Math.sin(phi);
 
 		// normalized image coordinates
-		double dx,dy;
-		if( model.coefRad.length > 0 ) {
+		/**/double dx, dy;
+		if (model.coefRad.length > 0) {
 			// distortion terms. radial and tangential
-			double dr = polynomial(model.coefRad, theta) * polytrig(model.coefRadTrig, cosphi, sinphi);
-			double dt = polynomial(model.coefTan, theta) * polytrig(model.coefRadTrig, cosphi, sinphi);
+			/**/double dr = polynomial(model.coefRad, theta)*polytrig(model.coefRadTrig, cosphi, sinphi);
+			/**/double dt = polynomial(model.coefTan, theta)*polytrig(model.coefRadTrig, cosphi, sinphi);
 
 			// put it all together to get normalized image coordinates
-			dx = (r + dr) * cosphi - dt * sinphi;
-			dy = (r + dr) * sinphi + dt * cosphi;
+			dx = (r + dr)*cosphi - dt*sinphi;
+			dy = (r + dr)*sinphi + dt*cosphi;
 		} else {
 			dx = r*cosphi;
 			dy = r*sinphi;
 		}
 		// project into pixels
-		out.x = model.fx*dx + model.skew*dy + model.cx;
-		out.y = model.fy*dy + model.cy;
+		out.x = (double)(model.fx*dx + model.skew*dy + model.cx);
+		out.y = (double)(model.fy*dy + model.cy);
 	}
 
-	private double polynomial( double[] coefs, double x ) {
-		double pow = x;
-		double result = 0;
+	private /**/double polynomial( /**/double[] coefs, /**/double x ) {
+		/**/double pow = x;
+		/**/double result = 0;
 		for (int i = 0; i < coefs.length; i++) {
 			result += coefs[i]*pow;
 			pow *= x*x;
@@ -82,20 +81,19 @@ public class KannalaBrandtStoP_F64 implements Point3Transform2_F64 {
 		return result;
 	}
 
-	private double polytrig(double[] coefs, double cos, double sin ) {
-		double result = 0;
-		for (int i = 0; i < coefs.length; i+=2) {
-			result += coefs[i  ] * cos;
-			result += coefs[i+1] * sin;
+	private /**/double polytrig( /**/double[] coefs, /**/double cos, /**/double sin ) {
+		/**/double result = 0;
+		for (int i = 0; i < coefs.length; i += 2) {
+			result += coefs[i]*cos;
+			result += coefs[i + 1]*sin;
 
 			// sin(2*phi) = 2*cos(phi)*sin(phi)
 			// cos(2*phi) = 2*cos^2(phi)-1
 			sin = 2*cos*sin;
-			cos = 2*cos*cos-1.0;
+			cos = 2*cos*cos - 1.0;
 		}
 		return result;
 	}
-
 
 	@Override
 	public Point3Transform2_F64 copyConcurrent() {

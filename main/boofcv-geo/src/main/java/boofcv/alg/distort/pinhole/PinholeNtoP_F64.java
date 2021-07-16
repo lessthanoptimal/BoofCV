@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -38,6 +38,10 @@ public class PinholeNtoP_F64 implements Point2Transform2_F64 {
 		this.skew = original.skew;
 		this.cx = original.cx;
 		this.cy = original.cy;
+	}
+
+	public PinholeNtoP_F64( CameraPinhole pinhole ) {
+		setK(pinhole);
 	}
 
 	public PinholeNtoP_F64() {}
