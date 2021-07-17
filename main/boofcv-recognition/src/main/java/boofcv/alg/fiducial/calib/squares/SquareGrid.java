@@ -41,33 +41,39 @@ public class SquareGrid {
 	/**
 	 * Looks up the node based on its coordinate. negative values wrap
 	 */
-	public SquareNode get( int row , int col ) {
-		return nodes.get( indexOf(row,col) );
+	public SquareNode get( int row, int col ) {
+		return nodes.get(indexOf(row, col));
 	}
 
-	public void set( int row , int col , SquareNode node  ) {
-		nodes.set( indexOf(row,col) , node );
+	public void set( int row, int col, SquareNode node ) {
+		nodes.set(indexOf(row, col), node);
 	}
 
-	public int indexOf( int row , int col ) {
-		if( row < 0 )
+	public int indexOf( int row, int col ) {
+		if (row < 0)
 			row = rows + row;
-		if( col < 0 )
+		if (col < 0)
 			col = columns + col;
 		return row*columns + col;
 	}
 
 	/**
 	 * Returns the corner specified by its index.
+	 *
 	 * @param index 0 to 3, inclusive
 	 */
 	public SquareNode getCornerByIndex( int index ) {
-		switch( index ) {
-			case 0: return get(0,0);
-			case 1: return get(0,-1);
-			case 2: return get(-1,-1);
-			case 3: return get(-1,0);
-			default: throw new RuntimeException("BUG!");
+		switch (index) {
+			case 0:
+				return get(0, 0);
+			case 1:
+				return get(0, -1);
+			case 2:
+				return get(-1, -1);
+			case 3:
+				return get(-1, 0);
+			default:
+				throw new RuntimeException("BUG!");
 		}
 	}
 
@@ -80,13 +86,13 @@ public class SquareGrid {
 		int x = index%columns;
 		int y = index/columns;
 
-		if( x <= 0 && y <= 0 ) {
+		if (x <= 0 && y <= 0) {
 			return 0;
-		} else if( x > 0 && y <= 0 ) {
+		} else if (x > 0 && y <= 0) {
 			return 1;
-		} else if( x > 0 && y > 0 ) {
+		} else if (x > 0 && y > 0) {
 			return 2;
-		} else if( x <= 0 && y > 0 ) {
+		} else if (x <= 0 && y > 0) {
 			return 3;
 		} else {
 			throw new RuntimeException("Not corner!");

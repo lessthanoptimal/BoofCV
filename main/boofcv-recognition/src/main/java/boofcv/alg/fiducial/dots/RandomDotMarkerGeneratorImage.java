@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -28,17 +28,16 @@ import boofcv.struct.image.GrayU8;
  * @author Peter Abeles
  */
 public class RandomDotMarkerGeneratorImage
-	extends RandomDotMarkerGenerator
-{
+		extends RandomDotMarkerGenerator {
 	public RandomDotMarkerGeneratorImage() {
 		render = new FiducialImageEngine();
 	}
 
-	public void configure( int width , int height , int border ) {
-		super.documentRegion.setLowerExtent(border,border);
-		super.documentRegion.width = width-2*border;
-		super.documentRegion.height = height-2*border;
-		((FiducialImageEngine)render).configure(border,width-2*border, height-2*border);
+	public void configure( int width, int height, int border ) {
+		super.documentRegion.setLowerExtent(border, border);
+		super.documentRegion.width = width - 2*border;
+		super.documentRegion.height = height - 2*border;
+		((FiducialImageEngine)render).configure(border, width - 2*border, height - 2*border);
 	}
 
 	public GrayU8 getImage() {
@@ -48,5 +47,4 @@ public class RandomDotMarkerGeneratorImage
 	public GrayF32 getImageF32() {
 		return ((FiducialImageEngine)render).getGrayF32();
 	}
-
 }

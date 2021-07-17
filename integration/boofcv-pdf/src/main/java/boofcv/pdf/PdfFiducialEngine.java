@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -45,6 +45,8 @@ public class PdfFiducialEngine extends FiducialRenderEngine {
 	public double markerWidth;
 	public double markerHeight;
 
+	public Color markerColor = Color.BLACK;
+
 	public PdfFiducialEngine(PDDocument document, PDPageContentStream pcs,
 							 double markerWidth, double markerHeight ) {
 		this.document = document;
@@ -58,10 +60,20 @@ public class PdfFiducialEngine extends FiducialRenderEngine {
 
 	}
 
+	@Override public void setGray( double value ) {
+		if (value == 0.0)
+			markerColor = Color.BLACK;
+		else if (value == 1.0)
+			markerColor = Color.WHITE;
+		else {
+			markerColor = new Color((float)value, (float)value, (float)value);
+		}
+	}
+
 	@Override
 	public void circle(double cx, double cy, double r) {
 		try {
-			pcs.setNonStrokingColor(Color.BLACK);
+			pcs.setNonStrokingColor(markerColor);
 
 			final float k = 0.552284749831f;
 			pcs.moveTo( adjustX(cx-r), adjustY(cy));
@@ -78,7 +90,7 @@ public class PdfFiducialEngine extends FiducialRenderEngine {
 	@Override
 	public void square(double x0, double y0, double width0, double thickness) {
 		try {
-			pcs.setNonStrokingColor(Color.BLACK);
+			pcs.setNonStrokingColor(markerColor);
 
 			pcs.moveTo(adjustX(x0), adjustY(y0));
 			pcs.lineTo(adjustX(x0), adjustY(y0+width0));
@@ -108,7 +120,7 @@ public class PdfFiducialEngine extends FiducialRenderEngine {
 			double width = x1-x0;
 			double height = y1-y0;
 
-			pcs.setNonStrokingColor(Color.BLACK);
+			pcs.setNonStrokingColor(markerColor);
 			pcs.addRect(adjustX(x0), adjustY(y0)-(float)height, (float)width, (float)height);
 			pcs.fill();
 		} catch( IOException e ) {

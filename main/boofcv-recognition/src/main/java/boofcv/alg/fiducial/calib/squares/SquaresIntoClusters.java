@@ -47,7 +47,7 @@ public class SquaresIntoClusters {
 		for (int i = 0; i < nodes.size(); i++) {
 			SquareNode n = nodes.get(i);
 			for (int j = 0; j < n.edges.length; j++) {
-				if( n.edges[j] != null ) {
+				if (n.edges[j] != null) {
 					graph.detachEdge(n.edges[j]);
 				}
 			}
@@ -55,7 +55,7 @@ public class SquaresIntoClusters {
 		for (int i = 0; i < nodes.size(); i++) {
 			SquareNode n = nodes.get(i);
 			for (int j = 0; j < n.edges.length; j++) {
-				if( n.edges[j] != null )
+				if (n.edges[j] != null)
 					throw new RuntimeException("BUG!");
 			}
 		}
@@ -76,7 +76,7 @@ public class SquaresIntoClusters {
 		for (int i = 0; i < nodes.size(); i++) {
 			SquareNode n = nodes.get(i);
 
-			if( n.graph < 0 ) {
+			if (n.graph < 0) {
 				n.graph = clusters.size();
 				List<SquareNode> graph = clusters.grow();
 				graph.add(n);
@@ -88,34 +88,33 @@ public class SquaresIntoClusters {
 	/**
 	 * Finds all neighbors and adds them to the graph. Repeated until there are no more nodes to add to the graph
 	 */
-	void addToCluster(SquareNode seed, List<SquareNode> graph) {
+	void addToCluster( SquareNode seed, List<SquareNode> graph ) {
 		open.clear();
 		open.add(seed);
-		while( !open.isEmpty() ) {
-			SquareNode n = open.remove( open.size() - 1 );
+		while (!open.isEmpty()) {
+			SquareNode n = open.remove(open.size() - 1);
 
 			for (int i = 0; i < n.square.size(); i++) {
 				SquareEdge edge = n.edges[i];
-				if( edge == null )
+				if (edge == null)
 					continue;
 
 				SquareNode other;
-				if( edge.a == n )
+				if (edge.a == n)
 					other = edge.b;
-				else if( edge.b == n )
+				else if (edge.b == n)
 					other = edge.a;
 				else
 					throw new RuntimeException("BUG!");
 
-				if( other.graph == SquareNode.RESET_GRAPH) {
+				if (other.graph == SquareNode.RESET_GRAPH) {
 					other.graph = n.graph;
 					graph.add(other);
 					open.add(other);
-				} else if( other.graph != n.graph ) {
-					throw new RuntimeException("BUG! "+other.graph+" "+n.graph);
+				} else if (other.graph != n.graph) {
+					throw new RuntimeException("BUG! " + other.graph + " " + n.graph);
 				}
 			}
 		}
 	}
-
 }

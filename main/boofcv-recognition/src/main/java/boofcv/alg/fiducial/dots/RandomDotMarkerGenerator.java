@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -58,7 +58,7 @@ public class RandomDotMarkerGenerator {
 	 * @param markerHeight Length of the marker along the y-axis
 	 * @param dotDiameter The dot's diameter
 	 */
-	public static List<Point2D_F64> createRandomMarker(Random rand , int num , double markerWidth, double markerHeight , double dotDiameter ) {
+	public static List<Point2D_F64> createRandomMarker( Random rand, int num, double markerWidth, double markerHeight, double dotDiameter ) {
 		final var points = new ArrayList<Point2D_F64>();
 		final var work = new Point2D_F64();
 
@@ -69,27 +69,27 @@ public class RandomDotMarkerGenerator {
 		double effectiveWidth = markerWidth - 2*borderCushion;
 		double effectiveHeight = markerHeight - 2*borderCushion;
 
-		if( effectiveWidth <= 0 || effectiveHeight <= 0)
+		if (effectiveWidth <= 0 || effectiveHeight <= 0)
 			throw new IllegalArgumentException("Marker isn't wide enough for dots to not touch border");
 
 		// The edges of two circle's cant be closer than 1 diameter
 		double tol = 2*dotDiameter*dotDiameter;
 
 		int failedAttempts = 0;
-		while( failedAttempts < 1000 && points.size() < num ) {
-			work.x = (rand.nextDouble()-0.5)*effectiveWidth;
-			work.y = (rand.nextDouble()-0.5)*effectiveHeight;
+		while (failedAttempts < 1000 && points.size() < num) {
+			work.x = (rand.nextDouble() - 0.5)*effectiveWidth;
+			work.y = (rand.nextDouble() - 0.5)*effectiveHeight;
 
 			// See if there's a point in the list that's too close
 			boolean good = true;
 			for (int i = 0; i < points.size(); i++) {
-				if( points.get(i).distance2(work) < tol ) {
+				if (points.get(i).distance2(work) < tol) {
 					good = false;
 					break;
 				}
 			}
 
-			if( good ) {
+			if (good) {
 				points.add(work.copy());
 			} else {
 				failedAttempts++;
@@ -104,7 +104,7 @@ public class RandomDotMarkerGenerator {
 	 *
 	 * @param dots dots on the marker. They should be inside a region -width/2 to width/2.
 	 */
-	public void render( List<Point2D_F64> dots , double markerWidth, double markerHeight ) {
+	public void render( List<Point2D_F64> dots, double markerWidth, double markerHeight ) {
 
 
 		// nFind the shift needed to put a point in the center of the draw region
@@ -112,7 +112,7 @@ public class RandomDotMarkerGenerator {
 		double regionCenterY = documentRegion.height/2;
 
 		// transform from points to paper coordinates
-		double point_to_pixel = Math.min(documentRegion.width/markerWidth,documentRegion.height/markerHeight);
+		double point_to_pixel = Math.min(documentRegion.width/markerWidth, documentRegion.height/markerHeight);
 
 		render.init();
 		dotsAdjusted.reset();
@@ -121,8 +121,8 @@ public class RandomDotMarkerGenerator {
 			Point2D_F64 a = dotsAdjusted.grow();
 			a.x = p.x*point_to_pixel + regionCenterX;
 			a.y = p.y*point_to_pixel + regionCenterY;
-			render.circle(a.x,a.y,radius);
-			render.inputToDocument(a.x,a.y,a);
+			render.circle(a.x, a.y, radius);
+			render.inputToDocument(a.x, a.y, a);
 		}
 	}
 }
