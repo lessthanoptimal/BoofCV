@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -32,6 +32,11 @@ public abstract class FiducialRenderEngine {
 	 * Init needs to be called for each new fiducial.
 	 */
 	public abstract void init();
+
+	/**
+	 * Sets the gray scale value of the shape. 0.0 = black. 1.0 = white.
+	 */
+	public abstract void setGray( double value );
 
 	public void square(double x0 , double y0 , double width ) {
 		rectangle(x0,y0,x0+width,y0+width);

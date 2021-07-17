@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -35,10 +35,9 @@ public class SquareEdge {
 	// the distance between the square's centers
 	public double distance;
 
-	public SquareEdge() {
-	}
+	public SquareEdge() {}
 
-	public SquareEdge(SquareNode a, SquareNode b, int sideA, int sideB) {
+	public SquareEdge( SquareNode a, SquareNode b, int sideA, int sideB ) {
 		this.a = a;
 		this.b = b;
 		this.sideA = sideA;
@@ -48,25 +47,25 @@ public class SquareEdge {
 	/**
 	 * Returns the destination node.
 	 */
-	public <T extends SquareNode>T destination(SquareNode src) {
-		if( a == src )
+	public <T extends SquareNode> T destination( SquareNode src ) {
+		if (a == src)
 			return (T)b;
-		else if( b == src )
+		else if (b == src)
 			return (T)a;
 		else
 			throw new IllegalArgumentException("BUG! src is not a or b");
 	}
 
-	public int destinationSide(SquareNode src) {
-		if( a == src )
+	public int destinationSide( SquareNode src ) {
+		if (a == src)
 			return sideB;
-		else if( b == src )
+		else if (b == src)
 			return sideA;
 		else
 			throw new IllegalArgumentException("BUG! src is not a or b");
 	}
 
-	public boolean isEndPoint(SquareNode target ) {
+	public boolean isEndPoint( SquareNode target ) {
 		return a == target || b == target;
 	}
 

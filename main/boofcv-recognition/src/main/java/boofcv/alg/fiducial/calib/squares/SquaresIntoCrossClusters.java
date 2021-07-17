@@ -59,26 +59,28 @@ public class SquaresIntoCrossClusters extends SquaresIntoClusters {
 
 	/**
 	 * Declares data structures and configures algorithm
+	 *
 	 * @param maxCornerDistance Maximum distance two corners can be in pixels.
 	 * @param maxNeighbors Max number of neighbors it will consider. Try 4 or -1 for all
 	 */
-	public SquaresIntoCrossClusters(double maxCornerDistance, int maxNeighbors) {
+	public SquaresIntoCrossClusters( double maxCornerDistance, int maxNeighbors ) {
 		this.maxCornerDistance = maxCornerDistance;
 		this.maxNeighbors = maxNeighbors > 0 ? maxNeighbors : Integer.MAX_VALUE;
 
 		//  avoid a roll over later on in the code
-		if( this.maxNeighbors == Integer.MAX_VALUE ) {
-			this.maxNeighbors = Integer.MAX_VALUE-1;
+		if (this.maxNeighbors == Integer.MAX_VALUE) {
+			this.maxNeighbors = Integer.MAX_VALUE - 1;
 		}
 	}
 
 	/**
 	 * Processes the unordered set of squares and creates a graph out of them using prior knowledge and geometric
 	 * constraints.
+	 *
 	 * @param squares Set of squares
 	 * @return List of graphs. All data structures are recycled on the next call to process().
 	 */
-	public List<List<SquareNode>> process(List<DetectPolygonFromContour.Info> squares ) {
+	public List<List<SquareNode>> process( List<DetectPolygonFromContour.Info> squares ) {
 		recycleData();
 
 		// set up nodes
@@ -101,7 +103,7 @@ public class SquaresIntoCrossClusters extends SquaresIntoClusters {
 			Polygon2D_F64 polygon = info.polygon;
 
 			// see if every corner touches a border
-			if( info.borderCorners.size() > 0 ) {
+			if (info.borderCorners.size() > 0) {
 				boolean allBorder = true;
 				for (int j = 0; j < info.borderCorners.size(); j++) {
 					if (!info.borderCorners.get(j)) {
@@ -116,11 +118,11 @@ public class SquaresIntoCrossClusters extends SquaresIntoClusters {
 			}
 
 			// The center is used when visualizing results
-			UtilPoint2D_F64.mean(polygon.vertexes.data,0,polygon.size(),n.center);
+			UtilPoint2D_F64.mean(polygon.vertexes.data, 0, polygon.size(), n.center);
 
-			for (int j = 0,k = polygon.size()-1; j < polygon.size(); k=j,j++) {
+			for (int j = 0, k = polygon.size() - 1; j < polygon.size(); k = j, j++) {
 				double l = polygon.get(j).distance(polygon.get(k));
-				n.largestSide = Math.max(n.largestSide,l);
+				n.largestSide = Math.max(n.largestSide, l);
 			}
 
 			n.square = polygon;
@@ -142,7 +144,7 @@ public class SquaresIntoCrossClusters extends SquaresIntoClusters {
 			SquareNode n = nodes.get(indexNode);
 
 			for (int indexLocal = 0; indexLocal < n.square.size(); indexLocal++) {
-				if( n.touch.size > 0 && n.touch.get(indexLocal) )
+				if (n.touch.size > 0 && n.touch.get(indexLocal))
 					continue;
 
 				// find it's neighbors
@@ -155,12 +157,12 @@ public class SquaresIntoCrossClusters extends SquaresIntoClusters {
 					Point2D_F64 closestCorner = neighborData.point;
 
 					// if the neighbor corner is from the same node skip it
-					if( neighborNode == n )
+					if (neighborNode == n)
 						continue;
 
-					int neighborCornerIndex = getCornerIndex(neighborNode,closestCorner.x,closestCorner.y);
+					int neighborCornerIndex = getCornerIndex(neighborNode, closestCorner.x, closestCorner.y);
 
-					if( candidateIsMuchCloser(n, neighborNode, neighborData.distance))
+					if (candidateIsMuchCloser(n, neighborNode, neighborData.distance))
 						graph.checkConnect(n, indexLocal, neighborNode, neighborCornerIndex, neighborData.distance);
 				}
 			}
@@ -170,10 +172,10 @@ public class SquaresIntoCrossClusters extends SquaresIntoClusters {
 	/**
 	 * Returns the corner index of the specified coordinate
 	 */
-	int getCornerIndex( SquareNode node , double x , double y ) {
+	int getCornerIndex( SquareNode node, double x, double y ) {
 		for (int i = 0; i < node.square.size(); i++) {
 			Point2D_F64 c = node.square.get(i);
-			if( c.x == x && c.y == y )
+			if (c.x == x && c.y == y)
 				return i;
 		}
 
@@ -191,29 +193,28 @@ public class SquaresIntoCrossClusters extends SquaresIntoClusters {
 			SquareNode n = nodes.get(i);
 
 			for (int j = 0; j < n.square.size(); j++) {
-				if( n.touch.size > 0 && n.touch.get(j) )
+				if (n.touch.size > 0 && n.touch.get(j))
 					continue;
-				searchPoints.add( n.square.get(j));
+				searchPoints.add(n.square.get(j));
 
 				// setup a list of squares for quick lookup
 				searchSquareList.add(n);
 			}
 		}
-		nn.setPoints(searchPoints,true);
+		nn.setPoints(searchPoints, true);
 	}
 
 	/**
 	 * Checks to see if the two corners which are to be connected are by far the two closest corners between the two
 	 * squares
 	 */
-	boolean candidateIsMuchCloser( SquareNode node0 ,
-								   SquareNode node1 ,
-								   double distance2 )
-	{
-		double length = Math.max(node0.largestSide,node1.largestSide)*tooFarFraction;
+	boolean candidateIsMuchCloser( SquareNode node0,
+								   SquareNode node1,
+								   double distance2 ) {
+		double length = Math.max(node0.largestSide, node1.largestSide)*tooFarFraction;
 		length *= length;
 
-		if( distance2 > length)
+		if (distance2 > length)
 			return false;
 		return distance2 <= length;
 	}
@@ -222,8 +223,7 @@ public class SquaresIntoCrossClusters extends SquaresIntoClusters {
 		return maxCornerDistance;
 	}
 
-	public void setMaxCornerDistance(double maxCornerDistance) {
+	public void setMaxCornerDistance( double maxCornerDistance ) {
 		this.maxCornerDistance = maxCornerDistance;
 	}
-
 }

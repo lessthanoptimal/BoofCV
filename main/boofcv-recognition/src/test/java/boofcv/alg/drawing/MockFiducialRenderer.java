@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -28,6 +28,8 @@ import georegression.struct.point.Point2D_F64;
  */
 public class MockFiducialRenderer extends FiducialRenderEngine {
 	@Override public void init() {}
+
+	@Override public void setGray( double value ) {}
 
 	@Override public void circle(double cx, double cy, double radius) {}
 

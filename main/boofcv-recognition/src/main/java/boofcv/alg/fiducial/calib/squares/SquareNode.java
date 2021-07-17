@@ -60,7 +60,7 @@ public class SquareNode {
 		double best = Double.MAX_VALUE;
 		for (int i = 0; i < 4; i++) {
 			double d = square.get(i).distance2(p);
-			if( d < best ) {
+			if (d < best) {
 				best = d;
 			}
 		}
@@ -73,12 +73,12 @@ public class SquareNode {
 	public void reset() {
 		square = null;
 		touch = null;
-		center.setTo(-1,-1);
+		center.setTo(-1, -1);
 		largestSide = 0;
 		smallestSide = Double.MAX_VALUE;
 		graph = RESET_GRAPH;
 		for (int i = 0; i < edges.length; i++) {
-			if ( edges[i] != null )
+			if (edges[i] != null)
 				throw new RuntimeException("BUG!");
 			sideLengths[i] = 0;
 		}
@@ -89,7 +89,7 @@ public class SquareNode {
 	// in order that aren't touching the border. Or something like that. Or maybe just remove corners that
 	// touch the border?
 	public void updateArrayLength() {
-		if( edges.length != square.size() ) {
+		if (edges.length != square.size()) {
 			edges = new SquareEdge[square.size()];
 			sideLengths = new double[square.size()];
 		}
@@ -101,7 +101,7 @@ public class SquareNode {
 	public int getNumberOfConnections() {
 		int ret = 0;
 		for (int i = 0; i < square.size(); i++) {
-			if( edges[i] != null )
+			if (edges[i] != null)
 				ret++;
 		}
 		return ret;
@@ -111,7 +111,7 @@ public class SquareNode {
 		double smallest = Double.MAX_VALUE;
 		for (int i = 0; i < square.size(); i++) {
 			double length = sideLengths[i];
-			if( length < smallest ) {
+			if (length < smallest) {
 				smallest = length;
 			}
 		}
@@ -120,14 +120,14 @@ public class SquareNode {
 
 	public SquareEdge findEdge( SquareNode target ) {
 		int index = findEdgeIndex(target);
-		if( index >= 0 )
+		if (index >= 0)
 			return edges[index];
 		return null;
 	}
 
 	public int findEdgeIndex( SquareNode target ) {
 		for (int i = 0; i < 4; i++) {
-			if( edges[i] != null && edges[i].isEndPoint(target) ) {
+			if (edges[i] != null && edges[i].isEndPoint(target)) {
 				return i;
 			}
 		}
@@ -137,17 +137,19 @@ public class SquareNode {
 	public static class KdTreeSquareNode implements KdTreeDistance<SquareNode> {
 
 		@Override
-		public double distance(SquareNode a, SquareNode b) {
+		public double distance( SquareNode a, SquareNode b ) {
 			return a.center.distance2(b.center);
 		}
 
 		@Override
-		public double valueAt(SquareNode point, int index) {
-			switch( index ) {
-				case 0: return point.center.x;
-				case 1: return point.center.y;
+		public double valueAt( SquareNode point, int index ) {
+			switch (index) {
+				case 0:
+					return point.center.x;
+				case 1:
+					return point.center.y;
 			}
-			throw new IllegalArgumentException("Out of bounds. "+index);
+			throw new IllegalArgumentException("Out of bounds. " + index);
 		}
 
 		@Override

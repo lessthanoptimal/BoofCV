@@ -44,9 +44,10 @@ public class SquareRegularClustersIntoGrids {
 
 	/**
 	 * Configures class
+	 *
 	 * @param minimumElements The minimum number of elements which must be in a cluster for it to be accepted
 	 */
-	public SquareRegularClustersIntoGrids(int minimumElements) {
+	public SquareRegularClustersIntoGrids( int minimumElements ) {
 		this.minimumElements = minimumElements;
 	}
 
@@ -58,15 +59,19 @@ public class SquareRegularClustersIntoGrids {
 	public void process( List<List<SquareNode>> clusters ) {
 
 		valid.reset();
-		for( int i = 0; i < clusters.size(); i++ ) {
+		for (int i = 0; i < clusters.size(); i++) {
 			List<SquareNode> graph = clusters.get(i);
 
-			if( graph.size() < minimumElements )
+			if (graph.size() < minimumElements)
 				continue;
 
-			switch( checkNumberOfConnections(graph) ) {
-				case 1:orderIntoLine(graph); break;
-				case 2:orderIntoGrid(graph); break;
+			switch (checkNumberOfConnections(graph)) {
+				case 1:
+					orderIntoLine(graph);
+					break;
+				case 2:
+					orderIntoGrid(graph);
+					break;
 //				default: System.out.println("Failed number of connections. size = "+graph.size());
 			}
 		}
@@ -82,23 +87,23 @@ public class SquareRegularClustersIntoGrids {
 		int histogram[] = new int[5];
 
 		for (int i = 0; i < graph.size(); i++) {
-			histogram[ graph.get(i).getNumberOfConnections() ]++;
+			histogram[graph.get(i).getNumberOfConnections()]++;
 		}
 
-		if( graph.size() == 1 ) {
-			if( histogram[0] != 1 )
+		if (graph.size() == 1) {
+			if (histogram[0] != 1)
 				return 0;
 
 			return 1;
-		} else if( histogram[1] == 2 ) {
+		} else if (histogram[1] == 2) {
 			// line
-			if( histogram[0] != 0 )
+			if (histogram[0] != 0)
 				return 0;
-			if( histogram[2] != graph.size()-2 )
+			if (histogram[2] != graph.size() - 2)
 				return 0;
-			if( histogram[3] != 0 )
+			if (histogram[3] != 0)
 				return 0;
-			if( histogram[4] != 0 )
+			if (histogram[4] != 0)
 				return 0;
 
 			return 1;
@@ -118,7 +123,8 @@ public class SquareRegularClustersIntoGrids {
 	 * Puts the un-ordered graph into a ordered grid which is a line.
 	 */
 	List<SquareNode> nodesLine = new ArrayList<>();
-	void orderIntoLine(List<SquareNode> graph) {
+
+	void orderIntoLine( List<SquareNode> graph ) {
 
 		// discard previous label information since its now being used to avoid cycles
 		for (int i = 0; i < graph.size(); i++) {
@@ -127,7 +133,7 @@ public class SquareRegularClustersIntoGrids {
 
 		nodesLine.clear();
 
-		if( graph.size() > 1 ) {
+		if (graph.size() > 1) {
 			escape:
 			for (int i = 0; i < graph.size(); i++) {
 				// Find a side with 2 connections and use that as the seed
@@ -164,13 +170,14 @@ public class SquareRegularClustersIntoGrids {
 
 	List<SquareNode> column = new ArrayList<>();
 	List<SquareNode> ordered = new ArrayList<>();
+
 	/**
 	 * Given an unordered set of nodes, it will order them into a grid with row-major indexes. This assumes
 	 * the grid is 2 by 2 or larger.
 	 *
 	 * @param graph unordered nodes in a connected graph
 	 */
-	void orderIntoGrid(List<SquareNode> graph) {
+	void orderIntoGrid( List<SquareNode> graph ) {
 
 		// discard previous label information since its now being used to avoid cycles
 		for (int i = 0; i < graph.size(); i++) {
@@ -183,7 +190,7 @@ public class SquareRegularClustersIntoGrids {
 		for (int i = 0; i < graph.size(); i++) {
 			// Find a side with 2 connections and use that as the seed
 			SquareNode seed = graph.get(i);
-			if( seed.getNumberOfConnections() != 2 )
+			if (seed.getNumberOfConnections() != 2)
 				continue;
 
 			seed.graph = SEARCHED;
@@ -191,7 +198,7 @@ public class SquareRegularClustersIntoGrids {
 
 			// find all the nodes along one side, just pick an edge arbitrarily. This will be the first column
 			for (int edge = 0; edge < 4; edge++) {
-				if( seed.edges[edge] == null )
+				if (seed.edges[edge] == null)
 					continue;
 
 				SquareNode b = seed.edges[edge].destination(seed);
@@ -211,14 +218,14 @@ public class SquareRegularClustersIntoGrids {
 		SquareGrid grid = valid.grow();
 		grid.nodes.clear();
 		grid.nodes.addAll(ordered);
-		grid.columns = ordered.size() / column.size();
+		grid.columns = ordered.size()/column.size();
 		grid.rows = column.size();
 	}
 
 	/**
 	 * Competes the graph by traversing down the first column and adding the rows one at a time
 	 */
-	boolean addRowsToGrid(List<SquareNode> column, List<SquareNode> ordered) {
+	boolean addRowsToGrid( List<SquareNode> column, List<SquareNode> ordered ) {
 		for (int i = 0; i < column.size(); i++) {
 			column.get(i).graph = 0;
 		}
@@ -232,39 +239,38 @@ public class SquareRegularClustersIntoGrids {
 			ordered.add(n);
 
 			SquareNode nextRow;
-			if( j == 0 ) {
-				if( n.getNumberOfConnections() != 2 ) {
-					if( verbose ) System.err.println(
-							"Unexpected number of connections. want 2 found "+n.getNumberOfConnections());
+			if (j == 0) {
+				if (n.getNumberOfConnections() != 2) {
+					if (verbose) System.err.println(
+							"Unexpected number of connections. want 2 found " + n.getNumberOfConnections());
 					return true;
 				}
 
 				nextRow = pickNot(n, column.get(j + 1));
-
-			} else if( j == column.size()-1 ) {
-				if( n.getNumberOfConnections() != 2 ) {
+			} else if (j == column.size() - 1) {
+				if (n.getNumberOfConnections() != 2) {
 					if (verbose) System.err.println(
 							"Unexpected number of connections. want 2 found " + n.getNumberOfConnections());
 					return true;
 				}
-				nextRow = pickNot(n,column.get(j-1));
+				nextRow = pickNot(n, column.get(j - 1));
 			} else {
-				if( n.getNumberOfConnections() != 3 ) {
+				if (n.getNumberOfConnections() != 3) {
 					if (verbose) System.err.println(
 							"Unexpected number of connections. want 2 found " + n.getNumberOfConnections());
 					return true;
 				}
-				nextRow = pickNot(n, column.get(j-1),column.get(j+1));
+				nextRow = pickNot(n, column.get(j - 1), column.get(j + 1));
 			}
 
 			nextRow.graph = SEARCHED;
 			ordered.add(nextRow);
 			int numberLine = addLineToGrid(n, nextRow, ordered);
 
-			if( j == 0 ) {
+			if (j == 0) {
 				numFirsRow = numberLine;
-			} else if(numberLine != numFirsRow ) {
-				if( verbose ) System.err.println("Number of elements in rows do not match.");
+			} else if (numberLine != numFirsRow) {
+				if (verbose) System.err.println("Number of elements in rows do not match.");
 				return true;
 			}
 		}
@@ -275,12 +281,12 @@ public class SquareRegularClustersIntoGrids {
 	 * Add all the nodes into the list which lie along the line defined by a and b. a is assumed to be
 	 * an end point. Care is taken to not cycle.
 	 */
-	int addLineToGrid(SquareNode a, SquareNode b, List<SquareNode> list) {
+	int addLineToGrid( SquareNode a, SquareNode b, List<SquareNode> list ) {
 
 		int total = 2;
 //		double maxAngle = UtilAngle.radian(45);
 
-		while( true ) {
+		while (true) {
 //			double slopeX0 = b.center.x - a.center.x;
 //			double slopeY0 = b.center.y - a.center.y;
 
@@ -289,26 +295,26 @@ public class SquareRegularClustersIntoGrids {
 			// see which side the edge belongs to on b
 			boolean matched = false;
 			int side;
-			for( side = 0; side < 4; side++ ) {
-				if( b.edges[side] != null && b.edges[side].destination(b) == a ) {
+			for (side = 0; side < 4; side++) {
+				if (b.edges[side] != null && b.edges[side].destination(b) == a) {
 					matched = true;
 					break;
 				}
 			}
 
-			if(!matched) {
+			if (!matched) {
 				throw new RuntimeException("BUG!");
 			}
 
 			// must be on the adjacent side
-			side = (side+2)%4;
+			side = (side + 2)%4;
 
-			if( b.edges[side] == null )
+			if (b.edges[side] == null)
 				break;
 
 			SquareNode c = b.edges[side].destination(b);
 
-			if (c.graph == SEARCHED )
+			if (c.graph == SEARCHED)
 				break;
 
 //			double slopeX1 = c.center.x - b.center.x;
@@ -332,13 +338,13 @@ public class SquareRegularClustersIntoGrids {
 	/**
 	 * There are only two edges on target. Pick the edge which does not go to the provided child
 	 */
-	static SquareNode pickNot( SquareNode target , SquareNode child ) {
+	static SquareNode pickNot( SquareNode target, SquareNode child ) {
 		for (int i = 0; i < 4; i++) {
 			SquareEdge e = target.edges[i];
-			if( e == null )
+			if (e == null)
 				continue;
 			SquareNode c = e.destination(target);
-			if( c != child )
+			if (c != child)
 				return c;
 		}
 		throw new RuntimeException("There was no odd one out some how");
@@ -347,12 +353,12 @@ public class SquareRegularClustersIntoGrids {
 	/**
 	 * There are only three edges on target and two of them are known. Pick the one which isn't an inptu child
 	 */
-	static SquareNode pickNot( SquareNode target , SquareNode child0 , SquareNode child1 ) {
+	static SquareNode pickNot( SquareNode target, SquareNode child0, SquareNode child1 ) {
 		for (int i = 0; i < 4; i++) {
 			SquareEdge e = target.edges[i];
-			if( e == null ) continue;
+			if (e == null) continue;
 			SquareNode c = e.destination(target);
-			if( c != child0 && c != child1 )
+			if (c != child0 && c != child1)
 				return c;
 		}
 		throw new RuntimeException("There was no odd one out some how");
@@ -369,7 +375,7 @@ public class SquareRegularClustersIntoGrids {
 		return verbose;
 	}
 
-	public void setVerbose(boolean verbose) {
+	public void setVerbose( boolean verbose ) {
 		this.verbose = verbose;
 	}
 }

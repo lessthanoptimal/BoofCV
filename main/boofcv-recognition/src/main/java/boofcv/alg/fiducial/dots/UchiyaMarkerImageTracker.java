@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -44,7 +44,7 @@ import java.util.List;
  */
 public class UchiyaMarkerImageTracker<T extends ImageGray<T>> {
 	// Storage the input image after it has been converted into a binary image
-	@Getter GrayU8 binary = new GrayU8(1,1);
+	@Getter GrayU8 binary = new GrayU8(1, 1);
 
 	// Used to find ellipses in the image
 	@Getter InputToBinary<T> inputToBinary;
@@ -62,10 +62,10 @@ public class UchiyaMarkerImageTracker<T extends ImageGray<T>> {
 	/** Time to reject ellipses */
 	@Getter double timeReject;
 
-	public UchiyaMarkerImageTracker(InputToBinary<T> inputToBinary,
-									BinaryEllipseDetectorPixel ellipseDetector,
-									EdgeIntensityEllipse<T> intensityCheck,
-									UchiyaMarkerTracker tracker) {
+	public UchiyaMarkerImageTracker( InputToBinary<T> inputToBinary,
+									 BinaryEllipseDetectorPixel ellipseDetector,
+									 EdgeIntensityEllipse<T> intensityCheck,
+									 UchiyaMarkerTracker tracker ) {
 		this.inputToBinary = inputToBinary;
 		this.ellipseDetector = ellipseDetector;
 		this.intensityCheck = intensityCheck;
@@ -76,15 +76,16 @@ public class UchiyaMarkerImageTracker<T extends ImageGray<T>> {
 
 	/**
 	 * Processes the image looking for dots and from those Uchiya markers
+	 *
 	 * @param input Gray scale image
 	 */
-	public void detect(T input) {
+	public void detect( T input ) {
 		// Filter out huge objects since they are very unlikely to be valid dots
-		ellipseDetector.setMaximumContour(Math.min(input.width,input.height)/4);
+		ellipseDetector.setMaximumContour(Math.min(input.width, input.height)/4);
 
 		// Find the ellipses inside a binary image
 		final long nano0 = System.nanoTime();
-		inputToBinary.process(input,binary);
+		inputToBinary.process(input, binary);
 		final long nano1 = System.nanoTime();
 		ellipseDetector.process(binary);
 		final long nano2 = System.nanoTime();
@@ -98,21 +99,21 @@ public class UchiyaMarkerImageTracker<T extends ImageGray<T>> {
 			BinaryEllipseDetectorPixel.Found f = foundRaw.get(i);
 
 			// Reject dots with low contrast
-			if( !intensityCheck.process(f.ellipse) ) {
+			if (!intensityCheck.process(f.ellipse)) {
 				// mark the ellipse as pruned for visualization
 				f.ellipse.a = f.ellipse.b = 0;
 				continue;
 			}
 			// NOTE: These centers will not be the geometric centers. The geometric center could be found using
 			//       tangent points and this would make it more accurate. Not sure it's worth the effort...
-			foundDots.add( f.ellipse.center );
+			foundDots.add(f.ellipse.center);
 		}
 		final long nano3 = System.nanoTime();
 
 		// Save timing info for profiling
-		timeBinary = (nano1-nano0)*1e-6;
-		timeEllipse = (nano2-nano1)*1e-6;
-		timeReject = (nano3-nano2)*1e-6;
+		timeBinary = (nano1 - nano0)*1e-6;
+		timeEllipse = (nano2 - nano1)*1e-6;
+		timeReject = (nano3 - nano2)*1e-6;
 
 		// run the tracker
 		tracker.process(foundDots);
@@ -125,8 +126,8 @@ public class UchiyaMarkerImageTracker<T extends ImageGray<T>> {
 	 * @param width Input image width
 	 * @param height Input image height
 	 */
-	public void setLensDistortion(LensDistortionNarrowFOV distortion, int width, int height) {
-		if( distortion == null ) {
+	public void setLensDistortion( LensDistortionNarrowFOV distortion, int width, int height ) {
+		if (distortion == null) {
 			ellipseDetector.setLensDistortion(null);
 			intensityCheck.setTransform(null);
 		} else {
