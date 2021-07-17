@@ -18,17 +18,128 @@
 
 package boofcv.alg.distort.kanbra;
 
+import boofcv.struct.calib.CameraKannalaBrandt;
 import boofcv.testing.BoofStandardJUnit;
+import georegression.struct.point.Point2D_F64;
+import georegression.struct.point.Point3D_F64;
+import org.ddogleg.optimization.DerivativeChecker;
+import org.ddogleg.optimization.functions.FunctionNtoM;
+import org.ddogleg.optimization.functions.FunctionNtoMxN;
+import org.ejml.UtilEjml;
+import org.ejml.data.DMatrix2x2;
+import org.ejml.data.DMatrixRMaj;
+import org.ejml.ops.DConvertMatrixStruct;
 import org.junit.jupiter.api.Test;
 
-import static org.junit.jupiter.api.Assertions.fail;
+import static boofcv.alg.distort.kanbra.KannalaBrandtUtils_F64.polynomial;
+import static boofcv.alg.distort.kanbra.KannalaBrandtUtils_F64.polytrig;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  * @author Peter Abeles
  */
 class TestKannalaBrandtPtoS_F64 extends BoofStandardJUnit {
-	@Test
-	void stuff() {
-		fail("Implement");
+	/**
+	 * Given spherical coordinates, compute pixel coordinates and see if we can invert them correctly.
+	 */
+	@Test void simpleSanityCheck_SymmetricOnly() {
+		CameraKannalaBrandt model = new CameraKannalaBrandt(0, 0, 0).fsetK(500, 550, 0.0, 600, 650);
+		model.fsetSymmetric(1.0, 0.1);
+
+		var expected = new Point3D_F64(0.1, -0.05, 0.8);
+		var pixel = new Point2D_F64();
+		var found = new Point3D_F64();
+
+		new KannalaBrandtStoP_F64(model).compute(expected.x, expected.y, expected.z, pixel);
+		new KannalaBrandtPtoS_F64(model).compute(pixel.x, pixel.y, found);
+
+		// make sure both have them have a norm of 1
+		expected.divideIP(expected.norm());
+		found.divideIP(found.norm());
+
+		// This should be very accurate. The inaccurate part isn't being called
+		assertEquals(0.0, expected.distance(found), UtilEjml.TEST_F64);
+	}
+
+	/**
+	 * The entire motion model will be exercised here
+	 */
+	@Test void simpleSanityCheck_Everything() {
+		CameraKannalaBrandt model = new CameraKannalaBrandt().fsetK(500, 550, 0.0, 600, 650);
+		model.fsetSymmetric(1.0, 0.4).fsetRadial(1.1, 0.2, -0.01).fsetTangent(0.5, -0.1, 0.06, 0.12).
+				fsetRadialTrig(0.01, 0.02, -0.03, 0.04).fsetTangentTrig(0.01, 0.2, 0.1, 0.4);
+
+		var expected = new Point3D_F64(0.1, -0.12, 0.8);
+		var pixel = new Point2D_F64();
+		var found = new Point3D_F64();
+
+		new KannalaBrandtStoP_F64(model).compute(expected.x, expected.y, expected.z, pixel);
+		new KannalaBrandtPtoS_F64(model).compute(pixel.x, pixel.y, found);
+
+		// make sure both have them have a norm of 1
+		expected.divideIP(expected.norm());
+		found.divideIP(found.norm());
+
+		// The paper says this will be noisy. Using Newton's method seems to be much more accurate
+		assertEquals(0.0, expected.distance(found), 1e-4);
+	}
+
+	/**
+	 * Compare to numerical Jacobian
+	 */
+	@Test void jacobianOfNormFunc() {
+		CameraKannalaBrandt model = new CameraKannalaBrandt().fsetK(500, 550, 0.0, 600, 650);
+		model.fsetSymmetric(1.0, 0.4).fsetRadial(1.1, 0.2, -0.01).fsetTangent(0.5, -0.1, 0.06, 0.12).
+				fsetRadialTrig(0.01, 0.03, -0.03, 0.04).fsetTangentTrig(0.01, 0.2, 0.1, 0.4);
+
+		FunctionNtoM function = new FunctionNtoM() {
+			@Override public void process( double[] input, double[] output ) {
+				double theta = input[0];
+				double psi = input[1];
+
+				double r = polynomial(model.coefSymm, theta);
+
+				double cospsi = Math.cos(psi);
+				double sinpsi = Math.sin(psi);
+
+				// distortion terms. radial and tangential
+				double dr = polynomial(model.coefRad, theta)*polytrig(model.coefRadTrig, cospsi, sinpsi);
+				double dt = polynomial(model.coefTan, theta)*polytrig(model.coefTanTrig, cospsi, sinpsi);
+
+				// put it all together to get normalized image coordinates
+				output[0] = (r + dr)*cospsi - dt*sinpsi;
+				output[1] = (r + dr)*sinpsi + dt*cospsi;
+			}
+
+			@Override public int getNumOfInputsN() {return 2;}
+
+			@Override public int getNumOfOutputsM() {return 2;}
+		};
+
+		var kb = new KannalaBrandtPtoS_F64(model);
+		FunctionNtoMxN<DMatrixRMaj> jacobian = new FunctionNtoMxN<>() {
+			final DMatrix2x2 a = new DMatrix2x2();
+
+			@Override public int getNumOfInputsN() {return 2;}
+
+			@Override public int getNumOfOutputsM() {return 2;}
+
+			@Override public DMatrixRMaj declareMatrixMxN() {return new DMatrixRMaj(2,2);}
+
+			@Override public void process( double[] input, DMatrixRMaj output ) {
+				double theta = input[0];
+				double psi = input[1];
+
+				double cospsi = Math.cos(psi);
+				double sinpsi = Math.sin(psi);
+
+				kb.jacobianOfNormFunc(theta, cospsi, sinpsi, a);
+				DConvertMatrixStruct.convert(a, output);
+			}
+		};
+
+//		DerivativeChecker.jacobianPrint(function, jacobian, new double[]{0.2, -0.4}, 1e-4);
+		assertTrue(DerivativeChecker.jacobian(function, jacobian, new double[]{0.2, -0.4}, 1e-4));
 	}
 }

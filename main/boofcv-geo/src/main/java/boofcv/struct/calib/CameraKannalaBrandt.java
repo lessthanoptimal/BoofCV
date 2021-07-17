@@ -18,6 +18,7 @@
 
 package boofcv.struct.calib;
 
+import boofcv.misc.BoofMiscOps;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -68,11 +69,11 @@ public class CameraKannalaBrandt extends CameraPinhole {
 	}
 
 	/**
-	 * Constructor which uses the standard number of coefficients.
+	 * With no coefficients specified.
 	 */
 	public CameraKannalaBrandt()
 	{
-		this(5,3,4);
+		this(0,0,0);
 	}
 
 	public CameraKannalaBrandt fsetK(double fx, double fy,
@@ -93,15 +94,28 @@ public class CameraKannalaBrandt extends CameraPinhole {
 		return this;
 	}
 
-	public CameraKannalaBrandt fsetDistRadial( double... coefs ) {
+	public CameraKannalaBrandt fsetRadial( double... coefs ) {
 		this.coefRad = coefs.clone();
 		return this;
 	}
 
-	public CameraKannalaBrandt fsetDistTangent( double... coefs ) {
+	public CameraKannalaBrandt fsetTangent( double... coefs ) {
 		this.coefTan = coefs.clone();
 		return this;
 	}
+
+	public CameraKannalaBrandt fsetRadialTrig( double... coefs ) {
+		BoofMiscOps.checkTrue(coefs.length==0 || coefs.length==4);
+		this.coefRadTrig = coefs.clone();
+		return this;
+	}
+
+	public CameraKannalaBrandt fsetTangentTrig( double... coefs ) {
+		BoofMiscOps.checkTrue(coefs.length==0 || coefs.length==4);
+		this.coefTanTrig = coefs.clone();
+		return this;
+	}
+
 
 	/**
 	 * Returns true if it's a symmetric model. That is, no radial or tangential distortion
@@ -122,6 +136,19 @@ public class CameraKannalaBrandt extends CameraPinhole {
 			}
 		}
 		return noRadial && noTangential;
+	}
+
+	/**
+	 * Returns true if there are coefficients that could result in a non-zero distortion for the
+	 * non-symmetric terms. This does not check to see if the coefficients are zero.
+	 */
+	public boolean hasNonSymmetricCoefficients() {
+		if (coefRad.length != 0 && coefRadTrig.length == 4)
+			return true;
+		if (coefTan.length != 0 && coefTanTrig.length == 4)
+			return true;
+
+		return false;
 	}
 
 	public void setTo( CameraKannalaBrandt src ) {

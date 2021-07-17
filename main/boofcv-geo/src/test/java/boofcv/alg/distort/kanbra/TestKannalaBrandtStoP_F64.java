@@ -18,47 +18,81 @@
 
 package boofcv.alg.distort.kanbra;
 
-import boofcv.alg.distort.pinhole.PinholeNtoP_F64;
 import boofcv.struct.calib.CameraKannalaBrandt;
-import boofcv.struct.calib.CameraPinhole;
 import boofcv.testing.BoofStandardJUnit;
 import georegression.struct.point.Point2D_F64;
 import georegression.struct.point.Point3D_F64;
+import org.ejml.UtilEjml;
 import org.junit.jupiter.api.Test;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.fail;
+import java.util.ArrayList;
+import java.util.List;
+
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  * @author Peter Abeles
  */
 class TestKannalaBrandtStoP_F64 extends BoofStandardJUnit {
 	/**
-	 * Compare to a pinhole camera when there's no distortion terms. Results should be identical.
+	 * pass in variable parameter lengths and see if bad stuff happens
 	 */
-	@Test void withoutDistortion() {
-		CameraPinhole pinhole = new CameraPinhole().fsetK(500, 550, 0.05, 600, 650);
-		CameraKannalaBrandt fish = new CameraKannalaBrandt().fsetK(500, 550, 0.05, 600, 650);
+	@Test void doesItBlowUp() {
+		List<CameraKannalaBrandt> models = new ArrayList<>();
 
-		// Arbitrary 3D point in front of the camera
+		models.add(new CameraKannalaBrandt(0, 0, 0).fsetK(500, 550, 0.0, 600, 650));
+		models.add(new CameraKannalaBrandt(0, 0, 0).fsetK(500, 550, 0.1, 600, 650));
+		models.add(new CameraKannalaBrandt(0, 0, 0).fsetK(500, 550, 0.0, 600, 650).fsetSymmetric(1.0,0.1));
+		models.add(new CameraKannalaBrandt(0, 0, 0).fsetK(500, 550, 0.0, 600, 650).fsetRadial(1.0,0.1));
+		models.add(new CameraKannalaBrandt(0, 0, 0).fsetK(500, 550, 0.0, 600, 650).fsetTangent(1.0,0.1));
+		models.add(new CameraKannalaBrandt(0, 0, 0).fsetK(500, 550, 0.0, 600, 650).
+				fsetSymmetric(1.0,0.1).fsetRadial(1.0,0.1).fsetTangent(1.0,0.1));
+
+
 		Point3D_F64 P3 = new Point3D_F64(0.1, -0.05, 0.8);
+		Point2D_F64 pixel = new Point2D_F64();
 
-		var pinholeStoP = new PinholeNtoP_F64(pinhole);
-		var fishStoP = new KannalaBrandtStoP_F64(fish);
-
-		Point2D_F64 expectedPixel = new Point2D_F64();
-		Point2D_F64 foundPixel = new Point2D_F64();
-
-		pinholeStoP.compute(P3.x/P3.z, P3.y/P3.z, expectedPixel);
-		fishStoP.compute(P3.x, P3.y, P3.z, foundPixel);
-
-		assertEquals(0.0, expectedPixel.distance(foundPixel), 1e-7);
+		for (CameraKannalaBrandt camera : models) {
+			new KannalaBrandtStoP_F64(camera).compute(P3.x, P3.y, P3.z, pixel);
+			assertFalse(UtilEjml.isUncountable(pixel.normSq()));
+		}
 	}
 
 	/**
 	 * Qualitative checks for when there's only symmetric distortion
 	 */
 	@Test void onlySymmetric() {
-		fail("Implement");
+		// different symmetric coefficient that has a known behavior to the distortion
+		CameraKannalaBrandt fish1 = new CameraKannalaBrandt().fsetK(500, 550, 0.0, 600, 650).fsetSymmetric(1.0,0.1);
+		CameraKannalaBrandt fish2 = new CameraKannalaBrandt().fsetK(500, 550, 0.0, 600, 650).fsetSymmetric(1.0,0.4);
+
+		Point2D_F64 pixel1 = new Point2D_F64();
+		Point2D_F64 pixel2 = new Point2D_F64();
+
+		// rotate around the circle. This should work in every direction
+		for (int i = 0; i < 20; i++ ) {
+			double theta = Math.PI*2.0*i/20.0;
+			double r = 0.5;
+			double x = r * Math.cos(theta);
+			double y = r * Math.sin(theta);
+
+			Point3D_F64 P3 = new Point3D_F64(x, y, 0.8);
+
+			new KannalaBrandtStoP_F64(fish1).compute(P3.x, P3.y, P3.z, pixel1);
+			new KannalaBrandtStoP_F64(fish2).compute(P3.x, P3.y, P3.z, pixel2);
+
+			pixel1.x -= fish1.cx;
+			pixel1.y -= fish1.cy;
+
+			pixel2.x -= fish2.cx;
+			pixel2.y -= fish2.cy;
+
+			// NOTE: The norm changes because fx != fy
+//			System.out.printf("angle=%.3f (%.2f %.2f) n=%.2f %.2f\n", theta, x,y,pixel1.norm(), pixel2.norm());
+
+			// larger positive coefficients should push points out farther in the radial direction
+			assertTrue(pixel1.norm() < pixel2.norm());
+		}
 	}
 }
