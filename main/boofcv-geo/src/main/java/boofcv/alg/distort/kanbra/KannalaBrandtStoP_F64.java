@@ -18,10 +18,15 @@
 
 package boofcv.alg.distort.kanbra;
 
+import boofcv.misc.BoofMiscOps;
 import boofcv.struct.calib.CameraKannalaBrandt;
 import boofcv.struct.distort.Point3Transform2_F64;
 import georegression.geometry.UtilPoint3D_F64;
 import georegression.struct.point.Point2D_F64;
+import lombok.Getter;
+
+import static boofcv.alg.distort.kanbra.KannalaBrandtUtils_F64.polynomial;
+import static boofcv.alg.distort.kanbra.KannalaBrandtUtils_F64.polytrig;
 
 /**
  * Forward projection model for {@link CameraKannalaBrandt}.  Takes a 3D point in camera unit sphere
@@ -31,9 +36,11 @@ import georegression.struct.point.Point2D_F64;
  * @author Peter Abeles
  */
 public class KannalaBrandtStoP_F64 implements Point3Transform2_F64 {
-	protected final CameraKannalaBrandt model;
+	@Getter protected final CameraKannalaBrandt model;
 
 	public KannalaBrandtStoP_F64( CameraKannalaBrandt model ) {
+		BoofMiscOps.checkTrue(model.coefRadTrig.length == 0 || model.coefRadTrig.length == 4);
+
 		this.model = new CameraKannalaBrandt(model);
 	}
 
@@ -42,57 +49,34 @@ public class KannalaBrandtStoP_F64 implements Point3Transform2_F64 {
 		// angle between incoming ray and principle axis
 		//    Principle Axis = (0,0,z)
 		//    Incoming Ray   = (x,y,z)
-		/**/double theta = Math.acos(z/UtilPoint3D_F64.norm(x, y, z)); // uses dot product
+		double theta = Math.acos(z/UtilPoint3D_F64.norm(x, y, z)); // uses dot product
 
 		// compute symmetric projection function
-		/**/double r = polynomial(model.coefSymm, theta);
+		double r = polynomial(model.coefSymm, theta);
 
 		// angle on the image plane of the incoming ray
-		/**/double phi = Math.atan2(y, x);
-		/**/double cosphi = Math.cos(phi);
-		/**/double sinphi = Math.sin(phi);
+		double psi = Math.atan2(y, x);
+		double cospsi = Math.cos(psi); // u_r[0] or u_psi[1]
+		double sinpsi = Math.sin(psi); // u_r[1] or -u_psi[0]
 
-		// normalized image coordinates
-		/**/double dx, dy;
-		if (model.coefRad.length > 0) {
+		// distorted (normalized) coordinates
+		double dx, dy;
+		if (model.hasNonSymmetricCoefficients()) {
 			// distortion terms. radial and tangential
-			/**/double dr = polynomial(model.coefRad, theta)*polytrig(model.coefRadTrig, cosphi, sinphi);
-			/**/double dt = polynomial(model.coefTan, theta)*polytrig(model.coefRadTrig, cosphi, sinphi);
+			double dr = polynomial(model.coefRad, theta)*polytrig(model.coefRadTrig, cospsi, sinpsi);
+			double dt = polynomial(model.coefTan, theta)*polytrig(model.coefTanTrig, cospsi, sinpsi);
 
 			// put it all together to get normalized image coordinates
-			dx = (r + dr)*cosphi - dt*sinphi;
-			dy = (r + dr)*sinphi + dt*cosphi;
+			dx = (r + dr)*cospsi - dt*sinpsi;
+			dy = (r + dr)*sinpsi + dt*cospsi;
 		} else {
-			dx = r*cosphi;
-			dy = r*sinphi;
+			dx = r*cospsi;
+			dy = r*sinpsi;
 		}
+
 		// project into pixels
-		out.x = (double)(model.fx*dx + model.skew*dy + model.cx);
-		out.y = (double)(model.fy*dy + model.cy);
-	}
-
-	private /**/double polynomial( /**/double[] coefs, /**/double x ) {
-		/**/double pow = x;
-		/**/double result = 0;
-		for (int i = 0; i < coefs.length; i++) {
-			result += coefs[i]*pow;
-			pow *= x*x;
-		}
-		return result;
-	}
-
-	private /**/double polytrig( /**/double[] coefs, /**/double cos, /**/double sin ) {
-		/**/double result = 0;
-		for (int i = 0; i < coefs.length; i += 2) {
-			result += coefs[i]*cos;
-			result += coefs[i + 1]*sin;
-
-			// sin(2*phi) = 2*cos(phi)*sin(phi)
-			// cos(2*phi) = 2*cos^2(phi)-1
-			sin = 2*cos*sin;
-			cos = 2*cos*cos - 1.0;
-		}
-		return result;
+		out.x = model.fx*dx + model.skew*dy + model.cx;
+		out.y = model.fy*dy + model.cy;
 	}
 
 	@Override
