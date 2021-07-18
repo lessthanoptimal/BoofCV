@@ -36,13 +36,16 @@ class TestChessDotsGenerator extends BoofStandardJUnit {
 
 	public static void main( String[] args ) {
 		var engine = new FiducialImageEngine();
-		engine.configure(10, 600);
+		engine.configure(10, 1200);
 		var renderer = new ChessDotsGenerator();
 		renderer.render = engine;
-		renderer.squareWidth = 100;
-		renderer.render(4, 3);
+		renderer.squareWidth = 50;
+		renderer.render(20, 23);
 
 		GrayU8 image = engine.getGray();
-		ShowImages.showBlocking(image, "Foo", 20_000);
+
+//		GImageMiscOps.addGaussian(image, new Random(23), 4.0, 0.0, 255.0);
+
+		ShowImages.showBlocking(image, "Foo", 200_000);
 	}
 }
