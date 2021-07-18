@@ -28,19 +28,30 @@ import boofcv.alg.drawing.FiducialRenderEngine;
  * @author Peter Abeles
  */
 public class ChessDotsGenerator {
-	// TODO reduce size of outside squares
+	// Design Notes:
+	// Encoding using both circles and squares were considered. Space was left between the shapes and they both ended
+	// to excite the x-corner detector weakly, but enough for a corner to appear. Squares have the advantage that the
+	// line connecting two false x-corners does not look like a chessboard line.
+
 	// TODO real encoding
 	// TODO Render a panel ID into the center of a middle white block?
 	// How wide a square is in the chessboard
 	double squareWidth;
-	// Number of columns in the chessboard pattern
+	/** Number of columns in the chessboard pattern */
 	int cols;
-	// Number of rows in the chessboard pattern
+	/** Number of rows in the chessboard pattern */
 	int rows;
-	// Number of dots wide the encoded grid is
+
+	/** Number of dots wide the data grid is */
 	int dotGridSize = 5;
-	// Fraction of a cell a dot is
-	double circleWidthFraction = 0.7;
+	/** Fraction of a cell's length the data bit is */
+	double dataBitWidthFraction = 0.7;
+
+	/** Fraction of the length the quite zone is around data bits */
+	double dataBorderFraction = 0.1;
+
+	/** Encode coordinates every X times */
+	int coordinateMultiplier = 1;
 
 	// used to draw the fiducial
 	protected FiducialRenderEngine render;
@@ -51,20 +62,29 @@ public class ChessDotsGenerator {
 
 		render.init();
 
-		// Start drawing black
-		render.setGray(0.0);
-
 		// First build the chessboard pattern
-		for (int col = 0; col < cols; col++) {
-			double x = squareWidth*col;
-			for (int row = col%2; row < rows; row += 2) {
-				double y = squareWidth*row;
-				render.square(x, y, squareWidth, squareWidth);
-			}
-		}
+		renderSquares();
 
 		// Render the unique ID for all inner squares
 		renderCodes();
+	}
+
+	private void renderSquares() {
+		// Start drawing black
+		render.setGray(0.0);
+
+		double stub = squareWidth/2;
+		for (int col = 0; col < cols; col++) {
+			boolean borderCol = col == 0 || col == cols - 1;
+			double x = col == 0 ? 0.0 : stub + squareWidth*(col - 1);
+			double lengthX = borderCol ? stub : squareWidth;
+			for (int row = col%2; row < rows; row += 2) {
+				boolean borderRow = row == 0 || row == rows - 1;
+				double lengthY = borderRow ? stub : squareWidth;
+				double y = row == 0 ? 0.0 : stub + squareWidth*(row - 1);
+				render.rectangle(x, y, x + lengthX, y + lengthY);
+			}
+		}
 	}
 
 	/**
@@ -74,12 +94,24 @@ public class ChessDotsGenerator {
 		// White circles will be rendered inside the inner squares
 		render.setGray(1.0);
 
-		int count = 0;
-		for (int col = 1; col < cols - 1; col++) {
-			double x = squareWidth*col;
+		double stub = squareWidth/2;
+		for (int col = 1; col < cols; col += 1) {
+			boolean borderCol = col == cols - 1;
+			double x = stub + squareWidth*(col - 1);
+			if ((col-1)%coordinateMultiplier != 0)
+				continue;
 			for (int row = col%2; row < rows; row += 2) {
-				double y = squareWidth*row;
-				renderEncoding(x, y, count++);
+				if ((row-1)%coordinateMultiplier != 0)
+					continue;
+
+				boolean borderRow = row == 0 || row == rows - 1;
+				double y = row == 0 ? 0.0 : stub + squareWidth*(row - 1);
+
+				if (borderCol || borderRow)
+					continue;
+
+				// TODO encode location into a set of bits
+				renderEncoding(x, y);
 			}
 		}
 	}
@@ -87,16 +119,20 @@ public class ChessDotsGenerator {
 	/**
 	 * Renders the specified value into a black square with white dots
 	 */
-	private void renderEncoding( double px, double py, int value ) {
-		double cellWidth = squareWidth/(2 + dotGridSize);
-		double circleRadius = cellWidth*0.5*circleWidthFraction;
+	private void renderEncoding( double px, double py ) {
+		double borderWidth = squareWidth*dataBorderFraction;
+		double cellWidth = (squareWidth - borderWidth*2)/dotGridSize;
+		double squareWidth = cellWidth*dataBitWidthFraction;
+
+		// Account for the data shape being smaller than a cell
+		double offset = borderWidth + cellWidth*(1.0 - dataBitWidthFraction)/2.0;
 
 		for (int col = 0; col < dotGridSize; col++) {
-			double x = px + (col + 1)*cellWidth;
+			double x = px + col*cellWidth + offset;
 			for (int row = 0; row < dotGridSize; row++) {
-				double y = py + (row + 1)*cellWidth;
+				double y = py + row*cellWidth + offset;
 
-				render.circle(x + circleRadius, y + circleRadius, circleRadius);
+				render.square(x, y, squareWidth);
 			}
 		}
 	}
