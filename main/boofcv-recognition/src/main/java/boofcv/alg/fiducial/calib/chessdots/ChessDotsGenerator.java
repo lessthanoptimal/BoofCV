@@ -49,7 +49,7 @@ public class ChessDotsGenerator {
 	double dataBitWidthFraction = 0.7;
 
 	/** Fraction of the length the quite zone is around data bits */
-	double dataBorderFraction = 0.1;
+	double dataBorderFraction = 0.15;
 
 	// used to draw the fiducial
 	protected FiducialRenderEngine render;
@@ -115,7 +115,7 @@ public class ChessDotsGenerator {
 					continue;
 
 				// Encode the coordinate into bits
-				codec.encode(row-1, col-1, packetBits);
+				codec.encode(row - 1, col - 1, packetBits);
 				renderEncoding(x, y);
 			}
 		}
@@ -139,7 +139,7 @@ public class ChessDotsGenerator {
 				double y = py + row*cellWidth + offset;
 
 				int bit = row*dotGridSize + col;
-				if (packetBits.get(bit)==0)
+				if (packetBits.get(bit) == 0)
 					continue;
 				render.square(x, y, squareWidth);
 			}

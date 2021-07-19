@@ -27,17 +27,32 @@ import lombok.Setter;
 import org.ddogleg.struct.DogArray_I8;
 
 /**
- * 2-bits for multiplier (0=1,1=2,2=4,3=8)
- * 2-bits reserved for future use (must be 0)
- * Encoded coordinates (row*max_length + col)
- * 4-bit checksum
+ * Encodes and decodes grid coordinates into a compact packet for use in calibration targets. A multiplier can be
+ * added which will scale the coordinate values. Useful for when only some square are filled in. The same error
+ * correction scheme used in QR codes is used here, but tweaked for the smaller packet size. A checksum was added
+ * to detect corrupted packets. Between the ECC mechanism and checksum most errors are caught, but for small
+ * packet sizes random data can be mistaken for a real target.
+ *
+ * Grid size is dynamically determined based on the maximum coordinate that's needed and the desired level of
+ * error correction. If there are extra bits those are allocated for ECC or filled in with a known pattern.
+ *
+ * Words (8-bit data chunks) are laid out in a pattern that's designed to keep each individual word's bits as close
+ * to eac other as possible. The error correction words on a per-word basis and not a per-bit basis. Dirt or damage
+ * tends to be located within a small spatial region and you want to minimize the number of words it corrupts.
+ *
+ * Packet Format:
+ * <ul>
+ *     <li>2-bits for multiplier (0=1,1=2,2=4,3=8)</li>
+ *     <li>2-bits reserved for future use (must be 0)</li>
+ *     <li>Encoded coordinates (row*max_length + col)</li>
+ *     <li>4-bit checksum. xor based</li>
+ * </ul>
  *
  * @author Peter Abeles
  */
 public class ChessboardSolomonMarkerCodec {
 	// TODO locate the bits spatially close to each for a single word so that local damage doesn't screw up
 	//      multiple words
-	// TODO if there are extra bits in the grid increase the number of ECC words
 
 	/** Number of bits per word */
 	public final int WORD_BITS = 8;
@@ -47,11 +62,13 @@ public class ChessboardSolomonMarkerCodec {
 	 */
 	@Getter @Setter double maxErrorFraction = 0.3;
 
+	// Used to mask out bits not in the word
 	int wordMask;
-	int maxCoordinate;
+	/** The maximum allowed coordinate */
+	@Getter int maxCoordinate;
 
 	// Number of bits needed to encode a number
-	int bitsNumber;
+	int bitsPerNumber;
 
 	// Number of bits in the data packet
 	int messageBitCount;
@@ -73,7 +90,7 @@ public class ChessboardSolomonMarkerCodec {
 	// Workspace that allowed you to construct a message one bit at a time
 	protected final PackedBits8 bits = new PackedBits8();
 
-	// Error correction algorithm
+	// Error correction algorithm. Primitive is taken from QR Code specification
 	private final ReidSolomonCodes rscodes = new ReidSolomonCodes(WORD_BITS, 0b100011101);
 
 	/**
@@ -91,8 +108,8 @@ public class ChessboardSolomonMarkerCodec {
 		this.maxCoordinate = maxCoordinate;
 
 		// Compute how many bits it will take to encode the two coordinates
-		bitsNumber = (int)Math.ceil(Math.log(maxCoordinate)/Math.log(2));
-		messageBitCount = 2*bitsNumber;
+		bitsPerNumber = (int)Math.ceil(Math.log(maxCoordinate)/Math.log(2));
+		messageBitCount = 2*bitsPerNumber;
 
 		// Add overhead
 		messageBitCount += 4; // (scale and reserved)
@@ -150,8 +167,8 @@ public class ChessboardSolomonMarkerCodec {
 		// Build the packet
 		bits.resize(0);
 		bits.append(multiplier.ordinal(), 4, false);
-		bits.append(row, bitsNumber, false);
-		bits.append(col, bitsNumber, false);
+		bits.append(row, bitsPerNumber, false);
+		bits.append(col, bitsPerNumber, false);
 
 		// Compute a checksum. ECC doesn't catch everything in targets this small
 		int checkSum = computeCheckSum();
@@ -236,8 +253,8 @@ public class ChessboardSolomonMarkerCodec {
 		int scale = Multiplier.values()[m].amount;
 
 		// Extract the coordinate
-		coordinate.y = scale*(bits.read(4, bitsNumber, true)); // row
-		coordinate.x = scale*(bits.read(4 + bitsNumber, bitsNumber, true)); // column
+		coordinate.y = scale*(bits.read(4, bitsPerNumber, true)); // row
+		coordinate.x = scale*(bits.read(4 + bitsPerNumber, bitsPerNumber, true)); // column
 
 		// See if the coordinate is invalid
 		return coordinate.x >= 0 && coordinate.y >= 0 && coordinate.y < maxCoordinate;
