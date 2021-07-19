@@ -19,6 +19,7 @@
 package boofcv.alg.fiducial.calib.chessdots;
 
 import boofcv.alg.drawing.FiducialRenderEngine;
+import boofcv.alg.fiducial.qrcode.PackedBits8;
 
 /**
  * Renders a chessboard pattern with numbers encoded inside the dots.
@@ -33,6 +34,8 @@ public class ChessDotsGenerator {
 	// to excite the x-corner detector weakly, but enough for a corner to appear. Squares have the advantage that the
 	// line connecting two false x-corners does not look like a chessboard line.
 
+	ChessboardSolomonMarkerCodec.Multiplier multiplier = ChessboardSolomonMarkerCodec.Multiplier.LEVEL_0;
+
 	// TODO real encoding
 	// TODO Render a panel ID into the center of a middle white block?
 	// How wide a square is in the chessboard
@@ -42,24 +45,23 @@ public class ChessDotsGenerator {
 	/** Number of rows in the chessboard pattern */
 	int rows;
 
-	/** Number of dots wide the data grid is */
-	int dotGridSize = 5;
 	/** Fraction of a cell's length the data bit is */
 	double dataBitWidthFraction = 0.7;
 
 	/** Fraction of the length the quite zone is around data bits */
 	double dataBorderFraction = 0.1;
 
-	/** Encode coordinates every X times */
-	int coordinateMultiplier = 1;
-
 	// used to draw the fiducial
 	protected FiducialRenderEngine render;
+	PackedBits8 packetBits = new PackedBits8();
+
+	ChessboardSolomonMarkerCodec codec = new ChessboardSolomonMarkerCodec();
 
 	public void render( int rows, int cols ) {
 		this.rows = rows;
 		this.cols = cols;
 
+		codec.configure(multiplier, Math.max(rows, cols));
 		render.init();
 
 		// First build the chessboard pattern
@@ -94,14 +96,16 @@ public class ChessDotsGenerator {
 		// White circles will be rendered inside the inner squares
 		render.setGray(1.0);
 
+		int coordinateMultiplier = multiplier.getAmount();
+
 		double stub = squareWidth/2;
 		for (int col = 1; col < cols; col += 1) {
 			boolean borderCol = col == cols - 1;
 			double x = stub + squareWidth*(col - 1);
-			if ((col-1)%coordinateMultiplier != 0)
+			if ((col - 1)%coordinateMultiplier != 0)
 				continue;
 			for (int row = col%2; row < rows; row += 2) {
-				if ((row-1)%coordinateMultiplier != 0)
+				if ((row - 1)%coordinateMultiplier != 0)
 					continue;
 
 				boolean borderRow = row == 0 || row == rows - 1;
@@ -110,7 +114,8 @@ public class ChessDotsGenerator {
 				if (borderCol || borderRow)
 					continue;
 
-				// TODO encode location into a set of bits
+				// Encode the coordinate into bits
+				codec.encode(row, col, packetBits);
 				renderEncoding(x, y);
 			}
 		}
@@ -120,6 +125,7 @@ public class ChessDotsGenerator {
 	 * Renders the specified value into a black square with white dots
 	 */
 	private void renderEncoding( double px, double py ) {
+		int dotGridSize = codec.getGridBitLength();
 		double borderWidth = squareWidth*dataBorderFraction;
 		double cellWidth = (squareWidth - borderWidth*2)/dotGridSize;
 		double squareWidth = cellWidth*dataBitWidthFraction;
@@ -132,6 +138,9 @@ public class ChessDotsGenerator {
 			for (int row = 0; row < dotGridSize; row++) {
 				double y = py + row*cellWidth + offset;
 
+				int bit = row*dotGridSize + col;
+				if (packetBits.get(bit)==0)
+					continue;
 				render.square(x, y, squareWidth);
 			}
 		}
