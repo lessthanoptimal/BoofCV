@@ -18,36 +18,42 @@
 
 package boofcv.alg.fiducial.calib.chessdots;
 
+import boofcv.alg.fiducial.qrcode.PackedBits8;
 import boofcv.testing.BoofStandardJUnit;
 import georegression.struct.point.Point2D_I32;
 import org.ddogleg.struct.DogArray_I8;
 import org.junit.jupiter.api.Test;
 
-import static boofcv.alg.fiducial.calib.chessdots.ChessDotsMessageEncoderDecoder.Multiplier.*;
-import static org.junit.jupiter.api.Assertions.*;
+import static boofcv.alg.fiducial.calib.chessdots.ChessboardSolomonMarkerCodec.Multiplier.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  * @author Peter Abeles
  */
-public class TestChessDotsMessageEncoderDecoder extends BoofStandardJUnit {
+public class TestChessboardSolomonMarkerCodec extends BoofStandardJUnit {
+
+	// Storage for encoded message
+	PackedBits8 encoded = new PackedBits8();
+	
 	@Test void configure() {
-		var alg = new ChessDotsMessageEncoderDecoder();
+		var alg = new ChessboardSolomonMarkerCodec();
 		alg.configure(LEVEL_0, 100);
 
 		// Hand compute solution:
 		// 7 bits to encode a number up to 100
-		// 14 bits for two-numbers + 2 for header + ecc. then round up
-		assertEquals(6, alg.squareLength);
+		// 14 bits for two-numbers + 4 for header + ecc. then round up
+		assertEquals(7, alg.gridBitLength);
 
 		// Same deal bu divide coordinates by 2
 		alg.configure(LEVEL_1, 100);
 		// 6-bits for a number up to 50
-		assertEquals(6, alg.squareLength);
+		assertEquals(7, alg.gridBitLength);
 
 		// Same deal bu divide coordinates by 4
 		alg.configure(LEVEL_3, 20);
 		// 4-bits for a number up to 13
-		assertEquals(5, alg.squareLength);
+		assertEquals(6, alg.gridBitLength);
 	}
 
 	/**
@@ -56,17 +62,17 @@ public class TestChessDotsMessageEncoderDecoder extends BoofStandardJUnit {
 	@Test void encode_decode() {
 		var found = new Point2D_I32();
 
-		var alg = new ChessDotsMessageEncoderDecoder();
+		var alg = new ChessboardSolomonMarkerCodec();
 
 		alg.configure(LEVEL_0, 2000);
-		alg.encode(10, 50);
-		assertTrue(alg.decode(alg.getRawData(), found));
+		alg.encode(10, 50, encoded);
+		assertTrue(alg.decode(encoded, found));
 		assertEquals(10, found.y);
 		assertEquals(50, found.x);
 
 		alg.configure(LEVEL_2, 400);
-		alg.encode(40, 88);
-		assertTrue(alg.decode(alg.getRawData(), found));
+		alg.encode(40, 88, encoded);
+		assertTrue(alg.decode(encoded, found));
 		assertEquals(40, found.y);
 		assertEquals(88, found.x);
 	}
@@ -75,39 +81,40 @@ public class TestChessDotsMessageEncoderDecoder extends BoofStandardJUnit {
 	 * Make sure the error correction works by introducing single bit errors
 	 */
 	@Test void singleBitError() {
-		var alg = new ChessDotsMessageEncoderDecoder();
+		var alg = new ChessboardSolomonMarkerCodec();
 
 		alg.configure(LEVEL_0, 100);
-		alg.encode(10, 51);
+		alg.encode(10, 51, encoded);
 
-		var original = new DogArray_I8();
-		original.setTo(alg.getRawData());
 
 		var found = new Point2D_I32();
-		var copy = new DogArray_I8();
-		int numBits = original.size*8;
-		for (int bit = 0; bit < numBits; bit++) {
-			copy.setTo(original);
+		var copy = new PackedBits8();
+		for (int bit = 0; bit < encoded.size; bit++) {
+			copy.setTo(encoded);
 			int byteIndex = bit/8;
 			copy.data[byteIndex] ^= (byte)(1 << bit%8);
 
-			assertTrue(alg.decode(copy, found));
+			// clear previous history so that it has to write to it for this to pass
+			found.setTo(-1,-1);
+
+			// Decode and check results
+			assertTrue(alg.decode(copy, found), "bit=" + bit);
 			assertEquals(10, found.y);
 			assertEquals(51, found.x);
 		}
 	}
 
 	@Test void multipleWordErrors() {
-		var alg = new ChessDotsMessageEncoderDecoder();
+		var alg = new ChessboardSolomonMarkerCodec();
 
 		// make it so it can recover from a bit error in all the words
 		alg.setMaxErrorFraction(1.0);
 
 		alg.configure(LEVEL_0, 20000);
-		alg.encode(10, 51);
+		alg.encode(10, 51, encoded);
 
-		var modified = new DogArray_I8();
-		modified.setTo(alg.getRawData());
+		var modified = new PackedBits8();
+		modified.setTo(encoded);
 
 		// This has been configured to recover from bit errors in all the message words
 		for (int i = 0; i < alg.message.size; i++) {
@@ -124,21 +131,25 @@ public class TestChessDotsMessageEncoderDecoder extends BoofStandardJUnit {
 	 * Make sure it doesn't accept pure noise
 	 */
 	@Test void failWhenPureNoise() {
-		var alg = new ChessDotsMessageEncoderDecoder();
+		var alg = new ChessboardSolomonMarkerCodec();
 
-		// This will fail if the error fraction is 0.5
-		alg.maxErrorFraction = 1.0;
-
-		alg.configure(LEVEL_0, 100);
-		alg.encode(10, 51);
+		alg.configure(LEVEL_0, 20);
+		alg.encode(1, 8, encoded);
 
 		var noise = new DogArray_I8();
-		noise.resize(alg.getRawData().size);
+		noise.resize(encoded.size);
 
+		int numTrials = 10_000;
+		int numFalsePositive=0;
 		var found = new Point2D_I32();
-		for (int trial = 0; trial < 1000; trial++) {
-			rand.nextBytes(noise.data);
-			assertFalse(alg.decode(noise, found), "trial=" + trial);
+		for (int trial = 0; trial < numTrials; trial++) {
+			rand.nextBytes(encoded.data);
+			if (alg.decode(encoded, found)) {
+				numFalsePositive++;
+			}
 		}
+
+		// I'm not sure what the theoretical limit should be, but this should have a very low false positive rate
+		assertTrue(numFalsePositive < numTrials*0.001, "false_positive="+numFalsePositive);
 	}
 }
