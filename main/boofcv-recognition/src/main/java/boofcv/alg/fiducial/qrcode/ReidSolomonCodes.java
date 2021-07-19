@@ -46,6 +46,11 @@ public class ReidSolomonCodes {
 	DogArray_I8 errorLocatorPoly = new DogArray_I8();
 	DogArray_I8 syndromes = new DogArray_I8();
 
+	// Workspace for error correction. Precomputed to avoid calls to new
+	DogArray_I8 err_eval = new DogArray_I8();
+	DogArray_I8 errorX = new DogArray_I8();
+	DogArray_I8 err_loc_prime_tmp = new DogArray_I8();
+
 	public ReidSolomonCodes( int numBits, int primitive ) {
 		math = new GaliosFieldTableOps(numBits, primitive);
 	}
@@ -117,13 +122,13 @@ public class ReidSolomonCodes {
 	 */
 	void findErrorLocatorPolynomialBM( DogArray_I8 syndromes, DogArray_I8 errorLocator ) {
 		DogArray_I8 C = errorLocator; // error polynomial
-		DogArray_I8 B = new DogArray_I8();  // previous error polynomial
-		// TODO remove new from this function
+		DogArray_I8 B = err_eval;  // previous error polynomial
 
 		initToOne(C, syndromes.size + 1);
 		initToOne(B, syndromes.size + 1);
 
-		DogArray_I8 tmp = new DogArray_I8(syndromes.size);
+		DogArray_I8 tmp = errorX;
+		tmp.resize(syndromes.size);
 
 //		int L = 0;
 //		int m = 1; // stores how much B is 'shifted' by
@@ -235,34 +240,33 @@ public class ReidSolomonCodes {
 						DogArray_I8 syndromes,
 						DogArray_I8 errorLocator,
 						DogArray_I32 errorLocations ) {
-		DogArray_I8 err_eval = new DogArray_I8(); // TODO avoid new
 		findErrorEvaluator(syndromes, errorLocator, err_eval);
 
 		// Compute error positions
-		DogArray_I8 X = DogArray_I8.zeros(errorLocations.size); // TODO avoid new
+		errorX.resetResize(errorLocations.size, (byte)0);
 		for (int i = 0; i < errorLocations.size; i++) {
 			int coef_pos = (length_msg_ecc - errorLocations.data[i] - 1);
-			X.data[i] = (byte)math.power(2, coef_pos);
+			errorX.data[i] = (byte)math.power(2, coef_pos);
 			// The commented out code below replicates exactly how the reference code works. This code above
 			// seems to work just as well and passes all the unit tests
 //			int coef_pos = math.max_value-(length_msg_ecc-errorLocations.data[i]-1);
 //			X.data[i] = (byte)math.power_n(2,-coef_pos);
 		}
 
-		DogArray_I8 err_loc_prime_tmp = new DogArray_I8(X.size);
+		err_loc_prime_tmp.resize(errorX.size);
 
 		// storage for error magnitude polynomial
-		for (int i = 0; i < X.size; i++) {
-			int Xi = X.data[i] & 0xFF;
+		for (int i = 0; i < errorX.size; i++) {
+			int Xi = errorX.data[i] & 0xFF;
 			int Xi_inv = math.inverse(Xi);
 
 			// Compute the polynomial derivative
 			err_loc_prime_tmp.size = 0;
-			for (int j = 0; j < X.size; j++) {
+			for (int j = 0; j < errorX.size; j++) {
 				if (i == j)
 					continue;
 				err_loc_prime_tmp.data[err_loc_prime_tmp.size++] =
-						(byte)GaliosFieldOps.subtract(1, math.multiply(Xi_inv, X.data[j] & 0xFF));
+						(byte)GaliosFieldOps.subtract(1, math.multiply(Xi_inv, errorX.data[j] & 0xFF));
 			}
 			// compute the product, which is the denominator of Forney algorithm (errata locator derivative)
 			int err_loc_prime = 1;
@@ -316,7 +320,7 @@ public class ReidSolomonCodes {
 	 *
 	 * g<sub>4</sub>(x) = (x - α0) (x - α1) (x - α2) (x - α3) = 01 x4 + 0f x3 + 36 x2 + 78 x + 40
 	 */
-	void generator( int degree ) {
+	public void generator( int degree ) {
 		// initialize to a polynomial = 1
 		initToOne(generator, degree + 1);
 
