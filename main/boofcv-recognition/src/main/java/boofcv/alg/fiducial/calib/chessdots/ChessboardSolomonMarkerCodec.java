@@ -111,6 +111,12 @@ public class ChessboardSolomonMarkerCodec {
 		// How big the square needs to be to encode all this information
 		gridBitLength = (int)Math.ceil(Math.sqrt(packetBitCount));
 
+		// See if there are enough extra bits to increase the number of ECC words
+		if (gridBitLength*gridBitLength - packetBitCount >= WORD_BITS) {
+			int extraWords = (gridBitLength*gridBitLength - packetBitCount)/WORD_BITS;
+			eccWords += extraWords;
+		}
+
 		// Compute the number of bytes to encode it all
 		message.resize(dataWords);
 		rscodes.generator(eccWords);
@@ -133,7 +139,7 @@ public class ChessboardSolomonMarkerCodec {
 	public void encode( int row, int col, PackedBits8 encodedPacket ) {
 		int scale = multiplier.amount;
 		if (row%scale != 0 || col%scale != 0)
-			throw new IllegalArgumentException("Coordinate is not evenly divisible by scale factor");
+			throw new IllegalArgumentException("Coordinate is not evenly divisible by scale factor. row=" + row + " col=" + col);
 		row /= scale;
 		col /= scale;
 		if (row >= maxCoordinate)
@@ -168,7 +174,7 @@ public class ChessboardSolomonMarkerCodec {
 		System.arraycopy(ecc.data, 0, encodedPacket.data, message.size, ecc.size);
 
 		// Fill in extra bits with a known pattern. This is ignored when decoding
-		for (int i = (message.size+ecc.size)*WORD_BITS; i < encodedPacket.size; i++) {
+		for (int i = (message.size + ecc.size)*WORD_BITS; i < encodedPacket.size; i++) {
 			encodedPacket.set(i, i%2);
 		}
 	}

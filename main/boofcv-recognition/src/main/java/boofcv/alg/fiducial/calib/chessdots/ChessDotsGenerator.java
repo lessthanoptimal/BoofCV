@@ -115,7 +115,7 @@ public class ChessDotsGenerator {
 					continue;
 
 				// Encode the coordinate into bits
-				codec.encode(row, col, packetBits);
+				codec.encode(row-1, col-1, packetBits);
 				renderEncoding(x, y);
 			}
 		}
