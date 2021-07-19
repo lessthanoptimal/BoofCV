@@ -38,6 +38,7 @@ class TestChessDotsGenerator extends BoofStandardJUnit {
 		var engine = new FiducialImageEngine();
 		engine.configure(10, 1200);
 		var renderer = new ChessDotsGenerator();
+//		renderer.multiplier = ChessboardSolomonMarkerCodec.Multiplier.LEVEL_2;
 		renderer.render = engine;
 		renderer.squareWidth = 50;
 		renderer.render(20, 23);
