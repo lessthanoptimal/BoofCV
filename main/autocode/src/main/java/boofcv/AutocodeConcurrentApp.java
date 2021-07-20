@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -53,6 +53,8 @@ import static java.nio.charset.StandardCharsets.UTF_8;
 @SuppressWarnings("NullAway")
 public class AutocodeConcurrentApp {
 
+	private static final String IMPORT_GENERATED = "import javax.annotation.Generated;";
+
 	private static final String prefix = "//CONCURRENT_";
 	private static final String tab = "\t";
 	private static final FindProjectRoot findRootDirectory = AutocodeMasterApp::findPathToProjectRoot;
@@ -88,7 +90,9 @@ public class AutocodeConcurrentApp {
 			if (where < 0) {
 				if (!foundImport && !foundClassDef && line.startsWith("import")) {
 					foundImport = true;
-					outputLines.add("import javax.annotation.Generated;");
+					// Don't add the import twice
+					if (!containsStartsWith(IMPORT_GENERATED, inputLines))
+						outputLines.add(IMPORT_GENERATED);
 				} else if (!foundClassDef && line.contains("class " + classNameOld)) {
 					foundClassDef = true;
 					if (foundImport)
@@ -336,6 +340,17 @@ public class AutocodeConcurrentApp {
 			stream.forEach(lines::add);
 		}
 		return lines;
+	}
+
+	/**
+	 * Checks to see if any of the lines start with the specified text
+	 */
+	public static boolean containsStartsWith( String text, List<String> lines ) {
+		for (int i = 0; i < lines.size(); i++) {
+			if (lines.get(i).startsWith(text))
+				return true;
+		}
+		return false;
 	}
 
 	@FunctionalInterface
