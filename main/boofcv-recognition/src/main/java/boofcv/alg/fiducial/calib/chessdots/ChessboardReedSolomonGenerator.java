@@ -20,6 +20,8 @@ package boofcv.alg.fiducial.calib.chessdots;
 
 import boofcv.alg.drawing.FiducialRenderEngine;
 import boofcv.alg.fiducial.qrcode.PackedBits8;
+import lombok.Getter;
+import lombok.Setter;
 
 /**
  * Renders a chessboard pattern with numbers encoded inside the dots.
@@ -28,16 +30,17 @@ import boofcv.alg.fiducial.qrcode.PackedBits8;
  *
  * @author Peter Abeles
  */
-public class ChessDotsGenerator {
+public class ChessboardReedSolomonGenerator {
 	// Design Notes:
 	// Encoding using both circles and squares were considered. Space was left between the shapes and they both ended
 	// to excite the x-corner detector weakly, but enough for a corner to appear. Squares have the advantage that the
 	// line connecting two false x-corners does not look like a chessboard line.
+	//
+	// Data can be embedded in the white or black squares inside the chessboard pattern. When put inside of the black
+	// squares it reduces the effective range of the chessboard detection algorithm by a significant amount.
 
-	ChessboardSolomonMarkerCodec.Multiplier multiplier = ChessboardSolomonMarkerCodec.Multiplier.LEVEL_0;
+	ChessboardReedSolomonCodec.Multiplier multiplier = ChessboardReedSolomonCodec.Multiplier.LEVEL_0;
 
-	// TODO real encoding
-	// TODO Render a panel ID into the center of a middle white block?
 	// How wide a square is in the chessboard
 	double squareWidth;
 	/** Number of columns in the chessboard pattern */
@@ -46,16 +49,16 @@ public class ChessDotsGenerator {
 	int rows;
 
 	/** Fraction of a cell's length the data bit is */
-	double dataBitWidthFraction = 0.7;
+	public @Getter @Setter double dataBitWidthFraction = 0.7;
 
 	/** Fraction of the length the quite zone is around data bits */
-	double dataBorderFraction = 0.15;
+	public @Getter @Setter double dataBorderFraction = 0.15;
 
 	// used to draw the fiducial
 	protected FiducialRenderEngine render;
 	PackedBits8 packetBits = new PackedBits8();
 
-	ChessboardSolomonMarkerCodec codec = new ChessboardSolomonMarkerCodec();
+	ChessboardReedSolomonCodec codec = new ChessboardReedSolomonCodec();
 
 	public void render( int rows, int cols ) {
 		this.rows = rows;
@@ -94,7 +97,7 @@ public class ChessDotsGenerator {
 	 */
 	private void renderCodes() {
 		// White circles will be rendered inside the inner squares
-		render.setGray(1.0);
+		render.setGray(0.0);
 
 		int coordinateMultiplier = multiplier.getAmount();
 
@@ -104,7 +107,7 @@ public class ChessDotsGenerator {
 			double x = stub + squareWidth*(col - 1);
 			if ((col - 1)%coordinateMultiplier != 0)
 				continue;
-			for (int row = col%2; row < rows; row += 2) {
+			for (int row = (col+1)%2; row < rows; row += 2) {
 				if ((row - 1)%coordinateMultiplier != 0)
 					continue;
 
