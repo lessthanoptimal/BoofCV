@@ -24,20 +24,20 @@ import georegression.struct.point.Point2D_I32;
 import org.ddogleg.struct.DogArray_I8;
 import org.junit.jupiter.api.Test;
 
-import static boofcv.alg.fiducial.calib.chessdots.ChessboardSolomonMarkerCodec.Multiplier.*;
+import static boofcv.alg.fiducial.calib.chessdots.ChessboardReedSolomonCodec.Multiplier.*;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  * @author Peter Abeles
  */
-public class TestChessboardSolomonMarkerCodec extends BoofStandardJUnit {
+public class TestChessboardReedSolomonCodec extends BoofStandardJUnit {
 
 	// Storage for encoded message
 	PackedBits8 encoded = new PackedBits8();
 	
 	@Test void configure() {
-		var alg = new ChessboardSolomonMarkerCodec();
+		var alg = new ChessboardReedSolomonCodec();
 		alg.configure(LEVEL_0, 100);
 
 		// Hand compute solution:
@@ -62,7 +62,7 @@ public class TestChessboardSolomonMarkerCodec extends BoofStandardJUnit {
 	@Test void encode_decode() {
 		var found = new Point2D_I32();
 
-		var alg = new ChessboardSolomonMarkerCodec();
+		var alg = new ChessboardReedSolomonCodec();
 
 		alg.configure(LEVEL_0, 2000);
 		alg.encode(10, 50, encoded);
@@ -81,7 +81,7 @@ public class TestChessboardSolomonMarkerCodec extends BoofStandardJUnit {
 	 * Make sure the error correction works by introducing single bit errors
 	 */
 	@Test void singleBitError() {
-		var alg = new ChessboardSolomonMarkerCodec();
+		var alg = new ChessboardReedSolomonCodec();
 
 		alg.configure(LEVEL_0, 100);
 		alg.encode(10, 51, encoded);
@@ -105,7 +105,7 @@ public class TestChessboardSolomonMarkerCodec extends BoofStandardJUnit {
 	}
 
 	@Test void multipleWordErrors() {
-		var alg = new ChessboardSolomonMarkerCodec();
+		var alg = new ChessboardReedSolomonCodec();
 
 		// make it so it can recover from a bit error in all the words
 		alg.setMaxErrorFraction(1.0);
@@ -131,7 +131,7 @@ public class TestChessboardSolomonMarkerCodec extends BoofStandardJUnit {
 	 * Make sure it doesn't accept pure noise
 	 */
 	@Test void failWhenPureNoise() {
-		var alg = new ChessboardSolomonMarkerCodec();
+		var alg = new ChessboardReedSolomonCodec();
 
 		alg.configure(LEVEL_0, 20);
 		alg.encode(1, 8, encoded);

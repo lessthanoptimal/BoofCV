@@ -29,7 +29,7 @@ import static org.junit.jupiter.api.Assertions.fail;
 /**
  * @author Peter Abeles
  */
-class TestChessDotsGenerator extends BoofStandardJUnit {
+class TestChessboardReedSolomonGenerator extends BoofStandardJUnit {
 	@Test void implement() {
 		fail("Implement");
 	}
@@ -37,7 +37,7 @@ class TestChessDotsGenerator extends BoofStandardJUnit {
 	public static void main( String[] args ) {
 		var engine = new FiducialImageEngine();
 		engine.configure(10, 1200);
-		var renderer = new ChessDotsGenerator();
+		var renderer = new ChessboardReedSolomonGenerator();
 //		renderer.multiplier = ChessboardSolomonMarkerCodec.Multiplier.LEVEL_2;
 		renderer.render = engine;
 		renderer.squareWidth = 100;

@@ -40,6 +40,8 @@ import org.ddogleg.struct.DogArray_I8;
  * to eac other as possible. The error correction words on a per-word basis and not a per-bit basis. Dirt or damage
  * tends to be located within a small spatial region and you want to minimize the number of words it corrupts.
  *
+ * TODO describe Reed-Solomon codes an how they are used.
+ *
  * Packet Format:
  * <ul>
  *     <li>2-bits for multiplier (0=1,1=2,2=4,3=8)</li>
@@ -50,7 +52,7 @@ import org.ddogleg.struct.DogArray_I8;
  *
  * @author Peter Abeles
  */
-public class ChessboardSolomonMarkerCodec {
+public class ChessboardReedSolomonCodec {
 	// TODO locate the bits spatially close to each for a single word so that local damage doesn't screw up
 	//      multiple words
 
