@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -168,8 +168,8 @@ public class ChessboardCornerClusterFinder<T extends ImageGray<T>> implements Ve
 
 		BoofMiscOps.checkTrue(indexesUpToLevel.size == corners.size());
 
-		if (verbose!=null) {
-			verbose.println("corners.size="+corners.size()+" vertexes.size="+vertexes.size);
+		if (verbose != null) {
+			verbose.println("corners.size=" + corners.size() + " vertexes.size=" + vertexes.size);
 			printDualGraph();
 		}
 
@@ -179,12 +179,12 @@ public class ChessboardCornerClusterFinder<T extends ImageGray<T>> implements Ve
 		}
 		pruneSingleConnections();
 
-		if (verbose!=null) printDualGraph();
+		if (verbose != null) printDualGraph();
 
 		// If more than one vertex's are near each other, pick one and remove the others
 		handleAmbiguousVertexes(corners);
 
-		if (verbose!=null) verbose.println("after ambiguous vertexes.size="+vertexes.size);
+		if (verbose != null) verbose.println("after ambiguous vertexes.size=" + vertexes.size);
 
 		// TODO Change pruning of ambiguous vertexes here
 		//      use incoming perpendicular edges to set distance threshold
@@ -195,7 +195,7 @@ public class ChessboardCornerClusterFinder<T extends ImageGray<T>> implements Ve
 		for (int idx = 0; idx < vertexes.size(); idx++) {
 			selectConnections(vertexes.get(idx));
 		}
-		if (verbose!=null) printDualGraph();
+		if (verbose != null) printDualGraph();
 
 		// Connects must be mutual to be accepted. Keep track of vertexes which were modified
 		dirtyVertexes.clear();
@@ -209,7 +209,7 @@ public class ChessboardCornerClusterFinder<T extends ImageGray<T>> implements Ve
 			}
 		}
 
-		if (verbose!=null) printDualGraph();
+		if (verbose != null) printDualGraph();
 
 		// attempt to recover from poorly made decisions in the past from the greedy algorithm
 		repairVertexes();

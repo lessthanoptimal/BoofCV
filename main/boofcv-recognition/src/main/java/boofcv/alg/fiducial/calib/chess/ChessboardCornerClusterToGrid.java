@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -159,18 +159,10 @@ public class ChessboardCornerClusterToGrid {
 				int row = g.row, col = g.col;
 
 				switch (idx) {
-					case 0:
-						col += 1;
-						break;
-					case 1:
-						row += 1;
-						break;
-					case 2:
-						col -= 1;
-						break;
-					case 3:
-						row -= 1;
-						break;
+					case 0 -> col += 1;
+					case 1 -> row += 1;
+					case 2 -> col -= 1;
+					case 3 -> row -= 1;
 				}
 
 				if (!ge.isAssigned()) {
