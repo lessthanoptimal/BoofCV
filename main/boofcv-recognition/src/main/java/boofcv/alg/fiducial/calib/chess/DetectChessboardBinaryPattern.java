@@ -25,6 +25,7 @@ import boofcv.struct.ConfigLength;
 import boofcv.struct.geo.PointIndex2D_F64;
 import boofcv.struct.image.GrayU8;
 import boofcv.struct.image.ImageGray;
+import lombok.Getter;
 
 import java.util.List;
 
@@ -51,26 +52,26 @@ import java.util.List;
 public class DetectChessboardBinaryPattern<T extends ImageGray<T>> {
 
 	// detects the chess board
-	private DetectChessboardSquarePoints<T> findSeeds;
+	private @Getter DetectChessboardSquarePoints<T> findSeeds;
 	// binary images used to detect chess board
-	private GrayU8 binary = new GrayU8(1, 1);
-	private GrayU8 eroded = new GrayU8(1, 1);
+	private @Getter GrayU8 binary = new GrayU8(1, 1);
+	private @Getter GrayU8 eroded = new GrayU8(1, 1);
 
 	// description of the grid its detecting
-	private int numRows,numCols;
+	private int numRows, numCols;
 
 	InputToBinary<T> inputToBinary;
 
 	/**
 	 * Configures detection parameters
+	 *
 	 * @param numRows Number of rows in the grid. Target dependent.
 	 * @param numCols Number of columns in the grid. Target dependent.
 	 * @param maxCornerDistance The maximum distance two square corners can be from each other in pixels
 	 */
-	public DetectChessboardBinaryPattern(int numRows, int numCols, ConfigLength maxCornerDistance,
-										 DetectPolygonBinaryGrayRefine<T> detectorSquare,
-										 InputToBinary<T> inputToBinary)
-	{
+	public DetectChessboardBinaryPattern( int numRows, int numCols, ConfigLength maxCornerDistance,
+										  DetectPolygonBinaryGrayRefine<T> detectorSquare,
+										  InputToBinary<T> inputToBinary ) {
 		this.numRows = numRows;
 		this.numCols = numCols;
 
@@ -87,11 +88,11 @@ public class DetectChessboardBinaryPattern<T extends ImageGray<T>> {
 	public void reset() {
 	}
 
-	public boolean process(T gray) {
+	public boolean process( T gray ) {
 		binary.reshape(gray.width, gray.height);
 		eroded.reshape(gray.width, gray.height);
 
-		inputToBinary.process(gray,binary);
+		inputToBinary.process(gray, binary);
 
 		// erode to make the squares separated
 		BinaryImageOps.erode8(binary, 1, eroded);
@@ -99,16 +100,8 @@ public class DetectChessboardBinaryPattern<T extends ImageGray<T>> {
 		return findSeeds.process(gray, eroded);
 	}
 
-	public DetectChessboardSquarePoints getFindSeeds() {
-		return findSeeds;
-	}
-
 	public List<PointIndex2D_F64> getCalibrationPoints() {
 		return findSeeds.getCalibrationPoints().toList();
-	}
-
-	public GrayU8 getBinary() {
-			return eroded;
 	}
 
 	public int getColumns() {

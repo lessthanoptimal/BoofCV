@@ -35,16 +35,16 @@ import java.util.List;
  */
 public class ChessboardPolygonHelper<T extends ImageGray<T>> implements PolygonHelper {
 
-	int width,height;
+	int width, height;
 
 	@Override
-	public void setImageShape(int width, int height) {
+	public void setImageShape( int width, int height ) {
 		this.width = width;
 		this.height = height;
 	}
 
 	@Override
-	public boolean filterContour(List<Point2D_I32> contour, boolean touchesBorder, boolean distorted) {
+	public boolean filterContour( List<Point2D_I32> contour, boolean touchesBorder, boolean distorted ) {
 		return true;
 	}
 
@@ -55,15 +55,15 @@ public class ChessboardPolygonHelper<T extends ImageGray<T>> implements PolygonH
 	 * a square can have.
 	 */
 	@Override
-	public boolean filterPixelPolygon(Polygon2D_F64 undistorted , Polygon2D_F64 distorted,
-									  DogArray_B touches, boolean touchesBorder) {
+	public boolean filterPixelPolygon( Polygon2D_F64 undistorted, Polygon2D_F64 distorted,
+									   DogArray_B touches, boolean touchesBorder ) {
 
-		if( touchesBorder ) {
-			if( distorted.size() < 3)
+		if (touchesBorder) {
+			if (distorted.size() < 3)
 				return false;
 			int totalRegular = distorted.size();
 			for (int i = 0; i < distorted.size(); i++) {
-				if( touches.get(i) )
+				if (touches.get(i))
 					totalRegular--;
 			}
 			return totalRegular > 0;
@@ -74,8 +74,8 @@ public class ChessboardPolygonHelper<T extends ImageGray<T>> implements PolygonH
 	}
 
 	@Override
-	public void configureBeforePolyline(PointsToPolyline contourToPolyline, boolean touchesBorder) {
-		if( touchesBorder ) {
+	public void configureBeforePolyline( PointsToPolyline contourToPolyline, boolean touchesBorder ) {
+		if (touchesBorder) {
 			contourToPolyline.setConvex(false);
 			contourToPolyline.setMinimumSides(3);
 			contourToPolyline.setMaximumSides(8);

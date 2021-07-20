@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -41,13 +41,13 @@ public class ChessboardCornerEdgeIntensity<T extends ImageGray<T>> {
 	/**
 	 * Number of points along the line from corner a to b that will be sampled
 	 */
-	private int lengthSamples=15;
+	private int lengthSamples = 15;
 	private float[] sampleValues = new float[lengthSamples];
 
 	// find the normal pointing towards white. Magnitude is relative to distance between two corners
-	float nx,ny;
+	float nx, ny;
 	// tangent step
-	float tx,ty;
+	float tx, ty;
 	float normalDiv = 15.0f;
 	// dynamically computed based on length of side. This is how far away it samples
 	private float tangentSampleStep;
@@ -55,7 +55,7 @@ public class ChessboardCornerEdgeIntensity<T extends ImageGray<T>> {
 	// length of the line segment between the two points
 	float lineLength;
 
-	int width,height;
+	int width, height;
 
 	public ChessboardCornerEdgeIntensity( Class<T> imageType ) {
 		interpolate = FactoryInterpolation.bilinearPixelS(imageType, BorderType.EXTENDED);
@@ -75,118 +75,119 @@ public class ChessboardCornerEdgeIntensity<T extends ImageGray<T>> {
 	 * @param direction_a_to_b Direction from a to b in radians.
 	 * @return the line intensity. more positive more intense. Units = pixels intensity
 	 */
-	public float process(ChessboardCorner ca, ChessboardCorner cb, double direction_a_to_b) {
+	public float process( ChessboardCorner ca, ChessboardCorner cb, double direction_a_to_b ) {
 		float cx = (float)ca.x;
 		float cy = (float)ca.y;
-		float dx = (float)(cb.x-ca.x);
-		float dy = (float)(cb.y-ca.y);
+		float dx = (float)(cb.x - ca.x);
+		float dy = (float)(cb.y - ca.y);
 
 		// find the direction that it should be and the magnitude of the step in tangential direction
 		computeUnitNormal(dx, dy);
 
 		// corners will not perfectly touch. Depending on the highest resolution that a corner was detected at
 		// set the offset. 2 pixels because that's the radius of the circle that the corner detector uses
-		float offsetA = (float)Math.pow(2,ca.levelMax);
-		float offsetB = (float)Math.pow(2,cb.levelMax);
+		float offsetA = (float)Math.pow(2, ca.levelMax);
+		float offsetB = (float)Math.pow(2, cb.levelMax);
 
-		offsetA = Math.max(1,Math.min(offsetA,lineLength*0.1f));
-		offsetB = Math.max(1,Math.min(offsetB,lineLength*0.1f));
+		offsetA = Math.max(1, Math.min(offsetA, lineLength*0.1f));
+		offsetB = Math.max(1, Math.min(offsetB, lineLength*0.1f));
 
 		// step away from the corner points. This is only really important with small chessboard where the samples
 		// will put it next to the corner
-		float l = offsetA+offsetB;
+		float l = offsetA + offsetB;
 		cx += nx*offsetA;
 		cy += ny*offsetA;
-		dx -= l * nx;
-		dy -= l * ny;
+		dx -= l*nx;
+		dy -= l*ny;
 		lineLength -= l;
 
 		// the line is too small, abort
-		if( lineLength < 2 )
+		if (lineLength < 2)
 			return -1;
 
 		// don't sample less than 1 pixel. This will make longitudinal checks fail
 		int lengthSamples = this.lengthSamples;
-		if( lengthSamples > lineLength ) {
+		if (lengthSamples > lineLength) {
 			lengthSamples = (int)lineLength;
 		}
 
 		// previous samples values along the tangent
-		float prevLeft=0;
-		float prevRight=0;
-		float prevMiddle=0;
+		float prevLeft = 0;
+		float prevRight = 0;
+		float prevMiddle = 0;
 		// The maximum longitudinal gradient magnitude
 		float longitudinalMaxValue = 0;
 
 		// The maximum distance it will sample in tangent direction. The offsets are added later which
 		// is why they are substracted here
-		float tangentMaxDistance = Math.max(0.0f,tangentSampleStep-(offsetA+offsetB)/2f);
+		float tangentMaxDistance = Math.max(0.0f, tangentSampleStep - (offsetA + offsetB)/2f);
 
 		// move from one side to the other
 		// divide it into lengthSamples+1 regions and don't sample the tail ends
 		for (int i = 0; i < lengthSamples; i++) {
-			float f = ((float)i)/(lengthSamples-1);
-			float x0 = cx+dx*f;
-			float y0 = cy+dy*f;
+			float f = ((float)i)/(lengthSamples - 1);
+			float x0 = cx + dx*f;
+			float y0 = cy + dy*f;
 
 			// Linearly increase sampling distance along tangent the closer it is to sampling the center.
 			// fp = [0,1]
-			float fp = (0.5f-Math.abs(f-0.5f))/0.5f;
+			float fp = (0.5f - Math.abs(f - 0.5f))/0.5f;
 
 			// Sample along the tangent now and look to see how strong the edge is
-			float perpDist = offsetA*(1.0f-f) + offsetB*f + tangentMaxDistance*fp;
-			float leftVal = interpolate.get(x0-tx*perpDist,y0-ty*perpDist);
-			float rightVal = interpolate.get(x0+tx*perpDist,y0+ty*perpDist);
-			float middle = interpolate.get(x0,y0);
+			float perpDist = offsetA*(1.0f - f) + offsetB*f + tangentMaxDistance*fp;
+			float leftVal = interpolate.get(x0 - tx*perpDist, y0 - ty*perpDist);
+			float rightVal = interpolate.get(x0 + tx*perpDist, y0 + ty*perpDist);
+			float middle = interpolate.get(x0, y0);
 
 			// Compute the gradient along the line
-			if( i > 0 ) {
+			if (i > 0) {
 				//-0.5 is needed to make it independent of the order of ca and cb
-				float ff = (i-0.5f)/(lengthSamples-1);
+				float ff = (i - 0.5f)/(lengthSamples - 1);
 				// rises from 0.1 to 1.1 is flat for a bit, then falls to 0.1
-				float fpp = 0.1f+Math.min(1.0f,Math.abs(0.5f-Math.abs(ff-0.5f))/0.35f);
+				float fpp = 0.1f + Math.min(1.0f, Math.abs(0.5f - Math.abs(ff - 0.5f))/0.35f);
 
 				// Compute longitudinal max error
-				longitudinalMaxValue = Math.max(longitudinalMaxValue,Math.abs(leftVal-prevLeft)*fpp);
-				longitudinalMaxValue = Math.max(longitudinalMaxValue,Math.abs(rightVal-prevRight)*fpp);
-				longitudinalMaxValue = Math.max(longitudinalMaxValue,Math.abs(middle-prevMiddle)*fpp);
+				longitudinalMaxValue = Math.max(longitudinalMaxValue, Math.abs(leftVal - prevLeft)*fpp);
+				longitudinalMaxValue = Math.max(longitudinalMaxValue, Math.abs(rightVal - prevRight)*fpp);
+				longitudinalMaxValue = Math.max(longitudinalMaxValue, Math.abs(middle - prevMiddle)*fpp);
 			}
 			prevLeft = leftVal;
 			prevRight = rightVal;
 			prevMiddle = middle;
 
-			sampleValues[i] = leftVal-rightVal;
+			sampleValues[i] = leftVal - rightVal;
 		}
 
 		// Compute the average of perpendicular gradients after removing outliers
-		Arrays.sort(sampleValues,0,lengthSamples);
+		Arrays.sort(sampleValues, 0, lengthSamples);
 		float perpendicularAverage = 0;
 		int n = lengthSamples > 6 ? 2 : lengthSamples >= 3 ? 1 : 0;
-		for (int i = n; i < lengthSamples-n; i++) {
+		for (int i = n; i < lengthSamples - n; i++) {
 			perpendicularAverage += sampleValues[i];
 		}
-		perpendicularAverage /= lengthSamples-n*2;
+		perpendicularAverage /= lengthSamples - n*2;
 
 		// The tangent direction was arbitrarily selected. See if the sign needs to be flipped
 		int numNegative = 0;
 		for (int i = 0; i < lengthSamples; i++) {
-			if( sampleValues[i] < 0 )
+			if (sampleValues[i] < 0)
 				numNegative++;
 		}
-		if( numNegative > lengthSamples*3/4) {
+		if (numNegative > lengthSamples*3/4) {
 			perpendicularAverage *= -1;
 		}
 
 		// Maximum perpendicular gradient and minimize longitudinal gradient
-		return perpendicularAverage-longitudinalMaxValue;
+		return perpendicularAverage - longitudinalMaxValue;
 	}
 
 	/**
 	 * Finds the line's unit normal and make sure it points towards what should be white pixels
+	 *
 	 * @param dx b.x - a.x
 	 * @param dy b.y - a.y
 	 */
-	void computeUnitNormal( float dx, float dy) {
+	void computeUnitNormal( float dx, float dy ) {
 		lineLength = (float)Math.sqrt(dx*dx + dy*dy);
 
 		// it will now have a normal of 1
@@ -195,23 +196,23 @@ public class ChessboardCornerEdgeIntensity<T extends ImageGray<T>> {
 
 		// the sign is currently one known, just pick one
 		tx = -ny;
-		ty =  nx;
+		ty = nx;
 		// In the past corner orientation was used. That worked 99.5% of the time, but the 0.5% if fails was very
 		// difficult to fix. It was an effective way to eliminate some false positives, but to bring it back
 		// there would have to be some sort of confidence value to know when to use it
 
 		// set the magnitude relative to the square size. Blurred images won't have sharp edges
 		// at the same time the magnitude of |n| shouldn't be less than 1
-		tangentSampleStep = Math.max(1f,lineLength/normalDiv);
+		tangentSampleStep = Math.max(1f, lineLength/normalDiv);
 	}
 
 	public int getLengthSamples() {
 		return lengthSamples;
 	}
 
-	public void setLengthSamples(int lengthSamples) {
+	public void setLengthSamples( int lengthSamples ) {
 		this.lengthSamples = lengthSamples;
-		if( sampleValues.length < lengthSamples)
+		if (sampleValues.length < lengthSamples)
 			sampleValues = new float[lengthSamples];
 	}
 

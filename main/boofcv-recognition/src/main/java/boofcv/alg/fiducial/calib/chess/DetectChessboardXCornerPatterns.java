@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -27,7 +27,7 @@ import org.ddogleg.struct.DogArray;
 
 /**
  * Chessboard detector that uses X-Corners and finds all valid chessboard patterns inside the image.
- * 
+ *
  * @author Peter Abeles
  */
 public class DetectChessboardXCornerPatterns<T extends ImageGray<T>> {
@@ -38,7 +38,7 @@ public class DetectChessboardXCornerPatterns<T extends ImageGray<T>> {
 
 	protected DogArray<GridInfo> found = new DogArray<>(GridInfo::new);
 
-	public DetectChessboardXCornerPatterns(ConfigChessboardX config , Class<T> imageType ) {
+	public DetectChessboardXCornerPatterns( ConfigChessboardX config, Class<T> imageType ) {
 
 		detector = new DetectChessboardCornersXPyramid<>(ImageType.single(imageType));
 		clusterFinder = new ChessboardCornerClusterFinder<>(imageType);
@@ -62,18 +62,18 @@ public class DetectChessboardXCornerPatterns<T extends ImageGray<T>> {
 	 * Used to add a filter which will check the shape of found grids before returning them. This can help prune
 	 * impossible configurations earlier and improve runtime speed.
 	 */
-	public void setCheckShape(ChessboardCornerClusterToGrid.CheckShape checkShape) {
+	public void setCheckShape( ChessboardCornerClusterToGrid.CheckShape checkShape ) {
 		clusterToGrid.setCheckShape(checkShape);
 	}
 
 	/**
 	 * Processes the image and searches for all chessboard patterns.
 	 */
-	public void findPatterns(T input) {
+	public void findPatterns( T input ) {
 		found.reset();
 		detector.process(input);
 //		T blurred = detector.getDetector().getBlurred();
-		clusterFinder.process(input,detector.getCorners().toList(),detector.getNumberOfLevels());
+		clusterFinder.process(input, detector.getCorners().toList(), detector.getNumberOfLevels());
 		DogArray<ChessboardCornerGraph> clusters = clusterFinder.getOutputClusters();
 
 		for (int clusterIdx = 0; clusterIdx < clusters.size; clusterIdx++) {
