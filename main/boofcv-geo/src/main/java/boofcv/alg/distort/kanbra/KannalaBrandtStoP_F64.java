@@ -57,23 +57,23 @@ public class KannalaBrandtStoP_F64 implements Point3Transform2_F64 {
 		double r = (double) polynomial(model.coefSymm, theta);
 
 		// angle on the image plane of the incoming ray
-		double psi = Math.atan2(y, x);
-		double cospsi = Math.cos(psi); // u_r[0] or u_psi[1]
-		double sinpsi = Math.sin(psi); // u_r[1] or -u_psi[0]
+		double phi = Math.atan2(y, x);
+		double cosphi = Math.cos(phi); // u_r[0] or u_phi[1]
+		double sinphi = Math.sin(phi); // u_r[1] or -u_phi[0]
 
 		// distorted (normalized) coordinates
 		double dx, dy;
 		if (model.hasNonSymmetricCoefficients()) {
 			// distortion terms. radial and tangential
-			double dr = (double) (polynomial(model.coefRad, theta)*polytrig(model.coefRadTrig, cospsi, sinpsi));
-			double dt = (double) (polynomial(model.coefTan, theta)*polytrig(model.coefTanTrig, cospsi, sinpsi));
+			double disRad = (double) (polynomial(model.coefRad, theta)*polytrig(model.coefRadTrig, cosphi, sinphi));
+			double disTan = (double) (polynomial(model.coefTan, theta)*polytrig(model.coefTanTrig, cosphi, sinphi));
 
 			// put it all together to get normalized image coordinates
-			dx = (r + dr)*cospsi - dt*sinpsi;
-			dy = (r + dr)*sinpsi + dt*cospsi;
+			dx = (r + disRad)*cosphi - disTan*sinphi;
+			dy = (r + disRad)*sinphi + disTan*cosphi;
 		} else {
-			dx = r*cospsi;
-			dy = r*sinpsi;
+			dx = r*cosphi;
+			dy = r*sinphi;
 		}
 
 		// project into pixels

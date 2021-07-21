@@ -91,7 +91,7 @@ class TestKannalaBrandtPtoS_F64 extends BoofStandardJUnit {
 	/**
 	 * Compare to numerical Jacobian
 	 */
-	@Test void jacobianOfNormFunc() {
+	@Test void jacobianOfDistorted() {
 		CameraKannalaBrandt model = new CameraKannalaBrandt().fsetK(500, 550, 0.0, 600, 650);
 		model.fsetSymmetric(1.0, 0.4).fsetRadial(1.1, 0.2, -0.01).fsetTangent(0.5, -0.1, 0.06, 0.12).
 				fsetRadialTrig(0.01, 0.03, -0.03, 0.04).fsetTangentTrig(0.01, 0.2, 0.1, 0.4);
@@ -137,7 +137,7 @@ class TestKannalaBrandtPtoS_F64 extends BoofStandardJUnit {
 				double cospsi = Math.cos(psi);
 				double sinpsi = Math.sin(psi);
 
-				kb.jacobianOfNormFunc(theta, cospsi, sinpsi, a);
+				kb.jacobianOfDistorted(theta, cospsi, sinpsi, a);
 				BoofMiscOps.convertMatrix(a, output);
 			}
 		};
