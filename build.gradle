@@ -19,19 +19,20 @@ allprojects {
     version = '0.39-SNAPSHOT'
 
     ext.COMMONS_IO_VERSION = '2.11.0'
+    ext.build_java8 = true // IntelliJ has issues when this is set to true
 
     createVersionFile.enabled = false // run only once. enabled in types
 }
 
 project.ext.set("deepboof_version", '0.5.1')
-project.ext.set("lombok_version", '1.18.18')
+project.ext.set("lombok_version", '1.18.20')
 project.ext.set("errorprone_version", '2.7.1')
 project.ext.set("jabel_version", '0.4.1')
 project.ext.set("guava_version", '30.1.1-jre')
 
 // Which native platforms are supported can be specified in the command line.  Otherwise
 // the default is to support all of them
-if( project.hasProperty("native_arch")) {
+if (project.hasProperty("native_arch")) {
     project.ext.native_arch = [project.native_arch]
 } else {
     project.ext.native_arch = ["linux-x86_64", "macosx-x86_64", "windows-x86_64"]
@@ -53,7 +54,8 @@ subprojects {
     // Prevents tons of errors if someone is using ASCII
     tasks.withType(JavaCompile).configureEach { options.encoding = "UTF-8" }
     // Creates Java 8 byte code
-    tasks.withType(JavaCompile).configureEach { options.release = 8 }
+    if (project.ext.build_java8)
+        tasks.withType(JavaCompile).configureEach { options.release = 8 }
 
     // Enable incremental compile. Should make single file changes faster
     tasks.withType(JavaCompile) { options.incremental = true }
@@ -149,11 +151,13 @@ subprojects {
         }
 
         // needed to use Java 11+ syntax with Java 1.8 byte code
-        annotationProcessor("com.github.bsideup.jabel:jabel-javac-plugin:${project.jabel_version}")
-        noautoAnnotationProcessor("com.github.bsideup.jabel:jabel-javac-plugin:${project.jabel_version}")
-        testAnnotationProcessor("com.github.bsideup.jabel:jabel-javac-plugin:${project.jabel_version}")
-        benchmarkAnnotationProcessor("com.github.bsideup.jabel:jabel-javac-plugin:${project.jabel_version}")
-        generateAnnotationProcessor("com.github.bsideup.jabel:jabel-javac-plugin:${project.jabel_version}")
+        if (project.ext.build_java8) {
+            annotationProcessor("com.github.bsideup.jabel:jabel-javac-plugin:${project.jabel_version}")
+            noautoAnnotationProcessor("com.github.bsideup.jabel:jabel-javac-plugin:${project.jabel_version}")
+            testAnnotationProcessor("com.github.bsideup.jabel:jabel-javac-plugin:${project.jabel_version}")
+            benchmarkAnnotationProcessor("com.github.bsideup.jabel:jabel-javac-plugin:${project.jabel_version}")
+            generateAnnotationProcessor("com.github.bsideup.jabel:jabel-javac-plugin:${project.jabel_version}")
+        }
 
         annotationProcessor "org.projectlombok:lombok:${project.lombok_version}"  // @Getter @Setter
         noautoAnnotationProcessor "org.projectlombok:lombok:${project.lombok_version}"  // @Getter @Setter
@@ -250,7 +254,7 @@ subprojects {
             // There is currently no good way to exclude files that contain "@Generated" or are not versions.
             // This should catch most of them with a few false positives.
             target('**/java/boofcv/**/*.java')
-            targetExclude('**/*_MT*.java','**/*_F32.java','**/generated/*')
+            targetExclude('**/*_MT*.java', '**/*_F32.java', '**/generated/*')
 
             toggleOffOn('formatter:off', 'formatter:on')
             removeUnusedImports()
@@ -264,7 +268,7 @@ subprojects {
         return
 
     // if Maven central isn't setup in ~/.gradle/gradle.properties fill in these variables to make it happy
-    if( !project.hasProperty('ossrhUsername') ) {
+    if (!project.hasProperty('ossrhUsername')) {
         ext.ossrhUsername = "dummy"
         ext.ossrhPassword = "dummy"
     }
@@ -330,7 +334,7 @@ subprojects {
         generateImplementation project(':main:boofcv-types').sourceSets.noauto.output
     }
 
-    if( project.path.contains('boofcv-types') )
+    if (project.path.contains('boofcv-types'))
         return
 
     project.dependencies {
@@ -371,7 +375,7 @@ checkProjectExistsAddToList(':integration:boofcv-openkinect', integrationProject
 def javadocProjects = mainProjects + integrationProjects
 
 // Creates a directory with all the compiled BoofCV jars and the dependencies for main
-task createLibraryDirectory( dependsOn: javadocProjects.collect {[ it+':jar',it+':sourcesJar']}.flatten() ) {
+task createLibraryDirectory(dependsOn: javadocProjects.collect { [it + ':jar', it + ':sourcesJar'] }.flatten()) {
     doLast {
         // Compiled jars (bin and src) for all BoofCV modules
         ext.boofJars = files(javadocProjects.collect { project(it).tasks.jar.archivePath })
@@ -382,7 +386,7 @@ task createLibraryDirectory( dependsOn: javadocProjects.collect {[ it+':jar',it+
         ext.listExternal = ext.listExternal - ext.boofJars
         ext.listExternal = ext.listExternal.findAll({ !it.getName().contains("android.jar") })
 
-        ext.fileName = "boofcv-v"+version+"-libs"
+        ext.fileName = "boofcv-v" + version + "-libs"
         file(ext.fileName).deleteDir()
         file(ext.fileName).mkdir()
 
@@ -396,7 +400,7 @@ task createLibraryDirectory( dependsOn: javadocProjects.collect {[ it+':jar',it+
             into ext.fileName
         }
 
-        println("\n\nSaved to directory "+ext.fileName)
+        println("\n\nSaved to directory " + ext.fileName)
     }
 }
 
@@ -410,7 +414,7 @@ task oneJarBin(type: Jar, dependsOn: javadocProjects.collect { it + ":compileJav
 }
 
 // Generates a global javadoc from all the modules
-task alljavadoc(type: Javadoc,  group: "Documentation") {
+task alljavadoc(type: Javadoc, group: "Documentation") {
     // only include source code in src directory to avoid including 3rd party code which some projects do as a hack
     source = javadocProjects.collect { project(it).sourceSets.main.allJava } +
             javadocProjects.collect { project(it).sourceSets.noauto.allJava }
@@ -437,10 +441,10 @@ task alljavadoc(type: Javadoc,  group: "Documentation") {
     configure(options) {
         failOnError = false
         title = "BoofCV ($project.version)"
-        links = [ 'http://docs.oracle.com/javase/8/docs/api/',
-                  'http://ejml.org/javadoc/',
-                  'http://georegression.org/javadoc/',
-                  'http://ddogleg.org/javadoc/']
+        links = ['http://docs.oracle.com/javase/8/docs/api/',
+                 'http://ejml.org/javadoc/',
+                 'http://georegression.org/javadoc/',
+                 'http://ddogleg.org/javadoc/']
     }
 
     // Work around a Gradle design flaw. It won't copy over files in doc-files
