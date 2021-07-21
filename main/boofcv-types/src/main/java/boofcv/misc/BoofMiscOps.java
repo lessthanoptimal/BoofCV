@@ -961,7 +961,7 @@ public class BoofMiscOps {
 	 * Convert matrix and work in auto generate F32 code
 	 */
 	public static void convertMatrix( FMatrix2x2 src, DMatrixRMaj dst ) {
-		dst.reshape(2,2);
+		dst.reshape(2, 2);
 		dst.data[0] = src.a11;
 		dst.data[1] = src.a12;
 		dst.data[2] = src.a21;
@@ -972,10 +972,21 @@ public class BoofMiscOps {
 	 * Convert matrix and work in auto generate F32 code
 	 */
 	public static void convertMatrix( DMatrix2x2 src, DMatrixRMaj dst ) {
-		dst.reshape(2,2);
+		dst.reshape(2, 2);
 		dst.data[0] = src.a11;
 		dst.data[1] = src.a12;
 		dst.data[2] = src.a21;
 		dst.data[3] = src.a22;
+	}
+
+	/**
+	 * Copies src into dst. If dst is not the correct size then a new instance is created and that returned.
+	 */
+	public static double[] copySmart( double[] src, @Nullable double[] dst ) {
+		if (dst == null || dst.length != src.length) {
+			dst = new double[src.length];
+		}
+		System.arraycopy(src, 0, dst, 0, src.length);
+		return dst;
 	}
 }

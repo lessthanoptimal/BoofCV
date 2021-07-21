@@ -106,7 +106,7 @@ public class KannalaBrandtPtoS_F64 implements Point2Transform3_F64, VerbosePrint
 		double phi = Math.atan2(norm.y, norm.x);
 		double theta = computeTheta(r);
 
-		if (model.hasNonSymmetricCoefficients()) {
+		if (model.isAsymmetricModel()) {
 			newtonsMethodUpdateThetaphi(theta, phi, r);
 			phi = updatedphi;
 			theta = updatedTheta;
