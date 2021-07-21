@@ -41,12 +41,12 @@ class TestKannalaBrandtStoP_F64 extends BoofStandardJUnit {
 	@Test void doesItBlowUp() {
 		List<CameraKannalaBrandt> models = new ArrayList<>();
 
-		models.add(new CameraKannalaBrandt(0, 0, 0).fsetK(500, 550, 0.0, 600, 650));
-		models.add(new CameraKannalaBrandt(0, 0, 0).fsetK(500, 550, 0.1, 600, 650));
-		models.add(new CameraKannalaBrandt(0, 0, 0).fsetK(500, 550, 0.0, 600, 650).fsetSymmetric(1.0,0.1));
-		models.add(new CameraKannalaBrandt(0, 0, 0).fsetK(500, 550, 0.0, 600, 650).fsetRadial(1.0,0.1));
-		models.add(new CameraKannalaBrandt(0, 0, 0).fsetK(500, 550, 0.0, 600, 650).fsetTangent(1.0,0.1));
-		models.add(new CameraKannalaBrandt(0, 0, 0).fsetK(500, 550, 0.0, 600, 650).
+		models.add(new CameraKannalaBrandt().fsetK(500, 550, 0.0, 600, 650));
+		models.add(new CameraKannalaBrandt().fsetK(500, 550, 0.1, 600, 650));
+		models.add(new CameraKannalaBrandt().fsetK(500, 550, 0.0, 600, 650).fsetSymmetric(1.0,0.1));
+		models.add(new CameraKannalaBrandt().fsetK(500, 550, 0.0, 600, 650).fsetRadial(1.0,0.1));
+		models.add(new CameraKannalaBrandt().fsetK(500, 550, 0.0, 600, 650).fsetTangent(1.0,0.1));
+		models.add(new CameraKannalaBrandt().fsetK(500, 550, 0.0, 600, 650).
 				fsetSymmetric(1.0,0.1).fsetRadial(1.0,0.1).fsetTangent(1.0,0.1));
 
 

@@ -29,6 +29,14 @@ import lombok.Setter;
  * skew was implicitly 0. (mu, mv) = (fx, fy). This was done primarily to maximize code reuse and integration with
  * existing code.
  *
+ * <p>
+ * NOTE: If the number of asymmetric distortion terms is set to zero then there will only be radially symmetric
+ * distortion. This is what most libraries refer to as the Kannala-Brandt model as they do not implement the full model.
+ * It's also often referred to as an Equidistance model. That's a bit of a misnomer as the Equidistance model is
+ * defined as r = f*theta, which is a special case of the symmetric model. BoofCV's naming convention is closer
+ * to the original authors in [1] and their source code.
+ * </p>
+ *
  * <p>[1] Kannala, J., and Brandt, S. S. (2006). A generic camera model and calibration method for conventional,
  * wide-angle, and fish-eye lenses. IEEE transactions on pattern analysis and machine intelligence,
  * 28(8), 1335-1340.</p>
@@ -49,16 +57,12 @@ public class CameraKannalaBrandt extends CameraPinhole {
 	/**
 	 * Constructor which allows the order of all distortion coefficients to be specified
 	 *
-	 * @param numRadSym Number of terms in 'k' radially symmetric model. Standard is 5
-	 * @param numDistRad Number of terms in 'l' and 'm' the distortion polynomial terms Standard is 3
-	 * @param numDistTrig Number of terms in 'i'  and 'j' the distortion trigonometric polynomial terms. Standard is 4
+	 * @param numSymmetric Number of radially symmetric terms. Standard is 5.
+	 * @param numAsymmetric Number of non symmetric terms. If not zero then trig coefficients will be 4.
+	 * Standard is 4
 	 */
-	public CameraKannalaBrandt( int numRadSym, int numDistRad, int numDistTrig ) {
-		symmetric = new double[numRadSym];
-		radial = new double[numDistRad];
-		tangent = new double[numDistRad];
-		radialTrig = new double[numDistTrig];
-		tangentTrig = new double[numDistTrig];
+	public CameraKannalaBrandt( int numSymmetric, int numAsymmetric ) {
+		configureCoefficients(numSymmetric, numAsymmetric);
 	}
 
 	/**
@@ -72,12 +76,29 @@ public class CameraKannalaBrandt extends CameraPinhole {
 	 * With no coefficients specified.
 	 */
 	public CameraKannalaBrandt() {
-		this(0, 0, 0);
+		this(0, 0);
+	}
+
+	/**
+	 * Configures the number of coefficients for each distortion term.
+	 *
+	 * @param numSymmetric Number of radially symmetric terms. Standard is 5.
+	 * @param numAsymmetric Number of non symmetric terms. If not zero then trig coefficients will be 4.
+	 * Standard is 4
+	 */
+	public void configureCoefficients( int numSymmetric, int numAsymmetric ) {
+		int numTrig = numAsymmetric != 0 ? 4 : 0;
+
+		symmetric = new double[numSymmetric];
+		radial = new double[numAsymmetric];
+		tangent = new double[numAsymmetric];
+		radialTrig = new double[numTrig];
+		tangentTrig = new double[numTrig];
 	}
 
 	@Override public CameraKannalaBrandt fsetK( double fx, double fy,
-									  double skew,
-									  double cx, double cy ) {
+												double skew,
+												double cx, double cy ) {
 		super.fsetK(fx, fy, skew, cx, cy);
 		return this;
 	}
@@ -140,7 +161,7 @@ public class CameraKannalaBrandt extends CameraPinhole {
 	 * Returns true if there are coefficients that could result in a non-zero distortion for the
 	 * non-symmetric terms. This does not check to see if the coefficients are zero.
 	 */
-	public boolean hasNonSymmetricCoefficients() {
+	public boolean isAsymmetricModel() {
 		if (radial.length != 0 && radialTrig.length == 4)
 			return true;
 		if (tangent.length != 0 && tangentTrig.length == 4)
@@ -149,16 +170,23 @@ public class CameraKannalaBrandt extends CameraPinhole {
 		return false;
 	}
 
+	/**
+	 * Copies the value of 'src' into 'this'. After this call they will be identical
+	 * @param src (input) Camera model
+	 */
 	public void setTo( CameraKannalaBrandt src ) {
 		super.setTo(src);
 
-		this.symmetric = src.symmetric.clone();
-		this.radial = src.radial.clone();
-		this.radialTrig = src.radialTrig.clone();
-		this.tangent = src.tangent.clone();
-		this.tangentTrig = src.tangentTrig.clone();
+		this.symmetric = BoofMiscOps.copySmart(src.symmetric, this.symmetric);
+		this.radial = BoofMiscOps.copySmart(src.radial, this.radial);
+		this.radialTrig = BoofMiscOps.copySmart(src.radialTrig, this.radialTrig);
+		this.tangent = BoofMiscOps.copySmart(src.tangent, this.tangent);
+		this.tangentTrig = BoofMiscOps.copySmart(src.tangentTrig, this.tangentTrig);
 	}
 
+	/**
+	 * Checks to see of the two models are exactly alike
+	 */
 	public boolean isIdentical( CameraKannalaBrandt src ) {
 		if (!super.isEquals(src, 0.0))
 			return false;
@@ -175,7 +203,10 @@ public class CameraKannalaBrandt extends CameraPinhole {
 		return true;
 	}
 
-	private boolean isIdentical( double[] a, double[] b ) {
+	/**
+	 * Checks to see if the two arrays are exactly alike
+	 */
+	private static boolean isIdentical( double[] a, double[] b ) {
 		if (a.length != b.length)
 			return false;
 
@@ -188,7 +219,7 @@ public class CameraKannalaBrandt extends CameraPinhole {
 
 	@Override
 	public <T extends CameraModel> T createLike() {
-		return (T)new CameraKannalaBrandt(symmetric.length, radial.length, radialTrig.length);
+		return (T)new CameraKannalaBrandt(symmetric.length, radial.length);
 	}
 
 	@Override

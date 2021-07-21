@@ -63,7 +63,7 @@ public class KannalaBrandtStoP_F64 implements Point3Transform2_F64 {
 
 		// distorted (normalized) coordinates
 		double dx, dy;
-		if (model.hasNonSymmetricCoefficients()) {
+		if (model.isAsymmetricModel()) {
 			// distortion terms. radial and tangential
 			double disRad = (double) (polynomial(model.radial, theta)*polytrig(model.radialTrig, cosphi, sinphi));
 			double disTan = (double) (polynomial(model.tangent, theta)*polytrig(model.tangentTrig, cosphi, sinphi));

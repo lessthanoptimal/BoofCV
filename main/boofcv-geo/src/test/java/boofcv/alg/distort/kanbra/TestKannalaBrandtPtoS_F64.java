@@ -47,7 +47,7 @@ class TestKannalaBrandtPtoS_F64 extends BoofStandardJUnit {
 	 * Given spherical coordinates, compute pixel coordinates and see if we can invert them correctly.
 	 */
 	@Test void simpleSanityCheck_SymmetricOnly() {
-		CameraKannalaBrandt model = new CameraKannalaBrandt(0, 0, 0).fsetK(500, 550, 0.0, 600, 650);
+		CameraKannalaBrandt model = new CameraKannalaBrandt().fsetK(500, 550, 0.0, 600, 650);
 		model.fsetSymmetric(1.0, 0.1);
 
 		var expected = new Point3D_F64(0.1, -0.05, 0.8);

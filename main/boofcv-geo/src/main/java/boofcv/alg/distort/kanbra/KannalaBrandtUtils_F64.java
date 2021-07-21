@@ -50,6 +50,16 @@ public class KannalaBrandtUtils_F64 {
 		return result;
 	}
 
+	/**
+	 * Computes the gradient as a function of the coefficients
+	 */
+	public static void polytrigGradient( double cos, double sin, double[] gradient ) {
+		gradient[0] = cos;
+		gradient[1] = sin;
+		gradient[2] = 2.0*cos*sin;
+		gradient[3] = 2.0*cos*cos - 1.0;
+	}
+
 	public static double polynomialDerivative( double[] coefs, double x ) {
 		double pow = 1.0;
 		double left = 1.0;
