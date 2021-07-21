@@ -44,6 +44,9 @@ import java.util.Set;
 
 import static boofcv.alg.distort.kanbra.KannalaBrandtUtils_F64.*;
 
+//CUSTOM ignore Complex_F64
+//CUSTOM ignore KannalaBrandtUtils_F64
+
 /**
  * Backwards project from a distorted 2D pixel to 3D unit sphere coordinate using the {@link CameraKannalaBrandt} model.
  *
@@ -117,8 +120,8 @@ public class KannalaBrandtPtoS_F64 implements Point2Transform3_F64, VerbosePrint
 
 		// go from angles to sphere point vector
 		double sintheta = Math.sin(theta);
-		out.x = sintheta*Math.cos(psi);
-		out.y = sintheta*Math.sin(psi);
+		out.x = sintheta * Math.cos(psi);
+		out.y = sintheta * Math.sin(psi);
 		out.z = Math.cos(theta);
 	}
 
@@ -144,7 +147,7 @@ public class KannalaBrandtPtoS_F64 implements Point2Transform3_F64, VerbosePrint
 		for (int i = 0; i < roots.size(); i++) {
 			Complex_F64 root = roots.get(i);
 			if (Math.abs(root.imaginary) <= realNumberTol && theta > root.real && root.real > -realNumberTol) {
-				theta = root.real;
+				theta = (double) root.real;
 			}
 		}
 
@@ -171,8 +174,8 @@ public class KannalaBrandtPtoS_F64 implements Point2Transform3_F64, VerbosePrint
 			double sinpsi = Math.sin(updatedPsi);
 
 			// distortion terms. radial and tangential
-			double dr = polynomial(model.coefRad, updatedTheta)*polytrig(model.coefRadTrig, cospsi, sinpsi);
-			double dt = polynomial(model.coefTan, updatedTheta)*polytrig(model.coefTanTrig, cospsi, sinpsi);
+			double dr = (double) (polynomial(model.coefRad, updatedTheta)*polytrig(model.coefRadTrig, cospsi, sinpsi));
+			double dt = (double) (polynomial(model.coefTan, updatedTheta)*polytrig(model.coefTanTrig, cospsi, sinpsi));
 
 			// put it all together to get normalized image coordinates
 			double dx = (updatedR + dr)*cospsi - dt*sinpsi;
@@ -227,7 +230,7 @@ public class KannalaBrandtPtoS_F64 implements Point2Transform3_F64, VerbosePrint
 			// Update the estimates for all the parameters
 			updatedTheta = theta + deltaTheta;
 			updatedPsi = psi + deltapsi;
-			updatedR = polynomial(model.coefSymm, updatedTheta);
+			updatedR = (double) polynomial(model.coefSymm, updatedTheta);
 		}
 	}
 
@@ -239,16 +242,16 @@ public class KannalaBrandtPtoS_F64 implements Point2Transform3_F64, VerbosePrint
 		// Xd = [dx, dy] = r(theta)*ur(psi) + deltaR(theta,psi)*ur(psi) + deltaT(theta,psi)*ut(psi)
 
 		// partials and forward functions
-		double sym = polynomial(model.coefSymm, theta);
-		double sym_dtheta = polynomialDerivative(model.coefSymm, theta);
+		double sym = (double) polynomial(model.coefSymm, theta);
+		double sym_dtheta = (double) polynomialDerivative(model.coefSymm, theta);
 
-		double deltaR = polynomial(model.coefRad, theta)*polytrig(model.coefRadTrig, cospsi, sinpsi);
-		double deltaR_dtheta = polynomialDerivative(model.coefRad, theta)*polytrig(model.coefRadTrig, cospsi, sinpsi);
-		double deltaR_dpsi = polynomial(model.coefRad, theta)*polytrigDerivative(model.coefRadTrig, cospsi, sinpsi);
+		double deltaR = (double) (polynomial(model.coefRad, theta)*polytrig(model.coefRadTrig, cospsi, sinpsi));
+		double deltaR_dtheta = (double) (polynomialDerivative(model.coefRad, theta)*polytrig(model.coefRadTrig, cospsi, sinpsi));
+		double deltaR_dpsi = (double) (polynomial(model.coefRad, theta)*polytrigDerivative(model.coefRadTrig, cospsi, sinpsi));
 
-		double deltaT = polynomial(model.coefTan, theta)*polytrig(model.coefTanTrig, cospsi, sinpsi);
-		double deltaT_dtheta = polynomialDerivative(model.coefTan, theta)*polytrig(model.coefTanTrig, cospsi, sinpsi);
-		double deltaT_dpsi = polynomial(model.coefTan, theta)*polytrigDerivative(model.coefTanTrig, cospsi, sinpsi);
+		double deltaT = (double) (polynomial(model.coefTan, theta)*polytrig(model.coefTanTrig, cospsi, sinpsi));
+		double deltaT_dtheta = (double) (polynomialDerivative(model.coefTan, theta)*polytrig(model.coefTanTrig, cospsi, sinpsi));
+		double deltaT_dpsi = (double) (polynomial(model.coefTan, theta)*polytrigDerivative(model.coefTanTrig, cospsi, sinpsi));
 
 		// dx/dtheta
 		gradient.a11 = (sym_dtheta + deltaR_dtheta)*cospsi - deltaT_dtheta*sinpsi;

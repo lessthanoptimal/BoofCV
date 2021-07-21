@@ -28,6 +28,8 @@ import lombok.Getter;
 import static boofcv.alg.distort.kanbra.KannalaBrandtUtils_F64.polynomial;
 import static boofcv.alg.distort.kanbra.KannalaBrandtUtils_F64.polytrig;
 
+//CUSTOM ignore KannalaBrandtUtils_F64
+
 /**
  * Forward projection model for {@link CameraKannalaBrandt}.  Takes a 3D point in camera unit sphere
  * coordinates and converts it into a distorted pixel coordinate.  There are no checks to see if
@@ -52,7 +54,7 @@ public class KannalaBrandtStoP_F64 implements Point3Transform2_F64 {
 		double theta = Math.acos(z/UtilPoint3D_F64.norm(x, y, z)); // uses dot product
 
 		// compute symmetric projection function
-		double r = polynomial(model.coefSymm, theta);
+		double r = (double) polynomial(model.coefSymm, theta);
 
 		// angle on the image plane of the incoming ray
 		double psi = Math.atan2(y, x);
@@ -63,8 +65,8 @@ public class KannalaBrandtStoP_F64 implements Point3Transform2_F64 {
 		double dx, dy;
 		if (model.hasNonSymmetricCoefficients()) {
 			// distortion terms. radial and tangential
-			double dr = polynomial(model.coefRad, theta)*polytrig(model.coefRadTrig, cospsi, sinpsi);
-			double dt = polynomial(model.coefTan, theta)*polytrig(model.coefTanTrig, cospsi, sinpsi);
+			double dr = (double) (polynomial(model.coefRad, theta)*polytrig(model.coefRadTrig, cospsi, sinpsi));
+			double dt = (double) (polynomial(model.coefTan, theta)*polytrig(model.coefTanTrig, cospsi, sinpsi));
 
 			// put it all together to get normalized image coordinates
 			dx = (r + dr)*cospsi - dt*sinpsi;
@@ -75,8 +77,8 @@ public class KannalaBrandtStoP_F64 implements Point3Transform2_F64 {
 		}
 
 		// project into pixels
-		out.x = model.fx*dx + model.skew*dy + model.cx;
-		out.y = model.fy*dy + model.cy;
+		out.x = (double) (model.fx*dx + model.skew*dy + model.cx);
+		out.y = (double) (model.fy*dy + model.cy);
 	}
 
 	@Override

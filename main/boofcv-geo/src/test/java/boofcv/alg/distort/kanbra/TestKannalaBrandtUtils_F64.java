@@ -27,6 +27,8 @@ import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+//CUSTOM ignore KannalaBrandtUtils_F64
+
 /**
  * @author Peter Abeles
  */
@@ -35,12 +37,12 @@ class TestKannalaBrandtUtils_F64 extends BoofStandardJUnit {
 	 * Compare to numerical derivative. This is linear so it should be very accurate
 	 */
 	@Test void polynomialDerivative() {
-		double[] coefs = new double[]{0.1, -0.05, 0.01, 0.05};
+		/**/double[] coefs = new /**/double[]{0.1, -0.05, 0.01, 0.05};
 
 		FunctionNtoS function = new FunctionNtoS() {
 			@Override public int getNumOfInputsN() {return 1;}
 
-			@Override public double process( double[] input ) {
+			@Override public /**/double process( /**/double[] input ) {
 				return KannalaBrandtUtils_F64.polynomial(coefs, input[0]);
 			}
 		};
@@ -48,24 +50,25 @@ class TestKannalaBrandtUtils_F64 extends BoofStandardJUnit {
 		FunctionNtoN gradient = new FunctionNtoN() {
 			@Override public int getN() {return 1;}
 
-			@Override public void process( double[] input, double[] output ) {
+			@Override public void process( /**/double[] input, /**/double[] output ) {
 				output[0] = KannalaBrandtUtils_F64.polynomialDerivative(coefs, input[0]);
 			}
 		};
 
-		assertTrue(DerivativeChecker.gradient(function, gradient, new double[]{0.1}, UtilEjml.TEST_F64));
+		assertTrue(DerivativeChecker.gradient(function, gradient, new /**/double[]{0.1},
+				UtilEjml.TEST_F64, Math.sqrt(UtilEjml.EPS)));
 	}
 
 	/**
 	 * Compare to numerical derivative.
 	 */
 	@Test void polytrigDerivative() {
-		double[] coefs = new double[]{0.1, -0.05, 0.01, 0.05};
+		/**/double[] coefs = new /**/double[]{0.1, -0.05, 0.01, 0.05};
 
 		FunctionNtoS function = new FunctionNtoS() {
 			@Override public int getNumOfInputsN() {return 1;}
 
-			@Override public double process( double[] input ) {
+			@Override public /**/double process( /**/double[] input ) {
 				double c = Math.cos(input[0]);
 				double s = Math.sin(input[0]);
 				return KannalaBrandtUtils_F64.polytrig(coefs, c, s);
@@ -75,7 +78,7 @@ class TestKannalaBrandtUtils_F64 extends BoofStandardJUnit {
 		FunctionNtoN gradient = new FunctionNtoN() {
 			@Override public int getN() {return 1;}
 
-			@Override public void process( double[] input, double[] output ) {
+			@Override public void process( /**/double[] input, /**/double[] output ) {
 				double c = Math.cos(input[0]);
 				double s = Math.sin(input[0]);
 				output[0] = KannalaBrandtUtils_F64.polytrigDerivative(coefs, c, s);
@@ -83,6 +86,7 @@ class TestKannalaBrandtUtils_F64 extends BoofStandardJUnit {
 		};
 
 		// Relaes the tolerance a little bit since this is a fairly non-linear function
-		assertTrue(DerivativeChecker.gradient(function, gradient, new double[]{0.1}, 1e-6));
+		assertTrue(DerivativeChecker.gradient(function, gradient, new /**/double[]{0.1},
+				UtilEjml.TEST_F64_SQ, Math.sqrt(UtilEjml.EPS)));
 	}
 }

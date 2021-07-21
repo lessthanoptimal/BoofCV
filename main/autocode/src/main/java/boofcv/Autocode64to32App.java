@@ -52,6 +52,7 @@ public class Autocode64to32App extends RecursiveConvert {
 		converter.replacePattern("double", "float");
 		converter.replacePattern("Double", "Float");
 		converter.replacePattern("_F64", "_F32");
+		converter.replacePattern("UtilEjml.EPS", "UtilEjml.F_EPS");
 		converter.replacePattern("64-bit", "32-bit");
 		converter.replacePattern("64F", "32F");
 		converter.replacePattern("_DD", "_FD");

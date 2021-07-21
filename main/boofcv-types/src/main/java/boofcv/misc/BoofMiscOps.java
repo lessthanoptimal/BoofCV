@@ -26,7 +26,9 @@ import boofcv.struct.image.*;
 import georegression.struct.GeoTuple;
 import georegression.struct.point.Point2D_F64;
 import org.ddogleg.struct.*;
+import org.ejml.data.DMatrix2x2;
 import org.ejml.data.DMatrixRMaj;
+import org.ejml.data.FMatrix2x2;
 import org.jetbrains.annotations.Nullable;
 import pabeles.concurrency.ConcurrencyOps;
 import pabeles.concurrency.GrowArray;
@@ -953,5 +955,27 @@ public class BoofMiscOps {
 			ret.add(values[i]);
 		}
 		return ret;
+	}
+
+	/**
+	 * Convert matrix and work in auto generate F32 code
+	 */
+	public static void convertMatrix( FMatrix2x2 src, DMatrixRMaj dst ) {
+		dst.reshape(2,2);
+		dst.data[0] = src.a11;
+		dst.data[1] = src.a12;
+		dst.data[2] = src.a21;
+		dst.data[3] = src.a22;
+	}
+
+	/**
+	 * Convert matrix and work in auto generate F32 code
+	 */
+	public static void convertMatrix( DMatrix2x2 src, DMatrixRMaj dst ) {
+		dst.reshape(2,2);
+		dst.data[0] = src.a11;
+		dst.data[1] = src.a12;
+		dst.data[2] = src.a21;
+		dst.data[3] = src.a22;
 	}
 }

@@ -18,6 +18,7 @@
 
 package boofcv.alg.distort.kanbra;
 
+import boofcv.misc.BoofMiscOps;
 import boofcv.struct.calib.CameraKannalaBrandt;
 import boofcv.testing.BoofStandardJUnit;
 import georegression.struct.point.Point2D_F64;
@@ -28,13 +29,15 @@ import org.ddogleg.optimization.functions.FunctionNtoMxN;
 import org.ejml.UtilEjml;
 import org.ejml.data.DMatrix2x2;
 import org.ejml.data.DMatrixRMaj;
-import org.ejml.ops.DConvertMatrixStruct;
 import org.junit.jupiter.api.Test;
 
 import static boofcv.alg.distort.kanbra.KannalaBrandtUtils_F64.polynomial;
 import static boofcv.alg.distort.kanbra.KannalaBrandtUtils_F64.polytrig;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+
+//CUSTOM ignore KannalaBrandtUtils_F64
+//CUSTOM ignore DMatrixRMaj
 
 /**
  * @author Peter Abeles
@@ -94,18 +97,18 @@ class TestKannalaBrandtPtoS_F64 extends BoofStandardJUnit {
 				fsetRadialTrig(0.01, 0.03, -0.03, 0.04).fsetTangentTrig(0.01, 0.2, 0.1, 0.4);
 
 		FunctionNtoM function = new FunctionNtoM() {
-			@Override public void process( double[] input, double[] output ) {
-				double theta = input[0];
-				double psi = input[1];
+			@Override public void process( /**/double[] input, /**/double[] output ) {
+				double theta = (double) input[0];
+				double psi = (double) input[1];
 
-				double r = polynomial(model.coefSymm, theta);
+				double r = (double) polynomial(model.coefSymm, theta);
 
 				double cospsi = Math.cos(psi);
 				double sinpsi = Math.sin(psi);
 
 				// distortion terms. radial and tangential
-				double dr = polynomial(model.coefRad, theta)*polytrig(model.coefRadTrig, cospsi, sinpsi);
-				double dt = polynomial(model.coefTan, theta)*polytrig(model.coefTanTrig, cospsi, sinpsi);
+				double dr = (double) (polynomial(model.coefRad, theta)*polytrig(model.coefRadTrig, cospsi, sinpsi));
+				double dt = (double) (polynomial(model.coefTan, theta)*polytrig(model.coefTanTrig, cospsi, sinpsi));
 
 				// put it all together to get normalized image coordinates
 				output[0] = (r + dr)*cospsi - dt*sinpsi;
@@ -127,19 +130,20 @@ class TestKannalaBrandtPtoS_F64 extends BoofStandardJUnit {
 
 			@Override public DMatrixRMaj declareMatrixMxN() {return new DMatrixRMaj(2,2);}
 
-			@Override public void process( double[] input, DMatrixRMaj output ) {
-				double theta = input[0];
-				double psi = input[1];
+			@Override public void process( /**/double[] input, DMatrixRMaj output ) {
+				double theta = (double) input[0];
+				double psi = (double) input[1];
 
 				double cospsi = Math.cos(psi);
 				double sinpsi = Math.sin(psi);
 
 				kb.jacobianOfNormFunc(theta, cospsi, sinpsi, a);
-				DConvertMatrixStruct.convert(a, output);
+				BoofMiscOps.convertMatrix(a, output);
 			}
 		};
 
 //		DerivativeChecker.jacobianPrint(function, jacobian, new double[]{0.2, -0.4}, 1e-4);
-		assertTrue(DerivativeChecker.jacobian(function, jacobian, new double[]{0.2, -0.4}, 1e-4));
+		assertTrue(DerivativeChecker.jacobian(function, jacobian, new /**/double[]{0.2, -0.4},
+				UtilEjml.TEST_F64_SQ, Math.sqrt(UtilEjml.EPS)));
 	}
 }
