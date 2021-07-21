@@ -78,7 +78,7 @@ public class KannalaBrandtPtoS_F64 implements Point2Transform3_F64, VerbosePrint
 	private final Polynomial polynomial = new Polynomial(5);
 
 	// Updated values using newton's method
-	double updatedTheta, updatedPsi;
+	double updatedTheta, updatedphi;
 	// Jacobian of distorted coordinates
 	DMatrix2x2 jacobian = new DMatrix2x2();
 	DMatrix2x2 jacobianInv = new DMatrix2x2();
@@ -101,14 +101,14 @@ public class KannalaBrandtPtoS_F64 implements Point2Transform3_F64, VerbosePrint
 		pinholePtoN.compute(x, y, norm);
 		// norm now is the observed distorted coordinates
 
-		// Compute initial estimate of r, psi, and theta, norm=X_d (in paper)
+		// Compute initial estimate of r, phi, and theta, norm=X_d (in paper)
 		double r = norm.norm();
-		double psi = Math.atan2(norm.y, norm.x);
+		double phi = Math.atan2(norm.y, norm.x);
 		double theta = computeTheta(r);
 
 		if (model.hasNonSymmetricCoefficients()) {
-			newtonsMethodUpdateThetaPsi(theta, psi, r);
-			psi = updatedPsi;
+			newtonsMethodUpdateThetaphi(theta, phi, r);
+			phi = updatedphi;
 			theta = updatedTheta;
 		}
 
@@ -120,8 +120,8 @@ public class KannalaBrandtPtoS_F64 implements Point2Transform3_F64, VerbosePrint
 
 		// go from angles to sphere point vector
 		double sintheta = Math.sin(theta);
-		out.x = sintheta * Math.cos(psi);
-		out.y = sintheta * Math.sin(psi);
+		out.x = sintheta * Math.cos(phi);
+		out.y = sintheta * Math.sin(phi);
 		out.z = Math.cos(theta);
 	}
 
@@ -157,35 +157,35 @@ public class KannalaBrandtPtoS_F64 implements Point2Transform3_F64, VerbosePrint
 	/**
 	 * Invert the function using Newton's method. This is different from the original paper which approximated the
 	 * original function using multiple taylor series expansions and no iteration. This function can only improve
-	 * the estimate of theta and psi. If the answer ever gets worse it aborts.
+	 * the estimate of theta and phi. If the answer ever gets worse it aborts.
 	 */
-	protected void newtonsMethodUpdateThetaPsi( double theta, double psi, double r ) {
+	protected void newtonsMethodUpdateThetaphi( double theta, double phi, double r ) {
 		// Use Newton's method to refine the estimate. Different from how it was done in the paper
 		double previousError = Double.MAX_VALUE;
 
 		// Update the estimates for all the parameters
 		updatedTheta = theta;
-		updatedPsi = psi;
+		updatedphi = phi;
 		double updatedR = r;
 
 		// Iterate until it converges or hits the maximum number of iterations
 		for (int iteration = 0; iteration < converge.maxIterations; iteration++) {
-			double cospsi = Math.cos(updatedPsi);
-			double sinpsi = Math.sin(updatedPsi);
+			double cosphi = Math.cos(updatedphi);
+			double sinphi = Math.sin(updatedphi);
 
 			// distortion terms. radial and tangential
-			double dr = (double) (polynomial(model.coefRad, updatedTheta)*polytrig(model.coefRadTrig, cospsi, sinpsi));
-			double dt = (double) (polynomial(model.coefTan, updatedTheta)*polytrig(model.coefTanTrig, cospsi, sinpsi));
+			double disRad = (double) (polynomial(model.coefRad, updatedTheta)*polytrig(model.coefRadTrig, cosphi, sinphi));
+			double disTan = (double) (polynomial(model.coefTan, updatedTheta)*polytrig(model.coefTanTrig, cosphi, sinphi));
 
-			// put it all together to get normalized image coordinates
-			double dx = (updatedR + dr)*cospsi - dt*sinpsi;
-			double dy = (updatedR + dr)*sinpsi + dt*cospsi;
+			// put it all together to get distorted (normalized) coordinates
+			double dx = (updatedR + disRad)*cosphi - disTan*sinphi;
+			double dy = (updatedR + disRad)*sinphi + disTan*cosphi;
 
 			// Compute the error between the true and estimated parameters
 			double error = norm.distance(dx, dy);
 
 			if (verbose != null)
-				verbose.printf("[%3d] error=%.2e theta=%.4f psi=%.4f\n", iteration, error, updatedTheta, updatedPsi);
+				verbose.printf("[%3d] error=%.2e theta=%.4f phi=%.4f\n", iteration, error, updatedTheta, updatedphi);
 
 			// If the error got worse, abort
 			if (error > previousError) {
@@ -206,14 +206,14 @@ public class KannalaBrandtPtoS_F64 implements Point2Transform3_F64, VerbosePrint
 			}
 			previousError = error;
 
-			// Save the new better estimates of (theta, psi)
+			// Save the new better estimates of (theta, phi)
 			theta = updatedTheta;
-			psi = updatedPsi;
+			phi = updatedphi;
 
 			// Compute the next update
 
 			// inv(Jacobian)*[X_d - F(x)] = delta
-			jacobianOfNormFunc(theta, cospsi, sinpsi, jacobian);
+			jacobianOfDistorted(theta, cosphi, sinphi, jacobian);
 			if (!CommonOps_DDF2.invert(jacobian, jacobianInv) || MatrixFeatures_DDF2.hasUncountable(jacobianInv)) {
 				if (verbose != null) verbose.println("Bad matrix inverse");
 				break;
@@ -223,13 +223,13 @@ public class KannalaBrandtPtoS_F64 implements Point2Transform3_F64, VerbosePrint
 			dx = norm.x - dx;
 			dy = norm.y - dy;
 
-			// Compute the delta for psi and theta
+			// Compute the delta for phi and theta
 			double deltaTheta = jacobianInv.a11*dx + jacobianInv.a12*dy;
-			double deltapsi = jacobianInv.a21*dx + jacobianInv.a22*dy;
+			double deltaphi = jacobianInv.a21*dx + jacobianInv.a22*dy;
 
 			// Update the estimates for all the parameters
 			updatedTheta = theta + deltaTheta;
-			updatedPsi = psi + deltapsi;
+			updatedphi = phi + deltaphi;
 			updatedR = (double) polynomial(model.coefSymm, updatedTheta);
 		}
 	}
@@ -237,30 +237,31 @@ public class KannalaBrandtPtoS_F64 implements Point2Transform3_F64, VerbosePrint
 	/**
 	 * Computes the Jacobian of the distorted coordinates [dx, dy].
 	 */
-	protected void jacobianOfNormFunc( double theta, double cospsi, double sinpsi, DMatrix2x2 gradient ) {
+	protected void jacobianOfDistorted( double theta, double cosphi, double sinphi, DMatrix2x2 gradient ) {
 
-		// Xd = [dx, dy] = r(theta)*ur(psi) + deltaR(theta,psi)*ur(psi) + deltaT(theta,psi)*ut(psi)
+		// Distorted Coordinates
+		// Xd = [dx, dy] = r(theta)*ur(phi) + deltaR(theta,phi)*ur(phi) + deltaT(theta,phi)*ut(phi)
 
 		// partials and forward functions
 		double sym = (double) polynomial(model.coefSymm, theta);
 		double sym_dtheta = (double) polynomialDerivative(model.coefSymm, theta);
 
-		double deltaR = (double) (polynomial(model.coefRad, theta)*polytrig(model.coefRadTrig, cospsi, sinpsi));
-		double deltaR_dtheta = (double) (polynomialDerivative(model.coefRad, theta)*polytrig(model.coefRadTrig, cospsi, sinpsi));
-		double deltaR_dpsi = (double) (polynomial(model.coefRad, theta)*polytrigDerivative(model.coefRadTrig, cospsi, sinpsi));
+		double deltaR = (double) (polynomial(model.coefRad, theta)*polytrig(model.coefRadTrig, cosphi, sinphi));
+		double deltaR_dtheta = (double) (polynomialDerivative(model.coefRad, theta)*polytrig(model.coefRadTrig, cosphi, sinphi));
+		double deltaR_dphi = (double) (polynomial(model.coefRad, theta)*polytrigDerivative(model.coefRadTrig, cosphi, sinphi));
 
-		double deltaT = (double) (polynomial(model.coefTan, theta)*polytrig(model.coefTanTrig, cospsi, sinpsi));
-		double deltaT_dtheta = (double) (polynomialDerivative(model.coefTan, theta)*polytrig(model.coefTanTrig, cospsi, sinpsi));
-		double deltaT_dpsi = (double) (polynomial(model.coefTan, theta)*polytrigDerivative(model.coefTanTrig, cospsi, sinpsi));
+		double deltaT = (double) (polynomial(model.coefTan, theta)*polytrig(model.coefTanTrig, cosphi, sinphi));
+		double deltaT_dtheta = (double) (polynomialDerivative(model.coefTan, theta)*polytrig(model.coefTanTrig, cosphi, sinphi));
+		double deltaT_dphi = (double) (polynomial(model.coefTan, theta)*polytrigDerivative(model.coefTanTrig, cosphi, sinphi));
 
 		// dx/dtheta
-		gradient.a11 = (sym_dtheta + deltaR_dtheta)*cospsi - deltaT_dtheta*sinpsi;
-		// dx/dpsi
-		gradient.a12 = -sym*sinpsi + deltaR_dpsi*cospsi - deltaR*sinpsi - deltaT_dpsi*sinpsi - deltaT*cospsi;
+		gradient.a11 = (sym_dtheta + deltaR_dtheta)*cosphi - deltaT_dtheta*sinphi;
+		// dx/dphi
+		gradient.a12 = -sym*sinphi + deltaR_dphi*cosphi - deltaR*sinphi - deltaT_dphi*sinphi - deltaT*cosphi;
 		// dy/dtheta
-		gradient.a21 = (sym_dtheta + deltaR_dtheta)*sinpsi + deltaT_dtheta*cospsi;
-		// dy/dpsi
-		gradient.a22 = sym*cospsi + deltaR_dpsi*sinpsi + deltaR*cospsi + deltaT_dpsi*cospsi - deltaT*sinpsi;
+		gradient.a21 = (sym_dtheta + deltaR_dtheta)*sinphi + deltaT_dtheta*cosphi;
+		// dy/dphi
+		gradient.a22 = sym*cosphi + deltaR_dphi*sinphi + deltaR*cosphi + deltaT_dphi*cosphi - deltaT*sinphi;
 	}
 
 	@Override
