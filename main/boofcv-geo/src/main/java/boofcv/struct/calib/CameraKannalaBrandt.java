@@ -75,14 +75,14 @@ public class CameraKannalaBrandt extends CameraPinhole {
 		this(0, 0, 0);
 	}
 
-	public CameraKannalaBrandt fsetK( double fx, double fy,
+	@Override public CameraKannalaBrandt fsetK( double fx, double fy,
 									  double skew,
 									  double cx, double cy ) {
 		super.fsetK(fx, fy, skew, cx, cy);
 		return this;
 	}
 
-	public CameraKannalaBrandt fsetShape( int width, int height ) {
+	@Override public CameraKannalaBrandt fsetShape( int width, int height ) {
 		this.width = width;
 		this.height = height;
 		return this;
