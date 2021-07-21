@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -21,12 +21,10 @@ package boofcv.factory.distort;
 import boofcv.alg.distort.LensDistortionNarrowFOV;
 import boofcv.alg.distort.LensDistortionWideFOV;
 import boofcv.alg.distort.brown.LensDistortionBrown;
+import boofcv.alg.distort.kanbra.LensDistortionKannalaBrandt;
 import boofcv.alg.distort.pinhole.LensDistortionPinhole;
 import boofcv.alg.distort.universal.LensDistortionUniversalOmni;
-import boofcv.struct.calib.CameraModel;
-import boofcv.struct.calib.CameraPinhole;
-import boofcv.struct.calib.CameraPinholeBrown;
-import boofcv.struct.calib.CameraUniversalOmni;
+import boofcv.struct.calib.*;
 
 /**
  * @author Peter Abeles
@@ -63,6 +61,8 @@ public class LensDistortionFactory {
 	public static LensDistortionWideFOV wide(CameraModel param ) {
 		if( param instanceof CameraUniversalOmni) {
 			return new LensDistortionUniversalOmni((CameraUniversalOmni)param);
+		} else if( param instanceof CameraKannalaBrandt) {
+			return new LensDistortionKannalaBrandt((CameraKannalaBrandt)param);
 		} else {
 			throw new IllegalArgumentException("Unknown camera model "+param.getClass().getSimpleName());
 		}

@@ -19,18 +19,17 @@
 package boofcv.io.calibration;
 
 import boofcv.alg.geo.calibration.CalibrationObservation;
+import boofcv.struct.calib.CameraKannalaBrandt;
 import boofcv.struct.calib.CameraPinholeBrown;
 import boofcv.struct.geo.PointIndex2D_F64;
 import boofcv.testing.BoofStandardJUnit;
 import org.junit.jupiter.api.Test;
 
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.InputStreamReader;
-import java.io.OutputStreamWriter;
+import java.io.*;
 import java.net.URL;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  * @author Peter Abeles
@@ -116,5 +115,27 @@ public class TestCalibrationIO extends BoofStandardJUnit {
 
 		assertEquals(4.4148972909019294e-04, model.t1, 1e-8);
 		assertEquals(-6.0304229617877381e-04, model.t2, 1e-8);
+	}
+
+	@Test void save_load_KannalaBrandt() {
+		// try simplified case with only symmetric distortion
+		CameraKannalaBrandt model;
+		model = new CameraKannalaBrandt().fsetK(500, 550, 0.1, 600, 650);
+		model.fsetSymmetric(1.0, 0.4);
+		save_load_KannalaBrandt(model);
+
+		// Full distortion model
+		model = new CameraKannalaBrandt().fsetK(500, 550, 0.1, 600, 650);
+		model.fsetSymmetric(1.0, 0.4).fsetRadial(1.1, 0.2, -0.01).fsetTangent(0.5, -0.1, 0.06, 0.12).
+				fsetRadialTrig(0.01, 0.03, -0.03, 0.04).fsetTangentTrig(0.01, 0.2, 0.1, 0.4);
+		save_load_KannalaBrandt(model);
+	}
+
+	void save_load_KannalaBrandt( CameraKannalaBrandt model ) {
+		ByteArrayOutputStream stream = new ByteArrayOutputStream();
+		CalibrationIO.save(model, new OutputStreamWriter(stream));
+
+		CameraKannalaBrandt found = CalibrationIO.load(new StringReader(stream.toString()));
+		assertTrue(model.isIdentical(found));
 	}
 }

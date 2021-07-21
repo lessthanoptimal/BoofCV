@@ -23,9 +23,9 @@ import lombok.Getter;
 import lombok.Setter;
 
 /**
- * A camera model for pinhole, wide angle, and fisheye cameras up to a FOV of 180 degrees. The full camera model
+ * A camera model for pinhole, wide angle, and fisheye cameras. The full camera model
  * from [1] has been implemented. While mathematically very similar to the model presented in [1], this has been
- * modified to extend a pinhole camera model and has one additional degree of freedom. In the original formulation
+ * modified to extend a pinhole camera model and now can model skew. In the original formulation
  * skew was implicitly 0. (mu, mv) = (fx, fy). This was done primarily to maximize code reuse and integration with
  * existing code.
  *
@@ -37,28 +37,28 @@ import lombok.Setter;
  */
 public class CameraKannalaBrandt extends CameraPinhole {
 
-	/** Coeffients for radially symmetric model */
-	@Getter @Setter public double[] coefSymm;
+	/** Coefficients for radially symmetric model */
+	@Getter @Setter public double[] symmetric;
 
 	/** Coefficients for distortion terms in radial direction */
-	@Getter @Setter public double[] coefRad, coefRadTrig;
+	@Getter @Setter public double[] radial, radialTrig;
 
 	/** Coefficients for distortion terms in tangential direction */
-	@Getter @Setter public double[] coefTan, coefTanTrig;
+	@Getter @Setter public double[] tangent, tangentTrig;
 
 	/**
 	 * Constructor which allows the order of all distortion coefficients to be specified
+	 *
 	 * @param numRadSym Number of terms in 'k' radially symmetric model. Standard is 5
 	 * @param numDistRad Number of terms in 'l' and 'm' the distortion polynomial terms Standard is 3
 	 * @param numDistTrig Number of terms in 'i'  and 'j' the distortion trigonometric polynomial terms. Standard is 4
 	 */
-	public CameraKannalaBrandt( int numRadSym, int numDistRad , int numDistTrig )
-	{
-		coefSymm = new double[numRadSym];
-		coefRad = new double[numDistRad];
-		coefTan = new double[numDistRad];
-		coefRadTrig = new double[numDistTrig];
-		coefTanTrig = new double[numDistTrig];
+	public CameraKannalaBrandt( int numRadSym, int numDistRad, int numDistTrig ) {
+		symmetric = new double[numRadSym];
+		radial = new double[numDistRad];
+		tangent = new double[numDistRad];
+		radialTrig = new double[numDistTrig];
+		tangentTrig = new double[numDistTrig];
 	}
 
 	/**
@@ -71,14 +71,13 @@ public class CameraKannalaBrandt extends CameraPinhole {
 	/**
 	 * With no coefficients specified.
 	 */
-	public CameraKannalaBrandt()
-	{
-		this(0,0,0);
+	public CameraKannalaBrandt() {
+		this(0, 0, 0);
 	}
 
-	public CameraKannalaBrandt fsetK(double fx, double fy,
-									 double skew,
-									 double cx, double cy) {
+	public CameraKannalaBrandt fsetK( double fx, double fy,
+									  double skew,
+									  double cx, double cy ) {
 		super.fsetK(fx, fy, skew, cx, cy);
 		return this;
 	}
@@ -90,47 +89,46 @@ public class CameraKannalaBrandt extends CameraPinhole {
 	}
 
 	public CameraKannalaBrandt fsetSymmetric( double... coefs ) {
-		this.coefSymm = coefs.clone();
+		this.symmetric = coefs.clone();
 		return this;
 	}
 
 	public CameraKannalaBrandt fsetRadial( double... coefs ) {
-		this.coefRad = coefs.clone();
+		this.radial = coefs.clone();
 		return this;
 	}
 
 	public CameraKannalaBrandt fsetTangent( double... coefs ) {
-		this.coefTan = coefs.clone();
+		this.tangent = coefs.clone();
 		return this;
 	}
 
 	public CameraKannalaBrandt fsetRadialTrig( double... coefs ) {
-		BoofMiscOps.checkTrue(coefs.length==0 || coefs.length==4);
-		this.coefRadTrig = coefs.clone();
+		BoofMiscOps.checkTrue(coefs.length == 0 || coefs.length == 4);
+		this.radialTrig = coefs.clone();
 		return this;
 	}
 
 	public CameraKannalaBrandt fsetTangentTrig( double... coefs ) {
-		BoofMiscOps.checkTrue(coefs.length==0 || coefs.length==4);
-		this.coefTanTrig = coefs.clone();
+		BoofMiscOps.checkTrue(coefs.length == 0 || coefs.length == 4);
+		this.tangentTrig = coefs.clone();
 		return this;
 	}
-
 
 	/**
 	 * Returns true if it's a symmetric model. That is, no radial or tangential distortion
 	 */
 	public boolean isSymmetricModel() {
 		boolean noRadial = true;
-		for (int i = 0; i < coefRad.length; i++) {
-			if (coefRad[i] != 0) {
+		for (int i = 0; i < radial.length; i++) {
+			if (radial[i] != 0) {
 				noRadial = false;
 				break;
 			}
 		}
 		boolean noTangential = true;
-		for (int i = 0; i < coefTan.length; i++) {
-			if (coefTan[i] != 0) {
+		for (int i = 0; i < tangent.length; i++) {
+			if (tangent[i] != 0) {
 				noTangential = false;
 				break;
 			}
@@ -143,9 +141,9 @@ public class CameraKannalaBrandt extends CameraPinhole {
 	 * non-symmetric terms. This does not check to see if the coefficients are zero.
 	 */
 	public boolean hasNonSymmetricCoefficients() {
-		if (coefRad.length != 0 && coefRadTrig.length == 4)
+		if (radial.length != 0 && radialTrig.length == 4)
 			return true;
-		if (coefTan.length != 0 && coefTanTrig.length == 4)
+		if (tangent.length != 0 && tangentTrig.length == 4)
 			return true;
 
 		return false;
@@ -154,36 +152,65 @@ public class CameraKannalaBrandt extends CameraPinhole {
 	public void setTo( CameraKannalaBrandt src ) {
 		super.setTo(src);
 
-		this.coefSymm = src.coefSymm.clone();
-		this.coefRad = src.coefRad.clone();
-		this.coefRadTrig = src.coefRadTrig.clone();
-		this.coefTan = src.coefTan.clone();
-		this.coefTanTrig = src.coefTanTrig.clone();
+		this.symmetric = src.symmetric.clone();
+		this.radial = src.radial.clone();
+		this.radialTrig = src.radialTrig.clone();
+		this.tangent = src.tangent.clone();
+		this.tangentTrig = src.tangentTrig.clone();
+	}
+
+	public boolean isIdentical( CameraKannalaBrandt src ) {
+		if (!super.isEquals(src, 0.0))
+			return false;
+		if (!isIdentical(symmetric, src.symmetric))
+			return false;
+		if (!isIdentical(radial, src.radial))
+			return false;
+		if (!isIdentical(radialTrig, src.radialTrig))
+			return false;
+		if (!isIdentical(tangent, src.tangent))
+			return false;
+		if (!isIdentical(tangentTrig, src.tangentTrig))
+			return false;
+		return true;
+	}
+
+	private boolean isIdentical( double[] a, double[] b ) {
+		if (a.length != b.length)
+			return false;
+
+		for (int i = 0; i < a.length; i++) {
+			if (a[i] != b[i])
+				return false;
+		}
+		return true;
 	}
 
 	@Override
 	public <T extends CameraModel> T createLike() {
-		return (T)new CameraKannalaBrandt(coefSymm.length, coefRad.length, coefRadTrig.length);
+		return (T)new CameraKannalaBrandt(symmetric.length, radial.length, radialTrig.length);
 	}
 
 	@Override
 	public void print() {
 		super.print();
-		printArray("symmetric", coefSymm);
-		printArray("radial", coefRad);
-		printArray("tangential", coefTan);
+		printArray("symmetric", symmetric);
+		printArray("radial", radial);
+		printArray("tangential", tangent);
+		printArray("radial_trig", radialTrig);
+		printArray("tangentrig", tangentTrig);
 	}
 
 	private static void printArray( String name, double[] coefs ) {
 
-		if( coefs.length > 0 ) {
-			System.out.print(name +" = [ ");
-			for( int i = 0; i < coefs.length; i++ ) {
-				System.out.printf("%6.2e ",coefs[i]);
+		if (coefs.length > 0) {
+			System.out.print(name + " = [ ");
+			for (int i = 0; i < coefs.length; i++) {
+				System.out.printf("%6.2e ", coefs[i]);
 			}
 			System.out.println("]");
 		} else {
-			System.out.println("No "+name);
+			System.out.println("No " + name);
 		}
 	}
 }

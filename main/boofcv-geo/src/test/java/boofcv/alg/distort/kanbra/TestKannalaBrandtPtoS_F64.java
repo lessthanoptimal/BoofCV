@@ -101,14 +101,14 @@ class TestKannalaBrandtPtoS_F64 extends BoofStandardJUnit {
 				double theta = (double) input[0];
 				double psi = (double) input[1];
 
-				double r = (double) polynomial(model.coefSymm, theta);
+				double r = (double) polynomial(model.symmetric, theta);
 
 				double cospsi = Math.cos(psi);
 				double sinpsi = Math.sin(psi);
 
 				// distortion terms. radial and tangential
-				double dr = (double) (polynomial(model.coefRad, theta)*polytrig(model.coefRadTrig, cospsi, sinpsi));
-				double dt = (double) (polynomial(model.coefTan, theta)*polytrig(model.coefTanTrig, cospsi, sinpsi));
+				double dr = (double) (polynomial(model.radial, theta)*polytrig(model.radialTrig, cospsi, sinpsi));
+				double dt = (double) (polynomial(model.tangent, theta)*polytrig(model.tangentTrig, cospsi, sinpsi));
 
 				// put it all together to get normalized image coordinates
 				output[0] = (r + dr)*cospsi - dt*sinpsi;

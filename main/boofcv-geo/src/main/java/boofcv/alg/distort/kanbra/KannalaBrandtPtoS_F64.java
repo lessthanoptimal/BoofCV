@@ -86,11 +86,11 @@ public class KannalaBrandtPtoS_F64 implements Point2Transform3_F64, VerbosePrint
 	PrintStream verbose;
 
 	public KannalaBrandtPtoS_F64( CameraKannalaBrandt model ) {
-		BoofMiscOps.checkTrue(model.coefRadTrig.length == 0 || model.coefRadTrig.length == 4);
+		BoofMiscOps.checkTrue(model.radialTrig.length == 0 || model.radialTrig.length == 4);
 
 		this.model = new CameraKannalaBrandt(model);
 		pinholePtoN.setK(model);
-		int numCoef = 1 + model.coefSymm.length*2;
+		int numCoef = 1 + model.symmetric.length*2;
 		rootFinder = PolynomialOps.createRootFinder(numCoef, RootFinderType.EVD);
 		polynomial.resize(numCoef);
 	}
@@ -133,8 +133,8 @@ public class KannalaBrandtPtoS_F64 implements Point2Transform3_F64, VerbosePrint
 		// r = k1*theta + k2*theta**3 + k3*theta**5 ...
 		Arrays.fill(polynomial.c, 0.0);
 		polynomial.c[0] = -r;
-		for (int i = 0; i < model.coefSymm.length; i++) {
-			polynomial.c[i*2 + 1] = model.coefSymm[i];
+		for (int i = 0; i < model.symmetric.length; i++) {
+			polynomial.c[i*2 + 1] = model.symmetric[i];
 		}
 		if (!rootFinder.process(polynomial)) {
 			// failed. not sure what else to do here
@@ -174,8 +174,8 @@ public class KannalaBrandtPtoS_F64 implements Point2Transform3_F64, VerbosePrint
 			double sinphi = Math.sin(updatedphi);
 
 			// distortion terms. radial and tangential
-			double disRad = (double) (polynomial(model.coefRad, updatedTheta)*polytrig(model.coefRadTrig, cosphi, sinphi));
-			double disTan = (double) (polynomial(model.coefTan, updatedTheta)*polytrig(model.coefTanTrig, cosphi, sinphi));
+			double disRad = (double) (polynomial(model.radial, updatedTheta)*polytrig(model.radialTrig, cosphi, sinphi));
+			double disTan = (double) (polynomial(model.tangent, updatedTheta)*polytrig(model.tangentTrig, cosphi, sinphi));
 
 			// put it all together to get distorted (normalized) coordinates
 			double dx = (updatedR + disRad)*cosphi - disTan*sinphi;
@@ -230,7 +230,7 @@ public class KannalaBrandtPtoS_F64 implements Point2Transform3_F64, VerbosePrint
 			// Update the estimates for all the parameters
 			updatedTheta = theta + deltaTheta;
 			updatedphi = phi + deltaphi;
-			updatedR = (double) polynomial(model.coefSymm, updatedTheta);
+			updatedR = (double) polynomial(model.symmetric, updatedTheta);
 		}
 	}
 
@@ -243,16 +243,16 @@ public class KannalaBrandtPtoS_F64 implements Point2Transform3_F64, VerbosePrint
 		// Xd = [dx, dy] = r(theta)*ur(phi) + deltaR(theta,phi)*ur(phi) + deltaT(theta,phi)*ut(phi)
 
 		// partials and forward functions
-		double sym = (double) polynomial(model.coefSymm, theta);
-		double sym_dtheta = (double) polynomialDerivative(model.coefSymm, theta);
+		double sym = (double) polynomial(model.symmetric, theta);
+		double sym_dtheta = (double) polynomialDerivative(model.symmetric, theta);
 
-		double deltaR = (double) (polynomial(model.coefRad, theta)*polytrig(model.coefRadTrig, cosphi, sinphi));
-		double deltaR_dtheta = (double) (polynomialDerivative(model.coefRad, theta)*polytrig(model.coefRadTrig, cosphi, sinphi));
-		double deltaR_dphi = (double) (polynomial(model.coefRad, theta)*polytrigDerivative(model.coefRadTrig, cosphi, sinphi));
+		double deltaR = (double) (polynomial(model.radial, theta)*polytrig(model.radialTrig, cosphi, sinphi));
+		double deltaR_dtheta = (double) (polynomialDerivative(model.radial, theta)*polytrig(model.radialTrig, cosphi, sinphi));
+		double deltaR_dphi = (double) (polynomial(model.radial, theta)*polytrigDerivative(model.radialTrig, cosphi, sinphi));
 
-		double deltaT = (double) (polynomial(model.coefTan, theta)*polytrig(model.coefTanTrig, cosphi, sinphi));
-		double deltaT_dtheta = (double) (polynomialDerivative(model.coefTan, theta)*polytrig(model.coefTanTrig, cosphi, sinphi));
-		double deltaT_dphi = (double) (polynomial(model.coefTan, theta)*polytrigDerivative(model.coefTanTrig, cosphi, sinphi));
+		double deltaT = (double) (polynomial(model.tangent, theta)*polytrig(model.tangentTrig, cosphi, sinphi));
+		double deltaT_dtheta = (double) (polynomialDerivative(model.tangent, theta)*polytrig(model.tangentTrig, cosphi, sinphi));
+		double deltaT_dphi = (double) (polynomial(model.tangent, theta)*polytrigDerivative(model.tangentTrig, cosphi, sinphi));
 
 		// dx/dtheta
 		gradient.a11 = (sym_dtheta + deltaR_dtheta)*cosphi - deltaT_dtheta*sinphi;
