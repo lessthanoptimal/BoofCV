@@ -53,6 +53,7 @@ public class CalibrationIO {
 	public static String MODEL_PINHOLE = "pinhole";
 	public static String MODEL_BROWN = "pinhole_radial_tangential";
 	public static String MODEL_OMNIDIRECTIONAL_UNIVERSAL = "omnidirectional_universal";
+	public static String MODEL_KANNALA_BRANDT = "kannala_brandt";
 	public static String MODEL_STEREO = "stereo_camera";
 	public static String MODEL_RIGID_BODY = "rigid_body";
 	public static String MODEL_VISUAL_DEPTH = "visual_depth";
@@ -88,8 +89,15 @@ public class CalibrationIO {
 			out.println("# radial = radial distortion, (t1,t2) = tangential distortion");
 			out.println();
 			putModelUniversalOmni((CameraUniversalOmni)parameters, data);
+		} else if (parameters instanceof CameraKannalaBrandt) {
+			out.println("# A camera model for pinhole, wide angle, and fisheye cameras.");
+			out.println("# Kannala, J., and Brandt, S. S. \"A generic camera model and calibration method for conventional,");
+			out.println("# wide-angle, and fish-eye lenses.\" IEEE transactions on pattern analysis and machine intelligence, 2006");
+			out.println("# (fx,fy) = focal length, (cx,cy) = principle point, (width,height) = image shape");
+			out.println("# Everything else is coefficients for different types of distortion");
+			out.println();
+			putKannalaBrandt((CameraKannalaBrandt)parameters, data);
 		} else {
-
 			out.println("# Pinhole camera model");
 			out.println("# (fx,fy) = focal length, (cx,cy) = principle point, (width,height) = image shape");
 			out.println();
@@ -313,6 +321,15 @@ public class CalibrationIO {
 			if (distortion.containsKey("t2"))
 				parameters.t2 = (double)distortion.get("t2");
 			return (T)parameters;
+		} else if (model.equals(MODEL_KANNALA_BRANDT)) {
+			var parameters = new CameraKannalaBrandt();
+			loadPinhole(getOrThrow(data, "pinhole"), parameters);
+			parameters.fsetSymmetric(loadCoefficients(data, "symmetric"));
+			parameters.fsetRadial(loadCoefficients(data, "radial"));
+			parameters.fsetRadialTrig(loadCoefficients(data, "radial_trig"));
+			parameters.fsetTangent(loadCoefficients(data, "tangent"));
+			parameters.fsetTangentTrig(loadCoefficients(data, "tangent_trig"));
+			return (T)parameters;
 		} else if (model.equals(MODEL_STEREO)) {
 			StereoParameters parameters = new StereoParameters();
 			parameters.left = load((Map<String, Object>)getOrThrow(data, "left"));
@@ -349,7 +366,7 @@ public class CalibrationIO {
 	}
 
 	public static Map<String, Object> putModelBrown( CameraPinholeBrown parameters,
-													  @Nullable Map<String, Object> map ) {
+													 @Nullable Map<String, Object> map ) {
 		if (map == null)
 			map = new HashMap<>();
 
@@ -362,7 +379,7 @@ public class CalibrationIO {
 	}
 
 	public static Map<String, Object> putModelUniversalOmni( CameraUniversalOmni parameters,
-															  @Nullable Map<String, Object> map ) {
+															 @Nullable Map<String, Object> map ) {
 		if (map == null)
 			map = new HashMap<>();
 
@@ -379,6 +396,24 @@ public class CalibrationIO {
 		mapDistort.put("t2", parameters.t2);
 
 		map.put("radial_tangential", mapDistort);
+
+		return map;
+	}
+
+	public static Map<String, Object> putKannalaBrandt( CameraKannalaBrandt parameters,
+														@Nullable Map<String, Object> map ) {
+		if (map == null)
+			map = new HashMap<>();
+
+		map.put("model", MODEL_KANNALA_BRANDT);
+		map.put(VERSION, 0);
+		map.put("pinhole", putParamsPinhole(parameters));
+
+		map.put("symmetric", parameters.symmetric);
+		map.put("radial", parameters.radial);
+		map.put("radial_trig", parameters.radialTrig);
+		map.put("tangent", parameters.tangent);
+		map.put("tangent_trig", parameters.tangentTrig);
 
 		return map;
 	}
@@ -431,6 +466,18 @@ public class CalibrationIO {
 		} catch (IOException e) {
 			throw new UncheckedIOException(e);
 		}
+	}
+
+	public static double[] loadCoefficients( Map<String, Object> map, String name ) {
+		if (!map.containsKey(name))
+			return new double[0];
+		List<Double> list = (List<Double>)map.get(name);
+		double[] coefficients = new double[list.size()];
+
+		for (int i = 0; i < list.size(); i++) {
+			coefficients[i] = list.get(i);
+		}
+		return coefficients;
 	}
 
 	public static Se3_F64 loadSe3( Map<String, Object> map, Se3_F64 transform ) {

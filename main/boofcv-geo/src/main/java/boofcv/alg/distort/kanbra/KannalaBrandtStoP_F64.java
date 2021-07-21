@@ -41,7 +41,7 @@ public class KannalaBrandtStoP_F64 implements Point3Transform2_F64 {
 	@Getter protected final CameraKannalaBrandt model;
 
 	public KannalaBrandtStoP_F64( CameraKannalaBrandt model ) {
-		BoofMiscOps.checkTrue(model.coefRadTrig.length == 0 || model.coefRadTrig.length == 4);
+		BoofMiscOps.checkTrue(model.radialTrig.length == 0 || model.radialTrig.length == 4);
 
 		this.model = new CameraKannalaBrandt(model);
 	}
@@ -54,7 +54,7 @@ public class KannalaBrandtStoP_F64 implements Point3Transform2_F64 {
 		double theta = Math.acos(z/UtilPoint3D_F64.norm(x, y, z)); // uses dot product
 
 		// compute symmetric projection function
-		double r = (double) polynomial(model.coefSymm, theta);
+		double r = (double) polynomial(model.symmetric, theta);
 
 		// angle on the image plane of the incoming ray
 		double phi = Math.atan2(y, x);
@@ -65,8 +65,8 @@ public class KannalaBrandtStoP_F64 implements Point3Transform2_F64 {
 		double dx, dy;
 		if (model.hasNonSymmetricCoefficients()) {
 			// distortion terms. radial and tangential
-			double disRad = (double) (polynomial(model.coefRad, theta)*polytrig(model.coefRadTrig, cosphi, sinphi));
-			double disTan = (double) (polynomial(model.coefTan, theta)*polytrig(model.coefTanTrig, cosphi, sinphi));
+			double disRad = (double) (polynomial(model.radial, theta)*polytrig(model.radialTrig, cosphi, sinphi));
+			double disTan = (double) (polynomial(model.tangent, theta)*polytrig(model.tangentTrig, cosphi, sinphi));
 
 			// put it all together to get normalized image coordinates
 			dx = (r + disRad)*cosphi - disTan*sinphi;
