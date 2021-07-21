@@ -27,7 +27,7 @@ allprojects {
 project.ext.set("deepboof_version", '0.5.1')
 project.ext.set("lombok_version", '1.18.20')
 project.ext.set("errorprone_version", '2.7.1')
-project.ext.set("jabel_version", '0.4.1')
+project.ext.set("jabel_version", '0.3.0')
 project.ext.set("guava_version", '30.1.1-jre')
 
 // Which native platforms are supported can be specified in the command line.  Otherwise
