@@ -41,7 +41,7 @@ public class Help {
 			CreateCalibrationTarget.class,
 			CreateQrCodeDocument.class,
 			DownSelectVideoFramesFor3DApp.class,
-			SceneReconstructionApp.class,
+			SceneReconstruction.class,
 			PointCloudViewerApp.class,
 	};
 

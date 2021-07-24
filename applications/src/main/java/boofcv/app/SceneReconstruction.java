@@ -25,6 +25,7 @@ import boofcv.abst.tracker.PointTracker;
 import boofcv.alg.cloud.PointCloudReader;
 import boofcv.alg.cloud.PointCloudUtils_F64;
 import boofcv.alg.geo.bundle.cameras.BundlePinholeSimplified;
+import boofcv.alg.misc.PixelMath;
 import boofcv.alg.mvs.DisparityParameters;
 import boofcv.alg.mvs.MultiViewStereoFromKnownSceneStructure;
 import boofcv.alg.similar.ConfigSimilarImagesSceneRecognition;
@@ -82,10 +83,8 @@ import java.util.List;
  *
  * @author Peter Abeles
  */
-public class SceneReconstructionApp {
+public class SceneReconstruction {
 	// TODO save and load vocabulary used in similar
-	// TODO sparse only
-	// TODO Resume from saved
 
 	ConfigPointTracker configTracker = FactorySceneRecognition.createDefaultTrackerConfig();
 	ConfigSimilarImagesTrackThenMatch configSimilarTracker = new ConfigSimilarImagesTrackThenMatch();
@@ -94,10 +93,11 @@ public class SceneReconstructionApp {
 	ConfigGeneratePairwiseImageGraph configPairwise = new ConfigGeneratePairwiseImageGraph();
 	ConfigSparseToDenseCloud configSparseToDense = new ConfigSparseToDenseCloud();
 
-	@Option(name = "-i", aliases = {"--Input"}, usage = "Directory or glob pattern or regex pattern.\n" +
-			"Glob example: 'glob:data/**/left*.jpg'\n" +
-			"Regex example: 'regex:data/\\w+/left\\d+.jpg'\n" +
-			"If not a pattern then it's assumed to be a path. All files with known image extensions in their name as added, e.g. jpg, png")
+	@Option(name = "-i", aliases = {"--Input"}, usage = """
+			Directory or glob pattern or regex pattern.
+			Glob example: 'glob:data/**/left*.jpg'
+			Regex example: 'regex:data/\\w+/left\\d+.jpg'
+			If not a pattern then it's assumed to be a path. All files with known image extensions in their name as added, e.g. jpg, png""")
 	String inputPattern;
 
 	@Option(name = "-o", aliases = {"--Output"}, usage = "Path to output directory.")
@@ -112,6 +112,9 @@ public class SceneReconstructionApp {
 
 	@Option(name = "--MaxPixels", usage = "Maximum number of images in an image before its down sampled. E.g. 800*600=480000")
 	int maxPixels = 800*600;
+
+	@Option(name = "--MinDisparity", usage = "Minimum disparity. Points less than this are filtered. Can be used to remove noisy distant points.")
+	double minDisparity = 0.0;
 
 	@Option(name = "--Ordered", usage = "Images are assumed to be in sequential order and a feature tracker can be used")
 	boolean ordered = false;
@@ -134,6 +137,17 @@ public class SceneReconstructionApp {
 
 	@Option(name = "--DeleteOutput", usage = "If true, it will recursively delete the output directory if it already exists")
 	boolean deleteOutput = false;
+
+	@Option(name = "--RerunDense", usage = "Re-runs dense reconstruction using previously saved results")
+	boolean rerunDense = false;
+
+	@Option(name = "--RerunSparse", usage = "Re-runs sparse reconstruction using previously saved results")
+	boolean rerunSparse = false;
+
+	// Indicates what it should load from disk
+	boolean loadSimilar = false;
+	boolean loadPairwise = false;
+	boolean loadSparseScene = false;
 
 	// Storage for intermediate results
 	PairwiseImageGraph pairwise = null;
@@ -158,6 +172,15 @@ public class SceneReconstructionApp {
 		System.out.println("input pattern  = " + inputPattern);
 		System.out.println("output dir     = " + outputPath);
 
+		if (rerunSparse) {
+			loadSimilar = true;
+			loadPairwise = true;
+		} else if (rerunDense) {
+			loadSimilar = true;
+			loadPairwise = true;
+			loadSparseScene = true;
+		}
+
 		List<String> paths = UtilIO.listSmartImages(inputPattern, true);
 
 		if (paths.isEmpty()) {
@@ -171,7 +194,6 @@ public class SceneReconstructionApp {
 		// Create the output directory if it doesn't exist
 		UtilIO.mkdirs(new File(outputPath), deleteOutput);
 
-		// TODO if video sequences are found, decompress them into images
 		System.out.println("Total images: " + paths.size());
 		saveIndexToImageTable(paths);
 
@@ -197,13 +219,31 @@ public class SceneReconstructionApp {
 			images = new LoadFileImageSequence2<>(paths, ImageType.PL_U8);
 			images.setTargetPixels(maxPixels);
 			listDimensions.clear();
-			if (ordered)
-				findSimilarImagesSequence();
-			else
-				findSimilarImagesUnsorted();
 
-			computePairwise();
-			computeMetric();
+			if (loadSimilar) {
+				System.out.println("Loading similar from disk");
+				loadImageSizes();
+				dbSimilar = MultiViewIO.loadSimilarImages(new File(outputPath, "similar.yaml").getPath());
+			} else {
+				if (ordered)
+					findSimilarImagesSequence();
+				else
+					findSimilarImagesUnsorted();
+				MultiViewIO.save(dbSimilar, new File(outputPath, "similar.yaml").getPath());
+			}
+
+			if (loadPairwise) {
+				System.out.println("Loading pairwise from disk");
+				pairwise = MultiViewIO.load(new File(outputPath, "pairwise.yaml").getPath(), (PairwiseImageGraph)null);
+			} else {
+				computePairwise();
+			}
+
+			if (loadSparseScene) {
+				if (loadScenesFromDisk()) return;
+			} else {
+				computeMetric();
+			}
 
 			// Finish constructing the largest or all the scenes
 			if (allScenes) {
@@ -226,6 +266,36 @@ public class SceneReconstructionApp {
 		System.out.println("Finished!");
 	}
 
+	private boolean loadScenesFromDisk() {
+		// Finding all the scene directories
+		File[] children = new File(outputPath).listFiles();
+		if (children == null) {
+			System.err.println("directory doesn't exist. path=" + outputPath);
+			System.exit(1);
+			return true;
+		}
+		List<String> sceneDirs = new ArrayList<>();
+		for (File c : children) {
+			if (c.isDirectory() && c.getName().startsWith("scene")) {
+				sceneDirs.add(c.getPath());
+			}
+		}
+		Collections.sort(sceneDirs);
+		if (sceneDirs.isEmpty()) {
+			System.err.println("Can't load sparse scene! No directories found. path=" + outputPath);
+			System.exit(1);
+			return true;
+		}
+
+		// Load all the scnes
+		for (String sceneDirectory : sceneDirs) {
+			File f = new File(sceneDirectory);
+			System.out.println("Loading scene=" + f.getName());
+			listScenes.add(MultiViewIO.load(new File(f, "working.yaml").getPath(), pairwise, (SceneWorkingGraph)null));
+		}
+		return false;
+	}
+
 	/**
 	 * Save the input image list so that you know what the numeric values of each image represents
 	 */
@@ -243,10 +313,14 @@ public class SceneReconstructionApp {
 	private void reconstructScene( List<String> paths, SceneWorkingGraph working, File sceneDirectory ) {
 		out.println("----- Building " + sceneDirectory.getName());
 
-		UtilIO.mkdirs(sceneDirectory);
-
-		bundleAdjustmentRefine(sceneDirectory, working);
-		MultiViewIO.save(working, new File(sceneDirectory, "working.yaml").getPath());
+		// If not loading from disk, refine the save the sparse scene
+		if (!loadSparseScene) {
+			UtilIO.mkdirs(sceneDirectory);
+			bundleAdjustmentRefine(sceneDirectory, working);
+			MultiViewIO.save(working, new File(sceneDirectory, "working.yaml").getPath());
+		} else {
+			scene = MultiViewIO.load( new File(sceneDirectory, "structure.yaml").getPath(), (SceneStructureMetric)null);
+		}
 		printSparseSummary(working);
 
 		computeDense(paths, working, sceneDirectory);
@@ -356,6 +430,20 @@ public class SceneReconstructionApp {
 		this.dbSimilar = similarImages;
 	}
 
+	/**
+	 * Loads each image and saves its size.
+	 */
+	private void loadImageSizes() {
+		dbCams.addCameraCanonical(images.getWidth(), images.getHeight(), 60);
+		int frameID = 0;
+		while (images.hasNext()) {
+			Planar<GrayU8> color = images.next();
+			listDimensions.add(new ImageDimension(color.width, color.height));
+			dbCams.addView(frameID+"", 0);
+			frameID += 1;
+		}
+	}
+
 	private void findSimilarImagesSequence() {
 		PointTracker<GrayU8> tracker = FactoryPointTracker.tracker(configTracker, GrayU8.class, null);
 		var activeTracks = new ArrayList<PointTrack>();
@@ -446,24 +534,29 @@ public class SceneReconstructionApp {
 		sparseToDense = FactorySceneReconstruction.sparseSceneToDenseCloud(configSparseToDense, ImageType.SB_U8);
 
 		// If requested, save disparity information as it's computed
+		File outputFused = new File(sceneDirectory, "fused");
 		if (saveFusedDisparity) {
-			File outputFused = new File(sceneDirectory, "fused");
 			UtilIO.mkdirs(outputFused);
+		}
 
-			sparseToDense.getMultiViewStereo().setListener(new MultiViewStereoFromKnownSceneStructure.Listener<>() {
-				@Override
-				public void handlePairDisparity( String left, String right, GrayU8 rect0, GrayU8 rect1,
-												 GrayF32 disparity, GrayU8 mask, DisparityParameters parameters ) {}
+		sparseToDense.getMultiViewStereo().setListener(new MultiViewStereoFromKnownSceneStructure.Listener<>() {
+			@Override
+			public void handlePairDisparity( String left, String right, GrayU8 rect0, GrayU8 rect1,
+											 GrayF32 disparity, GrayU8 mask, DisparityParameters parameters ) {}
 
-				@Override
-				public void handleFusedDisparity( String name, GrayF32 disparity, GrayU8 mask, DisparityParameters parameters ) {
+			@Override
+			public void handleFusedDisparity( String name, GrayF32 disparity, GrayU8 mask, DisparityParameters parameters ) {
+				if (minDisparity > 0) {
+					PixelMath.operator1(disparity, ( v ) -> v >= minDisparity ? v : parameters.disparityRange, disparity);
+				}
+
+				if (saveFusedDisparity) {
 					BufferedImage colorized = VisualizeImageData.disparity(disparity, null, parameters.disparityRange, 0);
 					UtilImageIO.saveImage(colorized, new File(outputFused, "visualized_" + name + ".png").getPath());
-
 					// It's not obvious what format to save the float and binary images in. leaving that for the future
 				}
-			});
-		}
+			}
+		});
 
 		sparseToDense.getMultiViewStereo().setVerbose(out, BoofMiscOps.hashSet(BoofVerbose.RECURSIVE, BoofVerbose.RUNTIME));
 
@@ -555,7 +648,7 @@ public class SceneReconstructionApp {
 	}
 
 	public static void main( String[] args ) {
-		var generator = new SceneReconstructionApp();
+		var generator = new SceneReconstruction();
 		var parser = new CmdLineParser(generator);
 
 		if (args.length == 0) {
