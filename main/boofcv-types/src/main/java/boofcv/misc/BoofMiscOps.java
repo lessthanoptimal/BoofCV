@@ -226,6 +226,22 @@ public class BoofMiscOps {
 		out.println("}");
 	}
 
+	/**
+	 * Parses the string into a dimension. The two numbers are seperated with a colon.
+	 */
+	public static boolean parseDimension( String text, ImageDimension dimension ) {
+		String[] words = text.split(":");
+		if (words.length != 2) {
+			System.err.println("Parse error splitting dimension");
+			return false;
+		}
+
+		dimension.width = Integer.parseInt(words[0]);
+		dimension.height = Integer.parseInt(words[1]);
+
+		return true;
+	}
+
 	private static class CompareStringNames implements Comparator<String> {
 
 		@Override

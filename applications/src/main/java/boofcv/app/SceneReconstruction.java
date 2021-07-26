@@ -31,6 +31,7 @@ import boofcv.alg.mvs.MultiViewStereoFromKnownSceneStructure;
 import boofcv.alg.similar.ConfigSimilarImagesSceneRecognition;
 import boofcv.alg.similar.ConfigSimilarImagesTrackThenMatch;
 import boofcv.alg.structure.*;
+import boofcv.concurrency.BoofConcurrency;
 import boofcv.core.image.ConvertImage;
 import boofcv.core.image.GConvertImage;
 import boofcv.factory.disparity.ConfigDisparity;
@@ -144,6 +145,12 @@ public class SceneReconstruction {
 	@Option(name = "--RerunSparse", usage = "Re-runs sparse reconstruction using previously saved results")
 	boolean rerunSparse = false;
 
+	@Option(name = "--WindowSize", usage = "Specifies the display window's width and height.")
+	String windowSizeString = "800:600";
+
+	@Option(name = "--Threads", usage = "Overrides default number of threads. 0 means system default.")
+	int numThreads = 0;
+
 	// Indicates what it should load from disk
 	boolean loadSimilar = false;
 	boolean loadPairwise = false;
@@ -163,6 +170,9 @@ public class SceneReconstruction {
 	LoadFileImageSequence2<Planar<GrayU8>> images;
 	List<ImageDimension> listDimensions = new ArrayList<>();
 
+	// How big the view will be
+	ImageDimension windowSize = new ImageDimension();
+
 	PrintStream out;
 
 	public void process() {
@@ -171,6 +181,8 @@ public class SceneReconstruction {
 		System.out.println("max pixels     = " + maxPixels + " , sqrt=" + Math.sqrt(maxPixels));
 		System.out.println("input pattern  = " + inputPattern);
 		System.out.println("output dir     = " + outputPath);
+
+		BoofMiscOps.parseDimension(windowSizeString, windowSize);
 
 		if (rerunSparse) {
 			loadSimilar = true;
@@ -188,8 +200,13 @@ public class SceneReconstruction {
 			System.exit(-1);
 		}
 
+		// See if the user overrode the number of threads
+		if (numThreads > 0) {
+			BoofConcurrency.setMaxThreads(numThreads);
+		}
+
 		// This will make SBA concurrent
-		DDoglegConcurrency.USE_CONCURRENT = true;
+		DDoglegConcurrency.USE_CONCURRENT = BoofConcurrency.isUseConcurrent();
 
 		// Create the output directory if it doesn't exist
 		UtilIO.mkdirs(new File(outputPath), deleteOutput);
@@ -632,7 +649,7 @@ public class SceneReconstruction {
 			BoofSwingUtil.visualizeCameras(structure, viewer);
 
 			// Display the point cloud
-			viewer.getComponent().setPreferredSize(new Dimension(600, 600));
+			viewer.getComponent().setPreferredSize(new Dimension(windowSize.width, windowSize.height));
 			ShowImages.showWindow(viewer.getComponent(), "Cloud: " + name, true);
 		});
 	}
