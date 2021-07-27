@@ -117,6 +117,9 @@ public class SceneReconstruction {
 	@Option(name = "--MinDisparity", usage = "Minimum disparity. Points less than this are filtered. Can be used to remove noisy distant points.")
 	double minDisparity = 0.0;
 
+	@Option(name = "--MaxDisparity", usage = "Used to override maximum disparity. Can't exceed 255.")
+	int maxDisparity = 0;
+
 	@Option(name = "--Ordered", usage = "Images are assumed to be in sequential order and a feature tracker can be used")
 	boolean ordered = false;
 
@@ -199,6 +202,9 @@ public class SceneReconstruction {
 			System.err.println("No inputs found. Bad path or pattern? " + inputPattern);
 			System.exit(-1);
 		}
+
+		if (maxDisparity > 255)
+			throw new RuntimeException("Max Disparity can't be larger than 255. maxDisparity=" + maxDisparity);
 
 		// See if the user overrode the number of threads
 		if (numThreads > 0) {
@@ -336,7 +342,7 @@ public class SceneReconstruction {
 			bundleAdjustmentRefine(sceneDirectory, working);
 			MultiViewIO.save(working, new File(sceneDirectory, "working.yaml").getPath());
 		} else {
-			scene = MultiViewIO.load( new File(sceneDirectory, "structure.yaml").getPath(), (SceneStructureMetric)null);
+			scene = MultiViewIO.load(new File(sceneDirectory, "structure.yaml").getPath(), (SceneStructureMetric)null);
 		}
 		printSparseSummary(working);
 
@@ -351,7 +357,7 @@ public class SceneReconstruction {
 		ConfigDisparitySGM configSgm = configSparseToDense.disparity.approachSGM;
 		configSgm.validateRtoL = 0;
 		configSgm.texture = 0.75;
-		configSgm.disparityRange = 250;
+		configSgm.disparityRange = maxDisparity <= 0 ? 250: maxDisparity;
 		configSgm.paths = ConfigDisparitySGM.Paths.P4;
 		configSgm.configBlockMatch.radiusX = 3;
 		configSgm.configBlockMatch.radiusY = 3;
@@ -456,7 +462,7 @@ public class SceneReconstruction {
 		while (images.hasNext()) {
 			Planar<GrayU8> color = images.next();
 			listDimensions.add(new ImageDimension(color.width, color.height));
-			dbCams.addView(frameID+"", 0);
+			dbCams.addView(frameID + "", 0);
 			frameID += 1;
 		}
 	}
