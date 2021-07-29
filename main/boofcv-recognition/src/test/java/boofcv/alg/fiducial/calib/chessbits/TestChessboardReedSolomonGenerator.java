@@ -16,10 +16,11 @@
  * limitations under the License.
  */
 
-package boofcv.alg.fiducial.calib.chessdots;
+package boofcv.alg.fiducial.calib.chessbits;
 
 import boofcv.alg.drawing.FiducialImageEngine;
 import boofcv.gui.image.ShowImages;
+import boofcv.struct.GridShape;
 import boofcv.struct.image.GrayU8;
 import boofcv.testing.BoofStandardJUnit;
 import org.junit.jupiter.api.Test;
@@ -37,11 +38,14 @@ class TestChessboardReedSolomonGenerator extends BoofStandardJUnit {
 	public static void main( String[] args ) {
 		var engine = new FiducialImageEngine();
 		engine.configure(10, 1200);
-		var renderer = new ChessboardReedSolomonGenerator();
+		var utils = new ChessBitsUtils();
+		utils.markers.add( new GridShape(10, 12) );
+		utils.fixate();
+		var renderer = new ChessboardReedSolomonGenerator(utils);
 //		renderer.multiplier = ChessboardSolomonMarkerCodec.Multiplier.LEVEL_2;
 		renderer.render = engine;
 		renderer.squareWidth = 100;
-		renderer.render(10, 12);
+		renderer.render(0);
 
 		GrayU8 image = engine.getGray();
 

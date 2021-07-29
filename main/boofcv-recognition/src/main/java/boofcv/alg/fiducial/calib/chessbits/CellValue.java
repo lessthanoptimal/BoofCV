@@ -16,24 +16,17 @@
  * limitations under the License.
  */
 
-package boofcv.alg.fiducial.calib.chessdots;
-
-import boofcv.alg.fiducial.qrcode.PackedBits8;
+package boofcv.alg.fiducial.calib.chessbits;
 
 /**
- * Describes the appearance of an encoded cell
- *
  * @author Peter Abeles
  */
-public class EncodedCell {
-	/** The number of bits along each side of the square */
-	public int width;
+public class CellValue {
+	public int markerID;
+	public int cellID;
 
-	/** Value of each bit in the cell. Number of bits must equal width*width. */
-	public final PackedBits8 bits = new PackedBits8();
-
-	public void reset() {
-		width = -1;
-		bits.resize(0);
+	public void setTo( int markerID, int cellID ) {
+		this.markerID = markerID;
+		this.cellID = cellID;
 	}
 }

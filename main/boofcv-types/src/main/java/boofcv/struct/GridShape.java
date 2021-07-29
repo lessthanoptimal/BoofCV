@@ -31,6 +31,13 @@ public class GridShape implements Configuration {
 	/** Number of columns */
 	public int cols;
 
+	public GridShape( int rows, int cols ) {
+		this.rows = rows;
+		this.cols = cols;
+	}
+
+	public GridShape() {}
+
 	@Override public void checkValidity() {
 		BoofMiscOps.checkTrue(rows >= 0);
 		BoofMiscOps.checkTrue(cols >= 0);

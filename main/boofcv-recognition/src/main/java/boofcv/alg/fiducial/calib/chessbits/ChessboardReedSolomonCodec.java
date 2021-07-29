@@ -16,7 +16,7 @@
  * limitations under the License.
  */
 
-package boofcv.alg.fiducial.calib.chessdots;
+package boofcv.alg.fiducial.calib.chessbits;
 
 import boofcv.alg.fiducial.qrcode.PackedBits8;
 import boofcv.alg.fiducial.qrcode.ReidSolomonCodes;

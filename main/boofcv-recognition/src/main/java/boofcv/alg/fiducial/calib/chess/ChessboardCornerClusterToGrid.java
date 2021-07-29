@@ -19,11 +19,16 @@
 package boofcv.alg.fiducial.calib.chess;
 
 import boofcv.alg.fiducial.calib.chess.ChessboardCornerGraph.Node;
+import boofcv.misc.BoofMiscOps;
 import georegression.metric.UtilAngle;
 import georegression.struct.shapes.Rectangle2D_I32;
+import lombok.Getter;
+import lombok.Setter;
 import org.ddogleg.sorting.QuickSort_F64;
 import org.ddogleg.struct.DogArray;
 import org.ddogleg.struct.DogArray_B;
+import org.ddogleg.struct.VerbosePrint;
+import org.jetbrains.annotations.Nullable;
 
 import java.io.PrintStream;
 import java.util.*;
@@ -50,7 +55,7 @@ import java.util.*;
  *
  * @author Peter Abeles
  */
-public class ChessboardCornerClusterToGrid {
+public class ChessboardCornerClusterToGrid implements VerbosePrint {
 	/** If true then it will find the largest rectangular grid and return this. This will often remove stray noise */
 	public boolean findLargestGrid = true;
 	/** If false then a hole in the middle of the grid will be considered a failure */
@@ -73,16 +78,19 @@ public class ChessboardCornerClusterToGrid {
 	List<Node> cornerList = new ArrayList<>();
 
 	// See documentation above. if true then the requirement that the (0,0) grid element be a corner is removed.
-	boolean requireCornerSquares = false;
+	@Getter @Setter boolean requireCornerSquares = false;
 
 	// Used to optionally print extra debugging information
 	PrintStream verbose;
 
 	// optional check on the shape
-	CheckShape checkShape;
+	@Setter CheckShape checkShape;
 
+	/** Storage for elements in the sparse grid. Elements are not ordered. */
 	DogArray<GridElement> sparseGrid = new DogArray<>(GridElement::new);
-	int sparseCols, sparseRows;
+	/** Dimension of the sparse/dense grids */
+	@Getter int sparseCols, sparseRows;
+	/** Dense grid. Empty elements are set to null */
 	GridElement[] denseGrid = new GridElement[0];
 
 	// Region of the dense grid that should be copied into the output
@@ -235,7 +243,7 @@ public class ChessboardCornerClusterToGrid {
 		int N = sparseCols*sparseRows;
 		if (denseGrid.length < N)
 			denseGrid = new GridElement[N];
-		Arrays.fill(denseGrid, null);
+		Arrays.fill(denseGrid, 0, N, null);
 
 		for (int i = 0; i < sparseGrid.size; i++) {
 			GridElement g = sparseGrid.get(i);
@@ -432,44 +440,19 @@ public class ChessboardCornerClusterToGrid {
 
 	/**
 	 * Returns true of the candidate is the top-left corner in a white square.
+	 *
+	 * @param a Corner at top-left
+	 * @param c Corner at bottom-right
 	 */
-	public boolean isWhiteSquare( Node candidate, Node nextColumn ) {
-
-		// Find the index of nextColumn in the candidate
-		int nextIndex = -1;
-		for (int i = 0; i < candidate.edges.length; i++) {
-			if (candidate.edges[i] == nextColumn) {
-				nextIndex = i;
-				break;
-			}
-		}
-		if (nextIndex == -1)
-			return false; // Is this a bug?
-
-		int nextNextIndex = (nextIndex+1)%4;
-		// See if the other corner is there
-		if (candidate.edges[nextNextIndex] == null)
-			return false;
-
-
-		candidate.putEdgesIntoList(edgeList);
-		if (edgeList.size() != 2) {
-			throw new RuntimeException("BUG! Should be a corner and have two edges");
-		}
-
-		Node a = edgeList.get(0);
-		Node b = edgeList.get(1);
-
+	public boolean isWhiteSquare( Node a, Node c ) {
 		// Find the average angle from the two vectors defined by the two connected nodes
-		double dirA = Math.atan2(a.y - candidate.y, a.x - candidate.x);
-		double dirB = Math.atan2(b.y - candidate.y, b.x - candidate.x);
+		double dirAC = Math.atan2(c.y - a.y, c.x - a.x);
 
-		double dirAB = UtilAngle.boundHalf(dirA + UtilAngle.distanceCCW(dirA, dirB)/2.0);
+		// If it's white then there will be a big difference between the orientation and c
+		double acute = UtilAngle.distHalf(dirAC, a.orientation);
 
-		// Find the acute angle between the corner's orientation and the vector
-		double acute = UtilAngle.distHalf(dirAB, candidate.orientation);
-
-		return acute < Math.PI/4.0;
+		// A "perfect" angle would be pi/2 with 0 being the worst
+		return acute > Math.PI/4.0;
 	}
 
 	/**
@@ -693,20 +676,15 @@ public class ChessboardCornerClusterToGrid {
 		grid.nodes.addAll(cornerList);
 	}
 
-	public void setVerbose( PrintStream verbose ) {
-		this.verbose = verbose;
+	/**
+	 * Used to access an element in the sparse grid
+	 */
+	public @Nullable GridElement getDense( int row, int col ) {
+		return denseGrid[row*sparseCols + col];
 	}
 
-	public void setCheckShape( CheckShape checkShape ) {
-		this.checkShape = checkShape;
-	}
-
-	public boolean isRequireCornerSquares() {
-		return requireCornerSquares;
-	}
-
-	public void setRequireCornerSquares( boolean requireCornerSquares ) {
-		this.requireCornerSquares = requireCornerSquares;
+	@Override public void setVerbose( @Nullable PrintStream out, @Nullable Set<String> configuration ) {
+		verbose = BoofMiscOps.addPrefix(this, out);
 	}
 
 	public static class GridElement {

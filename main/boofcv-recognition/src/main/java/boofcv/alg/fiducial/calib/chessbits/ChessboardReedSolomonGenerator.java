@@ -16,12 +16,12 @@
  * limitations under the License.
  */
 
-package boofcv.alg.fiducial.calib.chessdots;
+package boofcv.alg.fiducial.calib.chessbits;
 
 import boofcv.alg.drawing.FiducialRenderEngine;
 import boofcv.alg.fiducial.qrcode.PackedBits8;
-import lombok.Getter;
-import lombok.Setter;
+import boofcv.struct.GridShape;
+import georegression.struct.shapes.Rectangle2D_F64;
 
 /**
  * Renders a chessboard pattern with numbers encoded inside the dots.
@@ -39,43 +39,38 @@ public class ChessboardReedSolomonGenerator {
 	// Data can be embedded in the white or black squares inside the chessboard pattern. When put inside of the black
 	// squares it reduces the effective range of the chessboard detection algorithm by a significant amount.
 
-
 	// How wide a square is in the chessboard
 	double squareWidth;
-	/** Number of columns in the chessboard pattern */
-	int cols;
-	/** Number of rows in the chessboard pattern */
-	int rows;
 
-	int skip = 0; // TODO implement
-
-	/** Fraction of a cell's length the data bit is */
-	public @Getter @Setter double dataBitWidthFraction = 0.7;
-
-	/** Fraction of the length the quite zone is around data bits */
-	public @Getter @Setter double dataBorderFraction = 0.15;
+	final ChessBitsUtils utils;
 
 	// used to draw the fiducial
 	protected FiducialRenderEngine render;
 	PackedBits8 packetBits = new PackedBits8();
 
-	ChessboardReedSolomonCodec codec = new ChessboardReedSolomonCodec();
+	// Workspace
+	Rectangle2D_F64 rect = new Rectangle2D_F64();
 
-	public void render( int rows, int cols ) {
-		this.rows = rows;
-		this.cols = cols;
+	public ChessboardReedSolomonGenerator( ChessBitsUtils utils ) {
+		this.utils = utils;
+	}
 
-		codec.configure(rows, cols);
+	public void render( int marker ) {
+		GridShape shape = utils.markers.get(marker);
+
 		render.init();
 
 		// First build the chessboard pattern
-		renderSquares();
+		renderSquares(shape);
 
 		// Render the unique ID for all inner squares
-		renderCodes();
+		renderCodes(shape);
 	}
 
-	private void renderSquares() {
+	private void renderSquares( GridShape shape ) {
+		final int rows = shape.rows;
+		final int cols = shape.cols;
+
 		// Start drawing black
 		render.setGray(0.0);
 
@@ -96,7 +91,10 @@ public class ChessboardReedSolomonGenerator {
 	/**
 	 * Renders unique IDs on all the inner squares
 	 */
-	private void renderCodes() {
+	private void renderCodes( GridShape shape ) {
+		final int rows = shape.rows;
+		final int cols = shape.cols;
+
 		// White circles will be rendered inside the inner squares
 		render.setGray(0.0);
 
@@ -108,7 +106,7 @@ public class ChessboardReedSolomonGenerator {
 			double x = stub + squareWidth*(col - 1);
 			if ((col - 1)%coordinateMultiplier != 0)
 				continue;
-			for (int row = (col+1)%2; row < rows; row += 2) {
+			for (int row = (col + 1)%2; row < rows; row += 2) {
 				if ((row - 1)%coordinateMultiplier != 0)
 					continue;
 
@@ -119,7 +117,7 @@ public class ChessboardReedSolomonGenerator {
 					continue;
 
 				// Encode the coordinate into bits
-				codec.encode(row - 1, col - 1, packetBits);
+				utils.codec.encode(row - 1, col - 1, packetBits);
 				renderEncoding(x, y);
 			}
 		}
@@ -129,23 +127,19 @@ public class ChessboardReedSolomonGenerator {
 	 * Renders the specified value into a black square with white dots
 	 */
 	private void renderEncoding( double px, double py ) {
-		int dotGridSize = codec.getGridBitLength();
-		double borderWidth = squareWidth*dataBorderFraction;
-		double cellWidth = (squareWidth - borderWidth*2)/dotGridSize;
-		double squareWidth = cellWidth*dataBitWidthFraction;
-
-		// Account for the data shape being smaller than a cell
-		double offset = borderWidth + cellWidth*(1.0 - dataBitWidthFraction)/2.0;
+		int dotGridSize = utils.codec.getGridBitLength();
 
 		for (int col = 0; col < dotGridSize; col++) {
-			double x = px + col*cellWidth + offset;
 			for (int row = 0; row < dotGridSize; row++) {
-				double y = py + row*cellWidth + offset;
-
 				int bit = row*dotGridSize + col;
 				if (packetBits.get(bit) == 0)
 					continue;
-				render.square(x, y, squareWidth);
+
+				// Get bit location in bit-grid coordinates
+				utils.bitRect(row, col, rect);
+
+				// Render it after scaling it into pixels
+				render.square(px + rect.p0.x*squareWidth, py + rect.p0.y*squareWidth, squareWidth*rect.getWidth());
 			}
 		}
 	}

@@ -212,6 +212,19 @@ class TestChessboardCornerClusterToGrid extends BoofStandardJUnit
 		assertTrue(alg.isCornerValidOrigin(nodes.get(2*3+2)));
 	}
 
+	@Test void isWhiteSquare() {
+		ChessboardCornerClusterToGrid alg = new ChessboardCornerClusterToGrid();
+		DogArray<Node> nodes = createGrid(3,3, true);
+
+		int o = 3+1; // offset from a code. +1 x and +1 y
+
+		// Test all nodes it can test. All the others are outside the allowed bounds
+		assertFalse(alg.isWhiteSquare(nodes.get(0), nodes.get(o)));
+		assertTrue(alg.isWhiteSquare(nodes.get(1), nodes.get(1+o)));
+		assertTrue(alg.isWhiteSquare(nodes.get(3), nodes.get(3+o)));
+		assertFalse(alg.isWhiteSquare(nodes.get(4), nodes.get(4+o)));
+	}
+
 	@Test
 	void orderNodes() {
 		for (int rows = 2; rows <= 4; rows++) {

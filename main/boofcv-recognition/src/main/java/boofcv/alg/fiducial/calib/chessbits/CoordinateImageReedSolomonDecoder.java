@@ -16,7 +16,7 @@
  * limitations under the License.
  */
 
-package boofcv.alg.fiducial.calib.chessdots;
+package boofcv.alg.fiducial.calib.chessbits;
 
 import boofcv.struct.image.ImageGray;
 import georegression.struct.point.Point2D_F64;
