@@ -20,6 +20,7 @@ package boofcv.alg.fiducial.calib.chess;
 
 import boofcv.alg.fiducial.calib.chess.ChessboardCornerGraph.Node;
 import georegression.metric.UtilAngle;
+import georegression.struct.shapes.Rectangle2D_I32;
 import org.ddogleg.sorting.QuickSort_F64;
 import org.ddogleg.struct.DogArray;
 import org.ddogleg.struct.DogArray_B;
@@ -50,6 +51,11 @@ import java.util.*;
  * @author Peter Abeles
  */
 public class ChessboardCornerClusterToGrid {
+	/** If true then it will find the largest rectangular grid and return this. This will often remove stray noise */
+	public boolean findLargestGrid = true;
+	/** If false then a hole in the middle of the grid will be considered a failure */
+	public boolean allowHoles = false;
+
 	// used to put edge into CW order
 	QuickSort_F64 sorter = new QuickSort_F64();
 	double[] directions = new double[4];
@@ -79,19 +85,17 @@ public class ChessboardCornerClusterToGrid {
 	int sparseCols, sparseRows;
 	GridElement[] denseGrid = new GridElement[0];
 
-	/**
-	 * Puts cluster nodes into grid order and computes the number of rows and columns. If the cluster is not
-	 * a complete grid this function will fail and return false
-	 *
-	 * @param cluster (Input) cluster. Edge order will be modified.
-	 * @param info (Output) Contains ordered nodes and the grid's size.
-	 * @return true if successful or false if it failed
-	 */
-	public boolean convert( ChessboardCornerGraph cluster, GridInfo info ) {
-		sparseGrid.reset();
+	// Region of the dense grid that should be copied into the output
+	Rectangle2D_I32 region = new Rectangle2D_I32();
 
-		// default to an invalid value to ensure a failure doesn't go unnoticed.
-		info.reset();
+	/**
+	 * Converts the graph into a sparse grid. This ensures that chessboard constraints are logically consistent in
+	 * the grid
+	 *
+	 * @return true if no errors were detected
+	 */
+	public boolean clusterToSparse( ChessboardCornerGraph cluster ) {
+		sparseGrid.reset();
 
 		// Get the edges in a consistent order
 		if (!orderEdges(cluster))
@@ -100,10 +104,28 @@ public class ChessboardCornerClusterToGrid {
 		// Find the grid which defines a chessboard pattern
 		if (!createSparseGrid(cluster.corners))
 			return false;
+
+		return true;
+	}
+
+	/**
+	 * After the sparse grid has been found this function can then be called to extract a complete target. It will
+	 * find the largest rectangular region with all the elements contained.
+	 *
+	 * @param info (Output) Found rectangular grid
+	 * @return true if no errors were detected
+	 */
+	public boolean sparseToGrid( GridInfo info ) {
 		sparseToDense();
-		if (!findLargestRectangle(info)) {
+
+		if (!findLargestRectangle(region)) {
 			return false;
 		}
+
+		if (!copyDenseRectangle(region.x0, region.y0, region.x1, region.y1, info)) {
+			return false;
+		}
+
 		// Put grid elements into a specific order
 		// select a valid corner to be (0,0). If there are multiple options select the one which is
 		int corner = selectCorner(info);
@@ -209,7 +231,7 @@ public class ChessboardCornerClusterToGrid {
 	/**
 	 * Converts the sparse into a dense grid
 	 */
-	void sparseToDense() {
+	public void sparseToDense() {
 		int N = sparseCols*sparseRows;
 		if (denseGrid.length < N)
 			denseGrid = new GridElement[N];
@@ -224,7 +246,7 @@ public class ChessboardCornerClusterToGrid {
 	/**
 	 * Finds the largest complete rectangle with no holes in it.
 	 */
-	boolean findLargestRectangle( GridInfo info ) {
+	boolean findLargestRectangle( Rectangle2D_I32 rectangle ) {
 		int row0 = 0;
 		int row1 = sparseRows;
 		int col0 = 0;
@@ -282,24 +304,41 @@ public class ChessboardCornerClusterToGrid {
 			}
 		}
 
-		if (success) {
-			info.nodes.clear();
-			info.rows = row1 - row0;
-			info.cols = col1 - col0;
+		if (!success)
+			return false;
 
-			for (int row = row0; row < row1; row++) {
-				for (int col = col0; col < col1; col++) {
-					GridElement g = grid(row, col);
-					if (g == null) {
-						if (verbose != null)
-							verbose.println("Failed due to hole inside of grid");
-						return false;
-					}
-					info.nodes.add(g.node);
+		// Save the results
+		rectangle.x0 = col0;
+		rectangle.x1 = col1;
+		rectangle.y0 = row0;
+		rectangle.y1 = row1;
+
+		return success;
+	}
+
+	/**
+	 * Copies a portion of the dense grid into GridInfo
+	 *
+	 * @return true if no errors were found
+	 */
+	boolean copyDenseRectangle( int row0, int row1, int col0, int col1, GridInfo info ) {
+		info.nodes.clear();
+		info.rows = row1 - row0;
+		info.cols = col1 - col0;
+
+		for (int row = row0; row < row1; row++) {
+			for (int col = col0; col < col1; col++) {
+				GridElement g = grid(row, col);
+				if (g == null) {
+					if (verbose != null)
+						verbose.println("Failed due to hole inside of grid");
+					return false;
 				}
+				info.nodes.add(g.node);
 			}
 		}
-		return success;
+
+		return true;
 	}
 
 	int countZeros( int row0, int row1, int col0, int col1, int stepRow, int stepCol ) {
@@ -371,6 +410,48 @@ public class ChessboardCornerClusterToGrid {
 	 * the line splitting the direction to the two connecting nodes are the same.
 	 */
 	boolean isCornerValidOrigin( Node candidate ) {
+		candidate.putEdgesIntoList(edgeList);
+		if (edgeList.size() != 2) {
+			throw new RuntimeException("BUG! Should be a corner and have two edges");
+		}
+
+		Node a = edgeList.get(0);
+		Node b = edgeList.get(1);
+
+		// Find the average angle from the two vectors defined by the two connected nodes
+		double dirA = Math.atan2(a.y - candidate.y, a.x - candidate.x);
+		double dirB = Math.atan2(b.y - candidate.y, b.x - candidate.x);
+
+		double dirAB = UtilAngle.boundHalf(dirA + UtilAngle.distanceCCW(dirA, dirB)/2.0);
+
+		// Find the acute angle between the corner's orientation and the vector
+		double acute = UtilAngle.distHalf(dirAB, candidate.orientation);
+
+		return acute < Math.PI/4.0;
+	}
+
+	/**
+	 * Returns true of the candidate is the top-left corner in a white square.
+	 */
+	public boolean isWhiteSquare( Node candidate, Node nextColumn ) {
+
+		// Find the index of nextColumn in the candidate
+		int nextIndex = -1;
+		for (int i = 0; i < candidate.edges.length; i++) {
+			if (candidate.edges[i] == nextColumn) {
+				nextIndex = i;
+				break;
+			}
+		}
+		if (nextIndex == -1)
+			return false; // Is this a bug?
+
+		int nextNextIndex = (nextIndex+1)%4;
+		// See if the other corner is there
+		if (candidate.edges[nextNextIndex] == null)
+			return false;
+
+
 		candidate.putEdgesIntoList(edgeList);
 		if (edgeList.size() != 2) {
 			throw new RuntimeException("BUG! Should be a corner and have two edges");

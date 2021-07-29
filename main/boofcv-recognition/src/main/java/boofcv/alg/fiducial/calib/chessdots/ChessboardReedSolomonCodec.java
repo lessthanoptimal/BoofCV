@@ -21,34 +21,43 @@ package boofcv.alg.fiducial.calib.chessdots;
 import boofcv.alg.fiducial.qrcode.PackedBits8;
 import boofcv.alg.fiducial.qrcode.ReidSolomonCodes;
 import boofcv.misc.BoofMiscOps;
-import georegression.struct.point.Point2D_I32;
 import lombok.Getter;
 import lombok.Setter;
 import org.ddogleg.struct.DogArray_I8;
 
 /**
- * Encodes and decodes grid coordinates into a compact packet for use in calibration targets. A multiplier can be
- * added which will scale the coordinate values. Useful for when only some square are filled in. The same error
- * correction scheme used in QR codes is used here, but tweaked for the smaller packet size. A checksum was added
- * to detect corrupted packets. Between the ECC mechanism and checksum most errors are caught, but for small
- * packet sizes random data can be mistaken for a real target.
+ * Encodes and decodes the marker ID and cell ID from an encoded cell in a calibration target. The maximum number
+ * of possible markers and cells in a marker must be known in advance to decode and encode [1]. Error correction
+ * is provided bye Reed Solomon encoding and the amount of error correction is configurable. If there is extra
+ * words available in the data grid then the amount of error correction is increased.
  *
- * Grid size is dynamically determined based on the maximum coordinate that's needed and the desired level of
- * error correction. If there are extra bits those are allocated for ECC or filled in with a known pattern.
- *
+ * <p>
  * Words (8-bit data chunks) are laid out in a pattern that's designed to keep each individual word's bits as close
  * to eac other as possible. The error correction words on a per-word basis and not a per-bit basis. Dirt or damage
  * tends to be located within a small spatial region and you want to minimize the number of words it corrupts.
+ * <p>
  *
  * TODO describe Reed-Solomon codes an how they are used.
  *
+ * <p>
+ * The encoded message will have the format described below. Reserved bits are included so that in the future the
+ * format could be extended without breaking backwards compatibility and because the extra data helps with error
+ * correction when the message size is small.
+ *
+ * Number of bits used to encode the two ID numbers is dynamically determined based on their maximum value. The minimum
+ * number of bits is computed using this formula: bit count = ceil(log(max_number)/log(2))
+ * </p>
+ *
  * Packet Format:
  * <ul>
- *     <li>2-bits for multiplier (0=1,1=2,2=4,3=8)</li>
- *     <li>2-bits reserved for future use (must be 0)</li>
- *     <li>Encoded coordinates (row*max_length + col)</li>
- *     <li>4-bit checksum. xor based</li>
+ *     <li>2-bits: Reserved for future use (must be 0)</li>
+ *     <li>N-bits: Marker ID</li>
+ *     <li>M-bits: Cell ID</li>
+ *     <li>4-bits: XOR Checksum</li>
  * </ul>
+ *
+ * [1] An earlier design was considered that did encode this information in the marker. It typically increased the bit
+ * grid size by 1 but didn't remove the need to have prior information about the target to decode the target.
  *
  * @author Peter Abeles
  */
@@ -56,8 +65,11 @@ public class ChessboardReedSolomonCodec {
 	// TODO locate the bits spatially close to each for a single word so that local damage doesn't screw up
 	//      multiple words
 
-	/** Number of bits per word */
+	/**
+	 * Number of bits per word
+	 */
 	public final int WORD_BITS = 8;
+
 	/**
 	 * Maximum number of words that can have an error in it.
 	 * Change this value only if you really know what you are doing.
@@ -66,23 +78,19 @@ public class ChessboardReedSolomonCodec {
 
 	// Used to mask out bits not in the word
 	int wordMask;
-	/** The maximum allowed coordinate */
-	@Getter int maxCoordinate;
-
-	// Number of bits needed to encode a number
-	int bitsPerNumber;
 
 	// Number of bits in the data packet
 	int messageBitCount;
 
-	/** Length of the square grid the bits are encoded in */
+	/** Number of bits required to encode a marker ID */
+	@Getter int markerBitCount;
+	/** Number of bits required to encode a cell ID */
+	@Getter int cellBitCount;
+
+	/**
+	 * Length of the square grid the bits are encoded in
+	 */
 	@Getter int gridBitLength;
-
-	/** Multiplier that the coordinates are adjusted by */
-	@Getter Multiplier multiplier;
-
-	/** The resulting message that has been encoded */
-	@Getter private final DogArray_I8 encodedPacket = new DogArray_I8();
 
 	// Stores the encoded message
 	protected final DogArray_I8 message = new DogArray_I8();
@@ -99,23 +107,15 @@ public class ChessboardReedSolomonCodec {
 	 * Computes how large of a grid will be needed to encode the coordinates + overhead. Pre-allocates any memory
 	 * that will be needed
 	 *
-	 * @param multiplier Coordinate multiplier
-	 * @param maxCoordinate The maximum coordinate that will be needed
+	 * @param numUniqueMarkers Maximum number of unique markers required
+	 * @param numUniqueCells Maximum number of unique cell IDs in a marker required
 	 */
-	public void configure( Multiplier multiplier, int maxCoordinate ) {
-		this.multiplier = multiplier;
+	public void configure( int numUniqueMarkers, int numUniqueCells ) {
+		markerBitCount = numUniqueMarkers == 1 ? 0 : (int)Math.ceil(Math.log(numUniqueMarkers)/Math.log(2));
+		cellBitCount = (int)Math.ceil(Math.log(numUniqueCells)/Math.log(2));
 
-		// Adjust the coordinate for scaling
-		maxCoordinate = (int)Math.ceil(maxCoordinate/(double)multiplier.amount);
-		this.maxCoordinate = maxCoordinate;
-
-		// Compute how many bits it will take to encode the two coordinates
-		bitsPerNumber = (int)Math.ceil(Math.log(maxCoordinate)/Math.log(2));
-		messageBitCount = 2*bitsPerNumber;
-
-		// Add overhead
-		messageBitCount += 4; // (scale and reserved)
-		messageBitCount += 4; // checksum at end
+		// header + IDs + checksum
+		messageBitCount = 2 + markerBitCount + cellBitCount + 4;
 
 		// Compute number of words needed to save this message
 		int dataWords = (int)Math.ceil(messageBitCount/(double)WORD_BITS);
@@ -151,35 +151,36 @@ public class ChessboardReedSolomonCodec {
 	/**
 	 * Encodes the coordinate and copies the results into 'encodedPacket'
 	 *
-	 * @param row (input) Row number
-	 * @param col (input) Column number
+	 * @param markerID (Input) The marker's unique ID
+	 * @param cellID (input) The cell's unique ID inside the marker
 	 * @param encodedPacket (Output) The encoded packet
 	 */
-	public void encode( int row, int col, PackedBits8 encodedPacket ) {
-		int scale = multiplier.amount;
-		if (row%scale != 0 || col%scale != 0)
-			throw new IllegalArgumentException("Coordinate is not evenly divisible by scale factor. row=" + row + " col=" + col);
-		row /= scale;
-		col /= scale;
-		if (row >= maxCoordinate)
-			throw new IllegalArgumentException("Row is larger than max. row=" + row + " max=" + maxCoordinate);
-		if (col >= maxCoordinate)
-			throw new IllegalArgumentException("Column is larger than max. col=" + col + " max=" + maxCoordinate);
-
+	public void encode( int markerID, int cellID, PackedBits8 encodedPacket ) {
 		// Build the packet
 		bits.resize(0);
-		bits.append(multiplier.ordinal(), 4, false);
-		bits.append(row, bitsPerNumber, false);
-		bits.append(col, bitsPerNumber, false);
+
+		// Create the header
+		bits.append(0, 2, false);
+
+		// Specify the ID numbers
+		bits.append(markerID, markerBitCount, false);
+		bits.append(cellID, cellBitCount, false);
 
 		// Compute a checksum. ECC doesn't catch everything in targets this small
 		int checkSum = computeCheckSum();
 		bits.append(checkSum, 4, false);
 
 		// Sanity check
-		BoofMiscOps.checkEq(bits.arrayLength(), message.size);
+		BoofMiscOps.checkEq(bits.size, messageBitCount);
 
-		// Work from workspace to the message
+		// Fill extra bits with a known pattern
+		int fillBitIdx0 = (1 + (bits.size/WORD_BITS))*WORD_BITS;
+		bits.append(0, fillBitIdx0 - bits.size, false);
+		for (int bit = (1 + (bits.size/WORD_BITS))*WORD_BITS; bit < message.size; bit += WORD_BITS) {
+			bits.append(wordMask ^ bit, bit, false);
+		}
+
+		// Copy packet from the bits workspace into message
 		message.setTo(bits.data, 0, message.size);
 
 		// Compute the error correction code
@@ -224,11 +225,12 @@ public class ChessboardReedSolomonCodec {
 	 * most of them.
 	 *
 	 * @param readBits (Input) Read in bits from an image
-	 * @param coordinate (Output) Found coordinates
+	 * @param cell (Output) Found marker and cell ID
 	 * @return True is returned if it believes all errors have been fixed and the data is not corrupted.
 	 */
-	public boolean decode( PackedBits8 readBits, Point2D_I32 coordinate ) {
+	public boolean decode( PackedBits8 readBits, CellValue cell ) {
 		BoofMiscOps.checkEq(readBits.size, gridBitLength*gridBitLength, "Unexpected array size");
+
 		// Split up the incoming message into the message and ecc portions
 		message.setTo(readBits.data, 0, message.size);
 		ecc.setTo(readBits.data, message.size, ecc.size);
@@ -241,6 +243,13 @@ public class ChessboardReedSolomonCodec {
 		// Copy into bits array to make parsing easier
 		System.arraycopy(message.data, 0, bits.data, 0, message.size);
 		bits.size = messageBitCount;
+
+		// Make sure the two reserved bits are 0
+		int padding = bits.read(0, 2, true);
+		if (padding != 0) {
+			return false;
+		}
+
 		int foundCheckSum = bits.read(bits.size - 4, 4, true);
 		bits.resize(bits.size - 4);
 		int expectedCheckSum = computeCheckSum();
@@ -249,34 +258,9 @@ public class ChessboardReedSolomonCodec {
 			return false;
 
 		// Which scale factor was applied
-		int m = bits.read(0, 4, true);
-		if (m >= 4)
-			return false;
-		int scale = Multiplier.values()[m].amount;
+		cell.markerID = bits.read(2, markerBitCount, true);
+		cell.cellID = bits.read(2 + markerBitCount, cellBitCount, true);
 
-		// Extract the coordinate
-		coordinate.y = scale*(bits.read(4, bitsPerNumber, true)); // row
-		coordinate.x = scale*(bits.read(4 + bitsPerNumber, bitsPerNumber, true)); // column
-
-		// See if the coordinate is invalid
-		return coordinate.x >= 0 && coordinate.y >= 0 && coordinate.y < maxCoordinate;
-	}
-
-	/**
-	 * Specifies how often coordinates are printed on the grid and how to convert the encoded coordinate back to
-	 * the original scale
-	 */
-	public enum Multiplier {
-		LEVEL_0(1),
-		LEVEL_1(2),
-		LEVEL_2(4),
-		LEVEL_3(8);
-
-		/** How much the coordinate is multiplied by */
-		@Getter final int amount;
-
-		Multiplier( int amount ) {
-			this.amount = amount;
-		}
+		return true;
 	}
 }

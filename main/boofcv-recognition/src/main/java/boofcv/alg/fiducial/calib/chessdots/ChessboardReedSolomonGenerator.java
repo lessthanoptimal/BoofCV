@@ -39,7 +39,6 @@ public class ChessboardReedSolomonGenerator {
 	// Data can be embedded in the white or black squares inside the chessboard pattern. When put inside of the black
 	// squares it reduces the effective range of the chessboard detection algorithm by a significant amount.
 
-	ChessboardReedSolomonCodec.Multiplier multiplier = ChessboardReedSolomonCodec.Multiplier.LEVEL_0;
 
 	// How wide a square is in the chessboard
 	double squareWidth;
@@ -47,6 +46,8 @@ public class ChessboardReedSolomonGenerator {
 	int cols;
 	/** Number of rows in the chessboard pattern */
 	int rows;
+
+	int skip = 0; // TODO implement
 
 	/** Fraction of a cell's length the data bit is */
 	public @Getter @Setter double dataBitWidthFraction = 0.7;
@@ -64,7 +65,7 @@ public class ChessboardReedSolomonGenerator {
 		this.rows = rows;
 		this.cols = cols;
 
-		codec.configure(multiplier, Math.max(rows, cols));
+		codec.configure(rows, cols);
 		render.init();
 
 		// First build the chessboard pattern
@@ -99,7 +100,7 @@ public class ChessboardReedSolomonGenerator {
 		// White circles will be rendered inside the inner squares
 		render.setGray(0.0);
 
-		int coordinateMultiplier = multiplier.getAmount();
+		int coordinateMultiplier = 1; // todo update
 
 		double stub = squareWidth/2;
 		for (int col = 1; col < cols; col += 1) {
