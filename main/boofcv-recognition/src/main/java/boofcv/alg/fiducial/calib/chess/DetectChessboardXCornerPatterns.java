@@ -79,7 +79,13 @@ public class DetectChessboardXCornerPatterns<T extends ImageGray<T>> {
 		for (int clusterIdx = 0; clusterIdx < clusters.size; clusterIdx++) {
 			ChessboardCornerGraph c = clusters.get(clusterIdx);
 
-			if (!clusterToGrid.convert(c, found.grow())) {
+			// Find the chessboard structure
+			if (!clusterToGrid.clusterToSparse(c)) {
+				found.removeTail();
+			}
+
+			// Extract a valid chessboard pattern
+			if (!clusterToGrid.sparseToGrid(found.grow())) {
 				found.removeTail();
 			}
 		}

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -85,12 +85,15 @@ class TestChessboardCornerClusterToGrid extends BoofStandardJUnit
 
 		// See if it gets removed
 		GridInfo info = new GridInfo();
-		assertTrue(alg.convert(graph,info));
+		assertTrue(alg.clusterToSparse(graph));
+		assertTrue(alg.sparseToGrid(info));
 		assertTrue(info.hasCornerSquare);
 
 		assertEquals(5, info.cols);
 		assertEquals(4, info.rows);
 		assertEquals(5*4, info.nodes.size());
+
+		fail("Test these functions individually");
 	}
 
 	void convert(ChessboardCornerClusterToGrid alg, int rows , int cols , boolean randomized ) {
@@ -107,8 +110,11 @@ class TestChessboardCornerClusterToGrid extends BoofStandardJUnit
 		}
 
 		GridInfo info = new GridInfo();
-		assertTrue(alg.convert(graph,info));
+		assertTrue(alg.clusterToSparse(graph));
+		assertTrue(alg.sparseToGrid(info));
 		assertTrue(info.hasCornerSquare);
+
+		fail("Test these functions individually");
 
 		// test shape
 		if( rows == info.rows ) {

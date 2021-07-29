@@ -21,10 +21,15 @@ package boofcv.alg.fiducial.calib.chessdots;
 import boofcv.abst.fiducial.calib.ConfigChessboardX;
 import boofcv.alg.feature.detect.chess.DetectChessboardCornersXPyramid;
 import boofcv.alg.fiducial.calib.chess.ChessboardCornerClusterFinder;
+import boofcv.alg.fiducial.calib.chess.ChessboardCornerClusterToGrid;
 import boofcv.alg.fiducial.calib.chess.ChessboardCornerGraph;
+import boofcv.struct.GridShape;
 import boofcv.struct.image.ImageGray;
 import boofcv.struct.image.ImageType;
 import org.ddogleg.struct.DogArray;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * @author Peter Abeles
@@ -36,8 +41,13 @@ public class ChessboardReedSolomonDetector<T extends ImageGray<T>> {
 	// TODO concensus approach to deciding coordinates
 	// TODo specify max grid coordinates
 
+	protected ChessboardReedSolomonCodec codec;
+
 	protected DetectChessboardCornersXPyramid<T> detector;
 	protected ChessboardCornerClusterFinder<T> clusterFinder;
+	protected ChessboardCornerClusterToGrid clusterToGrid = new ChessboardCornerClusterToGrid();
+
+	List<GridShape> markers = new ArrayList<>();
 
 	public ChessboardReedSolomonDetector( ConfigChessboardX config, Class<T> imageType ) {
 
@@ -66,11 +76,19 @@ public class ChessboardReedSolomonDetector<T extends ImageGray<T>> {
 		DogArray<ChessboardCornerGraph> clusters = clusterFinder.getOutputClusters();
 
 		for (int clusterIdx = 0; clusterIdx < clusters.size; clusterIdx++) {
-			ChessboardCornerGraph c = clusters.get(clusterIdx);
+			// Find the chessboard pattern inside the cluster
+			if (!clusterToGrid.clusterToSparse(clusters.get(clusterIdx))) {
+				continue;
+			}
 
-//			if (!clusterToGrid.convert(c, found.grow())) {
-//				found.removeTail();
-//			}
+			// TODO iterate through every white cell
+			// Check squares for data patterns and save their coordinate for later retrieval
+
+			// If no data patterns are found, extract the largest grid and return that
+
+			// Select the coordinate system that best matches the decoded cells
+
+			// Prune corners using prior knowledge on this coordinate
 		}
 	}
 }
