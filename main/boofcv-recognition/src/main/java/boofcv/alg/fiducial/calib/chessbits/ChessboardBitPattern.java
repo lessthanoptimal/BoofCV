@@ -32,10 +32,10 @@ public class ChessboardBitPattern {
 	public int marker;
 
 	/** Number of square columns in the pattern. */
-	public int cols;
+	public int squareCols;
 
 	/** Number of square rows in the pattern. */
-	public int rows;
+	public int squareRows;
 
 	/** Found calibration corners it was able to observe */
 	public final DogArray<PointIndex2D_F64> corners = new DogArray<>(PointIndex2D_F64::new, (c)->c.setTo(-1,-1,-1));
@@ -48,8 +48,8 @@ public class ChessboardBitPattern {
 
 	public void reset() {
 		marker = -1;
-		cols = -1;
-		rows = -1;
+		squareCols = -1;
+		squareRows = -1;
 		corners.reset();
 		encoded.reset();
 		decodedSquares = -1;

@@ -19,6 +19,7 @@
 package boofcv.alg.fiducial.calib.chessbits;
 
 import boofcv.alg.geo.h.HomographyDirectLinearTransform;
+import boofcv.struct.GridCoordinate;
 import boofcv.struct.GridShape;
 import boofcv.struct.geo.AssociatedPair;
 import georegression.geometry.GeometryMath_F64;
@@ -85,7 +86,7 @@ public class ChessBitsUtils {
 		int N = findLargestCellCount();
 		codec.configure(markers.size(), N);
 
-		bitSampleCount = pixelsPerBit*2+1;
+		bitSampleCount = pixelsPerBit*2 + 1;
 	}
 
 	/**
@@ -112,13 +113,14 @@ public class ChessBitsUtils {
 	public void bitRect( int row, int col, Rectangle2D_F64 rect ) {
 		int bitGridLength = codec.getGridBitLength();
 
-		double squareWidth = (1.0 - dataBorderFraction*2)/bitGridLength;
-		double bitPadding = squareWidth*(1.0 - dataBitWidthFraction)/2.0;
+		// How wide the square cell is that stores a bit + bit padding
+		double cellWidth = (1.0 - dataBorderFraction*2)/bitGridLength;
+		double offset = dataBorderFraction + cellWidth*(1.0 - dataBitWidthFraction)/2.0;
 
-		rect.p0.x = dataBorderFraction + col*squareWidth + bitPadding;
-		rect.p0.y = dataBorderFraction + row*squareWidth + bitPadding;
-		rect.p1.x = rect.p0.x + squareWidth*dataBitWidthFraction;
-		rect.p1.y = rect.p0.y + squareWidth*dataBitWidthFraction;
+		rect.p0.x = col*cellWidth + offset;
+		rect.p0.y = row*cellWidth + offset;
+		rect.p1.x = rect.p0.x + cellWidth*dataBitWidthFraction;
+		rect.p1.y = rect.p0.y + cellWidth*dataBitWidthFraction;
 	}
 
 	/**
@@ -177,5 +179,26 @@ public class ChessBitsUtils {
 				GeometryMath_F64.mult(squareToPixel, bitSquare, pixels.grow());
 			}
 		}
+	}
+
+	/**
+	 * Given the markerID and cellID, compute the coordinate of the top left corner.
+	 *
+	 * @param markerID (Input) Marker
+	 * @param cellID (Input) Encoded cell ID
+	 * @param coordinate (Output) Coordinate of corner
+	 */
+	public void cellToCoordinate( int markerID, int cellID, GridCoordinate coordinate ) {
+		GridShape grid = markers.get(markerID);
+
+		// number of encoded squares in a two row set
+		int setCount = grid.cols - 2;
+		int setHalf = setCount/2;
+
+		int squareRow = 1 + 2*(cellID/setCount) + (cellID%setCount < setHalf ? 0 : 1);
+		int squareCol = squareRow%2 == 0 ? (cellID%setCount - setHalf)*2 + 1 : (cellID%setCount+1)*2;
+
+		coordinate.row = squareRow - 1;
+		coordinate.col = squareCol - 1;
 	}
 }

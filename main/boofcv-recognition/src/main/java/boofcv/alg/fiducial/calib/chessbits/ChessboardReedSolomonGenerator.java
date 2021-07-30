@@ -64,7 +64,7 @@ public class ChessboardReedSolomonGenerator {
 		renderSquares(shape);
 
 		// Render the unique ID for all inner squares
-		renderCodes(shape);
+		renderCodes(marker, shape);
 	}
 
 	private void renderSquares( GridShape shape ) {
@@ -91,33 +91,27 @@ public class ChessboardReedSolomonGenerator {
 	/**
 	 * Renders unique IDs on all the inner squares
 	 */
-	private void renderCodes( GridShape shape ) {
+	private void renderCodes( int marker, GridShape shape ) {
 		final int rows = shape.rows;
 		final int cols = shape.cols;
 
 		// White circles will be rendered inside the inner squares
 		render.setGray(0.0);
 
-		int coordinateMultiplier = 1; // todo update
-
 		double stub = squareWidth/2;
-		for (int col = 1; col < cols; col += 1) {
-			boolean borderCol = col == cols - 1;
-			double x = stub + squareWidth*(col - 1);
-			if ((col - 1)%coordinateMultiplier != 0)
-				continue;
-			for (int row = (col + 1)%2; row < rows; row += 2) {
-				if ((row - 1)%coordinateMultiplier != 0)
-					continue;
-
-				boolean borderRow = row == 0 || row == rows - 1;
-				double y = row == 0 ? 0.0 : stub + squareWidth*(row - 1);
+		int cellID = 0;
+		for (int row = 1; row < rows; row++) {
+			boolean borderRow = row == rows - 1;
+			double y = stub + squareWidth*(row - 1);
+			for (int col = 1+row%2; col < cols; col += 2) {
+				boolean borderCol = col == cols - 1;
+				double x = stub + squareWidth*(col - 1);
 
 				if (borderCol || borderRow)
 					continue;
 
 				// Encode the coordinate into bits
-				utils.codec.encode(row - 1, col - 1, packetBits);
+				utils.codec.encode(marker, cellID++, packetBits);
 				renderEncoding(x, y);
 			}
 		}
@@ -129,8 +123,8 @@ public class ChessboardReedSolomonGenerator {
 	private void renderEncoding( double px, double py ) {
 		int dotGridSize = utils.codec.getGridBitLength();
 
-		for (int col = 0; col < dotGridSize; col++) {
-			for (int row = 0; row < dotGridSize; row++) {
+		for (int row = 0; row < dotGridSize; row++) {
+			for (int col = 0; col < dotGridSize; col++) {
 				int bit = row*dotGridSize + col;
 				if (packetBits.get(bit) == 0)
 					continue;
@@ -139,7 +133,7 @@ public class ChessboardReedSolomonGenerator {
 				utils.bitRect(row, col, rect);
 
 				// Render it after scaling it into pixels
-				render.square(px + rect.p0.x*squareWidth, py + rect.p0.y*squareWidth, squareWidth*rect.getWidth());
+				render.square(px + rect.p0.x*squareWidth, py + rect.p0.y*squareWidth, rect.getWidth()*squareWidth);
 			}
 		}
 	}
