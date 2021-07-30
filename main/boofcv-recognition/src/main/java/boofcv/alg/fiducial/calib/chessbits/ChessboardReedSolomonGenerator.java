@@ -21,7 +21,11 @@ package boofcv.alg.fiducial.calib.chessbits;
 import boofcv.alg.drawing.FiducialRenderEngine;
 import boofcv.alg.fiducial.qrcode.PackedBits8;
 import boofcv.struct.GridShape;
+import georegression.struct.point.Point2D_F64;
 import georegression.struct.shapes.Rectangle2D_F64;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Renders a chessboard pattern with numbers encoded inside the dots.
@@ -51,11 +55,15 @@ public class ChessboardReedSolomonGenerator {
 	// Workspace
 	Rectangle2D_F64 rect = new Rectangle2D_F64();
 
+	// list of corners in ground truth
+	public final List<Point2D_F64> corner = new ArrayList<>();
+
 	public ChessboardReedSolomonGenerator( ChessBitsUtils utils ) {
 		this.utils = utils;
 	}
 
 	public void render( int marker ) {
+		corner.clear();
 		GridShape shape = utils.markers.get(marker);
 
 		render.init();
@@ -65,6 +73,9 @@ public class ChessboardReedSolomonGenerator {
 
 		// Render the unique ID for all inner squares
 		renderCodes(marker, shape);
+
+		// save ground truth corner location
+		saveCornerLocations(shape);
 	}
 
 	private void renderSquares( GridShape shape ) {
@@ -116,6 +127,25 @@ public class ChessboardReedSolomonGenerator {
 			}
 		}
 	}
+
+	private void saveCornerLocations( GridShape shape ) {
+		final int rows = shape.rows;
+		final int cols = shape.cols;
+
+		// White circles will be rendered inside the inner squares
+		render.setGray(0.0);
+
+		double stub = squareWidth/2;
+		for (int row = 1; row < rows; row++) {
+			double y = stub + squareWidth*(row - 1);
+			for (int col = 1; col < cols; col++) {
+				double x = stub + squareWidth*(col - 1);
+
+				corner.add( new Point2D_F64(x,y));
+			}
+		}
+	}
+
 
 	/**
 	 * Renders the specified value into a black square with white dots
