@@ -20,31 +20,42 @@ package boofcv.alg.fiducial.calib.chessbits;
 
 import boofcv.abst.fiducial.calib.ConfigChessboardX;
 import boofcv.alg.drawing.FiducialImageEngine;
+import boofcv.io.image.UtilImageIO;
+import boofcv.struct.GridCoordinate;
 import boofcv.struct.image.GrayU8;
 import boofcv.testing.BoofStandardJUnit;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assertions.fail;
 
 /**
  * @author Peter Abeles
  */
 public class TestChessboardReedSolomonDetector extends BoofStandardJUnit {
+
+	// Reduce boilerplate by pre-declaring the algorithm being tested
+	ConfigChessboardX config = new ConfigChessboardX();
+	ChessBitsUtils utils = new ChessBitsUtils();
+	ChessboardReedSolomonDetector<GrayU8> alg;
+
+	@BeforeEach void setup() {
+		utils.addMarker(5, 6);
+		utils.fixate();
+		alg = new ChessboardReedSolomonDetector<>(utils, config, GrayU8.class);
+	}
+
 	/**
 	 * Test the entire pipeline on a very simple synthetic scenario
 	 */
 	@Test void simpleOneTarget() {
-		var config = new ConfigChessboardX();
-		var utils = new ChessBitsUtils();
-		utils.addMarker(5, 6);
-		utils.fixate();
-
 		GrayU8 image = createMarker(utils);
 
+		UtilImageIO.saveImage(image, "gray.png");
 //		ShowImages.showWindow(image, "Rendered");
 //		BoofMiscOps.sleep(30_000);
 
-		var alg = new ChessboardReedSolomonDetector<>(utils, config, GrayU8.class);
 		alg.process(image);
 
 		fail("Implement");
@@ -60,5 +71,38 @@ public class TestChessboardReedSolomonDetector extends BoofStandardJUnit {
 		renderer.render(0);
 
 		return engine.getGray();
+	}
+
+	/**
+	 * Change the coordinate system's orientation and see if the (0,0) is as expected
+	 */
+	@Test void rotateObserved() {
+		var found = new GridCoordinate();
+		int rows = alg.utils.markers.get(0).rows;
+		int cols = alg.utils.markers.get(0).cols;
+		alg.clusterToGrid.sparseToDense();
+
+		int row = 0;
+		int col = 0;
+
+		ChessboardReedSolomonDetector.rotateObserved(rows, cols, row, col, 0, found);
+		assertTrue(found.equals(row, col));
+
+		ChessboardReedSolomonDetector.rotateObserved(rows, cols, row, col, 1, found);
+		assertTrue(found.equals(cols - 1 - col, row));
+
+		ChessboardReedSolomonDetector.rotateObserved(rows, cols, row, col, 2, found);
+		assertTrue(found.equals(rows - 1 - row, cols - 1 - col));
+
+		ChessboardReedSolomonDetector.rotateObserved(rows, cols, row, col, 3, found);
+		assertTrue(found.equals(col, rows - 1 - row));
+	}
+
+	@Test void findMatching() {
+		fail("Implement");
+	}
+
+	@Test void createCorrectedTarget() {
+		fail("Implement");
 	}
 }

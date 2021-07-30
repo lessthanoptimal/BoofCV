@@ -18,6 +18,7 @@
 
 package boofcv.alg.fiducial.calib.chessbits;
 
+import boofcv.struct.GridCoordinate;
 import boofcv.testing.BoofStandardJUnit;
 import georegression.geometry.GeometryMath_F64;
 import georegression.metric.Intersection2D_F64;
@@ -91,5 +92,43 @@ public class TestChessBitsUtils extends BoofStandardJUnit {
 			Point2D_F64 p = pixels.get(index+i);
 			assertTrue(Intersection2D_F64.contains(bitRect,p.x, p.y));
 		}
+	}
+
+	/**
+	 * Hand selected test cases
+	 */
+	@Test void cellToCoordinate_case0() {
+		var alg = new ChessBitsUtils();
+		alg.addMarker(6, 5);
+		alg.fixate();
+
+		var found = new GridCoordinate();
+		alg.cellToCoordinate(0, 0, found);
+		assertTrue(found.equals(0, 1));
+		alg.cellToCoordinate(0, 1, found);
+		assertTrue(found.equals(1, 0));
+		alg.cellToCoordinate(0, 3, found);
+		assertTrue(found.equals(2, 1));
+		alg.cellToCoordinate(0, 5, found);
+		assertTrue(found.equals(3, 2));
+	}
+
+	/**
+	 * Hand selected test cases
+	 */
+	@Test void cellToCoordinate_case1() {
+		var alg = new ChessBitsUtils();
+		alg.addMarker(4, 6);
+		alg.fixate();
+
+		var found = new GridCoordinate();
+		alg.cellToCoordinate(0, 0, found);
+		assertTrue(found.equals(0, 1));
+		alg.cellToCoordinate(0, 1, found);
+		assertTrue(found.equals(0, 3));
+		alg.cellToCoordinate(0, 2, found);
+		assertTrue(found.equals(1, 0));
+		alg.cellToCoordinate(0, 3, found);
+		assertTrue(found.equals(1, 2));
 	}
 }

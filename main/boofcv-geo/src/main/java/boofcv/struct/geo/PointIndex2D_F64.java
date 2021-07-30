@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -27,13 +27,22 @@ import georegression.struct.point.Point2D_F64;
  */
 public class PointIndex2D_F64 extends PointIndex<PointIndex2D_F64, Point2D_F64> {
 
-	public PointIndex2D_F64( double x, double y, int index ) { this();setTo(x, y, index); }
+	public PointIndex2D_F64( double x, double y, int index ) {
+		this();
+		setTo(x, y, index);
+	}
 
-	public PointIndex2D_F64( double x, double y ) { this();setTo(x, y, 0);}
+	public PointIndex2D_F64( double x, double y ) {
+		this();
+		setTo(x, y, 0);
+	}
 
 	public PointIndex2D_F64() {super(new Point2D_F64());}
 
-	public PointIndex2D_F64( Point2D_F64 p, int index ) { this();setTo(p, index); }
+	public PointIndex2D_F64( Point2D_F64 p, int index ) {
+		this();
+		setTo(p, index);
+	}
 
 	public void setTo( double x, double y, int index ) {
 		this.p.setTo(x, y);
@@ -43,5 +52,12 @@ public class PointIndex2D_F64 extends PointIndex<PointIndex2D_F64, Point2D_F64> 
 	@Override
 	public PointIndex2D_F64 copy() {
 		return new PointIndex2D_F64(p, index);
+	}
+
+	@Override public String toString() {
+		return "PointIndex2D_F64{" +
+				"index=" + index +
+				", p={ " + p.x + " , " + p.y + " }" +
+				'}';
 	}
 }

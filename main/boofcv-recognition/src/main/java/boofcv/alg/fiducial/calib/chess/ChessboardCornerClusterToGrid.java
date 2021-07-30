@@ -87,9 +87,9 @@ public class ChessboardCornerClusterToGrid implements VerbosePrint {
 	@Setter CheckShape checkShape;
 
 	/** Storage for elements in the sparse grid. Elements are not ordered. */
-	DogArray<GridElement> sparseGrid = new DogArray<>(GridElement::new);
+	@Getter DogArray<GridElement> sparseGrid = new DogArray<>(GridElement::new);
 	/** Dimension of the sparse/dense grids */
-	@Getter int sparseCols, sparseRows;
+	@Getter protected int sparseCols, sparseRows;
 	/** Dense grid. Empty elements are set to null */
 	GridElement[] denseGrid = new GridElement[0];
 
