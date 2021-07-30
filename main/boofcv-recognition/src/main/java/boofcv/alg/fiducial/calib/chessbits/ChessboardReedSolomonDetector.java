@@ -18,54 +18,75 @@
 
 package boofcv.alg.fiducial.calib.chessbits;
 
+import boofcv.BoofVerbose;
 import boofcv.abst.fiducial.calib.ConfigChessboardX;
 import boofcv.alg.feature.detect.chess.DetectChessboardCornersXPyramid;
 import boofcv.alg.fiducial.calib.chess.ChessboardCornerClusterFinder;
 import boofcv.alg.fiducial.calib.chess.ChessboardCornerClusterToGrid;
 import boofcv.alg.fiducial.calib.chess.ChessboardCornerClusterToGrid.GridElement;
+import boofcv.alg.fiducial.calib.chess.ChessboardCornerClusterToGrid.GridInfo;
 import boofcv.alg.fiducial.calib.chess.ChessboardCornerGraph;
 import boofcv.alg.fiducial.qrcode.PackedBits8;
 import boofcv.alg.interpolate.InterpolatePixelS;
 import boofcv.alg.misc.ImageMiscOps;
 import boofcv.factory.interpolate.FactoryInterpolation;
+import boofcv.misc.BoofMiscOps;
 import boofcv.struct.GridCoordinate;
-import boofcv.struct.geo.PointIndex2D_F64;
 import boofcv.struct.image.GrayU8;
 import boofcv.struct.image.ImageGray;
 import boofcv.struct.image.ImageType;
 import georegression.struct.point.Point2D_F64;
+import lombok.Getter;
 import org.ddogleg.struct.DogArray;
 import org.ddogleg.struct.FastAccess;
 import org.ddogleg.struct.FastArray;
+import org.ddogleg.struct.VerbosePrint;
 import org.jetbrains.annotations.Nullable;
 
+import java.io.PrintStream;
+import java.util.Set;
+
 /**
+ * <p>Detects chessboard patterns with marker and grid coordinate information encoded inside of the inner white squares.
+ * Multiple unique markers can be detected and damaged/partial targets will work. If no binary patterns are found
+ * in a chessboard, then an "anonymous" pattern is returned. Anonymous chessboards are useful when trying to track
+ * distant targets. Which corners were decoded next to a binary pattern is recorded as those corners are extremely
+ * unlikely to be a false positive.
+ * </p>
+ *
+ * Processing steps: 1) x-corner detector. 2) find clusters of corners. 3) clusters into grids. 4) detect encoded binary
+ * data inside of grids. 5) align coordinate systems
+ *
  * @author Peter Abeles
  */
-public class ChessboardReedSolomonDetector<T extends ImageGray<T>> {
-	// TODO Create a custom cluster finder
-	// TODO only keep clusters with 1 encoded pattern inside
-	// TODO concensus approach to deciding coordinates
-	// TODo specify max grid coordinates
+public class ChessboardReedSolomonDetector<T extends ImageGray<T>> implements VerbosePrint {
 	// TODO Handle the case where two or more chessboard patterns get merged together but can be distinguished based on
 	//      encoded cells
 	// TODO Weigh bit sample points based on distance from center?
 	// TODO Add back in the ability to encoded every N squares
+	// TODO use homography to select sample points so that perspective distortion is handled correctly. threshold
 
-	protected ChessBitsUtils utils;
+	/** Common utilies for decoding chessboard bit pattern */
+	@Getter protected ChessBitsUtils utils;
 
-	protected DetectChessboardCornersXPyramid<T> detector;
-	protected ChessboardCornerClusterFinder<T> clusterFinder;
-	protected ChessboardCornerClusterToGrid clusterToGrid = new ChessboardCornerClusterToGrid();
-
-	FastArray<CellReading> gridCells = new FastArray<>(CellReading.class);
-	DogArray<CellReading> cells = new DogArray<>(CellReading::new, CellReading::reset);
+	/** Chessboard corner detector */
+	@Getter protected DetectChessboardCornersXPyramid<T> detector;
+	/** Cluster Finder */
+	@Getter protected ChessboardCornerClusterFinder<T> clusterFinder;
+	/** Cluster to grid */
+	@Getter protected ChessboardCornerClusterToGrid clusterToGrid = new ChessboardCornerClusterToGrid();
 
 	/** Used to sample the input image when "undistorting" the bit pattern */
 	public InterpolatePixelS<T> interpolate;
 
 	/** Found chessboard patterns */
-	public DogArray<ChessboardBitPattern> found = new DogArray<>(ChessboardBitPattern::new, ChessboardBitPattern::reset);
+	@Getter public final
+	DogArray<ChessboardBitPattern> found = new DogArray<>(ChessboardBitPattern::new, ChessboardBitPattern::reset);
+
+	// Binary cells in grid pattern for easy access
+	FastArray<CellReading> gridBinaryCells = new FastArray<>(CellReading.class);
+	// All decoded binary cells
+	DogArray<CellReading> binaryCells = new DogArray<>(CellReading::new, CellReading::reset);
 
 	// Image pixels that are read when decoding the bit pattern
 	DogArray<Point2D_F64> samplePixels = new DogArray<>(Point2D_F64::new);
@@ -73,17 +94,37 @@ public class ChessboardReedSolomonDetector<T extends ImageGray<T>> {
 	PackedBits8 bits = new PackedBits8();
 	// Storage the bits inside an image so that it can be rotated easily
 	GrayU8 bitImage = new GrayU8(1, 1);
+	// Stores intermediate results when rotating
 	GrayU8 workImage = new GrayU8(1, 1);
+	// Used to indicate which corners and an observed binary pattern
+	GrayU8 nextToBinary = new GrayU8(1, 1);
 
 	// Found transform from found to a marker coordinate system
 	DogArray<Transform> transforms = new DogArray<>(Transform::new, Transform::reset);
 
+	// Workspace for anonymous chessboards
+	GridInfo anonymousInfo = new GridInfo();
+
 	// Storage for a decided binary pattern
 	CellValue decoded = new CellValue();
 
+	// Verbose print debugging
+	PrintStream verbose;
+	// If true it will print profiling information to verbose out
+	boolean runtimeProfiling;
+
+	// Processing time for different components in milliseconds
+	@Getter double timeCornerDetectorMS;
+	@Getter double timeClusteringMS;
+	@Getter double timeGridMS;
+	@Getter double timeDecodingMS;
+	@Getter double timeAllMS = 0;
+
+	/**
+	 * Specifies configuration for detector
+	 */
 	public ChessboardReedSolomonDetector( ChessBitsUtils utils,
 										  ConfigChessboardX config, Class<T> imageType ) {
-
 		this.utils = utils;
 
 		detector = new DetectChessboardCornersXPyramid<>(ImageType.single(imageType));
@@ -110,28 +151,47 @@ public class ChessboardReedSolomonDetector<T extends ImageGray<T>> {
 	 * Processes the image and searches for all chessboard patterns.
 	 */
 	public void process( T input ) {
+		// reset / initialize data structures
+		timeCornerDetectorMS = 0;
+		timeClusteringMS = 0;
+		timeGridMS = 0;
+		timeDecodingMS = 0;
+		timeAllMS = 0;
 		found.reset();
 		interpolate.setImage(input);
+
+		// Find the chessboard corners
+		long time0 = System.nanoTime();
 		detector.process(input);
+		long time1 = System.nanoTime();
+		timeCornerDetectorMS = (time1 - time0)*1e-6;
+
+		// Find chessboard clusters
 		clusterFinder.process(input, detector.getCorners().toList(), detector.getNumberOfLevels());
 		DogArray<ChessboardCornerGraph> clusters = clusterFinder.getOutputClusters();
+		long time2 = System.nanoTime();
+		timeClusteringMS = (time2 - time1)*1e-6;
 
+		// Convert the clusters into grids
 		for (int clusterIdx = 0; clusterIdx < clusters.size; clusterIdx++) {
 			// Find the chessboard pattern inside the cluster
+			long timeGrid0 = System.nanoTime();
 			if (!clusterToGrid.clusterToSparse(clusters.get(clusterIdx))) {
 				continue;
 			}
-			clusterToGrid.sparseToDense();
 
-			int rows = clusterToGrid.getSparseRows();
-			int cols = clusterToGrid.getSparseCols();
+			// Convert it into a dense grid to make it easier to process
+			clusterToGrid.sparseToDense();
+			long timeGrid1 = System.nanoTime();
+			timeGridMS += (timeGrid1 - timeGrid0)*1e-6;
 
 			// Go through and find all the white squares that could contain data. Attempt to decode
-			decodeBinaryPatterns(rows, cols);
+			decodeBinaryPatterns();
+			timeDecodingMS += (System.nanoTime() - timeGrid1)*1e-6;
 
 			// If no data patterns are found, extract the largest grid and return that
-			if (cells.isEmpty()) {
-				// TODO create empty result from largest grid
+			if (binaryCells.isEmpty()) {
+				createAnonymousTarget();
 				continue;
 			}
 
@@ -142,18 +202,31 @@ public class ChessboardReedSolomonDetector<T extends ImageGray<T>> {
 
 			// Construct the resulting observed chessboard by applying the transform
 			createCorrectedTarget(t, found.grow());
+		}
 
-			// TODO mark which corners had decded patterns next to them
+		timeAllMS = (System.nanoTime() - time0)*1e-6;
+
+		if (verbose != null && runtimeProfiling) {
+			verbose.printf("time (ms): all=%.1f corners=%.1f cluster=%.1f grid=%.1f decode=%.1f\n",
+					timeAllMS, timeCornerDetectorMS, timeClusteringMS, timeGridMS, timeDecodingMS);
 		}
 	}
 
 	/**
 	 * Examines all white cells in the found chessboard grid and attempts to decide the binary patterns.
 	 */
-	private void decodeBinaryPatterns( int rows, int cols ) {
-		gridCells.clear();
-		gridCells.resize(rows*cols);
-		cells.reset();
+	private void decodeBinaryPatterns() {
+		// Number of rows and columns the cluster algorithm found. These are corners and not squares
+		int rows = clusterToGrid.getSparseRows();
+		int cols = clusterToGrid.getSparseCols();
+
+		// Initialize data structures
+		nextToBinary.reshape(cols, rows);
+		ImageMiscOps.fill(nextToBinary, 0);
+
+		gridBinaryCells.clear();
+		gridBinaryCells.resize(rows*cols);
+		binaryCells.reset();
 
 		// Go through "squares" in the corner grid
 		for (int row = 1; row < rows; row++) {
@@ -171,15 +244,11 @@ public class ChessboardReedSolomonDetector<T extends ImageGray<T>> {
 				if (!clusterToGrid.isWhiteSquare(a.node, c.node))
 					continue;
 
-				// TODO use homography to select sample points so that perspective distortion is handled correctly
 				// Convert image pixels into bit values
 				float threshold = determineThreshold(a.node, b.node, c.node, d.node);
 				sampleBitsGray(a.node, b.node, c.node, d.node, threshold);
 
 //				bitImage.printBinary();
-
-				// true if it could be decoded
-				boolean success = false;
 
 				// Try all 4 possible orientations until something works
 				for (int orientation = 0; orientation < 4; orientation++) {
@@ -190,23 +259,21 @@ public class ChessboardReedSolomonDetector<T extends ImageGray<T>> {
 						continue;
 					}
 
-					success = true;
+					// mark corners as having a binary code next to them
+					nextToBinary.unsafe_set(col - 1, row - 1, 1);
+					nextToBinary.unsafe_set(col - 1, row, 1);
+					nextToBinary.unsafe_set(col, row - 1, 1);
+					nextToBinary.unsafe_set(col, row, 1);
 
 					// Save the decoded results into a sparse grid
-					CellReading cell = gridCells.data[row*cols + col] = cells.grow();
+					CellReading cell = gridBinaryCells.data[row*cols + col] = binaryCells.grow();
 					cell.row = row - 1;
 					cell.col = col - 1;
 					cell.orientation = orientation;
 					cell.markerID = decoded.markerID;
 					cell.cellID = decoded.cellID;
-					System.out.println("   (below) cellID="+cell.cellID);
 					break;
 				}
-
-				System.out.println("white square grid=(" + (row - 1) + "," + (col - 1) + ") tl=" + a.node + " decoded=" + success);
-
-//				if (!success)
-//					System.out.println("Failed to decode white square: row=" + (row-1) + " col=" + (col-1));
 			}
 		}
 	}
@@ -291,10 +358,7 @@ public class ChessboardReedSolomonDetector<T extends ImageGray<T>> {
 				if (value <= threshold) {
 					vote++;
 				}
-//				System.out.println("   sample="+pixel+"  value="+value);
 			}
-
-//			System.out.println("center="+samplePixels.get(i + blockSize-1)+" vote="+vote);
 
 			bitImage.data[bit] = (byte)(vote > majority ? 1 : 0);
 		}
@@ -316,8 +380,8 @@ public class ChessboardReedSolomonDetector<T extends ImageGray<T>> {
 		int numRows = clusterToGrid.getSparseRows();
 		int numCols = clusterToGrid.getSparseCols();
 
-		for (int cellIdx = 0; cellIdx < cells.size; cellIdx++) {
-			CellReading cell = cells.get(cellIdx);
+		for (int cellIdx = 0; cellIdx < binaryCells.size; cellIdx++) {
+			CellReading cell = binaryCells.get(cellIdx);
 
 			// Figure out the encoded coordinate the cell
 			utils.cellToCoordinate(cell.markerID, cell.cellID, decodedCoordinate);
@@ -329,7 +393,6 @@ public class ChessboardReedSolomonDetector<T extends ImageGray<T>> {
 			int offsetRow = decodedCoordinate.row - observedCoordinate.row;
 			int offsetCol = decodedCoordinate.col - observedCoordinate.col;
 
-			System.out.println("cell: id="+cell.cellID+" ori="+cell.orientation+" coor="+decodedCoordinate+" obs=("+cell.row+","+cell.col+") adj="+observedCoordinate);
 			// Save the coordinate system transform
 			Transform t = findMatching(offsetRow, offsetCol, cell.orientation, cell.markerID);
 			if (t == null) {
@@ -345,6 +408,9 @@ public class ChessboardReedSolomonDetector<T extends ImageGray<T>> {
 		}
 	}
 
+	/**
+	 * Selects the transform with the most votes
+	 */
 	Transform selectBestTransform() {
 		Transform best = transforms.get(0);
 		for (int i = 1; i < transforms.size; i++) {
@@ -383,6 +449,7 @@ public class ChessboardReedSolomonDetector<T extends ImageGray<T>> {
 	/**
 	 * Applies the transform to all found corners and creates a target ready to be returned. If a corner is impossible
 	 * it's assumed to be a false positive and not added.
+	 *
 	 * @param transform (Input) correction to corner grd coordinate system
 	 * @param target (Output) Description of target
 	 */
@@ -392,6 +459,7 @@ public class ChessboardReedSolomonDetector<T extends ImageGray<T>> {
 		// Save the shape of the grid in squares
 		target.squareRows = utils.markers.get(target.marker).rows;
 		target.squareCols = utils.markers.get(target.marker).cols;
+		target.decodedSquares = binaryCells.size;
 
 		var correctedCoordinate = new GridCoordinate();
 
@@ -410,16 +478,44 @@ public class ChessboardReedSolomonDetector<T extends ImageGray<T>> {
 				continue;
 			}
 
-			int cornerIndex = correctedCoordinate.row*cornerRows + correctedCoordinate.col;
-			target.corners.grow().setTo(e.node.x, e.node.y, cornerIndex);
+			// The ID is the index from a row-major matrix
+			int cornerID = correctedCoordinate.row*cornerCols + correctedCoordinate.col;
 
-			// TODO denote which corners were corners around a decoded square
-		}
+			// Save the pixel coordinate it was observed at
+			target.corners.grow().setTo(e.node.x, e.node.y, cornerID);
 
-		for (int i = 0; i < target.corners.size; i++) {
-			PointIndex2D_F64 c = target.corners.get(i);
-			System.out.println("corner="+c);
+			// Note if this corner touches a binary pattern
+			target.touchBinary.add(nextToBinary.get(e.col, e.row) != 0);
 		}
+	}
+
+	/**
+	 * No binary pattern was found inside the so we don't know which target it is, but this information still might
+	 * be useful
+	 */
+	void createAnonymousTarget() {
+		if (!clusterToGrid.sparseToGrid(anonymousInfo))
+			return;
+
+		ChessboardBitPattern target = found.grow();
+		target.squareRows = anonymousInfo.rows;
+		target.squareCols = anonymousInfo.cols;
+		target.decodedSquares = 0;
+
+		for (int i = 0; i < anonymousInfo.nodes.size(); i++) {
+			ChessboardCornerGraph.Node n = anonymousInfo.nodes.get(i);
+			target.corners.grow().setTo(n.x, n.y, i);
+		}
+	}
+
+	@Override public void setVerbose( @Nullable PrintStream out, @Nullable Set<String> configuration ) {
+		this.verbose = BoofMiscOps.addPrefix(this, out);
+		BoofMiscOps.verboseChildren(out, configuration, clusterFinder, clusterToGrid);
+
+		if (configuration == null)
+			return;
+
+		runtimeProfiling = configuration.contains(BoofVerbose.RUNTIME);
 	}
 
 	/**

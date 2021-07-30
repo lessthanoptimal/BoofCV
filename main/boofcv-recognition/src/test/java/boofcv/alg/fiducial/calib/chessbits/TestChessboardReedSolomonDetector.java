@@ -20,15 +20,19 @@ package boofcv.alg.fiducial.calib.chessbits;
 
 import boofcv.abst.fiducial.calib.ConfigChessboardX;
 import boofcv.alg.drawing.FiducialImageEngine;
-import boofcv.io.image.UtilImageIO;
 import boofcv.struct.GridCoordinate;
+import boofcv.struct.geo.PointIndex2D_F64;
 import boofcv.struct.image.GrayU8;
 import boofcv.testing.BoofStandardJUnit;
+import georegression.struct.point.Point2D_F64;
+import org.ddogleg.struct.FastAccess;
+import org.ejml.UtilEjml;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.junit.jupiter.api.Assertions.fail;
+import java.util.List;
+
+import static org.junit.jupiter.api.Assertions.*;
 
 /**
  * @author Peter Abeles
@@ -40,6 +44,11 @@ public class TestChessboardReedSolomonDetector extends BoofStandardJUnit {
 	ChessBitsUtils utils = new ChessBitsUtils();
 	ChessboardReedSolomonDetector<GrayU8> alg;
 
+	List<Point2D_F64> truthCorners;
+
+	// Quite zone around rendered marker
+	int borderPixels = 10;
+
 	@BeforeEach void setup() {
 		utils.addMarker(5, 6);
 		utils.fixate();
@@ -47,17 +56,68 @@ public class TestChessboardReedSolomonDetector extends BoofStandardJUnit {
 	}
 
 	/**
-	 * Test the entire pipeline on a very simple synthetic scenario
+	 * Test the entire pipeline on a very simple synthetic scenario with different shaped targets
 	 */
-	@Test void simpleOneTarget() {
+	@Test void oneTargetShapes() {
+		oneTargetShapes(5, 6);
+		oneTargetShapes(5, 5);
+		oneTargetShapes(4, 6);
+	}
+
+	void oneTargetShapes( int squareRows, int squareCols ) {
+		utils = new ChessBitsUtils();
+		utils.addMarker(squareRows, squareCols);
+		utils.fixate();
+		alg = new ChessboardReedSolomonDetector<>(utils, config, GrayU8.class);
+
 		GrayU8 image = createMarker(utils);
 
-		UtilImageIO.saveImage(image, "gray.png");
-//		ShowImages.showWindow(image, "Rendered");
-//		BoofMiscOps.sleep(30_000);
+		int numEncodedSquares = (squareCols - 2)*(squareRows - 2)/2;
 
 		alg.process(image);
 
+		FastAccess<ChessboardBitPattern> found = alg.getFound();
+		assertEquals(1, found.size);
+
+		ChessboardBitPattern marker = found.get(0);
+		assertEquals(0, marker.marker);
+		assertEquals(squareRows, marker.squareRows);
+		assertEquals(squareCols, marker.squareCols);
+		assertEquals(numEncodedSquares, marker.decodedSquares);
+		assertEquals(truthCorners.size(), marker.corners.size);
+
+		// see if the corners are at all the correct locations and have the correct ID
+		for (int i = 0; i < marker.corners.size; i++) {
+			PointIndex2D_F64 c = marker.corners.get(i);
+			Point2D_F64 truth = truthCorners.get(c.index);
+
+			// Check that their locations are the same and compensate for the border added to the marker
+			assertTrue(truth.isIdentical(c.p.x - borderPixels, c.p.y - borderPixels, UtilEjml.TEST_F64));
+		}
+	}
+
+	@Test void simpleOneTarget_Rotate() {
+		fail("Implement");
+	}
+
+	/**
+	 * See if it will return an anonymous chessboard
+	 */
+	@Test void chessboard_NoData() {
+		fail("Implement");
+	}
+
+	/**
+	 * Two patterns are so close their grids will overlap. See if this correctly splits them up
+	 */
+	@Test void touchingTargets() {
+		fail("Implement");
+	}
+
+	/**
+	 * Multiple patterns are visible at once
+	 */
+	@Test void multipleTargets() {
 		fail("Implement");
 	}
 
@@ -69,6 +129,8 @@ public class TestChessboardReedSolomonDetector extends BoofStandardJUnit {
 		renderer.render = engine;
 		renderer.squareWidth = 80;
 		renderer.render(0);
+
+		truthCorners = renderer.corner;
 
 		return engine.getGray();
 	}
@@ -103,6 +165,10 @@ public class TestChessboardReedSolomonDetector extends BoofStandardJUnit {
 	}
 
 	@Test void createCorrectedTarget() {
+		fail("Implement");
+	}
+
+	@Test void createAnonymousTarget() {
 		fail("Implement");
 	}
 }

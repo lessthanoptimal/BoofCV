@@ -41,7 +41,7 @@ public class ChessboardBitPattern {
 	public final DogArray<PointIndex2D_F64> corners = new DogArray<>(PointIndex2D_F64::new, (c)->c.setTo(-1,-1,-1));
 
 	/** Indicates if a corner was decoded next to an encoding. Very unlikely to be a false positive. */
-	public final DogArray_B encoded = new DogArray_B();
+	public final DogArray_B touchBinary = new DogArray_B();
 
 	/** Number of squares it was able to decode in the found chessboard */
 	public int decodedSquares;
@@ -51,7 +51,7 @@ public class ChessboardBitPattern {
 		squareCols = -1;
 		squareRows = -1;
 		corners.reset();
-		encoded.reset();
+		touchBinary.reset();
 		decodedSquares = -1;
 	}
 }
