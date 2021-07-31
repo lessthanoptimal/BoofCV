@@ -55,7 +55,7 @@ public abstract class GenericDetectFindChessboardCorners extends BoofStandardJUn
 
 	boolean showRendered = false;
 
-	public abstract List<PointIndex2D_F64> findCorners( int numRows , int numCols, GrayF32 image );
+	public abstract List<PointIndex2D_F64> findCorners( int numRows, int numCols, GrayF32 image );
 
 	@BeforeEach
 	public void setup() {
@@ -68,8 +68,8 @@ public abstract class GenericDetectFindChessboardCorners extends BoofStandardJUn
 	 * Give it a simple target and see if it finds the expected number of squares
 	 */
 	@Test void basicTest() {
-		for( int numRows = 3; numRows <= 7; numRows++ ) {
-			for( int numCols = 3; numCols <= 7; numCols++ ) {
+		for (int numRows = 3; numRows <= 7; numRows++) {
+			for (int numCols = 3; numCols <= 7; numCols++) {
 //				System.out.println("shape "+numCols+"  "+numRows);
 				basicTest(numRows, numCols);
 				basicTest(numRows, numCols);
@@ -77,17 +77,17 @@ public abstract class GenericDetectFindChessboardCorners extends BoofStandardJUn
 		}
 	}
 
-	public void basicTest(int numRows, int numCols ) {
+	public void basicTest( int numRows, int numCols ) {
 		GrayF32 gray = renderTarget(numRows, numCols);
 
-		ImageMiscOps.addGaussian(gray,rand,0.1,0,255);
+		ImageMiscOps.addGaussian(gray, rand, 0.1, 0, 255);
 
 //		ShowImages.showWindow(gray,"Rendered Image");
 //		try { Thread.sleep(1000); } catch (InterruptedException e) {}
 
-		List<PointIndex2D_F64> found = findCorners(numRows,numCols,gray);
-		if( found == null ) {
-			UtilImageIO.saveImage(gray,"savedchessboard.png");
+		List<PointIndex2D_F64> found = findCorners(numRows, numCols, gray);
+		if (found == null) {
+			UtilImageIO.saveImage(gray, "savedchessboard.png");
 			fail("Failed to detect target");
 		}
 		List<Point2D_F64> expected = calibrationPoints(numRows, numCols);
@@ -95,24 +95,24 @@ public abstract class GenericDetectFindChessboardCorners extends BoofStandardJUn
 		assertEquals(expected.size(), found.size());
 
 		// check the ordering of the points
-		for( int i = 0; i < expected.size(); i++ ) {
+		for (int i = 0; i < expected.size(); i++) {
 			Point2D_F64 e = expected.get(i);
 			Point2D_F64 f = found.get(i).p;
 
-			if( transform != null ) {
-				SePointOps_F64.transform(transform,e,e);
+			if (transform != null) {
+				SePointOps_F64.transform(transform, e, e);
 			}
 
-			assertEquals(e.x,f.x,2);
-			assertEquals(e.y,f.y,2);
+			assertEquals(e.x, f.x, 2);
+			assertEquals(e.y, f.y, 2);
 		}
 	}
 
-	public GrayF32 renderTarget(int numRows, int numCols) {
-		GrayF32 gray = new GrayF32(w,h);
+	public GrayF32 renderTarget( int numRows, int numCols ) {
+		GrayF32 gray = new GrayF32(w, h);
 		float backgroundValue = 150f;
 		float squareValue = 20f;
-		ImageMiscOps.fill(gray,backgroundValue);
+		ImageMiscOps.fill(gray, backgroundValue);
 
 		int numCols2 = numCols/2;
 		int numRows2 = numRows/2;
@@ -121,33 +121,33 @@ public abstract class GenericDetectFindChessboardCorners extends BoofStandardJUn
 		numRows = numRows/2 + numRows%2;
 
 		// create the grid
-		for( int y = 0; y < numRows; y++) {
-			for( int x = 0; x < numCols; x++ ) {
-				int pixelY = 2*y*squareLength+offsetY;
-				int pixelX = 2*x*squareLength+offsetX;
+		for (int y = 0; y < numRows; y++) {
+			for (int x = 0; x < numCols; x++) {
+				int pixelY = 2*y*squareLength + offsetY;
+				int pixelX = 2*x*squareLength + offsetX;
 
 				ImageMiscOps.fillRectangle(gray, squareValue, pixelX, pixelY, squareLength, squareLength);
 			}
 		}
-		for( int y = 0; y < numRows2; y++) {
-			for( int x = 0; x < numCols2; x++ ) {
-				int pixelY = 2*y*squareLength+offsetY+squareLength;
-				int pixelX = 2*x*squareLength+offsetX+squareLength;
+		for (int y = 0; y < numRows2; y++) {
+			for (int x = 0; x < numCols2; x++) {
+				int pixelY = 2*y*squareLength + offsetY + squareLength;
+				int pixelX = 2*x*squareLength + offsetX + squareLength;
 
 				ImageMiscOps.fillRectangle(gray, squareValue, pixelX, pixelY, squareLength, squareLength);
 			}
 		}
 
-		if( transform != null ) {
-			GrayF32 distorted = new GrayF32(gray.width,gray.height);
-			FDistort f = new FDistort(gray,distorted);
-			f.border(backgroundValue).affine(transform.c,-transform.s,transform.s,transform.c,
-					transform.T.x,transform.T.y).apply();
+		if (transform != null) {
+			GrayF32 distorted = new GrayF32(gray.width, gray.height);
+			FDistort f = new FDistort(gray, distorted);
+			f.border(backgroundValue).affine(transform.c, -transform.s, transform.s, transform.c,
+					transform.T.x, transform.T.y).apply();
 			gray = distorted;
 		}
 
-		if( showRendered ) {
-			ShowImages.showWindow(gray,"Rendered");
+		if (showRendered) {
+			ShowImages.showWindow(gray, "Rendered");
 			try {
 				Thread.sleep(4000);
 			} catch (InterruptedException e) {
@@ -158,16 +158,16 @@ public abstract class GenericDetectFindChessboardCorners extends BoofStandardJUn
 		return gray;
 	}
 
-	public List<Point2D_F64> calibrationPoints(int numRows, int numCols) {
+	public List<Point2D_F64> calibrationPoints( int numRows, int numCols ) {
 
 		List<Point2D_F64> ret = new ArrayList<>();
 
-		for( int y = 0; y < numRows-1; y++) {
-			for( int x = 0; x < numCols-1; x++ ) {
-				int pixelY = y*squareLength+offsetY+squareLength;
-				int pixelX = x*squareLength+offsetX+squareLength;
+		for (int y = 0; y < numRows - 1; y++) {
+			for (int x = 0; x < numCols - 1; x++) {
+				int pixelY = y*squareLength + offsetY + squareLength;
+				int pixelX = x*squareLength + offsetX + squareLength;
 
-				ret.add( new Point2D_F64(pixelX,pixelY));
+				ret.add(new Point2D_F64(pixelX, pixelY));
 			}
 		}
 
@@ -182,16 +182,16 @@ public abstract class GenericDetectFindChessboardCorners extends BoofStandardJUn
 	 */
 	@Test void touchesBorder_translate() {
 		for (int i = 0; i < 4; i++) {
-			if( i%2 == 0 )
+			if (i%2 == 0)
 				offsetX = 0;
 			else
 				offsetX = 15;
-			if( i/2 == 0 )
+			if (i/2 == 0)
 				offsetY = 0;
 			else
 				offsetY = 10;
 
-			basicTest(3,4);
+			basicTest(3, 4);
 		}
 	}
 }

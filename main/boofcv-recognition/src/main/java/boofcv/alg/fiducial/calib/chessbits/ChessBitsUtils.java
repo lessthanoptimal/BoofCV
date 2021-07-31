@@ -196,9 +196,25 @@ public class ChessBitsUtils {
 		int setHalf = setCount/2;
 
 		int squareRow = 1 + 2*(cellID/setCount) + (cellID%setCount < setHalf ? 0 : 1);
-		int squareCol = squareRow%2 == 0 ? (cellID%setCount - setHalf)*2 + 1 : (cellID%setCount+1)*2;
+		int squareCol = squareRow%2 == 0 ? (cellID%setCount - setHalf)*2 + 1 : (cellID%setCount + 1)*2;
 
 		coordinate.row = squareRow - 1;
 		coordinate.col = squareCol - 1;
+	}
+
+	/**
+	 * Returns the number of encoded cells in the chessboard
+	 *
+	 * @param markerID (Input) which marker
+	 */
+	public int countEncodedSquaresInMarker( int markerID ) {
+		GridShape grid = markers.get(markerID);
+		int setCount = grid.cols - 2;
+
+		int total = ((grid.rows - 2)/2)*setCount;
+		if (grid.rows%2 == 1)
+			total += (grid.cols - 1)/2;
+
+		return total;
 	}
 }

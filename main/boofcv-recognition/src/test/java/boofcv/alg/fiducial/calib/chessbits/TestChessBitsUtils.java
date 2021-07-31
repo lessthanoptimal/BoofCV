@@ -131,4 +131,18 @@ public class TestChessBitsUtils extends BoofStandardJUnit {
 		alg.cellToCoordinate(0, 3, found);
 		assertTrue(found.equals(1, 2));
 	}
+
+	/**
+	 * Test using hand computed solutions
+	 */
+	@Test void encodedSquaresInMarker() {
+		var alg = new ChessBitsUtils();
+		alg.addMarker(4, 6);
+		alg.addMarker(5, 6);
+		alg.addMarker(4, 5);
+
+		assertEquals(6, alg.countEncodedSquaresInMarker(0));
+		assertEquals(8, alg.countEncodedSquaresInMarker(1));
+		assertEquals(7, alg.countEncodedSquaresInMarker(2));
+	}
 }

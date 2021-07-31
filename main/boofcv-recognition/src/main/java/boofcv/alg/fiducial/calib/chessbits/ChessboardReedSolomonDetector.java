@@ -44,6 +44,7 @@ import org.ddogleg.struct.VerbosePrint;
 import org.jetbrains.annotations.Nullable;
 
 import java.io.PrintStream;
+import java.util.Collections;
 import java.util.Set;
 
 /**
@@ -75,9 +76,14 @@ public class ChessboardReedSolomonDetector<T extends ImageGray<T>> implements Ve
 	@Getter protected ChessboardCornerClusterFinder<T> clusterFinder;
 	/** Cluster to grid */
 	@Getter protected ChessboardCornerClusterToGrid clusterToGrid = new ChessboardCornerClusterToGrid();
-
 	/** Used to sample the input image when "undistorting" the bit pattern */
 	public InterpolatePixelS<T> interpolate;
+
+	/**
+	 * If true then a single grid can contain multiple targets. This can happen if two chessboards are very close
+	 * to each other. However, if an encoded cell is miss read this could cause a false positive.
+	 */
+	public boolean allowMultipleTargetsSingleGrid = true;
 
 	/** Found chessboard patterns */
 	@Getter public final
@@ -195,13 +201,21 @@ public class ChessboardReedSolomonDetector<T extends ImageGray<T>> implements Ve
 				continue;
 			}
 
-			// TODO split up chessboard if multiple likely hypotheses exist
 			// Select the coordinate system that best matches the decoded cells
 			tallyMarkerVotes();
-			Transform t = selectBestTransform();
 
-			// Construct the resulting observed chessboard by applying the transform
-			createCorrectedTarget(t, found.grow());
+			// Sort transform based on the number of votes. The ones with most votes should be first.
+			Collections.sort(transforms.toList(), (a,b)->Integer.compare(b.votes, a.votes));
+
+			// Two targets could be so close to each other that their chessboards become joined together
+			// Create targets from all hypothesises, unless there's a contradiction
+			for (int transformIdx = 0; transformIdx < transforms.size; transformIdx++) {
+				Transform t = transforms.get(transformIdx);
+				if (!createCorrectedTarget(t, found.grow())) {
+					// conflict was found, abort
+					found.removeTail();
+				}
+			}
 		}
 
 		timeAllMS = (System.nanoTime() - time0)*1e-6;
@@ -253,7 +267,8 @@ public class ChessboardReedSolomonDetector<T extends ImageGray<T>> implements Ve
 				// Try all 4 possible orientations until something works
 				for (int orientation = 0; orientation < 4; orientation++) {
 					convertBitImageToBitArray();
-					if (!utils.codec.decode(bits, decoded)) {
+					if (!decodeAndSanityCheck()) {
+						// rotate so it can try and see if another orientation works
 						ImageMiscOps.rotateCCW(bitImage, workImage);
 						bitImage.setTo(workImage);
 						continue;
@@ -276,6 +291,36 @@ public class ChessboardReedSolomonDetector<T extends ImageGray<T>> implements Ve
 				}
 			}
 		}
+	}
+
+	/**
+	 * Decode the bits and sanity check the solution to see if it could be correct.
+	 */
+	private boolean decodeAndSanityCheck() {
+		boolean success = false;
+		if (utils.codec.decode(bits, decoded)) {
+			success = true;
+		}
+		// If the marker is out of range it's invalid
+		if (success && decoded.markerID >= utils.markers.size()) {
+			success = false;
+
+			// This is a rare event. Let's print it just incase something is wrong.
+			if (verbose != null) {
+				verbose.println("Success decoding a cell, but markerID was invalid!");
+			}
+		}
+
+		// If the cellID is too larger it's invalid
+		if (success) {
+			int maxCellID = utils.countEncodedSquaresInMarker(decoded.markerID);
+			if (decoded.cellID >= maxCellID) {
+				verbose.println("Success decoding a cell, but cellID was invalid!");
+				success = false;
+			}
+		}
+
+		return success;
 	}
 
 	void convertBitImageToBitArray() {
@@ -409,19 +454,6 @@ public class ChessboardReedSolomonDetector<T extends ImageGray<T>> implements Ve
 	}
 
 	/**
-	 * Selects the transform with the most votes
-	 */
-	Transform selectBestTransform() {
-		Transform best = transforms.get(0);
-		for (int i = 1; i < transforms.size; i++) {
-			Transform t = transforms.get(i);
-			if (t.votes > best.votes)
-				best = t;
-		}
-		return best;
-	}
-
-	/**
 	 * Rotates the observed coordinate system so that it aligns with the decoded coordinate system
 	 */
 	static void rotateObserved( int numRows, int numCols, int row, int col, int orientation, GridCoordinate found ) {
@@ -453,7 +485,7 @@ public class ChessboardReedSolomonDetector<T extends ImageGray<T>> implements Ve
 	 * @param transform (Input) correction to corner grd coordinate system
 	 * @param target (Output) Description of target
 	 */
-	void createCorrectedTarget( Transform transform, ChessboardBitPattern target ) {
+	boolean createCorrectedTarget( Transform transform, ChessboardBitPattern target ) {
 		target.marker = transform.marker;
 
 		// Save the shape of the grid in squares
@@ -472,11 +504,25 @@ public class ChessboardReedSolomonDetector<T extends ImageGray<T>> implements Ve
 		FastAccess<GridElement> sparseGrid = clusterToGrid.getSparseGrid();
 		for (int i = 0; i < sparseGrid.size; i++) {
 			GridElement e = sparseGrid.get(i);
+
+			// Change coordinate system
 			rotateObserved(cornerRows, cornerCols, e.row, e.col, transform.orientation, correctedCoordinate);
+
+			// Change origin
+			correctedCoordinate.col += transform.offsetCol;
+			correctedCoordinate.row += transform.offsetRow;
+
+			// Make sure it's inside
 			if (correctedCoordinate.row < 0 || correctedCoordinate.col < 0 ||
 					correctedCoordinate.row >= cornerRows || correctedCoordinate.col >= cornerCols) {
 				continue;
 			}
+
+			// If the row has been marked that means another target already claimed this corner and a false positive
+			// is highly likely
+			if (e.marked)
+				return false;
+			e.marked = true;
 
 			// The ID is the index from a row-major matrix
 			int cornerID = correctedCoordinate.row*cornerCols + correctedCoordinate.col;
@@ -487,6 +533,8 @@ public class ChessboardReedSolomonDetector<T extends ImageGray<T>> implements Ve
 			// Note if this corner touches a binary pattern
 			target.touchBinary.add(nextToBinary.get(e.col, e.row) != 0);
 		}
+
+		return true;
 	}
 
 	/**
@@ -498,8 +546,8 @@ public class ChessboardReedSolomonDetector<T extends ImageGray<T>> implements Ve
 			return;
 
 		ChessboardBitPattern target = found.grow();
-		target.squareRows = anonymousInfo.rows;
-		target.squareCols = anonymousInfo.cols;
+		target.squareRows = anonymousInfo.rows+1;
+		target.squareCols = anonymousInfo.cols+1;
 		target.decodedSquares = 0;
 
 		for (int i = 0; i < anonymousInfo.nodes.size(); i++) {
