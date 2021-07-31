@@ -67,6 +67,9 @@ public class ChessboardReedSolomonDetector<T extends ImageGray<T>> implements Ve
 	// TODO Add back in the ability to encoded every N squares
 	// TODO use homography to select sample points so that perspective distortion is handled correctly. threshold
 
+	/** Number of times a side is sampled when determining binarization threshold */
+	final int NUM_SAMPLES_SIDE = 5; // number of samples along each side
+
 	/** Common utilies for decoding chessboard bit pattern */
 	@Getter protected ChessBitsUtils utils;
 
@@ -102,8 +105,8 @@ public class ChessboardReedSolomonDetector<T extends ImageGray<T>> implements Ve
 	GrayU8 bitImage = new GrayU8(1, 1);
 	// Stores intermediate results when rotating
 	GrayU8 workImage = new GrayU8(1, 1);
-	// Used to indicate which corners and an observed binary pattern
-	GrayU8 nextToBinary = new GrayU8(1, 1);
+	// Used to indicate which corners are around a binary pattern
+	GrayU8 cornersAroundBinary = new GrayU8(1, 1);
 
 	// Found transform from found to a marker coordinate system
 	DogArray<Transform> transforms = new DogArray<>(Transform::new, Transform::reset);
@@ -113,6 +116,12 @@ public class ChessboardReedSolomonDetector<T extends ImageGray<T>> implements Ve
 
 	// Storage for a decided binary pattern
 	CellValue decoded = new CellValue();
+
+	// Coordinate decoded from cellID
+	GridCoordinate decodedCoordinate = new GridCoordinate();
+
+	// Coordinate of the cell observed on the grid taking in account orientation
+	GridCoordinate observedCoordinate = new GridCoordinate();
 
 	// Verbose print debugging
 	PrintStream verbose;
@@ -205,7 +214,8 @@ public class ChessboardReedSolomonDetector<T extends ImageGray<T>> implements Ve
 			tallyMarkerVotes();
 
 			// Sort transform based on the number of votes. The ones with most votes should be first.
-			Collections.sort(transforms.toList(), (a,b)->Integer.compare(b.votes, a.votes));
+			if (transforms.size > 1) // don't know if line below will allocate memory or not
+				Collections.sort(transforms.toList(), ( a, b ) -> Integer.compare(b.votes, a.votes));
 
 			// Two targets could be so close to each other that their chessboards become joined together
 			// Create targets from all hypothesises, unless there's a contradiction
@@ -235,8 +245,8 @@ public class ChessboardReedSolomonDetector<T extends ImageGray<T>> implements Ve
 		int cols = clusterToGrid.getSparseCols();
 
 		// Initialize data structures
-		nextToBinary.reshape(cols, rows);
-		ImageMiscOps.fill(nextToBinary, 0);
+		cornersAroundBinary.reshape(cols, rows);
+		ImageMiscOps.fill(cornersAroundBinary, 0);
 
 		gridBinaryCells.clear();
 		gridBinaryCells.resize(rows*cols);
@@ -262,7 +272,7 @@ public class ChessboardReedSolomonDetector<T extends ImageGray<T>> implements Ve
 				float threshold = determineThreshold(a.node, b.node, c.node, d.node);
 				sampleBitsGray(a.node, b.node, c.node, d.node, threshold);
 
-//				bitImage.printBinary();
+				boolean success = false;
 
 				// Try all 4 possible orientations until something works
 				for (int orientation = 0; orientation < 4; orientation++) {
@@ -274,11 +284,13 @@ public class ChessboardReedSolomonDetector<T extends ImageGray<T>> implements Ve
 						continue;
 					}
 
+					success = true;
+
 					// mark corners as having a binary code next to them
-					nextToBinary.unsafe_set(col - 1, row - 1, 1);
-					nextToBinary.unsafe_set(col - 1, row, 1);
-					nextToBinary.unsafe_set(col, row - 1, 1);
-					nextToBinary.unsafe_set(col, row, 1);
+					cornersAroundBinary.unsafe_set(col - 1, row - 1, 1);
+					cornersAroundBinary.unsafe_set(col - 1, row, 1);
+					cornersAroundBinary.unsafe_set(col, row - 1, 1);
+					cornersAroundBinary.unsafe_set(col, row, 1);
 
 					// Save the decoded results into a sparse grid
 					CellReading cell = gridBinaryCells.data[row*cols + col] = binaryCells.grow();
@@ -289,6 +301,9 @@ public class ChessboardReedSolomonDetector<T extends ImageGray<T>> implements Ve
 					cell.cellID = decoded.cellID;
 					break;
 				}
+
+				if (verbose != null && !success)
+					verbose.printf("Failed to decode. tl=( %.1f %.1f )\n", a.node.x, a.node.y);
 			}
 		}
 	}
@@ -323,6 +338,9 @@ public class ChessboardReedSolomonDetector<T extends ImageGray<T>> implements Ve
 		return success;
 	}
 
+	/**
+	 * Converts the binary image into a dense bit array that's understood by the codec
+	 */
 	void convertBitImageToBitArray() {
 		bits.resize(bitImage.width*bitImage.height);
 		for (int y = 0, i = 0; y < bitImage.height; y++) {
@@ -353,8 +371,6 @@ public class ChessboardReedSolomonDetector<T extends ImageGray<T>> implements Ve
 	 * @return Average value of tangent points along the side
 	 */
 	private float sampleThresholdSide( Point2D_F64 a, Point2D_F64 b ) {
-		final int numSamples = 5; // number of samples along each side
-
 		double border = utils.dataBorderFraction;
 		double length = 1.0 - 2.0*border;
 
@@ -366,8 +382,8 @@ public class ChessboardReedSolomonDetector<T extends ImageGray<T>> implements Ve
 		float sumWhite = 0.0f;
 		float sumBlack = 0.0f;
 
-		for (int i = 0; i < numSamples; i++) {
-			double f = border + length*i/(double)(numSamples - 1);
+		for (int i = 0; i < NUM_SAMPLES_SIDE; i++) {
+			double f = border + length*i/(double)(NUM_SAMPLES_SIDE - 1);
 			float cx = (float)(a.x + (b.x - a.x)*f);
 			float cy = (float)(a.y + (b.y - a.y)*f);
 
@@ -375,7 +391,7 @@ public class ChessboardReedSolomonDetector<T extends ImageGray<T>> implements Ve
 			sumBlack += interpolate.get(cx + ny, cy - nx);
 		}
 
-		return (sumWhite + sumBlack)/(2.0f*numSamples);
+		return (sumWhite + sumBlack)/(2.0f*NUM_SAMPLES_SIDE);
 	}
 
 	/**
@@ -415,12 +431,6 @@ public class ChessboardReedSolomonDetector<T extends ImageGray<T>> implements Ve
 	 * Find the adjustment from the observed coordinate system to the one encoded and compute the number of matches
 	 */
 	void tallyMarkerVotes() {
-		// Coordinate decoded from cellID
-		var decodedCoordinate = new GridCoordinate();
-
-		// Coordinate of the cell observed on the grid taking in account orientation
-		var observedCoordinate = new GridCoordinate();
-
 		// Shape of the observed grid
 		int numRows = clusterToGrid.getSparseRows();
 		int numCols = clusterToGrid.getSparseCols();
@@ -433,10 +443,11 @@ public class ChessboardReedSolomonDetector<T extends ImageGray<T>> implements Ve
 
 			// rotate the arbitrary observed coordinate system to match the decoded
 			rotateObserved(numRows, numCols, cell.row, cell.col, cell.orientation, observedCoordinate);
+			ChessBitsUtils.adjustTopLeft(cell.orientation, observedCoordinate);
 
 			// Figure out the offset. This should be the same for all encoded cells from the same target
-			int offsetRow = decodedCoordinate.row - observedCoordinate.row;
-			int offsetCol = decodedCoordinate.col - observedCoordinate.col;
+			int offsetRow = observedCoordinate.row - decodedCoordinate.row;
+			int offsetCol = observedCoordinate.col - decodedCoordinate.col;
 
 			// Save the coordinate system transform
 			Transform t = findMatching(offsetRow, offsetCol, cell.orientation, cell.markerID);
@@ -466,6 +477,9 @@ public class ChessboardReedSolomonDetector<T extends ImageGray<T>> implements Ve
 		}
 	}
 
+	/**
+	 * Finds an existing transform that matches the one just computed
+	 */
 	@Nullable Transform findMatching( int offsetRow, int offsetCol, int orientation, int marker ) {
 		for (int i = 0; i < transforms.size; i++) {
 			Transform t = transforms.get(i);
@@ -493,7 +507,8 @@ public class ChessboardReedSolomonDetector<T extends ImageGray<T>> implements Ve
 		target.squareCols = utils.markers.get(target.marker).cols;
 		target.decodedSquares = binaryCells.size;
 
-		var correctedCoordinate = new GridCoordinate();
+		// Recycle the variable but give it a better name
+		final GridCoordinate correctedCoordinate = observedCoordinate;
 
 		// Get shape of the corner grid.
 		int cornerRows = target.squareRows - 1;
@@ -509,8 +524,8 @@ public class ChessboardReedSolomonDetector<T extends ImageGray<T>> implements Ve
 			rotateObserved(cornerRows, cornerCols, e.row, e.col, transform.orientation, correctedCoordinate);
 
 			// Change origin
-			correctedCoordinate.col += transform.offsetCol;
 			correctedCoordinate.row += transform.offsetRow;
+			correctedCoordinate.col += transform.offsetCol;
 
 			// Make sure it's inside
 			if (correctedCoordinate.row < 0 || correctedCoordinate.col < 0 ||
@@ -531,7 +546,7 @@ public class ChessboardReedSolomonDetector<T extends ImageGray<T>> implements Ve
 			target.corners.grow().setTo(e.node.x, e.node.y, cornerID);
 
 			// Note if this corner touches a binary pattern
-			target.touchBinary.add(nextToBinary.get(e.col, e.row) != 0);
+			target.touchBinary.add(cornersAroundBinary.get(e.col, e.row) != 0);
 		}
 
 		return true;
@@ -546,8 +561,8 @@ public class ChessboardReedSolomonDetector<T extends ImageGray<T>> implements Ve
 			return;
 
 		ChessboardBitPattern target = found.grow();
-		target.squareRows = anonymousInfo.rows+1;
-		target.squareCols = anonymousInfo.cols+1;
+		target.squareRows = anonymousInfo.rows + 1;
+		target.squareCols = anonymousInfo.cols + 1;
 		target.decodedSquares = 0;
 
 		for (int i = 0; i < anonymousInfo.nodes.size(); i++) {

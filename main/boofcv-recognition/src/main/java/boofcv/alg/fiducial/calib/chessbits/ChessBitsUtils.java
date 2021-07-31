@@ -203,6 +203,19 @@ public class ChessBitsUtils {
 	}
 
 	/**
+	 * Adjust the top left corner based on orientation
+	 */
+	public static void adjustTopLeft( int orientation, GridCoordinate coordinate ) {
+		switch (orientation) {
+			case 0 -> {}
+			case 1 -> {coordinate.row -= 1;}
+			case 2 -> {coordinate.row -= 1; coordinate.col -= 1;}
+			case 3 -> {coordinate.col -= 1;}
+			default -> throw new IllegalArgumentException("Unknown orientation: "+orientation);
+		}
+	}
+
+	/**
 	 * Returns the number of encoded cells in the chessboard
 	 *
 	 * @param markerID (Input) which marker
