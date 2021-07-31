@@ -87,7 +87,7 @@ public class ChessboardCornerClusterToGrid implements VerbosePrint {
 	@Setter CheckShape checkShape;
 
 	/** Storage for elements in the sparse grid. Elements are not ordered. */
-	@Getter DogArray<GridElement> sparseGrid = new DogArray<>(GridElement::new);
+	@Getter DogArray<GridElement> sparseGrid = new DogArray<>(GridElement::new, GridElement::reset);
 	/** Dimension of the sparse/dense grids */
 	@Getter protected int sparseCols, sparseRows;
 	/** Dense grid. Empty elements are set to null */
@@ -124,13 +124,15 @@ public class ChessboardCornerClusterToGrid implements VerbosePrint {
 	 * @return true if no errors were detected
 	 */
 	public boolean sparseToGrid( GridInfo info ) {
+		info.reset();
+
 		sparseToDense();
 
 		if (!findLargestRectangle(region)) {
 			return false;
 		}
 
-		if (!copyDenseRectangle(region.x0, region.y0, region.x1, region.y1, info)) {
+		if (!copyDenseRectangle(region.y0, region.y1, region.x0, region.x1, info)) {
 			return false;
 		}
 
@@ -691,6 +693,7 @@ public class ChessboardCornerClusterToGrid implements VerbosePrint {
 		public Node node;
 		public int row, col;
 		public int rowLength, colLength;
+		public boolean marked;
 
 		public boolean isAssigned() {
 			return row != Integer.MAX_VALUE;
@@ -701,6 +704,7 @@ public class ChessboardCornerClusterToGrid implements VerbosePrint {
 			rowLength = colLength = -1;
 			row = Integer.MAX_VALUE;
 			col = Integer.MAX_VALUE;
+			marked = false;
 		}
 	}
 

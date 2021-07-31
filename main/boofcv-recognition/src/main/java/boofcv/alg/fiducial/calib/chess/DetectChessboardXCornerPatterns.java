@@ -81,7 +81,7 @@ public class DetectChessboardXCornerPatterns<T extends ImageGray<T>> {
 
 			// Find the chessboard structure
 			if (!clusterToGrid.clusterToSparse(c)) {
-				found.removeTail();
+				continue;
 			}
 
 			// Extract a valid chessboard pattern
