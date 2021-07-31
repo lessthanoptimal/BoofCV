@@ -21,6 +21,8 @@ package boofcv.alg.fiducial.calib.chessbits;
 import boofcv.abst.fiducial.calib.ConfigChessboardX;
 import boofcv.alg.drawing.FiducialImageEngine;
 import boofcv.alg.misc.ImageMiscOps;
+import boofcv.gui.image.ShowImages;
+import boofcv.misc.BoofMiscOps;
 import boofcv.struct.GridCoordinate;
 import boofcv.struct.GridShape;
 import boofcv.struct.geo.PointIndex2D_F64;
@@ -107,10 +109,16 @@ public class TestChessboardReedSolomonDetector extends BoofStandardJUnit {
 		GrayU8 image = createMarker(utils, 0);
 		GrayU8 rotated = new GrayU8(1, 1);
 
+		alg.setVerbose(System.out, null);
+
 		for (int i = 0; i < 3; i++) {
+			System.out.println("Rotated " + i);
 			ImageMiscOps.rotateCCW(image, rotated);
 			alg.process(rotated);
 			image.setTo(rotated);
+
+			ShowImages.showWindow(rotated, "ASD");
+			BoofMiscOps.sleep(5_000);
 
 			FastAccess<ChessboardBitPattern> found = alg.getFound();
 			assertEquals(1, found.size);
@@ -137,8 +145,8 @@ public class TestChessboardReedSolomonDetector extends BoofStandardJUnit {
 
 		// zap all the encoded data
 		for (int row = 1; row < 4; row++) {
-			for (int cols = row%2+1; cols < 5; cols += 2) {
-				ImageMiscOps.fillRectangle(image, 255, 50+(cols-1)*80, 50+(row-1)*80,80,80);
+			for (int cols = row%2 + 1; cols < 5; cols += 2) {
+				ImageMiscOps.fillRectangle(image, 255, 50 + (cols - 1)*80, 50 + (row - 1)*80, 80, 80);
 			}
 		}
 
@@ -172,15 +180,15 @@ public class TestChessboardReedSolomonDetector extends BoofStandardJUnit {
 		GrayU8 combined = new GrayU8(image0.width, image0.height*2);
 
 		ImageMiscOps.copy(0, 0, 0, 0, image0.width, image0.height, image0, combined);
-		ImageMiscOps.copy(0, 10, 0, image0.height-10,
-				image1.width, image1.height-10, image1, combined);
+		ImageMiscOps.copy(0, 10, 0, image0.height - 10,
+				image1.width, image1.height - 10, image1, combined);
 
 		alg.process(combined);
 
 		FastAccess<ChessboardBitPattern> found = alg.getFound();
 		assertEquals(2, found.size);
 
-		found.forEach(t->{
+		found.forEach(t -> {
 			assertEquals(3, t.squareRows);
 			assertEquals(4, t.squareCols);
 			assertEquals(truthCorners.size(), t.corners.size);
