@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -30,15 +30,14 @@ import java.util.List;
 
 /**
  * Parses a configuration file for {@link CalibrateMonoPlanar}.
- * 
+ *
  * @author Peter Abeles
  */
 public class ParseMonoCalibrationConfig extends BaseCalibrationConfig {
 
-
 	public List<String> images = new ArrayList<>();
 
-	public ParseMonoCalibrationConfig(MediaManager media) {
+	public ParseMonoCalibrationConfig( MediaManager media ) {
 		this.media = media;
 	}
 
@@ -47,7 +46,7 @@ public class ParseMonoCalibrationConfig extends BaseCalibrationConfig {
 
 	public boolean parse( String fileName ) {
 		Reader input = media.openFile(fileName);
-		if( input == null )
+		if (input == null)
 			return false;
 
 		BufferedReader reader = new BufferedReader(input);
@@ -58,32 +57,31 @@ public class ParseMonoCalibrationConfig extends BaseCalibrationConfig {
 		try {
 			String line = reader.readLine();
 			// skip over comments
-			while( line != null && line.charAt(0) == '#' )
+			while (line != null && line.charAt(0) == '#')
 				line = reader.readLine();
 
-			if( line == null )
+			if (line == null)
 				return false;
 
-			String[]v = line.split("\\s");
-			if( v.length != 3 )
+			String[] v = line.split("\\s");
+			if (v.length != 3)
 				return false;
 
 			infoFile = v[2];
 
-			while( true ) {
+			while (true) {
 				line = reader.readLine();
-				if( line == null )
+				if (line == null)
 					break;
-				
+
 				v = line.split("\\s");
-				if( v.length != 3 )
+				if (v.length != 3)
 					continue;
 				images.add(v[2]);
 			}
-
 		} catch (IOException ignore) {}
-		
-		if( infoFile == null || images.size() == 0 )
+
+		if (infoFile == null || images.size() == 0)
 			return false;
 
 		try {
@@ -91,7 +89,7 @@ public class ParseMonoCalibrationConfig extends BaseCalibrationConfig {
 		} catch (FileNotFoundException e) {
 			throw new RuntimeException(e);
 		}
-		
+
 		return true;
 	}
 

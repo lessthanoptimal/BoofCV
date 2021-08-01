@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -31,14 +31,13 @@ import java.awt.*;
  *
  * @author Peter Abeles
  */
-public class DetectCalibrationPolygonPanel extends DetectCalibrationPanel
-{
+public class DetectCalibrationPolygonPanel extends DetectCalibrationPanel {
 	// selects threshold to create binary image from
 	DetectBlackPolygonControlPanel polygonPanel;
 
-	public DetectCalibrationPolygonPanel(int gridRows, int gridColumns,
-										 ConfigPolygonDetector configPolygon , ConfigThreshold configThreshold ) {
-		super(gridRows,gridColumns,false);
+	public DetectCalibrationPolygonPanel( int gridRows, int gridColumns,
+										  ConfigPolygonDetector configPolygon, ConfigThreshold configThreshold ) {
+		super(gridRows, gridColumns, false);
 
 		polygonPanel = new DetectBlackPolygonControlPanel(new ShapeGuiListener() {
 			@Override
@@ -53,7 +52,7 @@ public class DetectCalibrationPolygonPanel extends DetectCalibrationPanel
 			public void imageThresholdUpdated() {
 				listener.calibEventDetectorModified();
 			}
-		},configPolygon,configThreshold);
+		}, configPolygon, configThreshold);
 		polygonPanel.removeControlNumberOfSides();
 		polygonPanel.getThresholdPanel().addHistogramGraph();
 
@@ -63,7 +62,7 @@ public class DetectCalibrationPolygonPanel extends DetectCalibrationPanel
 
 	@Override
 	protected void addComponents() {
-		JPanel togglePanel = new JPanel( new GridLayout(0,2));
+		JPanel togglePanel = new JPanel(new GridLayout(0, 2));
 		togglePanel.add(showPoints);
 		togglePanel.add(showNumbers);
 		togglePanel.add(showGraph);

@@ -44,18 +44,17 @@ import java.util.List;
  *
  * @author Peter Abeles
  */
-public class DetectCalibrationSquareGridApp extends CommonDetectCalibrationApp
-{
+public class DetectCalibrationSquareGridApp extends CommonDetectCalibrationApp {
 	DetectSquareGridFiducial<GrayF32> alg;
 	ConfigSquareGrid configDet = new ConfigSquareGrid();
 	ConfigGridDimen configGrid;
 
-	public DetectCalibrationSquareGridApp(int numRows , int numColumns ,  double squareWidth, double spaceWidth,
-										  boolean forCalibration ,
-										  List<String> exampleInputs) {
+	public DetectCalibrationSquareGridApp( int numRows, int numColumns, double squareWidth, double spaceWidth,
+										   boolean forCalibration,
+										   List<String> exampleInputs ) {
 		super(exampleInputs);
-		configGrid = new ConfigGridDimen(numRows, numColumns, squareWidth,spaceWidth);
-		setUpGui(new DetectCalibrationPolygonPanel(numRows,numColumns, configDet.square, configDet.thresholding));
+		configGrid = new ConfigGridDimen(numRows, numColumns, squareWidth, spaceWidth);
+		setUpGui(new DetectCalibrationPolygonPanel(numRows, numColumns, configDet.square, configDet.thresholding));
 		declareDetector();
 	}
 
@@ -67,12 +66,12 @@ public class DetectCalibrationSquareGridApp extends CommonDetectCalibrationApp
 		configGrid.numRows = controlPanel.getGridRows();
 		configGrid.numCols = controlPanel.getGridColumns();
 
-		alg = FactoryFiducialCalibration.squareGrid(configDet,configGrid).getAlgorithm();
+		alg = FactoryFiducialCalibration.squareGrid(configDet, configGrid).getAlgorithm();
 		reprocessImageOnly();
 	}
 
 	@Override
-	protected boolean process(GrayF32 image) {
+	protected boolean process( GrayF32 image ) {
 		return alg.process(image);
 	}
 
@@ -103,7 +102,7 @@ public class DetectCalibrationSquareGridApp extends CommonDetectCalibrationApp
 
 	@Override
 	protected List<Polygon2D_F64> getFoundPolygons() {
-		return alg.getDetectorSquare().getPolygons(null,null);
+		return alg.getDetectorSquare().getPolygons(null, null);
 	}
 
 	@Override
@@ -116,16 +115,16 @@ public class DetectCalibrationSquareGridApp extends CommonDetectCalibrationApp
 		return alg.getGrids().getGrids();
 	}
 
-	public static void main(String[] args) {
+	public static void main( String[] args ) {
 
-		List<String>  examples = new ArrayList<>();
+		List<String> examples = new ArrayList<>();
 
 		for (int i = 1; i <= 11; i++) {
 			examples.add(UtilIO.pathExample(String.format("calibration/stereo/Bumblebee2_Square/left%02d.jpg", i)));
 		}
 		examples.add(UtilIO.pathExample("fiducial/square_grid/movie.mp4"));
 
-		SwingUtilities.invokeLater(()-> {
+		SwingUtilities.invokeLater(() -> {
 			DetectCalibrationSquareGridApp app = new DetectCalibrationSquareGridApp(4, 3, 1, 1, false, examples);
 
 			app.openFile(new File(examples.get(0)));
