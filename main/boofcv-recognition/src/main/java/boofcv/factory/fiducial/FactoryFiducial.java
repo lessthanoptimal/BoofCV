@@ -217,6 +217,7 @@ public class FactoryFiducial {
 
 		// Set up the utils, which configures how the targets will be encoded
 		var utils = new ChessBitsUtils();
+		utils.codec.setErrorCorrectionLevel(configMarkers.errorCorrectionLevel);
 		utils.setDataBorderFraction(configDetector.dataBorderFraction);
 		utils.setDataBitWidthFraction(configDetector.dataBitWidthFraction);
 		configMarkers.convertToGridList(utils.markers);

@@ -42,6 +42,18 @@ public class ConfigChessboardBitsMarkers implements Configuration {
 	public final List<MarkerShape> markerShapes = new ArrayList<>();
 
 	/**
+	 * <p>
+	 * Amount of error correction applied. Larger values increase the number of data bits that need to be encoded, but
+	 * increase the number of errors it can recover from. More bits means smaller dots and more errors. If there are
+	 * extra bits in the square they will be allocated to error correction automatically. If two targets have
+	 * different amounts of error correction they will be incompatible.
+	 * </p>
+	 *
+	 * 0 = no error correction. 10 = maximum amount.
+	 */
+	public int errorCorrectionLevel = 3;
+
+	/**
 	 * Configures N markers with the same shape
 	 */
 	public static ConfigChessboardBitsMarkers singleShape( int rows, int cols, double squareSize, int numMarkers ) {
@@ -72,6 +84,7 @@ public class ConfigChessboardBitsMarkers implements Configuration {
 
 	public void setTo( ConfigChessboardBitsMarkers src ) {
 		this.firstTargetDuplicated = src.firstTargetDuplicated;
+		this.errorCorrectionLevel = src.errorCorrectionLevel;
 		this.markerShapes.clear();
 		for (int i = 0; i < src.markerShapes.size(); i++) {
 			MarkerShape s = new MarkerShape();
@@ -83,6 +96,8 @@ public class ConfigChessboardBitsMarkers implements Configuration {
 	@Override public void checkValidity() {
 		BoofMiscOps.checkTrue(firstTargetDuplicated >= 1);
 		BoofMiscOps.checkTrue(markerShapes.size() >= 1);
+		BoofMiscOps.checkTrue(errorCorrectionLevel >= 0 && errorCorrectionLevel <= 10,
+				"error correction must be from 0 to 10, inclusive.");
 	}
 
 	public static class MarkerShape {

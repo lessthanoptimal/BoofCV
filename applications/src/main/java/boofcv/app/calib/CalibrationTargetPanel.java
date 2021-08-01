@@ -133,6 +133,7 @@ public class CalibrationTargetPanel extends StandardAlgConfigPanel implements Ac
 
 	private class ChessBitsPanel extends StandardAlgConfigPanel implements ChangeListener {
 		JSpinner sRows, sCols, sWidth, sMarkers;
+		JComboBox<String> comboErrorLevel;
 
 		public ChessBitsPanel() {
 			setBorder(BorderFactory.createEmptyBorder());
@@ -143,25 +144,29 @@ public class CalibrationTargetPanel extends StandardAlgConfigPanel implements Ac
 			sCols = spinner(shape.numCols, 1, 1000, 1);
 			sWidth = spinner(shape.squareSize, 0, 1000000.0, 1);
 			sMarkers = spinner(configChessboardBits.firstTargetDuplicated, 1, 1000, 1);
+			comboErrorLevel = combo(configChessboardBits.errorCorrectionLevel, "0","1","2","3","4","5","6","7","8","9","10");
 
 			addLabeled(sRows, "Rows", "Number of square rows");
 			addLabeled(sCols, "Cols", "Number of square columns");
 			addLabeled(sWidth, "Square Width", "How wide each square is");
 			addLabeled(sMarkers, "Count", "Number of unique markers");
+			addLabeled(comboErrorLevel, "Error Level", "Amount of error correction. 0 = none. 10 = max.");
 		}
 
 		@Override
-		public void stateChanged( ChangeEvent e ) {
+		public void controlChanged( Object source ) {
 			ConfigChessboardBitsMarkers.MarkerShape shape = configChessboardBits.markerShapes.get(0);
 
-			if (e.getSource() == sRows) {
+			if (source == sRows) {
 				shape.numRows = ((Number)sRows.getValue()).intValue();
-			} else if (e.getSource() == sCols) {
+			} else if (source == sCols) {
 				shape.numCols = ((Number)sCols.getValue()).intValue();
-			} else if (e.getSource() == sWidth) {
+			} else if (source == sWidth) {
 				shape.squareSize = ((Number)sWidth.getValue()).doubleValue();
-			} else if (e.getSource() == sMarkers) {
+			} else if (source == sMarkers) {
 				configChessboardBits.firstTargetDuplicated = ((Number)sMarkers.getValue()).intValue();
+			} else if (source == comboErrorLevel) {
+				configChessboardBits.errorCorrectionLevel = comboErrorLevel.getSelectedIndex();
 			}
 			updateParameters();
 		}

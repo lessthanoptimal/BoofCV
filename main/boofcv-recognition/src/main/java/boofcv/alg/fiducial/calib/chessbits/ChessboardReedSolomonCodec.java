@@ -71,10 +71,10 @@ public class ChessboardReedSolomonCodec {
 	public final int WORD_BITS = 8;
 
 	/**
-	 * Maximum number of words that can have an error in it.
-	 * Change this value only if you really know what you are doing.
+	 * Used to adjust the amount of error correction. Larger values mean more error correction. 0 = non. 10 = max.
 	 */
-	@Getter @Setter double maxErrorFraction = 0.3;
+	@Getter @Setter int errorCorrectionLevel = 3;
+	// this is an integer and not a float to make configuring easier and more precise to the user
 
 	// Used to mask out bits not in the word
 	int wordMask;
@@ -122,7 +122,7 @@ public class ChessboardReedSolomonCodec {
 
 		// Two words are needed to fix every word with an error. Multiple bit errors in a single word count
 		// as a single error. See Singleton Bound
-		int eccWords = (int)(2*Math.ceil(dataWords*maxErrorFraction));
+		int eccWords = (int)(2*Math.ceil(dataWords*errorCorrectionFraction()));
 
 		// Total number of bits that need to be encoded. message + ecc
 		int packetBitCount = (dataWords + eccWords)*WORD_BITS;
@@ -262,5 +262,12 @@ public class ChessboardReedSolomonCodec {
 		cell.cellID = bits.read(2 + markerBitCount, cellBitCount, true);
 
 		return true;
+	}
+
+	/**
+	 * Converts the level into a fraction
+	 */
+	public double errorCorrectionFraction() {
+		return errorCorrectionLevel / 10.0;
 	}
 }
