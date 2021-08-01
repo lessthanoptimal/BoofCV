@@ -54,9 +54,6 @@ public class CreateCalibrationTargetGenerator {
 	int rows, cols;
 	Unit units;
 
-	// Number of markers to make if multiple markers are supported for a target type
-	public int numMarkers = 1;
-
 	boolean showInfo = true;
 
 	float patternWidth;

@@ -21,6 +21,7 @@ package boofcv.app;
 import boofcv.abst.fiducial.calib.CalibrationPatterns;
 import boofcv.alg.fiducial.calib.chessbits.ChessBitsUtils;
 import boofcv.app.calib.CreateChessboardBitsDocumentPDF;
+import boofcv.app.fiducials.CreateFiducialDocumentPDF;
 import boofcv.generate.LengthUnit;
 import boofcv.generate.Unit;
 import org.kohsuke.args4j.CmdLineException;
@@ -199,7 +200,10 @@ public class CreateCalibrationTarget {
 		System.out.println("   info      : " + !disablePrintInfo);
 
 		if (type == CalibrationPatterns.CHESSBOARD_BITS) {
-			saveChessboardBitsToPdf(fileName + suffix, paperSize, unit, rows, columns, shapeWidth, numMarkers);
+			CreateFiducialDocumentPDF doc = chessboardBitsToPdf(fileName + suffix,
+					paperSize, unit, rows, columns, shapeWidth, numMarkers);
+			doc.showInfo = !disablePrintInfo;
+			doc.saveToDisk();
 			return;
 		}
 
@@ -218,9 +222,9 @@ public class CreateCalibrationTarget {
 		}
 	}
 
-	public static void saveChessboardBitsToPdf( String outputFile, PaperSize paper, Unit units,
-												int rows, int columns, float squareWidth,
-												int numMarkers) throws IOException {
+	public static CreateFiducialDocumentPDF chessboardBitsToPdf( String outputFile, PaperSize paper, Unit units,
+																 int rows, int columns, float squareWidth,
+																 int numMarkers) throws IOException {
 		ChessBitsUtils utils = new ChessBitsUtils();
 		for (int markerIdx = 0; markerIdx < numMarkers; markerIdx++) {
 			utils.addMarker(rows, columns);
@@ -233,7 +237,7 @@ public class CreateCalibrationTarget {
 		doc.spaceBetween = squareWidth/2.0f;
 		doc.squareWidth = squareWidth;
 		doc.render(utils);
-		doc.saveToDisk();
+		return doc;
 	}
 
 	public static void main( String[] args ) {

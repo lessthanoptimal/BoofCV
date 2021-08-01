@@ -136,13 +136,18 @@ public abstract class CreateFiducialDocumentPDF {
 			configureRenderer(r);
 
 			if (showInfo) {
+				// Print info on the right side of the document
 				float offX = Math.min(CM_TO_POINTS, spaceBetween*CM_TO_POINTS/2);
 				float offY = Math.min(CM_TO_POINTS, spaceBetween*CM_TO_POINTS/2);
 
+				int fontSize = 7;
+				String text = String.format("%sCreated by BoofCV", getMarkerType());
+				float textWidth = PDType1Font.TIMES_ROMAN.getStringWidth(text)/1000*fontSize;
+
 				pcs.beginText();
-				pcs.setFont(PDType1Font.TIMES_ROMAN, 7);
-				pcs.newLineAtOffset(offX, offY);
-				pcs.showText(String.format("%sCreated by BoofCV", getMarkerType()));
+				pcs.setFont(PDType1Font.TIMES_ROMAN, fontSize);
+				pcs.newLineAtOffset(pageWidth - textWidth - offX, offY);
+				pcs.showText(text);
 				pcs.endText();
 			}
 
@@ -224,13 +229,17 @@ public abstract class CreateFiducialDocumentPDF {
 		pcs.closeAndStroke();
 	}
 
-	public void sendToPrinter() throws PrinterException, IOException {
-		PrinterJob job = PrinterJob.getPrinterJob();
-		job.setPageable(new PDFPageable(document));
-		if (job.printDialog()) {
-			job.print();
+	public void sendToPrinter() {
+		try {
+			PrinterJob job = PrinterJob.getPrinterJob();
+			job.setPageable(new PDFPageable(document));
+			if (job.printDialog()) {
+				job.print();
+			}
+			document.close();
+		} catch (IOException | PrinterException e) {
+			throw new RuntimeException(e);
 		}
-		document.close();
 	}
 
 	public void saveToDisk() throws IOException {
