@@ -21,9 +21,6 @@ package boofcv.alg.fiducial.calib.chessbits;
 import boofcv.abst.fiducial.calib.ConfigChessboardX;
 import boofcv.alg.drawing.FiducialImageEngine;
 import boofcv.alg.misc.ImageMiscOps;
-import boofcv.gui.image.ShowImages;
-import boofcv.misc.BoofMiscOps;
-import boofcv.struct.GridCoordinate;
 import boofcv.struct.GridShape;
 import boofcv.struct.geo.PointIndex2D_F64;
 import boofcv.struct.image.GrayU8;
@@ -109,16 +106,11 @@ public class TestChessboardReedSolomonDetector extends BoofStandardJUnit {
 		GrayU8 image = createMarker(utils, 0);
 		GrayU8 rotated = new GrayU8(1, 1);
 
-		alg.setVerbose(System.out, null);
-
 		for (int i = 0; i < 3; i++) {
-			System.out.println("Rotated " + i);
 			ImageMiscOps.rotateCCW(image, rotated);
+
 			alg.process(rotated);
 			image.setTo(rotated);
-
-			ShowImages.showWindow(rotated, "ASD");
-			BoofMiscOps.sleep(5_000);
 
 			FastAccess<ChessboardBitPattern> found = alg.getFound();
 			assertEquals(1, found.size);
@@ -234,31 +226,6 @@ public class TestChessboardReedSolomonDetector extends BoofStandardJUnit {
 		truthCorners = renderer.corner;
 
 		return engine.getGray();
-	}
-
-	/**
-	 * Change the coordinate system's orientation and see if the (0,0) is as expected
-	 */
-	@Test void rotateObserved() {
-		var found = new GridCoordinate();
-		int rows = alg.utils.markers.get(0).rows;
-		int cols = alg.utils.markers.get(0).cols;
-		alg.clusterToGrid.sparseToDense();
-
-		int row = 0;
-		int col = 0;
-
-		ChessboardReedSolomonDetector.rotateObserved(rows, cols, row, col, 0, found);
-		assertTrue(found.equals(row, col));
-
-		ChessboardReedSolomonDetector.rotateObserved(rows, cols, row, col, 1, found);
-		assertTrue(found.equals(cols - 1 - col, row));
-
-		ChessboardReedSolomonDetector.rotateObserved(rows, cols, row, col, 2, found);
-		assertTrue(found.equals(rows - 1 - row, cols - 1 - col));
-
-		ChessboardReedSolomonDetector.rotateObserved(rows, cols, row, col, 3, found);
-		assertTrue(found.equals(col, rows - 1 - row));
 	}
 
 	/**

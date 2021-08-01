@@ -186,9 +186,9 @@ public class ChessBitsUtils {
 	 *
 	 * @param markerID (Input) Marker
 	 * @param cellID (Input) Encoded cell ID
-	 * @param coordinate (Output) Coordinate of corner
+	 * @param coordinate (Output) Corner coordinate in corner grid of TL corner
 	 */
-	public void cellToCoordinate( int markerID, int cellID, GridCoordinate coordinate ) {
+	public void cellIdToCornerCoordinate( int markerID, int cellID, GridCoordinate coordinate ) {
 		GridShape grid = markers.get(markerID);
 
 		// number of encoded squares in a two row set
@@ -203,15 +203,28 @@ public class ChessBitsUtils {
 	}
 
 	/**
+	 * Rotates the observed coordinate system so that it aligns with the decoded coordinate system
+	 */
+	static void rotateObserved( int numRows, int numCols, int row, int col, int orientation, GridCoordinate found ) {
+		switch (orientation) {
+			case 0 -> found.setTo(row, col); // top-left
+			case 1 -> found.setTo(-col, row); // top-right
+			case 2 -> found.setTo(-row, -col); // bottom-right
+			case 3 -> found.setTo(col, -row);  // bottom-left
+			default -> throw new IllegalStateException("Unknown orientation");
+		}
+	}
+
+	/**
 	 * Adjust the top left corner based on orientation
 	 */
 	public static void adjustTopLeft( int orientation, GridCoordinate coordinate ) {
 		switch (orientation) {
 			case 0 -> {}
-			case 1 -> {coordinate.row -= 1;}
-			case 2 -> {coordinate.row -= 1; coordinate.col -= 1;}
-			case 3 -> {coordinate.col -= 1;}
-			default -> throw new IllegalArgumentException("Unknown orientation: "+orientation);
+			case 1 -> coordinate.row -= 1;
+			case 2 -> {coordinate.row -= 1;	coordinate.col -= 1;}
+			case 3 -> coordinate.col -= 1;
+			default -> throw new IllegalArgumentException("Unknown orientation: " + orientation);
 		}
 	}
 
