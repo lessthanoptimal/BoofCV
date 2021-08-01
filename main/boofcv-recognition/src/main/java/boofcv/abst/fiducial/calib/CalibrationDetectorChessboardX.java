@@ -29,6 +29,8 @@ import boofcv.alg.geo.calibration.CalibrationObservation;
 import boofcv.struct.distort.Point2Transform2_F64;
 import boofcv.struct.image.GrayF32;
 import georegression.struct.point.Point2D_F64;
+import lombok.Getter;
+import org.ddogleg.struct.DogArray;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -39,33 +41,33 @@ import java.util.List;
  *
  * @author Peter Abeles
  */
-public class CalibrationDetectorChessboardX
-		extends DetectChessboardXCornerPatterns<GrayF32>
-		implements DetectorFiducialCalibration {
+public class CalibrationDetectorChessboardX implements DetectorFiducialCalibration {
 
-	int cornerRows, cornerCols;
+	@Getter int cornerRows, cornerCols;
 
-	List<Point2D_F64> layoutPoints;
-	CalibrationObservation detected;
+	@Getter DetectChessboardXCornerPatterns<GrayF32> detectorX;
 
 	// transform from input pixels to undistorted pixels
 	Point2Transform2_F64 pixel2undist;
 
-	public CalibrationDetectorChessboardX( ConfigChessboardX config, ConfigGridDimen shape ) {
-		super(config, GrayF32.class);
+	List<Point2D_F64> layoutPoints;
+	CalibrationObservation detected;
 
+	public CalibrationDetectorChessboardX( ConfigChessboardX config, ConfigGridDimen shape ) {
+		detectorX = new DetectChessboardXCornerPatterns<>(config, GrayF32.class);
 
 		cornerRows = shape.numRows - 1;
 		cornerCols = shape.numCols - 1;
 
 		layoutPoints = gridChess(shape.numRows, shape.numCols, shape.shapeSize);
 
-		clusterToGrid.setCheckShape(( r, c ) -> r == cornerRows && c == cornerCols);
+		detectorX.getClusterToGrid().setCheckShape(( r, c ) -> r == cornerRows && c == cornerCols);
 	}
 
 	@Override
 	public boolean process( GrayF32 input ) {
-		super.findPatterns(input);
+		detectorX.findPatterns(input);
+		DogArray<GridInfo> found = detectorX.getFoundChessboard();
 
 		if (found.size >= 1) {
 			detected = new CalibrationObservation(input.width, input.height);
@@ -90,13 +92,11 @@ public class CalibrationDetectorChessboardX
 		}
 	}
 
-	@Override
-	public CalibrationObservation getDetectedPoints() {
+	@Override public CalibrationObservation getDetectedPoints() {
 		return detected;
 	}
 
-	@Override
-	public List<Point2D_F64> getLayout() {
+	@Override public List<Point2D_F64> getLayout() {
 		return layoutPoints;
 	}
 
@@ -109,27 +109,16 @@ public class CalibrationDetectorChessboardX
 		}
 	}
 
-	@Override
 	public DetectChessboardCornersXPyramid<GrayF32> getDetector() {
-		return detector;
+		return detectorX.getDetector();
 	}
 
-	@Override
 	public ChessboardCornerClusterFinder<GrayF32> getClusterFinder() {
-		return clusterFinder;
+		return detectorX.getClusterFinder();
 	}
 
-	@Override
 	public ChessboardCornerClusterToGrid getClusterToGrid() {
-		return clusterToGrid;
-	}
-
-	public int getCornerRows() {
-		return cornerRows;
-	}
-
-	public int getCornerCols() {
-		return cornerCols;
+		return detectorX.getClusterToGrid();
 	}
 
 	/**
