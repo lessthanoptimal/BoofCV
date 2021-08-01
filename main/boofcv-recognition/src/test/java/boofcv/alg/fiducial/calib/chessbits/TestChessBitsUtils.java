@@ -103,33 +103,81 @@ public class TestChessBitsUtils extends BoofStandardJUnit {
 		alg.fixate();
 
 		var found = new GridCoordinate();
-		alg.cellToCoordinate(0, 0, found);
+		alg.cellIdToCornerCoordinate(0, 0, found);
 		assertTrue(found.equals(0, 1));
-		alg.cellToCoordinate(0, 1, found);
+		alg.cellIdToCornerCoordinate(0, 1, found);
 		assertTrue(found.equals(1, 0));
-		alg.cellToCoordinate(0, 3, found);
+		alg.cellIdToCornerCoordinate(0, 2, found);
+		assertTrue(found.equals(1, 2));
+		alg.cellIdToCornerCoordinate(0, 3, found);
 		assertTrue(found.equals(2, 1));
-		alg.cellToCoordinate(0, 5, found);
+		alg.cellIdToCornerCoordinate(0, 4, found);
+		assertTrue(found.equals(3, 0));
+		alg.cellIdToCornerCoordinate(0, 5, found);
 		assertTrue(found.equals(3, 2));
+	}
+
+	@Test void cellToCoordinate_case1() {
+		var alg = new ChessBitsUtils();
+		alg.addMarker(5, 6);
+		alg.fixate();
+
+		var found = new GridCoordinate();
+		alg.cellIdToCornerCoordinate(0, 0, found);
+		assertTrue(found.equals(0, 1));
+		alg.cellIdToCornerCoordinate(0, 1, found);
+		assertTrue(found.equals(0, 3));
+		alg.cellIdToCornerCoordinate(0, 2, found);
+		assertTrue(found.equals(1, 0));
+		alg.cellIdToCornerCoordinate(0, 3, found);
+		assertTrue(found.equals(1, 2));
+		alg.cellIdToCornerCoordinate(0, 4, found);
+		assertTrue(found.equals(2, 1));
+		alg.cellIdToCornerCoordinate(0, 5, found);
+		assertTrue(found.equals(2, 3));
 	}
 
 	/**
 	 * Hand selected test cases
 	 */
-	@Test void cellToCoordinate_case1() {
+	@Test void cellToCoordinate_case2() {
 		var alg = new ChessBitsUtils();
 		alg.addMarker(4, 6);
 		alg.fixate();
 
 		var found = new GridCoordinate();
-		alg.cellToCoordinate(0, 0, found);
+		alg.cellIdToCornerCoordinate(0, 0, found);
 		assertTrue(found.equals(0, 1));
-		alg.cellToCoordinate(0, 1, found);
+		alg.cellIdToCornerCoordinate(0, 1, found);
 		assertTrue(found.equals(0, 3));
-		alg.cellToCoordinate(0, 2, found);
+		alg.cellIdToCornerCoordinate(0, 2, found);
 		assertTrue(found.equals(1, 0));
-		alg.cellToCoordinate(0, 3, found);
+		alg.cellIdToCornerCoordinate(0, 3, found);
 		assertTrue(found.equals(1, 2));
+	}
+
+	/**
+	 * Change the coordinate system's orientation and see if the (0,0) is as expected
+	 */
+	@Test void rotateObserved() {
+		var found = new GridCoordinate();
+		int rows = 5;
+		int cols = 6;
+
+		int row = 0;
+		int col = 0;
+
+		ChessBitsUtils.rotateObserved(rows, cols, row, col, 0, found);
+		assertTrue(found.equals(row, col));
+
+		ChessBitsUtils.rotateObserved(rows, cols, row, col, 1, found);
+		assertTrue(found.equals(cols - 1 - col, row));
+
+		ChessBitsUtils.rotateObserved(rows, cols, row, col, 2, found);
+		assertTrue(found.equals(rows - 1 - row, cols - 1 - col));
+
+		ChessBitsUtils.rotateObserved(rows, cols, row, col, 3, found);
+		assertTrue(found.equals(col, rows - 1 - row));
 	}
 
 	/**

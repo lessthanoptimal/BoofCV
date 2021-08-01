@@ -47,6 +47,8 @@ import java.io.PrintStream;
 import java.util.Collections;
 import java.util.Set;
 
+import static boofcv.alg.fiducial.calib.chessbits.ChessBitsUtils.rotateObserved;
+
 /**
  * <p>Detects chessboard patterns with marker and grid coordinate information encoded inside of the inner white squares.
  * Multiple unique markers can be detected and damaged/partial targets will work. If no binary patterns are found
@@ -81,12 +83,6 @@ public class ChessboardReedSolomonDetector<T extends ImageGray<T>> implements Ve
 	@Getter protected ChessboardCornerClusterToGrid clusterToGrid = new ChessboardCornerClusterToGrid();
 	/** Used to sample the input image when "undistorting" the bit pattern */
 	public InterpolatePixelS<T> interpolate;
-
-	/**
-	 * If true then a single grid can contain multiple targets. This can happen if two chessboards are very close
-	 * to each other. However, if an encoded cell is miss read this could cause a false positive.
-	 */
-	public boolean allowMultipleTargetsSingleGrid = true;
 
 	/** Found chessboard patterns */
 	@Getter public final
@@ -252,6 +248,10 @@ public class ChessboardReedSolomonDetector<T extends ImageGray<T>> implements Ve
 		gridBinaryCells.resize(rows*cols);
 		binaryCells.reset();
 
+		if (verbose != null) {
+			verbose.printf("corner grid: shape=( %d %d ) size=%d\n", rows, cols, clusterToGrid.getSparseGrid().size);
+		}
+
 		// Go through "squares" in the corner grid
 		for (int row = 1; row < rows; row++) {
 			for (int col = 1; col < cols; col++) {
@@ -299,11 +299,21 @@ public class ChessboardReedSolomonDetector<T extends ImageGray<T>> implements Ve
 					cell.orientation = orientation;
 					cell.markerID = decoded.markerID;
 					cell.cellID = decoded.cellID;
+
+					if (verbose != null) {
+						utils.cellIdToCornerCoordinate(cell.markerID, cell.cellID, decodedCoordinate);
+						verbose.printf("marker=%d id=%d ori=%d code_grid=( %d %d ) obs_grid=( %d %d ) tl=( %.1f %.1f ) tr=( %.1f %.1f )\n",
+								decoded.markerID, decoded.cellID, orientation,
+								decodedCoordinate.row, decodedCoordinate.col,
+								row - 1, col - 1, a.node.x, a.node.y,
+								b.node.x, b.node.y);
+					}
+
 					break;
 				}
 
 				if (verbose != null && !success)
-					verbose.printf("Failed to decode. tl=( %.1f %.1f )\n", a.node.x, a.node.y);
+					verbose.printf("Failed to decode. obs_grid=(%d %d) tl=( %.1f %.1f )\n", row - 1, col - 1, a.node.x, a.node.y);
 			}
 		}
 	}
@@ -435,19 +445,22 @@ public class ChessboardReedSolomonDetector<T extends ImageGray<T>> implements Ve
 		int numRows = clusterToGrid.getSparseRows();
 		int numCols = clusterToGrid.getSparseCols();
 
+		transforms.reset();
 		for (int cellIdx = 0; cellIdx < binaryCells.size; cellIdx++) {
 			CellReading cell = binaryCells.get(cellIdx);
 
 			// Figure out the encoded coordinate the cell
-			utils.cellToCoordinate(cell.markerID, cell.cellID, decodedCoordinate);
+			utils.cellIdToCornerCoordinate(cell.markerID, cell.cellID, decodedCoordinate);
 
 			// rotate the arbitrary observed coordinate system to match the decoded
 			rotateObserved(numRows, numCols, cell.row, cell.col, cell.orientation, observedCoordinate);
+
+			// After correcting for orientation, the top left corner is in a different location
 			ChessBitsUtils.adjustTopLeft(cell.orientation, observedCoordinate);
 
 			// Figure out the offset. This should be the same for all encoded cells from the same target
-			int offsetRow = observedCoordinate.row - decodedCoordinate.row;
-			int offsetCol = observedCoordinate.col - decodedCoordinate.col;
+			int offsetRow = decodedCoordinate.row - observedCoordinate.row;
+			int offsetCol = decodedCoordinate.col - observedCoordinate.col;
 
 			// Save the coordinate system transform
 			Transform t = findMatching(offsetRow, offsetCol, cell.orientation, cell.markerID);
@@ -461,19 +474,6 @@ public class ChessboardReedSolomonDetector<T extends ImageGray<T>> implements Ve
 
 			// Increment the vote counter
 			t.votes++;
-		}
-	}
-
-	/**
-	 * Rotates the observed coordinate system so that it aligns with the decoded coordinate system
-	 */
-	static void rotateObserved( int numRows, int numCols, int row, int col, int orientation, GridCoordinate found ) {
-		switch (orientation) {
-			case 0 -> found.setTo(row, col); // top-left
-			case 1 -> found.setTo(numCols - col - 1, row); // top-right
-			case 2 -> found.setTo(numRows - row - 1, numCols - col - 1); // bottom-right
-			case 3 -> found.setTo(col, numRows - row - 1);  // bottom-left
-			default -> throw new IllegalStateException("Unknown orientation");
 		}
 	}
 
@@ -500,6 +500,10 @@ public class ChessboardReedSolomonDetector<T extends ImageGray<T>> implements Ve
 	 * @param target (Output) Description of target
 	 */
 	boolean createCorrectedTarget( Transform transform, ChessboardBitPattern target ) {
+		if (verbose != null)
+			verbose.printf("transform: votes=%d marker=%d ori=%d offset={ row=%d col=%d }\n",
+					transform.votes, transform.marker, transform.orientation, transform.offsetRow, transform.offsetCol);
+
 		target.marker = transform.marker;
 
 		// Save the shape of the grid in squares

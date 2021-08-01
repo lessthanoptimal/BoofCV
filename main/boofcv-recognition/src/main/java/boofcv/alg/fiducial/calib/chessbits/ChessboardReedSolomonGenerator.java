@@ -114,7 +114,7 @@ public class ChessboardReedSolomonGenerator {
 		for (int row = 1; row < rows; row++) {
 			boolean borderRow = row == rows - 1;
 			double y = stub + squareWidth*(row - 1);
-			for (int col = 1+row%2; col < cols; col += 2) {
+			for (int col = 1 + row%2; col < cols; col += 2) {
 				boolean borderCol = col == cols - 1;
 				double x = stub + squareWidth*(col - 1);
 
@@ -141,11 +141,10 @@ public class ChessboardReedSolomonGenerator {
 			for (int col = 1; col < cols; col++) {
 				double x = stub + squareWidth*(col - 1);
 
-				corner.add( new Point2D_F64(x,y));
+				corner.add(new Point2D_F64(x, y));
 			}
 		}
 	}
-
 
 	/**
 	 * Renders the specified value into a black square with white dots
