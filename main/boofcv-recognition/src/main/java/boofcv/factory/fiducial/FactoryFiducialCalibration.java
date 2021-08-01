@@ -22,6 +22,8 @@ import boofcv.abst.fiducial.calib.*;
 import boofcv.alg.fiducial.calib.chess.DetectChessboardBinaryPattern;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.List;
+
 /**
  * Creates detectors of calibration targets. These detectors return found key points in the image and
  * their known 2D location on the fiducial.
@@ -33,70 +35,67 @@ public class FactoryFiducialCalibration {
 	/**
 	 * Detector for a grid of square targets.  All squares must be entirely visible inside the image.
 	 *
-	 * @see boofcv.alg.fiducial.calib.grid.DetectSquareGridFiducial
-	 *
 	 * @param config Configuration for chessboard detector
 	 * @return Square grid target detector.
+	 * @see boofcv.alg.fiducial.calib.grid.DetectSquareGridFiducial
 	 */
-	public static CalibrationDetectorSquareGrid squareGrid(@Nullable ConfigSquareGrid config, ConfigGridDimen configDimen) {
-		if( config == null )
+	public static CalibrationDetectorSquareGrid squareGrid( @Nullable ConfigSquareGrid config, ConfigGridDimen configDimen ) {
+		if (config == null)
 			config = new ConfigSquareGrid();
 		config.checkValidity();
 
-		return new CalibrationDetectorSquareGrid(config,configDimen);
+		return new CalibrationDetectorSquareGrid(config, configDimen);
 	}
 
 	/**
 	 * Chessboard detector based on binary images. Fast but not as robust as the X-Corner method. Not recommended
 	 * for fisheye images.
 	 *
-	 * @see DetectChessboardBinaryPattern
-	 *
 	 * @param configDet Configuration for chessboard detector
 	 * @return Square grid target detector.
+	 * @see DetectChessboardBinaryPattern
 	 */
-	public static CalibrationDetectorChessboardBinary chessboardB(@Nullable ConfigChessboardBinary configDet ,
-																  ConfigGridDimen configGrid )
-	{
-		if( configDet == null )
+	public static CalibrationDetectorChessboardBinary chessboardB( @Nullable ConfigChessboardBinary configDet,
+																   ConfigGridDimen configGrid ) {
+		if (configDet == null)
 			configDet = new ConfigChessboardBinary();
 		configDet.checkValidity();
 
-		return new CalibrationDetectorChessboardBinary(configDet,configGrid);
+		return new CalibrationDetectorChessboardBinary(configDet, configGrid);
 	}
 
 	/**
 	 * Chessboard detector which searches for x-corners. Very robust but is about 2x to 3x slower on large images
 	 * than the binary method. Comparable speed on smaller images.
 	 *
-	 * @see CalibrationDetectorChessboardX
-	 *
 	 * @param config Configuration for chessboard detector
 	 * @return Square grid target detector.
+	 * @see CalibrationDetectorChessboardX
 	 */
-	public static CalibrationDetectorChessboardX chessboardX(@Nullable ConfigChessboardX config ,
-															 ConfigGridDimen dimen )
-	{
-		if( config == null )
+	public static CalibrationDetectorChessboardX chessboardX( @Nullable ConfigChessboardX config,
+															  ConfigGridDimen dimen ) {
+		if (config == null)
 			config = new ConfigChessboardX();
 		config.checkValidity();
 
-		return new CalibrationDetectorChessboardX(config,dimen);
+		return new CalibrationDetectorChessboardX(config, dimen);
 	}
 
 	/**
-	 * Detector for a grid of binary targets. Allows for squares to be obscured or partially outside of the
-	 * image.
+	 * Chessboard detector which searches for x-corners. Very robust but is about 2x to 3x slower on large images
+	 * than the binary method. Comparable speed on smaller images.
 	 *
-	 * @see CalibrationDetectorSquareFiducialGrid
-	 *
-	 * @param config Configuration of binary target
-	 * @return Detector for binary grid target
+	 * @param config Configuration for chessboard detector
+	 * @return Square grid target detector.
+	 * @see CalibrationDetectorChessboardX
 	 */
-	public static CalibrationDetectorSquareFiducialGrid binaryGrid(ConfigSquareGridBinary config ) {
+	public static CalibrationDetectorChessboardX chessboardBits( @Nullable ConfigChessboardBits config,
+																 List<ConfigGridDimen> markers ) {
+		if (config == null)
+			config = new ConfigChessboardBits();
 		config.checkValidity();
 
-		return new CalibrationDetectorSquareFiducialGrid(config);
+		throw new RuntimeException("Not supported yet");
 	}
 
 	/**
@@ -105,13 +104,13 @@ public class FactoryFiducialCalibration {
 	 * @param config Configuration for target
 	 * @return The detector
 	 */
-	public static CalibrationDetectorCircleHexagonalGrid circleHexagonalGrid( @Nullable ConfigCircleHexagonalGrid config ,
-																			 ConfigGridDimen configGrid ) {
-		if( config == null )
+	public static CalibrationDetectorCircleHexagonalGrid circleHexagonalGrid( @Nullable ConfigCircleHexagonalGrid config,
+																			  ConfigGridDimen configGrid ) {
+		if (config == null)
 			config = new ConfigCircleHexagonalGrid();
 		config.checkValidity();
 
-		return new CalibrationDetectorCircleHexagonalGrid(config,configGrid);
+		return new CalibrationDetectorCircleHexagonalGrid(config, configGrid);
 	}
 
 	/**
@@ -120,12 +119,12 @@ public class FactoryFiducialCalibration {
 	 * @param config Configuration for target
 	 * @return The detector
 	 */
-	public static CalibrationDetectorCircleRegularGrid circleRegularGrid( @Nullable ConfigCircleRegularGrid config ,
+	public static CalibrationDetectorCircleRegularGrid circleRegularGrid( @Nullable ConfigCircleRegularGrid config,
 																		  ConfigGridDimen configGrid ) {
-		if( config == null )
+		if (config == null)
 			config = new ConfigCircleRegularGrid();
 		config.checkValidity();
 
-		return new CalibrationDetectorCircleRegularGrid(config,configGrid);
+		return new CalibrationDetectorCircleRegularGrid(config, configGrid);
 	}
 }

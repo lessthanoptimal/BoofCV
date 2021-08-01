@@ -31,9 +31,8 @@ import lombok.Setter;
 /**
  * Calibration parameters for chessboard style calibration grid.
  *
- * @see DetectChessboardBinaryPattern
- *
  * @author Peter Abeles
+ * @see DetectChessboardBinaryPattern
  */
 @Getter @Setter
 public class ConfigChessboardBinary implements Configuration {
@@ -43,13 +42,12 @@ public class ConfigChessboardBinary implements Configuration {
 	 *
 	 * If relative it is relative to min(image.width,image.height)
 	 */
-	public ConfigLength maximumCornerDistance = ConfigLength.relative(8.0/800.0,8);
+	public ConfigLength maximumCornerDistance = ConfigLength.relative(8.0/800.0, 8);
 
 	/**
 	 * Configuration for thresholding the image
 	 */
-	public ConfigThreshold thresholding = new ConfigThresholdLocalOtsu(ConfigLength.relative(0.05,10),10);
-
+	public ConfigThreshold thresholding = new ConfigThresholdLocalOtsu(ConfigLength.relative(0.05, 10), 10);
 
 	/**
 	 * Configuration for square detector.
@@ -68,7 +66,7 @@ public class ConfigChessboardBinary implements Configuration {
 		((ConfigPolylineSplitMerge)square.detector.contourToPoly).thresholdSideSplitScore = 0;
 		// max side error is increased for  shapes which are parially outside of the image, but the local threshold
 		// makes them concave
-		((ConfigPolylineSplitMerge)square.detector.contourToPoly).maxSideError = ConfigLength.relative(0.5,4);
+		((ConfigPolylineSplitMerge)square.detector.contourToPoly).maxSideError = ConfigLength.relative(0.5, 4);
 //		((ConfigPolylineSplitMerge)square.detector.contourToPoly).convexTest = 1000;
 		square.detector.tangentEdgeIntensity = 2.5; // the initial contour is the result of being eroded
 		square.detector.minimumContour = ConfigLength.fixed(10);
@@ -90,5 +88,8 @@ public class ConfigChessboardBinary implements Configuration {
 
 	@Override
 	public void checkValidity() {
+		maximumCornerDistance.checkValidity();
+		thresholding.checkValidity();
+		square.checkValidity();
 	}
 }

@@ -31,6 +31,10 @@ public class GridShape implements Configuration {
 	/** Number of columns */
 	public int cols;
 
+	public GridShape( GridShape src ) {
+		this(src.rows, src.cols);
+	}
+
 	public GridShape( int rows, int cols ) {
 		this.rows = rows;
 		this.cols = cols;

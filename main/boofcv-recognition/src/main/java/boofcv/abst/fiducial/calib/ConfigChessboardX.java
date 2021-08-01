@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -19,6 +19,7 @@
 package boofcv.abst.fiducial.calib;
 
 import boofcv.alg.fiducial.calib.chess.DetectChessboardBinaryPattern;
+import boofcv.misc.BoofMiscOps;
 import boofcv.struct.Configuration;
 import lombok.Getter;
 import lombok.Setter;
@@ -26,9 +27,8 @@ import lombok.Setter;
 /**
  * Calibration parameters for chessboard style calibration grid.
  *
- * @see DetectChessboardBinaryPattern
- *
  * @author Peter Abeles
+ * @see DetectChessboardBinaryPattern
  */
 @Getter @Setter
 public class ConfigChessboardX implements Configuration {
@@ -89,8 +89,8 @@ public class ConfigChessboardX implements Configuration {
 	public double connMaxNeighborDistance = Double.MAX_VALUE;
 
 	/**
-	 * If true then a chessboard has to has to have at least one square which is connected to only one other
-	 * square. BoofCV calibration targets always have this requirements. Other projects might not.
+	 * If true then a chessboard has to have at least one square which is connected to only one other
+	 * square. BoofCV's calibration targets requirements this. Other projects might not.
 	 */
 	public boolean gridRequireCornerSquares = false;
 
@@ -110,7 +110,6 @@ public class ConfigChessboardX implements Configuration {
 
 	@Override
 	public void checkValidity() {
-		if( connDirectionTol < 0 || connDirectionTol > 1 )
-			throw new IllegalArgumentException("directionTol must be 0 to 1");
+		BoofMiscOps.checkFraction(connDirectionTol, "directionTol must be 0 to 1");
 	}
 }

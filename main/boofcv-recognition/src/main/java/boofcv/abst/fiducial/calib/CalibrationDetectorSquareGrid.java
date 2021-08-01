@@ -44,35 +44,34 @@ import java.util.List;
  */
 public class CalibrationDetectorSquareGrid implements DetectorFiducialCalibration {
 
-
 	DetectSquareGridFiducial<GrayF32> detector;
 
 	List<Point2D_F64> layoutPoints;
 	CalibrationObservation detected;
 
-	public CalibrationDetectorSquareGrid(ConfigSquareGrid configDet, ConfigGridDimen configDimen) {
+	public CalibrationDetectorSquareGrid( ConfigSquareGrid configDet, ConfigGridDimen configDimen ) {
 
 		double spaceToSquareRatio = configDimen.shapeDistance/configDimen.shapeSize;
 
 		InputToBinary<GrayF32> inputToBinary =
-				FactoryThresholdBinary.threshold(configDet.thresholding,GrayF32.class);
+				FactoryThresholdBinary.threshold(configDet.thresholding, GrayF32.class);
 
 		DetectPolygonBinaryGrayRefine<GrayF32> detectorSquare =
-				FactoryShapeDetector.polygon(configDet.square,GrayF32.class);
+				FactoryShapeDetector.polygon(configDet.square, GrayF32.class);
 
-		detector = new DetectSquareGridFiducial<>(configDimen.numRows,configDimen.numCols,
-				spaceToSquareRatio,inputToBinary,detectorSquare);
+		detector = new DetectSquareGridFiducial<>(configDimen.numRows, configDimen.numCols,
+				spaceToSquareRatio, inputToBinary, detectorSquare);
 
-		layoutPoints = createLayout(configDimen.numRows, configDimen.numCols, configDimen.shapeSize,configDimen.shapeDistance);
+		layoutPoints = createLayout(configDimen.numRows, configDimen.numCols, configDimen.shapeSize, configDimen.shapeDistance);
 	}
 
 	@Override
-	public boolean process(GrayF32 input) {
-		detected = new CalibrationObservation(input.width,input.height);
-		if( detector.process(input) )  {
+	public boolean process( GrayF32 input ) {
+		detected = new CalibrationObservation(input.width, input.height);
+		if (detector.process(input)) {
 			List<PointIndex2D_F64> found = detector.getCalibrationPoints();
 			for (int i = 0; i < found.size(); i++) {
-				detected.add( found.get(i).p, i );
+				detected.add(found.get(i).p, i);
 			}
 			return true;
 		} else {
@@ -90,30 +89,29 @@ public class CalibrationDetectorSquareGrid implements DetectorFiducialCalibratio
 	 * @param spaceWidth Distance between the sides on each square. Units are target dependent.
 	 * @return Target description
 	 */
-	public static List<Point2D_F64> createLayout(int numRows, int numCols, double squareWidth, double spaceWidth)
-	{
+	public static List<Point2D_F64> createLayout( int numRows, int numCols, double squareWidth, double spaceWidth ) {
 		List<Point2D_F64> all = new ArrayList<>();
 
-		double width = (numCols*squareWidth + (numCols-1)*spaceWidth);
-		double height = (numRows*squareWidth + (numRows-1)*spaceWidth);
+		double width = (numCols*squareWidth + (numCols - 1)*spaceWidth);
+		double height = (numRows*squareWidth + (numRows - 1)*spaceWidth);
 
 		double startX = -width/2;
 		double startY = -height/2;
 
-		for( int i = numRows-1; i >= 0; i-- ) {
+		for (int i = numRows - 1; i >= 0; i--) {
 			// this will be on the top of the black in the row
-			double y = startY + i*(squareWidth+spaceWidth)+squareWidth;
+			double y = startY + i*(squareWidth + spaceWidth) + squareWidth;
 
 			List<Point2D_F64> top = new ArrayList<>();
 			List<Point2D_F64> bottom = new ArrayList<>();
 
-			for( int j = 0; j < numCols; j++ ) {
-				double x = startX + j*(squareWidth+spaceWidth);
+			for (int j = 0; j < numCols; j++) {
+				double x = startX + j*(squareWidth + spaceWidth);
 
-				top.add( new Point2D_F64(x,y));
-				top.add( new Point2D_F64(x+squareWidth,y));
-				bottom.add( new Point2D_F64(x,y-squareWidth));
-				bottom.add( new Point2D_F64(x + squareWidth, y - squareWidth));
+				top.add(new Point2D_F64(x, y));
+				top.add(new Point2D_F64(x + squareWidth, y));
+				bottom.add(new Point2D_F64(x, y - squareWidth));
+				bottom.add(new Point2D_F64(x + squareWidth, y - squareWidth));
 			}
 
 			all.addAll(top);
@@ -134,16 +132,16 @@ public class CalibrationDetectorSquareGrid implements DetectorFiducialCalibratio
 	}
 
 	@Override
-	public void setLensDistortion(LensDistortionNarrowFOV distortion, int width, int height) {
-		if( distortion == null )
-			detector.getDetectorSquare().setLensDistortion(width,height,null,null);
+	public void setLensDistortion( LensDistortionNarrowFOV distortion, int width, int height ) {
+		if (distortion == null)
+			detector.getDetectorSquare().setLensDistortion(width, height, null, null);
 		else {
 			Point2Transform2_F32 pointDistToUndist = distortion.undistort_F32(true, true);
 			Point2Transform2_F32 pointUndistToDist = distortion.distort_F32(true, true);
 			PixelTransform<Point2D_F32> distToUndist = new PointToPixelTransform_F32(pointDistToUndist);
 			PixelTransform<Point2D_F32> undistToDist = new PointToPixelTransform_F32(pointUndistToDist);
 
-			detector.getDetectorSquare().setLensDistortion(width,height,distToUndist,undistToDist);
+			detector.getDetectorSquare().setLensDistortion(width, height, distToUndist, undistToDist);
 		}
 	}
 
@@ -153,6 +151,7 @@ public class CalibrationDetectorSquareGrid implements DetectorFiducialCalibratio
 
 	/**
 	 * Returns number of rows in the grid
+	 *
 	 * @return number of rows
 	 */
 	public int getGridRows() {
@@ -161,6 +160,7 @@ public class CalibrationDetectorSquareGrid implements DetectorFiducialCalibratio
 
 	/**
 	 * Returns number of columns in the grid
+	 *
 	 * @return number of columns
 	 */
 	public int getGridColumns() {
@@ -169,6 +169,7 @@ public class CalibrationDetectorSquareGrid implements DetectorFiducialCalibratio
 
 	/**
 	 * Returns number of rows in calibration point grid
+	 *
 	 * @return number of rows
 	 */
 	public int getPointRows() {
@@ -177,6 +178,7 @@ public class CalibrationDetectorSquareGrid implements DetectorFiducialCalibratio
 
 	/**
 	 * Returns number of columns in calibration point grid
+	 *
 	 * @return number of columns
 	 */
 	public int getPointColumns() {

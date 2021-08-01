@@ -28,16 +28,15 @@ import boofcv.struct.Configuration;
 /**
  * Calibration parameters for square-grid style calibration grid.
  *
- * @see boofcv.alg.fiducial.calib.grid.DetectSquareGridFiducial
- *
  * @author Peter Abeles
+ * @see boofcv.alg.fiducial.calib.grid.DetectSquareGridFiducial
  */
 public class ConfigSquareGrid implements Configuration {
 
 	/**
 	 * Configuration for thresholding the image
 	 */
-	public ConfigThreshold thresholding = ConfigThreshold.local(ThresholdType.BLOCK_MEAN,ConfigLength.relative(0.02,5));
+	public ConfigThreshold thresholding = ConfigThreshold.local(ThresholdType.BLOCK_MEAN, ConfigLength.relative(0.02, 5));
 
 	/**
 	 * Configuration for square detector
@@ -67,5 +66,7 @@ public class ConfigSquareGrid implements Configuration {
 
 	@Override
 	public void checkValidity() {
+		thresholding.checkValidity();
+		square.checkValidity();
 	}
 }

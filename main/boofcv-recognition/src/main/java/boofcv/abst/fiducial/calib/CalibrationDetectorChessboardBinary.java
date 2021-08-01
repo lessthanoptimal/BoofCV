@@ -39,7 +39,7 @@ import java.util.List;
 
 /**
  * Wrapper around {@link DetectChessboardBinaryPattern} for {@link DetectorFiducialCalibration}
- * 
+ *
  * @author Peter Abeles
  */
 public class CalibrationDetectorChessboardBinary implements DetectorFiducialCalibration {
@@ -49,27 +49,27 @@ public class CalibrationDetectorChessboardBinary implements DetectorFiducialCali
 	List<Point2D_F64> layoutPoints;
 	CalibrationObservation detected;
 
-	public CalibrationDetectorChessboardBinary(ConfigChessboardBinary configDet, ConfigGridDimen configGrid ) {
+	public CalibrationDetectorChessboardBinary( ConfigChessboardBinary configDet, ConfigGridDimen configGrid ) {
 
 		DetectPolygonBinaryGrayRefine<GrayF32> detectorSquare =
-				FactoryShapeDetector.polygon(configDet.square,GrayF32.class);
+				FactoryShapeDetector.polygon(configDet.square, GrayF32.class);
 
 		InputToBinary<GrayF32> inputToBinary =
-				FactoryThresholdBinary.threshold(configDet.thresholding,GrayF32.class);
+				FactoryThresholdBinary.threshold(configDet.thresholding, GrayF32.class);
 
 		alg = new DetectChessboardBinaryPattern<>(
-				configGrid.numRows, configGrid.numCols, configDet.maximumCornerDistance,detectorSquare,inputToBinary);
+				configGrid.numRows, configGrid.numCols, configDet.maximumCornerDistance, detectorSquare, inputToBinary);
 
 		layoutPoints = gridChess(configGrid.numRows, configGrid.numCols, configGrid.shapeSize);
 	}
 
 	@Override
-	public boolean process(GrayF32 input) {
-		detected = new CalibrationObservation(input.width,input.height);
-		if( alg.process(input) )  {
+	public boolean process( GrayF32 input ) {
+		detected = new CalibrationObservation(input.width, input.height);
+		if (alg.process(input)) {
 			List<PointIndex2D_F64> found = alg.getCalibrationPoints();
 			for (int i = 0; i < found.size(); i++) {
-				detected.add( found.get(i).p, i );
+				detected.add(found.get(i).p, i);
 			}
 			return true;
 		} else {
@@ -88,8 +88,8 @@ public class CalibrationDetectorChessboardBinary implements DetectorFiducialCali
 	}
 
 	@Override
-	public void setLensDistortion(LensDistortionNarrowFOV distortion, int width, int height) {
-		if( distortion == null ) {
+	public void setLensDistortion( LensDistortionNarrowFOV distortion, int width, int height ) {
+		if (distortion == null) {
 			alg.getFindSeeds().getDetectorSquare().setLensDistortion(width, height, null, null);
 		} else {
 			Point2Transform2_F32 pointDistToUndist = distortion.undistort_F32(true, true);
@@ -97,12 +97,13 @@ public class CalibrationDetectorChessboardBinary implements DetectorFiducialCali
 			PixelTransform<Point2D_F32> distToUndist = new PointToPixelTransform_F32(pointDistToUndist);
 			PixelTransform<Point2D_F32> undistToDist = new PointToPixelTransform_F32(pointUndistToDist);
 
-			alg.getFindSeeds().getDetectorSquare().setLensDistortion(width,height,distToUndist,undistToDist);
+			alg.getFindSeeds().getDetectorSquare().setLensDistortion(width, height, distToUndist, undistToDist);
 		}
 	}
 
 	/**
 	 * Returns number of rows in the chessboard grid
+	 *
 	 * @return number of rows
 	 */
 	public int getGridRows() {
@@ -111,12 +112,12 @@ public class CalibrationDetectorChessboardBinary implements DetectorFiducialCali
 
 	/**
 	 * Returns number of columns in the chessboard grid
+	 *
 	 * @return number of columns
 	 */
 	public int getGridColumns() {
 		return alg.getColumns();
 	}
-
 
 	public DetectChessboardBinaryPattern<GrayF32> getAlgorithm() {
 		return alg;
@@ -132,8 +133,7 @@ public class CalibrationDetectorChessboardBinary implements DetectorFiducialCali
 	 * @param squareWidth How wide each square is. Units are target dependent.
 	 * @return Target description
 	 */
-	public static List<Point2D_F64> gridChess(int numRows, int numCols, double squareWidth)
-	{
+	public static List<Point2D_F64> gridChess( int numRows, int numCols, double squareWidth ) {
 		List<Point2D_F64> all = new ArrayList<>();
 
 		// convert it into the number of calibration points
@@ -141,14 +141,14 @@ public class CalibrationDetectorChessboardBinary implements DetectorFiducialCali
 		numRows = numRows - 1;
 
 		// center the grid around the origin. length of a size divided by two
-		double startX = -((numCols-1)*squareWidth)/2.0;
-		double startY = -((numRows-1)*squareWidth)/2.0;
+		double startX = -((numCols - 1)*squareWidth)/2.0;
+		double startY = -((numRows - 1)*squareWidth)/2.0;
 
-		for( int i = numRows-1; i >= 0; i-- ) {
-			double y = startY+i*squareWidth;
-			for( int j = 0; j < numCols; j++ ) {
-				double x = startX+j*squareWidth;
-				all.add( new Point2D_F64(x,y));
+		for (int i = numRows - 1; i >= 0; i--) {
+			double y = startY + i*squareWidth;
+			for (int j = 0; j < numCols; j++) {
+				double x = startX + j*squareWidth;
+				all.add(new Point2D_F64(x, y));
 			}
 		}
 

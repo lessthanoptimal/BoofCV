@@ -36,14 +36,14 @@ import java.util.List;
 /**
  * Detector for chessboard calibration targets which searches for X-Corners.
  * Returns the first chessboard which is detected and matches the expected size is returned.
- * 
+ *
  * @author Peter Abeles
  */
 public class CalibrationDetectorChessboardX
 		extends DetectChessboardXCornerPatterns<GrayF32>
 		implements DetectorFiducialCalibration {
 
-	int cornerRows,cornerCols;
+	int cornerRows, cornerCols;
 
 	List<Point2D_F64> layoutPoints;
 	CalibrationObservation detected;
@@ -51,23 +51,23 @@ public class CalibrationDetectorChessboardX
 	// transform from input pixels to undistorted pixels
 	Point2Transform2_F64 pixel2undist;
 
-	public CalibrationDetectorChessboardX(ConfigChessboardX config, ConfigGridDimen shape ) {
+	public CalibrationDetectorChessboardX( ConfigChessboardX config, ConfigGridDimen shape ) {
 		super(config, GrayF32.class);
 
 
-		cornerRows = shape.numRows-1;
-		cornerCols = shape.numCols-1;
+		cornerRows = shape.numRows - 1;
+		cornerCols = shape.numCols - 1;
 
 		layoutPoints = gridChess(shape.numRows, shape.numCols, shape.shapeSize);
 
-		clusterToGrid.setCheckShape((r,c)->r==cornerRows&&c==cornerCols);
+		clusterToGrid.setCheckShape(( r, c ) -> r == cornerRows && c == cornerCols);
 	}
 
 	@Override
-	public boolean process(GrayF32 input) {
+	public boolean process( GrayF32 input ) {
 		super.findPatterns(input);
 
-		if( found.size >= 1 ) {
+		if (found.size >= 1) {
 			detected = new CalibrationObservation(input.width, input.height);
 			GridInfo info = found.get(0);
 
@@ -76,10 +76,10 @@ public class CalibrationDetectorChessboardX
 			}
 
 			// remove lens distortion
-			if( pixel2undist != null ) {
+			if (pixel2undist != null) {
 				for (int i = 0; i < info.nodes.size(); i++) {
 					Point2D_F64 p = detected.points.get(i).p;
-					pixel2undist.compute(p.x,p.y,p);
+					pixel2undist.compute(p.x, p.y, p);
 				}
 			}
 
@@ -101,8 +101,8 @@ public class CalibrationDetectorChessboardX
 	}
 
 	@Override
-	public void setLensDistortion(LensDistortionNarrowFOV distortion, int width, int height) {
-		if( distortion == null )
+	public void setLensDistortion( LensDistortionNarrowFOV distortion, int width, int height ) {
+		if (distortion == null)
 			pixel2undist = null;
 		else {
 			pixel2undist = distortion.undistort_F64(true, true);
@@ -142,8 +142,7 @@ public class CalibrationDetectorChessboardX
 	 * @param squareWidth How wide each square is. Units are target dependent.
 	 * @return Target description
 	 */
-	public static List<Point2D_F64> gridChess(int numRows, int numCols, double squareWidth)
-	{
+	public static List<Point2D_F64> gridChess( int numRows, int numCols, double squareWidth ) {
 		List<Point2D_F64> all = new ArrayList<>();
 
 		// convert it into the number of calibration points
@@ -151,14 +150,14 @@ public class CalibrationDetectorChessboardX
 		numRows = numRows - 1;
 
 		// center the grid around the origin. length of a size divided by two
-		double startX = -((numCols-1)*squareWidth)/2.0;
-		double startY = -((numRows-1)*squareWidth)/2.0;
+		double startX = -((numCols - 1)*squareWidth)/2.0;
+		double startY = -((numRows - 1)*squareWidth)/2.0;
 
-		for( int i = numRows-1; i >= 0; i-- ) {
-			double y = startY+i*squareWidth;
-			for( int j = 0; j < numCols; j++ ) {
-				double x = startX+j*squareWidth;
-				all.add( new Point2D_F64(x,y));
+		for (int i = numRows - 1; i >= 0; i--) {
+			double y = startY + i*squareWidth;
+			for (int j = 0; j < numCols; j++) {
+				double x = startX + j*squareWidth;
+				all.add(new Point2D_F64(x, y));
 			}
 		}
 
