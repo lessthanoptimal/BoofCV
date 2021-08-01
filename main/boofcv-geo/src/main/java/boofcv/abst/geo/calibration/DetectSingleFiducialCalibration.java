@@ -30,7 +30,7 @@ import java.util.List;
  *
  * @author Peter Abeles
  */
-public interface DetectorFiducialCalibration {
+public interface DetectSingleFiducialCalibration {
 
 	/**
 	 * Image processing for calibration target detection

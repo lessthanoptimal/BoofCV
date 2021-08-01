@@ -66,7 +66,7 @@ import java.util.Set;
 public class CalibrateMonoPlanar implements VerbosePrint {
 
 	// detects calibration points inside of images
-	protected DetectorFiducialCalibration detector;
+	protected DetectSingleFiducialCalibration detector;
 
 	// how the points are laid out
 	protected List<Point2D_F64> layout;

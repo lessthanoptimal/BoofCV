@@ -19,7 +19,7 @@
 package boofcv.abst.fiducial.calib;
 
 import boofcv.abst.filter.binary.InputToBinary;
-import boofcv.abst.geo.calibration.DetectorFiducialCalibration;
+import boofcv.abst.geo.calibration.DetectSingleFiducialCalibration;
 import boofcv.alg.distort.LensDistortionNarrowFOV;
 import boofcv.alg.fiducial.calib.circle.DetectCircleRegularGrid;
 import boofcv.alg.fiducial.calib.circle.EllipseClustersIntoGrid.Grid;
@@ -48,7 +48,7 @@ import java.util.List;
  * @see DetectCircleRegularGrid
  * @see KeyPointsCircleRegularGrid
  */
-public class CalibrationDetectorCircleRegularGrid implements DetectorFiducialCalibration {
+public class CalibrationDetectorCircleRegularGrid implements DetectSingleFiducialCalibration {
 
 	// Detectors the grids
 	private DetectCircleRegularGrid<GrayF32> detector;

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -20,7 +20,7 @@ package boofcv.demonstrations.calibration;
 
 import boofcv.abst.fiducial.calib.ConfigChessboardX;
 import boofcv.abst.fiducial.calib.ConfigGridDimen;
-import boofcv.abst.geo.calibration.DetectorFiducialCalibration;
+import boofcv.abst.geo.calibration.DetectSingleFiducialCalibration;
 import boofcv.factory.fiducial.FactoryFiducialCalibration;
 import boofcv.io.MediaManager;
 import boofcv.io.SimpleStringNumberReader;
@@ -42,7 +42,7 @@ public class BaseCalibrationConfig {
 	public boolean assumeZeroSkew;
 	public int numRadial;
 	public boolean includeTangential;
-	public DetectorFiducialCalibration detector;
+	public DetectSingleFiducialCalibration detector;
 
 	public BaseCalibrationConfig(MediaManager media) {
 		this.media = media;
@@ -86,7 +86,7 @@ public class BaseCalibrationConfig {
 		} catch (IOException ignore) {}
 	}
 
-	public DetectorFiducialCalibration getDetector() {
+	public DetectSingleFiducialCalibration getDetector() {
 		return detector;
 	}
 }

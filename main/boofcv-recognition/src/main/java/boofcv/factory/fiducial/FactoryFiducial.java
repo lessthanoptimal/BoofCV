@@ -39,15 +39,12 @@ import boofcv.factory.filter.binary.ThresholdType;
 import boofcv.factory.geo.ConfigHomography;
 import boofcv.factory.geo.FactoryMultiViewRobust;
 import boofcv.factory.shape.FactoryShapeDetector;
-import boofcv.struct.GridShape;
 import boofcv.struct.geo.AssociatedPair;
 import boofcv.struct.image.ImageGray;
 import boofcv.struct.image.ImageType;
 import georegression.struct.homography.Homography2D_F64;
 import org.ddogleg.fitting.modelset.ransac.Ransac;
 import org.jetbrains.annotations.Nullable;
-
-import java.util.List;
 
 /**
  * Factory for creating fiducial detectors which implement {@link FiducialDetector}.
@@ -206,26 +203,26 @@ public class FactoryFiducial {
 	 * Creates a new {@link ChessboardReedSolomonDetector}. This will detect chessboard patterns that have been
 	 * encoded with a marker ID and coordinates of every corner.
 	 *
-	 * @param config (Input) Configuration for how it will detect the markers
-	 * @param markers (Input) Configuration for what type of markers it can detect
+	 * @param configDetector Configuration for chessboard detector
+	 * @param configMarkers Configuration for what markers it should search for
 	 * @return New detector
 	 */
 	public static <T extends ImageGray<T>>
-	ChessboardReedSolomonDetector<T> chessboardBits( @Nullable ConfigChessboardBits config,
-													 List<GridShape> markers, Class<T> imageType ) {
-		if (config == null)
-			config = new ConfigChessboardBits();
+	ChessboardReedSolomonDetector<T> chessboardBits( @Nullable ConfigChessboardBits configDetector,
+													 ConfigChessboardBitsMarkers configMarkers, Class<T> imageType ) {
+		if (configDetector == null)
+			configDetector = new ConfigChessboardBits();
+		configDetector.checkValidity();
+		configMarkers.checkValidity();
 
 		// Set up the utils, which configures how the targets will be encoded
 		var utils = new ChessBitsUtils();
-		utils.setDataBorderFraction(config.dataBorderFraction);
-		utils.setDataBitWidthFraction(config.dataBitWidthFraction);
-		for (int i = 0; i < markers.size(); i++) {
-			utils.markers.add(new GridShape(markers.get(i)));
-		}
+		utils.setDataBorderFraction(configDetector.dataBorderFraction);
+		utils.setDataBitWidthFraction(configDetector.dataBitWidthFraction);
+		configMarkers.convertToGridList(utils.markers);
 		utils.fixate();
 
-		return new ChessboardReedSolomonDetector<>(utils, config.chessboard, imageType);
+		return new ChessboardReedSolomonDetector<>(utils, configDetector.chessboard, imageType);
 	}
 
 	/**

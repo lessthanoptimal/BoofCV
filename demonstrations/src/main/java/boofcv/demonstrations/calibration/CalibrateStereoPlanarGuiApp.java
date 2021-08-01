@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -20,7 +20,7 @@ package boofcv.demonstrations.calibration;
 
 import boofcv.abst.fiducial.calib.ConfigGridDimen;
 import boofcv.abst.geo.calibration.CalibrateStereoPlanar;
-import boofcv.abst.geo.calibration.DetectorFiducialCalibration;
+import boofcv.abst.geo.calibration.DetectSingleFiducialCalibration;
 import boofcv.alg.geo.PerspectiveOps;
 import boofcv.alg.geo.RectifyImageOps;
 import boofcv.alg.geo.calibration.CalibrationObservation;
@@ -53,7 +53,7 @@ public class CalibrateStereoPlanarGuiApp extends JPanel {
 
 	// computes calibration parameters
 	CalibrateStereoPlanar calibrator;
-	DetectorFiducialCalibration detector;
+	DetectSingleFiducialCalibration detector;
 	// displays results
 	StereoPlanarPanel gui = new StereoPlanarPanel();
 	// needed by ProcessThread for displaying its dialog
@@ -169,7 +169,7 @@ public class CalibrateStereoPlanarGuiApp extends JPanel {
 	 * @param leftImages Images taken by left camera.
 	 * @param rightImages Images taken by right camera.
 	 */
-	public void configure( DetectorFiducialCalibration detector,
+	public void configure( DetectSingleFiducialCalibration detector,
 						   int numRadial,
 						   boolean includeTangential,
 						   boolean assumeZeroSkew,
@@ -206,7 +206,7 @@ public class CalibrateStereoPlanarGuiApp extends JPanel {
 	}
 
 	public static void main( String[] args ) {
-		DetectorFiducialCalibration detector =
+		DetectSingleFiducialCalibration detector =
 				FactoryFiducialCalibration.chessboardX(null, new ConfigGridDimen(7, 5, 30));
 //				FactoryCalibrationTarget.squareGrid(null, new ConfigGridDimen(4, 3, 30, 30));
 

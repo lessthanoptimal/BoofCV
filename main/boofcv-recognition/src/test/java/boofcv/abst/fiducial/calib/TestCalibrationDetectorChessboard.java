@@ -18,7 +18,7 @@
 
 package boofcv.abst.fiducial.calib;
 
-import boofcv.abst.geo.calibration.DetectorFiducialCalibration;
+import boofcv.abst.geo.calibration.DetectSingleFiducialCalibration;
 import boofcv.factory.fiducial.FactoryFiducialCalibration;
 import boofcv.gui.RenderCalibrationTargetsGraphics2D;
 import boofcv.struct.image.GrayF32;
@@ -72,7 +72,7 @@ public class TestCalibrationDetectorChessboard extends GenericPlanarCalibrationD
 	}
 
 	@Override
-	public DetectorFiducialCalibration createDetector(ConfigGridDimen layout) {
+	public DetectSingleFiducialCalibration createDetector( ConfigGridDimen layout) {
 		return FactoryFiducialCalibration.chessboardX((ConfigChessboardX)null,layout);
 	}
 }

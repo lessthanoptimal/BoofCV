@@ -18,7 +18,7 @@
 
 package boofcv.abst.fiducial.calib;
 
-import boofcv.abst.geo.calibration.DetectorFiducialCalibration;
+import boofcv.abst.geo.calibration.DetectSingleFiducialCalibration;
 import boofcv.factory.fiducial.FactoryFiducialCalibration;
 import boofcv.io.UtilIO;
 import boofcv.io.image.ConvertBufferedImage;
@@ -47,11 +47,11 @@ public class BenchmarkCalibrationDetectors {
 	public static GrayF32 imageChess;
 	public static GrayF32 imageSquare;
 
-	DetectorFiducialCalibration chessboardB = FactoryFiducialCalibration.
+	DetectSingleFiducialCalibration chessboardB = FactoryFiducialCalibration.
 			chessboardB((ConfigChessboardBinary)null,new ConfigGridDimen(7, 5, 30));
-	DetectorFiducialCalibration chessboardX = FactoryFiducialCalibration.
+	DetectSingleFiducialCalibration chessboardX = FactoryFiducialCalibration.
 			chessboardX(null,new ConfigGridDimen(7, 5, 30));
-	DetectorFiducialCalibration squareGrid = FactoryFiducialCalibration.
+	DetectSingleFiducialCalibration squareGrid = FactoryFiducialCalibration.
 			squareGrid(new ConfigSquareGrid(),new ConfigGridDimen(4, 3, 30, 30));
 
 	@Setup public void setup() {
