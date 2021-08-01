@@ -19,6 +19,7 @@
 package boofcv.app.calib;
 
 import boofcv.abst.fiducial.calib.CalibrationPatterns;
+import boofcv.abst.fiducial.calib.ConfigChessboardBitsMarkers;
 import boofcv.abst.fiducial.calib.ConfigGridDimen;
 import boofcv.gui.StandardAlgConfigPanel;
 
@@ -26,7 +27,6 @@ import javax.swing.*;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 import java.awt.*;
-import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
 /**
@@ -43,7 +43,7 @@ public class CalibrationTargetPanel extends StandardAlgConfigPanel implements Ac
 	public CalibrationPatterns selected = CalibrationPatterns.CHESSBOARD;
 
 	public ConfigGridDimen configChessboard = new ConfigGridDimen(7, 5, 1);
-	public ConfigGridDimen configChessboardBits = new ConfigGridDimen(9, 7, 1);
+	public ConfigChessboardBitsMarkers configChessboardBits = ConfigChessboardBitsMarkers.singleShape(9, 7, 1, 1);
 	public ConfigGridDimen configSquare = new ConfigGridDimen(4, 3, 1, 1);
 	public ConfigGridDimen configCircle = new ConfigGridDimen(15, 10, 1, 1.5);
 	public ConfigGridDimen configCircleHex = new ConfigGridDimen(15, 15, 1, 1.5);
@@ -67,7 +67,7 @@ public class CalibrationTargetPanel extends StandardAlgConfigPanel implements Ac
 	}
 
 	public void updateParameters() {
-		ConfigGridDimen c = switch (selected) {
+		Object c = switch (selected) {
 			case CHESSBOARD -> configChessboard;
 			case CHESSBOARD_BITS -> configChessboardBits;
 			case SQUARE_GRID -> configSquare;
@@ -79,8 +79,8 @@ public class CalibrationTargetPanel extends StandardAlgConfigPanel implements Ac
 	}
 
 	@Override
-	public void actionPerformed( ActionEvent e ) {
-		if (e.getSource() == comboType) {
+	public void controlChanged( Object source ) {
+		if (source == comboType) {
 			selected = (CalibrationPatterns)comboType.getSelectedItem();
 			changeTargetPanel();
 			updateParameters();
@@ -88,10 +88,9 @@ public class CalibrationTargetPanel extends StandardAlgConfigPanel implements Ac
 	}
 
 	public void changeTargetPanel() {
-
 		JPanel p = switch (selected) {
 			case CHESSBOARD -> new ChessPanel();
-			case CHESSBOARD_BITS -> new ChessPanel();
+			case CHESSBOARD_BITS -> new ChessBitsPanel();
 			case SQUARE_GRID -> new SquareGridPanel();
 			case CIRCLE_GRID -> new CircleGridPanel();
 			case CIRCLE_HEXAGONAL -> new CircleHexPanel();
@@ -105,7 +104,6 @@ public class CalibrationTargetPanel extends StandardAlgConfigPanel implements Ac
 	}
 
 	private class ChessPanel extends StandardAlgConfigPanel implements ChangeListener {
-
 		JSpinner sRows, sCols, sWidth;
 
 		public ChessPanel() {
@@ -115,9 +113,9 @@ public class CalibrationTargetPanel extends StandardAlgConfigPanel implements Ac
 			sCols = spinner(configChessboard.numCols, 1, 1000, 1);
 			sWidth = spinner(configChessboard.shapeSize, 0, 1000000.0, 1);
 
-			addLabeled(sRows, "Rows");
-			addLabeled(sCols, "Cols");
-			addLabeled(sWidth, "Square Width");
+			addLabeled(sRows, "Rows", "Number of square rows");
+			addLabeled(sCols, "Cols", "Number of square columns");
+			addLabeled(sWidth, "Square Width", "How wide each square is");
 		}
 
 		@Override
@@ -128,6 +126,42 @@ public class CalibrationTargetPanel extends StandardAlgConfigPanel implements Ac
 				configChessboard.numCols = ((Number)sCols.getValue()).intValue();
 			} else if (e.getSource() == sWidth) {
 				configChessboard.shapeSize = ((Number)sWidth.getValue()).doubleValue();
+			}
+			updateParameters();
+		}
+	}
+
+	private class ChessBitsPanel extends StandardAlgConfigPanel implements ChangeListener {
+		JSpinner sRows, sCols, sWidth, sMarkers;
+
+		public ChessBitsPanel() {
+			setBorder(BorderFactory.createEmptyBorder());
+
+			ConfigChessboardBitsMarkers.MarkerShape shape = configChessboardBits.markerShapes.get(0);
+
+			sRows = spinner(shape.numRows, 1, 1000, 1);
+			sCols = spinner(shape.numCols, 1, 1000, 1);
+			sWidth = spinner(shape.squareSize, 0, 1000000.0, 1);
+			sMarkers = spinner(configChessboardBits.firstTargetDuplicated, 1, 1000, 1);
+
+			addLabeled(sRows, "Rows", "Number of square rows");
+			addLabeled(sCols, "Cols", "Number of square columns");
+			addLabeled(sWidth, "Square Width", "How wide each square is");
+			addLabeled(sMarkers, "Count", "Number of unique markers");
+		}
+
+		@Override
+		public void stateChanged( ChangeEvent e ) {
+			ConfigChessboardBitsMarkers.MarkerShape shape = configChessboardBits.markerShapes.get(0);
+
+			if (e.getSource() == sRows) {
+				shape.numRows = ((Number)sRows.getValue()).intValue();
+			} else if (e.getSource() == sCols) {
+				shape.numCols = ((Number)sCols.getValue()).intValue();
+			} else if (e.getSource() == sWidth) {
+				shape.squareSize = ((Number)sWidth.getValue()).doubleValue();
+			} else if (e.getSource() == sMarkers) {
+				configChessboardBits.firstTargetDuplicated = ((Number)sMarkers.getValue()).intValue();
 			}
 			updateParameters();
 		}
@@ -146,10 +180,10 @@ public class CalibrationTargetPanel extends StandardAlgConfigPanel implements Ac
 			sWidth = spinner(configSquare.shapeSize, 0, 1000000.0, 1);
 			sSpace = spinner(configSquare.shapeDistance, 0, 1000000.0, 1);
 
-			addLabeled(sRows, "Rows");
-			addLabeled(sCols, "Cols");
-			addLabeled(sWidth, "Square Width");
-			addLabeled(sSpace, "Space Width");
+			addLabeled(sRows, "Rows", "Number of square rows");
+			addLabeled(sCols, "Cols", "Number of square columns");
+			addLabeled(sWidth, "Square Width", "How wide each square is");
+			addLabeled(sSpace, "Space Width", "Space between squares");
 		}
 
 		@Override
@@ -236,6 +270,6 @@ public class CalibrationTargetPanel extends StandardAlgConfigPanel implements Ac
 	}
 
 	public interface Listener {
-		void calibrationParametersChanged( CalibrationPatterns type, ConfigGridDimen config );
+		void calibrationParametersChanged( CalibrationPatterns type, Object config );
 	}
 }

@@ -19,11 +19,15 @@
 package boofcv.app;
 
 import boofcv.abst.fiducial.calib.CalibrationPatterns;
+import boofcv.abst.fiducial.calib.ConfigChessboardBitsMarkers;
 import boofcv.abst.fiducial.calib.ConfigGridDimen;
+import boofcv.alg.fiducial.calib.chessbits.ChessBitsUtils;
+import boofcv.alg.fiducial.calib.chessbits.ChessboardReedSolomonGenerator;
 import boofcv.app.calib.CalibrationModelPanel;
 import boofcv.app.calib.CalibrationTargetPanel;
 import boofcv.factory.fiducial.FactoryFiducialCalibration;
 import boofcv.gui.BoofSwingUtil;
+import boofcv.gui.FiducialRenderEngineGraphics2D;
 import boofcv.gui.RenderCalibrationTargetsGraphics2D;
 import boofcv.gui.image.ImagePanel;
 import boofcv.gui.image.ScaleOptions;
@@ -244,22 +248,39 @@ public class CameraCalibrationGui extends JPanel
 	}
 
 	@Override
-	public void calibrationParametersChanged( CalibrationPatterns type, ConfigGridDimen config ) {
+	public void calibrationParametersChanged( CalibrationPatterns type, Object config ) {
+		if (type == CalibrationPatterns.CHESSBOARD_BITS) {
+			ConfigChessboardBitsMarkers c = (ConfigChessboardBitsMarkers)config;
+			FiducialRenderEngineGraphics2D render = new FiducialRenderEngineGraphics2D();
+			render.configure(20, 20,200, 200);
+
+			ChessBitsUtils utils = new ChessBitsUtils();
+			c.convertToGridList(utils.markers);
+			utils.fixate();
+
+			ChessboardReedSolomonGenerator generator = new ChessboardReedSolomonGenerator(utils);
+			generator.setRender(render);
+			renderingPanel.setImageUI(render.getImage());
+			return;
+		}
+
 		final RenderCalibrationTargetsGraphics2D renderer = new RenderCalibrationTargetsGraphics2D(20, 1);
 
 		if (type == CalibrationPatterns.CHESSBOARD) {
-			renderer.chessboard(config.numRows, config.numCols, 20);
-		} else if (type == CalibrationPatterns.CHESSBOARD) {
-			renderer.chessboard(config.numRows, config.numCols, 20);
+			ConfigGridDimen c = (ConfigGridDimen)config;
+			renderer.chessboard(c.numRows, c.numCols, 20);
 		} else if (type == CalibrationPatterns.SQUARE_GRID) {
-			double space = 20*config.shapeDistance/config.shapeSize;
-			renderer.squareGrid(config.numRows, config.numCols, 20, space);
+			ConfigGridDimen c = (ConfigGridDimen)config;
+			double space = 20*c.shapeDistance/c.shapeSize;
+			renderer.squareGrid(c.numRows, c.numCols, 20, space);
 		} else if (type == CalibrationPatterns.CIRCLE_GRID) {
-			double space = 10*config.shapeDistance/config.shapeSize;
-			renderer.circleRegular(config.numRows, config.numCols, 10, space);
+			ConfigGridDimen c = (ConfigGridDimen)config;
+			double space = 10*c.shapeDistance/c.shapeSize;
+			renderer.circleRegular(c.numRows, c.numCols, 10, space);
 		} else if (type == CalibrationPatterns.CIRCLE_HEXAGONAL) {
-			double space = 10*config.shapeDistance/config.shapeSize;
-			renderer.circleHex(config.numRows, config.numCols, 10, space);
+			ConfigGridDimen c = (ConfigGridDimen)config;
+			double space = 10*c.shapeDistance/c.shapeSize;
+			renderer.circleHex(c.numRows, c.numCols, 10, space);
 		}
 		renderingPanel.setImageUI(renderer.getBufferred());
 	}

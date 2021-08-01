@@ -19,10 +19,15 @@
 package boofcv.app;
 
 import boofcv.abst.fiducial.calib.CalibrationPatterns;
+import boofcv.abst.fiducial.calib.ConfigChessboardBitsMarkers;
 import boofcv.abst.fiducial.calib.ConfigGridDimen;
+import boofcv.alg.fiducial.calib.chessbits.ChessBitsUtils;
+import boofcv.alg.fiducial.calib.chessbits.ChessboardReedSolomonGenerator;
 import boofcv.app.calib.CalibrationTargetPanel;
+import boofcv.app.fiducials.CreateFiducialDocumentPDF;
 import boofcv.generate.Unit;
 import boofcv.gui.BoofSwingUtil;
+import boofcv.gui.FiducialRenderEngineGraphics2D;
 import boofcv.gui.RenderCalibrationTargetsGraphics2D;
 import boofcv.gui.image.ImagePanel;
 import boofcv.gui.image.ScaleOptions;
@@ -39,7 +44,7 @@ import java.awt.event.KeyEvent;
 import java.io.File;
 import java.io.IOException;
 
-import static boofcv.app.CreateCalibrationTarget.saveChessboardBitsToPdf;
+import static boofcv.app.CreateCalibrationTarget.chessboardBitsToPdf;
 import static boofcv.gui.StandardAlgConfigPanel.addLabeled;
 
 public class CreateCalibrationTargetGui extends JPanel
@@ -49,7 +54,7 @@ public class CreateCalibrationTargetGui extends JPanel
 	JComboBox<Unit> comboUnits = new JComboBox<>(Unit.values());
 
 	CalibrationPatterns selectedType;
-	ConfigGridDimen selectedCalib;
+	Object selectedCalib;
 
 	CalibrationTargetPanel controlsTarget = new CalibrationTargetPanel(this);
 	ImagePanel renderingPanel = new ImagePanel();
@@ -64,7 +69,7 @@ public class CreateCalibrationTargetGui extends JPanel
 
 		// set reasonable defaults
 		controlsTarget.configChessboard.shapeSize = 3;
-		controlsTarget.configChessboardBits.shapeSize = 3;
+		controlsTarget.configChessboardBits.markerShapes.get(0).squareSize = 3;
 		controlsTarget.configSquare.numRows = 5;
 		controlsTarget.configSquare.numCols = 4;
 		controlsTarget.configSquare.shapeSize = 3;
@@ -174,36 +179,39 @@ public class CreateCalibrationTargetGui extends JPanel
 		try {
 			switch (selectedType) {
 				case CHESSBOARD -> {
-					ConfigGridDimen config = selectedCalib;
+					ConfigGridDimen config = (ConfigGridDimen)selectedCalib;
 					CreateCalibrationTargetGenerator generator = new CreateCalibrationTargetGenerator(outputFile, paper,
 							config.numRows, config.numCols, units);
 					generator.sendToPrinter = sendToPrinter;
 					generator.chessboard((float)config.shapeSize);
 				}
-
 				case CHESSBOARD_BITS -> {
-					// TODO add number of markers to config
-					ConfigGridDimen config = selectedCalib;
-					saveChessboardBitsToPdf(outputFile, paper, units, config.numRows,
-							config.numCols, (float)config.shapeSize, 1);
+					ConfigChessboardBitsMarkers config = (ConfigChessboardBitsMarkers)selectedCalib;
+					ConfigChessboardBitsMarkers.MarkerShape shape = config.markerShapes.get(0);
+					CreateFiducialDocumentPDF doc = chessboardBitsToPdf(outputFile, paper, units, shape.numRows,
+							shape.numCols, (float)shape.squareSize, config.firstTargetDuplicated);
+					if (sendToPrinter) {
+						doc.sendToPrinter();
+					} else {
+						doc.saveToDisk();
+					}
 				}
-
 				case SQUARE_GRID -> {
-					ConfigGridDimen config = selectedCalib;
+					ConfigGridDimen config = (ConfigGridDimen)selectedCalib;
 					CreateCalibrationTargetGenerator generator = new CreateCalibrationTargetGenerator(outputFile, paper,
 							config.numRows, config.numCols, units);
 					generator.sendToPrinter = sendToPrinter;
 					generator.squareGrid((float)config.shapeSize, (float)config.shapeDistance);
 				}
 				case CIRCLE_GRID -> {
-					ConfigGridDimen config = selectedCalib;
+					ConfigGridDimen config = (ConfigGridDimen)selectedCalib;
 					CreateCalibrationTargetGenerator generator = new CreateCalibrationTargetGenerator(outputFile, paper,
 							config.numRows, config.numCols, units);
 					generator.sendToPrinter = sendToPrinter;
 					generator.circleGrid((float)config.shapeSize, (float)config.shapeDistance);
 				}
 				case CIRCLE_HEXAGONAL -> {
-					ConfigGridDimen config = selectedCalib;
+					ConfigGridDimen config = (ConfigGridDimen)selectedCalib;
 					CreateCalibrationTargetGenerator generator = new CreateCalibrationTargetGenerator(outputFile, paper,
 							config.numRows, config.numCols, units);
 					generator.sendToPrinter = sendToPrinter;
@@ -217,7 +225,7 @@ public class CreateCalibrationTargetGui extends JPanel
 	}
 
 	@Override
-	public void calibrationParametersChanged( CalibrationPatterns type, ConfigGridDimen _config ) {
+	public void calibrationParametersChanged( CalibrationPatterns type, Object _config ) {
 		this.selectedType = type;
 		this.selectedCalib = _config;
 
@@ -228,24 +236,51 @@ public class CreateCalibrationTargetGui extends JPanel
 		double paperWidth = paper.unit.convert(paper.width, units);
 		double paperHeight = paper.unit.convert(paper.height, units);
 
+		// TODO switch other calibration targets over to using the generic fiducial engine
+		if (selectedType == CalibrationPatterns.CHESSBOARD_BITS) {
+			ConfigChessboardBitsMarkers c = (ConfigChessboardBitsMarkers)selectedCalib;
+
+			ChessBitsUtils utils = new ChessBitsUtils();
+			c.convertToGridList(utils.markers);
+			utils.fixate();
+			ConfigChessboardBitsMarkers.MarkerShape shape = c.markerShapes.get(0);
+
+			double unitsToPixel = 400.0/paperWidth;
+			double paperWidthPixels = (int)(paperWidth*unitsToPixel);
+			double paperHeightPixels = (int)(paperHeight*unitsToPixel);
+			double squareSize = shape.squareSize*unitsToPixel;
+
+			// Center it in the page
+			int borderX = (int)(Math.max(0, paperWidthPixels-squareSize*(shape.numCols-1))/2);
+			int borderY = (int)(Math.max(0, paperHeightPixels-squareSize*(shape.numRows-1))/2);
+
+			// Render the marker. Adjust marker size so that when the border is added it will match the paper size
+			FiducialRenderEngineGraphics2D render = new FiducialRenderEngineGraphics2D();
+			render.configure(borderX, borderY,
+					(int)(paperWidth*unitsToPixel)-2*borderX, (int)(paperHeight*unitsToPixel)-2*borderY);
+
+			ChessboardReedSolomonGenerator generator = new ChessboardReedSolomonGenerator(utils);
+			generator.squareWidth = shape.squareSize*unitsToPixel;
+			generator.setRender(render);
+			generator.render(0);
+			renderingPanel.setImageUI(render.getImage());
+			return;
+		}
+
 		final RenderCalibrationTargetsGraphics2D renderer = new RenderCalibrationTargetsGraphics2D(-1, 400/paperWidth);
 		renderer.setPaperSize(paperWidth, paperHeight);
 
 		if (selectedType == CalibrationPatterns.CHESSBOARD) {
-			ConfigGridDimen config = selectedCalib;
+			ConfigGridDimen config = (ConfigGridDimen)selectedCalib;
 			renderer.chessboard(config.numRows, config.numCols, config.shapeSize);
-		} else if (selectedType == CalibrationPatterns.CHESSBOARD_BITS) {
-//			ConfigGridDimen config = selectedCalib;
-//			renderer.chessboard(config.numRows, config.numCols, config.shapeSize);
-			// TODO implement
 		} else if (selectedType == CalibrationPatterns.SQUARE_GRID) {
-			ConfigGridDimen config = selectedCalib;
+			ConfigGridDimen config = (ConfigGridDimen)selectedCalib;
 			renderer.squareGrid(config.numRows, config.numCols, config.shapeSize, config.shapeDistance);
 		} else if (selectedType == CalibrationPatterns.CIRCLE_GRID) {
-			ConfigGridDimen config = selectedCalib;
+			ConfigGridDimen config = (ConfigGridDimen)selectedCalib;
 			renderer.circleRegular(config.numRows, config.numCols, config.shapeSize, config.shapeDistance);
 		} else if (selectedType == CalibrationPatterns.CIRCLE_HEXAGONAL) {
-			ConfigGridDimen config = selectedCalib;
+			ConfigGridDimen config = (ConfigGridDimen)selectedCalib;
 			renderer.circleHex(config.numRows, config.numCols, config.shapeSize, config.shapeDistance);
 		}
 

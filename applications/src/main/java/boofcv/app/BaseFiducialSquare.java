@@ -26,7 +26,6 @@ import org.apache.commons.io.FilenameUtils;
 import org.kohsuke.args4j.CmdLineParser;
 import org.kohsuke.args4j.Option;
 
-import java.awt.print.PrinterException;
 import java.io.IOException;
 
 /**
@@ -116,15 +115,11 @@ public abstract class BaseFiducialSquare {
 			renderer.gridFill = gridFill;
 			renderer.drawGrid = drawGrid;
 			renderer.showInfo = !hideInfo;
-			try {
-				callRenderPdf(renderer);
-				if (sendToPrinter) {
-					renderer.sendToPrinter();
-				} else {
-					renderer.saveToDisk();
-				}
-			} catch (PrinterException e) {
-				throw new IOException(e);
+			callRenderPdf(renderer);
+			if (sendToPrinter) {
+				renderer.sendToPrinter();
+			} else {
+				renderer.saveToDisk();
 			}
 		} else {
 			CreateFiducialDocumentImage renderer = createRendererImage(fileName);
