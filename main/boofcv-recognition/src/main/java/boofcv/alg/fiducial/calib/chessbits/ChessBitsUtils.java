@@ -72,11 +72,11 @@ public class ChessBitsUtils {
 	/**
 	 * Adds a new marker to the list
 	 *
-	 * @param rows Number of rows in the chessboard pattern
-	 * @param cols Number of columns in thechessboard pattern
+	 * @param squareRows Number of square rows in the chessboard pattern
+	 * @param squareCols Number of square columns in the chessboard pattern
 	 */
-	public void addMarker( int rows, int cols ) {
-		markers.add(new GridShape(rows, cols));
+	public void addMarker( int squareRows, int squareCols ) {
+		markers.add(new GridShape(squareRows, squareCols));
 	}
 
 	/**

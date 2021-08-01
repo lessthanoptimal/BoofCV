@@ -18,39 +18,11 @@
 
 package boofcv.alg.fiducial.calib.chessbits;
 
-import boofcv.alg.drawing.FiducialImageEngine;
-import boofcv.gui.image.ShowImages;
-import boofcv.struct.GridShape;
-import boofcv.struct.image.GrayU8;
 import boofcv.testing.BoofStandardJUnit;
 import org.junit.jupiter.api.Test;
 
-import static org.junit.jupiter.api.Assertions.fail;
-
-/**
- * @author Peter Abeles
- */
 class TestChessboardReedSolomonGenerator extends BoofStandardJUnit {
-	@Test void implement() {
-		fail("Implement");
-	}
-
-	public static void main( String[] args ) {
-		var engine = new FiducialImageEngine();
-		engine.configure(10, 1200);
-		var utils = new ChessBitsUtils();
-		utils.markers.add( new GridShape(10, 12) );
-		utils.fixate();
-		var renderer = new ChessboardReedSolomonGenerator(utils);
-//		renderer.multiplier = ChessboardSolomonMarkerCodec.Multiplier.LEVEL_2;
-		renderer.render = engine;
-		renderer.squareWidth = 100;
-		renderer.render(0);
-
-		GrayU8 image = engine.getGray();
-
-//		GImageMiscOps.addGaussian(image, new Random(23), 4.0, 0.0, 255.0);
-
-		ShowImages.showBlocking(image, "Foo", 200_000);
+	@Test void intentionallyOmitted() {
+		// this is tested when the detector is tested
 	}
 }

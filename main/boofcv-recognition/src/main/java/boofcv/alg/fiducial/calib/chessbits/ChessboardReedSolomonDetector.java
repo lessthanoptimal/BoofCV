@@ -63,11 +63,9 @@ import static boofcv.alg.fiducial.calib.chessbits.ChessBitsUtils.rotateObserved;
  * @author Peter Abeles
  */
 public class ChessboardReedSolomonDetector<T extends ImageGray<T>> implements VerbosePrint {
-	// TODO Handle the case where two or more chessboard patterns get merged together but can be distinguished based on
-	//      encoded cells
+	// TODO use homography to select sample points so that perspective distortion is handled correctly. threshold
 	// TODO Weigh bit sample points based on distance from center?
 	// TODO Add back in the ability to encoded every N squares
-	// TODO use homography to select sample points so that perspective distortion is handled correctly. threshold
 
 	/** Number of times a side is sampled when determining binarization threshold */
 	final int NUM_SAMPLES_SIDE = 5; // number of samples along each side
@@ -330,7 +328,7 @@ public class ChessboardReedSolomonDetector<T extends ImageGray<T>> implements Ve
 		if (success && decoded.markerID >= utils.markers.size()) {
 			success = false;
 
-			// This is a rare event. Let's print it just incase something is wrong.
+			// This is a rare event. Let's print it just in case something is wrong.
 			if (verbose != null) {
 				verbose.println("Success decoding a cell, but markerID was invalid!");
 			}
@@ -588,7 +586,7 @@ public class ChessboardReedSolomonDetector<T extends ImageGray<T>> implements Ve
 	/**
 	 * Records a decoded cell and the location in the observed grid it was decoded at
 	 */
-	private static class CellReading {
+	static class CellReading {
 		/** Location of cell in the observed coordinate system */
 		public int row, col;
 		/** Number of times it needed to be rotated before decoded */
@@ -610,7 +608,7 @@ public class ChessboardReedSolomonDetector<T extends ImageGray<T>> implements Ve
 	/**
 	 * Transform from the arbitrary grid coordinate system into
 	 */
-	private static class Transform {
+	static class Transform {
 		/** Adjustment to grid coordinates after applying the rotation */
 		public int offsetRow, offsetCol;
 		/** Rotational difference between observed and encoded coordinate system */
@@ -619,6 +617,14 @@ public class ChessboardReedSolomonDetector<T extends ImageGray<T>> implements Ve
 		public int marker;
 		/** Number of encoded squares that agree with this transform */
 		public int votes;
+
+		public void setTo( int offsetRow, int offsetCol, int orientation, int marker, int votes ) {
+			this.offsetRow = offsetRow;
+			this.offsetCol = offsetCol;
+			this.orientation = orientation;
+			this.marker = marker;
+			this.votes = votes;
+		}
 
 		public void reset() {
 			offsetRow = 0;
