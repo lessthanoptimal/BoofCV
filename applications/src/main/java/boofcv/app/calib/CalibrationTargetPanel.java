@@ -18,6 +18,7 @@
 
 package boofcv.app.calib;
 
+import boofcv.abst.fiducial.calib.CalibrationPatterns;
 import boofcv.abst.fiducial.calib.ConfigGridDimen;
 import boofcv.gui.StandardAlgConfigPanel;
 
@@ -34,14 +35,15 @@ import java.awt.event.ActionListener;
  * @author Peter Abeles
  */
 public class CalibrationTargetPanel extends StandardAlgConfigPanel implements ActionListener {
-	JComboBox<TargetType> comboType;
+	JComboBox<CalibrationPatterns> comboType;
 	JPanel panelTarget = new JPanel();
 
 	Listener listener;
 
-	public TargetType selected = TargetType.CHESSBOARD;
+	public CalibrationPatterns selected = CalibrationPatterns.CHESSBOARD;
 
 	public ConfigGridDimen configChessboard = new ConfigGridDimen(7, 5, 1);
+	public ConfigGridDimen configChessboardBits = new ConfigGridDimen(9, 7, 1);
 	public ConfigGridDimen configSquare = new ConfigGridDimen(4, 3, 1, 1);
 	public ConfigGridDimen configCircle = new ConfigGridDimen(15, 10, 1, 1.5);
 	public ConfigGridDimen configCircleHex = new ConfigGridDimen(15, 15, 1, 1.5);
@@ -50,7 +52,7 @@ public class CalibrationTargetPanel extends StandardAlgConfigPanel implements Ac
 		setBorder(BorderFactory.createEmptyBorder());
 
 		this.listener = listener;
-		comboType = new JComboBox<>(TargetType.values());
+		comboType = new JComboBox<>(CalibrationPatterns.values());
 		comboType.addActionListener(this);
 		comboType.setMaximumSize(comboType.getPreferredSize());
 
@@ -67,9 +69,10 @@ public class CalibrationTargetPanel extends StandardAlgConfigPanel implements Ac
 	public void updateParameters() {
 		ConfigGridDimen c = switch (selected) {
 			case CHESSBOARD -> configChessboard;
+			case CHESSBOARD_BITS -> configChessboardBits;
 			case SQUARE_GRID -> configSquare;
 			case CIRCLE_GRID -> configCircle;
-			case CIRCLE_HEX -> configCircleHex;
+			case CIRCLE_HEXAGONAL -> configCircleHex;
 			default -> throw new RuntimeException("Unknown");
 		};
 		listener.calibrationParametersChanged(selected, c);
@@ -78,7 +81,7 @@ public class CalibrationTargetPanel extends StandardAlgConfigPanel implements Ac
 	@Override
 	public void actionPerformed( ActionEvent e ) {
 		if (e.getSource() == comboType) {
-			selected = (TargetType)comboType.getSelectedItem();
+			selected = (CalibrationPatterns)comboType.getSelectedItem();
 			changeTargetPanel();
 			updateParameters();
 		}
@@ -88,9 +91,10 @@ public class CalibrationTargetPanel extends StandardAlgConfigPanel implements Ac
 
 		JPanel p = switch (selected) {
 			case CHESSBOARD -> new ChessPanel();
+			case CHESSBOARD_BITS -> new ChessPanel();
 			case SQUARE_GRID -> new SquareGridPanel();
 			case CIRCLE_GRID -> new CircleGridPanel();
-			case CIRCLE_HEX -> new CircleHexPanel();
+			case CIRCLE_HEXAGONAL -> new CircleHexPanel();
 			default -> throw new RuntimeException("Unknown");
 		};
 
@@ -231,14 +235,7 @@ public class CalibrationTargetPanel extends StandardAlgConfigPanel implements Ac
 		}
 	}
 
-	public enum TargetType {
-		CHESSBOARD,
-		SQUARE_GRID,
-		CIRCLE_HEX,
-		CIRCLE_GRID
-	}
-
 	public interface Listener {
-		void calibrationParametersChanged( TargetType type, ConfigGridDimen config );
+		void calibrationParametersChanged( CalibrationPatterns type, ConfigGridDimen config );
 	}
 }

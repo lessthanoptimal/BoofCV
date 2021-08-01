@@ -18,6 +18,7 @@
 
 package boofcv.app;
 
+import boofcv.abst.fiducial.calib.CalibrationPatterns;
 import boofcv.abst.fiducial.calib.ConfigGridDimen;
 import boofcv.app.calib.CalibrationTargetPanel;
 import boofcv.generate.Unit;
@@ -38,6 +39,7 @@ import java.awt.event.KeyEvent;
 import java.io.File;
 import java.io.IOException;
 
+import static boofcv.app.CreateCalibrationTarget.saveChessboardBitsToPdf;
 import static boofcv.gui.StandardAlgConfigPanel.addLabeled;
 
 public class CreateCalibrationTargetGui extends JPanel
@@ -46,7 +48,7 @@ public class CreateCalibrationTargetGui extends JPanel
 	JComboBox<PaperSize> comboPaper = new JComboBox<>(PaperSize.values().toArray(new PaperSize[0]));
 	JComboBox<Unit> comboUnits = new JComboBox<>(Unit.values());
 
-	CalibrationTargetPanel.TargetType selectedType;
+	CalibrationPatterns selectedType;
 	ConfigGridDimen selectedCalib;
 
 	CalibrationTargetPanel controlsTarget = new CalibrationTargetPanel(this);
@@ -62,6 +64,7 @@ public class CreateCalibrationTargetGui extends JPanel
 
 		// set reasonable defaults
 		controlsTarget.configChessboard.shapeSize = 3;
+		controlsTarget.configChessboardBits.shapeSize = 3;
 		controlsTarget.configSquare.numRows = 5;
 		controlsTarget.configSquare.numCols = 4;
 		controlsTarget.configSquare.shapeSize = 3;
@@ -177,6 +180,14 @@ public class CreateCalibrationTargetGui extends JPanel
 					generator.sendToPrinter = sendToPrinter;
 					generator.chessboard((float)config.shapeSize);
 				}
+
+				case CHESSBOARD_BITS -> {
+					// TODO add number of markers to config
+					ConfigGridDimen config = selectedCalib;
+					saveChessboardBitsToPdf(outputFile, paper, units, config.numRows,
+							config.numCols, (float)config.shapeSize, 1);
+				}
+
 				case SQUARE_GRID -> {
 					ConfigGridDimen config = selectedCalib;
 					CreateCalibrationTargetGenerator generator = new CreateCalibrationTargetGenerator(outputFile, paper,
@@ -191,7 +202,7 @@ public class CreateCalibrationTargetGui extends JPanel
 					generator.sendToPrinter = sendToPrinter;
 					generator.circleGrid((float)config.shapeSize, (float)config.shapeDistance);
 				}
-				case CIRCLE_HEX -> {
+				case CIRCLE_HEXAGONAL -> {
 					ConfigGridDimen config = selectedCalib;
 					CreateCalibrationTargetGenerator generator = new CreateCalibrationTargetGenerator(outputFile, paper,
 							config.numRows, config.numCols, units);
@@ -206,7 +217,7 @@ public class CreateCalibrationTargetGui extends JPanel
 	}
 
 	@Override
-	public void calibrationParametersChanged( CalibrationTargetPanel.TargetType type, ConfigGridDimen _config ) {
+	public void calibrationParametersChanged( CalibrationPatterns type, ConfigGridDimen _config ) {
 		this.selectedType = type;
 		this.selectedCalib = _config;
 
@@ -220,16 +231,20 @@ public class CreateCalibrationTargetGui extends JPanel
 		final RenderCalibrationTargetsGraphics2D renderer = new RenderCalibrationTargetsGraphics2D(-1, 400/paperWidth);
 		renderer.setPaperSize(paperWidth, paperHeight);
 
-		if (selectedType == CalibrationTargetPanel.TargetType.CHESSBOARD) {
+		if (selectedType == CalibrationPatterns.CHESSBOARD) {
 			ConfigGridDimen config = selectedCalib;
 			renderer.chessboard(config.numRows, config.numCols, config.shapeSize);
-		} else if (selectedType == CalibrationTargetPanel.TargetType.SQUARE_GRID) {
+		} else if (selectedType == CalibrationPatterns.CHESSBOARD_BITS) {
+//			ConfigGridDimen config = selectedCalib;
+//			renderer.chessboard(config.numRows, config.numCols, config.shapeSize);
+			// TODO implement
+		} else if (selectedType == CalibrationPatterns.SQUARE_GRID) {
 			ConfigGridDimen config = selectedCalib;
 			renderer.squareGrid(config.numRows, config.numCols, config.shapeSize, config.shapeDistance);
-		} else if (selectedType == CalibrationTargetPanel.TargetType.CIRCLE_GRID) {
+		} else if (selectedType == CalibrationPatterns.CIRCLE_GRID) {
 			ConfigGridDimen config = selectedCalib;
 			renderer.circleRegular(config.numRows, config.numCols, config.shapeSize, config.shapeDistance);
-		} else if (selectedType == CalibrationTargetPanel.TargetType.CIRCLE_HEX) {
+		} else if (selectedType == CalibrationPatterns.CIRCLE_HEXAGONAL) {
 			ConfigGridDimen config = selectedCalib;
 			renderer.circleHex(config.numRows, config.numCols, config.shapeSize, config.shapeDistance);
 		}

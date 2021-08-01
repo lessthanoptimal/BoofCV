@@ -89,6 +89,11 @@ public class ChessBitsUtils {
 		bitSampleCount = pixelsPerBit*2 + 1;
 	}
 
+	public void checkFixate() {
+		if (bitSampleCount == 0)
+			throw new RuntimeException("BUG you forgot to call fixate()");
+	}
+
 	/**
 	 * Returns the number of cells in the largest marker
 	 */

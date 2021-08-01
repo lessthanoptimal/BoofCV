@@ -23,6 +23,8 @@ import boofcv.alg.fiducial.qrcode.PackedBits8;
 import boofcv.struct.GridShape;
 import georegression.struct.point.Point2D_F64;
 import georegression.struct.shapes.Rectangle2D_F64;
+import lombok.Getter;
+import lombok.Setter;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -43,13 +45,13 @@ public class ChessboardReedSolomonGenerator {
 	// Data can be embedded in the white or black squares inside the chessboard pattern. When put inside of the black
 	// squares it reduces the effective range of the chessboard detection algorithm by a significant amount.
 
-	// How wide a square is in the chessboard
-	double squareWidth;
+	/** How wide a square is in the chessboard */
+	public @Setter @Getter double squareWidth;
 
 	final ChessBitsUtils utils;
 
 	// used to draw the fiducial
-	protected FiducialRenderEngine render;
+	@Setter protected FiducialRenderEngine render;
 	PackedBits8 packetBits = new PackedBits8();
 
 	// Workspace
@@ -60,6 +62,7 @@ public class ChessboardReedSolomonGenerator {
 
 	public ChessboardReedSolomonGenerator( ChessBitsUtils utils ) {
 		this.utils = utils;
+		utils.checkFixate();
 	}
 
 	public void render( int marker ) {

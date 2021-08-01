@@ -18,6 +18,7 @@
 
 package boofcv.app;
 
+import boofcv.abst.fiducial.calib.CalibrationPatterns;
 import boofcv.abst.fiducial.calib.ConfigGridDimen;
 import boofcv.app.calib.CalibrationModelPanel;
 import boofcv.app.calib.CalibrationTargetPanel;
@@ -222,7 +223,7 @@ public class CameraCalibrationGui extends JPanel
 			case CHESSBOARD -> app.detector = FactoryFiducialCalibration.chessboardX(null, controlsTarget.configChessboard);
 			case SQUARE_GRID -> app.detector = FactoryFiducialCalibration.squareGrid(null, controlsTarget.configSquare);
 			case CIRCLE_GRID -> app.detector = FactoryFiducialCalibration.circleRegularGrid(null, controlsTarget.configCircle);
-			case CIRCLE_HEX -> app.detector = FactoryFiducialCalibration.circleHexagonalGrid(null, controlsTarget.configCircleHex);
+			case CIRCLE_HEXAGONAL -> app.detector = FactoryFiducialCalibration.circleHexagonalGrid(null, controlsTarget.configCircleHex);
 		}
 
 		app.modeType = controlsModel.selected;
@@ -241,18 +242,20 @@ public class CameraCalibrationGui extends JPanel
 	}
 
 	@Override
-	public void calibrationParametersChanged( CalibrationTargetPanel.TargetType type, ConfigGridDimen config ) {
+	public void calibrationParametersChanged( CalibrationPatterns type, ConfigGridDimen config ) {
 		final RenderCalibrationTargetsGraphics2D renderer = new RenderCalibrationTargetsGraphics2D(20, 1);
 
-		if (type == CalibrationTargetPanel.TargetType.CHESSBOARD) {
+		if (type == CalibrationPatterns.CHESSBOARD) {
 			renderer.chessboard(config.numRows, config.numCols, 20);
-		} else if (type == CalibrationTargetPanel.TargetType.SQUARE_GRID) {
+		} else if (type == CalibrationPatterns.CHESSBOARD) {
+			renderer.chessboard(config.numRows, config.numCols, 20);
+		} else if (type == CalibrationPatterns.SQUARE_GRID) {
 			double space = 20*config.shapeDistance/config.shapeSize;
 			renderer.squareGrid(config.numRows, config.numCols, 20, space);
-		} else if (type == CalibrationTargetPanel.TargetType.CIRCLE_GRID) {
+		} else if (type == CalibrationPatterns.CIRCLE_GRID) {
 			double space = 10*config.shapeDistance/config.shapeSize;
 			renderer.circleRegular(config.numRows, config.numCols, 10, space);
-		} else if (type == CalibrationTargetPanel.TargetType.CIRCLE_HEX) {
+		} else if (type == CalibrationPatterns.CIRCLE_HEXAGONAL) {
 			double space = 10*config.shapeDistance/config.shapeSize;
 			renderer.circleHex(config.numRows, config.numCols, 10, space);
 		}

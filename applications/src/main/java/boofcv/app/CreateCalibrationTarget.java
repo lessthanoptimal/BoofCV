@@ -19,6 +19,8 @@
 package boofcv.app;
 
 import boofcv.abst.fiducial.calib.CalibrationPatterns;
+import boofcv.alg.fiducial.calib.chessbits.ChessBitsUtils;
+import boofcv.app.calib.CreateChessboardBitsDocumentPDF;
 import boofcv.generate.LengthUnit;
 import boofcv.generate.Unit;
 import org.kohsuke.args4j.CmdLineException;
@@ -71,6 +73,9 @@ public class CreateCalibrationTarget {
 
 	@Option(name = "--GUI", usage = "Ignore all other command line arguments and switch to GUI mode")
 	private boolean guiMode = false;
+
+	@Option(name = "--NumMarkers", usage = "If the target type supports multiple markers, how many should it create")
+	int numMarkers = 1;
 
 	private static void printHelpExit( CmdLineParser parser ) {
 		parser.getProperties().withUsageWidth(120);
@@ -154,13 +159,14 @@ public class CreateCalibrationTarget {
 			failExit("Must specify a shape width more than zero");
 
 		switch (type) {
+			// TODO sanity check rows and cols to make sure there are enough of them
 			case BINARY_GRID, SQUARE_GRID -> {
 				if (centerDistance > 0)
 					failExit("Don't specify center distance for square type targets, use shape space instead");
 				if (shapeSpace <= 0)
 					shapeSpace = shapeWidth;
 			}
-			case CHESSBOARD -> {
+			case CHESSBOARD, CHESSBOARD_BITS -> {
 				if (centerDistance > 0)
 					failExit("Don't specify center distance for chessboard targets");
 				if (shapeSpace > 0)
@@ -185,10 +191,6 @@ public class CreateCalibrationTarget {
 	public void run() throws IOException {
 		String suffix = ".pdf";
 		System.out.println("Saving to " + fileName + suffix);
-		CreateCalibrationTargetGenerator generator =
-				new CreateCalibrationTargetGenerator(fileName + suffix, paperSize, rows, columns, unit);
-
-		generator.setShowInfo(!disablePrintInfo);
 
 		System.out.println("   paper     : " + paperSize);
 		System.out.println("   type      : " + type);
@@ -196,6 +198,15 @@ public class CreateCalibrationTarget {
 		System.out.println("   columns   : " + columns);
 		System.out.println("   info      : " + !disablePrintInfo);
 
+		if (type == CalibrationPatterns.CHESSBOARD_BITS) {
+			saveChessboardBitsToPdf(fileName + suffix, paperSize, unit, rows, columns, shapeWidth, numMarkers);
+			return;
+		}
+
+		CreateCalibrationTargetGenerator generator =
+				new CreateCalibrationTargetGenerator(fileName + suffix, paperSize, rows, columns, unit);
+
+		generator.setShowInfo(!disablePrintInfo);
 
 		switch (type) {
 			case CHESSBOARD -> generator.chessboard(shapeWidth);
@@ -205,6 +216,24 @@ public class CreateCalibrationTarget {
 			case CIRCLE_GRID -> generator.circleGrid(shapeWidth, centerDistance);
 			default -> throw new RuntimeException("Unknown target type");
 		}
+	}
+
+	public static void saveChessboardBitsToPdf( String outputFile, PaperSize paper, Unit units,
+												int rows, int columns, float squareWidth,
+												int numMarkers) throws IOException {
+		ChessBitsUtils utils = new ChessBitsUtils();
+		for (int markerIdx = 0; markerIdx < numMarkers; markerIdx++) {
+			utils.addMarker(rows, columns);
+		}
+		utils.fixate();
+
+		var doc = new CreateChessboardBitsDocumentPDF(outputFile, paper, units);
+		doc.markerWidth = (columns-1)*squareWidth;
+		doc.markerHeight = (rows-1)*squareWidth;
+		doc.spaceBetween = squareWidth/2.0f;
+		doc.squareWidth = squareWidth;
+		doc.render(utils);
+		doc.saveToDisk();
 	}
 
 	public static void main( String[] args ) {
