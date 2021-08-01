@@ -28,16 +28,15 @@ import boofcv.struct.Configuration;
 /**
  * Calibration parameters for an hexagonal grid of circle calibration target.
  *
- * @see DetectCircleHexagonalGrid
- *
  * @author Peter Abeles
+ * @see DetectCircleHexagonalGrid
  */
 public class ConfigCircleHexagonalGrid implements Configuration {
 
 	/**
 	 * Configuration for thresholding the image
 	 */
-	public ConfigThreshold thresholding = ConfigThreshold.local(ThresholdType.BLOCK_MEAN,ConfigLength.relative(0.02,5));
+	public ConfigThreshold thresholding = ConfigThreshold.local(ThresholdType.BLOCK_MEAN, ConfigLength.relative(0.02, 5));
 	/**
 	 * Configuration for the ellipse detector
 	 */

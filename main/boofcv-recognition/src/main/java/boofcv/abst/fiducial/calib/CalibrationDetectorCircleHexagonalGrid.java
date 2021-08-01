@@ -45,10 +45,9 @@ import java.util.List;
 /**
  * Calibration implementation of circle hexagonal grid fiducial.
  *
+ * @author Peter Abeles
  * @see DetectCircleHexagonalGrid
  * @see KeyPointsCircleHexagonalGrid
- *
- * @author Peter Abeles
  */
 public class CalibrationDetectorCircleHexagonalGrid implements DetectorFiducialCalibration {
 
@@ -66,48 +65,49 @@ public class CalibrationDetectorCircleHexagonalGrid implements DetectorFiducialC
 
 	/**
 	 * Configures the detector based on the pass in configuration class
+	 *
 	 * @param configDet Configuration for detector and target description
 	 */
-	public CalibrationDetectorCircleHexagonalGrid(ConfigCircleHexagonalGrid configDet, ConfigGridDimen configGrid ) {
+	public CalibrationDetectorCircleHexagonalGrid( ConfigCircleHexagonalGrid configDet, ConfigGridDimen configGrid ) {
 
 		InputToBinary<GrayF32> inputToBinary =
-				FactoryThresholdBinary.threshold(configDet.thresholding,GrayF32.class);
+				FactoryThresholdBinary.threshold(configDet.thresholding, GrayF32.class);
 
 		BinaryEllipseDetector<GrayF32> ellipseDetector =
-				FactoryShapeDetector.ellipse(configDet.ellipse,GrayF32.class);
+				FactoryShapeDetector.ellipse(configDet.ellipse, GrayF32.class);
 
 		spaceToDiameter = (configGrid.shapeDistance/configGrid.shapeSize);
 		double spaceToRadius = 2.0*spaceToDiameter;
 
-		double factor = 2*Math.sin(Math.PI/3)+0.25;
+		double factor = 2*Math.sin(Math.PI/3) + 0.25;
 
 		EllipsesIntoClusters e2c = new EllipsesIntoClusters(
-				spaceToRadius*factor,configDet.ellipseSizeSimilarity,configDet.edgeIntensitySimilarityTolerance);
+				spaceToRadius*factor, configDet.ellipseSizeSimilarity, configDet.edgeIntensitySimilarityTolerance);
 
-		detector = new DetectCircleHexagonalGrid<>(configGrid.numRows,configGrid.numCols,inputToBinary,
-				ellipseDetector,e2c);
+		detector = new DetectCircleHexagonalGrid<>(configGrid.numRows, configGrid.numCols, inputToBinary,
+				ellipseDetector, e2c);
 
 
-		layout = createLayout(detector.getRows(),detector.getColumns(), configGrid.shapeDistance);
+		layout = createLayout(detector.getRows(), detector.getColumns(), configGrid.shapeDistance);
 	}
 
 	@Override
-	public boolean process(GrayF32 input) {
-		results = new CalibrationObservation(input.width,input.height);
+	public boolean process( GrayF32 input ) {
+		results = new CalibrationObservation(input.width, input.height);
 		detector.process(input);
 
 		List<Grid> grids = detector.getGrids();
 
-		if( grids.size() != 1 )
+		if (grids.size() != 1)
 			return false;
 
-		if( !keypoint.process(grids.get(0)) )
+		if (!keypoint.process(grids.get(0)))
 			return false;
 
 		DogArray<PointIndex2D_F64> foundPixels = keypoint.getKeyPoints();
 
 		for (int i = 0; i < foundPixels.size; i++) {
-			results.add(foundPixels.get(i).p,i);
+			results.add(foundPixels.get(i).p, i);
 		}
 		return true;
 	}
@@ -123,42 +123,43 @@ public class CalibrationDetectorCircleHexagonalGrid implements DetectorFiducialC
 	}
 
 	@Override
-	public void setLensDistortion(LensDistortionNarrowFOV distortion, int width, int height) {
-		if( distortion == null )
-			detector.getEllipseDetector().setLensDistortion(null,null);
+	public void setLensDistortion( LensDistortionNarrowFOV distortion, int width, int height ) {
+		if (distortion == null)
+			detector.getEllipseDetector().setLensDistortion(null, null);
 		else {
 			Point2Transform2_F32 pointDistToUndist = distortion.undistort_F32(true, true);
 			Point2Transform2_F32 pointUndistToDist = distortion.distort_F32(true, true);
 			PixelTransform<Point2D_F32> distToUndist = new PointToPixelTransform_F32(pointDistToUndist);
 			PixelTransform<Point2D_F32> undistToDist = new PointToPixelTransform_F32(pointUndistToDist);
 
-			detector.getEllipseDetector().setLensDistortion(distToUndist,undistToDist);
+			detector.getEllipseDetector().setLensDistortion(distToUndist, undistToDist);
 		}
 	}
 
 	/**
 	 * Specifies the physical location of each point on the 2D calibration plane. The fiducial is centered on the
 	 * coordinate system
+	 *
 	 * @param numRows Number of rows
 	 * @param numCols Number of columns
 	 * @param centerDistance Space between each circle's center along x and y axis
 	 * @return 2D locations
 	 */
-	public static List<Point2D_F64> createLayout( int numRows , int numCols , double centerDistance ) {
+	public static List<Point2D_F64> createLayout( int numRows, int numCols, double centerDistance ) {
 
 		List<Point2D_F64> ret = new ArrayList<>();
 
 		double spaceX = centerDistance/2.0;
 		double spaceY = centerDistance*Math.sin(UtilAngle.radian(60));
 
-		double width = (numCols-1)*spaceX;
-		double height = (numRows-1)*spaceY;
+		double width = (numCols - 1)*spaceX;
+		double height = (numRows - 1)*spaceY;
 
 		for (int row = 0; row < numRows; row++) {
 			double y = row*spaceY - height/2;
 			for (int col = row%2; col < numCols; col += 2) {
 				double x = col*spaceX - width/2;
-				ret.add( new Point2D_F64(x,y));
+				ret.add(new Point2D_F64(x, y));
 			}
 		}
 

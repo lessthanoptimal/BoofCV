@@ -122,22 +122,6 @@ public class CalibrationFiducialDetector<T extends ImageGray<T>>
 		init(detector, width, imageType);
 	}
 
-	/**
-	 * Configure it to detect square-grid style targets
-	 */
-	public CalibrationFiducialDetector( ConfigSquareGridBinary config,
-										Class<T> imageType ) {
-		DetectorFiducialCalibration detector = FactoryFiducialCalibration.binaryGrid(config);
-		int squareCols = config.numCols;
-		int squareRows = config.numRows;
-		sideWidth = squareCols*config.squareWidth + (squareCols - 1)*config.spaceWidth;
-		sideHeight = squareRows*config.squareWidth + (squareRows - 1)*config.spaceWidth;
-
-		double width = (sideWidth + sideHeight)/2.0;
-
-		init(detector, width, imageType);
-	}
-
 	public CalibrationFiducialDetector( @Nullable ConfigCircleHexagonalGrid configDet,
 										ConfigGridDimen configGrid,
 										Class<T> imageType ) {

@@ -23,7 +23,6 @@ import boofcv.abst.fiducial.FiducialStability;
 import boofcv.abst.fiducial.SquareImage_to_FiducialDetector;
 import boofcv.abst.fiducial.Uchiya_to_FiducialDetector;
 import boofcv.abst.fiducial.calib.ConfigGridDimen;
-import boofcv.abst.fiducial.calib.ConfigSquareGridBinary;
 import boofcv.alg.distort.brown.LensDistortionBrown;
 import boofcv.factory.fiducial.ConfigFiducialBinary;
 import boofcv.factory.fiducial.ConfigFiducialImage;
@@ -61,9 +60,6 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.image.BufferedImage;
 import java.io.File;
-import java.io.IOException;
-import java.io.UncheckedIOException;
-import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -79,7 +75,6 @@ public class FiducialTrackerDemoApp<I extends ImageGray<I>> extends Demonstratio
 	private static final String RANDOM_DOTS = "Random Dots";
 	private static final String CALIB_CHESS = "Chessboard";
 	private static final String CALIB_SQUARE_GRID = "Square Grid";
-	private static final String CALIB_SQUARE_BINARY_GRID = "Square Binary Grid";
 	private static final String CALIB_CIRCLE_HEXAGONAL_GRID = "Circle Hexagonal Grid";
 	private static final String CALIB_CIRCLE_REGULAR_GRID = "Circle Regular Grid";
 
@@ -254,17 +249,6 @@ public class FiducialTrackerDemoApp<I extends ImageGray<I>> extends Demonstratio
 			break;
 			case CALIB_SQUARE_GRID: {
 				detector = FactoryFiducial.calibSquareGrid(null, new ConfigGridDimen(4, 3, 0.03, 0.03), imageClass);
-			}
-			break;
-			case CALIB_SQUARE_BINARY_GRID: {
-				File configFile = new File(path, "description_4x3_3x3_4cm_2cm.txt");
-				try {
-					ConfigSquareGridBinary config =
-							ConfigSquareGridBinary.parseSimple(Files.newBufferedReader(configFile.toPath()));
-					detector = FactoryFiducial.calibSquareGridBinary(config, imageClass);
-				} catch (IOException e) {
-					throw new UncheckedIOException(e);
-				}
 			}
 			break;
 			case CALIB_CIRCLE_HEXAGONAL_GRID: {

@@ -221,9 +221,11 @@ public class CameraCalibrationGui extends JPanel
 	private void createDetector() {
 		switch (controlsTarget.selected) {
 			case CHESSBOARD -> app.detector = FactoryFiducialCalibration.chessboardX(null, controlsTarget.configChessboard);
+			case CHESSBOARD_BITS -> throw new RuntimeException("Support!");
 			case SQUARE_GRID -> app.detector = FactoryFiducialCalibration.squareGrid(null, controlsTarget.configSquare);
 			case CIRCLE_GRID -> app.detector = FactoryFiducialCalibration.circleRegularGrid(null, controlsTarget.configCircle);
 			case CIRCLE_HEXAGONAL -> app.detector = FactoryFiducialCalibration.circleHexagonalGrid(null, controlsTarget.configCircleHex);
+			default -> throw new RuntimeException("Not supported yet. "+controlsTarget.selected);
 		}
 
 		app.modeType = controlsModel.selected;

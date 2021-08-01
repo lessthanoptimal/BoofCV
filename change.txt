@@ -6,6 +6,14 @@ Date Format: year/month/day
 Date    : 2021
 Version : 0.39
 
+- Calibration
+  * TODO updated high level API to support multiple targets
+  * Added new Chessboard Bits target type for multi camera calibration
+    TODO finalize binary bit pattern
+    TODO integrate into demo
+    TODO separate example?
+    TODO regression images and tests
+  * Removed Square Grid Binary target type as it was never reliable enough to flush out entirely and never used
 TODO New fisheye model
 TODO datta2009
 TODO Generic calibration target for multi cameras, QR Code for first version

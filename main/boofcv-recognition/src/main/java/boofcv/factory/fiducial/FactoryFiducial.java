@@ -23,6 +23,8 @@ import boofcv.abst.fiducial.calib.*;
 import boofcv.abst.filter.binary.InputToBinary;
 import boofcv.alg.feature.describe.llah.LlahHasher;
 import boofcv.alg.feature.describe.llah.LlahOperations;
+import boofcv.alg.fiducial.calib.chessbits.ChessBitsUtils;
+import boofcv.alg.fiducial.calib.chessbits.ChessboardReedSolomonDetector;
 import boofcv.alg.fiducial.dots.UchiyaMarkerImageTracker;
 import boofcv.alg.fiducial.dots.UchiyaMarkerTracker;
 import boofcv.alg.fiducial.qrcode.QrCodePositionPatternDetector;
@@ -37,12 +39,15 @@ import boofcv.factory.filter.binary.ThresholdType;
 import boofcv.factory.geo.ConfigHomography;
 import boofcv.factory.geo.FactoryMultiViewRobust;
 import boofcv.factory.shape.FactoryShapeDetector;
+import boofcv.struct.GridShape;
 import boofcv.struct.geo.AssociatedPair;
 import boofcv.struct.image.ImageGray;
 import boofcv.struct.image.ImageType;
 import georegression.struct.homography.Homography2D_F64;
 import org.ddogleg.fitting.modelset.ransac.Ransac;
 import org.jetbrains.annotations.Nullable;
+
+import java.util.List;
 
 /**
  * Factory for creating fiducial detectors which implement {@link FiducialDetector}.
@@ -54,27 +59,26 @@ public class FactoryFiducial {
 	/**
 	 * Detector for square binary based fiducials.
 	 *
-	 * @see DetectFiducialSquareBinary DetectFiducialSquareBinary for a description of this fiducial type.
-	 *
 	 * @param configFiducial Description of the fiducial. Can't be null.
 	 * @param configThreshold Threshold for binary image. null for default.
 	 * @param imageType Type of image it's processing
 	 * @return FiducialDetector
+	 * @see DetectFiducialSquareBinary DetectFiducialSquareBinary for a description of this fiducial type.
 	 */
 	public static <T extends ImageGray<T>>
 	SquareBinary_to_FiducialDetector<T> squareBinary( ConfigFiducialBinary configFiducial,
 													  @Nullable ConfigThreshold configThreshold,
 													  Class<T> imageType ) {
 
-		if( configThreshold == null ) {
-			configThreshold = ConfigThreshold.local(ThresholdType.LOCAL_MEAN,21);
+		if (configThreshold == null) {
+			configThreshold = ConfigThreshold.local(ThresholdType.LOCAL_MEAN, 21);
 		}
 
 		configFiducial.checkValidity();
 
 		final InputToBinary<T> binary = FactoryThresholdBinary.threshold(configThreshold, imageType);
 		final DetectPolygonBinaryGrayRefine<T> squareDetector = FactoryShapeDetector.
-				polygon(configFiducial.squareDetector,imageType);
+				polygon(configFiducial.squareDetector, imageType);
 
 		final DetectFiducialSquareBinary<T> alg =
 				new DetectFiducialSquareBinary<>(configFiducial.gridWidth,
@@ -90,24 +94,22 @@ public class FactoryFiducial {
 	 * <p>For this fiducial to work images need to be added to it. Which is why {@link SquareImage_to_FiducialDetector}
 	 * is returned instead of the more generic {@link FiducialDetector}.</p>
 	 *
-	 * @see DetectFiducialSquareImage DetectFiducialSquareImage for a description of this fiducial type.
-	 *
 	 * @param configFiducial Description of the fiducial. null for default.
 	 * @param configThreshold Threshold for binary image. null for default.
 	 * @param imageType Type of image it's processing
 	 * @return FiducialDetector
+	 * @see DetectFiducialSquareImage DetectFiducialSquareImage for a description of this fiducial type.
 	 */
-	public static  <T extends ImageGray<T>>
+	public static <T extends ImageGray<T>>
 	SquareImage_to_FiducialDetector<T> squareImage( @Nullable ConfigFiducialImage configFiducial,
 													@Nullable ConfigThreshold configThreshold,
-													Class<T> imageType )
-	{
-		if( configFiducial == null ) {
+													Class<T> imageType ) {
+		if (configFiducial == null) {
 			configFiducial = new ConfigFiducialImage();
 		}
 
-		if( configThreshold == null ) {
-			configThreshold = ConfigThreshold.local(ThresholdType.LOCAL_MEAN,21);
+		if (configThreshold == null) {
+			configThreshold = ConfigThreshold.local(ThresholdType.LOCAL_MEAN, 21);
 		}
 
 		configFiducial.squareDetector.detector.clockwise = false;
@@ -131,8 +133,8 @@ public class FactoryFiducial {
 	 * @return FiducialDetector
 	 */
 	public static <T extends ImageGray<T>>
-	CalibrationFiducialDetector<T> calibChessboardB(@Nullable ConfigChessboardBinary config,
-													ConfigGridDimen dimen, Class<T> imageType) {
+	CalibrationFiducialDetector<T> calibChessboardB( @Nullable ConfigChessboardBinary config,
+													 ConfigGridDimen dimen, Class<T> imageType ) {
 		return new CalibrationFiducialDetector<>(config, dimen, imageType);
 	}
 
@@ -145,9 +147,9 @@ public class FactoryFiducial {
 	 * @return FiducialDetector
 	 */
 	public static <T extends ImageGray<T>>
-	CalibrationFiducialDetector<T> calibChessboardX(@Nullable ConfigChessboardX config,
-													ConfigGridDimen dimen,
-													Class<T> imageType) {
+	CalibrationFiducialDetector<T> calibChessboardX( @Nullable ConfigChessboardX config,
+													 ConfigGridDimen dimen,
+													 Class<T> imageType ) {
 		return new CalibrationFiducialDetector<>(config, dimen, imageType);
 	}
 
@@ -161,24 +163,19 @@ public class FactoryFiducial {
 	 */
 	public static <T extends ImageGray<T>>
 	CalibrationFiducialDetector<T> calibSquareGrid( @Nullable ConfigSquareGrid config,
-													ConfigGridDimen configDimen, Class<T> imageType) {
+													ConfigGridDimen configDimen, Class<T> imageType ) {
 		return new CalibrationFiducialDetector<>(config, configDimen, imageType);
 	}
 
 	public static <T extends ImageGray<T>>
-	CalibrationFiducialDetector<T> calibSquareGridBinary( ConfigSquareGridBinary config, Class<T> imageType) {
-		return new CalibrationFiducialDetector<>(config, imageType);
-	}
-
-	public static <T extends ImageGray<T>>
 	CalibrationFiducialDetector<T> calibCircleHexagonalGrid( @Nullable ConfigCircleHexagonalGrid config,
-															 ConfigGridDimen configDimen, Class<T> imageType) {
+															 ConfigGridDimen configDimen, Class<T> imageType ) {
 		return new CalibrationFiducialDetector<>(config, configDimen, imageType);
 	}
 
 	public static <T extends ImageGray<T>>
 	CalibrationFiducialDetector<T> calibCircleRegularGrid( @Nullable ConfigCircleRegularGrid config,
-														   ConfigGridDimen configDimen, Class<T> imageType) {
+														   ConfigGridDimen configDimen, Class<T> imageType ) {
 		return new CalibrationFiducialDetector<>(config, configDimen, imageType);
 	}
 
@@ -190,45 +187,65 @@ public class FactoryFiducial {
 	 * @return the detector
 	 */
 	public static <T extends ImageGray<T>>
-	QrCodePreciseDetector<T> qrcode(ConfigQrCode config, Class<T> imageType) {
-		if( config == null )
+	QrCodePreciseDetector<T> qrcode( ConfigQrCode config, Class<T> imageType ) {
+		if (config == null)
 			config = new ConfigQrCode();
 
 		config.checkValidity();
 
-		InputToBinary<T> inputToBinary = FactoryThresholdBinary.threshold(config.threshold,imageType);
+		InputToBinary<T> inputToBinary = FactoryThresholdBinary.threshold(config.threshold, imageType);
 
 		DetectPolygonBinaryGrayRefine<T> squareDetector = FactoryShapeDetector.polygon(config.polygon, imageType);
 		QrCodePositionPatternDetector<T> detectPositionPatterns =
-				new QrCodePositionPatternDetector<>(squareDetector,config.versionMaximum);
+				new QrCodePositionPatternDetector<>(squareDetector, config.versionMaximum);
 
-		return new QrCodePreciseDetector<>(inputToBinary,detectPositionPatterns, config.forceEncoding,false, imageType);
+		return new QrCodePreciseDetector<>(inputToBinary, detectPositionPatterns, config.forceEncoding, false, imageType);
+	}
+
+	/**
+	 * Creates a new {@link ChessboardReedSolomonDetector}. This will detect chessboard patterns that have been
+	 * encoded with a marker ID and coordinates of every corner.
+	 *
+	 * @param config (Input) Configuration for how it will detect the markers
+	 * @param markers (Input) Configuration for what type of markers it can detect
+	 * @return New detector
+	 */
+	public static <T extends ImageGray<T>>
+	ChessboardReedSolomonDetector<T> chessboardBits( @Nullable ConfigChessboardBits config,
+													 List<GridShape> markers, Class<T> imageType ) {
+		if (config == null)
+			config = new ConfigChessboardBits();
+
+		// Set up the utils, which configures how the targets will be encoded
+		var utils = new ChessBitsUtils();
+		utils.setDataBorderFraction(config.dataBorderFraction);
+		utils.setDataBitWidthFraction(config.dataBitWidthFraction);
+		for (int i = 0; i < markers.size(); i++) {
+			utils.markers.add(new GridShape(markers.get(i)));
+		}
+		utils.fixate();
+
+		return new ChessboardReedSolomonDetector<>(utils, config.chessboard, imageType);
 	}
 
 	/**
 	 * QR Code but with the ability to estimate it's 3D pose using PnP. Implements {@link FiducialDetector}.
-	 *
-	 * @param config
-	 * @param imageType
-	 * @param <T>
-	 * @return
 	 */
 	public static <T extends ImageGray<T>>
-	QrCodeDetectorPnP<T> qrcode3D(ConfigQrCode config, Class<T> imageType) {
-		return new QrCodeDetectorPnP<>(qrcode(config,imageType));
+	QrCodeDetectorPnP<T> qrcode3D( ConfigQrCode config, Class<T> imageType ) {
+		return new QrCodeDetectorPnP<>(qrcode(config, imageType));
 	}
 
 	/**
 	 * Creates detector for random dot markers using Uchiya Marker approach.
 	 *
-	 * @see UchiyaMarkerImageTracker
-	 *
 	 * @param config Specifies the configuration. If null then default is used
 	 * @param imageType Type of input gray scale image
 	 * @return The fiducial detector
+	 * @see UchiyaMarkerImageTracker
 	 */
 	public static <T extends ImageGray<T>>
-	Uchiya_to_FiducialDetector<T> randomDots(ConfigUchiyaMarker config , Class<T> imageType ) {
+	Uchiya_to_FiducialDetector<T> randomDots( ConfigUchiyaMarker config, Class<T> imageType ) {
 		config.checkValidity();
 
 		var ellipseDetector = new BinaryEllipseDetectorPixel(config.contourRule);
@@ -242,25 +259,22 @@ public class FactoryFiducial {
 				config.checkEdge.numSampleContour,
 				config.checkEdge.minimumEdgeIntensity, imageType);
 
-		InputToBinary<T> inputToBinary = FactoryThresholdBinary.threshold(config.threshold,imageType);
+		InputToBinary<T> inputToBinary = FactoryThresholdBinary.threshold(config.threshold, imageType);
 
 		ConfigLlah llah = config.llah;
 
-		LlahHasher hasher;
-		switch( config.llah.hashType ) {
-			case AFFINE: hasher = new LlahHasher.Affine(llah.quantizationK, llah.hashTableSize); break;
-			case CROSS_RATIO: hasher = new LlahHasher.CrossRatio(llah.quantizationK, llah.hashTableSize); break;
-			default: throw new IllegalArgumentException("Unknown hash type "+config.llah.hashType);
-		}
+		LlahHasher hasher = switch (config.llah.hashType) {
+			case AFFINE -> new LlahHasher.Affine(llah.quantizationK, llah.hashTableSize);
+			case CROSS_RATIO -> new LlahHasher.CrossRatio(llah.quantizationK, llah.hashTableSize);
+		};
 
-		LlahOperations ops = new LlahOperations(config.llah.numberOfNeighborsN, config.llah.sizeOfCombinationM,hasher);
+		LlahOperations ops = new LlahOperations(config.llah.numberOfNeighborsN, config.llah.sizeOfCombinationM, hasher);
 		Ransac<Homography2D_F64, AssociatedPair> ransac =
 				FactoryMultiViewRobust.homographyRansac(new ConfigHomography(false), config.ransac);
-		UchiyaMarkerTracker uchiya = new UchiyaMarkerTracker(ops,ransac);
+		UchiyaMarkerTracker uchiya = new UchiyaMarkerTracker(ops, ransac);
 
-		UchiyaMarkerImageTracker<T> tracker = new UchiyaMarkerImageTracker<>(inputToBinary,ellipseDetector,check,uchiya);
+		UchiyaMarkerImageTracker<T> tracker = new UchiyaMarkerImageTracker<>(inputToBinary, ellipseDetector, check, uchiya);
 
 		return new Uchiya_to_FiducialDetector<T>(tracker, config.markerWidth, config.markerHeight, ImageType.single(imageType));
 	}
-
 }
