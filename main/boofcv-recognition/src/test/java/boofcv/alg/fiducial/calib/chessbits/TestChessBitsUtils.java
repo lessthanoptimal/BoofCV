@@ -157,30 +157,6 @@ public class TestChessBitsUtils extends BoofStandardJUnit {
 	}
 
 	/**
-	 * Change the coordinate system's orientation and see if the (0,0) is as expected
-	 */
-	@Test void rotateObserved() {
-		var found = new GridCoordinate();
-		int rows = 5;
-		int cols = 6;
-
-		int row = 0;
-		int col = 0;
-
-		ChessBitsUtils.rotateObserved(rows, cols, row, col, 0, found);
-		assertTrue(found.equals(row, col));
-
-		ChessBitsUtils.rotateObserved(rows, cols, row, col, 1, found);
-		assertTrue(found.equals(cols - 1 - col, row));
-
-		ChessBitsUtils.rotateObserved(rows, cols, row, col, 2, found);
-		assertTrue(found.equals(rows - 1 - row, cols - 1 - col));
-
-		ChessBitsUtils.rotateObserved(rows, cols, row, col, 3, found);
-		assertTrue(found.equals(col, rows - 1 - row));
-	}
-
-	/**
 	 * Test using hand computed solutions
 	 */
 	@Test void encodedSquaresInMarker() {
@@ -189,8 +165,8 @@ public class TestChessBitsUtils extends BoofStandardJUnit {
 		alg.addMarker(5, 6);
 		alg.addMarker(4, 5);
 
-		assertEquals(6, alg.countEncodedSquaresInMarker(0));
-		assertEquals(8, alg.countEncodedSquaresInMarker(1));
-		assertEquals(7, alg.countEncodedSquaresInMarker(2));
+		assertEquals(4, alg.countEncodedSquaresInMarker(0));
+		assertEquals(6, alg.countEncodedSquaresInMarker(1));
+		assertEquals(3, alg.countEncodedSquaresInMarker(2));
 	}
 }
