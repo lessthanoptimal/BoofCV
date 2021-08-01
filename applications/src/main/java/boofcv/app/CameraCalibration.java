@@ -20,7 +20,7 @@ package boofcv.app;
 
 import boofcv.abst.fiducial.calib.ConfigGridDimen;
 import boofcv.abst.geo.calibration.CalibrateMonoPlanar;
-import boofcv.abst.geo.calibration.DetectorFiducialCalibration;
+import boofcv.abst.geo.calibration.DetectSingleFiducialCalibration;
 import boofcv.app.calib.AssistedCalibration;
 import boofcv.app.calib.AssistedCalibrationGui;
 import boofcv.app.calib.ComputeGeometryScore;
@@ -63,7 +63,7 @@ public class CameraCalibration extends BaseStandardInputApp {
 
 	protected String inputPattern;
 	protected String outputFilePath = "intrinsic.yaml";
-	protected DetectorFiducialCalibration detector;
+	protected DetectSingleFiducialCalibration detector;
 	protected boolean zeroSkew = true;
 	protected int numRadial = 2;
 	protected boolean tangential = false;

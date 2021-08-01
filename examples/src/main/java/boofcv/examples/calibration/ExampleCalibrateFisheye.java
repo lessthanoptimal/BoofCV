@@ -20,7 +20,7 @@ package boofcv.examples.calibration;
 
 import boofcv.abst.fiducial.calib.ConfigGridDimen;
 import boofcv.abst.geo.calibration.CalibrateMonoPlanar;
-import boofcv.abst.geo.calibration.DetectorFiducialCalibration;
+import boofcv.abst.geo.calibration.DetectSingleFiducialCalibration;
 import boofcv.factory.fiducial.FactoryFiducialCalibration;
 import boofcv.io.UtilIO;
 import boofcv.io.calibration.CalibrationIO;
@@ -44,7 +44,7 @@ import java.util.List;
  */
 public class ExampleCalibrateFisheye {
 	public static void main( String[] args ) {
-		DetectorFiducialCalibration detector;
+		DetectSingleFiducialCalibration detector;
 		List<String> images;
 
 		// Circle based calibration targets not not recommended because the sever lens distortion will change

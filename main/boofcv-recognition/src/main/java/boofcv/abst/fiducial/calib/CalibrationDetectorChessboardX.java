@@ -18,7 +18,7 @@
 
 package boofcv.abst.fiducial.calib;
 
-import boofcv.abst.geo.calibration.DetectorFiducialCalibration;
+import boofcv.abst.geo.calibration.DetectSingleFiducialCalibration;
 import boofcv.alg.distort.LensDistortionNarrowFOV;
 import boofcv.alg.feature.detect.chess.DetectChessboardCornersXPyramid;
 import boofcv.alg.fiducial.calib.chess.ChessboardCornerClusterFinder;
@@ -41,7 +41,7 @@ import java.util.List;
  *
  * @author Peter Abeles
  */
-public class CalibrationDetectorChessboardX implements DetectorFiducialCalibration {
+public class CalibrationDetectorChessboardX implements DetectSingleFiducialCalibration {
 
 	@Getter int cornerRows, cornerCols;
 

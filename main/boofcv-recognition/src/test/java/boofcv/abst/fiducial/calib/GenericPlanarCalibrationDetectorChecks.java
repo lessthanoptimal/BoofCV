@@ -18,7 +18,7 @@
 
 package boofcv.abst.fiducial.calib;
 
-import boofcv.abst.geo.calibration.DetectorFiducialCalibration;
+import boofcv.abst.geo.calibration.DetectSingleFiducialCalibration;
 import boofcv.alg.geo.calibration.CalibrationObservation;
 import boofcv.gui.feature.VisualizeFeatures;
 import boofcv.gui.image.ShowImages;
@@ -110,7 +110,7 @@ public abstract class GenericPlanarCalibrationDetectorChecks extends BoofStandar
 									   GrayF32 image,
 									   List<Point2D_F64> points2D );
 
-	public abstract DetectorFiducialCalibration createDetector( ConfigGridDimen layout );
+	public abstract DetectSingleFiducialCalibration createDetector( ConfigGridDimen layout );
 
 	/**
 	 * See if it can detect targets distorted by fisheye lens. Entire target is always seen
@@ -123,7 +123,7 @@ public abstract class GenericPlanarCalibrationDetectorChecks extends BoofStandar
 		List<Point2D_F64> locations2D = new ArrayList<>();
 		GrayF32 pattern = new GrayF32(1, 1);
 		for (int i = 0; i < targetConfigs.size(); i++) {
-			DetectorFiducialCalibration detector = createDetector(targetConfigs.get(i));
+			DetectSingleFiducialCalibration detector = createDetector(targetConfigs.get(i));
 			renderTarget(targetConfigs.get(i), simulatedTargetWidth, pattern, locations2D);
 
 			simulator.resetScene();
@@ -140,7 +140,7 @@ public abstract class GenericPlanarCalibrationDetectorChecks extends BoofStandar
 		assertTrue(failedToDetect <= fisheyeAllowedFails);
 	}
 
-	private void checkRenderedResults( DetectorFiducialCalibration detector,
+	private void checkRenderedResults( DetectSingleFiducialCalibration detector,
 									   SimulatePlanarWorld simulator,
 									   List<Point2D_F64> locations2D ) {
 //		System.out.println("checkRendered");
@@ -235,7 +235,7 @@ public abstract class GenericPlanarCalibrationDetectorChecks extends BoofStandar
 		for (int i = 0; i < targetConfigs.size(); i++) {
 //			System.out.println("*---------- Configuration "+i);
 			failedToDetect = 0;
-			DetectorFiducialCalibration detector = createDetector(targetConfigs.get(i));
+			DetectSingleFiducialCalibration detector = createDetector(targetConfigs.get(i));
 			renderTarget(targetConfigs.get(i), simulatedTargetWidth, pattern, locations2D);
 
 			simulator.resetScene();
@@ -301,7 +301,7 @@ public abstract class GenericPlanarCalibrationDetectorChecks extends BoofStandar
 	 */
 	@Test void checkDetectionsNonnull() {
 		for (ConfigGridDimen layout : targetConfigs) {
-			DetectorFiducialCalibration detector = createDetector(layout);
+			DetectSingleFiducialCalibration detector = createDetector(layout);
 
 			detector.process(new GrayF32(300, 400));
 
@@ -314,7 +314,7 @@ public abstract class GenericPlanarCalibrationDetectorChecks extends BoofStandar
 	 * First call something was detected, second call nothing was detected. it should return an empty list
 	 */
 	@Test void checkDetectionsResetOnFailure() {
-		DetectorFiducialCalibration detector = createDetector(targetConfigs.get(0));
+		DetectSingleFiducialCalibration detector = createDetector(targetConfigs.get(0));
 
 		GrayF32 original = renderEasy(targetConfigs.get(0), null);
 
@@ -360,7 +360,7 @@ public abstract class GenericPlanarCalibrationDetectorChecks extends BoofStandar
 	 */
 	@Test void dataNotRecycled() {
 		for (ConfigGridDimen layout : targetConfigs) {
-			DetectorFiducialCalibration detector = createDetector(layout);
+			DetectSingleFiducialCalibration detector = createDetector(layout);
 
 			GrayF32 original = renderEasy(layout, null);
 			assertTrue(detector.process(original));
@@ -387,7 +387,7 @@ public abstract class GenericPlanarCalibrationDetectorChecks extends BoofStandar
 	 */
 	@Test void checkPointIndexIncreasingOrder() {
 		for (ConfigGridDimen layout : targetConfigs) {
-			DetectorFiducialCalibration detector = createDetector(layout);
+			DetectSingleFiducialCalibration detector = createDetector(layout);
 
 			GrayF32 original = renderEasy(layout, null);
 			assertTrue(detector.process(original));

@@ -20,7 +20,7 @@ package boofcv.examples.calibration;
 
 import boofcv.abst.fiducial.calib.ConfigGridDimen;
 import boofcv.abst.geo.calibration.CalibrateStereoPlanar;
-import boofcv.abst.geo.calibration.DetectorFiducialCalibration;
+import boofcv.abst.geo.calibration.DetectSingleFiducialCalibration;
 import boofcv.alg.geo.calibration.CalibrationObservation;
 import boofcv.factory.fiducial.FactoryFiducialCalibration;
 import boofcv.io.UtilIO;
@@ -54,7 +54,7 @@ import java.util.List;
 public class ExampleCalibrateStereo {
 
 	// Detects the target and calibration point inside the target
-	DetectorFiducialCalibration detector;
+	DetectSingleFiducialCalibration detector;
 
 	// List of calibration images
 	List<String> left;

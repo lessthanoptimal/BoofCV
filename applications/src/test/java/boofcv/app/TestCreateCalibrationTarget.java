@@ -22,7 +22,7 @@ import boofcv.abst.fiducial.calib.CalibrationDetectorChessboardX;
 import boofcv.abst.fiducial.calib.CalibrationDetectorCircleHexagonalGrid;
 import boofcv.abst.fiducial.calib.CalibrationDetectorSquareGrid;
 import boofcv.abst.fiducial.calib.ConfigGridDimen;
-import boofcv.abst.geo.calibration.DetectorFiducialCalibration;
+import boofcv.abst.geo.calibration.DetectSingleFiducialCalibration;
 import boofcv.factory.fiducial.FactoryFiducialCalibration;
 import boofcv.io.image.ConvertBufferedImage;
 import boofcv.struct.image.GrayF32;
@@ -98,7 +98,7 @@ public class TestCreateCalibrationTarget extends CommonFiducialPdfChecks {
 		GrayF32 gray = new GrayF32(image.getWidth(), image.getHeight());
 		ConvertBufferedImage.convertFrom(image, gray);
 
-		DetectorFiducialCalibration detector =
+		DetectSingleFiducialCalibration detector =
 				FactoryFiducialCalibration.circleRegularGrid(null, new ConfigGridDimen(8, 6, 2, 3));
 
 		assertTrue(detector.process(gray));

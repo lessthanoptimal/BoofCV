@@ -20,7 +20,7 @@ package boofcv.demonstrations.calibration;
 
 import boofcv.abst.fiducial.calib.ConfigGridDimen;
 import boofcv.abst.geo.calibration.CalibrateMonoPlanar;
-import boofcv.abst.geo.calibration.DetectorFiducialCalibration;
+import boofcv.abst.geo.calibration.DetectSingleFiducialCalibration;
 import boofcv.factory.fiducial.FactoryFiducialCalibration;
 import boofcv.gui.calibration.FisheyePlanarPanel;
 import boofcv.io.MediaManager;
@@ -49,7 +49,7 @@ public class CalibrateFisheyePlanarGuiApp extends JPanel {
 
 	// computes calibration parameters
 	CalibrateMonoPlanar calibrator;
-	DetectorFiducialCalibration detector;
+	DetectSingleFiducialCalibration detector;
 	// displays results
 	FisheyePlanarPanel gui = new FisheyePlanarPanel();
 	// needed by ProcessThread for displaying its dialog
@@ -66,7 +66,7 @@ public class CalibrateFisheyePlanarGuiApp extends JPanel {
 		add(gui, BorderLayout.CENTER);
 	}
 
-	public CalibrateMonoPlanar configure( DetectorFiducialCalibration detector,
+	public CalibrateMonoPlanar configure( DetectSingleFiducialCalibration detector,
 										  List<String> images ) {
 		this.detector = detector;
 		if (images.size() == 0)
@@ -153,7 +153,7 @@ public class CalibrateFisheyePlanarGuiApp extends JPanel {
 	}
 
 	public static void main( String[] args ) {
-		DetectorFiducialCalibration detector =
+		DetectSingleFiducialCalibration detector =
 //				FactoryFiducialCalibration.squareGrid(null,new ConfigGridDimen(8, 8, 0.5, 7.0 / 18.0));
 //				FactoryFiducialCalibration.squareGrid(null,new ConfigGridDimen(4,3,30,30));
 				FactoryFiducialCalibration.chessboardX(null, new ConfigGridDimen(7, 5, 30));

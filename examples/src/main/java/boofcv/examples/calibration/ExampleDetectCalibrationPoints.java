@@ -19,7 +19,7 @@
 package boofcv.examples.calibration;
 
 import boofcv.abst.fiducial.calib.ConfigGridDimen;
-import boofcv.abst.geo.calibration.DetectorFiducialCalibration;
+import boofcv.abst.geo.calibration.DetectSingleFiducialCalibration;
 import boofcv.alg.geo.calibration.CalibrationObservation;
 import boofcv.factory.fiducial.FactoryFiducialCalibration;
 import boofcv.gui.feature.VisualizeFeatures;
@@ -53,7 +53,7 @@ public class ExampleDetectCalibrationPoints {
 		GrayF32 input = ConvertBufferedImage.convertFrom(orig,(GrayF32)null);
 
 		// To select different types of detectors add or remove comments below
-		DetectorFiducialCalibration detector;
+		DetectSingleFiducialCalibration detector;
 
 		// For chessboard targets, tune RADIUS parameter for your images
 //		detector = FactoryFiducialCalibration.squareGrid(null, new ConfigGridDimen(4, 3, 30, 30));

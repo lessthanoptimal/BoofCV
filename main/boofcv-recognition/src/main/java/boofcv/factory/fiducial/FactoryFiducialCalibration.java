@@ -20,9 +20,9 @@ package boofcv.factory.fiducial;
 
 import boofcv.abst.fiducial.calib.*;
 import boofcv.alg.fiducial.calib.chess.DetectChessboardBinaryPattern;
+import boofcv.alg.fiducial.calib.chessbits.ChessboardReedSolomonDetector;
+import boofcv.struct.image.GrayF32;
 import org.jetbrains.annotations.Nullable;
-
-import java.util.List;
 
 /**
  * Creates detectors of calibration targets. These detectors return found key points in the image and
@@ -85,17 +85,28 @@ public class FactoryFiducialCalibration {
 	 * Chessboard detector which searches for x-corners. Very robust but is about 2x to 3x slower on large images
 	 * than the binary method. Comparable speed on smaller images.
 	 *
-	 * @param config Configuration for chessboard detector
+	 * @param configDetector Configuration for chessboard detector
+	 * @param configMarkers Configuration for what markers it should search for
 	 * @return Square grid target detector.
 	 * @see CalibrationDetectorChessboardX
 	 */
-	public static CalibrationDetectorChessboardX chessboardBits( @Nullable ConfigChessboardBits config,
-																 List<ConfigGridDimen> markers ) {
-		if (config == null)
-			config = new ConfigChessboardBits();
-		config.checkValidity();
+	public static CalibrationDetectorMultiChessboardBits chessboardBits( @Nullable ConfigChessboardBits configDetector,
+																		 ConfigChessboardBitsMarkers configMarkers ) {
+		ChessboardReedSolomonDetector<GrayF32> detector = FactoryFiducial.chessboardBits(
+				configDetector, configMarkers, GrayF32.class);
 
-		throw new RuntimeException("Not supported yet");
+		// Figure out the length of a square
+		double squareLength = configMarkers.markerShapes.get(0).squareSize;
+
+		// Sanity check to make sure the current limitations are meet
+		for (int i = 1; i < configMarkers.markerShapes.size(); i++) {
+			if (squareLength != configMarkers.markerShapes.get(i).squareSize) {
+				throw new IllegalArgumentException(
+						"Make a feature request for markers with different sizes. Not supported yet.");
+			}
+		}
+
+		return new CalibrationDetectorMultiChessboardBits(detector, squareLength);
 	}
 
 	/**

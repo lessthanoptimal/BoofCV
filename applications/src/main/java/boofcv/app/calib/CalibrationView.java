@@ -22,7 +22,7 @@ import boofcv.abst.fiducial.calib.CalibrationDetectorChessboardX;
 import boofcv.abst.fiducial.calib.CalibrationDetectorCircleHexagonalGrid;
 import boofcv.abst.fiducial.calib.CalibrationDetectorCircleRegularGrid;
 import boofcv.abst.fiducial.calib.CalibrationDetectorSquareGrid;
-import boofcv.abst.geo.calibration.DetectorFiducialCalibration;
+import boofcv.abst.geo.calibration.DetectSingleFiducialCalibration;
 import boofcv.alg.geo.calibration.CalibrationObservation;
 import boofcv.struct.geo.PointIndex2D_F64;
 import georegression.fitting.polygon.FitPolygon2D_F64;
@@ -44,7 +44,7 @@ public interface CalibrationView {
 	 * Intialize by providing it a reference to the detector. This is then used to determine the appearance
 	 * of the target
 	 */
-	void initialize( DetectorFiducialCalibration detector );
+	void initialize( DetectSingleFiducialCalibration detector );
 
 	/**
 	 * Get the sidesCollision for collision detection with points
@@ -67,7 +67,7 @@ public interface CalibrationView {
 		int pointRows, pointCols;
 
 		@Override
-		public void initialize( DetectorFiducialCalibration detector ) {
+		public void initialize( DetectSingleFiducialCalibration detector ) {
 			CalibrationDetectorChessboardX chessboard = (CalibrationDetectorChessboardX)detector;
 			this.numRows = chessboard.getCornerRows() + 1;
 			this.numCols = chessboard.getCornerCols() + 1;
@@ -106,7 +106,7 @@ public interface CalibrationView {
 		int pointRows, pointCols;
 
 		@Override
-		public void initialize( DetectorFiducialCalibration detector ) {
+		public void initialize( DetectSingleFiducialCalibration detector ) {
 			CalibrationDetectorSquareGrid target = (CalibrationDetectorSquareGrid)detector;
 			pointRows = target.getPointRows();
 			pointCols = target.getPointColumns();
@@ -149,7 +149,7 @@ public interface CalibrationView {
 		int[] indexes;
 
 		@Override
-		public void initialize( DetectorFiducialCalibration detector ) {
+		public void initialize( DetectSingleFiducialCalibration detector ) {
 			CalibrationDetectorCircleHexagonalGrid target = (CalibrationDetectorCircleHexagonalGrid)detector;
 			gridRows = target.getRows();
 			gridCols = target.getColumns();
@@ -234,7 +234,7 @@ public interface CalibrationView {
 		int[] indexes;
 
 		@Override
-		public void initialize( DetectorFiducialCalibration detector ) {
+		public void initialize( DetectSingleFiducialCalibration detector ) {
 			CalibrationDetectorCircleRegularGrid target = (CalibrationDetectorCircleRegularGrid)detector;
 			gridRows = target.getRows();
 			gridCols = target.getColumns();

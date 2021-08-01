@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -20,7 +20,7 @@ package boofcv.alg.geo.calibration;
 
 import boofcv.abst.fiducial.calib.CalibrationDetectorSquareGrid;
 import boofcv.abst.fiducial.calib.ConfigGridDimen;
-import boofcv.abst.geo.calibration.DetectorFiducialCalibration;
+import boofcv.abst.geo.calibration.DetectSingleFiducialCalibration;
 import boofcv.factory.fiducial.FactoryFiducialCalibration;
 import boofcv.testing.BoofStandardJUnit;
 import georegression.geometry.ConvertRotation3D_F64;
@@ -47,7 +47,7 @@ public class GenericCalibrationGrid extends BoofStandardJUnit {
 		return CalibrationDetectorSquareGrid.createLayout(6, 4, 30, 30);
 	}
 
-	public static DetectorFiducialCalibration createStandardConfig() {
+	public static DetectSingleFiducialCalibration createStandardConfig() {
 		return FactoryFiducialCalibration.squareGrid(null,new ConfigGridDimen(3, 2, 30, 30));
 	}
 
