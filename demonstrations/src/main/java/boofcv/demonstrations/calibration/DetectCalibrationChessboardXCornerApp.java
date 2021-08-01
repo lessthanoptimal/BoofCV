@@ -267,7 +267,7 @@ public class DetectCalibrationChessboardXCornerApp
 				}
 
 				{
-					DogArray<GridInfo> found = detector.getFoundChessboard();
+					DogArray<GridInfo> found = detector.getDetectorX().getFoundChessboard();
 					foundGrids.reset();
 					for (int i = 0; i < found.size; i++) {
 						GridInfo grid = found.get(i);

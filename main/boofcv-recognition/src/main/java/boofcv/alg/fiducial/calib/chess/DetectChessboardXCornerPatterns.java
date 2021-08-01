@@ -23,6 +23,7 @@ import boofcv.alg.feature.detect.chess.DetectChessboardCornersXPyramid;
 import boofcv.alg.fiducial.calib.chess.ChessboardCornerClusterToGrid.GridInfo;
 import boofcv.struct.image.ImageGray;
 import boofcv.struct.image.ImageType;
+import lombok.Getter;
 import org.ddogleg.struct.DogArray;
 
 /**
@@ -32,9 +33,9 @@ import org.ddogleg.struct.DogArray;
  */
 public class DetectChessboardXCornerPatterns<T extends ImageGray<T>> {
 
-	protected DetectChessboardCornersXPyramid<T> detector;
-	protected ChessboardCornerClusterFinder<T> clusterFinder;
-	protected ChessboardCornerClusterToGrid clusterToGrid = new ChessboardCornerClusterToGrid();
+	@Getter protected DetectChessboardCornersXPyramid<T> detector;
+	@Getter protected ChessboardCornerClusterFinder<T> clusterFinder;
+	@Getter protected ChessboardCornerClusterToGrid clusterToGrid = new ChessboardCornerClusterToGrid();
 
 	protected DogArray<GridInfo> found = new DogArray<>(GridInfo::new);
 
@@ -89,18 +90,6 @@ public class DetectChessboardXCornerPatterns<T extends ImageGray<T>> {
 				found.removeTail();
 			}
 		}
-	}
-
-	public DetectChessboardCornersXPyramid<T> getDetector() {
-		return detector;
-	}
-
-	public ChessboardCornerClusterFinder<T> getClusterFinder() {
-		return clusterFinder;
-	}
-
-	public ChessboardCornerClusterToGrid getClusterToGrid() {
-		return clusterToGrid;
 	}
 
 	public DogArray<GridInfo> getFoundChessboard() {
