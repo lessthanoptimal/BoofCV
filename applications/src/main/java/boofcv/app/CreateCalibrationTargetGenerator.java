@@ -127,11 +127,6 @@ public class CreateCalibrationTargetGenerator {
 		close();
 	}
 
-	public void binaryGrid( float squareWidth, float spacing ) {
-		System.out.println("Binary grid not yet supported because the standard isn't fully defined yet");
-		System.exit(0);
-	}
-
 	public void circleHexagonal( float diameter, float centerDistance ) throws IOException {
 		float diameterPoints = diameter*UNIT_TO_POINTS;
 

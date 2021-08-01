@@ -103,7 +103,8 @@ public class CreateChessboardBitsDocumentPDF extends CreateFiducialDocumentPDF {
 		names = new ArrayList<>();
 		for (int i = 0; i < totalMarkers; i++) {
 			GridShape shape = utils.markers.get(i);
-			names.add(String.format("ID: %d, markers=%d, rows=%d, cols=%d", i, totalMarkers, shape.rows, shape.cols));
+			names.add(String.format("ID: %d, markers=%d, rows=%d, cols=%d, error=%d",
+					i, totalMarkers, shape.rows, shape.cols, utils.codec.getErrorCorrectionLevel()));
 		}
 
 		render();
@@ -111,6 +112,6 @@ public class CreateChessboardBitsDocumentPDF extends CreateFiducialDocumentPDF {
 
 	@Override
 	protected String createMarkerSizeString() {
-		return String.format("squares: %4.1f %2s", squareWidth, units.getAbbreviation());
+		return String.format("full_squares: %4.1f %2s", squareWidth, units.getAbbreviation());
 	}
 }

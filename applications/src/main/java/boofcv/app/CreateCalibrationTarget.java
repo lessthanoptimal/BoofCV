@@ -19,6 +19,7 @@
 package boofcv.app;
 
 import boofcv.abst.fiducial.calib.CalibrationPatterns;
+import boofcv.abst.fiducial.calib.ConfigChessboardBitsMarkers;
 import boofcv.alg.fiducial.calib.chessbits.ChessBitsUtils;
 import boofcv.app.calib.CreateChessboardBitsDocumentPDF;
 import boofcv.app.fiducials.CreateFiducialDocumentPDF;
@@ -77,6 +78,9 @@ public class CreateCalibrationTarget {
 
 	@Option(name = "--NumMarkers", usage = "If the target type supports multiple markers, how many should it create")
 	int numMarkers = 1;
+
+	@Option(name = "--ChessBitsError", usage = "Error correction level for chessboard bits. 0 to 10")
+	int chessBitsError = new ConfigChessboardBitsMarkers().errorCorrectionLevel;
 
 	private static void printHelpExit( CmdLineParser parser ) {
 		parser.getProperties().withUsageWidth(120);
@@ -160,19 +164,32 @@ public class CreateCalibrationTarget {
 			failExit("Must specify a shape width more than zero");
 
 		switch (type) {
-			// TODO sanity check rows and cols to make sure there are enough of them
-			case BINARY_GRID, SQUARE_GRID -> {
+			case SQUARE_GRID -> {
 				if (centerDistance > 0)
 					failExit("Don't specify center distance for square type targets, use shape space instead");
 				if (shapeSpace <= 0)
 					shapeSpace = shapeWidth;
 			}
-			case CHESSBOARD, CHESSBOARD_BITS -> {
+			case CHESSBOARD -> {
 				if (centerDistance > 0)
 					failExit("Don't specify center distance for chessboard targets");
 				if (shapeSpace > 0)
 					failExit("Don't specify center distance for chessboard targets");
 			}
+
+			case CHESSBOARD_BITS -> {
+				if (centerDistance > 0)
+					failExit("Don't specify center distance for chessboard targets");
+				if (shapeSpace > 0)
+					failExit("Don't specify center distance for chessboard targets");
+				if (chessBitsError < 0 || chessBitsError > 10)
+					failExit("Error level must be 0 to 10, inclusive");
+				if (numMarkers <= 0)
+					failExit("Must specify at least one marker");
+				if (rows < 4 || columns < 3)
+					failExit("Grid is too small");
+			}
+
 			case CIRCLE_HEXAGONAL -> {
 				if (shapeSpace > 0)
 					failExit("Don't specify space for circle type targets, use center distance instead");
@@ -201,7 +218,7 @@ public class CreateCalibrationTarget {
 
 		if (type == CalibrationPatterns.CHESSBOARD_BITS) {
 			CreateFiducialDocumentPDF doc = chessboardBitsToPdf(fileName + suffix,
-					paperSize, unit, rows, columns, shapeWidth, numMarkers);
+					paperSize, unit, rows, columns, shapeWidth, numMarkers, chessBitsError);
 			doc.showInfo = !disablePrintInfo;
 			doc.saveToDisk();
 			return;
@@ -215,7 +232,6 @@ public class CreateCalibrationTarget {
 		switch (type) {
 			case CHESSBOARD -> generator.chessboard(shapeWidth);
 			case SQUARE_GRID -> generator.squareGrid(shapeWidth, shapeSpace);
-			case BINARY_GRID -> generator.binaryGrid(shapeWidth, shapeSpace);
 			case CIRCLE_HEXAGONAL -> generator.circleHexagonal(shapeWidth, centerDistance);
 			case CIRCLE_GRID -> generator.circleGrid(shapeWidth, centerDistance);
 			default -> throw new RuntimeException("Unknown target type");
@@ -224,8 +240,9 @@ public class CreateCalibrationTarget {
 
 	public static CreateFiducialDocumentPDF chessboardBitsToPdf( String outputFile, PaperSize paper, Unit units,
 																 int rows, int columns, float squareWidth,
-																 int numMarkers) throws IOException {
+																 int numMarkers, int errorLevel ) throws IOException {
 		ChessBitsUtils utils = new ChessBitsUtils();
+		utils.codec.setErrorCorrectionLevel(errorLevel);
 		for (int markerIdx = 0; markerIdx < numMarkers; markerIdx++) {
 			utils.addMarker(rows, columns);
 		}

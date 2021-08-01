@@ -188,8 +188,9 @@ public class CreateCalibrationTargetGui extends JPanel
 				case CHESSBOARD_BITS -> {
 					ConfigChessboardBitsMarkers config = (ConfigChessboardBitsMarkers)selectedCalib;
 					ConfigChessboardBitsMarkers.MarkerShape shape = config.markerShapes.get(0);
-					CreateFiducialDocumentPDF doc = chessboardBitsToPdf(outputFile, paper, units, shape.numRows,
-							shape.numCols, (float)shape.squareSize, config.firstTargetDuplicated);
+					CreateFiducialDocumentPDF doc = chessboardBitsToPdf(outputFile, paper, units,
+							shape.numRows, shape.numCols, (float)shape.squareSize,
+							config.firstTargetDuplicated, config.errorCorrectionLevel);
 					if (sendToPrinter) {
 						doc.sendToPrinter();
 					} else {
@@ -241,6 +242,7 @@ public class CreateCalibrationTargetGui extends JPanel
 			ConfigChessboardBitsMarkers c = (ConfigChessboardBitsMarkers)selectedCalib;
 
 			ChessBitsUtils utils = new ChessBitsUtils();
+			utils.codec.setErrorCorrectionLevel(c.errorCorrectionLevel);
 			c.convertToGridList(utils.markers);
 			utils.fixate();
 			ConfigChessboardBitsMarkers.MarkerShape shape = c.markerShapes.get(0);
