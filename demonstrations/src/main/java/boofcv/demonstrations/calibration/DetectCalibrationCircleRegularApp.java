@@ -51,25 +51,24 @@ import java.util.List;
  *
  * @author Peter Abeles
  */
-public class DetectCalibrationCircleRegularApp extends CommonDetectCalibrationApp
-{
+public class DetectCalibrationCircleRegularApp extends CommonDetectCalibrationApp {
 	CalibrationDetectorCircleRegularGrid detector;
 	ConfigGridDimen configGrid;
 	ConfigCircleRegularGrid configDet = new ConfigCircleRegularGrid();
 
-	Color colorId[];
+	Color[] colorId;
 	Line2D.Double line = new Line2D.Double();
 
-	public DetectCalibrationCircleRegularApp(int numRows , int numColumns ,
-											 double circleDiameter, double centerDistance,
-											 List<String> exampleInputs) {
+	public DetectCalibrationCircleRegularApp( int numRows, int numColumns,
+											  double circleDiameter, double centerDistance,
+											  List<String> exampleInputs ) {
 		super(exampleInputs);
-		setUpGui(new DetectCalibrationCirclePanel(numRows,numColumns,circleDiameter,centerDistance,false));
+		setUpGui(new DetectCalibrationCirclePanel(numRows, numColumns, circleDiameter, centerDistance, false));
 		configGrid = new ConfigGridDimen(numRows, numColumns, circleDiameter, centerDistance);
 		controlPanel.threshold.setConfiguration(configDet.thresholding);
 		declareDetector();
 
-		colorId = new Color[]{Color.RED,Color.BLUE,Color.CYAN,Color.ORANGE};
+		colorId = new Color[]{Color.RED, Color.BLUE, Color.CYAN, Color.ORANGE};
 	}
 
 	@Override
@@ -80,21 +79,21 @@ public class DetectCalibrationCircleRegularApp extends CommonDetectCalibrationAp
 		configGrid.shapeSize = ((DetectCalibrationCirclePanel)controlPanel).getCircleDiameter();
 		configGrid.shapeDistance = ((DetectCalibrationCirclePanel)controlPanel).getCircleSpacing();
 
-		detector = FactoryFiducialCalibration.circleRegularGrid(configDet,configGrid);
+		detector = FactoryFiducialCalibration.circleRegularGrid(configDet, configGrid);
 		reprocessImageOnly();
 	}
 
 	@Override
-	protected void renderClusters(Graphics2D g2, double scale) {
+	protected void renderClusters( Graphics2D g2, double scale ) {
 		List<BinaryEllipseDetector.EllipseInfo> found = detector.getDetector().getEllipseDetector().getFound().toList();
 		List<List<EllipsesIntoClusters.Node>> clusters = detector.getDetector().getClusters();
 
 		g2.setStroke(new BasicStroke(2));
 		int id = 0;
-		for( List<EllipsesIntoClusters.Node> c : clusters ) {
+		for (List<EllipsesIntoClusters.Node> c : clusters) {
 
-			g2.setColor(colorId[Math.min(id++,colorId.length-1)]);
-			for( EllipsesIntoClusters.Node n : c ) {
+			g2.setColor(colorId[Math.min(id++, colorId.length - 1)]);
+			for (EllipsesIntoClusters.Node n : c) {
 				EllipseRotated_F64 a = found.get(n.which).ellipse;
 				line.x1 = a.center.x*scale;
 				line.y1 = a.center.y*scale;
@@ -109,18 +108,18 @@ public class DetectCalibrationCircleRegularApp extends CommonDetectCalibrationAp
 	}
 
 	@Override
-	protected void renderGraph(Graphics2D g2 , double scale ) {
+	protected void renderGraph( Graphics2D g2, double scale ) {
 		throw new RuntimeException("Shouldn't be an option");
 	}
 
 	@Override
-	protected void renderGrid(Graphics2D g2 , double scale ) {
+	protected void renderGrid( Graphics2D g2, double scale ) {
 		List<Grid> grids = detector.getDetector().getGrider().getGrids().toList();
 
 		BasicStroke thin = new BasicStroke(3);
 		BasicStroke thick = new BasicStroke(5);
 
-		for( Grid g : grids ) {
+		for (Grid g : grids) {
 			double x0 = Double.MAX_VALUE;
 			double x1 = -Double.MAX_VALUE;
 			double y0 = Double.MAX_VALUE;
@@ -128,85 +127,87 @@ public class DetectCalibrationCircleRegularApp extends CommonDetectCalibrationAp
 
 			for (int i = 0; i < g.ellipses.size(); i++) {
 				EllipseRotated_F64 e = g.ellipses.get(i);
-				if( e == null ) continue;
-				x0 = Math.min(e.center.x,x0);
-				x1 = Math.max(e.center.x,x1);
-				y0 = Math.min(e.center.y,y0);
-				y1 = Math.max(e.center.y,y1);
+				if (e == null) continue;
+				x0 = Math.min(e.center.x, x0);
+				x1 = Math.max(e.center.x, x1);
+				y0 = Math.min(e.center.y, y0);
+				y1 = Math.max(e.center.y, y1);
 			}
 
-			x0 *= scale; y0 *= scale;
-			x1 *= scale; y1 *= scale;
+			x0 *= scale;
+			y0 *= scale;
+			x1 *= scale;
+			y1 *= scale;
 
 			g2.setColor(Color.WHITE);
 			g2.setStroke(thick);
-			VisualizeShapes.drawRectangle(x0,y0,x1,y1,line,g2);
+			VisualizeShapes.drawRectangle(x0, y0, x1, y1, line, g2);
 			g2.setColor(Color.ORANGE);
 			g2.setStroke(thin);
-			VisualizeShapes.drawRectangle(x0,y0,x1,y1,line,g2);
+			VisualizeShapes.drawRectangle(x0, y0, x1, y1, line, g2);
 		}
 	}
 
 	@Override
-	public void renderOrder(Graphics2D g2, double scale , List<PointIndex2D_F64> points ) {
-		renderOrderA(g2,scale,points);
+	public void renderOrder( Graphics2D g2, double scale, List<PointIndex2D_F64> points ) {
+		renderOrderA(g2, scale, points);
 	}
 
-	public static void renderOrderA(Graphics2D g2, double scale , List<PointIndex2D_F64> points ) {
+	public static void renderOrderA( Graphics2D g2, double scale, List<PointIndex2D_F64> points ) {
 		g2.setStroke(new BasicStroke(5));
 
-		Color colorsSquare[] = new Color[4];
-		colorsSquare[0] = new Color(0,255,0);
-		colorsSquare[1] = new Color(100,180,0);
-		colorsSquare[2] = new Color(160,140,0);
-		colorsSquare[3] = new Color(0,140,100);
+		Color[] colorsSquare = new Color[4];
+		colorsSquare[0] = new Color(0, 255, 0);
+		colorsSquare[1] = new Color(100, 180, 0);
+		colorsSquare[2] = new Color(160, 140, 0);
+		colorsSquare[3] = new Color(0, 140, 100);
 
 		Line2D.Double line = new Line2D.Double();
 
-		for (int i = 1; i+6 < points.size(); i += 4) {
+		for (int i = 1; i + 6 < points.size(); i += 4) {
 			Point2D_F64 p0 = points.get(i).p;
-			Point2D_F64 p1 = points.get(i+6).p;
+			Point2D_F64 p1 = points.get(i + 6).p;
 
-			double fraction = i / ((double) points.size() - 2);
+			double fraction = i/((double)points.size() - 2);
 
-			int red   = (int)(0xFF*fraction) + (int)(0x00*(1-fraction));
+			int red = (int)(0xFF*fraction) + (int)(0x00*(1 - fraction));
 			int green = 0x00;
-			int blue  = (int)(0x00*fraction) + (int)(0xff*(1-fraction));
+			int blue = (int)(0x00*fraction) + (int)(0xff*(1 - fraction));
 
 			int lineRGB = red << 16 | green << 8 | blue;
 
-			line.setLine(scale * p0.x , scale * p0.y, scale * p1.x, scale * p1.y );
+			line.setLine(scale*p0.x, scale*p0.y, scale*p1.x, scale*p1.y);
 
 			g2.setColor(new Color(lineRGB));
 			g2.draw(line);
 		}
 
-		for (int i = 0; i+3 < points.size(); i += 4) {
+		for (int i = 0; i + 3 < points.size(); i += 4) {
 			Point2D_F64 p0 = points.get(i).p;
-			Point2D_F64 p1 = points.get(i+1).p;
-			Point2D_F64 p2 = points.get(i+2).p;
-			Point2D_F64 p3 = points.get(i+3).p;
+			Point2D_F64 p1 = points.get(i + 1).p;
+			Point2D_F64 p2 = points.get(i + 2).p;
+			Point2D_F64 p3 = points.get(i + 3).p;
 
-			line.setLine(scale * p0.x , scale * p0.y, scale * p1.x, scale * p1.y );
+			line.setLine(scale*p0.x, scale*p0.y, scale*p1.x, scale*p1.y);
 			g2.setColor(colorsSquare[0]);
 			g2.draw(line);
 
-			line.setLine(scale * p1.x , scale * p1.y, scale * p2.x, scale * p2.y );
+			line.setLine(scale*p1.x, scale*p1.y, scale*p2.x, scale*p2.y);
 			g2.setColor(colorsSquare[1]);
 			g2.draw(line);
 
-			line.setLine(scale * p2.x , scale * p2.y, scale * p3.x, scale * p3.y );
+			line.setLine(scale*p2.x, scale*p2.y, scale*p3.x, scale*p3.y);
 			g2.setColor(colorsSquare[2]);
 			g2.draw(line);
 
-			line.setLine(scale * p3.x , scale * p3.y, scale * p0.x, scale * p0.y );
+			line.setLine(scale*p3.x, scale*p3.y, scale*p0.x, scale*p0.y);
 			g2.setColor(colorsSquare[3]);
 			g2.draw(line);
 		}
 	}
 
 	@Override
-	protected boolean process(GrayF32 image) {
+	protected boolean process( GrayF32 image ) {
 		return detector.process(image);
 	}
 
@@ -248,16 +249,16 @@ public class DetectCalibrationCircleRegularApp extends CommonDetectCalibrationAp
 		return new ArrayList<>();
 	}
 
-	public static void main(String[] args) {
+	public static void main( String[] args ) {
 
-		List<String>  examples = new ArrayList<>();
+		List<String> examples = new ArrayList<>();
 
 		for (int i = 0; i <= 5; i++) {
 			examples.add(UtilIO.pathExample(String.format("calibration/mono/Sony_DSC-HX5V_CircleRegular/image%05d.jpg", i)));
 		}
 		examples.add(UtilIO.pathExample("fiducial/circle_regular/movie.mp4"));
 
-		SwingUtilities.invokeLater(()-> {
+		SwingUtilities.invokeLater(() -> {
 			DetectCalibrationCircleRegularApp app = new DetectCalibrationCircleRegularApp(10, 8, 1.5, 2.5, examples);
 
 			app.openFile(new File(examples.get(0)));

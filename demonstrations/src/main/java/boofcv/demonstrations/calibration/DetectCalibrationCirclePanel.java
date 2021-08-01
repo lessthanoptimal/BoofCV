@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -40,8 +40,8 @@ public class DetectCalibrationCirclePanel extends DetectCalibrationPanel {
 
 	boolean showGraphs;
 
-	public DetectCalibrationCirclePanel(int gridRows, int gridColumns, double diameter , double spacing,
-										boolean showGraphs ) {
+	public DetectCalibrationCirclePanel( int gridRows, int gridColumns, double diameter, double spacing,
+										 boolean showGraphs ) {
 		super(gridRows, gridColumns, false);
 
 		doShowNumbers = false;
@@ -55,20 +55,20 @@ public class DetectCalibrationCirclePanel extends DetectCalibrationPanel {
 		this.showClusters.setSelected(doShowClusters);
 		this.showClusters.addItemListener(this);
 		this.showClusters.setMaximumSize(this.showClusters.getPreferredSize());
-		selectDiameter = spinner(diameter,0.0,1000.0,1.0);
-		selectSpacing = spinner(spacing,0.0,1000.0,1.0);
+		selectDiameter = spinner(diameter, 0.0, 1000.0, 1.0);
+		selectSpacing = spinner(spacing, 0.0, 1000.0, 1.0);
 
 		addComponents();
 	}
 
 	@Override
 	protected void addComponents() {
-		JPanel togglePanel = new JPanel( new GridLayout(0,2));
+		JPanel togglePanel = new JPanel(new GridLayout(0, 2));
 		togglePanel.add(showPoints);
 		togglePanel.add(showNumbers);
-		addAlignLeft(showClusters,this);
-		if( showGraphs )
-			addAlignLeft(showGraph,this);
+		addAlignLeft(showClusters, this);
+		if (showGraphs)
+			addAlignLeft(showGraph, this);
 		togglePanel.add(showGrids);
 		togglePanel.add(showOrder);
 		togglePanel.add(showShapes);
@@ -89,8 +89,8 @@ public class DetectCalibrationCirclePanel extends DetectCalibrationPanel {
 	}
 
 	@Override
-	public void itemStateChanged(ItemEvent e) {
-		if( e.getSource() == showClusters ) {
+	public void itemStateChanged( ItemEvent e ) {
+		if (e.getSource() == showClusters) {
 			doShowClusters = showClusters.isSelected();
 			listener.calibEventGUI();
 		} else {
@@ -99,12 +99,12 @@ public class DetectCalibrationCirclePanel extends DetectCalibrationPanel {
 	}
 
 	@Override
-	public void stateChanged(ChangeEvent e) {
-		if( e.getSource() == selectDiameter) {
-			circleDiameter = ((Number) selectDiameter.getValue()).doubleValue();
+	public void stateChanged( ChangeEvent e ) {
+		if (e.getSource() == selectDiameter) {
+			circleDiameter = ((Number)selectDiameter.getValue()).doubleValue();
 			listener.calibEventDetectorModified();
-		}  else if( e.getSource() == selectSpacing) {
-			circleSpacing = ((Number) selectSpacing.getValue()).doubleValue();
+		} else if (e.getSource() == selectSpacing) {
+			circleSpacing = ((Number)selectSpacing.getValue()).doubleValue();
 			listener.calibEventDetectorModified();
 		} else {
 			super.stateChanged(e);

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -44,18 +44,16 @@ import java.util.List;
  * @author Peter Abeles
  */
 public class DetectCalibrationChessboardBinaryApp
-		extends CommonDetectCalibrationApp
-
-{
+		extends CommonDetectCalibrationApp {
 	DetectChessboardBinaryPattern<GrayF32> alg;
 	ConfigGridDimen configGrid;
 	ConfigChessboardBinary configDet = new ConfigChessboardBinary();
 
-	public DetectCalibrationChessboardBinaryApp(int numRows , int numColumns ,
-												List<String> exampleInputs) {
+	public DetectCalibrationChessboardBinaryApp( int numRows, int numColumns,
+												 List<String> exampleInputs ) {
 		super(exampleInputs);
 		configGrid = new ConfigGridDimen(numRows, numColumns, 1);
-		setUpGui(new DetectCalibrationPolygonPanel(numRows,numColumns, configDet.square, configDet.thresholding));
+		setUpGui(new DetectCalibrationPolygonPanel(numRows, numColumns, configDet.square, configDet.thresholding));
 
 		declareDetector();
 	}
@@ -67,12 +65,12 @@ public class DetectCalibrationChessboardBinaryApp
 		configGrid.numRows = controlPanel.getGridRows();
 		configGrid.numCols = controlPanel.getGridColumns();
 
-		alg = FactoryFiducialCalibration.chessboardB(configDet,configGrid).getAlgorithm();
+		alg = FactoryFiducialCalibration.chessboardB(configDet, configGrid).getAlgorithm();
 		reprocessImageOnly();
 	}
 
 	@Override
-	protected boolean process(GrayF32 image) {
+	protected boolean process( GrayF32 image ) {
 		return alg.process(image);
 	}
 
@@ -100,7 +98,7 @@ public class DetectCalibrationChessboardBinaryApp
 
 	@Override
 	protected List<Polygon2D_F64> getFoundPolygons() {
-		return alg.getFindSeeds().getDetectorSquare().getPolygons(null,null);
+		return alg.getFindSeeds().getDetectorSquare().getPolygons(null, null);
 	}
 
 	@Override
@@ -113,20 +111,20 @@ public class DetectCalibrationChessboardBinaryApp
 		return alg.getFindSeeds().getGrids().getGrids().toList();
 	}
 
-	public void configure(int numRows, int numCols ) {
+	public void configure( int numRows, int numCols ) {
 		configGrid = new ConfigGridDimen(numRows, numCols, 1);
 	}
 
-	public static void main(String[] args) throws FileNotFoundException {
+	public static void main( String[] args ) throws FileNotFoundException {
 
 		List<String> examples = new ArrayList<>();
 
 		for (int i = 1; i <= 11; i++) {
-			examples.add(UtilIO.pathExample(String.format("calibration/stereo/Bumblebee2_Chess/left%02d.jpg",i)));
+			examples.add(UtilIO.pathExample(String.format("calibration/stereo/Bumblebee2_Chess/left%02d.jpg", i)));
 		}
 		examples.add(UtilIO.pathExample("fiducial/chessboard/movie.mjpeg"));
 
-		SwingUtilities.invokeLater(()-> {
+		SwingUtilities.invokeLater(() -> {
 			DetectCalibrationChessboardBinaryApp app = new DetectCalibrationChessboardBinaryApp(7, 5, examples);
 
 			app.openFile(new File(examples.get(0)));
