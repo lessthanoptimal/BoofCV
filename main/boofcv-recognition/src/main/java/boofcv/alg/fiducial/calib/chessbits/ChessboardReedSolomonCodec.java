@@ -137,6 +137,8 @@ public class ChessboardReedSolomonCodec {
 		}
 
 		// Compute the number of bytes to encode it all
+		ecc.resize(eccWords);
+		bits.resize(dataWords*WORD_BITS);
 		message.resize(dataWords);
 		rscodes.generator(eccWords);
 

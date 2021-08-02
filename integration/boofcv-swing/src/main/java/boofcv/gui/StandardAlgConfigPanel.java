@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -19,6 +19,7 @@
 package boofcv.gui;
 
 import boofcv.gui.controls.JConfigLength;
+import boofcv.gui.controls.JSpinnerNumber;
 import boofcv.misc.BoofLambdas;
 import boofcv.struct.ConfigLength;
 
@@ -193,6 +194,20 @@ public class StandardAlgConfigPanel extends JPanel implements ActionListener, Ch
 		spinner.setValue(1-initial);spinner.setValue(initial);
 		spinner.addChangeListener(this);
 		return spinner;
+	}
+
+	protected JSpinnerNumber spinnerWrap( double initial , double minimum , double maximum, double stepSize ) {
+		JSpinner spinner = new JSpinner(new SpinnerNumberModel(initial, minimum, maximum, stepSize));
+		spinner.setMaximumSize(spinner.getPreferredSize());
+		spinner.addChangeListener(this);
+		return new JSpinnerNumber(spinner, initial);
+	}
+
+	protected JSpinnerNumber spinnerWrap( int initial , int minimum , int maximum, int stepSize ) {
+		JSpinner spinner = new JSpinner(new SpinnerNumberModel(initial, minimum, maximum, stepSize));
+		spinner.setMaximumSize(spinner.getPreferredSize());
+		spinner.addChangeListener(this);
+		return new JSpinnerNumber(spinner, initial);
 	}
 
 	/**

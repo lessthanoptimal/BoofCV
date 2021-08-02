@@ -243,7 +243,7 @@ public class DetectCalibrationChessboardXCornerApp
 			featureImg = detector.getDetector().getDetector().getIntensityRaw();
 //			featureImg = detector.getDetector().getDetector().getIntensity2x2();
 
-			if (controlPanel.logItensity) {
+			if (controlPanel.logIntensity) {
 				PixelMath.logSign(featureImg, 0.2f, logIntensity);
 				VisualizeImageData.colorizeSign(logIntensity, visualized, ImageStatistics.maxAbs(logIntensity));
 			} else {
@@ -482,14 +482,14 @@ public class DetectCalibrationChessboardXCornerApp
 		boolean showClusters = false;
 		boolean showPerpendicular = false;
 		boolean showCorners = false;
-		boolean logItensity = false;
+		boolean logIntensity = false;
 		boolean meanShift = true;
 		boolean anyGrid = false;
 		int detMinPyrLevel = 0;
 		int translucent = 0;
 
 		JSlider sliderTranslucent = new JSlider(JSlider.HORIZONTAL, 0, 100, 0);
-		JCheckBox checkLogIntensity = checkbox("Log Intensity", logItensity);
+		JCheckBox checkLogIntensity = checkbox("Log Intensity", logIntensity);
 		JSpinner spinnerDRadius = spinner(detRadius, 1, 100, 1);
 		JSpinner spinnerDNonMaxThreshold = spinner(detNonMaxThreshold, 0, 100, 5);
 		JSpinner spinnerDRefinedXThreshold = spinner(detRefinedXThresh, 0.0, 20.0, 0.005, 2, 3);
@@ -519,7 +519,7 @@ public class DetectCalibrationChessboardXCornerApp
 			textArea.setLineWrap(true);
 
 			selectZoom = spinner(1.0, MIN_ZOOM, MAX_ZOOM, 1.0);
-			checkLogIntensity = checkbox("Log Intensity", logItensity);
+			checkLogIntensity = checkbox("Log Intensity", logIntensity);
 
 			sliderTranslucent.setMaximumSize(new Dimension(120, 26));
 			sliderTranslucent.setPreferredSize(sliderTranslucent.getMaximumSize());
@@ -601,7 +601,7 @@ public class DetectCalibrationChessboardXCornerApp
 				showCorners = checkShowCorners.isSelected();
 				imagePanel.repaint();
 			} else if (e.getSource() == checkLogIntensity) {
-				logItensity = checkLogIntensity.isSelected();
+				logIntensity = checkLogIntensity.isSelected();
 				reprocessImageOnly();
 			} else if (e.getSource() == checkShowTargets) {
 				showChessboards = checkShowTargets.isSelected();
