@@ -272,7 +272,8 @@ public class ChessboardReedSolomonDetector<T extends ImageGray<T>> implements Ve
 
 				// Convert image pixels into bit values
 				float threshold = determineThreshold(a.node, b.node, c.node, d.node);
-				sampleBitsGray(a.node, b.node, c.node, d.node, threshold);
+				if (!sampleBitsGray(a.node, b.node, c.node, d.node, threshold))
+					continue;
 
 				boolean success = false;
 
@@ -422,6 +423,7 @@ public class ChessboardReedSolomonDetector<T extends ImageGray<T>> implements Ve
 		int blockSize = utils.bitSampleCount;
 		int majority = blockSize/2;
 
+		int nonWhiteBits = 0;
 		for (int i = 0, bit = 0; i < samplePixels.size; i += blockSize, bit++) {
 			// Each pixel in the bit's block gets a vote for it's value
 			int vote = 0;
@@ -433,10 +435,13 @@ public class ChessboardReedSolomonDetector<T extends ImageGray<T>> implements Ve
 				}
 			}
 
-			bitImage.data[bit] = (byte)(vote > majority ? 1 : 0);
+			int value = vote > majority ? 1 : 0;
+			nonWhiteBits += value;
+			bitImage.data[bit] = (byte)value;
 		}
 
-		return true;
+		// If every bit is zero then it's a white square reject it
+		return nonWhiteBits != 0;
 	}
 
 	/**

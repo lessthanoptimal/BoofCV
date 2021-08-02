@@ -50,7 +50,7 @@ import org.ddogleg.struct.DogArray_I8;
  *
  * Packet Format:
  * <ul>
- *     <li>2-bits: Reserved for future use (must be 0)</li>
+ *     <li>2-bits: Reserved for future use (must be 0b11)</li>
  *     <li>N-bits: Marker ID</li>
  *     <li>M-bits: Cell ID</li>
  *     <li>4-bits: XOR Checksum</li>
@@ -162,7 +162,7 @@ public class ChessboardReedSolomonCodec {
 		bits.resize(0);
 
 		// Create the header
-		bits.append(0, 2, false);
+		bits.append(3, 2, false);
 
 		// Specify the ID numbers
 		bits.append(markerID, markerBitCount, false);
@@ -246,9 +246,9 @@ public class ChessboardReedSolomonCodec {
 		System.arraycopy(message.data, 0, bits.data, 0, message.size);
 		bits.size = messageBitCount;
 
-		// Make sure the two reserved bits are 0
-		int padding = bits.read(0, 2, true);
-		if (padding != 0) {
+		// Make sure the two reserved bits are 3
+		int header = bits.read(0, 2, true);
+		if (header != 3) {
 			return false;
 		}
 
