@@ -28,10 +28,12 @@ import boofcv.alg.fiducial.calib.chess.ChessboardCornerClusterToGrid.GridInfo;
 import boofcv.alg.fiducial.calib.chess.ChessboardCornerGraph;
 import boofcv.alg.fiducial.qrcode.PackedBits8;
 import boofcv.alg.interpolate.InterpolatePixelS;
+import boofcv.alg.interpolate.InterpolationType;
 import boofcv.alg.misc.ImageMiscOps;
 import boofcv.factory.interpolate.FactoryInterpolation;
 import boofcv.misc.BoofMiscOps;
 import boofcv.struct.GridCoordinate;
+import boofcv.struct.border.BorderType;
 import boofcv.struct.image.GrayU8;
 import boofcv.struct.image.ImageGray;
 import boofcv.struct.image.ImageType;
@@ -135,6 +137,7 @@ public class ChessboardReedSolomonDetector<T extends ImageGray<T>> implements Ve
 	public ChessboardReedSolomonDetector( ChessBitsUtils utils,
 										  ConfigChessboardX config, Class<T> imageType ) {
 		this.utils = utils;
+		this.utils.checkFixate();
 
 		detector = new DetectChessboardCornersXPyramid<>(ImageType.single(imageType));
 		clusterFinder = new ChessboardCornerClusterFinder<>(imageType);
@@ -151,7 +154,8 @@ public class ChessboardReedSolomonDetector<T extends ImageGray<T>> implements Ve
 		clusterFinder.setMaxNeighborDistance(config.connMaxNeighborDistance);
 		clusterFinder.setThresholdEdgeIntensity(config.connEdgeThreshold);
 
-		interpolate = FactoryInterpolation.nearestNeighborPixelS(imageType);
+		interpolate = FactoryInterpolation.createPixelS(0, 255,
+				InterpolationType.NEAREST_NEIGHBOR, BorderType.EXTENDED, imageType);
 
 		bitImage.reshape(utils.codec.gridBitLength, utils.codec.gridBitLength);
 	}
@@ -338,7 +342,7 @@ public class ChessboardReedSolomonDetector<T extends ImageGray<T>> implements Ve
 		if (success) {
 			int maxCellID = utils.countEncodedSquaresInMarker(decoded.markerID);
 			if (decoded.cellID >= maxCellID) {
-				verbose.println("Success decoding a cell, but cellID was invalid!");
+				if (verbose != null) verbose.println("Success decoding a cell, but cellID was invalid!");
 				success = false;
 			}
 		}

@@ -31,11 +31,11 @@ public class ChessboardBitPattern {
 	/** Which marker it came from. -1 if unknown */
 	public int marker;
 
-	/** Number of square columns in the pattern. */
-	public int squareCols;
-
 	/** Number of square rows in the pattern. */
 	public int squareRows;
+
+	/** Number of square columns in the pattern. */
+	public int squareCols;
 
 	/** Found calibration corners it was able to observe */
 	public final DogArray<PointIndex2D_F64> corners = new DogArray<>(PointIndex2D_F64::new, (c)->c.setTo(-1,-1,-1));
@@ -53,5 +53,17 @@ public class ChessboardBitPattern {
 		corners.reset();
 		touchBinary.reset();
 		decodedSquares = -1;
+	}
+
+	public void setTo( ChessboardBitPattern src ) {
+		this.marker = src.marker;
+		this.squareCols = src.squareCols;
+		this.squareRows = src.squareRows;
+		this.corners.resize(src.corners.size);
+		for (int i = 0; i < src.corners.size; i++) {
+			this.corners.get(i).setTo(src.corners.get(i));
+		}
+		this.touchBinary.setTo(src.touchBinary);
+		this.decodedSquares = src.decodedSquares;
 	}
 }
