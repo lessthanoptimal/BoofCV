@@ -266,7 +266,7 @@ public class ChessboardReedSolomonDetector<T extends ImageGray<T>> implements Ve
 				if (a == null || b == null || c == null || d == null)
 					continue;
 
-				// See if this square could have an ecoded value
+				// See if this square could have an encoded value
 				if (!clusterToGrid.isWhiteSquare(a.node, c.node))
 					continue;
 
