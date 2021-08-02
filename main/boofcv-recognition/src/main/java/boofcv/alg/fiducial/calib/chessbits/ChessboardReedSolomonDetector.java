@@ -516,7 +516,9 @@ public class ChessboardReedSolomonDetector<T extends ImageGray<T>> implements Ve
 		// Save the shape of the grid in squares
 		target.squareRows = utils.markers.get(target.marker).rows;
 		target.squareCols = utils.markers.get(target.marker).cols;
-		target.decodedSquares = binaryCells.size;
+		for (int i = 0; i < binaryCells.size; i++) {
+			target.decodedCells.add(binaryCells.get(i).cellID);
+		}
 
 		// Recycle the variable but give it a better name
 		final GridCoordinate correctedCoordinate = observedCoordinate;
@@ -574,7 +576,6 @@ public class ChessboardReedSolomonDetector<T extends ImageGray<T>> implements Ve
 		ChessboardBitPattern target = found.grow();
 		target.squareRows = anonymousInfo.rows + 1;
 		target.squareCols = anonymousInfo.cols + 1;
-		target.decodedSquares = 0;
 
 		for (int i = 0; i < anonymousInfo.nodes.size(); i++) {
 			ChessboardCornerGraph.Node n = anonymousInfo.nodes.get(i);

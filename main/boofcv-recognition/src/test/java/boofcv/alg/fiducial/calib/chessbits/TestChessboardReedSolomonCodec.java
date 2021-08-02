@@ -121,7 +121,7 @@ public class TestChessboardReedSolomonCodec extends BoofStandardJUnit {
 		var alg = new ChessboardReedSolomonCodec();
 
 		// make it so it can recover from a bit error in all the words
-		alg.setMaxErrorFraction(1.0);
+		alg.setErrorCorrectionLevel(10);
 
 		alg.configure(10, 20000);
 		alg.encode(5, 51, encoded);
