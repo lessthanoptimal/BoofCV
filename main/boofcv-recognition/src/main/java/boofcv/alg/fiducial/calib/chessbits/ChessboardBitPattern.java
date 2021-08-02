@@ -21,6 +21,7 @@ package boofcv.alg.fiducial.calib.chessbits;
 import boofcv.struct.geo.PointIndex2D_F64;
 import org.ddogleg.struct.DogArray;
 import org.ddogleg.struct.DogArray_B;
+import org.ddogleg.struct.DogArray_I32;
 
 /**
  * Storage for a found chessboard pattern.
@@ -43,8 +44,8 @@ public class ChessboardBitPattern {
 	/** Indicates if a corner was decoded next to an encoding. Very unlikely to be a false positive. */
 	public final DogArray_B touchBinary = new DogArray_B();
 
-	/** Number of squares it was able to decode in the found chessboard */
-	public int decodedSquares;
+	/** Cell ID for cells which were successfully decoded. */
+	public DogArray_I32 decodedCells = new DogArray_I32();
 
 	public void reset() {
 		marker = -1;
@@ -52,7 +53,7 @@ public class ChessboardBitPattern {
 		squareRows = -1;
 		corners.reset();
 		touchBinary.reset();
-		decodedSquares = -1;
+		decodedCells.reset();
 	}
 
 	public void setTo( ChessboardBitPattern src ) {
@@ -64,6 +65,6 @@ public class ChessboardBitPattern {
 			this.corners.get(i).setTo(src.corners.get(i));
 		}
 		this.touchBinary.setTo(src.touchBinary);
-		this.decodedSquares = src.decodedSquares;
+		this.decodedCells.setTo(src.decodedCells);
 	}
 }

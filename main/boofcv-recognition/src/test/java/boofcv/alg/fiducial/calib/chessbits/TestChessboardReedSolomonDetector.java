@@ -90,7 +90,7 @@ public class TestChessboardReedSolomonDetector extends BoofStandardJUnit {
 		assertEquals(0, marker.marker);
 		assertEquals(squareRows, marker.squareRows);
 		assertEquals(squareCols, marker.squareCols);
-		assertEquals(numEncodedSquares, marker.decodedSquares);
+		assertEquals(numEncodedSquares, marker.decodedCells);
 		assertEquals(truthCorners.size(), marker.corners.size);
 
 		// see if the corners are at all the correct locations and have the correct ID
@@ -145,7 +145,7 @@ public class TestChessboardReedSolomonDetector extends BoofStandardJUnit {
 		assertEquals(0, marker.marker);
 		assertEquals(5, marker.squareRows);
 		assertEquals(6, marker.squareCols);
-		assertEquals(5, marker.decodedSquares);
+		assertEquals(5, marker.decodedCells);
 		assertEquals(16, marker.corners.size);
 	}
 
@@ -172,7 +172,7 @@ public class TestChessboardReedSolomonDetector extends BoofStandardJUnit {
 		assertEquals(5, marker.squareRows);
 		assertEquals(6, marker.squareCols);
 		assertEquals(truthCorners.size(), marker.corners.size);
-		assertEquals(0, marker.decodedSquares);
+		assertEquals(0, marker.decodedCells);
 		assertEquals(0, marker.touchBinary.size);
 	}
 
