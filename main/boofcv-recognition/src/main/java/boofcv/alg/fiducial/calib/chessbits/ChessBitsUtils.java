@@ -34,27 +34,49 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * TODO document
+ * <p>Common functions that are needed for encoding, decoding, and detecting.</p>
+ *
+ * Definitions:
+ * <dl>
+ *     <dt>data region</dt>
+ *     <dd>Square region containing the encoded message inside a white inner square</dd>
+ *
+ *     <dt>data region coordinates</dt>
+ *     <dd>2D coordinate system with the origin in the data region's top-left corner. Values vary from 0 to 1. Where
+ *     0 is at the origin and 1 is either the x or y axis border.</dd>
+ *
+ *     <dt>inner square</dt>
+ *     <dd>Square (white or black) inside chessboard which does not touch the border</dd>
+ *
+ *     <dt>bit-cell</dt>
+ *     <dd>Region in which a single bit of data is encoded. size is data-region's length / grid size</dd>
+ *
+ *     <dt>grid size</dt>
+ *     <dd>The length of a grid. size=5 then there are 25 cells in the grid.</dd>
+ *
+ *     <dt>quite-zone</dt>
+ *     <dd>White space surrounding an image feature which reduces confusion with the background or other features.</dd>
+ * </dl>
  *
  * @author Peter Abeles
  */
 public class ChessBitsUtils {
-	/** Fraction of a cell's length the data bit is */
+	/** Fraction of a bit-cell's length that the black square is drawn in */
 	public @Getter @Setter double dataBitWidthFraction = 0.7;
 
-	/** Fraction of the length the quite zone is around data bits */
+	/** Fraction length of the quite-zone around data bits */
 	public @Getter @Setter double dataBorderFraction = 0.15;
 
 	/** Shape of all possible markers */
 	public final List<GridShape> markers = new ArrayList<>();
 
-	/** Number of pixels it will reach for each bit when constructing binary image */
-	public int pixelsPerBit = 2;
+	/** Length of the row/column in the grid it will sample when determining a cell's bit value */
+	public int bitSampleGridSize = 2;
 
 	/**
-	 * Number of samples it will do for each bit. Each sample is one vote. Dynamically computed from {@link #pixelsPerBit}
+	 * Number of samples it will do for each bit. Each sample is one vote. Dynamically computed from {@link #bitSampleGridSize}
 	 */
-	public int bitSampleCount;
+	@Getter protected int bitSampleCount;
 
 	/** Used to encode and decode bit streams with coordinate information */
 	public final ChessboardReedSolomonCodec codec = new ChessboardReedSolomonCodec();
@@ -62,7 +84,7 @@ public class ChessBitsUtils {
 	// Used to compute the homography from square coordinates into image pixels
 	HomographyDirectLinearTransform dlt = new HomographyDirectLinearTransform(true);
 	DogArray<AssociatedPair> storagePairs2D = new DogArray<>(AssociatedPair::new);
-	// homography that describes the transform from bit-square (0 to 1.0) to image pixels
+	// homography that describes the transform from data-region (0 to 1.0) to image pixels
 	DMatrixRMaj squareToPixel = new DMatrixRMaj(3, 3);
 
 	// pre-allcoated workspace
@@ -86,7 +108,7 @@ public class ChessBitsUtils {
 		int N = findLargestCellCount();
 		codec.configure(markers.size(), N);
 
-		bitSampleCount = pixelsPerBit*2 + 1;
+		bitSampleCount = bitSampleGridSize*2 + 1;
 	}
 
 	public void checkFixate() {
@@ -109,11 +131,12 @@ public class ChessBitsUtils {
 	}
 
 	/**
-	 * Returns the rectangle for a specific data bit in bit-square coordinates
+	 * Returns the rectangle in which a data-bit will be written to. The rectangle will be in data-region
+	 * coordinates.
 	 *
 	 * @param row Bit's row
 	 * @param col Bit's column
-	 * @param rect Rectangle containing the bit
+	 * @param rect (Output) Rectangle containing the bit
 	 */
 	public void bitRect( int row, int col, Rectangle2D_F64 rect ) {
 		int bitGridLength = codec.getGridBitLength();
@@ -129,7 +152,7 @@ public class ChessBitsUtils {
 	}
 
 	/**
-	 * Finds the correspondence from bit-square coordinates to image pixels
+	 * Finds the correspondence from data-region coordinates to image pixels
 	 *
 	 * @param a Pixel corresponding to (0,0)
 	 * @param b Pixel corresponding to (w,0)
@@ -167,11 +190,11 @@ public class ChessBitsUtils {
 			for (int col = 0; col < bitGridLength; col++) {
 				bitRect(row, col, rect);
 
-				for (int i = 0; i < pixelsPerBit; i++) {
+				for (int i = 0; i < bitSampleGridSize; i++) {
 					// sample the inner region to avoid edge conditions on the boundary of white/black
-					bitSquare.y = (rect.p1.y - rect.p0.y)*(padding + sampleLength*i/(pixelsPerBit - 1)) + rect.p0.y;
-					for (int j = 0; j < pixelsPerBit; j++) {
-						bitSquare.x = (rect.p1.x - rect.p0.x)*(padding + sampleLength*j/(pixelsPerBit - 1)) + rect.p0.x;
+					bitSquare.y = (rect.p1.y - rect.p0.y)*(padding + sampleLength*i/(bitSampleGridSize - 1)) + rect.p0.y;
+					for (int j = 0; j < bitSampleGridSize; j++) {
+						bitSquare.x = (rect.p1.x - rect.p0.x)*(padding + sampleLength*j/(bitSampleGridSize - 1)) + rect.p0.x;
 
 						GeometryMath_F64.mult(squareToPixel, bitSquare, pixels.grow());
 					}

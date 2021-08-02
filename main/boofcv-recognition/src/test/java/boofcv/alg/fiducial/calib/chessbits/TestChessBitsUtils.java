@@ -29,15 +29,47 @@ import org.ejml.UtilEjml;
 import org.ejml.dense.row.CommonOps_DDRM;
 import org.junit.jupiter.api.Test;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  * @author Peter Abeles
  */
 public class TestChessBitsUtils extends BoofStandardJUnit {
-	@Test void findLargestCellCount() {fail("Implement");}
+	@Test void findLargestCellCount() {
+		var alg = new ChessBitsUtils();
+		alg.addMarker(4, 3);
+		alg.addMarker(1, 2);
+		alg.addMarker(8, 2);
+		alg.addMarker(5, 5);
 
-	@Test void bitRect() {fail("Implement");}
+		assertEquals(25, alg.findLargestCellCount());
+	}
+
+	@Test void bitRect() {
+		var alg = new ChessBitsUtils();
+		alg.dataBitWidthFraction = 0.9; // make sure this isn't 1.0
+		alg.addMarker(4, 3);
+		alg.fixate();
+
+		// Sanity check to make sure it's the expected grid size
+		assertEquals(5, alg.bitSampleCount);
+
+		var rect = new Rectangle2D_F64();
+		alg.bitRect(2, 3, rect);
+
+		// Size of a square
+		double square = (1.0 - 2*alg.dataBorderFraction)/6.0;
+		double squareData = square*0.9;
+
+		// make sure it's the expected size
+		assertEquals(squareData, rect.getWidth(), UtilEjml.TEST_F64);
+		assertEquals(squareData, rect.getHeight(), UtilEjml.TEST_F64);
+
+		// At the expected location
+		assertEquals(alg.dataBorderFraction + square*(2 + 0.05), rect.p0.y, UtilEjml.TEST_F64);
+		assertEquals(alg.dataBorderFraction + square*(3 + 0.05), rect.p0.x, UtilEjml.TEST_F64);
+	}
 
 	@Test void computeGridToImage() {
 		var alg = new ChessBitsUtils();
@@ -89,8 +121,8 @@ public class TestChessBitsUtils extends BoofStandardJUnit {
 
 		// Every pixel should be inside the rect
 		for (int i = 0; i < alg.bitSampleCount; i++) {
-			Point2D_F64 p = pixels.get(index+i);
-			assertTrue(Intersection2D_F64.contains(bitRect,p.x, p.y));
+			Point2D_F64 p = pixels.get(index + i);
+			assertTrue(Intersection2D_F64.contains(bitRect, p.x, p.y));
 		}
 	}
 

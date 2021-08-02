@@ -18,16 +18,6 @@
 
 package boofcv.abst.fiducial.calib;
 
-import boofcv.testing.BoofStandardJUnit;
-import org.junit.jupiter.api.Test;
+import boofcv.struct.StandardConfigurationChecks;
 
-import static org.junit.jupiter.api.Assertions.fail;
-
-/**
- * @author Peter Abeles
- */
-public class TestCalibrationDetectorMultiChessboardBits extends BoofStandardJUnit  {
-	@Test void implement() {
-		fail("implement");
-	}
-}
+public class TestConfigChessboardBits extends StandardConfigurationChecks {}

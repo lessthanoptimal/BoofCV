@@ -47,6 +47,7 @@ import org.jetbrains.annotations.Nullable;
 
 import java.io.PrintStream;
 import java.util.Collections;
+import java.util.List;
 import java.util.Set;
 
 import static boofcv.alg.fiducial.calib.chessbits.ChessBitsUtils.rotateObserved;
@@ -86,7 +87,7 @@ public class ChessboardReedSolomonDetector<T extends ImageGray<T>> implements Ve
 
 	/** Found chessboard patterns */
 	@Getter public final
-	DogArray<ChessboardBitPattern> found = new DogArray<>(ChessboardBitPattern::new, ChessboardBitPattern::reset);
+	DogArray<ChessboardBitMarker> found = new DogArray<>(ChessboardBitMarker::new, ChessboardBitMarker::reset);
 
 	// Binary cells in grid pattern for easy access
 	FastArray<CellReading> gridBinaryCells = new FastArray<>(CellReading.class);
@@ -272,7 +273,16 @@ public class ChessboardReedSolomonDetector<T extends ImageGray<T>> implements Ve
 
 				// Convert image pixels into bit values
 				float threshold = determineThreshold(a.node, b.node, c.node, d.node);
-				if (!sampleBitsGray(a.node, b.node, c.node, d.node, threshold))
+
+				// compute homography from pixels to data-region coordinates
+				if (!utils.computeGridToImage(a.node, b.node, c.node, d.node))
+					continue;
+
+				// Which pixels need to be sampled
+				utils.selectPixelsToSample(samplePixels);
+
+				// Sample points and compute bit values
+				if (!sampleBitsGray(samplePixels.toList(), utils.bitSampleCount, threshold))
 					continue;
 
 				boolean success = false;
@@ -383,7 +393,7 @@ public class ChessboardReedSolomonDetector<T extends ImageGray<T>> implements Ve
 	 *
 	 * @return Average value of tangent points along the side
 	 */
-	private float sampleThresholdSide( Point2D_F64 a, Point2D_F64 b ) {
+	float sampleThresholdSide( Point2D_F64 a, Point2D_F64 b ) {
 		double border = utils.dataBorderFraction;
 		double length = 1.0 - 2.0*border;
 
@@ -410,25 +420,22 @@ public class ChessboardReedSolomonDetector<T extends ImageGray<T>> implements Ve
 	/**
 	 * Reads the gray values of data bits inside the square. Votes using the gray threshold. Decides on the bit values
 	 *
+	 * @param samplePoints (Input) Which pixels to sample. Flattened block array of points in the grid
+	 * @param blockSize (Input) How many points are sampled per bit.
 	 * @return true if nothing went wrong
 	 */
-	private boolean sampleBitsGray( Point2D_F64 a, Point2D_F64 b, Point2D_F64 c, Point2D_F64 d, float threshold ) {
-		// compute homography
-		if (!utils.computeGridToImage(a, b, c, d))
-			return false;
+	boolean sampleBitsGray( List<Point2D_F64> samplePoints, int blockSize, float threshold ) {
+		// Sanity check
+		BoofMiscOps.checkEq(bitImage.width*bitImage.height, samplePoints.size()/blockSize);
 
-		// Which pixels need to be sampled
-		utils.selectPixelsToSample(samplePixels);
-
-		int blockSize = utils.bitSampleCount;
 		int majority = blockSize/2;
 
 		int nonWhiteBits = 0;
-		for (int i = 0, bit = 0; i < samplePixels.size; i += blockSize, bit++) {
+		for (int i = 0, bit = 0; i < samplePoints.size(); i += blockSize, bit++) {
 			// Each pixel in the bit's block gets a vote for it's value
 			int vote = 0;
 			for (int blockIdx = 0; blockIdx < blockSize; blockIdx++) {
-				Point2D_F64 pixel = samplePixels.get(i + blockIdx);
+				Point2D_F64 pixel = samplePoints.get(i + blockIdx);
 				float value = interpolate.get((float)pixel.x, (float)pixel.y);
 				if (value <= threshold) {
 					vote++;
@@ -506,7 +513,7 @@ public class ChessboardReedSolomonDetector<T extends ImageGray<T>> implements Ve
 	 * @param transform (Input) correction to corner grd coordinate system
 	 * @param target (Output) Description of target
 	 */
-	boolean createCorrectedTarget( Transform transform, ChessboardBitPattern target ) {
+	boolean createCorrectedTarget( Transform transform, ChessboardBitMarker target ) {
 		if (verbose != null)
 			verbose.printf("transform: votes=%d marker=%d ori=%d offset={ row=%d col=%d }\n",
 					transform.votes, transform.marker, transform.orientation, transform.offsetRow, transform.offsetCol);
@@ -573,7 +580,7 @@ public class ChessboardReedSolomonDetector<T extends ImageGray<T>> implements Ve
 		if (!clusterToGrid.sparseToGrid(anonymousInfo))
 			return;
 
-		ChessboardBitPattern target = found.grow();
+		ChessboardBitMarker target = found.grow();
 		target.squareRows = anonymousInfo.rows + 1;
 		target.squareCols = anonymousInfo.cols + 1;
 
