@@ -168,7 +168,7 @@ public class DetectChessboardBitsApp extends DemonstrationBase {
 				System.out.println("  marker="+c.marker);
 				System.out.println("  rows="+c.squareRows);
 				System.out.println("  cols="+c.squareCols);
-				System.out.println("  decoded="+c.decodedCells);
+				System.out.println("  decoded="+c.decodedCells.size);
 
 			}
 		}

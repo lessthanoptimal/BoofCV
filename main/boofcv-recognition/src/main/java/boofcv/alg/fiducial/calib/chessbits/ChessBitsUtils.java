@@ -149,7 +149,7 @@ public class ChessBitsUtils {
 	/**
 	 * Selects pixels that it should sample for each bit. The number of pixels per bit is specified by pixelsPerBit.
 	 * The order of bits is in row-major format with a block of size bitSampleCount. Points are sampled in a grid
-	 * pattern with one points always in the center. This means there will be an odd number of points preventing a tie.
+	 * pattern with one point in the center. This means there will be an odd number of points preventing a tie.
 	 *
 	 * @param pixels Image pixels that correspond pixels in binary version of grid
 	 */
@@ -158,11 +158,10 @@ public class ChessBitsUtils {
 
 		pixels.reset();
 
-		// size of the square
-		double squareWidth = (1.0 - dataBorderFraction*2)/bitGridLength;
-
-		// Size of the black square that's a bit
-		double bitPadding = squareWidth*(1.0 - dataBitWidthFraction)/(pixelsPerBit*2);
+		// sample the inner 50% of the data square
+		double sampleLength = 0.5*dataBitWidthFraction;
+		// Offset from the sides. This will center the sampling
+		double padding = (1.0 - sampleLength)/2.0;
 
 		for (int row = 0; row < bitGridLength; row++) {
 			for (int col = 0; col < bitGridLength; col++) {
@@ -170,9 +169,9 @@ public class ChessBitsUtils {
 
 				for (int i = 0; i < pixelsPerBit; i++) {
 					// sample the inner region to avoid edge conditions on the boundary of white/black
-					bitSquare.y = (rect.p1.y - rect.p0.y)*i/pixelsPerBit + rect.p0.y + bitPadding;
+					bitSquare.y = (rect.p1.y - rect.p0.y)*(padding + sampleLength*i/(pixelsPerBit - 1)) + rect.p0.y;
 					for (int j = 0; j < pixelsPerBit; j++) {
-						bitSquare.x = (rect.p1.x - rect.p0.x)*j/pixelsPerBit + rect.p0.x + bitPadding;
+						bitSquare.x = (rect.p1.x - rect.p0.x)*(padding + sampleLength*j/(pixelsPerBit - 1)) + rect.p0.x;
 
 						GeometryMath_F64.mult(squareToPixel, bitSquare, pixels.grow());
 					}
@@ -225,9 +224,13 @@ public class ChessBitsUtils {
 	 */
 	public static void adjustTopLeft( int orientation, GridCoordinate coordinate ) {
 		switch (orientation) {
-			case 0 -> {}
+			case 0 -> {
+			}
 			case 1 -> coordinate.row -= 1;
-			case 2 -> {coordinate.row -= 1;	coordinate.col -= 1;}
+			case 2 -> {
+				coordinate.row -= 1;
+				coordinate.col -= 1;
+			}
 			case 3 -> coordinate.col -= 1;
 			default -> throw new IllegalArgumentException("Unknown orientation: " + orientation);
 		}
