@@ -20,7 +20,8 @@ package boofcv.demonstrations.fiducial;
 
 import boofcv.abst.fiducial.calib.ConfigChessboardBits;
 import boofcv.abst.fiducial.calib.ConfigChessboardBitsMarkers;
-import boofcv.alg.fiducial.calib.chessbits.ChessboardBitPattern;
+import boofcv.alg.feature.detect.chess.ChessboardCorner;
+import boofcv.alg.fiducial.calib.chessbits.ChessboardBitMarker;
 import boofcv.alg.fiducial.calib.chessbits.ChessboardReedSolomonDetector;
 import boofcv.demonstrations.shapes.DetectBlackShapePanel;
 import boofcv.demonstrations.shapes.ShapeVisualizePanel;
@@ -30,6 +31,7 @@ import boofcv.gui.DemonstrationBase;
 import boofcv.gui.StandardAlgConfigPanel;
 import boofcv.gui.calibration.DisplayPinholeCalibrationPanel;
 import boofcv.gui.controls.JSpinnerNumber;
+import boofcv.gui.feature.VisualizeFeatures;
 import boofcv.io.PathLabel;
 import boofcv.io.UtilIO;
 import boofcv.io.image.ConvertBufferedImage;
@@ -47,6 +49,7 @@ import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.awt.geom.AffineTransform;
 import java.awt.geom.Ellipse2D;
+import java.awt.geom.Line2D;
 import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -85,7 +88,8 @@ public class DetectChessboardBitsApp extends DemonstrationBase {
 
 	//------------- Lock for what's being drawn in the GUI
 	private final Object lockVisualize = new Object();
-	DogArray<ChessboardBitPattern> foundPatterns = new DogArray<>(ChessboardBitPattern::new);
+	private final DogArray<ChessboardBitMarker> foundPatterns = new DogArray<>(ChessboardBitMarker::new);
+	private final DogArray<ChessboardCorner> foundCorners = new DogArray<>(ChessboardCorner::new);
 	//-------------
 
 
@@ -147,9 +151,10 @@ public class DetectChessboardBitsApp extends DemonstrationBase {
 			long time1 = System.nanoTime();
 			processingTime = (time1 - time0)*1e-6; // milliseconds
 
-			FastAccess<ChessboardBitPattern> found = detector.getFound();
+			FastAccess<ChessboardBitMarker> found = detector.getFound();
 
 			synchronized (lockVisualize) {
+				// Copy found chessboard patterns
 				this.foundPatterns.resetResize(found.size);
 				for (int i = 0; i < found.size; i++) {
 					this.foundPatterns.get(i).setTo(found.get(i));
@@ -157,11 +162,18 @@ public class DetectChessboardBitsApp extends DemonstrationBase {
 					// Sort so that they have some sane order when visualized
 					Collections.sort(foundPatterns.get(i).corners.toList(), Comparator.comparingInt(a -> a.index));
 				}
+
+				// Copy found X-Corners
+				DogArray<ChessboardCorner> orig = detector.getDetector().getCorners();
+				foundCorners.resetResize(orig.size);
+				for (int i = 0; i < orig.size; i++) {
+					foundCorners.get(i).setTo(orig.get(i));
+				}
 			}
 
 			System.out.println("found.size="+found.size);
 			for (int i = 0; i < found.size; i++) {
-				ChessboardBitPattern c = found.get(i);
+				ChessboardBitMarker c = found.get(i);
 				if (!controlPanel.showAnonymous && c.marker < 0)
 					continue;
 				System.out.println("["+i+"]");
@@ -193,6 +205,7 @@ public class DetectChessboardBitsApp extends DemonstrationBase {
 
 	class DisplayPanel extends ShapeVisualizePanel {
 		Ellipse2D.Double circle = new Ellipse2D.Double();
+		Line2D.Double line = new Line2D.Double();
 		BasicStroke stroke2 = new BasicStroke(2);
 		BasicStroke stroke5 = new BasicStroke(5);
 
@@ -214,9 +227,36 @@ public class DetectChessboardBitsApp extends DemonstrationBase {
 				g2.setComposite(beforeAC);
 			}
 
+			if (controlPanel.showCorners) {
+				synchronized (lockVisualize) {
+					// TODO create a function for this and call it from DetectCalibrationChessboardXCornerApp
+					for (int i = 0; i < foundCorners.size; i++) {
+						ChessboardCorner c = foundCorners.get(i);
+
+						double x = c.x;
+						double y = c.y;
+
+						g2.setStroke(stroke5);
+						g2.setColor(Color.BLACK);
+						VisualizeFeatures.drawCircle(g2, x*scale, y*scale, 5, circle);
+						g2.setStroke(stroke2);
+						g2.setColor(Color.ORANGE);
+						VisualizeFeatures.drawCircle(g2, x*scale, y*scale, 5, circle);
+
+						double dx = 6*Math.cos(c.orientation);
+						double dy = 6*Math.sin(c.orientation);
+
+						g2.setStroke(stroke2);
+						g2.setColor(Color.CYAN);
+						line.setLine((x - dx)*scale, (y - dy)*scale, (x + dx)*scale, (y + dy)*scale);
+						g2.draw(line);
+					}
+				}
+			}
+
 			synchronized (lockVisualize) {
 				for (int i = 0; i < foundPatterns.size; i++) {
-					ChessboardBitPattern c = foundPatterns.get(i);
+					ChessboardBitMarker c = foundPatterns.get(i);
 					if (!controlPanel.showAnonymous && c.marker < 0)
 						continue;
 					DisplayPinholeCalibrationPanel.renderOrder(g2, scale, c.corners.toList());
@@ -242,12 +282,14 @@ public class DetectChessboardBitsApp extends DemonstrationBase {
 
 		boolean showChessboards = true;
 		boolean showNumbers = true;
+		boolean showCorners = false;
 		int translucent = 0;
 		boolean showAnonymous = false;
 
 		JSlider sliderTranslucent = new JSlider(JSlider.HORIZONTAL, 0, 100, 0);
 		JCheckBox checkShowTargets = checkbox("Chessboard", showChessboards);
 		JCheckBox checkShowNumbers = checkbox("Numbers", showNumbers);
+		JCheckBox checkShowCorners = checkbox("Corners", showCorners);
 		JCheckBox checkShowAnonymous = checkbox("Anonymous", showAnonymous);
 
 		ControlPanel() {
@@ -277,6 +319,7 @@ public class DetectChessboardBitsApp extends DemonstrationBase {
 
 			panelChecks.add(checkShowTargets);
 			panelChecks.add(checkShowNumbers);
+			panelChecks.add(checkShowCorners);
 			panelChecks.add(checkShowAnonymous);
 
 			panelChecks.setPreferredSize(panelChecks.getMinimumSize());
@@ -312,6 +355,9 @@ public class DetectChessboardBitsApp extends DemonstrationBase {
 				imagePanel.repaint();
 			} else if (source == checkShowNumbers) {
 				showNumbers = checkShowNumbers.isSelected();
+				imagePanel.repaint();
+			} else if (source == checkShowCorners) {
+				showCorners = checkShowCorners.isSelected();
 				imagePanel.repaint();
 			} else if (source == checkShowAnonymous) {
 				showAnonymous = checkShowAnonymous.isSelected();

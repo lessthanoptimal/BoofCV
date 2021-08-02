@@ -19,6 +19,7 @@
 package boofcv.alg.fiducial.calib.chessbits;
 
 import boofcv.abst.fiducial.calib.ConfigChessboardX;
+import boofcv.alg.distort.AbstractInterpolatePixelS;
 import boofcv.alg.drawing.FiducialImageEngine;
 import boofcv.alg.fiducial.calib.chess.ChessboardCornerClusterToGrid.GridElement;
 import boofcv.alg.fiducial.calib.chess.ChessboardCornerGraph;
@@ -35,6 +36,7 @@ import org.ejml.UtilEjml;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -83,10 +85,10 @@ public class TestChessboardReedSolomonDetector extends BoofStandardJUnit {
 
 		alg.process(image);
 
-		FastAccess<ChessboardBitPattern> found = alg.getFound();
+		FastAccess<ChessboardBitMarker> found = alg.getFound();
 		assertEquals(1, found.size);
 
-		ChessboardBitPattern marker = found.get(0);
+		ChessboardBitMarker marker = found.get(0);
 		assertEquals(0, marker.marker);
 		assertEquals(squareRows, marker.squareRows);
 		assertEquals(squareCols, marker.squareCols);
@@ -116,9 +118,9 @@ public class TestChessboardReedSolomonDetector extends BoofStandardJUnit {
 			alg.process(rotated);
 			image.setTo(rotated);
 
-			FastAccess<ChessboardBitPattern> found = alg.getFound();
+			FastAccess<ChessboardBitMarker> found = alg.getFound();
 			assertEquals(1, found.size);
-			ChessboardBitPattern marker = found.get(0);
+			ChessboardBitMarker marker = found.get(0);
 			assertEquals(0, marker.marker);
 			assertEquals(5, marker.squareRows);
 			assertEquals(6, marker.squareCols);
@@ -137,11 +139,11 @@ public class TestChessboardReedSolomonDetector extends BoofStandardJUnit {
 
 		alg.process(image);
 
-		FastAccess<ChessboardBitPattern> found = alg.getFound();
+		FastAccess<ChessboardBitMarker> found = alg.getFound();
 		assertEquals(1, found.size);
 
 		// number of squares and corners is found through manual inspection
-		ChessboardBitPattern marker = found.get(0);
+		ChessboardBitMarker marker = found.get(0);
 		assertEquals(0, marker.marker);
 		assertEquals(5, marker.squareRows);
 		assertEquals(6, marker.squareCols);
@@ -164,10 +166,10 @@ public class TestChessboardReedSolomonDetector extends BoofStandardJUnit {
 
 		alg.process(image);
 
-		FastAccess<ChessboardBitPattern> found = alg.getFound();
+		FastAccess<ChessboardBitMarker> found = alg.getFound();
 		assertEquals(1, found.size);
 
-		ChessboardBitPattern marker = found.get(0);
+		ChessboardBitMarker marker = found.get(0);
 		assertEquals(-1, marker.marker);
 		assertEquals(5, marker.squareRows);
 		assertEquals(6, marker.squareCols);
@@ -197,7 +199,7 @@ public class TestChessboardReedSolomonDetector extends BoofStandardJUnit {
 
 		alg.process(combined);
 
-		FastAccess<ChessboardBitPattern> found = alg.getFound();
+		FastAccess<ChessboardBitMarker> found = alg.getFound();
 		assertEquals(2, found.size);
 
 		found.forEach(t -> {
@@ -229,7 +231,7 @@ public class TestChessboardReedSolomonDetector extends BoofStandardJUnit {
 
 		alg.process(combined);
 
-		FastAccess<ChessboardBitPattern> found = alg.getFound();
+		FastAccess<ChessboardBitMarker> found = alg.getFound();
 		assertEquals(2, found.size);
 	}
 
@@ -257,7 +259,7 @@ public class TestChessboardReedSolomonDetector extends BoofStandardJUnit {
 		transform.marker = 0;
 
 		// make this large enough so that it doesn't blow up by trying to access a pixel out of bounds
-		alg.cornersAroundBinary.reshape(10,10);
+		alg.cornersAroundBinary.reshape(10, 10);
 
 		// Create a grid with a few arbitrary elements that will have no issues
 		DogArray<GridElement> sparseGrid = alg.clusterToGrid.getSparseGrid();
@@ -269,36 +271,84 @@ public class TestChessboardReedSolomonDetector extends BoofStandardJUnit {
 		}
 
 		// Pass the first time
-		assertTrue(alg.createCorrectedTarget(transform, new ChessboardBitPattern()));
+		assertTrue(alg.createCorrectedTarget(transform, new ChessboardBitMarker()));
 
 		// Second time it will blow up because they have been marked!
-		assertFalse(alg.createCorrectedTarget(transform, new ChessboardBitPattern()));
+		assertFalse(alg.createCorrectedTarget(transform, new ChessboardBitMarker()));
 	}
 
 	@Test void findMatching() {
-		alg.transforms.grow().setTo(1,2,3,4,0);
-		alg.transforms.grow().setTo(1,2,4,3,0);
-		alg.transforms.grow().setTo(2,2,3,4,0);
+		alg.transforms.grow().setTo(1, 2, 3, 4, 0);
+		alg.transforms.grow().setTo(1, 2, 4, 3, 0);
+		alg.transforms.grow().setTo(2, 2, 3, 4, 0);
 
 		// feed it transforms that are in the array
-		assertSame(alg.transforms.get(0), alg.findMatching(1,2,3,4));
-		assertSame(alg.transforms.get(1), alg.findMatching(1,2,4,3));
-		assertSame(alg.transforms.get(2), alg.findMatching(2,2,3,4));
+		assertSame(alg.transforms.get(0), alg.findMatching(1, 2, 3, 4));
+		assertSame(alg.transforms.get(1), alg.findMatching(1, 2, 4, 3));
+		assertSame(alg.transforms.get(2), alg.findMatching(2, 2, 3, 4));
 
 		// Some that are not in the list
-		assertNull(alg.findMatching(1,2,3,1));
-		assertNull(alg.findMatching(1,2,2,4));
-	}
-
-	@Test void convertBitImageToBitArray() {
-		fail("Implement");
+		assertNull(alg.findMatching(1, 2, 3, 1));
+		assertNull(alg.findMatching(1, 2, 2, 4));
 	}
 
 	@Test void sampleThresholdSide() {
-		fail("Implement");
+		Point2D_F64 a = new Point2D_F64(10,30);
+		Point2D_F64 b = new Point2D_F64(40,30);
+
+		// If it samples between the two points it should have a known value
+		// It should not sample exactly on the line or right next to the end points
+		alg.interpolate = new AbstractInterpolatePixelS<>() {
+			@Override public float get( float x, float y ) {
+				if (x < 12 || x > 38)
+					return 0;
+				if (y > 30)
+					return 200;
+				else if (y < 30)
+					return 120;
+				else
+					return 0;
+			}
+		};
+
+		float found = alg.sampleThresholdSide(a, b);
+		assertEquals(160, found, UtilEjml.TEST_F32);
 	}
 
+	/**
+	 * Create a simple scenario where the bits follow a known pattern.
+	 */
 	@Test void sampleBitsGray() {
-		fail("Implement");
+		var points = new ArrayList<Point2D_F64>();
+
+		int rows = 5;
+		int cols = 6;
+		int blockSize = 4;
+
+		for (int i = 0; i < rows; i++) {
+			for (int j = 0; j < cols; j++) {
+				for (int k = 0; k < blockSize; k++) {
+					points.add(new Point2D_F64(j*20, i*20));
+				}
+			}
+		}
+
+		alg.bitImage.reshape(cols, rows);
+		alg.interpolate = new AbstractInterpolatePixelS<>() {
+			@Override public float get( float x, float y ) {
+				int i = (int)(y/20 + 0.5);
+				int j = (int)(x/20 + 0.5);
+
+				return (i + j)%3 == 0 ? 10 : 200;
+			}
+		};
+		alg.sampleBitsGray(points, blockSize, 100);
+
+		for (int i = 0; i < rows; i++) {
+			for (int j = 0; j < cols; j++) {
+				int expected = (i + j)%3 == 0 ? 1 : 0;
+				assertEquals(expected, alg.bitImage.get(j, i));
+			}
+		}
 	}
 }

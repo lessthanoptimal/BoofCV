@@ -28,7 +28,7 @@ import org.ddogleg.struct.DogArray_I32;
  *
  * @author Peter Abeles
  */
-public class ChessboardBitPattern {
+public class ChessboardBitMarker {
 	/** Which marker it came from. -1 if unknown */
 	public int marker;
 
@@ -56,7 +56,7 @@ public class ChessboardBitPattern {
 		decodedCells.reset();
 	}
 
-	public void setTo( ChessboardBitPattern src ) {
+	public void setTo( ChessboardBitMarker src ) {
 		this.marker = src.marker;
 		this.squareCols = src.squareCols;
 		this.squareRows = src.squareRows;
