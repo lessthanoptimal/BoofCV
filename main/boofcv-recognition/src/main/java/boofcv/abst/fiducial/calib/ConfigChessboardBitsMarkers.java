@@ -100,14 +100,14 @@ public class ConfigChessboardBitsMarkers implements Configuration {
 				"error correction must be from 0 to 10, inclusive.");
 	}
 
-	public static class MarkerShape {
+	public static class MarkerShape implements Configuration {
 		/** Number of squares tall the grid is */
 		public int numRows = -1;
 
 		/** Number of squares wide the grid is */
 		public int numCols = -1;
 
-		/** Length of a squares size */
+		/** Length of the square's side */
 		public double squareSize;
 
 		public MarkerShape( int numRows, int numCols, double squareSize ) {
@@ -122,6 +122,12 @@ public class ConfigChessboardBitsMarkers implements Configuration {
 			this.numRows = src.numRows;
 			this.numCols = src.numCols;
 			this.squareSize = src.squareSize;
+		}
+
+		@Override public void checkValidity() {
+			BoofMiscOps.checkTrue(numRows >= 0);
+			BoofMiscOps.checkTrue(numCols >= 0);
+			BoofMiscOps.checkTrue(squareSize > 0);
 		}
 	}
 }

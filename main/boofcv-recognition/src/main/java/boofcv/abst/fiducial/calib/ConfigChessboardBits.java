@@ -46,4 +46,10 @@ public class ConfigChessboardBits implements Configuration {
 		BoofMiscOps.checkFraction(dataBorderFraction, "dataBorderFraction must be 0 to 1.0.");
 		chessboard.checkValidity();
 	}
+
+	public void setTo( ConfigChessboardBits src ) {
+		this.dataBitWidthFraction = src.dataBitWidthFraction;
+		this.dataBorderFraction = src.dataBorderFraction;
+		this.chessboard.setTo(src.chessboard);
+	}
 }
