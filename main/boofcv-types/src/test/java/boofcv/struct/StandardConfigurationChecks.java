@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -24,9 +24,7 @@ import org.junit.jupiter.api.Test;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
-import java.util.HashSet;
-import java.util.Random;
-import java.util.Set;
+import java.util.*;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -55,8 +53,12 @@ public abstract class StandardConfigurationChecks extends BoofStandardJUnit {
 	 * Selects non-default values public primitive fields.
 	 */
 	public Configuration createNotDefault( Random rand ) {
+		return (Configuration)createNotDefault(type, rand);
+	}
+
+	public static Object createNotDefault( Class<?> type, Random rand ) {
 		try {
-			Configuration config = type.getConstructor().newInstance();
+			Object config = type.getConstructor().newInstance();
 			Field[] fields = type.getFields();
 			for (Field f : fields) {
 				if (f.getType().isEnum()) {
@@ -109,6 +111,19 @@ public abstract class StandardConfigurationChecks extends BoofStandardJUnit {
 						throw new RuntimeException("BUG " + f.getType().getSimpleName());
 					}
 					f.set(config, o);
+				} else if( f.getType().isAssignableFrom(List.class)) {
+					// If it's a list, create a "non-default" element for each item in the original
+					List originalList = (List)f.get(config);
+					if (!originalList.isEmpty()) {
+						List outputList = new ArrayList();
+						for (int listIdx = 0; listIdx < originalList.size(); listIdx++) {
+							Object o = originalList.get(listIdx);
+							outputList.add(createNotDefault(o.getClass(), rand));
+						}
+						// It might be final. So just add the elements in after clearing it
+						originalList.clear();
+						originalList.addAll(outputList);
+					}
 				}
 			}
 			return config;
@@ -120,7 +135,7 @@ public abstract class StandardConfigurationChecks extends BoofStandardJUnit {
 	@Test
 	void setTo() {
 		Method m;
-		Configuration src = createNotDefault(rand);
+		Configuration src = (Configuration)createNotDefault(type, rand);
 		try {
 			Configuration dst = type.getConstructor().newInstance();
 			m = type.getMethod("setTo", type);
@@ -141,8 +156,20 @@ public abstract class StandardConfigurationChecks extends BoofStandardJUnit {
 
 				if (onlyOneOption)
 					assertEquals(f.get(src), f.get(dst), "Field Name: '" + f.getName() + "'");
-				else
+				else if (f.getType().isAssignableFrom(List.class)) {
+					List listSrc = (List)f.get(src);
+					List listDst = (List)f.get(dst);
+
+					// if the original list is empty there's nothing that can be tested.
+					if (listSrc.isEmpty()) {
+						// The type is unknown so nothing should have been added to dst
+						assertTrue(listDst.isEmpty());
+					} else {
+						throw new RuntimeException("Handle this!");
+					}
+				} else {
 					assertNotEquals(f.get(src), f.get(dst), "Field Name: '" + f.getName() + "'");
+				}
 			}
 
 			m.invoke(dst, src);
@@ -151,7 +178,14 @@ public abstract class StandardConfigurationChecks extends BoofStandardJUnit {
 			for (Field f : fields) {
 				if (f.getType().isEnum() || f.getType().isPrimitive() || f.get(src) == null)
 					assertEquals(f.get(src), f.get(dst), "Field Name: '" + f.getName() + "'");
-				else
+				else if (f.getType().isAssignableFrom(List.class)) {
+					List listSrc = (List)f.get(src);
+					List listDst = (List)f.get(dst);
+					assertEquals(listSrc.size(), listDst.size());
+					for (int i = 0; i < listSrc.size(); i++) {
+						throw new RuntimeException("IMplement!");
+					}
+				} else
 					assertNotEquals(f.get(src), f.get(dst), "Field Name: '" + f.getName() + "'");
 				// if they are equal that means it copied the reference
 			}
