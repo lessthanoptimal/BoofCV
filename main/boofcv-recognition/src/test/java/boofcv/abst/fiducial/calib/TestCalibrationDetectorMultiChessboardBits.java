@@ -18,16 +18,52 @@
 
 package boofcv.abst.fiducial.calib;
 
-import boofcv.testing.BoofStandardJUnit;
-import org.junit.jupiter.api.Test;
+import boofcv.abst.geo.calibration.DetectMultiFiducialCalibration;
+import boofcv.alg.drawing.FiducialImageEngine;
+import boofcv.alg.fiducial.calib.chessbits.ChessBitsUtils;
+import boofcv.alg.fiducial.calib.chessbits.ChessboardReedSolomonGenerator;
+import boofcv.factory.fiducial.FactoryFiducialCalibration;
+import boofcv.misc.BoofMiscOps;
+import boofcv.struct.GridShape;
+import boofcv.struct.geo.PointIndex2D_F64;
+import boofcv.struct.image.GrayF32;
 
-import static org.junit.jupiter.api.Assertions.fail;
+import java.util.List;
 
 /**
  * @author Peter Abeles
  */
-public class TestCalibrationDetectorMultiChessboardBits extends BoofStandardJUnit  {
-	@Test void implement() {
-		fail("implement");
+public class TestCalibrationDetectorMultiChessboardBits extends GenericDetectMultiFiducialCalibrationChecks {
+
+	ConfigChessboardBits configDetector = new ConfigChessboardBits();
+	ConfigChessboardBitsMarkers configMarkers = ConfigChessboardBitsMarkers.singleShape(4, 5, 0.05, 4);
+	ChessBitsUtils utils = new ChessBitsUtils();
+
+	public TestCalibrationDetectorMultiChessboardBits() {
+		configMarkers.convertToGridList(utils.markers);
+		utils.dataBorderFraction = configDetector.dataBorderFraction;
+		utils.dataBitWidthFraction = configDetector.dataBitWidthFraction;
+		utils.fixate();
+//		visualizeFailures = true;
+	}
+
+	@Override public DetectMultiFiducialCalibration createDetector() {
+		return FactoryFiducialCalibration.chessboardBits(configDetector, configMarkers);
+	}
+
+	@Override public GrayF32 renderPattern( int marker, List<PointIndex2D_F64> calibrationPoints ) {
+		GridShape shape = utils.markers.get(marker);
+		int squareLength = 60;
+
+		var engine = new FiducialImageEngine();
+		engine.configure(20, squareLength*(shape.cols - 1), squareLength*(shape.rows - 1));
+		var generator = new ChessboardReedSolomonGenerator(utils);
+		generator.squareWidth = squareLength;
+		generator.setRender(engine);
+		generator.render(marker);
+
+		BoofMiscOps.forIdx(generator.corner, ( idx, c ) -> calibrationPoints.add(new PointIndex2D_F64(c.x, c.y, idx)));
+
+		return engine.getGrayF32();
 	}
 }

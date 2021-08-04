@@ -40,7 +40,7 @@ public interface DetectMultiFiducialCalibration {
 	void process( GrayF32 input );
 
 	/** Returns the number of detected markers */
-	int getCount();
+	int getDetectionCount();
 
 	/** Returns which marker was seen for a particular detection */
 	int getMarkerID( int detectionID );

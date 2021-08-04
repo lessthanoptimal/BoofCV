@@ -92,8 +92,6 @@ class TestChessboardCornerClusterToGrid extends BoofStandardJUnit
 		assertEquals(5, info.cols);
 		assertEquals(4, info.rows);
 		assertEquals(5*4, info.nodes.size());
-
-		fail("Test these functions individually");
 	}
 
 	void convert(ChessboardCornerClusterToGrid alg, int rows , int cols , boolean randomized ) {
@@ -113,8 +111,6 @@ class TestChessboardCornerClusterToGrid extends BoofStandardJUnit
 		assertTrue(alg.clusterToSparse(graph));
 		assertTrue(alg.sparseToGrid(info));
 		assertTrue(info.hasCornerSquare);
-
-		fail("Test these functions individually");
 
 		// test shape
 		if( rows == info.rows ) {

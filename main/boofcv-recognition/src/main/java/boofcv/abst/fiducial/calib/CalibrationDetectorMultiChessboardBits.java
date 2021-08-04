@@ -63,7 +63,7 @@ public class CalibrationDetectorMultiChessboardBits implements DetectMultiFiduci
 		dimension.setTo(input.width, input.height);
 	}
 
-	@Override public int getCount() {
+	@Override public int getDetectionCount() {
 		return detector.getFound().size;
 	}
 
