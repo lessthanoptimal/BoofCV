@@ -32,7 +32,7 @@ import java.util.List;
 /**
  * @author Peter Abeles
  */
-public class TestCalibrationDetectorCircleRegularGrid extends GenericPlanarCalibrationDetectorChecks {
+public class TestCalibrationDetectorCircleRegularGrid extends GenericDetectSingleFiducialCalibrationChecks {
 
 	public TestCalibrationDetectorCircleRegularGrid() {
 		targetConfigs.add( new ConfigGridDimen(4, 3, 30,50));

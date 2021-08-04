@@ -22,33 +22,49 @@ import boofcv.alg.distort.LensDistortionNarrowFOV;
 import boofcv.alg.geo.calibration.CalibrationObservation;
 import boofcv.struct.image.GrayF32;
 import georegression.struct.point.Point2D_F64;
+import lombok.Getter;
+import lombok.Setter;
 
 import java.util.List;
 
 /**
+ * Wraps {@link DetectMultiFiducialCalibration} by limiting it to a single marker.
+ *
  * @author Peter Abeles
  */
 public class MultiToSingleFiducialCalibration implements DetectSingleFiducialCalibration {
 	DetectMultiFiducialCalibration alg;
 
+	/** Specifies which marker it will return. All other markers will be ignored */
+	@Getter @Setter int targetMarker = 0;
+
+	// which detection matches the target ID. -1 means it was not detected
+	private int detectedID;
+
 	public MultiToSingleFiducialCalibration( DetectMultiFiducialCalibration alg ) {
-		if (alg.getTotalUniqueMarkers() > 1)
-			throw new IllegalArgumentException("Must be able to only detect a single target. " +
-					"Won't know which layout to use.");
 		this.alg = alg;
 	}
 
 	@Override public boolean process( GrayF32 input ) {
 		alg.process(input);
-		return alg.getCount() == 1;
+
+		detectedID = -1;
+		for (int i = 0; i < alg.getDetectionCount(); i++) {
+			if (alg.getMarkerID(i) == targetMarker) {
+				detectedID = i;
+				break;
+			}
+		}
+
+		return detectedID != -1;
 	}
 
 	@Override public CalibrationObservation getDetectedPoints() {
-		return alg.getDetectedPoints(0);
+		return alg.getDetectedPoints(detectedID);
 	}
 
 	@Override public List<Point2D_F64> getLayout() {
-		return alg.getLayout(0);
+		return alg.getLayout(targetMarker);
 	}
 
 	@Override public void setLensDistortion( LensDistortionNarrowFOV distortion, int width, int height ) {

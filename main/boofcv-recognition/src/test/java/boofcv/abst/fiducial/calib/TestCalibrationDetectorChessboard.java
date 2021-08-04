@@ -33,7 +33,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 /**
  * @author Peter Abeles
  */
-public class TestCalibrationDetectorChessboard extends GenericPlanarCalibrationDetectorChecks {
+public class TestCalibrationDetectorChessboard extends GenericDetectSingleFiducialCalibrationChecks {
 
 
 	public TestCalibrationDetectorChessboard() {

@@ -39,6 +39,7 @@ import boofcv.io.image.SimpleImageSequence;
 import boofcv.struct.image.GrayF32;
 import boofcv.struct.image.ImageBase;
 import boofcv.struct.image.ImageType;
+import georegression.struct.point.Point2D_F64;
 import org.ddogleg.struct.DogArray;
 import org.ddogleg.struct.FastAccess;
 
@@ -47,6 +48,8 @@ import javax.swing.border.TitledBorder;
 import java.awt.*;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 import java.awt.geom.AffineTransform;
 import java.awt.geom.Ellipse2D;
 import java.awt.geom.Line2D;
@@ -107,6 +110,15 @@ public class DetectChessboardBitsApp extends DemonstrationBase {
 			public void keyPressed( KeyEvent e ) {
 				if (e.getKeyCode() == KeyEvent.VK_SPACE) {
 					streamPaused = !streamPaused;
+				}
+			}
+		});
+
+		imagePanel.getImagePanel().addMouseListener(new MouseAdapter() {
+			@Override public void mousePressed( MouseEvent e ) {
+				Point2D_F64 p = imagePanel.pixelToPoint(e.getX(), e.getY());
+				if (SwingUtilities.isLeftMouseButton(e)) {
+					System.out.printf("Clicked at %.2f , %.2f\n", p.x, p.y);
 				}
 			}
 		});
@@ -200,6 +212,7 @@ public class DetectChessboardBitsApp extends DemonstrationBase {
 			configMarker.errorCorrectionLevel = controlPanel.errorLevel.value.intValue();
 
 			detector = FactoryFiducial.chessboardBits(configDetector, configMarker, GrayF32.class);
+			detector.setVerbose(System.out, null);
 		}
 	}
 
@@ -254,12 +267,14 @@ public class DetectChessboardBitsApp extends DemonstrationBase {
 				}
 			}
 
-			synchronized (lockVisualize) {
-				for (int i = 0; i < foundPatterns.size; i++) {
-					ChessboardBitMarker c = foundPatterns.get(i);
-					if (!controlPanel.showAnonymous && c.marker < 0)
-						continue;
-					DisplayPinholeCalibrationPanel.renderOrder(g2, scale, c.corners.toList());
+			if (controlPanel.showChessboards) {
+				synchronized (lockVisualize) {
+					for (int i = 0; i < foundPatterns.size; i++) {
+						ChessboardBitMarker c = foundPatterns.get(i);
+						if (!controlPanel.showAnonymous && c.marker < 0)
+							continue;
+						DisplayPinholeCalibrationPanel.renderOrder(g2, scale, c.corners.toList());
+					}
 				}
 			}
 			

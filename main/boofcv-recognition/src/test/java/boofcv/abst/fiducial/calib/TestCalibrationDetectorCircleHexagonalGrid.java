@@ -31,7 +31,7 @@ import static boofcv.abst.fiducial.calib.CalibrationDetectorCircleHexagonalGrid.
 /**
  * @author Peter Abeles
  */
-public class TestCalibrationDetectorCircleHexagonalGrid extends GenericPlanarCalibrationDetectorChecks {
+public class TestCalibrationDetectorCircleHexagonalGrid extends GenericDetectSingleFiducialCalibrationChecks {
 
 	public TestCalibrationDetectorCircleHexagonalGrid() {
 		// each configuration has a different ending that needs to be handled

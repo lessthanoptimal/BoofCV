@@ -49,7 +49,7 @@ import static org.junit.jupiter.api.Assertions.*;
 /**
  * @author Peter Abeles
  */
-public abstract class GenericPlanarCalibrationDetectorChecks extends BoofStandardJUnit {
+public abstract class GenericDetectSingleFiducialCalibrationChecks extends BoofStandardJUnit {
 
 	List<ConfigGridDimen> targetConfigs = new ArrayList<>();
 
@@ -66,7 +66,7 @@ public abstract class GenericPlanarCalibrationDetectorChecks extends BoofStandar
 	// list of posses for fisheye test
 	protected List<Se3_F64> fisheye_poses = new ArrayList<>();
 
-	protected GenericPlanarCalibrationDetectorChecks() {
+	protected GenericDetectSingleFiducialCalibrationChecks() {
 		createFisheyePoses();
 	}
 

@@ -32,7 +32,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 /**
  * @author Peter Abeles
  */
-public class TestCalibrationDetectorSquareGrid extends GenericPlanarCalibrationDetectorChecks {
+public class TestCalibrationDetectorSquareGrid extends GenericDetectSingleFiducialCalibrationChecks {
 
 	public TestCalibrationDetectorSquareGrid() {
 		targetConfigs.add(  new ConfigGridDimen(3, 2, 30,30) );
