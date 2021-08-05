@@ -23,8 +23,8 @@ import boofcv.abst.fiducial.calib.*;
 import boofcv.abst.filter.binary.InputToBinary;
 import boofcv.alg.feature.describe.llah.LlahHasher;
 import boofcv.alg.feature.describe.llah.LlahOperations;
-import boofcv.alg.fiducial.calib.chessbits.ChessBitsUtils;
-import boofcv.alg.fiducial.calib.chessbits.ChessboardReedSolomonDetector;
+import boofcv.alg.fiducial.calib.ecocheck.ECoCheckDetector;
+import boofcv.alg.fiducial.calib.ecocheck.ECoCheckUtils;
 import boofcv.alg.fiducial.dots.UchiyaMarkerImageTracker;
 import boofcv.alg.fiducial.dots.UchiyaMarkerTracker;
 import boofcv.alg.fiducial.qrcode.QrCodePositionPatternDetector;
@@ -200,7 +200,7 @@ public class FactoryFiducial {
 	}
 
 	/**
-	 * Creates a new {@link ChessboardReedSolomonDetector}. This will detect chessboard patterns that have been
+	 * Creates a new {@link ECoCheckDetector}. This will detect chessboard patterns that have been
 	 * encoded with a marker ID and coordinates of every corner.
 	 *
 	 * @param configDetector Configuration for chessboard detector
@@ -208,22 +208,22 @@ public class FactoryFiducial {
 	 * @return New detector
 	 */
 	public static <T extends ImageGray<T>>
-	ChessboardReedSolomonDetector<T> chessboardBits( @Nullable ConfigChessboardBits configDetector,
-													 ConfigChessboardBitsMarkers configMarkers, Class<T> imageType ) {
+	ECoCheckDetector<T> ecocheck( @Nullable ConfigECoCheckDetector configDetector,
+								  ConfigECoCheckMarkers configMarkers, Class<T> imageType ) {
 		if (configDetector == null)
-			configDetector = new ConfigChessboardBits();
+			configDetector = new ConfigECoCheckDetector();
 		configDetector.checkValidity();
 		configMarkers.checkValidity();
 
 		// Set up the utils, which configures how the targets will be encoded
-		var utils = new ChessBitsUtils();
+		var utils = new ECoCheckUtils();
 		utils.codec.setErrorCorrectionLevel(configMarkers.errorCorrectionLevel);
-		utils.setDataBorderFraction(configDetector.dataBorderFraction);
-		utils.setDataBitWidthFraction(configDetector.dataBitWidthFraction);
+		utils.setDataBorderFraction(configMarkers.dataBorderFraction);
+		utils.setDataBitWidthFraction(configMarkers.dataBitWidthFraction);
 		configMarkers.convertToGridList(utils.markers);
 		utils.fixate();
 
-		return new ChessboardReedSolomonDetector<>(utils, configDetector.chessboard, imageType);
+		return new ECoCheckDetector<>(utils, configDetector.chessboard, imageType);
 	}
 
 	/**

@@ -25,7 +25,7 @@ package boofcv.abst.fiducial.calib;
  */
 public enum CalibrationPatterns {
 	CHESSBOARD,
-	CHESSBOARD_BITS,
+	ECOCHECK,
 	SQUARE_GRID,
 	CIRCLE_HEXAGONAL,
 	CIRCLE_GRID,

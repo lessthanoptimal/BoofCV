@@ -18,38 +18,34 @@
 
 package boofcv.abst.fiducial.calib;
 
+import boofcv.alg.fiducial.calib.ecocheck.ECoCheckDetector;
 import boofcv.misc.BoofMiscOps;
 import boofcv.struct.Configuration;
 
 /**
- * Configuration for detecting ChessboardBits markers. These markers are chessboard patterns with marker ID and cell ID
+ * Configuration for detecting ECoCheck markers. These markers are chessboard patterns with marker ID and cell ID
  * encoded in the white spaces. Intended for use in multi camera calibration. The number of unique markers and their
  * shapes is required to known before a marker can be detected as the encoding changes based on these values.
  *
- * @see boofcv.alg.fiducial.calib.chessbits.ChessboardReedSolomonDetector
+ * @see ECoCheckDetector
  *
  * @author Peter Abeles
  */
-public class ConfigChessboardBits implements Configuration {
+public class ConfigECoCheckDetector implements Configuration {
 
-	/** Fraction of a cell's length the data bit is */
-	public double dataBitWidthFraction = 0.7;
-
-	/** Fraction of the length the quite zone is around data bits */
-	public double dataBorderFraction = 0.15;
+	/** Number of times it will sample the side a square when determining the binarization threshold */
+	public int sampleCountSides = 5;
 
 	/** Describes how to detect the chessboard */
 	public final ConfigChessboardX chessboard = new ConfigChessboardX();
 
 	@Override public void checkValidity() {
-		BoofMiscOps.checkFraction(dataBitWidthFraction, "dataBitWidthFraction must be 0 to 1.0.");
-		BoofMiscOps.checkFraction(dataBorderFraction, "dataBorderFraction must be 0 to 1.0.");
+		BoofMiscOps.checkTrue(sampleCountSides>0, "sampleCountSides must be greater than zero");
 		chessboard.checkValidity();
 	}
 
-	public void setTo( ConfigChessboardBits src ) {
-		this.dataBitWidthFraction = src.dataBitWidthFraction;
-		this.dataBorderFraction = src.dataBorderFraction;
+	public void setTo( ConfigECoCheckDetector src ) {
+		this.sampleCountSides = src.sampleCountSides;
 		this.chessboard.setTo(src.chessboard);
 	}
 }

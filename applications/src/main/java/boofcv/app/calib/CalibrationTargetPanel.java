@@ -19,7 +19,7 @@
 package boofcv.app.calib;
 
 import boofcv.abst.fiducial.calib.CalibrationPatterns;
-import boofcv.abst.fiducial.calib.ConfigChessboardBitsMarkers;
+import boofcv.abst.fiducial.calib.ConfigECoCheckMarkers;
 import boofcv.abst.fiducial.calib.ConfigGridDimen;
 import boofcv.gui.StandardAlgConfigPanel;
 
@@ -43,7 +43,7 @@ public class CalibrationTargetPanel extends StandardAlgConfigPanel implements Ac
 	public CalibrationPatterns selected = CalibrationPatterns.CHESSBOARD;
 
 	public ConfigGridDimen configChessboard = new ConfigGridDimen(7, 5, 1);
-	public ConfigChessboardBitsMarkers configChessboardBits = ConfigChessboardBitsMarkers.singleShape(9, 7, 1, 1);
+	public ConfigECoCheckMarkers configECoCheck = ConfigECoCheckMarkers.singleShape(9, 7, 1, 1);
 	public ConfigGridDimen configSquare = new ConfigGridDimen(4, 3, 1, 1);
 	public ConfigGridDimen configCircle = new ConfigGridDimen(15, 10, 1, 1.5);
 	public ConfigGridDimen configCircleHex = new ConfigGridDimen(15, 15, 1, 1.5);
@@ -69,7 +69,7 @@ public class CalibrationTargetPanel extends StandardAlgConfigPanel implements Ac
 	public void updateParameters() {
 		Object c = switch (selected) {
 			case CHESSBOARD -> configChessboard;
-			case CHESSBOARD_BITS -> configChessboardBits;
+			case ECOCHECK -> configECoCheck;
 			case SQUARE_GRID -> configSquare;
 			case CIRCLE_GRID -> configCircle;
 			case CIRCLE_HEXAGONAL -> configCircleHex;
@@ -90,7 +90,7 @@ public class CalibrationTargetPanel extends StandardAlgConfigPanel implements Ac
 	public void changeTargetPanel() {
 		JPanel p = switch (selected) {
 			case CHESSBOARD -> new ChessPanel();
-			case CHESSBOARD_BITS -> new ChessBitsPanel();
+			case ECOCHECK -> new ChessBitsPanel();
 			case SQUARE_GRID -> new SquareGridPanel();
 			case CIRCLE_GRID -> new CircleGridPanel();
 			case CIRCLE_HEXAGONAL -> new CircleHexPanel();
@@ -138,13 +138,13 @@ public class CalibrationTargetPanel extends StandardAlgConfigPanel implements Ac
 		public ChessBitsPanel() {
 			setBorder(BorderFactory.createEmptyBorder());
 
-			ConfigChessboardBitsMarkers.MarkerShape shape = configChessboardBits.markerShapes.get(0);
+			ConfigECoCheckMarkers.MarkerShape shape = configECoCheck.markerShapes.get(0);
 
 			sRows = spinner(shape.numRows, 1, 1000, 1);
 			sCols = spinner(shape.numCols, 1, 1000, 1);
 			sWidth = spinner(shape.squareSize, 0, 1000000.0, 1);
-			sMarkers = spinner(configChessboardBits.firstTargetDuplicated, 1, 1000, 1);
-			comboErrorLevel = combo(configChessboardBits.errorCorrectionLevel, "0","1","2","3","4","5","6","7","8","9","10");
+			sMarkers = spinner(configECoCheck.firstTargetDuplicated, 1, 1000, 1);
+			comboErrorLevel = combo(configECoCheck.errorCorrectionLevel, "0","1","2","3","4","5","6","7","8","9","10");
 
 			addLabeled(sRows, "Rows", "Number of square rows");
 			addLabeled(sCols, "Cols", "Number of square columns");
@@ -155,7 +155,7 @@ public class CalibrationTargetPanel extends StandardAlgConfigPanel implements Ac
 
 		@Override
 		public void controlChanged( Object source ) {
-			ConfigChessboardBitsMarkers.MarkerShape shape = configChessboardBits.markerShapes.get(0);
+			ConfigECoCheckMarkers.MarkerShape shape = configECoCheck.markerShapes.get(0);
 
 			if (source == sRows) {
 				shape.numRows = ((Number)sRows.getValue()).intValue();
@@ -164,9 +164,9 @@ public class CalibrationTargetPanel extends StandardAlgConfigPanel implements Ac
 			} else if (source == sWidth) {
 				shape.squareSize = ((Number)sWidth.getValue()).doubleValue();
 			} else if (source == sMarkers) {
-				configChessboardBits.firstTargetDuplicated = ((Number)sMarkers.getValue()).intValue();
+				configECoCheck.firstTargetDuplicated = ((Number)sMarkers.getValue()).intValue();
 			} else if (source == comboErrorLevel) {
-				configChessboardBits.errorCorrectionLevel = comboErrorLevel.getSelectedIndex();
+				configECoCheck.errorCorrectionLevel = comboErrorLevel.getSelectedIndex();
 			}
 			updateParameters();
 		}

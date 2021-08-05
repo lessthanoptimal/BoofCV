@@ -19,10 +19,10 @@
 package boofcv.app;
 
 import boofcv.abst.fiducial.calib.CalibrationPatterns;
-import boofcv.abst.fiducial.calib.ConfigChessboardBitsMarkers;
+import boofcv.abst.fiducial.calib.ConfigECoCheckMarkers;
 import boofcv.abst.fiducial.calib.ConfigGridDimen;
-import boofcv.alg.fiducial.calib.chessbits.ChessBitsUtils;
-import boofcv.alg.fiducial.calib.chessbits.ChessboardReedSolomonGenerator;
+import boofcv.alg.fiducial.calib.ecocheck.ECoCheckGenerator;
+import boofcv.alg.fiducial.calib.ecocheck.ECoCheckUtils;
 import boofcv.app.calib.CalibrationTargetPanel;
 import boofcv.app.fiducials.CreateFiducialDocumentPDF;
 import boofcv.generate.Unit;
@@ -44,7 +44,7 @@ import java.awt.event.KeyEvent;
 import java.io.File;
 import java.io.IOException;
 
-import static boofcv.app.CreateCalibrationTarget.chessboardBitsToPdf;
+import static boofcv.app.CreateCalibrationTarget.ecoCheckToPdf;
 import static boofcv.gui.StandardAlgConfigPanel.addLabeled;
 
 public class CreateCalibrationTargetGui extends JPanel
@@ -69,7 +69,7 @@ public class CreateCalibrationTargetGui extends JPanel
 
 		// set reasonable defaults
 		controlsTarget.configChessboard.shapeSize = 3;
-		controlsTarget.configChessboardBits.markerShapes.get(0).squareSize = 3;
+		controlsTarget.configECoCheck.markerShapes.get(0).squareSize = 3;
 		controlsTarget.configSquare.numRows = 5;
 		controlsTarget.configSquare.numCols = 4;
 		controlsTarget.configSquare.shapeSize = 3;
@@ -185,10 +185,10 @@ public class CreateCalibrationTargetGui extends JPanel
 					generator.sendToPrinter = sendToPrinter;
 					generator.chessboard((float)config.shapeSize);
 				}
-				case CHESSBOARD_BITS -> {
-					ConfigChessboardBitsMarkers config = (ConfigChessboardBitsMarkers)selectedCalib;
-					ConfigChessboardBitsMarkers.MarkerShape shape = config.markerShapes.get(0);
-					CreateFiducialDocumentPDF doc = chessboardBitsToPdf(outputFile, paper, units,
+				case ECOCHECK -> {
+					ConfigECoCheckMarkers config = (ConfigECoCheckMarkers)selectedCalib;
+					ConfigECoCheckMarkers.MarkerShape shape = config.markerShapes.get(0);
+					CreateFiducialDocumentPDF doc = ecoCheckToPdf(outputFile, paper, units,
 							shape.numRows, shape.numCols, (float)shape.squareSize,
 							config.firstTargetDuplicated, config.errorCorrectionLevel);
 					if (sendToPrinter) {
@@ -238,14 +238,14 @@ public class CreateCalibrationTargetGui extends JPanel
 		double paperHeight = paper.unit.convert(paper.height, units);
 
 		// TODO switch other calibration targets over to using the generic fiducial engine
-		if (selectedType == CalibrationPatterns.CHESSBOARD_BITS) {
-			ConfigChessboardBitsMarkers c = (ConfigChessboardBitsMarkers)selectedCalib;
+		if (selectedType == CalibrationPatterns.ECOCHECK) {
+			ConfigECoCheckMarkers c = (ConfigECoCheckMarkers)selectedCalib;
 
-			ChessBitsUtils utils = new ChessBitsUtils();
+			ECoCheckUtils utils = new ECoCheckUtils();
 			utils.codec.setErrorCorrectionLevel(c.errorCorrectionLevel);
 			c.convertToGridList(utils.markers);
 			utils.fixate();
-			ConfigChessboardBitsMarkers.MarkerShape shape = c.markerShapes.get(0);
+			ConfigECoCheckMarkers.MarkerShape shape = c.markerShapes.get(0);
 
 			double unitsToPixel = 400.0/paperWidth;
 			double paperWidthPixels = (int)(paperWidth*unitsToPixel);
@@ -261,7 +261,7 @@ public class CreateCalibrationTargetGui extends JPanel
 			render.configure(borderX, borderY,
 					(int)(paperWidth*unitsToPixel)-2*borderX, (int)(paperHeight*unitsToPixel)-2*borderY);
 
-			ChessboardReedSolomonGenerator generator = new ChessboardReedSolomonGenerator(utils);
+			ECoCheckGenerator generator = new ECoCheckGenerator(utils);
 			generator.squareWidth = shape.squareSize*unitsToPixel;
 			generator.setRender(render);
 			generator.render(0);

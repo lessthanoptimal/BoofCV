@@ -19,9 +19,9 @@
 package boofcv.app;
 
 import boofcv.abst.fiducial.calib.CalibrationPatterns;
-import boofcv.abst.fiducial.calib.ConfigChessboardBitsMarkers;
-import boofcv.alg.fiducial.calib.chessbits.ChessBitsUtils;
-import boofcv.app.calib.CreateChessboardBitsDocumentPDF;
+import boofcv.abst.fiducial.calib.ConfigECoCheckMarkers;
+import boofcv.alg.fiducial.calib.ecocheck.ECoCheckUtils;
+import boofcv.app.calib.CreateECoCheckDocumentPDF;
 import boofcv.app.fiducials.CreateFiducialDocumentPDF;
 import boofcv.generate.LengthUnit;
 import boofcv.generate.Unit;
@@ -79,8 +79,8 @@ public class CreateCalibrationTarget {
 	@Option(name = "--NumMarkers", usage = "If the target type supports multiple markers, how many should it create")
 	int numMarkers = 1;
 
-	@Option(name = "--ChessBitsError", usage = "Error correction level for chessboard bits. 0 to 10")
-	int chessBitsError = new ConfigChessboardBitsMarkers().errorCorrectionLevel;
+	@Option(name = "--ECoCheckError", usage = "Error correction level for ECoCheck. 0 is no error correction. 0 to 10")
+	int chessBitsError = new ConfigECoCheckMarkers().errorCorrectionLevel;
 
 	private static void printHelpExit( CmdLineParser parser ) {
 		parser.getProperties().withUsageWidth(120);
@@ -177,7 +177,7 @@ public class CreateCalibrationTarget {
 					failExit("Don't specify center distance for chessboard targets");
 			}
 
-			case CHESSBOARD_BITS -> {
+			case ECOCHECK -> {
 				if (centerDistance > 0)
 					failExit("Don't specify center distance for chessboard targets");
 				if (shapeSpace > 0)
@@ -216,8 +216,8 @@ public class CreateCalibrationTarget {
 		System.out.println("   columns   : " + columns);
 		System.out.println("   info      : " + !disablePrintInfo);
 
-		if (type == CalibrationPatterns.CHESSBOARD_BITS) {
-			CreateFiducialDocumentPDF doc = chessboardBitsToPdf(fileName + suffix,
+		if (type == CalibrationPatterns.ECOCHECK) {
+			CreateFiducialDocumentPDF doc = ecoCheckToPdf(fileName + suffix,
 					paperSize, unit, rows, columns, shapeWidth, numMarkers, chessBitsError);
 			doc.showInfo = !disablePrintInfo;
 			doc.saveToDisk();
@@ -238,17 +238,17 @@ public class CreateCalibrationTarget {
 		}
 	}
 
-	public static CreateFiducialDocumentPDF chessboardBitsToPdf( String outputFile, PaperSize paper, Unit units,
-																 int rows, int columns, float squareWidth,
-																 int numMarkers, int errorLevel ) throws IOException {
-		ChessBitsUtils utils = new ChessBitsUtils();
+	public static CreateFiducialDocumentPDF ecoCheckToPdf( String outputFile, PaperSize paper, Unit units,
+														   int rows, int columns, float squareWidth,
+														   int numMarkers, int errorLevel ) throws IOException {
+		ECoCheckUtils utils = new ECoCheckUtils();
 		utils.codec.setErrorCorrectionLevel(errorLevel);
 		for (int markerIdx = 0; markerIdx < numMarkers; markerIdx++) {
 			utils.addMarker(rows, columns);
 		}
 		utils.fixate();
 
-		var doc = new CreateChessboardBitsDocumentPDF(outputFile, paper, units);
+		var doc = new CreateECoCheckDocumentPDF(outputFile, paper, units);
 		doc.markerWidth = (columns-1)*squareWidth;
 		doc.markerHeight = (rows-1)*squareWidth;
 		doc.spaceBetween = squareWidth/2.0f;

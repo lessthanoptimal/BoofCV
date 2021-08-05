@@ -16,7 +16,7 @@
  * limitations under the License.
  */
 
-package boofcv.alg.fiducial.calib.chessbits;
+package boofcv.alg.fiducial.calib.ecocheck;
 
 import boofcv.alg.fiducial.qrcode.PackedBits8;
 import boofcv.testing.BoofStandardJUnit;
@@ -29,13 +29,13 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 /**
  * @author Peter Abeles
  */
-public class TestChessboardReedSolomonCodec extends BoofStandardJUnit {
+public class TestECoCheckCodec extends BoofStandardJUnit {
 
 	// Storage for encoded message
 	PackedBits8 encoded = new PackedBits8();
 
 	@Test void configure() {
-		var alg = new ChessboardReedSolomonCodec();
+		var alg = new ECoCheckCodec();
 
 		// Hand compute solution:
 		// marker = 0, cell = 4bits. total=6+4+4=18. then convert to words. add in ecc
@@ -66,7 +66,7 @@ public class TestChessboardReedSolomonCodec extends BoofStandardJUnit {
 	@Test void encode_decode() {
 		var found = new CellValue();
 
-		var alg = new ChessboardReedSolomonCodec();
+		var alg = new ECoCheckCodec();
 
 		alg.configure(1, 15);
 		alg.encode(0, 14, encoded);
@@ -92,7 +92,7 @@ public class TestChessboardReedSolomonCodec extends BoofStandardJUnit {
 	}
 
 	void singleBitError( int numMarkers, int numCells ) {
-		var alg = new ChessboardReedSolomonCodec();
+		var alg = new ECoCheckCodec();
 
 		int marker = numMarkers-1;
 		int cell = numCells/2+1;
@@ -118,7 +118,7 @@ public class TestChessboardReedSolomonCodec extends BoofStandardJUnit {
 	}
 
 	@Test void multipleWordErrors() {
-		var alg = new ChessboardReedSolomonCodec();
+		var alg = new ECoCheckCodec();
 
 		// make it so it can recover from a bit error in all the words
 		alg.setErrorCorrectionLevel(10);
@@ -144,7 +144,7 @@ public class TestChessboardReedSolomonCodec extends BoofStandardJUnit {
 	 * Make sure it doesn't accept pure noise
 	 */
 	@Test void failWhenPureNoise() {
-		var alg = new ChessboardReedSolomonCodec();
+		var alg = new ECoCheckCodec();
 
 		alg.configure(1, 20);
 		alg.encode(1, 8, encoded);

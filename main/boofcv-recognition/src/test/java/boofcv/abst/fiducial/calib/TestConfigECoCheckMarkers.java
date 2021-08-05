@@ -20,4 +20,4 @@ package boofcv.abst.fiducial.calib;
 
 import boofcv.struct.StandardConfigurationChecks;
 
-public class TestConfigChessboardBits extends StandardConfigurationChecks {}
+public class TestConfigECoCheckMarkers extends StandardConfigurationChecks {}

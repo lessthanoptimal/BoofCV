@@ -26,14 +26,20 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Specifies the grid shape and physical sizes for one or more {@link ConfigChessboardBits} type markers.
+ * Specifies the grid shape and physical sizes for one or more {@link ConfigECoCheckDetector} type markers.
  * In most use cases, having a single marker shape is desirable. However, the detector supports arbitrary
  * shapes for each marker. This configuration can do both by allowing the first marker in the list to be
  * duplicated.
  *
  * @author Peter Abeles
  */
-public class ConfigChessboardBitsMarkers implements Configuration {
+public class ConfigECoCheckMarkers implements Configuration {
+
+	/** Fraction of a cell's length the data bit is */
+	public double dataBitWidthFraction = 0.7;
+
+	/** Fraction of the length the quite-zone is around data bits */
+	public double dataBorderFraction = 0.15;
 
 	/** Number of times the first marker is duplicated. */
 	public int firstTargetDuplicated = 1;
@@ -56,8 +62,8 @@ public class ConfigChessboardBitsMarkers implements Configuration {
 	/**
 	 * Configures N markers with the same shape
 	 */
-	public static ConfigChessboardBitsMarkers singleShape( int rows, int cols, double squareSize, int numMarkers ) {
-		var config = new ConfigChessboardBitsMarkers();
+	public static ConfigECoCheckMarkers singleShape( int rows, int cols, double squareSize, int numMarkers ) {
+		var config = new ConfigECoCheckMarkers();
 		config.firstTargetDuplicated = numMarkers;
 		config.markerShapes.add(new MarkerShape(rows, cols, squareSize));
 		return config;
@@ -82,7 +88,9 @@ public class ConfigChessboardBitsMarkers implements Configuration {
 		}
 	}
 
-	public void setTo( ConfigChessboardBitsMarkers src ) {
+	public void setTo( ConfigECoCheckMarkers src ) {
+		this.dataBitWidthFraction = src.dataBitWidthFraction;
+		this.dataBorderFraction = src.dataBorderFraction;
 		this.firstTargetDuplicated = src.firstTargetDuplicated;
 		this.errorCorrectionLevel = src.errorCorrectionLevel;
 		this.markerShapes.clear();
@@ -94,6 +102,8 @@ public class ConfigChessboardBitsMarkers implements Configuration {
 	}
 
 	@Override public void checkValidity() {
+		BoofMiscOps.checkFraction(dataBitWidthFraction, "dataBitWidthFraction must be 0 to 1.0.");
+		BoofMiscOps.checkFraction(dataBorderFraction, "dataBorderFraction must be 0 to 1.0.");
 		BoofMiscOps.checkTrue(firstTargetDuplicated >= 1);
 		BoofMiscOps.checkTrue(markerShapes.size() >= 1);
 		BoofMiscOps.checkTrue(errorCorrectionLevel >= 0 && errorCorrectionLevel <= 10,

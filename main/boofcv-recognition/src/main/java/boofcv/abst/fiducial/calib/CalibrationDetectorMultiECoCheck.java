@@ -20,7 +20,7 @@ package boofcv.abst.fiducial.calib;
 
 import boofcv.abst.geo.calibration.DetectMultiFiducialCalibration;
 import boofcv.alg.distort.LensDistortionNarrowFOV;
-import boofcv.alg.fiducial.calib.chessbits.ChessboardReedSolomonDetector;
+import boofcv.alg.fiducial.calib.ecocheck.ECoCheckDetector;
 import boofcv.alg.geo.calibration.CalibrationObservation;
 import boofcv.struct.GridShape;
 import boofcv.struct.geo.PointIndex2D_F64;
@@ -36,12 +36,12 @@ import java.util.List;
 import static boofcv.abst.fiducial.calib.CalibrationDetectorChessboardX.gridChess;
 
 /**
- * Implementation of {@link DetectMultiFiducialCalibration} for {@link ChessboardReedSolomonDetector}.
+ * Implementation of {@link DetectMultiFiducialCalibration} for {@link ECoCheckDetector}.
  *
  * @author Peter Abeles
  */
-public class CalibrationDetectorMultiChessboardBits implements DetectMultiFiducialCalibration {
-	ChessboardReedSolomonDetector<GrayF32> detector;
+public class CalibrationDetectorMultiECoCheck implements DetectMultiFiducialCalibration {
+	ECoCheckDetector<GrayF32> detector;
 
 	// Length of a square
 	double squareLength;
@@ -52,8 +52,8 @@ public class CalibrationDetectorMultiChessboardBits implements DetectMultiFiduci
 	// Storage for layouts. Not sure how big this could get so will use a map to lazily cache
 	TIntObjectMap<List<Point2D_F64>> cacheLayouts = new TIntObjectHashMap<>();
 
-	public CalibrationDetectorMultiChessboardBits( ChessboardReedSolomonDetector<GrayF32> detector,
-												   double squareLength ) {
+	public CalibrationDetectorMultiECoCheck( ECoCheckDetector<GrayF32> detector,
+											 double squareLength ) {
 		this.detector = detector;
 		this.squareLength = squareLength;
 	}

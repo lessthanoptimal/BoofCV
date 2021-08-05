@@ -16,7 +16,7 @@
  * limitations under the License.
  */
 
-package boofcv.alg.fiducial.calib.chessbits;
+package boofcv.alg.fiducial.calib.ecocheck;
 
 import boofcv.alg.fiducial.qrcode.PackedBits8;
 import boofcv.alg.fiducial.qrcode.ReidSolomonCodes;
@@ -61,7 +61,7 @@ import org.ddogleg.struct.DogArray_I8;
  *
  * @author Peter Abeles
  */
-public class ChessboardReedSolomonCodec {
+public class ECoCheckCodec {
 	// TODO locate the bits spatially close to each for a single word so that local damage doesn't screw up
 	//      multiple words
 
