@@ -18,11 +18,11 @@
 
 package boofcv.demonstrations.fiducial;
 
-import boofcv.abst.fiducial.calib.ConfigChessboardBits;
-import boofcv.abst.fiducial.calib.ConfigChessboardBitsMarkers;
+import boofcv.abst.fiducial.calib.ConfigECoCheckDetector;
+import boofcv.abst.fiducial.calib.ConfigECoCheckMarkers;
 import boofcv.alg.feature.detect.chess.ChessboardCorner;
-import boofcv.alg.fiducial.calib.chessbits.ChessboardBitMarker;
-import boofcv.alg.fiducial.calib.chessbits.ChessboardReedSolomonDetector;
+import boofcv.alg.fiducial.calib.ecocheck.ECoCheckDetector;
+import boofcv.alg.fiducial.calib.ecocheck.ECoCheckMarker;
 import boofcv.demonstrations.shapes.DetectBlackShapePanel;
 import boofcv.demonstrations.shapes.ShapeVisualizePanel;
 import boofcv.factory.fiducial.FactoryFiducial;
@@ -63,18 +63,18 @@ import static boofcv.gui.BoofSwingUtil.MAX_ZOOM;
 import static boofcv.gui.BoofSwingUtil.MIN_ZOOM;
 
 /**
- * Shows detections and visualizes intermediate results for {@link ChessboardReedSolomonDetector}
+ * Shows detections and visualizes intermediate results for {@link ECoCheckDetector}
  *
  * @author Peter Abeles
  */
-public class DetectChessboardBitsApp extends DemonstrationBase {
+public class DetectECoCheckApp extends DemonstrationBase {
 	// TODO colorize anonymous differently
 	// TODO mark decoded squares
 	// TODO Show square ID numbers
 	// TODO render marker ID
 	// TODO show squares which failed to decode
-	ConfigChessboardBits configDetector = new ConfigChessboardBits();
-	ConfigChessboardBitsMarkers configMarker = ConfigChessboardBitsMarkers.singleShape(9, 7, 1, 1);
+	ConfigECoCheckDetector configDetector = new ConfigECoCheckDetector();
+	ConfigECoCheckMarkers configMarker = ConfigECoCheckMarkers.singleShape(9, 7, 1, 1);
 
 	// GUI Controls and visualization panels
 	private final DisplayPanel imagePanel = new DisplayPanel();
@@ -86,17 +86,17 @@ public class DetectChessboardBitsApp extends DemonstrationBase {
 
 	//------------- Lock for when the detector is being used
 	private final Object lockAlgorithm = new Object();
-	ChessboardReedSolomonDetector<GrayF32> detector;
+	ECoCheckDetector<GrayF32> detector;
 	//-------------
 
 	//------------- Lock for what's being drawn in the GUI
 	private final Object lockVisualize = new Object();
-	private final DogArray<ChessboardBitMarker> foundPatterns = new DogArray<>(ChessboardBitMarker::new);
+	private final DogArray<ECoCheckMarker> foundPatterns = new DogArray<>(ECoCheckMarker::new);
 	private final DogArray<ChessboardCorner> foundCorners = new DogArray<>(ChessboardCorner::new);
 	//-------------
 
 
-	public DetectChessboardBitsApp( List<PathLabel> examples ) {
+	public DetectECoCheckApp( List<PathLabel> examples ) {
 		super(true, true, examples, ImageType.single(GrayF32.class));
 
 		controlPanel = new ControlPanel();
@@ -163,7 +163,7 @@ public class DetectChessboardBitsApp extends DemonstrationBase {
 			long time1 = System.nanoTime();
 			processingTime = (time1 - time0)*1e-6; // milliseconds
 
-			FastAccess<ChessboardBitMarker> found = detector.getFound();
+			FastAccess<ECoCheckMarker> found = detector.getFound();
 
 			synchronized (lockVisualize) {
 				// Copy found chessboard patterns
@@ -185,7 +185,7 @@ public class DetectChessboardBitsApp extends DemonstrationBase {
 
 			System.out.println("found.size="+found.size);
 			for (int i = 0; i < found.size; i++) {
-				ChessboardBitMarker c = found.get(i);
+				ECoCheckMarker c = found.get(i);
 				if (!controlPanel.showAnonymous && c.marker < 0)
 					continue;
 				System.out.println("["+i+"]");
@@ -211,7 +211,7 @@ public class DetectChessboardBitsApp extends DemonstrationBase {
 			configMarker.firstTargetDuplicated = controlPanel.numMarkers.value.intValue();
 			configMarker.errorCorrectionLevel = controlPanel.errorLevel.value.intValue();
 
-			detector = FactoryFiducial.chessboardBits(configDetector, configMarker, GrayF32.class);
+			detector = FactoryFiducial.ecocheck(configDetector, configMarker, GrayF32.class);
 			detector.setVerbose(System.out, null);
 		}
 	}
@@ -270,7 +270,7 @@ public class DetectChessboardBitsApp extends DemonstrationBase {
 			if (controlPanel.showChessboards) {
 				synchronized (lockVisualize) {
 					for (int i = 0; i < foundPatterns.size; i++) {
-						ChessboardBitMarker c = foundPatterns.get(i);
+						ECoCheckMarker c = foundPatterns.get(i);
 						if (!controlPanel.showAnonymous && c.marker < 0)
 							continue;
 						DisplayPinholeCalibrationPanel.renderOrder(g2, scale, c.corners.toList());
@@ -409,11 +409,11 @@ public class DetectChessboardBitsApp extends DemonstrationBase {
 		examples.add(new PathLabel("Chessboard 3 ", UtilIO.pathExample("calibration/stereo/Bumblebee2_Chess/left06.jpg")));
 
 		SwingUtilities.invokeLater(() -> {
-			var app = new DetectChessboardBitsApp(examples);
+			var app = new DetectECoCheckApp(examples);
 
 			app.openExample(examples.get(0));
 			app.waitUntilInputSizeIsKnown();
-			app.display("Chessboard Bits Detector");
+			app.display("ECoCheck Detector");
 		});
 	}
 }

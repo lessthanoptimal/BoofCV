@@ -20,7 +20,7 @@ package boofcv.factory.fiducial;
 
 import boofcv.abst.fiducial.calib.*;
 import boofcv.alg.fiducial.calib.chess.DetectChessboardBinaryPattern;
-import boofcv.alg.fiducial.calib.chessbits.ChessboardReedSolomonDetector;
+import boofcv.alg.fiducial.calib.ecocheck.ECoCheckDetector;
 import boofcv.struct.image.GrayF32;
 import org.jetbrains.annotations.Nullable;
 
@@ -90,9 +90,9 @@ public class FactoryFiducialCalibration {
 	 * @return Square grid target detector.
 	 * @see CalibrationDetectorChessboardX
 	 */
-	public static CalibrationDetectorMultiChessboardBits chessboardBits( @Nullable ConfigChessboardBits configDetector,
-																		 ConfigChessboardBitsMarkers configMarkers ) {
-		ChessboardReedSolomonDetector<GrayF32> detector = FactoryFiducial.chessboardBits(
+	public static CalibrationDetectorMultiECoCheck ecocheck( @Nullable ConfigECoCheckDetector configDetector,
+															 ConfigECoCheckMarkers configMarkers ) {
+		ECoCheckDetector<GrayF32> detector = FactoryFiducial.ecocheck(
 				configDetector, configMarkers, GrayF32.class);
 
 		// Figure out the length of a square
@@ -106,7 +106,7 @@ public class FactoryFiducialCalibration {
 			}
 		}
 
-		return new CalibrationDetectorMultiChessboardBits(detector, squareLength);
+		return new CalibrationDetectorMultiECoCheck(detector, squareLength);
 	}
 
 	/**

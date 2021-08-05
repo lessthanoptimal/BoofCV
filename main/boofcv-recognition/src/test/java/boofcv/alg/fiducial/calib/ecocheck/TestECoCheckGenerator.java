@@ -16,12 +16,12 @@
  * limitations under the License.
  */
 
-package boofcv.alg.fiducial.calib.chessbits;
+package boofcv.alg.fiducial.calib.ecocheck;
 
 import boofcv.testing.BoofStandardJUnit;
 import org.junit.jupiter.api.Test;
 
-class TestChessboardReedSolomonGenerator extends BoofStandardJUnit {
+class TestECoCheckGenerator extends BoofStandardJUnit {
 	@Test void intentionallyOmitted() {
 		// this is tested when the detector is tested
 	}

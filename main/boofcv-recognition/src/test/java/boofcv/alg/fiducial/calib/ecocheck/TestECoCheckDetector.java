@@ -16,14 +16,14 @@
  * limitations under the License.
  */
 
-package boofcv.alg.fiducial.calib.chessbits;
+package boofcv.alg.fiducial.calib.ecocheck;
 
 import boofcv.abst.fiducial.calib.ConfigChessboardX;
 import boofcv.alg.distort.AbstractInterpolatePixelS;
 import boofcv.alg.drawing.FiducialImageEngine;
 import boofcv.alg.fiducial.calib.chess.ChessboardCornerClusterToGrid.GridElement;
 import boofcv.alg.fiducial.calib.chess.ChessboardCornerGraph;
-import boofcv.alg.fiducial.calib.chessbits.ChessboardReedSolomonDetector.Transform;
+import boofcv.alg.fiducial.calib.ecocheck.ECoCheckDetector.Transform;
 import boofcv.alg.misc.ImageMiscOps;
 import boofcv.struct.GridShape;
 import boofcv.struct.geo.PointIndex2D_F64;
@@ -44,12 +44,12 @@ import static org.junit.jupiter.api.Assertions.*;
 /**
  * @author Peter Abeles
  */
-public class TestChessboardReedSolomonDetector extends BoofStandardJUnit {
+public class TestECoCheckDetector extends BoofStandardJUnit {
 
 	// Reduce boilerplate by pre-declaring the algorithm being tested
 	ConfigChessboardX config = new ConfigChessboardX();
-	ChessBitsUtils utils = new ChessBitsUtils();
-	ChessboardReedSolomonDetector<GrayU8> alg;
+	ECoCheckUtils utils = new ECoCheckUtils();
+	ECoCheckDetector<GrayU8> alg;
 
 	List<Point2D_F64> truthCorners;
 
@@ -61,10 +61,10 @@ public class TestChessboardReedSolomonDetector extends BoofStandardJUnit {
 	}
 
 	void setUp( int rows, int cols ) {
-		utils = new ChessBitsUtils();
+		utils = new ECoCheckUtils();
 		utils.addMarker(rows, cols);
 		utils.fixate();
-		alg = new ChessboardReedSolomonDetector<>(utils, config, GrayU8.class);
+		alg = new ECoCheckDetector<>(utils, config, GrayU8.class);
 	}
 
 	/**
@@ -85,10 +85,10 @@ public class TestChessboardReedSolomonDetector extends BoofStandardJUnit {
 
 		alg.process(image);
 
-		FastAccess<ChessboardBitMarker> found = alg.getFound();
+		FastAccess<ECoCheckMarker> found = alg.getFound();
 		assertEquals(1, found.size);
 
-		ChessboardBitMarker marker = found.get(0);
+		ECoCheckMarker marker = found.get(0);
 		assertEquals(0, marker.marker);
 		assertEquals(squareRows, marker.squareRows);
 		assertEquals(squareCols, marker.squareCols);
@@ -118,9 +118,9 @@ public class TestChessboardReedSolomonDetector extends BoofStandardJUnit {
 			alg.process(rotated);
 			image.setTo(rotated);
 
-			FastAccess<ChessboardBitMarker> found = alg.getFound();
+			FastAccess<ECoCheckMarker> found = alg.getFound();
 			assertEquals(1, found.size);
-			ChessboardBitMarker marker = found.get(0);
+			ECoCheckMarker marker = found.get(0);
 			assertEquals(0, marker.marker);
 			assertEquals(5, marker.squareRows);
 			assertEquals(6, marker.squareCols);
@@ -139,11 +139,11 @@ public class TestChessboardReedSolomonDetector extends BoofStandardJUnit {
 
 		alg.process(image);
 
-		FastAccess<ChessboardBitMarker> found = alg.getFound();
+		FastAccess<ECoCheckMarker> found = alg.getFound();
 		assertEquals(1, found.size);
 
 		// number of squares and corners is found through manual inspection
-		ChessboardBitMarker marker = found.get(0);
+		ECoCheckMarker marker = found.get(0);
 		assertEquals(0, marker.marker);
 		assertEquals(5, marker.squareRows);
 		assertEquals(6, marker.squareCols);
@@ -166,10 +166,10 @@ public class TestChessboardReedSolomonDetector extends BoofStandardJUnit {
 
 		alg.process(image);
 
-		FastAccess<ChessboardBitMarker> found = alg.getFound();
+		FastAccess<ECoCheckMarker> found = alg.getFound();
 		assertEquals(1, found.size);
 
-		ChessboardBitMarker marker = found.get(0);
+		ECoCheckMarker marker = found.get(0);
 		assertEquals(-1, marker.marker);
 		assertEquals(5, marker.squareRows);
 		assertEquals(6, marker.squareCols);
@@ -182,11 +182,11 @@ public class TestChessboardReedSolomonDetector extends BoofStandardJUnit {
 	 * Two patterns are so close their grids will overlap. See if this correctly splits them up
 	 */
 	@Test void touchingTargets() {
-		utils = new ChessBitsUtils();
+		utils = new ECoCheckUtils();
 		utils.addMarker(3, 4); // two targets with the same shape
 		utils.addMarker(3, 4);
 		utils.fixate();
-		alg = new ChessboardReedSolomonDetector<>(utils, config, GrayU8.class);
+		alg = new ECoCheckDetector<>(utils, config, GrayU8.class);
 
 		GrayU8 image0 = createMarker(utils, 0);
 		GrayU8 image1 = createMarker(utils, 1);
@@ -199,7 +199,7 @@ public class TestChessboardReedSolomonDetector extends BoofStandardJUnit {
 
 		alg.process(combined);
 
-		FastAccess<ChessboardBitMarker> found = alg.getFound();
+		FastAccess<ECoCheckMarker> found = alg.getFound();
 		assertEquals(2, found.size);
 
 		found.forEach(t -> {
@@ -213,11 +213,11 @@ public class TestChessboardReedSolomonDetector extends BoofStandardJUnit {
 	 * Multiple patterns are visible at once. Targets have enough space that they shouldn't be joined.
 	 */
 	@Test void multipleTargets() {
-		utils = new ChessBitsUtils();
+		utils = new ECoCheckUtils();
 		utils.addMarker(3, 4);
 		utils.addMarker(4, 3);
 		utils.fixate();
-		alg = new ChessboardReedSolomonDetector<>(utils, config, GrayU8.class);
+		alg = new ECoCheckDetector<>(utils, config, GrayU8.class);
 
 		GrayU8 image0 = createMarker(utils, 0);
 		GrayU8 image1 = createMarker(utils, 1);
@@ -231,16 +231,16 @@ public class TestChessboardReedSolomonDetector extends BoofStandardJUnit {
 
 		alg.process(combined);
 
-		FastAccess<ChessboardBitMarker> found = alg.getFound();
+		FastAccess<ECoCheckMarker> found = alg.getFound();
 		assertEquals(2, found.size);
 	}
 
-	private GrayU8 createMarker( ChessBitsUtils utils, int markerID ) {
+	private GrayU8 createMarker( ECoCheckUtils utils, int markerID ) {
 		int squareWidth = 80;
 		GridShape shape = utils.markers.get(markerID);
 		var engine = new FiducialImageEngine();
 		engine.configure(10, squareWidth*(shape.cols - 1), squareWidth*(shape.rows - 1));
-		var renderer = new ChessboardReedSolomonGenerator(utils);
+		var renderer = new ECoCheckGenerator(utils);
 		renderer.render = engine;
 		renderer.squareWidth = squareWidth;
 		renderer.render(markerID);
@@ -271,10 +271,10 @@ public class TestChessboardReedSolomonDetector extends BoofStandardJUnit {
 		}
 
 		// Pass the first time
-		assertTrue(alg.createCorrectedTarget(transform, new ChessboardBitMarker()));
+		assertTrue(alg.createCorrectedTarget(transform, new ECoCheckMarker()));
 
 		// Second time it will blow up because they have been marked!
-		assertFalse(alg.createCorrectedTarget(transform, new ChessboardBitMarker()));
+		assertFalse(alg.createCorrectedTarget(transform, new ECoCheckMarker()));
 	}
 
 	@Test void findMatching() {

@@ -16,7 +16,7 @@
  * limitations under the License.
  */
 
-package boofcv.alg.fiducial.calib.chessbits;
+package boofcv.alg.fiducial.calib.ecocheck;
 
 import boofcv.BoofVerbose;
 import boofcv.abst.fiducial.calib.ConfigChessboardX;
@@ -50,7 +50,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 
-import static boofcv.alg.fiducial.calib.chessbits.ChessBitsUtils.rotateObserved;
+import static boofcv.alg.fiducial.calib.ecocheck.ECoCheckUtils.rotateObserved;
 
 /**
  * <p>Detects chessboard patterns with marker and grid coordinate information encoded inside of the inner white squares.
@@ -65,16 +65,15 @@ import static boofcv.alg.fiducial.calib.chessbits.ChessBitsUtils.rotateObserved;
  *
  * @author Peter Abeles
  */
-public class ChessboardReedSolomonDetector<T extends ImageGray<T>> implements VerbosePrint {
-	// TODO use homography to select sample points so that perspective distortion is handled correctly. threshold
+public class ECoCheckDetector<T extends ImageGray<T>> implements VerbosePrint {
 	// TODO Weigh bit sample points based on distance from center?
 	// TODO Add back in the ability to encoded every N squares
 
 	/** Number of times a side is sampled when determining binarization threshold */
 	final int NUM_SAMPLES_SIDE = 5; // number of samples along each side
 
-	/** Common utilies for decoding chessboard bit pattern */
-	@Getter protected ChessBitsUtils utils;
+	/** Common utilities for decoding ECoCheck patterns */
+	@Getter protected ECoCheckUtils utils;
 
 	/** Chessboard corner detector */
 	@Getter protected DetectChessboardCornersXPyramid<T> detector;
@@ -87,7 +86,7 @@ public class ChessboardReedSolomonDetector<T extends ImageGray<T>> implements Ve
 
 	/** Found chessboard patterns */
 	@Getter public final
-	DogArray<ChessboardBitMarker> found = new DogArray<>(ChessboardBitMarker::new, ChessboardBitMarker::reset);
+	DogArray<ECoCheckMarker> found = new DogArray<>(ECoCheckMarker::new, ECoCheckMarker::reset);
 
 	// Binary cells in grid pattern for easy access
 	FastArray<CellReading> gridBinaryCells = new FastArray<>(CellReading.class);
@@ -135,8 +134,8 @@ public class ChessboardReedSolomonDetector<T extends ImageGray<T>> implements Ve
 	/**
 	 * Specifies configuration for detector
 	 */
-	public ChessboardReedSolomonDetector( ChessBitsUtils utils,
-										  ConfigChessboardX config, Class<T> imageType ) {
+	public ECoCheckDetector( ECoCheckUtils utils,
+							 ConfigChessboardX config, Class<T> imageType ) {
 		this.utils = utils;
 		this.utils.checkFixate();
 
@@ -470,7 +469,7 @@ public class ChessboardReedSolomonDetector<T extends ImageGray<T>> implements Ve
 			rotateObserved(numRows, numCols, cell.row, cell.col, cell.orientation, observedCoordinate);
 
 			// After correcting for orientation, the top left corner is in a different location
-			ChessBitsUtils.adjustTopLeft(cell.orientation, observedCoordinate);
+			ECoCheckUtils.adjustTopLeft(cell.orientation, observedCoordinate);
 
 			// Figure out the offset. This should be the same for all encoded cells from the same target
 			int offsetRow = decodedCoordinate.row - observedCoordinate.row;
@@ -513,7 +512,7 @@ public class ChessboardReedSolomonDetector<T extends ImageGray<T>> implements Ve
 	 * @param transform (Input) correction to corner grd coordinate system
 	 * @param target (Output) Description of target
 	 */
-	boolean createCorrectedTarget( Transform transform, ChessboardBitMarker target ) {
+	boolean createCorrectedTarget( Transform transform, ECoCheckMarker target ) {
 		if (verbose != null)
 			verbose.printf("transform: votes=%d marker=%d ori=%d offset={ row=%d col=%d }\n",
 					transform.votes, transform.marker, transform.orientation, transform.offsetRow, transform.offsetCol);
@@ -580,7 +579,7 @@ public class ChessboardReedSolomonDetector<T extends ImageGray<T>> implements Ve
 		if (!clusterToGrid.sparseToGrid(anonymousInfo))
 			return;
 
-		ChessboardBitMarker target = found.grow();
+		ECoCheckMarker target = found.grow();
 		target.squareRows = anonymousInfo.rows + 1;
 		target.squareCols = anonymousInfo.cols + 1;
 

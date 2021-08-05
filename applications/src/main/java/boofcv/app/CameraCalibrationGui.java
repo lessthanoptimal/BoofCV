@@ -19,10 +19,10 @@
 package boofcv.app;
 
 import boofcv.abst.fiducial.calib.CalibrationPatterns;
-import boofcv.abst.fiducial.calib.ConfigChessboardBitsMarkers;
+import boofcv.abst.fiducial.calib.ConfigECoCheckMarkers;
 import boofcv.abst.fiducial.calib.ConfigGridDimen;
-import boofcv.alg.fiducial.calib.chessbits.ChessBitsUtils;
-import boofcv.alg.fiducial.calib.chessbits.ChessboardReedSolomonGenerator;
+import boofcv.alg.fiducial.calib.ecocheck.ECoCheckGenerator;
+import boofcv.alg.fiducial.calib.ecocheck.ECoCheckUtils;
 import boofcv.app.calib.CalibrationModelPanel;
 import boofcv.app.calib.CalibrationTargetPanel;
 import boofcv.factory.fiducial.FactoryFiducialCalibration;
@@ -225,7 +225,7 @@ public class CameraCalibrationGui extends JPanel
 	private void createDetector() {
 		switch (controlsTarget.selected) {
 			case CHESSBOARD -> app.detector = FactoryFiducialCalibration.chessboardX(null, controlsTarget.configChessboard);
-			case CHESSBOARD_BITS -> throw new RuntimeException("Support!");
+			case ECOCHECK -> throw new RuntimeException("Support!");
 			case SQUARE_GRID -> app.detector = FactoryFiducialCalibration.squareGrid(null, controlsTarget.configSquare);
 			case CIRCLE_GRID -> app.detector = FactoryFiducialCalibration.circleRegularGrid(null, controlsTarget.configCircle);
 			case CIRCLE_HEXAGONAL -> app.detector = FactoryFiducialCalibration.circleHexagonalGrid(null, controlsTarget.configCircleHex);
@@ -249,16 +249,16 @@ public class CameraCalibrationGui extends JPanel
 
 	@Override
 	public void calibrationParametersChanged( CalibrationPatterns type, Object config ) {
-		if (type == CalibrationPatterns.CHESSBOARD_BITS) {
-			ConfigChessboardBitsMarkers c = (ConfigChessboardBitsMarkers)config;
+		if (type == CalibrationPatterns.ECOCHECK) {
+			ConfigECoCheckMarkers c = (ConfigECoCheckMarkers)config;
 			FiducialRenderEngineGraphics2D render = new FiducialRenderEngineGraphics2D();
 			render.configure(20, 20,200, 200);
 
-			ChessBitsUtils utils = new ChessBitsUtils();
+			ECoCheckUtils utils = new ECoCheckUtils();
 			c.convertToGridList(utils.markers);
 			utils.fixate();
 
-			ChessboardReedSolomonGenerator generator = new ChessboardReedSolomonGenerator(utils);
+			ECoCheckGenerator generator = new ECoCheckGenerator(utils);
 			generator.setRender(render);
 			renderingPanel.setImageUI(render.getImage());
 			return;

@@ -16,7 +16,7 @@
  * limitations under the License.
  */
 
-package boofcv.alg.fiducial.calib.chessbits;
+package boofcv.alg.fiducial.calib.ecocheck;
 
 import boofcv.struct.GridCoordinate;
 import boofcv.testing.BoofStandardJUnit;
@@ -35,9 +35,9 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 /**
  * @author Peter Abeles
  */
-public class TestChessBitsUtils extends BoofStandardJUnit {
+public class TestECoCheckUtils extends BoofStandardJUnit {
 	@Test void findLargestCellCount() {
-		var alg = new ChessBitsUtils();
+		var alg = new ECoCheckUtils();
 		alg.addMarker(4, 3);
 		alg.addMarker(1, 2);
 		alg.addMarker(8, 2);
@@ -47,7 +47,7 @@ public class TestChessBitsUtils extends BoofStandardJUnit {
 	}
 
 	@Test void bitRect() {
-		var alg = new ChessBitsUtils();
+		var alg = new ECoCheckUtils();
 		alg.dataBitWidthFraction = 0.9; // make sure this isn't 1.0
 		alg.addMarker(4, 3);
 		alg.fixate();
@@ -72,7 +72,7 @@ public class TestChessBitsUtils extends BoofStandardJUnit {
 	}
 
 	@Test void computeGridToImage() {
-		var alg = new ChessBitsUtils();
+		var alg = new ECoCheckUtils();
 		alg.addMarker(4, 3);
 		alg.fixate();
 
@@ -96,7 +96,7 @@ public class TestChessBitsUtils extends BoofStandardJUnit {
 	 * Have it compute all the sample points then make sure the points it expects are inside one of the squares
 	 */
 	@Test void selectPixelsToSample() {
-		var alg = new ChessBitsUtils();
+		var alg = new ECoCheckUtils();
 		alg.addMarker(4, 3);
 		alg.fixate();
 
@@ -130,7 +130,7 @@ public class TestChessBitsUtils extends BoofStandardJUnit {
 	 * Hand selected test cases
 	 */
 	@Test void cellToCoordinate_case0() {
-		var alg = new ChessBitsUtils();
+		var alg = new ECoCheckUtils();
 		alg.addMarker(6, 5);
 		alg.fixate();
 
@@ -150,7 +150,7 @@ public class TestChessBitsUtils extends BoofStandardJUnit {
 	}
 
 	@Test void cellToCoordinate_case1() {
-		var alg = new ChessBitsUtils();
+		var alg = new ECoCheckUtils();
 		alg.addMarker(5, 6);
 		alg.fixate();
 
@@ -173,7 +173,7 @@ public class TestChessBitsUtils extends BoofStandardJUnit {
 	 * Hand selected test cases
 	 */
 	@Test void cellToCoordinate_case2() {
-		var alg = new ChessBitsUtils();
+		var alg = new ECoCheckUtils();
 		alg.addMarker(4, 6);
 		alg.fixate();
 
@@ -192,7 +192,7 @@ public class TestChessBitsUtils extends BoofStandardJUnit {
 	 * Test using hand computed solutions
 	 */
 	@Test void encodedSquaresInMarker() {
-		var alg = new ChessBitsUtils();
+		var alg = new ECoCheckUtils();
 		alg.addMarker(4, 6);
 		alg.addMarker(5, 6);
 		alg.addMarker(4, 5);

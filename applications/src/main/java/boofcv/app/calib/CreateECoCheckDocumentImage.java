@@ -19,8 +19,8 @@
 package boofcv.app.calib;
 
 import boofcv.alg.drawing.FiducialImageEngine;
-import boofcv.alg.fiducial.calib.chessbits.ChessBitsUtils;
-import boofcv.alg.fiducial.calib.chessbits.ChessboardReedSolomonGenerator;
+import boofcv.alg.fiducial.calib.ecocheck.ECoCheckGenerator;
+import boofcv.alg.fiducial.calib.ecocheck.ECoCheckUtils;
 import boofcv.app.fiducials.CreateFiducialDocumentImage;
 import boofcv.misc.BoofMiscOps;
 
@@ -29,12 +29,12 @@ import boofcv.misc.BoofMiscOps;
  *
  * @author Peter Abeles
  */
-public class CreateChessboardBitsDocumentImage extends CreateFiducialDocumentImage {
+public class CreateECoCheckDocumentImage extends CreateFiducialDocumentImage {
 
 	FiducialImageEngine render = new FiducialImageEngine();
 
 
-	public CreateChessboardBitsDocumentImage( String documentName) {
+	public CreateECoCheckDocumentImage( String documentName) {
 		super(documentName);
 	}
 
@@ -42,8 +42,8 @@ public class CreateChessboardBitsDocumentImage extends CreateFiducialDocumentIma
 		render.configure(border, width - 2*border, height - 2*border);
 	}
 
-	public void render( ChessBitsUtils utils ) {
-		ChessboardReedSolomonGenerator g = new ChessboardReedSolomonGenerator(utils);
+	public void render( ECoCheckUtils utils ) {
+		ECoCheckGenerator g = new ECoCheckGenerator(utils);
 		g.setRender(render);
 		int numMarkers = utils.markers.size();
 		int numDigits = BoofMiscOps.numDigits(numMarkers);

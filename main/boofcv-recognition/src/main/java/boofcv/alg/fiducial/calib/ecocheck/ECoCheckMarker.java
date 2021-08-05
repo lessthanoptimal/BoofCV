@@ -16,7 +16,7 @@
  * limitations under the License.
  */
 
-package boofcv.alg.fiducial.calib.chessbits;
+package boofcv.alg.fiducial.calib.ecocheck;
 
 import boofcv.struct.geo.PointIndex2D_F64;
 import org.ddogleg.struct.DogArray;
@@ -24,11 +24,11 @@ import org.ddogleg.struct.DogArray_B;
 import org.ddogleg.struct.DogArray_I32;
 
 /**
- * Storage for a found chessboard pattern.
+ * Storage for a detected Error COrrecting Checkerboard (ECoCheck) marker found inside an image.
  *
  * @author Peter Abeles
  */
-public class ChessboardBitMarker {
+public class ECoCheckMarker {
 	/** Which marker it came from. -1 if unknown */
 	public int marker;
 
@@ -56,7 +56,7 @@ public class ChessboardBitMarker {
 		decodedCells.reset();
 	}
 
-	public void setTo( ChessboardBitMarker src ) {
+	public void setTo( ECoCheckMarker src ) {
 		this.marker = src.marker;
 		this.squareCols = src.squareCols;
 		this.squareRows = src.squareRows;

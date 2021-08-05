@@ -20,8 +20,8 @@ package boofcv.abst.fiducial.calib;
 
 import boofcv.abst.geo.calibration.DetectMultiFiducialCalibration;
 import boofcv.alg.drawing.FiducialImageEngine;
-import boofcv.alg.fiducial.calib.chessbits.ChessBitsUtils;
-import boofcv.alg.fiducial.calib.chessbits.ChessboardReedSolomonGenerator;
+import boofcv.alg.fiducial.calib.ecocheck.ECoCheckGenerator;
+import boofcv.alg.fiducial.calib.ecocheck.ECoCheckUtils;
 import boofcv.factory.fiducial.FactoryFiducialCalibration;
 import boofcv.misc.BoofMiscOps;
 import boofcv.struct.GridShape;
@@ -33,22 +33,22 @@ import java.util.List;
 /**
  * @author Peter Abeles
  */
-public class TestCalibrationDetectorMultiChessboardBits extends GenericDetectMultiFiducialCalibrationChecks {
+public class TestCalibrationDetectorMultiECoCheck extends GenericDetectMultiFiducialCalibrationChecks {
 
-	ConfigChessboardBits configDetector = new ConfigChessboardBits();
-	ConfigChessboardBitsMarkers configMarkers = ConfigChessboardBitsMarkers.singleShape(4, 5, 0.05, 4);
-	ChessBitsUtils utils = new ChessBitsUtils();
+	ConfigECoCheckDetector configDetector = new ConfigECoCheckDetector();
+	ConfigECoCheckMarkers configMarkers = ConfigECoCheckMarkers.singleShape(4, 5, 0.05, 4);
+	ECoCheckUtils utils = new ECoCheckUtils();
 
-	public TestCalibrationDetectorMultiChessboardBits() {
+	public TestCalibrationDetectorMultiECoCheck() {
 		configMarkers.convertToGridList(utils.markers);
-		utils.dataBorderFraction = configDetector.dataBorderFraction;
-		utils.dataBitWidthFraction = configDetector.dataBitWidthFraction;
+		utils.dataBorderFraction = configMarkers.dataBorderFraction;
+		utils.dataBitWidthFraction = configMarkers.dataBitWidthFraction;
 		utils.fixate();
 //		visualizeFailures = true;
 	}
 
 	@Override public DetectMultiFiducialCalibration createDetector() {
-		return FactoryFiducialCalibration.chessboardBits(configDetector, configMarkers);
+		return FactoryFiducialCalibration.ecocheck(configDetector, configMarkers);
 	}
 
 	@Override public GrayF32 renderPattern( int marker, List<PointIndex2D_F64> calibrationPoints ) {
@@ -57,7 +57,7 @@ public class TestCalibrationDetectorMultiChessboardBits extends GenericDetectMul
 
 		var engine = new FiducialImageEngine();
 		engine.configure(20, squareLength*(shape.cols - 1), squareLength*(shape.rows - 1));
-		var generator = new ChessboardReedSolomonGenerator(utils);
+		var generator = new ECoCheckGenerator(utils);
 		generator.squareWidth = squareLength;
 		generator.setRender(engine);
 		generator.render(marker);

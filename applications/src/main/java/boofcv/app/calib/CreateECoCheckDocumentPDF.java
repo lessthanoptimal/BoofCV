@@ -18,8 +18,8 @@
 
 package boofcv.app.calib;
 
-import boofcv.alg.fiducial.calib.chessbits.ChessBitsUtils;
-import boofcv.alg.fiducial.calib.chessbits.ChessboardReedSolomonGenerator;
+import boofcv.alg.fiducial.calib.ecocheck.ECoCheckGenerator;
+import boofcv.alg.fiducial.calib.ecocheck.ECoCheckUtils;
 import boofcv.app.PaperSize;
 import boofcv.app.fiducials.CreateFiducialDocumentPDF;
 import boofcv.generate.Unit;
@@ -36,23 +36,23 @@ import java.util.ArrayList;
  *
  * @author Peter Abeles
  */
-public class CreateChessboardBitsDocumentPDF extends CreateFiducialDocumentPDF {
+public class CreateECoCheckDocumentPDF extends CreateFiducialDocumentPDF {
 
-	@Getter ChessboardReedSolomonGenerator g;
+	@Getter ECoCheckGenerator g;
 
 	PdfFiducialEngine renderer;
 
 	// width of a square
 	public double squareWidth;
-	public ChessBitsUtils utils;
+	public ECoCheckUtils utils;
 
-	public CreateChessboardBitsDocumentPDF( String documentName, PaperSize paper, Unit units ) {
+	public CreateECoCheckDocumentPDF( String documentName, PaperSize paper, Unit units ) {
 		super(documentName, paper, units);
 	}
 
 	@Override
 	protected String getMarkerType() {
-		return "Chessboard Bits ";
+		return "ECoCheck ";
 	}
 
 	@Override
@@ -60,7 +60,7 @@ public class CreateChessboardBitsDocumentPDF extends CreateFiducialDocumentPDF {
 		if (markerHeight < 0)
 			throw new IllegalArgumentException("Must specify marker height even if square");
 		this.renderer = renderer;
-		g = new ChessboardReedSolomonGenerator(utils);
+		g = new ECoCheckGenerator(utils);
 		g.squareWidth = squareWidth*UNIT_TO_POINTS;
 		g.setRender(renderer);
 	}
@@ -96,7 +96,7 @@ public class CreateChessboardBitsDocumentPDF extends CreateFiducialDocumentPDF {
 		pcs.closeAndStroke();
 	}
 
-	public void render( ChessBitsUtils utils ) throws IOException {
+	public void render( ECoCheckUtils utils ) throws IOException {
 		this.utils = utils;
 
 		totalMarkers = utils.markers.size();

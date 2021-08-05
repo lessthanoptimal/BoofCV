@@ -16,7 +16,7 @@
  * limitations under the License.
  */
 
-package boofcv.alg.fiducial.calib.chessbits;
+package boofcv.alg.fiducial.calib.ecocheck;
 
 import boofcv.alg.geo.h.HomographyDirectLinearTransform;
 import boofcv.struct.GridCoordinate;
@@ -34,33 +34,12 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * <p>Common functions that are needed for encoding, decoding, and detecting.</p>
- *
- * Definitions:
- * <dl>
- *     <dt>data region</dt>
- *     <dd>Square region containing the encoded message inside a white inner square</dd>
- *
- *     <dt>data region coordinates</dt>
- *     <dd>2D coordinate system with the origin in the data region's top-left corner. Values vary from 0 to 1. Where
- *     0 is at the origin and 1 is either the x or y axis border.</dd>
- *
- *     <dt>inner square</dt>
- *     <dd>Square (white or black) inside chessboard which does not touch the border</dd>
- *
- *     <dt>bit-cell</dt>
- *     <dd>Region in which a single bit of data is encoded. size is data-region's length / grid size</dd>
- *
- *     <dt>grid size</dt>
- *     <dd>The length of a grid. size=5 then there are 25 cells in the grid.</dd>
- *
- *     <dt>quite-zone</dt>
- *     <dd>White space surrounding an image feature which reduces confusion with the background or other features.</dd>
- * </dl>
+ * <p>Common functions that are needed for encoding, decoding, and detecting. Terminology can be found in
+ * {@link ECoCheckGenerator}.</p>
  *
  * @author Peter Abeles
  */
-public class ChessBitsUtils {
+public class ECoCheckUtils {
 	/** Fraction of a bit-cell's length that the black square is drawn in */
 	public @Getter @Setter double dataBitWidthFraction = 0.7;
 
@@ -79,7 +58,7 @@ public class ChessBitsUtils {
 	@Getter protected int bitSampleCount;
 
 	/** Used to encode and decode bit streams with coordinate information */
-	public final ChessboardReedSolomonCodec codec = new ChessboardReedSolomonCodec();
+	public final ECoCheckCodec codec = new ECoCheckCodec();
 
 	// Used to compute the homography from square coordinates into image pixels
 	HomographyDirectLinearTransform dlt = new HomographyDirectLinearTransform(true);
