@@ -30,6 +30,7 @@ import georegression.struct.point.Point2D_F32;
 import georegression.struct.point.Point2D_F64;
 import georegression.struct.shapes.Polygon2D_F64;
 import lombok.Getter;
+import org.ddogleg.struct.DogArray_F32;
 
 /**
  * Reads binary values from the qr code's grid. Top left corner of the qr code is it's origin. +x = right and +y = down
@@ -121,11 +122,34 @@ public class QrCodeBinaryGridReader<T extends ImageGray<T>> {
 	}
 
 	/**
+	 * Reads intensity values around the location of each bit.
+	 *
+	 * @param row grid row
+	 * @param col grid column
+	 * @param intensity Storage for intensity values
+	 */
+	public void readBitIntensity( int row, int col, DogArray_F32 intensity ) {
+		float center = 0.5f;
+
+		transformGrid.gridToImage(row + center - 0.2f, col + center, pixel);
+		intensity.add(interpolate.get(pixel.x, pixel.y));
+		transformGrid.gridToImage(row + center + 0.2f, col + center, pixel);
+		intensity.add(interpolate.get(pixel.x, pixel.y));
+		transformGrid.gridToImage(row + center, col + center - 0.2f, pixel);
+		intensity.add(interpolate.get(pixel.x, pixel.y));
+		transformGrid.gridToImage(row + center, col + center + 0.2f, pixel);
+		intensity.add(interpolate.get(pixel.x, pixel.y));
+		transformGrid.gridToImage(row + center, col + center, pixel);
+		intensity.add(interpolate.get(pixel.x, pixel.y));
+	}
+
+	/**
 	 * Reads a bit from the qr code's data matrix while adjusting for location distortions using known
 	 * feature locations.
 	 *
 	 * @param row grid row
 	 * @param col grid column
+	 * @return 0 or 1 value for the bit
 	 */
 	public int readBit( int row, int col ) {
 		// todo use adjustments from near by alignment patterns
