@@ -26,6 +26,7 @@ import georegression.struct.point.Point2D_F64;
 import georegression.struct.point.Point2D_I32;
 import georegression.struct.shapes.Polygon2D_F64;
 import org.ddogleg.struct.DogArray;
+import org.ddogleg.struct.DogArray_F32;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
@@ -37,8 +38,6 @@ import java.util.List;
  * @author Peter Abeles
  */
 public class QrCodeDecoderImage<T extends ImageGray<T>> {
-	// TODO better support for damaged qr codes with missing finder patterns.
-
 	// used to compute error correction
 	QrCodeDecoderBits decoder;
 
@@ -54,6 +53,9 @@ public class QrCodeDecoderImage<T extends ImageGray<T>> {
 
 	QrCodeAlignmentPatternLocator<T> alignmentLocator;
 	QrCodeBinaryGridReader<T> gridReader;
+
+	// Storage for pixel intensity. There are N samples for each bit
+	DogArray_F32 intensityBits = new DogArray_F32();
 
 	/**
 	 * @param forceEncoding Force the default encoding to be this. Null for default
@@ -303,13 +305,74 @@ public class QrCodeDecoderImage<T extends ImageGray<T>> {
 		// predeclare memory
 		bits.resize(info.codewords*8);
 
-		// read bits from memory
+		// Get the location of each bit
 		List<Point2D_I32> locationBits = QrCode.LOCATION_BITS[qr.version];
+
+		// Sample the image intensity around each bit
+		int numModules = qr.getNumberOfModules();
+		intensityBits.reserve(locationBits.size()*5);
+		intensityBits.reset();
+
 		// end at bits.size instead of locationBits.size because location might point to useless bits
-		for (int i = 0; i < bits.size; i++) {
-			Point2D_I32 b = locationBits.get(i);
-			readDataMatrix(i, b.y, b.x, qr.mask);
+		int start = Math.max(8, numModules - 10);
+
+		float sumLowerRight = 0.0f;
+		int total = 0;
+		for (int bitIndex = 0; bitIndex < bits.size; bitIndex++) {
+			Point2D_I32 b = locationBits.get(bitIndex);
+			gridReader.readBitIntensity(b.y, b.x, intensityBits);
+
+			if (b.x < start && b.y < start)
+				continue;
+
+			total++;
+			for (int i = intensityBits.size-5; i < intensityBits.size; i++) {
+				sumLowerRight += intensityBits.data[i];
+			}
 		}
+		float thresholdDownRight = sumLowerRight/(5*total);
+
+		// NOTE document
+		float gridSize = qr.getNumberOfModules() - 1.0f;
+		float threshold00 = (float)qr.threshCorner;
+		float threshold01 = (float)qr.threshRight;
+		float threshold10 = (float)qr.threshDown;
+		float threshold11 = thresholdDownRight;
+
+		for (int intensityIndex = 0; intensityIndex < intensityBits.size; ) {
+			int bitIndex = intensityIndex/5;
+
+			Point2D_I32 b = locationBits.get(bitIndex);
+
+			float bx = b.x/gridSize;
+			float by = b.y/gridSize;
+
+			// Compute threshold by performing bilinear interpolation between local thresholds at each corner
+			float threshold = 0.0f;
+			threshold += (1.0f - bx)*(1.0f - by)*threshold00;
+			threshold += bx*(1.0f - by)*threshold01;
+			threshold += bx*by*threshold11;
+			threshold += (1.0f - bx)*by*threshold10;
+
+			int votes = 0;
+			votes += intensityBits.data[intensityIndex++] < threshold ? 1 : 0;
+			votes += intensityBits.data[intensityIndex++] < threshold ? 1 : 0;
+			votes += intensityBits.data[intensityIndex++] < threshold ? 1 : 0;
+			votes += intensityBits.data[intensityIndex++] < threshold ? 1 : 0;
+			votes += intensityBits.data[intensityIndex++] < threshold ? 1 : 0;
+
+			int bit = votes >= 3 ? 1 : 0;
+
+//			int expected = gridReader.readBit(b.y, b.x);
+
+			bits.set(bitIndex, qr.mask.apply(b.y, b.x, bit));
+		}
+
+//		// end at bits.size instead of locationBits.size because location might point to useless bits
+//		for (int i = 0; i < bits.size; i++) {
+//			Point2D_I32 b = locationBits.get(i);
+//			readDataMatrix(i, b.y, b.x, qr.mask);
+//		}
 
 //		System.out.println("Version "+qr.version);
 //		System.out.println("bits8.size "+bits8.size+"  locationBits "+locationBits.size());
