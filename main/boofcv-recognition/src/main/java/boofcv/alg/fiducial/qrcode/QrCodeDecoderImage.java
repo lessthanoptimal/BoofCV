@@ -308,6 +308,27 @@ public class QrCodeDecoderImage<T extends ImageGray<T>> {
 		// Get the location of each bit
 		List<Point2D_I32> locationBits = QrCode.LOCATION_BITS[qr.version];
 
+		// read the pixel intensity values at each bit while computing a threshold for the
+		// lower right corner region
+		qr.threshDownRight = readBitIntensityAndThresholdDownRight(qr, locationBits);
+
+		// Convert the sampled intensity at each bit into a binary number
+		bitIntensityToBitValue(qr, locationBits);
+
+		// copy over the results
+		System.arraycopy(bits.data, 0, qr.rawbits, 0, qr.rawbits.length);
+
+		return true;
+	}
+
+	/**
+	 * Samples pixel intensity around the center of each bit. Multiple points are measured to reduce the amount of
+	 * damage a single noisy pixel can cause.
+	 *
+	 * At the same time a threshold is computing for binarization from the pixel intensity values in the lower
+	 * right corner. It assumes the distribution of white and black squares is about equal.
+	 */
+	private float readBitIntensityAndThresholdDownRight( QrCode qr, List<Point2D_I32> locationBits ) {
 		// Sample the image intensity around each bit
 		int numModules = qr.getNumberOfModules();
 		intensityBits.reserve(locationBits.size()*5);
@@ -316,28 +337,41 @@ public class QrCodeDecoderImage<T extends ImageGray<T>> {
 		// end at bits.size instead of locationBits.size because location might point to useless bits
 		int start = Math.max(8, numModules - 10);
 
+		// sum of pixel intensity in lower right
 		float sumLowerRight = 0.0f;
+		// Number of points which contrinute to the dum
 		int total = 0;
+
+		// measure the intensity around each bit's location
 		for (int bitIndex = 0; bitIndex < bits.size; bitIndex++) {
 			Point2D_I32 b = locationBits.get(bitIndex);
 			gridReader.readBitIntensity(b.y, b.x, intensityBits);
 
+			// only consider points in the lower right corner
 			if (b.x < start && b.y < start)
 				continue;
 
-			total++;
-			for (int i = intensityBits.size-5; i < intensityBits.size; i++) {
+			total += QrCodeBinaryGridReader.BIT_INTENSITY_SAMPLES;
+			for (int i = intensityBits.size - QrCodeBinaryGridReader.BIT_INTENSITY_SAMPLES; i < intensityBits.size; i++) {
 				sumLowerRight += intensityBits.data[i];
 			}
 		}
-		float thresholdDownRight = sumLowerRight/(5*total);
 
-		// NOTE document
+		// simple average for the threshold. Could be improved with Otsu, but be more expensive
+		return sumLowerRight/total;
+	}
+
+	/**
+	 * Takes the previously measured intensity at each bit and converts it into a binary value. The threshold used
+	 * is computed by applying bilinear interpolation to the 4-thresholds computed at each corner of the QR code.
+	 * This provides
+	 */
+	private void bitIntensityToBitValue( QrCode qr, List<Point2D_I32> locationBits ) {
 		float gridSize = qr.getNumberOfModules() - 1.0f;
 		float threshold00 = (float)qr.threshCorner;
 		float threshold01 = (float)qr.threshRight;
 		float threshold10 = (float)qr.threshDown;
-		float threshold11 = thresholdDownRight;
+		float threshold11 = (float)qr.threshDownRight;
 
 		for (int intensityIndex = 0; intensityIndex < intensityBits.size; ) {
 			int bitIndex = intensityIndex/5;
@@ -363,25 +397,8 @@ public class QrCodeDecoderImage<T extends ImageGray<T>> {
 
 			int bit = votes >= 3 ? 1 : 0;
 
-//			int expected = gridReader.readBit(b.y, b.x);
-
 			bits.set(bitIndex, qr.mask.apply(b.y, b.x, bit));
 		}
-
-//		// end at bits.size instead of locationBits.size because location might point to useless bits
-//		for (int i = 0; i < bits.size; i++) {
-//			Point2D_I32 b = locationBits.get(i);
-//			readDataMatrix(i, b.y, b.x, qr.mask);
-//		}
-
-//		System.out.println("Version "+qr.version);
-//		System.out.println("bits8.size "+bits8.size+"  locationBits "+locationBits.size());
-//		bits8.print();
-
-		// copy over the results
-		System.arraycopy(bits.data, 0, qr.rawbits, 0, qr.rawbits.length);
-
-		return true;
 	}
 
 	/**
@@ -399,16 +416,6 @@ public class QrCodeDecoderImage<T extends ImageGray<T>> {
 			value = 0;
 		}
 		bits.set(bit, value);
-	}
-
-	private void readDataMatrix( int bit, int row, int col, QrCodeMaskPattern mask ) {
-		int value = gridReader.readBit(row, col);
-		if (value == -1) {
-			// The requested region is outside the image. A partial QR code can be read so let's just
-			// assign it a value of zero and let error correction handle this
-			value = 0;
-		}
-		bits.set(bit, mask.apply(row, col, value));
 	}
 
 	/**

@@ -24,6 +24,7 @@ import boofcv.testing.BoofStandardJUnit;
 import georegression.struct.point.Point2D_F32;
 import georegression.struct.point.Point2D_F64;
 import georegression.struct.point.Point2D_I32;
+import org.ddogleg.struct.DogArray_F32;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
@@ -136,6 +137,27 @@ public class TestQrCodeBinaryGridReader extends BoofStandardJUnit {
 		reader.setImage(helper.image);
 		reader.setMarker(helper.qr);
 		assertEquals(countCorrectRead(qr, reader), 1.0);
+	}
+
+	/**
+	 * Checks to see if the expected number of points was read
+	 */
+	@Test void readBitIntensity_count() {
+		DogArray_F32 intensity = new DogArray_F32();
+		// add a value to it to make sure it's not cleared
+		intensity.add(5);
+
+		QrCodeDistortedChecks helper = createDistortionCheck();
+
+		QrCodeBinaryGridReader<GrayF32> reader = new QrCodeBinaryGridReader<>(GrayF32.class);
+		reader.setImage(helper.image);
+		reader.setMarker(helper.qr);
+
+		reader.readBitIntensity(10, 11, intensity);
+
+		// Make sure the expected number of points was read
+		// If that changes you need to hunt down places '5' was hard coded. Sorry for that.
+		assertEquals(1 + QrCodeBinaryGridReader.BIT_INTENSITY_SAMPLES, intensity.size);
 	}
 
 	private double countCorrectRead( QrCode qr, QrCodeBinaryGridReader<GrayF32> reader ) {
