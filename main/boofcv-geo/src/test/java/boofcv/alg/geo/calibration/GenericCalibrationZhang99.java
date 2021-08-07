@@ -47,23 +47,20 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  * @author Peter Abeles
  */
 @SuppressWarnings("unchecked")
-public abstract class GenericCalibrationZhang99<CM extends CameraModel> extends BoofStandardJUnit
-{
+public abstract class GenericCalibrationZhang99<CM extends CameraModel> extends BoofStandardJUnit {
 	/**
 	 * Create a set of observations from a known grid, give it the observations and see if it can
 	 * reconstruct the known parameters.
 	 */
-	@Test
-	void fullTest() {
+	@Test void fullTest() {
 		fullTest(false);
 		fullTest(true);
 	}
 
 	void fullTest( boolean partial ) {
 
-		for( CameraConfig config : createCamera(rand) )
-		{
-			CalibInputs inputs = createInputs(config.model,3,rand);
+		for (CameraConfig config : createCamera(rand)) {
+			CalibInputs inputs = createInputs(config.model, 3, rand);
 
 			// remove points for partial visibility of a target
 			if (partial) {
@@ -75,10 +72,10 @@ public abstract class GenericCalibrationZhang99<CM extends CameraModel> extends 
 				}
 			}
 
-			Zhang99Camera zhangCamera = createGenerator(config);
+			Zhang99Camera zhangCamera = createGenerator(config, inputs.layout);
 
 			CalibrationPlanarGridZhang99 alg = new CalibrationPlanarGridZhang99(
-					inputs.layout, zhangCamera );
+					inputs.layout, zhangCamera);
 
 			// estimate camera parameters using full non-linear methods
 			alg.process(inputs.observations);
@@ -86,7 +83,7 @@ public abstract class GenericCalibrationZhang99<CM extends CameraModel> extends 
 			// verify results using errors
 			List<ImageResults> errors = alg.computeErrors();
 			for (int i = 0; i < errors.size(); i++) {
-				assertEquals(0,errors.get(i).meanError, 1e-3);
+				assertEquals(0, errors.get(i).meanError, 1e-3);
 			}
 		}
 	}
@@ -94,16 +91,13 @@ public abstract class GenericCalibrationZhang99<CM extends CameraModel> extends 
 	/**
 	 * See how well it computes an initial guess at the parameters given perfect inputs
 	 */
-	@Test
-	void linearEstimate()
-	{
-		for( CameraConfig config : createCameraForLinearTests(rand) )
-		{
-			CalibInputs inputs = createInputs(config.model,3,rand);
-			Zhang99Camera zhangCamera = createGenerator(config);
+	@Test void linearEstimate() {
+		for (CameraConfig config : createCameraForLinearTests(rand)) {
+			CalibInputs inputs = createInputs(config.model, 3, rand);
+			Zhang99Camera zhangCamera = createGenerator(config, inputs.layout);
 
-			CalibrationPlanarGridZhang99 alg = new CalibrationPlanarGridZhang99(
-					inputs.layout, zhangCamera );
+			var alg = new CalibrationPlanarGridZhang99(inputs.layout, zhangCamera);
+			alg.setZeroSkew(true);
 
 			alg.linearEstimate(inputs.observations);
 
@@ -111,13 +105,14 @@ public abstract class GenericCalibrationZhang99<CM extends CameraModel> extends 
 
 			CM found = (CM)zhangCamera.getCameraModel(structure.getCameras().get(0).model);
 
-			checkIntrinsicOnly(config.model,found, 0.01, 0.1, 0.1);
+			checkIntrinsicOnly(config.model, found, 0.01, 0.1, 0.1);
 		}
 	}
 
-	public abstract Zhang99Camera createGenerator(CameraConfig config );
+	public abstract Zhang99Camera createGenerator( CameraConfig config, List<Point2D_F64> layout );
 
 	public abstract DMatrixRMaj cameraToK( CameraConfig config );
+
 	public abstract double[] extractRadial( CameraConfig config );
 
 	public class CameraConfig {
@@ -127,25 +122,22 @@ public abstract class GenericCalibrationZhang99<CM extends CameraModel> extends 
 	/**
 	 * Test nonlinear optimization with perfect inputs
 	 */
-	@Test
-	void optimizedParam_perfect() {
-
-		for( CameraConfig config : createCamera(rand) ) {
-			CalibInputs inputs = createInputs(config.model,3,rand);
-			Zhang99Camera zhangCamera = createGenerator(config);
+	@Test void optimizedParam_perfect() {
+		for (CameraConfig config : createCamera(rand)) {
+			CalibInputs inputs = createInputs(config.model, 3, rand);
+			Zhang99Camera zhangCamera = createGenerator(config, inputs.layout);
 
 			CalibrationPlanarGridZhang99 alg = new CalibrationPlanarGridZhang99(inputs.layout, zhangCamera);
 
 			DMatrixRMaj K = cameraToK(config);
-			double[] radial = extractRadial(config);
 
-			alg.convertIntoBundleStructure(inputs.worldToViews,K,radial,inputs.observations);
+			alg.convertIntoBundleStructure(inputs.worldToViews, K, inputs.homographies, inputs.observations);
 			assertTrue(alg.performBundleAdjustment());
 
 			// verify results using errors
 			List<ImageResults> errors = alg.computeErrors();
 			for (int i = 0; i < errors.size(); i++) {
-				assertEquals(0,errors.get(i).meanError, 1e-3);
+				assertEquals(0, errors.get(i).meanError, 1e-3);
 			}
 		}
 	}
@@ -153,13 +145,12 @@ public abstract class GenericCalibrationZhang99<CM extends CameraModel> extends 
 	/**
 	 * Test nonlinear optimization with a bit of noise
 	 */
-	@Test
-	void optimizedParam_noisy() {
+	@Test void optimizedParam_noisy() {
 
-		for( CameraConfig config : createCamera(rand) ) {
-			CalibInputs inputs = createInputs(config.model,3,rand);
+		for (CameraConfig config : createCamera(rand)) {
+			CalibInputs inputs = createInputs(config.model, 3, rand);
 
-			Zhang99Camera zhangCamera = createGenerator(config);
+			Zhang99Camera zhangCamera = createGenerator(config, inputs.layout);
 
 			CalibrationPlanarGridZhang99 alg = new CalibrationPlanarGridZhang99(inputs.layout, zhangCamera);
 
@@ -172,87 +163,92 @@ public abstract class GenericCalibrationZhang99<CM extends CameraModel> extends 
 				radial[i] += rand.nextGaussian()*0.005;
 			}
 
-			alg.convertIntoBundleStructure(inputs.worldToViews,K,radial,inputs.observations);
+			alg.convertIntoBundleStructure(inputs.worldToViews, K, inputs.homographies, inputs.observations);
 			assertTrue(alg.performBundleAdjustment());
 
 			// verify results using errors
 			List<ImageResults> errors = alg.computeErrors();
 			for (int i = 0; i < errors.size(); i++) {
-				assertEquals(0,errors.get(i).meanError, 0.01);
+				assertEquals(0, errors.get(i).meanError, 0.01);
 			}
 		}
 	}
 
 	public static class CalibInputs {
-		List<Point2D_F64> layout= new ArrayList<>();
+		List<Point2D_F64> layout = new ArrayList<>();
+		List<DMatrixRMaj> homographies = new ArrayList<>();
 		List<Se3_F64> worldToViews = new ArrayList<>();
 		List<CalibrationObservation> observations = new ArrayList<>();
 	}
 
-	public static CalibInputs createInputs( CameraModel camera , int numViews , Random rand ) {
+	public static CalibInputs createInputs( CameraModel camera, int numViews, Random rand ) {
 		CalibInputs ret = new CalibInputs();
 
 		// project to distorted pixels. Support all wide and narrow FOV cameras
 		Point3Transform2_F64 p2p;
 		try {
 			p2p = LensDistortionFactory.wide(camera).distortStoP_F64();
-		} catch( IllegalArgumentException e ) {
-			Point2Transform2_F64 n2p = LensDistortionFactory.narrow(camera).distort_F64(false,true);
+		} catch (IllegalArgumentException e) {
+			Point2Transform2_F64 n2p = LensDistortionFactory.narrow(camera).distort_F64(false, true);
 			p2p = new SphereToNarrowPixel_F64(n2p);
 		}
 
 		// 3D point in world and view reference frames
-		Point3D_F64 worldP = new Point3D_F64();
-		Point3D_F64 viewP = new Point3D_F64();
+		var worldP = new Point3D_F64();
+		var viewP = new Point3D_F64();
 
 		ret.layout = GenericCalibrationGrid.standardLayout();
 
+		var computeHomography = new Zhang99ComputeTargetHomography(ret.layout);
+
 		for (int viewIdx = 0; viewIdx < numViews; viewIdx++) {
 			// randomly generate a view location
-			double rotX = (rand.nextDouble()-0.5)*UtilAngle.radian(30);
-			double rotY = (rand.nextDouble()-0.5)*UtilAngle.radian(30);
-			double rotZ = (rand.nextDouble()-0.5)*UtilAngle.radian(180);
+			double rotX = (rand.nextDouble() - 0.5)*UtilAngle.radian(30);
+			double rotY = (rand.nextDouble() - 0.5)*UtilAngle.radian(30);
+			double rotZ = (rand.nextDouble() - 0.5)*UtilAngle.radian(180);
 
 			double x = rand.nextGaussian()*5;
 			double y = rand.nextGaussian()*5;
-			double z = rand.nextGaussian()*5+300;
+			double z = rand.nextGaussian()*5 + 300;
 
-			Se3_F64 worldToView = SpecialEuclideanOps_F64.eulerXyz(x,y,z,rotX,rotY,rotZ,null);
+			Se3_F64 worldToView = SpecialEuclideanOps_F64.eulerXyz(x, y, z, rotX, rotY, rotZ, null);
 
-			CalibrationObservation obs = new CalibrationObservation(camera.width,camera.height);
+			var obs = new CalibrationObservation(camera.width, camera.height);
 			ret.worldToViews.add(worldToView);
 			ret.observations.add(obs);
 
 			// render pixel observations
 			for (int i = 0; i < ret.layout.size(); i++) {
-				worldP.setTo(ret.layout.get(i).x,ret.layout.get(i).y,0);
-				worldToView.transform(worldP,viewP);
+				worldP.setTo(ret.layout.get(i).x, ret.layout.get(i).y, 0);
+				worldToView.transform(worldP, viewP);
 				PointIndex2D_F64 pixel = new PointIndex2D_F64();
 
-				p2p.compute(viewP.x,viewP.y,viewP.z,pixel.p);
+				p2p.compute(viewP.x, viewP.y, viewP.z, pixel.p);
 				pixel.index = i;
 				obs.points.add(pixel);
 			}
+
+			assertTrue(computeHomography.computeHomography(obs));
+			ret.homographies.add(computeHomography.getHomography());
 		}
 
 		return ret;
 	}
 
-
 	/**
 	 * Standard testing parameters. Should be solvable with non-linear refinement.
 	 */
-	public abstract List<CameraConfig> createCamera(Random rand);
+	public abstract List<CameraConfig> createCamera( Random rand );
 
 	/**
 	 * These parameters are intended to be easy for the linear estimator to estimate.
 	 */
-	public abstract List<CameraConfig> createCameraForLinearTests(Random rand);
+	public abstract List<CameraConfig> createCameraForLinearTests( Random rand );
 
 	@Test void applyDistortion() {
-		Point2D_F64 n = new Point2D_F64(0.05,-0.1);
+		Point2D_F64 n = new Point2D_F64(0.05, -0.1);
 		double radial[] = new double[]{0.1};
-		double t1 = 0.034,t2 = 0.34;
+		double t1 = 0.034, t2 = 0.34;
 
 		Point2D_F64 distorted = new Point2D_F64();
 
@@ -260,13 +256,13 @@ public abstract class GenericCalibrationZhang99<CM extends CameraModel> extends 
 		distorted.x = n.x + radial[0]*r2*n.x + 2*t1*n.x*n.y + t2*(r2 + 2*n.x*n.x);
 		distorted.y = n.y + radial[0]*r2*n.y + t1*(r2 + 2*n.y*n.y) + 2*t2*n.x*n.y;
 
-		CalibrationPlanarGridZhang99.applyDistortion(n,radial,t1,t2);
+		CalibrationPlanarGridZhang99.applyDistortion(n, radial, t1, t2);
 
 		assertEquals(distorted.x, n.x, 1e-8);
 		assertEquals(distorted.y, n.y, 1e-8);
 	}
 
-	protected abstract void checkIntrinsicOnly(CM expected,
-											   CM found ,
-											   double tolK , double tolD , double tolT );
+	protected abstract void checkIntrinsicOnly( CM expected,
+												CM found,
+												double tolK, double tolD, double tolT );
 }

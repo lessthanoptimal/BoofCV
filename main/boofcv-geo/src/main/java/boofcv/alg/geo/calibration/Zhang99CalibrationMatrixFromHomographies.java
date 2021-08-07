@@ -18,6 +18,7 @@
 
 package boofcv.alg.geo.calibration;
 
+import lombok.Getter;
 import org.ejml.data.DMatrixRMaj;
 import org.ejml.dense.row.CommonOps_DDRM;
 import org.ejml.dense.row.MatrixFeatures_DDRM;
@@ -61,12 +62,12 @@ public class Zhang99CalibrationMatrixFromHomographies {
 	private SolveNullSpaceSvd_DDRM solverNull = new SolveNullSpaceSvd_DDRM();
 
 	// a vectorized description of the B = A^-T * A^-1 matrix.
-	private DMatrixRMaj b;
+	private DMatrixRMaj b = new DMatrixRMaj(1,1);
 	// the found calibration matrix
 	private DMatrixRMaj K = new DMatrixRMaj(3,3);
 
-	// if it should assume the skew is zero or not
-	private boolean assumeZeroSkew;
+	/** if it should assume the skew is zero or not */
+	@Getter private boolean assumeZeroSkew;
 
 
 	/**
@@ -75,13 +76,22 @@ public class Zhang99CalibrationMatrixFromHomographies {
 	 * @param assumeZeroSkew  Assume that skew matrix is zero or not
 	 */
 	public Zhang99CalibrationMatrixFromHomographies(boolean assumeZeroSkew) {
-		this.assumeZeroSkew = assumeZeroSkew;
+		setAssumeZeroSkew(assumeZeroSkew);
+	}
+
+	public Zhang99CalibrationMatrixFromHomographies() {}
+
+	/**
+	 * Specifies if it should assume skew is zero or not
+	 * @param zeroSkew true if skew is zero
+	 */
+	public void setAssumeZeroSkew( boolean zeroSkew ) {
+		this.assumeZeroSkew = zeroSkew;
 
 		if( assumeZeroSkew )
-			b = new DMatrixRMaj(5,1);
+			b.reshape(5,1);
 		else
-			b = new DMatrixRMaj(6,1);
-
+			b.reshape(6,1);
 	}
 
 	/**

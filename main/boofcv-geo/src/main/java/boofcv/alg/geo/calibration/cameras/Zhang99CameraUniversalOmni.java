@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -20,9 +20,14 @@ package boofcv.alg.geo.calibration.cameras;
 
 import boofcv.abst.geo.bundle.BundleAdjustmentCamera;
 import boofcv.alg.geo.bundle.cameras.BundleUniversalOmni;
+import boofcv.alg.geo.calibration.CalibrationObservation;
+import boofcv.alg.geo.calibration.RadialDistortionEstimateLinear;
 import boofcv.struct.calib.CameraModel;
 import boofcv.struct.calib.CameraUniversalOmni;
+import georegression.struct.point.Point2D_F64;
 import org.ejml.data.DMatrixRMaj;
+
+import java.util.List;
 
 /**
  * @author Peter Abeles
@@ -31,30 +36,33 @@ public class Zhang99CameraUniversalOmni implements Zhang99Camera {
 	boolean assumeZeroSkew;
 	boolean includeTangential;
 	public boolean fixedMirror;
-	int numRadial;
 	double mirror;
 
-	public Zhang99CameraUniversalOmni(boolean assumeZeroSkew, boolean includeTangential, int numRadial , double mirror ) {
+	private final RadialDistortionEstimateLinear computeRadial;
+
+	public Zhang99CameraUniversalOmni( List<Point2D_F64> layout,
+									   boolean assumeZeroSkew, boolean includeTangential, int numRadial, double mirror ) {
 		this.assumeZeroSkew = assumeZeroSkew;
 		this.includeTangential = includeTangential;
 		this.fixedMirror = true;
 		this.mirror = mirror;
-		this.numRadial = numRadial;
+		computeRadial = new RadialDistortionEstimateLinear(layout, numRadial);
 	}
 
-	public Zhang99CameraUniversalOmni(boolean assumeZeroSkew, boolean includeTangential, int numRadial ) {
-		this.assumeZeroSkew = assumeZeroSkew;
-		this.includeTangential = includeTangential;
-		this.fixedMirror = false;
-		this.numRadial = numRadial;
+	public Zhang99CameraUniversalOmni( List<Point2D_F64> layout,
+									   boolean assumeZeroSkew, boolean includeTangential, int numRadial ) {
+		this(layout, assumeZeroSkew, includeTangential, numRadial, 0.0);
 	}
 
-	@Override
-	public BundleAdjustmentCamera initalizeCamera(DMatrixRMaj K, double[] radial) {
-		BundleUniversalOmni cam = new BundleUniversalOmni(assumeZeroSkew,numRadial,includeTangential,fixedMirror);
-		System.arraycopy(radial,0,cam.radial,0,radial.length);
+	@Override public BundleAdjustmentCamera initializeCamera(
+			DMatrixRMaj K, List<DMatrixRMaj> homographies, List<CalibrationObservation> observations ) {
+		computeRadial.process(K, homographies, observations);
+		double[] radial = computeRadial.getParameters();
+
+		BundleUniversalOmni cam = new BundleUniversalOmni(assumeZeroSkew, radial.length, includeTangential, fixedMirror);
+		System.arraycopy(radial, 0, cam.radial, 0, radial.length);
 		cam.setK(K);
-		if( fixedMirror )
+		if (fixedMirror)
 			cam.mirrorOffset = mirror;
 		else
 			cam.mirrorOffset = 0; // paper recommends 1. Doesn't seem to make a difference
@@ -63,20 +71,10 @@ public class Zhang99CameraUniversalOmni implements Zhang99Camera {
 	}
 
 	@Override
-	public CameraModel getCameraModel(BundleAdjustmentCamera bundleCam) {
+	public CameraModel getCameraModel( BundleAdjustmentCamera bundleCam ) {
 		BundleUniversalOmni cam = (BundleUniversalOmni)bundleCam;
 		CameraUniversalOmni out = new CameraUniversalOmni(cam.radial.length);
 		cam.convert(out);
 		return out;
-	}
-
-	@Override
-	public boolean isZeroSkew() {
-		return assumeZeroSkew;
-	}
-
-	@Override
-	public int numRadial() {
-		return numRadial;
 	}
 }

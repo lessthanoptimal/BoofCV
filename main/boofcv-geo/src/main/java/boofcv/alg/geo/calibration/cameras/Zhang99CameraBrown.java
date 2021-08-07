@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -21,8 +21,13 @@ package boofcv.alg.geo.calibration.cameras;
 import boofcv.abst.geo.bundle.BundleAdjustmentCamera;
 import boofcv.alg.geo.bundle.BundleAdjustmentOps;
 import boofcv.alg.geo.bundle.cameras.BundlePinholeBrown;
+import boofcv.alg.geo.calibration.CalibrationObservation;
+import boofcv.alg.geo.calibration.RadialDistortionEstimateLinear;
 import boofcv.struct.calib.CameraModel;
+import georegression.struct.point.Point2D_F64;
 import org.ejml.data.DMatrixRMaj;
+
+import java.util.List;
 
 /**
  * @author Peter Abeles
@@ -30,20 +35,22 @@ import org.ejml.data.DMatrixRMaj;
 public class Zhang99CameraBrown implements Zhang99Camera {
 	boolean assumeZeroSkew;
 	boolean includeTangential;
-	int numRadial;
 
-	public Zhang99CameraBrown( boolean assumeZeroSkew, boolean includeTangential, int numRadial ) {
+	private final RadialDistortionEstimateLinear computeRadial;
+
+	public Zhang99CameraBrown( List<Point2D_F64> layout,
+							   boolean assumeZeroSkew, boolean includeTangential, int numRadial ) {
 		this.assumeZeroSkew = assumeZeroSkew;
 		this.includeTangential = includeTangential;
-		this.numRadial = numRadial;
+		computeRadial = new RadialDistortionEstimateLinear(layout, numRadial);
 	}
 
-	@Override
-	public BundleAdjustmentCamera initalizeCamera( DMatrixRMaj K, double[] radial ) {
+	@Override public BundleAdjustmentCamera initializeCamera(
+			DMatrixRMaj K, List<DMatrixRMaj> homographies, List<CalibrationObservation> observations ) {
+		computeRadial.process(K, homographies, observations);
+
 		BundlePinholeBrown cam = new BundlePinholeBrown(assumeZeroSkew, includeTangential);
-		cam.radial = radial.clone();
-		if (cam.radial.length != numRadial)
-			throw new RuntimeException("BUGW!");
+		cam.radial = computeRadial.getParameters().clone();
 		cam.setK(K);
 		return cam;
 	}
@@ -52,15 +59,5 @@ public class Zhang99CameraBrown implements Zhang99Camera {
 	public CameraModel getCameraModel( BundleAdjustmentCamera bundleCam ) {
 		BundlePinholeBrown cam = (BundlePinholeBrown)bundleCam;
 		return BundleAdjustmentOps.convert(cam, 0, 0, null);
-	}
-
-	@Override
-	public boolean isZeroSkew() {
-		return assumeZeroSkew;
-	}
-
-	@Override
-	public int numRadial() {
-		return numRadial;
 	}
 }

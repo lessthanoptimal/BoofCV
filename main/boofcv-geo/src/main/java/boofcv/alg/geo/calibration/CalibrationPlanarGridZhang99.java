@@ -27,10 +27,13 @@ import boofcv.alg.geo.bundle.CodecSceneStructureMetric;
 import boofcv.alg.geo.calibration.cameras.Zhang99Camera;
 import boofcv.factory.geo.ConfigBundleAdjustment;
 import boofcv.factory.geo.FactoryMultiView;
+import boofcv.misc.BoofMiscOps;
 import boofcv.struct.calib.CameraModel;
 import boofcv.struct.geo.PointIndex2D_F64;
 import georegression.struct.point.Point2D_F64;
 import georegression.struct.se.Se3_F64;
+import lombok.Getter;
+import lombok.Setter;
 import org.ddogleg.optimization.lm.ConfigLevenbergMarquardt;
 import org.ddogleg.struct.VerbosePrint;
 import org.ejml.data.DMatrixRMaj;
@@ -71,10 +74,12 @@ public class CalibrationPlanarGridZhang99 implements VerbosePrint {
 
 	Zhang99Camera cameraGenerator;
 
+	/** Should it assume zero skew when estimating a pinhole camera? */
+	@Getter @Setter public boolean zeroSkew = true;
+
 	// estimation algorithms
 	private final Zhang99ComputeTargetHomography computeHomography;
 	private final Zhang99CalibrationMatrixFromHomographies computeK;
-	private final RadialDistortionEstimateLinear computeRadial;
 	private final Zhang99DecomposeHomography decomposeH = new Zhang99DecomposeHomography();
 
 	// contains found parameters
@@ -101,8 +106,7 @@ public class CalibrationPlanarGridZhang99 implements VerbosePrint {
 		this.cameraGenerator = cameraGenerator;
 		this.layout = layout;
 		computeHomography = new Zhang99ComputeTargetHomography(layout);
-		computeK = new Zhang99CalibrationMatrixFromHomographies(cameraGenerator.isZeroSkew());
-		computeRadial = new RadialDistortionEstimateLinear(layout, cameraGenerator.numRadial());
+		computeK = new Zhang99CalibrationMatrixFromHomographies();
 	}
 
 	/**
@@ -122,6 +126,7 @@ public class CalibrationPlanarGridZhang99 implements VerbosePrint {
 	 * @return true if successful and false if it failed
 	 */
 	public boolean process( List<CalibrationObservation> observations ) {
+		computeK.setAssumeZeroSkew(zeroSkew);
 
 		// compute initial parameter estimates using linear algebra
 		if (!linearEstimate(observations))
@@ -165,12 +170,9 @@ public class CalibrationPlanarGridZhang99 implements VerbosePrint {
 			motions.add(decomposeH.decompose(H));
 		}
 
-		status("Estimating Radial Distortion");
-		computeRadial.process(K, homographies, observations);
+		status("Initial Model Parameters");
 
-		double[] distort = computeRadial.getParameters();
-
-		convertIntoBundleStructure(motions, K, distort, observations);
+		convertIntoBundleStructure(motions, K, homographies, observations);
 		return true;
 	}
 
@@ -213,8 +215,8 @@ public class CalibrationPlanarGridZhang99 implements VerbosePrint {
 	 */
 	public void convertIntoBundleStructure( List<Se3_F64> motions,
 											DMatrixRMaj K,
-											double[] distort,
-											List<CalibrationObservation> obs ) {
+											List<DMatrixRMaj> homographies,
+											List<CalibrationObservation> calibrationObservations ) {
 
 		structure = new SceneStructureMetric(false);
 		structure.initialize(1, motions.size(), -1, layout.size(), 1);
@@ -223,7 +225,7 @@ public class CalibrationPlanarGridZhang99 implements VerbosePrint {
 		observations.initialize(motions.size(), true);
 
 		// A single camera is assumed, that's what is being calibrated!
-		structure.setCamera(0, false, cameraGenerator.initalizeCamera(K, distort));
+		structure.setCamera(0, false, cameraGenerator.initializeCamera(K, homographies, calibrationObservations));
 		// A single rigid planar target is being viewed. It is assumed to be centered at the origin
 		structure.setRigid(0, true, new Se3_F64(), layout.size());
 		// Where the points are on the calibration target
@@ -236,7 +238,7 @@ public class CalibrationPlanarGridZhang99 implements VerbosePrint {
 		for (int viewIdx = 0; viewIdx < motions.size(); viewIdx++) {
 			structure.setView(viewIdx, 0, false, motions.get(viewIdx));
 			SceneObservations.View v = observations.getViewRigid(viewIdx);
-			CalibrationObservation ca = obs.get(viewIdx);
+			CalibrationObservation ca = calibrationObservations.get(viewIdx);
 			for (int j = 0; j < ca.size(); j++) {
 				PointIndex2D_F64 p = ca.get(j);
 				v.add(p.index, (float)p.p.x, (float)p.p.y);
@@ -336,7 +338,7 @@ public class CalibrationPlanarGridZhang99 implements VerbosePrint {
 
 	@Override
 	public void setVerbose( @Nullable PrintStream out, @Nullable Set<String> configuration ) {
-		this.verbose = out;
+		this.verbose = BoofMiscOps.addPrefix(this, out);
 	}
 
 	public interface Listener {

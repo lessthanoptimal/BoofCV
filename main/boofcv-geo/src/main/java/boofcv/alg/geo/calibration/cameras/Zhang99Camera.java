@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -19,18 +19,30 @@
 package boofcv.alg.geo.calibration.cameras;
 
 import boofcv.abst.geo.bundle.BundleAdjustmentCamera;
+import boofcv.alg.geo.calibration.CalibrationObservation;
 import boofcv.struct.calib.CameraModel;
 import org.ejml.data.DMatrixRMaj;
 
+import java.util.List;
+
 /**
+ * Wrapper that converts a camera model into a format understood by Zhang99.
+ *
  * @author Peter Abeles
  */
 public interface Zhang99Camera {
-	BundleAdjustmentCamera initalizeCamera(DMatrixRMaj K , double[]radial );
+	/**
+	 * Provide an initial estimate for the camera parameters given 1) estimated pinhole camera parameters,
+	 * set of found homographies, and observed calibration targets.
+	 *
+	 * @param K (Input) Estimated pinhole camera parameters
+	 * @param homographies (Input) Homographies
+	 * @param observations (Input) Target observations
+	 * @return Initial estimate of camera model
+	 */
+	BundleAdjustmentCamera initializeCamera( DMatrixRMaj K ,
+											 List<DMatrixRMaj> homographies,
+											 List<CalibrationObservation> observations );
 
 	CameraModel getCameraModel(BundleAdjustmentCamera bundleCam );
-
-	boolean isZeroSkew();
-
-	int numRadial();
 }
