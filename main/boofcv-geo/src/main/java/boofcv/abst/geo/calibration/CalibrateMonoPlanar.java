@@ -95,23 +95,25 @@ public class CalibrateMonoPlanar implements VerbosePrint {
 	/**
 	 * Specifies the calibration model.
 	 */
-	public void configure( Zhang99Camera camera ) {
+	public void configure( boolean assumeZeroSkew, Zhang99Camera camera ) {
 		zhang99 = new CalibrationPlanarGridZhang99(layout, camera);
+		zhang99.setZeroSkew(assumeZeroSkew);
 	}
 
 	public void configurePinhole( boolean assumeZeroSkew,
 								  int numRadialParam,
 								  boolean includeTangential ) {
-		Zhang99CameraBrown camera =
-				new Zhang99CameraBrown(assumeZeroSkew, includeTangential, numRadialParam);
+		var camera = new Zhang99CameraBrown(layout, assumeZeroSkew, includeTangential, numRadialParam);
 		zhang99 = new CalibrationPlanarGridZhang99(layout, camera);
+		zhang99.setZeroSkew(assumeZeroSkew);
 	}
 
 	public void configureUniversalOmni( boolean assumeZeroSkew,
 										int numRadialParam,
 										boolean includeTangential ) {
 		zhang99 = new CalibrationPlanarGridZhang99(layout,
-				new Zhang99CameraUniversalOmni(assumeZeroSkew, includeTangential, numRadialParam));
+				new Zhang99CameraUniversalOmni(layout, assumeZeroSkew, includeTangential, numRadialParam));
+		zhang99.setZeroSkew(assumeZeroSkew);
 	}
 
 	public void configureUniversalOmni( boolean assumeZeroSkew,
@@ -119,7 +121,8 @@ public class CalibrateMonoPlanar implements VerbosePrint {
 										boolean includeTangential,
 										double mirrorOffset ) {
 		zhang99 = new CalibrationPlanarGridZhang99(layout,
-				new Zhang99CameraUniversalOmni(assumeZeroSkew, includeTangential, numRadialParam, mirrorOffset));
+				new Zhang99CameraUniversalOmni(layout, assumeZeroSkew, includeTangential, numRadialParam, mirrorOffset));
+		zhang99.setZeroSkew(assumeZeroSkew);
 	}
 
 	/**
