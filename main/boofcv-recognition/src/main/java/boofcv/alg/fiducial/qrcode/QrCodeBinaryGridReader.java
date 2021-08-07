@@ -39,6 +39,9 @@ import org.ddogleg.struct.DogArray_F32;
  * @author Peter Abeles
  */
 public class QrCodeBinaryGridReader<T extends ImageGray<T>> {
+	// Number of points sampled at each bit
+	public static final int BIT_INTENSITY_SAMPLES = 5;
+
 	@Getter QrCodeBinaryGridToPixel transformGrid = new QrCodeBinaryGridToPixel();
 
 	InterpolatePixelS<T> interpolate;
@@ -126,7 +129,7 @@ public class QrCodeBinaryGridReader<T extends ImageGray<T>> {
 	 *
 	 * @param row grid row
 	 * @param col grid column
-	 * @param intensity Storage for intensity values
+	 * @param intensity (Output) Storage for intensity values
 	 */
 	public void readBitIntensity( int row, int col, DogArray_F32 intensity ) {
 		float center = 0.5f;
@@ -155,9 +158,6 @@ public class QrCodeBinaryGridReader<T extends ImageGray<T>> {
 		// todo use adjustments from near by alignment patterns
 
 		float center = 0.5f;
-
-//		if( pixel.x < -0.5 || pixel.y < -0.5 || pixel.x > imageWidth || pixel.y > imageHeight )
-//			return -1;
 
 		transformGrid.gridToImage(row + center - 0.2f, col + center, pixel);
 		float pixel01 = interpolate.get(pixel.x, pixel.y);
