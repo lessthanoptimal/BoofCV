@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -59,4 +59,11 @@ public abstract class CameraModel implements Serializable {
 	 * Creates a new camera model with zero values of the same type os this one
 	 */
 	public abstract <T extends CameraModel> T createLike();
+
+	/**
+	 * Prints a summary of this model to stdout
+	 */
+	public void print() {
+		System.out.println(this);
+	}
 }

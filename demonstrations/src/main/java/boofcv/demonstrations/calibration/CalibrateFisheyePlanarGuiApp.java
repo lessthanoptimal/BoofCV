@@ -22,7 +22,9 @@ import boofcv.abst.fiducial.calib.ConfigGridDimen;
 import boofcv.abst.geo.calibration.CalibrateMonoPlanar;
 import boofcv.abst.geo.calibration.DetectSingleFiducialCalibration;
 import boofcv.factory.fiducial.FactoryFiducialCalibration;
-import boofcv.gui.calibration.FisheyePlanarPanel;
+import boofcv.gui.calibration.CalibratedPlanarPanel;
+import boofcv.gui.calibration.KannalaBrandtPlanarPanel;
+import boofcv.gui.calibration.UniversalOmniPlanarPanel;
 import boofcv.io.MediaManager;
 import boofcv.io.ProgressMonitorThread;
 import boofcv.io.UtilIO;
@@ -30,6 +32,8 @@ import boofcv.io.calibration.CalibrationIO;
 import boofcv.io.image.ConvertBufferedImage;
 import boofcv.io.wrapper.DefaultMediaManager;
 import boofcv.misc.BoofMiscOps;
+import boofcv.struct.calib.CameraKannalaBrandt;
+import boofcv.struct.calib.CameraModel;
 import boofcv.struct.calib.CameraUniversalOmni;
 import boofcv.struct.image.GrayF32;
 
@@ -45,21 +49,30 @@ import java.util.List;
  *
  * @author Peter Abeles
  */
-public class CalibrateFisheyePlanarGuiApp extends JPanel {
+public class CalibrateFisheyePlanarGuiApp<CM extends CameraModel> extends JPanel {
 
 	// computes calibration parameters
 	CalibrateMonoPlanar calibrator;
 	DetectSingleFiducialCalibration detector;
 	// displays results
-	FisheyePlanarPanel gui = new FisheyePlanarPanel();
+	CalibratedPlanarPanel<CM> gui;
 	// needed by ProcessThread for displaying its dialog
 	JPanel owner;
 
 	List<String> images;
 	MediaManager media = DefaultMediaManager.INSTANCE;
 
-	public CalibrateFisheyePlanarGuiApp() {
+	public CalibrateFisheyePlanarGuiApp( Class<CM> cameraType ) {
 		setLayout(new BorderLayout());
+
+		if (cameraType == CameraUniversalOmni.class) {
+			gui = (CalibratedPlanarPanel<CM>)new UniversalOmniPlanarPanel();
+		} else if (cameraType == CameraKannalaBrandt.class) {
+			gui = (CalibratedPlanarPanel<CM>)new KannalaBrandtPlanarPanel();
+		} else {
+			throw new IllegalArgumentException("Unknown camera model: " + cameraType);
+		}
+
 		gui.mainView.setPreferredSize(new Dimension(600, 720));
 		this.owner = this;
 
@@ -107,7 +120,7 @@ public class CalibrateFisheyePlanarGuiApp extends JPanel {
 
 		SwingUtilities.invokeLater(() -> monitor.setMessage(1, "Estimating Parameters"));
 
-		final CameraUniversalOmni param = calibrator.process();
+		final CM param = calibrator.process();
 		SwingUtilities.invokeLater(() -> {
 			gui.setResults(calibrator.getErrors());
 			gui.setCalibration(calibrator.getIntrinsic(), calibrator.getStructure());
@@ -163,11 +176,17 @@ public class CalibrateFisheyePlanarGuiApp extends JPanel {
 		images = UtilIO.listAll(UtilIO.pathExample("calibration/fisheye/chessboard"));
 //		images = UtilIO.listAll(UtilIO.pathExample("calibration/fisheye/square_grid"));
 
-		SwingUtilities.invokeLater(() -> {
-			CalibrateFisheyePlanarGuiApp app = new CalibrateFisheyePlanarGuiApp();
-			app.configure(detector, images).configureUniversalOmni(true, 2, false);
+		Class cameraModel = CameraUniversalOmni.class;
 
-			JFrame frame = new JFrame("Fisheye Calibration with Planar Targets");
+		SwingUtilities.invokeLater(() -> {
+			CalibrateFisheyePlanarGuiApp app = new CalibrateFisheyePlanarGuiApp(cameraModel);
+			if (cameraModel == CameraUniversalOmni.class) {
+				app.configure(detector, images).configureUniversalOmni(true, 2, false);
+			} else if (cameraModel == CameraKannalaBrandt.class) {
+				app.configure(detector, images).configureKannalaBrandt(true, 5, 0);
+			}
+
+			JFrame frame = new JFrame(cameraModel.getSimpleName() + " with Planar Targets");
 			frame.add(app, BorderLayout.CENTER);
 			frame.pack();
 			frame.setLocationByPlatform(true);
