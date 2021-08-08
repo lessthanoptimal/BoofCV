@@ -26,18 +26,19 @@ import boofcv.alg.fiducial.calib.ecocheck.ECoCheckGenerator;
 import boofcv.alg.fiducial.calib.ecocheck.ECoCheckUtils;
 import boofcv.alg.fiducial.calib.hammingchess.HammingChessboardGenerator;
 import boofcv.alg.fiducial.calib.hamminggrids.HammingGridGenerator;
-import boofcv.app.calib.CalibrationModelPanel;
-import boofcv.app.calib.CalibrationTargetPanel;
 import boofcv.factory.fiducial.ConfigHammingChessboard;
 import boofcv.factory.fiducial.ConfigHammingGrid;
 import boofcv.factory.fiducial.FactoryFiducialCalibration;
 import boofcv.gui.BoofSwingUtil;
 import boofcv.gui.FiducialRenderEngineGraphics2D;
 import boofcv.gui.RenderCalibrationTargetsGraphics2D;
+import boofcv.gui.controls.CalibrationModelPanel;
+import boofcv.gui.controls.CalibrationTargetPanel;
 import boofcv.gui.image.ImagePanel;
 import boofcv.gui.image.ScaleOptions;
 import boofcv.gui.image.ShowImages;
 import boofcv.io.webcamcapture.OpenWebcamDialog;
+import boofcv.struct.calib.CameraModelType;
 
 import javax.swing.*;
 import javax.swing.border.EtchedBorder;
@@ -242,15 +243,15 @@ public class CameraCalibrationGui extends JPanel
 		}
 
 		app.modeType = controlsModel.selected;
-		if (app.modeType == CameraCalibration.ModelType.BROWN) {
+		if (app.modeType == CameraModelType.BROWN) {
 			app.numRadial = controlsModel.pinholeRadial;
 			app.tangential = controlsModel.pinholeTangential;
 			app.zeroSkew = controlsModel.pinholeSkew;
-		} else if (app.modeType == CameraCalibration.ModelType.UNIVERSAL) {
+		} else if (app.modeType == CameraModelType.UNIVERSAL) {
 			app.numRadial = controlsModel.universalRadial;
 			app.tangential = controlsModel.universalTangential;
 			app.zeroSkew = controlsModel.universalSkew;
-		} else if (app.modeType == CameraCalibration.ModelType.KANNALA_BRANDT) {
+		} else if (app.modeType == CameraModelType.KANNALA_BRANDT) {
 			app.kbNumSymmetric = controlsModel.kannalaBrandt.numSymmetric.value.intValue();
 			app.kbNumAsymmetric = controlsModel.kannalaBrandt.numAsymmetric.value.intValue();
 			app.zeroSkew = controlsModel.kannalaBrandt.skew.value;

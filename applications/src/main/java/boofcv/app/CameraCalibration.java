@@ -40,10 +40,7 @@ import boofcv.io.image.ConvertBufferedImage;
 import boofcv.io.image.UtilImageIO;
 import boofcv.io.webcamcapture.UtilWebcamCapture;
 import boofcv.misc.BoofMiscOps;
-import boofcv.struct.calib.CameraKannalaBrandt;
-import boofcv.struct.calib.CameraModel;
-import boofcv.struct.calib.CameraPinholeBrown;
-import boofcv.struct.calib.CameraUniversalOmni;
+import boofcv.struct.calib.*;
 import boofcv.struct.image.GrayF32;
 import com.github.sarxos.webcam.Webcam;
 import org.apache.commons.io.FilenameUtils;
@@ -71,7 +68,7 @@ public class CameraCalibration extends BaseStandardInputApp {
 	protected boolean zeroSkew = true;
 	protected int numRadial = 2;
 	protected boolean tangential = false;
-	protected ModelType modeType = ModelType.BROWN;
+	protected CameraModelType modeType = CameraModelType.BROWN;
 	protected FormatType formatType = FormatType.BOOFCV;
 
 	// parameters for Kannala-Brandt
@@ -213,11 +210,11 @@ public class CameraCalibration extends BaseStandardInputApp {
 						inputType = InputType.IMAGE;
 					} else if (flagName.compareToIgnoreCase("Model") == 0) {
 						if (parameters.compareToIgnoreCase("pinhole") == 0) {
-							modeType = ModelType.BROWN;
+							modeType = CameraModelType.BROWN;
 						} else if (parameters.compareToIgnoreCase("universal") == 0) {
-							modeType = ModelType.UNIVERSAL;
+							modeType = CameraModelType.UNIVERSAL;
 						} else if (parameters.toLowerCase().startsWith("kannala")) {
-							modeType = ModelType.KANNALA_BRANDT;
+							modeType = CameraModelType.KANNALA_BRANDT;
 						} else {
 							throw new RuntimeException("Unknown model type " + parameters);
 						}
@@ -263,7 +260,7 @@ public class CameraCalibration extends BaseStandardInputApp {
 			}
 		}
 
-		if (formatType == FormatType.OPENCV && modeType != ModelType.BROWN) {
+		if (formatType == FormatType.OPENCV && modeType != CameraModelType.BROWN) {
 			throw new RuntimeException("Can only save calibration in OpenCV format if pinhole model");
 		}
 	}
@@ -731,12 +728,6 @@ public class CameraCalibration extends BaseStandardInputApp {
 			outputFilePath = new File(OUTPUT_DIRECTORY, "intrinsic.yaml").getPath();
 			handleDirectory();
 		}
-	}
-
-	public enum ModelType {
-		BROWN,
-		UNIVERSAL,
-		KANNALA_BRANDT,
 	}
 
 	public enum FormatType {

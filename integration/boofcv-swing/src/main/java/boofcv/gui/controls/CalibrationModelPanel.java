@@ -16,12 +16,11 @@
  * limitations under the License.
  */
 
-package boofcv.app.calib;
+package boofcv.gui.controls;
 
-import boofcv.app.CameraCalibration.ModelType;
+import boofcv.abst.geo.calibration.CalibrateMonoPlanar;
 import boofcv.gui.StandardAlgConfigPanel;
-import boofcv.gui.controls.JCheckBoxValue;
-import boofcv.gui.controls.JSpinnerNumber;
+import boofcv.struct.calib.CameraModelType;
 
 import javax.swing.*;
 import javax.swing.event.ChangeEvent;
@@ -37,10 +36,10 @@ import java.awt.event.ActionListener;
  */
 public class CalibrationModelPanel extends StandardAlgConfigPanel implements ActionListener {
 
-	JComboBox<ModelType> comboType;
+	JComboBox<CameraModelType> comboType;
 	JPanel panelTarget = new JPanel();
 
-	public ModelType selected = ModelType.BROWN;
+	public CameraModelType selected = CameraModelType.BROWN;
 
 	public int pinholeRadial = 2;
 	public boolean pinholeTangential = true;
@@ -54,10 +53,13 @@ public class CalibrationModelPanel extends StandardAlgConfigPanel implements Act
 	public final UniversalPanel universal = new UniversalPanel();
 	public final KannalaBrandtPanel kannalaBrandt = new KannalaBrandtPanel();
 
+	// Used to find out when settings have been changed
+	public Listener listener = ()->{};
+
 	public CalibrationModelPanel() {
 		setBorder(BorderFactory.createEmptyBorder());
 
-		comboType = new JComboBox<>(ModelType.values());
+		comboType = new JComboBox<>(CameraModelType.values());
 		comboType.addActionListener(this);
 		comboType.setMaximumSize(comboType.getPreferredSize());
 
@@ -72,10 +74,19 @@ public class CalibrationModelPanel extends StandardAlgConfigPanel implements Act
 		addAlignCenter(panelTarget);
 	}
 
+	public void configureCalibrator(CalibrateMonoPlanar calibrator) {
+		switch (selected) {
+			case BROWN -> calibrator.configurePinhole(pinholeSkew, pinholeRadial, pinholeTangential);
+			case UNIVERSAL -> calibrator.configureUniversalOmni(universalSkew, universalRadial, universalTangential);
+			case KANNALA_BRANDT -> calibrator.configureKannalaBrandt(kannalaBrandt.skew.value,
+					kannalaBrandt.numSymmetric.vint(), kannalaBrandt.numAsymmetric.vint());
+		}
+	}
+
 	@Override
 	public void actionPerformed( ActionEvent e ) {
 		if (e.getSource() == comboType) {
-			selected = (ModelType)comboType.getSelectedItem();
+			selected = (CameraModelType)comboType.getSelectedItem();
 			changeTargetPanel();
 			updateParameters();
 		}
@@ -83,6 +94,7 @@ public class CalibrationModelPanel extends StandardAlgConfigPanel implements Act
 
 	public void updateParameters() {
 		changeTargetPanel();
+		listener.changed();
 	}
 
 	private void changeTargetPanel() {
@@ -198,5 +210,10 @@ public class CalibrationModelPanel extends StandardAlgConfigPanel implements Act
 			}
 			updateParameters();
 		}
+	}
+
+	@FunctionalInterface
+	public interface Listener {
+		void changed();
 	}
 }

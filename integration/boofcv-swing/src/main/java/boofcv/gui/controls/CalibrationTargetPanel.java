@@ -16,18 +16,15 @@
  * limitations under the License.
  */
 
-package boofcv.app.calib;
+package boofcv.gui.controls;
 
 import boofcv.abst.fiducial.calib.CalibrationPatterns;
 import boofcv.abst.fiducial.calib.ConfigECoCheckMarkers;
 import boofcv.abst.fiducial.calib.ConfigGridDimen;
-import boofcv.factory.fiducial.ConfigHammingChessboard;
-import boofcv.factory.fiducial.ConfigHammingGrid;
-import boofcv.factory.fiducial.ConfigHammingMarker;
-import boofcv.factory.fiducial.HammingDictionary;
+import boofcv.abst.geo.calibration.DetectSingleFiducialCalibration;
+import boofcv.abst.geo.calibration.MultiToSingleFiducialCalibration;
+import boofcv.factory.fiducial.*;
 import boofcv.gui.StandardAlgConfigPanel;
-import boofcv.gui.controls.JCheckBoxValue;
-import boofcv.gui.controls.JSpinnerNumber;
 
 import javax.swing.*;
 import javax.swing.event.ChangeEvent;
@@ -73,6 +70,17 @@ public class CalibrationTargetPanel extends StandardAlgConfigPanel {
 		addAlignLeft(saveLandmarks.check, "Save a file with landmark locations to disk with the pdf");
 		add(Box.createRigidArea(new Dimension(10, 10)));
 		addAlignCenter(panelTarget);
+	}
+
+	public DetectSingleFiducialCalibration createSingleTargetDetector() {
+		return switch (selected) {
+			case CHESSBOARD -> FactoryFiducialCalibration.chessboardX(null, configChessboard);
+			case ECOCHECK -> new MultiToSingleFiducialCalibration(FactoryFiducialCalibration.ecocheck(null, configECoCheck));
+			case SQUARE_GRID -> FactoryFiducialCalibration.squareGrid(null, configSquare);
+			case CIRCLE_GRID -> FactoryFiducialCalibration.circleRegularGrid(null, configCircle);
+			case CIRCLE_HEXAGONAL -> FactoryFiducialCalibration.circleHexagonalGrid(null, configCircleHex);
+			default -> throw new RuntimeException("Target type not yet supported.");
+		};
 	}
 
 	public void updateParameters() {

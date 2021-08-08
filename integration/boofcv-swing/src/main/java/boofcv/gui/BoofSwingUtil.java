@@ -24,6 +24,7 @@ import boofcv.core.image.ConvertImage;
 import boofcv.gui.dialogs.FilePreviewChooser;
 import boofcv.gui.dialogs.OpenImageSetDialog;
 import boofcv.gui.dialogs.OpenStereoSequencesChooser;
+import boofcv.gui.settings.GlobalDemoSettings;
 import boofcv.io.image.ConvertImageMisc;
 import boofcv.io.image.UtilImageIO;
 import boofcv.io.points.PointCloudIO;
@@ -75,6 +76,28 @@ public class BoofSwingUtil {
 
 	public static final double MIN_ZOOM = 0.01;
 	public static final double MAX_ZOOM = 50;
+
+	/**
+	 * Standard initialization of Swing for applications
+	 */
+	public static void initializeSwing() {
+		try {
+			// In Mac OS X Display the menubar in the correct location
+			System.setProperty("apple.laf.useScreenMenuBar", "true");
+
+			// smoother font
+			System.setProperty("apple.awt.textantialiasing", "true");
+		} catch (Exception ignore) {}
+
+		// If the default layout manager tabbed panes will get smaller and smaller since it has a border
+		Insets insets = UIManager.getInsets("TabbedPane.contentBorderInsets");
+		insets.bottom = 0; // because the sides are now mangled it looks better without the bottom border too
+		insets.left = 0;
+		insets.right = 0;
+		UIManager.put("TabbedPane.contentBorderInsets", insets);
+
+		GlobalDemoSettings.SETTINGS.changeTheme();
+	}
 
 	public static boolean isRightClick( MouseEvent e ) {
 		return (e.getButton() == MouseEvent.BUTTON3 ||
@@ -478,6 +501,10 @@ public class BoofSwingUtil {
 		if (!SwingUtilities.isEventDispatchThread())
 			throw new RuntimeException("Must be run in UI thread");
 	}
+	public static void checkNotGuiThread() {
+		if (SwingUtilities.isEventDispatchThread())
+			throw new RuntimeException("Must NOT be run in UI thread");
+	}
 
 	/**
 	 * Select a zoom which will allow the entire image to be shown in the panel
@@ -867,8 +894,8 @@ public class BoofSwingUtil {
 	}
 
 	public static class RecentFiles {
-		String name;
-		java.util.List<String> files;
+		public String name;
+		public java.util.List<String> files;
 	}
 
 	public enum FileTypes { FILES, YAML, XML, IMAGES, VIDEOS, DIRECTORIES }
