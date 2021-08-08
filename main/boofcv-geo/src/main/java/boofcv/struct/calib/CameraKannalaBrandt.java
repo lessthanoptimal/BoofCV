@@ -29,6 +29,19 @@ import lombok.Setter;
  * skew was implicitly 0. (mu, mv) = (fx, fy). This was done primarily to maximize code reuse and integration with
  * existing code.
  *
+ * <p>(x,y,z) is a point in 3D space in camera frame</p>
+ * <p>&theta; = acos(z/normf([x y z]))</p>
+ * <p>&phi; = atan2(y, x)</p>
+ * <p>symmetric(&theta;) = k<sub>1</sub>&theta; + k<sub>2</sub>&theta;<sup>3</sup> + ... + &theta;<sub>n</sub>&theta;<sup>2*n-1</sup></p>
+ * <p>radial(&theta;,&phi;) = (l<sub>1</sub>&theta; + l<sub>2</sub>&theta;<sup>3</sup> + l<sub>3</sub>&theta;<sup>5</sup>)
+ * (i<sub>1</sub>cos(&phi;) + i<sub>2</sub>sin(&phi;) + i<sub>3</sub>cos(2&phi;) + i<sub>4</sub>sin(2&phi;))</p>
+ * <p>tangential(&theta;,&phi;) = (m<sub>1</sub>&theta; + m<sub>2</sub>&theta;<sup>3</sup> + m<sub>3</sub>&theta;<sup>5</sup>)
+ * (j<sub>1</sub>cos(&phi;) + j<sub>2</sub>sin(&phi;) + j<sub>3</sub>cos(2&phi;) + j<sub>4</sub>sin(2&phi;))</p>
+ *
+ * Then the distorted normalized coordinates are found:
+ * <p>x<sub>d</sub> = (symmetric(&theta;) + radial(&theta;,&phi;))u<sub>r</sub>(&phi;) + tangential(&theta;,&phi;)u<sub>t</sub>(&phi;)</p>
+ * <p>where u<sub>r</sub> and u<sub>t</sub> are unit vectors in radial and tangential directions.</p>
+ *
  * <p>
  * NOTE: If the number of asymmetric distortion terms is set to zero then there will only be radially symmetric
  * distortion. This is what most libraries refer to as the Kannala-Brandt model as they do not implement the full model.
@@ -229,7 +242,7 @@ public class CameraKannalaBrandt extends CameraPinhole {
 		printArray("radial", radial);
 		printArray("tangential", tangent);
 		printArray("radial_trig", radialTrig);
-		printArray("tangentrig", tangentTrig);
+		printArray("tangent_trig", tangentTrig);
 	}
 
 	private static void printArray( String name, double[] coefs ) {

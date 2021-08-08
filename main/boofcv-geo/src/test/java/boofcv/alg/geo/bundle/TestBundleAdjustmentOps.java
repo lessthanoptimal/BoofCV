@@ -18,9 +18,11 @@
 
 package boofcv.alg.geo.bundle;
 
+import boofcv.alg.geo.bundle.cameras.BundleKannalaBrandt;
 import boofcv.alg.geo.bundle.cameras.BundlePinhole;
 import boofcv.alg.geo.bundle.cameras.BundlePinholeBrown;
 import boofcv.alg.geo.bundle.cameras.BundlePinholeSimplified;
+import boofcv.struct.calib.CameraKannalaBrandt;
 import boofcv.struct.calib.CameraPinhole;
 import boofcv.struct.calib.CameraPinholeBrown;
 import boofcv.testing.BoofStandardJUnit;
@@ -125,7 +127,28 @@ public class TestBundleAdjustmentOps extends BoofStandardJUnit {
 	}
 
 	@Test void convert_bundleKB_cameraKB() {
-		fail("Implement");
+		var src = new BundleKannalaBrandt();
+		var dst = new CameraKannalaBrandt();
+
+		src.model.fsetK(500, 550, 0.0, 600, 650);
+		src.model.fsetSymmetric(1.0, 0.4).fsetRadial(1.1, 0.2, -0.01).fsetTangent(0.5, -0.1, 0.06, 0.12).
+				fsetRadialTrig(0.01, 0.03, -0.03, 0.04).fsetTangentTrig(0.01, 0.2, 0.1, 0.4);
+
+		assertSame(dst, BundleAdjustmentOps.convert(src, 100, 120, dst));
+
+		assertEquals(100, dst.width);
+		assertEquals(120, dst.height);
+
+		assertEquals(src.model.fx, dst.fx, UtilEjml.TEST_F64);
+		assertEquals(src.model.fy, dst.fy, UtilEjml.TEST_F64);
+		assertEquals(src.model.cx, dst.cx, UtilEjml.TEST_F64);
+		assertEquals(src.model.cy, dst.cy, UtilEjml.TEST_F64);
+		assertEquals(src.model.skew, dst.skew, UtilEjml.TEST_F64);
+		assertArrayEquals(src.model.symmetric, dst.symmetric, UtilEjml.TEST_F64);
+		assertArrayEquals(src.model.radial, dst.radial, UtilEjml.TEST_F64);
+		assertArrayEquals(src.model.tangent, dst.tangent, UtilEjml.TEST_F64);
+		assertArrayEquals(src.model.radialTrig, dst.radialTrig, UtilEjml.TEST_F64);
+		assertArrayEquals(src.model.tangentTrig, dst.tangentTrig, UtilEjml.TEST_F64);
 	}
 
 	@Test void convert_pinhole_to_bundleSimple() {
@@ -141,7 +164,7 @@ public class TestBundleAdjustmentOps extends BoofStandardJUnit {
 
 	@Test void convert_pinhole_to_bundlePinhole() {
 		var src = new CameraPinhole(10, 12, 1, 1, 2, 10, 32);
-		var dst = new BundlePinhole().setK(9,3,0,0,2);
+		var dst = new BundlePinhole().setK(9, 3, 0, 0, 2);
 
 		assertSame(dst, BundleAdjustmentOps.convert(src, dst));
 

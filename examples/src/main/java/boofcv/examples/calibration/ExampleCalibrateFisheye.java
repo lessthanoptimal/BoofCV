@@ -26,7 +26,7 @@ import boofcv.io.UtilIO;
 import boofcv.io.calibration.CalibrationIO;
 import boofcv.io.image.ConvertBufferedImage;
 import boofcv.io.image.UtilImageIO;
-import boofcv.struct.calib.CameraUniversalOmni;
+import boofcv.struct.calib.CameraModel;
 import boofcv.struct.image.GrayF32;
 
 import java.awt.image.BufferedImage;
@@ -38,9 +38,8 @@ import java.util.List;
  * more images to properly calibrate. Often people will use larger calibration targets too that are easier to
  * see at a distance and cover more of the fisheye's camera large FOV.
  *
- * @see CalibrateMonoPlanar
- *
  * @author Peter Abeles
+ * @see CalibrateMonoPlanar
  */
 public class ExampleCalibrateFisheye {
 	public static void main( String[] args ) {
@@ -51,30 +50,30 @@ public class ExampleCalibrateFisheye {
 		// the apparent location of tangent points.
 
 		// Square Grid example
-//		detector = FactoryFiducialCalibration.squareGrid(null, new ConfigGridDimen(4, 3, 30, 30));
+//		detector = FactoryFiducialCalibration.squareGrid(null, new ConfigGridDimen(/*rows*/ 4, /*cols*/ 3, /*size*/ 30, /*space*/ 30));
 //		images = UtilIO.listAll(UtilIO.pathExample("calibration/fisheye/square_grid"));
 
 //		 Chessboard Example
-		detector = FactoryFiducialCalibration.chessboardX(null,new ConfigGridDimen(7, 5, 30));
+		detector = FactoryFiducialCalibration.chessboardX(null, new ConfigGridDimen(/*rows*/7, /*cols*/5, /*size*/30));
 		images = UtilIO.listAll(UtilIO.pathExample("calibration/fisheye/chessboard"));
 
 		// Declare and setup the calibration algorithm
-		CalibrateMonoPlanar calibrationAlg = new CalibrateMonoPlanar(detector.getLayout());
+		var calibrationAlg = new CalibrateMonoPlanar(detector.getLayout());
 
-		// tell it type type of target and which parameters to estimate
-		calibrationAlg.configureUniversalOmni( true, 2, false);
-//		calibrationAlg.configureKannalaBrandt( true, 5, 0);
-		// TODO WTF asymmetric parameters are exactly zero?
-
+		// Specify the camera model to use. Here are a few examples.
+		//
+		calibrationAlg.configureUniversalOmni( /*zeroSkew*/ true, /*radial*/ 2, /*tangential*/ false);
 		// it's also possible to fix the mirror offset parameter
 		// 0 = pinhole camera. 1 = fisheye
-//		calibrationAlg.configureUniversalOmni( true, 2, false,1.0);
+//		calibrationAlg.configureUniversalOmni( /*zeroSkew*/ true, /*radial*/ 2, /*tangential*/ false, /*offset*/ 1.0);
+		// Another popular model is Kannala-Brandt. Most people just use the symmetric terms.
+//		calibrationAlg.configureKannalaBrandt( /*zeroSkew*/ true, /*symmetric*/ 5, /*asymmetric*/ 0);
 
-		for( String n : images ) {
+		for (String n : images) {
 			BufferedImage input = UtilImageIO.loadImage(n);
-			if( input != null ) {
-				GrayF32 image = ConvertBufferedImage.convertFrom(input,(GrayF32)null);
-				if( detector.process(image)) {
+			if (input != null) {
+				GrayF32 image = ConvertBufferedImage.convertFrom(input, (GrayF32)null);
+				if (detector.process(image)) {
 					calibrationAlg.addImage(detector.getDetectedPoints().copy());
 				} else {
 					System.err.println("Failed to detect target in " + n);
@@ -82,8 +81,7 @@ public class ExampleCalibrateFisheye {
 			}
 		}
 		// process and compute intrinsic parameters
-		CameraUniversalOmni intrinsic = calibrationAlg.process();
-//		CameraKannalaBrandt intrinsic = calibrationAlg.process();
+		CameraModel intrinsic = calibrationAlg.process();
 
 		// save results to a file and print out
 		CalibrationIO.save(intrinsic, "fisheye.yaml");

@@ -48,6 +48,9 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  */
 @SuppressWarnings("unchecked")
 public abstract class GenericCalibrationZhang99<CM extends CameraModel> extends BoofStandardJUnit {
+
+	protected double reprojectionTol = 1e-3;
+
 	/**
 	 * Create a set of observations from a known grid, give it the observations and see if it can
 	 * reconstruct the known parameters.
@@ -58,7 +61,6 @@ public abstract class GenericCalibrationZhang99<CM extends CameraModel> extends 
 	}
 
 	void fullTest( boolean partial ) {
-
 		for (CameraConfig config : createCamera(rand)) {
 			CalibInputs inputs = createInputs(config.model, 3, rand);
 
@@ -83,7 +85,7 @@ public abstract class GenericCalibrationZhang99<CM extends CameraModel> extends 
 			// verify results using errors
 			List<ImageResults> errors = alg.computeErrors();
 			for (int i = 0; i < errors.size(); i++) {
-				assertEquals(0, errors.get(i).meanError, 1e-3);
+				assertEquals(0, errors.get(i).meanError, reprojectionTol);
 			}
 		}
 	}
@@ -91,7 +93,7 @@ public abstract class GenericCalibrationZhang99<CM extends CameraModel> extends 
 	/**
 	 * See how well it computes an initial guess at the parameters given perfect inputs
 	 */
-	@Test void linearEstimate() {
+	@Test public void linearEstimate() {
 		for (CameraConfig config : createCameraForLinearTests(rand)) {
 			CalibInputs inputs = createInputs(config.model, 3, rand);
 			Zhang99Camera zhangCamera = createGenerator(config, inputs.layout);
@@ -109,11 +111,15 @@ public abstract class GenericCalibrationZhang99<CM extends CameraModel> extends 
 		}
 	}
 
+	/**
+	 * Creates a camera model from the specified configuration
+	 */
 	public abstract Zhang99Camera createGenerator( CameraConfig config, List<Point2D_F64> layout );
 
+	/**
+	 * Extracts a pinhole camera model from the configuration
+	 */
 	public abstract DMatrixRMaj cameraToK( CameraConfig config );
-
-	public abstract double[] extractRadial( CameraConfig config );
 
 	public class CameraConfig {
 		public CM model;
@@ -123,46 +129,29 @@ public abstract class GenericCalibrationZhang99<CM extends CameraModel> extends 
 	 * Test nonlinear optimization with perfect inputs
 	 */
 	@Test void optimizedParam_perfect() {
-		for (CameraConfig config : createCamera(rand)) {
-			CalibInputs inputs = createInputs(config.model, 3, rand);
-			Zhang99Camera zhangCamera = createGenerator(config, inputs.layout);
-
-			CalibrationPlanarGridZhang99 alg = new CalibrationPlanarGridZhang99(inputs.layout, zhangCamera);
-
-			DMatrixRMaj K = cameraToK(config);
-
-			alg.convertIntoBundleStructure(inputs.worldToViews, K, inputs.homographies, inputs.observations);
-			assertTrue(alg.performBundleAdjustment());
-
-			// verify results using errors
-			List<ImageResults> errors = alg.computeErrors();
-			for (int i = 0; i < errors.size(); i++) {
-				assertEquals(0, errors.get(i).meanError, 1e-3);
-			}
-		}
+		optimizedParam_noisy(0.0);
 	}
 
 	/**
 	 * Test nonlinear optimization with a bit of noise
 	 */
 	@Test void optimizedParam_noisy() {
+		optimizedParam_noisy(50);
+	}
 
+	void optimizedParam_noisy( double noiseMagnitude) {
 		for (CameraConfig config : createCamera(rand)) {
 			CalibInputs inputs = createInputs(config.model, 3, rand);
 
 			Zhang99Camera zhangCamera = createGenerator(config, inputs.layout);
 
-			CalibrationPlanarGridZhang99 alg = new CalibrationPlanarGridZhang99(inputs.layout, zhangCamera);
-
+			// Add noise to the initial pinhole camera estimate
 			DMatrixRMaj K = cameraToK(config);
-			double[] radial = extractRadial(config);
 
-			K.data[0] += rand.nextDouble()*50;
-			K.data[4] += rand.nextDouble()*50;
-			for (int i = 0; i < radial.length; i++) {
-				radial[i] += rand.nextGaussian()*0.005;
-			}
+			K.data[0] += (rand.nextDouble()-0.5)*noiseMagnitude;
+			K.data[4] += (rand.nextDouble()-0.5)*noiseMagnitude;
 
+			var alg = new CalibrationPlanarGridZhang99(inputs.layout, zhangCamera);
 			alg.convertIntoBundleStructure(inputs.worldToViews, K, inputs.homographies, inputs.observations);
 			assertTrue(alg.performBundleAdjustment());
 
@@ -247,7 +236,7 @@ public abstract class GenericCalibrationZhang99<CM extends CameraModel> extends 
 
 	@Test void applyDistortion() {
 		Point2D_F64 n = new Point2D_F64(0.05, -0.1);
-		double radial[] = new double[]{0.1};
+		double[] radial = new double[]{0.1};
 		double t1 = 0.034, t2 = 0.34;
 
 		Point2D_F64 distorted = new Point2D_F64();

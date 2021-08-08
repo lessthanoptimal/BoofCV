@@ -131,11 +131,6 @@ public class TestZhang99CameraUniversalOmni
 	}
 
 	@Override
-	public double[] extractRadial( CameraConfig config ) {
-		return config.model.radial;
-	}
-
-	@Override
 	protected void checkIntrinsicOnly( CameraUniversalOmni expected, CameraUniversalOmni found,
 									   double tolK, double tolD, double tolT ) {
 		assertEquals(expected.fx, found.fx, Math.abs(expected.fx)*tolK + EPS);

@@ -51,6 +51,19 @@ public class Zhang99CameraKannalaBrandt implements Zhang99Camera {
 		var ret = new BundleKannalaBrandt();
 		ret.configure(assumeZeroSkew, numSymmetric, numAsymmetric);
 		ret.model.fsetK(K);
+
+		// all zeros are a pathological case. Fill it with arbitrary small values.
+		for (int i = 0; i < numAsymmetric; i++) {
+			ret.model.radial[i] = (i%2==0) ? 0.005 : -0.005;
+			ret.model.tangent[i] = (i%2==0) ? 0.005 : -0.005;
+		}
+
+		// Distortion terms are all initialized to zero or nearly zero. Stability could be improved if an initial
+		// estimate was provided. Maybe adjust the initial K since the pin-hole model and this model don't
+		// treat the two parameters as the same
+
+		// Could also try initializing with different noise and see if it does better?
+
 		return ret;
 	}
 
