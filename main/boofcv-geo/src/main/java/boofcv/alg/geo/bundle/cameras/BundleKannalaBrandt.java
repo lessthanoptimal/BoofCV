@@ -34,13 +34,14 @@ import static boofcv.alg.distort.kanbra.KannalaBrandtUtils_F64.*;
  * @author Peter Abeles
  */
 public class BundleKannalaBrandt implements BundleAdjustmentCamera {
-	protected final CameraKannalaBrandt model = new CameraKannalaBrandt();
+	/** Camera model parameters */
+	@Getter public  final CameraKannalaBrandt model = new CameraKannalaBrandt();
 
-	// forces skew to be zero
-	@Getter boolean zeroSkew;
+	/** forces skew to be zero */
+	@Getter public boolean zeroSkew;
 
-	// True if a there are asymmetric distortion terms
-	@Getter boolean isAsymmetric;
+	/** True if a there are asymmetric distortion terms */
+	@Getter public boolean isAsymmetric;
 
 	// Number of degrees of freedom in the model
 	int dof;
