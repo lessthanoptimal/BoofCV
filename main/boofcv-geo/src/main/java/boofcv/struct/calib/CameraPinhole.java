@@ -145,6 +145,7 @@ public class CameraPinhole extends CameraModel {
 		return x >= 0 && y >= 0 && x < width && y < height;
 	}
 
+	@Override
 	public void print() {
 		System.out.println("Shape " + width + " " + height);
 		System.out.printf("center %7.2f %7.2f\n", cx, cy);

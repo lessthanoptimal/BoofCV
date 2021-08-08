@@ -29,6 +29,7 @@ import boofcv.factory.geo.ConfigBundleAdjustment;
 import boofcv.factory.geo.FactoryMultiView;
 import boofcv.misc.BoofMiscOps;
 import boofcv.struct.calib.CameraModel;
+import boofcv.struct.calib.CameraPinholeBrown;
 import boofcv.struct.geo.PointIndex2D_F64;
 import georegression.struct.point.Point2D_F64;
 import georegression.struct.se.Se3_F64;
@@ -46,10 +47,22 @@ import java.util.Set;
 
 /**
  * <p>
- * Full implementation of the Zhang99 camera calibration algorithm using planar calibration targets. First
- * linear approximations of camera parameters are computed, which are then refined using non-linear estimation.
- * One difference from the original paper is that tangential distortion can be included. No linear estimate
- * if found for tangential, they are estimated by initializing the non-linear estimate with all zero.
+ * Full implementation of the Zhang99 camera calibration algorithm using planar calibration targets. The original
+ * algorithm has been extended to support multiple camera models. The general process is described below:
+ * </p>
+ * <ol>
+ *     <li>Linear estimate of pinhole camera parameters</li>
+ *     <li>Estimate of camera pose</li>
+ *     <li>{@link Zhang99Camera Camera model} specific initialization given the pinhole estimate</li>
+ *     <li>Non-linear refinement of intrinsic and extrinsic parameters</li>
+ * </ol>
+ *
+ * <p>
+ * The algorithm has been extended to multiple camera models by providing each camera model an initial estimate
+ * of the pinhole camera parameters with camera pose. If the camera model has radial distortion, as modeled by
+ * {@link CameraPinholeBrown}, then an initial estimate of radial distortion is
+ * {@link RadialDistortionEstimateLinear estimated} inside the camera model specific code. See specific cameras
+ * for how they are all initialized.
  * </p>
  *
  * <p>
@@ -82,18 +95,18 @@ public class CalibrationPlanarGridZhang99 implements VerbosePrint {
 	private final Zhang99CalibrationMatrixFromHomographies computeK;
 	private final Zhang99DecomposeHomography decomposeH = new Zhang99DecomposeHomography();
 
-	// contains found parameters
-	public SceneStructureMetric structure;
+	/** contains found parameters */
+	@Getter public SceneStructureMetric structure;
 	public SceneObservations observations;
 
-	// provides information on calibration status
-	private Listener listener;
+	/** provides information on calibration status as it's being computed */
+	@Getter @Setter private Listener listener;
 
 	// where calibration points are layout on the target.
 	private final List<Point2D_F64> layout;
 
-	// Use a robust non-linear solver. This can run significantly slower
-	private boolean robust = false;
+	/** Use a robust non-linear solver. This can run significantly slower */
+	@Getter @Setter private boolean robust = false;
 
 	private PrintStream verbose = null;
 
@@ -107,15 +120,6 @@ public class CalibrationPlanarGridZhang99 implements VerbosePrint {
 		this.layout = layout;
 		computeHomography = new Zhang99ComputeTargetHomography(layout);
 		computeK = new Zhang99CalibrationMatrixFromHomographies();
-	}
-
-	/**
-	 * Used to listen in on progress and request that processing be stopped
-	 *
-	 * @param listener The listener
-	 */
-	public void setListener( Listener listener ) {
-		this.listener = listener;
 	}
 
 	/**
@@ -318,14 +322,6 @@ public class CalibrationPlanarGridZhang99 implements VerbosePrint {
 
 		normPt.x = x + x*a + 2*t1*x*y + t2*(r2 + 2*x*x);
 		normPt.y = y + y*a + t1*(r2 + 2*y*y) + 2*t2*x*y;
-	}
-
-	public SceneStructureMetric getStructure() {
-		return structure;
-	}
-
-	public void setRobust( boolean robust ) {
-		this.robust = robust;
 	}
 
 	public static int totalPoints( List<CalibrationObservation> observations ) {

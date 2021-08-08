@@ -47,11 +47,6 @@ public class TestZhang99CameraBrown extends GenericCalibrationZhang99<CameraPinh
 	}
 
 	@Override
-	public double[] extractRadial( CameraConfig config ) {
-		return config.model.radial;
-	}
-
-	@Override
 	public List<CameraConfig> createCamera( Random rand ) {
 		List<BrownConfig> list = new ArrayList<>();
 

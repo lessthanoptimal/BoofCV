@@ -23,6 +23,7 @@ import boofcv.alg.geo.calibration.GenericCalibrationZhang99;
 import boofcv.struct.calib.CameraKannalaBrandt;
 import georegression.struct.point.Point2D_F64;
 import org.ejml.data.DMatrixRMaj;
+import org.junit.jupiter.api.Test;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -35,6 +36,12 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
  * @author Peter Abeles
  */
 public class TestZhang99CameraKannalaBrandt extends GenericCalibrationZhang99<CameraKannalaBrandt> {
+
+	public TestZhang99CameraKannalaBrandt() {
+		// needed to relax this a little for when there are asymmetric terms
+		reprojectionTol = 1e-2;
+	}
+
 	@Override
 	public Zhang99Camera createGenerator( CameraConfig config, List<Point2D_F64> layout ) {
 		KannalaBrandtConfig c = (KannalaBrandtConfig)config;
@@ -47,36 +54,24 @@ public class TestZhang99CameraKannalaBrandt extends GenericCalibrationZhang99<Ca
 	}
 
 	@Override
-	public double[] extractRadial( CameraConfig config ) {
-		return config.model.radial;
-	}
-
-	@Override
 	public List<CameraConfig> createCamera( Random rand ) {
 		List<KannalaBrandtConfig> list = new ArrayList<>();
 
-		list.add(createStandard(false, 2, 0, rand));
-		list.add(createStandard(true, 3, 0, rand));
-		list.add(createStandard(false, 2, 2, rand));
-		list.add(createStandard(true, 4, 4, rand));
+		list.add(createStandard(false, 5, 0, rand));
+		list.add(createStandard(true, 5, 0, rand));
+		list.add(createStandard(false, 5, 2, rand));
+		list.add(createStandard(true, 5, 2, rand));
 
 		return (List)list;
 	}
 
-	@Override
-	public List<CameraConfig> createCameraForLinearTests( Random rand ) {
-		List<CameraConfig> list = new ArrayList<>();
+	@Override @Test
+	public void linearEstimate() {
+		// The analogous parameters for pinhole in KB will not match a pure pinhole model
+	}
 
-		// tangent can't be linearly estimated
-		list.add(createStandard(false, 2, 0, rand));
-		list.add(createStandard(true, 2, 0, rand));
-
-		// radial distortion has to be very small for parameters to have a decent estimate
-		// the estimate it does come up with is much better than starting from zero but has
-		// large error
-//		list.add( createStandard(true,false,2,rand));
-
-		return (List)list;
+	@Override public List<CameraConfig> createCameraForLinearTests( Random rand ) {
+		throw new RuntimeException("Not supported");
 	}
 
 	public KannalaBrandtConfig createStandard( boolean zeroSkew,
@@ -96,7 +91,8 @@ public class TestZhang99CameraKannalaBrandt extends GenericCalibrationZhang99<Ca
 			p.model.skew = 0.05;
 
 		p.model.symmetric[0] = 1.0;
-		p.model.symmetric[1] = 0.1;
+		if (p.model.symmetric.length > 1)
+			p.model.symmetric[1] = 0.1;
 
 		for (int i = 0; i < numAsymmetric; i++) {
 			p.model.radial[i] = rand.nextGaussian()*0.05;
@@ -107,7 +103,6 @@ public class TestZhang99CameraKannalaBrandt extends GenericCalibrationZhang99<Ca
 			p.model.radialTrig[i] = rand.nextGaussian()*0.01;
 			p.model.tangentTrig[i] = rand.nextGaussian()*0.01;
 		}
-
 
 		return p;
 	}

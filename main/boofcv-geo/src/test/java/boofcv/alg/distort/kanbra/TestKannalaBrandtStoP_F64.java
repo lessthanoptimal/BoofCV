@@ -82,11 +82,11 @@ class TestKannalaBrandtStoP_F64 extends BoofStandardJUnit {
 			new KannalaBrandtStoP_F64(fish1).compute(P3.x, P3.y, P3.z, pixel1);
 			new KannalaBrandtStoP_F64(fish2).compute(P3.x, P3.y, P3.z, pixel2);
 
-			pixel1.x -= fish1.cx;
-			pixel1.y -= fish1.cy;
+			pixel1.x -= (double) fish1.cx;
+			pixel1.y -= (double) fish1.cy;
 
-			pixel2.x -= fish2.cx;
-			pixel2.y -= fish2.cy;
+			pixel2.x -= (double) fish2.cx;
+			pixel2.y -= (double) fish2.cy;
 
 			// NOTE: The norm changes because fx != fy
 //			System.out.printf("angle=%.3f (%.2f %.2f) n=%.2f %.2f\n", theta, x,y,pixel1.norm(), pixel2.norm());
