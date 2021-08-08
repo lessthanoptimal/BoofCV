@@ -16,39 +16,15 @@
  * limitations under the License.
  */
 
-package boofcv.gui.controls;
-
-import javax.swing.*;
+package boofcv.struct.calib;
 
 /**
- * Combines a spinner with a double value to reduce clutter.
+ * List of all built in camera models
  *
  * @author Peter Abeles
  */
-public class JSpinnerNumber {
-	public final JSpinner spinner;
-	/** Value. Safe to read outside the UI thread */
-	public Number value;
-
-	public JSpinnerNumber( JSpinner spinner, Number value ) {
-		this.spinner = spinner;
-		this.value = value;
-	}
-
-	public JSpinnerNumber tt( String tooltip ) {
-		spinner.setToolTipText(tooltip);
-		return this;
-	}
-
-	public void updateValue() {
-		value = (Number)spinner.getValue();
-	}
-
-	public int vint(){
-		return value.intValue();
-	}
-
-	public double vdouble(){
-		return value.doubleValue();
-	}
+public enum CameraModelType {
+	BROWN,
+	UNIVERSAL,
+	KANNALA_BRANDT,
 }
