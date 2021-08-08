@@ -27,8 +27,8 @@ import boofcv.app.calib.ComputeGeometryScore;
 import boofcv.factory.fiducial.FactoryFiducialCalibration;
 import boofcv.gui.BoofSwingUtil;
 import boofcv.gui.calibration.CalibratedPlanarPanel;
-import boofcv.gui.calibration.FisheyePlanarPanel;
 import boofcv.gui.calibration.MonoPlanarPanel;
+import boofcv.gui.calibration.UniversalOmniPlanarPanel;
 import boofcv.gui.image.ShowImages;
 import boofcv.io.ProgressMonitorThread;
 import boofcv.io.UtilIO;
@@ -401,7 +401,7 @@ public class CameraCalibration extends BaseStandardInputApp {
 		if (visualize) {
 			gui = switch (modeType) {
 				case BROWN -> new MonoPlanarPanel();
-				case UNIVERSAL -> new FisheyePlanarPanel();
+				case UNIVERSAL -> new UniversalOmniPlanarPanel();
 				default -> throw new RuntimeException("Unknown model type: " + modeType);
 			};
 			monitor = new ProcessThread(gui);

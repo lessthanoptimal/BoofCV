@@ -23,18 +23,18 @@ import boofcv.alg.distort.LensDistortionNarrowFOV;
 import boofcv.alg.distort.LensDistortionWideFOV;
 import boofcv.alg.distort.NarrowToWidePtoP_F32;
 import boofcv.alg.distort.pinhole.LensDistortionPinhole;
-import boofcv.alg.distort.universal.LensDistortionUniversalOmni;
 import boofcv.alg.geo.calibration.CalibrationObservation;
 import boofcv.alg.interpolate.InterpolatePixel;
 import boofcv.alg.interpolate.InterpolationType;
 import boofcv.factory.distort.FactoryDistort;
+import boofcv.factory.distort.LensDistortionFactory;
 import boofcv.factory.interpolate.FactoryInterpolation;
 import boofcv.gui.BoofSwingUtil;
 import boofcv.gui.feature.VisualizeFeatures;
 import boofcv.io.image.ConvertBufferedImage;
 import boofcv.struct.border.BorderType;
+import boofcv.struct.calib.CameraModel;
 import boofcv.struct.calib.CameraPinhole;
-import boofcv.struct.calib.CameraUniversalOmni;
 import boofcv.struct.distort.PointToPixelTransform_F32;
 import boofcv.struct.geo.PointIndex2D_F64;
 import boofcv.struct.image.GrayF32;
@@ -66,7 +66,7 @@ import static boofcv.gui.calibration.DisplayPinholeCalibrationPanel.drawNumbers;
  *
  * @author Peter Abeles
  */
-public class DisplayFisheyeCalibrationPanel extends DisplayCalibrationPanel<CameraUniversalOmni> {
+public class DisplayFisheyeCalibrationPanel<CM extends CameraModel> extends DisplayCalibrationPanel<CM> {
 
 	NarrowToWidePtoP_F32 distorter;
 	LensDistortionWideFOV fisheyeDistort;
@@ -116,11 +116,11 @@ public class DisplayFisheyeCalibrationPanel extends DisplayCalibrationPanel<Came
 	}
 
 	@Override
-	public void setCalibration( CameraUniversalOmni fisheyeModel ) {
+	public void setCalibration( CM fisheyeModel ) {
 		BoofSwingUtil.checkGuiThread();
 
 		LensDistortionNarrowFOV pinholeDistort = new LensDistortionPinhole(pinholeModel);
-		fisheyeDistort = new LensDistortionUniversalOmni(fisheyeModel);
+		fisheyeDistort = LensDistortionFactory.wide(fisheyeModel);
 		distorter = new NarrowToWidePtoP_F32(pinholeDistort, fisheyeDistort);
 
 		// Create the image distorter which will render the image

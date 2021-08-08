@@ -38,7 +38,7 @@ import java.util.List;
  *
  * @author Peter Abeles
  */
-public class FisheyePlanarPanel extends CalibratedPlanarPanel<CameraUniversalOmni> {
+public class UniversalOmniPlanarPanel extends CalibratedPlanarPanel<CameraUniversalOmni> {
 	JTextArea paramCenterX;
 	JTextArea paramCenterY;
 	JTextArea paramFX;
@@ -48,7 +48,7 @@ public class FisheyePlanarPanel extends CalibratedPlanarPanel<CameraUniversalOmn
 	JTextArea paramTangental;
 	JTextArea paramOffset;
 
-	public FisheyePlanarPanel() {
+	public UniversalOmniPlanarPanel() {
 
 		viewInfo.setListener(new ViewedImageInfoPanel.Listener() {
 			@Override

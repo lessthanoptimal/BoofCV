@@ -67,7 +67,7 @@ public class CalibrationIO {
 	 * @param parameters Camera parameters
 	 * @param outputWriter Path to where it should be saved
 	 */
-	public static <T extends CameraPinhole> void save( T parameters, Writer outputWriter ) {
+	public static <T extends CameraModel> void save( T parameters, Writer outputWriter ) {
 		PrintWriter out = new PrintWriter(outputWriter);
 
 		Yaml yaml = createYmlObject();
@@ -101,14 +101,14 @@ public class CalibrationIO {
 			out.println("# Pinhole camera model");
 			out.println("# (fx,fy) = focal length, (cx,cy) = principle point, (width,height) = image shape");
 			out.println();
-			putModelPinhole(parameters, data);
+			putModelPinhole((CameraPinhole)parameters, data);
 		}
 
 		yaml.dump(data, out);
 		out.flush();
 	}
 
-	public static <T extends CameraPinhole> void save( T parameters, String filePath ) {
+	public static <T extends CameraModel> void save( T parameters, String filePath ) {
 		try (var stream = new FileOutputStream(filePath)) {
 			save(parameters, new OutputStreamWriter(stream, UTF_8));
 		} catch (IOException e) {
@@ -116,7 +116,7 @@ public class CalibrationIO {
 		}
 	}
 
-	public static <T extends CameraPinhole> void save( T parameters, File filePath ) {
+	public static <T extends CameraModel> void save( T parameters, File filePath ) {
 		save(parameters, filePath.getPath());
 	}
 
