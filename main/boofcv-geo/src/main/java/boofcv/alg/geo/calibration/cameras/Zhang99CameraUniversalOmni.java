@@ -40,18 +40,25 @@ public class Zhang99CameraUniversalOmni implements Zhang99Camera {
 
 	private final RadialDistortionEstimateLinear computeRadial;
 
+	/**
+	 * Constructor where mirror offset is assumed to be known
+	 */
 	public Zhang99CameraUniversalOmni( List<Point2D_F64> layout,
 									   boolean assumeZeroSkew, boolean includeTangential, int numRadial, double mirror ) {
-		this.assumeZeroSkew = assumeZeroSkew;
-		this.includeTangential = includeTangential;
+		this(layout, assumeZeroSkew, includeTangential, numRadial);
 		this.fixedMirror = true;
 		this.mirror = mirror;
-		computeRadial = new RadialDistortionEstimateLinear(layout, numRadial);
 	}
 
+	/**
+	 * Constructor where mirror offset is assumed to be unknown
+	 */
 	public Zhang99CameraUniversalOmni( List<Point2D_F64> layout,
 									   boolean assumeZeroSkew, boolean includeTangential, int numRadial ) {
-		this(layout, assumeZeroSkew, includeTangential, numRadial, 0.0);
+		this.assumeZeroSkew = assumeZeroSkew;
+		this.includeTangential = includeTangential;
+		this.fixedMirror = false;
+		computeRadial = new RadialDistortionEstimateLinear(layout, numRadial);
 	}
 
 	@Override public BundleAdjustmentCamera initializeCamera(

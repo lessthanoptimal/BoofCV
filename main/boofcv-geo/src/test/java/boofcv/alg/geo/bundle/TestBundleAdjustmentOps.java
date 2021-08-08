@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -122,6 +122,10 @@ public class TestBundleAdjustmentOps extends BoofStandardJUnit {
 		assertEquals(src.cx, dst.cx);
 		assertEquals(src.cy, dst.cy);
 		assertEquals(src.skew, dst.skew);
+	}
+
+	@Test void convert_bundleKB_cameraKB() {
+		fail("Implement");
 	}
 
 	@Test void convert_pinhole_to_bundleSimple() {

@@ -47,7 +47,7 @@ public class ExampleCalibrateFisheye {
 		DetectSingleFiducialCalibration detector;
 		List<String> images;
 
-		// Circle based calibration targets not not recommended because the sever lens distortion will change
+		// Circle based calibration targets are not recommended because the sever lens distortion will change
 		// the apparent location of tangent points.
 
 		// Square Grid example
@@ -63,6 +63,8 @@ public class ExampleCalibrateFisheye {
 
 		// tell it type type of target and which parameters to estimate
 		calibrationAlg.configureUniversalOmni( true, 2, false);
+//		calibrationAlg.configureKannalaBrandt( true, 5, 0);
+		// TODO WTF asymmetric parameters are exactly zero?
 
 		// it's also possible to fix the mirror offset parameter
 		// 0 = pinhole camera. 1 = fisheye
@@ -81,6 +83,7 @@ public class ExampleCalibrateFisheye {
 		}
 		// process and compute intrinsic parameters
 		CameraUniversalOmni intrinsic = calibrationAlg.process();
+//		CameraKannalaBrandt intrinsic = calibrationAlg.process();
 
 		// save results to a file and print out
 		CalibrationIO.save(intrinsic, "fisheye.yaml");

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -19,9 +19,11 @@
 package boofcv.alg.geo.bundle;
 
 import boofcv.abst.geo.bundle.BundleAdjustmentCamera;
+import boofcv.alg.geo.bundle.cameras.BundleKannalaBrandt;
 import boofcv.alg.geo.bundle.cameras.BundlePinhole;
 import boofcv.alg.geo.bundle.cameras.BundlePinholeBrown;
 import boofcv.alg.geo.bundle.cameras.BundlePinholeSimplified;
+import boofcv.struct.calib.CameraKannalaBrandt;
 import boofcv.struct.calib.CameraPinhole;
 import boofcv.struct.calib.CameraPinholeBrown;
 import org.ejml.data.DMatrixRMaj;
@@ -134,6 +136,27 @@ public class BundleAdjustmentOps {
 
 		dst.fsetRadial(src.k1, src.k2).fsetTangental(0.0, 0.0);
 		dst.fsetK(src.f, src.f, 0.0, width/2, height/2, 0, 0);
+		dst.fsetShape(width, height);
+
+		return dst;
+	}
+
+	/**
+	 * Converts {@link CameraKannalaBrandt} into {@link CameraPinholeBrown}.
+	 *
+	 * @param src (Input) Input camera model.
+	 * @param dst (Output) Storage for output. If null a new instance is created.
+	 * @return The converted camera model
+	 */
+	public static CameraKannalaBrandt convert( BundleKannalaBrandt src, int width, int height,
+											   @Nullable CameraKannalaBrandt dst ) {
+		if (dst == null)
+			dst = new CameraKannalaBrandt();
+
+		dst.setTo(src.getModel());
+		if (src.zeroSkew)
+			dst.skew = 0;
+
 		dst.fsetShape(width, height);
 
 		return dst;

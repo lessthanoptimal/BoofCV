@@ -23,6 +23,7 @@ import boofcv.alg.geo.calibration.CalibrationObservation;
 import boofcv.alg.geo.calibration.CalibrationPlanarGridZhang99;
 import boofcv.alg.geo.calibration.cameras.Zhang99Camera;
 import boofcv.alg.geo.calibration.cameras.Zhang99CameraBrown;
+import boofcv.alg.geo.calibration.cameras.Zhang99CameraKannalaBrandt;
 import boofcv.alg.geo.calibration.cameras.Zhang99CameraUniversalOmni;
 import boofcv.struct.calib.CameraModel;
 import georegression.struct.point.Point2D_F64;
@@ -116,6 +117,14 @@ public class CalibrateMonoPlanar implements VerbosePrint {
 		zhang99.setZeroSkew(assumeZeroSkew);
 	}
 
+	public void configureKannalaBrandt( boolean assumeZeroSkew,
+										int numSymmetric,
+										int numAsymmetric ) {
+		zhang99 = new CalibrationPlanarGridZhang99(layout,
+				new Zhang99CameraKannalaBrandt(assumeZeroSkew, numSymmetric, numAsymmetric));
+		zhang99.setZeroSkew(assumeZeroSkew);
+	}
+
 	public void configureUniversalOmni( boolean assumeZeroSkew,
 										int numRadialParam,
 										boolean includeTangential,
@@ -144,8 +153,8 @@ public class CalibrateMonoPlanar implements VerbosePrint {
 			this.imageWidth = observation.getWidth();
 			this.imageHeight = observation.getHeight();
 		} else if (observation.getWidth() != this.imageWidth || observation.getHeight() != this.imageHeight) {
-			throw new IllegalArgumentException("Image shape miss match. Are these all from the same camera? "+
-					imageWidth+"x"+imageHeight+" vs "+observation.getWidth()+"x"+observation.getHeight());
+			throw new IllegalArgumentException("Image shape miss match. Are these all from the same camera? " +
+					imageWidth + "x" + imageHeight + " vs " + observation.getWidth() + "x" + observation.getHeight());
 		}
 		observations.add(observation);
 	}
@@ -180,7 +189,7 @@ public class CalibrateMonoPlanar implements VerbosePrint {
 		return (T)foundIntrinsic;
 	}
 
-	public void printStatistics(PrintStream out) {
+	public void printStatistics( PrintStream out ) {
 		printErrors(errors, out);
 	}
 
