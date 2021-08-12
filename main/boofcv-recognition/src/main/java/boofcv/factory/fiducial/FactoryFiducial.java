@@ -208,8 +208,8 @@ public class FactoryFiducial {
 	 * @return New detector
 	 */
 	public static <T extends ImageGray<T>>
-	ECoCheckDetector<T> ecocheck( @Nullable ConfigECoCheckDetector configDetector,
-								  ConfigECoCheckMarkers configMarkers, Class<T> imageType ) {
+	ECoCheck_to_FiducialDetector<T> ecocheck( @Nullable ConfigECoCheckDetector configDetector,
+											  ConfigECoCheckMarkers configMarkers, Class<T> imageType ) {
 		if (configDetector == null)
 			configDetector = new ConfigECoCheckDetector();
 		configDetector.checkValidity();
@@ -223,7 +223,8 @@ public class FactoryFiducial {
 		configMarkers.convertToGridList(utils.markers);
 		utils.fixate();
 
-		return new ECoCheckDetector<>(utils, configDetector.chessboard, imageType);
+		var alg = new ECoCheckDetector<>(utils, configDetector.chessboard, imageType);
+		return new ECoCheck_to_FiducialDetector<>(alg, configMarkers.markerShapes);
 	}
 
 	/**

@@ -23,6 +23,7 @@ import boofcv.testing.BoofStandardJUnit;
 import georegression.geometry.GeometryMath_F64;
 import georegression.metric.Intersection2D_F64;
 import georegression.struct.point.Point2D_F64;
+import georegression.struct.point.Point3D_F64;
 import georegression.struct.shapes.Rectangle2D_F64;
 import org.ddogleg.struct.DogArray;
 import org.ejml.UtilEjml;
@@ -200,5 +201,19 @@ public class TestECoCheckUtils extends BoofStandardJUnit {
 		assertEquals(4, alg.countEncodedSquaresInMarker(0));
 		assertEquals(6, alg.countEncodedSquaresInMarker(1));
 		assertEquals(3, alg.countEncodedSquaresInMarker(2));
+	}
+
+	@Test void cornerToMarker3D() {
+		var alg = new ECoCheckUtils();
+		alg.addMarker(4, 6);
+		alg.addMarker(5, 4);
+
+		var p = new Point3D_F64();
+		alg.cornerToMarker3D(0, 0, p);
+		assertEquals(0.0, p.distance((0.5 - 2.5)/5, -(0.5 - 1.5)/5, 0), UtilEjml.TEST_F64);
+		alg.cornerToMarker3D(0, 11, p);
+		assertEquals(0.0, p.distance((0.5 + 1 - 2.5)/5, -(0.5 + 2 - 1.5)/5, 0), UtilEjml.TEST_F64);
+		alg.cornerToMarker3D(1, 11, p);
+		assertEquals(0.0, p.distance((0.5 + 2 - 1.5)/4, -(0.5 + 3 - 2.0)/4, 0), UtilEjml.TEST_F64);
 	}
 }

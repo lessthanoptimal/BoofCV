@@ -22,7 +22,7 @@ import boofcv.abst.fiducial.calib.ConfigECoCheckDetector;
 import boofcv.abst.fiducial.calib.ConfigECoCheckMarkers;
 import boofcv.alg.feature.detect.chess.ChessboardCorner;
 import boofcv.alg.fiducial.calib.ecocheck.ECoCheckDetector;
-import boofcv.alg.fiducial.calib.ecocheck.ECoCheckMarker;
+import boofcv.alg.fiducial.calib.ecocheck.ECoCheckFound;
 import boofcv.demonstrations.shapes.DetectBlackShapePanel;
 import boofcv.demonstrations.shapes.ShapeVisualizePanel;
 import boofcv.factory.fiducial.FactoryFiducial;
@@ -91,7 +91,7 @@ public class DetectECoCheckApp extends DemonstrationBase {
 
 	//------------- Lock for what's being drawn in the GUI
 	private final Object lockVisualize = new Object();
-	private final DogArray<ECoCheckMarker> foundPatterns = new DogArray<>(ECoCheckMarker::new);
+	private final DogArray<ECoCheckFound> foundPatterns = new DogArray<>(ECoCheckFound::new);
 	private final DogArray<ChessboardCorner> foundCorners = new DogArray<>(ChessboardCorner::new);
 	//-------------
 
@@ -163,7 +163,7 @@ public class DetectECoCheckApp extends DemonstrationBase {
 			long time1 = System.nanoTime();
 			processingTime = (time1 - time0)*1e-6; // milliseconds
 
-			FastAccess<ECoCheckMarker> found = detector.getFound();
+			FastAccess<ECoCheckFound> found = detector.getFound();
 
 			synchronized (lockVisualize) {
 				// Copy found chessboard patterns
@@ -185,11 +185,11 @@ public class DetectECoCheckApp extends DemonstrationBase {
 
 			System.out.println("found.size="+found.size);
 			for (int i = 0; i < found.size; i++) {
-				ECoCheckMarker c = found.get(i);
-				if (!controlPanel.showAnonymous && c.marker < 0)
+				ECoCheckFound c = found.get(i);
+				if (!controlPanel.showAnonymous && c.markerID < 0)
 					continue;
 				System.out.println("["+i+"]");
-				System.out.println("  marker="+c.marker);
+				System.out.println("  marker="+c.markerID);
 				System.out.println("  rows="+c.squareRows);
 				System.out.println("  cols="+c.squareCols);
 				System.out.println("  decoded="+c.decodedCells.size);
@@ -211,7 +211,7 @@ public class DetectECoCheckApp extends DemonstrationBase {
 			configMarker.firstTargetDuplicated = controlPanel.numMarkers.value.intValue();
 			configMarker.errorCorrectionLevel = controlPanel.errorLevel.value.intValue();
 
-			detector = FactoryFiducial.ecocheck(configDetector, configMarker, GrayF32.class);
+			detector = FactoryFiducial.ecocheck(configDetector, configMarker, GrayF32.class).getDetector();
 			detector.setVerbose(System.out, null);
 		}
 	}
@@ -270,8 +270,8 @@ public class DetectECoCheckApp extends DemonstrationBase {
 			if (controlPanel.showChessboards) {
 				synchronized (lockVisualize) {
 					for (int i = 0; i < foundPatterns.size; i++) {
-						ECoCheckMarker c = foundPatterns.get(i);
-						if (!controlPanel.showAnonymous && c.marker < 0)
+						ECoCheckFound c = foundPatterns.get(i);
+						if (!controlPanel.showAnonymous && c.markerID < 0)
 							continue;
 						DisplayPinholeCalibrationPanel.renderOrder(g2, scale, c.corners.toList());
 					}

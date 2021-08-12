@@ -93,7 +93,7 @@ public class FactoryFiducialCalibration {
 	public static CalibrationDetectorMultiECoCheck ecocheck( @Nullable ConfigECoCheckDetector configDetector,
 															 ConfigECoCheckMarkers configMarkers ) {
 		ECoCheckDetector<GrayF32> detector = FactoryFiducial.ecocheck(
-				configDetector, configMarkers, GrayF32.class);
+				configDetector, configMarkers, GrayF32.class).getDetector();
 
 		// Figure out the length of a square
 		double squareLength = configMarkers.markerShapes.get(0).squareSize;

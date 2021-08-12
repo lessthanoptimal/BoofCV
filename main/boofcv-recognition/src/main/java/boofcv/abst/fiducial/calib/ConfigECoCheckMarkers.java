@@ -128,6 +128,20 @@ public class ConfigECoCheckMarkers implements Configuration {
 
 		public MarkerShape() {}
 
+		/**
+		 * Returns marker's width
+		 */
+		public double getWidth() {
+			return (numCols-1)*squareSize;
+		}
+
+		/**
+		 * Returns marker's width
+		 */
+		public double getHeight() {
+			return (numRows-1)*squareSize;
+		}
+
 		public void setTo( MarkerShape src ) {
 			this.numRows = src.numRows;
 			this.numCols = src.numCols;

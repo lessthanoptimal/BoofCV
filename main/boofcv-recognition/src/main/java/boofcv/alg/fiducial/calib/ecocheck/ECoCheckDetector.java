@@ -86,7 +86,7 @@ public class ECoCheckDetector<T extends ImageGray<T>> implements VerbosePrint {
 
 	/** Found chessboard patterns */
 	@Getter public final
-	DogArray<ECoCheckMarker> found = new DogArray<>(ECoCheckMarker::new, ECoCheckMarker::reset);
+	DogArray<ECoCheckFound> found = new DogArray<>(ECoCheckFound::new, ECoCheckFound::reset);
 
 	// Binary cells in grid pattern for easy access
 	FastArray<CellReading> gridBinaryCells = new FastArray<>(CellReading.class);
@@ -512,16 +512,16 @@ public class ECoCheckDetector<T extends ImageGray<T>> implements VerbosePrint {
 	 * @param transform (Input) correction to corner grd coordinate system
 	 * @param target (Output) Description of target
 	 */
-	boolean createCorrectedTarget( Transform transform, ECoCheckMarker target ) {
+	boolean createCorrectedTarget( Transform transform, ECoCheckFound target ) {
 		if (verbose != null)
 			verbose.printf("transform: votes=%d marker=%d ori=%d offset={ row=%d col=%d }\n",
 					transform.votes, transform.marker, transform.orientation, transform.offsetRow, transform.offsetCol);
 
-		target.marker = transform.marker;
+		target.markerID = transform.marker;
 
 		// Save the shape of the grid in squares
-		target.squareRows = utils.markers.get(target.marker).rows;
-		target.squareCols = utils.markers.get(target.marker).cols;
+		target.squareRows = utils.markers.get(target.markerID).rows;
+		target.squareCols = utils.markers.get(target.markerID).cols;
 		for (int i = 0; i < binaryCells.size; i++) {
 			target.decodedCells.add(binaryCells.get(i).cellID);
 		}
@@ -579,7 +579,7 @@ public class ECoCheckDetector<T extends ImageGray<T>> implements VerbosePrint {
 		if (!clusterToGrid.sparseToGrid(anonymousInfo))
 			return;
 
-		ECoCheckMarker target = found.grow();
+		ECoCheckFound target = found.grow();
 		target.squareRows = anonymousInfo.rows + 1;
 		target.squareCols = anonymousInfo.cols + 1;
 
@@ -587,6 +587,13 @@ public class ECoCheckDetector<T extends ImageGray<T>> implements VerbosePrint {
 			ChessboardCornerGraph.Node n = anonymousInfo.nodes.get(i);
 			target.corners.grow().setTo(n.x, n.y, i);
 		}
+	}
+
+	/**
+	 * Type of input image it processes
+	 */
+	public ImageType<T> getImageType() {
+		return detector.getImageType();
 	}
 
 	@Override public void setVerbose( @Nullable PrintStream out, @Nullable Set<String> configuration ) {

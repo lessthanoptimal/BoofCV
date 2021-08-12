@@ -85,11 +85,11 @@ public class TestECoCheckDetector extends BoofStandardJUnit {
 
 		alg.process(image);
 
-		FastAccess<ECoCheckMarker> found = alg.getFound();
+		FastAccess<ECoCheckFound> found = alg.getFound();
 		assertEquals(1, found.size);
 
-		ECoCheckMarker marker = found.get(0);
-		assertEquals(0, marker.marker);
+		ECoCheckFound marker = found.get(0);
+		assertEquals(0, marker.markerID);
 		assertEquals(squareRows, marker.squareRows);
 		assertEquals(squareCols, marker.squareCols);
 		assertEquals(numEncodedSquares, marker.decodedCells.size);
@@ -118,10 +118,10 @@ public class TestECoCheckDetector extends BoofStandardJUnit {
 			alg.process(rotated);
 			image.setTo(rotated);
 
-			FastAccess<ECoCheckMarker> found = alg.getFound();
+			FastAccess<ECoCheckFound> found = alg.getFound();
 			assertEquals(1, found.size);
-			ECoCheckMarker marker = found.get(0);
-			assertEquals(0, marker.marker);
+			ECoCheckFound marker = found.get(0);
+			assertEquals(0, marker.markerID);
 			assertEquals(5, marker.squareRows);
 			assertEquals(6, marker.squareCols);
 			assertEquals(truthCorners.size(), marker.corners.size);
@@ -139,12 +139,12 @@ public class TestECoCheckDetector extends BoofStandardJUnit {
 
 		alg.process(image);
 
-		FastAccess<ECoCheckMarker> found = alg.getFound();
+		FastAccess<ECoCheckFound> found = alg.getFound();
 		assertEquals(1, found.size);
 
 		// number of squares and corners is found through manual inspection
-		ECoCheckMarker marker = found.get(0);
-		assertEquals(0, marker.marker);
+		ECoCheckFound marker = found.get(0);
+		assertEquals(0, marker.markerID);
 		assertEquals(5, marker.squareRows);
 		assertEquals(6, marker.squareCols);
 		assertEquals(5, marker.decodedCells.size);
@@ -166,11 +166,11 @@ public class TestECoCheckDetector extends BoofStandardJUnit {
 
 		alg.process(image);
 
-		FastAccess<ECoCheckMarker> found = alg.getFound();
+		FastAccess<ECoCheckFound> found = alg.getFound();
 		assertEquals(1, found.size);
 
-		ECoCheckMarker marker = found.get(0);
-		assertEquals(-1, marker.marker);
+		ECoCheckFound marker = found.get(0);
+		assertEquals(-1, marker.markerID);
 		assertEquals(5, marker.squareRows);
 		assertEquals(6, marker.squareCols);
 		assertEquals(truthCorners.size(), marker.corners.size);
@@ -199,7 +199,7 @@ public class TestECoCheckDetector extends BoofStandardJUnit {
 
 		alg.process(combined);
 
-		FastAccess<ECoCheckMarker> found = alg.getFound();
+		FastAccess<ECoCheckFound> found = alg.getFound();
 		assertEquals(2, found.size);
 
 		found.forEach(t -> {
@@ -231,7 +231,7 @@ public class TestECoCheckDetector extends BoofStandardJUnit {
 
 		alg.process(combined);
 
-		FastAccess<ECoCheckMarker> found = alg.getFound();
+		FastAccess<ECoCheckFound> found = alg.getFound();
 		assertEquals(2, found.size);
 	}
 
@@ -271,10 +271,10 @@ public class TestECoCheckDetector extends BoofStandardJUnit {
 		}
 
 		// Pass the first time
-		assertTrue(alg.createCorrectedTarget(transform, new ECoCheckMarker()));
+		assertTrue(alg.createCorrectedTarget(transform, new ECoCheckFound()));
 
 		// Second time it will blow up because they have been marked!
-		assertFalse(alg.createCorrectedTarget(transform, new ECoCheckMarker()));
+		assertFalse(alg.createCorrectedTarget(transform, new ECoCheckFound()));
 	}
 
 	@Test void findMatching() {

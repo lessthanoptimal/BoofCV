@@ -28,9 +28,9 @@ import org.ddogleg.struct.DogArray_I32;
  *
  * @author Peter Abeles
  */
-public class ECoCheckMarker {
+public class ECoCheckFound {
 	/** Which marker it came from. -1 if unknown */
-	public int marker;
+	public int markerID;
 
 	/** Number of square rows in the pattern. */
 	public int squareRows;
@@ -48,7 +48,7 @@ public class ECoCheckMarker {
 	public DogArray_I32 decodedCells = new DogArray_I32();
 
 	public void reset() {
-		marker = -1;
+		markerID = -1;
 		squareCols = -1;
 		squareRows = -1;
 		corners.reset();
@@ -56,8 +56,8 @@ public class ECoCheckMarker {
 		decodedCells.reset();
 	}
 
-	public void setTo( ECoCheckMarker src ) {
-		this.marker = src.marker;
+	public void setTo( ECoCheckFound src ) {
+		this.markerID = src.markerID;
 		this.squareCols = src.squareCols;
 		this.squareRows = src.squareRows;
 		this.corners.resize(src.corners.size);

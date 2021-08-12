@@ -68,7 +68,7 @@ public class CalibrationDetectorMultiECoCheck implements DetectMultiFiducialCali
 	}
 
 	@Override public int getMarkerID( int detectionID ) {
-		return detector.getFound().get(detectionID).marker;
+		return detector.getFound().get(detectionID).markerID;
 	}
 
 	@Override public int getTotalUniqueMarkers() {
