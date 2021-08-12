@@ -45,21 +45,21 @@ public class EnsureUniqueAssociation {
 	 */
 	public void process( DogArray<AssociatedIndex> matches, int sizeDst ) {
 		// initialize data structures
-		if( bestScores.length < sizeDst )
+		if (bestScores.length < sizeDst)
 			bestScores = new AssociatedIndex[sizeDst];
 
-		for( int i = 0; i < matches.size; i++ ) {
+		for (int i = 0; i < matches.size; i++) {
 			AssociatedIndex match = matches.data[i];
 
-			if( bestScores[match.dst] == null || match.fitScore < bestScores[match.dst].fitScore) {
+			if (bestScores[match.dst] == null || match.fitScore < bestScores[match.dst].fitScore) {
 				bestScores[match.dst] = match;
 			}
 		}
 
 		// add the best unambiguous pairs back
 		unambiguous.reset();
-		for( int i = 0; i < sizeDst; i++ ) {
-			if( bestScores[i] != null ) {
+		for (int i = 0; i < sizeDst; i++) {
+			if (bestScores[i] != null) {
 				unambiguous.add(bestScores[i]);
 				// clean up so that you don't have a dangling reference
 				bestScores[i] = null;

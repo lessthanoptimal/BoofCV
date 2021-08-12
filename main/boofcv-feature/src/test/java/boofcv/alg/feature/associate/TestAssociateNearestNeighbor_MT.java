@@ -34,8 +34,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  * @author Peter Abeles
  */
 class TestAssociateNearestNeighbor_MT extends BoofStandardJUnit {
-	@Test
-	void compare() {
+	@Test void compare() {
 		DogArray<TupleDesc_F64> dataSrc = TestAssociateGreedyDesc_MT.createData(200);
 		DogArray<TupleDesc_F64> dataDst = TestAssociateGreedyDesc_MT.createData(200);
 
@@ -55,7 +54,7 @@ class TestAssociateNearestNeighbor_MT extends BoofStandardJUnit {
 		DogArray<AssociatedIndex> matches0 = sequentialAlg.getMatches();
 		DogArray<AssociatedIndex> matches1 = parallelAlg.getMatches();
 
-		assertEquals(matches0.size,matches1.size);
+		assertEquals(matches0.size, matches1.size);
 
 		for (int i = 0; i < matches0.size; i++) {
 			AssociatedIndex a = matches0.get(i);
@@ -63,12 +62,11 @@ class TestAssociateNearestNeighbor_MT extends BoofStandardJUnit {
 			for (int j = 0; j < matches1.size; j++) {
 				AssociatedIndex b = matches1.get(j);
 
-				if( a.src == b.src && a.dst == b.dst && a.fitScore == b.fitScore ) {
+				if (a.src == b.src && a.dst == b.dst && a.fitScore == b.fitScore) {
 					matched = true;
 				}
 			}
 			assertTrue(matched);
 		}
-
 	}
 }

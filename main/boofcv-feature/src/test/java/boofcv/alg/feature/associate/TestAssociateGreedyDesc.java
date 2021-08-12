@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -23,7 +23,6 @@ import boofcv.abst.feature.associate.ScoreAssociation;
 import boofcv.struct.feature.TupleDesc_F64;
 import org.ddogleg.struct.FastAccess;
 
-
 /**
  * @author Peter Abeles
  */
@@ -37,9 +36,9 @@ class TestAssociateGreedyDesc extends GenericAssociateGreedyChecks {
 	}
 
 	@Override
-	protected void associate(AssociateGreedyBase<TupleDesc_F64> alg,
-							 FastAccess<TupleDesc_F64> src,
-							 FastAccess<TupleDesc_F64> dst) {
-		((AssociateGreedyDesc<TupleDesc_F64>)alg).associate(src,dst);
+	protected void associate( AssociateGreedyBase<TupleDesc_F64> alg,
+							  FastAccess<TupleDesc_F64> src,
+							  FastAccess<TupleDesc_F64> dst ) {
+		((AssociateGreedyDesc<TupleDesc_F64>)alg).associate(src, dst);
 	}
 }

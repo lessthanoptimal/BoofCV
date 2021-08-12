@@ -41,29 +41,28 @@ import org.ddogleg.struct.FastAccess;
  * @author Peter Abeles
  */
 public class AssociateNearestNeighbor_ST<D>
-		extends AssociateNearestNeighbor<D>
-{
+		extends AssociateNearestNeighbor<D> {
 	// Nearest Neighbor algorithm and storage for the results
-	private NearestNeighbor.Search<D> search;
+	private final NearestNeighbor.Search<D> search;
 	NnData<D> result = new NnData<>();
 	DogArray<NnData<D>> result2 = new DogArray<>(NnData<D>::new);
 
 	// The type of description it can process
 	Class<D> descType;
 
-	public AssociateNearestNeighbor_ST(NearestNeighbor<D> alg, Class<D> descType) {
+	public AssociateNearestNeighbor_ST( NearestNeighbor<D> alg, Class<D> descType ) {
 		super(alg);
 		this.search = alg.createSearch();
 		this.descType = descType;
 	}
 
 	@Override
-	public void setSource(FastAccess<D> listSrc) {
+	public void setSource( FastAccess<D> listSrc ) {
 		super.setSource(listSrc);
 	}
 
 	@Override
-	public void setDestination(FastAccess<D> listDst) {
+	public void setDestination( FastAccess<D> listDst ) {
 		this.listDst = listDst;
 	}
 
@@ -72,7 +71,7 @@ public class AssociateNearestNeighbor_ST<D>
 
 		matchesAll.resize(listDst.size);
 		matchesAll.reset();
-		if( scoreRatioThreshold >= 1.0 ) {
+		if (scoreRatioThreshold >= 1.0) {
 			// if score ratio is not turned on then just use the best match
 			for (int i = 0; i < listDst.size; i++) {
 				if (!search.findNearest(listDst.data[i], maxDistance, result))
@@ -81,28 +80,28 @@ public class AssociateNearestNeighbor_ST<D>
 			}
 		} else {
 			for (int i = 0; i < listDst.size; i++) {
-				search.findNearest(listDst.data[i], maxDistance,2, result2);
+				search.findNearest(listDst.data[i], maxDistance, 2, result2);
 
-				if( result2.size == 1 ) {
+				if (result2.size == 1) {
 					NnData<D> r = result2.getTail();
 					matchesAll.grow().setTo(r.index, i, r.distance);
-				} else if( result2.size == 2 ) {
+				} else if (result2.size == 2) {
 					NnData<D> r0 = result2.get(0);
 					NnData<D> r1 = result2.get(1);
 
 					// ensure that r0 is the closest
-					if( r0.distance > r1.distance ) {
+					if (r0.distance > r1.distance) {
 						NnData<D> tmp = r0;
 						r0 = r1;
 						r1 = tmp;
 					}
 
-					double foundRatio = ratioUsesSqrt ?Math.sqrt(r0.distance)/Math.sqrt(r1.distance) :r0.distance/r1.distance;
-					if( foundRatio <= scoreRatioThreshold) {
+					double foundRatio = ratioUsesSqrt ? Math.sqrt(r0.distance)/Math.sqrt(r1.distance) : r0.distance/r1.distance;
+					if (foundRatio <= scoreRatioThreshold) {
 						matchesAll.grow().setTo(r0.index, i, r0.distance);
 					}
-				} else if( result2.size != 0 ){
-					throw new RuntimeException("BUG! 0,1,2 are acceptable not "+result2.size);
+				} else if (result2.size != 0) {
+					throw new RuntimeException("BUG! 0,1,2 are acceptable not " + result2.size);
 				}
 			}
 		}

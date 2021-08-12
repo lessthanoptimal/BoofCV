@@ -36,8 +36,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
  * @author Peter Abeles
  */
 class TestAssociateThreeByPairs extends BoofStandardJUnit {
-	@Test
-	void perfect() {
+	@Test void perfect() {
 		DogArray<TupleDesc_F64> featuresA = UtilFeature.createArrayF64(1);
 		DogArray<TupleDesc_F64> featuresB = UtilFeature.createArrayF64(1);
 		DogArray<TupleDesc_F64> featuresC = UtilFeature.createArrayF64(1);
@@ -64,7 +63,7 @@ class TestAssociateThreeByPairs extends BoofStandardJUnit {
 		featuresSetC.fill(0);
 
 		ScoreAssociation<TupleDesc_F64> score = FactoryAssociation.defaultScore(TupleDesc_F64.class);
-		AssociateDescription<TupleDesc_F64> associate = FactoryAssociation.greedy(new ConfigAssociateGreedy(true,1e-8),score);
+		AssociateDescription<TupleDesc_F64> associate = FactoryAssociation.greedy(new ConfigAssociateGreedy(true, 1e-8), score);
 
 		AssociateThreeByPairs<TupleDesc_F64> alg = new AssociateThreeByPairs<>(associate);
 
@@ -77,21 +76,20 @@ class TestAssociateThreeByPairs extends BoofStandardJUnit {
 
 		DogArray<AssociatedTripleIndex> matches = alg.getMatches();
 
-		assertEquals(10,matches.size);
+		assertEquals(10, matches.size);
 
 		for (int i = 0; i < 10; i++) {
 			AssociatedTripleIndex a = matches.get(i);
-			assertEquals(i,a.a);
-			assertEquals(i+1,a.b);
-			assertEquals(i+2,a.c);
+			assertEquals(i, a.a);
+			assertEquals(i + 1, a.b);
+			assertEquals(i + 2, a.c);
 		}
 	}
 
 	/**
 	 * A->B is good. B->C is good. C->A exceeds error margin
 	 */
-	@Test
-	void failOnCtoA() {
+	@Test void failOnCtoA() {
 		DogArray<TupleDesc_F64> featuresA = UtilFeature.createArrayF64(1);
 		DogArray<TupleDesc_F64> featuresB = UtilFeature.createArrayF64(1);
 		DogArray<TupleDesc_F64> featuresC = UtilFeature.createArrayF64(1);
@@ -105,8 +103,8 @@ class TestAssociateThreeByPairs extends BoofStandardJUnit {
 
 		for (int i = 0; i < 10; i++) {
 			featuresA.grow().setTo(i);
-			featuresB.grow().setTo(i+0.1);
-			featuresC.grow().setTo(i+0.2);
+			featuresB.grow().setTo(i + 0.1);
+			featuresC.grow().setTo(i + 0.2);
 		}
 
 		// there is only one set
@@ -117,9 +115,9 @@ class TestAssociateThreeByPairs extends BoofStandardJUnit {
 		featuresSetC.resize(featuresC.size);
 		featuresSetC.fill(0);
 
-		double maxError = 0.1*0.1+0.00000001;
+		double maxError = 0.1*0.1 + 0.00000001;
 		ScoreAssociation<TupleDesc_F64> score = FactoryAssociation.defaultScore(TupleDesc_F64.class);
-		AssociateDescription<TupleDesc_F64> associate = FactoryAssociation.greedy(new ConfigAssociateGreedy(true,maxError),score);
+		AssociateDescription<TupleDesc_F64> associate = FactoryAssociation.greedy(new ConfigAssociateGreedy(true, maxError), score);
 
 		AssociateThreeByPairs<TupleDesc_F64> alg = new AssociateThreeByPairs<>(associate);
 		alg.initialize(1);
@@ -132,14 +130,13 @@ class TestAssociateThreeByPairs extends BoofStandardJUnit {
 
 		DogArray<AssociatedTripleIndex> matches = alg.getMatches();
 
-		assertEquals(0,matches.size);
+		assertEquals(0, matches.size);
 	}
 
 	/**
 	 * A->B is good. B->C is bad.
 	 */
-	@Test
-	void failOnBtoC() {
+	@Test void failOnBtoC() {
 		DogArray<TupleDesc_F64> featuresA = UtilFeature.createArrayF64(1);
 		DogArray<TupleDesc_F64> featuresB = UtilFeature.createArrayF64(1);
 		DogArray<TupleDesc_F64> featuresC = UtilFeature.createArrayF64(1);
@@ -153,8 +150,8 @@ class TestAssociateThreeByPairs extends BoofStandardJUnit {
 
 		for (int i = 0; i < 10; i++) {
 			featuresA.grow().setTo(i);
-			featuresB.grow().setTo(i+0.1);
-			featuresC.grow().setTo(i+0.22);
+			featuresB.grow().setTo(i + 0.1);
+			featuresC.grow().setTo(i + 0.22);
 		}
 
 		// there is only one set
@@ -166,9 +163,9 @@ class TestAssociateThreeByPairs extends BoofStandardJUnit {
 		featuresSetC.fill(0);
 
 
-		double maxError = 0.1*0.1+0.00000001;
+		double maxError = 0.1*0.1 + 0.00000001;
 		ScoreAssociation<TupleDesc_F64> score = FactoryAssociation.defaultScore(TupleDesc_F64.class);
-		AssociateDescription<TupleDesc_F64> associate = FactoryAssociation.greedy(new ConfigAssociateGreedy(true,maxError),score);
+		AssociateDescription<TupleDesc_F64> associate = FactoryAssociation.greedy(new ConfigAssociateGreedy(true, maxError), score);
 
 		AssociateThreeByPairs<TupleDesc_F64> alg = new AssociateThreeByPairs<>(associate);
 		alg.initialize(1);
@@ -181,14 +178,13 @@ class TestAssociateThreeByPairs extends BoofStandardJUnit {
 
 		DogArray<AssociatedTripleIndex> matches = alg.getMatches();
 
-		assertEquals(0,matches.size);
+		assertEquals(0, matches.size);
 	}
 
 	/**
 	 * A->B is bad.
 	 */
-	@Test
-	void failOnAtoB() {
+	@Test void failOnAtoB() {
 		DogArray<TupleDesc_F64> featuresA = UtilFeature.createArrayF64(1);
 		DogArray<TupleDesc_F64> featuresB = UtilFeature.createArrayF64(1);
 		DogArray<TupleDesc_F64> featuresC = UtilFeature.createArrayF64(1);
@@ -202,8 +198,8 @@ class TestAssociateThreeByPairs extends BoofStandardJUnit {
 
 		for (int i = 0; i < 10; i++) {
 			featuresA.grow().setTo(i);
-			featuresB.grow().setTo(i+0.12);
-			featuresC.grow().setTo(i+0.3);
+			featuresB.grow().setTo(i + 0.12);
+			featuresC.grow().setTo(i + 0.3);
 		}
 
 		// there is only one set
@@ -214,9 +210,9 @@ class TestAssociateThreeByPairs extends BoofStandardJUnit {
 		featuresSetC.resize(featuresC.size);
 		featuresSetC.fill(0);
 
-		double maxError = 0.1*0.1+0.00000001;
+		double maxError = 0.1*0.1 + 0.00000001;
 		ScoreAssociation<TupleDesc_F64> score = FactoryAssociation.defaultScore(TupleDesc_F64.class);
-		AssociateDescription<TupleDesc_F64> associate = FactoryAssociation.greedy(new ConfigAssociateGreedy(true,maxError),score);
+		AssociateDescription<TupleDesc_F64> associate = FactoryAssociation.greedy(new ConfigAssociateGreedy(true, maxError), score);
 
 		AssociateThreeByPairs<TupleDesc_F64> alg = new AssociateThreeByPairs<>(associate);
 		alg.initialize(1);
@@ -229,6 +225,6 @@ class TestAssociateThreeByPairs extends BoofStandardJUnit {
 
 		DogArray<AssociatedTripleIndex> matches = alg.getMatches();
 
-		assertEquals(0,matches.size);
+		assertEquals(0, matches.size);
 	}
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -27,7 +27,7 @@ import boofcv.abst.feature.associate.AssociateDescription2D;
  */
 public interface AssociateMaxDistance<D> extends AssociateDescription2D<D> {
 
-	public double getMaxDistance();
+	double getMaxDistance();
 
-	public void setMaxDistance(double maxDistance);
+	void setMaxDistance( double maxDistance );
 }

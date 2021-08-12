@@ -57,9 +57,9 @@ public class AssociateUniqueByScoreAlg {
 	 * @param checkSource Should it check source features for uniqueness
 	 * @param checkDestination Should it check destination features for uniqueness
 	 */
-	public AssociateUniqueByScoreAlg(MatchScoreType type,
-									 boolean checkSource,
-									 boolean checkDestination) {
+	public AssociateUniqueByScoreAlg( MatchScoreType type,
+									  boolean checkSource,
+									  boolean checkDestination ) {
 		this.type = type;
 		this.checkSource = checkSource;
 		this.checkDestination = checkDestination;
@@ -72,17 +72,17 @@ public class AssociateUniqueByScoreAlg {
 	 * @param numSource Number of source features
 	 * @param numDestination Number of destination features
 	 */
-	public void process(FastAccess<AssociatedIndex> matches , int numSource , int numDestination ) {
+	public void process( FastAccess<AssociatedIndex> matches, int numSource, int numDestination ) {
 
-		if( checkSource ) {
-			if( checkDestination ) {
+		if (checkSource) {
+			if (checkDestination) {
 				processSource(matches, numSource, firstPass);
-				processDestination(firstPass,numDestination,pruned);
+				processDestination(firstPass, numDestination, pruned);
 			} else {
 				processSource(matches, numSource, pruned);
 			}
-		} else if( checkDestination ) {
-			processDestination(matches,numDestination,pruned);
+		} else if (checkDestination) {
+			processDestination(matches, numDestination, pruned);
 		} else {
 			// well this was pointless, just return the input set
 			pruned.reset();
@@ -93,38 +93,38 @@ public class AssociateUniqueByScoreAlg {
 	/**
 	 * Selects a subset of matches that have at most one association for each source feature.
 	 */
-	private void processSource(FastAccess<AssociatedIndex> matches, int numSource,
-							   FastArray<AssociatedIndex> output ) {
+	private void processSource( FastAccess<AssociatedIndex> matches, int numSource,
+								FastArray<AssociatedIndex> output ) {
 		//set up data structures
 		scores.resize(numSource);
 		solutions.resize(numSource);
-		for( int i =0; i < numSource; i++ ) {
+		for (int i = 0; i < numSource; i++) {
 			solutions.data[i] = -1;
 		}
 
 		// select best matches
-		for( int i = 0; i < matches.size(); i++ ) {
+		for (int i = 0; i < matches.size(); i++) {
 			AssociatedIndex a = matches.get(i);
 			int found = solutions.data[a.src];
-			if( found != -1 ) {
-				if( found == -2 ) {
+			if (found != -1) {
+				if (found == -2) {
 					// the best solution is invalid because two or more had the same score, see if this is better
 					double bestScore = scores.data[a.src];
-					int result = type.compareTo(bestScore,a.fitScore);
-					if( result < 0 ) {
+					int result = type.compareTo(bestScore, a.fitScore);
+					if (result < 0) {
 						// found a better one, use this now
 						solutions.data[a.src] = i;
 						scores.data[a.src] = a.fitScore;
 					}
 				} else {
 					// see if this new score is better than the current best
-					AssociatedIndex currentBest = matches.get( found );
-					int result = type.compareTo(currentBest.fitScore,a.fitScore);
-					if( result < 0 ) {
+					AssociatedIndex currentBest = matches.get(found);
+					int result = type.compareTo(currentBest.fitScore, a.fitScore);
+					if (result < 0) {
 						// found a better one, use this now
 						solutions.data[a.src] = i;
 						scores.data[a.src] = a.fitScore;
-					} else if( result == 0 ) {
+					} else if (result == 0) {
 						// two solutions have the same score
 						solutions.data[a.src] = -2;
 					}
@@ -137,10 +137,10 @@ public class AssociateUniqueByScoreAlg {
 		}
 
 		output.reset();
-		for( int i =0; i < numSource; i++ ) {
+		for (int i = 0; i < numSource; i++) {
 			int index = solutions.data[i];
-			if( index >= 0 ) {
-				output.add( matches.get(index) );
+			if (index >= 0) {
+				output.add(matches.get(index));
 			}
 		}
 	}
@@ -148,38 +148,38 @@ public class AssociateUniqueByScoreAlg {
 	/**
 	 * Selects a subset of matches that have at most one association for each destination feature.
 	 */
-	private void processDestination(FastAccess<AssociatedIndex> matches, int numDestination,
-									FastArray<AssociatedIndex> output ) {
+	private void processDestination( FastAccess<AssociatedIndex> matches, int numDestination,
+									 FastArray<AssociatedIndex> output ) {
 		//set up data structures
 		scores.resize(numDestination);
 		solutions.resize(numDestination);
-		for( int i =0; i < numDestination; i++ ) {
+		for (int i = 0; i < numDestination; i++) {
 			solutions.data[i] = -1;
 		}
 
 		// select best matches
-		for( int i = 0; i < matches.size(); i++ ) {
+		for (int i = 0; i < matches.size(); i++) {
 			AssociatedIndex a = matches.get(i);
 			int found = solutions.data[a.dst];
-			if( found != -1 ) {
-				if( found == -2 ) {
+			if (found != -1) {
+				if (found == -2) {
 					// the best solution is invalid because two or more had the same score, see if this is better
 					double bestScore = scores.data[a.dst];
-					int result = type.compareTo(bestScore,a.fitScore);
-					if( result < 0 ) {
+					int result = type.compareTo(bestScore, a.fitScore);
+					if (result < 0) {
 						// found a better one, use this now
 						solutions.data[a.dst] = i;
 						scores.data[a.dst] = a.fitScore;
 					}
 				} else {
 					// see if this new score is better than the current best
-					AssociatedIndex currentBest = matches.get( found );
-					int result = type.compareTo(currentBest.fitScore,a.fitScore);
-					if( result < 0 ) {
+					AssociatedIndex currentBest = matches.get(found);
+					int result = type.compareTo(currentBest.fitScore, a.fitScore);
+					if (result < 0) {
 						// found a better one, use this now
 						solutions.data[a.dst] = i;
 						scores.data[a.dst] = a.fitScore;
-					} else if( result == 0 ) {
+					} else if (result == 0) {
 						// two solutions have the same score
 						solutions.data[a.dst] = -2;
 					}
@@ -192,10 +192,10 @@ public class AssociateUniqueByScoreAlg {
 		}
 
 		output.reset();
-		for( int i =0; i < numDestination; i++ ) {
+		for (int i = 0; i < numDestination; i++) {
 			int index = solutions.data[i];
-			if( index >= 0 ) {
-				output.add( matches.get(index) );
+			if (index >= 0) {
+				output.add(matches.get(index));
 			}
 		}
 	}

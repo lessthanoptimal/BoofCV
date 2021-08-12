@@ -52,7 +52,7 @@ public class TestAssociateNearestNeighbor_ST extends StandardAssociateDescriptio
 	}
 
 	@Override
-	protected TupleDesc_F64 c(double value) {
+	protected TupleDesc_F64 c( double value ) {
 		TupleDesc_F64 s = new TupleDesc_F64(1);
 		s.data[0] = value;
 		return s;
@@ -64,7 +64,7 @@ public class TestAssociateNearestNeighbor_ST extends StandardAssociateDescriptio
 	@Test void scoreRatio() {
 		Dummy<TupleDesc_F64> nn = new Dummy<>();
 		// src = assoc[i] where src is the index of the source feature and i is the index of the dst feature
-		nn.assoc = new int[]{2,0,1,-1,4,-1,-1,2,2,1};
+		nn.assoc = new int[]{2, 0, 1, -1, 4, -1, -1, 2, 2, 1};
 		nn.distanceScale = 2.0;
 
 		AssociateNearestNeighbor_ST<TupleDesc_F64> alg = new AssociateNearestNeighbor_ST<>(nn, TupleDesc_F64.class);
@@ -72,12 +72,12 @@ public class TestAssociateNearestNeighbor_ST extends StandardAssociateDescriptio
 		FastArray<TupleDesc_F64> src = new FastArray<>(TupleDesc_F64.class);
 		FastArray<TupleDesc_F64> dst = new FastArray<>(TupleDesc_F64.class);
 
-		for( int i = 0; i < 5; i++ ) {
-			src.add( new TupleDesc_F64(10));
+		for (int i = 0; i < 5; i++) {
+			src.add(new TupleDesc_F64(10));
 		}
 
-		for( int i = 0; i < 10; i++ ) {
-			dst.add( new TupleDesc_F64(10));
+		for (int i = 0; i < 10; i++) {
+			dst.add(new TupleDesc_F64(10));
 		}
 
 		alg.setSource(src);
@@ -86,21 +86,20 @@ public class TestAssociateNearestNeighbor_ST extends StandardAssociateDescriptio
 		alg.setRatioUsesSqrt(false);
 		alg.setScoreRatioThreshold(0.49); // threshold should reject everything
 		alg.associate();
-		assertEquals(0,alg.getMatches().size);
+		assertEquals(0, alg.getMatches().size);
 
 		alg.setScoreRatioThreshold(0.51); // everything should be accepted
 		alg.associate();
-		assertEquals(10,alg.getMatches().size);
+		assertEquals(10, alg.getMatches().size);
 
 		alg.setRatioUsesSqrt(true);
-		alg.setScoreRatioThreshold(1.0/Math.sqrt(2.0)-0.001);
+		alg.setScoreRatioThreshold(1.0/Math.sqrt(2.0) - 0.001);
 		alg.associate();
-		assertEquals(0,alg.getMatches().size);
+		assertEquals(0, alg.getMatches().size);
 
-		alg.setScoreRatioThreshold(1.0/Math.sqrt(2.0)+0.001);
+		alg.setScoreRatioThreshold(1.0/Math.sqrt(2.0) + 0.001);
 		alg.associate();
-		assertEquals(10,alg.getMatches().size);
-
+		assertEquals(10, alg.getMatches().size);
 	}
 
 	/**
@@ -110,19 +109,19 @@ public class TestAssociateNearestNeighbor_ST extends StandardAssociateDescriptio
 
 		Dummy<TupleDesc_F64> nn = new Dummy<>();
 		// src = assoc[i] where src is the index of the source feature and i is the index of the dst feature
-		nn.assoc = new int[]{2,0,1,-1,4,-1,-1,2,2,1};
+		nn.assoc = new int[]{2, 0, 1, -1, 4, -1, -1, 2, 2, 1};
 
 		AssociateNearestNeighbor_ST<TupleDesc_F64> alg = new AssociateNearestNeighbor_ST<>(nn, TupleDesc_F64.class);
 
-		FastArray<TupleDesc_F64> src = new FastArray<>( TupleDesc_F64.class);
-		FastArray<TupleDesc_F64> dst = new FastArray<>( TupleDesc_F64.class);
+		FastArray<TupleDesc_F64> src = new FastArray<>(TupleDesc_F64.class);
+		FastArray<TupleDesc_F64> dst = new FastArray<>(TupleDesc_F64.class);
 
-		for( int i = 0; i < 5; i++ ) {
-			src.add( new TupleDesc_F64(10));
+		for (int i = 0; i < 5; i++) {
+			src.add(new TupleDesc_F64(10));
 		}
 
-		for( int i = 0; i < 10; i++ ) {
-			dst.add( new TupleDesc_F64(10));
+		for (int i = 0; i < 10; i++) {
+			dst.add(new TupleDesc_F64(10));
 		}
 
 		alg.setSource(src);
@@ -132,37 +131,36 @@ public class TestAssociateNearestNeighbor_ST extends StandardAssociateDescriptio
 
 		DogArray<AssociatedIndex> matches = alg.getMatches();
 
-		assertEquals(7,matches.size);
-		for( int i = 0, count = 0; i < nn.assoc.length; i++ ) {
-			if( nn.assoc[i] != -1 ) {
+		assertEquals(7, matches.size);
+		for (int i = 0, count = 0; i < nn.assoc.length; i++) {
+			if (nn.assoc[i] != -1) {
 				int source = nn.assoc[i];
-				assertEquals(source,matches.get(count).src);
-				assertEquals(i,matches.get(count).dst);
+				assertEquals(source, matches.get(count).src);
+				assertEquals(i, matches.get(count).dst);
 				count++;
 			}
 		}
 
 		DogArray_I32 unassoc = alg.getUnassociatedSource();
 		assertEquals(1, unassoc.size);
-		assertEquals(3,unassoc.get(0));
+		assertEquals(3, unassoc.get(0));
 		unassoc = alg.getUnassociatedDestination();
 		assertEquals(3, unassoc.size);
-		assertEquals(3,unassoc.get(0));
-		assertEquals(5,unassoc.get(1));
-		assertEquals(6,unassoc.get(2));
+		assertEquals(3, unassoc.get(0));
+		assertEquals(5, unassoc.get(1));
+		assertEquals(6, unassoc.get(2));
 	}
 
 	public static class Dummy<D> implements NearestNeighbor<D> {
-
 		List<D> points;
 
-		public int assoc[];
+		public int[] assoc;
 		int numCalls = 0;
 
 		double distanceScale;
 
 		@Override
-		public void setPoints(List<D> points, boolean assad) {
+		public void setPoints( List<D> points, boolean assad ) {
 			this.points = points;
 		}
 
@@ -174,11 +172,11 @@ public class TestAssociateNearestNeighbor_ST extends StandardAssociateDescriptio
 		private class InternalSearch implements NearestNeighbor.Search<D> {
 
 			@Override
-			public boolean findNearest(D point, double maxDistance, NnData<D> result) {
+			public boolean findNearest( D point, double maxDistance, NnData<D> result ) {
 
 				int w = assoc[numCalls++];
 
-				if( w >= 0 ) {
+				if (w >= 0) {
 					result.index = w;
 					result.point = points.get(w);
 					return true;
@@ -188,11 +186,11 @@ public class TestAssociateNearestNeighbor_ST extends StandardAssociateDescriptio
 			}
 
 			@Override
-			public void findNearest(D point, double maxDistance, int numNeighbors, DogArray<NnData<D>> result) {
+			public void findNearest( D point, double maxDistance, int numNeighbors, DogArray<NnData<D>> result ) {
 				result.reset();
 				int w = assoc[numCalls];
 
-				if( w >= 0 ) {
+				if (w >= 0) {
 					NnData r1 = result.grow();
 					r1.index = w;
 					r1.point = points.get(w);
@@ -205,5 +203,4 @@ public class TestAssociateNearestNeighbor_ST extends StandardAssociateDescriptio
 			}
 		}
 	}
-
 }

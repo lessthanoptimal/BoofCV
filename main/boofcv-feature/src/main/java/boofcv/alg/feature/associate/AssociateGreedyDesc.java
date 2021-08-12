@@ -39,7 +39,6 @@ import org.ddogleg.struct.FastAccess;
  * </p>
  *
  * @param <D> Feature description type.
- *
  * @author Peter Abeles
  */
 @SuppressWarnings({"Duplicates"})
@@ -49,7 +48,7 @@ public class AssociateGreedyDesc<D> extends AssociateGreedyDescBase<D> {
 	 *
 	 * @param score Computes the association score.
 	 */
-	public AssociateGreedyDesc(ScoreAssociation<D> score) {
+	public AssociateGreedyDesc( ScoreAssociation<D> score ) {
 		super(score);
 	}
 
@@ -60,54 +59,53 @@ public class AssociateGreedyDesc<D> extends AssociateGreedyDescBase<D> {
 	 * @param dst Destination list.
 	 */
 	@Override
-	public void associate(final FastAccess<D> src , final FastAccess<D> dst )
-	{
-		setupForAssociate(src.size,dst.size);
+	public void associate( final FastAccess<D> src, final FastAccess<D> dst ) {
+		setupForAssociate(src.size, dst.size);
 
 		final double ratioTest = this.ratioTest;
 
 		//CONCURRENT_BELOW BoofConcurrency.loopFor(0, src.size, i -> {
-		for( int i = 0; i < src.size; i++ ) {
+		for (int i = 0; i < src.size; i++) {
 			D a = src.data[i];
 			double bestScore = maxFitError;
 			double secondBest = bestScore;
 			int bestIndex = -1;
 
 			final int workIdx = i*dst.size;
-			for( int j = 0; j < dst.size; j++ ) {
+			for (int j = 0; j < dst.size; j++) {
 				D b = dst.data[j];
 
-				double fit = score.score(a,b);
-				scoreMatrix.set(workIdx+j,fit);
+				double fit = score.score(a, b);
+				scoreMatrix.set(workIdx + j, fit);
 
-				if( fit <= bestScore ) {
+				if (fit <= bestScore) {
 					bestIndex = j;
 					secondBest = bestScore;
 					bestScore = fit;
 				}
 			}
 
-			if( ratioTest < 1.0 && bestIndex != -1 && bestScore != 0.0 ) {
+			if (ratioTest < 1.0 && bestIndex != -1 && bestScore != 0.0) {
 				// the second best could lie after the best was seen
-				for (int j = bestIndex+1; j < dst.size; j++) {
-					double fit = scoreMatrix.get(workIdx+j);
-					if( fit < secondBest ) {
+				for (int j = bestIndex + 1; j < dst.size; j++) {
+					double fit = scoreMatrix.get(workIdx + j);
+					if (fit < secondBest) {
 						secondBest = fit;
 					}
 				}
-				pairs.set(i,secondBest*ratioTest >= bestScore ? bestIndex : -1);
+				pairs.set(i, secondBest*ratioTest >= bestScore ? bestIndex : -1);
 			} else {
-				pairs.set(i,bestIndex);
+				pairs.set(i, bestIndex);
 			}
 
-			fitQuality.set(i,bestScore);
+			fitQuality.set(i, bestScore);
 		}
 		//CONCURRENT_ABOVE });
 
-		if( backwardsValidation ) {
+		if (backwardsValidation) {
 			//CONCURRENT_BELOW BoofConcurrency.loopFor(0, src.size, i -> {
-			for( int i = 0; i < src.size; i++ ) {
-				forwardsBackwards(i,src.size,dst.size);
+			for (int i = 0; i < src.size; i++) {
+				forwardsBackwards(i, src.size, dst.size);
 			}
 			//CONCURRENT_ABOVE });
 		}

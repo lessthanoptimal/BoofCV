@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -42,14 +42,14 @@ class TestAssociateGreedyBruteForce2D extends GenericAssociateGreedyChecks {
 		var alg = new AssociateGreedyBruteForce2D<>(score, new AssociateImageDistanceEuclideanSq());
 		// it should now be equivalent
 		alg.maxDistanceLength.setTo(ConfigLength.fixed(Double.MAX_VALUE));
-		alg.init(100,100);
+		alg.init(100, 100);
 		return alg;
 	}
 
 	@Override
-	protected void associate(AssociateGreedyBase<TupleDesc_F64> _alg,
-							 FastAccess<TupleDesc_F64> src,
-							 FastAccess<TupleDesc_F64> dst) {
+	protected void associate( AssociateGreedyBase<TupleDesc_F64> _alg,
+							  FastAccess<TupleDesc_F64> src,
+							  FastAccess<TupleDesc_F64> dst ) {
 		var alg = (AssociateGreedyBruteForce2D<TupleDesc_F64>)_alg;
 
 		// Dummy Values
@@ -59,15 +59,14 @@ class TestAssociateGreedyBruteForce2D extends GenericAssociateGreedyChecks {
 		for (int i = 0; i < src.size; i++) {locSrc.grow();}
 		for (int i = 0; i < dst.size; i++) {locDst.grow();}
 
-		alg.setSource(locSrc,src);
-		alg.setDestination(locDst,dst);
+		alg.setSource(locSrc, src);
+		alg.setDestination(locDst, dst);
 		alg.associate();
 	}
 
-	@Test
-	void isMaxDistanceRespected() {
-		var descSrc = createData(1,2,3,4,5,6,7,8,9,10);
-		var descDst = createData(1,2,3,4,5,6,7,8,9,10,11);
+	@Test void isMaxDistanceRespected() {
+		var descSrc = createData(1, 2, 3, 4, 5, 6, 7, 8, 9, 10);
+		var descDst = createData(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11);
 
 		var locSrc = new DogArray<>(Point2D_F64::new);
 		var locDst = new DogArray<>(Point2D_F64::new);
@@ -77,34 +76,34 @@ class TestAssociateGreedyBruteForce2D extends GenericAssociateGreedyChecks {
 
 		double d = 10.0;
 		for (int i = 0; i < 4; i++) {
-			locDst.get(i).setTo(d,0);
+			locDst.get(i).setTo(d, 0);
 		}
 
 		var alg = new AssociateGreedyBruteForce2D<>(score, new AssociateImageDistanceEuclideanSq());
 		alg.setMaxFitError(0.1); // limit what it can be matched to to make testing easier
-		alg.setSource(locSrc,descSrc);
-		alg.setDestination(locDst,descDst);
+		alg.setSource(locSrc, descSrc);
+		alg.setDestination(locDst, descDst);
 
 		// very clear separation
 		alg.maxDistanceUnits = d*d/2;
 		alg.associate();
-		assertEquals(6,countMatches(alg.getPairs()));
+		assertEquals(6, countMatches(alg.getPairs()));
 
 		// everything should be matched
 		alg.maxDistanceUnits = d*d*2;
 		alg.associate();
-		assertEquals(10,countMatches(alg.getPairs()));
+		assertEquals(10, countMatches(alg.getPairs()));
 
 		// test that threshold is inclusive
 		alg.maxDistanceUnits = d*d;
 		alg.associate();
-		assertEquals(10,countMatches(alg.getPairs()));
+		assertEquals(10, countMatches(alg.getPairs()));
 	}
 
-	private int countMatches(DogArray_I32 pairs) {
+	private int countMatches( DogArray_I32 pairs ) {
 		int total = 0;
 		for (int i = 0; i < pairs.size; i++) {
-			if( pairs.data[i] >= 0 )
+			if (pairs.data[i] >= 0)
 				total++;
 		}
 		return total;

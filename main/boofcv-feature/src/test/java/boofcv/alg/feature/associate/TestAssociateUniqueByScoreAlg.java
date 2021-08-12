@@ -34,79 +34,79 @@ public class TestAssociateUniqueByScoreAlg extends BoofStandardJUnit {
 	DogArray<AssociatedIndex> matches = new DogArray<>(AssociatedIndex::new);
 
 	@Test void checkSource() {
-		AssociateUniqueByScoreAlg alg = new AssociateUniqueByScoreAlg(MatchScoreType.NORM_ERROR,true,false);
+		AssociateUniqueByScoreAlg alg = new AssociateUniqueByScoreAlg(MatchScoreType.NORM_ERROR, true, false);
 
 		// all unique matches, no change
 		matches.reset();
-		add(0,0,5);
-		add(1,2,4);
-		add(3,1,6);
-		alg.process(matches,5,6);
-		assertEquals(3,alg.getMatches().size);
+		add(0, 0, 5);
+		add(1, 2, 4);
+		add(3, 1, 6);
+		alg.process(matches, 5, 6);
+		assertEquals(3, alg.getMatches().size);
 
 		// one good match
 		matches.reset();
 		add(0, 0, 5);
 		add(0, 1, 6);
-		alg.process(matches,5,6);
-		assertEquals(1,alg.getMatches().size);
-		assertEquals(0,alg.getMatches().get(0).dst);
+		alg.process(matches, 5, 6);
+		assertEquals(1, alg.getMatches().size);
+		assertEquals(0, alg.getMatches().get(0).dst);
 
 		// two equal matches, ignore results
 		matches.reset();
 		add(0, 0, 5);
 		add(0, 1, 5);
-		alg.process(matches,5,6);
+		alg.process(matches, 5, 6);
 		assertEquals(0, alg.getMatches().size);
 	}
 
 	@Test void checkDestination() {
-		AssociateUniqueByScoreAlg alg = new AssociateUniqueByScoreAlg(MatchScoreType.NORM_ERROR,false,true);
+		AssociateUniqueByScoreAlg alg = new AssociateUniqueByScoreAlg(MatchScoreType.NORM_ERROR, false, true);
 
 		// all unique matches, no change
 		matches.reset();
-		add(0,0,5);
-		add(2,1,4);
-		add(1,3,6);
-		alg.process(matches,5,6);
-		assertEquals(3,alg.getMatches().size);
+		add(0, 0, 5);
+		add(2, 1, 4);
+		add(1, 3, 6);
+		alg.process(matches, 5, 6);
+		assertEquals(3, alg.getMatches().size);
 
 		// one good match
 		matches.reset();
 		add(0, 0, 5);
 		add(1, 0, 6);
-		alg.process(matches,5,6);
-		assertEquals(1,alg.getMatches().size);
-		assertEquals(0,alg.getMatches().get(0).src);
+		alg.process(matches, 5, 6);
+		assertEquals(1, alg.getMatches().size);
+		assertEquals(0, alg.getMatches().get(0).src);
 
 		// two equal matches, ignore results
 		matches.reset();
 		add(0, 0, 5);
 		add(1, 0, 5);
-		alg.process(matches,5,6);
-		assertEquals(0,alg.getMatches().size);
+		alg.process(matches, 5, 6);
+		assertEquals(0, alg.getMatches().size);
 	}
 
 	@Test void checkBoth() {
-		AssociateUniqueByScoreAlg alg = new AssociateUniqueByScoreAlg(MatchScoreType.NORM_ERROR,true,true);
+		AssociateUniqueByScoreAlg alg = new AssociateUniqueByScoreAlg(MatchScoreType.NORM_ERROR, true, true);
 
 		// all unique matches, no change
 		matches.reset();
-		add(0,0,5);
-		add(1,2,4);
-		add(3,1,6);
-		alg.process(matches,5,6);
-		assertEquals(3,alg.getMatches().size);
+		add(0, 0, 5);
+		add(1, 2, 4);
+		add(3, 1, 6);
+		alg.process(matches, 5, 6);
+		assertEquals(3, alg.getMatches().size);
 
 		// one good match in each direction
 		matches.reset();
 		add(0, 0, 5);
 		add(0, 1, 6);
 		add(1, 0, 7);
-		alg.process(matches,5,6);
-		assertEquals(1,alg.getMatches().size);
-		assertEquals(0,alg.getMatches().get(0).src);
-		assertEquals(0,alg.getMatches().get(0).dst);
+		alg.process(matches, 5, 6);
+		assertEquals(1, alg.getMatches().size);
+		assertEquals(0, alg.getMatches().get(0).src);
+		assertEquals(0, alg.getMatches().get(0).dst);
 
 		// two equal matches, ignore results
 		matches.reset();
@@ -114,11 +114,11 @@ public class TestAssociateUniqueByScoreAlg extends BoofStandardJUnit {
 		add(0, 1, 5);
 		add(2, 2, 7);
 		add(3, 2, 7);
-		alg.process(matches,5,6);
-		assertEquals(0,alg.getMatches().size);
+		alg.process(matches, 5, 6);
+		assertEquals(0, alg.getMatches().size);
 	}
 
-	private void add( int src , int dst , double score ) {
-		matches.grow().setTo(src,dst,score);
+	private void add( int src, int dst, double score ) {
+		matches.grow().setTo(src, dst, score);
 	}
 }

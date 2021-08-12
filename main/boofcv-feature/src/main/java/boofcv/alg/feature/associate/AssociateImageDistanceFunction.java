@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -26,6 +26,7 @@ import georegression.struct.point.Point2D_F64;
 public interface AssociateImageDistanceFunction {
 	/**
 	 * The source point which the distance is computed relative to
+	 *
 	 * @param index Index in the source list
 	 * @param pixel pixel value
 	 */
@@ -33,10 +34,11 @@ public interface AssociateImageDistanceFunction {
 
 	/**
 	 * Distance from the source
+	 *
 	 * @param index Index in dst list
 	 * @param pixel pixel value
 	 */
-	double distance( int index , Point2D_F64 pixel );
+	double distance( int index, Point2D_F64 pixel );
 
 	/** Copy for concurrency. All functions must be thread safe */
 	AssociateImageDistanceFunction copyConcurrent();

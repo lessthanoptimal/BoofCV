@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -26,8 +26,8 @@ import org.ddogleg.struct.FastAccess;
  *
  * @author Peter Abeles
  */
-public abstract class AssociateGreedyDescBase<D> extends AssociateGreedyBase<D>{
-	AssociateGreedyDescBase(ScoreAssociation<D> score) {
+public abstract class AssociateGreedyDescBase<D> extends AssociateGreedyBase<D> {
+	AssociateGreedyDescBase( ScoreAssociation<D> score ) {
 		super(score);
 	}
 
@@ -37,6 +37,5 @@ public abstract class AssociateGreedyDescBase<D> extends AssociateGreedyBase<D>{
 	 * @param src Source list.
 	 * @param dst Destination list.
 	 */
-	public abstract void associate(FastAccess<D> src , FastAccess<D> dst );
-
+	public abstract void associate( FastAccess<D> src, FastAccess<D> dst );
 }

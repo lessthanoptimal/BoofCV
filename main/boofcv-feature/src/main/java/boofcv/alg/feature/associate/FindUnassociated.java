@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -37,22 +37,21 @@ public class FindUnassociated {
 	DogArray_B matched = new DogArray_B();
 
 	/**
-	 *
 	 * @param matches List of matched features
 	 * @param featureCount Number of source features
 	 * @return indexes of unassociated features from source
 	 */
-	public DogArray_I32 checkSource(FastAccess<AssociatedIndex> matches , int featureCount ) {
+	public DogArray_I32 checkSource( FastAccess<AssociatedIndex> matches, int featureCount ) {
 		matched.resize(featureCount);
 		matched.fill(false);
 
-		for( int i = 0; i < matches.size; i++ ) {
+		for (int i = 0; i < matches.size; i++) {
 			matched.data[matches.get(i).src] = true;
 		}
 
 		unassociatedSrc.reset();
-		for( int i = 0; i < featureCount; i++ ) {
-			if( !matched.data[i] ) {
+		for (int i = 0; i < featureCount; i++) {
+			if (!matched.data[i]) {
 				unassociatedSrc.add(i);
 			}
 		}
@@ -60,22 +59,21 @@ public class FindUnassociated {
 	}
 
 	/**
-	 *
 	 * @param matches List of matched features
 	 * @param featureCount Number of destination features
 	 * @return indexes of unassociated features from destination
 	 */
-	public DogArray_I32 checkDestination( FastAccess<AssociatedIndex> matches , final int featureCount ) {
+	public DogArray_I32 checkDestination( FastAccess<AssociatedIndex> matches, final int featureCount ) {
 		matched.resize(featureCount);
 		matched.fill(false);
 
-		for( int i = 0; i < matches.size; i++ ) {
+		for (int i = 0; i < matches.size; i++) {
 			matched.data[matches.get(i).dst] = true;
 		}
 
 		unassociatedDst.reset();
-		for( int i = 0; i < featureCount; i++ ) {
-			if( !matched.data[i] ) {
+		for (int i = 0; i < featureCount; i++) {
+			if (!matched.data[i]) {
 				unassociatedDst.add(i);
 			}
 		}

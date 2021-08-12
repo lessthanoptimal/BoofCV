@@ -38,15 +38,14 @@ class TestAssociateGreedyBruteForce2D_MT extends BoofStandardJUnit {
 	final static int width = 100;
 	final static int height = 120;
 
-	@Test
-	void compare() {
+	@Test void compare() {
 		compare(false, 1.0);
-		compare(true , 1.0);
+		compare(true, 1.0);
 		compare(false, 0.1);
-		compare(true , 0.1);
+		compare(true, 0.1);
 	}
 
-	void compare( boolean backwards , double ratioTest ) {
+	void compare( boolean backwards, double ratioTest ) {
 		DogArray<TupleDesc_F64> descSrc = createData(200);
 		DogArray<TupleDesc_F64> descDst = createData(200);
 		DogArray<Point2D_F64> pointsSrc = createPoints(200);
@@ -55,9 +54,9 @@ class TestAssociateGreedyBruteForce2D_MT extends BoofStandardJUnit {
 
 		var distance = new AssociateImageDistanceEuclideanSq();
 
-		var sequentialAlg = new AssociateGreedyBruteForce2D<>( new ScoreAssociateEuclidean_F64(),distance);
-		sequentialAlg.init(width,height);
-		sequentialAlg.maxDistanceLength.setTo(ConfigLength.relative(0.25,6));
+		var sequentialAlg = new AssociateGreedyBruteForce2D<>(new ScoreAssociateEuclidean_F64(), distance);
+		sequentialAlg.init(width, height);
+		sequentialAlg.maxDistanceLength.setTo(ConfigLength.relative(0.25, 6));
 		sequentialAlg.backwardsValidation = backwards;
 		sequentialAlg.setRatioTest(ratioTest);
 		sequentialAlg.setMaxFitError(0.5);
@@ -65,9 +64,9 @@ class TestAssociateGreedyBruteForce2D_MT extends BoofStandardJUnit {
 		sequentialAlg.setDestination(pointsDst, descDst);
 		sequentialAlg.associate();
 
-		var parallelAlg = new AssociateGreedyBruteForce2D_MT<>( new ScoreAssociateEuclidean_F64(),distance);
-		parallelAlg.init(width,height);
-		parallelAlg.maxDistanceLength.setTo(ConfigLength.relative(0.25,6));
+		var parallelAlg = new AssociateGreedyBruteForce2D_MT<>(new ScoreAssociateEuclidean_F64(), distance);
+		parallelAlg.init(width, height);
+		parallelAlg.maxDistanceLength.setTo(ConfigLength.relative(0.25, 6));
 		parallelAlg.backwardsValidation = backwards;
 		parallelAlg.setRatioTest(ratioTest);
 		parallelAlg.setMaxFitError(0.5);
@@ -80,30 +79,28 @@ class TestAssociateGreedyBruteForce2D_MT extends BoofStandardJUnit {
 		double[] quality0 = sequentialAlg.getFitQuality().data;
 		double[] quality1 = parallelAlg.getFitQuality().data;
 
-		assertEquals(pairs0.length,pairs1.length);
+		assertEquals(pairs0.length, pairs1.length);
 
 		for (int i = 0; i < pairs0.length; i++) {
-			assertEquals(pairs0[i],pairs1[i]);
-			assertEquals(quality0[i],quality1[i]);
+			assertEquals(pairs0[i], pairs1[i]);
+			assertEquals(quality0[i], quality1[i]);
 		}
 	}
 
-	public static DogArray<TupleDesc_F64> createData( int count )
-	{
+	public static DogArray<TupleDesc_F64> createData( int count ) {
 		Random rand = new Random(234);
-		DogArray<TupleDesc_F64> ret = new DogArray<>(count,()-> new TupleDesc_F64(1));
-		for( int i = 0; i < count; i++ ) {
+		DogArray<TupleDesc_F64> ret = new DogArray<>(count, () -> new TupleDesc_F64(1));
+		for (int i = 0; i < count; i++) {
 			ret.grow().setTo(rand.nextDouble()*10);
 		}
 		return ret;
 	}
 
-	public static DogArray<Point2D_F64> createPoints(int count )
-	{
+	public static DogArray<Point2D_F64> createPoints( int count ) {
 		Random rand = new Random(234);
-		DogArray<Point2D_F64> ret = new DogArray<>(count,Point2D_F64::new);
-		for( int i = 0; i < count; i++ ) {
-			ret.grow().setTo(rand.nextDouble()*width,rand.nextDouble()*height);
+		DogArray<Point2D_F64> ret = new DogArray<>(count, Point2D_F64::new);
+		for (int i = 0; i < count; i++) {
+			ret.grow().setTo(rand.nextDouble()*width, rand.nextDouble()*height);
 		}
 		return ret;
 	}

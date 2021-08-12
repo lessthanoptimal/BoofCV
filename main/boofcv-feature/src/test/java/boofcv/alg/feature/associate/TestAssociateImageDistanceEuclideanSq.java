@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -29,8 +29,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
  * @author Peter Abeles
  */
 class TestAssociateImageDistanceEuclideanSq extends BoofStandardJUnit {
-	@Test
-	void checkDistance() {
+	@Test void checkDistance() {
 		var alg = new AssociateImageDistanceEuclideanSq();
 		alg.setSource(-1, new Point2D_F64(5, 7));
 		double expected = UtilPoint2D_F64.distanceSq(5, 7, 10, 1.5);
