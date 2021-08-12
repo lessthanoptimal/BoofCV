@@ -408,7 +408,6 @@ public abstract class GenericFiducialDetectorChecks extends BoofStandardJUnit {
 		CameraPinholeBrown intrinsic = loadDistortion(false);
 		LensDistortionBrown lensDistorted = new LensDistortionBrown(intrinsic);
 		for( ImageType type : types ) {
-
 			ImageBase image = renderImage(intrinsic,type);
 			FiducialDetector detector = createDetector(type);
 			detector.setLensDistortion(lensDistorted,image.width,image.height);
@@ -432,7 +431,7 @@ public abstract class GenericFiducialDetectorChecks extends BoofStandardJUnit {
 				worldToPixel.transform(new Point3D_F64(0,0,0),rendered);
 
 				// see if the reprojected is near the pixel location
-				assertTrue( rendered.distance(found) <= pixelAndProjectedTol);
+				assertEquals( 0.0, rendered.distance(found), pixelAndProjectedTol);
 			}
 		}
 	}

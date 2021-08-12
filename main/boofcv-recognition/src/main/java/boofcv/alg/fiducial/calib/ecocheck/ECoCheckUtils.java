@@ -24,6 +24,7 @@ import boofcv.struct.GridShape;
 import boofcv.struct.geo.AssociatedPair;
 import georegression.geometry.GeometryMath_F64;
 import georegression.struct.point.Point2D_F64;
+import georegression.struct.point.Point3D_F64;
 import georegression.struct.shapes.Rectangle2D_F64;
 import lombok.Getter;
 import lombok.Setter;
@@ -252,5 +253,32 @@ public class ECoCheckUtils {
 			total += (grid.cols - 1)/2;
 
 		return total;
+	}
+
+	/**
+	 * Converts a corner ID into a marker ID. The origin of the marker's coordinate system will be the marker's center.
+	 * Coordinates will range from -0.5 to 0.5. The length of the longest side will be 1.0.
+	 *
+	 * @param markerID Which marker
+	 * @param cornerID Which corner
+	 * @param coordinate (Output) Coordinate in the coordinate system described above
+	 */
+	public void cornerToMarker3D( int markerID, int cornerID, Point3D_F64 coordinate ) {
+		GridShape grid = markers.get(markerID);
+		double squareToUnit = 1.0/(Math.max(grid.cols, grid.rows) - 1);
+
+		// size of square grid
+		double width = (grid.cols - 1)*squareToUnit;
+		double height = (grid.rows - 1)*squareToUnit;
+
+		int row = cornerID/(grid.cols - 1);
+		int col = cornerID%(grid.cols - 1);
+
+		coordinate.x = (0.5 + col)*squareToUnit - width/2.0;
+		coordinate.y = (0.5 + row)*squareToUnit - height/2.0;
+		coordinate.z = 0;
+
+		// normally +y is up and not down like in images
+		coordinate.y *= -1.0;
 	}
 }
