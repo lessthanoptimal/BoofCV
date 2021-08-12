@@ -33,7 +33,8 @@ import java.util.List;
  * @author Peter Abeles
  */
 public class MultiToSingleFiducialCalibration implements DetectSingleFiducialCalibration {
-	DetectMultiFiducialCalibration alg;
+	/** The algorithm it's wrapping */
+	@Getter DetectMultiFiducialCalibration multi;
 
 	/** Specifies which marker it will return. All other markers will be ignored */
 	@Getter @Setter int targetMarker = 0;
@@ -42,15 +43,15 @@ public class MultiToSingleFiducialCalibration implements DetectSingleFiducialCal
 	private int detectedID;
 
 	public MultiToSingleFiducialCalibration( DetectMultiFiducialCalibration alg ) {
-		this.alg = alg;
+		this.multi = alg;
 	}
 
 	@Override public boolean process( GrayF32 input ) {
-		alg.process(input);
+		multi.process(input);
 
 		detectedID = -1;
-		for (int i = 0; i < alg.getDetectionCount(); i++) {
-			if (alg.getMarkerID(i) == targetMarker) {
+		for (int i = 0; i < multi.getDetectionCount(); i++) {
+			if (multi.getMarkerID(i) == targetMarker) {
 				detectedID = i;
 				break;
 			}
@@ -60,14 +61,14 @@ public class MultiToSingleFiducialCalibration implements DetectSingleFiducialCal
 	}
 
 	@Override public CalibrationObservation getDetectedPoints() {
-		return alg.getDetectedPoints(detectedID);
+		return multi.getDetectedPoints(detectedID);
 	}
 
 	@Override public List<Point2D_F64> getLayout() {
-		return alg.getLayout(targetMarker);
+		return multi.getLayout(targetMarker);
 	}
 
 	@Override public void setLensDistortion( LensDistortionNarrowFOV distortion, int width, int height ) {
-		alg.setLensDistortion(distortion, width, height);
+		multi.setLensDistortion(distortion, width, height);
 	}
 }

@@ -267,15 +267,21 @@ public class ECoCheckUtils {
 		GridShape grid = markers.get(markerID);
 		double squareToUnit = 1.0/(Math.max(grid.cols, grid.rows) - 1);
 
+		cornerToMarker3D(markerID, cornerID, squareToUnit, coordinate);
+	}
+
+	public void cornerToMarker3D( int markerID, int cornerID, double squareLength, Point3D_F64 coordinate ) {
+		GridShape grid = markers.get(markerID);
+
 		// size of square grid
-		double width = (grid.cols - 1)*squareToUnit;
-		double height = (grid.rows - 1)*squareToUnit;
+		double width = (grid.cols - 1)*squareLength;
+		double height = (grid.rows - 1)*squareLength;
 
 		int row = cornerID/(grid.cols - 1);
 		int col = cornerID%(grid.cols - 1);
 
-		coordinate.x = (0.5 + col)*squareToUnit - width/2.0;
-		coordinate.y = (0.5 + row)*squareToUnit - height/2.0;
+		coordinate.x = (0.5 + col)*squareLength - width/2.0;
+		coordinate.y = (0.5 + row)*squareLength - height/2.0;
 		coordinate.z = 0;
 
 		// normally +y is up and not down like in images

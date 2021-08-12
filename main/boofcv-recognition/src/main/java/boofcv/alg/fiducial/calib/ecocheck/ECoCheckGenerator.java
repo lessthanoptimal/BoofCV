@@ -85,8 +85,8 @@ public class ECoCheckGenerator {
 	// Data can be embedded in the white or black squares inside the chessboard pattern. When put inside of the black
 	// squares it reduces the effective range of the chessboard detection algorithm by a significant amount.
 
-	/** How wide a square is in the chessboard */
-	public @Setter @Getter double squareWidth;
+	/** How wide a checkerboard square is */
+	public @Setter @Getter double squareWidth = 1.0;
 
 	final ECoCheckUtils utils;
 

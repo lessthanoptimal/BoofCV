@@ -21,19 +21,20 @@ package boofcv.abst.fiducial.calib;
 import boofcv.abst.geo.calibration.DetectMultiFiducialCalibration;
 import boofcv.alg.distort.LensDistortionNarrowFOV;
 import boofcv.alg.fiducial.calib.ecocheck.ECoCheckDetector;
+import boofcv.alg.fiducial.calib.ecocheck.ECoCheckUtils;
 import boofcv.alg.geo.calibration.CalibrationObservation;
-import boofcv.struct.GridShape;
 import boofcv.struct.geo.PointIndex2D_F64;
 import boofcv.struct.image.GrayF32;
 import boofcv.struct.image.ImageDimension;
 import georegression.struct.point.Point2D_F64;
+import georegression.struct.point.Point3D_F64;
 import gnu.trove.map.TIntObjectMap;
 import gnu.trove.map.hash.TIntObjectHashMap;
+import lombok.Getter;
 import org.ddogleg.struct.FastAccess;
 
+import java.util.ArrayList;
 import java.util.List;
-
-import static boofcv.abst.fiducial.calib.CalibrationDetectorChessboardX.gridChess;
 
 /**
  * Implementation of {@link DetectMultiFiducialCalibration} for {@link ECoCheckDetector}.
@@ -41,10 +42,11 @@ import static boofcv.abst.fiducial.calib.CalibrationDetectorChessboardX.gridChes
  * @author Peter Abeles
  */
 public class CalibrationDetectorMultiECoCheck implements DetectMultiFiducialCalibration {
-	ECoCheckDetector<GrayF32> detector;
+	/** The ECoCheck detector */
+	@Getter ECoCheckDetector<GrayF32> detector;
 
-	// Length of a square
-	double squareLength;
+	/** Description of the types of markers it can detect */
+	@Getter List<ConfigECoCheckMarkers.MarkerShape> markers;
 
 	// Dimension of the most recently processed image
 	ImageDimension dimension = new ImageDimension();
@@ -53,9 +55,9 @@ public class CalibrationDetectorMultiECoCheck implements DetectMultiFiducialCali
 	TIntObjectMap<List<Point2D_F64>> cacheLayouts = new TIntObjectHashMap<>();
 
 	public CalibrationDetectorMultiECoCheck( ECoCheckDetector<GrayF32> detector,
-											 double squareLength ) {
+											 List<ConfigECoCheckMarkers.MarkerShape> markers ) {
 		this.detector = detector;
-		this.squareLength = squareLength;
+		this.markers = markers;
 	}
 
 	@Override public void process( GrayF32 input ) {
@@ -93,9 +95,18 @@ public class CalibrationDetectorMultiECoCheck implements DetectMultiFiducialCali
 		if (layout != null)
 			return layout;
 
-		GridShape shape = detector.getUtils().markers.get(markerID);
+		ECoCheckUtils utils = detector.getUtils();
+		ConfigECoCheckMarkers.MarkerShape shape = markers.get(markerID);
 
-		layout = gridChess(shape.rows, shape.cols, squareLength);
+		// Create a list of points that defines the layout
+		Point3D_F64 p = new Point3D_F64();
+		layout = new ArrayList<>();
+		int numCorners = shape.getNumCorners();
+		for (int cornerID = 0; cornerID < numCorners; cornerID++) {
+			utils.cornerToMarker3D(markerID, cornerID, shape.squareSize, p);
+			layout.add(cornerID, new Point2D_F64(p.x, p.y));
+		}
+
 		cacheLayouts.put(markerID, layout);
 
 		return layout;
