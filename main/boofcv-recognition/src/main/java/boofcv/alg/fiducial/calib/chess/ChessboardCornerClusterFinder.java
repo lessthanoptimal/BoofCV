@@ -91,7 +91,8 @@ public class ChessboardCornerClusterFinder<T extends ImageGray<T>> implements Ve
 	// Number of nearest neighbors it will search. It's assumed that the feature detector does a very
 	// good job removing false positives, meaning that tons of features do not need to be considered
 	private @Getter @Setter int maxNeighbors = 14; // 8 is minimum number given perfect data.
-	private @Getter @Setter double maxNeighborDistance = Double.MAX_VALUE; // maximum distance away (pixels Euclidean squared) a neighbor can be
+	private @Getter @Setter
+	double maxNeighborDistance = Double.MAX_VALUE; // maximum distance away (pixels Euclidean squared) a neighbor can be
 
 	/** Computes the intensity of the line which connects two corners */
 	private @Getter final ChessboardCornerEdgeIntensity<T> computeConnInten;
@@ -335,7 +336,7 @@ public class ChessboardCornerClusterFinder<T extends ImageGray<T>> implements Ve
 
 		for (Vertex n : vertexes.toList()) { // lint:forbidden ignore_line
 			ChessboardCorner c = corners.get(n.index);
-			verbose.printf("[" + format + "] {%3.0f, %3.0f} ->  90[ ", n.index, c.x, c.y);
+			verbose.printf("[" + format + "] px(%3.0f, %3.0f) ->  90[ ", n.index, c.x, c.y);
 			for (int i = 0; i < n.perpendicular.size(); i++) {
 				Edge e = n.perpendicular.get(i);
 				verbose.printf(format + " ", e.dst.index);
@@ -351,7 +352,7 @@ public class ChessboardCornerClusterFinder<T extends ImageGray<T>> implements Ve
 
 		for (Vertex n : vertexes.toList()) { // lint:forbidden ignore_line
 			ChessboardCorner c = corners.get(n.index);
-			System.out.printf("[" + format + "] {%3.0f, %3.0f} -> [ ", n.index, c.x, c.y);
+			System.out.printf("[" + format + "] px(%3.0f, %3.0f) -> [ ", n.index, c.x, c.y);
 			for (int i = 0; i < n.connections.size(); i++) {
 				Edge e = n.connections.get(i);
 				System.out.printf(format + " ", e.dst.index);
@@ -592,10 +593,20 @@ public class ChessboardCornerClusterFinder<T extends ImageGray<T>> implements Ve
 		if (target.perpendicular.size() <= 1)
 			return;
 
+		// NOTE: What this should do is select one perpendicular, then find all the remaining. Score then as a group
+
+		// Find max intensity of all the edges
+		// It's extremely unlikely that a false positive would have a high edge score
+		double maxIntensity = 0.0;
+		for (int i = 0; i < target.perpendicular.size(); i++) {
+			maxIntensity = Math.max(maxIntensity, target.perpendicular.get(i).line.intensity);
+		}
+
 		// go through each connection and select the one which should come after it
 		pairs.reset();
 		for (int i = 0; i < target.perpendicular.size(); i++) {
-			selectNext(target, i, target.perpendicular, pairs.grow());
+			// NOTE: Return value intentionally ignored since pairs needs to match up with pair indexes
+			selectNext(target, maxIntensity, i, target.perpendicular, pairs.grow());
 		}
 
 		// Select the sequence which the largest score
@@ -638,7 +649,7 @@ public class ChessboardCornerClusterFinder<T extends ImageGray<T>> implements Ve
 		}
 	}
 
-	boolean selectNext( Vertex target, int idx0, EdgeSet connections, PairIdx output ) {
+	boolean selectNext( Vertex target, double maxIntensity, int idx0, EdgeSet connections, PairIdx output ) {
 
 		output.idx0 = idx0;
 		output.idx1 = -1;
@@ -669,6 +680,8 @@ public class ChessboardCornerClusterFinder<T extends ImageGray<T>> implements Ve
 			}
 		}
 
+		output.score *= 0.1 + edge0.line.intensity/maxIntensity;
+
 		return output.score > 0;
 	}
 
@@ -679,6 +692,10 @@ public class ChessboardCornerClusterFinder<T extends ImageGray<T>> implements Ve
 		double distA = tgt.perpendicular.get(idxA).line.distance;
 		double angleB = tgt.perpendicular.get(idxB).direction;
 		double distB = tgt.perpendicular.get(idxB).line.distance;
+
+		// TODO break ties with intensity
+//		double intensityA = tgt.perpendicular.get(idxA).line.intensity;
+//		double intensityB = tgt.perpendicular.get(idxA).line.intensity;
 
 		ChessboardCorner targetCorner = corners.get(tgt.index);
 		ChessboardCorner commonCorner = corners.get(common.index);
@@ -894,16 +911,12 @@ public class ChessboardCornerClusterFinder<T extends ImageGray<T>> implements Ve
 
 	@Override
 	public void setVerbose( @Nullable PrintStream out, @Nullable Set<String> configuration ) {
-		this.verbose = out;
+		this.verbose = BoofMiscOps.addPrefix(this, out);
 	}
 
 	public static class SearchResults {
 		public int index;
 		public double error;
-	}
-
-	public static class TupleI32 {
-		public int a, b, c;
 	}
 
 	/**
@@ -922,7 +935,7 @@ public class ChessboardCornerClusterFinder<T extends ImageGray<T>> implements Ve
 		public EdgeSet perpendicular = new EdgeSet();
 
 		/**
-		 * Final set of edfes which it was decided that this vertex is connected to. Will have 2 to 4 elements.
+		 * Final set of edges which it was decided that this vertex is connected to. Will have 2 to 4 elements.
 		 */
 		public EdgeSet connections = new EdgeSet();
 
@@ -961,6 +974,11 @@ public class ChessboardCornerClusterFinder<T extends ImageGray<T>> implements Ve
 				case PERPENDICULAR -> perpendicular;
 				case CONNECTION -> connections;
 			};
+		}
+
+		@Override
+		public String toString() {
+			return "{index=" + index + " perp.size=" + perpendicular.size() + "}";
 		}
 	}
 
