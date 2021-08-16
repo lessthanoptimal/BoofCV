@@ -1,6 +1,6 @@
 language: java
 git:
-  depth: false # All branches will be checked out allowing spotless to do its thing
+  depth: 3 # All branches will be checked out allowing spotless to do its thing
 jdk:
   - openjdk14
 install:
