@@ -36,7 +36,7 @@ import java.util.List;
 public class TestCalibrationDetectorMultiECoCheck extends GenericDetectMultiFiducialCalibrationChecks {
 
 	ConfigECoCheckDetector configDetector = new ConfigECoCheckDetector();
-	ConfigECoCheckMarkers configMarkers = ConfigECoCheckMarkers.singleShape(4, 5, 0.05, 4);
+	ConfigECoCheckMarkers configMarkers = ConfigECoCheckMarkers.singleShape(4, 5, 4, 0.05);
 	ECoCheckUtils utils = new ECoCheckUtils();
 
 	public TestCalibrationDetectorMultiECoCheck() {

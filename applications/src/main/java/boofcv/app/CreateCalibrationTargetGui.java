@@ -153,10 +153,14 @@ public class CreateCalibrationTargetGui extends JPanel
 		if (sendToPrinter) {
 			f = new File(""); // dummy to make the code below happy and less complex
 		} else {
+			String defaultName = defaultFileName()+".pdf";
 			f = FileSystemView.getFileSystemView().getHomeDirectory();
-			f = new File(f, "calibration_target.pdf");
+			f = new File(f, defaultName);
 
-			f = BoofSwingUtil.fileChooser(null, this, false, f.getPath(), null);
+			f = BoofSwingUtil.fileChooser(null, this, false, f.getPath(), path->{
+				File tmp = new File(path);
+				return new File(tmp.getParent(), defaultName).getPath();
+			});
 			if (f == null) {
 				return;
 			}
@@ -287,6 +291,27 @@ public class CreateCalibrationTargetGui extends JPanel
 		}
 
 		renderingPanel.setImageUI(renderer.getBufferred());
+	}
+
+	String defaultFileName() {
+		if (selectedType == CalibrationPatterns.CHESSBOARD) {
+			ConfigGridDimen config = (ConfigGridDimen)selectedCalib;
+			return "chessboard_"+config.numRows+"x"+config.numCols;
+		} else if (selectedType == CalibrationPatterns.SQUARE_GRID) {
+			ConfigGridDimen config = (ConfigGridDimen)selectedCalib;
+			return "squaregrid_"+config.numRows+"x"+config.numCols;
+		} else if (selectedType == CalibrationPatterns.CIRCLE_GRID) {
+			ConfigGridDimen config = (ConfigGridDimen)selectedCalib;
+			return "circlegrid_"+config.numRows+"x"+config.numCols;
+		} else if (selectedType == CalibrationPatterns.CIRCLE_HEXAGONAL) {
+			ConfigGridDimen config = (ConfigGridDimen)selectedCalib;
+			return "circlehex_"+config.numRows+"x"+config.numCols;
+		} else if (selectedType == CalibrationPatterns.ECOCHECK) {
+			ConfigECoCheckMarkers config = (ConfigECoCheckMarkers)selectedCalib;
+			return "ecocheck_" + config.compactName();
+		} else {
+			return "calibration_target";
+		}
 	}
 
 	@Override

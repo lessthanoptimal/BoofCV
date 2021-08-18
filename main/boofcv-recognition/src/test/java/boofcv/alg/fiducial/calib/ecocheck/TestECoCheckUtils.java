@@ -30,8 +30,10 @@ import org.ejml.UtilEjml;
 import org.ejml.dense.row.CommonOps_DDRM;
 import org.junit.jupiter.api.Test;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import java.util.ArrayList;
+import java.util.List;
+
+import static org.junit.jupiter.api.Assertions.*;
 
 /**
  * @author Peter Abeles
@@ -215,5 +217,59 @@ public class TestECoCheckUtils extends BoofStandardJUnit {
 		assertEquals(0.0, p.distance((0.5 + 1 - 2.5)/5, -(0.5 + 2 - 1.5)/5, 0), UtilEjml.TEST_F64);
 		alg.cornerToMarker3D(1, 11, p);
 		assertEquals(0.0, p.distance((0.5 + 2 - 1.5)/4, -(0.5 + 3 - 2.0)/4, 0), UtilEjml.TEST_F64);
+	}
+
+	@Test void createCornerList() {
+		var alg = new ECoCheckUtils();
+		alg.addMarker(4, 6);
+		alg.addMarker(5, 6);
+
+		List<Point2D_F64> found = alg.createCornerList(1, 1.5);
+		Point3D_F64 coordinate = new Point3D_F64();
+		for (int cornerID = 0; cornerID < found.size(); cornerID++) {
+			alg.cornerToMarker3D(1, cornerID, 1.5, coordinate);
+			assertEquals(0.0, found.get(cornerID).distance(coordinate.x, coordinate.y), UtilEjml.TEST_F64);
+		}
+	}
+
+	@Test void mergeAndRemoveUnknown() {
+		var input = new ArrayList<ECoCheckFound>();
+
+		input.add(createFound(1, 5, 10));
+		input.add(createFound(0, 5, 10));
+		input.add(createFound(1, 12, 15));
+		input.add(createFound(-1, 0, 10));
+
+		List<ECoCheckFound> found = ECoCheckUtils.mergeAndRemoveUnknown(input);
+
+		assertEquals(2, found.size());
+		for (int i = 0; i < 2; i++) {
+			ECoCheckFound f = found.get(i);
+			if (f.markerID == 1) {
+				assertEquals(8, f.corners.size);
+				assertEquals(8, f.touchBinary.size);
+				assertEquals(2, f.decodedCells.size);
+			} else if (f.markerID == 0) {
+				assertEquals(5, f.corners.size);
+				assertEquals(5, f.touchBinary.size);
+				assertEquals(1, f.decodedCells.size);
+			} else {
+				fail("Unexpected ID");
+			}
+		}
+	}
+
+	private ECoCheckFound createFound( int markerID, int idx0, int idx1 ) {
+		var f = new ECoCheckFound();
+		f.markerID = markerID;
+
+		for (int i = idx0; i < idx1; i++) {
+			f.corners.grow().setTo(rand.nextDouble(), rand.nextDouble(), i);
+		}
+
+		f.touchBinary.resize(idx1 - idx0);
+		f.decodedCells.add(idx0);
+
+		return f;
 	}
 }
