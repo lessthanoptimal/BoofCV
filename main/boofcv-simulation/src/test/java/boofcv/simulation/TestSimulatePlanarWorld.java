@@ -20,6 +20,7 @@ package boofcv.simulation;
 
 import boofcv.alg.geo.PerspectiveOps;
 import boofcv.alg.geo.WorldToCameraToPixel;
+import boofcv.alg.interpolate.InterpolationType;
 import boofcv.alg.misc.GImageMiscOps;
 import boofcv.struct.calib.CameraPinhole;
 import boofcv.struct.image.GrayF32;
@@ -44,17 +45,17 @@ public class TestSimulatePlanarWorld extends BoofStandardJUnit {
 	@Test void checkApparentSize() {
 		double markerZ = 2;
 		double markerWidth = 0.5;
-		CameraPinhole pinhole = new CameraPinhole(400,400,0,300,250,600,500);
+		CameraPinhole pinhole = new CameraPinhole(400, 400, 0, 300, 250, 600, 500);
 
-		GrayF32 marker = new GrayF32(40,30);
-		GImageMiscOps.fill(marker,255);
+		GrayF32 marker = new GrayF32(40, 30);
+		GImageMiscOps.fill(marker, 255);
 
-		Se3_F64 markerToWorld = eulerXyz(0,0,markerZ,0,Math.PI,0,null);
+		Se3_F64 markerToWorld = eulerXyz(0, 0, markerZ, 0, Math.PI, 0, null);
 
 		SimulatePlanarWorld alg = new SimulatePlanarWorld();
 
 		alg.setCamera(pinhole);
-		alg.addSurface(markerToWorld,markerWidth,marker);
+		alg.addSurface(markerToWorld, markerWidth, marker);
 
 		alg.render();
 
@@ -64,60 +65,61 @@ public class TestSimulatePlanarWorld extends BoofStandardJUnit {
 		Point2D_F64 p1 = new Point2D_F64();
 		double ratio = marker.height/(double)marker.width;
 		WorldToCameraToPixel w2p = new WorldToCameraToPixel();
-		w2p.configure(pinhole,new Se3_F64());
-		assertTrue(w2p.transform(new Point3D_F64(-markerWidth/2,-ratio*markerWidth/2,markerZ),p0));
-		assertTrue(w2p.transform(new Point3D_F64(markerWidth/2,ratio*markerWidth/2,markerZ),p1));
+		w2p.configure(pinhole, new Se3_F64());
+		assertTrue(w2p.transform(new Point3D_F64(-markerWidth/2, -ratio*markerWidth/2, markerZ), p0));
+		assertTrue(w2p.transform(new Point3D_F64(markerWidth/2, ratio*markerWidth/2, markerZ), p1));
 
-		double expectedWidth = p1.x-p0.x;
-		double expectedHeight = p1.y-p0.y;
+		double expectedWidth = p1.x - p0.x;
+		double expectedHeight = p1.y - p0.y;
 
 		GrayF32 image = alg.getOutput();
 
-		assertEquals(expectedWidth,findWidth(image,image.height/2),1);
-		assertEquals(expectedWidth,findWidth(image,image.height/2-10),1);
-		assertEquals(expectedWidth,findWidth(image,image.height/2+10),1);
-		assertEquals(expectedHeight,findHeight(image,image.width/2),1);
-		assertEquals(expectedHeight,findHeight(image,image.width/2-10),1);
-		assertEquals(expectedHeight,findHeight(image,image.width/2+10),1);
+		assertEquals(expectedWidth, findWidth(image, image.height/2), 1);
+		assertEquals(expectedWidth, findWidth(image, image.height/2 - 10), 1);
+		assertEquals(expectedWidth, findWidth(image, image.height/2 + 10), 1);
+		assertEquals(expectedHeight, findHeight(image, image.width/2), 1);
+		assertEquals(expectedHeight, findHeight(image, image.width/2 - 10), 1);
+		assertEquals(expectedHeight, findHeight(image, image.width/2 + 10), 1);
 	}
 
-	public double findWidth( GrayF32 image , int row ) {
+	public double findWidth( GrayF32 image, int row ) {
 		int x0 = 0;
-		while( x0 < image.width ) {
-			if( image.get(x0,row) > 200 ) {
+		while (x0 < image.width) {
+			if (image.get(x0, row) > 200) {
 				break;
 			}
 			x0++;
 		}
 
 		int x1 = x0;
-		while( x1 < image.width ) {
-			if( image.get(x1,row) < 200 ) {
+		while (x1 < image.width) {
+			if (image.get(x1, row) < 200) {
 				break;
 			}
 			x1++;
 		}
 
-		return x1-x0+1;
+		return x1 - x0 + 1;
 	}
-	public double findHeight( GrayF32 image , int col ) {
+
+	public double findHeight( GrayF32 image, int col ) {
 		int y0 = 0;
-		while( y0 < image.height ) {
-			if( image.get(col,y0) > 200 ) {
+		while (y0 < image.height) {
+			if (image.get(col, y0) > 200) {
 				break;
 			}
 			y0++;
 		}
 
 		int y1 = y0;
-		while( y1 < image.height ) {
-			if( image.get(col,y1) < 200 ) {
+		while (y1 < image.height) {
+			if (image.get(col, y1) < 200) {
 				break;
 			}
 			y1++;
 		}
 
-		return y1-y0+1;
+		return y1 - y0 + 1;
 	}
 
 	/**
@@ -127,25 +129,24 @@ public class TestSimulatePlanarWorld extends BoofStandardJUnit {
 		checkOrientation(100, 255, 255, 255, 0);
 		checkOrientation(255, 255, 255, 100, Math.PI/2);
 		checkOrientation(255, 255, 100, 255, Math.PI);
-
 	}
 
-	private void checkOrientation(int expectedAA, int expectedAB, int expectedBB, int expectedBA, double rotZ) {
+	private void checkOrientation( int expectedAA, int expectedAB, int expectedBB, int expectedBA, double rotZ ) {
 		double markerZ = 2;
 		double markerWidth = 0.5;
-		CameraPinhole pinhole = new CameraPinhole(400,400,0,300,250,600,500);
+		CameraPinhole pinhole = new CameraPinhole(400, 400, 0, 300, 250, 600, 500);
 
-		GrayF32 marker = new GrayF32(40,30);
-		GImageMiscOps.fill(marker,255);
+		GrayF32 marker = new GrayF32(40, 30);
+		GImageMiscOps.fill(marker, 255);
 		// fill the top left corner so that we can tell the orientation
-		GImageMiscOps.fillRectangle(marker,100,0,0,20,15);
+		GImageMiscOps.fillRectangle(marker, 100, 0, 0, 20, 15);
 
-		Se3_F64 markerToWorld = eulerXyz(0,0,markerZ,0,Math.PI,rotZ,null);
+		Se3_F64 markerToWorld = eulerXyz(0, 0, markerZ, 0, Math.PI, rotZ, null);
 
 		SimulatePlanarWorld alg = new SimulatePlanarWorld();
 
 		alg.setCamera(pinhole);
-		alg.addSurface(markerToWorld,markerWidth,marker);
+		alg.addSurface(markerToWorld, markerWidth, marker);
 
 		alg.render();
 
@@ -163,65 +164,101 @@ public class TestSimulatePlanarWorld extends BoofStandardJUnit {
 		Point2D_F64 p1 = new Point2D_F64();
 		double ratio = marker.height/(double)marker.width;
 		WorldToCameraToPixel w2p = new WorldToCameraToPixel();
-		w2p.configure(pinhole,markerToWorld);
-		assertTrue(w2p.transform(new Point3D_F64(-markerWidth/2,-ratio*markerWidth/2,0),p0));
-		assertTrue(w2p.transform(new Point3D_F64(markerWidth/2,ratio*markerWidth/2,0),p1));
+		w2p.configure(pinhole, markerToWorld);
+		assertTrue(w2p.transform(new Point3D_F64(-markerWidth/2, -ratio*markerWidth/2, 0), p0));
+		assertTrue(w2p.transform(new Point3D_F64(markerWidth/2, ratio*markerWidth/2, 0), p1));
 
-		int x0 = (int)Math.min(p0.x,p1.x);
-		int y0 = (int)Math.min(p0.y,p1.y);
-		int x1 = (int)Math.max(p0.x,p1.x);
-		int y1 = (int)Math.max(p0.y,p1.y);
-		int xm = (x0+x1)/2;
-		int ym = (y0+y1)/2;
+		int x0 = (int)Math.min(p0.x, p1.x);
+		int y0 = (int)Math.min(p0.y, p1.y);
+		int x1 = (int)Math.max(p0.x, p1.x);
+		int y1 = (int)Math.max(p0.y, p1.y);
+		int xm = (x0 + x1)/2;
+		int ym = (y0 + y1)/2;
 
-		double regionAA = image.get((x0+xm)/2,(y0+ym)/2);
-		double regionAB = image.get((x0+xm)/2,(ym+y1)/2);
-		double regionBB = image.get((xm+x1)/2,(ym+y1)/2);
-		double regionBA = image.get((xm+x1)/2,(y0+ym)/2);
+		double regionAA = image.get((x0 + xm)/2, (y0 + ym)/2);
+		double regionAB = image.get((x0 + xm)/2, (ym + y1)/2);
+		double regionBB = image.get((xm + x1)/2, (ym + y1)/2);
+		double regionBA = image.get((xm + x1)/2, (y0 + ym)/2);
 
-		assertEquals(expectedAA,regionAA,5);
-		assertEquals(expectedAB,regionAB,5);
-		assertEquals(expectedBB,regionBB,5);
-		assertEquals(expectedBA,regionBA,5);
+		assertEquals(expectedAA, regionAA, 5);
+		assertEquals(expectedAB, regionAB, 5);
+		assertEquals(expectedBB, regionBB, 5);
+		assertEquals(expectedBA, regionBA, 5);
 	}
 
 	@Test void computePixel() {
 		double markerZ = 2;
 		double markerWidth = 0.5;
-		CameraPinhole pinhole = new CameraPinhole(400,400,0,300,250,600,500);
+		CameraPinhole pinhole = new CameraPinhole(400, 400, 0, 300, 250, 600, 500);
 
-		GrayF32 marker = new GrayF32(40,30);
-		GImageMiscOps.fill(marker,255);
+		GrayF32 marker = new GrayF32(40, 30);
+		GImageMiscOps.fill(marker, 255);
 
-		Se3_F64 markerToWorld = eulerXyz(0,0,markerZ,0,Math.PI,0,null);
+		Se3_F64 markerToWorld = eulerXyz(0, 0, markerZ, 0, Math.PI, 0, null);
 
 		SimulatePlanarWorld alg = new SimulatePlanarWorld();
 
 		alg.setCamera(pinhole);
-		alg.addSurface(markerToWorld,markerWidth,marker);
+		alg.addSurface(markerToWorld, markerWidth, marker);
 		alg.getImageRect(0).rectInCamera();
 
 		double ratio = marker.height/(double)marker.width;
 		Point2D_F64 p = new Point2D_F64();
 		WorldToCameraToPixel w2p = new WorldToCameraToPixel();
-		w2p.configure(pinhole,new Se3_F64());
+		w2p.configure(pinhole, new Se3_F64());
 
-		w2p.transform(new Point3D_F64(-markerWidth/2,-ratio*markerWidth/2,markerZ),p);
+		w2p.transform(new Point3D_F64(-markerWidth/2, -ratio*markerWidth/2, markerZ), p);
 
 		// marker coordinate system is +y up. I think that's how this works. I'm tired.
 		Point2D_F64 found = new Point2D_F64();
-		alg.computePixel(0,-markerWidth/2,ratio*markerWidth/2, found);
+		alg.computePixel(0, -markerWidth/2, ratio*markerWidth/2, found);
 
-		assertEquals( p.x , found.x , UtilEjml.TEST_F64_SQ);
-		assertEquals( p.y , found.y , UtilEjml.TEST_F64_SQ);
+		assertEquals(p.x, found.x, UtilEjml.TEST_F64_SQ);
+		assertEquals(p.y, found.y, UtilEjml.TEST_F64_SQ);
 
 		// should be in the top left quadrant
-		assertTrue( p.x < pinhole.width/2);
-		assertTrue( p.y < pinhole.height/2);
+		assertTrue(p.x < pinhole.width/2);
+		assertTrue(p.y < pinhole.height/2);
+	}
+
+	/**
+	 * Make sure computePixel and rendering are compatible with each other
+	 */
+	@Test void computePixel_render() {
+		double markerZ = 1;
+		double markerWidth = 0.4;
+		CameraPinhole pinhole = new CameraPinhole(400, 400, 0, 300, 250, 600, 500);
+
+		// test markers with even and odd length
+		for (int i = 0; i < 2; i++) {
+			GrayF32 marker = new GrayF32(40+i, 40+i);
+			GImageMiscOps.fill(marker, 255);
+			GImageMiscOps.fillRectangle(marker, 0, 10, 10, 10, 10);
+
+			Se3_F64 markerToWorld = eulerXyz(0, 0, markerZ, 0, Math.PI, 0, null);
+
+			SimulatePlanarWorld alg = new SimulatePlanarWorld();
+			alg.setInterpolation(InterpolationType.NEAREST_NEIGHBOR); // to make it easy to predict the color
+			alg.setBackground(0);
+			alg.setCamera(pinhole);
+			alg.addSurface(markerToWorld, markerWidth, marker);
+			GrayF32 rendered = alg.render();
+
+			// Select a pixel that should be inside the black square in the lower right corner
+			Point2D_F64 pixel = new Point2D_F64();
+			// Rember coordinate system is +x right, +y up
+			alg.computePixel(0, -0.001, 0.001, pixel);
+			assertEquals(0, rendered.get((int)pixel.x, (int)pixel.y));
+
+			// Just outside the black square. Since the object is axis aligned and that pixel should be barely inside
+			// the next pixels should be white.
+			alg.computePixel(0, 0.001, -0.001, pixel);
+			assertEquals(255, rendered.get((int)pixel.x, (int)pixel.y));
+		}
 	}
 
 	@Test void computeProjectionTable() {
-		CameraPinhole pinhole = new CameraPinhole(400,400,0,300,250,600,500);
+		CameraPinhole pinhole = new CameraPinhole(400, 400, 0, 300, 250, 600, 500);
 
 		SimulatePlanarWorld alg = new SimulatePlanarWorld();
 
@@ -239,11 +276,11 @@ public class TestSimulatePlanarWorld extends BoofStandardJUnit {
 				F.y = alg.pointing[index++];
 				F.z = alg.pointing[index++];
 
-				PerspectiveOps.convertPixelToNorm(pinhole,new Point2D_F64(x,y),n);
-				E.setTo(n.x,n.y,1);
+				PerspectiveOps.convertPixelToNorm(pinhole, new Point2D_F64(x, y), n);
+				E.setTo(n.x, n.y, 1);
 				E.divideIP(E.norm());
 
-				assertEquals(0,F.distance(E), UtilEjml.TEST_F64_SQ);
+				assertEquals(0, F.distance(E), UtilEjml.TEST_F64_SQ);
 			}
 		}
 	}
