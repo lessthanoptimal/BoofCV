@@ -10,3 +10,7 @@ script:
   - ./gradlew  -q --console plain dependencyInfo
   - ./gradlew test
   - ./gradlew spotlessJavaCheck
+cache:
+  directories:
+  - $HOME/.gradle/caches/
+  - $HOME/.gradle/wrapper/
