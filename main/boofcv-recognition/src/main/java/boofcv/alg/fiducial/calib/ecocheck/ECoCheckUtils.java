@@ -32,7 +32,9 @@ import org.ddogleg.struct.DogArray;
 import org.ejml.data.DMatrixRMaj;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * <p>Common functions that are needed for encoding, decoding, and detecting. Terminology can be found in
@@ -286,5 +288,77 @@ public class ECoCheckUtils {
 
 		// normally +y is up and not down like in images
 		coordinate.y *= -1.0;
+	}
+
+	/**
+	 * Creates a list of corners coordinates on the specified marker given the size of a full square
+	 *
+	 * @param markerID Which marker
+	 * @param squareLength Size of a full square
+	 * @return Location of corners in standard order
+	 */
+	public List<Point2D_F64> createCornerList( int markerID, double squareLength ) {
+		List<Point2D_F64> corners = new ArrayList<>();
+
+		GridShape grid = markers.get(markerID);
+
+		// size of square grid
+		double width = (grid.cols - 1)*squareLength;
+		double height = (grid.rows - 1)*squareLength;
+
+		int numCorners = (grid.rows - 1)*(grid.cols - 1);
+
+		for (int cornerID = 0; cornerID < numCorners; cornerID++) {
+			int row = cornerID/(grid.cols - 1);
+			int col = cornerID%(grid.cols - 1);
+
+			Point2D_F64 coordinate = new Point2D_F64();
+			coordinate.x = (0.5 + col)*squareLength - width/2.0;
+			coordinate.y = (0.5 + row)*squareLength - height/2.0;
+
+			// normally +y is up and not down like in images
+			coordinate.y *= -1.0;
+
+			corners.add(coordinate);
+		}
+
+		return corners;
+	}
+
+	/**
+	 * Merges detections with the same marker ID into a single detection and removes unknown markers. No checks
+	 * are done to ensure that there aren't logical inconsistencies, e.g. corners with same ID.
+	 *
+	 * @param found Original list of found markers.
+	 * @return New list of markers.
+	 */
+	public static List<ECoCheckFound> mergeAndRemoveUnknown( List<ECoCheckFound> found ) {
+		Map<Integer, ECoCheckFound> map = new HashMap<>();
+
+		for (int i = 0; i < found.size(); i++) {
+			ECoCheckFound f = found.get(i);
+
+			// Skip unknown markers
+			if (f.markerID < 0)
+				continue;
+
+			ECoCheckFound merged = map.get(f.markerID);
+			if (merged == null) {
+				var c = new ECoCheckFound();
+				c.setTo(f);
+				map.put(f.markerID, c);
+				continue;
+			}
+
+			// merge into a single result
+			// Hope that corners aren't duplicated.
+			merged.decodedCells.addAll(f.decodedCells);
+			merged.touchBinary.addAll(f.touchBinary);
+			for (int j = 0; j < f.corners.size; j++) {
+				merged.corners.grow().setTo(f.corners.get(j));
+			}
+		}
+
+		return new ArrayList<>(map.values());
 	}
 }

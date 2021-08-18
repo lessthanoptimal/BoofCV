@@ -62,10 +62,27 @@ public class ConfigECoCheckMarkers implements Configuration {
 	/**
 	 * Configures N markers with the same shape
 	 */
-	public static ConfigECoCheckMarkers singleShape( int rows, int cols, double squareSize, int numMarkers ) {
+	public static ConfigECoCheckMarkers singleShape( int rows, int cols, int numMarkers, double squareSize ) {
 		var config = new ConfigECoCheckMarkers();
 		config.firstTargetDuplicated = numMarkers;
 		config.markerShapes.add(new MarkerShape(rows, cols, squareSize));
+		return config;
+	}
+
+	/**
+	 * Parses the standard compact name string and converts it into a configuration.
+	 */
+	public static ConfigECoCheckMarkers parse( String description, double squareSize ) {
+		String[] words = description.split("e");
+		String[] shape = words[0].split("x");
+
+		int rows = Integer.parseInt(shape[0]);
+		int cols = Integer.parseInt(shape[1]);
+		int numMarkers = Integer.parseInt(words[1].split("n")[1]);
+
+		ConfigECoCheckMarkers config = singleShape(rows, cols, numMarkers, squareSize);
+		config.errorCorrectionLevel = Integer.parseInt(words[1].charAt(0) + "");
+
 		return config;
 	}
 
@@ -101,6 +118,17 @@ public class ConfigECoCheckMarkers implements Configuration {
 		}
 	}
 
+	/**
+	 * String which compactly describes markers with duplicate shapes.
+	 *
+	 * Example: 9x7e3n1 means 9x7 pattern with error correction level of 3 and 1 possible marker.
+	 */
+	public String compactName() {
+		BoofMiscOps.checkEq(1, markerShapes.size(), "Only one unique shape allowed");
+		MarkerShape shape = markerShapes.get(0);
+		return String.format("%dx%de%dn%d", shape.numRows, shape.numCols, errorCorrectionLevel, firstTargetDuplicated);
+	}
+
 	@Override public void checkValidity() {
 		BoofMiscOps.checkFraction(dataBitWidthFraction, "dataBitWidthFraction must be 0 to 1.0.");
 		BoofMiscOps.checkFraction(dataBorderFraction, "dataBorderFraction must be 0 to 1.0.");
@@ -129,21 +157,21 @@ public class ConfigECoCheckMarkers implements Configuration {
 		public MarkerShape() {}
 
 		public int getNumCorners() {
-			return (numCols-1)*(numRows-1);
+			return (numCols - 1)*(numRows - 1);
 		}
 
 		/**
 		 * Returns marker's width
 		 */
 		public double getWidth() {
-			return (numCols-1)*squareSize;
+			return (numCols - 1)*squareSize;
 		}
 
 		/**
 		 * Returns marker's width
 		 */
 		public double getHeight() {
-			return (numRows-1)*squareSize;
+			return (numRows - 1)*squareSize;
 		}
 
 		public void setTo( MarkerShape src ) {

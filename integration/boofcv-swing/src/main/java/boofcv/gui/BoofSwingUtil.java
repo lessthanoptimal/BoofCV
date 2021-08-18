@@ -294,13 +294,14 @@ public class BoofSwingUtil {
 			chooser.setFileFilter(chooser.getChoosableFileFilters()[1]);
 		}
 
-		// Always show the directory containing the selection
-		// If the previous is a selected directory then show the parent containing that directory
-		// If it's a file then show the file containing the directory
-		File currentDirectory = previousPath.isDirectory() ? previousPath.getParentFile() : previousPath;
+		// Point it at the directory containing the previous selection
+		File currentDirectory = previousPath.getParentFile();
 		if (currentDirectory != null && currentDirectory.exists()) {
 			chooser.setCurrentDirectory(currentDirectory);
 			chooser.setSelectedFile(previousPath);
+		} else {
+			// otherwise, set the name to the previous file/directory name
+			chooser.setSelectedFile(new File(previousPath.getName()));
 		}
 
 		File selected = null;
