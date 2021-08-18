@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -26,6 +26,7 @@ import boofcv.alg.distort.brown.LensDistortionBrown;
 import boofcv.alg.distort.pinhole.LensDistortionPinhole;
 import boofcv.alg.distort.universal.LensDistortionUniversalOmni;
 import boofcv.alg.interpolate.InterpolatePixelS;
+import boofcv.alg.interpolate.InterpolationType;
 import boofcv.alg.misc.ImageMiscOps;
 import boofcv.concurrency.BoofConcurrency;
 import boofcv.factory.interpolate.FactoryInterpolation;
@@ -59,6 +60,8 @@ import java.util.List;
  * @author Peter Abeles
  */
 public class SimulatePlanarWorld {
+
+	private InterpolationType interpolationType = InterpolationType.BILINEAR;
 
 	GrayF32 output = new GrayF32(1, 1);
 	GrayF32 depthMap = new GrayF32(1, 1);
@@ -155,11 +158,9 @@ public class SimulatePlanarWorld {
 	 */
 	public void addSurface( Se3_F64 rectToWorld, double widthWorld, GrayF32 texture ) {
 		SurfaceRect s = new SurfaceRect();
-		s.texture = texture.clone();
+		s.texture.setTo(texture);
 		s.width3D = widthWorld;
 		s.rectToWorld = rectToWorld;
-
-		ImageMiscOps.flipHorizontal(s.texture);
 
 		scene.add(s);
 	}
@@ -246,7 +247,7 @@ public class SimulatePlanarWorld {
 	}
 
 	private class RenderPixel {
-		InterpolatePixelS<GrayF32> interp = FactoryInterpolation.bilinearPixelS(GrayF32.class, BorderType.EXTENDED);
+		InterpolatePixelS<GrayF32> interp = FactoryInterpolation.createPixelS(0,255, interpolationType, BorderType.EXTENDED, GrayF32.class);
 		Vector3D_F64 _u = new Vector3D_F64();
 		Vector3D_F64 _v = new Vector3D_F64();
 		Vector3D_F64 _n = new Vector3D_F64();
@@ -272,14 +273,9 @@ public class SimulatePlanarWorld {
 				if (Math.abs(p3.z) > 0.001)
 					throw new RuntimeException("BUG!");
 
-				// now into surface pixels.
-				// but we have some weirdness due to image coordinate being +y down but normal coordinates +y up
-				p3.x += r.width3D/2;
-				p3.y += r.height3D/2;
-
-				// pixel coordinate on the surface
-				double surfaceX = p3.x*r.texture.width/r.width3D;
-				double surfaceY = p3.y*r.texture.height/r.height3D;
+				// pixel coordinate on the surface.
+				double surfaceX = -p3.x*r.texture.width/r.width3D + (r.texture.width/2);
+				double surfaceY = p3.y*r.texture.height/r.height3D + (r.texture.height/2);
 
 				if (surfaceX >= 0.0 && surfaceX < r.texture.width && surfaceY >= 0.0 && surfaceY < r.texture.height) {
 					float value = interp.get((float)surfaceX, (float)surfaceY);
@@ -300,6 +296,7 @@ public class SimulatePlanarWorld {
 
 	/**
 	 * Project a point which lies on the 2D planar polygon's surface onto the rendered image
+	 * The rectangle's coordinate system's origin will be at its center> +x right, +y up
 	 */
 	public void computePixel( int which, double x, double y, Point2D_F64 output ) {
 		SurfaceRect r = scene.get(which);
@@ -318,7 +315,7 @@ public class SimulatePlanarWorld {
 		Se3_F64 rectToCamera = new Se3_F64();
 		// surface normal in world frame
 		Vector3D_F64 normal = new Vector3D_F64();
-		GrayF32 texture;
+		GrayF32 texture = new GrayF32(1,1);
 		double width3D;
 		double height3D;
 
@@ -391,6 +388,14 @@ public class SimulatePlanarWorld {
 
 //			System.out.println("PixelRect "+pixelRect);
 		}
+	}
+
+	/**
+	 * Call to change how interpolation is done
+	 */
+	public void setInterpolation( InterpolationType interpolationType ) {
+		this.interpolationType = interpolationType;
+		renderPixel = new RenderPixel();
 	}
 
 	public GrayF32 getOutput() {
