@@ -20,7 +20,6 @@ package boofcv.simulation;
 
 import boofcv.alg.geo.PerspectiveOps;
 import boofcv.alg.geo.WorldToCameraToPixel;
-import boofcv.alg.interpolate.InterpolationType;
 import boofcv.alg.misc.GImageMiscOps;
 import boofcv.struct.calib.CameraPinhole;
 import boofcv.struct.image.GrayF32;
@@ -231,29 +230,37 @@ public class TestSimulatePlanarWorld extends BoofStandardJUnit {
 
 		// test markers with even and odd length
 		for (int i = 0; i < 2; i++) {
-			GrayF32 marker = new GrayF32(40+i, 40+i);
+			GrayF32 marker = new GrayF32(40 + i, 40 + i);
 			GImageMiscOps.fill(marker, 255);
 			GImageMiscOps.fillRectangle(marker, 0, 10, 10, 10, 10);
+			GImageMiscOps.fillRectangle(marker, 0, 20, 20, 10, 10);
 
 			Se3_F64 markerToWorld = eulerXyz(0, 0, markerZ, 0, Math.PI, 0, null);
 
 			SimulatePlanarWorld alg = new SimulatePlanarWorld();
-			alg.setInterpolation(InterpolationType.NEAREST_NEIGHBOR); // to make it easy to predict the color
+//			alg.enableHighAccuracy();
 			alg.setBackground(0);
 			alg.setCamera(pinhole);
 			alg.addSurface(markerToWorld, markerWidth, marker);
 			GrayF32 rendered = alg.render();
 
-			// Select a pixel that should be inside the black square in the lower right corner
+			// Look for a checker pattern with a wide margin of error
 			Point2D_F64 pixel = new Point2D_F64();
-			// Rember coordinate system is +x right, +y up
-			alg.computePixel(0, -0.001, 0.001, pixel);
+			alg.computePixel(0, -0.05, 0.05, pixel);
 			assertEquals(0, rendered.get((int)pixel.x, (int)pixel.y));
-
-			// Just outside the black square. Since the object is axis aligned and that pixel should be barely inside
-			// the next pixels should be white.
-			alg.computePixel(0, 0.001, -0.001, pixel);
+			alg.computePixel(0, 0.05, -0.05, pixel);
+			assertEquals(0, rendered.get((int)pixel.x, (int)pixel.y));
+			alg.computePixel(0, -0.05, -0.05, pixel);
 			assertEquals(255, rendered.get((int)pixel.x, (int)pixel.y));
+			alg.computePixel(0, 0.05, 0.05, pixel);
+			assertEquals(255, rendered.get((int)pixel.x, (int)pixel.y));
+
+			// Find the dead center
+			alg.computePixel(0, 0, 0, pixel);
+
+			// It should also be in the image center in this scenario
+			if (i == 0)
+				assertEquals(0.0, pixel.distance(pinhole.width/2, pinhole.height/2), UtilEjml.TEST_F64);
 		}
 	}
 
@@ -276,7 +283,7 @@ public class TestSimulatePlanarWorld extends BoofStandardJUnit {
 				F.y = alg.pointing[index++];
 				F.z = alg.pointing[index++];
 
-				PerspectiveOps.convertPixelToNorm(pinhole, new Point2D_F64(x, y), n);
+				PerspectiveOps.convertPixelToNorm(pinhole, new Point2D_F64(x + 0.25, y + 0.25), n);
 				E.setTo(n.x, n.y, 1);
 				E.divideIP(E.norm());
 

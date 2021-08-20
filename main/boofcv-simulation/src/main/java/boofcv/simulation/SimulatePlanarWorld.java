@@ -25,12 +25,8 @@ import boofcv.alg.distort.SphereToNarrowPixel_F64;
 import boofcv.alg.distort.brown.LensDistortionBrown;
 import boofcv.alg.distort.pinhole.LensDistortionPinhole;
 import boofcv.alg.distort.universal.LensDistortionUniversalOmni;
-import boofcv.alg.interpolate.InterpolatePixelS;
-import boofcv.alg.interpolate.InterpolationType;
 import boofcv.alg.misc.ImageMiscOps;
 import boofcv.concurrency.BoofConcurrency;
-import boofcv.factory.interpolate.FactoryInterpolation;
-import boofcv.struct.border.BorderType;
 import boofcv.struct.calib.CameraPinhole;
 import boofcv.struct.calib.CameraPinholeBrown;
 import boofcv.struct.calib.CameraUniversalOmni;
@@ -61,8 +57,6 @@ import java.util.List;
  */
 public class SimulatePlanarWorld {
 
-	private InterpolationType interpolationType = InterpolationType.BILINEAR;
-
 	GrayF32 output = new GrayF32(1, 1);
 	GrayF32 depthMap = new GrayF32(1, 1);
 
@@ -82,6 +76,16 @@ public class SimulatePlanarWorld {
 	Point2D_F64 pixel = new Point2D_F64();
 	LineParametric3D_F64 ray = new LineParametric3D_F64();
 	RenderPixel renderPixel = new RenderPixel();
+
+	/** Increase this value to increase the simulator's accuracy. More points are sampled per pixel. */
+	public int renderSampling = 2;
+
+	/**
+	 * More accurate rendering but will run slower
+	 */
+	public void enableHighAccuracy() {
+		renderSampling = 4;
+	}
 
 	public void setCamera( CameraUniversalOmni model ) {
 		LensDistortionWideFOV factory = new LensDistortionUniversalOmni(model);
@@ -126,19 +130,34 @@ public class SimulatePlanarWorld {
 
 		ImageMiscOps.fill(depthMap, -1);
 
-		pointing = new float[width*height*3];
+		int samplesPerPixel = renderSampling*renderSampling;
+		int pointingPixelStride = samplesPerPixel*3;
+		int pointingStride = output.width*pointingPixelStride;
+
+		pointing = new float[height*pointingStride];
+
+		double offsetSample = 0.5/renderSampling;
 
 		for (int y = 0; y < output.height; y++) {
 			for (int x = 0; x < output.width; x++) {
-				// Should this add 0.5 so that the ray goes out of the pixel's center? Seems to increase reprojection
-				// error in calibration tests if I do...
-				pixelTo3.compute(x, y, p3);
-				if (UtilEjml.isUncountable(p3.x)) {
-					depthMap.unsafe_set(x, y, Float.NaN);
-				} else {
-					pointing[(y*output.width + x)*3] = (float)p3.x;
-					pointing[(y*output.width + x)*3 + 1] = (float)p3.y;
-					pointing[(y*output.width + x)*3 + 2] = (float)p3.z;
+				int pointingIndex = y*pointingStride + x*pointingPixelStride;
+				for (int sampleIdx = 0; sampleIdx < samplesPerPixel; sampleIdx++) {
+					int sampleY = sampleIdx/renderSampling;
+					int sampleX = sampleIdx%renderSampling;
+
+					double subY = sampleY/(double)renderSampling;
+					double subX = sampleX/(double)renderSampling;
+
+					pixelTo3.compute(offsetSample + x + subX, offsetSample + y + subY, p3);
+
+					if (UtilEjml.isUncountable(p3.x)) {
+						depthMap.unsafe_set(x, y, Float.NaN);
+						break;
+					}
+
+					pointing[pointingIndex++] = (float)p3.x;
+					pointing[pointingIndex++] = (float)p3.y;
+					pointing[pointingIndex++] = (float)p3.z;
 				}
 			}
 		}
@@ -180,23 +199,26 @@ public class SimulatePlanarWorld {
 		ImageMiscOps.fill(depthMap, Float.MAX_VALUE);
 
 		for (int i = 0; i < scene.size(); i++) {
-			SurfaceRect r = scene.get(i);
-			r.rectInCamera();
+			scene.get(i).rectInCamera();
 		}
 
 		if (BoofConcurrency.USE_CONCURRENT && output.width*output.height > 100*100) {
 			renderMultiThread();
 		} else {
-			renderSingleThread();
+			renderSingleThread(0, output.height, renderPixel, ray);
 		}
 
 		return getOutput();
 	}
 
-	private void renderSingleThread() {
-		for (int y = 0; y < output.height; y++) {
-			int depthIdx = y*depthMap.stride;
-			for (int x = 0; x < output.width; x++) {
+	private void renderSingleThread( int y0, int y1, RenderPixel renderPixel, LineParametric3D_F64 ray ) {
+		int samplesPerPixel = renderSampling*renderSampling;
+		int pointingPixelStride = samplesPerPixel*3;
+		int pointingStride = output.width*pointingPixelStride;
+
+		for (int pixelY = y0; pixelY < y1; pixelY++) {
+			int depthIdx = pixelY*depthMap.stride;
+			for (int pixelX = 0; pixelX < output.width; pixelX++) {
 				if (Float.isNaN(depthMap.data[depthIdx++]))
 					continue;
 
@@ -204,13 +226,29 @@ public class SimulatePlanarWorld {
 					SurfaceRect r = scene.get(i);
 					if (!r.visible)
 						continue;
-					if (x >= r.pixelRect.x0 && x < r.pixelRect.x1 && y >= r.pixelRect.y0 && y < r.pixelRect.y1) {
-						renderPixel.setTexture(r.texture);
-						int index = (y*output.width + x)*3;
-						ray.slope.x = pointing[index];
-						ray.slope.y = pointing[index + 1];
-						ray.slope.z = pointing[index + 2];
-						renderPixel.render(ray, r, x, y);
+
+					float sumValue = 0.0f;
+					float sumDepth = 0.0f;
+					int pointingIndex = pixelY*pointingStride + pixelX*pointingPixelStride;
+					for (int sampleIdx = 0; sampleIdx < samplesPerPixel; sampleIdx++) {
+						ray.slope.x = pointing[pointingIndex++];
+						ray.slope.y = pointing[pointingIndex++];
+						ray.slope.z = pointing[pointingIndex++];
+
+						if (pixelX >= r.pixelRect.x0 && pixelX < r.pixelRect.x1 && pixelY >= r.pixelRect.y0 && pixelY < r.pixelRect.y1) {
+							if (renderPixel.render(ray, r, depthMap.unsafe_get(pixelX, pixelY))) {
+								sumValue += renderPixel.value;
+								sumDepth += renderPixel.depth;
+							} else {
+								sumDepth = 0.0f;
+								break;
+							}
+						}
+					}
+
+					if (sumDepth > 0.0f) {
+						output.unsafe_set(pixelX, pixelY, sumValue/samplesPerPixel);
+						depthMap.unsafe_set(pixelX, pixelY, sumDepth/samplesPerPixel);
 					}
 				}
 			}
@@ -219,70 +257,52 @@ public class SimulatePlanarWorld {
 
 	private void renderMultiThread() {
 		BoofConcurrency.loopBlocks(0, output.height, ( y0, y1 ) -> {
-			RenderPixel renderPixel = new RenderPixel();
-			LineParametric3D_F64 ray = new LineParametric3D_F64();
-
-			for (int y = y0; y < y1; y++) {
-				int depthIdx = y*depthMap.stride;
-				for (int x = 0; x < output.width; x++) {
-					if (Float.isNaN(depthMap.data[depthIdx++]))
-						continue;
-
-					for (int i = 0; i < scene.size(); i++) {
-						SurfaceRect r = scene.get(i);
-						if (!r.visible)
-							continue;
-						if (x >= r.pixelRect.x0 && x < r.pixelRect.x1 && y >= r.pixelRect.y0 && y < r.pixelRect.y1) {
-							renderPixel.setTexture(r.texture);
-							int index = (y*output.width + x)*3;
-							ray.slope.x = pointing[index];
-							ray.slope.y = pointing[index + 1];
-							ray.slope.z = pointing[index + 2];
-							renderPixel.render(ray, r, x, y);
-						}
-					}
-				}
-			}
+			var renderPixel = new RenderPixel();
+			var ray = new LineParametric3D_F64();
+			renderSingleThread(y0, y1, renderPixel, ray);
 		});
 	}
 
-	private class RenderPixel {
-		InterpolatePixelS<GrayF32> interp = FactoryInterpolation.createPixelS(0,255, interpolationType, BorderType.EXTENDED, GrayF32.class);
+	class RenderPixel {
+		// Pixel intensity on the surface where the ray hits
+		public float value;
+		// View depth at the location the ray hits
+		public float depth;
+
 		Vector3D_F64 _u = new Vector3D_F64();
 		Vector3D_F64 _v = new Vector3D_F64();
 		Vector3D_F64 _n = new Vector3D_F64();
 		Vector3D_F64 _w0 = new Vector3D_F64();
 		Point3D_F64 p3 = new Point3D_F64();
 
-		void setTexture( GrayF32 texture ) {
-			interp.setImage(texture);
-		}
-
-		void render( LineParametric3D_F64 ray, SurfaceRect r, int x, int y ) {
+		public boolean render( LineParametric3D_F64 ray, SurfaceRect r, float currentDepth ) {
 			// See if it intersects at a unique point and is positive in value
-			if (1 == Intersection3D_F64.intersectConvex(r.rect3D, ray, p3, _u, _v, _n, _w0)) {
-
-				// only care about intersections in front of the camera and closer that what was previously seen
-				double depth = p3.z;
-				if (depth <= 0 || depth >= depthMap.unsafe_get(x, y))
-					return;
-
-				// convert the point into rect coordinates
-				SePointOps_F64.transformReverse(r.rectToCamera, p3, p3);
-
-				if (Math.abs(p3.z) > 0.001)
-					throw new RuntimeException("BUG!");
-
-				// pixel coordinate on the surface.
-				double surfaceX = -p3.x*r.texture.width/r.width3D + (r.texture.width/2);
-				double surfaceY = p3.y*r.texture.height/r.height3D + (r.texture.height/2);
-
-				if (surfaceX >= 0.0 && surfaceX < r.texture.width && surfaceY >= 0.0 && surfaceY < r.texture.height) {
-					float value = interp.get((float)surfaceX, (float)surfaceY);
-					output.unsafe_set(x, y, value);
-					depthMap.unsafe_set(x, y, (float)depth);
-				}
+			if (1 != Intersection3D_F64.intersectConvex(r.rect3D, ray, p3, _u, _v, _n, _w0)) {
+				return false;
 			}
+
+			// only care about intersections in front of the camera and closer that what was previously seen
+			this.depth = (float)p3.z;
+			if (depth <= 0 || depth >= currentDepth)
+				return false;
+
+			// convert the point into rect coordinates
+			SePointOps_F64.transformReverse(r.rectToCamera, p3, p3);
+
+			// pixel coordinate on the surface.
+			double surfaceX = (-p3.x/r.width3D + 0.5)*r.texture.width;
+			double surfaceY = (p3.y/r.height3D + 0.5)*r.texture.height;
+
+			// We want to round towards the nearest pixel to remove rendering bias
+			surfaceX += 0.5;
+			surfaceY += 0.5;
+
+			// make sure it's in bounds of the texture
+			if (surfaceX >= 0.0 && surfaceX < r.texture.width && surfaceY >= 0.0 && surfaceY < r.texture.height) {
+				this.value = r.texture.unsafe_get((int)surfaceX, (int)surfaceY);
+				return true;
+			}
+			return false;
 		}
 	}
 
@@ -315,7 +335,7 @@ public class SimulatePlanarWorld {
 		Se3_F64 rectToCamera = new Se3_F64();
 		// surface normal in world frame
 		Vector3D_F64 normal = new Vector3D_F64();
-		GrayF32 texture = new GrayF32(1,1);
+		GrayF32 texture = new GrayF32(1, 1);
 		double width3D;
 		double height3D;
 
@@ -388,14 +408,6 @@ public class SimulatePlanarWorld {
 
 //			System.out.println("PixelRect "+pixelRect);
 		}
-	}
-
-	/**
-	 * Call to change how interpolation is done
-	 */
-	public void setInterpolation( InterpolationType interpolationType ) {
-		this.interpolationType = interpolationType;
-		renderPixel = new RenderPixel();
 	}
 
 	public GrayF32 getOutput() {
