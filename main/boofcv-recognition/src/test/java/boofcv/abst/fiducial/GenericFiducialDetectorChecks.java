@@ -65,8 +65,7 @@ public abstract class GenericFiducialDetectorChecks extends BoofStandardJUnit {
 
 	protected double stabilityShrink = 0.2;
 	protected double tolAccuracyT = 0.015;
-	protected double tolAccuracyTheta = 0.001;
-
+	protected double tolAccuracyTheta = 0.002;
 
 	/**
 	 * Renders everything in gray scale first then converts it
