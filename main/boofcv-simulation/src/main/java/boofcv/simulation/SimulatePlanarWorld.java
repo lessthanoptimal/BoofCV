@@ -335,8 +335,8 @@ public class SimulatePlanarWorld {
 		Se3_F64 rectToCamera = new Se3_F64();
 		// surface normal in world frame
 		Vector3D_F64 normal = new Vector3D_F64();
-		GrayF32 texture = new GrayF32(1, 1);
-		double width3D;
+		public final GrayF32 texture = new GrayF32(1, 1);
+		public double width3D;
 		double height3D;
 
 		// 3D point of corners in camera frame
