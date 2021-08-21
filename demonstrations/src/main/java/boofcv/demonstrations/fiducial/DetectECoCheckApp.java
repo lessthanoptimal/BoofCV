@@ -36,6 +36,7 @@ import boofcv.io.PathLabel;
 import boofcv.io.UtilIO;
 import boofcv.io.image.ConvertBufferedImage;
 import boofcv.io.image.SimpleImageSequence;
+import boofcv.misc.BoofMiscOps;
 import boofcv.struct.image.GrayF32;
 import boofcv.struct.image.ImageBase;
 import boofcv.struct.image.ImageType;
@@ -95,7 +96,6 @@ public class DetectECoCheckApp extends DemonstrationBase {
 	private final DogArray<ChessboardCorner> foundCorners = new DogArray<>(ChessboardCorner::new);
 	//-------------
 
-
 	public DetectECoCheckApp( List<PathLabel> examples ) {
 		super(true, true, examples, ImageType.single(GrayF32.class));
 
@@ -117,9 +117,14 @@ public class DetectECoCheckApp extends DemonstrationBase {
 		imagePanel.getImagePanel().addMouseListener(new MouseAdapter() {
 			@Override public void mousePressed( MouseEvent e ) {
 				Point2D_F64 p = imagePanel.pixelToPoint(e.getX(), e.getY());
-				if (SwingUtilities.isLeftMouseButton(e)) {
-					System.out.printf("Clicked at %.2f , %.2f\n", p.x, p.y);
+				int rgb = 0;
+				if (BoofMiscOps.isInside(original.getWidth(), original.getHeight(), p.x, p.y)) {
+					rgb = original.getRGB((int)p.x, (int)p.y);
 				}
+				int gray = (((rgb >> 16) & 0xFF) + ((rgb >> 8) & 0xFF) + (rgb & 0xFF))/3;
+
+				String text = String.format("pixel (%7.1f , %7.1f )\nrgb=0x%8x\ngray=%d\n", p.x, p.y, rgb, gray);
+				controlPanel.textArea.setText(text);
 			}
 		});
 	}
@@ -183,17 +188,16 @@ public class DetectECoCheckApp extends DemonstrationBase {
 				}
 			}
 
-			System.out.println("found.size="+found.size);
+			System.out.println("found.size=" + found.size);
 			for (int i = 0; i < found.size; i++) {
 				ECoCheckFound c = found.get(i);
 				if (!controlPanel.showAnonymous && c.markerID < 0)
 					continue;
-				System.out.println("["+i+"]");
-				System.out.println("  marker="+c.markerID);
-				System.out.println("  rows="+c.squareRows);
-				System.out.println("  cols="+c.squareCols);
-				System.out.println("  decoded="+c.decodedCells.size);
-
+				System.out.println("[" + i + "]");
+				System.out.println("  marker=" + c.markerID);
+				System.out.println("  rows=" + c.squareRows);
+				System.out.println("  cols=" + c.squareCols);
+				System.out.println("  decoded=" + c.decodedCells.size);
 			}
 		}
 
@@ -277,7 +281,6 @@ public class DetectECoCheckApp extends DemonstrationBase {
 					}
 				}
 			}
-			
 		}
 
 		@Override

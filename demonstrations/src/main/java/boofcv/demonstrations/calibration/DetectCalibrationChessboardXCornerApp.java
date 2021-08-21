@@ -43,6 +43,7 @@ import boofcv.io.PathLabel;
 import boofcv.io.UtilIO;
 import boofcv.io.image.ConvertBufferedImage;
 import boofcv.io.image.SimpleImageSequence;
+import boofcv.misc.BoofMiscOps;
 import boofcv.struct.geo.PointIndex2D_F64;
 import boofcv.struct.image.GrayF32;
 import boofcv.struct.image.ImageBase;
@@ -161,7 +162,13 @@ public class DetectCalibrationChessboardXCornerApp
 							}
 						}
 					} else {
-						text += String.format("  pixel (%7.1f , %7.1f )\n", p.x, p.y);
+						int rgb = 0;
+						if (BoofMiscOps.isInside(original.getWidth(), original.getHeight(), p.x, p.y)) {
+							rgb = original.getRGB((int)p.x, (int)p.y);
+						}
+						int gray = (((rgb >> 16) & 0xFF) + ((rgb >> 8) & 0xFF) + (rgb & 0xFF))/3;
+
+						text += String.format("pixel (%7.1f , %7.1f )\nrgb=0x%8x\ngray=%d\n", p.x, p.y, rgb, gray);
 					}
 					controlPanel.setInfoText(text);
 				}

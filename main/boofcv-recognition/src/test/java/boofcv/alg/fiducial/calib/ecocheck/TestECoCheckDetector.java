@@ -31,6 +31,7 @@ import boofcv.struct.image.GrayU8;
 import boofcv.testing.BoofStandardJUnit;
 import georegression.struct.point.Point2D_F64;
 import org.ddogleg.struct.DogArray;
+import org.ddogleg.struct.DogArray_F32;
 import org.ddogleg.struct.FastAccess;
 import org.ejml.UtilEjml;
 import org.junit.jupiter.api.BeforeEach;
@@ -293,8 +294,8 @@ public class TestECoCheckDetector extends BoofStandardJUnit {
 	}
 
 	@Test void sampleThresholdSide() {
-		Point2D_F64 a = new Point2D_F64(10,30);
-		Point2D_F64 b = new Point2D_F64(40,30);
+		Point2D_F64 a = new Point2D_F64(10, 30);
+		Point2D_F64 b = new Point2D_F64(40, 30);
 
 		// If it samples between the two points it should have a known value
 		// It should not sample exactly on the line or right next to the end points
@@ -311,7 +312,7 @@ public class TestECoCheckDetector extends BoofStandardJUnit {
 			}
 		};
 
-		float found = alg.sampleThresholdSide(a, b);
+		float found = alg.sampleInnerWhite(a, b);
 		assertEquals(160, found, UtilEjml.TEST_F32);
 	}
 
@@ -320,6 +321,7 @@ public class TestECoCheckDetector extends BoofStandardJUnit {
 	 */
 	@Test void sampleBitsGray() {
 		var points = new ArrayList<Point2D_F64>();
+		var values = new DogArray_F32();
 
 		int rows = 5;
 		int cols = 6;
@@ -342,7 +344,8 @@ public class TestECoCheckDetector extends BoofStandardJUnit {
 				return (i + j)%3 == 0 ? 10 : 200;
 			}
 		};
-		alg.sampleBitsGray(points, blockSize, 100);
+		alg.samplePixelValues(points, values);
+		alg.sampleBitsGray(values, blockSize, 100);
 
 		for (int i = 0; i < rows; i++) {
 			for (int j = 0; j < cols; j++) {
