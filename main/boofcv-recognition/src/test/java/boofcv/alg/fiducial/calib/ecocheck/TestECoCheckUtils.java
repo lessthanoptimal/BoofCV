@@ -233,14 +233,21 @@ public class TestECoCheckUtils extends BoofStandardJUnit {
 	}
 
 	@Test void mergeAndRemoveUnknown() {
+		var alg = new ECoCheckUtils();
+		alg.addMarker(4, 6);
+		alg.addMarker(5, 6);
+
 		var input = new ArrayList<ECoCheckFound>();
 
+		// one unknown that will be filtered
+		// one that is unique and should be kept
+		// two that will be merged
 		input.add(createFound(1, 5, 10));
 		input.add(createFound(0, 5, 10));
 		input.add(createFound(1, 12, 15));
 		input.add(createFound(-1, 0, 10));
 
-		List<ECoCheckFound> found = ECoCheckUtils.mergeAndRemoveUnknown(input);
+		List<ECoCheckFound> found = alg.mergeAndRemoveUnknown(input);
 
 		assertEquals(2, found.size());
 		for (int i = 0; i < 2; i++) {
@@ -257,6 +264,26 @@ public class TestECoCheckUtils extends BoofStandardJUnit {
 				fail("Unexpected ID");
 			}
 		}
+	}
+
+	/**
+	 * Makes sure the conflict resolution strategy is correctly implemented
+	 */
+	@Test void mergeAndRemoveUnknown_conflict() {
+		var alg = new ECoCheckUtils();
+		alg.addMarker(4, 6);
+		alg.addMarker(5, 6);
+
+		var input = new ArrayList<ECoCheckFound>();
+
+		// first two are in confict and the 3rd should be merged with the largest
+		input.add(createFound(1, 5, 10));
+		input.add(createFound(1, 9, 11));
+		input.add(createFound(1, 12, 15));
+
+		List<ECoCheckFound> found = alg.mergeAndRemoveUnknown(input);
+		assertEquals(1, found.size());
+		assertEquals(8, found.get(0).corners.size);
 	}
 
 	private ECoCheckFound createFound( int markerID, int idx0, int idx1 ) {

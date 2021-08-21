@@ -30,14 +30,15 @@ import georegression.struct.shapes.Rectangle2D_F64;
 import lombok.Getter;
 import lombok.Setter;
 import org.ddogleg.struct.DogArray;
+import org.ddogleg.struct.DogArray_B;
 import org.ddogleg.struct.DogArray_F32;
 import org.ddogleg.struct.DogArray_I32;
 import org.ejml.data.DMatrixRMaj;
 
 import java.util.ArrayList;
-import java.util.HashMap;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
-import java.util.Map;
 
 /**
  * <p>Common functions that are needed for encoding, decoding, and detecting. Terminology can be found in
@@ -366,40 +367,103 @@ public class ECoCheckUtils {
 		return corners;
 	}
 
+	public static int maxCorners( int rows, int cols ) {
+		return (rows-1)*(cols-1);
+	}
+
+	public boolean isLegalCornerIds( ECoCheckFound found ) {
+		GridShape shape = markers.get(found.markerID);
+		int maxCornerID = maxCorners(shape.rows, shape.cols);
+		for (int cornerIdx = 0; cornerIdx < found.corners.size; cornerIdx++) {
+			if (found.corners.get(cornerIdx).index >= maxCornerID) {
+				return false;
+			}
+		}
+		return true;
+	}
+
 	/**
-	 * Merges detections with the same marker ID into a single detection and removes unknown markers. No checks
-	 * are done to ensure that there aren't logical inconsistencies, e.g. corners with same ID.
+	 * Merges detections with the same marker ID into a single detection and removes unknown markers. A naive
+	 * algorithm is used to merge markers together. First it checks to see if there's a conflict between two markers
+	 * by them having the same cornerID. If that's good it will select the existing marker with the most corners.
+	 * If there is no matching marker then a new marker is created.
 	 *
 	 * @param found Original list of found markers.
 	 * @return New list of markers.
 	 */
-	public static List<ECoCheckFound> mergeAndRemoveUnknown( List<ECoCheckFound> found ) {
-		Map<Integer, ECoCheckFound> map = new HashMap<>();
+	public List<ECoCheckFound> mergeAndRemoveUnknown( List<ECoCheckFound> found ) {
+		List<ECoCheckFound> merged = new ArrayList<>();
+		DogArray_B used = new DogArray_B();
 
-		for (int i = 0; i < found.size(); i++) {
-			ECoCheckFound f = found.get(i);
+		for (int foundIdx = 0; foundIdx < found.size(); foundIdx++) {
+			ECoCheckFound f = found.get(foundIdx);
 
 			// Skip unknown markers
 			if (f.markerID < 0)
 				continue;
+			// Sanity check corners
+			if (!isLegalCornerIds(f))
+				continue;
 
-			ECoCheckFound merged = map.get(f.markerID);
-			if (merged == null) {
-				var c = new ECoCheckFound();
-				c.setTo(f);
-				map.put(f.markerID, c);
+			// Make sure this is a valid pattern
+			GridShape shape = markers.get(f.markerID);
+			used.resetResize(maxCorners(shape.rows, shape.cols), false);
+
+			ECoCheckFound match = null;
+			for (int mergedIdx = 0; mergedIdx < merged.size(); mergedIdx++) {
+				ECoCheckFound m = merged.get(mergedIdx);
+				if (f.markerID != m.markerID)
+					continue;
+
+				// See if there's a conflict by having the same corner in both sets
+				boolean conflict = false;
+				for (int cornerIdx = 0; cornerIdx < m.corners.size; cornerIdx++) {
+					used.data[m.corners.get(cornerIdx).index] = true;
+				}
+				for (int cornerIdx = 0; cornerIdx < f.corners.size; cornerIdx++) {
+					if (used.data[f.corners.get(cornerIdx).index]) {
+						conflict = true;
+						break;
+					}
+				}
+
+				if (conflict) {
+					continue;
+				}
+
+				// Prefer larger patterns if there are multiple. Harder to have a false positive
+				if (match == null || match.corners.size < m.corners.size) {
+					match = m;
+				}
+			}
+
+			if (match == null) {
+				// create a copy so that the input isn't modified
+				merged.add(new ECoCheckFound(f));
 				continue;
 			}
 
 			// merge into a single result
-			// Hope that corners aren't duplicated.
-			merged.decodedCells.addAll(f.decodedCells);
-			merged.touchBinary.addAll(f.touchBinary);
+			match.decodedCells.addAll(f.decodedCells);
+			match.touchBinary.addAll(f.touchBinary);
 			for (int j = 0; j < f.corners.size; j++) {
-				merged.corners.grow().setTo(f.corners.get(j));
+				match.corners.grow().setTo(f.corners.get(j));
 			}
 		}
 
-		return new ArrayList<>(map.values());
+		// Sort so that the largest is first
+		Collections.sort(merged, Comparator.comparingInt(a -> -a.corners.size));
+
+		// If there are duplicates only keep the largest
+		for (int i = 0; i < merged.size(); i++) {
+			int target = merged.get(i).markerID;
+			for (int j = merged.size()-1; j >= i+1; j--) {
+				if (merged.get(j).markerID == target) {
+					merged.remove(j);
+				}
+			}
+		}
+
+		return merged;
 	}
 }
