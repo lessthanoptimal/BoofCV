@@ -18,6 +18,7 @@
 
 package boofcv.alg.fiducial.calib.ecocheck;
 
+import boofcv.alg.filter.binary.GThresholdImageOps;
 import boofcv.alg.geo.h.HomographyDirectLinearTransform;
 import boofcv.struct.GridCoordinate;
 import boofcv.struct.GridShape;
@@ -29,6 +30,8 @@ import georegression.struct.shapes.Rectangle2D_F64;
 import lombok.Getter;
 import lombok.Setter;
 import org.ddogleg.struct.DogArray;
+import org.ddogleg.struct.DogArray_F32;
+import org.ddogleg.struct.DogArray_I32;
 import org.ejml.data.DMatrixRMaj;
 
 import java.util.ArrayList;
@@ -72,6 +75,13 @@ public class ECoCheckUtils {
 	// pre-allcoated workspace
 	Rectangle2D_F64 rect = new Rectangle2D_F64();
 	Point2D_F64 bitSquare = new Point2D_F64();
+
+	// histogram storage for otsu threshold
+	DogArray_I32 histogram = new DogArray_I32();
+
+	{
+		histogram.resize(100);
+	}
 
 	/**
 	 * Adds a new marker to the list
@@ -152,11 +162,42 @@ public class ECoCheckUtils {
 	}
 
 	/**
+	 * Computes a threshold using Otsu. Assumes that there are two clear peaks in the data.
+	 */
+	public float otsuThreshold( DogArray_F32 values ) {
+		// Find the local range
+		float min = Float.MAX_VALUE;
+		float max = Float.MIN_VALUE;
+
+		for (int i = 0; i < values.size; i++) {
+			min = Math.min(min, values.data[i]);
+			max = Math.max(max, values.data[i]);
+		}
+		float range = max - min + 1e-5f;
+		// add a small number so that the max value isn't outside the histogram's range
+
+		// Use range to convert into a discrete histogram
+		histogram.fill(0);
+
+		for (int i = 0; i < values.size; i++) {
+			float v = values.data[i];
+			int index = (int)(histogram.size*(v - min)/range);
+			histogram.data[index]++;
+		}
+
+		// Select threshold using OTSU
+		int selected = GThresholdImageOps.computeOtsu(histogram.data, histogram.size, values.size);
+
+		// Convert back into a float value
+		return range*selected/(histogram.size - 1) + min;
+	}
+
+	/**
 	 * Selects pixels that it should sample for each bit. The number of pixels per bit is specified by pixelsPerBit.
 	 * The order of bits is in row-major format with a block of size bitSampleCount. Points are sampled in a grid
 	 * pattern with one point in the center. This means there will be an odd number of points preventing a tie.
 	 *
-	 * @param pixels Image pixels that correspond pixels in binary version of grid
+	 * @param pixels (Output) Image pixels that correspond pixels in binary version of grid
 	 */
 	public void selectPixelsToSample( DogArray<Point2D_F64> pixels ) {
 		int bitGridLength = codec.getGridBitLength();

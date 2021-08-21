@@ -39,10 +39,7 @@ import boofcv.struct.image.ImageGray;
 import boofcv.struct.image.ImageType;
 import georegression.struct.point.Point2D_F64;
 import lombok.Getter;
-import org.ddogleg.struct.DogArray;
-import org.ddogleg.struct.FastAccess;
-import org.ddogleg.struct.FastArray;
-import org.ddogleg.struct.VerbosePrint;
+import org.ddogleg.struct.*;
 import org.jetbrains.annotations.Nullable;
 
 import java.io.PrintStream;
@@ -95,6 +92,8 @@ public class ECoCheckDetector<T extends ImageGray<T>> implements VerbosePrint {
 
 	// Image pixels that are read when decoding the bit pattern
 	DogArray<Point2D_F64> samplePixels = new DogArray<>(Point2D_F64::new);
+	// Storage for sampled pixel values
+	DogArray_F32 sampleValues = new DogArray_F32();
 	// The read in bits in a format the codec can understand
 	PackedBits8 bits = new PackedBits8();
 	// Storage the bits inside an image so that it can be rotated easily
@@ -270,18 +269,19 @@ public class ECoCheckDetector<T extends ImageGray<T>> implements VerbosePrint {
 				if (!clusterToGrid.isWhiteSquare(a.node, c.node))
 					continue;
 
-				// Convert image pixels into bit values
-				float threshold = determineThreshold(a.node, b.node, c.node, d.node);
-
 				// compute homography from pixels to data-region coordinates
 				if (!utils.computeGridToImage(a.node, b.node, c.node, d.node))
 					continue;
 
 				// Which pixels need to be sampled
 				utils.selectPixelsToSample(samplePixels);
+				samplePixelValues(samplePixels.toList(), sampleValues);
+
+				// Select a threshold that maximized the variance
+				float threshold = utils.otsuThreshold(sampleValues);
 
 				// Sample points and compute bit values
-				if (!sampleBitsGray(samplePixels.toList(), utils.bitSampleCount, threshold))
+				if (!sampleBitsGray(sampleValues, utils.bitSampleCount, threshold))
 					continue;
 
 				boolean success = false;
@@ -325,7 +325,7 @@ public class ECoCheckDetector<T extends ImageGray<T>> implements VerbosePrint {
 				}
 
 				if (verbose != null && !success)
-					verbose.printf("Failed to decode. obs_grid=(%d %d) tl=( %.1f %.1f )\n", row - 1, col - 1, a.node.x, a.node.y);
+					verbose.printf("Failed to decode. obs_grid=(%d %d) tl=( %.1f %.1f ) thresh=%.1f\n", row - 1, col - 1, a.node.x, a.node.y, threshold);
 			}
 		}
 	}
@@ -373,26 +373,12 @@ public class ECoCheckDetector<T extends ImageGray<T>> implements VerbosePrint {
 	}
 
 	/**
-	 * Sample along the line in known white/black regions
-	 */
-	private float determineThreshold( Point2D_F64 a, Point2D_F64 b, Point2D_F64 c, Point2D_F64 d ) {
-		float sum = 0.0f;
-
-		sum += sampleThresholdSide(a, b);
-		sum += sampleThresholdSide(b, c);
-		sum += sampleThresholdSide(c, d);
-		sum += sampleThresholdSide(d, a);
-
-		return sum/4.0f;
-	}
-
-	/**
 	 * Samples points offset along the line. The extremes of the line are avoided since those will naturally be
 	 * blurry in a chessboard pattern
 	 *
 	 * @return Average value of tangent points along the side
 	 */
-	float sampleThresholdSide( Point2D_F64 a, Point2D_F64 b ) {
+	float sampleInnerWhite( Point2D_F64 a, Point2D_F64 b ) {
 		double border = utils.dataBorderFraction;
 		double length = 1.0 - 2.0*border;
 
@@ -417,25 +403,39 @@ public class ECoCheckDetector<T extends ImageGray<T>> implements VerbosePrint {
 	}
 
 	/**
+	 * RReads the gray scale value at the provided pixel locations
+	 *
+	 * @param samplePoints (Input) Which pixels to sample.
+	 * @param sampleValues (Output) Pixel values
+	 */
+	void samplePixelValues( List<Point2D_F64> samplePoints, DogArray_F32 sampleValues ) {
+		sampleValues.resize(samplePoints.size());
+
+		for (int i = 0; i < samplePoints.size(); i++) {
+			Point2D_F64 pixel = samplePoints.get(i);
+			sampleValues.data[i] = interpolate.get((float)pixel.x, (float)pixel.y);
+		}
+	}
+
+	/**
 	 * Reads the gray values of data bits inside the square. Votes using the gray threshold. Decides on the bit values
 	 *
-	 * @param samplePoints (Input) Which pixels to sample. Flattened block array of points in the grid
+	 * @param sampleValues (Input) Values of each pixel.. Flattened block array of points in the grid
 	 * @param blockSize (Input) How many points are sampled per bit.
 	 * @return true if nothing went wrong
 	 */
-	boolean sampleBitsGray( List<Point2D_F64> samplePoints, int blockSize, float threshold ) {
+	boolean sampleBitsGray( DogArray_F32 sampleValues, int blockSize, float threshold ) {
 		// Sanity check
-		BoofMiscOps.checkEq(bitImage.width*bitImage.height, samplePoints.size()/blockSize);
+		BoofMiscOps.checkEq(bitImage.width*bitImage.height, sampleValues.size()/blockSize);
 
 		int majority = blockSize/2;
 
 		int nonWhiteBits = 0;
-		for (int i = 0, bit = 0; i < samplePoints.size(); i += blockSize, bit++) {
+		for (int i = 0, bit = 0; i < sampleValues.size(); i += blockSize, bit++) {
 			// Each pixel in the bit's block gets a vote for it's value
 			int vote = 0;
 			for (int blockIdx = 0; blockIdx < blockSize; blockIdx++) {
-				Point2D_F64 pixel = samplePoints.get(i + blockIdx);
-				float value = interpolate.get((float)pixel.x, (float)pixel.y);
+				float value =sampleValues.get(i + blockIdx);
 				if (value <= threshold) {
 					vote++;
 				}
