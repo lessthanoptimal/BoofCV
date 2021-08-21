@@ -28,6 +28,9 @@ import org.ddogleg.struct.FastArray;
  * available, adjacent position patterns are used to adjust the search so that locations distant from position
  * patterns can be compensated for.
  *
+ * NOTE: The current algorithm is a bit brittle and is a good target for further improvement. It has issues converging
+ * when its initial guess is off.
+ *
  * @author Peter Abeles
  */
 public class QrCodeAlignmentPatternLocator<T extends ImageGray<T>> {
