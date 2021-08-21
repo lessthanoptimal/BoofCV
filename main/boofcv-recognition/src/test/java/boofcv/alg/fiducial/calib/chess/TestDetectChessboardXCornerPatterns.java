@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -32,20 +32,19 @@ import java.util.List;
  * @author Peter Abeles
  */
 class TestDetectChessboardXCornerPatterns extends BoofStandardJUnit {
-
 	@Nested
 	class SingleTarget extends GenericDetectFindChessboardCorners {
 		@Override
-		public List<PointIndex2D_F64> findCorners( int numRows, int numCols, GrayF32 image) {
+		public List<PointIndex2D_F64> findCorners( int numRows, int numCols, GrayF32 image ) {
 			ConfigChessboardX config = new ConfigChessboardX();
-			DetectChessboardXCornerPatterns<GrayF32> alg = new DetectChessboardXCornerPatterns<>(config,GrayF32.class);
+			DetectChessboardXCornerPatterns<GrayF32> alg = new DetectChessboardXCornerPatterns<>(config, GrayF32.class);
 
 			alg.findPatterns(image);
 
-			for( GridInfo g : alg.getFoundChessboard().toList() ) {
-				if( g.rows == numRows-1 && g.cols == numCols-1 ) {
+			for (GridInfo g : alg.getFoundChessboard().toList()) {
+				if (g.rows == numRows - 1 && g.cols == numCols - 1) {
 					List<PointIndex2D_F64> found = new ArrayList<>();
-					g.nodes.forEach(p->found.add(new PointIndex2D_F64(p,0)));
+					g.nodes.forEach(p -> found.add(new PointIndex2D_F64(p.corner, 0)));
 					return found;
 				}
 			}

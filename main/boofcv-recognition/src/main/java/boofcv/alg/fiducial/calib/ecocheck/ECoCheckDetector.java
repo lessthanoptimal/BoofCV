@@ -269,8 +269,11 @@ public class ECoCheckDetector<T extends ImageGray<T>> implements VerbosePrint {
 				if (!clusterToGrid.isWhiteSquare(a.node, c.node))
 					continue;
 
+				// TODO see if the white border is brighter than outside
+				// reject if more than N points fail this test
+
 				// compute homography from pixels to data-region coordinates
-				if (!utils.computeGridToImage(a.node, b.node, c.node, d.node))
+				if (!utils.computeGridToImage(a.node.corner, b.node.corner, c.node.corner, d.node.corner))
 					continue;
 
 				// Which pixels need to be sampled
@@ -317,15 +320,16 @@ public class ECoCheckDetector<T extends ImageGray<T>> implements VerbosePrint {
 						verbose.printf("marker=%d id=%d ori=%d code_grid=( %d %d ) obs_grid=( %d %d ) tl=( %.1f %.1f ) tr=( %.1f %.1f )\n",
 								decoded.markerID, decoded.cellID, orientation,
 								decodedCoordinate.row, decodedCoordinate.col,
-								row - 1, col - 1, a.node.x, a.node.y,
-								b.node.x, b.node.y);
+								row - 1, col - 1, a.node.corner.x, a.node.corner.y,
+								b.node.corner.x, b.node.corner.y);
 					}
 
 					break;
 				}
 
 				if (verbose != null && !success)
-					verbose.printf("Failed to decode. obs_grid=(%d %d) tl=( %.1f %.1f ) thresh=%.1f\n", row - 1, col - 1, a.node.x, a.node.y, threshold);
+					verbose.printf("Failed to decode. obs_grid=(%d %d) tl=( %.1f %.1f ) thresh=%.1f\n",
+							row - 1, col - 1, a.node.corner.x, a.node.corner.y, threshold);
 			}
 		}
 	}
@@ -562,7 +566,7 @@ public class ECoCheckDetector<T extends ImageGray<T>> implements VerbosePrint {
 			int cornerID = correctedCoordinate.row*cornerCols + correctedCoordinate.col;
 
 			// Save the pixel coordinate it was observed at
-			target.corners.grow().setTo(e.node.x, e.node.y, cornerID);
+			target.addCorner(e.node.corner, cornerID);
 
 			// Note if this corner touches a binary pattern
 			target.touchBinary.add(cornersAroundBinary.get(e.col, e.row) != 0);
@@ -583,9 +587,9 @@ public class ECoCheckDetector<T extends ImageGray<T>> implements VerbosePrint {
 		target.squareRows = anonymousInfo.rows + 1;
 		target.squareCols = anonymousInfo.cols + 1;
 
-		for (int i = 0; i < anonymousInfo.nodes.size(); i++) {
-			ChessboardCornerGraph.Node n = anonymousInfo.nodes.get(i);
-			target.corners.grow().setTo(n.x, n.y, i);
+		for (int cornerID = 0; cornerID < anonymousInfo.nodes.size(); cornerID++) {
+			ChessboardCornerGraph.Node n = anonymousInfo.nodes.get(cornerID);
+			target.addCorner(n.corner, cornerID);
 		}
 	}
 

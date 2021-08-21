@@ -74,7 +74,7 @@ public class CalibrationDetectorChessboardX implements DetectSingleFiducialCalib
 			GridInfo info = found.get(0);
 
 			for (int i = 0; i < info.nodes.size(); i++) {
-				detected.add(info.nodes.get(i), i);
+				detected.add(info.nodes.get(i).corner, i);
 			}
 
 			// remove lens distortion

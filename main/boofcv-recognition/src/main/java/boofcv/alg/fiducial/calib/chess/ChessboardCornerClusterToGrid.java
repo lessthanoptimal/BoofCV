@@ -403,7 +403,7 @@ public class ChessboardCornerClusterToGrid implements VerbosePrint {
 
 				// If the distance is to (0,0) pixel is smaller or this is a corner square and the other best
 				// is not a corner square
-				double distance = n.normSq();
+				double distance = n.corner.normSq();
 				if (distance < bestScore || (!bestIsCornerSquare && corner)) {
 					bestIsCornerSquare |= corner;
 					bestScore = distance;
@@ -429,13 +429,13 @@ public class ChessboardCornerClusterToGrid implements VerbosePrint {
 		Node b = edgeList.get(1);
 
 		// Find the average angle from the two vectors defined by the two connected nodes
-		double dirA = Math.atan2(a.y - candidate.y, a.x - candidate.x);
-		double dirB = Math.atan2(b.y - candidate.y, b.x - candidate.x);
+		double dirA = Math.atan2(a.getY() - candidate.getY(), a.getX() - candidate.getX());
+		double dirB = Math.atan2(b.getY() - candidate.getY(), b.getX() - candidate.getX());
 
 		double dirAB = UtilAngle.boundHalf(dirA + UtilAngle.distanceCCW(dirA, dirB)/2.0);
 
 		// Find the acute angle between the corner's orientation and the vector
-		double acute = UtilAngle.distHalf(dirAB, candidate.orientation);
+		double acute = UtilAngle.distHalf(dirAB, candidate.getOrientation());
 
 		return acute < Math.PI/4.0;
 	}
@@ -448,10 +448,10 @@ public class ChessboardCornerClusterToGrid implements VerbosePrint {
 	 */
 	public boolean isWhiteSquare( Node a, Node c ) {
 		// Find the average angle from the two vectors defined by the two connected nodes
-		double dirAC = Math.atan2(c.y - a.y, c.x - a.x);
+		double dirAC = Math.atan2(c.getY() - a.getY(), c.getX() - a.getX());
 
 		// If it's white then there will be a big difference between the orientation and c
-		double acute = UtilAngle.distHalf(dirAC, a.orientation);
+		double acute = UtilAngle.distHalf(dirAC, a.getOrientation());
 
 		// A "perfect" angle would be pi/2 with 0 being the worst
 		return acute > Math.PI/4.0;
@@ -527,8 +527,8 @@ public class ChessboardCornerClusterToGrid implements VerbosePrint {
 		Node r = seed.edges[idxRow];
 		Node c = seed.edges[idxCol];
 
-		double dirRow = Math.atan2(r.y - seed.y, r.x - seed.x);
-		double dirCol = Math.atan2(c.y - seed.y, c.x - seed.x);
+		double dirRow = Math.atan2(r.getY() - seed.getY(), r.getX() - seed.getX());
+		double dirCol = Math.atan2(c.getY() - seed.getY(), c.getX() - seed.getX());
 
 		return UtilAngle.distanceCW(dirRow, dirCol) < Math.PI;
 	}
@@ -614,7 +614,7 @@ public class ChessboardCornerClusterToGrid implements VerbosePrint {
 					directions[i] = Double.MAX_VALUE;
 				} else {
 					Node nb = na.edges[i];
-					double angleB = Math.atan2(nb.y - na.y, nb.x - na.x);
+					double angleB = Math.atan2(nb.getY() - na.getY(), nb.getX() - na.getX());
 					if (Double.isNaN(ref)) {
 						ref = angleB;
 						directions[i] = 0;

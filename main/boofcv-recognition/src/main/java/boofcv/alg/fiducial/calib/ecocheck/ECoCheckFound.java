@@ -18,6 +18,7 @@
 
 package boofcv.alg.fiducial.calib.ecocheck;
 
+import boofcv.alg.feature.detect.chess.ChessboardCorner;
 import boofcv.struct.geo.PointIndex2D_F64;
 import org.ddogleg.struct.DogArray;
 import org.ddogleg.struct.DogArray_B;
@@ -41,11 +42,23 @@ public class ECoCheckFound {
 	/** Found calibration corners it was able to observe */
 	public final DogArray<PointIndex2D_F64> corners = new DogArray<>(PointIndex2D_F64::new, (c)->c.setTo(-1,-1,-1));
 
+	/** Corner image processing metadata. Provides focus and brightness info */
+	public final DogArray<ChessboardCorner> metadata = new DogArray<>(ChessboardCorner::new);
+
 	/** Indicates if a corner was decoded next to an encoding. Very unlikely to be a false positive. */
 	public final DogArray_B touchBinary = new DogArray_B();
 
 	/** Cell ID for cells which were successfully decoded. */
 	public DogArray_I32 decodedCells = new DogArray_I32();
+
+	public ECoCheckFound( ECoCheckFound src ) {setTo(src);}
+
+	public ECoCheckFound() {}
+
+	public void addCorner( ChessboardCorner corner, int cornerID ) {
+		corners.grow().setTo(corner, cornerID);
+		metadata.grow().setTo(corner);
+	}
 
 	public void reset() {
 		markerID = -1;
@@ -54,6 +67,7 @@ public class ECoCheckFound {
 		corners.reset();
 		touchBinary.reset();
 		decodedCells.reset();
+		metadata.reset();
 	}
 
 	public void setTo( ECoCheckFound src ) {
@@ -66,5 +80,9 @@ public class ECoCheckFound {
 		}
 		this.touchBinary.setTo(src.touchBinary);
 		this.decodedCells.setTo(src.decodedCells);
+		this.metadata.resetResize(src.metadata.size);
+		for (int i = 0; i < src.metadata.size; i++) {
+			this.metadata.get(i).setTo(src.metadata.get(i));
+		}
 	}
 }

@@ -896,7 +896,7 @@ public class ChessboardCornerClusterFinder<T extends ImageGray<T>> implements Ve
 			ChessboardCornerGraph.Node gn = graph.growCorner();
 			c2n.data[cornerIdx] = gn.index;
 			n2c.data[gn.index] = cornerIdx;
-			gn.set(corners.get(cornerIdx));
+			gn.corner = corners.get(cornerIdx);
 
 			// Add to the open list all the edges which haven't been processed yet;
 			for (int i = 0; i < v.connections.size(); i++) {
@@ -943,11 +943,6 @@ public class ChessboardCornerClusterFinder<T extends ImageGray<T>> implements Ve
 		 * Used when computing output. Indicates that the vertex has already been processed.
 		 */
 		public boolean marked;
-
-		/**
-		 * Used to determine if a point is ambiguous with this one
-		 */
-		public double neighborDistance;
 
 		public void reset() {
 			index = -1;
