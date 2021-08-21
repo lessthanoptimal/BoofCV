@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -92,7 +92,7 @@ public class TestCalibrationFiducialDetector extends BoofStandardJUnit {
 
 	@Nested
 	public static class HexagonalChecks extends GenericFiducialDetectorChecks {
-		ConfigGridDimen config = new ConfigGridDimen(5,6,0.1,0.15);
+		ConfigGridDimen config = new ConfigGridDimen(5,6,0.1,0.12);
 
 		public HexagonalChecks() {
 			pixelAndProjectedTol = 10;
@@ -109,7 +109,7 @@ public class TestCalibrationFiducialDetector extends BoofStandardJUnit {
 		public GrayF32 renderFiducial() {
 			RenderCalibrationTargetsGraphics2D generator = new RenderCalibrationTargetsGraphics2D(2,2);
 
-			generator.circleHex(config.numRows, config.numCols,10,15);
+			generator.circleHex(config.numRows, config.numCols,10,12);
 
 //			ShowImages.showWindow(generator.getBufferred(),"ASDASD",true);
 //			BoofMiscOps.sleep(10_000);

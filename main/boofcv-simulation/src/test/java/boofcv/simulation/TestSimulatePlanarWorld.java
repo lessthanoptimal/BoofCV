@@ -268,7 +268,7 @@ public class TestSimulatePlanarWorld extends BoofStandardJUnit {
 		CameraPinhole pinhole = new CameraPinhole(400, 400, 0, 300, 250, 600, 500);
 
 		SimulatePlanarWorld alg = new SimulatePlanarWorld();
-
+		alg.renderSampling = 1;
 		alg.setCamera(pinhole);
 //		alg.computeProjectionTable(pinhole.width,pinhole.height);
 
@@ -283,7 +283,7 @@ public class TestSimulatePlanarWorld extends BoofStandardJUnit {
 				F.y = alg.pointing[index++];
 				F.z = alg.pointing[index++];
 
-				PerspectiveOps.convertPixelToNorm(pinhole, new Point2D_F64(x + 0.25, y + 0.25), n);
+				PerspectiveOps.convertPixelToNorm(pinhole, new Point2D_F64(x + 0.5, y + 0.5), n);
 				E.setTo(n.x, n.y, 1);
 				E.divideIP(E.norm());
 

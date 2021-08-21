@@ -80,7 +80,7 @@ public class TestQrCodeAlignmentPatternLocator extends BoofStandardJUnit {
 			QrCode.Alignment al = helper.qr.alignment.get(i);
 			boolean matched = false;
 			for (int j = 0; j < 6; j++) {
-				if (al.pixel.distance(expected.get(j)) <= 0.9) {
+				if (al.pixel.distance(expected.get(j)) <= 2.0) {
 					matched = true;
 				}
 			}
