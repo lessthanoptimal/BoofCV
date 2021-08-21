@@ -21,6 +21,7 @@ package boofcv.alg.fiducial.calib.ecocheck;
 import boofcv.abst.fiducial.calib.ConfigChessboardX;
 import boofcv.alg.distort.AbstractInterpolatePixelS;
 import boofcv.alg.drawing.FiducialImageEngine;
+import boofcv.alg.feature.detect.chess.ChessboardCorner;
 import boofcv.alg.fiducial.calib.chess.ChessboardCornerClusterToGrid.GridElement;
 import boofcv.alg.fiducial.calib.chess.ChessboardCornerGraph;
 import boofcv.alg.fiducial.calib.ecocheck.ECoCheckDetector.Transform;
@@ -95,6 +96,7 @@ public class TestECoCheckDetector extends BoofStandardJUnit {
 		assertEquals(squareCols, marker.squareCols);
 		assertEquals(numEncodedSquares, marker.decodedCells.size);
 		assertEquals(truthCorners.size(), marker.corners.size);
+		assertEquals(truthCorners.size(), marker.metadata.size);
 
 		// see if the corners are at all the correct locations and have the correct ID
 		for (int i = 0; i < marker.corners.size; i++) {
@@ -126,6 +128,7 @@ public class TestECoCheckDetector extends BoofStandardJUnit {
 			assertEquals(5, marker.squareRows);
 			assertEquals(6, marker.squareCols);
 			assertEquals(truthCorners.size(), marker.corners.size);
+			assertEquals(truthCorners.size(), marker.metadata.size);
 		}
 	}
 
@@ -150,6 +153,7 @@ public class TestECoCheckDetector extends BoofStandardJUnit {
 		assertEquals(6, marker.squareCols);
 		assertEquals(5, marker.decodedCells.size);
 		assertEquals(16, marker.corners.size);
+		assertEquals(marker.corners.size, marker.metadata.size);
 	}
 
 	/**
@@ -175,6 +179,7 @@ public class TestECoCheckDetector extends BoofStandardJUnit {
 		assertEquals(5, marker.squareRows);
 		assertEquals(6, marker.squareCols);
 		assertEquals(truthCorners.size(), marker.corners.size);
+		assertEquals(truthCorners.size(), marker.metadata.size);
 		assertEquals(0, marker.decodedCells.size);
 		assertEquals(0, marker.touchBinary.size);
 	}
@@ -269,6 +274,7 @@ public class TestECoCheckDetector extends BoofStandardJUnit {
 			e.row = i;
 			e.col = 0;
 			e.node = new ChessboardCornerGraph.Node();
+			e.node.corner = new ChessboardCorner();
 		}
 
 		// Pass the first time

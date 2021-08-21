@@ -281,7 +281,7 @@ public class DetectCalibrationChessboardXCornerApp
 						c.points.clear();
 
 						for (int j = 0; j < grid.nodes.size(); j++) {
-							c.points.add(new PointIndex2D_F64(grid.nodes.get(j), j));
+							c.points.add(new PointIndex2D_F64(grid.nodes.get(j).corner, j));
 						}
 					}
 				}

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -20,7 +20,6 @@ package boofcv.alg.fiducial.calib.chess;
 
 import boofcv.alg.feature.detect.chess.ChessboardCorner;
 import boofcv.core.graph.FeatureGraph2D;
-import georegression.struct.point.Point2D_F64;
 import org.ddogleg.struct.DogArray;
 
 import java.util.List;
@@ -46,7 +45,7 @@ public class ChessboardCornerGraph {
 			Node c = corners.get(i);
 			FeatureGraph2D.Node n = graph.nodes.grow();
 			n.reset();
-			n.setTo(c.x, c.y);
+			n.setTo(c.corner.x, c.corner.y);
 			n.index = c.index;
 		}
 
@@ -72,7 +71,7 @@ public class ChessboardCornerGraph {
 		Node closest = null;
 		for (int i = 0; i < corners.size; i++) {
 			Node n = corners.get(i);
-			double d = n.distance2(x, y);
+			double d = n.corner.distance2(x, y);
 			if (d < distance) {
 				distance = d;
 				closest = n;
@@ -85,7 +84,7 @@ public class ChessboardCornerGraph {
 	public void print() {
 		for (int cornerIdx = 0; cornerIdx < corners.size; cornerIdx++) {
 			Node n = corners.get(cornerIdx);
-			System.out.printf("[%3d] {%3.0f, %3.0f} -> ", n.index, n.x, n.y);
+			System.out.printf("[%3d] {%3.0f, %3.0f} -> ", n.index, n.corner.x, n.corner.y);
 			for (int i = 0; i < 4; i++) {
 				if (n.edges[i] == null) {
 					System.out.print("[    ] ");
@@ -101,24 +100,25 @@ public class ChessboardCornerGraph {
 		corners.reset();
 	}
 
-	public static class Node extends Point2D_F64 {
+	public static class Node {
 		/**
 		 * Index in the node list
 		 */
 		public int index;
 		/**
-		 * Orientation of the corner feature as defined by the corner detector
+		 * Reference to the corner this node came from.
 		 */
-		public double orientation;
+		public ChessboardCorner corner;
 		/**
 		 * References to other corners. Can only be connected to 4 corners in directions approximated 90 degrees apart.
 		 */
 		public final Node[] edges = new Node[4];
 
-		public void set( ChessboardCorner c ) {
-			super.setTo(c);
-			this.orientation = c.orientation;
-		}
+		public double getX() {return corner.x;}
+
+		public double getY() {return corner.y;}
+
+		public double getOrientation() {return corner.orientation;}
 
 		/**
 		 * Iterates through edges until it encounters edge 'count'
@@ -144,9 +144,8 @@ public class ChessboardCornerGraph {
 		}
 
 		public void reset() {
-			x = y = -1;
 			index = -1;
-			orientation = Double.NaN;
+			corner = null;
 			for (int i = 0; i < 4; i++) {
 				edges[i] = null;
 			}
