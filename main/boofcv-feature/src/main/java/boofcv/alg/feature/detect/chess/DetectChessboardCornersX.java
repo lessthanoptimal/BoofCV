@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -51,7 +51,6 @@ import lombok.Getter;
 import lombok.Setter;
 import org.ddogleg.struct.DogArray;
 import org.ddogleg.struct.DogArray_F32;
-import org.ejml.UtilEjml;
 import pabeles.concurrency.GrowArray;
 
 import java.util.ArrayList;
@@ -90,7 +89,7 @@ public class DetectChessboardCornersX {
 	// The smallest allowed edge ratio allowed
 	@Getter @Setter public double edgeAspectRatioThreshold = 0.1;
 	// The smallest allowed corner intensity.
-	@Getter @Setter public double refinedXCornerThreshold = 0.025;
+	@Getter @Setter public double refinedXCornerThreshold = 0.001;
 	/**
 	 * Tolerance number of "spokes" in the wheel which break symmetry. Symmetry is defined as both sides being above
 	 * or below the mean value. Larger the value more tolerant it is.
@@ -246,7 +245,7 @@ public class DetectChessboardCornersX {
 		}
 
 		double maxEdge = 0;
-		double maxIntensity = 0;
+//		double maxIntensity = 0;
 
 //		System.out.println("  * features.size = "+packed.size());
 		for (int i = 0; i < corners.size(); i++) {
@@ -310,7 +309,7 @@ public class DetectChessboardCornersX {
 
 			// Save the max values for the entire image for use in later pruning
 			maxEdge = Math.max(maxEdge, c.edgeIntensity);
-			maxIntensity = Math.max(c.intensity, maxIntensity);
+//			maxIntensity = Math.max(c.intensity, maxIntensity);
 		}
 
 		// Filter corners based on edge intensity of found corners
@@ -473,15 +472,13 @@ public class DetectChessboardCornersX {
 	 * offset by 90 degrees.
 	 */
 	private boolean computeFeatures( ChessboardCorner corner ) {
-		double r = 4;
-
+		// Sample radius for the spokes
+		final double r = 4;
 		// magnitude of the difference is used remove false chessboard corners caused by the corners on black
 		// squares. In that situation there will be a large difference between the left and right values
 		// in the integral below for 1/2 the line
 		double cx = corner.x;
 		double cy = corner.y;
-		double sumDifference = 0;
-		double mean = 0;
 		for (int i = 0; i < numSpokeDiam; i++) {
 			int j = (i + numSpokeDiam)%numSpokes;
 			double angle = Math.PI*i/numSpokeDiam;
@@ -492,12 +489,7 @@ public class DetectChessboardCornersX {
 			double valB = spokesRadi[j] = integral.compute(cx, cy, cx - r*c, cy - r*s)/r;
 
 			spokesDiam[i] = valA + valB;
-
-			sumDifference += Math.abs(valA - valB);
-			mean += valA + valB;
 		}
-		mean /= numSpokes;
-		sumDifference /= numSpokeDiam;
 
 		// NOTE: There used to be a check to see if there was 4 transitions between high and low. it used the mean
 		//       as the dividing point. That was flawed in highly skewed corners where one color dominated
@@ -523,16 +515,7 @@ public class DetectChessboardCornersX {
 
 		double adjustedIndex = bestSpoke + FastHessianFeatureDetector.polyPeak(value0, bestSpoke, value2);
 		corner.orientation = UtilAngle.boundHalf(Math.PI*adjustedIndex/numSpokeDiam);
-
-		// Compute a how X-Corner like metric
-		double stdev = 0;
-		for (int i = 0; i < numSpokes; i++) {
-			double diff = mean - spokesRadi[i];
-			stdev += diff*diff;
-		}
-		stdev = Math.sqrt(stdev/numSpokes);
-
-		corner.intensity = -bestScore*stdev/(sumDifference + UtilEjml.EPS);
+		corner.intensity = -bestScore;
 
 		// Compute difference between white and black region
 		corner.contrast = (scoreDiam[(bestSpoke + numSpokeDiam/2)%numSpokeDiam] - scoreDiam[bestSpoke])/2.0;

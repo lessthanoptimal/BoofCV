@@ -48,7 +48,7 @@ public class ConfigChessboardX implements Configuration {
 	 * After the initial candidate x-corners have been found a more accurate x-corner intensity is computed which
 	 * doesn't compromise as much for speed. If the refined intensity is less than this value it will be discarded.
 	 */
-	public double detRefinedXCornerThreshold = 0.025;
+	public double detRefinedXCornerThreshold = 0.001;
 
 	/**
 	 * The minimum allowed size for the top most layer in the pyramid. size = min(width,height). To have
