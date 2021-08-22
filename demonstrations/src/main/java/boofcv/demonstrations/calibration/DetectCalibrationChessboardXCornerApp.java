@@ -22,14 +22,9 @@ import boofcv.abst.fiducial.calib.CalibrationDetectorChessboardX;
 import boofcv.abst.fiducial.calib.ConfigChessboardX;
 import boofcv.abst.fiducial.calib.ConfigGridDimen;
 import boofcv.alg.feature.detect.chess.ChessboardCorner;
-import boofcv.alg.fiducial.calib.chess.ChessboardCornerClusterFinder.LineInfo;
-import boofcv.alg.fiducial.calib.chess.ChessboardCornerClusterFinder.Vertex;
-import boofcv.alg.fiducial.calib.chess.ChessboardCornerClusterToGrid.GridInfo;
-import boofcv.alg.fiducial.calib.chess.ChessboardCornerGraph;
 import boofcv.alg.geo.calibration.CalibrationObservation;
 import boofcv.alg.misc.ImageStatistics;
 import boofcv.alg.misc.PixelMath;
-import boofcv.core.graph.FeatureGraph2D;
 import boofcv.demonstrations.shapes.DetectBlackShapePanel;
 import boofcv.demonstrations.shapes.ShapeVisualizePanel;
 import boofcv.demonstrations.shapes.ThresholdControlPanel;
@@ -37,7 +32,6 @@ import boofcv.gui.BoofSwingUtil;
 import boofcv.gui.DemonstrationBase;
 import boofcv.gui.StandardAlgConfigPanel;
 import boofcv.gui.calibration.DisplayPinholeCalibrationPanel;
-import boofcv.gui.feature.VisualizeFeatures;
 import boofcv.gui.image.VisualizeImageData;
 import boofcv.io.PathLabel;
 import boofcv.io.UtilIO;
@@ -59,7 +53,6 @@ import javax.swing.event.ChangeListener;
 import java.awt.*;
 import java.awt.event.*;
 import java.awt.geom.AffineTransform;
-import java.awt.geom.Ellipse2D;
 import java.awt.geom.Line2D;
 import java.awt.image.BufferedImage;
 import java.util.ArrayList;
@@ -97,10 +90,8 @@ public class DetectCalibrationChessboardXCornerApp
 
 	//-----------------
 	private final Object lockCorners = new Object();
-	private DogArray<ChessboardCorner> foundCorners = new DogArray<>(ChessboardCorner::new);
-	private DogArray<PointIndex2D_F64> foundChessboard = new DogArray<>(PointIndex2D_F64::new);
-	private DogArray<CalibrationObservation> foundGrids = new DogArray<>(CalibrationObservation::new);
-	private DogArray<FeatureGraph2D> foundClusters = new DogArray<>(FeatureGraph2D::new);
+	private final DogArray<PointIndex2D_F64> foundChessboard = new DogArray<>(PointIndex2D_F64::new);
+	private final VisualizeChessboardXCornerUtils visualizeUtils = new VisualizeChessboardXCornerUtils();
 	private boolean success;
 	//-----------------
 
@@ -127,7 +118,7 @@ public class DetectCalibrationChessboardXCornerApp
 			public void mousePressed( MouseEvent e ) {
 				Point2D_F64 p = imagePanel.pixelToPoint(e.getX(), e.getY());
 				if (SwingUtilities.isLeftMouseButton(e)) {
-					System.out.printf("Clicked at %.2f , %.2f\n", p.x, p.y);
+					System.out.printf("Clicked at (%.2f %.2f)\n", p.x, p.y);
 				} else if (SwingUtilities.isRightMouseButton(e)) {
 					String text = "";
 					// show info for a corner if the user clicked near it
@@ -137,8 +128,8 @@ public class DetectCalibrationChessboardXCornerApp
 							int bextId = -1;
 							// Must be closer if zoomed in. The on screen pixels represent a smaller distance
 							double bestDistance = 10/imagePanel.getScale();
-							for (int i = 0; i < foundCorners.size; i++) {
-								ChessboardCorner c = foundCorners.get(i);
+							for (int i = 0; i < visualizeUtils.foundCorners.size; i++) {
+								ChessboardCorner c = visualizeUtils.foundCorners.get(i);
 								// make sure it's a visible corner
 								if (c.level2 < controlPanel.detMinPyrLevel)
 									continue;
@@ -152,13 +143,13 @@ public class DetectCalibrationChessboardXCornerApp
 
 							if (best != null) {
 								text = String.format("Corner #%d\n", bextId);
-								text += String.format("  pixel (%7.1f , %7.1f )\n", best.x, best.y);
+								text += String.format("  pixel (%7.1f %7.1f)\n", best.x, best.y);
 								text += String.format("  levels %d to %d\n", best.level1, best.level2);
 								text += String.format("  levelMax %d\n", best.levelMax);
 								text += String.format("  intensity %f\n", best.intensity);
 								text += String.format("  orientation %.2f (deg)\n", UtilAngle.degree(best.orientation));
 							} else {
-								text += String.format("  pixel (%7.1f , %7.1f )\n", p.x, p.y);
+								text += String.format("  pixel (%7.1f %7.1f )\n", p.x, p.y);
 							}
 						}
 					} else {
@@ -168,7 +159,7 @@ public class DetectCalibrationChessboardXCornerApp
 						}
 						int gray = (((rgb >> 16) & 0xFF) + ((rgb >> 8) & 0xFF) + (rgb & 0xFF))/3;
 
-						text += String.format("pixel (%7.1f , %7.1f )\nrgb=0x%8x\ngray=%d\n", p.x, p.y, rgb, gray);
+						text += String.format("pixel (%7.1f %7.1f )\nrgb=0x%8x\ngray=%d\n", p.x, p.y, rgb, gray);
 					}
 					controlPanel.setInfoText(text);
 				}
@@ -258,38 +249,14 @@ public class DetectCalibrationChessboardXCornerApp
 			}
 
 			synchronized (lockCorners) {
+				visualizeUtils.update(detector);
 				this.success = success;
-				DogArray<ChessboardCorner> orig = detector.getDetector().getCorners();
-				foundCorners.reset();
-				for (int i = 0; i < orig.size; i++) {
-					foundCorners.grow().setTo(orig.get(i));
-				}
 				if (success) {
 					CalibrationObservation detected = detector.getDetectedPoints();
 					foundChessboard.reset();
 					for (int i = 0; i < detected.size(); i++) {
 						foundChessboard.grow().setTo(detected.get(i));
 					}
-				}
-
-				{
-					DogArray<GridInfo> found = detector.getDetectorX().getFoundChessboard();
-					foundGrids.reset();
-					for (int i = 0; i < found.size; i++) {
-						GridInfo grid = found.get(i);
-						CalibrationObservation c = foundGrids.grow();
-						c.points.clear();
-
-						for (int j = 0; j < grid.nodes.size(); j++) {
-							c.points.add(new PointIndex2D_F64(grid.nodes.get(j).corner, j));
-						}
-					}
-				}
-
-				foundClusters.reset();
-				DogArray<ChessboardCornerGraph> clusters = detector.getClusterFinder().getOutputClusters();
-				for (int i = 0; i < clusters.size; i++) {
-					clusters.get(i).convert(foundClusters.grow());
 				}
 			}
 		}
@@ -302,10 +269,6 @@ public class DetectCalibrationChessboardXCornerApp
 	}
 
 	class DisplayPanel extends ShapeVisualizePanel {
-		Ellipse2D.Double circle = new Ellipse2D.Double();
-		BasicStroke stroke2 = new BasicStroke(2);
-		BasicStroke stroke5 = new BasicStroke(5);
-
 		@Override
 		protected void paintInPanel( AffineTransform tran, Graphics2D g2 ) {
 			super.paintInPanel(tran, g2);
@@ -327,108 +290,28 @@ public class DetectCalibrationChessboardXCornerApp
 			Line2D.Double line = new Line2D.Double();
 			if (controlPanel.showCorners) {
 				synchronized (lockCorners) {
-					for (int i = 0; i < foundCorners.size; i++) {
-						ChessboardCorner c = foundCorners.get(i);
-						if (c.level2 < controlPanel.detMinPyrLevel)
-							continue;
-
-						double x = c.x;
-						double y = c.y;
-
-						g2.setStroke(stroke5);
-						g2.setColor(Color.BLACK);
-						VisualizeFeatures.drawCircle(g2, x*scale, y*scale, 5, circle);
-						g2.setStroke(stroke2);
-						g2.setColor(Color.ORANGE);
-						VisualizeFeatures.drawCircle(g2, x*scale, y*scale, 5, circle);
-
-						double dx = 6*Math.cos(c.orientation);
-						double dy = 6*Math.sin(c.orientation);
-
-						g2.setStroke(stroke2);
-						g2.setColor(Color.CYAN);
-						line.setLine((x - dx)*scale, (y - dy)*scale, (x + dx)*scale, (y + dy)*scale);
-						g2.draw(line);
-					}
-
-					if (controlPanel.showNumbers) {
-						DisplayPinholeCalibrationPanel.drawIndexes(g2, 18, foundCorners.toList(), null,
-								controlPanel.detMinPyrLevel, scale);
-					}
+					visualizeUtils.visualizeCorners(g2, scale, controlPanel.detMinPyrLevel, controlPanel.showNumbers);
 				}
 			}
 
 			if (controlPanel.showClusters) {
 				synchronized (lockCorners) {
-					int width = img.getWidth();
-					int height = img.getHeight();
-
-					for (int i = 0; i < foundClusters.size; i++) {
-						FeatureGraph2D graph = foundClusters.get(i);
-
-						// draw black outline
-						g2.setStroke(new BasicStroke(5));
-						g2.setColor(Color.black);
-						renderGraph(g2, line, graph);
-
-						// make each graph a different color depending on position
-						FeatureGraph2D.Node n0 = graph.nodes.get(0);
-						int color = (int)((n0.x/width)*255) << 16 | ((int)((n0.y/height)*200) + 55) << 8 | 255;
-						g2.setColor(new Color(color));
-						g2.setStroke(new BasicStroke(3));
-						renderGraph(g2, line, graph);
-					}
+					visualizeUtils.visualizeClusters(g2, scale, img.getWidth(), img.getHeight());
 				}
 			}
 
 			if (controlPanel.showPerpendicular) {
 				// Locking the algorithm will kill performance.
 				synchronized (lockAlgorithm) {
-					Font regular = new Font("Serif", Font.PLAIN, 12);
-					g2.setFont(regular);
-					BasicStroke thin = new BasicStroke(2);
-					BasicStroke thick = new BasicStroke(4);
-//					g2.setStroke(new BasicStroke(1));
-//					List<Vertex> vertexes = detector.getClusterFinder().getVertexes().toList();
-					List<LineInfo> lines = detector.getClusterFinder().getLines().toList();
-
-					for (int i = 0; i < lines.size(); i++) {
-						LineInfo lineInfo = lines.get(i);
-						if (lineInfo.isDisconnected() || lineInfo.parallel)
-							continue;
-
-						Vertex va = lineInfo.endA.dst;
-						Vertex vb = lineInfo.endB.dst;
-
-						ChessboardCorner ca = foundCorners.get(va.index);
-						ChessboardCorner cb = foundCorners.get(vb.index);
-
-						double intensity = lineInfo.intensity == -Double.MAX_VALUE ? Double.NaN : lineInfo.intensity;
-						line.setLine(ca.x*scale, ca.y*scale, cb.x*scale, cb.y*scale);
-
-						g2.setStroke(thick);
-						g2.setColor(Color.BLACK);
-						g2.draw(line);
-
-						g2.setStroke(thin);
-						g2.setColor(Color.ORANGE);
-
-						g2.draw(line);
-
-						float x = (float)((ca.x + cb.x)/2.0);
-						float y = (float)((ca.y + cb.y)/2.0);
-
-						g2.setColor(Color.RED);
-						g2.drawString(String.format("%.1f", intensity), x*(float)scale, y*(float)scale);
-					}
+					visualizeUtils.visualizePerpendicular(g2, scale, detector.getClusterFinder());
 				}
 			}
 
 			if (controlPanel.anyGrid) {
 				if (controlPanel.showChessboards) {
 					synchronized (lockCorners) {
-						for (int i = 0; i < foundGrids.size; i++) {
-							CalibrationObservation c = foundGrids.get(i);
+						for (int i = 0; i < visualizeUtils.foundGrids.size; i++) {
+							CalibrationObservation c = visualizeUtils.foundGrids.get(i);
 							DisplayPinholeCalibrationPanel.renderOrder(g2, scale, (List)c.points);
 
 							if (controlPanel.showNumbers) {
@@ -454,17 +337,6 @@ public class DetectCalibrationChessboardXCornerApp
 		public synchronized void setScale( double scale ) {
 			controlPanel.setZoom(scale);
 			super.setScale(controlPanel.zoom);
-		}
-
-		private void renderGraph( Graphics2D g2, Line2D.Double line, FeatureGraph2D graph ) {
-			for (int j = 0; j < graph.edges.size; j++) {
-				FeatureGraph2D.Edge e = graph.edges.get(j);
-				Point2D_F64 a = graph.nodes.get(e.src);
-				Point2D_F64 b = graph.nodes.get(e.dst);
-
-				line.setLine(a.x*scale, a.y*scale, b.x*scale, b.y*scale);
-				g2.draw(line);
-			}
 		}
 	}
 

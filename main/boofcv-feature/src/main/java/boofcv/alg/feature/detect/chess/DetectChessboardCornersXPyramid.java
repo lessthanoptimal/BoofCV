@@ -23,6 +23,8 @@ import boofcv.alg.misc.ImageNormalization;
 import boofcv.struct.image.GrayF32;
 import boofcv.struct.image.ImageGray;
 import boofcv.struct.image.ImageType;
+import lombok.Getter;
+import lombok.Setter;
 import org.ddogleg.nn.FactoryNearestNeighbor;
 import org.ddogleg.nn.NearestNeighbor;
 import org.ddogleg.nn.NnData;
@@ -39,9 +41,11 @@ import java.util.List;
  * @author Peter Abeles
  */
 public class DetectChessboardCornersXPyramid<T extends ImageGray<T>> {
-	// minimum number of pixels in the top most level in the pyramid
-	// If <= 0 then have a single layer at full resolution
-	int pyramidTopSize = 100;
+	/**
+	 * minimum number of pixels in the top most level in the pyramid
+	 *  If &le; 0 then have a single layer at full resolution
+ 	 */
+	@Getter @Setter int pyramidTopSize = 100;
 
 	// Input image with normalized pixel values
 	GrayF32 normalized = new GrayF32(1, 1);
@@ -52,21 +56,21 @@ public class DetectChessboardCornersXPyramid<T extends ImageGray<T>> {
 	// search radius when checking to see if the same feature has been detected at multiple scales
 	int radius = 7;
 
-	// Corner detector
-	DetectChessboardCornersX detector;
+	/** Corner detector */
+	@Getter DetectChessboardCornersX detector;
 
 	// Detection results for each layer in the pyramid
 	DogArray<PyramidLevel> featureLevels = new DogArray<>(PyramidLevel.class, PyramidLevel::new);
 
-	// Storage for final output corners
-	DogArray<ChessboardCorner> corners = new DogArray<>(ChessboardCorner::new);
+	/** Storage for final output corners */
+	@Getter DogArray<ChessboardCorner> corners = new DogArray<>(ChessboardCorner::new);
 
 	// Nearest-Neighbor search data structures
 	NearestNeighbor<ChessboardCorner> nn = FactoryNearestNeighbor.kdtree(new ChessboardCornerDistance());
 	NearestNeighbor.Search<ChessboardCorner> nnSearch = nn.createSearch();
 	DogArray<NnData<ChessboardCorner>> nnResults = new DogArray(NnData::new);
 
-	ImageType<T> imageType;
+	@Getter ImageType<T> imageType;
 
 	public DetectChessboardCornersXPyramid( DetectChessboardCornersX detector, ImageType<T> imageType ) {
 		this.detector = detector;
@@ -269,27 +273,7 @@ public class DetectChessboardCornersXPyramid<T extends ImageGray<T>> {
 		DogArray<ChessboardCorner> corners = new DogArray<>(ChessboardCorner::new);
 	}
 
-	public DetectChessboardCornersX getDetector() {
-		return detector;
-	}
-
-	public DogArray<ChessboardCorner> getCorners() {
-		return corners;
-	}
-
 	public int getNumberOfLevels() {
 		return pyramid.size();
-	}
-
-	public int getPyramidTopSize() {
-		return pyramidTopSize;
-	}
-
-	public void setPyramidTopSize( int pyramidTopSize ) {
-		this.pyramidTopSize = pyramidTopSize;
-	}
-
-	public ImageType<T> getImageType() {
-		return imageType;
 	}
 }
