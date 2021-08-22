@@ -25,22 +25,22 @@ import javax.swing.*;
  *
  * @author Peter Abeles
  */
-public class JSpinnerNumber {
-	public final JSpinner spinner;
+public class JCheckBoxValue {
+	public final JCheckBox check;
 	/** Value. Safe to read outside the UI thread */
-	public Number value;
+	public boolean value;
 
-	public JSpinnerNumber( JSpinner spinner, Number value ) {
-		this.spinner = spinner;
+	public JCheckBoxValue( JCheckBox check, boolean value ) {
+		this.check = check;
 		this.value = value;
 	}
 
-	public JSpinnerNumber tt( String tooltip ) {
-		spinner.setToolTipText(tooltip);
+	public JCheckBoxValue tt( String tooltip ) {
+		check.setToolTipText(tooltip);
 		return this;
 	}
 
 	public void updateValue() {
-		value = (Number)spinner.getValue();
+		value = check.isSelected();
 	}
 }

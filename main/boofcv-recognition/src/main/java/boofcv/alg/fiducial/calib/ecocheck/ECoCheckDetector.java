@@ -515,6 +515,7 @@ public class ECoCheckDetector<T extends ImageGray<T>> implements VerbosePrint {
 	 *
 	 * @param transform (Input) correction to corner grd coordinate system
 	 * @param target (Output) Description of target
+	 * @return true if no faults found and it was successful
 	 */
 	boolean createCorrectedTarget( Transform transform, ECoCheckFound target ) {
 		if (verbose != null)

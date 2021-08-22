@@ -341,6 +341,43 @@ public class DisplayPinholeCalibrationPanel extends DisplayCalibrationPanel<Came
 		}
 	}
 
+	public static void drawFeatureID( Graphics2D g2, int fontSize, List<PointIndex2D_F64> points,
+									  Point2Transform2_F32 transform,
+									  double scale ) {
+
+		int numDigits = BoofMiscOps.numDigits(points.size());
+		String format = "%" + numDigits + "d";
+		Font regular = new Font("Serif", Font.PLAIN, fontSize);
+		g2.setFont(regular);
+
+		Point2D_F32 adj = new Point2D_F32();
+
+		AffineTransform origTran = g2.getTransform();
+		for (int i = 0; i < points.size(); i++) {
+			PointIndex2D_F64 p = points.get(i);
+
+			if (transform != null) {
+				transform.compute((float)p.p.x, (float)p.p.y, adj);
+			} else {
+				adj.setTo((float)p.p.x, (float)p.p.y);
+			}
+
+			String text = String.format(format, p.index);
+
+			int x = (int)(adj.x*scale + 0.5);
+			int y = (int)(adj.y*scale + 0.5);
+
+			g2.setColor(Color.BLACK);
+			g2.drawString(text, x - 1, y);
+			g2.drawString(text, x + 1, y);
+			g2.drawString(text, x, y - 1);
+			g2.drawString(text, x, y + 1);
+			g2.setTransform(origTran);
+			g2.setColor(Color.GREEN);
+			g2.drawString(text, x, y);
+		}
+	}
+
 	public static void drawIndexes( Graphics2D g2, int fontSize, List<ChessboardCorner> points,
 									Point2Transform2_F32 transform,
 									int minLevel,

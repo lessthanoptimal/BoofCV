@@ -18,6 +18,7 @@
 
 package boofcv.gui;
 
+import boofcv.gui.controls.JCheckBoxValue;
 import boofcv.gui.controls.JConfigLength;
 import boofcv.gui.controls.JSpinnerNumber;
 import boofcv.misc.BoofLambdas;
@@ -258,6 +259,14 @@ public class StandardAlgConfigPanel extends JPanel implements ActionListener, Ch
 			c.setToolTipText(tooltip);
 
 		return c;
+	}
+
+	protected JCheckBoxValue checkboxWrap( String text , boolean value) {
+		JCheckBox c = new JCheckBox(text);
+		c.setSelected(value);
+		c.addActionListener( this);
+
+		return new JCheckBoxValue(c, value);
 	}
 
 	public void addAlignLeft( JComponent target , String tooltip ) {

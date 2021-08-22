@@ -23,6 +23,7 @@ import boofcv.abst.fiducial.calib.ConfigECoCheckMarkers;
 import boofcv.alg.feature.detect.chess.ChessboardCorner;
 import boofcv.alg.fiducial.calib.ecocheck.ECoCheckDetector;
 import boofcv.alg.fiducial.calib.ecocheck.ECoCheckFound;
+import boofcv.demonstrations.calibration.VisualizeChessboardXCornerUtils;
 import boofcv.demonstrations.shapes.DetectBlackShapePanel;
 import boofcv.demonstrations.shapes.ShapeVisualizePanel;
 import boofcv.factory.fiducial.FactoryFiducial;
@@ -30,8 +31,8 @@ import boofcv.gui.BoofSwingUtil;
 import boofcv.gui.DemonstrationBase;
 import boofcv.gui.StandardAlgConfigPanel;
 import boofcv.gui.calibration.DisplayPinholeCalibrationPanel;
+import boofcv.gui.controls.JCheckBoxValue;
 import boofcv.gui.controls.JSpinnerNumber;
-import boofcv.gui.feature.VisualizeFeatures;
 import boofcv.io.PathLabel;
 import boofcv.io.UtilIO;
 import boofcv.io.image.ConvertBufferedImage;
@@ -40,6 +41,7 @@ import boofcv.misc.BoofMiscOps;
 import boofcv.struct.image.GrayF32;
 import boofcv.struct.image.ImageBase;
 import boofcv.struct.image.ImageType;
+import georegression.metric.UtilAngle;
 import georegression.struct.point.Point2D_F64;
 import org.ddogleg.struct.DogArray;
 import org.ddogleg.struct.FastAccess;
@@ -52,8 +54,6 @@ import java.awt.event.KeyEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.geom.AffineTransform;
-import java.awt.geom.Ellipse2D;
-import java.awt.geom.Line2D;
 import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -93,7 +93,7 @@ public class DetectECoCheckApp extends DemonstrationBase {
 	//------------- Lock for what's being drawn in the GUI
 	private final Object lockVisualize = new Object();
 	private final DogArray<ECoCheckFound> foundPatterns = new DogArray<>(ECoCheckFound::new);
-	private final DogArray<ChessboardCorner> foundCorners = new DogArray<>(ChessboardCorner::new);
+	private final VisualizeChessboardXCornerUtils visualizeUtils = new VisualizeChessboardXCornerUtils();
 	//-------------
 
 	public DetectECoCheckApp( List<PathLabel> examples ) {
@@ -115,16 +115,55 @@ public class DetectECoCheckApp extends DemonstrationBase {
 		});
 
 		imagePanel.getImagePanel().addMouseListener(new MouseAdapter() {
-			@Override public void mousePressed( MouseEvent e ) {
+			@Override
+			public void mousePressed( MouseEvent e ) {
 				Point2D_F64 p = imagePanel.pixelToPoint(e.getX(), e.getY());
-				int rgb = 0;
-				if (BoofMiscOps.isInside(original.getWidth(), original.getHeight(), p.x, p.y)) {
-					rgb = original.getRGB((int)p.x, (int)p.y);
-				}
-				int gray = (((rgb >> 16) & 0xFF) + ((rgb >> 8) & 0xFF) + (rgb & 0xFF))/3;
+				if (SwingUtilities.isLeftMouseButton(e)) {
+					System.out.printf("Clicked at (%.2f %.2f)\n", p.x, p.y);
+				} else if (SwingUtilities.isRightMouseButton(e)) {
+					String text = "";
+					// show info for a corner if the user clicked near it
+					if (controlPanel.showCorners.value) {
+						synchronized (lockVisualize) {
+							ChessboardCorner best = null;
+							int bextId = -1;
+							// Must be closer if zoomed in. The on screen pixels represent a smaller distance
+							double bestDistance = 10/imagePanel.getScale();
+							for (int i = 0; i < visualizeUtils.foundCorners.size; i++) {
+								ChessboardCorner c = visualizeUtils.foundCorners.get(i);
+								// make sure it's a visible corner
+//								if (c.level2 < controlPanel.detMinPyrLevel)
+//									continue;
+								double d = c.distance(p);
+								if (d < bestDistance) {
+									bestDistance = d;
+									best = c;
+									bextId = i;
+								}
+							}
 
-				String text = String.format("pixel (%7.1f , %7.1f )\nrgb=0x%8x\ngray=%d\n", p.x, p.y, rgb, gray);
-				controlPanel.textArea.setText(text);
+							if (best != null) {
+								text = String.format("Corner #%d\n", bextId);
+								text += String.format("  pixel (%.1f %.1f)\n", best.x, best.y);
+								text += String.format("  levels %d to %d\n", best.level1, best.level2);
+								text += String.format("  levelMax %d\n", best.levelMax);
+								text += String.format("  intensity %.3f\n", best.intensity);
+								text += String.format("  orientation %.2f (deg)\n", UtilAngle.degree(best.orientation));
+							} else {
+								text += String.format("  pixel (%.1f %71f )\n", p.x, p.y);
+							}
+						}
+					} else {
+						int rgb = 0;
+						if (BoofMiscOps.isInside(original.getWidth(), original.getHeight(), p.x, p.y)) {
+							rgb = original.getRGB((int)p.x, (int)p.y);
+						}
+						int gray = (((rgb >> 16) & 0xFF) + ((rgb >> 8) & 0xFF) + (rgb & 0xFF))/3;
+
+						text += String.format("pixel (%.1f %.1f )\nrgb=0x%8x\ngray=%d\n", p.x, p.y, rgb, gray);
+					}
+					controlPanel.textArea.setText(text);
+				}
 			}
 		});
 	}
@@ -171,6 +210,8 @@ public class DetectECoCheckApp extends DemonstrationBase {
 			FastAccess<ECoCheckFound> found = detector.getFound();
 
 			synchronized (lockVisualize) {
+				visualizeUtils.update(detector);
+
 				// Copy found chessboard patterns
 				this.foundPatterns.resetResize(found.size);
 				for (int i = 0; i < found.size; i++) {
@@ -179,19 +220,12 @@ public class DetectECoCheckApp extends DemonstrationBase {
 					// Sort so that they have some sane order when visualized
 					Collections.sort(foundPatterns.get(i).corners.toList(), Comparator.comparingInt(a -> a.index));
 				}
-
-				// Copy found X-Corners
-				DogArray<ChessboardCorner> orig = detector.getDetector().getCorners();
-				foundCorners.resetResize(orig.size);
-				for (int i = 0; i < orig.size; i++) {
-					foundCorners.get(i).setTo(orig.get(i));
-				}
 			}
 
 			System.out.println("found.size=" + found.size);
 			for (int i = 0; i < found.size; i++) {
 				ECoCheckFound c = found.get(i);
-				if (!controlPanel.showAnonymous && c.markerID < 0)
+				if (!controlPanel.showAnonymous.value && c.markerID < 0)
 					continue;
 				System.out.println("[" + i + "]");
 				System.out.println("  marker=" + c.markerID);
@@ -202,6 +236,7 @@ public class DetectECoCheckApp extends DemonstrationBase {
 		}
 
 		SwingUtilities.invokeLater(() -> {
+			controlPanel.setImageSize(original.getWidth(), original.getHeight());
 			controlPanel.setProcessingTimeMS(processingTime);
 			imagePanel.setBufferedImageNoChange(original);
 			imagePanel.repaint();
@@ -221,11 +256,6 @@ public class DetectECoCheckApp extends DemonstrationBase {
 	}
 
 	class DisplayPanel extends ShapeVisualizePanel {
-		Ellipse2D.Double circle = new Ellipse2D.Double();
-		Line2D.Double line = new Line2D.Double();
-		BasicStroke stroke2 = new BasicStroke(2);
-		BasicStroke stroke5 = new BasicStroke(5);
-
 		@Override
 		protected void paintInPanel( AffineTransform tran, Graphics2D g2 ) {
 			super.paintInPanel(tran, g2);
@@ -244,41 +274,36 @@ public class DetectECoCheckApp extends DemonstrationBase {
 				g2.setComposite(beforeAC);
 			}
 
-			if (controlPanel.showCorners) {
+			if (controlPanel.showCorners.value) {
 				synchronized (lockVisualize) {
-					// TODO create a function for this and call it from DetectCalibrationChessboardXCornerApp
-					for (int i = 0; i < foundCorners.size; i++) {
-						ChessboardCorner c = foundCorners.get(i);
+					visualizeUtils.visualizeCorners(g2, scale, 0, controlPanel.showNumbers.value);
+				}
+			}
 
-						double x = c.x;
-						double y = c.y;
+			if (controlPanel.showChessboards.value) {
+				synchronized (lockVisualize) {
+					for (int i = 0; i < foundPatterns.size; i++) {
+						ECoCheckFound c = foundPatterns.get(i);
+						if (!controlPanel.showAnonymous.value && c.markerID < 0)
+							continue;
+						DisplayPinholeCalibrationPanel.renderOrder(g2, scale, c.corners.toList());
 
-						g2.setStroke(stroke5);
-						g2.setColor(Color.BLACK);
-						VisualizeFeatures.drawCircle(g2, x*scale, y*scale, 5, circle);
-						g2.setStroke(stroke2);
-						g2.setColor(Color.ORANGE);
-						VisualizeFeatures.drawCircle(g2, x*scale, y*scale, 5, circle);
-
-						double dx = 6*Math.cos(c.orientation);
-						double dy = 6*Math.sin(c.orientation);
-
-						g2.setStroke(stroke2);
-						g2.setColor(Color.CYAN);
-						line.setLine((x - dx)*scale, (y - dy)*scale, (x + dx)*scale, (y + dy)*scale);
-						g2.draw(line);
+						if (controlPanel.showNumbers.value) {
+							DisplayPinholeCalibrationPanel.drawFeatureID(g2, 18, c.corners.toList(), null, scale);
+						}
 					}
 				}
 			}
 
-			if (controlPanel.showChessboards) {
+			if (controlPanel.showPerpendicular.value) {
 				synchronized (lockVisualize) {
-					for (int i = 0; i < foundPatterns.size; i++) {
-						ECoCheckFound c = foundPatterns.get(i);
-						if (!controlPanel.showAnonymous && c.markerID < 0)
-							continue;
-						DisplayPinholeCalibrationPanel.renderOrder(g2, scale, c.corners.toList());
-					}
+					visualizeUtils.visualizePerpendicular(g2, scale, detector.getClusterFinder());
+				}
+			}
+
+			if (controlPanel.showClusters.value) {
+				synchronized (lockVisualize) {
+					visualizeUtils.visualizeClusters(g2, scale, visualized.getWidth(), visualized.getHeight());
 				}
 			}
 		}
@@ -298,17 +323,15 @@ public class DetectECoCheckApp extends DemonstrationBase {
 		JSpinnerNumber numMarkers = spinnerWrap(configMarker.firstTargetDuplicated, 1, 1000, 1);
 		JSpinnerNumber errorLevel = spinnerWrap(configMarker.errorCorrectionLevel, 0, 10, 1);
 
-		boolean showChessboards = true;
-		boolean showNumbers = true;
-		boolean showCorners = false;
 		int translucent = 0;
-		boolean showAnonymous = false;
 
 		JSlider sliderTranslucent = new JSlider(JSlider.HORIZONTAL, 0, 100, 0);
-		JCheckBox checkShowTargets = checkbox("Chessboard", showChessboards);
-		JCheckBox checkShowNumbers = checkbox("Numbers", showNumbers);
-		JCheckBox checkShowCorners = checkbox("Corners", showCorners);
-		JCheckBox checkShowAnonymous = checkbox("Anonymous", showAnonymous);
+		JCheckBoxValue showChessboards = checkboxWrap("Chessboard", true).tt("Display found chessboards");
+		JCheckBoxValue showNumbers = checkboxWrap("Numbers", false).tt("Show feature numbers");
+		JCheckBoxValue showCorners = checkboxWrap("Corners", false).tt( "Show x-corner locations");
+		JCheckBoxValue showAnonymous = checkboxWrap("Anonymous", false).tt("Show unknown chessboards");
+		JCheckBoxValue showClusters = checkboxWrap("Grids", false).tt("Chessboard grids");
+		JCheckBoxValue showPerpendicular = checkboxWrap("Perpendicular", false).tt("Chessboard edge intensity");
 
 		ControlPanel() {
 			textArea.setEditable(false);
@@ -335,10 +358,12 @@ public class DetectECoCheckApp extends DemonstrationBase {
 		JPanel createCheckPanel() {
 			JPanel panelChecks = new JPanel(new GridLayout(0, 2));
 
-			panelChecks.add(checkShowTargets);
-			panelChecks.add(checkShowNumbers);
-			panelChecks.add(checkShowCorners);
-			panelChecks.add(checkShowAnonymous);
+			panelChecks.add(showChessboards.check);
+			panelChecks.add(showNumbers.check);
+			panelChecks.add(showCorners.check);
+			panelChecks.add(showAnonymous.check);
+			panelChecks.add(showPerpendicular.check);
+			panelChecks.add(showClusters.check);
 
 			panelChecks.setPreferredSize(panelChecks.getMinimumSize());
 			panelChecks.setMaximumSize(panelChecks.getMinimumSize());
@@ -368,17 +393,23 @@ public class DetectECoCheckApp extends DemonstrationBase {
 		}
 
 		@Override public void controlChanged( Object source ) {
-			if (source == checkShowTargets) {
-				showChessboards = checkShowTargets.isSelected();
+			if (source == showChessboards.check) {
+				showChessboards.updateValue();
 				imagePanel.repaint();
-			} else if (source == checkShowNumbers) {
-				showNumbers = checkShowNumbers.isSelected();
+			} else if (source == showNumbers.check) {
+				showNumbers.updateValue();
 				imagePanel.repaint();
-			} else if (source == checkShowCorners) {
-				showCorners = checkShowCorners.isSelected();
+			} else if (source == showCorners.check) {
+				showCorners.updateValue();
 				imagePanel.repaint();
-			} else if (source == checkShowAnonymous) {
-				showAnonymous = checkShowAnonymous.isSelected();
+			} else if (source == showAnonymous.check) {
+				showAnonymous.updateValue();
+				imagePanel.repaint();
+			} else if (source == showPerpendicular.check) {
+				showPerpendicular.updateValue();
+				imagePanel.repaint();
+			} else if (source == showClusters.check) {
+				showClusters.updateValue();
 				imagePanel.repaint();
 			} else if (source == selectZoom) {
 				zoom = ((Number)selectZoom.getValue()).doubleValue();
