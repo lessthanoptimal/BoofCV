@@ -75,20 +75,22 @@ import static boofcv.misc.CircularIndex.addOffset;
  *     <li>Save remaining corners</li>
  * </ol>
  *
- * At several different steps various adaptive filters are applied. See code for details.
+ * At different steps various adaptive filters are applied. See code for details.
  *
  * @author Peter Abeles
  * @see XCornerAbeles2019Intensity
  */
 public class DetectChessboardCornersX {
-	// The largest x-corner intensity is found in the image then multiplied by this factor to select the cut off point
-	// for non-max suppression
+	/**
+	 * The largest x-corner intensity is found in the image then multiplied by this factor to select the cutoff point
+	 * for non-max suppression
+	 */
 	@Getter @Setter public float nonmaxThresholdRatio = 0.05f;
-	// Used to prune features with the smallest edge intensity in the image
+	/** Used to prune features with the smallest edge intensity in the image */
 	@Getter @Setter public double edgeIntensityRatioThreshold = 0.01;
-	// The smallest allowed edge ratio allowed
+	/** The smallest allowed edge ratio allowed */
 	@Getter @Setter public double edgeAspectRatioThreshold = 0.1;
-	// The smallest allowed corner intensity.
+	/** The smallest allowed corner intensity */
 	@Getter @Setter public double refinedXCornerThreshold = 0.001;
 	/**
 	 * Tolerance number of "spokes" in the wheel which break symmetry. Symmetry is defined as both sides being above
@@ -99,7 +101,7 @@ public class DetectChessboardCornersX {
 	 * Amount of blurred applied to input image. A radius of 1 was selected so that a 3x3 region would be sampled
 	 * when computing x-corner feature intensity.
 	 */
-	int blurRadius = 1;
+	public int blurRadius = 1;
 
 	// dynamically computed thresholds
 	float nonmaxThreshold;
@@ -490,9 +492,8 @@ public class DetectChessboardCornersX {
 
 			spokesDiam[i] = valA + valB;
 		}
-
-		// NOTE: There used to be a check to see if there was 4 transitions between high and low. it used the mean
-		//       as the dividing point. That was flawed in highly skewed corners where one color dominated
+		// NOTE: There used to be a check to see if there are 4 transitions between high and low. It used the mean
+		//       as the dividing point. It worked, but in highly skewed scenarios it degraded results a lot.
 
 		smoothSpokeDiam();
 		// Select the orientation
@@ -515,6 +516,11 @@ public class DetectChessboardCornersX {
 
 		double adjustedIndex = bestSpoke + FastHessianFeatureDetector.polyPeak(value0, bestSpoke, value2);
 		corner.orientation = UtilAngle.boundHalf(Math.PI*adjustedIndex/numSpokeDiam);
+
+		// Why this score? Basically, simplicity.
+		// A direct analog of Abeles2019 was tested here and produced slightly worse results on extreme fisheye.
+		// Another similar equation "intensity=-max(a-mean,b-mean) + max(c-mean,d-mean)" produced very similar results
+		// to what is below.
 		corner.intensity = -bestScore;
 
 		// Compute difference between white and black region

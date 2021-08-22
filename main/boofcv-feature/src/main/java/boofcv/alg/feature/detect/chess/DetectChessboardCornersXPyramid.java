@@ -135,7 +135,7 @@ public class DetectChessboardCornersXPyramid<T extends ImageGray<T>> {
 			// mark features in the next level as seen if they match ones in this level
 			for (int nextIdx = levelIdx + 1; nextIdx < pyramid.size(); nextIdx++) {
 				PyramidLevel level1 = featureLevels.get(nextIdx);
-				markSeenAsFalse(level0.corners, level1.corners, scale);
+				considerLocalizingAtThisScale(level0.corners, level1.corners, scale);
 				scale *= 2;
 			}
 			baseScale *= 2.0;
@@ -158,22 +158,26 @@ public class DetectChessboardCornersXPyramid<T extends ImageGray<T>> {
 //		System.out.println("Found Pyramid "+corners.size+" dropped "+dropped);
 	}
 
-	void markSeenAsFalse( DogArray<ChessboardCorner> corners0, DogArray<ChessboardCorner> corners1, double scale ) {
+	/**
+	 * Examine matching corners at this scale and decide based on intensity if this is the scale the feature
+	 * should take its location and orientation from. Also mark corners as seen or not.
+	 */
+	void considerLocalizingAtThisScale( DogArray<ChessboardCorner> corners0,
+										DogArray<ChessboardCorner> corners1, double scale ) {
 		nn.setPoints(corners1.toList(), false);
 
 		double searchRadius = radius*scale;
 		for (int i = 0; i < corners0.size; i++) {
 			ChessboardCorner c0 = corners0.get(i);
 
-			// prefer features found at higher resolutions since they can be more accurate. Do this by increasing
-			// their intensity value, but because non-max is being done here you have to be careful to not increase
-			// the value of a "non-maximum" corner and remove all!
-			//
-			// NOTE: With blurred images, the lower resolution images will have higher intensity
-			//       so as you go up scale intensity smoothly (more or less) increases
-			final double intensity = c0.intensity*(c0.first ? 8.0 : 1.0);
+			// In general, you want to use lower scales to localize your feature. However, images can be noisy and
+			// blurred which will corrupt localization. So the optimal corner will have a high intensity and be
+			// at a lower pyramid level. This is accomplished by requiring lower layers to have an intensity score
+			// which is much higher than the score found in lower levels.
+			final double intensity = c0.intensity*2.0;
 
 			nnSearch.findNearest(c0, searchRadius, 10, nnResults);
+			// true if the current value of the corner is a maximum
 			boolean maximum = true;
 
 			// Location accuracy is better at higher resolution but angle accuracy is better at lower resolution
@@ -186,7 +190,9 @@ public class DetectChessboardCornersXPyramid<T extends ImageGray<T>> {
 			for (int j = 0; j < nnResults.size; j++) {
 				ChessboardCorner c1 = nnResults.get(j).point;
 				level2 = c1.level2;
+
 				if (c1.intensity < intensity) {
+					// This corner is not going to be this feature's corner in this level
 					c1.first = false;
 				} else {
 					maximum = false;
@@ -198,6 +204,7 @@ public class DetectChessboardCornersXPyramid<T extends ImageGray<T>> {
 			}
 
 			if (!maximum) {
+				// another corner is going to be used for this feature
 				c0.first = false;
 			}
 
