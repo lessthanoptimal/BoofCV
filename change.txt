@@ -6,6 +6,10 @@ Date Format: year/month/day
 Date    : 2021
 Version : 0.39
 
+- Image Processing
+  * Added function for PSF for linear motion blur
+  * GConvolveImage - can now pass in BorderType
+  * ConvolveImage - automatic resizing of output
 - Simulation
   * Hunted down causes of small errors in rendering. New approach is used the samples multiple points.
 - Calibration

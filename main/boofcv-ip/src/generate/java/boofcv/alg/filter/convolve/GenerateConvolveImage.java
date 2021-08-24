@@ -21,6 +21,8 @@ package boofcv.alg.filter.convolve;
 import boofcv.generate.AutoTypeImage;
 import boofcv.generate.CodeGeneratorBase;
 
+import java.io.FileNotFoundException;
+
 /**
  * NOTE: There is a tinny bit of manual work required. need to comment out a few lines to unroll
  *
@@ -135,24 +137,24 @@ public class GenerateConvolveImage extends CodeGeneratorBase {
 
 		String kernelName = borderName+kernelType+ (inputType.isInteger() ? "<"+inputName+">" : "");
 
-		out.print("\tpublic static void "+name+"(Kernel"+dimen+"_"+kernelType+" kernel,\n" +
+		out.print("\tpublic static void "+name+"( Kernel"+dimen+"_"+kernelType+" kernel,\n" +
 				"\t\t\t\t\t\t\t\t  "+inputName+" input, "
-				+outputName+" output , "+kernelName+" border ) {\n" +
-				"\t\tInputSanityCheck.checkSameShape"+suffice2+"(input, output);\n" +
+				+outputName+" output, "+kernelName+" border ) {\n" +
+				"\t\tInputSanityCheck.checkReshape"+suffice2+"(input, output);\n" +
 				"\n" +
-				"\t\tboolean processed = BOverrideConvolveImage.invokeNative"+nativeName+"(kernel,input,output,border);\n" +
+				"\t\tif (BOverrideConvolveImage.invokeNative"+nativeName+"(kernel, input, output, border))\n" +
+				"\t\t\treturn;\n" +
 				"\n" +
-				"\t\tif( !processed ) {\n" +
-				"\t\t\tborder.setImage(input);\n" +
-				"\t\t\tConvolveImageNoBorder."+name+"(kernel,input,output);\n" +
-				"\t\t\tConvolveJustBorder_General_"+suffice+"."+name+"(kernel, border,output);\n" +
-				"\t\t}\n" +
+				"\t\tborder.setImage(input);\n" +
+				"\t\tConvolveImageNoBorder."+name+"(kernel, input, output);\n" +
+				"\t\tConvolveJustBorder_General_"+suffice+"."+name+"(kernel, border, output);\n" +
 				"\t}\n\n"
 		);
 	}
 
-	public static void main(String[] args) {
-		GenerateConvolveImage gen = new GenerateConvolveImage();
-		gen.generateCode();
+	public static void main(String[] args) throws FileNotFoundException {
+		var gen = new GenerateConvolveImage();
+		gen.setModuleName("boofcv-ip");
+		gen.generate();
 	}
 }

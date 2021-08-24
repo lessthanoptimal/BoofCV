@@ -19,7 +19,6 @@
 package boofcv.examples.imageprocessing;
 
 import boofcv.alg.filter.convolve.GConvolveImageOps;
-import boofcv.core.image.border.FactoryImageBorder;
 import boofcv.factory.filter.kernel.FactoryKernelGaussian;
 import boofcv.gui.ListDisplayPanel;
 import boofcv.gui.image.ShowImages;
@@ -28,7 +27,6 @@ import boofcv.io.UtilIO;
 import boofcv.io.image.ConvertBufferedImage;
 import boofcv.io.image.UtilImageIO;
 import boofcv.struct.border.BorderType;
-import boofcv.struct.border.ImageBorder;
 import boofcv.struct.convolve.Kernel1D_S32;
 import boofcv.struct.convolve.Kernel2D_S32;
 import boofcv.struct.image.GrayS16;
@@ -61,18 +59,17 @@ public class ExampleConvolution {
 	 * Convolves a 1D kernel horizontally and vertically
 	 */
 	private static void convolve1D( GrayU8 gray ) {
-		ImageBorder<GrayU8> border = FactoryImageBorder.wrap(BorderType.EXTENDED, gray);
-		Kernel1D_S32 kernel = new Kernel1D_S32(2);
+		var kernel = new Kernel1D_S32(2);
 		kernel.offset = 1; // specify the kernel's origin
 		kernel.data[0] = 1;
 		kernel.data[1] = -1;
 
-		GrayS16 output = new GrayS16(gray.width, gray.height);
+		var output = new GrayS16(gray.width, gray.height);
 
-		GConvolveImageOps.horizontal(kernel, gray, output, border);
+		GConvolveImageOps.horizontal(kernel, gray, output, BorderType.EXTENDED);
 		panel.addImage(VisualizeImageData.standard(output, null), "1D Horizontal");
 
-		GConvolveImageOps.vertical(kernel, gray, output, border);
+		GConvolveImageOps.vertical(kernel, gray, output, BorderType.EXTENDED);
 		panel.addImage(VisualizeImageData.standard(output, null), "1D Vertical");
 	}
 
@@ -81,17 +78,16 @@ public class ExampleConvolution {
 	 */
 	private static void convolve2D( GrayU8 gray ) {
 		// By default 2D kernels will be centered around width/2
-		Kernel2D_S32 kernel = new Kernel2D_S32(3);
+		var kernel = new Kernel2D_S32(3);
 		kernel.set(1, 0, 2);
 		kernel.set(2, 1, 2);
 		kernel.set(0, 1, -2);
 		kernel.set(1, 2, -2);
 
 		// Output needs to handle the increased domain after convolution. Can't be 8bit
-		GrayS16 output = new GrayS16(gray.width, gray.height);
-		ImageBorder<GrayU8> border = FactoryImageBorder.wrap(BorderType.EXTENDED, gray);
+		var output = new GrayS16(gray.width, gray.height);
 
-		GConvolveImageOps.convolve(kernel, gray, output, border);
+		GConvolveImageOps.convolve(kernel, gray, output, BorderType.EXTENDED);
 		panel.addImage(VisualizeImageData.standard(output, null), "2D Kernel");
 	}
 
@@ -105,7 +101,7 @@ public class ExampleConvolution {
 		// just use BlurImageOps instead.
 
 		// Since it's normalized it can be saved inside an 8bit image
-		GrayU8 output = new GrayU8(gray.width, gray.height);
+		var output = new GrayU8(gray.width, gray.height);
 
 		GConvolveImageOps.convolveNormalized(kernel, gray, output);
 		panel.addImage(VisualizeImageData.standard(output, null), "2D Normalized Kernel");
