@@ -465,6 +465,14 @@ public class KernelMath {
 		for (int i = 0; i < data.length; i++) data[i] /= total;
 	}
 
+	public static float sum( Kernel2D_F32 kernel ) {
+
+		float[] data = kernel.data;
+		float total = 0;
+		for (int i = 0; i < data.length; i++) total += data[i];
+		return total;
+	}
+
 	public static double sum( Kernel2D_F64 kernel ) {
 
 		double[] data = kernel.data;
