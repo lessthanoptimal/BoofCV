@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -50,17 +50,16 @@ public class ConvolveImage {
 	 * @param kernel The kernel that is being convolved. Not modified.
 	 * @param border How the image borders are handled.
 	 */
-	public static void horizontal(Kernel1D_F32 kernel,
-								  GrayF32 input, GrayF32 output , ImageBorder_F32 border ) {
-		InputSanityCheck.checkSameShape(input, output);
+	public static void horizontal( Kernel1D_F32 kernel,
+								  GrayF32 input, GrayF32 output, ImageBorder_F32 border ) {
+		InputSanityCheck.checkReshape(input, output);
 
-		boolean processed = BOverrideConvolveImage.invokeNativeHorizontal(kernel,input,output,border);
+		if (BOverrideConvolveImage.invokeNativeHorizontal(kernel, input, output, border))
+			return;
 
-		if( !processed ) {
-			border.setImage(input);
-			ConvolveImageNoBorder.horizontal(kernel,input,output);
-			ConvolveJustBorder_General_SB.horizontal(kernel, border,output);
-		}
+		border.setImage(input);
+		ConvolveImageNoBorder.horizontal(kernel, input, output);
+		ConvolveJustBorder_General_SB.horizontal(kernel, border, output);
 	}
 
 	/**
@@ -71,17 +70,16 @@ public class ConvolveImage {
 	 * @param kernel The kernel that is being convolved. Not modified.
 	 * @param border How the image borders are handled.
 	 */
-	public static void vertical(Kernel1D_F32 kernel,
-								  GrayF32 input, GrayF32 output , ImageBorder_F32 border ) {
-		InputSanityCheck.checkSameShape(input, output);
+	public static void vertical( Kernel1D_F32 kernel,
+								  GrayF32 input, GrayF32 output, ImageBorder_F32 border ) {
+		InputSanityCheck.checkReshape(input, output);
 
-		boolean processed = BOverrideConvolveImage.invokeNativeVertical(kernel,input,output,border);
+		if (BOverrideConvolveImage.invokeNativeVertical(kernel, input, output, border))
+			return;
 
-		if( !processed ) {
-			border.setImage(input);
-			ConvolveImageNoBorder.vertical(kernel,input,output);
-			ConvolveJustBorder_General_SB.vertical(kernel, border,output);
-		}
+		border.setImage(input);
+		ConvolveImageNoBorder.vertical(kernel, input, output);
+		ConvolveJustBorder_General_SB.vertical(kernel, border, output);
 	}
 
 	/**
@@ -92,17 +90,16 @@ public class ConvolveImage {
 	 * @param kernel The kernel that is being convolved. Not modified.
 	 * @param border How the image borders are handled.
 	 */
-	public static void convolve(Kernel2D_F32 kernel,
-								  GrayF32 input, GrayF32 output , ImageBorder_F32 border ) {
-		InputSanityCheck.checkSameShape(input, output);
+	public static void convolve( Kernel2D_F32 kernel,
+								  GrayF32 input, GrayF32 output, ImageBorder_F32 border ) {
+		InputSanityCheck.checkReshape(input, output);
 
-		boolean processed = BOverrideConvolveImage.invokeNativeConvolve(kernel,input,output,border);
+		if (BOverrideConvolveImage.invokeNativeConvolve(kernel, input, output, border))
+			return;
 
-		if( !processed ) {
-			border.setImage(input);
-			ConvolveImageNoBorder.convolve(kernel,input,output);
-			ConvolveJustBorder_General_SB.convolve(kernel, border,output);
-		}
+		border.setImage(input);
+		ConvolveImageNoBorder.convolve(kernel, input, output);
+		ConvolveJustBorder_General_SB.convolve(kernel, border, output);
 	}
 
 	/**
@@ -113,17 +110,16 @@ public class ConvolveImage {
 	 * @param kernel The kernel that is being convolved. Not modified.
 	 * @param border How the image borders are handled.
 	 */
-	public static void horizontal(Kernel1D_F32 kernel,
-								  InterleavedF32 input, InterleavedF32 output , ImageBorder_IL_F32 border ) {
-		InputSanityCheck.checkSameShapeB(input, output);
+	public static void horizontal( Kernel1D_F32 kernel,
+								  InterleavedF32 input, InterleavedF32 output, ImageBorder_IL_F32 border ) {
+		InputSanityCheck.checkReshapeB(input, output);
 
-		boolean processed = BOverrideConvolveImage.invokeNativeHorizontal(kernel,input,output,border);
+		if (BOverrideConvolveImage.invokeNativeHorizontal(kernel, input, output, border))
+			return;
 
-		if( !processed ) {
-			border.setImage(input);
-			ConvolveImageNoBorder.horizontal(kernel,input,output);
-			ConvolveJustBorder_General_IL.horizontal(kernel, border,output);
-		}
+		border.setImage(input);
+		ConvolveImageNoBorder.horizontal(kernel, input, output);
+		ConvolveJustBorder_General_IL.horizontal(kernel, border, output);
 	}
 
 	/**
@@ -134,17 +130,16 @@ public class ConvolveImage {
 	 * @param kernel The kernel that is being convolved. Not modified.
 	 * @param border How the image borders are handled.
 	 */
-	public static void vertical(Kernel1D_F32 kernel,
-								  InterleavedF32 input, InterleavedF32 output , ImageBorder_IL_F32 border ) {
-		InputSanityCheck.checkSameShapeB(input, output);
+	public static void vertical( Kernel1D_F32 kernel,
+								  InterleavedF32 input, InterleavedF32 output, ImageBorder_IL_F32 border ) {
+		InputSanityCheck.checkReshapeB(input, output);
 
-		boolean processed = BOverrideConvolveImage.invokeNativeVertical(kernel,input,output,border);
+		if (BOverrideConvolveImage.invokeNativeVertical(kernel, input, output, border))
+			return;
 
-		if( !processed ) {
-			border.setImage(input);
-			ConvolveImageNoBorder.vertical(kernel,input,output);
-			ConvolveJustBorder_General_IL.vertical(kernel, border,output);
-		}
+		border.setImage(input);
+		ConvolveImageNoBorder.vertical(kernel, input, output);
+		ConvolveJustBorder_General_IL.vertical(kernel, border, output);
 	}
 
 	/**
@@ -155,17 +150,16 @@ public class ConvolveImage {
 	 * @param kernel The kernel that is being convolved. Not modified.
 	 * @param border How the image borders are handled.
 	 */
-	public static void convolve(Kernel2D_F32 kernel,
-								  InterleavedF32 input, InterleavedF32 output , ImageBorder_IL_F32 border ) {
-		InputSanityCheck.checkSameShapeB(input, output);
+	public static void convolve( Kernel2D_F32 kernel,
+								  InterleavedF32 input, InterleavedF32 output, ImageBorder_IL_F32 border ) {
+		InputSanityCheck.checkReshapeB(input, output);
 
-		boolean processed = BOverrideConvolveImage.invokeNativeConvolve(kernel,input,output,border);
+		if (BOverrideConvolveImage.invokeNativeConvolve(kernel, input, output, border))
+			return;
 
-		if( !processed ) {
-			border.setImage(input);
-			ConvolveImageNoBorder.convolve(kernel,input,output);
-			ConvolveJustBorder_General_IL.convolve(kernel, border,output);
-		}
+		border.setImage(input);
+		ConvolveImageNoBorder.convolve(kernel, input, output);
+		ConvolveJustBorder_General_IL.convolve(kernel, border, output);
 	}
 
 	/**
@@ -176,17 +170,16 @@ public class ConvolveImage {
 	 * @param kernel The kernel that is being convolved. Not modified.
 	 * @param border How the image borders are handled.
 	 */
-	public static void horizontal(Kernel1D_S32 kernel,
-								  GrayU8 input, GrayI16 output , ImageBorder_S32<GrayU8> border ) {
-		InputSanityCheck.checkSameShape(input, output);
+	public static void horizontal( Kernel1D_S32 kernel,
+								  GrayU8 input, GrayI16 output, ImageBorder_S32<GrayU8> border ) {
+		InputSanityCheck.checkReshape(input, output);
 
-		boolean processed = BOverrideConvolveImage.invokeNativeHorizontal(kernel,input,output,border);
+		if (BOverrideConvolveImage.invokeNativeHorizontal(kernel, input, output, border))
+			return;
 
-		if( !processed ) {
-			border.setImage(input);
-			ConvolveImageNoBorder.horizontal(kernel,input,output);
-			ConvolveJustBorder_General_SB.horizontal(kernel, border,output);
-		}
+		border.setImage(input);
+		ConvolveImageNoBorder.horizontal(kernel, input, output);
+		ConvolveJustBorder_General_SB.horizontal(kernel, border, output);
 	}
 
 	/**
@@ -197,17 +190,16 @@ public class ConvolveImage {
 	 * @param kernel The kernel that is being convolved. Not modified.
 	 * @param border How the image borders are handled.
 	 */
-	public static void vertical(Kernel1D_S32 kernel,
-								  GrayU8 input, GrayI16 output , ImageBorder_S32<GrayU8> border ) {
-		InputSanityCheck.checkSameShape(input, output);
+	public static void vertical( Kernel1D_S32 kernel,
+								  GrayU8 input, GrayI16 output, ImageBorder_S32<GrayU8> border ) {
+		InputSanityCheck.checkReshape(input, output);
 
-		boolean processed = BOverrideConvolveImage.invokeNativeVertical(kernel,input,output,border);
+		if (BOverrideConvolveImage.invokeNativeVertical(kernel, input, output, border))
+			return;
 
-		if( !processed ) {
-			border.setImage(input);
-			ConvolveImageNoBorder.vertical(kernel,input,output);
-			ConvolveJustBorder_General_SB.vertical(kernel, border,output);
-		}
+		border.setImage(input);
+		ConvolveImageNoBorder.vertical(kernel, input, output);
+		ConvolveJustBorder_General_SB.vertical(kernel, border, output);
 	}
 
 	/**
@@ -218,17 +210,16 @@ public class ConvolveImage {
 	 * @param kernel The kernel that is being convolved. Not modified.
 	 * @param border How the image borders are handled.
 	 */
-	public static void convolve(Kernel2D_S32 kernel,
-								  GrayU8 input, GrayI16 output , ImageBorder_S32<GrayU8> border ) {
-		InputSanityCheck.checkSameShape(input, output);
+	public static void convolve( Kernel2D_S32 kernel,
+								  GrayU8 input, GrayI16 output, ImageBorder_S32<GrayU8> border ) {
+		InputSanityCheck.checkReshape(input, output);
 
-		boolean processed = BOverrideConvolveImage.invokeNativeConvolve(kernel,input,output,border);
+		if (BOverrideConvolveImage.invokeNativeConvolve(kernel, input, output, border))
+			return;
 
-		if( !processed ) {
-			border.setImage(input);
-			ConvolveImageNoBorder.convolve(kernel,input,output);
-			ConvolveJustBorder_General_SB.convolve(kernel, border,output);
-		}
+		border.setImage(input);
+		ConvolveImageNoBorder.convolve(kernel, input, output);
+		ConvolveJustBorder_General_SB.convolve(kernel, border, output);
 	}
 
 	/**
@@ -239,17 +230,16 @@ public class ConvolveImage {
 	 * @param kernel The kernel that is being convolved. Not modified.
 	 * @param border How the image borders are handled.
 	 */
-	public static void horizontal(Kernel1D_S32 kernel,
-								  InterleavedU8 input, InterleavedI16 output , ImageBorder_IL_S32<InterleavedU8> border ) {
-		InputSanityCheck.checkSameShapeB(input, output);
+	public static void horizontal( Kernel1D_S32 kernel,
+								  InterleavedU8 input, InterleavedI16 output, ImageBorder_IL_S32<InterleavedU8> border ) {
+		InputSanityCheck.checkReshapeB(input, output);
 
-		boolean processed = BOverrideConvolveImage.invokeNativeHorizontal(kernel,input,output,border);
+		if (BOverrideConvolveImage.invokeNativeHorizontal(kernel, input, output, border))
+			return;
 
-		if( !processed ) {
-			border.setImage(input);
-			ConvolveImageNoBorder.horizontal(kernel,input,output);
-			ConvolveJustBorder_General_IL.horizontal(kernel, border,output);
-		}
+		border.setImage(input);
+		ConvolveImageNoBorder.horizontal(kernel, input, output);
+		ConvolveJustBorder_General_IL.horizontal(kernel, border, output);
 	}
 
 	/**
@@ -260,17 +250,16 @@ public class ConvolveImage {
 	 * @param kernel The kernel that is being convolved. Not modified.
 	 * @param border How the image borders are handled.
 	 */
-	public static void vertical(Kernel1D_S32 kernel,
-								  InterleavedU8 input, InterleavedI16 output , ImageBorder_IL_S32<InterleavedU8> border ) {
-		InputSanityCheck.checkSameShapeB(input, output);
+	public static void vertical( Kernel1D_S32 kernel,
+								  InterleavedU8 input, InterleavedI16 output, ImageBorder_IL_S32<InterleavedU8> border ) {
+		InputSanityCheck.checkReshapeB(input, output);
 
-		boolean processed = BOverrideConvolveImage.invokeNativeVertical(kernel,input,output,border);
+		if (BOverrideConvolveImage.invokeNativeVertical(kernel, input, output, border))
+			return;
 
-		if( !processed ) {
-			border.setImage(input);
-			ConvolveImageNoBorder.vertical(kernel,input,output);
-			ConvolveJustBorder_General_IL.vertical(kernel, border,output);
-		}
+		border.setImage(input);
+		ConvolveImageNoBorder.vertical(kernel, input, output);
+		ConvolveJustBorder_General_IL.vertical(kernel, border, output);
 	}
 
 	/**
@@ -281,17 +270,16 @@ public class ConvolveImage {
 	 * @param kernel The kernel that is being convolved. Not modified.
 	 * @param border How the image borders are handled.
 	 */
-	public static void convolve(Kernel2D_S32 kernel,
-								  InterleavedU8 input, InterleavedI16 output , ImageBorder_IL_S32<InterleavedU8> border ) {
-		InputSanityCheck.checkSameShapeB(input, output);
+	public static void convolve( Kernel2D_S32 kernel,
+								  InterleavedU8 input, InterleavedI16 output, ImageBorder_IL_S32<InterleavedU8> border ) {
+		InputSanityCheck.checkReshapeB(input, output);
 
-		boolean processed = BOverrideConvolveImage.invokeNativeConvolve(kernel,input,output,border);
+		if (BOverrideConvolveImage.invokeNativeConvolve(kernel, input, output, border))
+			return;
 
-		if( !processed ) {
-			border.setImage(input);
-			ConvolveImageNoBorder.convolve(kernel,input,output);
-			ConvolveJustBorder_General_IL.convolve(kernel, border,output);
-		}
+		border.setImage(input);
+		ConvolveImageNoBorder.convolve(kernel, input, output);
+		ConvolveJustBorder_General_IL.convolve(kernel, border, output);
 	}
 
 	/**
@@ -302,17 +290,16 @@ public class ConvolveImage {
 	 * @param kernel The kernel that is being convolved. Not modified.
 	 * @param border How the image borders are handled.
 	 */
-	public static void horizontal(Kernel1D_S32 kernel,
-								  GrayU8 input, GrayS32 output , ImageBorder_S32<GrayU8> border ) {
-		InputSanityCheck.checkSameShape(input, output);
+	public static void horizontal( Kernel1D_S32 kernel,
+								  GrayU8 input, GrayS32 output, ImageBorder_S32<GrayU8> border ) {
+		InputSanityCheck.checkReshape(input, output);
 
-		boolean processed = BOverrideConvolveImage.invokeNativeHorizontal(kernel,input,output,border);
+		if (BOverrideConvolveImage.invokeNativeHorizontal(kernel, input, output, border))
+			return;
 
-		if( !processed ) {
-			border.setImage(input);
-			ConvolveImageNoBorder.horizontal(kernel,input,output);
-			ConvolveJustBorder_General_SB.horizontal(kernel, border,output);
-		}
+		border.setImage(input);
+		ConvolveImageNoBorder.horizontal(kernel, input, output);
+		ConvolveJustBorder_General_SB.horizontal(kernel, border, output);
 	}
 
 	/**
@@ -323,17 +310,16 @@ public class ConvolveImage {
 	 * @param kernel The kernel that is being convolved. Not modified.
 	 * @param border How the image borders are handled.
 	 */
-	public static void vertical(Kernel1D_S32 kernel,
-								  GrayU8 input, GrayS32 output , ImageBorder_S32<GrayU8> border ) {
-		InputSanityCheck.checkSameShape(input, output);
+	public static void vertical( Kernel1D_S32 kernel,
+								  GrayU8 input, GrayS32 output, ImageBorder_S32<GrayU8> border ) {
+		InputSanityCheck.checkReshape(input, output);
 
-		boolean processed = BOverrideConvolveImage.invokeNativeVertical(kernel,input,output,border);
+		if (BOverrideConvolveImage.invokeNativeVertical(kernel, input, output, border))
+			return;
 
-		if( !processed ) {
-			border.setImage(input);
-			ConvolveImageNoBorder.vertical(kernel,input,output);
-			ConvolveJustBorder_General_SB.vertical(kernel, border,output);
-		}
+		border.setImage(input);
+		ConvolveImageNoBorder.vertical(kernel, input, output);
+		ConvolveJustBorder_General_SB.vertical(kernel, border, output);
 	}
 
 	/**
@@ -344,17 +330,16 @@ public class ConvolveImage {
 	 * @param kernel The kernel that is being convolved. Not modified.
 	 * @param border How the image borders are handled.
 	 */
-	public static void convolve(Kernel2D_S32 kernel,
-								  GrayU8 input, GrayS32 output , ImageBorder_S32<GrayU8> border ) {
-		InputSanityCheck.checkSameShape(input, output);
+	public static void convolve( Kernel2D_S32 kernel,
+								  GrayU8 input, GrayS32 output, ImageBorder_S32<GrayU8> border ) {
+		InputSanityCheck.checkReshape(input, output);
 
-		boolean processed = BOverrideConvolveImage.invokeNativeConvolve(kernel,input,output,border);
+		if (BOverrideConvolveImage.invokeNativeConvolve(kernel, input, output, border))
+			return;
 
-		if( !processed ) {
-			border.setImage(input);
-			ConvolveImageNoBorder.convolve(kernel,input,output);
-			ConvolveJustBorder_General_SB.convolve(kernel, border,output);
-		}
+		border.setImage(input);
+		ConvolveImageNoBorder.convolve(kernel, input, output);
+		ConvolveJustBorder_General_SB.convolve(kernel, border, output);
 	}
 
 	/**
@@ -365,17 +350,16 @@ public class ConvolveImage {
 	 * @param kernel The kernel that is being convolved. Not modified.
 	 * @param border How the image borders are handled.
 	 */
-	public static void horizontal(Kernel1D_S32 kernel,
-								  InterleavedU8 input, InterleavedS32 output , ImageBorder_IL_S32<InterleavedU8> border ) {
-		InputSanityCheck.checkSameShapeB(input, output);
+	public static void horizontal( Kernel1D_S32 kernel,
+								  InterleavedU8 input, InterleavedS32 output, ImageBorder_IL_S32<InterleavedU8> border ) {
+		InputSanityCheck.checkReshapeB(input, output);
 
-		boolean processed = BOverrideConvolveImage.invokeNativeHorizontal(kernel,input,output,border);
+		if (BOverrideConvolveImage.invokeNativeHorizontal(kernel, input, output, border))
+			return;
 
-		if( !processed ) {
-			border.setImage(input);
-			ConvolveImageNoBorder.horizontal(kernel,input,output);
-			ConvolveJustBorder_General_IL.horizontal(kernel, border,output);
-		}
+		border.setImage(input);
+		ConvolveImageNoBorder.horizontal(kernel, input, output);
+		ConvolveJustBorder_General_IL.horizontal(kernel, border, output);
 	}
 
 	/**
@@ -386,17 +370,16 @@ public class ConvolveImage {
 	 * @param kernel The kernel that is being convolved. Not modified.
 	 * @param border How the image borders are handled.
 	 */
-	public static void vertical(Kernel1D_S32 kernel,
-								  InterleavedU8 input, InterleavedS32 output , ImageBorder_IL_S32<InterleavedU8> border ) {
-		InputSanityCheck.checkSameShapeB(input, output);
+	public static void vertical( Kernel1D_S32 kernel,
+								  InterleavedU8 input, InterleavedS32 output, ImageBorder_IL_S32<InterleavedU8> border ) {
+		InputSanityCheck.checkReshapeB(input, output);
 
-		boolean processed = BOverrideConvolveImage.invokeNativeVertical(kernel,input,output,border);
+		if (BOverrideConvolveImage.invokeNativeVertical(kernel, input, output, border))
+			return;
 
-		if( !processed ) {
-			border.setImage(input);
-			ConvolveImageNoBorder.vertical(kernel,input,output);
-			ConvolveJustBorder_General_IL.vertical(kernel, border,output);
-		}
+		border.setImage(input);
+		ConvolveImageNoBorder.vertical(kernel, input, output);
+		ConvolveJustBorder_General_IL.vertical(kernel, border, output);
 	}
 
 	/**
@@ -407,17 +390,16 @@ public class ConvolveImage {
 	 * @param kernel The kernel that is being convolved. Not modified.
 	 * @param border How the image borders are handled.
 	 */
-	public static void convolve(Kernel2D_S32 kernel,
-								  InterleavedU8 input, InterleavedS32 output , ImageBorder_IL_S32<InterleavedU8> border ) {
-		InputSanityCheck.checkSameShapeB(input, output);
+	public static void convolve( Kernel2D_S32 kernel,
+								  InterleavedU8 input, InterleavedS32 output, ImageBorder_IL_S32<InterleavedU8> border ) {
+		InputSanityCheck.checkReshapeB(input, output);
 
-		boolean processed = BOverrideConvolveImage.invokeNativeConvolve(kernel,input,output,border);
+		if (BOverrideConvolveImage.invokeNativeConvolve(kernel, input, output, border))
+			return;
 
-		if( !processed ) {
-			border.setImage(input);
-			ConvolveImageNoBorder.convolve(kernel,input,output);
-			ConvolveJustBorder_General_IL.convolve(kernel, border,output);
-		}
+		border.setImage(input);
+		ConvolveImageNoBorder.convolve(kernel, input, output);
+		ConvolveJustBorder_General_IL.convolve(kernel, border, output);
 	}
 
 	/**
@@ -428,17 +410,16 @@ public class ConvolveImage {
 	 * @param kernel The kernel that is being convolved. Not modified.
 	 * @param border How the image borders are handled.
 	 */
-	public static void horizontal(Kernel1D_S32 kernel,
-								  GrayS16 input, GrayI16 output , ImageBorder_S32<GrayS16> border ) {
-		InputSanityCheck.checkSameShape(input, output);
+	public static void horizontal( Kernel1D_S32 kernel,
+								  GrayS16 input, GrayI16 output, ImageBorder_S32<GrayS16> border ) {
+		InputSanityCheck.checkReshape(input, output);
 
-		boolean processed = BOverrideConvolveImage.invokeNativeHorizontal(kernel,input,output,border);
+		if (BOverrideConvolveImage.invokeNativeHorizontal(kernel, input, output, border))
+			return;
 
-		if( !processed ) {
-			border.setImage(input);
-			ConvolveImageNoBorder.horizontal(kernel,input,output);
-			ConvolveJustBorder_General_SB.horizontal(kernel, border,output);
-		}
+		border.setImage(input);
+		ConvolveImageNoBorder.horizontal(kernel, input, output);
+		ConvolveJustBorder_General_SB.horizontal(kernel, border, output);
 	}
 
 	/**
@@ -449,17 +430,16 @@ public class ConvolveImage {
 	 * @param kernel The kernel that is being convolved. Not modified.
 	 * @param border How the image borders are handled.
 	 */
-	public static void vertical(Kernel1D_S32 kernel,
-								  GrayS16 input, GrayI16 output , ImageBorder_S32<GrayS16> border ) {
-		InputSanityCheck.checkSameShape(input, output);
+	public static void vertical( Kernel1D_S32 kernel,
+								  GrayS16 input, GrayI16 output, ImageBorder_S32<GrayS16> border ) {
+		InputSanityCheck.checkReshape(input, output);
 
-		boolean processed = BOverrideConvolveImage.invokeNativeVertical(kernel,input,output,border);
+		if (BOverrideConvolveImage.invokeNativeVertical(kernel, input, output, border))
+			return;
 
-		if( !processed ) {
-			border.setImage(input);
-			ConvolveImageNoBorder.vertical(kernel,input,output);
-			ConvolveJustBorder_General_SB.vertical(kernel, border,output);
-		}
+		border.setImage(input);
+		ConvolveImageNoBorder.vertical(kernel, input, output);
+		ConvolveJustBorder_General_SB.vertical(kernel, border, output);
 	}
 
 	/**
@@ -470,17 +450,16 @@ public class ConvolveImage {
 	 * @param kernel The kernel that is being convolved. Not modified.
 	 * @param border How the image borders are handled.
 	 */
-	public static void convolve(Kernel2D_S32 kernel,
-								  GrayS16 input, GrayI16 output , ImageBorder_S32<GrayS16> border ) {
-		InputSanityCheck.checkSameShape(input, output);
+	public static void convolve( Kernel2D_S32 kernel,
+								  GrayS16 input, GrayI16 output, ImageBorder_S32<GrayS16> border ) {
+		InputSanityCheck.checkReshape(input, output);
 
-		boolean processed = BOverrideConvolveImage.invokeNativeConvolve(kernel,input,output,border);
+		if (BOverrideConvolveImage.invokeNativeConvolve(kernel, input, output, border))
+			return;
 
-		if( !processed ) {
-			border.setImage(input);
-			ConvolveImageNoBorder.convolve(kernel,input,output);
-			ConvolveJustBorder_General_SB.convolve(kernel, border,output);
-		}
+		border.setImage(input);
+		ConvolveImageNoBorder.convolve(kernel, input, output);
+		ConvolveJustBorder_General_SB.convolve(kernel, border, output);
 	}
 
 	/**
@@ -491,17 +470,16 @@ public class ConvolveImage {
 	 * @param kernel The kernel that is being convolved. Not modified.
 	 * @param border How the image borders are handled.
 	 */
-	public static void horizontal(Kernel1D_S32 kernel,
-								  InterleavedS16 input, InterleavedI16 output , ImageBorder_IL_S32<InterleavedS16> border ) {
-		InputSanityCheck.checkSameShapeB(input, output);
+	public static void horizontal( Kernel1D_S32 kernel,
+								  InterleavedS16 input, InterleavedI16 output, ImageBorder_IL_S32<InterleavedS16> border ) {
+		InputSanityCheck.checkReshapeB(input, output);
 
-		boolean processed = BOverrideConvolveImage.invokeNativeHorizontal(kernel,input,output,border);
+		if (BOverrideConvolveImage.invokeNativeHorizontal(kernel, input, output, border))
+			return;
 
-		if( !processed ) {
-			border.setImage(input);
-			ConvolveImageNoBorder.horizontal(kernel,input,output);
-			ConvolveJustBorder_General_IL.horizontal(kernel, border,output);
-		}
+		border.setImage(input);
+		ConvolveImageNoBorder.horizontal(kernel, input, output);
+		ConvolveJustBorder_General_IL.horizontal(kernel, border, output);
 	}
 
 	/**
@@ -512,17 +490,16 @@ public class ConvolveImage {
 	 * @param kernel The kernel that is being convolved. Not modified.
 	 * @param border How the image borders are handled.
 	 */
-	public static void vertical(Kernel1D_S32 kernel,
-								  InterleavedS16 input, InterleavedI16 output , ImageBorder_IL_S32<InterleavedS16> border ) {
-		InputSanityCheck.checkSameShapeB(input, output);
+	public static void vertical( Kernel1D_S32 kernel,
+								  InterleavedS16 input, InterleavedI16 output, ImageBorder_IL_S32<InterleavedS16> border ) {
+		InputSanityCheck.checkReshapeB(input, output);
 
-		boolean processed = BOverrideConvolveImage.invokeNativeVertical(kernel,input,output,border);
+		if (BOverrideConvolveImage.invokeNativeVertical(kernel, input, output, border))
+			return;
 
-		if( !processed ) {
-			border.setImage(input);
-			ConvolveImageNoBorder.vertical(kernel,input,output);
-			ConvolveJustBorder_General_IL.vertical(kernel, border,output);
-		}
+		border.setImage(input);
+		ConvolveImageNoBorder.vertical(kernel, input, output);
+		ConvolveJustBorder_General_IL.vertical(kernel, border, output);
 	}
 
 	/**
@@ -533,17 +510,16 @@ public class ConvolveImage {
 	 * @param kernel The kernel that is being convolved. Not modified.
 	 * @param border How the image borders are handled.
 	 */
-	public static void convolve(Kernel2D_S32 kernel,
-								  InterleavedS16 input, InterleavedI16 output , ImageBorder_IL_S32<InterleavedS16> border ) {
-		InputSanityCheck.checkSameShapeB(input, output);
+	public static void convolve( Kernel2D_S32 kernel,
+								  InterleavedS16 input, InterleavedI16 output, ImageBorder_IL_S32<InterleavedS16> border ) {
+		InputSanityCheck.checkReshapeB(input, output);
 
-		boolean processed = BOverrideConvolveImage.invokeNativeConvolve(kernel,input,output,border);
+		if (BOverrideConvolveImage.invokeNativeConvolve(kernel, input, output, border))
+			return;
 
-		if( !processed ) {
-			border.setImage(input);
-			ConvolveImageNoBorder.convolve(kernel,input,output);
-			ConvolveJustBorder_General_IL.convolve(kernel, border,output);
-		}
+		border.setImage(input);
+		ConvolveImageNoBorder.convolve(kernel, input, output);
+		ConvolveJustBorder_General_IL.convolve(kernel, border, output);
 	}
 
 	/**
@@ -554,17 +530,16 @@ public class ConvolveImage {
 	 * @param kernel The kernel that is being convolved. Not modified.
 	 * @param border How the image borders are handled.
 	 */
-	public static void horizontal(Kernel1D_S32 kernel,
-								  GrayS32 input, GrayS32 output , ImageBorder_S32<GrayS32> border ) {
-		InputSanityCheck.checkSameShape(input, output);
+	public static void horizontal( Kernel1D_S32 kernel,
+								  GrayS32 input, GrayS32 output, ImageBorder_S32<GrayS32> border ) {
+		InputSanityCheck.checkReshape(input, output);
 
-		boolean processed = BOverrideConvolveImage.invokeNativeHorizontal(kernel,input,output,border);
+		if (BOverrideConvolveImage.invokeNativeHorizontal(kernel, input, output, border))
+			return;
 
-		if( !processed ) {
-			border.setImage(input);
-			ConvolveImageNoBorder.horizontal(kernel,input,output);
-			ConvolveJustBorder_General_SB.horizontal(kernel, border,output);
-		}
+		border.setImage(input);
+		ConvolveImageNoBorder.horizontal(kernel, input, output);
+		ConvolveJustBorder_General_SB.horizontal(kernel, border, output);
 	}
 
 	/**
@@ -575,17 +550,16 @@ public class ConvolveImage {
 	 * @param kernel The kernel that is being convolved. Not modified.
 	 * @param border How the image borders are handled.
 	 */
-	public static void vertical(Kernel1D_S32 kernel,
-								  GrayS32 input, GrayS32 output , ImageBorder_S32<GrayS32> border ) {
-		InputSanityCheck.checkSameShape(input, output);
+	public static void vertical( Kernel1D_S32 kernel,
+								  GrayS32 input, GrayS32 output, ImageBorder_S32<GrayS32> border ) {
+		InputSanityCheck.checkReshape(input, output);
 
-		boolean processed = BOverrideConvolveImage.invokeNativeVertical(kernel,input,output,border);
+		if (BOverrideConvolveImage.invokeNativeVertical(kernel, input, output, border))
+			return;
 
-		if( !processed ) {
-			border.setImage(input);
-			ConvolveImageNoBorder.vertical(kernel,input,output);
-			ConvolveJustBorder_General_SB.vertical(kernel, border,output);
-		}
+		border.setImage(input);
+		ConvolveImageNoBorder.vertical(kernel, input, output);
+		ConvolveJustBorder_General_SB.vertical(kernel, border, output);
 	}
 
 	/**
@@ -596,17 +570,16 @@ public class ConvolveImage {
 	 * @param kernel The kernel that is being convolved. Not modified.
 	 * @param border How the image borders are handled.
 	 */
-	public static void convolve(Kernel2D_S32 kernel,
-								  GrayS32 input, GrayS32 output , ImageBorder_S32<GrayS32> border ) {
-		InputSanityCheck.checkSameShape(input, output);
+	public static void convolve( Kernel2D_S32 kernel,
+								  GrayS32 input, GrayS32 output, ImageBorder_S32<GrayS32> border ) {
+		InputSanityCheck.checkReshape(input, output);
 
-		boolean processed = BOverrideConvolveImage.invokeNativeConvolve(kernel,input,output,border);
+		if (BOverrideConvolveImage.invokeNativeConvolve(kernel, input, output, border))
+			return;
 
-		if( !processed ) {
-			border.setImage(input);
-			ConvolveImageNoBorder.convolve(kernel,input,output);
-			ConvolveJustBorder_General_SB.convolve(kernel, border,output);
-		}
+		border.setImage(input);
+		ConvolveImageNoBorder.convolve(kernel, input, output);
+		ConvolveJustBorder_General_SB.convolve(kernel, border, output);
 	}
 
 	/**
@@ -617,17 +590,16 @@ public class ConvolveImage {
 	 * @param kernel The kernel that is being convolved. Not modified.
 	 * @param border How the image borders are handled.
 	 */
-	public static void horizontal(Kernel1D_S32 kernel,
-								  InterleavedS32 input, InterleavedS32 output , ImageBorder_IL_S32<InterleavedS32> border ) {
-		InputSanityCheck.checkSameShapeB(input, output);
+	public static void horizontal( Kernel1D_S32 kernel,
+								  InterleavedS32 input, InterleavedS32 output, ImageBorder_IL_S32<InterleavedS32> border ) {
+		InputSanityCheck.checkReshapeB(input, output);
 
-		boolean processed = BOverrideConvolveImage.invokeNativeHorizontal(kernel,input,output,border);
+		if (BOverrideConvolveImage.invokeNativeHorizontal(kernel, input, output, border))
+			return;
 
-		if( !processed ) {
-			border.setImage(input);
-			ConvolveImageNoBorder.horizontal(kernel,input,output);
-			ConvolveJustBorder_General_IL.horizontal(kernel, border,output);
-		}
+		border.setImage(input);
+		ConvolveImageNoBorder.horizontal(kernel, input, output);
+		ConvolveJustBorder_General_IL.horizontal(kernel, border, output);
 	}
 
 	/**
@@ -638,17 +610,16 @@ public class ConvolveImage {
 	 * @param kernel The kernel that is being convolved. Not modified.
 	 * @param border How the image borders are handled.
 	 */
-	public static void vertical(Kernel1D_S32 kernel,
-								  InterleavedS32 input, InterleavedS32 output , ImageBorder_IL_S32<InterleavedS32> border ) {
-		InputSanityCheck.checkSameShapeB(input, output);
+	public static void vertical( Kernel1D_S32 kernel,
+								  InterleavedS32 input, InterleavedS32 output, ImageBorder_IL_S32<InterleavedS32> border ) {
+		InputSanityCheck.checkReshapeB(input, output);
 
-		boolean processed = BOverrideConvolveImage.invokeNativeVertical(kernel,input,output,border);
+		if (BOverrideConvolveImage.invokeNativeVertical(kernel, input, output, border))
+			return;
 
-		if( !processed ) {
-			border.setImage(input);
-			ConvolveImageNoBorder.vertical(kernel,input,output);
-			ConvolveJustBorder_General_IL.vertical(kernel, border,output);
-		}
+		border.setImage(input);
+		ConvolveImageNoBorder.vertical(kernel, input, output);
+		ConvolveJustBorder_General_IL.vertical(kernel, border, output);
 	}
 
 	/**
@@ -659,17 +630,16 @@ public class ConvolveImage {
 	 * @param kernel The kernel that is being convolved. Not modified.
 	 * @param border How the image borders are handled.
 	 */
-	public static void convolve(Kernel2D_S32 kernel,
-								  InterleavedS32 input, InterleavedS32 output , ImageBorder_IL_S32<InterleavedS32> border ) {
-		InputSanityCheck.checkSameShapeB(input, output);
+	public static void convolve( Kernel2D_S32 kernel,
+								  InterleavedS32 input, InterleavedS32 output, ImageBorder_IL_S32<InterleavedS32> border ) {
+		InputSanityCheck.checkReshapeB(input, output);
 
-		boolean processed = BOverrideConvolveImage.invokeNativeConvolve(kernel,input,output,border);
+		if (BOverrideConvolveImage.invokeNativeConvolve(kernel, input, output, border))
+			return;
 
-		if( !processed ) {
-			border.setImage(input);
-			ConvolveImageNoBorder.convolve(kernel,input,output);
-			ConvolveJustBorder_General_IL.convolve(kernel, border,output);
-		}
+		border.setImage(input);
+		ConvolveImageNoBorder.convolve(kernel, input, output);
+		ConvolveJustBorder_General_IL.convolve(kernel, border, output);
 	}
 
 }

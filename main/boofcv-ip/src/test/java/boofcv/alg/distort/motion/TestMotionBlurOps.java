@@ -20,16 +20,14 @@ package boofcv.alg.distort.motion;
 
 import boofcv.alg.filter.kernel.KernelMath;
 import boofcv.struct.convolve.Kernel2D_F32;
+import boofcv.testing.BoofStandardJUnit;
 import org.ejml.UtilEjml;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-/**
- * @author Peter Abeles
- */
-public class TestMotionBlurOps {
+public class TestMotionBlurOps extends BoofStandardJUnit {
 	/**
 	 * Really basic tests. Does not guarantee the PSF is correct.
 	 */

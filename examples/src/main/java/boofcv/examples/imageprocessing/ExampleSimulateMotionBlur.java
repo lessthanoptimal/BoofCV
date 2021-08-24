@@ -20,14 +20,12 @@ package boofcv.examples.imageprocessing;
 
 import boofcv.alg.distort.motion.MotionBlurOps;
 import boofcv.alg.filter.convolve.GConvolveImageOps;
-import boofcv.core.image.border.FactoryImageBorder;
 import boofcv.gui.ListDisplayPanel;
 import boofcv.gui.image.ShowImages;
 import boofcv.io.UtilIO;
 import boofcv.io.image.ConvertBufferedImage;
 import boofcv.io.image.UtilImageIO;
 import boofcv.struct.border.BorderType;
-import boofcv.struct.border.ImageBorder;
 import boofcv.struct.convolve.Kernel2D_F32;
 import boofcv.struct.image.GrayF32;
 import boofcv.struct.image.ImageType;
@@ -44,21 +42,21 @@ public class ExampleSimulateMotionBlur {
 	public static void main( String[] args ) {
 		// Load a chessboard image since it's easy to see blur with it
 		GrayF32 image = UtilImageIO.loadImage(UtilIO.fileExample("calibration/mono/Sony_DSC-HX5V_Chess/frame03.jpg"), true, ImageType.SB_F32);
+		GrayF32 blurred = image.createSameShape();
 
-		ListDisplayPanel panel = new ListDisplayPanel();
-
-		ImageBorder<GrayF32> border = FactoryImageBorder.generic(BorderType.EXTENDED, image.imageType);
+		var panel = new ListDisplayPanel();
 
 		for (int degrees : new int[]{0, 25, -75}) {
 			double radians = UtilAngle.degreeToRadian(degrees);
 			for (double lengthOfMotion : new double[]{5, 15, 30}) {
+				// Create the PSF (i.e. Kernel) that models motion blur with constant velocity
+				// radians is the motion blur's direction
 				Kernel2D_F32 kernel = MotionBlurOps.linearMotionPsf(lengthOfMotion, radians);
-				GrayF32 blurred = image.createSameShape();
+				GConvolveImageOps.convolve(kernel, image, blurred, BorderType.EXTENDED);
 
-				GConvolveImageOps.convolve(kernel, image, blurred, border);
-
+				// Visualize results
 				BufferedImage visualized = ConvertBufferedImage.convertTo(blurred, null);
-				panel.addImage(visualized, String.format("linear: angle=%d motion=%.0f",degrees,lengthOfMotion));
+				panel.addImage(visualized, String.format("linear: angle=%d motion=%.0f", degrees, lengthOfMotion));
 			}
 		}
 
