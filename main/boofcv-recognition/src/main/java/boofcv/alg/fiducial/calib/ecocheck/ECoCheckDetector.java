@@ -20,6 +20,7 @@ package boofcv.alg.fiducial.calib.ecocheck;
 
 import boofcv.BoofVerbose;
 import boofcv.abst.fiducial.calib.ConfigChessboardX;
+import boofcv.alg.feature.detect.chess.ChessboardCorner;
 import boofcv.alg.feature.detect.chess.DetectChessboardCornersXPyramid;
 import boofcv.alg.fiducial.calib.chess.ChessboardCornerClusterFinder;
 import boofcv.alg.fiducial.calib.chess.ChessboardCornerClusterToGrid;
@@ -37,6 +38,7 @@ import boofcv.struct.border.BorderType;
 import boofcv.struct.image.GrayU8;
 import boofcv.struct.image.ImageGray;
 import boofcv.struct.image.ImageType;
+import georegression.struct.line.LineSegment2D_F64;
 import georegression.struct.point.Point2D_F64;
 import lombok.Getter;
 import org.ddogleg.struct.*;
@@ -63,11 +65,19 @@ import static boofcv.alg.fiducial.calib.ecocheck.ECoCheckUtils.rotateObserved;
  * @author Peter Abeles
  */
 public class ECoCheckDetector<T extends ImageGray<T>> implements VerbosePrint {
-	// TODO Weigh bit sample points based on distance from center?
 	// TODO Add back in the ability to encoded every N squares
 
 	/** Number of times a side is sampled when determining binarization threshold */
 	final int NUM_SAMPLES_SIDE = 5; // number of samples along each side
+
+	/**
+	 * Number of points along a side it will sample when trying to determine if a border is white. Disable by settings
+	 * to zero.
+	 */
+	public int whiteBorderSampleCount = 5;
+
+	/** If more than this number of points fail the test consider it a failure */
+	public double maxWhiteBorderFailFraction = 0.3;
 
 	/** Common utilities for decoding ECoCheck patterns */
 	@Getter protected ECoCheckUtils utils;
@@ -117,6 +127,11 @@ public class ECoCheckDetector<T extends ImageGray<T>> implements VerbosePrint {
 
 	// Coordinate of the cell observed on the grid taking in account orientation
 	GridCoordinate observedCoordinate = new GridCoordinate();
+
+	// workspace for white border test
+	LineSegment2D_F64 lineBlack = new LineSegment2D_F64();
+	LineSegment2D_F64 lineWhite = new LineSegment2D_F64();
+	Point2D_F64 pixel = new Point2D_F64();
 
 	// Verbose print debugging
 	PrintStream verbose;
@@ -197,6 +212,8 @@ public class ECoCheckDetector<T extends ImageGray<T>> implements VerbosePrint {
 			long timeGrid1 = System.nanoTime();
 			timeGridMS += (timeGrid1 - timeGrid0)*1e-6;
 
+			// TODO make sure the grid has the
+
 			// Go through and find all the white squares that could contain data. Attempt to decode
 			decodeBinaryPatterns();
 			timeDecodingMS += (System.nanoTime() - timeGrid1)*1e-6;
@@ -265,26 +282,31 @@ public class ECoCheckDetector<T extends ImageGray<T>> implements VerbosePrint {
 				if (a == null || b == null || c == null || d == null)
 					continue;
 
+				// Grid orientation is currently unknown. We have to assume that any square could be black or white
 				// See if this square could have an encoded value
-				if (!clusterToGrid.isWhiteSquare(a.node, c.node))
+				if (!clusterToGrid.isWhiteSquareOrientation(a.node, c.node))
 					continue;
 
-				// TODO see if the white border is brighter than outside
-				// reject if more than N points fail this test
-
-				// compute homography from pixels to data-region coordinates
+				// Compute homography from pixels to data-region coordinates
 				if (!utils.computeGridToImage(a.node.corner, b.node.corner, c.node.corner, d.node.corner))
 					continue;
 
+				// This is needed as a backup if isWhiteSquare() is incorrect, which it can be for heavy fisheye/
+				// Checksum and ECC should catch most errors, but we are concerned about outlier performance.
+				// Verify that the border surrounding data bits is mostly white
+				if (!isBorderWhite(a.node.corner, b.node.corner, c.node.corner, d.node.corner)) {
+					continue;
+				}
+
 				// Which pixels need to be sampled
 				utils.selectPixelsToSample(samplePixels);
-				samplePixelValues(samplePixels.toList(), sampleValues);
+				samplePixelGray(samplePixels.toList(), sampleValues);
 
 				// Select a threshold that maximized the variance
 				float threshold = utils.otsuThreshold(sampleValues);
 
 				// Sample points and compute bit values
-				if (!sampleBitsGray(sampleValues, utils.bitSampleCount, threshold))
+				if (!graySamplesToBits(sampleValues, utils.bitSampleCount, threshold))
 					continue;
 
 				boolean success = false;
@@ -332,6 +354,10 @@ public class ECoCheckDetector<T extends ImageGray<T>> implements VerbosePrint {
 							row - 1, col - 1, a.node.corner.x, a.node.corner.y, threshold);
 			}
 		}
+	}
+
+	private boolean isBlackGridCoordinate( int row, int col ) {
+		return (row%2 == 1 && col%2 == 1) || (row%2 == 0 && col%2 == 0);
 	}
 
 	/**
@@ -412,7 +438,7 @@ public class ECoCheckDetector<T extends ImageGray<T>> implements VerbosePrint {
 	 * @param samplePoints (Input) Which pixels to sample.
 	 * @param sampleValues (Output) Pixel values
 	 */
-	void samplePixelValues( List<Point2D_F64> samplePoints, DogArray_F32 sampleValues ) {
+	void samplePixelGray( List<Point2D_F64> samplePoints, DogArray_F32 sampleValues ) {
 		sampleValues.resize(samplePoints.size());
 
 		for (int i = 0; i < samplePoints.size(); i++) {
@@ -422,13 +448,118 @@ public class ECoCheckDetector<T extends ImageGray<T>> implements VerbosePrint {
 	}
 
 	/**
+	 * Samples along the edge making sure the inside is brighter than the outside.
+	 */
+	boolean isBorderWhite( ChessboardCorner a, ChessboardCorner b, ChessboardCorner c, ChessboardCorner d ) {
+		// See if test has been disabled
+		if (whiteBorderSampleCount <= 0)
+			return true;
+
+		// Scan each side to see if they have the expected brightness pattern
+		int failures = 0;
+		failures += sampleWhiteSide(a, b, 0);
+		failures += sampleWhiteSide(b, c, 1);
+		failures += sampleWhiteSide(c, d, 2);
+		failures += sampleWhiteSide(d, a, 3);
+
+		boolean success = failures <= 4*whiteBorderSampleCount*maxWhiteBorderFailFraction;
+
+		if (!success && verbose != null) {
+			verbose.println("FAILED: white border test: " + failures + " / " + (4*whiteBorderSampleCount));
+		}
+
+		return success;
+	}
+
+	/**
+	 * Samples the specified side to see if inside points are brighter than outside points. The corner's scale
+	 * estimate is used to avoid the corners which tend to have lower contrast
+	 *
+	 * @return Number of points which failed the brightness check
+	 */
+	int sampleWhiteSide( ChessboardCorner a, ChessboardCorner b, int corner ) {
+		// Use the homography to estimate the center of the white border along this side
+		double r = utils.dataBorderFraction;
+
+		// set the corners up correctly for each side
+		switch (corner) {
+			case 0 -> {
+				utils.gridToPixel(r, r, lineWhite.a);
+				utils.gridToPixel(1.0 - r, r, lineWhite.b);
+				utils.gridToPixel(r, -r, lineBlack.a);
+				utils.gridToPixel(1.0 - r, -r, lineBlack.b);
+			}
+
+			case 1 -> {
+				utils.gridToPixel(1.0 - r, r, lineWhite.a);
+				utils.gridToPixel(1.0 - r, 1.0 - r, lineWhite.b);
+				utils.gridToPixel(1.0 + r, r, lineBlack.a);
+				utils.gridToPixel(1.0 + r, 1.0 - r, lineBlack.b);
+			}
+
+			case 2 -> {
+				utils.gridToPixel(1.0 - r, 1.0 - r, lineWhite.a);
+				utils.gridToPixel(r, 1.0 - r, lineWhite.b);
+				utils.gridToPixel(1.0 - r, 1.0 + r, lineBlack.a);
+				utils.gridToPixel(r, 1.0 + r, lineBlack.b);
+			}
+
+			case 3 -> {
+				utils.gridToPixel(r, 1.0 - r, lineWhite.a);
+				utils.gridToPixel(r, r, lineWhite.b);
+				utils.gridToPixel(-r, 1.0 - r, lineBlack.a);
+				utils.gridToPixel(-r, r, lineBlack.b);
+			}
+		}
+
+		// use blur to figure out how much padding is needed to avoid the blurred corner where black/white will
+		// be ambiguous
+		double blurPaddingA = Math.pow(2, a.levelMax);
+		double blurPaddingB = Math.pow(2, b.levelMax);
+
+		double slopeX = lineWhite.slopeX();
+		double slopeY = lineWhite.slopeY();
+		double n = Math.sqrt(slopeX*slopeX + slopeY*slopeY);
+
+		double fractionStart, fractionEnd;
+
+		fractionStart = blurPaddingA/n;
+		fractionEnd = 1.0 - blurPaddingB/n;
+
+		// if the blur is so great that the padding extends beyond the length just sample in the middle
+		if (fractionEnd < fractionStart) {
+			fractionStart = 0.45;
+			fractionEnd = 0.55;
+		}
+
+		// Sample points along the line
+		int failed = 0;
+		for (int i = 0; i < whiteBorderSampleCount; i++) {
+			double f = (fractionEnd - fractionStart)*i/(whiteBorderSampleCount - 1) + fractionStart;
+			pixel.x = (lineBlack.b.x - lineBlack.a.x)*f + lineBlack.a.x;
+			pixel.y = (lineBlack.b.y - lineBlack.a.y)*f + lineBlack.a.y;
+			float blackValue = interpolate.get((float)pixel.x, (float)pixel.y);
+			pixel.x = (lineWhite.b.x - lineWhite.a.x)*f + lineWhite.a.x;
+			pixel.y = (lineWhite.b.y - lineWhite.a.y)*f + lineWhite.a.y;
+			float whiteValue = interpolate.get((float)pixel.x, (float)pixel.y);
+
+			// Just check to see if white is brighter than black. Adding a tolerance is problematic since you need
+			// to estimate the tolerance
+			if (whiteValue <= blackValue)
+				failed++;
+		}
+
+		return failed;
+	}
+
+	/**
 	 * Reads the gray values of data bits inside the square. Votes using the gray threshold. Decides on the bit values
 	 *
 	 * @param sampleValues (Input) Values of each pixel.. Flattened block array of points in the grid
 	 * @param blockSize (Input) How many points are sampled per bit.
 	 * @return true if nothing went wrong
 	 */
-	boolean sampleBitsGray( DogArray_F32 sampleValues, int blockSize, float threshold ) {
+	boolean graySamplesToBits( DogArray_F32 sampleValues, int blockSize, float threshold ) {
 		// Sanity check
 		BoofMiscOps.checkEq(bitImage.width*bitImage.height, sampleValues.size()/blockSize);
 
@@ -439,7 +570,7 @@ public class ECoCheckDetector<T extends ImageGray<T>> implements VerbosePrint {
 			// Each pixel in the bit's block gets a vote for it's value
 			int vote = 0;
 			for (int blockIdx = 0; blockIdx < blockSize; blockIdx++) {
-				float value =sampleValues.get(i + blockIdx);
+				float value = sampleValues.get(i + blockIdx);
 				if (value <= threshold) {
 					vote++;
 				}
