@@ -446,7 +446,7 @@ public class ChessboardCornerClusterToGrid implements VerbosePrint {
 	 * @param a Corner at top-left
 	 * @param c Corner at bottom-right
 	 */
-	public boolean isWhiteSquare( Node a, Node c ) {
+	public boolean isWhiteSquareOrientation( Node a, Node c ) {
 		// Find the average angle from the two vectors defined by the two connected nodes
 		double dirAC = Math.atan2(c.getY() - a.getY(), c.getX() - a.getX());
 

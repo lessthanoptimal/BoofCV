@@ -194,6 +194,14 @@ public class ECoCheckUtils {
 	}
 
 	/**
+	 * Convenience function to go from a point in grid coordinates to image pixels
+	 */
+	public void gridToPixel( double x, double y, Point2D_F64 pixel ) {
+		bitSquare.setTo(x,y);
+		GeometryMath_F64.mult(squareToPixel, bitSquare, pixel);
+	}
+
+	/**
 	 * Selects pixels that it should sample for each bit. The number of pixels per bit is specified by pixelsPerBit.
 	 * The order of bits is in row-major format with a block of size bitSampleCount. Points are sampled in a grid
 	 * pattern with one point in the center. This means there will be an odd number of points preventing a tie.

@@ -299,7 +299,7 @@ public class TestECoCheckDetector extends BoofStandardJUnit {
 		assertNull(alg.findMatching(1, 2, 2, 4));
 	}
 
-	@Test void sampleThresholdSide() {
+	@Test void sampleInnerWhite() {
 		Point2D_F64 a = new Point2D_F64(10, 30);
 		Point2D_F64 b = new Point2D_F64(40, 30);
 
@@ -320,6 +320,45 @@ public class TestECoCheckDetector extends BoofStandardJUnit {
 
 		float found = alg.sampleInnerWhite(a, b);
 		assertEquals(160, found, UtilEjml.TEST_F32);
+	}
+
+	@Test void isBorderWhite() {
+		// give it the transform. t=85,85 scale=30
+		alg.utils.squareToPixel.data = new double[]{30,0,85,0,30,85,0,0,1};
+
+		// return black unless inside the hollow square
+		// inner square = (90, 90, 110, 110)
+		// outer square = (85, 85, 115, 115)
+		alg.interpolate = new AbstractInterpolatePixelS<>() {
+			@Override public float get( float x, float y ) {
+				x = Math.abs(x-100);
+				y = Math.abs(y-100);
+
+				if (x < 10 && y < 10)
+					return 0;
+				if (x < 15 && y < 15)
+					return 255;
+				return 0;
+			}
+		};
+
+		var a = new ChessboardCorner();
+		var b = new ChessboardCorner();
+		var c = new ChessboardCorner();
+		var d = new ChessboardCorner();
+
+		a.setTo(85,85);
+		b.setTo(110,85);
+		c.setTo(110,110);
+		d.setTo(85,110);
+
+		// order should not matter because the line it's sampled along is determined by squareToPixel transform
+		assertTrue(alg.isBorderWhite(a,b,c,d));
+		assertTrue(alg.isBorderWhite(d,c,b,a));
+
+		// changing the transform will cause it to fail
+		alg.utils.squareToPixel.data = new double[]{30,0,95,0,30,85,0,0,1};
+		assertFalse(alg.isBorderWhite(a,b,c,d));
 	}
 
 	/**
@@ -350,8 +389,8 @@ public class TestECoCheckDetector extends BoofStandardJUnit {
 				return (i + j)%3 == 0 ? 10 : 200;
 			}
 		};
-		alg.samplePixelValues(points, values);
-		alg.sampleBitsGray(values, blockSize, 100);
+		alg.samplePixelGray(points, values);
+		alg.graySamplesToBits(values, blockSize, 100);
 
 		for (int i = 0; i < rows; i++) {
 			for (int j = 0; j < cols; j++) {
