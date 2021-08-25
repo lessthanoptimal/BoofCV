@@ -337,7 +337,7 @@ public class SimulatePlanarWorld {
 		Vector3D_F64 normal = new Vector3D_F64();
 		public final GrayF32 texture = new GrayF32(1, 1);
 		public double width3D;
-		double height3D;
+		public double height3D;
 
 		// 3D point of corners in camera frame
 		DogArray<Point3D_F64> rect3D = new DogArray<>(Point3D_F64::new);
@@ -346,7 +346,7 @@ public class SimulatePlanarWorld {
 		// bounding box of visible region in pixels
 		Rectangle2D_I32 pixelRect = new Rectangle2D_I32();
 		// true if its visible
-		boolean visible;
+		public boolean visible;
 
 		/**
 		 * Computes the location of the surface's rectangle in the camera reference frame
