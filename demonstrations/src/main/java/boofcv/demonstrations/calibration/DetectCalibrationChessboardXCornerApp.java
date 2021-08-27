@@ -32,6 +32,7 @@ import boofcv.gui.BoofSwingUtil;
 import boofcv.gui.DemonstrationBase;
 import boofcv.gui.StandardAlgConfigPanel;
 import boofcv.gui.calibration.DisplayPinholeCalibrationPanel;
+import boofcv.gui.controls.JCheckBoxValue;
 import boofcv.gui.image.VisualizeImageData;
 import boofcv.io.PathLabel;
 import boofcv.io.UtilIO;
@@ -149,7 +150,7 @@ public class DetectCalibrationChessboardXCornerApp
 								text += String.format("  intensity %f\n", best.intensity);
 								text += String.format("  orientation %.2f (deg)\n", UtilAngle.degree(best.orientation));
 							} else {
-								text += String.format("  pixel (%7.1f %7.1f )\n", p.x, p.y);
+								text += String.format("  pixel (%7.1f %7.1f)\n", p.x, p.y);
 							}
 						}
 					} else {
@@ -159,7 +160,14 @@ public class DetectCalibrationChessboardXCornerApp
 						}
 						int gray = (((rgb >> 16) & 0xFF) + ((rgb >> 8) & 0xFF) + (rgb & 0xFF))/3;
 
-						text += String.format("pixel (%7.1f %7.1f )\nrgb=0x%8x\ngray=%d\n", p.x, p.y, rgb, gray);
+						text += String.format("pixel (%7.1f %7.1f)\nrgb=0x%8x\ngray=%d\n", p.x, p.y, rgb, gray);
+
+						synchronized (lockAlgorithm) {
+							float raw = detector.getDetector().getDetector().getIntensityRaw().get((int)p.x, (int)p.y);
+							float block = detector.getDetector().getDetector().getIntensity2x2().get((int)p.x, (int)p.y);
+							text += "xcorner-raw " + raw + "\n";
+							text += "xcorner-2x2 " + block + "\n";
+						}
 					}
 					controlPanel.setInfoText(text);
 				}
@@ -238,11 +246,14 @@ public class DetectCalibrationChessboardXCornerApp
 			long time1 = System.nanoTime();
 			processingTime = (time1 - time0)*1e-6; // milliseconds
 
-			featureImg = detector.getDetector().getDetector().getIntensityRaw();
-//			featureImg = detector.getDetector().getDetector().getIntensity2x2();
+			if (controlPanel.showRawIntensity.value) {
+				featureImg = detector.getDetector().getDetector().getIntensityRaw();
+			} else {
+				featureImg = detector.getDetector().getDetector().getIntensity2x2();
+			}
 
 			if (controlPanel.logIntensity) {
-				PixelMath.logSign(featureImg, 0.2f, logIntensity);
+				PixelMath.logSign(featureImg, 1.0f, logIntensity);
 				VisualizeImageData.colorizeSign(logIntensity, visualized, ImageStatistics.maxAbs(logIntensity));
 			} else {
 				VisualizeImageData.colorizeSign(featureImg, visualized, ImageStatistics.maxAbs(featureImg));
@@ -391,6 +402,7 @@ public class DetectCalibrationChessboardXCornerApp
 		JCheckBox checkShowCorners = checkbox("Corners", showCorners);
 		JCheckBox checkMeanShift = checkbox("Mean Shift", meanShift);
 		JCheckBox checkAnyGrid = checkbox("Any Grid", anyGrid);
+		JCheckBoxValue showRawIntensity = checkboxWrap("Raw Inten.", true).tt("Show raw vs 2x2-block filter xcorner intensity");
 
 		ControlPanel() {
 			textArea.setEditable(false);
@@ -445,6 +457,7 @@ public class DetectCalibrationChessboardXCornerApp
 			panelChecks.add(checkShowPerpendicular);
 			panelChecks.add(checkShowCorners);
 			panelChecks.add(checkLogIntensity);
+			panelChecks.add(showRawIntensity.check);
 
 			panelChecks.setPreferredSize(panelChecks.getMinimumSize());
 			panelChecks.setMaximumSize(panelChecks.getMinimumSize());
@@ -504,6 +517,9 @@ public class DetectCalibrationChessboardXCornerApp
 				spinnerGridRows.setEnabled(!anyGrid);
 				createAlgorithm();
 				reprocessImageOnly();
+			} else if (e.getSource() == showRawIntensity.check) {
+				showRawIntensity.updateValue();
+				reprocessImageOnly(); // need to reprocess since this is only rendered once
 			}
 		}
 
