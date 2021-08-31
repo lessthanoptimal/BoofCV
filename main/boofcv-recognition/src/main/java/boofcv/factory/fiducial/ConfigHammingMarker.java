@@ -25,6 +25,7 @@ import org.ddogleg.struct.DogArray;
 
 import java.io.*;
 import java.net.URL;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 /**
@@ -37,7 +38,7 @@ import java.util.stream.Collectors;
  * @author Peter Abeles
  * @see boofcv.alg.fiducial.square.DetectFiducialSquareHamming
  */
-public class ConfigHammingDictionary implements Configuration {
+public class ConfigHammingMarker implements Configuration {
 	/**
 	 * How wide the border is relative to the total fiducial width. Typically the width of one square.
 	 */
@@ -53,9 +54,9 @@ public class ConfigHammingDictionary implements Configuration {
 	public DogArray<Marker> encoding = new DogArray<>(Marker::new);
 
 	/** Which dictionary is this based off of. Typically, this will be pre-defined. */
-	public Dictionary dictionary;
+	public HammingDictionary dictionary;
 
-	public ConfigHammingDictionary() {}
+	public ConfigHammingMarker() {}
 
 	@Override public void checkValidity() {
 		BoofMiscOps.checkTrue(borderWidthFraction > 0.0);
@@ -66,7 +67,7 @@ public class ConfigHammingDictionary implements Configuration {
 		}
 	}
 
-	public void setTo( ConfigHammingDictionary src ) {
+	public void setTo( ConfigHammingMarker src ) {
 		this.borderWidthFraction = src.borderWidthFraction;
 		this.gridWidth = src.gridWidth;
 		this.minimumHamming = src.minimumHamming;
@@ -85,9 +86,6 @@ public class ConfigHammingDictionary implements Configuration {
 	 * Adds a new marker with the specified encoding number
 	 */
 	public void addMarker( long encoding ) {
-		if (encoding >= (long)gridWidth*(long)gridWidth)
-			throw new IllegalArgumentException("ID is larger than the number of bits available");
-
 		Marker m = this.encoding.grow();
 		m.id = this.encoding.size - 1;
 		m.pattern.resize(gridWidth*gridWidth);
@@ -118,8 +116,8 @@ public class ConfigHammingDictionary implements Configuration {
 	/**
 	 * Decodes a string that defined a dictionary in standard format
 	 */
-	public static ConfigHammingDictionary decodeDictionaryString( String text ) {
-		var config = new ConfigHammingDictionary();
+	public static ConfigHammingMarker decodeDictionaryString( String text ) {
+		var config = new ConfigHammingMarker();
 
 		String[] lines = text.split("\n");
 
@@ -157,8 +155,8 @@ public class ConfigHammingDictionary implements Configuration {
 	/**
 	 * Loads a predefined dictionary stored in the the resources
 	 */
-	public static ConfigHammingDictionary loadPredefined( String name ) {
-		URL path = ConfigHammingDictionary.class.getResource(name + ".txt");
+	public static ConfigHammingMarker loadPredefined( String name ) {
+		URL path = Objects.requireNonNull(ConfigHammingMarker.class.getResource(name + ".txt"));
 
 		try (InputStream stream = path.openStream()) {
 			String text = new BufferedReader(new InputStreamReader(stream))
@@ -175,8 +173,8 @@ public class ConfigHammingDictionary implements Configuration {
 	 * @param dictionary Which dictionary it should create
 	 * @return The specified dictionary
 	 */
-	public static ConfigHammingDictionary define( Dictionary dictionary ) {
-		ConfigHammingDictionary config = switch (dictionary) {
+	public static ConfigHammingMarker loadDictionary( HammingDictionary dictionary ) {
+		ConfigHammingMarker config = switch (dictionary) {
 			case CUSTOM -> throw new IllegalArgumentException("Need to manually specify a custom dictionary");
 			case ARUCO_ORIGINAL -> loadPredefined("aruco_original");
 			case ARUCO_MIP_16h3 -> loadPredefined("aruco_mip_16h3");
@@ -185,17 +183,5 @@ public class ConfigHammingDictionary implements Configuration {
 		};
 		config.dictionary = dictionary;
 		return config;
-	}
-
-	/**
-	 * List of pre-generated dictionaries
-	 */
-	public enum Dictionary {
-		/** Custom dictionary */
-		CUSTOM,
-		ARUCO_ORIGINAL,
-		ARUCO_MIP_16h3,
-		ARUCO_MIP_25h7,
-		ARUCO_MIP_36h12,
 	}
 }

@@ -18,14 +18,13 @@
 
 package boofcv.factory.fiducial;
 
-import boofcv.factory.fiducial.ConfigHammingDictionary.Dictionary;
 import boofcv.struct.StandardConfigurationChecks;
 import org.junit.jupiter.api.Test;
 
-import static boofcv.factory.fiducial.ConfigHammingDictionary.define;
+import static boofcv.factory.fiducial.ConfigHammingMarker.loadDictionary;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-public class TestConfigHammingDictionary extends StandardConfigurationChecks {
+public class TestConfigHammingMarker extends StandardConfigurationChecks {
 	@Test void decodeDictionaryString() {
 		String text = """
 				# Ignore this line
@@ -34,7 +33,7 @@ public class TestConfigHammingDictionary extends StandardConfigurationChecks {
 				dictionary=0x5867,0x8b03,0x2537,0x4d58dbea0
 				""";
 
-		ConfigHammingDictionary found = ConfigHammingDictionary.decodeDictionaryString(text);
+		ConfigHammingMarker found = ConfigHammingMarker.decodeDictionaryString(text);
 		assertEquals(4, found.gridWidth);
 		assertEquals(3, found.minimumHamming);
 		assertEquals(4, found.encoding.size);
@@ -49,8 +48,8 @@ public class TestConfigHammingDictionary extends StandardConfigurationChecks {
 		checkEncoding(Long.parseUnsignedLong("4d58dbea0", 16), found, 3);
 	}
 
-	private void checkEncoding( long id, ConfigHammingDictionary found, int markerIndex ) {
-		ConfigHammingDictionary.Marker marker = found.encoding.get(markerIndex);
+	private void checkEncoding( long id, ConfigHammingMarker found, int markerIndex ) {
+		ConfigHammingMarker.Marker marker = found.encoding.get(markerIndex);
 		int bits = found.bitsPerGrid();
 		for (int i = 0; i < bits; i++) {
 			int expected = (int)((id >> i) & 1L);
@@ -59,28 +58,28 @@ public class TestConfigHammingDictionary extends StandardConfigurationChecks {
 	}
 
 	@Test void define_ARUCO_ORIGINAL() {
-		ConfigHammingDictionary found = define(Dictionary.ARUCO_ORIGINAL);
+		ConfigHammingMarker found = loadDictionary(HammingDictionary.ARUCO_ORIGINAL);
 		assertEquals(5, found.gridWidth);
 		assertEquals(1, found.minimumHamming);
 		assertEquals(1023, found.encoding.size);
 	}
 
 	@Test void define_ARUCO_MIP_16h3() {
-		ConfigHammingDictionary found = define(Dictionary.ARUCO_MIP_16h3);
+		ConfigHammingMarker found = loadDictionary(HammingDictionary.ARUCO_MIP_16h3);
 		assertEquals(4, found.gridWidth);
 		assertEquals(3, found.minimumHamming);
 		assertEquals(250, found.encoding.size);
 	}
 
 	@Test void define_ARUCO_MIP_25h7() {
-		ConfigHammingDictionary found = define(Dictionary.ARUCO_MIP_25h7);
+		ConfigHammingMarker found = loadDictionary(HammingDictionary.ARUCO_MIP_25h7);
 		assertEquals(5, found.gridWidth);
 		assertEquals(7, found.minimumHamming);
 		assertEquals(100, found.encoding.size);
 	}
 
 	@Test void define_ARUCO_MIP_36h12() {
-		ConfigHammingDictionary found = define(Dictionary.ARUCO_MIP_36h12);
+		ConfigHammingMarker found = loadDictionary(HammingDictionary.ARUCO_MIP_36h12);
 		assertEquals(6, found.gridWidth);
 		assertEquals(12, found.minimumHamming);
 		assertEquals(250, found.encoding.size);

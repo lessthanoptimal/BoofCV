@@ -22,7 +22,7 @@ import boofcv.misc.BoofMiscOps;
 import boofcv.struct.Configuration;
 
 /**
- * Defines the calibration pattern based on {@link ConfigHammingDictionary hamming checkerboard fiducials} where square
+ * Defines the calibration pattern based on {@link ConfigHammingMarker hamming checkerboard fiducials} where square
  * markers are embedded inside a chessboard/checkerboard pattern. Calibration features come from the inner chessboard
  * pattern. Charuco is a member of this family.
  *
@@ -38,34 +38,47 @@ public class ConfigHammingChessboard implements Configuration {
 	/** The first marker will have this ID */
 	public int markerOffset = 0;
 
-	/** Encoding dictionary for binary patterns */
-	public final ConfigHammingDictionary dictionary;
+	/** Describes the markers are drawn inside the chessboard pattern */
+	public final ConfigHammingMarker markers;
 
 	/** How much smaller the marker is relative to the chessboard squares */
-	public double markerScale = 0.8;
+	public double markerScale = 0.7;
 
-	public ConfigHammingChessboard( ConfigHammingDictionary dictionary ) {
-		this.dictionary = dictionary;
+	/** Size of a square in document units */
+	public double squareSize = 1.0;
+
+	/** If an even pattern then the top-left will always be a black square */
+	public boolean chessboardEven = true;
+
+	public ConfigHammingChessboard( ConfigHammingMarker markers ) {
+		this.markers = markers;
 	}
 
 	@Override public void checkValidity() {
 		BoofMiscOps.checkTrue(numRows > 0);
 		BoofMiscOps.checkTrue(numCols > 0);
-		dictionary.checkValidity();
+		BoofMiscOps.checkTrue(markerOffset >= 0);
+		markers.checkValidity();
+		BoofMiscOps.checkTrue(markerScale > 0);
+		BoofMiscOps.checkTrue(squareSize > 0);
 	}
 
-	public void setTo( ConfigHammingGrid src ) {
+	public void setTo( ConfigHammingChessboard src ) {
 		this.numRows = src.numRows;
 		this.numCols = src.numCols;
-		this.dictionary.setTo(src.dictionary);
+		this.markerOffset = src.markerOffset;
+		this.markers.setTo(src.markers);
+		this.markerScale = src.markerScale;
+		this.squareSize = src.squareSize;
+		this.chessboardEven = src.chessboardEven;
 	}
 
 	/**
 	 * Create from a pre-defined dictionary
 	 */
-	public static ConfigHammingChessboard create( ConfigHammingDictionary.Dictionary dictionary,
+	public static ConfigHammingChessboard create( HammingDictionary dictionary,
 												  int rows, int cols ) {
-		ConfigHammingDictionary configDictionary = ConfigHammingDictionary.define(dictionary);
+		ConfigHammingMarker configDictionary = ConfigHammingMarker.loadDictionary(dictionary);
 
 		var config = new ConfigHammingChessboard(configDictionary);
 		config.numRows = rows;

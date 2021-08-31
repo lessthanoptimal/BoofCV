@@ -21,8 +21,12 @@ package boofcv.alg.fiducial.calib.hammingchess;
 import boofcv.alg.drawing.FiducialRenderEngine;
 import boofcv.alg.fiducial.square.FiducialSquareHammingGenerator;
 import boofcv.factory.fiducial.ConfigHammingChessboard;
+import georegression.struct.point.Point2D_F64;
 import lombok.Getter;
 import lombok.Setter;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Renders Hamming markers inside of chessboard patterns similar to Charuco markers.
@@ -41,13 +45,19 @@ public class HammingChessboardGenerator {
 	// Used to render individual markers
 	private final FiducialSquareHammingGenerator squareGenerator;
 
+	// list of corners in ground truth
+	public final List<Point2D_F64> corner = new ArrayList<>();
+
 	public HammingChessboardGenerator( ConfigHammingChessboard config ) {
 		this.config = config;
-		this.squareGenerator = new FiducialSquareHammingGenerator(config.dictionary);
+		this.squareGenerator = new FiducialSquareHammingGenerator(config.markers);
 	}
 
 	public void render() {
-		double markerOffset = squareWidth*(1.0-config.markerScale)/2.0;
+		render.init();
+		render.setGray(0);
+		squareGenerator.setRender(render);
+		double markerOffset = squareWidth*(1.0 - config.markerScale)/2.0;
 		squareGenerator.squareWidth = squareWidth*config.markerScale;
 
 		int markerIndex = config.markerOffset;
@@ -56,13 +66,39 @@ public class HammingChessboardGenerator {
 			for (int col = 0; col < config.numCols; col++) {
 				double x = col*squareWidth;
 
-				if (col%2==row%2) {
-					render.square(x,y,squareWidth);
+				boolean drawSquare;
+				if (config.chessboardEven) {
+					drawSquare = col%2 == row%2;
+				} else {
+					drawSquare = col%2 != row%2;
+				}
+
+				if (drawSquare) {
+					render.square(x, y, squareWidth);
 				} else {
 					squareGenerator.offsetX = x + markerOffset;
 					squareGenerator.offsetY = y + markerOffset;
-					squareGenerator.render(markerIndex++);
+					squareGenerator.renderNoInit(markerIndex++);
 				}
+			}
+		}
+
+		saveCornerLocations();
+	}
+
+	private void saveCornerLocations() {
+		corner.clear();
+
+		final int rows = config.numRows;
+		final int cols = config.numCols;
+
+		double stub = squareWidth/2;
+		for (int row = 1; row < rows; row++) {
+			double y = stub + squareWidth*(row - 1);
+			for (int col = 1; col < cols; col++) {
+				double x = stub + squareWidth*(col - 1);
+
+				corner.add(new Point2D_F64(x, y));
 			}
 		}
 	}
