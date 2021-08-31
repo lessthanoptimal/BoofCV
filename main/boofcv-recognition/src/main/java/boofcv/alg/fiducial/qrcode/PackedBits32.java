@@ -41,6 +41,11 @@ public class PackedBits32 implements PackedBits {
 
 	public PackedBits32() {}
 
+	public void setTo( PackedBits32 src ) {
+		resize(src.size);
+		System.arraycopy(src.data, 0, data, 0, src.arrayLength());
+	}
+
 	@Override
 	public int get( int which ) {
 		int index = which/32;
