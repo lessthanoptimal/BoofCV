@@ -23,8 +23,12 @@ import boofcv.abst.fiducial.calib.ConfigECoCheckMarkers;
 import boofcv.abst.fiducial.calib.ConfigGridDimen;
 import boofcv.alg.fiducial.calib.ecocheck.ECoCheckGenerator;
 import boofcv.alg.fiducial.calib.ecocheck.ECoCheckUtils;
+import boofcv.alg.fiducial.calib.hammingchess.HammingChessboardGenerator;
+import boofcv.alg.fiducial.calib.hamminggrids.HammingGridsGenerator;
 import boofcv.app.calib.CalibrationTargetPanel;
 import boofcv.app.fiducials.CreateFiducialDocumentPDF;
+import boofcv.factory.fiducial.ConfigHammingChessboard;
+import boofcv.factory.fiducial.ConfigHammingGrid;
 import boofcv.generate.Unit;
 import boofcv.gui.BoofSwingUtil;
 import boofcv.gui.FiducialRenderEngineGraphics2D;
@@ -44,7 +48,7 @@ import java.awt.event.KeyEvent;
 import java.io.File;
 import java.io.IOException;
 
-import static boofcv.app.CreateCalibrationTarget.ecoCheckToPdf;
+import static boofcv.app.CreateCalibrationTarget.*;
 import static boofcv.gui.StandardAlgConfigPanel.addLabeled;
 
 public class CreateCalibrationTargetGui extends JPanel
@@ -69,6 +73,8 @@ public class CreateCalibrationTargetGui extends JPanel
 
 		// set reasonable defaults
 		controlsTarget.configChessboard.shapeSize = 3;
+		controlsTarget.configHammingChess.squareSize = 3;
+		controlsTarget.configHammingGrid.squareSize = 3;
 		controlsTarget.configECoCheck.markerShapes.get(0).squareSize = 3;
 		controlsTarget.configSquare.numRows = 5;
 		controlsTarget.configSquare.numCols = 4;
@@ -153,11 +159,11 @@ public class CreateCalibrationTargetGui extends JPanel
 		if (sendToPrinter) {
 			f = new File(""); // dummy to make the code below happy and less complex
 		} else {
-			String defaultName = defaultFileName()+".pdf";
+			String defaultName = defaultFileName() + ".pdf";
 			f = FileSystemView.getFileSystemView().getHomeDirectory();
 			f = new File(f, defaultName);
 
-			f = BoofSwingUtil.fileChooser(null, this, false, f.getPath(), path->{
+			f = BoofSwingUtil.fileChooser(null, this, false, f.getPath(), path -> {
 				File tmp = new File(path);
 				return new File(tmp.getParent(), defaultName).getPath();
 			});
@@ -195,6 +201,28 @@ public class CreateCalibrationTargetGui extends JPanel
 					CreateFiducialDocumentPDF doc = ecoCheckToPdf(outputFile, paper, units,
 							shape.numRows, shape.numCols, (float)shape.squareSize,
 							config.firstTargetDuplicated, config.errorCorrectionLevel);
+					if (sendToPrinter) {
+						doc.sendToPrinter();
+					} else {
+						doc.saveToDisk();
+					}
+				}
+				case HAMMING_CHESSBOARD -> {
+					ConfigHammingChessboard config = (ConfigHammingChessboard)selectedCalib;
+					CreateFiducialDocumentPDF doc = hammingChessToPdf(outputFile, paper, units,
+							config.numRows, config.numCols, config.chessboardEven, (float)config.squareSize,
+							(float)config.markerScale, config.markers.dictionary.name(), config.markerOffset);
+					if (sendToPrinter) {
+						doc.sendToPrinter();
+					} else {
+						doc.saveToDisk();
+					}
+				}
+				case HAMMING_GRID -> {
+					ConfigHammingGrid config = (ConfigHammingGrid)selectedCalib;
+					CreateFiducialDocumentPDF doc = hammingGridToPdf(outputFile, paper, units,
+							config.numRows, config.numCols, (float)config.squareSize,
+							(float)config.spaceToSquare, config.markers.dictionary.name(), config.markerOffset);
 					if (sendToPrinter) {
 						doc.sendToPrinter();
 					} else {
@@ -257,18 +285,64 @@ public class CreateCalibrationTargetGui extends JPanel
 			double squareSize = shape.squareSize*unitsToPixel;
 
 			// Center it in the page
-			int borderX = (int)(Math.max(0, paperWidthPixels-squareSize*(shape.numCols-1))/2);
-			int borderY = (int)(Math.max(0, paperHeightPixels-squareSize*(shape.numRows-1))/2);
+			int borderX = (int)(Math.max(0, paperWidthPixels - squareSize*(shape.numCols - 1))/2);
+			int borderY = (int)(Math.max(0, paperHeightPixels - squareSize*(shape.numRows - 1))/2);
 
 			// Render the marker. Adjust marker size so that when the border is added it will match the paper size
 			FiducialRenderEngineGraphics2D render = new FiducialRenderEngineGraphics2D();
 			render.configure(borderX, borderY,
-					(int)(paperWidth*unitsToPixel)-2*borderX, (int)(paperHeight*unitsToPixel)-2*borderY);
+					(int)(paperWidth*unitsToPixel) - 2*borderX, (int)(paperHeight*unitsToPixel) - 2*borderY);
 
 			ECoCheckGenerator generator = new ECoCheckGenerator(utils);
 			generator.squareWidth = shape.squareSize*unitsToPixel;
 			generator.setRender(render);
 			generator.render(0);
+			renderingPanel.setImageUI(render.getImage());
+			return;
+		} else if (selectedType == CalibrationPatterns.HAMMING_CHESSBOARD) {
+			ConfigHammingChessboard c = (ConfigHammingChessboard)selectedCalib;
+
+			double unitsToPixel = 400.0/paperWidth;
+			double paperWidthPixels = (int)(paperWidth*unitsToPixel);
+			double paperHeightPixels = (int)(paperHeight*unitsToPixel);
+			double squareSize = c.squareSize*unitsToPixel;
+
+			// Center it in the page
+			int borderX = (int)(Math.max(0, paperWidthPixels - squareSize*c.numCols)/2);
+			int borderY = (int)(Math.max(0, paperHeightPixels - squareSize*c.numRows)/2);
+
+			// Render the marker. Adjust marker size so that when the border is added it will match the paper size
+			FiducialRenderEngineGraphics2D render = new FiducialRenderEngineGraphics2D();
+			render.configure(borderX, borderY,
+					(int)(paperWidth*unitsToPixel) - 2*borderX, (int)(paperHeight*unitsToPixel) - 2*borderY);
+
+			HammingChessboardGenerator generator = new HammingChessboardGenerator(c);
+			generator.squareWidth = squareSize;
+			generator.setRender(render);
+			generator.render();
+			renderingPanel.setImageUI(render.getImage());
+			return;
+		} else if (selectedType == CalibrationPatterns.HAMMING_GRID) {
+			ConfigHammingGrid c = (ConfigHammingGrid)selectedCalib;
+
+			double unitsToPixel = 400.0/paperWidth;
+			double paperWidthPixels = (int)(paperWidth*unitsToPixel);
+			double paperHeightPixels = (int)(paperHeight*unitsToPixel);
+			double squareSize = c.squareSize*unitsToPixel;
+
+			// Center it in the page
+			int borderX = (int)(Math.max(0, paperWidthPixels - unitsToPixel*c.getMarkerWidth())/2);
+			int borderY = (int)(Math.max(0, paperHeightPixels - unitsToPixel*c.getMarkerHeight())/2);
+
+			// Render the marker. Adjust marker size so that when the border is added it will match the paper size
+			var render = new FiducialRenderEngineGraphics2D();
+			render.configure(borderX, borderY,
+					(int)(paperWidth*unitsToPixel) - 2*borderX, (int)(paperHeight*unitsToPixel) - 2*borderY);
+
+			var generator = new HammingGridsGenerator(c);
+			generator.squareWidth = squareSize;
+			generator.setRender(render);
+			generator.render();
 			renderingPanel.setImageUI(render.getImage());
 			return;
 		}
@@ -296,19 +370,25 @@ public class CreateCalibrationTargetGui extends JPanel
 	String defaultFileName() {
 		if (selectedType == CalibrationPatterns.CHESSBOARD) {
 			ConfigGridDimen config = (ConfigGridDimen)selectedCalib;
-			return "chessboard_"+config.numRows+"x"+config.numCols;
+			return "chessboard_" + config.numRows + "x" + config.numCols;
 		} else if (selectedType == CalibrationPatterns.SQUARE_GRID) {
 			ConfigGridDimen config = (ConfigGridDimen)selectedCalib;
-			return "squaregrid_"+config.numRows+"x"+config.numCols;
+			return "squaregrid_" + config.numRows + "x" + config.numCols;
 		} else if (selectedType == CalibrationPatterns.CIRCLE_GRID) {
 			ConfigGridDimen config = (ConfigGridDimen)selectedCalib;
-			return "circlegrid_"+config.numRows+"x"+config.numCols;
+			return "circlegrid_" + config.numRows + "x" + config.numCols;
 		} else if (selectedType == CalibrationPatterns.CIRCLE_HEXAGONAL) {
 			ConfigGridDimen config = (ConfigGridDimen)selectedCalib;
-			return "circlehex_"+config.numRows+"x"+config.numCols;
+			return "circlehex_" + config.numRows + "x" + config.numCols;
 		} else if (selectedType == CalibrationPatterns.ECOCHECK) {
 			ConfigECoCheckMarkers config = (ConfigECoCheckMarkers)selectedCalib;
 			return "ecocheck_" + config.compactName();
+		} else if (selectedType == CalibrationPatterns.HAMMING_CHESSBOARD) {
+			ConfigHammingChessboard config = (ConfigHammingChessboard)selectedCalib;
+			return "chessboard_" + config.markers.dictionary;
+		} else if (selectedType == CalibrationPatterns.HAMMING_GRID) {
+			ConfigHammingGrid config = (ConfigHammingGrid)selectedCalib;
+			return "squaregrid_" + config.markers.dictionary;
 		} else {
 			return "calibration_target";
 		}

@@ -21,7 +21,13 @@ package boofcv.app.calib;
 import boofcv.abst.fiducial.calib.CalibrationPatterns;
 import boofcv.abst.fiducial.calib.ConfigECoCheckMarkers;
 import boofcv.abst.fiducial.calib.ConfigGridDimen;
+import boofcv.factory.fiducial.ConfigHammingChessboard;
+import boofcv.factory.fiducial.ConfigHammingGrid;
+import boofcv.factory.fiducial.ConfigHammingMarker;
+import boofcv.factory.fiducial.HammingDictionary;
 import boofcv.gui.StandardAlgConfigPanel;
+import boofcv.gui.controls.JCheckBoxValue;
+import boofcv.gui.controls.JSpinnerNumber;
 
 import javax.swing.*;
 import javax.swing.event.ChangeEvent;
@@ -47,6 +53,8 @@ public class CalibrationTargetPanel extends StandardAlgConfigPanel implements Ac
 	public ConfigGridDimen configSquare = new ConfigGridDimen(4, 3, 1, 1);
 	public ConfigGridDimen configCircle = new ConfigGridDimen(15, 10, 1, 1.5);
 	public ConfigGridDimen configCircleHex = new ConfigGridDimen(15, 15, 1, 1.5);
+	public ConfigHammingChessboard configHammingChess = ConfigHammingChessboard.create(HammingDictionary.ARUCO_MIP_25h7, 8, 6);
+	public ConfigHammingGrid configHammingGrid = ConfigHammingGrid.create(HammingDictionary.ARUCO_MIP_25h7, 6, 4, 0.4);
 
 	public CalibrationTargetPanel( Listener listener ) {
 		setBorder(BorderFactory.createEmptyBorder());
@@ -57,7 +65,7 @@ public class CalibrationTargetPanel extends StandardAlgConfigPanel implements Ac
 		comboType.setMaximumSize(comboType.getPreferredSize());
 
 		panelTarget.setLayout(new BorderLayout());
-		panelTarget.setPreferredSize(new Dimension(250, 106));
+		panelTarget.setPreferredSize(new Dimension(250, 180));
 		panelTarget.setMaximumSize(panelTarget.getPreferredSize());
 		changeTargetPanel();
 
@@ -73,7 +81,8 @@ public class CalibrationTargetPanel extends StandardAlgConfigPanel implements Ac
 			case SQUARE_GRID -> configSquare;
 			case CIRCLE_GRID -> configCircle;
 			case CIRCLE_HEXAGONAL -> configCircleHex;
-			default -> throw new RuntimeException("Unknown");
+			case HAMMING_CHESSBOARD -> configHammingChess;
+			case HAMMING_GRID -> configHammingGrid;
 		};
 		listener.calibrationParametersChanged(selected, c);
 	}
@@ -90,10 +99,12 @@ public class CalibrationTargetPanel extends StandardAlgConfigPanel implements Ac
 	public void changeTargetPanel() {
 		JPanel p = switch (selected) {
 			case CHESSBOARD -> new ChessPanel();
-			case ECOCHECK -> new ChessBitsPanel();
+			case ECOCHECK -> new EcoCheckPanel();
 			case SQUARE_GRID -> new SquareGridPanel();
 			case CIRCLE_GRID -> new CircleGridPanel();
 			case CIRCLE_HEXAGONAL -> new CircleHexPanel();
+			case HAMMING_CHESSBOARD -> new HammingChessPanel();
+			case HAMMING_GRID -> new HammingGridPanel();
 			default -> throw new RuntimeException("Unknown");
 		};
 
@@ -131,11 +142,11 @@ public class CalibrationTargetPanel extends StandardAlgConfigPanel implements Ac
 		}
 	}
 
-	private class ChessBitsPanel extends StandardAlgConfigPanel implements ChangeListener {
+	private class EcoCheckPanel extends StandardAlgConfigPanel implements ChangeListener {
 		JSpinner sRows, sCols, sWidth, sMarkers;
 		JComboBox<String> comboErrorLevel;
 
-		public ChessBitsPanel() {
+		public EcoCheckPanel() {
 			setBorder(BorderFactory.createEmptyBorder());
 
 			ConfigECoCheckMarkers.MarkerShape shape = configECoCheck.markerShapes.get(0);
@@ -144,7 +155,7 @@ public class CalibrationTargetPanel extends StandardAlgConfigPanel implements Ac
 			sCols = spinner(shape.numCols, 1, 1000, 1);
 			sWidth = spinner(shape.squareSize, 0, 1000000.0, 1);
 			sMarkers = spinner(configECoCheck.firstTargetDuplicated, 1, 1000, 1);
-			comboErrorLevel = combo(configECoCheck.errorCorrectionLevel, "0","1","2","3","4","5","6","7","8","9","10");
+			comboErrorLevel = combo(configECoCheck.errorCorrectionLevel, "0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "10");
 
 			addLabeled(sRows, "Rows", "Number of square rows");
 			addLabeled(sCols, "Cols", "Number of square columns");
@@ -269,6 +280,103 @@ public class CalibrationTargetPanel extends StandardAlgConfigPanel implements Ac
 				configCircleHex.shapeSize = ((Number)sDiam.getValue()).doubleValue();
 			} else if (e.getSource() == sDist) {
 				configCircleHex.shapeDistance = ((Number)sDist.getValue()).doubleValue();
+			}
+			updateParameters();
+		}
+	}
+
+	private class HammingChessPanel extends StandardAlgConfigPanel implements ChangeListener {
+		JSpinnerNumber sRows = spinnerWrap(configHammingChess.numRows, 1, 1000, 1);
+		JSpinnerNumber sCols = spinnerWrap(configHammingChess.numCols, 1, 1000, 1);
+		JSpinnerNumber sWidth = spinnerWrap(configHammingChess.squareSize, 0, 1000000.0, 1);
+		JSpinnerNumber sScale = spinnerWrap(configHammingChess.markerScale, 0, 1.0, 0.02);
+		JComboBox<?> cDict = combo(configHammingChess.markers.dictionary.ordinal(), (Object[])HammingDictionary.allPredefined());
+		JSpinnerNumber sOffset = spinnerWrap(configHammingChess.markerOffset, 0, 200, 1);
+		JCheckBoxValue cEven = checkboxWrap("Even pattern", configHammingChess.chessboardEven);
+
+		public HammingChessPanel() {
+			setBorder(BorderFactory.createEmptyBorder());
+
+			sScale.spinner.setPreferredSize(sRows.spinner.getPreferredSize());
+			sScale.spinner.setMaximumSize(sRows.spinner.getMaximumSize());
+
+			addLabeled(sRows.spinner, "Rows", "Number of square rows");
+			addLabeled(sCols.spinner, "Cols", "Number of square columns");
+			addAlignCenter(cEven.check,"Chessboard is an even or odd pattern");
+			addLabeled(sWidth.spinner, "Square Width", "How wide each square is");
+			addLabeled(sScale.spinner, "Marker Scale", "Relative size of markers");
+			addLabeled(cDict, "Dictionary", "Encoding dictionary");
+			addLabeled(sOffset.spinner, "Marker Offset", "Index of the first marker");
+		}
+
+		@Override public void controlChanged( final Object source ) {
+			if (source == sRows.spinner) {
+				sRows.updateValue();
+				configHammingChess.numRows = sRows.value.intValue();
+			} else if (source == sCols.spinner) {
+				sCols.updateValue();
+				configHammingChess.numCols = sCols.value.intValue();
+			} else if (source == cEven.check) {
+				cEven.updateValue();
+				configHammingChess.chessboardEven = cEven.value;
+			} else if (source == sWidth.spinner) {
+				sWidth.updateValue();
+				configHammingChess.squareSize = sWidth.value.doubleValue();
+			} else if (source == sScale.spinner) {
+				sScale.updateValue();
+				configHammingChess.markerScale = sScale.value.doubleValue();
+			} else if (source == cDict) {
+				HammingDictionary dictionary = HammingDictionary.valueOf((String)cDict.getSelectedItem());
+				configHammingChess.markers.setTo(ConfigHammingMarker.loadDictionary(dictionary));
+			} else if (source == sOffset.spinner) {
+				sOffset.updateValue();
+				configHammingChess.markerOffset = sOffset.value.intValue();
+			}
+			updateParameters();
+		}
+	}
+
+	private class HammingGridPanel extends StandardAlgConfigPanel implements ChangeListener {
+		JSpinnerNumber sRows = spinnerWrap(configHammingGrid.numRows, 1, 1000, 1);
+		JSpinnerNumber sCols = spinnerWrap(configHammingGrid.numCols, 1, 1000, 1);
+		JSpinnerNumber sWidth = spinnerWrap(configHammingGrid.squareSize, 0, 1000000.0, 1);
+		JSpinnerNumber sSpace = spinnerWrap(configHammingGrid.spaceToSquare, 0, 1.0, 0.02);
+		JComboBox<?> cDict = combo(configHammingGrid.markers.dictionary.ordinal(), (Object[])HammingDictionary.allPredefined());
+		JSpinnerNumber sOffset = spinnerWrap(configHammingGrid.markerOffset, 0, 200, 1);
+
+		public HammingGridPanel() {
+			setBorder(BorderFactory.createEmptyBorder());
+
+			sSpace.spinner.setPreferredSize(sRows.spinner.getPreferredSize());
+			sSpace.spinner.setMaximumSize(sRows.spinner.getMaximumSize());
+
+			addLabeled(sRows.spinner, "Rows", "Number of square rows");
+			addLabeled(sCols.spinner, "Cols", "Number of square columns");
+			addLabeled(sWidth.spinner, "Square Width", "How wide each square is");
+			addLabeled(sSpace.spinner, "Space", "Space between squares in units of squares");
+			addLabeled(cDict, "Dictionary", "Encoding dictionary");
+			addLabeled(sOffset.spinner, "Marker Offset", "Index of the first marker");
+		}
+
+		@Override public void controlChanged( final Object source ) {
+			if (source == sRows.spinner) {
+				sRows.updateValue();
+				configHammingGrid.numRows = sRows.value.intValue();
+			} else if (source == sCols.spinner) {
+				sCols.updateValue();
+				configHammingGrid.numCols = sCols.value.intValue();
+			} else if (source == sWidth.spinner) {
+				sWidth.updateValue();
+				configHammingGrid.squareSize = sWidth.value.doubleValue();
+			} else if (source == sSpace.spinner) {
+				sSpace.updateValue();
+				configHammingGrid.spaceToSquare = sSpace.value.doubleValue();
+			} else if (source == cDict) {
+				HammingDictionary dictionary = HammingDictionary.valueOf((String)cDict.getSelectedItem());
+				configHammingGrid.markers.setTo(ConfigHammingMarker.loadDictionary(dictionary));
+			} else if (source == sOffset.spinner) {
+				sOffset.updateValue();
+				configHammingGrid.markerOffset = sOffset.value.intValue();
 			}
 			updateParameters();
 		}

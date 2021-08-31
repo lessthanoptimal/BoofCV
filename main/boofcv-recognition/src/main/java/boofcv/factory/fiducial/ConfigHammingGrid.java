@@ -22,7 +22,7 @@ import boofcv.misc.BoofMiscOps;
 import boofcv.struct.Configuration;
 
 /**
- * Defines the calibration pattern based on {@link ConfigHammingDictionary hamming square fiducials} where each square
+ * Defines the calibration pattern based on {@link ConfigHammingMarker hamming square fiducials} where each square
  * is a marker that can be uniquely identified. These are typically used for multi camera calibration and are
  * robust against partial occlusions. Aruco Grids are a member of this family.
  *
@@ -35,17 +35,20 @@ public class ConfigHammingGrid implements Configuration {
 	/** Number of squares wide the grid is */
 	public int numCols = -1;
 
+	/** Size of a square in document units */
+	public double squareSize = 1.0;
+
 	/** How wide the space is between squares relative to the length of a square */
-	public double spaceToSquare;
+	public double spaceToSquare = 0.4;
 
 	/** The first marker will have this ID */
 	public int markerOffset = 0;
 
 	/** Encoding dictionary for binary patterns */
-	public final ConfigHammingDictionary dictionary;
+	public final ConfigHammingMarker markers;
 
-	public ConfigHammingGrid( ConfigHammingDictionary dictionary ) {
-		this.dictionary = dictionary;
+	public ConfigHammingGrid( ConfigHammingMarker dictionary ) {
+		this.markers = dictionary;
 	}
 
 	@Override public void checkValidity() {
@@ -53,23 +56,32 @@ public class ConfigHammingGrid implements Configuration {
 		BoofMiscOps.checkTrue(numCols > 0);
 		BoofMiscOps.checkTrue(spaceToSquare > 0);
 		BoofMiscOps.checkTrue(markerOffset > 0);
-		dictionary.checkValidity();
+		markers.checkValidity();
 	}
 
 	public void setTo( ConfigHammingGrid src ) {
 		this.numRows = src.numRows;
 		this.numCols = src.numCols;
+		this.squareSize = src.squareSize;
 		this.spaceToSquare = src.spaceToSquare;
 		this.markerOffset = src.markerOffset;
-		this.dictionary.setTo(src.dictionary);
+		this.markers.setTo(src.markers);
+	}
+
+	public double getMarkerWidth() {
+		return (numCols - 1)*(1.0 + spaceToSquare)*squareSize + squareSize;
+	}
+
+	public double getMarkerHeight() {
+		return (numRows - 1)*(1.0 + spaceToSquare)*squareSize + squareSize;
 	}
 
 	/**
 	 * Create from a pre-defined dictionary
 	 */
-	public static ConfigHammingGrid create(ConfigHammingDictionary.Dictionary dictionary,
-										   int rows, int cols, double spaceToSquare ) {
-		ConfigHammingDictionary configDictionary = ConfigHammingDictionary.define(dictionary);
+	public static ConfigHammingGrid create( HammingDictionary dictionary,
+											int rows, int cols, double spaceToSquare ) {
+		ConfigHammingMarker configDictionary = ConfigHammingMarker.loadDictionary(dictionary);
 
 		var config = new ConfigHammingGrid(configDictionary);
 		config.numRows = rows;

@@ -21,8 +21,12 @@ package boofcv.alg.fiducial.calib.hamminggrids;
 import boofcv.alg.drawing.FiducialRenderEngine;
 import boofcv.alg.fiducial.square.FiducialSquareHammingGenerator;
 import boofcv.factory.fiducial.ConfigHammingGrid;
+import georegression.struct.point.Point2D_F64;
 import lombok.Getter;
 import lombok.Setter;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Creates hamming grids
@@ -41,12 +45,17 @@ public class HammingGridsGenerator {
 	// Used to render individual markers
 	private final FiducialSquareHammingGenerator squareGenerator;
 
+	// list of corners in ground truth
+	public final List<Point2D_F64> corner = new ArrayList<>();
+
 	public HammingGridsGenerator( ConfigHammingGrid config ) {
 		this.config = config;
-		this.squareGenerator = new FiducialSquareHammingGenerator(config.dictionary);
+		this.squareGenerator = new FiducialSquareHammingGenerator(config.markers);
 	}
 
 	public void render() {
+		render.init();
+		squareGenerator.setRender(render);
 		squareGenerator.squareWidth = squareWidth;
 		double w = config.spaceToSquare + 1.0;
 
@@ -55,7 +64,30 @@ public class HammingGridsGenerator {
 			squareGenerator.offsetY = row*w*squareWidth;
 			for (int col = 0; col < config.numCols; col++, markerIndex++) {
 				squareGenerator.offsetX = col*w*squareWidth;
-				squareGenerator.render(markerIndex);
+				squareGenerator.renderNoInit(markerIndex);
+			}
+		}
+
+		saveCornerLocations();
+	}
+
+	private void saveCornerLocations() {
+		corner.clear();
+
+		double w = config.spaceToSquare + 1.0;
+
+		for (int row = 0; row < config.numRows; row++) {
+			double y = row*w*squareWidth;
+			for (int col = 0; col < config.numCols; col++) {
+				double x = col*w*squareWidth;
+				corner.add(new Point2D_F64(x,y));
+				corner.add(new Point2D_F64(x+squareWidth,y));
+			}
+			y += squareWidth;
+			for (int col = 0; col < config.numCols; col++) {
+				double x = col*w*squareWidth;
+				corner.add(new Point2D_F64(x,y));
+				corner.add(new Point2D_F64(x+squareWidth,y));
 			}
 		}
 	}

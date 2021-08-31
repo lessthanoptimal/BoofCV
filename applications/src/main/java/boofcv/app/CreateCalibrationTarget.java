@@ -22,7 +22,13 @@ import boofcv.abst.fiducial.calib.CalibrationPatterns;
 import boofcv.abst.fiducial.calib.ConfigECoCheckMarkers;
 import boofcv.alg.fiducial.calib.ecocheck.ECoCheckUtils;
 import boofcv.app.calib.CreateECoCheckDocumentPDF;
+import boofcv.app.calib.CreateHammingChessboardDocumentPDF;
+import boofcv.app.calib.CreateHammingGridDocumentPDF;
 import boofcv.app.fiducials.CreateFiducialDocumentPDF;
+import boofcv.factory.fiducial.ConfigHammingChessboard;
+import boofcv.factory.fiducial.ConfigHammingGrid;
+import boofcv.factory.fiducial.ConfigHammingMarker;
+import boofcv.factory.fiducial.HammingDictionary;
 import boofcv.generate.LengthUnit;
 import boofcv.generate.Unit;
 import org.kohsuke.args4j.CmdLineException;
@@ -72,6 +78,18 @@ public class CreateCalibrationTarget {
 
 	@Option(name = "-i", aliases = {"--DisablePrintInfo"}, usage = "Disable printing information about the calibration target")
 	boolean disablePrintInfo = false;
+
+	@Option(name = "-e", aliases = {"--Encoding"}, usage = "Encoding for hamming markers")
+	String encodingName = HammingDictionary.ARUCO_MIP_25h7.name();
+
+	@Option(name = "--EncodingOffset", usage = "Start encoding markers at this index")
+	int encodingOffset = 0;
+
+	@Option(name = "--MarkerScale", usage = "Scale of marker relative to square for hamming chessboard")
+	float markerScale = 0.7f;
+
+	@Option(name = "--ChessboardOdd", usage = "Switches chessboard from an even to odd pattern")
+	private boolean chessboardOdd = false;
 
 	@Option(name = "--GUI", usage = "Ignore all other command line arguments and switch to GUI mode")
 	private boolean guiMode = false;
@@ -190,6 +208,20 @@ public class CreateCalibrationTarget {
 					failExit("Grid is too small");
 			}
 
+			case HAMMING_CHESSBOARD -> {
+				if (centerDistance > 0)
+					failExit("Don't specify center distance for chessboard targets");
+				if (shapeSpace > 0)
+					failExit("Don't specify center distance for chessboard targets");
+			}
+
+			case HAMMING_GRID -> {
+				if (centerDistance > 0)
+					failExit("Don't specify center distance for square type targets, use shape space instead");
+				if (shapeSpace <= 0)
+					shapeSpace = (float)new ConfigHammingGrid(new ConfigHammingMarker()).spaceToSquare;
+			}
+
 			case CIRCLE_HEXAGONAL -> {
 				if (shapeSpace > 0)
 					failExit("Don't specify space for circle type targets, use center distance instead");
@@ -202,7 +234,7 @@ public class CreateCalibrationTarget {
 				if (centerDistance <= 0)
 					centerDistance = shapeWidth*2;
 			}
-			default -> throw new RuntimeException("Unknown type "+type);
+			default -> throw new RuntimeException("Unknown type " + type);
 		}
 	}
 
@@ -219,6 +251,18 @@ public class CreateCalibrationTarget {
 		if (type == CalibrationPatterns.ECOCHECK) {
 			CreateFiducialDocumentPDF doc = ecoCheckToPdf(fileName + suffix,
 					paperSize, unit, rows, columns, shapeWidth, numMarkers, chessBitsError);
+			doc.showInfo = !disablePrintInfo;
+			doc.saveToDisk();
+			return;
+		} else if (type == CalibrationPatterns.HAMMING_CHESSBOARD) {
+			CreateHammingChessboardDocumentPDF doc = hammingChessToPdf(fileName + suffix,
+					paperSize, unit, rows, columns, chessboardOdd, shapeWidth, markerScale, encodingName, encodingOffset);
+			doc.showInfo = !disablePrintInfo;
+			doc.saveToDisk();
+			return;
+		} else if (type == CalibrationPatterns.HAMMING_GRID) {
+			CreateHammingGridDocumentPDF doc = hammingGridToPdf(fileName + suffix,
+					paperSize, unit, rows, columns, shapeWidth, shapeSpace, encodingName, encodingOffset);
 			doc.showInfo = !disablePrintInfo;
 			doc.saveToDisk();
 			return;
@@ -249,11 +293,50 @@ public class CreateCalibrationTarget {
 		utils.fixate();
 
 		var doc = new CreateECoCheckDocumentPDF(outputFile, paper, units);
-		doc.markerWidth = (columns-1)*squareWidth;
-		doc.markerHeight = (rows-1)*squareWidth;
+		doc.markerWidth = (columns - 1)*squareWidth;
+		doc.markerHeight = (rows - 1)*squareWidth;
 		doc.spaceBetween = squareWidth/2.0f;
 		doc.squareWidth = squareWidth;
 		doc.render(utils);
+		return doc;
+	}
+
+	public static CreateHammingChessboardDocumentPDF hammingChessToPdf( String outputFile, PaperSize paper, Unit units,
+																		int rows, int columns, boolean chessboardEven,
+																		float squareWidth, float markerScale,
+																		String encoding, int markerOffset ) throws IOException {
+		HammingDictionary dictionary = HammingDictionary.valueOf(encoding);
+		ConfigHammingChessboard config = ConfigHammingChessboard.create(dictionary, rows, columns);
+		config.markerOffset = markerOffset;
+		config.markerScale = markerScale;
+		config.squareSize = squareWidth;
+		config.chessboardEven = chessboardEven;
+
+		var doc = new CreateHammingChessboardDocumentPDF(outputFile, paper, units);
+		doc.markerWidth = columns*squareWidth;
+		doc.markerHeight = rows*squareWidth;
+		doc.spaceBetween = squareWidth/2.0f;
+		doc.squareWidth = squareWidth;
+		doc.render(config);
+		return doc;
+	}
+
+	public static CreateHammingGridDocumentPDF hammingGridToPdf( String outputFile, PaperSize paper, Unit units,
+																 int rows, int columns,
+																 float squareWidth, float spaceToSquare,
+																 String encoding, int markerOffset ) throws IOException {
+		HammingDictionary dictionary = HammingDictionary.valueOf(encoding);
+		ConfigHammingGrid config = ConfigHammingGrid.create(dictionary, rows, columns, spaceToSquare);
+		config.markerOffset = markerOffset;
+		config.spaceToSquare = spaceToSquare;
+		config.squareSize = squareWidth;
+
+		var doc = new CreateHammingGridDocumentPDF(outputFile, paper, units);
+		doc.markerWidth = (float)config.getMarkerWidth();
+		doc.markerHeight = (float)config.getMarkerHeight();
+		doc.spaceBetween = squareWidth/2.0f;
+		doc.squareWidth = squareWidth;
+		doc.render(config);
 		return doc;
 	}
 

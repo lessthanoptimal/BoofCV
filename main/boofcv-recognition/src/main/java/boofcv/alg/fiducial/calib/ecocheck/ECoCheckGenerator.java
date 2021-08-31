@@ -175,9 +175,6 @@ public class ECoCheckGenerator {
 		final int rows = shape.rows;
 		final int cols = shape.cols;
 
-		// White circles will be rendered inside the inner squares
-		render.setGray(0.0);
-
 		double stub = squareWidth/2;
 		for (int row = 1; row < rows; row++) {
 			double y = stub + squareWidth*(row - 1);

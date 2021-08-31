@@ -19,8 +19,8 @@
 package boofcv.alg.fiducial.square;
 
 import boofcv.alg.drawing.FiducialRenderEngine;
-import boofcv.factory.fiducial.ConfigHammingDictionary;
-import boofcv.factory.fiducial.ConfigHammingDictionary.Marker;
+import boofcv.factory.fiducial.ConfigHammingMarker;
+import boofcv.factory.fiducial.ConfigHammingMarker.Marker;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -36,19 +36,23 @@ public class FiducialSquareHammingGenerator {
 	/** The top-left corner of the marker */
 	public double offsetX, offsetY;
 
-	final ConfigHammingDictionary dictionary;
+	final ConfigHammingMarker dictionary;
 
 	// used to draw the fiducial
 	@Setter protected FiducialRenderEngine render;
 
-	public FiducialSquareHammingGenerator( ConfigHammingDictionary dictionary ) {
+	public FiducialSquareHammingGenerator( ConfigHammingMarker dictionary ) {
 		this.dictionary = dictionary;
 	}
 
 	public void render( int markerIdx ) {
-		Marker shape = dictionary.encoding.get(markerIdx);
-
 		render.init();
+		renderNoInit(markerIdx);
+
+	}
+
+	public void renderNoInit( int markerIdx ) {
+		Marker shape = dictionary.encoding.get(markerIdx);
 
 		// Render black square surrounding the data bits
 		renderBorder();
@@ -62,14 +66,7 @@ public class FiducialSquareHammingGenerator {
 		render.setGray(0.0);
 
 		double bw = dictionary.borderWidthFraction*squareWidth;
-
-		// bottom and top
-		render.rectangle(offsetX, offsetY, offsetX + squareWidth, offsetY + bw);
-		render.rectangle(offsetX, offsetY + squareWidth - bw, offsetX + squareWidth, offsetY + squareWidth);
-
-		// left and right
-		render.rectangle(offsetX, offsetX + bw, offsetX + bw, offsetY + squareWidth - bw);
-		render.rectangle(offsetX + squareWidth - bw, offsetY + bw, offsetX + squareWidth, offsetY + squareWidth - bw);
+		render.square(offsetX, offsetY, squareWidth, bw);
 	}
 
 	/**

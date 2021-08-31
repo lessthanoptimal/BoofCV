@@ -16,19 +16,26 @@
  * limitations under the License.
  */
 
-package boofcv.abst.fiducial.calib;
+package boofcv.factory.fiducial;
 
 /**
- * List of all the supported types of calibration fiducial patterns
- *
- * @author Peter Abeles
+ * List of pre-generated dictionaries
  */
-public enum CalibrationPatterns {
-	CHESSBOARD,
-	ECOCHECK,
-	SQUARE_GRID,
-	CIRCLE_HEXAGONAL,
-	CIRCLE_GRID,
-	HAMMING_CHESSBOARD,
-	HAMMING_GRID,
+public enum HammingDictionary {
+	/** Custom dictionary */
+	CUSTOM,
+	ARUCO_ORIGINAL,
+	ARUCO_MIP_16h3,
+	ARUCO_MIP_25h7,
+	ARUCO_MIP_36h12;
+
+	/**
+	 * Returns all dictionaries but custom
+	 */
+	public static HammingDictionary[] allPredefined() {
+		HammingDictionary[] all = values();
+		HammingDictionary[] ret = new HammingDictionary[all.length-1];
+		System.arraycopy(all,1,ret,0,all.length-1);
+		return ret;
+	}
 }
