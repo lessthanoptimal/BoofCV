@@ -251,7 +251,7 @@ public class TestECoCheckDetector extends BoofStandardJUnit {
 		renderer.squareWidth = squareWidth;
 		renderer.render(markerID);
 
-		truthCorners = renderer.corner;
+		truthCorners = renderer.corners;
 
 		return engine.getGray();
 	}

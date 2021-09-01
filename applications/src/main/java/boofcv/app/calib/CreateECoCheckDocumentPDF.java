@@ -112,6 +112,6 @@ public class CreateECoCheckDocumentPDF extends CreateFiducialDocumentPDF {
 
 	@Override
 	protected String createMarkerSizeString() {
-		return String.format("full_squares: %4.1f %2s", squareWidth, units.getAbbreviation());
+		return String.format("square: %4.1f %2s", squareWidth, units.getAbbreviation());
 	}
 }

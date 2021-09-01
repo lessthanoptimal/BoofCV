@@ -62,7 +62,7 @@ public class TestCalibrationDetectorMultiECoCheck extends GenericDetectMultiFidu
 		generator.setRender(engine);
 		generator.render(marker);
 
-		BoofMiscOps.forIdx(generator.corner, ( idx, c ) -> calibrationPoints.add(new PointIndex2D_F64(c.x, c.y, idx)));
+		BoofMiscOps.forIdx(generator.corners, ( idx, c ) -> calibrationPoints.add(new PointIndex2D_F64(c.x, c.y, idx)));
 
 		return engine.getGrayF32();
 	}
