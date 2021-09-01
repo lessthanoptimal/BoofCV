@@ -46,7 +46,7 @@ public class HammingGridGenerator {
 	private final FiducialSquareHammingGenerator squareGenerator;
 
 	// list of corners in ground truth
-	public final List<Point2D_F64> corner = new ArrayList<>();
+	public final List<Point2D_F64> corners = new ArrayList<>();
 
 	public HammingGridGenerator( ConfigHammingGrid config ) {
 		this.config = config;
@@ -74,23 +74,24 @@ public class HammingGridGenerator {
 	}
 
 	public void saveCornerLocations() {
-		corner.clear();
-
+		corners.clear();
+		final int rows = config.numRows;
+		final int cols = config.numCols;
 		double w = squareWidth*config.squareSize;
 		double ws = w*(config.spaceToSquare + 1.0);
 
-		for (int row = 0; row < config.numRows; row++) {
-			double y = (config.numRows - row - 1)*ws + w;
-			for (int col = 0; col < config.numCols; col++) {
+		for (int row = 0; row < rows; row++) {
+			double y = (rows - row - 1)*ws + w;
+			for (int col = 0; col < cols; col++) {
 				double x = col*ws;
-				corner.add(new Point2D_F64(x, y));
-				corner.add(new Point2D_F64(x + w, y));
+				corners.add(new Point2D_F64(x, y));
+				corners.add(new Point2D_F64(x + w, y));
 			}
 			y -= w;
-			for (int col = 0; col < config.numCols; col++) {
+			for (int col = 0; col < cols; col++) {
 				double x = col*ws;
-				corner.add(new Point2D_F64(x, y));
-				corner.add(new Point2D_F64(x + w, y));
+				corners.add(new Point2D_F64(x, y));
+				corners.add(new Point2D_F64(x + w, y));
 			}
 		}
 	}

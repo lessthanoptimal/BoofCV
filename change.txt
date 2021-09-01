@@ -6,6 +6,9 @@ Date Format: year/month/day
 Date    : 2021
 Version : 0.39
 
+- Applications
+  * Calibration target generator supports more targets
+  * Add option to save landmarks locations on PDF document
 - Image Processing
   * Added function for PSF for linear motion blur
   * GConvolveImage - can now pass in BorderType

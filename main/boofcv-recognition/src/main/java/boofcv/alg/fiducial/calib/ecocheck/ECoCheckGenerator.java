@@ -98,7 +98,7 @@ public class ECoCheckGenerator {
 	Rectangle2D_F64 rect = new Rectangle2D_F64();
 
 	// list of corners in ground truth
-	public final List<Point2D_F64> corner = new ArrayList<>();
+	public final List<Point2D_F64> corners = new ArrayList<>();
 
 	public ECoCheckGenerator( ECoCheckUtils utils ) {
 		this.utils = utils;
@@ -106,7 +106,7 @@ public class ECoCheckGenerator {
 	}
 
 	public void render( int marker ) {
-		corner.clear();
+		corners.clear();
 		GridShape shape = utils.markers.get(marker);
 
 		render.init();
@@ -171,7 +171,8 @@ public class ECoCheckGenerator {
 		}
 	}
 
-	private void saveCornerLocations( GridShape shape ) {
+	public void saveCornerLocations( GridShape shape ) {
+		corners.clear();
 		final int rows = shape.rows;
 		final int cols = shape.cols;
 
@@ -181,7 +182,7 @@ public class ECoCheckGenerator {
 			for (int col = 1; col < cols; col++) {
 				double x = stub + squareWidth*(col - 1);
 
-				corner.add(new Point2D_F64(x, y));
+				corners.add(new Point2D_F64(x, y));
 			}
 		}
 	}

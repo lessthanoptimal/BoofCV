@@ -46,7 +46,7 @@ public class HammingChessboardGenerator {
 	private final FiducialSquareHammingGenerator squareGenerator;
 
 	// list of corners in ground truth
-	public final List<Point2D_F64> corner = new ArrayList<>();
+	public final List<Point2D_F64> corners = new ArrayList<>();
 
 	public HammingChessboardGenerator( ConfigHammingChessboard config ) {
 		this.config = config;
@@ -88,19 +88,17 @@ public class HammingChessboardGenerator {
 	}
 
 	public void saveCornerLocations() {
-		corner.clear();
+		corners.clear();
 
-		final int rows = config.numRows;
-		final int cols = config.numCols;
+		final int rows = config.numRows - 1;
+		final int cols = config.numCols - 1;
 		final double w = squareWidth*config.squareSize;
 
-		double stub = squareWidth/2;
-		for (int row = 1; row < rows; row++) {
-			double y = stub + w*(row - 1);
-			for (int col = 1; col < cols; col++) {
-				double x = stub + w*(col - 1);
-
-				corner.add(new Point2D_F64(x, y));
+		for (int row = 0; row < rows; row++) {
+			double y = w*(rows - row);
+			for (int col = 0; col < cols; col++) {
+				double x = w*(col + 1);
+				corners.add(new Point2D_F64(x, y));
 			}
 		}
 	}

@@ -24,18 +24,21 @@ import boofcv.alg.fiducial.calib.ecocheck.ECoCheckUtils;
 import boofcv.app.calib.CreateECoCheckDocumentPDF;
 import boofcv.app.calib.CreateHammingChessboardDocumentPDF;
 import boofcv.app.calib.CreateHammingGridDocumentPDF;
-import boofcv.app.fiducials.CreateFiducialDocumentPDF;
 import boofcv.factory.fiducial.ConfigHammingChessboard;
 import boofcv.factory.fiducial.ConfigHammingGrid;
 import boofcv.factory.fiducial.ConfigHammingMarker;
 import boofcv.factory.fiducial.HammingDictionary;
 import boofcv.generate.LengthUnit;
 import boofcv.generate.Unit;
+import georegression.struct.point.Point2D_F64;
 import org.kohsuke.args4j.CmdLineException;
 import org.kohsuke.args4j.CmdLineParser;
 import org.kohsuke.args4j.Option;
 
+import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.io.PrintStream;
+import java.util.List;
 
 /**
  * Application for generating calibration targets
@@ -94,11 +97,17 @@ public class CreateCalibrationTarget {
 	@Option(name = "--GUI", usage = "Ignore all other command line arguments and switch to GUI mode")
 	private boolean guiMode = false;
 
+	@Option(name = "--Landmarks", usage = "Save location of landmarks on saved document in landmarks.txt")
+	boolean saveLandmarks = false;
+
 	@Option(name = "--NumMarkers", usage = "If the target type supports multiple markers, how many should it create")
 	int numMarkers = 1;
 
 	@Option(name = "--ECoCheckError", usage = "Error correction level for ECoCheck. 0 is no error correction. 0 to 10")
 	int chessBitsError = new ConfigECoCheckMarkers().errorCorrectionLevel;
+
+	@Option(name = "--Printer", usage = "Send to printer instead of saving to a file")
+	boolean sendToPrinter = false;
 
 	private static void printHelpExit( CmdLineParser parser ) {
 		parser.getProperties().withUsageWidth(120);
@@ -249,28 +258,66 @@ public class CreateCalibrationTarget {
 		System.out.println("   info      : " + !disablePrintInfo);
 
 		if (type == CalibrationPatterns.ECOCHECK) {
-			CreateFiducialDocumentPDF doc = ecoCheckToPdf(fileName + suffix,
+			CreateECoCheckDocumentPDF doc = ecoCheckToPdf(fileName + suffix,
 					paperSize, unit, rows, columns, shapeWidth, numMarkers, chessBitsError);
 			doc.showInfo = !disablePrintInfo;
-			doc.saveToDisk();
+			if (sendToPrinter) {
+				doc.sendToPrinter();
+			} else {
+				doc.saveToDisk();
+			}
+			if (saveLandmarks) {
+				// make sure its saves the corners in the expected units
+				doc.getG().squareWidth = shapeWidth;
+				doc.getG().saveCornerLocations(doc.utils.markers.get(0));
+				saveLandmarks(doc.markerWidth, doc.markerHeight, doc.getG().corners,
+						String.format("EcoCheck rows=%d cols=%d err=%d markers=%d",
+								rows, columns, chessBitsError, numMarkers));
+			}
 			return;
 		} else if (type == CalibrationPatterns.HAMMING_CHESSBOARD) {
 			CreateHammingChessboardDocumentPDF doc = hammingChessToPdf(fileName + suffix,
 					paperSize, unit, rows, columns, chessboardOdd, shapeWidth, markerScale, encodingName, encodingOffset);
 			doc.showInfo = !disablePrintInfo;
-			doc.saveToDisk();
+			if (sendToPrinter) {
+				doc.sendToPrinter();
+			} else {
+				doc.saveToDisk();
+			}
+
+			if (saveLandmarks) {
+				// make sure its saves the corners in the expected units
+				doc.getG().squareWidth = 1;
+				doc.config.squareSize = shapeWidth;
+				doc.getG().saveCornerLocations();
+				saveLandmarks(doc.config.getMarkerWidth(), doc.config.getMarkerHeight(), doc.getG().corners,
+						String.format("Hamming Chessboard rows=%d cols=%d even=%s dict=%s",
+								doc.config.numRows, doc.config.numCols, doc.config.chessboardEven, doc.config.markers.dictionary));
+			}
 			return;
 		} else if (type == CalibrationPatterns.HAMMING_GRID) {
 			CreateHammingGridDocumentPDF doc = hammingGridToPdf(fileName + suffix,
 					paperSize, unit, rows, columns, shapeWidth, shapeSpace, encodingName, encodingOffset);
 			doc.showInfo = !disablePrintInfo;
-			doc.saveToDisk();
+			if (sendToPrinter) {
+				doc.sendToPrinter();
+			} else {
+				doc.saveToDisk();
+			}
+			if (saveLandmarks) {
+				// make sure its saves the corners in the expected units
+				doc.getG().squareWidth = 1;
+				doc.config.squareSize = shapeWidth;
+				doc.getG().saveCornerLocations();
+				saveLandmarks(doc.config.getMarkerWidth(), doc.config.getMarkerHeight(), doc.getG().corners,
+						String.format("Hamming Grid rows=%d cols=%d space=%f dict=%s",
+								doc.config.numRows, doc.config.numCols, doc.config.spaceToSquare, doc.config.markers.dictionary));
+			}
 			return;
 		}
 
-		CreateCalibrationTargetGenerator generator =
-				new CreateCalibrationTargetGenerator(fileName + suffix, paperSize, rows, columns, unit);
-
+		var generator = new CreateCalibrationTargetGenerator(fileName + suffix, paperSize, rows, columns, unit);
+		generator.sendToPrinter = sendToPrinter;
 		generator.setShowInfo(!disablePrintInfo);
 
 		switch (type) {
@@ -282,7 +329,29 @@ public class CreateCalibrationTarget {
 		}
 	}
 
-	public static CreateFiducialDocumentPDF ecoCheckToPdf( String outputFile, PaperSize paper, Unit units,
+	public void saveLandmarks( double markerWidth, double markerHeight, List<Point2D_F64> corners, String description ) {
+		double paperWidth = paperSize.convertWidth(unit);
+		double paperHeight = paperSize.convertHeight(unit);
+
+		double offsetX = paperWidth/2.0 - markerWidth/2.0;
+		double offsetY = paperHeight/2.0 - markerHeight/2.0;
+
+		try (PrintStream out = new PrintStream(fileName + "_landmarks.txt")) {
+			out.println("# " + description);
+			out.println("# Calibration target landmark locations");
+			out.println("paper=" + paperSize.name);
+			out.println("units=" + unit.name());
+			out.println("count=" + corners.size());
+			for (int cornerID = 0; cornerID < corners.size(); cornerID++) {
+				Point2D_F64 p = corners.get(cornerID);
+				out.printf("%d %.8f %.8f\n", cornerID, offsetX + p.x, offsetY + p.y);
+			}
+		} catch (FileNotFoundException e) {
+			throw new RuntimeException(e);
+		}
+	}
+
+	public static CreateECoCheckDocumentPDF ecoCheckToPdf( String outputFile, PaperSize paper, Unit units,
 														   int rows, int columns, float squareWidth,
 														   int numMarkers, int errorLevel ) throws IOException {
 		ECoCheckUtils utils = new ECoCheckUtils();

@@ -33,14 +33,14 @@ import javax.swing.*;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 import java.awt.*;
-import java.awt.event.ActionListener;
 
 /**
  * Used to specify the calibration target's parameters
  *
  * @author Peter Abeles
  */
-public class CalibrationTargetPanel extends StandardAlgConfigPanel implements ActionListener {
+public class CalibrationTargetPanel extends StandardAlgConfigPanel {
+	public final JCheckBoxValue saveLandmarks = checkboxWrap("Save Landmarks", false);
 	JComboBox<CalibrationPatterns> comboType;
 	JPanel panelTarget = new JPanel();
 
@@ -48,13 +48,13 @@ public class CalibrationTargetPanel extends StandardAlgConfigPanel implements Ac
 
 	public CalibrationPatterns selected = CalibrationPatterns.CHESSBOARD;
 
-	public ConfigGridDimen configChessboard = new ConfigGridDimen(7, 5, 1);
+	public ConfigGridDimen configChessboard = new ConfigGridDimen(8, 6, 1);
 	public ConfigECoCheckMarkers configECoCheck = ConfigECoCheckMarkers.singleShape(9, 7, 1, 1);
-	public ConfigGridDimen configSquare = new ConfigGridDimen(4, 3, 1, 1);
+	public ConfigGridDimen configSquare = new ConfigGridDimen(7, 5, 1, 0.2);
 	public ConfigGridDimen configCircle = new ConfigGridDimen(15, 10, 1, 1.5);
 	public ConfigGridDimen configCircleHex = new ConfigGridDimen(15, 15, 1, 1.5);
 	public ConfigHammingChessboard configHammingChess = ConfigHammingChessboard.create(HammingDictionary.ARUCO_MIP_25h7, 8, 6, 1.0);
-	public ConfigHammingGrid configHammingGrid = ConfigHammingGrid.create(HammingDictionary.ARUCO_MIP_25h7, 6, 4, 1.0, 0.4);
+	public ConfigHammingGrid configHammingGrid = ConfigHammingGrid.create(HammingDictionary.ARUCO_MIP_25h7, 7, 5, 1.0, 0.2);
 
 	public CalibrationTargetPanel( Listener listener ) {
 		setBorder(BorderFactory.createEmptyBorder());
@@ -70,6 +70,7 @@ public class CalibrationTargetPanel extends StandardAlgConfigPanel implements Ac
 		changeTargetPanel();
 
 		addLabeled(comboType, "Target Type");
+		addAlignLeft(saveLandmarks.check, "Save a file with landmark locations to disk with the pdf");
 		add(Box.createRigidArea(new Dimension(10, 10)));
 		addAlignCenter(panelTarget);
 	}
@@ -93,6 +94,8 @@ public class CalibrationTargetPanel extends StandardAlgConfigPanel implements Ac
 			selected = (CalibrationPatterns)comboType.getSelectedItem();
 			changeTargetPanel();
 			updateParameters();
+		} else if (source == saveLandmarks.check) {
+			saveLandmarks.updateValue();
 		}
 	}
 
@@ -302,7 +305,7 @@ public class CalibrationTargetPanel extends StandardAlgConfigPanel implements Ac
 
 			addLabeled(sRows.spinner, "Rows", "Number of square rows");
 			addLabeled(sCols.spinner, "Cols", "Number of square columns");
-			addAlignCenter(cEven.check,"Chessboard is an even or odd pattern");
+			addAlignCenter(cEven.check, "Chessboard is an even or odd pattern");
 			addLabeled(sWidth.spinner, "Square Width", "How wide each square is");
 			addLabeled(sScale.spinner, "Marker Scale", "Relative size of markers");
 			addLabeled(cDict, "Dictionary", "Encoding dictionary");
