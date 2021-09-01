@@ -72,7 +72,7 @@ public class FiducialSquareHammingGenerator {
 	/**
 	 * Renders unique IDs on all the inner squares
 	 */
-	private void renderCodes( Marker marker ) {
+	public void renderCodes( Marker marker ) {
 		final int rows = dictionary.gridWidth;
 		final int cols = dictionary.gridWidth;
 
@@ -85,11 +85,13 @@ public class FiducialSquareHammingGenerator {
 
 		for (int row = 0, bitIndex = 0; row < rows; row++) {
 			double y0 = offsetY + bw + (rows - row - 1)*bit;
+			double y1 = offsetY + bw + (rows - row)*bit;
 			for (int col = 0; col < cols; col++) {
 				double x0 = offsetX + bw + (cols - col - 1)*bit;
+				double x1 = offsetX + bw + (cols - col)*bit;
 				if (marker.pattern.get(bitIndex++) == 1)
 					continue;
-				render.rectangle(x0, y0, x0 + bit, y0 + bit);
+				render.rectangle(x0, y0, x1, y1);
 			}
 		}
 	}

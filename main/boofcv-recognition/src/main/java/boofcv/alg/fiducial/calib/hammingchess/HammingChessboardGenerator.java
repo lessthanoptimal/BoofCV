@@ -57,14 +57,15 @@ public class HammingChessboardGenerator {
 		render.init();
 		render.setGray(0);
 		squareGenerator.setRender(render);
-		double markerOffset = squareWidth*(1.0 - config.markerScale)/2.0;
-		squareGenerator.squareWidth = squareWidth*config.markerScale;
+		double w = squareWidth*config.squareSize;
+		double markerOffset = w*(1.0 - config.markerScale)/2.0;
+		squareGenerator.squareWidth = w*config.markerScale;
 
 		int markerIndex = config.markerOffset;
 		for (int row = 0; row < config.numRows; row++) {
-			double y = row*squareWidth;
+			double y = row*w;
 			for (int col = 0; col < config.numCols; col++) {
-				double x = col*squareWidth;
+				double x = col*w;
 
 				boolean drawSquare;
 				if (config.chessboardEven) {
@@ -74,7 +75,7 @@ public class HammingChessboardGenerator {
 				}
 
 				if (drawSquare) {
-					render.square(x, y, squareWidth);
+					render.square(x, y, w);
 				} else {
 					squareGenerator.offsetX = x + markerOffset;
 					squareGenerator.offsetY = y + markerOffset;
@@ -86,17 +87,18 @@ public class HammingChessboardGenerator {
 		saveCornerLocations();
 	}
 
-	private void saveCornerLocations() {
+	public void saveCornerLocations() {
 		corner.clear();
 
 		final int rows = config.numRows;
 		final int cols = config.numCols;
+		final double w = squareWidth*config.squareSize;
 
 		double stub = squareWidth/2;
 		for (int row = 1; row < rows; row++) {
-			double y = stub + squareWidth*(row - 1);
+			double y = stub + w*(row - 1);
 			for (int col = 1; col < cols; col++) {
-				double x = stub + squareWidth*(col - 1);
+				double x = stub + w*(col - 1);
 
 				corner.add(new Point2D_F64(x, y));
 			}

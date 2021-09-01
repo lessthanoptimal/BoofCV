@@ -53,8 +53,8 @@ public class CalibrationTargetPanel extends StandardAlgConfigPanel implements Ac
 	public ConfigGridDimen configSquare = new ConfigGridDimen(4, 3, 1, 1);
 	public ConfigGridDimen configCircle = new ConfigGridDimen(15, 10, 1, 1.5);
 	public ConfigGridDimen configCircleHex = new ConfigGridDimen(15, 15, 1, 1.5);
-	public ConfigHammingChessboard configHammingChess = ConfigHammingChessboard.create(HammingDictionary.ARUCO_MIP_25h7, 8, 6);
-	public ConfigHammingGrid configHammingGrid = ConfigHammingGrid.create(HammingDictionary.ARUCO_MIP_25h7, 6, 4, 0.4);
+	public ConfigHammingChessboard configHammingChess = ConfigHammingChessboard.create(HammingDictionary.ARUCO_MIP_25h7, 8, 6, 1.0);
+	public ConfigHammingGrid configHammingGrid = ConfigHammingGrid.create(HammingDictionary.ARUCO_MIP_25h7, 6, 4, 1.0, 0.4);
 
 	public CalibrationTargetPanel( Listener listener ) {
 		setBorder(BorderFactory.createEmptyBorder());

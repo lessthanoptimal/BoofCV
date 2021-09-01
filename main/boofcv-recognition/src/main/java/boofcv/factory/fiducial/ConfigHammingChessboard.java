@@ -73,16 +73,25 @@ public class ConfigHammingChessboard implements Configuration {
 		this.chessboardEven = src.chessboardEven;
 	}
 
+	public double getMarkerWidth() {
+		return squareSize*numCols;
+	}
+
+	public double getMarkerHeight() {
+		return squareSize*numRows;
+	}
+
 	/**
 	 * Create from a pre-defined dictionary
 	 */
 	public static ConfigHammingChessboard create( HammingDictionary dictionary,
-												  int rows, int cols ) {
+												  int rows, int cols, double squareSize ) {
 		ConfigHammingMarker configDictionary = ConfigHammingMarker.loadDictionary(dictionary);
 
 		var config = new ConfigHammingChessboard(configDictionary);
 		config.numRows = rows;
 		config.numCols = cols;
+		config.squareSize = squareSize;
 
 		return config;
 	}
