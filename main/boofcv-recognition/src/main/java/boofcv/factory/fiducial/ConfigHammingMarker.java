@@ -180,6 +180,15 @@ public class ConfigHammingMarker implements Configuration {
 			case ARUCO_MIP_16h3 -> loadPredefined("aruco_mip_16h3");
 			case ARUCO_MIP_25h7 -> loadPredefined("aruco_mip_25h7");
 			case ARUCO_MIP_36h12 -> loadPredefined("aruco_mip_36h12");
+			case ARUCO_OCV_4x4_1000 -> loadPredefined("aruco_ocv_4x4_1000");
+			case ARUCO_OCV_5x5_1000 -> loadPredefined("aruco_ocv_5x5_1000");
+			case ARUCO_OCV_6x6_1000 -> loadPredefined("aruco_ocv_6x6_1000");
+			case ARUCO_OCV_7x7_1000 -> loadPredefined("aruco_ocv_7x7_1000");
+			case APRILTAG_16h5 -> loadPredefined("apriltag_16h5");
+			case APRILTAG_25h7 -> loadPredefined("apriltag_25h7");
+			case APRILTAG_25h9 -> loadPredefined("apriltag_25h9");
+			case APRILTAG_36h10 -> loadPredefined("apriltag_36h10");
+			case APRILTAG_36h11 -> loadPredefined("apriltag_36h11");
 		};
 		config.dictionary = dictionary;
 		return config;

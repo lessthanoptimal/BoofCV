@@ -23,6 +23,9 @@ Version : 0.39
     TODO add to assisted calibration
   * Removed Square Grid Binary target type as it was never reliable enough to flush out entirely and never used
   * TODO Multi Camera Calibration API
+- Fiducial Markers
+  * Added support for ArUco and AprilTags as "HammingMarkers"
+  * Added calibration targets Hamming Marker grid and chessboard, e.g. ChaRuCo and ArUco grids.
 TODO New fisheye model
 TODO datta2009
 TODO Monocular VO
