@@ -306,7 +306,7 @@ public class CreateCalibrationTarget {
 																		float squareWidth, float markerScale,
 																		String encoding, int markerOffset ) throws IOException {
 		HammingDictionary dictionary = HammingDictionary.valueOf(encoding);
-		ConfigHammingChessboard config = ConfigHammingChessboard.create(dictionary, rows, columns);
+		ConfigHammingChessboard config = ConfigHammingChessboard.create(dictionary, rows, columns, 1.0);
 		config.markerOffset = markerOffset;
 		config.markerScale = markerScale;
 		config.squareSize = squareWidth;
@@ -326,7 +326,7 @@ public class CreateCalibrationTarget {
 																 float squareWidth, float spaceToSquare,
 																 String encoding, int markerOffset ) throws IOException {
 		HammingDictionary dictionary = HammingDictionary.valueOf(encoding);
-		ConfigHammingGrid config = ConfigHammingGrid.create(dictionary, rows, columns, spaceToSquare);
+		ConfigHammingGrid config = ConfigHammingGrid.create(dictionary, rows, columns, 1.0, spaceToSquare);
 		config.markerOffset = markerOffset;
 		config.spaceToSquare = spaceToSquare;
 		config.squareSize = squareWidth;

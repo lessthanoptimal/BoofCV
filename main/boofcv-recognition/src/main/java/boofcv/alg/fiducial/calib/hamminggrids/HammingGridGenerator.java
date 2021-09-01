@@ -33,7 +33,7 @@ import java.util.List;
  *
  * @author Peter Abeles
  */
-public class HammingGridsGenerator {
+public class HammingGridGenerator {
 	/** How wide a checkerboard square is */
 	public @Setter @Getter double squareWidth = 1.0;
 
@@ -48,7 +48,7 @@ public class HammingGridsGenerator {
 	// list of corners in ground truth
 	public final List<Point2D_F64> corner = new ArrayList<>();
 
-	public HammingGridsGenerator( ConfigHammingGrid config ) {
+	public HammingGridGenerator( ConfigHammingGrid config ) {
 		this.config = config;
 		this.squareGenerator = new FiducialSquareHammingGenerator(config.markers);
 	}
@@ -56,14 +56,16 @@ public class HammingGridsGenerator {
 	public void render() {
 		render.init();
 		squareGenerator.setRender(render);
-		squareGenerator.squareWidth = squareWidth;
-		double w = config.spaceToSquare + 1.0;
+
+		double w = squareWidth*config.squareSize;
+		double ws = w*(config.spaceToSquare + 1.0);
+		squareGenerator.squareWidth = w;
 
 		int markerIndex = config.markerOffset;
 		for (int row = 0; row < config.numRows; row++) {
-			squareGenerator.offsetY = row*w*squareWidth;
+			squareGenerator.offsetY = row*ws;
 			for (int col = 0; col < config.numCols; col++, markerIndex++) {
-				squareGenerator.offsetX = col*w*squareWidth;
+				squareGenerator.offsetX = col*ws;
 				squareGenerator.renderNoInit(markerIndex);
 			}
 		}
@@ -71,23 +73,24 @@ public class HammingGridsGenerator {
 		saveCornerLocations();
 	}
 
-	private void saveCornerLocations() {
+	public void saveCornerLocations() {
 		corner.clear();
 
-		double w = config.spaceToSquare + 1.0;
+		double w = squareWidth*config.squareSize;
+		double ws = w*(config.spaceToSquare + 1.0);
 
 		for (int row = 0; row < config.numRows; row++) {
-			double y = row*w*squareWidth;
+			double y = (config.numRows - row - 1)*ws + w;
 			for (int col = 0; col < config.numCols; col++) {
-				double x = col*w*squareWidth;
-				corner.add(new Point2D_F64(x,y));
-				corner.add(new Point2D_F64(x+squareWidth,y));
+				double x = col*ws;
+				corner.add(new Point2D_F64(x, y));
+				corner.add(new Point2D_F64(x + w, y));
 			}
-			y += squareWidth;
+			y -= w;
 			for (int col = 0; col < config.numCols; col++) {
-				double x = col*w*squareWidth;
-				corner.add(new Point2D_F64(x,y));
-				corner.add(new Point2D_F64(x+squareWidth,y));
+				double x = col*ws;
+				corner.add(new Point2D_F64(x, y));
+				corner.add(new Point2D_F64(x + w, y));
 			}
 		}
 	}

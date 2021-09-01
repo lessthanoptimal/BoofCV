@@ -61,8 +61,8 @@ public class CreateHammingChessboardDocumentPDF extends CreateFiducialDocumentPD
 		if (markerHeight < 0)
 			throw new IllegalArgumentException("Must specify marker height even if square");
 		this.renderer = renderer;
+		config.squareSize = squareWidth*UNIT_TO_POINTS;
 		g = new HammingChessboardGenerator(config);
-		g.squareWidth = squareWidth*UNIT_TO_POINTS;
 		g.setRender(renderer);
 	}
 

@@ -80,12 +80,13 @@ public class ConfigHammingGrid implements Configuration {
 	 * Create from a pre-defined dictionary
 	 */
 	public static ConfigHammingGrid create( HammingDictionary dictionary,
-											int rows, int cols, double spaceToSquare ) {
+											int rows, int cols, double squareSize, double spaceToSquare ) {
 		ConfigHammingMarker configDictionary = ConfigHammingMarker.loadDictionary(dictionary);
 
 		var config = new ConfigHammingGrid(configDictionary);
 		config.numRows = rows;
 		config.numCols = cols;
+		config.squareSize = squareSize;
 		config.spaceToSquare = spaceToSquare;
 
 		return config;

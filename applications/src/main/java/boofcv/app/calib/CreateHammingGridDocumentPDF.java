@@ -18,7 +18,7 @@
 
 package boofcv.app.calib;
 
-import boofcv.alg.fiducial.calib.hamminggrids.HammingGridsGenerator;
+import boofcv.alg.fiducial.calib.hamminggrids.HammingGridGenerator;
 import boofcv.app.PaperSize;
 import boofcv.app.fiducials.CreateFiducialDocumentPDF;
 import boofcv.factory.fiducial.ConfigHammingGrid;
@@ -39,7 +39,7 @@ import java.util.ArrayList;
  */
 public class CreateHammingGridDocumentPDF extends CreateFiducialDocumentPDF {
 
-	@Getter HammingGridsGenerator g;
+	@Getter HammingGridGenerator g;
 
 	PdfFiducialEngine renderer;
 
@@ -61,8 +61,8 @@ public class CreateHammingGridDocumentPDF extends CreateFiducialDocumentPDF {
 		if (markerHeight < 0)
 			throw new IllegalArgumentException("Must specify marker height even if square");
 		this.renderer = renderer;
-		g = new HammingGridsGenerator(config);
-		g.squareWidth = squareWidth*UNIT_TO_POINTS;
+		config.squareSize = squareWidth*UNIT_TO_POINTS;
+		g = new HammingGridGenerator(config);
 		g.setRender(renderer);
 	}
 
