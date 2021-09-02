@@ -40,7 +40,7 @@ import java.util.stream.Collectors;
  */
 public class ConfigHammingMarker implements Configuration {
 	/**
-	 * How wide the border is relative to the total fiducial width. Typically the width of one square.
+	 * How wide the border is relative to the total fiducial width. Typically, the width of one square.
 	 */
 	public double borderWidthFraction = 0.25;
 
@@ -56,12 +56,16 @@ public class ConfigHammingMarker implements Configuration {
 	/** Which dictionary is this based off of. Typically, this will be pre-defined. */
 	public HammingDictionary dictionary;
 
+	/** Length of a targets size in world units. */
+	public double targetWidth = 1;
+
 	public ConfigHammingMarker() {}
 
 	@Override public void checkValidity() {
 		BoofMiscOps.checkTrue(borderWidthFraction > 0.0);
 		BoofMiscOps.checkTrue(gridWidth > 0);
 		BoofMiscOps.checkTrue(minimumHamming >= 0);
+		BoofMiscOps.checkTrue(targetWidth > 0);
 		for (int i = 0; i < encoding.size; i++) {
 			encoding.get(i).checkValidity();
 		}
@@ -73,6 +77,7 @@ public class ConfigHammingMarker implements Configuration {
 		this.minimumHamming = src.minimumHamming;
 		this.encoding.resize(src.encoding.size);
 		this.dictionary = src.dictionary;
+		this.targetWidth = src.targetWidth;
 		for (int i = 0; i < src.encoding.size; i++) {
 			encoding.get(i).setTo(src.encoding.get(i));
 		}

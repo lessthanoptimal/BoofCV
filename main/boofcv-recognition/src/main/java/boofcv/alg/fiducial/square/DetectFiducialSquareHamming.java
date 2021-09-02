@@ -19,14 +19,16 @@
 package boofcv.alg.fiducial.square;
 
 import boofcv.abst.filter.binary.InputToBinary;
+import boofcv.alg.descriptor.DescriptorDistance;
+import boofcv.alg.fiducial.qrcode.PackedBits32;
+import boofcv.alg.filter.binary.ThresholdImageOps;
+import boofcv.alg.misc.ImageMiscOps;
 import boofcv.alg.shapes.polygon.DetectPolygonBinaryGrayRefine;
+import boofcv.factory.fiducial.ConfigHammingMarker;
 import boofcv.struct.image.GrayF32;
 import boofcv.struct.image.GrayU8;
 import boofcv.struct.image.ImageGray;
 import lombok.Getter;
-import lombok.Setter;
-import org.ddogleg.struct.DogArray;
-import org.ddogleg.struct.DogArray_B;
 
 /**
  * This detector decodes binary square fiducials where markers are indentified from a set of markers which is much
@@ -39,36 +41,35 @@ import org.ddogleg.struct.DogArray_B;
  */
 public class DetectFiducialSquareHamming<T extends ImageGray<T>>
 		extends BaseDetectFiducialSquare<T> {
-	/** Binary pattern for each known marker */
-	@Getter @Setter public final DogArray<DogArray_B> markers = new DogArray<>(DogArray_B::new);
 
-	/** Maximum allowed hamming distance from best fit marker */
-	@Getter @Setter public int maximumBitError = 0;
-
-	// number of rows/columns in the encoded binary pattern
-	@Getter protected int gridWidth;
+	/** Describes the marker it looks for */
+	@Getter public final ConfigHammingMarker description;
 
 	// converts the input image into a binary one
-	private GrayU8 binaryInner = new GrayU8(1,1);
+	final GrayU8 binaryInner = new GrayU8(1, 1);
 	// storage for no border sub-image
-	private GrayF32 grayNoBorder = new GrayF32();
+	final GrayF32 grayNoBorder = new GrayF32();
 
 	// width of a square in the inner undistorted image.
-	protected final static int w=10;
+	protected final static int w = 10;
 	// total number of pixels in a square. Outer pixels are ignored, hence -2 for each axis
-	protected final static int N=(w-4)*(w-4);
+	protected final static int N = (w - 4)*(w - 4);
+
+	// The read in bits in a format the codec can understand
+	final PackedBits32 bits = new PackedBits32();
+	// Storage the bits inside an image so that it can be rotated easily
+	final GrayU8 bitImage = new GrayU8(1, 1);
+	// Stores intermediate results when rotating
+	final GrayU8 workImage = new GrayU8(1, 1);
 
 	/**
 	 * Configures the fiducial detector
 	 *
-	 * @param gridWidth Number of elements wide the encoded square grid is. 3,4, or 5 is recommended.
-	 * @param borderWidthFraction Fraction of the fiducial's width that the border occupies. 0.25 is recommended.
 	 * @param inputToBinary Converts the input image into a binary image
 	 * @param quadDetector Detects quadrilaterals in the input image
 	 * @param inputType Type of image it's processing
 	 */
-	public DetectFiducialSquareHamming( int gridWidth,
-										double borderWidthFraction,
+	public DetectFiducialSquareHamming( ConfigHammingMarker description,
 										double minimumBlackBorderFraction,
 										final InputToBinary<T> inputToBinary,
 										final DetectPolygonBinaryGrayRefine<T> quadDetector, Class<T> inputType ) {
@@ -77,37 +78,122 @@ public class DetectFiducialSquareHamming<T extends ImageGray<T>>
 		// is determined by the size of the grid
 		// The number of pixels in the undistorted image (squarePixels) is selected using the above information
 		super(inputToBinary, quadDetector, false,
-				borderWidthFraction, minimumBlackBorderFraction, (int)Math.round((w*gridWidth)/(1.0 - borderWidthFraction*2.0)),
+				description.borderWidthFraction, minimumBlackBorderFraction,
+				(int)Math.round((w*description.gridWidth)/(1.0 - description.borderWidthFraction*2.0)),
 				inputType);
+		this.description = description;
 
-		if (gridWidth < 3 || gridWidth > 8)
-			throw new IllegalArgumentException("The grid must be at least 3 and at most 8 elements wide");
-
-		this.gridWidth = gridWidth;
-		binaryInner.reshape(w*gridWidth, w*gridWidth);
-	}
-
-	public void configureGrid( int gridWidth, double borderFraction ) {
-
+		binaryInner.reshape(w*description.gridWidth, w*description.gridWidth);
+		bitImage.reshape(description.gridWidth, description.gridWidth);
 	}
 
 	@Override protected boolean processSquare( GrayF32 square, Result result, double edgeInside, double edgeOutside ) {
-		// convert each cell in the grid into a binary value by voting
+		int off = (square.width - binaryInner.width)/2;
+		square.subimage(off, off, off + binaryInner.width, off + binaryInner.width, grayNoBorder);
 
-		return false;
+		// convert input image into binary number
+		double threshold = (edgeInside + edgeOutside)/2;
+		if (!decodeDataBits(grayNoBorder, threshold))
+			return false;
+
+		// Search all markers and orientation to see what is the best match. Stop if it finds a perfect match.
+		int bestMarker = -1;
+		int bestOrientation = -1;
+		int bestError = Integer.MAX_VALUE;
+		for (int orientation = 0; orientation < 4 && bestError != 0; orientation++) {
+			// git bit array for this orientation
+			convertBitImageToBitArray();
+			final int numWords = bits.arrayLength();
+
+			// Go through all markers
+			for (int markerIdx = 0; markerIdx < description.encoding.size; markerIdx++) {
+				int[] data = description.encoding.get(markerIdx).pattern.data;
+
+				int error = 0;
+				for (int wordIdx = 0; wordIdx < numWords; wordIdx++) {
+					error += DescriptorDistance.hamming(bits.data[wordIdx] ^ data[wordIdx]);
+				}
+
+				// Check to see if this is the best result
+				if (error < bestError) {
+					bestError = error;
+					bestOrientation = orientation;
+					bestMarker = markerIdx;
+
+					// stop if it's perfect
+					if (bestError == 0)
+						break;
+				}
+			}
+
+			// Rotate image and repeat
+			ImageMiscOps.rotateCW(bitImage, workImage);
+			bitImage.setTo(workImage);
+		}
+
+		// See if the error is too large
+		if (bestError > description.minimumHamming) {
+			return false;
+		}
+
+		// save the results
+		result.which = description.encoding.get(bestMarker).id;
+		result.lengthSide = 1;
+		result.rotation = bestOrientation;
+		result.error = bestError;
+
+		return true;
 	}
 
-	public static class Detected {
-		/** Which marker matched the observation */
-		public int markerIndex;
-		/** The hamming distance of the detection relative to the pattern */
-		public int hammingDistance;
+	/**
+	 * Converts the binary image into a dense bit array that's understood by the codec
+	 */
+	void convertBitImageToBitArray() {
+		bits.resize(bitImage.width*bitImage.height);
+		for (int y = 0, i = 0; y < bitImage.height; y++) {
+			for (int x = 0; x < bitImage.width; x++, i++) {
+				bits.set(bits.size - i - 1, bitImage.data[i]);
+			}
+		}
 	}
 
-	public static class Marker {
-		/** Expected binary pattern for this marker */
-		public final DogArray_B pattern = new DogArray_B();
-		/** Unique ID assigned to this marker */
-		public long id;
+	/**
+	 * Converts the gray scale image into a binary number. Skip the outer 1 pixel of each inner square. These
+	 * tend to be incorrectly classified due to distortion.
+	 */
+	protected boolean decodeDataBits( GrayF32 gray, double threshold ) {
+		// compute binary image using an adaptive algorithm to handle shadows
+		ThresholdImageOps.threshold(gray, binaryInner, (float)threshold, true);
+
+		final int voteThreshold = N/2;
+		final int gridWidth = description.gridWidth;
+
+		int countOnes = 0;
+		for (int row = 0; row < gridWidth; row++) {
+			int y0 = row*binaryInner.width/gridWidth + 2;
+			int y1 = (row + 1)*binaryInner.width/gridWidth - 2;
+			for (int col = 0; col < gridWidth; col++) {
+				int x0 = col*binaryInner.width/gridWidth + 2;
+				int x1 = (col + 1)*binaryInner.width/gridWidth - 2;
+
+				int total = 0;
+				for (int i = y0; i < y1; i++) {
+					int index = i*binaryInner.width + x0;
+					for (int j = x0; j < x1; j++) {
+						total += binaryInner.data[index++];
+					}
+				}
+
+				int bit = total <= voteThreshold ? 1 : 0;
+				bitImage.data[row*gridWidth + col] = (byte)bit;
+				countOnes += bit;
+			}
+		}
+
+		// Reject all black or all white squares
+		if (countOnes == 0 || countOnes == gridWidth*gridWidth) {
+			return false;
+		}
+		return true;
 	}
 }

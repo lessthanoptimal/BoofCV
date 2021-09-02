@@ -38,4 +38,7 @@ public class FoundFiducial {
 	 */
 	public Quadrilateral_F64 distortedPixels = new Quadrilateral_F64();
 
+	/** how close of a fit the observed pattern was to the best fit marker. Lower is better. */
+	public double encodingError;
+
 }

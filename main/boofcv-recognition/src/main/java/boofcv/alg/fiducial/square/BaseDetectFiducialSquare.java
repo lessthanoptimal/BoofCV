@@ -409,6 +409,7 @@ public abstract class BaseDetectFiducialSquare<T extends ImageGray<T>> {
 		// save the results for output
 		FoundFiducial f = found.grow();
 		f.id = result.which;
+		f.encodingError = result.error;
 
 		for (int i = 0; i < 4; i++) {
 			Point2D_F64 a = imageShape.get(i);
@@ -475,5 +476,7 @@ public abstract class BaseDetectFiducialSquare<T extends ImageGray<T>> {
 		// Just to make things confusion, the rotation is done in the visual clockwise, which
 		// is a counter-clockwise rotation when you look at the actual coordinates
 		int rotation;
+		// Optional error. How good of a fit the observed pattern is to the observed marker
+		double error;
 	}
 }

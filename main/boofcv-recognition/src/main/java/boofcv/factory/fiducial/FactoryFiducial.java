@@ -29,6 +29,7 @@ import boofcv.alg.fiducial.dots.UchiyaMarkerImageTracker;
 import boofcv.alg.fiducial.dots.UchiyaMarkerTracker;
 import boofcv.alg.fiducial.qrcode.QrCodePositionPatternDetector;
 import boofcv.alg.fiducial.square.DetectFiducialSquareBinary;
+import boofcv.alg.fiducial.square.DetectFiducialSquareHamming;
 import boofcv.alg.fiducial.square.DetectFiducialSquareImage;
 import boofcv.alg.shapes.ellipse.BinaryEllipseDetectorPixel;
 import boofcv.alg.shapes.ellipse.EdgeIntensityEllipse;
@@ -83,6 +84,35 @@ public class FactoryFiducial {
 						binary, squareDetector, imageType);
 		alg.setAmbiguityThreshold(configFiducial.ambiguousThreshold);
 		return new SquareBinary_to_FiducialDetector<>(alg, configFiducial.targetWidth);
+	}
+
+	/**
+	 * Detector for square binary based fiducials.
+	 *
+	 * @param configMarkers Describes the markers it will detect.
+	 * @param configDetector (Optional) Describes how it will detect the markers.
+	 * @param imageType Type of image it's processing
+	 * @return FiducialDetector
+	 * @see DetectFiducialSquareBinary DetectFiducialSquareBinary for a description of this fiducial type.
+	 */
+	public static <T extends ImageGray<T>>
+	SquareHamming_to_FiducialDetector<T> squareHamming( ConfigHammingMarker configMarkers,
+													   @Nullable ConfigFiducialHammingDetector configDetector,
+													   Class<T> imageType ) {
+
+		if (configDetector == null) {
+			configDetector = new ConfigFiducialHammingDetector();
+		}
+		configMarkers.checkValidity();
+		configDetector.checkValidity();
+
+		final InputToBinary<T> binary = FactoryThresholdBinary.threshold(configDetector.configThreshold, imageType);
+		final DetectPolygonBinaryGrayRefine<T> squareDetector = FactoryShapeDetector.
+				polygon(configDetector.squareDetector, imageType);
+
+		final var alg = new DetectFiducialSquareHamming<>(configMarkers, configDetector.minimumBlackBorderFraction,
+				binary, squareDetector, imageType);
+		return new SquareHamming_to_FiducialDetector<>(alg);
 	}
 
 	/**

@@ -51,7 +51,7 @@ public class PackedBits32 implements PackedBits {
 		int index = which/32;
 		int offset = which%32;
 
-		return (data[index] & (1 << offset)) >> offset;
+		return (data[index] >>> offset) & 1;
 	}
 
 	@Override
