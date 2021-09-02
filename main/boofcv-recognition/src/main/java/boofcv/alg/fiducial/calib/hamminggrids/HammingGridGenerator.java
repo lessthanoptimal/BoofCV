@@ -59,7 +59,7 @@ public class HammingGridGenerator {
 
 		double w = squareWidth*config.squareSize;
 		double ws = w*(config.spaceToSquare + 1.0);
-		squareGenerator.squareWidth = w;
+		squareGenerator.markerWidth = w;
 
 		int markerIndex = config.markerOffset;
 		for (int row = 0; row < config.numRows; row++) {

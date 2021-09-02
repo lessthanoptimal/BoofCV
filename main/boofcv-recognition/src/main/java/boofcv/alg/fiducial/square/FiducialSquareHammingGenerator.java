@@ -30,8 +30,8 @@ import lombok.Setter;
  * @author Peter Abeles
  */
 public class FiducialSquareHammingGenerator {
-	/** How wide a checkerboard square is */
-	public @Setter @Getter double squareWidth = 1.0;
+	/** How wide the marker is */
+	public @Setter @Getter double markerWidth = 1.0;
 
 	/** The top-left corner of the marker */
 	public double offsetX, offsetY;
@@ -48,7 +48,6 @@ public class FiducialSquareHammingGenerator {
 	public void render( int markerIdx ) {
 		render.init();
 		renderNoInit(markerIdx);
-
 	}
 
 	public void renderNoInit( int markerIdx ) {
@@ -65,8 +64,8 @@ public class FiducialSquareHammingGenerator {
 		// Start drawing black
 		render.setGray(0.0);
 
-		double bw = dictionary.borderWidthFraction*squareWidth;
-		render.square(offsetX, offsetY, squareWidth, bw);
+		double bw = dictionary.borderWidthFraction*markerWidth;
+		render.square(offsetX, offsetY, markerWidth, bw);
 	}
 
 	/**
@@ -79,9 +78,9 @@ public class FiducialSquareHammingGenerator {
 		render.setGray(0.0);
 
 		// border width
-		double bw = dictionary.borderWidthFraction*squareWidth;
+		double bw = dictionary.borderWidthFraction*markerWidth;
 		// square bit width
-		double bit = (squareWidth - 2.0*bw)/dictionary.gridWidth;
+		double bit = (markerWidth - 2.0*bw)/dictionary.gridWidth;
 
 		for (int row = 0, bitIndex = 0; row < rows; row++) {
 			double y0 = offsetY + bw + (rows - row - 1)*bit;

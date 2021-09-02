@@ -51,6 +51,15 @@ public class TestPackedBits32 extends BoofStandardJUnit {
 		}
 	}
 
+	/**
+	 * See if negative internal integers are handled correctly. This was a bug and get() return -1
+	 */
+	@Test void negativeInteger() {
+		PackedBits32 values = new PackedBits32(60);
+		values.data[0] = -Integer.MAX_VALUE;
+		assertEquals(1, values.get(31));
+	}
+
 	@Test void resize() {
 		PackedBits32 values = new PackedBits32(60);
 		assertEquals(60, values.size);

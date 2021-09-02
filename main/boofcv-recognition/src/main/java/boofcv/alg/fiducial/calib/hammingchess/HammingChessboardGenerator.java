@@ -59,7 +59,7 @@ public class HammingChessboardGenerator {
 		squareGenerator.setRender(render);
 		double w = squareWidth*config.squareSize;
 		double markerOffset = w*(1.0 - config.markerScale)/2.0;
-		squareGenerator.squareWidth = w*config.markerScale;
+		squareGenerator.markerWidth = w*config.markerScale;
 
 		int markerIndex = config.markerOffset;
 		for (int row = 0; row < config.numRows; row++) {
