@@ -39,7 +39,7 @@ public class ConfigHammingChessboard implements Configuration {
 	public int markerOffset = 0;
 
 	/** Describes the markers are drawn inside the chessboard pattern */
-	public final ConfigHammingMarker markers;
+	public ConfigHammingMarker markers;
 
 	/** How much smaller the marker is relative to the chessboard squares */
 	public double markerScale = 0.7;
@@ -52,6 +52,10 @@ public class ConfigHammingChessboard implements Configuration {
 
 	public ConfigHammingChessboard( ConfigHammingMarker markers ) {
 		this.markers = markers;
+	}
+
+	public ConfigHammingChessboard() {
+		markers = ConfigHammingMarker.loadDictionary(HammingDictionary.ARUCO_MIP_25h7);
 	}
 
 	@Override public void checkValidity() {
