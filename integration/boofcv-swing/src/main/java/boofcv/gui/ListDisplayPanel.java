@@ -91,9 +91,9 @@ public class ListDisplayPanel extends JPanel implements ListSelectionListener {
 		return (int)listPanel.getPreferredSize().getWidth();
 	}
 
-	public void addImage( ImageBase image, String name ) {
+	public ImagePanel addImage( ImageBase image, String name ) {
 		BufferedImage buff = ConvertBufferedImage.convertTo(image, null, true);
-		addImage(buff, name, ScaleOptions.DOWN);
+		return addImage(buff, name, ScaleOptions.DOWN);
 	}
 
 	/**
@@ -102,13 +102,15 @@ public class ListDisplayPanel extends JPanel implements ListSelectionListener {
 	 * @param image The image being displayed
 	 * @param name Name of the image. Shown in the list.
 	 */
-	public void addImage( BufferedImage image, String name ) {
-		addImage(image, name, ScaleOptions.DOWN);
+	public ImagePanel addImage( BufferedImage image, String name ) {
+		return addImage(image, name, ScaleOptions.DOWN);
 	}
 
-	public void addImage( BufferedImage image, String name, ScaleOptions scaling ) {
+	public ImagePanel addImage( BufferedImage image, String name, ScaleOptions scaling ) {
 		BoofMiscOps.checkTrue(image != null, "image is null. Does the file not exist?");
-		addItem(new ImagePanel(image, scaling), name);
+		var panel = new ImagePanel(image, scaling);
+		addItem(panel, name);
+		return panel;
 	}
 
 	public void addImage( String name, BufferedImage image ) {

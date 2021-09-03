@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -26,7 +26,6 @@ import java.awt.*;
 import java.awt.geom.AffineTransform;
 import java.awt.image.BufferedImage;
 
-
 /**
  * Simple JPanel for displaying buffered images allows images to be zoomed in and out of
  *
@@ -40,14 +39,14 @@ public class ImageZoomPanel extends JScrollPane {
 	public boolean autoScaleCenterOnSetImage = true;
 	private boolean hasImageChanged = false;
 
-	protected double scale=1;
-	protected double transX=0,transY=0;
+	protected double scale = 1;
+	protected double transX = 0, transY = 0;
 
 	boolean checkEventDispatch = true;
 
 	protected ImageZoomListener listener;
 
-	public ImageZoomPanel(final BufferedImage img ) {
+	public ImageZoomPanel( final BufferedImage img ) {
 		this.img = img;
 		setScale(1);
 	}
@@ -64,29 +63,28 @@ public class ImageZoomPanel extends JScrollPane {
 		panel.mouseListener = null;
 	}
 
-	public void autoScaleAndAlign(){
+	public void autoScaleAndAlign() {
 		this.autoScaleAndAlign(img);
 	}
 
 	/**
 	 * Automatically recomputes the scale to fit inside the window and centers it in the view
-	 * @param img
 	 */
-	private void autoScaleAndAlign(final BufferedImage img ) {
-		double ratioW = (double) getWidth() / (double) img.getWidth();
-		double ratioH = (double) getHeight() / (double) img.getHeight();
+	private void autoScaleAndAlign( final BufferedImage img ) {
+		double ratioW = (double)getWidth()/(double)img.getWidth();
+		double ratioH = (double)getHeight()/(double)img.getHeight();
 
 		double scale = Math.min(ratioW, ratioH);
-		if ( scale >= 1 )
+		if (scale >= 1)
 			scale = 1;
 
 		boolean scaleChange = this.scale != scale;
 		this.scale = scale;
-		if( scaleChange) {
-			if( listener != null ) {
+		if (scaleChange) {
+			if (listener != null) {
 				listener.handleScaleChange(this.scale);
 			}
-			updateSize(img.getWidth(),img.getHeight());
+			updateSize(img.getWidth(), img.getHeight());
 		}
 		// Scroll it to the top left (this is the align part)
 		getHorizontalScrollBar().setValue(0);
@@ -95,7 +93,7 @@ public class ImageZoomPanel extends JScrollPane {
 
 	public synchronized void setScale( double scale ) {
 		// do nothing if the scale has not changed
-		if( this.scale == scale )
+		if (this.scale == scale)
 			return;
 
 		Rectangle r = panel.getVisibleRect();
@@ -103,7 +101,7 @@ public class ImageZoomPanel extends JScrollPane {
 		double centerY = (r.y + r.height/2.0)/this.scale;
 
 		this.scale = scale;
-		if( img != null ) {
+		if (img != null) {
 			int w = (int)Math.ceil(img.getWidth()*scale);
 			int h = (int)Math.ceil(img.getHeight()*scale);
 			panel.setPreferredSize(new Dimension(w, h));
@@ -114,38 +112,38 @@ public class ImageZoomPanel extends JScrollPane {
 
 		{
 			ImageZoomListener listener = this.listener;
-			if( listener != null ) {
+			if (listener != null) {
 				listener.handleScaleChange(this.scale);
 			}
 		}
 	}
 
-	public synchronized void setScaleAndCenter( double scale,  double cx , double cy) {
+	public synchronized void setScaleAndCenter( double scale, double cx, double cy ) {
 		boolean scaleChanged = false;
-		if( scale != this.scale ) {
+		if (scale != this.scale) {
 			scaleChanged = true;
 			this.scale = scale;
 		}
-		if( img != null ) {
+		if (img != null) {
 			int w = (int)Math.ceil(img.getWidth()*scale);
 			int h = (int)Math.ceil(img.getHeight()*scale);
 			panel.setPreferredSize(new Dimension(w, h));
 		}
 		getViewport().setView(panel);
-		centerView(cx,cy);
+		centerView(cx, cy);
 
-		if( scaleChanged ) {
+		if (scaleChanged) {
 			ImageZoomListener listener = this.listener;
-			if( listener != null ) {
+			if (listener != null) {
 				listener.handleScaleChange(this.scale);
 			}
 		}
 	}
 
-	public synchronized void centerView( double cx , double cy ) {
+	public synchronized void centerView( double cx, double cy ) {
 		Rectangle r = panel.getVisibleRect();
-		int x = (int)(cx*scale-r.width/2);
-		int y = (int)(cy*scale-r.height/2);
+		int x = (int)(cx*scale - r.width/2);
+		int y = (int)(cy*scale - r.height/2);
 
 		getHorizontalScrollBar().setValue(x);
 		getVerticalScrollBar().setValue(y);
@@ -156,43 +154,42 @@ public class ImageZoomPanel extends JScrollPane {
 	 *
 	 * @param image The new image which will be displayed.
 	 */
-	public synchronized void setImage(BufferedImage image) {
+	public synchronized void setImage( BufferedImage image ) {
 		// assume the image was initially set before the GUI was invoked
-		if( checkEventDispatch && this.img != null ) {
-			if( !SwingUtilities.isEventDispatchThread() )
+		if (checkEventDispatch && this.img != null) {
+			if (!SwingUtilities.isEventDispatchThread())
 				throw new RuntimeException("Changed image when not in GUI thread?");
 		}
 
 		hasImageChanged = this.img != image;
-		int beforeWidth=-1,beforeHeight=-1;
-		if( this.img != null ) {
+		int beforeWidth = -1, beforeHeight = -1;
+		if (this.img != null) {
 			beforeWidth = this.img.getWidth();
 			beforeHeight = this.img.getHeight();
 		}
 		this.img = image;
 		// only update size if the image size has changed
-		if( image != null && hasImageChanged && beforeWidth != image.getWidth() && beforeHeight != image.getHeight() )
-		{
+		if (image != null && hasImageChanged && beforeWidth != image.getWidth() && beforeHeight != image.getHeight()) {
 			updateSize(image.getWidth(), image.getHeight());
 		}
 	}
 
-	public void updateSize( int width , int height ) {
+	public void updateSize( int width, int height ) {
 		Dimension prev = getPreferredSize();
 
 		int w = (int)Math.ceil(width*scale);
 		int h = (int)Math.ceil(height*scale);
 
-		if( prev.getWidth() != w || prev.getHeight() != h ) {
-			panel.setPreferredSize(new Dimension(w,h));
+		if (prev.getWidth() != w || prev.getHeight() != h) {
+			panel.setPreferredSize(new Dimension(w, h));
 			getViewport().setView(panel);
 		}
 	}
 
-	public synchronized void setBufferedImageNoChange(BufferedImage image) {
+	public synchronized void setBufferedImageNoChange( BufferedImage image ) {
 		// assume the image was initially set before the GUI was invoked
-		if( checkEventDispatch && this.img != null ) {
-			if( !SwingUtilities.isEventDispatchThread() )
+		if (checkEventDispatch && this.img != null) {
+			if (!SwingUtilities.isEventDispatchThread())
 				throw new RuntimeException("Changed image when not in GUI thread?");
 		}
 		this.img = image;
@@ -202,7 +199,7 @@ public class ImageZoomPanel extends JScrollPane {
 		return img;
 	}
 
-	public Point2D_F64 pixelToPoint(int x, int y) {
+	public Point2D_F64 pixelToPoint( int x, int y ) {
 		Point2D_F64 ret = new Point2D_F64();
 		ret.x = x/scale;
 		ret.y = y/scale;
@@ -213,35 +210,34 @@ public class ImageZoomPanel extends JScrollPane {
 	/**
 	 * Paint inside the image panel. Useful for overlays
 	 */
-	protected void paintInPanel(AffineTransform tran,Graphics2D g2 ) {
+	protected void paintInPanel( AffineTransform tran, Graphics2D g2 ) {
 		// intentionally empty
 	}
 
 	/** Called very last when you don't want to draw in image coordinates */
 	protected void paintOverPanel( Graphics2D g2 ) {}
 
-	public class ImagePanel extends JPanel
-	{
+	public class ImagePanel extends JPanel {
 		SaveImageOnClick mouseListener = new SaveImageOnClick(ImageZoomPanel.this.getViewport());
 
-		BufferedImage buffer = new BufferedImage(1,1,BufferedImage.TYPE_INT_ARGB);
+		BufferedImage buffer = new BufferedImage(1, 1, BufferedImage.TYPE_INT_ARGB);
 
 		public ImagePanel() {
 			addMouseListener(mouseListener);
 		}
 
 		@Override
-		public void paintComponent(Graphics g) {
+		public void paintComponent( Graphics g ) {
 			super.paintComponent(g);
 
-			if( img == null ) {
+			if (img == null) {
 				paintOverPanel((Graphics2D)g);
 				return;
 			}
 
-			if( hasImageChanged ) {
+			if (hasImageChanged) {
 				hasImageChanged = false;
-				if( autoScaleCenterOnSetImage ) {
+				if (autoScaleCenterOnSetImage) {
 					autoScaleAndAlign();
 				}
 			}
@@ -249,36 +245,36 @@ public class ImageZoomPanel extends JScrollPane {
 			// render to a buffer first to improve performance. This is particularly evident when rendering
 			// lines for some reason
 
-			int w = ImageZoomPanel.this.getWidth(),h = ImageZoomPanel.this.getHeight();
-			buffer = ConvertBufferedImage.checkDeclare(w,h,buffer,buffer.getType());
+			int w = ImageZoomPanel.this.getWidth(), h = ImageZoomPanel.this.getHeight();
+			buffer = ConvertBufferedImage.checkDeclare(w, h, buffer, buffer.getType());
 			Graphics2D g2 = buffer.createGraphics();
 			g2.setColor(getBackground());
-			g2.fillRect(0,0,w,h);
+			g2.fillRect(0, 0, w, h);
 
 			ImageZoomPanel.this.transX = -ImageZoomPanel.this.getHorizontalScrollBar().getValue();
 			ImageZoomPanel.this.transY = -ImageZoomPanel.this.getVerticalScrollBar().getValue();
 
-			AffineTransform tran = new AffineTransform(scale,0,0,scale,transX,transY);
-			synchronized ( ImageZoomPanel.this ) {
+			AffineTransform tran = new AffineTransform(scale, 0, 0, scale, transX, transY);
+			synchronized (ImageZoomPanel.this) {
 				g2.drawImage(img, tran, null);
 			}
 
 			AffineTransform orig = g2.getTransform();
 			// make the default behavior be a translate for backwards compatibility. Before it was rendered in a
 			// buffered image it was rendered into the full scale panel
-			tran = new AffineTransform(1,0,0,1,transX,transY);
+			tran = new AffineTransform(1, 0, 0, 1, transX, transY);
 			g2.setTransform(tran);
 			paintInPanel(tran, g2);
 			g2.setTransform(orig);
 
-			g.drawImage(buffer,(int)-transX,(int)-transY,null);
+			g.drawImage(buffer, (int)-transX, (int)-transY, null);
 
 			paintOverPanel((Graphics2D)g);
 		}
 	}
 
 	public void setScrollbarsVisible( boolean visible ) {
-		if( visible ) {
+		if (visible) {
 			setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_ALWAYS);
 			setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_ALWAYS);
 		} else {
@@ -300,11 +296,11 @@ public class ImageZoomPanel extends JScrollPane {
 		return listener;
 	}
 
-	public void setListener(ImageZoomListener listener) {
+	public void setListener( ImageZoomListener listener ) {
 		this.listener = listener;
 	}
 
 	public interface ImageZoomListener {
-		void handleScaleChange(double scale );
+		void handleScaleChange( double scale );
 	}
 }
