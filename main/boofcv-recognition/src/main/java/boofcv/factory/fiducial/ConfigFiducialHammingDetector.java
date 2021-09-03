@@ -46,7 +46,7 @@ public class ConfigFiducialHammingDetector implements Configuration {
 	 */
 	public ConfigPolygonDetector squareDetector = new ConfigPolygonDetector();
 
-	public final ConfigThreshold configThreshold = ConfigThreshold.local(ThresholdType.LOCAL_MEAN, 21);
+	public ConfigThreshold configThreshold = ConfigThreshold.local(ThresholdType.LOCAL_MEAN, 21);
 
 	{
 		((ConfigPolylineSplitMerge)squareDetector.detector.contourToPoly).cornerScorePenalty = 0.2;

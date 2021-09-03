@@ -45,10 +45,10 @@ public class DetectFiducialSquareHamming<T extends ImageGray<T>>
 	/** Describes the marker it looks for */
 	@Getter public final ConfigHammingMarker description;
 
-	// converts the input image into a binary one
-	final GrayU8 binaryInner = new GrayU8(1, 1);
-	// storage for no border sub-image
-	final GrayF32 grayNoBorder = new GrayF32();
+	/** converts the input image into a binary one */
+	@Getter protected final GrayU8 binaryInner = new GrayU8(1, 1);
+	/** storage for no border sub-image */
+	@Getter protected final GrayF32 grayNoBorder = new GrayF32();
 
 	// width of a square in the inner undistorted image.
 	protected final static int w = 10;

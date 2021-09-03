@@ -24,8 +24,10 @@ import boofcv.alg.distort.brown.LensDistortionBrown;
 import boofcv.factory.fiducial.ConfigHammingMarker;
 import boofcv.factory.fiducial.FactoryFiducial;
 import boofcv.factory.fiducial.HammingDictionary;
+import boofcv.gui.ListDisplayPanel;
 import boofcv.gui.feature.VisualizeShapes;
 import boofcv.gui.fiducial.VisualizeFiducial;
+import boofcv.gui.image.ScaleOptions;
 import boofcv.gui.image.ShowImages;
 import boofcv.io.UtilIO;
 import boofcv.io.calibration.CalibrationIO;
@@ -33,7 +35,6 @@ import boofcv.io.image.ConvertBufferedImage;
 import boofcv.io.image.UtilImageIO;
 import boofcv.struct.calib.CameraPinholeBrown;
 import boofcv.struct.image.GrayF32;
-import boofcv.struct.image.ImageType;
 import georegression.struct.point.Point2D_F64;
 import georegression.struct.se.Se3_F64;
 import georegression.struct.shapes.Polygon2D_F64;
@@ -50,14 +51,14 @@ import java.io.File;
  * the better it is at error correction. The recommended dictionary is ARUCO_MIP_25h7.
  *
  * See:
- *   Aruco https://www.uco.es/investiga/grupos/ava/node/26
- *   AprilTag https://april.eecs.umich.edu/software/apriltag
+ * Aruco https://www.uco.es/investiga/grupos/ava/node/26
+ * AprilTag https://april.eecs.umich.edu/software/apriltag
  *
  * @author Peter Abeles
  */
 public class ExampleFiducialHamming {
 	public static void main( String[] args ) {
-		String directory = UtilIO.pathExample("fiducial/aruco/mip25h7");
+		String directory = UtilIO.pathExample("fiducial/square_hamming/aruco_25h7");
 
 		// load the lens distortion parameters and the input image
 		CameraPinholeBrown param = CalibrationIO.load(new File(directory, "intrinsic.yaml"));
@@ -70,42 +71,52 @@ public class ExampleFiducialHamming {
 		// Provide it lens parameters so that a 3D pose estimate is possible
 		detector.setLensDistortion(lensDistortion, param.width, param.height);
 
-		// Load an example image
-		GrayF32 input = UtilImageIO.loadImage(new File(directory, "image0000.jpg"), true, ImageType.SB_F32);
+		// Load and process all example images
+		ListDisplayPanel gui = new ListDisplayPanel();
+		for (int imageID = 1; imageID <= 3; imageID++) {
+			String name = String.format("image%02d.jpg", imageID);
+			System.out.println("processing: " + name);
 
-		detector.detect(input);
+			// Load the image
+			BufferedImage buffered = UtilImageIO.loadImage(new File(directory, name).getPath());
 
-		// Render a 3D compute on top of all detections
-		BufferedImage buffered = ConvertBufferedImage.convertTo(input, null);
-		Graphics2D g2 = buffered.createGraphics();
-		Se3_F64 targetToSensor = new Se3_F64();
-		Point2D_F64 locationPixel = new Point2D_F64();
-		Polygon2D_F64 bounds = new Polygon2D_F64();
-		for (int i = 0; i < detector.totalFound(); i++) {
-			detector.getCenter(i, locationPixel);
-			detector.getBounds(i, bounds);
+			// Convert to a BoofCV format
+			GrayF32 input = ConvertBufferedImage.convertFrom(buffered, (GrayF32)null);
 
-			g2.setColor(new Color(50, 50, 255));
-			g2.setStroke(new BasicStroke(10));
-			VisualizeShapes.drawPolygon(bounds, true, 1.0, g2);
+			// Run the detector
+			detector.detect(input);
 
-			if (detector.hasID())
-				System.out.println("Target ID = " + detector.getId(i));
-			if (detector.hasMessage())
-				System.out.println("Message   = " + detector.getMessage(i));
-			System.out.println("2D Image Location = " + locationPixel);
+			// Render a 3D compute on top of all detections
+			Graphics2D g2 = buffered.createGraphics();
+			Se3_F64 targetToSensor = new Se3_F64();
+			Point2D_F64 locationPixel = new Point2D_F64();
+			Polygon2D_F64 bounds = new Polygon2D_F64();
+			for (int i = 0; i < detector.totalFound(); i++) {
+				detector.getCenter(i, locationPixel);
+				detector.getBounds(i, bounds);
 
-			if (detector.is3D()) {
-				detector.getFiducialToCamera(i, targetToSensor);
-				System.out.println("3D Location:");
-				System.out.println(targetToSensor);
-				VisualizeFiducial.drawCube(targetToSensor, param, detector.getWidth(i), 3, g2);
-				VisualizeFiducial.drawLabelCenter(targetToSensor, param, "" + detector.getId(i), g2);
-			} else {
-				VisualizeFiducial.drawLabel(locationPixel, "" + detector.getId(i), g2);
+				g2.setColor(new Color(50, 50, 255));
+				g2.setStroke(new BasicStroke(10));
+				VisualizeShapes.drawPolygon(bounds, true, 1.0, g2);
+
+				if (detector.hasID())
+					System.out.println("Target ID = " + detector.getId(i));
+				if (detector.hasMessage())
+					System.out.println("Message   = " + detector.getMessage(i));
+				System.out.println("2D Image Location = " + locationPixel);
+
+				if (detector.is3D()) {
+					detector.getFiducialToCamera(i, targetToSensor);
+					System.out.println("3D Location:");
+					System.out.println(targetToSensor);
+					VisualizeFiducial.drawCube(targetToSensor, param, detector.getWidth(i), 3, g2);
+					VisualizeFiducial.drawLabelCenter(targetToSensor, param, "" + detector.getId(i), g2);
+				} else {
+					VisualizeFiducial.drawLabel(locationPixel, "" + detector.getId(i), g2);
+				}
 			}
+			gui.addImage(buffered, name, ScaleOptions.ALL);
 		}
-
-		ShowImages.showWindow(buffered, "Fiducials", true);
+		ShowImages.showWindow(gui,"Example Fiducial Hamming", true);
 	}
 }
