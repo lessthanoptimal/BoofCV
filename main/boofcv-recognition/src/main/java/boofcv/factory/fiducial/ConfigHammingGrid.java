@@ -45,10 +45,14 @@ public class ConfigHammingGrid implements Configuration {
 	public int markerOffset = 0;
 
 	/** Encoding dictionary for binary patterns */
-	public final ConfigHammingMarker markers;
+	public ConfigHammingMarker markers;
 
 	public ConfigHammingGrid( ConfigHammingMarker dictionary ) {
 		this.markers = dictionary;
+	}
+
+	public ConfigHammingGrid() {
+		markers = ConfigHammingMarker.loadDictionary(HammingDictionary.ARUCO_MIP_25h7);
 	}
 
 	@Override public void checkValidity() {
