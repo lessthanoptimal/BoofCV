@@ -18,40 +18,33 @@
 
 package boofcv.alg.fiducial.square;
 
-import boofcv.alg.drawing.FiducialRenderEngine;
+import boofcv.alg.drawing.FiducialImageGenerator;
 import boofcv.factory.fiducial.ConfigHammingMarker;
 import boofcv.factory.fiducial.ConfigHammingMarker.Marker;
 import lombok.Getter;
-import lombok.Setter;
 
 /**
  * Renders a square hamming fiducial. Bits with a value of 0 are white and bits with a value of 1 are black.
  *
  * @author Peter Abeles
  */
-public class FiducialSquareHammingGenerator {
-	/** How wide the marker is */
-	public @Setter @Getter double markerWidth = 1.0;
-
+public class FiducialSquareHammingGenerator extends FiducialImageGenerator {
 	/** The top-left corner of the marker */
 	public double offsetX, offsetY;
 
-	final ConfigHammingMarker dictionary;
+	@Getter final ConfigHammingMarker config;
 
-	// used to draw the fiducial
-	@Setter protected FiducialRenderEngine render;
-
-	public FiducialSquareHammingGenerator( ConfigHammingMarker dictionary ) {
-		this.dictionary = dictionary;
+	public FiducialSquareHammingGenerator( ConfigHammingMarker config ) {
+		this.config = config;
 	}
 
-	public void render( int markerIdx ) {
-		render.init();
-		renderNoInit(markerIdx);
+	public void generate( int markerIdx ) {
+		renderer.init();
+		generateNoInit(markerIdx);
 	}
 
-	public void renderNoInit( int markerIdx ) {
-		Marker shape = dictionary.encoding.get(markerIdx);
+	public void generateNoInit( int markerIdx ) {
+		Marker shape = config.encoding.get(markerIdx);
 
 		// Render black square surrounding the data bits
 		renderBorder();
@@ -62,25 +55,25 @@ public class FiducialSquareHammingGenerator {
 
 	private void renderBorder() {
 		// Start drawing black
-		render.setGray(0.0);
+		renderer.setGray(0.0);
 
-		double bw = dictionary.borderWidthFraction*markerWidth;
-		render.square(offsetX, offsetY, markerWidth, bw);
+		double bw = config.borderWidthFraction*markerWidth;
+		renderer.square(offsetX, offsetY, markerWidth, bw);
 	}
 
 	/**
 	 * Renders unique IDs on all the inner squares
 	 */
 	public void renderCodes( Marker marker ) {
-		final int rows = dictionary.gridWidth;
-		final int cols = dictionary.gridWidth;
+		final int rows = config.gridWidth;
+		final int cols = config.gridWidth;
 
-		render.setGray(0.0);
+		renderer.setGray(0.0);
 
 		// border width
-		double bw = dictionary.borderWidthFraction*markerWidth;
+		double bw = config.borderWidthFraction*markerWidth;
 		// square bit width
-		double bit = (markerWidth - 2.0*bw)/dictionary.gridWidth;
+		double bit = (markerWidth - 2.0*bw)/config.gridWidth;
 
 		for (int row = 0, bitIndex = 0; row < rows; row++) {
 			double y0 = offsetY + bw + (rows - row - 1)*bit;
@@ -90,7 +83,7 @@ public class FiducialSquareHammingGenerator {
 				double x1 = offsetX + bw + (cols - col)*bit;
 				if (marker.pattern.get(bitIndex++) == 1)
 					continue;
-				render.rectangle(x0, y0, x1, y1);
+				renderer.rectangle(x0, y0, x1, y1);
 			}
 		}
 	}

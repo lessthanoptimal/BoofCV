@@ -47,9 +47,9 @@ public class TestSquareHamming_to_FiducialDetector extends GenericFiducialDetect
 		engine.configure(0, 200, 200);
 
 		var generator = new FiducialSquareHammingGenerator(config);
-		generator.setRender(engine);
+		generator.setRenderer(engine);
 		generator.setMarkerWidth(200);
-		generator.render(5);
+		generator.generate(5);
 
 		return engine.getGrayF32();
 	}

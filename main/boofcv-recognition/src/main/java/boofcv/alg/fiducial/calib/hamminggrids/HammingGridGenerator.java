@@ -55,18 +55,18 @@ public class HammingGridGenerator {
 
 	public void render() {
 		render.init();
-		squareGenerator.setRender(render);
+		squareGenerator.setRenderer(render);
 
 		double w = squareWidth*config.squareSize;
 		double ws = w*(config.spaceToSquare + 1.0);
-		squareGenerator.markerWidth = w;
+		squareGenerator.setMarkerWidth(w);
 
 		int markerIndex = config.markerOffset;
 		for (int row = 0; row < config.numRows; row++) {
 			squareGenerator.offsetY = row*ws;
 			for (int col = 0; col < config.numCols; col++, markerIndex++) {
 				squareGenerator.offsetX = col*ws;
-				squareGenerator.renderNoInit(markerIndex);
+				squareGenerator.generateNoInit(markerIndex);
 			}
 		}
 

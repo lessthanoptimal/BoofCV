@@ -18,6 +18,7 @@
 
 package boofcv.app;
 
+import boofcv.alg.fiducial.square.FiducialSquareGenerator;
 import boofcv.app.fiducials.CreateSquareFiducialControlPanel;
 import boofcv.app.fiducials.CreateSquareFiducialGui;
 import boofcv.gui.BoofSwingUtil;
@@ -38,6 +39,7 @@ public class CreateFiducialSquareImageGui extends CreateSquareFiducialGui {
 
 	public CreateFiducialSquareImageGui() {
 		super("square_image");
+		generator = new FiducialSquareGenerator(render);
 		controls = new ControlPanel(this);
 		setupGui(controls, "Square Image Fiducial");
 	}
@@ -51,7 +53,11 @@ public class CreateFiducialSquareImageGui extends CreateSquareFiducialGui {
 		c.unit = controls.documentUnits;
 		c.paperSize = controls.paperSize;
 		c.blackBorderFractionalWidth = (float)controls.borderFraction;
-		c.markerWidth = (float)controls.markerWidth;
+		if (controls.format.equalsIgnoreCase("pdf")) {
+			c.markerWidth = (float)controls.markerWidthUnits;
+		} else {
+			c.markerWidth = controls.markerWidthPixels;
+		}
 		c.spaceBetween = c.markerWidth/4;
 		c.gridFill = controls.fillGrid;
 		c.hideInfo = controls.hideInfo;
@@ -71,6 +77,7 @@ public class CreateFiducialSquareImageGui extends CreateSquareFiducialGui {
 		if (path == null) {
 			imagePanel.setImageRepaint(null);
 		} else {
+			FiducialSquareGenerator generator = (FiducialSquareGenerator)this.generator;
 			BufferedImage buffered = UtilImageIO.loadImage(path);
 			GrayU8 gray = ConvertBufferedImage.convertFrom(buffered, (GrayU8)null);
 			generator.setBlackBorder(controls.borderFraction);
@@ -105,7 +112,7 @@ public class CreateFiducialSquareImageGui extends CreateSquareFiducialGui {
 			});
 
 			add(new JScrollPane(listPatterns));
-			layoutComponents();
+			layoutComponents(true);
 		}
 
 		@Override

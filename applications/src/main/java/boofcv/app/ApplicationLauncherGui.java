@@ -46,7 +46,7 @@ public class ApplicationLauncherGui extends JPanel {
 		setLayout(layout);
 
 		setBackground(Color.WHITE);
-		setPreferredSize(new Dimension(620, 600));
+		setPreferredSize(new Dimension(620, 650));
 
 		// set a border so that the window is distinctive in Windows
 		setBorder(BorderFactory.createLineBorder(Color.GRAY));
@@ -59,6 +59,7 @@ public class ApplicationLauncherGui extends JPanel {
 		JButton bCreateCalib = createButton("Calibration", CreateCalibrationTargetGui::new);
 		JButton bCreateFidBin = createButton("Square Binary", CreateFiducialSquareBinaryGui::new);
 		JButton bCreateFidImage = createButton("Square Image", CreateFiducialSquareImageGui::new);
+		JButton bCreateFidHamming = createButton("Square Hamming", CreateFiducialSquareHammingGui::new);
 
 		JButton bUtilCalib = createButton("Calibration", CameraCalibrationGui::new);
 		JButton bUtilScanQrCode = createButton("Batch QR Code", BatchScanQrCodesGui::new);
@@ -91,7 +92,7 @@ public class ApplicationLauncherGui extends JPanel {
 		layout.putConstraint(SpringLayout.NORTH, logo, 0, SpringLayout.NORTH, this);
 
 		JPanel panelLeft = buttonPanel("Create / Print",
-				bCreateQR, bCreateDots, bCreateCalib, bCreateFidBin, bCreateFidImage);
+				bCreateQR, bCreateDots, bCreateCalib, bCreateFidBin, bCreateFidImage, bCreateFidHamming);
 		JPanel panelRight = buttonPanel("Tools", bUtilCalib, bUtilScanQrCode, bUtilDown, bUtilUndist, bUtilViewCloud);
 
 		layout.putConstraint(SpringLayout.WEST, panelLeft, 60, SpringLayout.WEST, this);
