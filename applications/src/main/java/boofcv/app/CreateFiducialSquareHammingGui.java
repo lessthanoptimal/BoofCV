@@ -78,7 +78,7 @@ public class CreateFiducialSquareHammingGui extends CreateSquareFiducialGui {
 	@Override
 	protected void renderPreview() {
 		long pattern = controls.selectedPattern;
-		if (pattern <= 0) {
+		if (pattern < 0) {
 			imagePanel.setImageRepaint(null);
 		} else if (pattern >= c.config.encoding.size) {
 			System.err.println("Pattern outside of allowed range");

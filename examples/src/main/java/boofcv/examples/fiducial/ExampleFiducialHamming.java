@@ -21,10 +21,9 @@ package boofcv.examples.fiducial;
 import boofcv.abst.fiducial.FiducialDetector;
 import boofcv.alg.distort.LensDistortionNarrowFOV;
 import boofcv.alg.distort.brown.LensDistortionBrown;
-import boofcv.factory.fiducial.ConfigFiducialBinary;
+import boofcv.factory.fiducial.ConfigHammingMarker;
 import boofcv.factory.fiducial.FactoryFiducial;
-import boofcv.factory.filter.binary.ConfigThreshold;
-import boofcv.factory.filter.binary.ThresholdType;
+import boofcv.factory.fiducial.HammingDictionary;
 import boofcv.gui.feature.VisualizeShapes;
 import boofcv.gui.fiducial.VisualizeFiducial;
 import boofcv.gui.image.ShowImages;
@@ -44,36 +43,41 @@ import java.awt.image.BufferedImage;
 import java.io.File;
 
 /**
- * Detects square binary fiducials inside an image, writes out there pose, and visualizes a virtual flat cube
- * above them in the input image.
+ * Hamming fiducials are an entire family of markers/tags which work by identifying unique ID's by minimizing
+ * the hamming distance. This family includes ArUco, ArUco 3, AprilTag, and others. Several prebuilt dictionaries
+ * are included with BoofCV and you can specify your own easily. Hamming tags have error correction capabilities
+ * can are resiliant to noise. How resilient depends on the dictionary. In general the fewer unique IDs available
+ * the better it is at error correction. The recommended dictionary is ARUCO_MIP_25h7.
  *
- * These markers can have issues with noise and you might want to consider using ExampleFiducialHamming instead.
+ * See:
+ *   Aruco https://www.uco.es/investiga/grupos/ava/node/26
+ *   AprilTag https://april.eecs.umich.edu/software/apriltag
  *
  * @author Peter Abeles
  */
-public class ExampleFiducialBinary {
+public class ExampleFiducialHamming {
 	public static void main( String[] args ) {
-		String directory = UtilIO.pathExample("fiducial/binary");
+		String directory = UtilIO.pathExample("fiducial/aruco/mip25h7");
 
 		// load the lens distortion parameters and the input image
 		CameraPinholeBrown param = CalibrationIO.load(new File(directory, "intrinsic.yaml"));
 		LensDistortionNarrowFOV lensDistortion = new LensDistortionBrown(param);
 
-		BufferedImage input = UtilImageIO.loadImage(directory, "image0000.jpg");
-//		BufferedImage input = UtilImageIO.loadImage(directory, "image0001.jpg");
-//		BufferedImage input = UtilImageIO.loadImage(directory, "image0002.jpg");
-		GrayF32 original = ConvertBufferedImage.convertFrom(input, true, ImageType.single(GrayF32.class));
+		// You need to create a different configuration for each dictionary type
+		ConfigHammingMarker configMarker = ConfigHammingMarker.loadDictionary(HammingDictionary.ARUCO_MIP_25h7);
+		FiducialDetector<GrayF32> detector = FactoryFiducial.squareHamming(configMarker, /*detector*/null, GrayF32.class);
 
-		// Detect the fiducial
-		FiducialDetector<GrayF32> detector = FactoryFiducial.squareBinary(
-				new ConfigFiducialBinary(0.1), ConfigThreshold.local(ThresholdType.LOCAL_MEAN, 21), GrayF32.class);
-//				new ConfigFiducialBinary(0.1), ConfigThreshold.fixed(100),GrayF32.class);
-
+		// Provide it lens parameters so that a 3D pose estimate is possible
 		detector.setLensDistortion(lensDistortion, param.width, param.height);
-		detector.detect(original);
 
-		// print the results
-		Graphics2D g2 = input.createGraphics();
+		// Load an example image
+		GrayF32 input = UtilImageIO.loadImage(new File(directory, "image0000.jpg"), true, ImageType.SB_F32);
+
+		detector.detect(input);
+
+		// Render a 3D compute on top of all detections
+		BufferedImage buffered = ConvertBufferedImage.convertTo(input, null);
+		Graphics2D g2 = buffered.createGraphics();
 		Se3_F64 targetToSensor = new Se3_F64();
 		Point2D_F64 locationPixel = new Point2D_F64();
 		Polygon2D_F64 bounds = new Polygon2D_F64();
@@ -102,6 +106,6 @@ public class ExampleFiducialBinary {
 			}
 		}
 
-		ShowImages.showWindow(input, "Fiducials", true);
+		ShowImages.showWindow(buffered, "Fiducials", true);
 	}
 }

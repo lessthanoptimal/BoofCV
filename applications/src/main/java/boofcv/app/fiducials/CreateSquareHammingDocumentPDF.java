@@ -53,6 +53,7 @@ public class CreateSquareHammingDocumentPDF extends CreateFiducialDocumentPDF {
 	}
 
 	public void render( DogArray_I32 markerIDs ) throws IOException {
+		markerType = config.dictionary.name()+" ";
 		this.markerIDs.resize(markerIDs.size);
 		totalMarkers = markerIDs.size;
 		names = new ArrayList<>();
