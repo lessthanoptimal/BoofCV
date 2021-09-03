@@ -80,9 +80,9 @@ class TestDetectFiducialSquareHamming extends BoofStandardJUnit {
 		var engine = new FiducialImageEngine();
 		engine.configure(0, side, side);
 		var generator = new FiducialSquareHammingGenerator(config);
-		generator.render = engine;
-		generator.markerWidth = side;
-		generator.render(markerID);
+		generator.setRenderer(engine);
+		generator.setMarkerWidth(side);
+		generator.generate(markerID);
 
 		return engine.getGrayF32();
 	}

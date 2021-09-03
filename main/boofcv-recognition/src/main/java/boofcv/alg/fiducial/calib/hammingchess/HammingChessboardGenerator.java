@@ -56,10 +56,10 @@ public class HammingChessboardGenerator {
 	public void render() {
 		render.init();
 		render.setGray(0);
-		squareGenerator.setRender(render);
+		squareGenerator.setRenderer(render);
 		double w = squareWidth*config.squareSize;
 		double markerOffset = w*(1.0 - config.markerScale)/2.0;
-		squareGenerator.markerWidth = w*config.markerScale;
+		squareGenerator.setMarkerWidth(w*config.markerScale);
 
 		int markerIndex = config.markerOffset;
 		for (int row = 0; row < config.numRows; row++) {
@@ -79,7 +79,7 @@ public class HammingChessboardGenerator {
 				} else {
 					squareGenerator.offsetX = x + markerOffset;
 					squareGenerator.offsetY = y + markerOffset;
-					squareGenerator.renderNoInit(markerIndex++);
+					squareGenerator.generateNoInit(markerIndex++);
 				}
 			}
 		}

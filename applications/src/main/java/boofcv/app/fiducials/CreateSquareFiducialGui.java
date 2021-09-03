@@ -19,12 +19,13 @@
 package boofcv.app.fiducials;
 
 import boofcv.alg.drawing.FiducialImageEngine;
-import boofcv.alg.fiducial.square.FiducialSquareGenerator;
-import boofcv.app.BaseFiducialSquareBorder;
+import boofcv.alg.drawing.FiducialImageGenerator;
+import boofcv.app.BaseFiducialSquare;
 import boofcv.gui.BoofSwingUtil;
 import boofcv.gui.image.ImagePanel;
 import boofcv.gui.image.ScaleOptions;
 import boofcv.gui.image.ShowImages;
+import org.apache.commons.io.FilenameUtils;
 
 import javax.swing.*;
 import javax.swing.filechooser.FileSystemView;
@@ -42,12 +43,12 @@ import java.io.IOException;
  */
 public abstract class CreateSquareFiducialGui extends JPanel implements CreateSquareFiducialControlPanel.Listener {
 
-	CreateSquareFiducialControlPanel controls;
+	protected CreateSquareFiducialControlPanel controls;
 	protected ImagePanel imagePanel = new ImagePanel();
 	JFrame frame;
 
 	protected FiducialImageEngine render = new FiducialImageEngine();
-	protected FiducialSquareGenerator generator = new FiducialSquareGenerator(render);
+	protected FiducialImageGenerator generator;
 	protected BufferedImage buffered;
 
 	String defaultSaveName;
@@ -126,7 +127,7 @@ public abstract class CreateSquareFiducialGui extends JPanel implements CreateSq
 		frame.setJMenuBar(menuBar);
 	}
 
-	protected void saveFile( boolean sendToPrinter, BaseFiducialSquareBorder c ) {
+	protected void saveFile( boolean sendToPrinter, BaseFiducialSquare c ) {
 		if (sendToPrinter) {
 			if (controls.format.compareToIgnoreCase("pdf") != 0) {
 				JOptionPane.showMessageDialog(this, "Must select PDF document type to print");
@@ -136,7 +137,7 @@ public abstract class CreateSquareFiducialGui extends JPanel implements CreateSq
 			File f = FileSystemView.getFileSystemView().getHomeDirectory();
 			f = new File(f, defaultSaveName + "." + controls.format);
 
-			f = BoofSwingUtil.fileChooser(null, this, false, f.getPath(), null);
+			f = BoofSwingUtil.fileChooser(null, this, false, f.getPath(), (n)-> FilenameUtils.getBaseName(n) + "." + controls.format);
 			if (f == null) {
 				return;
 			}

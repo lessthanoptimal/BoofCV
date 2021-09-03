@@ -27,7 +27,6 @@ import javax.swing.*;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 import java.awt.*;
-import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.text.ParseException;
 
@@ -55,7 +54,8 @@ public abstract class CreateSquareFiducialControlPanel extends StandardAlgConfig
 	public String format;
 
 	public Unit documentUnits = Unit.CENTIMETER;
-	public double markerWidth = 10;
+	public double markerWidthUnits = 10;
+	public int markerWidthPixels = 400;
 	public double borderFraction = 0.25;
 
 	Listener listener;
@@ -64,12 +64,19 @@ public abstract class CreateSquareFiducialControlPanel extends StandardAlgConfig
 		this.listener = listener;
 	}
 
-	protected void layoutComponents() {
+	protected void layoutComponents( boolean includeBorder ) {
 		configureTextField(fieldBorderFraction, borderFraction, a -> {
+			if (borderFraction == a)
+				return;
 			borderFraction = a;
 			listener.controlsUpdates();
 		});
-		configureTextField(fieldMarkerWidth, markerWidth, a -> markerWidth = a);
+		configureTextField(fieldMarkerWidth, markerWidthUnits, a -> {
+			if (comboOutputFormat.getSelectedIndex() == 0)
+				markerWidthUnits = a;
+			else
+				markerWidthPixels = (int)a;
+		});
 
 		comboOutputFormat.setMaximumSize(comboOutputFormat.getPreferredSize());
 		format = (String)comboOutputFormat.getSelectedItem();
@@ -88,7 +95,8 @@ public abstract class CreateSquareFiducialControlPanel extends StandardAlgConfig
 		add(new JSeparator());
 		addLabeled(comboOutputFormat, "Output Format");
 		addLabeled(comboPaper, "Paper Size");
-		addLabeled(fieldBorderFraction, "Border");
+		if (includeBorder)
+			addLabeled(fieldBorderFraction, "Border");
 		add(createMarkerWidthPanel());
 		add(createFlagPanel());
 		addVerticalGlue();
@@ -159,19 +167,18 @@ public abstract class CreateSquareFiducialControlPanel extends StandardAlgConfig
 		return panel;
 	}
 
-	@Override
-	public void actionPerformed( ActionEvent e ) {
-		if (e.getSource() == comboPaper) {
+	@Override public void controlChanged( final Object source ) {
+		if (source == comboPaper) {
 			paperSize = (PaperSize)comboPaper.getSelectedItem();
-		} else if (e.getSource() == checkHideInfo) {
+		} else if (source == checkHideInfo) {
 			hideInfo = checkHideInfo.isSelected();
-		} else if (e.getSource() == checkFillGrid) {
+		} else if (source == checkFillGrid) {
 			fillGrid = checkFillGrid.isSelected();
-		} else if (e.getSource() == checkDrawGrid) {
+		} else if (source == checkDrawGrid) {
 			drawGrid = checkDrawGrid.isSelected();
-		} else if (e.getSource() == comboUnits) {
+		} else if (source == comboUnits) {
 			documentUnits = (Unit)comboUnits.getSelectedItem();
-		} else if (e.getSource() == comboOutputFormat) {
+		} else if (source == comboOutputFormat) {
 			format = (String)comboOutputFormat.getSelectedItem();
 			// toggle controls depending on type of output format
 			boolean enable = comboOutputFormat.getSelectedIndex() == 0;
@@ -179,8 +186,17 @@ public abstract class CreateSquareFiducialControlPanel extends StandardAlgConfig
 			checkHideInfo.setEnabled(enable);
 			checkFillGrid.setEnabled(enable);
 			comboUnits.setEnabled(enable);
-			fieldMarkerWidth.setEnabled(enable);
+			if (enable) {
+				fieldMarkerWidth.setValue(markerWidthUnits);
+			} else {
+				fieldMarkerWidth.setValue(markerWidthPixels);
+			}
 		}
+	}
+
+	public void setBorderFraction( double fraction ) {
+		this.borderFraction = fraction;
+		fieldBorderFraction.setValue(fraction);
 	}
 
 	public abstract void handleAddPattern();

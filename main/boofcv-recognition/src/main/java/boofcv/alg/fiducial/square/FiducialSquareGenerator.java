@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -19,26 +19,24 @@
 package boofcv.alg.fiducial.square;
 
 import boofcv.abst.distort.FDistort;
+import boofcv.alg.drawing.FiducialImageGenerator;
 import boofcv.alg.drawing.FiducialRenderEngine;
 import boofcv.alg.filter.binary.ThresholdImageOps;
 import boofcv.alg.misc.PixelMath;
 import boofcv.struct.image.GrayU8;
+import lombok.Getter;
+import lombok.Setter;
 
 /**
  * Generates images of square fiducials
  *
  * @author Peter Abeles
  */
-public class FiducialSquareGenerator {
-	FiducialRenderEngine renderer;
-
-	// length of the white border surrounding the fiducial
-	double whiteBorderDoc = 0;
-	// length of the black border
-	double blackBorder = 0.25;
-
-	// size of marker in document units
-	double markerWidth = 0;
+public class FiducialSquareGenerator extends FiducialImageGenerator {
+	/** length of the white border surrounding the fiducial */
+	@Getter @Setter double whiteBorderDoc = 0;
+	/** length of the black border */
+	@Getter @Setter double blackBorder = 0.25;
 
 	public FiducialSquareGenerator( FiducialRenderEngine renderer ) {
 		this.renderer = renderer;
@@ -174,32 +172,5 @@ public class FiducialSquareGenerator {
 	 */
 	double U( double f ) {
 		return f*markerWidth;
-	}
-
-	public double getWhiteBorderDoc() {
-		return whiteBorderDoc;
-	}
-
-	/**
-	 * Specify white border in pixels
-	 */
-	public void setWhiteBorderDoc( double whiteBorder ) {
-		this.whiteBorderDoc = whiteBorder;
-	}
-
-	public double getBlackBorder() {
-		return blackBorder;
-	}
-
-	public void setBlackBorder( double blackBorder ) {
-		this.blackBorder = blackBorder;
-	}
-
-	public void setMarkerWidth( double markerWidth ) {
-		this.markerWidth = markerWidth;
-	}
-
-	public double getMarkerWidth() {
-		return markerWidth;
 	}
 }

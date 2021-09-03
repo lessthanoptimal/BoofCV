@@ -83,6 +83,12 @@ public abstract class BaseFiducialSquare {
 	@Option(name = "--GUI", usage = "Ignore all other command line arguments and switch to GUI mode")
 	public boolean guiMode = false;
 
+	@Option(name = "--Range", usage = "Range of markers. E.g. 5:20 will generate markers from 5 to 20, inclusive")
+	String stringRange = "";
+
+	int rangeLower = -1;
+	int rangeUpper = -2;
+
 	// if true it will send a document to the printer instead of saving it
 	public boolean sendToPrinter = false;
 	// specifies the file type
@@ -97,7 +103,6 @@ public abstract class BaseFiducialSquare {
 	}
 
 	public void run() throws IOException {
-
 		getFileTypeFromFileName();
 
 		System.out.println("   File Name    : " + fileName);
@@ -171,6 +176,8 @@ public abstract class BaseFiducialSquare {
 			throw new RuntimeException("Must specify markerWidth");
 		}
 
+		parseRange();
+
 		if (fileType.equals("pdf")) {
 			if (spaceBetween == 0)
 				spaceBetween = markerWidth/4;
@@ -189,6 +196,19 @@ public abstract class BaseFiducialSquare {
 				paperSize = new PaperSize(w.length, h.length, w.unit);
 			}
 		}
+	}
+
+	private void parseRange() {
+		if (stringRange.isEmpty())
+			return;
+
+		String[] words = stringRange.split(":");
+		if (words.length != 2) {
+			System.out.println("Invalid range");
+			return;
+		}
+		rangeLower = Integer.parseInt(words[0]);
+		rangeUpper = Integer.parseInt(words[1]);
 	}
 
 	protected void printHelp( CmdLineParser parser ) {

@@ -32,6 +32,7 @@ public class Help {
 	static Class[] options = new Class[]{
 			CreateFiducialSquareImage.class,
 			CreateFiducialSquareBinary.class,
+			CreateFiducialSquareHamming.class,
 			CreateFiducialRandomDot.class,
 			BatchRemoveLensDistortion.class,
 			BatchDownsizeImage.class,
@@ -69,7 +70,6 @@ public class Help {
 
 			try {
 				Class appClass = Class.forName("boofcv.app." + args[0]);
-
 				Method m = appClass.getMethod("main", String[].class);
 
 				m.invoke(null, new Object[]{truncated});
