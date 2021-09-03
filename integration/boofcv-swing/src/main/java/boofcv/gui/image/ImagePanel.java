@@ -84,9 +84,10 @@ public class ImagePanel extends JPanel {
 	 * Adds the ability to save an image using the middle mouse button. A dialog is shown to the user
 	 * so that they know what has happened. They can hide it in the future if they wish.
 	 */
-	public void addClickToSaveListener() {
+	public ImagePanel addClickToSaveListener() {
 		mouseListener = new SaveImageOnClick(this);
 		addMouseListener(mouseListener);
+		return this;
 	}
 
 	@Override
@@ -162,14 +163,15 @@ public class ImagePanel extends JPanel {
 	 *
 	 * @param image The new image which will be displayed.
 	 */
-	public void setImage( BufferedImage image ) {
+	public ImagePanel setImage( BufferedImage image ) {
 		this.img = image;
+		return this;
 	}
 
 	/**
 	 * Changes the buffered image and calls repaint. Does not need to be called in the UI thread.
 	 */
-	public void setImageRepaint( BufferedImage image ) {
+	public ImagePanel setImageRepaint( BufferedImage image ) {
 		// if image is larger before  than the new image then you need to make sure you repaint
 		// the entire image otherwise a ghost will be left
 		ScaleOffset workspace;
@@ -185,6 +187,7 @@ public class ImagePanel extends JPanel {
 		} else {
 			repaint();
 		}
+		return this;
 	}
 
 	/**
@@ -231,8 +234,9 @@ public class ImagePanel extends JPanel {
 		return img;
 	}
 
-	public void setScaling( ScaleOptions scaling ) {
+	public ImagePanel setScaling( ScaleOptions scaling ) {
 		this.scaling = scaling;
+		return this;
 	}
 
 	public void autoSetPreferredSize() {
@@ -243,8 +247,9 @@ public class ImagePanel extends JPanel {
 		return mouseListener;
 	}
 
-	public void setScale( double scale ) {
+	public ImagePanel setScale( double scale ) {
 		this.scale = scale;
+		return this;
 	}
 
 	private static class ScaleOffset {
