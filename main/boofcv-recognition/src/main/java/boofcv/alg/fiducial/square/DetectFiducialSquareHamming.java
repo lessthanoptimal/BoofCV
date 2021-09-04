@@ -39,8 +39,9 @@ import lombok.Getter;
  *
  * @author Peter Abeles
  */
-public class DetectFiducialSquareHamming<T extends ImageGray<T>>
-		extends BaseDetectFiducialSquare<T> {
+public class DetectFiducialSquareHamming<T extends ImageGray<T>> extends BaseDetectFiducialSquare<T> {
+	// IDEA: See if it's rectangle is too small for there to be any chance that it could resolve X number of bits
+	//       and it should just ignore the detection.
 
 	/** Describes the marker it looks for */
 	@Getter public final ConfigHammingMarker description;
@@ -93,7 +94,8 @@ public class DetectFiducialSquareHamming<T extends ImageGray<T>>
 
 		// convert input image into binary number
 		double threshold = (edgeInside + edgeOutside)/2;
-		if (!decodeDataBits(grayNoBorder, threshold))
+		int errorPureColor = decodeDataBits(grayNoBorder, threshold);
+		if (errorPureColor == 0)
 			return false;
 
 		// Search all markers and orientation to see what is the best match. Stop if it finds a perfect match.
@@ -131,8 +133,9 @@ public class DetectFiducialSquareHamming<T extends ImageGray<T>>
 			bitImage.setTo(workImage);
 		}
 
-		// See if the error is too large
-		if (bestError > description.minimumHamming) {
+		// See if the error is too large or worse than a square that's pure white or back. This is to reduce false
+		// positives
+		if (bestError > description.minimumHamming || bestError > errorPureColor) {
 			return false;
 		}
 
@@ -160,8 +163,10 @@ public class DetectFiducialSquareHamming<T extends ImageGray<T>>
 	/**
 	 * Converts the gray scale image into a binary number. Skip the outer 1 pixel of each inner square. These
 	 * tend to be incorrectly classified due to distortion.
+	 *
+	 * @return The error relative to a pure white or black square. The best score must be able to beat this.
 	 */
-	protected boolean decodeDataBits( GrayF32 gray, double threshold ) {
+	protected int decodeDataBits( GrayF32 gray, double threshold ) {
 		// compute binary image using an adaptive algorithm to handle shadows
 		ThresholdImageOps.threshold(gray, binaryInner, (float)threshold, true);
 
@@ -190,10 +195,7 @@ public class DetectFiducialSquareHamming<T extends ImageGray<T>>
 			}
 		}
 
-		// Reject all black or all white squares
-		if (countOnes == 0 || countOnes == gridWidth*gridWidth) {
-			return false;
-		}
-		return true;
+		// return best score if you assume it is pure black or white square inside
+		return Math.min(countOnes, gridWidth*gridWidth - countOnes);
 	}
 }

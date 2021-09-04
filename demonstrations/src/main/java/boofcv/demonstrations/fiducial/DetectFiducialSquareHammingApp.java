@@ -67,7 +67,7 @@ import static boofcv.gui.BoofSwingUtil.MIN_ZOOM;
  * @author Peter Abeles
  */
 public class DetectFiducialSquareHammingApp extends DemonstrationBase implements ShapeGuiListener {
-	// TODO Visualize the squares it collets when processing an image
+	// TODO Visualize the squares it collects when processing an image
 
 	Detector detector;
 	VisualizePanel guiImage;
@@ -282,7 +282,7 @@ public class DetectFiducialSquareHammingApp extends DemonstrationBase implements
 		// selects which image to view
 		JComboBox<String> imageView;
 
-		JCheckBoxValue showSquares = checkboxWrap("Squares", true);
+		JCheckBoxValue showSquares = checkboxWrap("Squares", false);
 		JCheckBoxValue showOrientation = checkboxWrap("Orientation", true);
 		JCheckBoxValue showContour = checkboxWrap("Contour", false);
 		JCheckBoxValue showLabels = checkboxWrap("Labels", false);

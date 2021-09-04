@@ -58,7 +58,7 @@ class TestDetectFiducialSquareHamming extends BoofStandardJUnit {
 		for (int i = 0; i < 4; i++) {
 			GrayF32 input = create(markerID);
 
-			for (int j = 0; j < i - 1; j++) {
+			for (int j = 1; j <= i; j++) {
 				ImageMiscOps.rotateCCW(input.clone(), input);
 			}
 
@@ -70,7 +70,7 @@ class TestDetectFiducialSquareHamming extends BoofStandardJUnit {
 //			BoofMiscOps.sleep(10_000);
 
 			assertEquals(markerID, result.which);
-			assertEquals(Math.max(0, i - 1), result.rotation);
+			assertEquals(i, result.rotation);
 		}
 	}
 
