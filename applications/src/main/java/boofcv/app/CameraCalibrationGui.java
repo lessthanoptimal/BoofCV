@@ -21,10 +21,15 @@ package boofcv.app;
 import boofcv.abst.fiducial.calib.CalibrationPatterns;
 import boofcv.abst.fiducial.calib.ConfigECoCheckMarkers;
 import boofcv.abst.fiducial.calib.ConfigGridDimen;
+import boofcv.abst.geo.calibration.MultiToSingleFiducialCalibration;
 import boofcv.alg.fiducial.calib.ecocheck.ECoCheckGenerator;
 import boofcv.alg.fiducial.calib.ecocheck.ECoCheckUtils;
+import boofcv.alg.fiducial.calib.hammingchess.HammingChessboardGenerator;
+import boofcv.alg.fiducial.calib.hamminggrids.HammingGridGenerator;
 import boofcv.app.calib.CalibrationModelPanel;
 import boofcv.app.calib.CalibrationTargetPanel;
+import boofcv.factory.fiducial.ConfigHammingChessboard;
+import boofcv.factory.fiducial.ConfigHammingGrid;
 import boofcv.factory.fiducial.FactoryFiducialCalibration;
 import boofcv.gui.BoofSwingUtil;
 import boofcv.gui.FiducialRenderEngineGraphics2D;
@@ -225,11 +230,15 @@ public class CameraCalibrationGui extends JPanel
 	private void createDetector() {
 		switch (controlsTarget.selected) {
 			case CHESSBOARD -> app.detector = FactoryFiducialCalibration.chessboardX(null, controlsTarget.configChessboard);
-			case ECOCHECK -> throw new RuntimeException("Support!");
+			case ECOCHECK -> app.detector = new MultiToSingleFiducialCalibration(
+					FactoryFiducialCalibration.ecocheck(null, controlsTarget.configECoCheck));
 			case SQUARE_GRID -> app.detector = FactoryFiducialCalibration.squareGrid(null, controlsTarget.configSquare);
 			case CIRCLE_GRID -> app.detector = FactoryFiducialCalibration.circleRegularGrid(null, controlsTarget.configCircle);
 			case CIRCLE_HEXAGONAL -> app.detector = FactoryFiducialCalibration.circleHexagonalGrid(null, controlsTarget.configCircleHex);
-			default -> throw new RuntimeException("Not supported yet. "+controlsTarget.selected);
+			default -> {
+				JOptionPane.showMessageDialog(this, "Target type not yet support: " + controlsTarget.selected);
+				throw new RuntimeException("Not supported yet. " + controlsTarget.selected);
+			}
 		}
 
 		app.modeType = controlsModel.selected;
@@ -241,6 +250,13 @@ public class CameraCalibrationGui extends JPanel
 			app.numRadial = controlsModel.universalRadial;
 			app.tangential = controlsModel.universalTangential;
 			app.zeroSkew = controlsModel.universalSkew;
+		} else if (app.modeType == CameraCalibration.ModelType.KANNALA_BRANDT) {
+			app.kbNumSymmetric = controlsModel.kannalaBrandt.numSymmetric.value.intValue();
+			app.kbNumAsymmetric = controlsModel.kannalaBrandt.numAsymmetric.value.intValue();
+			app.zeroSkew = controlsModel.kannalaBrandt.skew.value;
+		} else {
+			JOptionPane.showMessageDialog(this, "Camera model not yet support: " + app.modeType);
+			throw new RuntimeException("Not supported yet. " + app.modeType);
 		}
 
 		app.formatType = outputFormat;
@@ -249,17 +265,55 @@ public class CameraCalibrationGui extends JPanel
 
 	@Override
 	public void calibrationParametersChanged( CalibrationPatterns type, Object config ) {
+		int squareWidth = 40;
+		int circle = squareWidth/2;
+
 		if (type == CalibrationPatterns.ECOCHECK) {
 			ConfigECoCheckMarkers c = (ConfigECoCheckMarkers)config;
-			FiducialRenderEngineGraphics2D render = new FiducialRenderEngineGraphics2D();
-			render.configure(20, 20,200, 200);
 
 			ECoCheckUtils utils = new ECoCheckUtils();
+			utils.codec.setErrorCorrectionLevel(c.errorCorrectionLevel);
 			c.convertToGridList(utils.markers);
 			utils.fixate();
+			ConfigECoCheckMarkers.MarkerShape shape = c.markerShapes.get(0);
+
+			int markerWidth = squareWidth*(shape.numCols - 1);
+			int markerHeight = squareWidth*(shape.numRows - 1);
+
+			FiducialRenderEngineGraphics2D render = configureRenderGraphics2D(markerWidth, markerHeight, squareWidth/2);
 
 			ECoCheckGenerator generator = new ECoCheckGenerator(utils);
+			generator.squareWidth = squareWidth;
 			generator.setRender(render);
+			generator.render(0);
+			renderingPanel.setImageUI(render.getImage());
+			return;
+		} else if (type == CalibrationPatterns.HAMMING_CHESSBOARD) {
+			ConfigHammingChessboard c = (ConfigHammingChessboard)config;
+
+			int markerWidth = squareWidth*c.numCols;
+			int markerHeight = squareWidth*c.numRows;
+
+			FiducialRenderEngineGraphics2D render = configureRenderGraphics2D(markerWidth, markerHeight, squareWidth/2);
+
+			HammingChessboardGenerator generator = new HammingChessboardGenerator(c);
+			generator.squareWidth = squareWidth;
+			generator.setRender(render);
+			generator.render();
+			renderingPanel.setImageUI(render.getImage());
+			return;
+		} else if (type == CalibrationPatterns.HAMMING_GRID) {
+			ConfigHammingGrid c = (ConfigHammingGrid)config;
+
+			int markerWidth = (int)Math.round(squareWidth*c.getMarkerWidth()/c.squareSize);
+			int markerHeight = (int)Math.round(squareWidth*c.getMarkerHeight()/c.squareSize);
+
+			FiducialRenderEngineGraphics2D render = configureRenderGraphics2D(markerWidth, markerHeight, squareWidth/2);
+
+			var generator = new HammingGridGenerator(c);
+			generator.squareWidth = squareWidth;
+			generator.setRender(render);
+			generator.render();
 			renderingPanel.setImageUI(render.getImage());
 			return;
 		}
@@ -268,21 +322,28 @@ public class CameraCalibrationGui extends JPanel
 
 		if (type == CalibrationPatterns.CHESSBOARD) {
 			ConfigGridDimen c = (ConfigGridDimen)config;
-			renderer.chessboard(c.numRows, c.numCols, 20);
+			renderer.chessboard(c.numRows, c.numCols, squareWidth);
 		} else if (type == CalibrationPatterns.SQUARE_GRID) {
 			ConfigGridDimen c = (ConfigGridDimen)config;
-			double space = 20*c.shapeDistance/c.shapeSize;
-			renderer.squareGrid(c.numRows, c.numCols, 20, space);
+			double space = squareWidth*c.shapeDistance/c.shapeSize;
+			renderer.squareGrid(c.numRows, c.numCols, squareWidth, space);
 		} else if (type == CalibrationPatterns.CIRCLE_GRID) {
 			ConfigGridDimen c = (ConfigGridDimen)config;
-			double space = 10*c.shapeDistance/c.shapeSize;
-			renderer.circleRegular(c.numRows, c.numCols, 10, space);
+			double space = circle*c.shapeDistance/c.shapeSize;
+			renderer.circleRegular(c.numRows, c.numCols, circle, space);
 		} else if (type == CalibrationPatterns.CIRCLE_HEXAGONAL) {
 			ConfigGridDimen c = (ConfigGridDimen)config;
-			double space = 10*c.shapeDistance/c.shapeSize;
-			renderer.circleHex(c.numRows, c.numCols, 10, space);
+			double space = circle*c.shapeDistance/c.shapeSize;
+			renderer.circleHex(c.numRows, c.numCols, circle, space);
 		}
 		renderingPanel.setImageUI(renderer.getBufferred());
+	}
+
+	private FiducialRenderEngineGraphics2D configureRenderGraphics2D( int markerWidth, int markerHeight, int border ) {
+		// Render the marker. Adjust marker size so that when the border is added it will match the paper size
+		var render = new FiducialRenderEngineGraphics2D();
+		render.configure(border, border, markerWidth, markerHeight);
+		return render;
 	}
 
 	@Override

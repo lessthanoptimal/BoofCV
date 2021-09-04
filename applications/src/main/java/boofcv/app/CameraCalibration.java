@@ -18,15 +18,18 @@
 
 package boofcv.app;
 
+import boofcv.abst.fiducial.calib.ConfigECoCheckMarkers;
 import boofcv.abst.fiducial.calib.ConfigGridDimen;
 import boofcv.abst.geo.calibration.CalibrateMonoPlanar;
 import boofcv.abst.geo.calibration.DetectSingleFiducialCalibration;
+import boofcv.abst.geo.calibration.MultiToSingleFiducialCalibration;
 import boofcv.app.calib.AssistedCalibration;
 import boofcv.app.calib.AssistedCalibrationGui;
 import boofcv.app.calib.ComputeGeometryScore;
 import boofcv.factory.fiducial.FactoryFiducialCalibration;
 import boofcv.gui.BoofSwingUtil;
 import boofcv.gui.calibration.CalibratedPlanarPanel;
+import boofcv.gui.calibration.KannalaBrandtPlanarPanel;
 import boofcv.gui.calibration.MonoPlanarPanel;
 import boofcv.gui.calibration.UniversalOmniPlanarPanel;
 import boofcv.gui.image.ShowImages;
@@ -37,6 +40,7 @@ import boofcv.io.image.ConvertBufferedImage;
 import boofcv.io.image.UtilImageIO;
 import boofcv.io.webcamcapture.UtilWebcamCapture;
 import boofcv.misc.BoofMiscOps;
+import boofcv.struct.calib.CameraKannalaBrandt;
 import boofcv.struct.calib.CameraModel;
 import boofcv.struct.calib.CameraPinholeBrown;
 import boofcv.struct.calib.CameraUniversalOmni;
@@ -69,6 +73,10 @@ public class CameraCalibration extends BaseStandardInputApp {
 	protected boolean tangential = false;
 	protected ModelType modeType = ModelType.BROWN;
 	protected FormatType formatType = FormatType.BOOFCV;
+
+	// parameters for Kannala-Brandt
+	protected int kbNumSymmetric = 5;
+	protected int kbNumAsymmetric = 0;
 
 	protected boolean GUI = false;
 	protected boolean visualize = false;
@@ -119,7 +127,7 @@ public class CameraCalibration extends BaseStandardInputApp {
 		System.out.println("Calibration Parameters:");
 		System.out.println();
 		System.out.println("  --Model=<string>                   Specifies the camera model to use.");
-		System.out.println("                                     ( brown, universal )");
+		System.out.println("                                     ( brown, universal, kannala_brandt )");
 		System.out.println("                                     DEFAULT: " + modeType);
 		System.out.println("  --ZeroSkew=<true/false>            Can it assume zero skew?");
 		System.out.println("                                     DEFAULT: " + zeroSkew);
@@ -127,12 +135,20 @@ public class CameraCalibration extends BaseStandardInputApp {
 		System.out.println("                                     DEFAULT: " + numRadial);
 		System.out.println("  --Tangential=<true/false>          Should it include tangential terms?");
 		System.out.println("                                     DEFAULT: " + tangential);
+		System.out.println("  --KbSymmetric=<int>                Symmetric coeffients for Kannala-Brandt");
+		System.out.println("                                     DEFAULT: " + kbNumSymmetric);
+		System.out.println("  --KbASymmetric=<int>               Asymmetric coeffients for Kannala-Brandt");
+		System.out.println("                                     DEFAULT: " + kbNumAsymmetric);
 		System.out.println();
 		System.out.println("Fiducial Types:");
+		System.out.println("   ECOCHECK");
 		System.out.println("   CHESSBOARD");
 		System.out.println("   SQUAREGRID");
 		System.out.println("   CIRCLE_HEX");
 		System.out.println("   CIRCLE_REG");
+		System.out.println();
+		System.out.println("Flags for ECOCHECK:");
+		System.out.println("  --Format=<String>                  Format in shorthand. E.g. 9x7e3n1");
 		System.out.println();
 		System.out.println("Flags for CHESSBOARD:");
 		System.out.println("  --Grid=<rows>:<columns>            Specifies number of rows and columns.");
@@ -143,6 +159,7 @@ public class CameraCalibration extends BaseStandardInputApp {
 		System.out.println("  --SquareSpace=<square>:<space>     Specifies side of a square and space between square");
 		System.out.println("                                     Only the ratio matters.");
 		System.out.println("                                     Default: 1:1 square = 1 and space = 1");
+		System.out.println();
 		System.out.println("Flags for CIRCLE_HEX:");
 		System.out.println("  --Grid=<rows>:<columns>            Specifies number of rows and columns");
 		System.out.println("  --CenterDistance=<length>          Distance between circle centers");
@@ -199,6 +216,8 @@ public class CameraCalibration extends BaseStandardInputApp {
 							modeType = ModelType.BROWN;
 						} else if (parameters.compareToIgnoreCase("universal") == 0) {
 							modeType = ModelType.UNIVERSAL;
+						} else if (parameters.toLowerCase().startsWith("kannala")) {
+							modeType = ModelType.KANNALA_BRANDT;
 						} else {
 							throw new RuntimeException("Unknown model type " + parameters);
 						}
@@ -216,10 +235,17 @@ public class CameraCalibration extends BaseStandardInputApp {
 						numRadial = Integer.parseInt(parameters);
 					} else if (flagName.compareToIgnoreCase("Tangential") == 0) {
 						tangential = Boolean.parseBoolean(parameters);
+					} else if (flagName.compareToIgnoreCase("KbSymmetric") == 0) {
+						kbNumSymmetric = Integer.parseInt(parameters);
+					} else if (flagName.compareToIgnoreCase("KbASymmetric") == 0) {
+						kbNumAsymmetric = Integer.parseInt(parameters);
 					} else {
 						throw new RuntimeException("Unknown input option " + flagName);
 					}
 				}
+			} else if (arg.compareToIgnoreCase("ECOCHECK") == 0) {
+				parseECoCheck(i + 1, args);
+				break;
 			} else if (arg.compareToIgnoreCase("CHESSBOARD") == 0) {
 				parseChessboard(i + 1, args);
 				break;
@@ -240,6 +266,35 @@ public class CameraCalibration extends BaseStandardInputApp {
 		if (formatType == FormatType.OPENCV && modeType != ModelType.BROWN) {
 			throw new RuntimeException("Can only save calibration in OpenCV format if pinhole model");
 		}
+	}
+
+	protected void parseECoCheck( int index, String[] args ) {
+		String format = null;
+
+		for (; index < args.length; index++) {
+			String arg = args[index];
+
+			if (!arg.startsWith("--")) {
+				throw new RuntimeException("Expected flags for chessboard. Should start with '--'");
+			}
+
+			splitFlag(arg);
+			if (flagName.compareToIgnoreCase("Format") == 0) {
+				format = parameters;
+			} else {
+				throw new RuntimeException("Unknown image option " + flagName);
+			}
+		}
+
+		if (format == null) {
+			throw new RuntimeException("You must specify the ECoCheck marker using short format, e.g. 9x7e3n1");
+		}
+
+		if (verbose)
+			System.out.println("ecocheck: " + format);
+
+		ConfigECoCheckMarkers config = ConfigECoCheckMarkers.parse(format, 1.0);
+		detector = new MultiToSingleFiducialCalibration(FactoryFiducialCalibration.ecocheck(null, config));
 	}
 
 	protected void parseChessboard( int index, String[] args ) {
@@ -395,6 +450,7 @@ public class CameraCalibration extends BaseStandardInputApp {
 		switch (modeType) {
 			case BROWN -> calibrationAlg.configurePinhole(zeroSkew, numRadial, tangential);
 			case UNIVERSAL -> calibrationAlg.configureUniversalOmni(zeroSkew, numRadial, tangential);
+			case KANNALA_BRANDT -> calibrationAlg.configureKannalaBrandt(zeroSkew, kbNumSymmetric, kbNumAsymmetric);
 			default -> throw new RuntimeException("Unknown model type: " + modeType);
 		}
 
@@ -402,7 +458,7 @@ public class CameraCalibration extends BaseStandardInputApp {
 			gui = switch (modeType) {
 				case BROWN -> new MonoPlanarPanel();
 				case UNIVERSAL -> new UniversalOmniPlanarPanel();
-				default -> throw new RuntimeException("Unknown model type: " + modeType);
+				case KANNALA_BRANDT -> new KannalaBrandtPlanarPanel();
 			};
 			monitor = new ProcessThread(gui);
 			monitor.start();
@@ -564,24 +620,33 @@ public class CameraCalibration extends BaseStandardInputApp {
 				System.out.println();
 				System.out.println("--- " + modeType + " Parameters ---");
 				System.out.println();
+			}
 
-				switch (modeType) {
-					case BROWN -> {
-						CameraPinholeBrown m = (CameraPinholeBrown)intrinsic;
-						switch (formatType) {
-							case BOOFCV -> CalibrationIO.save(m, outputFilePath);
-							case OPENCV -> CalibrationIO.saveOpencv(m, outputFilePath);
-							default -> throw new IllegalArgumentException("Unknown format");
-						}
-						m.print();
+			switch (modeType) {
+				case BROWN -> {
+					CameraPinholeBrown m = (CameraPinholeBrown)intrinsic;
+					switch (formatType) {
+						case BOOFCV -> CalibrationIO.save(m, outputFilePath);
+						case OPENCV -> CalibrationIO.saveOpencv(m, outputFilePath);
+						default -> throw new IllegalArgumentException("Unknown format");
 					}
-					case UNIVERSAL -> {
-						CameraUniversalOmni m = (CameraUniversalOmni)intrinsic;
-						CalibrationIO.save(m, outputFilePath);
-						m.print();
-					}
-					default -> throw new RuntimeException("Unknown model type. " + modeType);
+					if (verbose) m.print();
 				}
+				case UNIVERSAL -> {
+					CameraUniversalOmni m = (CameraUniversalOmni)intrinsic;
+					CalibrationIO.save(m, outputFilePath);
+					if (verbose) m.print();
+				}
+
+				case KANNALA_BRANDT -> {
+					CameraKannalaBrandt m = (CameraKannalaBrandt)intrinsic;
+					CalibrationIO.save(m, outputFilePath);
+					if (verbose) m.print();
+				}
+				default -> throw new RuntimeException("Unknown model type. " + modeType);
+			}
+
+			if (verbose) {
 				System.out.println();
 				System.out.println("Save file format: " + formatType);
 				System.out.println("Destination:      " + outputFilePath);
@@ -670,7 +735,8 @@ public class CameraCalibration extends BaseStandardInputApp {
 
 	public enum ModelType {
 		BROWN,
-		UNIVERSAL
+		UNIVERSAL,
+		KANNALA_BRANDT,
 	}
 
 	public enum FormatType {

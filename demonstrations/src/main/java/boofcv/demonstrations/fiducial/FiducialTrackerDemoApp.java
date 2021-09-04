@@ -24,10 +24,7 @@ import boofcv.abst.fiducial.SquareImage_to_FiducialDetector;
 import boofcv.abst.fiducial.Uchiya_to_FiducialDetector;
 import boofcv.abst.fiducial.calib.ConfigGridDimen;
 import boofcv.alg.distort.brown.LensDistortionBrown;
-import boofcv.factory.fiducial.ConfigFiducialBinary;
-import boofcv.factory.fiducial.ConfigFiducialImage;
-import boofcv.factory.fiducial.ConfigUchiyaMarker;
-import boofcv.factory.fiducial.FactoryFiducial;
+import boofcv.factory.fiducial.*;
 import boofcv.factory.filter.binary.ConfigThreshold;
 import boofcv.factory.filter.binary.ThresholdType;
 import boofcv.gui.BoofSwingUtil;
@@ -71,6 +68,7 @@ import java.util.List;
 public class FiducialTrackerDemoApp<I extends ImageGray<I>> extends DemonstrationBase {
 	private static final String SQUARE_NUMBER = "Square Number";
 	private static final String SQUARE_PICTURE = "Square Picture";
+	private static final String SQUARE_HAMMING = "Square Hamming";
 	private static final String QR_CODE = "QR Code";
 	private static final String RANDOM_DOTS = "Random Dots";
 	private static final String CALIB_CHESS = "Chessboard";
@@ -201,12 +199,8 @@ public class FiducialTrackerDemoApp<I extends ImageGray<I>> extends Demonstratio
 		ConfigThreshold configThreshold = ConfigThreshold.local(ThresholdType.LOCAL_MEAN, 21);
 
 		switch (name) {
-			case SQUARE_NUMBER: {
-				detector = FactoryFiducial.squareBinary(new ConfigFiducialBinary(0.1), configThreshold, imageClass);
-			}
-			break;
-
-			case SQUARE_PICTURE: {
+			case SQUARE_NUMBER -> detector = FactoryFiducial.squareBinary(new ConfigFiducialBinary(0.1), configThreshold, imageClass);
+			case SQUARE_PICTURE -> {
 				double length = 0.1;
 				detector = FactoryFiducial.squareImage(new ConfigFiducialImage(), configThreshold, imageClass);
 
@@ -224,9 +218,11 @@ public class FiducialTrackerDemoApp<I extends ImageGray<I>> extends Demonstratio
 					d.addPatternImage(ConvertBufferedImage.convertFromSingle(img, null, imageClass), 125, length);
 				}
 			}
-			break;
-
-			case RANDOM_DOTS: {
+			case SQUARE_HAMMING -> {
+				ConfigHammingMarker config = ConfigHammingMarker.loadDictionary(HammingDictionary.ARUCO_MIP_25h7);
+				detector = FactoryFiducial.squareHamming(config, null, imageClass);
+			}
+			case RANDOM_DOTS -> {
 				RandomDotDefinition defs = FiducialIO.loadRandomDotYaml(new File(path, "descriptions.yaml"));
 				var config = new ConfigUchiyaMarker();
 				config.markerWidth = defs.markerWidth;
@@ -237,31 +233,12 @@ public class FiducialTrackerDemoApp<I extends ImageGray<I>> extends Demonstratio
 					tracker.addMarker(defs.markers.get(i));
 				}
 			}
-			break;
-
-			case QR_CODE: {
-				detector = FactoryFiducial.qrcode3D(null, imageClass);
-			}
-			break;
-			case CALIB_CHESS: {
-				detector = FactoryFiducial.calibChessboardX(null, new ConfigGridDimen(7, 5, 0.03), imageClass);
-			}
-			break;
-			case CALIB_SQUARE_GRID: {
-				detector = FactoryFiducial.calibSquareGrid(null, new ConfigGridDimen(4, 3, 0.03, 0.03), imageClass);
-			}
-			break;
-			case CALIB_CIRCLE_HEXAGONAL_GRID: {
-				detector = FactoryFiducial.calibCircleHexagonalGrid(null, new ConfigGridDimen(24, 28, 1, 1.2), imageClass);
-			}
-			break;
-			case CALIB_CIRCLE_REGULAR_GRID: {
-				detector = FactoryFiducial.calibCircleRegularGrid(null, new ConfigGridDimen(10, 8, 1.5, 2.5), imageClass);
-			}
-			break;
-
-			default:
-				throw new RuntimeException("Unknown selection");
+			case QR_CODE -> detector = FactoryFiducial.qrcode3D(null, imageClass);
+			case CALIB_CHESS -> detector = FactoryFiducial.calibChessboardX(null, new ConfigGridDimen(7, 5, 0.03), imageClass);
+			case CALIB_SQUARE_GRID -> detector = FactoryFiducial.calibSquareGrid(null, new ConfigGridDimen(4, 3, 0.03, 0.03), imageClass);
+			case CALIB_CIRCLE_HEXAGONAL_GRID -> detector = FactoryFiducial.calibCircleHexagonalGrid(null, new ConfigGridDimen(24, 28, 1, 1.2), imageClass);
+			case CALIB_CIRCLE_REGULAR_GRID -> detector = FactoryFiducial.calibCircleRegularGrid(null, new ConfigGridDimen(10, 8, 1.5, 2.5), imageClass);
+			default -> throw new RuntimeException("Unknown selection");
 		}
 		controls.setShowStability(true);
 
@@ -415,22 +392,22 @@ public class FiducialTrackerDemoApp<I extends ImageGray<I>> extends Demonstratio
 	}
 
 	public static void main( String[] args ) {
-//		Class type = GrayF32.class;
-		Class type = GrayU8.class;
+//		Class<GrayF32> type = GrayF32.class;
+		Class<GrayU8> type = GrayU8.class;
 
 		java.util.List<PathLabel> inputs = new ArrayList<>();
 		inputs.add(new PathLabel(SQUARE_NUMBER, UtilIO.pathExample("fiducial/binary/movie.mjpeg")));
 		inputs.add(new PathLabel(SQUARE_PICTURE, UtilIO.pathExample("fiducial/image/video/movie.mjpeg")));
+		inputs.add(new PathLabel(SQUARE_HAMMING, UtilIO.pathExample("fiducial/square_hamming/aruco_25h7/movie.mp4")));
 		inputs.add(new PathLabel(RANDOM_DOTS, UtilIO.pathExample("fiducial/random_dots/movie.mp4")));
 		inputs.add(new PathLabel(QR_CODE, UtilIO.pathExample("fiducial/qrcode/movie.mp4")));
 		inputs.add(new PathLabel(CALIB_CHESS, UtilIO.pathExample("fiducial/chessboard/movie.mjpeg")));
 		inputs.add(new PathLabel(CALIB_SQUARE_GRID, UtilIO.pathExample("fiducial/square_grid/movie.mp4")));
-//		inputs.add(new PathLabel(CALIB_SQUARE_BINARY_GRID, UtilIO.pathExample("fiducial/binary_grid/movie.mp4")));
 		inputs.add(new PathLabel(CALIB_CIRCLE_HEXAGONAL_GRID, UtilIO.pathExample("fiducial/circle_hexagonal/movie.mp4")));
 		inputs.add(new PathLabel(CALIB_CIRCLE_REGULAR_GRID, UtilIO.pathExample("fiducial/circle_regular/movie.mp4")));
 
 		SwingUtilities.invokeLater(() -> {
-			FiducialTrackerDemoApp app = new FiducialTrackerDemoApp(inputs, type);
+			var app = new FiducialTrackerDemoApp<>(inputs, type);
 			app.openExample(inputs.get(0));
 			app.display("Fiducial Demonstrations");
 		});

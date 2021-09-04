@@ -20,6 +20,8 @@ package boofcv.app.calib;
 
 import boofcv.app.CameraCalibration.ModelType;
 import boofcv.gui.StandardAlgConfigPanel;
+import boofcv.gui.controls.JCheckBoxValue;
+import boofcv.gui.controls.JSpinnerNumber;
 
 import javax.swing.*;
 import javax.swing.event.ChangeEvent;
@@ -47,6 +49,10 @@ public class CalibrationModelPanel extends StandardAlgConfigPanel implements Act
 	public int universalRadial = 2;
 	public boolean universalTangential = true;
 	public boolean universalSkew = true;
+
+	public final PinholePanel pinhole = new PinholePanel();
+	public final UniversalPanel universal = new UniversalPanel();
+	public final KannalaBrandtPanel kannalaBrandt = new KannalaBrandtPanel();
 
 	public CalibrationModelPanel() {
 		setBorder(BorderFactory.createEmptyBorder());
@@ -81,8 +87,9 @@ public class CalibrationModelPanel extends StandardAlgConfigPanel implements Act
 
 	private void changeTargetPanel() {
 		JPanel p = switch (selected) {
-			case BROWN -> new PinholePanel();
-			case UNIVERSAL -> new UniversalPanel();
+			case BROWN -> pinhole;
+			case UNIVERSAL -> universal;
+			case KANNALA_BRANDT -> kannalaBrandt;
 			default -> throw new RuntimeException("Unknown");
 		};
 
@@ -163,6 +170,31 @@ public class CalibrationModelPanel extends StandardAlgConfigPanel implements Act
 				universalTangential = tangential.isSelected();
 			} else if (e.getSource() == skew) {
 				universalSkew = skew.isSelected();
+			}
+			updateParameters();
+		}
+	}
+
+	public class KannalaBrandtPanel extends StandardAlgConfigPanel {
+		public final JSpinnerNumber numSymmetric = spinnerWrap(5, 0, 10, 1);
+		public final JSpinnerNumber numAsymmetric = spinnerWrap(0, 0, 10, 1);
+		public final JCheckBoxValue skew = checkboxWrap("Zero Skew", universalSkew);
+
+		public KannalaBrandtPanel() {
+			setBorder(BorderFactory.createEmptyBorder());
+
+			addLabeled(numSymmetric.spinner, "Symmetric");
+			addLabeled(numAsymmetric.spinner, "Asymmetric");
+			addAlignLeft(skew.check);
+		}
+
+		@Override public void controlChanged( final Object source ) {
+			if (source == numSymmetric.spinner) {
+				numSymmetric.updateValue();
+			} else if (source == numAsymmetric.spinner) {
+				numAsymmetric.updateValue();
+			} else if (source == skew.check) {
+				skew.updateValue();
 			}
 			updateParameters();
 		}

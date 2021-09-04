@@ -17,7 +17,8 @@ Version : 0.39
   * Hunted down causes of small errors in rendering. New approach is used the samples multiple points.
 - Calibration
   * Two high level calibration detection APIs. One for single target and one for multiple targets
-  * Added new Chessboard Bits target type for multi camera calibration
+  * Added support for full Kannala-Brandt fisheye camera model
+  * Added new ECoCheck marker for multi camera calibration
     TODO finalize binary bit pattern
     TODO integrate into demo
     TODO regression images and tests
