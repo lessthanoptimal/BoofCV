@@ -27,7 +27,6 @@ import boofcv.struct.image.ImageGray;
 
 import java.util.Arrays;
 
-
 /**
  * <p>
  * Square fiducial that encodes numerical values in a binary N by N grids, where N &ge; 3. The outer border
@@ -66,7 +65,7 @@ public class DetectFiducialSquareBinary<T extends ImageGray<T>>
 	int[] counts, classified, tmp;
 
 	// converts the input image into a binary one
-	private GrayU8 binaryInner = new GrayU8(1,1);
+	private GrayU8 binaryInner = new GrayU8(1, 1);
 	// storage for no border sub-image
 	private GrayF32 grayNoBorder = new GrayF32();
 
@@ -74,9 +73,9 @@ public class DetectFiducialSquareBinary<T extends ImageGray<T>>
 	private int gridWidth;
 
 	// width of a square in the inner undistorted image.
-	protected final static int w=10;
+	protected final static int w = 10;
 	// total number of pixels in a square. Outer pixels are ignored, hence -2 for each axis
-	protected final static int N=(w-4)*(w-4);
+	protected final static int N = (w - 4)*(w - 4);
 
 	// length of a side for the fiducial's black border in world units.
 	private double lengthSide = 1;
@@ -94,46 +93,45 @@ public class DetectFiducialSquareBinary<T extends ImageGray<T>>
 	 * @param quadDetector Detects quadrilaterals in the input image
 	 * @param inputType Type of image it's processing
 	 */
-	public DetectFiducialSquareBinary(int gridWidth,
-									  double borderWidthFraction ,
-									  double minimumBlackBorderFraction ,
-									  final InputToBinary<T> inputToBinary,
-									  final DetectPolygonBinaryGrayRefine<T> quadDetector, Class<T> inputType) {
+	public DetectFiducialSquareBinary( int gridWidth,
+									   double borderWidthFraction,
+									   double minimumBlackBorderFraction,
+									   final InputToBinary<T> inputToBinary,
+									   final DetectPolygonBinaryGrayRefine<T> quadDetector, Class<T> inputType ) {
 		// Black borders occupies 2.0*borderWidthFraction of the total width
 		// The number of pixels for each square is held constant and the total pixels for the inner region
 		// is determined by the size of the grid
 		// The number of pixels in the undistorted image (squarePixels) is selected using the above information
-		super(inputToBinary,quadDetector, false,
-				borderWidthFraction, minimumBlackBorderFraction, (int)Math.round((w * gridWidth) /(1.0-borderWidthFraction*2.0)),
+		super(inputToBinary, quadDetector, false,
+				borderWidthFraction, minimumBlackBorderFraction, (int)Math.round((w*gridWidth)/(1.0 - borderWidthFraction*2.0)),
 				inputType);
 
-		if( gridWidth < 3 || gridWidth > 8)
+		if (gridWidth < 3 || gridWidth > 8)
 			throw new IllegalArgumentException("The grid must be at least 3 and at most 8 elements wide");
 
 		this.gridWidth = gridWidth;
-		binaryInner.reshape(w * gridWidth,w * gridWidth);
+		binaryInner.reshape(w*gridWidth, w*gridWidth);
 		counts = new int[getTotalGridElements()];
 		classified = new int[getTotalGridElements()];
 		tmp = new int[getTotalGridElements()];
 	}
 
-	@Override
-	protected boolean processSquare(GrayF32 gray, Result result, double edgeInside, double edgeOutside) {
-		int off = (gray.width - binaryInner.width) / 2;
+	@Override protected boolean processSquare( GrayF32 gray, Result result, double edgeInside, double edgeOutside ) {
+		int off = (gray.width - binaryInner.width)/2;
 		gray.subimage(off, off, off + binaryInner.width, off + binaryInner.width, grayNoBorder);
 
 		// convert input image into binary number
-		double threshold = (edgeInside+edgeOutside)/2;
-		findBitCounts(grayNoBorder,threshold);
+		double threshold = (edgeInside + edgeOutside)/2;
+		findBitCounts(grayNoBorder, threshold);
 
 		if (thresholdBinaryNumber()) {
-			if( verbose ) System.out.println("  can't threshold binary, ambiguous");
+			if (verbose != null) System.out.println("  can't threshold binary, ambiguous");
 			return false;
 		}
-		
+
 		// adjust the orientation until the black corner is in the lower left
 		if (rotateUntilInLowerCorner(result)) {
-			if( verbose ) System.out.println("  rotate to corner failed");
+			if (verbose != null) System.out.println("  rotate to corner failed");
 			return false;
 		}
 
@@ -146,6 +144,7 @@ public class DetectFiducialSquareBinary<T extends ImageGray<T>>
 
 	/**
 	 * Extract the numerical value it encodes
+	 *
 	 * @return the int value of the numeral.
 	 */
 	protected int extractNumeral() {
@@ -154,7 +153,7 @@ public class DetectFiducialSquareBinary<T extends ImageGray<T>>
 		int shift = 0;
 
 		// -2 because the top and bottom rows have 2 unusable bits (the first and last)
-		for(int i = 1; i < gridWidth - 1; i++) {
+		for (int i = 1; i < gridWidth - 1; i++) {
 			final int idx = topLeft + i;
 			val |= classified[idx] << shift;
 			//System.out.println("val |= classified[" + idx + "] << " + shift + ";");
@@ -162,9 +161,9 @@ public class DetectFiducialSquareBinary<T extends ImageGray<T>>
 		}
 
 		// Don't do the first or last row, handled above and below - special cases
-		for(int ii = 1; ii < gridWidth - 1; ii++) {
-			for(int i = 0; i < gridWidth; i++) {
-				final int idx = getTotalGridElements() - (gridWidth * (ii + 1)) + i;
+		for (int ii = 1; ii < gridWidth - 1; ii++) {
+			for (int i = 0; i < gridWidth; i++) {
+				final int idx = getTotalGridElements() - (gridWidth*(ii + 1)) + i;
 				val |= classified[idx] << shift;
 				//  System.out.println("val |= classified[" + idx + "] << " + shift + ";");
 				shift++;
@@ -172,7 +171,7 @@ public class DetectFiducialSquareBinary<T extends ImageGray<T>>
 		}
 
 		// The last row
-		for(int i = 1; i < gridWidth - 1; i++) {
+		for (int i = 1; i < gridWidth - 1; i++) {
 			val |= classified[i] << shift;
 			//System.out.println("val |= classified[" + i + "] << " + shift + ";");
 			shift++;
@@ -185,7 +184,7 @@ public class DetectFiducialSquareBinary<T extends ImageGray<T>>
 	 * Rotate the pattern until the black corner is in the lower right. Sanity check to make
 	 * sure there is only one black corner
 	 */
-	private boolean rotateUntilInLowerCorner(Result result) {
+	private boolean rotateUntilInLowerCorner( Result result ) {
 		// sanity check corners. There should only be one exactly one black
 		final int topLeft = getTotalGridElements() - gridWidth;
 		final int topRight = getTotalGridElements() - 1;
@@ -212,8 +211,8 @@ public class DetectFiducialSquareBinary<T extends ImageGray<T>>
 		// Swap the four corners
 		for (int ii = 0; ii < gridWidth; ii++) {
 			for (int i = 0; i < gridWidth; i++) {
-				final int fromIdx = ii * gridWidth + i;
-				final int toIdx = (totalElements - (gridWidth * (i + 1))) + ii;
+				final int fromIdx = ii*gridWidth + i;
+				final int toIdx = (totalElements - (gridWidth*(i + 1))) + ii;
 				tmp[fromIdx] = classified[toIdx];
 			}
 		}
@@ -221,15 +220,14 @@ public class DetectFiducialSquareBinary<T extends ImageGray<T>>
 		System.arraycopy(tmp, 0, classified, 0, totalElements);
 	}
 
-
 	/**
 	 * Sees how many pixels were positive and negative in each square region. Then decides if they
 	 * should be 0 or 1 or unknown
 	 */
 	protected boolean thresholdBinaryNumber() {
 
-		int lower = (int) (N * (ambiguityThreshold / 2.0));
-		int upper = (int) (N * (1 - ambiguityThreshold / 2.0));
+		int lower = (int)(N*(ambiguityThreshold/2.0));
+		int upper = (int)(N*(1 - ambiguityThreshold/2.0));
 
 		final int totalElements = getTotalGridElements();
 		for (int i = 0; i < totalElements; i++) {
@@ -249,32 +247,32 @@ public class DetectFiducialSquareBinary<T extends ImageGray<T>>
 	 * Converts the gray scale image into a binary number. Skip the outer 1 pixel of each inner square. These
 	 * tend to be incorrectly classified due to distortion.
 	 */
-	protected void findBitCounts(GrayF32 gray , double threshold ) {
+	protected void findBitCounts( GrayF32 gray, double threshold ) {
 		// compute binary image using an adaptive algorithm to handle shadows
-		ThresholdImageOps.threshold(gray,binaryInner,(float)threshold,true);
+		ThresholdImageOps.threshold(gray, binaryInner, (float)threshold, true);
 
 		Arrays.fill(counts, 0);
 		for (int row = 0; row < gridWidth; row++) {
-			int y0 = row * binaryInner.width / gridWidth + 2;
-			int y1 = (row + 1) * binaryInner.width / gridWidth - 2;
+			int y0 = row*binaryInner.width/gridWidth + 2;
+			int y1 = (row + 1)*binaryInner.width/gridWidth - 2;
 			for (int col = 0; col < gridWidth; col++) {
-				int x0 = col * binaryInner.width / gridWidth + 2;
-				int x1 = (col + 1) * binaryInner.width / gridWidth - 2;
+				int x0 = col*binaryInner.width/gridWidth + 2;
+				int x1 = (col + 1)*binaryInner.width/gridWidth - 2;
 
 				int total = 0;
 				for (int i = y0; i < y1; i++) {
-					int index = i * binaryInner.width + x0;
+					int index = i*binaryInner.width + x0;
 					for (int j = x0; j < x1; j++) {
 						total += binaryInner.data[index++];
 					}
 				}
 
-				counts[row * gridWidth + col] = total;
+				counts[row*gridWidth + col] = total;
 			}
 		}
 	}
 
-	public void setLengthSide(final double lengthSide) {
+	public void setLengthSide( final double lengthSide ) {
 		this.lengthSide = lengthSide;
 	}
 
@@ -287,10 +285,11 @@ public class DetectFiducialSquareBinary<T extends ImageGray<T>>
 
 	/**
 	 * parameters which specifies how tolerant it is of a square being ambiguous black or white.
+	 *
 	 * @param ambiguityThreshold 0 to 1, inclusive
 	 */
-	public void setAmbiguityThreshold(double ambiguityThreshold) {
-		if( ambiguityThreshold < 0 || ambiguityThreshold > 1 )
+	public void setAmbiguityThreshold( double ambiguityThreshold ) {
+		if (ambiguityThreshold < 0 || ambiguityThreshold > 1)
 			throw new IllegalArgumentException("Must be from 0 to 1, inclusive");
 		this.ambiguityThreshold = ambiguityThreshold;
 	}
@@ -299,16 +298,16 @@ public class DetectFiducialSquareBinary<T extends ImageGray<T>>
 	 * Total number of elements in the grid
 	 */
 	private int getTotalGridElements() {
-		return gridWidth * gridWidth;
+		return gridWidth*gridWidth;
 	}
 
 	public long getNumberOfDistinctFiducials() {
 		// The -4 is for the 4 orientation squares
-		return (long) Math.pow(2, gridWidth * gridWidth - 4);
+		return (long)Math.pow(2, gridWidth*gridWidth - 4);
 	}
 
 	// For troubleshooting.
-	public GrayF32 getGrayNoBorder() { return grayNoBorder; }
+	public GrayF32 getGrayNoBorder() {return grayNoBorder;}
 
 	public GrayU8 getBinaryInner() {
 		return binaryInner;
@@ -321,12 +320,11 @@ public class DetectFiducialSquareBinary<T extends ImageGray<T>>
 		for (int row = 0; row < gridWidth; row++) {
 			System.out.print(" ");
 			for (int col = 0; col < gridWidth; col++) {
-				System.out.print(classified[row * gridWidth + col] == 1 ? " " : "X");
+				System.out.print(classified[row*gridWidth + col] == 1 ? " " : "X");
 			}
 			System.out.print(" ");
 			System.out.println();
 		}
 		System.out.println("      ");
-
 	}
 }

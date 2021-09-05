@@ -35,6 +35,7 @@ import boofcv.factory.distort.FactoryDistort;
 import boofcv.factory.geo.EpipolarError;
 import boofcv.factory.geo.FactoryMultiView;
 import boofcv.factory.interpolate.FactoryInterpolation;
+import boofcv.misc.BoofMiscOps;
 import boofcv.struct.border.BorderType;
 import boofcv.struct.distort.*;
 import boofcv.struct.geo.AssociatedPair;
@@ -47,13 +48,19 @@ import georegression.struct.homography.Homography2D_F64;
 import georegression.struct.point.Point2D_F32;
 import georegression.struct.point.Point2D_F64;
 import georegression.struct.shapes.Polygon2D_F64;
+import lombok.Getter;
+import lombok.Setter;
 import org.ddogleg.struct.DogArray;
+import org.ddogleg.struct.VerbosePrint;
 import org.ejml.UtilEjml;
 import org.ejml.data.DMatrixRMaj;
 import org.ejml.ops.DConvertMatrixStruct;
+import org.jetbrains.annotations.Nullable;
 
+import java.io.PrintStream;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 
 /**
  * <p>
@@ -75,15 +82,16 @@ import java.util.List;
  * @author Peter Abeles
  */
 // TODO create unit test for bright object
-public abstract class BaseDetectFiducialSquare<T extends ImageGray<T>> {
+public abstract class BaseDetectFiducialSquare<T extends ImageGray<T>> implements VerbosePrint {
 
 	// Storage for the found fiducials
-	private DogArray<FoundFiducial> found = new DogArray<>(FoundFiducial::new);
+	private final DogArray<FoundFiducial> found = new DogArray<>(FoundFiducial::new);
 
-	// converts input image into a binary image
-	InputToBinary<T> inputToBinary;
-	// Detects the squares
-	DetectPolygonBinaryGrayRefine<T> squareDetector;
+	/** converts input image into a binary image */
+	@Getter InputToBinary<T> inputToBinary;
+
+	/** Detects the squares */
+	@Getter DetectPolygonBinaryGrayRefine<T> squareDetector;
 
 	// Helps adjust the binary image for input into the contour finding algorithm
 	BinaryContourHelper contourHelper;
@@ -92,57 +100,57 @@ public abstract class BaseDetectFiducialSquare<T extends ImageGray<T>> {
 	GrayF32 square;
 
 	// Used to compute/remove perspective distortion
-	private Estimate1ofEpipolar computeHomography = FactoryMultiView.homographyDLT(true);
-	private RefineEpipolar refineHomography = FactoryMultiView.homographyRefine(1e-4,100, EpipolarError.SAMPSON);
-	private DMatrixRMaj H = new DMatrixRMaj(3,3);
-	private DMatrixRMaj H_refined = new DMatrixRMaj(3,3);
-	private Homography2D_F64 H_fixed = new Homography2D_F64();
-	private List<AssociatedPair> pairsRemovePerspective = new ArrayList<>();
-	private ImageDistort<T,GrayF32> removePerspective;
-	private PointTransformHomography_F32 transformHomography = new PointTransformHomography_F32();
+	private final Estimate1ofEpipolar computeHomography = FactoryMultiView.homographyDLT(true);
+	private final RefineEpipolar refineHomography = FactoryMultiView.homographyRefine(1e-4, 100, EpipolarError.SAMPSON);
+	private final DMatrixRMaj H = new DMatrixRMaj(3, 3);
+	private final DMatrixRMaj H_refined = new DMatrixRMaj(3, 3);
+	private final Homography2D_F64 H_fixed = new Homography2D_F64();
+	private final List<AssociatedPair> pairsRemovePerspective = new ArrayList<>();
+	private final ImageDistort<T, GrayF32> removePerspective;
+	private final PointTransformHomography_F32 transformHomography = new PointTransformHomography_F32();
 
 	private Point2Transform2_F64 undistToDist = new DoNothing2Transform2_F64();
 
-	// How wide the border is relative to the fiducial's total width
-	protected double borderWidthFraction;
+	/** How wide the border is relative to the fiducial's total width */
+	protected @Getter double borderWidthFraction;
 	// the minimum fraction of border pixels which must be black for it to be considered a fiducial
-	private double minimumBorderBlackFraction;
+	private final double minimumBorderBlackFraction;
 
 	// Storage for results of fiducial reading
-	private Result result = new Result();
+	private final Result result = new Result();
 
-	// type of input image
-	private Class<T> inputType;
+	/** type of input image */
+	private @Getter final Class<T> inputType;
 
-	// Smallest allowed aspect ratio between the smallest and largest side in a polygon
-	private double thresholdSideRatio = 0.05;
+	/** Smallest allowed aspect ratio between the smallest and largest side in a polygon */
+	private @Getter @Setter double thresholdSideRatio = 0.05;
 
-	// verbose debugging output
-	protected boolean verbose = false;
+	@Nullable PrintStream verbose;
 
 	/**
 	 * Configures the detector.
+	 *
 	 * @param inputToBinary Converts input image into a binary image
 	 * @param squareDetector Detects the quadrilaterals in the image
 	 * @param binaryCopy If true a copy is created of the binary image and it's not modified.
 	 * @param borderWidthFraction Fraction of the fiducial's width that the border occupies. 0.25 is recommended.
 	 * @param minimumBorderBlackFraction Minimum fraction of pixels inside the border which must be black. Try 0.65
-	 * @param squarePixels  Number of pixels wide the undistorted square image of the fiducial's interior is.
-	 *                      This will include the black border.
+	 * @param squarePixels Number of pixels wide the undistorted square image of the fiducial's interior is.
+	 * This will include the black border.
 	 * @param inputType Type of input image it's processing
 	 */
-	protected BaseDetectFiducialSquare(InputToBinary<T> inputToBinary,
-									   DetectPolygonBinaryGrayRefine<T> squareDetector,
-									   boolean binaryCopy,
-									   double borderWidthFraction, double minimumBorderBlackFraction,
-									   int squarePixels,
-									   Class<T> inputType) {
+	protected BaseDetectFiducialSquare( InputToBinary<T> inputToBinary,
+										DetectPolygonBinaryGrayRefine<T> squareDetector,
+										boolean binaryCopy,
+										double borderWidthFraction, double minimumBorderBlackFraction,
+										int squarePixels,
+										Class<T> inputType ) {
 
 		squareDetector.getDetector().setOutputClockwiseUpY(false);
 		squareDetector.getDetector().setConvex(true);
-		squareDetector.getDetector().setNumberOfSides(4,4);
+		squareDetector.getDetector().setNumberOfSides(4, 4);
 
-		if( borderWidthFraction <= 0 || borderWidthFraction >= 0.5 )
+		if (borderWidthFraction <= 0 || borderWidthFraction >= 0.5)
 			throw new RuntimeException("Border width fraction must be 0 < x < 0.5");
 
 		this.borderWidthFraction = borderWidthFraction;
@@ -151,7 +159,7 @@ public abstract class BaseDetectFiducialSquare<T extends ImageGray<T>> {
 		this.inputToBinary = inputToBinary;
 		this.squareDetector = squareDetector;
 		this.inputType = inputType;
-		this.square = new GrayF32(squarePixels,squarePixels);
+		this.square = new GrayF32(squarePixels, squarePixels);
 
 		for (int i = 0; i < 4; i++) {
 			pairsRemovePerspective.add(new AssociatedPair());
@@ -167,7 +175,7 @@ public abstract class BaseDetectFiducialSquare<T extends ImageGray<T>> {
 		removePerspective.setModel(new PointToPixelTransform_F32(transformHomography));
 
 		BinaryContourFinder contourFinder = squareDetector.getDetector().getContourFinder();
-		contourHelper = new BinaryContourHelper(contourFinder,binaryCopy);
+		contourHelper = new BinaryContourHelper(contourFinder, binaryCopy);
 	}
 
 	/**
@@ -177,12 +185,12 @@ public abstract class BaseDetectFiducialSquare<T extends ImageGray<T>> {
 	 * @param width Image width
 	 * @param height Image height
 	 * @param cache If there's lens distortion should it cache the transforms?  Speeds it up by about 12%. Ignored
-	 *              if no lens distortion
+	 * if no lens distortion
 	 */
-	public void configure(LensDistortionNarrowFOV distortion, int width , int height , boolean cache ) {
-		if( distortion == null ) {
+	public void configure( LensDistortionNarrowFOV distortion, int width, int height, boolean cache ) {
+		if (distortion == null) {
 			removePerspective.setModel(new PointToPixelTransform_F32(transformHomography));
-			squareDetector.setLensDistortion(width,height,null,null);
+			squareDetector.setLensDistortion(width, height, null, null);
 			undistToDist = new DoNothing2Transform2_F64();
 		} else {
 			Point2Transform2_F32 pointSquareToInput;
@@ -194,9 +202,9 @@ public abstract class BaseDetectFiducialSquare<T extends ImageGray<T>> {
 			// Sanity check to see if the camera model has no lens distortion. If there is no lens distortion then
 			// there's no need to do distort/undistort the image and everything will run faster
 			Point2D_F32 test = new Point2D_F32();
-			pointDistToUndist.compute(0,0,test);
-			if( test.norm() <= UtilEjml.TEST_F32) {
-				configure(null,width,height,false);
+			pointDistToUndist.compute(0, 0, test);
+			if (test.norm() <= UtilEjml.TEST_F32) {
+				configure(null, width, height, false);
 			} else {
 				if (cache) {
 					distToUndist = new PixelTransformCached_F32(width, height, distToUndist);
@@ -216,30 +224,30 @@ public abstract class BaseDetectFiducialSquare<T extends ImageGray<T>> {
 		}
 	}
 
-	private Polygon2D_F64 interpolationHack = new Polygon2D_F64(4);
+	private final Polygon2D_F64 interpolationHack = new Polygon2D_F64(4);
 
 	List<Polygon2D_F64> candidates = new ArrayList<>();
 	List<DetectPolygonFromContour.Info> candidatesInfo = new ArrayList<>();
 
 	/**
-	 * Examines the input image to detect fiducials inside of it
+	 * Examines the input image to detect fiducials inside it
 	 *
 	 * @param gray Undistorted input image
 	 */
 	public void process( T gray ) {
 		configureContourDetector(gray);
 
-		contourHelper.reshape(gray.width,gray.height);
+		contourHelper.reshape(gray.width, gray.height);
 
-		inputToBinary.process(gray,contourHelper.withoutPadding());
-		squareDetector.process(gray,contourHelper.padded());
+		inputToBinary.process(gray, contourHelper.withoutPadding());
+		squareDetector.process(gray, contourHelper.padded());
 		squareDetector.refineAll();
 		// These are in undistorted pixels
-		squareDetector.getPolygons(candidates,candidatesInfo);
+		squareDetector.getPolygons(candidates, candidatesInfo);
 
 		found.reset();
 
-		if( verbose ) System.out.println("---------- Got Polygons! "+candidates.size());
+		if (verbose != null) verbose.println("---------- Got Polygons! " + candidates.size());
 
 		for (int i = 0; i < candidates.size(); i++) {
 			// compute the homography from the input image to an undistorted square image
@@ -248,8 +256,8 @@ public abstract class BaseDetectFiducialSquare<T extends ImageGray<T>> {
 //			System.out.println(i+"  processing... "+p.areaSimple()+" at "+p.get(0));
 
 			// sanity check before processing
-			if( !checkSideSize(p) ) {
-				if( verbose ) System.out.println("  rejected side aspect ratio or size");
+			if (!checkSideSize(p)) {
+				if (verbose != null) verbose.println("_ rejected side aspect ratio or size");
 				continue;
 			}
 
@@ -258,10 +266,10 @@ public abstract class BaseDetectFiducialSquare<T extends ImageGray<T>> {
 			// interpolating from the lower extent it samples inside the image more
 			// A good unit test to see if this hack is no longer needed is to rotate the order of the polygon and
 			// see if it returns the same undistorted image each time
-			double best=Double.MAX_VALUE;
+			double best = Double.MAX_VALUE;
 			for (int j = 0; j < 4; j++) {
 				double found = p.get(0).normSq();
-				if( found < best ) {
+				if (found < best) {
 					best = found;
 					interpolationHack.setTo(p);
 				}
@@ -273,23 +281,23 @@ public abstract class BaseDetectFiducialSquare<T extends ImageGray<T>> {
 			// remember, visual clockwise isn't the same as math clockwise, hence
 			// counter clockwise visual to the clockwise quad
 			pairsRemovePerspective.get(0).setTo(0, 0, p.get(0).x, p.get(0).y);
-			pairsRemovePerspective.get(1).setTo( square.width ,      0        , p.get(1).x , p.get(1).y );
-			pairsRemovePerspective.get(2).setTo( square.width , square.height , p.get(2).x , p.get(2).y );
-			pairsRemovePerspective.get(3).setTo( 0            , square.height , p.get(3).x , p.get(3).y );
+			pairsRemovePerspective.get(1).setTo(square.width, 0, p.get(1).x, p.get(1).y);
+			pairsRemovePerspective.get(2).setTo(square.width, square.height, p.get(2).x, p.get(2).y);
+			pairsRemovePerspective.get(3).setTo(0, square.height, p.get(3).x, p.get(3).y);
 
-			if( !computeHomography.process(pairsRemovePerspective,H) ) {
-				if( verbose ) System.out.println("  rejected initial homography");
+			if (!computeHomography.process(pairsRemovePerspective, H)) {
+				if (verbose != null) verbose.println("_ rejected initial homography");
 				continue;
 			}
 
 			// refine homography estimate
-			if( !refineHomography.fitModel(pairsRemovePerspective,H,H_refined) ) {
-				if( verbose ) System.out.println("  rejected refine homography");
+			if (!refineHomography.fitModel(pairsRemovePerspective, H, H_refined)) {
+				if (verbose != null) verbose.println("_ rejected refine homography");
 				continue;
 			}
 
 			// pass the found homography onto the image transform
-			DConvertMatrixStruct.convert(H_refined,H_fixed);
+			DConvertMatrixStruct.convert(H_refined, H_fixed);
 			ConvertFloatType.convert(H_fixed, transformHomography.getModel());
 
 			// TODO Improve how perspective is removed
@@ -303,20 +311,20 @@ public abstract class BaseDetectFiducialSquare<T extends ImageGray<T>> {
 			DetectPolygonFromContour.Info info = candidatesInfo.get(i);
 
 			// see if the black border is actually black
-			if( minimumBorderBlackFraction > 0 ) {
-				double pixelThreshold = (info.edgeInside + info.edgeOutside) / 2;
-				double foundFraction = computeFractionBoundary((float) pixelThreshold);
-				if( foundFraction < minimumBorderBlackFraction ) {
-					if( verbose ) System.out.println("  rejected black border fraction "+foundFraction);
+			if (minimumBorderBlackFraction > 0) {
+				double pixelThreshold = (info.edgeInside + info.edgeOutside)/2;
+				double foundFraction = computeFractionBoundary((float)pixelThreshold);
+				if (foundFraction < minimumBorderBlackFraction) {
+					if (verbose != null) verbose.println("_ rejected black border fraction " + foundFraction);
 					continue;
 				}
 			}
-			if( processSquare(square,result,info.edgeInside,info.edgeOutside)) {
-				prepareForOutput(p,result);
+			if (processSquare(square, result, info.edgeInside, info.edgeOutside)) {
+				prepareForOutput(p, result);
 
-				if( verbose ) System.out.println("  accepted!");
+				if (verbose != null) verbose.println("_ accepted!");
 			} else {
-				if( verbose ) System.out.println("  rejected process square");
+				if (verbose != null) verbose.println("_ rejected process square");
 			}
 		}
 	}
@@ -326,29 +334,29 @@ public abstract class BaseDetectFiducialSquare<T extends ImageGray<T>> {
 	 * be decoded
 	 */
 	private boolean checkSideSize( Polygon2D_F64 p ) {
-		double max=0,min=Double.MAX_VALUE;
+		double max = 0, min = Double.MAX_VALUE;
 
 		for (int i = 0; i < p.size(); i++) {
 			double l = p.getSideLength(i);
-			max = Math.max(max,l);
-			min = Math.min(min,l);
+			max = Math.max(max, l);
+			min = Math.min(min, l);
 		}
 
 		// See if a side is too small to decode
-		if( min < 10 )
+		if (min < 10)
 			return false;
 
 		// see if it's under extreme perspective distortion and unlikely to be readable
-		return !(min / max < thresholdSideRatio);
+		return !(min/max < thresholdSideRatio);
 	}
 
 	/**
 	 * Configures the contour detector based on the image size. Setting a maximum contour and turning off recording
 	 * of inner contours and improve speed and reduce the memory foot print significantly.
 	 */
-	private void configureContourDetector(T gray) {
+	private void configureContourDetector( T gray ) {
 		// determine the maximum possible size of a square based on image size
-		int maxContourSize = Math.min(gray.width,gray.height)*4;
+		int maxContourSize = Math.min(gray.width, gray.height)*4;
 		BinaryContourFinder contourFinder = squareDetector.getDetector().getContourFinder();
 		contourFinder.setMaxContour(maxContourSize);
 		contourFinder.setSaveInnerContour(false);
@@ -356,15 +364,16 @@ public abstract class BaseDetectFiducialSquare<T extends ImageGray<T>> {
 
 	/**
 	 * Computes the fraction of pixels inside the image border which are black
+	 *
 	 * @param pixelThreshold Pixel's less than this value are considered black
 	 * @return fraction of border that's black
 	 */
 	protected double computeFractionBoundary( float pixelThreshold ) {
 		// TODO ignore outer pixels from this computation. Will require 8 regions (4 corners + top/bottom + left/right)
 		final int w = square.width;
-		int radius = (int) (w * borderWidthFraction);
+		int radius = (int)(w*borderWidthFraction);
 
-		int innerWidth = w-2*radius;
+		int innerWidth = w - 2*radius;
 		int total = w*w - innerWidth*innerWidth;
 		int count = 0;
 		for (int y = 0; y < radius; y++) {
@@ -372,21 +381,21 @@ public abstract class BaseDetectFiducialSquare<T extends ImageGray<T>> {
 			int indexBottom = (w - radius + y)*w;
 
 			for (int x = 0; x < w; x++) {
-				if( square.data[indexTop++] < pixelThreshold )
+				if (square.data[indexTop++] < pixelThreshold)
 					count++;
-				if( square.data[indexBottom++] < pixelThreshold )
+				if (square.data[indexBottom++] < pixelThreshold)
 					count++;
 			}
 		}
 
-		for (int y = radius; y < w-radius; y++) {
+		for (int y = radius; y < w - radius; y++) {
 			int indexLeft = y*w;
 			int indexRight = y*w + w - radius;
 
 			for (int x = 0; x < radius; x++) {
-				if( square.data[indexLeft++] < pixelThreshold )
+				if (square.data[indexLeft++] < pixelThreshold)
 					count++;
-				if( square.data[indexRight++] < pixelThreshold )
+				if (square.data[indexRight++] < pixelThreshold)
 					count++;
 			}
 		}
@@ -397,11 +406,11 @@ public abstract class BaseDetectFiducialSquare<T extends ImageGray<T>> {
 	/**
 	 * Takes the found quadrilateral and the computed 3D information and prepares it for output
 	 */
-	private void prepareForOutput(Polygon2D_F64 imageShape, Result result) {
+	private void prepareForOutput( Polygon2D_F64 imageShape, Result result ) {
 		// the rotation estimate, apply in counter clockwise direction
 		// since result.rotation is a clockwise rotation in the visual sense, which
 		// is CCW on the grid
-		int rotationCCW = (4-result.rotation)%4;
+		int rotationCCW = (4 - result.rotation)%4;
 		for (int j = 0; j < rotationCCW; j++) {
 			UtilPolygons2D_F64.shiftUp(imageShape);
 		}
@@ -434,38 +443,14 @@ public abstract class BaseDetectFiducialSquare<T extends ImageGray<T>> {
 	 * @param edgeOutside Average pixel value along edge outside
 	 * @return true if the square matches a known target.
 	 */
-	protected abstract boolean processSquare(GrayF32 square , Result result , double edgeInside , double edgeOutside  );
+	protected abstract boolean processSquare( GrayF32 square, Result result, double edgeInside, double edgeOutside );
 
-	/**
-	 * Used to toggle on/off verbose debugging information
-	 * @param verbose true for verbose output
-	 */
-	public void setVerbose(boolean verbose) {
-		this.verbose = verbose;
-	}
-
-	public DetectPolygonBinaryGrayRefine<T> getSquareDetector() {
-		return squareDetector;
+	@Override public void setVerbose( @Nullable PrintStream out, @Nullable Set<String> configuration ) {
+		verbose = BoofMiscOps.addPrefix(this, out);
 	}
 
 	public GrayU8 getBinary() {
 		return contourHelper.withoutPadding();
-	}
-
-	public Class<T> getInputType() {
-		return inputType;
-	}
-
-	public double getBorderWidthFraction() {
-		return borderWidthFraction;
-	}
-
-	public double getThresholdSideRatio() {
-		return thresholdSideRatio;
-	}
-
-	public void setThresholdSideRatio(double thresholdSideRatio) {
-		this.thresholdSideRatio = thresholdSideRatio;
 	}
 
 	public static class Result {

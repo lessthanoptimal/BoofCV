@@ -286,6 +286,7 @@ public class DetectFiducialSquareHammingApp extends DemonstrationBase implements
 		JCheckBoxValue showOrientation = checkboxWrap("Orientation", true);
 		JCheckBoxValue showContour = checkboxWrap("Contour", false);
 		JCheckBoxValue showLabels = checkboxWrap("Labels", false);
+		JCheckBoxValue printVerbose = checkboxWrap("Verbose", false).tt("Prints verbose messages to stdout");
 		JComboBox<String> comboDictionary = combo(configMarker.dictionary.ordinal() - 1, HammingDictionary.allPredefined());
 
 		DetectBlackPolygonControlPanel polygonPanel;
@@ -306,6 +307,7 @@ public class DetectFiducialSquareHammingApp extends DemonstrationBase implements
 			addAlignLeft(showLabels.check);
 			addAlignLeft(showSquares.check);
 			addAlignLeft(showContour.check);
+			addAlignLeft(printVerbose.check);
 			addLabeled(comboDictionary, "Dictionary");
 			add(polygonPanel);
 			addVerticalGlue(this);
@@ -327,6 +329,9 @@ public class DetectFiducialSquareHammingApp extends DemonstrationBase implements
 			} else if (source == showLabels.check) {
 				showLabels.updateValue();
 				guiImage.repaint();
+			} else if (source == printVerbose.check) {
+				printVerbose.updateValue();
+				detector.setVerbose(printVerbose.value ? System.out : null, null);
 			} else if (source == selectZoom) {
 				double value = ((Number)selectZoom.getValue()).doubleValue();
 				if (value != zoom) {

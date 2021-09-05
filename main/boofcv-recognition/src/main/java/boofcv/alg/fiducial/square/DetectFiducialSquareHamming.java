@@ -29,6 +29,7 @@ import boofcv.struct.image.GrayF32;
 import boofcv.struct.image.GrayU8;
 import boofcv.struct.image.ImageGray;
 import lombok.Getter;
+import lombok.Setter;
 
 /**
  * This detector decodes binary square fiducials where markers are indentified from a set of markers which is much
@@ -45,11 +46,12 @@ public class DetectFiducialSquareHamming<T extends ImageGray<T>> extends BaseDet
 
 	/** Describes the marker it looks for */
 	@Getter public final ConfigHammingMarker description;
-
 	/** converts the input image into a binary one */
 	@Getter protected final GrayU8 binaryInner = new GrayU8(1, 1);
 	/** storage for no border sub-image */
 	@Getter protected final GrayF32 grayNoBorder = new GrayF32();
+	/** How much ambiguous bits increase the error by. 0 = no penalty. 1=simple addition. */
+	@Getter @Setter public double ambiguousPenaltyFrac = 0.5;
 
 	// width of a square in the inner undistorted image.
 	protected final static int w = 10;
@@ -62,6 +64,9 @@ public class DetectFiducialSquareHamming<T extends ImageGray<T>> extends BaseDet
 	final GrayU8 bitImage = new GrayU8(1, 1);
 	// Stores intermediate results when rotating
 	final GrayU8 workImage = new GrayU8(1, 1);
+
+	// how many bits are not obvious 0 or 1
+	int ambiguousBitCount = 0;
 
 	/**
 	 * Configures the fiducial detector
@@ -95,8 +100,14 @@ public class DetectFiducialSquareHamming<T extends ImageGray<T>> extends BaseDet
 		// convert input image into binary number
 		double threshold = (edgeInside + edgeOutside)/2;
 		int errorPureColor = decodeDataBits(grayNoBorder, threshold);
-		if (errorPureColor == 0)
+
+		if (verbose != null) verbose.printf("_ square: threshold=%.1f ambiguous=%d errorPure=%d",
+				threshold, ambiguousBitCount, errorPureColor);
+
+		if (errorPureColor == 0) {
+			if (verbose != null) verbose.println();
 			return false;
+		}
 
 		// Search all markers and orientation to see what is the best match. Stop if it finds a perfect match.
 		int bestMarker = -1;
@@ -133,9 +144,13 @@ public class DetectFiducialSquareHamming<T extends ImageGray<T>> extends BaseDet
 			bitImage.setTo(workImage);
 		}
 
+		if (verbose != null) verbose.printf(" hamming_error=%d minimum=%d", bestError, description.minimumHamming);
+
 		// See if the error is too large or worse than a square that's pure white or back. This is to reduce false
-		// positives
-		if (bestError > description.minimumHamming || bestError > errorPureColor) {
+		// positives. Also consider ambiguous bits, as they are much more likely to be pure noise
+		if (bestError + ambiguousBitCount*ambiguousPenaltyFrac > description.minimumHamming ||
+				bestError >= errorPureColor) {
+			if (verbose != null) verbose.println();
 			return false;
 		}
 
@@ -144,6 +159,8 @@ public class DetectFiducialSquareHamming<T extends ImageGray<T>> extends BaseDet
 		result.lengthSide = 1;
 		result.rotation = bestOrientation;
 		result.error = bestError;
+
+		if (verbose != null) verbose.printf(" id=%d orientation=%d\n", result.which, result.rotation);
 
 		return true;
 	}
@@ -171,7 +188,9 @@ public class DetectFiducialSquareHamming<T extends ImageGray<T>> extends BaseDet
 		ThresholdImageOps.threshold(gray, binaryInner, (float)threshold, true);
 
 		final int voteThreshold = N/2;
+		final int ambiguousThreshold = N/4;
 		final int gridWidth = description.gridWidth;
+		ambiguousBitCount = 0;
 
 		int countOnes = 0;
 		for (int row = 0; row < gridWidth; row++) {
@@ -188,6 +207,10 @@ public class DetectFiducialSquareHamming<T extends ImageGray<T>> extends BaseDet
 						total += binaryInner.data[index++];
 					}
 				}
+
+				// See if this bit is not clearly white or black
+				if ((total > voteThreshold ? N - total : total) >= ambiguousThreshold)
+					ambiguousBitCount++;
 
 				int bit = total <= voteThreshold ? 1 : 0;
 				bitImage.data[row*gridWidth + col] = (byte)bit;

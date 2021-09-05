@@ -25,6 +25,8 @@ import boofcv.factory.shape.ConfigPolygonDetector;
 import boofcv.misc.BoofMiscOps;
 import boofcv.struct.ConfigLength;
 import boofcv.struct.Configuration;
+import lombok.Getter;
+import lombok.Setter;
 
 /**
  * Configuration that describes how to detect a Hamming marker.
@@ -37,6 +39,9 @@ public class ConfigFiducialHammingDetector implements Configuration {
 	 * Fraction of border pixels which must be black.
 	 */
 	public double minimumBlackBorderFraction = 0.65;
+
+	/** How much ambiguous bits increase the hamming error by. Their count is scaled by this much. */
+	@Getter @Setter public double ambiguousPenaltyFrac = 0.5;
 
 	/**
 	 * Configuration for square detector
@@ -60,6 +65,7 @@ public class ConfigFiducialHammingDetector implements Configuration {
 
 	public void setTo( ConfigFiducialHammingDetector src ) {
 		this.minimumBlackBorderFraction = src.minimumBlackBorderFraction;
+		this.ambiguousPenaltyFrac = src.ambiguousPenaltyFrac;
 		this.squareDetector.setTo(src.squareDetector);
 		this.configThreshold.setTo(src.configThreshold);
 	}
@@ -67,6 +73,7 @@ public class ConfigFiducialHammingDetector implements Configuration {
 	@Override
 	public void checkValidity() {
 		BoofMiscOps.checkTrue(minimumBlackBorderFraction >= 0);
+		BoofMiscOps.checkTrue(ambiguousPenaltyFrac >= 0);
 		squareDetector.checkValidity();
 		configThreshold.checkValidity();
 	}

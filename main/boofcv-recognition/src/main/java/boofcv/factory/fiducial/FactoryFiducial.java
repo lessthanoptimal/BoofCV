@@ -99,7 +99,6 @@ public class FactoryFiducial {
 	SquareHamming_to_FiducialDetector<T> squareHamming( ConfigHammingMarker configMarkers,
 													   @Nullable ConfigFiducialHammingDetector configDetector,
 													   Class<T> imageType ) {
-
 		if (configDetector == null) {
 			configDetector = new ConfigFiducialHammingDetector();
 		}
@@ -112,6 +111,7 @@ public class FactoryFiducial {
 
 		final var alg = new DetectFiducialSquareHamming<>(configMarkers, configDetector.minimumBlackBorderFraction,
 				binary, squareDetector, imageType);
+		alg.setAmbiguousPenaltyFrac(configDetector.ambiguousPenaltyFrac);
 		return new SquareHamming_to_FiducialDetector<>(alg);
 	}
 
