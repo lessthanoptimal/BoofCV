@@ -198,7 +198,7 @@ public class DetectChessboardCornersXPyramid<T extends ImageGray<T>> {
 
 			// Prefer localizing at a level where the corner is more intense, as it will be more stable
 			// but also prefer localizing at a lower level since the resolution is higher.
-			final double intensity0 = c0.intensity/(1.0 + c0.level1);
+			final double intensity0 = c0.intensity/(1.0 + c0.levelMax);
 			final double intensity1 = resultsMax.intensity/(1.0 + resultsMax.level1);
 
 			// See if the original corner is better than the candidates
