@@ -49,8 +49,6 @@ public class ChessboardCornerEdgeIntensity<T extends ImageGray<T>> {
 	// tangent step
 	float tx, ty;
 	float normalDiv = 15.0f;
-	// dynamically computed based on length of side. This is how far away it samples
-	private float tangentSampleStep;
 
 	// length of the line segment between the two points
 	float lineLength;
@@ -120,7 +118,7 @@ public class ChessboardCornerEdgeIntensity<T extends ImageGray<T>> {
 
 		// The maximum distance it will sample in tangent direction. The offsets are added later which
 		// is why they are substracted here
-		float tangentMaxDistance = Math.max(0.0f, tangentSampleStep - (offsetA + offsetB)/2f);
+		float tangentMaxDistance = Math.max(0.0f, Math.max(1f, lineLength/normalDiv) - (offsetA + offsetB)/2f);
 
 		// move from one side to the other
 		// divide it into lengthSamples+1 regions and don't sample the tail ends
@@ -197,13 +195,6 @@ public class ChessboardCornerEdgeIntensity<T extends ImageGray<T>> {
 		// the sign is currently one known, just pick one
 		tx = -ny;
 		ty = nx;
-		// In the past corner orientation was used. That worked 99.5% of the time, but the 0.5% if fails was very
-		// difficult to fix. It was an effective way to eliminate some false positives, but to bring it back
-		// there would have to be some sort of confidence value to know when to use it
-
-		// set the magnitude relative to the square size. Blurred images won't have sharp edges
-		// at the same time the magnitude of |n| shouldn't be less than 1
-		tangentSampleStep = Math.max(1f, lineLength/normalDiv);
 	}
 
 	public int getLengthSamples() {
