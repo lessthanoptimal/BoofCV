@@ -43,9 +43,12 @@ import java.util.List;
 public class DetectChessboardCornersXPyramid<T extends ImageGray<T>> {
 	/**
 	 * minimum number of pixels in the top most level in the pyramid
-	 *  If &le; 0 then have a single layer at full resolution
- 	 */
-	@Getter @Setter int pyramidTopSize = 100;
+	 * If &le; 0 then have a single layer at full resolution
+	 */
+	public @Getter @Setter int pyramidTopSize = 100;
+
+	/** Maximum number of corners it will return in kNN search */
+	public @Getter @Setter int searchMaxCount = 10;
 
 	// Input image with normalized pixel values
 	GrayF32 normalized = new GrayF32(1, 1);
@@ -54,23 +57,23 @@ public class DetectChessboardCornersXPyramid<T extends ImageGray<T>> {
 	List<GrayF32> pyramid = new ArrayList<>();
 
 	// search radius when checking to see if the same feature has been detected at multiple scales
-	int radius = 7;
+	public @Getter @Setter int radius = 7;
 
 	/** Corner detector */
-	@Getter DetectChessboardCornersX detector;
+	public @Getter DetectChessboardCornersX detector;
 
 	// Detection results for each layer in the pyramid
 	DogArray<PyramidLevel> featureLevels = new DogArray<>(PyramidLevel.class, PyramidLevel::new);
 
 	/** Storage for final output corners */
-	@Getter DogArray<ChessboardCorner> corners = new DogArray<>(ChessboardCorner::new);
+	public @Getter DogArray<ChessboardCorner> corners = new DogArray<>(ChessboardCorner::new);
 
 	// Nearest-Neighbor search data structures
 	NearestNeighbor<ChessboardCorner> nn = FactoryNearestNeighbor.kdtree(new ChessboardCornerDistance());
 	NearestNeighbor.Search<ChessboardCorner> nnSearch = nn.createSearch();
 	DogArray<NnData<ChessboardCorner>> nnResults = new DogArray(NnData::new);
 
-	@Getter ImageType<T> imageType;
+	public @Getter ImageType<T> imageType;
 
 	public DetectChessboardCornersXPyramid( DetectChessboardCornersX detector, ImageType<T> imageType ) {
 		this.detector = detector;
@@ -95,8 +98,9 @@ public class DetectChessboardCornersXPyramid<T extends ImageGray<T>> {
 		//                 purposes
 		float maxIntensityImage = 0;
 		detector.considerMaxIntensityImage = maxIntensityImage;
-		double scale = Math.pow(2.0, pyramid.size() - 1);
 		for (int level = pyramid.size() - 1; level >= 0; level--) {
+			double scale = Math.pow(2.0, level);
+
 			// In blurred images the x-corner intensity is likely to be much greater at lower resolutions
 			// At higher resolution there might be no corners and a very small non-maximum threshold is selected.
 			// This will cause a large percentage of the image to be selected as an x-corner, slowing things down!
@@ -109,7 +113,7 @@ public class DetectChessboardCornersXPyramid<T extends ImageGray<T>> {
 			PyramidLevel featsLevel = featureLevels.get(level);
 
 			List<ChessboardCorner> corners = detector.getCorners();
-			featsLevel.corners.reset();
+			featsLevel.corners.resetResize(corners.size());
 
 			for (int i = 0; i < corners.size(); i++) {
 				ChessboardCorner cf = corners.get(i);
@@ -118,7 +122,7 @@ public class DetectChessboardCornersXPyramid<T extends ImageGray<T>> {
 				double x = cf.x*scale;
 				double y = cf.y*scale;
 
-				ChessboardCorner cl = featsLevel.corners.grow();
+				ChessboardCorner cl = featsLevel.corners.get(i);
 				cl.first = true;
 				cl.setTo(x, y, cf.orientation, cf.intensity);
 				cl.contrast = cf.contrast;
@@ -126,23 +130,18 @@ public class DetectChessboardCornersXPyramid<T extends ImageGray<T>> {
 				cl.level1 = level;
 				cl.level2 = level;
 			}
-			scale /= 2.0;
 		}
 
 		// Perform non-maximum suppression against features in each scale.
 		// Because of the scale difference the search radius changes depending on the scale of the layer in the pyramid
-		double baseScale = 1.0;
-		for (int levelIdx = 0; levelIdx < pyramid.size(); levelIdx++) {
-			PyramidLevel level0 = featureLevels.get(levelIdx);
+		for (int level = 0; level < pyramid.size(); level++) {
+			PyramidLevel level0 = featureLevels.get(level);
 
-			scale = baseScale*2.0;
 			// mark features in the next level as seen if they match ones in this level
-			for (int nextIdx = levelIdx + 1; nextIdx < pyramid.size(); nextIdx++) {
-				PyramidLevel level1 = featureLevels.get(nextIdx);
-				considerLocalizingAtThisScale(level0.corners, level1.corners, scale);
-				scale *= 2;
+			for (int upperLevel = level + 1; upperLevel < pyramid.size(); upperLevel++) {
+				PyramidLevel level1 = featureLevels.get(upperLevel);
+				considerLocalizingAtThisScale(level0.corners, level1.corners, upperLevel);
 			}
-			baseScale *= 2.0;
 		}
 
 		// Only keep flagged features for the final output
@@ -167,59 +166,55 @@ public class DetectChessboardCornersXPyramid<T extends ImageGray<T>> {
 	 * should take its location and orientation from. Also mark corners as seen or not.
 	 */
 	void considerLocalizingAtThisScale( DogArray<ChessboardCorner> corners0,
-										DogArray<ChessboardCorner> corners1, double scale ) {
+										DogArray<ChessboardCorner> corners1, int level1 ) {
 		nn.setPoints(corners1.toList(), false);
 
-		double searchRadius = radius*scale;
-		for (int i = 0; i < corners0.size; i++) {
-			ChessboardCorner c0 = corners0.get(i);
+		double searchRadius = 4*radius*(level1 + 1);
+		for (int cornerIdx = 0; cornerIdx < corners0.size; cornerIdx++) {
+			ChessboardCorner c0 = corners0.get(cornerIdx);
 
-			// In general, you want to use lower scales to localize your feature. However, images can be noisy and
-			// blurred which will corrupt localization. So the optimal corner will have a high intensity and be
-			// at a lower pyramid level. This is accomplished by requiring lower layers to have an intensity score
-			// which is much higher than the score found in lower levels.
-			final double intensity = c0.intensity*2.0;
-
-			nnSearch.findNearest(c0, searchRadius, 10, nnResults);
-			// true if the current value of the corner is a maximum
-			boolean maximum = true;
+			nnSearch.findNearest(c0, searchRadius, searchMaxCount, nnResults);
+			if (nnResults.isEmpty())
+				continue;
 
 			// Location accuracy is better at higher resolution but angle accuracy is better at lower resolution
 			// accept the new angle if it has higher corner intensity
-			ChessboardCorner resultsMax = c0;
-			double distanceMax = 0;
+			ChessboardCorner resultsMax = nnResults.get(0).point;
+			for (int candidateIdx = 0; candidateIdx < nnResults.size; candidateIdx++) {
+				ChessboardCorner c1 = nnResults.get(candidateIdx).point;
 
-			// set the second level to the lowest resolution a neighbor is found in
-			int level2 = c0.level2;
-			for (int j = 0; j < nnResults.size; j++) {
-				ChessboardCorner c1 = nnResults.get(j).point;
-				level2 = c1.level2;
+				// Mark all candidates as false since they are "duplicates"
+				c1.first = false;
 
-				if (c1.intensity < intensity) {
-					// This corner is not going to be this feature's corner in this level
-					c1.first = false;
-				} else {
-					maximum = false;
-				}
+				// Resolve ambiguity by selecting the corner with the largest response
 				if (c1.intensity > resultsMax.intensity) {
-					distanceMax = nnResults.get(j).distance;
 					resultsMax = c1;
 				}
 			}
 
-			if (!maximum) {
-				// another corner is going to be used for this feature
-				c0.first = false;
-			}
+			// Make sure the lower level corner is a first one, if not there's nothing to update
+			if (!c0.first)
+				continue;
 
-			// Require it to be within the non-maximum radius to actually be merged into c0
-			// This is to prevent a feature from "drifting" and incorrectly appearing to go deep down in the pyramid
-			if (distanceMax <= radius*radius) {
-				c0.orientation = resultsMax.orientation;
-				c0.intensity = resultsMax.intensity;
-				c0.contrast = resultsMax.contrast;
-				c0.levelMax = resultsMax.levelMax;
-				c0.level2 = level2;
+			// Prefer localizing at a level where the corner is more intense, as it will be more stable
+			// but also prefer localizing at a lower level since the resolution is higher.
+			final double intensity0 = c0.intensity/(1.0 + c0.level1);
+			final double intensity1 = resultsMax.intensity/(1.0 + resultsMax.level1);
+
+			// See if the original corner is better than the candidates
+			if (intensity1 > intensity0) {
+				// bit of a hack to prevent location drift across scales.
+				// The entire search radius is a bit too generous but suppresses false positive corners
+				if (c0.distance2(resultsMax) > radius*radius)
+					continue;
+
+				// Copy the original corner into the new candidate so that it can continue to higher pyramid levels
+				int tmp = c0.level1;
+				c0.setTo(resultsMax);
+				c0.level1 = tmp;
+				c0.first = true;
+			} else {
+				c0.level2 = resultsMax.level2;
 			}
 		}
 	}
