@@ -24,7 +24,7 @@ import boofcv.io.wrapper.DefaultMediaManager;
 
 import javax.swing.*;
 import java.awt.*;
-import java.util.List;
+import java.io.File;
 
 /**
  * Computes intrinsic camera calibration parameters from a set of calibration images. Results
@@ -54,9 +54,8 @@ public class CalibrateFisheyePlanarGuiAppV2 extends BaseCalibrateCameraApp {
 	}
 
 	public static void main( String[] args ) {
-		List<String> images;
-		images = UtilIO.listImages(UtilIO.pathExample("calibration/fisheye/chessboard"), true);
-//		images = UtilIO.listAll(UtilIO.pathExample("calibration/fisheye/square_grid"));
+		File directory = new File(UtilIO.pathExample("calibration/fisheye/chessboard"));
+//		File directory = new File(UtilIO.pathExample("calibration/fisheye/square_grid"));
 
 		SwingUtilities.invokeLater(() -> {
 			var app = new CalibrateFisheyePlanarGuiAppV2();
@@ -71,7 +70,7 @@ public class CalibrateFisheyePlanarGuiAppV2 extends BaseCalibrateCameraApp {
 			app.window = frame;
 			app.window.setJMenuBar(app.menuBar);
 
-			new Thread(() -> app.processFiles(images)).start();
+			new Thread(() -> app.processDirectory(directory)).start();
 		});
 	}
 }

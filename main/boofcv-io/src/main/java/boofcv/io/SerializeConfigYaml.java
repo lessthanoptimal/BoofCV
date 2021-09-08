@@ -82,7 +82,10 @@ public class SerializeConfigYaml {
 						// to work.
 						type.getMethod("setTo", type);
 					} catch (NoSuchMethodException e) {
-						throw new RuntimeException("Referenced object which is not enum, primitive, or a valid class");
+						// This is intentionally annoying as a custom class specific serialization solution
+						// needs to be created. For now, it will complain and skip
+						System.err.println("Referenced object which is not enum, primitive, or a valid class. name=" + f.getName());
+						continue;
 					}
 					Map<String, Object> result = canonical != null ?
 							serialize(f.get(config), f.get(canonical)) : serialize(f.get(config), null);
