@@ -123,46 +123,26 @@ public class CameraCalibrationGui extends JPanel
 	}
 
 	void createMenuBar() {
-		JMenuBar menuBar = new JMenuBar();
+		var menuBar = new JMenuBar();
 
-		JMenu menu = new JMenu("File");
+		var menu = new JMenu("File");
 		menu.setMnemonic(KeyEvent.VK_F);
 		menuBar.add(menu);
 
-		JMenuItem menuOpenDirectory = new JMenuItem("Input Directory");
+		var menuOpenDirectory = new JMenuItem("Input Directory");
 		BoofSwingUtil.setMenuItemKeys(menuOpenDirectory, KeyEvent.VK_D, KeyEvent.VK_D);
-		menuOpenDirectory.addActionListener(new ActionListener() {
-			@Override
-			public void actionPerformed( ActionEvent e ) {
-				processDirectory();
-			}
-		});
+		menuOpenDirectory.addActionListener(e -> processDirectory());
 
-		JMenuItem menuWebcam = new JMenuItem("Input Webcam");
+		var menuWebcam = new JMenuItem("Input Webcam");
 		BoofSwingUtil.setMenuItemKeys(menuWebcam, KeyEvent.VK_W, KeyEvent.VK_W);
-		menuWebcam.addActionListener(new ActionListener() {
-			@Override
-			public void actionPerformed( ActionEvent e ) {
-				openWebcam();
-			}
-		});
+		menuWebcam.addActionListener(e -> openWebcam());
 
-		JMenuItem menuHelp = new JMenuItem("Help", KeyEvent.VK_H);
-		menuHelp.addActionListener(new ActionListener() {
-			@Override
-			public void actionPerformed( ActionEvent e ) {
-				showHelp();
-			}
-		});
+		var menuHelp = new JMenuItem("Help", KeyEvent.VK_H);
+		menuHelp.addActionListener(e -> showHelp());
 
-		JMenuItem menuQuit = new JMenuItem("Quit");
+		var menuQuit = new JMenuItem("Quit");
 		BoofSwingUtil.setMenuItemKeys(menuQuit, KeyEvent.VK_Q, KeyEvent.VK_Q);
-		menuQuit.addActionListener(new ActionListener() {
-			@Override
-			public void actionPerformed( ActionEvent e ) {
-				System.exit(0);
-			}
-		});
+		menuQuit.addActionListener(e -> System.exit(0));
 
 		menu.addSeparator();
 		menu.add(menuOpenDirectory);

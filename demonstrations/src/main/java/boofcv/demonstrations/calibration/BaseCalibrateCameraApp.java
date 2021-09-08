@@ -21,6 +21,7 @@ package boofcv.demonstrations.calibration;
 import boofcv.abst.geo.calibration.CalibrateMonoPlanar;
 import boofcv.abst.geo.calibration.DetectSingleFiducialCalibration;
 import boofcv.abst.geo.calibration.ImageResults;
+import boofcv.alg.fiducial.calib.ConfigCalibrationTarget;
 import boofcv.alg.geo.calibration.CalibrationObservation;
 import boofcv.demonstrations.shapes.ShapeVisualizePanel;
 import boofcv.gui.BoofSwingUtil;
@@ -37,6 +38,7 @@ import boofcv.gui.settings.GlobalSettingsControls;
 import boofcv.io.UtilIO;
 import boofcv.io.image.ConvertBufferedImage;
 import boofcv.io.image.UtilImageIO;
+import boofcv.misc.BoofMiscOps;
 import boofcv.misc.VariableLockSet;
 import boofcv.struct.geo.PointIndex2D_F64;
 import boofcv.struct.image.GrayF32;
@@ -49,6 +51,7 @@ import org.jetbrains.annotations.Nullable;
 import javax.swing.*;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
+import javax.swing.filechooser.FileNameExtensionFilter;
 import java.awt.*;
 import java.awt.event.KeyEvent;
 import java.awt.geom.AffineTransform;
@@ -71,11 +74,13 @@ import static boofcv.gui.calibration.DisplayPinholeCalibrationPanel.drawNumbers;
  * @author Peter Abeles
  */
 public abstract class BaseCalibrateCameraApp extends JPanel {
+	public static final String CALIBRATION_TARGET = "calibration_target.yaml";
 	// TODO render undistorted
 	// TODO show calibration in GUI
 	// TODO statistics summary in GUI
 	// TODO select landmark and remove landmark
 	// TODO remove image
+	// TODO Generalize recent file code and put into BoofSwingUtil
 
 	// TODO add ability to load previously saved results
 	// TODO cache most recently viewed images
@@ -95,6 +100,9 @@ public abstract class BaseCalibrateCameraApp extends JPanel {
 	protected ImageListPanel imageListPanel = new ImageListPanel();
 	protected ImageCalibrationPanel imagePanel = new ImageCalibrationPanel();
 	//--------------------------------------------------------------------
+
+	// Directory where images were loaded from
+	File imageDirectory = new File(".");
 
 	// True if a thread is running for calibration
 	protected boolean runningCalibration = false;
@@ -126,6 +134,10 @@ public abstract class BaseCalibrateCameraApp extends JPanel {
 		menuFile.add(menuRecent);
 		updateRecentItems();
 
+		var menuItemSaveTarget = new JMenuItem("Save Target");
+		menuItemSaveTarget.addActionListener(( e ) -> saveCalibrationTarget());
+		menuFile.add(menuItemSaveTarget);
+
 		JMenuItem menuSettings = new JMenuItem("Settings");
 		menuSettings.addActionListener(e -> new GlobalSettingsControls().showDialog(window, this));
 
@@ -136,6 +148,26 @@ public abstract class BaseCalibrateCameraApp extends JPanel {
 		menuFile.addSeparator();
 		menuFile.add(menuSettings);
 		menuFile.add(menuItemQuit);
+	}
+
+	/**
+	 * Saves a calibration target description to disk so that it can be loaded again later on.
+	 */
+	protected void saveCalibrationTarget() {
+		// Open a dialog which will save using the default name in the place images were recently loaded from
+		var chooser = new JFileChooser();
+		chooser.addChoosableFileFilter(new FileNameExtensionFilter("yaml", "yaml", "yml"));
+		chooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
+		chooser.setCurrentDirectory(imageDirectory);
+		chooser.setSelectedFile(new File(imageDirectory, CALIBRATION_TARGET));
+		int returnVal = chooser.showSaveDialog(this);
+		if (returnVal != JFileChooser.APPROVE_OPTION) {
+			return;
+		}
+
+		File file = chooser.getSelectedFile();
+		UtilIO.saveConfig(configurePanel.targetPanel.createConfigCalibrationTarget(),
+				new ConfigCalibrationTarget(), file);
 	}
 
 	/**
@@ -153,14 +185,7 @@ public abstract class BaseCalibrateCameraApp extends JPanel {
 		File selected = BoofSwingUtil.openFileChooser(this, BoofSwingUtil.FileTypes.DIRECTORIES);
 		if (selected == null)
 			return;
-		List<String> selectedImages = UtilIO.listImages(selected.getPath(), true);
-		// Disable the menu bar so the user can't try to open more images
-		setMenuBarEnabled(false);
-
-		targetChanged = true;
-
-		// Process the images in a non-gui thread
-		new Thread(() -> handleProcessCalled(selectedImages), "OpenImages()").start();
+		processDirectory(selected);
 	}
 
 	protected void createAlgorithms() {
@@ -173,6 +198,44 @@ public abstract class BaseCalibrateCameraApp extends JPanel {
 
 		targetChanged = false;
 		calibratorChanged = false;
+	}
+
+	/**
+	 * Detects image features from the set
+	 */
+	public void processDirectory( File directory ) {
+		List<String> selectedImages = UtilIO.listImages(directory.getPath(), true);
+		if (selectedImages.isEmpty())
+			return;
+
+		// If the calibration target type is specified load that
+		File fileTarget = new File(directory, CALIBRATION_TARGET);
+		if (fileTarget.exists()) {
+			System.out.println("Loading calibration target at " + fileTarget.getPath());
+			try {
+				ConfigCalibrationTarget config = UtilIO.loadConfig(fileTarget);
+				SwingUtilities.invokeLater(() -> configurePanel.targetPanel.setConfigurationTo(config));
+			} catch (RuntimeException e) {
+				e.printStackTrace();
+			}
+		}
+
+		imageDirectory = directory;
+		BoofSwingUtil.invokeNowOrLater(() -> {
+			// Disable the menu bar so the user can't try to open more images
+			setMenuBarEnabled(false);
+			// Add to list of recently opened directories
+			BoofSwingUtil.addToRecentFiles(this, directory.getName(), BoofMiscOps.asList(directory.getPath()));
+			updateRecentItems();
+		});
+
+		targetChanged = true;
+
+		// We need to launch the processing thread from the UI thread since it might have loaded the calibration
+		// target and that won't take effect until the UI thread runs
+		SwingUtilities.invokeLater(() ->
+				// Process the images in a non-gui thread
+				new Thread(() -> handleProcessCalled(selectedImages), "OpenImages()").start());
 	}
 
 	/**
@@ -259,7 +322,7 @@ public abstract class BaseCalibrateCameraApp extends JPanel {
 
 		for (BoofSwingUtil.RecentFiles info : recentFiles) {
 			JMenuItem recentItem = new JMenuItem(info.name);
-			recentItem.addActionListener(e -> openImages(info.files.get(0)));
+			recentItem.addActionListener(e -> processDirectory(new File(info.files.get(0))));
 			menuRecent.add(recentItem);
 		}
 

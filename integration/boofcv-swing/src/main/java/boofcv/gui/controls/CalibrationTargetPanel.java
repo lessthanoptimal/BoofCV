@@ -23,7 +23,9 @@ import boofcv.abst.fiducial.calib.ConfigECoCheckMarkers;
 import boofcv.abst.fiducial.calib.ConfigGridDimen;
 import boofcv.abst.geo.calibration.DetectSingleFiducialCalibration;
 import boofcv.abst.geo.calibration.MultiToSingleFiducialCalibration;
+import boofcv.alg.fiducial.calib.ConfigCalibrationTarget;
 import boofcv.factory.fiducial.*;
+import boofcv.gui.BoofSwingUtil;
 import boofcv.gui.StandardAlgConfigPanel;
 
 import javax.swing.*;
@@ -70,6 +72,36 @@ public class CalibrationTargetPanel extends StandardAlgConfigPanel {
 		addAlignLeft(saveLandmarks.check, "Save a file with landmark locations to disk with the pdf");
 		add(Box.createRigidArea(new Dimension(10, 10)));
 		addAlignCenter(panelTarget);
+	}
+
+	public void setConfigurationTo( ConfigCalibrationTarget target ) {
+		BoofSwingUtil.checkGuiThread();
+
+		this.selected = target.type;
+		switch (selected) {
+			case CHESSBOARD -> configChessboard.setTo(target.grid);
+			case SQUARE_GRID -> configSquare.setTo(target.grid);
+			case CIRCLE_GRID -> configCircle.setTo(target.grid);
+			case CIRCLE_HEXAGONAL -> configCircleHex.setTo(target.grid);
+			case ECOCHECK -> configECoCheck.setTo(target.ecocheck);
+			default -> throw new RuntimeException("Target type not yet supported");
+		}
+
+		comboType.setSelectedIndex(selected.ordinal());
+	}
+
+	public ConfigCalibrationTarget createConfigCalibrationTarget() {
+		var ret = new ConfigCalibrationTarget();
+		ret.type = selected;
+		switch (selected) {
+			case CHESSBOARD -> ret.grid.setTo(configChessboard);
+			case SQUARE_GRID -> ret.grid.setTo(configSquare);
+			case CIRCLE_GRID -> ret.grid.setTo(configCircle);
+			case CIRCLE_HEXAGONAL -> ret.grid.setTo(configCircleHex);
+			case ECOCHECK -> ret.ecocheck.setTo(configECoCheck);
+			default -> throw new RuntimeException("Target type not yet supported");
+		}
+		return ret;
 	}
 
 	public DetectSingleFiducialCalibration createSingleTargetDetector() {

@@ -259,7 +259,7 @@ public class BoofSwingUtil {
 	/**
 	 * @param massageName A lambda that lets you change the name of the previous path. Useful when a file type is selected.
 	 */
-	public static File fileChooser( String preferenceName, Component parent, boolean openFile, String defaultPath,
+	public static File fileChooser( @Nullable String preferenceName, Component parent, boolean openFile, String defaultPath,
 									@Nullable BoofLambdas.MassageString massageName,
 									FileTypes... filters ) {
 
@@ -277,22 +277,15 @@ public class BoofSwingUtil {
 		if (massageName != null) {
 			previousPath = new File(massageName.process(previousPath.getPath()));
 		}
-		JFileChooser chooser = new JFileChooser();
+		var chooser = new JFileChooser();
 
 		boolean selectDirectories = false;
 		for (FileTypes t : filters) {
 			javax.swing.filechooser.FileFilter ff;
 			ff = switch (t) {
 				case FILES -> new javax.swing.filechooser.FileFilter() {
-					@Override
-					public boolean accept( File pathname ) {
-						return true;
-					}
-
-					@Override
-					public String getDescription() {
-						return "All";
-					}
+					@Override public boolean accept( File pathname ) { return true; }
+					@Override public String getDescription() { return "All"; }
 				};
 				case YAML -> new FileNameExtensionFilter("yaml", "yaml", "yml");
 				case XML -> new FileNameExtensionFilter("xml", "xml");
