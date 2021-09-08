@@ -39,6 +39,8 @@ import boofcv.struct.geo.PointIndex2D_F64;
 import boofcv.struct.image.GrayF32;
 import georegression.struct.point.Point2D_F32;
 import georegression.struct.point.Point2D_F64;
+import org.ddogleg.struct.DogArray_B;
+import org.ddogleg.struct.DogArray_I32;
 import org.jetbrains.annotations.Nullable;
 
 import javax.swing.*;
@@ -66,9 +68,10 @@ import static boofcv.gui.calibration.DisplayPinholeCalibrationPanel.drawNumbers;
  * @author Peter Abeles
  */
 public abstract class BaseCalibrateCameraApp extends JPanel {
-	// TODO colorize images in file list if targets are not detected
 	// TODO Render preview of target type
-	// TODO render all stuff from before
+	// TODO render undistorted
+	// TODO show calibration in GUI
+	// TODO statistics summary in GUI
 
 	// TODO add ability to load previously saved results
 	// TODO cache most recently viewed images
@@ -146,15 +149,14 @@ public abstract class BaseCalibrateCameraApp extends JPanel {
 		File selected = BoofSwingUtil.openFileChooser(this, BoofSwingUtil.FileTypes.DIRECTORIES);
 		if (selected == null)
 			return;
-		List<String> images = UtilIO.listImages(UtilIO.pathExample("calibration/fisheye/chessboard"), true);
-
+		List<String> selectedImages = UtilIO.listImages(selected.getPath(), true);
 		// Disable the menu bar so the user can't try to open more images
 		setMenuBarEnabled(false);
 
 		targetChanged = true;
 
 		// Process the images in a non-gui thread
-		new Thread(() -> handleProcessCalled(), "OpenImages()").start();
+		new Thread(() -> handleProcessCalled(selectedImages), "OpenImages()").start();
 	}
 
 	protected void createAlgorithms() {
@@ -210,6 +212,9 @@ public abstract class BaseCalibrateCameraApp extends JPanel {
 			results.safe(() -> {
 				results.imagePaths.add(path);
 				results.imageObservations.put(path, observation);
+				// only images with 4 points can be used in calibration
+				if (observation.points.size() >= 4)
+					results.usedImages.add(results.imagePaths.size() - 1);
 			});
 			SwingUtilities.invokeLater(() -> {
 				imageListPanel.addImage(new File(path).getName(), detected);
@@ -288,19 +293,22 @@ public abstract class BaseCalibrateCameraApp extends JPanel {
 		imagePanel.repaint();
 	}
 
-	protected void handleProcessCalled() {
+	protected void handleProcessCalled( @Nullable List<String> imagePaths ) {
 		BoofSwingUtil.checkNotGuiThread();
 		boolean detectTargets = targetChanged;
 		createAlgorithms();
 
 		if (detectTargets) {
+			// If null then it must want to reprocess the current set of images
+			if (imagePaths == null) {
+				List<String> l = new ArrayList<>();
+				results.safe(() -> l.addAll(results.imagePaths));
+				imagePaths = l;
+			}
+
 			System.out.println("Detecting targets again");
 			// Disable the menu bar so the user can't try to open more images
 			SwingUtilities.invokeLater(() -> setMenuBarEnabled(false));
-
-			// pass in a copy since the original will be modified and to avoid locking for too long
-			List<String> imagePaths = new ArrayList<>();
-			results.safe(() -> imagePaths.addAll(results.imagePaths));
 			processFiles(imagePaths);
 		}
 
@@ -318,7 +326,8 @@ public abstract class BaseCalibrateCameraApp extends JPanel {
 		try {
 			detectorSet.calibrator.reset();
 			results.safe(() -> {
-				for (String image : results.imagePaths) {
+				for (int usedIdx = 0; usedIdx < results.usedImages.size(); usedIdx++) {
+					String image = results.imagePaths.get(results.usedImages.get(usedIdx));
 					detectorSet.calibrator.addImage(results.imageObservations.get(image));
 				}
 			});
@@ -331,7 +340,8 @@ public abstract class BaseCalibrateCameraApp extends JPanel {
 				results.imageResults.clear();
 				List<ImageResults> listResults = detectorSet.calibrator.getErrors();
 				for (int i = 0; i < listResults.size(); i++) {
-					results.imageResults.put(results.imagePaths.get(i), listResults.get(i));
+					String image = results.imagePaths.get(results.usedImages.get(i));
+					results.imageResults.put(image, listResults.get(i));
 				}
 			});
 
@@ -505,12 +515,25 @@ public abstract class BaseCalibrateCameraApp extends JPanel {
 	protected class ImageListPanel extends StandardAlgConfigPanel implements ListSelectionListener {
 		JList<String> imageList;
 		List<String> imageNames = new ArrayList<>();
+		DogArray_B imageSuccess = new DogArray_B();
 		int selectedImage = -1;
 
 		public ImageListPanel() {
 			imageList = new JList<>();
 			imageList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 			imageList.addListSelectionListener(this);
+
+			// Highlight images where it failed
+			imageList.setCellRenderer(new DefaultListCellRenderer() {
+				@Override public Component getListCellRendererComponent( JList list, Object value, int index,
+																		 boolean isSelected, boolean cellHasFocus ) {
+					Component c = super.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
+					if (!imageSuccess.get(index))
+						setBackground(Color.RED);
+					return c;
+				}
+			});
+
 			JScrollPane scroll = new JScrollPane(imageList);
 
 			add(scroll);
@@ -518,6 +541,7 @@ public abstract class BaseCalibrateCameraApp extends JPanel {
 
 		public void addImage( String imageName, boolean success ) {
 			imageNames.add(imageName);
+			this.imageSuccess.add(success);
 			String[] names = imageNames.toArray(new String[0]);
 			imageList.removeListSelectionListener(ImageListPanel.this);
 			imageList.setListData(names);
@@ -535,6 +559,7 @@ public abstract class BaseCalibrateCameraApp extends JPanel {
 
 		public void clearImages() {
 			imageNames.clear();
+			imageSuccess.reset();
 			imageList.removeListSelectionListener(ImageListPanel.this);
 			imageList.setListData(new String[0]);
 			selectedImage = -1;
@@ -630,7 +655,7 @@ public abstract class BaseCalibrateCameraApp extends JPanel {
 		@Override public void controlChanged( final Object source ) {
 			if (source == bCompute) {
 				if (!runningCalibration) {
-					new Thread(BaseCalibrateCameraApp.this::handleProcessCalled, "bCompute").start();
+					new Thread(() -> handleProcessCalled(null), "bCompute").start();
 				}
 			} else if (source == zoom.spinner) {
 				zoom.updateValue();
@@ -667,12 +692,15 @@ public abstract class BaseCalibrateCameraApp extends JPanel {
 		// List of found observations and results
 		protected final Map<String, CalibrationObservation> imageObservations = new HashMap<>();
 		protected final Map<String, ImageResults> imageResults = new HashMap<>();
+		// Index of images used when calibrating
+		protected final DogArray_I32 usedImages = new DogArray_I32();
 
 		public void reset() {
 			safe(() -> {
 				imagePaths.clear();
 				imageObservations.clear();
 				imageResults.clear();
+				usedImages.reset();
 			});
 		}
 	}
