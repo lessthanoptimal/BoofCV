@@ -125,6 +125,17 @@ public class CalibrationTargetPanel extends StandardAlgConfigPanel {
 		panelTarget.repaint();
 	}
 
+	public Object getActiveConfig() {
+		return switch (selected) {
+			case CHESSBOARD -> configChessboard;
+			case ECOCHECK -> configECoCheck;
+			case SQUARE_GRID -> configSquare;
+			case CIRCLE_GRID -> configCircle;
+			case CIRCLE_HEXAGONAL -> configCircleHex;
+			default -> throw new RuntimeException("Target type not yet supported.");
+		};
+	}
+
 	private class ChessPanel extends StandardAlgConfigPanel implements ChangeListener {
 		JSpinner sRows, sCols, sWidth;
 

@@ -22,14 +22,17 @@ import boofcv.abst.geo.calibration.CalibrateMonoPlanar;
 import boofcv.abst.geo.calibration.DetectSingleFiducialCalibration;
 import boofcv.abst.geo.calibration.ImageResults;
 import boofcv.alg.geo.calibration.CalibrationObservation;
+import boofcv.demonstrations.shapes.ShapeVisualizePanel;
 import boofcv.gui.BoofSwingUtil;
 import boofcv.gui.StandardAlgConfigPanel;
+import boofcv.gui.calibration.UtilCalibrationGui;
 import boofcv.gui.controls.CalibrationModelPanel;
 import boofcv.gui.controls.CalibrationTargetPanel;
 import boofcv.gui.controls.JCheckBoxValue;
 import boofcv.gui.controls.JSpinnerNumber;
 import boofcv.gui.feature.VisualizeFeatures;
-import boofcv.gui.image.ImageZoomPanel;
+import boofcv.gui.image.ImagePanel;
+import boofcv.gui.image.ScaleOptions;
 import boofcv.gui.settings.GlobalSettingsControls;
 import boofcv.io.UtilIO;
 import boofcv.io.image.ConvertBufferedImage;
@@ -68,10 +71,11 @@ import static boofcv.gui.calibration.DisplayPinholeCalibrationPanel.drawNumbers;
  * @author Peter Abeles
  */
 public abstract class BaseCalibrateCameraApp extends JPanel {
-	// TODO Render preview of target type
 	// TODO render undistorted
 	// TODO show calibration in GUI
 	// TODO statistics summary in GUI
+	// TODO select landmark and remove landmark
+	// TODO remove image
 
 	// TODO add ability to load previously saved results
 	// TODO cache most recently viewed images
@@ -414,20 +418,16 @@ public abstract class BaseCalibrateCameraApp extends JPanel {
 	/**
 	 * Displays and visualizes calibration information for a sepcific image
 	 */
-	protected class ImageCalibrationPanel extends ImageZoomPanel {
+	protected class ImageCalibrationPanel extends ShapeVisualizePanel {
 		Ellipse2D.Double ellipse = new Ellipse2D.Double();
 		Point2D_F32 adj = new Point2D_F32();
 
-		public ImageCalibrationPanel() {
-			setWheelScrollingEnabled(false);
-			panel.addMouseWheelListener(e -> setScale(BoofSwingUtil.mouseWheelImageZoom(scale, e)));
-		}
-
 		@Override public synchronized void setScale( double scale ) {
-			boolean changed = this.scale != scale;
+			// Avoid endless loops by making sure it's changing
+			if (this.scale == scale)
+				return;
 			super.setScale(scale);
-			if (changed)
-				configurePanel.setZoom(scale);
+			configurePanel.setZoom(scale);
 		}
 
 		@Override
@@ -604,15 +604,25 @@ public abstract class BaseCalibrateCameraApp extends JPanel {
 		JSpinnerNumber selectErrorScale = spinnerWrap(10.0, 0.1, 1000.0, 2.0);
 
 		CalibrationModelPanel modelPanel = new CalibrationModelPanel();
-		CalibrationTargetPanel targetPanel = new CalibrationTargetPanel(( a, b ) -> settingsChanged(true, false));
+		CalibrationTargetPanel targetPanel = new CalibrationTargetPanel(( a, b ) -> handleUpdatedTarget());
+		// Displays a preview of the calibration target
+		ImagePanel targetPreviewPanel = new ImagePanel();
 
 		public ConfigureInfoPanel() {
 
 			modelPanel.listener = () -> settingsChanged(false, true);
 
+			targetPreviewPanel.setScaling(ScaleOptions.DOWN);
+			targetPreviewPanel.setCentering(true);
+			targetPreviewPanel.setPreferredSize(new Dimension(200, 400));
+			var targetVerticalPanel = new JPanel(new BorderLayout());
+			targetVerticalPanel.add(targetPanel, BorderLayout.NORTH);
+			targetVerticalPanel.add(targetPreviewPanel, BorderLayout.CENTER);
+			handleUpdatedTarget();
+
 			JTabbedPane tabbedPane = new JTabbedPane();
 			tabbedPane.addTab("Model", modelPanel);
-			tabbedPane.addTab("Target", targetPanel);
+			tabbedPane.addTab("Target", targetVerticalPanel);
 
 			addLabeled(imageSizeLabel, "Image Size", "Size of image being viewed");
 			addLabeled(zoom.spinner, "Zoom", "Zoom of image being viewed");
@@ -620,6 +630,13 @@ public abstract class BaseCalibrateCameraApp extends JPanel {
 			add(createVisualFlagPanel());
 			addLabeled(selectErrorScale.spinner, "Error Scale", "Increases the error visualization");
 			add(tabbedPane);
+		}
+
+		private void handleUpdatedTarget() {
+			BufferedImage preview = UtilCalibrationGui.renderTargetBuffered(
+					targetPanel.selected, targetPanel.getActiveConfig(), 40);
+			targetPreviewPanel.setImageUI(preview);
+			settingsChanged(true, false);
 		}
 
 		private JPanel createVisualFlagPanel() {
