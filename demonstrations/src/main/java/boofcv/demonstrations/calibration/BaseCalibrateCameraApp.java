@@ -158,7 +158,7 @@ public abstract class BaseCalibrateCameraApp extends JPanel {
 	}
 
 	protected void createAlgorithms() {
-		detectorSet.safe(()->{
+		detectorSet.safe(() -> {
 			if (targetChanged)
 				detectorSet.detector = configurePanel.targetPanel.createSingleTargetDetector();
 			detectorSet.calibrator = new CalibrateMonoPlanar(detectorSet.detector.getLayout());
@@ -215,12 +215,12 @@ public abstract class BaseCalibrateCameraApp extends JPanel {
 				imageListPanel.addImage(new File(path).getName(), detected);
 				// This will show the viewed image, but it won't be "selected". Selecting it will cause the image to
 				// be loaded again
-				imagePanel.setImage(buffered);
+				imagePanel.setBufferedImageNoChange(buffered);
 			});
 		}
 
 		// Officially change the selected image
-		SwingUtilities.invokeLater(() -> imageListPanel.setSelected(imageListPanel.imageNames.size()-1));
+		SwingUtilities.invokeLater(() -> imageListPanel.setSelected(imageListPanel.imageNames.size() - 1));
 	}
 
 	protected void openImages( String directoryPath ) {
@@ -284,7 +284,7 @@ public abstract class BaseCalibrateCameraApp extends JPanel {
 			return;
 		}
 		configurePanel.setImageSize(image.getWidth(), image.getHeight());
-		imagePanel.setImage(image);
+		imagePanel.setBufferedImageNoChange(image);
 		imagePanel.repaint();
 	}
 
@@ -413,6 +413,13 @@ public abstract class BaseCalibrateCameraApp extends JPanel {
 			panel.addMouseWheelListener(e -> setScale(BoofSwingUtil.mouseWheelImageZoom(scale, e)));
 		}
 
+		@Override public synchronized void setScale( double scale ) {
+			boolean changed = this.scale != scale;
+			super.setScale(scale);
+			if (changed)
+				configurePanel.setZoom(scale);
+		}
+
 		@Override
 		protected void paintInPanel( AffineTransform tran, Graphics2D g2 ) {
 			BoofSwingUtil.antialiasing(g2);
@@ -445,7 +452,7 @@ public abstract class BaseCalibrateCameraApp extends JPanel {
 			}
 
 			if (configurePanel.checkAll.value) {
-				results.safe(()->{
+				results.safe(() -> {
 					for (String imageName : results.imagePaths) {
 						CalibrationObservation l = results.imageObservations.get(imageName);
 						for (PointIndex2D_F64 p : l.points) {
@@ -627,7 +634,7 @@ public abstract class BaseCalibrateCameraApp extends JPanel {
 				}
 			} else if (source == zoom.spinner) {
 				zoom.updateValue();
-				imagePanel.repaint();
+				imagePanel.setScale(zoom.vdouble());
 			} else {
 				if (source == checkPoints.check) {
 					checkPoints.updateValue();
