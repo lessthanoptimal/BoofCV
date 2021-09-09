@@ -46,9 +46,8 @@ import java.util.List;
  * loads calibration images as inputs, calibrates, and saves results to an XML file. See in code comments for tuning
  * and implementation issues.
  *
- * @see CalibrateMonoPlanar
- *
  * @author Peter Abeles
+ * @see CalibrateMonoPlanar
  */
 public class ExampleCalibrateMonocular {
 	public static void main( String[] args ) {
@@ -70,7 +69,7 @@ public class ExampleCalibrateMonocular {
 		// Chessboard Example
 		detector = FactoryFiducialCalibration.chessboardX(null,
 				new ConfigGridDimen(/*numRows*/ 7,/*numCols*/ 5,/*shapeSize*/ 30));
-		images = UtilIO.listByPrefix(UtilIO.pathExample("calibration/stereo/Bumblebee2_Chess"),"left", null);
+		images = UtilIO.listByPrefix(UtilIO.pathExample("calibration/stereo/Bumblebee2_Chess"), "left", null);
 
 		// Declare and setup the calibration algorithm
 		CalibrateMonoPlanar calibrationAlg = new CalibrateMonoPlanar(detector.getLayout());
@@ -81,11 +80,11 @@ public class ExampleCalibrateMonocular {
 				/*numRadialParam*/ 2,
 				/*includeTangential*/ false);
 
-		for( String n : images ) {
+		for (String n : images) {
 			BufferedImage input = UtilImageIO.loadImage(n);
-			if( input != null ) {
-				GrayF32 image = ConvertBufferedImage.convertFrom(input,(GrayF32)null);
-				if( detector.process(image)) {
+			if (input != null) {
+				GrayF32 image = ConvertBufferedImage.convertFrom(input, (GrayF32)null);
+				if (detector.process(image)) {
 					calibrationAlg.addImage(detector.getDetectedPoints().copy());
 				} else {
 					System.err.println("Failed to detect target in " + n);

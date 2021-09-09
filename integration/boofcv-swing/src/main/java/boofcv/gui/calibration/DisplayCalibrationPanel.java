@@ -46,14 +46,14 @@ public abstract class DisplayCalibrationPanel extends ImageZoomPanel {
 	@Nullable ImageResults results = null;
 	@Nullable List<CalibrationObservation> allFeatures;
 
-	public SetScale setScale = (s)->{};
+	public SetScale setScale = ( s ) -> {};
 
 	public DisplayCalibrationPanel() {
 		panel.addMouseWheelListener(e -> setScale(BoofSwingUtil.mouseWheelImageZoom(scale, e)));
 	}
 
-	public void setResults(CalibrationObservation features , ImageResults results ,
-						   List<CalibrationObservation> allFeatures ) {
+	public void setResults( CalibrationObservation features, ImageResults results,
+							List<CalibrationObservation> allFeatures ) {
 		BoofSwingUtil.checkGuiThread();
 
 		this.features = features;
@@ -69,11 +69,10 @@ public abstract class DisplayCalibrationPanel extends ImageZoomPanel {
 		allFeatures = null;
 	}
 
-	public void setDisplay( boolean showPoints , boolean showErrors ,
-							boolean showUndistorted , boolean showAll , boolean showNumbers ,
+	public void setDisplay( boolean showPoints, boolean showErrors,
+							boolean showUndistorted, boolean showAll, boolean showNumbers,
 							boolean showOrder,
-							double errorScale )
-	{
+							double errorScale ) {
 		this.showPoints = showPoints;
 		this.showErrors = showErrors;
 		this.showUndistorted = showUndistorted;

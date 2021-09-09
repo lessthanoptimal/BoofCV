@@ -55,18 +55,18 @@ public class CameraPinholeBrown extends CameraPinhole implements Serializable {
 	public CameraPinholeBrown() {
 	}
 
-	public CameraPinholeBrown(int numRadial ) {
+	public CameraPinholeBrown( int numRadial ) {
 		radial = new double[numRadial];
 	}
 
-	public CameraPinholeBrown(CameraPinholeBrown param ) {
+	public CameraPinholeBrown( CameraPinholeBrown param ) {
 		setTo(param);
 	}
 
-	public CameraPinholeBrown(double fx, double fy,
-							  double skew,
-							  double cx, double cy,
-							  int width, int height ) {
+	public CameraPinholeBrown( double fx, double fy,
+							   double skew,
+							   double cx, double cy,
+							   int width, int height ) {
 		fsetK(fx, fy, skew, cx, cy, width, height);
 	}
 
@@ -79,17 +79,17 @@ public class CameraPinholeBrown extends CameraPinhole implements Serializable {
 	}
 
 	@Override
-	public CameraPinholeBrown fsetK(double fx, double fy,
-									double skew,
-									double cx, double cy,
-									int width, int height) {
+	public CameraPinholeBrown fsetK( double fx, double fy,
+									 double skew,
+									 double cx, double cy,
+									 int width, int height ) {
 		return (CameraPinholeBrown)super.fsetK(fx, fy, skew, cx, cy, width, height);
 	}
 
-	public CameraPinholeBrown fsetRadial(@Nullable double ...radial ) {
-		if( radial == null ) {
+	public CameraPinholeBrown fsetRadial( @Nullable double... radial ) {
+		if (radial == null) {
 			this.radial = null;
-		} else if( this.radial == null || this.radial.length != radial.length )
+		} else if (this.radial == null || this.radial.length != radial.length)
 			this.radial = radial.clone();
 		else {
 			for (int i = 0; i < radial.length; i++) {
@@ -99,7 +99,7 @@ public class CameraPinholeBrown extends CameraPinhole implements Serializable {
 		return this;
 	}
 
-	public CameraPinholeBrown fsetTangental(double t1 , double t2) {
+	public CameraPinholeBrown fsetTangental( double t1, double t2 ) {
 		this.t1 = t1;
 		this.t2 = t2;
 		return this;
@@ -107,11 +107,11 @@ public class CameraPinholeBrown extends CameraPinhole implements Serializable {
 
 	@Override
 	public void setTo( CameraPinhole param ) {
-		if( param instanceof CameraPinholeBrown) {
+		if (param instanceof CameraPinholeBrown) {
 			CameraPinholeBrown p = (CameraPinholeBrown)param;
 
 			p.fsetRadial(p.radial);
-			if( p.radial != null )
+			if (p.radial != null)
 				radial = p.radial.clone();
 			else
 				radial = null;
@@ -130,9 +130,9 @@ public class CameraPinholeBrown extends CameraPinhole implements Serializable {
 	 * If true then distortion parameters are specified.
 	 */
 	public boolean isDistorted() {
-		if( radial != null && radial.length > 0 ) {
+		if (radial != null && radial.length > 0) {
 			for (int i = 0; i < radial.length; i++) {
-				if( radial[i] != 0 )
+				if (radial[i] != 0)
 					return true;
 			}
 		}
@@ -140,9 +140,9 @@ public class CameraPinholeBrown extends CameraPinhole implements Serializable {
 	}
 
 	public boolean isDistorted( double tol ) {
-		if( radial != null && radial.length > 0 ) {
+		if (radial != null && radial.length > 0) {
 			for (int i = 0; i < radial.length; i++) {
-				if( Math.abs(radial[i]) > tol )
+				if (Math.abs(radial[i]) > tol)
 					return true;
 			}
 		}
@@ -153,21 +153,21 @@ public class CameraPinholeBrown extends CameraPinhole implements Serializable {
 		return radial;
 	}
 
-	public void setRadial(double... radial) {
+	public void setRadial( double... radial ) {
 		this.radial = radial;
 	}
 
 	@Override
 	public void print() {
 		super.print();
-		if( radial != null ) {
-			for( int i = 0; i < radial.length; i++ ) {
-				System.out.printf("radial[%d] = %6.2e\n",i,radial[i]);
+		if (radial != null) {
+			for (int i = 0; i < radial.length; i++) {
+				System.out.printf("radial[%d] = %6.2e\n", i, radial[i]);
 			}
 		} else {
 			System.out.println("No radial");
 		}
-		if( t1 != 0 || t2 != 0)
+		if (t1 != 0 || t2 != 0)
 			System.out.printf("tangential = ( %6.2e , %6.2e)\n", t1, t2);
 		else {
 			System.out.println("No tangential");
@@ -177,8 +177,7 @@ public class CameraPinholeBrown extends CameraPinhole implements Serializable {
 	@Override
 	public String toString() {
 		FancyPrint fp = new FancyPrint();
-		String txt =
-				"CameraPinholeRadial{" +
+		String txt = "CameraPinholeRadial{" +
 				"fx=" + fx +
 				", fy=" + fy +
 				", skew=" + skew +
@@ -186,24 +185,30 @@ public class CameraPinholeBrown extends CameraPinhole implements Serializable {
 				", cy=" + cy +
 				", width=" + width +
 				", height=" + height;
-		if( radial != null ) {
-			txt += ",";
-			for( int i = 0; i < radial.length; i++ ) {
-				txt += " r"+i+"="+fp.s(radial[i]);
-			}
-		}
-		if( t1 != 0 || t2 != 0) {
-			txt += ", t1="+fp.s(t1)+" t2="+fp.s(t2);
+		txt += toStringArray(fp, "r", radial);
+
+		if (t1 != 0 || t2 != 0) {
+			txt += ", t1=" + fp.s(t1) + " t2=" + fp.s(t2);
 		}
 		txt += '}';
+		return txt;
+	}
+
+	protected static String toStringArray( FancyPrint fp, String name, @Nullable double[] param ) {
+		if (param == null || param.length == 0)
+			return "";
+		String txt = ",";
+		for (int i = 0; i < param.length; i++) {
+			txt += " " + name + i + "=" + fp.s(param[i]);
+		}
 		return txt;
 	}
 
 	@Override
 	public <T extends CameraModel> T createLike() {
 		CameraPinholeBrown model = new CameraPinholeBrown();
-		if( radial != null )
-			model.radial = new double[ radial.length ];
+		if (radial != null)
+			model.radial = new double[radial.length];
 		return (T)model;
 	}
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -47,11 +47,13 @@ public class GlobalDemoSettings implements Cloneable {
 	private static String KEY_CONTROLS3D = "controls3D";
 	private static String KEY_VERBOSE_RUNTIME = "verboseRuntime";
 	private static String KEY_VERBOSE_TRACKING = "verboseTracking";
+	private static String KEY_VERBOSE_RECURSIVE = "verboseRecursive";
 
 	public ThemesUI theme = ThemesUI.DEFAULT;
 	public Controls3D controls3D = Controls3D.WASD;
 	public boolean verboseRuntime = false;
 	public boolean verboseTracking = false;
+	public boolean verboseRecursive = false;
 
 	static {
 		SETTINGS.load();
@@ -63,9 +65,10 @@ public class GlobalDemoSettings implements Cloneable {
 		try {
 			theme = ThemesUI.valueOf(prefs.get(KEY_THEME, theme.name()));
 			controls3D = Controls3D.valueOf(prefs.get(KEY_CONTROLS3D, controls3D.name()));
-			verboseRuntime = prefs.getBoolean(KEY_VERBOSE_RUNTIME,verboseRuntime);
-			verboseTracking = prefs.getBoolean(KEY_VERBOSE_TRACKING,verboseTracking);
-		} catch( RuntimeException e ) {
+			verboseRuntime = prefs.getBoolean(KEY_VERBOSE_RUNTIME, verboseRuntime);
+			verboseTracking = prefs.getBoolean(KEY_VERBOSE_TRACKING, verboseTracking);
+			verboseRecursive = prefs.getBoolean(KEY_VERBOSE_RECURSIVE, verboseRecursive);
+		} catch (RuntimeException e) {
 			// save the current state to fix whatever went wrong
 			save();
 			e.printStackTrace();
@@ -79,6 +82,7 @@ public class GlobalDemoSettings implements Cloneable {
 		prefs.put(KEY_CONTROLS3D, controls3D.name());
 		prefs.putBoolean(KEY_VERBOSE_RUNTIME, verboseRuntime);
 		prefs.putBoolean(KEY_VERBOSE_TRACKING, verboseTracking);
+		prefs.putBoolean(KEY_VERBOSE_RECURSIVE, verboseRecursive);
 
 		try {
 			prefs.sync();
@@ -88,38 +92,41 @@ public class GlobalDemoSettings implements Cloneable {
 	}
 
 	public void changeTheme() {
-		LookAndFeel selectedInstance=null;
-		String selectedName=null;
+		LookAndFeel selectedInstance = null;
+		String selectedName = null;
 
 		LafManager.enableLogging(false);
 
-		switch( theme ) {
-			case DEFAULT:
-				if( System.getProperty("os.name").contains("Mac OS X") )
+		switch (theme) {
+			case DEFAULT -> {
+				if (System.getProperty("os.name").contains("Mac OS X"))
 					selectedName = UIManager.getSystemLookAndFeelClassName();
 				else
 					selectedName = UIManager.getCrossPlatformLookAndFeelClassName();
-				break;
-			case DARKULA:
+			}
+			case DARKULA -> {
 				LafManager.setTheme(new DarculaTheme());
 				selectedName = DarkLaf.class.getCanonicalName();
-				break;
-			case INTELLIJ:
+			}
+			case INTELLIJ -> {
 				LafManager.setTheme(new IntelliJTheme());
 				selectedName = DarkLaf.class.getCanonicalName();
-				break;
-			case SOLARIZED:
+			}
+			case SOLARIZED -> {
 				LafManager.setTheme(new SolarizedLightTheme());
 				selectedName = DarkLaf.class.getCanonicalName();
-				break;
-			case MARS_DARK: selectedInstance = new MaterialLookAndFeel(new JMarsDarkTheme()); break;
-			case MATERIAL_LITE: selectedInstance = new MaterialLookAndFeel(new MaterialLiteTheme()); break;
-			case MATERIAL_OCEANIC: selectedInstance = new MaterialLookAndFeel(new MaterialOceanicTheme()); break;
-			default: System.err.println("BUG! Unknown Look and Feel "+theme); return;
+			}
+			case MARS_DARK -> selectedInstance = new MaterialLookAndFeel(new JMarsDarkTheme());
+			case MATERIAL_LITE -> selectedInstance = new MaterialLookAndFeel(new MaterialLiteTheme());
+			case MATERIAL_OCEANIC -> selectedInstance = new MaterialLookAndFeel(new MaterialOceanicTheme());
+			default -> {
+				System.err.println("BUG! Unknown Look and Feel " + theme);
+				return;
+			}
 		}
 
 		try {
-			if( selectedInstance == null ) {
+			if (selectedInstance == null) {
 				UIManager.setLookAndFeel(selectedName);
 			} else {
 				UIManager.setLookAndFeel(selectedInstance);
@@ -147,7 +154,7 @@ public class GlobalDemoSettings implements Cloneable {
 		MATERIAL_LITE("Material Lite"),
 		MATERIAL_OCEANIC("Material Oceanic");
 
-		ThemesUI(String name) {
+		ThemesUI( String name ) {
 			this.name = name;
 		}
 

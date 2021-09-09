@@ -18,6 +18,10 @@
 
 package boofcv.struct.calib;
 
+import org.ejml.FancyPrint;
+
+import static boofcv.struct.calib.CameraPinholeBrown.toStringArray;
+
 /**
  * <p>Camera model for omnidirectional single viewpoint sensors [1]. Designed to work with parabolic,
  * hyperbolic, wide-angle, and spherical sensors. The FOV that this model can describe is dependent
@@ -158,6 +162,25 @@ public class CameraUniversalOmni extends CameraPinhole {
 
 	public void setMirrorOffset( double mirrorOffset ) {
 		this.mirrorOffset = mirrorOffset;
+	}
+
+	@Override public String toString() {
+		FancyPrint fp = new FancyPrint();
+		String txt = "CameraUniversalOmni{" +
+				"width=" + width +
+				", height=" + height +
+				", fx=" + fx +
+				", fy=" + fy +
+				", skew=" + skew +
+				", cx=" + cx +
+				", cy=" + cy +
+				", mirrorOffset=" + fp.s(mirrorOffset);
+		txt += toStringArray(fp, "r", radial);
+		if (t1 != 0 || t2 != 0) {
+			txt += ", t1=" + fp.s(t1) + " t2=" + fp.s(t2);
+		}
+		txt += '}';
+		return txt;
 	}
 
 	@Override
