@@ -21,17 +21,20 @@ package boofcv.demonstrations.calibration;
 import boofcv.abst.geo.calibration.CalibrateMonoPlanar;
 import boofcv.abst.geo.calibration.DetectSingleFiducialCalibration;
 import boofcv.abst.geo.calibration.ImageResults;
+import boofcv.alg.distort.LensDistortionWideFOV;
 import boofcv.alg.fiducial.calib.ConfigCalibrationTarget;
 import boofcv.alg.geo.calibration.CalibrationObservation;
-import boofcv.demonstrations.shapes.ShapeVisualizePanel;
+import boofcv.factory.distort.LensDistortionFactory;
 import boofcv.gui.BoofSwingUtil;
 import boofcv.gui.StandardAlgConfigPanel;
+import boofcv.gui.calibration.DisplayCalibrationPanel;
+import boofcv.gui.calibration.DisplayFisheyeCalibrationPanel;
+import boofcv.gui.calibration.DisplayPinholeCalibrationPanel;
 import boofcv.gui.calibration.UtilCalibrationGui;
 import boofcv.gui.controls.CalibrationModelPanel;
 import boofcv.gui.controls.CalibrationTargetPanel;
 import boofcv.gui.controls.JCheckBoxValue;
 import boofcv.gui.controls.JSpinnerNumber;
-import boofcv.gui.feature.VisualizeFeatures;
 import boofcv.gui.image.ImagePanel;
 import boofcv.gui.image.ScaleOptions;
 import boofcv.gui.settings.GlobalSettingsControls;
@@ -40,10 +43,10 @@ import boofcv.io.image.ConvertBufferedImage;
 import boofcv.io.image.UtilImageIO;
 import boofcv.misc.BoofMiscOps;
 import boofcv.misc.VariableLockSet;
-import boofcv.struct.geo.PointIndex2D_F64;
+import boofcv.struct.calib.CameraModel;
+import boofcv.struct.calib.CameraModelType;
+import boofcv.struct.calib.CameraPinholeBrown;
 import boofcv.struct.image.GrayF32;
-import georegression.struct.point.Point2D_F32;
-import georegression.struct.point.Point2D_F64;
 import org.ddogleg.struct.DogArray_B;
 import org.ddogleg.struct.DogArray_I32;
 import org.jetbrains.annotations.Nullable;
@@ -54,9 +57,6 @@ import javax.swing.event.ListSelectionListener;
 import javax.swing.filechooser.FileNameExtensionFilter;
 import java.awt.*;
 import java.awt.event.KeyEvent;
-import java.awt.geom.AffineTransform;
-import java.awt.geom.Ellipse2D;
-import java.awt.geom.Line2D;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.util.ArrayList;
@@ -66,7 +66,6 @@ import java.util.Map;
 
 import static boofcv.gui.BoofSwingUtil.MAX_ZOOM;
 import static boofcv.gui.BoofSwingUtil.MIN_ZOOM;
-import static boofcv.gui.calibration.DisplayPinholeCalibrationPanel.drawNumbers;
 
 /**
  * Base class for camera calibration applications
@@ -75,7 +74,6 @@ import static boofcv.gui.calibration.DisplayPinholeCalibrationPanel.drawNumbers;
  */
 public abstract class BaseCalibrateCameraApp extends JPanel {
 	public static final String CALIBRATION_TARGET = "calibration_target.yaml";
-	// TODO render undistorted
 	// TODO show calibration in GUI
 	// TODO statistics summary in GUI
 	// TODO select landmark and remove landmark
@@ -86,7 +84,6 @@ public abstract class BaseCalibrateCameraApp extends JPanel {
 	// TODO cache most recently viewed images
 
 	protected JMenuBar menuBar;
-	protected JMenuItem menuItemFile, menuItemWebcam, menuItemQuit;
 	protected JMenu menuRecent;
 
 	// Window the application is shown in
@@ -98,7 +95,11 @@ public abstract class BaseCalibrateCameraApp extends JPanel {
 	//----------------------- GUI owned objects
 	protected ConfigureInfoPanel configurePanel = new ConfigureInfoPanel();
 	protected ImageListPanel imageListPanel = new ImageListPanel();
-	protected ImageCalibrationPanel imagePanel = new ImageCalibrationPanel();
+	//	protected ImageCalibrationPanel imagePanel = new ImageCalibrationPanel();
+	protected DisplayFisheyeCalibrationPanel fisheyePanel = new DisplayFisheyeCalibrationPanel();
+	protected DisplayPinholeCalibrationPanel pinholePanel = new DisplayPinholeCalibrationPanel();
+	protected boolean cameraIsPinhole = true;
+
 	//--------------------------------------------------------------------
 
 	// Directory where images were loaded from
@@ -115,7 +116,22 @@ public abstract class BaseCalibrateCameraApp extends JPanel {
 	}
 
 	public BaseCalibrateCameraApp() {
+		setLayout(new BorderLayout());
 		imageListPanel.setPreferredSize(new Dimension(200, 200));
+
+		// When these images change value pass on the scale
+		fisheyePanel.setScale = ( scale ) -> configurePanel.setZoom(scale);
+		pinholePanel.setScale = ( scale ) -> configurePanel.setZoom(scale);
+
+		updateVisualizationSettings();
+		getCalibrationPanel().setPreferredSize(new Dimension(600, 720));
+
+		createMenuBar();
+		add(configurePanel, BorderLayout.WEST);
+		add(imageListPanel, BorderLayout.EAST);
+		add(getCalibrationPanel(), BorderLayout.CENTER);
+
+		createAlgorithms();
 	}
 
 	protected void createMenuBar() {
@@ -125,10 +141,10 @@ public abstract class BaseCalibrateCameraApp extends JPanel {
 		menuFile.setMnemonic(KeyEvent.VK_F);
 		menuBar.add(menuFile);
 
-		this.menuItemFile = new JMenuItem("Open Images");
+		var menuItemFile = new JMenuItem("Open Images");
 		BoofSwingUtil.setMenuItemKeys(menuItemFile, KeyEvent.VK_O, KeyEvent.VK_O);
-		this.menuItemFile.addActionListener(( e ) -> openImages());
-		menuFile.add(this.menuItemFile);
+		menuItemFile.addActionListener(( e ) -> openImages());
+		menuFile.add(menuItemFile);
 
 		menuRecent = new JMenu("Open Recent");
 		menuFile.add(menuRecent);
@@ -141,7 +157,7 @@ public abstract class BaseCalibrateCameraApp extends JPanel {
 		JMenuItem menuSettings = new JMenuItem("Settings");
 		menuSettings.addActionListener(e -> new GlobalSettingsControls().showDialog(window, this));
 
-		menuItemQuit = new JMenuItem("Quit", KeyEvent.VK_Q);
+		var menuItemQuit = new JMenuItem("Quit", KeyEvent.VK_Q);
 		menuItemQuit.addActionListener((e -> System.exit(0)));
 		BoofSwingUtil.setMenuItemKeys(menuItemQuit, KeyEvent.VK_Q, KeyEvent.VK_Q);
 
@@ -188,6 +204,9 @@ public abstract class BaseCalibrateCameraApp extends JPanel {
 		processDirectory(selected);
 	}
 
+	/**
+	 * Change camera model
+	 */
 	protected void createAlgorithms() {
 		detectorSet.safe(() -> {
 			if (targetChanged)
@@ -195,6 +214,27 @@ public abstract class BaseCalibrateCameraApp extends JPanel {
 			detectorSet.calibrator = new CalibrateMonoPlanar(detectorSet.detector.getLayout());
 			configurePanel.modelPanel.configureCalibrator(detectorSet.calibrator);
 		});
+
+		// See which type of camera model is active
+		boolean isPinhole = configurePanel.modelPanel.selected == CameraModelType.BROWN;
+
+		// Switch image visualization if it's a pinhole or fisheye model
+		SwingUtilities.invokeLater(() -> {
+			if (isPinhole != cameraIsPinhole) {
+				// Pass in the image to the now active panel
+				BufferedImage image = getCalibrationPanel().getImage();
+				remove(getCalibrationPanel());
+				cameraIsPinhole = isPinhole;
+				add(getCalibrationPanel(), BorderLayout.CENTER);
+
+				// Synchronize the image panel's state with the latest settings
+				getCalibrationPanel().setBufferedImageNoChange(image);
+				getCalibrationPanel().setScale(configurePanel.zoom.vdouble());
+				updateVisualizationSettings();
+				validate();
+			}
+		});
+
 
 		targetChanged = false;
 		calibratorChanged = false;
@@ -209,7 +249,7 @@ public abstract class BaseCalibrateCameraApp extends JPanel {
 			return;
 
 		// If the calibration target type is specified load that
-		File fileTarget = new File(directory, CALIBRATION_TARGET);
+		var fileTarget = new File(directory, CALIBRATION_TARGET);
 		if (fileTarget.exists()) {
 			System.out.println("Loading calibration target at " + fileTarget.getPath());
 			try {
@@ -244,7 +284,11 @@ public abstract class BaseCalibrateCameraApp extends JPanel {
 	public void processFiles( List<String> foundImages ) {
 		// reset all data structures
 		results.reset();
-		SwingUtilities.invokeLater(() -> imageListPanel.clearImages());
+		SwingUtilities.invokeLater(() -> {
+			imageListPanel.clearImages();
+			getCalibrationPanel().clearCalibration();
+			getCalibrationPanel().clearResults();
+		});
 
 		// Load and detect calibration targets
 		GrayF32 gray = new GrayF32(1, 1);
@@ -255,7 +299,7 @@ public abstract class BaseCalibrateCameraApp extends JPanel {
 				continue;
 			}
 
-			// Convert to gray and detect the marker inside of it
+			// Convert to gray and detect the marker inside it
 			ConvertBufferedImage.convertFrom(buffered, gray);
 
 			detectorSet.lock();
@@ -280,19 +324,26 @@ public abstract class BaseCalibrateCameraApp extends JPanel {
 				results.imagePaths.add(path);
 				results.imageObservations.put(path, observation);
 				// only images with 4 points can be used in calibration
-				if (observation.points.size() >= 4)
+				if (observation.points.size() >= 4) {
 					results.usedImages.add(results.imagePaths.size() - 1);
+					results.allObservations.add(observation);
+				}
 			});
 			SwingUtilities.invokeLater(() -> {
 				imageListPanel.addImage(new File(path).getName(), detected);
 				// This will show the viewed image, but it won't be "selected". Selecting it will cause the image to
 				// be loaded again
-				imagePanel.setBufferedImageNoChange(buffered);
+				getCalibrationPanel().setBufferedImageNoChange(buffered);
+				getCalibrationPanel().repaint();
 			});
 		}
 
 		// Officially change the selected image
 		SwingUtilities.invokeLater(() -> imageListPanel.setSelected(imageListPanel.imageNames.size() - 1));
+	}
+
+	protected DisplayCalibrationPanel getCalibrationPanel() {
+		return cameraIsPinhole ? pinholePanel : fisheyePanel;
 	}
 
 	protected void openImages( String directoryPath ) {
@@ -344,6 +395,9 @@ public abstract class BaseCalibrateCameraApp extends JPanel {
 	 * Change which image is being displayed. Request from GUI
 	 */
 	private void changeSelectedGUI( int index ) {
+		if (index < 0 || index >= results.imagePaths.size())
+			return;
+
 		BoofSwingUtil.checkGuiThread();
 
 		// Change the item selected in the list
@@ -356,8 +410,12 @@ public abstract class BaseCalibrateCameraApp extends JPanel {
 			return;
 		}
 		configurePanel.setImageSize(image.getWidth(), image.getHeight());
-		imagePanel.setBufferedImageNoChange(image);
-		imagePanel.repaint();
+		getCalibrationPanel().setBufferedImageNoChange(image);
+
+		CalibrationObservation imageObservations = getObservationsForSelected();
+		ImageResults imageResults = getResultsForSelected();
+		getCalibrationPanel().setResults(imageObservations, imageResults, results.allObservations);
+		getCalibrationPanel().repaint();
 	}
 
 	protected void handleProcessCalled( @Nullable List<String> imagePaths ) {
@@ -373,21 +431,22 @@ public abstract class BaseCalibrateCameraApp extends JPanel {
 				imagePaths = l;
 			}
 
-			System.out.println("Detecting targets again");
 			// Disable the menu bar so the user can't try to open more images
 			SwingUtilities.invokeLater(() -> setMenuBarEnabled(false));
 			processFiles(imagePaths);
 		}
 
-		System.out.println("Computing calibration");
 		calibrateFromCorners();
-		SwingUtilities.invokeLater(() -> imagePanel.repaint());
+		SwingUtilities.invokeLater(() -> getCalibrationPanel().repaint());
 	}
 
 	protected void calibrateFromCorners() {
 		BoofSwingUtil.checkNotGuiThread();
 		if (runningCalibration)
 			return;
+
+		SwingUtilities.invokeLater(() -> getCalibrationPanel().clearCalibration());
+
 		runningCalibration = true;
 		detectorSet.lock();
 		try {
@@ -413,7 +472,23 @@ public abstract class BaseCalibrateCameraApp extends JPanel {
 			});
 
 			detectorSet.calibrator.printStatistics(System.out);
-			SwingUtilities.invokeLater(() -> configurePanel.bCompute.setEnabled(false));
+
+			SwingUtilities.invokeLater(() -> detectorSet.safe(() -> {
+				// pass in the new calibrated camera
+				CameraModel foundIntrinsics = detectorSet.calibrator.getIntrinsic();
+				if (cameraIsPinhole) {
+					pinholePanel.setCalibration((CameraPinholeBrown)foundIntrinsics);
+				} else {
+					LensDistortionWideFOV model = LensDistortionFactory.wide(foundIntrinsics);
+					fisheyePanel.setCalibration(model, foundIntrinsics.width, foundIntrinsics.height);
+				}
+				configurePanel.bCompute.setEnabled(false);
+
+				// Force it to redraw with new image features
+				int selected = imageListPanel.imageList.getSelectedIndex();
+				imageListPanel.imageList.clearSelection();
+				imageListPanel.setSelected(selected);
+			}));
 		} catch (RuntimeException e) {
 			e.printStackTrace();
 			SwingUtilities.invokeLater(() -> BoofSwingUtil.warningDialog(this, e));
@@ -453,123 +528,12 @@ public abstract class BaseCalibrateCameraApp extends JPanel {
 		});
 	}
 
-	public static void renderOrder( Graphics2D g2, double scale, List<PointIndex2D_F64> points ) {
-		g2.setStroke(new BasicStroke(5));
-
-		Line2D.Double l = new Line2D.Double();
-
-		for (int i = 0, j = 1; j < points.size(); i = j, j++) {
-			Point2D_F64 p0 = points.get(i).p;
-			Point2D_F64 p1 = points.get(j).p;
-
-			double fraction = i/((double)points.size() - 2);
-//			fraction = fraction * 0.8 + 0.1;
-
-			int red = (int)(0xFF*fraction) + (int)(0x00*(1 - fraction));
-			int green = 0x00;
-			int blue = (int)(0x00*fraction) + (int)(0xff*(1 - fraction));
-
-			int lineRGB = red << 16 | green << 8 | blue;
-
-			l.setLine(scale*p0.x, scale*p0.y, scale*p1.x, scale*p1.y);
-
-			g2.setColor(new Color(lineRGB));
-			g2.draw(l);
-		}
-	}
-
-	/**
-	 * Displays and visualizes calibration information for a sepcific image
-	 */
-	protected class ImageCalibrationPanel extends ShapeVisualizePanel {
-		Ellipse2D.Double ellipse = new Ellipse2D.Double();
-		Point2D_F32 adj = new Point2D_F32();
-
-		@Override public synchronized void setScale( double scale ) {
-			// Avoid endless loops by making sure it's changing
-			if (this.scale == scale)
-				return;
-			super.setScale(scale);
-			configurePanel.setZoom(scale);
-		}
-
-		@Override
-		protected void paintInPanel( AffineTransform tran, Graphics2D g2 ) {
-			BoofSwingUtil.antialiasing(g2);
-
-			CalibrationObservation set = getObservationsForSelected();
-			if (set == null)
-				return;
-
-			if (configurePanel.checkOrder.value) {
-				renderOrder(g2, scale, set.points);
-			}
-
-			if (configurePanel.checkPoints.value) {
-				g2.setColor(Color.BLACK);
-				g2.setStroke(new BasicStroke(3));
-				for (PointIndex2D_F64 p : set.points) {
-					adj.setTo((float)p.p.x, (float)p.p.y);
-					VisualizeFeatures.drawCross(g2, adj.x*scale, adj.y*scale, 4);
-				}
-				g2.setStroke(new BasicStroke(1));
-				g2.setColor(Color.RED);
-				for (PointIndex2D_F64 p : set.points) {
-					adj.setTo((float)p.p.x, (float)p.p.y);
-					VisualizeFeatures.drawCross(g2, adj.x*scale, adj.y*scale, 4);
-				}
-			}
-
-			if (configurePanel.checkNumbers.value) {
-				drawNumbers(g2, set.points, null, scale);
-			}
-
-			if (configurePanel.checkAll.value) {
-				results.safe(() -> {
-					for (String imageName : results.imagePaths) {
-						CalibrationObservation l = results.imageObservations.get(imageName);
-						for (PointIndex2D_F64 p : l.points) {
-							adj.setTo((float)p.p.x, (float)p.p.y);
-							VisualizeFeatures.drawPoint(g2, adj.x*scale, adj.y*scale, 3, Color.BLUE, Color.WHITE, ellipse);
-						}
-					}
-				});
-			}
-
-			ImageResults results = getResultsForSelected();
-			if (results == null)
-				return;
-
-			if (configurePanel.checkErrors.value) {
-				double errorScale = configurePanel.selectErrorScale.value.doubleValue();
-				g2.setStroke(new BasicStroke(4));
-				g2.setColor(Color.BLACK);
-				for (int i = 0; i < set.size(); i++) {
-					PointIndex2D_F64 p = set.get(i);
-					adj.setTo((float)p.p.x, (float)p.p.y);
-
-					double r = errorScale*results.pointError[i];
-					if (r < 1)
-						continue;
-
-					VisualizeFeatures.drawCircle(g2, adj.x*scale, adj.y*scale, r, ellipse);
-				}
-
-				g2.setStroke(new BasicStroke(2.5f));
-				g2.setColor(Color.ORANGE);
-				for (int i = 0; i < set.size(); i++) {
-					PointIndex2D_F64 p = set.get(i);
-					adj.setTo((float)p.p.x, (float)p.p.y);
-
-					double r = errorScale*results.pointError[i];
-					if (r < 1)
-						continue;
-
-
-					VisualizeFeatures.drawCircle(g2, adj.x*scale, adj.y*scale, r);
-				}
-			}
-		}
+	protected void updateVisualizationSettings() {
+		DisplayCalibrationPanel panel = getCalibrationPanel();
+		panel.setDisplay(configurePanel.checkPoints.value, configurePanel.checkErrors.value,
+				configurePanel.checkUndistorted.value, configurePanel.checkAll.value,
+				configurePanel.checkNumbers.value, configurePanel.checkOrder.value, configurePanel.selectErrorScale.vdouble());
+		panel.repaint();
 	}
 
 	/**
@@ -739,7 +703,7 @@ public abstract class BaseCalibrateCameraApp extends JPanel {
 				}
 			} else if (source == zoom.spinner) {
 				zoom.updateValue();
-				imagePanel.setScale(zoom.vdouble());
+				getCalibrationPanel().setScale(zoom.vdouble());
 			} else {
 				if (source == checkPoints.check) {
 					checkPoints.updateValue();
@@ -756,7 +720,7 @@ public abstract class BaseCalibrateCameraApp extends JPanel {
 				} else if (source == selectErrorScale.spinner) {
 					selectErrorScale.updateValue();
 				}
-				imagePanel.repaint();
+				updateVisualizationSettings();
 			}
 		}
 	}
@@ -772,6 +736,7 @@ public abstract class BaseCalibrateCameraApp extends JPanel {
 		// List of found observations and results
 		protected final Map<String, CalibrationObservation> imageObservations = new HashMap<>();
 		protected final Map<String, ImageResults> imageResults = new HashMap<>();
+		protected final List<CalibrationObservation> allObservations = new ArrayList<>();
 		// Index of images used when calibrating
 		protected final DogArray_I32 usedImages = new DogArray_I32();
 
@@ -781,6 +746,7 @@ public abstract class BaseCalibrateCameraApp extends JPanel {
 				imageObservations.clear();
 				imageResults.clear();
 				usedImages.reset();
+				allObservations.clear();
 			});
 		}
 	}

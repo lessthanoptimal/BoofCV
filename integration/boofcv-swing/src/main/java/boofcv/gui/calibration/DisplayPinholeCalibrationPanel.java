@@ -44,7 +44,10 @@ import org.ejml.data.DMatrixRMaj;
 import org.ejml.data.FMatrixRMaj;
 import org.ejml.ops.ConvertMatrixData;
 
+import javax.swing.*;
 import java.awt.*;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 import java.awt.geom.AffineTransform;
 import java.awt.geom.Ellipse2D;
 import java.awt.geom.Line2D;
@@ -57,15 +60,13 @@ import java.util.List;
  *
  * @author Peter Abeles
  */
-public class DisplayPinholeCalibrationPanel extends DisplayCalibrationPanel<CameraPinholeBrown> {
+public class DisplayPinholeCalibrationPanel extends DisplayCalibrationPanel {
 
 	// which image is being displayed
 	int selectedImage;
 	// for displaying undistorted image
 	BufferedImage distorted;
 	BufferedImage undistorted;
-	// true if the image has been undistorted
-	boolean isUndistorted = false;
 
 	// for displaying corrected image
 	Planar<GrayF32> origMS = new Planar<>(GrayF32.class, 1, 1, 3);
@@ -77,10 +78,23 @@ public class DisplayPinholeCalibrationPanel extends DisplayCalibrationPanel<Came
 	// int horizontal line
 	int lineY = -1;
 
-	@Override
-	public synchronized void setImage( BufferedImage image ) {
-		this.distorted = image;
+	public DisplayPinholeCalibrationPanel() {
+		// navigate using left mouse clicks
+		panel.addMouseListener(new MouseAdapter() {
+			@Override
+			public void mousePressed( MouseEvent e) {
+				panel.requestFocus();
+				if( SwingUtilities.isLeftMouseButton(e)) {
+					Point2D_F64 p = pixelToPoint(e.getX(), e.getY());
+					centerView(p.x,p.y);
+				}
+			}
+		});
+	}
 
+	@Override
+	public synchronized void setBufferedImageNoChange( BufferedImage image ) {
+		this.distorted = image;
 		undoRadialDistortion(distorted);
 	}
 
@@ -109,7 +123,7 @@ public class DisplayPinholeCalibrationPanel extends DisplayCalibrationPanel<Came
 	}
 
 	private void undoRadialDistortion( BufferedImage image ) {
-		if (undoRadial == null)
+		if (undoRadial == null || image == null)
 			return;
 
 		ConvertBufferedImage.convertFrom(image, origMS, true);
@@ -245,7 +259,6 @@ public class DisplayPinholeCalibrationPanel extends DisplayCalibrationPanel<Came
 		}
 	}
 
-	@Override
 	public void setCalibration( CameraPinholeBrown param ) {
 		CameraPinhole undistorted = new CameraPinhole(param);
 		this.undoRadial = LensDistortionOps.changeCameraModel(
@@ -416,5 +429,9 @@ public class DisplayPinholeCalibrationPanel extends DisplayCalibrationPanel<Came
 			g2.setColor(Color.GREEN);
 			g2.drawString(text, x, y);
 		}
+	}
+
+	@Override public void clearCalibration() {
+		undoRadial = null;
 	}
 }

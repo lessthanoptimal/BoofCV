@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -64,7 +64,7 @@ public abstract class CalibratedPlanarPanel<CM extends CameraModel> extends JPan
 	int errorScale = 20;
 
 	ViewedImageInfoPanel viewInfo = new ViewedImageInfoPanel();
-	public DisplayCalibrationPanel<CM> mainView;
+	public DisplayCalibrationPanel mainView;
 
 	JList<String> imageList;
 

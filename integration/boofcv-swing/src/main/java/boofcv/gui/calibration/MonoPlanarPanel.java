@@ -134,7 +134,7 @@ public class MonoPlanarPanel extends CalibratedPlanarPanel<CameraPinholeBrown>
 	@Override
 	public void setCorrection( CameraPinholeBrown param ) {
 		checkUndistorted.setEnabled(true);
-		mainView.setCalibration(param);
+		((DisplayPinholeCalibrationPanel)mainView).setCalibration(param);
 	}
 
 	@Override
