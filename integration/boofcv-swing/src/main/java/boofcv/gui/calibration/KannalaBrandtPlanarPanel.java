@@ -20,7 +20,9 @@ package boofcv.gui.calibration;
 
 import boofcv.abst.geo.bundle.SceneStructureMetric;
 import boofcv.abst.geo.calibration.ImageResults;
+import boofcv.alg.distort.LensDistortionWideFOV;
 import boofcv.alg.geo.calibration.CalibrationObservation;
+import boofcv.factory.distort.LensDistortionFactory;
 import boofcv.gui.StandardAlgConfigPanel;
 import boofcv.gui.ViewedImageInfoPanel;
 import boofcv.struct.calib.CameraKannalaBrandt;
@@ -120,7 +122,8 @@ public class KannalaBrandtPlanarPanel extends CalibratedPlanarPanel<CameraKannal
 	@Override
 	public void setCorrection( CameraKannalaBrandt param ) {
 		checkUndistorted.setEnabled(true);
-		mainView.setCalibration(param);
+		LensDistortionWideFOV model = LensDistortionFactory.wide(param);
+		((DisplayFisheyeCalibrationPanel)mainView).setCalibration(model, param.width, param.height);
 	}
 
 	@Override

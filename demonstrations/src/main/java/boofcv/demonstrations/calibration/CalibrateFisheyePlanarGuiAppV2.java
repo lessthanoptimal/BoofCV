@@ -18,9 +18,7 @@
 
 package boofcv.demonstrations.calibration;
 
-import boofcv.io.MediaManager;
 import boofcv.io.UtilIO;
-import boofcv.io.wrapper.DefaultMediaManager;
 
 import javax.swing.*;
 import java.awt.*;
@@ -33,26 +31,6 @@ import java.io.File;
  * @author Peter Abeles
  */
 public class CalibrateFisheyePlanarGuiAppV2 extends BaseCalibrateCameraApp {
-
-	// needed by ProcessThread for displaying its dialog
-	JPanel owner;
-
-	MediaManager media = DefaultMediaManager.INSTANCE;
-
-	public CalibrateFisheyePlanarGuiAppV2( ) {
-		setLayout(new BorderLayout());
-
-		imagePanel.setPreferredSize(new Dimension(600, 720));
-		this.owner = this;
-
-		createMenuBar();
-		add(configurePanel, BorderLayout.WEST);
-		add(imageListPanel, BorderLayout.EAST);
-		add(imagePanel, BorderLayout.CENTER);
-
-		createAlgorithms();
-	}
-
 	public static void main( String[] args ) {
 		File directory = new File(UtilIO.pathExample("calibration/fisheye/chessboard"));
 //		File directory = new File(UtilIO.pathExample("calibration/fisheye/square_grid"));

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -22,14 +22,14 @@ import boofcv.abst.geo.calibration.ImageResults;
 import boofcv.alg.geo.calibration.CalibrationObservation;
 import boofcv.gui.BoofSwingUtil;
 import boofcv.gui.image.ImageZoomPanel;
-import boofcv.struct.calib.CameraModel;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
 
 /**
  * @author Peter Abeles
  */
-public abstract class DisplayCalibrationPanel<CM extends CameraModel> extends ImageZoomPanel {
+public abstract class DisplayCalibrationPanel extends ImageZoomPanel {
 
 	// configures what is displayed or not
 	boolean showPoints = true;
@@ -41,10 +41,16 @@ public abstract class DisplayCalibrationPanel<CM extends CameraModel> extends Im
 	double errorScale;
 
 	// observed feature locations
-	CalibrationObservation features = null;
+	@Nullable CalibrationObservation features = null;
 	// results of calibration
-	ImageResults results = null;
-	List<CalibrationObservation> allFeatures;
+	@Nullable ImageResults results = null;
+	@Nullable List<CalibrationObservation> allFeatures;
+
+	public SetScale setScale = (s)->{};
+
+	public DisplayCalibrationPanel() {
+		panel.addMouseWheelListener(e -> setScale(BoofSwingUtil.mouseWheelImageZoom(scale, e)));
+	}
 
 	public void setResults(CalibrationObservation features , ImageResults results ,
 						   List<CalibrationObservation> allFeatures ) {
@@ -53,6 +59,14 @@ public abstract class DisplayCalibrationPanel<CM extends CameraModel> extends Im
 		this.features = features;
 		this.results = results;
 		this.allFeatures = allFeatures;
+	}
+
+	public void clearResults() {
+		BoofSwingUtil.checkGuiThread();
+
+		features = null;
+		results = null;
+		allFeatures = null;
 	}
 
 	public void setDisplay( boolean showPoints , boolean showErrors ,
@@ -69,5 +83,20 @@ public abstract class DisplayCalibrationPanel<CM extends CameraModel> extends Im
 		this.errorScale = errorScale;
 	}
 
-	public abstract void setCalibration(CM model);
+	@Override public synchronized void setScale( double scale ) {
+		// Avoid endless loops by making sure it's changing
+		if (this.scale == scale)
+			return;
+		super.setScale(scale);
+		setScale.setScale(scale);
+	}
+
+	/**
+	 * Forgets the previously passed in calibration
+	 */
+	public abstract void clearCalibration();
+
+	@FunctionalInterface public interface SetScale {
+		void setScale( double scale );
+	}
 }

@@ -167,7 +167,7 @@ public class ImageZoomPanel extends JScrollPane {
 			beforeWidth = this.img.getWidth();
 			beforeHeight = this.img.getHeight();
 		}
-		this.img = image;
+		setBufferedImageNoChange(image);
 		// only update size if the image size has changed
 		if (image != null && hasImageChanged && beforeWidth != image.getWidth() && beforeHeight != image.getHeight()) {
 			updateSize(image.getWidth(), image.getHeight());

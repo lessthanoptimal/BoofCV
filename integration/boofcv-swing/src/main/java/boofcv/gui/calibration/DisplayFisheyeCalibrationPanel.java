@@ -27,13 +27,11 @@ import boofcv.alg.geo.calibration.CalibrationObservation;
 import boofcv.alg.interpolate.InterpolatePixel;
 import boofcv.alg.interpolate.InterpolationType;
 import boofcv.factory.distort.FactoryDistort;
-import boofcv.factory.distort.LensDistortionFactory;
 import boofcv.factory.interpolate.FactoryInterpolation;
 import boofcv.gui.BoofSwingUtil;
 import boofcv.gui.feature.VisualizeFeatures;
 import boofcv.io.image.ConvertBufferedImage;
 import boofcv.struct.border.BorderType;
-import boofcv.struct.calib.CameraModel;
 import boofcv.struct.calib.CameraPinhole;
 import boofcv.struct.distort.PointToPixelTransform_F32;
 import boofcv.struct.geo.PointIndex2D_F64;
@@ -48,7 +46,9 @@ import georegression.struct.point.Point3D_F32;
 import georegression.struct.point.Vector3D_F32;
 import georegression.struct.so.Rodrigues_F32;
 import org.ejml.data.FMatrixRMaj;
+import org.jetbrains.annotations.Nullable;
 
+import javax.swing.*;
 import java.awt.*;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
@@ -66,10 +66,10 @@ import static boofcv.gui.calibration.DisplayPinholeCalibrationPanel.drawNumbers;
  *
  * @author Peter Abeles
  */
-public class DisplayFisheyeCalibrationPanel<CM extends CameraModel> extends DisplayCalibrationPanel<CM> {
+public class DisplayFisheyeCalibrationPanel extends DisplayCalibrationPanel {
 
-	NarrowToWidePtoP_F32 distorter;
-	LensDistortionWideFOV fisheyeDistort;
+	@Nullable NarrowToWidePtoP_F32 distorter;
+	@Nullable LensDistortionWideFOV fisheyeDistort;
 	ImageDistort<Planar<GrayF32>, Planar<GrayF32>> distortImage;
 
 	Planar<GrayF32> imageFisheye = new Planar<>(GrayF32.class, 1, 1, 3);
@@ -82,7 +82,6 @@ public class DisplayFisheyeCalibrationPanel<CM extends CameraModel> extends Disp
 	double pixelX, pixelY;
 
 	public DisplayFisheyeCalibrationPanel() {
-
 		MouseAdapter adapter = new MouseAdapter() {
 			@Override
 			public void mouseDragged( MouseEvent e ) {
@@ -101,12 +100,25 @@ public class DisplayFisheyeCalibrationPanel<CM extends CameraModel> extends Disp
 			}
 		};
 		panel.addMouseMotionListener(adapter);
+
+		panel.addMouseListener(new MouseAdapter() {
+			@Override
+			public void mousePressed(MouseEvent e) {
+				// don't navigate using clicks when undistorting
+				if (showUndistorted)
+					return;
+				panel.requestFocus();
+				if( SwingUtilities.isLeftMouseButton(e)) {
+					Point2D_F64 p = pixelToPoint(e.getX(), e.getY());
+					centerView(p.x,p.y);
+				}
+			}
+		});
 	}
 
 	@Override
-	public synchronized void setImage( BufferedImage image ) {
-		BoofSwingUtil.checkGuiThread();
-		super.setImage(image);
+	public synchronized void setBufferedImageNoChange( BufferedImage image ) {
+		super.setBufferedImageNoChange(image);
 		ConvertBufferedImage.convertFrom(image, imageFisheye, true);
 
 		if (imageFisheye.getNumBands() != imageRendered.getNumBands()) {
@@ -115,12 +127,11 @@ public class DisplayFisheyeCalibrationPanel<CM extends CameraModel> extends Disp
 		renderPinhole();
 	}
 
-	@Override
-	public void setCalibration( CM fisheyeModel ) {
+	public void setCalibration( LensDistortionWideFOV fisheyeDistort, int width, int height ) {
 		BoofSwingUtil.checkGuiThread();
+		this.fisheyeDistort = fisheyeDistort;
 
 		LensDistortionNarrowFOV pinholeDistort = new LensDistortionPinhole(pinholeModel);
-		fisheyeDistort = LensDistortionFactory.wide(fisheyeModel);
 		distorter = new NarrowToWidePtoP_F32(pinholeDistort, fisheyeDistort);
 
 		// Create the image distorter which will render the image
@@ -131,7 +142,7 @@ public class DisplayFisheyeCalibrationPanel<CM extends CameraModel> extends Disp
 		// Pass in the transform created above
 		distortImage.setModel(new PointToPixelTransform_F32(distorter));
 
-		setPinholeCenter(fisheyeModel.width/2, fisheyeModel.height/2);
+		setPinholeCenter(width/2, height/2);
 
 		renderPinhole();
 	}
@@ -232,7 +243,6 @@ public class DisplayFisheyeCalibrationPanel<CM extends CameraModel> extends Disp
 		}
 
 		if (showErrors) {
-
 			g2.setStroke(new BasicStroke(4));
 			g2.setColor(Color.BLACK);
 			for (int i = 0; i < set.size(); i++) {
@@ -285,5 +295,10 @@ public class DisplayFisheyeCalibrationPanel<CM extends CameraModel> extends Disp
 			g2.setColor(new Color(lineRGB));
 			g2.draw(l);
 		}
+	}
+
+	@Override public void clearCalibration() {
+		fisheyeDistort = null;
+		distorter = null;
 	}
 }
