@@ -21,6 +21,9 @@ package boofcv.struct.calib;
 import boofcv.misc.BoofMiscOps;
 import lombok.Getter;
 import lombok.Setter;
+import org.ejml.FancyPrint;
+
+import static boofcv.struct.calib.CameraPinholeBrown.toStringArray;
 
 /**
  * A camera model for pinhole, wide angle, and fisheye cameras. The full camera model
@@ -233,6 +236,26 @@ public class CameraKannalaBrandt extends CameraPinhole {
 	@Override
 	public <T extends CameraModel> T createLike() {
 		return (T)new CameraKannalaBrandt(symmetric.length, radial.length);
+	}
+
+	@Override
+	public String toString() {
+		FancyPrint fp = new FancyPrint();
+		String txt = "CameraPinholeRadial{" +
+				"fx=" + fx +
+				", fy=" + fy +
+				", skew=" + skew +
+				", cx=" + cx +
+				", cy=" + cy +
+				", width=" + width +
+				", height=" + height;
+		txt += toStringArray(fp, "s", symmetric);
+		txt += toStringArray(fp, "r", radial);
+		txt += toStringArray(fp, "rt", radialTrig);
+		txt += toStringArray(fp, "t", tangent);
+		txt += toStringArray(fp, "tt", tangentTrig);
+		txt += '}';
+		return txt;
 	}
 
 	@Override

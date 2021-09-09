@@ -59,7 +59,7 @@ public class CalibrationTargetPanel extends StandardAlgConfigPanel {
 		setBorder(BorderFactory.createEmptyBorder());
 
 		this.listener = listener;
-		comboType = new JComboBox<>(CalibrationPatterns.values());
+		comboType = new JComboBox<>(supportedPatterns());
 		comboType.addActionListener(this);
 		comboType.setMaximumSize(comboType.getPreferredSize());
 
@@ -72,6 +72,13 @@ public class CalibrationTargetPanel extends StandardAlgConfigPanel {
 		addAlignLeft(saveLandmarks.check, "Save a file with landmark locations to disk with the pdf");
 		add(Box.createRigidArea(new Dimension(10, 10)));
 		addAlignCenter(panelTarget);
+	}
+
+	/** Return only patterns that can be used to calibrate */
+	private static CalibrationPatterns[] supportedPatterns() {
+		var ret = new CalibrationPatterns[CalibrationPatterns.values().length-2];
+		System.arraycopy(CalibrationPatterns.values(), 0, ret, 0, ret.length);
+		return ret;
 	}
 
 	public void setConfigurationTo( ConfigCalibrationTarget target ) {

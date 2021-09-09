@@ -40,7 +40,9 @@ import boofcv.io.image.ConvertBufferedImage;
 import boofcv.io.image.UtilImageIO;
 import boofcv.io.webcamcapture.UtilWebcamCapture;
 import boofcv.misc.BoofMiscOps;
-import boofcv.struct.calib.*;
+import boofcv.struct.calib.CameraModel;
+import boofcv.struct.calib.CameraModelType;
+import boofcv.struct.calib.CameraPinholeBrown;
 import boofcv.struct.image.GrayF32;
 import com.github.sarxos.webcam.Webcam;
 import org.apache.commons.io.FilenameUtils;
@@ -619,29 +621,17 @@ public class CameraCalibration extends BaseStandardInputApp {
 				System.out.println();
 			}
 
-			switch (modeType) {
-				case BROWN -> {
-					CameraPinholeBrown m = (CameraPinholeBrown)intrinsic;
-					switch (formatType) {
-						case BOOFCV -> CalibrationIO.save(m, outputFilePath);
-						case OPENCV -> CalibrationIO.saveOpencv(m, outputFilePath);
-						default -> throw new IllegalArgumentException("Unknown format");
-					}
-					if (verbose) m.print();
+			if (modeType == CameraModelType.BROWN) {
+				CameraPinholeBrown m = (CameraPinholeBrown)intrinsic;
+				switch (formatType) {
+					case BOOFCV -> CalibrationIO.save(m, outputFilePath);
+					case OPENCV -> CalibrationIO.saveOpencv(m, outputFilePath);
+					default -> throw new IllegalArgumentException("Unknown format");
 				}
-				case UNIVERSAL -> {
-					CameraUniversalOmni m = (CameraUniversalOmni)intrinsic;
-					CalibrationIO.save(m, outputFilePath);
-					if (verbose) m.print();
-				}
-
-				case KANNALA_BRANDT -> {
-					CameraKannalaBrandt m = (CameraKannalaBrandt)intrinsic;
-					CalibrationIO.save(m, outputFilePath);
-					if (verbose) m.print();
-				}
-				default -> throw new RuntimeException("Unknown model type. " + modeType);
+			} else {
+				CalibrationIO.save(intrinsic, outputFilePath);
 			}
+			if (verbose) intrinsic.print();
 
 			if (verbose) {
 				System.out.println();

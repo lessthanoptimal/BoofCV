@@ -18,6 +18,7 @@
 
 package boofcv.demonstrations.calibration;
 
+import boofcv.BoofVerbose;
 import boofcv.abst.geo.calibration.CalibrateMonoPlanar;
 import boofcv.abst.geo.calibration.DetectSingleFiducialCalibration;
 import boofcv.abst.geo.calibration.ImageResults;
@@ -37,8 +38,10 @@ import boofcv.gui.controls.JCheckBoxValue;
 import boofcv.gui.controls.JSpinnerNumber;
 import boofcv.gui.image.ImagePanel;
 import boofcv.gui.image.ScaleOptions;
+import boofcv.gui.settings.GlobalDemoSettings;
 import boofcv.gui.settings.GlobalSettingsControls;
 import boofcv.io.UtilIO;
+import boofcv.io.calibration.CalibrationIO;
 import boofcv.io.image.ConvertBufferedImage;
 import boofcv.io.image.UtilImageIO;
 import boofcv.misc.BoofMiscOps;
@@ -47,6 +50,7 @@ import boofcv.struct.calib.CameraModel;
 import boofcv.struct.calib.CameraModelType;
 import boofcv.struct.calib.CameraPinholeBrown;
 import boofcv.struct.image.GrayF32;
+import org.apache.commons.io.FilenameUtils;
 import org.ddogleg.struct.DogArray_B;
 import org.ddogleg.struct.DogArray_I32;
 import org.jetbrains.annotations.Nullable;
@@ -74,14 +78,14 @@ import static boofcv.gui.BoofSwingUtil.MIN_ZOOM;
  */
 public abstract class BaseCalibrateCameraApp extends JPanel {
 	public static final String CALIBRATION_TARGET = "calibration_target.yaml";
-	// TODO show calibration in GUI
-	// TODO statistics summary in GUI
+	public static final String INTRINSICS = "intrinsics.yaml";
 	// TODO select landmark and remove landmark
 	// TODO remove image
 	// TODO Generalize recent file code and put into BoofSwingUtil
+	// TODO move "save landmarks" checkbox
+	// TODO don't show unsupported targets
 
 	// TODO add ability to load previously saved results
-	// TODO cache most recently viewed images
 
 	protected JMenuBar menuBar;
 	protected JMenu menuRecent;
@@ -150,6 +154,15 @@ public abstract class BaseCalibrateCameraApp extends JPanel {
 		menuFile.add(menuRecent);
 		updateRecentItems();
 
+		var menuItemSaveCalibration = new JMenuItem("Save Intrinsics");
+		BoofSwingUtil.setMenuItemKeys(menuItemSaveCalibration, KeyEvent.VK_S, KeyEvent.VK_S);
+		menuItemSaveCalibration.addActionListener(( e ) -> saveIntrinsics());
+		menuFile.add(menuItemSaveCalibration);
+
+		var menuItemSaveLandmarks = new JMenuItem("Save Landmarks");
+		menuItemSaveLandmarks.addActionListener(( e ) -> saveLandmarks());
+		menuFile.add(menuItemSaveLandmarks);
+
 		var menuItemSaveTarget = new JMenuItem("Save Target");
 		menuItemSaveTarget.addActionListener(( e ) -> saveCalibrationTarget());
 		menuFile.add(menuItemSaveTarget);
@@ -167,6 +180,61 @@ public abstract class BaseCalibrateCameraApp extends JPanel {
 	}
 
 	/**
+	 * Let's the user select a directory to save detected landmarks
+	 */
+	protected void saveLandmarks() {
+		// Open a dialog which will save using the default name in the place images were recently loaded from
+		var chooser = new JFileChooser();
+		chooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
+		chooser.setSelectedFile(imageDirectory);
+		int returnVal = chooser.showSaveDialog(this);
+		if (returnVal != JFileChooser.APPROVE_OPTION) {
+			return;
+		}
+
+		// Make sure the directory exists
+		File destination = chooser.getSelectedFile();
+		if (!destination.exists())
+			BoofMiscOps.checkTrue(destination.mkdirs());
+
+		BoofMiscOps.checkTrue(!destination.isFile(), "Can't select a file as output");
+
+		try {
+			results.safe(() -> {
+				String detectorName = detectorSet.select(() -> detectorSet.detector.getClass().getSimpleName());
+				for (String imageName : results.imagePaths) {
+					String outputName = FilenameUtils.getBaseName(imageName) + ".csv";
+					CalibrationIO.saveLandmarksCsv(imageName, detectorName, results.imageObservations.get(imageName),
+							new File(destination, outputName));
+				}
+			});
+		} catch (RuntimeException e) {
+			e.printStackTrace();
+			BoofSwingUtil.warningDialog(this, e);
+		}
+	}
+
+	/**
+	 * Saves found intrinsic parameters
+	 */
+	protected void saveIntrinsics() {
+		var chooser = new JFileChooser();
+		chooser.addChoosableFileFilter(new FileNameExtensionFilter("yaml", "yaml", "yml"));
+		chooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
+		chooser.setSelectedFile(new File(imageDirectory, INTRINSICS));
+		int returnVal = chooser.showSaveDialog(this);
+		if (returnVal != JFileChooser.APPROVE_OPTION) {
+			return;
+		}
+		try {
+			CalibrationIO.save(detectorSet.calibrator.getIntrinsic(), chooser.getSelectedFile());
+		} catch (RuntimeException e) {
+			e.printStackTrace();
+			BoofSwingUtil.warningDialog(this, e);
+		}
+	}
+
+	/**
 	 * Saves a calibration target description to disk so that it can be loaded again later on.
 	 */
 	protected void saveCalibrationTarget() {
@@ -181,9 +249,14 @@ public abstract class BaseCalibrateCameraApp extends JPanel {
 			return;
 		}
 
-		File file = chooser.getSelectedFile();
-		UtilIO.saveConfig(configurePanel.targetPanel.createConfigCalibrationTarget(),
-				new ConfigCalibrationTarget(), file);
+		try {
+			File file = chooser.getSelectedFile();
+			UtilIO.saveConfig(configurePanel.targetPanel.createConfigCalibrationTarget(),
+					new ConfigCalibrationTarget(), file);
+		} catch (RuntimeException e) {
+			e.printStackTrace();
+			BoofSwingUtil.warningDialog(this, e);
+		}
 	}
 
 	/**
@@ -278,88 +351,8 @@ public abstract class BaseCalibrateCameraApp extends JPanel {
 				new Thread(() -> handleProcessCalled(selectedImages), "OpenImages()").start());
 	}
 
-	/**
-	 * Detects image features from the set
-	 */
-	public void processFiles( List<String> foundImages ) {
-		// reset all data structures
-		results.reset();
-		SwingUtilities.invokeLater(() -> {
-			imageListPanel.clearImages();
-			getCalibrationPanel().clearCalibration();
-			getCalibrationPanel().clearResults();
-		});
-
-		// Load and detect calibration targets
-		GrayF32 gray = new GrayF32(1, 1);
-		for (String path : foundImages) {
-			BufferedImage buffered = UtilImageIO.loadImage(path);
-			if (buffered == null) {
-				System.err.println("Failed to load image: " + path);
-				continue;
-			}
-
-			// Convert to gray and detect the marker inside it
-			ConvertBufferedImage.convertFrom(buffered, gray);
-
-			detectorSet.lock();
-			boolean detected;
-			CalibrationObservation observation;
-			try {
-				detected = detectorSet.detector.process(gray);
-				observation = detectorSet.detector.getDetectedPoints();
-			} catch (RuntimeException e) {
-				e.printStackTrace(System.err);
-				continue;
-			} finally {
-				detectorSet.unlock();
-			}
-
-			if (!detected) {
-				System.out.println("Failed to find target in " + path);
-			}
-
-			// Record that it could process this image and display it in the GUI
-			results.safe(() -> {
-				results.imagePaths.add(path);
-				results.imageObservations.put(path, observation);
-				// only images with 4 points can be used in calibration
-				if (observation.points.size() >= 4) {
-					results.usedImages.add(results.imagePaths.size() - 1);
-					results.allObservations.add(observation);
-				}
-			});
-			SwingUtilities.invokeLater(() -> {
-				imageListPanel.addImage(new File(path).getName(), detected);
-				// This will show the viewed image, but it won't be "selected". Selecting it will cause the image to
-				// be loaded again
-				getCalibrationPanel().setBufferedImageNoChange(buffered);
-				getCalibrationPanel().repaint();
-			});
-		}
-
-		// Officially change the selected image
-		SwingUtilities.invokeLater(() -> imageListPanel.setSelected(imageListPanel.imageNames.size() - 1));
-	}
-
 	protected DisplayCalibrationPanel getCalibrationPanel() {
 		return cameraIsPinhole ? pinholePanel : fisheyePanel;
-	}
-
-	protected void openImages( String directoryPath ) {
-		setGuiEnabled(false);
-
-		// Start a new thread to process everything in
-		new Thread(() -> {
-			imageListPanel.clearImages();
-			List<String> foundImages = UtilIO.listSmartImages(directoryPath, true);
-			if (foundImages.isEmpty()) {
-				JOptionPane.showMessageDialog(this, "No images found!");
-			} else {
-				processFiles(foundImages);
-			}
-			setGuiEnabled(true);
-		}, "openImages(dir)").start();
 	}
 
 	/**
@@ -418,6 +411,12 @@ public abstract class BaseCalibrateCameraApp extends JPanel {
 		getCalibrationPanel().repaint();
 	}
 
+	/**
+	 * Handle the user clicking on the process button. This will either detect landmarks AND calibrate or just
+	 * calibrate using existing features.
+	 *
+	 * @param imagePaths List of images or null if it should use existing landmarks.
+	 */
 	protected void handleProcessCalled( @Nullable List<String> imagePaths ) {
 		BoofSwingUtil.checkNotGuiThread();
 		boolean detectTargets = targetChanged;
@@ -433,11 +432,83 @@ public abstract class BaseCalibrateCameraApp extends JPanel {
 
 			// Disable the menu bar so the user can't try to open more images
 			SwingUtilities.invokeLater(() -> setMenuBarEnabled(false));
-			processFiles(imagePaths);
+			detectLandmarksInImages(imagePaths);
 		}
 
 		calibrateFromCorners();
 		SwingUtilities.invokeLater(() -> getCalibrationPanel().repaint());
+	}
+
+	/**
+	 * Detects image features from the set
+	 */
+	protected void detectLandmarksInImages( List<String> foundImages ) {
+		// reset all data structures
+		results.reset();
+		SwingUtilities.invokeLater(() -> {
+			imageListPanel.clearImages();
+			getCalibrationPanel().clearCalibration();
+			getCalibrationPanel().clearResults();
+		});
+
+		// Let the user configure verbose output to stdout
+		detectorSet.safe(() -> {
+			if (GlobalDemoSettings.SETTINGS.verboseRecursive)
+				detectorSet.calibrator.setVerbose(System.out, BoofMiscOps.hashSet(BoofVerbose.RECURSIVE));
+			else
+				detectorSet.calibrator.setVerbose(null, null);
+		});
+
+		// Load and detect calibration targets
+		GrayF32 gray = new GrayF32(1, 1);
+		for (String path : foundImages) {
+			BufferedImage buffered = UtilImageIO.loadImage(path);
+			if (buffered == null) {
+				System.err.println("Failed to load image: " + path);
+				continue;
+			}
+
+			// Convert to gray and detect the marker inside it
+			ConvertBufferedImage.convertFrom(buffered, gray);
+
+			detectorSet.lock();
+			boolean detected;
+			CalibrationObservation observation;
+			try {
+				detected = detectorSet.detector.process(gray);
+				observation = detectorSet.detector.getDetectedPoints();
+			} catch (RuntimeException e) {
+				e.printStackTrace(System.err);
+				continue;
+			} finally {
+				detectorSet.unlock();
+			}
+
+			if (!detected) {
+				System.out.println("Failed to find target in " + path);
+			}
+
+			// Record that it could process this image and display it in the GUI
+			results.safe(() -> {
+				results.imagePaths.add(path);
+				results.imageObservations.put(path, observation);
+				// only images with 4 points can be used in calibration
+				if (observation.points.size() >= 4) {
+					results.usedImages.add(results.imagePaths.size() - 1);
+					results.allObservations.add(observation);
+				}
+			});
+			SwingUtilities.invokeLater(() -> {
+				imageListPanel.addImage(new File(path).getName(), detected);
+				// This will show the viewed image, but it won't be "selected". Selecting it will cause the image to
+				// be loaded again
+				getCalibrationPanel().setBufferedImageNoChange(buffered);
+				getCalibrationPanel().repaint();
+			});
+		}
+
+		// Officially change the selected image
+		SwingUtilities.invokeLater(() -> imageListPanel.setSelected(imageListPanel.imageNames.size() - 1));
 	}
 
 	protected void calibrateFromCorners() {
@@ -449,6 +520,8 @@ public abstract class BaseCalibrateCameraApp extends JPanel {
 
 		runningCalibration = true;
 		detectorSet.lock();
+		// by default assume the calibration will be unsuccessful
+		detectorSet.calibrationSuccess = false;
 		try {
 			detectorSet.calibrator.reset();
 			results.safe(() -> {
@@ -460,6 +533,7 @@ public abstract class BaseCalibrateCameraApp extends JPanel {
 
 			// Calibrate
 			detectorSet.calibrator.process();
+			detectorSet.calibrationSuccess = true;
 
 			// Save results for visualization
 			results.safe(() -> {
@@ -472,30 +546,66 @@ public abstract class BaseCalibrateCameraApp extends JPanel {
 			});
 
 			detectorSet.calibrator.printStatistics(System.out);
-
-			SwingUtilities.invokeLater(() -> detectorSet.safe(() -> {
-				// pass in the new calibrated camera
-				CameraModel foundIntrinsics = detectorSet.calibrator.getIntrinsic();
-				if (cameraIsPinhole) {
-					pinholePanel.setCalibration((CameraPinholeBrown)foundIntrinsics);
-				} else {
-					LensDistortionWideFOV model = LensDistortionFactory.wide(foundIntrinsics);
-					fisheyePanel.setCalibration(model, foundIntrinsics.width, foundIntrinsics.height);
-				}
-				configurePanel.bCompute.setEnabled(false);
-
-				// Force it to redraw with new image features
-				int selected = imageListPanel.imageList.getSelectedIndex();
-				imageListPanel.imageList.clearSelection();
-				imageListPanel.setSelected(selected);
-			}));
 		} catch (RuntimeException e) {
 			e.printStackTrace();
 			SwingUtilities.invokeLater(() -> BoofSwingUtil.warningDialog(this, e));
+			return;
 		} finally {
 			runningCalibration = false;
 			detectorSet.unlock();
 		}
+
+		displayCalibrationResults();
+		showStatsToUser();
+	}
+
+	private void displayCalibrationResults() {
+		SwingUtilities.invokeLater(() -> detectorSet.safe(() -> {
+			// pass in the new calibrated camera
+			CameraModel foundIntrinsics = detectorSet.calibrator.getIntrinsic();
+			if (cameraIsPinhole) {
+				pinholePanel.setCalibration((CameraPinholeBrown)foundIntrinsics);
+			} else {
+				LensDistortionWideFOV model = LensDistortionFactory.wide(foundIntrinsics);
+				fisheyePanel.setCalibration(model, foundIntrinsics.width, foundIntrinsics.height);
+			}
+			configurePanel.bCompute.setEnabled(false);
+
+			// Force it to redraw with new image features
+			int selected = imageListPanel.imageList.getSelectedIndex();
+			imageListPanel.imageList.clearSelection();
+			imageListPanel.setSelected(selected);
+
+			// Show the user the found calibration parameters. Format a bit to make it look nicer
+			String text = foundIntrinsics.toString().replace(',', '\n').replace("{", "\n ");
+			text = text.replace('}', '\n');
+			configurePanel.textAreaCalib.setText(text);
+		}));
+	}
+
+	/** Format statistics on results and add to a text panel */
+	private void showStatsToUser() {
+		results.safe(() -> {
+			double averageError = 0.0;
+			double maxError = 0.0;
+			for (int i = 0; i < results.usedImages.size(); i++) {
+				String image = results.imagePaths.get(results.usedImages.get(i));
+				ImageResults r = results.imageResults.get(image);
+				averageError += r.meanError;
+				maxError = Math.max(maxError, r.maxError);
+			}
+			averageError /= results.usedImages.size();
+			String text = String.format("Reprojection Errors (px):\n\nmean=%.3f max=%.3f\n\n", averageError, maxError);
+			text += String.format("%-10s | %8s\n", "image", "max (px)");
+			for (int i = 0; i < results.usedImages.size(); i++) {
+				String image = results.imagePaths.get(results.usedImages.get(i));
+				ImageResults r = results.imageResults.get(image);
+				text += String.format("%-12s %8.3f\n", new File(image).getName(), r.maxError);
+			}
+
+			String _text = text;
+			SwingUtilities.invokeLater(() -> configurePanel.textAreaStats.setText(_text));
+		});
 	}
 
 	protected void settingsChanged( boolean target, boolean calibrator ) {
@@ -634,8 +744,13 @@ public abstract class BaseCalibrateCameraApp extends JPanel {
 		CalibrationTargetPanel targetPanel = new CalibrationTargetPanel(( a, b ) -> handleUpdatedTarget());
 		// Displays a preview of the calibration target
 		ImagePanel targetPreviewPanel = new ImagePanel();
+		// Displays calibration information
+		JTextArea textAreaCalib = new JTextArea();
+		JTextArea textAreaStats = new JTextArea();
 
 		public ConfigureInfoPanel() {
+			configureTextArea(textAreaCalib);
+			configureTextArea(textAreaStats);
 
 			modelPanel.listener = () -> settingsChanged(false, true);
 
@@ -650,6 +765,8 @@ public abstract class BaseCalibrateCameraApp extends JPanel {
 			JTabbedPane tabbedPane = new JTabbedPane();
 			tabbedPane.addTab("Model", modelPanel);
 			tabbedPane.addTab("Target", targetVerticalPanel);
+			tabbedPane.addTab("Calib", new JScrollPane(textAreaCalib));
+			tabbedPane.addTab("Stats", new JScrollPane(textAreaStats));
 
 			addLabeled(imageSizeLabel, "Image Size", "Size of image being viewed");
 			addLabeled(zoom.spinner, "Zoom", "Zoom of image being viewed");
@@ -657,6 +774,13 @@ public abstract class BaseCalibrateCameraApp extends JPanel {
 			add(createVisualFlagPanel());
 			addLabeled(selectErrorScale.spinner, "Error Scale", "Increases the error visualization");
 			add(tabbedPane);
+		}
+
+		private void configureTextArea( JTextArea textAreaCalib ) {
+			textAreaCalib.setEditable(false);
+			textAreaCalib.setWrapStyleWord(true);
+			textAreaCalib.setLineWrap(true);
+			textAreaCalib.setFont(new Font("monospaced", Font.PLAIN, 12));
 		}
 
 		private void handleUpdatedTarget() {
@@ -728,6 +852,7 @@ public abstract class BaseCalibrateCameraApp extends JPanel {
 	private static class DetectorLocked extends VariableLockSet {
 		protected DetectSingleFiducialCalibration detector;
 		protected CalibrateMonoPlanar calibrator;
+		protected boolean calibrationSuccess;
 	}
 
 	private static class ResultsLocked extends VariableLockSet {
