@@ -110,6 +110,8 @@ public class DisplayFisheyeCalibrationPanel extends DisplayCalibrationPanel {
 	@Override
 	public synchronized void setBufferedImageNoChange( BufferedImage image ) {
 		super.setBufferedImageNoChange(image);
+		if (image == null)
+			return;
 		ConvertBufferedImage.convertFrom(image, imageFisheye, true);
 
 		if (imageFisheye.getNumBands() != imageRendered.getNumBands()) {

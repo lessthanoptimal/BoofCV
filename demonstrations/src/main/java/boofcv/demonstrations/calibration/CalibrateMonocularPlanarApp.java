@@ -38,6 +38,7 @@ import boofcv.gui.controls.JCheckBoxValue;
 import boofcv.gui.controls.JSpinnerNumber;
 import boofcv.gui.image.ImagePanel;
 import boofcv.gui.image.ScaleOptions;
+import boofcv.gui.image.ShowImages;
 import boofcv.gui.settings.GlobalDemoSettings;
 import boofcv.gui.settings.GlobalSettingsControls;
 import boofcv.io.UtilIO;
@@ -50,6 +51,7 @@ import boofcv.struct.calib.CameraModel;
 import boofcv.struct.calib.CameraModelType;
 import boofcv.struct.calib.CameraPinholeBrown;
 import boofcv.struct.image.GrayF32;
+import lombok.Getter;
 import org.apache.commons.io.FilenameUtils;
 import org.ddogleg.struct.DogArray;
 import org.ddogleg.struct.DogArray_B;
@@ -82,11 +84,11 @@ public class CalibrateMonocularPlanarApp extends JPanel {
 	public static final String CALIBRATION_TARGET = "calibration_target.yaml";
 	public static final String INTRINSICS = "intrinsics.yaml";
 
-	protected JMenuBar menuBar;
+	public JMenuBar menuBar;
 	protected JMenu menuRecent;
 
 	// Window the application is shown in
-	protected JFrame window;
+	public JFrame window;
 
 	boolean calibratorChanged = true;
 	boolean targetChanged = true;
@@ -94,7 +96,7 @@ public class CalibrateMonocularPlanarApp extends JPanel {
 	boolean resultsInvalid;
 
 	//----------------------- GUI owned objects
-	protected ConfigureInfoPanel configurePanel = new ConfigureInfoPanel();
+	protected @Getter ConfigureInfoPanel configurePanel = new ConfigureInfoPanel();
 	protected ImageListPanel imageListPanel = new ImageListPanel();
 	//	protected ImageCalibrationPanel imagePanel = new ImageCalibrationPanel();
 	protected DisplayFisheyeCalibrationPanel fisheyePanel = new DisplayFisheyeCalibrationPanel();
@@ -256,13 +258,6 @@ public class CalibrateMonocularPlanarApp extends JPanel {
 		}
 	}
 
-	/**
-	 * Disables or enables the GUI. This can be done to prevent people from changing settings while computing results
-	 */
-	public void setGuiEnabled( boolean enabled ) {
-		// TODO needs to work inside and outside of the UI thread
-	}
-
 	public void setMenuBarEnabled( boolean enabled ) {
 		menuBar.setEnabled(enabled);
 	}
@@ -319,6 +314,21 @@ public class CalibrateMonocularPlanarApp extends JPanel {
 		if (selectedImages.isEmpty())
 			return;
 
+		BoofSwingUtil.invokeNowOrLater(() -> {
+			// Disable the menu bar so the user can't try to open more images
+			setMenuBarEnabled(false);
+			// Add to list of recently opened directories
+			BoofSwingUtil.addToRecentFiles(this, directory.getName(), BoofMiscOps.asList(directory.getPath()));
+			updateRecentItems();
+		});
+
+		processImages(directory, selectedImages);
+	}
+
+	/**
+	 * Detects image features from the set
+	 */
+	public void processImages( File directory, List<String> selectedImages ) {
 		// If the calibration target type is specified load that
 		var fileTarget = new File(directory, CALIBRATION_TARGET);
 		if (fileTarget.exists()) {
@@ -332,14 +342,6 @@ public class CalibrateMonocularPlanarApp extends JPanel {
 		}
 
 		imageDirectory = directory;
-		BoofSwingUtil.invokeNowOrLater(() -> {
-			// Disable the menu bar so the user can't try to open more images
-			setMenuBarEnabled(false);
-			// Add to list of recently opened directories
-			BoofSwingUtil.addToRecentFiles(this, directory.getName(), BoofMiscOps.asList(directory.getPath()));
-			updateRecentItems();
-		});
-
 		targetChanged = true;
 
 		// We need to launch the processing thread from the UI thread since it might have loaded the calibration
@@ -815,7 +817,7 @@ public class CalibrateMonocularPlanarApp extends JPanel {
 	/**
 	 * Provides controls to configure detection and calibration while also listing all the files
 	 */
-	protected class ConfigureInfoPanel extends StandardAlgConfigPanel {
+	public class ConfigureInfoPanel extends StandardAlgConfigPanel {
 		protected JSpinnerNumber zoom = spinnerWrap(1.0, MIN_ZOOM, MAX_ZOOM, 1.0);
 		protected JLabel imageSizeLabel = new JLabel();
 
@@ -830,8 +832,8 @@ public class CalibrateMonocularPlanarApp extends JPanel {
 		JCheckBoxValue checkOrder = checkboxWrap("Order", true).tt("Visualize landmark order");
 		JSpinnerNumber selectErrorScale = spinnerWrap(10.0, 0.1, 1000.0, 2.0);
 
-		CalibrationModelPanel modelPanel = new CalibrationModelPanel();
-		CalibrationTargetPanel targetPanel = new CalibrationTargetPanel(( a, b ) -> handleUpdatedTarget());
+		@Getter CalibrationModelPanel modelPanel = new CalibrationModelPanel();
+		@Getter CalibrationTargetPanel targetPanel = new CalibrationTargetPanel(( a, b ) -> handleUpdatedTarget());
 		// Displays a preview of the calibration target
 		ImagePanel targetPreviewPanel = new ImagePanel();
 		// Displays calibration information
@@ -974,23 +976,11 @@ public class CalibrateMonocularPlanarApp extends JPanel {
 	}
 
 	public static void main( String[] args ) {
-		File directory = new File(UtilIO.pathExample("calibration/fisheye/chessboard"));
-//		File directory = new File(UtilIO.pathExample("calibration/fisheye/square_grid"));
-
 		SwingUtilities.invokeLater(() -> {
 			var app = new CalibrateMonocularPlanarApp();
 
-			JFrame frame = new JFrame("Monocular Planar Calibration");
-			frame.add(app, BorderLayout.CENTER);
-			frame.pack();
-			frame.setLocationByPlatform(true);
-			frame.setVisible(true);
-			frame.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
-
-			app.window = frame;
+			app.window = ShowImages.showWindow(app, "Monocular Planar Calibration", true);
 			app.window.setJMenuBar(app.menuBar);
-
-			new Thread(() -> app.processDirectory(directory)).start();
 		});
 	}
 }

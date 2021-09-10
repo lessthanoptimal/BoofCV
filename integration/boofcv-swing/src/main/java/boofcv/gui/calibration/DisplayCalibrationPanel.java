@@ -81,7 +81,7 @@ public abstract class DisplayCalibrationPanel extends ImageZoomPanel {
 	// Called after setScale has been called
 	public SetScale setScale = ( s ) -> {};
 
-	public DisplayCalibrationPanel() {
+	protected DisplayCalibrationPanel() {
 		panel.addMouseWheelListener(e -> setScale(BoofSwingUtil.mouseWheelImageZoom(scale, e)));
 
 		// navigate using left mouse clicks

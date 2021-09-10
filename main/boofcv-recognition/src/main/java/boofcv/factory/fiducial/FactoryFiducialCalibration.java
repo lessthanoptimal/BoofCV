@@ -19,6 +19,9 @@
 package boofcv.factory.fiducial;
 
 import boofcv.abst.fiducial.calib.*;
+import boofcv.abst.geo.calibration.DetectSingleFiducialCalibration;
+import boofcv.abst.geo.calibration.MultiToSingleFiducialCalibration;
+import boofcv.alg.fiducial.calib.ConfigCalibrationTarget;
 import boofcv.alg.fiducial.calib.chess.DetectChessboardBinaryPattern;
 import boofcv.alg.fiducial.calib.ecocheck.ECoCheckDetector;
 import boofcv.struct.image.GrayF32;
@@ -31,6 +34,17 @@ import org.jetbrains.annotations.Nullable;
  * @author Peter Abeles
  */
 public class FactoryFiducialCalibration {
+
+	public static DetectSingleFiducialCalibration genericSingle( ConfigCalibrationTarget config ) {
+		return switch (config.type) {
+			case CHESSBOARD -> FactoryFiducialCalibration.chessboardX(null, config.grid);
+			case ECOCHECK -> new MultiToSingleFiducialCalibration(FactoryFiducialCalibration.ecocheck(null, config.ecocheck));
+			case SQUARE_GRID -> FactoryFiducialCalibration.squareGrid(null, config.grid);
+			case CIRCLE_GRID -> FactoryFiducialCalibration.circleRegularGrid(null, config.grid);
+			case CIRCLE_HEXAGONAL -> FactoryFiducialCalibration.circleHexagonalGrid(null, config.grid);
+			default -> throw new RuntimeException("Target type not yet supported.");
+		};
+	}
 
 	/**
 	 * Detector for a grid of square targets.  All squares must be entirely visible inside the image.
