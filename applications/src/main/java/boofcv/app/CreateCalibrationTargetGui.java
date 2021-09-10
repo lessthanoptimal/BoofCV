@@ -47,11 +47,13 @@ import java.awt.event.KeyEvent;
 import java.io.File;
 import java.io.IOException;
 
+import static boofcv.gui.StandardAlgConfigPanel.addAlignLeft;
 import static boofcv.gui.StandardAlgConfigPanel.addLabeled;
 
 public class CreateCalibrationTargetGui extends JPanel
 		implements CalibrationTargetPanel.Listener, ActionListener {
 
+	JCheckBox checkSaveLandmarks;
 	JComboBox<PaperSize> comboPaper = new JComboBox<>(PaperSize.values().toArray(new PaperSize[0]));
 	JComboBox<Unit> comboUnits = new JComboBox<>(Unit.values());
 
@@ -63,6 +65,7 @@ public class CreateCalibrationTargetGui extends JPanel
 
 	PaperSize paper = PaperSize.LETTER;
 	Unit units = Unit.CENTIMETER;
+	boolean saveLandmarks = false;
 
 	JFrame frame;
 
@@ -88,9 +91,13 @@ public class CreateCalibrationTargetGui extends JPanel
 		comboUnits.setSelectedIndex(units.ordinal());
 		comboUnits.setMaximumSize(comboUnits.getPreferredSize());
 
+		checkSaveLandmarks = new JCheckBox("Save Landmarks", saveLandmarks);
+		checkSaveLandmarks.addActionListener(this);
+
 		JPanel controlsPanel = new JPanel();
 		controlsPanel.setLayout(new BoxLayout(controlsPanel, BoxLayout.Y_AXIS));
 		controlsPanel.setBorder(BorderFactory.createEtchedBorder(EtchedBorder.RAISED));
+		addAlignLeft(checkSaveLandmarks, controlsPanel);
 		addLabeled(comboPaper, "Paper", null, controlsPanel);
 		controlsPanel.add(controlsTarget);
 		addLabeled(comboUnits, "Target Units", null, controlsPanel);
@@ -180,7 +187,7 @@ public class CreateCalibrationTargetGui extends JPanel
 		app.unit = units;
 		app.paperSize = paper;
 		app.type = selectedType;
-		app.saveLandmarks = controlsTarget.saveLandmarks.value;
+		app.saveLandmarks = saveLandmarks;
 
 		switch (selectedType) {
 			case CHESSBOARD -> {
@@ -385,6 +392,8 @@ public class CreateCalibrationTargetGui extends JPanel
 			paper = (PaperSize)comboPaper.getSelectedItem();
 		} else if (e.getSource() == comboUnits) {
 			units = Unit.values()[comboUnits.getSelectedIndex()];
+		} else if (e.getSource() == checkSaveLandmarks) {
+			saveLandmarks = checkSaveLandmarks.isSelected();
 		}
 
 		updatePreview();

@@ -39,7 +39,6 @@ import java.awt.*;
  * @author Peter Abeles
  */
 public class CalibrationTargetPanel extends StandardAlgConfigPanel {
-	public final JCheckBoxValue saveLandmarks = checkboxWrap("Save Landmarks", false);
 	JComboBox<CalibrationPatterns> comboType;
 	JPanel panelTarget = new JPanel();
 
@@ -69,7 +68,6 @@ public class CalibrationTargetPanel extends StandardAlgConfigPanel {
 		changeTargetPanel();
 
 		addLabeled(comboType, "Target Type");
-		addAlignLeft(saveLandmarks.check, "Save a file with landmark locations to disk with the pdf");
 		add(Box.createRigidArea(new Dimension(10, 10)));
 		addAlignCenter(panelTarget);
 	}
@@ -141,8 +139,6 @@ public class CalibrationTargetPanel extends StandardAlgConfigPanel {
 			selected = (CalibrationPatterns)comboType.getSelectedItem();
 			changeTargetPanel();
 			updateParameters();
-		} else if (source == saveLandmarks.check) {
-			saveLandmarks.updateValue();
 		}
 	}
 
