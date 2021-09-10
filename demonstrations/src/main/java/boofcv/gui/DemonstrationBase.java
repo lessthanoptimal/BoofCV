@@ -254,37 +254,15 @@ public abstract class DemonstrationBase extends JPanel {
 	 * Updates the list in recent menu
 	 */
 	protected void updateRecentItems() {
-		if (menuRecent == null)
-			return;
-		menuRecent.removeAll();
-		List<BoofSwingUtil.RecentFiles> recentFiles = BoofSwingUtil.getListOfRecentFiles(this);
-
-		for (BoofSwingUtil.RecentFiles info : recentFiles) {
-			JMenuItem recentItem = new JMenuItem(info.name);
-			recentItem.addActionListener(e -> {
-				if (useCustomOpenFiles) {
-					openFiles(BoofMiscOps.toFileList(info.files), true);
-				} else if (info.files.size() == 1) {
-					openFile(new File(info.files.get(0)), true);
-				} else {
-					openFiles(BoofMiscOps.toFileList(info.files), true);
-				}
-			});
-			menuRecent.add(recentItem);
-		}
-
-		// don't add clear option if there is nothing to clear
-		if (recentFiles.size() == 0)
-			return;
-
-		// Add the option to clear the list of recent files
-		JMenuItem clearItem = new JMenuItem("Clear Recent");
-		clearItem.addActionListener(e -> {
-			menuRecent.removeAll();
-			BoofSwingUtil.saveRecentFiles(DemonstrationBase.this.getClass().getSimpleName(), new ArrayList<>());
+		BoofSwingUtil.updateRecentItems(this, menuRecent, (info)->{
+			if (useCustomOpenFiles) {
+				openFiles(BoofMiscOps.toFileList(info.files), true);
+			} else if (info.files.size() == 1) {
+				openFile(new File(info.files.get(0)), true);
+			} else {
+				openFiles(BoofMiscOps.toFileList(info.files), true);
+			}
 		});
-		menuRecent.addSeparator();
-		menuRecent.add(clearItem);
 	}
 
 	/**

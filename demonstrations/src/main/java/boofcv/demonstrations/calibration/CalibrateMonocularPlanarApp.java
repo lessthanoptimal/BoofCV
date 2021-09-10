@@ -81,8 +81,7 @@ import static boofcv.gui.BoofSwingUtil.MIN_ZOOM;
 public class CalibrateMonocularPlanarApp extends JPanel {
 	public static final String CALIBRATION_TARGET = "calibration_target.yaml";
 	public static final String INTRINSICS = "intrinsics.yaml";
-
-	// TODO Generalize recent file code and put into BoofSwingUtil
+	
 	// TODO move "save landmarks" checkbox
 
 	protected JMenuBar menuBar;
@@ -360,29 +359,7 @@ public class CalibrateMonocularPlanarApp extends JPanel {
 	 * Updates the list in recent menu
 	 */
 	protected void updateRecentItems() {
-		if (menuRecent == null)
-			return;
-		menuRecent.removeAll();
-		List<BoofSwingUtil.RecentFiles> recentFiles = BoofSwingUtil.getListOfRecentFiles(this);
-
-		for (BoofSwingUtil.RecentFiles info : recentFiles) {
-			JMenuItem recentItem = new JMenuItem(info.name);
-			recentItem.addActionListener(e -> processDirectory(new File(info.files.get(0))));
-			menuRecent.add(recentItem);
-		}
-
-		// don't add clear option if there is nothing to clear
-		if (recentFiles.size() == 0)
-			return;
-
-		// Add the option to clear the list of recent files
-		JMenuItem clearItem = new JMenuItem("Clear Recent");
-		clearItem.addActionListener(e -> {
-			menuRecent.removeAll();
-			BoofSwingUtil.saveRecentFiles(getClass().getSimpleName(), new ArrayList<>());
-		});
-		menuRecent.addSeparator();
-		menuRecent.add(clearItem);
+		BoofSwingUtil.updateRecentItems(this, menuRecent, (info)->processDirectory(new File(info.files.get(0))));
 	}
 
 	/**
