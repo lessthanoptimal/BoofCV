@@ -28,6 +28,7 @@ import boofcv.struct.distort.Point2Transform2_F32;
 import boofcv.struct.geo.PointIndex2D_F64;
 import georegression.struct.point.Point2D_F32;
 import georegression.struct.point.Point2D_F64;
+import lombok.Getter;
 import org.jetbrains.annotations.Nullable;
 
 import javax.swing.*;
@@ -58,13 +59,13 @@ public abstract class DisplayCalibrationPanel extends ImageZoomPanel {
 	double errorScale;
 
 	// Which observation in the current image has the user selected
-	int selectedObservation = -1;
+	@Getter protected int selectedObservation = -1;
 
 	// observed feature locations
-	@Nullable CalibrationObservation features = null;
+	@Nullable @Getter CalibrationObservation observation = null;
 	// results of calibration
-	@Nullable ImageResults results = null;
-	@Nullable List<CalibrationObservation> allFeatures;
+	@Nullable @Getter public ImageResults results = null;
+	@Nullable List<CalibrationObservation> allObservations = null;
 
 	// Used to transform point coordinate system
 	protected Point2Transform2_F32 pixelTransform = new DoNothing2Transform2_F32();
@@ -86,45 +87,54 @@ public abstract class DisplayCalibrationPanel extends ImageZoomPanel {
 				panel.requestFocus();
 				if (!SwingUtilities.isRightMouseButton(e))
 					return;
-				CalibrationObservation features = DisplayCalibrationPanel.this.features;
+				CalibrationObservation features = DisplayCalibrationPanel.this.observation;
 				if (features == null)
 					return;
-
-				// use square distance since it's faster
-				double bestDistanceSq = canonicalClickDistance/scale;
-				bestDistanceSq *= bestDistanceSq;
-
-				int bestIndex = -1;
-				Point2D_F64 p = pixelToPoint(e.getX(), e.getY());
-				for (int i = 0; i < features.points.size(); i++) {
-					double d = p.distance2(features.points.get(i).p);
-					if (d <= bestDistanceSq) {
-						bestDistanceSq = d;
-						bestIndex = i;
-					}
-				}
-				selectedObservation = bestIndex;
+				selectedObservation = findClickedPoint(e, features);
 				repaint();
 			}
 		});
+	}
+
+	/**
+	 * Finds the landmark which is the closest to the point clicked by the user. Maximum distance is determined
+	 * in image pixels
+	 */
+	protected int findClickedPoint( MouseEvent e, CalibrationObservation features ) {
+		// use square distance since it's faster
+		double bestDistanceSq = canonicalClickDistance/scale;
+		bestDistanceSq *= bestDistanceSq;
+
+		int bestIndex = -1;
+		Point2D_F64 p = pixelToPoint(e.getX(), e.getY());
+		for (int i = 0; i < features.points.size(); i++) {
+			Point2D_F64 f = features.points.get(i).p;
+			pixelTransform.compute((float)f.x, (float)f.y, adj);
+			double d = p.distance2(adj.x ,adj.y);
+			if (d <= bestDistanceSq) {
+				bestDistanceSq = d;
+				bestIndex = i;
+			}
+		}
+		return bestIndex;
 	}
 
 	public void setResults( CalibrationObservation features, ImageResults results,
 							List<CalibrationObservation> allFeatures ) {
 		BoofSwingUtil.checkGuiThread();
 
-		this.features = features;
+		this.observation = features;
 		this.results = results;
-		this.allFeatures = allFeatures;
+		this.allObservations = allFeatures;
 		this.selectedObservation = -1;
 	}
 
 	public void clearResults() {
 		BoofSwingUtil.checkGuiThread();
 
-		features = null;
+		observation = null;
 		results = null;
-		allFeatures = null;
+		allObservations = null;
 		selectedObservation = -1;
 	}
 
@@ -154,20 +164,20 @@ public abstract class DisplayCalibrationPanel extends ImageZoomPanel {
 	 */
 	public abstract void clearCalibration();
 
-	protected void handleSelectionClick() {
-
+	public void deselectPoint() {
+		selectedObservation = -1;
 	}
 
 	/**
 	 * Visualizes calibration information, such as feature location and order.
 	 */
 	protected void drawFeatures( Graphics2D g2, double scale ) {
-		if (results == null || features == null || allFeatures == null)
+		if (observation == null || allObservations == null)
 			return;
 
 		BoofSwingUtil.antialiasing(g2);
 
-		final CalibrationObservation set = features;
+		final CalibrationObservation set = observation;
 
 		if (showOrder) {
 			renderOrder(g2, pixelTransform, scale, set.points);
@@ -189,7 +199,7 @@ public abstract class DisplayCalibrationPanel extends ImageZoomPanel {
 		}
 
 		if (showAll) {
-			for (CalibrationObservation l : allFeatures) {
+			for (CalibrationObservation l : allObservations) {
 				for (PointIndex2D_F64 p : l.points) {
 					pixelTransform.compute((float)p.p.x, (float)p.p.y, adj);
 					VisualizeFeatures.drawPoint(g2, adj.x*scale, adj.y*scale, 3, Color.BLUE, Color.WHITE, ellipse);
@@ -201,7 +211,7 @@ public abstract class DisplayCalibrationPanel extends ImageZoomPanel {
 			drawNumbers(g2, set.points, pixelTransform, scale);
 		}
 
-		if (showErrors) {
+		if (showErrors && results != null) {
 			g2.setStroke(new BasicStroke(4));
 			g2.setColor(Color.BLACK);
 			for (int i = 0; i < set.size(); i++) {
