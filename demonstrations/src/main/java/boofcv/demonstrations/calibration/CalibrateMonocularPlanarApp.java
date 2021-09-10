@@ -72,20 +72,18 @@ import static boofcv.gui.BoofSwingUtil.MAX_ZOOM;
 import static boofcv.gui.BoofSwingUtil.MIN_ZOOM;
 
 /**
- * Base class for camera calibration applications
+ * Application for calibrating single cameras from planar targets. User can change the camera model and
+ * target type from the GUI.
  *
  * @author Peter Abeles
  */
-public abstract class BaseCalibrateCameraApp extends JPanel {
+public class CalibrateMonocularPlanarApp extends JPanel {
 	public static final String CALIBRATION_TARGET = "calibration_target.yaml";
 	public static final String INTRINSICS = "intrinsics.yaml";
 	// TODO select landmark and remove landmark
 	// TODO remove image
 	// TODO Generalize recent file code and put into BoofSwingUtil
 	// TODO move "save landmarks" checkbox
-	// TODO don't show unsupported targets
-
-	// TODO add ability to load previously saved results
 
 	protected JMenuBar menuBar;
 	protected JMenu menuRecent;
@@ -119,7 +117,7 @@ public abstract class BaseCalibrateCameraApp extends JPanel {
 		BoofSwingUtil.initializeSwing();
 	}
 
-	public BaseCalibrateCameraApp() {
+	public CalibrateMonocularPlanarApp() {
 		setLayout(new BorderLayout());
 		imageListPanel.setPreferredSize(new Dimension(200, 200));
 
@@ -615,6 +613,21 @@ public abstract class BaseCalibrateCameraApp extends JPanel {
 		SwingUtilities.invokeLater(() -> configurePanel.bCompute.setEnabled(true));
 	}
 
+	/** Removes the selected point or does nothing if nothing is selected */
+	protected void removePoint() {
+
+	}
+
+	/** Removes an image */
+	protected void removeImage() {
+
+	}
+
+	/** Adds all images and points back in */
+	protected void undoAllRemove() {
+
+	}
+
 	/** If an image is selected, it returns the observed calibration landmarks */
 	protected @Nullable CalibrationObservation getObservationsForSelected() {
 		BoofSwingUtil.checkGuiThread();
@@ -650,6 +663,10 @@ public abstract class BaseCalibrateCameraApp extends JPanel {
 	 * List images used to calibrate the camera.
 	 */
 	protected class ImageListPanel extends StandardAlgConfigPanel implements ListSelectionListener {
+		JButton bRemovePoint = button("Remove Point", true, ( e ) -> removePoint());
+		JButton bRemoveImage = button("Remove Image", true, ( e ) -> removeImage());
+		JButton bReset = button("Reset", true, ( e ) -> undoAllRemove());
+
 		JList<String> imageList;
 		List<String> imageNames = new ArrayList<>();
 		DogArray_B imageSuccess = new DogArray_B();
@@ -673,6 +690,9 @@ public abstract class BaseCalibrateCameraApp extends JPanel {
 
 			JScrollPane scroll = new JScrollPane(imageList);
 
+			addAlignCenter(bRemovePoint, "Remove a point");
+			addAlignCenter(bRemoveImage, "Remove an image");
+			addAlignCenter(bReset, "Adds all removed objects back in");
 			add(scroll);
 		}
 
@@ -874,5 +894,26 @@ public abstract class BaseCalibrateCameraApp extends JPanel {
 				allObservations.clear();
 			});
 		}
+	}
+
+	public static void main( String[] args ) {
+		File directory = new File(UtilIO.pathExample("calibration/fisheye/chessboard"));
+//		File directory = new File(UtilIO.pathExample("calibration/fisheye/square_grid"));
+
+		SwingUtilities.invokeLater(() -> {
+			var app = new CalibrateMonocularPlanarApp();
+
+			JFrame frame = new JFrame("Monocular Planar Calibration");
+			frame.add(app, BorderLayout.CENTER);
+			frame.pack();
+			frame.setLocationByPlatform(true);
+			frame.setVisible(true);
+			frame.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
+
+			app.window = frame;
+			app.window.setJMenuBar(app.menuBar);
+
+			new Thread(() -> app.processDirectory(directory)).start();
+		});
 	}
 }

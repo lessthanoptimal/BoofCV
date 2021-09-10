@@ -31,7 +31,7 @@ import boofcv.demonstrations.shapes.ThresholdControlPanel;
 import boofcv.gui.BoofSwingUtil;
 import boofcv.gui.DemonstrationBase;
 import boofcv.gui.StandardAlgConfigPanel;
-import boofcv.gui.calibration.DisplayPinholeCalibrationPanel;
+import boofcv.gui.calibration.UtilCalibrationGui;
 import boofcv.gui.controls.JCheckBoxValue;
 import boofcv.gui.image.VisualizeImageData;
 import boofcv.io.PathLabel;
@@ -323,10 +323,10 @@ public class DetectCalibrationChessboardXCornerApp
 					synchronized (lockCorners) {
 						for (int i = 0; i < visualizeUtils.foundGrids.size; i++) {
 							CalibrationObservation c = visualizeUtils.foundGrids.get(i);
-							DisplayPinholeCalibrationPanel.renderOrder(g2, scale, (List)c.points);
+							UtilCalibrationGui.renderOrder(g2, null, scale, (List)c.points);
 
 							if (controlPanel.showNumbers) {
-								DisplayPinholeCalibrationPanel.drawNumbers(g2, c.points, null, scale);
+								UtilCalibrationGui.drawNumbers(g2, c.points, null, scale);
 							}
 						}
 					}
@@ -334,10 +334,10 @@ public class DetectCalibrationChessboardXCornerApp
 			} else {
 				if (success && controlPanel.showChessboards) {
 					synchronized (lockCorners) {
-						DisplayPinholeCalibrationPanel.renderOrder(g2, scale, (List)foundChessboard.toList());
+						UtilCalibrationGui.renderOrder(g2, null, scale, (List)foundChessboard.toList());
 
 						if (controlPanel.showNumbers) {
-							DisplayPinholeCalibrationPanel.drawNumbers(g2, foundChessboard.toList(), null, scale);
+							UtilCalibrationGui.drawNumbers(g2, foundChessboard.toList(), null, scale);
 						}
 					}
 				}

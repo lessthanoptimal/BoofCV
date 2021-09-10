@@ -23,24 +23,20 @@ import boofcv.alg.distort.LensDistortionNarrowFOV;
 import boofcv.alg.distort.LensDistortionWideFOV;
 import boofcv.alg.distort.NarrowToWidePtoP_F32;
 import boofcv.alg.distort.pinhole.LensDistortionPinhole;
-import boofcv.alg.geo.calibration.CalibrationObservation;
 import boofcv.alg.interpolate.InterpolatePixel;
 import boofcv.alg.interpolate.InterpolationType;
 import boofcv.factory.distort.FactoryDistort;
 import boofcv.factory.interpolate.FactoryInterpolation;
 import boofcv.gui.BoofSwingUtil;
-import boofcv.gui.feature.VisualizeFeatures;
 import boofcv.io.image.ConvertBufferedImage;
 import boofcv.struct.border.BorderType;
 import boofcv.struct.calib.CameraPinhole;
 import boofcv.struct.distort.PointToPixelTransform_F32;
-import boofcv.struct.geo.PointIndex2D_F64;
 import boofcv.struct.image.GrayF32;
 import boofcv.struct.image.Planar;
 import georegression.geometry.ConvertRotation3D_F32;
 import georegression.geometry.GeometryMath_F32;
 import georegression.geometry.UtilVector3D_F32;
-import georegression.struct.point.Point2D_F32;
 import georegression.struct.point.Point2D_F64;
 import georegression.struct.point.Point3D_F32;
 import georegression.struct.point.Vector3D_F32;
@@ -53,12 +49,7 @@ import java.awt.*;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.geom.AffineTransform;
-import java.awt.geom.Ellipse2D;
-import java.awt.geom.Line2D;
 import java.awt.image.BufferedImage;
-import java.util.List;
-
-import static boofcv.gui.calibration.DisplayPinholeCalibrationPanel.drawNumbers;
 
 /**
  * Used to display a calibrated fisheye camera. Shows a rendered pinhole camera view at the selected location
@@ -103,14 +94,14 @@ public class DisplayFisheyeCalibrationPanel extends DisplayCalibrationPanel {
 
 		panel.addMouseListener(new MouseAdapter() {
 			@Override
-			public void mousePressed(MouseEvent e) {
+			public void mousePressed( MouseEvent e ) {
 				// don't navigate using clicks when undistorting
 				if (showUndistorted)
 					return;
 				panel.requestFocus();
-				if( SwingUtilities.isLeftMouseButton(e)) {
+				if (SwingUtilities.isLeftMouseButton(e)) {
 					Point2D_F64 p = pixelToPoint(e.getX(), e.getY());
-					centerView(p.x,p.y);
+					centerView(p.x, p.y);
 				}
 			}
 		});
@@ -196,105 +187,6 @@ public class DisplayFisheyeCalibrationPanel extends DisplayCalibrationPanel {
 
 		renderTran.setTransform(scale*scaleSize, 0, 0, scale*scaleSize, offX, offY);
 		g2.drawImage(bufferedRendered, renderTran, null);
-	}
-
-	private void drawFeatures( Graphics2D g2, double scale ) {
-
-		if (results == null)
-			return;
-
-		BoofSwingUtil.antialiasing(g2);
-
-		CalibrationObservation set = features;
-
-		Ellipse2D.Double ellipse = new Ellipse2D.Double();
-		Point2D_F32 adj = new Point2D_F32();
-
-		if (showOrder) {
-			renderOrder(g2, scale, set.points);
-		}
-
-		if (showPoints) {
-			g2.setColor(Color.BLACK);
-			g2.setStroke(new BasicStroke(3));
-			for (PointIndex2D_F64 p : set.points) {
-				adj.setTo((float)p.p.x, (float)p.p.y);
-				VisualizeFeatures.drawCross(g2, adj.x*scale, adj.y*scale, 4);
-			}
-			g2.setStroke(new BasicStroke(1));
-			g2.setColor(Color.RED);
-			for (PointIndex2D_F64 p : set.points) {
-				adj.setTo((float)p.p.x, (float)p.p.y);
-				VisualizeFeatures.drawCross(g2, adj.x*scale, adj.y*scale, 4);
-			}
-		}
-
-		if (showAll) {
-			for (CalibrationObservation l : allFeatures) {
-				for (PointIndex2D_F64 p : l.points) {
-					adj.setTo((float)p.p.x, (float)p.p.y);
-					VisualizeFeatures.drawPoint(g2, adj.x*scale, adj.y*scale, 3, Color.BLUE, Color.WHITE, ellipse);
-				}
-			}
-		}
-
-		if (showNumbers) {
-			drawNumbers(g2, set.points, null, scale);
-		}
-
-		if (showErrors) {
-			g2.setStroke(new BasicStroke(4));
-			g2.setColor(Color.BLACK);
-			for (int i = 0; i < set.size(); i++) {
-				PointIndex2D_F64 p = set.get(i);
-				adj.setTo((float)p.p.x, (float)p.p.y);
-
-				double r = errorScale*results.pointError[i];
-				if (r < 1)
-					continue;
-
-				VisualizeFeatures.drawCircle(g2, adj.x*scale, adj.y*scale, r, ellipse);
-			}
-
-			g2.setStroke(new BasicStroke(2.5f));
-			g2.setColor(Color.ORANGE);
-			for (int i = 0; i < set.size(); i++) {
-				PointIndex2D_F64 p = set.get(i);
-				adj.setTo((float)p.p.x, (float)p.p.y);
-
-				double r = errorScale*results.pointError[i];
-				if (r < 1)
-					continue;
-
-
-				VisualizeFeatures.drawCircle(g2, adj.x*scale, adj.y*scale, r);
-			}
-		}
-	}
-
-	public static void renderOrder( Graphics2D g2, double scale, List<PointIndex2D_F64> points ) {
-		g2.setStroke(new BasicStroke(5));
-
-		Line2D.Double l = new Line2D.Double();
-
-		for (int i = 0, j = 1; j < points.size(); i = j, j++) {
-			Point2D_F64 p0 = points.get(i).p;
-			Point2D_F64 p1 = points.get(j).p;
-
-			double fraction = i/((double)points.size() - 2);
-//			fraction = fraction * 0.8 + 0.1;
-
-			int red = (int)(0xFF*fraction) + (int)(0x00*(1 - fraction));
-			int green = 0x00;
-			int blue = (int)(0x00*fraction) + (int)(0xff*(1 - fraction));
-
-			int lineRGB = red << 16 | green << 8 | blue;
-
-			l.setLine(scale*p0.x, scale*p0.y, scale*p1.x, scale*p1.y);
-
-			g2.setColor(new Color(lineRGB));
-			g2.draw(l);
-		}
 	}
 
 	@Override public void clearCalibration() {

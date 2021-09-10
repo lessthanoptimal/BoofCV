@@ -27,7 +27,7 @@ import boofcv.alg.fiducial.calib.ecocheck.ECoCheckDetector;
 import boofcv.alg.fiducial.calib.ecocheck.ECoCheckFound;
 import boofcv.alg.geo.calibration.CalibrationObservation;
 import boofcv.core.graph.FeatureGraph2D;
-import boofcv.gui.calibration.DisplayPinholeCalibrationPanel;
+import boofcv.gui.calibration.UtilCalibrationGui;
 import boofcv.gui.feature.VisualizeFeatures;
 import boofcv.struct.geo.PointIndex2D_F64;
 import boofcv.struct.image.GrayF32;
@@ -138,7 +138,7 @@ public class VisualizeChessboardXCornerUtils {
 		}
 
 		if (showNumbers) {
-			DisplayPinholeCalibrationPanel.drawIndexes(g2, 18, foundCorners.toList(), null,
+			UtilCalibrationGui.drawIndexes(g2, 18, foundCorners.toList(), null,
 					minPyramidLevel, scale);
 		}
 	}
