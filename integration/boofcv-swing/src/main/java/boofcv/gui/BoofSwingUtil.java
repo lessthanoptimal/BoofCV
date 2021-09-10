@@ -87,7 +87,8 @@ public class BoofSwingUtil {
 
 			// smoother font
 			System.setProperty("apple.awt.textantialiasing", "true");
-		} catch (Exception ignore) {}
+		} catch (Exception ignore) {
+		}
 
 		// If the default layout manager tabbed panes will get smaller and smaller since it has a border
 		Insets insets = UIManager.getInsets("TabbedPane.contentBorderInsets");
@@ -245,7 +246,8 @@ public class BoofSwingUtil {
 			switch (filter) {
 				case DIRECTORIES -> directories = true;
 				case IMAGES, VIDEOS -> images = true;
-				default -> {}
+				default -> {
+				}
 			}
 		}
 		if (!directories && images) {
@@ -284,14 +286,18 @@ public class BoofSwingUtil {
 			javax.swing.filechooser.FileFilter ff;
 			ff = switch (t) {
 				case FILES -> new javax.swing.filechooser.FileFilter() {
-					@Override public boolean accept( File pathname ) { return true; }
-					@Override public String getDescription() { return "All"; }
+					@Override public boolean accept( File pathname ) {return true;}
+
+					@Override public String getDescription() {return "All";}
 				};
 				case YAML -> new FileNameExtensionFilter("yaml", "yaml", "yml");
 				case XML -> new FileNameExtensionFilter("xml", "xml");
 				case IMAGES -> new FileNameExtensionFilter("Images", ImageIO.getReaderFileSuffixes());
 				case VIDEOS -> new FileNameExtensionFilter("Videos", "mpg", "mp4", "mov", "avi", "wmv");
-				case DIRECTORIES -> {selectDirectories = true; yield null;}
+				case DIRECTORIES -> {
+					selectDirectories = true;
+					yield null;
+				}
 				default -> throw new RuntimeException("Unknown file type");
 			};
 			if (ff == null)
@@ -365,16 +371,24 @@ public class BoofSwingUtil {
 					};
 					break;
 
-				case YAML: ff = new FileNameExtensionFilter("yaml", "yaml", "yml"); break;
+				case YAML:
+					ff = new FileNameExtensionFilter("yaml", "yaml", "yml");
+					break;
 
-				case XML: ff = new FileNameExtensionFilter("xml", "xml"); break;
-				case IMAGES: ff = new FileNameExtensionFilter("Images", UtilImageIO.IMAGE_SUFFIXES); break;
+				case XML:
+					ff = new FileNameExtensionFilter("xml", "xml");
+					break;
+				case IMAGES:
+					ff = new FileNameExtensionFilter("Images", UtilImageIO.IMAGE_SUFFIXES);
+					break;
 				case VIDEOS:
 					ff = new FileNameExtensionFilter("Videos", "mpg", "mp4", "mov", "avi", "wmv");
 					break;
 
-				case DIRECTORIES: break escape;
-				default: throw new RuntimeException("Unknown file type");
+				case DIRECTORIES:
+					break escape;
+				default:
+					throw new RuntimeException("Unknown file type");
 			}
 			chooser.getBrowser().addFileFilter(ff);
 		}
@@ -469,6 +483,33 @@ public class BoofSwingUtil {
 		prefs.put(KEY_RECENT_FILES, encoded);
 	}
 
+	public static void updateRecentItems( JComponent owner, @Nullable JMenu menuRecent,
+										  BoofLambdas.ProcessObject<BoofSwingUtil.RecentFiles> function ) {
+		if (menuRecent == null)
+			return;
+		menuRecent.removeAll();
+		List<BoofSwingUtil.RecentFiles> recentFiles = BoofSwingUtil.getListOfRecentFiles(owner);
+
+		for (BoofSwingUtil.RecentFiles info : recentFiles) {
+			JMenuItem recentItem = new JMenuItem(info.name);
+			recentItem.addActionListener(e -> function.process(info));
+			menuRecent.add(recentItem);
+		}
+
+		// don't add clear option if there is nothing to clear
+		if (recentFiles.size() == 0)
+			return;
+
+		// Add the option to clear the list of recent files
+		JMenuItem clearItem = new JMenuItem("Clear Recent");
+		clearItem.addActionListener(e -> {
+			menuRecent.removeAll();
+			BoofSwingUtil.saveRecentFiles(owner.getClass().getSimpleName(), new ArrayList<>());
+		});
+		menuRecent.addSeparator();
+		menuRecent.add(clearItem);
+	}
+
 	private static java.util.List<Map<String, Object>> encodeForYaml( java.util.List<RecentFiles> list ) {
 		java.util.List<Map<String, Object>> output = new ArrayList<>();
 
@@ -494,6 +535,7 @@ public class BoofSwingUtil {
 		if (!SwingUtilities.isEventDispatchThread())
 			throw new RuntimeException("Must be run in UI thread");
 	}
+
 	public static void checkNotGuiThread() {
 		if (SwingUtilities.isEventDispatchThread())
 			throw new RuntimeException("Must NOT be run in UI thread");
@@ -858,8 +900,8 @@ public class BoofSwingUtil {
 		Se3_F64 view_to_world = new Se3_F64();
 		Se3_F64 tmpSE3 = new Se3_F64();
 		double r = 0.1;
-		structure.views.forEach(v->{
-			structure.getWorldToView(v,world_to_view,tmpSE3).invert(view_to_world);
+		structure.views.forEach(v -> {
+			structure.getWorldToView(v, world_to_view, tmpSE3).invert(view_to_world);
 
 			// Represent the camera with a box
 			vertexes.reset();
@@ -891,5 +933,5 @@ public class BoofSwingUtil {
 		public java.util.List<String> files;
 	}
 
-	public enum FileTypes { FILES, YAML, XML, IMAGES, VIDEOS, DIRECTORIES }
+	public enum FileTypes {FILES, YAML, XML, IMAGES, VIDEOS, DIRECTORIES}
 }
