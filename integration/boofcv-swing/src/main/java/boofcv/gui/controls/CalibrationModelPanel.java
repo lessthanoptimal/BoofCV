@@ -121,7 +121,7 @@ public class CalibrationModelPanel extends StandardAlgConfigPanel implements Act
 		public PinholePanel() {
 			setBorder(BorderFactory.createEmptyBorder());
 
-			numRadial = spinner(pinholeRadial, 0, 3, 1);
+			numRadial = spinner(pinholeRadial, 0, 5, 1);
 			tangential = checkbox("Tangential", pinholeTangential);
 			skew = checkbox("Zero Skew", pinholeSkew);
 
@@ -159,7 +159,7 @@ public class CalibrationModelPanel extends StandardAlgConfigPanel implements Act
 		public UniversalPanel() {
 			setBorder(BorderFactory.createEmptyBorder());
 
-			numRadial = spinner(universalRadial, 0, 3, 1);
+			numRadial = spinner(universalRadial, 0, 5, 1);
 			tangential = checkbox("Tangential", universalTangential);
 			skew = checkbox("Zero Skew", universalSkew);
 

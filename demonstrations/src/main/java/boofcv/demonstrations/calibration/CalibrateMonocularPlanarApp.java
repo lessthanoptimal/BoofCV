@@ -82,7 +82,6 @@ public class CalibrateMonocularPlanarApp extends JPanel {
 	public static final String CALIBRATION_TARGET = "calibration_target.yaml";
 	public static final String INTRINSICS = "intrinsics.yaml";
 
-	// TODO visualize line between reprojected and observed points
 	// TODO Generalize recent file code and put into BoofSwingUtil
 	// TODO move "save landmarks" checkbox
 
@@ -750,6 +749,7 @@ public class CalibrateMonocularPlanarApp extends JPanel {
 		panel.setDisplay(configurePanel.checkPoints.value, configurePanel.checkErrors.value,
 				configurePanel.checkUndistorted.value, configurePanel.checkAll.value,
 				configurePanel.checkNumbers.value, configurePanel.checkOrder.value, configurePanel.selectErrorScale.vdouble());
+		panel.showResiduals = configurePanel.checkResidual.value;
 		panel.repaint();
 	}
 
@@ -847,7 +847,8 @@ public class CalibrateMonocularPlanarApp extends JPanel {
 		JButton bCompute = button("Compute", false);
 
 		JCheckBoxValue checkPoints = checkboxWrap("Points", true).tt("Show calibration landmarks");
-		JCheckBoxValue checkErrors = checkboxWrap("Errors", true).tt("Visualize residual errors");
+		JCheckBoxValue checkResidual = checkboxWrap("Residual", false).tt("Line showing residual exactly");
+		JCheckBoxValue checkErrors = checkboxWrap("Errors", true).tt("Exaggerated residual errors");
 		JCheckBoxValue checkUndistorted = checkboxWrap("Undistort", false).tt("Visualize undistorted image");
 		JCheckBoxValue checkAll = checkboxWrap("All", false).tt("Show location of all landmarks in all images");
 		JCheckBoxValue checkNumbers = checkboxWrap("Numbers", false).tt("Draw feature numbers");
@@ -911,6 +912,7 @@ public class CalibrateMonocularPlanarApp extends JPanel {
 			panel.add(checkPoints.check);
 			panel.add(checkErrors.check);
 			panel.add(checkUndistorted.check);
+			panel.add(checkResidual.check);
 			panel.add(checkAll.check);
 			panel.add(checkNumbers.check);
 			panel.add(checkOrder.check);
@@ -945,6 +947,8 @@ public class CalibrateMonocularPlanarApp extends JPanel {
 			} else {
 				if (source == checkPoints.check) {
 					checkPoints.updateValue();
+				} else if (source == checkResidual.check) {
+					checkResidual.updateValue();
 				} else if (source == checkErrors.check) {
 					checkErrors.updateValue();
 				} else if (source == checkUndistorted.check) {

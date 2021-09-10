@@ -36,6 +36,7 @@ import java.awt.*;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.geom.Ellipse2D;
+import java.awt.geom.Line2D;
 import java.util.List;
 
 import static boofcv.gui.calibration.UtilCalibrationGui.drawNumbers;
@@ -56,6 +57,7 @@ public abstract class DisplayCalibrationPanel extends ImageZoomPanel {
 	boolean showAll = false;
 	boolean showNumbers = true;
 	boolean showOrder = true;
+	public boolean showResiduals = false;
 	double errorScale;
 
 	// Which observation in the current image has the user selected
@@ -72,7 +74,9 @@ public abstract class DisplayCalibrationPanel extends ImageZoomPanel {
 
 	// workspace
 	protected Point2D_F32 adj = new Point2D_F32();
+	protected Point2D_F32 adj2 = new Point2D_F32();
 	protected Ellipse2D.Double ellipse = new Ellipse2D.Double();
+	protected Line2D.Double line = new Line2D.Double();
 
 	// Called after setScale has been called
 	public SetScale setScale = ( s ) -> {};
@@ -181,6 +185,23 @@ public abstract class DisplayCalibrationPanel extends ImageZoomPanel {
 
 		if (showOrder) {
 			renderOrder(g2, pixelTransform, scale, set.points);
+		}
+
+		if (showResiduals && results != null) {
+			// draw a line showing the difference between observed and reprojected points
+			// Draw this before points so that the observed points are drawn on top and you can see the delta
+			g2.setStroke(new BasicStroke(4));
+			g2.setColor(Color.GREEN);
+			for (int i = 0; i < set.size(); i++) {
+				PointIndex2D_F64 p = set.get(i);
+				float dx = (float)results.residuals[i*2];
+				float dy = (float)results.residuals[i*2+1];
+
+				pixelTransform.compute((float)p.p.x, (float)p.p.y, adj);
+				pixelTransform.compute((float)p.p.x + dx, (float)p.p.y + dy, adj2);
+				line.setLine(scale*adj.x, scale*adj.y, scale*adj2.x, scale*adj2.y);
+				g2.draw(line);
+			}
 		}
 
 		if (showPoints) {

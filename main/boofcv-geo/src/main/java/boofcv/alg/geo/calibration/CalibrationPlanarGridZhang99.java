@@ -274,8 +274,8 @@ public class CalibrationPlanarGridZhang99 implements VerbosePrint {
 			double maxError = 0;
 
 			for (int j = 0; j < v.size(); j++) {
-				double x = residuals[idx++];
-				double y = residuals[idx++];
+				double x = r.residuals[j*2] = residuals[idx++];
+				double y = r.residuals[j*2+1] = residuals[idx++];
 				double nerr = r.pointError[j] = Math.sqrt(x*x + y*y);
 
 				meanErrorMag += nerr;
