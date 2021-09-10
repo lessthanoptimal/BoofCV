@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -18,60 +18,24 @@
 
 package boofcv.abst.geo.calibration;
 
+import lombok.Getter;
+
 /**
  * Statistics on how accurately the found model fit each image during calibration.
  *
  * @author Peter Abeles
  */
 public class ImageResults {
-	public double meanError;
-	public double maxError;
-	public double biasX;
-	public double biasY;
-	
+	@Getter public double meanError;
+	@Getter public double maxError;
+	@Getter public double biasX;
+	@Getter public double biasY;
+
 	public double[] pointError;
+	public double[] residuals;
 
 	public ImageResults( int numPoints ) {
 		pointError = new double[numPoints];
-	}
-
-	public double getMeanError() {
-		return meanError;
-	}
-
-	public void setMeanError(double meanError) {
-		this.meanError = meanError;
-	}
-
-	public double getMaxError() {
-		return maxError;
-	}
-
-	public void setMaxError(double maxError) {
-		this.maxError = maxError;
-	}
-
-	public double getBiasX() {
-		return biasX;
-	}
-
-	public void setBiasX(double biasX) {
-		this.biasX = biasX;
-	}
-
-	public double getBiasY() {
-		return biasY;
-	}
-
-	public void setBiasY(double biasY) {
-		this.biasY = biasY;
-	}
-
-	public double[] getPointError() {
-		return pointError;
-	}
-
-	public void setPointError(double[] pointError) {
-		this.pointError = pointError;
+		residuals = new double[numPoints*2];
 	}
 }
