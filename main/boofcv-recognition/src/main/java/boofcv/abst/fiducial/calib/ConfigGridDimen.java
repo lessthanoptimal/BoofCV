@@ -64,6 +64,13 @@ public class ConfigGridDimen implements Configuration {
 	public ConfigGridDimen() {
 	}
 
+	public void setTo( int numRows, int numCols, double shapeSize, double shapeDistance  ) {
+		this.numRows = numRows;
+		this.numCols = numCols;
+		this.shapeSize = shapeSize;
+		this.shapeDistance = shapeDistance;
+	}
+
 	public void setTo( ConfigGridDimen src ) {
 		this.numRows = src.numRows;
 		this.numCols = src.numCols;

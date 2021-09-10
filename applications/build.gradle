@@ -6,6 +6,7 @@ dependencies {
 	api project(':main:boofcv-geo')
 	api project(':main:boofcv-sfm')
 	api project(':main:boofcv-recognition')
+	api project(':demonstrations')
 	api project(':integration:boofcv-swing')
 	api project(':integration:boofcv-WebcamCapture')
 	api project(':integration:boofcv-pdf')

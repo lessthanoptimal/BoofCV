@@ -90,7 +90,7 @@ public class DemonstrationLauncherApp extends ApplicationLauncherApp {
 	@Override
 	protected void createTree( DefaultMutableTreeNode root ) {
 		createNodes(root,"Calibration",
-				CalibrateMonocularPlanarApp.class,
+				CalibrateMonocularPlanarDemo.class,
 				CalibrateStereoPlanarGuiApp.class,
 				DetectCalibrationChessboardBinaryApp.class,
 				DetectCalibrationChessboardXCornerApp.class,

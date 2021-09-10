@@ -74,6 +74,27 @@ public class CalibrationModelPanel extends StandardAlgConfigPanel implements Act
 		addAlignCenter(panelTarget);
 	}
 
+	public void setToBrown(boolean skew, int numRadial, boolean tangential ) {
+		comboType.setSelectedIndex(CameraModelType.BROWN.ordinal());
+		pinhole.skew.setSelected(skew);
+		pinhole.numRadial.setValue(numRadial);
+		pinhole.tangential.setSelected(tangential);
+	}
+
+	public void setToUniversal(boolean skew, int numRadial, boolean tangential ) {
+		comboType.setSelectedIndex(CameraModelType.UNIVERSAL.ordinal());
+		universal.skew.setSelected(skew);
+		universal.numRadial.setValue(numRadial);
+		universal.tangential.setSelected(tangential);
+	}
+
+	public void setToKannalaBrandt(boolean skew, int numSymmetric, int numAsymmetric ) {
+		comboType.setSelectedIndex(CameraModelType.KANNALA_BRANDT.ordinal());
+		kannalaBrandt.skew.check.setSelected(skew);
+		kannalaBrandt.numSymmetric.spinner.setValue(numSymmetric);
+		kannalaBrandt.numAsymmetric.spinner.setValue(numAsymmetric);
+	}
+
 	public void configureCalibrator(CalibrateMonoPlanar calibrator) {
 		switch (selected) {
 			case BROWN -> calibrator.configurePinhole(pinholeSkew, pinholeRadial, pinholeTangential);

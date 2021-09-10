@@ -19,6 +19,7 @@
 package boofcv.app;
 
 import boofcv.app.qrcode.CreateQrCodeGui;
+import boofcv.demonstrations.calibration.CalibrateMonocularPlanarApp;
 import boofcv.gui.BoofLogo;
 import boofcv.gui.BoofSwingUtil;
 
@@ -61,7 +62,7 @@ public class ApplicationLauncherGui extends JPanel {
 		JButton bCreateFidImage = createButton("Square Image", CreateFiducialSquareImageGui::new);
 		JButton bCreateFidHamming = createButton("Square Hamming", CreateFiducialSquareHammingGui::new);
 
-		JButton bUtilCalib = createButton("Calibration", CameraCalibrationGui::new);
+		JButton bUtilCalib = createButton("Calibration", () -> CalibrateMonocularPlanarApp.main(null));
 		JButton bUtilScanQrCode = createButton("Batch QR Code", BatchScanQrCodesGui::new);
 		JButton bUtilDown = createButton("Batch Downsize", BatchDownsizeImageGui::new);
 		JButton bUtilUndist = createButton("Batch Undistort", BatchRemoveLensDistortionGui::new);

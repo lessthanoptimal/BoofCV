@@ -114,7 +114,7 @@ public class BaseStandardInputApp {
 			}
 		}
 		if (indexEquals == word.length())
-			throw new RuntimeException("Expected = inside of flag");
+			throw new RuntimeException("Expected = inside of flag. " + word);
 
 		flagName = word.substring(2, indexEquals);
 		parameters = word.substring(indexEquals + 1);

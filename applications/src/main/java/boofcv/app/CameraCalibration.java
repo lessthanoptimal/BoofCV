@@ -18,22 +18,18 @@
 
 package boofcv.app;
 
+import boofcv.abst.fiducial.calib.CalibrationPatterns;
 import boofcv.abst.fiducial.calib.ConfigECoCheckMarkers;
-import boofcv.abst.fiducial.calib.ConfigGridDimen;
 import boofcv.abst.geo.calibration.CalibrateMonoPlanar;
 import boofcv.abst.geo.calibration.DetectSingleFiducialCalibration;
-import boofcv.abst.geo.calibration.MultiToSingleFiducialCalibration;
+import boofcv.alg.fiducial.calib.ConfigCalibrationTarget;
 import boofcv.app.calib.AssistedCalibration;
 import boofcv.app.calib.AssistedCalibrationGui;
 import boofcv.app.calib.ComputeGeometryScore;
+import boofcv.demonstrations.calibration.CalibrateMonocularPlanarApp;
 import boofcv.factory.fiducial.FactoryFiducialCalibration;
-import boofcv.gui.BoofSwingUtil;
-import boofcv.gui.calibration.CalibratedPlanarPanel;
-import boofcv.gui.calibration.KannalaBrandtPlanarPanel;
-import boofcv.gui.calibration.MonoPlanarPanel;
-import boofcv.gui.calibration.UniversalOmniPlanarPanel;
+import boofcv.gui.controls.CalibrationModelPanel;
 import boofcv.gui.image.ShowImages;
-import boofcv.io.ProgressMonitorThread;
 import boofcv.io.UtilIO;
 import boofcv.io.calibration.CalibrationIO;
 import boofcv.io.image.ConvertBufferedImage;
@@ -48,7 +44,6 @@ import com.github.sarxos.webcam.Webcam;
 import org.apache.commons.io.FilenameUtils;
 
 import javax.swing.*;
-import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.*;
 import java.util.ArrayList;
@@ -66,19 +61,19 @@ public class CameraCalibration extends BaseStandardInputApp {
 
 	protected String inputPattern;
 	protected String outputFilePath = "intrinsic.yaml";
-	protected DetectSingleFiducialCalibration detector;
 	protected boolean zeroSkew = true;
 	protected int numRadial = 2;
 	protected boolean tangential = false;
 	protected CameraModelType modeType = CameraModelType.BROWN;
 	protected FormatType formatType = FormatType.BOOFCV;
 
+	protected ConfigCalibrationTarget configTarget = new ConfigCalibrationTarget();
+
 	// parameters for Kannala-Brandt
 	protected int kbNumSymmetric = 5;
 	protected int kbNumAsymmetric = 0;
 
 	protected boolean GUI = false;
-	protected boolean visualize = false;
 	protected boolean saveLandmarks = false;
 	protected boolean justDetect = false;
 	protected boolean verbose = false;
@@ -105,8 +100,6 @@ public class CameraCalibration extends BaseStandardInputApp {
 		System.out.println("                                     If not a pattern then it's assumed to be a path. All files");
 		System.out.println("                                     with known image extensions in their name as added,");
 		System.out.println("                                     e.g. jpg, png");
-		System.out.println();
-		System.out.println("  --Visualize                        Turns on visualization in a GUI of final results");
 		System.out.println();
 		System.out.println("Input: Webcam Options:  ");
 		System.out.println();
@@ -186,6 +179,8 @@ public class CameraCalibration extends BaseStandardInputApp {
 			throw new RuntimeException("Must specify some arguments");
 		}
 
+		configTarget.type = null;
+
 		cameraId = -1; // override default value of zero so that its easy to tell if a camera was slected
 		for (int i = 0; i < args.length; i++) {
 			String arg = args[i];
@@ -195,8 +190,6 @@ public class CameraCalibration extends BaseStandardInputApp {
 					GUI = true;
 				} else if (arg.compareToIgnoreCase("--Verbose") == 0) {
 					verbose = true;
-				} else if (arg.compareToIgnoreCase("--Visualize") == 0) {
-					visualize = true;
 				} else if (arg.compareToIgnoreCase("--SaveLandmarks") == 0) {
 					saveLandmarks = true;
 				} else if (arg.compareToIgnoreCase("--JustDetect") == 0) {
@@ -268,6 +261,7 @@ public class CameraCalibration extends BaseStandardInputApp {
 	}
 
 	protected void parseECoCheck( int index, String[] args ) {
+		configTarget.type = CalibrationPatterns.ECOCHECK;
 		String format = null;
 
 		for (; index < args.length; index++) {
@@ -292,11 +286,11 @@ public class CameraCalibration extends BaseStandardInputApp {
 		if (verbose)
 			System.out.println("ecocheck: " + format);
 
-		ConfigECoCheckMarkers config = ConfigECoCheckMarkers.parse(format, 1.0);
-		detector = new MultiToSingleFiducialCalibration(FactoryFiducialCalibration.ecocheck(null, config));
+		configTarget.ecocheck = ConfigECoCheckMarkers.parse(format, 1.0);
 	}
 
 	protected void parseChessboard( int index, String[] args ) {
+		configTarget.type = CalibrationPatterns.CHESSBOARD;
 		int numRows = 0, numColumns = 0;
 
 		for (; index < args.length; index++) {
@@ -324,12 +318,11 @@ public class CameraCalibration extends BaseStandardInputApp {
 		if (verbose)
 			System.out.println("chessboard: " + numRows + " x " + numColumns);
 
-		ConfigGridDimen config = new ConfigGridDimen(numRows, numColumns, 1);
-
-		detector = FactoryFiducialCalibration.chessboardX(null, config);
+		configTarget.grid.setTo(numRows, numColumns, 1, -1);
 	}
 
 	protected void parseSquareGrid( int index, String[] args ) {
+		configTarget.type = CalibrationPatterns.SQUARE_GRID;
 		int numRows = 0, numColumns = 0;
 		double square = 1, space = 1;
 
@@ -366,9 +359,7 @@ public class CameraCalibration extends BaseStandardInputApp {
 		if (verbose)
 			System.out.println("squaregrid: " + numRows + " x " + numColumns + " square/space = " + (square/space));
 
-		ConfigGridDimen config = new ConfigGridDimen(numRows, numColumns, square, space);
-
-		detector = FactoryFiducialCalibration.squareGrid(null, config);
+		configTarget.grid.setTo(numRows, numColumns, square, space);
 	}
 
 	protected void parseCircle( int index, String[] args, boolean hexagonal ) {
@@ -406,19 +397,17 @@ public class CameraCalibration extends BaseStandardInputApp {
 
 		if (hexagonal) {
 			System.out.println("circle hexagonal: " + numRows + " x " + numColumns + " diameter = " + diameter + " center distance = " + centerDistance);
-			ConfigGridDimen config = new ConfigGridDimen(numRows, numColumns, diameter, centerDistance);
-
-			detector = FactoryFiducialCalibration.circleHexagonalGrid(null, config);
+			configTarget.type = CalibrationPatterns.CIRCLE_HEXAGONAL;
+			configTarget.grid.setTo(numRows, numColumns, diameter, centerDistance);
 		} else {
 			System.out.println("circle regular: " + numRows + " x " + numColumns + " diameter = " + diameter + " center distance = " + centerDistance);
-			ConfigGridDimen config = new ConfigGridDimen(numRows, numColumns, diameter, centerDistance);
-
-			detector = FactoryFiducialCalibration.circleRegularGrid(null, config);
+			configTarget.type = CalibrationPatterns.CIRCLE_GRID;
+			configTarget.grid.setTo(numRows, numColumns, diameter, centerDistance);
 		}
 	}
 
 	public void process() {
-		if (detector == null) {
+		if (!GUI && configTarget.type == null) {
 			printHelp();
 			System.out.println();
 			System.err.println("Must specify the type of fiducial to use for calibration!");
@@ -442,29 +431,6 @@ public class CameraCalibration extends BaseStandardInputApp {
 		File outputDirectory = null;
 		PrintStream summaryDetection = null;
 
-		final CalibrateMonoPlanar calibrationAlg = new CalibrateMonoPlanar(detector.getLayout());
-		final CalibratedPlanarPanel gui;
-		ProcessThread monitor = null;
-
-		switch (modeType) {
-			case BROWN -> calibrationAlg.configurePinhole(zeroSkew, numRadial, tangential);
-			case UNIVERSAL -> calibrationAlg.configureUniversalOmni(zeroSkew, numRadial, tangential);
-			case KANNALA_BRANDT -> calibrationAlg.configureKannalaBrandt(zeroSkew, kbNumSymmetric, kbNumAsymmetric);
-			default -> throw new RuntimeException("Unknown model type: " + modeType);
-		}
-
-		if (visualize) {
-			gui = switch (modeType) {
-				case BROWN -> new MonoPlanarPanel();
-				case UNIVERSAL -> new UniversalOmniPlanarPanel();
-				case KANNALA_BRANDT -> new KannalaBrandtPlanarPanel();
-			};
-			monitor = new ProcessThread(gui);
-			monitor.start();
-		} else {
-			gui = null;
-		}
-
 		List<String> imagePath = UtilIO.listSmartImages(inputPattern, true);
 
 		if (imagePath.isEmpty()) {
@@ -476,6 +442,21 @@ public class CameraCalibration extends BaseStandardInputApp {
 
 		if (verbose)
 			System.out.println("Total images found: " + imagePath.size());
+
+		if (GUI) {
+			launchCalibrationApp(imagePath);
+			return;
+		}
+
+		final DetectSingleFiducialCalibration detector = FactoryFiducialCalibration.genericSingle(configTarget);
+		final CalibrateMonoPlanar calibrationAlg = new CalibrateMonoPlanar(detector.getLayout());
+
+		switch (modeType) {
+			case BROWN -> calibrationAlg.configurePinhole(zeroSkew, numRadial, tangential);
+			case UNIVERSAL -> calibrationAlg.configureUniversalOmni(zeroSkew, numRadial, tangential);
+			case KANNALA_BRANDT -> calibrationAlg.configureKannalaBrandt(zeroSkew, kbNumSymmetric, kbNumAsymmetric);
+			default -> throw new RuntimeException("Unknown model type: " + modeType);
+		}
 
 		// If configured to do so, create directory to store more verbose information
 		if (saveLandmarks) {
@@ -502,14 +483,9 @@ public class CameraCalibration extends BaseStandardInputApp {
 			}
 		}
 
-		if (monitor != null) {
-			monitor.setMessage(0, "Loading images");
-		}
-
 		final List<File> imagesSuccess = new ArrayList<>();
 		final List<File> imagesFailed = new ArrayList<>();
 
-		boolean first = true;
 		for (String path : imagePath) {
 			File f = new File(path);
 			if (f.isDirectory() || f.isHidden())
@@ -522,23 +498,6 @@ public class CameraCalibration extends BaseStandardInputApp {
 			}
 
 			GrayF32 image = ConvertBufferedImage.convertFrom(buffered, (GrayF32)null);
-
-			if (monitor != null) {
-				monitor.setMessage(0, f.getName());
-
-				if (first) {
-					first = false;
-					// should do this more intelligently based on image resolution
-					int width = Math.min(1000, image.getWidth());
-					int height = Math.min(width*image.height/image.width, image.getHeight());
-
-					gui.mainView.setPreferredSize(new Dimension(width, height));
-					gui.showImageProcessed(buffered);
-					ShowImages.showWindow(gui, "Monocular Calibration", true);
-				} else {
-					BoofSwingUtil.invokeNowOrLater(() -> gui.showImageProcessed(buffered));
-				}
-			}
 
 			if (detector.process(image)) {
 				imagesSuccess.add(f);
@@ -577,31 +536,9 @@ public class CameraCalibration extends BaseStandardInputApp {
 			return;
 		}
 
-		if (monitor != null) {
-			monitor.setMessage(1, "Computing intrinsics");
-		}
-
 		// process and compute intrinsic parameters
 		try {
 			final CameraModel intrinsic = calibrationAlg.process();
-
-			if (monitor != null) {
-				monitor.stopThread();
-
-				if (imagesFailed.size() > 0) {
-					JOptionPane.showMessageDialog(gui, "Failed to detect in " + imagesFailed.size() + " images");
-				}
-
-				SwingUtilities.invokeLater(() -> {
-					gui.setImages(imagesSuccess);
-					gui.setImagesFailed(imagesFailed);
-					gui.setObservations(calibrationAlg.getObservations());
-					gui.setResults(calibrationAlg.getErrors());
-					gui.setCalibration(calibrationAlg.getIntrinsic(), calibrationAlg.getStructure());
-					gui.setCorrection(intrinsic);
-					gui.repaint();
-				});
-			}
 
 			// Save calibration statistics to disk
 			if (outputDirectory != null) {
@@ -640,29 +577,32 @@ public class CameraCalibration extends BaseStandardInputApp {
 				System.out.println();
 			}
 		} catch (RuntimeException e) {
-			if (visualize)
-				BoofSwingUtil.warningDialog(gui, e);
 			e.printStackTrace();
 			System.exit(1);
 		}
 	}
 
-	/**
-	 * Displays a progress monitor and updates its state periodically
-	 */
-	public static class ProcessThread extends ProgressMonitorThread {
-		public ProcessThread( Component parent ) {
-			super(new ProgressMonitor(parent, "Computing Calibration", "", 0, 2));
-		}
+	private void launchCalibrationApp( List<String> imagePath ) {
+		SwingUtilities.invokeLater(() -> {
+			var app = new CalibrateMonocularPlanarApp();
+			// Configure the application using the commandline arguments
+			app.getConfigurePanel().getTargetPanel().setConfigurationTo(configTarget);
+			CalibrationModelPanel modelPanel = app.getConfigurePanel().getModelPanel();
+			switch (modeType) {
+				case BROWN -> modelPanel.setToBrown(zeroSkew, numRadial, tangential);
+				case UNIVERSAL -> modelPanel.setToUniversal(zeroSkew, numRadial, tangential);
+				case KANNALA_BRANDT -> modelPanel.setToKannalaBrandt(zeroSkew, kbNumSymmetric, kbNumAsymmetric);
+			}
 
-		public void setMessage( final int state, final String message ) {
-			SwingUtilities.invokeLater(() -> {
-				monitor.setProgress(state);
-				monitor.setNote(message);
-			});
-		}
+			app.window = ShowImages.showWindow(app, "Monocular Planar Calibration", true);
+			app.window.setJMenuBar(app.menuBar);
 
-		@Override public void doRun() {}
+			// it needs a directory. images could be in multiple directories, this just picks the first one
+			File directory = new File(imagePath.get(0)).getParentFile();
+
+			// start processing!
+			new Thread(() -> app.processImages(directory, imagePath)).start();
+		});
 	}
 
 	/**
@@ -683,6 +623,7 @@ public class CameraCalibration extends BaseStandardInputApp {
 			}
 		}));
 
+		final DetectSingleFiducialCalibration detector = FactoryFiducialCalibration.genericSingle(configTarget);
 		ComputeGeometryScore quality = new ComputeGeometryScore(zeroSkew, detector.getLayout());
 		AssistedCalibrationGui gui = new AssistedCalibrationGui(webcam.getViewSize());
 		JFrame frame = ShowImages.showWindow(gui, "Webcam Calibration", true);
@@ -731,11 +672,7 @@ public class CameraCalibration extends BaseStandardInputApp {
 		try {
 			if (args.length > 0) {
 				app.parse(args);
-				if (app.GUI) {
-					new CameraCalibrationGui();
-				} else {
-					app.process();
-				}
+				app.process();
 				failed = false;
 			}
 		} catch (RuntimeException e) {
