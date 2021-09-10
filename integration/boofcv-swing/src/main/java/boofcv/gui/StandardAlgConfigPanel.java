@@ -42,14 +42,14 @@ import java.text.DecimalFormat;
 public class StandardAlgConfigPanel extends JPanel implements ActionListener, ChangeListener, JConfigLength.Listener {
 
 	public StandardAlgConfigPanel() {
-		setLayout(new BoxLayout(this,BoxLayout.Y_AXIS));
+		setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
 		setBorder(BorderFactory.createEtchedBorder(EtchedBorder.RAISED));
 	}
 
-	protected JFormattedTextField textfield( double value , double min , double max , int panelWidth ) {
+	public JFormattedTextField textfield( double value, double min, double max, int panelWidth ) {
 		JFormattedTextField field = BoofSwingUtil.createTextField(value, min, max);
 		field.addActionListener(this);
-		field.setPreferredSize(new Dimension(panelWidth,24));
+		field.setPreferredSize(new Dimension(panelWidth, 24));
 		field.setMaximumSize(field.getPreferredSize());
 		return field;
 	}
@@ -57,7 +57,7 @@ public class StandardAlgConfigPanel extends JPanel implements ActionListener, Ch
 	/**
 	 * Wraps the input panel inside another panel that will fill the control panel horizontally
 	 */
-	protected static JPanel fillHorizontally( JPanel panel ) {
+	public static JPanel fillHorizontally( JPanel panel ) {
 		JPanel hack = new JPanel(new BorderLayout()) {
 			@Override
 			public Dimension getPreferredSize() {
@@ -71,61 +71,60 @@ public class StandardAlgConfigPanel extends JPanel implements ActionListener, Ch
 				return getPreferredSize();
 			}
 		};
-		hack.add(panel,BorderLayout.CENTER);
+		hack.add(panel, BorderLayout.CENTER);
 		return hack;
 	}
 
-	protected void addToolTip( JComponent component , String toolTip ) {
+	protected void addToolTip( JComponent component, String toolTip ) {
 		component.setToolTipText(toolTip);
 		add(component);
 	}
 
-	protected JConfigLength configLength(ConfigLength initial , double min , double max ) {
-		JConfigLength control = new JConfigLength(this,true);
+	public JConfigLength configLength( ConfigLength initial, double min, double max ) {
+		JConfigLength control = new JConfigLength(this, true);
 		control.setValue(initial);
-		control.setLengthBounds(min,max);
+		control.setLengthBounds(min, max);
 		control.setMaximumSize(control.getPreferredSize());
 		return control;
 	}
 
-	protected JConfigLength configLength(ConfigLength initial , double min , double max , BoofLambdas.ProcessCall listener ) {
-		JConfigLength.Listener cl = (source, fraction, length) -> listener.process();
+	public JConfigLength configLength( ConfigLength initial, double min, double max, BoofLambdas.ProcessCall listener ) {
+		JConfigLength.Listener cl = ( source, fraction, length ) -> listener.process();
 
-		JConfigLength control = new JConfigLength(cl,true);
+		JConfigLength control = new JConfigLength(cl, true);
 		control.setValue(initial);
-		control.setLengthBounds(min,max);
+		control.setLengthBounds(min, max);
 		control.setMaximumSize(control.getPreferredSize());
 		return control;
 	}
 
-	protected JButton buttonIcon( String name , boolean enabled ) {
-		JButton b = BoofSwingUtil.createButtonIconGUI(name,24,24);
+	public JButton buttonIcon( String name, boolean enabled ) {
+		JButton b = BoofSwingUtil.createButtonIconGUI(name, 24, 24);
 		b.setEnabled(enabled);
 		b.addActionListener(this);
 		return b;
 	}
 
-
-	protected JButton button( String name , boolean enabled ) {
-		return button(name,enabled,this);
+	public JButton button( String name, boolean enabled ) {
+		return button(name, enabled, this);
 	}
 
-	protected JButton button( String name , boolean enabled , ActionListener listener ) {
+	public JButton button( String name, boolean enabled, ActionListener listener ) {
 		JButton b = new JButton(name);
 		b.setEnabled(enabled);
 		b.addActionListener(listener);
 		return b;
 	}
 
-	protected JSlider slider( int min , int max , int initial , int widgetWidth ) {
-		JSlider slider = new JSlider(min,max,initial);
-		slider.setMaximumSize(new Dimension(widgetWidth,24));
+	public JSlider slider( int min, int max, int initial, int widgetWidth ) {
+		JSlider slider = new JSlider(min, max, initial);
+		slider.setMaximumSize(new Dimension(widgetWidth, 24));
 		slider.setPreferredSize(slider.getMaximumSize());
 		slider.addChangeListener(this);
 		return slider;
 	}
 
-	protected JComboBox<String> combo( int initial , Object... items ) {
+	public JComboBox<String> combo( int initial, Object... items ) {
 		JComboBox<String> c = new JComboBox<>();
 
 		for (int i = 0; i < items.length; i++) {
@@ -137,20 +136,20 @@ public class StandardAlgConfigPanel extends JPanel implements ActionListener, Ch
 		return c;
 	}
 
-	protected JComboBox<String> combo( ActionListener listener, int initial , Object... items ) {
+	public JComboBox<String> combo( ActionListener listener, int initial, Object... items ) {
 		JComboBox<String> c = new JComboBox<>();
 
 		for (int i = 0; i < items.length; i++) {
 			c.addItem(items[i].toString());
 		}
 		c.setSelectedIndex(initial);
-		if( listener != null )
+		if (listener != null)
 			c.addActionListener(listener);
 		c.setMaximumSize(c.getPreferredSize());
 		return c;
 	}
 
-	protected JSpinner spinner(int initial , Object[] items ) {
+	public JSpinner spinner( int initial, Object[] items ) {
 		JSpinner spinner = new JSpinner(new SpinnerListModel(items));
 		spinner.setValue(items[initial]);
 		spinner.setMaximumSize(spinner.getPreferredSize());
@@ -158,29 +157,29 @@ public class StandardAlgConfigPanel extends JPanel implements ActionListener, Ch
 		return spinner;
 	}
 
-	protected JSpinner spinner(int initial , int minimum , int maximum, int stepSize , ChangeListener listener ) {
+	public JSpinner spinner( int initial, int minimum, int maximum, int stepSize, ChangeListener listener ) {
 		JSpinner spinner = new JSpinner(new SpinnerNumberModel(initial, minimum, maximum, stepSize));
 		spinner.setMaximumSize(spinner.getPreferredSize());
 		spinner.addChangeListener(listener);
 		return spinner;
 	}
 
-	protected JSpinner spinner(int initial , int minimum , int maximum, int stepSize ) {
+	public JSpinner spinner( int initial, int minimum, int maximum, int stepSize ) {
 		JSpinner spinner = new JSpinner(new SpinnerNumberModel(initial, minimum, maximum, stepSize));
 		spinner.setMaximumSize(spinner.getPreferredSize());
 		spinner.addChangeListener(this);
 		return spinner;
 	}
 
-	protected JSpinner spinner( double initial , double minimum , double maximum, double stepSize ) {
+	public JSpinner spinner( double initial, double minimum, double maximum, double stepSize ) {
 		JSpinner spinner = new JSpinner(new SpinnerNumberModel(initial, minimum, maximum, stepSize));
 		spinner.setMaximumSize(spinner.getPreferredSize());
 		spinner.addChangeListener(this);
 		return spinner;
 	}
 
-	protected JSpinner spinner( double initial , double minimum , double maximum, double stepSize,
-								int integerDigits, int fractionDigits ) {
+	public JSpinner spinner( double initial, double minimum, double maximum, double stepSize,
+							 int integerDigits, int fractionDigits ) {
 		JSpinner spinner = new JSpinner(new SpinnerNumberModel(initial, minimum, maximum, stepSize));
 		JSpinner.NumberEditor editor = (JSpinner.NumberEditor)spinner.getEditor();
 		DecimalFormat format = editor.getFormat();
@@ -188,23 +187,24 @@ public class StandardAlgConfigPanel extends JPanel implements ActionListener, Ch
 		format.setMinimumIntegerDigits(integerDigits);
 		editor.getTextField().setHorizontalAlignment(SwingConstants.CENTER);
 		Dimension d = spinner.getPreferredSize();
-		d.width = (integerDigits+1+fractionDigits)*12;
+		d.width = (integerDigits + 1 + fractionDigits)*12;
 		spinner.setPreferredSize(d);
 		spinner.setMaximumSize(d);
 		// force it to render using the format specified above. A bit of a hack. Got a better idea?
-		spinner.setValue(1-initial);spinner.setValue(initial);
+		spinner.setValue(1 - initial);
+		spinner.setValue(initial);
 		spinner.addChangeListener(this);
 		return spinner;
 	}
 
-	protected JSpinnerNumber spinnerWrap( double initial , double minimum , double maximum, double stepSize ) {
+	public JSpinnerNumber spinnerWrap( double initial, double minimum, double maximum, double stepSize ) {
 		JSpinner spinner = new JSpinner(new SpinnerNumberModel(initial, minimum, maximum, stepSize));
 		spinner.setMaximumSize(spinner.getPreferredSize());
 		spinner.addChangeListener(this);
 		return new JSpinnerNumber(spinner, initial);
 	}
 
-	protected JSpinnerNumber spinnerWrap( int initial , int minimum , int maximum, int stepSize ) {
+	public JSpinnerNumber spinnerWrap( int initial, int minimum, int maximum, int stepSize ) {
 		JSpinner spinner = new JSpinner(new SpinnerNumberModel(initial, minimum, maximum, stepSize));
 		spinner.setMaximumSize(spinner.getPreferredSize());
 		spinner.addChangeListener(this);
@@ -212,14 +212,13 @@ public class StandardAlgConfigPanel extends JPanel implements ActionListener, Ch
 	}
 
 	/**
-	 *
 	 * @param formatString Example of a format. "0.0E0". See {@link DecimalFormat}
 	 */
-	protected JSpinner spinner( double initial , double minimum , double maximum, double stepSize,
-								String formatString , int digits  ) {
+	public JSpinner spinner( double initial, double minimum, double maximum, double stepSize,
+							 String formatString, int digits ) {
 
 		JSpinner spinner = new JSpinner(new SpinnerNumberModel(initial, minimum, maximum, stepSize));
-		JSpinner.NumberEditor editor = new JSpinner.NumberEditor(spinner,formatString);
+		JSpinner.NumberEditor editor = new JSpinner.NumberEditor(spinner, formatString);
 		spinner.setEditor(editor);
 		editor.getTextField().setHorizontalAlignment(SwingConstants.CENTER);
 		Dimension d = spinner.getPreferredSize();
@@ -227,12 +226,13 @@ public class StandardAlgConfigPanel extends JPanel implements ActionListener, Ch
 		spinner.setPreferredSize(d);
 		spinner.setMaximumSize(d);
 		// force it to render using the format specified above. A bit of a hack. Got a better idea?
-		spinner.setValue(1-initial);spinner.setValue(initial);
+		spinner.setValue(1 - initial);
+		spinner.setValue(initial);
 		spinner.addChangeListener(this);
 		return spinner;
 	}
 
-	protected void configureSpinnerFloat(JSpinner spinner, int integerDigits, int fractionDigits) {
+	public void configureSpinnerFloat( JSpinner spinner, int integerDigits, int fractionDigits ) {
 		double min = ((Number)((SpinnerNumberModel)spinner.getModel()).getMinimum()).doubleValue();
 		int adjust = min < 0 ? 1 : 0;
 		JSpinner.NumberEditor editor = (JSpinner.NumberEditor)spinner.getEditor();
@@ -241,64 +241,64 @@ public class StandardAlgConfigPanel extends JPanel implements ActionListener, Ch
 		format.setMinimumIntegerDigits(integerDigits);
 		editor.getTextField().setHorizontalAlignment(SwingConstants.CENTER);
 		Dimension d = spinner.getPreferredSize();
-		d.width = (adjust+integerDigits+1+fractionDigits)*11;
+		d.width = (adjust + integerDigits + 1 + fractionDigits)*11;
 		spinner.setPreferredSize(d);
 		spinner.setMaximumSize(d);
 	}
 
-	protected JCheckBox checkbox( String text , boolean value ) {
-		return checkbox(text,value,null);
+	public JCheckBox checkbox( String text, boolean value ) {
+		return checkbox(text, value, null);
 	}
 
-	protected JCheckBox checkbox( String text , boolean value , String tooltip ) {
+	public JCheckBox checkbox( String text, boolean value, String tooltip ) {
 		JCheckBox c = new JCheckBox(text);
 		c.setSelected(value);
-		c.addActionListener( this);
+		c.addActionListener(this);
 
-		if( tooltip != null )
+		if (tooltip != null)
 			c.setToolTipText(tooltip);
 
 		return c;
 	}
 
-	protected JCheckBoxValue checkboxWrap( String text , boolean value) {
+	public JCheckBoxValue checkboxWrap( String text, boolean value ) {
 		JCheckBox c = new JCheckBox(text);
 		c.setSelected(value);
-		c.addActionListener( this);
+		c.addActionListener(this);
 
 		return new JCheckBoxValue(c, value);
 	}
 
-	public void addAlignLeft( JComponent target , String tooltip ) {
+	public void addAlignLeft( JComponent target, String tooltip ) {
 		target.setToolTipText(tooltip);
-		addAlignLeft(target,this);
+		addAlignLeft(target, this);
 	}
 
-	public void addAlignRight( JComponent target , String tooltip  ) {
+	public void addAlignRight( JComponent target, String tooltip ) {
 		target.setToolTipText(tooltip);
-		addAlignRight(target,this);
+		addAlignRight(target, this);
 	}
 
-	public void addAlignCenter( JComponent target , String tooltip  ) {
+	public void addAlignCenter( JComponent target, String tooltip ) {
 		target.setToolTipText(tooltip);
-		addAlignCenter(target,this);
+		addAlignCenter(target, this);
 	}
 
 	public void addAlignLeft( JComponent target ) {
-		addAlignLeft(target,this);
+		addAlignLeft(target, this);
 	}
 
 	public void addAlignRight( JComponent target ) {
-		addAlignRight(target,this);
+		addAlignRight(target, this);
 	}
 
 	public void addAlignCenter( JComponent target ) {
-		addAlignCenter(target,this);
+		addAlignCenter(target, this);
 	}
 
 	public static void addAlignLeft( JComponent target, JPanel owner ) {
 		JPanel p = new JPanel();
-		p.setLayout(new BoxLayout(p,BoxLayout.X_AXIS));
+		p.setLayout(new BoxLayout(p, BoxLayout.X_AXIS));
 		p.add(target);
 		p.add(Box.createHorizontalGlue());
 		owner.add(p);
@@ -306,7 +306,7 @@ public class StandardAlgConfigPanel extends JPanel implements ActionListener, Ch
 
 	public static void addAlignRight( JComponent target, JPanel owner ) {
 		JPanel p = new JPanel();
-		p.setLayout(new BoxLayout(p,BoxLayout.X_AXIS));
+		p.setLayout(new BoxLayout(p, BoxLayout.X_AXIS));
 		p.add(Box.createHorizontalGlue());
 		p.add(target);
 		owner.add(p);
@@ -314,7 +314,7 @@ public class StandardAlgConfigPanel extends JPanel implements ActionListener, Ch
 
 	public static void addAlignCenter( JComponent target, JPanel owner ) {
 		JPanel p = new JPanel();
-		p.setLayout(new BoxLayout(p,BoxLayout.X_AXIS));
+		p.setLayout(new BoxLayout(p, BoxLayout.X_AXIS));
 		p.add(Box.createHorizontalGlue());
 		p.add(target);
 		p.add(Box.createHorizontalGlue());
@@ -322,18 +322,18 @@ public class StandardAlgConfigPanel extends JPanel implements ActionListener, Ch
 	}
 
 	public void addCenterLabel( String text ) {
-		addCenterLabel(text,this);
+		addCenterLabel(text, this);
 	}
 
-	public void addCenterLabel( String text , JPanel owner ) {
+	public void addCenterLabel( String text, JPanel owner ) {
 		JLabel l = new JLabel(text);
 		l.setAlignmentX(Component.CENTER_ALIGNMENT);
 		owner.add(l);
-		owner.add(Box.createRigidArea(new Dimension(1,8)));
+		owner.add(Box.createRigidArea(new Dimension(1, 8)));
 	}
 
-	public void addSeparator(int width) {
-		add(Box.createRigidArea(new Dimension(1,8)));
+	public void addSeparator( int width ) {
+		add(Box.createRigidArea(new Dimension(1, 8)));
 		JSeparator separator = new JSeparator(SwingConstants.HORIZONTAL);
 		separator.setMaximumSize(new Dimension(width, 5));
 		add(separator);
@@ -343,47 +343,47 @@ public class StandardAlgConfigPanel extends JPanel implements ActionListener, Ch
 	public void addSeparator() {
 		add(Box.createRigidArea(new Dimension(1, 8)));
 		add(new JSeparator());
-		add(Box.createRigidArea(new Dimension(1,8)));
+		add(Box.createRigidArea(new Dimension(1, 8)));
 	}
 
-	public void addLabeled( JComponent target , String text ) {
-		addLabeled(target,text,null);
+	public void addLabeled( JComponent target, String text ) {
+		addLabeled(target, text, null);
 	}
 
-	public void addLabeled( JComponent target , String text , String tooltip ) {
-		addLabeled(target,text, tooltip, this);
+	public void addLabeled( JComponent target, String text, String tooltip ) {
+		addLabeled(target, text, tooltip, this);
 	}
 
-	public static void addLabeled(JComponent target, String text, String tooltip, JPanel owner) {
+	public static void addLabeled( JComponent target, String text, String tooltip, JPanel owner ) {
 		JLabel label = new JLabel(text);
 		label.setLabelFor(target);
 		JPanel p = new JPanel();
-		p.setLayout(new BoxLayout(p,BoxLayout.X_AXIS));
+		p.setLayout(new BoxLayout(p, BoxLayout.X_AXIS));
 		p.add(label);
 		p.add(Box.createHorizontalGlue());
 		p.add(target);
 		owner.add(p);
 
-		if( tooltip != null ) {
+		if (tooltip != null) {
 			label.setToolTipText(tooltip);
 			target.setToolTipText(tooltip);
 		}
 	}
 
-	public static JPanel createHorizontalPanel( Component ...children ) {
+	public static JPanel createHorizontalPanel( Component... children ) {
 		JPanel panel = new JPanel();
-		panel.setLayout(new BoxLayout(panel,BoxLayout.X_AXIS));
-		for( var c : children ) {
+		panel.setLayout(new BoxLayout(panel, BoxLayout.X_AXIS));
+		for (var c : children) {
 			panel.add(c);
 		}
 		return panel;
 	}
 
-	public void addLabeledV( JComponent target , String text ) {
-		addLabeledV(target,text,this);
+	public void addLabeledV( JComponent target, String text ) {
+		addLabeledV(target, text, this);
 	}
 
-	public static void addLabeledV( JComponent target , String text , JPanel owner ) {
+	public static void addLabeledV( JComponent target, String text, JPanel owner ) {
 		JLabel label = new JLabel(text);
 		label.setLabelFor(target);
 		target.setAlignmentX(Component.CENTER_ALIGNMENT);
@@ -398,6 +398,7 @@ public class StandardAlgConfigPanel extends JPanel implements ActionListener, Ch
 	public void addVerticalGlue() {
 		addVerticalGlue(this);
 	}
+
 	public static void addVerticalGlue( JPanel owner ) {
 		owner.add(Box.createVerticalGlue());
 	}
@@ -406,13 +407,13 @@ public class StandardAlgConfigPanel extends JPanel implements ActionListener, Ch
 		owner.add(Box.createHorizontalGlue());
 	}
 
-	protected void setEnabled( int index , boolean enabled ) {
+	protected void setEnabled( int index, boolean enabled ) {
 		Component c = getComponent(index);
-		if( c instanceof JPanel ) {
+		if (c instanceof JPanel) {
 			JPanel p = (JPanel)c;
 			p.getComponent(0).setEnabled(enabled);
 			p.getComponent(2).setEnabled(enabled);
-		} else if( c instanceof JLabel ) {
+		} else if (c instanceof JLabel) {
 			c.setEnabled(enabled);
 		}
 	}
@@ -421,7 +422,7 @@ public class StandardAlgConfigPanel extends JPanel implements ActionListener, Ch
 	 * Searches inside the children of "root" for a component that's a JPanel. Then inside the JPanel it
 	 * looks for the target. If the target is inside the JPanel the JPanel is removed from root.
 	 */
-	protected static void removeChildInsidePanel( JComponent root , JComponent target ) {
+	protected static void removeChildInsidePanel( JComponent root, JComponent target ) {
 		int N = root.getComponentCount();
 
 		for (int i = 0; i < N; i++) {
@@ -429,12 +430,13 @@ public class StandardAlgConfigPanel extends JPanel implements ActionListener, Ch
 				JPanel p = (JPanel)root.getComponent(i);
 				Component[] children = p.getComponents();
 				for (int j = 0; j < children.length; j++) {
-					if( children[j] == target ) {
+					if (children[j] == target) {
 						root.remove(i);
 						return;
 					}
 				}
-			}catch( ClassCastException ignore){}
+			} catch (ClassCastException ignore) {
+			}
 		}
 	}
 
@@ -442,32 +444,31 @@ public class StandardAlgConfigPanel extends JPanel implements ActionListener, Ch
 	 * Searches inside the children of "root" for 'target'. If found it is removed and the
 	 * previous component.
 	 */
-	protected static void removeChildAndPrevious( JComponent root , JComponent target ) {
+	protected static void removeChildAndPrevious( JComponent root, JComponent target ) {
 		int N = root.getComponentCount();
 
 		for (int i = 0; i < N; i++) {
-			if( root.getComponent(i) == target ) {
+			if (root.getComponent(i) == target) {
 				root.remove(i);
-				root.remove(i-1);
+				root.remove(i - 1);
 				return;
 			}
 		}
 		throw new RuntimeException("Can't find component");
 	}
 
-
 	@Override
-	public void actionPerformed(ActionEvent e) {
+	public void actionPerformed( ActionEvent e ) {
 		controlChanged(e.getSource());
 	}
 
 	@Override
-	public void stateChanged(ChangeEvent e) {
+	public void stateChanged( ChangeEvent e ) {
 		controlChanged(e.getSource());
 	}
 
 	@Override
-	public void changeConfigLength(JConfigLength source, double fraction, double length) {
+	public void changeConfigLength( JConfigLength source, double fraction, double length ) {
 		controlChanged(source);
 	}
 
@@ -478,5 +479,4 @@ public class StandardAlgConfigPanel extends JPanel implements ActionListener, Ch
 	public void controlChanged( Object source ) {
 		throw new RuntimeException("You need to override controlChanges() or implement actionPerformed()/stateChanged()");
 	}
-
 }

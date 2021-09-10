@@ -81,8 +81,6 @@ import static boofcv.gui.BoofSwingUtil.MIN_ZOOM;
 public class CalibrateMonocularPlanarApp extends JPanel {
 	public static final String CALIBRATION_TARGET = "calibration_target.yaml";
 	public static final String INTRINSICS = "intrinsics.yaml";
-	
-	// TODO move "save landmarks" checkbox
 
 	protected JMenuBar menuBar;
 	protected JMenu menuRecent;
