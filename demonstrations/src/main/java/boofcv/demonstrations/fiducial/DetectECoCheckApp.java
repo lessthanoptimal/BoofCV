@@ -30,7 +30,7 @@ import boofcv.factory.fiducial.FactoryFiducial;
 import boofcv.gui.BoofSwingUtil;
 import boofcv.gui.DemonstrationBase;
 import boofcv.gui.StandardAlgConfigPanel;
-import boofcv.gui.calibration.DisplayPinholeCalibrationPanel;
+import boofcv.gui.calibration.UtilCalibrationGui;
 import boofcv.gui.controls.JCheckBoxValue;
 import boofcv.gui.controls.JSpinnerNumber;
 import boofcv.io.PathLabel;
@@ -286,10 +286,10 @@ public class DetectECoCheckApp extends DemonstrationBase {
 						ECoCheckFound c = foundPatterns.get(i);
 						if (!controlPanel.showAnonymous.value && c.markerID < 0)
 							continue;
-						DisplayPinholeCalibrationPanel.renderOrder(g2, scale, c.corners.toList());
+						UtilCalibrationGui.renderOrder(g2, null, scale, c.corners.toList());
 
 						if (controlPanel.showNumbers.value) {
-							DisplayPinholeCalibrationPanel.drawFeatureID(g2, 18, c.corners.toList(), null, scale);
+							UtilCalibrationGui.drawFeatureID(g2, 18, c.corners.toList(), null, scale);
 						}
 					}
 				}

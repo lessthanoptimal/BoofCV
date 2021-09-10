@@ -21,15 +21,32 @@ package boofcv.gui.calibration;
 import boofcv.abst.geo.calibration.ImageResults;
 import boofcv.alg.geo.calibration.CalibrationObservation;
 import boofcv.gui.BoofSwingUtil;
+import boofcv.gui.feature.VisualizeFeatures;
 import boofcv.gui.image.ImageZoomPanel;
+import boofcv.struct.distort.DoNothing2Transform2_F32;
+import boofcv.struct.distort.Point2Transform2_F32;
+import boofcv.struct.geo.PointIndex2D_F64;
+import georegression.struct.point.Point2D_F32;
+import georegression.struct.point.Point2D_F64;
 import org.jetbrains.annotations.Nullable;
 
+import javax.swing.*;
+import java.awt.*;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
+import java.awt.geom.Ellipse2D;
 import java.util.List;
+
+import static boofcv.gui.calibration.UtilCalibrationGui.drawNumbers;
+import static boofcv.gui.calibration.UtilCalibrationGui.renderOrder;
 
 /**
  * @author Peter Abeles
  */
 public abstract class DisplayCalibrationPanel extends ImageZoomPanel {
+
+	// number of pixels away at zoom=1 a corner can be selected
+	double canonicalClickDistance = 15;
 
 	// configures what is displayed or not
 	boolean showPoints = true;
@@ -40,16 +57,56 @@ public abstract class DisplayCalibrationPanel extends ImageZoomPanel {
 	boolean showOrder = true;
 	double errorScale;
 
+	// Which observation in the current image has the user selected
+	int selectedObservation = -1;
+
 	// observed feature locations
 	@Nullable CalibrationObservation features = null;
 	// results of calibration
 	@Nullable ImageResults results = null;
 	@Nullable List<CalibrationObservation> allFeatures;
 
+	// Used to transform point coordinate system
+	protected Point2Transform2_F32 pixelTransform = new DoNothing2Transform2_F32();
+
+	// workspace
+	protected Point2D_F32 adj = new Point2D_F32();
+	protected Ellipse2D.Double ellipse = new Ellipse2D.Double();
+
+	// Called after setScale has been called
 	public SetScale setScale = ( s ) -> {};
 
 	public DisplayCalibrationPanel() {
 		panel.addMouseWheelListener(e -> setScale(BoofSwingUtil.mouseWheelImageZoom(scale, e)));
+
+		// navigate using left mouse clicks
+		panel.addMouseListener(new MouseAdapter() {
+			@Override
+			public void mousePressed( MouseEvent e ) {
+				panel.requestFocus();
+				if (!SwingUtilities.isRightMouseButton(e))
+					return;
+				CalibrationObservation features = DisplayCalibrationPanel.this.features;
+				if (features == null)
+					return;
+
+				// use square distance since it's faster
+				double bestDistanceSq = canonicalClickDistance/scale;
+				bestDistanceSq *= bestDistanceSq;
+
+				int bestIndex = -1;
+				Point2D_F64 p = pixelToPoint(e.getX(), e.getY());
+				for (int i = 0; i < features.points.size(); i++) {
+					double d = p.distance2(features.points.get(i).p);
+					if (d <= bestDistanceSq) {
+						bestDistanceSq = d;
+						bestIndex = i;
+					}
+				}
+				selectedObservation = bestIndex;
+				repaint();
+			}
+		});
 	}
 
 	public void setResults( CalibrationObservation features, ImageResults results,
@@ -59,6 +116,7 @@ public abstract class DisplayCalibrationPanel extends ImageZoomPanel {
 		this.features = features;
 		this.results = results;
 		this.allFeatures = allFeatures;
+		this.selectedObservation = -1;
 	}
 
 	public void clearResults() {
@@ -67,6 +125,7 @@ public abstract class DisplayCalibrationPanel extends ImageZoomPanel {
 		features = null;
 		results = null;
 		allFeatures = null;
+		selectedObservation = -1;
 	}
 
 	public void setDisplay( boolean showPoints, boolean showErrors,
@@ -94,6 +153,89 @@ public abstract class DisplayCalibrationPanel extends ImageZoomPanel {
 	 * Forgets the previously passed in calibration
 	 */
 	public abstract void clearCalibration();
+
+	protected void handleSelectionClick() {
+
+	}
+
+	/**
+	 * Visualizes calibration information, such as feature location and order.
+	 */
+	protected void drawFeatures( Graphics2D g2, double scale ) {
+		if (results == null || features == null || allFeatures == null)
+			return;
+
+		BoofSwingUtil.antialiasing(g2);
+
+		final CalibrationObservation set = features;
+
+		if (showOrder) {
+			renderOrder(g2, pixelTransform, scale, set.points);
+		}
+
+		if (showPoints) {
+			g2.setColor(Color.BLACK);
+			g2.setStroke(new BasicStroke(3));
+			for (PointIndex2D_F64 p : set.points) {
+				pixelTransform.compute((float)p.p.x, (float)p.p.y, adj);
+				VisualizeFeatures.drawCross(g2, adj.x*scale, adj.y*scale, 4);
+			}
+			g2.setStroke(new BasicStroke(1));
+			g2.setColor(Color.RED);
+			for (PointIndex2D_F64 p : set.points) {
+				pixelTransform.compute((float)p.p.x, (float)p.p.y, adj);
+				VisualizeFeatures.drawCross(g2, adj.x*scale, adj.y*scale, 4);
+			}
+		}
+
+		if (showAll) {
+			for (CalibrationObservation l : allFeatures) {
+				for (PointIndex2D_F64 p : l.points) {
+					pixelTransform.compute((float)p.p.x, (float)p.p.y, adj);
+					VisualizeFeatures.drawPoint(g2, adj.x*scale, adj.y*scale, 3, Color.BLUE, Color.WHITE, ellipse);
+				}
+			}
+		}
+
+		if (showNumbers) {
+			drawNumbers(g2, set.points, pixelTransform, scale);
+		}
+
+		if (showErrors) {
+			g2.setStroke(new BasicStroke(4));
+			g2.setColor(Color.BLACK);
+			for (int i = 0; i < set.size(); i++) {
+				PointIndex2D_F64 p = set.get(i);
+				pixelTransform.compute((float)p.p.x, (float)p.p.y, adj);
+
+				double r = errorScale*results.pointError[i];
+				if (r < 1)
+					continue;
+
+				VisualizeFeatures.drawCircle(g2, adj.x*scale, adj.y*scale, r, ellipse);
+			}
+
+			g2.setStroke(new BasicStroke(2.5f));
+			g2.setColor(Color.ORANGE);
+			for (int i = 0; i < set.size(); i++) {
+				PointIndex2D_F64 p = set.get(i);
+				pixelTransform.compute((float)p.p.x, (float)p.p.y, adj);
+
+				double r = errorScale*results.pointError[i];
+				if (r < 1)
+					continue;
+
+				VisualizeFeatures.drawCircle(g2, adj.x*scale, adj.y*scale, r, ellipse);
+			}
+		}
+
+		// Draw the selected feature
+		if (selectedObservation >= 0 && selectedObservation < set.size()) {
+			PointIndex2D_F64 p = set.get(selectedObservation);
+			pixelTransform.compute((float)p.p.x, (float)p.p.y, adj);
+			VisualizeFeatures.drawPoint(g2, adj.x*scale, adj.y*scale, 10.0, Color.GREEN, true, ellipse);
+		}
+	}
 
 	@FunctionalInterface public interface SetScale {
 		void setScale( double scale );

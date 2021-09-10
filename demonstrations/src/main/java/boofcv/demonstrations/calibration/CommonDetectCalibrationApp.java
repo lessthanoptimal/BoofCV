@@ -25,7 +25,7 @@ import boofcv.alg.filter.binary.Contour;
 import boofcv.gui.BoofSwingUtil;
 import boofcv.gui.DemonstrationBase;
 import boofcv.gui.binary.VisualizeBinaryData;
-import boofcv.gui.calibration.DisplayPinholeCalibrationPanel;
+import boofcv.gui.calibration.UtilCalibrationGui;
 import boofcv.gui.feature.VisualizeFeatures;
 import boofcv.gui.feature.VisualizeShapes;
 import boofcv.gui.image.ImageZoomPanel;
@@ -311,7 +311,7 @@ public abstract class CommonDetectCalibrationApp extends DemonstrationBase
 	}
 
 	public void renderOrder( Graphics2D g2, double scale, List<PointIndex2D_F64> points ) {
-		DisplayPinholeCalibrationPanel.renderOrder(g2, scale, points);
+		UtilCalibrationGui.renderOrder(g2, null, scale, points);
 	}
 
 	protected void renderClusters( Graphics2D g2, double scale ) {}
