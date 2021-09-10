@@ -759,11 +759,16 @@ public class CalibrateMonocularPlanarApp extends JPanel {
 				}
 			});
 
-			JScrollPane scroll = new JScrollPane(imageList);
+			var scroll = new JScrollPane(imageList);
 
-			addAlignCenter(bRemovePoint, "Remove a point");
-			addAlignCenter(bRemoveImage, "Remove an image");
-			addAlignCenter(bReset, "Adds all removed objects back in");
+			// use a GridLayout so all buttons are the same size
+			var editPanel = new JPanel(new GridLayout(0,1));
+			editPanel.add(bRemovePoint);
+			editPanel.add(bRemoveImage);
+			editPanel.add(bReset);
+			editPanel.setMaximumSize(editPanel.getPreferredSize());
+
+			add(editPanel);
 			add(scroll);
 		}
 
