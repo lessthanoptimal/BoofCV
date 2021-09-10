@@ -203,7 +203,7 @@ public class CalibrateMonoPlanar implements VerbosePrint {
 			ImageResults r = results.get(i);
 			totalError += r.meanError;
 
-			out.printf("image %3d Euclidean ( mean = %7.1e max = %7.1e ) bias ( X = %8.1e Y %8.1e )\n", i, r.meanError, r.maxError, r.biasX, r.biasY);
+			out.printf("image %3d errors (px) mean=%7.1e max=%7.1e, bias: %8.1e %8.1e\n", i, r.meanError, r.maxError, r.biasX, r.biasY);
 		}
 		out.println("Average Mean Error = " + (totalError/results.size()));
 	}

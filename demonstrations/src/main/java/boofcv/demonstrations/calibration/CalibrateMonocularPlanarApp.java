@@ -51,6 +51,7 @@ import boofcv.struct.calib.CameraModelType;
 import boofcv.struct.calib.CameraPinholeBrown;
 import boofcv.struct.image.GrayF32;
 import org.apache.commons.io.FilenameUtils;
+import org.ddogleg.struct.DogArray;
 import org.ddogleg.struct.DogArray_B;
 import org.ddogleg.struct.DogArray_I32;
 import org.jetbrains.annotations.Nullable;
@@ -80,8 +81,8 @@ import static boofcv.gui.BoofSwingUtil.MIN_ZOOM;
 public class CalibrateMonocularPlanarApp extends JPanel {
 	public static final String CALIBRATION_TARGET = "calibration_target.yaml";
 	public static final String INTRINSICS = "intrinsics.yaml";
-	// TODO select landmark and remove landmark
-	// TODO remove image
+
+	// TODO visualize line between reprojected and observed points
 	// TODO Generalize recent file code and put into BoofSwingUtil
 	// TODO move "save landmarks" checkbox
 
@@ -93,6 +94,8 @@ public class CalibrateMonocularPlanarApp extends JPanel {
 
 	boolean calibratorChanged = true;
 	boolean targetChanged = true;
+	// if true the landmarks have been modified and it should not display results
+	boolean resultsInvalid;
 
 	//----------------------- GUI owned objects
 	protected ConfigureInfoPanel configurePanel = new ConfigureInfoPanel();
@@ -309,6 +312,7 @@ public class CalibrateMonocularPlanarApp extends JPanel {
 
 		targetChanged = false;
 		calibratorChanged = false;
+		resultsInvalid = true;
 	}
 
 	/**
@@ -405,7 +409,7 @@ public class CalibrateMonocularPlanarApp extends JPanel {
 
 		CalibrationObservation imageObservations = getObservationsForSelected();
 		ImageResults imageResults = getResultsForSelected();
-		getCalibrationPanel().setResults(imageObservations, imageResults, results.allObservations);
+		getCalibrationPanel().setResults(imageObservations, imageResults, results.allUsedObservations);
 		getCalibrationPanel().repaint();
 	}
 
@@ -493,8 +497,11 @@ public class CalibrateMonocularPlanarApp extends JPanel {
 				// only images with 4 points can be used in calibration
 				if (observation.points.size() >= 4) {
 					results.usedImages.add(results.imagePaths.size() - 1);
-					results.allObservations.add(observation);
+					results.allUsedObservations.add(observation);
 				}
+				// need to create a copy since the copy being passed in to the other structures might be modified
+				// later on
+				results.originalObservations.grow().setTo(observation);
 			});
 			SwingUtilities.invokeLater(() -> {
 				imageListPanel.addImage(new File(path).getName(), detected);
@@ -532,6 +539,7 @@ public class CalibrateMonocularPlanarApp extends JPanel {
 			// Calibrate
 			detectorSet.calibrator.process();
 			detectorSet.calibrationSuccess = true;
+			resultsInvalid = false;
 
 			// Save results for visualization
 			results.safe(() -> {
@@ -615,17 +623,100 @@ public class CalibrateMonocularPlanarApp extends JPanel {
 
 	/** Removes the selected point or does nothing if nothing is selected */
 	protected void removePoint() {
+		int whichPoint = getCalibrationPanel().getSelectedObservation();
+		if (whichPoint < 0)
+			return;
 
+		CalibrationObservation observation = getCalibrationPanel().getObservation();
+		if (observation == null)
+			return;
+
+		resultsInvalid = true;
+
+		results.safe(() -> {
+			if (whichPoint >= observation.points.size())
+				return;
+			observation.points.remove(whichPoint);
+			if (observation.points.size() < 4) {
+				removeImage();
+			}
+		});
+
+		SwingUtilities.invokeLater(() -> {
+			// Remove the results since they are no longer valid
+			getCalibrationPanel().results = null;
+			getCalibrationPanel().deselectPoint();
+			configurePanel.bCompute.setEnabled(true);
+			getCalibrationPanel().repaint();
+		});
 	}
 
 	/** Removes an image */
 	protected void removeImage() {
+		BoofSwingUtil.invokeNowOrLater(() -> {
+			int selected = imageListPanel.imageList.getSelectedIndex();
+			if (selected < 0)
+				return;
 
+			// If the image isn't "used" don't remove it
+			if (!imageListPanel.imageSuccess.get(selected))
+				return;
+
+			resultsInvalid = true;
+
+			// Mark it as not used in the UI
+			imageListPanel.imageSuccess.set(selected, false);
+
+			results.safe(() -> {
+				// Remove all points from this image, which will remove it from the active list
+				String image = results.imagePaths.get(selected);
+				results.imageObservations.get(image).points.clear();
+
+				// This image is no longer used for calibration
+				int usedIdx = results.usedImages.indexOf(selected);
+				if (usedIdx >= 0)
+					results.usedImages.remove(usedIdx);
+			});
+
+			// Visually show the changes
+			getCalibrationPanel().results = null;
+			configurePanel.bCompute.setEnabled(true);
+			getCalibrationPanel().repaint();
+		});
 	}
 
 	/** Adds all images and points back in */
 	protected void undoAllRemove() {
+		resultsInvalid = true;
+		results.safe(() -> {
+			// we will re-generate the used image list
+			results.usedImages.reset();
+			for (int i = 0; i < results.originalObservations.size; i++) {
+				// Revert by mindlessly copying
+				CalibrationObservation o = results.originalObservations.get(i);
+				String image = results.imagePaths.get(i);
+				results.imageObservations.get(image).setTo(o);
 
+				// If the image has enough points, use it
+				if (o.size() >= 4)
+					results.usedImages.add(i);
+			}
+		});
+
+		// Update the list of which images can be used in the UI
+		BoofSwingUtil.invokeNowOrLater(() -> {
+			results.safe(() -> {
+				for (int i = 0; i < results.usedImages.size; i++) {
+					int which = results.usedImages.get(i);
+					imageListPanel.imageSuccess.set(which, true);
+				}
+			});
+
+			// Visually show the changes
+			configurePanel.bCompute.setEnabled(true);
+			getCalibrationPanel().repaint();
+			imageListPanel.repaint();
+		});
 	}
 
 	/** If an image is selected, it returns the observed calibration landmarks */
@@ -642,6 +733,9 @@ public class CalibrateMonocularPlanarApp extends JPanel {
 
 	protected @Nullable ImageResults getResultsForSelected() {
 		BoofSwingUtil.checkGuiThread();
+
+		if (resultsInvalid)
+			return null;
 
 		int selected = imageListPanel.selectedImage;
 		return results.select(() -> {
@@ -881,9 +975,12 @@ public class CalibrateMonocularPlanarApp extends JPanel {
 		// List of found observations and results
 		protected final Map<String, CalibrationObservation> imageObservations = new HashMap<>();
 		protected final Map<String, ImageResults> imageResults = new HashMap<>();
-		protected final List<CalibrationObservation> allObservations = new ArrayList<>();
+		// All observations with at least 4 points
+		protected final List<CalibrationObservation> allUsedObservations = new ArrayList<>();
 		// Index of images used when calibrating
 		protected final DogArray_I32 usedImages = new DogArray_I32();
+		// Copy of original observation before any edits
+		protected final DogArray<CalibrationObservation> originalObservations = new DogArray<>(CalibrationObservation::new);
 
 		public void reset() {
 			safe(() -> {
@@ -891,7 +988,8 @@ public class CalibrateMonocularPlanarApp extends JPanel {
 				imageObservations.clear();
 				imageResults.clear();
 				usedImages.reset();
-				allObservations.clear();
+				allUsedObservations.clear();
+				originalObservations.reset();
 			});
 		}
 	}

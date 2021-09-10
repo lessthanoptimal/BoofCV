@@ -20,6 +20,8 @@ package boofcv.alg.geo.calibration;
 
 import boofcv.struct.geo.PointIndex2D_F64;
 import georegression.struct.point.Point2D_F64;
+import lombok.Getter;
+import lombok.Setter;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -37,29 +39,27 @@ public class CalibrationObservation {
 	/**
 	 * Shape of the image in which observations were created from. Use to configure intrinsics and sanity checks
 	 */
-	public int width,height;
+	@Getter @Setter public int width, height;
 
 	/**
 	 * List of pixel observations and the index of the control point
 	 */
-	public List<PointIndex2D_F64> points = new ArrayList<>();
+	@Getter public List<PointIndex2D_F64> points = new ArrayList<>();
 
-	public CalibrationObservation(int width, int height) {
+	public CalibrationObservation( int width, int height ) {
 		this.width = width;
 		this.height = height;
 	}
 
-	public CalibrationObservation(){
+	public CalibrationObservation() {}
 
-	}
-
-	public void setTo(CalibrationObservation obs ) {
+	public void setTo( CalibrationObservation obs ) {
 		reset();
 		this.width = obs.width;
 		this.height = obs.height;
 		for (int i = 0; i < obs.size(); i++) {
 			PointIndex2D_F64 p = obs.points.get(i);
-			points.add( p.copy() );
+			points.add(p.copy());
 		}
 	}
 
@@ -68,16 +68,15 @@ public class CalibrationObservation {
 	}
 
 	/**
-	 *
 	 * @param observation The observation. A copy is internally created.
 	 * @param which Index of the observed feature
 	 */
-	public void add( Point2D_F64 observation , int which ) {
+	public void add( Point2D_F64 observation, int which ) {
 		points.add(new PointIndex2D_F64(observation, which));
 	}
 
-	public void add( double x , double y , int which ) {
-		points.add(new PointIndex2D_F64(x,y, which));
+	public void add( double x, double y, int which ) {
+		points.add(new PointIndex2D_F64(x, y, which));
 	}
 
 	public void reset() {
@@ -88,23 +87,11 @@ public class CalibrationObservation {
 
 	public void sort() {
 		// Old style sort is used for java 1.8 compatibility
-		Collections.sort(points,Comparator.comparingInt(o -> o.index));
-	}
-
-	public int getWidth() {
-		return width;
-	}
-
-	public int getHeight() {
-		return height;
+		Collections.sort(points, Comparator.comparingInt(o -> o.index));
 	}
 
 	public int size() {
 		return points.size();
-	}
-
-	public List<PointIndex2D_F64> getPoints() {
-		return points;
 	}
 
 	public CalibrationObservation copy() {

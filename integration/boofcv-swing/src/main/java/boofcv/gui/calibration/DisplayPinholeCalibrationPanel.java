@@ -103,7 +103,7 @@ public class DisplayPinholeCalibrationPanel extends DisplayCalibrationPanel {
 	}
 
 	@Override protected void paintInPanel( AffineTransform tran, Graphics2D g2 ) {
-		if (features != null && features.size() > selectedImage) {
+		if (observation != null && observation.size() > selectedImage) {
 			drawFeatures(g2, scale);
 		}
 
