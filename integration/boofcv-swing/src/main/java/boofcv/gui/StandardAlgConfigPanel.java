@@ -198,17 +198,25 @@ public class StandardAlgConfigPanel extends JPanel implements ActionListener, Ch
 	}
 
 	public JSpinnerNumber spinnerWrap( double initial, double minimum, double maximum, double stepSize ) {
-		JSpinner spinner = new JSpinner(new SpinnerNumberModel(initial, minimum, maximum, stepSize));
+		var spinner = new JSpinner(new SpinnerNumberModel(initial, minimum, maximum, stepSize));
 		spinner.setMaximumSize(spinner.getPreferredSize());
-		spinner.addChangeListener(this);
-		return new JSpinnerNumber(spinner, initial);
+		var wrap = new JSpinnerNumber(spinner, initial);
+		spinner.addChangeListener(( e ) -> {
+			wrap.updateValue();
+			stateChanged(e);
+		});
+		return wrap;
 	}
 
 	public JSpinnerNumber spinnerWrap( int initial, int minimum, int maximum, int stepSize ) {
-		JSpinner spinner = new JSpinner(new SpinnerNumberModel(initial, minimum, maximum, stepSize));
+		var spinner = new JSpinner(new SpinnerNumberModel(initial, minimum, maximum, stepSize));
 		spinner.setMaximumSize(spinner.getPreferredSize());
-		spinner.addChangeListener(this);
-		return new JSpinnerNumber(spinner, initial);
+		var wrap = new JSpinnerNumber(spinner, initial);
+		spinner.addChangeListener(( e ) -> {
+			wrap.updateValue();
+			stateChanged(e);
+		});
+		return wrap;
 	}
 
 	/**
@@ -264,9 +272,13 @@ public class StandardAlgConfigPanel extends JPanel implements ActionListener, Ch
 	public JCheckBoxValue checkboxWrap( String text, boolean value ) {
 		JCheckBox c = new JCheckBox(text);
 		c.setSelected(value);
-		c.addActionListener(this);
-
-		return new JCheckBoxValue(c, value);
+		var wrap = new JCheckBoxValue(c, value);
+		// update the value automatically, this is almost always done
+		c.addActionListener(( e ) -> {
+			wrap.updateValue();
+			actionPerformed(e);
+		});
+		return wrap;
 	}
 
 	public void addAlignLeft( JComponent target, String tooltip ) {
