@@ -66,10 +66,8 @@ import java.awt.*;
 import java.awt.event.KeyEvent;
 import java.awt.image.BufferedImage;
 import java.io.File;
-import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 import static boofcv.gui.BoofSwingUtil.MAX_ZOOM;
 import static boofcv.gui.BoofSwingUtil.MIN_ZOOM;
@@ -462,9 +460,8 @@ public class CalibrateMonocularPlanarApp extends JPanel {
 				detectorSet.unlock();
 			}
 
-			if (!detected) {
-				System.out.println("Failed to find target in " + path);
-			}
+			// Order matters for visualization later on
+			Collections.sort(observation.points, Comparator.comparingInt(a -> a.index));
 
 			// Record that it could process this image and display it in the GUI
 			results.safe(() -> {
