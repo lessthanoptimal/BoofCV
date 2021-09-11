@@ -174,8 +174,7 @@ public class ECoCheckUtils {
 			min = Math.min(min, values.data[i]);
 			max = Math.max(max, values.data[i]);
 		}
-		float range = max - min + 1e-5f;
-		// add a small number so that the max value isn't outside the histogram's range
+		float range = max - min;
 
 		// Use range to convert into a discrete histogram
 		histogram.fill(0);
@@ -183,7 +182,7 @@ public class ECoCheckUtils {
 		for (int i = 0; i < values.size; i++) {
 			float v = values.data[i];
 			int index = (int)(histogram.size*(v - min)/range);
-			histogram.data[index]++;
+			histogram.data[Math.min(histogram.size - 1, index)]++;
 		}
 
 		// Select threshold using OTSU
@@ -197,7 +196,7 @@ public class ECoCheckUtils {
 	 * Convenience function to go from a point in grid coordinates to image pixels
 	 */
 	public void gridToPixel( double x, double y, Point2D_F64 pixel ) {
-		bitSquare.setTo(x,y);
+		bitSquare.setTo(x, y);
 		GeometryMath_F64.mult(squareToPixel, bitSquare, pixel);
 	}
 
@@ -376,7 +375,7 @@ public class ECoCheckUtils {
 	}
 
 	public static int maxCorners( int rows, int cols ) {
-		return (rows-1)*(cols-1);
+		return (rows - 1)*(cols - 1);
 	}
 
 	public boolean isLegalCornerIds( ECoCheckFound found ) {
@@ -465,7 +464,7 @@ public class ECoCheckUtils {
 		// If there are duplicates only keep the largest
 		for (int i = 0; i < merged.size(); i++) {
 			int target = merged.get(i).markerID;
-			for (int j = merged.size()-1; j >= i+1; j--) {
+			for (int j = merged.size() - 1; j >= i + 1; j--) {
 				if (merged.get(j).markerID == target) {
 					merged.remove(j);
 				}
