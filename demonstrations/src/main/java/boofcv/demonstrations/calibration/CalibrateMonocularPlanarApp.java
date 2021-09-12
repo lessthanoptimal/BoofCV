@@ -54,13 +54,10 @@ import boofcv.struct.image.GrayF32;
 import lombok.Getter;
 import org.apache.commons.io.FilenameUtils;
 import org.ddogleg.struct.DogArray;
-import org.ddogleg.struct.DogArray_B;
 import org.ddogleg.struct.DogArray_I32;
 import org.jetbrains.annotations.Nullable;
 
 import javax.swing.*;
-import javax.swing.event.ListSelectionEvent;
-import javax.swing.event.ListSelectionListener;
 import javax.swing.filechooser.FileNameExtensionFilter;
 import java.awt.*;
 import java.awt.event.KeyEvent;
@@ -95,7 +92,7 @@ public class CalibrateMonocularPlanarApp extends JPanel {
 
 	//----------------------- GUI owned objects
 	protected @Getter ConfigureInfoPanel configurePanel = new ConfigureInfoPanel();
-	protected ImageListPanel imageListPanel = new ImageListPanel();
+	protected CalibrationListPanel imageListPanel = createImageListPanel();
 	//	protected ImageCalibrationPanel imagePanel = new ImageCalibrationPanel();
 	protected DisplayFisheyeCalibrationPanel fisheyePanel = new DisplayFisheyeCalibrationPanel();
 	protected DisplayPinholeCalibrationPanel pinholePanel = new DisplayPinholeCalibrationPanel();
@@ -357,7 +354,7 @@ public class CalibrateMonocularPlanarApp extends JPanel {
 	 * Updates the list in recent menu
 	 */
 	protected void updateRecentItems() {
-		BoofSwingUtil.updateRecentItems(this, menuRecent, (info)->processDirectory(new File(info.files.get(0))));
+		BoofSwingUtil.updateRecentItems(this, menuRecent, ( info ) -> processDirectory(new File(info.files.get(0))));
 	}
 
 	/**
@@ -728,92 +725,15 @@ public class CalibrateMonocularPlanarApp extends JPanel {
 	}
 
 	/**
-	 * List images used to calibrate the camera.
+	 * Creates and configures a panel for displaying images names and control buttons for removing points/images
 	 */
-	protected class ImageListPanel extends StandardAlgConfigPanel implements ListSelectionListener {
-		JButton bRemovePoint = button("Remove Point", true, ( e ) -> removePoint());
-		JButton bRemoveImage = button("Remove Image", true, ( e ) -> removeImage());
-		JButton bReset = button("Reset", true, ( e ) -> undoAllRemove());
-
-		JList<String> imageList;
-		List<String> imageNames = new ArrayList<>();
-		DogArray_B imageSuccess = new DogArray_B();
-		int selectedImage = -1;
-
-		public ImageListPanel() {
-			imageList = new JList<>();
-			imageList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
-			imageList.addListSelectionListener(this);
-
-			// Highlight images where it failed
-			imageList.setCellRenderer(new DefaultListCellRenderer() {
-				@Override public Component getListCellRendererComponent( JList list, Object value, int index,
-																		 boolean isSelected, boolean cellHasFocus ) {
-					Component c = super.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
-					if (!imageSuccess.get(index))
-						setBackground(Color.RED);
-					return c;
-				}
-			});
-
-			var scroll = new JScrollPane(imageList);
-
-			// use a GridLayout so all buttons are the same size
-			var editPanel = new JPanel(new GridLayout(0,1));
-			editPanel.add(bRemovePoint);
-			editPanel.add(bRemoveImage);
-			editPanel.add(bReset);
-			editPanel.setMaximumSize(editPanel.getPreferredSize());
-
-			add(editPanel);
-			add(scroll);
-		}
-
-		public void addImage( String imageName, boolean success ) {
-			imageNames.add(imageName);
-			this.imageSuccess.add(success);
-			String[] names = imageNames.toArray(new String[0]);
-			imageList.removeListSelectionListener(ImageListPanel.this);
-			imageList.setListData(names);
-			if (names.length == 1) {
-				selectedImage = 0;
-				imageList.addListSelectionListener(ImageListPanel.this);
-				imageList.setSelectedIndex(selectedImage);
-				validate();
-			} else {
-				// each time an image is added it resets the selected value
-				imageList.setSelectedIndex(selectedImage);
-				imageList.addListSelectionListener(ImageListPanel.this);
-			}
-		}
-
-		public void clearImages() {
-			imageNames.clear();
-			imageSuccess.reset();
-			imageList.removeListSelectionListener(ImageListPanel.this);
-			imageList.setListData(new String[0]);
-			selectedImage = -1;
-		}
-
-		public void setSelected( int index ) {
-			if (imageList.getSelectedIndex() == index)
-				return;
-			imageList.setSelectedIndex(index);
-		}
-
-		@Override public void valueChanged( ListSelectionEvent e ) {
-			if (e.getValueIsAdjusting() || e.getFirstIndex() == -1)
-				return;
-
-			int selected = imageList.getSelectedIndex();
-
-			// See if there's no change
-			if (selected == selectedImage)
-				return;
-
-			selectedImage = selected;
-			changeSelectedGUI(selected);
-		}
+	protected CalibrationListPanel createImageListPanel() {
+		var panel = new CalibrationListPanel();
+		panel.bRemovePoint.addActionListener(( e ) -> removePoint());
+		panel.bRemoveImage.addActionListener(( e ) -> removeImage());
+		panel.bReset.addActionListener(( e ) -> undoAllRemove());
+		panel.selectionChanged = this::changeSelectedGUI;
+		return panel;
 	}
 
 	/**
@@ -924,23 +844,6 @@ public class CalibrateMonocularPlanarApp extends JPanel {
 				zoom.updateValue();
 				getCalibrationPanel().setScale(zoom.vdouble());
 			} else {
-				if (source == checkPoints.check) {
-					checkPoints.updateValue();
-				} else if (source == checkResidual.check) {
-					checkResidual.updateValue();
-				} else if (source == checkErrors.check) {
-					checkErrors.updateValue();
-				} else if (source == checkUndistorted.check) {
-					checkUndistorted.updateValue();
-				} else if (source == checkAll.check) {
-					checkAll.updateValue();
-				} else if (source == checkNumbers.check) {
-					checkNumbers.updateValue();
-				} else if (source == checkOrder.check) {
-					checkOrder.updateValue();
-				} else if (source == selectErrorScale.spinner) {
-					selectErrorScale.updateValue();
-				}
 				updateVisualizationSettings();
 			}
 		}

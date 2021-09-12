@@ -51,14 +51,14 @@ public abstract class DisplayCalibrationPanel extends ImageZoomPanel {
 	double canonicalClickDistance = 15;
 
 	// configures what is displayed or not
-	boolean showPoints = true;
-	boolean showErrors = true;
-	boolean showUndistorted = false;
-	boolean showAll = false;
-	boolean showNumbers = true;
-	boolean showOrder = true;
+	public boolean showPoints = true;
+	public boolean showErrors = true;
+	public boolean showUndistorted = false;
+	public boolean showAll = false;
+	public boolean showNumbers = true;
+	public boolean showOrder = true;
 	public boolean showResiduals = false;
-	double errorScale;
+	public double errorScale;
 
 	// Which observation in the current image has the user selected
 	@Getter protected int selectedObservation = -1;
