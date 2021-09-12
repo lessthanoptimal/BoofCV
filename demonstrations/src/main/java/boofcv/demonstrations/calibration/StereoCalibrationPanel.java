@@ -19,7 +19,9 @@
 package boofcv.demonstrations.calibration;
 
 import boofcv.gui.calibration.DisplayPinholeCalibrationPanel;
+import boofcv.struct.calib.CameraPinholeBrown;
 import lombok.Getter;
+import org.ejml.data.DMatrixRMaj;
 
 import javax.swing.*;
 import java.awt.*;
@@ -39,6 +41,12 @@ public class StereoCalibrationPanel extends JPanel {
 		super(new GridLayout(0,2));
 		add(panelLeft);
 		add(panelRight);
+	}
+
+	public void setRectification( CameraPinholeBrown leftParam, DMatrixRMaj leftRect,
+								  CameraPinholeBrown rightParam, DMatrixRMaj rightRect ) {
+		panelLeft.setCalibration(leftParam, leftRect);
+		panelRight.setCalibration(rightParam, rightRect);
 	}
 
 	public void setShowPoints( boolean state ) {

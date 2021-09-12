@@ -114,7 +114,7 @@ public abstract class DisplayCalibrationPanel extends ImageZoomPanel {
 		for (int i = 0; i < features.points.size(); i++) {
 			Point2D_F64 f = features.points.get(i).p;
 			pixelTransform.compute((float)f.x, (float)f.y, adj);
-			double d = p.distance2(adj.x ,adj.y);
+			double d = p.distance2(adj.x, adj.y);
 			if (d <= bestDistanceSq) {
 				bestDistanceSq = d;
 				bestIndex = i;
@@ -123,7 +123,7 @@ public abstract class DisplayCalibrationPanel extends ImageZoomPanel {
 		return bestIndex;
 	}
 
-	public void setResults( CalibrationObservation features, ImageResults results,
+	public void setResults( CalibrationObservation features, @Nullable ImageResults results,
 							List<CalibrationObservation> allFeatures ) {
 		BoofSwingUtil.checkGuiThread();
 
@@ -195,7 +195,7 @@ public abstract class DisplayCalibrationPanel extends ImageZoomPanel {
 			for (int i = 0; i < set.size(); i++) {
 				PointIndex2D_F64 p = set.get(i);
 				float dx = (float)results.residuals[i*2];
-				float dy = (float)results.residuals[i*2+1];
+				float dy = (float)results.residuals[i*2 + 1];
 
 				pixelTransform.compute((float)p.p.x, (float)p.p.y, adj);
 				pixelTransform.compute((float)p.p.x + dx, (float)p.p.y + dy, adj2);

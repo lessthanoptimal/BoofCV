@@ -20,7 +20,11 @@ package boofcv.demonstrations.calibration;
 
 import boofcv.abst.geo.calibration.CalibrateStereoPlanar;
 import boofcv.abst.geo.calibration.DetectSingleFiducialCalibration;
+import boofcv.abst.geo.calibration.ImageResults;
+import boofcv.alg.geo.PerspectiveOps;
+import boofcv.alg.geo.RectifyImageOps;
 import boofcv.alg.geo.calibration.CalibrationObservation;
+import boofcv.alg.geo.rectify.RectifyCalibrated;
 import boofcv.gui.BoofSwingUtil;
 import boofcv.gui.StandardAlgConfigPanel;
 import boofcv.gui.calibration.UtilCalibrationGui;
@@ -39,9 +43,11 @@ import boofcv.misc.BoofMiscOps;
 import boofcv.misc.VariableLockSet;
 import boofcv.struct.calib.StereoParameters;
 import boofcv.struct.image.GrayF32;
+import georegression.struct.se.Se3_F64;
 import lombok.Getter;
 import org.ddogleg.struct.DogArray;
 import org.ddogleg.struct.DogArray_I32;
+import org.ejml.data.DMatrixRMaj;
 import org.jetbrains.annotations.Nullable;
 
 import javax.swing.*;
@@ -94,6 +100,9 @@ public class CalibrateStereoPlanarAppV2 extends JPanel {
 
 	public CalibrateStereoPlanarAppV2() {
 		setLayout(new BorderLayout());
+
+		stereoPanel.panelLeft.setScale = ( scale ) -> configurePanel.setZoom(scale);
+		stereoPanel.panelRight.setScale = ( scale ) -> configurePanel.setZoom(scale);
 
 		stereoPanel.setPreferredSize(new Dimension(1000, 720));
 
@@ -241,9 +250,35 @@ public class CalibrateStereoPlanarAppV2 extends JPanel {
 			detectLandmarksInImages();
 
 		// Perform calibration
-		StereoParameters param = algorithms.select(() -> algorithms.calibrator.process());
-		algorithms.calibrationSuccess = true;
-		// TODO do something with the results
+		try {
+			StereoParameters param = algorithms.select(() -> algorithms.calibrator.process());
+			// Visualize the results
+			setRectification(param);
+			algorithms.calibrationSuccess = true;
+		} catch (RuntimeException e) {
+			e.printStackTrace();
+			SwingUtilities.invokeLater(() -> BoofSwingUtil.warningDialog(this, e));
+			algorithms.calibrationSuccess = false;
+		}
+		// Tell it to select the last image since that's what's being previewed already
+		SwingUtilities.invokeLater(() -> changeSelectedGUI(inputImages.size() - 1));
+	}
+
+	/**
+	 * Computes stereo rectification and then passes the distortion along to the gui.
+	 */
+	private void setRectification( final StereoParameters param ) {
+		// calibration matrix for left and right camera
+		DMatrixRMaj K1 = PerspectiveOps.pinholeToMatrix(param.getLeft(), (DMatrixRMaj)null);
+		DMatrixRMaj K2 = PerspectiveOps.pinholeToMatrix(param.getRight(), (DMatrixRMaj)null);
+
+		RectifyCalibrated rectify = RectifyImageOps.createCalibrated();
+		rectify.process(K1, new Se3_F64(), K2, param.getRightToLeft().invert(null));
+
+		final DMatrixRMaj rect1 = rectify.getUndistToRectPixels1();
+		final DMatrixRMaj rect2 = rectify.getUndistToRectPixels2();
+
+		SwingUtilities.invokeLater(() -> stereoPanel.setRectification(param.getLeft(), rect1, param.getRight(), rect2));
 	}
 
 	private void detectLandmarksInImages() {
@@ -261,6 +296,7 @@ public class CalibrateStereoPlanarAppV2 extends JPanel {
 		resultsLeft.reset();
 		resultsRight.reset();
 
+		int numUsed = 0;
 		GrayF32 image = new GrayF32(1, 1);
 		for (int imageIdx = 0; imageIdx < numStereoPairs; imageIdx++) {
 			CalibrationObservation calibLeft, calibRight;
@@ -291,8 +327,17 @@ public class CalibrateStereoPlanarAppV2 extends JPanel {
 			used |= resultsRight.add(imageIdx, calibRight);
 
 			// Pass in the results to the calibrator for future use
-			if (used)
+			if (used) {
 				algorithms.safe(() -> algorithms.calibrator.addPair(calibLeft, calibRight));
+				numUsed++;
+			}
+
+			resultsLeft.lock();
+			resultsLeft.inputToUsed.add(used ? numUsed - 1 : -1);
+			resultsLeft.unlock();
+			resultsRight.lock();
+			resultsRight.inputToUsed.add(used ? numUsed - 1 : -1);
+			resultsRight.unlock();
 
 			// Update the GUI by showing the latest images
 			boolean _used = used;
@@ -346,10 +391,31 @@ public class CalibrateStereoPlanarAppV2 extends JPanel {
 		stereoPanel.panelLeft.setBufferedImageNoChange(buffLeft);
 		stereoPanel.panelRight.setBufferedImageNoChange(buffRight);
 
-		// TODO pass in observations and results
-//		CalibrationObservation imageObservations = getObservationsForSelected();
-//		ImageResults imageResults = getResultsForSelected();
-//		getCalibrationPanel().setResults(imageObservations, imageResults, results.allUsedObservations);
+		updateResultsVisuals(index);
+	}
+
+	private void updateResultsVisuals( int inputIndex ) {
+		BoofSwingUtil.checkGuiThread();
+
+		resultsLeft.safe(() -> {
+			List<CalibrationObservation> all = algorithms.select(() ->
+					algorithms.calibrator.getCalibLeft().getObservations());
+			CalibrationObservation o = resultsLeft.observations.get(inputIndex);
+			int errorIndex = resultsLeft.inputToUsed.get(inputIndex);
+			List<ImageResults> errors = algorithms.calibrator.getCalibLeft().getErrors();
+			ImageResults results = errorIndex == -1 || errors == null ? null : errors.get(errorIndex);
+			stereoPanel.panelLeft.setResults(o, results, all);
+		});
+		resultsLeft.safe(() -> {
+			List<CalibrationObservation> all = algorithms.select(() ->
+					algorithms.calibrator.getCalibRight().getObservations());
+			CalibrationObservation o = resultsRight.observations.get(inputIndex);
+			int errorIndex = resultsRight.inputToUsed.get(inputIndex);
+			List<ImageResults> errors = algorithms.calibrator.getCalibRight().getErrors();
+			ImageResults results = errorIndex == -1 || errors == null ? null : errors.get(errorIndex);
+			stereoPanel.panelRight.setResults(o, results, all);
+		});
+
 		stereoPanel.repaint();
 	}
 
@@ -358,6 +424,7 @@ public class CalibrateStereoPlanarAppV2 extends JPanel {
 	 */
 	protected CalibrationListPanel createImageListPanel() {
 		var panel = new CalibrationListPanel();
+		// TODO implement these
 //		panel.bRemovePoint.addActionListener(( e ) -> removePoint());
 //		panel.bRemoveImage.addActionListener(( e ) -> removeImage());
 //		panel.bReset.addActionListener(( e ) -> undoAllRemove());
@@ -484,6 +551,7 @@ public class CalibrateStereoPlanarAppV2 extends JPanel {
 	private static class ResultsLocked extends VariableLockSet {
 		// Index of images used when calibrating
 		protected final DogArray_I32 usedImages = new DogArray_I32();
+		protected final DogArray_I32 inputToUsed = new DogArray_I32();
 		// Active list of observations
 		protected final List<CalibrationObservation> observations = new ArrayList<>();
 		// Copy of original observation before any edits
@@ -505,6 +573,7 @@ public class CalibrateStereoPlanarAppV2 extends JPanel {
 				usedImages.reset();
 				observations.clear();
 				original.reset();
+				inputToUsed.reset();
 			});
 		}
 	}
