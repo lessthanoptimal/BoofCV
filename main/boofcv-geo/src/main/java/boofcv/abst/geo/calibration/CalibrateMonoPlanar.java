@@ -155,8 +155,7 @@ public class CalibrateMonoPlanar implements VerbosePrint {
 		} else if (observation.getWidth() != this.imageWidth || observation.getHeight() != this.imageHeight) {
 			throw new IllegalArgumentException("Image shape miss match. Are these all from the same camera? " +
 					imageWidth + "x" + imageHeight + " vs " + observation.getWidth() + "x" + observation.getHeight());
-		} else if (observation.points.size() < 4)
-			throw new IllegalArgumentException("At least 4 points are required");
+		}
 		observations.add(observation);
 	}
 

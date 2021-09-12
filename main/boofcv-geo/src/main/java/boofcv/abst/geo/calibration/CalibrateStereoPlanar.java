@@ -34,6 +34,7 @@ import georegression.struct.point.Point2D_F64;
 import georegression.struct.point.Point3D_F64;
 import georegression.struct.se.Se3_F64;
 import georegression.transform.se.SePointOps_F64;
+import lombok.Getter;
 import org.ddogleg.struct.VerbosePrint;
 import org.jetbrains.annotations.Nullable;
 
@@ -69,8 +70,8 @@ public class CalibrateStereoPlanar implements VerbosePrint {
 	List<Se3_F64> viewRight = new ArrayList<>();
 
 	// calibrates the left and right camera image
-	CalibrateMonoPlanar calibLeft;
-	CalibrateMonoPlanar calibRight;
+	@Getter CalibrateMonoPlanar calibLeft;
+	@Getter CalibrateMonoPlanar calibRight;
 
 	List<Point2D_F64> layout;
 
@@ -266,14 +267,6 @@ public class CalibrateStereoPlanar implements VerbosePrint {
 				parameters.left.width, parameters.left.height, parameters.left);
 		BundleAdjustmentOps.convert(((BundlePinholeBrown)structure.cameras.get(1).model),
 				parameters.left.width, parameters.left.height, parameters.right);
-	}
-
-	public CalibrateMonoPlanar getCalibLeft() {
-		return calibLeft;
-	}
-
-	public CalibrateMonoPlanar getCalibRight() {
-		return calibRight;
 	}
 
 	public void printStatistics() {

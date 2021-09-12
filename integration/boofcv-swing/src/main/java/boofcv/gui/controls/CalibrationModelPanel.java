@@ -41,15 +41,11 @@ public class CalibrationModelPanel extends StandardAlgConfigPanel implements Act
 
 	public CameraModelType selected = CameraModelType.BROWN;
 
-	public int pinholeRadial = 2;
-	public boolean pinholeTangential = true;
-	public boolean pinholeSkew = true;
-
 	public int universalRadial = 2;
 	public boolean universalTangential = true;
 	public boolean universalSkew = true;
 
-	public final PinholePanel pinhole = new PinholePanel();
+	public final ControlPanelPinhole pinhole = new ControlPanelPinhole(this::updateParameters);
 	public final UniversalPanel universal = new UniversalPanel();
 	public final KannalaBrandtPanel kannalaBrandt = new KannalaBrandtPanel();
 
@@ -76,9 +72,9 @@ public class CalibrationModelPanel extends StandardAlgConfigPanel implements Act
 
 	public void setToBrown(boolean skew, int numRadial, boolean tangential ) {
 		comboType.setSelectedIndex(CameraModelType.BROWN.ordinal());
-		pinhole.skew.setSelected(skew);
-		pinhole.numRadial.setValue(numRadial);
-		pinhole.tangential.setSelected(tangential);
+		pinhole.skew.check.setSelected(skew);
+		pinhole.numRadial.spinner.setValue(numRadial);
+		pinhole.tangential.check.setSelected(tangential);
 	}
 
 	public void setToUniversal(boolean skew, int numRadial, boolean tangential ) {
@@ -97,7 +93,8 @@ public class CalibrationModelPanel extends StandardAlgConfigPanel implements Act
 
 	public void configureCalibrator(CalibrateMonoPlanar calibrator) {
 		switch (selected) {
-			case BROWN -> calibrator.configurePinhole(pinholeSkew, pinholeRadial, pinholeTangential);
+			case BROWN -> calibrator.configurePinhole(
+					pinhole.skew.value, pinhole.numRadial.value.intValue(), pinhole.tangential.value);
 			case UNIVERSAL -> calibrator.configureUniversalOmni(universalSkew, universalRadial, universalTangential);
 			case KANNALA_BRANDT -> calibrator.configureKannalaBrandt(kannalaBrandt.skew.value,
 					kannalaBrandt.numSymmetric.vint(), kannalaBrandt.numAsymmetric.vint());
@@ -130,44 +127,6 @@ public class CalibrationModelPanel extends StandardAlgConfigPanel implements Act
 		panelTarget.add(BorderLayout.CENTER, p);
 		panelTarget.validate();
 		panelTarget.repaint();
-	}
-
-	private class PinholePanel extends StandardAlgConfigPanel
-			implements ChangeListener, ActionListener {
-
-		JSpinner numRadial;
-		JCheckBox tangential;
-		JCheckBox skew;
-
-		public PinholePanel() {
-			setBorder(BorderFactory.createEmptyBorder());
-
-			numRadial = spinner(pinholeRadial, 0, 5, 1);
-			tangential = checkbox("Tangential", pinholeTangential);
-			skew = checkbox("Zero Skew", pinholeSkew);
-
-			addLabeled(numRadial, "Radial");
-			addAlignLeft(tangential);
-			addAlignLeft(skew);
-		}
-
-		@Override
-		public void stateChanged( ChangeEvent e ) {
-			if (e.getSource() == numRadial) {
-				pinholeRadial = ((Number)numRadial.getValue()).intValue();
-			}
-			updateParameters();
-		}
-
-		@Override
-		public void actionPerformed( ActionEvent e ) {
-			if (e.getSource() == tangential) {
-				pinholeTangential = tangential.isSelected();
-			} else if (e.getSource() == skew) {
-				pinholeSkew = skew.isSelected();
-			}
-			updateParameters();
-		}
 	}
 
 	private class UniversalPanel extends StandardAlgConfigPanel
@@ -222,13 +181,6 @@ public class CalibrationModelPanel extends StandardAlgConfigPanel implements Act
 		}
 
 		@Override public void controlChanged( final Object source ) {
-			if (source == numSymmetric.spinner) {
-				numSymmetric.updateValue();
-			} else if (source == numAsymmetric.spinner) {
-				numAsymmetric.updateValue();
-			} else if (source == skew.check) {
-				skew.updateValue();
-			}
 			updateParameters();
 		}
 	}

@@ -18,9 +18,10 @@
 
 package boofcv.demonstrations.calibration;
 
-import boofcv.abst.fiducial.calib.ConfigGridDimen;
+import boofcv.abst.fiducial.calib.ConfigECoCheckMarkers;
 import boofcv.abst.geo.calibration.CalibrateStereoPlanar;
 import boofcv.abst.geo.calibration.DetectSingleFiducialCalibration;
+import boofcv.abst.geo.calibration.MultiToSingleFiducialCalibration;
 import boofcv.alg.geo.PerspectiveOps;
 import boofcv.alg.geo.RectifyImageOps;
 import boofcv.alg.geo.calibration.CalibrationObservation;
@@ -207,7 +208,8 @@ public class CalibrateStereoPlanarGuiApp extends JPanel {
 
 	public static void main( String[] args ) {
 		DetectSingleFiducialCalibration detector =
-				FactoryFiducialCalibration.chessboardX(null, new ConfigGridDimen(7, 5, 30));
+				new MultiToSingleFiducialCalibration(FactoryFiducialCalibration.
+						ecocheck(null, ConfigECoCheckMarkers.parse("10x7e3n1", 30)));
 //				FactoryCalibrationTarget.squareGrid(null, new ConfigGridDimen(4, 3, 30, 30));
 
 
@@ -232,7 +234,7 @@ public class CalibrateStereoPlanarGuiApp extends JPanel {
 
 		SwingUtilities.invokeLater(() -> {
 			CalibrateStereoPlanarGuiApp app = new CalibrateStereoPlanarGuiApp();
-			app.configure(detector, 2, false, true, leftFiles, rightFiles);
+			app.configure(detector, 4, false, true, leftFiles, rightFiles);
 
 			ShowImages.showWindow(app, "Planar Stereo Calibration", true);
 
