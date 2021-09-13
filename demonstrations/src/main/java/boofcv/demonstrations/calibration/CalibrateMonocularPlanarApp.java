@@ -50,6 +50,7 @@ import boofcv.misc.VariableLockSet;
 import boofcv.struct.calib.CameraModel;
 import boofcv.struct.calib.CameraModelType;
 import boofcv.struct.calib.CameraPinholeBrown;
+import boofcv.struct.calib.StereoParameters;
 import boofcv.struct.image.GrayF32;
 import lombok.Getter;
 import org.apache.commons.io.FilenameUtils;
@@ -150,7 +151,8 @@ public class CalibrateMonocularPlanarApp extends JPanel {
 
 		var menuItemSaveCalibration = new JMenuItem("Save Intrinsics");
 		BoofSwingUtil.setMenuItemKeys(menuItemSaveCalibration, KeyEvent.VK_S, KeyEvent.VK_S);
-		menuItemSaveCalibration.addActionListener(( e ) -> saveIntrinsics());
+		menuItemSaveCalibration.addActionListener(( e ) ->
+				saveIntrinsics(this, imageDirectory, detectorSet.calibrator.getIntrinsic()));
 		menuFile.add(menuItemSaveCalibration);
 
 		var menuItemSaveLandmarks = new JMenuItem("Save Landmarks");
@@ -212,20 +214,26 @@ public class CalibrateMonocularPlanarApp extends JPanel {
 	/**
 	 * Saves found intrinsic parameters
 	 */
-	protected void saveIntrinsics() {
+	protected static void saveIntrinsics( JComponent owner, File directory, Object calibration ) {
+		boolean mono = calibration instanceof CameraModel;
 		var chooser = new JFileChooser();
 		chooser.addChoosableFileFilter(new FileNameExtensionFilter("yaml", "yaml", "yml"));
 		chooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
-		chooser.setSelectedFile(new File(imageDirectory, INTRINSICS));
-		int returnVal = chooser.showSaveDialog(this);
+		chooser.setSelectedFile(new File(directory, mono ? INTRINSICS : "stereo.yaml"));
+		int returnVal = chooser.showSaveDialog(owner);
 		if (returnVal != JFileChooser.APPROVE_OPTION) {
 			return;
 		}
+
 		try {
-			CalibrationIO.save(detectorSet.calibrator.getIntrinsic(), chooser.getSelectedFile());
+			if (mono) {
+				CalibrationIO.save((CameraModel)calibration, chooser.getSelectedFile());
+			} else {
+				CalibrationIO.save((StereoParameters)calibration, chooser.getSelectedFile());
+			}
 		} catch (RuntimeException e) {
 			e.printStackTrace();
-			BoofSwingUtil.warningDialog(this, e);
+			BoofSwingUtil.warningDialog(owner, e);
 		}
 	}
 
