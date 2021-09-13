@@ -27,18 +27,20 @@ import boofcv.alg.geo.calibration.CalibrationObservation;
 import boofcv.alg.geo.rectify.RectifyCalibrated;
 import boofcv.gui.BoofSwingUtil;
 import boofcv.gui.StandardAlgConfigPanel;
+import boofcv.gui.calibration.StereoImageSet;
+import boofcv.gui.calibration.StereoImageSetList;
 import boofcv.gui.calibration.UtilCalibrationGui;
 import boofcv.gui.controls.CalibrationTargetPanel;
 import boofcv.gui.controls.ControlPanelPinhole;
 import boofcv.gui.controls.JCheckBoxValue;
 import boofcv.gui.controls.JSpinnerNumber;
+import boofcv.gui.dialogs.OpenStereoSequencesChooser;
 import boofcv.gui.image.ImagePanel;
 import boofcv.gui.image.ScaleOptions;
 import boofcv.gui.image.ShowImages;
 import boofcv.gui.settings.GlobalSettingsControls;
 import boofcv.io.UtilIO;
 import boofcv.io.image.ConvertBufferedImage;
-import boofcv.io.image.UtilImageIO;
 import boofcv.misc.BoofMiscOps;
 import boofcv.misc.VariableLockSet;
 import boofcv.struct.calib.StereoParameters;
@@ -59,6 +61,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+import static boofcv.demonstrations.calibration.CalibrateMonocularPlanarApp.saveCalibrationTarget;
 import static boofcv.gui.BoofSwingUtil.MAX_ZOOM;
 import static boofcv.gui.BoofSwingUtil.MIN_ZOOM;
 
@@ -68,6 +71,13 @@ import static boofcv.gui.BoofSwingUtil.MIN_ZOOM;
  * @author Peter Abeles
  */
 public class CalibrateStereoPlanarAppV2 extends JPanel {
+	// TODO display stats for right images
+	// TODO Make sure it works with ecocheck
+	// TODO option for rectification view style
+	// TODO draw horizontal line again
+	// TODO remove corners
+	// TODO remove images
+	// TODO Dialog for reading in split image sequence
 
 	protected @Nullable StereoImageSet inputImages;
 	protected final Object lockInput = new Object();
@@ -84,6 +94,9 @@ public class CalibrateStereoPlanarAppV2 extends JPanel {
 	protected @Getter ConfigureInfoPanel configurePanel = new ConfigureInfoPanel();
 	protected CalibrationListPanel imageListPanel = createImageListPanel();
 	//--------------------------------------------------------------------
+
+	// Directory where input images came from. Used as a default output in some situations
+	File sourceDirectory = new File(".");
 
 	// True if a thread is running for calibration
 	protected boolean runningCalibration = false;
@@ -105,6 +118,7 @@ public class CalibrateStereoPlanarAppV2 extends JPanel {
 		stereoPanel.panelRight.setScale = ( scale ) -> configurePanel.setZoom(scale);
 
 		stereoPanel.setPreferredSize(new Dimension(1000, 720));
+		updateVisualizationSettings();
 
 		createAlgorithms();
 		add(imageListPanel, BorderLayout.EAST);
@@ -139,9 +153,10 @@ public class CalibrateStereoPlanarAppV2 extends JPanel {
 //		menuItemSaveLandmarks.addActionListener(( e ) -> saveLandmarks());
 //		menuFile.add(menuItemSaveLandmarks);
 //
-//		var menuItemSaveTarget = new JMenuItem("Save Target");
-//		menuItemSaveTarget.addActionListener(( e ) -> saveCalibrationTarget());
-//		menuFile.add(menuItemSaveTarget);
+		var menuItemSaveTarget = new JMenuItem("Save Target");
+		menuItemSaveTarget.addActionListener(( e ) -> saveCalibrationTarget
+				(this, sourceDirectory, configurePanel.targetPanel.createConfigCalibrationTarget()));
+		menuFile.add(menuItemSaveTarget);
 
 		JMenuItem menuSettings = new JMenuItem("Settings");
 		menuSettings.addActionListener(e -> new GlobalSettingsControls().showDialog(window, this));
@@ -156,11 +171,54 @@ public class CalibrateStereoPlanarAppV2 extends JPanel {
 	}
 
 	protected void updateRecentItems() {
-//		BoofSwingUtil.updateRecentItems(this, menuRecent, (info)->processDirectory(new File(info.files.get(0))));
+		BoofSwingUtil.updateRecentItems(this, menuRecent, ( info ) -> {
+			List<String> left = UtilIO.listSmartImages(info.files.get(0), false);
+			List<String> right = UtilIO.listSmartImages(info.files.get(1), false);
+
+			checkDefaultTarget(new File(info.files.get(0)));
+
+			new Thread(() -> process(left, right), "Recent Item").start();
+		});
 	}
 
+	/**
+	 * Opens a dialog and lets the user select stereo sequences
+	 */
 	public void openDialog() {
+		BoofSwingUtil.checkGuiThread();
 
+		OpenStereoSequencesChooser.Selected selected =
+				BoofSwingUtil.openStereoChooser(window, getClass(), true, true);
+		if (selected == null)
+			return;
+
+		// Remember where it opened these files and add it to the recent file list
+		BoofSwingUtil.addToRecentFiles(this, selected.left.getParent(),
+				BoofMiscOps.asList(selected.left.getPath(), selected.right.getPath()));
+
+		// Load the files and process
+		List<String> left = UtilIO.listSmartImages(selected.left.getPath(), false);
+		List<String> right = UtilIO.listSmartImages(selected.right.getPath(), false);
+
+		if (left.isEmpty() || right.isEmpty())
+			return;
+
+		checkDefaultTarget(new File(left.get(0)).getParentFile());
+
+		new Thread(() -> process(left, right), "Open Dialog").start();
+	}
+
+	/**
+	 * If there's a default target for this data, update the target.
+	 *
+	 * @param directory directory potentially containing target description
+	 */
+	public void checkDefaultTarget( File directory ) {
+		BoofSwingUtil.checkGuiThread();
+		sourceDirectory = directory;
+		if (!CalibrateMonocularPlanarApp.loadDefaultTarget(sourceDirectory, configurePanel.targetPanel)) {
+			targetChanged = true;
+		}
 	}
 
 	/**
@@ -187,35 +245,15 @@ public class CalibrateStereoPlanarAppV2 extends JPanel {
 	 * Process two sets of images for left and right cameras
 	 */
 	public void process( List<String> listLeft, List<String> listRight ) {
-		BoofMiscOps.checkEq(listLeft.size(), listRight.size());
+		if (listLeft.isEmpty())
+			return;
+		BoofMiscOps.checkEq(listLeft.size(), listRight.size(), "The two image sets must have matching pairs");
 
 		Collections.sort(listLeft);
 		Collections.sort(listRight);
 
 		synchronized (lockInput) {
-			inputImages = new StereoImageSet() {
-				int selected;
-
-				@Override public void setSelected( int index ) {this.selected = index;}
-
-				@Override public int size() {return listLeft.size();}
-
-				@Override public String getLeftName() {return new File(listLeft.get(selected)).getName();}
-
-				@Override public String getRightName() {return new File(listRight.get(selected)).getName();}
-
-				@Override public BufferedImage loadLeft() {
-					BufferedImage image = UtilImageIO.loadImage(listLeft.get(selected));
-					BoofMiscOps.checkTrue(image != null);
-					return image;
-				}
-
-				@Override public BufferedImage loadRight() {
-					BufferedImage image = UtilImageIO.loadImage(listRight.get(selected));
-					BoofMiscOps.checkTrue(image != null);
-					return image;
-				}
-			};
+			inputImages = new StereoImageSetList(listLeft, listRight);
 		}
 
 		targetChanged = true;
@@ -240,7 +278,12 @@ public class CalibrateStereoPlanarAppV2 extends JPanel {
 		// TODO disable and re-enable menu bar when done
 		// Prevent the user from trying to open up new images or change anything while this is dynamic
 //		SwingUtilities.invokeLater(() -> setMenuBarEnabled(false));
-		SwingUtilities.invokeLater(() -> configurePanel.bCompute.setEnabled(false));
+		SwingUtilities.invokeLater(() -> {
+			// Disable menu bar to prevent the user from trying to load while this is being processed
+			//			setMenuBarEnabled(false);
+			// Compute has been invoked and can be disabled
+			configurePanel.bCompute.setEnabled(false);
+		});
 
 		// Update algorithm based on the latest user requests
 		boolean detectTargets = targetChanged;
@@ -255,9 +298,22 @@ public class CalibrateStereoPlanarAppV2 extends JPanel {
 			// Visualize the results
 			setRectification(param);
 			algorithms.calibrationSuccess = true;
+
+			// Show the user the found calibration parameters. Format a bit to make it look nicer
+			String text = param.toStringQuaternion().replace(',', '\n').replace("{", "\n ");
+			text = text.replace('}', '\n');
+			String _text = text;
+			SwingUtilities.invokeLater(() -> {
+				configurePanel.textAreaCalib.setText(_text);
+				showStatsToUser();
+			});
 		} catch (RuntimeException e) {
 			e.printStackTrace();
-			SwingUtilities.invokeLater(() -> BoofSwingUtil.warningDialog(this, e));
+			SwingUtilities.invokeLater(() -> {
+				BoofSwingUtil.warningDialog(this, e);
+				configurePanel.textAreaCalib.setText("");
+				configurePanel.textAreaStats.setText("");
+			});
 			algorithms.calibrationSuccess = false;
 		}
 		// Tell it to select the last image since that's what's being previewed already
@@ -351,6 +407,47 @@ public class CalibrateStereoPlanarAppV2 extends JPanel {
 		}
 	}
 
+	/** Format statistics on results and add to a text panel */
+	private void showStatsToUser() {
+		BoofSwingUtil.checkGuiThread();
+
+		algorithms.lock();
+		resultsLeft.lock();
+		resultsRight.lock();
+
+		try {
+			double averageError = 0.0;
+			double maxError = 0.0;
+			List<ImageResults> results = algorithms.calibrator.computeErrors();
+			if (results.isEmpty())
+				return;
+
+			for (int i = 0; i < results.size(); i++) {
+				ImageResults r = results.get(i);
+				averageError += r.meanError;
+				maxError = Math.max(maxError, r.maxError);
+			}
+			averageError /= results.size();
+			String text = String.format("Reprojection Errors (px):\n\nmean=%.3f max=%.3f\n\n", averageError, maxError);
+			text += String.format("%-10s | %8s\n", "image", "max (px)");
+			for (int i = 0; i < imageListPanel.imageNames.size(); i++) {
+				int resultsIndex = resultsLeft.inputToUsed.get(i);
+				if (resultsIndex < 0)
+					continue;
+				String image = imageListPanel.imageNames.get(i);
+				ImageResults r = results.get(resultsIndex);
+				text += String.format("%-12s %8.3f\n", image, r.maxError);
+			}
+
+			String _text = text;
+			SwingUtilities.invokeLater(() -> configurePanel.textAreaStats.setText(_text));
+		} finally {
+			algorithms.unlock();
+			resultsLeft.unlock();
+			resultsRight.unlock();
+		}
+	}
+
 	protected void settingsChanged( boolean target, boolean calibrator ) {
 		BoofSwingUtil.checkGuiThread();
 		targetChanged |= target;
@@ -359,6 +456,7 @@ public class CalibrateStereoPlanarAppV2 extends JPanel {
 	}
 
 	protected void updateVisualizationSettings() {
+		BoofSwingUtil.checkGuiThread();
 		stereoPanel.setShowPoints(configurePanel.checkPoints.value);
 		stereoPanel.setShowErrors(configurePanel.checkErrors.value);
 		stereoPanel.setRectify(configurePanel.checkRectified.value);
@@ -367,6 +465,7 @@ public class CalibrateStereoPlanarAppV2 extends JPanel {
 		stereoPanel.setShowOrder(configurePanel.checkOrder.value);
 		stereoPanel.setErrorScale(configurePanel.selectErrorScale.value.doubleValue());
 		stereoPanel.setShowResiduals(configurePanel.checkResidual.value);
+		stereoPanel.repaint();
 	}
 
 	/**
@@ -443,7 +542,7 @@ public class CalibrateStereoPlanarAppV2 extends JPanel {
 
 		JCheckBoxValue checkPoints = checkboxWrap("Points", true).tt("Show calibration landmarks");
 		JCheckBoxValue checkResidual = checkboxWrap("Residual", false).tt("Line showing residual exactly");
-		JCheckBoxValue checkErrors = checkboxWrap("Errors", true).tt("Exaggerated residual errors");
+		JCheckBoxValue checkErrors = checkboxWrap("Errors", false).tt("Exaggerated residual errors");
 		JCheckBoxValue checkRectified = checkboxWrap("Rectify", false).tt("Visualize rectified images");
 		JCheckBoxValue checkAll = checkboxWrap("All", false).tt("Show location of all landmarks in all images");
 		JCheckBoxValue checkNumbers = checkboxWrap("Numbers", false).tt("Draw feature numbers");
@@ -590,6 +689,7 @@ public class CalibrateStereoPlanarAppV2 extends JPanel {
 			app.window = ShowImages.showWindow(app, "Planar Stereo Calibration", true);
 			app.window.setJMenuBar(app.menuBar);
 
+			app.checkDefaultTarget(new File(directory));
 			new Thread(() -> app.process(leftImages, rightImages)).start();
 		});
 	}

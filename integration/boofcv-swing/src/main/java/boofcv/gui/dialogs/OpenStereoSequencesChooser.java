@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -25,6 +25,7 @@ import boofcv.io.calibration.CalibrationIO;
 import boofcv.io.image.UtilImageIO;
 import boofcv.misc.BoofLambdas;
 import boofcv.struct.calib.StereoParameters;
+import org.jetbrains.annotations.Nullable;
 
 import javax.swing.*;
 import java.awt.*;
@@ -51,9 +52,9 @@ public class OpenStereoSequencesChooser extends JSpringPanel {
 	protected Listener listener;
 
 	// Path to left and right input
-	JTextField textLeftPath= createTextWidget();
-	JTextField textRightPath= createTextWidget();
-	JTextField textCalibrationPath= createTextWidget();
+	JTextField textLeftPath = createTextWidget();
+	JTextField textRightPath = createTextWidget();
+	JTextField textCalibrationPath = createTextWidget();
 
 	ImagePanel previewLeft = new ImagePanel();
 	ImagePanel previewRight = new ImagePanel();
@@ -64,42 +65,48 @@ public class OpenStereoSequencesChooser extends JSpringPanel {
 	// the directory it's i
 	File directory;
 
-	JDialog dialog;
 	StereoParameters stereoParameters;
 
-	public OpenStereoSequencesChooser(JDialog dialog, Listener listener,File directory) {
+	boolean justImages;
+
+	public OpenStereoSequencesChooser( JDialog dialog, Listener listener, File directory, boolean justImages ) {
 		this.listener = listener;
 		this.directory = directory;
+		this.justImages = justImages;
 
 		JPanel previewPanel = new JPanel();
-		previewPanel.setLayout(new BoxLayout(previewPanel,BoxLayout.X_AXIS));
+		previewPanel.setLayout(new BoxLayout(previewPanel, BoxLayout.X_AXIS));
 		previewPanel.add(previewLeft);
 		previewPanel.add(previewRight);
 
-		int ip = PREVIEW_PIXELS+40;
-		previewLeft.setPreferredSize(new Dimension(ip,ip));
-		previewRight.setPreferredSize(new Dimension(ip,ip));
+		int ip = PREVIEW_PIXELS + 40;
+		previewLeft.setPreferredSize(new Dimension(ip, ip));
+		previewRight.setPreferredSize(new Dimension(ip, ip));
 
 		configureButtons(dialog, listener);
 
-		JPanel buttonPanel = StandardAlgConfigPanel.createHorizontalPanel(bCancel,Box.createHorizontalGlue(),bOK);
+		JPanel buttonPanel = StandardAlgConfigPanel.createHorizontalPanel(bCancel, Box.createHorizontalGlue(), bOK);
 
-		JPanel leftPanel = createPathPanel("Left",textLeftPath,this::handleLeftPath);
-		JPanel rightPanel = createPathPanel("Right",textRightPath,this::handleRightPath);
-		JPanel calibPanel = createPathPanel("Calibration",textCalibrationPath,this::handleCalibrationPath);
+		JPanel leftPanel = createPathPanel("Left", textLeftPath, this::handleLeftPath);
+		JPanel rightPanel = createPathPanel("Right", textRightPath, this::handleRightPath);
 
-		constrainWestNorthEast(leftPanel,null,6,6);
-		constrainWestNorthEast(rightPanel,leftPanel,6,6);
-		constrainWestNorthEast(calibPanel,rightPanel,6,6);
-		constrainWestNorthEast(previewPanel,calibPanel,6,6);
-		constrainWestSouthEast(buttonPanel,null,10,10);
+		constrainWestNorthEast(leftPanel, null, 6, 6);
+		constrainWestNorthEast(rightPanel, leftPanel, 6, 6);
+
+		if (!justImages) {
+			JPanel calibPanel = createPathPanel("Calibration", textCalibrationPath, this::handleCalibrationPath);
+			constrainWestNorthEast(calibPanel, rightPanel, 6, 6);
+			constrainWestNorthEast(previewPanel, calibPanel, 6, 6);
+		}
+
+		constrainWestSouthEast(buttonPanel, null, 10, 10);
 
 		layout.putConstraint(SpringLayout.SOUTH, previewPanel, -5, SpringLayout.NORTH, buttonPanel);
 
-		setPreferredSize(new Dimension(500,400));
+		setPreferredSize(new Dimension(500, 400));
 	}
 
-	private void configureButtons(JDialog dialog, Listener listener) {
+	private void configureButtons( JDialog dialog, Listener listener ) {
 		// Fix the size
 		bCancel.setMaximumSize(bCancel.getPreferredSize());
 		bOK.setMaximumSize(bOK.getPreferredSize());
@@ -112,8 +119,8 @@ public class OpenStereoSequencesChooser extends JSpringPanel {
 		SwingUtilities.getRootPane(dialog).setDefaultButton(bOK);
 
 		// Specify how it should respond to the user selecting these buttons
-		bCancel.addActionListener((e)->listener.userCanceled());
-		bOK.addActionListener((e)->handleOK());
+		bCancel.addActionListener(( e ) -> listener.userCanceled());
+		bOK.addActionListener(( e ) -> handleOK());
 	}
 
 	/**
@@ -123,21 +130,21 @@ public class OpenStereoSequencesChooser extends JSpringPanel {
 		File left = new File(textLeftPath.getText());
 		File right = new File(textRightPath.getText());
 		File calibration = new File(textCalibrationPath.getText());
-		listener.selectedInputs(left,right,calibration);
+		listener.selectedInputs(left, right, calibration);
 	}
 
 	/**
 	 * User wishes to select a path for left sequence
 	 */
 	private void handleLeftPath() {
-		handleSelectSequence(textLeftPath,previewLeft);
+		handleSelectSequence(textLeftPath, previewLeft);
 	}
 
 	/**
 	 * User wishes to select a path for right sequence
 	 */
 	private void handleRightPath() {
-		handleSelectSequence(textRightPath,previewRight);
+		handleSelectSequence(textRightPath, previewRight);
 	}
 
 	/**
@@ -148,7 +155,7 @@ public class OpenStereoSequencesChooser extends JSpringPanel {
 		fc.setFileSelectionMode(JFileChooser.FILES_ONLY);
 		fc.setCurrentDirectory(directory);
 		int returnVal = fc.showOpenDialog(this);
-		if( returnVal != JFileChooser.APPROVE_OPTION )
+		if (returnVal != JFileChooser.APPROVE_OPTION)
 			return;
 		File selected = fc.getSelectedFile();
 		try {
@@ -156,8 +163,8 @@ public class OpenStereoSequencesChooser extends JSpringPanel {
 			textCalibrationPath.setText(selected.getPath());
 			directory = selected.getParentFile();
 			checkEverythingSet();
-		} catch( RuntimeException e ){
-			BoofSwingUtil.warningDialog(this,e);
+		} catch (RuntimeException e) {
+			BoofSwingUtil.warningDialog(this, e);
 		}
 	}
 
@@ -165,22 +172,24 @@ public class OpenStereoSequencesChooser extends JSpringPanel {
 	 * Checks to see if the user has selected all three inputs
 	 */
 	private void checkEverythingSet() {
-		boolean allGood = !textLeftPath.getText().isEmpty() &&
-				!textRightPath.getText().isEmpty() && !textCalibrationPath.getText().isEmpty();
+		boolean allGood = !textLeftPath.getText().isEmpty() && !textRightPath.getText().isEmpty();
+		if (!justImages) {
+			allGood &= !textCalibrationPath.getText().isEmpty();
+		}
 		bOK.setEnabled(allGood);
 	}
 
-	private void handleSelectSequence( JTextField textArea , ImagePanel previewPanel ) {
+	private void handleSelectSequence( JTextField textArea, ImagePanel previewPanel ) {
 		final JFileChooser fc = new JFileChooser();
 		fc.setFileSelectionMode(JFileChooser.FILES_AND_DIRECTORIES);
 		fc.setCurrentDirectory(directory);
 		int returnVal = fc.showOpenDialog(this);
-		if( returnVal != JFileChooser.APPROVE_OPTION )
+		if (returnVal != JFileChooser.APPROVE_OPTION)
 			return;
 
 		File selected = fc.getSelectedFile();
 		textArea.setText(selected.getPath());
-		setPreview(selected,previewPanel);
+		setPreview(selected, previewPanel);
 		checkEverythingSet();
 		// If it's a file you want the directory it's in.
 		// If it's a directory containing images you want to open the parent directory
@@ -190,11 +199,11 @@ public class OpenStereoSequencesChooser extends JSpringPanel {
 	/**
 	 * Sets a preview image for selected path. If directory it uses the first image.
 	 */
-	private void setPreview( File path , ImagePanel previewPanel ) {
-		BufferedImage preview=null;
-		if( path.isDirectory() ) {
+	private void setPreview( File path, ImagePanel previewPanel ) {
+		BufferedImage preview = null;
+		if (path.isDirectory()) {
 			File f = findFirstImageInDirectory(path);
-			if( f != null )
+			if (f != null)
 				preview = UtilImageIO.loadImage(f.getAbsolutePath());
 		} else {
 			preview = UtilImageIO.loadImage(path.getAbsolutePath());
@@ -208,20 +217,20 @@ public class OpenStereoSequencesChooser extends JSpringPanel {
 	private File findFirstImageInDirectory( File directory ) {
 		String first = null;
 		File[] files = directory.listFiles();
-		if( files == null )
+		if (files == null)
 			return null;
 		for (int i = 0; i < files.length; i++) {
 			File f = files[i];
-			if( f.isDirectory() )
+			if (f.isDirectory())
 				continue;
-			if( !UtilImageIO.isImage(f))
+			if (!UtilImageIO.isImage(f))
 				continue;
-			if( first == null || first.compareTo(f.getName()) < 0 ) {
+			if (first == null || first.compareTo(f.getName()) < 0) {
 				first = f.getName();
 			}
 		}
-		if( first != null )
-			return new File(directory,first);
+		if (first != null)
+			return new File(directory, first);
 		else
 			return null;
 	}
@@ -233,19 +242,19 @@ public class OpenStereoSequencesChooser extends JSpringPanel {
 		listener.userCanceled();
 	}
 
-	private JPanel createPathPanel(String name, JTextField text , BoofLambdas.ProcessCall callback ) {
+	private JPanel createPathPanel( String name, JTextField text, BoofLambdas.ProcessCall callback ) {
 		JLabel label = new JLabel(name);
-		label.setPreferredSize(new Dimension(100,30));
+		label.setPreferredSize(new Dimension(100, 30));
 		JButton bOpen = new JButton();
 		bOpen.setIcon(UIManager.getIcon("FileView.directoryIcon"));
 		bOpen.setMaximumSize(bOpen.getPreferredSize());
-		bOpen.addActionListener(e->callback.process());
+		bOpen.addActionListener(e -> callback.process());
 
 		JPanel panel = new JPanel();
-		panel.setLayout(new BoxLayout(panel,BoxLayout.X_AXIS));
+		panel.setLayout(new BoxLayout(panel, BoxLayout.X_AXIS));
 		panel.add(label);
 		panel.add(text);
-		panel.add(Box.createRigidArea(new Dimension(10,5)));
+		panel.add(Box.createRigidArea(new Dimension(10, 5)));
 		panel.add(bOpen);
 
 		return panel;
@@ -261,7 +270,7 @@ public class OpenStereoSequencesChooser extends JSpringPanel {
 	 * Lets the listener know what the user has chosen to do.
 	 */
 	public interface Listener {
-		void selectedInputs(File left, File right, File calibration);
+		void selectedInputs( File left, File right, File calibration );
 
 		void userCanceled();
 	}
@@ -280,12 +289,12 @@ public class OpenStereoSequencesChooser extends JSpringPanel {
 		public boolean canceled = false;
 		public final Selected selected = new Selected();
 
-		public DefaultListener(JDialog dialog) {
+		public DefaultListener( JDialog dialog ) {
 			this.dialog = dialog;
 		}
 
 		@Override
-		public void selectedInputs(File left, File right, File calibration) {
+		public void selectedInputs( File left, File right, File calibration ) {
 			this.selected.left = left;
 			this.selected.right = right;
 			this.selected.calibration = calibration;
@@ -304,21 +313,21 @@ public class OpenStereoSequencesChooser extends JSpringPanel {
 	 *
 	 * @param owner The owner for this dialog
 	 * @param sequences True for sequences of images or false for still images
+	 * @param justImages If it only needs image and no calibration file
 	 * @param path Path to input file
 	 * @return The selected stereo files or null of it canceled
 	 */
-	public static Selected showDialog( Window owner , boolean sequences, File path )
-	{
-		if( !sequences )
+	public static @Nullable Selected showDialog( Window owner, boolean sequences, boolean justImages, File path ) {
+		if (!sequences)
 			throw new RuntimeException("Not yet supported");
 
-		JDialog dialog = new JDialog(owner,"Open Stereo Sequence", Dialog.ModalityType.APPLICATION_MODAL);
+		JDialog dialog = new JDialog(owner, "Open Stereo Sequence", Dialog.ModalityType.APPLICATION_MODAL);
 		DefaultListener listener = new DefaultListener(dialog);
-		OpenStereoSequencesChooser panel = new OpenStereoSequencesChooser(dialog,listener,path);
+		OpenStereoSequencesChooser panel = new OpenStereoSequencesChooser(dialog, listener, path, justImages);
 
 		dialog.addWindowListener(new WindowAdapter() {
 			@Override
-			public void windowClosing(WindowEvent e) {
+			public void windowClosing( WindowEvent e ) {
 				panel.handleCancel();
 			}
 		});
@@ -331,7 +340,7 @@ public class OpenStereoSequencesChooser extends JSpringPanel {
 		// should block at this point
 		dialog.dispose();
 
-		if( listener.canceled )
+		if (listener.canceled)
 			return null;
 
 		return listener.selected;

@@ -169,21 +169,22 @@ public class BoofSwingUtil {
 		return response;
 	}
 
-	public static OpenStereoSequencesChooser.Selected openStereoChooser( Window parent, boolean isSequence ) {
+	public static OpenStereoSequencesChooser.Selected openStereoChooser(
+			Window parent, @Nullable Class<?> owner, boolean isSequence, boolean justImages ) {
 		Preferences prefs;
-		if (parent == null) {
+		if (owner == null) {
 			prefs = Preferences.userRoot();
 		} else {
-			prefs = Preferences.userRoot().node(parent.getClass().getSimpleName());
+			prefs = Preferences.userRoot().node(owner.getSimpleName());
 		}
 		File defaultPath = BoofSwingUtil.directoryUserHome();
 		String previousPath = prefs.get(KEY_PREVIOUS_SELECTION, defaultPath.getPath());
 
 		OpenStereoSequencesChooser.Selected response =
-				OpenStereoSequencesChooser.showDialog(parent, isSequence, new File(previousPath));
+				OpenStereoSequencesChooser.showDialog(parent, isSequence, justImages, new File(previousPath));
 
 		if (response != null) {
-			prefs.put(KEY_PREVIOUS_SELECTION, response.calibration.getParent());
+			prefs.put(KEY_PREVIOUS_SELECTION, response.left.getParent());
 		}
 		return response;
 	}

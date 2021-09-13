@@ -158,7 +158,8 @@ public class CalibrateMonocularPlanarApp extends JPanel {
 		menuFile.add(menuItemSaveLandmarks);
 
 		var menuItemSaveTarget = new JMenuItem("Save Target");
-		menuItemSaveTarget.addActionListener(( e ) -> saveCalibrationTarget());
+		menuItemSaveTarget.addActionListener(( e ) -> saveCalibrationTarget(this, imageDirectory,
+				configurePanel.targetPanel.createConfigCalibrationTarget()));
 		menuFile.add(menuItemSaveTarget);
 
 		JMenuItem menuSettings = new JMenuItem("Settings");
@@ -231,25 +232,25 @@ public class CalibrateMonocularPlanarApp extends JPanel {
 	/**
 	 * Saves a calibration target description to disk so that it can be loaded again later on.
 	 */
-	protected void saveCalibrationTarget() {
+	protected static void saveCalibrationTarget(
+			Component owner, File imageDirectory, ConfigCalibrationTarget target) {
 		// Open a dialog which will save using the default name in the place images were recently loaded from
 		var chooser = new JFileChooser();
 		chooser.addChoosableFileFilter(new FileNameExtensionFilter("yaml", "yaml", "yml"));
 		chooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
 		chooser.setCurrentDirectory(imageDirectory);
 		chooser.setSelectedFile(new File(imageDirectory, CALIBRATION_TARGET));
-		int returnVal = chooser.showSaveDialog(this);
+		int returnVal = chooser.showSaveDialog(owner);
 		if (returnVal != JFileChooser.APPROVE_OPTION) {
 			return;
 		}
 
 		try {
 			File file = chooser.getSelectedFile();
-			UtilIO.saveConfig(configurePanel.targetPanel.createConfigCalibrationTarget(),
-					new ConfigCalibrationTarget(), file);
+			UtilIO.saveConfig(target, new ConfigCalibrationTarget(), file);
 		} catch (RuntimeException e) {
 			e.printStackTrace();
-			BoofSwingUtil.warningDialog(this, e);
+			BoofSwingUtil.warningDialog(owner, e);
 		}
 	}
 
@@ -324,17 +325,7 @@ public class CalibrateMonocularPlanarApp extends JPanel {
 	 * Detects image features from the set
 	 */
 	public void processImages( File directory, List<String> selectedImages ) {
-		// If the calibration target type is specified load that
-		var fileTarget = new File(directory, CALIBRATION_TARGET);
-		if (fileTarget.exists()) {
-			System.out.println("Loading calibration target at " + fileTarget.getPath());
-			try {
-				ConfigCalibrationTarget config = UtilIO.loadConfig(fileTarget);
-				SwingUtilities.invokeLater(() -> configurePanel.targetPanel.setConfigurationTo(config));
-			} catch (RuntimeException e) {
-				e.printStackTrace();
-			}
-		}
+		loadDefaultTarget(directory, configurePanel.targetPanel);
 
 		imageDirectory = directory;
 		targetChanged = true;
@@ -344,6 +335,21 @@ public class CalibrateMonocularPlanarApp extends JPanel {
 		SwingUtilities.invokeLater(() ->
 				// Process the images in a non-gui thread
 				new Thread(() -> handleProcessCalled(selectedImages), "OpenImages()").start());
+	}
+
+	protected static boolean loadDefaultTarget( File directory, CalibrationTargetPanel panel ) {
+		// If the calibration target type is specified load that
+		var fileTarget = new File(directory, CALIBRATION_TARGET);
+		if (fileTarget.exists()) {
+			try {
+				ConfigCalibrationTarget config = UtilIO.loadConfig(fileTarget);
+				BoofSwingUtil.invokeNowOrLater(() -> panel.setConfigurationTo(config));
+				return true;
+			} catch (RuntimeException e) {
+				e.printStackTrace();
+			}
+		}
+		return false;
 	}
 
 	protected DisplayCalibrationPanel getCalibrationPanel() {
