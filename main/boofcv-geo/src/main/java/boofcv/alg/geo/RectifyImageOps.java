@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -85,6 +85,36 @@ public class RectifyImageOps {
 	 */
 	public static RectifyFundamental createUncalibrated() {
 		return new RectifyFundamental();
+	}
+
+	/**
+	 * <p>
+	 * Adjust the rectification based on the provided rule for filling the view.
+	 * </p>
+	 *
+	 * <p>
+	 * WARNING: There are pathological conditions where this will fail. If the new rotated image view
+	 * and a pixel are parallel it will require infinite area.
+	 * </p>
+	 *
+	 * @param paramLeft (Input) Left camera intrinsic parameters
+	 * @param rectifyLeft (Input, Output) Left image transform from pixels to rectified pixels.
+	 * @param rectifyRight (Input, Output) Right image transform from pixels to rectified pixels.
+	 * @param rectifyK (Input, Output) Rectified intrinsic calibration matrix.
+	 * @param rectifiedSize (Output, Optional) Rectified image size that maximizes usable pixels at native resolution.
+	 */
+	public static void adjustView( RectifyFillType approach,
+								   CameraPinholeBrown paramLeft,
+								   DMatrixRMaj rectifyLeft, DMatrixRMaj rectifyRight,
+								   DMatrixRMaj rectifyK, @Nullable ImageDimension rectifiedSize ) {
+		if (rectifiedSize == null)
+			rectifiedSize = new ImageDimension();
+
+		switch (approach) {
+			case NONE -> {}
+			case ALL_INSIDE_LEFT -> allInsideLeft(paramLeft, rectifyLeft, rectifyRight, rectifyK, rectifiedSize);
+			case FULL_VIEW_LEFT -> fullViewLeft(paramLeft, rectifyLeft, rectifyRight, rectifyK, rectifiedSize);
+		}
 	}
 
 	/**

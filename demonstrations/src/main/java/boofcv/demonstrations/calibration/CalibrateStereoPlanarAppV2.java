@@ -18,10 +18,12 @@
 
 package boofcv.demonstrations.calibration;
 
+import boofcv.BoofVerbose;
 import boofcv.abst.geo.calibration.CalibrateStereoPlanar;
 import boofcv.abst.geo.calibration.DetectSingleFiducialCalibration;
 import boofcv.abst.geo.calibration.ImageResults;
 import boofcv.alg.geo.PerspectiveOps;
+import boofcv.alg.geo.RectifyFillType;
 import boofcv.alg.geo.RectifyImageOps;
 import boofcv.alg.geo.calibration.CalibrationObservation;
 import boofcv.alg.geo.rectify.RectifyCalibrated;
@@ -38,6 +40,7 @@ import boofcv.gui.dialogs.OpenStereoSequencesChooser;
 import boofcv.gui.image.ImagePanel;
 import boofcv.gui.image.ScaleOptions;
 import boofcv.gui.image.ShowImages;
+import boofcv.gui.settings.GlobalDemoSettings;
 import boofcv.gui.settings.GlobalSettingsControls;
 import boofcv.io.UtilIO;
 import boofcv.io.image.ConvertBufferedImage;
@@ -62,6 +65,7 @@ import java.util.Collections;
 import java.util.List;
 
 import static boofcv.demonstrations.calibration.CalibrateMonocularPlanarApp.saveCalibrationTarget;
+import static boofcv.demonstrations.calibration.CalibrateMonocularPlanarApp.saveIntrinsics;
 import static boofcv.gui.BoofSwingUtil.MAX_ZOOM;
 import static boofcv.gui.BoofSwingUtil.MIN_ZOOM;
 
@@ -71,9 +75,7 @@ import static boofcv.gui.BoofSwingUtil.MIN_ZOOM;
  * @author Peter Abeles
  */
 public class CalibrateStereoPlanarAppV2 extends JPanel {
-	// TODO display stats for right images
-	// TODO Make sure it works with ecocheck
-	// TODO option for rectification view style
+	// TODO save rectified image pairs
 	// TODO draw horizontal line again
 	// TODO remove corners
 	// TODO remove images
@@ -144,10 +146,13 @@ public class CalibrateStereoPlanarAppV2 extends JPanel {
 		menuFile.add(menuRecent);
 		updateRecentItems();
 
-//		var menuItemSaveCalibration = new JMenuItem("Save Intrinsics");
-//		BoofSwingUtil.setMenuItemKeys(menuItemSaveCalibration, KeyEvent.VK_S, KeyEvent.VK_S);
-//		menuItemSaveCalibration.addActionListener(( e ) -> saveIntrinsics());
-//		menuFile.add(menuItemSaveCalibration);
+		var menuItemSaveCalibration = new JMenuItem("Save Calibration");
+		BoofSwingUtil.setMenuItemKeys(menuItemSaveCalibration, KeyEvent.VK_S, KeyEvent.VK_S);
+		menuItemSaveCalibration.addActionListener(( e ) -> algorithms.safe(() -> {
+			if (algorithms.calibrationSuccess)
+				saveIntrinsics(this, sourceDirectory, algorithms.parameters);
+		}));
+		menuFile.add(menuItemSaveCalibration);
 //
 //		var menuItemSaveLandmarks = new JMenuItem("Save Landmarks");
 //		menuItemSaveLandmarks.addActionListener(( e ) -> saveLandmarks());
@@ -177,6 +182,8 @@ public class CalibrateStereoPlanarAppV2 extends JPanel {
 
 			checkDefaultTarget(new File(info.files.get(0)));
 
+			// disable menu bar while in the UI thread
+			setMenuBarEnabled(false);
 			new Thread(() -> process(left, right), "Recent Item").start();
 		});
 	}
@@ -205,6 +212,8 @@ public class CalibrateStereoPlanarAppV2 extends JPanel {
 
 		checkDefaultTarget(new File(left.get(0)).getParentFile());
 
+		// disable menu bar while in the UI thread
+		setMenuBarEnabled(false);
 		new Thread(() -> process(left, right), "Open Dialog").start();
 	}
 
@@ -241,23 +250,32 @@ public class CalibrateStereoPlanarAppV2 extends JPanel {
 		resultsInvalid = true;
 	}
 
+	public void setMenuBarEnabled( boolean enabled ) {
+		BoofSwingUtil.checkGuiThread();
+		BoofSwingUtil.recursiveEnable(menuBar, enabled);
+	}
+
 	/**
 	 * Process two sets of images for left and right cameras
 	 */
 	public void process( List<String> listLeft, List<String> listRight ) {
-		if (listLeft.isEmpty())
-			return;
-		BoofMiscOps.checkEq(listLeft.size(), listRight.size(), "The two image sets must have matching pairs");
+		try {
+			if (listLeft.isEmpty())
+				return;
+			BoofMiscOps.checkEq(listLeft.size(), listRight.size(), "The two image sets must have matching pairs");
 
-		Collections.sort(listLeft);
-		Collections.sort(listRight);
+			Collections.sort(listLeft);
+			Collections.sort(listRight);
 
-		synchronized (lockInput) {
-			inputImages = new StereoImageSetList(listLeft, listRight);
+			synchronized (lockInput) {
+				inputImages = new StereoImageSetList(listLeft, listRight);
+			}
+
+			targetChanged = true;
+			handleProcessCalled();
+		} finally {
+			SwingUtilities.invokeLater(() -> setMenuBarEnabled(true));
 		}
-
-		targetChanged = true;
-		handleProcessCalled();
 	}
 
 	/**
@@ -275,15 +293,8 @@ public class CalibrateStereoPlanarAppV2 extends JPanel {
 		if (inputImages == null)
 			return;
 
-		// TODO disable and re-enable menu bar when done
-		// Prevent the user from trying to open up new images or change anything while this is dynamic
-//		SwingUtilities.invokeLater(() -> setMenuBarEnabled(false));
-		SwingUtilities.invokeLater(() -> {
-			// Disable menu bar to prevent the user from trying to load while this is being processed
-			//			setMenuBarEnabled(false);
-			// Compute has been invoked and can be disabled
-			configurePanel.bCompute.setEnabled(false);
-		});
+		// Compute has been invoked and can be disabled
+		SwingUtilities.invokeLater(() -> configurePanel.bCompute.setEnabled(false));
 
 		// Update algorithm based on the latest user requests
 		boolean detectTargets = targetChanged;
@@ -294,10 +305,19 @@ public class CalibrateStereoPlanarAppV2 extends JPanel {
 
 		// Perform calibration
 		try {
+			// User specifies if stdout should be verbose or not
+			algorithms.safe(() -> {
+				if (GlobalDemoSettings.SETTINGS.verboseRecursive)
+					algorithms.calibrator.setVerbose(System.out, BoofMiscOps.hashSet(BoofVerbose.RECURSIVE));
+				else
+					algorithms.calibrator.setVerbose(null, null);
+			});
+
 			StereoParameters param = algorithms.select(() -> algorithms.calibrator.process());
 			// Visualize the results
 			setRectification(param);
 			algorithms.calibrationSuccess = true;
+			algorithms.parameters = param;
 
 			// Show the user the found calibration parameters. Format a bit to make it look nicer
 			String text = param.toStringQuaternion().replace(',', '\n').replace("{", "\n ");
@@ -321,6 +341,16 @@ public class CalibrateStereoPlanarAppV2 extends JPanel {
 	}
 
 	/**
+	 * The user has changed how reftification should fill the stereo pair
+	 */
+	private void handleRectificationChange() {
+		if (!algorithms.calibrationSuccess)
+			return;
+		setRectification(algorithms.parameters);
+		SwingUtilities.invokeLater(() -> stereoPanel.recomputeRectification());
+	}
+
+	/**
 	 * Computes stereo rectification and then passes the distortion along to the gui.
 	 */
 	private void setRectification( final StereoParameters param ) {
@@ -333,6 +363,9 @@ public class CalibrateStereoPlanarAppV2 extends JPanel {
 
 		final DMatrixRMaj rect1 = rectify.getUndistToRectPixels1();
 		final DMatrixRMaj rect2 = rectify.getUndistToRectPixels2();
+		final DMatrixRMaj rectK = rectify.getCalibrationMatrix();
+
+		RectifyImageOps.adjustView(configurePanel.rectType, param.getLeft(), rect1, rect2, rectK, null);
 
 		SwingUtilities.invokeLater(() -> stereoPanel.setRectification(param.getLeft(), rect1, param.getRight(), rect2));
 	}
@@ -431,12 +464,15 @@ public class CalibrateStereoPlanarAppV2 extends JPanel {
 			String text = String.format("Reprojection Errors (px):\n\nmean=%.3f max=%.3f\n\n", averageError, maxError);
 			text += String.format("%-10s | %8s\n", "image", "max (px)");
 			for (int i = 0; i < imageListPanel.imageNames.size(); i++) {
-				int resultsIndex = resultsLeft.inputToUsed.get(i);
+				int resultsIndex = resultsLeft.inputToUsed.get(i)*2;
 				if (resultsIndex < 0)
 					continue;
 				String image = imageListPanel.imageNames.get(i);
 				ImageResults r = results.get(resultsIndex);
 				text += String.format("%-12s %8.3f\n", image, r.maxError);
+				// print right image now
+				r = results.get(resultsIndex+1);
+				text += String.format("%-12s %8.3f\n", "", r.maxError);
 			}
 
 			String _text = text;
@@ -537,6 +573,7 @@ public class CalibrateStereoPlanarAppV2 extends JPanel {
 	public class ConfigureInfoPanel extends StandardAlgConfigPanel {
 		protected JSpinnerNumber zoom = spinnerWrap(1.0, MIN_ZOOM, MAX_ZOOM, 1.0);
 		protected JLabel imageSizeLabel = new JLabel();
+		protected RectifyFillType rectType = RectifyFillType.FULL_VIEW_LEFT;
 
 		JButton bCompute = button("Compute", false);
 
@@ -548,6 +585,7 @@ public class CalibrateStereoPlanarAppV2 extends JPanel {
 		JCheckBoxValue checkNumbers = checkboxWrap("Numbers", false).tt("Draw feature numbers");
 		JCheckBoxValue checkOrder = checkboxWrap("Order", true).tt("Visualize landmark order");
 		JSpinnerNumber selectErrorScale = spinnerWrap(10.0, 0.1, 1000.0, 2.0);
+		JComboBox<String> comboRect = combo(rectType.ordinal(), RectifyFillType.values());
 
 		@Getter ControlPanelPinhole pinhole = new ControlPanelPinhole(() -> settingsChanged(false, true));
 		@Getter CalibrationTargetPanel targetPanel = new CalibrationTargetPanel(( a, b ) -> handleUpdatedTarget());
@@ -577,6 +615,7 @@ public class CalibrateStereoPlanarAppV2 extends JPanel {
 
 			addLabeled(imageSizeLabel, "Image Size", "Size of image being viewed");
 			addLabeled(zoom.spinner, "Zoom", "Zoom of image being viewed");
+			addLabeled(comboRect, "Rectify");
 			addAlignCenter(bCompute, "Press to compute calibration with current settings.");
 			add(createVisualFlagPanel());
 			addLabeled(selectErrorScale.spinner, "Error Scale", "Increases the error visualization");
@@ -635,6 +674,9 @@ public class CalibrateStereoPlanarAppV2 extends JPanel {
 				}
 			} else if (source == zoom.spinner) {
 				stereoPanel.setScale(zoom.vdouble());
+			} else if (source == comboRect) {
+				rectType = RectifyFillType.values()[comboRect.getSelectedIndex()];
+				handleRectificationChange();
 			} else {
 				updateVisualizationSettings();
 			}
@@ -645,6 +687,7 @@ public class CalibrateStereoPlanarAppV2 extends JPanel {
 		protected DetectSingleFiducialCalibration detector;
 		protected CalibrateStereoPlanar calibrator;
 		protected boolean calibrationSuccess;
+		protected StereoParameters parameters;
 	}
 
 	private static class ResultsLocked extends VariableLockSet {
@@ -690,6 +733,7 @@ public class CalibrateStereoPlanarAppV2 extends JPanel {
 			app.window.setJMenuBar(app.menuBar);
 
 			app.checkDefaultTarget(new File(directory));
+			app.setMenuBarEnabled(false);
 			new Thread(() -> app.process(leftImages, rightImages)).start();
 		});
 	}

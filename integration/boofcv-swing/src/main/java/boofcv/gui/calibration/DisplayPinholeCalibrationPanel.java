@@ -114,6 +114,14 @@ public class DisplayPinholeCalibrationPanel extends DisplayCalibrationPanel {
 		}
 	}
 
+	/**
+	 * Recomputes the rectified image from the current distorted image and tells the panel to repaint
+	 */
+	public void recomputeRectification() {
+		undoRadialDistortion(distorted);
+		repaint();
+	}
+
 	private void undoRadialDistortion( BufferedImage image ) {
 		if (undoRadial == null || image == null)
 			return;

@@ -49,6 +49,11 @@ public class StereoCalibrationPanel extends JPanel {
 		panelRight.setCalibration(rightParam, rightRect);
 	}
 
+	public void recomputeRectification() {
+		panelLeft.recomputeRectification();
+		panelRight.recomputeRectification();
+	}
+
 	public void setShowPoints( boolean state ) {
 		panelLeft.showPoints = state;
 		panelRight.showPoints = state;
