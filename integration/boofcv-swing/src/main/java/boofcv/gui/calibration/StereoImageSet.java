@@ -16,7 +16,7 @@
  * limitations under the License.
  */
 
-package boofcv.demonstrations.calibration;
+package boofcv.gui.calibration;
 
 import java.awt.image.BufferedImage;
 

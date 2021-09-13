@@ -22,10 +22,12 @@ import georegression.geometry.ConvertRotation3D_F64;
 import georegression.struct.EulerType;
 import georegression.struct.point.Vector3D_F64;
 import georegression.struct.se.Se3_F64;
+import georegression.struct.so.Quaternion_F64;
 import lombok.AccessLevel;
 import lombok.Data;
 import lombok.Getter;
 import lombok.Setter;
+import org.ejml.FancyPrint;
 
 import java.io.Serializable;
 
@@ -67,7 +69,6 @@ public class StereoParameters implements Serializable {
 		this.left = new CameraPinholeBrown(left);
 		this.right_to_left = right_to_left.copy();
 		this.right = new CameraPinholeBrown(right);
-
 	}
 
 	public StereoParameters() {}
@@ -122,6 +123,25 @@ public class StereoParameters implements Serializable {
 			this.right_to_left = src.right_to_left.copy();
 		else
 			this.right_to_left.setTo(src.right_to_left);
+	}
+
+	@Override public String toString() {
+		return "StereoParameters{" +
+				"left=" + left +
+				", right=" + right +
+				", right_to_left=" + right_to_left +
+				'}';
+	}
+
+	public String toStringQuaternion() {
+		FancyPrint fp = new FancyPrint();
+		Quaternion_F64 quat = ConvertRotation3D_F64.matrixToQuaternion(right_to_left.R, null);
+		return "StereoParameters{" +
+				"left=" + left +
+				", right=" + right +
+				", right_to_left={ p={" + fp.p(right_to_left.T.x) + " " + fp.p(right_to_left.T.y) +
+				" " + fp.p(right_to_left.T.z) + "}, q={ " +
+				fp.p(quat.x) + " " + fp.p(quat.y) + " " + fp.p(quat.z) + " " + fp.p(quat.w) + "} }";
 	}
 
 	public void print() {

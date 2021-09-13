@@ -169,7 +169,7 @@ public class VisualizeStereoVisualOdometryApp<T extends ImageGray<T>>
 
 	@Override
 	protected void openFileMenuBar() {
-		OpenStereoSequencesChooser.Selected s = BoofSwingUtil.openStereoChooser(window, true);
+		OpenStereoSequencesChooser.Selected s = BoofSwingUtil.openStereoChooser(window, null, true, false);
 		if (s == null)
 			return;
 

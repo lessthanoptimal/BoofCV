@@ -80,7 +80,7 @@ public class StereoCalibrationPanel extends JPanel {
 	}
 
 	public void setShowResiduals( boolean state ) {
-		panelLeft.showNumbers = state;
+		panelLeft.showResiduals = state;
 		panelRight.showResiduals = state;
 	}
 
