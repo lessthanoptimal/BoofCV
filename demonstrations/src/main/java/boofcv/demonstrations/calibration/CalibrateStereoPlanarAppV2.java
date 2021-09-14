@@ -200,20 +200,23 @@ public class CalibrateStereoPlanarAppV2 extends JPanel {
 		BoofMiscOps.checkTrue(!destination.isFile(), "Can't select a file as output");
 
 		try {
-			saveLandmarks(results.left, destination);
-			saveLandmarks(results.right, destination);
+			saveLandmarks(results.left, true, destination);
+			saveLandmarks(results.right, false, destination);
 		} catch (RuntimeException e) {
 			e.printStackTrace();
 			BoofSwingUtil.warningDialog(this, e);
 		}
 	}
 
-	protected void saveLandmarks( ViewResults view, File destination ) {
+	protected void saveLandmarks( ViewResults view, boolean left, File destination ) {
 		results.safe(() -> {
 			String detectorName = algorithms.select(() -> algorithms.detector.getClass().getSimpleName());
-			for (int imageIdx = 0; imageIdx < results.used.size(); imageIdx++) {
-				String imageName = results.used.get(imageIdx);
-				String outputName = FilenameUtils.getBaseName(imageName) + ".csv";
+			for (int imageIdx = 0; imageIdx < results.names.size(); imageIdx++) {
+				String imageName = results.names.get(imageIdx);
+				if (!results.used.contains(imageName))
+					continue;
+				String fileName = left ? imageName : results.namesRight.get(imageIdx);
+				String outputName = FilenameUtils.getBaseName(fileName) + ".csv";
 				CalibrationIO.saveLandmarksCsv(imageName, detectorName, view.observations.get(imageName),
 						new File(destination, outputName));
 			}
@@ -394,8 +397,7 @@ public class CalibrateStereoPlanarAppV2 extends JPanel {
 		results.lock();
 		try {
 			algorithms.calibrator.reset();
-			for (int i = 0; i < results.used.size(); i++) {
-				String imageName = results.used.get(i);
+			for (String imageName : results.used) {
 				CalibrationObservation left = results.left.observations.get(imageName);
 				CalibrationObservation right = results.right.observations.get(imageName);
 				if (left == null || right == null)
@@ -456,7 +458,7 @@ public class CalibrateStereoPlanarAppV2 extends JPanel {
 		for (int imageIdx = 0; imageIdx < numStereoPairs; imageIdx++) {
 			CalibrationObservation calibLeft, calibRight;
 			BufferedImage buffLeft, buffRight;
-			String imageName;
+			String imageName, imageRight;
 
 			// Load the image
 			synchronized (lockInput) {
@@ -464,6 +466,7 @@ public class CalibrateStereoPlanarAppV2 extends JPanel {
 				buffLeft = inputImages.loadLeft();
 				buffRight = inputImages.loadRight();
 				imageName = inputImages.getLeftName();
+				imageRight = inputImages.getRightName();
 				// we use the left image to identify the stereo pair
 			}
 			// Detect calibration landmarks
@@ -472,6 +475,8 @@ public class CalibrateStereoPlanarAppV2 extends JPanel {
 				algorithms.detector.process(image);
 				return algorithms.detector.getDetectedPoints();
 			});
+			// Order matters for visualization later on
+			Collections.sort(calibLeft.points, Comparator.comparingInt(a -> a.index));
 			// see if at least one view was able to use this target
 			boolean used = results.select(() -> results.left.add(imageName, calibLeft));
 
@@ -480,12 +485,16 @@ public class CalibrateStereoPlanarAppV2 extends JPanel {
 				algorithms.detector.process(image);
 				return algorithms.detector.getDetectedPoints();
 			});
+			Collections.sort(calibRight.points, Comparator.comparingInt(a -> a.index));
 			used |= results.select(() -> results.right.add(imageName, calibRight));
 
 			if (used) {
 				results.safe(() -> results.used.add(imageName));
 			}
-			results.safe(() -> results.names.add(imageName));
+			results.safe(() -> {
+				results.names.add(imageName);
+				results.namesRight.add(imageRight);
+			});
 
 			// Update the GUI by showing the latest images
 			boolean _used = used;
@@ -864,8 +873,10 @@ public class CalibrateStereoPlanarAppV2 extends JPanel {
 	}
 
 	private static class ResultsLocked extends VariableLockSet {
-		// Index of images used when calibrating
+		// List of all image names. Left view, but this is these are the names used to identify the pairs
 		protected final List<String> names = new ArrayList<>();
+		// Names of right images
+		protected final List<String> namesRight = new ArrayList<>();
 		// List of images in use
 		protected final List<String> used = new ArrayList<>();
 
