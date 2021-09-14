@@ -9,6 +9,8 @@ Version : 0.39
 - Applications
   * Calibration target generator supports more targets
   * Add option to save landmarks locations on PDF document
+  * New monocular calibration GUI app
+  * TODO add stereo calibration app
 - Image Processing
   * Added function for PSF for linear motion blur
   * GConvolveImage - can now pass in BorderType
@@ -20,9 +22,6 @@ Version : 0.39
   * Added support for full Kannala-Brandt fisheye camera model
   * Added new ECoCheck marker for multi camera calibration
     TODO finalize binary bit pattern
-    TODO integrate into demo
-    TODO regression images and tests
-    TODO integrate into single target calibration app
     TODO Add to current mono camera calibration example
     TODO add to assisted calibration
   * Removed Square Grid Binary target type as it was never reliable enough to flush out entirely and never used
@@ -30,7 +29,6 @@ Version : 0.39
 - Fiducial Markers
   * Added support for ArUco and AprilTags as "HammingMarkers"
   * Added calibration targets Hamming Marker grid and chessboard, e.g. ChaRuCo and ArUco grids.
-TODO New fisheye model
 TODO datta2009
 TODO Monocular VO
 TODO Monocular SLAM
