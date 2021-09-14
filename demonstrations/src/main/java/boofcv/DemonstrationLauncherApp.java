@@ -91,7 +91,7 @@ public class DemonstrationLauncherApp extends ApplicationLauncherApp {
 	protected void createTree( DefaultMutableTreeNode root ) {
 		createNodes(root,"Calibration",
 				CalibrateMonocularPlanarDemo.class,
-				CalibrateStereoPlanarGuiApp.class,
+				CalibrateStereoPlanarDemo.class,
 				DetectCalibrationChessboardBinaryApp.class,
 				DetectCalibrationChessboardXCornerApp.class,
 				DetectCalibrationSquareGridApp.class,

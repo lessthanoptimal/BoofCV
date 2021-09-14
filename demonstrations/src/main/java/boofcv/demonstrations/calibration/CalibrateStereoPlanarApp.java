@@ -72,7 +72,7 @@ import static boofcv.gui.BoofSwingUtil.MIN_ZOOM;
  *
  * @author Peter Abeles
  */
-public class CalibrateStereoPlanarAppV2 extends JPanel {
+public class CalibrateStereoPlanarApp extends JPanel {
 	protected @Nullable StereoImageSet inputImages;
 	protected final Object lockInput = new Object();
 
@@ -104,7 +104,7 @@ public class CalibrateStereoPlanarAppV2 extends JPanel {
 		BoofSwingUtil.initializeSwing();
 	}
 
-	public CalibrateStereoPlanarAppV2() {
+	public CalibrateStereoPlanarApp() {
 		setLayout(new BorderLayout());
 
 		stereoPanel.panelLeft.setScale = ( scale ) -> configurePanel.setZoom(scale);
@@ -992,20 +992,11 @@ public class CalibrateStereoPlanarAppV2 extends JPanel {
 	}
 
 	public static void main( String[] args ) {
-		String directory = UtilIO.pathExample("calibration/stereo/Bumblebee2_Chess");
-
-		List<String> leftImages = UtilIO.listByPrefix(directory, "left", null);
-		List<String> rightImages = UtilIO.listByPrefix(directory, "right", null);
-
 		SwingUtilities.invokeLater(() -> {
-			var app = new CalibrateStereoPlanarAppV2();
+			var app = new CalibrateStereoPlanarApp();
 
 			app.window = ShowImages.showWindow(app, "Planar Stereo Calibration", true);
 			app.window.setJMenuBar(app.menuBar);
-
-			app.checkDefaultTarget(new File(directory));
-			app.setMenuBarEnabled(false);
-			new Thread(() -> app.process(leftImages, rightImages)).start();
 		});
 	}
 }
