@@ -18,6 +18,7 @@
 
 package boofcv.gui;
 
+import boofcv.BoofVerbose;
 import boofcv.abst.geo.bundle.SceneStructureMetric;
 import boofcv.alg.cloud.PointCloudReader;
 import boofcv.core.image.ConvertImage;
@@ -29,6 +30,7 @@ import boofcv.io.image.ConvertImageMisc;
 import boofcv.io.image.UtilImageIO;
 import boofcv.io.points.PointCloudIO;
 import boofcv.misc.BoofLambdas;
+import boofcv.misc.BoofMiscOps;
 import boofcv.struct.Point3dRgbI_F64;
 import boofcv.struct.image.GrayF32;
 import boofcv.struct.image.GrayU16;
@@ -40,6 +42,7 @@ import georegression.struct.se.Se3_F64;
 import georegression.transform.se.SePointOps_F64;
 import org.apache.commons.io.FilenameUtils;
 import org.ddogleg.struct.DogArray;
+import org.ddogleg.struct.VerbosePrint;
 import org.jetbrains.annotations.Nullable;
 import org.yaml.snakeyaml.DumperOptions;
 import org.yaml.snakeyaml.Yaml;
@@ -98,6 +101,13 @@ public class BoofSwingUtil {
 		UIManager.put("TabbedPane.contentBorderInsets", insets);
 
 		GlobalDemoSettings.SETTINGS.changeTheme();
+	}
+
+	public static void setVerboseWithDemoSettings( VerbosePrint v ) {
+		if (GlobalDemoSettings.SETTINGS.verboseRecursive)
+			v.setVerbose(System.out, BoofMiscOps.hashSet(BoofVerbose.RECURSIVE));
+		else
+			v.setVerbose(null, null);
 	}
 
 	public static boolean isRightClick( MouseEvent e ) {

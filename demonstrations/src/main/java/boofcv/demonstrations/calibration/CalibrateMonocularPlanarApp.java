@@ -18,7 +18,6 @@
 
 package boofcv.demonstrations.calibration;
 
-import boofcv.BoofVerbose;
 import boofcv.abst.geo.calibration.CalibrateMonoPlanar;
 import boofcv.abst.geo.calibration.DetectSingleFiducialCalibration;
 import boofcv.abst.geo.calibration.ImageResults;
@@ -39,7 +38,6 @@ import boofcv.gui.controls.JSpinnerNumber;
 import boofcv.gui.image.ImagePanel;
 import boofcv.gui.image.ScaleOptions;
 import boofcv.gui.image.ShowImages;
-import boofcv.gui.settings.GlobalDemoSettings;
 import boofcv.gui.settings.GlobalSettingsControls;
 import boofcv.io.UtilIO;
 import boofcv.io.calibration.CalibrationIO;
@@ -439,12 +437,7 @@ public class CalibrateMonocularPlanarApp extends JPanel {
 		});
 
 		// Let the user configure verbose output to stdout
-		detectorSet.safe(() -> {
-			if (GlobalDemoSettings.SETTINGS.verboseRecursive)
-				detectorSet.calibrator.setVerbose(System.out, BoofMiscOps.hashSet(BoofVerbose.RECURSIVE));
-			else
-				detectorSet.calibrator.setVerbose(null, null);
-		});
+		detectorSet.safe(() -> BoofSwingUtil.setVerboseWithDemoSettings(detectorSet.calibrator));
 
 		// Load and detect calibration targets
 		GrayF32 gray = new GrayF32(1, 1);

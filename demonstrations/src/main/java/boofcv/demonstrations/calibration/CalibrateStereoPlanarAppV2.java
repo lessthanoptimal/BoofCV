@@ -18,7 +18,6 @@
 
 package boofcv.demonstrations.calibration;
 
-import boofcv.BoofVerbose;
 import boofcv.abst.geo.calibration.CalibrateStereoPlanar;
 import boofcv.abst.geo.calibration.DetectSingleFiducialCalibration;
 import boofcv.abst.geo.calibration.ImageResults;
@@ -40,7 +39,6 @@ import boofcv.gui.dialogs.OpenStereoSequencesChooser;
 import boofcv.gui.image.ImagePanel;
 import boofcv.gui.image.ScaleOptions;
 import boofcv.gui.image.ShowImages;
-import boofcv.gui.settings.GlobalDemoSettings;
 import boofcv.gui.settings.GlobalSettingsControls;
 import boofcv.io.UtilIO;
 import boofcv.io.image.ConvertBufferedImage;
@@ -76,7 +74,6 @@ import static boofcv.gui.BoofSwingUtil.MIN_ZOOM;
  */
 public class CalibrateStereoPlanarAppV2 extends JPanel {
 	// TODO save rectified image pairs
-	// TODO draw horizontal line again
 	// TODO remove corners
 	// TODO remove images
 	// TODO Dialog for reading in split image sequence
@@ -294,7 +291,10 @@ public class CalibrateStereoPlanarAppV2 extends JPanel {
 			return;
 
 		// Compute has been invoked and can be disabled
-		SwingUtilities.invokeLater(() -> configurePanel.bCompute.setEnabled(false));
+		SwingUtilities.invokeLater(() -> {
+			configurePanel.bCompute.setEnabled(false);
+			stereoPanel.clearVisuals();
+		});
 
 		// Update algorithm based on the latest user requests
 		boolean detectTargets = targetChanged;
@@ -303,16 +303,12 @@ public class CalibrateStereoPlanarAppV2 extends JPanel {
 		if (detectTargets)
 			detectLandmarksInImages();
 
+		// User specifies if stdout should be verbose or not
+		algorithms.safe(() -> BoofSwingUtil.setVerboseWithDemoSettings(algorithms.calibrator));
+		addObservationsToCalibrator();
+
 		// Perform calibration
 		try {
-			// User specifies if stdout should be verbose or not
-			algorithms.safe(() -> {
-				if (GlobalDemoSettings.SETTINGS.verboseRecursive)
-					algorithms.calibrator.setVerbose(System.out, BoofMiscOps.hashSet(BoofVerbose.RECURSIVE));
-				else
-					algorithms.calibrator.setVerbose(null, null);
-			});
-
 			StereoParameters param = algorithms.select(() -> algorithms.calibrator.process());
 			// Visualize the results
 			setRectification(param);
@@ -338,6 +334,28 @@ public class CalibrateStereoPlanarAppV2 extends JPanel {
 		}
 		// Tell it to select the last image since that's what's being previewed already
 		SwingUtilities.invokeLater(() -> changeSelectedGUI(inputImages.size() - 1));
+	}
+
+	/**
+	 * Resets then adds all used observations to the calibrator
+	 */
+	private void addObservationsToCalibrator() {
+		algorithms.lock();
+		resultsLeft.lock();
+		resultsRight.lock();
+		try {
+			algorithms.calibrator.reset();
+			for (int i = 0; i < resultsLeft.usedImages.size(); i++) {
+				int imageIndex = resultsLeft.usedImages.get(i);
+				CalibrationObservation left = resultsLeft.observations.get(imageIndex);
+				CalibrationObservation right = resultsRight.observations.get(imageIndex);
+				algorithms.calibrator.addPair(left, right);
+			}
+		} finally {
+			algorithms.unlock();
+			resultsLeft.unlock();
+			resultsRight.unlock();
+		}
 	}
 
 	/**
@@ -417,7 +435,6 @@ public class CalibrateStereoPlanarAppV2 extends JPanel {
 
 			// Pass in the results to the calibrator for future use
 			if (used) {
-				algorithms.safe(() -> algorithms.calibrator.addPair(calibLeft, calibRight));
 				numUsed++;
 			}
 
@@ -434,6 +451,7 @@ public class CalibrateStereoPlanarAppV2 extends JPanel {
 				// Show images as they are being loaded
 				stereoPanel.panelLeft.setImage(buffLeft);
 				stereoPanel.panelRight.setImage(buffRight);
+				stereoPanel.repaint();
 
 				imageListPanel.addImage(leftName, _used);
 			});
@@ -471,7 +489,7 @@ public class CalibrateStereoPlanarAppV2 extends JPanel {
 				ImageResults r = results.get(resultsIndex);
 				text += String.format("%-12s %8.3f\n", image, r.maxError);
 				// print right image now
-				r = results.get(resultsIndex+1);
+				r = results.get(resultsIndex + 1);
 				text += String.format("%-12s %8.3f\n", "", r.maxError);
 			}
 
