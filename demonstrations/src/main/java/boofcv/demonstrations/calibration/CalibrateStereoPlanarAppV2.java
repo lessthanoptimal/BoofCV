@@ -28,6 +28,7 @@ import boofcv.alg.geo.calibration.CalibrationObservation;
 import boofcv.alg.geo.rectify.RectifyCalibrated;
 import boofcv.gui.BoofSwingUtil;
 import boofcv.gui.StandardAlgConfigPanel;
+import boofcv.gui.calibration.DisplayPinholeCalibrationPanel;
 import boofcv.gui.calibration.StereoImageSet;
 import boofcv.gui.calibration.StereoImageSetList;
 import boofcv.gui.calibration.UtilCalibrationGui;
@@ -51,7 +52,6 @@ import georegression.struct.se.Se3_F64;
 import lombok.Getter;
 import org.apache.commons.io.FilenameUtils;
 import org.ddogleg.struct.DogArray;
-import org.ddogleg.struct.DogArray_I32;
 import org.ejml.data.DMatrixRMaj;
 import org.jetbrains.annotations.Nullable;
 
@@ -60,9 +60,8 @@ import java.awt.*;
 import java.awt.event.KeyEvent;
 import java.awt.image.BufferedImage;
 import java.io.File;
-import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
+import java.util.*;
 
 import static boofcv.demonstrations.calibration.CalibrateMonocularPlanarApp.saveCalibrationTarget;
 import static boofcv.demonstrations.calibration.CalibrateMonocularPlanarApp.saveIntrinsics;
@@ -75,16 +74,13 @@ import static boofcv.gui.BoofSwingUtil.MIN_ZOOM;
  * @author Peter Abeles
  */
 public class CalibrateStereoPlanarAppV2 extends JPanel {
-	// TODO remove corners
-	// TODO remove images
 	// TODO Dialog for reading in split image sequence
 
 	protected @Nullable StereoImageSet inputImages;
 	protected final Object lockInput = new Object();
 
 	AlgorithmsLocked algorithms = new AlgorithmsLocked();
-	ResultsLocked resultsLeft = new ResultsLocked();
-	ResultsLocked resultsRight = new ResultsLocked();
+	ResultsLocked results = new ResultsLocked();
 
 	//--------------------- GUI owned thread
 	public JMenuBar menuBar;
@@ -204,21 +200,21 @@ public class CalibrateStereoPlanarAppV2 extends JPanel {
 		BoofMiscOps.checkTrue(!destination.isFile(), "Can't select a file as output");
 
 		try {
-			saveLandmarks(resultsLeft, destination);
-			saveLandmarks(resultsRight, destination);
+			saveLandmarks(results.left, destination);
+			saveLandmarks(results.right, destination);
 		} catch (RuntimeException e) {
 			e.printStackTrace();
 			BoofSwingUtil.warningDialog(this, e);
 		}
 	}
 
-	protected void saveLandmarks(ResultsLocked results, File destination) {
+	protected void saveLandmarks( ViewResults view, File destination ) {
 		results.safe(() -> {
 			String detectorName = algorithms.select(() -> algorithms.detector.getClass().getSimpleName());
-			for (int imageIdx = 0; imageIdx < results.imageNames.size(); imageIdx++) {
-				String imageName = results.imageNames.get(imageIdx);
+			for (int imageIdx = 0; imageIdx < results.used.size(); imageIdx++) {
+				String imageName = results.used.get(imageIdx);
 				String outputName = FilenameUtils.getBaseName(imageName) + ".csv";
-				CalibrationIO.saveLandmarksCsv(imageName, detectorName, results.observations.get(imageIdx),
+				CalibrationIO.saveLandmarksCsv(imageName, detectorName, view.observations.get(imageName),
 						new File(destination, outputName));
 			}
 		});
@@ -349,6 +345,9 @@ public class CalibrateStereoPlanarAppV2 extends JPanel {
 		// Perform calibration
 		try {
 			StereoParameters param = algorithms.select(() -> algorithms.calibrator.process());
+
+			saveErrorsInResults();
+
 			// Visualize the results
 			setRectification(param);
 			algorithms.calibrationSuccess = true;
@@ -375,25 +374,37 @@ public class CalibrateStereoPlanarAppV2 extends JPanel {
 		SwingUtilities.invokeLater(() -> changeSelectedGUI(inputImages.size() - 1));
 	}
 
+	private void saveErrorsInResults() {
+		results.lock();
+		algorithms.lock();
+		for (int i = 0; i < results.used.size(); i++) {
+			String imageName = results.used.get(i);
+			results.left.errors.put(imageName, algorithms.calibrator.getCalibLeft().getErrors().get(i));
+			results.right.errors.put(imageName, algorithms.calibrator.getCalibRight().getErrors().get(i));
+		}
+		results.unlock();
+		algorithms.unlock();
+	}
+
 	/**
 	 * Resets then adds all used observations to the calibrator
 	 */
 	private void addObservationsToCalibrator() {
 		algorithms.lock();
-		resultsLeft.lock();
-		resultsRight.lock();
+		results.lock();
 		try {
 			algorithms.calibrator.reset();
-			for (int i = 0; i < resultsLeft.usedImages.size(); i++) {
-				int imageIndex = resultsLeft.usedImages.get(i);
-				CalibrationObservation left = resultsLeft.observations.get(imageIndex);
-				CalibrationObservation right = resultsRight.observations.get(imageIndex);
+			for (int i = 0; i < results.used.size(); i++) {
+				String imageName = results.used.get(i);
+				CalibrationObservation left = results.left.observations.get(imageName);
+				CalibrationObservation right = results.right.observations.get(imageName);
+				if (left == null || right == null)
+					throw new RuntimeException("Egads");
 				algorithms.calibrator.addPair(left, right);
 			}
 		} finally {
 			algorithms.unlock();
-			resultsLeft.unlock();
-			resultsRight.unlock();
+			results.unlock();
 		}
 	}
 
@@ -439,23 +450,21 @@ public class CalibrateStereoPlanarAppV2 extends JPanel {
 		}
 
 		algorithms.calibrationSuccess = false;
-		resultsLeft.reset();
-		resultsRight.reset();
+		results.reset();
 
-		int numUsed = 0;
 		GrayF32 image = new GrayF32(1, 1);
 		for (int imageIdx = 0; imageIdx < numStereoPairs; imageIdx++) {
 			CalibrationObservation calibLeft, calibRight;
 			BufferedImage buffLeft, buffRight;
-			String leftName, rightName;
+			String imageName;
 
 			// Load the image
 			synchronized (lockInput) {
 				inputImages.setSelected(imageIdx);
 				buffLeft = inputImages.loadLeft();
 				buffRight = inputImages.loadRight();
-				leftName = inputImages.getLeftName();
-				rightName = inputImages.getRightName();
+				imageName = inputImages.getLeftName();
+				// we use the left image to identify the stereo pair
 			}
 			// Detect calibration landmarks
 			ConvertBufferedImage.convertFrom(buffLeft, image);
@@ -464,26 +473,19 @@ public class CalibrateStereoPlanarAppV2 extends JPanel {
 				return algorithms.detector.getDetectedPoints();
 			});
 			// see if at least one view was able to use this target
-			boolean used = resultsLeft.add(leftName, imageIdx, calibLeft);
+			boolean used = results.select(() -> results.left.add(imageName, calibLeft));
 
 			ConvertBufferedImage.convertFrom(buffRight, image);
 			calibRight = algorithms.select(() -> {
 				algorithms.detector.process(image);
 				return algorithms.detector.getDetectedPoints();
 			});
-			used |= resultsRight.add(rightName, imageIdx, calibRight);
+			used |= results.select(() -> results.right.add(imageName, calibRight));
 
-			// Pass in the results to the calibrator for future use
 			if (used) {
-				numUsed++;
+				results.safe(() -> results.used.add(imageName));
 			}
-
-			resultsLeft.lock();
-			resultsLeft.inputToUsed.add(used ? numUsed - 1 : -1);
-			resultsLeft.unlock();
-			resultsRight.lock();
-			resultsRight.inputToUsed.add(used ? numUsed - 1 : -1);
-			resultsRight.unlock();
+			results.safe(() -> results.names.add(imageName));
 
 			// Update the GUI by showing the latest images
 			boolean _used = used;
@@ -493,7 +495,7 @@ public class CalibrateStereoPlanarAppV2 extends JPanel {
 				stereoPanel.panelRight.setImage(buffRight);
 				stereoPanel.repaint();
 
-				imageListPanel.addImage(leftName, _used);
+				imageListPanel.addImage(imageName, _used);
 			});
 		}
 	}
@@ -503,33 +505,29 @@ public class CalibrateStereoPlanarAppV2 extends JPanel {
 		BoofSwingUtil.checkGuiThread();
 
 		algorithms.lock();
-		resultsLeft.lock();
-		resultsRight.lock();
+		results.lock();
 
 		try {
 			double averageError = 0.0;
 			double maxError = 0.0;
-			List<ImageResults> results = algorithms.calibrator.computeErrors();
-			if (results.isEmpty())
+			List<ImageResults> errors = algorithms.calibrator.computeErrors();
+			if (errors.isEmpty())
 				return;
 
-			for (int i = 0; i < results.size(); i++) {
-				ImageResults r = results.get(i);
+			for (int i = 0; i < errors.size(); i++) {
+				ImageResults r = errors.get(i);
 				averageError += r.meanError;
 				maxError = Math.max(maxError, r.maxError);
 			}
-			averageError /= results.size();
+			averageError /= errors.size();
 			String text = String.format("Reprojection Errors (px):\n\nmean=%.3f max=%.3f\n\n", averageError, maxError);
 			text += String.format("%-10s | %8s\n", "image", "max (px)");
-			for (int i = 0; i < imageListPanel.imageNames.size(); i++) {
-				int resultsIndex = resultsLeft.inputToUsed.get(i)*2;
-				if (resultsIndex < 0)
-					continue;
-				String image = imageListPanel.imageNames.get(i);
-				ImageResults r = results.get(resultsIndex);
+			for (int i = 0; i < results.used.size(); i++) {
+				String image = results.used.get(i);
+				ImageResults r = errors.get(i*2);
 				text += String.format("%-12s %8.3f\n", image, r.maxError);
 				// print right image now
-				r = results.get(resultsIndex + 1);
+				r = errors.get(i*2 + 1);
 				text += String.format("%-12s %8.3f\n", "", r.maxError);
 			}
 
@@ -537,8 +535,7 @@ public class CalibrateStereoPlanarAppV2 extends JPanel {
 			SwingUtilities.invokeLater(() -> configurePanel.textAreaStats.setText(_text));
 		} finally {
 			algorithms.unlock();
-			resultsLeft.unlock();
-			resultsRight.unlock();
+			results.unlock();
 		}
 	}
 
@@ -590,23 +587,24 @@ public class CalibrateStereoPlanarAppV2 extends JPanel {
 	private void updateResultsVisuals( int inputIndex ) {
 		BoofSwingUtil.checkGuiThread();
 
-		resultsLeft.safe(() -> {
-			List<CalibrationObservation> all = algorithms.select(() ->
-					algorithms.calibrator.getCalibLeft().getObservations());
-			CalibrationObservation o = resultsLeft.observations.get(inputIndex);
-			int errorIndex = resultsLeft.inputToUsed.get(inputIndex);
-			List<ImageResults> errors = algorithms.calibrator.getCalibLeft().getErrors();
-			ImageResults results = errorIndex == -1 || errors == null ? null : errors.get(errorIndex);
-			stereoPanel.panelLeft.setResults(o, results, all);
-		});
-		resultsLeft.safe(() -> {
-			List<CalibrationObservation> all = algorithms.select(() ->
-					algorithms.calibrator.getCalibRight().getObservations());
-			CalibrationObservation o = resultsRight.observations.get(inputIndex);
-			int errorIndex = resultsRight.inputToUsed.get(inputIndex);
-			List<ImageResults> errors = algorithms.calibrator.getCalibRight().getErrors();
-			ImageResults results = errorIndex == -1 || errors == null ? null : errors.get(errorIndex);
-			stereoPanel.panelRight.setResults(o, results, all);
+		results.safe(() -> {
+			String imageName = results.names.get(inputIndex);
+
+			{
+				List<CalibrationObservation> all = algorithms.select(() ->
+						algorithms.calibrator.getCalibLeft().getObservations());
+				CalibrationObservation o = results.left.observations.get(imageName);
+				ImageResults errors = results.left.errors.get(imageName);
+				stereoPanel.panelLeft.setResults(o, errors, all);
+			}
+
+			{
+				List<CalibrationObservation> all = algorithms.select(() ->
+						algorithms.calibrator.getCalibRight().getObservations());
+				CalibrationObservation o = results.right.observations.get(imageName);
+				ImageResults errors = results.right.errors.get(imageName);
+				stereoPanel.panelRight.setResults(o, errors, all);
+			}
 		});
 
 		stereoPanel.repaint();
@@ -617,12 +615,129 @@ public class CalibrateStereoPlanarAppV2 extends JPanel {
 	 */
 	protected CalibrationListPanel createImageListPanel() {
 		var panel = new CalibrationListPanel();
-		// TODO implement these
-//		panel.bRemovePoint.addActionListener(( e ) -> removePoint());
-//		panel.bRemoveImage.addActionListener(( e ) -> removeImage());
-//		panel.bReset.addActionListener(( e ) -> undoAllRemove());
+		panel.bRemovePoint.addActionListener(( e ) -> removePoint());
+		panel.bRemoveImage.addActionListener(( e ) -> removeImage());
+		panel.bReset.addActionListener(( e ) -> undoAllRemove());
 		panel.selectionChanged = this::changeSelectedGUI;
 		return panel;
+	}
+
+	protected void removePoint() {
+		removePoint(stereoPanel.panelLeft);
+		removePoint(stereoPanel.panelRight);
+	}
+
+	protected void removePoint( DisplayPinholeCalibrationPanel panel ) {
+		int whichPoint = panel.getSelectedObservation();
+		if (whichPoint < 0)
+			return;
+
+		CalibrationObservation observation = panel.getObservation();
+		if (observation == null)
+			return;
+
+		resultsInvalid = true;
+
+		results.safe(() -> {
+			if (whichPoint >= observation.points.size())
+				return;
+			observation.points.remove(whichPoint);
+			if (observation.points.size() < 4) {
+				removeImage(true);
+			}
+		});
+
+		SwingUtilities.invokeLater(() -> {
+			// Remove the results since they are no longer valid
+			panel.results = null;
+			panel.deselectPoint();
+			configurePanel.bCompute.setEnabled(true);
+			panel.repaint();
+		});
+	}
+
+	protected void removeImage() {
+		removeImage(false);
+	}
+
+	/**
+	 * Removes the selected image. If soft is specified then it's only removed if there are too few points
+	 * in both images.
+	 */
+	protected void removeImage( boolean soft ) {
+		BoofSwingUtil.invokeNowOrLater(() -> {
+			int selected = imageListPanel.imageList.getSelectedIndex();
+			if (selected < 0)
+				return;
+
+			// If the image isn't "used" don't remove it
+			if (!imageListPanel.imageSuccess.get(selected))
+				return;
+
+			String imageName = results.select(() -> results.names.get(selected));
+
+			if (soft) {
+				// if a soft rule is applied then only remove if there are not enough observations in left and right
+				// images
+				boolean leftTooFew = results.select(() -> results.left.observations.get(imageName).size() < 4);
+				boolean rightTooFew = results.select(() -> results.right.observations.get(imageName).size() < 4);
+				if (!leftTooFew || !rightTooFew)
+					return;
+			}
+			resultsInvalid = true;
+
+			// Mark it as not used in the UI
+			imageListPanel.imageSuccess.set(selected, false);
+
+			results.safe(() -> {
+				results.used.remove(imageName);
+				results.left.observations.get(imageName).points.clear();
+				results.right.observations.get(imageName).points.clear();
+			});
+
+			// Visually show the changes
+			stereoPanel.panelLeft.results = null;
+			stereoPanel.panelRight.results = null;
+			configurePanel.bCompute.setEnabled(true);
+			stereoPanel.repaint();
+		});
+	}
+
+	/**
+	 * Reverts any changes to observations
+	 */
+	protected void undoAllRemove() {
+		resultsInvalid = true;
+
+		// Rebuild list of used images and copy over original observations into the active observations
+		results.safe(() -> {
+			results.used.clear();
+			for (int i = 0; i < results.names.size(); i++) {
+				String imageName = results.names.get(i);
+				CalibrationObservation ol = results.left.observations.get(imageName);
+				CalibrationObservation or = results.right.observations.get(imageName);
+				ol.setTo(results.left.original.get(i));
+				or.setTo(results.right.original.get(i));
+
+				if (ol.size() >= 4 || or.size() >= 4) {
+					results.used.add(imageName);
+				}
+			}
+		});
+
+		// Visually show the changes
+		BoofSwingUtil.invokeNowOrLater(() -> {
+			results.safe(() -> {
+				for (int i = 0; i < results.names.size(); i++) {
+					String imageName = results.names.get(i);
+					imageListPanel.imageSuccess.set(i, results.used.contains(imageName));
+				}
+			});
+
+			configurePanel.bCompute.setEnabled(true);
+			stereoPanel.repaint();
+			imageListPanel.repaint();
+		});
 	}
 
 	/**
@@ -750,34 +865,40 @@ public class CalibrateStereoPlanarAppV2 extends JPanel {
 
 	private static class ResultsLocked extends VariableLockSet {
 		// Index of images used when calibrating
-		protected final DogArray_I32 usedImages = new DogArray_I32();
-		protected final DogArray_I32 inputToUsed = new DogArray_I32();
-		protected final List<String> imageNames = new ArrayList<>();
-		// Active list of observations
-		protected final List<CalibrationObservation> observations = new ArrayList<>();
-		// Copy of original observation before any edits
-		protected final DogArray<CalibrationObservation> original = new DogArray<>(CalibrationObservation::new);
+		protected final List<String> names = new ArrayList<>();
+		// List of images in use
+		protected final List<String> used = new ArrayList<>();
 
-		public boolean add( String path, int imageIndex, CalibrationObservation o ) {
-			boolean used = o.points.size() >= 4;
-			safe(() -> {
-				if (used)
-					usedImages.add(imageIndex);
-				observations.add(o);
-				imageNames.add(path);
-				original.grow().setTo(o);
-			});
-			return used;
-		}
+		protected final ViewResults left = new ViewResults();
+		protected final ViewResults right = new ViewResults();
 
 		public void reset() {
 			safe(() -> {
-				usedImages.reset();
-				observations.clear();
-				original.reset();
-				inputToUsed.reset();
-				imageNames.clear();
+				used.clear();
+				left.reset();
+				right.reset();
+				names.clear();
 			});
+		}
+	}
+
+	private static class ViewResults {
+		protected final Map<String, ImageResults> errors = new HashMap<>();
+		// Active list of observations
+		protected final Map<String, CalibrationObservation> observations = new HashMap<>();
+		// Copy of original observation before any edits
+		protected final DogArray<CalibrationObservation> original = new DogArray<>(CalibrationObservation::new);
+
+		public boolean add( String path, CalibrationObservation o ) {
+			observations.put(path, o);
+			original.grow().setTo(o);
+			return o.size() >= 4;
+		}
+
+		public void reset() {
+			errors.clear();
+			observations.clear();
+			original.reset();
 		}
 	}
 
