@@ -41,6 +41,7 @@ import boofcv.gui.image.ScaleOptions;
 import boofcv.gui.image.ShowImages;
 import boofcv.gui.settings.GlobalSettingsControls;
 import boofcv.io.UtilIO;
+import boofcv.io.calibration.CalibrationIO;
 import boofcv.io.image.ConvertBufferedImage;
 import boofcv.misc.BoofMiscOps;
 import boofcv.misc.VariableLockSet;
@@ -48,6 +49,7 @@ import boofcv.struct.calib.StereoParameters;
 import boofcv.struct.image.GrayF32;
 import georegression.struct.se.Se3_F64;
 import lombok.Getter;
+import org.apache.commons.io.FilenameUtils;
 import org.ddogleg.struct.DogArray;
 import org.ddogleg.struct.DogArray_I32;
 import org.ejml.data.DMatrixRMaj;
@@ -73,7 +75,6 @@ import static boofcv.gui.BoofSwingUtil.MIN_ZOOM;
  * @author Peter Abeles
  */
 public class CalibrateStereoPlanarAppV2 extends JPanel {
-	// TODO save rectified image pairs
 	// TODO remove corners
 	// TODO remove images
 	// TODO Dialog for reading in split image sequence
@@ -150,11 +151,11 @@ public class CalibrateStereoPlanarAppV2 extends JPanel {
 				saveIntrinsics(this, sourceDirectory, algorithms.parameters);
 		}));
 		menuFile.add(menuItemSaveCalibration);
-//
-//		var menuItemSaveLandmarks = new JMenuItem("Save Landmarks");
-//		menuItemSaveLandmarks.addActionListener(( e ) -> saveLandmarks());
-//		menuFile.add(menuItemSaveLandmarks);
-//
+
+		var menuItemSaveLandmarks = new JMenuItem("Save Landmarks");
+		menuItemSaveLandmarks.addActionListener(( e ) -> saveLandmarks());
+		menuFile.add(menuItemSaveLandmarks);
+
 		var menuItemSaveTarget = new JMenuItem("Save Target");
 		menuItemSaveTarget.addActionListener(( e ) -> saveCalibrationTarget
 				(this, sourceDirectory, configurePanel.targetPanel.createConfigCalibrationTarget()));
@@ -182,6 +183,44 @@ public class CalibrateStereoPlanarAppV2 extends JPanel {
 			// disable menu bar while in the UI thread
 			setMenuBarEnabled(false);
 			new Thread(() -> process(left, right), "Recent Item").start();
+		});
+	}
+
+	protected void saveLandmarks() {
+		// Open a dialog which will save using the default name in the place images were recently loaded from
+		var chooser = new JFileChooser();
+		chooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
+		chooser.setSelectedFile(sourceDirectory);
+		int returnVal = chooser.showSaveDialog(this);
+		if (returnVal != JFileChooser.APPROVE_OPTION) {
+			return;
+		}
+
+		// Make sure the directory exists
+		File destination = chooser.getSelectedFile();
+		if (!destination.exists())
+			BoofMiscOps.checkTrue(destination.mkdirs());
+
+		BoofMiscOps.checkTrue(!destination.isFile(), "Can't select a file as output");
+
+		try {
+			saveLandmarks(resultsLeft, destination);
+			saveLandmarks(resultsRight, destination);
+		} catch (RuntimeException e) {
+			e.printStackTrace();
+			BoofSwingUtil.warningDialog(this, e);
+		}
+	}
+
+	protected void saveLandmarks(ResultsLocked results, File destination) {
+		results.safe(() -> {
+			String detectorName = algorithms.select(() -> algorithms.detector.getClass().getSimpleName());
+			for (int imageIdx = 0; imageIdx < results.imageNames.size(); imageIdx++) {
+				String imageName = results.imageNames.get(imageIdx);
+				String outputName = FilenameUtils.getBaseName(imageName) + ".csv";
+				CalibrationIO.saveLandmarksCsv(imageName, detectorName, results.observations.get(imageIdx),
+						new File(destination, outputName));
+			}
 		});
 	}
 
@@ -408,7 +447,7 @@ public class CalibrateStereoPlanarAppV2 extends JPanel {
 		for (int imageIdx = 0; imageIdx < numStereoPairs; imageIdx++) {
 			CalibrationObservation calibLeft, calibRight;
 			BufferedImage buffLeft, buffRight;
-			String leftName;
+			String leftName, rightName;
 
 			// Load the image
 			synchronized (lockInput) {
@@ -416,6 +455,7 @@ public class CalibrateStereoPlanarAppV2 extends JPanel {
 				buffLeft = inputImages.loadLeft();
 				buffRight = inputImages.loadRight();
 				leftName = inputImages.getLeftName();
+				rightName = inputImages.getRightName();
 			}
 			// Detect calibration landmarks
 			ConvertBufferedImage.convertFrom(buffLeft, image);
@@ -424,14 +464,14 @@ public class CalibrateStereoPlanarAppV2 extends JPanel {
 				return algorithms.detector.getDetectedPoints();
 			});
 			// see if at least one view was able to use this target
-			boolean used = resultsLeft.add(imageIdx, calibLeft);
+			boolean used = resultsLeft.add(leftName, imageIdx, calibLeft);
 
 			ConvertBufferedImage.convertFrom(buffRight, image);
 			calibRight = algorithms.select(() -> {
 				algorithms.detector.process(image);
 				return algorithms.detector.getDetectedPoints();
 			});
-			used |= resultsRight.add(imageIdx, calibRight);
+			used |= resultsRight.add(rightName, imageIdx, calibRight);
 
 			// Pass in the results to the calibrator for future use
 			if (used) {
@@ -712,17 +752,19 @@ public class CalibrateStereoPlanarAppV2 extends JPanel {
 		// Index of images used when calibrating
 		protected final DogArray_I32 usedImages = new DogArray_I32();
 		protected final DogArray_I32 inputToUsed = new DogArray_I32();
+		protected final List<String> imageNames = new ArrayList<>();
 		// Active list of observations
 		protected final List<CalibrationObservation> observations = new ArrayList<>();
 		// Copy of original observation before any edits
 		protected final DogArray<CalibrationObservation> original = new DogArray<>(CalibrationObservation::new);
 
-		public boolean add( int imageIndex, CalibrationObservation o ) {
+		public boolean add( String path, int imageIndex, CalibrationObservation o ) {
 			boolean used = o.points.size() >= 4;
 			safe(() -> {
 				if (used)
 					usedImages.add(imageIndex);
 				observations.add(o);
+				imageNames.add(path);
 				original.grow().setTo(o);
 			});
 			return used;
@@ -734,6 +776,7 @@ public class CalibrateStereoPlanarAppV2 extends JPanel {
 				observations.clear();
 				original.reset();
 				inputToUsed.reset();
+				imageNames.clear();
 			});
 		}
 	}
