@@ -52,6 +52,7 @@ import georegression.struct.se.Se3_F64;
 import lombok.Getter;
 import org.apache.commons.io.FilenameUtils;
 import org.ddogleg.struct.DogArray;
+import org.ddogleg.struct.DogArray_B;
 import org.ejml.data.DMatrixRMaj;
 import org.jetbrains.annotations.Nullable;
 
@@ -213,7 +214,7 @@ public class CalibrateStereoPlanarAppV2 extends JPanel {
 			String detectorName = algorithms.select(() -> algorithms.detector.getClass().getSimpleName());
 			for (int imageIdx = 0; imageIdx < results.names.size(); imageIdx++) {
 				String imageName = results.names.get(imageIdx);
-				if (!results.used.contains(imageName))
+				if (!results.used.get(imageIdx))
 					continue;
 				String fileName = left ? imageName : results.namesRight.get(imageIdx);
 				String outputName = FilenameUtils.getBaseName(fileName) + ".csv";
@@ -380,10 +381,13 @@ public class CalibrateStereoPlanarAppV2 extends JPanel {
 	private void saveErrorsInResults() {
 		results.lock();
 		algorithms.lock();
-		for (int i = 0; i < results.used.size(); i++) {
-			String imageName = results.used.get(i);
-			results.left.errors.put(imageName, algorithms.calibrator.getCalibLeft().getErrors().get(i));
-			results.right.errors.put(imageName, algorithms.calibrator.getCalibRight().getErrors().get(i));
+		for (int imageIdx = 0, usedIdx=0; imageIdx < results.names.size(); imageIdx++) {
+			if (!results.used.get(imageIdx))
+				continue;
+			String imageName = results.names.get(imageIdx);
+			results.left.errors.put(imageName, algorithms.calibrator.getCalibLeft().getErrors().get(usedIdx));
+			results.right.errors.put(imageName, algorithms.calibrator.getCalibRight().getErrors().get(usedIdx));
+			usedIdx += 1;
 		}
 		results.unlock();
 		algorithms.unlock();
@@ -397,7 +401,10 @@ public class CalibrateStereoPlanarAppV2 extends JPanel {
 		results.lock();
 		try {
 			algorithms.calibrator.reset();
-			for (String imageName : results.used) {
+			for (int imageIdx = 0; imageIdx < results.names.size(); imageIdx++) {
+				String imageName = results.names.get(imageIdx);
+				if (!results.used.get(imageIdx))
+					continue;
 				CalibrationObservation left = results.left.observations.get(imageName);
 				CalibrationObservation right = results.right.observations.get(imageName);
 				if (left == null || right == null)
@@ -488,16 +495,14 @@ public class CalibrateStereoPlanarAppV2 extends JPanel {
 			Collections.sort(calibRight.points, Comparator.comparingInt(a -> a.index));
 			used |= results.select(() -> results.right.add(imageName, calibRight));
 
-			if (used) {
-				results.safe(() -> results.used.add(imageName));
-			}
+			boolean _used = used;
 			results.safe(() -> {
+				results.used.add(_used);
 				results.names.add(imageName);
 				results.namesRight.add(imageRight);
 			});
 
 			// Update the GUI by showing the latest images
-			boolean _used = used;
 			SwingUtilities.invokeLater(() -> {
 				// Show images as they are being loaded
 				stereoPanel.panelLeft.setImage(buffLeft);
@@ -531,13 +536,16 @@ public class CalibrateStereoPlanarAppV2 extends JPanel {
 			averageError /= errors.size();
 			String text = String.format("Reprojection Errors (px):\n\nmean=%.3f max=%.3f\n\n", averageError, maxError);
 			text += String.format("%-10s | %8s\n", "image", "max (px)");
-			for (int i = 0; i < results.used.size(); i++) {
-				String image = results.used.get(i);
-				ImageResults r = errors.get(i*2);
-				text += String.format("%-12s %8.3f\n", image, r.maxError);
+			for (int imageIdx = 0, i=0; imageIdx < results.names.size(); imageIdx++) {
+				if (!results.used.get(imageIdx))
+					continue;
+				String imageName = results.names.get(imageIdx);
+				ImageResults r = errors.get(i);
+				text += String.format("%-12s %8.3f\n", imageName, r.maxError);
 				// print right image now
-				r = errors.get(i*2 + 1);
+				r = errors.get(i + 1);
 				text += String.format("%-12s %8.3f\n", "", r.maxError);
+				i += 2;
 			}
 
 			String _text = text;
@@ -699,7 +707,7 @@ public class CalibrateStereoPlanarAppV2 extends JPanel {
 			imageListPanel.imageSuccess.set(selected, false);
 
 			results.safe(() -> {
-				results.used.remove(imageName);
+				results.used.set(selected, false);
 				results.left.observations.get(imageName).points.clear();
 				results.right.observations.get(imageName).points.clear();
 			});
@@ -720,7 +728,7 @@ public class CalibrateStereoPlanarAppV2 extends JPanel {
 
 		// Rebuild list of used images and copy over original observations into the active observations
 		results.safe(() -> {
-			results.used.clear();
+			results.used.reset();
 			for (int i = 0; i < results.names.size(); i++) {
 				String imageName = results.names.get(i);
 				CalibrationObservation ol = results.left.observations.get(imageName);
@@ -728,9 +736,7 @@ public class CalibrateStereoPlanarAppV2 extends JPanel {
 				ol.setTo(results.left.original.get(i));
 				or.setTo(results.right.original.get(i));
 
-				if (ol.size() >= 4 || or.size() >= 4) {
-					results.used.add(imageName);
-				}
+				results.used.add(ol.size() >= 4 || or.size() >= 4);
 			}
 		});
 
@@ -739,7 +745,7 @@ public class CalibrateStereoPlanarAppV2 extends JPanel {
 			results.safe(() -> {
 				for (int i = 0; i < results.names.size(); i++) {
 					String imageName = results.names.get(i);
-					imageListPanel.imageSuccess.set(i, results.used.contains(imageName));
+					imageListPanel.imageSuccess.set(i, results.used.get(i));
 				}
 			});
 
@@ -878,14 +884,14 @@ public class CalibrateStereoPlanarAppV2 extends JPanel {
 		// Names of right images
 		protected final List<String> namesRight = new ArrayList<>();
 		// List of images in use
-		protected final List<String> used = new ArrayList<>();
+		protected final DogArray_B used = new DogArray_B();
 
 		protected final ViewResults left = new ViewResults();
 		protected final ViewResults right = new ViewResults();
 
 		public void reset() {
 			safe(() -> {
-				used.clear();
+				used.reset();
 				left.reset();
 				right.reset();
 				names.clear();
