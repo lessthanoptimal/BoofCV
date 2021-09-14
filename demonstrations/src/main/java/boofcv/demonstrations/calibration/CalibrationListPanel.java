@@ -37,12 +37,12 @@ import java.util.List;
  * @author Peter Abeles
  */
 public class CalibrationListPanel extends StandardAlgConfigPanel implements ListSelectionListener {
-	public final JButton bRemovePoint = button("Remove Point", true);
-	public final JButton bRemoveImage = button("Remove Image", true);
-	public final JButton bReset = button("Reset", true);
+	public final JButton bRemovePoint = button("Remove Point", true, e -> {});
+	public final JButton bRemoveImage = button("Remove Image", true, e -> {});
+	public final JButton bReset = button("Reset", true, e -> {});
 
 	/** Called when the selected image has been changed */
-	@Getter @Setter public BoofLambdas.ProcessI selectionChanged = ( index)->{};
+	@Getter @Setter public BoofLambdas.ProcessI selectionChanged = ( index ) -> {};
 
 	JList<String> imageList;
 	List<String> imageNames = new ArrayList<>();
@@ -68,7 +68,7 @@ public class CalibrationListPanel extends StandardAlgConfigPanel implements List
 		var scroll = new JScrollPane(imageList);
 
 		// use a GridLayout so all buttons are the same size
-		var editPanel = new JPanel(new GridLayout(0,1));
+		var editPanel = new JPanel(new GridLayout(0, 1));
 		editPanel.add(bRemovePoint);
 		editPanel.add(bRemoveImage);
 		editPanel.add(bReset);
