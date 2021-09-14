@@ -59,6 +59,9 @@ public class OpenStereoSequencesChooser extends JSpringPanel {
 	ImagePanel previewLeft = new ImagePanel();
 	ImagePanel previewRight = new ImagePanel();
 
+	JPanel leftPathPanel, rightPathPanel;
+	JCheckBox cSplit = new JCheckBox("Split", false);
+
 	JButton bCancel = new JButton("Cancel");
 	JButton bOK = new JButton("OK");
 
@@ -83,25 +86,29 @@ public class OpenStereoSequencesChooser extends JSpringPanel {
 		previewLeft.setPreferredSize(new Dimension(ip, ip));
 		previewRight.setPreferredSize(new Dimension(ip, ip));
 
+		cSplit.addActionListener(( e ) -> handleSplit());
 		configureButtons(dialog, listener);
 
 		JPanel buttonPanel = StandardAlgConfigPanel.createHorizontalPanel(bCancel, Box.createHorizontalGlue(), bOK);
 
-		JPanel leftPanel = createPathPanel("Left", textLeftPath, this::handleLeftPath);
-		JPanel rightPanel = createPathPanel("Right", textRightPath, this::handleRightPath);
+		leftPathPanel = createPathPanel("Left", textLeftPath, this::handleLeftPath);
+		rightPathPanel = createPathPanel("Right", textRightPath, this::handleRightPath);
 
-		constrainWestNorthEast(leftPanel, null, 6, 6);
-		constrainWestNorthEast(rightPanel, leftPanel, 6, 6);
+		constrainWestNorthEast(leftPathPanel, null, 6, 6);
+		constrainWestNorthEast(rightPathPanel, leftPathPanel, 6, 6);
 
 		if (!justImages) {
 			JPanel calibPanel = createPathPanel("Calibration", textCalibrationPath, this::handleCalibrationPath);
-			constrainWestNorthEast(calibPanel, rightPanel, 6, 6);
+			constrainWestNorthEast(calibPanel, rightPathPanel, 6, 6);
 			constrainWestNorthEast(previewPanel, calibPanel, 6, 6);
+		} else {
+			constrainWestNorthEast(previewPanel, rightPathPanel, 6, 6);
 		}
 
+		constrainWestSouthEast(cSplit, buttonPanel, 10, 10);
 		constrainWestSouthEast(buttonPanel, null, 10, 10);
 
-		layout.putConstraint(SpringLayout.SOUTH, previewPanel, -5, SpringLayout.NORTH, buttonPanel);
+		layout.putConstraint(SpringLayout.SOUTH, previewPanel, -5, SpringLayout.NORTH, cSplit);
 
 		setPreferredSize(new Dimension(500, 400));
 	}
@@ -128,9 +135,19 @@ public class OpenStereoSequencesChooser extends JSpringPanel {
 	 */
 	private void handleOK() {
 		File left = new File(textLeftPath.getText());
-		File right = new File(textRightPath.getText());
-		File calibration = new File(textCalibrationPath.getText());
+		File right = cSplit.isSelected() ? null : new File(textRightPath.getText());
+		File calibration = justImages ? null : new File(textCalibrationPath.getText());
 		listener.selectedInputs(left, right, calibration);
+	}
+
+	private void handleSplit() {
+		// Clear text in the right path if it now just needs a single input
+		if (cSplit.isSelected()) {
+			textRightPath.setText("");
+		}
+		// Toggle if the right path is enabled
+		BoofSwingUtil.recursiveEnable(rightPathPanel, !cSplit.isSelected());
+		checkEverythingSet();
 	}
 
 	/**
@@ -172,7 +189,9 @@ public class OpenStereoSequencesChooser extends JSpringPanel {
 	 * Checks to see if the user has selected all three inputs
 	 */
 	private void checkEverythingSet() {
-		boolean allGood = !textLeftPath.getText().isEmpty() && !textRightPath.getText().isEmpty();
+		boolean allGood = !textLeftPath.getText().isEmpty();
+		if (!cSplit.isSelected())
+			allGood &= !textRightPath.getText().isEmpty();
 		if (!justImages) {
 			allGood &= !textCalibrationPath.getText().isEmpty();
 		}
@@ -209,6 +228,7 @@ public class OpenStereoSequencesChooser extends JSpringPanel {
 			preview = UtilImageIO.loadImage(path.getAbsolutePath());
 		}
 		previewPanel.setImageRepaint(preview);
+		System.out.println("panel.size=" + previewPanel.getSize());
 	}
 
 	/**
@@ -280,8 +300,12 @@ public class OpenStereoSequencesChooser extends JSpringPanel {
 	 */
 	public static class Selected {
 		public File left;
-		public File right;
-		public File calibration;
+		public @Nullable File right;
+		public @Nullable File calibration;
+
+		public boolean isSplit() {
+			return right == null;
+		}
 	}
 
 	public static class DefaultListener implements Listener {

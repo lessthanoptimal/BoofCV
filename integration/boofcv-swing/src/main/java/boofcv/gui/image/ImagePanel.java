@@ -19,6 +19,7 @@
 package boofcv.gui.image;
 
 import boofcv.gui.BoofSwingUtil;
+import org.jetbrains.annotations.Nullable;
 
 import javax.swing.*;
 import java.awt.*;
@@ -171,7 +172,7 @@ public class ImagePanel extends JPanel {
 	/**
 	 * Changes the buffered image and calls repaint. Does not need to be called in the UI thread.
 	 */
-	public ImagePanel setImageRepaint( BufferedImage image ) {
+	public ImagePanel setImageRepaint( @Nullable BufferedImage image ) {
 		// if image is larger before  than the new image then you need to make sure you repaint
 		// the entire image otherwise a ghost will be left
 		ScaleOffset workspace;

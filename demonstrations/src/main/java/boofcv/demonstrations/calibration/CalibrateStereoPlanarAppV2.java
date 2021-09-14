@@ -28,10 +28,7 @@ import boofcv.alg.geo.calibration.CalibrationObservation;
 import boofcv.alg.geo.rectify.RectifyCalibrated;
 import boofcv.gui.BoofSwingUtil;
 import boofcv.gui.StandardAlgConfigPanel;
-import boofcv.gui.calibration.DisplayPinholeCalibrationPanel;
-import boofcv.gui.calibration.StereoImageSet;
-import boofcv.gui.calibration.StereoImageSetList;
-import boofcv.gui.calibration.UtilCalibrationGui;
+import boofcv.gui.calibration.*;
 import boofcv.gui.controls.CalibrationTargetPanel;
 import boofcv.gui.controls.ControlPanelPinhole;
 import boofcv.gui.controls.JCheckBoxValue;
@@ -44,6 +41,7 @@ import boofcv.gui.settings.GlobalSettingsControls;
 import boofcv.io.UtilIO;
 import boofcv.io.calibration.CalibrationIO;
 import boofcv.io.image.ConvertBufferedImage;
+import boofcv.io.image.UtilImageIO;
 import boofcv.misc.BoofMiscOps;
 import boofcv.misc.VariableLockSet;
 import boofcv.struct.calib.StereoParameters;
@@ -75,8 +73,6 @@ import static boofcv.gui.BoofSwingUtil.MIN_ZOOM;
  * @author Peter Abeles
  */
 public class CalibrateStereoPlanarAppV2 extends JPanel {
-	// TODO Dialog for reading in split image sequence
-
 	protected @Nullable StereoImageSet inputImages;
 	protected final Object lockInput = new Object();
 
@@ -172,14 +168,34 @@ public class CalibrateStereoPlanarAppV2 extends JPanel {
 
 	protected void updateRecentItems() {
 		BoofSwingUtil.updateRecentItems(this, menuRecent, ( info ) -> {
-			List<String> left = UtilIO.listSmartImages(info.files.get(0), false);
-			List<String> right = UtilIO.listSmartImages(info.files.get(1), false);
+			if (info.files.size() == 1) {
+				List<String> images = UtilIO.listSmartImages(info.files.get(0), false);
+				if (images.isEmpty()) {
+					return;
+				}
 
-			checkDefaultTarget(new File(info.files.get(0)));
+				checkDefaultTarget(new File(info.files.get(0)));
+				Integer splitX = determineSplit(images);
+				if (splitX == null) return;
 
-			// disable menu bar while in the UI thread
-			setMenuBarEnabled(false);
-			new Thread(() -> process(left, right), "Recent Item").start();
+				// disable menu bar while in the UI thread
+				setMenuBarEnabled(false);
+				new Thread(() -> process(images, splitX), "Recent Item").start();
+			} else {
+				List<String> left = UtilIO.listSmartImages(info.files.get(0), false);
+				List<String> right = UtilIO.listSmartImages(info.files.get(1), false);
+
+				if (left.isEmpty() || left.size() != right.size()) {
+					System.err.println("Bad image sets. left=" + left.size() + " right=" + right.size());
+					return;
+				}
+
+				checkDefaultTarget(new File(info.files.get(0)));
+
+				// disable menu bar while in the UI thread
+				setMenuBarEnabled(false);
+				new Thread(() -> process(left, right), "Recent Item").start();
+			}
 		});
 	}
 
@@ -235,22 +251,53 @@ public class CalibrateStereoPlanarAppV2 extends JPanel {
 		if (selected == null)
 			return;
 
-		// Remember where it opened these files and add it to the recent file list
-		BoofSwingUtil.addToRecentFiles(this, selected.left.getParent(),
-				BoofMiscOps.asList(selected.left.getPath(), selected.right.getPath()));
-
 		// Load the files and process
-		List<String> left = UtilIO.listSmartImages(selected.left.getPath(), false);
-		List<String> right = UtilIO.listSmartImages(selected.right.getPath(), false);
+		if (selected.isSplit()) {
+			// Remember where it opened these files and add it to the recent file list
+			BoofSwingUtil.addToRecentFiles(this, selected.left.getParent(),
+					BoofMiscOps.asList(selected.left.getPath()));
 
-		if (left.isEmpty() || right.isEmpty())
-			return;
+			List<String> images = UtilIO.listSmartImages(selected.left.getPath(), false);
 
-		checkDefaultTarget(new File(left.get(0)).getParentFile());
+			if (images.isEmpty())
+				return;
 
-		// disable menu bar while in the UI thread
-		setMenuBarEnabled(false);
-		new Thread(() -> process(left, right), "Open Dialog").start();
+			// Load the first image and assume it's split halfway through
+			Integer splitX = determineSplit(images);
+			if (splitX == null) return;
+
+			checkDefaultTarget(new File(images.get(0)).getParentFile());
+
+			// disable menu bar while in the UI thread
+			setMenuBarEnabled(false);
+			new Thread(() -> process(images, splitX), "Open Dialog").start();
+		} else {
+			// Remember where it opened these files and add it to the recent file list
+			BoofSwingUtil.addToRecentFiles(this, selected.left.getParent(),
+					BoofMiscOps.asList(selected.left.getPath(), Objects.requireNonNull(selected.right).getPath()));
+
+			List<String> left = UtilIO.listSmartImages(selected.left.getPath(), false);
+			List<String> right = UtilIO.listSmartImages(selected.right.getPath(), false);
+
+			if (left.isEmpty() || right.isEmpty())
+				return;
+
+			checkDefaultTarget(new File(left.get(0)).getParentFile());
+
+			// disable menu bar while in the UI thread
+			setMenuBarEnabled(false);
+			new Thread(() -> process(left, right), "Open Dialog").start();
+		}
+	}
+
+	@Nullable private Integer determineSplit( List<String> images ) {
+		BufferedImage tmp = UtilImageIO.loadImage(images.get(0));
+		if (tmp == null) {
+			System.err.println("Failed to load " + images.get(0));
+			return null;
+		}
+		int splitX = tmp.getWidth()/2;
+		return splitX;
 	}
 
 	/**
@@ -318,10 +365,24 @@ public class CalibrateStereoPlanarAppV2 extends JPanel {
 	 * Process a single set of images that will be automatically split
 	 *
 	 * @param listFused List of input images
-	 * @param horizontal true then left and right images are side by side and split in the middle
+	 * @param splitX Coordinate where the stereo image is slit in half
 	 */
-	public void process( List<String> listFused, boolean horizontal ) {
+	public void process( List<String> listFused, int splitX ) {
+		try {
+			if (listFused.isEmpty())
+				return;
 
+			Collections.sort(listFused);
+
+			synchronized (lockInput) {
+				inputImages = new StereoImageSetListSplit(listFused, splitX);
+			}
+
+			targetChanged = true;
+			handleProcessCalled();
+		} finally {
+			SwingUtilities.invokeLater(() -> setMenuBarEnabled(true));
+		}
 	}
 
 	protected void handleProcessCalled() {
@@ -381,7 +442,7 @@ public class CalibrateStereoPlanarAppV2 extends JPanel {
 	private void saveErrorsInResults() {
 		results.lock();
 		algorithms.lock();
-		for (int imageIdx = 0, usedIdx=0; imageIdx < results.names.size(); imageIdx++) {
+		for (int imageIdx = 0, usedIdx = 0; imageIdx < results.names.size(); imageIdx++) {
 			if (!results.used.get(imageIdx))
 				continue;
 			String imageName = results.names.get(imageIdx);
@@ -536,7 +597,7 @@ public class CalibrateStereoPlanarAppV2 extends JPanel {
 			averageError /= errors.size();
 			String text = String.format("Reprojection Errors (px):\n\nmean=%.3f max=%.3f\n\n", averageError, maxError);
 			text += String.format("%-10s | %8s\n", "image", "max (px)");
-			for (int imageIdx = 0, i=0; imageIdx < results.names.size(); imageIdx++) {
+			for (int imageIdx = 0, i = 0; imageIdx < results.names.size(); imageIdx++) {
 				if (!results.used.get(imageIdx))
 					continue;
 				String imageName = results.names.get(imageIdx);
@@ -744,7 +805,6 @@ public class CalibrateStereoPlanarAppV2 extends JPanel {
 		BoofSwingUtil.invokeNowOrLater(() -> {
 			results.safe(() -> {
 				for (int i = 0; i < results.names.size(); i++) {
-					String imageName = results.names.get(i);
 					imageListPanel.imageSuccess.set(i, results.used.get(i));
 				}
 			});
@@ -753,6 +813,18 @@ public class CalibrateStereoPlanarAppV2 extends JPanel {
 			stereoPanel.repaint();
 			imageListPanel.repaint();
 		});
+	}
+
+	private void handleComputeButtonPressed() {
+		BoofSwingUtil.checkGuiThread();
+		setMenuBarEnabled(false);
+		new Thread(() -> {
+			try {
+				handleProcessCalled();
+			} finally {
+				SwingUtilities.invokeLater(() -> setMenuBarEnabled(true));
+			}
+		}, "bCompute").start();
 	}
 
 	/**
@@ -858,7 +930,7 @@ public class CalibrateStereoPlanarAppV2 extends JPanel {
 		@Override public void controlChanged( final Object source ) {
 			if (source == bCompute) {
 				if (!runningCalibration) {
-					new Thread(() -> handleProcessCalled(), "bCompute").start();
+					handleComputeButtonPressed();
 				}
 			} else if (source == zoom.spinner) {
 				stereoPanel.setScale(zoom.vdouble());
