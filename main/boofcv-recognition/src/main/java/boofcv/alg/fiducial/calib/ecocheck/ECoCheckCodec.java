@@ -40,21 +40,18 @@ import org.ddogleg.struct.DogArray_I8;
  * TODO describe Reed-Solomon codes an how they are used.
  *
  * <p>
- * The encoded message will have the format described below. Reserved bits are included so that in the future the
- * format could be extended without breaking backwards compatibility and because the extra data helps with error
- * correction when the message size is small.
- *
  * Number of bits used to encode the two ID numbers is dynamically determined based on their maximum value. The minimum
  * number of bits is computed using this formula: bit count = ceil(log(max_number)/log(2))
  * </p>
  *
  * Packet Format:
  * <ul>
- *     <li>2-bits: Reserved for future use (must be 0b11)</li>
  *     <li>N-bits: Marker ID</li>
  *     <li>M-bits: Cell ID</li>
- *     <li>4-bits: XOR Checksum</li>
+ *     <li>K-bits: XOR Checksum</li>
  * </ul>
+ *
+ * TODO merge marker ID and cell ID into a single number
  *
  * [1] An earlier design was considered that did encode this information in the marker. It typically increased the bit
  * grid size by 1 but didn't remove the need to have prior information about the target to decode the target.
@@ -76,6 +73,9 @@ public class ECoCheckCodec {
 	@Getter @Setter int errorCorrectionLevel = 3;
 	// this is an integer and not a float to make configuring easier and more precise to the user
 
+	/** Number of checksum bits. Max 8 */
+	@Getter @Setter int checksumBitCount = 6;
+
 	// Used to mask out bits not in the word
 	int wordMask;
 
@@ -91,6 +91,13 @@ public class ECoCheckCodec {
 	 * Length of the square grid the bits are encoded in
 	 */
 	@Getter int gridBitLength;
+
+	// Precomputed mask for checksum
+	protected int checksumMask;
+
+	// number of bits needed to make data aligned with word side
+	protected int paddingCount;
+	protected int paddingBits;
 
 	// Stores the encoded message
 	protected final DogArray_I8 message = new DogArray_I8();
@@ -111,11 +118,13 @@ public class ECoCheckCodec {
 	 * @param numUniqueCells Maximum number of unique cell IDs in a marker required
 	 */
 	public void configure( int numUniqueMarkers, int numUniqueCells ) {
+		BoofMiscOps.checkTrue(checksumBitCount >= 0 && checksumBitCount <= 8);
+
 		markerBitCount = numUniqueMarkers == 1 ? 0 : (int)Math.ceil(Math.log(numUniqueMarkers)/Math.log(2));
 		cellBitCount = (int)Math.ceil(Math.log(numUniqueCells)/Math.log(2));
 
-		// header + IDs + checksum
-		messageBitCount = 2 + markerBitCount + cellBitCount + 4;
+		// maker ID + cell ID + checksum
+		messageBitCount = markerBitCount + cellBitCount + checksumBitCount;
 
 		// Compute number of words needed to save this message
 		int dataWords = (int)Math.ceil(messageBitCount/(double)WORD_BITS);
@@ -142,12 +151,14 @@ public class ECoCheckCodec {
 		message.resize(dataWords);
 		rscodes.generator(eccWords);
 
+		// Compute number of bits to align data with word size
+		paddingCount = messageBitCount%WORD_BITS == 0 ? 0 : WORD_BITS-(messageBitCount%WORD_BITS);
+
 		// only save bits that are in the word
-		wordMask = 0;
-		for (int i = 0; i < WORD_BITS; i++) {
-			wordMask |= 1 << i;
-		}
-//		System.out.println("squareLength=" + squareLength + " dataWords=" + dataWords + " eccWords=" + eccWords);
+		wordMask = BoofMiscOps.generateBitMask(WORD_BITS);
+		checksumMask = BoofMiscOps.generateBitMask(checksumBitCount);
+		// All padding bits are 1
+		paddingBits = BoofMiscOps.generateBitMask(paddingCount);
 	}
 
 	/**
@@ -161,26 +172,19 @@ public class ECoCheckCodec {
 		// Build the packet
 		bits.resize(0);
 
-		// Create the header
-		bits.append(3, 2, false);
-
 		// Specify the ID numbers
 		bits.append(markerID, markerBitCount, false);
 		bits.append(cellID, cellBitCount, false);
 
 		// Compute a checksum. ECC doesn't catch everything in targets this small
 		int checkSum = computeCheckSum();
-		bits.append(checkSum, 4, false);
+		bits.append(checkSum, checksumBitCount, true);
 
 		// Sanity check
 		BoofMiscOps.checkEq(bits.size, messageBitCount);
 
-		// Fill extra bits with a known pattern
-		int fillBitIdx0 = (1 + (bits.size/WORD_BITS))*WORD_BITS;
-		bits.append(0, fillBitIdx0 - bits.size, false);
-		for (int bit = (1 + (bits.size/WORD_BITS))*WORD_BITS; bit < message.size; bit += WORD_BITS) {
-			bits.append(wordMask ^ bit, bit, false);
-		}
+		// Add padding to align message with words
+		bits.append(paddingBits, paddingCount, false);
 
 		// Copy packet from the bits workspace into message
 		message.setTo(bits.data, 0, message.size);
@@ -202,23 +206,16 @@ public class ECoCheckCodec {
 	}
 
 	/**
-	 * Computes a 4-bit checksum by xor the data portion of the packet
+	 * Computes a k-bit checksum by xor the data portion of the packet
 	 */
 	private int computeCheckSum() {
-		int checkSum = 0b1010;
-		int length = bits.arrayLength();
-		for (int i = 0; i < length; i++) {
-			int v = bits.data[i] & 0xFF;
-			// If at the end, zero out extra bits at the end
-			if ((i + 1)*8 > bits.size) {
-				int unused = (i + 1)*8 - bits.size;
-				v = (((byte)(v << unused)) >> unused) & 0xFF;
-			}
-
-			checkSum ^= v >> 4;
-			checkSum ^= v & 0x0F;
+		int checkSum = 0b1010_1011; // selected to avoid symmetry and being filled with all 0 or 1
+		final int length = bits.length();
+		for (int i = 0; i < length; i += checksumBitCount) {
+			int amount = Math.min(checksumBitCount, length - i);
+			checkSum ^= bits.read(i, amount, false);
 		}
-		return checkSum;
+		return checkSum & checksumMask;
 	}
 
 	/**
@@ -244,24 +241,26 @@ public class ECoCheckCodec {
 
 		// Copy into bits array to make parsing easier
 		System.arraycopy(message.data, 0, bits.data, 0, message.size);
-		bits.size = messageBitCount;
 
-		// Make sure the two reserved bits are 3
-		int header = bits.read(0, 2, true);
-		if (header != 3) {
-			return false;
+		// Reject if padding bits are not the expected value
+		if (paddingCount > 0) {
+			bits.size = messageBitCount + paddingCount;
+			int padding = bits.read(messageBitCount, paddingCount, false);
+			if (padding != paddingBits)
+				return false;
 		}
 
-		int foundCheckSum = bits.read(bits.size - 4, 4, true);
-		bits.resize(bits.size - 4);
+		bits.size = messageBitCount;
+		int foundCheckSum = bits.read(markerBitCount + cellBitCount, checksumBitCount, false);
+		bits.resize(markerBitCount + cellBitCount);
 		int expectedCheckSum = computeCheckSum();
 
 		if (foundCheckSum != expectedCheckSum)
 			return false;
 
 		// Which scale factor was applied
-		cell.markerID = bits.read(2, markerBitCount, true);
-		cell.cellID = bits.read(2 + markerBitCount, cellBitCount, true);
+		cell.markerID = bits.read(0, markerBitCount, true);
+		cell.cellID = bits.read(markerBitCount, cellBitCount, true);
 
 		return true;
 	}
@@ -270,6 +269,6 @@ public class ECoCheckCodec {
 	 * Converts the level into a fraction
 	 */
 	public double errorCorrectionFraction() {
-		return errorCorrectionLevel / 10.0;
+		return errorCorrectionLevel/10.0;
 	}
 }

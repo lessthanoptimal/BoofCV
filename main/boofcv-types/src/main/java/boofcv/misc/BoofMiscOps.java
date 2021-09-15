@@ -989,4 +989,15 @@ public class BoofMiscOps {
 		System.arraycopy(src, 0, dst, 0, src.length);
 		return dst;
 	}
+
+	/**
+	 * Generates mask where the first N bits are filled in with 1
+	 */
+	public static int generateBitMask( int numBits ) {
+		int mask = 0;
+		for (int i = 0; i < numBits; i++) {
+			mask |= 1 << i;
+		}
+		return mask;
+	}
 }
