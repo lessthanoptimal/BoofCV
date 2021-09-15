@@ -80,7 +80,7 @@ public class CreateFiducialSquareHammingGui extends CreateSquareFiducialGui {
 		long pattern = controls.selectedPattern;
 		if (pattern < 0) {
 			imagePanel.setImageRepaint(null);
-		} else if (pattern >= c.config.encoding.size) {
+		} else if (pattern >= c.config.encoding.size()) {
 			System.err.println("Pattern outside of allowed range");
 			imagePanel.setImageRepaint(null);
 		} else {
@@ -106,7 +106,7 @@ public class CreateFiducialSquareHammingGui extends CreateSquareFiducialGui {
 		public ControlPanel( Listener listener ) {
 			super(listener);
 
-			labelMaxID.setText(c.config.encoding.size+"");
+			labelMaxID.setText(c.config.encoding.size()+"");
 			listPatterns.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 			listPatterns.setLayoutOrientation(JList.VERTICAL);
 //			listPatterns.setVisibleRowCount(-1);
@@ -131,7 +131,7 @@ public class CreateFiducialSquareHammingGui extends CreateSquareFiducialGui {
 				encoding = comboEncoding.getSelectedIndex();
 				HammingDictionary dictionary = HammingDictionary.values()[encoding+1];
 				c.config.setTo(ConfigHammingMarker.loadDictionary(dictionary));
-				labelMaxID.setText(c.config.encoding.size+"");
+				labelMaxID.setText(c.config.encoding.size()+"");
 				renderPreview();
 			} else {
 				super.controlChanged(source);
@@ -144,7 +144,7 @@ public class CreateFiducialSquareHammingGui extends CreateSquareFiducialGui {
 			try {
 				int lvalue = Integer.parseInt(text);
 
-				int maxValue = c.config.encoding.size-1;
+				int maxValue = c.config.encoding.size()-1;
 				if (lvalue > maxValue)
 					lvalue = maxValue;
 				else if (lvalue < 0)

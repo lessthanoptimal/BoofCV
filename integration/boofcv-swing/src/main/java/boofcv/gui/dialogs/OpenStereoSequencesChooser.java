@@ -228,7 +228,6 @@ public class OpenStereoSequencesChooser extends JSpringPanel {
 			preview = UtilImageIO.loadImage(path.getAbsolutePath());
 		}
 		previewPanel.setImageRepaint(preview);
-		System.out.println("panel.size=" + previewPanel.getSize());
 	}
 
 	/**

@@ -60,7 +60,7 @@ public class CreateSquareHammingDocumentPDF extends CreateFiducialDocumentPDF {
 		for (int i = 0; i < markerIDs.size; i++) {
 			// make sure the marker ID is valid. This is better than crashing. Should filter before it gets here.
 			int id = markerIDs.get(i);
-			id = Math.min(config.encoding.size-1, id);
+			id = Math.min(config.encoding.size()-1, id);
 
 			// add the marker
 			this.markerIDs.set(i, id);

@@ -109,7 +109,7 @@ public class FactoryFiducialCalibration {
 		ECoCheckDetector<GrayF32> detector = FactoryFiducial.ecocheck(
 				configDetector, configMarkers, GrayF32.class).getDetector();
 
-		return new CalibrationDetectorMultiECoCheck(detector, configMarkers.markerShapes);
+		return new CalibrationDetectorMultiECoCheck(detector, configMarkers.markerShapes.toList());
 	}
 
 	/**

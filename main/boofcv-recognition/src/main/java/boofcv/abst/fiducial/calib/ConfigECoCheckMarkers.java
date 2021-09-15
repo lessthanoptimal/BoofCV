@@ -21,8 +21,8 @@ package boofcv.abst.fiducial.calib;
 import boofcv.misc.BoofMiscOps;
 import boofcv.struct.Configuration;
 import boofcv.struct.GridShape;
+import org.ddogleg.struct.FastArray;
 
-import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -45,7 +45,7 @@ public class ConfigECoCheckMarkers implements Configuration {
 	public int firstTargetDuplicated = 1;
 
 	/** Shapes of individual markers. The first marker might be duplicated. */
-	public final List<MarkerShape> markerShapes = new ArrayList<>();
+	public final FastArray<MarkerShape> markerShapes = new FastArray<>(MarkerShape.class);
 
 	/**
 	 * <p>

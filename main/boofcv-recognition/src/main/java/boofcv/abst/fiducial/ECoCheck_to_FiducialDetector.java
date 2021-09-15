@@ -37,6 +37,7 @@ import georegression.transform.homography.HomographyPointOps_F64;
 import lombok.Getter;
 import org.ddogleg.struct.DogArray;
 import org.ddogleg.struct.DogArray_I32;
+import org.ddogleg.struct.FastArray;
 import org.ejml.data.DMatrixRMaj;
 import org.ejml.dense.fixed.CommonOps_DDF3;
 import org.ejml.ops.DConvertMatrixStruct;
@@ -65,14 +66,14 @@ public class ECoCheck_to_FiducialDetector<T extends ImageGray<T>> extends Fiduci
 	private final DogArray<AssociatedPair> pairs = new DogArray<>(AssociatedPair::new);
 
 	// used to retrieve grid shape and marker's physical size
-	final List<MarkerShape> markerShapes;
+	final FastArray<MarkerShape> markerShapes;
 
 	// list of known detections with known markers
 	DogArray_I32 foundToDetection = new DogArray_I32();
 
 	final Point3D_F64 point3 = new Point3D_F64();
 
-	public ECoCheck_to_FiducialDetector( ECoCheckDetector<T> detector, List<MarkerShape> markerShapes ) {
+	public ECoCheck_to_FiducialDetector( ECoCheckDetector<T> detector, FastArray<MarkerShape> markerShapes ) {
 		this.detector = detector;
 		this.markerShapes = markerShapes;
 	}

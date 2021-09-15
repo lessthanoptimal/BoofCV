@@ -119,7 +119,7 @@ public class DetectFiducialSquareHamming<T extends ImageGray<T>> extends BaseDet
 			final int numWords = bits.arrayLength();
 
 			// Go through all markers
-			for (int markerIdx = 0; markerIdx < description.encoding.size; markerIdx++) {
+			for (int markerIdx = 0; markerIdx < description.encoding.size(); markerIdx++) {
 				int[] data = description.encoding.get(markerIdx).pattern.data;
 
 				int error = 0;
@@ -155,7 +155,7 @@ public class DetectFiducialSquareHamming<T extends ImageGray<T>> extends BaseDet
 		}
 
 		// save the results
-		result.which = description.encoding.get(bestMarker).id;
+		result.which = bestMarker;
 		result.lengthSide = 1;
 		result.rotation = bestOrientation;
 		result.error = bestError;

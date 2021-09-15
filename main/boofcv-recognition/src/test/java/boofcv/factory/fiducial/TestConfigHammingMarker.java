@@ -38,11 +38,7 @@ public class TestConfigHammingMarker extends StandardConfigurationChecks {
 		ConfigHammingMarker found = ConfigHammingMarker.decodeDictionaryString(text);
 		assertEquals(4, found.gridWidth);
 		assertEquals(3, found.minimumHamming);
-		assertEquals(4, found.encoding.size);
-
-		for (int i = 0; i < found.encoding.size; i++) {
-			assertEquals(i, found.encoding.get(i).id);
-		}
+		assertEquals(4, found.encoding.size());
 
 		checkEncoding(0x5867, found, 0);
 		checkEncoding(0x8b03, found, 1);
@@ -63,98 +59,98 @@ public class TestConfigHammingMarker extends StandardConfigurationChecks {
 		ConfigHammingMarker found = loadDictionary(HammingDictionary.ARUCO_ORIGINAL);
 		assertEquals(5, found.gridWidth);
 		assertEquals(bruteForceMinimum(found), found.minimumHamming);
-		assertEquals(1024, found.encoding.size);
+		assertEquals(1024, found.encoding.size());
 	}
 
 	@Test void define_ARUCO_MIP_16h3() {
 		ConfigHammingMarker found = loadDictionary(HammingDictionary.ARUCO_MIP_16h3);
 		assertEquals(4, found.gridWidth);
 		assertEquals(3, found.minimumHamming);
-		assertEquals(250, found.encoding.size);
+		assertEquals(250, found.encoding.size());
 	}
 
 	@Test void define_ARUCO_MIP_25h7() {
 		ConfigHammingMarker found = loadDictionary(HammingDictionary.ARUCO_MIP_25h7);
 		assertEquals(5, found.gridWidth);
 		assertEquals(bruteForceMinimum(found), found.minimumHamming);
-		assertEquals(100, found.encoding.size);
+		assertEquals(100, found.encoding.size());
 	}
 
 	@Test void define_ARUCO_MIP_36h12() {
 		ConfigHammingMarker found = loadDictionary(HammingDictionary.ARUCO_MIP_36h12);
 		assertEquals(6, found.gridWidth);
 		assertEquals(bruteForceMinimum(found), found.minimumHamming);
-		assertEquals(250, found.encoding.size);
+		assertEquals(250, found.encoding.size());
 	}
 
 	@Test void define_ARUCO_OCV_4x4_1000() {
 		ConfigHammingMarker found = loadDictionary(HammingDictionary.ARUCO_OCV_4x4_1000);
 		assertEquals(4, found.gridWidth);
 		assertEquals(bruteForceMinimum(found), found.minimumHamming);
-		assertEquals(1000, found.encoding.size);
+		assertEquals(1000, found.encoding.size());
 	}
 
 	@Test void define_ARUCO_OCV_5x5_1000() {
 		ConfigHammingMarker found = loadDictionary(HammingDictionary.ARUCO_OCV_5x5_1000);
 		assertEquals(5, found.gridWidth);
 		assertEquals(bruteForceMinimum(found), found.minimumHamming);
-		assertEquals(1000, found.encoding.size);
+		assertEquals(1000, found.encoding.size());
 	}
 
 	@Test void define_ARUCO_OCV_6x6_1000() {
 		ConfigHammingMarker found = loadDictionary(HammingDictionary.ARUCO_OCV_6x6_1000);
 		assertEquals(6, found.gridWidth);
 		assertEquals(bruteForceMinimum(found), found.minimumHamming);
-		assertEquals(1000, found.encoding.size);
+		assertEquals(1000, found.encoding.size());
 	}
 
 	@Test void define_ARUCO_OCV_7x7_1000() {
 		ConfigHammingMarker found = loadDictionary(HammingDictionary.ARUCO_OCV_7x7_1000);
 		assertEquals(7, found.gridWidth);
 		assertEquals(bruteForceMinimum(found), found.minimumHamming);
-		assertEquals(1000, found.encoding.size);
+		assertEquals(1000, found.encoding.size());
 	}
 
 	@Test void define_APRILTAG_16h5() {
 		ConfigHammingMarker found = loadDictionary(HammingDictionary.APRILTAG_16h5);
 		assertEquals(4, found.gridWidth);
 		assertEquals(bruteForceMinimum(found), found.minimumHamming);
-		assertEquals(30, found.encoding.size);
+		assertEquals(30, found.encoding.size());
 	}
 
 	@Test void define_APRILTAG_25h7() {
 		ConfigHammingMarker found = loadDictionary(HammingDictionary.APRILTAG_25h7);
 		assertEquals(5, found.gridWidth);
 		assertEquals(bruteForceMinimum(found), found.minimumHamming);
-		assertEquals(242, found.encoding.size);
+		assertEquals(242, found.encoding.size());
 	}
 
 	@Test void define_APRILTAG_25h9() {
 		ConfigHammingMarker found = loadDictionary(HammingDictionary.APRILTAG_25h9);
 		assertEquals(5, found.gridWidth);
 		assertEquals(bruteForceMinimum(found), found.minimumHamming);
-		assertEquals(35, found.encoding.size);
+		assertEquals(35, found.encoding.size());
 	}
 
 	@Test void define_APRILTAG_36h10() {
 		ConfigHammingMarker found = loadDictionary(HammingDictionary.APRILTAG_36h10);
 		assertEquals(6, found.gridWidth);
 		assertEquals(bruteForceMinimum(found), found.minimumHamming);
-		assertEquals(2320, found.encoding.size);
+		assertEquals(2320, found.encoding.size());
 	}
 
 	@Test void define_APRILTAG_36h11() {
 		ConfigHammingMarker found = loadDictionary(HammingDictionary.APRILTAG_36h11);
 		assertEquals(6, found.gridWidth);
 		assertEquals(bruteForceMinimum(found), found.minimumHamming);
-		assertEquals(587, found.encoding.size);
+		assertEquals(587, found.encoding.size());
 	}
 
 	private int bruteForceMinimum(ConfigHammingMarker found) {
 		int distance = found.gridWidth*found.gridWidth;
-		for (int i = 0; i < found.encoding.size; i++) {
+		for (int i = 0; i < found.encoding.size(); i++) {
 			PackedBits32 pi = found.encoding.get(i).pattern;
-			for (int j = i+1; j < found.encoding.size; j++) {
+			for (int j = i+1; j < found.encoding.size(); j++) {
 				PackedBits32 pj = found.encoding.get(j).pattern;
 
 				int c = 0;

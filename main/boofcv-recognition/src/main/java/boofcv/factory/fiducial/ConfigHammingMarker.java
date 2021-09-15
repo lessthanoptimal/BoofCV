@@ -21,10 +21,12 @@ package boofcv.factory.fiducial;
 import boofcv.alg.fiducial.qrcode.PackedBits32;
 import boofcv.misc.BoofMiscOps;
 import boofcv.struct.Configuration;
-import org.ddogleg.struct.DogArray;
+import org.ddogleg.struct.FastArray;
 
 import java.io.*;
 import java.net.URL;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
 
@@ -51,7 +53,7 @@ public class ConfigHammingMarker implements Configuration {
 	public int minimumHamming;
 
 	/** How each marker is encoded */
-	public DogArray<Marker> encoding = new DogArray<>(Marker::new);
+	public FastArray<Marker> encoding = new FastArray<>(Marker.class);
 
 	/** Which dictionary is this based off of. Typically, this will be pre-defined. */
 	public HammingDictionary dictionary;
@@ -66,21 +68,40 @@ public class ConfigHammingMarker implements Configuration {
 		BoofMiscOps.checkTrue(gridWidth > 0);
 		BoofMiscOps.checkTrue(minimumHamming >= 0);
 		BoofMiscOps.checkTrue(targetWidth > 0);
-		for (int i = 0; i < encoding.size; i++) {
+		for (int i = 0; i < encoding.size(); i++) {
 			encoding.get(i).checkValidity();
 		}
+	}
+
+	@Override public void serializeInitialize() {
+		// If it's custom then the dictionary was encoded
+		if (dictionary == HammingDictionary.CUSTOM)
+			return;
+
+		// Otherwise, we need to load a pre-defined dictionary
+		this.encoding = loadDictionary(dictionary).encoding;
+	}
+
+	@Override public List<String> serializeActiveFields() {
+		List<String> active = new ArrayList<>();
+		active.add("borderWidthFraction");
+		active.add("gridWidth");
+		active.add("minimumHamming");
+		active.add("dictionary");
+		if (dictionary == HammingDictionary.CUSTOM)
+			active.add("encoding");
+
+		return active;
 	}
 
 	public void setTo( ConfigHammingMarker src ) {
 		this.borderWidthFraction = src.borderWidthFraction;
 		this.gridWidth = src.gridWidth;
 		this.minimumHamming = src.minimumHamming;
-		this.encoding.resize(src.encoding.size);
 		this.dictionary = src.dictionary;
 		this.targetWidth = src.targetWidth;
-		for (int i = 0; i < src.encoding.size; i++) {
-			encoding.get(i).setTo(src.encoding.get(i));
-		}
+		this.encoding.clear();
+		encoding.addAll(src.encoding);
 	}
 
 	public int bitsPerGrid() {
@@ -91,8 +112,8 @@ public class ConfigHammingMarker implements Configuration {
 	 * Adds a new marker with the specified encoding number
 	 */
 	public void addMarker( long encoding ) {
-		Marker m = this.encoding.grow();
-		m.id = this.encoding.size - 1;
+		var m = new Marker();
+		this.encoding.add(m);
 		m.pattern.resize(gridWidth*gridWidth);
 		for (int bit = 0; bit < m.pattern.size; bit++) {
 			m.pattern.set(bit, (int)((encoding >> bit) & 1L));
@@ -105,15 +126,12 @@ public class ConfigHammingMarker implements Configuration {
 	public static class Marker {
 		/** Expected binary bit pattern */
 		public final PackedBits32 pattern = new PackedBits32();
-		/** Unique ID that this marker represents */
-		public int id;
 
 		public void checkValidity() {
 			BoofMiscOps.checkTrue(pattern.size > 0);
 		}
 
 		public void setTo( Marker src ) {
-			this.id = src.id;
 			this.pattern.setTo(src.pattern);
 		}
 	}
@@ -134,20 +152,19 @@ public class ConfigHammingMarker implements Configuration {
 			String[] words = line.split("=");
 			if (words.length != 2)
 				throw new RuntimeException("Expected 2 words on line " + i);
-			if (words[0].equals("grid_width")) {
-				config.gridWidth = Integer.parseInt(words[1]);
-			} else if (words[0].equals("minimum_hamming")) {
-				config.minimumHamming = Integer.parseInt(words[1]);
-			} else if (words[0].equals("dictionary")) {
-				String[] ids = words[1].split(",");
-				for (int idIdx = 0; idIdx < ids.length; idIdx++) {
-					if (ids[idIdx].startsWith("0x"))
-						config.addMarker(Long.parseUnsignedLong(ids[idIdx].substring(2), 16));
-					else
-						config.addMarker(Long.parseUnsignedLong(ids[idIdx]));
+			switch (words[0]) {
+				case "grid_width" -> config.gridWidth = Integer.parseInt(words[1]);
+				case "minimum_hamming" -> config.minimumHamming = Integer.parseInt(words[1]);
+				case "dictionary" -> {
+					String[] ids = words[1].split(",");
+					for (int idIdx = 0; idIdx < ids.length; idIdx++) {
+						if (ids[idIdx].startsWith("0x"))
+							config.addMarker(Long.parseUnsignedLong(ids[idIdx].substring(2), 16));
+						else
+							config.addMarker(Long.parseUnsignedLong(ids[idIdx]));
+					}
 				}
-			} else {
-				throw new RuntimeException("Unknown key='" + words[0] + "'");
+				default -> throw new RuntimeException("Unknown key='" + words[0] + "'");
 			}
 		}
 

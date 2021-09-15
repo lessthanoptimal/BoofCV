@@ -20,6 +20,8 @@ package boofcv.io;
 
 import boofcv.BoofVersion;
 import boofcv.struct.Configuration;
+import org.ddogleg.struct.FastAccess;
+import org.ddogleg.struct.FastArray;
 import org.jetbrains.annotations.Nullable;
 import org.yaml.snakeyaml.Yaml;
 
@@ -29,7 +31,9 @@ import java.io.UncheckedIOException;
 import java.io.Writer;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import static boofcv.io.calibration.CalibrationIO.createYmlObject;
@@ -69,30 +73,79 @@ public class SerializeConfigYaml {
 		Map<String, Object> state = new HashMap<>();
 		Class type = config.getClass();
 		try {
+			// Get a list of active fields, if a list is specified by the configuration
+			List<String> active = new ArrayList<>();
+			if (config instanceof Configuration) {
+				active = ((Configuration)config).serializeActiveFields();
+			}
 			Field[] fields = type.getFields();
 			for (Field f : fields) {
+				if (!(active.isEmpty() || active.contains(f.getName())))
+					continue;
+
 				if (f.getType().isEnum() || f.getType().isPrimitive() || f.getType().getName().equals("java.lang.String")) {
 					// Only add if they are not identical
 					if (canonical == null || !f.get(config).equals(f.get(canonical)))
 						state.put(f.getName(), f.get(config));
-				} else {
-					try {
-						// All Configuration must have setTo()
-						// We don't check to see if implements Configuration to allow objects outside of BoofCV
-						// to work.
-						type.getMethod("setTo", type);
-					} catch (NoSuchMethodException e) {
-						// This is intentionally annoying as a custom class specific serialization solution
-						// needs to be created. For now, it will complain and skip
-						System.err.println("Referenced object which is not enum, primitive, or a valid class. name=" + f.getName());
+					continue;
+				}
+
+				// FastArray are a special case. Serialize each element in the list
+				if (FastArray.class.isAssignableFrom(f.getType())) {
+					FastAccess<?> list = (FastAccess<?>)f.get(config);
+
+					// See if the lists are identical. If they are skip
+					escape:
+					if (canonical != null) {
+						FastAccess<?> listCanon = (FastAccess<?>)f.get(canonical);
+
+						if (list.size() != listCanon.size())
+							break escape;
+						if (list.isEmpty())
+							continue;
+						for (int i = 0; i < list.size(); i++) {
+							if (!list.get(i).equals(listCanon.get(i)))
+								break escape;
+						}
 						continue;
 					}
-					Map<String, Object> result = canonical != null ?
-							serialize(f.get(config), f.get(canonical)) : serialize(f.get(config), null);
-					// If everything is identical then the returned object will be empty
-					if (!result.isEmpty())
-						state.put(f.getName(), result);
+
+					// Encode the list. Basic types are just copied. Everything else is serialized.
+					Class<?> itemType = list.type;
+					boolean basic = itemType.isEnum() || itemType.isPrimitive() || itemType.getName().equals("java.lang.String");
+					List<Object> serializedList = new ArrayList<>();
+					for (int i = 0; i < list.size(); i++) {
+						if (basic) {
+							serializedList.add(list.get(i));
+						} else {
+							serializedList.add(serialize(list.get(i), null));
+						}
+					}
+					state.put(f.getName(), serializedList);
+					continue;
 				}
+				if (List.class.isAssignableFrom(f.getType())) {
+					System.err.println("Can't serialize lists. Use FastArray instead " +
+							"since it specifies the item type. name=" + f.getName());
+					continue;
+				}
+
+				try {
+					// All Configuration must have setTo()
+					// We don't check to see if implements Configuration to allow objects outside of BoofCV
+					// to work.
+					type.getMethod("setTo", type);
+				} catch (NoSuchMethodException e) {
+					// This is intentionally annoying as a custom class specific serialization solution
+					// needs to be created. For now, it will complain and skip
+					System.err.println("Referenced object which is not enum, primitive, or a valid class. name=" + f.getName());
+					continue;
+				}
+				Map<String, Object> result = canonical != null ?
+						serialize(f.get(config), f.get(canonical)) : serialize(f.get(config), null);
+				// If everything is identical then the returned object will be empty
+				if (!result.isEmpty())
+					state.put(f.getName(), result);
 			}
 			return state;
 		} catch (IllegalAccessException e) {
@@ -109,6 +162,7 @@ public class SerializeConfigYaml {
 					continue;
 				T config = (T)Class.forName(key).getConstructor().newInstance();
 				deserialize(config, (Map<String, Object>)state.get(key));
+				config.serializeInitialize();
 				return config;
 			}
 		} catch (InstantiationException | IllegalAccessException |
@@ -148,6 +202,30 @@ public class SerializeConfigYaml {
 						throw new RuntimeException("Unknown primitive " + ftype);
 				} else if (ftype.getName().equals("java.lang.String")) {
 					f.set(parent, state.get(key));
+				} else if (FastArray.class.isAssignableFrom(ftype)) {
+					// See if the list is empty and there's nothing to do
+					List listOfStates = (List)state.get(key);
+					if (listOfStates.isEmpty())
+						continue;
+
+					// Grab the existing instance of the array
+					FastArray<Object> plist = (FastArray<Object>)f.get(parent);
+					Class<?> itemType = plist.type;
+					boolean basic = itemType.isEnum() || itemType.isPrimitive() || itemType.getName().equals("java.lang.String");
+
+					// deserialize each element and add it to the list
+					plist.reset();
+					for (int i = 0; i < listOfStates.size(); i++) {
+						Object value = listOfStates.get(i);
+						if (basic) {
+							// since numeric values are stored as objects this should work too. Not tested.
+							plist.add(value);
+						} else {
+							Object dst = itemType.getConstructor().newInstance();
+							deserialize(dst, (Map)value);
+							plist.add(dst);
+						}
+					}
 				} else {
 					Object child = ftype.getConstructor().newInstance();
 					deserialize(child, (Map<String, Object>)state.get(key));
