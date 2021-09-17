@@ -34,6 +34,8 @@ import java.util.List;
  * @author Peter Abeles
  */
 public class ConfigECoCheckMarkers implements Configuration {
+	public static final int DEFAULT_CHECKSUM = 6;
+	public static final int DEFAULT_ECC = 3;
 
 	/** Fraction of a cell's length the data bit is */
 	public double dataBitWidthFraction = 0.7;
@@ -57,7 +59,12 @@ public class ConfigECoCheckMarkers implements Configuration {
 	 *
 	 * 0 = no error correction. 10 = maximum amount.
 	 */
-	public int errorCorrectionLevel = 3;
+	public int errorCorrectionLevel = DEFAULT_ECC;
+
+	/**
+	 * Number of bits allocated to the checksum. There can be at most 8 bits.
+	 */
+	public int checksumBits = DEFAULT_CHECKSUM;
 
 	/**
 	 * Configures N markers with the same shape
@@ -70,18 +77,42 @@ public class ConfigECoCheckMarkers implements Configuration {
 	}
 
 	/**
-	 * Parses the standard compact name string and converts it into a configuration.
+	 * Parses the standard compact name string and converts it into a configuration. Note that error correction
+	 * 'e' and checksum 'c' are optional.
 	 */
 	public static ConfigECoCheckMarkers parse( String description, double squareSize ) {
-		String[] words = description.split("e");
-		String[] shape = words[0].split("x");
+		// 9x7n1e3c6
+
+		int locN = -1;
+		int locE = -1;
+		int locC = -1;
+
+		for (int i = 0; i < description.length(); i++) {
+			switch (description.charAt(i)) {
+				case 'n' -> locN = i;
+				case 'e' -> locE = i;
+				case 'c' -> locC = i;
+			}
+		}
+
+		String[] shape = description.substring(0, locN).split("x");
 
 		int rows = Integer.parseInt(shape[0]);
 		int cols = Integer.parseInt(shape[1]);
-		int numMarkers = Integer.parseInt(words[1].split("n")[1]);
+		int numMarkers;
+		if (locE == -1)
+			numMarkers = Integer.parseInt(description.substring(locN + 1));
+		else
+			numMarkers = Integer.parseInt(description.substring(locN + 1, locE));
 
 		ConfigECoCheckMarkers config = singleShape(rows, cols, numMarkers, squareSize);
-		config.errorCorrectionLevel = Integer.parseInt(words[1].charAt(0) + "");
+		if (locE != -1)
+			if (locC == -1)
+				config.errorCorrectionLevel = Integer.parseInt(description.substring(locE + 1));
+			else
+				config.errorCorrectionLevel = Integer.parseInt(description.substring(locE + 1, locC));
+		if (locC != -1)
+			config.checksumBits = Integer.parseInt(description.substring(locC + 1));
 
 		return config;
 	}
@@ -110,6 +141,7 @@ public class ConfigECoCheckMarkers implements Configuration {
 		this.dataBorderFraction = src.dataBorderFraction;
 		this.firstTargetDuplicated = src.firstTargetDuplicated;
 		this.errorCorrectionLevel = src.errorCorrectionLevel;
+		this.checksumBits = src.checksumBits;
 		this.markerShapes.clear();
 		for (int i = 0; i < src.markerShapes.size(); i++) {
 			MarkerShape s = new MarkerShape();
@@ -121,12 +153,24 @@ public class ConfigECoCheckMarkers implements Configuration {
 	/**
 	 * String which compactly describes markers with duplicate shapes.
 	 *
-	 * Example: 9x7e3n1 means 9x7 pattern with error correction level of 3 and 1 possible marker.
+	 * Example: 9x7n1e3c6 means 9x7 pattern, 1 possible marker, with error correction level of 3, checksum with 6 bits.
+	 * Example: 9x7n1 is the same, but ecc and checksum have default values.
 	 */
 	public String compactName() {
 		BoofMiscOps.checkEq(1, markerShapes.size(), "Only one unique shape allowed");
 		MarkerShape shape = markerShapes.get(0);
-		return String.format("%dx%de%dn%d", shape.numRows, shape.numCols, errorCorrectionLevel, firstTargetDuplicated);
+		String text = String.format("%dx%dn%de%dc%d", shape.numRows, shape.numCols,
+				firstTargetDuplicated, errorCorrectionLevel, checksumBits);
+
+		// Truncate if using default values
+		if (checksumBits == DEFAULT_CHECKSUM) {
+			text = text.substring(0, text.length() - 2);
+			if (errorCorrectionLevel == DEFAULT_ECC)
+				text = text.substring(0, text.length() - 2);
+		}
+
+
+		return text;
 	}
 
 	@Override public void checkValidity() {
@@ -136,6 +180,8 @@ public class ConfigECoCheckMarkers implements Configuration {
 		BoofMiscOps.checkTrue(markerShapes.size() >= 1);
 		BoofMiscOps.checkTrue(errorCorrectionLevel >= 0 && errorCorrectionLevel <= 10,
 				"error correction must be from 0 to 10, inclusive.");
+		BoofMiscOps.checkTrue(checksumBits >= 0 && checksumBits <= 8,
+				"checksum bits must be from 0 to 8, inclusive.");
 	}
 
 	public static class MarkerShape implements Configuration {

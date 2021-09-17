@@ -57,6 +57,7 @@ public class UtilCalibrationGui {
 
 			ECoCheckUtils utils = new ECoCheckUtils();
 			utils.codec.setErrorCorrectionLevel(c.errorCorrectionLevel);
+			utils.codec.setChecksumBitCount(c.checksumBits);
 			c.convertToGridList(utils.markers);
 			utils.fixate();
 			ConfigECoCheckMarkers.MarkerShape shape = c.markerShapes.get(0);
