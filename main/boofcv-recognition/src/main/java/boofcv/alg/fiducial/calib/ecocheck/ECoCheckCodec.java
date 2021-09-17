@@ -87,17 +87,20 @@ public class ECoCheckCodec {
 	/** Number of bits required to encode a cell ID */
 	@Getter int cellBitCount;
 
-	/**
-	 * Length of the square grid the bits are encoded in
-	 */
+	/** Length of the square grid the bits are encoded in */
 	@Getter int gridBitLength;
 
 	// Precomputed mask for checksum
 	protected int checksumMask;
 
-	// number of bits needed to make data aligned with word side
-	protected int paddingCount;
-	protected int paddingBits;
+	// number of words needed to encode data portion of the message
+	protected int dataWords;
+	// number of words needed to encode ECC portion of the message
+	protected int eccWords;
+
+	// Values to use as padding when there are unused bits
+	protected int paddingBits = 0;
+	// NOTE: for some reason 0 bits produce a lot better results than all 1. maybe thresholding approach? FP corners?
 
 	// Stores the encoded message
 	protected final DogArray_I8 message = new DogArray_I8();
@@ -127,38 +130,38 @@ public class ECoCheckCodec {
 		messageBitCount = markerBitCount + cellBitCount + checksumBitCount;
 
 		// Compute number of words needed to save this message
-		int dataWords = (int)Math.ceil(messageBitCount/(double)WORD_BITS);
-
-		// Two words are needed to fix every word with an error. Multiple bit errors in a single word count
-		// as a single error. See Singleton Bound
-		int eccWords = (int)(2*Math.ceil(dataWords*errorCorrectionFraction()));
+		dataWords = (int)Math.ceil(messageBitCount/(double)WORD_BITS);
 
 		// Total number of bits that need to be encoded. message + ecc
-		int packetBitCount = (dataWords + eccWords)*WORD_BITS;
+		int packetBitCount;
+		if (errorCorrectionLevel > 0) {
+			// Two words are needed to fix every word with an error. Multiple bit errors in a single word count
+			// as a single error. See Singleton Bound
+			eccWords = (int)(2*Math.ceil(dataWords*errorCorrectionFraction()));
+			packetBitCount = (dataWords + eccWords)*WORD_BITS;
+		} else {
+			// When there's no ECC there's no need to force the message length to align with a word size
+			packetBitCount = messageBitCount;
+			eccWords = 0;
+		}
 
 		// How big the square needs to be to encode all this information
 		gridBitLength = (int)Math.ceil(Math.sqrt(packetBitCount));
 
 		// See if there are enough extra bits to increase the number of ECC words
-		if (gridBitLength*gridBitLength - packetBitCount >= WORD_BITS) {
+		if (errorCorrectionLevel > 0 && gridBitLength*gridBitLength - packetBitCount >= WORD_BITS) {
 			int extraWords = (gridBitLength*gridBitLength - packetBitCount)/WORD_BITS;
 			eccWords += extraWords;
 		}
 
 		// Compute the number of bytes to encode it all
 		ecc.resize(eccWords);
-		bits.resize(dataWords*WORD_BITS);
-		message.resize(dataWords);
+		bits.resize(messageBitCount);
 		rscodes.generator(eccWords);
-
-		// Compute number of bits to align data with word size
-		paddingCount = messageBitCount%WORD_BITS == 0 ? 0 : WORD_BITS-(messageBitCount%WORD_BITS);
 
 		// only save bits that are in the word
 		wordMask = BoofMiscOps.generateBitMask(WORD_BITS);
 		checksumMask = BoofMiscOps.generateBitMask(checksumBitCount);
-		// All padding bits are 1
-		paddingBits = BoofMiscOps.generateBitMask(paddingCount);
 	}
 
 	/**
@@ -169,6 +172,10 @@ public class ECoCheckCodec {
 	 * @param encodedPacket (Output) The encoded packet
 	 */
 	public void encode( int markerID, int cellID, PackedBits8 encodedPacket ) {
+		// pre-allocate memory for encoded packet
+		int elementsInGrid = gridBitLength*gridBitLength;
+		encodedPacket.resize(elementsInGrid);
+
 		// Build the packet
 		bits.resize(0);
 
@@ -176,32 +183,38 @@ public class ECoCheckCodec {
 		bits.append(markerID, markerBitCount, false);
 		bits.append(cellID, cellBitCount, false);
 
-		// Compute a checksum. ECC doesn't catch everything in targets this small
+		// Compute a checksum. Checksum is needed since ECC won't catch everything in smaller packets
 		int checkSum = computeCheckSum();
 		bits.append(checkSum, checksumBitCount, true);
 
 		// Sanity check
 		BoofMiscOps.checkEq(bits.size, messageBitCount);
 
-		// Add padding to align message with words
-		bits.append(paddingBits, paddingCount, false);
+		// Concat the message and ecc data together
+		encodedPacket.resize(0);
+		encodedPacket.append(bits, bits.size);
 
-		// Copy packet from the bits workspace into message
-		message.setTo(bits.data, 0, message.size);
+		int bitsEncoded;
+		if (errorCorrectionLevel > 0) {
+			// Copy packet from the bits workspace into message
+			message.setTo(bits.data, 0, dataWords);
 
-		// Compute the error correction code
-		rscodes.computeECC(message, ecc);
+			// Compute the error correction code
+			rscodes.computeECC(message, ecc);
 
-		// Allocate enough bits for every element in the data grid
-		encodedPacket.resize(gridBitLength*gridBitLength);
+			// Copy ECC into the encoded packet. The message data is now implicitly filled with zeros to align with
+			// a word
+			System.arraycopy(ecc.data, 0, encodedPacket.data, dataWords, ecc.size);
 
-		// Copy into output array
-		System.arraycopy(message.data, 0, encodedPacket.data, 0, message.size);
-		System.arraycopy(ecc.data, 0, encodedPacket.data, message.size, ecc.size);
+			bitsEncoded = (dataWords + ecc.size)*WORD_BITS;
+		} else {
+			bitsEncoded = bits.size;
+		}
 
-		// Fill in extra bits with a known pattern. This is ignored when decoding
-		for (int i = (message.size + ecc.size)*WORD_BITS; i < encodedPacket.size; i++) {
-			encodedPacket.set(i, i%2);
+		// Add padding to the remainder
+		encodedPacket.size = bitsEncoded;
+		for (int i = encodedPacket.size; i < elementsInGrid; i += 32) {
+			encodedPacket.append(paddingBits, Math.min(32, elementsInGrid - i), false);
 		}
 	}
 
@@ -231,8 +244,8 @@ public class ECoCheckCodec {
 		BoofMiscOps.checkEq(readBits.size, gridBitLength*gridBitLength, "Unexpected array size");
 
 		// Split up the incoming message into the message and ecc portions
-		message.setTo(readBits.data, 0, message.size);
-		ecc.setTo(readBits.data, message.size, ecc.size);
+		message.setTo(readBits.data, 0, dataWords);
+		ecc.setTo(readBits.data, dataWords, eccWords);
 
 		// Attempt to fix any errors
 		if (!rscodes.correct(message, ecc)) {
@@ -240,19 +253,14 @@ public class ECoCheckCodec {
 		}
 
 		// Copy into bits array to make parsing easier
-		System.arraycopy(message.data, 0, bits.data, 0, message.size);
+		System.arraycopy(message.data, 0, bits.data, 0, dataWords);
 
-		// Reject if padding bits are not the expected value
-		if (paddingCount > 0) {
-			bits.size = messageBitCount + paddingCount;
-			int padding = bits.read(messageBitCount, paddingCount, false);
-			if (padding != paddingBits)
-				return false;
-		}
-
+		// Extract the checksum
 		bits.size = messageBitCount;
-		int foundCheckSum = bits.read(markerBitCount + cellBitCount, checksumBitCount, false);
-		bits.resize(markerBitCount + cellBitCount);
+		int foundCheckSum = bits.read(bits.size - checksumBitCount, checksumBitCount, false);
+
+		// Compute checksum, including padding bits
+		bits.resize(bits.size - checksumBitCount);
 		int expectedCheckSum = computeCheckSum();
 
 		if (foundCheckSum != expectedCheckSum)
