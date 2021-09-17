@@ -138,7 +138,7 @@ public class TestECoCheckCodec extends BoofStandardJUnit {
 		var alg = new ECoCheckCodec();
 
 		// make it so it can recover from a bit error in all the words
-		alg.setErrorCorrectionLevel(10);
+		alg.setErrorCorrectionLevel(9);
 
 		alg.configure(10, 20000);
 		alg.encode(5, 51, encoded);
