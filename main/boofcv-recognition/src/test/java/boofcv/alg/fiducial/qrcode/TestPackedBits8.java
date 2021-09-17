@@ -111,6 +111,22 @@ public class TestPackedBits8 extends BoofStandardJUnit {
 		assertEquals(1, values.get(7));
 	}
 
+	@Test void append_array() {
+		PackedBits8 src = new PackedBits8(0);
+		for (int i = 0; i < 2; i++) {
+			src.append(rand.nextInt(), 8, false);
+		}
+		src.append(0b101, 3, false);
+
+		PackedBits8 dst = new PackedBits8(0);
+		dst.append(src, src.size);
+
+		assertEquals(src.size, dst.size);
+		for (int i = 0; i < src.size; i++) {
+			assertEquals(src.get(i), dst.get(i), "i=" + i);
+		}
+	}
+
 	@Test void read() {
 		PackedBits8 values = new PackedBits8(0);
 

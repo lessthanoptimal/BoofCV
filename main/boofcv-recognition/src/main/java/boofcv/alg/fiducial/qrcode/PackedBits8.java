@@ -94,6 +94,24 @@ public class PackedBits8 implements PackedBits {
 	}
 
 	/**
+	 * Appends the bit array onto the end
+	 */
+	public void append( PackedBits8 bits, int numberOfBits ) {
+		if (numberOfBits > bits.size)
+			throw new IllegalArgumentException("numberOfBits must be <= bits.size");
+
+		int numWords = bits.size/8;
+		for (int i = 0; i < numWords; i++) {
+			append(bits.data[i] & 0xFF, 8, true);
+		}
+		int remaining = bits.size - numWords*8;
+		if (remaining == 0)
+			return;
+		int tail = bits.read(numWords*8, remaining, true);
+		append(tail, remaining, false);
+	}
+
+	/**
 	 * Read bits from the array and store them in an int
 	 *
 	 * @param location The index of the first bit
