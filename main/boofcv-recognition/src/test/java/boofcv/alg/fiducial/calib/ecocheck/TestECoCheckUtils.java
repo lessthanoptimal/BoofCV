@@ -39,20 +39,34 @@ import static org.junit.jupiter.api.Assertions.*;
  * @author Peter Abeles
  */
 public class TestECoCheckUtils extends BoofStandardJUnit {
-	@Test void findLargestCellCount() {
+	@Test void findMaxEncodedSquares() {
 		var alg = new ECoCheckUtils();
 		alg.addMarker(4, 3);
-		alg.addMarker(1, 2);
-		alg.addMarker(8, 2);
+		assertEquals(1, alg.findMaxEncodedSquares());
+		alg.addMarker(3, 4);
+		assertEquals(1, alg.findMaxEncodedSquares());
+		alg.addMarker(3, 5);
+		assertEquals(1, alg.findMaxEncodedSquares());
+		alg.addMarker(4, 4);
+		assertEquals(2, alg.findMaxEncodedSquares());
+		alg.addMarker(4, 5);
+		assertEquals(3, alg.findMaxEncodedSquares());
+		alg.addMarker(5, 4);
+		assertEquals(3, alg.findMaxEncodedSquares());
 		alg.addMarker(5, 5);
-
-		assertEquals(25, alg.findLargestCellCount());
+		assertEquals(4, alg.findMaxEncodedSquares());
+		alg.addMarker(5, 6);
+		assertEquals(6, alg.findMaxEncodedSquares());
+		alg.addMarker(6, 5);
+		assertEquals(6, alg.findMaxEncodedSquares());
+		alg.addMarker(6, 6);
+		assertEquals(8, alg.findMaxEncodedSquares());
 	}
 
 	@Test void bitRect() {
 		var alg = new ECoCheckUtils();
 		alg.dataBitWidthFraction = 0.9; // make sure this isn't 1.0
-		alg.addMarker(4, 3);
+		alg.addMarker(6, 5);
 		alg.fixate();
 
 		// Sanity check to make sure it's the expected grid size

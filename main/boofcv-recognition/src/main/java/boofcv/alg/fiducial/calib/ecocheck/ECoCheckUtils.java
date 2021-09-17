@@ -98,8 +98,7 @@ public class ECoCheckUtils {
 	 * Call after its done being configured so that it can precompute everything that's needed
 	 */
 	public void fixate() {
-		int N = findLargestCellCount();
-		codec.configure(markers.size(), N);
+		codec.configure(markers.size(), findMaxEncodedSquares());
 
 		bitSampleCount = bitSampleGridSize*2 + 1;
 	}
@@ -110,15 +109,20 @@ public class ECoCheckUtils {
 	}
 
 	/**
-	 * Returns the number of cells in the largest marker
+	 * Returns the max number of encoded squares found in any of the markers
 	 */
-	int findLargestCellCount() {
+	int findMaxEncodedSquares() {
 		int largest = 0;
 		for (int i = 0; i < markers.size(); i++) {
 			GridShape g = markers.get(i);
-			int n = g.cols*g.rows;
-			if (n > largest)
-				largest = n;
+
+			int rows = g.rows-2;
+			int cols = g.cols-2;
+
+			int count = (rows/2)*cols + (rows%2)*(cols/2);
+			if (count > largest) {
+				largest = count;
+			}
 		}
 		return largest;
 	}

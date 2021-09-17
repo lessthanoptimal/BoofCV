@@ -38,7 +38,7 @@ public class TestECoCheckCodec extends BoofStandardJUnit {
 		var alg = new ECoCheckCodec();
 
 		// Hand compute solution:
-		// marker = 0, cell = 4bits. total=6+4+4=18. then convert to words. add in ecc
+		// marker = 0, cell = 4 bits. checksum=6, total=0+4+6=10. then convert to words. add in ecc
 		alg.configure(1, 12);
 		assertEquals(0, alg.markerBitCount);
 		assertEquals(4, alg.cellBitCount);
@@ -58,6 +58,15 @@ public class TestECoCheckCodec extends BoofStandardJUnit {
 		assertEquals(10, alg.markerBitCount);
 		assertEquals(15, alg.cellBitCount);
 		assertEquals(8, alg.gridBitLength);
+
+		// Another hand solution with more checksum bits
+		// marker = 0, cell = 4bits. total=4+4=8. then convert to words. add in ecc
+		alg.checksumBitCount = 4;
+		alg.errorCorrectionLevel = 0;
+		alg.configure(1, 12);
+		assertEquals(0, alg.markerBitCount);
+		assertEquals(4, alg.cellBitCount);
+		assertEquals(3, alg.gridBitLength);
 	}
 
 	/**
@@ -74,6 +83,14 @@ public class TestECoCheckCodec extends BoofStandardJUnit {
 		assertEquals(0, found.markerID);
 		assertEquals(14, found.cellID);
 
+		alg.configure(12, 400);
+		alg.encode(6, 335, encoded);
+		assertTrue(alg.decode(encoded, found));
+		assertEquals(6, found.markerID);
+		assertEquals(335, found.cellID);
+
+		// Try it with no ECC
+		alg.errorCorrectionLevel = 0;
 		alg.configure(12, 400);
 		alg.encode(6, 335, encoded);
 		assertTrue(alg.decode(encoded, found));
