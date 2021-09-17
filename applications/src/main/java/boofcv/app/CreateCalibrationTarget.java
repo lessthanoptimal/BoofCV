@@ -106,6 +106,9 @@ public class CreateCalibrationTarget {
 	@Option(name = "--ECoCheckError", usage = "Error correction level for ECoCheck. 0 is no error correction. 0 to 10")
 	int chessBitsError = new ConfigECoCheckMarkers().errorCorrectionLevel;
 
+	@Option(name = "--ECoCheckChecksum", usage = "Checksum bits. 0 to 8.")
+	int ecocheckChecksum = new ConfigECoCheckMarkers().checksumBits;
+
 	@Option(name = "--Printer", usage = "Send to printer instead of saving to a file")
 	boolean sendToPrinter = false;
 
@@ -211,6 +214,8 @@ public class CreateCalibrationTarget {
 					failExit("Don't specify center distance for chessboard targets");
 				if (chessBitsError < 0 || chessBitsError > 10)
 					failExit("Error level must be 0 to 10, inclusive");
+				if (ecocheckChecksum < 0 || ecocheckChecksum > 8)
+					failExit("Checksum must be 0 to 8, inclusive");
 				if (numMarkers <= 0)
 					failExit("Must specify at least one marker");
 				if (rows < 4 || columns < 3)
@@ -259,7 +264,7 @@ public class CreateCalibrationTarget {
 
 		if (type == CalibrationPatterns.ECOCHECK) {
 			CreateECoCheckDocumentPDF doc = ecoCheckToPdf(fileName + suffix,
-					paperSize, unit, rows, columns, shapeWidth, numMarkers, chessBitsError);
+					paperSize, unit, rows, columns, shapeWidth, numMarkers, chessBitsError, ecocheckChecksum);
 			doc.showInfo = !disablePrintInfo;
 			if (sendToPrinter) {
 				doc.sendToPrinter();
@@ -271,8 +276,8 @@ public class CreateCalibrationTarget {
 				doc.getG().squareWidth = shapeWidth;
 				doc.getG().saveCornerLocations(doc.utils.markers.get(0));
 				saveLandmarks(doc.markerWidth, doc.markerHeight, doc.getG().corners,
-						String.format("EcoCheck rows=%d cols=%d err=%d markers=%d",
-								rows, columns, chessBitsError, numMarkers));
+						String.format("EcoCheck rows=%d cols=%d err=%d csum=%d markers=%d",
+								rows, columns, chessBitsError, ecocheckChecksum, numMarkers));
 			}
 			return;
 		} else if (type == CalibrationPatterns.HAMMING_CHESSBOARD) {
@@ -353,9 +358,10 @@ public class CreateCalibrationTarget {
 
 	public static CreateECoCheckDocumentPDF ecoCheckToPdf( String outputFile, PaperSize paper, Unit units,
 														   int rows, int columns, float squareWidth,
-														   int numMarkers, int errorLevel ) throws IOException {
+														   int numMarkers, int errorLevel, int checksum ) throws IOException {
 		ECoCheckUtils utils = new ECoCheckUtils();
 		utils.codec.setErrorCorrectionLevel(errorLevel);
+		utils.codec.setChecksumBitCount(checksum);
 		for (int markerIdx = 0; markerIdx < numMarkers; markerIdx++) {
 			utils.addMarker(rows, columns);
 		}

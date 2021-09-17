@@ -322,6 +322,7 @@ public class DetectECoCheckApp extends DemonstrationBase {
 		JSpinnerNumber gridCols = spinnerWrap(configMarker.markerShapes.get(0).numCols, 4, 500, 1);
 		JSpinnerNumber numMarkers = spinnerWrap(configMarker.firstTargetDuplicated, 1, 1000, 1);
 		JSpinnerNumber errorLevel = spinnerWrap(configMarker.errorCorrectionLevel, 0, 10, 1);
+		JSpinnerNumber checksum = spinnerWrap(configMarker.checksumBits, 0, 8, 1);
 
 		int translucent = 0;
 
@@ -352,6 +353,7 @@ public class DetectECoCheckApp extends DemonstrationBase {
 			add(createGridShapePanel());
 			addLabeled(numMarkers.spinner, "Num. Markers");
 			addLabeled(errorLevel.spinner, "Error Level");
+			addLabeled(checksum.spinner, "Checksum");
 			add(tabbedPane);
 		}
 

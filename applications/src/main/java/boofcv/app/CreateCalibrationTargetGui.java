@@ -204,6 +204,7 @@ public class CreateCalibrationTargetGui extends JPanel
 				app.shapeWidth = (float)shape.squareSize;
 				app.numMarkers = config.firstTargetDuplicated;
 				app.chessBitsError = config.errorCorrectionLevel;
+				app.ecocheckChecksum = config.checksumBits;
 			}
 			case HAMMING_CHESSBOARD -> {
 				ConfigHammingChessboard config = (ConfigHammingChessboard)selectedCalib;
@@ -272,6 +273,7 @@ public class CreateCalibrationTargetGui extends JPanel
 
 			ECoCheckUtils utils = new ECoCheckUtils();
 			utils.codec.setErrorCorrectionLevel(c.errorCorrectionLevel);
+			utils.codec.setChecksumBitCount(c.checksumBits);
 			c.convertToGridList(utils.markers);
 			utils.fixate();
 			ConfigECoCheckMarkers.MarkerShape shape = c.markerShapes.get(0);
