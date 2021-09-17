@@ -24,6 +24,7 @@ import org.junit.jupiter.api.Test;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.lang.reflect.Modifier;
 import java.util.*;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -61,6 +62,8 @@ public abstract class StandardConfigurationChecks extends BoofStandardJUnit {
 			Object config = type.getConstructor().newInstance();
 			Field[] fields = type.getFields();
 			for (Field f : fields) {
+				if (Modifier.isStatic(f.getModifiers()))
+					continue;
 				if (f.getType().isEnum()) {
 					// Select an e num value which isn't the same as the current value
 					Object[] values = f.getType().getEnumConstants();
@@ -143,6 +146,8 @@ public abstract class StandardConfigurationChecks extends BoofStandardJUnit {
 			Field[] fields = type.getFields();
 			// first see if the not default configuration was set up correctly
 			for (Field f : fields) {
+				if (Modifier.isStatic(f.getModifiers()))
+					continue;
 				boolean onlyOneOption = false;
 
 				// If it's an enum with only one value then it can't be not equals
