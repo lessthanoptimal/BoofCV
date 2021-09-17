@@ -18,6 +18,7 @@
 
 package boofcv.abst.fiducial.calib;
 
+import boofcv.alg.fiducial.calib.ecocheck.ECoCheckCodec;
 import boofcv.misc.BoofMiscOps;
 import boofcv.struct.Configuration;
 import boofcv.struct.GridShape;
@@ -57,7 +58,7 @@ public class ConfigECoCheckMarkers implements Configuration {
 	 * different amounts of error correction they will be incompatible.
 	 * </p>
 	 *
-	 * 0 = no error correction. 10 = maximum amount.
+	 * 0 = no error correction. 9 = maximum amount.
 	 */
 	public int errorCorrectionLevel = DEFAULT_ECC;
 
@@ -178,9 +179,9 @@ public class ConfigECoCheckMarkers implements Configuration {
 		BoofMiscOps.checkFraction(dataBorderFraction, "dataBorderFraction must be 0 to 1.0.");
 		BoofMiscOps.checkTrue(firstTargetDuplicated >= 1);
 		BoofMiscOps.checkTrue(markerShapes.size() >= 1);
-		BoofMiscOps.checkTrue(errorCorrectionLevel >= 0 && errorCorrectionLevel <= 10,
-				"error correction must be from 0 to 10, inclusive.");
-		BoofMiscOps.checkTrue(checksumBits >= 0 && checksumBits <= 8,
+		BoofMiscOps.checkTrue(errorCorrectionLevel >= 0 && errorCorrectionLevel <= ECoCheckCodec.MAX_ECC_LEVEL,
+				"error correction must be from 0 to 9, inclusive.");
+		BoofMiscOps.checkTrue(checksumBits >= 0 && checksumBits <= ECoCheckCodec.MAX_CHECKSUM_BITS,
 				"checksum bits must be from 0 to 8, inclusive.");
 	}
 

@@ -212,7 +212,7 @@ public class CalibrationTargetPanel extends StandardAlgConfigPanel {
 			sCols = spinner(shape.numCols, 1, 1000, 1);
 			sWidth = spinner(shape.squareSize, 0, 1000000.0, 1);
 			sMarkers = spinner(configECoCheck.firstTargetDuplicated, 1, 1000, 1);
-			comboErrorLevel = combo(configECoCheck.errorCorrectionLevel, "0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "10");
+			comboErrorLevel = combo(configECoCheck.errorCorrectionLevel, "0", "1", "2", "3", "4", "5", "6", "7", "8", "9");
 			comboChecksum = combo(configECoCheck.checksumBits, "0", "1", "2", "3", "4", "5", "6", "7", "8");
 
 			addLabeled(sRows, "Rows", "Number of square rows");

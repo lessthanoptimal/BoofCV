@@ -27,17 +27,24 @@ import org.ddogleg.struct.DogArray_I8;
 
 /**
  * Encodes and decodes the marker ID and cell ID from an encoded cell in a calibration target. The maximum number
- * of possible markers and cells in a marker must be known in advance to decode and encode [1]. Error correction
- * is provided bye Reed Solomon encoding and the amount of error correction is configurable. If there is extra
- * words available in the data grid then the amount of error correction is increased.
+ * of possible markers and cells in a marker must be known in advance to decode and encode [1]. Validation
+ * is done using a checksum and optional Reed Solomon error correction code (ECC) is provided to fix errors. The amount
+ * of ECC is configurable. If ECC is turned on and there are extra bits, then those bits will be used for additional
+ * error correction, if possible.
  *
  * <p>
- * Words (8-bit data chunks) are laid out in a pattern that's designed to keep each individual word's bits as close
- * to eac other as possible. The error correction words on a per-word basis and not a per-bit basis. Dirt or damage
- * tends to be located within a small spatial region and you want to minimize the number of words it corrupts.
- * <p>
+ * The checksum was provided as a way to catch some invalid encoding and employs a simple xor strategy. It was found
+ * that this checksum was needed even when ECC was turned on because for smaller messages it had an unacceptable
+ * false positive rate. The number of bits for the checksum is {@link #checksumBitCount configurable}.
+ * </p>
  *
- * TODO describe Reed-Solomon codes an how they are used.
+ * <p>
+ * The Reed Solomon encoding used in ECoCheck is the same as what's used in QR Codes. It can detect and fix
+ * errors inside of 8-bit words. Two words are needed to detect and recover from an error in a single word. This
+ * will increase the packet size as an encoded message has to now be contained inside of "word" sized chunks and
+ * several extra words are required to fix errors. The amount of error correction can be
+ * {@link #errorCorrectionLevel configured}.
+ * </p>
  *
  * <p>
  * Number of bits used to encode the two ID numbers is dynamically determined based on their maximum value. The minimum
@@ -51,24 +58,23 @@ import org.ddogleg.struct.DogArray_I8;
  *     <li>K-bits: XOR Checksum</li>
  * </ul>
  *
- * TODO merge marker ID and cell ID into a single number
- *
  * [1] An earlier design was considered that did encode this information in the marker. It typically increased the bit
  * grid size by 1 but didn't remove the need to have prior information about the target to decode the target.
  *
  * @author Peter Abeles
  */
 public class ECoCheckCodec {
-	// TODO locate the bits spatially close to each for a single word so that local damage doesn't screw up
-	//      multiple words
+	// Design Note: Encoding marker and cell ID as a single value saves at most a single bit in practical scenarios
+	//              so it was decided to keep them separate to make the packet easier to understand.
+
+	public final static int MAX_ECC_LEVEL = 9;
+	public final static int MAX_CHECKSUM_BITS = 8;
+
+	/** Number of bits per word */
+	public final static int WORD_BITS = 8;
 
 	/**
-	 * Number of bits per word
-	 */
-	public final int WORD_BITS = 8;
-
-	/**
-	 * Used to adjust the amount of error correction. Larger values mean more error correction. 0 = non. 10 = max.
+	 * Used to adjust the amount of error correction. Larger values mean more error correction. 0 = none. 9 = max.
 	 */
 	@Getter @Setter int errorCorrectionLevel = 3;
 	// this is an integer and not a float to make configuring easier and more precise to the user
@@ -121,7 +127,8 @@ public class ECoCheckCodec {
 	 * @param numUniqueCells Maximum number of unique cell IDs in a marker required
 	 */
 	public void configure( int numUniqueMarkers, int numUniqueCells ) {
-		BoofMiscOps.checkTrue(checksumBitCount >= 0 && checksumBitCount <= 8);
+		BoofMiscOps.checkTrue(checksumBitCount >= 0 && checksumBitCount <= MAX_CHECKSUM_BITS);
+		BoofMiscOps.checkTrue(errorCorrectionLevel >= 0 && errorCorrectionLevel <= MAX_ECC_LEVEL);
 
 		markerBitCount = numUniqueMarkers == 1 ? 0 : (int)Math.ceil(Math.log(numUniqueMarkers)/Math.log(2));
 		cellBitCount = (int)Math.ceil(Math.log(numUniqueCells)/Math.log(2));
@@ -277,6 +284,6 @@ public class ECoCheckCodec {
 	 * Converts the level into a fraction
 	 */
 	public double errorCorrectionFraction() {
-		return errorCorrectionLevel/10.0;
+		return errorCorrectionLevel/(double)MAX_ECC_LEVEL;
 	}
 }

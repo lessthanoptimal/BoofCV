@@ -103,7 +103,7 @@ public class CreateCalibrationTarget {
 	@Option(name = "--NumMarkers", usage = "If the target type supports multiple markers, how many should it create")
 	int numMarkers = 1;
 
-	@Option(name = "--ECoCheckError", usage = "Error correction level for ECoCheck. 0 is no error correction. 0 to 10")
+	@Option(name = "--ECoCheckError", usage = "Error correction level for ECoCheck. 0 is no error correction. 0 to 9")
 	int chessBitsError = new ConfigECoCheckMarkers().errorCorrectionLevel;
 
 	@Option(name = "--ECoCheckChecksum", usage = "Checksum bits. 0 to 8.")
@@ -212,8 +212,8 @@ public class CreateCalibrationTarget {
 					failExit("Don't specify center distance for chessboard targets");
 				if (shapeSpace > 0)
 					failExit("Don't specify center distance for chessboard targets");
-				if (chessBitsError < 0 || chessBitsError > 10)
-					failExit("Error level must be 0 to 10, inclusive");
+				if (chessBitsError < 0 || chessBitsError > 9)
+					failExit("Error level must be 0 to 9, inclusive");
 				if (ecocheckChecksum < 0 || ecocheckChecksum > 8)
 					failExit("Checksum must be 0 to 8, inclusive");
 				if (numMarkers <= 0)
