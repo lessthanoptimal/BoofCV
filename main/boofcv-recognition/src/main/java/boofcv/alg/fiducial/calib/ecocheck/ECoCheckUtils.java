@@ -18,6 +18,7 @@
 
 package boofcv.alg.fiducial.calib.ecocheck;
 
+import boofcv.abst.fiducial.calib.ConfigECoCheckMarkers;
 import boofcv.alg.filter.binary.GThresholdImageOps;
 import boofcv.alg.geo.h.HomographyDirectLinearTransform;
 import boofcv.struct.GridCoordinate;
@@ -85,6 +86,17 @@ public class ECoCheckUtils {
 
 	{
 		histogram.resize(100);
+	}
+
+	/**
+	 * Assign all parameters from a config class as possible
+	 */
+	public void setParametersFromConfig( ConfigECoCheckMarkers config ) {
+		this.dataBitWidthFraction = config.dataBitWidthFraction;
+		this.dataBorderFraction = config.dataBorderFraction;
+		this.codec.setChecksumBitCount(config.checksumBits);
+		this.codec.setErrorCorrectionLevel(config.errorCorrectionLevel);
+		config.convertToGridList(markers);
 	}
 
 	/**

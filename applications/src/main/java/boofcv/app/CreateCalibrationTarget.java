@@ -359,12 +359,12 @@ public class CreateCalibrationTarget {
 	public static CreateECoCheckDocumentPDF ecoCheckToPdf( String outputFile, PaperSize paper, Unit units,
 														   int rows, int columns, float squareWidth,
 														   int numMarkers, int errorLevel, int checksum ) throws IOException {
-		ECoCheckUtils utils = new ECoCheckUtils();
-		utils.codec.setErrorCorrectionLevel(errorLevel);
-		utils.codec.setChecksumBitCount(checksum);
-		for (int markerIdx = 0; markerIdx < numMarkers; markerIdx++) {
-			utils.addMarker(rows, columns);
-		}
+		ConfigECoCheckMarkers config = ConfigECoCheckMarkers.singleShape(rows, columns, numMarkers, squareWidth);
+		config.errorCorrectionLevel = errorLevel;
+		config.checksumBits = checksum;
+
+		var utils = new ECoCheckUtils();
+		utils.setParametersFromConfig(config);
 		utils.fixate();
 
 		var doc = new CreateECoCheckDocumentPDF(outputFile, paper, units);

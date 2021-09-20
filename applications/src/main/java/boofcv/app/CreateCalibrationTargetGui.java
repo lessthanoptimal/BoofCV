@@ -272,9 +272,7 @@ public class CreateCalibrationTargetGui extends JPanel
 			ConfigECoCheckMarkers c = (ConfigECoCheckMarkers)selectedCalib;
 
 			ECoCheckUtils utils = new ECoCheckUtils();
-			utils.codec.setErrorCorrectionLevel(c.errorCorrectionLevel);
-			utils.codec.setChecksumBitCount(c.checksumBits);
-			c.convertToGridList(utils.markers);
+			utils.setParametersFromConfig(c);
 			utils.fixate();
 			ConfigECoCheckMarkers.MarkerShape shape = c.markerShapes.get(0);
 

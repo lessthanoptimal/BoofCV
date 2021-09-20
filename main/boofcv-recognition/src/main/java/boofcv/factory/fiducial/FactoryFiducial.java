@@ -247,11 +247,7 @@ public class FactoryFiducial {
 
 		// Set up the utils, which configures how the targets will be encoded
 		var utils = new ECoCheckUtils();
-		utils.codec.setErrorCorrectionLevel(configMarkers.errorCorrectionLevel);
-		utils.codec.setChecksumBitCount(configMarkers.checksumBits);
-		utils.setDataBorderFraction(configMarkers.dataBorderFraction);
-		utils.setDataBitWidthFraction(configMarkers.dataBitWidthFraction);
-		configMarkers.convertToGridList(utils.markers);
+		utils.setParametersFromConfig(configMarkers);
 		utils.fixate();
 
 		var alg = new ECoCheckDetector<>(utils, configDetector.chessboard, imageType);
