@@ -67,6 +67,9 @@ public class ECoCheckUtils {
 	/** Used to encode and decode bit streams with coordinate information */
 	public final ECoCheckCodec codec = new ECoCheckCodec();
 
+	/** How bits are ordered. This is done to make bits which are in the same  word spatially close to each other */
+	public final DogArray_I32 bitOrder = new DogArray_I32();
+
 	// Used to compute the homography from square coordinates into image pixels
 	HomographyDirectLinearTransform dlt = new HomographyDirectLinearTransform(true);
 	DogArray<AssociatedPair> storagePairs2D = new DogArray<>(AssociatedPair::new);
@@ -101,6 +104,7 @@ public class ECoCheckUtils {
 		codec.configure(markers.size(), findMaxEncodedSquares());
 
 		bitSampleCount = bitSampleGridSize*2 + 1;
+		new ECoCheckLayout().selectSnake(codec.gridBitLength, bitOrder);
 	}
 
 	public void checkFixate() {
@@ -116,8 +120,8 @@ public class ECoCheckUtils {
 		for (int i = 0; i < markers.size(); i++) {
 			GridShape g = markers.get(i);
 
-			int rows = g.rows-2;
-			int cols = g.cols-2;
+			int rows = g.rows - 2;
+			int cols = g.cols - 2;
 
 			int count = (rows/2)*cols + (rows%2)*(cols/2);
 			if (count > largest) {
