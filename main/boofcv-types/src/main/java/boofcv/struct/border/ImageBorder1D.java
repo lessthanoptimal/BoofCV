@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -19,6 +19,9 @@
 package boofcv.struct.border;
 
 /**
+ * Interface for classes that modify the coordinate of a pixel so that it will always reference a pixel inside
+ * the image. This is done independently for x and y axes. E.g. x=-1 will become x=0.
+ *
  * @author Peter Abeles
  */
 public interface ImageBorder1D {

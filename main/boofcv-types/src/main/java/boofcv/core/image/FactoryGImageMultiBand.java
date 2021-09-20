@@ -26,6 +26,8 @@ import boofcv.struct.border.ImageBorder_IL_S32;
 import boofcv.struct.image.*;
 
 /**
+ * Creates {@link GImageMultiBand} for different image types.
+ *
  * @author Peter Abeles
  */
 @SuppressWarnings({"rawtypes", "unchecked"})

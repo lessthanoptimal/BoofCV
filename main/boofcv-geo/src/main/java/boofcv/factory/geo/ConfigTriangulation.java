@@ -27,6 +27,8 @@ import boofcv.misc.ConfigConverge;
 import boofcv.struct.Configuration;
 
 /**
+ * Configuration for triangulation methods.
+ *
  * @author Peter Abeles
  */
 public class ConfigTriangulation implements Configuration {

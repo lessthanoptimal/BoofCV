@@ -54,7 +54,6 @@ import javax.swing.event.ChangeListener;
 import java.awt.*;
 import java.awt.event.*;
 import java.awt.geom.AffineTransform;
-import java.awt.geom.Line2D;
 import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 import java.util.List;
@@ -298,7 +297,6 @@ public class DetectCalibrationChessboardXCornerApp
 				g2.setComposite(beforeAC);
 			}
 
-			Line2D.Double line = new Line2D.Double();
 			if (controlPanel.showCorners) {
 				synchronized (lockCorners) {
 					visualizeUtils.visualizeCorners(g2, scale, controlPanel.detMinPyrLevel, controlPanel.showNumbers);

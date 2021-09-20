@@ -30,6 +30,8 @@ import org.ejml.data.DMatrixRMaj;
 import java.util.List;
 
 /**
+ * Camera parameters for model {@link boofcv.struct.calib.CameraPinholeBrown}.
+ *
  * @author Peter Abeles
  */
 public class Zhang99CameraBrown implements Zhang99Camera {

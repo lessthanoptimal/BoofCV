@@ -30,6 +30,8 @@ import org.ejml.data.DMatrixRMaj;
 import java.util.List;
 
 /**
+ * Camera parameters for model {@link CameraUniversalOmni}.
+ *
  * @author Peter Abeles
  */
 public class Zhang99CameraUniversalOmni implements Zhang99Camera {

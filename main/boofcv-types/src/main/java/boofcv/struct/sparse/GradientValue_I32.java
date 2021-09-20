@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -19,6 +19,8 @@
 package boofcv.struct.sparse;
 
 /**
+ * Specifies a pixel's gradient using integer values.
+ *
  * @author Peter Abeles
  */
 public class GradientValue_I32 implements GradientValue {

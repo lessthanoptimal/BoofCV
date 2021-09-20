@@ -25,6 +25,7 @@ import org.ddogleg.struct.FastArray;
 
 import java.io.*;
 import java.net.URL;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -181,7 +182,7 @@ public class ConfigHammingMarker implements Configuration {
 		URL path = Objects.requireNonNull(ConfigHammingMarker.class.getResource(name + ".txt"));
 
 		try (InputStream stream = path.openStream()) {
-			String text = new BufferedReader(new InputStreamReader(stream))
+			String text = new BufferedReader(new InputStreamReader(stream, StandardCharsets.UTF_8))
 					.lines().collect(Collectors.joining("\n"));
 			return decodeDictionaryString(text);
 		} catch (IOException e) {

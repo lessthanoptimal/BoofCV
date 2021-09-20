@@ -537,7 +537,7 @@ public class PnPLepetitEPnP {
 
 	/**
 	 * Given the set of betas it computes a new set of control points and adjust sthe scale
-	 * using the {@link ##matchScale} function.
+	 * using the {@link #matchScale} function.
 	 */
 	private void refine( double[] betas ) {
 		for (int i = 0; i < numControl; i++) {

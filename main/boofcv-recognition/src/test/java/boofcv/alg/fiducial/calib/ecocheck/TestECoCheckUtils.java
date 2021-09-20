@@ -153,17 +153,17 @@ public class TestECoCheckUtils extends BoofStandardJUnit {
 
 		var found = new GridCoordinate();
 		alg.cellIdToCornerCoordinate(0, 0, found);
-		assertTrue(found.equals(0, 1));
+		assertTrue(found.identical(0, 1));
 		alg.cellIdToCornerCoordinate(0, 1, found);
-		assertTrue(found.equals(1, 0));
+		assertTrue(found.identical(1, 0));
 		alg.cellIdToCornerCoordinate(0, 2, found);
-		assertTrue(found.equals(1, 2));
+		assertTrue(found.identical(1, 2));
 		alg.cellIdToCornerCoordinate(0, 3, found);
-		assertTrue(found.equals(2, 1));
+		assertTrue(found.identical(2, 1));
 		alg.cellIdToCornerCoordinate(0, 4, found);
-		assertTrue(found.equals(3, 0));
+		assertTrue(found.identical(3, 0));
 		alg.cellIdToCornerCoordinate(0, 5, found);
-		assertTrue(found.equals(3, 2));
+		assertTrue(found.identical(3, 2));
 	}
 
 	@Test void cellToCoordinate_case1() {
@@ -173,17 +173,17 @@ public class TestECoCheckUtils extends BoofStandardJUnit {
 
 		var found = new GridCoordinate();
 		alg.cellIdToCornerCoordinate(0, 0, found);
-		assertTrue(found.equals(0, 1));
+		assertTrue(found.identical(0, 1));
 		alg.cellIdToCornerCoordinate(0, 1, found);
-		assertTrue(found.equals(0, 3));
+		assertTrue(found.identical(0, 3));
 		alg.cellIdToCornerCoordinate(0, 2, found);
-		assertTrue(found.equals(1, 0));
+		assertTrue(found.identical(1, 0));
 		alg.cellIdToCornerCoordinate(0, 3, found);
-		assertTrue(found.equals(1, 2));
+		assertTrue(found.identical(1, 2));
 		alg.cellIdToCornerCoordinate(0, 4, found);
-		assertTrue(found.equals(2, 1));
+		assertTrue(found.identical(2, 1));
 		alg.cellIdToCornerCoordinate(0, 5, found);
-		assertTrue(found.equals(2, 3));
+		assertTrue(found.identical(2, 3));
 	}
 
 	/**
@@ -196,13 +196,13 @@ public class TestECoCheckUtils extends BoofStandardJUnit {
 
 		var found = new GridCoordinate();
 		alg.cellIdToCornerCoordinate(0, 0, found);
-		assertTrue(found.equals(0, 1));
+		assertTrue(found.identical(0, 1));
 		alg.cellIdToCornerCoordinate(0, 1, found);
-		assertTrue(found.equals(0, 3));
+		assertTrue(found.identical(0, 3));
 		alg.cellIdToCornerCoordinate(0, 2, found);
-		assertTrue(found.equals(1, 0));
+		assertTrue(found.identical(1, 0));
 		alg.cellIdToCornerCoordinate(0, 3, found);
-		assertTrue(found.equals(1, 2));
+		assertTrue(found.identical(1, 2));
 	}
 
 	/**

@@ -263,7 +263,7 @@ public class SimulatePlanarWorld {
 		});
 	}
 
-	class RenderPixel {
+	static class RenderPixel {
 		// Pixel intensity on the surface where the ray hits
 		public float value;
 		// View depth at the location the ray hits

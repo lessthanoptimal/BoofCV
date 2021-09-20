@@ -287,7 +287,8 @@ public class DetectFiducialSquareHammingApp extends DemonstrationBase implements
 		JCheckBoxValue showContour = checkboxWrap("Contour", false);
 		JCheckBoxValue showLabels = checkboxWrap("Labels", false);
 		JCheckBoxValue printVerbose = checkboxWrap("Verbose", false).tt("Prints verbose messages to stdout");
-		JComboBox<String> comboDictionary = combo(configMarker.dictionary.ordinal() - 1, HammingDictionary.allPredefined());
+		JComboBox<String> comboDictionary = combo(configMarker.dictionary.ordinal() - 1,
+				(Object[])HammingDictionary.allPredefined());
 
 		DetectBlackPolygonControlPanel polygonPanel;
 

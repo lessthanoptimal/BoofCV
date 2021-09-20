@@ -21,6 +21,9 @@ package boofcv.struct.border;
 import boofcv.struct.image.InterleavedF64;
 
 /**
+ * Image border is handled independently along each axis by changing the indexes so that it references a pixel
+ * inside the image. For {@link ImageBorder_IL_F64}.
+ *
  * @author Peter Abeles
  */
 public class ImageBorder1D_IL_F64 extends ImageBorder_IL_F64 implements ImageBorder1D {

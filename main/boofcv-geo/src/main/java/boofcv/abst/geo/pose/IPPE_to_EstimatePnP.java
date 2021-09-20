@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -29,6 +29,8 @@ import org.ddogleg.struct.DogArray;
 import java.util.List;
 
 /**
+ * Wrapper around {@link PnPInfinitesimalPlanePoseEstimation} for {@link Estimate1ofPnP}.
+ *
  * @author Peter Abeles
  */
 public class IPPE_to_EstimatePnP implements Estimate1ofPnP {

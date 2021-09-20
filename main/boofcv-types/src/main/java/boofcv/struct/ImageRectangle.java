@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -22,6 +22,8 @@ import georegression.metric.Intersection2D_I32;
 import georegression.struct.shapes.Rectangle2D_I32;
 
 /**
+ * Axis aligned rectangle with integer values for use on images.
+ *
  * @author Peter Abeles
  */
 public class ImageRectangle extends Rectangle2D_I32 {

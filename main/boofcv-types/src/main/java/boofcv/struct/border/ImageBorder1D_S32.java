@@ -21,6 +21,9 @@ package boofcv.struct.border;
 import boofcv.struct.image.GrayI;
 
 /**
+ * Image border is handled independently along each axis by changing the indexes so that it references a pixel
+ * inside the image. For {@link ImageBorder_S32}.
+ *
  * @author Peter Abeles
  */
 public class ImageBorder1D_S32<T extends GrayI<T>> extends ImageBorder_S32<T> implements ImageBorder1D {

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -19,11 +19,12 @@
 package boofcv.misc;
 
 /**
+ * Used in profiling. This approach has been replaced by JMH.
+ *
  * @author Peter Abeles
  */
 public interface Performer {
+	void process();
 
-	public void process();
-
-	public String getName();
+	String getName();
 }

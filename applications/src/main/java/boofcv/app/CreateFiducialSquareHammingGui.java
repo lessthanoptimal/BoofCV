@@ -101,7 +101,7 @@ public class CreateFiducialSquareHammingGui extends CreateSquareFiducialGui {
 		DefaultListModel<Long> listModel = new DefaultListModel<>();
 		JList<Long> listPatterns = new JList<>(listModel);
 		DogArray_I32 patterns = new DogArray_I32();
-		JComboBox<String> comboEncoding = combo(encoding, HammingDictionary.allPredefined());
+		JComboBox<String> comboEncoding = combo(encoding, (Object[])HammingDictionary.allPredefined());
 
 		public ControlPanel( Listener listener ) {
 			super(listener);

@@ -28,6 +28,7 @@ import lombok.Getter;
 import java.awt.*;
 import java.awt.geom.AffineTransform;
 import java.awt.geom.Ellipse2D;
+import java.awt.geom.Rectangle2D;
 import java.awt.image.BufferedImage;
 
 /**
@@ -37,7 +38,7 @@ public class FiducialRenderEngineGraphics2D extends FiducialRenderEngine {
 	@Getter protected BufferedImage image = new BufferedImage(1, 1, BufferedImage.TYPE_INT_RGB);
 	protected Graphics2D g2;
 	protected Ellipse2D.Double ellipse = new Ellipse2D.Double();
-	protected Rectangle.Double rect = new Rectangle.Double();
+	protected Rectangle2D.Double rect = new Rectangle2D.Double();
 
 	// number of pixels in the border
 	@Getter private int borderPixelsX;

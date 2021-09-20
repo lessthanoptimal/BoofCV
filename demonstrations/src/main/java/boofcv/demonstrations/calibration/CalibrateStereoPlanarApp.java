@@ -845,7 +845,7 @@ public class CalibrateStereoPlanarApp extends JPanel {
 		JCheckBoxValue checkNumbers = checkboxWrap("Numbers", false).tt("Draw feature numbers");
 		JCheckBoxValue checkOrder = checkboxWrap("Order", true).tt("Visualize landmark order");
 		JSpinnerNumber selectErrorScale = spinnerWrap(10.0, 0.1, 1000.0, 2.0);
-		JComboBox<String> comboRect = combo(rectType.ordinal(), RectifyFillType.values());
+		JComboBox<String> comboRect = combo(rectType.ordinal(), (Object[])RectifyFillType.values());
 
 		@Getter ControlPanelPinhole pinhole = new ControlPanelPinhole(() -> settingsChanged(false, true));
 		@Getter CalibrationTargetPanel targetPanel = new CalibrationTargetPanel(( a, b ) -> handleUpdatedTarget());

@@ -99,7 +99,7 @@ public abstract class ConfigGenerator<Config extends Configuration> {
 	 */
 	public <E extends Enum<E>> void setOfEnums( String parameter, Enum<E>... values ) {
 		checkPath(parameter, values[0].getDeclaringClass());
-		parameters.add(new SetOfObjects(parameter, BoofMiscOps.asList((Enum<E>[])values)));
+		parameters.add(new SetOfObjects(parameter, BoofMiscOps.asList((Object[])values)));
 	}
 
 	/**

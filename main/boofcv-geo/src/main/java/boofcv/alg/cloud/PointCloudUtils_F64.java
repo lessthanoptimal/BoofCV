@@ -32,6 +32,8 @@ import org.jetbrains.annotations.Nullable;
 import java.util.List;
 
 /**
+ * Various utility functions for working with point clouds with a float type of double.
+ *
  * @author Peter Abeles
  */
 public class PointCloudUtils_F64 {

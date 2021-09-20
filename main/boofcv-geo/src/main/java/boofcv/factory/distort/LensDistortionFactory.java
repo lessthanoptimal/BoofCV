@@ -27,6 +27,8 @@ import boofcv.alg.distort.universal.LensDistortionUniversalOmni;
 import boofcv.struct.calib.*;
 
 /**
+ * Factory for lens distortion given different built-in camera models.
+ *
  * @author Peter Abeles
  */
 public class LensDistortionFactory {

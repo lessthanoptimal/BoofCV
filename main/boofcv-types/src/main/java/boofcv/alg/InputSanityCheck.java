@@ -24,9 +24,10 @@ import boofcv.struct.pyramid.ImagePyramid;
 import org.jetbrains.annotations.Nullable;
 
 /**
+ * Operations for basic sanity checks on function arguments. Checks if the contract is being obeyed by the caller.
+ *
  * @author Peter Abeles
  */
-// todo move to misc?
 public class InputSanityCheck {
 
 	/**

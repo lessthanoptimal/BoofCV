@@ -19,6 +19,8 @@
 package boofcv.struct;
 
 /**
+ * Coordinate in a 2D grid. I.e. row and column.
+ *
  * @author Peter Abeles
  */
 public class GridCoordinate {
@@ -37,11 +39,11 @@ public class GridCoordinate {
 		this.col = col;
 	}
 
-	public boolean equals( int row, int col ) {
+	public boolean identical( int row, int col ) {
 		return this.row == row && this.col == col;
 	}
 
-	public boolean equals( GridCoordinate a ) {
+	public boolean identical( GridCoordinate a ) {
 		return this.row == a.row && this.col == a.col;
 	}
 

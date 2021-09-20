@@ -33,6 +33,8 @@ import org.ddogleg.struct.DogArray_I32;
  */
 public interface PointCloudWriter {
 	/**
+	 * Initializes and passes in configurations.
+	 *
 	 * @param size Estimated size of the point cloud. Passes in a value &le; 0 if it's unknown
 	 * @param hasColor true if the cloud has color information
 	 */

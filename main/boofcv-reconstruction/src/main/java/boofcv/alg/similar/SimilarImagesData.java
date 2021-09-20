@@ -94,7 +94,7 @@ public class SimilarImagesData implements LookUpSimilarImages {
 			AssociatedIndex b = matches.get(i);
 
 			if (swapped) {
-				a.setTo(b.dst, b.src);
+				a.setTo(/* src= */b.dst, /* dst= */b.src);
 			} else {
 				a.setTo(b);
 			}
@@ -135,7 +135,7 @@ public class SimilarImagesData implements LookUpSimilarImages {
 			pairs.resetResize(related.pairs.size);
 			for (int i = 0; i < pairs.size; i++) {
 				AssociatedIndex b = related.pairs.get(i);
-				pairs.get(i).setTo(b.dst, b.src);
+				pairs.get(i).setTo(/* src= */b.dst, /* dst= */b.src);
 			}
 		} else {
 			Relationship related = Objects.requireNonNull(targetInfo.findRelated(similarD));

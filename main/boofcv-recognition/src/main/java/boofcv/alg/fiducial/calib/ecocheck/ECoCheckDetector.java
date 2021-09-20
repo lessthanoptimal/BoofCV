@@ -356,10 +356,6 @@ public class ECoCheckDetector<T extends ImageGray<T>> implements VerbosePrint {
 		}
 	}
 
-	private boolean isBlackGridCoordinate( int row, int col ) {
-		return (row%2 == 1 && col%2 == 1) || (row%2 == 0 && col%2 == 0);
-	}
-
 	/**
 	 * Decode the bits and sanity check the solution to see if it could be correct.
 	 */

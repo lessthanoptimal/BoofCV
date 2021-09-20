@@ -27,6 +27,10 @@ Version : 0.39
 - Fiducial Markers
   * Added support for ArUco and AprilTags as "HammingMarkers"
   * Added calibration targets Hamming Marker grid and chessboard, e.g. ChaRuCo and ArUco grids.
+
+TODO code compliance
+     MissingSummary for sfm, simulation, and reconstruction
+
 TODO datta2009
 TODO Monocular VO
 TODO Monocular SLAM
