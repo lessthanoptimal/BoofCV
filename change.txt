@@ -10,7 +10,7 @@ Version : 0.39
   * Calibration target generator supports more targets
   * Add option to save landmarks locations on PDF document
   * New monocular calibration GUI app
-  * TODO add stereo calibration app
+  * New stereo calibration app
 - Image Processing
   * Added function for PSF for linear motion blur
   * GConvolveImage - can now pass in BorderType
@@ -21,9 +21,7 @@ Version : 0.39
   * Two high level calibration detection APIs. One for single target and one for multiple targets
   * Added support for full Kannala-Brandt fisheye camera model
   * Added new ECoCheck marker for multi camera calibration
-    TODO finalize binary bit pattern
     TODO Add to current mono camera calibration example
-    TODO add to assisted calibration
   * Removed Square Grid Binary target type as it was never reliable enough to flush out entirely and never used
   * TODO Multi Camera Calibration API
 - Fiducial Markers

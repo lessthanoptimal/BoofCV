@@ -25,7 +25,6 @@ import boofcv.abst.geo.calibration.DetectSingleFiducialCalibration;
 import boofcv.alg.fiducial.calib.ConfigCalibrationTarget;
 import boofcv.app.calib.AssistedCalibration;
 import boofcv.app.calib.AssistedCalibrationGui;
-import boofcv.app.calib.ComputeGeometryScore;
 import boofcv.demonstrations.calibration.CalibrateMonocularPlanarApp;
 import boofcv.factory.fiducial.FactoryFiducialCalibration;
 import boofcv.gui.controls.CalibrationModelPanel;
@@ -623,8 +622,6 @@ public class CameraCalibration extends BaseStandardInputApp {
 			}
 		}));
 
-		final DetectSingleFiducialCalibration detector = FactoryFiducialCalibration.genericSingle(configTarget);
-		ComputeGeometryScore quality = new ComputeGeometryScore(zeroSkew, detector.getLayout());
 		AssistedCalibrationGui gui = new AssistedCalibrationGui(webcam.getViewSize());
 		JFrame frame = ShowImages.showWindow(gui, "Webcam Calibration", true);
 
@@ -636,7 +633,8 @@ public class CameraCalibration extends BaseStandardInputApp {
 						"  Desired: " + desiredWidth + " " + desiredHeight);
 		}
 
-		AssistedCalibration assisted = new AssistedCalibration(detector, quality, gui, OUTPUT_DIRECTORY, IMAGE_DIRECTORY);
+		var assisted = new AssistedCalibration(gui, OUTPUT_DIRECTORY, IMAGE_DIRECTORY);
+		SwingUtilities.invokeLater(() -> assisted.gui.getTargetPanel().configPanel.setConfigurationTo(configTarget));
 		assisted.init(gray.width, gray.height);
 
 		BufferedImage image;
@@ -646,6 +644,7 @@ public class CameraCalibration extends BaseStandardInputApp {
 			try {
 				assisted.process(gray, image);
 			} catch (RuntimeException e) {
+				e.printStackTrace();
 				System.err.println("BUG!!! saving image to crash_image.png");
 				UtilImageIO.saveImage(image, "crash_image.png");
 				throw e;
@@ -654,6 +653,9 @@ public class CameraCalibration extends BaseStandardInputApp {
 		webcam.close();
 		if (assisted.isFinished()) {
 			frame.setVisible(false);
+
+			// Update target description to whatever the user selected
+			assisted.gui.getTargetPanel().configPanel.updateConfig(configTarget);
 
 			inputPattern = new File(OUTPUT_DIRECTORY, IMAGE_DIRECTORY).getPath();
 			outputFilePath = new File(OUTPUT_DIRECTORY, "intrinsic.yaml").getPath();

@@ -18,6 +18,7 @@
 
 package boofcv.app.calib;
 
+import boofcv.abst.fiducial.calib.ConfigECoCheckMarkers;
 import boofcv.alg.fiducial.calib.ecocheck.ECoCheckGenerator;
 import boofcv.alg.fiducial.calib.ecocheck.ECoCheckUtils;
 import boofcv.app.PaperSize;
@@ -98,13 +99,21 @@ public class CreateECoCheckDocumentPDF extends CreateFiducialDocumentPDF {
 
 	public void render( ECoCheckUtils utils ) throws IOException {
 		this.utils = utils;
-
 		totalMarkers = utils.markers.size();
+
+		// Create a config to generate shorthand description
+		String shorthand;
+		{
+			GridShape shape = utils.markers.get(0);
+			ConfigECoCheckMarkers config = ConfigECoCheckMarkers.singleShape(shape.rows, shape.cols, totalMarkers, 1);
+			config.checksumBits = utils.codec.getChecksumBitCount();
+			config.errorCorrectionLevel = utils.codec.getErrorCorrectionLevel();
+			shorthand = config.compactName();
+		}
+
 		names = new ArrayList<>();
 		for (int i = 0; i < totalMarkers; i++) {
-			GridShape shape = utils.markers.get(i);
-			names.add(String.format("ID: %d, markers=%d, rows=%d, cols=%d, error=%d",
-					i, totalMarkers, shape.rows, shape.cols, utils.codec.getErrorCorrectionLevel()));
+			names.add(String.format("ID: %d, config=%s", i, shorthand));
 		}
 
 		render();

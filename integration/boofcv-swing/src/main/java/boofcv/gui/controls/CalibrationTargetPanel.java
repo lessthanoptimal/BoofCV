@@ -160,6 +160,22 @@ public class CalibrationTargetPanel extends StandardAlgConfigPanel {
 		panelTarget.repaint();
 	}
 
+	public void updateConfig( ConfigCalibrationTarget config ) {
+		config.type = selected;
+
+		// Just update the selected type
+		switch (selected) {
+			case CHESSBOARD -> config.grid.setTo(configChessboard);
+			case ECOCHECK -> config.ecocheck.setTo(configECoCheck);
+			case SQUARE_GRID -> config.grid.setTo(configSquare);
+			case CIRCLE_GRID -> config.grid.setTo(configCircle);
+			case CIRCLE_HEXAGONAL -> config.grid.setTo(configCircleHex);
+			case HAMMING_CHESSBOARD -> config.hammingChess.setTo(configHammingChess);
+			case HAMMING_GRID -> config.hammingGrid.setTo(configHammingGrid);
+			default -> throw new RuntimeException("Target type not yet supported.");
+		};
+	}
+
 	public Object getActiveConfig() {
 		return switch (selected) {
 			case CHESSBOARD -> configChessboard;
@@ -167,6 +183,8 @@ public class CalibrationTargetPanel extends StandardAlgConfigPanel {
 			case SQUARE_GRID -> configSquare;
 			case CIRCLE_GRID -> configCircle;
 			case CIRCLE_HEXAGONAL -> configCircleHex;
+			case HAMMING_CHESSBOARD -> configHammingChess;
+			case HAMMING_GRID -> configHammingGrid;
 			default -> throw new RuntimeException("Target type not yet supported.");
 		};
 	}

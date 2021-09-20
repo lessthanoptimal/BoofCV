@@ -85,7 +85,21 @@ public class CalibrationObservation {
 		this.height = 0;
 	}
 
+	/**
+	 * Ensures the points order is in increasing order of index value
+	 */
 	public void sort() {
+		// check to see if they are already ordered first to avoid wasting CPU
+		boolean ordered = true;
+		for (int i = 1; i < points.size(); i++) {
+			if (points.get(i-1).index >= points.get(i).index) {
+				ordered = false;
+				break;
+			}
+		}
+		if (ordered)
+			return;
+
 		// Old style sort is used for java 1.8 compatibility
 		Collections.sort(points, Comparator.comparingInt(o -> o.index));
 	}

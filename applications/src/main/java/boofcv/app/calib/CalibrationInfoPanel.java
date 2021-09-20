@@ -18,6 +18,7 @@
 
 package boofcv.app.calib;
 
+import boofcv.gui.BoofSwingUtil;
 import boofcv.gui.StandardAlgConfigPanel;
 import boofcv.gui.image.ImagePanel;
 import boofcv.gui.image.ScaleOptions;
@@ -92,6 +93,20 @@ public class CalibrationInfoPanel extends StandardAlgConfigPanel
 		add(finishedButton);
 		add(Box.createVerticalGlue());
 		add(forceSaveButton);
+	}
+
+	public void resetGui() {
+		BoofSwingUtil.checkGuiThread();
+		imageTemplate = null;
+		imageView = null;
+		saveRequested = false;
+		forceSaveImage = false;
+		undistortedTemplate.setImageUI(null);
+		undistortedView.setImageUI(null);
+		geometryProgress.setValue(0);
+		fillProgress.setValue(0);
+		focusMeter.setValue(0);
+		finishedButton.setEnabled(false);
 	}
 
 	public void updateTemplate( GrayF32 image ) {

@@ -18,11 +18,9 @@
 
 package boofcv.app.calib;
 
-import boofcv.abst.fiducial.calib.CalibrationDetectorChessboardX;
-import boofcv.abst.fiducial.calib.CalibrationDetectorCircleHexagonalGrid;
-import boofcv.abst.fiducial.calib.CalibrationDetectorCircleRegularGrid;
-import boofcv.abst.fiducial.calib.CalibrationDetectorSquareGrid;
+import boofcv.abst.fiducial.calib.*;
 import boofcv.abst.geo.calibration.DetectSingleFiducialCalibration;
+import boofcv.abst.geo.calibration.MultiToSingleFiducialCalibration;
 import boofcv.alg.geo.calibration.CalibrationObservation;
 import boofcv.gui.BoofSwingUtil;
 import boofcv.io.UtilIO;
@@ -98,7 +96,9 @@ public class AssistedCalibration {
 	GrayF32 input;
 
 	// detects the calibration target
+	final Object detectorLock = new Object();
 	DetectSingleFiducialCalibration detector;
+	int totalLandmarks;
 
 	int imageSize;
 	int imageWidth, imageHeight;
@@ -113,7 +113,7 @@ public class AssistedCalibration {
 	Ellipse2D.Double ellipse = new Ellipse2D.Double();
 
 	DetectUserActions actions = new DetectUserActions();
-	AssistedCalibrationGui gui;
+	public AssistedCalibrationGui gui;
 
 	// used to compute the geometric quality of collected fiducials
 	ComputeGeometryScore quality;
@@ -137,15 +137,11 @@ public class AssistedCalibration {
 	/**
 	 * Constructor with configuration
 	 *
-	 * @param detector Target detector
-	 * @param quality Used to compute geometry score
 	 * @param gui Visualization
 	 * @param outputDirectory Root directory for where all output will be stored
 	 * @param imageDirectory Where images will be stored. Relative to outputDirectory
 	 */
-	public AssistedCalibration( DetectSingleFiducialCalibration detector,
-								ComputeGeometryScore quality,
-								AssistedCalibrationGui gui,
+	public AssistedCalibration( AssistedCalibrationGui gui,
 								String outputDirectory, String imageDirectory ) {
 		File outputDir = new File(outputDirectory);
 		if (outputDir.exists()) {
@@ -153,27 +149,51 @@ public class AssistedCalibration {
 			UtilIO.deleteRecursive(outputDir);
 		}
 
-		this.detector = detector;
 		this.gui = gui;
-		this.quality = quality;
+		gui.handleTargetChanged = this::handleTargetChanged;
 		this.saver = new ImageSelectorAndSaver(new File(outputDir, imageDirectory).getPath());
 
-		if (detector instanceof CalibrationDetectorChessboardX) {
-			view = new CalibrationView.Chessboard();
-		} else if (detector instanceof CalibrationDetectorSquareGrid) {
-			view = new CalibrationView.SquareGrid();
-		} else if (detector instanceof CalibrationDetectorCircleHexagonalGrid) {
-			view = new CalibrationView.CircleHexagonalGrid();
-		} else if (detector instanceof CalibrationDetectorCircleRegularGrid) {
-			view = new CalibrationView.CircleRegularGrid();
-		} else {
-			throw new RuntimeException("Unknown calibration detector type: " + detector.getClass().getSimpleName());
-		}
-		view.initialize(detector);
+		handleTargetChanged();
 	}
 
-	public AssistedCalibration( DetectSingleFiducialCalibration detector, ComputeGeometryScore quality, AssistedCalibrationGui gui ) {
-		this(detector, quality, gui, OUTPUT_DIRECTORY, IMAGE_DIRECTORY);
+	public void handleTargetChanged() {
+		// Reset te GUI
+		state = State.DETERMINE_SIZE;
+		totalLandmarks = 0;
+		canonicalWidth = 0;
+		geometryTrigger = false;
+		pictureTaken = false;
+		actions.resetActionState();
+		BoofSwingUtil.invokeNowOrLater(() -> {
+			regions.reset();
+			gui.getInfoPanel().resetGui();
+		});
+
+		synchronized (detectorLock) {
+			detector = gui.targetPanel.configPanel.createSingleTargetDetector();
+			totalLandmarks = detector.getLayout().size();
+			quality = new ComputeGeometryScore(true, detector.getLayout());
+
+			if (detector instanceof CalibrationDetectorChessboardX) {
+				view = new CalibrationView.Chessboard();
+			} else if (detector instanceof CalibrationDetectorSquareGrid) {
+				view = new CalibrationView.SquareGrid();
+			} else if (detector instanceof CalibrationDetectorCircleHexagonalGrid) {
+				view = new CalibrationView.CircleHexagonalGrid();
+			} else if (detector instanceof CalibrationDetectorCircleRegularGrid) {
+				view = new CalibrationView.CircleRegularGrid();
+			} else if (detector instanceof MultiToSingleFiducialCalibration) {
+				MultiToSingleFiducialCalibration m2s = (MultiToSingleFiducialCalibration)detector;
+				if (m2s.getMulti() instanceof CalibrationDetectorMultiECoCheck) {
+					view = new CalibrationView.ECoCheck();
+				} else {
+					throw new RuntimeException("Unknown calibration detector multiple type: " + m2s.getMulti().getClass().getSimpleName());
+				}
+			} else {
+				throw new RuntimeException("Unknown calibration detector type: " + detector.getClass().getSimpleName());
+			}
+			view.initialize(detector);
+		}
 	}
 
 	public void init( int imageWidth, int imageHeight ) {
@@ -192,9 +212,18 @@ public class AssistedCalibration {
 		g2 = image.createGraphics();
 		BoofSwingUtil.antialiasing(g2);
 
-		boolean success = detector.process(gray);
+		boolean success;
+		synchronized (detectorLock) {
+			success = detector.process(gray);
 
-		actions.update(success, detector.getDetectedPoints());
+			// Require all the landmarks be visible
+			if (success)
+				success = detector.getDetectedPoints().size() == totalLandmarks;
+
+			CalibrationObservation found = detector.getDetectedPoints();
+			found.sort();
+			actions.update(success, found);
+		}
 
 		if (gui.getInfoPanel().forceSaveImage) {
 			String name = String.format("debug_save_%03d.png", totalDebugSave++);
@@ -204,16 +233,9 @@ public class AssistedCalibration {
 		}
 
 		switch (state) {
-			case DETERMINE_SIZE:
-				handleDetermineSize(success);
-				break;
-
-			case REMOVE_DOTS:
-				handleClearDots(success);
-				break;
-
-			case FILL_SCREEN:
-				handleFillScreen(success);
+			case DETERMINE_SIZE -> handleDetermineSize(success);
+			case REMOVE_DOTS -> handleClearDots(success);
+			case FILL_SCREEN -> handleFillScreen(success);
 		}
 
 		gui.setImage(image);
@@ -226,8 +248,12 @@ public class AssistedCalibration {
 		if (detected) {
 			double stationaryTime = actions.getStationaryTime();
 
-			CalibrationObservation points = detector.getDetectedPoints();
-			view.getQuadFocus(points, focusQuad);
+			CalibrationObservation points;
+			synchronized (detectorLock) {
+				points = detector.getDetectedPoints();
+				points.sort();
+				view.getQuadFocus(points, focusQuad);
+			}
 
 			double top = focusQuad.get(0).distance(focusQuad.get(1));
 			double right = focusQuad.get(1).distance(focusQuad.get(2));
@@ -280,6 +306,7 @@ public class AssistedCalibration {
 	}
 
 	private void selectMagnetLocations() {
+		magnets.clear();
 		magnets.add(new Magnet(imageWidth/2, padding, false));
 		magnets.add(new Magnet(imageWidth/2, imageHeight - padding, false));
 		magnets.add(new Magnet(padding, imageHeight/2, false));
@@ -294,12 +321,7 @@ public class AssistedCalibration {
 	}
 
 	boolean pictureTaken = false;
-	DogArray<Polygon2D_F64> regions = new DogArray<Polygon2D_F64>(Polygon2D_F64::new) {
-		@Override
-		protected Polygon2D_F64 createInstance() {
-			return new Polygon2D_F64(4);
-		}
-	};
+	DogArray<Polygon2D_F64> regions = new DogArray<>(()->new Polygon2D_F64(4));
 
 	private void handleClearDots( boolean detected ) {
 		String message = "Clear the dots!";

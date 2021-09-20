@@ -47,6 +47,15 @@ public class DetectUserActions {
 		thresholdDistance = size*0.005;
 	}
 
+	public void resetActionState() {
+		points = null;
+		numMissed = 0;
+		previous.reset();
+		first.reset();
+		stationaryStart = 0;
+		stationaryTime = 0;
+	}
+
 	public void update( boolean detected, CalibrationObservation points ) {
 		if (detected) {
 			this.points = points;

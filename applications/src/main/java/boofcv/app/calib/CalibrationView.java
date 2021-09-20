@@ -18,12 +18,12 @@
 
 package boofcv.app.calib;
 
-import boofcv.abst.fiducial.calib.CalibrationDetectorChessboardX;
-import boofcv.abst.fiducial.calib.CalibrationDetectorCircleHexagonalGrid;
-import boofcv.abst.fiducial.calib.CalibrationDetectorCircleRegularGrid;
-import boofcv.abst.fiducial.calib.CalibrationDetectorSquareGrid;
+import boofcv.abst.fiducial.calib.*;
+import boofcv.abst.geo.calibration.DetectMultiFiducialCalibration;
 import boofcv.abst.geo.calibration.DetectSingleFiducialCalibration;
+import boofcv.abst.geo.calibration.MultiToSingleFiducialCalibration;
 import boofcv.alg.geo.calibration.CalibrationObservation;
+import boofcv.struct.GridShape;
 import boofcv.struct.geo.PointIndex2D_F64;
 import georegression.fitting.polygon.FitPolygon2D_F64;
 import georegression.geometry.UtilPolygons2D_F64;
@@ -31,6 +31,8 @@ import georegression.metric.UtilAngle;
 import georegression.struct.point.Point2D_F64;
 import georegression.struct.shapes.Polygon2D_F64;
 
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 
 /**
@@ -62,7 +64,6 @@ public interface CalibrationView {
 	int getBufferWidth( double gridPixelsWide );
 
 	class Chessboard implements CalibrationView {
-
 		int numRows, numCols;
 		int pointRows, pointCols;
 
@@ -79,6 +80,48 @@ public interface CalibrationView {
 		@Override
 		public void getSidesCollision( CalibrationObservation detections, List<Point2D_F64> sides ) {
 			sides.clear();
+			sides.add(get(0, 0, detections.points));
+			sides.add(get(0, pointCols - 1, detections.points));
+			sides.add(get(pointRows - 1, pointCols - 1, detections.points));
+			sides.add(get(pointRows - 1, 0, detections.points));
+		}
+
+		@Override
+		public void getQuadFocus( CalibrationObservation detections, List<Point2D_F64> sides ) {
+			getSidesCollision(detections, sides);
+		}
+
+		private Point2D_F64 get( int row, int col, List<PointIndex2D_F64> detections ) {
+			return detections.get(row*pointCols + col).p;
+		}
+
+		@Override
+		public int getBufferWidth( double gridPixelsWide ) {
+			return (int)(0.2*gridPixelsWide/(pointCols - 1) + 0.5);
+		}
+	}
+
+	class ECoCheck implements CalibrationView {
+		int numRows, numCols;
+		int pointRows, pointCols;
+
+		@Override
+		public void initialize( DetectSingleFiducialCalibration detector ) {
+			DetectMultiFiducialCalibration multi = ((MultiToSingleFiducialCalibration)detector).getMulti();
+			var ecocheck = (CalibrationDetectorMultiECoCheck)multi;
+			GridShape shape = ecocheck.getDetector().getUtils().markers.get(0);
+			this.numRows = shape.rows;
+			this.numCols = shape.cols;
+
+			pointRows = numRows - 1;
+			pointCols = numCols - 1;
+		}
+
+		@Override
+		public void getSidesCollision( CalibrationObservation detections, List<Point2D_F64> sides ) {
+			Collections.sort(detections.points, Comparator.comparingInt(a -> a.index));
+			sides.clear();
+
 			sides.add(get(0, 0, detections.points));
 			sides.add(get(0, pointCols - 1, detections.points));
 			sides.add(get(pointRows - 1, pointCols - 1, detections.points));

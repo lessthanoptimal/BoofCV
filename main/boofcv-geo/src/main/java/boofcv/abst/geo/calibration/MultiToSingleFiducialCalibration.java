@@ -61,6 +61,9 @@ public class MultiToSingleFiducialCalibration implements DetectSingleFiducialCal
 	}
 
 	@Override public CalibrationObservation getDetectedPoints() {
+		if (detectedID == -1)
+			return new CalibrationObservation();
+
 		return multi.getDetectedPoints(detectedID);
 	}
 

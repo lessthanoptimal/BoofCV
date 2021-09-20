@@ -18,7 +18,11 @@
 
 package boofcv.app.calib;
 
+import boofcv.gui.StandardAlgConfigPanel;
+import boofcv.gui.calibration.UtilCalibrationGui;
+import boofcv.gui.controls.CalibrationTargetPanel;
 import boofcv.gui.image.ImagePanel;
+import lombok.Getter;
 
 import javax.swing.*;
 import javax.swing.border.BevelBorder;
@@ -33,18 +37,18 @@ public class AssistedCalibrationGui extends JPanel {
 	ImagePanel imagePanel;
 
 	BufferedImage workImage;
-	CalibrationInfoPanel infoPanel;
+	@Getter CalibrationInfoPanel infoPanel;
+
+	@Getter TargetConfigurePanel targetPanel = new TargetConfigurePanel();
+
+	Runnable handleTargetChanged = ()->{};
 
 	public AssistedCalibrationGui( Dimension dimension ) {
 		this(dimension.width, dimension.height);
 	}
 
 	public AssistedCalibrationGui( int imageWidth, int imageHeight ) {
-//		super(new GridLayout(2,1));
 		super(new BorderLayout());
-
-//		JLabel panelMessage = new JLabel();
-//		panelMessage.setBorder(new BevelBorder(BevelBorder.LOWERED));
 
 		messageLabel = new JLabel();
 		messageLabel.setBorder(new BevelBorder(BevelBorder.LOWERED));
@@ -57,12 +61,21 @@ public class AssistedCalibrationGui extends JPanel {
 
 		imagePanel = new ImagePanel(imageWidth, imageHeight);
 
+		handleUpdatedTarget();
+
 		add(messageLabel, BorderLayout.NORTH);
 		add(imagePanel, BorderLayout.CENTER);
 		add(infoPanel, BorderLayout.EAST);
-
+		add(targetPanel, BorderLayout.WEST);
 
 		workImage = new BufferedImage(imageWidth, imageHeight, BufferedImage.TYPE_INT_BGR);
+	}
+
+	private void handleUpdatedTarget() {
+		BufferedImage preview = UtilCalibrationGui.renderTargetBuffered(
+				targetPanel.configPanel.selected, targetPanel.configPanel.getActiveConfig(), 40);
+		targetPanel.targetPreviewPanel.setImageUI(preview);
+		handleTargetChanged.run();
 	}
 
 	public void setMessage( final String message ) {
@@ -72,12 +85,17 @@ public class AssistedCalibrationGui extends JPanel {
 		SwingUtilities.invokeLater(() -> {
 			messageLabel.setText(message);
 			messageLabel.repaint();
-//				messageLabel.invalidate();
 		});
 	}
 
-	public CalibrationInfoPanel getInfoPanel() {
-		return infoPanel;
+	public class TargetConfigurePanel extends StandardAlgConfigPanel {
+		public CalibrationTargetPanel configPanel = new CalibrationTargetPanel(( a, b ) -> handleUpdatedTarget());
+		public ImagePanel targetPreviewPanel = new ImagePanel();
+
+		public TargetConfigurePanel() {
+			add(configPanel);
+			add(targetPreviewPanel);
+		}
 	}
 
 	public synchronized void setImage( BufferedImage image ) {

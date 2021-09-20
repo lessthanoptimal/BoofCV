@@ -84,8 +84,7 @@ public class CalibrationDetectorMultiECoCheck implements DetectMultiFiducialCali
 		found.height = dimension.height;
 
 		for (int i = 0; i < original.size; i++) {
-			PointIndex2D_F64 p = original.get(i);
-			found.add(p.p, p.index);
+			found.points.add(original.get(i).copy());
 		}
 		return found;
 	}
