@@ -32,7 +32,7 @@ import java.util.List;
  */
 public class CalibrateStereoPlanarDemo {
 	public static void main( String[] args ) {
-		String directory = UtilIO.pathExample("calibration/stereo/Bumblebee2_Chess");
+		String directory = UtilIO.pathExample("calibration/stereo/Zed_ecocheck");
 
 		java.util.List<String> leftImages = UtilIO.listByPrefix(directory, "left", null);
 		List<String> rightImages = UtilIO.listByPrefix(directory, "right", null);

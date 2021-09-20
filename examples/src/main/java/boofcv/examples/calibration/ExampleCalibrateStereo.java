@@ -18,9 +18,11 @@
 
 package boofcv.examples.calibration;
 
+import boofcv.abst.fiducial.calib.ConfigECoCheckMarkers;
 import boofcv.abst.fiducial.calib.ConfigGridDimen;
 import boofcv.abst.geo.calibration.CalibrateStereoPlanar;
 import boofcv.abst.geo.calibration.DetectSingleFiducialCalibration;
+import boofcv.abst.geo.calibration.MultiToSingleFiducialCalibration;
 import boofcv.alg.geo.calibration.CalibrationObservation;
 import boofcv.factory.fiducial.FactoryFiducialCalibration;
 import boofcv.io.UtilIO;
@@ -46,10 +48,9 @@ import java.util.List;
  * loads calibration images as inputs, calibrates, and saves results to an XML file. See in code comments for tuning
  * and implementation issues.
  *
+ * @author Peter Abeles
  * @see boofcv.examples.stereo.ExampleRectifyCalibratedStereo
  * @see CalibrateStereoPlanar
- *
- * @author Peter Abeles
  */
 public class ExampleCalibrateStereo {
 
@@ -61,11 +62,25 @@ public class ExampleCalibrateStereo {
 	List<String> right;
 
 	/**
+	 * ECoCheck target taken by a Zed stereo camera
+	 */
+	public void setupECoCheck() {
+		// Creates a detector and specifies its physical characteristics
+		detector = new MultiToSingleFiducialCalibration(FactoryFiducialCalibration.
+				ecocheck(null, ConfigECoCheckMarkers.singleShape(9, 7, 1, 30)));
+
+		String directory = UtilIO.pathExample("calibration/stereo/Zed_ecocheck");
+
+		left = UtilIO.listByPrefix(directory, "left", null);
+		right = UtilIO.listByPrefix(directory, "right", null);
+	}
+
+	/**
 	 * Square grid target taken by a PtGrey Bumblebee camera.
 	 */
-	public void setupBumblebeeSquare() {
+	public void setupSquareGrid() {
 		// Creates a detector and specifies its physical characteristics
-		detector = FactoryFiducialCalibration.squareGrid(null,new ConfigGridDimen(4, 3, 30, 30));
+		detector = FactoryFiducialCalibration.squareGrid(null, new ConfigGridDimen(4, 3, 30, 30));
 
 		String directory = UtilIO.pathExample("calibration/stereo/Bumblebee2_Square");
 
@@ -76,9 +91,9 @@ public class ExampleCalibrateStereo {
 	/**
 	 * Chessboard target taken by a PtGrey Bumblebee camera.
 	 */
-	public void setupBumblebeeChess() {
+	public void setupChessboard() {
 		// Creates a detector and specifies its physical characteristics
-		detector = FactoryFiducialCalibration.chessboardX(null,new ConfigGridDimen(7, 5, 30));
+		detector = FactoryFiducialCalibration.chessboardX(null, new ConfigGridDimen(7, 5, 30));
 
 		String directory = UtilIO.pathExample("calibration/stereo/Bumblebee2_Chess");
 
@@ -92,7 +107,8 @@ public class ExampleCalibrateStereo {
 	public void process() {
 		// Declare and setup the calibration algorithm
 		var calibratorAlg = new CalibrateStereoPlanar(detector.getLayout());
-		calibratorAlg.configure(true, 2, false);
+		calibratorAlg.configure(/*zero skew*/true, /* radial */4, /* tangential */false);
+
 		// Uncomment to print more information to stdout
 //		calibratorAlg.setVerbose(System.out,null);
 
@@ -100,21 +116,21 @@ public class ExampleCalibrateStereo {
 		Collections.sort(left);
 		Collections.sort(right);
 
-		for( int i = 0; i < left.size(); i++ ) {
+		for (int i = 0; i < left.size(); i++) {
 			BufferedImage l = UtilImageIO.loadImage(left.get(i));
 			BufferedImage r = UtilImageIO.loadImage(right.get(i));
 
-			GrayF32 imageLeft = ConvertBufferedImage.convertFrom(l,(GrayF32)null);
-			GrayF32 imageRight = ConvertBufferedImage.convertFrom(r,(GrayF32)null);
+			GrayF32 imageLeft = ConvertBufferedImage.convertFrom(l, (GrayF32)null);
+			GrayF32 imageRight = ConvertBufferedImage.convertFrom(r, (GrayF32)null);
 
-			CalibrationObservation calibLeft,calibRight;
-			if( !detector.process(imageLeft)) {
-				System.out.println("Failed to detect target in "+left.get(i));
+			CalibrationObservation calibLeft, calibRight;
+			if (!detector.process(imageLeft)) {
+				System.out.println("Failed to detect target in " + left.get(i));
 				continue;
 			}
 			calibLeft = detector.getDetectedPoints();
-			if( !detector.process(imageRight)) {
-				System.out.println("Failed to detect target in "+right.get(i));
+			if (!detector.process(imageRight)) {
+				System.out.println("Failed to detect target in " + right.get(i));
 				continue;
 			}
 			calibRight = detector.getDetectedPoints();
@@ -137,11 +153,13 @@ public class ExampleCalibrateStereo {
 	}
 
 	public static void main( String[] args ) {
-		ExampleCalibrateStereo alg = new ExampleCalibrateStereo();
+		var alg = new ExampleCalibrateStereo();
 
-		// Select which set of targets to use
-		alg.setupBumblebeeChess();
-//		alg.setupBumblebeeSquare();
+		// Strongly recommended that ECoCheck target is used as it allows you to entirely fill in left and right
+		// stereo images since it allows for partially observed targets
+		alg.setupECoCheck();
+//		alg.setupChessboard();
+//		alg.setupSquareGrid();
 
 		// compute and save results
 		alg.process();

@@ -66,6 +66,11 @@ public class ExampleCalibrateMonocular {
 //		detector = FactoryFiducialCalibration.squareGrid(null, new ConfigGridDimen(4, 3, 30, 30));
 //		images = UtilIO.listByPrefix(UtilIO.pathExample("calibration/stereo/Bumblebee2_Square"),"left", null);
 
+		// ECoCheck Example
+//		detector = new MultiToSingleFiducialCalibration(FactoryFiducialCalibration.
+//				ecocheck(null, ConfigECoCheckMarkers.singleShape(9, 7, 1, 30)));
+//		images = UtilIO.listByPrefix(UtilIO.pathExample("calibration/stereo/Zed_ecocheck"), "left", null);
+
 		// Chessboard Example
 		detector = FactoryFiducialCalibration.chessboardX(null,
 				new ConfigGridDimen(/*numRows*/ 7,/*numCols*/ 5,/*shapeSize*/ 30));
