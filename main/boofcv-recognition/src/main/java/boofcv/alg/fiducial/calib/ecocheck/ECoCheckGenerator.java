@@ -195,7 +195,7 @@ public class ECoCheckGenerator {
 
 		for (int row = 0; row < dotGridSize; row++) {
 			for (int col = 0; col < dotGridSize; col++) {
-				int bit = row*dotGridSize + col;
+				int bit = utils.bitOrder.get(row*dotGridSize + col);
 				if (packetBits.get(bit) == 0)
 					continue;
 

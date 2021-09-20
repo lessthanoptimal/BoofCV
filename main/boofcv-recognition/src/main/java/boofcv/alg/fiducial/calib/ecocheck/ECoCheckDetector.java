@@ -397,7 +397,7 @@ public class ECoCheckDetector<T extends ImageGray<T>> implements VerbosePrint {
 		bits.resize(bitImage.width*bitImage.height);
 		for (int y = 0, i = 0; y < bitImage.height; y++) {
 			for (int x = 0; x < bitImage.width; x++, i++) {
-				bits.set(i, bitImage.data[i]);
+				bits.set(utils.bitOrder.get(i), bitImage.data[i]);
 			}
 		}
 	}

@@ -324,15 +324,15 @@ public class TestECoCheckDetector extends BoofStandardJUnit {
 
 	@Test void isBorderWhite() {
 		// give it the transform. t=85,85 scale=30
-		alg.utils.squareToPixel.data = new double[]{30,0,85,0,30,85,0,0,1};
+		alg.utils.squareToPixel.data = new double[]{30, 0, 85, 0, 30, 85, 0, 0, 1};
 
 		// return black unless inside the hollow square
 		// inner square = (90, 90, 110, 110)
 		// outer square = (85, 85, 115, 115)
 		alg.interpolate = new AbstractInterpolatePixelS<>() {
 			@Override public float get( float x, float y ) {
-				x = Math.abs(x-100);
-				y = Math.abs(y-100);
+				x = Math.abs(x - 100);
+				y = Math.abs(y - 100);
 
 				if (x < 10 && y < 10)
 					return 0;
@@ -347,18 +347,18 @@ public class TestECoCheckDetector extends BoofStandardJUnit {
 		var c = new ChessboardCorner();
 		var d = new ChessboardCorner();
 
-		a.setTo(85,85);
-		b.setTo(110,85);
-		c.setTo(110,110);
-		d.setTo(85,110);
+		a.setTo(85, 85);
+		b.setTo(110, 85);
+		c.setTo(110, 110);
+		d.setTo(85, 110);
 
 		// order should not matter because the line it's sampled along is determined by squareToPixel transform
-		assertTrue(alg.isBorderWhite(a,b,c,d));
-		assertTrue(alg.isBorderWhite(d,c,b,a));
+		assertTrue(alg.isBorderWhite(a, b, c, d));
+		assertTrue(alg.isBorderWhite(d, c, b, a));
 
 		// changing the transform will cause it to fail
-		alg.utils.squareToPixel.data = new double[]{30,0,95,0,30,85,0,0,1};
-		assertFalse(alg.isBorderWhite(a,b,c,d));
+		alg.utils.squareToPixel.data = new double[]{30, 0, 95, 0, 30, 85, 0, 0, 1};
+		assertFalse(alg.isBorderWhite(a, b, c, d));
 	}
 
 	/**
