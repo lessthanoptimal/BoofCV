@@ -229,6 +229,10 @@ public class ECoCheckCodec {
 	 * Computes a k-bit checksum by xor the data portion of the packet
 	 */
 	private int computeCheckSum() {
+		// See if the checksum is disabled
+		if (checksumBitCount == 0)
+			return 0;
+
 		int checkSum = 0b1010_1011; // selected to avoid symmetry and being filled with all 0 or 1
 		final int length = bits.length();
 		for (int i = 0; i < length; i += checksumBitCount) {

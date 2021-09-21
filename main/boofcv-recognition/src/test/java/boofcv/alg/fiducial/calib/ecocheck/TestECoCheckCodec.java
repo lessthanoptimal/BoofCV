@@ -99,6 +99,22 @@ public class TestECoCheckCodec extends BoofStandardJUnit {
 	}
 
 	/**
+	 * There are no checksum bits. Does it still work?
+	 */
+	@Test void encode_decode_NoChecksum() {
+		var found = new CellValue();
+
+		var alg = new ECoCheckCodec();
+		alg.checksumBitCount = 0;
+
+		alg.configure(1, 15);
+		alg.encode(0, 14, encoded);
+		assertTrue(alg.decode(encoded, found));
+		assertEquals(0, found.markerID);
+		assertEquals(14, found.cellID);
+	}
+
+	/**
 	 * Make sure the error correction works by introducing single bit errors.
 	 */
 	@Test void singleBitError() {
