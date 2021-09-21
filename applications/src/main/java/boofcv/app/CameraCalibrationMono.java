@@ -56,7 +56,7 @@ import static boofcv.app.calib.AssistedCalibration.OUTPUT_DIRECTORY;
  *
  * @author Peter Abeles
  */
-public class CameraCalibration extends BaseStandardInputApp {
+public class CameraCalibrationMono extends BaseStandardInputApp {
 
 	protected String inputPattern;
 	protected String outputFilePath = "intrinsic.yaml";
@@ -669,7 +669,7 @@ public class CameraCalibration extends BaseStandardInputApp {
 	}
 
 	public static void main( String[] args ) {
-		CameraCalibration app = new CameraCalibration();
+		CameraCalibrationMono app = new CameraCalibrationMono();
 		boolean failed = true;
 		try {
 			if (args.length > 0) {

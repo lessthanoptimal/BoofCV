@@ -28,31 +28,19 @@ import java.nio.file.Path;
 
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-class TestBatchScanQrCodes extends BoofStandardJUnit {
+public class TestCameraCalibrationMono extends BoofStandardJUnit {
 	public void scan( String args ) {
-		BatchScanQrCodes.main(args.split("\\s+"));
+		CameraCalibrationMono.main(args.split("\\s+"));
 	}
 
-	@Test void pathDirectory() throws IOException {
-		String examplePath = UtilIO.pathExample("fiducial/qrcode");
-		Path outputPath = Files.createTempDirectory("myFile");
+	@Test void justDetect() throws IOException {
+		String examplePath = UtilIO.pathExample("calibration/mono/Sony_DSC-HX5V_Chess");
+		Path outputPath = Files.createTempDirectory("calibration");
 
-		scan(String.format("-i %s -o %s/results.txt",examplePath,outputPath.toString()));
+		scan(String.format("--Output=%s/intrinsics.yaml --JustDetect --Input=%s/frame12.jpg CHESSBOARD --Grid=7:5",outputPath.toString(),examplePath));
 
-		// Just make sure it ran and generated a file
-		Path resultsPath = outputPath.resolve("results.txt");
-		assertTrue(resultsPath.toFile().exists());
-	}
-
-	@Test void pathGlob() throws IOException {
-		// Create the path and handle window file paths
-		String examplePath = UtilIO.pathExample("fiducial/qrcode").replace("\\","/");
-		Path outputPath = Files.createTempDirectory("myFile");
-
-		scan(String.format("-i glob:%s/*.jpg -o %s/results.txt",examplePath,outputPath.toString()));
-
-		// Just make sure it ran and generated a file
-		Path resultsPath = outputPath.resolve("results.txt");
-		assertTrue(resultsPath.toFile().exists());
+		// Just make sure it ran and generated files
+		assertTrue(outputPath.resolve("intrinsics_landmarks/frame12.csv").toFile().exists());
+		assertTrue(outputPath.resolve("intrinsics_landmarks/summary_detection.csv").toFile().exists());
 	}
 }

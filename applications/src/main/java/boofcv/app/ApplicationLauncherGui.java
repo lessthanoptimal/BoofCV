@@ -20,6 +20,7 @@ package boofcv.app;
 
 import boofcv.app.qrcode.CreateQrCodeGui;
 import boofcv.demonstrations.calibration.CalibrateMonocularPlanarApp;
+import boofcv.demonstrations.calibration.CalibrateStereoPlanarApp;
 import boofcv.gui.BoofLogo;
 import boofcv.gui.BoofSwingUtil;
 
@@ -62,7 +63,8 @@ public class ApplicationLauncherGui extends JPanel {
 		JButton bCreateFidImage = createButton("Square Image", CreateFiducialSquareImageGui::new);
 		JButton bCreateFidHamming = createButton("Square Hamming", CreateFiducialSquareHammingGui::new);
 
-		JButton bUtilCalib = createButton("Calibration", () -> CalibrateMonocularPlanarApp.main(null));
+		JButton bUtilCalib = createButton("Mono Calibration", () -> CalibrateMonocularPlanarApp.main(null));
+		JButton bUtilStereoCalib = createButton("Stereo Calibration", () -> CalibrateStereoPlanarApp.main(null));
 		JButton bUtilScanQrCode = createButton("Batch QR Code", BatchScanQrCodesGui::new);
 		JButton bUtilDown = createButton("Batch Downsize", BatchDownsizeImageGui::new);
 		JButton bUtilUndist = createButton("Batch Undistort", BatchRemoveLensDistortionGui::new);
@@ -94,7 +96,7 @@ public class ApplicationLauncherGui extends JPanel {
 
 		JPanel panelLeft = buttonPanel("Create / Print",
 				bCreateQR, bCreateDots, bCreateCalib, bCreateFidBin, bCreateFidImage, bCreateFidHamming);
-		JPanel panelRight = buttonPanel("Tools", bUtilCalib, bUtilScanQrCode, bUtilDown, bUtilUndist, bUtilViewCloud);
+		JPanel panelRight = buttonPanel("Tools", bUtilCalib, bUtilStereoCalib, bUtilScanQrCode, bUtilDown, bUtilUndist, bUtilViewCloud);
 
 		layout.putConstraint(SpringLayout.WEST, panelLeft, 60, SpringLayout.WEST, this);
 		layout.putConstraint(SpringLayout.NORTH, panelLeft, 0, SpringLayout.SOUTH, logo);

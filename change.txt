@@ -10,27 +10,30 @@ Version : 0.39
   * Calibration target generator supports more targets
   * Add option to save landmarks locations on PDF document
   * New monocular calibration GUI app
-  * New stereo calibration app
+  * New stereo calibration app. Command line and GUI.
+  * Assisted calibration can now change target type in the GUI
 - Image Processing
   * Added function for PSF for linear motion blur
   * GConvolveImage - can now pass in BorderType
   * ConvolveImage - automatic resizing of output
 - Simulation
   * Hunted down causes of small errors in rendering. New approach is used the samples multiple points.
+  * Can simulate motion blur
 - Calibration
   * Two high level calibration detection APIs. One for single target and one for multiple targets
   * Added support for full Kannala-Brandt fisheye camera model
   * Added new ECoCheck marker for multi camera calibration
-    TODO Add to current mono camera calibration example
   * Removed Square Grid Binary target type as it was never reliable enough to flush out entirely and never used
-  * TODO Multi Camera Calibration API
 - Fiducial Markers
   * Added support for ArUco and AprilTags as "HammingMarkers"
-  * Added calibration targets Hamming Marker grid and chessboard, e.g. ChaRuCo and ArUco grids.
+  * Can render ChaRuCo and ArUco grids, but can't detect them yet
+Demonstrations
+  * Improved stereo and mono calibration applications
 
 TODO code compliance
      MissingSummary for sfm, simulation, and reconstruction
 
+TODO Added calibration targets Hamming Marker grid and chessboard, e.g. ChaRuCo and ArUco grids.
 TODO datta2009
 TODO Monocular VO
 TODO Monocular SLAM

@@ -40,9 +40,6 @@ import java.util.Objects;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-/**
- * @author Peter Abeles
- */
 class TestCreateFiducialSquareImage extends CommonFiducialPdfChecks {
 
 	private final ConfigThreshold configThreshold = ConfigThreshold.fixed(125);

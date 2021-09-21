@@ -31,9 +31,6 @@ import java.io.PrintStream;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-/**
- * @author Peter Abeles
- */
 public class TestCreateFiducialSquareBinary extends CommonFiducialPdfChecks {
 
 	private final ConfigThreshold configThreshold = ConfigThreshold.fixed(125);

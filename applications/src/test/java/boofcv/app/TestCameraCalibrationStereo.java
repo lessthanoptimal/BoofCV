@@ -28,22 +28,21 @@ import java.nio.file.Path;
 
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-/**
- * @author Peter Abeles
- */
-public class TestCameraCalibration extends BoofStandardJUnit {
+public class TestCameraCalibrationStereo extends BoofStandardJUnit {
 	public void scan( String args ) {
-		CameraCalibration.main(args.split("\\s+"));
+		CameraCalibrationStereo.main(args.split("\\s+"));
 	}
 
-	@Test void justDetect() throws IOException {
-		String examplePath = UtilIO.pathExample("calibration/mono/Sony_DSC-HX5V_Chess");
+	@Test void calibrate() throws IOException {
+		String pathLeft = "glob:"+UtilIO.pathExample("calibration/stereo/Zed_ecocheck")+"/left*.jpg";
+		String pathRight = "glob:"+UtilIO.pathExample("calibration/stereo/Zed_ecocheck")+"/right*.jpg";
 		Path outputPath = Files.createTempDirectory("calibration");
 
-		scan(String.format("--Output=%s/intrinsics.yaml --JustDetect --Input=%s/frame12.jpg CHESSBOARD --Grid=7:5",outputPath.toString(),examplePath));
+		scan(String.format("-l %s -r %s --ECoCheck 9x7n1 --ShapeSize 30 -o=%s/stereo.yaml --SaveLandmarks",pathLeft, pathRight,outputPath));
 
 		// Just make sure it ran and generated files
-		assertTrue(outputPath.resolve("intrinsics_landmarks/frame12.csv").toFile().exists());
-		assertTrue(outputPath.resolve("intrinsics_landmarks/summary_detection.csv").toFile().exists());
+		assertTrue(outputPath.resolve("stereo.yaml").toFile().exists());
+		assertTrue(outputPath.resolve("landmarks/left00.jpg.csv").toFile().exists());
+		assertTrue(outputPath.resolve("landmarks/right27.jpg.csv").toFile().exists());
 	}
 }

@@ -34,9 +34,6 @@ import java.util.Random;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-/**
- * @author Peter Abeles
- */
 class TestCreateFiducialUchiya extends CommonFiducialPdfChecks {
 
 	CreateFiducialRandomDot defaults = new CreateFiducialRandomDot();

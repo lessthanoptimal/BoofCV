@@ -42,12 +42,16 @@ public class MultiToSingleFiducialCalibration implements DetectSingleFiducialCal
 	// which detection matches the target ID. -1 means it was not detected
 	private int detectedID;
 
+	int width, height;
+
 	public MultiToSingleFiducialCalibration( DetectMultiFiducialCalibration alg ) {
 		this.multi = alg;
 	}
 
 	@Override public boolean process( GrayF32 input ) {
 		multi.process(input);
+		width = input.width;
+		height = input.height;
 
 		detectedID = -1;
 		for (int i = 0; i < multi.getDetectionCount(); i++) {
@@ -62,7 +66,7 @@ public class MultiToSingleFiducialCalibration implements DetectSingleFiducialCal
 
 	@Override public CalibrationObservation getDetectedPoints() {
 		if (detectedID == -1)
-			return new CalibrationObservation();
+			return new CalibrationObservation(width, height);
 
 		return multi.getDetectedPoints(detectedID);
 	}

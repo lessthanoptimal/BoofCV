@@ -34,7 +34,7 @@ import java.util.List;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 /**
- * Tests the create calibration target application. Invokes the application to create a target. Then converts
+ * Tests create calibration target application. Invokes the application to create a target. Then converts
  * the postscript document into an image. After the image has been generated it is then processed by the fiducial
  * detector.
  *
