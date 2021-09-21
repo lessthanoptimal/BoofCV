@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -30,9 +30,11 @@ import org.ejml.data.DMatrixRMaj;
 import java.util.List;
 
 /**
+ * Distance given a known rotation.
+ *
  * @author Peter Abeles
  */
-public class DistanceTranGivenRotSq implements DistanceFromModel<Vector3D_F64,Point2D3D> {
+public class DistanceTranGivenRotSq implements DistanceFromModel<Vector3D_F64, Point2D3D> {
 
 	Se3_F64 motion = new Se3_F64();
 
@@ -43,16 +45,16 @@ public class DistanceTranGivenRotSq implements DistanceFromModel<Vector3D_F64,Po
 	}
 
 	@Override
-	public void setModel(Vector3D_F64 translation) {
+	public void setModel( Vector3D_F64 translation ) {
 		motion.getT().setTo(translation);
 	}
 
 	@Override
-	public double distance(Point2D3D pt) {
+	public double distance( Point2D3D pt ) {
 		Point3D_F64 X = pt.location;
 		Point2D_F64 obs = pt.observation;
 
-		SePointOps_F64.transform(motion,X,localX);
+		SePointOps_F64.transform(motion, X, localX);
 
 		double dx = obs.x - localX.x/localX.z;
 		double dy = obs.y - localX.y/localX.z;
@@ -61,8 +63,8 @@ public class DistanceTranGivenRotSq implements DistanceFromModel<Vector3D_F64,Po
 	}
 
 	@Override
-	public void distances(List<Point2D3D> data, double[] distance) {
-		for( int i = 0; i < data.size(); i++ ) {
+	public void distances( List<Point2D3D> data, double[] distance ) {
+		for (int i = 0; i < data.size(); i++) {
 			distance[i] = distance(data.get(i));
 		}
 	}

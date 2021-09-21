@@ -23,12 +23,14 @@ import georegression.struct.shapes.Rectangle2D_F64;
 import georegression.struct.shapes.Rectangle2D_I32;
 
 /**
+ * Helper functions for {@link TldTracker}
+ *
  * @author Peter Abeles
  */
 public class TldHelperFunctions {
 
 	// storage for intermediate results
-	private ImageRectangle work = new ImageRectangle();
+	private final ImageRectangle work = new ImageRectangle();
 
 	/**
 	 * Computes the fractional area of intersection between the two regions.

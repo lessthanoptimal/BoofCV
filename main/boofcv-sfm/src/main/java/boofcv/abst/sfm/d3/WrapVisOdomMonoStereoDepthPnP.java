@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -39,6 +39,8 @@ import java.util.List;
 import java.util.Set;
 
 /**
+ * Wrapper around {@link VisOdomMonoDepthPnP} for {@link StereoVisualOdometry}.
+ *
  * @author Peter Abeles
  */
 // TODO WARNING! active list has been modified by dropping and adding tracks

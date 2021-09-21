@@ -135,15 +135,13 @@ public class ConfigEpipolarScore3D implements Configuration {
 	 * Configuration for {@link ScoreFundamentalHomographyCompatibility}
 	 */
 	public static class FundamentalCompatible implements Configuration {
-		/** @see ScoreFundamentalHomographyCompatibility#ratio3D */
+		/** {@link ScoreFundamentalHomographyCompatibility#ratio3D} */
 		public double ratio3D = 1.2;
 
-		/** @see ScoreFundamentalHomographyCompatibility#inlierErrorTol */
+		/** {@link ScoreFundamentalHomographyCompatibility#inlierErrorTol} */
 		public double inlierErrorTol = 2.0;
 
-		/**
-		 * @see ScoreFundamentalHomographyCompatibility#maxRatioScore
-		 */
+		/** {@link ScoreFundamentalHomographyCompatibility#maxRatioScore} */
 		public double maxRatioScore = 10.0;
 
 		/** The minimum number of inliers for an edge to be accepted. If relative, then relative to pairs. */
@@ -168,15 +166,13 @@ public class ConfigEpipolarScore3D implements Configuration {
 	 * Configuration for {@link ScoreFundamentalVsRotation}
 	 */
 	public static class FundamentalRotation implements Configuration {
-		/** @see ScoreFundamentalVsRotation#ratio3D */
+		/** {@link ScoreFundamentalVsRotation#ratio3D} */
 		public double ratio3D = 1.2;
 
-		/** @see ScoreFundamentalVsRotation#inlierErrorTol */
+		/** {@link ScoreFundamentalVsRotation#inlierErrorTol} */
 		public double inlierErrorTol = 1.5;
 
-		/**
-		 * @see ScoreFundamentalVsRotation#maxRatioScore
-		 */
+		/** {@link ScoreFundamentalVsRotation#maxRatioScore} */
 		public double maxRatioScore = 10.0;
 
 		/** The minimum number of inliers for an edge to be accepted. If relative, then relative to pairs. */

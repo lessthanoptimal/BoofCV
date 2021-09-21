@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -39,9 +39,9 @@ public class ConfigKeyFrameManager implements Configuration {
 	public int tickPeriod = 2;
 
 	public enum Type {
-		/** @see MaxGeoKeyFrameManager */
+		/** {@link MaxGeoKeyFrameManager} */
 		MAX_GEO,
-		/** @see TickTockKeyFrameManager */
+		/** {@link TickTockKeyFrameManager} */
 		TICK_TOCK
 	}
 

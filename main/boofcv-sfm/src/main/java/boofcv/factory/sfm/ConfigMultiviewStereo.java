@@ -27,17 +27,13 @@ import boofcv.struct.Configuration;
  * @author Peter Abeles
  */
 public class ConfigMultiviewStereo implements Configuration {
-	/**
-	 * @see boofcv.alg.mvs.MultiViewStereoFromKnownSceneStructure#minimumQuality3D
-	 */
+	/** {@link boofcv.alg.mvs.MultiViewStereoFromKnownSceneStructure#minimumQuality3D} */
 	public double minimumQuality3D = 0.05;
 
-	/**
-	 * @see boofcv.alg.mvs.MultiViewStereoFromKnownSceneStructure#maximumCenterOverlap
-	 */
+	/** {@link boofcv.alg.mvs.MultiViewStereoFromKnownSceneStructure#maximumCenterOverlap} */
 	public double maximumCenterOverlap = 0.80;
 
-	/** @see boofcv.alg.mvs.MultiViewStereoFromKnownSceneStructure#maxCombinePairs */
+	/** {@link boofcv.alg.mvs.MultiViewStereoFromKnownSceneStructure#maxCombinePairs} */
 	public int maxCombinePairs = 10;
 
 	@Override public void checkValidity() {

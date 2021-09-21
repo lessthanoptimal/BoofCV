@@ -188,7 +188,9 @@ subprojects {
                 "PublicConstructorForAbstractClass", "NarrowingCompoundAssignment", "JdkObsolete")
 
         // Gradually bring this inspection in to compliance
-        if (!project.getName().contains("boofcv-types")) {
+        if (!(project.getName() in
+                ["boofcv-types", "boofcv-sfm", "boofcv-geo", "boofcv-simulation", "boofcv-reconstruction",
+                "boofcv-reconstruction", "boofcv-recognition", "boofcv-learning", "boofcv-ip-multiview", "boofcv-io"])) {
             options.errorprone.disable("MissingSummary")
         } else {
             if (name.endsWith("compileJava") || name.endsWith("compileNoautoJava")) {

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -22,6 +22,8 @@ import boofcv.struct.geo.TrifocalTensor;
 import org.ddogleg.fitting.modelset.ModelManager;
 
 /**
+ * {@link ModelManager} for {@link TrifocalTensor}.
+ *
  * @author Peter Abeles
  */
 public class ManagerTrifocalTensor implements ModelManager<TrifocalTensor> {
@@ -31,7 +33,7 @@ public class ManagerTrifocalTensor implements ModelManager<TrifocalTensor> {
 	}
 
 	@Override
-	public void copyModel(TrifocalTensor src, TrifocalTensor dst) {
+	public void copyModel( TrifocalTensor src, TrifocalTensor dst ) {
 		dst.setTo(src);
 	}
 }

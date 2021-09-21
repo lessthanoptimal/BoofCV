@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -23,18 +23,19 @@ import boofcv.struct.image.ImageGray;
 import boofcv.struct.image.ImageType;
 
 /**
+ * Wrapper for any implementation of {@link DisparityBlockMatchRowFormat}
+ *
  * @author Peter Abeles
  */
 public class WrapDisparityBlockMatchRowFormat<T extends ImageGray<T>, DI extends ImageGray<DI>>
-		extends WrapBaseBlockMatch<T,T, DI>
-{
-	public WrapDisparityBlockMatchRowFormat(DisparityBlockMatchRowFormat<T, DI> alg) {
+		extends WrapBaseBlockMatch<T, T, DI> {
+	public WrapDisparityBlockMatchRowFormat( DisparityBlockMatchRowFormat<T, DI> alg ) {
 		super(alg);
 	}
 
 	@Override
-	public void _process(T imageLeft, T imageRight) {
-		alg.process(imageLeft,imageRight,disparity);
+	public void _process( T imageLeft, T imageRight ) {
+		alg.process(imageLeft, imageRight, disparity);
 	}
 
 	@Override

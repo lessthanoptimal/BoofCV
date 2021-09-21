@@ -19,10 +19,14 @@
 package boofcv.alg.fiducial.calib.ecocheck;
 
 /**
+ * Value of a decoded cell inside of {@link ECoCheckDetector}.
+ *
  * @author Peter Abeles
  */
 public class CellValue {
+	/** Which marker the cell behinds to */
 	public int markerID;
+	/** Which cell inside the marker */
 	public int cellID;
 
 	public void setTo( int markerID, int cellID ) {

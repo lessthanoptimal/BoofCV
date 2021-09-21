@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -26,14 +26,15 @@ import boofcv.struct.image.ImageType;
 import java.io.FileNotFoundException;
 
 /**
+ * Loads a MJPEG wrapped inside a {@link SimpleImageSequence}.
+ *
  * @author Peter Abeles
  */
 public class BoofMjpegVideo implements VideoInterface {
 	@Override
-	public <T extends ImageBase<T>> SimpleImageSequence<T> load(String fileName, ImageType<T> imageType) {
-
+	public <T extends ImageBase<T>> SimpleImageSequence<T> load( String fileName, ImageType<T> imageType ) {
 		try {
-			return new MjpegStreamSequence(fileName,imageType);
+			return new MjpegStreamSequence<>(fileName, imageType);
 		} catch (FileNotFoundException e) {
 			return null;
 		}

@@ -21,6 +21,8 @@ package boofcv.alg.geo.selfcalib;
 import org.ddogleg.fitting.modelset.ModelManager;
 
 /**
+ * {@link ModelManager} for {@link MetricCameraTriple}.
+ *
  * @author Peter Abeles
  */
 public class ModelManagerMetricCameraTriple implements ModelManager<MetricCameraTriple> {

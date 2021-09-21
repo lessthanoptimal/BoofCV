@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -32,60 +32,56 @@ import java.awt.image.BufferedImage;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.Reader;
-import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.Map;
 
-import static boofcv.io.UtilIO.UTF8;
-
 /**
+ * The default media manager used by BoofCV. Uses the best available for each data source type.
+ *
  * @author Peter Abeles
  */
 public class DefaultMediaManager implements MediaManager {
 
 	public static final DefaultMediaManager INSTANCE = new DefaultMediaManager();
 
-	Map<String,BufferedImage> cachedImage = new HashMap<>();
+	Map<String, BufferedImage> cachedImage = new HashMap<>();
 	VideoInterface videoInterface = new DynamicVideoInterface();
 	WebcamInterface webcamInterface = new DynamicWebcamInterface();
 
-	@Override
-	public Reader openFile(String fileName) {
+	@Override public Reader openFile( String fileName ) {
 		InputStream stream = UtilIO.openStream(fileName);
-		if( stream == null )
+		if (stream == null)
 			return null;
-		return new InputStreamReader(stream,Charset.forName(UTF8));
+		return new InputStreamReader(stream, StandardCharsets.UTF_8);
 	}
 
-	@Override
-	public BufferedImage openImage(String fileName) {
-		
+	@Override public BufferedImage openImage( String fileName ) {
 		BufferedImage b = cachedImage.get(fileName);
-		
-		if( b == null ) {
+
+		if (b == null) {
 			b = UtilImageIO.loadImage(fileName);
-			
-			if( b == null )
+
+			if (b == null)
 				return null;
-			
-			cachedImage.put(fileName,b);
+
+			cachedImage.put(fileName, b);
 		}
 
 		// return a copy of the image so that if it is modified strangeness won't happen
-		BufferedImage c = new BufferedImage(b.getWidth(),b.getHeight(),b.getType());
+		BufferedImage c = new BufferedImage(b.getWidth(), b.getHeight(), b.getType());
 		Graphics2D g2 = c.createGraphics();
-		g2.drawImage(b,0,0,null);
+		g2.drawImage(b, 0, 0, null);
 		return c;
 	}
 
-	@Override
-	public <T extends ImageBase<T>> SimpleImageSequence<T>
-	openVideo(String fileName, ImageType<T> type) {
+	@Override public <T extends ImageBase<T>> SimpleImageSequence<T>
+	openVideo( String fileName, ImageType<T> type ) {
 		return videoInterface.load(fileName, type);
 	}
 
-	@Override
-	public <T extends ImageBase<T>> SimpleImageSequence<T> openCamera(String device, int width, int height, ImageType<T> imageType) {
-		return webcamInterface.open(device,width,height,imageType);
+	@Override public <T extends ImageBase<T>> SimpleImageSequence<T>
+	openCamera( String device, int width, int height, ImageType<T> imageType ) {
+		return webcamInterface.open(device, width, height, imageType);
 	}
 }

@@ -43,6 +43,8 @@ import static boofcv.io.calibration.CalibrationIO.createYmlObject;
 import static java.nio.charset.StandardCharsets.UTF_8;
 
 /**
+ * Functions for reading and writing different data structures to a file or data stream.
+ *
  * @author Peter Abeles
  */
 @SuppressWarnings({"JdkObsolete", "unchecked", "ConstantConditions"})

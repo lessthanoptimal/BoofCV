@@ -104,13 +104,9 @@ public class ConfigFeatureToSceneRecognition implements Configuration {
 	 * Which type of recognition algorithm to use
 	 */
 	public enum Type {
-		/**
-		 * @see RecognitionVocabularyTreeNister2006
-		 */
+		/** {@link RecognitionVocabularyTreeNister2006} */
 		NISTER_2006,
-		/**
-		 * @see RecognitionNearestNeighborInvertedFile
-		 */
+		/** {@link RecognitionNearestNeighborInvertedFile} */
 		NEAREST_NEIGHBOR
 	}
 }

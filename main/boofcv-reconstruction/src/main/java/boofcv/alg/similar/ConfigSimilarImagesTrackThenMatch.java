@@ -43,12 +43,12 @@ public class ConfigSimilarImagesTrackThenMatch implements Configuration {
 	public int minimumRecognizeDistance = 30;
 
 	/**
-	 * @see SimilarImagesFromTracks#searchRadius
+	 * {@link SimilarImagesFromTracks#searchRadius}
 	 */
 	public int sequentialSearchRadius = 8;
 
 	/**
-	 * @see SimilarImagesFromTracks#minimumCommonTracks
+	 * {@link SimilarImagesFromTracks#minimumCommonTracks}
 	 */
 	public final ConfigLength sequentialMinimumCommonTracks = ConfigLength.relative(0.4, 200.0);
 

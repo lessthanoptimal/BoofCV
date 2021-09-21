@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -23,8 +23,19 @@ import boofcv.struct.image.ImageBase;
 import boofcv.struct.image.ImageType;
 
 /**
+ * High level interface for opening a webcam. Easy to use but you can't do much configuration.
+ *
  * @author Peter Abeles
  */
 public interface WebcamInterface {
+	/**
+	 * Opens the webcam. The specified resolution is a suggestion only.
+	 *
+	 * @param device Which webcam to open
+	 * @param width Desired image width
+	 * @param height Desired image height
+	 * @param imageType Type of image
+	 * @return {@link SimpleImageSequence} for the webcam.
+	 */
 	<T extends ImageBase<T>> SimpleImageSequence<T> open( String device , int width , int height , ImageType<T> imageType );
 }

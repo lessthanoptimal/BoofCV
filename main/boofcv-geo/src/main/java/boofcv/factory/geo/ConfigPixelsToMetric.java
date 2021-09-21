@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -54,11 +54,11 @@ public class ConfigPixelsToMetric implements Configuration {
 	}
 
 	public enum Type {
-		/** @see ConfigSelfCalibDualQuadratic */
+		/** {@link ConfigSelfCalibDualQuadratic} */
 		DUAL_QUADRATIC,
-		/** @see ConfigSelfCalibEssentialGuess */
+		/** {@link ConfigSelfCalibEssentialGuess} */
 		ESSENTIAL_GUESS,
-		/** @see ConfigSelfCalibPracticalGuess */
+		/** {@link ConfigSelfCalibPracticalGuess} */
 		PRACTICAL_GUESS
 	}
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -26,6 +26,8 @@ import boofcv.struct.distort.Point3Transform2_F32;
 import boofcv.struct.distort.Point3Transform2_F64;
 
 /**
+ * Distortion for {@link CameraUniversalOmni}.
+ *
  * @author Peter Abeles
  */
 public class LensDistortionUniversalOmni implements LensDistortionWideFOV {

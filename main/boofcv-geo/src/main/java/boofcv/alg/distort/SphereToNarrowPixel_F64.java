@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -23,6 +23,8 @@ import boofcv.struct.distort.Point3Transform2_F64;
 import georegression.struct.point.Point2D_F64;
 
 /**
+ * Converts a spherical coordinate into a pixel coordinate.
+ *
  * @author Peter Abeles
  */
 public class SphereToNarrowPixel_F64 implements Point3Transform2_F64 {

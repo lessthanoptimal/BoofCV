@@ -26,6 +26,9 @@ import boofcv.struct.image.ImageType;
 import java.lang.reflect.InvocationTargetException;
 
 /**
+ * Implementation of {@link WebcamInterface} that sees which of the known libraries are available and uses
+ * the best ones. Reflection is used to check what's available.
+ *
  * @author Peter Abeles
  */
 public class DynamicWebcamInterface implements WebcamInterface {
@@ -35,16 +38,17 @@ public class DynamicWebcamInterface implements WebcamInterface {
 	public DynamicWebcamInterface() {
 		try {
 			webcam = loadManager("boofcv.io.webcamcapture.WebcamCaptureWebcamInterface");
-		} catch( RuntimeException ignore ) {}
+		} catch (RuntimeException ignore) {
+		}
 	}
 
 	@Override
 	public <T extends ImageBase<T>> SimpleImageSequence<T>
-	open(String device, int width, int height, ImageType<T> imageType) {
-		if( webcam == null ) {
+	open( String device, int width, int height, ImageType<T> imageType ) {
+		if (webcam == null) {
 			throw new RuntimeException("No webcam libraries loaded");
 		}
-		return webcam.open(device,width,height,imageType);
+		return webcam.open(device, width, height, imageType);
 	}
 
 	/**
@@ -53,9 +57,9 @@ public class DynamicWebcamInterface implements WebcamInterface {
 	 * @return Video interface
 	 */
 	@SuppressWarnings("unchecked")
-	public static WebcamInterface loadManager(String pathToManager ) {
+	public static WebcamInterface loadManager( String pathToManager ) {
 		try {
-			Class<WebcamInterface> c = (Class<WebcamInterface>) Class.forName(pathToManager);
+			Class<WebcamInterface> c = (Class<WebcamInterface>)Class.forName(pathToManager);
 			return c.getConstructor().newInstance();
 		} catch (ClassNotFoundException e) {
 			throw new RuntimeException("Class not found. Is it included in the class path?");

@@ -44,6 +44,8 @@ public class FiducialImageEngine extends FiducialRenderEngine {
 	private int drawColor = black;
 
 	/**
+	 * Specifies image size and the border.
+	 *
 	 * @param borderPixels size of white border around document
 	 * @param markerPixels size of workable region inside the document
 	 */
