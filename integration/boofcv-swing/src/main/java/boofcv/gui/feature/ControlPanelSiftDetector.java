@@ -28,6 +28,8 @@ import org.jetbrains.annotations.Nullable;
 import javax.swing.*;
 
 /**
+ * Control panel for SIFT. {@link ConfigSiftScaleSpace} and {@link ConfigSiftDetector}
+ *
  * @author Peter Abeles
  */
 public class ControlPanelSiftDetector extends StandardAlgConfigPanel {

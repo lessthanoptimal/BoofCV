@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -26,6 +26,8 @@ import org.ddogleg.struct.DogArray_I32;
 import java.util.List;
 
 /**
+ * Wrapper around {@link PolylineSplitMerge} for {@link PointsToPolyline}.
+ *
  * @author Peter Abeles
  */
 public class NewSplitMerge_to_PointsToPolyline implements PointsToPolyline {

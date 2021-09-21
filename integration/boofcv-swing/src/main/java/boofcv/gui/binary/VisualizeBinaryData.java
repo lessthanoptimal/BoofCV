@@ -25,6 +25,7 @@ import boofcv.gui.BoofSwingUtil;
 import boofcv.struct.image.GrayS32;
 import boofcv.struct.image.GrayU8;
 import georegression.struct.point.Point2D_I32;
+import org.jetbrains.annotations.Nullable;
 
 import java.awt.*;
 import java.awt.geom.Line2D;
@@ -33,13 +34,13 @@ import java.util.List;
 import java.util.Random;
 
 /**
+ * Operations for visualizing binary images and related data structures.
+ *
  * @author Peter Abeles
  */
 public class VisualizeBinaryData {
-
 	public static BufferedImage renderContours( List<EdgeContour> edges, int[] colors,
 												int width, int height, BufferedImage out ) {
-
 		if (out == null) {
 			out = new BufferedImage(width, height, BufferedImage.TYPE_INT_RGB);
 		} else {
@@ -77,7 +78,6 @@ public class VisualizeBinaryData {
 	 */
 	public static BufferedImage renderContours( List<Contour> contours, int colorExternal, int colorInternal,
 												int width, int height, BufferedImage out ) {
-
 		if (out == null) {
 			out = new BufferedImage(width, height, BufferedImage.TYPE_INT_RGB);
 		} else {
@@ -112,8 +112,7 @@ public class VisualizeBinaryData {
 	 * @return Rendered contours
 	 */
 	public static BufferedImage renderContours( List<Contour> contours, int[] colorExternal, int colorInternal,
-												int width, int height, BufferedImage out ) {
-
+												int width, int height, @Nullable BufferedImage out ) {
 		if (out == null) {
 			out = new BufferedImage(width, height, BufferedImage.TYPE_INT_RGB);
 		} else {
@@ -143,9 +142,9 @@ public class VisualizeBinaryData {
 	/**
 	 * Renders only the external contours. Each contour is individually colored as specified by 'colors'
 	 *
-	 * @param contours List of contours
-	 * @param colors List of RGB colors for each element in contours. If null then random colors will be used.
-	 * @param out (Optional) Storage for output
+	 * @param contours (Input) List of contours
+	 * @param colors (Input) List of RGB colors for each element in contours. If null then random colors will be used.
+	 * @param out (Output) Where the contours are rendered.
 	 */
 	public static void render( List<Contour> contours, int[] colors, BufferedImage out ) {
 

@@ -21,6 +21,9 @@ package boofcv.gui.calibration;
 import java.awt.image.BufferedImage;
 
 /**
+ * Used to specify a set of stereo images. The set has a fixed sized and O(1) time to switch images. Images
+ * are returned as a {@link BufferedImage}.
+ *
  * @author Peter Abeles
  */
 public interface StereoImageSet {

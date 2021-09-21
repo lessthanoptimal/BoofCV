@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -18,34 +18,28 @@
 
 package boofcv.factory.flow;
 
+import boofcv.alg.flow.DenseOpticalFlowBlockPyramid;
 import boofcv.struct.Configuration;
 
 /**
+ * Configuration for {@link DenseOpticalFlowBlockPyramid}
+ *
  * @author Peter Abeles
  */
 public class ConfigOpticalFlowBlockPyramid implements Configuration {
-
-	/**
-	 * Radius of the search area
-	 */
+	/** Radius of the search area */
 	public int searchRadius = 4;
-	/**
-	 * Radius of the square region
-	 */
+
+	/** Radius of the square region */
 	public int regionRadius = 5;
-	/**
-	 * Maximum error allowed per pixel. Default is 30
-	 */
+
+	/** Maximum error allowed per pixel. Default is 30 */
 	public int maxPerPixelError = 30;
 
-	/**
-	 * Difference in scale between layers in the pyramid. A value of 1 means a single layer.
-	 */
+	/** Difference in scale between layers in the pyramid. A value of 1 means a single layer. */
 	public double pyramidScale = 0.75;
 
-	/**
-	 * The maximum number of layers in the pyramid
-	 */
+	/** The maximum number of layers in the pyramid  */
 	public int maxPyramidLayers = 20;
 
 	public ConfigOpticalFlowBlockPyramid() {}
@@ -58,8 +52,5 @@ public class ConfigOpticalFlowBlockPyramid implements Configuration {
 		this.maxPyramidLayers = src.maxPyramidLayers;
 	}
 
-	@Override
-	public void checkValidity() {
-
-	}
+	@Override public void checkValidity() {}
 }

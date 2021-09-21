@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -21,6 +21,8 @@ package boofcv.demonstrations.sfm.d3;
 import javax.swing.*;
 
 /**
+ * Controls for {@link VisualizeDepthVisualOdometryApp}.
+ *
  * @author Peter Abeles
  */
 public class VisualOdometryFeatureTrackerPanel extends VisualOdometryAlgorithmPanel {
@@ -31,21 +33,21 @@ public class VisualOdometryFeatureTrackerPanel extends VisualOdometryAlgorithmPa
 		displayTracks = createTextInfo();
 		displayInliers = createTextInfo();
 
-		addLabeledV(displayTracks,  "Tracks", this);
+		addLabeledV(displayTracks, "Tracks", this);
 		addLabeledV(displayInliers, "Inliers", this);
 		addHorizontalGlue(this);
 	}
 
 	public void setNumTracks( int totalTracks ) {
-		displayTracks.setText(String.format("%5d",totalTracks));
+		displayTracks.setText(String.format("%5d", totalTracks));
 	}
 
-	public void setNumInliers(int totalInliers) {
-		displayInliers.setText(String.format("%5d",totalInliers));
+	public void setNumInliers( int totalInliers ) {
+		displayInliers.setText(String.format("%5d", totalInliers));
 	}
 
 	private JTextArea createTextInfo() {
-		JTextArea comp = new JTextArea(1,6);
+		JTextArea comp = new JTextArea(1, 6);
 		comp.setMaximumSize(comp.getPreferredSize());
 		comp.setEditable(false);
 		return comp;

@@ -24,6 +24,8 @@ import boofcv.struct.image.ImageGray;
 import boofcv.struct.image.ImageType;
 
 /**
+ * Wrapper around {@link DescribePointBriefSO} for {@link DescribePointRadiusAngle}
+ *
  * @author Peter Abeles
  */
 public class DescribeBriefSO_RadiusAngle<T extends ImageGray<T>> implements DescribePointRadiusAngle<T, TupleDesc_B> {

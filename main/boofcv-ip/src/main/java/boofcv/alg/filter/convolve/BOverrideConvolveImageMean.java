@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -23,6 +23,8 @@ import boofcv.override.BOverrideManager;
 import boofcv.struct.image.ImageBase;
 
 /**
+ * Override for {@link ConvolveImageMean}
+ *
  * @author Peter Abeles
  */
 public class BOverrideConvolveImageMean extends BOverrideClass {

@@ -39,6 +39,8 @@ import java.awt.event.MouseEvent;
 import java.text.DecimalFormat;
 
 /**
+ * Controls for adjusting binary thresholding
+ *
  * @author Peter Abeles
  */
 public class ThresholdControlPanel extends StandardAlgConfigPanel

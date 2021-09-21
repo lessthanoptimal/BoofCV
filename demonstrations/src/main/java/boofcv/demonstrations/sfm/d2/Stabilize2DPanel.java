@@ -24,6 +24,8 @@ import java.awt.*;
 import java.awt.image.BufferedImage;
 
 /**
+ * Displays stabilized images
+ *
  * @author Peter Abeles
  */
 public class Stabilize2DPanel extends Motion2DPanel {

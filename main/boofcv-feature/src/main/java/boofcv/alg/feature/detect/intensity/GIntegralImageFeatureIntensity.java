@@ -25,6 +25,8 @@ import boofcv.struct.image.ImageGray;
 import org.jetbrains.annotations.Nullable;
 
 /**
+ * Functions for computing feature intensity on an image. Image type agnostic.
+ *
  * @author Peter Abeles
  */
 public class GIntegralImageFeatureIntensity {

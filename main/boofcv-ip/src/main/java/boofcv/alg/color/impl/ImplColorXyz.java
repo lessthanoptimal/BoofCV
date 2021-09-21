@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -26,11 +26,13 @@ import boofcv.struct.image.Planar;
 //CONCURRENT_INLINE import boofcv.concurrency.BoofConcurrency;
 
 /**
+ * Low level implementation of function for converting XYZ images.
+ *
  * @author Peter Abeles
  */
 @SuppressWarnings("Duplicates")
 public class ImplColorXyz {
-	public static void rgbToXyz_F32(Planar<GrayF32> rgb , Planar<GrayF32> xyz ) {
+	public static void rgbToXyz_F32( Planar<GrayF32> rgb, Planar<GrayF32> xyz ) {
 		xyz.reshape(rgb);
 
 		GrayF32 R = rgb.getBand(0);
@@ -42,11 +44,11 @@ public class ImplColorXyz {
 		GrayF32 Z = xyz.getBand(2);
 
 		//CONCURRENT_BELOW BoofConcurrency.loopFor(0,rgb.height,row->{
-		for( int row = 0; row < xyz.height; row++ ) {
+		for (int row = 0; row < xyz.height; row++) {
 			int indexXyz = xyz.startIndex + row*xyz.stride;
 			int indexRgb = rgb.startIndex + row*rgb.stride;
 
-			for( int col = 0; col < xyz.width; col++ , indexXyz++ , indexRgb++) {
+			for (int col = 0; col < xyz.width; col++, indexXyz++, indexRgb++) {
 				float r = (float)ColorXyz.invGamma(R.data[indexRgb]/255f);
 				float g = (float)ColorXyz.invGamma(G.data[indexRgb]/255f);
 				float b = (float)ColorXyz.invGamma(B.data[indexRgb]/255f);
@@ -59,7 +61,7 @@ public class ImplColorXyz {
 		//CONCURRENT_ABOVE });
 	}
 
-	public static void rgbToXyz_U8(Planar<GrayU8> rgb , Planar<GrayF32> xyz ) {
+	public static void rgbToXyz_U8( Planar<GrayU8> rgb, Planar<GrayF32> xyz ) {
 		xyz.reshape(rgb);
 
 		GrayU8 R = rgb.getBand(0);
@@ -71,14 +73,14 @@ public class ImplColorXyz {
 		GrayF32 Z = xyz.getBand(2);
 
 		//CONCURRENT_BELOW BoofConcurrency.loopFor(0,rgb.height,row->{
-		for( int row = 0; row < xyz.height; row++ ) {
+		for (int row = 0; row < xyz.height; row++) {
 			int indexXyz = xyz.startIndex + row*xyz.stride;
 			int indexRgb = rgb.startIndex + row*rgb.stride;
 
-			for( int col = 0; col < xyz.width; col++ , indexXyz++ , indexRgb++) {
-				float r = ColorXyz.table_invgamma_f[R.data[indexRgb]&0xFF];
-				float g = ColorXyz.table_invgamma_f[G.data[indexRgb]&0xFF];
-				float b = ColorXyz.table_invgamma_f[B.data[indexRgb]&0xFF];
+			for (int col = 0; col < xyz.width; col++, indexXyz++, indexRgb++) {
+				float r = ColorXyz.table_invgamma_f[R.data[indexRgb] & 0xFF];
+				float g = ColorXyz.table_invgamma_f[G.data[indexRgb] & 0xFF];
+				float b = ColorXyz.table_invgamma_f[B.data[indexRgb] & 0xFF];
 
 				X.data[indexXyz] = 0.412453f*r + 0.35758f*g + 0.180423f*b;
 				Y.data[indexXyz] = 0.212671f*r + 0.71516f*g + 0.072169f*b;
@@ -88,7 +90,7 @@ public class ImplColorXyz {
 		//CONCURRENT_ABOVE });
 	}
 
-	public static void xyzToRgb_F32(Planar<GrayF32> xyz , Planar<GrayF32> rgb ) {
+	public static void xyzToRgb_F32( Planar<GrayF32> xyz, Planar<GrayF32> rgb ) {
 		rgb.reshape(xyz);
 
 		GrayF32 X = xyz.getBand(0);
@@ -100,24 +102,24 @@ public class ImplColorXyz {
 		GrayF32 B = rgb.getBand(2);
 
 		//CONCURRENT_BELOW BoofConcurrency.loopFor(0,xyz.height,row->{
-		for( int row = 0; row < xyz.height; row++ ) {
+		for (int row = 0; row < xyz.height; row++) {
 			int indexXyz = xyz.startIndex + row*xyz.stride;
 			int indexRgb = rgb.startIndex + row*rgb.stride;
 
-			for( int col = 0; col < xyz.width; col++ , indexXyz++ , indexRgb++) {
+			for (int col = 0; col < xyz.width; col++, indexXyz++, indexRgb++) {
 				float x = X.data[indexXyz];
 				float y = Y.data[indexXyz];
 				float z = Z.data[indexXyz];
 
-				R.data[indexRgb] = (float)(255.0*ColorXyz.gamma( 3.240479f*x - 1.53715f*y  - 0.498535f*z));
+				R.data[indexRgb] = (float)(255.0*ColorXyz.gamma(3.240479f*x - 1.53715f*y - 0.498535f*z));
 				G.data[indexRgb] = (float)(255.0*ColorXyz.gamma(-0.969256f*x + 1.875991f*y + 0.041556f*z));
-				B.data[indexRgb] = (float)(255.0*ColorXyz.gamma( 0.055648f*x - 0.204043f*y + 1.057311f*z));
+				B.data[indexRgb] = (float)(255.0*ColorXyz.gamma(0.055648f*x - 0.204043f*y + 1.057311f*z));
 			}
 		}
 		//CONCURRENT_ABOVE });
 	}
 
-	public static void xyzToRgb_U8(Planar<GrayF32> xyz , Planar<GrayU8> rgb ) {
+	public static void xyzToRgb_U8( Planar<GrayF32> xyz, Planar<GrayU8> rgb ) {
 		rgb.reshape(xyz);
 
 		GrayF32 X = xyz.getBand(0);
@@ -129,18 +131,18 @@ public class ImplColorXyz {
 		GrayU8 B = rgb.getBand(2);
 
 		//CONCURRENT_BELOW BoofConcurrency.loopFor(0,xyz.height,row->{
-		for( int row = 0; row < xyz.height; row++ ) {
+		for (int row = 0; row < xyz.height; row++) {
 			int indexXyz = xyz.startIndex + row*xyz.stride;
 			int indexRgb = rgb.startIndex + row*rgb.stride;
 
-			for( int col = 0; col < xyz.width; col++ , indexXyz++ , indexRgb++) {
+			for (int col = 0; col < xyz.width; col++, indexXyz++, indexRgb++) {
 				float x = X.data[indexXyz];
 				float y = Y.data[indexXyz];
 				float z = Z.data[indexXyz];
 
-				R.data[indexRgb] = (byte)(255.0*ColorXyz.gamma( 3.240479f*x - 1.53715f*y  - 0.498535f*z)+0.5f);
-				G.data[indexRgb] = (byte)(255.0*ColorXyz.gamma(-0.969256f*x + 1.875991f*y + 0.041556f*z)+0.5f);
-				B.data[indexRgb] = (byte)(255.0*ColorXyz.gamma( 0.055648f*x - 0.204043f*y + 1.057311f*z)+0.5f);
+				R.data[indexRgb] = (byte)(255.0*ColorXyz.gamma(3.240479f*x - 1.53715f*y - 0.498535f*z) + 0.5f);
+				G.data[indexRgb] = (byte)(255.0*ColorXyz.gamma(-0.969256f*x + 1.875991f*y + 0.041556f*z) + 0.5f);
+				B.data[indexRgb] = (byte)(255.0*ColorXyz.gamma(0.055648f*x - 0.204043f*y + 1.057311f*z) + 0.5f);
 			}
 		}
 		//CONCURRENT_ABOVE });

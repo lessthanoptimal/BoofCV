@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -26,22 +26,23 @@ import boofcv.struct.image.ImageType;
 import org.ddogleg.struct.Stoppable;
 
 /**
+ * Wrapper around {@link SegmentMeanShift} for {@link ImageSuperpixels}.
+ *
  * @author Peter Abeles
  */
 public class MeanShift_to_ImageSuperpixels<T extends ImageBase<T>>
-		implements ImageSuperpixels<T> , Stoppable
-{
+		implements ImageSuperpixels<T>, Stoppable {
 	SegmentMeanShift<T> ms;
 	ConnectRule rule;
 
-	public MeanShift_to_ImageSuperpixels(SegmentMeanShift<T> ms, ConnectRule rule) {
+	public MeanShift_to_ImageSuperpixels( SegmentMeanShift<T> ms, ConnectRule rule ) {
 		this.ms = ms;
 		this.rule = rule;
 	}
 
 	@Override
-	public void segment(T input, GrayS32 output) {
-		ms.process(input,output);
+	public void segment( T input, GrayS32 output ) {
+		ms.process(input, output);
 	}
 
 	@Override

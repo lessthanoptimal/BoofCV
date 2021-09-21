@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -21,76 +21,59 @@ package boofcv.alg.distort;
 import boofcv.struct.image.*;
 
 /**
+ * Abstract way to assign pixel values to {@link ImageMultiBand} without knowing the underlying data type.
+ *
  * @author Peter Abeles
  */
-public interface AssignPixelValue_MB <T extends ImageMultiBand<T>> {
+public interface AssignPixelValue_MB<T extends ImageMultiBand<T>> {
 	void setImage( T image );
-	void assign(int indexDst, float[] value);
+
+	void assign( int indexDst, float[] value );
 
 	class F32 implements AssignPixelValue_MB<InterleavedF32> {
-
 		InterleavedF32 image;
 
-		@Override
-		public void setImage(InterleavedF32 image) {
-			this.image = image;
-		}
+		@Override public void setImage( InterleavedF32 image ) {this.image = image;}
 
-		@Override
-		public void assign(int indexDst, float[] value) {
-			for( int i = 0; i < image.numBands; i++ ) {
-				image.data[indexDst+i] = value[i];
+		@Override public void assign( int indexDst, float[] value ) {
+			for (int i = 0; i < image.numBands; i++) {
+				image.data[indexDst + i] = value[i];
 			}
 		}
 	}
 
-	class I8 <T extends InterleavedI8<T>> implements AssignPixelValue_MB<T> {
-
+	class I8<T extends InterleavedI8<T>> implements AssignPixelValue_MB<T> {
 		T image;
 
-		@Override
-		public void setImage(T image) {
-			this.image = image;
-		}
+		@Override public void setImage( T image ) {this.image = image;}
 
-		@Override
-		public void assign(int indexDst, float[] value) {
-			for( int i = 0; i < image.numBands; i++ ) {
-				image.data[indexDst+i] = (byte)value[i];
+		@Override public void assign( int indexDst, float[] value ) {
+			for (int i = 0; i < image.numBands; i++) {
+				image.data[indexDst + i] = (byte)value[i];
 			}
 		}
 	}
 
-	class I16 <T extends InterleavedI16<T>> implements AssignPixelValue_MB<T> {
-
+	class I16<T extends InterleavedI16<T>> implements AssignPixelValue_MB<T> {
 		T image;
 
-		@Override
-		public void setImage(T image) {
-			this.image = image;
-		}
+		@Override public void setImage( T image ) {this.image = image;}
 
-		@Override
-		public void assign(int indexDst, float[] value) {
-			for( int i = 0; i < image.numBands; i++ ) {
-				image.data[indexDst+i] = (short)value[i];
+		@Override public void assign( int indexDst, float[] value ) {
+			for (int i = 0; i < image.numBands; i++) {
+				image.data[indexDst + i] = (short)value[i];
 			}
 		}
 	}
 
 	class S32 implements AssignPixelValue_MB<InterleavedS32> {
-
 		InterleavedS32 image;
 
-		@Override
-		public void setImage(InterleavedS32 image) {
-			this.image = image;
-		}
+		@Override public void setImage( InterleavedS32 image ) {this.image = image;}
 
-		@Override
-		public void assign(int indexDst, float[] value) {
-			for( int i = 0; i < image.numBands; i++ ) {
-				image.data[indexDst+i] = (int)value[i];
+		@Override public void assign( int indexDst, float[] value ) {
+			for (int i = 0; i < image.numBands; i++) {
+				image.data[indexDst + i] = (int)value[i];
 			}
 		}
 	}

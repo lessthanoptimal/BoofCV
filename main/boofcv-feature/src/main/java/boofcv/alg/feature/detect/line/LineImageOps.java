@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -34,6 +34,8 @@ import java.util.Iterator;
 import java.util.List;
 
 /**
+ * Operations for working with lines detected inside an image.
+ *
  * @author Peter Abeles
  */
 public class LineImageOps {

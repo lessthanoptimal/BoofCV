@@ -24,6 +24,8 @@ import boofcv.struct.image.GrayI;
 import boofcv.struct.image.GrayS32;
 
 /**
+ * Operations for manipulating different convolution kernels.
+ *
  * @author Peter Abeles
  */
 public class KernelMath {

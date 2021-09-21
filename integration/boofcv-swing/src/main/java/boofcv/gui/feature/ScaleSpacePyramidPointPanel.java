@@ -35,6 +35,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
+ * Panel for visualizing points inside a pyramidal scale space.
+ *
  * @author Peter Abeles
  */
 public class ScaleSpacePyramidPointPanel extends JPanel implements MouseListener {

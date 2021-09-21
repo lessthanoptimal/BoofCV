@@ -18,7 +18,6 @@
 
 package boofcv.core.image.border;
 
-
 import boofcv.struct.border.BorderIndex1D;
 
 /**
@@ -31,11 +30,11 @@ import boofcv.struct.border.BorderIndex1D;
  */
 public class BorderIndex1D_Reflect extends BorderIndex1D {
 	@Override
-	public int getIndex(int index) {
-		if( index < 0 )
+	public int getIndex( int index ) {
+		if (index < 0)
 			return -index;
-		else if( index >= length)
-			return length-2-(index-length);
+		else if (index >= length)
+			return length - 2 - (index - length);
 		else
 			return index;
 	}

@@ -35,6 +35,8 @@ import boofcv.struct.image.ImageType;
 import java.lang.reflect.Method;
 
 /**
+ * Factory for {@link ConvolveInterface}.
+ *
  * @author Peter Abeles
  */
 @SuppressWarnings({"unchecked", "rawtypes"})

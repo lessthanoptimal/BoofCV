@@ -27,6 +27,8 @@ import static boofcv.alg.color.ColorHsv.d60_F32;
 //CONCURRENT_INLINE import boofcv.concurrency.BoofConcurrency;
 
 /**
+ * Low level implementation of function for converting HSV images.
+ *
  * @author Peter Abeles
  */
 @SuppressWarnings("Duplicates")

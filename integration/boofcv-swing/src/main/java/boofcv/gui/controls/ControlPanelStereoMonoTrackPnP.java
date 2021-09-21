@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -30,6 +30,8 @@ import javax.swing.*;
 import java.awt.*;
 
 /**
+ * Control panel for {@link ConfigStereoMonoTrackPnP}
+ *
  * @author Peter Abeles
  */
 public class ControlPanelStereoMonoTrackPnP extends JPanel {
@@ -38,34 +40,34 @@ public class ControlPanelStereoMonoTrackPnP extends JPanel {
 	ControlPanelPointTrackers controlTrackers;
 	ControlPanelDisparitySparse controlDisparity;
 
-	public ControlPanelStereoMonoTrackPnP(ConfigStereoMonoTrackPnP config, Listener listener ) {
+	public ControlPanelStereoMonoTrackPnP( ConfigStereoMonoTrackPnP config, Listener listener ) {
 		setLayout(new BorderLayout());
 		controlPnpDepth = new ControlPanelVisOdomTrackPnP(listener::changedStereoMonoTrackPnP, config.scene);
-		controlTrackers = new ControlPanelPointTrackers(listener::changedStereoMonoTrackPnP,config.tracker);
+		controlTrackers = new ControlPanelPointTrackers(listener::changedStereoMonoTrackPnP, config.tracker);
 		controlDisparity = new ControlPanelDisparitySparse(listener::changedStereoMonoTrackPnP, config.disparity);
 
 		var panelAlgControls = new JPanel(new BorderLayout());
 		var tuningTabs = new JTabbedPane();
-		tuningTabs.addTab("VO",panelAlgControls);
-		tuningTabs.addTab("Tracker",controlTrackers);
-		tuningTabs.addTab("Stereo",controlDisparity);
+		tuningTabs.addTab("VO", panelAlgControls);
+		tuningTabs.addTab("Tracker", controlTrackers);
+		tuningTabs.addTab("Stereo", controlDisparity);
 
 		panelAlgControls.add(BorderLayout.CENTER, controlPnpDepth);
 
 		var panelTuning = new JPanel();
-		panelTuning.setLayout(new BoxLayout(panelTuning,BoxLayout.Y_AXIS));
+		panelTuning.setLayout(new BoxLayout(panelTuning, BoxLayout.Y_AXIS));
 		panelTuning.add(tuningTabs);
 
 		add(BorderLayout.CENTER, tuningTabs);
 	}
 
 	public <T extends ImageGray<T>>
-	StereoVisualOdometry<T> createVisOdom(Class<T> imageType ) {
+	StereoVisualOdometry<T> createVisOdom( Class<T> imageType ) {
 
 		PointTracker<T> tracker = controlTrackers.createTracker(ImageType.single(imageType));
 		StereoDisparitySparse<T> disparity = controlDisparity.createAlgorithm(imageType);
 
-		return FactoryVisualOdometry.stereoMonoPnP(controlPnpDepth.config,disparity,tracker,imageType);
+		return FactoryVisualOdometry.stereoMonoPnP(controlPnpDepth.config, disparity, tracker, imageType);
 	}
 
 	public interface Listener {

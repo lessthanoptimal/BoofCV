@@ -29,7 +29,6 @@ import georegression.struct.point.Point2D_F64;
 import lombok.Getter;
 import lombok.Setter;
 import org.ddogleg.struct.DogArray;
-import org.jetbrains.annotations.Nullable;
 
 import javax.swing.*;
 import java.awt.*;
@@ -41,6 +40,8 @@ import static javax.swing.ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER;
 import static javax.swing.ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS;
 
 /**
+ * For showing which images are related to each other.
+ *
  * @author Peter Abeles
  */
 public class RelatedImagePanel extends JPanel {
@@ -239,14 +240,5 @@ public class RelatedImagePanel extends JPanel {
 			double previewScale = img.getWidth()/(double)dbShape.width;
 			return previewScale*scale;
 		}
-	}
-
-	@FunctionalInterface
-	interface CustomFeatureColors {
-		/**
-		 * @param label Which view it's applied to. If null then it's the main view
-		 * @param featureID Which feature in the view
-		 */
-		int getFeatureColor( @Nullable String label, int featureID );
 	}
 }

@@ -92,6 +92,8 @@ public class ContourTracer {
 	}
 
 	/**
+	 * Specifies the input images.
+	 *
 	 * @param binary Binary image with a border of zeros added to the outside.
 	 * @param labeled Labeled image. Size is the same as the original binary image without border.
 	 */
@@ -130,6 +132,8 @@ public class ContourTracer {
 	}
 
 	/**
+	 * Traces the contour starting at the specified seed.
+	 *
 	 * @param external True for tracing an external contour or false for internal.
 	 */
 	public void trace( int label, int initialX, int initialY, boolean external ) {

@@ -46,6 +46,8 @@ import java.awt.event.MouseListener;
 import java.awt.image.BufferedImage;
 
 /**
+ * Visualized {@link TldTracker}.
+ *
  * @author Peter Abeles
  */
 public class VisualizeTldDetectionApp<T extends ImageGray<T>,D extends ImageGray<D>>

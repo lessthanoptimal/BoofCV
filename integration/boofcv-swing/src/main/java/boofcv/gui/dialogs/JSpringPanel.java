@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -23,6 +23,8 @@ import javax.swing.event.ChangeListener;
 import java.awt.*;
 
 /**
+ * Panel which uses {@link SpringLayout}. Contain functions that make working with Spring easier.
+ *
  * @author Peter Abeles
  */
 public class JSpringPanel extends JPanel {

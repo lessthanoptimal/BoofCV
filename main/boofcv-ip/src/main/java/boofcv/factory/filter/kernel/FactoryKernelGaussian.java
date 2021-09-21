@@ -26,6 +26,8 @@ import boofcv.struct.image.ImageGray;
 import org.ddogleg.stats.UtilGaussian;
 
 /**
+ * Factory for creating Gaussian kernels for convolution.
+ *
  * @author Peter Abeles
  */
 // TODO don't use radius use width so that even and odd width kernels are supported

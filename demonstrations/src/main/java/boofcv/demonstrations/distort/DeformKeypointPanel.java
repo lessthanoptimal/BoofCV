@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -33,6 +33,8 @@ import static boofcv.gui.BoofSwingUtil.MAX_ZOOM;
 import static boofcv.gui.BoofSwingUtil.MIN_ZOOM;
 
 /**
+ * Controls for {@link DeformImageKeyPointsApp}
+ *
  * @author Peter Abeles
  */
 public class DeformKeypointPanel extends StandardAlgConfigPanel

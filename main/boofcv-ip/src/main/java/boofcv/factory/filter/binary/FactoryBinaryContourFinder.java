@@ -29,8 +29,9 @@ import boofcv.abst.filter.binary.BinaryLabelContourFinderChang2004;
  */
 public class FactoryBinaryContourFinder {
 	/**
+	 * {@link boofcv.alg.filter.binary.LinearContourLabelChang2004}
+	 *
 	 * @return new instance
-	 * @see boofcv.alg.filter.binary.LinearContourLabelChang2004
 	 */
 	public static BinaryLabelContourFinder linearChang2004() {
 		if (BOverrideFactoryBinaryContourFinder.chang2004 != null) {
@@ -41,7 +42,7 @@ public class FactoryBinaryContourFinder {
 	}
 
 	/**
-	 * Binary contour finder for external contours only
+	 * Binary contour finder for external contours only. {@link BinaryContourFinderLinearExternal}
 	 */
 	public static BinaryContourFinderLinearExternal linearExternal() {
 		return new BinaryContourFinderLinearExternal();

@@ -163,6 +163,8 @@ public class BinaryThinning {
 		}
 
 		/**
+		 * Applies the mask.
+		 *
 		 * @param onesIn (input) Indexes of pixels with a value of 1
 		 * @param onesOut (output) Indexes of pixels with a value of 1 after the mask is applied
 		 * @param zerosOut (output) Indexes of pixels whose values have changed form 1 to 0

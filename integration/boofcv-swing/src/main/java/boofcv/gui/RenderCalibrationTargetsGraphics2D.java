@@ -30,6 +30,8 @@ import java.awt.geom.Rectangle2D;
 import java.awt.image.BufferedImage;
 
 /**
+ * Renders calibration targets using {@link Graphics2D}.
+ *
  * @author Peter Abeles
  */
 public class RenderCalibrationTargetsGraphics2D extends RenderCalibrationTargets {
@@ -37,56 +39,56 @@ public class RenderCalibrationTargetsGraphics2D extends RenderCalibrationTargets
 	int padding;
 	double unitsToPixels;
 
-	BufferedImage bufferred;
+	BufferedImage buffered;
 	Graphics2D g2;
 
-	double paperWidth,paperHeight;
+	double paperWidth, paperHeight;
 
-	int offsetX,offsetY;
+	int offsetX, offsetY;
 
-	public RenderCalibrationTargetsGraphics2D(int padding, double unitsToPixels) {
+	public RenderCalibrationTargetsGraphics2D( int padding, double unitsToPixels ) {
 		this.padding = padding;
 		this.unitsToPixels = unitsToPixels;
 	}
 
-	public void setPaperSize( double widthUnits , double heightUnits ) {
+	public void setPaperSize( double widthUnits, double heightUnits ) {
 		this.paperWidth = widthUnits;
 		this.paperHeight = heightUnits;
 	}
 
 	@Override
-	public void specifySize(double width, double height) {
+	public void specifySize( double width, double height ) {
 
-		int w = (int)(unitsToPixels*width+0.5);
-		int h = (int)(unitsToPixels*height+0.5);
+		int w = (int)(unitsToPixels*width + 0.5);
+		int h = (int)(unitsToPixels*height + 0.5);
 
-		if( paperWidth <= 0 || paperHeight <= 0 ) {
+		if (paperWidth <= 0 || paperHeight <= 0) {
 			offsetX = offsetY = padding;
 		} else {
-			offsetX = ((int)(unitsToPixels*paperWidth+0.5)-w)/2;
-			offsetY = ((int)(unitsToPixels*paperHeight+0.5)-h)/2;
+			offsetX = ((int)(unitsToPixels*paperWidth + 0.5) - w)/2;
+			offsetY = ((int)(unitsToPixels*paperHeight + 0.5) - h)/2;
 		}
 
-		if( offsetX <= 0 || offsetY <= 0 )
-			bufferred = new BufferedImage(w,h,BufferedImage.TYPE_INT_RGB);
+		if (offsetX <= 0 || offsetY <= 0)
+			buffered = new BufferedImage(w, h, BufferedImage.TYPE_INT_RGB);
 		else
-			bufferred = new BufferedImage(w+2*offsetX,h+2*offsetY,BufferedImage.TYPE_INT_RGB);
+			buffered = new BufferedImage(w + 2*offsetX, h + 2*offsetY, BufferedImage.TYPE_INT_RGB);
 
-		g2 = bufferred.createGraphics();
+		g2 = buffered.createGraphics();
 		g2.setColor(Color.WHITE);
-		g2.fillRect(0,0,bufferred.getWidth(),bufferred.getHeight());
+		g2.fillRect(0, 0, buffered.getWidth(), buffered.getHeight());
 		g2.setColor(Color.BLACK);
 		BoofSwingUtil.antialiasing(g2);
 	}
 
 	@Override
-	public void markerToTarget(double x, double y, Point2D_F64 p) {
+	public void markerToTarget( double x, double y, Point2D_F64 p ) {
 		p.x = offsetX + x*unitsToPixels;
 		p.y = offsetY + y*unitsToPixels;
 	}
 
 	@Override
-	public void drawSquare(double x, double y, double width) {
+	public void drawSquare( double x, double y, double width ) {
 		Rectangle2D.Double r = new Rectangle2D.Double();
 		r.x = offsetX + x*unitsToPixels;
 		r.y = offsetY + y*unitsToPixels;
@@ -97,21 +99,21 @@ public class RenderCalibrationTargetsGraphics2D extends RenderCalibrationTargets
 	}
 
 	@Override
-	public void drawCircle(double cx, double cy, double diameter) {
+	public void drawCircle( double cx, double cy, double diameter ) {
 		Ellipse2D.Double ellipse = new Ellipse2D.Double();
-		ellipse.x = offsetX + (cx-diameter/2)*unitsToPixels;
-		ellipse.y = offsetY + (cy-diameter/2)*unitsToPixels;
+		ellipse.x = offsetX + (cx - diameter/2)*unitsToPixels;
+		ellipse.y = offsetY + (cy - diameter/2)*unitsToPixels;
 		ellipse.width = diameter*unitsToPixels;
 		ellipse.height = diameter*unitsToPixels;
 		g2.fill(ellipse);
 	}
 
 	public double getWidthWorld() {
-		return bufferred.getWidth()/unitsToPixels;
+		return buffered.getWidth()/unitsToPixels;
 	}
 
 	public double getHeightWorld() {
-		return bufferred.getHeight()/unitsToPixels;
+		return buffered.getHeight()/unitsToPixels;
 	}
 
 	public int getOffsetX() {
@@ -123,18 +125,18 @@ public class RenderCalibrationTargetsGraphics2D extends RenderCalibrationTargets
 	}
 
 	public GrayU8 getGrayU8() {
-		GrayU8 gray = new GrayU8(bufferred.getWidth(),bufferred.getHeight());
-		ConvertBufferedImage.convertFrom(bufferred,gray);
+		GrayU8 gray = new GrayU8(buffered.getWidth(), buffered.getHeight());
+		ConvertBufferedImage.convertFrom(buffered, gray);
 		return gray;
 	}
 
 	public GrayF32 getGrayF32() {
-		GrayF32 gray = new GrayF32(bufferred.getWidth(),bufferred.getHeight());
-		ConvertBufferedImage.convertFrom(bufferred,gray);
+		GrayF32 gray = new GrayF32(buffered.getWidth(), buffered.getHeight());
+		ConvertBufferedImage.convertFrom(buffered, gray);
 		return gray;
 	}
 
-	public BufferedImage getBufferred() {
-		return bufferred;
+	public BufferedImage getBuffered() {
+		return buffered;
 	}
 }

@@ -24,28 +24,16 @@ package boofcv.alg.filter.derivative;
  * @author Peter Abeles
  */
 public enum DerivativeType {
-	/**
-	 * @see GradientPrewitt
-	 */
+	/** {@link GradientPrewitt} */
 	PREWITT,
-	/**
-	 * @see GradientSobel
-	 */
+	/** {@link GradientSobel} */
 	SOBEL,
-	/**
-	 * @see GradientScharr
-	 */
+	/** {@link GradientScharr} */
 	SCHARR,
-	/**
-	 * @see GradientThree
-	 */
+	/** {@link GradientThree} */
 	THREE,
-	/**
-	 * @see GradientTwo0
-	 */
+	/** {@link GradientTwo0} */
 	TWO_0,
-	/**
-	 * @see GradientTwo1
-	 */
+	/** {@link GradientTwo1} */
 	TWO_1
 }

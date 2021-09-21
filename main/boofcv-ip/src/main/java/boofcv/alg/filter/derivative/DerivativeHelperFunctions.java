@@ -30,6 +30,8 @@ import boofcv.struct.image.GrayS32;
 import boofcv.struct.image.GrayU8;
 
 /**
+ * Functions for image derivatives.
+ *
  * @author Peter Abeles
  */
 public class DerivativeHelperFunctions {

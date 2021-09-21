@@ -18,31 +18,28 @@
 
 package boofcv.factory.feature.detect.line;
 
+import boofcv.abst.feature.detect.line.DetectLineSegmentsGridRansac;
 import boofcv.struct.Configuration;
 
 /**
+ * Configuration for {@link DetectLineSegmentsGridRansac}.
+ *
  * @author Peter Abeles
  */
 public class ConfigLineRansac implements Configuration {
+	/** Size of the region considered. Try 40 and tune. */
+	public int regionSize = 40;
 
-	/**
-	 * Size of the region considered. Try 40 and tune.
-	 */
-	public int regionSize=40;
-	/**
-	 * Threshold for determining which pixels belong to an edge or not. Try 30 and tune.
-	 */
-	public double thresholdEdge=30;
-	/**
-	 * Tolerance in angle for allowing two edgels to be paired up, in radians. Try 2.36
-	 */
-	public double thresholdAngle=2.36;
-	/**
-	 * Should lines be connected and optimized.
-	 */
-	public boolean connectLines=true;
+	/** Threshold for determining which pixels belong to an edge or not. Try 30 and tune. */
+	public double thresholdEdge = 30;
 
-	public ConfigLineRansac(int regionSize, double thresholdEdge, double thresholdAngle, boolean connectLines) {
+	/** Tolerance in angle for allowing two edgels to be paired up, in radians. Try 2.36 */
+	public double thresholdAngle = 2.36;
+
+	/** Should lines be connected and optimized. */
+	public boolean connectLines = true;
+
+	public ConfigLineRansac( int regionSize, double thresholdEdge, double thresholdAngle, boolean connectLines ) {
 		this.regionSize = regionSize;
 		this.thresholdEdge = thresholdEdge;
 		this.thresholdAngle = thresholdAngle;
@@ -58,8 +55,5 @@ public class ConfigLineRansac implements Configuration {
 		this.connectLines = src.connectLines;
 	}
 
-	@Override
-	public void checkValidity() {
-
-	}
+	@Override public void checkValidity() {}
 }

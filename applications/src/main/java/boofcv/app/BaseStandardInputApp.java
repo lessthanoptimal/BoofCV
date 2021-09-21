@@ -22,6 +22,8 @@ import boofcv.misc.BoofMiscOps;
 import com.github.sarxos.webcam.Webcam;
 
 /**
+ * Base class for application which stream multiple images
+ *
  * @author Peter Abeles
  */
 public class BaseStandardInputApp {

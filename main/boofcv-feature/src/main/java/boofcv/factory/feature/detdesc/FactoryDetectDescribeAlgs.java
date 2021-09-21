@@ -35,6 +35,8 @@ import boofcv.struct.image.GrayF32;
 import org.jetbrains.annotations.Nullable;
 
 /**
+ * Factory for specific implementations of Detect and Describe feature algorithms.
+ *
  * @author Peter Abeles
  */
 public class FactoryDetectDescribeAlgs {

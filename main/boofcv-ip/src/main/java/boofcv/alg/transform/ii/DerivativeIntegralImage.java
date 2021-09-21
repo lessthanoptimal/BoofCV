@@ -23,10 +23,11 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 /**
+ * Functions related to image derivatives in integral images.
+ *
  * @author Peter Abeles
  */
 public class DerivativeIntegralImage {
-
 	/**
 	 * Creates a kernel for a symmetric box derivative.
 	 *

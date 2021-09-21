@@ -61,11 +61,10 @@ import java.util.Arrays;
 import java.util.List;
 
 /**
- * Visualizes data from
+ * Visualizes data from {@link DepthVisualOdometry}.
  *
  * @author Peter Abeles
  */
-
 // TODO custom visualization for direct method
 // TODO   - Key Fraction - Diversity - Key Frames
 // TODO   - Show image unwarping

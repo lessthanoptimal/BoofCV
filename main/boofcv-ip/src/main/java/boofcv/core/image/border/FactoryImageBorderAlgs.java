@@ -25,11 +25,13 @@ import boofcv.struct.image.GrayF64;
 import boofcv.struct.image.GrayI;
 
 /**
+ * Factory for creating data type specific implementations of {@link ImageBorder1D}.
+ *
  * @author Peter Abeles
  */
 public class FactoryImageBorderAlgs {
 
-	public static ImageBorder1D_F64 extend(GrayF64 image ) {
+	public static ImageBorder1D_F64 extend( GrayF64 image ) {
 		ImageBorder1D_F64 ret = new ImageBorder1D_F64(BorderIndex1D_Extend::new);
 		ret.setImage(image);
 		return ret;
@@ -47,11 +49,11 @@ public class FactoryImageBorderAlgs {
 		return ret;
 	}
 
-	public static ImageBorder_F64 value(GrayF64 image , double value ) {
-		return ImageBorderValue.wrap(image,value);
+	public static ImageBorder_F64 value( GrayF64 image, double value ) {
+		return ImageBorderValue.wrap(image, value);
 	}
 
-	public static ImageBorder1D_F32 extend(GrayF32 image ) {
+	public static ImageBorder1D_F32 extend( GrayF32 image ) {
 		ImageBorder1D_F32 ret = new ImageBorder1D_F32(BorderIndex1D_Extend::new);
 		ret.setImage(image);
 		return ret;
@@ -69,29 +71,29 @@ public class FactoryImageBorderAlgs {
 		return ret;
 	}
 
-	public static ImageBorder_F32 value(GrayF32 image , float value ) {
-		return ImageBorderValue.wrap(image,value);
+	public static ImageBorder_F32 value( GrayF32 image, float value ) {
+		return ImageBorderValue.wrap(image, value);
 	}
 
-	public static <T extends GrayI<T>> ImageBorder1D_S32<T> extend(T image ) {
+	public static <T extends GrayI<T>> ImageBorder1D_S32<T> extend( T image ) {
 		ImageBorder1D_S32<T> ret = new ImageBorder1D_S32<>(BorderIndex1D_Extend::new);
 		ret.setImage(image);
 		return ret;
 	}
 
-	public static <T extends GrayI<T>> ImageBorder1D_S32<T> reflect(T image ) {
+	public static <T extends GrayI<T>> ImageBorder1D_S32<T> reflect( T image ) {
 		ImageBorder1D_S32<T> ret = new ImageBorder1D_S32<>(BorderIndex1D_Reflect::new);
 		ret.setImage(image);
 		return ret;
 	}
 
-	public static <T extends GrayI<T>> ImageBorder1D_S32<T> wrap(T image ) {
+	public static <T extends GrayI<T>> ImageBorder1D_S32<T> wrap( T image ) {
 		ImageBorder1D_S32<T> ret = new ImageBorder1D_S32<>(BorderIndex1D_Wrap::new);
 		ret.setImage(image);
 		return ret;
 	}
 
-	public static ImageBorder_S32 value(GrayI image , int value ) {
-		return ImageBorderValue.wrap(image,value);
+	public static ImageBorder_S32 value( GrayI image, int value ) {
+		return ImageBorderValue.wrap(image, value);
 	}
 }

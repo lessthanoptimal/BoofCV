@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -21,6 +21,8 @@ package boofcv.demonstrations.sfm.d3;
 import javax.swing.*;
 
 /**
+ * Controls for {@link VisualizeDepthVisualOdometryApp}
+ *
  * @author Peter Abeles
  */
 public class VisualOdometryDirectPanel extends VisualOdometryAlgorithmPanel {
@@ -29,16 +31,16 @@ public class VisualOdometryDirectPanel extends VisualOdometryAlgorithmPanel {
 	public VisualOdometryDirectPanel() {
 		displayInBounds = createTextInfo();
 
-		addLabeledV(displayInBounds,  "In Bounds", this);
+		addLabeledV(displayInBounds, "In Bounds", this);
 		addHorizontalGlue(this);
 	}
 
 	public void setInBounds( double fractionInBounds ) {
-		displayInBounds.setText(String.format("%5.3f",fractionInBounds));
+		displayInBounds.setText(String.format("%5.3f", fractionInBounds));
 	}
 
 	private JTextArea createTextInfo() {
-		JTextArea comp = new JTextArea(1,6);
+		JTextArea comp = new JTextArea(1, 6);
 		comp.setMaximumSize(comp.getPreferredSize());
 		comp.setEditable(false);
 		return comp;

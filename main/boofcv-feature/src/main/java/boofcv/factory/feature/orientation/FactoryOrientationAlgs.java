@@ -27,6 +27,8 @@ import boofcv.alg.feature.orientation.impl.*;
 import boofcv.struct.image.*;
 
 /**
+ * Creates specific implementations of local region orientation estimators.
+ *
  * @author Peter Abeles
  */
 @SuppressWarnings({"unchecked"})
@@ -109,6 +111,8 @@ public class FactoryOrientationAlgs {
 	}
 
 	/**
+	 * Orientation using "average" approach on integral images.
+	 *
 	 * @param config Configuration for algorithm.
 	 * @param integralType Type of image being processed.
 	 * @return OrientationIntegral

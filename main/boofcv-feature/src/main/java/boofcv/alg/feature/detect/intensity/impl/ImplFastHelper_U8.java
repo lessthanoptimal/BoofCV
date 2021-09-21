@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -21,6 +21,8 @@ package boofcv.alg.feature.detect.intensity.impl;
 import boofcv.struct.image.GrayU8;
 
 /**
+ * Helper functions for {@link boofcv.alg.feature.detect.intensity.FastCornerDetector} with {@link GrayU8} images.
+ *
  * @author Peter Abeles
  */
 public abstract class ImplFastHelper_U8 implements FastCornerInterface<GrayU8> {
@@ -32,14 +34,14 @@ public abstract class ImplFastHelper_U8 implements FastCornerInterface<GrayU8> {
 	protected byte[] data;
 
 	int centerValue;
-	int lower,upper;
+	int lower, upper;
 
-	protected ImplFastHelper_U8(int pixelTol  ) {
+	protected ImplFastHelper_U8( int pixelTol ) {
 		this.tol = pixelTol;
 	}
 
 	@Override
-	public void setImage( GrayU8 image , int[] offsets ) {
+	public void setImage( GrayU8 image, int[] offsets ) {
 		this.data = image.data;
 		this.offsets = offsets;
 	}
@@ -48,15 +50,15 @@ public abstract class ImplFastHelper_U8 implements FastCornerInterface<GrayU8> {
 	public float scoreLower( int index ) {
 		int total = 0;
 		int count = 0;
-		for( int i = 0; i < offsets.length; i++ ) {
-			int v = data[index+offsets[i]] & 0xFF;
-			if( v < lower ) {
+		for (int i = 0; i < offsets.length; i++) {
+			int v = data[index + offsets[i]] & 0xFF;
+			if (v < lower) {
 				total += v;
 				count++;
 			}
 		}
 
-		if( count == 0 )
+		if (count == 0)
 			return 0;
 
 		return total - centerValue*count;
@@ -66,15 +68,15 @@ public abstract class ImplFastHelper_U8 implements FastCornerInterface<GrayU8> {
 	public float scoreUpper( int index ) {
 		int total = 0;
 		int count = 0;
-		for( int i = 0; i < offsets.length; i++ ) {
-			int v = data[index+offsets[i]] & 0xFF;
-			if( v > upper ) {
+		for (int i = 0; i < offsets.length; i++) {
+			int v = data[index + offsets[i]] & 0xFF;
+			if (v > upper) {
 				total += v;
 				count++;
 			}
 		}
 
-		if( count == 0 )
+		if (count == 0)
 			return 0;
 
 		return total - centerValue*count;
@@ -82,7 +84,7 @@ public abstract class ImplFastHelper_U8 implements FastCornerInterface<GrayU8> {
 
 	@Override
 	public void setThreshold( int index ) {
-		centerValue = data[index]& 0xFF;
+		centerValue = data[index] & 0xFF;
 		lower = centerValue - tol;
 		upper = centerValue + tol;
 	}

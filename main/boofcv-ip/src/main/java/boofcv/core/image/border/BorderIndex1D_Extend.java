@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -18,21 +18,20 @@
 
 package boofcv.core.image.border;
 
-
 import boofcv.struct.border.BorderIndex1D;
 
 /**
- * Access to outside of the array return the element at the closest border.
+ * Returns the closest point inside the image based on Manhattan distance.
  *
  * @author Peter Abeles
  */
 public class BorderIndex1D_Extend extends BorderIndex1D {
 	@Override
-	public int getIndex(int index) {
-		if( index < 0 ) {
+	public int getIndex( int index ) {
+		if (index < 0) {
 			return 0;
-		} else if( index >= length )
-			return length-1;
+		} else if (index >= length)
+			return length - 1;
 		return index;
 	}
 

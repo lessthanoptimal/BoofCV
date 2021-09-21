@@ -32,6 +32,8 @@ import java.awt.*;
 import java.awt.event.ActionEvent;
 
 /**
+ * Control panel for {@link ConfigStereoDualTrackPnP}.
+ *
  * @author Peter Abeles
  */
 public class ControlPanelStereoDualTrackPnP extends JTabbedPane {

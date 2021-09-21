@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -22,10 +22,11 @@ import boofcv.struct.ConfigLength;
 import boofcv.struct.Configuration;
 
 /**
+ * Configuration for {@link PointTrackerHybrid}.
+ *
  * @author Peter Abeles
  */
 public class ConfigTrackerHybrid implements Configuration {
-
 	/**
 	 * KLT tracks can drift to being on top of each other. This will prune a few if that happens
 	 */
@@ -43,15 +44,10 @@ public class ConfigTrackerHybrid implements Configuration {
 	 */
 	public ConfigLength thresholdRespawn = ConfigLength.relative(0.4,50);
 
-	/**
-	 * Random seed
-	 */
+	/** Random seed */
 	public long seed=0xDEADBEEF;
 
-	@Override
-	public void checkValidity() {
-
-	}
+	@Override public void checkValidity() {}
 
 	public void setTo( ConfigTrackerHybrid src ) {
 		this.pruneCloseTracks = src.pruneCloseTracks;

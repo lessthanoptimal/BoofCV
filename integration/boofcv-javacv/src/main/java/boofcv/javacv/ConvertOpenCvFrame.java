@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -27,44 +27,44 @@ import java.nio.Buffer;
 import java.nio.ByteBuffer;
 
 /**
+ * Converts OpenCV's image format into BoofCV's format.
+ *
  * @author Peter Abeles
  */
 public class ConvertOpenCvFrame {
 
-	public static void BGR_to_RGB(Planar planar ) {
-		ImageGray tmp0 = planar.getBand(0);
-		ImageGray tmp2 = planar.getBand(2);
+	public static <T extends ImageGray<T>> void BGR_to_RGB( Planar<T> planar ) {
+		T tmp0 = planar.getBand(0);
+		T tmp2 = planar.getBand(2);
 
 		planar.bands[0] = tmp2;
 		planar.bands[2] = tmp0;
 	}
 
-	public static void convert(Frame input , ImageBase output , boolean swapRgb, DogArray_I8 work) {
-
-		if( work == null )
+	public static void convert( Frame input, ImageBase output, boolean swapRgb, DogArray_I8 work ) {
+		if (work == null)
 			work = new DogArray_I8();
 
 		Buffer data = input.image[0];
-		if( !(data instanceof ByteBuffer) ) {
+		if (!(data instanceof ByteBuffer)) {
 			return;
 		}
 		ByteBuffer bb = (ByteBuffer)data;
-		output.reshape(input.imageWidth,input.imageHeight);
+		output.reshape(input.imageWidth, input.imageHeight);
 
-		if( output instanceof Planar ) {
+		if (output instanceof Planar) {
 			((Planar)output).setNumberOfBands(input.imageChannels);
-			ConvertByteBufferImage.from_3BU8_to_3PU8(bb,0,input.imageStride,(Planar)output,work);
+			ConvertByteBufferImage.from_3BU8_to_3PU8(bb, 0, input.imageStride, (Planar)output, work);
 
-			if( swapRgb ) {
+			if (swapRgb) {
 				BGR_to_RGB((Planar)output);
 			}
-		} else if( output instanceof ImageGray ) {
-			ConvertByteBufferImage.from_3BU8_to_U8(bb,0,input.imageStride,(GrayU8)output,work);
-		} else if( output instanceof ImageInterleaved) {
-			ConvertByteBufferImage.from_3BU8_to_3IU8(bb,0,input.imageStride,(InterleavedU8)output);
+		} else if (output instanceof ImageGray) {
+			ConvertByteBufferImage.from_3BU8_to_U8(bb, 0, input.imageStride, (GrayU8)output, work);
+		} else if (output instanceof ImageInterleaved) {
+			ConvertByteBufferImage.from_3BU8_to_3IU8(bb, 0, input.imageStride, (InterleavedU8)output);
 		} else {
 			throw new IllegalArgumentException("Unsupported output type");
 		}
 	}
-
 }

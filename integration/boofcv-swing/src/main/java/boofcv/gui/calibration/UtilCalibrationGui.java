@@ -118,7 +118,7 @@ public class UtilCalibrationGui {
 			double space = circle*c.shapeDistance/c.shapeSize;
 			renderer.circleHex(c.numRows, c.numCols, circle, space);
 		}
-		return renderer.getBufferred();
+		return renderer.getBuffered();
 	}
 
 	private static FiducialRenderEngineGraphics2D configureRenderGraphics2D( int markerWidth, int markerHeight, int border ) {

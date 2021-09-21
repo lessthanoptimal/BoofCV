@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -30,43 +30,44 @@ import boofcv.struct.image.GrayS32;
 //CONCURRENT_INLINE import boofcv.concurrency.BoofConcurrency;
 
 /**
+ * Implementation of SSD Weighted Corner for {@link GrayS16} images.
+ *
  * @author Peter Abeles
  */
-public class ImplSsdCornerWeighted_S16 extends ImplSsdCornerBase<GrayS16,GrayS32>
-		implements GradientCornerIntensity<GrayS16>
-{
+public class ImplSsdCornerWeighted_S16 extends ImplSsdCornerBase<GrayS16, GrayS32>
+		implements GradientCornerIntensity<GrayS16> {
 	CornerIntensity_S32 intensity;
 
 	Kernel1D_S32 kernel;
-	GrayS32 temp = new GrayS32(1,1);
+	GrayS32 temp = new GrayS32(1, 1);
 
-	public ImplSsdCornerWeighted_S16(int radius, CornerIntensity_S32 intensity) {
+	public ImplSsdCornerWeighted_S16( int radius, CornerIntensity_S32 intensity ) {
 		super(radius, GrayS16.class, GrayS32.class);
 		this.intensity = intensity;
 		kernel = FactoryKernelGaussian.gaussian(Kernel1D_S32.class, -1, radius);
 	}
 
 	@Override
-	public void process(GrayS16 derivX, GrayS16 derivY, GrayF32 intensity ) {
+	public void process( GrayS16 derivX, GrayS16 derivY, GrayF32 intensity ) {
 		InputSanityCheck.checkSameShape(derivX, derivY);
-		intensity.reshape(derivX.width,derivX.height);
+		intensity.reshape(derivX.width, derivX.height);
 
 		int w = derivX.width;
 		int h = derivX.height;
-		
-		horizXX.reshape(w,h);
-		horizXY.reshape(w,h);
-		horizYY.reshape(w,h);
-		temp.reshape(w,h);
-		intensity.reshape(w,h);
+
+		horizXX.reshape(w, h);
+		horizXY.reshape(w, h);
+		horizYY.reshape(w, h);
+		temp.reshape(w, h);
+		intensity.reshape(w, h);
 
 		//CONCURRENT_BELOW BoofConcurrency.loopFor(0,h,y->{
-		for( int y = 0; y < h; y++ ) {
+		for (int y = 0; y < h; y++) {
 			int indexX = derivX.startIndex + derivX.stride*y;
 			int indexY = derivY.startIndex + derivY.stride*y;
 
 			int index = horizXX.stride*y;
-			for( int x = 0; x < w; x++ , index++ ) {
+			for (int x = 0; x < w; x++, index++) {
 				int dx = derivX.data[indexX++];
 				int dy = derivY.data[indexY++];
 
@@ -78,27 +79,27 @@ public class ImplSsdCornerWeighted_S16 extends ImplSsdCornerBase<GrayS16,GrayS32
 		//CONCURRENT_ABOVE });
 
 		// apply the the Gaussian weights
-		blur(horizXX,temp);
-		blur(horizXY,temp);
-		blur(horizYY,temp);
+		blur(horizXX, temp);
+		blur(horizXY, temp);
+		blur(horizYY, temp);
 
 		//CONCURRENT_BELOW BoofConcurrency.loopFor(0,h,y->{
-		for( int y = 0; y < h; y++ ) {
+		for (int y = 0; y < h; y++) {
 			int index = horizXX.stride*y;
-			for( int x = 0; x < w; x++ , index++ ) {
+			for (int x = 0; x < w; x++, index++) {
 				int totalXX = horizXX.data[index];
 				int totalXY = horizXY.data[index];
 				int totalYY = horizYY.data[index];
 
-				intensity.data[index] = this.intensity.compute(totalXX,totalXY,totalYY);
+				intensity.data[index] = this.intensity.compute(totalXX, totalXY, totalYY);
 			}
 		}
 		//CONCURRENT_ABOVE });
 	}
 
-	private void blur(GrayS32 image , GrayS32 temp ) {
+	private void blur( GrayS32 image, GrayS32 temp ) {
 		ConvolveImageNormalized.horizontal(kernel, image, temp);
-		ConvolveImageNormalized.vertical(kernel,temp,image);
+		ConvolveImageNormalized.vertical(kernel, temp, image);
 	}
 
 	@Override

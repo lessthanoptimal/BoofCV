@@ -36,6 +36,8 @@ import java.util.List;
 import static boofcv.gui.fiducial.VisualizeFiducial.drawLine;
 
 /**
+ * Functions for rendering different shapes.
+ *
  * @author Peter Abeles
  */
 public class VisualizeShapes {

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -19,8 +19,7 @@
 package boofcv.alg.interpolate.array;
 
 /**
- * Same as {@link PolynomialNeville_F32} but it assumes that the points are
- * sampled at integer values only.
+ * Same as {@link PolynomialNeville_F32} but it assumes that the points are sampled at integer values only.
  *
  * @author Peter Abeles
  */
@@ -28,29 +27,26 @@ public class PolynomialNevilleFixed_F32 {
 
 	// number of sample points
 	private int size;
-	private float y[];
+	private float[] y;
 
-	float c[];
-	float d[];
+	float[] c;
+	float[] d;
 
 	public PolynomialNevilleFixed_F32( int maxDegree ) {
 		c = new float[maxDegree];
 		d = new float[maxDegree];
 	}
 
-	public PolynomialNevilleFixed_F32( int maxDegree, float y[], int size ) {
+	public PolynomialNevilleFixed_F32( int maxDegree, float[] y, int size ) {
 		this(maxDegree);
 		setInput(y, size);
 	}
 
-	public void setInput( float y[], int size ) {
+	public void setInput( float[] y, int size ) {
 		this.size = size;
 		this.y = y;
 	}
 
-	/**
-	 *
-	 */
 	public float process( float sample, int i0, int i1 ) {
 		if (i1 < i0 || (i1 - i0 + 1) > c.length || i1 >= size) {
 			throw new IllegalArgumentException("Bad arguments");

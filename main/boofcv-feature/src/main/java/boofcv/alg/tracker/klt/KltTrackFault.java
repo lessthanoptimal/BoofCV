@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -19,6 +19,8 @@
 package boofcv.alg.tracker.klt;
 
 /**
+ * Different types of faults that can cause a KLT track to be dropped.
+ *
  * @author Peter Abeles
  */
 public enum KltTrackFault {

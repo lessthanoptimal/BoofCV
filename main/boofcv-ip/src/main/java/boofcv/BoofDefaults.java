@@ -22,6 +22,8 @@ import boofcv.struct.border.BorderType;
 
 
 /**
+ * Grab bag of different default values used throughout BoofCV.
+ *
  * @author Peter Abeles
  */
 public class BoofDefaults {

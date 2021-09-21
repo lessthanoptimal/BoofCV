@@ -30,6 +30,8 @@ import java.awt.*;
 import java.awt.image.BufferedImage;
 
 /**
+ * GUI for assisted calibration
+ *
  * @author Peter Abeles
  */
 public class AssistedCalibrationGui extends JPanel {

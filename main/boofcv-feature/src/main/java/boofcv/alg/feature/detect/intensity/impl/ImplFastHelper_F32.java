@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -21,6 +21,8 @@ package boofcv.alg.feature.detect.intensity.impl;
 import boofcv.struct.image.GrayF32;
 
 /**
+ * Helper functions for {@link boofcv.alg.feature.detect.intensity.FastCornerDetector} with {@link GrayF32} images.
+ *
  * @author Peter Abeles
  */
 public abstract class ImplFastHelper_F32 implements FastCornerInterface<GrayF32> {
@@ -32,14 +34,14 @@ public abstract class ImplFastHelper_F32 implements FastCornerInterface<GrayF32>
 	protected float[] data;
 
 	float centerValue;
-	float lower,upper;
+	float lower, upper;
 
-	protected ImplFastHelper_F32(float pixelTol) {
+	protected ImplFastHelper_F32( float pixelTol ) {
 		this.tol = pixelTol;
 	}
 
 	@Override
-	public void setImage( GrayF32 image , int[] offsets ) {
+	public void setImage( GrayF32 image, int[] offsets ) {
 		this.data = image.data;
 		this.offsets = offsets;
 	}
@@ -48,15 +50,15 @@ public abstract class ImplFastHelper_F32 implements FastCornerInterface<GrayF32>
 	public float scoreLower( int index ) {
 		float total = 0.0f;
 		int count = 0;
-		for( int i = 0; i < offsets.length; i++ ) {
-			float v = data[index+offsets[i]];
-			if( v < lower ) {
+		for (int i = 0; i < offsets.length; i++) {
+			float v = data[index + offsets[i]];
+			if (v < lower) {
 				total += v;
 				count++;
 			}
 		}
 
-		if( count == 0 )
+		if (count == 0)
 			return 0;
 
 		return total - centerValue*count;
@@ -66,15 +68,15 @@ public abstract class ImplFastHelper_F32 implements FastCornerInterface<GrayF32>
 	public float scoreUpper( int index ) {
 		float total = 0.0f;
 		int count = 0;
-		for( int i = 0; i < offsets.length; i++ ) {
-			float v = data[index+offsets[i]];
-			if( v > upper ) {
+		for (int i = 0; i < offsets.length; i++) {
+			float v = data[index + offsets[i]];
+			if (v > upper) {
 				total += v;
 				count++;
 			}
 		}
 
-		if( count == 0 )
+		if (count == 0)
 			return 0;
 
 		return total - centerValue*count;

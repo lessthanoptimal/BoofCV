@@ -41,12 +41,13 @@ import boofcv.struct.image.ImageType;
 public class FactoryThresholdBinary {
 
 	/**
+	 * {@link LocalGaussianBinaryFilter}
+	 *
 	 * @param regionWidth Width of square region.
 	 * @param scale Threshold scale adjustment
 	 * @param down Should it threshold up or down.
 	 * @param inputType Type of input image
 	 * @return Filter to binary
-	 * @see LocalGaussianBinaryFilter
 	 */
 	public static <T extends ImageGray<T>>
 	InputToBinary<T> localGaussian( ConfigLength regionWidth, double scale, boolean down, Class<T> inputType ) {
@@ -56,12 +57,13 @@ public class FactoryThresholdBinary {
 	}
 
 	/**
+	 * {@link ThresholdNiblackFamily}
+	 *
 	 * @param width Width of square region.
 	 * @param down Should it threshold up or down.
 	 * @param k User specified threshold adjustment factor. Must be positive. Try 0.3
 	 * @param inputType Type of input image
 	 * @return Filter to binary
-	 * @see ThresholdNiblackFamily
 	 */
 	public static <T extends ImageGray<T>>
 	InputToBinary<T> localSauvola( ConfigLength width, boolean down, float k, Class<T> inputType ) {
@@ -69,12 +71,13 @@ public class FactoryThresholdBinary {
 	}
 
 	/**
+	 * {@link ThresholdNiblackFamily}
+	 *
 	 * @param width Width of square region.
 	 * @param down Should it threshold up or down.
 	 * @param k User specified threshold adjustment factor. Must be positive. Try 0.3
 	 * @param inputType Type of input image
 	 * @return Filter to binary
-	 * @see ThresholdNiblackFamily
 	 */
 	public static <T extends ImageGray<T>>
 	InputToBinary<T> localWolf( ConfigLength width, boolean down, float k, Class<T> inputType ) {
@@ -82,12 +85,13 @@ public class FactoryThresholdBinary {
 	}
 
 	/**
+	 * {@link ThresholdNiblackFamily}
+	 *
 	 * @param width Width of square region.
 	 * @param down Should it threshold up or down.
 	 * @param k User specified threshold adjustment factor. Must be positive. Try 0.3
 	 * @param inputType Type of input image
 	 * @return Filter to binary
-	 * @see ThresholdNiblackFamily
 	 */
 	public static <T extends ImageGray<T>>
 	InputToBinary<T> localNiblack( ConfigLength width, boolean down, float k, Class<T> inputType ) {
@@ -95,13 +99,14 @@ public class FactoryThresholdBinary {
 	}
 
 	/**
+	 * {@link ThresholdNiblackFamily}
+	 *
 	 * @param variant Which variant in the family
 	 * @param width Width of square region.
 	 * @param down Should it threshold up or down.
 	 * @param k User specified threshold adjustment factor. Must be positive. Try 0.3
 	 * @param inputType Type of input image
 	 * @return Filter to binary
-	 * @see ThresholdNiblackFamily
 	 */
 	protected static <T extends ImageGray<T>>
 	InputToBinary<T> localNiblackFamily( ThresholdNiblackFamily.Variant variant,
@@ -119,12 +124,13 @@ public class FactoryThresholdBinary {
 	}
 
 	/**
+	 * {@link ThresholdNick}
+	 *
 	 * @param width size of local region. Try 31
 	 * @param down Should it threshold up or down.
 	 * @param k The Niblack factor. Recommend -0.1 to -0.2
 	 * @param inputType Type of input image
 	 * @return Filter to binary
-	 * @see ThresholdNick
 	 */
 	public static <T extends ImageGray<T>>
 	InputToBinary<T> localNick( ConfigLength width, boolean down, float k, Class<T> inputType ) {
@@ -134,12 +140,13 @@ public class FactoryThresholdBinary {
 	}
 
 	/**
+	 * {@link boofcv.alg.filter.binary.GThresholdImageOps#localMean}
+	 *
 	 * @param width Width of square region.
 	 * @param scale Scale factor adjust for threshold. 1.0 means no change.
 	 * @param down Should it threshold up or down.
 	 * @param inputType Type of input image
 	 * @return Filter to binary
-	 * @see boofcv.alg.filter.binary.GThresholdImageOps#localMean
 	 */
 	public static <T extends ImageGray<T>>
 	InputToBinary<T> localMean( ConfigLength width, double scale, boolean down, Class<T> inputType ) {
@@ -149,7 +156,7 @@ public class FactoryThresholdBinary {
 	}
 
 	/**
-	 * Applies a local Otsu threshold
+	 * Applies a local Otsu threshold. {@link ThresholdLocalOtsu}
 	 *
 	 * @param regionWidth About how wide and tall you wish a block to be in pixels.
 	 * @param scale Scale factor adjust for threshold. 1.0 means no change.
@@ -157,7 +164,6 @@ public class FactoryThresholdBinary {
 	 * @param tuning Tuning parameter. 0 = standard Otsu. Greater than 0 will penalize zero texture.
 	 * @param inputType Type of input image
 	 * @return Filter to binary
-	 * @see ThresholdLocalOtsu
 	 */
 	public static <T extends ImageGray<T>>
 	InputToBinary<T> localOtsu( ConfigLength regionWidth, double scale, boolean down, boolean otsu2, double tuning, Class<T> inputType ) {
@@ -236,14 +242,13 @@ public class FactoryThresholdBinary {
 	}
 
 	/**
-	 * Applies a non-overlapping block Otsu threshold
+	 * Applies a non-overlapping block Otsu threshold. {@link ThresholdBlockOtsu}
 	 *
 	 * @param regionWidth Approximate size of block region
 	 * @param scale Scale factor adjust for threshold. 1.0 means no change.
 	 * @param down Should it threshold up or down.
 	 * @param inputType Type of input image
 	 * @return Filter to binary
-	 * @see ThresholdBlockOtsu
 	 */
 	public static <T extends ImageGray<T>>
 	InputToBinary<T> blockOtsu( ConfigLength regionWidth, double scale, boolean down, boolean thresholdFromLocalBlocks,
@@ -265,12 +270,13 @@ public class FactoryThresholdBinary {
 	}
 
 	/**
+	 * {@link GThresholdImageOps#computeEntropy}
+	 *
 	 * @param minValue The minimum value of a pixel in the image. (inclusive)
 	 * @param maxValue The maximum value of a pixel in the image. (inclusive)
 	 * @param down Should it threshold up or down.
 	 * @param inputType Type of input image
 	 * @return Filter to binary
-	 * @see GThresholdImageOps#computeEntropy
 	 */
 	public static <T extends ImageGray<T>>
 	InputToBinary<T> globalEntropy( int minValue, int maxValue, double scale, boolean down, Class<T> inputType ) {
@@ -280,11 +286,12 @@ public class FactoryThresholdBinary {
 	}
 
 	/**
+	 * {@link boofcv.alg.filter.binary.GThresholdImageOps#threshold}
+	 *
 	 * @param threshold threshold value.
 	 * @param down If true then the inequality &le; is used, otherwise if false then &ge; is used.
 	 * @param inputType Type of input image
 	 * @return Filter to binary
-	 * @see boofcv.alg.filter.binary.GThresholdImageOps#threshold
 	 */
 	public static <T extends ImageGray<T>>
 	InputToBinary<T> globalFixed( double threshold, boolean down, Class<T> inputType ) {
@@ -294,12 +301,13 @@ public class FactoryThresholdBinary {
 	}
 
 	/**
+	 * {@link boofcv.alg.filter.binary.GThresholdImageOps#computeOtsu}
+	 *
 	 * @param minValue The minimum value of a pixel in the image. (inclusive)
 	 * @param maxValue The maximum value of a pixel in the image. (inclusive)
 	 * @param down Should it threshold up or down.
 	 * @param inputType Type of input image
 	 * @return Filter to binary
-	 * @see boofcv.alg.filter.binary.GThresholdImageOps#computeOtsu
 	 */
 	public static <T extends ImageGray<T>>
 	InputToBinary<T> globalOtsu( double minValue, double maxValue, double scale, boolean down, Class<T> inputType ) {
@@ -309,12 +317,13 @@ public class FactoryThresholdBinary {
 	}
 
 	/**
+	 * {@link boofcv.alg.filter.binary.GThresholdImageOps#computeLi(int[], int)}
+	 *
 	 * @param minValue The minimum value of a pixel in the image. (inclusive)
 	 * @param maxValue The maximum value of a pixel in the image. (inclusive)
 	 * @param down Should it threshold up or down.
 	 * @param inputType Type of input image
 	 * @return Filter to binary
-	 * @see boofcv.alg.filter.binary.GThresholdImageOps#computeLi(int[], int)
 	 */
 	public static <T extends ImageGray<T>>
 	InputToBinary<T> globalLi( double minValue, double maxValue, double scale, boolean down, Class<T> inputType ) {
@@ -322,12 +331,13 @@ public class FactoryThresholdBinary {
 	}
 
 	/**
+	 * {@link boofcv.alg.filter.binary.GThresholdImageOps#computeHuang(int[], int)}.
+	 *
 	 * @param minValue The minimum value of a pixel in the image. (inclusive)
 	 * @param maxValue The maximum value of a pixel in the image. (inclusive)
 	 * @param down Should it threshold up or down.
 	 * @param inputType Type of input image
 	 * @return Filter to binary
-	 * @see boofcv.alg.filter.binary.GThresholdImageOps#computeHuang(int[], int)
 	 */
 	public static <T extends ImageGray<T>>
 	InputToBinary<T> globalHuang( double minValue, double maxValue, double scale, boolean down, Class<T> inputType ) {
@@ -343,62 +353,37 @@ public class FactoryThresholdBinary {
 	 */
 	public static <T extends ImageGray<T>>
 	InputToBinary<T> threshold( ConfigThreshold config, Class<T> inputType ) {
+		return switch (config.type) {
+			case FIXED -> globalFixed(config.fixedThreshold, config.down, inputType);
+			case GLOBAL_OTSU -> globalOtsu(config.minPixelValue, config.maxPixelValue, config.scale, config.down, inputType);
+			case GLOBAL_ENTROPY -> globalEntropy(config.minPixelValue, config.maxPixelValue, config.scale, config.down, inputType);
+			case GLOBAL_LI -> globalLi(config.minPixelValue, config.maxPixelValue, config.scale, config.down, inputType);
+			case GLOBAL_HUANG -> globalHuang(config.minPixelValue, config.maxPixelValue, config.scale, config.down, inputType);
+			case LOCAL_GAUSSIAN -> localGaussian(config.width, config.scale, config.down, inputType);
+			case LOCAL_NIBLACK -> localNiblack(config.width, config.down, config.niblackK, inputType);
+			case LOCAL_SAVOLA -> localSauvola(config.width, config.down, config.niblackK, inputType);
+			case LOCAL_WOLF -> localWolf(config.width, config.down, config.niblackK, inputType);
+			case LOCAL_NICK -> localNick(config.width, config.down, config.nickK, inputType);
+			case LOCAL_MEAN -> localMean(config.width, config.scale, config.down, inputType);
 
-		switch (config.type) {
-			case FIXED:
-				return globalFixed(config.fixedThreshold, config.down, inputType);
-
-			case GLOBAL_OTSU:
-				return globalOtsu(config.minPixelValue, config.maxPixelValue, config.scale, config.down, inputType);
-
-			case GLOBAL_ENTROPY:
-				return globalEntropy(config.minPixelValue, config.maxPixelValue, config.scale, config.down, inputType);
-
-			case GLOBAL_LI:
-				return globalLi(config.minPixelValue, config.maxPixelValue, config.scale, config.down, inputType);
-
-			case GLOBAL_HUANG:
-				return globalHuang(config.minPixelValue, config.maxPixelValue, config.scale, config.down, inputType);
-
-			case LOCAL_GAUSSIAN:
-				return localGaussian(config.width, config.scale, config.down, inputType);
-
-			case LOCAL_NIBLACK:
-				return localNiblack(config.width, config.down, config.niblackK, inputType);
-
-			case LOCAL_SAVOLA:
-				return localSauvola(config.width, config.down, config.niblackK, inputType);
-
-			case LOCAL_WOLF:
-				return localWolf(config.width, config.down, config.niblackK, inputType);
-
-			case LOCAL_NICK:
-				return localNick(config.width, config.down, config.nickK, inputType);
-
-			case LOCAL_MEAN:
-				return localMean(config.width, config.scale, config.down, inputType);
-
-			case LOCAL_OTSU: {
+			case LOCAL_OTSU -> {
 				ConfigThresholdLocalOtsu c = (ConfigThresholdLocalOtsu)config;
-				return localOtsu(config.width, config.scale, config.down, c.useOtsu2, c.tuning, inputType);
+				yield localOtsu(config.width, config.scale, config.down, c.useOtsu2, c.tuning, inputType);
 			}
 
-			case BLOCK_MIN_MAX: {
+			case BLOCK_MIN_MAX -> {
 				ConfigThresholdBlockMinMax c = (ConfigThresholdBlockMinMax)config;
-				return blockMinMax(c.width, c.scale, c.down, c.thresholdFromLocalBlocks, c.minimumSpread,
+				yield blockMinMax(c.width, c.scale, c.down, c.thresholdFromLocalBlocks, c.minimumSpread,
 						inputType);
 			}
 
-			case BLOCK_MEAN:
-				return blockMean(config.width, config.scale, config.down,
-						config.thresholdFromLocalBlocks, inputType);
+			case BLOCK_MEAN -> blockMean(config.width, config.scale, config.down, config.thresholdFromLocalBlocks, inputType);
 
-			case BLOCK_OTSU: {
+			case BLOCK_OTSU -> {
 				ConfigThresholdLocalOtsu c = (ConfigThresholdLocalOtsu)config;
-				return blockOtsu(c.width, c.scale, c.down, c.thresholdFromLocalBlocks, c.useOtsu2, c.tuning,
+				yield blockOtsu(c.width, c.scale, c.down, c.thresholdFromLocalBlocks, c.useOtsu2, c.tuning,
 						inputType);
 			}
-		}
-		throw new IllegalArgumentException("Unknown type " + config.type);
+		};
 	}
 }

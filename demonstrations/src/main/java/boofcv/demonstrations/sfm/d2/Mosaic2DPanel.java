@@ -21,6 +21,8 @@ package boofcv.demonstrations.sfm.d2;
 import java.awt.*;
 
 /**
+ * Displays image mosaics
+ *
  * @author Peter Abeles
  */
 public class Mosaic2DPanel extends Motion2DPanel {

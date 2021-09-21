@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -30,6 +30,8 @@ import java.util.Collections;
 import java.util.List;
 
 /**
+ * Functions for pruning and merging lines.
+ *
  * @author Peter Abeles
  */
 public class ImageLinePruneMerge {

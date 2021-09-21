@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -28,21 +28,22 @@ import org.ddogleg.struct.DogArray_I32;
 import org.ddogleg.struct.FastAccess;
 
 /**
+ * Census transform which saves output in a {@link GrayS64}.
+ *
  * @author Peter Abeles
  */
 public class FilterCensusTransformSampleS64<In extends ImageGray<In>>
-		extends FilterCensusTransform<In, GrayS64>
-{
+		extends FilterCensusTransform<In, GrayS64> {
 	FastAccess<Point2D_I32> samples;
 	DogArray_I32 workSpace = new DogArray_I32();
 
-	public FilterCensusTransformSampleS64(FastAccess<Point2D_I32> samples , ImageBorder<In> border, Class<In> imageType ) {
-		super(computeRadius(samples),border,imageType, ImageType.SB_S64);
+	public FilterCensusTransformSampleS64( FastAccess<Point2D_I32> samples, ImageBorder<In> border, Class<In> imageType ) {
+		super(computeRadius(samples), border, imageType, ImageType.SB_S64);
 		this.samples = samples;
 	}
 
 	@Override
-	public void process(In in, GrayS64 out) {
-		GCensusTransform.sample_S64(in,samples,out,border,workSpace);
+	public void process( In in, GrayS64 out ) {
+		GCensusTransform.sample_S64(in, samples, out, border, workSpace);
 	}
 }

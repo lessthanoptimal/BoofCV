@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -56,10 +56,11 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
+ * Visualizes results from detecting square fiducials.
+ *
  * @author Peter Abeles
  */
 public class VisualizeSquareFiducial {
-
 	static ConfigThreshold configThreshold = ConfigThreshold.local(ThresholdType.LOCAL_MEAN, 13);
 
 	static InputToBinary<GrayF32> inputToBinary = FactoryThresholdBinary.threshold(configThreshold, GrayF32.class);

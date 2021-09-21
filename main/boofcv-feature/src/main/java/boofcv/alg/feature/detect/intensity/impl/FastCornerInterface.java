@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -21,11 +21,13 @@ package boofcv.alg.feature.detect.intensity.impl;
 import boofcv.struct.image.ImageGray;
 
 /**
+ * Low level interface for specific implementations of Fast Corner detectors.
+ *
  * @author Peter Abeles
  */
 public interface FastCornerInterface<T extends ImageGray<T>> {
 
-	void setImage( T image , int[] offsets );
+	void setImage( T image, int[] offsets );
 
 	/**
 	 * Sets the lower and upper thresholds relative to the current pixel value

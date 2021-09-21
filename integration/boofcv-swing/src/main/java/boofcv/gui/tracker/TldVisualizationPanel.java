@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -32,6 +32,8 @@ import java.awt.event.MouseListener;
 import java.awt.image.BufferedImage;
 
 /**
+ * Panel for visualizing {@link TldTracker}
+ *
  * @author Peter Abeles
  */
 public class TldVisualizationPanel extends JPanel implements MouseListener {

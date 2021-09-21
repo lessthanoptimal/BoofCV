@@ -38,6 +38,8 @@ import boofcv.struct.image.GrayU8;
 import java.awt.image.BufferedImage;
 
 /**
+ * Visualizes steps in canny edge detector.
+ *
  * @author Peter Abeles
  */
 // todo abstract image type. Put in integer images

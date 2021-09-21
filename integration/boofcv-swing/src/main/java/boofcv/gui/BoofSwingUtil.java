@@ -270,6 +270,8 @@ public class BoofSwingUtil {
 	}
 
 	/**
+	 * Opens a file chooser for the specified file types. Previous path is loaded using preferences.
+	 *
 	 * @param massageName A lambda that lets you change the name of the previous path. Useful when a file type is selected.
 	 */
 	public static File fileChooser( @Nullable String preferenceName, Component parent, boolean openFile, String defaultPath,

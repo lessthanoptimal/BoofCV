@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -25,6 +25,8 @@ import org.jcodec.common.model.ColorSpace;
 import org.jcodec.common.model.Picture;
 
 /**
+ * Low level operations for converting JCodec images.
+ *
  * @author Peter Abeles
  */
 public class ImplConvertJCodecPicture {
@@ -39,7 +41,7 @@ public class ImplConvertJCodecPicture {
 
 		output.reshape(input.getWidth(),input.getHeight());
 
-		byte dataIn[] = input.getData()[0];
+		byte[] dataIn = input.getData()[0];
 
 		GrayU8 out0 = output.getBand(0);
 		GrayU8 out1 = output.getBand(1);

@@ -37,6 +37,8 @@ public class FindUnassociated {
 	DogArray_B matched = new DogArray_B();
 
 	/**
+	 * Finds unassociated features in source
+	 *
 	 * @param matches List of matched features
 	 * @param featureCount Number of source features
 	 * @return indexes of unassociated features from source
@@ -59,6 +61,8 @@ public class FindUnassociated {
 	}
 
 	/**
+	 * Finds unassociated features in destination
+	 *
 	 * @param matches List of matched features
 	 * @param featureCount Number of destination features
 	 * @return indexes of unassociated features from destination

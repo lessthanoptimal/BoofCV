@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -33,12 +33,11 @@ import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
 
 /**
+ * Panel for {@link VisualizeMonocularPlaneVisualOdometryApp}.
+ *
  * @author Peter Abeles
  */
-public class VisualOdometryPanel
-		extends StandardAlgConfigPanel
-		implements ItemListener, ActionListener
-{
+public class VisualOdometryPanel extends StandardAlgConfigPanel implements ItemListener, ActionListener {
 	JLabel displayStatus;
 
 	JComboBox selectView;
@@ -69,18 +68,18 @@ public class VisualOdometryPanel
 	Listener listener;
 
 	public VisualOdometryPanel( Type type ) {
-		setLayout(new BoxLayout(this,BoxLayout.Y_AXIS));
+		setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
 		setBorder(BorderFactory.createEtchedBorder(EtchedBorder.RAISED));
 
 		displayStatus = new JLabel();
-		displayStatus.setFont(new Font("Dialog",Font.BOLD,16));
+		displayStatus.setFont(new Font("Dialog", Font.BOLD, 16));
 
-		if( type == Type.STEREO )
-			selectView = new JComboBox(new String[]{"Right","3D"});
-		else if( type == Type.DEPTH )
-			selectView = new JComboBox(new String[]{"Depth","3D"});
-		else if( type == Type.MONO_PLANE )
-			selectView = new JComboBox(new String[]{"2D","3D"});
+		if (type == Type.STEREO)
+			selectView = new JComboBox(new String[]{"Right", "3D"});
+		else if (type == Type.DEPTH)
+			selectView = new JComboBox(new String[]{"Depth", "3D"});
+		else if (type == Type.MONO_PLANE)
+			selectView = new JComboBox(new String[]{"2D", "3D"});
 		selectView.addActionListener(this);
 		selectView.setMaximumSize(selectView.getPreferredSize());
 
@@ -104,9 +103,9 @@ public class VisualOdometryPanel
 		displayFps = createTextInfo();
 
 		addAlignCenter(displayStatus);
-		addLabeled(selectView,  "View");
+		addLabeled(selectView, "View");
 		addSeparator(150);
-		addLabeled(displayTracks,  "Tracks");
+		addLabeled(displayTracks, "Tracks");
 		addLabeled(displayInliers, "Inliers");
 		addLabeled(displayFaults, "Faults");
 		addLabeled(displayFps, "FPS");
@@ -130,35 +129,35 @@ public class VisualOdometryPanel
 	}
 
 	private JTextArea createTextInfo() {
-		JTextArea comp = new JTextArea(1,6);
+		JTextArea comp = new JTextArea(1, 6);
 		comp.setMaximumSize(comp.getPreferredSize());
 		comp.setEditable(false);
 		return comp;
 	}
 
 	@Override
-	public void itemStateChanged(ItemEvent e) {
-		if( e.getItem() == showInliers) {
+	public void itemStateChanged( ItemEvent e ) {
+		if (e.getItem() == showInliers) {
 			setShowInliers = e.getStateChange() != ItemEvent.DESELECTED;
-		} else if( e.getItem() == showAll) {
+		} else if (e.getItem() == showAll) {
 			setShowAll = e.getStateChange() != ItemEvent.DESELECTED;
 		}
 	}
 
-	public void setCameraToWorld(Se3_F64 cameraToWorld) {
-		displayX.setText(String.format("%6.1f",cameraToWorld.getT().x));
-		displayY.setText(String.format("%6.1f",cameraToWorld.getT().y));
-		displayZ.setText(String.format("%6.1f",cameraToWorld.getT().z));
+	public void setCameraToWorld( Se3_F64 cameraToWorld ) {
+		displayX.setText(String.format("%6.1f", cameraToWorld.getT().x));
+		displayY.setText(String.format("%6.1f", cameraToWorld.getT().y));
+		displayZ.setText(String.format("%6.1f", cameraToWorld.getT().z));
 
-		Vector3D_F64 v = new Vector3D_F64(0,0,1);
+		Vector3D_F64 v = new Vector3D_F64(0, 0, 1);
 		GeometryMath_F64.mult(cameraToWorld.getR(), v, v);
 
 		orientation.setVector(v);
 		orientation.repaint();
 
-		displayOrigin.setText(String.format("%6.1f",cameraToWorld.getT().norm()));
+		displayOrigin.setText(String.format("%6.1f", cameraToWorld.getT().norm()));
 
-		if( prevToWorld == null ) {
+		if (prevToWorld == null) {
 			prevToWorld = cameraToWorld.copy();
 		} else {
 			Se3_F64 worldToPrev = prevToWorld.invert(null);
@@ -166,28 +165,28 @@ public class VisualOdometryPanel
 			integral += prevToWorld.getT().norm();
 			prevToWorld.setTo(cameraToWorld);
 		}
-		displayIntegral.setText(String.format("%6.1f",integral));
+		displayIntegral.setText(String.format("%6.1f", integral));
 	}
 
-	public void setStatus( String text , Color color ) {
+	public void setStatus( String text, Color color ) {
 		displayStatus.setText(text);
 		displayStatus.setForeground(color);
 	}
 
 	public void setNumTracks( int totalTracks ) {
-		displayTracks.setText(String.format("%5d",totalTracks));
+		displayTracks.setText(String.format("%5d", totalTracks));
 	}
 
-	public void setNumInliers(int totalInliers) {
-		displayInliers.setText(String.format("%5d",totalInliers));
+	public void setNumInliers( int totalInliers ) {
+		displayInliers.setText(String.format("%5d", totalInliers));
 	}
 
-	public void setNumFaults(int totalFaults) {
-		displayFaults.setText(String.format("%5d",totalFaults));
+	public void setNumFaults( int totalFaults ) {
+		displayFaults.setText(String.format("%5d", totalFaults));
 	}
 
-	public void setFps(double fps) {
-		displayFps.setText(String.format("%6.1f",fps));
+	public void setFps( double fps ) {
+		displayFps.setText(String.format("%6.1f", fps));
 	}
 
 	public boolean isShowAll() {
@@ -202,14 +201,14 @@ public class VisualOdometryPanel
 		return listener;
 	}
 
-	public void setListener(Listener listener) {
+	public void setListener( Listener listener ) {
 		this.listener = listener;
 	}
 
 	@Override
-	public void actionPerformed(ActionEvent e) {
-		if( e.getSource() == selectView ) {
-			if( listener != null )
+	public void actionPerformed( ActionEvent e ) {
+		if (e.getSource() == selectView) {
+			if (listener != null)
 				listener.eventVoPanel(selectView.getSelectedIndex());
 		}
 	}

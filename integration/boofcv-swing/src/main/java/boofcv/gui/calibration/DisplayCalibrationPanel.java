@@ -43,6 +43,8 @@ import static boofcv.gui.calibration.UtilCalibrationGui.drawNumbers;
 import static boofcv.gui.calibration.UtilCalibrationGui.renderOrder;
 
 /**
+ * Panel for displaying results from camera calibration. Controls and renders visuals.
+ *
  * @author Peter Abeles
  */
 public abstract class DisplayCalibrationPanel extends ImageZoomPanel {

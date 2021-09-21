@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -25,17 +25,18 @@ import boofcv.struct.image.ImageGray;
 import boofcv.struct.image.ImageType;
 
 /**
+ * Census {@link GCensusTransform#dense5x5} transform with output in {@link GrayS32} image.
+ *
  * @author Peter Abeles
  */
-public class FilterCensusTransformD55S32 <In extends ImageGray<In>>
-		extends FilterCensusTransform<In, GrayS32>
-{
-	public FilterCensusTransformD55S32(ImageBorder<In> border, Class<In> imageType ) {
-		super(2,border,imageType, ImageType.SB_S32);
+public class FilterCensusTransformD55S32<In extends ImageGray<In>>
+		extends FilterCensusTransform<In, GrayS32> {
+	public FilterCensusTransformD55S32( ImageBorder<In> border, Class<In> imageType ) {
+		super(2, border, imageType, ImageType.SB_S32);
 	}
 
 	@Override
-	public void process(In in, GrayS32 out) {
-		GCensusTransform.dense5x5(in,out,border);
+	public void process( In in, GrayS32 out ) {
+		GCensusTransform.dense5x5(in, out, border);
 	}
 }

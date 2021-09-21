@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -30,7 +30,7 @@ import java.nio.ByteBuffer;
 // the threads can't share the same processor, since it internally increments the pixel index
 
 /**
- *
+ * Low level implementation of YUV-420 to RGB-888
  *
  * @author Peter Abeles
  */

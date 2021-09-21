@@ -32,6 +32,8 @@ import java.io.File;
 import java.util.ArrayList;
 
 /**
+ * GUI for creating fiducials with a square black border
+ *
  * @author Peter Abeles
  */
 public class CreateFiducialSquareImageGui extends CreateSquareFiducialGui {

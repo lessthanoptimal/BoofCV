@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -30,6 +30,8 @@ import boofcv.struct.image.Planar;
 import java.awt.image.BufferedImage;
 
 /**
+ * Visualizes average down sampling.
+ *
  * @author Peter Abeles
  */
 public class VisualizeAverageDownSample {

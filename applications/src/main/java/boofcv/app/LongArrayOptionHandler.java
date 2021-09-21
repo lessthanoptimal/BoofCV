@@ -26,6 +26,8 @@ import org.kohsuke.args4j.spi.Parameters;
 import org.kohsuke.args4j.spi.Setter;
 
 /**
+ * Allows arrays of longs to be passed in as a command line argument
+ *
  * @author Peter Abeles
  */
 public class LongArrayOptionHandler extends OptionHandler<Long> {

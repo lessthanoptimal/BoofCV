@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -21,69 +21,51 @@ package boofcv.alg.distort;
 import boofcv.struct.image.*;
 
 /**
+ * Abstract way to assign pixel values to {@link ImageGray} without knowing the underlying data type.
+ *
  * @author Peter Abeles
  */
-public interface AssignPixelValue_SB <T extends ImageGray<T>> {
+public interface AssignPixelValue_SB<T extends ImageGray<T>> {
 	void setImage( T image );
 
-	void assign( int indexDst , float value );
+	void assign( int indexDst, float value );
 
 	class F32 implements AssignPixelValue_SB<GrayF32> {
-
 		GrayF32 image;
 
-		@Override
-		public void setImage(GrayF32 image) {
-			this.image = image;
-		}
+		@Override public void setImage( GrayF32 image ) {this.image = image;}
 
-		@Override
-		public void assign(int indexDst, float value) {
+		@Override public void assign( int indexDst, float value ) {
 			this.image.data[indexDst] = value;
 		}
 	}
 
-	class I8 <T extends GrayI8<T>> implements AssignPixelValue_SB<T> {
-
+	class I8<T extends GrayI8<T>> implements AssignPixelValue_SB<T> {
 		T image;
 
-		@Override
-		public void setImage(T image) {
-			this.image = image;
-		}
+		@Override public void setImage( T image ) {this.image = image;}
 
-		@Override
-		public void assign(int indexDst, float value) {
+		@Override public void assign( int indexDst, float value ) {
 			this.image.data[indexDst] = (byte)value;
 		}
 	}
 
-	class I16 <T extends GrayI16<T>> implements AssignPixelValue_SB<T> {
-
+	class I16<T extends GrayI16<T>> implements AssignPixelValue_SB<T> {
 		T image;
 
-		@Override
-		public void setImage(T image) {
-			this.image = image;
-		}
+		@Override public void setImage( T image ) {this.image = image;}
 
-		@Override
-		public void assign(int indexDst, float value) {
+		@Override public void assign( int indexDst, float value ) {
 			this.image.data[indexDst] = (short)value;
 		}
 	}
 
 	class S32 implements AssignPixelValue_SB<GrayS32> {
-
 		GrayS32 image;
 
-		@Override
-		public void setImage(GrayS32 image) {
-			this.image = image;
-		}
+		@Override public void setImage( GrayS32 image ) {this.image = image;}
 
-		@Override
-		public void assign(int indexDst, float value) {
+		@Override public void assign( int indexDst, float value ) {
 			this.image.data[indexDst] = (int)value;
 		}
 	}

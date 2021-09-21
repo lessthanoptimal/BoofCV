@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -18,19 +18,20 @@
 
 package boofcv.core.image.border;
 
-
 import boofcv.struct.border.BorderIndex1D;
 
 /**
+ * Handles borders by wrapping around to the image's other side.
+ *
  * @author Peter Abeles
  */
 public class BorderIndex1D_Wrap extends BorderIndex1D {
 	@Override
-	public int getIndex(int index) {
-		if( index < 0 )
-			return length+index;
-		else if( index >= length)
-			return index-length;
+	public int getIndex( int index ) {
+		if (index < 0)
+			return length + index;
+		else if (index >= length)
+			return index - length;
 		else
 			return index;
 	}

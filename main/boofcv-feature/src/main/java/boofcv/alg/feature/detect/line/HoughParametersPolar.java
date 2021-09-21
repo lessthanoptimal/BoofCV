@@ -26,6 +26,8 @@ import georegression.struct.point.Point2D_F32;
 import georegression.struct.point.Point2D_F64;
 
 /**
+ * {@link HoughTransformParameters} with a polar parameterization.
+ *
  * @author Peter Abeles
  */
 public class HoughParametersPolar implements HoughTransformParameters {

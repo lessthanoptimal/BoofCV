@@ -25,6 +25,8 @@ import boofcv.abst.feature.detect.interest.ConfigSiftDetector;
 import boofcv.struct.Configuration;
 
 /**
+ * Configuration for detecting any built in interest point.
+ *
  * @author Peter Abeles
  */
 public class ConfigDetectInterestPoint implements Configuration {
@@ -37,8 +39,10 @@ public class ConfigDetectInterestPoint implements Configuration {
 
 	/** Configuration for point based detectors (e.g. corners and blob) */
 	public ConfigPointDetector point = new ConfigPointDetector();
+
 	/** Fast Hessian scale invariant blob detector. This is what SURF uses */
 	public ConfigFastHessian fastHessian = new ConfigFastHessian();
+
 	/** SIFT scale invariant blob detector */
 	public ConfigSiftDetector sift = new ConfigSiftDetector();
 

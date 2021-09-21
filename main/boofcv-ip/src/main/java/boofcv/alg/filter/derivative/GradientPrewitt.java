@@ -36,6 +36,8 @@ import boofcv.struct.image.ImageGray;
 import org.jetbrains.annotations.Nullable;
 
 /**
+ * Operations for computing Prewitt image gradient.
+ *
  * @author Peter Abeles
  */
 public class GradientPrewitt {

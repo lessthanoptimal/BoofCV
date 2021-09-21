@@ -28,6 +28,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
+ * Control panel for visualizing a TLD template.
+ *
  * @author Peter Abeles
  */
 public class TldTemplatePanel extends JPanel {

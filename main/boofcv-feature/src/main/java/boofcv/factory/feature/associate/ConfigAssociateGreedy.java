@@ -18,9 +18,12 @@
 
 package boofcv.factory.feature.associate;
 
+import boofcv.alg.feature.associate.AssociateGreedyDesc;
 import boofcv.struct.Configuration;
 
 /**
+ * Configuration for {@link AssociateGreedyDesc}.
+ *
  * @author Peter Abeles
  */
 public class ConfigAssociateGreedy implements Configuration {
@@ -58,11 +61,9 @@ public class ConfigAssociateGreedy implements Configuration {
 		this.forwardsBackwards = forwardsBackwards;
 	}
 
-	public ConfigAssociateGreedy() {
-	}
+	public ConfigAssociateGreedy() {}
 
-	@Override
-	public void checkValidity() {
+	@Override public void checkValidity() {
 		if (scoreRatioThreshold < 0.0)
 			throw new IllegalArgumentException("scoreRatioThreshold must be greater than or equal to 0");
 	}

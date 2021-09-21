@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -18,7 +18,6 @@
 
 package boofcv.abst.feature.detect.line;
 
-
 import boofcv.abst.filter.derivative.ImageGradient;
 import boofcv.alg.feature.detect.edge.GGradientToEdgeFeatures;
 import boofcv.alg.feature.detect.line.ConnectLinesGrid;
@@ -35,12 +34,12 @@ import georegression.struct.line.LineSegment2D_F32;
 import java.util.List;
 
 /**
+ * Wrapper around {@link GridRansacLineDetector} for {@link DetectLineSegment}
+ *
  * @author Peter Abeles
  */
-// TODO update description in FactoryDetectLineAlgs
 public class DetectLineSegmentsGridRansac<T extends ImageGray<T>, D extends ImageGray<D>>
-		implements DetectLineSegment<T>
-{
+		implements DetectLineSegment<T> {
 	GridRansacLineDetector<D> detectorGrid;
 	ConnectLinesGrid connect;
 
@@ -49,15 +48,15 @@ public class DetectLineSegmentsGridRansac<T extends ImageGray<T>, D extends Imag
 	GrayF32 edgeIntensity;
 	GrayU8 detected;
 
-	ImageGradient<T,D> gradient;
+	ImageGradient<T, D> gradient;
 
 	double edgeThreshold;
 
-	public DetectLineSegmentsGridRansac(GridRansacLineDetector<D> detectorGrid,
-										ConnectLinesGrid connect,
-										ImageGradient<T,D> gradient,
-										double edgeThreshold ,
-										Class<T> imageType , Class<D> derivType ) {
+	public DetectLineSegmentsGridRansac( GridRansacLineDetector<D> detectorGrid,
+										 ConnectLinesGrid connect,
+										 ImageGradient<T, D> gradient,
+										 double edgeThreshold,
+										 Class<T> imageType, Class<D> derivType ) {
 		this.detectorGrid = detectorGrid;
 		this.connect = connect;
 		this.gradient = gradient;
@@ -65,31 +64,31 @@ public class DetectLineSegmentsGridRansac<T extends ImageGray<T>, D extends Imag
 
 		derivX = GeneralizedImageOps.createSingleBand(derivType, 1, 1);
 		derivY = GeneralizedImageOps.createSingleBand(derivType, 1, 1);
-		edgeIntensity = new GrayF32(1,1);
-		detected = new GrayU8(1,1);
+		edgeIntensity = new GrayF32(1, 1);
+		detected = new GrayU8(1, 1);
 	}
 
 	@Override
-	public List<LineSegment2D_F32> detect(T input) {
+	public List<LineSegment2D_F32> detect( T input ) {
 
-		derivX.reshape(input.width,input.height);
-		derivY.reshape(input.width,input.height);
-		edgeIntensity.reshape(input.width,input.height);
-		detected.reshape(input.width,input.height);
+		derivX.reshape(input.width, input.height);
+		derivY.reshape(input.width, input.height);
+		edgeIntensity.reshape(input.width, input.height);
+		detected.reshape(input.width, input.height);
 
-		gradient.process(input,derivX,derivY);
+		gradient.process(input, derivX, derivY);
 		GGradientToEdgeFeatures.intensityAbs(derivX, derivY, edgeIntensity);
 		GThresholdImageOps.threshold(edgeIntensity, detected, edgeThreshold, false);
 
-		detectorGrid.process(derivX,derivY,detected);
+		detectorGrid.process(derivX, derivY, detected);
 
 		MatrixOfList<LineSegment2D_F32> grid = detectorGrid.getFoundLines();
-		if( connect != null ) {
+		if (connect != null) {
 			connect.process(grid);
 		}
 
 		List<LineSegment2D_F32> found = grid.createSingleList();
-		LineImageOps.mergeSimilar(found, (float) (Math.PI * 0.03), 5f);
+		LineImageOps.mergeSimilar(found, (float)(Math.PI*0.03), 5f);
 
 		return found;
 	}

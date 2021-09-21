@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -28,6 +28,8 @@ import org.bytedeco.javacv.OpenCVFrameGrabber;
 import org.ddogleg.struct.DogArray_I8;
 
 /**
+ * Implementation of {@link WebcamInterface} for OpenCV.
+ *
  * @author Peter Abeles
  */
 public class WebcamOpenCV implements WebcamInterface {

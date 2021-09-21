@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -24,6 +24,9 @@ import boofcv.struct.image.ImageGray;
 import georegression.struct.point.Point2D_F32;
 
 /**
+ * Implementation of {@link GImageGray} that applies a {@link PixelTransform} then
+ * {@link InterpolatePixelS interpolates} to get the pixel's value.
+ *
  * @author Peter Abeles
  */
 public class GImageGrayDistorted<T extends ImageGray<T>> implements GImageGray {
@@ -32,16 +35,16 @@ public class GImageGrayDistorted<T extends ImageGray<T>> implements GImageGray {
 	InterpolatePixelS<T> interpolate;
 
 	Point2D_F32 distorted = new Point2D_F32();
-	int inputWidth,inputHeight;
+	int inputWidth, inputHeight;
 
-	public GImageGrayDistorted(PixelTransform<Point2D_F32> transform,
-							   InterpolatePixelS<T> interpolate) {
+	public GImageGrayDistorted( PixelTransform<Point2D_F32> transform,
+								InterpolatePixelS<T> interpolate ) {
 		this.transform = transform;
 		this.interpolate = interpolate;
 	}
 
 	@Override
-	public void wrap(ImageGray image) {
+	public void wrap( ImageGray image ) {
 		interpolate.setImage((T)image);
 
 		inputWidth = image.getWidth();
@@ -64,35 +67,35 @@ public class GImageGrayDistorted<T extends ImageGray<T>> implements GImageGray {
 	}
 
 	@Override
-	public Number get(int x, int y) {
-		transform.compute(x,y,distorted);
+	public Number get( int x, int y ) {
+		transform.compute(x, y, distorted);
 		return interpolate.get(distorted.x, distorted.y);
 	}
 
 	@Override
-	public void set(int x, int y, Number num) {
+	public void set( int x, int y, Number num ) {
 		throw new IllegalArgumentException("set is not supported");
 	}
 
 	@Override
-	public double unsafe_getD(int x, int y) {
-		transform.compute(x,y,distorted);
+	public double unsafe_getD( int x, int y ) {
+		transform.compute(x, y, distorted);
 		return interpolate.get(distorted.x, distorted.y);
 	}
 
 	@Override
-	public float unsafe_getF(int x, int y) {
-		transform.compute(x,y,distorted);
+	public float unsafe_getF( int x, int y ) {
+		transform.compute(x, y, distorted);
 		return interpolate.get(distorted.x, distorted.y);
 	}
 
 	@Override
-	public void set(int index, float value) {
+	public void set( int index, float value ) {
 		throw new IllegalArgumentException("set is not supported");
 	}
 
 	@Override
-	public float getF(int index) {
+	public float getF( int index ) {
 		throw new IllegalArgumentException("getF is not supported");
 	}
 

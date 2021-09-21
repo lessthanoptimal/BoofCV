@@ -31,6 +31,8 @@ import java.awt.image.BufferedImage;
 import java.util.prefs.Preferences;
 
 /**
+ * GUI for {@link BatchDownsizeImage}.
+ *
  * @author Peter Abeles
  */
 public class BatchDownsizeImageGui extends JPanel implements BatchDownsizeImage.Listener {

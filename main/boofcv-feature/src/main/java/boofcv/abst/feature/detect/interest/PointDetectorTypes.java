@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -31,44 +31,49 @@ import boofcv.factory.feature.detect.interest.FactoryDetectPoint;
 public enum PointDetectorTypes {
 	/**
 	 * Maximums only
+	 *
 	 * @see boofcv.alg.feature.detect.intensity.ShiTomasiCornerIntensity
 	 */
 	SHI_TOMASI,
 	/**
 	 * Maximums only
+	 *
 	 * @see boofcv.alg.feature.detect.intensity.HarrisCornerIntensity
 	 */
 	HARRIS,
 	/**
 	 * Maximums and minimums
+	 *
 	 * @see FastCornerDetector
 	 */
 	FAST,
 	/**
 	 * Computed by directly sampling input image. Maximums and minimums
+	 *
 	 * @see FactoryDetectPoint#createHessianDirect
 	 */
 	LAPLACIAN,
 	/**
 	 * Computed by directly sampling input image. Maximums only
+	 *
 	 * @see FactoryDetectPoint#createHessianDirect
 	 */
 	DETERMINANT,
-	/**
-	 * @see boofcv.alg.feature.detect.intensity.KitRosCornerIntensity
-	 */
+
+	/** {@link boofcv.alg.feature.detect.intensity.KitRosCornerIntensity} */
 	KIT_ROS,
-	/**
-	 * @see MedianCornerIntensity
-	 */
+
+	/** {@link MedianCornerIntensity} */
 	MEDIAN,
 	/**
 	 * Computed using the Hessian image. Maximums and minimums
+	 *
 	 * @see HessianBlobIntensity
 	 */
 	LAPLACIAN_H,
 	/**
 	 * Computed using the Hessian image. Maximums only
+	 *
 	 * @see HessianBlobIntensity
 	 */
 	DETERMINANT_H;
@@ -76,5 +81,5 @@ public enum PointDetectorTypes {
 	/**
 	 * Point types which take in the input image or the gradient (first-derivative) image only.
 	 */
-	public static final PointDetectorTypes[] FIRST_ONLY = new PointDetectorTypes[]{SHI_TOMASI,HARRIS,FAST,LAPLACIAN,DETERMINANT,KIT_ROS, MEDIAN};
+	public static final PointDetectorTypes[] FIRST_ONLY = new PointDetectorTypes[]{SHI_TOMASI, HARRIS, FAST, LAPLACIAN, DETERMINANT, KIT_ROS, MEDIAN};
 }

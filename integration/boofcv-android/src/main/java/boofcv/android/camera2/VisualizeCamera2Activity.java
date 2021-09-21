@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -170,6 +170,8 @@ public abstract class VisualizeCamera2Activity extends SimpleCamera2Activity {
 	}
 
 	/**
+	 * Starts the camera.
+	 *
 	 * @param layout Where the visualization overlay will be placed inside of
 	 * @param view If not null then this will be used to display the camera preview.
 	 */

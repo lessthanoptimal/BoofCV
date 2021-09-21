@@ -31,6 +31,8 @@ import java.awt.geom.Line2D;
 import java.awt.geom.Rectangle2D;
 
 /**
+ * Functions to help with visualizing fiducials.
+ *
  * @author Peter Abeles
  */
 public class VisualizeFiducial {

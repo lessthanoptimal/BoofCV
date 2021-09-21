@@ -45,6 +45,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
+ * Visualizes binary contours.
+ *
  * @author Peter Abeles
  */
 public class VisualizeBinaryContourApp<T extends ImageGray<T>> extends DemonstrationBase

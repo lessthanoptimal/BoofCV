@@ -182,22 +182,15 @@ subprojects {
                 "CatchAndPrintStackTrace", // Should clean up, but done too often right now
                 "UnnecessaryParentheses", // Log SPAM due to JDK-14 Error Prone BUG
                 "SameNameButDifferent", // Lombok confuses it
-//                "MissingSummary", // This should be an error, but so many classes are non-compliant
-                "UnescapedEntity", "EmptyBlockTag")
+                "UnescapedEntity",
+                "EmptyBlockTag"
+        )
         options.errorprone.error("MissingOverride", "MissingCasesInEnumSwitch", "BadInstanceof",
-                "PublicConstructorForAbstractClass", "NarrowingCompoundAssignment", "JdkObsolete")
+                "PublicConstructorForAbstractClass", "NarrowingCompoundAssignment", "JdkObsolete", "MissingSummary")
 
-        // Gradually bring this inspection in to compliance
-        if (!(project.getName() in
-                ["boofcv-types", "boofcv-sfm", "boofcv-geo", "boofcv-simulation", "boofcv-reconstruction",
-                "boofcv-reconstruction", "boofcv-recognition", "boofcv-learning", "boofcv-ip-multiview", "boofcv-io"])) {
+        // Allow sloppy code where it's not published
+        if (!(name.endsWith("compileJava") || name.endsWith("compileNoautoJava"))) {
             options.errorprone.disable("MissingSummary")
-        } else {
-            if (name.endsWith("compileJava") || name.endsWith("compileNoautoJava")) {
-                options.errorprone.error("MissingSummary")
-            } else {
-                options.errorprone.disable("MissingSummary")
-            }
         }
 
         // Disable in third party code

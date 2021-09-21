@@ -25,6 +25,8 @@ import boofcv.struct.ConfigLength;
 import boofcv.struct.image.ImageGray;
 
 /**
+ * Override functions which allows external code to be called instead of BoofCV for thresholding operations.
+ *
  * @author Peter Abeles
  */
 public class BOverrideFactoryThresholdBinary extends BOverrideClass {

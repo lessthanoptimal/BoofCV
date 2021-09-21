@@ -22,6 +22,8 @@ import boofcv.struct.ConnectRule;
 import boofcv.struct.image.GrayU8;
 
 /**
+ * Base implementation for different tracer connectivity rules.
+ *
  * @author Peter Abeles
  */
 public class ContourTracerBase {
@@ -74,6 +76,8 @@ public class ContourTracerBase {
 	}
 
 	/**
+	 * Specifies input binary image.
+	 *
 	 * @param binary Binary image with a border of zeros added to the outside.
 	 */
 	public void setInputs( GrayU8 binary ) {

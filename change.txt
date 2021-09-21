@@ -6,6 +6,8 @@ Date Format: year/month/day
 Date    : 2021
 Version : 0.39
 
+- Build
+  * Summary JavaDoc is now required
 - Applications
   * Calibration target generator supports more targets
   * Add option to save landmarks locations on PDF document
@@ -27,7 +29,7 @@ Version : 0.39
 - Fiducial Markers
   * Added support for ArUco and AprilTags as "HammingMarkers"
   * Can render ChaRuCo and ArUco grids, but can't detect them yet
-Demonstrations
+- Demonstrations
   * Improved stereo and mono calibration applications
 
 TODO Added calibration targets Hamming Marker grid and chessboard, e.g. ChaRuCo and ArUco grids.

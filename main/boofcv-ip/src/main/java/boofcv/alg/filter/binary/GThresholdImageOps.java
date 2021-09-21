@@ -608,7 +608,7 @@ public class GThresholdImageOps {
 	}
 
 	/**
-	 * @see FactoryThresholdBinary#localOtsu(ConfigLength, double, boolean, boolean, double, Class)
+	 * {@link FactoryThresholdBinary#localOtsu(ConfigLength, double, boolean, boolean, double, Class)}
 	 */
 	public static <T extends ImageGray<T>>
 	GrayU8 localOtsu( T input, @Nullable GrayU8 output, boolean otsu2, ConfigLength width, double tuning, double scale, boolean down ) {

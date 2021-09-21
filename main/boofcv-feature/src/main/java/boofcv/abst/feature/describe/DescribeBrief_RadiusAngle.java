@@ -24,6 +24,8 @@ import boofcv.struct.image.ImageGray;
 import boofcv.struct.image.ImageType;
 
 /**
+ * Wrapper around {@link DescribePointBrief} for {@link DescribePointRadiusAngle}.
+ *
  * @author Peter Abeles
  */
 public class DescribeBrief_RadiusAngle<T extends ImageGray<T>> implements DescribePointRadiusAngle<T, TupleDesc_B> {
@@ -38,44 +40,22 @@ public class DescribeBrief_RadiusAngle<T extends ImageGray<T>> implements Descri
 		this.imageType = ImageType.single(imageType);
 	}
 
-	@Override
-	public TupleDesc_B createDescription() {
-		return new TupleDesc_B(length);
-	}
+	@Override public TupleDesc_B createDescription() {return new TupleDesc_B(length);}
 
-	@Override
-	public void setImage( T image ) {
-		alg.setImage(image);
-	}
+	@Override public void setImage( T image ) {alg.setImage(image);}
 
-	@Override
-	public boolean process( double x, double y, double orientation, double radius, TupleDesc_B storage ) {
+	@Override public boolean process( double x, double y, double orientation, double radius, TupleDesc_B storage ) {
 		alg.process(x, y, storage);
 		return true;
 	}
 
-	@Override
-	public boolean isScalable() {
-		return false;
-	}
+	@Override public boolean isScalable() {return false;}
 
-	@Override
-	public boolean isOriented() {
-		return false;
-	}
+	@Override public boolean isOriented() {return false;}
 
-	@Override
-	public ImageType<T> getImageType() {
-		return imageType;
-	}
+	@Override public ImageType<T> getImageType() {return imageType;}
 
-	@Override
-	public Class<TupleDesc_B> getDescriptionType() {
-		return TupleDesc_B.class;
-	}
+	@Override public Class<TupleDesc_B> getDescriptionType() {return TupleDesc_B.class;}
 
-	@Override
-	public double getCanonicalWidth() {
-		return alg.getDefinition().radius*2 + 1;
-	}
+	@Override public double getCanonicalWidth() {return alg.getDefinition().radius*2 + 1;}
 }

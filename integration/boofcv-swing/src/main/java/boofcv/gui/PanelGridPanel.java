@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -25,23 +25,25 @@ import java.awt.*;
 import java.awt.image.BufferedImage;
 
 /**
+ * Panel for displaying panels in a grid.
+ *
  * @author Peter Abeles
  */
 public class PanelGridPanel extends JPanel {
-	public PanelGridPanel( int numColumns , JComponent ...panels ) {
+	public PanelGridPanel( int numColumns, JComponent... panels ) {
 
 		int numRows = panels.length/numColumns;
 
-		GridLayout experimentLayout = new GridLayout(numRows,numColumns);
+		GridLayout experimentLayout = new GridLayout(numRows, numColumns);
 
 		setLayout(experimentLayout);
 
-		for( JComponent p : panels )
+		for (JComponent p : panels)
 			add(p);
 	}
 
-	public PanelGridPanel( int numRows , int numColumns ) {
-		setLayout( new GridLayout(numRows,numColumns));
+	public PanelGridPanel( int numRows, int numColumns ) {
+		setLayout(new GridLayout(numRows, numColumns));
 	}
 
 	public void add( BufferedImage image ) {

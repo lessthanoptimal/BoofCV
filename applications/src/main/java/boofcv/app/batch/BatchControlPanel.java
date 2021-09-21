@@ -25,6 +25,8 @@ import java.awt.*;
 import java.io.File;
 
 /**
+ * Batch processing of files control panel
+ *
  * @author Peter Abeles
  */
 public abstract class BatchControlPanel extends StandardAlgConfigPanel {

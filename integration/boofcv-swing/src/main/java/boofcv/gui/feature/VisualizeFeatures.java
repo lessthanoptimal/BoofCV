@@ -26,6 +26,8 @@ import java.awt.geom.Ellipse2D;
 import java.awt.geom.Line2D;
 
 /**
+ * Functions for visualizing image features.
+ *
  * @author Peter Abeles
  */
 public class VisualizeFeatures {

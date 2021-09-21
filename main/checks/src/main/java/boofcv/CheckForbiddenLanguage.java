@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -299,7 +299,7 @@ public class CheckForbiddenLanguage {
 	@FunctionalInterface
 	public interface ConditionalRule {
 		/**
-		 * @return true if the code is valid by this rule or false if not
+		 * Returns true if the code is valid by this rule or false if not
 		 */
 		boolean matches( String line, List<String> tokens );
 	}

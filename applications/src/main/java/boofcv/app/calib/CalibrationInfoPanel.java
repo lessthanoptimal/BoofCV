@@ -32,6 +32,8 @@ import java.awt.event.ActionListener;
 import java.awt.image.BufferedImage;
 
 /**
+ * Displays information about calibration
+ *
  * @author Peter Abeles
  */
 public class CalibrationInfoPanel extends StandardAlgConfigPanel

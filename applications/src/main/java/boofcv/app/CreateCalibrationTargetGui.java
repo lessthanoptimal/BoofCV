@@ -335,7 +335,7 @@ public class CreateCalibrationTargetGui extends JPanel
 			renderer.circleHex(config.numRows, config.numCols, config.shapeSize, config.shapeDistance);
 		}
 
-		renderingPanel.setImageUI(renderer.getBufferred());
+		renderingPanel.setImageUI(renderer.getBuffered());
 	}
 
 	private FiducialRenderEngineGraphics2D configureRenderGraphics2D( double markerWidth, double markerHeight, double unitsToPixel ) {

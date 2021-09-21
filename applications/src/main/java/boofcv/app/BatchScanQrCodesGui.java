@@ -28,6 +28,8 @@ import java.awt.*;
 import java.util.prefs.Preferences;
 
 /**
+ * GUI for batch scanning of QR codes.
+ *
  * @author Peter Abeles
  */
 public class BatchScanQrCodesGui extends BatchProcessControlPanel

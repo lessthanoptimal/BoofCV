@@ -28,6 +28,8 @@ import boofcv.struct.image.ImageGray;
 import org.jetbrains.annotations.Nullable;
 
 /**
+ * Wrapper around {@link DerivativeLaplacian} for {@link BaseGeneralFeatureIntensity}.
+ *
  * @author Peter Abeles
  */
 public class WrapperLaplacianBlobIntensity<I extends ImageGray<I>, D extends ImageGray<D>>

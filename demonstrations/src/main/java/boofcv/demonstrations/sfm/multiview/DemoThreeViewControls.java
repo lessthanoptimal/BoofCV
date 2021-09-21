@@ -39,6 +39,8 @@ import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
 
 /**
+ * Controls for {@link DemoThreeViewStereoApp}
+ *
  * @author Peter Abeles
  */
 public class DemoThreeViewControls extends StandardAlgConfigPanel

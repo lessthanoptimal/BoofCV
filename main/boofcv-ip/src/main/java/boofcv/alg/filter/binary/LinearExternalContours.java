@@ -22,6 +22,8 @@ import boofcv.alg.misc.ImageMiscOps;
 import boofcv.struct.ConnectRule;
 import boofcv.struct.PackedSetsPoint2D_I32;
 import boofcv.struct.image.GrayU8;
+import lombok.Getter;
+import lombok.Setter;
 
 /**
  * Finds the external contours of binary blobs in linear time. No label image is required. Designed to quickly
@@ -55,9 +57,9 @@ import boofcv.struct.image.GrayU8;
  */
 public class LinearExternalContours {
 	// Maximum number of pixels in an external contour. If the contour is longer than this it will be discarded
-	private int maxContourLength = Integer.MAX_VALUE;
+	@Getter @Setter private int maxContourLength = Integer.MAX_VALUE;
 	// External contours less than this will be discarded
-	private int minContourLength = 0;
+	@Getter @Setter private int minContourLength = 0;
 
 	// adjusts coordinate from binary to output
 	private int adjustX, adjustY;
@@ -310,21 +312,5 @@ public class LinearExternalContours {
 
 	public PackedSetsPoint2D_I32 getExternalContours() {
 		return storagePoints;
-	}
-
-	public int getMaxContourLength() {
-		return maxContourLength;
-	}
-
-	public void setMaxContourLength( int maxContourLength ) {
-		this.maxContourLength = maxContourLength;
-	}
-
-	public int getMinContourLength() {
-		return minContourLength;
-	}
-
-	public void setMinContourLength( int minContourLength ) {
-		this.minContourLength = minContourLength;
 	}
 }

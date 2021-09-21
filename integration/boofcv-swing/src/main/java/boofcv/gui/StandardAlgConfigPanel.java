@@ -220,6 +220,8 @@ public class StandardAlgConfigPanel extends JPanel implements ActionListener, Ch
 	}
 
 	/**
+	 * Creates a spiner for double data type.
+	 *
 	 * @param formatString Example of a format. "0.0E0". See {@link DecimalFormat}
 	 */
 	public JSpinner spinner( double initial, double minimum, double maximum, double stepSize,

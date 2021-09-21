@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -36,11 +36,11 @@ import java.awt.event.MouseMotionListener;
 import java.awt.image.BufferedImage;
 
 /**
+ * Visualization for {@link VisualizeCirculantTrackerApp}
+ *
  * @author Peter Abeles
  */
-public class CirculantVisualizationPanel extends JPanel
-		implements MouseListener, MouseMotionListener  {
-
+public class CirculantVisualizationPanel extends JPanel implements MouseListener, MouseMotionListener  {
 	BufferedImage frame;
 	CenterPanel centerPanel = new CenterPanel();
 
@@ -54,7 +54,6 @@ public class CirculantVisualizationPanel extends JPanel
 	BufferedImage response;
 
 	GrayF32 tmp = new GrayF32(1,1);
-
 
 	public CirculantVisualizationPanel(Listener listener) {
 		setLayout(new BorderLayout());

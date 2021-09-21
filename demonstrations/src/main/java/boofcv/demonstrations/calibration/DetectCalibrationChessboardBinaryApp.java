@@ -41,6 +41,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
+ * Visualizes {@link DetectChessboardBinaryPattern}.
+ *
  * @author Peter Abeles
  */
 public class DetectCalibrationChessboardBinaryApp

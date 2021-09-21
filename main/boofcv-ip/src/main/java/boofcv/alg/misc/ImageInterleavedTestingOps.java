@@ -23,6 +23,8 @@ import boofcv.struct.image.InterleavedI8;
 import java.util.Random;
 
 /**
+ * Operations to help with testing interleaved images.
+ *
  * @author Peter Abeles
  */
 public class ImageInterleavedTestingOps {

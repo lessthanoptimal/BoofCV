@@ -24,6 +24,8 @@ import georegression.struct.point.Point2D_F32;
 import georegression.struct.point.Point2D_F64;
 
 /**
+ * {@link HoughTransformParameters} with a foot-of-norm parameterization.
+ *
  * @author Peter Abeles
  */
 public class HoughParametersFootOfNorm implements HoughTransformParameters {

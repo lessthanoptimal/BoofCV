@@ -25,6 +25,8 @@ import boofcv.struct.image.ImageGray;
 import boofcv.struct.image.ImageType;
 
 /**
+ * Wrapper around {@link DescribePointSurf} for {@link DescribePointRadiusAngle}
+ *
  * @author Peter Abeles
  */
 public class DescribeSurf_RadiusAngle<T extends ImageGray<T>, II extends ImageGray<II>>

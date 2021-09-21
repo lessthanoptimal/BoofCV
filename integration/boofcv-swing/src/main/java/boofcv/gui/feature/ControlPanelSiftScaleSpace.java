@@ -24,6 +24,8 @@ import boofcv.gui.StandardAlgConfigPanel;
 import javax.swing.*;
 
 /**
+ * Control panel for {@link ConfigSiftScaleSpace}
+ *
  * @author Peter Abeles
  */
 public class ControlPanelSiftScaleSpace extends StandardAlgConfigPanel {

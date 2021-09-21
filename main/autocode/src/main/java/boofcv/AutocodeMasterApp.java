@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -23,6 +23,8 @@ import java.io.IOException;
 import java.nio.file.Paths;
 
 /**
+ * Master application which calls all auto code generating classes.
+ *
  * @author Peter Abeles
  */
 public class AutocodeMasterApp {

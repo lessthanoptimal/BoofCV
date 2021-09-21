@@ -30,6 +30,8 @@ import java.awt.event.*;
 import java.awt.image.BufferedImage;
 
 /**
+ * Application which lets you open a webcam and zoom in to it. Software zoom.
+ *
  * @author Peter Abeles
  */
 public class WebcamZoomApp {

@@ -31,6 +31,8 @@ import java.awt.geom.AffineTransform;
 import java.awt.geom.Line2D;
 
 /**
+ * Displays stereo calibration data for {@link CalibrateStereoPlanarApp}.
+ *
  * @author Peter Abeles
  */
 public class StereoCalibrationPanel extends JPanel {
