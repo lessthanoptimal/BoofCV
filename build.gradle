@@ -191,7 +191,11 @@ subprojects {
         if (!project.getName().contains("boofcv-types")) {
             options.errorprone.disable("MissingSummary")
         } else {
-            options.errorprone.error("MissingSummary")
+            if (name.endsWith("compileJava") || name.endsWith("compileNoautoJava")) {
+                options.errorprone.error("MissingSummary")
+            } else {
+                options.errorprone.disable("MissingSummary")
+            }
         }
 
         // Disable in third party code
