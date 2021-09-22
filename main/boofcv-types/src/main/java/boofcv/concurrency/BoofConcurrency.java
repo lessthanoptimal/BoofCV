@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -47,5 +47,14 @@ public class BoofConcurrency extends ConcurrencyOps {
 
 	public static boolean isUseConcurrent() {
 		return USE_CONCURRENT;
+	}
+
+	/**
+	 * Either returns the number of threads in the thread pool or one if threading is disabled
+	 */
+	public static int getEffectiveActiveThreads() {
+		if (USE_CONCURRENT)
+			return getThreadPool().getActiveThreadCount();
+		return 1;
 	}
 }

@@ -63,7 +63,6 @@ public class ControlPanelStereoMonoTrackPnP extends JPanel {
 
 	public <T extends ImageGray<T>>
 	StereoVisualOdometry<T> createVisOdom( Class<T> imageType ) {
-
 		PointTracker<T> tracker = controlTrackers.createTracker(ImageType.single(imageType));
 		StereoDisparitySparse<T> disparity = controlDisparity.createAlgorithm(imageType);
 
