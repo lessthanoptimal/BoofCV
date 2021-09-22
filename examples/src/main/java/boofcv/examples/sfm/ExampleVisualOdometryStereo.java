@@ -103,10 +103,7 @@ public class ExampleVisualOdometryStereo {
 		StereoVisualOdometry<GrayU8> visodom = FactoryVisualOdometry.stereoMonoPnP(configVisOdom, disparity, tracker, GrayU8.class);
 
 		// Optionally dump verbose debugging information to stdout
-//		Set<String> configuration = new HashSet<>();
-//		configuration.add(VisualOdometry.VERBOSE_RUNTIME);
-//		configuration.add(VisualOdometry.VERBOSE_TRACKING);
-//		visodom.setVerbose(System.out,configuration);
+//		visodom.setVerbose(System.out, BoofMiscOps.hashSet(BoofVerbose.RUNTIME, VisualOdometry.VERBOSE_TRACKING));
 
 		// Pass in intrinsic/extrinsic calibration. This can be changed in the future.
 		visodom.setCalibration(stereoParam);

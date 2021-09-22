@@ -18,6 +18,7 @@
 
 package boofcv.alg.sfm.d3;
 
+import boofcv.BoofVerbose;
 import boofcv.abst.feature.associate.AssociateDescription2D;
 import boofcv.abst.feature.associate.AssociateDescriptionSets2D;
 import boofcv.abst.feature.detdesc.DetectDescribePoint;
@@ -26,7 +27,6 @@ import boofcv.abst.geo.TriangulateNViewsMetric;
 import boofcv.abst.geo.bundle.MetricBundleAdjustmentUtils;
 import boofcv.abst.geo.bundle.SceneObservations;
 import boofcv.abst.geo.bundle.SceneStructureMetric;
-import boofcv.abst.sfm.d3.VisualOdometry;
 import boofcv.alg.descriptor.UtilFeature;
 import boofcv.factory.distort.LensDistortionFactory;
 import boofcv.factory.geo.ConfigTriangulation;
@@ -752,7 +752,7 @@ public class VisOdomStereoQuadPnP<T extends ImageGray<T>, TD extends TupleDesc<T
 			return;
 		}
 
-		if (configuration.contains(VisualOdometry.VERBOSE_RUNTIME))
+		if (configuration.contains(BoofVerbose.RUNTIME))
 			this.profileOut = verbose;
 	}
 }

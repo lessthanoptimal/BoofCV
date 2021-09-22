@@ -29,8 +29,6 @@ import org.ddogleg.struct.VerbosePrint;
  * @author Peter Abeles
  */
 public interface VisualOdometry<M> extends VerbosePrint {
-	/** Key used to indicate that it should print out profile information */
-	String VERBOSE_RUNTIME = "runtime";
 	/** Key used to indicate that it should print out feature tracking information */
 	String VERBOSE_TRACKING = "tracking";
 

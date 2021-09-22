@@ -18,6 +18,7 @@
 
 package boofcv.demonstrations.sfm.d3;
 
+import boofcv.BoofVerbose;
 import boofcv.abst.feature.detect.interest.PointDetectorTypes;
 import boofcv.abst.sfm.AccessPointTracks3D;
 import boofcv.abst.sfm.d3.StereoVisualOdometry;
@@ -121,8 +122,7 @@ public class VisualizeStereoVisualOdometryApp<T extends ImageGray<T>> extends De
 
 	ImageType imageType;
 
-	public VisualizeStereoVisualOdometryApp( List<PathLabel> examples,
-											 Class<T> imageType ) {
+	public VisualizeStereoVisualOdometryApp( List<PathLabel> examples, Class<T> imageType ) {
 		super(true, false, examples, ImageType.single(imageType));
 		useCustomOpenFiles = true;
 		this.imageType = ImageType.single(imageType);
@@ -193,7 +193,15 @@ public class VisualizeStereoVisualOdometryApp<T extends ImageGray<T>> extends De
 	protected void customAddToFileMenu( JMenu menuFile ) {
 		menuFile.addSeparator();
 
-		JMenuItem itemSaveCloud = new JMenuItem("Save Point Cloud");
+		var itemSaveConfiguration = new JMenuItem("Save Configuration");
+		itemSaveConfiguration.addActionListener(e -> saveConfiguration());
+		menuFile.add(itemSaveConfiguration);
+
+		var itemSavePath = new JMenuItem("Save Path");
+		itemSavePath.addActionListener(e -> savePath());
+		menuFile.add(itemSavePath);
+
+		var itemSaveCloud = new JMenuItem("Save Point Cloud");
 		itemSaveCloud.addActionListener(e -> savePointCloud());
 		menuFile.add(itemSaveCloud);
 	}
@@ -206,6 +214,20 @@ public class VisualizeStereoVisualOdometryApp<T extends ImageGray<T>> extends De
 		stopAllInputProcessing();
 		// Save it to disk
 		BoofSwingUtil.savePointCloudDialog(this, KEY_PREVIOUS_DIRECTORY, cloudPanel.gui);
+	}
+
+	/**
+	 * Save the estimate path the left camera took
+	 */
+	private void savePath() {
+
+	}
+
+	/**
+	 * Save visual odometry configuration to disk
+	 */
+	private void saveConfiguration() {
+
 	}
 
 	/**
@@ -394,7 +416,7 @@ public class VisualizeStereoVisualOdometryApp<T extends ImageGray<T>> extends De
 		if (settings.verboseTracking)
 			configuration.add(VisualOdometry.VERBOSE_TRACKING);
 		if (settings.verboseRuntime)
-			configuration.add(VisualOdometry.VERBOSE_RUNTIME);
+			configuration.add(BoofVerbose.RUNTIME);
 		if (configuration.isEmpty())
 			alg.setVerbose(null, null);
 		else

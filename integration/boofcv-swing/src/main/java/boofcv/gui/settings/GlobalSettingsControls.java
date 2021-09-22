@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -18,13 +18,13 @@
 
 package boofcv.gui.settings;
 
+import boofcv.concurrency.BoofConcurrency;
 import boofcv.gui.StandardAlgConfigPanel;
 import boofcv.gui.dialogs.JSpringPanel;
 import com.github.weisj.darklaf.LafManager;
 
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
@@ -34,15 +34,19 @@ import java.awt.event.WindowEvent;
  *
  * @author Peter Abeles
  */
-public class GlobalSettingsControls extends StandardAlgConfigPanel implements ActionListener  {
+public class GlobalSettingsControls extends StandardAlgConfigPanel implements ActionListener {
 
 	GlobalDemoSettings settings = GlobalDemoSettings.SETTINGS.copy();
+	// We don't put threads into settings as that could be very nasty if someone forgot to undo the change after
+	// disabling threading
+	public int threadCount = BoofConcurrency.getEffectiveActiveThreads();
 
-	JComboBox<String> comboThemes = combo(settings.theme.ordinal(), (Object[]) GlobalDemoSettings.ThemesUI.values());
-	JComboBox<String> comboControl3D = combo(settings.controls3D.ordinal(), (Object[]) GlobalDemoSettings.Controls3D.values());
+	JComboBox<String> comboThemes = combo(settings.theme.ordinal(), (Object[])GlobalDemoSettings.ThemesUI.values());
+	JComboBox<String> comboControl3D = combo(settings.controls3D.ordinal(), (Object[])GlobalDemoSettings.Controls3D.values());
 
-	JCheckBox checkVerboseRuntime = checkbox("Verbose Runtime",settings.verboseRuntime);
-	JCheckBox checkVerboseTracking = checkbox("Verbose Tracking",settings.verboseTracking);
+	JCheckBox checkVerboseRuntime = checkbox("Verbose Runtime", settings.verboseRuntime);
+	JCheckBox checkVerboseTracking = checkbox("Verbose Tracking", settings.verboseTracking);
+	JSpinner spinnerThreads = spinner(threadCount, 0, Runtime.getRuntime().availableProcessors(), 1);
 
 	JButton bSave = new JButton("Save");
 	JButton bReset = new JButton("Reset");
@@ -53,20 +57,21 @@ public class GlobalSettingsControls extends StandardAlgConfigPanel implements Ac
 	boolean canceled = false;
 
 	public GlobalSettingsControls() {
-		bSave.addActionListener((e)-> handleSave());
-		bReset.addActionListener((e)-> handleReset());
+		bSave.addActionListener(( e ) -> handleSave());
+		bReset.addActionListener(( e ) -> handleReset());
 
-		addLabeled(comboThemes,"Themes","Change the Swing theme");
-		addLabeled(comboControl3D,"Control3D");
-		addAlignLeft(checkVerboseRuntime,"Turn on verbose output to stdout");
-		addAlignLeft(checkVerboseTracking,"Turn on verbose output to stdout");
+		addLabeled(comboThemes, "Themes", "Change the Swing theme");
+		addLabeled(comboControl3D, "Control3D");
+		addAlignLeft(checkVerboseRuntime, "Print runtime profiling to stdout");
+		addAlignLeft(checkVerboseTracking, "Turn on verbose output to stdout");
+		addLabeled(spinnerThreads, "Threads", "Change number of threads used. 0=max possible");
 		addVerticalGlue();
-		JPanel foo = JSpringPanel.createLockedSides(bReset,bSave,30);
-		foo.setBorder(BorderFactory.createEmptyBorder(6,10,6,10));
-		foo.setPreferredSize(new Dimension(0,40));
-		foo.setMaximumSize(new Dimension(5000,40));
+		JPanel foo = JSpringPanel.createLockedSides(bReset, bSave, 30);
+		foo.setBorder(BorderFactory.createEmptyBorder(6, 10, 6, 10));
+		foo.setPreferredSize(new Dimension(0, 40));
+		foo.setMaximumSize(new Dimension(5000, 40));
 		add(foo);
-		setPreferredSize(new Dimension(250,180));
+		setPreferredSize(new Dimension(250, 180));
 	}
 
 	private void handleSave() {
@@ -87,30 +92,30 @@ public class GlobalSettingsControls extends StandardAlgConfigPanel implements Ac
 		dialog.setVisible(false);
 	}
 
-	@Override
-	public void actionPerformed(ActionEvent e) {
-		if( e.getSource() == comboThemes ) {
+	@Override public void controlChanged( final Object source ) {
+		if (source == comboThemes) {
 			settings.theme = GlobalDemoSettings.ThemesUI.values()[comboThemes.getSelectedIndex()];
 			changedTheme = true;
-		} else if( e.getSource() == comboControl3D ) {
+		} else if (source == comboControl3D) {
 			settings.controls3D = GlobalDemoSettings.Controls3D.values()[comboControl3D.getSelectedIndex()];
-		} else if( e.getSource() == checkVerboseRuntime ) {
+		} else if (source == checkVerboseRuntime) {
 			settings.verboseRuntime = checkVerboseRuntime.isSelected();
-		} else if( e.getSource() == checkVerboseTracking ) {
+		} else if (source == checkVerboseTracking) {
 			settings.verboseTracking = checkVerboseTracking.isSelected();
+		} else if (source == spinnerThreads) {
+			threadCount = (Integer)spinnerThreads.getValue();
 		}
 	}
 
-	public void showDialog( JFrame owner , Component parent )
-	{
+	public void showDialog( JFrame owner, Component parent ) {
 		canceled = false;
 
-		dialog = new JDialog(owner,"Demonstration Settings", Dialog.ModalityType.APPLICATION_MODAL);
+		dialog = new JDialog(owner, "Demonstration Settings", Dialog.ModalityType.APPLICATION_MODAL);
 
 		try {
 			dialog.addWindowListener(new WindowAdapter() {
 				@Override
-				public void windowClosing(WindowEvent e) {
+				public void windowClosing( WindowEvent e ) {
 					handleCancel();
 				}
 			});
@@ -120,7 +125,7 @@ public class GlobalSettingsControls extends StandardAlgConfigPanel implements Ac
 			dialog.pack();
 			dialog.setLocationRelativeTo(parent);
 			dialog.setVisible(true);
-		} catch( RuntimeException e ) {
+		} catch (RuntimeException e) {
 			e.printStackTrace();
 			System.err.println("Handling exception by resetting LAF");
 			// if something went horribly wrong here it's probably look and feel related. Revert to the default
@@ -134,20 +139,24 @@ public class GlobalSettingsControls extends StandardAlgConfigPanel implements Ac
 		dialog = null;
 
 		// See if it needs to enact the changes
-		if( !canceled ) {
-			if( changedTheme ) {
+		if (!canceled) {
+			// Update the maximum number of threads if there has been a change
+			if (threadCount != BoofConcurrency.getEffectiveActiveThreads()) {
+				BoofConcurrency.setMaxThreads(threadCount != 0 ? threadCount : Runtime.getRuntime().availableProcessors());
+			}
+			if (changedTheme) {
 				settings.changeTheme();
 				// Update the all windows with the new theme
 				LafManager.updateLaf();
 				// This warning is needed since not all changes from the previous LAF are reset and can result
 				// in really messed up looking themes
-				JOptionPane.showMessageDialog(parent,"Restart to ensure the theme renders correctly");
+				JOptionPane.showMessageDialog(parent, "Restart to ensure the theme renders correctly");
 			}
 		}
 	}
 
-	public static void main(String[] args) {
+	public static void main( String[] args ) {
 		GlobalSettingsControls controls = new GlobalSettingsControls();
-		controls.showDialog(null,null);
+		controls.showDialog(null, null);
 	}
 }

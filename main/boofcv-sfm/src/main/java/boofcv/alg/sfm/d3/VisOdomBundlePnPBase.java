@@ -18,8 +18,8 @@
 
 package boofcv.alg.sfm.d3;
 
+import boofcv.BoofVerbose;
 import boofcv.abst.geo.TriangulateNViewsMetric;
-import boofcv.abst.sfm.d3.VisualOdometry;
 import boofcv.abst.tracker.PointTrack;
 import boofcv.abst.tracker.PointTracker;
 import boofcv.alg.geo.PerspectiveOps;
@@ -332,7 +332,7 @@ public abstract class VisOdomBundlePnPBase<Track extends VisOdomBundleAdjustment
 			return;
 		}
 
-		if (configuration.contains(VisualOdometry.VERBOSE_RUNTIME)) {
+		if (configuration.contains(BoofVerbose.RUNTIME)) {
 			this.profileOut = verbose;
 		}
 	}
