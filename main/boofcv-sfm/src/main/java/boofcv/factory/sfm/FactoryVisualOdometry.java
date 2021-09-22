@@ -34,7 +34,6 @@ import boofcv.abst.sfm.d2.ImageMotion2D;
 import boofcv.abst.sfm.d3.*;
 import boofcv.abst.tracker.PointTracker;
 import boofcv.alg.feature.associate.AssociateStereo2D;
-import boofcv.alg.geo.DistanceFromModelMultiView;
 import boofcv.alg.geo.pose.*;
 import boofcv.alg.sfm.DepthSparse3D;
 import boofcv.alg.sfm.StereoSparse3D;
@@ -48,10 +47,7 @@ import boofcv.alg.sfm.robust.GenerateSe2_PlanePtPixel;
 import boofcv.factory.feature.associate.FactoryAssociation;
 import boofcv.factory.feature.describe.FactoryDescribePointRadiusAngle;
 import boofcv.factory.feature.detdesc.FactoryDetectDescribe;
-import boofcv.factory.geo.ConfigTriangulation;
-import boofcv.factory.geo.EnumPNP;
-import boofcv.factory.geo.EstimatorToGenerator;
-import boofcv.factory.geo.FactoryMultiView;
+import boofcv.factory.geo.*;
 import boofcv.factory.tracker.FactoryPointTracker;
 import boofcv.factory.transform.pyramid.FactoryPyramid;
 import boofcv.struct.feature.TupleDesc;
@@ -68,7 +64,6 @@ import georegression.fitting.se.ModelManagerSe2_F64;
 import georegression.fitting.se.ModelManagerSe3_F64;
 import georegression.struct.se.Se2_F64;
 import georegression.struct.se.Se3_F64;
-import org.ddogleg.fitting.modelset.ModelMatcherPost;
 import org.ddogleg.fitting.modelset.ransac.Ransac;
 import org.jetbrains.annotations.Nullable;
 
@@ -105,14 +100,17 @@ public class FactoryVisualOdometry {
 		//squared pixel error
 		double ransacTOL = inlierPixelTol*inlierPixelTol;
 
-		ModelManagerSe2_F64 manager = new ModelManagerSe2_F64();
-		DistancePlane2DToPixelSq distance = new DistancePlane2DToPixelSq();
-		GenerateSe2_PlanePtPixel generator = new GenerateSe2_PlanePtPixel();
+		var manager = new ModelManagerSe2_F64();
+		var distance = new DistancePlane2DToPixelSq();
+		var generator = new GenerateSe2_PlanePtPixel();
 
-		// TODO add concurrent variant
-		ModelMatcherPost<Se2_F64, PlanePtPixel> motion =
-				new Ransac<>(2323, ransacIterations, ransacTOL, manager, PlanePtPixel.class);
-		motion.setModel(() -> generator, () -> distance);
+		var configRansac = new ConfigRansac();
+		configRansac.randSeed = 2323;
+		configRansac.iterations = ransacIterations;
+
+		Ransac<Se2_F64, PlanePtPixel> motion = FactoryMultiViewRobust.
+				createRansac(configRansac, ransacTOL, manager, PlanePtPixel.class);
+		motion.setModel(generator::newConcurrent, distance::newConcurrent);
 
 		VisOdomMonoPlaneInfinity<T> alg =
 				new VisOdomMonoPlaneInfinity<>(thresholdAdd, thresholdRetire, inlierPixelTol, motion, tracker);
@@ -183,23 +181,21 @@ public class FactoryVisualOdometry {
 										   Class<T> imageType ) {
 		if (configVO == null)
 			configVO = new ConfigVisOdomTrackPnP();
+		final ConfigVisOdomTrackPnP _configVO = configVO;
 
-		// Range from sparse disparity
-		var pixelTo3D = new StereoSparse3D<>(sparseDisparity, imageType);
-
-		Estimate1ofPnP estimator = FactoryMultiView.pnp_1(configVO.pnp, -1, 1);
-		final DistanceFromModelMultiView<Se3_F64, Point2D3D> distance = new PnPDistanceReprojectionSq();
-
+		var distance = new PnPDistanceReprojectionSq();
 		var manager = new ModelManagerSe3_F64();
-		EstimatorToGenerator<Se3_F64, Point2D3D> generator = new EstimatorToGenerator<>(estimator);
 
 		// Need to square the error RANSAC inliers
 		double ransacTOL = configVO.ransac.inlierThreshold*configVO.ransac.inlierThreshold;
 
-		// TODO add concurrent variant
-		Ransac<Se3_F64, Point2D3D> motion = new Ransac<>(
-				configVO.ransac.randSeed, configVO.ransac.iterations, ransacTOL, manager, Point2D3D.class);
-		motion.setModel(() -> generator, () -> distance);
+		Ransac<Se3_F64, Point2D3D> motion = FactoryMultiViewRobust.
+				createRansac(configVO.ransac, ransacTOL, manager, Point2D3D.class);
+		motion.setModel(() -> {
+					Estimate1ofPnP estimator = FactoryMultiView.pnp_1(_configVO.pnp, -1, 1);
+					return new EstimatorToGenerator<>(estimator);
+				}
+				, distance::newConcurrentChild);
 
 		RefinePnP refine = null;
 
@@ -211,6 +207,9 @@ public class FactoryVisualOdometry {
 			case MAX_GEO -> new MaxGeoKeyFrameManager(configVO.keyframes.geoMinCoverage);
 			case TICK_TOCK -> new TickTockKeyFrameManager(configVO.keyframes.tickPeriod);
 		};
+
+		// Range from sparse disparity
+		var pixelTo3D = new StereoSparse3D<>(sparseDisparity, imageType);
 
 		VisOdomMonoDepthPnP<T> alg = new VisOdomMonoDepthPnP<>(motion, pixelTo3D, refine, tracker);
 		alg.getBundleViso().bundle.setSba(FactoryMultiView.bundleSparseMetric(configVO.bundle));
@@ -251,19 +250,25 @@ public class FactoryVisualOdometry {
 		// Range from sparse disparity
 		ImagePixelTo3D pixelTo3D = new DepthSparse3D_to_PixelTo3D<>(sparseDepth);
 
-		Estimate1ofPnP estimator = FactoryMultiView.pnp_1(EnumPNP.P3P_FINSTERWALDER, -1, 2);
-		final DistanceFromModelMultiView<Se3_F64, Point2D3D> distance = new PnPDistanceReprojectionSq();
+
+		var distance = new PnPDistanceReprojectionSq();
 
 		ModelManagerSe3_F64 manager = new ModelManagerSe3_F64();
-		EstimatorToGenerator<Se3_F64, Point2D3D> generator = new EstimatorToGenerator<>(estimator);
 
 		// 1/2 a pixel tolerance for RANSAC inliers
 		double ransacTOL = inlierPixelTol*inlierPixelTol;
 
-		// TODO add concurrent variant
-		Ransac<Se3_F64, Point2D3D> motion = new Ransac<>(
-				2323, ransacIterations, ransacTOL, manager, Point2D3D.class);
-		motion.setModel(() -> generator, () -> distance);
+		var configRansac = new ConfigRansac();
+		configRansac.randSeed = 2323;
+		configRansac.iterations = ransacIterations;
+
+		Ransac<Se3_F64, Point2D3D> motion = FactoryMultiViewRobust.
+				createRansac(configRansac, ransacTOL, manager, Point2D3D.class);
+
+		motion.setModel(() -> {
+			Estimate1ofPnP estimator = FactoryMultiView.pnp_1(EnumPNP.P3P_FINSTERWALDER, -1, 2);
+			return new EstimatorToGenerator<>(estimator);
+		}, distance::newConcurrentChild);
 
 		RefinePnP refine = null;
 
@@ -288,27 +293,25 @@ public class FactoryVisualOdometry {
 		// Range from sparse disparity
 		ImagePixelTo3D pixelTo3D = new DepthSparse3D_to_PixelTo3D<>(sparseDepth);
 
-		Estimate1ofPnP estimator = FactoryMultiView.pnp_1(configVO.pnp, -1, 1);
-		final DistanceFromModelMultiView<Se3_F64, Point2D3D> distance = new PnPDistanceReprojectionSq();
 
-		ModelManagerSe3_F64 manager = new ModelManagerSe3_F64();
-		EstimatorToGenerator<Se3_F64, Point2D3D> generator = new EstimatorToGenerator<>(estimator);
+		var distance = new PnPDistanceReprojectionSq();
+		var manager = new ModelManagerSe3_F64();
 
 		// 1/2 a pixel tolerance for RANSAC inliers
 		double ransacTOL = configVO.ransac.inlierThreshold*configVO.ransac.inlierThreshold;
 
-		// TODO add concurrent variant
-		Ransac<Se3_F64, Point2D3D> motion = new Ransac<>(
-				configVO.ransac.randSeed, configVO.ransac.iterations, ransacTOL,
-				manager, Point2D3D.class);
-		motion.setModel(() -> generator, () -> distance);
+		Ransac<Se3_F64, Point2D3D> motion = FactoryMultiViewRobust.
+				createRansac(configVO.ransac, ransacTOL, manager, Point2D3D.class);
+		motion.setModel(() -> {
+			Estimate1ofPnP estimator = FactoryMultiView.pnp_1(configVO.pnp, -1, 1);
+			return new EstimatorToGenerator<>(estimator);
+		}, distance::newConcurrentChild);
 
 		RefinePnP refine = null;
 
 		if (configVO.refineIterations > 0) {
 			refine = FactoryMultiView.pnpRefine(1e-12, configVO.refineIterations);
 		}
-
 
 		VisOdomKeyFrameManager keyframe = switch (configVO.keyframes.type) {
 			case MAX_GEO -> new MaxGeoKeyFrameManager(configVO.keyframes.geoMinCoverage);
@@ -356,22 +359,26 @@ public class FactoryVisualOdometry {
 			configVO = new ConfigVisOdomTrackPnP();
 		configVO.checkValidity();
 
-		EstimateNofPnP pnp = FactoryMultiView.pnp_N(configVO.pnp, -1);
-		DistanceFromModelMultiView<Se3_F64, Point2D3D> distanceMono = new PnPDistanceReprojectionSq();
-		PnPStereoDistanceReprojectionSq distanceStereo = new PnPStereoDistanceReprojectionSq();
-		PnPStereoEstimator pnpStereo = new PnPStereoEstimator(pnp, distanceMono, 0);
-
-		ModelManagerSe3_F64 manager = new ModelManagerSe3_F64();
-		EstimatorToGenerator<Se3_F64, Stereo2D3D> generator = new EstimatorToGenerator<>(pnpStereo);
-
 		// Pixel tolerance for RANSAC inliers - euclidean error squared from left + right images
 		double ransacTOL = 2*configVO.ransac.inlierThreshold*configVO.ransac.inlierThreshold;
 
-		// TODO add concurrent variant
-		ModelMatcherPost<Se3_F64, Stereo2D3D> motion = new Ransac<>(
-				configVO.ransac.randSeed, configVO.ransac.iterations, ransacTOL,
-				manager, Stereo2D3D.class);
-		motion.setModel(() -> generator, () -> distanceStereo);
+		// Each of these data structures is common to all threads OR contains common internal elements
+		var sharedLeftToRight = new Se3_F64();
+		var distanceLeft = new PnPDistanceReprojectionSq();
+		var distanceRight = new PnPDistanceReprojectionSq();
+		var distanceStereo = new PnPStereoDistanceReprojectionSq();
+
+		Ransac<Se3_F64, Stereo2D3D> motion = FactoryMultiViewRobust.
+				createRansac(configVO.ransac, ransacTOL, new ModelManagerSe3_F64(), Stereo2D3D.class);
+		ConfigVisOdomTrackPnP _configVO = configVO;
+		motion.setModel(() -> {
+			EstimateNofPnP pnp = FactoryMultiView.pnp_N(_configVO.pnp, -1);
+			var pnpStereo = new PnPStereoEstimator(pnp,
+					distanceLeft.newConcurrentChild(),
+					distanceRight.newConcurrentChild(), 0);
+			pnpStereo.setLeftToRightReference(sharedLeftToRight);
+			return new EstimatorToGenerator<>(pnpStereo);
+		}, distanceStereo::newConcurrentChild);
 
 		RefinePnPStereo refinePnP = null;
 
@@ -410,8 +417,8 @@ public class FactoryVisualOdometry {
 		alg.getBundleViso().getSelectTracks().maxFeaturesPerFrame = configVO.bundleMaxFeaturesPerFrame;
 		alg.getBundleViso().getSelectTracks().minTrackObservations = configVO.bundleMinObservations;
 
-		return new WrapVisOdomDualTrackPnP<>(
-				alg, pnpStereo, distanceMono, distanceStereo, associateL2R, refinePnP, imageType);
+		return new WrapVisOdomDualTrackPnP<>(alg, sharedLeftToRight, distanceLeft, distanceRight, distanceStereo,
+				associateL2R, refinePnP, imageType);
 	}
 
 	/**
@@ -422,22 +429,29 @@ public class FactoryVisualOdometry {
 	 */
 	public static <T extends ImageGray<T>, Desc extends TupleDesc<Desc>>
 	StereoVisualOdometry<T> stereoQuadPnP( ConfigStereoQuadPnP config, Class<T> imageType ) {
-		EstimateNofPnP pnp = FactoryMultiView.pnp_N(config.pnp, -1);
-		DistanceFromModelMultiView<Se3_F64, Point2D3D> distanceMono = new PnPDistanceReprojectionSq();
-		PnPStereoEstimator pnpStereo = new PnPStereoEstimator(pnp, distanceMono, 0);
-		PnPStereoDistanceReprojectionSq distanceStereo = new PnPStereoDistanceReprojectionSq();
-
-		ModelManagerSe3_F64 manager = new ModelManagerSe3_F64();
-		EstimatorToGenerator<Se3_F64, Stereo2D3D> generator = new EstimatorToGenerator<>(pnpStereo);
 
 		// Pixel tolerance for RANSAC inliers - euclidean error squared from left + right images
 		double ransacTOL = 2*config.ransac.inlierThreshold*config.ransac.inlierThreshold;
 
-		// TODO add concurrent variant
-		ModelMatcherPost<Se3_F64, Stereo2D3D> motion =
-				new Ransac<>(config.ransac.randSeed, config.ransac.iterations, ransacTOL,
-						manager, Stereo2D3D.class);
-		motion.setModel(() -> generator, () -> distanceStereo);
+		Ransac<Se3_F64, Stereo2D3D> motion = FactoryMultiViewRobust.
+				createRansac(config.ransac, ransacTOL, new ModelManagerSe3_F64(), Stereo2D3D.class);
+
+		// Each of these data structures is common to all threads OR contains common internal elements
+		var sharedLeftToRight = new Se3_F64();
+		var distanceLeft = new PnPDistanceReprojectionSq();
+		var distanceRight = new PnPDistanceReprojectionSq();
+		var distanceStereo = new PnPStereoDistanceReprojectionSq();
+
+		// Creates new models, but careful to make sure everything is thread safe and that common priors are
+		// referenced by each instance.
+		motion.setModel(() -> {
+			EstimateNofPnP pnp = FactoryMultiView.pnp_N(config.pnp, -1);
+			var pnpStereo = new PnPStereoEstimator(pnp,
+					distanceLeft.newConcurrentChild(),
+					distanceRight.newConcurrentChild(), 0);
+			pnpStereo.setLeftToRightReference(sharedLeftToRight);
+			return new EstimatorToGenerator<>(pnpStereo);
+		}, distanceStereo::newConcurrentChild);
 		RefinePnPStereo refinePnP = null;
 
 		if (config.refineIterations > 0) {
@@ -447,7 +461,6 @@ public class FactoryVisualOdometry {
 		DetectDescribePoint<T, Desc> detector = FactoryDetectDescribe.generic(config.detectDescribe, imageType);
 
 		Class<Desc> descType = detector.getDescriptionType();
-
 
 		// need to make sure associations are unique
 		ScoreAssociation<Desc> scorer = FactoryAssociation.defaultScore(descType);
@@ -465,7 +478,8 @@ public class FactoryVisualOdometry {
 		alg.getBundle().sba = FactoryMultiView.bundleSparseMetric(config.bundle);
 		alg.getBundle().configConverge.setTo(config.bundleConverge);
 
-		return new WrapVisOdomQuadPnP<>(alg, refinePnP, associateL2R, distanceStereo, distanceMono, imageType);
+		return new WrapVisOdomQuadPnP<>(alg, refinePnP, associateL2R,
+				distanceStereo, distanceLeft, distanceRight, imageType);
 	}
 
 	/**

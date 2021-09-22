@@ -29,6 +29,8 @@ Version : 0.39
 - Fiducial Markers
   * Added support for ArUco and AprilTags as "HammingMarkers"
   * Can render ChaRuCo and ArUco grids, but can't detect them yet
+- Visual Odometry
+  * Now supports concurrent model matching
 - Demonstrations
   * Improved stereo and mono calibration applications
 

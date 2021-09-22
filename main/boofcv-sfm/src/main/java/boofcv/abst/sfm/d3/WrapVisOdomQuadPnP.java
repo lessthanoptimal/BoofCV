@@ -33,6 +33,7 @@ import georegression.struct.point.Point2D_F64;
 import georegression.struct.point.Point3D_F64;
 import georegression.struct.se.Se3_F64;
 import georegression.transform.se.SePointOps_F64;
+import lombok.Getter;
 import org.ddogleg.struct.DogArray;
 import org.jetbrains.annotations.Nullable;
 
@@ -48,26 +49,31 @@ import java.util.Set;
  */
 public class WrapVisOdomQuadPnP<T extends ImageGray<T>, TD extends TupleDesc<TD>>
 		implements StereoVisualOdometry<T>, AccessPointTracks3D {
-	VisOdomStereoQuadPnP<T, TD> alg;
-	RefinePnPStereo refine;
-	AssociateStereo2D<TD> associateStereo;
-	PnPStereoDistanceReprojectionSq distance;
-	DistanceFromModelMultiView<Se3_F64, Point2D3D> distanceMono;
+	@Getter VisOdomStereoQuadPnP<T, TD> alg;
+	@Nullable RefinePnPStereo refine;
+	@Getter AssociateStereo2D<TD> associateStereo;
+	@Getter PnPStereoDistanceReprojectionSq distanceStereo;
+	@Getter DistanceFromModelMultiView<Se3_F64, Point2D3D> distanceLeft;
+	@Getter DistanceFromModelMultiView<Se3_F64, Point2D3D> distanceRight;
+
 	Class<T> imageType;
+
 	// Doesn't really have tracks. So it's hacked by given every feature a new ID
 	long totalFeatures;
 
 	public WrapVisOdomQuadPnP( VisOdomStereoQuadPnP<T, TD> alg,
-							   RefinePnPStereo refine,
+							   @Nullable RefinePnPStereo refine,
 							   AssociateStereo2D<TD> associateStereo,
 							   PnPStereoDistanceReprojectionSq distance,
-							   DistanceFromModelMultiView<Se3_F64, Point2D3D> distanceMono,
+							   DistanceFromModelMultiView<Se3_F64, Point2D3D> distanceLeft,
+							   DistanceFromModelMultiView<Se3_F64, Point2D3D> distanceRight,
 							   Class<T> imageType ) {
 		this.alg = alg;
 		this.refine = refine;
 		this.associateStereo = associateStereo;
-		this.distance = distance;
-		this.distanceMono = distanceMono;
+		this.distanceStereo = distance;
+		this.distanceLeft = distanceLeft;
+		this.distanceRight = distanceRight;
 		this.imageType = imageType;
 	}
 
@@ -122,11 +128,9 @@ public class WrapVisOdomQuadPnP<T extends ImageGray<T>, TD extends TupleDesc<TD>
 
 		alg.setCalibration(parameters);
 		associateStereo.setCalibration(parameters);
-		distance.setLeftToRight(leftToRight);
-		distance.setIntrinsic(0, parameters.left);
-		distance.setIntrinsic(1, parameters.right);
-
-		distanceMono.setIntrinsic(0, parameters.left);
+		distanceStereo.setStereoParameters(parameters);
+		distanceLeft.setIntrinsic(0, parameters.left);
+		distanceRight.setIntrinsic(0, parameters.right);
 
 		if (refine != null)
 			refine.setLeftToRight(leftToRight);

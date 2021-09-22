@@ -80,6 +80,7 @@ public class ExampleVisualOdometryMonocularPlane {
 		visualOdometry.setCalibration(calibration);
 
 		// Process the video sequence and output the location plus number of inliers
+		long startTime = System.nanoTime();
 		while (video.hasNext()) {
 			GrayU8 image = video.next();
 
@@ -93,5 +94,6 @@ public class ExampleVisualOdometryMonocularPlane {
 
 			System.out.printf("Location %8.2f %8.2f %8.2f, %s\n", T.x, T.y, T.z, trackStats(visualOdometry));
 		}
+		System.out.printf("FPS %4.2f\n", video.getFrameNumber()/((System.nanoTime() - startTime)*1e-9));
 	}
 }

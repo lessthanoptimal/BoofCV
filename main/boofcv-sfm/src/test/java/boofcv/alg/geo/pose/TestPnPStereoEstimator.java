@@ -19,10 +19,8 @@
 package boofcv.alg.geo.pose;
 
 import boofcv.abst.geo.EstimateNofPnP;
-import boofcv.alg.geo.DistanceFromModelMultiView;
 import boofcv.factory.geo.EnumPNP;
 import boofcv.factory.geo.FactoryMultiView;
-import boofcv.struct.geo.Point2D3D;
 import georegression.geometry.ConvertRotation3D_F64;
 import georegression.struct.EulerType;
 import georegression.struct.se.Se3_F64;
@@ -44,9 +42,10 @@ public class TestPnPStereoEstimator extends CommonStereoMotionNPoint {
 
 	private void perfectData( int numExtra ) {
 		EstimateNofPnP pnp = FactoryMultiView.pnp_N(EnumPNP.P3P_FINSTERWALDER, -1);
-		DistanceFromModelMultiView<Se3_F64, Point2D3D> distanceMono = new PnPDistanceReprojectionSq();
+		var distanceLeft = new PnPDistanceReprojectionSq();
+		var distanceRight = new PnPDistanceReprojectionSq();
 
-		PnPStereoEstimator alg = new PnPStereoEstimator(pnp, distanceMono, numExtra);
+		PnPStereoEstimator alg = new PnPStereoEstimator(pnp, distanceLeft, distanceRight, numExtra);
 
 		Se3_F64 expected = new Se3_F64();
 		expected.getR().setTo(ConvertRotation3D_F64.eulerToMatrix(EulerType.XYZ, 0.05, -0.03, 0.02, null));
@@ -58,9 +57,6 @@ public class TestPnPStereoEstimator extends CommonStereoMotionNPoint {
 
 		alg.setLeftToRight(leftToRight);
 		assertTrue(alg.process(pointPose, found));
-
-//		found.print();
-//		expected.print();
 
 		assertTrue(MatrixFeatures_DDRM.isIdentical(expected.getR(), found.getR(), 1e-8));
 		assertTrue(found.getT().isIdentical(expected.getT(), 1e-8));

@@ -18,12 +18,13 @@
 
 package boofcv.alg.geo.pose;
 
+import boofcv.alg.geo.DistanceFromModelMultiView;
+import boofcv.struct.calib.StereoParameters;
 import boofcv.struct.geo.GeoModelEstimator1;
 import boofcv.struct.geo.GeoModelEstimatorN;
 import boofcv.struct.geo.Point2D3D;
 import boofcv.struct.sfm.Stereo2D3D;
 import georegression.struct.se.Se3_F64;
-import org.ddogleg.fitting.modelset.DistanceFromModel;
 import org.ddogleg.struct.DogArray;
 
 import java.util.List;
@@ -41,7 +42,8 @@ public class PnPStereoEstimator implements GeoModelEstimator1<Se3_F64, Stereo2D3
 	// PnP pose estimator
 	private final GeoModelEstimatorN<Se3_F64, Point2D3D> alg;
 	// Used to resolve ambiguous solutions
-	private final DistanceFromModel<Se3_F64, Point2D3D> distance;
+	private final DistanceFromModelMultiView<Se3_F64, Point2D3D> distanceLeft;
+	private final DistanceFromModelMultiView<Se3_F64, Point2D3D> distanceRight;
 
 	// Stereo observations converted into a monocular observation
 	private final DogArray<Point2D3D> monoPoints = new DogArray<>(10, Point2D3D::new);
@@ -61,14 +63,20 @@ public class PnPStereoEstimator implements GeoModelEstimator1<Se3_F64, Stereo2D3
 	 * @param extraForTest Right camera is used so zero is the minimum number
 	 */
 	public PnPStereoEstimator( GeoModelEstimatorN<Se3_F64, Point2D3D> alg,
-							   DistanceFromModel<Se3_F64, Point2D3D> distance,
+							   DistanceFromModelMultiView<Se3_F64, Point2D3D> distanceLeft,
+							   DistanceFromModelMultiView<Se3_F64, Point2D3D> distanceRight,
 							   int extraForTest ) {
 		this.alg = alg;
-		this.distance = distance;
+		this.distanceLeft = distanceLeft;
+		this.distanceRight = distanceRight;
 		this.extraForTest = extraForTest;
 	}
 
 	public void setLeftToRight( Se3_F64 leftToRight ) {
+		this.leftToRight.setTo(leftToRight);
+	}
+
+	public void setLeftToRightReference( Se3_F64 leftToRight ) {
 		this.leftToRight = leftToRight;
 	}
 
@@ -101,22 +109,22 @@ public class PnPStereoEstimator implements GeoModelEstimator1<Se3_F64, Stereo2D3
 			double totalError = 0;
 
 			// use extra observations from the left camera
-			distance.setModel(worldToLeft);
+			distanceLeft.setModel(worldToLeft);
 			for (int j = N; j < points.size(); j++) {
 				Stereo2D3D s = points.get(i);
 				p.observation = s.leftObs;
 				p.location = s.location;
-				totalError += distance.distance(p);
+				totalError += distanceLeft.distance(p);
 			}
 
 			// Use all observations from the right camera
 			worldToLeft.concat(leftToRight, worldToRight);
-			distance.setModel(worldToRight);
+			distanceRight.setModel(worldToRight);
 			for (int j = 0; j < points.size(); j++) {
 				Stereo2D3D s = points.get(j);
 				p.observation = s.rightObs;
 				p.location = s.location;
-				totalError += distance.distance(p);
+				totalError += distanceRight.distance(p);
 			}
 
 			if (totalError < bestError) {
@@ -130,6 +138,12 @@ public class PnPStereoEstimator implements GeoModelEstimator1<Se3_F64, Stereo2D3
 
 		estimatedModel.setTo(bestMotion);
 		return true;
+	}
+
+	public void setStereoParameters( StereoParameters param ) {
+		param.right_to_left.invert(leftToRight);
+		distanceLeft.setIntrinsic(0, param.left);
+		distanceRight.setIntrinsic(0, param.right);
 	}
 
 	@Override

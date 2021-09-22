@@ -192,8 +192,6 @@ public class FactoryMultiViewRobust {
 					case GEOMETRIC -> new DistanceFundamentalGeometric();
 				});
 
-		alg.setErrorFraction(configLMedS.errorFraction);
-
 		return alg;
 	}
 
@@ -322,7 +320,6 @@ public class FactoryMultiViewRobust {
 		lmeds.setModel(
 				() -> new GenerateHomographyLinear(_configHomography.normalize),
 				DistanceHomographySq::new);
-		lmeds.setErrorFraction(configLMedS.errorFraction);
 		return lmeds;
 	}
 
@@ -465,12 +462,20 @@ public class FactoryMultiViewRobust {
 
 	public static<Model, Point> LeastMedianOfSquares<Model, Point>
 	createLMEDS(ConfigLMedS configLMedS, ModelManager<Model> manager, Class<Point> pointType) {
-		return BoofConcurrency.isUseConcurrent() ?
+		LeastMedianOfSquares<Model, Point> alg = BoofConcurrency.isUseConcurrent() ?
 				new LeastMedianOfSquares_MT<>(configLMedS.randSeed, configLMedS.totalCycles, manager, pointType)
 				:
 				new LeastMedianOfSquares<>(configLMedS.randSeed, configLMedS.totalCycles, manager, pointType);
+		alg.setErrorFraction(configLMedS.errorFraction);
+		return alg;
 	}
 
+	/**
+	 * Returns a new instance of RANSAC. If concurrency is turned on then a concurrent version will be returned.
+	 *
+	 * @param ransacTol inlier tolerance. The tolerance on config isn't used since that might have the wrong units. This
+	 * lets the user easily adjust the units without modifying the config.
+	 */
 	public static<Model, Point> Ransac<Model, Point>
 	createRansac(ConfigRansac configRansac, double ransacTol, ModelManager<Model> manager, Class<Point> pointType) {
 		return BoofConcurrency.isUseConcurrent() ?

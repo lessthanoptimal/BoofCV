@@ -93,6 +93,7 @@ public class ExampleVisualOdometryDepth {
 		SimpleImageSequence<GrayU16> videoDepth = media.openVideo(
 				new File(directory, "depth.mpng").getPath(), ImageType.single(GrayU16.class));
 
+		long startTime = System.nanoTime();
 		while (videoVisual.hasNext()) {
 			GrayU8 visual = videoVisual.next();
 			GrayU16 depth = videoDepth.next();
@@ -106,5 +107,6 @@ public class ExampleVisualOdometryDepth {
 
 			System.out.printf("Location %8.2f %8.2f %8.2f, %s\n", T.x, T.y, T.z, trackStats(visualOdometry));
 		}
+		System.out.printf("FPS %4.2f\n", videoVisual.getFrameNumber()/((System.nanoTime() - startTime)*1e-9));
 	}
 }

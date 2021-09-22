@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -23,10 +23,8 @@ import boofcv.alg.feature.associate.AssociateStereo2D;
 import boofcv.alg.geo.DistanceFromModelMultiView;
 import boofcv.alg.geo.PerspectiveOps;
 import boofcv.alg.geo.pose.PnPStereoDistanceReprojectionSq;
-import boofcv.alg.geo.pose.PnPStereoEstimator;
 import boofcv.alg.geo.pose.RefinePnPStereo;
 import boofcv.alg.sfm.d3.VisOdomDualTrackPnP;
-import boofcv.struct.calib.CameraPinholeBrown;
 import boofcv.struct.calib.StereoParameters;
 import boofcv.struct.geo.Point2D3D;
 import boofcv.struct.image.ImageGray;
@@ -42,15 +40,15 @@ import java.util.List;
 import java.util.Set;
 
 /**
- * TODO comment
+ * Wrapper around {@link VisOdomDualTrackPnP} for {@link StereoVisualOdometry}.
  *
  * @author Peter Abeles
  */
-public class WrapVisOdomDualTrackPnP<T extends ImageGray<T>>
-		implements StereoVisualOdometry<T>, AccessPointTracks3D {
-	@Getter RefinePnPStereo refine;
-	@Getter PnPStereoEstimator pnp;
-	@Getter DistanceFromModelMultiView<Se3_F64, Point2D3D> distanceMono;
+public class WrapVisOdomDualTrackPnP<T extends ImageGray<T>> implements StereoVisualOdometry<T>, AccessPointTracks3D {
+	@Getter @Nullable RefinePnPStereo refine;
+	@Getter Se3_F64 sharedLeftToRight;
+	@Getter DistanceFromModelMultiView<Se3_F64, Point2D3D> distanceLeft;
+	@Getter DistanceFromModelMultiView<Se3_F64, Point2D3D> distanceRight;
 	@Getter PnPStereoDistanceReprojectionSq distanceStereo;
 	@Getter AssociateStereo2D<?> assoc;
 
@@ -60,15 +58,18 @@ public class WrapVisOdomDualTrackPnP<T extends ImageGray<T>>
 
 	boolean success;
 
-	public WrapVisOdomDualTrackPnP( VisOdomDualTrackPnP<T, ?> visualOdometry, PnPStereoEstimator pnp,
-									DistanceFromModelMultiView<Se3_F64, Point2D3D> distanceMono,
+	public WrapVisOdomDualTrackPnP( VisOdomDualTrackPnP<T, ?> visualOdometry,
+									Se3_F64 sharedLeftToRight,
+									DistanceFromModelMultiView<Se3_F64, Point2D3D> distanceLeft,
+									DistanceFromModelMultiView<Se3_F64, Point2D3D> distanceRight,
 									PnPStereoDistanceReprojectionSq distanceStereo,
 									AssociateStereo2D<?> assoc,
-									RefinePnPStereo refine,
+									@Nullable RefinePnPStereo refine,
 									Class<T> imageType ) {
 		this.visualOdometry = visualOdometry;
-		this.pnp = pnp;
-		this.distanceMono = distanceMono;
+		this.sharedLeftToRight = sharedLeftToRight;
+		this.distanceLeft = distanceLeft;
+		this.distanceRight = distanceRight;
 		this.distanceStereo = distanceStereo;
 		this.assoc = assoc;
 		this.refine = refine;
@@ -111,18 +112,15 @@ public class WrapVisOdomDualTrackPnP<T extends ImageGray<T>>
 
 	@Override
 	public void setCalibration( StereoParameters parameters ) {
-		Se3_F64 leftToRight = parameters.getRightToLeft().invert(null);
+		parameters.getRightToLeft().invert(sharedLeftToRight);
 
-		pnp.setLeftToRight(leftToRight);
 		if (refine != null)
-			refine.setLeftToRight(leftToRight);
+			refine.setLeftToRight(sharedLeftToRight);
 		visualOdometry.setCalibration(parameters);
 
-		CameraPinholeBrown left = parameters.left;
-		distanceMono.setIntrinsic(0, left);
-		distanceStereo.setLeftToRight(parameters.right_to_left.invert(null));
-		distanceStereo.setIntrinsic(0, parameters.left);
-		distanceStereo.setIntrinsic(1, parameters.right);
+		distanceLeft.setIntrinsic(0, parameters.left);
+		distanceRight.setIntrinsic(0, parameters.right);
+		distanceStereo.setStereoParameters(parameters);
 		assoc.setCalibration(parameters);
 	}
 

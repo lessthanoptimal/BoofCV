@@ -287,7 +287,7 @@ public class VisOdomStereoQuadPnP<T extends ImageGray<T>, TD extends TupleDesc<T
 			}
 		}
 
-		if (verbose != null) {
+		if (verbose != null && frameID != 0) {
 			int leftDetections = featsLeft1.locationPixels.size;
 			int inliers = matcher.getMatchSet().size();
 			int matchesL2R = assocL2R.getMatches().size;

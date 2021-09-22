@@ -47,10 +47,16 @@ public class PnPDistanceReprojectionSq implements DistanceFromModelMultiView<Se3
 	private Se3_F64 worldToCamera;
 
 	// storage for point in camera frame
-	private Point3D_F64 X = new Point3D_F64();
+	private final Point3D_F64 X = new Point3D_F64();
 
 	// computes the error in units of pixels
 	private NormalizedToPixelError pixelError = new NormalizedToPixelError(1, 1, 0);
+
+	public PnPDistanceReprojectionSq( NormalizedToPixelError pixelError ) {
+		this.pixelError = pixelError;
+	}
+
+	public PnPDistanceReprojectionSq() {}
 
 	@Override
 	public void setModel( Se3_F64 worldToCamera ) {
@@ -95,5 +101,12 @@ public class PnPDistanceReprojectionSq implements DistanceFromModelMultiView<Se3
 	@Override
 	public int getNumberOfViews() {
 		return 1;
+	}
+
+	/**
+	 * Creates a child which references the intrinsics but is otherwise decoupled
+	 */
+	public DistanceFromModelMultiView<Se3_F64, Point2D3D> newConcurrentChild() {
+		return new PnPDistanceReprojectionSq(pixelError);
 	}
 }

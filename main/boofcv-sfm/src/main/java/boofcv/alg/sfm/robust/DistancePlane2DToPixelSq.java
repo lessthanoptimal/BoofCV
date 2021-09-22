@@ -47,10 +47,18 @@ public class DistancePlane2DToPixelSq implements DistanceFromModel<Se2_F64, Plan
 	private final Point2D_F64 normalizedPred = new Point2D_F64();
 
 	// code for projection to/from plane
-	private final CameraPlaneProjection planeProjection = new CameraPlaneProjection();
+	private CameraPlaneProjection planeProjection = new CameraPlaneProjection();
 
 	// given observations in normalized image coordinates, compute the error in pixels
-	private final NormalizedToPixelError errorCamera = new NormalizedToPixelError();
+	private NormalizedToPixelError errorCamera = new NormalizedToPixelError();
+
+	public DistancePlane2DToPixelSq( CameraPlaneProjection planeProjection,
+									 NormalizedToPixelError errorCamera ) {
+		this.planeProjection = planeProjection;
+		this.errorCamera = errorCamera;
+	}
+
+	public DistancePlane2DToPixelSq() {}
 
 	/**
 	 * Specify extrinsic camera properties
@@ -106,5 +114,13 @@ public class DistancePlane2DToPixelSq implements DistanceFromModel<Se2_F64, Plan
 	@Override
 	public Class<Se2_F64> getModelType() {
 		return Se2_F64.class;
+	}
+
+	/**
+	 * Creates a new instances for concurrency. Calibration data is shared between all instance so that only one
+	 * needs to be updated.
+	 */
+	public DistancePlane2DToPixelSq newConcurrent() {
+		return new DistancePlane2DToPixelSq(planeProjection, errorCamera);
 	}
 }

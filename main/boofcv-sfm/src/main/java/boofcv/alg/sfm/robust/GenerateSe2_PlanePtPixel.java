@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -25,6 +25,8 @@ import georegression.fitting.se.MotionSe2PointSVD_F64;
 import georegression.struct.point.Point2D_F64;
 import georegression.struct.se.Se2_F64;
 import georegression.struct.se.Se3_F64;
+import lombok.Getter;
+import lombok.Setter;
 import org.ddogleg.fitting.modelset.ModelGenerator;
 import org.ddogleg.struct.DogArray;
 
@@ -40,21 +42,19 @@ import java.util.List;
 public class GenerateSe2_PlanePtPixel implements
 		ModelGenerator<Se2_F64, PlanePtPixel> {
 	// estimates rigid body motion from two sets of associated points
-	MotionTransformPoint<Se2_F64, Point2D_F64> estimator;
+	@Getter @Setter MotionTransformPoint<Se2_F64, Point2D_F64> estimator = new MotionSe2PointSVD_F64();
 
 	// code for projection to/from plane
-	private final CameraPlaneProjection planeProjection = new CameraPlaneProjection();
+	@Getter private CameraPlaneProjection planeProjection = new CameraPlaneProjection();
 
 	List<Point2D_F64> from = new ArrayList<>();
 	DogArray<Point2D_F64> to = new DogArray<>(Point2D_F64::new);
 
-	public GenerateSe2_PlanePtPixel( MotionTransformPoint<Se2_F64, Point2D_F64> estimator ) {
-		this.estimator = estimator;
+	public GenerateSe2_PlanePtPixel( CameraPlaneProjection planeProjection ) {
+		this.planeProjection = planeProjection;
 	}
 
-	public GenerateSe2_PlanePtPixel() {
-		estimator = new MotionSe2PointSVD_F64();
-	}
+	public GenerateSe2_PlanePtPixel() {}
 
 	/**
 	 * Specify extrinsic camera properties
@@ -93,5 +93,9 @@ public class GenerateSe2_PlanePtPixel implements
 	@Override
 	public int getMinimumPoints() {
 		return estimator.getMinimumPoints();
+	}
+
+	public GenerateSe2_PlanePtPixel newConcurrent() {
+		return new GenerateSe2_PlanePtPixel(planeProjection);
 	}
 }

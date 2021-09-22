@@ -44,20 +44,31 @@ import java.util.List;
  */
 public class PnPStereoDistanceReprojectionSq implements DistanceFromModelMultiView<Se3_F64, Stereo2D3D> {
 
-	// transform from world to left camera
+	// transform from world to left camera. Model being tested.
 	private Se3_F64 worldToLeft;
-	// transform from left to right camera
-	private Se3_F64 leftToRight;
+
 
 	// storage for point in camera frame
 	private final Point3D_F64 X = new Point3D_F64();
 
-	// computes the error in units of pixels
-	private NormalizedToPixelError leftPixelError;
-	private NormalizedToPixelError rightPixelError;
+	// transform from left to right camera. Assumed to be known.
+	private Se3_F64 leftToRight = new Se3_F64();
+	// computes the error in units of pixels. Assumed to be known
+	private NormalizedToPixelError leftPixelError = new NormalizedToPixelError();
+	private NormalizedToPixelError rightPixelError = new NormalizedToPixelError();
+
+	public PnPStereoDistanceReprojectionSq( NormalizedToPixelError leftPixelError,
+											NormalizedToPixelError rightPixelError,
+											Se3_F64 leftToRight) {
+		this.leftPixelError = leftPixelError;
+		this.rightPixelError = rightPixelError;
+		this.leftToRight = leftToRight;
+	}
+
+	public PnPStereoDistanceReprojectionSq() {}
 
 	public void setLeftToRight( Se3_F64 leftToRight ) {
-		this.leftToRight = leftToRight.copy();
+		this.leftToRight.setTo(leftToRight);
 	}
 
 	@Override
@@ -110,9 +121,9 @@ public class PnPStereoDistanceReprojectionSq implements DistanceFromModelMultiVi
 	@Override
 	public void setIntrinsic( int view, CameraPinhole intrinsic ) {
 		if (view == 0)
-			leftPixelError = new NormalizedToPixelError(intrinsic.fx, intrinsic.fy, intrinsic.skew);
+			leftPixelError.setTo(intrinsic.fx, intrinsic.fy, intrinsic.skew);
 		else if (view == 1)
-			rightPixelError = new NormalizedToPixelError(intrinsic.fx, intrinsic.fy, intrinsic.skew);
+			rightPixelError.setTo(intrinsic.fx, intrinsic.fy, intrinsic.skew);
 		else
 			throw new IllegalArgumentException("View must be 0 or 1");
 	}
@@ -123,8 +134,15 @@ public class PnPStereoDistanceReprojectionSq implements DistanceFromModelMultiVi
 	}
 
 	public void setStereoParameters( StereoParameters param ) {
-		setLeftToRight(param.right_to_left.invert(null));
+		param.right_to_left.invert(leftToRight);
 		setIntrinsic(0, param.left);
 		setIntrinsic(1, param.right);
+	}
+
+	/**
+	 * Creates a child which references the intrinsics but is otherwise decoupled
+	 */
+	public DistanceFromModelMultiView<Se3_F64, Stereo2D3D> newConcurrentChild() {
+		return new PnPStereoDistanceReprojectionSq(leftPixelError, rightPixelError, leftToRight);
 	}
 }
