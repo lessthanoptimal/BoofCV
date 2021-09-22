@@ -89,8 +89,7 @@ import static javax.swing.ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED;
  *
  * @author Peter Abeles
  */
-public class VisualizeStereoVisualOdometryApp<T extends ImageGray<T>>
-		extends DemonstrationBase {
+public class VisualizeStereoVisualOdometryApp<T extends ImageGray<T>> extends DemonstrationBase {
 	// Main GUI elements for the app
 	ControlPanel controls = new ControlPanel();
 	StereoPanel stereoPanel = new StereoPanel();
@@ -111,16 +110,22 @@ public class VisualizeStereoVisualOdometryApp<T extends ImageGray<T>>
 	// if true that means it will change the view to match the latest estimate
 	boolean followCamera = false;
 
+	// If the input in a single stream and the stream should be split into two images
+	boolean splitFrame = false;
+
 	// number if stereo frames processed
 	int frame = 0;
 	// total distance traveled
 	double traveled = 0;
 	final Se3_F64 prev_to_world = new Se3_F64();
 
+	ImageType imageType;
+
 	public VisualizeStereoVisualOdometryApp( List<PathLabel> examples,
 											 Class<T> imageType ) {
-		super(true, false, examples, ImageType.single(imageType), ImageType.single(imageType));
+		super(true, false, examples, ImageType.single(imageType));
 		useCustomOpenFiles = true;
+		this.imageType = ImageType.single(imageType);
 
 		addViewMenu();
 
@@ -175,8 +180,11 @@ public class VisualizeStereoVisualOdometryApp<T extends ImageGray<T>>
 
 		final var files = new ArrayList<File>();
 		files.add(s.left);
-		files.add(s.right);
+		if (!s.isSplit()) {
+			files.add(s.right);
+		}
 		files.add(s.calibration);
+		splitFrame = s.isSplit();
 
 		openFiles(files);
 	}
@@ -305,18 +313,43 @@ public class VisualizeStereoVisualOdometryApp<T extends ImageGray<T>>
 
 	@Override
 	protected boolean openCustomFiles( String[] filePaths, List<String> outSequence, List<String> outImages ) {
-		if (filePaths.length == 2) {
+		int videoCount = splitFrame ? 1 : 2;
+		if (filePaths.length == videoCount) {
 			File f = new File(filePaths[0]).getParentFile();
 			stereoParameters = CalibrationIO.load(new File(f, "stereo.yaml"));
-		} else if (filePaths.length == 3) {
-			stereoParameters = CalibrationIO.load(filePaths[2]);
+		} else if (filePaths.length == videoCount + 1) {
+			stereoParameters = CalibrationIO.load(filePaths[videoCount]);
 		} else {
 			throw new RuntimeException("Unexpected number of files " + filePaths.length);
 		}
 
 		outSequence.add(filePaths[0]);
-		outSequence.add(filePaths[1]);
+		if (!splitFrame)
+			outSequence.add(filePaths[1]);
 		return true;
+	}
+
+	@Override
+	protected void openVideo( boolean reopen, String... filePaths ) {
+		// See if the last argument is a configuration. If so load and remove it otherwise it will cause
+		// a crash later on
+		try {
+			stereoParameters = CalibrationIO.load(filePaths[filePaths.length-1]);
+			String[] temp = new String[filePaths.length-1];
+			System.arraycopy(filePaths,0,temp, 0, temp.length);
+			filePaths = temp;
+		} catch (RuntimeException ignore) {}
+
+		// If there is just one input then it must be a split image
+		splitFrame = filePaths.length==1;
+
+		// The base class assumes the number of streams is constant. So we hack it to be dynamic.
+		if (splitFrame)
+			setImageTypes(imageType);
+		else
+			setImageTypes(imageType, imageType);
+
+		super.openVideo(reopen, filePaths);
 	}
 
 	@Override
@@ -341,10 +374,13 @@ public class VisualizeStereoVisualOdometryApp<T extends ImageGray<T>>
 
 		double hfov = PerspectiveOps.computeHFov(stereoParameters.left);
 
+		int leftWidth = splitFrame ? width/2 : width;
+		int leftHeight = height;
+
 		SwingUtilities.invokeLater(() -> {
 			// change the scale so that the entire image is visible
-			stereoPanel.setPreferredSize(new Dimension(width, height*2));
-			double scale = BoofSwingUtil.selectZoomToShowAll(stereoPanel, width, height*2);
+			stereoPanel.setPreferredSize(new Dimension(leftWidth, leftHeight*2));
+			double scale = BoofSwingUtil.selectZoomToShowAll(stereoPanel, leftWidth, leftHeight*2);
 			controls.setZoom(scale);
 			cloudPanel.configureViewer(hfov);
 			cloudPanel.gui.setTranslationStep(stereoParameters.getBaseline());
@@ -367,20 +403,33 @@ public class VisualizeStereoVisualOdometryApp<T extends ImageGray<T>>
 
 	@Override
 	public void processImage( int sourceID, long frameID, BufferedImage buffered, ImageBase input ) {
-		switch (sourceID) {
-			case 0 -> {
-				stereoPanel.left = checkCopy(buffered, stereoPanel.left);
-				convertFrom(buffered, true, inputLeft);
-			}
-			case 1 -> {
-				stereoPanel.right = checkCopy(buffered, stereoPanel.right);
-				convertFrom(buffered, true, inputRight);
-			}
-			default -> throw new RuntimeException("BUG");
-		}
+		if (splitFrame) {
+			int leftWidth = splitFrame ? buffered.getWidth()/2 : buffered.getWidth();
+			int height = buffered.getHeight();
+			T full = (T)input;
+			inputLeft.setTo(full.subimage(0, 0, leftWidth, height));
+			inputRight.setTo(full.subimage(leftWidth, 0, buffered.getWidth(), height));
 
-		if (sourceID == 0)
-			return;
+
+			stereoPanel.left = checkCopy(buffered.getSubimage(0, 0, leftWidth, height), stereoPanel.left);
+			stereoPanel.right = checkCopy(buffered.
+					getSubimage(leftWidth, 0, buffered.getWidth() - leftWidth, height), stereoPanel.right);
+		} else {
+			switch (sourceID) {
+				case 0 -> {
+					stereoPanel.left = checkCopy(buffered, stereoPanel.left);
+					convertFrom(buffered, true, inputLeft);
+				}
+				case 1 -> {
+					stereoPanel.right = checkCopy(buffered, stereoPanel.right);
+					convertFrom(buffered, true, inputRight);
+				}
+				default -> throw new RuntimeException("BUG");
+			}
+
+			if (sourceID == 0)
+				return;
+		}
 
 		long time0 = System.nanoTime();
 		boolean success = alg.process(inputLeft, inputRight);
@@ -640,15 +689,15 @@ public class VisualizeStereoVisualOdometryApp<T extends ImageGray<T>>
 			add(createHorizontalPanel(bUpdateAlg, bPause, bStep));
 		}
 
-		public void setInliersTracks( int count ) { labelInliersN.setText("" + count); }
+		public void setInliersTracks( int count ) {labelInliersN.setText("" + count);}
 
-		public void setVisibleTracks( int count ) { labelVisibleN.setText("" + count); }
+		public void setVisibleTracks( int count ) {labelVisibleN.setText("" + count);}
 
-		public void setBundleTracks( int count ) { labelBundleN.setText("" + count); }
+		public void setBundleTracks( int count ) {labelBundleN.setText("" + count);}
 
-		public void setDistanceTraveled( double distance ) { labelTraveled.setText(String.format("%.1f", distance)); }
+		public void setDistanceTraveled( double distance ) {labelTraveled.setText(String.format("%.1f", distance));}
 
-		public void setFrame( int frame ) { videoFrameLabel.setText("" + frame); }
+		public void setFrame( int frame ) {videoFrameLabel.setText("" + frame);}
 
 		@Override
 		public void controlChanged( Object source ) {
