@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -47,7 +47,7 @@ public class ControlPanelPointTrackerKlt extends StandardAlgConfigPanel {
 	private final JSpinner spinnerMaxError;
 	private final JSpinner spinnerDescRadius;
 	private final JSpinner spinnerForwardsBackwards;
-	private final ControlPanelPointDetector controlDetector;
+	public final ControlPanelPointDetector controlDetector;
 
 	public ControlPanelPointTrackerKlt(Listener listener) {
 		this(listener,new ConfigPointDetector(),ConfigPKlt.levels(4));

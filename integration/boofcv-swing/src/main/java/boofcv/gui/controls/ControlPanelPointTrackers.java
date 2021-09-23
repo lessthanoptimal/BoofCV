@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -19,7 +19,9 @@
 package boofcv.gui.controls;
 
 import boofcv.abst.tracker.PointTracker;
+import boofcv.factory.feature.detect.interest.ConfigDetectInterestPoint;
 import boofcv.factory.tracker.ConfigPointTracker;
+import boofcv.factory.tracker.FactoryPointTracker;
 import boofcv.gui.StandardAlgConfigPanel;
 import boofcv.struct.image.ImageBase;
 import boofcv.struct.image.ImageType;
@@ -47,52 +49,66 @@ public class ControlPanelPointTrackers extends StandardAlgConfigPanel {
 
 	Listener listener;
 
-	public ControlPanelPointTrackers( Listener listener ,
-									  ConfigPointTracker config )
-	{
+	public ControlPanelPointTrackers( Listener listener, ConfigPointTracker config ) {
 		setBorder(BorderFactory.createEmptyBorder());
 		this.listener = listener;
 
 		// TODO pass in copies since each control panel is independent
 		controlKlt = config == null ? new ControlPanelPointTrackerKlt(listener::changePointTracker)
 				: new ControlPanelPointTrackerKlt(listener::changePointTracker,
-				config.detDesc.detectPoint.copy(),config.klt.copy());
+				config.detDesc.detectPoint.copy(), config.klt.copy());
 		controlDda = config == null ? new ControlPanelDdaTracker(listener::changePointTracker)
 				: new ControlPanelDdaTracker(listener::changePointTracker,
-				config.dda.copy(),config.detDesc.copy(),config.associate.copy());
-		controlHybrid = config == null ?  new ControlPanelHybridTracker(listener::changePointTracker)
-				: new ControlPanelHybridTracker(listener::changePointTracker,config.hybrid,config.klt.copy(),
-				config.detDesc.copy(),config.associate.copy());
-		if( config != null )
+				config.dda.copy(), config.detDesc.copy(), config.associate.copy());
+		controlHybrid = config == null ? new ControlPanelHybridTracker(listener::changePointTracker)
+				: new ControlPanelHybridTracker(listener::changePointTracker, config.hybrid, config.klt.copy(),
+				config.detDesc.copy(), config.associate.copy());
+		if (config != null)
 			selectedFamily = config.typeTracker;
 
 		controlDda.initializeControlsGUI();
 		controlHybrid.initializeControlsGUI();
 
-		cFamily = combo(selectedFamily.ordinal(), (Object[]) ConfigPointTracker.TrackerType.values());
+		cFamily = combo(selectedFamily.ordinal(), (Object[])ConfigPointTracker.TrackerType.values());
 		ConfigPointTracker.TrackerType selected = selectedFamily;
 		selectedFamily = null; // so that it will update
 		changeFamily(selected);
 
-		addLabeled(cFamily,"Family","Which high level point tracker type");
+		addLabeled(cFamily, "Family", "Which high level point tracker type");
 		add(mainPanel);
 	}
 
+	public ConfigPointTracker createConfiguration() {
+		var config = new ConfigPointTracker();
+		config.typeTracker = selectedFamily;
+
+		// only copy configurations that are active
+		switch (selectedFamily) {
+			case KLT -> {
+				config.klt.setTo(controlKlt.configKlt);
+				config.detDesc.typeDetector = ConfigDetectInterestPoint.Type.POINT;
+				config.detDesc.detectPoint.setTo(controlKlt.configDetect);
+			}
+			case DDA -> {
+				config.dda.setTo(controlDda.configDDA);
+				config.associate.setTo(controlDda.configAssociate);
+				config.detDesc.setTo(controlDda.configDetDesc);
+			}
+			case HYBRID -> config.setTo(controlHybrid.createConfiguration());
+			default -> throw new RuntimeException("Not yet supported");
+		}
+		return config;
+	}
 
 	public <T extends ImageBase<T>>
 	PointTracker<T> createTracker( ImageType<T> imageType ) {
-		return switch (selectedFamily) {
-			case KLT -> controlKlt.createTracker(imageType);
-			case DDA -> controlDda.createTracker(imageType);
-			case HYBRID -> controlHybrid.createTracker(imageType);
-			default -> throw new RuntimeException("Not yet supported");
-		};
+		return FactoryPointTracker.tracker(createConfiguration(), imageType.getImageClass(), null);
 	}
 
 	private void changeFamily( ConfigPointTracker.TrackerType which ) {
-		if( which == selectedFamily )
+		if (which == selectedFamily)
 			return;
-		if( previous != null )
+		if (previous != null)
 			mainPanel.remove(previous);
 		previous = switch (which) {
 			case KLT -> controlKlt;
@@ -101,14 +117,14 @@ public class ControlPanelPointTrackers extends StandardAlgConfigPanel {
 			default -> throw new RuntimeException("BUG");
 		};
 		selectedFamily = which;
-		mainPanel.add(BorderLayout.CENTER,previous);
+		mainPanel.add(BorderLayout.CENTER, previous);
 		mainPanel.validate();
 		mainPanel.repaint();
 	}
 
 	@Override
-	public void controlChanged(final Object source) {
-		if( source == cFamily ) {
+	public void controlChanged( final Object source ) {
+		if (source == cFamily) {
 			changeFamily(ConfigPointTracker.TrackerType.values()[cFamily.getSelectedIndex()]);
 		}
 		listener.changePointTracker();

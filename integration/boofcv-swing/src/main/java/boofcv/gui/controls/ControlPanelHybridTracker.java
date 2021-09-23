@@ -19,7 +19,6 @@
 package boofcv.gui.controls;
 
 import boofcv.abst.feature.describe.ConfigTemplateDescribe;
-import boofcv.abst.feature.detdesc.DetectDescribePoint;
 import boofcv.abst.tracker.ConfigTrackerHybrid;
 import boofcv.abst.tracker.PointTracker;
 import boofcv.alg.tracker.klt.ConfigPKlt;
@@ -27,6 +26,7 @@ import boofcv.factory.feature.associate.ConfigAssociate;
 import boofcv.factory.feature.describe.ConfigDescribeRegion;
 import boofcv.factory.feature.detdesc.ConfigDetectDescribe;
 import boofcv.factory.feature.detect.interest.ConfigDetectInterestPoint;
+import boofcv.factory.tracker.ConfigPointTracker;
 import boofcv.factory.tracker.FactoryPointTracker;
 import boofcv.gui.StandardAlgConfigPanel;
 import boofcv.struct.image.ImageBase;
@@ -129,14 +129,19 @@ public class ControlPanelHybridTracker extends ControlPanelDetDescAssocBase {
 		SwingUtilities.invokeLater(this::repaint);
 	}
 
+	public ConfigPointTracker createConfiguration() {
+		var config = new ConfigPointTracker();
+		config.typeTracker = ConfigPointTracker.TrackerType.HYBRID;
+		config.hybrid.setTo(configHybrid);
+		config.detDesc.setTo(configDetDesc);
+		config.associate.setTo(configAssociate);
+		config.klt.setTo(configKlt);
+		return config;
+	}
+
 	public <T extends ImageBase<T>>
-	PointTracker<T> createTracker(ImageType<T> imageType ) {
-		Class inputType = imageType.getImageClass();
-
-		DetectDescribePoint detDesc = createDetectDescribe(inputType);
-
-		return FactoryPointTracker.hybrid(detDesc,createAssociate2(detDesc),
-				configDetDesc.findNonMaxRadius(), configKlt, configHybrid, imageType.getImageClass());
+	PointTracker<T> createTracker( ImageType<T> imageType ) {
+		return FactoryPointTracker.tracker(createConfiguration(), imageType.getImageClass(), null);
 	}
 
 	@Override
