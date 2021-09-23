@@ -434,7 +434,7 @@ public class VisualizeDepthVisualOdometryApp
 			configTracker.detDesc.typeDetector = ConfigDetectInterestPoint.Type.POINT;
 
 			PointTracker tracker = FactoryPointTracker.tracker(configTracker, imageType, derivType);
-			alg = FactoryVisualOdometry.depthDepthPnP(configVO, sparseDepth, tracker, imageType, GrayU16.class);
+			alg = FactoryVisualOdometry.rgbDepthPnP(configVO, sparseDepth, tracker, imageType, GrayU16.class);
 
 //			ConfigGeneralDetector configDetector = new ConfigGeneralDetector(600, 3, 1);
 //			PointTrackerTwoPass tracker = FactoryPointTrackerTwoPass.klt(configPKlt, configDetector,
@@ -450,7 +450,7 @@ public class VisualizeDepthVisualOdometryApp
 
 			PointTracker tracker = FactoryPointTracker.tracker(configTracker, imageType, derivType);
 
-			alg = FactoryVisualOdometry.depthDepthPnP(configVO, sparseDepth, tracker, imageType, GrayU16.class);
+			alg = FactoryVisualOdometry.rgbDepthPnP(configVO, sparseDepth, tracker, imageType, GrayU16.class);
 
 //			alg = FactoryVisualOdometry.
 //					depthDepthPnP(1.5, 80, 3, 200, 50, false, sparseDepth, tracker, imageType, GrayU16.class);
@@ -463,7 +463,7 @@ public class VisualizeDepthVisualOdometryApp
 
 			PointTracker tracker = FactoryPointTracker.tracker(configTracker, imageType, derivType);
 
-			alg = FactoryVisualOdometry.depthDepthPnP(configVO, sparseDepth, tracker, imageType, GrayU16.class);
+			alg = FactoryVisualOdometry.rgbDepthPnP(configVO, sparseDepth, tracker, imageType, GrayU16.class);
 
 //			PointTracker tracker = FactoryPointTracker.
 //					combined_ST_SURF_KLT(new ConfigGeneralDetector(600, 3, 1),

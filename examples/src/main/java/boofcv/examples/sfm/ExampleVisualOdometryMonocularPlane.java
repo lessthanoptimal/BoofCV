@@ -18,13 +18,11 @@
 
 package boofcv.examples.sfm;
 
-import boofcv.abst.feature.detect.interest.ConfigPointDetector;
 import boofcv.abst.feature.detect.interest.PointDetectorTypes;
 import boofcv.abst.sfm.d3.MonocularPlaneVisualOdometry;
-import boofcv.abst.tracker.PointTracker;
-import boofcv.alg.tracker.klt.ConfigPKlt;
+import boofcv.factory.sfm.ConfigPlanarTrackPnP;
 import boofcv.factory.sfm.FactoryVisualOdometry;
-import boofcv.factory.tracker.FactoryPointTracker;
+import boofcv.factory.tracker.ConfigPointTracker;
 import boofcv.io.MediaManager;
 import boofcv.io.UtilIO;
 import boofcv.io.calibration.CalibrationIO;
@@ -60,21 +58,26 @@ public class ExampleVisualOdometryMonocularPlane {
 		SimpleImageSequence<GrayU8> video = media.openVideo(
 				new File(directory, "left.mjpeg").getPath(), ImageType.single(GrayU8.class));
 
-		// specify how the image features are going to be tracked
-		ConfigPKlt configKlt = new ConfigPKlt();
-		configKlt.pyramidLevels = ConfigDiscreteLevels.levels(4);
-		configKlt.templateRadius = 3;
-		ConfigPointDetector configDetector = new ConfigPointDetector();
-		configDetector.type = PointDetectorTypes.SHI_TOMASI;
-		configDetector.general.maxFeatures = 600;
-		configDetector.general.radius = 3;
-		configDetector.general.threshold = 1;
+		var config = new ConfigPlanarTrackPnP();
 
-		PointTracker<GrayU8> tracker = FactoryPointTracker.klt(configKlt, configDetector, GrayU8.class, null);
+		// specify how the image features are going to be tracked
+		config.tracker.typeTracker = ConfigPointTracker.TrackerType.KLT;
+		config.tracker.klt.pyramidLevels = ConfigDiscreteLevels.levels(4);
+		config.tracker.klt.templateRadius = 3;
+
+		config.tracker.detDesc.detectPoint.type = PointDetectorTypes.SHI_TOMASI;
+		config.tracker.detDesc.detectPoint.general.maxFeatures = 600;
+		config.tracker.detDesc.detectPoint.general.radius = 3;
+		config.tracker.detDesc.detectPoint.general.threshold = 1;
+
+		// Configure how visual odometry works
+		config.thresholdAdd = 75;
+		config.thresholdRetire = 2;
+		config.ransac.iterations = 200;
+		config.ransac.inlierThreshold = 1.5;
 
 		// declares the algorithm
-		MonocularPlaneVisualOdometry<GrayU8> visualOdometry =
-				FactoryVisualOdometry.monoPlaneInfinity(75, 2, 1.5, 200, tracker, ImageType.single(GrayU8.class));
+		MonocularPlaneVisualOdometry<GrayU8> visualOdometry = FactoryVisualOdometry.monoPlaneInfinity(config, GrayU8.class);
 
 		// Pass in intrinsic/extrinsic calibration. This can be changed in the future.
 		visualOdometry.setCalibration(calibration);
