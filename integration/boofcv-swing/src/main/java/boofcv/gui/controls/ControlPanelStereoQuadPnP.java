@@ -38,7 +38,7 @@ import java.awt.*;
  */
 public class ControlPanelStereoQuadPnP extends JTabbedPane {
 
-	final ConfigStereoQuadPnP config;
+	public final ConfigStereoQuadPnP config;
 
 	final ControlPanelDetDescAssocBase panelFeatures;
 	final ControlPanelMotion panelMotion;

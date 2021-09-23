@@ -43,33 +43,33 @@ public class ControlPanelStereoDualTrackPnP extends JTabbedPane {
 	StereoControls controlStereo;
 
 	final Listener listener;
-	final ConfigStereoDualTrackPnP config;
+	public final ConfigStereoDualTrackPnP config;
 
-	public ControlPanelStereoDualTrackPnP(ConfigStereoDualTrackPnP config, Listener listener ) {
+	public ControlPanelStereoDualTrackPnP( ConfigStereoDualTrackPnP config, Listener listener ) {
 		setBorder(BorderFactory.createEmptyBorder());
 		this.listener = listener;
 		this.config = config;
 
 		controlPnpDepth = new ControlPanelVisOdomTrackPnP(listener::changedStereoDualTrackPnP, config.scene);
-		controlTrackers = new ControlPanelPointTrackers(listener::changedStereoDualTrackPnP,config.tracker);
+		controlTrackers = new ControlPanelPointTrackers(listener::changedStereoDualTrackPnP, config.tracker);
 		controlStereo = new StereoControls();
 
 		var panelAlgControls = new JPanel(new BorderLayout());
 		panelAlgControls.add(BorderLayout.CENTER, controlPnpDepth);
 
-		addTab("VO",panelAlgControls);
-		addTab("Tracker",controlTrackers);
-		addTab("Stereo",controlStereo);
+		addTab("VO", panelAlgControls);
+		addTab("Tracker", controlTrackers);
+		addTab("Stereo", controlStereo);
 	}
 
 	public <T extends ImageGray<T>>
-	StereoVisualOdometry<T> createVisOdom(Class<T> imageType ) {
+	StereoVisualOdometry<T> createVisOdom( Class<T> imageType ) {
 
 		PointTracker<T> trackerLeft = controlTrackers.createTracker(ImageType.single(imageType));
 		PointTracker<T> trackerRight = controlTrackers.createTracker(ImageType.single(imageType));
 
 		return FactoryVisualOdometry.stereoDualTrackerPnP(controlPnpDepth.config,
-				trackerLeft,trackerRight,config,imageType);
+				trackerLeft, trackerRight, config, imageType);
 	}
 
 	public class StereoControls extends StandardAlgConfigPanel {
@@ -79,19 +79,19 @@ public class ControlPanelStereoDualTrackPnP extends JTabbedPane {
 
 		public StereoControls() {
 			setBorder(BorderFactory.createEmptyBorder());
-			spinnerScaleRadius = spinner(config.stereoRadius,0.0,500.0,1.0);
-			spinnerEpipolarTol = spinner(config.epipolarTol,0.0,100.0,1.0);
+			spinnerScaleRadius = spinner(config.stereoRadius, 0.0, 500.0, 1.0);
+			spinnerEpipolarTol = spinner(config.epipolarTol, 0.0, 100.0, 1.0);
 
-			addLabeled(spinnerScaleRadius,"Describe Radius","Size of region covered by descriptor");
-			addLabeled(spinnerEpipolarTol,"Epipolar Tol.","Maximum distance away from the epipolar line two features can be");
+			addLabeled(spinnerScaleRadius, "Describe Radius", "Size of region covered by descriptor");
+			addLabeled(spinnerEpipolarTol, "Epipolar Tol.", "Maximum distance away from the epipolar line two features can be");
 			add(panelDescribe);
 		}
 
 		@Override
 		public void controlChanged( final Object source ) {
-			if( source == spinnerScaleRadius ) {
+			if (source == spinnerScaleRadius) {
 				config.stereoRadius = ((Number)spinnerScaleRadius.getValue()).doubleValue();
-			} else if( source == spinnerEpipolarTol ) {
+			} else if (source == spinnerEpipolarTol) {
 				config.epipolarTol = ((Number)spinnerEpipolarTol.getValue()).doubleValue();
 			}
 			listener.changedStereoDualTrackPnP();
@@ -109,7 +109,7 @@ public class ControlPanelStereoDualTrackPnP extends JTabbedPane {
 
 			setBorder(BorderFactory.createEmptyBorder());
 			initializeControlsGUI();
-			addLabeled(comboDescribe,"Type");
+			addLabeled(comboDescribe, "Type");
 			add(panelDescriptor);
 
 			handleDescriptorChanged();
@@ -118,7 +118,7 @@ public class ControlPanelStereoDualTrackPnP extends JTabbedPane {
 		private void handleDescriptorChanged() {
 			config.stereoDescribe.type = configDetDesc.typeDescribe;
 			panelDescriptor.removeAll();
-			panelDescriptor.add(getDescriptorPanel(),BorderLayout.CENTER);
+			panelDescriptor.add(getDescriptorPanel(), BorderLayout.CENTER);
 			panelDescriptor.invalidate();
 			ControlPanelStereoDualTrackPnP.this.repaint();
 		}
@@ -129,8 +129,8 @@ public class ControlPanelStereoDualTrackPnP extends JTabbedPane {
 		}
 
 		@Override
-		public void actionPerformed(ActionEvent e) {
-			if( comboDescribe == e.getSource() ) {
+		public void actionPerformed( ActionEvent e ) {
+			if (comboDescribe == e.getSource()) {
 				configDetDesc.typeDescribe =
 						ConfigDescribeRegion.Type.values()[comboDescribe.getSelectedIndex()];
 				handleDescriptorChanged();

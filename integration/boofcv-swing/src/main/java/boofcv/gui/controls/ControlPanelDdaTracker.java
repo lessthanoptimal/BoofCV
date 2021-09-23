@@ -45,7 +45,7 @@ public class ControlPanelDdaTracker extends ControlPanelDetDescAssocBase {
 	private final JPanel controlPanel = new JPanel(new BorderLayout());
 	private final Listener listener;
 
-	private final ConfigTrackerDda configDDA;
+	public final ConfigTrackerDda configDDA;
 	private ControlTracker controlTrackerDDA;
 
 	public ControlPanelDdaTracker(Listener listener) {

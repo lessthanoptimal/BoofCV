@@ -227,7 +227,21 @@ public class VisualizeStereoVisualOdometryApp<T extends ImageGray<T>> extends De
 	 * Save visual odometry configuration to disk
 	 */
 	private void saveConfiguration() {
+		String fileName = "StereoVisualOdometry.yaml";
 
+		// Select a file but keep the name as the default
+		File selected = BoofSwingUtil.fileChooser(null, this, false, new File(fileName).getPath(),
+				( path ) -> new File(new File(path).getParentFile(), fileName).getPath(), FileTypes.YAML);
+		if (selected == null)
+			return;
+
+		switch (controls.approach) {
+			case 0 -> UtilIO.saveConfig(controls.controlMonoTrack.createConfiguration(),
+					new ConfigStereoMonoTrackPnP(), selected);
+			case 1 -> UtilIO.saveConfig(controls.controlDualTrack.config, new ConfigStereoDualTrackPnP(), selected);
+			case 2 -> UtilIO.saveConfig(controls.controlQuad.config, new ConfigStereoQuadPnP(), selected);
+			default -> throw new RuntimeException("Unknown approach " + controls.approach);
+		}
 	}
 
 	/**
@@ -356,14 +370,14 @@ public class VisualizeStereoVisualOdometryApp<T extends ImageGray<T>> extends De
 		// See if the last argument is a configuration. If so load and remove it otherwise it will cause
 		// a crash later on
 		try {
-			stereoParameters = CalibrationIO.load(filePaths[filePaths.length-1]);
-			String[] temp = new String[filePaths.length-1];
-			System.arraycopy(filePaths,0,temp, 0, temp.length);
+			stereoParameters = CalibrationIO.load(filePaths[filePaths.length - 1]);
+			String[] temp = new String[filePaths.length - 1];
+			System.arraycopy(filePaths, 0, temp, 0, temp.length);
 			filePaths = temp;
 		} catch (RuntimeException ignore) {}
 
 		// If there is just one input then it must be a split image
-		splitFrame = filePaths.length==1;
+		splitFrame = filePaths.length == 1;
 
 		// The base class assumes the number of streams is constant. So we hack it to be dynamic.
 		if (splitFrame)

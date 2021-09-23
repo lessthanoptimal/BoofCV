@@ -18,13 +18,10 @@
 
 package boofcv.gui.controls;
 
-import boofcv.abst.disparity.StereoDisparitySparse;
 import boofcv.abst.sfm.d3.StereoVisualOdometry;
-import boofcv.abst.tracker.PointTracker;
 import boofcv.factory.sfm.ConfigStereoMonoTrackPnP;
 import boofcv.factory.sfm.FactoryVisualOdometry;
 import boofcv.struct.image.ImageGray;
-import boofcv.struct.image.ImageType;
 
 import javax.swing.*;
 import java.awt.*;
@@ -61,12 +58,17 @@ public class ControlPanelStereoMonoTrackPnP extends JPanel {
 		add(BorderLayout.CENTER, tuningTabs);
 	}
 
+	public ConfigStereoMonoTrackPnP createConfiguration() {
+		var config = new ConfigStereoMonoTrackPnP();
+		config.tracker.setTo(controlTrackers.createConfiguration());
+		config.scene.setTo(controlPnpDepth.config);
+		config.disparity.setTo(controlDisparity.config);
+		return config;
+	}
+
 	public <T extends ImageGray<T>>
 	StereoVisualOdometry<T> createVisOdom( Class<T> imageType ) {
-		PointTracker<T> tracker = controlTrackers.createTracker(ImageType.single(imageType));
-		StereoDisparitySparse<T> disparity = controlDisparity.createAlgorithm(imageType);
-
-		return FactoryVisualOdometry.stereoMonoPnP(controlPnpDepth.config, disparity, tracker, imageType);
+		return FactoryVisualOdometry.stereoMonoPnP(createConfiguration(), imageType);
 	}
 
 	public interface Listener {
