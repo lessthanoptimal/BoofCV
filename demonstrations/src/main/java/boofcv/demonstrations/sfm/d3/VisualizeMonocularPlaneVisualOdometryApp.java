@@ -25,7 +25,9 @@ import boofcv.abst.sfm.d3.MonocularPlaneVisualOdometry;
 import boofcv.abst.tracker.PointTracker;
 import boofcv.alg.filter.derivative.GImageDerivativeOps;
 import boofcv.alg.tracker.klt.ConfigPKlt;
+import boofcv.factory.sfm.ConfigPlanarTrackPnP;
 import boofcv.factory.sfm.FactoryVisualOdometry;
+import boofcv.factory.tracker.ConfigPointTracker;
 import boofcv.factory.tracker.FactoryPointTracker;
 import boofcv.gui.VideoProcessAppBase;
 import boofcv.gui.VisualizeApp;
@@ -293,19 +295,22 @@ public class VisualizeMonocularPlaneVisualOdometryApp<I extends ImageGray<I>>
 		Class derivType = GImageDerivativeOps.getDerivativeType(imageClass);
 
 		if (whichAlg == 0) {
-			ConfigPKlt configKlt = new ConfigPKlt();
-			configKlt.pyramidLevels = ConfigDiscreteLevels.levels(4);
-			configKlt.templateRadius = 3;
+			var config = new ConfigPlanarTrackPnP();
+			config.tracker.typeTracker = ConfigPointTracker.TrackerType.KLT;
+			config.tracker.klt.pyramidLevels = ConfigDiscreteLevels.levels(4);
+			config.tracker.klt.templateRadius = 3;
 
-			ConfigPointDetector configDetector = new ConfigPointDetector();
-			configDetector.type = PointDetectorTypes.SHI_TOMASI;
-			configDetector.general.maxFeatures = 600;
-			configDetector.general.radius = 3;
-			configDetector.general.threshold = 1;
+			config.tracker.detDesc.detectPoint.type = PointDetectorTypes.SHI_TOMASI;
+			config.tracker.detDesc.detectPoint.general.maxFeatures = 600;
+			config.tracker.detDesc.detectPoint.general.radius = 3;
+			config.tracker.detDesc.detectPoint.general.threshold = 1;
 
-			PointTracker<I> tracker = FactoryPointTracker.klt(configKlt, configDetector, imageClass, derivType);
+			config.thresholdAdd = 75;
+			config.thresholdRetire = 2;
+			config.ransac.iterations = 200;
+			config.ransac.inlierThreshold = 1.5;
 
-			return FactoryVisualOdometry.monoPlaneInfinity(75, 2, 1.5, 200, tracker, imageType);
+			return FactoryVisualOdometry.monoPlaneInfinity(config, imageClass);
 		} else if (whichAlg == 1) {
 			ConfigPKlt configKlt = new ConfigPKlt();
 			configKlt.pyramidLevels = ConfigDiscreteLevels.levels(4);

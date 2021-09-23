@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -18,15 +18,11 @@
 
 package boofcv.abst.sfm.d3;
 
-import boofcv.abst.feature.detect.interest.ConfigPointDetector;
 import boofcv.abst.feature.detect.interest.PointDetectorTypes;
-import boofcv.abst.tracker.PointTracker;
-import boofcv.alg.tracker.klt.ConfigPKlt;
+import boofcv.factory.sfm.ConfigPlanarTrackPnP;
 import boofcv.factory.sfm.FactoryVisualOdometry;
-import boofcv.factory.tracker.FactoryPointTracker;
-import boofcv.struct.image.GrayS16;
+import boofcv.factory.tracker.ConfigPointTracker;
 import boofcv.struct.image.GrayU8;
-import boofcv.struct.image.ImageType;
 import boofcv.struct.pyramid.ConfigDiscreteLevels;
 
 /**
@@ -36,24 +32,25 @@ public class TestMonoMotion2D_to_MonocularPlaneVisualOdometry extends CheckVisua
 
 	public TestMonoMotion2D_to_MonocularPlaneVisualOdometry() {
 		super(GrayU8.class, -20, 0.04);   // angle selected to include ground points and points far away
-
 		setAlgorithm(createAlgorithm());
 	}
 
 	protected MonocularPlaneVisualOdometry<GrayU8> createAlgorithm() {
+		var config = new ConfigPlanarTrackPnP();
+		config.tracker.typeTracker = ConfigPointTracker.TrackerType.KLT;
+		config.tracker.klt.pyramidLevels = ConfigDiscreteLevels.levels(4);
+		config.tracker.klt.templateRadius = 3;
 
-		ConfigPKlt config = new ConfigPKlt();
-		config.pyramidLevels = ConfigDiscreteLevels.levels(4);
-		config.templateRadius = 3;
-		ConfigPointDetector configDetector = new ConfigPointDetector();
-		configDetector.type = PointDetectorTypes.SHI_TOMASI;
-		configDetector.general.maxFeatures = 600;
-		configDetector.general.radius = 3;
-		configDetector.general.threshold = 1;
+		config.tracker.detDesc.detectPoint.type = PointDetectorTypes.SHI_TOMASI;
+		config.tracker.detDesc.detectPoint.general.maxFeatures = 600;
+		config.tracker.detDesc.detectPoint.general.radius = 3;
+		config.tracker.detDesc.detectPoint.general.threshold = 1;
 
-		PointTracker<GrayU8> tracker = FactoryPointTracker.klt(config, configDetector,
-				GrayU8.class, GrayS16.class);
+		config.thresholdAdd = 50;
+		config.thresholdRetire = 2;
+		config.ransac.iterations = 300;
+		config.ransac.inlierThreshold = 1.5;
 
-		return FactoryVisualOdometry.monoPlaneInfinity(50, 2, 1.5, 300, tracker, ImageType.single(GrayU8.class));
+		return FactoryVisualOdometry.monoPlaneInfinity(config, GrayU8.class);
 	}
 }

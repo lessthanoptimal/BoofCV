@@ -18,27 +18,20 @@
 
 package boofcv.examples.sfm;
 
-import boofcv.abst.disparity.StereoDisparitySparse;
-import boofcv.abst.feature.detect.interest.ConfigPointDetector;
 import boofcv.abst.feature.detect.interest.PointDetectorTypes;
 import boofcv.abst.sfm.AccessPointTracks3D;
 import boofcv.abst.sfm.d3.StereoVisualOdometry;
 import boofcv.abst.sfm.d3.VisualOdometry;
-import boofcv.abst.tracker.PointTracker;
-import boofcv.alg.tracker.klt.ConfigPKlt;
-import boofcv.factory.disparity.ConfigDisparityBM;
 import boofcv.factory.disparity.DisparityError;
-import boofcv.factory.disparity.FactoryStereoDisparity;
-import boofcv.factory.sfm.ConfigVisOdomTrackPnP;
+import boofcv.factory.sfm.ConfigStereoMonoTrackPnP;
 import boofcv.factory.sfm.FactoryVisualOdometry;
-import boofcv.factory.tracker.FactoryPointTracker;
+import boofcv.factory.tracker.ConfigPointTracker;
 import boofcv.io.MediaManager;
 import boofcv.io.UtilIO;
 import boofcv.io.calibration.CalibrationIO;
 import boofcv.io.image.SimpleImageSequence;
 import boofcv.io.wrapper.DefaultMediaManager;
 import boofcv.struct.calib.StereoParameters;
-import boofcv.struct.image.GrayS16;
 import boofcv.struct.image.GrayU8;
 import boofcv.struct.image.ImageType;
 import boofcv.struct.pyramid.ConfigDiscreteLevels;
@@ -66,41 +59,38 @@ public class ExampleVisualOdometryStereo {
 		SimpleImageSequence<GrayU8> video2 = media.openVideo(
 				new File(directory, "right.mjpeg").getPath(), ImageType.single(GrayU8.class));
 
-		// Specify which tracker and how it will behave
-		var configKlt = new ConfigPKlt();
-		configKlt.pyramidLevels = ConfigDiscreteLevels.levels(4);
-		configKlt.templateRadius = 4;
-		configKlt.toleranceFB = 3;
-		configKlt.pruneClose = true;
+		var config = new ConfigStereoMonoTrackPnP();
 
-		var configDet = new ConfigPointDetector();
-		configDet.type = PointDetectorTypes.SHI_TOMASI;
-		configDet.shiTomasi.radius = 4;
-		configDet.general.maxFeatures = 300;
-		configDet.general.radius = 5;
+		// Specify which tracker and how it will behave
+		config.tracker.typeTracker = ConfigPointTracker.TrackerType.KLT;
+		config.tracker.klt.pyramidLevels = ConfigDiscreteLevels.levels(4);
+		config.tracker.klt.templateRadius = 4;
+		config.tracker.klt.toleranceFB = 3;
+		config.tracker.klt.pruneClose = true;
+
+		config.tracker.detDesc.detectPoint.type = PointDetectorTypes.SHI_TOMASI;
+		config.tracker.detDesc.detectPoint.shiTomasi.radius = 4;
+		config.tracker.detDesc.detectPoint.general.maxFeatures = 300;
+		config.tracker.detDesc.detectPoint.general.radius = 5;
 
 		// We will estimate the location of features using block matching stereo
-		var configBM = new ConfigDisparityBM();
-		configBM.errorType = DisparityError.CENSUS;
-		configBM.disparityMin = 0;
-		configBM.disparityRange = 50;
-		configBM.regionRadiusX = 3;
-		configBM.regionRadiusY = 3;
-		configBM.maxPerPixelError = 30;
-		configBM.texture = 0.05;
-		configBM.validateRtoL = 1;
-		configBM.subpixel = true;
+		config.disparity.errorType = DisparityError.CENSUS;
+		config.disparity.disparityMin = 0;
+		config.disparity.disparityRange = 50;
+		config.disparity.regionRadiusX = 3;
+		config.disparity.regionRadiusY = 3;
+		config.disparity.maxPerPixelError = 30;
+		config.disparity.texture = 0.05;
+		config.disparity.validateRtoL = 1;
+		config.disparity.subpixel = true;
 
 		// Configurations related to how the structure is chained together frame to frame
-		var configVisOdom = new ConfigVisOdomTrackPnP();
-		configVisOdom.keyframes.geoMinCoverage = 0.4;
-		configVisOdom.ransac.iterations = 200;
-		configVisOdom.ransac.inlierThreshold = 1.0;
+		config.scene.keyframes.geoMinCoverage = 0.4;
+		config.scene.ransac.iterations = 200;
+		config.scene.ransac.inlierThreshold = 1.0;
 
 		// Declare each component then visual odometry
-		PointTracker<GrayU8> tracker = FactoryPointTracker.klt(configKlt, configDet, GrayU8.class, GrayS16.class);
-		StereoDisparitySparse<GrayU8> disparity = FactoryStereoDisparity.sparseRectifiedBM(configBM, GrayU8.class);
-		StereoVisualOdometry<GrayU8> visodom = FactoryVisualOdometry.stereoMonoPnP(configVisOdom, disparity, tracker, GrayU8.class);
+		StereoVisualOdometry<GrayU8> visodom = FactoryVisualOdometry.stereoMonoPnP(config, GrayU8.class);
 
 		// Optionally dump verbose debugging information to stdout
 //		visodom.setVerbose(System.out, BoofMiscOps.hashSet(BoofVerbose.RUNTIME, VisualOdometry.VERBOSE_TRACKING));

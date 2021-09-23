@@ -44,10 +44,14 @@ import boofcv.alg.sfm.d3.structure.TickTockKeyFrameManager;
 import boofcv.alg.sfm.d3.structure.VisOdomKeyFrameManager;
 import boofcv.alg.sfm.robust.DistancePlane2DToPixelSq;
 import boofcv.alg.sfm.robust.GenerateSe2_PlanePtPixel;
+import boofcv.factory.disparity.FactoryStereoDisparity;
 import boofcv.factory.feature.associate.FactoryAssociation;
 import boofcv.factory.feature.describe.FactoryDescribePointRadiusAngle;
 import boofcv.factory.feature.detdesc.FactoryDetectDescribe;
-import boofcv.factory.geo.*;
+import boofcv.factory.geo.ConfigTriangulation;
+import boofcv.factory.geo.EstimatorToGenerator;
+import boofcv.factory.geo.FactoryMultiView;
+import boofcv.factory.geo.FactoryMultiViewRobust;
 import boofcv.factory.tracker.FactoryPointTracker;
 import boofcv.factory.transform.pyramid.FactoryPyramid;
 import boofcv.struct.feature.TupleDesc;
@@ -74,48 +78,31 @@ import org.jetbrains.annotations.Nullable;
  */
 @SuppressWarnings({"unchecked", "rawtypes"})
 public class FactoryVisualOdometry {
-
 	/**
-	 * Monocular plane based visual odometry algorithm which uses both points on the plane and off plane for motion
-	 * estimation.
-	 *
-	 * @param thresholdAdd New points are spawned when the number of on plane inliers drops below this value.
-	 * @param thresholdRetire Tracks are dropped when they are not contained in the inlier set for this many frames
-	 * in a row. Try 2
-	 * @param inlierPixelTol Threshold used to determine inliers in pixels. Try 1.5
-	 * @param ransacIterations Number of RANSAC iterations. Try 200
-	 * @param tracker Image feature tracker
-	 * @param imageType Type of input image it processes
-	 * @return New instance of
-	 * @see VisOdomMonoPlaneInfinity
+	 * Creates monocular visual odometry which relies on the ground being a flat plane
 	 */
 	public static <T extends ImageGray<T>>
-	MonocularPlaneVisualOdometry<T> monoPlaneInfinity( int thresholdAdd,
-													   int thresholdRetire,
-													   double inlierPixelTol,
-													   int ransacIterations,
-													   PointTracker<T> tracker,
-													   ImageType<T> imageType ) {
+	MonocularPlaneVisualOdometry<T> monoPlaneInfinity( @Nullable ConfigPlanarTrackPnP config, Class<T> imageType ) {
+		if (config == null)
+			config = new ConfigPlanarTrackPnP();
+		PointTracker<T> tracker = FactoryPointTracker.tracker(config.tracker, imageType, null);
 
 		//squared pixel error
-		double ransacTOL = inlierPixelTol*inlierPixelTol;
+		double ransacTOL = config.ransac.inlierThreshold*config.ransac.inlierThreshold;
 
 		var manager = new ModelManagerSe2_F64();
 		var distance = new DistancePlane2DToPixelSq();
 		var generator = new GenerateSe2_PlanePtPixel();
 
-		var configRansac = new ConfigRansac();
-		configRansac.randSeed = 2323;
-		configRansac.iterations = ransacIterations;
-
 		Ransac<Se2_F64, PlanePtPixel> motion = FactoryMultiViewRobust.
-				createRansac(configRansac, ransacTOL, manager, PlanePtPixel.class);
+				createRansac(config.ransac, ransacTOL, manager, PlanePtPixel.class);
 		motion.setModel(generator::newConcurrent, distance::newConcurrent);
 
-		VisOdomMonoPlaneInfinity<T> alg =
-				new VisOdomMonoPlaneInfinity<>(thresholdAdd, thresholdRetire, inlierPixelTol, motion, tracker);
+		VisOdomMonoPlaneInfinity<T> alg = new VisOdomMonoPlaneInfinity<>(
+				config.thresholdAdd, config.thresholdRetire, config.ransac.inlierThreshold, motion, tracker);
 
-		return new MonoPlaneInfinity_to_MonocularPlaneVisualOdometry<>(alg, distance, generator, imageType);
+		return new MonoPlaneInfinity_to_MonocularPlaneVisualOdometry<>(alg, distance, generator,
+				ImageType.single(imageType));
 	}
 
 	/**
@@ -167,6 +154,24 @@ public class FactoryVisualOdometry {
 	 * Stereo vision based visual odometry algorithm which runs a sparse feature tracker in the left camera and
 	 * estimates the range of tracks once when first detected using disparity between left and right cameras.
 	 *
+	 * @return StereoVisualOdometry
+	 * @see VisOdomMonoDepthPnP
+	 */
+	public static <T extends ImageGray<T>>
+	StereoVisualOdometry<T> stereoMonoPnP( @Nullable ConfigStereoMonoTrackPnP config, Class<T> imageType ) {
+		if (config == null)
+			config = new ConfigStereoMonoTrackPnP();
+
+		PointTracker<T> tracker = FactoryPointTracker.tracker(config.tracker, imageType, null);
+		StereoDisparitySparse<T> disparity = FactoryStereoDisparity.sparseRectifiedBM(config.disparity, imageType);
+
+		return stereoMonoPnP(config.scene, disparity, tracker, imageType);
+	}
+
+	/**
+	 * Stereo vision based visual odometry algorithm which runs a sparse feature tracker in the left camera and
+	 * estimates the range of tracks once when first detected using disparity between left and right cameras.
+	 *
 	 * @param configVO Configuration for visual odometry
 	 * @param sparseDisparity Estimates the 3D location of features
 	 * @param tracker Image point feature tracker.
@@ -175,7 +180,7 @@ public class FactoryVisualOdometry {
 	 * @see VisOdomMonoDepthPnP
 	 */
 	public static <T extends ImageGray<T>>
-	StereoVisualOdometry<T> stereoMonoPnP( ConfigVisOdomTrackPnP configVO,
+	StereoVisualOdometry<T> stereoMonoPnP( @Nullable ConfigVisOdomTrackPnP configVO,
 										   StereoDisparitySparse<T> sparseDisparity,
 										   PointTracker<T> tracker,
 										   Class<T> imageType ) {
@@ -222,77 +227,29 @@ public class FactoryVisualOdometry {
 		return new WrapVisOdomMonoStereoDepthPnP<>(alg, pixelTo3D, distance, imageType);
 	}
 
-	/**
-	 * Depth sensor based visual odometry algorithm which runs a sparse feature tracker in the visual camera and
-	 * estimates the range of tracks once when first detected using the depth sensor.
-	 *
-	 * @param thresholdAdd Add new tracks when less than this number are in the inlier set. Tracker dependent. Set to
-	 * a value &le; 0 to add features every frame.
-	 * @param thresholdRetire Discard a track if it is not in the inlier set after this many updates. Try 2
-	 * @param sparseDepth Extracts depth of pixels from a depth sensor.
-	 * @param visualType Type of visual image being processed.
-	 * @param depthType Type of depth image being processed.
-	 * @return StereoVisualOdometry
-	 * @see VisOdomMonoDepthPnP
-	 */
-	@Deprecated
 	public static <Vis extends ImageGray<Vis>, Depth extends ImageGray<Depth>>
-	DepthVisualOdometry<Vis, Depth> depthDepthPnP( double inlierPixelTol,
-												   int thresholdAdd,
-												   int thresholdRetire,
-												   int ransacIterations,
-												   int refineIterations,
-												   boolean doublePass,
-												   DepthSparse3D<Depth> sparseDepth,
-												   PointTracker<Vis> tracker,
-												   Class<Vis> visualType, Class<Depth> depthType ) {
+	DepthVisualOdometry<Vis, Depth> rgbDepthPnP( ConfigRgbDepthTrackPnP config,
+												 Class<Vis> visualType, Class<Depth> depthType ) {
+		PointTracker<Vis> tracker = FactoryPointTracker.tracker(config.tracker, visualType, null);
+		DepthSparse3D<Depth> sparseDepth;
 
-		// Range from sparse disparity
-		ImagePixelTo3D pixelTo3D = new DepthSparse3D_to_PixelTo3D<>(sparseDepth);
-
-
-		var distance = new PnPDistanceReprojectionSq();
-
-		ModelManagerSe3_F64 manager = new ModelManagerSe3_F64();
-
-		// 1/2 a pixel tolerance for RANSAC inliers
-		double ransacTOL = inlierPixelTol*inlierPixelTol;
-
-		var configRansac = new ConfigRansac();
-		configRansac.randSeed = 2323;
-		configRansac.iterations = ransacIterations;
-
-		Ransac<Se3_F64, Point2D3D> motion = FactoryMultiViewRobust.
-				createRansac(configRansac, ransacTOL, manager, Point2D3D.class);
-
-		motion.setModel(() -> {
-			Estimate1ofPnP estimator = FactoryMultiView.pnp_1(EnumPNP.P3P_FINSTERWALDER, -1, 2);
-			return new EstimatorToGenerator<>(estimator);
-		}, distance::newConcurrentChild);
-
-		RefinePnP refine = null;
-
-		if (refineIterations > 0) {
-			refine = FactoryMultiView.pnpRefine(1e-12, refineIterations);
+		ImageType depthInfo = ImageType.single(depthType);
+		if (depthInfo.getDataType().isInteger()) {
+			sparseDepth = (DepthSparse3D<Depth>)new DepthSparse3D.I(config.depthScale);
+		} else {
+			sparseDepth = (DepthSparse3D<Depth>)new DepthSparse3D.F32(config.depthScale);
 		}
 
-
-		VisOdomMonoDepthPnP<Vis> alg = new VisOdomMonoDepthPnP<>(motion, pixelTo3D, refine, tracker);
-		alg.setThresholdRetireTracks(thresholdRetire);
-
-		return new VisOdomPixelDepthPnP_to_DepthVisualOdometry<>
-				(sparseDepth, alg, distance, ImageType.single(visualType), depthType);
+		return rgbDepthPnP(config.scene, sparseDepth, tracker, visualType, depthType);
 	}
 
 	public static <Vis extends ImageGray<Vis>, Depth extends ImageGray<Depth>>
-	DepthVisualOdometry<Vis, Depth> depthDepthPnP( ConfigVisOdomTrackPnP configVO,
-												   DepthSparse3D<Depth> sparseDepth,
-												   PointTracker<Vis> tracker,
-												   Class<Vis> visualType, Class<Depth> depthType ) {
-
+	DepthVisualOdometry<Vis, Depth> rgbDepthPnP( ConfigVisOdomTrackPnP configVO,
+												 DepthSparse3D<Depth> sparseDepth,
+												 PointTracker<Vis> tracker,
+												 Class<Vis> visualType, Class<Depth> depthType ) {
 		// Range from sparse disparity
 		ImagePixelTo3D pixelTo3D = new DepthSparse3D_to_PixelTo3D<>(sparseDepth);
-
 
 		var distance = new PnPDistanceReprojectionSq();
 		var manager = new ModelManagerSe3_F64();
