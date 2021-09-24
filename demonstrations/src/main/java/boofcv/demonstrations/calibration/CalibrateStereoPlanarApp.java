@@ -38,6 +38,7 @@ import boofcv.gui.image.ImagePanel;
 import boofcv.gui.image.ScaleOptions;
 import boofcv.gui.image.ShowImages;
 import boofcv.gui.settings.GlobalSettingsControls;
+import boofcv.io.PathLabel;
 import boofcv.io.UtilIO;
 import boofcv.io.calibration.CalibrationIO;
 import boofcv.io.image.ConvertBufferedImage;
@@ -164,6 +165,24 @@ public class CalibrateStereoPlanarApp extends JPanel {
 		menuFile.addSeparator();
 		menuFile.add(menuSettings);
 		menuFile.add(menuItemQuit);
+	}
+
+	/**
+	 * Adds a new menu for examples
+	 */
+	public void addExamples( List<PathLabel> examples ) {
+		JMenu menuExamples = new JMenu("Examples");
+
+		for (PathLabel p : examples) {
+			var menuItem = new JMenuItem(p.label);
+			menuItem.addActionListener(( e ) -> {
+				checkDefaultTarget(new File(p.getPath()));
+				new Thread(() -> processExample(p.getPath())).start();
+			});
+			menuExamples.add(menuItem);
+		}
+
+		menuBar.add(menuExamples);
 	}
 
 	protected void updateRecentItems() {
@@ -336,6 +355,16 @@ public class CalibrateStereoPlanarApp extends JPanel {
 	public void setMenuBarEnabled( boolean enabled ) {
 		BoofSwingUtil.checkGuiThread();
 		BoofSwingUtil.recursiveEnable(menuBar, enabled);
+	}
+
+	/**
+	 * Process images in example directory
+	 */
+	public void processExample( String pathDirectory ) {
+		List<String> leftImages = UtilIO.listByPrefix(pathDirectory, "left", null);
+		List<String> rightImages = UtilIO.listByPrefix(pathDirectory, "right", null);
+
+		process(leftImages, rightImages);
 	}
 
 	/**

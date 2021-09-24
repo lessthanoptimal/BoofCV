@@ -18,11 +18,14 @@
 
 package boofcv.demonstrations.calibration;
 
+import boofcv.io.PathLabel;
 import boofcv.io.UtilIO;
 
 import javax.swing.*;
 import java.awt.*;
 import java.io.File;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Launches calibration application with example data
@@ -31,13 +34,19 @@ import java.io.File;
  */
 public class CalibrateMonocularPlanarDemo {
 	public static void main( String[] args ) {
-		File directory = new File(UtilIO.pathExample("calibration/fisheye/chessboard"));
-//		File directory = new File(UtilIO.pathExample("calibration/fisheye/square_grid"));
+		List<PathLabel> examples = new ArrayList<>();
+		examples.add(new PathLabel("chessboard", UtilIO.pathExample("calibration/mono/Sony_DSC-HX5V_Chess")));
+		examples.add(new PathLabel("square", UtilIO.pathExample("calibration/mono/Sony_DSC-HX5V_Square")));
+		examples.add(new PathLabel("circle hexagonal", UtilIO.pathExample("calibration/mono/Sony_DSC-HX5V_CircleHexagonal")));
+		examples.add(new PathLabel("circle regular", UtilIO.pathExample("calibration/mono/Sony_DSC-HX5V_CircleRegular")));
+		examples.add(new PathLabel("fisheye chessboard", UtilIO.pathExample("calibration/fisheye/chessboard")));
+		examples.add(new PathLabel("fisheye square grid", UtilIO.pathExample("calibration/fisheye/square_grid")));
 
 		SwingUtilities.invokeLater(() -> {
 			var app = new CalibrateMonocularPlanarApp();
+			app.addExamples(examples);
 
-			JFrame frame = new JFrame("Monocular Planar Calibration");
+			var frame = new JFrame("Monocular Planar Calibration");
 			frame.add(app, BorderLayout.CENTER);
 			frame.pack();
 			frame.setLocationByPlatform(true);
@@ -47,7 +56,7 @@ public class CalibrateMonocularPlanarDemo {
 			app.window = frame;
 			app.window.setJMenuBar(app.menuBar);
 
-			new Thread(() -> app.processDirectory(directory)).start();
+			new Thread(() -> app.processDirectory(new File(examples.get(0).path[0]))).start();
 		});
 	}
 }
