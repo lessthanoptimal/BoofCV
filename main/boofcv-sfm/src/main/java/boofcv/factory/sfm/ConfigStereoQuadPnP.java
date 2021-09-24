@@ -60,7 +60,7 @@ public class ConfigStereoQuadPnP implements Configuration {
 	public ConfigAssociateGreedy associateL2R = new ConfigAssociateGreedy(false, 1.0, -1);
 
 	/** Tolerance for matching stereo features along epipolar line in Pixels */
-	public double epipolarTol = 1.0;
+	public double epipolarTol = 3.0;
 
 	{
 		detectDescribe.typeDescribe = ConfigDescribeRegion.Type.BRIEF;
@@ -68,7 +68,7 @@ public class ConfigStereoQuadPnP implements Configuration {
 
 		detectDescribe.typeDetector = ConfigDetectInterestPoint.Type.FAST_HESSIAN;
 		detectDescribe.detectFastHessian.extract.radius = 2;
-		detectDescribe.detectFastHessian.maxFeaturesPerScale = 200;
+		detectDescribe.detectFastHessian.maxFeaturesPerScale = 300;
 		detectDescribe.detectFastHessian.numberOfOctaves = 4;
 
 		// while not active, let's give it a reasonable configuration for a point detector
@@ -77,7 +77,7 @@ public class ConfigStereoQuadPnP implements Configuration {
 		detectDescribe.detectPoint.shiTomasi.radius = 3;
 		detectDescribe.detectPoint.general.threshold = 1.0f;
 		detectDescribe.detectPoint.general.radius = 4;
-		detectDescribe.detectPoint.general.maxFeatures = 500;
+		detectDescribe.detectPoint.general.maxFeatures = 1000;
 		detectDescribe.detectPoint.general.selector.type = SelectLimitTypes.SELECT_N;
 
 		associateF2F.type = ConfigAssociate.AssociationType.GREEDY;

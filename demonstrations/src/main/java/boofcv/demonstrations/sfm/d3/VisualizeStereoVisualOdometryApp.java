@@ -353,6 +353,17 @@ public class VisualizeStereoVisualOdometryApp<T extends ImageGray<T>> extends De
 	private static ConfigStereoQuadPnP createConfigStereoQuadPnP() {
 		var config = new ConfigStereoQuadPnP();
 		config.associateF2F.maximumDistancePixels.setRelative(0.25, 0);
+		config.epipolarTol = 4;
+		config.ransac.iterations = 1000;
+		config.refineIterations = 5;
+
+		config.detectDescribe.typeDetector = ConfigDetectInterestPoint.Type.POINT;
+		config.detectDescribe.detectPoint.type = PointDetectorTypes.SHI_TOMASI;
+		config.detectDescribe.detectPoint.shiTomasi.radius = 3;
+		config.detectDescribe.detectPoint.general.radius = 3;
+		config.detectDescribe.detectPoint.general.maxFeatures = 1000;
+
+		config.associateF2F.greedy.scoreRatioThreshold = 0.9;
 
 		return config;
 	}
