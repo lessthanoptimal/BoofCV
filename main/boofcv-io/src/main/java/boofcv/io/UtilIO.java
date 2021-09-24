@@ -24,12 +24,20 @@ import boofcv.misc.BoofLambdas;
 import boofcv.misc.BoofMiscOps;
 import boofcv.struct.Configuration;
 import boofcv.struct.calib.CameraPinholeBrown;
+import georegression.geometry.ConvertRotation3D_F64;
+import georegression.struct.EulerType;
+import georegression.struct.RotationType;
+import georegression.struct.point.Vector3D_F64;
+import georegression.struct.se.Se3_F64;
+import georegression.struct.so.Quaternion_F64;
+import georegression.struct.so.Rodrigues_F64;
 import org.apache.commons.io.FilenameUtils;
 import org.jetbrains.annotations.Nullable;
 import org.yaml.snakeyaml.Yaml;
 
 import javax.swing.*;
 import java.io.*;
+import java.lang.reflect.InvocationTargetException;
 import java.net.*;
 import java.nio.file.*;
 import java.nio.file.attribute.BasicFileAttributes;
@@ -77,6 +85,57 @@ public class UtilIO {
 	}
 
 	/**
+	 * Saves a list of 6-dof pose in a CSV format. Rotation matrix is converted into the specified encoding.
+	 *
+	 * @param list (Input) List of poses
+	 * @param type (Input) Format to use for rotation matrix
+	 * @param file (Output) Where it's written to.
+	 */
+	public static void savePoseListCsv( List<Se3_F64> list, RotationType type, File file ) {
+		try (var stream = new FileOutputStream(file)) {
+			savePoseListCsv(list, type, stream);
+		} catch (IOException e) {
+			throw new UncheckedIOException(e);
+		}
+	}
+
+	/**
+	 * Saves a list of 6-dof pose in a CSV format. Rotation matrix is converted into the specified encoding.
+	 *
+	 * @param list (Input) List of poses
+	 * @param type (Input) Format to use for rotation matrix
+	 * @param output (Output) Where it's written to.
+	 */
+	public static void savePoseListCsv( List<Se3_F64> list, RotationType type, OutputStream output ) {
+		PrintStream out = new PrintStream(output);
+		out.println("# 6-DOF pose");
+		out.println("# x, y, z, (rotation)");
+		out.println("rotation=" + type.name());
+		out.println("count=" + list.size());
+		for (int i = 0; i < list.size(); i++) {
+			Se3_F64 pose = list.get(i);
+			out.printf("%.8e %.8e %.8e ", pose.T.x, pose.T.y, pose.T.z);
+			switch (type) {
+				case EULER -> {
+					double[] euler = ConvertRotation3D_F64.matrixToEuler(pose.R, EulerType.XYZ, null);
+					out.printf("%.8e %.8e %.8e\n", euler[0], euler[1], euler[2]);
+				}
+
+				case QUATERNION -> {
+					Quaternion_F64 quat = ConvertRotation3D_F64.matrixToQuaternion(pose.R, null);
+					out.printf("%.8e %.8e %.8e %.8e\n", quat.x, quat.y, quat.z, quat.w);
+				}
+
+				case RODRIGUES -> {
+					Rodrigues_F64 rod = ConvertRotation3D_F64.matrixToRodrigues(pose.R, null);
+					Vector3D_F64 v = rod.unitAxisRotation;
+					out.printf("%.8e %.8e %.8e %.8e\n", v.x, v.y, v.z, rod.theta);
+				}
+			}
+		}
+	}
+
+	/**
 	 * Saves a BoofCV {@link Configuration} in a YAML format to disk
 	 */
 	public static void saveConfig( Configuration config, File file ) {
@@ -95,10 +154,20 @@ public class UtilIO {
 	 *
 	 * @param config (Input) The configuration which is to be saved
 	 * @param canonical (Input) A configuration that is compared against. Only what's not identical will be saved.
+	 * IF null then a new configuration will be created using default constructor.
 	 * @param file (Input) Reference to the file that the configuration will be saved at.
 	 */
 	public static <C extends Configuration>
-	void saveConfig( C config, C canonical, File file ) {
+	void saveConfig( C config, @Nullable C canonical, File file ) {
+		try {
+			if (canonical == null) {
+				canonical = (C)config.getClass().getConstructor().newInstance();
+			}
+		} catch (InvocationTargetException | InstantiationException |
+				IllegalAccessException | NoSuchMethodException e) {
+			throw new RuntimeException(e);
+		}
+
 		try (var stream = new FileOutputStream(file)) {
 			var output = new BufferedOutputStream(stream);
 			SerializeConfigYaml.serialize(config, canonical, new OutputStreamWriter(output, UTF_8));
@@ -113,8 +182,7 @@ public class UtilIO {
 	public static <T extends Configuration> T loadConfig( File file ) {
 		try (var stream = new FileInputStream(file)) {
 			var output = new BufferedInputStream(stream);
-			Configuration config = SerializeConfigYaml.deserialize(new InputStreamReader(output, UTF_8));
-			return (T)config;
+			return (T)SerializeConfigYaml.deserialize(new InputStreamReader(output, UTF_8));
 		} catch (IOException e) {
 			throw new UncheckedIOException(e);
 		}
@@ -290,7 +358,8 @@ public class UtilIO {
 			} else {
 				return url.openStream();
 			}
-		} catch (IOException ignore) {}
+		} catch (IOException ignore) {
+		}
 		return null;
 	}
 
@@ -713,7 +782,8 @@ public class UtilIO {
 				} else if (url.getProtocol().equals("jar")) {
 					return listJarPrefix(url, prefix, suffix);
 				}
-			} catch (MalformedURLException ignore) {}
+			} catch (MalformedURLException ignore) {
+			}
 		}
 		if (!d.isDirectory())
 			throw new IllegalArgumentException("Must specify an directory. " + directory);
@@ -872,7 +942,8 @@ public class UtilIO {
 				} else if (url.getProtocol().equals("jar")) {
 					return listJarRegex(url, regex);
 				}
-			} catch (MalformedURLException ignore) {}
+			} catch (MalformedURLException ignore) {
+			}
 		}
 		if (!d.isDirectory())
 			throw new IllegalArgumentException("Must specify an directory. " + directory);
@@ -922,7 +993,8 @@ public class UtilIO {
 			} else {
 				throw new RuntimeException("Not sure what to do with this url. " + url.toString());
 			}
-		} catch (MalformedURLException ignore) {}
+		} catch (MalformedURLException ignore) {
+		}
 
 		File d = new File(directory);
 
@@ -957,7 +1029,8 @@ public class UtilIO {
 			} else {
 				throw new RuntimeException("Not sure what to do with this url. " + url.toString());
 			}
-		} catch (MalformedURLException ignore) {}
+		} catch (MalformedURLException ignore) {
+		}
 
 		File d = new File(directory);
 
@@ -976,7 +1049,8 @@ public class UtilIO {
 
 				if (mimeType.contains(type))
 					ret.add(f.getAbsolutePath());
-			} catch (IOException ignore) {}
+			} catch (IOException ignore) {
+			}
 		}
 
 		Collections.sort(ret);

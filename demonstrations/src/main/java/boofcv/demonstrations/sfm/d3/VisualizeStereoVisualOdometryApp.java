@@ -57,6 +57,7 @@ import boofcv.struct.image.ImageType;
 import boofcv.struct.pyramid.ConfigDiscreteLevels;
 import boofcv.visualize.PointCloudViewer;
 import boofcv.visualize.VisualizeData;
+import georegression.struct.RotationType;
 import georegression.struct.point.Point2D_F64;
 import georegression.struct.point.Point3D_F64;
 import georegression.struct.se.Se3_F64;
@@ -172,8 +173,7 @@ public class VisualizeStereoVisualOdometryApp<T extends ImageGray<T>> extends De
 		});
 	}
 
-	@Override
-	protected void openFileMenuBar() {
+	@Override protected void openFileMenuBar() {
 		OpenStereoSequencesChooser.Selected s = BoofSwingUtil.openStereoChooser(window, null, true, false);
 		if (s == null)
 			return;
@@ -189,8 +189,7 @@ public class VisualizeStereoVisualOdometryApp<T extends ImageGray<T>> extends De
 		openFiles(files);
 	}
 
-	@Override
-	protected void customAddToFileMenu( JMenu menuFile ) {
+	@Override protected void customAddToFileMenu( JMenu menuFile ) {
 		menuFile.addSeparator();
 
 		var itemSaveConfiguration = new JMenuItem("Save Configuration");
@@ -220,7 +219,18 @@ public class VisualizeStereoVisualOdometryApp<T extends ImageGray<T>> extends De
 	 * Save the estimate path the left camera took
 	 */
 	private void savePath() {
+		// Stop processing so that the ego motion list isn't being modified
+		stopAllInputProcessing();
 
+		String fileName = "camera_pose.csv";
+
+		// Select a file but keep the name as the default
+		File selected = BoofSwingUtil.fileChooser(null, this, false, new File(fileName).getPath(),
+				( path ) -> new File(new File(path).getParentFile(), fileName).getPath(), FileTypes.YAML);
+		if (selected == null)
+			return;
+
+		UtilIO.savePoseListCsv(egoMotion_cam_to_world.toList(), RotationType.QUATERNION, selected);
 	}
 
 	/**
@@ -347,8 +357,7 @@ public class VisualizeStereoVisualOdometryApp<T extends ImageGray<T>> extends De
 		return config;
 	}
 
-	@Override
-	protected boolean openCustomFiles( String[] filePaths, List<String> outSequence, List<String> outImages ) {
+	@Override protected boolean openCustomFiles( String[] filePaths, List<String> outSequence, List<String> outImages ) {
 		int videoCount = splitFrame ? 1 : 2;
 		if (filePaths.length == videoCount) {
 			File f = new File(filePaths[0]).getParentFile();
@@ -365,8 +374,7 @@ public class VisualizeStereoVisualOdometryApp<T extends ImageGray<T>> extends De
 		return true;
 	}
 
-	@Override
-	protected void openVideo( boolean reopen, String... filePaths ) {
+	@Override protected void openVideo( boolean reopen, String... filePaths ) {
 		// See if the last argument is a configuration. If so load and remove it otherwise it will cause
 		// a crash later on
 		try {
@@ -388,8 +396,7 @@ public class VisualizeStereoVisualOdometryApp<T extends ImageGray<T>> extends De
 		super.openVideo(reopen, filePaths);
 	}
 
-	@Override
-	protected void handleInputChange( int source, InputMethod method, int width, int height ) {
+	@Override protected void handleInputChange( int source, InputMethod method, int width, int height ) {
 		if (stereoParameters == null)
 			throw new RuntimeException("stereoParameters should have been loaded in openFiles()");
 		followCamera = false;
@@ -437,8 +444,7 @@ public class VisualizeStereoVisualOdometryApp<T extends ImageGray<T>> extends De
 			alg.setVerbose(System.out, configuration);
 	}
 
-	@Override
-	public void processImage( int sourceID, long frameID, BufferedImage buffered, ImageBase input ) {
+	@Override public void processImage( int sourceID, long frameID, BufferedImage buffered, ImageBase input ) {
 		if (splitFrame) {
 			int leftWidth = splitFrame ? buffered.getWidth()/2 : buffered.getWidth();
 			int height = buffered.getHeight();
@@ -607,7 +613,6 @@ public class VisualizeStereoVisualOdometryApp<T extends ImageGray<T>> extends De
 	}
 
 	class ControlPanel extends DetectBlackShapePanel {
-
 		// flags that toggle what's visualized in stereo panel view
 		boolean showInliers = false;
 		boolean showNew = false;
@@ -703,8 +708,7 @@ public class VisualizeStereoVisualOdometryApp<T extends ImageGray<T>> extends De
 			panelApproach.add(BorderLayout.CENTER, getControlVisOdom());
 
 			var tabbedTopPane = new JTabbedPane() {
-				@Override
-				public Dimension getPreferredSize() {
+				@Override 			public Dimension getPreferredSize() {
 					// This hack is needed so that it the scrollbar will only expand vertically
 					Dimension d = super.getPreferredSize();
 					return new Dimension(200, d.height);
@@ -735,18 +739,15 @@ public class VisualizeStereoVisualOdometryApp<T extends ImageGray<T>> extends De
 
 		public void setFrame( int frame ) {videoFrameLabel.setText("" + frame);}
 
-		@Override
-		public void controlChanged( Object source ) {
+		@Override public void controlChanged( Object source ) {
 			if (source == selectZoom) {
 				zoom = (Double)selectZoom.getValue();
 				stereoPanel.setScale(zoom);
 			} else if (source == bPause) {
 				streamPaused = !streamPaused;
-//				bPause.setText(paused?"Resume":"Paused");
 			} else if (source == bStep) {
 				streamPaused = false;
 				streamStepCounter = 1;
-//				bPause.setText("Resume");
 			} else if (source == checkInliers) {
 				showInliers = checkInliers.isSelected();
 				stereoPanel.repaint();
@@ -808,8 +809,7 @@ public class VisualizeStereoVisualOdometryApp<T extends ImageGray<T>> extends De
 			repaint();
 		}
 
-		@Override
-		protected void paintComponent( Graphics g ) {
+		@Override protected void paintComponent( Graphics g ) {
 			super.paintComponent(g);
 
 			final BufferedImage left = this.left;
