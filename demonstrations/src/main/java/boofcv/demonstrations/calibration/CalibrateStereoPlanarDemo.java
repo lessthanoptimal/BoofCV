@@ -19,10 +19,12 @@
 package boofcv.demonstrations.calibration;
 
 import boofcv.gui.image.ShowImages;
+import boofcv.io.PathLabel;
 import boofcv.io.UtilIO;
 
 import javax.swing.*;
 import java.io.File;
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -34,18 +36,21 @@ public class CalibrateStereoPlanarDemo {
 	public static void main( String[] args ) {
 		String directory = UtilIO.pathExample("calibration/stereo/Zed_ecocheck");
 
-		java.util.List<String> leftImages = UtilIO.listByPrefix(directory, "left", null);
-		List<String> rightImages = UtilIO.listByPrefix(directory, "right", null);
+		List<PathLabel> examples = new ArrayList<>();
+		examples.add(new PathLabel("ECoCheck", UtilIO.pathExample("calibration/stereo/Zed_ecocheck")));
+		examples.add(new PathLabel("Chessboard", UtilIO.pathExample("calibration/stereo/Bumblebee2_Chess")));
+		examples.add(new PathLabel("Square Grid", UtilIO.pathExample("calibration/stereo/Bumblebee2_Square")));
 
 		SwingUtilities.invokeLater(() -> {
 			var app = new CalibrateStereoPlanarApp();
+			app.addExamples(examples);
 
 			app.window = ShowImages.showWindow(app, "Planar Stereo Calibration", true);
 			app.window.setJMenuBar(app.menuBar);
 
 			app.checkDefaultTarget(new File(directory));
 			app.setMenuBarEnabled(false);
-			new Thread(() -> app.process(leftImages, rightImages)).start();
+			new Thread(() -> app.processExample(examples.get(0).getPath())).start();
 		});
 	}
 }

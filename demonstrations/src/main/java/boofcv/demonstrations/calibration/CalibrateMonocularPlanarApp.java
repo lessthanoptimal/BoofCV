@@ -39,6 +39,7 @@ import boofcv.gui.image.ImagePanel;
 import boofcv.gui.image.ScaleOptions;
 import boofcv.gui.image.ShowImages;
 import boofcv.gui.settings.GlobalSettingsControls;
+import boofcv.io.PathLabel;
 import boofcv.io.UtilIO;
 import boofcv.io.calibration.CalibrationIO;
 import boofcv.io.image.ConvertBufferedImage;
@@ -175,7 +176,22 @@ public class CalibrateMonocularPlanarApp extends JPanel {
 	}
 
 	/**
-	 * Let's the user select a directory to save detected landmarks
+	 * Adds a new menu for examples
+	 */
+	public void addExamples( List<PathLabel> examples ) {
+		JMenu menuExamples = new JMenu("Examples");
+
+		for (PathLabel p : examples) {
+			var menuItem = new JMenuItem(p.label);
+			menuItem.addActionListener((e)->processDirectory(new File(p.path[0])));
+			menuExamples.add(menuItem);
+		}
+
+		menuBar.add(menuExamples);
+	}
+
+	/**
+	 * Let the user select a directory to save detected landmarks
 	 */
 	protected void saveLandmarks() {
 		// Open a dialog which will save using the default name in the place images were recently loaded from
