@@ -108,7 +108,7 @@ public class DemonstrationLauncherApp extends ApplicationLauncherApp {
 				FisheyePinholeApp.class,
 				DeformImageKeyPointsApp.class,
 				RemoveLensDistortionApp.class,
-				RenderSyntheticCamerModelApp.class);
+				RenderSyntheticCameraModelApp.class);
 
 		createNodes(root,"Enhance",
 				ImageEnhanceApp.class,

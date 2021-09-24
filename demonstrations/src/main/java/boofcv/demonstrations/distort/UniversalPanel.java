@@ -20,7 +20,7 @@ package boofcv.demonstrations.distort;
 
 import boofcv.gui.StandardAlgConfigPanel;
 import boofcv.gui.controls.JSpinnerNumber;
-import boofcv.struct.calib.CameraPinholeBrown;
+import boofcv.struct.calib.CameraUniversalOmni;
 
 import javax.swing.event.ChangeEvent;
 
@@ -29,7 +29,7 @@ import javax.swing.event.ChangeEvent;
  *
  * @author Peter Abeles
  */
-public class PinholePanel extends StandardAlgConfigPanel {
+public class UniversalPanel extends StandardAlgConfigPanel {
 	JSpinnerNumber selectWidth = spinnerWrap(500, 0, 10_000, 10);
 	JSpinnerNumber selectHeight = spinnerWrap(500, 0, 10_000, 10);
 	JSpinnerNumber selectFX = spinnerWrap(50, 0.01, 1000.0, 1);
@@ -43,14 +43,11 @@ public class PinholePanel extends StandardAlgConfigPanel {
 	JSpinnerNumber selectR2 = spinnerWrap(0, -10.0, 10.0, 0.05);
 	JSpinnerNumber selectR3 = spinnerWrap(0, -10.0, 10.0, 0.05);
 	JSpinnerNumber selectR4 = spinnerWrap(0, -10.0, 10.0, 0.05);
+	JSpinnerNumber selectMirror = spinnerWrap(1.0, 0.01, 50.0, 0.1);
 
 	public Listener listener;
 
-	public PinholePanel() {
-		this((m)->{});
-	}
-
-	public PinholePanel( Listener listener ) {
+	public UniversalPanel( Listener listener ) {
 		this.listener = listener;
 
 		addLabeled(selectWidth.spinner, "Image Width: ");
@@ -66,9 +63,10 @@ public class PinholePanel extends StandardAlgConfigPanel {
 		addLabeled(selectR2.spinner, "r2: ");
 		addLabeled(selectR3.spinner, "r3: ");
 		addLabeled(selectR4.spinner, "r4: ");
+		addLabeled(selectMirror.spinner, "Mirror: ");
 	}
 
-	public void setCameraModel( CameraPinholeBrown model ) {
+	public void setCameraModel( CameraUniversalOmni model ) {
 		// disable broadcasting of changes
 		Listener original = this.listener;
 		this.listener = (m)->{};
@@ -86,20 +84,21 @@ public class PinholePanel extends StandardAlgConfigPanel {
 		selectR2.spinner.setValue(model.radial[1]);
 		selectR3.spinner.setValue(model.radial[2]);
 		selectR4.spinner.setValue(model.radial[3]);
+		selectMirror.spinner.setValue(model.mirrorOffset);
 
 		// re-enable
 		this.listener = original;
 	}
 
-	public CameraPinholeBrown getCameraModel() {
-		var model = new CameraPinholeBrown(4);
+	public CameraUniversalOmni createCameraModel() {
+		var model = new CameraUniversalOmni(4);
 
 		model.width = selectWidth.vint();
 		model.height = selectHeight.vint();
-		model.fx = model.width*selectFX.vdouble()/100.0;
+		model.fx = model.width*selectFY.vdouble()/100.0;
 		model.fy = model.width*selectFY.vdouble()/100.0;
-		model.cx = model.width*selectCX.vdouble()/100.0;
-		model.cy = model.height*selectCY.vdouble()/100.0;
+		model.cx = model.width*selectFY.vdouble()/100.0;
+		model.cy = model.height*selectFY.vdouble()/100.0;
 		model.skew = selectSkew.vdouble();
 		model.t1 = selectT1.vdouble();
 		model.t2 = selectT2.vdouble();
@@ -107,15 +106,16 @@ public class PinholePanel extends StandardAlgConfigPanel {
 		model.radial[1] = selectR2.vdouble();
 		model.radial[2] = selectR3.vdouble();
 		model.radial[3] = selectR4.vdouble();
+		model.mirrorOffset = selectMirror.vdouble();
 
 		return model;
 	}
 
 	@Override public void stateChanged( ChangeEvent e ) {
-		listener.updatedPinholeModel(getCameraModel());
+		listener.updatedUniversalModel(createCameraModel());
 	}
 
 	@FunctionalInterface public interface Listener {
-		void updatedPinholeModel( CameraPinholeBrown model );
+		void updatedUniversalModel( CameraUniversalOmni model );
 	}
 }
