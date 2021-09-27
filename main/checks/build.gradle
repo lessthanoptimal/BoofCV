@@ -15,6 +15,7 @@ dependencies {
 	testImplementation project(':main:boofcv-types').sourceSets.test.output
 	testImplementation project(':integration:boofcv-swing')
 
+	runtime project(':main:boofcv-feature').sourceSets.experimental.output
 	runtime project(':main:boofcv-feature').sourceSets.benchmark.output
 	runtime project(':main:boofcv-geo').sourceSets.benchmark.output
 	runtime project(':main:boofcv-io').sourceSets.benchmark.output
