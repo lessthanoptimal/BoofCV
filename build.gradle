@@ -18,17 +18,19 @@ allprojects {
     group = 'org.boofcv'
     version = '0.39-SNAPSHOT'
 
-    ext.COMMONS_IO_VERSION = '2.11.0'
     ext.build_java8 = true // IntelliJ has issues when this is set to true
 
     createVersionFile.enabled = false // run only once. enabled in types
 }
-
-project.ext.set("deepboof_version", '0.5.1')
-project.ext.set("lombok_version", '1.18.20')
-project.ext.set("errorprone_version", '2.9.0')
-project.ext.set("jabel_version", '0.3.0')
-project.ext.set("guava_version", '30.1.1-jre')
+project.ext.commons_io_version = '2.11.0'
+project.ext.deepboof_version = '0.5.1'
+project.ext.lombok_version = '1.18.20'
+project.ext.jabel_version = '0.3.0'
+project.ext.guava_version = '30.1.1-jre'
+project.ext.args4j_version = '2.33'
+project.ext.junit_version = '5.4.0'
+project.ext.errorprone_version = '2.9.0'
+project.ext.auto64to32_version = '2.2-SNAPSHOT'
 
 // Which native platforms are supported can be specified in the command line.  Otherwise
 // the default is to support all of them

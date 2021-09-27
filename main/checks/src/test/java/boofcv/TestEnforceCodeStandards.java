@@ -20,6 +20,8 @@ package boofcv;
 
 import boofcv.io.UtilIO;
 import boofcv.testing.BoofStandardJUnit;
+import com.peterabeles.lang.CheckForbiddenHelper;
+import com.peterabeles.lang.CheckForbiddenLanguage;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.filefilter.DirectoryFileFilter;
 import org.apache.commons.io.filefilter.RegexFileFilter;

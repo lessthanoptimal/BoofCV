@@ -18,8 +18,8 @@
 
 package boofcv;
 
-import com.peterabeles.auto64fto32f.ConvertFile32From64;
-import com.peterabeles.auto64fto32f.RecursiveConvert;
+import com.peterabeles.autocode.ConvertFile32From64;
+import com.peterabeles.autocode.RecursiveConvert;
 
 import java.io.File;
 

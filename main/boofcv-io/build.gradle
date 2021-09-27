@@ -6,5 +6,5 @@ dependencies {
 	api project(':main:boofcv-reconstruction')
 
 	api group: 'org.yaml', name: 'snakeyaml', version: '1.23'
-	api group: 'commons-io', name: 'commons-io', version: COMMONS_IO_VERSION
+	api group: 'commons-io', name: 'commons-io', version: commons_io_version
 }
