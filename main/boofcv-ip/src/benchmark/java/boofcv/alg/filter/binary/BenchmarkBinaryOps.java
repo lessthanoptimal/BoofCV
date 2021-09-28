@@ -36,9 +36,9 @@ import java.util.concurrent.TimeUnit;
 @Warmup(iterations = 2)
 @Measurement(iterations = 5)
 @State(Scope.Benchmark)
-@Fork(value=1)
-public class BenchmarkBinaryOps  {
-	@Param({"true","false"})
+@Fork(value = 1)
+public class BenchmarkBinaryOps {
+	@Param({"true", "false"})
 	public boolean concurrent;
 
 	//	@Param({"100", "500", "1000", "5000", "10000"})
@@ -62,64 +62,18 @@ public class BenchmarkBinaryOps  {
 		ImageMiscOps.fillUniform(inputB, rand, 0, 1);
 	}
 
-	@Benchmark
-	public void erode4() {
-		BinaryImageOps.erode4(inputA,1,output);
-	}
-
-	@Benchmark
-	public void erode8() {
-		BinaryImageOps.erode8(inputA,1,output);
-	}
-
-	@Benchmark
-	public void dilate4() {
-		BinaryImageOps.dilate4(inputA,1,output);
-	}
-
-	@Benchmark
-	public void dilate8() {
-		BinaryImageOps.dilate8(inputA,1,output);
-	}
-
-	@Benchmark
-	public void removePointNoise() {
-		BinaryImageOps.removePointNoise(inputA,output);
-	}
-
-	@Benchmark
-	public void edge4() {
-		BinaryImageOps.edge4(inputA,output,true);
-	}
-
-	@Benchmark
-	public void edge8() {
-		BinaryImageOps.edge8(inputA,output,true);
-	}
-
-	@Benchmark
-	public void logicAnd() {
-		BinaryImageOps.logicAnd(inputA,inputB,output);
-	}
-
-	@Benchmark
-	public void logicOr() {
-		BinaryImageOps.logicOr(inputA,inputB,output);
-	}
-
-	@Benchmark
-	public void logicXor() {
-		BinaryImageOps.logicXor(inputA,inputB,output);
-	}
-
-	@Benchmark
-	public void invert() {
-		BinaryImageOps.invert(inputA,output);
-	}
-
-	@Benchmark
-	public void thin() {
-		BinaryImageOps.thin(inputA,5,output);
-	}
-
+	// @formatter:off
+	@Benchmark public void erode4() { BinaryImageOps.erode4(inputA, 1, output); }
+	@Benchmark public void erode8() { BinaryImageOps.erode8(inputA, 1, output); }
+	@Benchmark public void dilate4() { BinaryImageOps.dilate4(inputA, 1, output); }
+	@Benchmark public void dilate8() { BinaryImageOps.dilate8(inputA, 1, output); }
+	@Benchmark public void removePointNoise() { BinaryImageOps.removePointNoise(inputA, output); }
+	@Benchmark public void edge4() { BinaryImageOps.edge4(inputA, output, true); }
+	@Benchmark public void edge8() { BinaryImageOps.edge8(inputA, output, true); }
+	@Benchmark public void logicAnd() { BinaryImageOps.logicAnd(inputA, inputB, output); }
+	@Benchmark public void logicOr() { BinaryImageOps.logicOr(inputA, inputB, output); }
+	@Benchmark public void logicXor() { BinaryImageOps.logicXor(inputA, inputB, output); }
+	@Benchmark public void invert() { BinaryImageOps.invert(inputA, output); }
+	@Benchmark public void thin() { BinaryImageOps.thin(inputA, 5, output); }
+	// @formatter:on
 }

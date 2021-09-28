@@ -45,12 +45,12 @@ import java.util.concurrent.TimeUnit;
 @Warmup(iterations = 2)
 @Measurement(iterations = 3)
 @State(Scope.Benchmark)
-@Fork(value=1)
+@Fork(value = 1)
 public class BenchmarkThresholding {
-	@Param({"true","false"})
+	@Param({"true", "false"})
 	public boolean concurrent;
 
-//	@Param({"5","50"})
+	//	@Param({"5","50"})
 	@Param("50")
 	public int region;
 
@@ -84,45 +84,47 @@ public class BenchmarkThresholding {
 		Random rand = new Random(234);
 
 		inputU8.reshape(size, size);
-		inputF32.reshape(size,size);
+		inputF32.reshape(size, size);
 		output.reshape(size, size);
 
-		ImageMiscOps.fillUniform(inputU8,rand,0,200);
-		ConvertImage.convert(inputU8,inputF32);
+		ImageMiscOps.fillUniform(inputU8, rand, 0, 200);
+		ConvertImage.convert(inputU8, inputF32);
 
 		ConfigLength configLength = ConfigLength.fixed(region);
 
-		globalOtsuU8 = FactoryThresholdBinary.globalOtsu(0,255,1.0,true,GrayU8.class);
-		globalEntropyU8 = FactoryThresholdBinary.globalEntropy(0,255,1.0,true,GrayU8.class);
+		globalOtsuU8 = FactoryThresholdBinary.globalOtsu(0, 255, 1.0, true, GrayU8.class);
+		globalEntropyU8 = FactoryThresholdBinary.globalEntropy(0, 255, 1.0, true, GrayU8.class);
 
 		localOtsuU8 = FactoryThresholdBinary.localOtsu(configLength, 1.0, true, true, 0.1, GrayU8.class);
-		localMeanU8 = FactoryThresholdBinary.localMean(configLength,1.0,true,GrayU8.class);
-		localGaussianU8 = FactoryThresholdBinary.localGaussian(configLength,1.0,true,GrayU8.class);
+		localMeanU8 = FactoryThresholdBinary.localMean(configLength, 1.0, true, GrayU8.class);
+		localGaussianU8 = FactoryThresholdBinary.localGaussian(configLength, 1.0, true, GrayU8.class);
 		localNiblackF32 = FactoryThresholdBinary.localNiblack(configLength, true, 0.3f, GrayF32.class);
 		localSauvolaF32 = FactoryThresholdBinary.localSauvola(configLength, true, 0.3f, GrayF32.class);
 		localWolfF32 = FactoryThresholdBinary.localWolf(configLength, true, 0.3f, GrayF32.class);
 		localNickF32 = FactoryThresholdBinary.localNick(configLength, true, -0.15f, GrayF32.class);
 
-		blockMeanU8 = FactoryThresholdBinary.blockMean(configLength,1.0,true,true,GrayU8.class);
-		blockMinMaxU8 = FactoryThresholdBinary.blockMinMax(configLength,1.0,true, true, 5, GrayU8.class);
-		blockOtsuU8 = FactoryThresholdBinary.blockOtsu(configLength,1.0,true,true,true,0.1,GrayU8.class);
+		blockMeanU8 = FactoryThresholdBinary.blockMean(configLength, 1.0, true, true, GrayU8.class);
+		blockMinMaxU8 = FactoryThresholdBinary.blockMinMax(configLength, 1.0, true, true, 5, GrayU8.class);
+		blockOtsuU8 = FactoryThresholdBinary.blockOtsu(configLength, 1.0, true, true, true, 0.1, GrayU8.class);
 	}
 
-	@Benchmark public void globalThreshold() {ThresholdImageOps.threshold(inputU8,output,100,true);}
-	@Benchmark public void globalOtsu() {globalOtsuU8.process(inputU8,output);}
-	@Benchmark public void globalEntropy() {globalEntropyU8.process(inputU8,output);}
-	@Benchmark public void localOtsu() {localOtsuU8.process(inputU8,output);}
-	@Benchmark public void localMean() {localMeanU8.process(inputU8,output);}
-	@Benchmark public void localGaussian() {localGaussianU8.process(inputU8,output);}
-	@Benchmark public void localNiblack() {localNiblackF32.process(inputF32,output);}
-	@Benchmark public void localSauvola() {localSauvolaF32.process(inputF32,output);}
-	@Benchmark public void localWolf() {localWolfF32.process(inputF32,output);}
-	@Benchmark public void localNick() {localNickF32.process(inputF32,output);}
-	@Benchmark public void blockMean() {blockMeanU8.process(inputU8,output);}
-	@Benchmark public void blockMinMax() {blockMinMaxU8.process(inputU8,output);}
-	@Benchmark public void blockOtsu() {blockOtsuU8.process(inputU8,output);}
+	// @formatter:off
+	@Benchmark public void globalThreshold() {ThresholdImageOps.threshold(inputU8, output, 100, true);}
+	@Benchmark public void globalOtsu() {globalOtsuU8.process(inputU8, output);}
+	@Benchmark public void globalEntropy() {globalEntropyU8.process(inputU8, output);}
+	@Benchmark public void localOtsu() {localOtsuU8.process(inputU8, output);}
+	@Benchmark public void localMean() {localMeanU8.process(inputU8, output);}
+	@Benchmark public void localGaussian() {localGaussianU8.process(inputU8, output);}
+	@Benchmark public void localNiblack() {localNiblackF32.process(inputF32, output);}
+	@Benchmark public void localSauvola() {localSauvolaF32.process(inputF32, output);}
+	@Benchmark public void localWolf() {localWolfF32.process(inputF32, output);}
+	@Benchmark public void localNick() {localNickF32.process(inputF32, output);}
+	@Benchmark public void blockMean() {blockMeanU8.process(inputU8, output);}
+	@Benchmark public void blockMinMax() {blockMinMaxU8.process(inputU8, output);}
+	@Benchmark public void blockOtsu() {blockOtsuU8.process(inputU8, output);}
+	// @formatter:on
 
-	public static void main(String[] args) throws RunnerException {
+	public static void main( String[] args ) throws RunnerException {
 		Options opt = new OptionsBuilder()
 				.include(BenchmarkThresholding.class.getSimpleName())
 				.build();

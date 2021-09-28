@@ -23,7 +23,10 @@ import boofcv.concurrency.BoofConcurrency;
 import boofcv.core.image.border.BorderIndex1D_Extend;
 import boofcv.core.image.border.FactoryImageBorder;
 import boofcv.struct.border.*;
-import boofcv.struct.image.*;
+import boofcv.struct.image.GrayF32;
+import boofcv.struct.image.ImageType;
+import boofcv.struct.image.InterleavedF32;
+import boofcv.struct.image.Planar;
 import org.openjdk.jmh.annotations.*;
 import org.openjdk.jmh.runner.Runner;
 import org.openjdk.jmh.runner.RunnerException;
@@ -44,7 +47,8 @@ public class BenchmarkConvolveImage extends CommonBenchmarkConvolve_SB {
 	@Param({"true", "false"})
 	boolean concurrent;
 
-	@Param({"10"})
+//	@Param({"1", "10"})
+	@Param({"5"})
 	private int radius;
 
 	static private int numBands = 2;
@@ -52,11 +56,8 @@ public class BenchmarkConvolveImage extends CommonBenchmarkConvolve_SB {
 	static private ImageBorder_S32 border_I32 = new ImageBorder1D_S32(BorderIndex1D_Extend::new);
 	static private ImageBorder_F32 border_F32 = new ImageBorder1D_F32(BorderIndex1D_Extend::new);
 
-	static private ImageBorder_IL_S32 border_IL_S32 = new ImageBorder1D_IL_S32(BorderIndex1D_Extend::new);
 	static private ImageBorder_IL_F32 border_IL_F32 = new ImageBorder1D_IL_F32(BorderIndex1D_Extend::new);
 
-	static private ImageBorder<Planar<GrayU8>> border_PL_U8 = FactoryImageBorder.generic(BorderType.EXTENDED,
-			ImageType.pl(numBands, GrayU8.class));
 	static private ImageBorder<Planar<GrayF32>> border_PL_F32 = FactoryImageBorder.generic(BorderType.EXTENDED,
 			ImageType.pl(numBands, GrayF32.class));
 
@@ -92,7 +93,7 @@ public class BenchmarkConvolveImage extends CommonBenchmarkConvolve_SB {
 
 	public static void main( String[] args ) throws RunnerException {
 		Options opt = new OptionsBuilder()
-				.include(BenchmarkConvolveImage.class.getSimpleName())
+				.include("\\b"+BenchmarkConvolveImage.class.getSimpleName()+"\\b")
 				.warmupTime(TimeValue.seconds(1))
 				.measurementTime(TimeValue.seconds(1))
 				.build();

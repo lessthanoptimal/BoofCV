@@ -37,7 +37,8 @@ import java.util.concurrent.TimeUnit;
 public class BenchmarkConvolveDownNormalized extends CommonBenchmarkConvolve_SB {
 	static int skip = 2;
 
-	@Param({"2", "10"})
+//	@Param({"2", "10"})
+	@Param({"5"})
 	public int radius;
 
 	@Setup public void setup() {setupSkip(radius, skip);}

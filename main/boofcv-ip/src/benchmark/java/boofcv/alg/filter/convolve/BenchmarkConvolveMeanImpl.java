@@ -40,7 +40,8 @@ import java.util.concurrent.TimeUnit;
 @Fork(value = 1)
 @SuppressWarnings({"UnusedDeclaration"})
 public class BenchmarkConvolveMeanImpl extends CommonBenchmarkConvolve_SB {
-	@Param({"1", "10"})
+//	@Param({"1", "10"})
+	@Param({"5"})
 	public int radius;
 
 	GrowArray<DogArray_I32> work_I32 = new GrowArray<>(DogArray_I32::new);

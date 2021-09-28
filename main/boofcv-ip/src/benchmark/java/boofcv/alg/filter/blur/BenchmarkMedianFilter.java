@@ -38,7 +38,8 @@ import java.util.concurrent.TimeUnit;
 @State(Scope.Benchmark)
 @Fork(value = 1)
 public class BenchmarkMedianFilter extends CommonBenchmarkConvolve_SB {
-	@Param({"1", "4"})
+//	@Param({"1", "4"})
+	@Param({"4"})
 	public int radius;
 
 	@Setup public void setup() {setup(radius);}

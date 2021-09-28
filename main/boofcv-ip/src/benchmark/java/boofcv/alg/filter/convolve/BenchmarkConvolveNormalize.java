@@ -36,7 +36,8 @@ import java.util.concurrent.TimeUnit;
 @Fork(value = 1)
 @SuppressWarnings({"UnusedDeclaration"})
 public class BenchmarkConvolveNormalize extends CommonBenchmarkConvolve_SB {
-	@Param({"1", "4"})
+//	@Param({"1", "4"})
+	@Param({"5"})
 	public int radius;
 
 	@Setup public void setup() {setup(radius);}
