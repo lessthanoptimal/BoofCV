@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -44,7 +44,7 @@ public class BenchmarkFastHessianFeatureIntensity {
 	@Param({"true","false"})
 	public boolean concurrent=false;
 
-	public int imageSize=2000;
+	public int imageSize=1000;
 
 	static int skip = 1;
 	static int size = 15;

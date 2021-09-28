@@ -46,7 +46,7 @@ public class BenchmarkBlurImageOps {
 	@Param({"true", "false"})
 	public boolean concurrent;
 
-	@Param({"100", "2000"})
+	@Param({"1000"})
 	public int size;
 
 	private final GrayU8 inputU8 = new GrayU8(size, size);

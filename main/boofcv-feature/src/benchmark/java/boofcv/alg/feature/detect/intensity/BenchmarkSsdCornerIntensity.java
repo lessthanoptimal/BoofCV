@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -47,7 +47,7 @@ public class BenchmarkSsdCornerIntensity {
 	public boolean weighted=true;
 
 //	@Param({"500","5000"})
-	public int size=2000;
+	public int size=1000;
 
 	@Param({"2","5","20"})
 	public int radius=5;

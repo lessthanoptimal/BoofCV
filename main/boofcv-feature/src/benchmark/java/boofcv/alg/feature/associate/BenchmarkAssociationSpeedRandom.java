@@ -46,8 +46,9 @@ public class BenchmarkAssociationSpeedRandom {
 	@Param({"true", "false"})
 	boolean concurrent;
 
-	@Param({"5", "100"})
-	int DOF = 50;
+//	@Param({"5", "100"})
+	@Param({"50"})
+	int DOF;
 
 	int NUM_FEATURES = 1000;
 

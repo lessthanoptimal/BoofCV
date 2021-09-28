@@ -55,7 +55,7 @@ public class BenchmarkThresholding {
 	public int region;
 
 	//	@Param({"100", "500", "1000", "5000", "10000"})
-	@Param({"2000"})
+	@Param({"1000"})
 	public int size;
 
 	GrayU8 inputU8 = new GrayU8(size, size);

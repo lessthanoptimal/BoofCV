@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -39,23 +39,21 @@ import java.util.concurrent.TimeUnit;
 @Warmup(iterations = 2)
 @Measurement(iterations = 5)
 @State(Scope.Benchmark)
-@Fork(value=1)
+@Fork(value = 1)
 public class BenchmarkExtractors {
-
 	private static float threshold = 1.0f;
 
-	@Param({"true","false"})
+	@Param({"true", "false"})
 	public boolean concurrent;
 
-	@Param({"500","5000"})
-	public int width;
+	//	@Param({"500","5000"})
+	public int width = 1000;
 
-	@Param({"2","5","20"})
+	@Param({"2", "5", "20"})
 	public int radius;
 
-	GrayF32 intensity = new GrayF32(1,1);
+	GrayF32 intensity = new GrayF32(1, 1);
 	QueueCorner corners;
-
 
 	NonMaxSuppression blockStrictMax;
 
@@ -63,11 +61,11 @@ public class BenchmarkExtractors {
 	public void setup() {
 		BoofConcurrency.USE_CONCURRENT = concurrent;
 
-		intensity.reshape(width,width);
+		intensity.reshape(width, width);
 		corners = new QueueCorner();
 
 		Random rand = new Random(234);
-		ImageMiscOps.fillUniform(intensity,rand,0,200);
+		ImageMiscOps.fillUniform(intensity, rand, 0, 200);
 
 		ConfigExtract config = new ConfigExtract();
 		config.radius = radius;
@@ -80,7 +78,7 @@ public class BenchmarkExtractors {
 
 	@Benchmark
 	public void blockStrictMax() {
-		blockStrictMax.process(intensity,null,null,corners,corners);
+		blockStrictMax.process(intensity, null, null, corners, corners);
 	}
 
 	@Benchmark
@@ -92,7 +90,7 @@ public class BenchmarkExtractors {
 		config.threshold = threshold;
 		config.useStrictRule = true;
 		NonMaxSuppression alg = FactoryFeatureExtractor.nonmax(config);
-		alg.process(intensity,null,null,corners,corners);
+		alg.process(intensity, null, null, corners, corners);
 	}
 
 	@Benchmark
@@ -104,7 +102,7 @@ public class BenchmarkExtractors {
 		config.threshold = threshold;
 		config.useStrictRule = false;
 		NonMaxSuppression alg = FactoryFeatureExtractor.nonmax(config);
-		alg.process(intensity,null,null,corners,corners);
+		alg.process(intensity, null, null, corners, corners);
 	}
 
 	@Benchmark
@@ -116,7 +114,7 @@ public class BenchmarkExtractors {
 		config.threshold = threshold;
 		config.useStrictRule = false;
 		NonMaxSuppression alg = FactoryFeatureExtractor.nonmax(config);
-		alg.process(intensity,null,null,corners,corners);
+		alg.process(intensity, null, null, corners, corners);
 	}
 
 	@Benchmark
@@ -124,10 +122,10 @@ public class BenchmarkExtractors {
 		NonMaxExtractorNaive alg = new NonMaxExtractorNaive(true);
 		alg.radius = radius;
 		alg.thresh = threshold;
-		alg.process(intensity,corners);
+		alg.process(intensity, corners);
 	}
 
-	public static void main(String[] args) throws RunnerException {
+	public static void main( String[] args ) throws RunnerException {
 		Options opt = new OptionsBuilder()
 				.include(BenchmarkExtractors.class.getSimpleName())
 				.build();

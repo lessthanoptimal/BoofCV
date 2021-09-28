@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -47,7 +47,7 @@ public class BenchmarkImageBandMath {
 	public boolean concurrent;
 
 //	@Param({"100", "500", "1000", "5000", "10000"})
-	@Param({"5000"})
+	@Param({"1000"})
 	public int size;
 
 	@Param({"10","11"})

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -47,7 +47,7 @@ import java.util.concurrent.TimeUnit;
 @Fork(value = 1)
 public class BenchmarkFastIntensity {
 
-	static int imageSize = 2000;
+	static int imageSize = 1000;
 
 	@State(Scope.Benchmark)
 	public static class NaiveState {

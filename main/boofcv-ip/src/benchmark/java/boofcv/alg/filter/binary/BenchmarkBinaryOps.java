@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -42,7 +42,7 @@ public class BenchmarkBinaryOps  {
 	public boolean concurrent;
 
 	//	@Param({"100", "500", "1000", "5000", "10000"})
-	@Param({"2000"})
+	@Param({"1000"})
 	public int size;
 
 	private final GrayU8 inputA = new GrayU8(size, size);

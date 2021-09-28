@@ -37,7 +37,7 @@ import java.util.concurrent.TimeUnit;
 
 /**
  * Benchmarks related to functions inside of ConvertImage
- * 
+ *
  * @author Peter Abeles
  */
 @BenchmarkMode(Mode.AverageTime)
@@ -45,13 +45,12 @@ import java.util.concurrent.TimeUnit;
 @Warmup(iterations = 2)
 @Measurement(iterations = 5)
 @State(Scope.Benchmark)
-@Fork(value=1)
+@Fork(value = 1)
 public class BenchmarkEnhanceImageOps {
-	@Param({"true","false"})
+	@Param({"true", "false"})
 	public boolean concurrent;
 
-	//	@Param({"100", "500", "1000", "5000", "10000"})
-	@Param({"5000"})
+	@Param({"1000"})
 	public int size;
 
 	GrayU8 inputU8 = new GrayU8(size, size);
@@ -64,16 +63,16 @@ public class BenchmarkEnhanceImageOps {
 		BoofConcurrency.USE_CONCURRENT = concurrent;
 		Random rand = new Random(234);
 
-		inputU8.reshape(size,size);
-		outputU8.reshape(size,size);
+		inputU8.reshape(size, size);
+		outputU8.reshape(size, size);
 
 
-		GImageMiscOps.fillUniform(inputU8,rand,0,200);
+		GImageMiscOps.fillUniform(inputU8, rand, 0, 200);
 	}
 
 	@Benchmark
 	public void equalizeLocal_U8() {
-		EnhanceImageOps.equalizeLocal(inputU8,10,outputU8,255,workArrays);
+		EnhanceImageOps.equalizeLocal(inputU8, 10, outputU8, 255, workArrays);
 	}
 
 	@Benchmark
@@ -81,15 +80,16 @@ public class BenchmarkEnhanceImageOps {
 		workArrays.reset();
 		int[] histogram = BoofMiscOps.checkDeclare(workArrays.grow(), 256, false);
 		int[] transform = BoofMiscOps.checkDeclare(workArrays.grow(), 256, false);
-		ImageStatistics.histogram(inputU8,0, histogram);
+		ImageStatistics.histogram(inputU8, 0, histogram);
 		EnhanceImageOps.equalize(histogram, transform);
-		EnhanceImageOps.applyTransform(inputU8,transform,outputU8);
+		EnhanceImageOps.applyTransform(inputU8, transform, outputU8);
 	}
 
-	@Benchmark public void sharpen4() {EnhanceImageOps.sharpen4(inputU8,outputU8);}
-	@Benchmark public void sharpen8() {EnhanceImageOps.sharpen8(inputU8,outputU8);}
+	@Benchmark public void sharpen4() {EnhanceImageOps.sharpen4(inputU8, outputU8);}
 
-	public static void main(String[] args) throws RunnerException {
+	@Benchmark public void sharpen8() {EnhanceImageOps.sharpen8(inputU8, outputU8);}
+
+	public static void main( String[] args ) throws RunnerException {
 		Options opt = new OptionsBuilder()
 				.include(BenchmarkEnhanceImageOps.class.getSimpleName())
 				.warmupTime(TimeValue.seconds(1))

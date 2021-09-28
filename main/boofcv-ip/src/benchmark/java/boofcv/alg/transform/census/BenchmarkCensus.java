@@ -49,7 +49,7 @@ public class BenchmarkCensus {
 	public boolean concurrent;
 
 	//	@Param({"100", "500", "1000", "5000", "10000"})
-	@Param({"2000"})
+	@Param({"1000"})
 	public int size;
 
 	private final GrayU8 input = new GrayU8(size, size);

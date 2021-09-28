@@ -43,7 +43,8 @@ import java.util.concurrent.TimeUnit;
 @State(Scope.Benchmark)
 @Fork(value = 1)
 public class BenchmarkPrimitiveMap {
-	@Param({"1000", "10000"})
+//	@Param({"1000", "10000"})
+	@Param({"2000"})
 	int total;
 
 	int[] keys;

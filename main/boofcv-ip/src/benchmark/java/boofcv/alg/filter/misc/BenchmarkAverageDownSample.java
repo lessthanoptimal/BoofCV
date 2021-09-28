@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -42,7 +42,7 @@ public class BenchmarkAverageDownSample {
 	@Param({"true","false"})
 	public boolean concurrent;
 
-	@Param({"5000"})
+	@Param({"1000"})
 	public int size;
 
 	GrayU8 inputU8 = new GrayU8(1,1);
@@ -50,8 +50,7 @@ public class BenchmarkAverageDownSample {
 	GrayU8 out8 = new GrayU8(1,1);
 	GrayF32 outF32 = new GrayF32(1,1);
 
-	@Setup
-	public void setup() {
+	@Setup public void setup() {
 		BoofConcurrency.USE_CONCURRENT = concurrent;
 		Random rand = new Random(234);
 
@@ -64,8 +63,7 @@ public class BenchmarkAverageDownSample {
 		ImageMiscOps.fillUniform(inputS8,rand,0,200);
 	}
 
-	@Benchmark
-	public void general_8_U8() {
+	@Benchmark public void general_8_U8() {
 		if( BoofConcurrency.USE_CONCURRENT ) {
 			ImplAverageDownSampleN_MT.down(inputU8, 8, out8);
 		} else {
@@ -73,8 +71,7 @@ public class BenchmarkAverageDownSample {
 		}
 	}
 
-	@Benchmark
-	public void general_2_U8() {
+	@Benchmark public void general_2_U8() {
 		if( BoofConcurrency.USE_CONCURRENT ) {
 			ImplAverageDownSampleN_MT.down(inputU8, 2, out8);
 		} else {
@@ -82,8 +79,7 @@ public class BenchmarkAverageDownSample {
 		}
 	}
 
-	@Benchmark
-	public void general_2_S8() {
+	@Benchmark public void general_2_S8() {
 		if( BoofConcurrency.USE_CONCURRENT ) {
 			ImplAverageDownSampleN_MT.down(inputS8, 2, out8);
 		} else {
@@ -91,8 +87,7 @@ public class BenchmarkAverageDownSample {
 		}
 	}
 
-	@Benchmark
-	public void special2x2_U8() {
+	@Benchmark public void special2x2_U8() {
 		if( BoofConcurrency.USE_CONCURRENT ) {
 			ImplAverageDownSample2_MT.down(inputU8, out8);
 		} else {
@@ -100,8 +95,7 @@ public class BenchmarkAverageDownSample {
 		}
 	}
 
-	@Benchmark
-	public void general_HV_U8() {
+	@Benchmark public void general_HV_U8() {
 		outF32.reshape(size/2, size);
 		out8.reshape(size/2, size/2);
 		if( BoofConcurrency.USE_CONCURRENT ) {
