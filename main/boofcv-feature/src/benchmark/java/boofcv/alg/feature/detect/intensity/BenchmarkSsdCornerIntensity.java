@@ -36,30 +36,29 @@ import java.util.concurrent.TimeUnit;
 @BenchmarkMode(Mode.AverageTime)
 @OutputTimeUnit(TimeUnit.MILLISECONDS)
 @Warmup(iterations = 2)
-@Measurement(iterations = 5)
+@Measurement(iterations = 3)
 @State(Scope.Benchmark)
 @Fork(value = 1)
 public class BenchmarkSsdCornerIntensity {
-	@Param({"true","false"})
-	public boolean concurrent=false;
+	@Param({"true", "false"})
+	public boolean concurrent = false;
 
-	@Param({"false","true"})
-	public boolean weighted=true;
+	@Param({"false", "true"})
+	public boolean weighted = true;
 
-//	@Param({"500","5000"})
-	public int size=1000;
+	//	@Param({"500","5000"})
+	public int size = 800;
 
-	@Param({"2","5","20"})
-	public int radius=5;
+	//	@Param({"2","5","20"})
+	@Param({"2", "20"})
+	public int radius = 5;
 
-	GrayF32 derivX_F32 = new GrayF32(1,1);
-	GrayF32 derivY_F32 = new GrayF32(1,1);
-	GrayS16 derivX_S16 = new GrayS16(1,1);
-	GrayS16 derivY_S16 = new GrayS16(1,1);
+	GrayF32 derivX_F32 = new GrayF32(1, 1);
+	GrayF32 derivY_F32 = new GrayF32(1, 1);
+	GrayS16 derivX_S16 = new GrayS16(1, 1);
+	GrayS16 derivY_S16 = new GrayS16(1, 1);
 
-	GrayF32 intensity = new GrayF32(1,1);
-
-	static Random rand = new Random(234);
+	GrayF32 intensity = new GrayF32(1, 1);
 
 	GradientCornerIntensity<GrayS16> shitomasi_S16;
 	GradientCornerIntensity<GrayF32> shitomasi_F32;
@@ -75,16 +74,17 @@ public class BenchmarkSsdCornerIntensity {
 		derivY_S16.reshape(size, size);
 		intensity.reshape(size, size);
 
-		ImageMiscOps.fillUniform(derivX_F32,rand,0,200);
-		ImageMiscOps.fillUniform(derivY_F32,rand,0,200);
-		ImageMiscOps.fillUniform(derivX_S16,rand,0,200);
-		ImageMiscOps.fillUniform(derivY_S16,rand,0,200);
+		Random rand = new Random(234);
+		ImageMiscOps.fillUniform(derivX_F32, rand, 0, 200);
+		ImageMiscOps.fillUniform(derivY_F32, rand, 0, 200);
+		ImageMiscOps.fillUniform(derivX_S16, rand, 0, 200);
+		ImageMiscOps.fillUniform(derivY_S16, rand, 0, 200);
 
-		shitomasi_S16 = FactoryIntensityPointAlg.shiTomasi(radius,weighted,GrayS16.class);
-		shitomasi_F32 = FactoryIntensityPointAlg.shiTomasi(radius,weighted,GrayF32.class);
+		shitomasi_S16 = FactoryIntensityPointAlg.shiTomasi(radius, weighted, GrayS16.class);
+		shitomasi_F32 = FactoryIntensityPointAlg.shiTomasi(radius, weighted, GrayF32.class);
 
-		harris_S16 = FactoryIntensityPointAlg.harris(radius,0.04f,weighted,GrayS16.class);
-		harris_F32 = FactoryIntensityPointAlg.harris(radius,0.04f,weighted,GrayF32.class);
+		harris_S16 = FactoryIntensityPointAlg.harris(radius, 0.04f, weighted, GrayS16.class);
+		harris_F32 = FactoryIntensityPointAlg.harris(radius, 0.04f, weighted, GrayF32.class);
 	}
 
 	// @formatter:off
@@ -94,7 +94,7 @@ public class BenchmarkSsdCornerIntensity {
 	@Benchmark public void Harris_F32() {harris_F32.process(derivX_F32,derivY_F32,intensity);}
 	// @formatter:on
 
-	public static void main(String[] args) throws RunnerException {
+	public static void main( String[] args ) throws RunnerException {
 		Options opt = new OptionsBuilder()
 				.include(BenchmarkSsdCornerIntensity.class.getSimpleName())
 				.warmupTime(TimeValue.seconds(1))

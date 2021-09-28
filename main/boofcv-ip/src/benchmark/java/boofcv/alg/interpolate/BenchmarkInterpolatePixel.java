@@ -24,6 +24,11 @@ import boofcv.factory.interpolate.FactoryInterpolation;
 import boofcv.struct.border.BorderType;
 import boofcv.struct.image.GrayF32;
 import org.openjdk.jmh.annotations.*;
+import org.openjdk.jmh.runner.Runner;
+import org.openjdk.jmh.runner.RunnerException;
+import org.openjdk.jmh.runner.options.Options;
+import org.openjdk.jmh.runner.options.OptionsBuilder;
+import org.openjdk.jmh.runner.options.TimeValue;
 
 import java.util.Random;
 import java.util.concurrent.TimeUnit;
@@ -36,11 +41,11 @@ import java.util.concurrent.TimeUnit;
 @BenchmarkMode(Mode.AverageTime)
 @OutputTimeUnit(TimeUnit.MILLISECONDS)
 @Warmup(iterations = 2)
-@Measurement(iterations = 5)
+@Measurement(iterations = 3)
 @State(Scope.Benchmark)
-@Fork(value=1)
+@Fork(value = 1)
 public class BenchmarkInterpolatePixel {
-	@Param({"true","false"})
+	@Param({"true", "false"})
 	public boolean concurrent;
 
 	//	@Param({"100", "500", "1000", "5000", "10000"})
@@ -63,10 +68,10 @@ public class BenchmarkInterpolatePixel {
 		BoofConcurrency.USE_CONCURRENT = concurrent;
 		Random rand = new Random(234);
 
-		inputF32.reshape(size,size);
-		outputF32.reshape(size,size);
+		inputF32.reshape(size, size);
+		outputF32.reshape(size, size);
 
-		GImageMiscOps.fillUniform(inputF32,rand,0,200);
+		GImageMiscOps.fillUniform(inputF32, rand, 0, 200);
 
 		bilinear_sb = FactoryInterpolation.bilinearPixelS(GrayF32.class, BorderType.EXTENDED);
 		nearest_sb = FactoryInterpolation.nearestNeighborPixelS(GrayF32.class);
@@ -74,15 +79,29 @@ public class BenchmarkInterpolatePixel {
 
 	@Benchmark
 	public void bilinear_F32() {
+		bilinear_sb.setImage(inputF32);
+		int idx = 0;
 		for (float x = start; x <= end; x += step)
 			for (float y = start; y <= end; y += step)
-				bilinear_sb.get(x, y);
+				outputF32.data[idx++] = bilinear_sb.get(x, y);
 	}
 
 	@Benchmark
 	public void nn_F32() {
+		nearest_sb.setImage(inputF32);
+		int idx = 0;
 		for (float x = start; x <= end; x += step)
 			for (float y = start; y <= end; y += step)
-				nearest_sb.get(x, y);
+				outputF32.data[idx++] = nearest_sb.get(x, y);
+	}
+
+	public static void main( String[] args ) throws RunnerException {
+		Options opt = new OptionsBuilder()
+				.include(BenchmarkInterpolatePixel.class.getSimpleName())
+				.warmupTime(TimeValue.seconds(1))
+				.measurementTime(TimeValue.seconds(1))
+				.build();
+
+		new Runner(opt).run();
 	}
 }

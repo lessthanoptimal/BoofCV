@@ -48,7 +48,7 @@ import static java.lang.Math.PI;
 @BenchmarkMode(Mode.AverageTime)
 @OutputTimeUnit(TimeUnit.MILLISECONDS)
 @Warmup(iterations = 2)
-@Measurement(iterations = 5)
+@Measurement(iterations = 3)
 @State(Scope.Benchmark)
 @Fork(value = 1)
 public class BenchmarkOrientation<I extends ImageGray<I>, D extends ImageGray<D>> {
@@ -56,12 +56,12 @@ public class BenchmarkOrientation<I extends ImageGray<I>, D extends ImageGray<D>
 	@Param({"SB_U8", "SB_F32"})
 	String imageTypeName;
 
+	@Param({"300"})
+	public int size;
+
 	int NUM_POINTS = 1000;
 	static int RADIUS = 6;
 	static double OBJECt_TO_SCALE = 1.0/2.0;
-
-	final static int width = 640;
-	final static int height = 480;
 
 	I image;
 	D derivX;
@@ -73,6 +73,7 @@ public class BenchmarkOrientation<I extends ImageGray<I>, D extends ImageGray<D>
 
 	Class<I> imageType;
 	Class<D> derivType;
+	Class integralType;
 
 	ConfigAverageIntegral confAverageIIW = new ConfigAverageIntegral();
 	ConfigSlidingIntegral confSlidingIIW = new ConfigSlidingIntegral();
@@ -83,12 +84,12 @@ public class BenchmarkOrientation<I extends ImageGray<I>, D extends ImageGray<D>
 		imageType = ImageType.stringToType(imageTypeName, 0).getImageClass();
 		this.derivType = GImageDerivativeOps.getDerivativeType(imageType);
 
-		Class integralType = GrayF32.class == imageType ? GrayF32.class : GrayS32.class;
+		integralType = GrayF32.class == imageType ? GrayF32.class : GrayS32.class;
 
-		image = GeneralizedImageOps.createSingleBand(imageType, width, height);
-		ii = GeneralizedImageOps.createSingleBand(integralType, width, height);
-		derivX = GeneralizedImageOps.createSingleBand(derivType, width, height);
-		derivY = GeneralizedImageOps.createSingleBand(derivType, width, height);
+		image = GeneralizedImageOps.createSingleBand(imageType, size, size);
+		ii = GeneralizedImageOps.createSingleBand(integralType, size, size);
+		derivX = GeneralizedImageOps.createSingleBand(derivType, size, size);
+		derivY = GeneralizedImageOps.createSingleBand(derivType, size, size);
 
 		GImageMiscOps.fillUniform(image, rand, 0, 100);
 		GIntegralImageOps.transform(image, ii);
@@ -100,8 +101,8 @@ public class BenchmarkOrientation<I extends ImageGray<I>, D extends ImageGray<D>
 		radiuses = new double[NUM_POINTS];
 		int border = 6;
 		for (int i = 0; i < NUM_POINTS; i++) {
-			int x = rand.nextInt(width - border*2) + border;
-			int y = rand.nextInt(height - border*2) + border;
+			int x = rand.nextInt(size - border*2) + border;
+			int y = rand.nextInt(size - border*2) + border;
 			pts[i] = new Point2D_I32(x, y);
 			radiuses[i] = rand.nextDouble()*100 + 10;
 		}
@@ -111,22 +112,22 @@ public class BenchmarkOrientation<I extends ImageGray<I>, D extends ImageGray<D>
 	}
 
 	// @formatter:off
-	@Benchmark public void Average() { gradient(average(OBJECt_TO_SCALE,RADIUS, false, derivType)); }
-	@Benchmark public void Average_W() { gradient(average(OBJECt_TO_SCALE,RADIUS, true, derivType)); }
-	@Benchmark public void Histogram() { gradient(histogram(0.5,15, RADIUS, false, derivType)); }
-	@Benchmark public void Histogram_W() { gradient(histogram(0.5,15, RADIUS, true, derivType)); }
-	@Benchmark public void Sliding() { gradient(sliding(OBJECt_TO_SCALE, 15, PI/3.0, RADIUS, false, derivType)); }
-	@Benchmark public void Sliding_W() { gradient(sliding(OBJECt_TO_SCALE, 15, PI/3.0, RADIUS, true, derivType)); }
+	@Benchmark public void Average() {gradient(average(OBJECt_TO_SCALE, RADIUS, false, derivType));}
+	@Benchmark public void Average_W() {gradient(average(OBJECt_TO_SCALE, RADIUS, true, derivType));}
+	@Benchmark public void Histogram() {gradient(histogram(0.5, 15, RADIUS, false, derivType));}
+	@Benchmark public void Histogram_W() {gradient(histogram(0.5, 15, RADIUS, true, derivType));}
+	@Benchmark public void Sliding() {gradient(sliding(OBJECt_TO_SCALE, 15, PI/3.0, RADIUS, false, derivType));}
+	@Benchmark public void Sliding_W() {gradient(sliding(OBJECt_TO_SCALE, 15, PI/3.0, RADIUS, true, derivType));}
 
-	@Benchmark public void SIFT() { image(FactoryOrientation.sift(null, null, imageType)); }
-	@Benchmark public void No_Gradient() { image(nogradient(OBJECt_TO_SCALE, RADIUS, imageType)); }
+	@Benchmark public void SIFT() {image(FactoryOrientation.sift(null, null, imageType));}
+	@Benchmark public void No_Gradient() {image(nogradient(OBJECt_TO_SCALE, RADIUS, imageType));}
 
-	@Benchmark public void Image_II() { integral(image_ii(1.0/2.0,RADIUS, 1, 4, 0, imageType)); }
-	@Benchmark public void Image_II_W() { integral(image_ii(1.0/2.0,RADIUS, 1, 4, -1, imageType)); }
-	@Benchmark public void Average_II() { integral(average_ii(null, imageType)); }
-	@Benchmark public void Average_II_W() { integral(average_ii(confAverageIIW, imageType)); }
-	@Benchmark public void Sliding_II() { integral(sliding_ii(null, imageType)); }
-	@Benchmark public void Sliding_II_W() { integral(sliding_ii(confSlidingIIW, imageType)); }
+	@Benchmark public void Image_II() {integral(image_ii(1.0/2.0, RADIUS, 1, 4, 0, integralType));}
+	@Benchmark public void Image_II_W() {integral(image_ii(1.0/2.0, RADIUS, 1, 4, -1, integralType));}
+	@Benchmark public void Average_II() {integral(average_ii(null, integralType));}
+	@Benchmark public void Average_II_W() {integral(average_ii(confAverageIIW, integralType));}
+	@Benchmark public void Sliding_II() {integral(sliding_ii(null, integralType));}
+	@Benchmark public void Sliding_II_W() {integral(sliding_ii(confSlidingIIW, integralType));}
 	// @formatter:on
 
 	void gradient( OrientationGradient<D> alg ) {

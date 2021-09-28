@@ -16,10 +16,10 @@
  * limitations under the License.
  */
 
-package boofcv.alg.filter.derivative;
+package boofcv.alg.misc;
 
-import boofcv.alg.filter.derivative.impl.GradientPrewitt_Shared;
 import boofcv.concurrency.BoofConcurrency;
+import boofcv.struct.image.GrayF32;
 import org.openjdk.jmh.annotations.*;
 import org.openjdk.jmh.runner.Runner;
 import org.openjdk.jmh.runner.RunnerException;
@@ -27,33 +27,47 @@ import org.openjdk.jmh.runner.options.Options;
 import org.openjdk.jmh.runner.options.OptionsBuilder;
 import org.openjdk.jmh.runner.options.TimeValue;
 
+import java.util.Random;
 import java.util.concurrent.TimeUnit;
 
 @BenchmarkMode(Mode.AverageTime)
 @OutputTimeUnit(TimeUnit.MILLISECONDS)
-@Warmup(iterations = 2)
-@Measurement(iterations = 3)
+@Warmup(iterations = 3)
+@Measurement(iterations = 5)
 @State(Scope.Benchmark)
 @Fork(value = 1)
-public class BenchmarkGradientPrewitt extends CommonBenchmarkDerivative {
+public class BenchmarkImageNormalization {
 	@Param({"true", "false"})
 	public boolean concurrent;
 
-	@Setup @Override public void setup() {
+	@Param({"1000"})
+	public int size;
+
+	GrayF32 imgA_F32 = new GrayF32(size, size);
+	GrayF32 imgB_F32 = new GrayF32(size, size);
+
+	NormalizeParameters param = new NormalizeParameters(5, 2.1);
+
+	@Setup public void setup() {
 		BoofConcurrency.USE_CONCURRENT = concurrent;
-		super.setup();
+		var rand = new Random(2345);
+
+		imgA_F32.reshape(size, size);
+		imgB_F32.reshape(size, size);
+
+		GImageMiscOps.fillUniform(imgA_F32, rand, 0, 200);
 	}
 
 	// @formatter:off
-	@Benchmark public void Standard_I8() {GradientPrewitt.process(imgI8, dx_I16, dy_I16, borderI32);}
-	@Benchmark public void Standard_F32() {GradientPrewitt.process(imgF32, dx_F32, dy_F32, borderF32);}
-	@Benchmark public void Shared_I8() {GradientPrewitt_Shared.process(imgI8, dx_I16, dy_I16);}
-	@Benchmark public void Shared_F32() {GradientPrewitt_Shared.process(imgF32, dx_F32, dy_F32);}
+	@Benchmark public void apply() {ImageNormalization.apply(imgA_F32, param, imgB_F32);}
+	@Benchmark public void maxAbsOfOne() {ImageNormalization.maxAbsOfOne(imgA_F32, imgB_F32, param);}
+	@Benchmark public void zeroMeanMaxOne() {ImageNormalization.zeroMeanMaxOne(imgA_F32, imgB_F32, param);}
+	@Benchmark public void zeroMeanStdOne() {ImageNormalization.zeroMeanStdOne(imgA_F32, imgB_F32, param);}
 	// @formatter:on
 
 	public static void main( String[] args ) throws RunnerException {
 		Options opt = new OptionsBuilder()
-				.include(BenchmarkGradientPrewitt.class.getSimpleName())
+				.include(BenchmarkImageNormalization.class.getSimpleName())
 				.warmupTime(TimeValue.seconds(1))
 				.measurementTime(TimeValue.seconds(1))
 				.build();

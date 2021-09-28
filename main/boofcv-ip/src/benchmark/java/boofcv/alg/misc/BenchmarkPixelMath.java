@@ -25,6 +25,7 @@ import org.openjdk.jmh.runner.Runner;
 import org.openjdk.jmh.runner.RunnerException;
 import org.openjdk.jmh.runner.options.Options;
 import org.openjdk.jmh.runner.options.OptionsBuilder;
+import org.openjdk.jmh.runner.options.TimeValue;
 
 import java.util.Random;
 import java.util.concurrent.TimeUnit;
@@ -37,15 +38,15 @@ import java.util.concurrent.TimeUnit;
 @Warmup(iterations = 2)
 @Measurement(iterations = 5)
 @State(Scope.Benchmark)
-@Fork(value=2)
+@Fork(value = 1)
 public class BenchmarkPixelMath {
 
 	public static final int radius = 5;
 
-	@Param({"true","false"})
+	@Param({"true", "false"})
 	public boolean concurrent;
 
-//	@Param({"100", "500", "1000", "5000", "10000"})
+	//	@Param({"100", "500", "1000", "5000", "10000"})
 	@Param({"1000"})
 	public int size;
 
@@ -62,33 +63,31 @@ public class BenchmarkPixelMath {
 		input2.reshape(size, size);
 		output.reshape(size, size);
 
-		GImageMiscOps.fillUniform(input,rand,0,200);
-		GImageMiscOps.fillUniform(input2,rand,0,200);
+		GImageMiscOps.fillUniform(input, rand, 0, 200);
+		GImageMiscOps.fillUniform(input2, rand, 0, 200);
 	}
 
-	@Benchmark
-	public void abs() {
-		GPixelMath.abs(input,output);
-	}
+	// @formatter:off
+	@Benchmark public void abs() {GPixelMath.abs(input, output);}
+	@Benchmark public void abs_operator() {PixelMath.operator1(input, a -> (byte)Math.abs(a), output);}
+	@Benchmark public void add() {GPixelMath.add(input, input2, output);}
+	@Benchmark public void add_operator() {GPixelMath.operator2(input, (PixelMathLambdas.Function2_F32)Float::sum, input2, output);}
+	@Benchmark public void negative() {GPixelMath.negative(input, output);}
+	@Benchmark public void subtract() {GPixelMath.divide(input, input2, output);}
+	@Benchmark public void multiply() {GPixelMath.divide(input, input2, output);}
+	@Benchmark public void divide() {GPixelMath.divide(input, input2, output);}
+	@Benchmark public void sqrt() {GPixelMath.sqrt(input, output);}
+	@Benchmark public void log() {GPixelMath.log(input, 1.0f, output);}
+	@Benchmark public void logSign() {GPixelMath.logSign(input, 1.0f, output);}
+	@Benchmark public void pow2() {GPixelMath.pow2(input, output);}
+	@Benchmark public void stdev() {GPixelMath.stdev(input, input2, output);}
+	// @formatter:on
 
-	@Benchmark
-	public void abs_operator() {
-		PixelMath.operator1(input, a -> (byte)Math.abs(a),output);
-	}
-
-	@Benchmark
-	public void add() {
-		GPixelMath.add(input,input2,output);
-	}
-
-	@Benchmark
-	public void add_operator() {
-		GPixelMath.operator2(input, (PixelMathLambdas.Function2_F32)Float::sum,input2,output);
-	}
-
-	public static void main(String[] args) throws RunnerException {
+	public static void main( String[] args ) throws RunnerException {
 		Options opt = new OptionsBuilder()
 				.include(BenchmarkPixelMath.class.getSimpleName())
+				.warmupTime(TimeValue.seconds(1))
+				.measurementTime(TimeValue.seconds(1))
 				.build();
 
 		new Runner(opt).run();

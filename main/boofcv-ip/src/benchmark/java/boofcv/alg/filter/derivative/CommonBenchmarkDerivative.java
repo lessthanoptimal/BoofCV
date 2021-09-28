@@ -35,7 +35,7 @@ import java.util.Random;
  *
  * @author Peter Abeles
  */
-public abstract class BenchmarkDerivativeBase {
+public abstract class CommonBenchmarkDerivative {
 	public static int width = 1024;
 	public static int height = 768;
 	public static boolean border = true;

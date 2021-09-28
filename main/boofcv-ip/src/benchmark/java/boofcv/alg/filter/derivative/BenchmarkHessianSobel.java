@@ -36,7 +36,7 @@ import java.util.concurrent.TimeUnit;
 @Measurement(iterations = 5)
 @State(Scope.Benchmark)
 @Fork(value = 1)
-public class BenchmarkHessianSobel extends BenchmarkDerivativeBase {
+public class BenchmarkHessianSobel extends CommonBenchmarkDerivative {
 
 	static GrayF32 tempA_F32 = new GrayF32(width, height);
 	static GrayF32 tempB_F32 = new GrayF32(width, height);

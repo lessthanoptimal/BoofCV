@@ -28,25 +28,23 @@ import org.openjdk.jmh.runner.Runner;
 import org.openjdk.jmh.runner.RunnerException;
 import org.openjdk.jmh.runner.options.Options;
 import org.openjdk.jmh.runner.options.OptionsBuilder;
+import org.openjdk.jmh.runner.options.TimeValue;
 
 import java.util.Random;
 import java.util.concurrent.TimeUnit;
 
-/**
- * @author Peter Abeles
- */
 @BenchmarkMode(Mode.AverageTime)
 @OutputTimeUnit(TimeUnit.MILLISECONDS)
 @Warmup(iterations = 3)
 @Measurement(iterations = 5)
 @State(Scope.Benchmark)
-@Fork(value=1)
+@Fork(value = 1)
 public class BenchmarkImageMiscOps {
 
-	@Param({"true","false"})
+	@Param({"true", "false"})
 	public boolean concurrent;
 
-//	@Param({"100", "500", "1000", "5000", "10000"})
+	//	@Param({"100", "500", "1000", "5000", "10000"})
 	@Param({"1000"})
 	public int size;
 
@@ -55,17 +53,15 @@ public class BenchmarkImageMiscOps {
 
 	GrayF32 imgA_F32 = new GrayF32(size, size);
 	GrayF32 imgB_F32 = new GrayF32(size, size);
-	InterleavedU8 imgA_IU8 = new InterleavedU8(size,size,3);
-	InterleavedU8 imgB_IU8 = new InterleavedU8(size,size,3);
-	InterleavedF32 imgA_IF32 = new InterleavedF32(size,size,3);
-	InterleavedF32 imgB_IF32 = new InterleavedF32(size,size,3);
+	InterleavedU8 imgA_IU8 = new InterleavedU8(size, size, 3);
+	InterleavedU8 imgB_IU8 = new InterleavedU8(size, size, 3);
+	InterleavedF32 imgA_IF32 = new InterleavedF32(size, size, 3);
+	InterleavedF32 imgB_IF32 = new InterleavedF32(size, size, 3);
+	Random rand;
 
-	int[] histogram = new int[256];
-
-	@Setup
-	public void setup() {
+	@Setup public void setup() {
 		BoofConcurrency.USE_CONCURRENT = concurrent;
-		Random rand = new Random(234);
+		rand = new Random(234);
 
 		imgA_U8.reshape(size, size);
 		imgB_U8.reshape(size, size);
@@ -76,22 +72,31 @@ public class BenchmarkImageMiscOps {
 		imgA_IF32.reshape(size, size);
 		imgB_IF32.reshape(size, size);
 
-		GImageMiscOps.fillUniform(imgA_U8,rand,0,200);
-		GImageMiscOps.fillUniform(imgB_U8,rand,0,200);
-		GImageMiscOps.fillUniform(imgA_F32,rand,-100,100);
-		GImageMiscOps.fillUniform(imgB_F32,rand,-100,100);
-		GImageMiscOps.fillUniform(imgA_IU8,rand,-100,100);
-		GImageMiscOps.fillUniform(imgB_IU8,rand,-100,100);
-		GImageMiscOps.fillUniform(imgA_IF32,rand,-100,100);
-		GImageMiscOps.fillUniform(imgB_IF32,rand,-100,100);
+		GImageMiscOps.fillUniform(imgA_U8, rand, 0, 200);
+		GImageMiscOps.fillUniform(imgB_U8, rand, 0, 200);
+		GImageMiscOps.fillUniform(imgA_F32, rand, -100, 100);
+		GImageMiscOps.fillUniform(imgB_F32, rand, -100, 100);
+		GImageMiscOps.fillUniform(imgA_IU8, rand, -100, 100);
+		GImageMiscOps.fillUniform(imgB_IU8, rand, -100, 100);
+		GImageMiscOps.fillUniform(imgA_IF32, rand, -100, 100);
+		GImageMiscOps.fillUniform(imgB_IF32, rand, -100, 100);
 	}
 
+	// @formatter:off
 	@Benchmark public void copy_U8() {ImageMiscOps.copy(10,10,0,0,size-10,size-10,imgA_U8,imgB_U8);}
 	@Benchmark public void copy_F32() {ImageMiscOps.copy(10,10,0,0,size-10,size-10,imgA_F32,imgB_F32);}
 	@Benchmark public void fill_U8() {ImageMiscOps.fill(imgA_U8,2);}
 	@Benchmark public void fill_F32() {ImageMiscOps.fill(imgA_F32, 2.0f);}
 	@Benchmark public void fillRectangle_U8() {ImageMiscOps.fillRectangle(imgA_U8,2,10,12,size-10,size-12);}
 	@Benchmark public void fillRectangle_IU8() {ImageMiscOps.fillRectangle(imgA_IU8,2,10,12,size-10,size-12);}
+	@Benchmark public void fillUniform_U8() {ImageMiscOps.fillUniform(imgA_U8, rand, 0, 200);}
+	@Benchmark public void fillUniform_F32() {ImageMiscOps.fillUniform(imgA_F32, rand, 0, 200);}
+	@Benchmark public void fillUniform_IU8() {ImageMiscOps.fillUniform(imgA_IU8, rand, 0, 200);}
+	@Benchmark public void fillUniform_IF32() {ImageMiscOps.fillUniform(imgA_IF32, rand, 0, 200);}
+	@Benchmark public void fillGaussian_U8() {ImageMiscOps.fillGaussian(imgA_U8, rand, 0, 5, 0, 200);}
+	@Benchmark public void fillGaussian_F32() {ImageMiscOps.fillGaussian(imgA_F32, rand, 0, 5, 0, 200);}
+	@Benchmark public void fillGaussian_IU8() {ImageMiscOps.fillGaussian(imgA_IU8, rand, 0, 5, 0, 200);}
+	@Benchmark public void fillGaussian_IF32() {ImageMiscOps.fillGaussian(imgA_IF32, rand, 0, 5, 0, 200);}
 	@Benchmark public void fillBorder_U8() {ImageMiscOps.fillBorder(imgA_U8,2,10);}
 	@Benchmark public void fillBorder_F32() {ImageMiscOps.fillBorder(imgA_F32, 2.0f,10);}
 	@Benchmark public void extractBand_IU8() {ImageMiscOps.extractBand(imgA_IU8,2,imgA_U8);}
@@ -109,10 +114,13 @@ public class BenchmarkImageMiscOps {
 	@Benchmark public void rotateCCW_F32() {ImageMiscOps.rotateCCW(imgA_F32);}
 	@Benchmark public void rotateCCW_2_U8() {ImageMiscOps.rotateCCW(imgA_U8,imgB_U8);}
 	@Benchmark public void rotateCCW_2_F32() {ImageMiscOps.rotateCCW(imgA_F32,imgB_F32);}
+	// @formatter:on
 
-	public static void main(String[] args) throws RunnerException {
+	public static void main( String[] args ) throws RunnerException {
 		Options opt = new OptionsBuilder()
 				.include(BenchmarkImageMiscOps.class.getSimpleName())
+				.warmupTime(TimeValue.seconds(1))
+				.measurementTime(TimeValue.seconds(1))
 				.build();
 
 		new Runner(opt).run();

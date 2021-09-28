@@ -49,7 +49,8 @@ public class BenchmarkExtractors {
 	//	@Param({"500","5000"})
 	public int width = 1000;
 
-	@Param({"2", "5", "20"})
+//	@Param({"2", "5", "20"})
+	@Param({"2", "20"})
 	public int radius;
 
 	GrayF32 intensity = new GrayF32(1, 1);

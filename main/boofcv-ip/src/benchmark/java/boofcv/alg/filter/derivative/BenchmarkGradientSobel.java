@@ -37,7 +37,7 @@ import java.util.concurrent.TimeUnit;
 @Measurement(iterations = 5)
 @State(Scope.Benchmark)
 @Fork(value = 1)
-public class BenchmarkGradientSobel extends BenchmarkDerivativeBase {
+public class BenchmarkGradientSobel extends CommonBenchmarkDerivative {
 	@Param({"true", "false"})
 	public boolean concurrent;
 
