@@ -30,7 +30,7 @@ project.ext.guava_version = '30.1.1-jre'
 project.ext.args4j_version = '2.33'
 project.ext.junit_version = '5.4.0'
 project.ext.errorprone_version = '2.9.0'
-project.ext.auto64to32_version = '2.2-SNAPSHOT'
+project.ext.auto64to32_version = '3.1-SNAPSHOT'
 
 // Which native platforms are supported can be specified in the command line.  Otherwise
 // the default is to support all of them

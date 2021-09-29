@@ -19,7 +19,6 @@
 package boofcv.regression;
 
 import boofcv.BoofVersion;
-import com.peterabeles.LibrarySourceInfo;
 import com.peterabeles.ProjectUtils;
 import com.peterabeles.regression.RuntimeRegressionMasterApp;
 
@@ -30,14 +29,11 @@ public class BoofCVRuntimeRegressionApp {
 		// Set up the environment
 		ProjectUtils.checkRoot = ( f ) ->
 				new File(f, "README.md").exists() && new File(f, "settings.gradle").exists();
-		ProjectUtils.sourceInfo = () -> {
-			var info = new LibrarySourceInfo();
-			info.version = BoofVersion.VERSION;
-			info.gitDate = BoofVersion.GIT_DATE;
-			info.gitSha = BoofVersion.GIT_SHA;
-			info.projectName = "BoofCV";
-			return info;
-		};
+
+		ProjectUtils.libraryInfo.version = BoofVersion.VERSION;
+		ProjectUtils.libraryInfo.gitDate = BoofVersion.GIT_DATE;
+		ProjectUtils.libraryInfo.gitSha = BoofVersion.GIT_SHA;
+		ProjectUtils.libraryInfo.projectName = "BoofCV";
 
 		// Specify which packages it should skip over
 		String[] excluded = new String[]{"autocode", "checks", "boofcv-types", "boofcv-core"};
