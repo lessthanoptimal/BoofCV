@@ -241,7 +241,7 @@ public class CameraKannalaBrandt extends CameraPinhole {
 	@Override
 	public String toString() {
 		FancyPrint fp = new FancyPrint();
-		String txt = "CameraPinholeRadial{" +
+		String txt = "CameraKannalaBrandt{" +
 				"fx=" + fx +
 				", fy=" + fy +
 				", skew=" + skew +

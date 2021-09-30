@@ -73,6 +73,7 @@ import boofcv.demonstrations.transform.pyramid.VisualizeScaleSpacePyramidApp;
 import boofcv.demonstrations.transform.wavelet.WaveletVisualizeApp;
 import boofcv.gui.ApplicationLauncherApp;
 
+import javax.swing.*;
 import javax.swing.tree.DefaultMutableTreeNode;
 
 /**
@@ -198,7 +199,6 @@ public class DemonstrationLauncherApp extends ApplicationLauncherApp {
 	}
 
 	public static void main(String[] args) {
-		final DemonstrationLauncherApp app = new DemonstrationLauncherApp();
-		app.showWindow("Demonstration Launcher");
+		SwingUtilities.invokeLater(()-> new DemonstrationLauncherApp().showWindow("Demonstration Launcher"));
 	}
 }

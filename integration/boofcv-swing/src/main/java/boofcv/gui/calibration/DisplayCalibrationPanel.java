@@ -83,6 +83,8 @@ public abstract class DisplayCalibrationPanel extends ImageZoomPanel {
 	// Called after setScale has been called
 	public SetScale setScale = ( s ) -> {};
 
+	final Color lightRed = new Color(255, 150, 150);
+
 	protected DisplayCalibrationPanel() {
 		panel.addMouseWheelListener(e -> setScale(BoofSwingUtil.mouseWheelImageZoom(scale, e)));
 
@@ -208,16 +210,16 @@ public abstract class DisplayCalibrationPanel extends ImageZoomPanel {
 
 		if (showPoints) {
 			g2.setColor(Color.BLACK);
-			g2.setStroke(new BasicStroke(3));
+			g2.setStroke(new BasicStroke(5));
 			for (PointIndex2D_F64 p : set.points) {
 				pixelTransform.compute((float)p.p.x, (float)p.p.y, adj);
-				VisualizeFeatures.drawCross(g2, adj.x*scale, adj.y*scale, 4);
+				VisualizeFeatures.drawCross(g2, adj.x*scale, adj.y*scale, 5);
 			}
-			g2.setStroke(new BasicStroke(1));
-			g2.setColor(Color.RED);
+			g2.setStroke(new BasicStroke(2));
+			g2.setColor(lightRed);
 			for (PointIndex2D_F64 p : set.points) {
 				pixelTransform.compute((float)p.p.x, (float)p.p.y, adj);
-				VisualizeFeatures.drawCross(g2, adj.x*scale, adj.y*scale, 4);
+				VisualizeFeatures.drawCross(g2, adj.x*scale, adj.y*scale, 5);
 			}
 		}
 

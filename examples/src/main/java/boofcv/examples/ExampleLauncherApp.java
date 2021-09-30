@@ -23,6 +23,7 @@ import boofcv.gui.ApplicationLauncherApp;
 import org.reflections.Reflections;
 import org.reflections.scanners.SubTypesScanner;
 
+import javax.swing.*;
 import javax.swing.tree.DefaultMutableTreeNode;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -42,7 +43,7 @@ public class ExampleLauncherApp extends ApplicationLauncherApp {
 	}
 
 	@Override
-	protected void createTree(DefaultMutableTreeNode root) {
+	protected void createTree( DefaultMutableTreeNode root ) {
 		List<String> packages = new ArrayList<>();
 		packages.add("boofcv.examples.calibration");
 		packages.add("boofcv.examples.enhance");
@@ -58,47 +59,45 @@ public class ExampleLauncherApp extends ApplicationLauncherApp {
 		packages.add("boofcv.examples.tracking");
 
 		// Reflections is a weird package that does not behave the way one would expect. Several hacks below
-		for( String p : packages ) {
-			Reflections reflections = new Reflections(p,
-					new SubTypesScanner(false));
+		for (String p : packages) {
+			Reflections reflections = new Reflections(p, new SubTypesScanner(false));
 
 			List<String> listTypes = new ArrayList<>();
 
 			listTypes.addAll(reflections.getAllTypes());
-			addAll((Set)reflections.getSubTypesOf(LearnSceneFromFiles.class),listTypes);
+			addAll((Set)reflections.getSubTypesOf(LearnSceneFromFiles.class), listTypes);
 
 			String name = p.split("\\.")[2];
 
 			Collections.sort(listTypes);
 
-			List<Class> classes = new ArrayList<>();
-			String classNames[] = listTypes.toArray(new String[1]);
-			for( int i = 0; i < classNames.length; i++ ) {
-				if( !classNames[i].contains("Example"))
+			List<Class<?>> classes = new ArrayList<>();
+			String[] classNames = listTypes.toArray(new String[1]);
+			for (int i = 0; i < classNames.length; i++) {
+				if (!classNames[i].contains("Example"))
 					continue;
 				// no idea why this is needed
-				if( classNames[i].contains("$"))
+				if (classNames[i].contains("$"))
 					continue;
 
 				try {
-					classes.add( Class.forName(classNames[i]));
+					classes.add(Class.forName(classNames[i]));
 				} catch (ClassNotFoundException e) {
 					throw new RuntimeException(e);
 				}
 			}
 
-			createNodes(root,name,classes.toArray(new Class[0]));
+			createNodes(root, name, classes.toArray(new Class[0]));
 		}
 	}
 
-	private static void addAll( Set<Class> classes , List<String> output ) {
-		for( Class c : classes ) {
-			output.add( c.getName() );
+	private static void addAll( Set<Class<?>> classes, List<String> output ) {
+		for (Class<?> c : classes) {
+			output.add(c.getName());
 		}
 	}
 
-	public static void main(String[] args) {
-		ExampleLauncherApp app = new ExampleLauncherApp();
-		app.showWindow("Example Launcher");
+	public static void main( String[] args ) {
+		SwingUtilities.invokeLater(() -> new ExampleLauncherApp().showWindow("Example Launcher"));
 	}
 }

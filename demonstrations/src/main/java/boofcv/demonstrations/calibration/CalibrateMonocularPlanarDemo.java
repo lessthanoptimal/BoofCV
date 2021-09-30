@@ -18,11 +18,11 @@
 
 package boofcv.demonstrations.calibration;
 
+import boofcv.gui.image.ShowImages;
 import boofcv.io.PathLabel;
 import boofcv.io.UtilIO;
 
 import javax.swing.*;
-import java.awt.*;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
@@ -46,14 +46,7 @@ public class CalibrateMonocularPlanarDemo {
 			var app = new CalibrateMonocularPlanarApp();
 			app.addExamples(examples);
 
-			var frame = new JFrame("Monocular Planar Calibration");
-			frame.add(app, BorderLayout.CENTER);
-			frame.pack();
-			frame.setLocationByPlatform(true);
-			frame.setVisible(true);
-			frame.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
-
-			app.window = frame;
+			app.window = ShowImages.showWindow(app, "Monocular Planar Calibration", true);
 			app.window.setJMenuBar(app.menuBar);
 
 			new Thread(() -> app.processDirectory(new File(examples.get(0).path[0]))).start();

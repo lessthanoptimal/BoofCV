@@ -21,6 +21,7 @@ package boofcv.gui;
 import boofcv.BoofVersion;
 import boofcv.gui.image.ShowImages;
 import boofcv.io.UtilIO;
+import boofcv.misc.BoofMiscOps;
 import org.fife.ui.rsyntaxtextarea.RSyntaxTextArea;
 import org.fife.ui.rsyntaxtextarea.SyntaxConstants;
 
@@ -30,6 +31,7 @@ import javax.swing.event.DocumentListener;
 import javax.swing.event.ListDataEvent;
 import javax.swing.event.ListDataListener;
 import javax.swing.tree.DefaultMutableTreeNode;
+import javax.swing.tree.TreeNode;
 import javax.swing.tree.TreePath;
 import javax.swing.tree.TreeSelectionModel;
 import java.awt.*;
@@ -49,23 +51,20 @@ import java.util.*;
  *
  * @author Peter Abeles
  */
-@SuppressWarnings({"JdkObsolete"})
+@SuppressWarnings("ForLoopReplaceableByForEach")
 public abstract class ApplicationLauncherApp extends JPanel implements ActionListener, ListDataListener {
-
-	private JTree tree;
+	private final JTree tree;
 
 	JButton bKill = new JButton("Kill");
 	JCheckBox checkRemoveOnDeath = new JCheckBox("Auto Remove");
 	JButton bKillAll = new JButton("Kill All");
 
-	JList processList;
+	JList<ActiveProcess> processList;
 	DefaultListModel<ActiveProcess> listModel = new DefaultListModel<>();
 	JTabbedPane outputPanel = new JTabbedPane();
 
-	int memoryMB = 1024;
+	protected int memoryMB = -1;
 	final List<ActiveProcess> processes = new ArrayList<>();
-
-	boolean defaultRemoveTabOnDeath;
 
 	protected ApplicationLauncherApp( boolean defaultRemoveTabOnDeath ) {
 		setLayout(new BorderLayout());
@@ -81,8 +80,7 @@ public abstract class ApplicationLauncherApp extends JPanel implements ActionLis
 		final JTextField searchBox = new JTextField();
 		searchBox.setToolTipText("Search");
 		searchBox.getDocument().addDocumentListener(new DocumentListener() {
-			@Override
-			public void insertUpdate( DocumentEvent e ) {
+			@Override public void insertUpdate( DocumentEvent e ) {
 				String text = searchBox.getText();
 				DefaultMutableTreeNode selection = (DefaultMutableTreeNode)tree.getModel().getRoot();
 
@@ -95,8 +93,7 @@ public abstract class ApplicationLauncherApp extends JPanel implements ActionLis
 				}
 			}
 
-			@Override
-			public void removeUpdate( DocumentEvent e ) {
+			@Override public void removeUpdate( DocumentEvent e ) {
 				String text = searchBox.getText();
 				DefaultMutableTreeNode selection = (DefaultMutableTreeNode)tree.getModel().getRoot();
 				TreePath path = searchTree(text, selection, true);
@@ -108,11 +105,11 @@ public abstract class ApplicationLauncherApp extends JPanel implements ActionLis
 				}
 			}
 
-			@Override
-			public void changedUpdate( DocumentEvent e ) {
-
-			}
+			@Override public void changedUpdate( DocumentEvent e ) {}
 		});
+		// Prevent the vertical size from getting too tall and look silly
+		searchBox.setMaximumSize(new Dimension(1000, 50));
+
 		KeyStroke down = KeyStroke.getKeyStroke(KeyEvent.VK_DOWN, 0, true);
 		KeyStroke up = KeyStroke.getKeyStroke(KeyEvent.VK_UP, 0, true);
 		Action nextSearch = new AbstractAction() {
@@ -205,7 +202,7 @@ public abstract class ApplicationLauncherApp extends JPanel implements ActionLis
 		bKill.addActionListener(this);
 		bKillAll.addActionListener(this);
 
-		processList = new JList(listModel);
+		processList = new JList<>(listModel);
 		processList.setSelectionMode(ListSelectionModel.SINGLE_INTERVAL_SELECTION);
 		processList.setLayoutOrientation(JList.VERTICAL);
 		processList.setVisibleRowCount(-1);
@@ -250,7 +247,7 @@ public abstract class ApplicationLauncherApp extends JPanel implements ActionLis
 
 	protected abstract void createTree( DefaultMutableTreeNode root );
 
-	protected void createNodes( DefaultMutableTreeNode root, String subjectName, Class... apps ) {
+	protected void createNodes( DefaultMutableTreeNode root, String subjectName, Class<?>... apps ) {
 		DefaultMutableTreeNode top = new DefaultMutableTreeNode(subjectName);
 		for (int i = 0; i < apps.length; i++) {
 			DefaultMutableTreeNode node = new DefaultMutableTreeNode(new AppInfo(apps[i]));
@@ -265,11 +262,11 @@ public abstract class ApplicationLauncherApp extends JPanel implements ActionLis
 
 		List<String> classPath = Arrays.asList(arrayPath);
 
-		final ActiveProcess process = new ActiveProcess();
+		final var process = new ActiveProcess();
 		process.info = info;
 		process.launcher = new JavaRuntimeLauncher(classPath);
 		process.launcher.setFrozenTime(-1);
-		process.launcher.setMemoryInMB(-1);
+		process.launcher.setMemoryInMB(memoryMB);
 		// Having a fixed amount of memory caused problems with memory hungry apps
 
 		synchronized (processes) {
@@ -284,28 +281,22 @@ public abstract class ApplicationLauncherApp extends JPanel implements ActionLis
 		process.start();
 	}
 
+	@SuppressWarnings("JdkObsolete")
 	private TreePath searchTree( String text, DefaultMutableTreeNode node, boolean forward ) {
-		Enumeration e = ((DefaultMutableTreeNode)this.tree.getModel().getRoot()).breadthFirstEnumeration();
+		Enumeration<TreeNode> e = ((DefaultMutableTreeNode)this.tree.getModel().getRoot()).breadthFirstEnumeration();
 		if (!forward) {
-			final Stack tmp = new Stack();
+			final var tmp = new ArrayDeque<TreeNode>();
 			while (e.hasMoreElements())
 				tmp.push(e.nextElement());
 
-			e = new Enumeration() {
-				@Override
-				public boolean hasMoreElements() {
-					return !tmp.isEmpty();
-				}
-
-				@Override
-				public Object nextElement() {
-					return tmp.pop();
-				}
+			e = new Enumeration<>() {
+				@Override public boolean hasMoreElements() {return !tmp.isEmpty();}
+				@Override public TreeNode nextElement() {return tmp.pop();}
 			};
 		}
 
 		while (e.hasMoreElements()) {
-			DefaultMutableTreeNode n = (DefaultMutableTreeNode)e.nextElement();
+			var n = (DefaultMutableTreeNode)e.nextElement();
 			if (n.equals(node)) {
 				while (e.hasMoreElements()) {
 					DefaultMutableTreeNode candidate = (DefaultMutableTreeNode)e.nextElement();
@@ -327,7 +318,7 @@ public abstract class ApplicationLauncherApp extends JPanel implements ActionLis
 			return;
 		if (!node.isLeaf())
 			return;
-		AppInfo info = (AppInfo)node.getUserObject();
+		var info = (AppInfo)node.getUserObject();
 		launch(info);
 		System.out.println("clicked " + info);
 	}
@@ -339,7 +330,7 @@ public abstract class ApplicationLauncherApp extends JPanel implements ActionLis
 	private void handleContextMenu( JTree tree, int x, int y ) {
 		TreePath path = tree.getPathForLocation(x, y);
 		tree.setSelectionPath(path);
-		DefaultMutableTreeNode node = (DefaultMutableTreeNode)tree.getLastSelectedPathComponent();
+		var node = (DefaultMutableTreeNode)tree.getLastSelectedPathComponent();
 
 		if (node == null)
 			return;
@@ -349,23 +340,23 @@ public abstract class ApplicationLauncherApp extends JPanel implements ActionLis
 		}
 		final AppInfo info = (AppInfo)node.getUserObject();
 
-		JMenuItem copyname = new JMenuItem("Copy Name");
+		var copyname = new JMenuItem("Copy Name");
 		copyname.addActionListener(e -> {
 			Clipboard clipboard = Toolkit.getDefaultToolkit().getSystemClipboard();
 			clipboard.setContents(new StringSelection(info.app.getSimpleName()), null);
 		});
 
-		JMenuItem copypath = new JMenuItem("Copy Path");
+		var copypath = new JMenuItem("Copy Path");
 		copypath.addActionListener(e -> {
 			String path1 = UtilIO.getSourcePath(info.app.getPackage().getName(), info.app.getSimpleName());
 			Clipboard clipboard = Toolkit.getDefaultToolkit().getSystemClipboard();
 			clipboard.setContents(new StringSelection(path1), null);
 		});
 
-		JMenuItem github = new JMenuItem("Go to Github");
+		var github = new JMenuItem("Go to Github");
 		github.addActionListener(e -> openInGitHub(info));
 
-		JPopupMenu submenu = new JPopupMenu();
+		var submenu = new JPopupMenu();
 		submenu.add(copyname);
 		submenu.add(copypath);
 		submenu.add(github);
@@ -395,7 +386,7 @@ public abstract class ApplicationLauncherApp extends JPanel implements ActionLis
 	@Override
 	public void actionPerformed( ActionEvent e ) {
 		if (e.getSource() == bKill) {
-			ActiveProcess selected = (ActiveProcess)processList.getSelectedValue();
+			ActiveProcess selected = processList.getSelectedValue();
 			if (selected == null)
 				return;
 
@@ -417,14 +408,10 @@ public abstract class ApplicationLauncherApp extends JPanel implements ActionLis
 	 */
 	public void killAllProcesses( long blockTimeMS ) {
 		// remove already dead processes from the GUI
-		SwingUtilities.invokeLater(new Runnable() {
-			@Override
-			public void run() {
-				DefaultListModel model = (DefaultListModel)processList.getModel();
-				for (int i = model.size() - 1; i >= 0; i--) {
-					ActiveProcess p = (ActiveProcess)model.get(i);
-					removeProcessTab(p, false);
-				}
+		SwingUtilities.invokeLater(() -> {
+			DefaultListModel<ActiveProcess> model = (DefaultListModel<ActiveProcess>)processList.getModel();
+			for (int i = model.size() - 1; i >= 0; i--) {
+				removeProcessTab(model.get(i), false);
 			}
 		});
 
@@ -457,21 +444,16 @@ public abstract class ApplicationLauncherApp extends JPanel implements ActionLis
 	/**
 	 * Called after a new process is added to the process list
 	 */
-	@Override
-	public void intervalAdded( ListDataEvent e ) {
+	@Override public void intervalAdded( ListDataEvent e ) {
 		//retrieve the most recently added process and display it
 		DefaultListModel listModel = (DefaultListModel)e.getSource();
 		ActiveProcess process = (ActiveProcess)listModel.get(listModel.getSize() - 1);
 		addProcessTab(process, outputPanel);
 	}
 
-	@Override
-	public void intervalRemoved( ListDataEvent e ) {
-	}
+	@Override public void intervalRemoved( ListDataEvent e ) {}
 
-	@Override
-	public void contentsChanged( ListDataEvent e ) {
-	}
+	@Override public void contentsChanged( ListDataEvent e ) {}
 
 	private void displaySource( final JTextArea sourceTextArea, ActiveProcess process ) {
 		if (sourceTextArea == null)
@@ -507,9 +489,9 @@ public abstract class ApplicationLauncherApp extends JPanel implements ActionLis
 	private void addProcessTab( final ActiveProcess process, JTabbedPane pane ) {
 		String title = process.info.app.getSimpleName();
 
-		final ProcessTabPanel component = new ProcessTabPanel(process.getId());
+		final var component = new ProcessTabPanel(process.getId());
 
-		final RSyntaxTextArea sourceTextArea = new RSyntaxTextArea();
+		final var sourceTextArea = new RSyntaxTextArea();
 		sourceTextArea.setSyntaxEditingStyle(SyntaxConstants.SYNTAX_STYLE_JAVA);
 		sourceTextArea.setFont(new Font("monospaced", Font.PLAIN, 12));
 		sourceTextArea.setCodeFoldingEnabled(true);
@@ -517,45 +499,32 @@ public abstract class ApplicationLauncherApp extends JPanel implements ActionLis
 		sourceTextArea.setLineWrap(true);
 		sourceTextArea.setWrapStyleWord(true);
 
-		final JTextArea outputTextArea = new JTextArea();
+		final var outputTextArea = new JTextArea();
 		outputTextArea.setFont(new Font("monospaced", Font.PLAIN, 12));
 		outputTextArea.setEditable(false);
 		outputTextArea.setLineWrap(true);
 		outputTextArea.setWrapStyleWord(true);
 
-		final JScrollPane container = new JScrollPane();
+		final var container = new JScrollPane();
 		container.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_ALWAYS);
 
-		component.bOpenInGitHub.addActionListener(new ActionListener() {
-			@Override
-			public void actionPerformed( ActionEvent e ) {
-				openInGitHub(process.info);
-			}
-		});
-		component.options.addActionListener(new ActionListener() {
-			@Override
-			public void actionPerformed( ActionEvent e ) {
-				JComboBox source = (JComboBox)e.getSource();
-				if (source.getSelectedIndex() == 0) {
+		component.bOpenInGitHub.addActionListener(e -> openInGitHub(process.info));
+		component.options.addActionListener(e -> {
+			if (component.options.getSelectedIndex() == 0) {
+				container.getViewport().removeAll();
+				container.getViewport().add(sourceTextArea);
+				displaySource(sourceTextArea, process);
 
-					container.getViewport().removeAll();
-					container.getViewport().add(sourceTextArea);
-					displaySource(sourceTextArea, process);
-
-					// after the GUI has figured out the shape of everything move scroll to the start of the
-					// source code and skip over the preamble stuff
-					SwingUtilities.invokeLater(new Runnable() {
-						@Override
-						public void run() {
-							String code = sourceTextArea.getText();
-							int scrollTo = UtilIO.indexOfSourceStart(code);
-							sourceTextArea.setCaretPosition(scrollTo);
-						}
-					});
-				} else if (source.getSelectedIndex() == 1) {
-					container.getViewport().removeAll();
-					container.getViewport().add(outputTextArea);
-				}
+				// after the GUI has figured out the shape of everything move scroll to the start of the
+				// source code and skip over the preamble stuff
+				SwingUtilities.invokeLater(() -> {
+					String code = sourceTextArea.getText();
+					int scrollTo = UtilIO.indexOfSourceStart(code);
+					sourceTextArea.setCaretPosition(scrollTo);
+				});
+			} else if (component.options.getSelectedIndex() == 1) {
+				container.getViewport().removeAll();
+				container.getViewport().add(outputTextArea);
 			}
 		});
 
@@ -574,38 +543,27 @@ public abstract class ApplicationLauncherApp extends JPanel implements ActionLis
 	}
 
 	static class TextOutputStream extends OutputStream {
-		private JTextArea textArea;
-		private boolean mirror;
+		private final JTextArea textArea;
+		private final boolean mirror;
 
 		public TextOutputStream( JTextArea textArea, boolean mirror ) {
 			this.textArea = textArea;
 			this.mirror = mirror;
 		}
 
-		@Override
-		public void write( final int b ) throws IOException {
+		@Override public void write( final int b ) throws IOException {
 			if (mirror)
 				System.out.write(b);
-			SwingUtilities.invokeLater(new Runnable() {
-				@Override
-				public void run() {
-					textArea.append(String.valueOf((char)b));
-				}
-			});
+			SwingUtilities.invokeLater(() -> textArea.append(String.valueOf((char)b)));
 		}
 	}
 
 	public static class AppInfo {
-		Class app;
+		Class<?> app;
 
-		public AppInfo( Class app ) {
-			this.app = app;
-		}
+		public AppInfo( Class<?> app ) {this.app = app;}
 
-		@Override
-		public String toString() {
-			return app.getSimpleName();
-		}
+		@Override public String toString() {return app.getSimpleName();}
 	}
 
 	public static class ActiveProcess extends Thread {
@@ -615,8 +573,7 @@ public abstract class ApplicationLauncherApp extends JPanel implements ActionLis
 		volatile boolean active = false;
 		JavaRuntimeLauncher.Exit exit;
 
-		@Override
-		public void run() {
+		@Override public void run() {
 			active = true;
 			exit = launcher.launch(info.app);
 			launcher.getPrintOut().println("\n\n~~~~~~~~~ Finished ~~~~~~~~~");
@@ -633,8 +590,7 @@ public abstract class ApplicationLauncherApp extends JPanel implements ActionLis
 			return active;
 		}
 
-		@Override
-		public String toString() {
+		@Override public String toString() {
 			if (launcher.isKillRequested() && active) {
 				return "Killing " + info;
 			} else {
@@ -644,29 +600,19 @@ public abstract class ApplicationLauncherApp extends JPanel implements ActionLis
 	}
 
 	class ProcessStatusThread extends Thread {
-		@Override
-		public void run() {
+		@Override public void run() {
 			while (true) {
 				synchronized (processes) {
 					for (int i = processes.size() - 1; i >= 0; i--) {
 						final ActiveProcess p = processes.get(i);
 
 						if (!p.isActive()) {
-							SwingUtilities.invokeLater(new Runnable() {
-								@Override
-								public void run() {
-									removeProcessTab(p, true);
-								}
-							});
+							SwingUtilities.invokeLater(() -> removeProcessTab(p, true));
 							processes.remove(i);
 						}
 					}
 				}
-				try {
-					sleep(250);
-				} catch (InterruptedException e) {
-					break;
-				}
+				BoofMiscOps.sleep(250);
 			}
 		}
 	}

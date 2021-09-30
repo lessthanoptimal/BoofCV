@@ -23,8 +23,6 @@ import boofcv.gui.StandardAlgConfigPanel;
 import boofcv.struct.calib.CameraModelType;
 
 import javax.swing.*;
-import javax.swing.event.ChangeEvent;
-import javax.swing.event.ChangeListener;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -41,16 +39,12 @@ public class CalibrationModelPanel extends StandardAlgConfigPanel implements Act
 
 	public CameraModelType selected = CameraModelType.BROWN;
 
-	public int universalRadial = 2;
-	public boolean universalTangential = true;
-	public boolean universalSkew = true;
-
 	public final ControlPanelPinhole pinhole = new ControlPanelPinhole(this::updateParameters);
-	public final UniversalPanel universal = new UniversalPanel();
+	public final UniversalPanel universal = new UniversalPanel(this::updateParameters);
 	public final KannalaBrandtPanel kannalaBrandt = new KannalaBrandtPanel();
 
 	// Used to find out when settings have been changed
-	public Listener listener = ()->{};
+	public Listener listener = () -> {};
 
 	public CalibrationModelPanel() {
 		setBorder(BorderFactory.createEmptyBorder());
@@ -70,32 +64,33 @@ public class CalibrationModelPanel extends StandardAlgConfigPanel implements Act
 		addAlignCenter(panelTarget);
 	}
 
-	public void setToBrown(boolean skew, int numRadial, boolean tangential ) {
+	public void setToBrown( boolean skew, int numRadial, boolean tangential ) {
 		comboType.setSelectedIndex(CameraModelType.BROWN.ordinal());
 		pinhole.skew.check.setSelected(skew);
 		pinhole.numRadial.spinner.setValue(numRadial);
 		pinhole.tangential.check.setSelected(tangential);
 	}
 
-	public void setToUniversal(boolean skew, int numRadial, boolean tangential ) {
+	public void setToUniversal( boolean skew, int numRadial, boolean tangential ) {
 		comboType.setSelectedIndex(CameraModelType.UNIVERSAL.ordinal());
-		universal.skew.setSelected(skew);
-		universal.numRadial.setValue(numRadial);
-		universal.tangential.setSelected(tangential);
+		universal.skew.check.setSelected(skew);
+		universal.numRadial.spinner.setValue(numRadial);
+		universal.tangential.check.setSelected(tangential);
 	}
 
-	public void setToKannalaBrandt(boolean skew, int numSymmetric, int numAsymmetric ) {
+	public void setToKannalaBrandt( boolean skew, int numSymmetric, int numAsymmetric ) {
 		comboType.setSelectedIndex(CameraModelType.KANNALA_BRANDT.ordinal());
 		kannalaBrandt.skew.check.setSelected(skew);
 		kannalaBrandt.numSymmetric.spinner.setValue(numSymmetric);
 		kannalaBrandt.numAsymmetric.spinner.setValue(numAsymmetric);
 	}
 
-	public void configureCalibrator(CalibrateMonoPlanar calibrator) {
+	public void configureCalibrator( CalibrateMonoPlanar calibrator ) {
 		switch (selected) {
 			case BROWN -> calibrator.configurePinhole(
 					pinhole.skew.value, pinhole.numRadial.value.intValue(), pinhole.tangential.value);
-			case UNIVERSAL -> calibrator.configureUniversalOmni(universalSkew, universalRadial, universalTangential);
+			case UNIVERSAL -> calibrator.configureUniversalOmni(
+					universal.skew.value, universal.numRadial.value.intValue(), universal.tangential.value);
 			case KANNALA_BRANDT -> calibrator.configureKannalaBrandt(kannalaBrandt.skew.value,
 					kannalaBrandt.numSymmetric.vint(), kannalaBrandt.numAsymmetric.vint());
 		}
@@ -129,48 +124,35 @@ public class CalibrationModelPanel extends StandardAlgConfigPanel implements Act
 		panelTarget.repaint();
 	}
 
-	private class UniversalPanel extends StandardAlgConfigPanel
-			implements ChangeListener, ActionListener {
+	private class UniversalPanel extends StandardAlgConfigPanel {
+		public final JSpinnerNumber numRadial = spinnerWrap(2, 0, 10, 1).tt("Number of radial distortion terms");
+		public final JCheckBoxValue tangential = checkboxWrap("Tangential", false).tt("Include tangential distortion");
+		public final JCheckBoxValue skew = checkboxWrap("Zero Skew", true).tt("Include skew in camera model. Rarely needed.");
 
-		JSpinner numRadial;
-		JCheckBox tangential;
-		JCheckBox skew;
+		// called after a parameter changes value
+		public Runnable parametersUpdated = () -> {};
 
 		public UniversalPanel() {
 			setBorder(BorderFactory.createEmptyBorder());
-
-			numRadial = spinner(universalRadial, 0, 5, 1);
-			tangential = checkbox("Tangential", universalTangential);
-			skew = checkbox("Zero Skew", universalSkew);
-
-			addLabeled(numRadial, "Radial");
-			addAlignLeft(tangential);
-			addAlignLeft(skew);
+			addLabeled(numRadial.spinner, "Radial");
+			addAlignLeft(tangential.check);
+			addAlignLeft(skew.check);
 		}
 
-		@Override
-		public void stateChanged( ChangeEvent e ) {
-			if (e.getSource() == numRadial) {
-				universalRadial = ((Number)numRadial.getValue()).intValue();
-			}
-			updateParameters();
+		public UniversalPanel( Runnable parametersUpdated ) {
+			this();
+			this.parametersUpdated = parametersUpdated;
 		}
 
-		@Override
-		public void actionPerformed( ActionEvent e ) {
-			if (e.getSource() == tangential) {
-				universalTangential = tangential.isSelected();
-			} else if (e.getSource() == skew) {
-				universalSkew = skew.isSelected();
-			}
-			updateParameters();
+		@Override public void controlChanged( Object source ) {
+			parametersUpdated.run();
 		}
 	}
 
 	public class KannalaBrandtPanel extends StandardAlgConfigPanel {
-		public final JSpinnerNumber numSymmetric = spinnerWrap(5, 0, 10, 1);
-		public final JSpinnerNumber numAsymmetric = spinnerWrap(0, 0, 10, 1);
-		public final JCheckBoxValue skew = checkboxWrap("Zero Skew", universalSkew);
+		public final JSpinnerNumber numSymmetric = spinnerWrap(5, 0, 10, 1).tt("Number of symmetric terms");
+		public final JSpinnerNumber numAsymmetric = spinnerWrap(0, 0, 10, 1).tt("Number of asymmetric terms. Typically not used.");
+		public final JCheckBoxValue skew = checkboxWrap("Zero Skew", true).tt("Include skew in camera model. Rarely needed.");
 
 		public KannalaBrandtPanel() {
 			setBorder(BorderFactory.createEmptyBorder());

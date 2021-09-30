@@ -28,10 +28,9 @@ import javax.swing.*;
  * @author Peter Abeles
  */
 public class ControlPanelPinhole extends StandardAlgConfigPanel {
-
-	public final JSpinnerNumber numRadial = spinnerWrap(2, 0, 5, 1);
-	public final JCheckBoxValue tangential = checkboxWrap("Tangential", false);
-	public final JCheckBoxValue skew = checkboxWrap("Zero Skew", true);
+	public final JSpinnerNumber numRadial = spinnerWrap(2, 0, 10, 1).tt("Number of radial distortion terms");
+	public final JCheckBoxValue tangential = checkboxWrap("Tangential", false).tt("Include tangential distortion");
+	public final JCheckBoxValue skew = checkboxWrap("Zero Skew", true).tt("Include skew in camera model. Rarely needed.");
 
 	// called after a parameter changes value
 	public Runnable parametersUpdated = ()->{};

@@ -639,7 +639,10 @@ public class CalibrateStereoPlanarApp extends JPanel {
 			}
 
 			String _text = text;
-			SwingUtilities.invokeLater(() -> configurePanel.textAreaStats.setText(_text));
+			SwingUtilities.invokeLater(() -> {
+				configurePanel.textAreaStats.setText(_text);
+				configurePanel.textAreaStats.setCaretPosition(0); // show the top where summary stats are
+			});
 		} finally {
 			algorithms.unlock();
 			results.unlock();
