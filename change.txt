@@ -3,7 +3,7 @@ Change Log
 Date Format: year/month/day
 
 ---------------------------------------------
-Date    : 2021
+Date    : 2021/Oct/9
 Version : 0.39
 
 - Build
@@ -33,12 +33,6 @@ Version : 0.39
   * Now supports concurrent model matching
 - Demonstrations
   * Improved stereo and mono calibration applications
-
-TODO Added calibration targets Hamming Marker grid and chessboard, e.g. ChaRuCo and ArUco grids.
-TODO datta2009
-TODO Monocular VO
-TODO Monocular SLAM
-TODO Stereo SLAM
 
 ---------------------------------------------
 Date    : 2021/Jul/12

@@ -1,3 +1,9 @@
+TODO Added calibration targets Hamming Marker grid and chessboard, e.g. ChaRuCo and ArUco grids.
+TODO datta2009
+TODO Monocular VO
+TODO Monocular SLAM
+TODO Stereo SLAM
+
 TODO DB
     - Check all views when merging scenes for consistency
     - Root cause why it diverges if you consider too many images

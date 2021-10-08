@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -48,13 +48,13 @@ import java.io.File;
  * such that they are parallel to each other, facilitating stereo processing.
  *
  * The example code does the following:
- * <lo>
+ * <ol>
  *     <li>Load stereo extrinsic and intrinsic parameters from a file along with a pair of images.</li>
  *     <li>Undistort and rectify images. This provides one rectification matrix for each image along with a new
  *         camera calibration matrix.</li>
  *     <li>The original rectification does not try to maximize view area, however it can be adjusted.</li>
  *     <li>After rectification is finished the results are displayed.</li>
- * </lo>
+ * </ol>
  *
  * Note that the y-axis in left and right images align after rectification. You can click in the images to draw a line
  * that makes this easy to see. The curved image birder is an artifact of lens distortion being removed.

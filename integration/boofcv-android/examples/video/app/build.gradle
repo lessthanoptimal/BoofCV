@@ -40,7 +40,7 @@ configurations {
 
 dependencies {
     ['boofcv-android', 'boofcv-core'].each {
-        String a -> api group: 'org.boofcv', name: a, version: '0.38' }
+        String a -> api group: 'org.boofcv', name: a, version: '0.39' }
 
     annotationProcessor 'org.projectlombok:lombok:1.18.16'
 
