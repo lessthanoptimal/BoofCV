@@ -164,7 +164,7 @@ public class UtilImageIO {
 	}
 
 	public static <T extends ImageBase<T>> T loadImage( File image, boolean orderRgb, ImageType<T> imageType ) {
-		BufferedImage img = loadImage(image.getAbsolutePath());
+		BufferedImage img = loadImage(image.getPath());
 		if( img == null )
 			return null;
 
