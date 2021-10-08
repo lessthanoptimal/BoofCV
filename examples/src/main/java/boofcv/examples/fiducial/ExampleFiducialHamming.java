@@ -117,6 +117,6 @@ public class ExampleFiducialHamming {
 			}
 			gui.addImage(buffered, name, ScaleOptions.ALL);
 		}
-		ShowImages.showWindow(gui,"Example Fiducial Hamming", true);
+		ShowImages.showWindow(gui, "Example Fiducial Hamming", true);
 	}
 }

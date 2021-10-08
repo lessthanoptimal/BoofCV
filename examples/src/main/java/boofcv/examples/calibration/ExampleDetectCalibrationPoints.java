@@ -42,15 +42,13 @@ import java.awt.image.BufferedImage;
  * @author Peter Abeles
  */
 public class ExampleDetectCalibrationPoints {
-
 	public static void main( String[] args ) {
-
 		// load the test image
 //		String directory = UtilIO.pathExample("calibration/stereo/Bumblebee2_Square");
 		String directory = UtilIO.pathExample("calibration/stereo/Bumblebee2_Chess");
 
-		BufferedImage orig = UtilImageIO.loadImage(directory+"/left01.jpg");
-		GrayF32 input = ConvertBufferedImage.convertFrom(orig,(GrayF32)null);
+		BufferedImage orig = UtilImageIO.loadImage(directory + "/left01.jpg");
+		GrayF32 input = ConvertBufferedImage.convertFrom(orig, (GrayF32)null);
 
 		// To select different types of detectors add or remove comments below
 		DetectSingleFiducialCalibration detector;
@@ -60,7 +58,7 @@ public class ExampleDetectCalibrationPoints {
 		detector = FactoryFiducialCalibration.chessboardX(null, new ConfigGridDimen(7, 5, 30));
 
 		// process the image and check for failure condition
-		if( !detector.process(input) )
+		if (!detector.process(input))
 			throw new RuntimeException("Target detection failed!");
 
 		// Ordered observations of calibration points on the target
@@ -68,9 +66,9 @@ public class ExampleDetectCalibrationPoints {
 
 		// render and display the results
 		Graphics2D g2 = orig.createGraphics();
-		for( PointIndex2D_F64 p : set.points )
-			VisualizeFeatures.drawPoint(g2,p.p.x,p.p.y,3,Color.RED, true);
+		for (PointIndex2D_F64 p : set.points)
+			VisualizeFeatures.drawPoint(g2, p.p.x, p.p.y, 3, Color.RED, true);
 
-		ShowImages.showWindow(orig,"Calibration Points", true);
+		ShowImages.showWindow(orig, "Calibration Points", true);
 	}
 }

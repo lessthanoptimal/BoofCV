@@ -63,7 +63,7 @@ For Maven projects:
 <dependency>
   <groupId>org.boofcv</groupId>
   <artifactId>boofcv-core</artifactId>
-  <version>0.38</version>
+  <version>0.39</version>
 </dependency>
 ```
 

@@ -19,10 +19,6 @@
 package boofcv.demonstrations.shapes;
 
 import javax.swing.*;
-import javax.swing.event.ChangeEvent;
-import javax.swing.event.ChangeListener;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 
 import static boofcv.gui.BoofSwingUtil.MAX_ZOOM;
 import static boofcv.gui.BoofSwingUtil.MIN_ZOOM;
@@ -32,87 +28,62 @@ import static boofcv.gui.BoofSwingUtil.MIN_ZOOM;
  *
  * @author Peter Abeles
  */
-public class DetectBlackPolygonAppControlPanel extends DetectBlackShapePanel
-		implements ActionListener, ChangeListener
-{
+public class DetectBlackPolygonAppControlPanel extends DetectBlackShapePanel {
 	ShapeGuiListener owner;
 
 	// selects which image to view
-	JComboBox imageView;
-
-	JCheckBox showCorners;
-	JCheckBox showLines;
-	JCheckBox showContour;
-
-
-	DetectBlackPolygonControlPanel polygonPanel;
+	JComboBox<String> imageView = combo(0, "Input", "Binary", "Black");
 
 	boolean bShowCorners = true;
 	boolean bShowLines = true;
 	boolean bShowContour = false;
 
-	public DetectBlackPolygonAppControlPanel(ShapeGuiListener owner) {
+	JCheckBox showCorners = checkbox("Corners", bShowCorners);
+	JCheckBox showLines = checkbox("Lines", bShowLines);
+	JCheckBox showContour = checkbox("Contour", bShowContour);
+
+	DetectBlackPolygonControlPanel polygonPanel;
+
+	public DetectBlackPolygonAppControlPanel( ShapeGuiListener owner ) {
 		this.owner = owner;
 
-		imageView = new JComboBox();
-		imageView.addItem("Input");
-		imageView.addItem("Binary");
-		imageView.addItem("Black");
-		imageView.addActionListener(this);
-		imageView.setMaximumSize(imageView.getPreferredSize());
-
-		selectZoom = new JSpinner(new SpinnerNumberModel(1,MIN_ZOOM,MAX_ZOOM,1));
-		selectZoom.addChangeListener(this);
-		selectZoom.setMaximumSize(selectZoom.getPreferredSize());
-
-		showCorners = new JCheckBox("Corners");
-		showCorners.addActionListener(this);
-		showCorners.setSelected(bShowCorners);
-		showLines = new JCheckBox("Lines");
-		showLines.setSelected(bShowLines);
-		showLines.addActionListener(this);
-		showContour = new JCheckBox("Contour");
-		showContour.addActionListener(this);
-		showContour.setSelected(bShowContour);
-
+		selectZoom = spinner(1, MIN_ZOOM, MAX_ZOOM, 1);
 		polygonPanel = new DetectBlackPolygonControlPanel(owner);
 
 		JPanel visualsPanel = new JPanel();
-		visualsPanel.setLayout(new BoxLayout(visualsPanel,BoxLayout.X_AXIS));
+		visualsPanel.setLayout(new BoxLayout(visualsPanel, BoxLayout.X_AXIS));
 		visualsPanel.add(showCorners);
 		visualsPanel.add(showLines);
 		visualsPanel.add(showContour);
 
-		addLabeled(processingTimeLabel,"Time (ms)");
-		addLabeled(imageSizeLabel,"Size");
+		addLabeled(processingTimeLabel, "Time (ms)");
+		addLabeled(imageSizeLabel, "Size");
 		addLabeled(imageView, "View: ");
-		addLabeled(selectZoom,"Zoom");
+		addLabeled(selectZoom, "Zoom");
 		add(visualsPanel);
 		add(polygonPanel);
 		addVerticalGlue(this);
 	}
 
-	@Override
-	public void actionPerformed(ActionEvent e) {
-		if( e.getSource() == imageView ) {
+	@Override public void controlChanged( Object source ) {
+		if (source == imageView) {
 			selectedView = imageView.getSelectedIndex();
 			owner.viewUpdated();
-		} else if( e.getSource() == showCorners ) {
+			return;
+		} else if (source == showCorners) {
 			bShowCorners = showCorners.isSelected();
 			owner.viewUpdated();
-		} else if( e.getSource() == showLines ) {
+			return;
+		} else if (source == showLines) {
 			bShowLines = showLines.isSelected();
 			owner.viewUpdated();
-		} else if( e.getSource() == showContour ) {
+			return;
+		} else if (source == showContour) {
 			bShowContour = showContour.isSelected();
 			owner.viewUpdated();
-		}
-	}
-
-	@Override
-	public void stateChanged(ChangeEvent e) {
-		if( e.getSource() == selectZoom ) {
-			zoom = ((Number) selectZoom.getValue()).doubleValue();
+			return;
+		} else if (source == selectZoom) {
+			zoom = ((Number)selectZoom.getValue()).doubleValue();
 			owner.viewUpdated();
 			return;
 		}
