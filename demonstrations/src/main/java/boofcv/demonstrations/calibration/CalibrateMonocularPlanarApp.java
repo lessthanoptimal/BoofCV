@@ -183,7 +183,7 @@ public class CalibrateMonocularPlanarApp extends JPanel {
 
 		for (PathLabel p : examples) {
 			var menuItem = new JMenuItem(p.label);
-			menuItem.addActionListener((e)->processDirectory(new File(p.path[0])));
+			menuItem.addActionListener(( e ) -> processDirectory(new File(p.path[0])));
 			menuExamples.add(menuItem);
 		}
 
@@ -254,8 +254,7 @@ public class CalibrateMonocularPlanarApp extends JPanel {
 	/**
 	 * Saves a calibration target description to disk so that it can be loaded again later on.
 	 */
-	protected static void saveCalibrationTarget(
-			Component owner, File imageDirectory, ConfigCalibrationTarget target) {
+	protected static void saveCalibrationTarget( Component owner, File imageDirectory, ConfigCalibrationTarget target ) {
 		// Open a dialog which will save using the default name in the place images were recently loaded from
 		var chooser = new JFileChooser();
 		chooser.addChoosableFileFilter(new FileNameExtensionFilter("yaml", "yaml", "yml"));
@@ -362,15 +361,13 @@ public class CalibrateMonocularPlanarApp extends JPanel {
 	protected static boolean loadDefaultTarget( File directory, CalibrationTargetPanel panel ) {
 		// If the calibration target type is specified load that
 		var fileTarget = new File(directory, CALIBRATION_TARGET);
-		if (fileTarget.exists()) {
-			try {
-				ConfigCalibrationTarget config = UtilIO.loadConfig(fileTarget);
-				BoofSwingUtil.invokeNowOrLater(() -> panel.setConfigurationTo(config));
-				return true;
-			} catch (RuntimeException e) {
-				e.printStackTrace();
-			}
-		}
+		try {
+			// Just try to load it. Checking to see if it exists will fail inside a jar where it will always return
+			// false.
+			ConfigCalibrationTarget config = UtilIO.loadConfig(fileTarget);
+			BoofSwingUtil.invokeNowOrLater(() -> panel.setConfigurationTo(config));
+			return true;
+		} catch (RuntimeException ignore) {}
 		return false;
 	}
 

@@ -55,7 +55,7 @@ import static java.nio.charset.StandardCharsets.UTF_8;
  *
  * @author Peter Abeles
  */
-@SuppressWarnings({"JdkObsolete", "unchecked", "ConstantConditions"})
+@SuppressWarnings({"JdkObsolete", "unchecked", "ConstantConditions", "ForLoopReplaceableByForEach"})
 public class UtilIO {
 	public static final String UTF8 = "UTF-8";
 	public static final String IMAGE_REGEX = "(.*/)*.+\\.(png|jpg|gif|bmp|jpeg|PNG|JPG|GIF|BMP|JPEG)$";
@@ -76,7 +76,8 @@ public class UtilIO {
 	 * Saves a list of strings from a YAML file
 	 */
 	public static List<String> loadListStringYaml( File file ) {
-		try (var reader = new BufferedInputStream(new FileInputStream(file))) {
+		URL url = UtilIO.ensureURL(file.getPath());
+		try (var reader = new BufferedInputStream(url.openStream())) {
 			Yaml yaml = createYmlObject();
 			return yaml.load(reader);
 		} catch (IOException e) {
@@ -180,7 +181,9 @@ public class UtilIO {
 	 * Loads a BoofCV {@link Configuration} in a YAML format from the disk
 	 */
 	public static <T extends Configuration> T loadConfig( File file ) {
-		try (var stream = new FileInputStream(file)) {
+		URL url = UtilIO.ensureURL(file.getPath());
+
+		try (InputStream stream = url.openStream()) {
 			var output = new BufferedInputStream(stream);
 			return (T)SerializeConfigYaml.deserialize(new InputStreamReader(output, UTF_8));
 		} catch (IOException e) {
@@ -204,7 +207,7 @@ public class UtilIO {
 			if (pathToBase != null) {
 				File pathExample = new File(pathToBase, "data/example/");
 				if (pathExample.exists()) {
-					return new File(pathExample.getPath(), path).getAbsoluteFile().toURL();
+					return new File(pathExample.getPath(), path).getAbsoluteFile().toURI().toURL();
 				}
 			}
 
@@ -295,6 +298,7 @@ public class UtilIO {
 		if (url == null)
 			return null;
 		try {
+			//noinspection CharsetObjectCanBeUsed
 			return URLDecoder.decode(url.getPath(), UTF8);
 		} catch (UnsupportedEncodingException e) {
 			return null;
@@ -547,7 +551,8 @@ public class UtilIO {
 	}
 
 	public static <T> T load( String fileName ) {
-		try (FileInputStream fileIn = new FileInputStream(fileName)) {
+		URL url = UtilIO.ensureURL(fileName);
+		try (InputStream fileIn = url.openStream()) {
 			ObjectInputStream in = new ObjectInputStream(fileIn);
 			return (T)in.readObject();
 		} catch (IOException | ClassNotFoundException e) {
