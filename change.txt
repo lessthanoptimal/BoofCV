@@ -3,11 +3,23 @@ Change Log
 Date Format: year/month/day
 
 ---------------------------------------------
+Date    : 2021
+Version : 0.40
+
+TODO Generate Java 11 byte code
+TODO make sure library command isn't copying .class files!
+TODO Added calibration targets Hamming Marker grid and chessboard, e.g. ChArUco and ArUco grids.
+TODO Monocular VO
+TODO Monocular SLAM
+TODO Stereo SLAM
+
+---------------------------------------------
 Date    : 2021/Oct/8
 Version : 0.39
 
 - Build
   * Summary JavaDoc is now required
+  * Runtime regression from JMH files
 - Applications
   * Calibration target generator supports more targets
   * Add option to save landmarks locations on PDF document
