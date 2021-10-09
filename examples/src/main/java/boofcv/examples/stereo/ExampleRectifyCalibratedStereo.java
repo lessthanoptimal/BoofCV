@@ -103,14 +103,14 @@ public class ExampleRectifyCalibratedStereo {
 //		RectifyImageOps.allInsideLeft(param.left, rect1, rect2, rectK, null);
 
 		// undistorted and rectify images
-		FMatrixRMaj rect1_F32 = new FMatrixRMaj(3, 3); // TODO simplify code some how
-		FMatrixRMaj rect2_F32 = new FMatrixRMaj(3, 3);
+		var rect1_F32 = new FMatrixRMaj(3, 3); // TODO simplify code some how
+		var rect2_F32 = new FMatrixRMaj(3, 3);
 		ConvertMatrixData.convert(rect1, rect1_F32);
 		ConvertMatrixData.convert(rect2, rect2_F32);
 
-		ImageDistort rectifyImageLeft =
+		ImageDistort<Planar<GrayF32>, Planar<GrayF32>> rectifyImageLeft =
 				RectifyDistortImageOps.rectifyImage(param.getLeft(), rect1_F32, BorderType.SKIP, distLeft.getImageType());
-		ImageDistort rectifyImageRight =
+		ImageDistort<Planar<GrayF32>, Planar<GrayF32>> rectifyImageRight =
 				RectifyDistortImageOps.rectifyImage(param.getRight(), rect2_F32, BorderType.SKIP, distRight.getImageType());
 
 		rectifyImageLeft.apply(distLeft, rectLeft);
@@ -121,7 +121,7 @@ public class ExampleRectifyCalibratedStereo {
 		BufferedImage outRight = ConvertBufferedImage.convertTo(rectRight, null, true);
 
 		// show results and draw a horizontal line where the user clicks to see rectification easier
-		ListDisplayPanel panel = new ListDisplayPanel();
+		var panel = new ListDisplayPanel();
 		panel.addItem(new RectifiedPairPanel(true, origLeft, origRight), "Original");
 		panel.addItem(new RectifiedPairPanel(true, outLeft, outRight), "Rectified");
 

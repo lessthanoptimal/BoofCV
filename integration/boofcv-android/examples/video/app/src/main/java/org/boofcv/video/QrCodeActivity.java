@@ -47,15 +47,13 @@ import georegression.struct.shapes.Polygon2D_F64;
 /**
  * Demonstrates how to detect a QR Code and visualize the results.
  *
+ * @author Peter Abeles
  * @see VisualizeCamera2Activity
  * @see boofcv.android.camera2.SimpleCamera2Activity
- *
- * @author Peter Abeles
  */
-public class QrCodeActivity extends VisualizeCamera2Activity
-{
+public class QrCodeActivity extends VisualizeCamera2Activity {
 	// QR Code detector. Use default configuration
-	private final QrCodeDetector<GrayU8> detector = FactoryFiducial.qrcode(null,GrayU8.class);
+	private final QrCodeDetector<GrayU8> detector = FactoryFiducial.qrcode(null, GrayU8.class);
 
 	// Used to display text info on the display
 	private final Paint paintText = new Paint();
@@ -64,7 +62,7 @@ public class QrCodeActivity extends VisualizeCamera2Activity
 
 	// Storage for bounds of found QR Codes
 	private final DogArray<Polygon2D_F64> foundQR = new DogArray<>(Polygon2D_F64::new);
-	private String message=""; // most recently decoded QR code
+	private String message = ""; // most recently decoded QR code
 
 	// Used to compute average time in the detector
 	private final MovingAverage timeDetection = new MovingAverage();
@@ -83,7 +81,7 @@ public class QrCodeActivity extends VisualizeCamera2Activity
 	}
 
 	@Override
-	protected void onCreate(Bundle savedInstanceState) {
+	protected void onCreate( Bundle savedInstanceState ) {
 		super.onCreate(savedInstanceState);
 
 		// Java 1.8 issues with older SDK versions
@@ -102,28 +100,28 @@ public class QrCodeActivity extends VisualizeCamera2Activity
 		paintText.setStrokeWidth(4*displayMetrics.density);
 		paintText.setTextSize(14*displayMetrics.density);
 		paintText.setTextAlign(Paint.Align.LEFT);
-		paintText.setARGB(0xFF,0xFF,0xB0,0);
+		paintText.setARGB(0xFF, 0xFF, 0xB0, 0);
 		paintText.setTypeface(Typeface.create(Typeface.MONOSPACE, Typeface.BOLD));
 
 		// Color that detected QR will be painted
-		colorDetected.setARGB(0xA0,0,0xFF,0);
+		colorDetected.setARGB(0xA0, 0, 0xFF, 0);
 		colorDetected.setStyle(Paint.Style.FILL);
 
 		// The camera stream will now start after this function is called.
-		startCamera(surface,null);
+		startCamera(surface, null);
 	}
 
 	/**
 	 * This function is invoked in its own thread and can take as long as you want.
 	 */
 	@Override
-	protected void processImage(ImageBase image) {
+	protected void processImage( ImageBase image ) {
 		// Detect the QR Code
 		// GrayU8 image was specified in onCreate()
 		long time0 = System.nanoTime();
 		detector.process((GrayU8)image);
 		long time1 = System.nanoTime();
-		timeDetection.update((time1-time0)*1e-6);
+		timeDetection.update((time1 - time0)*1e-6);
 
 		// Create a copy of what we will visualize here. In general you want a copy because
 		// the UI and image processing is done on two different threads
@@ -142,7 +140,7 @@ public class QrCodeActivity extends VisualizeCamera2Activity
 	 * Demonstrates how to draw visuals
 	 */
 	@Override
-	protected void onDrawFrame(SurfaceView view, Canvas canvas) {
+	protected void onDrawFrame( SurfaceView view, Canvas canvas ) {
 		super.onDrawFrame(view, canvas);
 
 		// Display info on the image being process and how fast input camera
@@ -150,12 +148,12 @@ public class QrCodeActivity extends VisualizeCamera2Activity
 		int width = bitmap.getWidth();
 		int height = bitmap.getHeight();
 		canvas.drawText(String.format(Locale.getDefault(),
-				"%d x %d Convert: %4.1f (ms)",
-				width,height,periodConvert.getAverage()),
-				0,120,paintText);
+						"%d x %d Convert: %4.1f (ms)",
+						width, height, periodConvert.getAverage()),
+				0, 120, paintText);
 		canvas.drawText(String.format(Locale.getDefault(),
-				"detector: %4.1f (ms)",timeDetection.getAverage()),
-				180,170,paintText);
+						"detector: %4.1f (ms)", timeDetection.getAverage()),
+				180, 170, paintText);
 
 		// This line is magical and will save you hours/days of anguish
 		// What it does is correctly convert the coordinate system from
@@ -166,9 +164,9 @@ public class QrCodeActivity extends VisualizeCamera2Activity
 		// Draw the bounding squares around the QR Codes
 		synchronized (foundQR) {
 			for (int foundIdx = 0; foundIdx < foundQR.size(); foundIdx++) {
-				renderPolygon(foundQR.get(foundIdx),path,canvas,colorDetected);
+				renderPolygon(foundQR.get(foundIdx), path, canvas, colorDetected);
 			}
-			if( foundQR.size() > 0 )
+			if (foundQR.size() > 0)
 				textMessageView.setText(message);
 		}
 
@@ -176,17 +174,17 @@ public class QrCodeActivity extends VisualizeCamera2Activity
 		// In Android Studio expand "Build Variants" tab on left.
 	}
 
-	public static void renderPolygon(Polygon2D_F64 s, Path path , Canvas canvas , Paint paint ) {
+	public static void renderPolygon( Polygon2D_F64 s, Path path, Canvas canvas, Paint paint ) {
 		path.reset();
 		for (int j = 0; j < s.size(); j++) {
 			Point2D_F64 p = s.get(j);
 			if (j == 0)
-				path.moveTo((float) p.x, (float) p.y);
+				path.moveTo((float)p.x, (float)p.y);
 			else
-				path.lineTo((float) p.x, (float) p.y);
+				path.lineTo((float)p.x, (float)p.y);
 		}
 		Point2D_F64 p = s.get(0);
-		path.lineTo((float) p.x, (float) p.y);
+		path.lineTo((float)p.x, (float)p.y);
 		path.close();
 		canvas.drawPath(path, paint);
 	}

@@ -51,20 +51,18 @@ import boofcv.struct.image.ImageType;
  * Internally it uses the camera 2 API. You can customize its behavior by overriding
  * different internal functions. For more details, see the JavaDoc of it's parent classes.
  *
+ * @author Peter Abeles
  * @see VisualizeCamera2Activity
  * @see boofcv.android.camera2.SimpleCamera2Activity
- *
- * @author Peter Abeles
  */
-public class GradientActivity extends VisualizeCamera2Activity
-{
+public class GradientActivity extends VisualizeCamera2Activity {
 	// Storage for the gradient
-	private GrayS16 derivX = new GrayS16(1,1);
-	private GrayS16 derivY = new GrayS16(1,1);
+	private GrayS16 derivX = new GrayS16(1, 1);
+	private GrayS16 derivY = new GrayS16(1, 1);
 
 	// Storage for image gradient. In general you will want to precompute data structures due
 	// to the expense of garbage collection
-	private ImageGradient<GrayU8,GrayS16> gradient = FactoryDerivative.three(GrayU8.class, GrayS16.class);
+	private ImageGradient<GrayU8, GrayS16> gradient = FactoryDerivative.three(GrayU8.class, GrayS16.class);
 
 	// Used to display text info on the display
 	private Paint paintText = new Paint();
@@ -77,7 +75,7 @@ public class GradientActivity extends VisualizeCamera2Activity
 	}
 
 	@Override
-	protected void onCreate(Bundle savedInstanceState) {
+	protected void onCreate( Bundle savedInstanceState ) {
 		super.onCreate(savedInstanceState);
 
 		// Java 1.8 issues with older SDK versions
@@ -95,11 +93,11 @@ public class GradientActivity extends VisualizeCamera2Activity
 		paintText.setStrokeWidth(4*displayMetrics.density);
 		paintText.setTextSize(14*displayMetrics.density);
 		paintText.setTextAlign(Paint.Align.LEFT);
-		paintText.setARGB(0xFF,0xFF,0xB0,0);
+		paintText.setARGB(0xFF, 0xFF, 0xB0, 0);
 		paintText.setTypeface(Typeface.create(Typeface.MONOSPACE, Typeface.BOLD));
 
 		// The camera stream will now start after this function is called.
-		startCamera(surface,null);
+		startCamera(surface, null);
 	}
 
 	/**
@@ -109,7 +107,7 @@ public class GradientActivity extends VisualizeCamera2Activity
 	 * @param captureRequestBuilder Used to configure the camera.
 	 */
 	@Override
-	protected void configureCamera(CameraDevice device, CameraCharacteristics characteristics, CaptureRequest.Builder captureRequestBuilder) {
+	protected void configureCamera( CameraDevice device, CameraCharacteristics characteristics, CaptureRequest.Builder captureRequestBuilder ) {
 		captureRequestBuilder.set(CaptureRequest.CONTROL_AF_MODE, CaptureRequest.CONTROL_AF_MODE_CONTINUOUS_VIDEO);
 		captureRequestBuilder.set(CaptureRequest.CONTROL_AE_MODE, CaptureRequest.CONTROL_AE_MODE_ON);
 	}
@@ -120,8 +118,8 @@ public class GradientActivity extends VisualizeCamera2Activity
 	 * on the video feeds resolution.
 	 */
 	@Override
-	protected void onCameraResolutionChange( int width , int height, int sensorOrientation ) {
-		super.onCameraResolutionChange(width, height,sensorOrientation);
+	protected void onCameraResolutionChange( int width, int height, int sensorOrientation ) {
+		super.onCameraResolutionChange(width, height, sensorOrientation);
 
 		derivX.reshape(width, height);
 		derivY.reshape(width, height);
@@ -131,27 +129,28 @@ public class GradientActivity extends VisualizeCamera2Activity
 	 * This function is invoked in its own thread and can take as long as you want.
 	 */
 	@Override
-	protected void processImage(ImageBase image) {
+	protected void processImage( ImageBase image ) {
 		// The data type of 'image' was specified in onCreate() function
 		// The line below will compute the gradient and store it in two images. One for the
 		// gradient along the x-axis and the other along the y-axis
-		gradient.process((GrayU8)image,derivX,derivY);
+		gradient.process((GrayU8)image, derivX, derivY);
 	}
 
 	/**
 	 * Override the default behavior and colorize gradient instead of converting input image.
 	 */
 	@Override
-	protected void renderBitmapImage(BitmapMode mode, ImageBase image) {
-		switch( mode ) {
+	protected void renderBitmapImage( BitmapMode mode, ImageBase image ) {
+		switch (mode) {
 			case UNSAFE: { // this application is configured to use double buffer and could ignore all other modes
 				VisualizeImageData.colorizeGradient(derivX, derivY, -1, bitmap, bitmapTmp);
-			} break;
+			}
+			break;
 
 			case DOUBLE_BUFFER: {
 				VisualizeImageData.colorizeGradient(derivX, derivY, -1, bitmapWork, bitmapTmp);
 
-				if( bitmapLock.tryLock() ) {
+				if (bitmapLock.tryLock()) {
 					try {
 						Bitmap tmp = bitmapWork;
 						bitmapWork = bitmap;
@@ -160,7 +159,8 @@ public class GradientActivity extends VisualizeCamera2Activity
 						bitmapLock.unlock();
 					}
 				}
-			} break;
+			}
+			break;
 		}
 	}
 
@@ -168,7 +168,7 @@ public class GradientActivity extends VisualizeCamera2Activity
 	 * Demonstrates how to draw visuals
 	 */
 	@Override
-	protected void onDrawFrame(SurfaceView view, Canvas canvas) {
+	protected void onDrawFrame( SurfaceView view, Canvas canvas ) {
 		super.onDrawFrame(view, canvas);
 
 		// Display info on the image being process and how fast input camera
@@ -176,9 +176,9 @@ public class GradientActivity extends VisualizeCamera2Activity
 		int width = bitmap.getWidth();
 		int height = bitmap.getHeight();
 		canvas.drawText(String.format(Locale.getDefault(),
-				"%d x %d Convert: %4.1f (ms)",
-				width,height,periodConvert.getAverage()),
-				0,120,paintText);
+						"%d x %d Convert: %4.1f (ms)",
+						width, height, periodConvert.getAverage()),
+				0, 120, paintText);
 
 		// Pro tip: Run in app fast or release mode for a dramatic speed up!
 		// In Android Studio expand "Build Variants" tab on left.

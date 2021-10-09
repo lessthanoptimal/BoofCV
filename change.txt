@@ -3,7 +3,7 @@ Change Log
 Date Format: year/month/day
 
 ---------------------------------------------
-Date    : 2021/Oct/9
+Date    : 2021/Oct/8
 Version : 0.39
 
 - Build
