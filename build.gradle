@@ -16,9 +16,9 @@ allprojects {
     apply plugin: 'com.peterabeles.gversion'
 
     group = 'org.boofcv'
-    version = '0.39'
+    version = '0.40-SNAPSHOT'
 
-    ext.build_java8 = true // IntelliJ has issues when this is set to true
+    ext.build_java11 = true // IntelliJ has issues when this is set to true
 
     createVersionFile.enabled = false // run only once. enabled in types
 }
@@ -57,8 +57,8 @@ subprojects {
     // Prevents tons of errors if someone is using ASCII
     tasks.withType(JavaCompile).configureEach { options.encoding = "UTF-8" }
     // Creates Java 8 byte code
-    if (project.ext.build_java8)
-        tasks.withType(JavaCompile).configureEach { options.release = 8 }
+    if (project.ext.build_java11)
+        tasks.withType(JavaCompile).configureEach { options.release = 11 }
 
     // Enable incremental compile. Should make single file changes faster
     tasks.withType(JavaCompile) { options.incremental = true }
@@ -152,7 +152,7 @@ subprojects {
         benchmarkAnnotationProcessor("org.openjdk.jmh:jmh-generator-annprocess:$jmh_version")
 
         // needed to use Java 11+ syntax with Java 1.8 byte code
-        if (project.ext.build_java8) {
+        if (project.ext.build_java11) {
             annotationProcessor("com.github.bsideup.jabel:jabel-javac-plugin:${project.jabel_version}")
             noautoAnnotationProcessor("com.github.bsideup.jabel:jabel-javac-plugin:${project.jabel_version}")
             testAnnotationProcessor("com.github.bsideup.jabel:jabel-javac-plugin:${project.jabel_version}")

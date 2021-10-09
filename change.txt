@@ -6,8 +6,11 @@ Date Format: year/month/day
 Date    : 2021
 Version : 0.40
 
-TODO Generate Java 11 byte code
+Build
+- Dropped support for Java 8 (finally)
+- Generates Java 11 bytecode
 TODO make sure library command isn't copying .class files!
+TODO work around for Android JavaDoc issue?
 TODO Added calibration targets Hamming Marker grid and chessboard, e.g. ChArUco and ArUco grids.
 TODO Monocular VO
 TODO Monocular SLAM
