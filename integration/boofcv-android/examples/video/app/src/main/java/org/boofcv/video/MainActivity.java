@@ -82,7 +82,7 @@ public class MainActivity extends Activity {
 
 	@Override
 	public void onRequestPermissionsResult(int requestCode,
-										   String permissions[], int[] grantResults) {
+										   String[] permissions, int[] grantResults) {
 		switch (requestCode) {
 			case 0: {
 				// If request is cancelled, the result arrays are empty.
@@ -97,11 +97,7 @@ public class MainActivity extends Activity {
 		AlertDialog.Builder builder = new AlertDialog.Builder(this);
 		builder.setMessage("Denied access to the camera! Exiting.")
 				.setCancelable(false)
-				.setPositiveButton("OK", new DialogInterface.OnClickListener() {
-					public void onClick(DialogInterface dialog, int id) {
-						System.exit(0);
-					}
-				});
+				.setPositiveButton("OK", (dialog, id) -> System.exit(0));
 		AlertDialog alert = builder.create();
 		alert.show();
 	}

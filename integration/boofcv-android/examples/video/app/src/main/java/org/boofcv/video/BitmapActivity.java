@@ -46,11 +46,10 @@ public class BitmapActivity extends AppCompatActivity {
     }
 
     /**
-     * Respond to the user clicking the select image button by opening up an image select
-     * intent
+     * Respond to the user clicking the select image button by opening up an image select intent
      */
     public void clickSelectImage( View view ) {
-        Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
+        var intent = new Intent(Intent.ACTION_GET_CONTENT);
         intent.setType("image/*");
         startActivityForResult(intent, PICK_IMAGE);
     }
@@ -86,7 +85,7 @@ public class BitmapActivity extends AppCompatActivity {
             Bitmap scaled = Bitmap.createScaledBitmap( original,newWidth, newHeight, true);
 
             // Convert it into a BoofCV image that can be processed
-            GrayU8 gray = new GrayU8(1,1);
+            var gray = new GrayU8(1,1);
             ConvertBitmap.bitmapToBoof(scaled,gray,null);
 
             // Send it through the QR code detector

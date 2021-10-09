@@ -55,19 +55,19 @@ import georegression.struct.shapes.Polygon2D_F64;
 public class QrCodeActivity extends VisualizeCamera2Activity
 {
 	// QR Code detector. Use default configuration
-	private QrCodeDetector<GrayU8> detector = FactoryFiducial.qrcode(null,GrayU8.class);
+	private final QrCodeDetector<GrayU8> detector = FactoryFiducial.qrcode(null,GrayU8.class);
 
 	// Used to display text info on the display
-	private Paint paintText = new Paint();
+	private final Paint paintText = new Paint();
 
-	private Paint colorDetected = new Paint();
+	private final Paint colorDetected = new Paint();
 
 	// Storage for bounds of found QR Codes
 	private final DogArray<Polygon2D_F64> foundQR = new DogArray<>(Polygon2D_F64::new);
 	private String message=""; // most recently decoded QR code
 
 	// Used to compute average time in the detector
-	private MovingAverage timeDetection = new MovingAverage();
+	private final MovingAverage timeDetection = new MovingAverage();
 
 	// where the decoded QR's message is printed
 	private TextView textMessageView;
@@ -156,7 +156,6 @@ public class QrCodeActivity extends VisualizeCamera2Activity
 		canvas.drawText(String.format(Locale.getDefault(),
 				"detector: %4.1f (ms)",timeDetection.getAverage()),
 				180,170,paintText);
-
 
 		// This line is magical and will save you hours/days of anguish
 		// What it does is correctly convert the coordinate system from
