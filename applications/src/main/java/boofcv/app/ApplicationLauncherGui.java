@@ -63,6 +63,7 @@ public class ApplicationLauncherGui extends JPanel {
 		JButton bCreateFidImage = createButton("Square Image", CreateFiducialSquareImageGui::new);
 		JButton bCreateFidHamming = createButton("Square Hamming", CreateFiducialSquareHammingGui::new);
 
+		JButton bUtilAssisted = createButton("Assisted Calibration", () -> CameraCalibrationAssisted.main(null));
 		JButton bUtilCalib = createButton("Mono Calibration", () -> CalibrateMonocularPlanarApp.main(null));
 		JButton bUtilStereoCalib = createButton("Stereo Calibration", () -> CalibrateStereoPlanarApp.main(null));
 		JButton bUtilScanQrCode = createButton("Batch QR Code", BatchScanQrCodesGui::new);
@@ -94,9 +95,10 @@ public class ApplicationLauncherGui extends JPanel {
 		layout.putConstraint(SpringLayout.EAST, logo, -40, SpringLayout.EAST, this);
 		layout.putConstraint(SpringLayout.NORTH, logo, 0, SpringLayout.NORTH, this);
 
-		JPanel panelLeft = buttonPanel("Create / Print",
+		JComponent panelLeft = buttonPanel("Create / Print",
 				bCreateQR, bCreateDots, bCreateCalib, bCreateFidBin, bCreateFidImage, bCreateFidHamming);
-		JPanel panelRight = buttonPanel("Tools", bUtilCalib, bUtilStereoCalib, bUtilScanQrCode, bUtilDown, bUtilUndist, bUtilViewCloud);
+		JComponent panelRight = buttonPanel("Tools",
+				bUtilAssisted, bUtilCalib, bUtilStereoCalib, bUtilScanQrCode, bUtilDown, bUtilUndist, bUtilViewCloud);
 
 		layout.putConstraint(SpringLayout.WEST, panelLeft, 60, SpringLayout.WEST, this);
 		layout.putConstraint(SpringLayout.NORTH, panelLeft, 0, SpringLayout.SOUTH, logo);
@@ -136,24 +138,41 @@ public class ApplicationLauncherGui extends JPanel {
 		requestFocus();
 	}
 
-	public JPanel buttonPanel( String title, JButton... buttons ) {
-		JPanel panel = new JPanel();
-		panel.setBackground(Color.WHITE);
-		panel.setPreferredSize(new Dimension(200, buttons.length*60));
-		panel.setMaximumSize(panel.getPreferredSize());
-		panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
-		panel.add(Box.createRigidArea(new Dimension(0, 10)));
-		JLabel label = new JLabel(title);
-		Font font = label.getFont();
-		label.setFont(new Font(font.getName(), Font.PLAIN, 5*font.getSize()/3));
+	public JComponent buttonPanel( String title, JButton... buttons ) {
+		var label = new JLabel(title, SwingConstants.CENTER);
+		var font = label.getFont();
+		label.setFont(new Font(font.getName(), Font.PLAIN, 6*font.getSize()/3));
 
-		label.setAlignmentX(Component.CENTER_ALIGNMENT);
-		panel.add(label);
+		var buttonPanel = new JPanel();
+		buttonPanel.setBackground(Color.WHITE);
+		buttonPanel.setLayout(new BoxLayout(buttonPanel, BoxLayout.Y_AXIS));
 		for (int i = 0; i < buttons.length; i++) {
-			panel.add(Box.createRigidArea(new Dimension(0, 10)));
-			panel.add(buttons[i]);
+			buttonPanel.add(buttons[i]);
+			if (i != buttons.length - 1)
+				buttonPanel.add(Box.createRigidArea(new Dimension(0, 10)));
 		}
-		panel.add(Box.createVerticalGlue());
+
+		var scrollPane = new JScrollPane(buttonPanel);
+		scrollPane.setBorder(BorderFactory.createEmptyBorder());
+		scrollPane.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED);
+		scrollPane.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
+
+		SpringLayout layout = new SpringLayout();
+		var panel = new JPanel(layout);
+		panel.setBackground(Color.WHITE);
+		panel.add(label);
+		panel.add(scrollPane);
+		panel.setPreferredSize(new Dimension(240, 325));
+		panel.setMaximumSize(panel.getPreferredSize());
+
+		layout.putConstraint(SpringLayout.WEST, label, 0, SpringLayout.WEST, panel);
+		layout.putConstraint(SpringLayout.EAST, label, 0, SpringLayout.EAST, panel);
+		layout.putConstraint(SpringLayout.NORTH, label, 0, SpringLayout.NORTH, panel);
+		layout.putConstraint(SpringLayout.WEST, scrollPane, 0, SpringLayout.WEST, panel);
+		layout.putConstraint(SpringLayout.EAST, scrollPane, 0, SpringLayout.EAST, panel);
+		layout.putConstraint(SpringLayout.NORTH, scrollPane, 0, SpringLayout.SOUTH, label);
+		layout.putConstraint(SpringLayout.SOUTH, scrollPane, 0, SpringLayout.SOUTH, panel);
+
 		return panel;
 	}
 

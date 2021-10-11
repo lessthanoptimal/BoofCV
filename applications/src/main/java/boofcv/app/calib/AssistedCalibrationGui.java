@@ -47,7 +47,7 @@ public class AssistedCalibrationGui extends JPanel {
 	Runnable handleTargetChanged = () -> {};
 
 	public AssistedCalibrationGui( Dimension dimension ) {
-		this(dimension.width, Math.max(500, dimension.height));
+		this(dimension.width, Math.max(600, dimension.height));
 	}
 
 	public AssistedCalibrationGui( int imageWidth, int imageHeight ) {
