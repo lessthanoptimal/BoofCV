@@ -198,6 +198,7 @@ public class AssistedCalibration {
 
 	public void init( int imageWidth, int imageHeight ) {
 		actions.setImageSize(imageWidth, imageHeight);
+		gui.targetPanel.setImageSize(imageWidth, imageHeight);
 
 		MAGNET_RADIUS = Math.max(5, (int)(Math.min(imageWidth, imageHeight)/30.0));
 	}
@@ -212,6 +213,7 @@ public class AssistedCalibration {
 		g2 = image.createGraphics();
 		BoofSwingUtil.antialiasing(g2);
 
+		long time0 = System.nanoTime();
 		boolean success;
 		synchronized (detectorLock) {
 			success = detector.process(gray);
@@ -224,6 +226,9 @@ public class AssistedCalibration {
 			found.sort();
 			actions.update(success, found);
 		}
+		long time1 = System.nanoTime();
+		double elapsedSeconds = (time1-time0)*1e-9;
+		gui.targetPanel.setProcessingTimeS(elapsedSeconds);
 
 		if (gui.getInfoPanel().forceSaveImage) {
 			String name = String.format("debug_save_%03d.png", totalDebugSave++);

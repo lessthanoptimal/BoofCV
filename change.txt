@@ -9,6 +9,9 @@ Version : 0.40
 Build
 - Dropped support for Java 8 (finally)
 - Generates Java 11 bytecode
+Applications
+- Fixed assisted calibration launcher from CameraCalibrationMono
+
 TODO make sure library command isn't copying .class files!
 TODO work around for Android JavaDoc issue?
 TODO Added calibration targets Hamming Marker grid and chessboard, e.g. ChArUco and ArUco grids.

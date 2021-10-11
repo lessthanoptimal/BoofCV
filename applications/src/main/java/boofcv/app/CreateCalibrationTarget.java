@@ -416,8 +416,8 @@ public class CreateCalibrationTarget {
 	}
 
 	public static void main( String[] args ) {
-		CreateCalibrationTarget generator = new CreateCalibrationTarget();
-		CmdLineParser parser = new CmdLineParser(generator);
+		var generator = new CreateCalibrationTarget();
+		var parser = new CmdLineParser(generator);
 		try {
 			parser.parseArgument(args);
 			generator.finishParsing(parser);

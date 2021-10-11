@@ -406,13 +406,6 @@ public class CameraCalibrationMono extends BaseStandardInputApp {
 	}
 
 	public void process() {
-		if (!GUI && configTarget.type == null) {
-			printHelp();
-			System.out.println();
-			System.err.println("Must specify the type of fiducial to use for calibration!");
-			return;
-		}
-
 		switch (inputType) {
 			case VIDEO -> throw new RuntimeException("Calibration from video not supported");
 			case IMAGE -> handleDirectory();
@@ -622,7 +615,7 @@ public class CameraCalibrationMono extends BaseStandardInputApp {
 			}
 		}));
 
-		AssistedCalibrationGui gui = new AssistedCalibrationGui(webcam.getViewSize());
+		var gui = new AssistedCalibrationGui(webcam.getViewSize());
 		JFrame frame = ShowImages.showWindow(gui, "Webcam Calibration", true);
 
 		GrayF32 gray = new GrayF32(webcam.getViewSize().width, webcam.getViewSize().height);
@@ -634,7 +627,11 @@ public class CameraCalibrationMono extends BaseStandardInputApp {
 		}
 
 		var assisted = new AssistedCalibration(gui, OUTPUT_DIRECTORY, IMAGE_DIRECTORY);
-		SwingUtilities.invokeLater(() -> assisted.gui.getTargetPanel().configPanel.setConfigurationTo(configTarget));
+
+		// If the user specified a target type use that as the default
+		if (configTarget.type != null)
+			SwingUtilities.invokeLater(() -> assisted.gui.getTargetPanel().configPanel.setConfigurationTo(configTarget));
+
 		assisted.init(gray.width, gray.height);
 
 		BufferedImage image;
@@ -669,7 +666,7 @@ public class CameraCalibrationMono extends BaseStandardInputApp {
 	}
 
 	public static void main( String[] args ) {
-		CameraCalibrationMono app = new CameraCalibrationMono();
+		var app = new CameraCalibrationMono();
 		boolean failed = true;
 		try {
 			if (args.length > 0) {

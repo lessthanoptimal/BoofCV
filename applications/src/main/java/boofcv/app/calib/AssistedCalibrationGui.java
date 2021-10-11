@@ -18,6 +18,7 @@
 
 package boofcv.app.calib;
 
+import boofcv.gui.BoofSwingUtil;
 import boofcv.gui.StandardAlgConfigPanel;
 import boofcv.gui.calibration.UtilCalibrationGui;
 import boofcv.gui.controls.CalibrationTargetPanel;
@@ -43,10 +44,10 @@ public class AssistedCalibrationGui extends JPanel {
 
 	@Getter TargetConfigurePanel targetPanel = new TargetConfigurePanel();
 
-	Runnable handleTargetChanged = ()->{};
+	Runnable handleTargetChanged = () -> {};
 
 	public AssistedCalibrationGui( Dimension dimension ) {
-		this(dimension.width, dimension.height);
+		this(dimension.width, Math.max(500, dimension.height));
 	}
 
 	public AssistedCalibrationGui( int imageWidth, int imageHeight ) {
@@ -91,12 +92,26 @@ public class AssistedCalibrationGui extends JPanel {
 	}
 
 	public class TargetConfigurePanel extends StandardAlgConfigPanel {
+		protected JLabel imageSizeLabel = new JLabel();
+		protected JLabel processingTimeLabel = new JLabel();
 		public CalibrationTargetPanel configPanel = new CalibrationTargetPanel(( a, b ) -> handleUpdatedTarget());
 		public ImagePanel targetPreviewPanel = new ImagePanel();
 
 		public TargetConfigurePanel() {
+			targetPreviewPanel.setCentering(true);
+
+			addLabeled(imageSizeLabel, "Resolution");
+			addLabeled(processingTimeLabel, "Process Time (ms)");
 			add(configPanel);
 			add(targetPreviewPanel);
+		}
+
+		public void setImageSize( final int width, final int height ) {
+			BoofSwingUtil.invokeNowOrLater(() -> imageSizeLabel.setText(width + " x " + height));
+		}
+
+		public void setProcessingTimeS( double seconds ) {
+			BoofSwingUtil.invokeNowOrLater(() -> processingTimeLabel.setText(String.format("%7.1f", (seconds*1000))));
 		}
 	}
 
