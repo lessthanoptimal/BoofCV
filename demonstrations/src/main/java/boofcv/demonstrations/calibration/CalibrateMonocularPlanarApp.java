@@ -122,7 +122,7 @@ public class CalibrateMonocularPlanarApp extends JPanel {
 		pinholePanel.setScale = ( scale ) -> configurePanel.setZoom(scale);
 
 		updateVisualizationSettings();
-		getCalibrationPanel().setPreferredSize(new Dimension(600, 720));
+		getCalibrationPanel().setPreferredSize(new Dimension(600, 600));
 
 		createMenuBar();
 		add(configurePanel, BorderLayout.WEST);
@@ -793,7 +793,7 @@ public class CalibrateMonocularPlanarApp extends JPanel {
 
 			targetPreviewPanel.setScaling(ScaleOptions.DOWN);
 			targetPreviewPanel.setCentering(true);
-			targetPreviewPanel.setPreferredSize(new Dimension(200, 400));
+			targetPreviewPanel.setPreferredSize(new Dimension(200, 300));
 			var targetVerticalPanel = new JPanel(new BorderLayout());
 			targetVerticalPanel.add(targetPanel, BorderLayout.NORTH);
 			targetVerticalPanel.add(targetPreviewPanel, BorderLayout.CENTER);

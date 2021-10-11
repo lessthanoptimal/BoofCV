@@ -40,7 +40,7 @@ public class ShowImages {
 	 * Creates a dialog window showing the specified image. The function will not
 	 * exit until the user clicks ok
 	 */
-	public static void showDialog(BufferedImage img) {
+	public static void showDialog( BufferedImage img ) {
 		ImageIcon icon = new ImageIcon();
 		icon.setImage(img);
 		JOptionPane.showMessageDialog(null, icon);
@@ -54,11 +54,11 @@ public class ShowImages {
 	 * @param images List of images to show
 	 * @return Display panel
 	 */
-	public static ImageGridPanel showGrid( int numColumns , String title , BufferedImage ...images ) {
+	public static ImageGridPanel showGrid( int numColumns, String title, BufferedImage... images ) {
 		JFrame frame = new JFrame(title);
 
 		int numRows = images.length/numColumns + images.length%numColumns;
-		ImageGridPanel panel = new ImageGridPanel(numRows,numColumns,images);
+		ImageGridPanel panel = new ImageGridPanel(numRows, numColumns, images);
 
 		frame.add(panel, BorderLayout.CENTER);
 
@@ -71,14 +71,14 @@ public class ShowImages {
 	/**
 	 * Creates a window showing the specified image.
 	 */
-	public static ImagePanel showWindow(BufferedImage img, String title) {
-		return showWindow(img,title,false);
+	public static ImagePanel showWindow( BufferedImage img, String title ) {
+		return showWindow(img, title, false);
 	}
 
 	/**
 	 * Creates a window showing the specified image.
 	 */
-	public static ImagePanel showWindow(BufferedImage img, String title, boolean closeOnExit ) {
+	public static ImagePanel showWindow( BufferedImage img, String title, boolean closeOnExit ) {
 		JFrame frame = new JFrame(title);
 
 		ImagePanel panel = new ImagePanel(img);
@@ -87,59 +87,59 @@ public class ShowImages {
 		// If the window will be too large to be displayed on the monitor set the bounds to something that can be
 		// shown. The default behavior will just change one axis leaving it to have an awkward appearance
 		Rectangle monitorBounds = frame.getGraphicsConfiguration().getBounds();
-		if( monitorBounds.width < img.getWidth() || monitorBounds.height < img.getHeight()) {
-			double scale = Math.min(monitorBounds.width/(double)img.getWidth(),monitorBounds.height/(double)img.getHeight());
+		if (monitorBounds.width < img.getWidth() || monitorBounds.height < img.getHeight()) {
+			double scale = Math.min(monitorBounds.width/(double)img.getWidth(), monitorBounds.height/(double)img.getHeight());
 			int width = (int)(scale*img.getWidth());
 			int height = (int)(scale*img.getHeight());
-			panel.setPreferredSize(new Dimension(width,height));
+			panel.setPreferredSize(new Dimension(width, height));
 		}
 
 		frame.add(panel, BorderLayout.CENTER);
 		frame.pack();
 		setFrameLocation(frame);
 		frame.setVisible(true);
-		if( closeOnExit )
+		if (closeOnExit)
 			frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
 		return panel;
 	}
 
 	public static ImagePanel showWindow( ImageBase<?> img, String title ) {
-		BufferedImage buff = ConvertBufferedImage.convertTo(img,null,true);
-		return showWindow(buff,title);
+		BufferedImage buff = ConvertBufferedImage.convertTo(img, null, true);
+		return showWindow(buff, title);
 	}
 
 	/**
 	 * Show a window for a set amount of time. Blocks until that time has elapsed
 	 */
-	public static void showBlocking( ImageBase<?> img, String title , long milliseconds ) {
-		BufferedImage buff = ConvertBufferedImage.convertTo(img,null,true);
-		ImagePanel panel = showWindow(buff,title);
+	public static void showBlocking( ImageBase<?> img, String title, long milliseconds ) {
+		BufferedImage buff = ConvertBufferedImage.convertTo(img, null, true);
+		ImagePanel panel = showWindow(buff, title);
 		BoofMiscOps.sleep(milliseconds);
 		// close the window
-		SwingUtilities.invokeLater(()->{
-			JFrame topFrame = (JFrame) SwingUtilities.getWindowAncestor(panel);
+		SwingUtilities.invokeLater(() -> {
+			JFrame topFrame = (JFrame)SwingUtilities.getWindowAncestor(panel);
 			topFrame.setVisible(false);
 			topFrame.dispose();
 		});
 	}
 
-	public static void showBlocking( JComponent component, String title , long milliseconds ) {
-		JFrame frame = showWindow(component,title);
+	public static void showBlocking( JComponent component, String title, long milliseconds ) {
+		JFrame frame = showWindow(component, title);
 		BoofMiscOps.sleep(milliseconds);
 		// close the window
-		SwingUtilities.invokeLater(()->{
+		SwingUtilities.invokeLater(() -> {
 			frame.setVisible(false);
 			frame.dispose();
 		});
 	}
 
-	public static JFrame showWindow( final JComponent component , String title ) {
-		return showWindow(component,title,false);
+	public static JFrame showWindow( final JComponent component, String title ) {
+		return showWindow(component, title, false);
 	}
 
-	public static JFrame showWindow( final JComponent component , String title, final boolean closeOnExit ) {
-		final JFrame frame = new JFrame(title);
+	public static JFrame showWindow( final JComponent component, String title, final boolean closeOnExit ) {
+		final var frame = new JFrame(title);
 		frame.add(component, BorderLayout.CENTER);
 
 		SwingUtilities.invokeLater(() -> {
@@ -151,14 +151,14 @@ public class ShowImages {
 			// prevent it from creating a window larger than the screen
 			int width = frame.getWidth();
 			int height = frame.getHeight();
-			if( width > screenSize.width || height > screenSize.height ) {
-				width = Math.min(width,screenSize.width);
-				height = Math.min(height,screenSize.height);
-				frame.setSize(width,height);
+			if (width > screenSize.width || height > screenSize.height) {
+				width = Math.min(width, screenSize.width);
+				height = Math.min(height, screenSize.height);
+				frame.setSize(width, height);
 			}
 
 			frame.setVisible(true);
-			if( closeOnExit )
+			if (closeOnExit)
 				frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		});
 
@@ -168,7 +168,7 @@ public class ShowImages {
 	/**
 	 * Sets up the window but doesn't show it. Must be called in a GUI thread
 	 */
-	public static JFrame setupWindow( final JComponent component , String title, final boolean closeOnExit ) {
+	public static JFrame setupWindow( final JComponent component, String title, final boolean closeOnExit ) {
 		BoofSwingUtil.checkGuiThread();
 
 		final JFrame frame = new JFrame(title);
@@ -176,7 +176,7 @@ public class ShowImages {
 
 		frame.pack();
 		setFrameLocation(frame);
-		if( closeOnExit )
+		if (closeOnExit)
 			frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
 		return frame;
@@ -185,26 +185,27 @@ public class ShowImages {
 	/**
 	 * Set location using a single function call to make sure all operations follow the same standard
 	 */
-	private static void setFrameLocation(JFrame frame) {
+	private static void setFrameLocation( JFrame frame ) {
 		frame.setLocationByPlatform(true);
 	}
 
-	public static ImagePanel showWindow(ImageGray<?> img , Colorization type, String title, boolean closeOnExit ) {
+	public static ImagePanel showWindow( ImageGray<?> img, Colorization type, String title, boolean closeOnExit ) {
 		double max = GImageStatistics.maxAbs(img);
 		BufferedImage buff;
-		switch( type ) {
+		switch (type) {
 			case MAGNITUDE:
-				buff = VisualizeImageData.grayMagnitude(img,null,max);
+				buff = VisualizeImageData.grayMagnitude(img, null, max);
 				break;
 
 			case SIGN:
-				buff = VisualizeImageData.colorizeSign(img,null,max);
+				buff = VisualizeImageData.colorizeSign(img, null, max);
 				break;
 
-			default:throw new IllegalArgumentException("Unknown type. "+type);
+			default:
+				throw new IllegalArgumentException("Unknown type. " + type);
 		}
 
-		return showWindow(buff,title, closeOnExit);
+		return showWindow(buff, title, closeOnExit);
 	}
 
 	public enum Colorization {

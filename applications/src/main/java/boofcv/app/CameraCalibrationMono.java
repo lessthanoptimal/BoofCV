@@ -406,6 +406,12 @@ public class CameraCalibrationMono extends BaseStandardInputApp {
 	}
 
 	public void process() {
+		// If a GUI was requested just launch the GUI app
+		if (GUI) {
+			launchCalibrationApp(new ArrayList<>());
+			return;
+		}
+
 		switch (inputType) {
 			case VIDEO -> throw new RuntimeException("Calibration from video not supported");
 			case IMAGE -> handleDirectory();
@@ -578,7 +584,8 @@ public class CameraCalibrationMono extends BaseStandardInputApp {
 		SwingUtilities.invokeLater(() -> {
 			var app = new CalibrateMonocularPlanarApp();
 			// Configure the application using the commandline arguments
-			app.getConfigurePanel().getTargetPanel().setConfigurationTo(configTarget);
+			if (configTarget.type != null)
+				app.getConfigurePanel().getTargetPanel().setConfigurationTo(configTarget);
 			CalibrationModelPanel modelPanel = app.getConfigurePanel().getModelPanel();
 			switch (modeType) {
 				case BROWN -> modelPanel.setToBrown(zeroSkew, numRadial, tangential);
@@ -589,11 +596,13 @@ public class CameraCalibrationMono extends BaseStandardInputApp {
 			app.window = ShowImages.showWindow(app, "Monocular Planar Calibration", true);
 			app.window.setJMenuBar(app.menuBar);
 
-			// it needs a directory. images could be in multiple directories, this just picks the first one
-			File directory = new File(imagePath.get(0)).getParentFile();
+			if (!imagePath.isEmpty()) {
+				// it needs a directory. images could be in multiple directories, this just picks the first one
+				File directory = new File(imagePath.get(0)).getParentFile();
 
-			// start processing!
-			new Thread(() -> app.processImages(directory, imagePath)).start();
+				// start processing!
+				new Thread(() -> app.processImages(directory, imagePath)).start();
+			}
 		});
 	}
 

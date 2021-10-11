@@ -12,7 +12,7 @@ Build
 Applications
 - Fixed assisted calibration launcher from CameraCalibrationMono
 - Launcher now has a scrollbar and assisted calibration button
-- TODO --Gui should open the GUI app, unless video is specified
+- CameraCalibrationMono --GUI now launches the new GUI
 
 TODO make sure library command isn't copying .class files!
 TODO work around for Android JavaDoc issue?
