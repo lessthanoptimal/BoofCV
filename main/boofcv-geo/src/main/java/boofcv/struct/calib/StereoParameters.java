@@ -51,13 +51,13 @@ public class StereoParameters implements Serializable {
 	public static final long serialVersionUID = 1L;
 
 	/** intrinsic camera parameters of left camera */
-	public CameraPinholeBrown left;
+	public CameraPinholeBrown left = new CameraPinholeBrown();
 	/** intrinsic camera parameters of right camera */
-	public CameraPinholeBrown right;
+	public CameraPinholeBrown right = new CameraPinholeBrown();
 	/** transform from left camera to right camera */
 	@Getter(AccessLevel.NONE)
 	@Setter(AccessLevel.NONE)
-	public Se3_F64 right_to_left;
+	public Se3_F64 right_to_left = new Se3_F64();
 
 	public StereoParameters( StereoParameters param ) {
 		this(param.left, param.right, param.getRightToLeft());
@@ -66,9 +66,9 @@ public class StereoParameters implements Serializable {
 	public StereoParameters( CameraPinholeBrown left,
 							 CameraPinholeBrown right,
 							 Se3_F64 right_to_left ) {
-		this.left = new CameraPinholeBrown(left);
-		this.right_to_left = right_to_left.copy();
-		this.right = new CameraPinholeBrown(right);
+		this.left.setTo(left);
+		this.right.setTo(right);
+		this.right_to_left.setTo(right_to_left);
 	}
 
 	public StereoParameters() {}
@@ -110,19 +110,9 @@ public class StereoParameters implements Serializable {
 	 * @param src The set of parameters that is to be copied.
 	 */
 	public void setTo( StereoParameters src ) {
-		if (this.left == null)
-			this.left = new CameraPinholeBrown(src.left);
-		else
-			this.left.setTo(src.left);
-		if (this.right == null)
-			this.right = new CameraPinholeBrown(src.right);
-		else
-			this.right.setTo(src.right);
-
-		if (this.right_to_left == null)
-			this.right_to_left = src.right_to_left.copy();
-		else
-			this.right_to_left.setTo(src.right_to_left);
+		this.left.setTo(src.left);
+		this.right.setTo(src.right);
+		this.right_to_left.setTo(src.right_to_left);
 	}
 
 	@Override public String toString() {

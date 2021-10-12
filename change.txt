@@ -14,6 +14,8 @@ Applications
 - Launcher now has a scrollbar and assisted calibration button
 - CameraCalibrationMono --GUI now launches the new GUI
 - Fixed crash in CreateFiducialSquareHammingGui
+Data Structures
+- StereoParameters is no longer initialized with null fields
 
 TODO make sure library command isn't copying .class files!
 TODO work around for Android JavaDoc issue?
