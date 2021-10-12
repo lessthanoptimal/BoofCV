@@ -610,6 +610,9 @@ public class CameraCalibrationMono extends BaseStandardInputApp {
 	 * Captures calibration data live using a webcam and a GUI to assist the user
 	 */
 	public void handleWebcam() {
+		// Webcam can only be processed in GUI mode
+		GUI = true;
+
 		final Webcam webcam = openSelectedCamera();
 		if (desiredWidth > 0 && desiredHeight > 0)
 			UtilWebcamCapture.adjustResolution(webcam, desiredWidth, desiredHeight);

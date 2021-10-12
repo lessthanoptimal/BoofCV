@@ -177,8 +177,8 @@ public class ConfigECoCheckMarkers implements Configuration {
 	@Override public void checkValidity() {
 		BoofMiscOps.checkFraction(dataBitWidthFraction, "dataBitWidthFraction must be 0 to 1.0.");
 		BoofMiscOps.checkFraction(dataBorderFraction, "dataBorderFraction must be 0 to 1.0.");
-		BoofMiscOps.checkTrue(firstTargetDuplicated >= 1);
-		BoofMiscOps.checkTrue(markerShapes.size() >= 1);
+		BoofMiscOps.checkTrue(firstTargetDuplicated >= 1, "firstTargetDuplicated <= 0");
+		BoofMiscOps.checkTrue(markerShapes.size() >= 1, "Shapes not defined");
 		BoofMiscOps.checkTrue(errorCorrectionLevel >= 0 && errorCorrectionLevel <= ECoCheckCodec.MAX_ECC_LEVEL,
 				"error correction must be from 0 to 9, inclusive.");
 		BoofMiscOps.checkTrue(checksumBits >= 0 && checksumBits <= ECoCheckCodec.MAX_CHECKSUM_BITS,
