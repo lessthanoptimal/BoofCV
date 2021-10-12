@@ -85,7 +85,6 @@ public class CreateFiducialSquareHammingGui extends CreateSquareFiducialGui {
 			imagePanel.setImageRepaint(null);
 		} else {
 			FiducialSquareHammingGenerator generator = (FiducialSquareHammingGenerator)this.generator;
-			generator.getConfig().setTo(c.config);
 			generator.generate(controls.selectedPattern);
 			ConvertBufferedImage.convertTo(render.getGray(), buffered, true);
 			imagePanel.setImageRepaint(buffered);
