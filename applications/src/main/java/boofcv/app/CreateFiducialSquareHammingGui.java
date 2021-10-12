@@ -94,7 +94,7 @@ public class CreateFiducialSquareHammingGui extends CreateSquareFiducialGui {
 	class ControlPanel extends CreateSquareFiducialControlPanel {
 
 		int selectedPattern = -1;
-		int encoding = c.config.dictionary.ordinal()-1;
+		int encoding = c.config.dictionary.ordinal() - 1;
 
 		JLabel labelMaxID = new JLabel();
 		DefaultListModel<Long> listModel = new DefaultListModel<>();
@@ -105,7 +105,7 @@ public class CreateFiducialSquareHammingGui extends CreateSquareFiducialGui {
 		public ControlPanel( Listener listener ) {
 			super(listener);
 
-			labelMaxID.setText(c.config.encoding.size()+"");
+			labelMaxID.setText(c.config.encoding.size() + "");
 			listPatterns.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 			listPatterns.setLayoutOrientation(JList.VERTICAL);
 //			listPatterns.setVisibleRowCount(-1);
@@ -128,9 +128,9 @@ public class CreateFiducialSquareHammingGui extends CreateSquareFiducialGui {
 		@Override public void controlChanged( final Object source ) {
 			if (source == comboEncoding) {
 				encoding = comboEncoding.getSelectedIndex();
-				HammingDictionary dictionary = HammingDictionary.values()[encoding+1];
+				HammingDictionary dictionary = HammingDictionary.values()[encoding + 1];
 				c.config.setTo(ConfigHammingMarker.loadDictionary(dictionary));
-				labelMaxID.setText(c.config.encoding.size()+"");
+				labelMaxID.setText(c.config.encoding.size() + "");
 				renderPreview();
 			} else {
 				super.controlChanged(source);
@@ -143,7 +143,7 @@ public class CreateFiducialSquareHammingGui extends CreateSquareFiducialGui {
 			try {
 				int lvalue = Integer.parseInt(text);
 
-				int maxValue = c.config.encoding.size()-1;
+				int maxValue = c.config.encoding.size() - 1;
 				if (lvalue > maxValue)
 					lvalue = maxValue;
 				else if (lvalue < 0)
