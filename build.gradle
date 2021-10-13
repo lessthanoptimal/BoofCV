@@ -18,7 +18,7 @@ allprojects {
     group = 'org.boofcv'
     version = '0.39.1-SNAPSHOT'
 
-    ext.build_java11 = true // IntelliJ has issues when this is set to true
+    ext.build_java11 = false // IntelliJ has issues when this is set to true
 
     createVersionFile.enabled = false // run only once. enabled in types
 }
@@ -356,31 +356,30 @@ subprojects {
 
 // list of projects for creating javadoc and jars
 def mainProjects = [
+        ':main:boofcv-feature',
+        ':main:boofcv-geo',
+        ':main:boofcv-io',
         ':main:boofcv-types',
         ':main:boofcv-ip',
         ':main:boofcv-ip-multiview',
         ':main:boofcv-learning',
-        ':main:boofcv-io',
-        ':main:boofcv-feature',
-        ':main:boofcv-geo',
-        ':main:boofcv-sfm',
         ':main:boofcv-recognition',
         ':main:boofcv-reconstruction',
-        ':main:boofcv-learning',
+        ':main:boofcv-sfm',
         ':main:boofcv-simulation',
         ':integration:boofcv-swing'
 ]
 
 def integrationProjects = [
-        ':integration:boofcv-jcodec',
-        ':integration:boofcv-WebcamCapture',
-        ':integration:boofcv-javacv',
         ':integration:boofcv-ffmpeg',
+        ':integration:boofcv-javacv',
+        ':integration:boofcv-jcodec',
+        ':integration:boofcv-pdf',
+        ':integration:boofcv-WebcamCapture',
 ]
 
 checkProjectExistsAddToList(':integration:boofcv-javafx', integrationProjects)
 checkProjectExistsAddToList(':integration:boofcv-android', integrationProjects)
-checkProjectExistsAddToList(':integration:boofcv-openkinect', integrationProjects)
 
 def javadocProjects = mainProjects + integrationProjects
 
@@ -414,13 +413,17 @@ task oneJarBin(type: Jar, dependsOn: javadocProjects.collect { it + ":compileJav
     }
 }
 
+// The android code causes javadoc generation to silently fail so we are removing it.
+// Someone should investigate this and see if it can be fixed.
+def javadocProjectsNoAndroid = javadocProjects.findAll({ !it.contains("android")})
+
 // Generates a global javadoc from all the modules
-task alljavadoc(type: Javadoc, group: "Documentation") {
+task alljavadoc(type: Javadoc, group: "Documentation", dependsOn: javadocProjectsNoAndroid.collect { it + ":compileJava" }) {
     // only include source code in src directory to avoid including 3rd party code which some projects do as a hack
-    source = javadocProjects.collect { project(it).sourceSets.main.allJava } +
-            javadocProjects.collect { project(it).sourceSets.noauto.allJava }
-    classpath = files(javadocProjects.collect { project(it).sourceSets.main.compileClasspath }) +
-            files(javadocProjects.collect { project(it).sourceSets.noauto.compileClasspath })
+    source = javadocProjectsNoAndroid.collect { project(it).sourceSets.main.allJava } +
+            javadocProjectsNoAndroid.collect { project(it).sourceSets.noauto.allJava }
+    classpath = files(javadocProjectsNoAndroid.collect { project(it).sourceSets.main.compileClasspath }) +
+            files(javadocProjectsNoAndroid.collect { project(it).sourceSets.noauto.compileClasspath })
 
     destinationDir = file("docs/api")
 
@@ -442,7 +445,7 @@ task alljavadoc(type: Javadoc, group: "Documentation") {
     configure(options) {
         failOnError = false
         title = "BoofCV ($project.version)"
-        links = ['http://docs.oracle.com/javase/8/docs/api/',
+        links = ['http://docs.oracle.com/en/java/javase/11/docs/api',
                  'http://ejml.org/javadoc/',
                  'http://georegression.org/javadoc/',
                  'http://ddogleg.org/javadoc/']
