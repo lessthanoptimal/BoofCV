@@ -19,14 +19,15 @@
 package boofcv.alg.feature.detect.intensity.impl;
 
 import boofcv.alg.transform.ii.DerivativeIntegralImage;
-import boofcv.alg.transform.ii.IntegralImageOps;
+import boofcv.alg.transform.ii.IntegralImageOps; //CONCURRENT_REMOVE_LINE
 import boofcv.alg.transform.ii.IntegralKernel;
+//CONCURRENT_INLINE import boofcv.concurrency.BoofConcurrency;
 import boofcv.struct.image.GrayF32;
 import boofcv.struct.image.GrayS32;
 import org.jetbrains.annotations.Nullable;
 
 import javax.annotation.Generated;
-//CONCURRENT_INLINE import boofcv.concurrency.BoofConcurrency;
+
 //CONCURRENT_INLINE import static boofcv.alg.feature.detect.intensity.impl.ImplIntegralImageFeatureIntensity.computeHessian;
 
 /**
