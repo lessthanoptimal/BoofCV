@@ -2,7 +2,7 @@
 - Run regression tests
 - Update Version
    * README.md
-   * Android example should reference latest BoofCV
+   * Android example should reference the latest BoofCV
    * build.gradle
 - Set release date in change.txt
 - Make sure all examples work
