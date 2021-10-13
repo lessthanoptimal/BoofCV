@@ -3,8 +3,8 @@ Change Log
 Date Format: year/month/day
 
 ---------------------------------------------
-Date    : 2021
-Version : 0.40
+Date    : 2021/Oct/13
+Version : 0.39.1
 
 Build
 - Dropped support for Java 8 (finally)
@@ -18,12 +18,6 @@ Applications
 - Fixed crash in CreateFiducialSquareHammingGui
 Data Structures
 - StereoParameters is no longer initialized with null fields
-
-TODO applications for self calibration mono and stereo
-TODO Added calibration targets Hamming Marker grid and chessboard, e.g. ChArUco and ArUco grids.
-TODO Monocular VO
-TODO Monocular SLAM
-TODO Stereo SLAM
 
 ---------------------------------------------
 Date    : 2021/Oct/8
