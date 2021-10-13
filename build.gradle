@@ -16,7 +16,7 @@ allprojects {
     apply plugin: 'com.peterabeles.gversion'
 
     group = 'org.boofcv'
-    version = '0.40-SNAPSHOT'
+    version = '0.39.1-SNAPSHOT'
 
     ext.build_java11 = true // IntelliJ has issues when this is set to true
 
@@ -387,26 +387,17 @@ def javadocProjects = mainProjects + integrationProjects
 // Creates a directory with all the compiled BoofCV jars and the dependencies for main
 task createLibraryDirectory(dependsOn: javadocProjects.collect { [it + ':jar', it + ':sourcesJar'] }.flatten()) {
     doLast {
-        // Compiled jars (bin and src) for all BoofCV modules
-        ext.boofJars = files(javadocProjects.collect { project(it).tasks.jar.archivePath })
-        ext.boofJars += files(javadocProjects.collect { project(it).tasks.sourcesJar.archivePath })
-
-        // This will be a list of just external dependencies
-        ext.listExternal = files(javadocProjects.collect { project(it).configurations.runtimeClasspath })
-        ext.listExternal = ext.listExternal - ext.boofJars
-        ext.listExternal = ext.listExternal.findAll({ !it.getName().contains("android.jar") })
+        // Collects BoofCV jars and external jars
+        ext.listJars = files(javadocProjects.collect { project(it).configurations.runtimeClasspath })
+        ext.listJars = ext.listJars.findAll({ !it.getName().contains("android.jar") })
+        ext.listJars = ext.listJars.findAll({ !it.isDirectory() }) // remove .class files
 
         ext.fileName = "boofcv-v" + version + "-libs"
         file(ext.fileName).deleteDir()
         file(ext.fileName).mkdir()
 
         copy {
-            from ext.listExternal
-            into ext.fileName
-        }
-
-        copy {
-            from ext.boofJars
+            from ext.listJars
             into ext.fileName
         }
 
