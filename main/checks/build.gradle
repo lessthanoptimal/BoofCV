@@ -1,36 +1,37 @@
 dependencies {
-    api project(':main:boofcv-core')
-    api project(':main:autocode')
+	api project(':main:boofcv-core')
+	api project(':main:autocode')
 
-    testImplementation project(':main:boofcv-feature').sourceSets.test.output
-    testImplementation project(':main:boofcv-geo').sourceSets.test.output
-    testImplementation project(':main:boofcv-io').sourceSets.test.output
-    testImplementation project(':main:boofcv-ip').sourceSets.test.output
-    testImplementation project(':main:boofcv-ip-multiview').sourceSets.test.output
-    testImplementation project(':main:boofcv-learning').sourceSets.test.output
-    testImplementation project(':main:boofcv-recognition').sourceSets.test.output
-    testImplementation project(':main:boofcv-reconstruction').sourceSets.test.output
-    testImplementation project(':main:boofcv-sfm').sourceSets.test.output
-    testImplementation project(':main:boofcv-simulation').sourceSets.test.output
-    testImplementation project(':main:boofcv-types').sourceSets.test.output
-    testImplementation project(':integration:boofcv-swing')
+	testImplementation project(':main:boofcv-feature').sourceSets.test.output
+	testImplementation project(':main:boofcv-geo').sourceSets.test.output
+	testImplementation project(':main:boofcv-io').sourceSets.test.output
+	testImplementation project(':main:boofcv-ip').sourceSets.test.output
+	testImplementation project(':main:boofcv-ip-multiview').sourceSets.test.output
+	testImplementation project(':main:boofcv-learning').sourceSets.test.output
+	testImplementation project(':main:boofcv-recognition').sourceSets.test.output
+	testImplementation project(':main:boofcv-reconstruction').sourceSets.test.output
+	testImplementation project(':main:boofcv-sfm').sourceSets.test.output
+	testImplementation project(':main:boofcv-simulation').sourceSets.test.output
+	testImplementation project(':main:boofcv-types').sourceSets.test.output
+	testImplementation project(':integration:boofcv-swing')
 
-    runtime project(':main:boofcv-feature').sourceSets.experimental.output
-    runtime project(':main:boofcv-feature').sourceSets.benchmark.output
-    runtime project(':main:boofcv-geo').sourceSets.benchmark.output
-    runtime project(':main:boofcv-io').sourceSets.benchmark.output
-    runtime project(':main:boofcv-ip').sourceSets.benchmark.output
-    runtime project(':main:boofcv-ip-multiview').sourceSets.benchmark.output
-    runtime project(':main:boofcv-learning').sourceSets.benchmark.output
-    runtime project(':main:boofcv-recognition').sourceSets.benchmark.output
-    runtime project(':main:boofcv-reconstruction').sourceSets.benchmark.output
-    runtime project(':main:boofcv-sfm').sourceSets.benchmark.output
-    runtime project(':integration:boofcv-ffmpeg') // one test decodes a mp4
+	runtime project(':main:boofcv-feature').sourceSets.experimental.output
+	runtime project(':main:boofcv-feature').sourceSets.benchmark.output
+	runtime project(':main:boofcv-geo').sourceSets.benchmark.output
+	runtime project(':main:boofcv-io').sourceSets.benchmark.output
+	runtime project(':main:boofcv-ip').sourceSets.benchmark.output
+	runtime project(':main:boofcv-ip-multiview').sourceSets.benchmark.output
+	runtime project(':main:boofcv-learning').sourceSets.benchmark.output
+	runtime project(':main:boofcv-recognition').sourceSets.benchmark.output
+	runtime project(':main:boofcv-reconstruction').sourceSets.benchmark.output
+	runtime project(':main:boofcv-sfm').sourceSets.benchmark.output
+	runtime project(':integration:boofcv-ffmpeg') // one test decodes a mp4
 
-    implementation(group: 'com.peterabeles', name: 'regression', version: auto64to32_version) {
-        exclude(group: "org.openjdk.jmh")
-    }
-    implementation group: 'com.peterabeles', name: 'language', version: auto64to32_version
+	implementation(group: 'com.peterabeles', name: 'regression', version: auto64to32_version) {
+		exclude(group: "org.openjdk.jmh")
+	}
+	implementation group: 'com.peterabeles', name: 'language', version: auto64to32_version
+	api("org.openjdk.jmh:jmh-core:$jmh_version")
 }
 
 // Run the regression using a gradle command
@@ -38,10 +39,10 @@ dependencies {
 //
 // Example: ./gradlew runtimeRegression run --console=plain -Dexec.args="--SummaryOnly"
 task runtimeRegression(type: JavaExec) {
-    dependsOn build
-    group = "Execution"
-    description = "Run the mainClass from the output jar in classpath with ExecTask"
-    classpath = sourceSets.main.runtimeClasspath
-    main = "boofcv.regression.BoofCVRuntimeRegressionApp"
-    args System.getProperty("exec.args", "").split()
+	dependsOn build
+	group = "Execution"
+	description = "Run the mainClass from the output jar in classpath with ExecTask"
+	classpath = sourceSets.main.runtimeClasspath
+	main = "boofcv.regression.BoofCVRuntimeRegressionApp"
+	args System.getProperty("exec.args", "").split()
 }
