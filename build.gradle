@@ -16,7 +16,7 @@ allprojects {
     apply plugin: 'com.peterabeles.gversion'
 
     group = 'org.boofcv'
-    version = '0.39.1'
+    version = '0.40-SNAPSHOT'
 
     ext.build_java11 = true // IntelliJ has issues when this is set to true
 
