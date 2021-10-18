@@ -11,6 +11,23 @@ plugins {
 ext.libpath = file('./').absolutePath
 
 allprojects {
+    tasks.withType(Test).configureEach {
+        maxParallelForks = 4
+    }
+
+    tasks.withType(Test).configureEach {
+        forkEvery = 100
+    }
+
+    tasks.withType(Test).configureEach {
+        reports.html.required = false
+        reports.junitXml.required = false
+    }
+
+    tasks.withType(JavaCompile).configureEach {
+        options.fork = true
+    }
+
     apply plugin: 'idea'
     apply plugin: 'eclipse'
     apply plugin: 'com.peterabeles.gversion'
