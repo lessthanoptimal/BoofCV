@@ -18,7 +18,7 @@ allprojects {
     group = 'org.boofcv'
     version = '0.40-SNAPSHOT'
 
-    ext.build_java11 = true // IntelliJ has issues when this is set to true
+    ext.build_java11 = false // IntelliJ has issues when this is set to true
 
     createVersionFile.enabled = false // run only once. enabled in types
 }
@@ -415,7 +415,7 @@ task oneJarBin(type: Jar, dependsOn: javadocProjects.collect { it + ":compileJav
 
 // The android code causes javadoc generation to silently fail so we are removing it.
 // Someone should investigate this and see if it can be fixed.
-def javadocProjectsNoAndroid = javadocProjects.findAll({ !it.contains("android")})
+def javadocProjectsNoAndroid = javadocProjects.findAll({ !it.contains("android") })
 
 // Generates a global javadoc from all the modules
 task alljavadoc(type: Javadoc, group: "Documentation", dependsOn: javadocProjectsNoAndroid.collect { it + ":compileJava" }) {
@@ -471,6 +471,31 @@ alljavadocWeb.finalizedBy(alljavadoc)
 task testReport(type: TestReport) {
     destinationDir = file("$buildDir/reports/allTests")
     reportOn subprojects*.test
+}
+
+// Sanity check to make sure that autogenerate has been called. This is the source of a lot of confusion from users
+project(":main:boofcv-types") {
+    // This is the first task that the main source code will depend on
+    tasks.findByName("compileJava").doFirst { task ->
+        // Determine the sourceSet by looking at the path
+        def iterator = task.stableSources.iterator()
+        if (!iterator.hasNext())
+            return
+
+        // Get the path to the first file and compensate for how file paths are specified on Windows
+        def path = iterator.next().path.replace("\\", "/")
+
+        // make sure it's only checking the main source set
+        if (!path.contains("boofcv-types/src/main"))
+            return
+
+        // See if an arbitrary auto generated file exists
+        if (file("src/main/java/boofcv/struct/border/ImageBorder_F32.java").exists())
+            return
+
+        // Attempt to make this error very obvious despite all the "helpful" text gradle dumps afterwards
+        throw new InvalidUserDataException("*****\n  You must run './gradlew autogenerate' before you can build!\n*****")
+    }
 }
 
 wrapper {
