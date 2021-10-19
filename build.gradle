@@ -18,7 +18,7 @@ allprojects {
     group = 'org.boofcv'
     version = '0.40-SNAPSHOT'
 
-    ext.build_java11 = false // IntelliJ has issues when this is set to true
+    ext.build_java11 = true // IntelliJ has issues when this is set to true
 
     createVersionFile.enabled = false // run only once. enabled in types
 }
