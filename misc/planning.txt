@@ -1,9 +1,3 @@
-TODO Monocular SLAM
-TODO Stereo SLAM
-TODO Added calibration targets Hamming Marker grid and chessboard, e.g. ChArUco and ArUco grids.
-TODO applications for self calibration mono and stereo
-TODO Monocular VO
-
 TODO DB
     - Check all views when merging scenes for consistency
     - Root cause why it diverges if you consider too many images

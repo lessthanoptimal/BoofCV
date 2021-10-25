@@ -50,8 +50,10 @@ public class VariableLockSet {
 
 	public void unlock() {lock.unlock();}
 
-	@FunctionalInterface
-	public interface SelectObject<T> {
+	/** Returns true if the lock is active */
+	public boolean isLocked() {return lock.isLocked();}
+
+	@FunctionalInterface public interface SelectObject<T> {
 		T select();
 	}
 }

@@ -7,7 +7,13 @@ Date    : 2021/
 Version : 0.40
 
 Build
-- Added sanity check that makes sure autogenerate was run first and prints out a helpful message
+- Added sanity check that makes sure autogenerate had been run already first and prints out a helpful message
+
+TODO Monocular SLAM
+TODO Stereo SLAM
+TODO Added calibration targets Hamming Marker grid and chessboard, e.g. ChArUco and ArUco grids.
+TODO applications for self calibration mono and stereo
+TODO Monocular VO
 
 ---------------------------------------------
 Date    : 2021/Oct/13
