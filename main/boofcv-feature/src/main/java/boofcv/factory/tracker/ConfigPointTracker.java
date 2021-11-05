@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -50,8 +50,7 @@ public class ConfigPointTracker implements Configuration {
 	/** Association for detect and describe approach */
 	public ConfigAssociate associate = new ConfigAssociate();
 
-	@Override
-	public void checkValidity() {
+	@Override public void checkValidity() {
 		klt.checkValidity();
 		dda.checkValidity();
 		hybrid.checkValidity();
@@ -63,12 +62,13 @@ public class ConfigPointTracker implements Configuration {
 		KLT,DDA,HYBRID
 	}
 
-	public void setTo( ConfigPointTracker src ) {
+	public ConfigPointTracker setTo( ConfigPointTracker src ) {
 		this.typeTracker = src.typeTracker;
 		this.klt.setTo(src.klt);
 		this.dda.setTo(src.dda);
 		this.hybrid.setTo(src.hybrid);
 		this.detDesc.setTo(src.detDesc);
 		this.associate.setTo(src.associate);
+		return this;
 	}
 }

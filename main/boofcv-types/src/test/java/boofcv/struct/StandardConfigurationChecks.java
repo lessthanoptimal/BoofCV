@@ -135,8 +135,7 @@ public abstract class StandardConfigurationChecks extends BoofStandardJUnit {
 		}
 	}
 
-	@Test
-	void setTo() {
+	@Test void setTo() {
 		Method m;
 		Configuration src = (Configuration)createNotDefault(type, rand);
 		try {
@@ -177,7 +176,9 @@ public abstract class StandardConfigurationChecks extends BoofStandardJUnit {
 				}
 			}
 
-			m.invoke(dst, src);
+			Object ret = m.invoke(dst, src);
+			assertSame(dst, ret, "setTo() must return 'this'");
+			// you want to return 'this' so that commands can be chained
 
 			// after setTo() they should be the same
 			for (Field f : fields) {

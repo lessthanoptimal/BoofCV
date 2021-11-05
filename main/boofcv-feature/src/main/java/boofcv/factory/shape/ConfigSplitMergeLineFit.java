@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -66,7 +66,7 @@ public class ConfigSplitMergeLineFit extends BaseConfigPolyline {
 	 */
 	public boolean loop = true;
 
-	public void setTo( ConfigSplitMergeLineFit src ) {
+	public ConfigSplitMergeLineFit setTo( ConfigSplitMergeLineFit src ) {
 		super.setTo(src);
 		this.splitFraction = src.splitFraction;
 		this.iterations = src.iterations;
@@ -74,6 +74,7 @@ public class ConfigSplitMergeLineFit extends BaseConfigPolyline {
 		this.pruneSplitPenalty = src.pruneSplitPenalty;
 		this.minimumSide.setTo(src.minimumSide);
 		this.loop = src.loop;
+		return this;
 	}
 
 	@Override

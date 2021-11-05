@@ -46,10 +46,11 @@ public class ConfigFundamental implements Configuration {
 	public ConfigFundamental() {
 	}
 
-	public void setTo( ConfigFundamental src ) {
+	public ConfigFundamental setTo( ConfigFundamental src ) {
 		this.which = src.which;
 		this.numResolve = src.numResolve;
 		this.errorModel = src.errorModel;
+		return this;
 	}
 
 	@Override

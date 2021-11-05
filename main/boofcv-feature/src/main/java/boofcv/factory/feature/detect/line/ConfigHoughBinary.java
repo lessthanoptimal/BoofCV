@@ -54,7 +54,7 @@ public class ConfigHoughBinary implements Configuration {
 	 * If absolute it will be the number of counts in a cell. If relative
 	 * it will be relative to the total area of the transform image.
 	 */
-	public ConfigLength minCounts = ConfigLength.relative(0.001,1);
+	public ConfigLength minCounts = ConfigLength.relative(0.001, 1);
 
 	/**
 	 * Maximum number of lines to return. If &le; 0 it will return all
@@ -73,11 +73,11 @@ public class ConfigHoughBinary implements Configuration {
 
 	public ConfigHoughBinary() {}
 
-	public ConfigHoughBinary(int maxLines) {
+	public ConfigHoughBinary( int maxLines ) {
 		this.maxLines = maxLines;
 	}
 
-	public void setTo( ConfigHoughBinary src ) {
+	public ConfigHoughBinary setTo( ConfigHoughBinary src ) {
 		this.binarization = src.binarization;
 		this.thresholdImage.setTo(src.thresholdImage);
 		this.thresholdEdge.setTo(src.thresholdEdge);
@@ -86,12 +86,10 @@ public class ConfigHoughBinary implements Configuration {
 		this.maxLines = src.maxLines;
 		this.mergeAngle = src.mergeAngle;
 		this.mergeDistance = src.mergeDistance;
+		return this;
 	}
 
-	@Override
-	public void checkValidity() {
-
-	}
+	@Override public void checkValidity() {}
 
 	/**
 	 * Approach used to compute a binary image

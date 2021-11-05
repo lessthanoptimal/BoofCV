@@ -80,10 +80,11 @@ public class ConfigChessboardBinary implements Configuration {
 		square.refineGray.maxIterations = 5;
 	}
 
-	public void setTo( ConfigChessboardBinary src ) {
+	public ConfigChessboardBinary setTo( ConfigChessboardBinary src ) {
 		this.maximumCornerDistance.setTo(src.maximumCornerDistance);
 		this.thresholding.setTo(src.thresholding);
 		this.square.setTo(src.square);
+		return this;
 	}
 
 	@Override

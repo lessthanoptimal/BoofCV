@@ -65,7 +65,7 @@ public class TestSparseFlowObjectTracker extends BoofStandardJUnit {
 
 		new FDistort(frame0,frame1).affine(c,-s,s,c,tranX,tranY).apply();
 
-		SfotConfig config = new SfotConfig();
+		ConfigSfot config = new ConfigSfot();
 
 		ImageGradient<GrayU8,GrayS16> gradient = FactoryDerivative.sobel(GrayU8.class,GrayS16.class);
 

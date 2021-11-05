@@ -66,7 +66,7 @@ public class ConfigBackgroundGmm extends BaseConfigBackground {
 
 	public ConfigBackgroundGmm() {}
 
-	public void setTo( ConfigBackgroundGmm src ) {
+	public ConfigBackgroundGmm setTo( ConfigBackgroundGmm src ) {
 		super.setTo(src);
 		this.learningPeriod = src.learningPeriod;
 		this.initialVariance = src.initialVariance;
@@ -74,6 +74,7 @@ public class ConfigBackgroundGmm extends BaseConfigBackground {
 		this.maxDistance = src.maxDistance;
 		this.numberOfGaussian = src.numberOfGaussian;
 		this.significantWeight = src.significantWeight;
+		return this;
 	}
 
 	@Override

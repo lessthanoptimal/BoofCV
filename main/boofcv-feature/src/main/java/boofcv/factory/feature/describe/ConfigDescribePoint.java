@@ -50,10 +50,11 @@ public class ConfigDescribePoint implements Configuration {
 		convert.checkValidity();
 	}
 
-	public void setTo( ConfigDescribePoint src ) {
+	public ConfigDescribePoint setTo( ConfigDescribePoint src ) {
 		this.radius = src.radius;
 		this.descriptors.setTo(src.descriptors);
 		this.orientation.setTo(orientation);
 		this.convert.setTo(src.convert);
+		return this;
 	}
 }

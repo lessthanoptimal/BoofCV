@@ -43,10 +43,11 @@ public class ConfigEdgeThreshold implements Configuration {
 	 */
 	public boolean nonMax = true;
 
-	public void setTo( ConfigEdgeThreshold src ) {
+	public ConfigEdgeThreshold setTo( ConfigEdgeThreshold src ) {
 		this.gradient = src.gradient;
 		this.threshold = src.threshold;
 		this.nonMax = src.nonMax;
+		return this;
 	}
 
 	@Override

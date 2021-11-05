@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -60,12 +60,13 @@ public class ConfigSegmentMeanShift implements Configuration {
 		this.fast = fast;
 	}
 
-	public void setTo( ConfigSegmentMeanShift src ) {
+	public ConfigSegmentMeanShift setTo( ConfigSegmentMeanShift src ) {
 		this.spacialRadius = src.spacialRadius;
 		this.colorRadius = src.colorRadius;
 		this.minimumRegionSize = src.minimumRegionSize;
 		this.fast = src.fast;
 		this.connectRule = src.connectRule;
+		return this;
 	}
 
 	@Override

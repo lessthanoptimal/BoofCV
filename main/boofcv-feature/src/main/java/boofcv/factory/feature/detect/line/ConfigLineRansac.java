@@ -48,11 +48,12 @@ public class ConfigLineRansac implements Configuration {
 
 	public ConfigLineRansac() {}
 
-	public void setTo( ConfigLineRansac src ) {
+	public ConfigLineRansac setTo( ConfigLineRansac src ) {
 		this.regionSize = src.regionSize;
 		this.thresholdEdge = src.thresholdEdge;
 		this.thresholdAngle = src.thresholdAngle;
 		this.connectLines = src.connectLines;
+		return this;
 	}
 
 	@Override public void checkValidity() {}

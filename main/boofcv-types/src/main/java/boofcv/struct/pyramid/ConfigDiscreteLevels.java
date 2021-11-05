@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -53,8 +53,7 @@ public class ConfigDiscreteLevels implements Configuration {
 		return new ConfigDiscreteLevels(-1, sideLength, sideLength);
 	}
 
-	public ConfigDiscreteLevels() {
-	}
+	public ConfigDiscreteLevels() {}
 
 	public ConfigDiscreteLevels( int numLevelsRequested, int minWidth, int minHeight ) {
 		this.numLevelsRequested = numLevelsRequested;
@@ -96,10 +95,11 @@ public class ConfigDiscreteLevels implements Configuration {
 		return numLevelsRequested > 0;
 	}
 
-	public void setTo( ConfigDiscreteLevels config ) {
+	public ConfigDiscreteLevels setTo( ConfigDiscreteLevels config ) {
 		this.numLevelsRequested = config.numLevelsRequested;
 		this.minWidth = config.minWidth;
 		this.minHeight = config.minHeight;
+		return this;
 	}
 
 	@Override

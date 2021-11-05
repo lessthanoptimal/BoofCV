@@ -42,18 +42,18 @@ public class ConfigLMedS implements Configuration {
 	 */
 	public double errorFraction = 0.5;
 
-	public ConfigLMedS() {
-	}
+	public ConfigLMedS() {}
 
 	public ConfigLMedS( long randSeed, int totalCycles ) {
 		this.randSeed = randSeed;
 		this.totalCycles = totalCycles;
 	}
 
-	public void setTo( ConfigLMedS src ) {
+	public ConfigLMedS setTo( ConfigLMedS src ) {
 		this.randSeed = src.randSeed;
 		this.totalCycles = src.totalCycles;
 		this.errorFraction = src.errorFraction;
+		return this;
 	}
 
 	@Override

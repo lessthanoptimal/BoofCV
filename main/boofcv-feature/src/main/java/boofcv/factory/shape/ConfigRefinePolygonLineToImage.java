@@ -57,19 +57,17 @@ public class ConfigRefinePolygonLineToImage implements Configuration {
 	 */
 	public double maxCornerChangePixel = 2.0;
 
-	public void setTo( ConfigRefinePolygonLineToImage src ) {
+	public ConfigRefinePolygonLineToImage setTo( ConfigRefinePolygonLineToImage src ) {
 		this.cornerOffset = src.cornerOffset;
 		this.lineSamples = src.lineSamples;
 		this.sampleRadius = src.sampleRadius;
 		this.maxIterations = src.maxIterations;
 		this.convergeTolPixels = src.convergeTolPixels;
 		this.maxCornerChangePixel = src.maxCornerChangePixel;
+		return this;
 	}
 
-	@Override
-	public void checkValidity() {
-
-	}
+	@Override public void checkValidity() {}
 
 	@Override
 	public String toString() {

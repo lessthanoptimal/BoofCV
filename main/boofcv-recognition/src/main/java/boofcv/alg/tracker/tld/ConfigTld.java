@@ -143,7 +143,7 @@ public class ConfigTld implements Configuration {
 		trackerConfig.maxIterations = 50;
 	}
 
-	public void setTo( ConfigTld src ) {
+	public ConfigTld setTo( ConfigTld src ) {
 		this.maximumCascadeConsider = src.maximumCascadeConsider;
 		this.numNegativeFerns = src.numNegativeFerns;
 		this.maximumErrorFB = src.maximumErrorFB;
@@ -163,6 +163,7 @@ public class ConfigTld implements Configuration {
 		this.fernSize = src.fernSize;
 		this.confidenceAccept = src.confidenceAccept;
 		this.scaleSpread = src.scaleSpread;
+		return this;
 	}
 
 	@Override

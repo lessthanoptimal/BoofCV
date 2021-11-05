@@ -31,12 +31,10 @@ public class ConfigParamFoot implements Configuration {
 	 */
 	public int minDistanceFromOrigin = 5;
 
-	public void setTo( ConfigParamFoot src ) {
+	public ConfigParamFoot setTo( ConfigParamFoot src ) {
 		this.minDistanceFromOrigin = src.minDistanceFromOrigin;
+		return this;
 	}
 
-	@Override
-	public void checkValidity() {
-
-	}
+	@Override public void checkValidity() {}
 }

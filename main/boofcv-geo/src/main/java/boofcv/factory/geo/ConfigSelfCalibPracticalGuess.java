@@ -46,10 +46,11 @@ public class ConfigSelfCalibPracticalGuess implements Configuration {
 		BoofMiscOps.checkTrue(numberOfSamples >= 1);
 	}
 
-	public void setTo( ConfigSelfCalibPracticalGuess src ) {
+	public ConfigSelfCalibPracticalGuess setTo( ConfigSelfCalibPracticalGuess src ) {
 		this.sampleMin = src.sampleMin;
 		this.sampleMax = src.sampleMax;
 		this.numberOfSamples = src.numberOfSamples;
 		this.fixedFocus = src.fixedFocus;
+		return this;
 	}
 }

@@ -37,13 +37,11 @@ public class ConfigHornSchunck implements Configuration {
 	 */
 	public int numIterations = 1000;
 
-	public void setTo( ConfigHornSchunck src ) {
+	public ConfigHornSchunck setTo( ConfigHornSchunck src ) {
 		this.alpha = src.alpha;
 		this.numIterations = src.numIterations;
+		return this;
 	}
 
-	@Override
-	public void checkValidity() {
-
-	}
+	@Override public void checkValidity() {}
 }

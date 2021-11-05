@@ -65,10 +65,9 @@ public class ConfigCirculantTracker implements Configuration {
 		this.interp_factor = interp_factor;
 	}
 
-	public ConfigCirculantTracker() {
-	}
+	public ConfigCirculantTracker() {}
 
-	public void setTo( ConfigCirculantTracker src ) {
+	public ConfigCirculantTracker setTo( ConfigCirculantTracker src ) {
 		this.output_sigma_factor = src.output_sigma_factor;
 		this.sigma = src.sigma;
 		this.lambda = src.lambda;
@@ -76,10 +75,8 @@ public class ConfigCirculantTracker implements Configuration {
 		this.maxPixelValue = src.maxPixelValue;
 		this.padding = src.padding;
 		this.workSpace = src.workSpace;
+		return this;
 	}
 
-	@Override
-	public void checkValidity() {
-
-	}
+	@Override public void checkValidity() {}
 }

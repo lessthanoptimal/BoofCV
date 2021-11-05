@@ -74,15 +74,15 @@ public class ConfigCompleteSift implements Configuration {
 		detector.maxFeaturesPerScale = maxFeaturesPerScale;
 	}
 
-	public void setTo( ConfigCompleteSift src ) {
+	public ConfigCompleteSift setTo( ConfigCompleteSift src ) {
 		this.scaleSpace.setTo(src.scaleSpace);
 		this.detector.setTo(src.detector);
 		this.orientation.setTo(src.orientation);
 		this.describe.setTo(src.describe);
+		return this;
 	}
 
-	@Override
-	public void checkValidity() {
+	@Override public void checkValidity() {
 		scaleSpace.checkValidity();
 		detector.checkValidity();
 		orientation.checkValidity();

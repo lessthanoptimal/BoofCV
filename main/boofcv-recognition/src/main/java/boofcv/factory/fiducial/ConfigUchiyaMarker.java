@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -29,12 +29,10 @@ import boofcv.struct.ConnectRule;
 /**
  * Configuration for Uchiya Marker approach to detect random dot markers
  *
- * @see boofcv.alg.fiducial.dots.UchiyaMarkerImageTracker
- *
  * @author Peter Abeles
+ * @see boofcv.alg.fiducial.dots.UchiyaMarkerImageTracker
  */
 public class ConfigUchiyaMarker implements Configuration {
-
 	/**
 	 * Specifies the marker's width. This must match width used to generate the random dots.
 	 */
@@ -57,7 +55,7 @@ public class ConfigUchiyaMarker implements Configuration {
 	/**
 	 * Configures RANSAC used to fit the homography. You might need to tune this.
 	 */
-	public ConfigRansac ransac = new ConfigRansac(200,2.0);
+	public ConfigRansac ransac = new ConfigRansac(200, 2.0);
 
 	/**
 	 * Pixel connectivity rule for blob/contour finder.
@@ -102,7 +100,7 @@ public class ConfigUchiyaMarker implements Configuration {
 		// checkEdge.minimumEdgeIntensity = 15;
 	}
 
-	public void setTo( ConfigUchiyaMarker src ) {
+	public ConfigUchiyaMarker setTo( ConfigUchiyaMarker src ) {
 		this.markerWidth = src.markerWidth;
 		this.markerHeight = src.markerHeight;
 		this.threshold.setTo(src.threshold);
@@ -114,14 +112,15 @@ public class ConfigUchiyaMarker implements Configuration {
 		this.minimumMinorAxis = src.minimumMinorAxis;
 		this.maxMajorToMinorRatio = src.maxMajorToMinorRatio;
 		this.checkEdge.setTo(src.checkEdge);
+		return this;
 	}
 
 	@Override
 	public void checkValidity() {
 		llah.checkValidity();
-		if( markerWidth <= 0 )
+		if (markerWidth <= 0)
 			throw new IllegalArgumentException("Marker's width must set!");
-		if( markerHeight <= 0 )
+		if (markerHeight <= 0)
 			throw new IllegalArgumentException("Marker's height must set!");
 	}
 }

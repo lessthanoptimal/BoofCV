@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -49,15 +49,15 @@ public class ConfigLlah implements Configuration {
 	/** Type of invariant used to compute the hash code */
 	public HashType hashType = HashType.AFFINE;
 
-	public ConfigLlah() {
-	}
+	public ConfigLlah() {}
 
-	public void setTo( ConfigLlah src ) {
+	public ConfigLlah setTo( ConfigLlah src ) {
 		this.numberOfNeighborsN = src.numberOfNeighborsN;
 		this.sizeOfCombinationM = src.sizeOfCombinationM;
 		this.quantizationK = src.quantizationK;
 		this.hashTableSize = src.hashTableSize;
 		this.hashType = src.hashType;
+		return this;
 	}
 
 	@Override

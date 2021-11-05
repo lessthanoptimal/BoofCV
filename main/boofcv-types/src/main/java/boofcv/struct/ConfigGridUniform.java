@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -26,6 +26,7 @@ package boofcv.struct;
 public class ConfigGridUniform implements Configuration {
 	/** Scales the size of a region up by this amount */
 	public double regionScaleFactor = 2.0;
+
 	/** The smallest allowed cell size in pixels */
 	public int minCellLength = 5;
 
@@ -60,14 +61,13 @@ public class ConfigGridUniform implements Configuration {
 			throw new IllegalArgumentException("Scale factor must be greater than zero");
 	}
 
-	public void setTo( ConfigGridUniform src ) {
+	public ConfigGridUniform setTo( ConfigGridUniform src ) {
 		this.regionScaleFactor = src.regionScaleFactor;
 		this.minCellLength = src.minCellLength;
+		return this;
 	}
 
 	public ConfigGridUniform copy() {
-		var out = new ConfigGridUniform();
-		out.setTo(this);
-		return out;
+		return new ConfigGridUniform().setTo(this);
 	}
 }

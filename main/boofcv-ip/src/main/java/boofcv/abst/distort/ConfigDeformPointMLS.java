@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -29,33 +29,25 @@ import boofcv.struct.Configuration;
  */
 public class ConfigDeformPointMLS implements Configuration {
 
-	/**
-	 * Deformation model it should use
-	 */
+	/** Deformation model it should use */
 	public TypeDeformMLS type = TypeDeformMLS.RIGID;
 
-	/**
-	 * Number of columns in precomputed distortion grd
-	 */
+	/** Number of columns in precomputed distortion grd */
 	public int cols = 50;
 
-	/**
-	 * Number of rows in precomputed distortion grd
-	 */
+	/** Number of rows in precomputed distortion grd */
 	public int rows = 50;
 
-	/**
-	 * Used to tune distance function
-	 */
+	/** Used to tune distance function */
 	public float alpha = 3.0f/2.0f;
 
-	public void setTo( ConfigDeformPointMLS src ) {
+	public ConfigDeformPointMLS setTo( ConfigDeformPointMLS src ) {
 		this.type = src.type;
 		this.cols = src.cols;
 		this.rows = src.rows;
 		this.alpha = src.alpha;
+		return this;
 	}
 
-	@Override
-	public void checkValidity() {}
+	@Override public void checkValidity() {}
 }

@@ -94,16 +94,16 @@ public class ConfigExtract implements Configuration {
 		this(radius,threshold,0,true);
 	}
 
-	public ConfigExtract() {
-	}
+	public ConfigExtract() {}
 
-	public void setTo( ConfigExtract src ) {
+	public ConfigExtract setTo( ConfigExtract src ) {
 		this.radius = src.radius;
 		this.threshold = src.threshold;
 		this.ignoreBorder = src.ignoreBorder;
 		this.useStrictRule = src.useStrictRule;
 		this.detectMinimums = src.detectMinimums;
 		this.detectMaximums = src.detectMaximums;
+		return this;
 	}
 
 	@Override

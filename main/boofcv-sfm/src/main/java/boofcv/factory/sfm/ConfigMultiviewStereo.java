@@ -41,9 +41,10 @@ public class ConfigMultiviewStereo implements Configuration {
 		BoofMiscOps.checkTrue(maximumCenterOverlap >= 0.0 && maximumCenterOverlap <= 1.0);
 	}
 
-	public void setTo( ConfigMultiviewStereo src ) {
+	public ConfigMultiviewStereo setTo( ConfigMultiviewStereo src ) {
 		this.minimumQuality3D = src.minimumQuality3D;
 		this.maximumCenterOverlap = src.maximumCenterOverlap;
 		this.maxCombinePairs = src.maxCombinePairs;
+		return this;
 	}
 }

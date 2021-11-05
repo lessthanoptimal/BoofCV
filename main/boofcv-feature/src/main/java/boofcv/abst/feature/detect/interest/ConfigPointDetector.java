@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -26,7 +26,6 @@ import boofcv.struct.Configuration;
  * @author Peter Abeles
  */
 public class ConfigPointDetector implements Configuration {
-
 	/**
 	 * Which detector is used.
 	 */
@@ -55,22 +54,21 @@ public class ConfigPointDetector implements Configuration {
 
 	@Override
 	public void checkValidity() {
-		if( scaleRadius <= 0 )
+		if (scaleRadius <= 0)
 			throw new IllegalArgumentException("Radius must be a positive number");
 	}
 
-	public void setTo( ConfigPointDetector src ) {
+	public ConfigPointDetector setTo( ConfigPointDetector src ) {
 		this.type = src.type;
 		this.scaleRadius = src.scaleRadius;
 		this.general.setTo(src.general);
 		this.harris.setTo(src.harris);
 		this.shiTomasi.setTo(src.shiTomasi);
 		this.fast.setTo(src.fast);
+		return this;
 	}
 
 	public ConfigPointDetector copy() {
-		var out = new ConfigPointDetector();
-		out.setTo(this);
-		return out;
+		return new ConfigPointDetector().setTo(this);
 	}
 }

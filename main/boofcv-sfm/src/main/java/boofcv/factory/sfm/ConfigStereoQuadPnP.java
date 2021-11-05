@@ -83,7 +83,7 @@ public class ConfigStereoQuadPnP implements Configuration {
 		associateF2F.type = ConfigAssociate.AssociationType.GREEDY;
 	}
 
-	public void setTo( ConfigStereoQuadPnP src ) {
+	public ConfigStereoQuadPnP setTo( ConfigStereoQuadPnP src ) {
 		this.bundle.setTo(src.bundle);
 		this.bundleConverge.setTo(src.bundleConverge);
 		this.pnp = src.pnp;
@@ -93,6 +93,7 @@ public class ConfigStereoQuadPnP implements Configuration {
 		this.associateF2F.setTo(src.associateF2F);
 		this.associateL2R.setTo(src.associateL2R);
 		this.epipolarTol = src.epipolarTol;
+		return this;
 	}
 
 	@Override

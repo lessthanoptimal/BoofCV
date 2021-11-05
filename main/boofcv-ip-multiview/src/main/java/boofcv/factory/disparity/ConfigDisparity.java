@@ -43,11 +43,12 @@ public class ConfigDisparity implements Configuration {
 		approachSGM.checkValidity();
 	}
 
-	public void setTo( ConfigDisparity src ) {
+	public ConfigDisparity setTo( ConfigDisparity src ) {
 		this.approach = src.approach;
 		this.approachBM.setTo(src.approachBM);
 		this.approachBM5.setTo(src.approachBM5);
 		this.approachSGM.setTo(src.approachSGM);
+		return this;
 	}
 
 	/**

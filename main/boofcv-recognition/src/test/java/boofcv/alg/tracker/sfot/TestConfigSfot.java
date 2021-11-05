@@ -20,4 +20,4 @@ package boofcv.alg.tracker.sfot;
 
 import boofcv.struct.StandardConfigurationChecks;
 
-class TestSfotConfig extends StandardConfigurationChecks {}
+class TestConfigSfot extends StandardConfigurationChecks {}

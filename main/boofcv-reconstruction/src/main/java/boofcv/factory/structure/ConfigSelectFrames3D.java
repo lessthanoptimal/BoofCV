@@ -119,7 +119,7 @@ public class ConfigSelectFrames3D implements Configuration {
 		scorer3D.checkValidity();
 	}
 
-	public void setTo( ConfigSelectFrames3D src ) {
+	public ConfigSelectFrames3D setTo( ConfigSelectFrames3D src ) {
 		this.historyLength = src.historyLength;
 		this.motionInlierPx = src.motionInlierPx;
 		this.thresholdQuick = src.thresholdQuick;
@@ -132,5 +132,6 @@ public class ConfigSelectFrames3D implements Configuration {
 		this.tracker.setTo(src.tracker);
 		this.describe.setTo(src.describe);
 		this.associate.setTo(src.associate);
+		return this;
 	}
 }

@@ -73,21 +73,18 @@ public class ConfigPolygonDetector implements Configuration {
 		detector = new ConfigPolygonFromContour(clockwise, minimumSides, maximumSides);
 	}
 
-	public ConfigPolygonDetector() {
-	}
+	public ConfigPolygonDetector() {}
 
-	public void setTo( ConfigPolygonDetector src ) {
+	public ConfigPolygonDetector setTo( ConfigPolygonDetector src ) {
 		this.detector.setTo(src.detector);
 		this.minimumRefineEdgeIntensity = src.minimumRefineEdgeIntensity;
 		this.refineContour = src.refineContour;
 		this.adjustForThresholdBias = src.adjustForThresholdBias;
 		this.refineGray.setTo(src.refineGray);
+		return this;
 	}
 
-	@Override
-	public void checkValidity() {
-
-	}
+	@Override public void checkValidity() {}
 
 	@Override
 	public String toString() {

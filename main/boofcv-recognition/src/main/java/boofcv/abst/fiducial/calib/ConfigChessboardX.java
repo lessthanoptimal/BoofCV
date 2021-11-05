@@ -94,7 +94,7 @@ public class ConfigChessboardX implements Configuration {
 	 */
 	public boolean gridRequireCornerSquares = false;
 
-	public void setTo( ConfigChessboardX src ) {
+	public ConfigChessboardX setTo( ConfigChessboardX src ) {
 		this.detNonMaxRadius = src.detNonMaxRadius;
 		this.detNonMaxThresholdRatio = src.detNonMaxThresholdRatio;
 		this.detRefinedXCornerThreshold = src.detRefinedXCornerThreshold;
@@ -106,6 +106,7 @@ public class ConfigChessboardX implements Configuration {
 		this.connMaxNeighbors = src.connMaxNeighbors;
 		this.connMaxNeighborDistance = src.connMaxNeighborDistance;
 		this.gridRequireCornerSquares = src.gridRequireCornerSquares;
+		return this;
 	}
 
 	@Override

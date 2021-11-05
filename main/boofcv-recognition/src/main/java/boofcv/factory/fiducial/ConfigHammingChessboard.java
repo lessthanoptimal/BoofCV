@@ -67,7 +67,7 @@ public class ConfigHammingChessboard implements Configuration {
 		BoofMiscOps.checkTrue(squareSize > 0);
 	}
 
-	public void setTo( ConfigHammingChessboard src ) {
+	public ConfigHammingChessboard setTo( ConfigHammingChessboard src ) {
 		this.numRows = src.numRows;
 		this.numCols = src.numCols;
 		this.markerOffset = src.markerOffset;
@@ -75,6 +75,7 @@ public class ConfigHammingChessboard implements Configuration {
 		this.markerScale = src.markerScale;
 		this.squareSize = src.squareSize;
 		this.chessboardEven = src.chessboardEven;
+		return this;
 	}
 
 	public double getMarkerWidth() {

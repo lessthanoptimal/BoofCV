@@ -79,7 +79,7 @@ public class ConfigBroxWarping implements Configuration {
 	 */
 	public InterpolationType interpolation = InterpolationType.BILINEAR;
 
-	public void setTo( ConfigBroxWarping src ) {
+	public ConfigBroxWarping setTo( ConfigBroxWarping src ) {
 		this.alpha = src.alpha;
 		this.gamma = src.gamma;
 		this.SOR_RELAXATION = src.SOR_RELAXATION;
@@ -91,13 +91,12 @@ public class ConfigBroxWarping implements Configuration {
 		this.pyrSigma = src.pyrSigma;
 		this.pyrMaxLayers = src.pyrMaxLayers;
 		this.interpolation = src.interpolation;
+		return this;
 	}
 
-	@Override
-	public void checkValidity() {}
+	@Override public void checkValidity() {}
 
-	public ConfigBroxWarping() {
-	}
+	public ConfigBroxWarping() {}
 
 	public ConfigBroxWarping( float alpha, float gamma ) {
 		this.alpha = alpha;

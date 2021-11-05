@@ -79,22 +79,18 @@ public class ConfigSiftDetector implements Configuration {
 		this.maxFeaturesPerScale = maxFeaturesPerScale;
 	}
 
-	@Override
-	public void checkValidity() {
+	@Override public void checkValidity() {}
 
-	}
-
-	public void setTo( ConfigSiftDetector src ) {
+	public ConfigSiftDetector setTo( ConfigSiftDetector src ) {
 		this.extract.setTo(src.extract);
 		this.maxFeaturesPerScale = src.maxFeaturesPerScale;
 		this.maxFeaturesAll = src.maxFeaturesAll;
 		this.selector.setTo(src.selector);
 		this.edgeR = src.edgeR;
+		return this;
 	}
 
 	public ConfigSiftDetector copy() {
-		var out = new ConfigSiftDetector();
-		out.setTo(this);
-		return out;
+		return new ConfigSiftDetector().setTo(this);
 	}
 }

@@ -60,11 +60,12 @@ public class ConfigRecognitionNearestNeighbor implements Configuration {
 		nearestNeighbor.checkValidity();
 	}
 
-	public void setTo( ConfigRecognitionNearestNeighbor src ) {
+	public ConfigRecognitionNearestNeighbor setTo( ConfigRecognitionNearestNeighbor src ) {
 		this.kmeans.setTo(src.kmeans);
 		this.nearestNeighbor.setTo(src.nearestNeighbor);
 		this.numberOfWords = src.numberOfWords;
 		this.distanceNorm = src.distanceNorm;
 		this.randSeed = src.randSeed;
+		return this;
 	}
 }

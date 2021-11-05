@@ -71,13 +71,14 @@ public class ConfigEpipolarScore3D implements Configuration {
 		typeCompatible.checkValidity();
 	}
 
-	public void setTo( ConfigEpipolarScore3D src ) {
+	public ConfigEpipolarScore3D setTo( ConfigEpipolarScore3D src ) {
 		this.ransacF.setTo(src.ransacF);
 		this.fundamental.setTo(src.fundamental);
 		this.type = src.type;
 		this.typeInliers.setTo(src.typeInliers);
 		this.typeCompatible.setTo(src.typeCompatible);
 		this.typeRotation.setTo(src.typeRotation);
+		return this;
 	}
 
 	/**
@@ -122,12 +123,13 @@ public class ConfigEpipolarScore3D implements Configuration {
 			minimumInliers.checkValidity();
 		}
 
-		public void setTo( ModelInliers src ) {
+		public ModelInliers setTo( ModelInliers src ) {
 			this.ratio3D = src.ratio3D;
 			this.maxRatioScore = src.maxRatioScore;
 			this.ransacH.setTo(src.ransacH);
 			this.homography.setTo(src.homography);
 			this.minimumInliers.setTo(src.minimumInliers);
+			return this;
 		}
 	}
 
@@ -154,11 +156,12 @@ public class ConfigEpipolarScore3D implements Configuration {
 			minimumInliers.checkValidity();
 		}
 
-		public void setTo( FundamentalCompatible src ) {
+		public FundamentalCompatible setTo( FundamentalCompatible src ) {
 			this.ratio3D = src.ratio3D;
 			this.inlierErrorTol = src.inlierErrorTol;
 			this.maxRatioScore = src.maxRatioScore;
 			this.minimumInliers.setTo(src.minimumInliers);
+			return this;
 		}
 	}
 
@@ -185,11 +188,12 @@ public class ConfigEpipolarScore3D implements Configuration {
 			minimumInliers.checkValidity();
 		}
 
-		public void setTo( FundamentalRotation src ) {
+		public FundamentalRotation setTo( FundamentalRotation src ) {
 			this.ratio3D = src.ratio3D;
 			this.inlierErrorTol = src.inlierErrorTol;
 			this.maxRatioScore = src.maxRatioScore;
 			this.minimumInliers.setTo(src.minimumInliers);
+			return this;
 		}
 	}
 }

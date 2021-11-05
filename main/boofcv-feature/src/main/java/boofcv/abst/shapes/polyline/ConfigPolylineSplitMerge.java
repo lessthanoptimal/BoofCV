@@ -75,7 +75,7 @@ public class ConfigPolylineSplitMerge extends BaseConfigPolyline {
 	 */
 	public int refineIterations = 10;
 
-	public void setTo( ConfigPolylineSplitMerge src ) {
+	public ConfigPolylineSplitMerge setTo( ConfigPolylineSplitMerge src ) {
 		super.setTo(src);
 		this.minimumSideLength = src.minimumSideLength;
 		this.extraConsider.setTo(src.extraConsider);
@@ -85,6 +85,7 @@ public class ConfigPolylineSplitMerge extends BaseConfigPolyline {
 		this.convexTest = src.convexTest;
 		this.maxSideError.setTo(src.maxSideError);
 		this.refineIterations = src.refineIterations;
+		return this;
 	}
 
 	@Override

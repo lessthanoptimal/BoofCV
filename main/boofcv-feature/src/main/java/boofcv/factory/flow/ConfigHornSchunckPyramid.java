@@ -70,12 +70,12 @@ public class ConfigHornSchunckPyramid implements Configuration {
 	public ConfigHornSchunckPyramid() {
 	}
 
-	public ConfigHornSchunckPyramid(float alpha, int maxInnerIterations) {
+	public ConfigHornSchunckPyramid( float alpha, int maxInnerIterations ) {
 		this.alpha = alpha;
 		this.maxInnerIterations = maxInnerIterations;
 	}
 
-	public void setTo( ConfigHornSchunckPyramid src ) {
+	public ConfigHornSchunckPyramid setTo( ConfigHornSchunckPyramid src ) {
 		this.alpha = src.alpha;
 		this.SOR_RELAXATION = src.SOR_RELAXATION;
 		this.numWarps = src.numWarps;
@@ -85,9 +85,8 @@ public class ConfigHornSchunckPyramid implements Configuration {
 		this.pyrSigma = src.pyrSigma;
 		this.pyrMaxLayers = src.pyrMaxLayers;
 		this.interpolation = src.interpolation;
+		return this;
 	}
 
-	@Override
-	public void checkValidity() {}
-
+	@Override public void checkValidity() {}
 }

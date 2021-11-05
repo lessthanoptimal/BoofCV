@@ -70,9 +70,10 @@ public class ConfigStereoMonoTrackPnP implements Configuration {
 		disparity.checkValidity();
 	}
 
-	public void setTo( ConfigStereoMonoTrackPnP src ) {
+	public ConfigStereoMonoTrackPnP setTo( ConfigStereoMonoTrackPnP src ) {
 		this.scene.setTo(src.scene);
 		this.tracker.setTo(src.tracker);
 		this.disparity.setTo(src.disparity);
+		return this;
 	}
 }

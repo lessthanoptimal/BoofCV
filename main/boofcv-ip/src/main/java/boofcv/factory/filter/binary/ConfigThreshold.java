@@ -137,7 +137,7 @@ public class ConfigThreshold implements Configuration {
 		return (T)config;
 	}
 
-	public void setTo( ConfigThreshold src ) {
+	public ConfigThreshold setTo( ConfigThreshold src ) {
 		this.type = src.type;
 		this.fixedThreshold = src.fixedThreshold;
 		this.scale = src.scale;
@@ -148,12 +148,10 @@ public class ConfigThreshold implements Configuration {
 		this.minPixelValue = src.minPixelValue;
 		this.maxPixelValue = src.maxPixelValue;
 		this.thresholdFromLocalBlocks = src.thresholdFromLocalBlocks;
+		return this;
 	}
 
-	@Override
-	public void checkValidity() {
-
-	}
+	@Override public void checkValidity() {}
 
 	@Override
 	public String toString() {

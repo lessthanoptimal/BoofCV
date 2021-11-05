@@ -53,16 +53,18 @@ public class ConfigConverge implements Configuration {
 
 	public ConfigConverge() {}
 
-	public void setTo( double ftol, double gtol, int maxIterations ) {
+	public ConfigConverge setTo( double ftol, double gtol, int maxIterations ) {
 		this.ftol = ftol;
 		this.gtol = gtol;
 		this.maxIterations = maxIterations;
+		return this;
 	}
 
-	public void setTo( ConfigConverge src ) {
+	public ConfigConverge setTo( ConfigConverge src ) {
 		this.ftol = src.ftol;
 		this.gtol = src.gtol;
 		this.maxIterations = src.maxIterations;
+		return this;
 	}
 
 	@Override
@@ -70,7 +72,7 @@ public class ConfigConverge implements Configuration {
 		BoofMiscOps.checkTrue(ftol >= 0.0 && ftol <= 1.0, "ftol is out of range");
 		BoofMiscOps.checkTrue(gtol >= 0.0, "gtol is out of range");
 
-		if( maxIterations < 0)
+		if (maxIterations < 0)
 			throw new IllegalArgumentException("Max iterations has to be set to a value more than or equal to zero");
 	}
 }

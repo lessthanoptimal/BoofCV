@@ -57,11 +57,12 @@ public class ConfigSlic implements Configuration {
 
 	public ConfigSlic(){}
 
-	public void setTo( ConfigSlic src ) {
+	public ConfigSlic setTo( ConfigSlic src ) {
 		this.numberOfRegions = src.numberOfRegions;
 		this.spacialWeight = src.spacialWeight;
 		this.totalIterations = src.totalIterations;
 		this.connectRule = src.connectRule;
+		return this;
 	}
 
 	@Override

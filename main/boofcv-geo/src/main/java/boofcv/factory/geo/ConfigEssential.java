@@ -45,10 +45,11 @@ public class ConfigEssential implements Configuration {
 
 	public ConfigEssential() {}
 
-	public void setTo( ConfigEssential src ) {
+	public ConfigEssential setTo( ConfigEssential src ) {
 		this.which = src.which;
 		this.errorModel = src.errorModel;
 		this.numResolve = src.numResolve;
+		return this;
 	}
 
 	@Override

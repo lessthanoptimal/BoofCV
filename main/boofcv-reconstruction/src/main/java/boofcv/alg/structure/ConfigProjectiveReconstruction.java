@@ -52,12 +52,13 @@ public class ConfigProjectiveReconstruction implements Configuration {
 		sbaConverge.checkValidity();
 	}
 
-	public void setTo( ConfigProjectiveReconstruction config ) {
+	public ConfigProjectiveReconstruction setTo( ConfigProjectiveReconstruction config ) {
 		ransac.setTo(config.ransac);
 		ransacTrifocal.setTo(config.ransacTrifocal);
 		ransacError.setTo(config.ransacError);
 		sba.setTo(config.sba);
 		sbaConverge.setTo(config.sbaConverge);
 		sbaScale = config.sbaScale;
+		return this;
 	}
 }

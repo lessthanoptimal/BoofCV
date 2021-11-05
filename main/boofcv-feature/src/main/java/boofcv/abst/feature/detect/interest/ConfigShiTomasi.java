@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -53,14 +53,13 @@ public class ConfigShiTomasi implements Configuration {
 			throw new IllegalArgumentException("Radius must be greater than zero");
 	}
 
-	public void setTo( ConfigShiTomasi src ) {
+	public ConfigShiTomasi setTo( ConfigShiTomasi src ) {
 		this.weighted = src.weighted;
 		this.radius = src.radius;
+		return this;
 	}
 
 	public ConfigShiTomasi copy() {
-		var dst = new ConfigShiTomasi();
-		dst.setTo(this);
-		return dst;
+		return new ConfigShiTomasi().setTo(this);
 	}
 }

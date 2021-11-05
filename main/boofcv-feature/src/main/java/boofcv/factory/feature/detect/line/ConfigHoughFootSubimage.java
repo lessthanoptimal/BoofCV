@@ -75,7 +75,7 @@ public class ConfigHoughFootSubimage implements Configuration {
 		this.totalVerticalDivisions = totalVerticalDivisions;
 	}
 
-	public void setTo( ConfigHoughFootSubimage src ) {
+	public ConfigHoughFootSubimage setTo( ConfigHoughFootSubimage src ) {
 		this.localMaxRadius = src.localMaxRadius;
 		this.minCounts = src.minCounts;
 		this.minDistanceFromOrigin = src.minDistanceFromOrigin;
@@ -83,10 +83,8 @@ public class ConfigHoughFootSubimage implements Configuration {
 		this.maxLines = src.maxLines;
 		this.totalHorizontalDivisions = src.totalHorizontalDivisions;
 		this.totalVerticalDivisions = src.totalVerticalDivisions;
+		return this;
 	}
 
-	@Override
-	public void checkValidity() {
-
-	}
+	@Override public void checkValidity() {}
 }

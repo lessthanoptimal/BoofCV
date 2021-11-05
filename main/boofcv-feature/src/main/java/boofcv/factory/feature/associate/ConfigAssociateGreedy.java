@@ -68,9 +68,10 @@ public class ConfigAssociateGreedy implements Configuration {
 			throw new IllegalArgumentException("scoreRatioThreshold must be greater than or equal to 0");
 	}
 
-	public void setTo( ConfigAssociateGreedy src ) {
+	public ConfigAssociateGreedy setTo( ConfigAssociateGreedy src ) {
 		this.forwardsBackwards = src.forwardsBackwards;
 		this.scoreRatioThreshold = src.scoreRatioThreshold;
 		this.maxErrorThreshold = src.maxErrorThreshold;
+		return this;
 	}
 }

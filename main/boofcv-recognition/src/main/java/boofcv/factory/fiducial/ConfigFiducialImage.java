@@ -22,6 +22,8 @@ import boofcv.abst.shapes.polyline.ConfigPolylineSplitMerge;
 import boofcv.factory.shape.ConfigPolygonDetector;
 import boofcv.struct.ConfigLength;
 import boofcv.struct.Configuration;
+import lombok.Getter;
+import lombok.Setter;
 
 /**
  * Configuration for {@link boofcv.abst.fiducial.SquareImage_to_FiducialDetector}.
@@ -30,6 +32,7 @@ import boofcv.struct.Configuration;
  *
  * @author Peter Abeles
  */
+@Getter @Setter
 public class ConfigFiducialImage implements Configuration {
 
 	/**
@@ -64,36 +67,20 @@ public class ConfigFiducialImage implements Configuration {
 		squareDetector.refineGray.cornerOffset = 0;
 	}
 
-	public ConfigFiducialImage() {
-	}
+	public ConfigFiducialImage() {}
 
-	public void setTo( ConfigFiducialImage src ) {
+	public ConfigFiducialImage setTo( ConfigFiducialImage src ) {
 		this.maxErrorFraction = src.maxErrorFraction;
 		this.borderWidthFraction = src.borderWidthFraction;
 		this.minimumBlackBorderFraction = src.minimumBlackBorderFraction;
 		this.squareDetector.setTo(src.squareDetector);
+		return this;
 	}
 
 	@Override
 	public void checkValidity() {
 		if( borderWidthFraction <= 0 || borderWidthFraction >= 0.5 )
 			throw new IllegalArgumentException("Border width fraction must be 0 < fraction < 0.5");
-	}
-
-	public double getMaxErrorFraction() {
-		return maxErrorFraction;
-	}
-
-	public void setMaxErrorFraction(double maxErrorFraction) {
-		this.maxErrorFraction = maxErrorFraction;
-	}
-
-	public ConfigPolygonDetector getSquareDetector() {
-		return squareDetector;
-	}
-
-	public void setSquareDetector(ConfigPolygonDetector squareDetector) {
-		this.squareDetector = squareDetector;
 	}
 
 	@Override

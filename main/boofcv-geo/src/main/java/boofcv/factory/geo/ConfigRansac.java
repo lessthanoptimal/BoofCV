@@ -53,9 +53,10 @@ public class ConfigRansac implements Configuration {
 		BoofMiscOps.checkTrue(iterations >= 0, "Must specify a non-negative number for number of iterations");
 	}
 
-	public void setTo( ConfigRansac src ) {
+	public ConfigRansac setTo( ConfigRansac src ) {
 		this.randSeed = src.randSeed;
 		this.iterations = src.iterations;
 		this.inlierThreshold = src.inlierThreshold;
+		return this;
 	}
 }

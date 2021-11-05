@@ -109,7 +109,7 @@ public class ConfigDetectDescribe implements Configuration {
 		convertDescriptor.checkValidity();
 	}
 
-	public void setTo( ConfigDetectDescribe src ) {
+	public ConfigDetectDescribe setTo( ConfigDetectDescribe src ) {
 		this.typeDescribe = src.typeDescribe;
 		this.typeDetector = src.typeDetector;
 		this.scaleSpaceSift.setTo(src.scaleSpaceSift);
@@ -122,11 +122,10 @@ public class ConfigDetectDescribe implements Configuration {
 		this.detectFastHessian.setTo(src.detectFastHessian);
 		this.detectSift.setTo(src.detectSift);
 		this.convertDescriptor.setTo(src.convertDescriptor);
+		return this;
 	}
 
 	public ConfigDetectDescribe copy() {
-		var out = new ConfigDetectDescribe();
-		out.setTo(this);
-		return out;
+		return new ConfigDetectDescribe().setTo(this);
 	}
 }

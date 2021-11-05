@@ -24,14 +24,16 @@ import boofcv.alg.fiducial.square.DetectFiducialSquareBinary;
 import boofcv.factory.shape.ConfigPolygonDetector;
 import boofcv.struct.ConfigLength;
 import boofcv.struct.Configuration;
+import lombok.Getter;
+import lombok.Setter;
 
 /**
  * Configuration for {@link SquareBinary_to_FiducialDetector}.
  *
- * @see DetectFiducialSquareBinary
- *
  * @author Peter Abeles
+ * @see DetectFiducialSquareBinary
  */
+@Getter @Setter
 public class ConfigFiducialBinary implements Configuration {
 	/**
 	 * Length of a targets size in world units.
@@ -76,62 +78,30 @@ public class ConfigFiducialBinary implements Configuration {
 		squareDetector.refineGray.cornerOffset = 0;
 	}
 
-	public ConfigFiducialBinary() {
-	}
+	public ConfigFiducialBinary() {}
 
-	public ConfigFiducialBinary(double targetWidth) {
+	public ConfigFiducialBinary( double targetWidth ) {
 		this.targetWidth = targetWidth;
 	}
 
-	public void setTo( ConfigFiducialBinary src ) {
+	public ConfigFiducialBinary setTo( ConfigFiducialBinary src ) {
 		this.targetWidth = src.targetWidth;
 		this.ambiguousThreshold = src.ambiguousThreshold;
 		this.gridWidth = src.gridWidth;
 		this.borderWidthFraction = src.borderWidthFraction;
 		this.minimumBlackBorderFraction = src.minimumBlackBorderFraction;
 		this.squareDetector.setTo(src.squareDetector);
+		return this;
 	}
 
 	@Override
 	public void checkValidity() {
-		if( ambiguousThreshold < 0 || ambiguousThreshold > 1 )
+		if (ambiguousThreshold < 0 || ambiguousThreshold > 1)
 			throw new IllegalArgumentException("ambiguousThreshold must be from 0 to 1, inclusive");
-		if( gridWidth < 3 || gridWidth > 8 )
+		if (gridWidth < 3 || gridWidth > 8)
 			throw new IllegalArgumentException("Grid width must be at least 3 elements and at most 8");
-		if( borderWidthFraction <= 0 || borderWidthFraction >= 0.5 )
+		if (borderWidthFraction <= 0 || borderWidthFraction >= 0.5)
 			throw new IllegalArgumentException("Border width fraction must be 0 < fraction < 0.5");
-	}
-
-	public int getGridWidth() {
-		return gridWidth;
-	}
-
-	public void setGridWidth(int gridWidth) {
-		this.gridWidth = gridWidth;
-	}
-
-	public double getBorderWidthFraction() {
-		return borderWidthFraction;
-	}
-
-	public void setBorderWidthFraction(double borderWidthFraction) {
-		this.borderWidthFraction = borderWidthFraction;
-	}
-
-	public double getTargetWidth() {
-		return targetWidth;
-	}
-
-	public void setTargetWidth(double targetWidth) {
-		this.targetWidth = targetWidth;
-	}
-
-	public ConfigPolygonDetector getSquareDetector() {
-		return squareDetector;
-	}
-
-	public void setSquareDetector(ConfigPolygonDetector squareDetector) {
-		this.squareDetector = squareDetector;
 	}
 
 	@Override

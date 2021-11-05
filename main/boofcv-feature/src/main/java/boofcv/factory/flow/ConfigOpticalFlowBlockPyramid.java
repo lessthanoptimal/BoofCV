@@ -44,12 +44,13 @@ public class ConfigOpticalFlowBlockPyramid implements Configuration {
 
 	public ConfigOpticalFlowBlockPyramid() {}
 
-	public void setTo( ConfigOpticalFlowBlockPyramid src ) {
+	public ConfigOpticalFlowBlockPyramid setTo( ConfigOpticalFlowBlockPyramid src ) {
 		this.searchRadius = src.searchRadius;
 		this.regionRadius = src.regionRadius;
 		this.maxPerPixelError = src.maxPerPixelError;
 		this.pyramidScale = src.pyramidScale;
 		this.maxPyramidLayers = src.maxPyramidLayers;
+		return this;
 	}
 
 	@Override public void checkValidity() {}

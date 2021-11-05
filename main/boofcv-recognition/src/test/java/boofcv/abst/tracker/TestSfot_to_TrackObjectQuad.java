@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -20,7 +20,7 @@ package boofcv.abst.tracker;
 
 import boofcv.abst.filter.derivative.ImageGradient;
 import boofcv.alg.filter.derivative.GImageDerivativeOps;
-import boofcv.alg.tracker.sfot.SfotConfig;
+import boofcv.alg.tracker.sfot.ConfigSfot;
 import boofcv.alg.tracker.sfot.SparseFlowObjectTracker;
 import boofcv.factory.filter.derivative.FactoryDerivative;
 import boofcv.struct.image.GrayU8;
@@ -43,7 +43,7 @@ public class TestSfot_to_TrackObjectQuad extends TextureGrayTrackerObjectRectang
 		Class dt = GImageDerivativeOps.getDerivativeType(ct);
 
 		ImageGradient gradient = FactoryDerivative.sobel(ct, dt);
-		SfotConfig config = new SfotConfig();
+		ConfigSfot config = new ConfigSfot();
 
 		SparseFlowObjectTracker tracker = new SparseFlowObjectTracker(config,ct,dt,gradient);
 

@@ -42,9 +42,10 @@ public class ConfigGenerateStereoGraph implements Configuration {
 		BoofMiscOps.checkTrue(targetDisparity > 0);
 	}
 
-	public void setTo( ConfigGenerateStereoGraph src ) {
+	public ConfigGenerateStereoGraph setTo( ConfigGenerateStereoGraph src ) {
 		this.countSmootherParam = src.countSmootherParam;
 		this.minimumCommonFeaturesFrac = src.minimumCommonFeaturesFrac;
 		this.targetDisparity = src.targetDisparity;
+		return this;
 	}
 }

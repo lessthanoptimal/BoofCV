@@ -42,13 +42,11 @@ public class ConfigParamPolar implements Configuration {
 
 	public ConfigParamPolar() {}
 
-	public void setTo( ConfigParamPolar src ) {
+	public ConfigParamPolar setTo( ConfigParamPolar src ) {
 		this.resolutionRange = src.resolutionRange;
 		this.numBinsAngle = src.numBinsAngle;
+		return this;
 	}
 
-	@Override
-	public void checkValidity() {
-
-	}
+	@Override public void checkValidity() {}
 }

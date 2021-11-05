@@ -25,7 +25,7 @@ import boofcv.alg.interpolate.InterpolatePixelMB;
 import boofcv.alg.interpolate.InterpolatePixelS;
 import boofcv.alg.tracker.circulant.CirculantTracker;
 import boofcv.alg.tracker.meanshift.*;
-import boofcv.alg.tracker.sfot.SfotConfig;
+import boofcv.alg.tracker.sfot.ConfigSfot;
 import boofcv.alg.tracker.sfot.SparseFlowObjectTracker;
 import boofcv.alg.tracker.tld.ConfigTld;
 import boofcv.alg.tracker.tld.TldTracker;
@@ -50,7 +50,7 @@ public class FactoryTrackerObjectAlgs {
 	}
 
 	public static <T extends ImageGray<T>,D extends ImageGray<D>>
-	SparseFlowObjectTracker<T,D> createSparseFlow( SfotConfig config ,
+	SparseFlowObjectTracker<T,D> createSparseFlow( ConfigSfot config ,
 												   Class<T> imageType , Class<D> derivType ,
 												   ImageGradient<T, D> gradient) {
 		return new SparseFlowObjectTracker<>(config, imageType, derivType, gradient);

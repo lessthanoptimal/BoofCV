@@ -33,19 +33,16 @@ public class ConfigHomography implements Configuration {
 	 */
 	public boolean normalize = true;
 
-	public ConfigHomography(boolean normalize) {
+	public ConfigHomography( boolean normalize ) {
 		this.normalize = normalize;
 	}
 
-	public ConfigHomography() {
-	}
+	public ConfigHomography() {}
 
-	public void setTo( ConfigHomography src ) {
+	public ConfigHomography setTo( ConfigHomography src ) {
 		this.normalize = src.normalize;
+		return this;
 	}
 
-	@Override
-	public void checkValidity() {
-
-	}
+	@Override public void checkValidity() {}
 }

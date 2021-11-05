@@ -48,9 +48,10 @@ public class ConfigSiftOrientation implements Configuration {
 		return config;
 	}
 
-	public void setTo( ConfigSiftOrientation src ) {
+	public ConfigSiftOrientation setTo( ConfigSiftOrientation src ) {
 		this.histogramSize = src.histogramSize;
 		this.sigmaEnlarge = src.sigmaEnlarge;
+		return this;
 	}
 
 	@Override

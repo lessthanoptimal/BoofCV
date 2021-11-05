@@ -50,11 +50,12 @@ public class ConfigPlanarTrackPnP implements Configuration {
 		BoofMiscOps.checkTrue(thresholdPixelError >= 0);
 	}
 
-	public void setTo( ConfigPlanarTrackPnP src ) {
+	public ConfigPlanarTrackPnP setTo( ConfigPlanarTrackPnP src ) {
 		this.thresholdAdd = src.thresholdAdd;
 		this.thresholdRetire = src.thresholdRetire;
 		this.thresholdPixelError = src.thresholdPixelError;
 		this.tracker.setTo(src.tracker);
 		this.ransac.setTo(src.ransac);
+		return this;
 	}
 }

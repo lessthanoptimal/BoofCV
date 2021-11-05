@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -26,6 +26,7 @@ import boofcv.factory.shape.ConfigPolygonDetector;
 import boofcv.struct.ConfigLength;
 import boofcv.struct.Configuration;
 import boofcv.struct.ConnectRule;
+import org.jetbrains.annotations.Nullable;
 
 /**
  * Configuration for {@link boofcv.abst.fiducial.QrCodePreciseDetector}
@@ -33,15 +34,10 @@ import boofcv.struct.ConnectRule;
  * @author Peter Abeles
  */
 public class ConfigQrCode implements Configuration {
-
-	/**
-	 * Specifies how images are thresholded and converted into a binary format
-	 */
+	/** Specifies how images are thresholded and converted into a binary format */
 	public ConfigThreshold threshold;
 
-	/**
-	 * Configuration for polygon detector that's used to find position patterns
-	 */
+	/** Configuration for polygon detector that's used to find position patterns */
 	public ConfigPolygonDetector polygon = new ConfigPolygonDetector();
 
 	/**
@@ -56,7 +52,7 @@ public class ConfigQrCode implements Configuration {
 	 * there is any ambiguity. ISO 18004:2015 says it should be 8859-1 but
 	 * most encoders and decoders use UTF-8 instead
 	 */
-	public String forceEncoding = null;
+	public @Nullable String forceEncoding = null;
 
 	{
 
@@ -65,7 +61,7 @@ public class ConfigQrCode implements Configuration {
 //		configThreshold.scale = 1.00;
 
 		// fast but does a bad job detecting fiducials that are up close
-		ConfigThresholdLocalOtsu configThreshold = ConfigThreshold.local(ThresholdType.BLOCK_OTSU,40);
+		ConfigThresholdLocalOtsu configThreshold = ConfigThreshold.local(ThresholdType.BLOCK_OTSU, 40);
 		configThreshold.useOtsu2 = true;
 		// 0.95 makes it better some times but worse overall
 		configThreshold.scale = 1.0;
@@ -77,7 +73,7 @@ public class ConfigQrCode implements Configuration {
 
 		polygon.detector.contourRule = ConnectRule.EIGHT;
 		polygon.detector.clockwise = false;
-		((ConfigPolylineSplitMerge)polygon.detector.contourToPoly).maxSideError = ConfigLength.relative(0.12,3);
+		((ConfigPolylineSplitMerge)polygon.detector.contourToPoly).maxSideError = ConfigLength.relative(0.12, 3);
 		((ConfigPolylineSplitMerge)polygon.detector.contourToPoly).cornerScorePenalty = 0.4;
 		((ConfigPolylineSplitMerge)polygon.detector.contourToPoly).minimumSideLength = 2;
 		// 28 pixels = 7 by 7 square viewed head on. Each cell is then 1 pixel. Any slight skew results in
@@ -101,12 +97,13 @@ public class ConfigQrCode implements Configuration {
 		return config;
 	}
 
-	public void setTo( ConfigQrCode src ) {
+	public ConfigQrCode setTo( ConfigQrCode src ) {
 		this.threshold.setTo(src.threshold);
 		this.polygon.setTo(src.polygon);
 		this.versionMinimum = src.versionMinimum;
 		this.versionMaximum = src.versionMaximum;
 		this.forceEncoding = src.forceEncoding;
+		return this;
 	}
 
 	@Override

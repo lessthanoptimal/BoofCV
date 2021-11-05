@@ -62,15 +62,13 @@ public class ConfigSiftScaleSpace implements Configuration {
 		return config;
 	}
 
-	@Override
-	public void checkValidity() {
+	@Override public void checkValidity() {}
 
-	}
-
-	public void setTo( ConfigSiftScaleSpace src ) {
+	public ConfigSiftScaleSpace setTo( ConfigSiftScaleSpace src ) {
 		this.sigma0 = src.sigma0;
 		this.numScales = src.numScales;
 		this.firstOctave = src.firstOctave;
 		this.lastOctave = src.lastOctave;
+		return this;
 	}
 }

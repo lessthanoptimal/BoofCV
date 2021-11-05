@@ -92,7 +92,7 @@ public class ConfigPolygonFromContour implements Configuration {
 
 	public ConfigPolygonFromContour(){}
 
-	public void setTo( ConfigPolygonFromContour src ) {
+	public ConfigPolygonFromContour setTo( ConfigPolygonFromContour src ) {
 		this.canTouchBorder = src.canTouchBorder;
 		this.contourRule = src.contourRule;
 		this.contourToPoly.setTo(src.contourToPoly);
@@ -100,6 +100,7 @@ public class ConfigPolygonFromContour implements Configuration {
 		this.tangentEdgeIntensity = src.tangentEdgeIntensity;
 		this.minimumContour.setTo(src.minimumContour);
 		this.clockwise = src.clockwise;
+		return this;
 	}
 
 	@Override
