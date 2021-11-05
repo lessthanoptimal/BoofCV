@@ -63,13 +63,14 @@ public class ConfigHammingGrid implements Configuration {
 		markers.checkValidity();
 	}
 
-	public void setTo( ConfigHammingGrid src ) {
+	public ConfigHammingGrid setTo( ConfigHammingGrid src ) {
 		this.numRows = src.numRows;
 		this.numCols = src.numCols;
 		this.squareSize = src.squareSize;
 		this.spaceToSquare = src.spaceToSquare;
 		this.markerOffset = src.markerOffset;
 		this.markers.setTo(src.markers);
+		return this;
 	}
 
 	public double getMarkerWidth() {

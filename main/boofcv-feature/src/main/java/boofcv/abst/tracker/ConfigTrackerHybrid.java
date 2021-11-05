@@ -49,16 +49,15 @@ public class ConfigTrackerHybrid implements Configuration {
 
 	@Override public void checkValidity() {}
 
-	public void setTo( ConfigTrackerHybrid src ) {
+	public ConfigTrackerHybrid setTo( ConfigTrackerHybrid src ) {
 		this.pruneCloseTracks = src.pruneCloseTracks;
 		this.maxInactiveTracks = src.maxInactiveTracks;
 		this.seed = src.seed;
 		this.thresholdRespawn.setTo(src.thresholdRespawn);
+		return this;
 	}
 
 	public ConfigTrackerHybrid copy() {
-		var out = new ConfigTrackerHybrid();
-		out.setTo(this);
-		return out;
+		return new ConfigTrackerHybrid().setTo(this);
 	}
 }

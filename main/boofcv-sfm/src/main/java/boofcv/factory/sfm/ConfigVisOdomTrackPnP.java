@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -69,7 +69,7 @@ public class ConfigVisOdomTrackPnP implements Configuration {
 			throw new IllegalArgumentException("bundleMinObservations must be >= 2");
 	}
 
-	public void setTo( ConfigVisOdomTrackPnP src ) {
+	public ConfigVisOdomTrackPnP setTo( ConfigVisOdomTrackPnP src ) {
 		this.bundle.setTo(src.bundle);
 		this.bundleConverge.setTo(src.bundleConverge);
 		this.bundleMaxFeaturesPerFrame = src.bundleMaxFeaturesPerFrame;
@@ -80,5 +80,6 @@ public class ConfigVisOdomTrackPnP implements Configuration {
 		this.refineIterations = src.refineIterations;
 		this.pnp = src.pnp;
 		this.keyframes.setTo(src.keyframes);
+		return this;
 	}
 }

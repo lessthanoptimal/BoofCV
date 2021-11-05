@@ -42,9 +42,7 @@ import java.util.stream.Collectors;
  * @see boofcv.alg.fiducial.square.DetectFiducialSquareHamming
  */
 public class ConfigHammingMarker implements Configuration {
-	/**
-	 * How wide the border is relative to the total fiducial width. Typically, the width of one square.
-	 */
+	/** How wide the border is relative to the total fiducial width. Typically, the width of one square. */
 	public double borderWidthFraction = 0.25;
 
 	/** Number of cells along each side in the binary grid */
@@ -95,7 +93,7 @@ public class ConfigHammingMarker implements Configuration {
 		return active;
 	}
 
-	public void setTo( ConfigHammingMarker src ) {
+	public ConfigHammingMarker setTo( ConfigHammingMarker src ) {
 		this.borderWidthFraction = src.borderWidthFraction;
 		this.gridWidth = src.gridWidth;
 		this.minimumHamming = src.minimumHamming;
@@ -103,6 +101,7 @@ public class ConfigHammingMarker implements Configuration {
 		this.targetWidth = src.targetWidth;
 		this.encoding.clear();
 		encoding.addAll(src.encoding);
+		return this;
 	}
 
 	public int bitsPerGrid() {

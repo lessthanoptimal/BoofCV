@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -29,7 +29,8 @@ import boofcv.alg.disparity.DisparityBlockMatchBestFive;
  * @author Peter Abeles
  */
 public class ConfigDisparityBMBest5 extends ConfigDisparityBM {
-	public void setTo( ConfigDisparityBMBest5 src ) {
+	public ConfigDisparityBMBest5 setTo( ConfigDisparityBMBest5 src ) {
 		super.setTo(src);
+		return this;
 	}
 }

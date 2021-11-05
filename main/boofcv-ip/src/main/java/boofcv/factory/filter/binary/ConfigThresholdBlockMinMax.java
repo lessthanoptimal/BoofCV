@@ -53,9 +53,10 @@ public class ConfigThresholdBlockMinMax extends ConfigThreshold {
 	public ConfigThresholdBlockMinMax() {
 	}
 
-	public void setTo( ConfigThresholdBlockMinMax src ) {
+	public ConfigThresholdBlockMinMax setTo( ConfigThresholdBlockMinMax src ) {
 		super.setTo(src);
 		this.minimumSpread = src.minimumSpread;
+		return this;
 	}
 
 	@Override

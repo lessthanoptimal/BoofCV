@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -113,15 +113,14 @@ public class ConfigLength implements Configuration {
 				throw new IllegalArgumentException("Fractional value must be from 0.0maxFeatures to 1.0, inclusive");
 	}
 
-	public void setTo( ConfigLength src ) {
+	public ConfigLength setTo( ConfigLength src ) {
 		this.length = src.length;
 		this.fraction = src.fraction;
+		return this;
 	}
 
 	public ConfigLength copy() {
-		var out = new ConfigLength();
-		out.setTo(this);
-		return out;
+		return new ConfigLength().setTo(this);
 	}
 
 	@Override public String toString() {

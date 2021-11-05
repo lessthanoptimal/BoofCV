@@ -33,7 +33,8 @@ public class ConfigGeneratePairwiseImageGraph implements Configuration {
 		score.checkValidity();
 	}
 
-	public void setTo( ConfigGeneratePairwiseImageGraph src ) {
+	public ConfigGeneratePairwiseImageGraph setTo( ConfigGeneratePairwiseImageGraph src ) {
 		this.score.setTo(src.score);
+		return this;
 	}
 }

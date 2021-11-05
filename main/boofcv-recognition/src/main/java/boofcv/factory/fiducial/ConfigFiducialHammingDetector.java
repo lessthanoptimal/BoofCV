@@ -63,11 +63,12 @@ public class ConfigFiducialHammingDetector implements Configuration {
 
 	public ConfigFiducialHammingDetector() {}
 
-	public void setTo( ConfigFiducialHammingDetector src ) {
+	public ConfigFiducialHammingDetector setTo( ConfigFiducialHammingDetector src ) {
 		this.minimumBlackBorderFraction = src.minimumBlackBorderFraction;
 		this.ambiguousPenaltyFrac = src.ambiguousPenaltyFrac;
 		this.squareDetector.setTo(src.squareDetector);
 		this.configThreshold.setTo(src.configThreshold);
+		return this;
 	}
 
 	@Override

@@ -32,7 +32,7 @@ public class ConfigFastHessian implements Configuration {
 	/**
 	 * Configuration for non-maximum thresholding
 	 */
-	public ConfigExtract extract = new ConfigExtract(2,1,0,true);
+	public ConfigExtract extract = new ConfigExtract(2, 1, 0, true);
 
 	/**
 	 * The maximum number of features it can detect in a single scale. Useful if you want to prevent high frequency
@@ -76,13 +76,13 @@ public class ConfigFastHessian implements Configuration {
 	 */
 	public int scaleStepSize = 6;
 
-	public ConfigFastHessian(float detectThreshold,
-							 int extractRadius,
-							 int maxFeaturesPerScale,
-							 int initialSampleStep,
-							 int initialSize,
-							 int numberScalesPerOctave,
-							 int numberOfOctaves) {
+	public ConfigFastHessian( float detectThreshold,
+							  int extractRadius,
+							  int maxFeaturesPerScale,
+							  int initialSampleStep,
+							  int initialSize,
+							  int numberScalesPerOctave,
+							  int numberOfOctaves ) {
 		this.extract.threshold = detectThreshold;
 		this.extract.radius = extractRadius;
 		this.maxFeaturesPerScale = maxFeaturesPerScale;
@@ -92,14 +92,11 @@ public class ConfigFastHessian implements Configuration {
 		this.numberOfOctaves = numberOfOctaves;
 	}
 
-	public ConfigFastHessian() {
-	}
+	public ConfigFastHessian() {}
 
-	@Override
-	public void checkValidity() {
-	}
+	@Override public void checkValidity() {}
 
-	public void setTo( ConfigFastHessian src ) {
+	public ConfigFastHessian setTo( ConfigFastHessian src ) {
 		this.extract.setTo(src.extract);
 		this.maxFeaturesPerScale = src.maxFeaturesPerScale;
 		this.initialSampleStep = src.initialSampleStep;
@@ -109,11 +106,10 @@ public class ConfigFastHessian implements Configuration {
 		this.scaleStepSize = src.scaleStepSize;
 		this.maxFeaturesAll = src.maxFeaturesAll;
 		this.selector.setTo(src.selector);
+		return this;
 	}
 
 	public ConfigFastHessian copy() {
-		var dst = new ConfigFastHessian();
-		dst.setTo(this);
-		return dst;
+		return new ConfigFastHessian().setTo(this);
 	}
 }

@@ -114,11 +114,12 @@ public class ConfigSimilarImagesSceneRecognition implements Configuration {
 		associate.checkValidity();
 	}
 
-	public void setTo( ConfigSimilarImagesSceneRecognition src ) {
+	public ConfigSimilarImagesSceneRecognition setTo( ConfigSimilarImagesSceneRecognition src ) {
 		this.limitMatchesConsider = src.limitMatchesConsider;
 		this.minimumSimilar.setTo(src.minimumSimilar);
 		this.features.setTo(src.features);
 		this.recognizeNister2006.setTo(src.recognizeNister2006);
 		this.associate.setTo(src.associate);
+		return this;
 	}
 }

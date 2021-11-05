@@ -98,7 +98,7 @@ public class ConfigEllipseDetector implements Configuration {
 	 */
 	public double maxMajorToMinorRatio = 20.0;
 
-	public void setTo( ConfigEllipseDetector src ) {
+	public ConfigEllipseDetector setTo( ConfigEllipseDetector src ) {
 		this.maxDistanceFromEllipse = src.maxDistanceFromEllipse;
 		this.minimumContour = src.minimumContour;
 		this.maximumContour = src.maximumContour;
@@ -112,8 +112,8 @@ public class ConfigEllipseDetector implements Configuration {
 		this.minimumEdgeIntensity = src.minimumEdgeIntensity;
 		this.checkRadialDistance = src.checkRadialDistance;
 		this.maxMajorToMinorRatio = src.maxMajorToMinorRatio;
+		return this;
 	}
 
-	@Override
-	public void checkValidity() {}
+	@Override public void checkValidity() {}
 }

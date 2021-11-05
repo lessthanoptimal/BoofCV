@@ -42,10 +42,11 @@ public class ConfigPnP implements Configuration {
 	 */
 	public int epnpIterations = 10;
 
-	public void setTo( ConfigPnP src ) {
+	public ConfigPnP setTo( ConfigPnP src ) {
 		this.which = src.which;
 		this.numResolve = src.numResolve;
 		this.epnpIterations = src.epnpIterations;
+		return this;
 	}
 
 	@Override

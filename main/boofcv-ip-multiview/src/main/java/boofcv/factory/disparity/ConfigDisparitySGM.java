@@ -77,7 +77,7 @@ public class ConfigDisparitySGM implements Configuration {
 	 */
 	public BorderType border = BorderType.REFLECT;
 
-	public void setTo( ConfigDisparitySGM src ) {
+	public ConfigDisparitySGM setTo( ConfigDisparitySGM src ) {
 		this.disparityMin = src.disparityMin;
 		this.disparityRange = src.disparityRange;
 		this.maxError = src.maxError;
@@ -93,10 +93,10 @@ public class ConfigDisparitySGM implements Configuration {
 		this.configHMI.setTo(src.configHMI);
 		this.configBlockMatch.setTo(src.configBlockMatch);
 		this.border = src.border;
+		return this;
 	}
 
 	public static class ConfigBlockMatchError implements Configuration {
-
 		/**
 		 * Block radius X
 		 */
@@ -108,9 +108,10 @@ public class ConfigDisparitySGM implements Configuration {
 
 		public BlockMatchingApproach approach = BlockMatchingApproach.BEST5;
 
-		public void setTo( ConfigBlockMatchError src ) {
+		public ConfigBlockMatchError setTo( ConfigBlockMatchError src ) {
 			this.radiusX = src.radiusX;
 			this.radiusY = src.radiusY;
+			return this;
 		}
 
 		@Override

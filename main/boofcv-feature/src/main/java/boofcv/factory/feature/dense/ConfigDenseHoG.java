@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -55,13 +55,14 @@ public class ConfigDenseHoG implements Configuration {
 	 */
 	public boolean fastVariant = true;
 
-	public void setTo( ConfigDenseHoG src ) {
+	public ConfigDenseHoG setTo( ConfigDenseHoG src ) {
 		this.orientationBins = src.orientationBins;
 		this.pixelsPerCell = src.pixelsPerCell;
 		this.cellsPerBlockX = src.cellsPerBlockX;
 		this.cellsPerBlockY = src.cellsPerBlockY;
 		this.stepBlock = src.stepBlock;
 		this.fastVariant = src.fastVariant;
+		return this;
 	}
 
 	@Override

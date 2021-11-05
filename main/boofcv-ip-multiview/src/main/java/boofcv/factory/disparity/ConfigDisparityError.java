@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -28,7 +28,6 @@ import boofcv.struct.pyramid.ConfigDiscreteLevels;
  * @author Peter Abeles
  */
 public interface ConfigDisparityError extends Configuration {
-
 	/**
 	 * Configuration for Census
 	 */
@@ -38,8 +37,9 @@ public interface ConfigDisparityError extends Configuration {
 		@Override
 		public void checkValidity() {}
 
-		public void setTo( Census src ) {
+		public Census setTo( Census src ) {
 			this.variant = src.variant;
+			return this;
 		}
 	}
 
@@ -61,12 +61,12 @@ public interface ConfigDisparityError extends Configuration {
 		 */
 		public boolean normalizeInput = true;
 
-		@Override
-		public void checkValidity() {}
+		@Override public void checkValidity() {}
 
-		public void setTo( NCC src ) {
+		public NCC setTo( NCC src ) {
 			this.eps = src.eps;
 			this.normalizeInput = src.normalizeInput;
+			return this;
 		}
 	}
 
@@ -94,16 +94,14 @@ public interface ConfigDisparityError extends Configuration {
 		 */
 		public int extraIterations = 0;
 
-		@Override
-		public void checkValidity() {
+		@Override public void checkValidity() {}
 
-		}
-
-		public void setTo( HMI src ) {
+		public HMI setTo( HMI src ) {
 			this.totalGrayLevels = src.totalGrayLevels;
 			this.pyramidLayers.setTo(src.pyramidLayers);
 			this.smoothingRadius = src.smoothingRadius;
 			this.extraIterations = src.extraIterations;
+			return this;
 		}
 	}
 }

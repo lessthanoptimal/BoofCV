@@ -59,14 +59,13 @@ public class ConfigCircleRegularGrid implements Configuration {
 		thresholding.scale = 0.85;
 	}
 
-	public void setTo( ConfigCircleRegularGrid src ) {
+	public ConfigCircleRegularGrid setTo( ConfigCircleRegularGrid src ) {
 		this.thresholding.setTo(src.thresholding);
 		this.ellipse.setTo(src.ellipse);
 		this.ellipseSizeSimilarity = src.ellipseSizeSimilarity;
 		this.edgeIntensitySimilarityTolerance = src.edgeIntensitySimilarityTolerance;
+		return this;
 	}
 
-	@Override
-	public void checkValidity() {
-	}
+	@Override public void checkValidity() {}
 }

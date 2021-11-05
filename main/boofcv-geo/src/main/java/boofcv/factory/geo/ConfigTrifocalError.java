@@ -39,9 +39,10 @@ public class ConfigTrifocalError implements Configuration {
 	 */
 	public final ConfigConverge converge = new ConfigConverge(1e-8, 1e-8, 20);
 
-	public void setTo( ConfigTrifocalError src ) {
+	public ConfigTrifocalError setTo( ConfigTrifocalError src ) {
 		this.model = src.model;
 		this.converge.setTo(src.converge);
+		return this;
 	}
 
 	@Override

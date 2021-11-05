@@ -41,9 +41,10 @@ public class ConfigRgbDepthTrackPnP implements Configuration {
 		tracker.checkValidity();
 	}
 
-	public void setTo( ConfigRgbDepthTrackPnP src ) {
+	public ConfigRgbDepthTrackPnP setTo( ConfigRgbDepthTrackPnP src ) {
 		this.scene.setTo(src.scene);
 		this.tracker.setTo(src.tracker);
 		this.depthScale = src.depthScale;
+		return this;
 	}
 }

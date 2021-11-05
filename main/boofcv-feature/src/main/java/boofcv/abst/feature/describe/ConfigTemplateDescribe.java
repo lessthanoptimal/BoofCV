@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -40,10 +40,7 @@ public class ConfigTemplateDescribe implements Configuration {
 	 */
 	public int height=11;
 
-	@Override
-	public void checkValidity() {
-
-	}
+	@Override public void checkValidity() {}
 
 	public enum Type {
 		/**
@@ -56,9 +53,10 @@ public class ConfigTemplateDescribe implements Configuration {
 		NCC
 	}
 
-	public void setTo( ConfigTemplateDescribe src ) {
+	public ConfigTemplateDescribe setTo( ConfigTemplateDescribe src ) {
 		this.type = src.type;
 		this.width = src.width;
 		this.height = src.height;
+		return this;
 	}
 }

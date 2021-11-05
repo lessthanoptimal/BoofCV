@@ -46,15 +46,15 @@ public class ConfigSiftDescribe implements Configuration {
 	/** Maximum fraction a single element can have in descriptor. Helps with non-affine changes in lighting. See paper.*/
 	public double maxDescriptorElementValue=0.2;
 
-	@Override
-	public void checkValidity() {}
+	@Override public void checkValidity() {}
 
-	public void setTo( ConfigSiftDescribe src ) {
+	public ConfigSiftDescribe setTo( ConfigSiftDescribe src ) {
 		this.widthSubregion = src.widthSubregion;
 		this.widthGrid = src.widthGrid;
 		this.numHistogramBins = src.numHistogramBins;
 		this.sigmaToPixels = src.sigmaToPixels;
 		this.weightingSigmaFraction = src.weightingSigmaFraction;
 		this.maxDescriptorElementValue = src.maxDescriptorElementValue;
+		return this;
 	}
 }

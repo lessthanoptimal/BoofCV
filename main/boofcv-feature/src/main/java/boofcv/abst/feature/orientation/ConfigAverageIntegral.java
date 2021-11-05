@@ -33,21 +33,16 @@ public class ConfigAverageIntegral implements ConfigOrientation {
 	 */
 	public double objectRadiusToScale = 1.0/BoofDefaults.SURF_SCALE_TO_RADIUS;
 
-	/**
-	 * Radius of the region being considered in terms of samples. Typically 6.
-	 */
+	/** Radius of the region being considered in terms of samples. Typically 6. */
 	public int radius = 6;
-	/**
-	 * How often the image is sampled. This number is scaled. Typically 1.
-	 */
+
+	/** How often the image is sampled. This number is scaled. Typically 1. */
 	public double samplePeriod = 1;
-	/**
-	 * How wide of a kernel should be used to sample. Try 6
-	 */
+
+	/** How wide of a kernel should be used to sample. Try 6 */
 	public int sampleWidth = 6;
-	/**
-	 * Sigma for weighting. zero for unweighted. less than zero for automatic. Try -1.
-	 */
+
+	/** Sigma for weighting. zero for unweighted. less than zero for automatic. Try -1. */
 	public double weightSigma = -1;
 
 	public ConfigAverageIntegral(int radius, double samplePeriod, int sampleWidth, double weightSigma) {
@@ -57,18 +52,16 @@ public class ConfigAverageIntegral implements ConfigOrientation {
 		this.weightSigma = weightSigma;
 	}
 
-	public ConfigAverageIntegral() {
-	}
+	public ConfigAverageIntegral() {}
 
-	public void setTo( ConfigAverageIntegral src ) {
+	public ConfigAverageIntegral setTo( ConfigAverageIntegral src ) {
 		this.objectRadiusToScale = src.objectRadiusToScale;
 		this.radius = src.radius;
 		this.samplePeriod = src.samplePeriod;
 		this.sampleWidth = src.sampleWidth;
 		this.weightSigma = src.weightSigma;
+		return this;
 	}
 
-	@Override
-	public void checkValidity() {
-	}
+	@Override public void checkValidity() {}
 }

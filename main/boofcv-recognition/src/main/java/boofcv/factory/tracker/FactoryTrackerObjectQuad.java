@@ -26,7 +26,7 @@ import boofcv.alg.tracker.circulant.CirculantTracker;
 import boofcv.alg.tracker.meanshift.PixelLikelihood;
 import boofcv.alg.tracker.meanshift.TrackerMeanShiftComaniciu2003;
 import boofcv.alg.tracker.meanshift.TrackerMeanShiftLikelihood;
-import boofcv.alg.tracker.sfot.SfotConfig;
+import boofcv.alg.tracker.sfot.ConfigSfot;
 import boofcv.alg.tracker.sfot.SparseFlowObjectTracker;
 import boofcv.alg.tracker.tld.TldTracker;
 import boofcv.factory.filter.derivative.FactoryDerivative;
@@ -77,13 +77,13 @@ public class FactoryTrackerObjectQuad {
 	 * @return TrackerObjectQuad
 	 */
 	public static <T extends ImageGray<T>,D extends ImageGray<D>>
-	TrackerObjectQuad<T> sparseFlow(SfotConfig config, Class<T> imageType , Class<D> derivType ) {
+	TrackerObjectQuad<T> sparseFlow( ConfigSfot config, Class<T> imageType , Class<D> derivType ) {
 
 		if( derivType == null )
 			derivType = GImageDerivativeOps.getDerivativeType(imageType);
 
 		if( config == null )
-			config = new SfotConfig();
+			config = new ConfigSfot();
 
 		ImageGradient<T, D> gradient = FactoryDerivative.sobel(imageType,derivType);
 

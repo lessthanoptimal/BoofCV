@@ -58,14 +58,13 @@ public class ConfigCircleHexagonalGrid implements Configuration {
 		thresholding.scale = 0.85;
 	}
 
-	public void setTo( ConfigCircleHexagonalGrid src ) {
+	public ConfigCircleHexagonalGrid setTo( ConfigCircleHexagonalGrid src ) {
 		this.thresholding.setTo(src.thresholding);
 		this.ellipse.setTo(src.ellipse);
 		this.ellipseSizeSimilarity = src.ellipseSizeSimilarity;
 		this.edgeIntensitySimilarityTolerance = src.edgeIntensitySimilarityTolerance;
+		return this;
 	}
 
-	@Override
-	public void checkValidity() {
-	}
+	@Override public void checkValidity() {}
 }

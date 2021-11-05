@@ -62,9 +62,10 @@ public class ConfigTriangulation implements Configuration {
 		return new ConfigTriangulation(Type.GEOMETRIC);
 	}
 
-	public void setTo( ConfigTriangulation src ) {
+	public ConfigTriangulation setTo( ConfigTriangulation src ) {
 		this.type = src.type;
 		this.converge.setTo(src.converge);
+		return this;
 	}
 
 	@Override

@@ -69,15 +69,14 @@ public class ConfigGeneralDetector extends ConfigExtract {
 	public ConfigGeneralDetector() {
 	}
 
-	public void setTo(ConfigGeneralDetector orig) {
+	public ConfigGeneralDetector setTo(ConfigGeneralDetector orig) {
 		super.setTo(orig);
 		this.maxFeatures = orig.maxFeatures;
 		this.selector.setTo(orig.selector);
+		return this;
 	}
 
 	public ConfigGeneralDetector copy() {
-		var out = new ConfigGeneralDetector();
-		out.setTo(this);
-		return out;
+		return new ConfigGeneralDetector().setTo(this);
 	}
 }

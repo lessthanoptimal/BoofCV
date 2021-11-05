@@ -44,9 +44,10 @@ public class ConfigDenseSift implements Configuration {
 
 	public ConfigDenseSift() {}
 
-	public void setTo( ConfigDenseSift src ) {
+	public ConfigDenseSift setTo( ConfigDenseSift src ) {
 		this.sift.setTo(src.sift);
 		this.sampling.setTo(src.sampling);
+		return this;
 	}
 
 	@Override

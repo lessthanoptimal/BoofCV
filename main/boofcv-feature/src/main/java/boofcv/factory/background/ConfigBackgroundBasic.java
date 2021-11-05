@@ -57,11 +57,12 @@ public class ConfigBackgroundBasic extends BaseConfigBackground {
 
 	public ConfigBackgroundBasic() {}
 
-	public void setTo( ConfigBackgroundBasic src ) {
+	public ConfigBackgroundBasic setTo( ConfigBackgroundBasic src ) {
 		super.setTo(src);
 		this.learnRate = src.learnRate;
 		this.threshold = src.threshold;
 		this.interpolation = src.interpolation;
+		return this;
 	}
 
 	@Override

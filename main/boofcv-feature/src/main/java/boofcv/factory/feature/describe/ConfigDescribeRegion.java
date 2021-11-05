@@ -53,7 +53,7 @@ public class ConfigDescribeRegion implements Configuration {
 		convert.checkValidity();
 	}
 
-	public void setTo( ConfigDescribeRegion src ) {
+	public ConfigDescribeRegion setTo( ConfigDescribeRegion src ) {
 		this.type = src.type;
 		this.scaleSpaceSift.setTo(src.scaleSpaceSift);
 		this.surfFast.setTo(src.surfFast);
@@ -62,6 +62,7 @@ public class ConfigDescribeRegion implements Configuration {
 		this.brief.setTo(src.brief);
 		this.template.setTo(src.template);
 		this.convert.setTo(src.convert);
+		return this;
 	}
 
 	public enum Type {

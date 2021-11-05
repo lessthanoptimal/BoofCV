@@ -52,11 +52,12 @@ public class ConfigSelfCalibDualQuadratic implements Configuration {
 		checkTrue(knownAspectRatio && zeroSkew, "If aspect ratio is known then zero skew must be assumed");
 	}
 
-	public void setTo( ConfigSelfCalibDualQuadratic src ) {
+	public ConfigSelfCalibDualQuadratic setTo( ConfigSelfCalibDualQuadratic src ) {
 		this.zeroSkew = src.zeroSkew;
 		this.knownAspectRatio = src.knownAspectRatio;
 		this.aspectRatio = src.aspectRatio;
 		this.invalidFractionAccept = src.invalidFractionAccept;
 		this.refineAlgebraic.setTo(src.refineAlgebraic);
+		return this;
 	}
 }

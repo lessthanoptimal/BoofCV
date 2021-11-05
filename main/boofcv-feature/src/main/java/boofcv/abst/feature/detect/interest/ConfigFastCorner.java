@@ -24,24 +24,22 @@ import boofcv.struct.Configuration;
 /**
  * Configuration for FAST feature detector.
  *
- * @see FastCornerDetector
- *
  * @author Peter Abeles
+ * @see FastCornerDetector
  */
 public class ConfigFastCorner implements Configuration {
 
 	/**
-	 * How different pixels need to be to be considered part of a corner. Image dependent. Try 20 to start.
+	 * How different pixels need to be considered part of a corner. Image dependent. Try 20 to start.
 	 */
 	public int pixelTol = 20;
 
 	/**
 	 * Minimum number of pixels around the circle that are required to be a corner. Can be 9 to 12
 	 */
-	public int minContinuous=9;
+	public int minContinuous = 9;
 
-
-	public ConfigFastCorner(int pixelTol, int minContinuous) {
+	public ConfigFastCorner( int pixelTol, int minContinuous ) {
 		this.pixelTol = pixelTol;
 		this.minContinuous = minContinuous;
 	}
@@ -51,18 +49,17 @@ public class ConfigFastCorner implements Configuration {
 
 	@Override
 	public void checkValidity() {
-		if( minContinuous < 9 || minContinuous > 12 )
+		if (minContinuous < 9 || minContinuous > 12)
 			throw new IllegalArgumentException("minContinuous must be from 9 to 12, inclusive");
 	}
 
-	public void setTo(ConfigFastCorner src ) {
+	public ConfigFastCorner setTo( ConfigFastCorner src ) {
 		this.pixelTol = src.pixelTol;
 		this.minContinuous = src.minContinuous;
+		return this;
 	}
 
 	public ConfigFastCorner copy() {
-		var dst = new ConfigFastCorner();
-		dst.setTo(this);
-		return dst;
+		return new ConfigFastCorner().setTo(this);
 	}
 }

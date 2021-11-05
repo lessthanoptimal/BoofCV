@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -35,8 +35,9 @@ public class ConfigBundleAdjustment {
 	 */
 	public Object configOptimizer = new ConfigLevenbergMarquardt();
 
-	public void setTo( ConfigBundleAdjustment src ) {
-		// it should copy / overwrite but that isn'y possible/easy. So this is the compromise
+	public ConfigBundleAdjustment setTo( ConfigBundleAdjustment src ) {
+		// it should copy / overwrite but that isn't possible/easy. So this is the compromise
 		this.configOptimizer = src.configOptimizer;
+		return this;
 	}
 }

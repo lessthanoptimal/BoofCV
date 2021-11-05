@@ -56,11 +56,12 @@ public class ConfigCalibrationTarget implements Configuration {
 		getActiveDescription().checkValidity();
 	}
 
-	public void setTo( ConfigCalibrationTarget src ) {
+	public ConfigCalibrationTarget setTo( ConfigCalibrationTarget src ) {
 		this.type = src.type;
 		this.ecocheck.setTo(src.ecocheck);
 		this.hammingChess.setTo(src.hammingChess);
 		this.hammingGrid.setTo(src.hammingGrid);
 		this.grid.setTo(src.grid);
+		return this;
 	}
 }

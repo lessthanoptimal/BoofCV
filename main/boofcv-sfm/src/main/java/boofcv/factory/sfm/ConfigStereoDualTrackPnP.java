@@ -72,11 +72,12 @@ public class ConfigStereoDualTrackPnP implements Configuration {
 		stereoDescribe.checkValidity();
 	}
 
-	public void setTo( ConfigStereoDualTrackPnP src ) {
+	public ConfigStereoDualTrackPnP setTo( ConfigStereoDualTrackPnP src ) {
 		this.scene.setTo(src.scene);
 		this.tracker.setTo(src.tracker);
 		this.stereoDescribe.setTo(src.stereoDescribe);
 		this.stereoRadius = src.stereoRadius;
 		this.epipolarTol = src.epipolarTol;
+		return this;
 	}
 }

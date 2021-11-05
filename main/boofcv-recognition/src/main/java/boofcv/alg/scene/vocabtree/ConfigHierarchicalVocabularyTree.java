@@ -38,8 +38,9 @@ public class ConfigHierarchicalVocabularyTree implements Configuration {
 		BoofMiscOps.checkTrue(maximumLevel > 0, "Maximum level must be a positive integer");
 	}
 
-	public void setTo( ConfigHierarchicalVocabularyTree src ) {
+	public ConfigHierarchicalVocabularyTree setTo( ConfigHierarchicalVocabularyTree src ) {
 		this.branchFactor = src.branchFactor;
 		this.maximumLevel = src.maximumLevel;
+		return this;
 	}
 }

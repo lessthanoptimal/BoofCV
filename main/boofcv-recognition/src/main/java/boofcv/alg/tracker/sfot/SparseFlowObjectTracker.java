@@ -74,7 +74,7 @@ public class SparseFlowObjectTracker<Image extends ImageGray<Image>, Derivative 
 	private boolean trackLost;
 
 	// configuration parameters
-	private final SfotConfig config;
+	private final ConfigSfot config;
 
 	// class used to compute the image derivative
 	private final ImageGradient<Image, Derivative> gradient;
@@ -87,7 +87,7 @@ public class SparseFlowObjectTracker<Image extends ImageGray<Image>, Derivative 
 	// location of the target in the current frame
 	RectangleRotate_F64 region = new RectangleRotate_F64();
 
-	public SparseFlowObjectTracker( SfotConfig config,
+	public SparseFlowObjectTracker( ConfigSfot config,
 									Class<Image> imageType, Class<Derivative> derivType,
 									ImageGradient<Image, Derivative> gradient ) {
 
@@ -314,7 +314,7 @@ public class SparseFlowObjectTracker<Image extends ImageGray<Image>, Derivative 
 		return trackLost;
 	}
 
-	public SfotConfig getConfig() {
+	public ConfigSfot getConfig() {
 		return config;
 	}
 }

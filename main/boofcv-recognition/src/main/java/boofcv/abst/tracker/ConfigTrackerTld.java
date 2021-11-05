@@ -39,10 +39,7 @@ public class ConfigTrackerTld implements Configuration {
 	 */
 	public InterpolationType interpolate = InterpolationType.BILINEAR;
 
-	@Override
-	public void checkValidity() {
-
-	}
+	@Override public void checkValidity() {}
 
 	public ConfigTrackerTld(boolean stable ) {
 		if( !stable ) {
@@ -53,11 +50,11 @@ public class ConfigTrackerTld implements Configuration {
 		}
 	}
 
-	public ConfigTrackerTld() {
-	}
+	public ConfigTrackerTld() {}
 
-	public void setTo( ConfigTrackerTld src ) {
+	public ConfigTrackerTld setTo( ConfigTrackerTld src ) {
 		this.parameters.setTo(src.parameters);
 		this.interpolate = src.interpolate;
+		return this;
 	}
 }

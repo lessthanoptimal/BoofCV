@@ -59,9 +59,10 @@ public class ConfigSquareGrid implements Configuration {
 		square.refineGray.maxIterations = 10;
 	}
 
-	public void setTo( ConfigSquareGrid src ) {
+	public ConfigSquareGrid setTo( ConfigSquareGrid src ) {
 		this.thresholding.setTo(src.thresholding);
 		this.square.setTo(src.square);
+		return this;
 	}
 
 	@Override

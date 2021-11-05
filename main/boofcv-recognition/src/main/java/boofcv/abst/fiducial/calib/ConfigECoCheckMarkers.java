@@ -137,7 +137,7 @@ public class ConfigECoCheckMarkers implements Configuration {
 		}
 	}
 
-	public void setTo( ConfigECoCheckMarkers src ) {
+	public ConfigECoCheckMarkers setTo( ConfigECoCheckMarkers src ) {
 		this.dataBitWidthFraction = src.dataBitWidthFraction;
 		this.dataBorderFraction = src.dataBorderFraction;
 		this.firstTargetDuplicated = src.firstTargetDuplicated;
@@ -149,6 +149,7 @@ public class ConfigECoCheckMarkers implements Configuration {
 			s.setTo(src.markerShapes.get(i));
 			this.markerShapes.add(s);
 		}
+		return this;
 	}
 
 	/**

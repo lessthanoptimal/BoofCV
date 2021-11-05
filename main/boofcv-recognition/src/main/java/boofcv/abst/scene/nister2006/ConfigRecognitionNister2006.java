@@ -118,7 +118,7 @@ public class ConfigRecognitionNister2006 implements Configuration {
 		learningMinimumPointsForChildren.checkValidity();
 	}
 
-	public void setTo( ConfigRecognitionNister2006 src ) {
+	public ConfigRecognitionNister2006 setTo( ConfigRecognitionNister2006 src ) {
 		this.kmeans.setTo(src.kmeans);
 		this.tree.setTo(src.tree);
 		this.distanceNorm = src.distanceNorm;
@@ -129,5 +129,6 @@ public class ConfigRecognitionNister2006 implements Configuration {
 		this.queryMaximumImagesInNode.setTo(src.queryMaximumImagesInNode);
 		this.learningMaximumImagesInNode.setTo(src.learningMaximumImagesInNode);
 		this.learningMinimumPointsForChildren.setTo(src.learningMinimumPointsForChildren);
+		return this;
 	}
 }

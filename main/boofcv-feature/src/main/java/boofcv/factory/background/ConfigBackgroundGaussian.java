@@ -70,16 +70,16 @@ public class ConfigBackgroundGaussian extends BaseConfigBackground {
 		this.learnRate = learnRate;
 	}
 
-	public ConfigBackgroundGaussian() {
-	}
+	public ConfigBackgroundGaussian() {}
 
-	public void setTo( ConfigBackgroundGaussian src ) {
+	public ConfigBackgroundGaussian setTo( ConfigBackgroundGaussian src ) {
 		super.setTo(src);
 		this.learnRate = src.learnRate;
 		this.threshold = src.threshold;
 		this.initialVariance = src.initialVariance;
 		this.minimumDifference = src.minimumDifference;
 		this.interpolation = src.interpolation;
+		return this;
 	}
 
 	@Override

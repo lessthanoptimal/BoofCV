@@ -44,10 +44,11 @@ public class ConfigThreeViewRefine implements Configuration {
 	 */
 	public Algorithm which = Algorithm.GEOMETRIC;
 
-	public void setTo( ConfigThreeViewRefine src ) {
+	public ConfigThreeViewRefine setTo( ConfigThreeViewRefine src ) {
 		this.normalizePixels = src.normalizePixels;
 		this.converge.setTo(src.converge);
 		this.which = src.which;
+		return this;
 	}
 
 	@Override

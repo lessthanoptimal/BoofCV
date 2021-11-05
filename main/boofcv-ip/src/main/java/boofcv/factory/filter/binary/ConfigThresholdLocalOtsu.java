@@ -60,9 +60,10 @@ public class ConfigThresholdLocalOtsu extends ConfigThreshold {
 		this.type = ThresholdType.BLOCK_OTSU;
 	}
 
-	public void setTo( ConfigThresholdLocalOtsu src ) {
+	public ConfigThresholdLocalOtsu setTo( ConfigThresholdLocalOtsu src ) {
 		super.setTo(src);
 		this.tuning = src.tuning;
 		this.useOtsu2 = src.useOtsu2;
+		return this;
 	}
 }

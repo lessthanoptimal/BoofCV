@@ -93,10 +93,9 @@ public class ConfigComaniciu2003 implements Configuration {
 			scaleChange = 0.1f;
 	}
 
-	public ConfigComaniciu2003() {
-	}
+	public ConfigComaniciu2003() {}
 
-	public void setTo( ConfigComaniciu2003 src ) {
+	public ConfigComaniciu2003 setTo( ConfigComaniciu2003 src ) {
 		this.numSamples = src.numSamples;
 		this.numSigmas = src.numSigmas;
 		this.numHistogramBins = src.numHistogramBins;
@@ -108,8 +107,8 @@ public class ConfigComaniciu2003 implements Configuration {
 		this.scaleChange = src.scaleChange;
 		this.minimumSizeRatio = src.minimumSizeRatio;
 		this.interpolation = src.interpolation;
+		return this;
 	}
 
-	@Override
-	public void checkValidity() {}
+	@Override public void checkValidity() {}
 }

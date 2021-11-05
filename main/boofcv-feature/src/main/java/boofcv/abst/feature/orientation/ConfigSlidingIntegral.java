@@ -26,31 +26,25 @@ import boofcv.BoofDefaults;
  * @author Peter Abeles
  */
 public class ConfigSlidingIntegral implements ConfigOrientation.Integral {
-
 	/**
 	 * How to convert the radius to the internal canonical scale. Can be used to adjust how
 	 * big or small the region is.
 	 */
 	public double objectRadiusToScale = 1.0/BoofDefaults.SURF_SCALE_TO_RADIUS;
-	/**
-	 * How often the image is sampled. This number is scaled. Typically 0.65.
-	 */
+
+	/** How often the image is sampled. This number is scaled. Typically 0.65. */
 	public double samplePeriod = 0.65;
-	/**
-	 * Angular window that is slide across. Try PI/3
-	 */
+
+	/** Angular window that is slide across. Try PI/3  */
 	public double windowSize = Math.PI / 3.0;
-	/**
-	 * Radius of the region being considered in terms of samples. Typically 8.
-	 */
+
+	/** Radius of the region being considered in terms of samples. Typically 8. */
 	public int radius = 8;
-	/**
-	 * Sigma for weighting distribution. 0 for unweighted. less than zero for automatic. Try -1
-	 */
+
+	/** Sigma for weighting distribution. 0 for unweighted. less than zero for automatic. Try -1 */
 	public double weightSigma = -1;
-	/**
-	 * Size of kernel doing the sampling. Typically 6.
-	 */
+
+	/** Size of kernel doing the sampling. Typically 6. */
 	public int sampleWidth = 6;
 
 	public ConfigSlidingIntegral(double samplePeriod, double windowSize, int radius,
@@ -64,15 +58,15 @@ public class ConfigSlidingIntegral implements ConfigOrientation.Integral {
 
 	public ConfigSlidingIntegral() {}
 
-	public void setTo( ConfigSlidingIntegral src ) {
+	public ConfigSlidingIntegral setTo( ConfigSlidingIntegral src ) {
 		this.objectRadiusToScale = src.objectRadiusToScale;
 		this.samplePeriod = src.samplePeriod;
 		this.windowSize = src.windowSize;
 		this.radius = src.radius;
 		this.weightSigma = src.weightSigma;
 		this.sampleWidth = src.sampleWidth;
+		return this;
 	}
 
-	@Override
-	public void checkValidity() {}
+	@Override public void checkValidity() {}
 }

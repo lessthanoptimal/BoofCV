@@ -32,13 +32,12 @@ public class ConfigConvertTupleDesc implements Configuration {
 	 */
 	public DataType outputData = DataType.NATIVE;
 
-	public void setTo( ConfigConvertTupleDesc src ) {
+	public ConfigConvertTupleDesc setTo( ConfigConvertTupleDesc src ) {
 		this.outputData = src.outputData;
+		return this;
 	}
 
-	@Override public void checkValidity() {
-
-	}
+	@Override public void checkValidity() {}
 
 	/** Array data type for output tuple */
 	public enum DataType {

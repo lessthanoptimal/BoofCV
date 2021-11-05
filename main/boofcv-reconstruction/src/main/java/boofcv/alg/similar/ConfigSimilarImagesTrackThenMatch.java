@@ -88,7 +88,7 @@ public class ConfigSimilarImagesTrackThenMatch implements Configuration {
 		sequentialMinimumCommonTracks.checkValidity();
 	}
 
-	public void setTo( ConfigSimilarImagesTrackThenMatch src ) {
+	public ConfigSimilarImagesTrackThenMatch setTo( ConfigSimilarImagesTrackThenMatch src ) {
 		this.sequentialSearchRadius = src.sequentialSearchRadius;
 		this.sequentialMinimumCommonTracks.setTo(src.sequentialMinimumCommonTracks);
 		this.limitQuery = src.limitQuery;
@@ -97,5 +97,6 @@ public class ConfigSimilarImagesTrackThenMatch implements Configuration {
 		this.descriptions.setTo(src.descriptions);
 		this.recognizeNister2006.setTo(src.recognizeNister2006);
 		this.associate.setTo(src.associate);
+		return this;
 	}
 }

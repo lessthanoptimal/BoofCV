@@ -54,10 +54,11 @@ public class ConfigSparseToDenseCloud implements Configuration {
 		mvs.checkValidity();
 	}
 
-	public void setTo( ConfigSparseToDenseCloud src ) {
+	public ConfigSparseToDenseCloud setTo( ConfigSparseToDenseCloud src ) {
 		this.disparity.setTo(src.disparity);
 		this.smoother.setTo(src.smoother);
 		this.graph.setTo(src.graph);
 		this.mvs.setTo(src.mvs);
+		return this;
 	}
 }

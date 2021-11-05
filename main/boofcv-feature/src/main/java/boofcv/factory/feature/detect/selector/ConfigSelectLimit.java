@@ -47,10 +47,7 @@ public class ConfigSelectLimit implements Configuration {
 		this.randomSeed = randomSeed;
 	}
 
-	@Override
-	public void checkValidity() {
-
-	}
+	@Override public void checkValidity() {}
 
 	public static ConfigSelectLimit selectBestN() {
 		return new ConfigSelectLimit(SelectLimitTypes.SELECT_N, -1);
@@ -66,15 +63,14 @@ public class ConfigSelectLimit implements Configuration {
 		return config;
 	}
 
-	public void setTo( ConfigSelectLimit src ) {
+	public ConfigSelectLimit setTo( ConfigSelectLimit src ) {
 		this.type = src.type;
 		this.randomSeed = src.randomSeed;
 		this.uniform.setTo(uniform);
+		return this;
 	}
 
 	public ConfigSelectLimit copy() {
-		var out = new ConfigSelectLimit();
-		out.setTo(this);
-		return out;
+		return new ConfigSelectLimit().setTo(this);
 	}
 }

@@ -35,10 +35,11 @@ public class ConfigOrientation2 implements Configuration {
 	// TODO support fixed scale variants
 	// TODO have option for fixed orientation where you specify the value or orientation
 
-	public void setTo( ConfigOrientation2 src ) {
+	public ConfigOrientation2 setTo( ConfigOrientation2 src ) {
 		this.type = src.type;
 		this.slidingIntegral.setTo(src.slidingIntegral);
 		this.averageIntegral.setTo(src.averageIntegral);
+		return this;
 	}
 
 	@Override

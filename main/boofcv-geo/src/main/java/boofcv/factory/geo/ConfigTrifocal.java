@@ -37,9 +37,10 @@ public class ConfigTrifocal implements Configuration {
 	 */
 	public ConfigConverge converge = new ConfigConverge(1e-8, 1e-8, 10);
 
-	public void setTo( ConfigTrifocal src ) {
+	public ConfigTrifocal setTo( ConfigTrifocal src ) {
 		this.which = src.which;
 		this.converge.setTo(src.converge);
+		return this;
 	}
 
 	@Override

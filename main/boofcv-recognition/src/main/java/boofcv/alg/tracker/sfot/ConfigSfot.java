@@ -26,43 +26,32 @@ import boofcv.struct.Configuration;
  *
  * @author Peter Abeles
  */
-public class SfotConfig implements Configuration {
-
-	/**
-	 * Random seed used by random number generator
-	 */
+public class ConfigSfot implements Configuration {
+	/** Random seed used by random number generator */
 	public long randSeed = 0xFEED;
-	/**
-	 * Number of iterative cycles used by LeastMedianOfSquares
-	 */
+
+	/** Number of iterative cycles used by LeastMedianOfSquares */
 	public int robustCycles = 50;
-	/**
-	 * Maximum allowed error in pixels when performing robust model fitting using LeastMedianOfSquares
-	 */
+
+	/** Maximum allowed error in pixels when performing robust model fitting using LeastMedianOfSquares */
 	public double robustMaxError = 10;
 	public int trackerFeatureRadius = 5;
 
-	/**
-	 * Number of points it samples along one side of the grid.
-	 */
+	/** Number of points it samples along one side of the grid. */
 	public int numberOfSamples = 15;
 
-	/**
-	 * Maximum allowed forward-backwards error in pixels
-	 */
+	/** Maximum allowed forward-backwards error in pixels */
 	public double maximumErrorFB = 10;
 
-	/**
-	 * Basic parameters for tracker. KltConfig.createDefault() with maxIterations = 50 is suggested.
-	 */
+	/** Basic parameters for tracker. KltConfig.createDefault() with maxIterations = 50 is suggested. */
 	public final ConfigKlt trackerConfig;
 
-	public SfotConfig() {
+	public ConfigSfot() {
 		trackerConfig = new ConfigKlt();
 		trackerConfig.maxIterations = 50;
 	}
 
-	public void setTo(SfotConfig src) {
+	public ConfigSfot setTo( ConfigSfot src ) {
 		this.randSeed = src.randSeed;
 		this.robustCycles = src.robustCycles;
 		this.robustMaxError = src.robustMaxError;
@@ -70,6 +59,7 @@ public class SfotConfig implements Configuration {
 		this.numberOfSamples = src.numberOfSamples;
 		this.maximumErrorFB = src.maximumErrorFB;
 		this.trackerConfig.setTo(src.trackerConfig);
+		return this;
 	}
 
 	@Override public void checkValidity() {

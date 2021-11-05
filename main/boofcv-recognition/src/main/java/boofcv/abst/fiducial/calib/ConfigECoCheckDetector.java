@@ -44,8 +44,9 @@ public class ConfigECoCheckDetector implements Configuration {
 		chessboard.checkValidity();
 	}
 
-	public void setTo( ConfigECoCheckDetector src ) {
+	public ConfigECoCheckDetector setTo( ConfigECoCheckDetector src ) {
 		this.sampleCountSides = src.sampleCountSides;
 		this.chessboard.setTo(src.chessboard);
+		return this;
 	}
 }

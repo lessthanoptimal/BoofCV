@@ -81,13 +81,14 @@ public class ConfigPKlt implements Configuration {
 		// toleranceFB is valid for all values
 	}
 
-	public void setTo( ConfigPKlt src ) {
+	public ConfigPKlt setTo( ConfigPKlt src ) {
 		this.config.setTo(src.config);
 		this.toleranceFB = src.toleranceFB;
 		this.templateRadius = src.templateRadius;
 		this.pyramidLevels.setTo(src.pyramidLevels);
 		this.pruneClose = src.pruneClose;
 		this.maximumTracks.setTo(src.maximumTracks);
+		return this;
 	}
 
 	public ConfigPKlt copy() {

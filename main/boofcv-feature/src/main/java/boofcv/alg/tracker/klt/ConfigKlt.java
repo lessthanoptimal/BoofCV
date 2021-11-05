@@ -63,12 +63,13 @@ public class ConfigKlt implements Configuration {
 			throw new IllegalArgumentException("driftFracTol must be >= 0");
 	}
 
-	public void setTo( ConfigKlt src ) {
+	public ConfigKlt setTo( ConfigKlt src ) {
 		this.forbiddenBorder = src.forbiddenBorder;
 		this.maxPerPixelError = src.maxPerPixelError;
 		this.maxIterations = src.maxIterations;
 		this.minDeterminant = src.minDeterminant;
 		this.minPositionDelta = src.minPositionDelta;
 		this.driftFracTol = src.driftFracTol;
+		return this;
 	}
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -42,19 +42,16 @@ public class ConfigTrackerDda implements Configuration {
 	 */
 	public long seed=0xDEADBEEF;
 
-	@Override
-	public void checkValidity() {
-	}
+	@Override public void checkValidity() {}
 
-	public void setTo( ConfigTrackerDda src ) {
+	public ConfigTrackerDda setTo( ConfigTrackerDda src ) {
 		this.updateDescription = src.updateDescription;
 		this.maxInactiveTracks = src.maxInactiveTracks;
 		this.seed = src.seed;
+		return this;
 	}
 
 	public ConfigTrackerDda copy() {
-		var out = new ConfigTrackerDda();
-		out.setTo(this);
-		return out;
+		return new ConfigTrackerDda().setTo(this);
 	}
 }

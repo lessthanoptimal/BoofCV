@@ -54,15 +54,14 @@ public class ConfigAssociate implements Configuration {
 		GREEDY, KD_TREE, RANDOM_FOREST,
 	}
 
-	public void setTo( ConfigAssociate src ) {
+	public ConfigAssociate setTo( ConfigAssociate src ) {
 		this.type = src.type;
 		this.greedy.setTo(src.greedy);
 		this.nearestNeighbor.setTo(src.nearestNeighbor);
+		return this;
 	}
 
 	public ConfigAssociate copy() {
-		var out = new ConfigAssociate();
-		out.setTo(this);
-		return out;
+		return new ConfigAssociate().setTo(this);
 	}
 }

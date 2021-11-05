@@ -50,11 +50,12 @@ public class ConfigBundleUtils implements Configuration {
 		BoofMiscOps.checkFraction(keepFraction,"keepFraction");
 	}
 
-	public void setTo( ConfigBundleUtils src ) {
+	public ConfigBundleUtils setTo( ConfigBundleUtils src ) {
 		this.converge.setTo(src.converge);
 		this.scale = src.scale;
 		this.homogenous = src.homogenous;
 		this.keepFraction = src.keepFraction;
 		this.triangulation.setTo(src.triangulation);
+		return this;
 	}
 }

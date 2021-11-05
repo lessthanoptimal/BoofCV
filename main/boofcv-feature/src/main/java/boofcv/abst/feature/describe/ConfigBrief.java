@@ -63,18 +63,16 @@ public class ConfigBrief implements Configuration {
 		this.fixed = fixed;
 	}
 
-	public ConfigBrief() {
-	}
+	public ConfigBrief() {}
 
-	@Override
-	public void checkValidity() {
-	}
+	@Override public void checkValidity() {}
 
-	public void setTo( ConfigBrief src ) {
+	public ConfigBrief setTo( ConfigBrief src ) {
 		this.radius = src.radius;
 		this.numPoints = src.numPoints;
 		this.blurSigma = src.blurSigma;
 		this.blurRadius = src.blurRadius;
 		this.fixed = src.fixed;
+		return this;
 	}
 }

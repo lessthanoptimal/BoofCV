@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -29,20 +29,20 @@ import static boofcv.misc.BoofMiscOps.checkTrue;
  * @author Peter Abeles
  */
 public class ConfigSpeckleFilter implements Configuration {
-
 	/** How similar two pixel values need to be for them to be considered connected */
 	public float similarTol = 1.0f;
 
 	/** The maximum area (in pixels) for a region to be filtered. If relative, then it's relative to width*height */
-	public final ConfigLength maximumArea = ConfigLength.relative(0.002,0.0);
+	public final ConfigLength maximumArea = ConfigLength.relative(0.002, 0.0);
 
 	@Override public void checkValidity() {
-		checkTrue(similarTol>=0.0f);
+		checkTrue(similarTol >= 0.0f);
 		maximumArea.checkValidity();
 	}
 
-	public void setTo( ConfigSpeckleFilter src ) {
+	public ConfigSpeckleFilter setTo( ConfigSpeckleFilter src ) {
 		this.similarTol = src.similarTol;
 		this.maximumArea.setTo(src.maximumArea);
+		return this;
 	}
 }

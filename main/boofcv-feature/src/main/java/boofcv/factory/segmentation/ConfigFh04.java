@@ -66,13 +66,13 @@ public class ConfigFh04 implements Configuration {
 		this.approximateSortBins = approximateSortBins;
 	}
 
-	public void setTo( ConfigFh04 src ) {
+	public ConfigFh04 setTo( ConfigFh04 src ) {
 		this.K = src.K;
 		this.minimumRegionSize = src.minimumRegionSize;
 		this.connectRule = src.connectRule;
 		this.approximateSortBins = src.approximateSortBins;
+		return this;
 	}
 
-	@Override
-	public void checkValidity() {}
+	@Override public void checkValidity() {}
 }

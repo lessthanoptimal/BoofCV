@@ -45,12 +45,13 @@ public class ConfigPixelsToMetric implements Configuration {
 		practicalGuess.checkValidity();
 	}
 
-	public void setTo( ConfigPixelsToMetric src ) {
+	public ConfigPixelsToMetric setTo( ConfigPixelsToMetric src ) {
 		this.type = src.type;
 		this.trifocal.setTo(src.trifocal);
 		this.dualQuadratic.setTo(src.dualQuadratic);
 		this.essentialGuess.setTo(src.essentialGuess);
 		this.practicalGuess.setTo(src.practicalGuess);
+		return this;
 	}
 
 	public enum Type {

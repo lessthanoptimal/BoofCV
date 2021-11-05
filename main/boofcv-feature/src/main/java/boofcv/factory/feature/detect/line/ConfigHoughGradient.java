@@ -80,7 +80,7 @@ public class ConfigHoughGradient implements Configuration {
 		this.maxLines = maxLines;
 	}
 
-	public void setTo( ConfigHoughGradient src ) {
+	public ConfigHoughGradient setTo( ConfigHoughGradient src ) {
 		this.localMaxRadius = src.localMaxRadius;
 		this.minCounts = src.minCounts;
 		this.minDistanceFromOrigin = src.minDistanceFromOrigin;
@@ -89,10 +89,8 @@ public class ConfigHoughGradient implements Configuration {
 		this.mergeAngle = src.mergeAngle;
 		this.mergeDistance = src.mergeDistance;
 		this.refineRadius = src.refineRadius;
+		return this;
 	}
 
-	@Override
-	public void checkValidity() {
-
-	}
+	@Override public void checkValidity() {}
 }

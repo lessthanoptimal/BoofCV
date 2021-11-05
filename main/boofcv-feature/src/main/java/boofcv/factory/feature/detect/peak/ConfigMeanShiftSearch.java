@@ -56,15 +56,13 @@ public class ConfigMeanShiftSearch implements Configuration {
 
 	public ConfigMeanShiftSearch() {}
 
-	public void setTo( ConfigMeanShiftSearch src ) {
+	public ConfigMeanShiftSearch setTo( ConfigMeanShiftSearch src ) {
 		this.maxIterations = src.maxIterations;
 		this.convergenceTol = src.convergenceTol;
 		this.odd = src.odd;
 		this.positiveOnly = src.positiveOnly;
+		return this;
 	}
 
-	@Override
-	public void checkValidity() {
-
-	}
+	@Override public void checkValidity() {}
 }

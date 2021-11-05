@@ -48,10 +48,11 @@ public class ConfigDenseSurfStable implements Configuration {
 
 	public ConfigDenseSurfStable() {}
 
-	public void setTo( ConfigDenseSurfStable src ) {
+	public ConfigDenseSurfStable setTo( ConfigDenseSurfStable src ) {
 		this.surf.setTo(src.surf);
 		this.sampling.setTo(src.sampling);
 		this.descriptorScale = src.descriptorScale;
+		return this;
 	}
 
 	@Override

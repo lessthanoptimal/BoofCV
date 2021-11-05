@@ -47,10 +47,11 @@ public class ConfigDenseSurfFast implements Configuration {
 
 	public ConfigDenseSurfFast() {}
 
-	public void setTo( ConfigDenseSurfFast src ) {
+	public ConfigDenseSurfFast setTo( ConfigDenseSurfFast src ) {
 		this.surf.setTo(src.surf);
 		this.sampling.setTo(src.sampling);
 		this.descriptorScale = src.descriptorScale;
+		return this;
 	}
 
 	@Override
