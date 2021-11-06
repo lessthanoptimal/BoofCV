@@ -26,9 +26,7 @@ import georegression.struct.shapes.Quadrilateral_F64;
  * @author Peter Abeles
  */
 public class FoundFiducial {
-	/**
-	 * ID number of the fiducial
-	 */
+	/** ID number of the fiducial */
 	public long id;
 
 	/**
@@ -41,4 +39,18 @@ public class FoundFiducial {
 	/** how close of a fit the observed pattern was to the best fit marker. Lower is better. */
 	public double encodingError;
 
+	public void reset() {
+		id = -1;
+		distortedPixels.a.setTo(0,0);
+		distortedPixels.b.setTo(0,0);
+		distortedPixels.c.setTo(0,0);
+		distortedPixels.d.setTo(0,0);
+		encodingError = 0;
+	}
+
+	public void setTo( FoundFiducial src ) {
+		this.id = src.id;
+		this.distortedPixels.setTo(src.distortedPixels);
+		this.encodingError = src.encodingError;
+	}
 }
