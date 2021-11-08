@@ -45,7 +45,7 @@ public class QrCodeDecoderBits {
 
 	StringBuilder workString = new StringBuilder();
 
-	// Currently specified ECI encoding
+	// Specified ECI encoding
 	String encodingEci;
 
 	// If null the encoding of byte messages will attempt to be automatically determined, with a default
@@ -130,9 +130,6 @@ public class QrCodeDecoderBits {
 		bits.data = qr.corrected;
 		bits.size = qr.corrected.length*8;
 
-//		System.out.println("decoded message");
-//		bits.print();System.out.println();
-
 		workString.setLength(0);
 		qr.message = null;
 
@@ -146,29 +143,19 @@ public class QrCodeDecoderBits {
 			QrCode.Mode mode = QrCode.Mode.lookup(modeBits);
 			qr.mode = updateModeLogic(qr.mode, mode);
 			switch (mode) {
-				case NUMERIC:
-					location = decodeNumeric(qr, bits, location);
-					break;
-				case ALPHANUMERIC:
-					location = decodeAlphanumeric(qr, bits, location);
-					break;
-				case BYTE:
-					location = decodeByte(qr, bits, location);
-					break;
-				case KANJI:
-					location = decodeKanji(qr, bits, location);
-					break;
-				case ECI:
-					location = decodeEci(bits, location);
-					break;
-				case FNC1_FIRST:
-				case FNC1_SECOND:
+				case NUMERIC -> location = decodeNumeric(qr, bits, location);
+				case ALPHANUMERIC -> location = decodeAlphanumeric(qr, bits, location);
+				case BYTE -> location = decodeByte(qr, bits, location);
+				case KANJI -> location = decodeKanji(qr, bits, location);
+				case ECI -> location = decodeEci(bits, location);
+				case FNC1_FIRST, FNC1_SECOND -> {
 					// This isn't the proper way to handle this mode, but it
 					// should still parse the data
-					break;
-				default:
+				}
+				default -> {
 					qr.failureCause = QrCode.Failure.UNKNOWN_MODE;
 					return false;
+				}
 			}
 
 			if (location < 0) {
@@ -352,7 +339,7 @@ public class QrCodeDecoderBits {
 			return -1;
 		}
 
-		byte rawdata[] = new byte[length];
+		byte[] rawdata = new byte[length];
 
 		for (int i = 0; i < length; i++) {
 			rawdata[i] = (byte)data.read(bitLocation, 8, true);
@@ -386,7 +373,7 @@ public class QrCodeDecoderBits {
 		int length = data.read(bitLocation, lengthBits, true);
 		bitLocation += lengthBits;
 
-		byte rawdata[] = new byte[length*2];
+		byte[] rawdata = new byte[length*2];
 
 		for (int i = 0; i < length; i++) {
 			if (data.size < bitLocation + 13) {

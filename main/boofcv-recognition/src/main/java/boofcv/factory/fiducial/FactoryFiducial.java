@@ -182,7 +182,7 @@ public class FactoryFiducial {
 
 	/**
 	 * Wrapper around square-grid calibration detector. Refine with lines is set to true automatically. This
-	 * isn't being used for calibration and its better to use the whole line.
+	 * isn't being used for calibration, and it's better to use the whole line.
 	 *
 	 * @param config Description of the chessboard.
 	 * @param imageType Type of image it's processing
@@ -214,7 +214,7 @@ public class FactoryFiducial {
 	 * @return the detector
 	 */
 	public static <T extends ImageGray<T>>
-	QrCodePreciseDetector<T> qrcode( ConfigQrCode config, Class<T> imageType ) {
+	QrCodePreciseDetector<T> qrcode( @Nullable ConfigQrCode config, Class<T> imageType ) {
 		if (config == null)
 			config = new ConfigQrCode();
 
