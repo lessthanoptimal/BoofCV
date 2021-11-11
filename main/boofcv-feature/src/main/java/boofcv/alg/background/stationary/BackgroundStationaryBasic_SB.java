@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -30,17 +30,15 @@ import boofcv.struct.image.*;
  *
  * @author Peter Abeles
  */
-public class BackgroundStationaryBasic_SB<T extends ImageGray<T>>
-	extends BackgroundStationaryBasic<T>
-{
+public class BackgroundStationaryBasic_SB<T extends ImageGray<T>> extends BackgroundStationaryBasic<T> {
 	// storage for background image
-	protected GrayF32 background = new GrayF32(0,0);
+	protected GrayF32 background = new GrayF32(0, 0);
 
 	// wrapper which provides abstraction across image types
 	protected GImageGray inputWrapper;
 
-	public BackgroundStationaryBasic_SB(float learnRate, float threshold,
-										Class<T> imageType) {
+	public BackgroundStationaryBasic_SB( float learnRate, float threshold,
+										 Class<T> imageType ) {
 		super(learnRate, threshold, ImageType.single(imageType));
 
 		inputWrapper = FactoryGImageGray.create(imageType);
@@ -55,21 +53,18 @@ public class BackgroundStationaryBasic_SB<T extends ImageGray<T>>
 		return background;
 	}
 
-	@Override
-	public void reset() {
-		background.reshape(0,0);
+	@Override public void reset() {
+		background.reshape(0, 0);
 	}
 
-	@Override
-	public void updateBackground( T frame) {
-		if( background.width != frame.width ) {
+	@Override public void updateBackground( T frame ) {
+		if (background.width != frame.width) {
 			background.reshape(frame.width, frame.height);
 			GConvertImage.convert(frame, background);
 			return;
-		} else {
-			InputSanityCheck.checkSameShape(background,frame);
 		}
 
+		InputSanityCheck.checkSameShape(background, frame);
 		inputWrapper.wrap(frame);
 
 		float minusLearn = 1.0f - learnRate;
@@ -78,7 +73,7 @@ public class BackgroundStationaryBasic_SB<T extends ImageGray<T>>
 		for (int y = 0; y < frame.height; y++) {
 			int indexInput = frame.startIndex + y*frame.stride;
 			int end = indexInput + frame.width;
-			while( indexInput < end ) {
+			while (indexInput < end) {
 				float value = inputWrapper.getF(indexInput++);
 				float bg = background.data[indexBG];
 
@@ -87,13 +82,12 @@ public class BackgroundStationaryBasic_SB<T extends ImageGray<T>>
 		}
 	}
 
-	@Override
-	public void segment(T frame, GrayU8 segmented) {
-		if( background.width != frame.width ) {
-			ImageMiscOps.fill(segmented,unknownValue);
+	@Override public void segment( T frame, GrayU8 segmented ) {
+		if (background.width != frame.width) {
+			ImageMiscOps.fill(segmented, unknownValue);
 			return;
 		}
-		InputSanityCheck.checkSameShape(background,frame,segmented);
+		InputSanityCheck.checkSameShape(background, frame, segmented);
 		inputWrapper.wrap(frame);
 
 		float thresholdSq = threshold*threshold;
@@ -104,12 +98,12 @@ public class BackgroundStationaryBasic_SB<T extends ImageGray<T>>
 			int indexSegmented = segmented.startIndex + y*segmented.stride;
 
 			int end = indexInput + frame.width;
-			while( indexInput < end ) {
+			while (indexInput < end) {
 				float bg = background.data[indexBG];
 				float pixelFrame = inputWrapper.getF(indexInput);
 
 				float diff = bg - pixelFrame;
-				if (diff * diff <= thresholdSq) {
+				if (diff*diff <= thresholdSq) {
 					segmented.data[indexSegmented] = 0;
 				} else {
 					segmented.data[indexSegmented] = 1;
@@ -121,6 +115,4 @@ public class BackgroundStationaryBasic_SB<T extends ImageGray<T>>
 			}
 		}
 	}
-
-
 }

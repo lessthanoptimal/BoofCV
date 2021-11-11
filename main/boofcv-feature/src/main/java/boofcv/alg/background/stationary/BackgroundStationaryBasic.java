@@ -61,23 +61,19 @@ public abstract class BackgroundStationaryBasic<T extends ImageBase<T>>
 		this.threshold = threshold;
 	}
 
-	@Override
-	public float getLearnRate() {
+	@Override public float getLearnRate() {
 		return learnRate;
 	}
 
-	@Override
-	public void setLearnRate( float learnRate ) {
+	@Override public void setLearnRate( float learnRate ) {
 		this.learnRate = learnRate;
 	}
 
-	@Override
-	public float getThreshold() {
+	@Override public float getThreshold() {
 		return threshold;
 	}
 
-	@Override
-	public void setThreshold( float threshold ) {
+	@Override public void setThreshold( float threshold ) {
 		this.threshold = threshold;
 	}
 }

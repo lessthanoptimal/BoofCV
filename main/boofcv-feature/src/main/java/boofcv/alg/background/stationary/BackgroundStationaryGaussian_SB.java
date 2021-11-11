@@ -32,14 +32,12 @@ import boofcv.struct.image.*;
  *
  * @author Peter Abeles
  */
-public class BackgroundStationaryGaussian_SB<T extends ImageGray<T>>
-		extends BackgroundStationaryGaussian<T>
-{
+public class BackgroundStationaryGaussian_SB<T extends ImageGray<T>> extends BackgroundStationaryGaussian<T> {
 	// wrappers which provide abstraction across image types
 	protected GImageGray inputWrapper;
 
 	// background is composed of two channels. 0 = mean, 1 = variance
-	Planar<GrayF32> background = new Planar<>(GrayF32.class,1,1,2);
+	Planar<GrayF32> background = new Planar<>(GrayF32.class, 1, 1, 2);
 
 	/**
 	 * Configurations background removal.
@@ -48,24 +46,21 @@ public class BackgroundStationaryGaussian_SB<T extends ImageGray<T>>
 	 * @param threshold Threshold for background. Try 10.
 	 * @param imageType Type of input image.
 	 */
-	public BackgroundStationaryGaussian_SB(float learnRate, float threshold, Class<T> imageType)
-	{
+	public BackgroundStationaryGaussian_SB( float learnRate, float threshold, Class<T> imageType ) {
 		super(learnRate, threshold, ImageType.single(imageType));
 
 		inputWrapper = FactoryGImageGray.create(imageType);
 	}
 
-	@Override
-	public void reset() {
-		background.reshape(1,1);
+	@Override public void reset() {
+		background.reshape(1, 1);
 	}
 
-	@Override
-	public void updateBackground( T frame) {
-		if( background.width == 1 ) {
+	@Override public void updateBackground( T frame ) {
+		if (background.width == 1) {
 			background.reshape(frame.width, frame.height);
 			GConvertImage.convert(frame, background.getBand(0));
-			GImageMiscOps.fill(background.getBand(1),initialVariance);
+			GImageMiscOps.fill(background.getBand(1), initialVariance);
 			return;
 		} else {
 			InputSanityCheck.checkSameShape(background, frame);
@@ -83,12 +78,12 @@ public class BackgroundStationaryGaussian_SB<T extends ImageGray<T>>
 			int indexInput = frame.startIndex + y*frame.stride;
 
 			int end = indexInput + frame.width;
-			while( indexInput < end ) {
+			while (indexInput < end) {
 				float inputValue = inputWrapper.getF(indexInput);
 				float meanBG = backgroundMean.data[indexBG];
 				float varianceBG = backgroundVar.data[indexBG];
 
-				float diff = meanBG-inputValue;
+				float diff = meanBG - inputValue;
 				backgroundMean.data[indexBG] = minusLearn*meanBG + learnRate*inputValue;
 				backgroundVar.data[indexBG] = minusLearn*varianceBG + learnRate*diff*diff;
 
@@ -98,13 +93,12 @@ public class BackgroundStationaryGaussian_SB<T extends ImageGray<T>>
 		}
 	}
 
-	@Override
-	public void segment( T frame, GrayU8 segmented) {
-		if( background.width == 1 ) {
+	@Override public void segment( T frame, GrayU8 segmented ) {
+		if (background.width == 1) {
 			ImageMiscOps.fill(segmented, unknownValue);
 			return;
 		}
-		InputSanityCheck.checkSameShape(background,frame,segmented);
+		InputSanityCheck.checkSameShape(background, frame, segmented);
 		inputWrapper.wrap(frame);
 
 		GrayF32 backgroundMean = background.getBand(0);
@@ -116,7 +110,7 @@ public class BackgroundStationaryGaussian_SB<T extends ImageGray<T>>
 			int indexSegmented = segmented.startIndex + y*segmented.stride;
 
 			int end = indexInput + frame.width;
-			while( indexInput < end ) {
+			while (indexInput < end) {
 				float pixelFrame = inputWrapper.getF(indexInput);
 
 				float meanBG = backgroundMean.data[indexBG];
@@ -128,7 +122,7 @@ public class BackgroundStationaryGaussian_SB<T extends ImageGray<T>>
 				if (chisq <= threshold) {
 					segmented.data[indexSegmented] = 0;
 				} else {
-					if( diff >= minimumDifference || -diff >= minimumDifference )
+					if (diff >= minimumDifference || -diff >= minimumDifference)
 						segmented.data[indexSegmented] = 1;
 					else
 						segmented.data[indexSegmented] = 0;

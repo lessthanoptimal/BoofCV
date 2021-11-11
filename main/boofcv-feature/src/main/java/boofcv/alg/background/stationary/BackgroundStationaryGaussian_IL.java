@@ -32,9 +32,7 @@ import boofcv.struct.image.InterleavedF32;
  *
  * @author Peter Abeles
  */
-public class BackgroundStationaryGaussian_IL<T extends ImageInterleaved<T>>
-		extends BackgroundStationaryGaussian<T>
-{
+public class BackgroundStationaryGaussian_IL<T extends ImageInterleaved<T>> extends BackgroundStationaryGaussian<T> {
 
 	// wrappers which provide abstraction across image types
 	protected GImageMultiBand inputWrapper;
@@ -52,17 +50,15 @@ public class BackgroundStationaryGaussian_IL<T extends ImageInterleaved<T>>
 	 *
 	 * @param learnRate Specifies how quickly the background is updated. 0 = static  1.0 = instant. Try 0.05
 	 * @param threshold Threshold for background. Consult a chi-square table for reasonably values.
-	 *                  10 to 16 for 1 to 3 bands.
+	 * 10 to 16 for 1 to 3 bands.
 	 * @param imageType Type of input image.
 	 */
-	public BackgroundStationaryGaussian_IL(float learnRate, float threshold,
-										   ImageType<T> imageType)
-	{
+	public BackgroundStationaryGaussian_IL( float learnRate, float threshold, ImageType<T> imageType ) {
 		super(learnRate, threshold, imageType);
 
 		int numBands = imageType.getNumBands();
 
-		background = new InterleavedF32(1,1,2*numBands);
+		background = new InterleavedF32(1, 1, 2*numBands);
 		bgWrapper = FactoryGImageMultiBand.create(background.getImageType());
 		bgWrapper.wrap(background);
 
@@ -72,32 +68,30 @@ public class BackgroundStationaryGaussian_IL<T extends ImageInterleaved<T>>
 		bgPixel = new float[numBands*2];
 	}
 
-	@Override
-	public void reset() {
-		background.reshape(1,1);
+	@Override public void reset() {
+		background.reshape(1, 1);
 	}
 
-	@Override
-	public void updateBackground( T frame) {
+	@Override public void updateBackground( T frame ) {
 		inputWrapper.wrap(frame);
 
-		if( background.width == 1 ) {
+		if (background.width == 1) {
 			background.reshape(frame.width, frame.height);
 
 			for (int y = 0; y < frame.height; y++) {
 				for (int x = 0; x < frame.width; x++) {
-					inputWrapper.get(x,y,inputPixel);
+					inputWrapper.get(x, y, inputPixel);
 					for (int i = 0; i < frame.numBands; i++) {
 						bgPixel[i*2] = inputPixel[i];
-						bgPixel[i*2+1] = initialVariance;
+						bgPixel[i*2 + 1] = initialVariance;
 					}
-					bgWrapper.set(x,y,bgPixel);
+					bgWrapper.set(x, y, bgPixel);
 				}
 			}
 			return;
-		} else {
-			InputSanityCheck.checkSameShape(background, frame);
 		}
+
+		InputSanityCheck.checkSameShape(background, frame);
 
 		int numBands = background.getNumBands()/2;
 		float minusLearn = 1.0f - learnRate;
@@ -106,16 +100,16 @@ public class BackgroundStationaryGaussian_IL<T extends ImageInterleaved<T>>
 		for (int y = 0; y < background.height; y++) {
 			int indexInput = frame.startIndex + y*frame.stride;
 			int end = indexInput + frame.width*numBands;
-			while( indexInput < end ) {
+			while (indexInput < end) {
 				inputWrapper.getF(indexInput, inputPixel);
 
 				for (int band = 0; band < numBands; band++) {
 
 					float inputValue = inputPixel[band];
 					float meanBG = background.data[indexBG];
-					float varianceBG = background.data[indexBG+1];
+					float varianceBG = background.data[indexBG + 1];
 
-					float diff = meanBG-inputValue;
+					float diff = meanBG - inputValue;
 					background.data[indexBG++] = minusLearn*meanBG + learnRate*inputValue;
 					background.data[indexBG++] = minusLearn*varianceBG + learnRate*diff*diff;
 				}
@@ -125,12 +119,12 @@ public class BackgroundStationaryGaussian_IL<T extends ImageInterleaved<T>>
 		}
 	}
 
-	@Override
-	public void segment( T frame, GrayU8 segmented) {
-		if( background.width == 1 ) {
+	@Override public void segment( T frame, GrayU8 segmented ) {
+		if (background.width == 1) {
 			ImageMiscOps.fill(segmented, unknownValue);
 			return;
 		}
+
 		inputWrapper.wrap(frame);
 
 		final int numBands = background.getNumBands()/2;
@@ -143,7 +137,7 @@ public class BackgroundStationaryGaussian_IL<T extends ImageInterleaved<T>>
 			int indexSegmented = segmented.startIndex + y*segmented.stride;
 
 			int end = indexInput + frame.width*frame.numBands;
-			while( indexInput < end ) {
+			while (indexInput < end) {
 				inputWrapper.getF(indexInput, inputPixel);
 
 				float mahalanobis = 0;
@@ -152,16 +146,16 @@ public class BackgroundStationaryGaussian_IL<T extends ImageInterleaved<T>>
 					int indexBG_band = indexBG + band*2;
 
 					float meanBG = background.data[indexBG_band];
-					float varBG  = background.data[indexBG_band+1];
+					float varBG = background.data[indexBG_band + 1];
 
 					float diff = meanBG - inputPixel[band];
-					mahalanobis += diff * diff / varBG;
+					mahalanobis += diff*diff/varBG;
 				}
 
 				if (mahalanobis <= threshold) {
 					segmented.data[indexSegmented] = 0;
 				} else {
-					if( minimumDifference == 0) {
+					if (minimumDifference == 0) {
 						segmented.data[indexSegmented] = 1;
 					} else {
 						float sumAbsDiff = 0;
@@ -176,9 +170,9 @@ public class BackgroundStationaryGaussian_IL<T extends ImageInterleaved<T>>
 					}
 				}
 
-				indexInput     += frame.numBands;
+				indexInput += frame.numBands;
 				indexSegmented += 1;
-				indexBG        += background.numBands;
+				indexBG += background.numBands;
 			}
 		}
 	}

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -43,13 +43,11 @@ public abstract class BackgroundMovingGmm<T extends ImageBase<T>, Motion extends
 		common = new BackgroundGmmCommon(learningPeriod, decayCoef, maxGaussians, imageType);
 	}
 
-	@Override
-	public void reset() {
+	@Override public void reset() {
 		common.model.zero();
 	}
 
-	@Override
-	public void initialize( int backgroundWidth, int backgroundHeight, Motion homeToWorld ) {
+	@Override public void initialize( int backgroundWidth, int backgroundHeight, Motion homeToWorld ) {
 		common.model.reshape(backgroundHeight, backgroundWidth*common.modelStride);
 		common.model.zero();
 
@@ -60,28 +58,23 @@ public abstract class BackgroundMovingGmm<T extends ImageBase<T>, Motion extends
 		this.backgroundHeight = backgroundHeight;
 	}
 
-	@Override
-	public float getInitialVariance() {
+	@Override public float getInitialVariance() {
 		return common.initialVariance;
 	}
 
-	@Override
-	public void setInitialVariance( float initialVariance ) {
+	@Override public void setInitialVariance( float initialVariance ) {
 		common.initialVariance = initialVariance;
 	}
 
-	@Override
-	public float getLearningPeriod() {
+	@Override public float getLearningPeriod() {
 		return 1.0f/common.learningRate;
 	}
 
-	@Override
-	public void setLearningPeriod( float period ) {
+	@Override public void setLearningPeriod( float period ) {
 		common.learningRate = 1.0f/period;
 	}
 
-	@Override
-	public void setSignificantWeight( float value ) {
+	@Override public void setSignificantWeight( float value ) {
 		common.significantWeight = value;
 	}
 

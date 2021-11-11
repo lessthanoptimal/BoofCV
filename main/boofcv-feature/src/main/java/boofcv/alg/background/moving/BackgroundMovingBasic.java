@@ -34,7 +34,6 @@ import georegression.struct.InvertibleTransform;
  */
 public abstract class BackgroundMovingBasic<T extends ImageBase<T>, Motion extends InvertibleTransform<Motion>>
 		extends BackgroundModelMoving<T, Motion> implements BackgroundAlgorithmBasic {
-
 	/**
 	 * Specifies how fast it will adapt. 0 to 1, inclusive. 0 = static  1.0 = instant.
 	 */
@@ -65,23 +64,19 @@ public abstract class BackgroundMovingBasic<T extends ImageBase<T>, Motion exten
 		this.threshold = threshold;
 	}
 
-	@Override
-	public float getLearnRate() {
+	@Override public float getLearnRate() {
 		return learnRate;
 	}
 
-	@Override
-	public void setLearnRate( float learnRate ) {
+	@Override public void setLearnRate( float learnRate ) {
 		this.learnRate = learnRate;
 	}
 
-	@Override
-	public float getThreshold() {
+	@Override public float getThreshold() {
 		return threshold;
 	}
 
-	@Override
-	public void setThreshold( float threshold ) {
+	@Override public void setThreshold( float threshold ) {
 		this.threshold = threshold;
 	}
 }

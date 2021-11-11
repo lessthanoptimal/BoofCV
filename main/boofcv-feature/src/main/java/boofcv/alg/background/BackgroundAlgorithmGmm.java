@@ -46,15 +46,17 @@ public interface BackgroundAlgorithmGmm {
 
 	/**
 	 * Returns the initial variance assigned to a pixel
+	 *
 	 * @return initial variance
 	 */
 	float getInitialVariance();
 
 	/**
 	 * Sets the initial variance assigned to a pixel
+	 *
 	 * @param initialVariance initial variance
 	 */
-	void setInitialVariance(float initialVariance);
+	void setInitialVariance( float initialVariance );
 
 	/**
 	 * Returns the learning period.
@@ -63,9 +65,10 @@ public interface BackgroundAlgorithmGmm {
 
 	/**
 	 * Specifies the learning rate
+	 *
 	 * @param period Must be more than 0.
 	 */
-	void setLearningPeriod(float period);
+	void setLearningPeriod( float period );
 
 	/**
 	 * Minimum value of a Gaussian's weight to be considered part of the background

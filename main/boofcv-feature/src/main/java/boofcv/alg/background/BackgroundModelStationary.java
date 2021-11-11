@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -31,12 +31,12 @@ import boofcv.struct.image.ImageType;
  */
 public abstract class BackgroundModelStationary<T extends ImageBase<T>> extends BackgroundModel<T> {
 
-	protected BackgroundModelStationary(ImageType<T> imageType) {
+	protected BackgroundModelStationary( ImageType<T> imageType ) {
 		super(imageType);
 	}
 
 	/**
-	 *  Updates the background with new image information.
+	 * Updates the background with new image information.
 	 */
 	public abstract void updateBackground( T frame );
 
@@ -45,9 +45,9 @@ public abstract class BackgroundModelStationary<T extends ImageBase<T>> extends 
 	 * significantly faster than doing it with separate function calls. Segmentation is performed using the model
 	 * which it has prior to the update.
 	 */
-	public void updateBackground( T frame , GrayU8 segment ) {
+	public void updateBackground( T frame, GrayU8 segment ) {
 		updateBackground(frame);
-		segment(frame,segment);
+		segment(frame, segment);
 	}
 
 	/**
@@ -57,5 +57,5 @@ public abstract class BackgroundModelStationary<T extends ImageBase<T>> extends 
 	 * @param frame (input) current image
 	 * @param segmented (output) Segmented image. 0 = background, 1 = foreground/moving
 	 */
-	public abstract void segment( T frame , GrayU8 segmented );
+	public abstract void segment( T frame, GrayU8 segmented );
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -30,17 +30,14 @@ import boofcv.struct.image.*;
  *
  * @author Peter Abeles
  */
-public class BackgroundStationaryBasic_IL<T extends ImageInterleaved<T>>
-	extends BackgroundStationaryBasic<T>
-{
+public class BackgroundStationaryBasic_IL<T extends ImageInterleaved<T>> extends BackgroundStationaryBasic<T> {
 	// storage for background image
 	protected InterleavedF32 background;
 
 	// wrapper which provides abstraction across image types
 	protected GImageMultiBand inputWrapper;
 
-	public BackgroundStationaryBasic_IL(float learnRate, float threshold,
-										ImageType<T> imageType) {
+	public BackgroundStationaryBasic_IL( float learnRate, float threshold, ImageType<T> imageType ) {
 		super(learnRate, threshold, imageType);
 
 		int numBands = imageType.getNumBands();
@@ -59,21 +56,18 @@ public class BackgroundStationaryBasic_IL<T extends ImageInterleaved<T>>
 		return background;
 	}
 
-	@Override
-	public void reset() {
-		background.reshape(0,0);
+	@Override public void reset() {
+		background.reshape(0, 0);
 	}
 
-	@Override
-	public void updateBackground( T frame) {
-		if( background.width != frame.width ) {
+	@Override public void updateBackground( T frame ) {
+		if (background.width != frame.width) {
 			background.reshape(frame.width, frame.height);
 			GConvertImage.convert(frame, background);
 			return;
-		} else {
-			InputSanityCheck.checkSameShape(background,frame);
 		}
 
+		InputSanityCheck.checkSameShape(background, frame);
 		inputWrapper.wrap(frame);
 
 		int numBands = background.getNumBands();
@@ -83,9 +77,9 @@ public class BackgroundStationaryBasic_IL<T extends ImageInterleaved<T>>
 		for (int y = 0; y < frame.height; y++) {
 			int indexInput = frame.startIndex + y*frame.stride;
 			int end = indexInput + frame.width*numBands;
-			while( indexInput < end ) {
+			while (indexInput < end) {
 				int endIndexBG = indexBG + numBands;
-				while( indexBG < endIndexBG ) {
+				while (indexBG < endIndexBG) {
 					float valueBG = background.data[indexBG];
 					background.data[indexBG] = minusLearn*valueBG + learnRate*inputWrapper.getF(indexInput);
 					indexBG++;
@@ -95,13 +89,12 @@ public class BackgroundStationaryBasic_IL<T extends ImageInterleaved<T>>
 		}
 	}
 
-	@Override
-	public void segment(T frame, GrayU8 segmented) {
-		if( background.width != frame.width ) {
-			ImageMiscOps.fill(segmented,unknownValue);
+	@Override public void segment( T frame, GrayU8 segmented ) {
+		if (background.width != frame.width) {
+			ImageMiscOps.fill(segmented, unknownValue);
 			return;
 		}
-		InputSanityCheck.checkSameShape(background,frame,segmented);
+		InputSanityCheck.checkSameShape(background, frame, segmented);
 		inputWrapper.wrap(frame);
 
 		int numBands = background.getNumBands();
@@ -113,10 +106,10 @@ public class BackgroundStationaryBasic_IL<T extends ImageInterleaved<T>>
 			int indexSegmented = segmented.startIndex + y*segmented.stride;
 
 			int end = indexInput + frame.width*numBands;
-			while( indexInput < end ) {
+			while (indexInput < end) {
 				float sumErrorSq = 0;
 				int endIndexBG = indexBG + numBands;
-				while( indexBG < endIndexBG ) {
+				while (indexBG < endIndexBG) {
 					float diff = background.data[indexBG++] - inputWrapper.getF(indexInput++);
 					sumErrorSq += diff*diff;
 				}
@@ -130,6 +123,4 @@ public class BackgroundStationaryBasic_IL<T extends ImageInterleaved<T>>
 			}
 		}
 	}
-
-
 }
