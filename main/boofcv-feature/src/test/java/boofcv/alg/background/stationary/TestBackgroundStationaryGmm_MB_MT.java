@@ -19,22 +19,22 @@
 package boofcv.alg.background.stationary;
 
 import boofcv.alg.background.BackgroundModelStationary;
-import boofcv.struct.image.GrayF32;
-import boofcv.struct.image.GrayU8;
-import boofcv.struct.image.ImageBase;
-import boofcv.struct.image.ImageType;
+import boofcv.struct.image.*;
 
-/**
- * @author Peter Abeles
- */
-public class TestBackgroundStationaryGmm_SB extends GenericBackgroundModelStationaryChecks {
-	public TestBackgroundStationaryGmm_SB() {
-		imageTypes.add(ImageType.single(GrayU8.class));
-		imageTypes.add(ImageType.single(GrayF32.class));
+class TestBackgroundStationaryGmm_MB_MT extends CompareBackgroundStationarySingleToMultiChecks {
+	public TestBackgroundStationaryGmm_MB_MT() {
+		imageTypes.add(ImageType.il(3, InterleavedU8.class));
+		imageTypes.add(ImageType.il(3, InterleavedF32.class));
+		imageTypes.add(ImageType.pl(3, GrayU8.class));
+		imageTypes.add(ImageType.pl(3, GrayF32.class));
 	}
 
-	@Override
-	public <T extends ImageBase<T>> BackgroundModelStationary<T> create( ImageType<T> imageType ) {
-		return new BackgroundStationaryGmm_SB(1000.0f, 0.001f, 10, imageType);
+	@Override public <T extends ImageBase<T>> BackgroundModelStationary<T>
+	create( boolean singleThread, ImageType<T> imageType ) {
+		if (singleThread) {
+			return new BackgroundStationaryGmm_MB(1000.0f, 0.001f, 10, imageType);
+		}
+		return new BackgroundStationaryGmm_MB_MT(1000.0f, 0.001f, 10, imageType);
 	}
 }
+

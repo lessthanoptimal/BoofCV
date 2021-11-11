@@ -19,22 +19,29 @@
 package boofcv.alg.background.stationary;
 
 import boofcv.alg.background.BackgroundModelStationary;
-import boofcv.struct.image.GrayF32;
-import boofcv.struct.image.GrayU8;
 import boofcv.struct.image.ImageBase;
 import boofcv.struct.image.ImageType;
+import boofcv.struct.image.InterleavedF32;
+import boofcv.struct.image.InterleavedU8;
 
-/**
- * @author Peter Abeles
- */
-public class TestBackgroundStationaryGmm_SB extends GenericBackgroundModelStationaryChecks {
-	public TestBackgroundStationaryGmm_SB() {
-		imageTypes.add(ImageType.single(GrayU8.class));
-		imageTypes.add(ImageType.single(GrayF32.class));
+class TestBackgroundStationaryGaussian_IL_MT extends CompareBackgroundStationarySingleToMultiChecks {
+	public TestBackgroundStationaryGaussian_IL_MT() {
+		imageTypes.add(ImageType.il(2, InterleavedU8.class));
+		imageTypes.add(ImageType.il(3, InterleavedU8.class));
+		imageTypes.add(ImageType.il(3, InterleavedF32.class));
 	}
 
-	@Override
-	public <T extends ImageBase<T>> BackgroundModelStationary<T> create( ImageType<T> imageType ) {
-		return new BackgroundStationaryGmm_SB(1000.0f, 0.001f, 10, imageType);
+	@Override public <T extends ImageBase<T>> BackgroundModelStationary<T>
+	create( boolean singleThread, ImageType<T> imageType ) {
+		if (singleThread) {
+			var alg = new BackgroundStationaryGaussian_IL(0.05f, 10f, imageType);
+			alg.setInitialVariance(12);
+			return alg;
+		} else {
+			var alg = new BackgroundStationaryGaussian_IL_MT(0.05f, 10f, imageType);
+			alg.setInitialVariance(12);
+			return alg;
+		}
 	}
 }
+

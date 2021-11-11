@@ -18,13 +18,15 @@
 
 package boofcv.alg.background.stationary;
 
-import boofcv.alg.InputSanityCheck;
 import boofcv.alg.misc.GImageMiscOps;
 import boofcv.alg.misc.ImageMiscOps;
 import boofcv.core.image.FactoryGImageMultiBand;
 import boofcv.core.image.GConvertImage;
 import boofcv.core.image.GImageMultiBand;
 import boofcv.struct.image.*;
+import pabeles.concurrency.GrowArray;
+
+//CONCURRENT_INLINE import boofcv.concurrency.BoofConcurrency;
 
 /**
  * Implementation of {@link BackgroundStationaryGaussian} for {@link Planar}.
@@ -38,7 +40,7 @@ public class BackgroundStationaryGaussian_PL<T extends ImageGray<T>> extends Bac
 	protected GImageMultiBand bgWrapper;
 
 	// storage for multi-band pixel values
-	protected float[] inputPixel;
+	GrowArray<float[]> storageInput;
 
 	// background is composed of bands*2 channels. even = mean, odd = variance
 	Planar<GrayF32> background;
@@ -63,15 +65,17 @@ public class BackgroundStationaryGaussian_PL<T extends ImageGray<T>> extends Bac
 
 		inputWrapper = FactoryGImageMultiBand.create(imageType);
 
-		inputPixel = new float[numBands];
+		storageInput = new GrowArray<>(() -> new float[numBands]);
 	}
 
 	@Override public void reset() {
-		background.reshape(1, 1);
+		background.reshape(0, 0);
 	}
 
 	@Override public void updateBackground( Planar<T> frame ) {
-		if (background.width == 1) {
+
+		// Fill in background model with the mean and initial variance of each pixel
+		if (background.width != frame.width || background.height != frame.height) {
 			background.reshape(frame.width, frame.height);
 			// initialize the mean to the current image and the initial variance is whatever it is set to
 			for (int band = 0; band < background.getNumBands(); band += 2) {
@@ -79,18 +83,19 @@ public class BackgroundStationaryGaussian_PL<T extends ImageGray<T>> extends Bac
 				GImageMiscOps.fill(background.getBand(band + 1), initialVariance);
 			}
 			return;
-		} else {
-			InputSanityCheck.checkSameShape(background, frame);
 		}
 
 		inputWrapper.wrap(frame);
 
-		int numBands = background.getNumBands()/2;
-		float minusLearn = 1.0f - learnRate;
+		final int numBands = background.getNumBands()/2;
+		final float minusLearn = 1.0f - learnRate;
 
+		storageInput.reset(); //CONCURRENT_REMOVE_LINE
 
-		int indexBG = 0;
-		for (int y = 0; y < background.height; y++) {
+		//CONCURRENT_BELOW BoofConcurrency.loopBlocks(0, frame.height, 20, storageInput, (inputPixel, idx0, idx1) -> {
+		final int idx0 = 0, idx1 = frame.height; final float[] inputPixel = storageInput.grow();
+		for (int y = idx0; y < idx1; y++) {
+			int indexBG = y*frame.width;
 			int indexInput = frame.startIndex + y*frame.stride;
 			int end = indexInput + frame.width;
 			while (indexInput < end) {
@@ -113,9 +118,11 @@ public class BackgroundStationaryGaussian_PL<T extends ImageGray<T>> extends Bac
 				indexBG++;
 			}
 		}
+		//CONCURRENT_ABOVE }});
 	}
 
 	@Override public void segment( Planar<T> frame, GrayU8 segmented ) {
+		segmented.reshape(frame.width, frame.height);
 		if (background.width == 1) {
 			ImageMiscOps.fill(segmented, unknownValue);
 			return;
@@ -124,14 +131,18 @@ public class BackgroundStationaryGaussian_PL<T extends ImageGray<T>> extends Bac
 
 		final int numBands = background.getNumBands()/2;
 
-		float adjustedMinimumDifference = minimumDifference*numBands;
+		final float adjustedMinimumDifference = minimumDifference*numBands;
 
-		int indexBG = 0;
-		for (int y = 0; y < frame.height; y++) {
+		storageInput.reset(); //CONCURRENT_REMOVE_LINE
+
+		//CONCURRENT_BELOW BoofConcurrency.loopBlocks(0, frame.height, 20, storageInput, (inputPixel, idx0, idx1) -> {
+		final int idx0 = 0, idx1 = frame.height; final float[] inputPixel = storageInput.grow();
+		for (int y = idx0; y < idx1; y++) {
+			int indexBG = y*frame.width;
 			int indexInput = frame.startIndex + y*frame.stride;
 			int indexSegmented = segmented.startIndex + y*segmented.stride;
 
-			int end = indexInput + frame.width;
+			final int end = indexInput + frame.width;
 			while (indexInput < end) {
 				inputWrapper.getF(indexInput, inputPixel);
 
@@ -159,10 +170,8 @@ public class BackgroundStationaryGaussian_PL<T extends ImageGray<T>> extends Bac
 							GrayF32 backgroundMean = background.getBand(band*2);
 							sumAbsDiff += Math.abs(backgroundMean.data[indexBG] - inputPixel[band]);
 						}
-						if (sumAbsDiff >= adjustedMinimumDifference)
-							segmented.data[indexSegmented] = 1;
-						else
-							segmented.data[indexSegmented] = 0;
+
+						segmented.data[indexSegmented] = (byte)(sumAbsDiff >= adjustedMinimumDifference? 1 : 0);
 					}
 				}
 
@@ -171,5 +180,6 @@ public class BackgroundStationaryGaussian_PL<T extends ImageGray<T>> extends Bac
 				indexBG++;
 			}
 		}
+		//CONCURRENT_ABOVE }});
 	}
 }

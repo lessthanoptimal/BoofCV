@@ -25,6 +25,8 @@ import boofcv.struct.image.ImageGray;
 import boofcv.struct.image.ImageType;
 import org.jetbrains.annotations.Nullable;
 
+//CONCURRENT_INLINE import boofcv.concurrency.BoofConcurrency;
+
 /**
  * Implementation of {@link BackgroundAlgorithmGmm} for {@link ImageGray}.
  *
@@ -46,6 +48,8 @@ public class BackgroundStationaryGmm_SB<T extends ImageGray<T>> extends Backgrou
 		super.updateBackground(frame, mask);
 
 		common.inputWrapperG.wrap(frame);
+
+		//CONCURRENT_BELOW BoofConcurrency.loopFor(0, common.imageHeight, row -> {
 		for (int row = 0; row < common.imageHeight; row++) {
 			int inputIndex = frame.startIndex + row*frame.stride;
 			float[] dataRow = common.model.data[row];
@@ -67,11 +71,12 @@ public class BackgroundStationaryGmm_SB<T extends ImageGray<T>> extends Backgrou
 				}
 			}
 		}
+		//CONCURRENT_ABOVE });
 	}
 
 	@Override public void segment( T frame, GrayU8 segmented ) {
+		segmented.reshape(frame.width, frame.height);
 		if (common.imageWidth != frame.width || common.imageHeight != frame.height) {
-			segmented.reshape(frame.width, frame.height);
 			ImageMiscOps.fill(segmented, unknownValue);
 			return;
 		}
@@ -79,6 +84,7 @@ public class BackgroundStationaryGmm_SB<T extends ImageGray<T>> extends Backgrou
 		common.unknownValue = unknownValue;
 		common.inputWrapperG.wrap(frame);
 
+		//CONCURRENT_BELOW BoofConcurrency.loopFor(0, common.imageHeight, row -> {
 		for (int row = 0; row < common.imageHeight; row++) {
 			int indexIn = frame.startIndex + row*frame.stride;
 			int indexOut = segmented.startIndex + row*segmented.stride;
@@ -91,5 +97,6 @@ public class BackgroundStationaryGmm_SB<T extends ImageGray<T>> extends Backgrou
 				segmented.data[indexOut++] = (byte)common.checkBackground(pixelValue, dataRow, modelIndex);
 			}
 		}
+		//CONCURRENT_ABOVE });
 	}
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -27,14 +27,14 @@ import boofcv.struct.image.*;
 public class TestBackgroundStationaryGmm_MB extends GenericBackgroundModelStationaryChecks {
 
 	public TestBackgroundStationaryGmm_MB() {
-		imageTypes.add(ImageType.il(3,InterleavedU8.class));
-		imageTypes.add(ImageType.il(3,InterleavedF32.class));
-		imageTypes.add(ImageType.pl(3,GrayU8.class));
-		imageTypes.add(ImageType.pl(3,GrayF32.class));
+		imageTypes.add(ImageType.il(3, InterleavedU8.class));
+		imageTypes.add(ImageType.il(3, InterleavedF32.class));
+		imageTypes.add(ImageType.pl(3, GrayU8.class));
+		imageTypes.add(ImageType.pl(3, GrayF32.class));
 	}
 
 	@Override
-	public <T extends ImageBase<T>> BackgroundModelStationary<T> create(ImageType<T> imageType) {
-		return new BackgroundStationaryGmm_MB(1000.0f,0.001f,10,imageType);
+	public <T extends ImageBase<T>> BackgroundModelStationary<T> create( ImageType<T> imageType ) {
+		return new BackgroundStationaryGmm_MB(1000.0f, 0.001f, 10, imageType);
 	}
 }

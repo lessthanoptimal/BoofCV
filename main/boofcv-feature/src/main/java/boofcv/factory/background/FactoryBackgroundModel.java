@@ -21,6 +21,7 @@ package boofcv.factory.background;
 import boofcv.alg.background.BackgroundModelStationary;
 import boofcv.alg.background.moving.*;
 import boofcv.alg.background.stationary.*;
+import boofcv.concurrency.BoofConcurrency;
 import boofcv.struct.distort.Point2Transform2Model_F32;
 import boofcv.struct.image.ImageBase;
 import boofcv.struct.image.ImageType;
@@ -32,7 +33,7 @@ import org.jetbrains.annotations.Nullable;
  *
  * @author Peter Abeles
  */
-@SuppressWarnings("unchecked")
+@SuppressWarnings({"unchecked", "rawtypes"})
 public class FactoryBackgroundModel {
 
 	/**
@@ -47,13 +48,20 @@ public class FactoryBackgroundModel {
 
 		config.checkValidity();
 
-		return switch (imageType.getFamily()) {
-			case GRAY -> new BackgroundStationaryBasic_SB(config.learnRate, config.threshold, imageType.getImageClass());
-			case PLANAR -> new BackgroundStationaryBasic_PL(config.learnRate, config.threshold, imageType);
-			case INTERLEAVED -> new BackgroundStationaryBasic_IL(config.learnRate, config.threshold, imageType);
-			default -> throw new IllegalArgumentException("Unknown image type");
-		};
-
+		if (BoofConcurrency.isUseConcurrent()) {
+			// Profiling showed SB_MT to be the same or slower than single thread
+			return switch (imageType.getFamily()) {
+				case GRAY -> new BackgroundStationaryBasic_SB(config.learnRate, config.threshold, imageType.getImageClass());
+				case PLANAR -> new BackgroundStationaryBasic_PL_MT(config.learnRate, config.threshold, imageType);
+				case INTERLEAVED -> new BackgroundStationaryBasic_IL_MT(config.learnRate, config.threshold, imageType);
+			};
+		} else {
+			return switch (imageType.getFamily()) {
+				case GRAY -> new BackgroundStationaryBasic_SB(config.learnRate, config.threshold, imageType.getImageClass());
+				case PLANAR -> new BackgroundStationaryBasic_PL(config.learnRate, config.threshold, imageType);
+				case INTERLEAVED -> new BackgroundStationaryBasic_IL(config.learnRate, config.threshold, imageType);
+			};
+		}
 	}
 
 	/**
@@ -76,7 +84,6 @@ public class FactoryBackgroundModel {
 					transform, config.interpolation, imageType);
 			case INTERLEAVED -> new BackgroundMovingBasic_IL(config.learnRate, config.threshold,
 					transform, config.interpolation, imageType);
-			default -> throw new IllegalArgumentException("Unknown image type");
 		};
 
 		ret.setUnknownValue(config.unknownValue);
@@ -95,12 +102,21 @@ public class FactoryBackgroundModel {
 
 		config.checkValidity();
 
-		BackgroundStationaryGaussian<T> ret = switch (imageType.getFamily()) {
-			case GRAY -> new BackgroundStationaryGaussian_SB(config.learnRate, config.threshold, imageType.getImageClass());
-			case PLANAR -> new BackgroundStationaryGaussian_PL(config.learnRate, config.threshold, imageType);
-			case INTERLEAVED -> new BackgroundStationaryGaussian_IL(config.learnRate, config.threshold, imageType);
-			default -> throw new IllegalArgumentException("Unknown image type");
-		};
+		BackgroundStationaryGaussian<T> ret;
+		if (BoofConcurrency.isUseConcurrent()) {
+			// Profiling showed SB_MT was found to be about the same as single thread
+			ret = switch (imageType.getFamily()) {
+				case GRAY -> new BackgroundStationaryGaussian_SB(config.learnRate, config.threshold, imageType.getImageClass());
+				case PLANAR -> new BackgroundStationaryGaussian_PL_MT(config.learnRate, config.threshold, imageType);
+				case INTERLEAVED -> new BackgroundStationaryGaussian_IL_MT(config.learnRate, config.threshold, imageType);
+			};
+		} else {
+			ret = switch (imageType.getFamily()) {
+				case GRAY -> new BackgroundStationaryGaussian_SB(config.learnRate, config.threshold, imageType.getImageClass());
+				case PLANAR -> new BackgroundStationaryGaussian_PL(config.learnRate, config.threshold, imageType);
+				case INTERLEAVED -> new BackgroundStationaryGaussian_IL(config.learnRate, config.threshold, imageType);
+			};
+		}
 
 		ret.setInitialVariance(config.initialVariance);
 		ret.setMinimumDifference(config.minimumDifference);
@@ -130,7 +146,6 @@ public class FactoryBackgroundModel {
 					transform, config.interpolation, imageType);
 			case INTERLEAVED -> new BackgroundMovingGaussian_IL(config.learnRate, config.threshold,
 					transform, config.interpolation, imageType);
-			default -> throw new IllegalArgumentException("Unknown image type");
 		};
 
 		ret.setInitialVariance(config.initialVariance);
@@ -155,13 +170,22 @@ public class FactoryBackgroundModel {
 		else
 			config.checkValidity();
 
-		BackgroundStationaryGmm<T> ret = switch (imageType.getFamily()) {
-			case GRAY -> new BackgroundStationaryGmm_SB(config.learningPeriod, config.decayCoefient,
-					config.numberOfGaussian, imageType);
-			case PLANAR, INTERLEAVED -> new BackgroundStationaryGmm_MB(config.learningPeriod, config.decayCoefient,
-					config.numberOfGaussian, imageType);
-			default -> throw new IllegalArgumentException("Unknown image type");
-		};
+		BackgroundStationaryGmm<T> ret;
+		if (BoofConcurrency.isUseConcurrent()) {
+			ret = switch (imageType.getFamily()) {
+				case GRAY -> new BackgroundStationaryGmm_SB_MT(config.learningPeriod, config.decayCoefient,
+						config.numberOfGaussian, imageType);
+				case PLANAR, INTERLEAVED -> new BackgroundStationaryGmm_MB_MT(config.learningPeriod, config.decayCoefient,
+						config.numberOfGaussian, imageType);
+			};
+		} else {
+			ret = switch (imageType.getFamily()) {
+				case GRAY -> new BackgroundStationaryGmm_SB(config.learningPeriod, config.decayCoefient,
+						config.numberOfGaussian, imageType);
+				case PLANAR, INTERLEAVED -> new BackgroundStationaryGmm_MB(config.learningPeriod, config.decayCoefient,
+						config.numberOfGaussian, imageType);
+			};
+		}
 
 		ret.setInitialVariance(config.initialVariance);
 		ret.setMaxDistance(config.maxDistance);
@@ -192,7 +216,6 @@ public class FactoryBackgroundModel {
 					config.numberOfGaussian, transform, imageType);
 			case PLANAR, INTERLEAVED -> new BackgroundMovingGmm_MB(config.learningPeriod, config.decayCoefient,
 					config.numberOfGaussian, transform, imageType);
-			default -> throw new IllegalArgumentException("Unknown image type");
 		};
 
 		ret.setInitialVariance(config.initialVariance);

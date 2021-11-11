@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -38,7 +38,7 @@ public class TestBackgroundStationaryGaussian_IL extends GenericBackgroundStatio
 	@Override
 	public <T extends ImageBase<T>> BackgroundModelStationary<T>
 	create(ImageType<T> imageType) {
-		BackgroundStationaryGaussian alg = new BackgroundStationaryGaussian_IL(0.05f,10f,imageType);
+		var alg = new BackgroundStationaryGaussian_IL(0.05f,10f,imageType);
 		if( !Float.isNaN(initialVariance))
 			alg.setInitialVariance(initialVariance);
 		return alg;

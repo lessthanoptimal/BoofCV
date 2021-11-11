@@ -26,6 +26,9 @@ import boofcv.struct.image.GrayU8;
 import boofcv.struct.image.ImageInterleaved;
 import boofcv.struct.image.ImageType;
 import boofcv.struct.image.InterleavedF32;
+import pabeles.concurrency.GrowArray;
+
+//CONCURRENT_INLINE import boofcv.concurrency.BoofConcurrency;
 
 /**
  * Implementation of {@link BackgroundStationaryGaussian} for {@link ImageInterleaved}.
@@ -39,8 +42,8 @@ public class BackgroundStationaryGaussian_IL<T extends ImageInterleaved<T>> exte
 	protected GImageMultiBand bgWrapper;
 
 	// storage for multi-band pixel values
-	protected float[] inputPixel;
-	protected float[] bgPixel;
+	Work work;
+	GrowArray<Work> workspace;
 
 	// background is composed of bands*2 channels. even = mean, odd = variance
 	InterleavedF32 background;
@@ -64,8 +67,8 @@ public class BackgroundStationaryGaussian_IL<T extends ImageInterleaved<T>> exte
 
 		inputWrapper = FactoryGImageMultiBand.create(imageType);
 
-		inputPixel = new float[numBands];
-		bgPixel = new float[numBands*2];
+		workspace = new GrowArray<>(() -> new Work(numBands));
+		work = workspace.grow();
 	}
 
 	@Override public void reset() {
@@ -75,10 +78,15 @@ public class BackgroundStationaryGaussian_IL<T extends ImageInterleaved<T>> exte
 	@Override public void updateBackground( T frame ) {
 		inputWrapper.wrap(frame);
 
+		// Fill in background model with the mean and initial variance of each pixel
 		if (background.width == 1) {
 			background.reshape(frame.width, frame.height);
 
-			for (int y = 0; y < frame.height; y++) {
+			//CONCURRENT_BELOW BoofConcurrency.loopBlocks(0, frame.height, 20, workspace, (work, idx0, idx1) -> {
+			final int idx0 = 0, idx1 = frame.height;
+			float[] inputPixel = work.inputPixel;
+			float[] bgPixel = work.bgPixel;
+			for (int y = idx0; y < idx1; y++) {
 				for (int x = 0; x < frame.width; x++) {
 					inputWrapper.get(x, y, inputPixel);
 					for (int i = 0; i < frame.numBands; i++) {
@@ -88,16 +96,20 @@ public class BackgroundStationaryGaussian_IL<T extends ImageInterleaved<T>> exte
 					bgWrapper.set(x, y, bgPixel);
 				}
 			}
+			//CONCURRENT_ABOVE }});
 			return;
 		}
 
 		InputSanityCheck.checkSameShape(background, frame);
 
-		int numBands = background.getNumBands()/2;
-		float minusLearn = 1.0f - learnRate;
+		final int numBands = background.getNumBands()/2;
+		final float minusLearn = 1.0f - learnRate;
 
-		int indexBG = 0;
-		for (int y = 0; y < background.height; y++) {
+		//CONCURRENT_BELOW BoofConcurrency.loopBlocks(0, frame.height, 20, workspace, (work, idx0, idx1) -> {
+		final int idx0 = 0, idx1 = frame.height;
+		float[] inputPixel = work.inputPixel;
+		for (int y = idx0; y < idx1; y++) {
+			int indexBG = y*frame.width*numBands;
 			int indexInput = frame.startIndex + y*frame.stride;
 			int end = indexInput + frame.width*numBands;
 			while (indexInput < end) {
@@ -117,9 +129,11 @@ public class BackgroundStationaryGaussian_IL<T extends ImageInterleaved<T>> exte
 				indexInput += frame.numBands;
 			}
 		}
+		//CONCURRENT_ABOVE }});
 	}
 
 	@Override public void segment( T frame, GrayU8 segmented ) {
+		segmented.reshape(frame.width, frame.height);
 		if (background.width == 1) {
 			ImageMiscOps.fill(segmented, unknownValue);
 			return;
@@ -131,8 +145,11 @@ public class BackgroundStationaryGaussian_IL<T extends ImageInterleaved<T>> exte
 
 		float adjustedMinimumDifference = minimumDifference*numBands;
 
-		int indexBG = 0;
-		for (int y = 0; y < frame.height; y++) {
+		//CONCURRENT_BELOW BoofConcurrency.loopBlocks(0, frame.height, 20, workspace, (work, idx0, idx1) -> {
+		final int idx0 = 0, idx1 = frame.height;
+		float[] inputPixel = work.inputPixel;
+		for (int y = idx0; y < idx1; y++) {
+			int indexBG = y*frame.width*frame.numBands;
 			int indexInput = frame.startIndex + y*frame.stride;
 			int indexSegmented = segmented.startIndex + y*segmented.stride;
 
@@ -142,7 +159,6 @@ public class BackgroundStationaryGaussian_IL<T extends ImageInterleaved<T>> exte
 
 				float mahalanobis = 0;
 				for (int band = 0; band < numBands; band++) {
-
 					int indexBG_band = indexBG + band*2;
 
 					float meanBG = background.data[indexBG_band];
@@ -174,6 +190,17 @@ public class BackgroundStationaryGaussian_IL<T extends ImageInterleaved<T>> exte
 				indexSegmented += 1;
 				indexBG += background.numBands;
 			}
+		}
+		//CONCURRENT_ABOVE }});
+	}
+
+	private static class Work {
+		final float[] inputPixel;
+		final float[] bgPixel;
+
+		public Work( int numBands ) {
+			inputPixel = new float[numBands];
+			bgPixel = new float[numBands*2];
 		}
 	}
 }

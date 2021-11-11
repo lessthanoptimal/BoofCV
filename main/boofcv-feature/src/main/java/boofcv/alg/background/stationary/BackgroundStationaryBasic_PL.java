@@ -18,12 +18,14 @@
 
 package boofcv.alg.background.stationary;
 
-import boofcv.alg.InputSanityCheck;
 import boofcv.alg.misc.ImageMiscOps;
 import boofcv.core.image.FactoryGImageMultiBand;
 import boofcv.core.image.GConvertImage;
 import boofcv.core.image.GImageMultiBand;
 import boofcv.struct.image.*;
+import pabeles.concurrency.GrowArray;
+
+//CONCURRENT_INLINE import boofcv.concurrency.BoofConcurrency;
 
 /**
  * Implementation of {@link BackgroundStationaryBasic} for {@link ImageGray}.
@@ -37,7 +39,7 @@ public class BackgroundStationaryBasic_PL<T extends ImageGray<T>> extends Backgr
 	// wrapper which provides abstraction across image types
 	protected GImageMultiBand inputWrapper;
 
-	protected float[] inputPixels;
+	GrowArray<float[]> storagePixels;
 
 	public BackgroundStationaryBasic_PL( float learnRate, float threshold, ImageType<Planar<T>> imageType ) {
 		super(learnRate, threshold, imageType);
@@ -48,7 +50,7 @@ public class BackgroundStationaryBasic_PL<T extends ImageGray<T>> extends Backgr
 
 		inputWrapper = FactoryGImageMultiBand.create(imageType);
 
-		inputPixels = new float[numBands];
+		storagePixels = new GrowArray<>(() -> new float[numBands]);
 	}
 
 	/**
@@ -65,22 +67,24 @@ public class BackgroundStationaryBasic_PL<T extends ImageGray<T>> extends Backgr
 	}
 
 	@Override public void updateBackground( Planar<T> frame ) {
-		if (background.width != frame.width) {
+		if (background.width != frame.width || background.height != frame.height) {
 			background.reshape(frame.width, frame.height);
 			GConvertImage.convert(frame, background);
 			return;
 		}
 
-		InputSanityCheck.checkSameShape(background, frame);
 		inputWrapper.wrap(frame);
 
-		int numBands = background.getNumBands();
-		float minusLearn = 1.0f - learnRate;
+		final int numBands = background.getNumBands();
+		final float minusLearn = 1.0f - learnRate;
+		storagePixels.reset(); //CONCURRENT_REMOVE_LINE
 
-		int indexBG = 0;
-		for (int y = 0; y < frame.height; y++) {
+		//CONCURRENT_BELOW BoofConcurrency.loopBlocks(0, frame.height, 20, storagePixels, (inputPixels, idx0, idx1) -> {
+		final int idx0 = 0, idx1 = frame.height; final float[] inputPixels = storagePixels.grow();
+		for (int y = idx0; y < idx1; y++) {
+			int indexBG = y*frame.width;
 			int indexInput = frame.startIndex + y*frame.stride;
-			int end = indexInput + frame.width;
+			final int end = indexInput + frame.width;
 			while (indexInput < end) {
 				inputWrapper.getF(indexInput, inputPixels);
 
@@ -93,26 +97,30 @@ public class BackgroundStationaryBasic_PL<T extends ImageGray<T>> extends Backgr
 				indexBG++;
 			}
 		}
+		//CONCURRENT_ABOVE }});
 	}
 
 	@Override public void segment( Planar<T> frame, GrayU8 segmented ) {
-		if (background.width != frame.width) {
+		segmented.reshape(frame.width, frame.height);
+		if (background.width != frame.width || background.height != frame.height) {
 			ImageMiscOps.fill(segmented, unknownValue);
 			return;
 		}
 
-		InputSanityCheck.checkSameShape(background, frame, segmented);
 		inputWrapper.wrap(frame);
 
-		int numBands = background.getNumBands();
-		float thresholdSq = numBands*threshold*threshold;
+		final int numBands = background.getNumBands();
+		final float thresholdSq = numBands*threshold*threshold;
+		storagePixels.reset(); //CONCURRENT_REMOVE_LINE
 
-		int indexBG = 0;
-		for (int y = 0; y < frame.height; y++) {
+		//CONCURRENT_BELOW BoofConcurrency.loopBlocks(0, frame.height, 20, storagePixels, (inputPixels, idx0, idx1) -> {
+		final int idx0 = 0, idx1 = frame.height; final float[] inputPixels = storagePixels.grow();
+		for (int y = idx0; y < idx1; y++) {
+			int indexBG = y*frame.width;
 			int indexInput = frame.startIndex + y*frame.stride;
 			int indexSegmented = segmented.startIndex + y*segmented.stride;
 
-			int end = indexInput + frame.width;
+			final int end = indexInput + frame.width;
 			while (indexInput < end) {
 				inputWrapper.getF(indexInput, inputPixels);
 
@@ -122,16 +130,12 @@ public class BackgroundStationaryBasic_PL<T extends ImageGray<T>> extends Backgr
 					sumErrorSq += diff*diff;
 				}
 
-				if (sumErrorSq <= thresholdSq) {
-					segmented.data[indexSegmented] = 0;
-				} else {
-					segmented.data[indexSegmented] = 1;
-				}
+				segmented.data[indexSegmented++] = (byte)(sumErrorSq <= thresholdSq ? 0 : 1);
 
 				indexInput++;
-				indexSegmented++;
 				indexBG++;
 			}
 		}
+		//CONCURRENT_ABOVE }});
 	}
 }

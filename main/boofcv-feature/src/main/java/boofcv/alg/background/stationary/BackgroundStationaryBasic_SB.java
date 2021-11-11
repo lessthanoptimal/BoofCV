@@ -24,6 +24,9 @@ import boofcv.core.image.FactoryGImageGray;
 import boofcv.core.image.GConvertImage;
 import boofcv.core.image.GImageGray;
 import boofcv.struct.image.*;
+import lombok.Getter;
+
+//CONCURRENT_INLINE import boofcv.concurrency.BoofConcurrency;
 
 /**
  * Implementation of {@link BackgroundStationaryBasic} for {@link Planar}.
@@ -31,8 +34,8 @@ import boofcv.struct.image.*;
  * @author Peter Abeles
  */
 public class BackgroundStationaryBasic_SB<T extends ImageGray<T>> extends BackgroundStationaryBasic<T> {
-	// storage for background image
-	protected GrayF32 background = new GrayF32(0, 0);
+	/** Background model image */
+	@Getter protected GrayF32 background = new GrayF32(0, 0);
 
 	// wrapper which provides abstraction across image types
 	protected GImageGray inputWrapper;
@@ -44,20 +47,11 @@ public class BackgroundStationaryBasic_SB<T extends ImageGray<T>> extends Backgr
 		inputWrapper = FactoryGImageGray.create(imageType);
 	}
 
-	/**
-	 * Returns the background image.
-	 *
-	 * @return background image.
-	 */
-	public GrayF32 getBackground() {
-		return background;
-	}
-
 	@Override public void reset() {
 		background.reshape(0, 0);
 	}
 
-	@Override public void updateBackground( T frame ) {
+	@Override public void updateBackground( final T frame ) {
 		if (background.width != frame.width) {
 			background.reshape(frame.width, frame.height);
 			GConvertImage.convert(frame, background);
@@ -67,52 +61,51 @@ public class BackgroundStationaryBasic_SB<T extends ImageGray<T>> extends Backgr
 		InputSanityCheck.checkSameShape(background, frame);
 		inputWrapper.wrap(frame);
 
-		float minusLearn = 1.0f - learnRate;
+		final float minusLearn = 1.0f - learnRate;
+		final float[] backgroundData = background.data;
 
-		int indexBG = 0;
+		//CONCURRENT_BELOW BoofConcurrency.loopFor(0, frame.height, y -> {
 		for (int y = 0; y < frame.height; y++) {
+			int indexBG = y*frame.width;
 			int indexInput = frame.startIndex + y*frame.stride;
-			int end = indexInput + frame.width;
+			final int end = indexInput + frame.width;
 			while (indexInput < end) {
-				float value = inputWrapper.getF(indexInput++);
-				float bg = background.data[indexBG];
+				final float value = inputWrapper.getF(indexInput++);
+				final float bg = backgroundData[indexBG];
 
-				background.data[indexBG++] = minusLearn*bg + learnRate*value;
+				backgroundData[indexBG++] = minusLearn*bg + learnRate*value;
 			}
 		}
+		//CONCURRENT_ABOVE });
 	}
 
-	@Override public void segment( T frame, GrayU8 segmented ) {
-		if (background.width != frame.width) {
+	@Override public void segment( final T frame, final GrayU8 segmented ) {
+		segmented.reshape(frame.width, frame.height);
+		if (background.width != frame.width || background.height != frame.height) {
 			ImageMiscOps.fill(segmented, unknownValue);
 			return;
 		}
-		InputSanityCheck.checkSameShape(background, frame, segmented);
 		inputWrapper.wrap(frame);
 
-		float thresholdSq = threshold*threshold;
+		final float thresholdSq = threshold*threshold;
+		final byte[] segmentedData = segmented.data;
+		final float[] backgroundData = background.data;
 
-		int indexBG = 0;
+		//CONCURRENT_BELOW BoofConcurrency.loopFor(0, frame.height, y -> {
 		for (int y = 0; y < frame.height; y++) {
+			int indexBG = y*frame.width;
 			int indexInput = frame.startIndex + y*frame.stride;
 			int indexSegmented = segmented.startIndex + y*segmented.stride;
 
-			int end = indexInput + frame.width;
+			final int end = indexInput + frame.width;
 			while (indexInput < end) {
-				float bg = background.data[indexBG];
-				float pixelFrame = inputWrapper.getF(indexInput);
+				final float bg = backgroundData[indexBG++];
+				final float pixelFrame = inputWrapper.getF(indexInput++);
 
-				float diff = bg - pixelFrame;
-				if (diff*diff <= thresholdSq) {
-					segmented.data[indexSegmented] = 0;
-				} else {
-					segmented.data[indexSegmented] = 1;
-				}
-
-				indexInput++;
-				indexSegmented++;
-				indexBG++;
+				final float diff = bg - pixelFrame;
+				segmentedData[indexSegmented++] = (byte)(diff*diff <= thresholdSq ? 0 : 1);
 			}
 		}
+		//CONCURRENT_ABOVE });
 	}
 }
