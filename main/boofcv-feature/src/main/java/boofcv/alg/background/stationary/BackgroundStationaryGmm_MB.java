@@ -25,13 +25,14 @@ import boofcv.struct.image.ImageMultiBand;
 import boofcv.struct.image.ImageType;
 import org.jetbrains.annotations.Nullable;
 
+//CONCURRENT_INLINE import boofcv.concurrency.BoofConcurrency;
+
 /**
  * Implementation of {@link BackgroundAlgorithmGmm} for {@link ImageMultiBand}.
  *
  * @author Peter Abeles
  */
-public class BackgroundStationaryGmm_MB<T extends ImageMultiBand<T>>
-		extends BackgroundStationaryGmm<T> {
+public class BackgroundStationaryGmm_MB<T extends ImageMultiBand<T>> extends BackgroundStationaryGmm<T> {
 	/**
 	 * @param learningPeriod Specifies how fast it will adjust to changes in the image. Must be greater than zero.
 	 * @param decayCoef Determines how quickly a Gaussian is forgotten
@@ -51,32 +52,38 @@ public class BackgroundStationaryGmm_MB<T extends ImageMultiBand<T>>
 
 		common.inputWrapperMB.wrap(frame);
 		final int pixelStride = common.inputWrapperMB.getPixelStride();
-		for (int row = 0; row < common.imageHeight; row++) {
-			int inputIndex = frame.getIndex(0, row);
-			float[] dataRow = common.model.data[row];
+
+		common.storagePixels.reset(); //CONCURRENT_REMOVE_LINE
+
+		//CONCURRENT_BELOW BoofConcurrency.loopBlocks(0, frame.height, 20, common.storagePixels, (inputPixel, idx0, idx1) -> {
+		final int idx0 = 0, idx1 = frame.height; final float[] inputPixel = common.storagePixels.grow();
+		for (int y = idx0; y < idx1; y++) {
+			int inputIndex = frame.getIndex(0, y);
+			float[] dataRow = common.model.data[y];
 
 			if (mask == null) {
 				for (int col = 0; col < common.imageWidth; col++, inputIndex += pixelStride) {
-					common.inputWrapperMB.getF(inputIndex, common.inputPixel);
+					common.inputWrapperMB.getF(inputIndex, inputPixel);
 					int modelIndex = col*common.modelStride;
 
-					common.updateMixture(common.inputPixel, dataRow, modelIndex);
+					common.updateMixture(inputPixel, dataRow, modelIndex);
 				}
 			} else {
-				int indexMask = mask.startIndex + row*mask.stride;
+				int indexMask = mask.startIndex + y*mask.stride;
 				for (int col = 0; col < common.imageWidth; col++, inputIndex += pixelStride) {
-					common.inputWrapperMB.getF(inputIndex, common.inputPixel);
+					common.inputWrapperMB.getF(inputIndex, inputPixel);
 					int modelIndex = col*common.modelStride;
 
-					mask.data[indexMask++] = (byte)common.updateMixture(common.inputPixel, dataRow, modelIndex);
+					mask.data[indexMask++] = (byte)common.updateMixture(inputPixel, dataRow, modelIndex);
 				}
 			}
 		}
+		//CONCURRENT_ABOVE }});
 	}
 
 	@Override public void segment( T frame, GrayU8 segmented ) {
+		segmented.reshape(frame.width, frame.height);
 		if (common.imageWidth != frame.width || common.imageHeight != frame.height) {
-			segmented.reshape(frame.width, frame.height);
 			ImageMiscOps.fill(segmented, unknownValue);
 			return;
 		}
@@ -84,17 +91,23 @@ public class BackgroundStationaryGmm_MB<T extends ImageMultiBand<T>>
 		common.unknownValue = unknownValue;
 		common.inputWrapperMB.wrap(frame);
 		final int pixelStride = common.inputWrapperMB.getPixelStride();
-		for (int row = 0; row < common.imageHeight; row++) {
-			int indexIn = frame.getIndex(0, row);
-			int indexOut = segmented.startIndex + row*segmented.stride;
-			float[] dataRow = common.model.data[row];
+
+		common.storagePixels.reset(); //CONCURRENT_REMOVE_LINE
+
+		//CONCURRENT_BELOW BoofConcurrency.loopBlocks(0, frame.height, 20, common.storagePixels, (inputPixel, idx0, idx1) -> {
+		final int idx0 = 0, idx1 = frame.height; final float[] inputPixel = common.storagePixels.grow();
+		for (int y = idx0; y < idx1; y++) {
+			int indexIn = frame.getIndex(0, y);
+			int indexOut = segmented.startIndex + y*segmented.stride;
+			float[] dataRow = common.model.data[y];
 
 			for (int col = 0; col < common.imageWidth; col++, indexIn += pixelStride) {
-				common.inputWrapperMB.getF(indexIn, common.inputPixel);
+				common.inputWrapperMB.getF(indexIn, inputPixel);
 				int modelIndex = col*common.modelStride;
 
-				segmented.data[indexOut++] = (byte)common.checkBackground(common.inputPixel, dataRow, modelIndex);
+				segmented.data[indexOut++] = (byte)common.checkBackground(inputPixel, dataRow, modelIndex);
 			}
 		}
+		//CONCURRENT_ABOVE }});
 	}
 }

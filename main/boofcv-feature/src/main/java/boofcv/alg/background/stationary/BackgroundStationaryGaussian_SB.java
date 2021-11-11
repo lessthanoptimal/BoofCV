@@ -18,7 +18,6 @@
 
 package boofcv.alg.background.stationary;
 
-import boofcv.alg.InputSanityCheck;
 import boofcv.alg.background.moving.BackgroundMovingGaussian;
 import boofcv.alg.misc.GImageMiscOps;
 import boofcv.alg.misc.ImageMiscOps;
@@ -26,6 +25,8 @@ import boofcv.core.image.FactoryGImageGray;
 import boofcv.core.image.GConvertImage;
 import boofcv.core.image.GImageGray;
 import boofcv.struct.image.*;
+
+//CONCURRENT_INLINE import boofcv.concurrency.BoofConcurrency;
 
 /**
  * Implementation of {@link BackgroundMovingGaussian} for {@link ImageGray}.
@@ -53,17 +54,17 @@ public class BackgroundStationaryGaussian_SB<T extends ImageGray<T>> extends Bac
 	}
 
 	@Override public void reset() {
-		background.reshape(1, 1);
+		background.reshape(0, 0);
 	}
 
 	@Override public void updateBackground( T frame ) {
-		if (background.width == 1) {
+
+		// Fill in background model with the mean and initial variance of each pixel
+		if (background.width != frame.width || background.height != frame.height) {
 			background.reshape(frame.width, frame.height);
 			GConvertImage.convert(frame, background.getBand(0));
 			GImageMiscOps.fill(background.getBand(1), initialVariance);
 			return;
-		} else {
-			InputSanityCheck.checkSameShape(background, frame);
 		}
 
 		inputWrapper.wrap(frame);
@@ -73,8 +74,9 @@ public class BackgroundStationaryGaussian_SB<T extends ImageGray<T>> extends Bac
 		GrayF32 backgroundMean = background.getBand(0);
 		GrayF32 backgroundVar = background.getBand(1);
 
-		int indexBG = 0;
+		//CONCURRENT_BELOW BoofConcurrency.loopFor(0, frame.height, y -> {
 		for (int y = 0; y < background.height; y++) {
+			int indexBG = y*frame.width;
 			int indexInput = frame.startIndex + y*frame.stride;
 
 			int end = indexInput + frame.width;
@@ -91,21 +93,23 @@ public class BackgroundStationaryGaussian_SB<T extends ImageGray<T>> extends Bac
 				indexInput++;
 			}
 		}
+		//CONCURRENT_ABOVE });
 	}
 
 	@Override public void segment( T frame, GrayU8 segmented ) {
+		segmented.reshape(frame.width, frame.height);
 		if (background.width == 1) {
 			ImageMiscOps.fill(segmented, unknownValue);
 			return;
 		}
-		InputSanityCheck.checkSameShape(background, frame, segmented);
 		inputWrapper.wrap(frame);
 
 		GrayF32 backgroundMean = background.getBand(0);
 		GrayF32 backgroundVar = background.getBand(1);
 
-		int indexBG = 0;
+		//CONCURRENT_BELOW BoofConcurrency.loopFor(0, frame.height, y -> {
 		for (int y = 0; y < frame.height; y++) {
+			int indexBG = y*frame.width;
 			int indexInput = frame.startIndex + y*frame.stride;
 			int indexSegmented = segmented.startIndex + y*segmented.stride;
 
@@ -133,5 +137,6 @@ public class BackgroundStationaryGaussian_SB<T extends ImageGray<T>> extends Bac
 				indexBG++;
 			}
 		}
+		//CONCURRENT_ABOVE });
 	}
 }

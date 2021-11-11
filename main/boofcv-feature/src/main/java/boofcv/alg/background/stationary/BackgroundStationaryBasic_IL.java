@@ -18,12 +18,13 @@
 
 package boofcv.alg.background.stationary;
 
-import boofcv.alg.InputSanityCheck;
 import boofcv.alg.misc.ImageMiscOps;
 import boofcv.core.image.FactoryGImageMultiBand;
 import boofcv.core.image.GConvertImage;
 import boofcv.core.image.GImageMultiBand;
 import boofcv.struct.image.*;
+
+//CONCURRENT_INLINE import boofcv.concurrency.BoofConcurrency;
 
 /**
  * Implementation of {@link BackgroundStationaryBasic} for {@link ImageGray}.
@@ -61,20 +62,20 @@ public class BackgroundStationaryBasic_IL<T extends ImageInterleaved<T>> extends
 	}
 
 	@Override public void updateBackground( T frame ) {
-		if (background.width != frame.width) {
+		if (background.width != frame.width || background.height != frame.height) {
 			background.reshape(frame.width, frame.height);
 			GConvertImage.convert(frame, background);
 			return;
 		}
 
-		InputSanityCheck.checkSameShape(background, frame);
 		inputWrapper.wrap(frame);
 
 		int numBands = background.getNumBands();
 		float minusLearn = 1.0f - learnRate;
 
-		int indexBG = 0;
+		//CONCURRENT_BELOW BoofConcurrency.loopFor(0, frame.height, y -> {
 		for (int y = 0; y < frame.height; y++) {
+			int indexBG = y*frame.width*numBands;
 			int indexInput = frame.startIndex + y*frame.stride;
 			int end = indexInput + frame.width*numBands;
 			while (indexInput < end) {
@@ -87,21 +88,23 @@ public class BackgroundStationaryBasic_IL<T extends ImageInterleaved<T>> extends
 				}
 			}
 		}
+		//CONCURRENT_ABOVE });
 	}
 
 	@Override public void segment( T frame, GrayU8 segmented ) {
-		if (background.width != frame.width) {
+		segmented.reshape(frame.width, frame.height);
+		if (background.width != frame.width || background.height != frame.height) {
 			ImageMiscOps.fill(segmented, unknownValue);
 			return;
 		}
-		InputSanityCheck.checkSameShape(background, frame, segmented);
 		inputWrapper.wrap(frame);
 
 		int numBands = background.getNumBands();
 		float thresholdSq = numBands*threshold*threshold;
 
-		int indexBG = 0;
+		//CONCURRENT_BELOW BoofConcurrency.loopFor(0, frame.height, y -> {
 		for (int y = 0; y < frame.height; y++) {
+			int indexBG = y*frame.width*numBands;
 			int indexInput = frame.startIndex + y*frame.stride;
 			int indexSegmented = segmented.startIndex + y*segmented.stride;
 
@@ -114,13 +117,9 @@ public class BackgroundStationaryBasic_IL<T extends ImageInterleaved<T>> extends
 					sumErrorSq += diff*diff;
 				}
 
-				if (sumErrorSq <= thresholdSq) {
-					segmented.data[indexSegmented] = 0;
-				} else {
-					segmented.data[indexSegmented] = 1;
-				}
-				indexSegmented++;
+				segmented.data[indexSegmented++] = (byte)(sumErrorSq <= thresholdSq ? 0 : 1);
 			}
 		}
+		//CONCURRENT_ABOVE });
 	}
 }

@@ -29,40 +29,38 @@ import georegression.struct.InvertibleTransform;
  *
  * @author Peter Abeles
  */
-public class BackgroundMovingGmm_SB <T extends ImageGray<T>, Motion extends InvertibleTransform<Motion>>
-	extends BackgroundMovingGmm<T,Motion>
-{
-	public BackgroundMovingGmm_SB(float learningPeriod, float decayCoef, int maxGaussians,
-								  Point2Transform2Model_F32<Motion> transformImageType, ImageType<T> imageType)
-	{
+public class BackgroundMovingGmm_SB<T extends ImageGray<T>, Motion extends InvertibleTransform<Motion>>
+		extends BackgroundMovingGmm<T, Motion> {
+	public BackgroundMovingGmm_SB( float learningPeriod, float decayCoef, int maxGaussians,
+								   Point2Transform2Model_F32<Motion> transformImageType, ImageType<T> imageType ) {
 		super(learningPeriod, decayCoef, maxGaussians, transformImageType, imageType);
 	}
 
-	@Override protected void updateBackground(int x0, int y0, int x1, int y1, T frame) {
+	@Override protected void updateBackground( int x0, int y0, int x1, int y1, T frame ) {
 
 		common.inputWrapperG.wrap(frame);
 		transform.setModel(worldToCurrent);
 
 		for (int y = y0; y < y1; y++) {
-			float modelRow[] = common.model.data[y];
+			float[] modelRow = common.model.data[y];
 			for (int x = x0; x < x1; x++) {
 				int indexModel = x*common.modelStride;
 
-				transform.compute(x,y,work);
-				int xx = (int)(work.x+0.5f);
-				int yy = (int)(work.y+0.5f);
+				transform.compute(x, y, work);
+				int xx = (int)(work.x + 0.5f);
+				int yy = (int)(work.y + 0.5f);
 
-				if( work.x >= 0 && xx < frame.width && work.y >= 0 && yy < frame.height) {
+				if (work.x >= 0 && xx < frame.width && work.y >= 0 && yy < frame.height) {
 
-					float pixelValue = common.inputWrapperG.unsafe_getF(xx,yy);
+					float pixelValue = common.inputWrapperG.unsafe_getF(xx, yy);
 
-					common.updateMixture(pixelValue,modelRow,indexModel); // TODO assigned mask here
+					common.updateMixture(pixelValue, modelRow, indexModel); // TODO assigned mask here
 				}
 			}
 		}
 	}
 
-	@Override protected void _segment(Motion currentToWorld, T frame, GrayU8 segmented) {
+	@Override protected void _segment( Motion currentToWorld, T frame, GrayU8 segmented ) {
 		common.inputWrapperG.wrap(frame);
 		transform.setModel(currentToWorld);
 		common.unknownValue = unknownValue;
@@ -71,20 +69,20 @@ public class BackgroundMovingGmm_SB <T extends ImageGray<T>, Motion extends Inve
 			int indexOut = segmented.startIndex + y*segmented.stride;
 			for (int x = 0; x < frame.width; x++, indexOut++) {
 
-				transform.compute(x,y,work);
+				transform.compute(x, y, work);
 
-				int xx = (int)(work.x+0.5f);
-				int yy = (int)(work.y+0.5f);
+				int xx = (int)(work.x + 0.5f);
+				int yy = (int)(work.y + 0.5f);
 
-				if( work.x >= 0 && xx < backgroundWidth && work.y >= 0 && yy < backgroundHeight) {
+				if (work.x >= 0 && xx < backgroundWidth && work.y >= 0 && yy < backgroundHeight) {
 
-					float pixelValue = common.inputWrapperG.unsafe_getF(x,y);
+					float pixelValue = common.inputWrapperG.unsafe_getF(x, y);
 
-					float modelRow[] = common.model.data[yy];
+					float[] modelRow = common.model.data[yy];
 					int indexModel = xx*common.modelStride;
 
 					segmented.data[indexOut] = (byte)common.checkBackground(pixelValue, modelRow, indexModel);
-				}else {
+				} else {
 					// there is no background here. Just mark it as not moving to avoid false positives
 					segmented.data[indexOut] = unknownValue;
 				}

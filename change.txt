@@ -12,11 +12,14 @@ Misc
 - Config classes now must implement setTo() which returns 'this' to allow chaining and easy copies
 ImageProcessing
 - TODO ImageMiscOps.transpose()
+Background Model
+- Created threaded implementations of stationary
+- TODO threaded implementations moving
 
 TODO Monocular SLAM
 TODO Stereo SLAM
 TODO Added calibration targets Hamming Marker grid and chessboard, e.g. ChArUco and ArUco grids.
-TODO applications for self calibration mono and stereo
+TODO Applications for self calibration mono and stereo
 TODO Monocular VO
 
 ---------------------------------------------

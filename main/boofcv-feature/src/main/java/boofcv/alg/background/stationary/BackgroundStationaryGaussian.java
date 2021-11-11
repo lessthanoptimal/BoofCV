@@ -22,6 +22,8 @@ import boofcv.alg.background.BackgroundAlgorithmGaussian;
 import boofcv.alg.background.BackgroundModelStationary;
 import boofcv.struct.image.ImageBase;
 import boofcv.struct.image.ImageType;
+import lombok.Getter;
+import lombok.Setter;
 
 /**
  * <p>Implementation of {@link BackgroundAlgorithmGaussian} for stationary images.</p>
@@ -35,21 +37,21 @@ public abstract class BackgroundStationaryGaussian<T extends ImageBase<T>>
 	/**
 	 * Specifies how fast it will adapt. 0 to 1, inclusive. 0 = static  1.0 = instant.
 	 */
-	protected float learnRate;
+	@Getter @Setter protected float learnRate;
 
 	/**
 	 * Threshold for classifying a pixel as background or not. This threshold is applied to the
 	 * computed Mahalanobis from the distribution.
 	 */
-	protected float threshold;
+	@Getter @Setter protected float threshold;
 
 	/**
 	 * The initial variance assigned to a new pixel. Larger values to reduce false positives due to
 	 * under sampling
 	 */
-	protected float initialVariance = Float.MIN_VALUE;
+	@Getter @Setter protected float initialVariance = Float.MIN_VALUE;
 
-	protected float minimumDifference = 0;
+	@Getter @Setter protected float minimumDifference = 0;
 
 	/**
 	 * See class documentation for parameters definitions.
@@ -66,37 +68,5 @@ public abstract class BackgroundStationaryGaussian<T extends ImageBase<T>>
 
 		this.learnRate = learnRate;
 		this.threshold = threshold;
-	}
-
-	@Override public float getInitialVariance() {
-		return initialVariance;
-	}
-
-	@Override public void setInitialVariance( float initialVariance ) {
-		this.initialVariance = initialVariance;
-	}
-
-	@Override public float getLearnRate() {
-		return learnRate;
-	}
-
-	@Override public void setLearnRate( float learnRate ) {
-		this.learnRate = learnRate;
-	}
-
-	@Override public float getThreshold() {
-		return threshold;
-	}
-
-	@Override public void setThreshold( float threshold ) {
-		this.threshold = threshold;
-	}
-
-	@Override public float getMinimumDifference() {
-		return minimumDifference;
-	}
-
-	@Override public void setMinimumDifference( float minimumDifference ) {
-		this.minimumDifference = minimumDifference;
 	}
 }

@@ -24,17 +24,23 @@ import boofcv.struct.image.GrayU8;
 import boofcv.struct.image.ImageBase;
 import boofcv.struct.image.ImageType;
 
-/**
- * @author Peter Abeles
- */
-public class TestBackgroundStationaryGmm_SB extends GenericBackgroundModelStationaryChecks {
-	public TestBackgroundStationaryGmm_SB() {
+class TestBackgroundStationaryGaussian_SB_MT extends CompareBackgroundStationarySingleToMultiChecks {
+	public TestBackgroundStationaryGaussian_SB_MT() {
 		imageTypes.add(ImageType.single(GrayU8.class));
 		imageTypes.add(ImageType.single(GrayF32.class));
 	}
 
-	@Override
-	public <T extends ImageBase<T>> BackgroundModelStationary<T> create( ImageType<T> imageType ) {
-		return new BackgroundStationaryGmm_SB(1000.0f, 0.001f, 10, imageType);
+	@Override public <T extends ImageBase<T>> BackgroundModelStationary<T>
+	create( boolean singleThread, ImageType<T> imageType ) {
+		if (singleThread) {
+			var alg = new BackgroundStationaryGaussian_SB(0.05f, 10f, imageType.getImageClass());
+			alg.setInitialVariance(12);
+			return alg;
+		} else {
+			var alg = new BackgroundStationaryGaussian_SB_MT(0.05f, 10f, imageType.getImageClass());
+			alg.setInitialVariance(12);
+			return alg;
+		}
 	}
 }
+

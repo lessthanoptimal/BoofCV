@@ -24,6 +24,7 @@ import boofcv.core.image.GImageGray;
 import boofcv.core.image.GImageMultiBand;
 import boofcv.struct.RArray2D_F32;
 import boofcv.struct.image.ImageType;
+import pabeles.concurrency.GrowArray;
 
 /**
  * Common code for all implementations of {@link BackgroundAlgorithmGmm}. This is where most of the important
@@ -71,7 +72,7 @@ public class BackgroundGmmCommon {
 
 	// For multiband images only
 	public GImageMultiBand inputWrapperMB;
-	public float inputPixel[];
+	public GrowArray<float[]> storagePixels;
 
 	public GImageGray inputWrapperG;
 
@@ -89,14 +90,11 @@ public class BackgroundGmmCommon {
 		this.significantWeight = Math.min(0.2f, 100*learningRate);
 
 		switch (imageType.getFamily()) {
-			case GRAY:
-				inputWrapperG = FactoryGImageGray.create(imageType.getImageClass());
-				break;
-
-			default:
+			case GRAY -> inputWrapperG = FactoryGImageGray.create(imageType.getImageClass());
+			default -> {
 				inputWrapperMB = FactoryGImageMultiBand.create(imageType);
-				inputPixel = new float[imageType.numBands];
-				break;
+				storagePixels = new GrowArray<>(() -> new float[imageType.numBands]);
+			}
 		}
 
 		this.numBands = imageType.numBands;
@@ -297,7 +295,7 @@ public class BackgroundGmmCommon {
 			// Update Gaussian weights and prune models
 			updateWeightAndPrune(dataRow, modelIndex, ng + 1, bestIndex, learningRate);
 
-			return 1; // must be foreground since it didn't match any background
+			return 1; // must be in the foreground since it didn't match any background
 		} else {
 			// didn't match any models and can't create a new model
 			return 1;
@@ -305,7 +303,7 @@ public class BackgroundGmmCommon {
 	}
 
 	/**
-	 * Checks to see if the the pivel value refers to the background or foreground
+	 * Checks to see if the pixel value refers to the background or foreground
 	 *
 	 * @return true for background or false for foreground
 	 */
