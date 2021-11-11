@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -45,7 +45,7 @@ public class ImageMiscOps {
 	 * run slower
 	 */
 	public static int MIN_ELEMENTS_CONCURRENT = 400*400;
-	
+
 	public static boolean runConcurrent( ImageBase image ) {
 		return runConcurrent(image.width*image.height);
 	}
@@ -145,11 +145,12 @@ public class ImageMiscOps {
 	 * @param value The value that the image is being filled with.
 	 */
 	public static void fill(InterleavedI8 image, int value) {
-		if( runConcurrent(image) ) {
-			ImplImageMiscOps_MT.fill(image, value);
-		} else {
+//		concurrent isn't faster in benchmark results
+//		if( runConcurrent(image) ) {
+//			ImplImageMiscOps_MT.fill(image, value);
+//		} else {
 			ImplImageMiscOps.fill(image, value);
-		}
+//		}
 	}
 
 	/**
@@ -311,7 +312,7 @@ public class ImageMiscOps {
 	 * Sets each value in the image to a value drawn from a Gaussian distribution. A user
 	 * specified lower and upper bound is provided to ensure that the values are within a legal
 	 * range. A drawn value outside the allowed range will be set to the closest bound.
-	 * 
+	 *
 	 * @param input Input image. Modified.
 	 * @param rand Random number generator
 	 * @param mean Distribution's mean.
@@ -327,7 +328,7 @@ public class ImageMiscOps {
 	 * Sets each value in the image to a value drawn from a Gaussian distribution. A user
 	 * specified lower and upper bound is provided to ensure that the values are within a legal
 	 * range. A drawn value outside the allowed range will be set to the closest bound.
-	 * 
+	 *
 	 * @param input Input image. Modified.
 	 * @param rand Random number generator
 	 * @param mean Distribution's mean.
@@ -431,7 +432,7 @@ public class ImageMiscOps {
 
 	/**
 	 * Creates a new image which is a copy of the src image but extended with border pixels.
-	 * 
+	 *
 	 * @param src (Input) source image
 	 * @param border (Input) image border generator
 	 * @param borderX0 (Input) Border x-axis lower extent
@@ -718,7 +719,7 @@ public class ImageMiscOps {
 	 * Sets each value in the image to a value drawn from a Gaussian distribution. A user
 	 * specified lower and upper bound is provided to ensure that the values are within a legal
 	 * range. A drawn value outside the allowed range will be set to the closest bound.
-	 * 
+	 *
 	 * @param input Input image. Modified.
 	 * @param rand Random number generator
 	 * @param mean Distribution's mean.
@@ -734,7 +735,7 @@ public class ImageMiscOps {
 	 * Sets each value in the image to a value drawn from a Gaussian distribution. A user
 	 * specified lower and upper bound is provided to ensure that the values are within a legal
 	 * range. A drawn value outside the allowed range will be set to the closest bound.
-	 * 
+	 *
 	 * @param input Input image. Modified.
 	 * @param rand Random number generator
 	 * @param mean Distribution's mean.
@@ -838,7 +839,7 @@ public class ImageMiscOps {
 
 	/**
 	 * Creates a new image which is a copy of the src image but extended with border pixels.
-	 * 
+	 *
 	 * @param src (Input) source image
 	 * @param border (Input) image border generator
 	 * @param borderX0 (Input) Border x-axis lower extent
@@ -1125,7 +1126,7 @@ public class ImageMiscOps {
 	 * Sets each value in the image to a value drawn from a Gaussian distribution. A user
 	 * specified lower and upper bound is provided to ensure that the values are within a legal
 	 * range. A drawn value outside the allowed range will be set to the closest bound.
-	 * 
+	 *
 	 * @param input Input image. Modified.
 	 * @param rand Random number generator
 	 * @param mean Distribution's mean.
@@ -1141,7 +1142,7 @@ public class ImageMiscOps {
 	 * Sets each value in the image to a value drawn from a Gaussian distribution. A user
 	 * specified lower and upper bound is provided to ensure that the values are within a legal
 	 * range. A drawn value outside the allowed range will be set to the closest bound.
-	 * 
+	 *
 	 * @param input Input image. Modified.
 	 * @param rand Random number generator
 	 * @param mean Distribution's mean.
@@ -1245,7 +1246,7 @@ public class ImageMiscOps {
 
 	/**
 	 * Creates a new image which is a copy of the src image but extended with border pixels.
-	 * 
+	 *
 	 * @param src (Input) source image
 	 * @param border (Input) image border generator
 	 * @param borderX0 (Input) Border x-axis lower extent
@@ -1531,7 +1532,7 @@ public class ImageMiscOps {
 	 * Sets each value in the image to a value drawn from a Gaussian distribution. A user
 	 * specified lower and upper bound is provided to ensure that the values are within a legal
 	 * range. A drawn value outside the allowed range will be set to the closest bound.
-	 * 
+	 *
 	 * @param input Input image. Modified.
 	 * @param rand Random number generator
 	 * @param mean Distribution's mean.
@@ -1547,7 +1548,7 @@ public class ImageMiscOps {
 	 * Sets each value in the image to a value drawn from a Gaussian distribution. A user
 	 * specified lower and upper bound is provided to ensure that the values are within a legal
 	 * range. A drawn value outside the allowed range will be set to the closest bound.
-	 * 
+	 *
 	 * @param input Input image. Modified.
 	 * @param rand Random number generator
 	 * @param mean Distribution's mean.
@@ -1651,7 +1652,7 @@ public class ImageMiscOps {
 
 	/**
 	 * Creates a new image which is a copy of the src image but extended with border pixels.
-	 * 
+	 *
 	 * @param src (Input) source image
 	 * @param border (Input) image border generator
 	 * @param borderX0 (Input) Border x-axis lower extent
@@ -1771,11 +1772,12 @@ public class ImageMiscOps {
 	 * @param value The value that the image is being filled with.
 	 */
 	public static void fill(InterleavedF32 image, float value) {
-		if( runConcurrent(image) ) {
-			ImplImageMiscOps_MT.fill(image, value);
-		} else {
+//		concurrent isn't faster in benchmark results
+//		if( runConcurrent(image) ) {
+//			ImplImageMiscOps_MT.fill(image, value);
+//		} else {
 			ImplImageMiscOps.fill(image, value);
-		}
+//		}
 	}
 
 	/**
@@ -1800,11 +1802,12 @@ public class ImageMiscOps {
 	 * @param value The value that the image is being filled with.
 	 */
 	public static void fillBand(InterleavedF32 image, int band, float value) {
-		if( runConcurrent(image) ) {
-			ImplImageMiscOps_MT.fillBand(image, band, value);
-		} else {
+//		concurrent isn't faster in benchmark results
+//		if( runConcurrent(image) ) {
+//			ImplImageMiscOps_MT.fillBand(image, band, value);
+//		} else {
 			ImplImageMiscOps.fillBand(image, band, value);
-		}
+//		}
 	}
 
 	/**
@@ -1815,11 +1818,12 @@ public class ImageMiscOps {
 	 * @param output The multi-band image which the input image is to be inserted into
 	 */
 	public static void insertBand( GrayF32 input, int band, InterleavedF32 output) {
-		if( runConcurrent(input) ) {
-			ImplImageMiscOps_MT.insertBand(input, band, output);
-		} else {
+//		concurrent isn't faster in benchmark results
+//		if( runConcurrent(input) ) {
+//			ImplImageMiscOps_MT.insertBand(input, band, output);
+//		} else {
 			ImplImageMiscOps.insertBand(input, band, output);
-		}
+//		}
 	}
 
 	/**
@@ -1937,7 +1941,7 @@ public class ImageMiscOps {
 	 * Sets each value in the image to a value drawn from a Gaussian distribution. A user
 	 * specified lower and upper bound is provided to ensure that the values are within a legal
 	 * range. A drawn value outside the allowed range will be set to the closest bound.
-	 * 
+	 *
 	 * @param input Input image. Modified.
 	 * @param rand Random number generator
 	 * @param mean Distribution's mean.
@@ -1953,7 +1957,7 @@ public class ImageMiscOps {
 	 * Sets each value in the image to a value drawn from a Gaussian distribution. A user
 	 * specified lower and upper bound is provided to ensure that the values are within a legal
 	 * range. A drawn value outside the allowed range will be set to the closest bound.
-	 * 
+	 *
 	 * @param input Input image. Modified.
 	 * @param rand Random number generator
 	 * @param mean Distribution's mean.
@@ -2057,7 +2061,7 @@ public class ImageMiscOps {
 
 	/**
 	 * Creates a new image which is a copy of the src image but extended with border pixels.
-	 * 
+	 *
 	 * @param src (Input) source image
 	 * @param border (Input) image border generator
 	 * @param borderX0 (Input) Border x-axis lower extent
@@ -2343,7 +2347,7 @@ public class ImageMiscOps {
 	 * Sets each value in the image to a value drawn from a Gaussian distribution. A user
 	 * specified lower and upper bound is provided to ensure that the values are within a legal
 	 * range. A drawn value outside the allowed range will be set to the closest bound.
-	 * 
+	 *
 	 * @param input Input image. Modified.
 	 * @param rand Random number generator
 	 * @param mean Distribution's mean.
@@ -2359,7 +2363,7 @@ public class ImageMiscOps {
 	 * Sets each value in the image to a value drawn from a Gaussian distribution. A user
 	 * specified lower and upper bound is provided to ensure that the values are within a legal
 	 * range. A drawn value outside the allowed range will be set to the closest bound.
-	 * 
+	 *
 	 * @param input Input image. Modified.
 	 * @param rand Random number generator
 	 * @param mean Distribution's mean.
@@ -2463,7 +2467,7 @@ public class ImageMiscOps {
 
 	/**
 	 * Creates a new image which is a copy of the src image but extended with border pixels.
-	 * 
+	 *
 	 * @param src (Input) source image
 	 * @param border (Input) image border generator
 	 * @param borderX0 (Input) Border x-axis lower extent

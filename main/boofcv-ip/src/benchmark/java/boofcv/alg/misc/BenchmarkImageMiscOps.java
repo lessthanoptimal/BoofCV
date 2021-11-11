@@ -85,8 +85,14 @@ public class BenchmarkImageMiscOps {
 	// @formatter:off
 	@Benchmark public void copy_U8() {ImageMiscOps.copy(10,10,0,0,size-10,size-10,imgA_U8,imgB_U8);}
 	@Benchmark public void copy_F32() {ImageMiscOps.copy(10,10,0,0,size-10,size-10,imgA_F32,imgB_F32);}
-	@Benchmark public void fill_U8() {ImageMiscOps.fill(imgA_U8,2);}
+	@Benchmark public void fill_U8() {ImageMiscOps.fill(imgA_U8, 2);}
 	@Benchmark public void fill_F32() {ImageMiscOps.fill(imgA_F32, 2.0f);}
+	@Benchmark public void fill_IU8() {ImageMiscOps.fill(imgA_IU8, 2);}
+	@Benchmark public void fill_IF32() {ImageMiscOps.fill(imgB_IF32, 2.0f);}
+	@Benchmark public void fill_mb_IU8() {ImageMiscOps.fill(imgA_IU8, new int[]{5,8,2});}
+	@Benchmark public void fill_mb_IF32() {ImageMiscOps.fill(imgB_IF32, new float[]{5,8,2});}
+	@Benchmark public void fillBand_IU8() {ImageMiscOps.fillBand(imgA_IU8,1, 2);}
+	@Benchmark public void fillBand_IF32() {ImageMiscOps.fillBand(imgB_IF32, 1, 2.0f);}
 	@Benchmark public void fillRectangle_U8() {ImageMiscOps.fillRectangle(imgA_U8,2,10,12,size-10,size-12);}
 	@Benchmark public void fillRectangle_IU8() {ImageMiscOps.fillRectangle(imgA_IU8,2,10,12,size-10,size-12);}
 	@Benchmark public void fillUniform_U8() {ImageMiscOps.fillUniform(imgA_U8, rand, 0, 200);}
@@ -102,6 +108,7 @@ public class BenchmarkImageMiscOps {
 	@Benchmark public void extractBand_IU8() {ImageMiscOps.extractBand(imgA_IU8,2,imgA_U8);}
 	@Benchmark public void extractBand_F32() {ImageMiscOps.extractBand(imgA_IF32,2,imgA_F32);}
 	@Benchmark public void insertBand_IU8() {ImageMiscOps.insertBand(imgA_U8,2,imgA_IU8);}
+	@Benchmark public void insertBand_IF32() {ImageMiscOps.insertBand(imgA_F32,2,imgA_IF32);}
 	@Benchmark public void flipHorizontal_U8() {ImageMiscOps.flipHorizontal(imgA_U8);}
 	@Benchmark public void flipHorizontal_F32() {ImageMiscOps.flipHorizontal(imgA_F32);}
 	@Benchmark public void flipVertical_U8() {ImageMiscOps.flipVertical(imgA_U8);}
