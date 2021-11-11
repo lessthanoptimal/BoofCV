@@ -31,9 +31,7 @@ import boofcv.struct.image.*;
  *
  * @author Peter Abeles
  */
-public class BackgroundStationaryGaussian_PL<T extends ImageGray<T>>
-		extends BackgroundStationaryGaussian<Planar<T>>
-{
+public class BackgroundStationaryGaussian_PL<T extends ImageGray<T>> extends BackgroundStationaryGaussian<Planar<T>> {
 
 	// wrappers which provide abstraction across image types
 	protected GImageMultiBand inputWrapper;
@@ -50,17 +48,16 @@ public class BackgroundStationaryGaussian_PL<T extends ImageGray<T>>
 	 *
 	 * @param learnRate Specifies how quickly the background is updated. 0 = static  1.0 = instant. Try 0.05
 	 * @param threshold Threshold for background. Consult a chi-square table for reasonably values.
-	 *                  10 to 16 for 1 to 3 bands.
+	 * 10 to 16 for 1 to 3 bands.
 	 * @param imageType Type of input image.
 	 */
-	public BackgroundStationaryGaussian_PL(float learnRate, float threshold,
-										   ImageType<Planar<T>> imageType)
-	{
+	public BackgroundStationaryGaussian_PL( float learnRate, float threshold,
+											ImageType<Planar<T>> imageType ) {
 		super(learnRate, threshold, imageType);
 
 		int numBands = imageType.getNumBands();
 
-		background = new Planar<>(GrayF32.class,1,1,2*numBands);
+		background = new Planar<>(GrayF32.class, 1, 1, 2*numBands);
 		bgWrapper = FactoryGImageMultiBand.create(background.getImageType());
 		bgWrapper.wrap(background);
 
@@ -69,18 +66,16 @@ public class BackgroundStationaryGaussian_PL<T extends ImageGray<T>>
 		inputPixel = new float[numBands];
 	}
 
-	@Override
-	public void reset() {
-		background.reshape(1,1);
+	@Override public void reset() {
+		background.reshape(1, 1);
 	}
 
-	@Override
-	public void updateBackground( Planar<T> frame) {
-		if( background.width == 1 ) {
+	@Override public void updateBackground( Planar<T> frame ) {
+		if (background.width == 1) {
 			background.reshape(frame.width, frame.height);
 			// initialize the mean to the current image and the initial variance is whatever it is set to
 			for (int band = 0; band < background.getNumBands(); band += 2) {
-				GConvertImage.convert(frame.getBand(band / 2), background.getBand(band));
+				GConvertImage.convert(frame.getBand(band/2), background.getBand(band));
 				GImageMiscOps.fill(background.getBand(band + 1), initialVariance);
 			}
 			return;
@@ -98,18 +93,18 @@ public class BackgroundStationaryGaussian_PL<T extends ImageGray<T>>
 		for (int y = 0; y < background.height; y++) {
 			int indexInput = frame.startIndex + y*frame.stride;
 			int end = indexInput + frame.width;
-			while( indexInput < end ) {
+			while (indexInput < end) {
 				inputWrapper.getF(indexInput, inputPixel);
 
 				for (int band = 0; band < numBands; band++) {
 					GrayF32 backgroundMean = background.getBand(band*2);
-					GrayF32 backgroundVar = background.getBand(band*2+1);
+					GrayF32 backgroundVar = background.getBand(band*2 + 1);
 
 					float inputValue = inputPixel[band];
 					float meanBG = backgroundMean.data[indexBG];
 					float varianceBG = backgroundVar.data[indexBG];
 
-					float diff = meanBG-inputValue;
+					float diff = meanBG - inputValue;
 					backgroundMean.data[indexBG] = minusLearn*meanBG + learnRate*inputValue;
 					backgroundVar.data[indexBG] = minusLearn*varianceBG + learnRate*diff*diff;
 				}
@@ -120,9 +115,8 @@ public class BackgroundStationaryGaussian_PL<T extends ImageGray<T>>
 		}
 	}
 
-	@Override
-	public void segment(Planar<T> frame, GrayU8 segmented) {
-		if( background.width == 1 ) {
+	@Override public void segment( Planar<T> frame, GrayU8 segmented ) {
+		if (background.width == 1) {
 			ImageMiscOps.fill(segmented, unknownValue);
 			return;
 		}
@@ -138,26 +132,26 @@ public class BackgroundStationaryGaussian_PL<T extends ImageGray<T>>
 			int indexSegmented = segmented.startIndex + y*segmented.stride;
 
 			int end = indexInput + frame.width;
-			while( indexInput < end ) {
+			while (indexInput < end) {
 				inputWrapper.getF(indexInput, inputPixel);
 
 				float mahalanobis = 0;
 				for (int band = 0; band < numBands; band++) {
 
 					GrayF32 backgroundMean = background.getBand(band*2);
-					GrayF32 backgroundVar = background.getBand(band*2+1);
+					GrayF32 backgroundVar = background.getBand(band*2 + 1);
 
 					float meanBG = backgroundMean.data[indexBG];
 					float varBG = backgroundVar.data[indexBG];
 
 					float diff = meanBG - inputPixel[band];
-					mahalanobis += diff * diff / varBG;
+					mahalanobis += diff*diff/varBG;
 				}
 
 				if (mahalanobis <= threshold) {
 					segmented.data[indexSegmented] = 0;
 				} else {
-					if( minimumDifference == 0) {
+					if (minimumDifference == 0) {
 						segmented.data[indexSegmented] = 1;
 					} else {
 						float sumAbsDiff = 0;

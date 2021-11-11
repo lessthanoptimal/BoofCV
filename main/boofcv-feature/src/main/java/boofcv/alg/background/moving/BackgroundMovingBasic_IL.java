@@ -79,8 +79,7 @@ public class BackgroundMovingBasic_IL<T extends ImageInterleaved<T>, Motion exte
 		return background;
 	}
 
-	@Override
-	public void initialize( int backgroundWidth, int backgroundHeight, Motion homeToWorld ) {
+	@Override public void initialize( int backgroundWidth, int backgroundHeight, Motion homeToWorld ) {
 		background.reshape(backgroundWidth, backgroundHeight);
 		GImageMiscOps.fill(background, Float.MAX_VALUE);
 
@@ -91,13 +90,11 @@ public class BackgroundMovingBasic_IL<T extends ImageInterleaved<T>, Motion exte
 		this.backgroundHeight = backgroundHeight;
 	}
 
-	@Override
-	public void reset() {
+	@Override public void reset() {
 		GImageMiscOps.fill(background, Float.MAX_VALUE);
 	}
 
-	@Override
-	protected void updateBackground( int x0, int y0, int x1, int y1, T frame ) {
+	@Override protected void updateBackground( int x0, int y0, int x1, int y1, T frame ) {
 
 		transform.setModel(worldToCurrent);
 		interpolationInput.setImage(frame);
@@ -132,8 +129,7 @@ public class BackgroundMovingBasic_IL<T extends ImageInterleaved<T>, Motion exte
 		}
 	}
 
-	@Override
-	protected void _segment( Motion currentToWorld, T frame, GrayU8 segmented ) {
+	@Override protected void _segment( Motion currentToWorld, T frame, GrayU8 segmented ) {
 		transform.setModel(currentToWorld);
 		inputWrapper.wrap(frame);
 

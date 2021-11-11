@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -42,22 +42,19 @@ public abstract class BackgroundStationaryGmm<T extends ImageBase<T>>
 		common = new BackgroundGmmCommon(learningPeriod, decayCoef, maxGaussians, imageType);
 	}
 
-	@Override
-	public void reset() {
+	@Override public void reset() {
 		common.model.reshape(0, 0);
 		common.imageWidth = common.imageHeight = 0;
 	}
 
-	@Override
-	public void updateBackground( T frame ) {
+	@Override public void updateBackground( T frame ) {
 		updateBackground(frame, null);
 	}
 
 	/**
 	 * @param mask If null then the background mask is ignored
 	 */
-	@Override
-	public void updateBackground( T frame, @Nullable GrayU8 mask ) {
+	@Override public void updateBackground( T frame, @Nullable GrayU8 mask ) {
 
 		// if the image size has changed it's safe to assume it needs to be re-initialized
 		if (common.imageWidth != frame.width || common.imageHeight != frame.height) {
@@ -73,28 +70,23 @@ public abstract class BackgroundStationaryGmm<T extends ImageBase<T>>
 		}
 	}
 
-	@Override
-	public float getInitialVariance() {
+	@Override public float getInitialVariance() {
 		return common.initialVariance;
 	}
 
-	@Override
-	public void setInitialVariance( float initialVariance ) {
+	@Override public void setInitialVariance( float initialVariance ) {
 		common.initialVariance = initialVariance;
 	}
 
-	@Override
-	public float getLearningPeriod() {
+	@Override public float getLearningPeriod() {
 		return 1.0f/common.learningRate;
 	}
 
-	@Override
-	public void setLearningPeriod( float period ) {
+	@Override public void setLearningPeriod( float period ) {
 		common.learningRate = 1.0f/period;
 	}
 
-	@Override
-	public void setSignificantWeight( float value ) {
+	@Override public void setSignificantWeight( float value ) {
 		common.significantWeight = value;
 	}
 

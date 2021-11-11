@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -56,7 +56,7 @@ public class BackgroundGmmCommon {
 	public int maxGaussians;
 
 	// Maximum Mahanolobis distance
-	public float maxDistance = 3 * 3; // standard deviations squared away
+	public float maxDistance = 3*3; // standard deviations squared away
 
 	// if the weight of the best fit Gaussian is more than this value it is considered to belong to the background
 	// the foreground could have small values as it moves around, which is why simply matching a model
@@ -75,7 +75,7 @@ public class BackgroundGmmCommon {
 
 	public GImageGray inputWrapperG;
 
-	public BackgroundGmmCommon(float learningPeriod, float decayCoef, int maxGaussians, ImageType imageType) {
+	public BackgroundGmmCommon( float learningPeriod, float decayCoef, int maxGaussians, ImageType imageType ) {
 
 		if (learningPeriod <= 0)
 			throw new IllegalArgumentException("Must be greater than zero");
@@ -86,9 +86,9 @@ public class BackgroundGmmCommon {
 		this.decay = decayCoef;
 		this.maxGaussians = maxGaussians;
 
-		this.significantWeight = Math.min(0.2f, 100 * learningRate);
+		this.significantWeight = Math.min(0.2f, 100*learningRate);
 
-		switch( imageType.getFamily() ) {
+		switch (imageType.getFamily()) {
 			case GRAY:
 				inputWrapperG = FactoryGImageGray.create(imageType.getImageClass());
 				break;
@@ -101,59 +101,59 @@ public class BackgroundGmmCommon {
 
 		this.numBands = imageType.numBands;
 		this.gaussianStride = 2 + numBands; // 1 weight, 1 variance, N means
-		this.modelStride = maxGaussians * gaussianStride;
+		this.modelStride = maxGaussians*gaussianStride;
 	}
-
 
 	/**
 	 * Updates the mixtures of gaussian and determines if the pixel matches the background model
+	 *
 	 * @return true if it matches the background or false if not
 	 */
-	public int updateMixture( float[] pixelValue , float[] dataRow , int modelIndex ) {
+	public int updateMixture( float[] pixelValue, float[] dataRow, int modelIndex ) {
 
 		// see which gaussian is the best fit based on Mahalanobis distance
 		int index = modelIndex;
 		float bestDistance = maxDistance*numBands;
-		int bestIndex=-1;
+		int bestIndex = -1;
 
 		int ng; // number of gaussians in use
 		for (ng = 0; ng < maxGaussians; ng++, index += gaussianStride) {
-			float variance = dataRow[index+1];
-			if( variance <= 0 ) {
+			float variance = dataRow[index + 1];
+			if (variance <= 0) {
 				break;
 			}
 
 			float mahalanobis = 0;
 			for (int i = 0; i < numBands; i++) {
-				float mean = dataRow[index+2+i];
-				float delta = pixelValue[i]-mean;
+				float mean = dataRow[index + 2 + i];
+				float delta = pixelValue[i] - mean;
 				mahalanobis += delta*delta/variance;
 			}
 
-			if( mahalanobis < bestDistance ) {
+			if (mahalanobis < bestDistance) {
 				bestDistance = mahalanobis;
 				bestIndex = index;
 			}
 		}
 
 		// Update the model for the best gaussian
-		if( bestIndex != -1 ) {
+		if (bestIndex != -1) {
 			// If there is a good fit update the model
 			float weight = dataRow[bestIndex];
-			float variance = dataRow[bestIndex+1];
+			float variance = dataRow[bestIndex + 1];
 
-			weight += learningRate*(1f-weight);
-			dataRow[bestIndex]   = 1; // set to one so that it can't possible go negative
+			weight += learningRate*(1f - weight);
+			dataRow[bestIndex] = 1; // set to one so that it can't possible go negative
 
 			float sumDeltaSq = 0;
 			for (int i = 0; i < numBands; i++) {
-				float mean = dataRow[bestIndex+2+i];
-				float delta = pixelValue[i]-mean;
-				dataRow[bestIndex+2+i] = mean + delta*learningRate/weight;
+				float mean = dataRow[bestIndex + 2 + i];
+				float delta = pixelValue[i] - mean;
+				dataRow[bestIndex + 2 + i] = mean + delta*learningRate/weight;
 				sumDeltaSq += delta*delta;
 			}
 			sumDeltaSq /= numBands;
-			dataRow[bestIndex+1] = variance + (learningRate /weight)*(sumDeltaSq*1.2F - variance);
+			dataRow[bestIndex + 1] = variance + (learningRate/weight)*(sumDeltaSq*1.2F - variance);
 			// 1.2f is a fudge factor. Empirical testing shows that the above equation is biased. Can't be bothered
 			// to verify the derivation and see if there's a mistake
 
@@ -161,20 +161,20 @@ public class BackgroundGmmCommon {
 			updateWeightAndPrune(dataRow, modelIndex, ng, bestIndex, weight);
 
 			return weight >= significantWeight ? 0 : 1;
-		} else if( ng < maxGaussians ) {
+		} else if (ng < maxGaussians) {
 			// if there is no good fit then create a new model, if there is room
 
 			bestIndex = modelIndex + ng*gaussianStride;
-			dataRow[bestIndex]   = 1; // weight is changed later or it's the only model
-			dataRow[bestIndex+1] = initialVariance;
+			dataRow[bestIndex] = 1; // weight is changed later or it's the only model
+			dataRow[bestIndex + 1] = initialVariance;
 			for (int i = 0; i < numBands; i++) {
-				dataRow[bestIndex+2+i] = pixelValue[i];
+				dataRow[bestIndex + 2 + i] = pixelValue[i];
 			}
 			// There are no models. Return unknown
-			if( ng == 0 )
+			if (ng == 0)
 				return unknownValue;
 
-			updateWeightAndPrune(dataRow, modelIndex, ng+1, bestIndex, learningRate);
+			updateWeightAndPrune(dataRow, modelIndex, ng + 1, bestIndex, learningRate);
 			return 1;
 		} else {
 			// didn't match any models and can't create a new model
@@ -185,28 +185,28 @@ public class BackgroundGmmCommon {
 	/**
 	 * Updates the weight of each Gaussian and prunes one which have a negative weight after the update.
 	 */
-	public void updateWeightAndPrune(float[] dataRow, int modelIndex, int ng, int bestIndex, float bestWeight) {
+	public void updateWeightAndPrune( float[] dataRow, int modelIndex, int ng, int bestIndex, float bestWeight ) {
 		int index = modelIndex;
 		float weightTotal = 0;
-		for (int i = 0; i < ng;  ) {
+		for (int i = 0; i < ng; ) {
 			float weight = dataRow[index];
 //			if( ng > 1 )
 //				System.out.println("["+i+"] = "+ng+"  weight "+weight);
 			weight = weight - learningRate*(weight + decay); // <-- original equation
 //			weight = weight - learningRate*decay;
-			if( weight <= 0 ) {
+			if (weight <= 0) {
 				// copy the last Gaussian into this location
-				int indexLast = modelIndex + (ng-1)*gaussianStride;
+				int indexLast = modelIndex + (ng - 1)*gaussianStride;
 				for (int j = 0; j < gaussianStride; j++) {
-					dataRow[index+j] = dataRow[indexLast+j];
+					dataRow[index + j] = dataRow[indexLast + j];
 				}
 
 				// see if the best Gaussian just got moved to here
-				if( indexLast == bestIndex )
+				if (indexLast == bestIndex)
 					bestIndex = index;
 
 				// mark it as unused by setting variance to zero
-				dataRow[indexLast+1] = 0;
+				dataRow[indexLast + 1] = 0;
 
 				// decrease the number of gaussians
 				ng -= 1;
@@ -220,7 +220,7 @@ public class BackgroundGmmCommon {
 
 		// undo the change to the best model. It was done in the for loop to avoid an if statement which would
 		// have slowed it down
-		if( bestIndex != -1 ) {
+		if (bestIndex != -1) {
 			weightTotal -= dataRow[bestIndex];
 			weightTotal += bestWeight;
 			dataRow[bestIndex] = bestWeight;
@@ -235,66 +235,67 @@ public class BackgroundGmmCommon {
 
 	/**
 	 * Updates the mixtures of gaussian and determines if the pixel matches the background model
+	 *
 	 * @return true if it matches the background or false if not
 	 */
-	public int updateMixture( float pixelValue , float[] dataRow , int modelIndex ) {
+	public int updateMixture( float pixelValue, float[] dataRow, int modelIndex ) {
 
 		// see which gaussian is the best fit based on Mahalanobis distance
 		int index = modelIndex;
 		float bestDistance = maxDistance;
-		int bestIndex=-1;
+		int bestIndex = -1;
 
 		int ng; // number of gaussians in use
 		for (ng = 0; ng < maxGaussians; ng++, index += 3) {
-			float variance = dataRow[index+1];
-			float mean = dataRow[index+2];
+			float variance = dataRow[index + 1];
+			float mean = dataRow[index + 2];
 
-			if( variance <= 0 ) {
+			if (variance <= 0) {
 				break;
 			}
 
-			float delta = pixelValue-mean;
+			float delta = pixelValue - mean;
 			float mahalanobis = delta*delta/variance;
-			if( mahalanobis < bestDistance ) {
+			if (mahalanobis < bestDistance) {
 				bestDistance = mahalanobis;
 				bestIndex = index;
 			}
 		}
 
 		// Update the model for the best gaussian
-		if( bestDistance != maxDistance ) {
+		if (bestDistance != maxDistance) {
 			// If there is a good fit update the model
 			float weight = dataRow[bestIndex];
-			float variance = dataRow[bestIndex+1];
-			float mean = dataRow[bestIndex+2];
+			float variance = dataRow[bestIndex + 1];
+			float mean = dataRow[bestIndex + 2];
 
-			float delta = pixelValue-mean;
+			float delta = pixelValue - mean;
 
-			weight += learningRate*(1f-weight);
-			dataRow[bestIndex]   = 1; // set to one so that it can't possible go negative. changed later
-			dataRow[bestIndex+1] = variance + (learningRate /weight)*(delta*delta*1.2F - variance);
+			weight += learningRate*(1f - weight);
+			dataRow[bestIndex] = 1; // set to one so that it can't possible go negative. changed later
+			dataRow[bestIndex + 1] = variance + (learningRate/weight)*(delta*delta*1.2F - variance);
 			// 1.2f is a fudge factor. Empirical testing shows that the above equation is biased. Can't be bothered
 			// to verify the derivation and see if there's a mistake
-			dataRow[bestIndex+2] = mean + delta* learningRate /weight;
+			dataRow[bestIndex + 2] = mean + delta*learningRate/weight;
 
 			// Update Gaussian weights and prune models
 			updateWeightAndPrune(dataRow, modelIndex, ng, bestIndex, weight);
 
 			return weight >= significantWeight ? 0 : 1;
-		} else if( ng < maxGaussians ) {
+		} else if (ng < maxGaussians) {
 			// if there is no good fit then create a new model, if there is room
 			bestIndex = modelIndex + ng*3;
-			dataRow[bestIndex]   = 1; // weight is changed later or it's the only model
-			dataRow[bestIndex+1] = initialVariance;
-			dataRow[bestIndex+2] = pixelValue;
+			dataRow[bestIndex] = 1; // weight is changed later or it's the only model
+			dataRow[bestIndex + 1] = initialVariance;
+			dataRow[bestIndex + 2] = pixelValue;
 
 			// There are no models. Return unknown
 			// weight was set to one above, so that's correct since there's only one model
-			if( ng == 0 )
+			if (ng == 0)
 				return unknownValue;
 
 			// Update Gaussian weights and prune models
-			updateWeightAndPrune(dataRow, modelIndex, ng+1, bestIndex, learningRate);
+			updateWeightAndPrune(dataRow, modelIndex, ng + 1, bestIndex, learningRate);
 
 			return 1; // must be foreground since it didn't match any background
 		} else {
@@ -308,7 +309,7 @@ public class BackgroundGmmCommon {
 	 *
 	 * @return true for background or false for foreground
 	 */
-	public int checkBackground( float[] pixelValue , float[] dataRow , int modelIndex ) {
+	public int checkBackground( float[] pixelValue, float[] dataRow, int modelIndex ) {
 
 		// see which gaussian is the best fit based on Mahalanobis distance
 		int index = modelIndex;
@@ -324,9 +325,9 @@ public class BackgroundGmmCommon {
 
 			float mahalanobis = 0;
 			for (int i = 0; i < numBands; i++) {
-				float mean = dataRow[index + 2+i];
+				float mean = dataRow[index + 2 + i];
 				float delta = pixelValue[i] - mean;
-				mahalanobis += delta * delta / variance;
+				mahalanobis += delta*delta/variance;
 			}
 
 			if (mahalanobis < bestDistance) {
@@ -335,7 +336,7 @@ public class BackgroundGmmCommon {
 			}
 		}
 
-		if( ng == 0 ) // There are no models. Return unknown
+		if (ng == 0) // There are no models. Return unknown
 			return unknownValue;
 		return bestWeight >= significantWeight ? 0 : 1;
 	}
@@ -345,7 +346,7 @@ public class BackgroundGmmCommon {
 	 *
 	 * @return true for background or false for foreground
 	 */
-	public int checkBackground( float pixelValue , float[] dataRow , int modelIndex ) {
+	public int checkBackground( float pixelValue, float[] dataRow, int modelIndex ) {
 
 		// see which gaussian is the best fit based on Mahalanobis distance
 		int index = modelIndex;
@@ -362,27 +363,27 @@ public class BackgroundGmmCommon {
 			}
 
 			float delta = pixelValue - mean;
-			float mahalanobis = delta * delta / variance;
+			float mahalanobis = delta*delta/variance;
 			if (mahalanobis < bestDistance) {
 				bestDistance = mahalanobis;
 				bestWeight = dataRow[index];
 			}
 		}
 
-		if( ng == 0 ) // There are no models. Return unknown
+		if (ng == 0) // There are no models. Return unknown
 			return unknownValue;
 		return bestWeight >= significantWeight ? 0 : 1;
 	}
 
-	public void setLearningPeriod(float period) {
-		learningRate = 1.0f / period;
+	public void setLearningPeriod( float period ) {
+		learningRate = 1.0f/period;
 	}
 
 	public float getMaxDistance() {
 		return maxDistance;
 	}
 
-	public void setMaxDistance(float maxDistance) {
+	public void setMaxDistance( float maxDistance ) {
 		this.maxDistance = maxDistance;
 	}
 
@@ -390,7 +391,7 @@ public class BackgroundGmmCommon {
 		return significantWeight;
 	}
 
-	public void setSignificantWeight(float significantWeight) {
+	public void setSignificantWeight( float significantWeight ) {
 		this.significantWeight = significantWeight;
 	}
 
@@ -398,7 +399,7 @@ public class BackgroundGmmCommon {
 		return initialVariance;
 	}
 
-	public void setInitialVariance(float initialVariance) {
+	public void setInitialVariance( float initialVariance ) {
 		this.initialVariance = initialVariance;
 	}
 }

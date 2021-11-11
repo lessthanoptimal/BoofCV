@@ -74,8 +74,7 @@ public class BackgroundMovingGaussian_SB<T extends ImageGray<T>, Motion extends 
 		inputWrapper = FactoryGImageGray.create(imageType);
 	}
 
-	@Override
-	public void initialize( int backgroundWidth, int backgroundHeight, Motion homeToWorld ) {
+	@Override public void initialize( int backgroundWidth, int backgroundHeight, Motion homeToWorld ) {
 		background.reshape(backgroundWidth, backgroundHeight);
 		GImageMiscOps.fill(background.getBand(0), 0);
 		GImageMiscOps.fill(background.getBand(1), -1);
@@ -87,14 +86,12 @@ public class BackgroundMovingGaussian_SB<T extends ImageGray<T>, Motion extends 
 		this.backgroundHeight = backgroundHeight;
 	}
 
-	@Override
-	public void reset() {
+	@Override public void reset() {
 		GImageMiscOps.fill(background.getBand(0), 0);
 		GImageMiscOps.fill(background.getBand(1), -1);
 	}
 
-	@Override
-	protected void updateBackground( int x0, int y0, int x1, int y1, T frame ) {
+	@Override protected void updateBackground( int x0, int y0, int x1, int y1, T frame ) {
 		transform.setModel(worldToCurrent);
 		interpolateInput.setImage(frame);
 
@@ -126,8 +123,7 @@ public class BackgroundMovingGaussian_SB<T extends ImageGray<T>, Motion extends 
 		}
 	}
 
-	@Override
-	protected void _segment( Motion currentToWorld, T frame, GrayU8 segmented ) {
+	@Override protected void _segment( Motion currentToWorld, T frame, GrayU8 segmented ) {
 		transform.setModel(currentToWorld);
 		inputWrapper.wrap(frame);
 

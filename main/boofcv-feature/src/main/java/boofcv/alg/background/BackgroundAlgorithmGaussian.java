@@ -53,33 +53,37 @@ public interface BackgroundAlgorithmGaussian {
 
 	/**
 	 * Returns the initial variance assigned to a pixel
+	 *
 	 * @return initial variance
 	 */
 	float getInitialVariance();
 
 	/**
 	 * Sets the initial variance assigned to a pixel
+	 *
 	 * @param initialVariance initial variance
 	 */
-	void setInitialVariance(float initialVariance);
+	void setInitialVariance( float initialVariance );
 
 	/**
 	 * Returns the learning rate.
+	 *
 	 * @return 0 (slow) to 1 (fast)
 	 */
 	float getLearnRate();
 
 	/**
 	 * Specifies the learning rate
+	 *
 	 * @param learnRate 0 (slow) to 1 (fast)
 	 */
-	void setLearnRate(float learnRate);
+	void setLearnRate( float learnRate );
 
 	float getThreshold();
 
-	void setThreshold(float threshold);
+	void setThreshold( float threshold );
 
-	public float getMinimumDifference();
+	float getMinimumDifference();
 
-	public void setMinimumDifference(float minimumDifference);
+	void setMinimumDifference( float minimumDifference );
 }

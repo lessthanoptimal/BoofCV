@@ -68,43 +68,35 @@ public abstract class BackgroundStationaryGaussian<T extends ImageBase<T>>
 		this.threshold = threshold;
 	}
 
-	@Override
-	public float getInitialVariance() {
+	@Override public float getInitialVariance() {
 		return initialVariance;
 	}
 
-	@Override
-	public void setInitialVariance( float initialVariance ) {
+	@Override public void setInitialVariance( float initialVariance ) {
 		this.initialVariance = initialVariance;
 	}
 
-	@Override
-	public float getLearnRate() {
+	@Override public float getLearnRate() {
 		return learnRate;
 	}
 
-	@Override
-	public void setLearnRate( float learnRate ) {
+	@Override public void setLearnRate( float learnRate ) {
 		this.learnRate = learnRate;
 	}
 
-	@Override
-	public float getThreshold() {
+	@Override public float getThreshold() {
 		return threshold;
 	}
 
-	@Override
-	public void setThreshold( float threshold ) {
+	@Override public void setThreshold( float threshold ) {
 		this.threshold = threshold;
 	}
 
-	@Override
-	public float getMinimumDifference() {
+	@Override public float getMinimumDifference() {
 		return minimumDifference;
 	}
 
-	@Override
-	public void setMinimumDifference( float minimumDifference ) {
+	@Override public void setMinimumDifference( float minimumDifference ) {
 		this.minimumDifference = minimumDifference;
 	}
 }

@@ -39,8 +39,7 @@ public class BackgroundMovingGmm_MB<T extends ImageMultiBand<T>, Motion extends 
 		super(learningPeriod, decayCoef, maxGaussians, transformImageType, imageType);
 	}
 
-	@Override
-	protected void updateBackground(int x0, int y0, int x1, int y1, T frame) {
+	@Override protected void updateBackground(int x0, int y0, int x1, int y1, T frame) {
 
 		common.inputWrapperMB.wrap(frame);
 		transform.setModel(worldToCurrent);
@@ -64,8 +63,7 @@ public class BackgroundMovingGmm_MB<T extends ImageMultiBand<T>, Motion extends 
 		}
 	}
 
-	@Override
-	protected void _segment(Motion currentToWorld, T frame, GrayU8 segmented) {
+	@Override protected void _segment(Motion currentToWorld, T frame, GrayU8 segmented) {
 		common.inputWrapperMB.wrap(frame);
 		transform.setModel(currentToWorld);
 		common.unknownValue = unknownValue;

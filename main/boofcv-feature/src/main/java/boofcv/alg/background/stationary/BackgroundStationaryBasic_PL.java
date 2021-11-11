@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -30,24 +30,21 @@ import boofcv.struct.image.*;
  *
  * @author Peter Abeles
  */
-public class BackgroundStationaryBasic_PL<T extends ImageGray<T>>
-	extends BackgroundStationaryBasic<Planar<T>>
-{
+public class BackgroundStationaryBasic_PL<T extends ImageGray<T>> extends BackgroundStationaryBasic<Planar<T>> {
 	// storage for background image
 	protected Planar<GrayF32> background;
 
 	// wrapper which provides abstraction across image types
 	protected GImageMultiBand inputWrapper;
 
-	protected float inputPixels[];
+	protected float[] inputPixels;
 
-	public BackgroundStationaryBasic_PL(float learnRate, float threshold,
-										ImageType<Planar<T>> imageType) {
+	public BackgroundStationaryBasic_PL( float learnRate, float threshold, ImageType<Planar<T>> imageType ) {
 		super(learnRate, threshold, imageType);
 
 		int numBands = imageType.getNumBands();
 
-		background = new Planar<>(GrayF32.class,0,0,numBands);
+		background = new Planar<>(GrayF32.class, 0, 0, numBands);
 
 		inputWrapper = FactoryGImageMultiBand.create(imageType);
 
@@ -63,21 +60,18 @@ public class BackgroundStationaryBasic_PL<T extends ImageGray<T>>
 		return background;
 	}
 
-	@Override
-	public void reset() {
-		background.reshape(0,0);
+	@Override public void reset() {
+		background.reshape(0, 0);
 	}
 
-	@Override
-	public void updateBackground( Planar<T> frame) {
-		if( background.width != frame.width ) {
+	@Override public void updateBackground( Planar<T> frame ) {
+		if (background.width != frame.width) {
 			background.reshape(frame.width, frame.height);
 			GConvertImage.convert(frame, background);
 			return;
-		} else {
-			InputSanityCheck.checkSameShape(background,frame);
 		}
 
+		InputSanityCheck.checkSameShape(background, frame);
 		inputWrapper.wrap(frame);
 
 		int numBands = background.getNumBands();
@@ -87,7 +81,7 @@ public class BackgroundStationaryBasic_PL<T extends ImageGray<T>>
 		for (int y = 0; y < frame.height; y++) {
 			int indexInput = frame.startIndex + y*frame.stride;
 			int end = indexInput + frame.width;
-			while( indexInput < end ) {
+			while (indexInput < end) {
 				inputWrapper.getF(indexInput, inputPixels);
 
 				for (int band = 0; band < numBands; band++) {
@@ -101,13 +95,13 @@ public class BackgroundStationaryBasic_PL<T extends ImageGray<T>>
 		}
 	}
 
-	@Override
-	public void segment(Planar<T> frame, GrayU8 segmented) {
-		if( background.width != frame.width ) {
-			ImageMiscOps.fill(segmented,unknownValue);
+	@Override public void segment( Planar<T> frame, GrayU8 segmented ) {
+		if (background.width != frame.width) {
+			ImageMiscOps.fill(segmented, unknownValue);
 			return;
 		}
-		InputSanityCheck.checkSameShape(background,frame,segmented);
+
+		InputSanityCheck.checkSameShape(background, frame, segmented);
 		inputWrapper.wrap(frame);
 
 		int numBands = background.getNumBands();
@@ -119,7 +113,7 @@ public class BackgroundStationaryBasic_PL<T extends ImageGray<T>>
 			int indexSegmented = segmented.startIndex + y*segmented.stride;
 
 			int end = indexInput + frame.width;
-			while( indexInput < end ) {
+			while (indexInput < end) {
 				inputWrapper.getF(indexInput, inputPixels);
 
 				double sumErrorSq = 0;
@@ -140,6 +134,4 @@ public class BackgroundStationaryBasic_PL<T extends ImageGray<T>>
 			}
 		}
 	}
-
-
 }

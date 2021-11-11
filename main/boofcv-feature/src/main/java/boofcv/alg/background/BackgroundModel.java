@@ -34,7 +34,7 @@ public abstract class BackgroundModel<T extends ImageBase<T>> {
 	// value assigned to pixels outside the image. Default to 0, which is background
 	protected byte unknownValue = 0;
 
-	protected BackgroundModel(ImageType<T> imageType) {
+	protected BackgroundModel( ImageType<T> imageType ) {
 		this.imageType = imageType;
 	}
 
@@ -42,7 +42,6 @@ public abstract class BackgroundModel<T extends ImageBase<T>> {
 	 * Resets model to its original state
 	 */
 	public abstract void reset();
-
 
 	/**
 	 * Returns the value that pixels in the segmented image are assigned if there is no background information.
@@ -55,10 +54,11 @@ public abstract class BackgroundModel<T extends ImageBase<T>> {
 
 	/**
 	 * Specify the value of a segmented pixel which has no corresponding pixel in the background image.
+	 *
 	 * @param unknownValue Value for pixels with out a background pixel. 0 to 255, inclusive.
 	 */
-	public void setUnknownValue(int unknownValue) {
-		if( unknownValue < 0 || unknownValue > 255 )
+	public void setUnknownValue( int unknownValue ) {
+		if (unknownValue < 0 || unknownValue > 255)
 			throw new IllegalArgumentException("out of range. 0 to 255");
 		this.unknownValue = (byte)unknownValue;
 	}

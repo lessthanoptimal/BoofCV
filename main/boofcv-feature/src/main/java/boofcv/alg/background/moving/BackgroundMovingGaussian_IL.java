@@ -85,8 +85,7 @@ public class BackgroundMovingGaussian_IL<T extends ImageInterleaved<T>, Motion e
 		pixelInput = new float[numBands];
 	}
 
-	@Override
-	public void initialize( int backgroundWidth, int backgroundHeight, Motion homeToWorld ) {
+	@Override public void initialize( int backgroundWidth, int backgroundHeight, Motion homeToWorld ) {
 		background.reshape(backgroundWidth, backgroundHeight);
 		GImageMiscOps.fill(background, -1);
 
@@ -97,13 +96,11 @@ public class BackgroundMovingGaussian_IL<T extends ImageInterleaved<T>, Motion e
 		this.backgroundHeight = backgroundHeight;
 	}
 
-	@Override
-	public void reset() {
+	@Override public void reset() {
 		GImageMiscOps.fill(background, -1);
 	}
 
-	@Override
-	protected void updateBackground( int x0, int y0, int x1, int y1, T frame ) {
+	@Override protected void updateBackground( int x0, int y0, int x1, int y1, T frame ) {
 		transform.setModel(worldToCurrent);
 		interpolateInput.setImage(frame);
 
@@ -140,8 +137,7 @@ public class BackgroundMovingGaussian_IL<T extends ImageInterleaved<T>, Motion e
 		}
 	}
 
-	@Override
-	protected void _segment( Motion currentToWorld, T frame, GrayU8 segmented ) {
+	@Override protected void _segment( Motion currentToWorld, T frame, GrayU8 segmented ) {
 		transform.setModel(currentToWorld);
 		inputWrapper.wrap(frame);
 
