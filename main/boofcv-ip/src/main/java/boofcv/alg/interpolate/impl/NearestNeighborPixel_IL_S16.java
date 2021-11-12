@@ -77,8 +77,8 @@ public class NearestNeighborPixel_IL_S16 extends NearestNeighborPixelMB<Interlea
 
 	@Override
 	public InterpolatePixelMB<InterleavedS16> copy() {
-		NearestNeighborPixel_IL_S16 out = new NearestNeighborPixel_IL_S16();
-		out.setBorder(border);
+		var out = new NearestNeighborPixel_IL_S16();
+		out.setBorder(border.copy());
 		return out;
 	}
 }

@@ -126,8 +126,8 @@ public class ImplBilinearPixel_IL_F64 extends BilinearPixelMB<InterleavedF64> {
 
 	@Override
 	public InterpolatePixelMB<InterleavedF64> copy() {
-		ImplBilinearPixel_IL_F64 out = new ImplBilinearPixel_IL_F64(temp0.length);
-		out.setBorder(border);
+		var out = new ImplBilinearPixel_IL_F64(temp0.length);
+		out.setBorder(border.copy());
 		return out;
 	}
 	@Override

@@ -126,8 +126,8 @@ public class ImplBilinearPixel_IL_F32 extends BilinearPixelMB<InterleavedF32> {
 
 	@Override
 	public InterpolatePixelMB<InterleavedF32> copy() {
-		ImplBilinearPixel_IL_F32 out = new ImplBilinearPixel_IL_F32(temp0.length);
-		out.setBorder(border);
+		var out = new ImplBilinearPixel_IL_F32(temp0.length);
+		out.setBorder(border.copy());
 		return out;
 	}
 	@Override

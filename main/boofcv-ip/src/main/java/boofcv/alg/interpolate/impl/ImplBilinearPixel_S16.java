@@ -41,9 +41,9 @@ public class ImplBilinearPixel_S16 extends BilinearPixelS<GrayS16> {
 	public ImplBilinearPixel_S16() {}
 
 	public ImplBilinearPixel_S16(GrayS16 orig) {
-
 		setImage(orig);
 	}
+
 	@Override
 	public float get_fast(float x, float y) {
 		int xt = (int) x;
@@ -91,8 +91,8 @@ public class ImplBilinearPixel_S16 extends BilinearPixelS<GrayS16> {
 
 	@Override
 	public InterpolatePixelS<GrayS16> copy() {
-		ImplBilinearPixel_S16 out = new ImplBilinearPixel_S16();
-		out.setBorder(border);
+		var out = new ImplBilinearPixel_S16();
+		out.setBorder(border.copy());
 		return out;
 	}
 

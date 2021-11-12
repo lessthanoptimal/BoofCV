@@ -73,8 +73,8 @@ public class NearestNeighborPixel_U8 extends NearestNeighborPixelS<GrayU8> {
 
 	@Override
 	public InterpolatePixelS<GrayU8> copy() {
-		NearestNeighborPixel_U8 out = new NearestNeighborPixel_U8();
-		out.setBorder(border);
+		var out = new NearestNeighborPixel_U8();
+		out.setBorder(border.copy());
 		return out;
 	}
 
