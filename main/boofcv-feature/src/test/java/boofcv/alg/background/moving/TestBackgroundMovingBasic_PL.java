@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -38,9 +38,8 @@ public class TestBackgroundMovingBasic_PL extends GenericBackgroundMovingBasicCh
 	}
 
 	@Override
-	public <T extends ImageBase<T>> BackgroundModelMoving<T, Homography2D_F32>
-	create(ImageType<T> imageType) {
-		PointTransformHomography_F32 transform = new PointTransformHomography_F32();
+	public <T extends ImageBase<T>> BackgroundModelMoving<T, Homography2D_F32> create( ImageType<T> imageType ) {
+		var transform = new PointTransformHomography_F32();
 		return new BackgroundMovingBasic_PL(0.05f, 10f, transform, InterpolationType.BILINEAR, imageType);
 	}
 }

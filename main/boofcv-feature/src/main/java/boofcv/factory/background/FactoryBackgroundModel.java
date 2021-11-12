@@ -77,14 +77,26 @@ public class FactoryBackgroundModel {
 
 		config.checkValidity();
 
-		BackgroundMovingBasic<T, Motion> ret = switch (imageType.getFamily()) {
-			case GRAY -> new BackgroundMovingBasic_SB(config.learnRate, config.threshold,
-					transform, config.interpolation, imageType.getImageClass());
-			case PLANAR -> new BackgroundMovingBasic_PL(config.learnRate, config.threshold,
-					transform, config.interpolation, imageType);
-			case INTERLEAVED -> new BackgroundMovingBasic_IL(config.learnRate, config.threshold,
-					transform, config.interpolation, imageType);
-		};
+		BackgroundMovingBasic<T, Motion> ret;
+		if (BoofConcurrency.isUseConcurrent()) {
+			ret = switch (imageType.getFamily()) {
+				case GRAY -> new BackgroundMovingBasic_SB_MT(config.learnRate, config.threshold,
+						transform, config.interpolation, imageType.getImageClass());
+				case PLANAR -> new BackgroundMovingBasic_PL_MT(config.learnRate, config.threshold,
+						transform, config.interpolation, imageType);
+				case INTERLEAVED -> new BackgroundMovingBasic_IL_MT(config.learnRate, config.threshold,
+						transform, config.interpolation, imageType);
+			};
+		} else {
+			ret = switch (imageType.getFamily()) {
+				case GRAY -> new BackgroundMovingBasic_SB(config.learnRate, config.threshold,
+						transform, config.interpolation, imageType.getImageClass());
+				case PLANAR -> new BackgroundMovingBasic_PL(config.learnRate, config.threshold,
+						transform, config.interpolation, imageType);
+				case INTERLEAVED -> new BackgroundMovingBasic_IL(config.learnRate, config.threshold,
+						transform, config.interpolation, imageType);
+			};
+		}
 
 		ret.setUnknownValue(config.unknownValue);
 		return ret;
@@ -99,7 +111,6 @@ public class FactoryBackgroundModel {
 	 */
 	public static <T extends ImageBase<T>>
 	BackgroundStationaryGaussian<T> stationaryGaussian( ConfigBackgroundGaussian config, ImageType<T> imageType ) {
-
 		config.checkValidity();
 
 		BackgroundStationaryGaussian<T> ret;
@@ -139,14 +150,27 @@ public class FactoryBackgroundModel {
 
 		config.checkValidity();
 
-		BackgroundMovingGaussian<T, Motion> ret = switch (imageType.getFamily()) {
-			case GRAY -> new BackgroundMovingGaussian_SB(config.learnRate, config.threshold,
-					transform, config.interpolation, imageType.getImageClass());
-			case PLANAR -> new BackgroundMovingGaussian_PL(config.learnRate, config.threshold,
-					transform, config.interpolation, imageType);
-			case INTERLEAVED -> new BackgroundMovingGaussian_IL(config.learnRate, config.threshold,
-					transform, config.interpolation, imageType);
-		};
+		BackgroundMovingGaussian<T, Motion> ret;
+
+		if (BoofConcurrency.isUseConcurrent()) {
+			ret = switch (imageType.getFamily()) {
+				case GRAY -> new BackgroundMovingGaussian_SB_MT(config.learnRate, config.threshold,
+						transform, config.interpolation, imageType.getImageClass());
+				case PLANAR -> new BackgroundMovingGaussian_PL_MT(config.learnRate, config.threshold,
+						transform, config.interpolation, imageType);
+				case INTERLEAVED -> new BackgroundMovingGaussian_IL_MT(config.learnRate, config.threshold,
+						transform, config.interpolation, imageType);
+			};
+		} else {
+			ret = switch (imageType.getFamily()) {
+				case GRAY -> new BackgroundMovingGaussian_SB(config.learnRate, config.threshold,
+						transform, config.interpolation, imageType.getImageClass());
+				case PLANAR -> new BackgroundMovingGaussian_PL(config.learnRate, config.threshold,
+						transform, config.interpolation, imageType);
+				case INTERLEAVED -> new BackgroundMovingGaussian_IL(config.learnRate, config.threshold,
+						transform, config.interpolation, imageType);
+			};
+		}
 
 		ret.setInitialVariance(config.initialVariance);
 		ret.setMinimumDifference(config.minimumDifference);
@@ -211,12 +235,23 @@ public class FactoryBackgroundModel {
 		else
 			config.checkValidity();
 
-		BackgroundMovingGmm<T, Motion> ret = switch (imageType.getFamily()) {
-			case GRAY -> new BackgroundMovingGmm_SB(config.learningPeriod, config.decayCoefient,
-					config.numberOfGaussian, transform, imageType);
-			case PLANAR, INTERLEAVED -> new BackgroundMovingGmm_MB(config.learningPeriod, config.decayCoefient,
-					config.numberOfGaussian, transform, imageType);
-		};
+		BackgroundMovingGmm<T, Motion> ret;
+
+		if (BoofConcurrency.isUseConcurrent()) {
+			ret = switch (imageType.getFamily()) {
+				case GRAY -> new BackgroundMovingGmm_SB_MT(config.learningPeriod, config.decayCoefient,
+						config.numberOfGaussian, transform, imageType);
+				case PLANAR, INTERLEAVED -> new BackgroundMovingGmm_MB_MT(config.learningPeriod, config.decayCoefient,
+						config.numberOfGaussian, transform, imageType);
+			};
+		} else {
+			ret = switch (imageType.getFamily()) {
+				case GRAY -> new BackgroundMovingGmm_SB(config.learningPeriod, config.decayCoefient,
+						config.numberOfGaussian, transform, imageType);
+				case PLANAR, INTERLEAVED -> new BackgroundMovingGmm_MB(config.learningPeriod, config.decayCoefient,
+						config.numberOfGaussian, transform, imageType);
+			};
+		}
 
 		ret.setInitialVariance(config.initialVariance);
 		ret.setMaxDistance(config.maxDistance);

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -30,8 +30,7 @@ import georegression.struct.homography.Homography2D_F32;
 /**
  * @author Peter Abeles
  */
-public class TestBackgroundMovingGaussian_PL extends GenericBackgroundMovingGaussianChecks
-{
+public class TestBackgroundMovingGaussian_PL extends GenericBackgroundMovingGaussianChecks {
 	public TestBackgroundMovingGaussian_PL() {
 		imageTypes.add(ImageType.pl(2, GrayU8.class));
 		imageTypes.add(ImageType.pl(3, GrayU8.class));
@@ -40,10 +39,9 @@ public class TestBackgroundMovingGaussian_PL extends GenericBackgroundMovingGaus
 
 	@Override
 	public <T extends ImageBase<T>> BackgroundModelMoving<T, Homography2D_F32>
-	create(ImageType<T> imageType) {
-		PointTransformHomography_F32 transform = new PointTransformHomography_F32();
-		BackgroundMovingGaussian_PL alg =
-				new BackgroundMovingGaussian_PL(0.05f,16,transform, InterpolationType.BILINEAR,imageType);
+	create( ImageType<T> imageType ) {
+		var transform = new PointTransformHomography_F32();
+		var alg = new BackgroundMovingGaussian_PL(0.05f, 16, transform, InterpolationType.BILINEAR, imageType);
 		alg.setInitialVariance(12);
 		return alg;
 	}

@@ -21,7 +21,7 @@ package boofcv.alg.background.stationary;
 import boofcv.alg.background.BackgroundModelStationary;
 import boofcv.struct.image.*;
 
-class TestBackgroundStationaryGmm_MB_MT extends CompareBackgroundStationarySingleToMultiChecks {
+class TestBackgroundStationaryGmm_MB_MT extends CompareBackgroundStationaryThreadsChecks {
 	public TestBackgroundStationaryGmm_MB_MT() {
 		imageTypes.add(ImageType.il(3, InterleavedU8.class));
 		imageTypes.add(ImageType.il(3, InterleavedF32.class));

@@ -16,32 +16,32 @@
  * limitations under the License.
  */
 
-package boofcv.alg.background.stationary;
+package boofcv.alg.background.moving;
 
-import boofcv.alg.background.BackgroundModelStationary;
+import boofcv.alg.background.BackgroundModelMoving;
+import boofcv.alg.distort.PointTransformHomography_F32;
+import boofcv.alg.interpolate.InterpolationType;
 import boofcv.struct.image.GrayF32;
 import boofcv.struct.image.GrayU8;
 import boofcv.struct.image.ImageBase;
 import boofcv.struct.image.ImageType;
+import georegression.struct.homography.Homography2D_F32;
 
-class TestBackgroundStationaryGaussian_PL_MT extends CompareBackgroundStationaryThreadsChecks {
-	public TestBackgroundStationaryGaussian_PL_MT() {
+@SuppressWarnings({"unchecked", "rawtypes"})
+class TestBackgroundMovingBasic_PL_MT extends GenericBackgroundMovingThreadsChecks {
+	public TestBackgroundMovingBasic_PL_MT() {
 		imageTypes.add(ImageType.pl(2, GrayU8.class));
 		imageTypes.add(ImageType.pl(3, GrayU8.class));
 		imageTypes.add(ImageType.pl(3, GrayF32.class));
 	}
 
-	@Override public <T extends ImageBase<T>> BackgroundModelStationary<T>
+	@Override public <T extends ImageBase<T>> BackgroundModelMoving<T, Homography2D_F32>
 	create( boolean singleThread, ImageType<T> imageType ) {
-		if (singleThread) {
-			var alg = new BackgroundStationaryGaussian_PL(0.05f, 10f, imageType);
-			alg.setInitialVariance(12);
-			return alg;
-		} else {
-			var alg = new BackgroundStationaryGaussian_PL_MT(0.05f, 10f, imageType);
-			alg.setInitialVariance(12);
-			return alg;
-		}
+		var transform = new PointTransformHomography_F32();
+		if (singleThread)
+			return new BackgroundMovingBasic_PL(0.05f, 10f, transform, InterpolationType.BILINEAR, imageType);
+		else
+			return new BackgroundMovingBasic_PL_MT(0.05f, 10f, transform, InterpolationType.BILINEAR, imageType);
 	}
 }
 

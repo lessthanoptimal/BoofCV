@@ -34,13 +34,12 @@ import org.junit.jupiter.api.Test;
  */
 public abstract class GenericBackgroundMovingBasicChecks extends GenericBackgroundModelMovingChecks {
 
-
 	@Test void performStationaryTests() {
 		GenericBackgroundStationaryBasicChecks stationary = new GenericBackgroundStationaryBasicChecks() {
 			@Override
-			public BackgroundModelStationary create(ImageType imageType) {
+			public BackgroundModelStationary create( ImageType imageType ) {
 				BackgroundModelMoving moving = GenericBackgroundMovingBasicChecks.this.create(imageType);
-				return new MovingToStationary((BackgroundMovingBasic)moving,new Homography2D_F32());
+				return new MovingToStationary((BackgroundMovingBasic)moving, new Homography2D_F32());
 			}
 		};
 
@@ -54,19 +53,19 @@ public abstract class GenericBackgroundMovingBasicChecks extends GenericBackgrou
 		BackgroundMovingBasic moving;
 		InvertibleTransform stationary;
 
-		public MovingToStationary( BackgroundMovingBasic moving , InvertibleTransform stationary ) {
-			super(0,0, moving.getImageType());
+		public MovingToStationary( BackgroundMovingBasic moving, InvertibleTransform stationary ) {
+			super(0, 0, moving.getImageType());
 			this.stationary = stationary;
 		}
 
 		@Override
-		public void updateBackground(ImageBase frame) {
-			moving.updateBackground(stationary,frame);
+		public void updateBackground( ImageBase frame ) {
+			moving.updateBackground(stationary, frame);
 		}
 
 		@Override
-		public void segment(ImageBase frame, GrayU8 segmented) {
-			moving.segment(stationary,frame,segmented);
+		public void segment( ImageBase frame, GrayU8 segmented ) {
+			moving.segment(stationary, frame, segmented);
 		}
 
 		@Override
@@ -80,7 +79,7 @@ public abstract class GenericBackgroundMovingBasicChecks extends GenericBackgrou
 		}
 
 		@Override
-		public void setLearnRate(float learnRate) {
+		public void setLearnRate( float learnRate ) {
 			moving.setLearnRate(learnRate);
 		}
 
@@ -90,7 +89,7 @@ public abstract class GenericBackgroundMovingBasicChecks extends GenericBackgrou
 		}
 
 		@Override
-		public void setThreshold(float threshold) {
+		public void setThreshold( float threshold ) {
 			moving.setThreshold(threshold);
 		}
 
@@ -100,7 +99,7 @@ public abstract class GenericBackgroundMovingBasicChecks extends GenericBackgrou
 		}
 
 		@Override
-		public void setUnknownValue(int unknownValue) {
+		public void setUnknownValue( int unknownValue ) {
 			moving.setUnknownValue(unknownValue);
 		}
 	}

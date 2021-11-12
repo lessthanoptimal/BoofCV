@@ -24,6 +24,8 @@ import boofcv.struct.distort.Point2Transform2Model_F32;
 import boofcv.struct.image.ImageBase;
 import boofcv.struct.image.ImageType;
 import georegression.struct.InvertibleTransform;
+import lombok.Getter;
+import lombok.Setter;
 
 /**
  * <p>Implementation of {@link BackgroundAlgorithmBasic} for moving images.</p>
@@ -37,13 +39,13 @@ public abstract class BackgroundMovingBasic<T extends ImageBase<T>, Motion exten
 	/**
 	 * Specifies how fast it will adapt. 0 to 1, inclusive. 0 = static  1.0 = instant.
 	 */
-	protected float learnRate;
+	@Getter @Setter protected float learnRate;
 
 	/**
 	 * Threshold for classifying a pixel as background or not. If euclidean distance less than or equal to this value
 	 * it is background.
 	 */
-	protected float threshold;
+	@Getter @Setter protected float threshold;
 
 	/**
 	 * Configures background model
@@ -61,22 +63,6 @@ public abstract class BackgroundMovingBasic<T extends ImageBase<T>, Motion exten
 			throw new IllegalArgumentException("LearnRate must be 0 <= rate <= 1.0f");
 
 		this.learnRate = learnRate;
-		this.threshold = threshold;
-	}
-
-	@Override public float getLearnRate() {
-		return learnRate;
-	}
-
-	@Override public void setLearnRate( float learnRate ) {
-		this.learnRate = learnRate;
-	}
-
-	@Override public float getThreshold() {
-		return threshold;
-	}
-
-	@Override public void setThreshold( float threshold ) {
 		this.threshold = threshold;
 	}
 }

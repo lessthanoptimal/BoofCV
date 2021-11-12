@@ -20,23 +20,27 @@ package boofcv.alg.background.moving;
 
 import boofcv.alg.background.BackgroundModelMoving;
 import boofcv.alg.distort.PointTransformHomography_F32;
-import boofcv.struct.image.*;
+import boofcv.alg.interpolate.InterpolationType;
+import boofcv.struct.image.GrayF32;
+import boofcv.struct.image.GrayU8;
+import boofcv.struct.image.ImageBase;
+import boofcv.struct.image.ImageType;
 import georegression.struct.homography.Homography2D_F32;
 
-/**
- * @author Peter Abeles
- */
-public class TestBackgroundMovingGmm_MB extends GenericBackgroundMovingGaussianChecks {
-	public TestBackgroundMovingGmm_MB() {
-		imageTypes.add(ImageType.il(3, InterleavedU8.class));
-		imageTypes.add(ImageType.il(3, InterleavedF32.class));
-		imageTypes.add(ImageType.pl(3, GrayU8.class));
-		imageTypes.add(ImageType.pl(3, GrayF32.class));
+@SuppressWarnings({"unchecked", "rawtypes"})
+class TestBackgroundMovingBasic_SB_MT extends GenericBackgroundMovingThreadsChecks {
+	public TestBackgroundMovingBasic_SB_MT() {
+		imageTypes.add(ImageType.single(GrayU8.class));
+		imageTypes.add(ImageType.single(GrayF32.class));
 	}
 
-	@Override
-	public <T extends ImageBase<T>> BackgroundModelMoving<T, Homography2D_F32> create( ImageType<T> imageType ) {
+	@Override public <T extends ImageBase<T>> BackgroundModelMoving<T, Homography2D_F32>
+	create( boolean singleThread, ImageType<T> imageType ) {
 		var transform = new PointTransformHomography_F32();
-		return new BackgroundMovingGmm_MB(1000F, 0.001F, 10, transform, imageType);
+		if (singleThread)
+			return new BackgroundMovingBasic_SB(0.05f, 10f, transform, InterpolationType.BILINEAR, imageType.getImageClass());
+		else
+			return new BackgroundMovingBasic_SB_MT(0.05f, 10f, transform, InterpolationType.BILINEAR, imageType.getImageClass());
 	}
 }
+

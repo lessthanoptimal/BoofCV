@@ -37,9 +37,9 @@ public abstract class GenericBackgroundMovingGmmChecks extends GenericBackground
 	@Test void performStationaryTests() {
 		GenericBackgroundStationaryGmmChecks stationary = new GenericBackgroundStationaryGmmChecks() {
 			@Override
-			public BackgroundModelStationary create(ImageType imageType) {
+			public BackgroundModelStationary create( ImageType imageType ) {
 				BackgroundModelMoving moving = GenericBackgroundMovingGmmChecks.this.create(imageType);
-				return new MovingToStationary((BackgroundMovingGmm)moving,new Homography2D_F32());
+				return new MovingToStationary((BackgroundMovingGmm)moving, new Homography2D_F32());
 			}
 		};
 
@@ -53,19 +53,19 @@ public abstract class GenericBackgroundMovingGmmChecks extends GenericBackground
 		BackgroundMovingGmm moving;
 		InvertibleTransform stationary;
 
-		public MovingToStationary( BackgroundMovingGmm moving , InvertibleTransform stationary ) {
-			super(moving.getLearningPeriod(),moving.common.decay,moving.common.maxGaussians,moving.getImageType());
+		public MovingToStationary( BackgroundMovingGmm moving, InvertibleTransform stationary ) {
+			super(moving.getLearningPeriod(), moving.common.decay, moving.common.maxGaussians, moving.getImageType());
 			this.stationary = stationary;
 		}
 
 		@Override
-		public void updateBackground(ImageBase frame) {
-			moving.updateBackground(stationary,frame);
+		public void updateBackground( ImageBase frame ) {
+			moving.updateBackground(stationary, frame);
 		}
 
 		@Override
-		public void segment(ImageBase frame, GrayU8 segmented) {
-			moving.segment(stationary,frame,segmented);
+		public void segment( ImageBase frame, GrayU8 segmented ) {
+			moving.segment(stationary, frame, segmented);
 		}
 
 		@Override
@@ -79,7 +79,7 @@ public abstract class GenericBackgroundMovingGmmChecks extends GenericBackground
 		}
 
 		@Override
-		public void setInitialVariance(float initialVariance) {
+		public void setInitialVariance( float initialVariance ) {
 			moving.setInitialVariance(initialVariance);
 		}
 
@@ -89,7 +89,7 @@ public abstract class GenericBackgroundMovingGmmChecks extends GenericBackground
 		}
 
 		@Override
-		public void setUnknownValue(int unknownValue) {
+		public void setUnknownValue( int unknownValue ) {
 			moving.setUnknownValue(unknownValue);
 		}
 	}

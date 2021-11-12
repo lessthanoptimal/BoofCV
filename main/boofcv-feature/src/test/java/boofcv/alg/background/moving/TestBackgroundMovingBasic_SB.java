@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -30,17 +30,15 @@ import georegression.struct.homography.Homography2D_F32;
 /**
  * @author Peter Abeles
  */
-public class TestBackgroundMovingBasic_SB extends GenericBackgroundMovingBasicChecks
-{
+public class TestBackgroundMovingBasic_SB extends GenericBackgroundMovingBasicChecks {
 	public TestBackgroundMovingBasic_SB() {
 		imageTypes.add(ImageType.single(GrayU8.class));
 		imageTypes.add(ImageType.single(GrayF32.class));
 	}
 
 	@Override
-	public <T extends ImageBase<T>> BackgroundModelMoving<T, Homography2D_F32>
-	create(ImageType<T> imageType) {
-		PointTransformHomography_F32 transform = new PointTransformHomography_F32();
-		return new BackgroundMovingBasic_SB(0.05f,10f,transform, InterpolationType.BILINEAR,imageType.getImageClass());
+	public <T extends ImageBase<T>> BackgroundModelMoving<T, Homography2D_F32> create( ImageType<T> imageType ) {
+		var transform = new PointTransformHomography_F32();
+		return new BackgroundMovingBasic_SB(0.05f, 10f, transform, InterpolationType.BILINEAR, imageType.getImageClass());
 	}
 }

@@ -28,6 +28,10 @@ import boofcv.struct.border.BorderType;
 import boofcv.struct.distort.Point2Transform2Model_F32;
 import boofcv.struct.image.*;
 import georegression.struct.InvertibleTransform;
+import georegression.struct.point.Point2D_F32;
+import lombok.Getter;
+
+//CONCURRENT_INLINE import boofcv.concurrency.BoofConcurrency;
 
 /**
  * Implementation of {@link BackgroundMovingBasic} for {@link Planar}.
@@ -36,18 +40,15 @@ import georegression.struct.InvertibleTransform;
  */
 public class BackgroundMovingBasic_IL<T extends ImageInterleaved<T>, Motion extends InvertibleTransform<Motion>>
 		extends BackgroundMovingBasic<T, Motion> {
-	// where the background image is stored
-	protected InterleavedF32 background;
+	/** Background model. Pixels which haven't been assigned yet are marked with {@link Float#MAX_VALUE}. */
+	@Getter protected InterleavedF32 background;
 	// interpolates the input image
-	protected InterpolatePixelMB<T> interpolationInput;
+	protected InterpolatePixelMB<T> interpolationInput; // todo move into threads
 	// interpolates the background image
-	protected InterpolatePixelMB<InterleavedF32> interpolationBG;
+	protected InterpolatePixelMB<InterleavedF32> interpolationBG; // todo move into threads
 
 	// wrappers which provide abstraction across image types
 	protected GImageMultiBand inputWrapper;
-	// storage for multi-band pixel values
-	protected float[] pixelInput;
-	protected float[] pixelBack;
 
 	public BackgroundMovingBasic_IL( float learnRate, float threshold,
 									 Point2Transform2Model_F32<Motion> transform,
@@ -64,19 +65,7 @@ public class BackgroundMovingBasic_IL<T extends ImageInterleaved<T>, Motion exte
 				0, 255, interpType, BorderType.EXTENDED, ImageType.il(numBands, InterleavedF32.class));
 		this.interpolationBG.setImage(background);
 
-		pixelInput = new float[numBands];
-		pixelBack = new float[numBands];
-
 		inputWrapper = FactoryGImageMultiBand.create(imageType);
-	}
-
-	/**
-	 * Returns the background image. Pixels which haven't been assigned yet are marked with {@link Float#MAX_VALUE}.
-	 *
-	 * @return background image.
-	 */
-	public InterleavedF32 getBackground() {
-		return background;
 	}
 
 	@Override public void initialize( int backgroundWidth, int backgroundHeight, Motion homeToWorld ) {
@@ -95,25 +84,27 @@ public class BackgroundMovingBasic_IL<T extends ImageInterleaved<T>, Motion exte
 	}
 
 	@Override protected void updateBackground( int x0, int y0, int x1, int y1, T frame ) {
-
-		transform.setModel(worldToCurrent);
 		interpolationInput.setImage(frame);
 
 		final int numBands = frame.getNumBands();
-		float minusLearn = 1.0f - learnRate;
+		final float minusLearn = 1.0f - learnRate;
 
-		for (int y = y0; y < y1; y++) {
+		//CONCURRENT_BELOW BoofConcurrency.loopBlocks(y0, y1, 20, workspaceValues, (values, idx0, idx1) -> {
+		final int idx0 = y0, idx1 = y1;
+		final float[] valueInput = values.valueInput;
+		final Point2D_F32 pixel =  values.pixel;
+		values.transform.setModel(currentToWorld);
+		for (int y = idx0; y < idx1; y++) {
 			int indexBG = background.startIndex + y*background.stride + x0*numBands;
 			for (int x = x0; x < x1; x++) {
-				transform.compute(x, y, work);
+				values.transform.compute(x, y, pixel);
 
-				if (work.x >= 0 && work.x < frame.width && work.y >= 0 && work.y < frame.height) {
-
-					interpolationInput.get(work.x, work.y, pixelInput);
+				if (pixel.x >= 0 && pixel.x < frame.width && pixel.y >= 0 && pixel.y < frame.height) {
+					interpolationInput.get(pixel.x, pixel.y, valueInput);
 
 					for (int band = 0; band < numBands; band++, indexBG++) {
 
-						float value = pixelInput[band];
+						float value = valueInput[band];
 						float bg = background.data[indexBG];
 
 						if (bg == Float.MAX_VALUE) {
@@ -127,31 +118,35 @@ public class BackgroundMovingBasic_IL<T extends ImageInterleaved<T>, Motion exte
 				}
 			}
 		}
+		//CONCURRENT_ABOVE }});
 	}
 
 	@Override protected void _segment( Motion currentToWorld, T frame, GrayU8 segmented ) {
-		transform.setModel(currentToWorld);
 		inputWrapper.wrap(frame);
 
-		int numBands = background.getNumBands();
+		final int numBands = background.getNumBands();
 
-		float thresholdSq = numBands*threshold*threshold;
+		final float thresholdSq = numBands*threshold*threshold;
 
-		for (int y = 0; y < frame.height; y++) {
+		//CONCURRENT_BELOW BoofConcurrency.loopBlocks(0, frame.height, 20, workspaceValues, (values, idx0, idx1) -> {
+		final int idx0 = 0, idx1 = frame.height;
+		final float[] valueBG = values.valueBG;
+		final Point2D_F32 pixel =  values.pixel;
+		values.transform.setModel(currentToWorld);
+		for (int y = idx0; y < idx1; y++) {
 			int indexFrame = frame.startIndex + y*frame.stride;
 			int indexSegmented = segmented.startIndex + y*segmented.stride;
 
 			for (int x = 0; x < frame.width; x++, indexFrame += numBands, indexSegmented++) {
-				transform.compute(x, y, work);
+				values.transform.compute(x, y, pixel);
 
 				escapeIf:
-				if (work.x >= 0 && work.x < background.width && work.y >= 0 && work.y < background.height) {
-
-					interpolationBG.get(work.x, work.y, pixelBack);
+				if (pixel.x >= 0 && pixel.x < background.width && pixel.y >= 0 && pixel.y < background.height) {
+					interpolationBG.get(pixel.x, pixel.y, valueBG);
 
 					double sumErrorSq = 0;
 					for (int band = 0; band < numBands; band++) {
-						float bg = pixelBack[band];
+						float bg = valueBG[band];
 						float pixelFrame = inputWrapper.getF(indexFrame + band);
 
 						if (bg == Float.MAX_VALUE) {
@@ -163,16 +158,13 @@ public class BackgroundMovingBasic_IL<T extends ImageInterleaved<T>, Motion exte
 						}
 					}
 
-					if (sumErrorSq <= thresholdSq) {
-						segmented.data[indexSegmented] = 0;
-					} else {
-						segmented.data[indexSegmented] = 1;
-					}
+					segmented.data[indexSegmented] = (byte)(sumErrorSq <= thresholdSq ? 0 : 1);
 				} else {
 					// there is no background here. Just mark it as not moving to avoid false positives
 					segmented.data[indexSegmented] = unknownValue;
 				}
 			}
 		}
+		//CONCURRENT_ABOVE }});
 	}
 }
