@@ -37,9 +37,9 @@ public abstract class GenericBackgroundMovingGaussianChecks extends GenericBackg
 	@Test void performStationaryTests() {
 		GenericBackgroundStationaryGaussianChecks stationary = new GenericBackgroundStationaryGaussianChecks() {
 			@Override
-			public BackgroundModelStationary create(ImageType imageType) {
+			public BackgroundModelStationary create( ImageType imageType ) {
 				BackgroundModelMoving moving = GenericBackgroundMovingGaussianChecks.this.create(imageType);
-				return new MovingToStationary((BackgroundMovingGaussian)moving,new Homography2D_F32());
+				return new MovingToStationary((BackgroundMovingGaussian)moving, new Homography2D_F32());
 			}
 		};
 
@@ -54,19 +54,19 @@ public abstract class GenericBackgroundMovingGaussianChecks extends GenericBackg
 		BackgroundMovingGaussian moving;
 		InvertibleTransform stationary;
 
-		public MovingToStationary( BackgroundMovingGaussian moving , InvertibleTransform stationary ) {
-			super(0,0, moving.getImageType());
+		public MovingToStationary( BackgroundMovingGaussian moving, InvertibleTransform stationary ) {
+			super(0, 0, moving.getImageType());
 			this.stationary = stationary;
 		}
 
 		@Override
-		public void updateBackground(ImageBase frame) {
-			moving.updateBackground(stationary,frame);
+		public void updateBackground( ImageBase frame ) {
+			moving.updateBackground(stationary, frame);
 		}
 
 		@Override
-		public void segment(ImageBase frame, GrayU8 segmented) {
-			moving.segment(stationary,frame,segmented);
+		public void segment( ImageBase frame, GrayU8 segmented ) {
+			moving.segment(stationary, frame, segmented);
 		}
 
 		@Override
@@ -80,7 +80,7 @@ public abstract class GenericBackgroundMovingGaussianChecks extends GenericBackg
 		}
 
 		@Override
-		public void setLearnRate(float learnRate) {
+		public void setLearnRate( float learnRate ) {
 			moving.setLearnRate(learnRate);
 		}
 
@@ -90,7 +90,7 @@ public abstract class GenericBackgroundMovingGaussianChecks extends GenericBackg
 		}
 
 		@Override
-		public void setThreshold(float threshold) {
+		public void setThreshold( float threshold ) {
 			moving.setThreshold(threshold);
 		}
 
@@ -100,7 +100,7 @@ public abstract class GenericBackgroundMovingGaussianChecks extends GenericBackg
 		}
 
 		@Override
-		public void setInitialVariance(float initialVariance) {
+		public void setInitialVariance( float initialVariance ) {
 			moving.setInitialVariance(initialVariance);
 		}
 
@@ -110,7 +110,7 @@ public abstract class GenericBackgroundMovingGaussianChecks extends GenericBackg
 		}
 
 		@Override
-		public void setMinimumDifference(float minimumDifference) {
+		public void setMinimumDifference( float minimumDifference ) {
 			moving.setMinimumDifference(minimumDifference);
 		}
 
@@ -120,7 +120,7 @@ public abstract class GenericBackgroundMovingGaussianChecks extends GenericBackg
 		}
 
 		@Override
-		public void setUnknownValue(int unknownValue) {
+		public void setUnknownValue( int unknownValue ) {
 			moving.setUnknownValue(unknownValue);
 		}
 	}

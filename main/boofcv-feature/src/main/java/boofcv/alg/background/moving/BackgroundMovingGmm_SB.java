@@ -23,6 +23,9 @@ import boofcv.struct.image.GrayU8;
 import boofcv.struct.image.ImageGray;
 import boofcv.struct.image.ImageType;
 import georegression.struct.InvertibleTransform;
+import georegression.struct.point.Point2D_F32;
+
+//CONCURRENT_INLINE import boofcv.concurrency.BoofConcurrency;
 
 /**
  * Implementation of {@link BackgroundMovingGmm} for {@link ImageGray}.
@@ -37,45 +40,50 @@ public class BackgroundMovingGmm_SB<T extends ImageGray<T>, Motion extends Inver
 	}
 
 	@Override protected void updateBackground( int x0, int y0, int x1, int y1, T frame ) {
-
 		common.inputWrapperG.wrap(frame);
-		transform.setModel(worldToCurrent);
+		transformOG.setModel(worldToCurrent);
 
-		for (int y = y0; y < y1; y++) {
+		//CONCURRENT_BELOW BoofConcurrency.loopBlocks(y0, y1, 20, workspaceValues, (values, idx0, idx1) -> {
+		final int idx0 = y0, idx1 = y1;
+		final Point2D_F32 pixel =  values.pixel;
+		values.transform.setModel(currentToWorld);
+		for (int y = idx0; y < idx1; y++) {
 			float[] modelRow = common.model.data[y];
 			for (int x = x0; x < x1; x++) {
 				int indexModel = x*common.modelStride;
 
-				transform.compute(x, y, work);
-				int xx = (int)(work.x + 0.5f);
-				int yy = (int)(work.y + 0.5f);
+				values.transform.compute(x, y, pixel);
+				final int xx = (int)(pixel.x + 0.5f);
+				final int yy = (int)(pixel.y + 0.5f);
 
-				if (work.x >= 0 && xx < frame.width && work.y >= 0 && yy < frame.height) {
-
+				if (pixel.x >= 0 && xx < frame.width && pixel.y >= 0 && yy < frame.height) {
 					float pixelValue = common.inputWrapperG.unsafe_getF(xx, yy);
-
 					common.updateMixture(pixelValue, modelRow, indexModel); // TODO assigned mask here
 				}
 			}
 		}
+		//CONCURRENT_ABOVE }});
 	}
 
 	@Override protected void _segment( Motion currentToWorld, T frame, GrayU8 segmented ) {
 		common.inputWrapperG.wrap(frame);
-		transform.setModel(currentToWorld);
+		transformOG.setModel(currentToWorld);
 		common.unknownValue = unknownValue;
 
-		for (int y = 0; y < frame.height; y++) {
+		//CONCURRENT_BELOW BoofConcurrency.loopBlocks(0, frame.height, 20, workspaceValues, (values, idx0, idx1) -> {
+		final int idx0 = 0, idx1 = frame.height;
+		final Point2D_F32 pixel =  values.pixel;
+		values.transform.setModel(currentToWorld);
+		for (int y = idx0; y < idx1; y++) {
 			int indexOut = segmented.startIndex + y*segmented.stride;
 			for (int x = 0; x < frame.width; x++, indexOut++) {
 
-				transform.compute(x, y, work);
+				values.transform.compute(x, y, pixel);
 
-				int xx = (int)(work.x + 0.5f);
-				int yy = (int)(work.y + 0.5f);
+				final int xx = (int)(pixel.x + 0.5f);
+				final int yy = (int)(pixel.y + 0.5f);
 
-				if (work.x >= 0 && xx < backgroundWidth && work.y >= 0 && yy < backgroundHeight) {
-
+				if (pixel.x >= 0 && xx < backgroundWidth && pixel.y >= 0 && yy < backgroundHeight) {
 					float pixelValue = common.inputWrapperG.unsafe_getF(x, y);
 
 					float[] modelRow = common.model.data[yy];
@@ -88,5 +96,6 @@ public class BackgroundMovingGmm_SB<T extends ImageGray<T>, Motion extends Inver
 				}
 			}
 		}
+		//CONCURRENT_ABOVE }});
 	}
 }

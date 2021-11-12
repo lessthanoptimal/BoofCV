@@ -24,7 +24,7 @@ import boofcv.struct.image.GrayU8;
 import boofcv.struct.image.ImageBase;
 import boofcv.struct.image.ImageType;
 
-class TestBackgroundStationaryBasic_PL_MT extends CompareBackgroundStationarySingleToMultiChecks {
+class TestBackgroundStationaryBasic_PL_MT extends CompareBackgroundStationaryThreadsChecks {
 	public TestBackgroundStationaryBasic_PL_MT() {
 		imageTypes.add(ImageType.pl(2, GrayU8.class));
 		imageTypes.add(ImageType.pl(3, GrayU8.class));

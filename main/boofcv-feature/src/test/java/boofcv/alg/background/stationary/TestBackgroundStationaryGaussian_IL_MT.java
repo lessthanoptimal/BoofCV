@@ -24,7 +24,7 @@ import boofcv.struct.image.ImageType;
 import boofcv.struct.image.InterleavedF32;
 import boofcv.struct.image.InterleavedU8;
 
-class TestBackgroundStationaryGaussian_IL_MT extends CompareBackgroundStationarySingleToMultiChecks {
+class TestBackgroundStationaryGaussian_IL_MT extends CompareBackgroundStationaryThreadsChecks {
 	public TestBackgroundStationaryGaussian_IL_MT() {
 		imageTypes.add(ImageType.il(2, InterleavedU8.class));
 		imageTypes.add(ImageType.il(3, InterleavedU8.class));

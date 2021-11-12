@@ -23,20 +23,23 @@ import boofcv.alg.distort.PointTransformHomography_F32;
 import boofcv.struct.image.*;
 import georegression.struct.homography.Homography2D_F32;
 
-/**
- * @author Peter Abeles
- */
-public class TestBackgroundMovingGmm_MB extends GenericBackgroundMovingGaussianChecks {
-	public TestBackgroundMovingGmm_MB() {
-		imageTypes.add(ImageType.il(3, InterleavedU8.class));
-		imageTypes.add(ImageType.il(3, InterleavedF32.class));
-		imageTypes.add(ImageType.pl(3, GrayU8.class));
-		imageTypes.add(ImageType.pl(3, GrayF32.class));
+class TestBackgroundMovingGmm_MB_MT extends GenericBackgroundMovingThreadsChecks {
+	public TestBackgroundMovingGmm_MB_MT() {
+			imageTypes.add(ImageType.il(3, InterleavedU8.class));
+			imageTypes.add(ImageType.il(3,InterleavedF32.class));
+			imageTypes.add(ImageType.pl(3,GrayU8.class));
+			imageTypes.add(ImageType.pl(3,GrayF32.class));
 	}
 
-	@Override
-	public <T extends ImageBase<T>> BackgroundModelMoving<T, Homography2D_F32> create( ImageType<T> imageType ) {
+	@Override public <T extends ImageBase<T>> BackgroundModelMoving<T, Homography2D_F32>
+	create( boolean singleThread, ImageType<T> imageType ) {
 		var transform = new PointTransformHomography_F32();
-		return new BackgroundMovingGmm_MB(1000F, 0.001F, 10, transform, imageType);
+		BackgroundMovingGmm alg;
+		if (singleThread)
+			alg = new BackgroundMovingGmm_MB(1000F,0.001F,10,transform,imageType);
+		else
+			alg = new BackgroundMovingGmm_MB_MT(1000F,0.001F,10,transform,imageType);
+		return alg;
 	}
 }
+

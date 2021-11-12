@@ -28,6 +28,9 @@ import boofcv.struct.border.BorderType;
 import boofcv.struct.distort.Point2Transform2Model_F32;
 import boofcv.struct.image.*;
 import georegression.struct.InvertibleTransform;
+import georegression.struct.point.Point2D_F32;
+
+//CONCURRENT_INLINE import boofcv.concurrency.BoofConcurrency;
 
 /**
  * Implementation of {@link BackgroundMovingGaussian} for {@link Planar}.
@@ -36,7 +39,6 @@ import georegression.struct.InvertibleTransform;
  */
 public class BackgroundMovingGaussian_PL<T extends ImageGray<T>, Motion extends InvertibleTransform<Motion>>
 		extends BackgroundMovingGaussian<Planar<T>, Motion> {
-
 	// interpolates the input image
 	protected InterpolatePixelMB<Planar<T>> interpolateInput;
 	// interpolates the background image
@@ -44,9 +46,6 @@ public class BackgroundMovingGaussian_PL<T extends ImageGray<T>, Motion extends 
 
 	// wrappers which provide abstraction across image types
 	protected GImageMultiBand inputWrapper;
-	// storage for multi-band pixel values
-	protected float[] pixelBG;
-	protected float[] pixelInput;
 
 	// background is composed of bands*2 channels. even = mean, odd = variance
 	Planar<GrayF32> background;
@@ -77,9 +76,6 @@ public class BackgroundMovingGaussian_PL<T extends ImageGray<T>, Motion extends 
 				0, 255, interpType, BorderType.EXTENDED, background.getImageType());
 		this.interpolationBG.setImage(background);
 		inputWrapper = FactoryGImageMultiBand.create(imageType);
-
-		pixelBG = new float[2*numBands];
-		pixelInput = new float[numBands];
 	}
 
 	@Override public void initialize( int backgroundWidth, int backgroundHeight, Motion homeToWorld ) {
@@ -104,26 +100,30 @@ public class BackgroundMovingGaussian_PL<T extends ImageGray<T>, Motion extends 
 	}
 
 	@Override protected void updateBackground( int x0, int y0, int x1, int y1, Planar<T> frame ) {
-		transform.setModel(worldToCurrent);
 		interpolateInput.setImage(frame);
 
 		float minusLearn = 1.0f - learnRate;
 
 		final int numBands = background.getNumBands()/2;
 
-		for (int y = y0; y < y1; y++) {
+		//CONCURRENT_BELOW BoofConcurrency.loopBlocks(y0, y1, 20, workspaceValues, (values, idx0, idx1) -> {
+		final int idx0 = y0, idx1 = y1;
+		final float[] valueInput = values.valueInput;
+		final Point2D_F32 pixel =  values.pixel;
+		values.transform.setModel(currentToWorld);
+		for (int y = idx0; y < idx1; y++) {
 			int indexBG = background.startIndex + y*background.stride + x0;
 			for (int x = x0; x < x1; x++, indexBG++) {
-				transform.compute(x, y, work);
+				values.transform.compute(x, y, pixel);
 
-				if (work.x >= 0 && work.x < frame.width && work.y >= 0 && work.y < frame.height) {
-					interpolateInput.get(work.x, work.y, pixelInput);
+				if (pixel.x >= 0 && pixel.x < frame.width && pixel.y >= 0 && pixel.y < frame.height) {
+					interpolateInput.get(pixel.x, pixel.y, valueInput);
 
 					for (int band = 0; band < numBands; band++) {
 						GrayF32 backgroundMean = background.getBand(band*2);
 						GrayF32 backgroundVar = background.getBand(band*2 + 1);
 
-						float inputValue = pixelInput[band];
+						float inputValue = valueInput[band];
 						float meanBG = backgroundMean.data[indexBG];
 						float varianceBG = backgroundVar.data[indexBG];
 
@@ -139,38 +139,44 @@ public class BackgroundMovingGaussian_PL<T extends ImageGray<T>, Motion extends 
 				}
 			}
 		}
+		//CONCURRENT_ABOVE }});
 	}
 
 	@Override protected void _segment( Motion currentToWorld, Planar<T> frame, GrayU8 segmented ) {
-		transform.setModel(currentToWorld);
 		inputWrapper.wrap(frame);
 
 		final int numBands = background.getNumBands()/2;
 		float adjustedMinimumDifference = minimumDifference*numBands;
 
-		for (int y = 0; y < frame.height; y++) {
+		//CONCURRENT_BELOW BoofConcurrency.loopBlocks(0, frame.height, 20, workspaceValues, (values, idx0, idx1) -> {
+		final int idx0 = 0, idx1 = frame.height;
+		final float[] valueBG = values.valueBG;
+		final float[] valueInput = values.valueInput;
+		final Point2D_F32 pixel =  values.pixel;
+		values.transform.setModel(currentToWorld);
+		for (int y = idx0; y < idx1; y++) {
 			int indexFrame = frame.startIndex + y*frame.stride;
 			int indexSegmented = segmented.startIndex + y*segmented.stride;
 
 			for (int x = 0; x < frame.width; x++, indexFrame++, indexSegmented++) {
-				transform.compute(x, y, work);
+				values.transform.compute(x, y, pixel);
 
 				escapeIf:
-				if (work.x >= 0 && work.x < background.width && work.y >= 0 && work.y < background.height) {
-					interpolationBG.get(work.x, work.y, pixelBG);
-					inputWrapper.getF(indexFrame, pixelInput);
+				if (pixel.x >= 0 && pixel.x < background.width && pixel.y >= 0 && pixel.y < background.height) {
+					interpolationBG.get(pixel.x, pixel.y, valueBG);
+					inputWrapper.getF(indexFrame, valueInput);
 
 					float mahalanobis = 0;
 
 					for (int band = 0; band < numBands; band++) {
-						float meanBG = pixelBG[band*2];
-						float varBG = pixelBG[band*2 + 1];
+						float meanBG = valueBG[band*2];
+						float varBG = valueBG[band*2 + 1];
 
 						if (varBG < 0) {
 							segmented.data[indexSegmented] = unknownValue;
 							break escapeIf;
 						} else {
-							float diff = meanBG - pixelInput[band];
+							float diff = meanBG - valueInput[band];
 							mahalanobis += diff*diff/varBG;
 						}
 					}
@@ -181,13 +187,9 @@ public class BackgroundMovingGaussian_PL<T extends ImageGray<T>, Motion extends 
 						if (minimumDifference > 0) {
 							float sumAbsDiff = 0;
 							for (int band = 0; band < numBands; band++) {
-								sumAbsDiff += Math.abs(pixelBG[band*2] - pixelInput[band]);
+								sumAbsDiff += Math.abs(valueBG[band*2] - valueInput[band]);
 							}
-							if (sumAbsDiff >= adjustedMinimumDifference) {
-								segmented.data[indexSegmented] = 1;
-							} else {
-								segmented.data[indexSegmented] = 0;
-							}
+							segmented.data[indexSegmented] = (byte)(sumAbsDiff >= adjustedMinimumDifference ? 1 : 0);
 						} else {
 							segmented.data[indexSegmented] = 1;
 						}
@@ -198,5 +200,6 @@ public class BackgroundMovingGaussian_PL<T extends ImageGray<T>, Motion extends 
 				}
 			}
 		}
+		//CONCURRENT_ABOVE }});
 	}
 }

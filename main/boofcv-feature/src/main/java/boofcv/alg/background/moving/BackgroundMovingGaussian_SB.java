@@ -29,6 +29,9 @@ import boofcv.struct.border.BorderType;
 import boofcv.struct.distort.Point2Transform2Model_F32;
 import boofcv.struct.image.*;
 import georegression.struct.InvertibleTransform;
+import georegression.struct.point.Point2D_F32;
+
+//CONCURRENT_INLINE import boofcv.concurrency.BoofConcurrency;
 
 /**
  * Implementation of {@link BackgroundMovingGaussian} for {@link ImageGray}.
@@ -92,21 +95,24 @@ public class BackgroundMovingGaussian_SB<T extends ImageGray<T>, Motion extends 
 	}
 
 	@Override protected void updateBackground( int x0, int y0, int x1, int y1, T frame ) {
-		transform.setModel(worldToCurrent);
 		interpolateInput.setImage(frame);
 
-		float minusLearn = 1.0f - learnRate;
+		final float minusLearn = 1.0f - learnRate;
 
 		GrayF32 backgroundMean = background.getBand(0);
 		GrayF32 backgroundVar = background.getBand(1);
 
-		for (int y = y0; y < y1; y++) {
+		//CONCURRENT_BELOW BoofConcurrency.loopBlocks(y0, y1, 20, workspaceValues, (values, idx0, idx1) -> {
+		final int idx0 = y0, idx1 = y1;
+		final Point2D_F32 pixel =  values.pixel;
+		values.transform.setModel(currentToWorld);
+		for (int y = idx0; y < idx1; y++) {
 			int indexBG = background.startIndex + y*background.stride + x0;
 			for (int x = x0; x < x1; x++, indexBG++) {
-				transform.compute(x, y, work);
+				values.transform.compute(x, y, pixel);
 
-				if (work.x >= 0 && work.x < frame.width && work.y >= 0 && work.y < frame.height) {
-					float inputValue = interpolateInput.get(work.x, work.y);
+				if (pixel.x >= 0 && pixel.x < frame.width && pixel.y >= 0 && pixel.y < frame.height) {
+					float inputValue = interpolateInput.get(pixel.x, pixel.y);
 					float meanBG = backgroundMean.data[indexBG];
 					float varianceBG = backgroundVar.data[indexBG];
 
@@ -121,21 +127,27 @@ public class BackgroundMovingGaussian_SB<T extends ImageGray<T>, Motion extends 
 				}
 			}
 		}
+		//CONCURRENT_ABOVE }});
 	}
 
 	@Override protected void _segment( Motion currentToWorld, T frame, GrayU8 segmented ) {
-		transform.setModel(currentToWorld);
 		inputWrapper.wrap(frame);
 
-		for (int y = 0; y < frame.height; y++) {
+		final float minimumDifferenceSq = minimumDifference*minimumDifference;
+
+		//CONCURRENT_BELOW BoofConcurrency.loopBlocks(0, frame.height, 20, workspaceValues, (values, idx0, idx1) -> {
+		final int idx0 = 0, idx1 = frame.height;
+		final Point2D_F32 pixel =  values.pixel;
+		values.transform.setModel(currentToWorld);
+		for (int y = idx0; y < idx1; y++) {
 			int indexFrame = frame.startIndex + y*frame.stride;
 			int indexSegmented = segmented.startIndex + y*segmented.stride;
 
 			for (int x = 0; x < frame.width; x++, indexFrame++, indexSegmented++) {
-				transform.compute(x, y, work);
+				values.transform.compute(x, y, pixel);
 
-				if (work.x >= 0 && work.x < background.width && work.y >= 0 && work.y < background.height) {
-					interpolationBG.get(work.x, work.y, pixelBG);
+				if (pixel.x >= 0 && pixel.x < background.width && pixel.y >= 0 && pixel.y < background.height) {
+					interpolationBG.get(pixel.x, pixel.y, pixelBG);
 					float pixelFrame = inputWrapper.getF(indexFrame);
 
 					float meanBG = pixelBG[0];
@@ -150,10 +162,7 @@ public class BackgroundMovingGaussian_SB<T extends ImageGray<T>, Motion extends 
 						if (chisq <= threshold) {
 							segmented.data[indexSegmented] = 0;
 						} else {
-							if (diff > minimumDifference || -diff > minimumDifference)
-								segmented.data[indexSegmented] = 1;
-							else
-								segmented.data[indexSegmented] = 0;
+							segmented.data[indexSegmented] = (byte)(diff*diff > minimumDifferenceSq ? 1 : 0);
 						}
 					}
 				} else {
@@ -162,5 +171,6 @@ public class BackgroundMovingGaussian_SB<T extends ImageGray<T>, Motion extends 
 				}
 			}
 		}
+		//CONCURRENT_ABOVE }});
 	}
 }

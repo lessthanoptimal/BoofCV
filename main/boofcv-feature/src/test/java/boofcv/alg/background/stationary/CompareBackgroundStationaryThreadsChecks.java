@@ -38,7 +38,7 @@ import static org.junit.jupiter.api.Assertions.assertNotEquals;
 /**
  * @author Peter Abeles
  */
-public abstract class CompareBackgroundStationarySingleToMultiChecks extends BoofStandardJUnit {
+public abstract class CompareBackgroundStationaryThreadsChecks extends BoofStandardJUnit {
 	int width = 120;
 	int height = 90;
 
