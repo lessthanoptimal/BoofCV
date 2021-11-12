@@ -34,6 +34,7 @@ import lombok.Setter;
  * @see BackgroundAlgorithmGaussian
  * @see BackgroundModelMoving
  */
+@SuppressWarnings("MissingOverride")
 public abstract class BackgroundMovingGaussian<T extends ImageBase<T>, Motion extends InvertibleTransform<Motion>>
 		extends BackgroundModelMoving<T, Motion> implements BackgroundAlgorithmGaussian {
 	/**
