@@ -34,6 +34,7 @@ import lombok.Setter;
  * @see BackgroundAlgorithmBasic
  * @see BackgroundModelMoving
  */
+@SuppressWarnings("MissingOverride")
 public abstract class BackgroundMovingBasic<T extends ImageBase<T>, Motion extends InvertibleTransform<Motion>>
 		extends BackgroundModelMoving<T, Motion> implements BackgroundAlgorithmBasic {
 	/**

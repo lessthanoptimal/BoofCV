@@ -32,6 +32,7 @@ import lombok.Setter;
  * @see BackgroundAlgorithmGaussian
  * @see BackgroundModelStationary
  */
+@SuppressWarnings("MissingOverride")
 public abstract class BackgroundStationaryGaussian<T extends ImageBase<T>>
 		extends BackgroundModelStationary<T> implements BackgroundAlgorithmGaussian {
 	/**
