@@ -77,8 +77,8 @@ public class NearestNeighborPixel_IL_U8 extends NearestNeighborPixelMB<Interleav
 
 	@Override
 	public InterpolatePixelMB<InterleavedU8> copy() {
-		NearestNeighborPixel_IL_U8 out = new NearestNeighborPixel_IL_U8();
-		out.setBorder(border);
+		var out = new NearestNeighborPixel_IL_U8();
+		out.setBorder(border.copy());
 		return out;
 	}
 }

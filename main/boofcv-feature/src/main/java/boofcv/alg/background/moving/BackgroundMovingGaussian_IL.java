@@ -32,6 +32,7 @@ import boofcv.struct.image.ImageType;
 import boofcv.struct.image.InterleavedF32;
 import georegression.struct.InvertibleTransform;
 import georegression.struct.point.Point2D_F32;
+import pabeles.concurrency.GrowArray;
 
 //CONCURRENT_INLINE import boofcv.concurrency.BoofConcurrency;
 
@@ -43,15 +44,18 @@ import georegression.struct.point.Point2D_F32;
 public class BackgroundMovingGaussian_IL<T extends ImageInterleaved<T>, Motion extends InvertibleTransform<Motion>>
 		extends BackgroundMovingGaussian<T, Motion> {
 	// interpolates the input image
-	protected InterpolatePixelMB<T> interpolateInput;
+	protected final InterpolatePixelMB<T> _interpolationInput;
 	// interpolates the background image
-	protected InterpolatePixelMB<InterleavedF32> interpolationBG;
+	protected final InterpolatePixelMB<InterleavedF32> _interpolationBG;
 
 	// wrappers which provide abstraction across image types
-	protected GImageMultiBand inputWrapper;
+	protected final GImageMultiBand inputWrapper;
 
 	// background is composed of bands*2 channels. even = mean, odd = variance
-	InterleavedF32 background;
+	protected final InterleavedF32 background;
+
+	protected final GrowArray<Helper> helpers;
+	protected final Helper helper;
 
 	/**
 	 * Configurations background removal.
@@ -71,14 +75,17 @@ public class BackgroundMovingGaussian_IL<T extends ImageInterleaved<T>, Motion e
 
 		int numBands = imageType.getNumBands();
 
-		this.interpolateInput = FactoryInterpolation.createPixelMB(0, 255,
+		this._interpolationInput = FactoryInterpolation.createPixelMB(0, 255,
 				InterpolationType.BILINEAR, BorderType.EXTENDED, imageType);
 
 		background = new InterleavedF32(1, 1, 2*numBands);
-		this.interpolationBG = FactoryInterpolation.createPixelMB(
+		this._interpolationBG = FactoryInterpolation.createPixelMB(
 				0, 255, interpType, BorderType.EXTENDED, ImageType.il(numBands*2, InterleavedF32.class));
-		this.interpolationBG.setImage(background);
+		this._interpolationBG.setImage(background);
 		inputWrapper = FactoryGImageMultiBand.create(imageType);
+
+		helpers = new GrowArray<>(() -> new Helper(imageType.numBands));
+		helper = helpers.grow();
 	}
 
 	@Override public void initialize( int backgroundWidth, int backgroundHeight, Motion homeToWorld ) {
@@ -97,31 +104,62 @@ public class BackgroundMovingGaussian_IL<T extends ImageInterleaved<T>, Motion e
 	}
 
 	@Override protected void updateBackground( int x0, int y0, int x1, int y1, T frame ) {
-		interpolateInput.setImage(frame);
-
-		float minusLearn = 1.0f - learnRate;
-
-		final int numBands = background.getNumBands()/2;
-
-		//CONCURRENT_BELOW BoofConcurrency.loopBlocks(y0, y1, 20, workspaceValues, (values, idx0, idx1) -> {
+		//CONCURRENT_BELOW BoofConcurrency.loopBlocks(y0, y1, 20, helpers, (helper, idx0, idx1) -> {
 		final int idx0 = y0, idx1 = y1;
-		final float[] valueInput = values.valueInput;
-		final Point2D_F32 pixel =  values.pixel;
-		values.transform.setModel(currentToWorld);
-		for (int y = idx0; y < idx1; y++) {
-			int indexBG = background.startIndex + y*background.stride + x0*background.numBands;
-			for (int x = x0; x < x1; x++, indexBG += numBands*2) {
-				values.transform.compute(x, y, pixel);
+		helper.updateBackground(x0, idx0, x1, idx1, frame);
+		//CONCURRENT_INLINE });
+	}
 
-				if (pixel.x >= 0 && pixel.x < frame.width && pixel.y >= 0 && pixel.y < frame.height) {
-					interpolateInput.get(pixel.x, pixel.y, valueInput);
+	@Override protected void _segment( Motion currentToWorld, T frame, GrayU8 segmented ) {
+		inputWrapper.wrap(frame);
+
+		//CONCURRENT_BELOW BoofConcurrency.loopBlocks(0, frame.height, 20, helpers, (helper, idx0, idx1) -> {
+		final int idx0 = 0, idx1 = frame.height;
+		helper.segment(idx0, idx1, currentToWorld, frame, segmented);
+		//CONCURRENT_INLINE });
+	}
+
+	private class Helper {
+		final private float[] valueInput;
+		final private float[] valueBG;
+		final private Point2D_F32 pixel = new Point2D_F32();
+		final private Point2Transform2Model_F32<Motion> transform;
+		final private InterpolatePixelMB<T> interpolationInput;
+		final private InterpolatePixelMB<InterleavedF32> interpolationBG;
+
+		public Helper( int numBands ) {
+			valueInput = new float[numBands];
+			valueBG = new float[2*numBands];
+			transform = (Point2Transform2Model_F32<Motion>)_transform.copyConcurrent();
+			interpolationInput = _interpolationInput.copy();
+			interpolationBG = _interpolationBG.copy();
+			interpolationBG.setImage(background);
+		}
+
+		public void updateBackground( int x0, int y0, int x1, int y1, T frame ) {
+			interpolationInput.setImage(frame);
+
+			final float minusLearn = 1.0f - learnRate;
+
+			final int numBands = background.getNumBands()/2;
+
+			transform.setModel(worldToCurrent);
+			for (int y = y0; y < y1; y++) {
+				int indexBG = background.startIndex + y*background.stride + x0*background.numBands;
+				for (int x = x0; x < x1; x++, indexBG += numBands*2) {
+					transform.compute(x, y, pixel);
+
+					if (!(pixel.x >= 0 && pixel.x < frame.width && pixel.y >= 0 && pixel.y < frame.height)) {
+						continue;
+					}
+					interpolationInput.get(pixel.x, pixel.y, valueInput);
 
 					for (int band = 0; band < numBands; band++) {
 						int indexBG_band = indexBG + band*2;
 
-						float inputValue = valueInput[band];
-						float meanBG = background.data[indexBG_band];
-						float varianceBG = background.data[indexBG_band + 1];
+						final float inputValue = valueInput[band];
+						final float meanBG = background.data[indexBG_band];
+						final float varianceBG = background.data[indexBG_band + 1];
 
 						if (varianceBG < 0) {
 							background.data[indexBG_band] = inputValue;
@@ -135,67 +173,58 @@ public class BackgroundMovingGaussian_IL<T extends ImageInterleaved<T>, Motion e
 				}
 			}
 		}
-		//CONCURRENT_ABOVE }});
-	}
 
-	@Override protected void _segment( Motion currentToWorld, T frame, GrayU8 segmented ) {
-		inputWrapper.wrap(frame);
+		protected void segment( int y0, int y1, Motion currentToWorld, T frame, GrayU8 segmented ) {
+			final int numBands = background.getNumBands()/2;
+			final float adjustedMinimumDifference = minimumDifference*numBands;
 
-		final int numBands = background.getNumBands()/2;
-		final float adjustedMinimumDifference = minimumDifference*numBands;
+			transform.setModel(currentToWorld);
+			for (int y = y0; y < y1; y++) {
+				int indexFrame = frame.startIndex + y*frame.stride;
+				int indexSegmented = segmented.startIndex + y*segmented.stride;
 
-		//CONCURRENT_BELOW BoofConcurrency.loopBlocks(0, frame.height, 20, workspaceValues, (values, idx0, idx1) -> {
-		final int idx0 = 0, idx1 = frame.height;
-		final float[] valueBG = values.valueBG;
-		final float[] valueInput = values.valueInput;
-		final Point2D_F32 pixel =  values.pixel;
-		values.transform.setModel(currentToWorld);
-		for (int y = idx0; y < idx1; y++) {
-			int indexFrame = frame.startIndex + y*frame.stride;
-			int indexSegmented = segmented.startIndex + y*segmented.stride;
+				for (int x = 0; x < frame.width; x++, indexFrame += numBands, indexSegmented++) {
+					transform.compute(x, y, pixel);
 
-			for (int x = 0; x < frame.width; x++, indexFrame += numBands, indexSegmented++) {
-				values.transform.compute(x, y, pixel);
+					escapeIf:
+					if (pixel.x >= 0 && pixel.x < background.width && pixel.y >= 0 && pixel.y < background.height) {
+						interpolationBG.get(pixel.x, pixel.y, valueBG);
+						inputWrapper.getF(indexFrame, valueInput);
 
-				escapeIf:
-				if (pixel.x >= 0 && pixel.x < background.width && pixel.y >= 0 && pixel.y < background.height) {
-					interpolationBG.get(pixel.x, pixel.y, valueBG);
-					inputWrapper.getF(indexFrame, valueInput);
+						float mahalanobis = 0;
 
-					float mahalanobis = 0;
+						for (int band = 0; band < numBands; band++) {
+							final float meanBG = valueBG[band*2];
+							final float varBG = valueBG[band*2 + 1];
 
-					for (int band = 0; band < numBands; band++) {
-						float meanBG = valueBG[band*2];
-						float varBG = valueBG[band*2 + 1];
-
-						if (varBG < 0) {
-							segmented.data[indexSegmented] = unknownValue;
-							break escapeIf;
-						} else {
-							float diff = meanBG - valueInput[band];
-							mahalanobis += diff*diff/varBG;
-						}
-					}
-
-					if (mahalanobis <= threshold) {
-						segmented.data[indexSegmented] = 0;
-					} else {
-						if (minimumDifference > 0) {
-							float sumAbsDiff = 0;
-							for (int band = 0; band < numBands; band++) {
-								sumAbsDiff += Math.abs(valueBG[band*2] - valueInput[band]);
+							if (varBG < 0) {
+								segmented.data[indexSegmented] = unknownValue;
+								break escapeIf;
+							} else {
+								float diff = meanBG - valueInput[band];
+								mahalanobis += diff*diff/varBG;
 							}
-							segmented.data[indexSegmented] = (byte)(sumAbsDiff >= adjustedMinimumDifference ? 1 : 0);
-						} else {
-							segmented.data[indexSegmented] = 1;
 						}
+
+						if (mahalanobis <= threshold) {
+							segmented.data[indexSegmented] = 0;
+						} else {
+							if (minimumDifference > 0) {
+								float sumAbsDiff = 0;
+								for (int band = 0; band < numBands; band++) {
+									sumAbsDiff += Math.abs(valueBG[band*2] - valueInput[band]);
+								}
+								segmented.data[indexSegmented] = (byte)(sumAbsDiff >= adjustedMinimumDifference ? 1 : 0);
+							} else {
+								segmented.data[indexSegmented] = 1;
+							}
+						}
+					} else {
+						// there is no background here. Just mark it as not moving to avoid false positives
+						segmented.data[indexSegmented] = unknownValue;
 					}
-				} else {
-					// there is no background here. Just mark it as not moving to avoid false positives
-					segmented.data[indexSegmented] = unknownValue;
 				}
 			}
 		}
-		//CONCURRENT_ABOVE }});
 	}
 }

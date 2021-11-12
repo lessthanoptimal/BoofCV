@@ -126,8 +126,8 @@ public class ImplBilinearPixel_IL_U8 extends BilinearPixelMB<InterleavedU8> {
 
 	@Override
 	public InterpolatePixelMB<InterleavedU8> copy() {
-		ImplBilinearPixel_IL_U8 out = new ImplBilinearPixel_IL_U8(temp0.length);
-		out.setBorder(border);
+		var out = new ImplBilinearPixel_IL_U8(temp0.length);
+		out.setBorder(border.copy());
 		return out;
 	}
 	@Override

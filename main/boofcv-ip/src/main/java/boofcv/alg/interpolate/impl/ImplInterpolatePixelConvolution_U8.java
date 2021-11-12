@@ -212,7 +212,7 @@ public class ImplInterpolatePixelConvolution_U8 implements InterpolatePixelS<Gra
 	@Override
 	public InterpolatePixelS<GrayU8> copy() {
 		var out = new ImplInterpolatePixelConvolution_U8(kernel,min,max);
-		out.setBorder(border);
+		out.setBorder(border.copy());
 		return out;
 	}
 

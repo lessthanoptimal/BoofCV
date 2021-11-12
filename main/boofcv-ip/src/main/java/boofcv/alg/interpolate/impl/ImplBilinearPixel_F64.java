@@ -91,8 +91,8 @@ public class ImplBilinearPixel_F64 extends BilinearPixelS<GrayF64> {
 
 	@Override
 	public InterpolatePixelS<GrayF64> copy() {
-		ImplBilinearPixel_F64 out = new ImplBilinearPixel_F64();
-		out.setBorder(border);
+		var out = new ImplBilinearPixel_F64();
+		out.setBorder(border.copy());
 		return out;
 	}
 

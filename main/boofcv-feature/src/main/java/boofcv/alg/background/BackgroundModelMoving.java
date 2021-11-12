@@ -25,7 +25,6 @@ import boofcv.struct.image.ImageBase;
 import boofcv.struct.image.ImageType;
 import georegression.struct.InvertibleTransform;
 import georegression.struct.point.Point2D_F32;
-import pabeles.concurrency.GrowArray;
 
 /**
  * <p>
@@ -59,7 +58,7 @@ public abstract class BackgroundModelMoving
 		<T extends ImageBase<T>, MotionModel extends InvertibleTransform<MotionModel>> extends BackgroundModel<T> {
 
 	// Convert the motion model into a usable format
-	protected Point2Transform2Model_F32<MotionModel> transformOG;
+	protected final Point2Transform2Model_F32<MotionModel> _transform;
 
 	// transforms
 	protected MotionModel homeToWorld;
@@ -74,12 +73,6 @@ public abstract class BackgroundModelMoving
 
 	// storage for corners which are used to find bounding box
 	protected Point2D_F32[] corners = new Point2D_F32[4];
-	// storage for transformed coordinate
-//	protected Point2D_F32 pixel = new Point2D_F32();
-
-	// Work space for individual threads
-	protected GrowArray<Work> workspaceValues;
-	protected Work values;
 
 	/**
 	 * Constructor which provides the motion model and image type
@@ -89,7 +82,7 @@ public abstract class BackgroundModelMoving
 	 */
 	protected BackgroundModelMoving( Point2Transform2Model_F32<MotionModel> transform, ImageType<T> imageType ) {
 		super(imageType);
-		this.transformOG = transform;
+		this._transform = transform;
 
 		this.homeToWorld = transform.newInstanceModel();
 		this.worldToHome = transform.newInstanceModel();
@@ -99,9 +92,6 @@ public abstract class BackgroundModelMoving
 		for (int i = 0; i < corners.length; i++) {
 			corners[i] = new Point2D_F32();
 		}
-
-		workspaceValues = new GrowArray<>(() -> new Work(imageType.numBands));
-		values = workspaceValues.grow();
 	}
 
 	/**
@@ -125,11 +115,11 @@ public abstract class BackgroundModelMoving
 		worldToCurrent.invert(currentToWorld);
 
 		// find the distorted polygon of the current image in the "home" background reference frame
-		transformOG.setModel(currentToWorld);
-		transformOG.compute(0, 0, corners[0]);
-		transformOG.compute(frame.width - 1, 0, corners[1]);
-		transformOG.compute(frame.width - 1, frame.height - 1, corners[2]);
-		transformOG.compute(0, frame.height - 1, corners[3]);
+		_transform.setModel(currentToWorld);
+		_transform.compute(0, 0, corners[0]);
+		_transform.compute(frame.width - 1, 0, corners[1]);
+		_transform.compute(frame.width - 1, frame.height - 1, corners[2]);
+		_transform.compute(0, frame.height - 1, corners[3]);
 
 		// find the bounding box
 		int x0 = Integer.MAX_VALUE;
@@ -182,16 +172,4 @@ public abstract class BackgroundModelMoving
 
 	protected abstract void _segment( MotionModel currentToWorld, T frame, GrayU8 segmented );
 
-	protected class Work {
-		final public float[] valueInput;
-		final public float[] valueBG;
-		final public Point2D_F32 pixel = new Point2D_F32();
-		final public Point2Transform2Model_F32<MotionModel> transform;
-
-		public Work( int numBands ) {
-			valueInput = new float[numBands];
-			valueBG = new float[2*numBands];
-			transform = (Point2Transform2Model_F32<MotionModel>)transformOG.copyConcurrent();
-		}
-	}
 }

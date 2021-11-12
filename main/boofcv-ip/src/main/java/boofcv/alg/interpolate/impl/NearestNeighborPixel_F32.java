@@ -73,8 +73,8 @@ public class NearestNeighborPixel_F32 extends NearestNeighborPixelS<GrayF32> {
 
 	@Override
 	public InterpolatePixelS<GrayF32> copy() {
-		NearestNeighborPixel_F32 out = new NearestNeighborPixel_F32();
-		out.setBorder(border);
+		var out = new NearestNeighborPixel_F32();
+		out.setBorder(border.copy());
 		return out;
 	}
 

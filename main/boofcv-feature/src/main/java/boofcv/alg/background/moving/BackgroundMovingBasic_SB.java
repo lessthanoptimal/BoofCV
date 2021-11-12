@@ -34,6 +34,7 @@ import boofcv.struct.image.ImageType;
 import georegression.struct.InvertibleTransform;
 import georegression.struct.point.Point2D_F32;
 import lombok.Getter;
+import pabeles.concurrency.GrowArray;
 
 //CONCURRENT_INLINE import boofcv.concurrency.BoofConcurrency;
 
@@ -47,12 +48,15 @@ public class BackgroundMovingBasic_SB<T extends ImageGray<T>, Motion extends Inv
 	/** Background model. Pixels which haven't been assigned yet are marked with {@link Float#MAX_VALUE}. */
 	@Getter protected GrayF32 background = new GrayF32(1, 1);
 	// interpolates the input image
-	protected InterpolatePixelS<T> interpolateInput;
+	protected InterpolatePixelS<T> _interpolationInput;
 	// interpolates the background image
-	protected InterpolatePixelS<GrayF32> interpolationBG;
+	protected InterpolatePixelS<GrayF32> _interpolationBG;
 
 	// wrapper which provides abstraction across image types
 	protected GImageGray inputWrapper;
+
+	protected GrowArray<Helper> helpers;
+	protected Helper helper;
 
 	public BackgroundMovingBasic_SB( float learnRate, float threshold,
 									 Point2Transform2Model_F32<Motion> transform,
@@ -60,13 +64,16 @@ public class BackgroundMovingBasic_SB<T extends ImageGray<T>, Motion extends Inv
 									 Class<T> imageType ) {
 		super(learnRate, threshold, transform, ImageType.single(imageType));
 
-		this.interpolateInput = FactoryInterpolation.bilinearPixelS(imageType, BorderType.EXTENDED);
+		this._interpolationInput = FactoryInterpolation.bilinearPixelS(imageType, BorderType.EXTENDED);
 
-		this.interpolationBG = FactoryInterpolation.createPixelS(0, 255, interpType, BorderType.EXTENDED, GrayF32.class);
-		this.interpolationBG.setBorder(FactoryImageBorder.single(BorderType.EXTENDED, GrayF32.class));
-		this.interpolationBG.setImage(background);
+		this._interpolationBG = FactoryInterpolation.createPixelS(0, 255, interpType, BorderType.EXTENDED, GrayF32.class);
+		this._interpolationBG.setBorder(FactoryImageBorder.single(BorderType.EXTENDED, GrayF32.class));
+		this._interpolationBG.setImage(background);
 
 		inputWrapper = FactoryGImageGray.create(imageType);
+
+		helpers = new GrowArray<>(Helper::new);
+		helper = helpers.grow();
 	}
 
 	@Override public void initialize( int backgroundWidth, int backgroundHeight, Motion homeToWorld ) {
@@ -85,66 +92,86 @@ public class BackgroundMovingBasic_SB<T extends ImageGray<T>, Motion extends Inv
 	}
 
 	@Override protected void updateBackground( int x0, int y0, int x1, int y1, T frame ) {
-		interpolateInput.setImage(frame);
-
-		final float minusLearn = 1.0f - learnRate;
-
-		//CONCURRENT_BELOW BoofConcurrency.loopBlocks(y0, y1, 20, workspaceValues, (values, idx0, idx1) -> {
+		//CONCURRENT_BELOW BoofConcurrency.loopBlocks(y0, y1, 20, helpers, (helper, idx0, idx1) -> {
 		final int idx0 = y0, idx1 = y1;
-		final Point2D_F32 pixel =  values.pixel;
-		values.transform.setModel(currentToWorld);
-		for (int y = idx0; y < idx1; y++) {
-			int indexBG = background.startIndex + y*background.stride + x0;
-			for (int x = x0; x < x1; x++, indexBG++) {
-				values.transform.compute(x, y, pixel);
-
-				if (pixel.x >= 0 && pixel.x < frame.width && pixel.y >= 0 && pixel.y < frame.height) {
-					final float value = interpolateInput.get(pixel.x, pixel.y);
-					final float bg = background.data[indexBG];
-
-					if (bg == Float.MAX_VALUE) {
-						background.data[indexBG] = value;
-					} else {
-						background.data[indexBG] = minusLearn*bg + learnRate*value;
-					}
-				}
-			}
-		}
-		//CONCURRENT_ABOVE }});
+		helper.updateBackground(x0, idx0, x1, idx1, frame);
+		//CONCURRENT_INLINE });
 	}
 
 	@Override protected void _segment( Motion currentToWorld, T frame, GrayU8 segmented ) {
 		inputWrapper.wrap(frame);
 
-		final float thresholdSq = threshold*threshold;
-
-		//CONCURRENT_BELOW BoofConcurrency.loopBlocks(0, frame.height, 20, workspaceValues, (values, idx0, idx1) -> {
+		//CONCURRENT_BELOW BoofConcurrency.loopBlocks(0, frame.height, 20, helpers, (helper, idx0, idx1) -> {
 		final int idx0 = 0, idx1 = frame.height;
-		final Point2D_F32 pixel =  values.pixel;
-		values.transform.setModel(currentToWorld);
-		for (int y = idx0; y < idx1; y++) {
-			int indexFrame = frame.startIndex + y*frame.stride;
-			int indexSegmented = segmented.startIndex + y*segmented.stride;
+		helper.segment(idx0, idx1, currentToWorld, frame, segmented);
+		//CONCURRENT_INLINE });
+	}
 
-			for (int x = 0; x < frame.width; x++, indexFrame++, indexSegmented++) {
-				values.transform.compute(x, y, pixel);
+	private class Helper {
+		final private Point2D_F32 pixel = new Point2D_F32();
+		final private Point2Transform2Model_F32<Motion> transform;
+		final private InterpolatePixelS<T> interpolationInput;
+		final private InterpolatePixelS<GrayF32> interpolationBG;
 
-				if (pixel.x >= 0 && pixel.x < background.width && pixel.y >= 0 && pixel.y < background.height) {
-					final float bg = interpolationBG.get(pixel.x, pixel.y);
-					final float pixelFrame = inputWrapper.getF(indexFrame);
+		public Helper() {
+			transform = (Point2Transform2Model_F32<Motion>)_transform.copyConcurrent();
+			interpolationInput = _interpolationInput.copy();
+			interpolationBG = _interpolationBG.copy();
+			interpolationBG.setImage(background);
+		}
 
-					if (bg == Float.MAX_VALUE) {
-						segmented.data[indexSegmented] = unknownValue;
-					} else {
-						float diff = bg - pixelFrame;
-						segmented.data[indexSegmented] = (byte)(diff*diff <= thresholdSq ? 0 : 1);
+		public void updateBackground( int x0, int y0, int x1, int y1, T frame ) {
+			interpolationInput.setImage(frame);
+
+			final float minusLearn = 1.0f - learnRate;
+
+			transform.setModel(worldToCurrent);
+			for (int y = y0; y < y1; y++) {
+				int indexBG = background.startIndex + y*background.stride + x0;
+				for (int x = x0; x < x1; x++, indexBG++) {
+					transform.compute(x, y, pixel);
+
+					if (pixel.x >= 0 && pixel.x < frame.width && pixel.y >= 0 && pixel.y < frame.height) {
+						final float value = interpolationInput.get(pixel.x, pixel.y);
+						final float bg = background.data[indexBG];
+
+						if (bg == Float.MAX_VALUE) {
+							background.data[indexBG] = value;
+						} else {
+							background.data[indexBG] = minusLearn*bg + learnRate*value;
+						}
 					}
-				} else {
-					// there is no background here. Just mark it as not moving to avoid false positives
-					segmented.data[indexSegmented] = unknownValue;
 				}
 			}
 		}
-		//CONCURRENT_ABOVE }});
+
+		protected void segment( int y0, int y1, Motion currentToWorld, T frame, GrayU8 segmented ) {
+			final float thresholdSq = threshold*threshold;
+
+			transform.setModel(currentToWorld);
+			for (int y = y0; y < y1; y++) {
+				int indexFrame = frame.startIndex + y*frame.stride;
+				int indexSegmented = segmented.startIndex + y*segmented.stride;
+
+				for (int x = 0; x < frame.width; x++, indexFrame++, indexSegmented++) {
+					transform.compute(x, y, pixel);
+
+					if (pixel.x >= 0 && pixel.x < background.width && pixel.y >= 0 && pixel.y < background.height) {
+						final float bg = interpolationBG.get(pixel.x, pixel.y);
+						final float pixelFrame = inputWrapper.getF(indexFrame);
+
+						if (bg == Float.MAX_VALUE) {
+							segmented.data[indexSegmented] = unknownValue;
+						} else {
+							float diff = bg - pixelFrame;
+							segmented.data[indexSegmented] = (byte)(diff*diff <= thresholdSq ? 0 : 1);
+						}
+					} else {
+						// there is no background here. Just mark it as not moving to avoid false positives
+						segmented.data[indexSegmented] = unknownValue;
+					}
+				}
+			}
+		}
 	}
 }

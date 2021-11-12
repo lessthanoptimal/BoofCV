@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -143,7 +143,7 @@ public class GenerateImplBilinearPixel extends CodeGeneratorBase {
 				"\t@Override\n" +
 				"\tpublic InterpolatePixelS<"+image.getSingleBandName()+"> copy() {\n" +
 				"\t\t"+className+" out = new "+className+"();\n" +
-				"\t\tout.setBorder(border);\n" +
+				"\t\tout.setBorder(border.copy());\n" +
 				"\t\treturn out;\n" +
 				"\t}\n" +
 				"\n" +

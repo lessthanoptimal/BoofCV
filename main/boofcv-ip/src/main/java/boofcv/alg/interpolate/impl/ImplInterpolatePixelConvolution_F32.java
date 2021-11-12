@@ -212,7 +212,7 @@ public class ImplInterpolatePixelConvolution_F32 implements InterpolatePixelS<Gr
 	@Override
 	public InterpolatePixelS<GrayF32> copy() {
 		var out = new ImplInterpolatePixelConvolution_F32(kernel,min,max);
-		out.setBorder(border);
+		out.setBorder(border.copy());
 		return out;
 	}
 

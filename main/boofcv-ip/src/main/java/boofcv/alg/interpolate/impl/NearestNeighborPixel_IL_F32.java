@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -62,8 +62,8 @@ public class NearestNeighborPixel_IL_F32 extends NearestNeighborPixelMB<Interlea
 
 	@Override
 	public InterpolatePixelMB<InterleavedF32> copy() {
-		NearestNeighborPixel_IL_F32 out = new NearestNeighborPixel_IL_F32();
-		out.setBorder(border);
+		var out = new NearestNeighborPixel_IL_F32();
+		out.setBorder(border.copy());
 		return out;
 	}
 

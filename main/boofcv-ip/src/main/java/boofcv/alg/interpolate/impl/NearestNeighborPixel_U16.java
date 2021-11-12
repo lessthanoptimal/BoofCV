@@ -73,8 +73,8 @@ public class NearestNeighborPixel_U16 extends NearestNeighborPixelS<GrayU16> {
 
 	@Override
 	public InterpolatePixelS<GrayU16> copy() {
-		NearestNeighborPixel_U16 out = new NearestNeighborPixel_U16();
-		out.setBorder(border);
+		var out = new NearestNeighborPixel_U16();
+		out.setBorder(border.copy());
 		return out;
 	}
 

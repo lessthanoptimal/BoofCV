@@ -13,8 +13,8 @@ Misc
 ImageProcessing
 - TODO ImageMiscOps.transpose()
 Background Model
-- Created threaded implementations of stationary
-- TODO threaded implementations moving
+- Created threaded implementations of stationary and moving
+- Added internal benchmarks for moving
 
 TODO Monocular SLAM
 TODO Stereo SLAM

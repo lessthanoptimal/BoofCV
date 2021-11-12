@@ -212,7 +212,7 @@ public class ImplInterpolatePixelConvolution_S16 implements InterpolatePixelS<Gr
 	@Override
 	public InterpolatePixelS<GrayS16> copy() {
 		var out = new ImplInterpolatePixelConvolution_S16(kernel,min,max);
-		out.setBorder(border);
+		out.setBorder(border.copy());
 		return out;
 	}
 

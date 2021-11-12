@@ -91,8 +91,8 @@ public class ImplBilinearPixel_U8 extends BilinearPixelS<GrayU8> {
 
 	@Override
 	public InterpolatePixelS<GrayU8> copy() {
-		ImplBilinearPixel_U8 out = new ImplBilinearPixel_U8();
-		out.setBorder(border);
+		var out = new ImplBilinearPixel_U8();
+		out.setBorder(border.copy());
 		return out;
 	}
 
