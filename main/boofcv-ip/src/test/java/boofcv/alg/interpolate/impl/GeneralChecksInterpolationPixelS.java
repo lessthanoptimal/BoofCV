@@ -305,6 +305,6 @@ public abstract class GeneralChecksInterpolationPixelS<T extends ImageGray<T>> e
 
 		InterpolatePixelS<T> interpB = interpA.copy();
 
-		assertSame(interpA.getBorder(), interpB.getBorder());
+		assertNotSame(interpA.getBorder(), interpB.getBorder());
 	}
 }
