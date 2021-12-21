@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -25,6 +25,7 @@ package boofcv.struct.image;
  *
  * @author Peter Abeles
  */
+@SuppressWarnings({"NullAway.Init"})
 public class GrayS32 extends GrayI<GrayS32> {
 
 	public int[] data;
@@ -40,7 +41,7 @@ public class GrayS32 extends GrayI<GrayS32> {
 	}
 
 	/** Creates an image with no data declared and the width/height set to zero. */
-	public GrayS32() {}
+	public GrayS32() {data = new int[0];}
 
 	@Override
 	public void unsafe_set( int x, int y, int value ) {

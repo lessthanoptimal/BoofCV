@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -25,6 +25,7 @@ package boofcv.struct.image;
  *
  * @author Peter Abeles
  */
+@SuppressWarnings({"NullAway.Init"})
 public class GrayF32 extends GrayF<GrayF32> {
 
 	public float[] data;
@@ -40,7 +41,7 @@ public class GrayF32 extends GrayF<GrayF32> {
 	}
 
 	/** Creates an image with no data declared and the width/height set to zero. */
-	public GrayF32() {}
+	public GrayF32() {data = new float[0];}
 
 	/**
 	 * Returns the value of the specified pixel.

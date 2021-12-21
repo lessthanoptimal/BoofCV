@@ -27,6 +27,7 @@ import org.jetbrains.annotations.Nullable;
  *
  * @author Peter Abeles
  */
+@SuppressWarnings({"NullAway.Init"})
 public abstract class InterleavedI8<T extends InterleavedI8<T>> extends InterleavedInteger<T> {
 
 	public byte[] data;
@@ -42,7 +43,7 @@ public abstract class InterleavedI8<T extends InterleavedI8<T>> extends Interlea
 		super(width, height, numBands);
 	}
 
-	protected InterleavedI8() {}
+	protected InterleavedI8() {data = new byte[0];}
 
 	@Override
 	public String toString_element( int index ) {

@@ -73,7 +73,14 @@ public class ImageType<T extends ImageBase> implements Serializable {
 		this.numBands = numBands;
 	}
 
-	protected ImageType(){}
+	/**
+	 * Create an image type with default values
+	 */
+	protected ImageType() {
+		family = Family.GRAY;
+		dataType = ImageDataType.U8;
+		numBands = 1;
+	}
 
 	public static <I extends ImageGray<I>> ImageType<I> single( Class<I> imageType ) {
 		return new ImageType<>(Family.GRAY, ImageDataType.classToType(imageType), 1);
@@ -103,7 +110,7 @@ public class ImageType<T extends ImageBase> implements Serializable {
 	 * Converts the short hand string into an image type. A new instance is returned.
 	 */
 	@SuppressWarnings("unchecked")
-	public static<T extends ImageBase> ImageType<T> stringToType( String name , int numBands ) {
+	public static <T extends ImageBase> ImageType<T> stringToType( String name, int numBands ) {
 		ImageType type = new ImageType();
 		type.setTo(switch (name) {
 			case "SB_U8" -> SB_U8;
@@ -130,7 +137,7 @@ public class ImageType<T extends ImageBase> implements Serializable {
 			case "PL_S64" -> PL_S64;
 			case "PL_F32" -> PL_F32;
 			case "PL_F64" -> PL_F64;
-			default -> throw new RuntimeException("Unknown "+name);
+			default -> throw new RuntimeException("Unknown " + name);
 		});
 		type.numBands = numBands;
 		return type;

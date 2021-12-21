@@ -19,6 +19,7 @@
 package boofcv.struct.image;
 
 import boofcv.testing.BoofStandardJUnit;
+import org.jetbrains.annotations.Nullable;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -29,32 +30,33 @@ import static org.junit.jupiter.api.Assertions.*;
 public class TestImageGray extends BoofStandardJUnit {
 
 	@Test void reshape() {
-		DummyImage a = new DummyImage(10,30);
+		DummyImage a = new DummyImage(10, 30);
 		// b has the expected values
-		DummyImage b = new DummyImage(11,12);
+		DummyImage b = new DummyImage(11, 12);
 
-		a.reshape(11,12);
+		a.reshape(11, 12);
 
 		assertFalse(a.subImage);
-		assertEquals(b.stride,a.stride);
-		assertEquals(b.width,a.width);
-		assertEquals(b.height,a.height);
+		assertEquals(b.stride, a.stride);
+		assertEquals(b.width, a.width);
+		assertEquals(b.height, a.height);
 
 		// see if it will grow
-		b = new DummyImage(100,120);
-		a.reshape(100,120);
+		b = new DummyImage(100, 120);
+		a.reshape(100, 120);
 
-		assertEquals(b.stride,a.stride);
-		assertEquals(b.width,a.width);
-		assertEquals(b.height,a.height);
+		assertEquals(b.stride, a.stride);
+		assertEquals(b.width, a.width);
+		assertEquals(b.height, a.height);
 
 
 		// should throw an exception if a sub-image is reshaped
 		try {
-			a.subimage(1,2,1,2, null).reshape(100,200);
+			a.subimage(1, 2, 1, 2, null).reshape(100, 200);
 
 			fail("should have thrown an exception");
-		} catch( IllegalArgumentException e ) {}
+		} catch (IllegalArgumentException e) {
+		}
 	}
 
 	@Test void setTo() {
@@ -77,7 +79,6 @@ public class TestImageGray extends BoofStandardJUnit {
 		assertEquals(6, c.data[15]);
 	}
 
-
 	/**
 	 * The two matrices do not have the same shape
 	 */
@@ -97,7 +98,7 @@ public class TestImageGray extends BoofStandardJUnit {
 	@Test void constructor_w_h_n() {
 		DummyImage a = new DummyImage(10, 20);
 
-		assertEquals(10 * 20, a.data.length);
+		assertEquals(10*20, a.data.length);
 		assertEquals(10, a.getWidth());
 		assertEquals(20, a.getHeight());
 		assertEquals(10, a.getStride());
@@ -108,11 +109,11 @@ public class TestImageGray extends BoofStandardJUnit {
 		DummyImage a = new DummyImage(10, 20).subimage(2, 3, 8, 10, null);
 
 		assertTrue(a.subImage);
-		assertEquals(10 * 20, a.data.length);
+		assertEquals(10*20, a.data.length);
 		assertEquals(6, a.getWidth());
 		assertEquals(7, a.getHeight());
 		assertEquals(10, a.getStride());
-		assertEquals(3 * 10 + 2, a.getStartIndex());
+		assertEquals(3*10 + 2, a.getStartIndex());
 	}
 
 	@Test void isInBounds() {
@@ -130,44 +131,31 @@ public class TestImageGray extends BoofStandardJUnit {
 	@Test void getIndex() {
 		DummyImage a = new DummyImage(10, 20);
 
-		assertEquals(4 * 10 + 3, a.getIndex(3, 4));
+		assertEquals(4*10 + 3, a.getIndex(3, 4));
 	}
 
-	private static class DummyImage extends ImageGray<DummyImage> {
-		int data[];
+	private static class DummyImage extends GrayS32 {
+		int[] data;
 
-		private DummyImage(int width, int height) {
-			super(width, height);
-		}
+		private DummyImage( int width, int height ) { super(width, height); }
 
-		private DummyImage() {
-		}
+		private DummyImage() {}
 
-		@Override
-		public void print() {}
+		@Override public void print() {}
 
-		@Override
-		protected Object _getData() {
-			return data;
-		}
+		@Override protected Object _getData() { return data; }
+
+		@Override public ImageDataType getDataType() { return ImageDataType.S32; }
+
+		@Override public void _setData( Object data ) { this.data = (int[])data; }
 
 		@Override
-		public ImageDataType getDataType() {
-			return ImageDataType.S32;
-		}
+		public DummyImage createNew( int imgWidth, int imgHeight ) { return new DummyImage(imgWidth, imgHeight); }
 
-		@Override public void _setData( Object data ) {
-			this.data = (int[]) data;
-		}
+		@Override public void copyCol( int col, int row0, int row1, int offset, Object array ) {}
 
-		@Override
-		public DummyImage createNew(int imgWidth, int imgHeight) {
-			return new DummyImage(imgWidth,imgHeight);
-		}
-
-		@Override
-		public void copyCol(int col, int row0, int row1, int offset, Object array) {
-
+		@Override public DummyImage subimage( int x0, int y0, int x1, int y1, @Nullable GrayS32 subimage ) {
+			return (DummyImage)super.subimage(x0, y0, x1, y1, subimage);
 		}
 	}
 }

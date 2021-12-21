@@ -27,6 +27,7 @@ import org.jetbrains.annotations.Nullable;
  *
  * @author Peter Abeles
  */
+@SuppressWarnings({"NullAway.Init"})
 public class InterleavedF32 extends ImageInterleaved<InterleavedF32> {
 
 	public float[] data;
@@ -42,7 +43,7 @@ public class InterleavedF32 extends ImageInterleaved<InterleavedF32> {
 		super(width, height, numBands);
 	}
 
-	public InterleavedF32() {}
+	public InterleavedF32() {data = new float[0];}
 
 	@Override
 	public String toString_element( int index ) {

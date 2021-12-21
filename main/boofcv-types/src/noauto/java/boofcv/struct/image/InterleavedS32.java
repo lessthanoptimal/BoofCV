@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -25,6 +25,7 @@ package boofcv.struct.image;
  *
  * @author Peter Abeles
  */
+@SuppressWarnings({"NullAway.Init"})
 public class InterleavedS32 extends InterleavedInteger<InterleavedS32> {
 
 	public int[] data;
@@ -40,7 +41,7 @@ public class InterleavedS32 extends InterleavedInteger<InterleavedS32> {
 		super(width, height, numBands);
 	}
 
-	public InterleavedS32() {}
+	public InterleavedS32() {data = new int[0];}
 
 	@Override
 	public String toString_element( int index ) {

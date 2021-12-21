@@ -27,6 +27,7 @@ import org.jetbrains.annotations.Nullable;
  *
  * @author Peter Abeles
  */
+@SuppressWarnings({"NullAway.Init"})
 public class InterleavedS64 extends ImageInterleaved<InterleavedS64> {
 
 	public long[] data;
@@ -42,7 +43,7 @@ public class InterleavedS64 extends ImageInterleaved<InterleavedS64> {
 		super(width, height, numBands);
 	}
 
-	public InterleavedS64() {}
+	public InterleavedS64() {data = new long[0];}
 
 	@Override
 	public String toString_element( int index ) {

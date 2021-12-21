@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -25,6 +25,7 @@ package boofcv.struct.image;
  *
  * @author Peter Abeles
  */
+@SuppressWarnings({"NullAway.Init"})
 public abstract class GrayI16<T extends GrayI16<T>> extends GrayI<T> {
 
 	public short[] data;
@@ -33,7 +34,7 @@ public abstract class GrayI16<T extends GrayI16<T>> extends GrayI<T> {
 		super(width, height);
 	}
 
-	protected GrayI16() {}
+	protected GrayI16() {data = new short[0];}
 
 	/**
 	 * Sets the value of the specified pixel.
