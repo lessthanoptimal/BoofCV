@@ -1,6 +1,5 @@
+import net.ltgt.gradle.errorprone.CheckSeverity
 import org.gradle.api.tasks.testing.logging.TestExceptionFormat
-
-//import net.ltgt.gradle.errorprone.CheckSeverity
 
 plugins {
     id "com.peterabeles.gversion" version "1.10" apply false
@@ -22,6 +21,7 @@ allprojects {
 
     createVersionFile.enabled = false // run only once. enabled in types
 }
+
 project.ext.commons_io_version = '2.11.0'
 project.ext.deepboof_version = '0.5.1'
 project.ext.lombok_version = '1.18.20'
@@ -30,6 +30,7 @@ project.ext.guava_version = '31.0.1-jre'
 project.ext.args4j_version = '2.33'
 project.ext.junit_version = '5.8.1'
 project.ext.errorprone_version = '2.9.0'
+project.ext.nullaway_version = '0.9.3-SNAPSHOT'
 project.ext.auto64to32_version = '3.1.0'
 project.ext.jmh_version = '1.33'
 
@@ -164,10 +165,13 @@ subprojects {
         noautoAnnotationProcessor "org.projectlombok:lombok:${project.lombok_version}"  // @Getter @Setter
 
         errorprone("com.google.errorprone:error_prone_core:$project.errorprone_version")
-//        // even if it's not used you still need to include the dependency
-//        annotationProcessor "com.uber.nullaway:nullaway:0.8.0"
-//        testAnnotationProcessor "com.uber.nullaway:nullaway:0.8.0"
-//        benchmarkAnnotationProcessor "com.uber.nullaway:nullaway:0.8.0"
+
+        // even if it's not used you still need to include the dependency
+        annotationProcessor "com.uber.nullaway:nullaway:${project.nullaway_version}"
+        noautoAnnotationProcessor "com.uber.nullaway:nullaway:${project.nullaway_version}"
+        testAnnotationProcessor "com.uber.nullaway:nullaway:${project.nullaway_version}"
+        benchmarkAnnotationProcessor "com.uber.nullaway:nullaway:${project.nullaway_version}"
+        generateAnnotationProcessor "com.uber.nullaway:nullaway:${project.nullaway_version}"
     }
 
     tasks.withType(JavaCompile).configureEach {
@@ -207,11 +211,18 @@ subprojects {
             options.errorprone.disable("StaticAssignmentInConstructor", "UnusedVariable")
         }
 
-//        options.errorprone {
-//            check("NullAway", CheckSeverity.ERROR)
-//            option("NullAway:TreatGeneratedAsUnannotated", true)
-//            option("NullAway:AnnotatedPackages", "boofcv")
-//        }
+        // Disable ErrorProne for benchmarks and auto code generators
+//        options.errorprone.enabled = false
+        if (name.startsWith("compileBenchmark") || name.startsWith("compileGenerate") ) {
+            options.errorprone.enabled = false
+            return
+        }
+
+        options.errorprone {
+            check("NullAway", CheckSeverity.ERROR)
+            option("NullAway:TreatGeneratedAsUnannotated", true)
+            option("NullAway:AnnotatedPackages", "boofcv")
+        }
     }
 
     javadoc {

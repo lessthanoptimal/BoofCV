@@ -18,6 +18,8 @@
 
 package boofcv.generate;
 
+import org.jetbrains.annotations.Nullable;
+
 /**
  * Specifies how long and in what units something is.
  *
@@ -25,14 +27,14 @@ package boofcv.generate;
  */
 public class LengthUnit {
 	public double length;
-	public Unit unit;
+	public @Nullable Unit unit;
 
 	public LengthUnit( String string ) {
 		unit = null;
-		for( Unit u : Unit.values() ) { // lint:forbidden ignore_line
-			if( string.endsWith(u.abbreviation)) {
+		for (Unit u : Unit.values()) { // lint:forbidden ignore_line
+			if (string.endsWith(u.abbreviation)) {
 				unit = u;
-				string = string.substring(0,string.length()-u.abbreviation.length());
+				string = string.substring(0, string.length() - u.abbreviation.length());
 				break;
 			}
 		}
@@ -40,17 +42,17 @@ public class LengthUnit {
 	}
 
 	public double convert( Unit target ) {
-		if( unit == null )
+		if (unit == null)
 			return length;
 		else
-			return unit.convert(length,target);
+			return unit.convert(length, target);
 	}
 
 	@Override
 	public String toString() {
-		if( unit == null )
-			return length+"";
+		if (unit == null)
+			return length + "";
 		else
-			return length+unit.abbreviation;
+			return length + unit.abbreviation;
 	}
 }

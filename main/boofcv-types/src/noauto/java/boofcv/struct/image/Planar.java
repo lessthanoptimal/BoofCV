@@ -18,6 +18,8 @@
 
 package boofcv.struct.image;
 
+import org.jetbrains.annotations.Nullable;
+
 import java.lang.reflect.Array;
 
 /**
@@ -144,11 +146,11 @@ public class Planar<T extends ImageGray<T>> extends ImageMultiBand<Planar<T>>{
 	 * @param y0 y-coordinate of top-left corner of the sub-image.
 	 * @param x1 x-coordinate of bottom-right corner of the sub-image.
 	 * @param y1 y-coordinate of bottom-right corner of the sub-image.
-	 * @param subimage
+	 * @param output Optional storage for subimage
 	 * @return A sub-image of this image.
 	 */
 	@Override
-	public Planar<T> subimage(int x0, int y0, int x1, int y1, Planar<T> subimage) {
+	public Planar<T> subimage(int x0, int y0, int x1, int y1, @Nullable Planar<T> output) {
 		if (x0 < 0 || y0 < 0)
 			throw new IllegalArgumentException("x0 or y0 is less than zero");
 		if (x1 < x0 || y1 < y0)
@@ -156,18 +158,24 @@ public class Planar<T extends ImageGray<T>> extends ImageMultiBand<Planar<T>>{
 		if (x1 > width || y1 > height)
 			throw new IllegalArgumentException("x1 or y1 is more than the width or height respectively");
 
-		Planar<T> ret = new Planar<>(type, bands.length);
-		ret.stride = Math.max(width, stride);
-		ret.width = x1 - x0;
-		ret.height = y1 - y0;
-		ret.startIndex = startIndex + y0 * stride + x0;
-		ret.subImage = true;
+		if (output != null) {
+			output.type = type;
+			output.bands = (T[]) Array.newInstance(type, bands.length);
+		} else {
+			output = new Planar<>(type, bands.length);
+		}
+
+		output.stride = Math.max(width, stride);
+		output.width = x1 - x0;
+		output.height = y1 - y0;
+		output.startIndex = startIndex + y0 * stride + x0;
+		output.subImage = true;
 
 		for( int i = 0; i < bands.length; i++ ) {
-			ret.bands[i] = (T)bands[i].subimage(x0,y0,x1,y1);
+			output.bands[i] = (T)bands[i].subimage(x0,y0,x1,y1);
 		}
 		
-		return ret;
+		return output;
 	}
 
 	/**

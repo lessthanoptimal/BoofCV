@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -42,17 +42,17 @@ public enum AutoTypeImage {
 	F32(GrayF32.class),
 	F64(GrayF64.class);
 
-	private String imageSingleName;
-	private @Getter String dataType;
-	private @Getter String bitWise;
-	private @Getter String sumType;
-	private @Getter String largeSumType;
+	private final String imageSingleName;
+	private @Getter final String dataType;
+	private @Getter String bitWise = "unknown";
+	private @Getter String sumType = "unknown";
+	private @Getter String largeSumType = "unknown";
 	private @Getter boolean isInteger;
 	private boolean isSigned;
 	private @Getter int numBits;
-	private String abbreviatedType;
+	private String abbreviatedType = "unknown";
 
-	private Class<?> primitiveType;
+	private Class<?> primitiveType = Object.class;
 
 	AutoTypeImage( Class<?> imageType ) throws RuntimeException {
 

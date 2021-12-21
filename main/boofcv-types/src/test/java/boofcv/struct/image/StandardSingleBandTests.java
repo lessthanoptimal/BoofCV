@@ -40,6 +40,7 @@ import static org.junit.jupiter.api.Assertions.*;
  *
  * @author Peter Abeles
  */
+@SuppressWarnings("rawtypes")
 public abstract class StandardSingleBandTests<T extends ImageGray<T>> extends BoofStandardJUnit {
 
 	public Random rand = new Random(234);
@@ -73,7 +74,7 @@ public abstract class StandardSingleBandTests<T extends ImageGray<T>> extends Bo
 		Number orig = (Number)call(img, "get", 0, null, 1, 1);
 
 		// make sure the two are not equal
-		assertFalse(expected.equals(orig));
+		assertNotEquals(expected, orig);
 
 		// set the expected to the point in the image
 		call(img, "set", 1, expected, 1, 1);
@@ -82,9 +83,9 @@ public abstract class StandardSingleBandTests<T extends ImageGray<T>> extends Bo
 			assertEquals(expected.doubleValue(), found.doubleValue(), 1e-4);
 		else {
 			if (img.getDataType().isSigned())
-				assertTrue(expected.intValue() == found.intValue());
+				assertEquals(expected.intValue(), found.intValue());
 			else
-				assertTrue((expected.intValue() & 0xFFFF) == found.intValue());
+				assertEquals((expected.intValue() & 0xFFFF), found.intValue());
 		}
 	}
 
@@ -99,7 +100,7 @@ public abstract class StandardSingleBandTests<T extends ImageGray<T>> extends Bo
 		Number orig = (Number)call(img, "unsafe_get", 0, null, 1, 1);
 
 		// make sure the two are not equal
-		assertFalse(expected.equals(orig));
+		assertNotEquals(expected, orig);
 
 		// set the expected to the point in the image
 		call(img, "unsafe_set", 1, expected, 1, 1);
@@ -108,9 +109,9 @@ public abstract class StandardSingleBandTests<T extends ImageGray<T>> extends Bo
 			assertEquals(expected.doubleValue(), found.doubleValue(), 1e-4);
 		else {
 			if (img.getDataType().isSigned())
-				assertTrue(expected.intValue() == found.intValue());
+				assertEquals(expected.intValue(), found.intValue());
 			else
-				assertTrue((expected.intValue() & 0xFFFF) == found.intValue());
+				assertEquals((expected.intValue() & 0xFFFF), found.intValue());
 		}
 	}
 
@@ -185,7 +186,7 @@ public abstract class StandardSingleBandTests<T extends ImageGray<T>> extends Bo
 
 		T sub = (T)img.subimage(2, 3, 3, 5, null);
 
-		assertTrue(img.getImageType() == sub.getImageType());
+		assertSame(img.getImageType(), sub.getImageType());
 		assertEquals(1, sub.getWidth());
 		assertEquals(2, sub.getHeight());
 
@@ -259,8 +260,8 @@ public abstract class StandardSingleBandTests<T extends ImageGray<T>> extends Bo
 	@Test void checkNoArgumentConstructor() {
 		ImageGray a = createImage();
 
-		assertTrue(a._getData() == null);
-		assertTrue(a.getImageType() != null);
+		assertNotNull(a._getData());
+		assertNotNull(a.getImageType());
 	}
 
 	@Test void copyRow() {

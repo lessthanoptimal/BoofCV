@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -25,6 +25,7 @@ package boofcv.struct.image;
  *
  * @author Peter Abeles
  */
+@SuppressWarnings({"NullAway.Init"})
 public class GrayS64 extends ImageGray<GrayS64> {
 
 	public long[] data;
@@ -40,7 +41,7 @@ public class GrayS64 extends ImageGray<GrayS64> {
 	}
 
 	/** Creates an image with no data declared and the width/height set to zero. */
-	public GrayS64() {}
+	public GrayS64() {data = new long[0];}
 
 	/**
 	 * Returns the value of the specified pixel.

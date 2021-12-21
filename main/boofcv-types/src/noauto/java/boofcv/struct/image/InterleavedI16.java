@@ -27,6 +27,7 @@ import org.jetbrains.annotations.Nullable;
  *
  * @author Peter Abeles
  */
+@SuppressWarnings({"NullAway.Init"})
 public abstract class InterleavedI16<T extends InterleavedI16<T>> extends InterleavedInteger<T> {
 
 	public short[] data;
@@ -42,7 +43,7 @@ public abstract class InterleavedI16<T extends InterleavedI16<T>> extends Interl
 		super(width, height, numBands);
 	}
 
-	protected InterleavedI16() {}
+	protected InterleavedI16() {data = new short[0];}
 
 	@Override
 	public String toString_element( int index ) {

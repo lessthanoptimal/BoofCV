@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -19,7 +19,6 @@
 package boofcv.struct.image;
 
 import lombok.Getter;
-import org.jetbrains.annotations.Nullable;
 
 /**
  * Describes the physical characteristics of the internal primitive data types inside the image
@@ -109,32 +108,33 @@ public enum ImageDataType {
 		this.maxValue = selectMaxValue();
 	}
 
-	public static @Nullable ImageDataType classToType( Class imageClass ) {
+	@SuppressWarnings("unchecked")
+	public static ImageDataType classToType( Class imageClass ) {
 		// @formatter:off
-		if      (imageClass == GrayU8.class)         return U8;
-		else if (imageClass == GrayS8.class)         return S8;
-		else if (imageClass == GrayU16.class)        return U16;
-		else if (imageClass == GrayS16.class)        return S16;
-		else if (imageClass == GrayS32.class)        return S32;
-		else if (imageClass == GrayS64.class)        return S64;
-		else if (imageClass == GrayF32.class)        return F32;
-		else if (imageClass == GrayF64.class)        return F64;
-		else if (imageClass == GrayI8.class)         return I8;
-		else if (imageClass == GrayI16.class)        return I16;
-		else if (imageClass == GrayI.class)          return I;
-		else if (imageClass == GrayF.class)          return F;
-		else if (imageClass == InterleavedU8.class)  return U8;
-		else if (imageClass == InterleavedS8.class)  return S8;
-		else if (imageClass == InterleavedU16.class) return U16;
-		else if (imageClass == InterleavedS16.class) return S16;
-		else if (imageClass == InterleavedS32.class) return S32;
-		else if (imageClass == InterleavedS64.class) return S64;
-		else if (imageClass == InterleavedF32.class) return F32;
-		else if (imageClass == InterleavedF64.class) return F64;
-		else if (imageClass == InterleavedI8.class)  return I8;
-		else if (imageClass == InterleavedI16.class) return I16;
+		if      (GrayU8.class.isAssignableFrom(imageClass))         return U8;
+		else if (GrayS8.class.isAssignableFrom(imageClass))         return S8;
+		else if (GrayU16.class.isAssignableFrom(imageClass))        return U16;
+		else if (GrayS16.class.isAssignableFrom(imageClass))        return S16;
+		else if (GrayS32.class.isAssignableFrom(imageClass))        return S32;
+		else if (GrayS64.class.isAssignableFrom(imageClass))        return S64;
+		else if (GrayF32.class.isAssignableFrom(imageClass))        return F32;
+		else if (GrayF64.class.isAssignableFrom(imageClass))        return F64;
+		else if (GrayI8.class.isAssignableFrom(imageClass))         return I8;
+		else if (GrayI16.class.isAssignableFrom(imageClass))        return I16;
+		else if (GrayI.class.isAssignableFrom(imageClass))          return I;
+		else if (GrayF.class.isAssignableFrom(imageClass))          return F;
+		else if (InterleavedU8.class.isAssignableFrom(imageClass))  return U8;
+		else if (InterleavedS8.class.isAssignableFrom(imageClass))  return S8;
+		else if (InterleavedU16.class.isAssignableFrom(imageClass)) return U16;
+		else if (InterleavedS16.class.isAssignableFrom(imageClass)) return S16;
+		else if (InterleavedS32.class.isAssignableFrom(imageClass)) return S32;
+		else if (InterleavedS64.class.isAssignableFrom(imageClass)) return S64;
+		else if (InterleavedF32.class.isAssignableFrom(imageClass)) return F32;
+		else if (InterleavedF64.class.isAssignableFrom(imageClass)) return F64;
+		else if (InterleavedI8.class.isAssignableFrom(imageClass))  return I8;
+		else if (InterleavedI16.class.isAssignableFrom(imageClass)) return I16;
 		else
-			return null;
+			throw new IllegalArgumentException("Unknown image type. class="+imageClass.getCanonicalName());
 		// @formatter:on
 	}
 

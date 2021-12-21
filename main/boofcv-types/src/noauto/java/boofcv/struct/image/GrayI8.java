@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -25,6 +25,7 @@ package boofcv.struct.image;
  *
  * @author Peter Abeles
  */
+@SuppressWarnings({"NullAway.Init"})
 public abstract class GrayI8<T extends GrayI8<T>> extends GrayI<T> {
 
 	public byte[] data;
@@ -39,7 +40,7 @@ public abstract class GrayI8<T extends GrayI8<T>> extends GrayI<T> {
 		super(width, height);
 	}
 
-	protected GrayI8() {}
+	protected GrayI8() {data = new byte[0];}
 
 	/**
 	 * Create a copy from the two array. input[y][x]

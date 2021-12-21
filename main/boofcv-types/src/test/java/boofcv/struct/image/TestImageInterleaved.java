@@ -19,6 +19,7 @@
 package boofcv.struct.image;
 
 import boofcv.testing.BoofStandardJUnit;
+import org.jetbrains.annotations.Nullable;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -51,8 +52,8 @@ public class TestImageInterleaved extends BoofStandardJUnit {
 	 * The two matrices do not have the same shape
 	 */
 	@Test void setTo_mismatch() {
-		DummyImage a = new DummyImage(10, 20 , 3);
-		DummyImage b = new DummyImage(11, 21 , 3);
+		DummyImage a = new DummyImage(10, 20, 3);
+		DummyImage b = new DummyImage(11, 21, 3);
 
 		a.setTo(b);
 
@@ -63,55 +64,56 @@ public class TestImageInterleaved extends BoofStandardJUnit {
 	@Test void reshape_wh() {
 		DummyImage a = new DummyImage(10, 20, 3);
 
-		a.reshape(5,10);
+		a.reshape(5, 10);
 		assertTrue(50 <= a.data.length);
-		assertEquals(5,a.width);
-		assertEquals(10,a.height);
-		assertEquals(3,a.numBands);
-		assertEquals(5*3,a.stride);
+		assertEquals(5, a.width);
+		assertEquals(10, a.height);
+		assertEquals(3, a.numBands);
+		assertEquals(5*3, a.stride);
 
-		a.reshape(30,25);
+		a.reshape(30, 25);
 		assertTrue(30*25 <= a.data.length);
-		assertEquals(30,a.width);
-		assertEquals(25,a.height);
-		assertEquals(3,a.numBands);
-		assertEquals(30*3,a.stride);
+		assertEquals(30, a.width);
+		assertEquals(25, a.height);
+		assertEquals(3, a.numBands);
+		assertEquals(30*3, a.stride);
 	}
 
 	@Test void reshape_whb() {
 		DummyImage a = new DummyImage(10, 20, 3);
 
-		a.reshape(5,10,3);
+		a.reshape(5, 10, 3);
 		assertTrue(5*10*3 <= a.data.length);
-		assertEquals(5,a.width);
-		assertEquals(10,a.height);
-		assertEquals(3,a.numBands);
-		assertEquals(5*3,a.stride);
+		assertEquals(5, a.width);
+		assertEquals(10, a.height);
+		assertEquals(3, a.numBands);
+		assertEquals(5*3, a.stride);
 
-		a.reshape(5,10,2);
+		a.reshape(5, 10, 2);
 		assertTrue(5*10*2 <= a.data.length);
-		assertEquals(5,a.width);
-		assertEquals(10,a.height);
-		assertEquals(2,a.numBands);
-		assertEquals(5*2,a.stride);
+		assertEquals(5, a.width);
+		assertEquals(10, a.height);
+		assertEquals(2, a.numBands);
+		assertEquals(5*2, a.stride);
 
 
-		a.reshape(30,25,3);
+		a.reshape(30, 25, 3);
 		assertTrue(30*25*3 <= a.data.length);
-		assertEquals(30,a.width);
-		assertEquals(25,a.height);
-		assertEquals(3,a.numBands);
-		assertEquals(30*3,a.stride);
+		assertEquals(30, a.width);
+		assertEquals(25, a.height);
+		assertEquals(3, a.numBands);
+		assertEquals(30*3, a.stride);
 	}
 
 	@Test void reshape_subimage() {
 		DummyImage img = new DummyImage(10, 20, 3);
-		img = img.subimage(0,0,2,2, null);
+		img = img.subimage(0, 0, 2, 2, null);
 
 		try {
-			img.reshape(10,20);
+			img.reshape(10, 20);
 			fail("Should have thrown exception");
-		} catch( IllegalArgumentException ignore ) {}
+		} catch (IllegalArgumentException ignore) {
+		}
 	}
 
 	/**
@@ -146,7 +148,7 @@ public class TestImageInterleaved extends BoofStandardJUnit {
 	@Test void constructor_w_h_n() {
 		DummyImage a = new DummyImage(10, 20, 3);
 
-		assertEquals(10 * 20 * 3, a.data.length);
+		assertEquals(10*20*3, a.data.length);
 		assertEquals(10, a.getWidth());
 		assertEquals(20, a.getHeight());
 		assertEquals(3, a.getNumBands());
@@ -161,14 +163,14 @@ public class TestImageInterleaved extends BoofStandardJUnit {
 		DummyImage b = a.subimage(2, 3, 8, 10, null);
 
 		assertTrue(b.isSubimage());
-		assertTrue(a.getImageType()==b.getImageType());
-		assertTrue(a._getData()==b._getData());
-		assertEquals(10 * 20 * 3, b.data.length);
+		assertTrue(a.getImageType() == b.getImageType());
+		assertTrue(a._getData() == b._getData());
+		assertEquals(10*20*3, b.data.length);
 		assertEquals(6, b.getWidth());
 		assertEquals(7, b.getHeight());
 		assertEquals(3, b.getNumBands());
 		assertEquals(30, b.getStride());
-		assertEquals(3 * 30 + 2 * 3, b.getStartIndex());
+		assertEquals(3*30 + 2*3, b.getStartIndex());
 	}
 
 	@Test void isInBounds() {
@@ -186,51 +188,42 @@ public class TestImageInterleaved extends BoofStandardJUnit {
 	@Test void getIndex() {
 		DummyImage a = new DummyImage(10, 20, 3);
 
-		assertEquals(4 * 30 + 3 * 3 + 1, a.getIndex(3, 4, 1));
+		assertEquals(4*30 + 3*3 + 1, a.getIndex(3, 4, 1));
 	}
 
-	private static class DummyImage extends ImageInterleaved<DummyImage> {
-		int data[];
+	private static class DummyImage extends InterleavedS32 {
+		int[] data;
 
-		private DummyImage(int width, int height, int numBands) {
+		private DummyImage( int width, int height, int numBands ) {
 			super(width, height, numBands);
 		}
 
-		private DummyImage() {
-		}
+		private DummyImage() {}
 
-		@Override
-		public ImageDataType getDataType() {
+		@Override public ImageDataType getDataType() {
 			return ImageDataType.S32;
 		}
 
-		@Override
-		protected Object _getData() {
+		@Override protected Object _getData() {
 			return data;
 		}
 
-		@Override
-		protected Class getPrimitiveDataType() {
-			return int.class;
+		@Override protected Class getPrimitiveDataType() {return int.class;}
+
+		@Override protected void _setData( Object data ) {
+			this.data = (int[])data;
 		}
 
+		@Override public String toString_element( int index ) {return null;}
 
-		@Override
-		protected void _setData(Object data) {
-			this.data = (int[]) data;
+		@Override public DummyImage createNew( int imgWidth, int imgHeight ) {
+			return new DummyImage(imgWidth, imgHeight, numBands);
 		}
 
-		@Override
-		public String toString_element(int index) {return null;}
+		@Override public void copyCol( int col, int row0, int row1, int offset, Object array ) {}
 
-		@Override
-		public DummyImage createNew(int imgWidth, int imgHeight) {
-			return new DummyImage(imgWidth,imgHeight,numBands);
-		}
-
-		@Override
-		public void copyCol(int col, int row0, int row1, int offset, Object array) {
-
+		@Override public DummyImage subimage( int x0, int y0, int x1, int y1, @Nullable InterleavedS32 subimage ) {
+			return (DummyImage)super.subimage(x0, y0, x1, y1, subimage);
 		}
 	}
 }

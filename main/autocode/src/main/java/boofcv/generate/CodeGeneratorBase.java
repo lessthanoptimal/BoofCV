@@ -43,7 +43,7 @@ public abstract class CodeGeneratorBase {
 	public static final int MAX_LINE_LENGTH = 120;
 	public static final int SPACE_PER_TAB = 4;
 
-	protected PrintStream out;
+	protected PrintStream out = System.out;
 	protected @Nullable String className;
 	protected @Setter @Nullable String moduleName;
 	/**

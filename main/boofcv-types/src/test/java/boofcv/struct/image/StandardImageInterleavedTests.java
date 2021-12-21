@@ -250,7 +250,7 @@ import static org.junit.jupiter.api.Assertions.*;
 	@Test void checkNoArgumentConstructor() {
 		T a = createImage();
 
-		assertNull(a._getData());
+		assertNotNull(a._getData());
 		assertNotNull(a.getPrimitiveDataType());
 		assertNotNull(a.getImageType());
 	}
