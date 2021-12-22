@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -23,6 +23,7 @@ import boofcv.struct.geo.AssociatedPair;
 import org.ddogleg.fitting.modelset.ModelCodec;
 import org.ddogleg.optimization.functions.FunctionNtoM;
 import org.ejml.data.DMatrixRMaj;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
 
@@ -49,7 +50,7 @@ public class ResidualsEpipolarMatrixN implements FunctionNtoM {
 	 * @param param Converts parameters into epipolar matrix
 	 * @param residual Function for computing the residuals
 	 */
-	public ResidualsEpipolarMatrixN(ModelCodec<DMatrixRMaj> param,
+	public ResidualsEpipolarMatrixN(@Nullable ModelCodec<DMatrixRMaj> param,
 									ModelObservationResidualN residual) {
 		this.param = param == null ? new ModelCodecSwapData(9) : param;
 		this.residual = residual;

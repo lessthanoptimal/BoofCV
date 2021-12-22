@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -21,6 +21,7 @@ package boofcv.alg.interpolate.impl;
 import boofcv.alg.interpolate.InterpolateRectangle;
 import boofcv.struct.image.GrayF32;
 
+import javax.annotation.processing.Generated;
 
 /**
  * <p>
@@ -34,11 +35,12 @@ import boofcv.struct.image.GrayF32;
  *
  * @author Peter Abeles
  */
+@Generated("GenerateBilinearRectangle")
 public class BilinearRectangle_F32 implements InterpolateRectangle<GrayF32> {
 
 	private GrayF32 orig;
 
-	private float data[];
+	private float[] data;
 	private int stride;
 
 	public BilinearRectangle_F32(GrayF32 image) {

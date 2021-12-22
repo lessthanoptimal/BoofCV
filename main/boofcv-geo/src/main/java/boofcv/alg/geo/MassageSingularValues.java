@@ -30,6 +30,7 @@ import org.ejml.interfaces.decomposition.SingularValueDecomposition_F64;
  *
  * @author Peter Abeles
  */
+@SuppressWarnings({"NullAway.Init"})
 public class MassageSingularValues {
 	protected SingularValueDecomposition_F64<DMatrixRMaj> svd;
 
@@ -54,7 +55,7 @@ public class MassageSingularValues {
 	}
 
 	public MassageSingularValues() {
-		this(F->{});
+		this(F -> {});
 	}
 
 	/**

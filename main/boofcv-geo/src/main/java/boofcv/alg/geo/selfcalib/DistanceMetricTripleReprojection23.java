@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -38,6 +38,7 @@ import java.util.List;
  * Image based reprojection error using error in view 2 and view 3. If triangulation fails or it appears behind
  * a camera then it returns the max allowed distance
  */
+@SuppressWarnings({"NullAway.Init"})
 public class DistanceMetricTripleReprojection23 implements DistanceFromModel<MetricCameraTriple, AssociatedTriple> {
 
 	// the model

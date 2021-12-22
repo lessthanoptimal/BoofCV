@@ -52,7 +52,7 @@ public class SceneStructureMetric extends SceneStructureCommon {
 	/** List of rigid objects. A rigid object is a group of 3D points that have a known relationship with each other. */
 	public final DogArray<Rigid> rigids = new DogArray<>(Rigid::new, Rigid::reset);
 	// Lookup table from rigid point to rigid object
-	public int[] lookupRigid;
+	public int[] lookupRigid = new int[0];
 
 	/**
 	 * Configure bundle adjustment
@@ -100,7 +100,7 @@ public class SceneStructureMetric extends SceneStructureCommon {
 		rigids.resize(totalRigid);
 
 		// forget old assignments
-		lookupRigid = null;
+		lookupRigid = new int[0];
 	}
 
 	/**
@@ -109,7 +109,7 @@ public class SceneStructureMetric extends SceneStructureCommon {
 	 */
 	public void assignIDsToRigidPoints() {
 		// return if it has already been assigned
-		if (lookupRigid != null)
+		if (lookupRigid.length != 0)
 			return;
 		// Assign a unique ID to each point belonging to a rigid object
 		// at the same time create a look up table that allows for the object that a point belongs to be quickly found
@@ -497,6 +497,7 @@ public class SceneStructureMetric extends SceneStructureCommon {
 	 * A set of connected points that form a rigid structure. The 3D location of points
 	 * in the rigid body's reference frame is constant.
 	 */
+	@SuppressWarnings({"NullAway.Init"})
 	public static class Rigid {
 		/** If the parameters are assumed to be known and should not be optimised. */
 		public boolean known;
@@ -505,7 +506,7 @@ public class SceneStructureMetric extends SceneStructureCommon {
 		public final Se3_F64 object_to_world = new Se3_F64();
 
 		/** Location of points in object's reference frame. The coordinate is always fixed. */
-		public Point[] points;
+		public @Nullable Point[] points;
 
 		/** Index of the first point in the list */
 		public int indexFirst;

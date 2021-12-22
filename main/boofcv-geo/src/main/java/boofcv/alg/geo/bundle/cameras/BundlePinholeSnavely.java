@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -19,6 +19,7 @@
 package boofcv.alg.geo.bundle.cameras;
 
 import georegression.struct.point.Point2D_F64;
+import org.jetbrains.annotations.Nullable;
 
 /**
  * Bundler and Bundle Adjustment in the Large use a different coordinate system. This
@@ -34,7 +35,8 @@ public class BundlePinholeSnavely extends BundlePinholeSimplified {
 
 	@Override
 	public void jacobian( double X, double Y, double Z,
-						  double[] inputX, double[] inputY, boolean computeIntrinsic, double[] calibX, double[] calibY ) {
+						  double[] inputX, double[] inputY,
+						  boolean computeIntrinsic, @Nullable double[] calibX, @Nullable double[] calibY ) {
 
 		Z = -Z;
 
@@ -65,7 +67,7 @@ public class BundlePinholeSnavely extends BundlePinholeSimplified {
 		inputX[2] = f*normX*(r/Z - r_Z); // you have no idea how many hours I lost before I realized the mistake here
 		inputY[2] = f*normY*(r/Z - r_Z);
 
-		if (!computeIntrinsic)
+		if (!computeIntrinsic || calibX == null || calibY == null)
 			return;
 
 		// partial f

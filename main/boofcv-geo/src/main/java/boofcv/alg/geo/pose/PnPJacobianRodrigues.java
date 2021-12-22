@@ -37,6 +37,7 @@ import java.util.List;
  *
  * @author Peter Abeles
  */
+@SuppressWarnings({"NullAway.Init"})
 public class PnPJacobianRodrigues implements FunctionNtoMxN<DMatrixRMaj> {
 
 	// transformation from world to camera frame

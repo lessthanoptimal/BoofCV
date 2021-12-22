@@ -28,6 +28,7 @@ import lombok.Setter;
  *
  * @author Peter Abeles
  */
+@SuppressWarnings({"NullAway.Init"})
 @Getter @Setter
 public class ConfigThreshold implements Configuration {
 

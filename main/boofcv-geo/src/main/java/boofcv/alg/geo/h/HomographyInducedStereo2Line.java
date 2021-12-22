@@ -30,6 +30,7 @@ import georegression.struct.point.Point3D_F64;
 import georegression.struct.point.Vector3D_F64;
 import org.ejml.data.DMatrixRMaj;
 import org.ejml.dense.row.CommonOps_DDRM;
+import org.jetbrains.annotations.Nullable;
 
 /**
  * <p>
@@ -91,7 +92,7 @@ public class HomographyInducedStereo2Line {
 	 * @param F Fundamental matrix.
 	 * @param e2 Epipole for camera 2. If null it will be computed internally.
 	 */
-	public void setFundamental( DMatrixRMaj F, Point3D_F64 e2 ) {
+	public void setFundamental( DMatrixRMaj F, @Nullable Point3D_F64 e2 ) {
 		if (e2 != null)
 			this.e2.setTo(e2);
 		else {

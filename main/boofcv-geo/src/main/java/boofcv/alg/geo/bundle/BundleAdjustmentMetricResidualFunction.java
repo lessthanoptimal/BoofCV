@@ -32,6 +32,7 @@ import org.ddogleg.struct.DogArray;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Objects;
 
 /**
  * <p>
@@ -48,6 +49,7 @@ import java.util.Map;
  * @see SceneStructureMetric
  * @see SceneObservations
  */
+@SuppressWarnings({"NullAway.Init"})
 public class BundleAdjustmentMetricResidualFunction
 		implements BundleAdjustmentSchur.FunctionResiduals<SceneStructureMetric> {
 	private SceneStructureMetric structure;
@@ -263,16 +265,16 @@ public class BundleAdjustmentMetricResidualFunction
 		if (v.parent == null)
 			return parent_to_view;
 
-		Se3_F64 world_to_view = mapWorldToView.get(v);
+		Se3_F64 world_to_view = Objects.requireNonNull(mapWorldToView.get(v));
 		SceneStructureMetric.View parentView = v.parent;
 
 		// See if the parent is relative to the global frame
 		if (parentView.parent == null) {
-			Se3_F64 world_to_parent = structure.getParentToView(v.parent);
+			Se3_F64 world_to_parent = Objects.requireNonNull(structure.getParentToView(v.parent));
 			world_to_parent.concat(parent_to_view, world_to_view);
 		} else {
 			// Since the parent must have a lower index it's transform is already known
-			Se3_F64 world_to_parent = mapWorldToView.get(v.parent);
+			Se3_F64 world_to_parent = Objects.requireNonNull(mapWorldToView.get(v.parent));
 			world_to_parent.concat(parent_to_view, world_to_view);
 		}
 		return world_to_view;

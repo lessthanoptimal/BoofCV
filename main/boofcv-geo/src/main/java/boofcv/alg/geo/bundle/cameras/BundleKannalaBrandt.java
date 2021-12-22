@@ -275,7 +275,7 @@ public class BundleKannalaBrandt implements BundleAdjustmentCamera {
 			pointX[2] += model.skew*distY_dZ;
 		}
 
-		if (!computeIntrinsic)
+		if (!computeIntrinsic || calibX == null || calibY == null)
 			return;
 
 		// Intrinsic parameters K

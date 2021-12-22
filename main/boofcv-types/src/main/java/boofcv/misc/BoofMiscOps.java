@@ -912,7 +912,7 @@ public class BoofMiscOps {
 		return out + "}";
 	}
 
-	public static @Nullable PrintStream addPrefix( VerbosePrint owner, PrintStream out ) {
+	public static @Nullable PrintStream addPrefix( VerbosePrint owner, @Nullable PrintStream out ) {
 		return addPrefix(owner, 1, out);
 	}
 

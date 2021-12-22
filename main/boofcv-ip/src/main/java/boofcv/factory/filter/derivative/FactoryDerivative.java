@@ -90,7 +90,7 @@ public class FactoryDerivative {
 	 * @return gradient filter
 	 */
 	public static <I extends ImageGray<I>, D extends ImageGray<D>>
-	ImageGradient<I, D> gradientSB( DerivativeType type, Class<I> inputType, Class<D> derivType ) {
+	ImageGradient<I, D> gradientSB( DerivativeType type, Class<I> inputType, @Nullable Class<D> derivType ) {
 		if (derivType == null)
 			derivType = GImageDerivativeOps.getDerivativeType(inputType);
 
@@ -259,7 +259,7 @@ public class FactoryDerivative {
 		return m;
 	}
 
-	private static Method findHessianFromGradient( Class<?> derivativeClass, Class<?> imageType ) {
+	private static Method findHessianFromGradient( Class<?> derivativeClass, @Nullable Class<?> imageType ) {
 		String name = derivativeClass.getSimpleName().substring(8);
 		Method m;
 		try {

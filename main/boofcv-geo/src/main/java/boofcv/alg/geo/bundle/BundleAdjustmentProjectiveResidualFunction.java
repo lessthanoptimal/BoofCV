@@ -43,6 +43,7 @@ import georegression.struct.point.Point4D_F64;
  * @see SceneStructureProjective
  * @see SceneObservations
  */
+@SuppressWarnings({"NullAway.Init"})
 public class BundleAdjustmentProjectiveResidualFunction
 		implements BundleAdjustmentSchur.FunctionResiduals<SceneStructureProjective> {
 	private SceneStructureProjective structure;

@@ -83,6 +83,7 @@ import java.util.Set;
  *
  * @author Peter Abeles
  */
+@SuppressWarnings({"NullAway.Init"})
 public class CalibrationPlanarGridZhang99 implements VerbosePrint {
 
 	Zhang99Camera cameraGenerator;
@@ -108,7 +109,7 @@ public class CalibrationPlanarGridZhang99 implements VerbosePrint {
 	/** Use a robust non-linear solver. This can run significantly slower */
 	@Getter @Setter private boolean robust = false;
 
-	private PrintStream verbose = null;
+	private @Nullable PrintStream verbose = null;
 
 	/**
 	 * Configures calibration process.

@@ -26,6 +26,7 @@ import georegression.struct.so.Rodrigues_F64;
 import org.ejml.UtilEjml;
 import org.ejml.data.DMatrixRMaj;
 import org.ejml.dense.row.CommonOps_DDRM;
+import org.jetbrains.annotations.Nullable;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
@@ -69,7 +70,7 @@ public class BoofTesting {
 		return tol;
 	}
 
-	public static <T> T convertToGenericType( Class<?> type ) {
+	public static <T> @Nullable T convertToGenericType( @Nullable Class<?> type ) {
 		if (type == GrayS8.class || type == GrayU8.class)
 			return (T)GrayI8.class;
 		if (type == GrayS16.class || type == GrayU16.class)

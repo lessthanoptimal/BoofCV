@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -20,6 +20,7 @@ package boofcv.alg.geo.bundle.cameras;
 
 import boofcv.abst.geo.bundle.BundleAdjustmentCamera;
 import georegression.struct.point.Point2D_F64;
+import org.jetbrains.annotations.Nullable;
 
 /**
  * Formulas for {@link boofcv.struct.calib.CameraPinhole}.
@@ -85,7 +86,7 @@ public class BundlePinhole implements BundleAdjustmentCamera {
 	@Override
 	public void jacobian( double camX, double camY, double camZ,
 						  double[] inputX, double[] inputY, boolean computeIntrinsic,
-						  double[] calibX, double[] calibY ) {
+						  @Nullable double[] calibX, @Nullable double[] calibY ) {
 		double nx = camX/camZ;
 		double ny = camY/camZ;
 
@@ -96,7 +97,7 @@ public class BundlePinhole implements BundleAdjustmentCamera {
 		inputX[2] = -(fx*camX + skew*camY)/(camZ*camZ);
 		inputY[2] = -fy*camY/(camZ*camZ);
 
-		if (!computeIntrinsic)
+		if (!computeIntrinsic || calibX == null || calibY == null)
 			return;
 
 		calibX[0] = nx;

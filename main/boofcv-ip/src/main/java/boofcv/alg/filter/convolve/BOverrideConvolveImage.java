@@ -24,6 +24,7 @@ import boofcv.struct.border.ImageBorder;
 import boofcv.struct.convolve.Kernel1D;
 import boofcv.struct.convolve.Kernel2D;
 import boofcv.struct.image.ImageBase;
+import org.jetbrains.annotations.Nullable;
 
 /**
  * Override for {@link ConvolveImage}.
@@ -36,9 +37,9 @@ public class BOverrideConvolveImage extends BOverrideClass {
 		BOverrideManager.register(BOverrideConvolveImage.class);
 	}
 
-	public static Horizontal horizontal;
-	public static Vertical vertical;
-	public static Convolve convolve;
+	public static @Nullable Horizontal horizontal;
+	public static @Nullable Vertical vertical;
+	public static @Nullable Convolve convolve;
 
 	public interface Horizontal {
 		void horizontal(Kernel1D kernel, ImageBase input, ImageBase output , ImageBorder border);

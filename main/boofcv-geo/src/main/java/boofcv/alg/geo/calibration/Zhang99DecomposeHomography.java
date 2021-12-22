@@ -53,6 +53,7 @@ import org.ejml.dense.row.SpecializedOps_DDRM;
  *
  * @author Peter Abeles
  */
+@SuppressWarnings({"NullAway.Init"})
 public class Zhang99DecomposeHomography {
 
 	// Rows in rotation matrix

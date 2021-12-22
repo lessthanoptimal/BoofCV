@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -282,7 +282,7 @@ public class BundleUniversalOmni implements BundleAdjustmentCamera {
 		inputX[2] = fx*fooX + skew*fooY;
 		inputY[2] = fy*fooY;
 
-		if (!computeIntrinsic)
+		if (!computeIntrinsic || calibX == null || calibY == null)
 			return;
 
 		// compute distorted normalized image coordinates

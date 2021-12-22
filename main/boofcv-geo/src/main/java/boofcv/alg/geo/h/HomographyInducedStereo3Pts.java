@@ -29,6 +29,7 @@ import org.ejml.LinearSolverSafe;
 import org.ejml.data.DMatrixRMaj;
 import org.ejml.dense.row.factory.LinearSolverFactory_DDRM;
 import org.ejml.interfaces.linsol.LinearSolverDense;
+import org.jetbrains.annotations.Nullable;
 
 /**
  * <p>
@@ -91,7 +92,7 @@ public class HomographyInducedStereo3Pts {
 	 * @param F Fundamental matrix.
 	 * @param e2 Epipole for camera 2. If null it will be computed internally.
 	 */
-	public void setFundamental( DMatrixRMaj F, Point3D_F64 e2 ) {
+	public void setFundamental( DMatrixRMaj F, @Nullable Point3D_F64 e2 ) {
 		if (e2 != null)
 			this.e2.setTo(e2);
 		else {

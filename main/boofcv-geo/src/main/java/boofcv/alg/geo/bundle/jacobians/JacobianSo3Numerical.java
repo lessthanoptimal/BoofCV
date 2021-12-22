@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -28,6 +28,7 @@ import org.ejml.data.DMatrixRMaj;
  *
  * @author Peter Abeles
  */
+@SuppressWarnings({"NullAway.Init"})
 public abstract class JacobianSo3Numerical implements JacobianSo3 {
 
 	private FunctionNtoMxN<DMatrixRMaj> numericalJac; // function used to compute numerical jacobian

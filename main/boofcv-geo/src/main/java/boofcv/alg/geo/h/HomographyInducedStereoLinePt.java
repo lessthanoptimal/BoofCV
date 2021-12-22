@@ -25,6 +25,7 @@ import georegression.geometry.GeometryMath_F64;
 import georegression.struct.point.Point3D_F64;
 import org.ejml.data.DMatrixRMaj;
 import org.ejml.dense.row.CommonOps_DDRM;
+import org.jetbrains.annotations.Nullable;
 
 /**
  * <p>
@@ -52,22 +53,22 @@ public class HomographyInducedStereoLinePt {
 	// Fundamental matrix
 	private DMatrixRMaj F;
 	// Epipole in camera 2
-	private Point3D_F64 e2 = new Point3D_F64();
+	private final Point3D_F64 e2 = new Point3D_F64();
 
 	// The found homography from view 1 to view 2
-	private DMatrixRMaj H = new DMatrixRMaj(3, 3);
+	private final DMatrixRMaj H = new DMatrixRMaj(3, 3);
 
 	// pick a reasonable scale and sign
-	private AdjustHomographyMatrix adjust = new AdjustHomographyMatrix();
+	private final AdjustHomographyMatrix adjust = new AdjustHomographyMatrix();
 
 	// storage for intermediate results
-	private DMatrixRMaj el = new DMatrixRMaj(3, 3);
-	private DMatrixRMaj lf = new DMatrixRMaj(3, 3);
+	private final DMatrixRMaj el = new DMatrixRMaj(3, 3);
+	private final DMatrixRMaj lf = new DMatrixRMaj(3, 3);
 
-	private Point3D_F64 Fx = new Point3D_F64();
+	private final Point3D_F64 Fx = new Point3D_F64();
 
-	private Point3D_F64 t0 = new Point3D_F64();
-	private Point3D_F64 t1 = new Point3D_F64();
+	private final Point3D_F64 t0 = new Point3D_F64();
+	private final Point3D_F64 t1 = new Point3D_F64();
 
 	/**
 	 * Specify the fundamental matrix and the camera 2 epipole.
@@ -75,7 +76,7 @@ public class HomographyInducedStereoLinePt {
 	 * @param F Fundamental matrix.
 	 * @param e2 Epipole for camera 2. If null it will be computed internally.
 	 */
-	public void setFundamental( DMatrixRMaj F, Point3D_F64 e2 ) {
+	public void setFundamental( DMatrixRMaj F, @Nullable Point3D_F64 e2 ) {
 		this.F = F;
 		if (e2 != null)
 			this.e2.setTo(e2);

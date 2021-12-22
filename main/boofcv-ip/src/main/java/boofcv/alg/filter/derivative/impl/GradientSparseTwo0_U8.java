@@ -28,6 +28,7 @@ import boofcv.struct.sparse.SparseImageGradient;
  *
  * @author Peter Abeles
  */
+@SuppressWarnings({"NullAway.Init"})
 public class GradientSparseTwo0_U8 implements SparseImageGradient<GrayU8,GradientValue_I32> {
 
 	// image being processed
