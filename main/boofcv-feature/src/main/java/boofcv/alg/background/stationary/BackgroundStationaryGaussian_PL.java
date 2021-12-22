@@ -59,7 +59,7 @@ public class BackgroundStationaryGaussian_PL<T extends ImageGray<T>> extends Bac
 
 		int numBands = imageType.getNumBands();
 
-		background = new Planar<>(GrayF32.class, 1, 1, 2*numBands);
+		background = new Planar<>(GrayF32.class, 0, 0, 2*numBands);
 		bgWrapper = FactoryGImageMultiBand.create(background.getImageType());
 		bgWrapper.wrap(background);
 
@@ -95,7 +95,7 @@ public class BackgroundStationaryGaussian_PL<T extends ImageGray<T>> extends Bac
 		//CONCURRENT_BELOW BoofConcurrency.loopBlocks(0, frame.height, 20, storageInput, (inputPixel, idx0, idx1) -> {
 		final int idx0 = 0, idx1 = frame.height; final float[] inputPixel = storageInput.grow();
 		for (int y = idx0; y < idx1; y++) {
-			int indexBG = y*frame.width;
+			int indexBG = y*background.width;
 			int indexInput = frame.startIndex + y*frame.stride;
 			int end = indexInput + frame.width;
 			while (indexInput < end) {
@@ -123,7 +123,7 @@ public class BackgroundStationaryGaussian_PL<T extends ImageGray<T>> extends Bac
 
 	@Override public void segment( Planar<T> frame, GrayU8 segmented ) {
 		segmented.reshape(frame.width, frame.height);
-		if (background.width == 1) {
+		if (background.width != frame.width || background.height != frame.height) {
 			ImageMiscOps.fill(segmented, unknownValue);
 			return;
 		}
@@ -138,7 +138,7 @@ public class BackgroundStationaryGaussian_PL<T extends ImageGray<T>> extends Bac
 		//CONCURRENT_BELOW BoofConcurrency.loopBlocks(0, frame.height, 20, storageInput, (inputPixel, idx0, idx1) -> {
 		final int idx0 = 0, idx1 = frame.height; final float[] inputPixel = storageInput.grow();
 		for (int y = idx0; y < idx1; y++) {
-			int indexBG = y*frame.width;
+			int indexBG = y*background.width;
 			int indexInput = frame.startIndex + y*frame.stride;
 			int indexSegmented = segmented.startIndex + y*segmented.stride;
 
@@ -171,7 +171,7 @@ public class BackgroundStationaryGaussian_PL<T extends ImageGray<T>> extends Bac
 							sumAbsDiff += Math.abs(backgroundMean.data[indexBG] - inputPixel[band]);
 						}
 
-						segmented.data[indexSegmented] = (byte)(sumAbsDiff >= adjustedMinimumDifference? 1 : 0);
+						segmented.data[indexSegmented] = (byte)(sumAbsDiff >= adjustedMinimumDifference ? 1 : 0);
 					}
 				}
 

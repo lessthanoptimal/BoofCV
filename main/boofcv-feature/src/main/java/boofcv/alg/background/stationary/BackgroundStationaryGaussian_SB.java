@@ -18,6 +18,7 @@
 
 package boofcv.alg.background.stationary;
 
+import boofcv.alg.InputSanityCheck;
 import boofcv.alg.background.moving.BackgroundMovingGaussian;
 import boofcv.alg.misc.GImageMiscOps;
 import boofcv.alg.misc.ImageMiscOps;
@@ -38,7 +39,7 @@ public class BackgroundStationaryGaussian_SB<T extends ImageGray<T>> extends Bac
 	protected GImageGray inputWrapper;
 
 	// background is composed of two channels. 0 = mean, 1 = variance
-	Planar<GrayF32> background = new Planar<>(GrayF32.class, 1, 1, 2);
+	Planar<GrayF32> background = new Planar<>(GrayF32.class, 0, 0, 2);
 
 	/**
 	 * Configurations background removal.
@@ -76,7 +77,7 @@ public class BackgroundStationaryGaussian_SB<T extends ImageGray<T>> extends Bac
 
 		//CONCURRENT_BELOW BoofConcurrency.loopFor(0, frame.height, y -> {
 		for (int y = 0; y < background.height; y++) {
-			int indexBG = y*frame.width;
+			int indexBG = y*background.width;
 			int indexInput = frame.startIndex + y*frame.stride;
 
 			int end = indexInput + frame.width;
@@ -98,10 +99,11 @@ public class BackgroundStationaryGaussian_SB<T extends ImageGray<T>> extends Bac
 
 	@Override public void segment( T frame, GrayU8 segmented ) {
 		segmented.reshape(frame.width, frame.height);
-		if (background.width == 1) {
+		if (background.width != frame.width || background.height != frame.height) {
 			ImageMiscOps.fill(segmented, unknownValue);
 			return;
 		}
+		InputSanityCheck.checkSameShape(background, frame, segmented);
 		inputWrapper.wrap(frame);
 
 		GrayF32 backgroundMean = background.getBand(0);
@@ -109,7 +111,7 @@ public class BackgroundStationaryGaussian_SB<T extends ImageGray<T>> extends Bac
 
 		//CONCURRENT_BELOW BoofConcurrency.loopFor(0, frame.height, y -> {
 		for (int y = 0; y < frame.height; y++) {
-			int indexBG = y*frame.width;
+			int indexBG = y*background.width;
 			int indexInput = frame.startIndex + y*frame.stride;
 			int indexSegmented = segmented.startIndex + y*segmented.stride;
 

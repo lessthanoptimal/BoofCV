@@ -61,7 +61,7 @@ public class BackgroundStationaryGaussian_IL<T extends ImageInterleaved<T>> exte
 
 		int numBands = imageType.getNumBands();
 
-		background = new InterleavedF32(1, 1, 2*numBands);
+		background = new InterleavedF32(0, 0, 2*numBands);
 		bgWrapper = FactoryGImageMultiBand.create(background.getImageType());
 		bgWrapper.wrap(background);
 
@@ -72,14 +72,14 @@ public class BackgroundStationaryGaussian_IL<T extends ImageInterleaved<T>> exte
 	}
 
 	@Override public void reset() {
-		background.reshape(1, 1);
+		background.reshape(0, 0);
 	}
 
 	@Override public void updateBackground( T frame ) {
 		inputWrapper.wrap(frame);
 
 		// Fill in background model with the mean and initial variance of each pixel
-		if (background.width == 1) {
+		if (background.width != frame.width || background.height != frame.height) {
 			background.reshape(frame.width, frame.height);
 
 			//CONCURRENT_BELOW BoofConcurrency.loopBlocks(0, frame.height, 20, workspace, (work, idx0, idx1) -> {
@@ -109,7 +109,7 @@ public class BackgroundStationaryGaussian_IL<T extends ImageInterleaved<T>> exte
 		final int idx0 = 0, idx1 = frame.height;
 		float[] inputPixel = work.inputPixel;
 		for (int y = idx0; y < idx1; y++) {
-			int indexBG = y*frame.width*numBands;
+			int indexBG = y*background.stride;
 			int indexInput = frame.startIndex + y*frame.stride;
 			int end = indexInput + frame.width*numBands;
 			while (indexInput < end) {
@@ -134,7 +134,7 @@ public class BackgroundStationaryGaussian_IL<T extends ImageInterleaved<T>> exte
 
 	@Override public void segment( T frame, GrayU8 segmented ) {
 		segmented.reshape(frame.width, frame.height);
-		if (background.width == 1) {
+		if (background.width != frame.width || background.height != frame.height) {
 			ImageMiscOps.fill(segmented, unknownValue);
 			return;
 		}
@@ -149,7 +149,7 @@ public class BackgroundStationaryGaussian_IL<T extends ImageInterleaved<T>> exte
 		final int idx0 = 0, idx1 = frame.height;
 		float[] inputPixel = work.inputPixel;
 		for (int y = idx0; y < idx1; y++) {
-			int indexBG = y*frame.width*frame.numBands;
+			int indexBG = y*background.stride;
 			int indexInput = frame.startIndex + y*frame.stride;
 			int indexSegmented = segmented.startIndex + y*segmented.stride;
 
