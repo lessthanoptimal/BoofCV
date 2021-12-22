@@ -32,6 +32,7 @@ import java.util.List;
  *
  * @author Peter Abeles
  */
+@SuppressWarnings({"NullAway.Init"})
 public class ResidualsTriangulateMetricSimple implements FunctionNtoM {
 
 	// observations of the same feature in normalized coordinates

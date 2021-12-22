@@ -43,18 +43,6 @@ public class PairLineNorm {
 	}
 
 	/**
-	 * Constructor which allows the lines to not be declared.
-	 *
-	 * @param declare If true then new lines will be declared
-	 */
-	public PairLineNorm(boolean declare) {
-		if( declare ) {
-			l1 = new Vector3D_F64();
-			l2 = new Vector3D_F64();
-		}
-	}
-
-	/**
 	 * Creates a new instance by copying the values of the two lines.
 	 *
 	 * @param l1 image 1 location

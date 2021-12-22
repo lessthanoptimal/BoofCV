@@ -39,6 +39,7 @@ import java.util.List;
  *
  * @author Peter Abeles
  */
+@SuppressWarnings({"NullAway.Init"})
 public class ResidualsTriangulateEpipolarSampson implements FunctionNtoM {
 
 	// observations of the same feature in normalized coordinates

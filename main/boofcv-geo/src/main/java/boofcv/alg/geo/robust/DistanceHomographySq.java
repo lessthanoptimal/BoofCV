@@ -48,7 +48,7 @@ public class DistanceHomographySq implements DistanceFromModel<Homography2D_F64,
 	Point2D_F64 expected = new Point2D_F64();
 
 	public void setModel( DMatrixRMaj H ) {
-		if (model==null)
+		if (model == null)
 			model = new Homography2D_F64();
 		UtilHomography_F64.convert(H, model);
 	}

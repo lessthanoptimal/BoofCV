@@ -60,6 +60,7 @@ import java.util.List;
  *
  * @author Peter Abeles
  */
+@SuppressWarnings({"NullAway.Init"})
 public class DistanceSe3SymmetricSq implements DistanceFromModelMultiView<Se3_F64, AssociatedPair> {
 
 	// transform from key frame to current frame

@@ -120,7 +120,7 @@ public class RefineDualQuadraticAlgebraicError implements VerbosePrint {
 	// storage for p'*w
 	DMatrixRMaj pw = new DMatrixRMaj(3, 1);
 
-	PrintStream verbose;
+	@Nullable PrintStream verbose;
 
 	/**
 	 * Must call this function before all others. Specifies the number of cameras and views. Preallocates memory.

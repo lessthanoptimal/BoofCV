@@ -651,7 +651,7 @@ public abstract class BundleAdjustmentMetricSchurJacobian<M extends DMatrix>
 			world_to_view.setTo(parent_to_view);
 			return;
 		}
-		Se3_F64 saved_world_to_view = mapWorldToView.get(v);
+		Se3_F64 saved_world_to_view = Objects.requireNonNull(mapWorldToView.get(v));
 		SceneStructureMetric.View parentView = v.parent;
 
 		if (parentView.parent == null) {

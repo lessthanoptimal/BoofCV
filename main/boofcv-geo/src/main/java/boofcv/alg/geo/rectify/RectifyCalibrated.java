@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -51,6 +51,7 @@ import org.ejml.simple.SimpleMatrix;
  *
  * @author Peter Abeles
  */
+@SuppressWarnings({"NullAway.Init"})
 public class RectifyCalibrated {
 
 	/** Rectification transform for view-1 camera. Undistored to rectified pixels. */

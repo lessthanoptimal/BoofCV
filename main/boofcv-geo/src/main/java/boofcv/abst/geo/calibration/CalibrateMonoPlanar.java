@@ -64,6 +64,7 @@ import java.util.Set;
  *
  * @author Peter Abeles
  */
+@SuppressWarnings({"NullAway.Init"})
 public class CalibrateMonoPlanar implements VerbosePrint {
 
 	// detects calibration points inside of images
@@ -83,7 +84,7 @@ public class CalibrateMonoPlanar implements VerbosePrint {
 	protected @Getter List<CalibrationObservation> observations = new ArrayList<>();
 	protected @Getter List<ImageResults> errors;
 
-	public PrintStream verbose = null;
+	public @Nullable PrintStream verbose = null;
 
 	// shape of the image
 	private int imageWidth;

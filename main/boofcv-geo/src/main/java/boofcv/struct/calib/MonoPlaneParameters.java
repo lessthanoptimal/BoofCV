@@ -27,6 +27,7 @@ import georegression.struct.se.Se3_F64;
  *
  * @author Peter Abeles
  */
+@SuppressWarnings({"NullAway.Init"})
 public class MonoPlaneParameters {
 	/**
 	 * Intrinsic parameters for the camera

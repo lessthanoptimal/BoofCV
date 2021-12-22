@@ -63,6 +63,7 @@ import java.util.Set;
  *
  * @author Peter Abeles
  */
+@SuppressWarnings({"NullAway.Init"})
 public class CalibrateStereoPlanar implements VerbosePrint {
 
 	// transform from world to camera in each view
@@ -77,7 +78,7 @@ public class CalibrateStereoPlanar implements VerbosePrint {
 
 	MetricBundleAdjustmentUtils bundleUtils = new MetricBundleAdjustmentUtils();
 
-	PrintStream verbose;
+	@Nullable PrintStream verbose;
 
 	/**
 	 * Configures stereo calibration

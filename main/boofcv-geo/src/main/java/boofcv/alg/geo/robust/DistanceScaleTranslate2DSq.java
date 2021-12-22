@@ -31,6 +31,7 @@ import java.util.List;
  *
  * @author Peter Abeles
  */
+@SuppressWarnings({"NullAway.Init"})
 public class DistanceScaleTranslate2DSq implements DistanceFromModel<ScaleTranslate2D, AssociatedPair> {
 
 	ScaleTranslate2D model;
