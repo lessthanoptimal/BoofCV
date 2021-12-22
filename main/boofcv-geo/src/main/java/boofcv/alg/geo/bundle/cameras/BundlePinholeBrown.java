@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -22,12 +22,14 @@ import boofcv.abst.geo.bundle.BundleAdjustmentCamera;
 import boofcv.struct.calib.CameraPinholeBrown;
 import georegression.struct.point.Point2D_F64;
 import org.ejml.data.DMatrixRMaj;
+import org.jetbrains.annotations.Nullable;
 
 /**
  * Formulas for {@link CameraPinholeBrown}.
  *
  * @author Peter Abeles
  */
+@SuppressWarnings({"NullAway.Init"})
 public class BundlePinholeBrown implements BundleAdjustmentCamera {
 
 	// if true skew is assumed to be zero
@@ -150,7 +152,7 @@ public class BundlePinholeBrown implements BundleAdjustmentCamera {
 
 	@Override
 	public void jacobian( double camX, double camY, double camZ, double[] inputX, double[] inputY,
-						  boolean computeIntrinsic, double[] calibX, double[] calibY ) {
+						  boolean computeIntrinsic, @Nullable double[] calibX, @Nullable double[] calibY ) {
 		double nx = camX/camZ;
 		double ny = camY/camZ;
 
@@ -213,7 +215,8 @@ public class BundlePinholeBrown implements BundleAdjustmentCamera {
 		double x = nx + nx*sum + (tangential ? 2*t1*nx*ny + t2*(r2 + 2*nx*nx) : 0);
 		double y = ny + ny*sum + (tangential ? t1*(r2 + 2*ny*ny) + 2*t2*ny*ny : 0);
 
-		jacobianIntrinsic(calibX, calibY, nx, ny, x, y);
+		if (calibX != null && calibY != null)
+			jacobianIntrinsic(calibX, calibY, nx, ny, x, y);
 	}
 
 	/**

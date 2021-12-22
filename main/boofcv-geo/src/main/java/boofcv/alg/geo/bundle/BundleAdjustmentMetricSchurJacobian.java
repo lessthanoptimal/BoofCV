@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -41,6 +41,7 @@ import org.ejml.dense.row.CommonOps_DDRM;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Objects;
 
 /**
  * Computes the Jacobian for bundle adjustment with a Schur implementation. This is the base class
@@ -109,8 +110,8 @@ public abstract class BundleAdjustmentMetricSchurJacobian<M extends DMatrix>
 	// Storage for gradients
 	private final double[] pointGradX = new double[3];
 	private final double[] pointGradY = new double[3];
-	private double[] calibGradX = null;
-	private double[] calibGradY = null;
+	private double[] calibGradX = new double[0];
+	private double[] calibGradY = new double[0];
 
 	// work space for R2*R1
 	DMatrixRMaj RR = new DMatrixRMaj(3, 3);
@@ -565,7 +566,7 @@ public abstract class BundleAdjustmentMetricSchurJacobian<M extends DMatrix>
 		} else {
 			world_to_view = structure.motions.get(view.parent_to_view).motion;
 		}
-		return world_to_view;
+		return Objects.requireNonNull(world_to_view);
 	}
 
 	private void partialRigidSE3( DMatrix leftPoint, int rigidIndex,

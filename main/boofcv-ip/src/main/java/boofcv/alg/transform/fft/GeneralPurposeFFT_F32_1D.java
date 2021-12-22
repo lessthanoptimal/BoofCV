@@ -45,7 +45,7 @@ import java.util.Arrays;
  * @author Peter Abeles
  *
  */
-@SuppressWarnings({"OperatorPrecedence"})
+@SuppressWarnings({"OperatorPrecedence", "NullAway"})
 public class GeneralPurposeFFT_F32_1D {
 
 	private static enum Plans {

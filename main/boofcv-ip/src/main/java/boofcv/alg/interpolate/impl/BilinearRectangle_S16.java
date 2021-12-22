@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -22,6 +22,7 @@ import boofcv.alg.interpolate.InterpolateRectangle;
 import boofcv.struct.image.GrayF32;
 import boofcv.struct.image.GrayS16;
 
+import javax.annotation.processing.Generated;
 
 /**
  * <p>
@@ -35,11 +36,12 @@ import boofcv.struct.image.GrayS16;
  *
  * @author Peter Abeles
  */
+@Generated("GenerateBilinearRectangle")
 public class BilinearRectangle_S16 implements InterpolateRectangle<GrayS16> {
 
 	private GrayS16 orig;
 
-	private short data[];
+	private short[] data;
 	private int stride;
 
 	public BilinearRectangle_S16(GrayS16 image) {
@@ -81,7 +83,7 @@ public class BilinearRectangle_S16 implements InterpolateRectangle<GrayS16> {
 
 		int regWidth = output.width;
 		int regHeight = output.height;
-		final float results[] = output.data;
+		final float[] results = output.data;
 		boolean borderRight = false;
 		boolean borderBottom = false;
 

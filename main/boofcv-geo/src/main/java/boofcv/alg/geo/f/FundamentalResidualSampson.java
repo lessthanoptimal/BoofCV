@@ -36,6 +36,7 @@ import org.ejml.data.DMatrixRMaj;
  *
  * @author Peter Abeles
  */
+@SuppressWarnings({"NullAway.Init"})
 public class FundamentalResidualSampson
 		implements ModelObservationResidual<DMatrixRMaj,AssociatedPair> {
 	DMatrixRMaj F;

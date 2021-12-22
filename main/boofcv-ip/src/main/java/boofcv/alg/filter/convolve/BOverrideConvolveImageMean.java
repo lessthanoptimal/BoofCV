@@ -21,6 +21,7 @@ package boofcv.alg.filter.convolve;
 import boofcv.override.BOverrideClass;
 import boofcv.override.BOverrideManager;
 import boofcv.struct.image.ImageBase;
+import org.jetbrains.annotations.Nullable;
 
 /**
  * Override for {@link ConvolveImageMean}
@@ -33,8 +34,8 @@ public class BOverrideConvolveImageMean extends BOverrideClass {
 		BOverrideManager.register(BOverrideConvolveImageMean.class);
 	}
 
-	public static Horizontal horizontal;
-	public static Vertical vertical;
+	public static @Nullable Horizontal horizontal;
+	public static @Nullable Vertical vertical;
 
 	public interface Horizontal {
 		void horizontal(ImageBase input, ImageBase output, int offset, int length);

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -22,6 +22,7 @@ import boofcv.alg.interpolate.InterpolateRectangle;
 import boofcv.struct.image.GrayF32;
 import boofcv.struct.image.GrayU8;
 
+import javax.annotation.processing.Generated;
 
 /**
  * <p>
@@ -35,11 +36,12 @@ import boofcv.struct.image.GrayU8;
  *
  * @author Peter Abeles
  */
+@Generated("GenerateBilinearRectangle")
 public class BilinearRectangle_U8 implements InterpolateRectangle<GrayU8> {
 
 	private GrayU8 orig;
 
-	private byte data[];
+	private byte[] data;
 	private int stride;
 
 	public BilinearRectangle_U8(GrayU8 image) {
@@ -81,7 +83,7 @@ public class BilinearRectangle_U8 implements InterpolateRectangle<GrayU8> {
 
 		int regWidth = output.width;
 		int regHeight = output.height;
-		final float results[] = output.data;
+		final float[] results = output.data;
 		boolean borderRight = false;
 		boolean borderBottom = false;
 
@@ -120,7 +122,7 @@ public class BilinearRectangle_U8 implements InterpolateRectangle<GrayU8> {
 				Xy = xy;
 			}
 		}
-		
+
 		// if touching the image border handle the special case
 		if( borderBottom || borderRight )
 			handleBorder(output, xt, yt, ax, ay, bx, by, regWidth, regHeight, results, borderRight, borderBottom);

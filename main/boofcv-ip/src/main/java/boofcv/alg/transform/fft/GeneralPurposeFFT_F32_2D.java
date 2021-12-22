@@ -45,6 +45,7 @@ package boofcv.alg.transform.fft;
  * @author Peter Abeles
  *
  */
+@SuppressWarnings({"OperatorPrecedence", "NullAway"})
 public class GeneralPurposeFFT_F32_2D {
 
 	private int rows;

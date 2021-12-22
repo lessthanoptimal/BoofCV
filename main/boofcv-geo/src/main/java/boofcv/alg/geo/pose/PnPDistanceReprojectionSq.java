@@ -41,6 +41,7 @@ import java.util.List;
  *
  * @author Peter Abeles
  */
+@SuppressWarnings({"NullAway.Init"})
 public class PnPDistanceReprojectionSq implements DistanceFromModelMultiView<Se3_F64, Point2D3D> {
 
 	// transform from world to camera

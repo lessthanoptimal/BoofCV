@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -23,6 +23,7 @@ import boofcv.override.BOverrideManager;
 import boofcv.struct.convolve.Kernel1D;
 import boofcv.struct.convolve.Kernel2D;
 import boofcv.struct.image.ImageBase;
+import org.jetbrains.annotations.Nullable;
 
 /**
  * Override for normalized convolutions
@@ -35,9 +36,9 @@ public class BOverrideConvolveImageNormalized extends BOverrideClass {
 		BOverrideManager.register(BOverrideConvolveImageNormalized.class);
 	}
 
-	public static Horizontal horizontal;
-	public static Vertical vertical;
-	public static Convolve convolve;
+	public static @Nullable Horizontal horizontal;
+	public static @Nullable Vertical vertical;
+	public static @Nullable Convolve convolve;
 
 	public interface Horizontal {
 		void horizontal(Kernel1D kernel, ImageBase input, ImageBase output);

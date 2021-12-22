@@ -25,10 +25,13 @@ import georegression.struct.point.Point2D_F64;
  *
  * @author Peter Abeles
  */
+@SuppressWarnings({"NullAway.Init"})
 public class PointToPixelTransform_F64 implements PixelTransform<Point2D_F64> {
 	Point2Transform2_F64 alg;
 
 	public PointToPixelTransform_F64( Point2Transform2_F64 alg ) { this.alg = alg; }
+
+	public PointToPixelTransform_F64(){}
 
 	public void setTransform( Point2Transform2_F64 transform ) { this.alg = transform; }
 

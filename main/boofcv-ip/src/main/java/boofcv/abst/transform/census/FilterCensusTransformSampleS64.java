@@ -26,6 +26,7 @@ import boofcv.struct.image.ImageType;
 import georegression.struct.point.Point2D_I32;
 import org.ddogleg.struct.DogArray_I32;
 import org.ddogleg.struct.FastAccess;
+import org.jetbrains.annotations.Nullable;
 
 /**
  * Census transform which saves output in a {@link GrayS64}.
@@ -37,7 +38,7 @@ public class FilterCensusTransformSampleS64<In extends ImageGray<In>>
 	FastAccess<Point2D_I32> samples;
 	DogArray_I32 workSpace = new DogArray_I32();
 
-	public FilterCensusTransformSampleS64( FastAccess<Point2D_I32> samples, ImageBorder<In> border, Class<In> imageType ) {
+	public FilterCensusTransformSampleS64( FastAccess<Point2D_I32> samples, @Nullable ImageBorder<In> border, Class<In> imageType ) {
 		super(computeRadius(samples), border, imageType, ImageType.SB_S64);
 		this.samples = samples;
 	}

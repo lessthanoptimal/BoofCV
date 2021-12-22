@@ -73,6 +73,7 @@ import static boofcv.misc.BoofMiscOps.checkTrue;
  * European Conference on Computer Vision. Springer, Berlin, Heidelberg, 2010.</li>
  * </p>
  */
+@SuppressWarnings({"NullAway.Init"})
 public class SelfCalibrationPraticalGuessAndCheckFocus implements VerbosePrint {
 
 	// Development Note
@@ -131,7 +132,7 @@ public class SelfCalibrationPraticalGuessAndCheckFocus implements VerbosePrint {
 	boolean localMinimum;
 
 	// if not null debug info is printed
-	PrintStream verbose;
+	@Nullable PrintStream verbose;
 
 	public SelfCalibrationPraticalGuessAndCheckFocus() {
 		normalizedP = new DogArray<>(() -> new DMatrixRMaj(3, 4));

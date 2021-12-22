@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -21,6 +21,7 @@ package boofcv.alg.geo.bundle.cameras;
 import boofcv.abst.geo.bundle.BundleAdjustmentCamera;
 import georegression.struct.point.Point2D_F64;
 import org.ejml.FancyPrint;
+import org.jetbrains.annotations.Nullable;
 
 /**
  * A pinhole camera with radial distortion that is fully described using three parameters. Focal length and two
@@ -81,7 +82,8 @@ public class BundlePinholeSimplified implements BundleAdjustmentCamera {
 
 	@Override
 	public void jacobian( double X, double Y, double Z,
-						  double[] inputX, double[] inputY, boolean computeIntrinsic, double[] calibX, double[] calibY ) {
+						  double[] inputX, double[] inputY, boolean computeIntrinsic,
+						  @Nullable double[] calibX, @Nullable double[] calibY ) {
 
 		double normX = X/Z;
 		double normY = Y/Z;
@@ -110,7 +112,7 @@ public class BundlePinholeSimplified implements BundleAdjustmentCamera {
 		inputX[2] = f*normX*(r_Z - r/Z);
 		inputY[2] = f*normY*(r_Z - r/Z);
 
-		if (!computeIntrinsic)
+		if (!computeIntrinsic || calibX == null || calibY == null)
 			return;
 
 		// partial f

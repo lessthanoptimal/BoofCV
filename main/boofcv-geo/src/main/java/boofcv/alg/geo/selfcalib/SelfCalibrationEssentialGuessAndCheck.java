@@ -106,7 +106,7 @@ public class SelfCalibrationEssentialGuessAndCheck implements VerbosePrint {
 	final DMatrixRMaj K2 = new DMatrixRMaj(3, 3);
 
 	// If not null then verbose information is printed
-	private PrintStream verbose;
+	private @Nullable PrintStream verbose;
 
 	/**
 	 * Specifies the range of focal lengths it will evaluate as ratio of {@link #imageLengthPixels}

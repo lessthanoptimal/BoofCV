@@ -539,8 +539,10 @@ public class MultiViewOps {
 	 * @return The homography from view 1 to view 2 or null if it fails
 	 * @see boofcv.alg.geo.h.HomographyInducedStereo3Pts
 	 */
-	public static DMatrixRMaj fundamentalToHomography3Pts( DMatrixRMaj F,
-														   AssociatedPair p1, AssociatedPair p2, AssociatedPair p3 ) {
+	public static @Nullable DMatrixRMaj fundamentalToHomography3Pts( DMatrixRMaj F,
+																	 AssociatedPair p1,
+																	 AssociatedPair p2,
+																	 AssociatedPair p3 ) {
 		HomographyInducedStereo3Pts alg = new HomographyInducedStereo3Pts();
 
 		alg.setFundamental(F, null);
@@ -2056,19 +2058,6 @@ public class MultiViewOps {
 
 		// In the future an alternative implementation might require error checking, so this is staying
 		return true;
-	}
-
-	/**
-	 * Converts a homography in pixel coordinates (uncalibrated) in to a homography in normalized image coordinates
-	 * (calibrated) given the two intrinsic camera matrices.
-	 *
-	 * @param H21 (Input) Homography in pixel coordinates
-	 * @param K1 (Input) Intrinsic camera matrix 1
-	 * @param K2 (Input) Intrinsic camera matrix 2
-	 * @return The homography in normalized image coordinates. Which is (in theory) a rotation matrix.
-	 */
-	public static DMatrixRMaj homographyToCalibrated( DMatrixRMaj H21, DMatrixRMaj K1, DMatrixRMaj K2 ) {
-		return null;
 	}
 
 	/**

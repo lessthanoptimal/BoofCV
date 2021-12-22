@@ -47,7 +47,7 @@ public class ImplPerspectiveOps_F64 {
 
 	public static <C extends CameraPinhole> C adjustIntrinsic( C parameters,
 															   DMatrixRMaj adjustMatrix,
-															   C adjustedParam ) {
+															   @Nullable C adjustedParam ) {
 		if (adjustedParam == null)
 			adjustedParam = parameters.createLike();
 		adjustedParam.setTo(parameters);
@@ -120,7 +120,7 @@ public class ImplPerspectiveOps_F64 {
 		return output;
 	}
 
-	public static Point2D_F64 convertNormToPixel( CameraModel param, double x, double y, Point2D_F64 pixel ) {
+	public static Point2D_F64 convertNormToPixel( CameraModel param, double x, double y, @Nullable Point2D_F64 pixel ) {
 
 		if (pixel == null)
 			pixel = new Point2D_F64();
@@ -132,7 +132,7 @@ public class ImplPerspectiveOps_F64 {
 		return pixel;
 	}
 
-	public static Point2D_F64 convertNormToPixel( DMatrixRMaj K, Point2D_F64 norm, Point2D_F64 pixel ) {
+	public static Point2D_F64 convertNormToPixel( DMatrixRMaj K, Point2D_F64 norm, @Nullable Point2D_F64 pixel ) {
 		if (pixel == null)
 			pixel = new Point2D_F64();
 
@@ -144,7 +144,7 @@ public class ImplPerspectiveOps_F64 {
 		return pixel;
 	}
 
-	public static Point2D_F64 convertPixelToNorm( CameraModel param, Point2D_F64 pixel, Point2D_F64 norm ) {
+	public static Point2D_F64 convertPixelToNorm( CameraModel param, Point2D_F64 pixel, @Nullable Point2D_F64 norm ) {
 		if (norm == null)
 			norm = new Point2D_F64();
 
@@ -155,7 +155,7 @@ public class ImplPerspectiveOps_F64 {
 		return norm;
 	}
 
-	public static Point2D_F64 convertPixelToNorm( DMatrixRMaj K, Point2D_F64 pixel, Point2D_F64 norm ) {
+	public static Point2D_F64 convertPixelToNorm( DMatrixRMaj K, Point2D_F64 pixel, @Nullable Point2D_F64 norm ) {
 		if (norm == null)
 			norm = new Point2D_F64();
 
@@ -167,7 +167,7 @@ public class ImplPerspectiveOps_F64 {
 		return norm;
 	}
 
-	public static Point2D_F64 convertPixelToNorm( CameraPinhole intrinsic, double pixelX, double pixelY, Point2D_F64 norm ) {
+	public static Point2D_F64 convertPixelToNorm( CameraPinhole intrinsic, double pixelX, double pixelY, @Nullable Point2D_F64 norm ) {
 		if (norm == null)
 			norm = new Point2D_F64();
 
@@ -183,7 +183,8 @@ public class ImplPerspectiveOps_F64 {
 		return norm;
 	}
 
-	public static Point2D_F64 renderPixel( Se3_F64 worldToCamera, DMatrixRMaj K, Point3D_F64 X, @Nullable Point2D_F64 pixel ) {
+	public static @Nullable Point2D_F64 renderPixel( Se3_F64 worldToCamera, DMatrixRMaj K, Point3D_F64 X,
+													 @Nullable Point2D_F64 pixel ) {
 		DMatrixRMaj R = worldToCamera.R;
 		Vector3D_F64 T = worldToCamera.T;
 

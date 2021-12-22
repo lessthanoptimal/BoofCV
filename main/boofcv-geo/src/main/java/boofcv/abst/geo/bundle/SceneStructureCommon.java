@@ -19,6 +19,7 @@
 package boofcv.abst.geo.bundle;
 
 import boofcv.alg.geo.bundle.BundleAdjustmentOps;
+import boofcv.alg.geo.bundle.cameras.BundleDummyCamera;
 import boofcv.alg.geo.bundle.cameras.BundlePinhole;
 import boofcv.alg.geo.bundle.cameras.BundlePinholeBrown;
 import boofcv.alg.geo.bundle.cameras.BundlePinholeSimplified;
@@ -37,6 +38,7 @@ import org.jetbrains.annotations.Nullable;
  *
  * @author Peter Abeles
  */
+@SuppressWarnings({"NullAway.Init"})
 public abstract class SceneStructureCommon implements SceneStructure {
 	public final DogArray<Camera> cameras = new DogArray<>(Camera::new, Camera::reset);
 	public DogArray<Point> points;
@@ -162,22 +164,24 @@ public abstract class SceneStructureCommon implements SceneStructure {
 		 * If the parameters are assumed to be known and should not be optimised.
 		 */
 		public boolean known = true;
-		public @Nullable BundleAdjustmentCamera model;
+		public BundleAdjustmentCamera model = BundleDummyCamera.INSTANCE;
 
-		public <T extends BundleAdjustmentCamera> T getModel() {
+		public <T extends BundleAdjustmentCamera> @Nullable T getModel() {
 			return (T)model;
 		}
 
 		public void reset() {
 			known = true;
-			model = null;
+			model = BundleDummyCamera.INSTANCE;
 		}
 
 		public boolean isIdentical( Camera m, double tol ) {
 			if (known != m.known)
 				return false;
 			if (model == null)
-				return m.model == null;
+				return m.model == BundleDummyCamera.INSTANCE;
+			else if (m.model == BundleDummyCamera.INSTANCE)
+				return false;
 
 			try {
 				if (model instanceof BundlePinholeSimplified) {

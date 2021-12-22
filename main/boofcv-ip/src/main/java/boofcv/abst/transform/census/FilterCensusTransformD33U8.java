@@ -23,6 +23,7 @@ import boofcv.struct.border.ImageBorder;
 import boofcv.struct.image.GrayU8;
 import boofcv.struct.image.ImageGray;
 import boofcv.struct.image.ImageType;
+import org.jetbrains.annotations.Nullable;
 
 /**
  * Census {@link GCensusTransform#dense3x3} transform with output in {@link GrayU8} image.
@@ -30,14 +31,13 @@ import boofcv.struct.image.ImageType;
  * @author Peter Abeles
  */
 public class FilterCensusTransformD33U8<In extends ImageGray<In>>
-		extends FilterCensusTransform<In, GrayU8>
-{
-	public FilterCensusTransformD33U8(ImageBorder<In> border, Class<In> imageType ) {
-		super(1,border,imageType, ImageType.SB_U8);
+		extends FilterCensusTransform<In, GrayU8> {
+	public FilterCensusTransformD33U8( @Nullable ImageBorder<In> border, Class<In> imageType ) {
+		super(1, border, imageType, ImageType.SB_U8);
 	}
 
 	@Override
-	public void process(In in, GrayU8 out) {
-		GCensusTransform.dense3x3(in,out,border);
+	public void process( In in, GrayU8 out ) {
+		GCensusTransform.dense3x3(in, out, border);
 	}
 }
