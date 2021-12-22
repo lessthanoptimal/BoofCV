@@ -83,6 +83,7 @@ public class FactoryGImageMultiBand {
 		};
 	}
 
+	@SuppressWarnings({"NullAway.Init"})
 	public static class PL implements GImageMultiBand {
 		Planar image;
 		GImageGray[] bandWrappers;
@@ -91,8 +92,7 @@ public class FactoryGImageMultiBand {
 			wrap(image);
 		}
 
-		public PL() {
-		}
+		public PL() {}
 
 		@Override
 		public void wrap( ImageBase image ) {
@@ -111,22 +111,17 @@ public class FactoryGImageMultiBand {
 			}
 		}
 
-		@Override
-		public int getWidth() {return image.getWidth();}
+		@Override public int getWidth() {return image.getWidth();}
 
-		@Override
-		public int getHeight() {return image.getHeight();}
+		@Override public int getHeight() {return image.getHeight();}
 
-		@Override
-		public int getNumberOfBands() {return image.getNumBands();}
+		@Override public int getNumberOfBands() {return image.getNumBands();}
 
-		@Override
-		public int getPixelStride() {
+		@Override public int getPixelStride() {
 			return 1;
 		}
 
-		@Override
-		public int getIndex( int x, int y ) {
+		@Override public int getIndex( int x, int y ) {
 			return this.image.getIndex(x, y);
 		}
 
@@ -189,32 +184,25 @@ public class FactoryGImageMultiBand {
 			}
 		}
 
-		@Override
-		public int getWidth() {return sb.getWidth();}
+		@Override public int getWidth() {return sb.getWidth();}
 
-		@Override
-		public int getHeight() {return sb.getHeight();}
+		@Override public int getHeight() {return sb.getHeight();}
 
-		@Override
-		public int getNumberOfBands() {return 1;}
+		@Override public int getNumberOfBands() {return 1;}
 
-		@Override
-		public int getPixelStride() {
+		@Override public int getPixelStride() {
 			return 1;
 		}
 
-		@Override
-		public int getIndex( int x, int y ) {
+		@Override public int getIndex( int x, int y ) {
 			return sb.getImage().getIndex(x, y);
 		}
 
-		@Override
-		public void set( int x, int y, float[] value ) {
+		@Override public void set( int x, int y, float[] value ) {
 			sb.set(x, y, value[0]);
 		}
 
-		@Override
-		public void get( int x, int y, float[] value ) {
+		@Override public void get( int x, int y, float[] value ) {
 			value[0] = sb.unsafe_getF(x, y);
 		}
 
@@ -246,6 +234,7 @@ public class FactoryGImageMultiBand {
 		}
 	}
 
+	@SuppressWarnings({"NullAway.Init"})
 	public static abstract class IL<T extends ImageInterleaved<T>> implements GImageMultiBand {
 		T image;
 
@@ -254,31 +243,20 @@ public class FactoryGImageMultiBand {
 			this.image = (T)image;
 		}
 
-		@Override
-		public int getWidth() {return image.getWidth();}
+		@Override public int getWidth() {return image.getWidth();}
 
-		@Override
-		public int getHeight() {return image.getHeight();}
+		@Override public int getHeight() {return image.getHeight();}
 
-		@Override
-		public int getNumberOfBands() {return image.getNumBands();}
+		@Override public int getNumberOfBands() {return image.getNumBands();}
 
-		@Override
-		public int getPixelStride() {
-			return image.getNumBands();
-		}
+		@Override public int getPixelStride() { return image.getNumBands(); }
 
-		@Override
-		public int getIndex( int x, int y ) {
-			return image.getIndex(x, y);
-		}
+		@Override public int getIndex( int x, int y ) { return image.getIndex(x, y); }
 
-		@Override
-		public <GT extends ImageBase<GT>> GT getImage() {
-			return (GT)image;
-		}
+		@Override public <GT extends ImageBase<GT>> GT getImage() { return (GT)image; }
 	}
 
+	@SuppressWarnings({"NullAway.Init"})
 	public static class IL_U8 extends IL<InterleavedU8> {
 		public IL_U8( InterleavedU8 image ) {
 			wrap(image);
@@ -321,6 +299,7 @@ public class FactoryGImageMultiBand {
 		}
 	}
 
+	@SuppressWarnings({"NullAway.Init"})
 	public static class IL_S8 extends IL<InterleavedS8> {
 		public IL_S8( InterleavedS8 image ) {
 			wrap(image);
@@ -363,6 +342,7 @@ public class FactoryGImageMultiBand {
 		}
 	}
 
+	@SuppressWarnings({"NullAway.Init"})
 	public static class IL_U16 extends IL<InterleavedU16> {
 		public IL_U16( InterleavedU16 image ) {
 			wrap(image);
@@ -405,6 +385,7 @@ public class FactoryGImageMultiBand {
 		}
 	}
 
+	@SuppressWarnings({"NullAway.Init"})
 	public static class IL_S16 extends IL<InterleavedS16> {
 		public IL_S16( InterleavedS16 image ) {
 			wrap(image);
@@ -447,6 +428,7 @@ public class FactoryGImageMultiBand {
 		}
 	}
 
+	@SuppressWarnings({"NullAway.Init"})
 	public static class IL_S32 extends IL<InterleavedS32> {
 		public IL_S32( InterleavedS32 image ) {
 			wrap(image);
@@ -489,6 +471,7 @@ public class FactoryGImageMultiBand {
 		}
 	}
 
+	@SuppressWarnings({"NullAway.Init"})
 	public static class IL_S64 extends IL<InterleavedS64> {
 		public IL_S64( InterleavedS64 image ) {
 			wrap(image);
@@ -531,6 +514,7 @@ public class FactoryGImageMultiBand {
 		}
 	}
 
+	@SuppressWarnings({"NullAway.Init"})
 	public static class IL_F32 extends IL<InterleavedF32> {
 		public IL_F32( InterleavedF32 image ) {
 			wrap(image);
@@ -573,6 +557,7 @@ public class FactoryGImageMultiBand {
 		}
 	}
 
+	@SuppressWarnings({"NullAway.Init"})
 	public static class IL_F64 extends IL<InterleavedF64> {
 		public IL_F64( InterleavedF64 image ) {
 			wrap(image);

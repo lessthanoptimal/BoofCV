@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -29,8 +29,6 @@ public class PointToPixelTransform_F64 implements PixelTransform<Point2D_F64> {
 	Point2Transform2_F64 alg;
 
 	public PointToPixelTransform_F64( Point2Transform2_F64 alg ) { this.alg = alg; }
-
-	public PointToPixelTransform_F64() {}
 
 	public void setTransform( Point2Transform2_F64 transform ) { this.alg = transform; }
 

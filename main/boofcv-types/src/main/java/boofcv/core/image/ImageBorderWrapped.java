@@ -38,15 +38,15 @@ public abstract class ImageBorderWrapped {
 	 * Creates an ImageBorder for the two specified images. The offsets are created by dividing the difference
 	 * inside by 2. Border must be bigger the image.
 	 */
-	public static <T extends ImageGray<T>> ImageBorder<T> wrap( T border , T image ) {
-		int offsetX = (border.width-image.width)/2;
-		int offsetY = (border.height-image.height)/2;
+	public static <T extends ImageGray<T>> ImageBorder<T> wrap( T border, T image ) {
+		int offsetX = (border.width - image.width)/2;
+		int offsetY = (border.height - image.height)/2;
 
 		ImageBorder<T> ret;
-		if( border instanceof GrayI ) {
-			ret = new S32(offsetX,offsetY,(GrayI)border);
-		} else if( border instanceof GrayF32 ) {
-			ret = (ImageBorder)new F32(offsetX,offsetY,(GrayF32)border);
+		if (border instanceof GrayI) {
+			ret = new S32(offsetX, offsetY, (GrayI)border);
+		} else if (border instanceof GrayF32) {
+			ret = (ImageBorder)new F32(offsetX, offsetY, (GrayF32)border);
 		} else {
 			throw new RuntimeException("Not supported yet");
 		}
@@ -54,15 +54,16 @@ public abstract class ImageBorderWrapped {
 		return ret;
 	}
 
+	@SuppressWarnings({"NullAway.Init"})
 	public static class S32<T extends GrayI<T>> extends ImageBorder_S32<T> {
 		/**
 		 * Specifies where the image starts inside the larger image
 		 */
-		public @Getter @Setter int offsetX,offsetY;
+		public @Getter @Setter int offsetX, offsetY;
 
 		public @Getter @Setter T borderImage;
 
-		public S32(int offsetX, int offsetY, T borderImage) {
+		public S32( int offsetX, int offsetY, T borderImage ) {
 			this.offsetX = offsetX;
 			this.offsetY = offsetY;
 			this.borderImage = borderImage;
@@ -72,12 +73,12 @@ public abstract class ImageBorderWrapped {
 		}
 
 		@Override
-		public int getOutside(int x, int y) {
-			return borderImage.get(x+offsetX, y+offsetY);
+		public int getOutside( int x, int y ) {
+			return borderImage.get(x + offsetX, y + offsetY);
 		}
 
 		@Override
-		public void setOutside(int x, int y, int value) {
+		public void setOutside( int x, int y, int value ) {
 			throw new RuntimeException("Not supported");
 		}
 
@@ -92,15 +93,16 @@ public abstract class ImageBorderWrapped {
 		}
 	}
 
+	@SuppressWarnings({"NullAway.Init"})
 	public static class F32 extends ImageBorder_F32 {
 		/**
 		 * Specifies where the image starts inside the larger image
 		 */
-		public @Getter @Setter int offsetX,offsetY;
+		public @Getter @Setter int offsetX, offsetY;
 
 		public @Getter @Setter GrayF32 borderImage;
 
-		public F32(int offsetX, int offsetY, GrayF32 borderImage) {
+		public F32( int offsetX, int offsetY, GrayF32 borderImage ) {
 			this.offsetX = offsetX;
 			this.offsetY = offsetY;
 			this.borderImage = borderImage;
@@ -109,12 +111,12 @@ public abstract class ImageBorderWrapped {
 		public F32() {}
 
 		@Override
-		public float getOutside(int x, int y) {
-			return borderImage.get(x+offsetX, y+offsetY);
+		public float getOutside( int x, int y ) {
+			return borderImage.get(x + offsetX, y + offsetY);
 		}
 
 		@Override
-		public void setOutside(int x, int y, float value) {
+		public void setOutside( int x, int y, float value ) {
 			throw new RuntimeException("Not supported");
 		}
 

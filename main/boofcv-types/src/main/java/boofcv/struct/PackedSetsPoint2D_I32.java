@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -44,8 +44,6 @@ public class PackedSetsPoint2D_I32 {
 
 	// the length/size of the last block
 	int tailBlockSize;
-	// the set which is on the tail and can have points added to
-	BlockIndexLength tail;
 
 	/**
 	 * Configures the storage
@@ -88,19 +86,17 @@ public class PackedSetsPoint2D_I32 {
 		s.block = blocks.size - 1;
 		s.start = tailBlockSize;
 		s.length = 0;
-
-		tail = s;
 	}
 
 	/**
 	 * Removes the current point set from the end
 	 */
 	public void removeTail() {
+		BlockIndexLength tail = sets.getTail();
 		while (blocks.size - 1 != tail.block)
 			blocks.removeTail();
 		tailBlockSize = tail.start;
 		sets.removeTail();
-		tail = sets.size > 0 ? sets.get(sets.size - 1) : null;
 	}
 
 	/**
@@ -110,6 +106,10 @@ public class PackedSetsPoint2D_I32 {
 	 * @param y coordinate
 	 */
 	public void addPointToTail( int x, int y ) {
+		if (sets.size==0) {
+			grow();
+		}
+		BlockIndexLength tail = sets.getTail();
 		int index = tail.start + tail.length*2;
 
 		int[] block;
@@ -191,7 +191,7 @@ public class PackedSetsPoint2D_I32 {
 	 * Returns the size of the set at the tail. If there is no tail an exception will be thrown.
 	 */
 	public int sizeOfTail() {
-		return tail.length;
+		return sets.size == 0 ? 0 : sets.getTail().length;
 	}
 
 	/**
@@ -219,6 +219,7 @@ public class PackedSetsPoint2D_I32 {
 	/**
 	 * Used to access all the points in a set without making a copy.
 	 */
+	@SuppressWarnings({"NullAway.Init"})
 	public class SetIterator {
 		BlockIndexLength set;
 		int pointIndex;

@@ -8,6 +8,8 @@ Version : 0.40
 
 Build
 - Added sanity check that makes sure autogenerate had been run already first and prints out a helpful message
+- Fixed accidental Lombok dependency
+- Added Nullable again
 Misc
 - Config classes now must implement setTo() which returns 'this' to allow chaining and easy copies
 ImageProcessing

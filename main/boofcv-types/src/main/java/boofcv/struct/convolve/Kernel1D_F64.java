@@ -27,6 +27,7 @@ package boofcv.struct.convolve;
  *
  * @author Peter Abeles
  */
+@SuppressWarnings({"NullAway.Init"})
 public class Kernel1D_F64 extends Kernel1D {
 
 	public double[] data;
@@ -77,8 +78,7 @@ public class Kernel1D_F64 extends Kernel1D {
 		data = new double[width];
 	}
 
-	protected Kernel1D_F64() {
-	}
+	protected Kernel1D_F64() {}
 
 	@Override
 	public /**/double /**/getDouble( int index ) {

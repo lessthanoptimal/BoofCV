@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -25,6 +25,8 @@ import java.util.List;
 /**
  * Provides default implementations of ModelMatcher functions.
  */
+@SuppressWarnings("NullAway")
+//@formatter:off
 public class ModelMatcherDefault<Model,Point> implements ModelMatcher<Model,Point> {
 	@Override public boolean process( List<Point> dataSet ) { return true; }
 	@Override public Model getModelParameters() { return null; }
@@ -36,3 +38,4 @@ public class ModelMatcherDefault<Model,Point> implements ModelMatcher<Model,Poin
 	@Override public Class<Point> getPointType() { return null; }
 	@Override public Class<Model> getModelType() { return null; }
 }
+//@formatter:on

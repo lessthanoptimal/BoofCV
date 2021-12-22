@@ -19,6 +19,7 @@
 package boofcv.generate;
 
 import lombok.Getter;
+import org.jetbrains.annotations.Nullable;
 
 /**
  * Set of standard units of measure, conversions between them, and their abbreviations
@@ -46,7 +47,7 @@ public enum Unit {
 	/**
 	 * Sees if the specified work matches any of the units full name or short name.
 	 */
-	public static Unit lookup( String word ) {
+	public static @Nullable Unit lookup( String word ) {
 		Unit[] values = values();
 		for (int i = 0; i < values.length; i++) {
 			Unit unit = values[i];

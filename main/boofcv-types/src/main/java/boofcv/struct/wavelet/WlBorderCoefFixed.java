@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -23,7 +23,7 @@ package boofcv.struct.wavelet;
  *
  * @author Peter Abeles
  */
-@SuppressWarnings({"unchecked"})
+@SuppressWarnings({"unchecked", "NullAway.Init"})
 public class WlBorderCoefFixed<T extends WlCoef> implements WlBorderCoef<T> {
 
 	// coefficients for the lower border
