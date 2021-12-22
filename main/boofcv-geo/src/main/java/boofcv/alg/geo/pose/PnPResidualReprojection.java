@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -30,25 +30,25 @@ import georegression.transform.se.SePointOps_F64;
  *
  * @author Peter Abeles
  */
+@SuppressWarnings({"NullAway.Init"})
 public class PnPResidualReprojection
-		implements ModelObservationResidualN<Se3_F64,Point2D3D>
-{
+		implements ModelObservationResidualN<Se3_F64, Point2D3D> {
 	Se3_F64 motion;
 
 	Point3D_F64 temp = new Point3D_F64();
 
 	@Override
-	public void setModel(Se3_F64 model) {
+	public void setModel( Se3_F64 model ) {
 		this.motion = model;
 	}
 
 	@Override
-	public int computeResiduals(Point2D3D data, double[] residuals, int index) {
+	public int computeResiduals( Point2D3D data, double[] residuals, int index ) {
 
-		SePointOps_F64.transform(motion,data.location,temp);
+		SePointOps_F64.transform(motion, data.location, temp);
 
-		double expectedX = temp.x / temp.z;
-		double expectedY = temp.y / temp.z;
+		double expectedX = temp.x/temp.z;
+		double expectedY = temp.y/temp.z;
 
 		residuals[index++] = expectedX - data.observation.x;
 		residuals[index++] = expectedY - data.observation.y;

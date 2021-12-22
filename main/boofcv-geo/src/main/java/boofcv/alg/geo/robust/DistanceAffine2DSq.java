@@ -37,6 +37,7 @@ import java.util.List;
  *
  * @author Peter Abeles
  */
+@SuppressWarnings({"NullAway.Init"})
 public class DistanceAffine2DSq implements DistanceFromModel<Affine2D_F64, AssociatedPair> {
 
 	Affine2D_F64 model;

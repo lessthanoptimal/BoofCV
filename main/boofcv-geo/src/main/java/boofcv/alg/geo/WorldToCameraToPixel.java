@@ -36,6 +36,7 @@ import lombok.Getter;
  *
  * @author Peter Abeles
  */
+@SuppressWarnings({"NullAway.Init"})
 public class WorldToCameraToPixel {
 
 	/** transform from world to camera reference frames */

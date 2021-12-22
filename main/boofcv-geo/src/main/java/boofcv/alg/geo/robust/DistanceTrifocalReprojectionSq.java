@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -42,6 +42,7 @@ import java.util.List;
  *
  * @author Peter Abeles
  */
+@SuppressWarnings({"NullAway.Init"})
 public class DistanceTrifocalReprojectionSq implements DistanceFromModel<TrifocalTensor, AssociatedTriple> {
 	DMatrixRMaj P1 = CommonOps_DDRM.identity(3, 4);
 	DMatrixRMaj P2 = new DMatrixRMaj(3, 4);

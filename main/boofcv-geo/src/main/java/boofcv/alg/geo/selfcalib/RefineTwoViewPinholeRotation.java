@@ -65,6 +65,7 @@ import java.util.Set;
  *
  * @author Peter Abeles
  */
+@SuppressWarnings({"NullAway.Init"})
 public class RefineTwoViewPinholeRotation implements VerbosePrint {
 	/** Convergence criteria */
 	public @Getter final ConfigConverge converge = new ConfigConverge(1e-12, 1e-8, 100);
@@ -99,7 +100,7 @@ public class RefineTwoViewPinholeRotation implements VerbosePrint {
 	// Reference to input set of associated pixels
 	List<AssociatedPair> associatedPixels;
 
-	PrintStream verbose = null;
+	@Nullable PrintStream verbose = null;
 
 	CameraPinhole inputIntrinsic1;
 	CameraPinhole inputIntrinsic2;

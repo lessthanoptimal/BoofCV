@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -18,20 +18,21 @@
 
 package boofcv.alg.distort.brown;
 
+import lombok.Getter;
+import lombok.Setter;
+import org.jetbrains.annotations.Nullable;
+
 /**
  * Distortion parameters for radial and tangential model
  *
  * @author Peter Abeles
  */
 public class RadialTangential_F64 {
-	/**
-	 * Radial distortion parameters
-	 */
+	/** Radial distortion parameters */
 	public double[] radial;
-	/**
-	 * Tangential distortion parameters
-	 */
-	public double t1, t2;
+
+	/** Tangential distortion parameters  */
+	@Getter @Setter public double t1, t2;
 
 	public RadialTangential_F64( RadialTangential_F64 original ) {
 		this.radial = original.radial.clone();
@@ -46,11 +47,11 @@ public class RadialTangential_F64 {
 	public RadialTangential_F64() {
 	}
 
-	public RadialTangential_F64( /**/double[] radial, /**/double t1, /**/double t2 ) {
-		this.set(radial, t1, t2);
+	public RadialTangential_F64( @Nullable /**/double[] radial, /**/double t1, /**/double t2 ) {
+		this.setTo(radial, t1, t2);
 	}
 
-	public void set(/**/double[] radial, /**/double t1, /**/double t2 ) {
+	public void setTo( @Nullable /**/double[] radial, /**/double t1, /**/double t2 ) {
 		if (radial == null)
 			this.radial = new double[0];
 		else {
@@ -61,21 +62,5 @@ public class RadialTangential_F64 {
 		}
 		this.t1 = (double)t1;
 		this.t2 = (double)t2;
-	}
-
-	public double getT1() {
-		return t1;
-	}
-
-	public void setT1( double t1 ) {
-		this.t1 = t1;
-	}
-
-	public double getT2() {
-		return t2;
-	}
-
-	public void setT2( double t2 ) {
-		this.t2 = t2;
 	}
 }

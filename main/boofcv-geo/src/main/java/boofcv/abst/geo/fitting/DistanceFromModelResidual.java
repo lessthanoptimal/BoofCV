@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -60,11 +60,11 @@ public class DistanceFromModelResidual<Model, Point>
 
 	@Override
 	public Class<Point> getPointType() {
-		return null;
+		throw new RuntimeException("Not supported");
 	}
 
 	@Override
 	public Class<Model> getModelType() {
-		return null;
+		throw new RuntimeException("Not supported");
 	}
 }

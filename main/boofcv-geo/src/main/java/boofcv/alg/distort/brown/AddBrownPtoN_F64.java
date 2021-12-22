@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -26,6 +26,7 @@ import georegression.struct.point.Point2D_F64;
  *
  * @author Peter Abeles
  */
+@SuppressWarnings({"NullAway.Init"})
 public class AddBrownPtoN_F64 implements Point2Transform2_F64 {
 
 	// distortion parameters
@@ -35,8 +36,7 @@ public class AddBrownPtoN_F64 implements Point2Transform2_F64 {
 	// These are the upper triangular elements in a 3x3 matrix
 	private double a11, a12, a13, a22, a23;
 
-	public AddBrownPtoN_F64() {
-	}
+	public AddBrownPtoN_F64() {}
 
 	/**
 	 * Specify camera calibration parameters

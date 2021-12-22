@@ -41,35 +41,35 @@ import org.ejml.interfaces.linsol.LinearSolverDense;
  *
  * @author Peter Abeles
  */
+@SuppressWarnings({"NullAway.Init"})
 public class HomographyResidualSampson
-		implements ModelObservationResidualN<DMatrixRMaj,AssociatedPair>
-{
+		implements ModelObservationResidualN<DMatrixRMaj, AssociatedPair> {
 
 	DMatrixRMaj H;
 	Point2D_F64 temp = new Point2D_F64();
 
-	DMatrixRMaj J = new DMatrixRMaj(2,4);
-	DMatrixRMaj JJ = new DMatrixRMaj(2,2);
-	DMatrixRMaj e = new DMatrixRMaj(2,1);
-	DMatrixRMaj x = new DMatrixRMaj(2,1);
-	DMatrixRMaj error = new DMatrixRMaj(4,1);
+	DMatrixRMaj J = new DMatrixRMaj(2, 4);
+	DMatrixRMaj JJ = new DMatrixRMaj(2, 2);
+	DMatrixRMaj e = new DMatrixRMaj(2, 1);
+	DMatrixRMaj x = new DMatrixRMaj(2, 1);
+	DMatrixRMaj error = new DMatrixRMaj(4, 1);
 
 	LinearSolverDense<DMatrixRMaj> solver = LinearSolverFactory_DDRM.linear(2);
 
 	@Override
-	public void setModel(DMatrixRMaj H) {
+	public void setModel( DMatrixRMaj H ) {
 		this.H = H;
 	}
 
 	@Override
-	public int computeResiduals(AssociatedPair p, double[] residuals, int index) {
+	public int computeResiduals( AssociatedPair p, double[] residuals, int index ) {
 
 		GeometryMath_F64.mult(H, p.p1, temp);
 
-		double top1 = error1(p.p1.x,p.p1.y,p.p2.x,p.p2.y);
-		double top2 = error2(p.p1.x,p.p1.y,p.p2.x,p.p2.y);
+		double top1 = error1(p.p1.x, p.p1.y, p.p2.x, p.p2.y);
+		double top2 = error2(p.p1.x, p.p1.y, p.p2.x, p.p2.y);
 
-		computeJacobian(p.p1,p.p2);
+		computeJacobian(p.p1, p.p2);
 		// JJ = J*J'
 		CommonOps_DDRM.multTransB(J, J, JJ);
 
@@ -77,10 +77,10 @@ public class HomographyResidualSampson
 		e.data[0] = -top1;
 		e.data[1] = -top2;
 
-		if( solver.setA(JJ) ) {
-			solver.solve(e,x);
+		if (solver.setA(JJ)) {
+			solver.solve(e, x);
 			// -J'(J*J')^-1*e
-			CommonOps_DDRM.multTransA(J,x,error);
+			CommonOps_DDRM.multTransA(J, x, error);
 			residuals[index++] = error.data[0];
 			residuals[index++] = error.data[1];
 			residuals[index++] = error.data[2];
@@ -96,40 +96,36 @@ public class HomographyResidualSampson
 	}
 
 	/**
-	 *
 	 * x2 = H*x1
-	 *
 	 */
-	public double error1( double x1 , double y1 ,
-						  double x2 , double y2 )
-	{
+	public double error1( double x1, double y1,
+						  double x2, double y2 ) {
 		double ret;
 
-		ret = -(x1*H.get(1,0)+y1*H.get(1,1)+H.get(1,2));
-		ret += y2*(x1*H.get(2,0)+y1*H.get(2,1)+H.get(2,2));
+		ret = -(x1*H.get(1, 0) + y1*H.get(1, 1) + H.get(1, 2));
+		ret += y2*(x1*H.get(2, 0) + y1*H.get(2, 1) + H.get(2, 2));
 
 		return ret;
 	}
 
-	public double error2( double x1 , double y1 ,
-						  double x2 , double y2 )
-	{
+	public double error2( double x1, double y1,
+						  double x2, double y2 ) {
 		double ret;
 
-		ret = (x1*H.get(0,0)+y1*H.get(0,1)+H.get(0,2));
-		ret -= x2*(x1*H.get(2,0)+y1*H.get(2,1)+H.get(2,2));
+		ret = (x1*H.get(0, 0) + y1*H.get(0, 1) + H.get(0, 2));
+		ret -= x2*(x1*H.get(2, 0) + y1*H.get(2, 1) + H.get(2, 2));
 
 		return ret;
 	}
 
-	public void computeJacobian( Point2D_F64 x1 , Point2D_F64 x2 ) {
-		J.data[0] = -H.get(1,0) + x2.y*H.get(2,0);
-		J.data[1] = -H.get(1,1) + x2.y*H.get(2,1);
+	public void computeJacobian( Point2D_F64 x1, Point2D_F64 x2 ) {
+		J.data[0] = -H.get(1, 0) + x2.y*H.get(2, 0);
+		J.data[1] = -H.get(1, 1) + x2.y*H.get(2, 1);
 		J.data[2] = 0;
-		J.data[3] = x1.x*H.get(2,0) + x1.y*H.get(2,1) + H.get(2,2);
+		J.data[3] = x1.x*H.get(2, 0) + x1.y*H.get(2, 1) + H.get(2, 2);
 
-		J.data[4] = H.get(0,0) - x2.x*H.get(2,0);
-		J.data[5] = H.get(0,1) - x2.x*H.get(2,1);
+		J.data[4] = H.get(0, 0) - x2.x*H.get(2, 0);
+		J.data[5] = H.get(0, 1) - x2.x*H.get(2, 1);
 		J.data[6] = -J.data[3];
 		J.data[7] = 0;
 	}

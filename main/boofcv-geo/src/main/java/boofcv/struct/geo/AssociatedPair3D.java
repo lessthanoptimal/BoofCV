@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -20,7 +20,6 @@ package boofcv.struct.geo;
 
 import georegression.struct.point.Point3D_F64;
 
-
 /**
  * <p>
  * The observed location of a feature in two camera views. Typically a point in homogenous coordinates a line.
@@ -30,32 +29,15 @@ import georegression.struct.point.Point3D_F64;
  */
 public class AssociatedPair3D {
 
-	/**
-	 * Location of the feature in the first image
-	 */
+	/** Location of the feature in the first image */
 	public Point3D_F64 p1;
-	/**
-	 * Location of the feature in the second image.
-	 */
+	/** Location of the feature in the second image. */
 	public Point3D_F64 p2;
 
 	public AssociatedPair3D() {
 		p1 = new Point3D_F64();
 		p2 = new Point3D_F64();
 	}
-
-	/**
-	 * Constructor which allows the points to not be declared.
-	 *
-	 * @param declare If true then new points will be declared
-	 */
-	public AssociatedPair3D(boolean declare ) {
-		if( declare ) {
-			p1 = new Point3D_F64();
-			p2 = new Point3D_F64();
-		}
-	}
-
 	/**
 	 * Creates a new associated point from the two provided points.
 	 *
@@ -64,8 +46,8 @@ public class AssociatedPair3D {
 	 * @param x2 image 2 location x-axis.
 	 * @param y2 image 2 location y-axis.
 	 */
-	public AssociatedPair3D(double x1, double y1, double z1,
-							double x2, double y2, double z2) {
+	public AssociatedPair3D( double x1, double y1, double z1,
+							 double x2, double y2, double z2 ) {
 		p1 = new Point3D_F64(x1, y1, z1);
 		p2 = new Point3D_F64(x2, y2, z2);
 	}
@@ -76,8 +58,8 @@ public class AssociatedPair3D {
 	 * @param p1 image 1 location
 	 * @param p2 image 2 location
 	 */
-	public AssociatedPair3D(Point3D_F64 p1, Point3D_F64 p2) {
-		this(p1, p2,true);
+	public AssociatedPair3D( Point3D_F64 p1, Point3D_F64 p2 ) {
+		this(p1, p2, true);
 	}
 
 	/**
@@ -87,7 +69,7 @@ public class AssociatedPair3D {
 	 * @param p2 image 2 location
 	 * @param newInstance Should it create new points or save a reference to these instances.
 	 */
-	public AssociatedPair3D(Point3D_F64 p1, Point3D_F64 p2, boolean newInstance) {
+	public AssociatedPair3D( Point3D_F64 p1, Point3D_F64 p2, boolean newInstance ) {
 		if (newInstance) {
 			this.p1 = new Point3D_F64(p1);
 			this.p2 = new Point3D_F64(p2);
@@ -95,6 +77,10 @@ public class AssociatedPair3D {
 			this.p1 = p1;
 			this.p2 = p2;
 		}
+	}
+
+	public static AssociatedPair3D wrap(Point3D_F64 p1, Point3D_F64 p2) {
+		return new AssociatedPair3D(p1, p2, false);
 	}
 
 	public void setTo( AssociatedPair3D original ) {
@@ -105,7 +91,7 @@ public class AssociatedPair3D {
 	/**
 	 * Assigns this object to be equal to the passed in values.
 	 */
-	public void setTo( Point3D_F64 p1 , Point3D_F64 p2 ) {
+	public void setTo( Point3D_F64 p1, Point3D_F64 p2 ) {
 		this.p1.setTo(p1);
 		this.p2.setTo(p2);
 	}
@@ -115,14 +101,14 @@ public class AssociatedPair3D {
 	 */
 	public void setTo( double x1, double y1, double z1,
 					   double x2, double y2, double z2 ) {
-		this.p1.setTo(x1,y1,z1);
-		this.p2.setTo(x2,y2,z2);
+		this.p1.setTo(x1, y1, z1);
+		this.p2.setTo(x2, y2, z2);
 	}
 
 	/**
 	 * Changes the references to the passed in objects.
 	 */
-	public void assign( Point3D_F64 p1 , Point3D_F64 p2 ) {
+	public void assign( Point3D_F64 p1, Point3D_F64 p2 ) {
 		this.p1 = p1;
 		this.p2 = p2;
 	}
@@ -136,7 +122,7 @@ public class AssociatedPair3D {
 	}
 
 	public AssociatedPair3D copy() {
-		return new AssociatedPair3D(p1,p2,true);
+		return new AssociatedPair3D(p1, p2, true);
 	}
 
 	@Override

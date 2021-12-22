@@ -50,7 +50,7 @@ public class UniOmniStoP_F64 implements Point3Transform2_F64 {
 	public void setModel(CameraUniversalOmni model) {
 		this.mirrorOffset = (double)model.mirrorOffset;
 
-		distortion.set(model.radial,model.t1,model.t2);
+		distortion.setTo(model.radial,model.t1,model.t2);
 
 		this.cx = (double)model.cx;
 		this.cy = (double)model.cy;

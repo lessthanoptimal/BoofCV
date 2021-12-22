@@ -65,7 +65,7 @@ public class UniOmniPtoS_F64 implements Point2Transform3_F64 {
 	public void setModel(CameraUniversalOmni model) {
 		this.mirrorOffset = (double)model.mirrorOffset;
 
-		distortion.set(model.radial,model.t1,model.t2);
+		distortion.setTo(model.radial,model.t1,model.t2);
 
 		K_inv.set(0,0, (double)model.fx);
 		K_inv.set(1,1, (double)model.fy);

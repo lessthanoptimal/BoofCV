@@ -29,6 +29,7 @@ import java.util.List;
  *
  * @author Peter Abeles
  */
+@SuppressWarnings({"NullAway.Init"})
 public class ResidualsCodecToMatrix<Model,Observation> implements FunctionNtoM {
 	// converts parameters to and from the motion
 	protected ModelCodec<Model> param;

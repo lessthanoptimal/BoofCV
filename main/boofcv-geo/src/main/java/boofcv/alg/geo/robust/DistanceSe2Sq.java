@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -32,7 +32,8 @@ import java.util.List;
  *
  * @author Peter Abeles
  */
-public class DistanceSe2Sq implements DistanceFromModel<Se2_F64,AssociatedPair> {
+@SuppressWarnings({"NullAway.Init"})
+public class DistanceSe2Sq implements DistanceFromModel<Se2_F64, AssociatedPair> {
 
 	// motion from key frame to current frame in plane 2D reference frame
 	Se2_F64 keyToCurr;
@@ -41,12 +42,12 @@ public class DistanceSe2Sq implements DistanceFromModel<Se2_F64,AssociatedPair> 
 	Point2D_F64 curr2D = new Point2D_F64();
 
 	@Override
-	public void setModel(Se2_F64 keyToCurr) {
+	public void setModel( Se2_F64 keyToCurr ) {
 		this.keyToCurr = keyToCurr;
 	}
 
 	@Override
-	public double distance(AssociatedPair sample ) {
+	public double distance( AssociatedPair sample ) {
 
 		// apply transform from key frame to current frame
 		SePointOps_F64.transform(keyToCurr, sample.p1, curr2D);
@@ -59,8 +60,8 @@ public class DistanceSe2Sq implements DistanceFromModel<Se2_F64,AssociatedPair> 
 	}
 
 	@Override
-	public void distances(List<AssociatedPair> samples, double[] distance) {
-		for( int i = 0; i < samples.size(); i++ ) {
+	public void distances( List<AssociatedPair> samples, double[] distance ) {
+		for (int i = 0; i < samples.size(); i++) {
 			distance[i] = distance(samples.get(i));
 		}
 	}

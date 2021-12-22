@@ -29,8 +29,8 @@ import lombok.Data;
  *
  * @author Peter Abeles
  */
-@Data
-public class VisualDepthParameters {
+@SuppressWarnings({"NullAway.Init"})
+@Data public class VisualDepthParameters {
 
 	/** The maximum depth which the depth sensor can sense */
 	public Number maxDepth;

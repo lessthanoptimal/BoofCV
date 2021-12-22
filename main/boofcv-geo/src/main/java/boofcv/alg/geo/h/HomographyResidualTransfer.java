@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -32,25 +32,26 @@ import org.ejml.data.DMatrixRMaj;
  *
  * @author Peter Abeles
  */
+@SuppressWarnings({"NullAway.Init"})
 public class HomographyResidualTransfer
-		implements ModelObservationResidualN<DMatrixRMaj,AssociatedPair> {
+		implements ModelObservationResidualN<DMatrixRMaj, AssociatedPair> {
 
 	DMatrixRMaj H;
 
 	Point2D_F64 temp = new Point2D_F64();
 
 	@Override
-	public void setModel(DMatrixRMaj F) {
+	public void setModel( DMatrixRMaj F ) {
 		this.H = F;
 	}
 
 	@Override
-	public int computeResiduals(AssociatedPair p, double[] residuals, int index) {
+	public int computeResiduals( AssociatedPair p, double[] residuals, int index ) {
 
 		GeometryMath_F64.mult(H, p.p1, temp);
 
-		residuals[index++] = temp.x-p.p2.x;
-		residuals[index++] = temp.y-p.p2.y;
+		residuals[index++] = temp.x - p.p2.x;
+		residuals[index++] = temp.y - p.p2.y;
 
 		return index;
 	}
