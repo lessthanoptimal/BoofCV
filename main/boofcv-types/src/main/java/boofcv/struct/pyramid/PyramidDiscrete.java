@@ -31,7 +31,7 @@ import org.jetbrains.annotations.Nullable;
  *
  * @author Peter Abeles
  */
-@SuppressWarnings({"unchecked"})
+@SuppressWarnings({"NullAway.Init"})
 public abstract class PyramidDiscrete<T extends ImageBase<T>> extends ImagePyramidBase<T> {
 
 	// Configuration for the number of layers in the pyramid

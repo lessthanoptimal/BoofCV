@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -26,9 +26,9 @@ package boofcv.struct.wavelet;
 public class WlCoef_I32 extends WlCoef {
 
 	// scaling numbers
-	public int scaling[];
+	public int[] scaling = new int[0];
 	// wavelet numbers
-	public int wavelet[];
+	public int[] wavelet = new int[0];
 
 	// denominator for scaling coefficients
 	public int denominatorScaling;

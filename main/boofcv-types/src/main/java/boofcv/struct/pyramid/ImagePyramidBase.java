@@ -36,7 +36,7 @@ import boofcv.struct.image.ImageType;
  *
  * @author Peter Abeles
  */
-@SuppressWarnings({"unchecked"})
+@SuppressWarnings({"NullAway.Init"})
 public abstract class ImagePyramidBase<T extends ImageBase<T>>
 		implements ImagePyramid<T> {
 	// shape of full resolution input image

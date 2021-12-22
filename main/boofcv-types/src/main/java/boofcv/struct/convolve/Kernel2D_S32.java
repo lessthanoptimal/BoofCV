@@ -30,6 +30,7 @@ package boofcv.struct.convolve;
  *
  * @author Peter Abeles
  */
+@SuppressWarnings({"NullAway.Init"})
 public class Kernel2D_S32 extends Kernel2D {
 
 	public int[] data;

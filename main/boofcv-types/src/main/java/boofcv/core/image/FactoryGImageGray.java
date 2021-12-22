@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -32,6 +32,7 @@ import boofcv.struct.image.*;
 @SuppressWarnings("rawtypes")
 public class FactoryGImageGray {
 
+	@SuppressWarnings({"NullAway"})
 	public static GImageGray create( Class imageType ) {
 		if (imageType == GrayU8.class)
 			return new GSingle_U8(null);

@@ -30,6 +30,7 @@ package boofcv.struct.convolve;
  *
  * @author Peter Abeles
  */
+@SuppressWarnings({"NullAway.Init"})
 public class Kernel2D_F64 extends Kernel2D {
 
 	public double[] data;
@@ -72,8 +73,7 @@ public class Kernel2D_F64 extends Kernel2D {
 		data = new double[width*width];
 	}
 
-	protected Kernel2D_F64() {
-	}
+	protected Kernel2D_F64() {}
 
 	/**
 	 * Creates a kernel whose elements are the specified data array and has

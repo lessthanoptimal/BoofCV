@@ -536,7 +536,7 @@ public class BoofMiscOps {
 		System.out.println();
 	}
 
-	public static int[] convertArray( double[] input, int[] output ) {
+	public static int[] convertArray( double[] input, @Nullable int[] output ) {
 		if (output == null)
 			output = new int[input.length];
 
@@ -547,7 +547,7 @@ public class BoofMiscOps {
 		return output;
 	}
 
-	public static long[] convertArray( double[] input, long[] output ) {
+	public static long[] convertArray( double[] input, @Nullable long[] output ) {
 		if (output == null)
 			output = new long[input.length];
 
@@ -558,7 +558,7 @@ public class BoofMiscOps {
 		return output;
 	}
 
-	public static float[] convertArray( double[] input, float[] output ) {
+	public static float[] convertArray( double[] input, @Nullable float[] output ) {
 		if (output == null)
 			output = new float[input.length];
 
@@ -569,7 +569,7 @@ public class BoofMiscOps {
 		return output;
 	}
 
-	public static double[] convertArray( float[] input, double[] output ) {
+	public static double[] convertArray( float[] input, @Nullable double[] output ) {
 		if (output == null)
 			output = new double[input.length];
 
@@ -580,7 +580,7 @@ public class BoofMiscOps {
 		return output;
 	}
 
-	public static int[] convertArray( float[] input, int[] output ) {
+	public static int[] convertArray( float[] input, @Nullable int[] output ) {
 		if (output == null)
 			output = new int[input.length];
 
@@ -591,7 +591,7 @@ public class BoofMiscOps {
 		return output;
 	}
 
-	public static float[] convertArray( int[] input, float[] output ) {
+	public static float[] convertArray( int[] input, @Nullable float[] output ) {
 		if (output == null)
 			output = new float[input.length];
 
@@ -912,11 +912,11 @@ public class BoofMiscOps {
 		return out + "}";
 	}
 
-	public static PrintStream addPrefix( VerbosePrint owner, PrintStream out ) {
+	public static @Nullable PrintStream addPrefix( VerbosePrint owner, PrintStream out ) {
 		return addPrefix(owner, 1, out);
 	}
 
-	public static PrintStream addPrefix( VerbosePrint owner, int numIndents, PrintStream out ) {
+	public static @Nullable PrintStream addPrefix( VerbosePrint owner, int numIndents, @Nullable PrintStream out ) {
 		if (out == null || out instanceof PrintStreamInjectIndent)
 			return out;
 
