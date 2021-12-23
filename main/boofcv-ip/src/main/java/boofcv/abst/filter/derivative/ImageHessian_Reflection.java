@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -28,37 +28,36 @@ import boofcv.struct.image.ImageType;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 
-
 /**
  * Generic implementation which uses reflections to call hessian functions
  *
  * @author Peter Abeles
  */
+@SuppressWarnings({"NullAway.Init"})
 public class ImageHessian_Reflection<Output extends ImageGray<Output>>
-		implements ImageHessian<Output>
-{
+		implements ImageHessian<Output> {
 	// How the image border should be handled
 	BorderType borderType = BoofDefaults.DERIV_BORDER_TYPE;
 	ImageBorder<Output> border;
 	// the image hessian function
 	private Method m;
 
-	public ImageHessian_Reflection(Method m ) {
+	public ImageHessian_Reflection( Method m ) {
 		this.m = m;
 		setBorderType(borderType);
 	}
 
 	@Override
-	public void process(Output inputDerivX, Output inputDerivY , Output derivXX, Output derivYY, Output derivXY) {
+	public void process( Output inputDerivX, Output inputDerivY, Output derivXX, Output derivYY, Output derivXY ) {
 		try {
-			m.invoke(null,inputDerivX, inputDerivY, derivXX, derivYY, derivXY, border);
+			m.invoke(null, inputDerivX, inputDerivY, derivXX, derivYY, derivXY, border);
 		} catch (IllegalAccessException | InvocationTargetException e) {
 			throw new RuntimeException(e);
 		}
 	}
 
 	@Override
-	public void setBorderType(BorderType type) {
+	public void setBorderType( BorderType type ) {
 		this.borderType = type;
 		Class imageType = m.getParameterTypes()[0];
 		border = FactoryImageBorder.single(borderType, imageType);
@@ -71,7 +70,7 @@ public class ImageHessian_Reflection<Output extends ImageGray<Output>>
 
 	@Override
 	public int getBorder() {
-		if( borderType != BorderType.SKIP)
+		if (borderType != BorderType.SKIP)
 			return 0;
 		else
 			return 1;

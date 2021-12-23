@@ -24,10 +24,11 @@ import boofcv.struct.border.ImageBorder;
 import boofcv.struct.convolve.KernelBase;
 import boofcv.struct.image.ImageBase;
 import boofcv.struct.image.ImageType;
+import org.jetbrains.annotations.Nullable;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
-
+import java.util.Objects;
 
 /**
  * Generalized interface for filtering images with convolution kernels. Can invoke different
@@ -41,7 +42,7 @@ public class GenericConvolve<Input extends ImageBase<Input>, Output extends Imag
 	Method m;
 	KernelBase kernel;
 	BorderType type;
-	ImageBorder borderRule;
+	@Nullable ImageBorder borderRule;
 
 	ImageType<Input> inputType;
 	ImageType<Output> outputType;
@@ -54,7 +55,7 @@ public class GenericConvolve<Input extends ImageBase<Input>, Output extends Imag
 		this.inputType = inputType;
 		this.outputType = outputType;
 
-		Class<?> params[] = m.getParameterTypes();
+		Class<?>[] params = m.getParameterTypes();
 		if( type == BorderType.SKIP || type == BorderType.NORMALIZED )
 			this.borderRule = null;
 		else
@@ -65,28 +66,14 @@ public class GenericConvolve<Input extends ImageBase<Input>, Output extends Imag
 	public void process(Input input, Output output) {
 		try {
 			if( kernel.getDimension() == 1 ) {
-				switch( type ) {
-					case SKIP:
-						m.invoke(null,kernel,input,output);
-						break;
-
-					case NORMALIZED:
-						m.invoke(null,kernel,input,output);
-						break;
-
-					default:
-						m.invoke(null,kernel,input,output, borderRule);
-						break;
+				switch (type) {
+					case SKIP, NORMALIZED -> m.invoke(null, kernel, input, output);
+					default -> m.invoke(null, kernel, input, output, Objects.requireNonNull(borderRule));
 				}
 			} else {
-				switch( type ) {
-					case SKIP:
-					case NORMALIZED:
-						m.invoke(null,kernel,input,output);
-						break;
-
-					default:
-						m.invoke(null,kernel,input,output, borderRule);
+				switch (type) {
+					case SKIP, NORMALIZED -> m.invoke(null, kernel, input, output);
+					default -> m.invoke(null, kernel, input, output, Objects.requireNonNull(borderRule));
 				}
 			}
 		} catch (IllegalAccessException | InvocationTargetException e) {

@@ -28,22 +28,21 @@ import boofcv.struct.image.ImageGray;
  *
  * @author Peter Abeles
  */
-public abstract class ImageConvolveSparse< T extends ImageGray<T>, K extends KernelBase>
-		implements ImageFunctionSparse<T>
-{
+@SuppressWarnings({"NullAway.Init"})
+public abstract class ImageConvolveSparse<T extends ImageGray<T>, K extends KernelBase>
+		implements ImageFunctionSparse<T> {
 	// kernel being convolved
 	protected K kernel;
 	// image wrapper to handle the image borders
 	protected ImageBorder<T> image;
 
-	protected ImageConvolveSparse(K kernel) {
+	protected ImageConvolveSparse( K kernel ) {
 		this.kernel = kernel;
 	}
 
-	protected ImageConvolveSparse() {
-	}
+	protected ImageConvolveSparse() {}
 
-	public void setImageBorder(ImageBorder<T> image) {
+	public void setImageBorder( ImageBorder<T> image ) {
 		this.image = image;
 	}
 
@@ -52,7 +51,7 @@ public abstract class ImageConvolveSparse< T extends ImageGray<T>, K extends Ker
 	}
 
 	@Override
-	public void setImage(T image) {
+	public void setImage( T image ) {
 		this.image.setImage(image);
 	}
 }

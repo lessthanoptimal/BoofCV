@@ -39,7 +39,7 @@ import java.lang.reflect.Method;
  *
  * @author Peter Abeles
  */
-@SuppressWarnings({"unchecked"})
+@SuppressWarnings({"unchecked", "NullAway"})
 public class FactoryConvolveDown {
 
 	public static <In extends ImageBase<In>, Out extends ImageBase<Out>>

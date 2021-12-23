@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -19,6 +19,9 @@
 package boofcv.abst.filter.binary;
 
 import boofcv.struct.image.GrayU8;
+import org.jetbrains.annotations.Nullable;
+
+import java.util.Objects;
 
 /**
  * Helper function that makes it easier to adjust the size of the binary image when working with a padded or unpadded
@@ -29,9 +32,9 @@ import boofcv.struct.image.GrayU8;
  */
 public class BinaryContourHelper {
 	// if not null then the binary image will be modified by the contour algorithm and will be padded
-	BinaryContourInterface.Padded padded;
+	@Nullable BinaryContourInterface.Padded padded;
 	// contains a sub image without padding
-	GrayU8 subimage;
+	@Nullable GrayU8 subimage;
 	GrayU8 binary = new GrayU8(1,1);
 
 	public BinaryContourHelper( BinaryContourInterface alg , boolean copyBinary ) {
@@ -51,7 +54,7 @@ public class BinaryContourHelper {
 			binary.reshape(width, height);
 		} else {
 			binary.reshape(width + 2, height + 2);
-			binary.subimage(1, 1, width + 1, height + 1, subimage);
+			binary.subimage(1, 1, width + 1, height + 1, Objects.requireNonNull(subimage));
 		}
 	}
 
@@ -69,6 +72,6 @@ public class BinaryContourHelper {
 		if( padded == null )
 			return binary;
 		else
-			return subimage;
+			return Objects.requireNonNull(subimage);
 	}
 }

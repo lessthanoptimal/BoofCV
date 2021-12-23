@@ -39,7 +39,7 @@ import java.lang.reflect.Method;
  *
  * @author Peter Abeles
  */
-@SuppressWarnings({"unchecked", "rawtypes"})
+@SuppressWarnings({"unchecked", "rawtypes", "NullAway"})
 public class FactoryConvolve {
 
 	/**

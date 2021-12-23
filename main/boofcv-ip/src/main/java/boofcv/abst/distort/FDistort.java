@@ -39,6 +39,7 @@ import georegression.struct.affine.Affine2D_F32;
 import georegression.struct.affine.Affine2D_F64;
 import georegression.struct.point.Point2D_F32;
 import lombok.Getter;
+import org.jetbrains.annotations.Nullable;
 
 /**
  * <p>High level interface for rendering a distorted image into another one. Uses a flow style interface to remove
@@ -53,17 +54,16 @@ import lombok.Getter;
  * @author Peter Abeles
  */
 @SuppressWarnings({"rawtypes", "unchecked"})
-public class FDistort
-{
+public class FDistort {
 	// type of input image
 	@Getter ImageType inputType;
 
 	// input and output images
-	ImageBase input,output;
+	ImageBase input, output;
 	// specifies how the borders are handled
-	ImageDistort distorter;
-	InterpolatePixel interp;
-	@Getter PixelTransform<Point2D_F32> outputToInput;
+	@Nullable ImageDistort distorter;
+	@Nullable InterpolatePixel interp;
+	@Getter @Nullable PixelTransform<Point2D_F32> outputToInput;
 
 	// type of border being used
 	@Getter BorderType borderType;
@@ -78,15 +78,16 @@ public class FDistort
 	 * @param input Input image
 	 * @param output output image
 	 */
-	public FDistort(ImageBase input, ImageBase output) {
+	public FDistort( ImageBase input, ImageBase output ) {
 		init(input, output);
 	}
 
 	/**
 	 * Constructor
+	 *
 	 * @param inputType Type of input image
 	 */
-	public FDistort(ImageType inputType) {
+	public FDistort( ImageType inputType ) {
 		this.inputType = inputType;
 	}
 
@@ -96,7 +97,7 @@ public class FDistort
 	/**
 	 * Specifies the input and output image and sets interpolation to BILINEAR, black image border, cache is off.
 	 */
-	public FDistort init(ImageBase input, ImageBase output) {
+	public FDistort init( ImageBase input, ImageBase output ) {
 		this.input = input;
 		this.output = output;
 
@@ -140,7 +141,7 @@ public class FDistort
 	 * image has a different shape
 	 */
 	public FDistort input( ImageBase input ) {
-		if( this.input == null || this.input.width != input.width || this.input.height != input.height ) {
+		if (this.input == null || this.input.width != input.width || this.input.height != input.height) {
 			distorter = null;
 		}
 		this.input = input;
@@ -153,7 +154,7 @@ public class FDistort
 	 * image has a different shape
 	 */
 	public FDistort output( ImageBase output ) {
-		if( this.output == null || this.output.width != output.width || this.output.height != output.height ) {
+		if (this.output == null || this.output.width != output.width || this.output.height != output.height) {
 			distorter = null;
 		}
 		this.output = output;
@@ -166,7 +167,7 @@ public class FDistort
 	 * @param border Sets the border. If null then it will skip the border.
 	 */
 	public FDistort border( ImageBorder border ) {
-		if( border == null ) {
+		if (border == null) {
 			this.borderType = BorderType.SKIP;
 			// the edge is less jagged if you extend, even with skip = true
 			interp.setBorder(FactoryImageBorder.generic(BorderType.EXTENDED, inputType));
@@ -181,9 +182,9 @@ public class FDistort
 	 * Sets the border by type.
 	 */
 	public FDistort border( BorderType type ) {
-		if( borderType == type )
+		if (borderType == type)
 			return this;
-		if( type == BorderType.SKIP ) {
+		if (type == BorderType.SKIP) {
 			return border((ImageBorder)null);
 		} else {
 			border(FactoryImageBorder.generic(type, inputType));
@@ -210,7 +211,6 @@ public class FDistort
 		return border(BorderType.EXTENDED);
 	}
 
-
 	/**
 	 * used to provide a custom interpolation algorithm
 	 *
@@ -219,7 +219,7 @@ public class FDistort
 	 * you are being very careful about your memory management.
 	 * </p>
 	 */
-	public FDistort interp(InterpolatePixelS interpolation) {
+	public FDistort interp( InterpolatePixelS interpolation ) {
 		distorter = null;
 		this.interp = interpolation;
 		return this;
@@ -228,7 +228,7 @@ public class FDistort
 	/**
 	 * Specifies the interpolation used by type.
 	 */
-	public FDistort interp(InterpolationType type) {
+	public FDistort interp( InterpolationType type ) {
 		distorter = null;
 		this.interp = FactoryInterpolation.createPixel(0, 255, type, BorderType.EXTENDED, inputType);
 
@@ -263,18 +263,18 @@ public class FDistort
 	 * Used to manually specify a transform. From output to input
 	 */
 	public FDistort transform( Point2Transform2_F32 outputToInput ) {
-		return transform( new PointToPixelTransform_F32(outputToInput));
+		return transform(new PointToPixelTransform_F32(outputToInput));
 	}
 
 	/**
 	 * Affine transform from input to output
 	 */
-	public FDistort affine(double a11, double a12, double a21, double a22,
-						   double dx, double dy) {
+	public FDistort affine( double a11, double a12, double a21, double a22,
+							double dx, double dy ) {
 
 		PixelTransformAffine_F32 transform;
 
-		if( outputToInput != null && outputToInput instanceof PixelTransformAffine_F32 ) {
+		if (outputToInput != null && outputToInput instanceof PixelTransformAffine_F32) {
 			transform = (PixelTransformAffine_F32)outputToInput;
 		} else {
 			transform = new PixelTransformAffine_F32();
@@ -295,7 +295,7 @@ public class FDistort
 	}
 
 	public FDistort affine( Affine2D_F64 affine ) {
-		return affine(affine.a11,affine.a12,affine.a21,affine.a22,affine.tx,affine.ty);
+		return affine(affine.a11, affine.a12, affine.a21, affine.a22, affine.tx, affine.ty);
 	}
 
 	/**
@@ -307,7 +307,7 @@ public class FDistort
 	 * to avoid declaring new memory.
 	 */
 	public FDistort scale() {
-		if( outputToInput != null && outputToInput instanceof PixelTransformAffine_F32 ) {
+		if (outputToInput != null && outputToInput instanceof PixelTransformAffine_F32) {
 			PixelTransformAffine_F32 affine = (PixelTransformAffine_F32)outputToInput;
 			DistortSupport.transformScale(output, input, affine);
 			return this;
@@ -330,8 +330,8 @@ public class FDistort
 	 * Applies a distortion which will rotate the input image by the specified amount.
 	 */
 	public FDistort rotate( double angleInputToOutput ) {
-		PixelTransform<Point2D_F32> outputToInput = DistortSupport.transformRotate(input.width/2,input.height/2,
-				output.width/2,output.height/2,(float)angleInputToOutput);
+		PixelTransform<Point2D_F32> outputToInput = DistortSupport.transformRotate(input.width/2, input.height/2,
+				output.width/2, output.height/2, (float)angleInputToOutput);
 
 		return transform(outputToInput);
 	}
@@ -341,9 +341,9 @@ public class FDistort
 	 */
 	public FDistort apply() {
 		// see if the distortion class needs to be created again
-		if( distorter == null ) {
+		if (distorter == null) {
 			Class typeOut = output.getImageType().getImageClass();
-			switch( input.getImageType().getFamily() ) {
+			switch (input.getImageType().getFamily()) {
 				case GRAY:
 					distorter = FactoryDistort.distortSB(cached, (InterpolatePixelS)interp, typeOut);
 					break;
@@ -353,7 +353,7 @@ public class FDistort
 					break;
 
 				case INTERLEAVED:
-					distorter = FactoryDistort.distortIL(cached, (InterpolatePixelMB) interp, output.getImageType());
+					distorter = FactoryDistort.distortIL(cached, (InterpolatePixelMB)interp, output.getImageType());
 					break;
 
 				default:
@@ -362,8 +362,8 @@ public class FDistort
 		}
 		distorter.setModel(outputToInput);
 
-		distorter.setRenderAll(borderType!=BorderType.SKIP);
-		distorter.apply(input,output);
+		distorter.setRenderAll(borderType != BorderType.SKIP);
+		distorter.apply(input, output);
 		return this;
 	}
 }

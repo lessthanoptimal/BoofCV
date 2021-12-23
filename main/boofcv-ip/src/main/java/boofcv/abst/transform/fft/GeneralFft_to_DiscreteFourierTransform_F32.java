@@ -28,6 +28,7 @@ import boofcv.struct.image.InterleavedF32;
  *
  * @author Peter Abeles
  */
+@SuppressWarnings({"NullAway.Init"})
 public class GeneralFft_to_DiscreteFourierTransform_F32
 		implements DiscreteFourierTransform<GrayF32, InterleavedF32> {
 	// previous size of input image

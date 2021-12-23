@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -26,19 +26,17 @@ import boofcv.struct.image.ImageDimension;
 import boofcv.struct.image.ImageGray;
 import boofcv.struct.image.ImageType;
 
-
 /**
  * Simplifies removing image noise using a wavelet transform.
  *
  * @param <T> Type of image being processed.
- *
  * @author Peter Abeles
  */
 @SuppressWarnings({"unchecked"})
 public class WaveletDenoiseFilter<T extends ImageGray<T>> implements FilterImageInterface<T, T> {
 
 	// performs the wavelet transform
-	private WaveletTransform<T,T,?> wavelet;
+	private WaveletTransform<T, T, ?> wavelet;
 
 	// algorithm used to denoise the image
 	private DenoiseWavelet alg;
@@ -52,27 +50,27 @@ public class WaveletDenoiseFilter<T extends ImageGray<T>> implements FilterImage
 	 * @param wavelet Description of the wavelet transform.
 	 * @param denoiser Algorithm used to remove noise
 	 */
-	public WaveletDenoiseFilter(WaveletTransform<T, ?, ?> wavelet,
-								DenoiseWavelet denoiser) {
-		this.wavelet = (WaveletTransform<T,T,?>)wavelet;
+	public WaveletDenoiseFilter( WaveletTransform<T, ?, ?> wavelet,
+								 DenoiseWavelet denoiser ) {
+		this.wavelet = (WaveletTransform<T, T, ?>)wavelet;
 		this.alg = denoiser;
 	}
 
 	@Override
-	public void process(T original, T denoised ) {
+	public void process( T original, T denoised ) {
 
 		// compute the wavelet transform
-		if( transform != null ) {
-			ImageDimension d = UtilWavelet.transformDimension(original,wavelet.getLevels());
-			transform.reshape(d.width,d.height);
+		if (transform != null) {
+			ImageDimension d = UtilWavelet.transformDimension(original, wavelet.getLevels());
+			transform.reshape(d.width, d.height);
 		}
-		transform = wavelet.transform(original,transform);
+		transform = wavelet.transform(original, transform);
 
 		// remove noise from the transformed image
-		alg.denoise(transform,wavelet.getLevels());
+		alg.denoise(transform, wavelet.getLevels());
 
 		// reverse the transform
-		wavelet.invert(transform,denoised);
+		wavelet.invert(transform, denoised);
 	}
 
 	@Override

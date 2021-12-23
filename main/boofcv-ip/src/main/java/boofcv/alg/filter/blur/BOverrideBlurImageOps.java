@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -26,7 +26,7 @@ import org.jetbrains.annotations.Nullable;
 
 /**
  * Override for blur image ops functions
- * 
+ *
  * @author Peter Abeles
  */
 public class BOverrideBlurImageOps extends BOverrideClass {
@@ -35,34 +35,35 @@ public class BOverrideBlurImageOps extends BOverrideClass {
 		BOverrideManager.register(BOverrideBlurImageOps.class);
 	}
 
-	public static Mean mean;
-	public static Median median;
-	public static Gaussian gaussian;
+	public static @Nullable Mean mean;
+	public static @Nullable Median median;
+	public static @Nullable Gaussian gaussian;
 
 	public interface Mean<T extends ImageBase<T>> {
-		void processMeanWeighted(T input, T output, int radiusX, int radiusY, T storage);
-		void processMeanBorder(T input, T output, int radiusX, int radiusY, @Nullable ImageBorder<T> border , T storage);
+		void processMeanWeighted( T input, T output, int radiusX, int radiusY, T storage );
+
+		void processMeanBorder( T input, T output, int radiusX, int radiusY, @Nullable ImageBorder<T> border, T storage );
 	}
 
 	public interface Median<T extends ImageBase<T>> {
-		void processMedian(T input, T output, int radiusX, int radiusY);
+		void processMedian( T input, T output, int radiusX, int radiusY );
 	}
-	
+
 	public interface Gaussian<T extends ImageBase<T>> {
-		void processGaussian(T input, T output, double sigmaX , int radiusX, double sigmaY, int radiusY, T storage );
+		void processGaussian( T input, T output, double sigmaX, int radiusX, double sigmaY, int radiusY, T storage );
 	}
 
 	/**
 	 * Weighted average mean
 	 */
 	public static <T extends ImageBase<T>>
-	boolean invokeNativeMeanWeighted(T input, T output, int radiusX, int radiusY, T storage) {
+	boolean invokeNativeMeanWeighted( T input, T output, int radiusX, int radiusY, T storage ) {
 		boolean processed = false;
-		if( BOverrideBlurImageOps.mean != null ) {
+		if (BOverrideBlurImageOps.mean != null) {
 			try {
-				BOverrideBlurImageOps.mean.processMeanWeighted(input,output,radiusX,radiusY,storage);
+				BOverrideBlurImageOps.mean.processMeanWeighted(input, output, radiusX, radiusY, storage);
 				processed = true;
-			} catch( RuntimeException ignore ) {}
+			} catch (RuntimeException ignore) {}
 		}
 		return processed;
 	}
@@ -71,38 +72,40 @@ public class BOverrideBlurImageOps extends BOverrideClass {
 	 * Extended border mean
 	 */
 	public static <T extends ImageBase<T>>
-	boolean invokeNativeMeanBorder(T input, T output, int radiusX, int radiusY, @Nullable ImageBorder<T> border , T storage) {
+	boolean invokeNativeMeanBorder( T input, T output, int radiusX, int radiusY, @Nullable ImageBorder<T> border, T storage ) {
 		boolean processed = false;
-		if( BOverrideBlurImageOps.mean != null ) {
+		if (BOverrideBlurImageOps.mean != null) {
 			try {
-				BOverrideBlurImageOps.mean.processMeanBorder(input,output,radiusX,radiusY,border,storage);
+				BOverrideBlurImageOps.mean.processMeanBorder(input, output, radiusX, radiusY, border, storage);
 				processed = true;
-			} catch( RuntimeException ignore ) {}
+			} catch (RuntimeException ignore) {}
 		}
 		return processed;
 	}
 
 	public static <T extends ImageBase<T>>
-	boolean invokeNativeMedian(T input, T output, int radiusX, int radiusY) {
+	boolean invokeNativeMedian( T input, T output, int radiusX, int radiusY ) {
 		boolean processed = false;
-		if( BOverrideBlurImageOps.median != null ) {
+		if (BOverrideBlurImageOps.median != null) {
 			try {
-				BOverrideBlurImageOps.median.processMedian(input,output,radiusX,radiusY);
+				BOverrideBlurImageOps.median.processMedian(input, output, radiusX, radiusY);
 				processed = true;
-			} catch( RuntimeException ignore ) {}
+			} catch (RuntimeException ignore) {
+			}
 		}
 		return processed;
 	}
 
 	// TODO replace with native normalized?
 	public static <T extends ImageBase<T>>
-	boolean invokeNativeGaussian(T input, T output, double sigmaX , int radiusX, double sigmaY , int radiusY,T storage) {
+	boolean invokeNativeGaussian( T input, T output, double sigmaX, int radiusX, double sigmaY, int radiusY, T storage ) {
 		boolean processed = false;
-		if( BOverrideBlurImageOps.gaussian != null ) {
+		if (BOverrideBlurImageOps.gaussian != null) {
 			try {
-				BOverrideBlurImageOps.gaussian.processGaussian(input,output,sigmaX,radiusX,sigmaY,radiusY,storage);
+				BOverrideBlurImageOps.gaussian.processGaussian(input, output, sigmaX, radiusX, sigmaY, radiusY, storage);
 				processed = true;
-			} catch( RuntimeException ignore ) {}
+			} catch (RuntimeException ignore) {
+			}
 		}
 		return processed;
 	}

@@ -82,7 +82,7 @@ public class BinaryThinning {
 			new Mask4(), new Mask5(), new Mask6(), new Mask7()};
 
 	// reference to input image
-	GrayU8 binary;
+	GrayU8 binary = new GrayU8(0, 0);
 	// all pixels outside the image are set to 0
 	ImageBorder_S32<GrayU8> inputBorder = ImageBorderValue.wrap(binary, 0);
 	// list of one valued pixels, input

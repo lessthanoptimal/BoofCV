@@ -29,13 +29,13 @@ import boofcv.struct.image.ImageType;
 
 import static boofcv.factory.filter.kernel.FactoryKernelGaussian.sigmaForRadius;
 
-
 /**
  * Finds the derivative using a Gaussian kernel. This is the same as convolving the image
  * and then computing the derivative
  *
  * @author Peter Abeles
  */
+@SuppressWarnings({"NullAway.Init"})
 public class ImageGradient_Gaussian<I extends ImageGray<I>, D extends ImageGray<D>>
 		implements ImageGradient<I, D> {
 
@@ -54,44 +54,44 @@ public class ImageGradient_Gaussian<I extends ImageGray<I>, D extends ImageGray<
 
 	Class<I> imageType;
 
-	public ImageGradient_Gaussian(int radius , Class<I> inputType , Class<D> derivType) {
-		this(sigmaForRadius(radius,0),radius,inputType,derivType);
+	public ImageGradient_Gaussian( int radius, Class<I> inputType, Class<D> derivType ) {
+		this(sigmaForRadius(radius, 0), radius, inputType, derivType);
 	}
 
-	public ImageGradient_Gaussian(double sigma, int radius,
-								  Class<I> inputType , Class<D> derivType ) {
+	public ImageGradient_Gaussian( double sigma, int radius,
+								   Class<I> inputType, Class<D> derivType ) {
 		this.imageType = inputType;
 		this.derivType = derivType;
 
 		// need to do this here to make sure the blur and derivative functions have the same paramters.
-		if( radius <= 0 )
-			radius = FactoryKernelGaussian.radiusForSigma(sigma,1);
-		else if( sigma <= 0 )
-			sigma = FactoryKernelGaussian.sigmaForRadius(radius,1);
+		if (radius <= 0)
+			radius = FactoryKernelGaussian.radiusForSigma(sigma, 1);
+		else if (sigma <= 0)
+			sigma = FactoryKernelGaussian.sigmaForRadius(radius, 1);
 
-		kernelBlur = FactoryKernelGaussian.gaussian1D(inputType,sigma,radius);
-		kernelDeriv = FactoryKernelGaussian.derivativeI(inputType,1,sigma,radius);
+		kernelBlur = FactoryKernelGaussian.gaussian1D(inputType, sigma, radius);
+		kernelDeriv = FactoryKernelGaussian.derivativeI(inputType, 1, sigma, radius);
 		border = FactoryImageBorder.single(borderType, derivType);
 	}
 
 	@SuppressWarnings({"unchecked"})
 	@Override
-	public void process( I inputImage , D derivX, D derivY ) {
+	public void process( I inputImage, D derivX, D derivY ) {
 
-		if( storage == null ) {
-			storage = (I)inputImage.createNew(inputImage.width,inputImage.height );
+		if (storage == null) {
+			storage = (I)inputImage.createNew(inputImage.width, inputImage.height);
 		} else {
-			storage.reshape(inputImage.width,inputImage.height);
+			storage.reshape(inputImage.width, inputImage.height);
 		}
 
-		GConvolveImageOps.verticalNormalized(kernelBlur,inputImage,storage);
-		GConvolveImageOps.horizontal(kernelDeriv,storage,derivX,border );
-		GConvolveImageOps.horizontalNormalized(kernelBlur,inputImage,storage);
-		GConvolveImageOps.vertical(kernelDeriv,storage,derivY,border );
+		GConvolveImageOps.verticalNormalized(kernelBlur, inputImage, storage);
+		GConvolveImageOps.horizontal(kernelDeriv, storage, derivX, border);
+		GConvolveImageOps.horizontalNormalized(kernelBlur, inputImage, storage);
+		GConvolveImageOps.vertical(kernelDeriv, storage, derivY, border);
 	}
 
 	@Override
-	public void setBorderType(BorderType type) {
+	public void setBorderType( BorderType type ) {
 		this.borderType = type;
 		border = FactoryImageBorder.single(borderType, derivType);
 	}

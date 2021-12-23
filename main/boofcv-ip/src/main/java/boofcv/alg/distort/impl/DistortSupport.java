@@ -31,6 +31,7 @@ import georegression.struct.point.Point2D_F32;
 import georegression.struct.se.Se2_F32;
 import georegression.transform.ConvertTransform_F32;
 import georegression.transform.InvertibleTransformSequence;
+import org.jetbrains.annotations.Nullable;
 
 /**
  * Provides low level functions that {@link boofcv.alg.distort.DistortImageOps} can call.
@@ -44,7 +45,7 @@ public class DistortSupport {
 	 * the x and y axises.
 	 */
 	public static PixelTransformAffine_F32 transformScale( ImageBase from, ImageBase to,
-														   PixelTransformAffine_F32 distort ) {
+														   @Nullable PixelTransformAffine_F32 distort ) {
 		if (distort == null)
 			distort = new PixelTransformAffine_F32();
 
