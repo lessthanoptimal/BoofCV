@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -23,6 +23,7 @@ import boofcv.core.image.GConvertImage;
 import boofcv.struct.image.GrayU8;
 import boofcv.struct.image.ImageGray;
 import boofcv.struct.image.ImageType;
+import org.jetbrains.annotations.Nullable;
 
 /**
  * {@link InputToBinary} which will convert the input image into the specified type prior to processing.
@@ -34,30 +35,28 @@ public class InputToBinarySwitch<T extends ImageGray<T>> implements InputToBinar
 	ImageType<T> inputType;
 
 	InputToBinary alg;
-	ImageGray work;
+	@Nullable ImageGray work;
 
 	/**
 	 * @see ThresholdBlockOtsu
 	 */
-	public InputToBinarySwitch(InputToBinary alg,
-							   Class<T> inputType) {
-
+	public InputToBinarySwitch( InputToBinary alg, Class<T> inputType ) {
 		this.alg = alg;
 		this.inputType = ImageType.single(inputType);
 
-		if( !alg.getInputType().isSameType(this.inputType)) {
-			work = (ImageGray)alg.getInputType().createImage(1,1);
+		if (!alg.getInputType().isSameType(this.inputType)) {
+			work = (ImageGray)alg.getInputType().createImage(1, 1);
 		}
 	}
 
 	@Override
-	public void process(T input, GrayU8 output) {
-		if( this.work == null )
-			alg.process(input,output);
+	public void process( T input, GrayU8 output ) {
+		if (this.work == null)
+			alg.process(input, output);
 		else {
-			this.work.reshape(input.width,input.height);
-			GConvertImage.convert(input,this.work);
-			alg.process(this.work,output);
+			this.work.reshape(input.width, input.height);
+			GConvertImage.convert(input, this.work);
+			alg.process(this.work, output);
 		}
 	}
 

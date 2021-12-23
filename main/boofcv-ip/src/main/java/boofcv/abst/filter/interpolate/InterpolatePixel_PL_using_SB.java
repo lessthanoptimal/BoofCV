@@ -31,32 +31,32 @@ import boofcv.struct.image.Planar;
  *
  * @author Peter Abeles
  */
+@SuppressWarnings({"NullAway.Init"})
 public class InterpolatePixel_PL_using_SB<T extends ImageGray<T>>
-		implements InterpolatePixelMB<Planar<T>>
-{
+		implements InterpolatePixelMB<Planar<T>> {
 	InterpolatePixelS<T> alg;
 
 	Planar<T> image;
 
-	public InterpolatePixel_PL_using_SB(InterpolatePixelS<T> alg) {
+	public InterpolatePixel_PL_using_SB( InterpolatePixelS<T> alg ) {
 		this.alg = alg;
 	}
 
 	@Override
-	public void get(float x, float y, float[] values) {
+	public void get( float x, float y, float[] values ) {
 		final int N = image.getNumBands();
-		for( int i = 0; i < N; i++ ) {
+		for (int i = 0; i < N; i++) {
 			alg.setImage(image.getBand(i));
-			values[i] = alg.get(x,y);
+			values[i] = alg.get(x, y);
 		}
 	}
 
 	@Override
-	public void get_fast(float x, float y, float[] values) {
+	public void get_fast( float x, float y, float[] values ) {
 		final int N = image.getNumBands();
-		for( int i = 0; i < N; i++ ) {
+		for (int i = 0; i < N; i++) {
 			alg.setImage(image.getBand(i));
-			values[i] = alg.get_fast(x,y);
+			values[i] = alg.get_fast(x, y);
 		}
 	}
 
@@ -66,7 +66,7 @@ public class InterpolatePixel_PL_using_SB<T extends ImageGray<T>>
 	}
 
 	@Override
-	public void setBorder(ImageBorder<Planar<T>> border) {
+	public void setBorder( ImageBorder<Planar<T>> border ) {
 		this.alg.setBorder((ImageBorder)border);
 	}
 
@@ -76,10 +76,10 @@ public class InterpolatePixel_PL_using_SB<T extends ImageGray<T>>
 	}
 
 	@Override
-	public void setImage(Planar<T> image) {
+	public void setImage( Planar<T> image ) {
 		this.image = image;
 		// set it to use the first band by default so that other functions can work
-		alg.setImage( image.getBand(0));
+		alg.setImage(image.getBand(0));
 	}
 
 	@Override
@@ -88,8 +88,8 @@ public class InterpolatePixel_PL_using_SB<T extends ImageGray<T>>
 	}
 
 	@Override
-	public boolean isInFastBounds(float x, float y) {
-		return alg.isInFastBounds(x,y);
+	public boolean isInFastBounds( float x, float y ) {
+		return alg.isInFastBounds(x, y);
 	}
 
 	@Override

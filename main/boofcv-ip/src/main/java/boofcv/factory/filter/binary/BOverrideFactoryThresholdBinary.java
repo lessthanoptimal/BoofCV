@@ -23,6 +23,7 @@ import boofcv.override.BOverrideClass;
 import boofcv.override.BOverrideManager;
 import boofcv.struct.ConfigLength;
 import boofcv.struct.image.ImageGray;
+import org.jetbrains.annotations.Nullable;
 
 /**
  * Override functions which allows external code to be called instead of BoofCV for thresholding operations.
@@ -31,16 +32,16 @@ import boofcv.struct.image.ImageGray;
  */
 public class BOverrideFactoryThresholdBinary extends BOverrideClass {
 
-	public static GlobalEntropy globalEntropy;
-	public static GlobalFixed globalFixed;
-	public static GlobalOtsu globalOtsu;
-	public static LocalGaussian localGaussian;
-	public static LocalSauvola localSauvola;
-	public static LocalMean localMean;
-	public static LocalOtsu localOtsu;
-	public static LocalBlockMinMax blockMinMax;
-	public static LocalBlockMean blockMean;
-	public static LocalBlockOtsu blockOtsu;
+	public static @Nullable GlobalEntropy globalEntropy;
+	public static @Nullable GlobalFixed globalFixed;
+	public static @Nullable GlobalOtsu globalOtsu;
+	public static @Nullable LocalGaussian localGaussian;
+	public static @Nullable LocalSauvola localSauvola;
+	public static @Nullable LocalMean localMean;
+	public static @Nullable LocalOtsu localOtsu;
+	public static @Nullable LocalBlockMinMax blockMinMax;
+	public static @Nullable LocalBlockMean blockMean;
+	public static @Nullable LocalBlockOtsu blockOtsu;
 
 	static {
 		BOverrideManager.register(BOverrideFactoryThresholdBinary.class);

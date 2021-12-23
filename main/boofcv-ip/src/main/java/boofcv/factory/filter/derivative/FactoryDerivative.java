@@ -259,12 +259,14 @@ public class FactoryDerivative {
 		return m;
 	}
 
-	private static Method findHessianFromGradient( Class<?> derivativeClass, @Nullable Class<?> imageType ) {
-		String name = derivativeClass.getSimpleName().substring(8);
+	private static Method findHessianFromGradient( Class<?> gradientType, @Nullable Class<?> derivType ) {
+		if (derivType == null)
+			derivType = gradientType;
+		String name = gradientType.getSimpleName().substring(8);
 		Method m;
 		try {
-			Class<?> borderType = GeneralizedImageOps.isFloatingPoint(imageType) ? ImageBorder_F32.class : ImageBorder_S32.class;
-			m = HessianFromGradient.class.getDeclaredMethod("hessian" + name, imageType, imageType, imageType, imageType, imageType, borderType);
+			Class<?> borderType = GeneralizedImageOps.isFloatingPoint(derivType) ? ImageBorder_F32.class : ImageBorder_S32.class;
+			m = HessianFromGradient.class.getDeclaredMethod("hessian" + name, derivType, derivType, derivType, derivType, derivType, borderType);
 		} catch (NoSuchMethodException e) {
 			throw new RuntimeException("Input and derivative types are probably not compatible", e);
 		}

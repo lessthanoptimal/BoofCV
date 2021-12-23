@@ -21,6 +21,7 @@ package boofcv.factory.filter.binary;
 import boofcv.abst.filter.binary.BinaryLabelContourFinder;
 import boofcv.override.BOverrideClass;
 import boofcv.override.BOverrideManager;
+import org.jetbrains.annotations.Nullable;
 
 /**
  * Override for {@link FactoryBinaryContourFinder}.+
@@ -29,7 +30,7 @@ import boofcv.override.BOverrideManager;
  */
 public class BOverrideFactoryBinaryContourFinder extends BOverrideClass {
 
-	public static Chang2004 chang2004;
+	public static @Nullable Chang2004 chang2004;
 
 	static {
 		BOverrideManager.register(BOverrideFactoryBinaryContourFinder.class);

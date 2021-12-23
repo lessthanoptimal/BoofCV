@@ -25,6 +25,7 @@ import boofcv.struct.image.ImageBase;
 import boofcv.struct.image.ImageType;
 import lombok.Getter;
 import lombok.Setter;
+import org.jetbrains.annotations.Nullable;
 import pabeles.concurrency.GrowArray;
 
 /**
@@ -50,7 +51,7 @@ public class BlurStorageFilter<T extends ImageBase<T>> implements BlurFilter<T> 
 	GrowArray<?> growArray;
 
 	/** Specified how the border is handled for mean images. If null then it's normalized */
-	@Getter @Setter ImageBorder<T> border = null;
+	@Getter @Setter @Nullable ImageBorder<T> border = null;
 
 	public BlurStorageFilter( String functionName, ImageType<T> inputType, int radius ) {
 		this(functionName, inputType, -1, radius, -1, radius);
@@ -68,21 +69,25 @@ public class BlurStorageFilter<T extends ImageBase<T>> implements BlurFilter<T> 
 		this.sigmaY = sigmaY;
 		this.inputType = inputType;
 
-		if (functionName.equals("mean")) {
-			operation = new MeanOperation();
-			createStorage();
-		} else if (functionName.equals("meanB")) {
-			operation = new MeanBorderOperation();
-			createStorage();
-		} else if (functionName.equals("gaussian")) {
-			operation = new GaussianOperation();
-			createStorage();
-		} else if (functionName.equals("median")) {
-			if (radiusX != radiusY)
-				throw new IllegalArgumentException("Median currently only supports equal radius");
-			operation = new MedianOperator();
-		} else {
-			throw new IllegalArgumentException("Unknown function " + functionName);
+		switch (functionName) {
+			case "mean" -> {
+				operation = new MeanOperation();
+				createStorage();
+			}
+			case "meanB" -> {
+				operation = new MeanBorderOperation();
+				createStorage();
+			}
+			case "gaussian" -> {
+				operation = new GaussianOperation();
+				createStorage();
+			}
+			case "median" -> {
+				if (radiusX != radiusY)
+					throw new IllegalArgumentException("Median currently only supports equal radius");
+				operation = new MedianOperator();
+			}
+			default -> throw new IllegalArgumentException("Unknown function " + functionName);
 		}
 
 		growArray = GeneralizedImageOps.createGrowArray(inputType);

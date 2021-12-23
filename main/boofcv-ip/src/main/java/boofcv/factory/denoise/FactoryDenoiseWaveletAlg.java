@@ -26,6 +26,7 @@ import boofcv.alg.denoise.wavelet.DenoiseVisuShrink_F32;
 import boofcv.alg.denoise.wavelet.ShrinkThresholdSoft_F32;
 import boofcv.struct.image.GrayF32;
 import boofcv.struct.image.ImageGray;
+import org.jetbrains.annotations.Nullable;
 
 /**
  * Factory for creating wavelet based image denoising classes.
@@ -42,7 +43,7 @@ public class FactoryDenoiseWaveletAlg {
 	 * @param imageType Type of image it will process.
 	 * @return Bayes Shrink
 	 */
-	public static <T extends ImageGray<T>> DenoiseWavelet<T> bayes( ShrinkThresholdRule<T> rule, Class<T> imageType ) {
+	public static <T extends ImageGray<T>> DenoiseWavelet<T> bayes( @Nullable ShrinkThresholdRule<T> rule, Class<T> imageType ) {
 		if (rule == null) {
 			rule = (ShrinkThresholdRule<T>)new ShrinkThresholdSoft_F32();
 		}

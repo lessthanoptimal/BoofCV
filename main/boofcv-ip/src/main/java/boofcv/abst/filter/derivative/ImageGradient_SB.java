@@ -31,6 +31,7 @@ import boofcv.struct.image.ImageType;
  *
  * @author Peter Abeles
  */
+@SuppressWarnings({"NullAway.Init"})
 public abstract class ImageGradient_SB<Input extends ImageGray<Input>, Output extends ImageGray<Output>>
 		implements ImageGradient<Input, Output> {
 	// How the image border should be handled
@@ -75,7 +76,7 @@ public abstract class ImageGradient_SB<Input extends ImageGray<Input>, Output ex
 	}
 
 	public static class Sobel<T extends ImageGray<T>, D extends ImageGray<D>> extends ImageGradient_SB<T, D> {
-		public Sobel( Class<T> inputType, Class<D> derivType ) { super(inputType, derivType); }
+		public Sobel( Class<T> inputType, Class<D> derivType ) {super(inputType, derivType);}
 
 		@Override
 		public void process( T inputImage, D derivX, D derivY ) {
@@ -84,7 +85,7 @@ public abstract class ImageGradient_SB<Input extends ImageGray<Input>, Output ex
 	}
 
 	public static class Prewitt<T extends ImageGray<T>, D extends ImageGray<D>> extends ImageGradient_SB<T, D> {
-		public Prewitt( Class<T> inputType, Class<D> derivType ) { super(inputType, derivType); }
+		public Prewitt( Class<T> inputType, Class<D> derivType ) {super(inputType, derivType);}
 
 		@Override
 		public void process( T inputImage, D derivX, D derivY ) {
@@ -93,7 +94,7 @@ public abstract class ImageGradient_SB<Input extends ImageGray<Input>, Output ex
 	}
 
 	public static class Scharr<T extends ImageGray<T>, D extends ImageGray<D>> extends ImageGradient_SB<T, D> {
-		public Scharr( Class<T> inputType, Class<D> derivType ) { super(inputType, derivType); }
+		public Scharr( Class<T> inputType, Class<D> derivType ) {super(inputType, derivType);}
 
 		@Override
 		public void process( T inputImage, D derivX, D derivY ) {
@@ -102,7 +103,7 @@ public abstract class ImageGradient_SB<Input extends ImageGray<Input>, Output ex
 	}
 
 	public static class Three<T extends ImageGray<T>, D extends ImageGray<D>> extends ImageGradient_SB<T, D> {
-		public Three( Class<T> inputType, Class<D> derivType ) { super(inputType, derivType); }
+		public Three( Class<T> inputType, Class<D> derivType ) {super(inputType, derivType);}
 
 		@Override
 		public void process( T inputImage, D derivX, D derivY ) {
@@ -111,7 +112,7 @@ public abstract class ImageGradient_SB<Input extends ImageGray<Input>, Output ex
 	}
 
 	public static class Two0<T extends ImageGray<T>, D extends ImageGray<D>> extends ImageGradient_SB<T, D> {
-		public Two0( Class<T> inputType, Class<D> derivType ) { super(inputType, derivType); }
+		public Two0( Class<T> inputType, Class<D> derivType ) {super(inputType, derivType);}
 
 		@Override
 		public void process( T inputImage, D derivX, D derivY ) {
@@ -120,7 +121,7 @@ public abstract class ImageGradient_SB<Input extends ImageGray<Input>, Output ex
 	}
 
 	public static class Two1<T extends ImageGray<T>, D extends ImageGray<D>> extends ImageGradient_SB<T, D> {
-		public Two1( Class<T> inputType, Class<D> derivType ) { super(inputType, derivType); }
+		public Two1( Class<T> inputType, Class<D> derivType ) {super(inputType, derivType);}
 
 		@Override
 		public void process( T inputImage, D derivX, D derivY ) {

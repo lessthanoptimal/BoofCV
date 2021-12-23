@@ -26,7 +26,6 @@ import boofcv.struct.image.ImageType;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 
-
 /**
  * Generalized interface for filtering images with convolution kernels while skipping pixels.
  * Can invoke different techniques for handling image borders. The first pixel sampled is always (0,0) and the
@@ -35,8 +34,7 @@ import java.lang.reflect.Method;
  * @author Peter Abeles
  */
 public class GenericConvolveDown<Input extends ImageBase<Input>, Output extends ImageBase<Output>>
-	implements ConvolveDown<Input,Output>
-{
+		implements ConvolveDown<Input, Output> {
 	Method m;
 	KernelBase kernel;
 	BorderType type;
@@ -44,10 +42,10 @@ public class GenericConvolveDown<Input extends ImageBase<Input>, Output extends 
 	ImageType<Input> inputType;
 	ImageType<Output> outputType;
 
-	public GenericConvolveDown(Method m, KernelBase kernel,
-							   BorderType type, int skip ,
-							   ImageType<Input> inputType,
-							   ImageType<Output> outputType) {
+	public GenericConvolveDown( Method m, KernelBase kernel,
+								BorderType type, int skip,
+								ImageType<Input> inputType,
+								ImageType<Output> outputType ) {
 		this.m = m;
 		this.kernel = kernel;
 		this.type = type;
@@ -62,14 +60,14 @@ public class GenericConvolveDown<Input extends ImageBase<Input>, Output extends 
 	}
 
 	@Override
-	public void setSkip(int skip) {
+	public void setSkip( int skip ) {
 		this.skip = skip;
 	}
 
 	@Override
-	public void process(Input input, Output output) {
+	public void process( Input input, Output output ) {
 		try {
-			m.invoke(null,kernel,input,output,skip);
+			m.invoke(null, kernel, input, output, skip);
 		} catch (IllegalAccessException | InvocationTargetException e) {
 			throw new RuntimeException(e);
 		}
@@ -77,7 +75,7 @@ public class GenericConvolveDown<Input extends ImageBase<Input>, Output extends 
 
 	@Override
 	public int getBorderX() {
-		if( type == BorderType.SKIP)
+		if (type == BorderType.SKIP)
 			return kernel.getRadius();
 		else
 			return 0;

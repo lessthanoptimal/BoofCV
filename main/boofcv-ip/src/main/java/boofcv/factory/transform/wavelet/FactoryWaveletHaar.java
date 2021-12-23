@@ -20,7 +20,7 @@ package boofcv.factory.transform.wavelet;
 
 import boofcv.core.image.border.BorderIndex1D_Extend;
 import boofcv.struct.wavelet.*;
-
+import org.jetbrains.annotations.Nullable;
 
 /**
  * Coefficients for Haar wavelet.
@@ -29,32 +29,31 @@ import boofcv.struct.wavelet.*;
  */
 public class FactoryWaveletHaar {
 
-	public static <C extends WlCoef> 
-	WaveletDescription<C> generate( boolean isInteger , int imageBits )
-	{
-		if( isInteger ) {
-			if( imageBits <= 32) {
+	public static <C extends WlCoef>
+	@Nullable WaveletDescription<C> generate( boolean isInteger, int imageBits ) {
+		if (isInteger) {
+			if (imageBits <= 32) {
 				WlCoef_I32 forward = new WlCoef_I32();
 
-				forward.scaling = new int[]{1,1};
-				forward.wavelet = new int[]{forward.scaling[0],-forward.scaling[0]};
+				forward.scaling = new int[]{1, 1};
+				forward.wavelet = new int[]{forward.scaling[0], -forward.scaling[0]};
 				forward.denominatorScaling = 1;
 				forward.denominatorWavelet = 1;
 
 				WlBorderCoef<WlCoef_I32> inverse = new WlBorderCoefStandard<>(generateInv_I32());
 
-				return new WaveletDescription(new BorderIndex1D_Extend(),forward,inverse);
+				return new WaveletDescription(new BorderIndex1D_Extend(), forward, inverse);
 			}
 		} else {
-			if( imageBits == 32 ) {
+			if (imageBits == 32) {
 				WlCoef_F32 forward = new WlCoef_F32();
 
-				forward.scaling = new float[]{(float)(1.0/Math.sqrt(2)),(float)(1.0/Math.sqrt(2))};
-				forward.wavelet = new float[]{forward.scaling[0],-forward.scaling[0]};
+				forward.scaling = new float[]{(float)(1.0/Math.sqrt(2)), (float)(1.0/Math.sqrt(2))};
+				forward.wavelet = new float[]{forward.scaling[0], -forward.scaling[0]};
 
 				WlBorderCoef<WlCoef_F32> inverse = new WlBorderCoefStandard<>(forward);
 
-				return new WaveletDescription(new BorderIndex1D_Extend(),forward,inverse);
+				return new WaveletDescription(new BorderIndex1D_Extend(), forward, inverse);
 			}
 		}
 		return null;
@@ -69,8 +68,8 @@ public class FactoryWaveletHaar {
 	private static WlCoef_I32 generateInv_I32() {
 		WlCoef_I32 ret = new WlCoef_I32();
 
-		ret.scaling = new int[]{1,1};
-		ret.wavelet = new int[]{ret.scaling[0],-ret.scaling[0]};
+		ret.scaling = new int[]{1, 1};
+		ret.wavelet = new int[]{ret.scaling[0], -ret.scaling[0]};
 		ret.denominatorScaling = 2;
 		ret.denominatorWavelet = 2;
 

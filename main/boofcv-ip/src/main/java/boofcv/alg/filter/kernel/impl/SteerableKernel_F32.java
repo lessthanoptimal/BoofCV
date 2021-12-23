@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -31,6 +31,7 @@ import boofcv.struct.convolve.Kernel2D_F32;
  *
  * @author Peter Abeles
  */
+@SuppressWarnings({"NullAway.Init"})
 public class SteerableKernel_F32 implements SteerableKernel<Kernel2D_F32> {
 
 	// stores the output kernel
@@ -38,7 +39,7 @@ public class SteerableKernel_F32 implements SteerableKernel<Kernel2D_F32> {
 
 	// definition of steerable function
 	private SteerableCoefficients coef;
-	private Kernel2D basis[];
+	private Kernel2D[] basis;
 
 	@Override
 	public void setBasis( SteerableCoefficients coef, Kernel2D... basis ) {

@@ -54,7 +54,7 @@ public class AnyImageDerivative<I extends ImageGray<I>, D extends ImageGray<D>> 
 
 	private I inputImage;
 
-		// stores computed derivative images
+	// stores computed derivative images
 	private D[][] derivatives;
 	// if true then
 	private boolean[][] stale;
@@ -68,18 +68,17 @@ public class AnyImageDerivative<I extends ImageGray<I>, D extends ImageGray<D>> 
 	 * @param inputType The type of input image.
 	 * @param derivType Derivative image type
 	 */
-	public AnyImageDerivative( Kernel1D deriv , Class<I> inputType , Class<D> derivType )
-	{
+	public AnyImageDerivative( Kernel1D deriv, Class<I> inputType, Class<D> derivType ) {
 		this.derivType = derivType;
 
 		ImageType<I> _inputType = ImageType.single(inputType);
 		ImageType<D> _derivType = ImageType.single(derivType);
 
-		derivX = FactoryConvolve.convolve(deriv,_inputType,_derivType, borderDeriv,true);
-		derivY = FactoryConvolve.convolve(deriv,_inputType,_derivType, borderDeriv,false);
+		derivX = FactoryConvolve.convolve(deriv, _inputType, _derivType, borderDeriv, true);
+		derivY = FactoryConvolve.convolve(deriv, _inputType, _derivType, borderDeriv, false);
 
-		derivDerivX = FactoryConvolve.convolve(deriv,_derivType,_derivType, borderDeriv,true);
-		derivDerivY = FactoryConvolve.convolve(deriv,_derivType,_derivType, borderDeriv,false);
+		derivDerivX = FactoryConvolve.convolve(deriv, _derivType, _derivType, borderDeriv, true);
+		derivDerivY = FactoryConvolve.convolve(deriv, _derivType, _derivType, borderDeriv, false);
 	}
 
 	/**
@@ -89,16 +88,15 @@ public class AnyImageDerivative<I extends ImageGray<I>, D extends ImageGray<D>> 
 	 * @param inputType The type of input image.
 	 * @param derivType Derivative image type
 	 */
-	public AnyImageDerivative( Kernel2D derivX , Class<I> inputType , Class<D> derivType )
-	{
+	public AnyImageDerivative( Kernel2D derivX, Class<I> inputType, Class<D> derivType ) {
 		this.derivType = derivType;
 		Kernel2D derivY = GKernelMath.transpose(derivX);
 
-		this.derivX = FactoryConvolve.convolve(derivX,inputType,derivType, borderDeriv);
-		this.derivY = FactoryConvolve.convolve(derivY,inputType,derivType, borderDeriv);
+		this.derivX = FactoryConvolve.convolve(derivX, inputType, derivType, borderDeriv);
+		this.derivY = FactoryConvolve.convolve(derivY, inputType, derivType, borderDeriv);
 
-		derivDerivX = FactoryConvolve.convolve(derivX,derivType,derivType, borderDeriv);
-		derivDerivY = FactoryConvolve.convolve(derivY,derivType,derivType, borderDeriv);
+		derivDerivX = FactoryConvolve.convolve(derivX, derivType, derivType, borderDeriv);
+		derivDerivY = FactoryConvolve.convolve(derivY, derivType, derivType, borderDeriv);
 	}
 
 	/**
@@ -110,10 +108,9 @@ public class AnyImageDerivative<I extends ImageGray<I>, D extends ImageGray<D>> 
 	 * @param derivYY Filter for computing derivative along y axis from input image.
 	 * @param inputType The type of input image.
 	 */
-	public AnyImageDerivative(ConvolveInterface<I, D> derivX , ConvolveInterface<I, D> derivY ,
-							  ConvolveInterface<D, D> derivXX , ConvolveInterface<D, D> derivYY ,
-							  Class<I> inputType , Class<D> derivType )
-	{
+	public AnyImageDerivative( ConvolveInterface<I, D> derivX, ConvolveInterface<I, D> derivY,
+							   ConvolveInterface<D, D> derivXX, ConvolveInterface<D, D> derivYY,
+							   Class<I> inputType, Class<D> derivType ) {
 		this.derivType = derivType;
 
 		this.derivX = derivX;
@@ -132,10 +129,10 @@ public class AnyImageDerivative<I extends ImageGray<I>, D extends ImageGray<D>> 
 		this.inputImage = input;
 
 		// reset the state flag so that everything need sto be computed
-		if( stale != null ) {
-			for( int i = 0; i < stale.length; i++) {
+		if (stale != null) {
+			for (int i = 0; i < stale.length; i++) {
 				boolean a[] = stale[i];
-				for( int j = 0; j < a.length; j++ ) {
+				for (int j = 0; j < a.length; j++) {
 					a[j] = true;
 				}
 			}
@@ -146,54 +143,54 @@ public class AnyImageDerivative<I extends ImageGray<I>, D extends ImageGray<D>> 
 	 * Computes derivative images using previously computed lower level derivatives. Only
 	 * computes/declares images as needed.
 	 */
-	public D getDerivative(boolean... isX) {
-		if( derivatives == null ) {
+	public D getDerivative( boolean... isX ) {
+		if (derivatives == null) {
 			declareTree(isX.length);
-		} else if( isX.length > stale.length ) {
+		} else if (isX.length > stale.length) {
 			growTree(isX.length);
 		}
 
 		int index = 0;
 		int prevIndex = 0;
-		for( int level = 0; level < isX.length; level++ ) {
+		for (int level = 0; level < isX.length; level++) {
 			index |= isX[level] ? 0 : 1 << level;
 
-			if( stale[level][index] ) {
+			if (stale[level][index]) {
 				stale[level][index] = false;
-				derivatives[level][index].reshape(inputImage.getWidth(),inputImage.getHeight());
+				derivatives[level][index].reshape(inputImage.getWidth(), inputImage.getHeight());
 
-				if( level == 0 ) {
-					if( isX[level]) {
-						derivX.process(inputImage,derivatives[level][index]);
+				if (level == 0) {
+					if (isX[level]) {
+						derivX.process(inputImage, derivatives[level][index]);
 					} else {
-						derivY.process(inputImage,derivatives[level][index]);
+						derivY.process(inputImage, derivatives[level][index]);
 					}
 				} else {
-					D prev = derivatives[level-1][prevIndex];
-					if( isX[level]) {
-						derivDerivX.process(prev,derivatives[level][index]);
+					D prev = derivatives[level - 1][prevIndex];
+					if (isX[level]) {
+						derivDerivX.process(prev, derivatives[level][index]);
 					} else {
-						derivDerivY.process(prev,derivatives[level][index]);
+						derivDerivY.process(prev, derivatives[level][index]);
 					}
 				}
 			}
 			prevIndex = index;
 		}
 
-		return derivatives[isX.length-1][index];
+		return derivatives[isX.length - 1][index];
 	}
 
 	private void declareTree( int maxDerivativeOrder ) {
 		derivatives = (D[][])new ImageGray[maxDerivativeOrder][];
 		stale = new boolean[maxDerivativeOrder][];
 
-		for( int i = 0; i < maxDerivativeOrder; i++) {
-			int N = (int)Math.pow(2,i+1);
+		for (int i = 0; i < maxDerivativeOrder; i++) {
+			int N = (int)Math.pow(2, i + 1);
 			derivatives[i] = (D[])new ImageGray[N];
 			stale[i] = new boolean[N];
-			for( int j = 0; j < N; j++ ) {
+			for (int j = 0; j < N; j++) {
 				stale[i][j] = true;
-				derivatives[i][j] = GeneralizedImageOps.createSingleBand(derivType,1,1);
+				derivatives[i][j] = GeneralizedImageOps.createSingleBand(derivType, 1, 1);
 			}
 		}
 	}
@@ -205,13 +202,12 @@ public class AnyImageDerivative<I extends ImageGray<I>, D extends ImageGray<D>> 
 		declareTree(maxDerivativeOrder);
 
 		int N = oldStale.length;
-		for( int i = 0; i < N; i++ ) {
+		for (int i = 0; i < N; i++) {
 			int M = oldStale[i].length;
-			for( int j = 0; j < M; j++ ) {
+			for (int j = 0; j < M; j++) {
 				derivatives[i][j] = oldDerives[i][j];
 				stale[i][j] = oldStale[i][j];
 			}
 		}
-
 	}
 }

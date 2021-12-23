@@ -20,35 +20,35 @@ package boofcv.alg.transform.ii;
 
 import boofcv.struct.ImageRectangle;
 
-
 /**
  * Convolution kernel for an integral image. Note that the bounds in the specified
  * rectangle are inclusive. Normally the upper bounds are exclusive.
  *
  * @author Peter Abeles
  */
+@SuppressWarnings({"NullAway.Init"})
 public class IntegralKernel {
 	public ImageRectangle[] blocks;
 	public int[] scales;
 
 	public IntegralKernel( int numBlocks ) {
 		this.blocks = new ImageRectangle[numBlocks];
-		this.scales = new int[ numBlocks ];
+		this.scales = new int[numBlocks];
 
-		for( int i = 0; i < numBlocks; i++ ) {
+		for (int i = 0; i < numBlocks; i++) {
 			blocks[i] = new ImageRectangle();
 		}
 	}
 
 	public IntegralKernel() {}
 
-	public void resizeBlocks(int desired) {
+	public void resizeBlocks( int desired ) {
 		if (getNumBlocks() == desired)
 			return;
 		this.blocks = new ImageRectangle[desired];
-		this.scales = new int[ desired ];
+		this.scales = new int[desired];
 
-		for( int i = 0; i < desired; i++ ) {
+		for (int i = 0; i < desired; i++) {
 			blocks[i] = new ImageRectangle();
 		}
 	}
@@ -58,8 +58,8 @@ public class IntegralKernel {
 	}
 
 	public IntegralKernel copy() {
-		IntegralKernel ret = new IntegralKernel( blocks.length );
-		for( int i = 0; i < blocks.length; i++ ) {
+		IntegralKernel ret = new IntegralKernel(blocks.length);
+		for (int i = 0; i < blocks.length; i++) {
 			this.blocks[i] = new ImageRectangle(blocks[i]);
 			this.scales[i] = scales[i];
 		}

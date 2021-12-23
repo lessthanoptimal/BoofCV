@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -27,6 +27,7 @@ import boofcv.struct.image.*;
  * @author Peter Abeles
  */
 public class LookUpColorRgbFormats {
+	@SuppressWarnings({"NullAway.Init"})
 	public static class PL_U8 implements LookUpColorRgb<Planar<GrayU8>> {
 		Planar<GrayU8> image;
 
@@ -42,6 +43,7 @@ public class LookUpColorRgbFormats {
 		@Override public ImageType<Planar<GrayU8>> getImageType() {return ImageType.PL_U8;}
 	}
 
+	@SuppressWarnings({"NullAway.Init"})
 	public static class PL_F32 implements LookUpColorRgb<Planar<GrayF32>> {
 		Planar<GrayF32> image;
 
@@ -61,6 +63,7 @@ public class LookUpColorRgbFormats {
 		@Override public ImageType<Planar<GrayF32>> getImageType() {return ImageType.PL_F32;}
 	}
 
+	@SuppressWarnings({"NullAway.Init"})
 	public static class IL_U8 implements LookUpColorRgb<InterleavedU8> {
 		InterleavedU8 image;
 
@@ -76,6 +79,7 @@ public class LookUpColorRgbFormats {
 		@Override public ImageType<InterleavedU8> getImageType() {return ImageType.IL_U8;}
 	}
 
+	@SuppressWarnings({"NullAway.Init"})
 	public static class IL_F32 implements LookUpColorRgb<InterleavedF32> {
 		InterleavedF32 image;
 
@@ -95,6 +99,7 @@ public class LookUpColorRgbFormats {
 		@Override public ImageType<InterleavedF32> getImageType() {return ImageType.IL_F32;}
 	}
 
+	@SuppressWarnings({"NullAway.Init"})
 	public static class SB_U8 implements LookUpColorRgb<GrayU8> {
 		GrayU8 image;
 
@@ -110,6 +115,7 @@ public class LookUpColorRgbFormats {
 		@Override public ImageType<GrayU8> getImageType() {return ImageType.SB_U8;}
 	}
 
+	@SuppressWarnings({"NullAway.Init"})
 	public static class SB_F32 implements LookUpColorRgb<GrayF32> {
 		GrayF32 image;
 

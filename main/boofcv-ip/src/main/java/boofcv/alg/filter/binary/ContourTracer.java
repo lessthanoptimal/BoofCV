@@ -30,6 +30,7 @@ import boofcv.struct.image.GrayU8;
  *
  * @author Peter Abeles
  */
+@SuppressWarnings({"NullAway.Init"})
 public class ContourTracer {
 
 	// Stops saving the contour when it meets or exceeds this value
