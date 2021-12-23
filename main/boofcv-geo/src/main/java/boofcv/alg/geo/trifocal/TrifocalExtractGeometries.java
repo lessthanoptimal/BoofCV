@@ -48,6 +48,7 @@ import org.ejml.interfaces.decomposition.SingularValueDecomposition_F64;
  *
  * @author Peter Abeles
  */
+@SuppressWarnings({"NullAway.Init"})
 public class TrifocalExtractGeometries {
 
 	// reference to input tensor
@@ -57,23 +58,23 @@ public class TrifocalExtractGeometries {
 	private SingularValueDecomposition_F64<DMatrixRMaj> svd;
 
 	// storage for left and right null space of the trifocal matrices
-	private DMatrixRMaj u1 = new DMatrixRMaj(3,1);
-	private DMatrixRMaj u2 = new DMatrixRMaj(3,1);
-	private DMatrixRMaj u3 = new DMatrixRMaj(3,1);
-	private DMatrixRMaj v1 = new DMatrixRMaj(3,1);
-	private DMatrixRMaj v2 = new DMatrixRMaj(3,1);
-	private DMatrixRMaj v3 = new DMatrixRMaj(3,1);
+	private DMatrixRMaj u1 = new DMatrixRMaj(3, 1);
+	private DMatrixRMaj u2 = new DMatrixRMaj(3, 1);
+	private DMatrixRMaj u3 = new DMatrixRMaj(3, 1);
+	private DMatrixRMaj v1 = new DMatrixRMaj(3, 1);
+	private DMatrixRMaj v2 = new DMatrixRMaj(3, 1);
+	private DMatrixRMaj v3 = new DMatrixRMaj(3, 1);
 
-	private DMatrixRMaj U = new DMatrixRMaj(3,3);
-	private DMatrixRMaj V = new DMatrixRMaj(3,3);
+	private DMatrixRMaj U = new DMatrixRMaj(3, 3);
+	private DMatrixRMaj V = new DMatrixRMaj(3, 3);
 
 	// temporary storage for computed epipole
-	private DMatrixRMaj tempE = new DMatrixRMaj(3,1);
+	private DMatrixRMaj tempE = new DMatrixRMaj(3, 1);
 
 	// storage for intermediate results
 	Point3D_F64 column = new Point3D_F64();
 	Point3D_F64 temp0 = new Point3D_F64();
-	DMatrixRMaj temp1 = new DMatrixRMaj(3,3);
+	DMatrixRMaj temp1 = new DMatrixRMaj(3, 3);
 
 	// The epipoles
 	Point3D_F64 e2 = new Point3D_F64(), e3 = new Point3D_F64();
@@ -91,34 +92,34 @@ public class TrifocalExtractGeometries {
 	 */
 	public void setTensor( TrifocalTensor tensor ) {
 		this.tensor = tensor;
-		if( !svd.decompose(tensor.T1) )
+		if (!svd.decompose(tensor.T1))
 			throw new RuntimeException("SVD failed?!");
 
 		SingularOps_DDRM.nullVector(svd, true, v1);
-		SingularOps_DDRM.nullVector(svd, false,u1);
+		SingularOps_DDRM.nullVector(svd, false, u1);
 
 //		DMatrixRMaj zero = new DMatrixRMaj(3,1);
 //		CommonOps_DDRM.mult(tensor.T1,v1,zero);zero.print();
 //		CommonOps_DDRM.multTransA(u1,tensor.T1,zero);zero.print();
 
-		if( !svd.decompose(tensor.T2) )
+		if (!svd.decompose(tensor.T2))
 			throw new RuntimeException("SVD failed?!");
-		SingularOps_DDRM.nullVector(svd,true,v2);
-		SingularOps_DDRM.nullVector(svd,false,u2);
+		SingularOps_DDRM.nullVector(svd, true, v2);
+		SingularOps_DDRM.nullVector(svd, false, u2);
 //		CommonOps_DDRM.mult(tensor.T2,v2,zero);zero.print();
 //		CommonOps_DDRM.multTransA(u2,tensor.T2,zero);zero.print();
 
-		if( !svd.decompose(tensor.T3) )
+		if (!svd.decompose(tensor.T3))
 			throw new RuntimeException("SVD failed?!");
-		SingularOps_DDRM.nullVector(svd,true,v3);
-		SingularOps_DDRM.nullVector(svd,false,u3);
+		SingularOps_DDRM.nullVector(svd, true, v3);
+		SingularOps_DDRM.nullVector(svd, false, u3);
 //		CommonOps_DDRM.mult(tensor.T3,v3,zero);zero.print();
 //		CommonOps_DDRM.multTransA(u3,tensor.T3,zero);zero.print();
 
-		for( int i = 0; i < 3; i++ ) {
-			U.set(i,0,u1.get(i));
-			U.set(i,1,u2.get(i));
-			U.set(i,2,u3.get(i));
+		for (int i = 0; i < 3; i++) {
+			U.set(i, 0, u1.get(i));
+			U.set(i, 1, u2.get(i));
+			U.set(i, 2, u3.get(i));
 
 			V.set(i, 0, v1.get(i));
 			V.set(i, 1, v2.get(i));
@@ -138,10 +139,10 @@ public class TrifocalExtractGeometries {
 	 * Extracts the epipoles from the trifocal tensor. Extracted epipoles will have a norm of 1
 	 * as an artifact of using SVD.
 	 *
-	 * @param e2  Output: Epipole in image 2. Homogeneous coordinates. Modified
-	 * @param e3  Output: Epipole in image 3. Homogeneous coordinates. Modified
+	 * @param e2 Output: Epipole in image 2. Homogeneous coordinates. Modified
+	 * @param e3 Output: Epipole in image 3. Homogeneous coordinates. Modified
 	 */
-	public void extractEpipoles( Point3D_F64 e2 , Point3D_F64 e3 ) {
+	public void extractEpipoles( Point3D_F64 e2, Point3D_F64 e3 ) {
 		e2.setTo(this.e2);
 		e3.setTo(this.e3);
 	}
@@ -160,17 +161,17 @@ public class TrifocalExtractGeometries {
 	 * @param P2 Output: 3x4 camera matrix for views 2. Modified.
 	 * @param P3 Output: 3x4 camera matrix for views 3. Modified.
 	 */
-	public void extractCamera( DMatrixRMaj P2 , DMatrixRMaj P3 ) {
+	public void extractCamera( DMatrixRMaj P2, DMatrixRMaj P3 ) {
 		// temp1 = [e3*e3^T -I]
-		for( int i = 0; i < 3; i++ ) {
-			for( int j = 0; j < 3; j++ ) {
-				temp1.set(i,j,e3.getIdx(i)*e3.getIdx(j));
+		for (int i = 0; i < 3; i++) {
+			for (int j = 0; j < 3; j++) {
+				temp1.set(i, j, e3.getIdx(i)*e3.getIdx(j));
 			}
-			temp1.set(i,i , temp1.get(i,i) - 1);
+			temp1.set(i, i, temp1.get(i, i) - 1);
 		}
 
 		// compute the camera matrices one column at a time
-		for( int i = 0; i < 3; i++ ) {
+		for (int i = 0; i < 3; i++) {
 			DMatrixRMaj T = tensor.getT(i);
 
 			GeometryMath_F64.mult(T, e3, column);
@@ -207,26 +208,25 @@ public class TrifocalExtractGeometries {
 	 * @param F21 (Output) Fundamental matrix
 	 * @param F31 (Output) Fundamental matrix
 	 */
-	public void extractFundmental( DMatrixRMaj F21 , DMatrixRMaj F31 ) {
+	public void extractFundmental( DMatrixRMaj F21, DMatrixRMaj F31 ) {
 		// compute the camera matrices one column at a time
-		for( int i = 0; i < 3; i++ ) {
+		for (int i = 0; i < 3; i++) {
 			DMatrixRMaj T = tensor.getT(i);
 
 
-			GeometryMath_F64.mult(T,e3,temp0);
-			GeometryMath_F64.cross(e2,temp0,column);
+			GeometryMath_F64.mult(T, e3, temp0);
+			GeometryMath_F64.cross(e2, temp0, column);
 
-			F21.set(0,i,column.x);
-			F21.set(1,i,column.y);
-			F21.set(2,i,column.z);
+			F21.set(0, i, column.x);
+			F21.set(1, i, column.y);
+			F21.set(2, i, column.z);
 
-			GeometryMath_F64.multTran(T,e2,temp0);
-			GeometryMath_F64.cross(e3,temp0,column);
+			GeometryMath_F64.multTran(T, e2, temp0);
+			GeometryMath_F64.cross(e3, temp0, column);
 
-			F31.set(0,i,column.x);
-			F31.set(1,i,column.y);
-			F31.set(2,i,column.z);
+			F31.set(0, i, column.x);
+			F31.set(1, i, column.y);
+			F31.set(2, i, column.z);
 		}
 	}
-
 }

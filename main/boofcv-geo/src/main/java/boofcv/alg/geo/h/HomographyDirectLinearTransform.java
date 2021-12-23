@@ -35,6 +35,7 @@ import org.ejml.simple.SimpleMatrix;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
+import java.util.Objects;
 
 /**
  * <p>
@@ -152,7 +153,7 @@ public class HomographyDirectLinearTransform {
 		shouldNormalize = false;//normalize && points2D != null;
 
 		if (shouldNormalize) {
-			LowLevelMultiViewOps.computeNormalization(points2D, N1, N2);
+			LowLevelMultiViewOps.computeNormalization(Objects.requireNonNull(points2D), N1, N2);
 		}
 		A.reshape(numRows, 9);
 		A.zero();

@@ -55,6 +55,29 @@ public class TestSceneStructureMetric extends BoofStandardJUnit {
 		assertEquals(2, scene.rigids.data[1].indexFirst);
 	}
 
+	@Test void rigid_Reset() {
+		var scene = new SceneStructureMetric(false);
+		scene.initialize(1, 2, 2, 3, 2);
+		SceneStructureMetric.Rigid r = scene.rigids.get(0);
+		r.indexFirst = 2;
+		r.known = true;
+		r.object_to_world.T.x = 10;
+		r.init(4, 3);
+		assertEquals(-1, r.indexFirst);
+		assertFalse(r.known);
+		assertEquals(0, r.object_to_world.T.x, 1e-8);
+		assertEquals(4, r.points.length);
+		assertEquals(3, r.points[0].coordinate.length);
+
+		r.init(4, 4);
+		assertEquals(4, r.points.length);
+		assertEquals(4, r.points[0].coordinate.length);
+
+		r.init(3, 4);
+		assertEquals(3, r.points.length);
+		assertEquals(4, r.points[0].coordinate.length);
+	}
+
 	@Test void getParentToView() {
 		var scene = new SceneStructureMetric(false);
 

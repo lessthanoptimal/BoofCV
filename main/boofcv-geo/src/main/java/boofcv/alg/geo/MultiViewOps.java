@@ -579,7 +579,8 @@ public class MultiViewOps {
 	 * @return The homography from view 1 to view 2 or null if it fails
 	 * @see HomographyInducedStereo2Line
 	 */
-	public static DMatrixRMaj fundamentalToHomography2Lines( DMatrixRMaj F, PairLineNorm line0, PairLineNorm line1 ) {
+	public static @Nullable DMatrixRMaj
+	fundamentalToHomography2Lines( DMatrixRMaj F, PairLineNorm line0, PairLineNorm line1 ) {
 		HomographyInducedStereo2Line alg = new HomographyInducedStereo2Line();
 
 		alg.setFundamental(F, null);

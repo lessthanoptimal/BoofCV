@@ -31,6 +31,7 @@ import java.util.List;
  *
  * @author Peter Abeles
  */
+@SuppressWarnings({"NullAway.Init"})
 public class DistanceScaleTranslateRotate2DSq implements DistanceFromModel<ScaleTranslateRotate2D, AssociatedPair> {
 
 	ScaleTranslateRotate2D model;

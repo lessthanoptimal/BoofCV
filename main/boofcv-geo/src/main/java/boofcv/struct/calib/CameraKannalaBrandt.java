@@ -59,6 +59,7 @@ import static boofcv.struct.calib.CameraPinholeBrown.toStringArray;
  *
  * @author Peter Abeles
  */
+@SuppressWarnings({"NullAway.Init"})
 public class CameraKannalaBrandt extends CameraPinhole {
 
 	/** Coefficients for radially symmetric model */

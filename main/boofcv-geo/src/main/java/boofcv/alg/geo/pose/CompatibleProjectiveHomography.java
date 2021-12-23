@@ -447,19 +447,14 @@ public class CompatibleProjectiveHomography {
 
 		distanceWorld.scene1 = scene1;
 		distanceWorld.scene2 = scene2;
-
 		lm.setFunction(distanceWorld, null);
 		lm.initialize(H.data, 1e-8, 1e-8);
 
 		UtilOptimize.process(lm, configConverge.maxIterations);
 
 		System.arraycopy(lm.getParameters(), 0, H.data, 0, 16);
-
-		distanceWorld.scene1 = null;
-		distanceWorld.scene2 = null;
 	}
 
-	@SuppressWarnings({"NullAway"})
 	public void refineReprojection( List<DMatrixRMaj> cameras1, List<Point4D_F64> scene1,
 									List<Point4D_F64> scene2, DMatrixRMaj H ) {
 		if (H.numCols != 4 || H.numRows != 4)
@@ -480,11 +475,6 @@ public class CompatibleProjectiveHomography {
 		UtilOptimize.process(lm, configConverge.maxIterations);
 
 		System.arraycopy(lm.getParameters(), 0, H.data, 0, 16);
-
-		// make sure it blows up if called without initializing
-		distanceRepojection.cameras1 = null;
-		distanceRepojection.scene1 = null;
-		distanceRepojection.scene2 = null;
 	}
 
 	/**

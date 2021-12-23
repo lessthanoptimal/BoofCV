@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -33,6 +33,7 @@ import org.ejml.data.DMatrixRMaj;
  *
  * @author Peter Abeles
  */
+@SuppressWarnings({"NullAway.Init"})
 public class TrifocalTransfer {
 
 	TrifocalTensor tensor;
@@ -40,8 +41,8 @@ public class TrifocalTransfer {
 	// extracts fundamental matrices
 	TrifocalExtractGeometries extract = new TrifocalExtractGeometries();
 	// extracted fundamental matrices
-	DMatrixRMaj F21 = new DMatrixRMaj(3,3);
-	DMatrixRMaj F31 = new DMatrixRMaj(3,3);
+	DMatrixRMaj F21 = new DMatrixRMaj(3, 3);
+	DMatrixRMaj F31 = new DMatrixRMaj(3, 3);
 	// used to force observations to lie on the epipolar lines
 	EpipolarMinimizeGeometricError adjuster = new EpipolarMinimizeGeometricError();
 
@@ -54,12 +55,13 @@ public class TrifocalTransfer {
 
 	/**
 	 * Specify the trifocaltensor
+	 *
 	 * @param tensor tensor
 	 */
-	public void setTrifocal(TrifocalTensor tensor ) {
+	public void setTrifocal( TrifocalTensor tensor ) {
 		this.tensor = tensor;
 		extract.setTensor(tensor);
-		extract.extractFundmental(F21,F31);
+		extract.extractFundmental(F21, F31);
 	}
 
 	/**
@@ -71,20 +73,19 @@ public class TrifocalTransfer {
 	 * @param y2 (Input) Observation in view 2. pixels.
 	 * @param p3 (Output) Estimated location in view 3.
 	 */
-	public void transfer_1_to_3(double x1 , double y1 ,
-								double x2 , double y2 , Point3D_F64 p3)
-	{
+	public void transfer_1_to_3( double x1, double y1,
+								 double x2, double y2, Point3D_F64 p3 ) {
 		// Adjust the observations so that they lie on the epipolar lines exactly
-		adjuster.process(F21,x1,y1,x2,y2,pa,pb);
+		adjuster.process(F21, x1, y1, x2, y2, pa, pb);
 
-		GeometryMath_F64.mult(F21,pa,la);
+		GeometryMath_F64.mult(F21, pa, la);
 
 		// line through pb and perpendicular to la
 		l.x = la.y;
 		l.y = -la.x;
 		l.z = -pb.x*la.y + pb.y*la.x;
 
-		MultiViewOps.transfer_1_to_3(tensor,pa,l,p3);
+		MultiViewOps.transfer_1_to_3(tensor, pa, l, p3);
 	}
 
 	/**
@@ -96,19 +97,18 @@ public class TrifocalTransfer {
 	 * @param y3 (Input) Observation in view 3. pixels.
 	 * @param p2 (Output) Estimated location in view 2.
 	 */
-	public void transfer_1_to_2(double x1 , double y1 ,
-								double x3 , double y3 , Point3D_F64 p2)
-	{
+	public void transfer_1_to_2( double x1, double y1,
+								 double x3, double y3, Point3D_F64 p2 ) {
 		// Adjust the observations so that they lie on the epipolar lines exactly
-		adjuster.process(F31,x1,y1,x3,y3,pa,pb);
+		adjuster.process(F31, x1, y1, x3, y3, pa, pb);
 
-		GeometryMath_F64.multTran(F31,pa,la);
+		GeometryMath_F64.multTran(F31, pa, la);
 
 		// line through pb and perpendicular to la
 		l.x = la.y;
 		l.y = -la.x;
 		l.z = -pb.x*la.y + pb.y*la.x;
 
-		MultiViewOps.transfer_1_to_2(tensor,pa,l,p2);
+		MultiViewOps.transfer_1_to_2(tensor, pa, l, p2);
 	}
 }

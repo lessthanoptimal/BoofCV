@@ -60,6 +60,7 @@ import org.jetbrains.annotations.Nullable;
  *
  * @author Peter Abeles
  */
+@SuppressWarnings("NullAway") // for NullAway bug
 public class FactoryMultiViewRobust {
 
 	/**

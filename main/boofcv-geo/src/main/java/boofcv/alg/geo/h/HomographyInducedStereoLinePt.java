@@ -48,6 +48,7 @@ import org.jetbrains.annotations.Nullable;
  *
  * @author Peter Abeles
  */
+@SuppressWarnings({"NullAway.Init"})
 public class HomographyInducedStereoLinePt {
 
 	// Fundamental matrix

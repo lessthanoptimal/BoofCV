@@ -32,6 +32,7 @@ import org.ejml.dense.row.CommonOps_DDRM;
  *
  * @author Peter Abeles
  */
+@SuppressWarnings({"NullAway.Init"})
 public class NarrowToWidePtoP_F64 implements Point2Transform2_F64 {
 
 	// rotation matrix
@@ -44,8 +45,7 @@ public class NarrowToWidePtoP_F64 implements Point2Transform2_F64 {
 	// unit circle coordinate storage
 	Point3D_F64 unit = new Point3D_F64();
 
-	public NarrowToWidePtoP_F64() {
-	}
+	public NarrowToWidePtoP_F64() {}
 
 	public NarrowToWidePtoP_F64( LensDistortionNarrowFOV narrow, LensDistortionWideFOV wide ) {
 		configure(narrow, wide);

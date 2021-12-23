@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -27,7 +27,7 @@ import georegression.struct.point.Point2D_F64;
  *
  * @author Peter Abeles
  */
-@SuppressWarnings("Duplicates")
+@SuppressWarnings({"NullAway.Init", "Duplicates"})
 public class Transform2ThenPixel_F64 implements Point2Transform2_F64 {
 
 	double fx, fy, skew, cx, cy;

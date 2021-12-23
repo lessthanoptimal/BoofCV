@@ -27,6 +27,7 @@ import org.jetbrains.annotations.Nullable;
  *
  * @author Peter Abeles
  */
+@SuppressWarnings({"NullAway.Init"})
 public class RadialTangential_F64 {
 	/** Radial distortion parameters */
 	public double[] radial;

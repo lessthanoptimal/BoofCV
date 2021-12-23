@@ -41,6 +41,7 @@ import org.ejml.interfaces.linsol.LinearSolverDense;
  *
  * @author Peter Abeles
  */
+@SuppressWarnings({"NullAway.Init"})
 public class Relinearlize {
 
 	// number of control points. 4 for general 3 for planar

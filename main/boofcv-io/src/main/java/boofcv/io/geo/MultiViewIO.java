@@ -418,14 +418,13 @@ public class MultiViewIO {
 			for (int i = 0; i < yamlRigids.size(); i++) {
 				SceneStructureMetric.Rigid r = scene.rigids.get(i);
 				Map<String, Object> yamlRigid = yamlRigids.get(i);
-
+				List<Map<String, Object>> points = getOrThrow(yamlRigid, "points");
+				r.init(points.size(), scene.isHomogenous() ? 4 : 3);
 				r.known = getOrThrow(yamlRigid, "known");
 				r.indexFirst = getOrThrow(yamlRigid, "indexFirst");
 				loadSE3(getOrThrow(yamlRigid, "object_to_world"), r.object_to_world);
-				List<Map<String, Object>> points = getOrThrow(yamlRigid, "points");
-				r.points = new SceneStructureCommon.Point[points.size()];
 				for (int j = 0; j < r.points.length; j++) {
-					r.points[j] = decodeScenePoint(points.get(j), null);
+					decodeScenePoint(points.get(j), r.points[j]);
 				}
 			}
 
@@ -503,13 +502,11 @@ public class MultiViewIO {
 
 					pairs.resetResize(yamlPairs.size()/2);
 					for (int j = 0; j < pairs.size; j++) {
-						pairs.get(j).setTo(yamlPairs.get(j*2), yamlPairs.get(j*2+1));
+						pairs.get(j).setTo(yamlPairs.get(j*2), yamlPairs.get(j*2 + 1));
 					}
 					ret.setRelationship(id, similarID, pairs.toList());
 				}
 			}
-
-
 		} catch (IOException e) {
 			throw new UncheckedIOException(e);
 		}
