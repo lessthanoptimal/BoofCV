@@ -49,6 +49,7 @@ import java.util.Objects;
  *
  * @author Peter Abeles
  */
+@SuppressWarnings({"NullAway.Init"})
 public abstract class BundleAdjustmentMetricSchurJacobian<M extends DMatrix>
 		implements BundleAdjustmentSchur.Jacobian<SceneStructureMetric, M> {
 	private SceneStructureMetric structure;
@@ -660,7 +661,7 @@ public abstract class BundleAdjustmentMetricSchurJacobian<M extends DMatrix>
 			world_to_parent.concat(parent_to_view, saved_world_to_view);
 		} else {
 			// Since the parent must have a lower index it's transform is already known
-			Se3_F64 world_to_parent = mapWorldToView.get(v.parent);
+			Se3_F64 world_to_parent = Objects.requireNonNull(mapWorldToView.get(v.parent));
 			world_to_parent.concat(parent_to_view, saved_world_to_view);
 		}
 		world_to_view.setTo(saved_world_to_view);

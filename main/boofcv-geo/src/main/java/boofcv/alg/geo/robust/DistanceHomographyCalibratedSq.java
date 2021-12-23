@@ -36,6 +36,7 @@ import java.util.List;
  *
  * @author Peter Abeles
  */
+@SuppressWarnings({"NullAway.Init"})
 public class DistanceHomographyCalibratedSq implements DistanceFromModelMultiView<Homography2D_F64, AssociatedPair> {
 	Homography2D_F64 model;
 	private Point2D_F64 expected = new Point2D_F64();

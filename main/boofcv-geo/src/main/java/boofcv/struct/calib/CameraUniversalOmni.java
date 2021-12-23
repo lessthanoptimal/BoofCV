@@ -66,6 +66,7 @@ import static boofcv.struct.calib.CameraPinholeBrown.toStringArray;
  *
  * @author Peter Abeles
  */
+@SuppressWarnings({"NullAway.Init"})
 public class CameraUniversalOmni extends CameraPinhole {
 	/** Mirror offset distance. &xi; */
 	public double mirrorOffset;

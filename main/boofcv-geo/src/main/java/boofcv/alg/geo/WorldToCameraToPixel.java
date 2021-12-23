@@ -29,6 +29,7 @@ import georegression.struct.point.Point3D_F64;
 import georegression.struct.se.Se3_F64;
 import georegression.transform.se.SePointOps_F64;
 import lombok.Getter;
+import org.jetbrains.annotations.Nullable;
 
 /**
  * Convenience class which will take a point in world coordinates, translate it to camera reference frame,
@@ -114,7 +115,7 @@ public class WorldToCameraToPixel {
 	 * @param worldPt Location of point on world reference frame
 	 * @return Pixel coordinate of point or null if not visible
 	 */
-	public Point2D_F64 transform( Point3D_F64 worldPt ) {
+	public @Nullable Point2D_F64 transform( Point3D_F64 worldPt ) {
 		Point2D_F64 out = new Point2D_F64();
 		if (transform(worldPt, out))
 			return out;

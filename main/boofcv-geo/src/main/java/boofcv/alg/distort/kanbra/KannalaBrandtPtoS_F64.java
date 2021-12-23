@@ -55,6 +55,7 @@ import static boofcv.alg.distort.kanbra.KannalaBrandtUtils_F64.*;
  *
  * @author Peter Abeles
  */
+@SuppressWarnings({"NullAway.Init"})
 public class KannalaBrandtPtoS_F64 implements Point2Transform3_F64, VerbosePrint {
 
 	/** A complex number is considered real if the imaginary component has a magnitude &le; this value */
@@ -83,7 +84,7 @@ public class KannalaBrandtPtoS_F64 implements Point2Transform3_F64, VerbosePrint
 	DMatrix2x2 jacobian = new DMatrix2x2();
 	DMatrix2x2 jacobianInv = new DMatrix2x2();
 
-	PrintStream verbose;
+	@Nullable PrintStream verbose;
 
 	public KannalaBrandtPtoS_F64( CameraKannalaBrandt model ) {
 		BoofMiscOps.checkTrue(model.radialTrig.length == 0 || model.radialTrig.length == 4);

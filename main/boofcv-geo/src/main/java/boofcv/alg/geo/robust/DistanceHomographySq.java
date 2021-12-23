@@ -42,6 +42,7 @@ import java.util.List;
  *
  * @author Peter Abeles
  */
+@SuppressWarnings({"NullAway.Init"})
 public class DistanceHomographySq implements DistanceFromModel<Homography2D_F64, AssociatedPair> {
 
 	Homography2D_F64 model;

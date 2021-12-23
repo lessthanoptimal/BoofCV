@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -20,12 +20,14 @@ package boofcv.alg.distort.brown;
 
 import boofcv.struct.distort.Point2Transform2_F64;
 import georegression.struct.point.Point2D_F64;
+import org.jetbrains.annotations.Nullable;
 
 /**
  * Given an undistorted normalized pixel coordinate, compute the distorted normalized coordinate.
  *
  * @author Peter Abeles
  */
+@SuppressWarnings({"NullAway.Init"})
 public class AddBrownNtoN_F64 implements Point2Transform2_F64 {
 
 	private RadialTangential_F64 params;
@@ -37,7 +39,7 @@ public class AddBrownNtoN_F64 implements Point2Transform2_F64 {
 	 *
 	 * @param radial Radial distortion parameters
 	 */
-	public AddBrownNtoN_F64 setDistortion( /**/double[] radial, /**/double t1, /**/double t2 ) {
+	public AddBrownNtoN_F64 setDistortion( @Nullable /**/double[] radial, /**/double t1, /**/double t2 ) {
 		params = new RadialTangential_F64(radial, t1, t2);
 		return this;
 	}

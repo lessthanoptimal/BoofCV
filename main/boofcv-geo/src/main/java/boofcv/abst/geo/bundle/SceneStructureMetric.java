@@ -50,7 +50,7 @@ public class SceneStructureMetric extends SceneStructureCommon {
 	public final DogArray<Motion> motions = new DogArray<>(Motion::new, Motion::reset);
 
 	/** List of rigid objects. A rigid object is a group of 3D points that have a known relationship with each other. */
-	public final DogArray<Rigid> rigids = new DogArray<>(Rigid::new, Rigid::reset);
+	public final DogArray<Rigid> rigids = new DogArray<>(Rigid::new);
 	// Lookup table from rigid point to rigid object
 	public int[] lookupRigid = new int[0];
 
@@ -248,13 +248,10 @@ public class SceneStructureMetric extends SceneStructureCommon {
 	 * @param totalPoints Total number of points attached to this rigid object
 	 */
 	public void setRigid( int which, boolean known, Se3_F64 worldToObject, int totalPoints ) {
-		Rigid r = rigids.data[which] = new Rigid();
+		Rigid r = rigids.data[which];
+		r.init(totalPoints, pointSize);
 		r.known = known;
 		r.object_to_world.setTo(worldToObject);
-		r.points = new Point[totalPoints];
-		for (int i = 0; i < totalPoints; i++) {
-			r.points[i] = new Point(pointSize);
-		}
 	}
 
 	/**
@@ -327,6 +324,7 @@ public class SceneStructureMetric extends SceneStructureCommon {
 
 	/**
 	 * Projects the requested point onto the requested view and computes its predicted pixel coordinates.
+	 *
 	 * @param pointIdx (Input) index of point
 	 * @param viewIdx (Input) index of view
 	 * @param world_to_view (Output) Internal work space
@@ -341,11 +339,11 @@ public class SceneStructureMetric extends SceneStructureCommon {
 
 		// Get the coordinate transform
 		View view = views.get(viewIdx);
-		getWorldToView(view,world_to_view,tmpSE);
+		getWorldToView(view, world_to_view, tmpSE);
 
 		// extract the coordinate for 3D and homogenous case
 		Point p = points.get(pointIdx);
-		double x,y,z,w;
+		double x, y, z, w;
 		x = p.coordinate[0];
 		y = p.coordinate[1];
 		z = p.coordinate[2];
@@ -353,7 +351,7 @@ public class SceneStructureMetric extends SceneStructureCommon {
 
 		// Project the pixel while being careful for points at infinity
 		BundleAdjustmentCamera camera = Objects.requireNonNull(getViewCamera(view).model);
-		SePointOps_F64.transformV(world_to_view, x,y,z,w, tmpX);
+		SePointOps_F64.transformV(world_to_view, x, y, z, w, tmpX);
 		camera.project(tmpX.x, tmpX.y, tmpX.z, pixel);
 
 		// if the sign is positive then it's in front
@@ -381,7 +379,7 @@ public class SceneStructureMetric extends SceneStructureCommon {
 		return views;
 	}
 
-	public DogArray<Rigid> getRigids() { return rigids; }
+	public DogArray<Rigid> getRigids() {return rigids;}
 
 	/**
 	 * Checks to see if the passed in scene is identical to "this" scene. Floating point values are checked to within
@@ -506,16 +504,30 @@ public class SceneStructureMetric extends SceneStructureCommon {
 		public final Se3_F64 object_to_world = new Se3_F64();
 
 		/** Location of points in object's reference frame. The coordinate is always fixed. */
-		public @Nullable Point[] points;
+		public Point[] points = new Point[0];
 
 		/** Index of the first point in the list */
 		public int indexFirst;
 
-		public void reset() {
+		/**
+		 * Resets and initialzies internal data structures. If possible previously declared data is reused
+		 *
+		 * @param numPoints Number of points in the rigid body
+		 * @param dof DOF in each point
+		 */
+		public void init( int numPoints, int dof ) {
 			known = false;
 			object_to_world.reset();
-			points = null;
 			indexFirst = -1;
+
+			if (points.length != numPoints)
+				points = new SceneStructureCommon.Point[numPoints];
+
+			if (points.length > 0 && (points[0] == null || points[0].coordinate.length != numPoints)) {
+				for (int i = 0; i < numPoints; i++) {
+					points[i] = new Point(dof);
+				}
+			}
 		}
 
 		public void setPoint( int which, double x, double y, double z ) {

@@ -33,6 +33,7 @@ import java.util.List;
  * @author Peter Abeles
  * @see EpipolarMinimizeGeometricError
  */
+@SuppressWarnings({"NullAway.Init"})
 public class DistanceFundamentalGeometric implements DistanceFromModel<DMatrixRMaj, AssociatedPair> {
 
 	EpipolarMinimizeGeometricError adjuster = new EpipolarMinimizeGeometricError();
@@ -52,7 +53,7 @@ public class DistanceFundamentalGeometric implements DistanceFromModel<DMatrixRM
 			// Not the same error, but better than nothing?
 			// This is an algebraic error and maybe the correct way to do it is to compute a more stable geometric
 			// error or even better root cause why this is failing.
-			return 2.0*Math.abs(MultiViewOps.constraint(F21,original.p1, original.p2));
+			return 2.0*Math.abs(MultiViewOps.constraint(F21, original.p1, original.p2));
 		}
 
 		// Since the adjusted observations will intersect perfectly there's no need to triangulate
@@ -67,6 +68,7 @@ public class DistanceFundamentalGeometric implements DistanceFromModel<DMatrixRM
 		}
 	}
 
-	@Override public Class<AssociatedPair> getPointType() { return AssociatedPair.class; }
-	@Override public Class<DMatrixRMaj> getModelType() { return DMatrixRMaj.class; }
+	@Override public Class<AssociatedPair> getPointType() {return AssociatedPair.class;}
+
+	@Override public Class<DMatrixRMaj> getModelType() {return DMatrixRMaj.class;}
 }

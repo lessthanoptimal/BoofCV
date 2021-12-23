@@ -82,7 +82,7 @@ public class CalibrateMonoPlanar implements VerbosePrint {
 
 	// Information on calibration targets and results
 	protected @Getter List<CalibrationObservation> observations = new ArrayList<>();
-	protected @Getter List<ImageResults> errors;
+	protected @Getter List<ImageResults> errors = new ArrayList<>();
 
 	public @Nullable PrintStream verbose = null;
 
@@ -140,7 +140,7 @@ public class CalibrateMonoPlanar implements VerbosePrint {
 	 */
 	public void reset() {
 		observations = new ArrayList<>();
-		errors = null;
+		errors = new ArrayList<>();
 		imageHeight = imageWidth = 0;
 	}
 

@@ -20,6 +20,7 @@ package boofcv.alg.distort.brown;
 
 import boofcv.struct.distort.Point2Transform2_F64;
 import georegression.struct.point.Point2D_F64;
+import org.jetbrains.annotations.Nullable;
 
 /**
  * Given an undistorted pixel coordinate, compute the distorted normalized image coordinate.
@@ -64,7 +65,7 @@ public class AddBrownPtoN_F64 implements Point2Transform2_F64 {
 	 *
 	 * @param radial Radial distortion parameters
 	 */
-	public AddBrownPtoN_F64 setDistortion( /**/double[] radial, /**/double t1, /**/double t2 ) {
+	public AddBrownPtoN_F64 setDistortion( @Nullable /**/double[] radial, /**/double t1, /**/double t2 ) {
 		params = new RadialTangential_F64(radial, t1, t2);
 		return this;
 	}

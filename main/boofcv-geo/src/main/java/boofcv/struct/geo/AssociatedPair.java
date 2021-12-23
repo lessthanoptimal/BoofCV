@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -42,18 +42,6 @@ public class AssociatedPair {
 	public AssociatedPair() {
 		p1 = new Point2D_F64();
 		p2 = new Point2D_F64();
-	}
-
-	/**
-	 * Constructor which allows the points to not be declared.
-	 *
-	 * @param declare If true then new points will be declared
-	 */
-	public AssociatedPair( boolean declare ) {
-		if( declare ) {
-			p1 = new Point2D_F64();
-			p2 = new Point2D_F64();
-		}
 	}
 
 	/**

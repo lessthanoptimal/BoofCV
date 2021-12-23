@@ -33,6 +33,7 @@ import java.util.List;
  *
  * @author Peter Abeles
  */
+@SuppressWarnings({"NullAway.Init"})
 public class ResidualsEpipolarMatrixN implements FunctionNtoM {
 	// converts parameters to and from the fundamental matrix
 	protected ModelCodec<DMatrixRMaj> param;

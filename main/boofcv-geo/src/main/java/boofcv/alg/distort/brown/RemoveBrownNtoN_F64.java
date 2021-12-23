@@ -28,6 +28,7 @@ import org.jetbrains.annotations.Nullable;
  *
  * @author Peter Abeles
  */
+@SuppressWarnings({"NullAway.Init"})
 public class RemoveBrownNtoN_F64 implements Point2Transform2_F64 {
 
 	// distortion parameters
