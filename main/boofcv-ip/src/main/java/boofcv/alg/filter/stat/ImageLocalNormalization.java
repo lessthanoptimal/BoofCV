@@ -39,6 +39,7 @@ import pabeles.concurrency.GrowArray;
  *
  * @author Peter Abeles
  */
+@SuppressWarnings({"NullAway.Init"})
 public class ImageLocalNormalization<T extends GrayF<T>> {
 
 	// storage for the adjusted input which has a max pixel value of 1

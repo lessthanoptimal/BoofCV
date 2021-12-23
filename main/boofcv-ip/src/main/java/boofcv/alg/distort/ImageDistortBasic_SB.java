@@ -29,8 +29,8 @@ import georegression.struct.point.Point2D_F32;
  *
  * @author Peter Abeles
  */
-public class ImageDistortBasic_SB<Input extends ImageGray<Input>,Output extends ImageGray<Output>>
-		extends ImageDistortBasic<Input,Output,InterpolatePixelS<Input>> {
+public class ImageDistortBasic_SB<Input extends ImageGray<Input>, Output extends ImageGray<Output>>
+		extends ImageDistortBasic<Input, Output, InterpolatePixelS<Input>> {
 
 	protected AssignPixelValue_SB<Output> assigner;
 	Point2D_F32 distorted = new Point2D_F32();
@@ -40,15 +40,15 @@ public class ImageDistortBasic_SB<Input extends ImageGray<Input>,Output extends 
 	 *
 	 * @param interp Interpolation algorithm
 	 */
-	public ImageDistortBasic_SB(AssignPixelValue_SB<Output> assigner,
-								InterpolatePixelS<Input> interp) {
+	public ImageDistortBasic_SB( AssignPixelValue_SB<Output> assigner,
+								 InterpolatePixelS<Input> interp ) {
 		super(interp);
 
 		this.assigner = assigner;
 	}
 
 	@Override
-	protected void init(Input srcImg, Output dstImg) {
+	protected void init( Input srcImg, Output dstImg ) {
 		super.init(srcImg, dstImg);
 		assigner.setImage(dstImg);
 	}
@@ -58,31 +58,31 @@ public class ImageDistortBasic_SB<Input extends ImageGray<Input>,Output extends 
 
 		// todo TO make this faster first apply inside the region which can process the fast border
 		// then do the slower border thingy
-		for( int y = y0; y < y1; y++ ) {
+		for (int y = y0; y < y1; y++) {
 			int indexDst = dstImg.startIndex + dstImg.stride*y + x0;
-			for( int x = x0; x < x1; x++ , indexDst++ ) {
-				dstToSrc.compute(x,y,distorted);
-				assigner.assign(indexDst,interp.get(distorted.x,distorted.y));
+			for (int x = x0; x < x1; x++, indexDst++) {
+				dstToSrc.compute(x, y, distorted);
+				assigner.assign(indexDst, interp.get(distorted.x, distorted.y));
 			}
 		}
 	}
 
 	@Override
 	protected void applyAll( GrayU8 mask ) {
-		float maxWidth = srcImg.getWidth()-1;
-		float maxHeight = srcImg.getHeight()-1;
+		float maxWidth = srcImg.getWidth() - 1;
+		float maxHeight = srcImg.getHeight() - 1;
 
 		// todo TO make this faster first apply inside the region which can process the fast border
 		// then do the slower border thingy
-		for( int y = y0; y < y1; y++ ) {
+		for (int y = y0; y < y1; y++) {
 			int indexDst = dstImg.startIndex + dstImg.stride*y + x0;
 			int indexMsk = mask.startIndex + mask.stride*y + x0;
 
-			for( int x = x0; x < x1; x++ , indexDst++, indexMsk++ ) {
-				dstToSrc.compute(x,y,distorted);
-				assigner.assign(indexDst,interp.get(distorted.x,distorted.y));
-				if( distorted.x >= 0 && distorted.x <= maxWidth &&
-						distorted.y >= 0 && distorted.y <= maxHeight ) {
+			for (int x = x0; x < x1; x++, indexDst++, indexMsk++) {
+				dstToSrc.compute(x, y, distorted);
+				assigner.assign(indexDst, interp.get(distorted.x, distorted.y));
+				if (distorted.x >= 0 && distorted.x <= maxWidth &&
+						distorted.y >= 0 && distorted.y <= maxHeight) {
 					mask.data[indexMsk] = 1;
 				} else {
 					mask.data[indexMsk] = 0;
@@ -94,17 +94,17 @@ public class ImageDistortBasic_SB<Input extends ImageGray<Input>,Output extends 
 	@Override
 	protected void applyOnlyInside() {
 
-		float maxWidth = srcImg.getWidth()-1;
-		float maxHeight = srcImg.getHeight()-1;
+		float maxWidth = srcImg.getWidth() - 1;
+		float maxHeight = srcImg.getHeight() - 1;
 
-		for( int y = y0; y < y1; y++ ) {
+		for (int y = y0; y < y1; y++) {
 			int indexDst = dstImg.startIndex + dstImg.stride*y + x0;
-			for( int x = x0; x < x1; x++ , indexDst++ ) {
-				dstToSrc.compute(x,y,distorted);
+			for (int x = x0; x < x1; x++, indexDst++) {
+				dstToSrc.compute(x, y, distorted);
 
-				if( distorted.x >= 0 && distorted.x <= maxWidth &&
-						distorted.y >= 0 && distorted.y <= maxHeight ) {
-					assigner.assign(indexDst,interp.get(distorted.x, distorted.y));
+				if (distorted.x >= 0 && distorted.x <= maxWidth &&
+						distorted.y >= 0 && distorted.y <= maxHeight) {
+					assigner.assign(indexDst, interp.get(distorted.x, distorted.y));
 				}
 			}
 		}
@@ -113,19 +113,19 @@ public class ImageDistortBasic_SB<Input extends ImageGray<Input>,Output extends 
 	@Override
 	protected void applyOnlyInside( GrayU8 mask ) {
 
-		float maxWidth = srcImg.getWidth()-1;
-		float maxHeight = srcImg.getHeight()-1;
+		float maxWidth = srcImg.getWidth() - 1;
+		float maxHeight = srcImg.getHeight() - 1;
 
-		for( int y = y0; y < y1; y++ ) {
+		for (int y = y0; y < y1; y++) {
 			int indexDst = dstImg.startIndex + dstImg.stride*y + x0;
 			int indexMsk = mask.startIndex + mask.stride*y + x0;
 
-			for( int x = x0; x < x1; x++ , indexDst++ , indexMsk++ ) {
-				dstToSrc.compute(x,y,distorted);
+			for (int x = x0; x < x1; x++, indexDst++, indexMsk++) {
+				dstToSrc.compute(x, y, distorted);
 
-				if( distorted.x >= 0 && distorted.x <= maxWidth &&
-						distorted.y >= 0 && distorted.y <= maxHeight ) {
-					assigner.assign(indexDst,interp.get(distorted.x, distorted.y));
+				if (distorted.x >= 0 && distorted.x <= maxWidth &&
+						distorted.y >= 0 && distorted.y <= maxHeight) {
+					assigner.assign(indexDst, interp.get(distorted.x, distorted.y));
 					mask.data[indexMsk] = 1;
 				} else {
 					mask.data[indexMsk] = 0;

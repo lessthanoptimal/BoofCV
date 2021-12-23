@@ -26,6 +26,7 @@ import boofcv.struct.image.ImageGray;
  *
  * @author Peter Abeles
  */
+@SuppressWarnings({"NullAway.Init"})
 public abstract class NearestNeighborPixelS<T extends ImageGray<T>> implements InterpolatePixelS<T> {
 	protected ImageBorder<T> border;
 	protected T orig;

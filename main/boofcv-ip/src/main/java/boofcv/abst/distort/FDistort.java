@@ -41,6 +41,8 @@ import georegression.struct.point.Point2D_F32;
 import lombok.Getter;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.Objects;
+
 /**
  * <p>High level interface for rendering a distorted image into another one. Uses a flow style interface to remove
  * much of the drugery.</p>
@@ -53,7 +55,7 @@ import org.jetbrains.annotations.Nullable;
  *
  * @author Peter Abeles
  */
-@SuppressWarnings({"rawtypes", "unchecked"})
+@SuppressWarnings({"rawtypes", "unchecked", "NullAway.Init"})
 public class FDistort {
 	// type of input image
 	@Getter ImageType inputType;
@@ -62,11 +64,11 @@ public class FDistort {
 	ImageBase input, output;
 	// specifies how the borders are handled
 	@Nullable ImageDistort distorter;
-	@Nullable InterpolatePixel interp;
+	InterpolatePixel interp;
 	@Getter @Nullable PixelTransform<Point2D_F32> outputToInput;
 
-	// type of border being used
-	@Getter BorderType borderType;
+	// type of border being used. If null that means the border was set explicitly with a border class
+	@Getter @Nullable BorderType borderType;
 
 	// if the transform should be cached or not.
 	@Getter boolean cached = false;
@@ -89,9 +91,6 @@ public class FDistort {
 	 */
 	public FDistort( ImageType inputType ) {
 		this.inputType = inputType;
-	}
-
-	public FDistort() {
 	}
 
 	/**
@@ -166,7 +165,7 @@ public class FDistort {
 	 *
 	 * @param border Sets the border. If null then it will skip the border.
 	 */
-	public FDistort border( ImageBorder border ) {
+	public FDistort border( @Nullable ImageBorder border ) {
 		if (border == null) {
 			this.borderType = BorderType.SKIP;
 			// the edge is less jagged if you extend, even with skip = true
@@ -343,24 +342,15 @@ public class FDistort {
 		// see if the distortion class needs to be created again
 		if (distorter == null) {
 			Class typeOut = output.getImageType().getImageClass();
-			switch (input.getImageType().getFamily()) {
-				case GRAY:
-					distorter = FactoryDistort.distortSB(cached, (InterpolatePixelS)interp, typeOut);
-					break;
-
-				case PLANAR:
-					distorter = FactoryDistort.distortPL(cached, (InterpolatePixelS)interp, typeOut);
-					break;
-
-				case INTERLEAVED:
-					distorter = FactoryDistort.distortIL(cached, (InterpolatePixelMB)interp, output.getImageType());
-					break;
-
-				default:
-					throw new IllegalArgumentException("Unsupported image type");
-			}
+			InterpolatePixel interp = Objects.requireNonNull(this.interp);
+			distorter = switch (input.getImageType().getFamily()) {
+				case GRAY -> FactoryDistort.distortSB(cached, (InterpolatePixelS)interp, typeOut);
+				case PLANAR -> FactoryDistort.distortPL(cached, (InterpolatePixelS)interp, typeOut);
+				case INTERLEAVED -> FactoryDistort.distortIL(cached, (InterpolatePixelMB)interp, output.getImageType());
+				default -> throw new IllegalArgumentException("Unsupported image type");
+			};
 		}
-		distorter.setModel(outputToInput);
+		distorter.setModel(Objects.requireNonNull(outputToInput));
 
 		distorter.setRenderAll(borderType != BorderType.SKIP);
 		distorter.apply(input, output);

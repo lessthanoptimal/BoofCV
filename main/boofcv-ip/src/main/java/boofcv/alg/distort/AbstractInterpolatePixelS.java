@@ -28,9 +28,11 @@ import boofcv.struct.image.ImageType;
  *
  * @author Peter Abeles
  */
+@SuppressWarnings({"NullAway"})
 public class AbstractInterpolatePixelS<T extends ImageGray<T>> implements InterpolatePixelS<T> {
 	protected T image;
 
+	// @formatter:off
 	@Override public void setBorder( ImageBorder<T> border ) {}
 	@Override public ImageBorder<T> getBorder() {return null;}
 	@Override public void setImage( T image ) {this.image = image;}
@@ -42,4 +44,5 @@ public class AbstractInterpolatePixelS<T extends ImageGray<T>> implements Interp
 	@Override public float get( float x, float y ) {return 0;}
 	@Override public float get_fast( float x, float y ) {return 0;}
 	@Override public InterpolatePixelS<T> copy() {return this;}
+	// @formatter:on
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -60,7 +60,7 @@ public class PyramidFloatScale< T extends ImageGray<T>>
 		if( isSaveOriginalReference() )
 			throw new IllegalArgumentException("The original reference cannot be saved");
 
-		FDistort distort = new FDistort();
+		var distort = new FDistort(getImageType());
 
 		for( int i = 0; i < scale.length; i++ ) {
 			T prev = i == 0 ? input : getLayer(i-1);

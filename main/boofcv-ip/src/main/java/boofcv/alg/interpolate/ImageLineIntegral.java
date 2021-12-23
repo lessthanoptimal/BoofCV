@@ -44,8 +44,8 @@ import org.ejml.UtilEjml;
  *
  * @author Peter Abeles
  */
+@SuppressWarnings({"NullAway.Init"})
 public class ImageLineIntegral {
-
 	// reference to image.
 	GImageGray image;
 

@@ -25,13 +25,14 @@ package boofcv.alg.interpolate.array;
  *
  * @author Peter Abeles
  */
+@SuppressWarnings({"NullAway.Init"})
 public abstract class Interpolate1D_F32 {
 
 	// the sample data
 	// both axises must be monotonic increasing or decreasing
 	protected int size;
-	protected float x[];
-	protected float y[];
+	protected float[] x;
+	protected float[] y;
 
 	// how many points should the interpolation use
 	// this is equal to the degree + 1
@@ -64,7 +65,7 @@ public abstract class Interpolate1D_F32 {
 	 * @param y The value at the sample points. Not modifed. Reference saved.
 	 * @param size The number of points used.
 	 */
-	protected Interpolate1D_F32( int degree, float x[], float y[], int size ) {
+	protected Interpolate1D_F32( int degree, float[] x, float[] y, int size ) {
 		this(degree);
 		setInput(x, y, size);
 	}
@@ -76,7 +77,7 @@ public abstract class Interpolate1D_F32 {
 	 * @param y The value at the sample points. Not modifed. Reference saved.
 	 * @param size The number of points used.
 	 */
-	public void setInput( float x[], float y[], int size ) {
+	public void setInput( float[] x, float[] y, int size ) {
 		if (x.length < size || y.length < size) {
 			throw new IllegalArgumentException("Arrays too small for size.");
 		}

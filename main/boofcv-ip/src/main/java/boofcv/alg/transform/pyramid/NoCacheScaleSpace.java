@@ -41,6 +41,7 @@ import boofcv.struct.image.ImageType;
  *
  * @author Peter Abeles
  */
+@SuppressWarnings({"NullAway.Init"})
 public class NoCacheScaleSpace<I extends ImageGray<I>, D extends ImageGray<D>>
 		implements GaussianScaleSpace<I,D>
 {

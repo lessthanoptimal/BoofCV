@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -28,7 +28,7 @@ import georegression.struct.point.Point2D_F64;
  */
 public class DoNothingPixelTransform_F64 implements PixelTransform<Point2D_F64> {
 	@Override
-	public void compute(int x, int y, Point2D_F64 output ) {
+	public void compute( int x, int y, Point2D_F64 output ) {
 		output.x = x;
 		output.y = y;
 	}
@@ -37,5 +37,4 @@ public class DoNothingPixelTransform_F64 implements PixelTransform<Point2D_F64> 
 	public DoNothingPixelTransform_F64 copyConcurrent() {
 		return new DoNothingPixelTransform_F64();
 	}
-
 }

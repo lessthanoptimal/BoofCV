@@ -39,18 +39,19 @@ import boofcv.struct.image.ImageType;
  *
  * @author Peter Abeles
  */
+@SuppressWarnings({"NullAway.Init"})
 public class AnyImageDerivative<I extends ImageGray<I>, D extends ImageGray<D>> {
 
 	// filters for computing image derivatives
-	private ConvolveInterface<I, D> derivX;
-	private ConvolveInterface<I, D> derivY;
+	private final ConvolveInterface<I, D> derivX;
+	private final ConvolveInterface<I, D> derivY;
 
 	// gaussian blur the derivative image
-	private ConvolveInterface<D, D> derivDerivX;
-	private ConvolveInterface<D, D> derivDerivY;
+	private final ConvolveInterface<D, D> derivDerivX;
+	private final ConvolveInterface<D, D> derivDerivY;
 
 	// how the borders are handled
-	private BorderType borderDeriv = BoofDefaults.DERIV_BORDER_TYPE;
+	private final BorderType borderDeriv = BoofDefaults.DERIV_BORDER_TYPE;
 
 	private I inputImage;
 
@@ -59,7 +60,7 @@ public class AnyImageDerivative<I extends ImageGray<I>, D extends ImageGray<D>> 
 	// if true then
 	private boolean[][] stale;
 
-	private Class<D> derivType;
+	private final Class<D> derivType;
 
 	/**
 	 * Constructor for 1D kernels.

@@ -30,6 +30,7 @@ import georegression.struct.point.Point2D_F32;
  *
  * @author Peter Abeles
  */
+@SuppressWarnings({"NullAway.Init"})
 public abstract class ImageDistortBasic
 		<Input extends ImageBase<Input>,Output extends ImageBase<Output>,Interpolate extends InterpolatePixel<Input>>
 		implements ImageDistort<Input,Output> {

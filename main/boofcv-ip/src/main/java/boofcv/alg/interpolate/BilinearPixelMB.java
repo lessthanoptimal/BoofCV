@@ -29,6 +29,7 @@ import boofcv.struct.image.ImageInterleaved;
  *
  * @author Peter Abeles
  */
+@SuppressWarnings({"NullAway.Init"})
 public abstract class BilinearPixelMB<T extends ImageInterleaved<T>> implements InterpolatePixelMB<T> {
 
 	protected ImageBorder<T> border;

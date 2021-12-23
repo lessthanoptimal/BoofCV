@@ -29,6 +29,7 @@ import boofcv.struct.image.ImageGray;
  *
  * @author Peter Abeles
  */
+@SuppressWarnings({"NullAway.Init"})
 public abstract class BilinearPixelS<T extends ImageGray<T>> implements InterpolatePixelS<T> {
 
 	protected ImageBorder<T> border;

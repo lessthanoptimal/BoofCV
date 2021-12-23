@@ -26,6 +26,7 @@ import boofcv.struct.image.GrayU8;
  *
  * @author Peter Abeles
  */
+@SuppressWarnings({"NullAway.Init"})
 public class ContourTracerBase {
 	// which connectivity rule is being used. 4 and 8 supported
 	protected final ConnectRule rule;
@@ -58,7 +59,7 @@ public class ContourTracerBase {
 
 		if (ConnectRule.EIGHT == rule) {
 			// start the next search +2 away from the square it came from
-			// the square it came from is the opposite from the previous 'dir'
+			// the square it came from is the opposite to the previous 'dir'
 			nextDirection = new int[8];
 			for (int i = 0; i < 8; i++)
 				nextDirection[i] = ((i + 4)%8 + 2)%8;

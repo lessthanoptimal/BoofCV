@@ -70,18 +70,9 @@ public class BlurStorageFilter<T extends ImageBase<T>> implements BlurFilter<T> 
 		this.inputType = inputType;
 
 		switch (functionName) {
-			case "mean" -> {
-				operation = new MeanOperation();
-				createStorage();
-			}
-			case "meanB" -> {
-				operation = new MeanBorderOperation();
-				createStorage();
-			}
-			case "gaussian" -> {
-				operation = new GaussianOperation();
-				createStorage();
-			}
+			case "mean" -> operation = new MeanOperation();
+			case "meanB" -> operation = new MeanBorderOperation();
+			case "gaussian" -> operation = new GaussianOperation();
 			case "median" -> {
 				if (radiusX != radiusY)
 					throw new IllegalArgumentException("Median currently only supports equal radius");
@@ -91,6 +82,7 @@ public class BlurStorageFilter<T extends ImageBase<T>> implements BlurFilter<T> 
 		}
 
 		growArray = GeneralizedImageOps.createGrowArray(inputType);
+		createStorage();
 	}
 
 	private void createStorage() {

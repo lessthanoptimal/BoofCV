@@ -47,7 +47,7 @@ import org.jetbrains.annotations.Nullable;
  *
  * @author Peter Abeles
  */
-@SuppressWarnings({"unchecked"})
+@SuppressWarnings({"unchecked", "NullAway.Init"})
 public class PyramidDiscreteSampleBlur<T extends ImageBase<T>> extends PyramidDiscrete<T> {
 
 	// stores the results from the first convolution
