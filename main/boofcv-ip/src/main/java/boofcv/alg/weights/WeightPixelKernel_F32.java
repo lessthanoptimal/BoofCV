@@ -26,29 +26,20 @@ import boofcv.struct.convolve.Kernel2D_F32;
  *
  * @author Peter Abeles
  */
+@SuppressWarnings({"NullAway.Init"})
 public abstract class WeightPixelKernel_F32 implements WeightPixel_F32 {
 	protected Kernel2D_F32 kernel;
 
-	@Override
-	public float weightIndex(int index) {
-		return kernel.data[index];
-	}
+	@Override public float weightIndex( int index ) {return kernel.data[index];}
 
-	@Override
-	public float weight(int x, int y) {
+	@Override public float weight( int x, int y ) {
 		x += kernel.getRadius();
 		y += kernel.getRadius();
 
-		return kernel.data[ y*kernel.width + x ];
+		return kernel.data[y*kernel.width + x];
 	}
 
-	@Override
-	public int getRadiusX() {
-		return kernel.getRadius();
-	}
+	@Override public int getRadiusX() {return kernel.getRadius();}
 
-	@Override
-	public int getRadiusY() {
-		return kernel.getRadius();
-	}
+	@Override public int getRadiusY() {return kernel.getRadius();}
 }

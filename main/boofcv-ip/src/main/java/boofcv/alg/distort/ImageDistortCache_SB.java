@@ -31,6 +31,7 @@ import georegression.struct.point.Point2D_F32;
  *
  * @author Peter Abeles
  */
+@SuppressWarnings({"NullAway.Init"})
 public class ImageDistortCache_SB<Input extends ImageGray<Input>, Output extends ImageGray<Output>>
 		implements ImageDistort<Input, Output> {
 
@@ -38,7 +39,7 @@ public class ImageDistortCache_SB<Input extends ImageGray<Input>, Output extends
 
 	// size of output image
 	protected int width = -1, height = -1;
-	protected Point2D_F32 map[];
+	protected Point2D_F32[] map;
 	// sub pixel interpolation
 	protected InterpolatePixelS<Input> interp;
 

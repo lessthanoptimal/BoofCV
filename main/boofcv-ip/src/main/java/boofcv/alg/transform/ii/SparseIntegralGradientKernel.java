@@ -22,15 +22,14 @@ import boofcv.struct.image.ImageGray;
 import boofcv.struct.sparse.GradientValue_F64;
 import boofcv.struct.sparse.SparseImageGradient;
 
-
 /**
  * Computes the gradient from an integral image. Does not check for border conditions.
  *
  * @author Peter Abeles
  */
+@SuppressWarnings({"NullAway.Init"})
 public class SparseIntegralGradientKernel<T extends ImageGray<T>>
-		implements SparseImageGradient<T, GradientValue_F64>
-{
+		implements SparseImageGradient<T, GradientValue_F64> {
 	// input integral image
 	T ii;
 	// kernels for computing derivatives along x and y
@@ -39,32 +38,32 @@ public class SparseIntegralGradientKernel<T extends ImageGray<T>>
 
 	GradientValue_F64 ret = new GradientValue_F64();
 
-	public SparseIntegralGradientKernel(IntegralKernel kernelX, IntegralKernel kernelY) {
+	public SparseIntegralGradientKernel( IntegralKernel kernelX, IntegralKernel kernelY ) {
 		this.kernelX = kernelX;
 		this.kernelY = kernelY;
 	}
 
 	@Override
-	public boolean isInBounds(int x, int y) {
+	public boolean isInBounds( int x, int y ) {
 
-		if( !IntegralImageOps.isInBounds(x,y,kernelX,ii.width,ii.height))
+		if (!IntegralImageOps.isInBounds(x, y, kernelX, ii.width, ii.height))
 			return false;
-		if( !IntegralImageOps.isInBounds(x,y,kernelY,ii.width,ii.height))
+		if (!IntegralImageOps.isInBounds(x, y, kernelY, ii.width, ii.height))
 			return false;
 
 		return true;
 	}
 
 	@Override
-	public void setImage(T integralImage) {
+	public void setImage( T integralImage ) {
 		this.ii = integralImage;
 	}
 
 	@Override
-	public GradientValue_F64 compute(int x, int y) {
+	public GradientValue_F64 compute( int x, int y ) {
 
-		ret.x = GIntegralImageOps.convolveSparse(ii,kernelX,x,y);
-		ret.y = GIntegralImageOps.convolveSparse(ii,kernelY,x,y);
+		ret.x = GIntegralImageOps.convolveSparse(ii, kernelX, x, y);
+		ret.y = GIntegralImageOps.convolveSparse(ii, kernelY, x, y);
 
 		return ret;
 	}

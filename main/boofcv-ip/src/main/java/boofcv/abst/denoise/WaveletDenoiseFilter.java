@@ -32,7 +32,7 @@ import boofcv.struct.image.ImageType;
  * @param <T> Type of image being processed.
  * @author Peter Abeles
  */
-@SuppressWarnings({"unchecked"})
+@SuppressWarnings({"unchecked", "NullAway.Init"})
 public class WaveletDenoiseFilter<T extends ImageGray<T>> implements FilterImageInterface<T, T> {
 
 	// performs the wavelet transform

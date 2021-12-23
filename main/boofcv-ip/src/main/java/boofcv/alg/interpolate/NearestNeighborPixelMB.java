@@ -27,6 +27,7 @@ import boofcv.struct.image.ImageType;
  *
  * @author Peter Abeles
  */
+@SuppressWarnings({"NullAway.Init"})
 public abstract class NearestNeighborPixelMB<T extends ImageMultiBand<T>> implements InterpolatePixelMB<T> {
 	protected ImageBorder<T> border;
 	protected T orig;

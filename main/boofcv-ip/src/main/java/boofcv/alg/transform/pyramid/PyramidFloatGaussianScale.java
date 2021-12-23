@@ -45,7 +45,7 @@ import boofcv.struct.pyramid.PyramidFloat;
  *
  * @author Peter Abeles
  */
-@SuppressWarnings({"unchecked"})
+@SuppressWarnings({"unchecked", "NullAway.Init"})
 public class PyramidFloatGaussianScale< T extends ImageGray<T>> extends PyramidFloat<T> {
 
 	// interpolation algorithm
@@ -121,12 +121,11 @@ public class PyramidFloatGaussianScale< T extends ImageGray<T>> extends PyramidF
 			blur.process(prev,tempImage);
 
 			// Resample the blurred image
-			FDistort distort = new FDistort();
 			if( scale[i] == 1 ) {
 				layer.setTo(tempImage);
 			} else {
 				PixelTransformAffine_F32 model = DistortSupport.transformScale(layer,tempImage, null);
-				distort.setRefs(tempImage,layer).transform(model).interp(interpolate).apply();
+				new FDistort(tempImage,layer).transform(model).interp(interpolate).apply();
 			}
 		}
 	}

@@ -30,6 +30,7 @@ public interface AssignPixelValue_SB<T extends ImageGray<T>> {
 
 	void assign( int indexDst, float value );
 
+	@SuppressWarnings({"NullAway.Init"})
 	class F32 implements AssignPixelValue_SB<GrayF32> {
 		GrayF32 image;
 
@@ -40,6 +41,7 @@ public interface AssignPixelValue_SB<T extends ImageGray<T>> {
 		}
 	}
 
+	@SuppressWarnings({"NullAway.Init"})
 	class I8<T extends GrayI8<T>> implements AssignPixelValue_SB<T> {
 		T image;
 
@@ -50,6 +52,7 @@ public interface AssignPixelValue_SB<T extends ImageGray<T>> {
 		}
 	}
 
+	@SuppressWarnings({"NullAway.Init"})
 	class I16<T extends GrayI16<T>> implements AssignPixelValue_SB<T> {
 		T image;
 
@@ -60,6 +63,7 @@ public interface AssignPixelValue_SB<T extends ImageGray<T>> {
 		}
 	}
 
+	@SuppressWarnings({"NullAway.Init"})
 	class S32 implements AssignPixelValue_SB<GrayS32> {
 		GrayS32 image;
 

@@ -34,8 +34,8 @@ import java.util.ArrayDeque;
  * @author Peter Abeles
  */
 public class ImageDistortBasic_IL_MT
-		<Input extends ImageInterleaved<Input>,Output extends ImageInterleaved<Output>>
-		extends ImageDistortBasic<Input,Output,InterpolatePixelMB<Input>> {
+		<Input extends ImageInterleaved<Input>, Output extends ImageInterleaved<Output>>
+		extends ImageDistortBasic<Input, Output, InterpolatePixelMB<Input>> {
 
 	private AssignPixelValue_MB<Output> assigner;
 
@@ -46,8 +46,8 @@ public class ImageDistortBasic_IL_MT
 	 *
 	 * @param interp Interpolation algorithm
 	 */
-	public ImageDistortBasic_IL_MT(AssignPixelValue_MB<Output> assigner,
-								   InterpolatePixelMB<Input> interp) {
+	public ImageDistortBasic_IL_MT( AssignPixelValue_MB<Output> assigner,
+									InterpolatePixelMB<Input> interp ) {
 		super(interp);
 		this.assigner = assigner;
 	}
@@ -68,46 +68,44 @@ public class ImageDistortBasic_IL_MT
 		}
 	}
 
-
 	@Override
-	protected void init(Input srcImg, Output dstImg) {
-		super.init(srcImg,dstImg);
+	protected void init( Input srcImg, Output dstImg ) {
+		super.init(srcImg, dstImg);
 		assigner.setImage(dstImg);
 	}
 
 	@Override
 	public void applyAll() {
-		BoofConcurrency.loopBlocks(y0,y1,(y0, y1)->{
+		BoofConcurrency.loopBlocks(y0, y1, ( y0, y1 ) -> {
 			BlockDistort b = pop();
-			b.applyAll(y0,y1);
+			b.applyAll(y0, y1);
 			recycle(b);
 		});
 	}
 
 	@Override
 	public void applyAll( GrayU8 mask ) {
-		BoofConcurrency.loopBlocks(y0,y1,(y0,y1)->{
+		BoofConcurrency.loopBlocks(y0, y1, ( y0, y1 ) -> {
 			BlockDistort b = pop();
-			b.applyAll(y0,y1,mask);
+			b.applyAll(y0, y1, mask);
 			recycle(b);
 		});
-
 	}
 
 	@Override
 	public void applyOnlyInside() {
-		BoofConcurrency.loopBlocks(y0,y1,(y0,y1)->{
+		BoofConcurrency.loopBlocks(y0, y1, ( y0, y1 ) -> {
 			BlockDistort b = pop();
-			b.applyOnlyInside(y0,y1);
+			b.applyOnlyInside(y0, y1);
 			recycle(b);
 		});
 	}
 
 	@Override
 	public void applyOnlyInside( GrayU8 mask ) {
-		BoofConcurrency.loopBlocks(y0,y1,(y0,y1)->{
+		BoofConcurrency.loopBlocks(y0, y1, ( y0, y1 ) -> {
 			BlockDistort b = pop();
-			b.applyOnlyInside(y0,y1,mask);
+			b.applyOnlyInside(y0, y1, mask);
 			recycle(b);
 		});
 	}
@@ -116,50 +114,51 @@ public class ImageDistortBasic_IL_MT
 		return srcImg.numBands;
 	}
 
+	@SuppressWarnings({"NullAway.Init"})
 	private class BlockDistort {
 		Point2D_F32 distorted = new Point2D_F32();
 		PixelTransform<Point2D_F32> dstToSrc;
 		InterpolatePixelMB<Input> interp = ImageDistortBasic_IL_MT.this.interp.copy();
-		float values[] = new float[getNumberOfBands()];
+		float[] values = new float[getNumberOfBands()];
 
 		public void init() {
 			dstToSrc = ImageDistortBasic_IL_MT.this.dstToSrc.copyConcurrent();
 			interp.setImage(srcImg);
 		}
 
-		void applyAll( int y0 , int y1 ) {
+		void applyAll( int y0, int y1 ) {
 			init();
 
 			// todo TO make this faster first apply inside the region which can process the fast border
 			// then do the slower border thingy
-			for( int y = y0; y < y1; y++ ) {
+			for (int y = y0; y < y1; y++) {
 				int indexDst = dstImg.startIndex + dstImg.stride*y + x0*dstImg.numBands;
-				for( int x = x0; x < x1; x++ , indexDst += dstImg.numBands ) {
-					dstToSrc.compute(x,y,distorted);
+				for (int x = x0; x < x1; x++, indexDst += dstImg.numBands) {
+					dstToSrc.compute(x, y, distorted);
 					interp.get(distorted.x, distorted.y, values);
-					assigner.assign(indexDst,values);
+					assigner.assign(indexDst, values);
 				}
 			}
 		}
 
-		void applyAll( int y0 , int y1 , GrayU8 mask ) {
+		void applyAll( int y0, int y1, GrayU8 mask ) {
 			init();
 
-			float maxWidth = srcImg.getWidth()-1;
-			float maxHeight = srcImg.getHeight()-1;
+			float maxWidth = srcImg.getWidth() - 1;
+			float maxHeight = srcImg.getHeight() - 1;
 
-			for( int y = y0; y < y1; y++ ) {
+			for (int y = y0; y < y1; y++) {
 				int indexDst = dstImg.startIndex + dstImg.stride*y + x0*dstImg.numBands;
 				int indexMsk = mask.startIndex + mask.stride*y + x0;
 
-				for( int x = x0; x < x1; x++ , indexDst += dstImg.numBands , indexMsk++) {
-					dstToSrc.compute(x,y,distorted);
+				for (int x = x0; x < x1; x++, indexDst += dstImg.numBands, indexMsk++) {
+					dstToSrc.compute(x, y, distorted);
 					interp.get(distorted.x, distorted.y, values);
 
-					assigner.assign(indexDst,values);
+					assigner.assign(indexDst, values);
 
-					if( distorted.x >= 0 && distorted.x <= maxWidth &&
-							distorted.y >= 0 && distorted.y <= maxHeight ) {
+					if (distorted.x >= 0 && distorted.x <= maxWidth &&
+							distorted.y >= 0 && distorted.y <= maxHeight) {
 						mask.data[indexMsk] = 1;
 					} else {
 						mask.data[indexMsk] = 0;
@@ -168,43 +167,43 @@ public class ImageDistortBasic_IL_MT
 			}
 		}
 
-		void applyOnlyInside( int y0 , int y1 ) {
+		void applyOnlyInside( int y0, int y1 ) {
 			init();
 
-			float maxWidth = srcImg.getWidth()-1;
-			float maxHeight = srcImg.getHeight()-1;
+			float maxWidth = srcImg.getWidth() - 1;
+			float maxHeight = srcImg.getHeight() - 1;
 
-			for( int y = y0; y < y1; y++ ) {
+			for (int y = y0; y < y1; y++) {
 				int indexDst = dstImg.startIndex + dstImg.stride*y + x0*dstImg.numBands;
-				for( int x = x0; x < x1; x++ , indexDst += dstImg.numBands ) {
-					dstToSrc.compute(x,y,distorted);
+				for (int x = x0; x < x1; x++, indexDst += dstImg.numBands) {
+					dstToSrc.compute(x, y, distorted);
 
-					if( distorted.x >= 0 && distorted.x <= maxWidth &&
-							distorted.y >= 0 && distorted.y <= maxHeight ) {
+					if (distorted.x >= 0 && distorted.x <= maxWidth &&
+							distorted.y >= 0 && distorted.y <= maxHeight) {
 						interp.get(distorted.x, distorted.y, values);
-						assigner.assign(indexDst,values);
+						assigner.assign(indexDst, values);
 					}
 				}
 			}
 		}
 
-		void applyOnlyInside( int y0 , int y1 , GrayU8 mask ) {
+		void applyOnlyInside( int y0, int y1, GrayU8 mask ) {
 			init();
 
-			float maxWidth = srcImg.getWidth()-1;
-			float maxHeight = srcImg.getHeight()-1;
+			float maxWidth = srcImg.getWidth() - 1;
+			float maxHeight = srcImg.getHeight() - 1;
 
-			for( int y = y0; y < y1; y++ ) {
+			for (int y = y0; y < y1; y++) {
 				int indexDst = dstImg.startIndex + dstImg.stride*y + x0*dstImg.numBands;
 				int indexMsk = mask.startIndex + mask.stride*y + x0;
 
-				for( int x = x0; x < x1; x++ , indexDst += dstImg.numBands , indexMsk++) {
-					dstToSrc.compute(x,y,distorted);
+				for (int x = x0; x < x1; x++, indexDst += dstImg.numBands, indexMsk++) {
+					dstToSrc.compute(x, y, distorted);
 
-					if( distorted.x >= 0 && distorted.x <= maxWidth &&
-							distorted.y >= 0 && distorted.y <= maxHeight ) {
+					if (distorted.x >= 0 && distorted.x <= maxWidth &&
+							distorted.y >= 0 && distorted.y <= maxHeight) {
 						interp.get(distorted.x, distorted.y, values);
-						assigner.assign(indexDst,values);
+						assigner.assign(indexDst, values);
 						mask.data[indexMsk] = 1;
 					} else {
 						mask.data[indexMsk] = 0;

@@ -30,6 +30,7 @@ public interface AssignPixelValue_MB<T extends ImageMultiBand<T>> {
 
 	void assign( int indexDst, float[] value );
 
+	@SuppressWarnings({"NullAway.Init"})
 	class F32 implements AssignPixelValue_MB<InterleavedF32> {
 		InterleavedF32 image;
 
@@ -42,6 +43,7 @@ public interface AssignPixelValue_MB<T extends ImageMultiBand<T>> {
 		}
 	}
 
+	@SuppressWarnings({"NullAway.Init"})
 	class I8<T extends InterleavedI8<T>> implements AssignPixelValue_MB<T> {
 		T image;
 
@@ -54,6 +56,7 @@ public interface AssignPixelValue_MB<T extends ImageMultiBand<T>> {
 		}
 	}
 
+	@SuppressWarnings({"NullAway.Init"})
 	class I16<T extends InterleavedI16<T>> implements AssignPixelValue_MB<T> {
 		T image;
 
@@ -66,6 +69,7 @@ public interface AssignPixelValue_MB<T extends ImageMultiBand<T>> {
 		}
 	}
 
+	@SuppressWarnings({"NullAway.Init"})
 	class S32 implements AssignPixelValue_MB<InterleavedS32> {
 		InterleavedS32 image;
 

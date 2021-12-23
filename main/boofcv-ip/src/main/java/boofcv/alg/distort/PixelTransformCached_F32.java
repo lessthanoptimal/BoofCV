@@ -30,6 +30,7 @@ import org.ejml.UtilEjml;
  *
  * @author Peter Abeles
  */
+@SuppressWarnings({"NullAway.Init"})
 public class PixelTransformCached_F32 implements PixelTransform<Point2D_F32> {
 
 	Point2D_F32[] map;
@@ -63,8 +64,7 @@ public class PixelTransformCached_F32 implements PixelTransform<Point2D_F32> {
 		}
 	}
 
-	PixelTransformCached_F32() {
-	}
+	PixelTransformCached_F32() {}
 
 	public Point2D_F32 getPixel( int x, int y ) {
 		return map[width*y + x];

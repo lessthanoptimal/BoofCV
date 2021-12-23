@@ -23,6 +23,7 @@ package boofcv.alg.interpolate.array;
  *
  * @author Peter Abeles
  */
+@SuppressWarnings({"NullAway.Init"})
 public class PolynomialNevilleFixed_F32 {
 
 	// number of sample points
