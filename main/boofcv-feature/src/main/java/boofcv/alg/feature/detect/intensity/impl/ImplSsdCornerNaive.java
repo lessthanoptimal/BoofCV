@@ -24,6 +24,7 @@ import boofcv.factory.filter.kernel.FactoryKernelGaussian;
 import boofcv.struct.convolve.Kernel2D_S32;
 import boofcv.struct.image.GrayF32;
 import boofcv.struct.image.ImageGray;
+import org.jetbrains.annotations.Nullable;
 
 /**
  * Naive implementation of {@link boofcv.alg.feature.detect.intensity.ShiTomasiCornerIntensity} which performs computations in a straight
@@ -38,7 +39,7 @@ public class ImplSsdCornerNaive<T extends ImageGray<T>> implements GradientCorne
 	// feature's radius
 	private int radius;
 
-	private Kernel2D_S32 weights;
+	private @Nullable Kernel2D_S32 weights;
 
 	public ImplSsdCornerNaive(int imageWidth, int imageHeight,
 							  int windowRadius, boolean weighted) {

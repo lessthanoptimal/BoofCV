@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -21,6 +21,9 @@ package boofcv.alg.feature.detect.extract;
 import boofcv.struct.QueueCorner;
 import boofcv.struct.image.GrayF32;
 import georegression.struct.point.Point2D_I32;
+import org.jetbrains.annotations.Nullable;
+
+import java.util.Objects;
 
 /**
  * <p>
@@ -29,6 +32,7 @@ import georegression.struct.point.Point2D_I32;
  *
  * @author Peter Abeles
  */
+@SuppressWarnings({"NullAway.Init"})
 public abstract class NonMaxBlockSearchRelaxed implements NonMaxBlock.Search {
 
 	// storage for local maximums
@@ -43,15 +47,25 @@ public abstract class NonMaxBlockSearchRelaxed implements NonMaxBlock.Search {
 	private QueueCorner localMin, localMax;
 	GrayF32 img;
 
+	@SuppressWarnings({"NullAway"})
 	@Override
 	public void initialize( NonMaxBlock.Configuration configuration, GrayF32 image,
-							QueueCorner localMin, QueueCorner localMax ) {
+							@Nullable QueueCorner localMin, @Nullable QueueCorner localMax ) {
 		this.thresholdMin = configuration.thresholdMin;
 		this.thresholdMax = configuration.thresholdMax;
 		this.radius = configuration.radius;
 		this.img = image;
+
+		// we want these to be null so that it blows up if a local min/max is searched when it shouldn't
+		// but enforcing nullability is tedious, so we turn it off for this function
 		this.localMin = localMin;
 		this.localMax = localMax;
+
+		// Sanity check contract
+		if (isDetectMinimums())
+			Objects.requireNonNull(localMin);
+		if (isDetectMaximums())
+			Objects.requireNonNull(localMax);
 
 		int w = 2*radius + 1;
 
@@ -67,7 +81,6 @@ public abstract class NonMaxBlockSearchRelaxed implements NonMaxBlock.Search {
 	}
 
 	public static class Max extends NonMaxBlockSearchRelaxed {
-
 		@Override
 		public void searchBlock( int x0, int y0, int x1, int y1 ) {
 

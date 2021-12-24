@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -50,7 +50,6 @@ public class NonMaxBlock_MT extends NonMaxBlock {
 	 */
 	@Override
 	public void process( GrayF32 intensityImage, @Nullable QueueCorner localMin, @Nullable QueueCorner localMax ) {
-
 		if (localMin != null)
 			localMin.reset();
 		if (localMax != null)
@@ -95,7 +94,7 @@ public class NonMaxBlock_MT extends NonMaxBlock {
 			}
 		});
 
-		// Save results outside of the thread. This ensures the order is not randomized. That was wrecking havoc
+		// Save results outside the thread. This ensures the order is not randomized. That was wrecking havoc
 		// on results that needed to be deterministic
 		for (int i = 0; i < searches.size(); i++) {
 			SearchData data = searches.get(i);

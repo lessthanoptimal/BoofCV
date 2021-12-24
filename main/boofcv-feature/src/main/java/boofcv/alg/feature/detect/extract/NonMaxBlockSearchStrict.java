@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -20,6 +20,9 @@ package boofcv.alg.feature.detect.extract;
 
 import boofcv.struct.QueueCorner;
 import boofcv.struct.image.GrayF32;
+import org.jetbrains.annotations.Nullable;
+
+import java.util.Objects;
 
 /**
  * <p>
@@ -28,6 +31,7 @@ import boofcv.struct.image.GrayF32;
  *
  * @author Peter Abeles
  */
+@SuppressWarnings({"NullAway.Init"})
 public abstract class NonMaxBlockSearchStrict implements NonMaxBlock.Search {
 
 	// threshold for intensity values when detecting minimums and maximums
@@ -35,25 +39,34 @@ public abstract class NonMaxBlockSearchStrict implements NonMaxBlock.Search {
 	float thresholdMax;
 	int radius;
 
-	private QueueCorner localMin,localMax;
+	private QueueCorner localMin, localMax;
 	GrayF32 img;
 
+	@SuppressWarnings({"NullAway"})
 	@Override
 	public void initialize( NonMaxBlock.Configuration configuration,
-							GrayF32 image, QueueCorner localMin, QueueCorner localMax) {
+							GrayF32 image, @Nullable QueueCorner localMin, @Nullable QueueCorner localMax ) {
 
 		this.thresholdMin = configuration.thresholdMin;
 		this.thresholdMax = configuration.thresholdMax;
 		this.radius = configuration.radius;
 		this.img = image;
+
+		// we want these to be null so that it blows up if a local min/max is searched when it shouldn't
+		// but enforcing nullability is tedious, so we turn it off for this function
 		this.localMin = localMin;
 		this.localMax = localMax;
+
+		// Sanity check contract
+		if (isDetectMinimums())
+			Objects.requireNonNull(localMin);
+		if (isDetectMaximums())
+			Objects.requireNonNull(localMax);
 	}
 
 	public static class Max extends NonMaxBlockSearchStrict {
-
 		@Override
-		public void searchBlock(int x0, int y0, int x1, int y1 ) {
+		public void searchBlock( int x0, int y0, int x1, int y1 ) {
 
 			int peakX = 0;
 			int peakY = 0;
@@ -61,7 +74,7 @@ public abstract class NonMaxBlockSearchStrict implements NonMaxBlock.Search {
 			float peakVal = -Float.MAX_VALUE;
 
 			for (int y = y0; y < y1; y++) {
-				int index = img.startIndex + y * img.stride + x0;
+				int index = img.startIndex + y*img.stride + x0;
 				for (int x = x0; x < x1; x++) {
 					float v = img.data[index++];
 
@@ -97,7 +110,7 @@ public abstract class NonMaxBlockSearchStrict implements NonMaxBlock.Search {
 	public static class Min extends NonMaxBlockSearchStrict {
 
 		@Override
-		public void searchBlock(int x0, int y0, int x1, int y1 ) {
+		public void searchBlock( int x0, int y0, int x1, int y1 ) {
 
 			int peakX = 0;
 			int peakY = 0;
@@ -105,7 +118,7 @@ public abstract class NonMaxBlockSearchStrict implements NonMaxBlock.Search {
 			float peakVal = Float.MAX_VALUE;
 
 			for (int y = y0; y < y1; y++) {
-				int index = img.startIndex + y * img.stride + x0;
+				int index = img.startIndex + y*img.stride + x0;
 				for (int x = x0; x < x1; x++) {
 					float v = img.data[index++];
 
@@ -141,7 +154,7 @@ public abstract class NonMaxBlockSearchStrict implements NonMaxBlock.Search {
 	public static class MinMax extends NonMaxBlockSearchStrict {
 
 		@Override
-		public void searchBlock(int x0, int y0, int x1, int y1 ) {
+		public void searchBlock( int x0, int y0, int x1, int y1 ) {
 
 			int maxX = 0;
 			int maxY = 0;
@@ -152,7 +165,7 @@ public abstract class NonMaxBlockSearchStrict implements NonMaxBlock.Search {
 			float minVal = Float.MAX_VALUE;
 
 			for (int y = y0; y < y1; y++) {
-				int index = img.startIndex + y * img.stride + x0;
+				int index = img.startIndex + y*img.stride + x0;
 				for (int x = x0; x < x1; x++) {
 					float v = img.data[index++];
 
@@ -193,7 +206,7 @@ public abstract class NonMaxBlockSearchStrict implements NonMaxBlock.Search {
 		}
 	}
 
-	protected void checkLocalMax(int x_c, int y_c, float peakVal, GrayF32 img) {
+	protected void checkLocalMax( int x_c, int y_c, float peakVal, GrayF32 img ) {
 		int x0 = x_c - radius;
 		int x1 = x_c + radius;
 		int y0 = y_c - radius;
@@ -205,7 +218,7 @@ public abstract class NonMaxBlockSearchStrict implements NonMaxBlock.Search {
 		if (y1 >= img.height) y1 = img.height - 1;
 
 		for (int y = y0; y <= y1; y++) {
-			int index = img.startIndex + y * img.stride + x0;
+			int index = img.startIndex + y*img.stride + x0;
 			for (int x = x0; x <= x1; x++) {
 				float v = img.data[index++];
 
@@ -220,7 +233,7 @@ public abstract class NonMaxBlockSearchStrict implements NonMaxBlock.Search {
 		localMax.append(x_c, y_c);
 	}
 
-	protected void checkLocalMin(int x_c, int y_c, float peakVal, GrayF32 img) {
+	protected void checkLocalMin( int x_c, int y_c, float peakVal, GrayF32 img ) {
 		int x0 = x_c - radius;
 		int x1 = x_c + radius;
 		int y0 = y_c - radius;
@@ -232,7 +245,7 @@ public abstract class NonMaxBlockSearchStrict implements NonMaxBlock.Search {
 		if (y1 >= img.height) y1 = img.height - 1;
 
 		for (int y = y0; y <= y1; y++) {
-			int index = img.startIndex + y * img.stride + x0;
+			int index = img.startIndex + y*img.stride + x0;
 			for (int x = x0; x <= x1; x++) {
 				float v = img.data[index++];
 

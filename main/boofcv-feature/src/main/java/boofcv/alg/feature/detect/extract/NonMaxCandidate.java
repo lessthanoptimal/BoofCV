@@ -31,6 +31,7 @@ import org.jetbrains.annotations.Nullable;
  *
  * @author Peter Abeles
  */
+@SuppressWarnings({"NullAway.Init"})
 public class NonMaxCandidate {
 	// size of the search area
 	protected int radius;
@@ -196,6 +197,7 @@ public class NonMaxCandidate {
 	/**
 	 * Search with a relaxes rule. &le;
 	 */
+	@SuppressWarnings({"NullAway.Init"})
 	public static class Relaxed implements NonMaxCandidate.Search {
 		GrayF32 intensity;
 
@@ -239,6 +241,7 @@ public class NonMaxCandidate {
 	/**
 	 * Search with a strict rule &lt;
 	 */
+	@SuppressWarnings({"NullAway.Init"})
 	public static class Strict implements NonMaxCandidate.Search {
 		GrayF32 intensity;
 

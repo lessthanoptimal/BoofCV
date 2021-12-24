@@ -37,6 +37,7 @@ import boofcv.struct.image.ImageGray;
  *
  * @author Peter Abeles
  */
+@SuppressWarnings({"NullAway.Init"})
 public abstract class ImplSsdCornerBase<D extends ImageGray<D>, D2 extends ImageGray<D2>>
 		implements GradientCornerIntensity<D>
 {

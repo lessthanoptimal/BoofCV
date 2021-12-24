@@ -21,7 +21,7 @@ package boofcv.abst.feature.detect.extract;
 import boofcv.struct.ListIntPoint2D;
 import boofcv.struct.QueueCorner;
 import boofcv.struct.image.GrayF32;
-
+import org.jetbrains.annotations.Nullable;
 
 /**
  * <p>
@@ -66,9 +66,9 @@ public interface NonMaxSuppression {
 	 * @param foundMin (Output) Storage for found minimums. Can be null if not used.
 	 * @param foundMax (Output) Storage for found maximums. Can be null if not used.
 	 */
-	void process(GrayF32 intensity,
-				 ListIntPoint2D candidateMin, ListIntPoint2D candidateMax,
-				 QueueCorner foundMin, QueueCorner foundMax );
+	void process( GrayF32 intensity,
+				  @Nullable ListIntPoint2D candidateMin, @Nullable ListIntPoint2D candidateMax,
+				  @Nullable QueueCorner foundMin, @Nullable QueueCorner foundMax );
 
 	/**
 	 * Returns true if the algorithm requires a candidate list of corners.

@@ -193,8 +193,8 @@ public class TestKltTracker extends BoofStandardJUnit {
 		featureB.setPosition(20.6f, 25.1f);
 
 		tracker.setAllowedBounds(featureA);
-		tracker.internalSetDescription(featureA);
-		tracker.internalSetDescriptionBorder(featureB);
+		tracker.internalSetDescription(featureA, derivX, derivY);
+		tracker.internalSetDescriptionBorder(featureB, derivX, derivY);
 
 		for (int i = 0; i < featureA.desc.data.length; i++) {
 			assertEquals(featureB.desc.data[i], featureA.desc.data[i]);

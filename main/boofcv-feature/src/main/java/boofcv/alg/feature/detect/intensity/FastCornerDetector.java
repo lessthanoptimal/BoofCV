@@ -66,6 +66,7 @@ import lombok.Getter;
  * [1] Edward Rosten, Reid Porter and Tom Drummond. "Faster and better: a machine learning approach to corner detection"
  * </p>
  */
+@SuppressWarnings({"NullAway.Init"})
 public class FastCornerDetector<T extends ImageGray<T>> implements FeatureIntensity<T> {
 
 	// radius of the circle being sampled
