@@ -54,7 +54,7 @@ import java.util.List;
  * @author Peter Abeles
  * @see boofcv.factory.feature.detect.interest.FactoryInterestPoint
  */
-@SuppressWarnings({"unchecked"})
+@SuppressWarnings({"unchecked", "NullAway.Init"})
 public class FeaturePyramid<T extends ImageGray<T>, D extends ImageGray<D>>
 		implements InterestPointScaleSpacePyramid<T> {
 

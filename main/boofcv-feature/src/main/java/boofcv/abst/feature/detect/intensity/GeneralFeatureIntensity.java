@@ -45,7 +45,9 @@ public interface GeneralFeatureIntensity<I extends ImageGray<I>, D extends Image
 	 * @param derivYY Second derivative x-axis y-axis
 	 * @param derivXY Second derivative x-axis y-axis
 	 */
-	void process( I image, D derivX, D derivY, D derivXX, D derivYY, D derivXY );
+	void process( I image,
+				  @Nullable D derivX, @Nullable D derivY,
+				  @Nullable D derivXX, @Nullable D derivYY, @Nullable D derivXY );
 
 	/**
 	 * Returns an image containing an intensity mapping showing how corner like each pixel is.

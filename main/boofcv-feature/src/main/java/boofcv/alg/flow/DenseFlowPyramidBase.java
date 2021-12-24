@@ -34,6 +34,7 @@ import boofcv.struct.pyramid.PyramidFloat;
  *
  * @author Peter Abeles
  */
+@SuppressWarnings({"NullAway.Init"})
 public abstract class DenseFlowPyramidBase<T extends ImageGray<T>> {
 
 	// storage for normalized image

@@ -30,6 +30,8 @@ import lombok.Setter;
 import org.ddogleg.struct.FastArray;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.Objects;
+
 /**
  * <p>
  * Detects features which are local maximums and/or local minimums in the feature intensity image.
@@ -108,11 +110,11 @@ public class GeneralFeatureDetector<I extends ImageGray<I>, D extends ImageGray<
 		// sanity check ignore borders and increase the size of the extractor's ignore border
 		// if its ignore border is too small then false positive are highly likely
 		if (intensity.localMinimums()) {
-			if (intensity.getIgnoreBorder() > extractorMin.getIgnoreBorder())
+			if (intensity.getIgnoreBorder() > Objects.requireNonNull(extractorMin).getIgnoreBorder())
 				extractorMin.setIgnoreBorder(intensity.getIgnoreBorder());
 		}
 		if (intensity.localMaximums()) {
-			if (intensity.getIgnoreBorder() > extractorMax.getIgnoreBorder())
+			if (intensity.getIgnoreBorder() > Objects.requireNonNull(extractorMax).getIgnoreBorder())
 				extractorMax.setIgnoreBorder(intensity.getIgnoreBorder());
 		}
 	}
@@ -125,11 +127,13 @@ public class GeneralFeatureDetector<I extends ImageGray<I>, D extends ImageGray<
 	 * @param image Original image.
 	 * @param derivX image derivative in along the x-axis. Only needed if {@link #getRequiresGradient()} is true.
 	 * @param derivY image derivative in along the y-axis. Only needed if {@link #getRequiresGradient()} is true.
-	 * @param derivXX Second derivative. Only needed if {@link #getRequiresHessian()} ()} is true.
-	 * @param derivXY Second derivative. Only needed if {@link #getRequiresHessian()} ()} is true.
-	 * @param derivYY Second derivative. Only needed if {@link #getRequiresHessian()} ()} is true.
+	 * @param derivXX Second derivative. Only needed if {@link #getRequiresHessian()} is true.
+	 * @param derivXY Second derivative. Only needed if {@link #getRequiresHessian()} is true.
+	 * @param derivYY Second derivative. Only needed if {@link #getRequiresHessian()} is true.
 	 */
-	public void process( I image, D derivX, D derivY, D derivXX, D derivYY, D derivXY ) {
+	public void process( I image,
+						 @Nullable D derivX, @Nullable D derivY,
+						 @Nullable D derivXX, @Nullable D derivYY, @Nullable D derivXY ) {
 		minimums.reset();
 		maximums.reset();
 

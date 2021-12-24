@@ -36,6 +36,7 @@ import java.util.Arrays;
  *
  * @author Peter Abeles
  */
+@SuppressWarnings({"NullAway.Init"})
 public class DenseOpticalFlowKlt<I extends ImageGray<I>, D extends ImageGray<D>> {
 
 	// Amount it adjusts the score for the center of a region.

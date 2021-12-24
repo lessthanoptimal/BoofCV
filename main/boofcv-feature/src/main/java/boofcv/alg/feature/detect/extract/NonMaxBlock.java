@@ -134,11 +134,11 @@ public class NonMaxBlock {
 		 *
 		 * @param configuration Describes how it should search
 		 * @param image The image that is being searched
-		 * @param localMin Storage for local minimums
-		 * @param localMax Storage for local maximums
+		 * @param localMin Storage for local minimums. Can be null if not used.
+		 * @param localMax Storage for local maximums. Can be null if not used.
 		 */
 		void initialize( Configuration configuration,
-						 GrayF32 image, QueueCorner localMin, QueueCorner localMax );
+						 GrayF32 image, @Nullable QueueCorner localMin, @Nullable QueueCorner localMax );
 
 		/**
 		 * Search the image for local max/min inside the specified region

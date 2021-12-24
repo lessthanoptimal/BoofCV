@@ -25,6 +25,7 @@ import boofcv.struct.image.GrayF32;
  *
  * @author Peter Abeles
  */
+@SuppressWarnings({"NullAway.Init"})
 public abstract class ImplFastHelper_F32 implements FastCornerInterface<GrayF32> {
 	// how similar do the pixel in the circle need to be to the center pixel
 	protected float tol;

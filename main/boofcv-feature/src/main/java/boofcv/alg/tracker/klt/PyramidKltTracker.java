@@ -34,6 +34,7 @@ import boofcv.struct.pyramid.ImagePyramid;
  *
  * @author Peter Abeles
  */
+@SuppressWarnings({"NullAway.Init"})
 public class PyramidKltTracker<InputImage extends ImageGray<InputImage>, DerivativeImage extends ImageGray<DerivativeImage>> {
 
 	// basic KLT tracker which works on a single image
@@ -127,7 +128,7 @@ public class PyramidKltTracker<InputImage extends ImageGray<InputImage>, Derivat
 			y /= scale;
 
 			// tracking never needs the derivative
-			tracker.unsafe_setImage(image.getLayer(layer), null, null);
+			tracker.setImage(image.getLayer(layer), null, null);
 
 			KltFeature f = feature.desc[layer];
 			f.setPosition(x, y);
@@ -164,8 +165,8 @@ public class PyramidKltTracker<InputImage extends ImageGray<InputImage>, Derivat
 
 	private void setupKltTracker( int layer ) {
 		if (derivX != null)
-			tracker.unsafe_setImage(image.getLayer(layer), derivX[layer], derivY[layer]);
+			tracker.setImage(image.getLayer(layer), derivX[layer], derivY[layer]);
 		else
-			tracker.unsafe_setImage(image.getLayer(layer), null, null);
+			tracker.setImage(image.getLayer(layer), null, null);
 	}
 }

@@ -23,6 +23,9 @@ import boofcv.alg.interpolate.InterpolateRectangle;
 import boofcv.alg.misc.ImageMiscOps;
 import boofcv.struct.image.GrayF32;
 import boofcv.struct.image.ImageGray;
+import org.jetbrains.annotations.Nullable;
+
+import java.util.Objects;
 
 /**
  * <p>
@@ -57,7 +60,7 @@ public class KltTracker<I extends ImageGray<I>, D extends ImageGray<D>> {
 	// input image
 	protected I image;
 	// image gradient
-	protected D derivX, derivY;
+	protected @Nullable D derivX, derivY;
 
 	// Used to interpolate the image and gradient
 	protected InterpolateRectangle<I> interpInput;
@@ -119,20 +122,10 @@ public class KltTracker<I extends ImageGray<I>, D extends ImageGray<D>> {
 	 * @param derivX Image derivative along the x-axis
 	 * @param derivY Image derivative along the y-axis
 	 */
-	public void setImage( I image, D derivX, D derivY ) {
-		InputSanityCheck.checkSameShape(image, derivX, derivY);
+	public void setImage( I image, @Nullable D derivX, @Nullable D derivY ) {
+		if (derivX != null && derivY != null)
+			InputSanityCheck.checkSameShape(image, derivX, derivY);
 
-		this.image = image;
-		this.interpInput.setImage(image);
-
-		this.derivX = derivX;
-		this.derivY = derivY;
-	}
-
-	/**
-	 * Same as {@link #setImage}, but it doesn't check to see if the images are the same size each time
-	 */
-	public void unsafe_setImage( I image, D derivX, D derivY ) {
 		this.image = image;
 		this.interpInput.setImage(image);
 
@@ -151,17 +144,20 @@ public class KltTracker<I extends ImageGray<I>, D extends ImageGray<D>> {
 	public boolean setDescription( KltFeature feature ) {
 		setAllowedBounds(feature);
 
+		final D derivX = Objects.requireNonNull(this.derivX, "Derivative must be specified for descriptions");
+		final D derivY = Objects.requireNonNull(this.derivY, "Derivative must be specified for descriptions");
+
 		if (!isFullyInside(feature.x, feature.y)) {
 			if (isFullyOutside(feature.x, feature.y))
 				return false;
 			else
-				return internalSetDescriptionBorder(feature);
+				return internalSetDescriptionBorder(feature, derivX, derivY);
 		}
 
-		return internalSetDescription(feature);
+		return internalSetDescription(feature, derivX, derivY);
 	}
 
-	protected boolean internalSetDescription( KltFeature feature ) {
+	protected boolean internalSetDescription( KltFeature feature, D derivX, D derivY ) {
 		int regionWidth = feature.radius*2 + 1;
 		int size = regionWidth*regionWidth;
 
@@ -199,7 +195,7 @@ public class KltTracker<I extends ImageGray<I>, D extends ImageGray<D>> {
 	 * is save the pixel value, but derivative information is also computed
 	 * so that it can reject bad features immediately.
 	 */
-	protected boolean internalSetDescriptionBorder( KltFeature feature ) {
+	protected boolean internalSetDescriptionBorder( KltFeature feature, D derivX, D derivY ) {
 
 		computeSubImageBounds(feature, feature.x, feature.y);
 
