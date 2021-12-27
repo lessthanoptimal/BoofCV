@@ -206,6 +206,7 @@ public class BinaryEllipseDetector<T extends ImageGray<T>> {
 		return storage;
 	}
 
+	@SuppressWarnings({"NullAway.Init"})
 	public static class EllipseInfo {
 		public EllipseRotated_F64 ellipse = new EllipseRotated_F64();
 		public List<Point2D_I32> contour;

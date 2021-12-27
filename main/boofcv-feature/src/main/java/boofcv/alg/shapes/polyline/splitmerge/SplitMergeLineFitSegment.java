@@ -24,6 +24,7 @@ import georegression.struct.point.Point2D_I32;
 import org.ddogleg.struct.DogArray_I32;
 
 import java.util.List;
+import java.util.Objects;
 
 /**
  * Implementation of {@link SplitMergeLineFit} for lists in which the end points are not connected.
@@ -116,7 +117,7 @@ public class SplitMergeLineFitSegment extends SplitMergeLineFit {
 	 * (set up prior to calling). Returns the index if the distance is less than tolerance, otherwise -1
 	 */
 	protected int selectSplitBetween( int indexStart, int indexEnd ) {
-
+		Objects.requireNonNull(contour);
 		Point2D_I32 a = contour.get(indexStart);
 		Point2D_I32 c = contour.get(indexEnd);
 

@@ -20,6 +20,7 @@ package boofcv.alg.tracker.klt;
 
 import boofcv.struct.image.ImageGray;
 import boofcv.struct.pyramid.ImagePyramid;
+import org.jetbrains.annotations.Nullable;
 
 /**
  * <p>
@@ -42,8 +43,8 @@ public class PyramidKltTracker<InputImage extends ImageGray<InputImage>, Derivat
 	// image pyramid for raw input image
 	protected ImagePyramid<InputImage> image;
 	// image pyramid for image gradient
-	protected DerivativeImage[] derivX;
-	protected DerivativeImage[] derivY;
+	protected @Nullable DerivativeImage[] derivX;
+	protected @Nullable DerivativeImage[] derivY;
 
 	public PyramidKltTracker( KltTracker<InputImage, DerivativeImage> tracker ) {
 		this.tracker = tracker;
@@ -164,7 +165,7 @@ public class PyramidKltTracker<InputImage extends ImageGray<InputImage>, Derivat
 	}
 
 	private void setupKltTracker( int layer ) {
-		if (derivX != null)
+		if (derivX != null && derivY != null)
 			tracker.setImage(image.getLayer(layer), derivX[layer], derivY[layer]);
 		else
 			tracker.setImage(image.getLayer(layer), null, null);

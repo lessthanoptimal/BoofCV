@@ -23,6 +23,7 @@ package boofcv.alg.shapes;
  *
  * @author Peter Abeles
  */
+@SuppressWarnings({"NullAway.Init"})
 public class FitData<Shape> {
 	/**
 	 * Description of the shape

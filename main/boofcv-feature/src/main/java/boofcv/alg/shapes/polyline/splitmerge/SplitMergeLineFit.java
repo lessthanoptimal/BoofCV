@@ -24,6 +24,7 @@ import georegression.struct.point.Point2D_F64;
 import georegression.struct.point.Point2D_I32;
 import org.ddogleg.struct.DogArray_B;
 import org.ddogleg.struct.DogArray_I32;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
 
@@ -46,6 +47,7 @@ import java.util.List;
  *
  * @author Peter Abeles
  */
+@SuppressWarnings({"NullAway.Init"})
 public abstract class SplitMergeLineFit {
 
 	// maximum number of split and merge iterations
@@ -60,7 +62,7 @@ public abstract class SplitMergeLineFit {
 	protected int minimumSideLengthPixel;
 
 	// Reference to the input contour list
-	protected List<Point2D_I32> contour;
+	protected @Nullable List<Point2D_I32> contour;
 
 	// used to compute distance from line
 	protected LineParametric2D_F64 line = new LineParametric2D_F64();

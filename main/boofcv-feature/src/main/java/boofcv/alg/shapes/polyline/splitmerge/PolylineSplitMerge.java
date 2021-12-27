@@ -30,8 +30,10 @@ import org.ddogleg.struct.DogArray_F64;
 import org.ddogleg.struct.DogArray_I32;
 import org.ddogleg.struct.DogLinkedList;
 import org.ddogleg.struct.DogLinkedList.Element;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
+import java.util.Objects;
 
 /**
  * <p>
@@ -114,7 +116,7 @@ public class PolylineSplitMerge {
 
 	// List of all the found polylines and their score
 	private final DogArray<CandidatePolyline> polylines = new DogArray<>(CandidatePolyline::new);
-	private CandidatePolyline bestPolyline;
+	private @Nullable CandidatePolyline bestPolyline;
 
 	// if true that means a fatal error and no polygon can be fit
 	private boolean fatalError;
@@ -169,7 +171,7 @@ public class PolylineSplitMerge {
 		}
 
 		// There was no good match within the min/max size requirement
-		if (bestSize < minSides) {
+		if (bestSize < minSides || bestPolyline == null) {
 			return false;
 		}
 
@@ -472,7 +474,7 @@ public class PolylineSplitMerge {
 	 *
 	 * @return the selected side or null if the score will not be improved if any of the sides are split
 	 */
-	Element<Corner> selectCornerToSplit( boolean loops ) {
+	@Nullable Element<Corner> selectCornerToSplit( boolean loops ) {
 		Element<Corner> selected = null;
 		double bestChange = convex ? 0 : -Double.MAX_VALUE;
 
@@ -508,7 +510,7 @@ public class PolylineSplitMerge {
 	 *
 	 * @return The corner to remove. Should only return null if there are 3 sides or less
 	 */
-	Element<Corner> selectCornerToRemove( List<Point2D_I32> contour, ErrorValue sideError, boolean loops ) {
+	@Nullable Element<Corner> selectCornerToRemove( List<Point2D_I32> contour, ErrorValue sideError, boolean loops ) {
 		if (list.size() <= 3)
 			return null;
 
@@ -543,7 +545,7 @@ public class PolylineSplitMerge {
 			target = target.next;
 		}
 
-		return best;
+		return Objects.requireNonNull(best);
 	}
 
 	/**
@@ -833,7 +835,7 @@ public class PolylineSplitMerge {
 	/**
 	 * Returns the polyline with the best score or null if it failed to fit a polyline
 	 */
-	public CandidatePolyline getBestPolyline() {
+	public @Nullable CandidatePolyline getBestPolyline() {
 		return bestPolyline;
 	}
 

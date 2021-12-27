@@ -54,7 +54,7 @@ import java.util.Objects;
  *
  * @author Peter Abeles
  */
-@SuppressWarnings({"SuspiciousNameCombination"})
+@SuppressWarnings({"SuspiciousNameCombination", "NullAway.Init"})
 public class KltTracker<I extends ImageGray<I>, D extends ImageGray<D>> {
 
 	// input image

@@ -34,6 +34,7 @@ import georegression.struct.trig.Circle2D_F64;
 import org.ddogleg.struct.DogArray;
 import org.ddogleg.struct.DogArray_F64;
 import org.ddogleg.struct.DogArray_I32;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -173,7 +174,7 @@ public class ShapeFittingOps {
 		return convert_I32_F64(points, null).toList();
 	}
 
-	public static DogArray<Point2D_F64> convert_I32_F64( List<Point2D_I32> input, DogArray<Point2D_F64> output ) {
+	public static DogArray<Point2D_F64> convert_I32_F64( List<Point2D_I32> input, @Nullable DogArray<Point2D_F64> output ) {
 		if (output == null)
 			output = new DogArray<>(input.size(), Point2D_F64::new);
 		else
@@ -190,7 +191,7 @@ public class ShapeFittingOps {
 		return convert_I32_F32(points, null).toList();
 	}
 
-	public static DogArray<Point2D_F32> convert_I32_F32( List<Point2D_I32> input, DogArray<Point2D_F32> output ) {
+	public static DogArray<Point2D_F32> convert_I32_F32( List<Point2D_I32> input, @Nullable DogArray<Point2D_F32> output ) {
 		if (output == null)
 			output = new DogArray<>(input.size(), Point2D_F32::new);
 		else
@@ -272,8 +273,9 @@ public class ShapeFittingOps {
 	 * @param outputStorage (Output/Optional) Storage for results. If null then a new circle instance will be returned.
 	 * @return The found circle fit.
 	 */
-	public static FitData<Circle2D_F64> averageCircle_F64( List<Point2D_F64> points, DogArray_F64 optional,
-														   FitData<Circle2D_F64> outputStorage ) {
+	public static FitData<Circle2D_F64> averageCircle_F64( List<Point2D_F64> points,
+														   @Nullable DogArray_F64 optional,
+														   @Nullable FitData<Circle2D_F64> outputStorage ) {
 		if (outputStorage == null) {
 			outputStorage = new FitData<>(new Circle2D_F64());
 		}
